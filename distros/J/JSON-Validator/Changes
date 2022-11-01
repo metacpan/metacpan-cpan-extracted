@@ -1,5 +1,12 @@
 Revision history for perl distribution JSON-Validator
 
+5.12 2022-10-26T20:14:57
+ - Allow unicode strings in the JSON schema #268
+   Contributor: Brad Barden
+ - Specified Perl version
+ - Updated basic repository files
+ - Updated contributors list
+
 5.11 2022-08-30T15:41:16+0900
  - Fix sorting routes with placeholders on different positions
 

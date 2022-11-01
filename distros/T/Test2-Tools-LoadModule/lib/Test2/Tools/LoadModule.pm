@@ -14,12 +14,13 @@ use Exporter 5.567;	# Comes with Perl 5.8.1.
 # use File::Find ();
 # use File::Spec ();
 # use Getopt::Long 2.34;	# Comes with Perl 5.8.1.
-use Test2::API ();
-use Test2::Util ();
+use Test2::API 1.302096 ();
+use Test2::API::Context 1.302096 ();	# for pass_and_release().
+use Test2::Util 1.302096 ();
 
 use base qw{ Exporter };
 
-our $VERSION = '0.007';
+our $VERSION = '0.008';
 $VERSION =~ s/ _ //smxg;
 
 {
@@ -785,7 +786,7 @@ Thomas R. Wyant, III F<wyant at cpan dot org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2019-2021 by Thomas R. Wyant, III
+Copyright (C) 2019-2022 by Thomas R. Wyant, III
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl 5.10.0. For more details, see the full text

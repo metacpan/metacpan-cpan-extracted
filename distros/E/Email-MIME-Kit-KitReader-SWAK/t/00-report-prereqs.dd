@@ -1,0 +1,43 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '6.78'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Encode' => '0',
+                                      'Test::More' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Email::MIME::Kit' => '2.002',
+                                      'Email::MIME::Kit::Role::KitReader' => '0',
+                                      'Moose' => '0',
+                                      'Path::Resolver' => '3.092200',
+                                      'Path::Resolver::Resolver::AnyDist' => '0',
+                                      'Path::Resolver::Resolver::FileSystem' => '0',
+                                      'Path::Resolver::Resolver::Mux::Prefix' => '0',
+                                      'perl' => '5.012'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'Email::MIME::Kit' => '2.002',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Test::More' => '0.96',
+                                   'strict' => '0',
+                                   'warnings' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

@@ -4,9 +4,9 @@
 #  (C) Paul Evans, 2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.57 ':experimental(init_expr)';
+use Object::Pad 0.70 ':experimental(init_expr adjust_params)';
 
-package Device::Serial::SLuRM 0.02;
+package Device::Serial::SLuRM 0.03;
 class Device::Serial::SLuRM;
 
 use Carp;
@@ -108,20 +108,21 @@ under the namespace prefix of C<slurm>. The following metrics are provided:
 An unlabelled counter tracking the number of times a received packet is
 discarded due to failing CRC check.
 
-=item packets_received
+=item packets
 
-A counter, labelled by packet type, tracking the number of packets received of
-each type.
-
-=item packets_sent
-
-A counter, labelled by packet type, tracking the number of packets sent of
-each type.
+A counter, labelled by direction and packet type, tracking the number of
+packets sent and received of each type.
 
 =item retransmits
 
 An unlabelled counter tracking the number of times a (REQUEST) packet had to
 be retransmitted after the initial one timed out.
+
+=item serial_bytes
+
+A counter, labelled by direction, tracking the number of bytes sent and
+received directly over the serial port. The rate of this can be used to
+calculate overall serial link utilisation.
 
 =item timeouts
 
@@ -147,22 +148,23 @@ if( defined $METRICS ) {
       description => "Number of received packets discarded due to CRC check",
    );
 
-   $METRICS->make_counter( packets_received =>
-      description => "Number of SLµRM packets received, by type",
-      labels => [qw( type )],
+   $METRICS->make_counter( packets =>
+      description => "Number of SLµRM packets sent and received, by type",
+      labels => [qw( dir type )],
    );
 
-   $METRICS->make_counter( packets_sent =>
-      description => "Number of SLµRM packets sent, by type",
-      labels => [qw( type )],
-   );
-
-   $METRICS->make_distribution( request_retries =>
-      description => "How many requests eventually succeeded after a given number of retries",
-      buckets => [ 0 .. 2 ],
+   $METRICS->make_distribution( request_success_attempts =>
+      description => "How many requests eventually succeeded after a given number of transmissions",
+      units => "",
+      buckets => [ 1 .. 3 ],
    );
    $METRICS->make_counter( retransmits =>
       description => "Number of retransmits of packets",
+   );
+
+   $METRICS->make_counter( serial_bytes =>
+      description => "Total number of bytes sent and received on the serial link",
+      labels => [qw( dir )],
    );
 
    $METRICS->make_counter( timeouts =>
@@ -174,8 +176,10 @@ if( defined $METRICS ) {
 
    # Keep prometheus increase() happy by initialising all the counters to zero
    $METRICS->inc_counter_by( discards => 0 );
-   $METRICS->inc_counter_by( packets_received => 0, { type => $_ } ) for values %PKTTYPE_NAME;
-   $METRICS->inc_counter_by( packets_sent     => 0, { type => $_ } ) for values %PKTTYPE_NAME;
+   foreach my $dir (qw( rx tx )) {
+      $METRICS->inc_counter_by( packets => 0, [ dir => $dir, type => $_ ] ) for values %PKTTYPE_NAME;
+      $METRICS->inc_counter_by( serial_bytes => 0, [ dir => $dir ] );
+   }
    $METRICS->inc_counter_by( retransmits => 0 );
    $METRICS->inc_counter_by( timeouts => 0 );
 }
@@ -232,16 +236,17 @@ C<request> method will make up to 3 attempts).
 
 field $_fh :param { undef };
 
-ADJUST ( $params )
-{
+ADJUST :params (
+   :$dev  = undef,
+   :$baud = undef,
+) {
    if( defined $_fh ) {
       # fine
    }
-   elsif( exists $params->{dev} ) {
-      my $dev  = delete $params->{dev};
-      my $baud = delete $params->{baud} // 115200; # TODO default baud?
-
+   elsif( defined $dev ) {
       require IO::Termios;
+
+      $baud //= 115200;
 
       $_fh = IO::Termios->open( $dev, "$baud,8,n,1" ) or
          croak "Cannot open device $dev - $!";
@@ -282,7 +287,12 @@ field $_next_resetack_f;
 async method recv_packet
 {
    $_recv_buffer //= Future::Buffer->new(
-      fill => sub { Future::IO->sysread( $_fh, 8192 ) },
+      fill => $METRICS
+         ? sub {
+            Future::IO->sysread( $_fh, 8192 )
+               ->on_done( sub { $METRICS->inc_counter_by( serial_bytes => length $_[0], [ dir => "rx" ] ) } );
+            }
+         : sub { Future::IO->sysread( $_fh, 8192 ) },
    );
 
    PACKET: {
@@ -316,7 +326,7 @@ async method recv_packet
          if DEBUG > 1;
 
       $METRICS and
-         $METRICS->inc_counter( packets_received => { type => $PKTTYPE_NAME{ $pktctrl & 0xF0 } // "UNKNOWN" } );
+         $METRICS->inc_counter( packets => [ dir => "rx", type => $PKTTYPE_NAME{ $pktctrl & 0xF0 } // "UNKNOWN" ] );
 
       return $pktctrl, $payload;
    }
@@ -399,7 +409,7 @@ async method _run
             $slot->{retransmit_f}->cancel;
 
             $METRICS and
-               $METRICS->report_distribution( request_retries => $_retransmit_count - $slot->{retransmit_count} );
+               $METRICS->report_distribution( request_success_attempts => 1 + $_retransmit_count - $slot->{retransmit_count} );
 
             undef $_pending_slots[$seqno];
 
@@ -498,7 +508,9 @@ async method send_packet ( $pktctrl, $payload )
    $bytes .= pack( "C", crc8( $bytes ) );
 
    $METRICS and
-      $METRICS->inc_counter( packets_sent => { type => $PKTTYPE_NAME{ $pktctrl & 0xF0 } // "UNKNOWN" } );
+      $METRICS->inc_counter( packets => [ dir => "tx", type => $PKTTYPE_NAME{ $pktctrl & 0xF0 } // "UNKNOWN" ] );
+   $METRICS and
+      $METRICS->inc_counter_by( serial_bytes => 1 + length $bytes, [ dir => "tx" ] );
 
    return await Future::IO->syswrite_exactly( $_fh, "\x55" . $bytes );
 }

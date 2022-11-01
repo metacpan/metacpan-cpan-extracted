@@ -7,8 +7,8 @@ Unbound.xs - Perl interface to libunbound
 
 Perl XS extension providing access to the NLnetLabs libunbound library.
 
-This is a minimal implementation to support Net::DNS::Resolver::Unbound
-which is NOT suitable for general use.
+This implementation is intended to support Net::DNS::Resolver::Unbound.
+It is NOT, nor will it ever be, suitable for general use.
 
 
 =head1 COPYRIGHT
@@ -55,15 +55,7 @@ extern "C" {
 #endif
 
 
-#define UNBOUND_VERSION	( (UNBOUND_VERSION_MAJOR*1000) + UNBOUND_VERSION_MINOR )
-#define unimplemented	croak( "not implemented  %s line %d", __FILE__, __LINE__ )
-
-#if (UNBOUND_VERSION < 1009)
-int ub_ctx_set_stub(struct ub_ctx* ctx, const char* zone, const char* addr, int isprime) { unimplemented; }
-int ub_ctx_add_ta_autr(struct ub_ctx* ctx, const char* fname) { unimplemented; }
-int ub_ctx_set_tls(struct ub_ctx* ctx, int tls) { unimplemented; }
-#endif
-
+#define UNBOUND_VERSION (UNBOUND_VERSION_MAJOR*100 + UNBOUND_VERSION_MINOR)*100 + UNBOUND_VERSION_MICRO
 
 #define checkerr(arg)	checkret( (arg), __LINE__ )
 static void checkret(const int err, int line)
@@ -99,7 +91,7 @@ DESTROY(struct av* handle)
 	sv_2mortal( (SV*) handle );
 
 int
-async_id(struct av* handle)
+query_id(struct av* handle)
     INIT:
 	SV** index = av_fetch(handle, 0, 0);
     CODE:
@@ -215,16 +207,6 @@ set_fwd(struct ub_ctx* ctx, const char* addr)
 	checkerr( ub_ctx_set_fwd(ctx, addr) );
 
 void
-set_tls(struct ub_ctx* ctx, int tls)
-    CODE:
-	checkerr( ub_ctx_set_tls(ctx, tls) );
-
-void
-set_stub(struct ub_ctx* ctx, const char* zone, const char* addr, int isprime)
-    CODE:
-	checkerr( ub_ctx_set_stub(ctx, zone, addr, isprime) );
-
-void
 resolv_conf(struct ub_ctx* ctx, const char* fname)
     CODE:
 	checkerr( ub_ctx_resolvconf(ctx, fname) );
@@ -243,11 +225,6 @@ void
 add_ta_file(struct ub_ctx* ctx, const char* fname)
     CODE:
 	checkerr( ub_ctx_add_ta_file(ctx, fname) );
-
-void
-add_ta_autr(struct ub_ctx* ctx, const char* fname)
-    CODE:
-	checkerr( ub_ctx_add_ta_autr(ctx, fname) );
 
 void
 trusted_keys(struct ub_ctx* ctx, const char* fname)
@@ -280,12 +257,10 @@ ub_resolve(struct ub_ctx* ctx, SV* name, int rrtype, int rrclass)
 
 Net::DNS::Resolver::Unbound::Handle
 ub_resolve_async(struct ub_ctx* ctx, SV* name, int rrtype, int rrclass, int query_id=0)
-    INIT:
-	int async_id = 0;
     CODE:
 	RETVAL = newAV();
 	checkerr( ub_resolve_async(ctx, (const char*) SvPVX(name), rrtype, rrclass,
-					(void*) RETVAL, async_callback, &async_id) );
+					(void*) RETVAL, async_callback, NULL) );
 	av_push(RETVAL, newSViv(query_id) );
     OUTPUT:
 	RETVAL
@@ -300,6 +275,24 @@ ub_wait(struct ub_ctx* ctx)
     CODE:
 	checkerr( ub_wait(ctx) );
 
+
+#if !(UNBOUND_VERSION < 10900)
+void
+set_stub(struct ub_ctx* ctx, const char* zone, const char* addr, int isprime)
+    CODE:
+	checkerr( ub_ctx_set_stub(ctx, zone, addr, isprime) );
+
+void
+add_ta_autr(struct ub_ctx* ctx, const char* fname)
+    CODE:
+	checkerr( ub_ctx_add_ta_autr(ctx, fname) );
+
+void
+set_tls(struct ub_ctx* ctx, int tls)
+    CODE:
+	checkerr( ub_ctx_set_tls(ctx, tls) );
+
+#endif
 
 
 ########################
@@ -327,19 +320,19 @@ VERSION(void)
 	RETVAL
 
 Net::DNS::Resolver::Unbound::Handle
-emulate_callback(int async_id, int err, struct ub_result* result=NULL)
+emulate_callback(int query_id, int err, struct ub_result* result=NULL)
     CODE:
 	RETVAL = newAV();
-	av_push(RETVAL, newSViv(async_id) );
+	av_push(RETVAL, newSViv(query_id) );
 	async_callback( (void*) RETVAL, err, result );
     OUTPUT:
 	RETVAL
 
 Net::DNS::Resolver::Unbound::Handle
-emulate_wait(int async_id)
+emulate_wait(int query_id)
     CODE:
 	RETVAL = newAV();
-	av_push(RETVAL, newSViv(async_id) );
+	av_push(RETVAL, newSViv(query_id) );
     OUTPUT:
 	RETVAL
 

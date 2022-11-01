@@ -17,6 +17,8 @@ my %WriteMakefileArgs = (
     "script/add-clipboard-content",
     "script/clear-clipboard-content",
     "script/clear-clipboard-history",
+    "script/clipadd",
+    "script/clipget",
     "script/detect-clipboard-manager",
     "script/get-clipboard-content",
     "script/list-clipboard-history"
@@ -24,11 +26,11 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "App::ClipboardUtils",
   "PREREQ_PM" => {
-    "Clipboard::Any" => "0.003",
-    "Data::Sah::Compiler::perl::TH::str" => "0.911",
+    "Clipboard::Any" => "0.004",
+    "Data::Sah::Compiler::perl::TH::str" => "0.914",
     "Log::ger" => "0.038",
-    "Perinci::CmdLine::Any" => "0.152",
-    "Perinci::CmdLine::Lite" => "1.915",
+    "Perinci::CmdLine::Any" => "0.154",
+    "Perinci::CmdLine::Lite" => "1.924",
     "strict" => 0
   },
   "TEST_REQUIRES" => {
@@ -37,7 +39,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.003",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,14 +47,14 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Clipboard::Any" => "0.003",
-  "Data::Sah::Compiler::perl::TH::str" => "0.911",
+  "Clipboard::Any" => "0.004",
+  "Data::Sah::Compiler::perl::TH::str" => "0.914",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Log::ger" => "0.038",
-  "Perinci::CmdLine::Any" => "0.152",
-  "Perinci::CmdLine::Lite" => "1.915",
+  "Perinci::CmdLine::Any" => "0.154",
+  "Perinci::CmdLine::Lite" => "1.924",
   "Test::More" => 0,
   "strict" => 0
 );

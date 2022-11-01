@@ -40,4 +40,16 @@ use Object::Pad;
    no_growth { WithContainerFields->new };
 }
 
+{
+   use Object::Pad ':experimental(adjust_params)';
+
+   class WithAdjustParams {
+      field $_x;
+      ADJUST :params ( :$x ) { $_x = $x; }
+   }
+
+   no_growth { WithAdjustParams->new( x => "the X value" ) }
+      'named constructor param does not leak';
+}
+
 done_testing;

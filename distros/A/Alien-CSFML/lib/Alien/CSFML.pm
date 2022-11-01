@@ -1,5 +1,5 @@
 package Alien::CSFML;
-{ $Alien::CSFML::VERSION = 'v0.0.5'; }
+{ $Alien::CSFML::VERSION = 'v0.0.7'; }
 use strict;
 use warnings;
 use File::ShareDir        qw[dist_dir];

@@ -6,7 +6,7 @@ use File::Basename qw(dirname basename);
 use File::Copy;
 use Archive::SevenZip 'AZ_OK';
 
-our $VERSION= '0.13';
+our $VERSION= '0.15';
 
 sub new {
     my( $class, %options )= @_;
@@ -35,14 +35,25 @@ to also read other archive files supported by 7z.
 
 =cut
 
+# Helper to decode the hashref/named API
+sub _params {
+    my( $args, @names ) = @_;
+    if( ref $args->[1] eq 'HASH' ) {
+        return( $args->[0], @{ $args }{ @names } )
+    } else {
+        return @$args
+    }
+}
+
 sub writeToFileNamed {
-    my( $self, $targetName )= @_;
+    my( $self, $targetName ) = _params(\@_, qw(fileName));
     copy( $self->sevenZip->{archivename}, $targetName );
     return AZ_OK;
 }
 
 sub addFileOrDirectory {
-    my($self, $name, $newName, $compressionLevel) = @_;
+    my($self, $name, $newName, $compressionLevel)
+        = _params(\@_, qw(name zipName compressionLevel));
     $newName = $name
         unless defined $newName;
     $self->sevenZip->add(
@@ -52,20 +63,18 @@ sub addFileOrDirectory {
 }
 
 sub addString {
-    my( $self, $content, $name, %options ) = @_;
+    my( $self, $content, $name, %options )
+        = _params(\@_, qw( string zipName compressionLevel ));
     $self->sevenZip->add_scalar($name => $content);
     $self->memberNamed($name, %options);
 }
 
 sub addDirectory {
     # Create just a directory name
-    my( $self, $name, $target, %options ) = @_;
+    my( $self, $name, $target, %options )
+        = _params(\@_, qw( directoryName zipName ));
     $target ||= $name;
-    
-    if( ref $name ) {
-        croak "Hashref API not supported, sorry";
-    };
-    
+
     $self->sevenZip->add_directory($name, $target, %options);
     $self->memberNamed($target, %options);
 }
@@ -106,28 +115,37 @@ sub numberOfMembers {
 
 # Archive::Zip API
 sub memberNamed {
-    my( $self, $name, %options )= @_;
-    $self->sevenZip->memberNamed($name, %options );
+    #my( $self, $name, %options )
+    my( $self, $name )
+        = _params( \@_, qw( zipName ));
+    #$self->sevenZip->memberNamed($name, %options );
+    $self->sevenZip->memberNamed($name);
 }
 
 sub extractMember {
-    my( $self, $name, $target, %options ) = @_;
+    #my( $self, $name, $target, %options ) = @_;
+    my( $self, $name, $target )
+        = _params(\@_, qw( memberOrZipName name ));
     if( ref $name and $name->can('fileName')) {
         $name = $name->fileName;
     };
-    $self->sevenZip->extractMember( $name, $target, %options );
+    #$self->sevenZip->extractMember( $name, $target, %options );
+    $self->sevenZip->extractMember( $name, $target );
 }
 
 sub removeMember {
-    my( $self, $name, $target, %options ) = @_;
+    #my( $self, $name, $target, %options ) = @_;
+    my( $self, $name )
+        = _params( \@_, qw(memberOrZipName ));
     # Just for the result:
     my $res = ref $name ? $name : $self->memberNamed( $name );
-    
+
     if( ref $name and $name->can('fileName')) {
         $name = $name->fileName;
     };
-    $self->sevenZip->removeMember( $name, %options );
-    
+    #$self->sevenZip->removeMember( $name, %options );
+    $self->sevenZip->removeMember( $name );
+
     $res
 }
 
@@ -148,36 +166,38 @@ sub replaceMember {
     my( $self, $name, $replacement, %_options ) = @_;
 
     my %options = (%$self, %_options);
-    
+
     if( $^O =~ /MSWin/ ) {
         $name =~ s!/!\\!g;
     }
-    
+
     my $res = $self->removeMember( $name );
     $self->add( $replacement );
-    
+
     $res
 };
 
 
 sub addFile {
-    my( $self, $name, $target, %options ) = @_;
+    my( $self, $name, $target, $compressionLevel )
+        = _params(\@_, qw(filename zipName compressionLevel ));
     if( ref $name and $name->can('fileName')) {
         $name = $name->fileName;
     };
     $target ||= $name;
-    $self->sevenZip->add( items => [[ $name, $target ]], %options );
-    return $self->memberNamed($target, %options);
+    $self->sevenZip->add( items => [[ $name, $target ]]);
+    return $self->memberNamed($target);
 }
 
 sub addMember {
-    my( $self, $name, $target, %options ) = @_;
-    if( ref $name and $name->can('fileName')) {
-        $name = $name->fileName;
-    };
-    $target ||= $name;
-    $self->sevenZip->add( items => [[ $name, $target ]], %options );
-    return $self->memberNamed($target, %options);
+    #my( $self, $name, $target, %options ) = @_;
+    my( $self, $member ) = _param( \@_, qw(member));
+    my $target = $member->fileName;
+    my $fh = $member->open( binmode => ':raw' );
+    local $/;
+    my $content = <$fh>;
+    $self->sevenZip->add_scalar( $target => $content );
+    return $self->memberNamed($target );
 }
 { no warnings 'once';
 *add = \&addMember;
@@ -185,14 +205,14 @@ sub addMember {
 
 sub addTree {
     my( $self, $sourceDir, $target, $predicate, %options ) = @_;
-    
+
     croak "Predicates are not supported, sorry"
         if $predicate;
-        
+
     $target ||= $sourceDir;
     croak "Different target for ->addTree not supported, sorry"
         if $target ne $sourceDir;
-        
+
     $self->sevenZip->add( items => [[ $sourceDir, $target ]], recursive => 1, %options );
     return $self->memberNamed($target, %options);
 }
@@ -214,7 +234,7 @@ such guarantee.
 
 =head1 REPOSITORY
 
-The public repository of this module is 
+The public repository of this module is
 L<https://github.com/Corion/archive-sevenzip>.
 
 =head1 SUPPORT

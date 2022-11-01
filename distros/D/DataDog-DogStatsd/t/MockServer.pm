@@ -29,8 +29,8 @@ sub run {
         last unless @ready;
 
         $socket->recv($_data, 1024);
-        $_data =~ s/^\s+//;
-        $_data =~ s/\s+$//;
+        $_data         =~ s/^\s+//;
+        $_data         =~ s/\s+$//;
         last if $_data =~ /^quit/i;
 
         push @messages, $_data;

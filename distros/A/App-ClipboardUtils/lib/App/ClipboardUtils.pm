@@ -3,9 +3,9 @@ package App::ClipboardUtils;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-09'; # DATE
+our $DATE = '2022-10-25'; # DATE
 our $DIST = 'App-ClipboardUtils'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 1;
 # ABSTRACT: CLI utilities related to clipboard
@@ -22,7 +22,7 @@ App::ClipboardUtils - CLI utilities related to clipboard
 
 =head1 VERSION
 
-This document describes version 0.003 of App::ClipboardUtils (from Perl distribution App-ClipboardUtils), released on 2022-10-09.
+This document describes version 0.005 of App::ClipboardUtils (from Perl distribution App-ClipboardUtils), released on 2022-10-25.
 
 =head1 DESCRIPTION
 
@@ -35,6 +35,10 @@ This distribution contains the following CLI utilities related to clipboard:
 =item * L<clear-clipboard-content>
 
 =item * L<clear-clipboard-history>
+
+=item * L<clipadd>
+
+=item * L<clipget>
 
 =item * L<detect-clipboard-manager>
 

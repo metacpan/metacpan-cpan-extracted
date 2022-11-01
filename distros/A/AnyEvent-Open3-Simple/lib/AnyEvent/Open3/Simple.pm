@@ -14,9 +14,9 @@ use constant _is_native_win32 => $^O eq 'MSWin32';
 use constant _detect => _is_native_win32() ? 'idle' : 'child';
 
 # ABSTRACT: Interface to open3 under AnyEvent
-our $VERSION = '0.87'; # VERSION
+our $VERSION = '0.88'; # VERSION
 
- 
+
 sub new
 {
   my $default_handler = sub { };
@@ -26,11 +26,11 @@ sub new
   croak "stdin passed into AnyEvent::Open3::Simple->new no longer supported" if $args->{stdin};
   croak "raw passed into AnyEvent::Open::Simple->new no longer supported" if $args->{raw};
   $self{$_} = $args->{$_} || $default_handler for qw( on_stdout on_stderr on_start on_exit on_signal on_fail on_error on_success );
-  $self{impl} = $args->{implementation} 
+  $self{impl} = $args->{implementation}
              || $ENV{ANYEVENT_OPEN3_SIMPLE}
              || _detect();
   croak "unknown implementation $self{impl}" unless $self{impl} =~ /^(idle|child|mojo)$/;
-  $self{impl} = _detect() 
+  $self{impl} = _detect()
     if $self{impl} eq 'mojo' && do { require Mojo::Reactor; Mojo::Reactor->detect eq 'Mojo::Reactor::EV' };
   bless \%self, $class;
 }
@@ -47,7 +47,7 @@ sub run
   $stdin = pop if ref $_[-1];
 
   my($self, $program, @arguments) = @_;
-  
+
   my($child_stdin, $child_stdout, $child_stderr);
   $child_stderr = gensym;
 
@@ -62,7 +62,7 @@ sub run
       : $$stdin
     );
     $file->seek(0,0);
-    open TEMP, '<&=', $file;
+    open TEMP, '<&=', $file;  ## no critic
     $child_stdin = '<&TEMP';
   }
 
@@ -78,15 +78,15 @@ sub run
     require Mojo::IOLoop;
     require AnyEvent::Open3::Simple::Mojo;
   }
-  
+
   my $pid = eval { open3 $child_stdin, $child_stdout, $child_stderr, $program, @arguments };
-  
+
   if(my $error = $@)
   {
     $self->{on_error}->($error, $program, @arguments);
     return;
   }
-  
+
   my $proc = AnyEvent::Open3::Simple::Process->new($pid, $child_stdin);
   $proc_user->($proc);
 
@@ -94,7 +94,7 @@ sub run
 
   my $watcher_stdout;
   my $watcher_stderr;
-  
+
   my $stdout_callback = sub {
     my $input = <$child_stdout>;
     return unless defined $input;
@@ -118,7 +118,7 @@ sub run
       poll => 'r',
       cb   => $stdout_callback,
     ) unless _is_native_win32();
-  
+
     $watcher_stderr = AnyEvent->io(
       fh   => $child_stderr,
       poll => 'r',
@@ -132,9 +132,9 @@ sub run
     #my($pid, $status) = @_;
     my $status = $_[1];
     my($exit_value, $signal) = ($status >> 8, $status & 127);
-      
+
     $proc->close;
-      
+
     # make sure we consume any stdout and stderr which hasn't
     # been consumed yet.  This seems to make on_out.t work on
     # cygwin
@@ -154,7 +154,7 @@ sub run
         my $ref = $self->{on_stdout};
         ref($ref) eq 'ARRAY' ? push @$ref, $input : $ref->($proc, $input);
       }
-      
+
       while(!eof $child_stderr)
       {
         my $input = <$child_stderr>;
@@ -164,7 +164,7 @@ sub run
         ref($ref) eq 'ARRAY' ? push @$ref, $input : $ref->($proc, $input);
       }
     }
-      
+
     $self->{on_exit}->($proc, $exit_value, $signal);
     $self->{on_signal}->($proc, $signal) if $signal > 0;
     $self->{on_fail}->($proc, $exit_value) if $exit_value > 0;
@@ -178,7 +178,7 @@ sub run
   if($self->{impl} eq 'mojo')
   {
     my($selout, $selerr);
-    
+
     if(_is_native_win32())
     {
       require IO::Select;
@@ -204,12 +204,12 @@ sub run
         }
       });
     });
-   
+
   }
   elsif($self->{impl} eq 'idle')
   {
     my($selout, $selerr);
-    
+
     if(_is_native_win32())
     {
       require IO::Select;
@@ -233,7 +233,7 @@ sub run
       cb  => $end_cb,
     );
   }
-  
+
   $self;
 }
 
@@ -251,7 +251,7 @@ AnyEvent::Open3::Simple - Interface to open3 under AnyEvent
 
 =head1 VERSION
 
-version 0.87
+version 0.88
 
 =head1 SYNOPSIS
 
@@ -268,7 +268,7 @@ version 0.87
      my @args = @_;          # list of arguments
      say 'child PID: ', $proc->pid;
    },
-   on_stdout => sub { 
+   on_stdout => sub {
      my $proc = shift;       # isa AnyEvent::Open3::Simple::Process
      my $line = shift;       # string
      say 'out: ', $string;
@@ -302,13 +302,13 @@ version 0.87
 
 This module provides an interface to open3 while running under AnyEvent
 that delivers data from stdout and stderr as lines are written by the
-subprocess.  The interface is reminiscent of L<IPC::Open3::Simple>, 
+subprocess.  The interface is reminiscent of L<IPC::Open3::Simple>,
 although this module does provides a somewhat different API, so it
 cannot be used a drop in replacement for that module.
 
 There are already a number of interfaces for interacting with subprocesses
 in the context of L<AnyEvent>, but this one is the most convenient for my
-usage.  Note the modules listed in the SEE ALSO section below for other 
+usage.  Note the modules listed in the SEE ALSO section below for other
 interfaces that may be more or less appropriate.
 
 =head1 CONSTRUCTOR
@@ -339,14 +339,14 @@ L<AnyEvent::Open3::Simple> with L<Mojolicious> but without L<EV>
 
 =head2 EVENTS
 
-These events will be triggered by the subprocess when the run method is 
-called. Each event callback (except C<on_error>) gets passed in an 
-instance of L<AnyEvent::Open3::Simple::Process> as its first argument 
-which can be used to get the PID of the subprocess, or to write to it.  
-C<on_error> does not get a process object because it indicates an error in 
+These events will be triggered by the subprocess when the run method is
+called. Each event callback (except C<on_error>) gets passed in an
+instance of L<AnyEvent::Open3::Simple::Process> as its first argument
+which can be used to get the PID of the subprocess, or to write to it.
+C<on_error> does not get a process object because it indicates an error in
 the creation of the process.
 
-Not all of these events will fire depending on the execution of the 
+Not all of these events will fire depending on the execution of the
 child process.  In the very least exactly one of C<on_start> or C<on_error>
 will be called.
 
@@ -365,12 +365,12 @@ method.
 
 Called when there is an execution error, for example, if you ask
 to run a program that does not exist.  No process is passed in
-because the process failed to create.  The error passed in is 
+because the process failed to create.  The error passed in is
 the error thrown by L<IPC::Open3> (typically a string which begins
 with "open3: ...").
 
 In some environments open3 is unable to detect exec errors in the
-child, so you may not be able to rely on this event.  It does 
+child, so you may not be able to rely on this event.  It does
 seem to work consistently on Perl 5.14 or better though.
 
 Different environments have different ways of handling it when
@@ -394,7 +394,7 @@ Called on every line printed to stderr by the child process.
 =item * C<on_exit> ($proc, $exit_value, $signal)
 
 Called when the processes completes, either because it called exit,
-or if it was killed by a signal.  
+or if it was killed by a signal.
 
 =item * C<on_success> ($proc)
 
@@ -430,7 +430,7 @@ You may optionally provide the full content of standard input
 as a string reference or list reference as the last argument
 (or second to last if you are providing a callback below).
 If provided as a list reference, it will be joined by new lines
-in whatever format is native to your Perl.  Currently on 
+in whatever format is native to your Perl.  Currently on
 (non cygwin) Windows (Strawberry, ActiveState) this is the only
 way to provide standard input to the subprocess.
 
@@ -439,7 +439,7 @@ and L<AnyEvent::Open3::Simple::Process#print> or L<AnyEvent::Open3::Simple::Proc
 otherwise bad things may happen.
 
 In version 0.80 or better, you may provide a callback as the last argument
-which is called before C<on_start>, and takes the process object as its only 
+which is called before C<on_start>, and takes the process object as its only
 argument.  For example:
 
  foreach my $i (1..10)
@@ -456,8 +456,8 @@ be out of scope otherwise.
 =head1 CAVEATS
 
 Some AnyEvent implementations may not work properly with the method
-used by AnyEvent::Open3::Simple to wait for the child process to 
-terminate.  See L<AnyEvent/"CHILD-PROCESS-WATCHERS"> for details.
+used by AnyEvent::Open3::Simple to wait for the child process to
+terminate.  See L<AnyEvent/"CHILD PROCESS WATCHERS"> for details.
 
 This module uses an idle watcher instead of a child watcher to detect
 program termination on Microsoft Windows (but not Cygwin).  This is
@@ -474,7 +474,7 @@ As of version 0.85, this module works on Windows with L<AnyEvent::Impl::EV>,
 L<AnyEvent::Impl::Event> and L<AnyEvent::Impl::Perl> (possibly others),
 although in the past they have either not worked or had limitations placed
 on them.  Because the author of L<AnyEvent> does not hold the native Windows
-port of Perl in high regard problems such as this may pop up again
+port of Perl in high regard: problems such as this may pop up again
 in the future and may not be addressed, and may be out of the control of the
 author of this module.
 
@@ -483,7 +483,7 @@ is almost certainly suboptimal, but the author of this module uses it
 and finds it useful despite this.
 
 Writing to a subprocesses stdin with L<AnyEvent::Open3::Simple::Process#print>
-or L<AnyEvent::Open3::Simple::Process#say> is unsupported on Microsoft 
+or L<AnyEvent::Open3::Simple::Process#say> is unsupported on Microsoft
 Windows (it does work under Cygwin though).
 
 There are some traps for the unwary relating to buffers and deadlocks,
@@ -521,7 +521,22 @@ if the exception isn't caught somewhere else.
 
 =head1 SEE ALSO
 
-L<AnyEvent::Subprocess>, L<AnyEvent::Util>, L<AnyEvent::Run>.
+=over 4
+
+=item L<AnyEvent::Open3::Simple::Process>
+
+Represents a process being run by this module, typically passed
+into the callbacks.
+
+=item L<AnyEvent::Subprocess>
+
+Alternative to this module.
+
+=item L<AnyEvent::Run>
+
+Alternative to this module.
+
+=back
 
 =head1 AUTHOR
 
@@ -535,7 +550,7 @@ Scott Wiersdorf
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012-2019 by Graham Ollis.
+This software is copyright (c) 2012-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

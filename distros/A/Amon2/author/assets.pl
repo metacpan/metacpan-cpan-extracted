@@ -22,11 +22,6 @@ my $xslate = Text::Xslate->new(
 my $ua = LWP::UserAgent->new();
 
 __PACKAGE__->register_js(
-    'run_es5shim',
-    'https://raw.github.com/es-shims/es5-shim/v4.5.1/es5-shim.min.js',
-    'ES5Shim',
-);
-__PACKAGE__->register_js(
     'run_strftimejs',
     'https://raw.github.com/tokuhirom/strftime-js/master/strftime.js',
     'StrftimeJS',
@@ -65,7 +60,6 @@ sub main {
         run_jquery();
         run_bootstrap();
 
-        run_es5shim();
         run_strftimejs();
         run_micro_template_js();
         run_sprintf_js();
@@ -177,7 +171,7 @@ sub files {
 }
 
 sub run_jquery {
-    my $url = 'http://code.jquery.com/jquery-3.5.0.min.js';
+    my $url = 'http://code.jquery.com/jquery-3.6.1.min.js';
     my $res = $ua->get($url);
     $res->is_success or die "Cannot fetch $url: " . $res->status_line;
 

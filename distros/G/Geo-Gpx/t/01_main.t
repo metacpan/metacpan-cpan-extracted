@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 5;
+use Test::More tests => 18;
 use Geo::Gpx;
 use File::Temp qw/ tempfile tempdir /;
 use Cwd qw(cwd abs_path);
@@ -43,18 +43,35 @@ isa_ok ($o_trk_only2,  'Geo::Gpx');
 #
 # Section B - Object Methods
 
+# *_count() accessors:
+is($o_trk_only1->waypoints_count, 0,   "    waypoints_count(): test the number of waypoints found");
+is($o->routes_count, 0,                "    routes_count(): test the number of routes found");
+is($o->tracks_count, 0,                "    tracks_count(): test the number of tracks found");
+
 # waypoints_add(): will likely rename waypoints_add()
 my %point = ( lat => 54.786989, lon => -2.344214, ele => 512, time => 1164488503, name => 'My house', desc => 'There\'s no place like home' );
 my $pt = Geo::Gpx::Point->new( %point );
 $pt->sym('Triangle, Blue');
 $o->waypoints_add( $pt );
+is($o->waypoints_count, 4,             "    waypoints_add(): test the number of waypoints found");
+
+# waypoints():
+my $gotten1 = $o->waypoints( name => 'My house' );
+my $gotten2 = $o->waypoints( 4 );
+is_deeply ($gotten1, $gotten2,         "    waypoints(): compare waypoints obtained with name => \$name and integer index");
+my $waypoints_ret_val;
+$waypoints_ret_val = $o->waypoints( name => 'There are none with that name' );
+is($waypoints_ret_val, undef,          "    waypoints(): no exception raised if name is not found, return undef");
+$waypoints_ret_val = $o->waypoints( 5 );
+is($waypoints_ret_val, undef,          "    waypoints(): no exception raised if index is not found, return undef");
 
 # tracks_add():
 my $track1 = $o_trk_only1->tracks( 1 );
 my $track2 = $o_trk_only2->tracks( 1 );
 $o_wpt_only1->tracks_add( $track1, name => 'My first track' );
-$o_wpt_only1->tracks_add( $track2, name => 'A second track' );
-my $get_track = $o_wpt_only1->tracks( name => 'A second track' );
+$o_wpt_only1->tracks_add( $track2 );
+my $get_track = $o_wpt_only1->tracks( name => '2020-10-25T20:36:07+00:00' );
+is($o_wpt_only1->tracks_count, 2,      "    tracks_add(): test the number of tracks found");
 
 # tracks_add(): test also with aref's
 my $aref1 = [
@@ -78,15 +95,34 @@ my $aref3 = [
     { lat => 45.405020, lon => -75.139528,  ele => -0.242, time => '2020-10-25T21:35:15Z' },
     { lat => 45.404974, lon => -75.139638,  ele => -0.047, time => '2020-10-25T21:35:19Z' },
 ];
-my $o_ta1 = Geo::Gpx->new();
-my $o_ta2 = Geo::Gpx->new();
-$o_ta1->tracks_add( $aref1, name => 'A track with one segment' );
-$o_ta2->tracks_add( $aref2, $aref3, name => 'Two segments near the end of the trail' );
+my $o_ta = Geo::Gpx->new();
+$o_ta->tracks_add( $aref1, name => 'A track with one segment' );
+is($o_ta->tracks_count, 1,             "    tracks_add(): test the number of tracks found");
+$o_ta->tracks_add( $aref2, $aref3, name => 'Two segments near the end of the trail' );
+is($o_ta->tracks_count, 2,             "    tracks_add(): test the number of tracks found");
 
-$DB::single = 1;
-$o_ta1->routes_add( $aref2, name => 'My first route' );
-my @rtes = $o_ta1->routes();
+# routes_add():
+$o_ta->routes_add( $aref2, name => 'My first route' );
+is($o_ta->routes_count, 1,             "    routes_add(): test the number of routes found");
 
+# waypoints_search():
+my @search;
+@search = $o_wpt_only1->waypoints_search( name => qr/(?i:p[0-4])/);
+@search = $o_wpt_only1->waypoints_search( desc => qr/(?i:limoges)/);
+
+# waypoints_merge():
+$DB::single=1;
+my $n_merged = $o->waypoints_merge( $o_wpt_only1, qr/LP[4-9]/ );
+is($n_merged, 2,                       "    waypoints_merge(): number of waypoints merged");
+is($o->waypoints_count, 6,             "    waypoints_merge(): number of waypoints found");
+
+# waypoint_closest_to();
+my $pt2 = Geo::Gpx::Point->new( lat => 45.405441, lon => -75.137497 );
+my ($closest, $dist) = $o_wpt_only1->waypoint_closest_to( $pt2 );
+
+# waypoint_delete():
+$o_wpt_only1->waypoint_delete('LP1');
+$o_wpt_only1->waypoints_count;      # was 3 should now be 2
 
 # save(): a few saves
 $o->set_wd( $tmp_dir );

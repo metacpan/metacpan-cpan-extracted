@@ -60,7 +60,7 @@ sub notifications_received_for
 
    if( HAVE_TEST_METRICS_ANY ) {
       Test::Metrics::Any::is_metrics( {
-         "slurm_packets_received type:NOTIFY" => 1,
+         "slurm_packets dir:rx type:NOTIFY" => 1,
       }, 'Received NOTIFY packet increments metrics' );
    }
 
@@ -117,7 +117,7 @@ sub notifications_received_for
 
    if( HAVE_TEST_METRICS_ANY ) {
       Test::Metrics::Any::is_metrics( {
-         "slurm_packets_sent type:NOTIFY" => 2,
+         "slurm_packets dir:tx type:NOTIFY" => 2,
       }, '->send_notify increments metrics' );
    }
 

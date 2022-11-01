@@ -1,0 +1,28 @@
+{
+   "account" : "acct_1032D82eZvKYlo2C",
+   "future_requirements" : {
+      "alternatives" : [],
+      "current_deadline" : null,
+      "currently_due" : [],
+      "disabled_reason" : null,
+      "errors" : [],
+      "eventually_due" : [],
+      "past_due" : [],
+      "pending_verification" : []
+   },
+   "id" : "card_payments",
+   "object" : "capability",
+   "requested" : 1,
+   "requested_at" : "1662261085",
+   "requirements" : {
+      "alternatives" : [],
+      "current_deadline" : null,
+      "currently_due" : [],
+      "disabled_reason" : null,
+      "errors" : [],
+      "eventually_due" : [],
+      "past_due" : [],
+      "pending_verification" : []
+   },
+   "status" : "inactive"
+}

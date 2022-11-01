@@ -2,7 +2,7 @@
 ## Stripe API - ~/lib/Net/API/Stripe/Connect/CountrySpec/VerificationFields/Details.pm
 ## Version v0.100.0
 ## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2020/05/15
 ## 
@@ -11,13 +11,18 @@ package Net::API::Stripe::Connect::CountrySpec::VerificationFields::Details;
 BEGIN
 {
     use strict;
+    use warnings;
     use parent qw( Net::API::Stripe::Generic );
+    use vars qw( $VERSION );
     our( $VERSION ) = 'v0.100.0';
 };
 
-sub additional { shift->_set_get_array( 'additional', @_ ); }
+use strict;
+use warnings;
 
-sub minimum { shift->_set_get_array( 'minimum', @_ ); }
+sub additional { return( shift->_set_get_array( 'additional', @_ ) ); }
+
+sub minimum { return( shift->_set_get_array( 'minimum', @_ ) ); }
 
 1;
 
@@ -48,104 +53,96 @@ This is instantiated by methods B<company> and B<individual> from module L<Net::
 
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>( %ARG )
+=head2 new( %ARG )
 
 Creates a new L<Net::API::Stripe::Connect::CountrySpec::VerificationFields::Details> object.
 It may also take an hash like arguments, that also are method of the same name.
 
-=back
-
 =head1 METHODS
 
-=over 4
-
-=item B<additional> array containing strings
+=head2 additional array containing strings
 
 Additional fields which are only required for some users.
 
-=item B<minimum> array containing strings
+=head2 minimum array containing strings
 
 Fields which every account must eventually provide.
 
-=back
-
 =head1 API SAMPLE
 
-	{
-	  "id": "US",
-	  "object": "country_spec",
-	  "default_currency": "usd",
-	  "supported_bank_account_currencies": {
-		"usd": [
-		  "US"
-		]
-	  },
-	  "supported_payment_currencies": [
-		"usd",
-		"aed",
-		"afn",
-		"..."
-	  ],
-	  "supported_payment_methods": [
-		"ach",
-		"card",
-		"stripe"
-	  ],
-	  "supported_transfer_countries": [
-		"US"
-	  ],
-	  "verification_fields": {
-		"company": {
-		  "additional": [
-			"relationship.representative"
-		  ],
-		  "minimum": [
-			"business_profile.mcc",
-			"business_profile.url",
-			"business_type",
-			"company.address.city",
-			"company.address.line1",
-			"company.address.postal_code",
-			"company.address.state",
-			"company.name",
-			"company.phone",
-			"company.tax_id",
-			"external_account",
-			"relationship.owner",
-			"relationship.representative",
-			"tos_acceptance.date",
-			"tos_acceptance.ip"
-		  ]
-		},
-		"individual": {
-		  "additional": [
-			"individual.id_number"
-		  ],
-		  "minimum": [
-			"business_profile.mcc",
-			"business_profile.url",
-			"business_type",
-			"external_account",
-			"individual.address.city",
-			"individual.address.line1",
-			"individual.address.postal_code",
-			"individual.address.state",
-			"individual.dob.day",
-			"individual.dob.month",
-			"individual.dob.year",
-			"individual.email",
-			"individual.first_name",
-			"individual.last_name",
-			"individual.phone",
-			"individual.ssn_last_4",
-			"tos_acceptance.date",
-			"tos_acceptance.ip"
-		  ]
-		}
-	  }
-	}
+    {
+      "id": "US",
+      "object": "country_spec",
+      "default_currency": "usd",
+      "supported_bank_account_currencies": {
+        "usd": [
+          "US"
+        ]
+      },
+      "supported_payment_currencies": [
+        "usd",
+        "aed",
+        "afn",
+        "..."
+      ],
+      "supported_payment_methods": [
+        "ach",
+        "card",
+        "stripe"
+      ],
+      "supported_transfer_countries": [
+        "US"
+      ],
+      "verification_fields": {
+        "company": {
+          "additional": [
+            "relationship.representative"
+          ],
+          "minimum": [
+            "business_profile.mcc",
+            "business_profile.url",
+            "business_type",
+            "company.address.city",
+            "company.address.line1",
+            "company.address.postal_code",
+            "company.address.state",
+            "company.name",
+            "company.phone",
+            "company.tax_id",
+            "external_account",
+            "relationship.owner",
+            "relationship.representative",
+            "tos_acceptance.date",
+            "tos_acceptance.ip"
+          ]
+        },
+        "individual": {
+          "additional": [
+            "individual.id_number"
+          ],
+          "minimum": [
+            "business_profile.mcc",
+            "business_profile.url",
+            "business_type",
+            "external_account",
+            "individual.address.city",
+            "individual.address.line1",
+            "individual.address.postal_code",
+            "individual.address.state",
+            "individual.dob.day",
+            "individual.dob.month",
+            "individual.dob.year",
+            "individual.email",
+            "individual.first_name",
+            "individual.last_name",
+            "individual.phone",
+            "individual.ssn_last_4",
+            "tos_acceptance.date",
+            "tos_acceptance.ip"
+          ]
+        }
+      }
+    }
 
 =head1 HISTORY
 

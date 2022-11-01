@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Issuing/Transaction.pm
-## Version v0.100.0
+## Version v0.101.0
 ## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
-## Modified 2020/05/15
+## Modified 2022/10/29
 ## 
 ##----------------------------------------------------------------------------
 ## https://stripe.com/docs/api/issuing/transactions
@@ -12,41 +12,99 @@ package Net::API::Stripe::Issuing::Transaction;
 BEGIN
 {
     use strict;
+    use warnings;
     use parent qw( Net::API::Stripe::Generic );
-    our( $VERSION ) = 'v0.100.0';
+    use vars qw( $VERSION );
+    our( $VERSION ) = 'v0.101.0';
 };
 
-sub id { shift->_set_get_scalar( 'id', @_ ); }
+use strict;
+use warnings;
 
-sub object { shift->_set_get_scalar( 'object', @_ ); }
+sub id { return( shift->_set_get_scalar( 'id', @_ ) ); }
 
-sub amount { shift->_set_get_number( 'amount', @_ ); }
+sub object { return( shift->_set_get_scalar( 'object', @_ ) ); }
 
-sub authorization { shift->_set_get_scalar_or_object( 'authorization', 'Net::API::Stripe::Issuing::Authorization', @_ ); }
+sub amount { return( shift->_set_get_number( 'amount', @_ ) ); }
 
-sub balance_transaction { shift->_set_get_scalar_or_object( 'balance_transaction', 'Net::API::Stripe::Balance::Transaction', @_ ); }
+sub amount_details { return( shift->_set_get_class( 'amount_details', {
+    atm_fee => { type => "number" }
+}, @_ ) ); }
 
-sub card { shift->_set_get_scalar_or_object( 'card', 'Net::API::Stripe::Payment::Card', @_ ); }
+sub authorization { return( shift->_set_get_scalar_or_object( 'authorization', 'Net::API::Stripe::Issuing::Authorization', @_ ) ); }
 
-sub cardholder { shift->_set_get_scalar_or_object( 'cardholder', 'Net::API::Stripe::Issuing::Card::Holder', @_ ); }
+sub balance_transaction { return( shift->_set_get_scalar_or_object( 'balance_transaction', 'Net::API::Stripe::Balance::Transaction', @_ ) ); }
 
-sub created { shift->_set_get_datetime( 'created', @_ ); }
+sub card { return( shift->_set_get_scalar_or_object( 'card', 'Net::API::Stripe::Payment::Card', @_ ) ); }
 
-sub currency { shift->_set_get_scalar( 'currency', @_ ); }
+sub cardholder { return( shift->_set_get_scalar_or_object( 'cardholder', 'Net::API::Stripe::Issuing::Card::Holder', @_ ) ); }
 
-sub dispute { shift->_set_get_scalar_or_object( 'dispute', 'Net::API::Stripe::Issuing::Dispute', @_ ); }
+sub created { return( shift->_set_get_datetime( 'created', @_ ) ); }
 
-sub livemode { shift->_set_get_boolean( 'livemode', @_ ); }
+sub currency { return( shift->_set_get_scalar( 'currency', @_ ) ); }
+
+sub dispute { return( shift->_set_get_scalar_or_object( 'dispute', 'Net::API::Stripe::Issuing::Dispute', @_ ) ); }
+
+sub livemode { return( shift->_set_get_boolean( 'livemode', @_ ) ); }
 
 sub merchant_amount { return( shift->_set_get_number( 'merchant_amount', @_ ) ); }
 
 sub merchant_currency { return( shift->_set_get_scalar( 'merchant_currency', @_ ) ); }
 
-sub merchant_data { shift->_set_get_object( 'merchant_data', 'Net::API::Stripe::Issuing::MerchantData', @_ ); }
+sub merchant_data { return( shift->_set_get_object( 'merchant_data', 'Net::API::Stripe::Issuing::MerchantData', @_ ) ); }
 
-sub metadata { shift->_set_get_hash( 'metadata', @_ ); }
+sub metadata { return( shift->_set_get_hash( 'metadata', @_ ) ); }
 
-sub type { shift->_set_get_scalar( 'type', @_ ); }
+sub purchase_details { return( shift->_set_get_class( 'purchase_details',
+{
+  flight    => {
+                 definition => {
+                   departure_at   => { type => "number" },
+                   passenger_name => { type => "scalar" },
+                   refundable     => { type => "boolean" },
+                   segments       => {
+                                       definition => {
+                                         arrival_airport_code   => { type => "scalar" },
+                                         carrier                => { type => "scalar" },
+                                         departure_airport_code => { type => "scalar" },
+                                         flight_number          => { type => "scalar" },
+                                         service_class          => { type => "scalar" },
+                                         stopover_allowed       => { type => "boolean" },
+                                       },
+                                       type => "class_array",
+                                     },
+                   travel_agency  => { type => "scalar" },
+                 },
+                 type => "class",
+               },
+  fuel      => {
+                 definition => {
+                   type => { type => "scalar" },
+                   unit => { type => "scalar" },
+                   unit_cost_decimal => { type => "number" },
+                   volume_decimal => { type => "number" },
+                 },
+                 type => "class",
+               },
+  lodging   => {
+                 definition => { check_in_at => { type => "number" }, nights => { type => "number" } },
+                 type => "class",
+               },
+  receipt   => {
+                 definition => {
+                   description => { type => "scalar" },
+                   quantity    => { type => "number" },
+                   total       => { type => "number" },
+                   unit_cost   => { type => "number" },
+                 },
+                 type => "class_array",
+               },
+  reference => { type => "scalar" },
+}, @_ ) ); }
+
+sub type { return( shift->_set_get_scalar( 'type', @_ ) ); }
+
+sub wallet { return( shift->_set_get_scalar( 'wallet', @_ ) ); }
 
 1;
 
@@ -75,7 +133,7 @@ See documentation in L<Net::API::Stripe> for example to make api calls to Stripe
 
 =head1 VERSION
 
-    v0.100.0
+    v0.101.0
 
 =head1 DESCRIPTION
 
@@ -83,116 +141,266 @@ Any use of an issued card (L<https://stripe.com/docs/issuing>) that results in f
 
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>( %ARG )
+=head2 new( %ARG )
 
 Creates a new L<Net::API::Stripe::Issuing::Transaction> object.
 It may also take an hash like arguments, that also are method of the same name.
 
-=back
-
 =head1 METHODS
 
-=over 4
-
-=item B<id> string
+=head2 id string
 
 Unique identifier for the object.
 
-=item B<object> string, value is "issuing.transaction"
+=head2 object string, value is "issuing.transaction"
 
 String representing the object’s type. Objects of the same type share the same value.
 
-=item B<amount> integer
+=head2 amount integer
 
-=item B<authorization> string (expandable)
+The transaction amount, which will be reflected in your balance. This amount is in your currency and in the L<smallest currency unit|https://stripe.com/docs/currencies#zero-decimal>.
+
+=head2 amount_details hash
+
+Detailed breakdown of amount components. These amounts are denominated in `currency` and in the L<smallest currency unit|https://stripe.com/docs/currencies#zero-decimal>.
+
+It has the following properties:
+
+=over 4
+
+=item I<atm_fee> integer
+
+The fee charged by the ATM for the cash withdrawal.
+
+=back
+
+=head2 authorization string (expandable)
 
 The Authorization object that led to this transaction.
 
 When expanded, this is a L<Net::API::Stripe::Issuing::Authorization> object.
 
-=item B<balance_transaction> string (expandable)
+=head2 balance_transaction string (expandable)
 
 When expanded, this is a L<Net::API::Stripe::Balance::Transaction> object.
 
-=item B<card> string (expandable)
+=head2 card string (expandable)
 
 The card used to make this transaction.
 
 When expanded, this is a L<Net::API::Stripe::Payment::Card> object.
 
-=item B<cardholder> string (expandable)
+=head2 cardholder string (expandable)
 
 The cardholder to whom this transaction belongs.
 
 When expanded, this is a L<Net::API::Stripe::Issuing::Card::Holder> object.
 
-=item B<created> timestamp
+=head2 created timestamp
 
 Time at which the object was created. Measured in seconds since the Unix epoch.
 
-=item B<currency> currency
+=head2 currency currency
 
 Three-letter ISO currency code, in lowercase. Must be a supported currency.
 
-=item B<dispute> string (expandable)
+=head2 dispute string (expandable)
 
 When expanded, this is a L<Net::API::Stripe::Issuing::Dispute> object.
 
-=item B<livemode> boolean
+=head2 livemode boolean
 
 Has the value true if the object exists in live mode or the value false if the object exists in test mode.
 
-=item B<merchant_amount> integer
+=head2 merchant_amount integer
 
-=item B<merchant_currency> currency
+The amount that the merchant will receive, denominated in L</merchant_currency> and in the smallest currency unit. It will be different from L</amount> if the merchant is taking payment in a different currency.
 
-=item B<merchant_data> hash
+=head2 merchant_currency currency
+
+The currency with which the merchant is taking payment.
+
+=head2 merchant_data hash
 
 More information about the user involved in the transaction.
 
 This is a L<Net::API::Stripe::Issuing::MerchantData> object.
 
-=item B<metadata> hash
+=head2 metadata hash
 
 Set of key-value pairs that you can attach to an object. This can be useful for storing additional information about the object in a structured format.
 
-=item B<type> string
+=head2 purchase_details hash
 
-One of capture, refund, cash_withdrawal, refund_reversal, dispute, or dispute_loss.
+Additional purchase information that is optionally provided by the merchant.
+
+It has the following properties:
+
+=over 4
+
+=item I<flight> hash
+
+Information about the flight that was purchased with this transaction.
+
+=over 8
+
+=item I<departure_at> integer
+
+The time that the flight departed.
+
+=item I<passenger_name> string
+
+The name of the passenger.
+
+=item I<refundable> boolean
+
+Whether the ticket is refundable.
+
+=item I<segments> array
+
+The legs of the trip.
+
+=over 12
+
+=item I<arrival_airport_code> string
+
+The three-letter IATA airport code of the flight's destination.
+
+=item I<carrier> string
+
+The airline carrier code.
+
+=item I<departure_airport_code> string
+
+The three-letter IATA airport code that the flight departed from.
+
+=item I<flight_number> string
+
+The flight number.
+
+=item I<service_class> string
+
+The flight's service class.
+
+=item I<stopover_allowed> boolean
+
+Whether a stopover is allowed on this flight.
 
 =back
 
+=item I<travel_agency> string
+
+The travel agency that issued the ticket.
+
+=back
+
+=item I<fuel> hash
+
+Information about fuel that was purchased with this transaction.
+
+=over 8
+
+=item I<type> string
+
+The type of fuel that was purchased. One of `diesel`, `unleaded_plus`, `unleaded_regular`, `unleaded_super`, or `other`.
+
+=item I<unit> string
+
+The units for `volume_decimal`. One of `us_gallon` or `liter`.
+
+=item I<unit_cost_decimal> decimal_string
+
+The cost in cents per each unit of fuel, represented as a decimal string with at most 12 decimal places.
+
+=item I<volume_decimal> decimal_string
+
+The volume of the fuel that was pumped, represented as a decimal string with at most 12 decimal places.
+
+=back
+
+=item I<lodging> hash
+
+Information about lodging that was purchased with this transaction.
+
+=over 8
+
+=item I<check_in_at> integer
+
+The time of checking into the lodging.
+
+=item I<nights> integer
+
+The number of nights stayed at the lodging.
+
+=back
+
+=item I<receipt> array
+
+The line items in the purchase.
+
+=over 8
+
+=item I<description> string
+
+The description of the item. The maximum length of this field is 26 characters.
+
+=item I<quantity> decimal
+
+The quantity of the item.
+
+=item I<total> integer
+
+The total for this line item in cents.
+
+=item I<unit_cost> integer
+
+The unit cost of the item in cents.
+
+=back
+
+=item I<reference> string
+
+A merchant-specific order number.
+
+=back
+
+=head2 type string
+
+One of capture, refund, cash_withdrawal, refund_reversal, dispute, or dispute_loss.
+
+=head2 wallet string
+
+The digital wallet used for this transaction. One of C<apple_pay>, C<google_pay>, or C<samsung_pay>.
+
 =head1 API SAMPLE
 
-	{
-	  "id": "ipi_fake123456789",
-	  "object": "issuing.transaction",
-	  "amount": -100,
-	  "authorization": "iauth_fake123456789",
-	  "balance_transaction": null,
-	  "card": "ic_fake123456789",
-	  "cardholder": null,
-	  "created": 1571480456,
-	  "currency": "usd",
-	  "dispute": null,
-	  "livemode": false,
-	  "merchant_amount": -100,
-	  "merchant_currency": "usd",
-	  "merchant_data": {
-		"category": "taxicabs_limousines",
-		"city": "San Francisco",
-		"country": "US",
-		"name": "Rocket Rides",
-		"network_id": "1234567890",
-		"postal_code": "94107",
-		"state": "CA",
-		"url": null
-	  },
-	  "metadata": {},
-	  "type": "capture"
-	}
+    {
+      "id": "ipi_fake123456789",
+      "object": "issuing.transaction",
+      "amount": -100,
+      "authorization": "iauth_fake123456789",
+      "balance_transaction": null,
+      "card": "ic_fake123456789",
+      "cardholder": null,
+      "created": 1571480456,
+      "currency": "usd",
+      "dispute": null,
+      "livemode": false,
+      "merchant_amount": -100,
+      "merchant_currency": "usd",
+      "merchant_data": {
+        "category": "taxicabs_limousines",
+        "city": "San Francisco",
+        "country": "US",
+        "name": "Rocket Rides",
+        "network_id": "1234567890",
+        "postal_code": "94107",
+        "state": "CA",
+        "url": null
+      },
+      "metadata": {},
+      "type": "capture"
+    }
 
 =head1 HISTORY
 

@@ -3,17 +3,18 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Generate musical cadence chords
 
-our $VERSION = '0.1505';
-
-use List::Util 'any';
-use Music::Chord::Note;
-use Music::Chord::Positions;
-use Music::Note;
-use Music::Scales;
-use Music::ToRoman;
+our $VERSION = '0.1506';
 
 use Moo;
 use strictures 2;
+
+use List::Util qw(any);
+use Music::Chord::Note ();
+use Music::Chord::Positions ();
+use Music::Note ();
+use Music::Scales qw(get_scale_notes);
+use Music::ToRoman ();
+
 use namespace::clean;
 
 with('Music::PitchNum');
@@ -303,7 +304,7 @@ Music::Cadence - Generate musical cadence chords
 
 =head1 VERSION
 
-version 0.1505
+version 0.1506
 
 =head1 SYNOPSIS
 

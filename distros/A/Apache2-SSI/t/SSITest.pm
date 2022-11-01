@@ -29,7 +29,6 @@ sub handler : method
         $r->log_error( "No method \"$path\" for SSI testing." );
         return( Apache2::Const::DECLINED );
     }
-    $self->message( "Calling method \"$path\"." );
     my $res = $code->( $self );
     return( Apache2::Const::OK );
 }
@@ -97,9 +96,7 @@ sub success { return( shift->reply( Apache2::Const::HTTP_OK => 'ok' ) ); }
 sub test01
 {
     my $self = shift( @_ );
-    $self->message( "Getting test 1 type uri: " . TEST_URI_1 );
     my $f = $self->_get_test_uri_1;
-    $self->message( "File object returned is: '", overload::StrVal( $f ), "'." );
     return( $self->ok( defined( $f ) && $f->isa( 'Apache2::SSI::URI' ) ) );
 }
 
@@ -129,7 +126,6 @@ sub test05
     my $self = shift( @_ );
     my $f = $self->_get_test_uri_1 || return;
     my $base_uri = $f->base_uri;
-    $self->message( "Base uri returned is '$base_uri'" );
     return( $self->ok( "$base_uri" eq '/' ) );
 }
 
@@ -187,11 +183,9 @@ sub test12
     my $r = $self->apache_request || return( $self->error( "No Apache2::RequestRec object set!" ) );
     my $f = $self->_get_test_uri_1 || return;
     my $f2 = $f->clone;
-    $self->message( "Setting path info to '/some/pathinfo'" );
     $f2->path_info( '/some/pathinfo' );
     my $u = APR::URI->parse( $r->pool, $f2->document_uri );
     my $real = $u->rpath;
-    $self->message( "Path info retrieved from document uri '", $f2->document_uri, "' resolving to '$real'." );
     return( $self->ok( $real eq BASE_URI . '/include.cgi' ) );
 }
 
@@ -251,7 +245,6 @@ sub test18
     my $self = shift( @_ );
     my $r = $self->apache_request || return( $self->error( "No Apache2::RequestRec object set!" ) );
     my $f = $self->_get_test_uri_1 || return;
-    ## $self->message( 3, "URI parent uri is '", $f->parent->document_uri, "' vs BASE_URI '", BASE_URI, "'." );
     return( $self->ok( $f->parent->document_uri eq BASE_URI ) );
 }
 
@@ -267,9 +260,7 @@ sub test19
 sub test20
 {
     my $self = shift( @_ );
-    $self->message( "Getting test 1 type file: " . $self->apache_request->document_root . '/' . TEST_URI_1 );
     my $f = $self->_get_test_file_1;
-    $self->message( "File object returned is: '", overload::StrVal( $f ), "'." );
     return( $self->ok( defined( $f ) && $f->isa( 'Apache2::SSI::File' ) ) );
 }
 
@@ -301,7 +292,6 @@ sub test23
 sub test24
 {
     my $self = shift( @_ );
-    $self->message( "Getting test 1 type file: " . $self->apache_request->document_root . '/' . TEST_URI_1 );
     my $f = $self->_get_test_file_1;
     my $base = $f->base_dir;
     return( $self->ok( $f->filename eq $self->apache_request->document_root . BASE_URI . '/include.cgi' ) );
@@ -368,7 +358,6 @@ sub _get_test_uri_1
 {
     my $self = shift( @_ );
     my $r = $self->apache_request || return( $self->error( "No Apache2::RequestRec object set!" ) );
-    $self->message( "Getting a Apache2::SSI::URI object for uri \"", TEST_URI_1, "\"." );
     my $f = Apache2::SSI::URI->new(
         apache_request => $r,
         document_uri => TEST_URI_1,
@@ -396,7 +385,6 @@ sub _get_test_file_1
 {
     my $self = shift( @_ );
     my $r = $self->apache_request || return( $self->error( "No Apache2::RequestRec object set!" ) );
-    $self->message( "Getting a Apache2::SSI::File object for file \"", $r->document_root . '/' . TEST_URI_1, "\"." );
     my $f = Apache2::SSI::File->new( $r->document_root . '/' . TEST_URI_1,
         apache_request => $r,
         debug => $self->{debug},

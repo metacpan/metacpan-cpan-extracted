@@ -19,12 +19,12 @@ name: Rinci
 provides:
   Rinci:
     file: lib/Rinci.pm
-    version: v1.1.102
+    version: v1.1.103
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Rinci
   homepage: https://metacpan.org/release/Rinci
   repository: git://github.com/perlancar/perl-Rinci.git
-version: 1.1.102
+version: 1.1.103
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -302,7 +302,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::PERLANCAR::Contributing
               name: '@Author::PERLANCAR/PERLANCAR/Contributing'
-              version: '0.292'
+              version: '0.293'
             -
               class: Pod::Weaver::Section::Legal
               name: '@Author::PERLANCAR/Legal'
@@ -310,7 +310,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.780'
+              version: '0.784'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'

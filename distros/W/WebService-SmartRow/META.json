@@ -41,8 +41,8 @@
       },
       "runtime" : {
          "requires" : {
-            "HTTP::Tiny" : "0.080",
-            "JSON::MaybeXS" : "1.004003",
+            "HTTP::Tiny" : "0.082",
+            "JSON::MaybeXS" : "1.004004",
             "Moo" : "2.005004",
             "namespace::clean" : "0.27",
             "perl" : "v5.10.0"
@@ -61,7 +61,7 @@
    "provides" : {
       "WebService::SmartRow" : {
          "file" : "lib/WebService/SmartRow.pm",
-         "version" : "0.006"
+         "version" : "0.007"
       }
    },
    "release_status" : "stable",
@@ -76,7 +76,7 @@
          "web" : "https://github.com/lancew/WebService-SmartRow"
       }
    },
-   "version" : "0.006",
+   "version" : "0.007",
    "x_generated_by_perl" : "v5.35.4",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
    "x_spdx_expression" : "MIT"

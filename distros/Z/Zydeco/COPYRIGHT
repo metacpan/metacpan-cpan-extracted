@@ -80,12 +80,12 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
-Files: examples/bench.pl
-Copyright: This software is copyright (c) 2013, 2020 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: dist.ini
 Copyright: Copyright 2020 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: examples/bench.pl
+Copyright: This software is copyright (c) 2013, 2020 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0

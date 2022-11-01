@@ -14,7 +14,7 @@ use utf8;
 ## use critic (Modules::RequireExplicitPackage)
 
 package Sys::OsPackage;
-$Sys::OsPackage::VERSION = '0.1.6';
+$Sys::OsPackage::VERSION = '0.3.0';
 use Config;
 use Carp qw(carp croak confess);
 use Sys::OsRelease;
@@ -118,7 +118,7 @@ sub class_or_obj
 
     # safety net: all-stop if we received an undef
     if (not defined $coo) {
-        confess "coo got undef from:".(join "|", caller 1);
+        confess "class_or_obj() got undef from: ".(join "|", caller 1);
     }
 
     # return the instance
@@ -229,13 +229,46 @@ sub debug
     return $self->{debug};
 }
 
+# read-only accessor for boolean flags
+sub ro_flag_accessor
+{
+    my ($class_or_obj, $name) = @_;
+    my $self = class_or_obj($class_or_obj);
+
+    return deftrue($self->{_config}{$name});
+}
+
 # read-only accessor for quiet flag
 sub quiet
 {
     my ($class_or_obj) = @_;
-    my $self = class_or_obj($class_or_obj);
+    return ro_flag_accessor($class_or_obj, "quiet");
+}
 
-    return deftrue($self->{_config}{quiet});
+# read-only accessor for notest flag
+sub notest
+{
+    my ($class_or_obj) = @_;
+    return ro_flag_accessor($class_or_obj, "notest");
+}
+
+# read-only accessor for sudo flag
+sub sudo
+{
+    my ($class_or_obj) = @_;
+    return ro_flag_accessor($class_or_obj, "sudo");
+}
+
+# for generation of commands with sudo: return sudo or empty list depending on --sudo flag
+# The sudo command is not generated if the user already has root privileges.
+sub sudo_cmd
+{
+    my ($class_or_obj) = @_;
+    my $self = class_or_obj($class_or_obj);
+    if ($self->sudo() and not $self->is_root()) {
+        return "sudo";
+    }
+    return ();
 }
 
 # read/write accessor for system environment data
@@ -312,27 +345,27 @@ sub module_installed
 {
     my ($class_or_obj, $name, $value) = @_;
     my $self = class_or_obj($class_or_obj);
-
-    # if a value is provided then act as a write accessor to the module_installed flag for the module
-    if (defined $value) {
-        my $flag = $value ? 1 : 0;
-        $self->{module_installed}{$name} = $flag;
-        return $flag;
-    }
-
-    # short-circuit the search if we installed the module or already found it installed
-    return 1 if deftrue($self->{module_installed}{$name});
+    my $found = 0;
 
     # check each path element for the module
     my $modfile = join("/", split(/::/x, $name));
     foreach my $element (@INC) {
         my $filepath = "$element/$modfile.pm";
         if (-f $filepath) {
-            $self->{module_installed}{$name} = 1;
-            return 1;
+            $found = 1;
+            last;
         }
     }
-    return 0;
+
+    # if a value is provided, act as a write accessor to the module_installed flag for the module
+    # Set it to true if a true value was provided and the module was found in the @INC path.
+    if (defined $value) {
+        if ( $found and $value ) {
+            $self->{module_installed}{$name} = $found;
+        }
+    }
+
+    return $found;
 }
 
 # run an external command and capture its standard output
@@ -779,7 +812,7 @@ sub is_root
     my ($class_or_obj) = @_;
     my $self = class_or_obj($class_or_obj);
 
-    return ($self->sysenv("root") != 0);
+    return deftrue($self->sysenv("root"));
 }
 
 # handle various systems' packagers
@@ -877,8 +910,8 @@ sub module_package
     my $self = class_or_obj($class_or_obj);
 
     # check if we can install a package
-    if (not $self->is_root()) {
-        # must be root to install an OS package
+    if (not $self->is_root() and not $self->sudo()) {
+        # must be root or set sudo flag in order to install an OS package
         return 0;
     }
     if (not $self->call_pkg_driver(op => "implemented")) {
@@ -908,13 +941,18 @@ sub pkg_installed
 }
 
 # check if module is installed, and install it if not present
+# throws exception on failure
 sub install_module
 {
     my ($class_or_obj, $name) = @_;
     my $self = class_or_obj($class_or_obj);
+    $self->debug() and print STDERR "debug: install_module($name) begin\n";
+    my $result = $self->module_installed($name);
 
     # check if module is installed
-    if (not $self->module_installed($name)) {
+    if ($result) {
+        $self->debug() and print STDERR "debug: install_module($name) skip - already installed\n";
+    } else {
         # print header for module installation
         if (not $self->quiet()) {
             print  $self->text_green().('-' x 75)."\n";
@@ -922,23 +960,29 @@ sub install_module
         }
 
         # try first to install it with an OS package (root required)
-        my $done=0;
-        if ($self->is_root()) {
+        if ($self->is_root() or $self->sudo()) {
             if ($self->module_package($name)) {
-                $self->module_installed($name, 1);
-                $done=1;
+                $result = $self->module_installed($name, 1);
             }
         }
 
         # try again with CPAN or CPANMinus if it wasn't installed by a package
-        if (not $done) {
-            my $cmd = (defined $self->sysenv("cpan") ? $self->sysenv("cpan") : $self->sysenv("cpanm"));
-            $self->run_cmd($cmd, $name)
+        if (not $result) {
+            my ($cmd, @test_param);
+            if (defined $self->sysenv("cpan")) {
+                $cmd = $self->sysenv("cpan");
+                $self->notest() and push @test_param, "-T";
+            } else {
+                $cmd = $self->sysenv("cpanm");
+                $self->notest() and push @test_param, "--notest";
+            }
+            $self->run_cmd($cmd, @test_param, $name)
                 or croak "failed to install $name module";
-            $self->module_installed($name, 1);
+            $result = $self->module_installed($name, 1);
         }
     }
-    return;
+    $self->debug() and print STDERR "debug: install_module($name) result=$result\n";
+    return $result;
 }
 
 # bootstrap CPAN-Minus in a subdirectory of the current directory
@@ -1043,11 +1087,11 @@ sub establish_cpan
         }
     }
 
-    # install dependencies for this tool
+    # install modules used by Sys::OsPackage or CPAN
     foreach my $dep (@{perlconf("module_deps")}) {
         $self->install_module($dep);
     }
-    return;
+    return 1;
 }
 
 1;
@@ -1062,7 +1106,7 @@ Sys::OsPackage - install OS packages and determine if CPAN modules are packaged 
 
 =head1 VERSION
 
-version 0.1.6
+version 0.3.0
 
 =head1 SYNOPSIS
 

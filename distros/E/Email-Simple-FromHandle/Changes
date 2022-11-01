@@ -1,5 +1,8 @@
 This is the revision history for Email-Simple-FromHandle
 
+0.055     2022-10-22 16:51:40-04:00 America/New_York
+        - update dist metadata
+
 0.054     2013-09-24 20:55:08 America/New_York
           replace busted-on-Win32 test file
 

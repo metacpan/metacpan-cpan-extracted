@@ -1,7 +1,7 @@
 #!perl
 use strict;
 use warnings;
-use Test::More tests => 6;
+use Test::More;
 use String::Flogger qw(flog);
 
 is(
@@ -39,3 +39,19 @@ like(
   qr/foo.+bar/,
   "hashref keys/values printed",
 );
+
+my $object = bless {}, 'String::Flogger::Test';
+
+like(
+  flog([ 'an object: %s', $object ]),
+  qr/\Aan object: obj\(String::Flogger::Test=HASH\(0x[[:xdigit:]]+\)\)\z/,
+  "an object in the output",
+);
+
+like(
+  flog([ 'an object: %s', [$object] ]),
+  qr/\Aan object: \{\{\["obj\(String::Flogger::Test=HASH\(0x[[:xdigit:]]+\)\)"\]}}\z/,
+  "an object in an array in the output",
+);
+
+done_testing;

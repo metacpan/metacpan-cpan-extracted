@@ -10,7 +10,7 @@ __END__
 
 =head1 NAME
 
-App::Alog - An Apache access log viewer
+alog - An Apache access log viewer
 
 =head1 SYNOPSIS
 
@@ -18,22 +18,24 @@ App::Alog - An Apache access log viewer
 
 =head1 OPTIONS
 
-    -a[<n>]    show last n accesses with info spread vertically
-    -d=<file>  default log when one isn't found for cwd
-    -f         tail -f the log
-    -g         graph requests at hourly intervals
-    -gd        graph requests at daily intervals
-    -h         displays this help text
-    -i         info and statistics
-    -l         list available logs
-    -ll        list available logs verbosely
-    -p         print log path
-    -r<n>      rotation number
-    -v         vim the log
+    -f <regex>        filter based on regex
+    -g [<interval>]   graph errors
+    -h                show this help text
+    -i                show info spread vertically
+    -I                show info verbosely
+    -l                list available logs
+    -L                list available logs with details
+    -m <n>            process a maximum of n accesses, starting from the end
+    -o <n>            process accesses starting at an offset from the end
+    -p                print log path
+    -r <n>            rotation number
+    -s                show statistics
 
-    <name>     name of the log you are trying to access (regexp),
-               if name contains a "/", name is treated as a file name,
-               default is the access log for the cwd.
+    <name>            name of the log you are trying to access (regex),
+                      if name contains a "/", name is treated as a file name,
+                      default is the access log for the cwd.
+
+By default, this command will open the log in \$PAGER or less(1)
 
 =head1 DESCRIPTION
 
@@ -54,11 +56,12 @@ after the `alog` command. For example, `alog foo`.
 
 To see a list of all the access logs on the server use `alog -l`.
 More detailed information, such as what rotations exist for each
-log, use `alog -ll`.
+log, use `alog -L`.
 
 To specify an older rotation of an access log, use the -r option.
-For example `alog -r2`, might show the /var/log/httpd/foo.access_log.2.gz
-file.
+For example `alog -r 2`, might show the /var/log/httpd/foo.access_log.2.gz
+file. If that rotation doesn't exist, it will choose the 2nd in the list
+shown when you use the -L option.
 
 The way it determines which access log to show is by parsing Apache
 config files in either /etc/httpd or /etc/apache2. A CustomLog line
@@ -68,23 +71,29 @@ access log uses.
 
 The -p option will show the path the selected access log file.
 
-The -f option will open the log in `tail -f`.
+The -f option will filter based on a given regex for the -i, -s, or -g option.
 
-The -v option will open the log in `vim`.
-
-The -i option will show statistics about the access log file such
+The -s option will show statistics about the access log file such
 as how many requests there were, their time frame, and most active
-uris.
+URIs.
 
-The -a option will show the data fields of the access log entry on
+The -i option will show the data fields of the access log entry on
 their own line, so you don't have to scroll right to see the part
 you are interested in.
 
-The -g option will show a graph of the number of requests in an hourly
-interval.
+The -I option will show all the fields we have for the entry on it's
+own line.
 
-The -gd option will show a graph of the number of requests in a daily
-interval.
+The -m option limits the maximum number of accesses shown with the -i, -s, or the
+-g option, starting from the end of the log (most recent).
+
+The -o option sets an offset to the accesses shown with the -i option, so
+"elog -i -m 1" shows the last access, "elog -i -m 1 -o 1" shows the second
+to last access.
+
+The -g option will show a graph of the number of accesses in hourly
+intervals. If provided an argument, it can be h for hourly, d for daily,
+or a number of seconds.
 
 =head1 METACPAN
 

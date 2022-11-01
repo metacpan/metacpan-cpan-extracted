@@ -54,7 +54,7 @@
             "Import::Into" : "1.002005",
             "Scalar::Util" : "1.50",
             "Text::Balanced" : "2.01",
-            "Type::Params" : "1.004004",
+            "Type::Params" : "1.999010",
             "attributes" : "0",
             "constant" : "0",
             "enum" : "1.08",
@@ -87,22 +87,19 @@
    "provides" : {
       "Sub::Multi::Tiny" : {
          "file" : "lib/Sub/Multi/Tiny.pm",
-         "version" : "0.000012"
+         "version" : "0.000013"
       },
       "Sub::Multi::Tiny::Dispatcher::Default" : {
          "file" : "lib/Sub/Multi/Tiny/Dispatcher/Default.pm",
-         "version" : "0.000012"
+         "version" : "0.000013"
       },
       "Sub::Multi::Tiny::Dispatcher::TypeParams" : {
          "file" : "lib/Sub/Multi/Tiny/Dispatcher/TypeParams.pm",
-         "version" : "0.000012"
-      },
-      "Sub::Multi::Tiny::SigParse" : {
-         "file" : "lib/Sub/Multi/Tiny/SigParse.pm"
+         "version" : "0.000013"
       },
       "Sub::Multi::Tiny::Util" : {
          "file" : "lib/Sub/Multi/Tiny/Util.pm",
-         "version" : "0.000012"
+         "version" : "0.000013"
       }
    },
    "release_status" : "stable",
@@ -116,11 +113,11 @@
          "web" : "https://github.com/cxw42/Sub-Multi-Tiny"
       }
    },
-   "version" : "0.000012",
+   "version" : "0.000013",
    "x_authority" : "cpan:CXW",
    "x_contributors" : [
       "Mohammad S Anwar <manwar@cpan.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27400_02",
+   "x_serialization_backend" : "JSON::PP version 4.02",
    "x_static_install" : 0
 }

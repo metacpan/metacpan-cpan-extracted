@@ -35,11 +35,11 @@
          "requires" : {
             "Browser::Open" : "0",
             "Data::Sah::Coerce::perl::To_float::From_str::percent" : "0",
-            "Data::Sah::Compiler::perl::TH::array" : "0.911",
-            "Data::Sah::Compiler::perl::TH::bool" : "0.911",
-            "Data::Sah::Compiler::perl::TH::float" : "0.911",
-            "Data::Sah::Compiler::perl::TH::int" : "0.911",
-            "Data::Sah::Compiler::perl::TH::str" : "0.911",
+            "Data::Sah::Compiler::perl::TH::array" : "0.914",
+            "Data::Sah::Compiler::perl::TH::bool" : "0.914",
+            "Data::Sah::Compiler::perl::TH::float" : "0.914",
+            "Data::Sah::Compiler::perl::TH::int" : "0.914",
+            "Data::Sah::Compiler::perl::TH::str" : "0.914",
             "Exporter" : "5.57",
             "File::Slurper" : "0",
             "File::Temp" : "0.2307",
@@ -49,8 +49,8 @@
             "Org::To::ANSIText" : "0",
             "Org::To::HTML" : "0.18",
             "Org::To::Text" : "0.050",
-            "Perinci::CmdLine::Any" : "0.152",
-            "Perinci::CmdLine::Lite" : "1.915",
+            "Perinci::CmdLine::Any" : "0.154",
+            "Perinci::CmdLine::Lite" : "1.924",
             "Perinci::Sub::Gen::AccessTable" : "0.586",
             "Perinci::Sub::Property::result::table" : "0",
             "Sah::Schema::true" : "0",
@@ -59,6 +59,7 @@
             "Text::Table::More" : "0",
             "perl" : "5.010001",
             "strict" : "0",
+            "utf8" : "0",
             "warnings" : "0"
          }
       },
@@ -74,7 +75,11 @@
    "provides" : {
       "App::BPOMUtils" : {
          "file" : "lib/App/BPOMUtils.pm",
-         "version" : "0.007"
+         "version" : "0.012"
+      },
+      "App::BPOMUtils::Table" : {
+         "file" : "lib/App/BPOMUtils/Table.pm",
+         "version" : "0.012"
       }
    },
    "release_status" : "stable",
@@ -89,7 +94,7 @@
          "web" : "https://github.com/perlancar/perl-App-BPOMUtils"
       }
    },
-   "version" : "0.007",
+   "version" : "0.012",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
@@ -97,12 +102,62 @@
       "plugins" : [
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
+            "name" : "GenPericmdScript bpom-daftar-bahan-baku-pangan",
+            "version" : "0.424"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GenPericmdScript",
+            "name" : "GenPericmdScript bpom-daftar-bahan-tambahan-pangan",
+            "version" : "0.424"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GenPericmdScript",
+            "name" : "GenPericmdScript bpom-daftar-karakteristik-dasar-dan-cemaran-logam-pangan",
+            "version" : "0.424"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GenPericmdScript",
+            "name" : "GenPericmdScript bpom-daftar-cemaran-mikroba-pangan",
+            "version" : "0.424"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript bpom-daftar-jenis-pangan",
             "version" : "0.424"
          },
          {
             "class" : "Dist::Zilla::Plugin::GenPericmdScript",
+            "name" : "GenPericmdScript bpom-daftar-kategori-pangan",
+            "version" : "0.424"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GenPericmdScript",
             "name" : "GenPericmdScript bpom-daftar-kode-prefiks-reg",
+            "version" : "0.424"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GenPericmdScript",
+            "name" : "GenPericmdScript bpom-list-food-additives",
+            "version" : "0.424"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GenPericmdScript",
+            "name" : "GenPericmdScript bpom-list-food-categories",
+            "version" : "0.424"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GenPericmdScript",
+            "name" : "GenPericmdScript bpom-list-food-ingredients",
+            "version" : "0.424"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GenPericmdScript",
+            "name" : "GenPericmdScript bpom-list-food-inputs",
+            "version" : "0.424"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GenPericmdScript",
+            "name" : "GenPericmdScript bpom-list-food-microbe-inputs",
             "version" : "0.424"
          },
          {

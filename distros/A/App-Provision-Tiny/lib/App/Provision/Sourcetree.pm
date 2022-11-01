@@ -1,5 +1,5 @@
 package App::Provision::SourceTree;
-$App::Provision::SourceTree::VERSION = '0.0404';
+$App::Provision::SourceTree::VERSION = '0.0405';
 our $AUTHORITY = 'cpan:GENE';
 use strict;
 use warnings;
@@ -57,7 +57,7 @@ App::Provision::SourceTree
 
 =head1 VERSION
 
-version 0.0404
+version 0.0405
 
 =head1 FUNCTIONS
 

@@ -1,3 +1,6 @@
+0.1100  2022-10-28
+    - Add the "--ns" flag.
+
 0.1004  2022-08-18
     - Refactorings
         - New runtime dep: https://metacpan.org/pod/File::ShouldUpdate .

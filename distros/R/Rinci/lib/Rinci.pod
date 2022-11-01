@@ -24,7 +24,7 @@ Rinci - Language-neutral metadata for your code entities
 
 =head1 VERSION
 
-This document describes version 1.1.102 of Rinci (from Perl distribution Rinci), released on 2022-04-22.
+This document describes version 1.1.103 of Rinci (from Perl distribution Rinci), released on 2022-10-21.
 
 =head1 ABSTRACT
 
@@ -450,31 +450,6 @@ These specifications are planned or considered, but not yet defined:
 
 =back
 
-=head1 1.1 (Jan 2012)
-
-To clearly separate specification from implementation, rename specification from
-C<Sub::Spec> to C<Rinci> (the namespace C<Perinci> is now used for the Perl
-implementation). Support code entities other than functions/methods. Bump
-specification version from 1.0 to 1.1 due to several incompatibilities like
-changed C<args> and C<result> properties, terminologies, defaults. Versioning
-property (C<v>) now required.
-
-=head2 1.0 (Aug 2011)
-
-First release version of Sub::Spec.
-
-=head2 0.x (Feb-Aug 2011)
-
-Series of Sub::Spec drafts.
-
-=head2 Spanel project (2009-2010)
-
-I started using some metadata for API functions, calling them spec and putting
-them in %spec instead of in POD, so I can list and grab all the summaries easily
-as a single dump for API catalog (instead of having to parse POD from my source
-code files). Later on I kept adding more and more stuffs to this, from argument
-specification, requirements, and so on.
-
 =head1 FAQ
 
 =head2 What does Rinci mean?
@@ -523,6 +498,31 @@ Below is the general history of the project and major changes to the
 specifications. For more detailed changes between releases, see the B<Changes>
 file in the distribution.
 
+=head2 1.1 (Jan 2012)
+
+To clearly separate specification from implementation, rename specification from
+C<Sub::Spec> to C<Rinci> (the namespace C<Perinci> is now used for the Perl
+implementation). Support code entities other than functions/methods. Bump
+specification version from 1.0 to 1.1 due to several incompatibilities like
+changed C<args> and C<result> properties, terminologies, defaults. Versioning
+property (C<v>) now required.
+
+=head2 1.0 (Aug 2011)
+
+First release version of Sub::Spec.
+
+=head2 0.x (Feb-Aug 2011)
+
+Series of Sub::Spec drafts.
+
+=head2 Spanel project (2009-2010)
+
+I started using some metadata for API functions, calling them spec and putting
+them in %spec instead of in POD, so I can list and grab all the summaries easily
+as a single dump for API catalog (instead of having to parse POD from my source
+code files). Later on I kept adding more and more stuffs to this, from argument
+specification, requirements, and so on.
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
@@ -540,9 +540,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

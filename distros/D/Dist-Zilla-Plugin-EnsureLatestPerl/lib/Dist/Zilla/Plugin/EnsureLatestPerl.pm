@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::EnsureLatestPerl; # git description: v0.007-4-g35ba876
-# vim: set ts=8 sts=4 sw=4 tw=115 et :
+package Dist::Zilla::Plugin::EnsureLatestPerl; # git description: v0.008-7-g2af63e3
+# vim: set ts=8 sts=2 sw=2 tw=115 et :
 # ABSTRACT: Ensure the author is releasing using the latest Perl
 # KEYWORDS: plugin release develop author perl version latest
 
-our $VERSION = '0.008';
+our $VERSION = '0.009';
 
 use Moose;
 with 'Dist::Zilla::Role::BeforeRelease';
@@ -76,7 +76,7 @@ Dist::Zilla::Plugin::EnsureLatestPerl - Ensure the author is releasing using the
 
 =head1 VERSION
 
-version 0.008
+version 0.009
 
 =head1 SYNOPSIS
 
@@ -121,7 +121,7 @@ L<http://dzil.org/#mailing-list>.
 There is also an irc channel available for users of this distribution, at
 L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
 
-I am also usually active on irc, as 'ether' at C<irc.perl.org>.
+I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.libera.chat>.
 
 =head1 AUTHOR
 

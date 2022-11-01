@@ -24,6 +24,7 @@
       "configure" : {},
       "runtime" : {
          "requires" : {
+            "Scalar::Util" : "1.11",
             "perl" : "5.006"
          },
          "suggests" : {
@@ -50,7 +51,7 @@
          "web" : "https://github.com/ap/Memoize"
       }
    },
-   "version" : "1.14",
+   "version" : "1.15",
    "x_copyright" : {
       "holder" : "Mark Jason Dominus",
       "year" : 2012

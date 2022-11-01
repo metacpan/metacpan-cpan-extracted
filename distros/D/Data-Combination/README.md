@@ -1,0 +1,202 @@
+# NAME
+
+Data::Combination - Hash and Array element combination generator
+
+# SYNOPIS
+
+```perl
+    use Data::Combination;
+    
+    #Generate combination of array with two 'fields'
+    my $result=Data::Combination::combinations([[1,2,3], [qw(a b c)])
+    
+    # $result is an array ref of all combinations of the two fields
+    [
+            [1,a],
+            [1,b],
+            [1,c],
+
+            [2,a],
+            [2,b],
+            [2,c],
+
+            [3,a],
+            [3,b],
+            [3,c]
+    ]
+
+    #Generate combination of hash with two 'fields'
+    my $result=Data::Combination::combinations(key1=>[1,2,3], key2=>[qw(a b c)])
+
+    # $result is an array ref of all combinations of the two fields
+    [
+            {key1=>1,key2=>a},
+            {key1=>2,key2=>a},
+            {key1=>3,key2=>a},
+            
+            {key1=>1,key2=>b},
+            {key1=>2,key2=>b},
+            {key1=>3,key2=>b},
+
+            {key1=>1,key2=>c},
+            {key1=>2,key2=>c},
+            {key1=>3,key2=>c},
+    ]
+```
+
+# DESCRIPTION
+
+`Data::Combinations` generates hashes or arrays by making combinations of
+values for keys with array values.
+
+# EXAMPLES
+
+Array examples:
+
+```perl
+    ===
+    input:
+    ["a","b","c"]
+
+    output:
+    [
+            ["a","b","c"]
+    ]
+    
+    ===
+    input:
+    [["a","b","c"]]
+
+    output:
+    [
+            ["a"],
+            ["b"],
+            ["c"]
+    ]
+
+    ===
+    input:
+    [["a","b"], [1,2]];
+
+    output:
+    [
+            [a, 1],
+            [a, 2],
+            [b, 1],
+            [b, 2]
+    ]
+
+    ===
+    input:
+    ["a", "b", ["x","y"], {key=>"val"}]
+
+    output:
+    [
+            ["a","b","x", {key=>"val"}],
+            ["a","b","y", {key=>"val"}]
+    ]
+```
+
+Hash examples:
+
+```perl
+    ===
+    input:
+    {k1=>"a",k2=>"b",k3=>"c"}
+
+    outputs:
+    [
+            {k1=>"a",k2=>"b",k3=>"c"}
+    ]
+    
+    ===
+    input:
+    {k1=>["a","b","c"]}
+
+    output:
+    [
+            {k1=>"a"},
+            {k2=>"b"},
+            {k3=>"c"}
+    ]
+
+    ===
+    input:
+    {k1=>["a","b"], k2=>[1,2]}
+
+    output:
+    [
+            {k1=>"a", k2=>1},
+            {k1=>"b", k2=>2},
+            {k1=>"a", k2=>1},
+            {k1=>"b", k2=>2}
+    ]
+
+    ===
+    input:
+    [
+            {k1=>"a", k2=>"b", k3=>["x","y"], k4=>{key=>"val"}}
+    ]
+
+    output:
+    [
+            {k1=>"a",k2=>"b",k3=>"x", k4=>{key=>"val"}},
+            {k1=>"a",k2=>"b",k3=>"y", k4=>{key=>"val"}}
+    ]
+```
+
+# API
+
+The module currently has a single function, which isn't exported. To use it it
+must be addressed by its full name
+
+## combinations
+
+```perl
+    my $result=Data::Combinations::combinations $ref;
+```
+
+Generates the combinations of 'fields' in `$ref`. A 'field' is either a hash
+element or array element which contains a reference to an array. If a field
+contains another scalar type, it is wrapped into an array of a single element.
+
+If `$ref` is a hash, the keys are preserved in the outputs, with the values
+for each key used for combination. 
+
+If `$ref` is an array, the indexes are preserved in the outputs, with the
+values for each index used for combination. 
+
+Return value is a reference to an array of the created combinations. 
+
+# SEE ALSO
+
+There are other permutation modules. But they only work with flat lists?
+
+[Algorithm::Permute](https://metacpan.org/pod/Algorithm%3A%3APermute)
+
+[Math::Permute::Lists](https://metacpan.org/pod/Math%3A%3APermute%3A%3ALists)
+
+[Math::Combinatorics](https://metacpan.org/pod/Math%3A%3ACombinatorics)
+
+# AUTHOR
+
+Ruben Westerberg, <drclaw@mac.com>
+
+# REPOSITORTY and BUGS
+
+Please report any bugs via git hub: [http://github.com/drclaw1394/perl-data-combination](http://github.com/drclaw1394/perl-data-combination)
+
+# COPYRIGHT AND LICENSE
+
+Copyright (C) 2022 by Ruben Westerberg
+
+This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl or the MIT
+license.
+
+# DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS
+OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+PARTICULAR PURPOSE.

@@ -1384,35 +1384,35 @@ else {
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_get_uniform_meat = \&PDL::GSL::RNG::gsl_get_uniform_meat;
 #line 1391 "RNG.pm"
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_get_uniform_pos_meat = \&PDL::GSL::RNG::gsl_get_uniform_pos_meat;
 #line 1398 "RNG.pm"
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_get_meat = \&PDL::GSL::RNG::gsl_get_meat;
 #line 1405 "RNG.pm"
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_get_int_meat = \&PDL::GSL::RNG::gsl_get_int_meat;
 #line 1412 "RNG.pm"
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_gaussian_meat = \&PDL::GSL::RNG::ran_gaussian_meat;
 #line 1419 "RNG.pm"
@@ -1440,7 +1440,7 @@ else {
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_gaussian_var_meat = \&PDL::GSL::RNG::ran_gaussian_var_meat;
 #line 1447 "RNG.pm"
@@ -1459,7 +1459,7 @@ my ($obj,@var) = @_;
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_ugaussian_tail_meat = \&PDL::GSL::RNG::ran_ugaussian_tail_meat;
 #line 1466 "RNG.pm"
@@ -1487,7 +1487,7 @@ else {
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_ugaussian_tail_var_meat = \&PDL::GSL::RNG::ran_ugaussian_tail_var_meat;
 #line 1494 "RNG.pm"
@@ -1506,7 +1506,7 @@ my ($obj,@var) = @_;
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_exponential_meat = \&PDL::GSL::RNG::ran_exponential_meat;
 #line 1513 "RNG.pm"
@@ -1534,7 +1534,7 @@ else {
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_exponential_var_meat = \&PDL::GSL::RNG::ran_exponential_var_meat;
 #line 1541 "RNG.pm"
@@ -1553,7 +1553,7 @@ my ($obj,@var) = @_;
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_laplace_meat = \&PDL::GSL::RNG::ran_laplace_meat;
 #line 1560 "RNG.pm"
@@ -1581,7 +1581,7 @@ else {
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_laplace_var_meat = \&PDL::GSL::RNG::ran_laplace_var_meat;
 #line 1588 "RNG.pm"
@@ -1600,7 +1600,7 @@ my ($obj,@var) = @_;
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_exppow_meat = \&PDL::GSL::RNG::ran_exppow_meat;
 #line 1607 "RNG.pm"
@@ -1628,7 +1628,7 @@ else {
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_exppow_var_meat = \&PDL::GSL::RNG::ran_exppow_var_meat;
 #line 1635 "RNG.pm"
@@ -1647,7 +1647,7 @@ my ($obj,@var) = @_;
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_cauchy_meat = \&PDL::GSL::RNG::ran_cauchy_meat;
 #line 1654 "RNG.pm"
@@ -1675,7 +1675,7 @@ else {
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_cauchy_var_meat = \&PDL::GSL::RNG::ran_cauchy_var_meat;
 #line 1682 "RNG.pm"
@@ -1694,7 +1694,7 @@ my ($obj,@var) = @_;
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_rayleigh_meat = \&PDL::GSL::RNG::ran_rayleigh_meat;
 #line 1701 "RNG.pm"
@@ -1722,7 +1722,7 @@ else {
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_rayleigh_var_meat = \&PDL::GSL::RNG::ran_rayleigh_var_meat;
 #line 1729 "RNG.pm"
@@ -1741,7 +1741,7 @@ my ($obj,@var) = @_;
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_rayleigh_tail_meat = \&PDL::GSL::RNG::ran_rayleigh_tail_meat;
 #line 1748 "RNG.pm"
@@ -1769,7 +1769,7 @@ else {
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_rayleigh_tail_var_meat = \&PDL::GSL::RNG::ran_rayleigh_tail_var_meat;
 #line 1776 "RNG.pm"
@@ -1788,7 +1788,7 @@ my ($obj,@var) = @_;
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_levy_meat = \&PDL::GSL::RNG::ran_levy_meat;
 #line 1795 "RNG.pm"
@@ -1816,7 +1816,7 @@ else {
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_levy_var_meat = \&PDL::GSL::RNG::ran_levy_var_meat;
 #line 1823 "RNG.pm"
@@ -1835,7 +1835,7 @@ my ($obj,@var) = @_;
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_gamma_meat = \&PDL::GSL::RNG::ran_gamma_meat;
 #line 1842 "RNG.pm"
@@ -1863,7 +1863,7 @@ else {
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_gamma_var_meat = \&PDL::GSL::RNG::ran_gamma_var_meat;
 #line 1870 "RNG.pm"
@@ -1882,7 +1882,7 @@ my ($obj,@var) = @_;
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_flat_meat = \&PDL::GSL::RNG::ran_flat_meat;
 #line 1889 "RNG.pm"
@@ -1910,7 +1910,7 @@ else {
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_flat_var_meat = \&PDL::GSL::RNG::ran_flat_var_meat;
 #line 1917 "RNG.pm"
@@ -1929,7 +1929,7 @@ my ($obj,@var) = @_;
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_lognormal_meat = \&PDL::GSL::RNG::ran_lognormal_meat;
 #line 1936 "RNG.pm"
@@ -1957,7 +1957,7 @@ else {
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_lognormal_var_meat = \&PDL::GSL::RNG::ran_lognormal_var_meat;
 #line 1964 "RNG.pm"
@@ -1976,7 +1976,7 @@ my ($obj,@var) = @_;
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_chisq_meat = \&PDL::GSL::RNG::ran_chisq_meat;
 #line 1983 "RNG.pm"
@@ -2004,7 +2004,7 @@ else {
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_chisq_var_meat = \&PDL::GSL::RNG::ran_chisq_var_meat;
 #line 2011 "RNG.pm"
@@ -2023,7 +2023,7 @@ my ($obj,@var) = @_;
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_fdist_meat = \&PDL::GSL::RNG::ran_fdist_meat;
 #line 2030 "RNG.pm"
@@ -2051,7 +2051,7 @@ else {
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_fdist_var_meat = \&PDL::GSL::RNG::ran_fdist_var_meat;
 #line 2058 "RNG.pm"
@@ -2070,7 +2070,7 @@ my ($obj,@var) = @_;
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_tdist_meat = \&PDL::GSL::RNG::ran_tdist_meat;
 #line 2077 "RNG.pm"
@@ -2098,7 +2098,7 @@ else {
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_tdist_var_meat = \&PDL::GSL::RNG::ran_tdist_var_meat;
 #line 2105 "RNG.pm"
@@ -2117,7 +2117,7 @@ my ($obj,@var) = @_;
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_beta_meat = \&PDL::GSL::RNG::ran_beta_meat;
 #line 2124 "RNG.pm"
@@ -2145,7 +2145,7 @@ else {
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_beta_var_meat = \&PDL::GSL::RNG::ran_beta_var_meat;
 #line 2152 "RNG.pm"
@@ -2164,7 +2164,7 @@ my ($obj,@var) = @_;
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_logistic_meat = \&PDL::GSL::RNG::ran_logistic_meat;
 #line 2171 "RNG.pm"
@@ -2192,7 +2192,7 @@ else {
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_logistic_var_meat = \&PDL::GSL::RNG::ran_logistic_var_meat;
 #line 2199 "RNG.pm"
@@ -2211,7 +2211,7 @@ my ($obj,@var) = @_;
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_pareto_meat = \&PDL::GSL::RNG::ran_pareto_meat;
 #line 2218 "RNG.pm"
@@ -2239,7 +2239,7 @@ else {
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_pareto_var_meat = \&PDL::GSL::RNG::ran_pareto_var_meat;
 #line 2246 "RNG.pm"
@@ -2258,7 +2258,7 @@ my ($obj,@var) = @_;
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_weibull_meat = \&PDL::GSL::RNG::ran_weibull_meat;
 #line 2265 "RNG.pm"
@@ -2286,7 +2286,7 @@ else {
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_weibull_var_meat = \&PDL::GSL::RNG::ran_weibull_var_meat;
 #line 2293 "RNG.pm"
@@ -2305,7 +2305,7 @@ my ($obj,@var) = @_;
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_gumbel1_meat = \&PDL::GSL::RNG::ran_gumbel1_meat;
 #line 2312 "RNG.pm"
@@ -2333,7 +2333,7 @@ else {
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_gumbel1_var_meat = \&PDL::GSL::RNG::ran_gumbel1_var_meat;
 #line 2340 "RNG.pm"
@@ -2352,7 +2352,7 @@ my ($obj,@var) = @_;
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_gumbel2_meat = \&PDL::GSL::RNG::ran_gumbel2_meat;
 #line 2359 "RNG.pm"
@@ -2380,7 +2380,7 @@ else {
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_gumbel2_var_meat = \&PDL::GSL::RNG::ran_gumbel2_var_meat;
 #line 2387 "RNG.pm"
@@ -2399,7 +2399,7 @@ my ($obj,@var) = @_;
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_poisson_meat = \&PDL::GSL::RNG::ran_poisson_meat;
 #line 2406 "RNG.pm"
@@ -2427,7 +2427,7 @@ else {
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_poisson_var_meat = \&PDL::GSL::RNG::ran_poisson_var_meat;
 #line 2434 "RNG.pm"
@@ -2446,7 +2446,7 @@ my ($obj,@var) = @_;
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_bernoulli_meat = \&PDL::GSL::RNG::ran_bernoulli_meat;
 #line 2453 "RNG.pm"
@@ -2474,7 +2474,7 @@ else {
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_bernoulli_var_meat = \&PDL::GSL::RNG::ran_bernoulli_var_meat;
 #line 2481 "RNG.pm"
@@ -2493,7 +2493,7 @@ my ($obj,@var) = @_;
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_binomial_meat = \&PDL::GSL::RNG::ran_binomial_meat;
 #line 2500 "RNG.pm"
@@ -2521,7 +2521,7 @@ else {
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_binomial_var_meat = \&PDL::GSL::RNG::ran_binomial_var_meat;
 #line 2528 "RNG.pm"
@@ -2540,7 +2540,7 @@ my ($obj,@var) = @_;
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_negative_binomial_meat = \&PDL::GSL::RNG::ran_negative_binomial_meat;
 #line 2547 "RNG.pm"
@@ -2568,7 +2568,7 @@ else {
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_negative_binomial_var_meat = \&PDL::GSL::RNG::ran_negative_binomial_var_meat;
 #line 2575 "RNG.pm"
@@ -2587,7 +2587,7 @@ my ($obj,@var) = @_;
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_pascal_meat = \&PDL::GSL::RNG::ran_pascal_meat;
 #line 2594 "RNG.pm"
@@ -2615,7 +2615,7 @@ else {
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_pascal_var_meat = \&PDL::GSL::RNG::ran_pascal_var_meat;
 #line 2622 "RNG.pm"
@@ -2634,7 +2634,7 @@ my ($obj,@var) = @_;
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_geometric_meat = \&PDL::GSL::RNG::ran_geometric_meat;
 #line 2641 "RNG.pm"
@@ -2662,7 +2662,7 @@ else {
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_geometric_var_meat = \&PDL::GSL::RNG::ran_geometric_var_meat;
 #line 2669 "RNG.pm"
@@ -2681,7 +2681,7 @@ my ($obj,@var) = @_;
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_hypergeometric_meat = \&PDL::GSL::RNG::ran_hypergeometric_meat;
 #line 2688 "RNG.pm"
@@ -2709,7 +2709,7 @@ else {
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_hypergeometric_var_meat = \&PDL::GSL::RNG::ran_hypergeometric_var_meat;
 #line 2716 "RNG.pm"
@@ -2728,7 +2728,7 @@ my ($obj,@var) = @_;
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_logarithmic_meat = \&PDL::GSL::RNG::ran_logarithmic_meat;
 #line 2735 "RNG.pm"
@@ -2756,7 +2756,7 @@ else {
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_logarithmic_var_meat = \&PDL::GSL::RNG::ran_logarithmic_var_meat;
 #line 2763 "RNG.pm"
@@ -2775,7 +2775,7 @@ my ($obj,@var) = @_;
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_additive_gaussian_meat = \&PDL::GSL::RNG::ran_additive_gaussian_meat;
 #line 2782 "RNG.pm"
@@ -2797,7 +2797,7 @@ my ($obj,@var) = @_;
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_additive_poisson_meat = \&PDL::GSL::RNG::ran_additive_poisson_meat;
 #line 2804 "RNG.pm"
@@ -2819,7 +2819,7 @@ my ($obj,@var) = @_;
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_feed_poisson_meat = \&PDL::GSL::RNG::ran_feed_poisson_meat;
 #line 2826 "RNG.pm"
@@ -2841,7 +2841,7 @@ my ($obj,@var) = @_;
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_bivariate_gaussian_meat = \&PDL::GSL::RNG::ran_bivariate_gaussian_meat;
 #line 2848 "RNG.pm"
@@ -2863,21 +2863,21 @@ my ($obj,@var) = @_;
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_dir_2d_meat = \&PDL::GSL::RNG::ran_dir_2d_meat;
 #line 2870 "RNG.pm"
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_dir_3d_meat = \&PDL::GSL::RNG::ran_dir_3d_meat;
 #line 2877 "RNG.pm"
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_dir_nd_meat = \&PDL::GSL::RNG::ran_dir_nd_meat;
 #line 2884 "RNG.pm"
@@ -2902,7 +2902,7 @@ my ($obj,@var) = @_;
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_discrete_meat = \&PDL::GSL::RNG::ran_discrete_meat;
 #line 2909 "RNG.pm"
@@ -2967,14 +2967,14 @@ return @out;
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_ver_meat = \&PDL::GSL::RNG::ran_ver_meat;
 #line 2974 "RNG.pm"
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *ran_caos_meat = \&PDL::GSL::RNG::ran_caos_meat;
 #line 2981 "RNG.pm"

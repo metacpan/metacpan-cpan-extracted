@@ -1,0 +1,29 @@
+{
+   "created" : "1662261086",
+   "data_load_time" : "1662076800",
+   "file" : {
+      "created" : "1508284799",
+      "expires_at" : null,
+      "filename" : "path",
+      "id" : "file_1BE4yZ2eZvKYlo2C9MeXgqcB",
+      "links" : {
+         "data" : [],
+         "has_more" : 0,
+         "object" : "list",
+         "url" : "/v1/file_links?file=file_1BE4yZ2eZvKYlo2C9MeXgqcB"
+      },
+      "object" : "file",
+      "purpose" : "sigma_scheduled_query",
+      "size" : "500",
+      "title" : null,
+      "type" : "csv",
+      "url" : "https://files.stripe.com/v1/files/file_1BE4yZ2eZvKYlo2C9MeXgqcB/contents"
+   },
+   "id" : "sqr_1Le9F42eZvKYlo2C5YVm0Fcp",
+   "livemode" : 0,
+   "object" : "scheduled_query_run",
+   "result_available_until" : "1693785600",
+   "sql" : "SELECT count(*) from charges",
+   "status" : "completed",
+   "title" : "Count all charges"
+}

@@ -1,0 +1,12 @@
+#include <stdio.h>
+#include <math.h>
+#include <quadmath.h>
+
+int main(void) {
+  __float128 x = 3.5Q;
+  x = ceilq(x);
+  if(x == 4.0Q) printf("quadmath is GO!!\n");
+
+  return 0;
+}
+

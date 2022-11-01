@@ -101,7 +101,7 @@ use Scalar::Util 'blessed';
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -184,14 +184,14 @@ index barfs if any of the index values are bad.
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "../../blib/lib/PDL/PP.pm"
 
 *index = \&PDL::index;
 #line 191 "Slices.pm"
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -274,14 +274,14 @@ index1d propagates BAD index elements to the output variable.
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "../../blib/lib/PDL/PP.pm"
 
 *index1d = \&PDL::index1d;
 #line 281 "Slices.pm"
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -364,7 +364,7 @@ index2d barfs if either of the index values are bad.
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "../../blib/lib/PDL/PP.pm"
 
 *index2d = \&PDL::index2d;
 #line 371 "Slices.pm"
@@ -471,7 +471,7 @@ sub PDL::range {
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -752,14 +752,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "../../blib/lib/PDL/PP.pm"
 
 *rangeb = \&PDL::rangeb;
 #line 759 "Slices.pm"
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -793,7 +793,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 950 "../../blib/lib/PDL/PP.pm"
 
 sub PDL::rld {
   my ($x,$y) = @_;
@@ -814,14 +814,14 @@ sub PDL::rld {
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "../../blib/lib/PDL/PP.pm"
 
 *rld = \&PDL::rld;
 #line 821 "Slices.pm"
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -881,7 +881,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 950 "../../blib/lib/PDL/PP.pm"
 
 sub PDL::rle {
   my $c = shift;
@@ -895,14 +895,14 @@ sub PDL::rle {
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "../../blib/lib/PDL/PP.pm"
 
 *rle = \&PDL::rle;
 #line 902 "Slices.pm"
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -919,7 +919,7 @@ Run-length encode a set of vectors.
 Higher-order rle(), for use with qsortvec().
 
 Given set of vectors $c, generate a vector $a with the number of occurrences of each element
-(where an "element" is a vector of length $M ocurring in $c),
+(where an "element" is a vector of length $M occurring in $c),
 and a set of vectors $b containing the unique values.
 As for rle(), only the elements up to the first instance of 0 in $a should be considered.
 
@@ -943,14 +943,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "../../blib/lib/PDL/PP.pm"
 
 *rlevec = \&PDL::rlevec;
 #line 950 "Slices.pm"
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -984,7 +984,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 950 "../../blib/lib/PDL/PP.pm"
 
 sub PDL::rldvec {
   my ($a,$b,$c) = @_;
@@ -1003,14 +1003,14 @@ sub PDL::rldvec {
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "../../blib/lib/PDL/PP.pm"
 
 *rldvec = \&PDL::rldvec;
 #line 1010 "Slices.pm"
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1044,14 +1044,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "../../blib/lib/PDL/PP.pm"
 
 *rleseq = \&PDL::rleseq;
 #line 1051 "Slices.pm"
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1088,7 +1088,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 950 "../../blib/lib/PDL/PP.pm"
 
 sub PDL::rldseq {
   my ($a,$b,$c) = @_;
@@ -1105,7 +1105,7 @@ sub PDL::rldseq {
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "../../blib/lib/PDL/PP.pm"
 
 *rldseq = \&PDL::rldseq;
 #line 1112 "Slices.pm"
@@ -1126,7 +1126,7 @@ Run-length encode a set of (sorted) n-dimensional values.
 
 Generalization of rle() and vv_rlevec():
 given set of values $data, generate a vector $counts with the number of occurrences of each element
-(where an "element" is a matrix of dimensions @vdims ocurring as a sequential run over the
+(where an "element" is a matrix of dimensions @vdims occurring as a sequential run over the
 final dimension in $data), and a set of vectors $elts containing the elements which begin a run.
 Really just a wrapper for clump() and rlevec().
 
@@ -1195,14 +1195,14 @@ sub rldND {
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "../../blib/lib/PDL/PP.pm"
 
 *_clump_int = \&PDL::_clump_int;
 #line 1202 "Slices.pm"
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1242,7 +1242,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "../../blib/lib/PDL/PP.pm"
 
 *xchg = \&PDL::xchg;
 #line 1249 "Slices.pm"
@@ -1374,7 +1374,7 @@ sub PDL::reorder {
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1414,7 +1414,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "../../blib/lib/PDL/PP.pm"
 
 *mv = \&PDL::mv;
 #line 1421 "Slices.pm"
@@ -1456,7 +1456,7 @@ sub PDL::using {
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1522,21 +1522,21 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 950 "../../blib/lib/PDL/PP.pm"
 
 sub PDL::diagonal { shift->_diagonal_int(my $o=PDL->null, \@_); $o }
 #line 1529 "Slices.pm"
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "../../blib/lib/PDL/PP.pm"
 
 *diagonal = \&PDL::diagonal;
 #line 1536 "Slices.pm"
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1590,14 +1590,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "../../blib/lib/PDL/PP.pm"
 
 *lags = \&PDL::lags;
 #line 1597 "Slices.pm"
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1637,14 +1637,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "../../blib/lib/PDL/PP.pm"
 
 *splitdim = \&PDL::splitdim;
 #line 1644 "Slices.pm"
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1670,14 +1670,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "../../blib/lib/PDL/PP.pm"
 
 *rotate = \&PDL::rotate;
 #line 1677 "Slices.pm"
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1710,14 +1710,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "../../blib/lib/PDL/PP.pm"
 
 *broadcastI = \&PDL::broadcastI;
 #line 1717 "Slices.pm"
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1745,7 +1745,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "../../blib/lib/PDL/PP.pm"
 
 *unbroadcast = \&PDL::unbroadcast;
 #line 1752 "Slices.pm"
@@ -1907,7 +1907,7 @@ sub PDL::dice_axis {
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -2085,7 +2085,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 950 "../../blib/lib/PDL/PP.pm"
 
 sub PDL::slice {
     my ($source, @others) = @_;
@@ -2127,7 +2127,7 @@ sub PDL::slice {
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "../../blib/lib/PDL/PP.pm"
 
 *slice = \&PDL::slice;
 #line 2134 "Slices.pm"

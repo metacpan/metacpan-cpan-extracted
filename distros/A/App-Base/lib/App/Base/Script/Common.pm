@@ -4,7 +4,7 @@ use warnings;
 use 5.010;
 use Moose::Role;
 
-our $VERSION = '0.07';    ## VERSION
+our $VERSION = '0.08';    ## VERSION
 
 =head1 NAME
 
@@ -24,9 +24,8 @@ use Getopt::Long;
 use IO::Handle;
 use List::Util qw( max );
 use Path::Tiny;
-use POSIX qw( strftime );
+use POSIX        qw( strftime );
 use Text::Reform qw( form break_wrap );
-use Try::Tiny;
 
 use MooseX::Types::Moose qw( Str Bool );
 
@@ -351,7 +350,7 @@ sub _parse_arguments {
         $options_hash{$id} = \$scalar;
     }
 
-    my $result = GetOptions(%options_hash);
+    my $result        = GetOptions(%options_hash);
     my %option_values = map { $_ => ${$getopt_args{$_}} } (keys %getopt_args);
     return {
         parse_result  => $result,

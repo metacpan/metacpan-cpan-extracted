@@ -22,13 +22,16 @@ print $fh q{
   .1 2   2 2
 3  1 1   2 1
   1e1 2   2 2
-3  1 1   2 1
+4  1 1   2 1
   +1e1 2   2 2
 };
 
 close($fh);
 
 use Data::Dumper;
-ok(scalar eval { rsnp($fn) }, "unusual first line numeric values");
+my @ret = eval { rsnp($fn) };
+my $err = $@ // '';
+
+ok(scalar(@ret), "unusual first line numeric values ($err)");
 
 unlink($fn);

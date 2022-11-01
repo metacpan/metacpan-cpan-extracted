@@ -5,7 +5,7 @@ use warnings;
 package Sub::HandlesVia::Handler;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.038';
+our $VERSION   = '0.044';
 
 use Sub::HandlesVia::Mite -all;
 
@@ -213,8 +213,8 @@ sub lookup {
 				eval "require $class; 1"
 					or warn $@;
 			}
-			if ($class->isa('Sub::HandlesVia::HandlerLibrary') and $class->can($method_name)) {
-				$handler = $class->$method_name;
+			if ($class->isa('Sub::HandlesVia::HandlerLibrary') and $class->has_handler($method_name)) {
+				$handler = $class->get_handler($method_name);
 			}
 		}
 	}
@@ -271,9 +271,10 @@ sub _generate_handler {
 }
 
 package Sub::HandlesVia::Handler::Traditional;
+# XXX: can this be replaced by Blessed trait?
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.038';
+our $VERSION   = '0.044';
 
 use Sub::HandlesVia::Mite -all;
 extends 'Sub::HandlesVia::Handler';
@@ -294,7 +295,7 @@ sub template {
 package Sub::HandlesVia::Handler::CodeRef;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.038';
+our $VERSION   = '0.044';
 
 use Sub::HandlesVia::Mite -all;
 extends 'Sub::HandlesVia::Handler';

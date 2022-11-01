@@ -6,13 +6,13 @@
 use v5.26;
 use Object::Pad 0.66 ':experimental(init_expr)';
 
-package Device::Chip::Sensor 0.24;
+package Device::Chip::Sensor 0.25;
 
 use strict;
 use warnings;
 
 use experimental 'signatures';
-use Object::Pad ':experimental(mop)';
+use Object::Pad ':experimental(mop adjust_params)';
 
 use Carp;
 
@@ -122,6 +122,8 @@ default will be created by prefixing C<"read_"> onto the sensor name.
 
 =item sanity_bounds => ARRAY[ 2 * NUM ]
 
+I<Since version 0.23.>
+
 Optional bounding values to sanity-test reported readings. If a reading is
 obtained that is lower than the first value or higher than the second, it is
 declared to be out of bounds by the L</read> method. Either bound may be set
@@ -226,9 +228,9 @@ ADJUST
    $_method //= "read_$_name";
 }
 
-ADJUSTPARAMS ( $params )
+ADJUST :params ( :$sanity_bounds = [] )
 {
-   ( $_lbound, $_ubound ) = ( delete $params->{sanity_bounds} // [] )->@*;
+   ( $_lbound, $_ubound ) = $sanity_bounds->@*;
 }
 
 method bind ( $chip )

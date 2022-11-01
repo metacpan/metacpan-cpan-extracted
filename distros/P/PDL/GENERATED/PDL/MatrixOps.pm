@@ -164,15 +164,15 @@ matrix, with higher dimensions preserved.
 sub identity {
   my $n = shift;
   my $out =
-    !UNIVERSAL::isa($n,'PDL') ? zeroes($n,$n) :
-    $n->getndims == 0 ? zeroes($n->at(0),$n->at(0)) :
+    !(my $was_pdl = UNIVERSAL::isa($n,'PDL')) ? zeroes($n,$n) :
+    $n->getndims == 0 ? zeroes($n->type, $n->at(0),$n->at(0)) :
     undef;
   if (!defined $out) {
     my @dims = $n->dims;
-    $out = zeroes(@dims[0, 0, 2..$#dims]);
+    $out = zeroes($n->type, @dims[0, 0, 2..$#dims]);
   }
   (my $tmp = $out->diagonal(0,1))++; # work around perl -d "feature"
-  $out;
+  $was_pdl ? bless $out, ref($n) : $out;
 }
 #line 178 "MatrixOps.pm"
 
@@ -268,7 +268,6 @@ sub inv {
   my $opt = shift;
   $opt = {} unless defined($opt);
 
-
   barf "inverse needs a square PDL as a matrix\n" 
     unless(UNIVERSAL::isa($x,'PDL') &&
 	   $x->dims >= 2 &&
@@ -304,11 +303,11 @@ sub inv {
   $x .= $out;
   $x;
 }
-#line 308 "MatrixOps.pm"
+#line 307 "MatrixOps.pm"
 
 
 
-#line 288 "matrixops.pd"
+#line 287 "matrixops.pd"
 
 
 =head2 det
@@ -365,11 +364,11 @@ sub det {
    
   ( (defined $lu) ? $lu->diagonal(0,1)->prodover * $par : 0 );
 }
-#line 369 "MatrixOps.pm"
+#line 368 "MatrixOps.pm"
 
 
 
-#line 350 "matrixops.pd"
+#line 349 "matrixops.pd"
 
 
 =head2 determinant
@@ -452,11 +451,11 @@ sub determinant {
   
   return $sum;
 }
-#line 456 "MatrixOps.pm"
+#line 455 "MatrixOps.pm"
 
 
 
-#line 1058 "../../blib/lib/PDL/PP.pm"
+#line 949 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -506,11 +505,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 510 "MatrixOps.pm"
+#line 509 "MatrixOps.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 950 "../../blib/lib/PDL/PP.pm"
 
 
    sub PDL::eigens_sym {
@@ -545,18 +544,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 	if(wantarray);
       $e;                #just eigenvalues
    }
-#line 549 "MatrixOps.pm"
+#line 548 "MatrixOps.pm"
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 951 "../../blib/lib/PDL/PP.pm"
 
 *eigens_sym = \&PDL::eigens_sym;
-#line 556 "MatrixOps.pm"
+#line 555 "MatrixOps.pm"
 
 
 
-#line 1058 "../../blib/lib/PDL/PP.pm"
+#line 949 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -632,11 +631,11 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 636 "MatrixOps.pm"
+#line 635 "MatrixOps.pm"
 
 
 
-#line 1059 "../../blib/lib/PDL/PP.pm"
+#line 950 "../../blib/lib/PDL/PP.pm"
 
 
    sub PDL::eigens {
@@ -684,18 +683,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
           return $e->index(0)->sever;  #just eigenvalues
       }
    }
-#line 688 "MatrixOps.pm"
+#line 687 "MatrixOps.pm"
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 951 "../../blib/lib/PDL/PP.pm"
 
 *eigens = \&PDL::eigens;
-#line 695 "MatrixOps.pm"
+#line 694 "MatrixOps.pm"
 
 
 
-#line 1058 "../../blib/lib/PDL/PP.pm"
+#line 949 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -763,18 +762,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 767 "MatrixOps.pm"
+#line 766 "MatrixOps.pm"
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 951 "../../blib/lib/PDL/PP.pm"
 
 *svd = \&PDL::svd;
-#line 774 "MatrixOps.pm"
+#line 773 "MatrixOps.pm"
 
 
 
-#line 815 "matrixops.pd"
+#line 814 "matrixops.pd"
 
 
 =head2 lu_decomp
@@ -868,7 +867,6 @@ sub lu_decomp {
    my($inplace) = $in->is_inplace;
    my($out) = ($inplace) ? $in : $in->copy;
 
-
    if(defined $permute) {
       barf('lu_decomp: permutation vector must match the matrix')
       if(!UNIVERSAL::isa($permute,'PDL') || 
@@ -895,7 +893,8 @@ sub lu_decomp {
    }
 
    # Some holding tanks
-   my($tmprow) = $out->slice('(0)')->double->zeroes;
+   my($tmprow) = $out->slice('(0)')->zeroes;
+   $tmprow = $tmprow->double if $tmprow->type < double;
    my($tmpval) = $tmprow->slice('(0)')->sever;
 
    my($col,$row);
@@ -937,10 +936,9 @@ sub lu_decomp {
             }
          }
 
-         # Sidestep near-singularity (NR does this; not sure if it is helpful)
-
+         # LAPACK cgetrf does not try fix singularity so nor do we, even though NR does
          my $notbig = $big->where(abs($big) < $TINY);
-         $notbig .= $TINY * (1.0 - 2.0*($notbig < 0));
+         return if !$notbig->isempty;
 
          # Divide by the diagonal element (which is now the largest element)
          my $tout;
@@ -948,16 +946,13 @@ sub lu_decomp {
       } # end of pivoting part
    } # end of column loop
 
-   if(wantarray) {
-      return ($out,$permute,$parity);
-   }
-   $out;
+   wantarray ? ($out,$permute,$parity) : $out;
 }
-#line 957 "MatrixOps.pm"
+#line 952 "MatrixOps.pm"
 
 
 
-#line 998 "matrixops.pd"
+#line 993 "matrixops.pd"
 
 
 =head2 lu_decomp2
@@ -1073,16 +1068,13 @@ sub lu_decomp2 {
 
   } # end of column loop
 
-  if(wantarray) {
-    return ($out,$perm,$par);
-  }
-  $out;
+  wantarray ? ($out,$perm,$par) : $out;
 }
-#line 1082 "MatrixOps.pm"
+#line 1074 "MatrixOps.pm"
 
 
 
-#line 1123 "matrixops.pd"
+#line 1115 "matrixops.pd"
 
 
 =head2 lu_backsub
@@ -1296,11 +1288,11 @@ BROADCAST_OK:
    }
    $out;
 }
-#line 1300 "MatrixOps.pm"
+#line 1292 "MatrixOps.pm"
 
 
 
-#line 1058 "../../blib/lib/PDL/PP.pm"
+#line 949 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1342,18 +1334,18 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1346 "MatrixOps.pm"
+#line 1338 "MatrixOps.pm"
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 951 "../../blib/lib/PDL/PP.pm"
 
 *simq = \&PDL::simq;
-#line 1353 "MatrixOps.pm"
+#line 1345 "MatrixOps.pm"
 
 
 
-#line 1058 "../../blib/lib/PDL/PP.pm"
+#line 949 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1377,20 +1369,20 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 =cut
-#line 1381 "MatrixOps.pm"
+#line 1373 "MatrixOps.pm"
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 951 "../../blib/lib/PDL/PP.pm"
 
 *squaretotri = \&PDL::squaretotri;
-#line 1388 "MatrixOps.pm"
+#line 1380 "MatrixOps.pm"
 
 
 
 
 
-#line 1418 "matrixops.pd"
+#line 1410 "matrixops.pd"
 
 
 =head1 AUTHOR
@@ -1403,7 +1395,7 @@ itself.  If this file is separated from the PDL distribution, then the
 PDL copyright notice should be included in this file.
 
 =cut
-#line 1407 "MatrixOps.pm"
+#line 1399 "MatrixOps.pm"
 
 
 

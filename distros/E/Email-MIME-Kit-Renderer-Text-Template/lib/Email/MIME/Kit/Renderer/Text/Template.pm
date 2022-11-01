@@ -1,7 +1,4 @@
-package Email::MIME::Kit::Renderer::Text::Template;
-{
-  $Email::MIME::Kit::Renderer::Text::Template::VERSION = '1.101302';
-}
+package Email::MIME::Kit::Renderer::Text::Template 1.101303;
 use Moose;
 with 'Email::MIME::Kit::Role::Renderer';
 # ABSTRACT: render parts of your mail with Text::Template
@@ -19,6 +16,12 @@ sub _enref_as_needed {
   return \%return;
 }
 
+#pod =attr template_class
+#pod
+#pod This attribute stores the name of the class that will be standing in for
+#pod Text::Template, if any.  It defaults, obviously, to Text::Template.
+#pod
+#pod =cut
 
 has template_class => (
   is  => 'ro',
@@ -26,6 +29,12 @@ has template_class => (
   default => 'Text::Template',
 );
 
+#pod =attr template_args
+#pod
+#pod These are the arguments that will be passed to C<fill_this_in> along with the
+#pod template, input, and a few required handlers.
+#pod
+#pod =cut
 
 has template_args => (
   is  => 'ro',
@@ -61,13 +70,27 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Email::MIME::Kit::Renderer::Text::Template - render parts of your mail with Text::Template
 
 =head1 VERSION
 
-version 1.101302
+version 1.101303
+
+=head1 PERL VERSION
+
+This module should work on any version of perl still receiving updates from
+the Perl 5 Porters.  This means it should work on any version of perl released
+in the last two to three years.  (That is, if the most recently released
+version is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 ATTRIBUTES
 
@@ -83,11 +106,11 @@ template, input, and a few required handlers.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Ricardo Signes.
+This software is copyright (c) 2022 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

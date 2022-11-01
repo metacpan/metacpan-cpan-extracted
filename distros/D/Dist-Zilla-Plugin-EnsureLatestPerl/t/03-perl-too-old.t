@@ -14,7 +14,7 @@ my $latest_stable_perl = Versions::latest_stable_perl();
 my $latest_dev_perl = Versions::latest_dev_perl();
 
 # fake the current perl version to be something old.
-local $] = '5.010000';
+local $] = '5.024000';
 
 $ENV{DZIL_ANY_PERL} = 0;
 
@@ -37,7 +37,7 @@ $tzil->chrome->logger->set_debug(1);
 ### BEGIN $tzil->release check
 like(
     exception { $tzil->release },
-    qr/^\[EnsureLatestPerl\] current perl \(5.010000\) is neither the latest stable nor development perl \($latest_stable_perl, $latest_dev_perl\) -- disable check with DZIL_ANY_PERL=1/,
+    qr/^\[EnsureLatestPerl\] current perl \(5.024000\) is neither the latest stable nor development perl \($latest_stable_perl, $latest_dev_perl\) -- disable check with DZIL_ANY_PERL=1/,
     'release halts if perl is too old',
 );
 ### END $tzil->release check

@@ -2,7 +2,7 @@
 ## Stripe API - ~/lib/Net/API/Stripe/Fraud/Review/Session.pm
 ## Version v0.100.0
 ## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2020/05/15
 ## 
@@ -10,10 +10,15 @@
 package Net::API::Stripe::Fraud::Review::Session;
 BEGIN
 {
-	use strict;
-	use parent qw( Net::API::Stripe::Generic );
-	our( $VERSION ) = 'v0.100.0';
+    use strict;
+    use warnings;
+    use parent qw( Net::API::Stripe::Generic );
+    use vars qw( $VERSION );
+    our( $VERSION ) = 'v0.100.0';
 };
+
+use strict;
+use warnings;
 
 sub browser { return( shift->_set_get_scalar( 'browser', @_ ) ); }
 
@@ -56,54 +61,46 @@ This is instantiated by method B<session> in module L<Net::API::Stripe::Fraud::R
 
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>( %ARG )
+=head2 new( %ARG )
 
 Creates a new L<Net::API::Stripe::Fraud::Review::Session> object.
 It may also take an hash like arguments, that also are method of the same name.
 
-=back
-
 =head1 METHODS
 
-=over 4
-
-=item B<browser> string
+=head2 browser string
 
 The browser used in this browser session (e.g., Chrome).
 
-=item B<device> string
+=head2 device string
 
 Information about the device used for the browser session (e.g., Samsung SM-G930T).
 
-=item B<platform> string
+=head2 platform string
 
 The platform for the browser session (e.g., Macintosh).
 
-=item B<version> string
+=head2 version string
 
 The version for the browser session (e.g., 61.0.3163.100).
 
-=back
-
 =head1 API SAMPLE
 
-	{
-	  "id": "prv_fake123456789",
-	  "object": "review",
-	  "billing_zip": null,
-	  "charge": "ch_fake123456789",
-	  "closed_reason": null,
-	  "created": 1571480456,
-	  "ip_address": null,
-	  "ip_address_location": null,
-	  "livemode": false,
-	  "open": true,
-	  "opened_reason": "rule",
-	  "reason": "rule",
-	  "session": null
-	}
+    {
+      "id": "prv_fake123456789",
+      "object": "review",
+      "billing_zip": null,
+      "charge": "ch_fake123456789",
+      "closed_reason": null,
+      "created": 1571480456,
+      "ip_address": null,
+      "ip_address_location": null,
+      "livemode": false,
+      "open": true,
+      "opened_reason": "rule",
+      "reason": "rule",
+      "session": null
+    }
 
 =head1 HISTORY
 

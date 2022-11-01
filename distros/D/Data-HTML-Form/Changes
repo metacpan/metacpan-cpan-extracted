@@ -1,3 +1,6 @@
+0.05 2022-10-26T02:08:59+02:00
+ - Add Select and Option objects.
+
 0.04 2022-09-29T10:28:58+02:00
  - Add tests for Data::HTML::Form.
  - Fix minimal dependency for Mo::utils.

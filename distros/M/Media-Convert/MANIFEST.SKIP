@@ -5,3 +5,4 @@ MANIFEST.bak
 Media-Convert-[\d.]+
 blib/.*
 pm_to_blib
+debian/.*

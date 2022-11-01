@@ -1,18 +1,16 @@
 package Curses::UI::Time;
 
-# Pragmas.
 use Curses::UI::Widget;
 use base qw(Curses::UI::ContainerWidget);
 use strict;
 use warnings;
 
-# Modules.
 use Curses;
 use Curses::UI::Common qw(keys_to_lowercase);
 use Curses::UI::Label;
 use Curses::UI::Number;
-use Encode qw(decode_utf8);
 use Readonly;
+use Unicode::UTF8 qw(decode_utf8);
 
 # Constants.
 Readonly::Scalar our $COLON => decode_utf8(<<'END');
@@ -33,8 +31,7 @@ Readonly::Scalar our $WIDTH_NUM => 6;
 Readonly::Scalar our $WIDTH_SEC => 52;
 Readonly::Scalar our $WIDTH_SPACE => 1;
 
-# Version.
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 # Constructor.
 sub new {
@@ -232,6 +229,7 @@ Curses::UI::Time - Create and manipulate time widgets.
 =head1 SYNOPSIS
 
  use Curses::UI;
+
  my $win = $cui->add('window_id', 'Window');
  my $time = $win->add(
          'mynum', 'Curses::UI::Time',
@@ -317,11 +315,11 @@ L<Curses::UI::Widget|Curses::UI::Widget>.
 
 =head1 EXAMPLE1
 
- # Pragmas.
+=for comment filename=curses_ui_time.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Curses::UI;
 
  # Object.
@@ -351,11 +349,11 @@ L<Curses::UI::Widget|Curses::UI::Widget>.
 
 =head1 EXAMPLE2
 
- # Pragmas.
+=for comment filename=curses_ui_clock.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Curses::UI;
 
  # Object.
@@ -402,11 +400,11 @@ L<Curses::UI::Widget|Curses::UI::Widget>.
 
 =head1 EXAMPLE3
 
- # Pragmas.
+=for comment filename=curses_ui_clock_with_date.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Curses::UI;
 
  # Object.
@@ -461,8 +459,8 @@ L<Curses::UI::Common>,
 L<Curses::UI::Label>,
 L<Curses::UI::Number>,
 L<Curses::UI::Widget>,
-L<Encode>,
-L<Readonly>.
+L<Readonly>,
+L<Unicode::UTF8>.
 
 =head1 SEE ALSO
 
@@ -476,18 +474,19 @@ Install the Curses::UI modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Curses-UI-Time>
+L<https://github.com/michal-josef-spacek/Curses-UI-Time>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2014-2015 Michal Špaček
- BSD 2-Clause License
+© 2014-2020 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 DEDICATION
 
@@ -497,6 +496,6 @@ tty-clock program.
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

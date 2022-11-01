@@ -10,8 +10,9 @@ use_ok('Media::Convert::Asset::ProfileFactory');
 use_ok('Media::Convert::Pipe');
 use_ok('Media::Convert::FfmpegInfo');
 
+my $codecs = Media::Convert::FfmpegInfo->instance->codecs;
 SKIP: {
-	skip "libsvtav1 codec not supported by ffmpeg, this will be too slow", 5 unless Media::Convert::FfmpegInfo->instance->codecs->{av1}{description} =~ /libsvtav1/;
+	skip "libsvtav1 codec not supported by ffmpeg, this will be too slow", 5 unless exists($codecs->{av1}) && $codecs->{av1}{description} =~ /libsvtav1/;
 
 	my $input = Media::Convert::Asset->new(url => 't/testvids/bbb.mp4');
 	my $profile = Media::Convert::Asset::ProfileFactory->create("av1", $input);

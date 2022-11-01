@@ -4,8 +4,7 @@
 struct FieldMeta {
   SV *name;
   ClassMeta *class;
-  SV *defaultsv;
-  OP *defaultexpr; /* at most one of defaultsv or defaultexpr should be set */
+  OP *defaultexpr;
   FIELDOFFSET fieldix;
   SV *paramname;
   AV *hooks; /* NULL, or AV of raw pointers directly to FieldHook structs */

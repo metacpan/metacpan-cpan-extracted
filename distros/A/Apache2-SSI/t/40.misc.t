@@ -1,13 +1,19 @@
 #!/usr/local/bin/perl
 BEGIN
 {
+    use strict;
+    use warnings;
     use Test::More qw( no_plan );
     use lib './lib';
+    use vars qw( $DEBUG );
     use_ok( 'Apache2::SSI' ) || BAIL_OUT( "Unable to load Apache2::SSI" );
     use constant HAS_APACHE_TEST => $ENV{HAS_APACHE_TEST};
     use URI::file;
-    our $DEBUG = 0;
+    our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
+
+use strict;
+use warnings;
 
 use utf8;
 my $doc_root = URI::file->new_abs( './t/htdocs' )->file;

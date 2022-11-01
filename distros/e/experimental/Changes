@@ -1,5 +1,8 @@
 Revision history for experimental
 
+0.029     2022-10-25 23:22:21+02:00 Europe/Amsterdam
+          - Fix handling of warning categories that have been removed
+
 0.028     2022-04-26 02:02:45+02:00 Europe/Amsterdam
           - Add extra_paired_delims feature
 

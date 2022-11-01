@@ -13,7 +13,7 @@ use Sub::Multi::Tiny::Util ':all';
 use subs ();
 use vars ();
 
-our $VERSION = '0.000012'; # TRIAL
+our $VERSION = '0.000013';
 
 use constant { true => !!1, false => !!0 };
 

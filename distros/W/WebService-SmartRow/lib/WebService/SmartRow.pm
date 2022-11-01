@@ -4,7 +4,7 @@ use warnings;
 use v5.010;
 
 package WebService::SmartRow;
-$WebService::SmartRow::VERSION = '0.006';
+$WebService::SmartRow::VERSION = '0.007';
 # ABSTRACT: Connect and get data from SmartRow API
 
 use HTTP::Tiny;
@@ -23,7 +23,6 @@ has http => (
     },
 );
 
-
 # https://smartrow.fit/api/challenge
 sub get_challenges {
     my $self = shift;
@@ -31,7 +30,10 @@ sub get_challenges {
     my ( $user, $pass ) = $self->_credentials_via_env;
 
     my $response = $self->http->request( 'GET',
-        'https://' . $user . ':' . $pass . '@' . 'smartrow.fit/api/challenge' );
+              'https://'
+            . $user . ':'
+            . $pass . '@'
+            . 'smartrow.fit/api/challenge' );
 
     if ( !$response->{success} ) {
         return 'Response error';
@@ -41,7 +43,6 @@ sub get_challenges {
 
     return $json;
 }
-
 
 # https://smartrow.fit/api/account
 sub get_profile {
@@ -71,8 +72,7 @@ sub get_workouts {
               'https://'
             . $user . ':'
             . $pass . '@'
-            . 'smartrow.fit/api/public-game'
-            );
+            . 'smartrow.fit/api/public-game' );
 
     if ( !$response->{success} ) {
         return 'Response error';
@@ -138,7 +138,7 @@ WebService::SmartRow - Connect and get data from SmartRow API
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 

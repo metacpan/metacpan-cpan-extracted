@@ -68,7 +68,7 @@
          "web" : "https://github.com/ology/MIDI-Drummer-Tiny"
       }
    },
-   "version" : "0.4001",
+   "version" : "0.4002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.032001"

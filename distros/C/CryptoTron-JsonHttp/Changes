@@ -1,0 +1,26 @@
+Revision history for Perl extension CryptoTron-JsonHttp.
+
+0.07  2022-11-01
+        - Module GetReward added.
+        - Module GetAccountResource added.
+        - Module GetAccountNet added.
+
+0.03 - 0.06  2022-11-01
+        - Bug fixing. Typo fixing.
+
+0.03  2022-10-31
+        - Module WithdrawBalance added. 
+        - Module BroadcastTransaction added. 
+        - Changes in package JsonHttp.pm.  
+        - Changes in package GetAccount.pm.  
+        - Changes in package tree structure.
+        - Changes in code. Changes in documentation.
+
+0.02  2022-10-29
+        - Changes in package tree structure.
+        - Changes in code. Changes in documentation.
+
+0.01  Fri Oct 28 11:28:02 2022
+	- original version; created by h2xs 1.23 with options
+		-AX --skip-exporter --use-new-tests -n CryptoTron -b 5.10.1
+

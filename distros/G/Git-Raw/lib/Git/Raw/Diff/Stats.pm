@@ -1,5 +1,5 @@
 package Git::Raw::Diff::Stats;
-$Git::Raw::Diff::Stats::VERSION = '0.88';
+$Git::Raw::Diff::Stats::VERSION = '0.90';
 use strict;
 use warnings;
 
@@ -11,7 +11,7 @@ Git::Raw::Diff::Stats - Git diff statistics class
 
 =head1 VERSION
 
-version 0.88
+version 0.90
 
 =head1 DESCRIPTION
 
@@ -68,7 +68,7 @@ Include extended header information such as creations, renames and mode changes.
 
 Alessandro Ghedini <alexbio@cpan.org>
 
-Jacques Germishuys <jacquesg@striata.com>
+Jacques Germishuys <jacquesg@cpan.org>
 
 =head1 LICENSE AND COPYRIGHT
 

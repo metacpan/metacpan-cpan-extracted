@@ -1,5 +1,5 @@
 package App::XML::DocBook::Docmake;
-$App::XML::DocBook::Docmake::VERSION = '0.1004';
+$App::XML::DocBook::Docmake::VERSION = '0.1100';
 use 5.014;
 use strict;
 use warnings;
@@ -24,6 +24,7 @@ use Class::XSAccessor {
             _output_path
             _stylesheet
             _trailing_slash
+            _use_xsl_ns
             _verbose
             _real_mode
             _xslt_mode
@@ -94,7 +95,8 @@ sub _init
     my $stylesheet;
     my @in_stringparams;
     my $base_path;
-    my $make_like = 0;
+    my $make_like   = 0;
+    my $_use_xsl_ns = 0;
     my ( $help, $man );
     my $trailing_slash = 1;
 
@@ -108,6 +110,7 @@ sub _init
         "make"             => \$make_like,
         'help|h'           => \$help,
         'man'              => \$man,
+        'ns'               => \$_use_xsl_ns,
         'trailing-slash=i' => \$trailing_slash,
     );
 
@@ -145,6 +148,7 @@ sub _init
     $self->_make_like($make_like);
     $self->_base_path($base_path);
     $self->_trailing_slash($trailing_slash);
+    $self->_use_xsl_ns($_use_xsl_ns);
 
     my $mode = shift(@$argv);
 
@@ -320,7 +324,9 @@ sub _calc_default_xslt_stylesheet
     my $mode = $self->_xslt_mode();
 
     return
-"http://docbook.sourceforge.net/release/xsl/current/${mode}/docbook.xsl";
+        sprintf(
+        "http://docbook.sourceforge.net/release/%s/current/%s/docbook.xsl",
+        ( $self->_use_xsl_ns() ? "xsl-ns" : "xsl" ), $mode, );
 }
 
 sub _is_xhtml
@@ -591,7 +597,7 @@ App::XML::DocBook::Docmake - translate DocBook/XML to other formats
 
 =head1 VERSION
 
-version 0.1004
+version 0.1100
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
 package App::XML::DocBook::Docmake::CmdComponent;
-$App::XML::DocBook::Docmake::CmdComponent::VERSION = '0.1004';
+$App::XML::DocBook::Docmake::CmdComponent::VERSION = '0.1100';
 use strict;
 use warnings;
 
@@ -31,7 +31,7 @@ __END__
 
 =head1 VERSION
 
-version 0.1004
+version 0.1100
 
 =head1 SYNOPSIS
 

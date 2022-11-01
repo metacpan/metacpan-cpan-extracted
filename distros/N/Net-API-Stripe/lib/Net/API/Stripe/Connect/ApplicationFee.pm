@@ -2,7 +2,7 @@
 ## Stripe API - ~/lib/Net/API/Stripe/Connect/ApplicationFee.pm
 ## Version v0.100.0
 ## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2020/05/15
 ## 
@@ -12,37 +12,42 @@ package Net::API::Stripe::Connect::ApplicationFee;
 BEGIN
 {
     use strict;
+    use warnings;
     use parent qw( Net::API::Stripe::Generic );
+    use vars qw( $VERSION );
     our( $VERSION ) = 'v0.100.0';
 };
 
-sub id { shift->_set_get_scalar( 'id', @_ ); }
+use strict;
+use warnings;
 
-sub object { shift->_set_get_scalar( 'object', @_ ); }
+sub id { return( shift->_set_get_scalar( 'id', @_ ) ); }
 
-sub account { shift->_set_get_scalar_or_object( 'account', 'Net::API::Stripe::Connect::Account', @_ ); }
+sub object { return( shift->_set_get_scalar( 'object', @_ ) ); }
 
-sub amount { shift->_set_get_number( 'amount', @_ ); }
+sub account { return( shift->_set_get_scalar_or_object( 'account', 'Net::API::Stripe::Connect::Account', @_ ) ); }
 
-sub amount_refunded { shift->_set_get_number( 'amount_refunded', @_ ); }
+sub amount { return( shift->_set_get_number( 'amount', @_ ) ); }
 
-sub application { shift->_set_get_scalar_or_object( 'application', 'Net::API::Stripe::Connect::Account', @_ ); }
+sub amount_refunded { return( shift->_set_get_number( 'amount_refunded', @_ ) ); }
 
-sub balance_transaction { shift->_set_get_scalar_or_object( 'balance_transaction', 'Net::API::Stripe::Balance::Transaction', @_ ); }
+sub application { return( shift->_set_get_scalar_or_object( 'application', 'Net::API::Stripe::Connect::Account', @_ ) ); }
 
-sub charge { shift->_set_get_scalar_or_object( 'charge', 'Net::API::Stripe::Charge', @_ ); }
+sub balance_transaction { return( shift->_set_get_scalar_or_object( 'balance_transaction', 'Net::API::Stripe::Balance::Transaction', @_ ) ); }
 
-sub created { shift->_set_get_datetime( 'created', @_ ); }
+sub charge { return( shift->_set_get_scalar_or_object( 'charge', 'Net::API::Stripe::Charge', @_ ) ); }
 
-sub currency { shift->_set_get_scalar( 'currency', @_ ); }
+sub created { return( shift->_set_get_datetime( 'created', @_ ) ); }
 
-sub livemode { shift->_set_get_boolean( 'livemode', @_ ); }
+sub currency { return( shift->_set_get_scalar( 'currency', @_ ) ); }
 
-sub originating_transaction { shift->_set_get_scalar_or_object( 'originating_transaction', 'Net::API::Stripe::Charge', @_ ); }
+sub livemode { return( shift->_set_get_boolean( 'livemode', @_ ) ); }
 
-sub refunded { shift->_set_get_boolean( 'refunded', @_ ); }
+sub originating_transaction { return( shift->_set_get_scalar_or_object( 'originating_transaction', 'Net::API::Stripe::Charge', @_ ) ); }
 
-sub refunds { shift->_set_get_object( 'refunds', 'Net::API::Stripe::Connect::ApplicationFee::Refunds', @_ ); }
+sub refunded { return( shift->_set_get_boolean( 'refunded', @_ ) ); }
+
+sub refunds { return( shift->_set_get_object( 'refunds', 'Net::API::Stripe::Connect::ApplicationFee::Refunds', @_ ) ); }
 
 1;
 
@@ -73,108 +78,100 @@ When you collect a transaction fee on top of a charge made for your user (using 
 
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>( %ARG )
+=head2 new( %ARG )
 
 Creates a new L<Net::API::Stripe::Connect::ApplicationFee> object.
 It may also take an hash like arguments, that also are method of the same name.
 
-=back
-
 =head1 METHODS
 
-=over 4
-
-=item B<id> string
+=head2 id string
 
 Unique identifier for the object.
 
-=item B<object> string, value is "application_fee"
+=head2 object string, value is "application_fee"
 
 String representing the object’s type. Objects of the same type share the same value.
 
-=item B<account> string (expandable)
+=head2 account string (expandable)
 
 ID of the Stripe account this fee was taken from. When expanded, this is a L<Net::API::Stripe::Connect::Account> object.
 
-=item B<amount> integer
+=head2 amount integer
 
 Amount earned, in JPY.
 
-=item B<amount_refunded> positive integer or zero
+=head2 amount_refunded positive integer or zero
 
 Amount in JPY refunded (can be less than the amount attribute on the fee if a partial refund was issued)
 
-=item B<application> string (expandable) "application"
+=head2 application string (expandable) "application"
 
 ID of the Connect application that earned the fee. When expanded, this is a L<Net::API::Stripe::Connect::Account> object.
 
-=item B<balance_transaction> string (expandable)
+=head2 balance_transaction string (expandable)
 
 Balance transaction that describes the impact of this collected application fee on your account balance (not including refunds).
 
 When expanded, this is a L<Net::API::Stripe::Balance::Transaction> object.
 
-=item B<charge> string (expandable)
+=head2 charge string (expandable)
 
 ID of the charge that the application fee was taken from. When expanded, this is a L<Net::API::Stripe::Charge> object.
 
-=item B<created> timestamp
+=head2 created timestamp
 
 Time at which the object was created. Measured in seconds since the Unix epoch.
 
 This is a C<DateTime> object.
 
-=item B<currency> currency
+=head2 currency currency
 
 Three-letter ISO currency code, in lowercase. Must be a supported currency.
 
-=item B<livemode> boolean
+=head2 livemode boolean
 
 Has the value true if the object exists in live mode or the value false if the object exists in test mode.
 
-=item B<originating_transaction> string (expandable) charge or transfer
+=head2 originating_transaction string (expandable) charge or transfer
 
 ID of the corresponding charge on the platform account, if this fee was the result of a charge using the destination parameter.
 
 When expanded, this is a L<Net::API::Stripe::Charge> object.
 
-=item B<refunded> boolean
+=head2 refunded boolean
 
 Whether the fee has been fully refunded. If the fee is only partially refunded, this attribute will still be false.
 
-=item B<refunds> list
+=head2 refunds list
 
 A list of refunds that have been applied to the fee.
 
 This is a L<Net::API::Stripe::Connect::ApplicationFee::Refunds> object.
 
-=back
-
 =head1 API SAMPLE
 
-	{
-	  "id": "fee_fake123456789",
-	  "object": "application_fee",
-	  "account": "acct_fake123456789",
-	  "amount": 100,
-	  "amount_refunded": 0,
-	  "application": "ca_fake123456789",
-	  "balance_transaction": "txn_fake123456789",
-	  "charge": "ch_fake123456789",
-	  "created": 1571480455,
-	  "currency": "jpy",
-	  "livemode": false,
-	  "originating_transaction": null,
-	  "refunded": false,
-	  "refunds": {
-		"object": "list",
-		"data": [],
-		"has_more": false,
-		"url": "/v1/application_fees/fee_fake123456789/refunds"
-	  }
-	}
+    {
+      "id": "fee_fake123456789",
+      "object": "application_fee",
+      "account": "acct_fake123456789",
+      "amount": 100,
+      "amount_refunded": 0,
+      "application": "ca_fake123456789",
+      "balance_transaction": "txn_fake123456789",
+      "charge": "ch_fake123456789",
+      "created": 1571480455,
+      "currency": "jpy",
+      "livemode": false,
+      "originating_transaction": null,
+      "refunded": false,
+      "refunds": {
+        "object": "list",
+        "data": [],
+        "has_more": false,
+        "url": "/v1/application_fees/fee_fake123456789/refunds"
+      }
+    }
 
 =head1 HISTORY
 

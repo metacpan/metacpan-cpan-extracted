@@ -1,7 +1,7 @@
 {
   am_pm_abbreviated => [
-    "n tufat",
-    "n tmeddit",
+    "n\N{U+202f}tufat",
+    "n\N{U+202f}tmeddit",
   ],
   available_formats => {
     Bh => "h B",
@@ -266,10 +266,10 @@
   ],
   script => undef,
   territory => "Algeria",
-  time_format_full => "h:mm:ss a zzzz",
-  time_format_long => "h:mm:ss a z",
-  time_format_medium => "h:mm:ss a",
-  time_format_short => "h:mm a",
+  time_format_full => "h:mm:ss\N{U+202f}a zzzz",
+  time_format_long => "h:mm:ss\N{U+202f}a z",
+  time_format_medium => "h:mm:ss\N{U+202f}a",
+  time_format_short => "h:mm\N{U+202f}a",
   variant => undef,
-  version => 41,
+  version => 42,
 }

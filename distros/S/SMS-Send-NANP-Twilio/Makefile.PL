@@ -9,5 +9,20 @@ WriteMakefile(
                         'SMS::Send::Driver::WebService' => 0.06,
                       },
     ABSTRACT_FROM  => 'lib/SMS/Send/NANP/Twilio.pm',
-    AUTHOR         => 'Michael Davis <mdavis@localdomain>',
+    AUTHOR         => 'Michael Davis <mrdvt>',
+    'META_MERGE'   => {
+                        'resources' => {
+                          'repository' => {
+                            'web' => 'https://github.com/mrdvt92/perl-SMS-Send-NANP-Twilio.git',
+                            'url' => 'git@github.com:mrdvt92/perl-SMS-Send-NANP-Twilio.git',
+                            'type' => 'git'
+                          },
+                          'homepage' => 'https://github.com/mrdvt92/perl-SMS-Send-NANP-Twilio',
+                          'bugtracker' => {
+                            'web' => 'https://github.com/mrdvt92/perl-SMS-Send-NANP-Twilio/issues'
+                          }
+                        },
+                        'meta-spec' => {'version' => 2},
+                      },
+
 );

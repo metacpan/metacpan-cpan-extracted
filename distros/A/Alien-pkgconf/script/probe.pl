@@ -28,7 +28,32 @@ my %status = (
 $status{system_libdir}     = ['/usr/lib'];
 $status{system_includedir} = ['/usr/include'];
 
-if($^O eq 'solaris')
+sub is_solaris      { !! ($^O eq 'solaris'                                           ) }
+sub is_linux_gentoo { !! ($^O eq 'linux' && -f '/etc/gentoo-release'                 ) }
+sub is_linux_alpine { !! ($^O eq 'linux' && -f '/etc/alpine-release'                 ) }
+sub is_linux_debian { !! ($^O =~ /^(gnukfreebsd|linux)$/ && -r "/etc/debian_version" ) }
+sub is_freebsd      { !! ($^O eq 'freebsd' || $^O eq 'dragonfly'                     ) }
+sub is_cygwin       { !! ($^O eq 'cygwin'                                            ) }
+sub is_windows      { !! ($^O eq 'MSWin32'                                           ) }
+sub is_netbsd       { !! ($^O eq 'netbsd'                                            ) }
+sub is_openbsd      { !! ($^O eq 'openbsd'                                           ) }
+sub is_macos        { !! ($^O eq 'darwin'                                            ) }
+
+sub is_linux_redhat
+{
+  return 0 unless $^O eq 'linux';
+  #return 1 if -r '/etc/redhat-release';
+  if(-r '/etc/os-release')
+  {
+    open my $fh, '<', '/etc/os-release';
+    while(my $line = <$fh>) {
+      return 1 if $line =~ /(centos|fedora|redhat|amazon linux)/i;
+    }
+    close $fh;
+  }
+}
+
+if(is_solaris())
 {
   if($Config{ptrsize} == 8)
   {
@@ -66,7 +91,7 @@ if($^O eq 'solaris')
   }
 }
 
-elsif($^O eq 'linux' && -f '/etc/gentoo-release')
+elsif(is_linux_gentoo())
 {
   if($Config{ptrsize} == 8)
   {
@@ -85,7 +110,7 @@ elsif($^O eq 'linux' && -f '/etc/gentoo-release')
   }
 }
 
-elsif($^O eq 'linux' && -f '/etc/alpine-release')
+elsif(is_linux_alpine())
 {
   $status{pkg_config_dir}    = [qw(
     /usr/lib/pkgconfig
@@ -101,7 +126,7 @@ elsif($^O eq 'linux' && -f '/etc/alpine-release')
 
 }
 
-elsif($^O =~ /^(gnukfreebsd|linux)$/ && -r "/etc/debian_version")
+elsif(is_linux_debian())
 {
 
   my $arch;
@@ -202,7 +227,7 @@ elsif($^O =~ /^(gnukfreebsd|linux)$/ && -r "/etc/debian_version")
   }
 }
 
-elsif($^O eq 'linux' && -r "/etc/redhat-release")
+elsif(is_linux_redhat())
 {
   if(-d "/usr/lib64/pkgconfig")
   {
@@ -221,7 +246,7 @@ elsif($^O eq 'linux' && -r "/etc/redhat-release")
   }
 }
 
-elsif($^O eq 'freebsd' || $^O eq 'dragonfly')
+elsif(is_freebsd())
 {
   $status{pkg_config_dir} = [
     "/usr/local/libdata/pkgconfig",
@@ -229,7 +254,7 @@ elsif($^O eq 'freebsd' || $^O eq 'dragonfly')
   ];
 }
 
-elsif($^O eq 'cygwin')
+elsif(is_cygwin())
 {
   $status{pkg_config_dir}    = [qw(
     /usr/lib/pkgconfig
@@ -237,7 +262,7 @@ elsif($^O eq 'cygwin')
   )];
 }
 
-elsif($^O eq 'MSWin32')
+elsif(is_windows())
 {
   if($Config::Config{myuname} =~ /strawberry-perl/)
   {
@@ -264,7 +289,7 @@ elsif($^O eq 'MSWin32')
   }
 }
 
-elsif($^O eq 'netbsd')
+elsif(is_netbsd())
 {
   $status{pkg_config_dir} = [qw(
     /usr/pkg/lib/pkgconfig
@@ -274,7 +299,7 @@ elsif($^O eq 'netbsd')
   )];
 }
 
-elsif($^O eq 'openbsd')
+elsif(is_openbsd())
 {
   $status{pkg_config_dir} = [qw(
     /usr/lib/pkgconfig
@@ -285,7 +310,7 @@ elsif($^O eq 'openbsd')
   )];
 }
 
-elsif($^O eq 'darwin')
+elsif(is_macos())
 {
   $status{pkg_config_dir} = [qw(
     /usr/lib/pkgconfig

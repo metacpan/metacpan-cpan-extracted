@@ -140,7 +140,7 @@ for my $event_id (@event_ids) {
     for ( @{$contests} ) {
         $total_contests++;
         $years{total_contests}++;
-        $years{$_->{comp_year}}{total_all_nations}++;
+        $years{ $_->{comp_year} }{total_all_nations}++;
 
         my $white_nation = $_->{country_short_white};
         my $blue_nation  = $_->{country_short_blue};
@@ -148,18 +148,17 @@ for my $event_id (@event_ids) {
         if ( $blue_nation && grep /^$blue_nation$/, @countries ) {
             $data{$blue_nation}
                 {"$_->{family_name_blue} $_->{given_name_blue}"}++;
-            $years{$_->{comp_year}}{total_commonwealth}++;
-            $years{$_->{comp_year}}{$blue_nation}++;    
+            $years{ $_->{comp_year} }{total_commonwealth}++;
+            $years{ $_->{comp_year} }{$blue_nation}++;
         }
 
         if ( $white_nation && grep /^$white_nation$/, @countries ) {
             $data{$white_nation}
                 {"$_->{family_name_white} $_->{given_name_white}"}++;
-            $years{$_->{comp_year}}{total_commonwealth}++;
-            $years{$_->{comp_year}}{$white_nation}++;    
+            $years{ $_->{comp_year} }{total_commonwealth}++;
+            $years{ $_->{comp_year} }{$white_nation}++;
         }
 
-        
     }
 
 }

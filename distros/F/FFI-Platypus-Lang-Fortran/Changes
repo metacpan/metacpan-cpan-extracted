@@ -1,4 +1,8 @@
-Revision history for Perl module FFI::Platypus::Lang::Fortran
+Revision history for FFI-Platypus-Lang-Fortran
+
+0.14      2022-10-30 16:38:26 -0600
+  - Test migrated to Test2::Suite (gh#19)
+  - Documentation improvements (gh#9, gh#22)
 
 0.12 2020-07-07 14:37:46 -0600
   - Moved to PerlFFI GitHub org

@@ -13,9 +13,9 @@ use String::ShellQuote;
 use Exporter 'import';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-29'; # DATE
+our $DATE = '2022-10-15'; # DATE
 our $DIST = 'Perinci-CmdLine-POD'; # DIST
-our $VERSION = '0.033'; # VERSION
+our $VERSION = '0.037'; # VERSION
 
 our @EXPORT_OK = qw(gen_pod_for_pericmd_script);
 
@@ -30,6 +30,8 @@ sub _fmt_opt {
     my ($opt, $ospec) = @_;
 
     my @res;
+
+    my $has_text;
 
     my $arg_spec = $ospec->{arg_spec};
     my $is_bool = $arg_spec->{schema} &&
@@ -50,15 +52,23 @@ sub _fmt_opt {
 
     push @res, "=item $opt\n\n";
 
-    push @res, "$ospec->{summary}$add_sum.\n\n" if $ospec->{summary};
+    if ($ospec->{summary}) {
+        push @res, "$ospec->{summary}$add_sum.\n\n";
+        $has_text++;
+    }
 
-    push @res, "Default value:\n\n ", dmp($ospec->{default}), "\n\n" if $show_default;
+    if ($show_default) {
+        push @res, "Default value:\n\n ", dmp($ospec->{default}), "\n\n";
+        $has_text++;
+    }
 
     if ($arg_spec->{schema} && !$ospec->{is_alias}) {
         if ($arg_spec->{schema}[1]{in}) {
             push @res, "Valid values:\n\n ", dmp($arg_spec->{schema}[1]{in}), "\n\n";
+            $has_text++;
         } elsif ($arg_spec->{schema}[1]{examples}) {
             push @res, "Example valid values:\n\n ", dmp($arg_spec->{schema}[1]{examples}), "\n\n";
+            $has_text++;
         }
     }
 
@@ -67,11 +77,14 @@ sub _fmt_opt {
         $main_opt =~ s/\s*,.+//;
         $main_opt =~ s/=.+//;
         push @res, "See C<$main_opt>.\n\n";
+        $has_text++;
     } else {
         require Markdown::To::POD;
 
-        push @res, Markdown::To::POD::markdown_to_pod($ospec->{description}), "\n\n"
-            if $ospec->{description};
+        my $description = $ospec->{description};
+        $description = '(No description)' if !defined $description && !$has_text;
+        push @res, Markdown::To::POD::markdown_to_pod($description), "\n\n"
+            if $description;
     }
 
     if (defined $arg_spec->{pos}) {
@@ -532,24 +545,42 @@ sub gen_pod_for_pericmd_script {
     # section: SYNOPSIS
     {
         my @sectpod;
+
+        # 1. show usage that comes from common options
+
+        for my $opt (sort keys %{ $cli->{common_opts} || {} }) {
+            my $co_spec = $cli->{common_opts}{$opt};
+            if (defined $co_spec->{'usage.alt.fmt.pod'}) {
+                push @sectpod, "B<$program_name> ".$co_spec->{'usage.alt.fmt.pod'}."\n\n";
+            } elsif (defined $co_spec->{usage}) {
+                # text format, the next best thing
+                require String::PodQuote;
+                push @sectpod, "B<$program_name> ".String::PodQuote::pod_escape($co_spec->{usage})."\n\n";
+            }
+        }
+
         if ($cli->{subcommands}) {
+            # 2a. show per-subcommand usage lines, if there are subcommands
             if ($gen_scs) {
                 for my $sc_name (sort keys %clidocdata) {
                     next unless length $sc_name;
                     if (defined $gen_sc) { next unless $sc_name eq $gen_sc }
                     my $usage = $clidocdata{$sc_name}->{'usage_line.alt.fmt.pod'};
                     $usage =~ s/\[\[prog\]\]/$program_name $sc_name/;
-                    push @sectpod, "% $usage\n\n";
+                    push @sectpod, "$usage\n\n";
                 }
             } else {
-                push @sectpod, "% B<$program_name> [I<options>] [I<subcommand>] [I<arg>]...\n\n";
+                push @sectpod, "B<$program_name> [I<options>] [I<subcommand>] [I<arg>]...\n\n";
             }
             push @sectpod, "\n\n";
         } else {
+            # 2b. show main usage line
             my $usage = $clidocdata{''}->{'usage_line.alt.fmt.pod'};
             $usage =~ s/\[\[prog\]\]/$program_name/;
-            push @sectpod, "% $usage\n\n";
+            push @sectpod, "$usage\n\n";
         }
+
+        # point to examples in Examples section, if any
         push @sectpod, "\n\nSee examples in the L</EXAMPLES> section.\n\n" if $has_examples;
 
         push @{ $resmeta->{'func.sections'} }, {name=>'SYNOPSIS', content=>join("", @sectpod), ignore=>1};
@@ -1084,7 +1115,7 @@ Perinci::CmdLine::POD - Generate POD for Perinci::CmdLine-based CLI script
 
 =head1 VERSION
 
-This document describes version 0.033 of Perinci::CmdLine::POD (from Perl distribution Perinci-CmdLine-POD), released on 2022-07-29.
+This document describes version 0.037 of Perinci::CmdLine::POD (from Perl distribution Perinci-CmdLine-POD), released on 2022-10-15.
 
 =head1 SYNOPSIS
 
@@ -1241,9 +1272,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

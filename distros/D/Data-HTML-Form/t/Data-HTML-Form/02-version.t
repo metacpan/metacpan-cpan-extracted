@@ -6,4 +6,4 @@ use Test::More 'tests' => 2;
 use Test::NoWarnings;
 
 # Test.
-is($Data::HTML::Form::VERSION, 0.04, 'Version.');
+is($Data::HTML::Form::VERSION, 0.05, 'Version.');

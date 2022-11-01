@@ -18,6 +18,9 @@ WriteMakefile(
 		'Moose' => 0,
 		'MooseX::Singleton' => 0,
 	},
+	EXE_FILES => [
+		'scripts/mc-encode',
+	],
 	TEST_REQUIRES => {
 		'Test::More' => 0,
 	},

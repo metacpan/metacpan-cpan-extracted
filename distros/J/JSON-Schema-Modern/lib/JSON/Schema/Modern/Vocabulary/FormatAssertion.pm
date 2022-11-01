@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::FormatAssertion;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Format-Assertion vocabulary
 
-our $VERSION = '0.556';
+our $VERSION = '0.557';
 
 use 5.020;
 use Moo;
@@ -177,10 +177,11 @@ sub _eval_keyword_format ($self, $data, $schema, $state) {
       : $default_spec ? +{ type => 'string', sub => $default_spec }
       : undef;
 
+  A($state, $schema->{format});
   return E($state, 'not a%s %s', $schema->{format} =~ /^[aeio]/ ? 'n' : '', $schema->{format})
     if $spec and is_type($spec->{type}, $data) and not $spec->{sub}->($data);
 
-  return A($state, $schema->{format});
+  return 1;
 }
 
 1;
@@ -197,7 +198,7 @@ JSON::Schema::Modern::Vocabulary::FormatAssertion - Implementation of the JSON S
 
 =head1 VERSION
 
-version 0.556
+version 0.557
 
 =head1 DESCRIPTION
 

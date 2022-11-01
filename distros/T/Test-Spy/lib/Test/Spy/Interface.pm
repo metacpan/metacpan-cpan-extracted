@@ -1,11 +1,11 @@
 package Test::Spy::Interface;
-$Test::Spy::Interface::VERSION = '0.002';
+$Test::Spy::Interface::VERSION = '0.004';
 use v5.10;
 use strict;
 use warnings;
 
 use Moo::Role;
-use Mooish::AttributeBuilder;
+use Mooish::AttributeBuilder -standard;
 
 requires qw(
 	call_history

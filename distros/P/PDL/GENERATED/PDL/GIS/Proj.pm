@@ -69,7 +69,7 @@ sub get_proj_info
 
 
 
-#line 948 "../../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -104,14 +104,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *fwd_transform = \&PDL::fwd_transform;
 #line 111 "Proj.pm"
 
 
 
-#line 948 "../../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -147,7 +147,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *inv_transform = \&PDL::inv_transform;
 #line 154 "Proj.pm"

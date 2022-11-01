@@ -1,0 +1,912 @@
+#!perl
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Lilith;
+use TOML        qw(from_toml to_toml);
+use File::Slurp qw(read_file);
+use JSON;
+use Text::ANSITable;
+use Term::ANSIColor;
+use Net::Server::Daemonize qw(daemonize);
+use MIME::Base64;
+use Gzip::Faster;
+use Data::Dumper;
+
+sub version {
+	print "lilith v. 0.0.1\n";
+}
+
+sub help {
+	&version;
+
+	print '
+
+--config <ini>     Config INI file.
+                   Default :: /usr/local/etc/lilith.ini
+
+-a <action>        Action to perform.
+                   Default :: search
+
+Action :: run
+Description :: Runs the ingestion loop.
+
+Action :: class_map
+Description :: Display class to short class mappings.
+
+Action :: create_tables
+Description :: Creates the tables in PostgreSQL.
+
+Action :: dump_self
+Description :: Dumps $lilith via Data::Dumper
+
+Action :: event
+Description :: Fetch the information for the specified event.
+               Either --id or --event is needed.
+
+--id <row id>  Row ID to fetch.
+               Default :: undef
+
+--event <id>   Event ID to fetch.
+               Default :: undef
+
+Action :: extend
+Description :: LibreNMS style SNMP extend.
+
+-m <minutes>    How far backt to go in minutes.
+                Default :: 5
+
+-Z              LibreNMS style compression, gzipped and
+                then base64 encoded.
+                Default :: undef
+
+Action :: search
+Description :: Searches the specified table returns the results.
+
+--ouput <return>   Return type. Either table or json.
+                   Default :: table
+
+-t <table>         Table to search. suricata/sagan
+                   Default :: suricata
+
+-m <minutes>       How far backt to go in minutes.
+                   Default :: 1440
+
+--order <clm>      Column to order by.
+                   Default :: timestamp
+
+--limit <int>      Limit to return.
+                   Default :: undef
+
+--offset <int>     Offset for a limited return.
+                   Default :: undef
+
+--orderdir <dir>   Direction to order in.
+                   Default :: ASC
+
+
+* IP Options
+
+
+--si <src ip>    Source IP.
+                 Default :: undef
+                 Type :: string
+
+--di <dst ip>    Destination IP.
+                 Default :: undef
+                 Type :: string
+
+--ip <ip>        IP, either dst or src.
+                 Default :: undef
+                 Type :: complex
+
+
+* Port Options
+
+--sp <src port>  Source port.
+                 Default :: undef
+                 Type :: integer
+
+--dp <dst port>  Destination port.
+                 Default :: undef
+                 Type :: integer
+
+-p <port>        Port, either dst or src.
+                 Default :: undef
+                 Type :: complex
+
+
+* Host Options
+
+--host <host>   Host.
+                Default :: undef
+                Type :: string
+
+--hostl         Use like for matching host.
+                Default :: undef
+
+--hostN         Invert host matching.
+                Default :: undef
+
+--ih <host>     Instance host.
+                Default :: undef
+                Type :: string
+
+--ihl           Use like for matching instance host.
+                Default :: undef
+
+--ihN           Invert instance host matching.
+                Default :: undef
+
+
+* Instance Options
+
+--i <instance>  Instance.
+                Default :: undef
+                Type :: string
+
+--il            Use like for matching instance.
+                Default :: undef
+
+--iN            Invert instance matching.
+                Default :: undef
+
+
+* Class Options
+
+-c <class>      Classification.
+                Default :: undef
+                Type :: string
+
+-cl             Use like for matching classification.
+                Default :: undef
+
+--cN            Invert class matching.
+                Default :: undef
+
+
+* Signature Options
+
+-s <sig>        Signature.
+                Default :: undef
+                Type :: string
+
+-sl             Use like for matching signature.
+                Default :: undef
+
+--sN            Invert signature matching.
+                Default :: undef
+
+
+* In Interface Options
+
+-if <if>        Interface.
+                Default :: undef
+                Type :: string
+
+-ifl            Use like for matching interface.
+                Default :: undef
+
+--ifN           Invert interface matching.
+                Default :: undef
+
+
+* App Proto Options
+
+-ap <proto>     App proto.
+                Default :: undef
+                Type :: string
+
+-apl            Use like for matching app proto.
+                Default :: undef
+
+--apN           Invert app proto matching.
+                Default :: undef
+
+
+* Rule Options
+
+--gid <gid>     GID.
+                Default :: undef
+                Type :: integer
+
+--sid <sid>     SID.
+                Default :: undef
+                Type :: integer
+
+--rev <rev>     Rev.
+                Default :: undef
+                Type :: integer
+
+* Types
+
+Integer :: A comma seperated list of integers to check for. Any number
+           prefixed with a ! will be negated.
+String :: A string to check for. May be matched using like or negated via
+          the proper options.
+Complex :: A item to match.
+';
+}
+
+# get the commandline options
+my $help        = 0;
+my $version     = 0;
+my $config_file = '/usr/local/etc/lilith.toml';
+my $action      = 'search';
+my $src_ip;
+my $dest_ip;
+my $src_port;
+my $dest_port;
+my $alert_id;
+my $table = 'suricata';
+my $host;
+my $host_not;
+my $host_like;
+my $instance_host;
+my $instance_host_not;
+my $instance_host_like;
+my $instance;
+my $instance_not;
+my $instance_like;
+my $class;
+my $class_not;
+my $class_like;
+my $signature;
+my $signature_not;
+my $signature_like;
+my $ip;
+my $port;
+my $go_back_minutes;
+my $in_iface;
+my $in_iface_not;
+my $in_iface_like;
+my $proto;
+my $app_proto;
+my $app_proto_not;
+my $app_proto_like;
+my $gid;
+my $sid;
+my $rev;
+my $limit;
+my $order_by;
+my $order_dir;
+my $offset;
+my $search_output = 'table';
+my $pretty;
+my $columns;
+my $column_set = 'default';
+my $class_shortern;
+my $debug;
+my $event_id;
+my $id;
+my $decode_raw;
+my $daemonize;
+my $user  = 0;
+my $group = 0;
+my $librenms_compress;
+Getopt::Long::Configure('no_ignore_case');
+Getopt::Long::Configure('bundling');
+GetOptions(
+	'version'     => \$version,
+	'v'           => \$version,
+	'help'        => \$help,
+	'h'           => \$help,
+	'config=s'    => \$config_file,
+	'a=s'         => \$action,
+	'si=s'        => \$src_ip,
+	'sp=s'        => \$src_port,
+	'di=s'        => \$dest_ip,
+	'dp=s'        => \$dest_port,
+	'id=s'        => \$alert_id,
+	't=s'         => \$table,
+	'host=s'      => \$host,
+	'hostN=s'     => \$host_not,
+	'hostl'       => \$host_like,
+	'ihl'         => \$instance_host_like,
+	'ihN=s'       => \$instance_host_not,
+	'ih=s'        => \$instance_host,
+	'i=s'         => \$instance,
+	'iN=s'        => \$instance_not,
+	'il'          => \$instance_like,
+	'c=s'         => \$class,
+	'cN=s'        => \$class_not,
+	'cl'          => \$class_like,
+	's=s'         => \$signature,
+	'sN=s'        => \$signature_not,
+	'sl'          => \$signature_like,
+	'ip=s'        => \$ip,
+	'p=s'         => \$port,
+	'm=s'         => \$go_back_minutes,
+	'if=s'        => \$in_iface,
+	'ifN=s'       => \$in_iface_not,
+	'ifl'         => \$in_iface_like,
+	'proto=s'     => \$proto,
+	'ap=s'        => \$app_proto,
+	'apN=s'       => \$app_proto_not,
+	'apl'         => \$app_proto_like,
+	'gid=s'       => \$gid,
+	'sid=s'       => \$sid,
+	'rev=s'       => \$rev,
+	'limit=s'     => \$limit,
+	'offset=s'    => \$offset,
+	'order=s'     => \$order_by,
+	'orderdir=s'  => \$order_dir,
+	'output=s'    => \$search_output,
+	'pretty'      => \$pretty,
+	'columns=s'   => \$columns,
+	'columnset=s' => \$column_set,
+	'debug'       => \$debug,
+	'id=s'        => \$id,
+	'event=s'     => \$event_id,
+	'raw'         => \$decode_raw,
+	'daemonize'   => \$daemonize,
+	'user=s'      => \$user,
+	'group=s'     => \$user,
+	'Z'           => \$librenms_compress,
+);
+
+# print version or help if requested
+if ($help) {
+	&help;
+	exit 42;
+}
+if ($version) {
+	&version;
+	exit 42;
+}
+
+if ( !defined( $ENV{Lilith_table_color} ) ) {
+	$ENV{Lilith_table_color} = 'Text::ANSITable::Standard::NoGradation';
+}
+
+if ( !defined( $ENV{Lilith_table_border} ) ) {
+	$ENV{Lilith_table_border} = 'ASCII::None';
+}
+
+if ( !defined( $ENV{Lilith_IP_color} ) ) {
+	$ENV{Lilith_IP_color} = '1';
+}
+
+if ( !defined( $ENV{Lilith_IP_private_color} ) ) {
+	$ENV{Lilith_IP_private_color} = 'bright_green';
+}
+
+if ( !defined( $ENV{Lilith_IP_remote_color} ) ) {
+	$ENV{Lilith_IP_remote_color} = 'bright_yellow';
+}
+
+if ( !defined( $ENV{Lilith_IP_local_color} ) ) {
+	$ENV{Lilith_IP_local_color} = 'bright_red';
+}
+
+if ( !defined( $ENV{Lilith_timesamp_drop_micro} ) ) {
+	$ENV{Lilith_timestamp_drop_micro} = '0';
+}
+
+if ( !defined( $ENV{Lilith_timesamp_drop_offset} ) ) {
+	$ENV{Lilith_timestamp_drop_offset} = '0';
+}
+
+if ( !defined( $ENV{Lilith_instance_color} ) ) {
+	$ENV{Lilith_instance_color} = '1';
+}
+
+if ( !defined( $ENV{Lilith_instance_type_color} ) ) {
+	$ENV{Lilith_instance_type_color} = 'bright_blue';
+}
+
+if ( !defined( $ENV{Lilith_instance_slug_color} ) ) {
+	$ENV{Lilith_instance_slug_color} = 'bright_magenta';
+}
+
+if ( !defined( $ENV{Lilith_instance_loc_color} ) ) {
+	$ENV{Lilith_instance_loc_color} = 'bright_cyan';
+}
+
+if ( !defined($action) ) {
+	die('No action defined via -a');
+}
+
+# make sure the file exists
+if ( !-f $config_file ) {
+	die( '"' . $config_file . '" does not exist' );
+}
+
+# read the in or die
+my $toml_raw = read_file($config_file) or die 'Failed to read "' . $config_file . '"';
+
+# read the specified config
+my ( $toml, $err ) = from_toml($toml_raw);
+unless ($toml) {
+	die "Error parsing toml,'" . $config_file . "'" . $err;
+}
+
+my $lilith = Lilith->new(
+	dsn                   => $toml->{dsn},
+	sagan                 => $toml->{sagan},
+	suricata              => $toml->{suricata},
+	user                  => $toml->{user},
+	pass                  => $toml->{pass},
+	debug                 => $debug,
+	class_ignore          => $toml->{class_ignore},
+	sid_ignore            => $toml->{sid_ignore},
+	suricata_class_ignore => $toml->{suricata_class_ignore},
+	suricata_sid_ignore   => $toml->{suricata_sid_ignore},
+	sagan_class_ignore    => $toml->{sagan_class_ignore},
+	sagan_sid_ignore      => $toml->{sagan_sid_ignore},
+);
+
+# create the tables if requested
+if ( $action eq 'create_tables' ) {
+	$lilith->create_tables();
+	exit;
+}
+
+# dump self if asked
+if ( $action eq 'dump_self' ) {
+	print Dumper($lilith);
+	exit 0;
+}
+
+my %files;
+my @toml_keys = keys( %{$toml} );
+my $int       = 0;
+while ( defined( $toml_keys[$int] ) ) {
+	my $item = $toml_keys[$int];
+
+	if ( ref( $toml->{$item} ) eq "HASH" ) {
+
+		# add the file in question
+		$files{$item} = $toml->{$item};
+	}
+
+	$int++;
+}
+
+if ( $action eq 'run' ) {
+	print "Lilith starting...\n" . "dsn: ";
+	if ( defined( $toml->{dsn} ) ) {
+		print $toml->{dsn} . "\n";
+	}
+	else {
+		print "***undefined***\n";
+	}
+	print "sagan: ";
+	if ( defined( $toml->{sagan} ) ) {
+		print $toml->{sagan} . "\n";
+	}
+	else {
+		print "***undefined***\n";
+	}
+	print "suricata: ";
+	if ( defined( $toml->{suricata} ) ) {
+		print $toml->{suricata} . "\n";
+	}
+	else {
+		print "***undefined***\n";
+	}
+	print "user: ";
+	if ( defined( $toml->{user} ) ) {
+		print $toml->{user} . "\n";
+	}
+	else {
+		print "***undefined***\n";
+	}
+	print "pass: ";
+	if ( defined( $toml->{pass} ) ) {
+		print "***defined***\n";
+	}
+	else {
+		print "***undefined***\n";
+	}
+
+	print "\nConfigured Instances...\n" . to_toml( \%files ) . "\n\n\nCalling Lilith->run now....\n";
+
+	if ($daemonize) {
+		daemonize( $user, $group, '/var/run/lilith/pid' );
+	}
+
+	$lilith->run( files => \%files, );
+}
+
+if ( $action eq 'extend' ) {
+
+	if ( !defined($go_back_minutes) ) {
+		$go_back_minutes = 5,;
+	}
+
+	my $to_return = $lilith->extend( go_back_minutes => $go_back_minutes, );
+	my $json      = JSON->new;
+	if ($pretty) {
+		$json->canonical(1);
+		$json->pretty(1);
+	}
+
+	my $raw_json = $json->encode($to_return);
+	if ($librenms_compress) {
+		my $compressed = encode_base64( gzip($raw_json) );
+		$compressed =~ s/\n//g;
+		$compressed = $compressed . "\n";
+		print $compressed;
+	}
+	else {
+		print $raw_json;
+	}
+	if ( !$pretty && !$librenms_compress ) {
+		print "\n";
+	}
+
+	exit 0;
+}
+
+if ( $action eq 'search' ) {
+
+	#
+	# run the search
+	#
+	my $returned = $lilith->search(
+		src_ip             => $src_ip,
+		src_port           => $src_port,
+		dest_ip            => $dest_ip,
+		dest_port          => $dest_port,
+		ip                 => $ip,
+		port               => $port,
+		alert_id           => $alert_id,
+		table              => $table,
+		host               => $host,
+		host_not           => $host_not,
+		host_like          => $host_like,
+		instance_host      => $instance_host,
+		instance_host_not  => $instance_host_not,
+		instance_host_like => $instance_host_like,
+		instance           => $instance,
+		instance_not       => $instance_not,
+		instance_like      => $instance_like,
+		class              => $class,
+		class_not          => $class_not,
+		class_like         => $class_like,
+		signature          => $signature,
+		signature_not      => $signature_not,
+		signature_like     => $signature_like,
+		ip                 => $ip,
+		port               => $port,
+		app_proto          => $app_proto,
+		app_proto_not      => $app_proto_not,
+		app_proto_like     => $app_proto_like,
+		proto              => $proto,
+		gid                => $gid,
+		sid                => $sid,
+		rev                => $rev,
+		order_by           => $order_by,
+		order_dir          => $order_dir,
+		limit              => $limit,
+		offset             => $offset,
+		go_back_minutes    => $go_back_minutes,
+	);
+
+	#
+	# assemble the selected output
+	#
+	if ( $search_output eq 'json' ) {
+		my $json = JSON->new;
+		if ($pretty) {
+			$json->canonical(1);
+			$json->pretty(1);
+		}
+		print $json->encode($returned);
+		if ( !$pretty ) {
+			print "\n";
+		}
+		exit 0;
+	}
+	elsif ( $search_output eq 'table' ) {
+
+		#
+		# set the columns they had not been manually specified
+		#
+		if ( !defined($columns) ) {
+			if ( $table eq 'suricata' ) {
+				if ( $column_set eq 'default' ) {
+					$columns
+						= 'id,instance,in_iface,src_ip,src_port,dest_ip,dest_port,proto,app_proto,signature,classification,rule_id';
+				}
+				elsif ( $column_set eq 'default_timestamp' ) {
+					$columns
+						= 'timestamp,instance,in_iface,src_ip,src_port,dest_ip,dest_port,proto,app_proto,signature,classification,rule_id';
+				}
+				elsif ( $column_set eq 'default_event' ) {
+					$columns
+						= 'id,event_id,instance,in_iface,src_ip,src_port,dest_ip,dest_port,proto,app_proto,signature,classification,rule_id';
+				}
+				elsif ( $column_set eq 'default_timestamp_event' ) {
+					$columns
+						= 'timestamp,event_id,instance,in_iface,src_ip,src_port,dest_ip,dest_port,proto,app_proto,signature,classification,rule_id';
+				}
+				else {
+					die( '"' . $column_set . '" is not a known column set' );
+				}
+			}
+			else {
+				if ( $column_set eq 'default' ) {
+					$columns
+						= 'id,instance,src_ip,host,xff,facility,level,priority,program,signature,classification,rule_id';
+				}
+				elsif ( $column_set eq 'default_timestamp' ) {
+					$columns
+						= 'timestamp,instance,src_ip,host,xff,facility,level,priority,program,signature,classification,rule_id';
+				}
+				elsif ( $column_set eq 'default_event' ) {
+					$columns
+						= 'id,event_id,instance,src_ip,host,xff,facility,level,priority,program,signature,classification,rule_id';
+				}
+				elsif ( $column_set eq 'default_timestamp_event' ) {
+					$columns
+						= 'timestamp,event_id,instance,src_ip,host,xff,facility,level,priority,program,signature,classification,rule_id';
+				}
+				else {
+					die( '"' . $column_set . '" is not a known column set' );
+				}
+			}
+		}
+
+		# friendly column names
+		my $column_names = {
+			'id'                  => 'id',
+			'instance'            => 'instance',
+			'host'                => 'host',
+			'timestamp'           => 'timestamp',
+			'event_id'            => 'event_id',
+			'flow_id'             => 'flow_id',
+			'in_iface'            => 'if',
+			'src_ip'              => 'src_ip',
+			'src_port'            => 'sport',
+			'dest_ip'             => 'dest_ip',
+			'dest_port'           => 'dport',
+			'proto'               => 'proto',
+			'app_proto'           => 'aproto',
+			'flow_pkts_toserver'  => 'PtS',
+			'flow_bytes_toserver' => 'BtS',
+			'flow_pkts_toclient'  => 'PtC',
+			'flow_bytes_toclient' => 'BtC',
+			'flow_start'          => 'flow_start',
+			'classification'      => 'class',
+			'signature'           => 'signature',
+			'gid'                 => 'gid',
+			'sid'                 => 'sid',
+			'rev'                 => 'rev',
+			'rule_id'             => 'rule_id',
+			'facility'            => 'facility',
+			'level'               => 'level',
+			'priority'            => 'priority',
+			'program'             => 'program',
+			'xff'                 => 'xff',
+			'stream'              => 'stream',
+			'event_id'            => 'event',
+		};
+
+		#
+		# init the table
+		#
+		my $tb = Text::ANSITable->new;
+		$tb->border_style( $ENV{Lilith_table_border} );
+		$tb->color_theme( $ENV{Lilith_table_color} );
+
+		my @columns_array = split( /,/, $columns );
+		my $header_int    = 0;
+		my $padding       = 0;
+		my @headers;
+		foreach my $header (@columns_array) {
+
+			push( @headers, $column_names->{$header} );
+
+			if   ( ( $header_int % 2 ) != 0 ) { $padding = 1; }
+			else                              { $padding = 0; }
+
+			$tb->set_column_style( $header_int, pad => $padding );
+
+			$header_int++;
+		}
+
+		$tb->columns( \@headers );
+
+		#
+		# process each found row
+		#
+		my @td;
+		foreach my $row ( @{$returned} ) {
+			my @new_line;
+
+			foreach my $column (@columns_array) {
+
+				if ( $column eq 'rule_id' ) {
+					$row->{rule_id} = $row->{gid} . ':' . $row->{sid} . ':' . $row->{rev};
+				}
+
+				if ( defined( $row->{$column} ) && $column eq 'rule_id' ) {
+					push( @new_line, $row->{gid} . ':' . $row->{sid} . ':' . $row->{rev} );
+				}
+				elsif ( defined( $row->{$column} ) && $column eq 'classification' ) {
+					push( @new_line, $lilith->get_short_class( $row->{$column} ) );
+				}
+				elsif ( defined( $row->{$column} ) && ( $column eq 'src_ip' || $column eq 'dest_ip' ) ) {
+					if ( defined( $ENV{Lilith_IP_color} ) ) {
+						if (   $row->{$column} =~ /^192\.168\./
+							|| $row->{$column} =~ /^10\./
+							|| $row->{$column} =~ /^172\.16/
+							|| $row->{$column} =~ /^172\.17/
+							|| $row->{$column} =~ /^172\.19/
+							|| $row->{$column} =~ /^172\.19/
+							|| $row->{$column} =~ /^172\.20/
+							|| $row->{$column} =~ /^172\.21/
+							|| $row->{$column} =~ /^172\.22/
+							|| $row->{$column} =~ /^172\.23/
+							|| $row->{$column} =~ /^172\.24/
+							|| $row->{$column} =~ /^172\.25/
+							|| $row->{$column} =~ /^172\.26/
+							|| $row->{$column} =~ /^172\.26/
+							|| $row->{$column} =~ /^172\.27/
+							|| $row->{$column} =~ /^172\.28/
+							|| $row->{$column} =~ /^172\.29/
+							|| $row->{$column} =~ /^172\.30/
+							|| $row->{$column} =~ /^172\.31/ )
+						{
+							$row->{$column} = color( $ENV{Lilith_IP_private_color} ) . $row->{$column} . color('reset');
+						}
+						elsif ( $row->{$column} =~ /^127\./ ) {
+							$row->{$column} = color( $ENV{Lilith_IP_local_color} ) . $row->{$column} . color('reset');
+						}
+						else {
+							$row->{$column} = color( $ENV{Lilith_IP_remote_color} ) . $row->{$column} . color('reset');
+						}
+					}
+					push( @new_line, $row->{$column} );
+				}
+				elsif ( defined( $row->{$column} ) && $column eq 'timestamp' ) {
+					if ( $ENV{Lilith_timesamp_drop_micro} ) {
+						$row->{$column} =~ s/\.[0-9]+//;
+					}
+					if ( $ENV{Lilith_timesamp_drop_offset} ) {
+						$row->{$column} =~ s/\-[0-9]+$//;
+					}
+					push( @new_line, $row->{$column} );
+				}
+				elsif ( defined( $row->{$column} ) && $column eq 'instance' && $ENV{Lilith_instance_color} ) {
+					my $color0 = color( $ENV{Lilith_instance_slug_color} );
+					my $color1 = color('reset');
+					my $color3 = color( $ENV{Lilith_instance_type_color} );
+					my $color4 = color( $ENV{Lilith_instance_loc_color} );
+					$row->{$column} =~ s/(^[A-Za-z0-9]+)\-/$color0$1$color1-/;
+					$row->{$column} =~ s/\-(ids|pie|lae)$/-$color3$1$color1/;
+					$row->{$column} =~ s/\-([A-Za-z0-9\-]+)\-/-$color4$1$color1/;
+					push( @new_line, $row->{$column} );
+				}
+				elsif ( defined( $row->{$column} ) ) {
+					push( @new_line, $row->{$column} );
+				}
+				else {
+					push( @new_line, '' );
+				}
+
+			}
+
+			push( @td, \@new_line );
+		}
+
+		#
+		# print the table
+		#
+		$tb->add_rows( \@td );
+		print $tb->draw;
+		exit 0;
+	}
+
+	# bad selection via --output
+	die('No applicable output found');
+}
+
+#
+# gets a event
+#
+
+if ( $action eq 'event' ) {
+	if ( defined($id) && defined($event_id) ) {
+		die('Can not search via both --id and --event for fetching a event');
+	}
+
+	my $returned = $lilith->search(
+		table    => $table,
+		id       => $id,
+		event_id => $event_id,
+		debug    => $debug,
+		no_time  => 1,
+		limit    => 1,
+	);
+
+	if ( !defined( $returned->[0] ) ) {
+		print "{}\n";
+		exit 42;
+	}
+
+	if (   $decode_raw
+		&& defined( $returned->[0] )
+		&& defined( $returned->[0]{raw} ) )
+	{
+		$returned->[0]{raw} = decode_json( $returned->[0]{raw} );
+	}
+
+	my $json = JSON->new;
+	if ($pretty) {
+		$json->canonical(1);
+		$json->pretty(1);
+	}
+	my $raw_json = $json->encode( $returned->[0] );
+	print $raw_json;
+	if ( !$pretty ) {
+		print "\n";
+	}
+	exit 0;
+}
+
+#
+# print the class_map
+#
+
+if ( $action eq 'class_map' ) {
+	#
+	# init the table
+	#
+	my $tb = Text::ANSITable->new;
+	$tb->border_style( $ENV{Lilith_table_border} );
+	$tb->color_theme( $ENV{Lilith_table_color} );
+
+	my @columns = ( 'Class', 'Mapping' );
+
+	my $header_int = 0;
+	my $padding;
+	my @headers;
+	foreach my $header (@columns) {
+		push( @headers, $header );
+
+		if   ( ( $header_int % 2 ) != 0 ) { $padding = 1; }
+		else                              { $padding = 0; }
+
+		$tb->set_column_style( $header_int, pad => $padding );
+
+		$header_int++;
+	}
+
+	$tb->columns( \@headers );
+
+	#
+	#
+	#
+	my @td;
+	foreach my $key ( sort( keys( %{ $lilith->{class_map} } ) ) ) {
+		my @row = ( $key, $lilith->{class_map}{$key} );
+		push( @td, \@row );
+	}
+
+	#
+	# print the table
+	#
+	$tb->add_rows( \@td );
+	print $tb->draw;
+
+	exit 0;
+}
+
+if ( $action eq 'get_short_class_snmp_list' ) {
+	my $class_list = $lilith->get_short_class_snmp_list;
+
+	foreach my $item ( @{$class_list} ) {
+		print $item. "\n";
+	}
+
+	exit 0;
+}
+
+#
+# means we did not match anything
+#
+die( 'No matching action, -a, found for "' . $action . '"' );

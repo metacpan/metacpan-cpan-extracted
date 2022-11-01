@@ -343,7 +343,6 @@ Ndjamena
 New_Salem
 New_York
 Nicosia
-Nipigon
 Niue
 Nome
 Norfolk
@@ -397,7 +396,6 @@ Qyzylorda
 RO
 RW
 Rabbitson
-Rainy_River
 Rankin_Inlet
 Rarotonga
 Rata
@@ -471,7 +469,6 @@ Tehran
 Tell_City
 Thimphu
 Thule
-Thunder_Bay
 Tijuana
 TimeZone
 Timor

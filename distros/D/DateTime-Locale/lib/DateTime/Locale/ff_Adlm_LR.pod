@@ -19,12 +19,12 @@
 
 =head1 NAME
 
-DateTime::Locale::ff_Adlm_LR - Locale data examples for the Fulah Liberia Adlam (ff-Adlm-LR) locale
+DateTime::Locale::ff_Adlm_LR - Locale data examples for the Fula Liberia Adlam (ff-Adlm-LR) locale
 
 =head1 DESCRIPTION
 
 This pod file contains examples of the locale data available for the
-Fulah Liberia Adlam locale.
+Fula Liberia Adlam locale.
 
 =head2 Days
 
@@ -302,15 +302,15 @@ Fulah Liberia Adlam locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = 𞤃𞤢𞤱𞤦𞤢𞥄𞤪𞤫 5 𞤕𞤮𞤤𞤼𞤮⹁ 2008 𞤉 6:30:30 𞤇𞤎 UTC
-   1995-12-22T09:05:02 = 𞤃𞤢𞤱𞤲𞤣𞤫 22 𞤄𞤮𞤱𞤼𞤮⹁ 1995 𞤉 9:05:02 𞤀𞤎 UTC
-  -0010-09-15T04:44:23 = 𞤖𞤮𞤪𞤦𞤭𞤪𞥆𞤫 15 𞤅𞤭𞤤𞤼𞤮⹁ -10 𞤉 4:44:23 𞤀𞤎 UTC
+   2008-02-05T18:30:30 = 𞤃𞤢𞤱𞤦𞤢𞥄𞤪𞤫 5 𞤕𞤮𞤤𞤼𞤮⹁ 2008 6:30:30 𞤇𞤎 UTC
+   1995-12-22T09:05:02 = 𞤃𞤢𞤱𞤲𞤣𞤫 22 𞤄𞤮𞤱𞤼𞤮⹁ 1995 9:05:02 𞤀𞤎 UTC
+  -0010-09-15T04:44:23 = 𞤖𞤮𞤪𞤦𞤭𞤪𞥆𞤫 15 𞤅𞤭𞤤𞤼𞤮⹁ -10 4:44:23 𞤀𞤎 UTC
 
 =head3 Long
 
-   2008-02-05T18:30:30 = 5 𞤕𞤮𞤤𞤼𞤮⹁ 2008 𞤉 6:30:30 𞤇𞤎 UTC
-   1995-12-22T09:05:02 = 22 𞤄𞤮𞤱𞤼𞤮⹁ 1995 𞤉 9:05:02 𞤀𞤎 UTC
-  -0010-09-15T04:44:23 = 15 𞤅𞤭𞤤𞤼𞤮⹁ -10 𞤉 4:44:23 𞤀𞤎 UTC
+   2008-02-05T18:30:30 = 5 𞤕𞤮𞤤𞤼𞤮⹁ 2008 6:30:30 𞤇𞤎 UTC
+   1995-12-22T09:05:02 = 22 𞤄𞤮𞤱𞤼𞤮⹁ 1995 9:05:02 𞤀𞤎 UTC
+  -0010-09-15T04:44:23 = 15 𞤅𞤭𞤤𞤼𞤮⹁ -10 4:44:23 𞤀𞤎 UTC
 
 =head3 Medium
 

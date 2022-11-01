@@ -537,3 +537,33 @@ xxxxx.xxxxxx$ e[1D [1Dalarm show
 +---------------------------------------------------------------------------------------------------------------------------+
 
 xxxxx.xxxxxx$ exit
+
+xxxxx.xxxxxx$ ptp show
++-------------------------------------------------------- PTP STATUS SUMMARY -----------------------------------------------------+
+|       |                     Admin Configuration                   |                      Operational Status                     |
+|  PTP  |State|FEC |  XCVR Mode   |Link Optimization Mode|Freq (GHz)| State |FEC |  XCVR Mode   |Link Optimization Mode|Freq (GHz)|
++-------+-----+----+--------------+----------------------+----------+-------+----+--------------+----------------------+----------+
+|1/1    | Ena |    | OCH          |                      |          |Up     |    | OCH          |                      |          |
+|1/2    | Ena |    | OCH          |                      |          |Flt    |    | OCH          |                      |          |
+|1/3    | Ena |    | OCH          |                      |          |Up     |    | OCH          |                      |          |
+|1/4    | Ena |    | OCH          |                      |          |Flt    |    | OCH          |                      |          |
+|1/5    | Ena |    | OCH          |                      |          |Flt    |    | OCH          |                      |          |
+|1/6    | Ena |    | OCH          |                      |          |Flt    |    | OCH          |                      |          |
+|1/7    | Ena |    | OCH          |                      |          |Flt    |    | OCH          |                      |          |
+|1/8    | Ena |    | OCH          |                      |          |Flt    |    | OCH          |                      |          |
+|1/9    | Ena |    | OCH          |                      |          |Flt    |    | OCH          |                      |          |
+|1/10   | Ena |    | OCH          |                      |          |Flt    |    | OCH          |                      |          |
+|1/11   | Ena |    | OSC          |                      |          |Up     |    | OSC          |                      |          |
+|1/12   | Ena |    | OSC-ADD-DROP |                      |          |Up     |    | OSC-ADD-DROP |                      |          |
+|1/13   | Ena |    | OTM          |                      |          |Up     |    | OTM          |                      |          |
+|2/1    | Ena |Ena | 56-400       | Standard             | 194800.0 |Up     |Ena | 56-400       | Standard             | 194800.0 |
+|2/3    | Ena |Dis | 100GE        |                      |          |Up     |Dis | 100GE        |                      |          |
+|2/4    | Ena |Dis | 100GE        |                      |          |Up     |Dis | 100GE        |                      |          |
+|2/5    | Ena |Dis | 100GE        |                      |          |Up     |Dis | 100GE        |                      |          |
+|2/6    | Ena |Dis | 100GE        |                      |          |Up     |Dis | 100GE        |                      |          |
+|3/1    | Ena |Ena | 56-400       | Standard             | 194200.0 |Up     |Ena | 56-400       | Standard             | 194200.0 |
+|3/3    | Ena |Dis | 100GE        |                      |          |Up     |Dis | 100GE        |                      |          |
+|3/4    | Ena |Dis | 100GE        |                      |          |Up     |Dis | 100GE        |                      |          |
+|3/5    | Ena |Dis | 100GE        |                      |          |Up     |Dis | 100GE        |                      |          |
+|3/6    | Ena |Dis | 100GE        |                      |          |Up     |Dis | 100GE        |                      |          |
++-------+-----+----+--------------+----------------------+----------+-------+----+--------------+----------------------+----------+

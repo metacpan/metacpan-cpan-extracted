@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package Syntax::Operator::Divides 0.01;
+package Syntax::Operator::Divides 0.02;
 
 use v5.14;
 use warnings;
@@ -75,6 +75,11 @@ sub import_into
    my %syms = map { $_ => 1 } @syms;
    $^H{"Syntax::Operator::Divides/divides"}++ if delete $syms{divides};
 
+   {
+      no strict 'refs';
+      *{"${caller}::is_divisor"} = \&is_divisor if delete $syms{is_divisor};
+   }
+
    croak "Unrecognised import symbols @{[ keys %syms ]}" if keys %syms;
 }
 
@@ -87,6 +92,27 @@ sub import_into
 Yields true if the numerator operand is a whole integer multiple of the
 denominator. This is implemented by using the C<%> modulus operator and
 testing if the remainder is zero.
+
+=cut
+
+=head1 FUNCTIONS
+
+As a convenience, the following functions may be imported which implement the
+same behaviour as the infix operators, though are accessed via regular
+function call syntax.
+
+These wrapper functions are implemented using L<XS::Parse::Infix>, and thus
+have an optimising call-checker attached to them. In most cases, code which
+calls them should not in fact have the full runtime overhead of a function
+call because the underlying test operator will get inlined into the calling
+code at compiletime. In effect, code calling these functions should run with
+the same performance as code using the infix operators directly.
+
+=head2 is_divisor
+
+   my $divides = is_divisor( $numerator, $denominator );
+
+A function version of the L</%%> operator.
 
 =cut
 

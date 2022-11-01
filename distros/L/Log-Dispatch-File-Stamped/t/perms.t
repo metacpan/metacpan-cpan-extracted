@@ -16,7 +16,7 @@ my $file = $tempdir->child(sprintf("logfile-%04d%02d%02d.txt", $year+1900, $mon+
 my %params = (
     name        => 'file',
     min_level   => 'debug',
-    permissions => 0600,
+    permissions => 0521,
     filename  => $tempdir->child('logfile.txt')->stringify,
 );
 my $stamped = Log::Dispatch::File::Stamped->new(%params);
@@ -32,7 +32,7 @@ SKIP: {
             || $^O eq 'MSWin32' || $^O eq 'dos'
             || $^O eq 'cygwin' || $^O eq 'MacOS';
 
-    is((stat($file))[2] & 07777, 0600, 'permissions are correct');
+    is((stat($file))[2] & 07777, 0521, 'permissions are correct');
 }
 
 done_testing;

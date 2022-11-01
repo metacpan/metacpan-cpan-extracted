@@ -8,6 +8,7 @@
 #include "const-c.inc"
 #include <fcntl.h>
 #include <sys/socket.h>
+#include <sys/un.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <poll.h>
@@ -56,6 +57,7 @@ SV * slurp(pTHX_ int fd, int read_size){
 }
 
 
+
 #if defined(IO_FD_OS_DARWIN)|| defined(IO_FD_OS_BSD)
 #define IO_FD_ATIME atime=buf.st_atimespec.tv_sec+buf.st_atimespec.tv_nsec*1e-9;
 #define IO_FD_MTIME mtime=buf.st_mtimespec.tv_sec+buf.st_mtimespec.tv_nsec*1e-9;
@@ -86,6 +88,9 @@ INCLUDE: const-xs.inc
 #SOCKET
 #######
 
+#TODO: 
+#Allow a string af, which is actually sockaddr structure
+#Extract out the family, Saves a step
 SV* 
 socket(sock,af,type,proto)
 		SV* sock;
@@ -209,6 +214,28 @@ connect(fd, address)
 		}
 	OUTPUT:
 		RETVAL
+	
+#SOCKATMARK
+##########
+SV*
+sockatmark(fd)
+	SV *fd;
+	INIT:
+		int ret;
+	PPCODE:
+		if(SvOK(fd)&&SvIOK(fd)){
+			ret=sockatmark(SvIV(fd));
+			if(ret<0){
+				XSRETURN_UNDEF;
+			}
+			else{
+				XSRETURN_IV(ret);
+			}
+
+		}
+		else{
+			XSRETURN_UNDEF;
+		}
 		
 #SYSOPEN
 ########
@@ -1151,6 +1178,7 @@ mkstemp(template)
 			switch(GIMME_V){
 				case G_SCALAR:
 					mXPUSHs(newSViv(ret));
+					XSRETURN(1);
 					break;
 				case G_ARRAY:
 					//path_sv=newSV(MAXPATHLEN);	
@@ -1162,9 +1190,11 @@ mkstemp(template)
 					mPUSHs(newSViv(ret));
 					//mPUSHs(newSVpv(path,0));
 					mPUSHs(&PL_sv_undef);
+					XSRETURN(2);
 					break;
 
 				default:
+					XSRETURN_EMPTY;
 					break;
 					
 			}
@@ -1202,6 +1232,7 @@ mktemp(template)
 		}
 		else{
 			mXPUSHs(newSVpv(ret, 0));
+			XSRETURN(1);
 		}
 
 
@@ -1340,7 +1371,24 @@ getsockname(fd)
 	OUTPUT:
 		RETVAL
 
+void
+shutdown(fd, how)
+	int fd
+	int how
 
+	INIT:
+
+	  int ret;
+	PPCODE:
+		ret=shutdown(fd, how);
+
+		if(ret<0){
+			XSRETURN_UNDEF;
+		}
+		else{
+			mXPUSHs(newSViv(1));
+			XSRETURN(1);
+		}
 
 void
 stat(target)
@@ -1442,6 +1490,7 @@ stat(target)
 		switch(GIMME_V){
 			case G_SCALAR:
 				mXPUSHs(&PL_sv_undef);
+				XSRETURN(1);
 				break;
 			case G_VOID:
 			case G_ARRAY:
@@ -1449,6 +1498,9 @@ stat(target)
 				XSRETURN_EMPTY;
 				break;
 		}
+
+
+
 
 
 #if defined(IO_FD_OS_DARWIN) || defined(IO_FD_OS_BSD)
@@ -1656,6 +1708,7 @@ readline(fd)
 						SvCUR_set(buffer,ret);	//Set the length of the string
 						EXTEND(SP,1);		//Extend stack
 						mPUSHs(buffer);		//Push record
+						XSRETURN(1);
 					}
 					else {
 						XSRETURN_UNDEF;
@@ -1672,6 +1725,7 @@ readline(fd)
 				//SLURP entire file
 				EXTEND(SP,1);
 				PUSHs(slurp(aTHX_ fd, 4096));
+				XSRETURN(1);
 			}
 		}
 		else {

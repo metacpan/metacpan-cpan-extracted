@@ -8,7 +8,7 @@ no warnings;
 
 use Carp qw(carp);
 
-our $VERSION = '1.115';
+our $VERSION = '1.116';
 
 =encoding utf8
 
@@ -130,9 +130,8 @@ sub _eval_version {
 	local $^W = 0;
 
 	my $s = Safe->new;
-	$s->share_from('main', ['*version::']);
-	$s->share_from('version', ['&qv']);
-	if (defined $Devel::Cover::VERSION) {
+
+if (defined $Devel::Cover::VERSION) {
 		$s->share_from('main', ['&Devel::Cover::use_file']);
 	}
 	$s->reval('$VERSION = ' . $rhs);

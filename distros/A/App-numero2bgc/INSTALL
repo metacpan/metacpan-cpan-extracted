@@ -1,0 +1,10 @@
+
+INSTALL memo for "App::numero2bgc" : 
+
+   cpanm App::numero2bgc  # For installing (^_^)
+
+   cpanm -U App::numero2bgc  # For uninstalling (;_;)
+
+   
+
+

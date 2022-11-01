@@ -3,17 +3,16 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Search YouTube
 
-our $VERSION = '0.0303';
+our $VERSION = '0.0304';
 
-use Moo;
 use strictures 2;
-use namespace::clean;
-
-use Carp;
-use Mojo::UserAgent;
-use Mojo::JSON qw( decode_json );
-use Mojo::URL;
+use Carp qw(croak);
+use Mojo::UserAgent ();
+use Mojo::JSON qw(decode_json);
+use Mojo::URL ();
+use Moo;
 use Try::Tiny;
+use namespace::clean;
 
 
 has key => (
@@ -89,7 +88,7 @@ WebService::YTSearch - Search YouTube
 
 =head1 VERSION
 
-version 0.0303
+version 0.0304
 
 =head1 SYNOPSIS
 
@@ -147,13 +146,13 @@ The tests in F<t/01-methods.t>
 
 L<https://developers.google.com/youtube/v3/docs/search/list>
 
-L<Moo>
-
 L<Mojo::JSON>
+
+L<Mojo::URL>
 
 L<Mojo::UserAgent>
 
-L<Mojo::URL>
+L<Moo>
 
 L<Try::Tiny>
 
@@ -163,7 +162,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Gene Boggs.
+This software is copyright (c) 2022 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

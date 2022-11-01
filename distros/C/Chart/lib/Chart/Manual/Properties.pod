@@ -56,7 +56,7 @@ The usual options are:
 
   names:  'blue'
   
-All names are tabulated visually and by name under L<Chart::Color::Constant/NAMES>.
+All names are tabulated visually and by name under L<Chart::Property::DataType::Color::Constant/NAMES>.
 You can also define a color with integer values in the RGB or HSL space.
 Acceptable ranges are for RGB: 3x 0..255 and for  HSL: 0..359, 2 x 0..100.
   
@@ -66,7 +66,7 @@ Acceptable ranges are for RGB: 3x 0..255 and for  HSL: 0..359, 2 x 0..100.
   HSL hashes: { H   => 240,  S     => 100, L     => 50 }
   HSL hashes: { hue => 240, saturation => 100, lightness => 50 }
 
-Detailed explanation and even more options you find under L<Chart::Color>.
+Detailed explanation and even more options you find under L<Graphics::Toolkit::Color>.
 
 =head2 font
 
@@ -827,7 +827,7 @@ under same terms as Perl itself.
 
 =head1 AUTHOR
 
-David Bonner, <chartgrp@web.de>
+David Bonner, Chart Group, 
 
 Herbert Breunung, <lichtkind@cpan.org>
 

@@ -2,7 +2,7 @@
 ## Stripe API - ~/lib/Net/API/Stripe/Event/Data.pm
 ## Version v0.100.0
 ## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2020/05/15
 ## 
@@ -13,23 +13,28 @@ package Net::API::Stripe::Event::Data;
 BEGIN
 {
     use strict;
+    use warnings;
     use parent qw( Net::API::Stripe::Generic );
+    use vars qw( $VERSION );
     our( $VERSION ) = 'v0.100.0';
 };
 
+use strict;
+use warnings;
+
 sub object 
 {
-	my $self = shift( @_ );
-	if( @_ )
-	{
-		my $ref = shift( @_ );
-		## This is not a type, there is an object property that contains a hash
-		my $type = $ref->{object} || return( $self->error( "No object type could be found for field $self->{_field} in hash: ", sub{ $self->dumper( $ref ) } ) );
-		my $class = $self->_object_type_to_class( $type ) ||
-		return( $self->error( "No class found for object type $type" ) );
-		return( $self->_set_get_object( 'object', $class, $ref ) );
-	}
-	return( $self->{object} );
+    my $self = shift( @_ );
+    if( @_ )
+    {
+        my $ref = shift( @_ );
+        ## This is not a type, there is an object property that contains a hash
+        my $type = $ref->{object} || return( $self->error( "No object type could be found for field $self->{_field} in hash: ", sub{ $self->dumper( $ref ) } ) );
+        my $class = $self->_object_type_to_class( $type ) ||
+        return( $self->error( "No class found for object type $type" ) );
+        return( $self->_set_get_object( 'object', $class, $ref ) );
+    }
+    return( $self->{object} );
 }
 
 sub previous_attributes { return( shift->_set_get_hash( 'previous_attributes', @_ ) ); }
@@ -63,74 +68,66 @@ This is instantiated by the method B<data> in module L<Net::API::Stripe::Event>
 
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>( %ARG )
+=head2 new( %ARG )
 
 Creates a new L<Net::API::Stripe::Event::Data> object.
 It may also take an hash like arguments, that also are method of the same name.
 
-=back
-
 =head1 METHODS
 
-=over 4
-
-=item B<object> hash
+=head2 object hash
 
 Object containing the API resource relevant to the event. For example, an invoice.created event will have a full invoice object as the value of the object key.
 
-=item B<previous_attributes> hash
+=head2 previous_attributes hash
 
 Object containing the names of the attributes that have changed, and their previous values (sent along only with *.updated events).
 
-=back
-
 =head1 API SAMPLE
 
-	{
-	  "id": "evt_fake123456789",
-	  "object": "event",
-	  "api_version": "2017-02-14",
-	  "created": 1528914645,
-	  "data": {
-		"object": {
-		  "object": "balance",
-		  "available": [
-			{
-			  "currency": "jpy",
-			  "amount": 1025751,
-			  "source_types": {
-				"card": 1025751
-			  }
-			}
-		  ],
-		  "connect_reserved": [
-			{
-			  "currency": "jpy",
-			  "amount": 0
-			}
-		  ],
-		  "livemode": false,
-		  "pending": [
-			{
-			  "currency": "jpy",
-			  "amount": 0,
-			  "source_types": {
-				"card": 0
-			  }
-			}
-		  ]
-		}
-	  },
-	  "livemode": false,
-	  "pending_webhooks": 0,
-	  "request": {
-		"id": null,
-		"idempotency_key": null
-	  },
-	  "type": "balance.available"
-	}
+    {
+      "id": "evt_fake123456789",
+      "object": "event",
+      "api_version": "2017-02-14",
+      "created": 1528914645,
+      "data": {
+        "object": {
+          "object": "balance",
+          "available": [
+            {
+              "currency": "jpy",
+              "amount": 1025751,
+              "source_types": {
+                "card": 1025751
+              }
+            }
+          ],
+          "connect_reserved": [
+            {
+              "currency": "jpy",
+              "amount": 0
+            }
+          ],
+          "livemode": false,
+          "pending": [
+            {
+              "currency": "jpy",
+              "amount": 0,
+              "source_types": {
+                "card": 0
+              }
+            }
+          ]
+        }
+      },
+      "livemode": false,
+      "pending_webhooks": 0,
+      "request": {
+        "id": null,
+        "idempotency_key": null
+      },
+      "type": "balance.available"
+    }
 
 =head1 HISTORY
 

@@ -1,5 +1,7 @@
 package Travel::Status::DE::HAFAS;
 
+# vim:foldmethod=marker
+
 use strict;
 use warnings;
 use 5.014;
@@ -10,240 +12,615 @@ no if $] >= 5.018, warnings => 'experimental::smartmatch';
 use Carp qw(confess);
 use DateTime;
 use DateTime::Format::Strptime;
+use Digest::MD5 qw(md5_hex);
+use Encode      qw(decode encode);
+use JSON;
 use LWP::UserAgent;
-use POSIX qw(strftime);
-use Travel::Status::DE::HAFAS::Result;
+use Travel::Status::DE::HAFAS::Message;
+use Travel::Status::DE::HAFAS::Polyline qw(decode_polyline);
+use Travel::Status::DE::HAFAS::Journey;
 use Travel::Status::DE::HAFAS::StopFinder;
-use XML::LibXML;
 
-our $VERSION = '3.01';
+our $VERSION = '4.01';
+
+# {{{ Endpoint Definition
 
 my %hafas_instance = (
-
-	#BVG => {
-	#	url         => 'https://bvg.hafas.de/bin/stboard.exe',
-	#	stopfinder  => 'https://bvg.hafas.de/bin/ajax-getstop.exe',
-	#	name        => 'Berliner Verkehrsgesellschaft',
-	#	productbits => [qw[s u tram bus ferry ice regio ondemand]],
-	#},
 	DB => {
-		url         => 'https://reiseauskunft.bahn.de/bin/bhftafel.exe',
 		stopfinder  => 'https://reiseauskunft.bahn.de/bin/ajax-getstop.exe',
-		trainsearch => 'https://reiseauskunft.bahn.de/bin/trainsearch.exe',
-		traininfo   => 'https://reiseauskunft.bahn.de/bin/traininfo.exe',
+		mgate       => 'https://reiseauskunft.bahn.de/bin/mgate.exe',
 		name        => 'Deutsche Bahn',
-		productbits =>
-		  [qw[ice ic_ec d regio s bus ferry u tram ondemand x x x x]],
+		productbits => [qw[ice ic_ec d regio s bus ferry u tram ondemand]],
+		salt        => 'bdI8UVj4' . '0K5fvxwf',
+		request     => {
+			client => {
+				id   => 'DB',
+				v    => '20100000',
+				type => 'IPH',
+				name => 'DB Navigator',
+			},
+			ext  => 'DB.R21.12.a',
+			ver  => '1.15',
+			auth => {
+				type => 'AID',
+				aid  => 'n91dB8Z77' . 'MLdoR0K'
+			},
+		},
 	},
 	NAHSH => {
-		url         => 'https://nah.sh.hafas.de/bin/stboard.exe',
+		mgate       => 'https://nah.sh.hafas.de/bin/mgate.exe',
 		stopfinder  => 'https://nah.sh.hafas.de/bin/ajax-getstop.exe',
 		name        => 'Nahverkehrsverbund Schleswig-Holstein',
 		productbits => [qw[ice ice ice regio s bus ferry u tram ondemand]],
+		request     => {
+			client => {
+				id   => 'NAHSH',
+				v    => '3000700',
+				type => 'IPH',
+				name => 'NAHSHPROD',
+			},
+			ver  => '1.16',
+			auth => {
+				type => 'AID',
+				aid  => 'r0Ot9FLF' . 'NAFxijLW'
+			},
+		},
 	},
 	NASA => {
-		url         => 'https://reiseauskunft.insa.de/bin/stboard.exe',
+		mgate       => 'https://reiseauskunft.insa.de/bin/mgate.exe',
 		stopfinder  => 'https://reiseauskunft.insa.de/bin/ajax-getstop.exe',
 		name        => 'Nahverkehrsservice Sachsen-Anhalt',
 		productbits => [qw[ice ice regio regio regio tram bus ondemand]],
+		request     => {
+			client => {
+				id   => 'NASA',
+				v    => '4000200',
+				type => 'IPH',
+				name => 'nasaPROD',
+				os   => 'iPhone OS 13.1.2',
+			},
+			ver  => '1.18',
+			auth => {
+				type => 'AID',
+				aid  => 'nasa-' . 'apps',
+			},
+			lang => 'deu',
+		},
 	},
 	NVV => {
-		url => 'https://auskunft.nvv.de/auskunft/bin/jp/stboard.exe',
+		mgate      => 'https://auskunft.nvv.de/auskunft/bin/app/mgate.exe',
 		stopfinder =>
 		  'https://auskunft.nvv.de/auskunft/bin/jp/ajax-getstop.exe',
-		name => 'Nordhessischer VerkehrsVerbund',
+		name        => 'Nordhessischer VerkehrsVerbund',
 		productbits =>
 		  [qw[ice ic_ec regio s u tram bus bus ferry ondemand regio regio]],
+		request => {
+			client => {
+				id   => 'NVV',
+				v    => '5000300',
+				type => 'IPH',
+				name => 'NVVMobilPROD_APPSTORE',
+				os   => 'iOS 13.1.2',
+			},
+			ext  => 'NVV.6.0',
+			ver  => '1.18',
+			auth => {
+				type => 'AID',
+				aid  => 'Kt8eNOH7' . 'qjVeSxNA',
+			},
+			lang => 'deu',
+		},
 	},
 	'ÖBB' => {
-		url        => 'https://fahrplan.oebb.at/bin/stboard.exe',
-		stopfinder => 'https://fahrplan.oebb.at/bin/ajax-getstop.exe',
-		name       => 'Österreichische Bundesbahnen',
+		mgate       => 'https://fahrplan.oebb.at/bin/mgate.exe',
+		stopfinder  => 'https://fahrplan.oebb.at/bin/ajax-getstop.exe',
+		name        => 'Österreichische Bundesbahnen',
 		productbits =>
 		  [qw[ice ice ice regio regio s bus ferry u tram ice ondemand ice]],
+		request => {
+			client => {
+				id   => 'OEBB',
+				v    => '6030600',
+				type => 'IPH',
+				name => 'oebbPROD-ADHOC',
+			},
+			ver  => '1.41',
+			auth => {
+				type => 'AID',
+				aid  => 'OWDL4fE4' . 'ixNiPBBm',
+			},
+			lang => 'deu',
+		},
 	},
-	RSAG => {
-		url         => 'https://fahrplan.rsag-online.de/hafas/stboard.exe',
-		stopfinder  => 'https://fahrplan.rsag-online.de/hafas/ajax-getstop.exe',
-		name        => 'Rostocker Straßenbahn AG',
-		productbits => [qw[ice ice ice regio s bus ferry u tram ondemand]],
-	},
-
-	#SBB => {
-	#	url        => 'https://fahrplan.sbb.ch/bin/stboard.exe',
-	#	stopfinder => 'https://fahrplan.sbb.ch/bin/ajax-getstop.exe',
-	#	name       => 'Schweizerische Bundesbahnen',
-	#	productbits =>
-	#	  [qw[ice ice regio regio ferry s bus cablecar regio tram]],
-	#},
 	VBB => {
-		url         => 'https://fahrinfo.vbb.de/bin/stboard.exe',
+		mgate       => 'https://fahrinfo.vbb.de/bin/mgate.exe',
 		stopfinder  => 'https://fahrinfo.vbb.de/bin/ajax-getstop.exe',
 		name        => 'Verkehrsverbund Berlin-Brandenburg',
 		productbits => [qw[s u tram bus ferry ice regio]],
+		request     => {
+			client => {
+				id   => 'VBB',
+				type => 'WEB',
+				name => 'VBB WebApp',
+				l    => 'vs_webapp_vbb',
+			},
+			ext  => 'VBB.1',
+			ver  => '1.33',
+			auth => {
+				type => 'AID',
+				aid  => 'hafas-vb' . 'b-webapp',
+			},
+			lang => 'deu',
+		},
 	},
 	VBN => {
-		url         => 'https://fahrplaner.vbn.de/hafas/stboard.exe',
+		mgate       => 'https://fahrplaner.vbn.de/bin/mgate.exe',
 		stopfinder  => 'https://fahrplaner.vbn.de/hafas/ajax-getstop.exe',
 		name        => 'Verkehrsverbund Bremen/Niedersachsen',
 		productbits => [qw[ice ice regio regio s bus ferry u tram ondemand]],
+		salt        => 'SP31mBu' . 'fSyCLmNxp',
+		micmac      => 1,
+		request     => {
+			client => {
+				id   => 'VBN',
+				v    => '6000000',
+				type => 'IPH',
+				name => 'vbn',
+			},
+			ver  => '1.42',
+			auth => {
+				type => 'AID',
+				aid  => 'kaoxIXLn' . '03zCr2KR',
+			},
+			lang => 'deu',
+		},
 	},
 );
 
+# }}}
+# {{{ Constructors
+
 sub new {
 	my ( $obj, %conf ) = @_;
-
-	my $date = $conf{date} // strftime( '%d.%m.%Y', localtime(time) );
-	my $time = $conf{time} // strftime( '%H:%M',    localtime(time) );
-	my $lang = $conf{language} // 'd';
-	my $mode = $conf{mode}     // 'dep';
 	my $service = $conf{service};
 
-	my %lwp_options = %{ $conf{lwp_options} // { timeout => 10 } };
+	my $ua = $conf{user_agent};
 
-	my $ua = LWP::UserAgent->new(%lwp_options);
-
-	$ua->env_proxy;
-
-	my $reply;
-
-	if ( not $conf{station} ) {
-		confess('You need to specify a station');
+	if ( not $ua ) {
+		my %lwp_options = %{ $conf{lwp_options} // { timeout => 10 } };
+		$ua = LWP::UserAgent->new(%lwp_options);
+		$ua->env_proxy;
 	}
 
-	if ( not defined $service and not defined $conf{url} ) {
-		$service = 'DB';
+	if ( not $conf{station} and not $conf{journey} ) {
+		confess('station or journey must be specified');
+	}
+
+	if ( not defined $service ) {
+		$service = $conf{service} = 'DB';
 	}
 
 	if ( defined $service and not exists $hafas_instance{$service} ) {
 		confess("The service '$service' is not supported");
 	}
 
-	my $ref = {
+	my $now  = DateTime->now( time_zone => 'Europe/Berlin' );
+	my $self = {
 		active_service => $service,
+		arrivals       => $conf{arrivals},
+		cache          => $conf{cache},
 		developer_mode => $conf{developer_mode},
 		exclusive_mots => $conf{exclusive_mots},
 		excluded_mots  => $conf{excluded_mots},
+		messages       => [],
+		results        => [],
 		station        => $conf{station},
 		ua             => $ua,
-		post           => {
-			input => $conf{station},
-			date  => $date,
-			time  => $time,
-			start => 'yes',         # value doesn't matter, just needs to be set
-			boardType => $mode,
-			L         => 'vs_java3',
-		},
+		now            => $now,
 	};
 
-	bless( $ref, $obj );
+	bless( $self, $obj );
 
-	$ref->set_productfilter;
+	my $req;
 
-	my $url = ( $conf{url} // $hafas_instance{$service}{url} ) . "/${lang}n";
+	if ( $conf{journey} ) {
+		$req = {
+			svcReqL => [
+				{
+					meth => 'JourneyDetails',
+					req  => {
+						jid         => $conf{journey}{id},
+						name        => $conf{journey}{name} // '0',
+						getPolyline => $conf{with_polyline} ? \1 : \0,
+					},
+				}
+			],
+			%{ $hafas_instance{$service}{request} }
+		};
+	}
+	else {
+		my $date = ( $conf{datetime} // $now )->strftime('%Y%m%d');
+		my $time = ( $conf{datetime} // $now )->strftime('%H%M%S');
 
-	$reply = $ua->post( $url, $ref->{post} );
+		my $lid;
+		if ( $self->{station} =~ m{ ^ [0-9]+ $ }x ) {
+			$lid = 'A=1@L=' . $self->{station} . '@';
+		}
+		else {
+			$lid = 'A=1@O=' . $self->{station} . '@';
+		}
 
-	if ( $reply->is_error ) {
-		$ref->{errstr} = $reply->status_line;
-		return $ref;
+		my $mot_mask = 2**@{ $hafas_instance{$service}{productbits} } - 1;
+
+		my %mot_pos;
+		for my $i ( 0 .. $#{ $hafas_instance{$service}{productbits} } ) {
+			$mot_pos{ $hafas_instance{$service}{productbits}[$i] } = $i;
+		}
+
+		if ( my @mots = @{ $self->{exclusive_mots} // [] } ) {
+			$mot_mask = 0;
+			for my $mot (@mots) {
+				$mot_mask |= 1 << $mot_pos{$mot};
+			}
+		}
+
+		if ( my @mots = @{ $self->{excluded_mots} // [] } ) {
+			for my $mot (@mots) {
+				$mot_mask &= ~( 1 << $mot_pos{$mot} );
+			}
+		}
+
+		$req = {
+			svcReqL => [
+				{
+					meth => 'StationBoard',
+					req  => {
+						type     => ( $conf{arrivals} ? 'ARR' : 'DEP' ),
+						stbLoc   => { lid => $lid },
+						dirLoc   => undef,
+						maxJny   => 30,
+						date     => $date,
+						time     => $time,
+						dur      => -1,
+						jnyFltrL => [
+							{
+								type  => "PROD",
+								mode  => "INC",
+								value => $mot_mask
+							}
+						]
+					},
+				},
+			],
+			%{ $hafas_instance{$service}{request} }
+		};
 	}
 
-	$ref->{raw_xml} = $reply->content;
-
-	# the interface often does not return valid XML (but it's close!)
-	if ( substr( $ref->{raw_xml}, 0, 5 ) ne '<?xml' ) {
-		$ref->{raw_xml}
-		  = '<?xml version="1.0" encoding="iso-8859-15"?><wrap>'
-		  . $ref->{raw_xml}
-		  . '</wrap>';
-	}
-
-	if ( defined $service and $service =~ m{ ^ VBB | NVV $ }x ) {
-
-		# Returns invalid XML with tags inside HIMMessage's lead attribute.
-		# Fix this.
-		$ref->{raw_xml}
-		  =~ s{ lead = " \K ( [^"]+ ) }{ $1 =~ s{ < [^>]+ > }{}grx }egx;
-	}
-
-	# TODO the DB backend also retuns invalid XML (similar to above, but with
-	# errors in delay="...") when setting the language to dutch/italian.
-	# No, I don't know why.
-
-	if ( $ref->{developer_mode} ) {
-		say $ref->{raw_xml};
-	}
-
-	$ref->{tree} = XML::LibXML->load_xml(
-		string => $ref->{raw_xml},
+	$self->{strptime_obj} //= DateTime::Format::Strptime->new(
+		pattern   => '%Y%m%dT%H%M%S',
+		time_zone => 'Europe/Berlin',
 	);
 
-	if ( $ref->{developer_mode} ) {
-		say $ref->{tree}->toString(1);
+	my $json = $self->{json} = JSON->new->utf8;
+
+	# The JSON request is the cache key, so if we have a cache we must ensure
+	# that JSON serialization is deterministic.
+	if ( $self->{cache} ) {
+		$json->canonical;
 	}
 
-	$ref->check_input_error;
-	return $ref;
+	$req = $json->encode($req);
+	$self->{post} = $req;
+
+	my $url = $conf{url} // $hafas_instance{$service}{mgate};
+
+	if ( my $salt = $hafas_instance{$service}{salt} ) {
+		if ( $hafas_instance{$service}{micmac} ) {
+			my $mic = md5_hex( $self->{post} );
+			my $mac = md5_hex( $mic . $salt );
+			$url .= "?mic=$mic&mac=$mac";
+		}
+		else {
+			$url .= '?checksum=' . md5_hex( $self->{post} . $salt );
+		}
+	}
+
+	if ( $conf{async} ) {
+		$self->{url} = $url;
+		return $self;
+	}
+
+	if ( $conf{json} ) {
+		$self->{raw_json} = $conf{json};
+	}
+	else {
+		if ( $self->{developer_mode} ) {
+			say "requesting $req from $url";
+		}
+
+		my ( $content, $error ) = $self->post_with_cache($url);
+
+		if ($error) {
+			$self->{errstr} = $error;
+			return $self;
+		}
+
+		if ( $self->{developer_mode} ) {
+			say decode( 'utf-8', $content );
+		}
+
+		$self->{raw_json} = $json->decode($content);
+	}
+
+	$self->check_mgate;
+
+	if ( $conf{journey} ) {
+		$self->parse_journey;
+	}
+	else {
+		$self->parse_board;
+	}
+
+	return $self;
 }
 
-sub set_productfilter {
+sub new_p {
+	my ( $obj, %conf ) = @_;
+	my $promise = $conf{promise}->new;
+
+	if ( not $conf{station} and not $conf{journey} ) {
+		return $promise->reject('station or journey flag must be passed');
+	}
+
+	my $self = $obj->new( %conf, async => 1 );
+	$self->{promise} = $conf{promise};
+
+	$self->post_with_cache_p( $self->{url} )->then(
+		sub {
+			my ($content) = @_;
+			$self->{raw_json} = $self->{json}->decode($content);
+			$self->check_mgate;
+			if ( $conf{journey} ) {
+				$self->parse_journey;
+			}
+			else {
+				$self->parse_board;
+			}
+			if ( $self->errstr ) {
+				$promise->reject( $self->errstr );
+			}
+			else {
+				$promise->resolve($self);
+			}
+			return;
+		}
+	)->catch(
+		sub {
+			my ($err) = @_;
+			$promise->reject($err);
+			return;
+		}
+	)->wait;
+
+	return $promise;
+}
+
+# }}}
+# {{{ Internal Helpers
+
+sub post_with_cache {
+	my ( $self, $url ) = @_;
+	my $cache = $self->{cache};
+
+	if ( $self->{developer_mode} ) {
+		say "POST $url";
+	}
+
+	if ($cache) {
+		my $content = $cache->thaw( $self->{post} );
+		if ($content) {
+			if ( $self->{developer_mode} ) {
+				say '  cache hit';
+			}
+			return ( ${$content}, undef );
+		}
+	}
+
+	if ( $self->{developer_mode} ) {
+		say '  cache miss';
+	}
+
+	my $ua    = $self->{user_agent};
+	my $reply = $self->{ua}->post(
+		$url,
+		'Content-Type' => 'application/json',
+		Content        => $self->{post}
+	);
+
+	if ( $reply->is_error ) {
+		return ( undef, $reply->status_line );
+	}
+	my $content = $reply->content;
+
+	if ($cache) {
+		say "freeeez";
+		$cache->freeze( $self->{post}, \$content );
+	}
+
+	return ( $content, undef );
+}
+
+sub post_with_cache_p {
+	my ( $self, $url ) = @_;
+	my $cache = $self->{cache};
+
+	if ( $self->{developer_mode} ) {
+		say "POST $url";
+	}
+
+	my $promise = $self->{promise}->new;
+
+	if ($cache) {
+		my $content = $cache->thaw( $self->{post} );
+		if ($content) {
+			if ( $self->{developer_mode} ) {
+				say '  cache hit';
+			}
+			return $promise->resolve( ${$content} );
+		}
+	}
+
+	if ( $self->{developer_mode} ) {
+		say '  cache miss';
+	}
+
+	$self->{ua}->post_p( $url, $self->{post} )->then(
+		sub {
+			my ($tx) = @_;
+			if ( my $err = $tx->error ) {
+				$promise->reject(
+					"POST $url returned HTTP $err->{code} $err->{message}");
+				return;
+			}
+			my $content = $tx->res->body;
+			if ($cache) {
+				$cache->freeze( $self->{post}, \$content );
+			}
+			$promise->resolve($content);
+			return;
+		}
+	)->catch(
+		sub {
+			my ($err) = @_;
+			$promise->reject($err);
+			return;
+		}
+	)->wait;
+
+	return $promise;
+}
+
+sub check_mgate {
 	my ($self) = @_;
 
-	my $service     = $self->{active_service};
-	my $mot_default = '1';
+	if ( $self->{raw_json}{err} and $self->{raw_json}{err} ne 'OK' ) {
+		$self->{errstr} = $self->{raw_json}{errTxt}
+		  // 'error code is ' . $self->{raw_json}{err};
+		$self->{errcode} = $self->{raw_json}{err};
+	}
+	elsif ( defined $self->{raw_json}{cInfo}{code}
+		and $self->{raw_json}{cInfo}{code} ne 'OK'
+		and $self->{raw_json}{cInfo}{code} ne 'VH' )
+	{
+		$self->{errstr}  = 'cInfo code is ' . $self->{raw_json}{cInfo}{code};
+		$self->{errcode} = $self->{raw_json}{cInfo}{code};
+	}
+	elsif ( @{ $self->{raw_json}{svcResL} // [] } == 0 ) {
+		$self->{errstr} = 'svcResL is empty';
+	}
+	elsif ( $self->{raw_json}{svcResL}[0]{err} ne 'OK' ) {
+		$self->{errstr}
+		  = 'svcResL[0].err is ' . $self->{raw_json}{svcResL}[0]{err};
+		$self->{errcode} = $self->{raw_json}{svcResL}[0]{err};
+	}
 
-	if ( not $service or not exists $hafas_instance{$service}{productbits} ) {
+	return $self;
+}
+
+sub add_message {
+	my ( $self, $json, $is_him ) = @_;
+
+	my $short = $json->{txtS};
+	my $text  = $json->{txtN};
+	my $code  = $json->{code};
+	my $prio  = $json->{prio};
+
+	if ($is_him) {
+		$short = $json->{head};
+		$text  = $json->{text};
+		$code  = $json->{hid};
+	}
+
+	# Some backends use remL for operator information. We don't want that.
+	if ( $code eq 'OPERATOR' ) {
 		return;
 	}
 
-	my %mot_pos;
-	for my $i ( 0 .. $#{ $hafas_instance{$service}{productbits} } ) {
-		$mot_pos{ $hafas_instance{$service}{productbits}[$i] } = $i;
-	}
-
-	if ( $self->{exclusive_mots} and @{ $self->{exclusive_mots} } ) {
-		$mot_default = '0';
-	}
-
-	$self->{post}{productsFilter}
-	  = $mot_default x ( scalar @{ $hafas_instance{$service}{productbits} } );
-
-	if ( $self->{exclusive_mots} and @{ $self->{exclusive_mots} } ) {
-		for my $mot ( @{ $self->{exclusive_mots} } ) {
-			if ( exists $mot_pos{$mot} ) {
-				substr( $self->{post}{productsFilter}, $mot_pos{$mot}, 1, '1' );
-			}
+	for my $message ( @{ $self->{messages} } ) {
+		if ( $code eq $message->{code} and $text eq $message->{text} ) {
+			$message->{ref_count}++;
+			return $message;
 		}
 	}
 
-	if ( $self->{excluded_mots} and @{ $self->{excluded_mots} } ) {
-		for my $mot ( @{ $self->{excluded_mots} } ) {
-			if ( exists $mot_pos{$mot} ) {
-				substr( $self->{post}{productsFilter}, $mot_pos{$mot}, 1, '0' );
-			}
-		}
-	}
-
-	return;
+	my $message = Travel::Status::DE::HAFAS::Message->new(
+		short     => $short,
+		text      => $text,
+		code      => $code,
+		prio      => $prio,
+		is_him    => $is_him,
+		ref_count => 1,
+	);
+	push( @{ $self->{messages} }, $message );
+	return $message;
 }
 
-sub check_input_error {
+sub parse_journey {
 	my ($self) = @_;
 
-	my $xp_err = XML::LibXML::XPathExpression->new('//Err');
-	my $err    = ( $self->{tree}->findnodes($xp_err) )[0];
-
-	if ($err) {
-		$self->{errstr}
-		  = $err->getAttribute('text')
-		  . ' (code '
-		  . $err->getAttribute('code') . ')';
-		$self->{errcode} = $err->getAttribute('code');
+	if ( $self->{errstr} ) {
+		return $self;
 	}
 
-	return;
+	my @locL    = @{ $self->{raw_json}{svcResL}[0]{res}{common}{locL} // [] };
+	my $journey = $self->{raw_json}{svcResL}[0]{res}{journey};
+	my @polyline;
+
+	if ( $journey->{poly} ) {
+		@polyline = decode_polyline( $journey->{poly}{crdEncYX} );
+		for my $ref ( @{ $journey->{poly}{ppLocRefL} // [] } ) {
+			my $poly = $polyline[ $ref->{ppIdx} ];
+			my $loc  = $locL[ $ref->{locX} ];
+
+			$poly->{name} = $loc->{name};
+			$poly->{eva}  = $loc->{extId} + 0;
+		}
+	}
+
+	$self->{result} = Travel::Status::DE::HAFAS::Journey->new(
+		common   => $self->{raw_json}{svcResL}[0]{res}{common},
+		journey  => $journey,
+		polyline => \@polyline,
+		hafas    => $self,
+	);
 }
+
+sub parse_board {
+	my ($self) = @_;
+
+	$self->{results} = [];
+
+	if ( $self->{errstr} ) {
+		return $self;
+	}
+
+	my @jnyL = @{ $self->{raw_json}{svcResL}[0]{res}{jnyL} // [] };
+
+	for my $result (@jnyL) {
+		push(
+			@{ $self->{results} },
+			Travel::Status::DE::HAFAS::Journey->new(
+				common  => $self->{raw_json}{svcResL}[0]{res}{common},
+				journey => $result,
+				hafas   => $self,
+			)
+		);
+	}
+	return $self;
+}
+
+# }}}
+# {{{ Public Functions
 
 sub errcode {
 	my ($self) = @_;
@@ -264,9 +641,6 @@ sub similar_stops {
 
 	if ( $service and exists $hafas_instance{$service}{stopfinder} ) {
 
-		# we do not pass our constructor's language argument here,
-		# because most stopfinder services do not return any results
-		# for languages other than german ('d' aka the default)
 		my $sf = Travel::Status::DE::HAFAS::StopFinder->new(
 			url            => $hafas_instance{$service}{stopfinder},
 			input          => $self->{station},
@@ -282,93 +656,19 @@ sub similar_stops {
 	return;
 }
 
+sub messages {
+	my ($self) = @_;
+	return @{ $self->{messages} };
+}
+
 sub results {
 	my ($self) = @_;
-	my $mode = $self->{post}->{boardType};
-
-	my $xp_element = XML::LibXML::XPathExpression->new('//Journey');
-	my $xp_msg     = XML::LibXML::XPathExpression->new('./HIMMessage');
-
-	if ( defined $self->{results} ) {
-		return @{ $self->{results} };
-	}
-	if ( not defined $self->{tree} ) {
-		return;
-	}
-
-	$self->{results} = [];
-
-	$self->{datetime_now} //= DateTime->now(
-		time_zone => 'Europe/Berlin',
-	);
-	$self->{strptime_obj} //= DateTime::Format::Strptime->new(
-		pattern   => '%d.%m.%YT%H:%M',
-		time_zone => 'Europe/Berlin',
-	);
-
-	for my $tr ( @{ $self->{tree}->findnodes($xp_element) } ) {
-
-		my @message_nodes = $tr->findnodes($xp_msg);
-		my $train         = $tr->getAttribute('prod');
-		my $time          = $tr->getAttribute('fpTime');
-		my $date          = $tr->getAttribute('fpDate');
-		my $dest          = $tr->getAttribute('targetLoc');
-		my $platform      = $tr->getAttribute('platform');
-		my $new_platform  = $tr->getAttribute('newpl');
-		my $delay         = $tr->getAttribute('delay');
-		my $e_delay       = $tr->getAttribute('e_delay');
-		my $info          = $tr->getAttribute('delayReason');
-		my @messages;
-
-		if ( not( $time and $dest ) ) {
-			next;
-		}
-
-		for my $n (@message_nodes) {
-			push( @messages, $n->getAttribute('header') );
-		}
-
-		# Some backends report dd.mm.yy, some report dd.mm.yyyy
-		# -> map all dates to dd.mm.yyyy
-		if ( length($date) == 8 ) {
-			substr( $date, 6, 0, '20' );
-		}
-
-		# TODO the first charactor of delayReason is special:
-		# " " -> no additional data, rest (if any) is delay reason
-		# else -> first word is not a delay reason but additional data,
-		# for instance "Zusatzfahrt/Ersatzfahrt" for a replacement train
-		if ( defined $info and $info eq q{ } ) {
-			$info = undef;
-		}
-		elsif ( defined $info and substr( $info, 0, 1 ) eq q{ } ) {
-			substr( $info, 0, 1, q{} );
-		}
-
-		$train =~ s{#.*$}{};
-
-		my $datetime = $self->{strptime_obj}->parse_datetime("${date}T${time}");
-
-		push(
-			@{ $self->{results} },
-			Travel::Status::DE::HAFAS::Result->new(
-				sched_date     => $date,
-				sched_datetime => $datetime,
-				datetime_now   => $self->{datetime_now},
-				raw_delay      => $delay,
-				raw_e_delay    => $e_delay,
-				messages       => \@messages,
-				sched_time     => $time,
-				train          => $train,
-				route_end      => $dest,
-				platform       => $platform,
-				new_platform   => $new_platform,
-				info           => $info,
-			)
-		);
-	}
-
 	return @{ $self->{results} };
+}
+
+sub result {
+	my ($self) = @_;
+	return $self->{result};
 }
 
 # static
@@ -400,6 +700,8 @@ sub get_active_service {
 	}
 	return;
 }
+
+# }}}
 
 1;
 
@@ -434,40 +736,60 @@ monitors
 
 =head1 VERSION
 
-version 3.01
+version 4.01
 
 =head1 DESCRIPTION
 
 Travel::Status::DE::HAFAS is an interface to HAFAS-based
-arrival/departure monitors, for instance the one available at
-L<http://reiseauskunft.bahn.de/bin/bhftafel.exe/dn>.
+arrival/departure monitors using the mgate.exe interface.
 
-It takes a station name and (optional) date and time and reports all arrivals
-or departures at that station starting at the specified point in time (now if
-unspecified).
+It can report departures/arrivals at a specific station, or provide details
+about a specific journey. It supports non-blocking operation via promises.
 
 =head1 METHODS
 
 =over
 
-=item my $status = Travel::Status::DE::HAFAS->new(I<%opts>)
+=item my $status = Travel::Status::DE::HAFAS->new(I<%opt>)
 
-Requests the departures/arrivals as specified by I<opts> and returns a new
+Requests departures/arrivals/journey as specified by I<opt> and returns a new
 Travel::Status::DE::HAFAS element with the results.  Dies if the wrong
-I<opts> were passed.
+I<opt> were passed.
 
-Supported I<opts> are:
+I<opt> must contain either a B<station> or a B<journey> flag:
 
 =over
 
 =item B<station> => I<station>
 
-The station or stop to report for, e.g.  "Essen HBf" or
-"Alfredusbad, Essen (Ruhr)".  Mandatory.
+Request station board (arrivals or departures) for I<station>, e.g. "Essen HBf" or
+"Alfredusbad, Essen (Ruhr)". Results are available via C<< $status->results >>.
 
-=item B<date> => I<dd>.I<mm>.I<yyyy>
+=item B<journey> => B<{> B<id> => I<tripid> [, B<name> => I<line> ] B<}>
 
-Date to report for.  Defaults to the current day.
+Request details about the journey identified by I<tripid> and I<line>.
+The result is available via C<< $status->result >>.
+
+=back
+
+The following optional flags may be set:
+
+=over
+
+=item B<arrivals> => I<bool>
+
+Request arrivals (if I<bool> is true) rather than departures (if I<bool> is
+false or B<arrivals> is not specified).  Only relevant in station board mode.
+
+=item B<cache> => I<Cache::File object>
+
+Store HAFAS replies in the provided cache object.  This module works with
+real-time data, so the object should be configured for an expiry of one to two
+minutes.
+
+=item B<datetime> => I<DateTime object>
+
+Date and time to report for.  Defaults to now.  Only relevant in station board mode.
 
 =item B<excluded_mots> => [I<mot1>, I<mot2>, ...]
 
@@ -475,31 +797,19 @@ By default, all modes of transport (trains, trams, buses etc.) are returned.
 If this option is set, all modes appearing in I<mot1>, I<mot2>, ... will
 be excluded. The supported modes depend on B<service>, use
 B<get_services> or B<get_service> to get the supported values.
-
-Note that this parameter does not work if the B<url> parameter is set.
+Only relevant in station board mode.
 
 =item B<exclusive_mots> => [I<mot1>, I<mot2>, ...]
 
 If this option is set, only the modes of transport appearing in I<mot1>,
 I<mot2>, ...  will be returned.  The supported modes depend on B<service>, use
 B<get_services> or B<get_service> to get the supported values.
-
-Note that this parameter does not work if the B<url> parameter is set.
-
-=item B<language> => I<language>
-
-Set language for additional information. Accepted arguments are B<d>eutsch,
-B<e>nglish, B<i>talian and B<n> (dutch), depending on the used service.
+Only relevant in station board mode.
 
 =item B<lwp_options> => I<\%hashref>
 
 Passed on to C<< LWP::UserAgent->new >>. Defaults to C<< { timeout => 10 } >>,
-you can use an empty hashref to override it.
-
-=item B<mode> => B<arr>|B<dep>
-
-By default, Travel::Status::DE::HAFAS reports train departures
-(B<dep>).  Set this to B<arr> to get arrivals instead.
+pass an empty hashref to call the LWP::UserAgent constructor without arguments.
 
 =item B<service> => I<service>
 
@@ -507,13 +817,31 @@ Request results from I<service>, defaults to "DB".
 See B<get_services> (and C<< hafas-m --list >>) for a list of supported
 services.
 
-=item B<time> => I<hh>:I<mm>
+=item B<with_polyline> => I<bool>
 
-Time to report for.  Defaults to now.
+Request a polyline (series of geo-coordinates) indicating the train's route.
+Only relevant in journey mode.
 
-=item B<url> => I<url>
+=back
 
-Request results from I<url>, defaults to the one belonging to B<service>.
+=item my $status = Travel::Status::DE::HAFAS->new_p(I<%opt>)
+
+Return a promise that resolves into a Travel::Status::DE::HAFAS instance
+($status) on success and rejects with an error message ($status->errstr) on
+failure. In addition to the arguments of B<new>, the following mandatory
+arguments must be set.
+
+=over
+
+=item B<promise> => I<promises module>
+
+Promises implementation to use for internal promises as well as B<new_p> return
+value.  Recommended: Mojo::Promise(3pm).
+
+=item B<user_agent> => I<user agent>
+
+User agent instance to use for asynchronous requests. The object must implement
+a B<post_p> function. Recommended: Mojo::UserAgent(3pm).
 
 =back
 
@@ -530,10 +858,22 @@ describing it.  If no error occurred, returns undef.
 =item $status->results
 
 Returns a list of arrivals/departures.  Each list element is a
-Travel::Status::DE::HAFAS::Result(3pm) object.
+Travel::Status::DE::HAFAS::Journey(3pm) object. Unavailable in journey mode.
 
 If no matching results were found or the parser / http request failed, returns
 undef.
+
+=item $status->result
+
+Returns a single Travel::Status::DE::HAFAS::Journey(3pm) object that describes
+the requested journey. Unavailable in station board mode.
+
+If no result was found or the parser / http request failed, returns undef.
+
+=item $status->messages
+
+Returns a list of Travel::Status::DE::HAFAS::Message(3pm) objects with
+service messages. Each message belongs to at least one arrival/departure.
 
 =item $status->similar_stops
 
@@ -584,8 +924,6 @@ None.
 
 =item * LWP::UserAgent(3pm)
 
-=item * XML::LibXML(3pm)
-
 =back
 
 =head1 BUGS AND LIMITATIONS
@@ -594,11 +932,11 @@ The non-default services (anything other than DB) are not well tested.
 
 =head1 SEE ALSO
 
-Travel::Status::DE::HAFAS::Result(3pm), Travel::Status::DE::HAFAS::StopFinder(3pm).
+Travel::Status::DE::HAFAS::Journey(3pm), Travel::Status::DE::HAFAS::StopFinder(3pm).
 
 =head1 AUTHOR
 
-Copyright (C) 2015-2020 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2015-2022 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

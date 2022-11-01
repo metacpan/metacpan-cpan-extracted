@@ -48,7 +48,7 @@ the PDL::Graphics::TriD module. Currently, there are
 
 
 
-#line 948 "../../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -78,14 +78,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *combcoords = \&PDL::combcoords;
 #line 85 "Rout.pm"
 
 
 
-#line 948 "../../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -126,14 +126,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *repulse = \&PDL::repulse;
 #line 133 "Rout.pm"
 
 
 
-#line 948 "../../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -174,14 +174,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *attract = \&PDL::attract;
 #line 181 "Rout.pm"
 
 
 
-#line 948 "../../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -208,7 +208,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *vrmlcoordsvert = \&PDL::vrmlcoordsvert;
 #line 215 "Rout.pm"
@@ -280,7 +280,7 @@ sub PDL::Graphics::TriD::Contours::contour_segments {
 
 
 
-#line 950 "../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *contour_segments_internal = \&PDL::contour_segments_internal;
 #line 287 "Rout.pm"

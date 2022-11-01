@@ -2,6 +2,7 @@
 BEGIN
 {
     use strict;
+    use warnings;
     use warnings FATAL => 'all';
     use Test::More;
     unless( $ENV{AUTHOR_TESTING} )
@@ -9,6 +10,9 @@ BEGIN
         plan( skip_all => "Author tests not required for installation" );
     }
 };
+
+use strict;
+use warnings;
 
 my $min_tcm = 0.9;
 

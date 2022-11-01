@@ -7,7 +7,7 @@ my %REQUIRES_PERL = (
 );
 
 my %REQUIRES_OP = (
-   'Object::Pad' => '0.66',
+   'Object::Pad' => '0.70',
 );
 
 use feature ();

@@ -56,7 +56,7 @@ under same terms as Perl itself.
 
 =head1 AUTHOR
 
-David Bonner, <chartgrp@web.de>
+David Bonner, Chart Group,
 
 Herbert Breunung, <lichtkind@cpan.org>
 

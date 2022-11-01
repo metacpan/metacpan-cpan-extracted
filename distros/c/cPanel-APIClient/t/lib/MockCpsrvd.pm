@@ -12,6 +12,7 @@ use warnings;
 use autodie;
 
 use Test::More;
+use Socket;
 
 use HTTP::Request          ();
 use HTTP::Response         ();
@@ -210,19 +211,24 @@ sub _serve_socket {
                     $resp_obj = $class->_get_response($req);
                 }
 
-                # We aren’t going to read any more, so stop listening.
-                shutdown $peer, 0;
-                1 while read $peer, my $buf, 65536;
-
                 $resp_obj->header( Connection     => 'close' );
                 $resp_obj->header( 'X-TestServer' => $class );
 
+                # Ideally we’d use unbuffered I/O, but since we already used
+                # buffered I/O to read we might as well use buffered to write.
                 print {$peer} 'HTTP/1.1 ' . $resp_obj->as_string("\x0d\x0a");
+
+                # This has to come after the write, or else TLS might get
+                # get confused. (OpenSSL’s write logic might try to read!)
+                #
+                shutdown $peer, Socket::SHUT_RD;
+                1 while read $peer, my $buf, 65536;
+
+                # NB: we can no longer manually close() the peer socket
+                # because it’ll fail its TLS shutdown.
 
                 diag "Handler PID $$ sent response";
             }
-
-            close $peer;
 
             1;
         };

@@ -32,6 +32,7 @@ typedef __float128 float128;
 #  define Newx(v,n,t) New(0,v,n,t)
 #endif
 
+/* An abbreviated form of Math::MPFR::_itsa */
 SV * _itsa(pTHX_ SV * a) {
      if(SvUOK(a)) return newSVuv(1);
      if(SvIOK(a)) return newSVuv(2);

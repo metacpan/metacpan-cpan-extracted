@@ -1,5 +1,5 @@
 package Form::Tiny::Filter;
-$Form::Tiny::Filter::VERSION = '2.14';
+$Form::Tiny::Filter::VERSION = '2.15';
 use v5.10;
 use strict;
 use warnings;

@@ -2,7 +2,7 @@
 ## Stripe API - ~/lib/Net/API/Stripe/Connect/ExternalAccount/Bank.pm
 ## Version v0.100.0
 ## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2020/05/15
 ## 
@@ -12,39 +12,48 @@ package Net::API::Stripe::Connect::ExternalAccount::Bank;
 BEGIN
 {
     use strict;
+    use warnings;
     use parent qw( Net::API::Stripe::Generic );
+    use vars qw( $VERSION );
     our( $VERSION ) = 'v0.100.0';
 };
 
-sub id { shift->_set_get_scalar( 'id', @_ ); }
+use strict;
+use warnings;
 
-sub object { shift->_set_get_scalar( 'object', @_ ); }
+sub id { return( shift->_set_get_scalar( 'id', @_ ) ); }
 
-sub account { shift->_set_get_scalar_or_object( 'account', 'Net::API::Stripe::Connect::Account', @_ ); }
+sub object { return( shift->_set_get_scalar( 'object', @_ ) ); }
 
-sub account_holder_name { shift->_set_get_scalar( 'account_holder_name', @_ ); }
+sub account { return( shift->_set_get_scalar_or_object( 'account', 'Net::API::Stripe::Connect::Account', @_ ) ); }
 
-sub account_holder_type { shift->_set_get_scalar( 'account_holder_type', @_ ); }
+sub account_holder_name { return( shift->_set_get_scalar( 'account_holder_name', @_ ) ); }
 
-sub bank_name { shift->_set_get_scalar( 'bank_name', @_ ); }
+sub account_holder_type { return( shift->_set_get_scalar( 'account_holder_type', @_ ) ); }
 
-sub country { shift->_set_get_scalar( 'country', @_ ); }
+sub account_type { return( shift->_set_get_scalar( 'account_type', @_ ) ); }
 
-sub currency { shift->_set_get_scalar( 'currency', @_ ); }
+sub available_payout_methods { return( shift->_set_get_array( 'available_payout_methods', @_ ) ); }
 
-sub customer { shift->_set_get_scalar_or_object( 'customer', 'Net::API::Stripe::Customer', @_ ); }
+sub bank_name { return( shift->_set_get_scalar( 'bank_name', @_ ) ); }
 
-sub default_for_currency { shift->_set_get_boolean( 'default_for_currency', @_ ); }
+sub country { return( shift->_set_get_scalar( 'country', @_ ) ); }
 
-sub fingerprint { shift->_set_get_scalar( 'fingerprint', @_ ); }
+sub currency { return( shift->_set_get_scalar( 'currency', @_ ) ); }
 
-sub last4 { shift->_set_get_scalar( 'last4', @_ ); }
+sub customer { return( shift->_set_get_scalar_or_object( 'customer', 'Net::API::Stripe::Customer', @_ ) ); }
 
-sub metadata { shift->_set_get_hash( 'metadata', @_ ); }
+sub default_for_currency { return( shift->_set_get_boolean( 'default_for_currency', @_ ) ); }
 
-sub routing_number { shift->_set_get_scalar( 'routing_number', @_ ); }
+sub fingerprint { return( shift->_set_get_scalar( 'fingerprint', @_ ) ); }
 
-sub status { shift->_set_get_scalar( 'status', @_ ); }
+sub last4 { return( shift->_set_get_scalar( 'last4', @_ ) ); }
+
+sub metadata { return( shift->_set_get_hash( 'metadata', @_ ) ); }
+
+sub routing_number { return( shift->_set_get_scalar( 'routing_number', @_ ) ); }
+
+sub status { return( shift->_set_get_scalar( 'status', @_ ) ); }
 
 1;
 
@@ -102,98 +111,100 @@ Bank accounts (L<https://stripe.com/docs/api#customer_bank_account_object>) and 
 
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>( %ARG )
+=head2 new( %ARG )
 
 Creates a new L<Net::API::Stripe::Connect::ExternalAccount::Bank> object.
 It may also take an hash like arguments, that also are method of the same name.
 
-=back
-
 =head1 METHODS
 
-=over 4
-
-=item B<id> string
+=head2 id string
 
 Unique identifier for the object.
 
-=item B<object> string, value is "bank_account"
+=head2 object string, value is "bank_account"
 
 String representing the object’s type. Objects of the same type share the same value.
 
-=item B<account> string (expandable)
+=head2 account string (expandable)
 
 When expanded, this is a L<Net::API::Stripe::Connect::Account> object.
 
-=item B<account_holder_name> string
+=head2 account_holder_name string
 
 The name of the person or business that owns the bank account.
 
-=item B<account_holder_type> string
+=head2 account_holder_type string
 
 The type of entity that holds the account. This can be either individual or company.
 
-=item B<bank_name> string
+=head2 account_type string
+
+The bank account type. This can only be C<checking> or C<savings> in most countries. In Japan, this can only be C<futsu> or C<toza>.
+
+=head2 available_payout_methods array
+
+A set of available payout methods for this bank account. Only values from this set should be passed as the method when creating a payout.
+
+=head2 bank_name string
 
 Name of the bank associated with the routing number (e.g., WELLS FARGO).
 
-=item B<country> string
+=head2 country string
 
 Two-letter ISO code representing the country the bank account is located in.
 
-=item B<currency> currency
+=head2 currency currency
 
 Three-letter ISO code for the currency paid out to the bank account.
 
-=item B<customer> string (expandable)
+=head2 customer string (expandable)
 
 When expanded, this is a L<Net::API::Stripe::Customer> object.
 
-=item B<default_for_currency> boolean
+=head2 default_for_currency boolean
 
 Whether this bank account is the default external account for its currency.
 
-=item B<fingerprint> string
+=head2 fingerprint string
 
 Uniquely identifies this particular bank account. You can use this attribute to check whether two bank accounts are the same.
 
-=item B<last4> string
+=head2 last4 string
 
-=item B<metadata> hash
+The last four digits of the bank account number.
+
+=head2 metadata hash
 
 Set of key-value pairs that you can attach to an object. This can be useful for storing additional information about the object in a structured format.
 
-=item B<routing_number> string
+=head2 routing_number string
 
 The routing transit number for the bank account.
 
-=item B<status> string
+=head2 status string
 
-For bank accounts, possible values are new, validated, verified, verification_failed, or errored. A bank account that hasn’t had any activity or validation performed is new. If Stripe can determine that the bank account exists, its status will be validated. Note that there often isn’t enough information to know (e.g., for smaller credit unions), and the validation is not always run. If customer bank account verification has succeeded, the bank account status will be verified. If the verification failed for any reason, such as microdeposit failure, the status will be verification_failed. If a transfer sent to this bank account fails, we’ll set the status to errored and will not continue to send transfers until the bank details are updated.
+For bank accounts, possible values are C<new>, C<validated>, C<verified>, C<verification_failed>, or C<errored>. A bank account that hasn’t had any activity or validation performed is C<new>. If Stripe can determine that the bank account exists, its status will be C<validated>. Note that there often isn’t enough information to know (e.g., for smaller credit unions), and the validation is not always run. If customer bank account verification has succeeded, the bank account status will be C<verified>. If the verification failed for any reason, such as microdeposit failure, the status will be C<verification_failed>. If a transfer sent to this bank account fails, we’ll set the status to C<errored> and will not continue to send transfers until the bank details are updated.
 
-For external accounts, possible values are new and errored. Validations aren’t run against external accounts because they’re only used for payouts. This means the other statuses don’t apply. If a transfer fails, the status is set to errored and transfers are stopped until account details are updated.
-
-=back
+For external accounts, possible values are C<new> and C<errored>. Validations aren’t run against external accounts because they’re only used for payouts. This means the other statuses don’t apply. If a transfer fails, the status is set to C<errored> and transfers are stopped until account details are updated.
 
 =head1 API SAMPLE
 
-	{
-	  "id": "ba_fake123456789",
-	  "object": "bank_account",
-	  "account": "acct_fake123456789",
-	  "account_holder_name": "Jane Austen",
-	  "account_holder_type": "individual",
-	  "bank_name": "STRIPE TEST BANK",
-	  "country": "US",
-	  "currency": "jpy",
-	  "fingerprint": "ksfkhfkjcchjkn",
-	  "last4": "6789",
-	  "metadata": {},
-	  "routing_number": "110000000",
-	  "status": "new"
-	}
+    {
+      "id": "ba_fake123456789",
+      "object": "bank_account",
+      "account": "acct_fake123456789",
+      "account_holder_name": "Jane Austen",
+      "account_holder_type": "individual",
+      "bank_name": "STRIPE TEST BANK",
+      "country": "US",
+      "currency": "jpy",
+      "fingerprint": "ksfkhfkjcchjkn",
+      "last4": "6789",
+      "metadata": {},
+      "routing_number": "110000000",
+      "status": "new"
+    }
 
 =head1 HISTORY
 

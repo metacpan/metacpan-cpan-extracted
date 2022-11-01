@@ -2,7 +2,6 @@ class Sys::Process {
   
   use Sys::Process::Constant;
   
-  native static method alarm : int ($seconds : int);
   native static method fork : int ();
   native static method getpriority : int ($which : int, $who : int);
   native static method setpriority : int ($which : int, $who : int, $prio : int);
@@ -29,6 +28,4 @@ class Sys::Process {
   native static method WIFCONTINUED : int ($wstatus : int);
 
   native static method usleep : int ($usec : long);
-  
-  native static method ualarm : long ($usecs : long, $interval : long);
 }

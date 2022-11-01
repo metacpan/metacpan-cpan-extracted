@@ -137,7 +137,7 @@ SKIP:
     {
         my $dt2 = DateTime->from_epoch( epoch => $now, time_zone => $dt->time_zone );
         diag( "created is '", $dt->iso8601, "' vs '", $dt2->iso8601, "'" ) if( $DEBUG );
-        ok( ( $dt->ymd == $dt2->ymd && $dt->hour == $dt2->hour && $dt->minute == $dt2->minute ), 'datetime value' );
+        ok( ( $dt->ymd eq $dt2->ymd && $dt->hour == $dt2->hour && $dt->minute == $dt2->minute ), 'datetime value' );
         $o->created( '+1d' );
         my $dt4 = DateTime->now( time_zone => $dt->time_zone )->add( days => 1 );
         $dt4->truncate( to => 'minute' );
@@ -152,7 +152,7 @@ SKIP:
     }
 };
 
-my $test = $o->file = "./some/file.txt";
+$o->file = "./some/file.txt";
 my $f2 = $o->file;
 diag( "\$f2 is '", overload::StrVal( $f2 ), "'" ) if( $DEBUG );                             
 isa_ok( $f2, 'Module::Generic::File', '_set_get_file as lvalue' );

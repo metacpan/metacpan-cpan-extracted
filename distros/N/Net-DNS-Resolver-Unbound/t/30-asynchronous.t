@@ -10,18 +10,27 @@ use Net::DNS::Resolver::Unbound;
 my $resolver = Net::DNS::Resolver::Unbound->new( debug_level => 0 );
 
 plan skip_all => 'no local nameserver' unless $resolver->nameservers;
-plan tests    => 4;
+plan tests    => 5;
 
 
-my $handle = $resolver->bgsend('ns.net-dns.org.');
-ok( $handle, '$resolver->bgsend(ns.net-dns.org.)' );
+my $fqdn = 'ns.net-dns.org.';
 
-sleep 1 if $resolver->bgbusy($handle);
+for ( my $handle = $resolver->bgsend($fqdn) ) {
+	ok( $handle, "resolver->bgsend('$fqdn')" );
 
-my $reply = $resolver->bgread($handle);
-ok( $handle->async_id(), 'handle->async_id' );
-ok( !$handle->err(),	 'no handle->err' );
-ok( $reply,		 '$reselver->bgread($handle)' );
+	sleep 1 if $resolver->bgbusy($handle);
+
+	ok( !$handle->err,		'handle->err empty' );
+	ok( $resolver->bgread($handle), 'reselver->bgread(handle)' );
+}
+
+
+my $packet = Net::DNS::Packet->new($fqdn);
+for ( my $handle = $resolver->bgsend($packet) ) {
+	my $reply = $resolver->bgread($handle);
+	ok( $handle, "resolver->bgsend(packet)" );
+	ok( $reply,  'reselver->bgread(handle)' );
+}
 
 
 exit;

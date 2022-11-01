@@ -1,5 +1,9 @@
 Revision history for Email-MessageID
 
+1.407     2022-10-22 16:07:04-04:00 America/New_York
+        - update docs: this is not a subclass of Email::Address (thanks, Pali!)
+        - update some packaging notes
+
 1.406     2015-08-10 12:08:52-04:00 America/New_York
         - when Sys::Hostname::Long is available, use hostname_long, not
           hostname()

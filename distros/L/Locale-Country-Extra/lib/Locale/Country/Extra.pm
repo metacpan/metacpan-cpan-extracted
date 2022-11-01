@@ -2,7 +2,7 @@ package Locale::Country::Extra;
 use strict;
 use warnings;
 use utf8;
-our $VERSION = '1.0.4';
+our $VERSION = '1.06';
 
 use Locale::Country qw();
 use Locale::Country::Multilingual {use_io_layer => 1};
@@ -11,7 +11,10 @@ our %COUNTRY_MAP = (
     "brunei darussalam"                 => "bn",
     "cocos islands"                     => "cc",
     "congo"                             => "cg",
+    "côte d'ivoire"                     => "ci",
+    "côte d’ivoire"                     => "ci",
     "curacao"                           => "cw",
+    "eswatini"                          => "sz",
     "heard island and mcdonald islands" => "hm",
     "hong kong s.a.r."                  => "hk",
     "korea"                             => "kr",
@@ -26,6 +29,7 @@ our %COUNTRY_MAP = (
     "south georgia & south sandwich"    => "gs",
     "syrian arab republic"              => "sy",
     "taiwan"                            => "tw",
+    "trinidad & tobago"                 => "tt",
     "u.a.e."                            => "ae",
     "vatican city state"                => "va",
     "virgin islands"                    => "vg"

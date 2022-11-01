@@ -28,7 +28,6 @@ use Dist::CheckConflicts
         Specio::Subs
         Try::Tiny
         XSLoader
-        base
         integer
         namespace::autoclean
         overload

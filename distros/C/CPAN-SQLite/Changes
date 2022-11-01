@@ -1,5 +1,8 @@
 Revision history for Perl extension CPAN::SQLite.
 
+0.220 October 29, 2022
+  - Fixed a test failure (RT#140735)
+
 0.219 May 30, 2020
   - More FP protections
 

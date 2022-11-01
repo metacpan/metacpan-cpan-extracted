@@ -6,7 +6,7 @@ pod_spelling_system:
   stopwords:
     - libffi
     - Petr
-    - Pisar
+    - Písař
     - ppisar
 
 pod_coverage:

@@ -3,15 +3,16 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Parse the UCI Bach choral harmony data set
 
-our $VERSION = '0.0410';
+our $VERSION = '0.0411';
 
 use Moo;
 use strictures 2;
-use namespace::clean;
 
-use Text::CSV;
+use Text::CSV ();
 use File::ShareDir qw/ dist_dir /;
 use List::Util qw/ any /;
+
+use namespace::clean;
 
 
 has data_file => (
@@ -343,7 +344,7 @@ Music::BachChoralHarmony - Parse the UCI Bach choral harmony data set
 
 =head1 VERSION
 
-version 0.0410
+version 0.0411
 
 =head1 SYNOPSIS
 
@@ -535,7 +536,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Gene Boggs.
+This software is copyright (c) 2022 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

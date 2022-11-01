@@ -2,7 +2,7 @@
 ## Stripe API - ~/lib/Net/API/Stripe/CustomField.pm
 ## Version v0.100.0
 ## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2020/05/15
 ## 
@@ -10,10 +10,15 @@
 package Net::API::Stripe::CustomField;
 BEGIN
 {
-	use strict;
-	use parent qw( Net::API::Stripe::Generic );
-	our( $VERSION ) = 'v0.100.0';
+    use strict;
+    use warnings;
+    use parent qw( Net::API::Stripe::Generic );
+    use vars qw( $VERSION );
+    our( $VERSION ) = 'v0.100.0';
 };
+
+use strict;
+use warnings;
 
 sub name { return( shift->_set_get_scalar( 'name', @_ ) ); }
 
@@ -54,28 +59,20 @@ It is used by L<Net::API::Stripe::Billing::Invoice>, L<Net::API::Stripe::Custome
 
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>( %ARG )
+=head2 new( %ARG )
 
 Creates a new L<Net::API::Stripe::CustomField> object.
 It may also take an hash like arguments, that also are method of the same name.
 
-=back
-
 =head1 METHODS
 
-=over 4
-
-=item B<name> string
+=head2 name string
 
 The name of the custom field.
 
-=item B<value> string
+=head2 value string
 
 The value of the custom field.
-
-=back
 
 =head1 API SAMPLE
 

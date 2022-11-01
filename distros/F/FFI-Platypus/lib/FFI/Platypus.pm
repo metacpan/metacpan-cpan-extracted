@@ -8,7 +8,7 @@ use FFI::Platypus::Function;
 use FFI::Platypus::Type;
 
 # ABSTRACT: Write Perl bindings to non-Perl libraries with FFI. No XS required.
-our $VERSION = '2.01'; # VERSION
+our $VERSION = '2.03'; # VERSION
 
 # Platypus-Man,
 # Platypus-Man,
@@ -382,6 +382,7 @@ sub attach
 sub closure
 {
   my($self, $coderef) = @_;
+  return undef unless defined $coderef;
   croak "not a coderef" unless ref $coderef eq 'CODE';
   require FFI::Platypus::Closure;
   FFI::Platypus::Closure->new($coderef);
@@ -597,7 +598,7 @@ FFI::Platypus - Write Perl bindings to non-Perl libraries with FFI. No XS requir
 
 =head1 VERSION
 
-version 2.01
+version 2.03
 
 =head1 SYNOPSIS
 

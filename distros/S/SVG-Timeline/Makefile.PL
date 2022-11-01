@@ -4,7 +4,7 @@ WriteMakefile(
   NAME => 'SVG::Timeline',
   VERSION_FROM => 'lib/SVG/Timeline.pm',
   LICENSE      => 'perl_5',
-  MIN_PERL_VERSION => '5.10.0',
+  MIN_PERL_VERSION => '5.14.0',
 
   BUILD_REQUIRES => {
     'Test::More' => 0,
@@ -19,7 +19,7 @@ WriteMakefile(
     Moose => 0,
     'List::Util' => 0,
     Carp => 0,
-    'Time::Piece' => 0,
+    'DateTime::Format::Strptime' => 0,
   },
   META_MERGE => {
     'meta-spec' => { version => 2 },

@@ -1,5 +1,9 @@
 Revision history for Graph-Easy-Weighted:
 
+0.0701 2022-10-21
+    - Avoid implicit imports.
+    - Use constant not Readonly.
+
 0.07  2017-03-01
     - Add and use the dump() function.
 

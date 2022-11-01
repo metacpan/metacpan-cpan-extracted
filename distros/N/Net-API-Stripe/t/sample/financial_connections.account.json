@@ -1,0 +1,25 @@
+{
+   "accountholder" : {
+      "customer" : "cus_AJ78ZaALpqgiuZ",
+      "type" : "customer"
+   },
+   "balance" : null,
+   "balance_refresh" : null,
+   "category" : "cash",
+   "created" : "1662261086",
+   "display_name" : "Sample Checking Account",
+   "id" : "fca_1Le9F42eZvKYlo2Cboplw3LC",
+   "institution_name" : "StripeBank",
+   "last4" : "6789",
+   "livemode" : 0,
+   "object" : "linked_account",
+   "ownership" : null,
+   "ownership_refresh" : null,
+   "permissions" : [],
+   "status" : "active",
+   "subcategory" : "checking",
+   "supported_payment_method_types" : [
+      "us_bank_account"
+   ],
+   "transaction_refresh" : null
+}

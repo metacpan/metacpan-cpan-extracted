@@ -1,0 +1,15 @@
+{
+   "amount" : "-500",
+   "created" : "1662261084",
+   "credit_note" : null,
+   "currency" : "usd",
+   "customer" : "cus_AJ78ZaALpqgiuZ",
+   "description" : null,
+   "ending_balance" : "-500",
+   "id" : "cbtxn_1Le9F22eZvKYlo2CgeZenKBG",
+   "invoice" : null,
+   "livemode" : 0,
+   "metadata" : null,
+   "object" : "customer_balance_transaction",
+   "type" : "adjustment"
+}

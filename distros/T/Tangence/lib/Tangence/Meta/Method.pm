@@ -1,12 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.51;
+use Object::Pad 0.70 ':experimental(adjust_params)';
 
-package Tangence::Meta::Method 0.29;
+package Tangence::Meta::Method 0.30;
 class Tangence::Meta::Method :strict(params);
 
 =head1 NAME
@@ -54,15 +54,15 @@ reference
 
 =cut
 
-has $class :param :weak :reader;
-has $name  :param       :reader;
-has @arguments;
-has $ret   :param       :reader;
+field $class :param :weak :reader;
+field $name  :param       :reader;
+field @arguments;
+field $ret   :param       :reader;
 
-ADJUSTPARAMS ( $params )
-{
-   exists $params->{arguments} and
-      @arguments = @{ delete $params->{arguments} };
+ADJUST :params (
+   :$arguments = undef,
+) {
+   @arguments = $arguments->@* if $arguments;
 }
 
 =head1 ACCESSORS

@@ -4,11 +4,14 @@
 use v5.12;
 
 package Graphics::Toolkit::Color;
-our $VERSION = '1.00';
+our $VERSION = '1.02';
 
 use Carp;
 use Graphics::Toolkit::Color::Constant ':all';
 use Graphics::Toolkit::Color::Value ':all';
+
+use Exporter 'import';
+our @EXPORT_OK = qw/color/;
 
 my $new_help = 'constructor of Graphics::Toolkit::Color object needs either:'.
         ' 1. RGB or HSL hash or ref: ->new(r => 255, g => 0, b => 0), ->new({ h => 0, s => 100, l => 50 })'.
@@ -16,6 +19,8 @@ my $new_help = 'constructor of Graphics::Toolkit::Color object needs either:'.
         ' 3. hex form "#FF0000" or "#f00" 4. a name: "red" or "SVG:red".';
 
 ## constructor #########################################################
+
+sub color { Graphics::Toolkit::Color->new ( @_ ) }
         
 sub new {
     my ($pkg, @args) = @_;
@@ -56,16 +61,14 @@ sub _rgb_from_name_or_hex {
     if (substr($arg, 0, 1) eq '#'){                  # resolve #RRGGBB -> ($r, $g, $b)
         return rgb_from_hex( $arg );
     } elsif ($i > -1 ){                              # resolve pallet:name -> ($r, $g, $b)
-        my $pallet_name = substr $arg,   0, $i-1;
-        my $color_name = substr $arg, $i+1;
-        
+        my $pallet_name = substr $arg,   0, $i;
+        my $color_name = Graphics::Toolkit::Color::Constant::_clean_name(substr $arg, $i+1);
         my $module_base = 'Graphics::ColorNames';
         eval "use $module_base";
         return carp "$module_base is not installed, but it's needed to load external colors" if $@;
-        
         my $module = $module_base.'::'.$pallet_name;
         eval "use $module";
-        return carp "$module is not installed, to load color '$color_name'" if $@;
+        return carp "$module is not installed, but needed to load color '$pallet_name:$color_name'" if $@;
         
         my $pal = Graphics::ColorNames->new( $pallet_name );
         my @rgb = $pal->rgb( $color_name );
@@ -250,7 +253,7 @@ __END__
 
 =head1 NAME
 
-Graphics::Toolkit::Color - color palette creation tool
+Graphics::Toolkit::Color - color palette creation helper
 
 =head1 SYNOPSIS 
 
@@ -277,21 +280,24 @@ or HSL color space.
 
 =head2 new( 'name' )
 
-Get a color by providing a name from the X11 or HTML (SVG) standard or
-a Pantone report. Upper/Camel case will be treated as lower case and
-inserted underscore letters ('_') will be ignored as perl does in
-numbers (1_000 == 1000) (see more under L<Graphics::Toolkit::Color::Constant>).
+Get a color by providing a name from the X11, HTML (CSS) or SVG standard
+or a Pantone report. UPPER or CamelCase will be normalized to lower case
+and inserted underscore letters ('_') will be ignored as perl does in
+numbers (1_000 == 1000). All available names are listed under
+L<Graphics::Toolkit::Color::Constant>.s
 
     my $color = Graphics::Toolkit::Color->new('Emerald');
     my @names = Graphics::Toolkit::Color::Constant::all_names(); # select from these
 
-=head2 new( 'standard:color' )
+=head2 new( 'pallet:color' )
 
-Get a color by name from a specific standard as provided by an external
-module L<Graphics::ColorNames>::* , which has to be installed separately.
-* is a placeholder for the pallet name, which might be: Crayola, CSS,
-EmergyC, GrayScale, HTML, IE, SVG, Werner, WWW or X. In ladder case
-Graphics::ColorNames::X has to be installed.
+Get a color by name from a specific pallet or standard as provided by an
+external module L<Graphics::ColorNames>::* , which has to be installed
+separately. * is a placeholder for the pallet name, which might be: 
+Crayola, CSS, EmergyC, GrayScale, HTML, IE, Mozilla, Netscape, Pantone,
+PantoneReport, SVG, VACCC, Werner, Windows, WWW or X. In ladder case
+Graphics::ColorNames::X has to be installed. The color name will be 
+normalized as above.
 
     my $color = Graphics::Toolkit::Color->new('SVG:green');
     my @s = Graphics::ColorNames::all_schemes();    # installed pallets
@@ -336,6 +342,17 @@ it will be rotated into range, e.g. 361 = 1.
     my $red = Graphics::Toolkit::Color->new( h =>   0, s => 100, b => 50 );
     my $red = Graphics::Toolkit::Color->new({h =>   0, s => 100, b => 50}); # good too
     ... ->new( Hue => 0, Saturation => 100, Lightness => 50 ); # also fine
+
+=head2 color
+
+If writing C<Graphics::Toolkit::Color->new(...> is too much typing for you
+or takes to much space, import the subroutine C<color>, which takes
+all the same arguments as described above.
+
+
+    use Graphics::Toolkit::Color qw/color/;
+    my $green = color('green');
+    my $darkblue = color([20, 20, 250]);
 
 
 =head1 GETTER / ATTRIBUTES
@@ -522,6 +539,10 @@ L<Color::Scheme>
 
 =item *
 
+L<Color::Library>
+
+=item *
+
 L<Graphics::ColorUtils>
 
 =item *
@@ -531,10 +552,6 @@ L<Graphics::ColorObject>
 =item *
 
 L<Convert::Color>
-
-=item *
-
-L<Graphics::ColorNames>
 
 =item *
 

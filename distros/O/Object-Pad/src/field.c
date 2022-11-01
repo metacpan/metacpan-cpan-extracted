@@ -35,7 +35,6 @@ FieldMeta *ObjectPad_mop_create_field(pTHX_ SV *fieldname, ClassMeta *classmeta)
   fieldmeta->name = SvREFCNT_inc(fieldname);
   fieldmeta->class = classmeta;
   fieldmeta->fieldix = classmeta->next_fieldix;
-  fieldmeta->defaultsv = NULL;
   fieldmeta->defaultexpr = NULL;
   fieldmeta->paramname = NULL;
 
@@ -62,41 +61,77 @@ static void S_mop_field_set_param(pTHX_ FieldMeta *fieldmeta, SV *paramname)
   if(!classmeta->parammap)
     classmeta->parammap = newHV();
 
-  HV *parammap = classmeta->parammap;
-
-  HE *he;
-  if((he = hv_fetch_ent(parammap, paramname, 0, 0))) {
-    ParamMeta *colliding_parammeta = (ParamMeta *)HeVAL(he);
-    if(colliding_parammeta->field->class != classmeta)
-      croak("Already have a named constructor parameter called '%" SVf "' inherited from %" SVf,
-        SVfARG(paramname), SVfARG(colliding_parammeta->field->class->name));
-    else
-      croak("Already have a named constructor parameter called '%" SVf "'", SVfARG(paramname));
-  }
+  check_colliding_param(classmeta, paramname);
 
   ParamMeta *parammeta;
   Newx(parammeta, 1, struct ParamMeta);
 
   parammeta->name = SvREFCNT_inc(paramname);
-  parammeta->field = fieldmeta;
-  parammeta->fieldix = fieldmeta->fieldix;
+  parammeta->class = classmeta;
+  parammeta->type = PARAM_FIELD;
+  parammeta->field.fieldmeta = fieldmeta;
+  parammeta->field.fieldix   = fieldmeta->fieldix;
 
   fieldmeta->paramname = SvREFCNT_inc(paramname);
 
-  hv_store_ent(parammap, paramname, (SV *)parammeta, 0);
+  hv_store_ent(classmeta->parammap, paramname, (SV *)parammeta, 0);
 }
 
 SV *ObjectPad_mop_field_get_default_sv(pTHX_ FieldMeta *fieldmeta)
 {
-  return fieldmeta->defaultsv;
+  if(!fieldmeta->defaultexpr)
+    return NULL;
+
+  OP *o = fieldmeta->defaultexpr;
+
+  switch(mop_field_get_sigil(fieldmeta)) {
+    case '$':
+      break;
+
+    case '@':
+      if(o->op_type != OP_RV2AV)
+        return NULL;
+      o = cUNOPo->op_first;
+      break;
+
+    case '%':
+      if(o->op_type != OP_RV2HV)
+        return NULL;
+      o = cUNOPo->op_first;
+      break;
+  }
+
+  if(o->op_type != OP_CUSTOM || o->op_ppaddr != PL_ppaddr[OP_CONST])
+    return NULL;
+
+  return cSVOPo_sv;
 }
 
 void ObjectPad_mop_field_set_default_sv(pTHX_ FieldMeta *fieldmeta, SV *sv)
 {
-  if(fieldmeta->defaultsv)
-    SvREFCNT_dec(fieldmeta->defaultsv);
+  if(fieldmeta->defaultexpr)
+    op_free(fieldmeta->defaultexpr);
 
-  fieldmeta->defaultsv = sv;
+  /* An OP_CONST whose op_type is OP_CUSTOM. This way we avoid the opchecker
+   * and finalizer doing bad things to our defaultsv SV by setting it
+   * SvREADONLY_on() */
+  OP *valueop = newSVOP_CUSTOM(PL_ppaddr[OP_CONST], 0, sv);
+
+  switch(mop_field_get_sigil(fieldmeta)) {
+    case '$':
+      fieldmeta->defaultexpr = valueop;
+      break;
+
+    case '@':
+      assert(SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVAV);
+      fieldmeta->defaultexpr = newUNOP(OP_RV2AV, 0, valueop);
+      break;
+
+    case '%':
+      assert(SvROK(sv) && SvTYPE(SvRV(sv)) == SVt_PVHV);
+      fieldmeta->defaultexpr = newUNOP(OP_RV2HV, 0, valueop);
+      break;
+  }
 }
 
 typedef struct FieldAttributeRegistration FieldAttributeRegistration;
@@ -262,9 +297,103 @@ AV *ObjectPad_mop_field_get_attribute_values(pTHX_ FieldMeta *fieldmeta, const c
   return ret;
 }
 
+#define gen_field_init_op(fieldmeta)  S_gen_field_init_op(aTHX_ fieldmeta)
+static OP *S_gen_field_init_op(pTHX_ FieldMeta *fieldmeta)
+{
+  ClassMeta *classmeta = fieldmeta->class;
+
+  char sigil = SvPV_nolen(fieldmeta->name)[0];
+  OP *op = NULL;
+
+  switch(sigil) {
+    case '$':
+    {
+      OP *valueop = NULL;
+
+      if(fieldmeta->defaultexpr) {
+        valueop = fieldmeta->defaultexpr;
+      }
+
+      if(fieldmeta->paramname) {
+        SV *paramname = fieldmeta->paramname;
+
+        if(!valueop)
+          valueop = newop_croak_from_constructor(
+            newSVpvf("Required parameter '%" SVf "' is missing for %" SVf " constructor",
+              SVfARG(paramname), SVfARG(classmeta->name)));
+
+        valueop = newCONDOP(0,
+          /* exists $params{$paramname} */
+          newUNOP(OP_EXISTS, 0,
+            newBINOP(OP_HELEM, 0,
+              newPADxVOP(OP_PADHV, OPf_REF, PADIX_PARAMS),
+              newSVOP(OP_CONST, 0, SvREFCNT_inc(paramname)))),
+
+          /* ? delete $params{$paramname} */
+          newUNOP(OP_DELETE, 0,
+            newBINOP(OP_HELEM, 0,
+              newPADxVOP(OP_PADHV, OPf_REF, PADIX_PARAMS),
+              newSVOP(OP_CONST, 0, SvREFCNT_inc(paramname)))),
+
+          /* : valueop or die */
+          valueop);
+      }
+
+      if(valueop)
+        op = newBINOP(OP_SASSIGN, 0,
+          valueop,
+          /* $fields[$idx] */
+          newAELEMOP(OPf_MOD,
+            newPADxVOP(OP_PADAV, OPf_MOD|OPf_REF, PADIX_SLOTS),
+            fieldmeta->fieldix));
+      break;
+    }
+    case '@':
+    case '%':
+    {
+      OP *valueop = NULL;
+      U16 coerceop = (sigil == '%') ? OP_RV2HV : OP_RV2AV;
+
+      if(fieldmeta->defaultexpr) {
+        valueop = fieldmeta->defaultexpr;
+      }
+
+      if(valueop) {
+        /* $fields[$idx]->@* or ->%* */
+        OP *lhs = force_list_keeping_pushmark(newUNOP(coerceop, OPf_MOD|OPf_REF,
+                    newAELEMOP(0,
+                      newPADxVOP(OP_PADAV, OPf_MOD|OPf_REF, PADIX_SLOTS),
+                      fieldmeta->fieldix)));
+
+        op = newBINOP(OP_AASSIGN, 0,
+            force_list_keeping_pushmark(valueop),
+            lhs);
+      }
+      break;
+    }
+
+    default:
+      croak("ARGH: not sure how to handle a field sigil %c\n", sigil);
+  }
+
+  return op;
+}
+
 void ObjectPad_mop_field_seal(pTHX_ FieldMeta *fieldmeta)
 {
   MOP_FIELD_RUN_HOOKS_NOARGS(fieldmeta, seal);
+
+  need_PLparser();
+
+  ClassMeta *classmeta = fieldmeta->class;
+
+  OP *lines = classmeta->initfields_lines;
+
+  /* TODO: grab a COP at the initexpr time */
+  lines = op_append_elem(OP_LINESEQ, lines, newSTATEOP(0, NULL, NULL));
+  lines = op_append_elem(OP_LINESEQ, lines, gen_field_init_op(fieldmeta));
+
+  classmeta->initfields_lines = lines;
 }
 
 /*******************

@@ -1,5 +1,5 @@
 package Git::Raw::Merge::File::Result;
-$Git::Raw::Merge::File::Result::VERSION = '0.88';
+$Git::Raw::Merge::File::Result::VERSION = '0.90';
 use strict;
 use warnings;
 
@@ -9,7 +9,7 @@ Git::Raw::Merge::File::Result - Git merge result class
 
 =head1 VERSION
 
-version 0.88
+version 0.90
 
 =head1 DESCRIPTION
 
@@ -36,7 +36,7 @@ conflict would occur.
 
 =head1 AUTHOR
 
-Jacques Germishuys <jacquesg@striata.com>
+Jacques Germishuys <jacquesg@cpan.org>
 
 =head1 LICENSE AND COPYRIGHT
 

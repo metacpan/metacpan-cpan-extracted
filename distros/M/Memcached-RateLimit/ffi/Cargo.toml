@@ -1,0 +1,11 @@
+[package]
+name = "rl"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+memcache = "0.17.0"
+anyhow = "1.0.65"

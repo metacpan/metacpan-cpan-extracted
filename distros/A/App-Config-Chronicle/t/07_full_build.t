@@ -3,6 +3,7 @@ use Test::Warn;
 use Data::Chronicle::Mock;
 use App::Config::Chronicle;
 use FindBin qw($Bin);
+no warnings 'deprecated';
 
 my $app_config;
 my ($chronicle_r, $chronicle_w) = Data::Chronicle::Mock::get_mocked_chronicle();
@@ -23,6 +24,7 @@ $app_config->save_dynamic;
 is_deeply($app_config->system->email, 'test@abc.com', "email is updated");
 my $new_revision = $app_config->current_revision;
 isnt($new_revision, $old_revision, "revision updated");
+is($app_config->loaded_revision, $new_revision, "Loaded revision matches current revision");
 my $app_config2 = App::Config::Chronicle->new(
     definition_yml   => "$Bin/test.yml",
     chronicle_reader => $chronicle_r,
@@ -38,9 +40,13 @@ $app_config->save_dynamic;
 # will not refresh as not enough time has passed
 $app_config2->check_for_update;
 is($app_config2->system->email, 'test@abc.com', "still have old value");
-
-sleep($app_config2->refresh_interval);
-$app_config2->check_for_update;
+cmp_ok($app_config2->loaded_revision, '<=', $app_config2->current_revision, "Loaded revision is older than current revision");
+{
+    no warnings 'redefine';
+    local *Time::HiRes::time = sub { return Time::HiRes::gettimeofday + $app_config2->refresh_interval };
+    $app_config2->check_for_update;
+}
 is($app_config2->system->email, 'test2@abc.com', "check_for_update worked");
+cmp_ok($app_config2->loaded_revision, '==', $app_config2->current_revision, "Loaded revision once again current revision");
 
 done_testing;

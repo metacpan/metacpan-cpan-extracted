@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.66;  # field
 
-package Device::Chip::Base::RegisteredI2C 0.24;
+package Device::Chip::Base::RegisteredI2C 0.25;
 class Device::Chip::Base::RegisteredI2C :isa(Device::Chip);
 
 use utf8;

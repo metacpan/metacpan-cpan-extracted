@@ -22,7 +22,7 @@ subtest 'get' => sub {
     };
 
     subtest 'from app_config' => sub {
-        my $data = {tests => {get => 'b'}};
+        my $data       = {tests => {get => 'b'}};
         my $app_config = Data::Hash::DotNotation->new(data => $data);
 
         my $attribute = App::Config::Chronicle::Attribute::Global->new(
@@ -44,7 +44,7 @@ subtest 'get' => sub {
     };
 
     subtest 'from global(data)' => sub {
-        my $data = {tests => {get => 'c'}};
+        my $data   = {tests => {get => 'c'}};
         my $global = Data::Hash::DotNotation->new(data => $data);
 
         $data = {tests => {get => 'b'}};
@@ -71,7 +71,7 @@ subtest 'get' => sub {
 };
 
 subtest 'set - where' => sub {
-    my $data = {tests => {get => 'd'}};
+    my $data                   = {tests => {get => 'd'}};
     my $app_settings_overrides = Data::Hash::DotNotation->new(data => $data);
 
     $data = {tests => {get => 'c'}};

@@ -17,7 +17,7 @@ platform()
             return 0
         fi
     done
-    if [ "$str" = $(uname -s) ]
+    if [ "$str" = "$(uname -s)" ]
     then
         return 0
     fi
@@ -49,23 +49,24 @@ fi
     if platform debian || platform ubuntu
     then
         apt update --yes --quiet
-        apt install --yes --quiet perl-modules libmodule-build-perl libyaml-perl make tar
+        apt install --yes --quiet perl-modules libmodule-build-perl libyaml-perl libtry-tiny-perl make tar
     elif  platform fedora || platform centos || platform rhel
     then
         dnf upgrade --quiet --assumeyes
-        dnf --assumeyes --quiet install perl perl-Module-Build perl-YAML make tar < /dev/null
+        dnf --assumeyes --quiet install perl perl-Module-Build perl-YAML perl-Try-Tiny make tar < /dev/null
     elif  platform alpine
     then
         apk update --quiet
-        apk add --quiet perl perl-module-build perl-yaml make tar < /dev/null
+        apk add --quiet perl perl-module-build perl-yaml perl-try-tiny make tar < /dev/null
     elif platform arch
     then
         pacman --sync --refresh --quiet
-        pacman --sync --needed --quiet --noconfirm perl perl-module-build perl-yaml make tar
+        pacman --sync --needed --quiet --noconfirm perl perl-module-build perl-yaml perl-try-tiny make tar
     elif platform opensuse || platform suse
     then
-        zypper --non-interactive --quiet update
-        zypper --non-interactive --quiet install perl perl-Module-Build perl-YAML make tar gzip < /dev/null
+        zypper --non-interactive --quiet refresh --force-build
+        zypper --non-interactive --quiet update --best-effort
+        zypper --non-interactive --quiet install perl perl-Module-Build perl-YAML perl-Try-Tiny make tar gzip < /dev/null
     fi
 ) >>$output 2>&1
 

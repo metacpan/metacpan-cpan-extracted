@@ -1,12 +1,12 @@
 package AI::Pathfinding::OptimizeMultiple::App::CmdLine;
-$AI::Pathfinding::OptimizeMultiple::App::CmdLine::VERSION = '0.0.16';
+$AI::Pathfinding::OptimizeMultiple::App::CmdLine::VERSION = '0.0.17';
 use strict;
 use warnings;
 
 use MooX qw/late/;
 
 use Getopt::Long qw(GetOptionsFromArray);
-use IO::File ();
+use IO::File     ();
 
 use AI::Pathfinding::OptimizeMultiple                ();
 use AI::Pathfinding::OptimizeMultiple::PostProcessor ();
@@ -29,7 +29,7 @@ has _num_boards      => ( isa => 'Int', is  => 'rw' );
 has _offset_quotas   => ( isa => 'Int', is  => 'rw' );
 has _optimize_for    => ( isa => 'Str', is  => 'rw' );
 has _output_filename => ( isa => 'Str', is  => 'rw' );
-has _post_processor  => (
+has _post_processor => (
     isa => 'Maybe[AI::Pathfinding::OptimizeMultiple::PostProcessor]',
     is  => 'rw'
 );
@@ -39,7 +39,7 @@ has _should_rle_be_done   => ( isa => 'Bool',       is => 'rw' );
 has _should_trace_be_done => ( isa => 'Bool',       is => 'rw' );
 has _simulate_to          => ( isa => 'Maybe[Str]', is => 'rw' );
 has _start_board          => ( isa => 'Int',        is => 'rw' );
-has _stats_factors        =>
+has _stats_factors =>
     ( isa => 'HashRef', is => 'rw', default => sub { return +{}; }, );
 
 my $_component_re = qr/[A-Za-z][A-Za-z0-9_]*/;
@@ -310,7 +310,9 @@ sub _format_prelude_iter
 
     my $iter = shift;
 
-    return ( $self->_is_flares() ? "Run:" : "" ) . $iter->iters() . '@'
+    return
+          ( $self->_is_flares() ? "Run:" : "" )
+        . $iter->iters() . '@'
         . $self->_map_scan_idx_to_id( $iter->scan_idx() );
 }
 
@@ -568,7 +570,7 @@ AI::Pathfinding::OptimizeMultiple::App::CmdLine - the command line application c
 
 =head1 VERSION
 
-version 0.0.16
+version 0.0.17
 
 =head1 SUBROUTINES/METHODS
 
@@ -677,7 +679,7 @@ Shlomi Fish <shlomif@cpan.org>
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/ai-pathfinding-optimizemultiple/issues>
+L<https://github.com/shlomif/fc-solve/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

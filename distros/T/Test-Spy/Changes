@@ -1,3 +1,12 @@
+0.004 Nov 1 2022
+	- use Mooish::AttributeBuilder >=1.001
+
+0.003 Oct 22 2022
+	- drop Util::H2O dependency
+	- add support for base objects
+	- add proper can, DOES and isa handling
+	- add method observers
+
 0.002 Oct 17 2022
 	- add clear_all method to Test::Spy
 	- add wasnt_called method to testing interface

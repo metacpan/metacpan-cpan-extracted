@@ -2,7 +2,7 @@
 ## Stripe API - ~/lib/Net/API/Stripe/Billing/TaxID.pm
 ## Version v0.100.0
 ## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/12/19
 ## Modified 2020/05/15
 ## 
@@ -12,9 +12,14 @@ package Net::API::Stripe::Billing::TaxID;
 BEGIN
 {
     use strict;
+    use warnings;
     use parent qw( Net::API::Stripe::Generic );
+    use vars qw( $VERSION );
     our( $VERSION ) = 'v0.100.0';
 };
+
+use strict;
+use warnings;
 
 sub id { return( shift->_set_get_scalar( 'id', @_ ) ); }
 
@@ -47,7 +52,7 @@ Net::API::Stripe::Billing::TaxID - A Stripe Customer Tax ID Object
 =head1 SYNOPSIS
 
     my $tax = $stripe->tax_id({
-        country => 'jp',
+        country => 'JP',
         customer => $customer_object,
         # or maybe 'unknown'
         type => 'eu_vat',
@@ -65,56 +70,50 @@ See Customer Tax Identification Numbers L<https://stripe.com/docs/billing/taxes/
 
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>( %ARG )
+=head2 new
 
 Creates a new L<Net::API::Stripe::Billing::TaxID> object.
 It may also take an hash like arguments, that also are method of the same name.
 
-=back
-
 =head1 METHODS
 
-=over 4
-
-=item B<id> string
+=head2 id string
 
 Unique identifier for the object.
 
-=item B<object> string, value is "tax_id"
+=head2 object string, value is "tax_id"
 
 String representing the object’s type. Objects of the same type share the same value.
 
-=item B<country> string
+=head2 country string
 
 Two-letter ISO code representing the country of the tax ID.
 
-=item B<created> timestamp
+=head2 created timestamp
 
 Time at which the object was created. Measured in seconds since the Unix epoch.
 
-=item B<customer> string (expandable)
+=head2 customer string (expandable)
 
 ID of the customer. When expanded, this is a L<Net::API::Stripe::Customer> object.
 
-=item B<livemode> boolean
+=head2 livemode boolean
 
 Has the value true if the object exists in live mode or the value false if the object exists in test mode.
 
-=item B<type> string
+=head2 type string
 
 Type of the tax ID, one of au_abn, ch_vat, eu_vat, in_gst, mx_rfc, no_vat, nz_gst, za_vat, or unknown
 
-=item B<value> string
+=head2 value string
 
 Value of the tax ID.
 
-=item B<verification> hash
+=head2 verification hash
 
 Tax ID verification information.
 
-=over 8
+=over 4
 
 =item I<status> string
 
@@ -130,25 +129,23 @@ Verified name.
 
 =back
 
-=back
-
 =head1 API SAMPLE
 
-	{
-	  "id": "txi_123456789",
-	  "object": "tax_id",
-	  "country": "DE",
-	  "created": 123456789,
-	  "customer": "cus_fake123456789",
-	  "livemode": false,
-	  "type": "eu_vat",
-	  "value": "DE123456789",
-	  "verification": {
-		"status": "pending",
-		"verified_address": null,
-		"verified_name": null
-	  }
-	}
+    {
+      "id": "txi_123456789",
+      "object": "tax_id",
+      "country": "DE",
+      "created": 123456789,
+      "customer": "cus_fake123456789",
+      "livemode": false,
+      "type": "eu_vat",
+      "value": "DE123456789",
+      "verification": {
+        "status": "pending",
+        "verified_address": null,
+        "verified_name": null
+      }
+    }
 
 =head1 HISTORY
 

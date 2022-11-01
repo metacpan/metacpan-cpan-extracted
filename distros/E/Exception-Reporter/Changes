@@ -1,5 +1,9 @@
 Revision history for Exception-Reporter
 
+0.015     2022-10-22 16:58:43-04:00 America/New_York
+        - update dist metadata
+        - replace Email::Address with Email::Address::XS
+
 0.014     2017-04-21 13:52:40-04:00 America/New_York
         - the return value of report_exception has been documented
         - the Reporter now has a collect_summaries method for performing

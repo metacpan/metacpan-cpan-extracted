@@ -1,11 +1,17 @@
-Change log for Graphics::ColorNames::GrayScale:
+3.0 2022-10-31 lichtkind
+--------
+    * = full compatible - rest changed
+    * * flatten entire content, more kB less deps (Tie::Sub)
+    * § new maintainer
+    * & moved to dzil
+    * ! fix tests
 
 2.00   26 Aug 2004
-	- returns a CODE reference to dynamically parse name
-	- grey as alias to gray
+    - returns a CODE reference to dynamically parse name
+    - grey as alias to gray
 
 1.01   26 Aug 2004
-	- corrected README
+    - corrected README
 
 1.00   26 Aug 2004
-	- first release
+    - first release

@@ -43,5 +43,4 @@ resources:
   bugtracker: https://github.com/skirmess/Dist-Zilla-Plugin-Git-FilePermissions/issues
   homepage: https://github.com/skirmess/Dist-Zilla-Plugin-Git-FilePermissions
   repository: https://github.com/skirmess/Dist-Zilla-Plugin-Git-FilePermissions.git
-version: '1.001'
-x_spdx_expression: BSD-2-Clause-FreeBSD
+version: '1.002'

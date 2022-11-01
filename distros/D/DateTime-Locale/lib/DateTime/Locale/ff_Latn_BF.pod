@@ -19,12 +19,12 @@
 
 =head1 NAME
 
-DateTime::Locale::ff_Latn_BF - Locale data examples for the Fulah Burkina Faso Latin (ff-Latn-BF) locale
+DateTime::Locale::ff_Latn_BF - Locale data examples for the Fula Burkina Faso Latin (ff-Latn-BF) locale
 
 =head1 DESCRIPTION
 
 This pod file contains examples of the locale data available for the
-Fulah Burkina Faso Latin locale.
+Fula Burkina Faso Latin locale.
 
 =head2 Days
 

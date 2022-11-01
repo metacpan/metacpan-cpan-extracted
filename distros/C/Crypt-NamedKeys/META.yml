@@ -3,6 +3,7 @@ abstract: 'A Crypt::CBC wrapper with key rotation support'
 author:
   - 'binary.com <BINARY@cpan.org>'
 build_requires:
+  Data::Dumper: '0'
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
   IO::Handle: '0'
@@ -10,31 +11,59 @@ build_requires:
   Test::CheckDeps: '0.010'
   Test::Differences: '0'
   Test::More: '0.94'
-  Test::Most: '0'
-  perl: '5.014000'
+  Test::Most: '0.22'
+  Test::NoWarnings: '0'
+  perl: '5.006'
 configure_requires:
-  ExtUtils::MakeMaker: '6.48'
+  ExtUtils::MakeMaker: '7.64'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Crypt-NamedKeys
+no_index:
+  directory:
+    - eg
+    - share
+    - shares
+    - t
+    - xt
+provides:
+  Crypt::NamedKeys:
+    file: lib/Crypt/NamedKeys.pm
+    version: '1.13'
 requires:
   Carp: '0'
-  Crypt::CBC: '0'
+  Crypt::CBC: '>= 0, <= 2.37'
   Crypt::Rijndael: '0'
   Digest::SHA: '0'
-  JSON: '0'
+  Encode: '0'
+  JSON::MaybeXS: '0'
   MIME::Base64: '0'
   Moo: '0'
   String::Compare::ConstantTime: '0'
-  Try::Tiny: '0'
   YAML::XS: '0'
-  perl: '5.014000'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
 resources:
   bugtracker: https://github.com/binary-com/perl-Crypt-NamedKeys/issues
-  repository: git://github.com/binary-com/perl-Crypt-NamedKeys.git
-version: 1.1.2
-x_serialization_backend: 'YAML::Tiny version 1.66'
+  homepage: https://github.com/binary-com/perl-Crypt-NamedKeys
+  repository: https://github.com/binary-com/perl-Crypt-NamedKeys.git
+version: '1.13'
+x_authority: cpan:DERIV
+x_contributors:
+  - 'Chylli <chylli@binary.com>'
+  - 'Chris Travers <christravers@binary.com>'
+  - 'Jean-Yves Sireau <jy@binary.com>'
+  - 'Chris Travers <chris@efficito.com>'
+  - 'Chris Travers <chris.travers@gmail.com>'
+  - 'Zak B. Elep <zakame@zakame.net>'
+  - 'chylli-binary <52912308+chylli-binary@users.noreply.github.com>'
+  - 'Chylli <chylli.email@gmail.com>'
+  - 'Tom Molesworth <tom@binary.com>'
+x_generated_by_perl: v5.26.2
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

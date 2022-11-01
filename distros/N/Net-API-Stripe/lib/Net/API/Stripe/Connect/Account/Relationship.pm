@@ -2,7 +2,7 @@
 ## Stripe API - ~/lib/Net/API/Stripe/Connect/Account/Relationship.pm
 ## Version v0.100.0
 ## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2020/05/15
 ## 
@@ -10,10 +10,15 @@
 package Net::API::Stripe::Connect::Account::Relationship;
 BEGIN
 {
-	use strict;
-	use parent qw( Net::API::Stripe::Generic );
-	our( $VERSION ) = 'v0.100.0';
+    use strict;
+    use warnings;
+    use parent qw( Net::API::Stripe::Generic );
+    use vars qw( $VERSION );
+    our( $VERSION ) = 'v0.100.0';
 };
+
+use strict;
+use warnings;
 
 sub director { return( shift->_set_get_boolean( 'director', @_ ) ); }
 
@@ -58,97 +63,89 @@ Describes the person’s relationship to the account.
 
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>( %ARG )
+=head2 new( %ARG )
 
 Creates a new L<Net::API::Stripe::Connect::Account::Relationship> object.
 It may also take an hash like arguments, that also are method of the same name.
 
 This is instantiated from the method B<relationship> in module L<Net::API::Stripe::Connect::Person>
 
-=back
-
 =head1 METHODS
 
-=over 4
-
-=item B<director> boolean
+=head2 director boolean
 
 Whether the person is a director of the account’s legal entity. Currently only required for accounts in the EU. Directors are typically members of the governing board of the company, or responsible for ensuring the company meets its regulatory obligations.
 
-=item B<executive> boolean
+=head2 executive boolean
 
 Whether the person has significant responsibility to control, manage, or direct the organization.
 
-=item B<owner> boolean
+=head2 owner boolean
 
 Whether the person is an owner of the account’s legal entity.
 
-=item B<percent_ownership> decimal
+=head2 percent_ownership decimal
 
 The percent owned by the person of the account’s legal entity.
 
-=item B<representative> boolean
+=head2 representative boolean
 
 Whether the person is authorized as the primary representative of the account. This is the person nominated by the business to provide information about themselves, and general information about the account. There can only be one representative at any given time. At the time the account is created, this person should be set to the person responsible for opening the account.
 
-=item B<title> string
+=head2 title string
 
 The person’s title (e.g., CEO, Support Engineer).
 
-=back
-
 =head1 API SAMPLE
 
-	{
-	  "id": "person_fake123456789",
-	  "object": "person",
-	  "account": "acct_fake123456789",
-	  "created": 1571602397,
-	  "dob": {
-		"day": null,
-		"month": null,
-		"year": null
-	  },
-	  "first_name_kana": null,
-	  "first_name_kanji": null,
-	  "gender": null,
-	  "last_name_kana": null,
-	  "last_name_kanji": null,
-	  "metadata": {},
-	  "relationship": {
-		"director": false,
-		"executive": false,
-		"owner": false,
-		"percent_ownership": null,
-		"representative": false,
-		"title": null
-	  },
-	  "requirements": {
-		"currently_due": [],
-		"eventually_due": [],
-		"past_due": [],
-		"pending_verification": []
-	  },
-	  "verification": {
-		"additional_document": {
-		  "back": null,
-		  "details": null,
-		  "details_code": null,
-		  "front": null
-		},
-		"details": null,
-		"details_code": null,
-		"document": {
-		  "back": null,
-		  "details": null,
-		  "details_code": null,
-		  "front": null
-		},
-		"status": "unverified"
-	  }
-	}
+    {
+      "id": "person_fake123456789",
+      "object": "person",
+      "account": "acct_fake123456789",
+      "created": 1571602397,
+      "dob": {
+        "day": null,
+        "month": null,
+        "year": null
+      },
+      "first_name_kana": null,
+      "first_name_kanji": null,
+      "gender": null,
+      "last_name_kana": null,
+      "last_name_kanji": null,
+      "metadata": {},
+      "relationship": {
+        "director": false,
+        "executive": false,
+        "owner": false,
+        "percent_ownership": null,
+        "representative": false,
+        "title": null
+      },
+      "requirements": {
+        "currently_due": [],
+        "eventually_due": [],
+        "past_due": [],
+        "pending_verification": []
+      },
+      "verification": {
+        "additional_document": {
+          "back": null,
+          "details": null,
+          "details_code": null,
+          "front": null
+        },
+        "details": null,
+        "details_code": null,
+        "document": {
+          "back": null,
+          "details": null,
+          "details_code": null,
+          "front": null
+        },
+        "status": "unverified"
+      }
+    }
 
 =head1 HISTORY
 

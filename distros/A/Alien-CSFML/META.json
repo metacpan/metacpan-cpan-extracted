@@ -101,7 +101,7 @@
    "provides" : {
       "Alien::CSFML" : {
          "file" : "lib/Alien/CSFML.pm",
-         "version" : "v0.0.5"
+         "version" : "v0.0.7"
       }
    },
    "release_status" : "stable",
@@ -116,7 +116,7 @@
          "web" : "https://github.com/sanko/alien-csfml"
       }
    },
-   "version" : "v0.0.5",
+   "version" : "v0.0.7",
    "x_authority" : "cpan:SANKO",
    "x_serialization_backend" : "JSON::PP version 4.11",
    "x_static_install" : 0

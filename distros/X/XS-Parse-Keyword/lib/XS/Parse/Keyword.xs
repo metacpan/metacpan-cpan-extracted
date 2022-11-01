@@ -30,18 +30,64 @@ struct XSParseInfixHooks_v0 {
 
 static void XSParseInfix_register_v0(pTHX_ const char *opname, const struct XSParseInfixHooks_v0 *hooks_v0, void *hookdata)
 {
+  warn("XSParseInfix ABI version 0 is deprecated and will soon be removed");
+
   struct XSParseInfixHooks *hooks;
   Newx(hooks, 1, struct XSParseInfixHooks);
 
-  hooks->flags = hooks_v0->flags;
+  hooks->flags = hooks_v0->flags | (1<<15); /* NO_PARSEDATA */
   hooks->cls   = hooks_v0->cls;
 
   hooks->wrapper_func_name = NULL;
 
   hooks->permit_hintkey = hooks_v0->permit_hintkey;
   hooks->permit         = hooks_v0->permit;
-  hooks->new_op         = hooks_v0->new_op;
+  hooks->new_op         = (OP *(*)(pTHX_ U32, OP *, OP *, SV **, void *))hooks_v0->new_op;
   hooks->ppaddr         = hooks_v0->ppaddr;
+  hooks->parse          = NULL;
+
+  XSParseInfix_register(aTHX_ opname, hooks, hookdata);
+}
+
+/* v1 hooks.newop did not pass parsedata */
+struct XSParseInfixHooks_v1 {
+  U16 flags;
+  U8 lhs_flags, rhs_flags;
+  enum XSParseInfixClassification cls;
+
+  const char *wrapper_func_name;
+
+  const char *permit_hintkey;
+  bool (*permit) (pTHX_ void *hookdata);
+
+  OP *(*new_op)(pTHX_ U32 flags, OP *lhs, OP *rhs, void *hookdata);
+  OP *(*ppaddr)(pTHX);
+
+  OP *(*parse_rhs)(pTHX_ void *hookdata);
+};
+
+static void XSParseInfix_register_v1(pTHX_ const char *opname, const struct XSParseInfixHooks_v1 *hooks_v1, void *hookdata)
+{
+  if(hooks_v1->rhs_flags & XPI_OPERAND_CUSTOM)
+    croak("XPI_OPERAND_CUSTOM is no longer supported");
+  if(hooks_v1->parse_rhs)
+    croak("XSParseInfixHooks.parse_rhs is no longer supported");
+
+  struct XSParseInfixHooks *hooks;
+  Newx(hooks, 1, struct XSParseInfixHooks);
+
+  hooks->flags     = hooks_v1->flags | (1<<15) /* NO_PARSEDATA */;
+  hooks->lhs_flags = hooks_v1->lhs_flags;
+  hooks->rhs_flags = hooks_v1->rhs_flags;
+  hooks->cls       = hooks_v1->cls;
+
+  hooks->wrapper_func_name = hooks_v1->wrapper_func_name;
+
+  hooks->permit_hintkey = hooks_v1->permit_hintkey;
+  hooks->permit         = hooks_v1->permit;
+  hooks->new_op         = (OP *(*)(pTHX_ U32, OP *, OP *, SV **, void *))hooks_v1->new_op;
+  hooks->ppaddr         = hooks_v1->ppaddr;
+  hooks->parse          = NULL;
 
   XSParseInfix_register(aTHX_ opname, hooks, hookdata);
 }
@@ -65,8 +111,10 @@ BOOT:
   sv_setiv(*hv_fetchs(PL_modglobal, "XS::Parse::Infix/ABIVERSION_MIN", 1), 0);
   sv_setiv(*hv_fetchs(PL_modglobal, "XS::Parse::Infix/ABIVERSION_MAX", 1), XSPARSEINFIX_ABI_VERSION);
 
+  sv_setuv(*hv_fetchs(PL_modglobal, "XS::Parse::Infix/parse()@2", 1), PTR2UV(&XSParseInfix_parse));
   sv_setuv(*hv_fetchs(PL_modglobal, "XS::Parse::Infix/new_op()@0", 1), PTR2UV(&XSParseInfix_new_op));
   sv_setuv(*hv_fetchs(PL_modglobal, "XS::Parse::Infix/register()@0", 1), PTR2UV(&XSParseInfix_register_v0));
-  sv_setuv(*hv_fetchs(PL_modglobal, "XS::Parse::Infix/register()@1", 1), PTR2UV(&XSParseInfix_register));
+  sv_setuv(*hv_fetchs(PL_modglobal, "XS::Parse::Infix/register()@1", 1), PTR2UV(&XSParseInfix_register_v1));
+  sv_setuv(*hv_fetchs(PL_modglobal, "XS::Parse::Infix/register()@2", 1), PTR2UV(&XSParseInfix_register));
 
   XSParseInfix_boot(aTHX);

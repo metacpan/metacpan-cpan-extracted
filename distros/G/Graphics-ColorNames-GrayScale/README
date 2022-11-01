@@ -1,6 +1,6 @@
 NAME
-    Graphics::ColorNames::GrayScale - grayscale colors for
-    Graphics::ColorNames
+    Graphics::ColorNames::GrayScale - RGB values of shades of gray and base
+    colors
 
 SYNOPSIS
       require Graphics::ColorNames::GrayScale;
@@ -9,6 +9,9 @@ SYNOPSIS
       $RgbColor  = $NameTable->{gray80};
 
 DESCRIPTION
+    See the documentation of Graphics::ColorNames for information how to use
+    this module.
+
     This module provides grayscale colors for Graphics::ColorNames. The
     following are valid colors:
 
@@ -32,8 +35,11 @@ DESCRIPTION
 AUTHOR
     Robert Rothenberg <rrwo at cpan.org>
 
+MAINTAINER
+    Herbert Breunung <lichtkind@cpan.org>
+
 LICENSE
-    Copyright (c) 2004 Robert Rothenberg. All rights reserved. This program
-    is free software; you can redistribute it and/or modify it under the
-    same terms as Perl itself.
+    Copyright (c) 2004-2022 Robert Rothenberg. All rights reserved. This
+    program is free software; you can redistribute it and/or modify it under
+    the same terms as Perl itself.
 

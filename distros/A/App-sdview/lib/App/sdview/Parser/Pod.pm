@@ -5,9 +5,9 @@
 
 use v5.26;
 
-use Object::Pad 0.43;  # :strict(params), ADJUST
+use Object::Pad 0.66;
 
-package App::sdview::Parser::Pod 0.07;
+package App::sdview::Parser::Pod 0.08;
 class App::sdview::Parser::Pod
    isa Pod::Simple
    does App::sdview::Parser
@@ -46,11 +46,11 @@ ADJUST
    $self->nix_X_codes( 1 );
 }
 
-has @_indentstack;
-has @_parastack;
+field @_indentstack;
+field @_parastack;
 
-has %_curtags;
-has $_curpara;
+field %_curtags;
+field $_curpara;
 
 method parse_file ( $fh )
 {

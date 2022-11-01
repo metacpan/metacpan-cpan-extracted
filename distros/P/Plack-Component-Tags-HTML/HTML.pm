@@ -8,13 +8,14 @@ use CSS::Struct::Output::Raw;
 use Encode qw(encode);
 use Error::Pure qw(err);
 use Plack::Util::Accessor qw(author content_type css encoding
-	favicon flag_begin flag_end generator psgi_app status_code title tags);
+	favicon flag_begin flag_end generator psgi_app script_js script_js_src
+	status_code title tags);
 use Scalar::Util qw(blessed);
 use Tags::HTML::Page::Begin;
 use Tags::HTML::Page::End;
 use Tags::Output::Raw;
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 sub call {
 	my ($self, $env) = @_;
@@ -53,8 +54,8 @@ sub prepare_app {
 	} else {
 		$self->tags(Tags::Output::Raw->new(
 			'xml' => 1,
-			'no_simple' => ['textarea'],
-			'preserved' => ['pre'],
+			'no_simple' => ['script', 'textarea'],
+			'preserved' => ['pre', 'style'],
 		));
 	}
 
@@ -84,6 +85,14 @@ sub prepare_app {
 
 	if (! defined $self->flag_end) {
 		$self->flag_end(1);
+	}
+
+	if (! defined $self->script_js) {
+		$self->script_js([]);
+	}
+
+	if (! defined $self->script_js_src) {
+		$self->script_js_src([]);
 	}
 
 	$self->_prepare_app;
@@ -134,6 +143,8 @@ sub _tags {
 			'lang' => {
 				'title' => $self->title,
 			},
+			'script_js' => $self->script_js,
+			'script_js_src' => $self->script_js_src,
 			'tags' => $self->tags,
 		)->process;
 	}
@@ -249,6 +260,16 @@ Default value is undef.
 PSGI application to run instead of normal process.
 Intent of this is change application in C<_process_actions> method.
 Default value is undef.
+
+=head2 C<script_js>
+
+Reference to array with Javascript code strings.
+Default value is [].
+
+=head2 C<script_js_src>
+
+Reference to array with Javascript URLs.
+Default value is [].
 
 =head2 C<status_code>
 
@@ -459,6 +480,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut

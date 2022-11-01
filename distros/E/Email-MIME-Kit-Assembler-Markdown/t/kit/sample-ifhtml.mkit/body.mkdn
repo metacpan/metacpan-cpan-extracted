@@ -1,0 +1,8 @@
+
+## Fantastic New Assembler!
+
+Is HTML cool?  Survey says: [% part_type %]
+
+-- 
+Yours truly,
+Ricardo Signes

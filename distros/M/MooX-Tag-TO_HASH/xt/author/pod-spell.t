@@ -17,6 +17,8 @@ MooX
 Observatory
 Smithsonian
 TO_HASH
+TO_JSON
 Tag
+Util
 djerius
 lib

@@ -1,0 +1,265 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with App::Config::Chronicle
+at lib/App/Config/Chronicle.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+App::Config::Chronicle - An OO configuration module which can be changed and stored into chronicle database.
+
+=head1 SYNOPSIS
+
+    my $app_config = App::Config::Chronicle->new;
+
+=head1 DESCRIPTION
+
+This module parses configuration files and provides interface to access
+configuration information.
+
+=head1 FILE FORMAT
+
+The configuration file is a YAML file. Here is an example:
+
+    system:
+      description: "Various parameters determining core application functionality"
+      isa: section
+      contains:
+        email:
+          description: "Dummy email address"
+          isa: Str
+          default: "dummy@mail.com"
+          global: 1
+        refresh:
+          description: "System refresh rate"
+          isa: Num
+          default: 10
+          global: 1
+        admins:
+          description: "Are we on Production?"
+          isa: ArrayRef
+          default: []
+
+Every attribute is very intuitive. If an item is global, you can change its value and the value will be stored into chronicle database by calling the method C<save_dynamic>.
+
+=head1 SUBROUTINES/METHODS (LEGACY)
+
+=head2 REDIS_HISTORY_TTL
+
+The maximum length of time (in seconds) that a cached history entry will stay in Redis.
+
+=head2 definition_yml
+
+The YAML file that store the configuration
+
+=head2 chronicle_reader
+
+The chronicle store that configurations can be fetch from it. It should be an instance of L<Data::Chronicle::Reader>.
+But user is free to implement any storage backend he wants if it is implemented with a 'get' method.
+
+=head2 chronicle_writer
+
+The chronicle store that updated configurations can be stored into it. It should be an instance of L<Data::Chronicle::Writer>.
+But user is free to implement any storage backend he wants if it is implemented with a 'set' method.
+
+=head2 chronicle_subscriber
+
+The chronicle connection that can notify via callbacks when particular configuration items have a new value set. It should be an instance of L<Data::Chronicle::Subscriber>.
+
+=head2 refresh_interval
+
+How much time (in seconds) should pass between L<check_for_update> invocations until
+it actually will do (a bit heavy) lookup for settings in redis.
+
+Default value is 10 seconds
+
+=head2 check_for_update
+
+check and load updated settings from chronicle db
+
+Checks at most every C<refresh_interval> unless forced with
+a truthy first argument
+
+=head2 save_dynamic
+
+Save dynamic settings into chronicle db
+
+=head2 current_revision
+
+Loads setting from chronicle reader and returns the last revision
+
+It is more likely that you want L</loaded_revision> in regular use
+
+=head2 loaded_revision
+
+Returns the revision loaded and served by this instance
+
+This may not reflect the latest stored version in the Chronicle persistence.
+However, it is the revision of the data which will be returned when
+querying this instance
+
+=head1 SUBROUTINES/METHODS
+######################################################
+###### Start new API
+######################################################
+
+=head2 local_caching
+
+If local_caching is set to the true then key-value pairs stored in Redis will be cached locally.
+
+Calling update_cache will update the local cache with any changes from Redis.
+refresh_interval defines (in seconds) the minimum time between seqequent updates.
+
+Calls to get on this object will only ever access the cache.
+Calls to set on this object will immediately update the values in the local cache and Redis.
+
+=head2 update_cache
+
+Loads latest values from data chronicle into local cache.
+Calls to this method are rate-limited by C<refresh_interval>.
+
+=head2 global_revision
+
+Returns the global revision version of the config chronicle.
+This will correspond to the last time any of values were changed.
+
+=head2 set
+
+Takes a hashref of key->value pairs and atomically sets them in config chronicle
+
+Example:
+    set({key1 => 'value1', key2 => 'value2', key3 => 'value3',...});
+
+=head2 get
+
+Takes either
+    - an arrayref of keys, gets them atomically, and returns a hashref of key->values,
+    including the global_revision under the key '_global_rev'.
+    - a single key (as a string), gets the value, and returns it directly.
+If a key has an empty value, it will return with undef.
+
+For convenience a get with just a key string will return the value only.
+
+Example:
+    get(['key1','key2','key3',...]);
+Returns:
+    {'key1' => 'value1', 'key2' => 'value2', 'key3' => 'value3',..., '_global_rev' => '<number>'}
+
+Example:
+    get(['key1']);
+Returns:
+    {'key1' => 'value1', '_global_rev' => '<number>'}
+
+Example:
+    get('key1');
+Returns:
+    'value1'
+
+=head2 get_history
+
+Retreives a past revision of an app config entry, where $rev is the number of revisions in the past requested.
+If the optional third argument is true then result of the query will be cached in Redis. This is useful if a certain
+    revision will be needed repeatedly, to avoid excessive database access. By default this argument is 0.
+All cached revisions will become stale if the key is set with a new value.
+
+Example:
+    get_history('system.email', 0); Retrieves current version
+    get_history('system.email', 1); Retreives previous revision
+    get_history('system.email', 2); Retreives version before previous
+
+=head2 subscribe
+
+Subscribes to changes for the specified $key with the sub $subref called when a new value is set.
+The chronicle_writer must have publish_on_set enabled.
+
+=head2 unsubscribe
+
+Stops the sub $subref from being called when $key is set with a new value.
+The chronicle_writer must have publish_on_set enabled.
+
+=head2 all_keys
+
+Returns a list containing all keys in the config chronicle schema
+
+=head2 dynamic_keys
+
+Returns a list containing only the dynamic keys in the config chronicle schema
+
+=head2 static_keys
+
+Returns a list containing only the static keys in the config chronicle schema
+
+=head2 get_data_type
+
+Returns the data type associated with a particular key
+
+=head2 get_default
+
+Returns the default value associated with a particular key
+
+=head2 get_description
+
+Returns the default value associated with a particular key
+
+=head2 get_key_type
+
+Returns the key type associated with a particular key
+
+=head2 BUILD
+
+=head1 AUTHOR
+
+Binary.com, C<< <binary at cpan.org> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-app-config at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=App-Config>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc App::Config::Chronicle
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker (report bugs here)
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-Config>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/App-Config>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/App-Config>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/App-Config/>
+
+=back
+
+=head1 ACKNOWLEDGEMENTS
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Moose::Object>
+
+L<BUILDALL|Moose::Object/BUILDALL>, L<BUILDARGS|Moose::Object/BUILDARGS>, L<DEMOLISHALL|Moose::Object/DEMOLISHALL>, L<DOES|Moose::Object/DOES>, L<does|Moose::Object/does>, L<dump|Moose::Object/dump>
+
+=back
+

@@ -1,15 +1,13 @@
 package Curses::UI::Number;
 
-# Pragmas.
 use base qw(Curses::UI::Label);
 use strict;
 use warnings;
 
-# Modules.
 use Curses::UI::Common qw(keys_to_lowercase);
 use Curses::UI::Label;
-use Encode qw(decode_utf8);
 use Readonly;
+use Unicode::UTF8 qw(decode_utf8);
 
 # Constants.
 Readonly::Scalar our $BLANK_PIXEL => q{  };
@@ -17,8 +15,7 @@ Readonly::Scalar our $EMPTY_STR => q{};
 Readonly::Scalar our $PIXELS => 14;
 Readonly::Scalar our $PIXELS_ON_LINE => 3;
 
-# Version.
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 
 # Constructor.
 sub new {
@@ -111,6 +108,7 @@ Curses::UI::Number - Create and manipulate number widgets.
 =head1 SYNOPSIS
 
  use Curses::UI;
+
  my $win = $cui->add('window_id', 'Window');
  my $number = $win->add(
          'mynum', 'Curses::UI::Number',
@@ -179,11 +177,11 @@ L<Curses::UI::Widget|Curses::UI::Widget>.
 
 =head1 EXAMPLE1
 
- # Pragmas.
+=for comment filename=curses_ui_five.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Curses::UI;
 
  # Object.
@@ -213,11 +211,11 @@ L<Curses::UI::Widget|Curses::UI::Widget>.
 
 =head1 EXAMPLE2
 
- # Pragmas.
+=for comment filename=curses_ui_timer.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Curses::UI;
 
  # Object.
@@ -270,7 +268,7 @@ L<Curses::UI::Widget|Curses::UI::Widget>.
 L<Curses::UI::Common>,
 L<Curses::UI::Label>,
 L<Curses::UI::Widget>,
-L<Encode>.
+L<Unicode::UTF8>.
 
 =head1 SEE ALSO
 
@@ -284,18 +282,19 @@ Install the Curses::UI modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Curses-UI-Number>
+L<https://github.com/michal-josef-spacek/Curses-UI-Number>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2014-2015 Michal Špaček
- BSD 2-Clause License
+© 2014-2015 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 DEDICATION
 
@@ -303,6 +302,6 @@ To Czech Perl Workshop 2014 and their organizers.
 
 =head1 VERSION
 
-0.06
+0.07
 
 =cut

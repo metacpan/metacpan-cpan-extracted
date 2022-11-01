@@ -35,7 +35,7 @@ sub also_sealed :Sealed {
             $a->foo;
         };
     }
-    sub render :Sealed { my main $b = $a; $b->foo }
+    sub render :Sealed { my main $b = $a; local our @Q=1; $b->foo }
     $a->bar();
 }
 my %tests = (

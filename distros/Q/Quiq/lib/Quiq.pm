@@ -3,7 +3,7 @@ package Quiq;
 use strict;
 use warnings;
 
-our $VERSION = '1.204';
+our $VERSION = '1.205';
 
 =encoding utf8
 
@@ -600,6 +600,10 @@ L<Quiq::LaTeX::LongTable> - Erzeuge LaTeX longtable
 
 =item *
 
+L<Quiq::Ldap::Client> - LDAP Client
+
+=item *
+
 L<Quiq::LineProcessor> - Verarbeite Datei als Array von Zeilen
 
 =item *
@@ -958,7 +962,7 @@ L<Quiq::Xml::LibXml> - Funktionale Erweiterungen von XML::LibXML
 
 =head1 VERSION
 
-1.204
+1.205
 
 =head1 AUTHOR
 

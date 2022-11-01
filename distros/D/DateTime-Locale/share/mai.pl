@@ -1,7 +1,7 @@
 {
   am_pm_abbreviated => [
-    "AM",
-    "PM",
+    "\N{U+092d}\N{U+094b}\N{U+0930}",
+    "\N{U+0938}\N{U+093e}\N{U+0902}\N{U+091d}",
   ],
   available_formats => {
     Bh => "B h",
@@ -57,8 +57,8 @@
   date_format_long => "d MMMM y",
   date_format_medium => "d MMM y",
   date_format_short => "d/M/yy",
-  datetime_format_full => "{1} \N{U+0915}\N{U+0947} {0}",
-  datetime_format_long => "{1} \N{U+0915}\N{U+0947} {0}",
+  datetime_format_full => "{1}, {0}",
+  datetime_format_long => "{1}, {0}",
   datetime_format_medium => "{1}, {0}",
   datetime_format_short => "{1}, {0}",
   day_format_abbreviated => [
@@ -267,5 +267,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 41,
+  version => 42,
 }

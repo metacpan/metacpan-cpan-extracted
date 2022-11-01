@@ -1,5 +1,12 @@
 Revision history for Log-Dispatch-File-Stamped
 
+0.21      2022-10-23 02:19:49Z
+          - fix Specio prereq (RT#144903)
+
+0.20      2022-10-22 18:27:55Z
+          - new config value "stamp_sep", for changing the separator character
+            in the log filename (PR #2, thanks Sven Willenbuecher!)
+
 0.19      2017-02-21 03:59:32Z
           - fix unit tests for different path separator on MSWin32
 

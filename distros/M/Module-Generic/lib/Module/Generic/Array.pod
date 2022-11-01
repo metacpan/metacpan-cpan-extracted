@@ -175,7 +175,7 @@ Module::Generic::Array - An Array Manipulation Object Class
 
 =head1 VERSION
 
-    v1.5.2
+    v1.5.3
 
 =head1 DESCRIPTION
 

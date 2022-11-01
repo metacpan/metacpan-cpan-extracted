@@ -1,19 +1,30 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Connect/Account/Requirements.pm
-## Version v0.100.0
+## Version v0.101.0
 ## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
-## Modified 2020/05/15
+## Modified 2022/10/29
 ## 
 ##----------------------------------------------------------------------------
 package Net::API::Stripe::Connect::Account::Requirements;
 BEGIN
 {
-	use strict;
-	use parent qw( Net::API::Stripe::Generic );
-	our( $VERSION ) = 'v0.100.0';
+    use strict;
+    use warnings;
+    use parent qw( Net::API::Stripe::Generic );
+    use vars qw( $VERSION );
+    our( $VERSION ) = 'v0.101.0';
 };
+
+use strict;
+use warnings;
+
+sub alternatives { return( shift->_set_get_class_array( 'alternatives',
+{
+  alternative_fields_due => { type => "array" },
+  original_fields_due    => { type => "array" },
+}, @_ ) ); }
 
 sub current_deadline { return( shift->_set_get_datetime( 'current_deadline', @_ ) ); }
 
@@ -22,15 +33,16 @@ sub currently_due { return( shift->_set_get_array( 'currently_due', @_ ) ); }
 sub disabled_reason { return( shift->_set_get_scalar( 'disabled_reason', @_ ) ); }
 
 # sub errors { return( shift->_set_get_array( 'errors', @_ ) ); }
+
 sub errors
 {
-	return( shift->_set_get_class_array( 'errors',
-	    {
-	    code => { type => 'scalar' },
-	    reason => { type => 'scalar' },
-	    requirement => { type => 'scalar' },
-	    })
-	);
+    return( shift->_set_get_class_array( 'errors',
+        {
+        code => { type => 'scalar' },
+        reason => { type => 'scalar' },
+        requirement => { type => 'scalar' },
+        })
+    );
 }
 
 sub eventually_due { return( shift->_set_get_array( 'eventually_due', @_ ) ); }
@@ -64,7 +76,7 @@ Net::API::Stripe::Connect::Account::Requirements - A Stripe Account Requirements
 
 =head1 VERSION
 
-    v0.100.0
+    v0.101.0
 
 =head1 DESCRIPTION
 
@@ -74,34 +86,46 @@ This is instantiated from method B<requirements> in modules L<Net::API::Stripe::
 
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>( %ARG )
+=head2 new( %ARG )
 
 Creates a new L<Net::API::Stripe::Connect::Account::Requirements> object.
 It may also take an hash like arguments, that also are method of the same name.
 
-=back
-
 =head1 METHODS
+
+=head2 alternatives array of hash
+
+Fields that are due and can be satisfied by providing the corresponding alternative fields instead.
+
+It has the following properties:
 
 =over 4
 
-=item B<current_deadline> timestamp
+=item C<alternative_fields_due> string_array
+
+Fields that can be provided to satisfy all fields in C<original_fields_due>.
+
+=item C<original_fields_due> string_array
+
+Fields that are due and can be satisfied by providing all fields in C<alternative_fields_due>.
+
+=back
+
+=head2 current_deadline timestamp
 
 The date the fields in currently_due must be collected by to keep the capability enabled for the account.
 
 This is a C<DateTime> object;
 
-=item B<currently_due> array containing strings
+=head2 currently_due array containing strings
 
 Fields that need to be collected to keep the person’s account enabled. If not collected by the account’s current_deadline, these fields appear in past_due as well, and the account is disabled.
 
-=item B<disabled_reason> string
+=head2 disabled_reason string
 
 If the capability is disabled, this string describes why. Possible values are requirement.fields_needed, pending.onboarding, pending.review, rejected_fraud, or rejected.other.
 
-=item B<errors> array of hash
+=head2 errors array of hash
 
 The fields that need to be collected again because validation or verification failed for some reason.
 
@@ -111,7 +135,7 @@ This is an array reference of virtual objects class L<Net::API::Stripe::Connect:
 
 =item I<code> The code for the type of error. Possible enum values
 
-=over 8
+=over 4
 
 =item I<invalid_address_city_state_postal_code>
 
@@ -273,70 +297,68 @@ Verification failed for an unknown reason. Correct any errors and resubmit the r
 
 =back
 
-=item B<eventually_due> array containing strings
+=head2 eventually_due array containing strings
 
 Fields that need to be collected assuming all volume thresholds are reached. As fields are needed, they are moved to currently_due and the account’s current_deadline is set.
 
-=item B<past_due> array containing strings
+=head2 past_due array containing strings
 
 Fields that weren’t collected by the account’s current_deadline. These fields need to be collected to enable payouts for the person’s account.
 
-=item B<pending_verification> array containing strings
+=head2 pending_verification array containing strings
 
 Fields that may become required depending on the results of verification or review. An empty array unless an asynchronous verification is pending. If verification fails, the fields in this array become required and move to currently_due or past_due.
 
-=back
-
 =head1 API SAMPLE
 
-	{
-	  "id": "person_fake123456789",
-	  "object": "person",
-	  "account": "acct_fake123456789",
-	  "created": 1571602397,
-	  "dob": {
-		"day": null,
-		"month": null,
-		"year": null
-	  },
-	  "first_name_kana": null,
-	  "first_name_kanji": null,
-	  "gender": null,
-	  "last_name_kana": null,
-	  "last_name_kanji": null,
-	  "metadata": {},
-	  "relationship": {
-		"director": false,
-		"executive": false,
-		"owner": false,
-		"percent_ownership": null,
-		"representative": false,
-		"title": null
-	  },
-	  "requirements": {
-		"currently_due": [],
-		"eventually_due": [],
-		"past_due": [],
-		"pending_verification": []
-	  },
-	  "verification": {
-		"additional_document": {
-		  "back": null,
-		  "details": null,
-		  "details_code": null,
-		  "front": null
-		},
-		"details": null,
-		"details_code": null,
-		"document": {
-		  "back": null,
-		  "details": null,
-		  "details_code": null,
-		  "front": null
-		},
-		"status": "unverified"
-	  }
-	}
+    {
+      "id": "person_fake123456789",
+      "object": "person",
+      "account": "acct_fake123456789",
+      "created": 1571602397,
+      "dob": {
+        "day": null,
+        "month": null,
+        "year": null
+      },
+      "first_name_kana": null,
+      "first_name_kanji": null,
+      "gender": null,
+      "last_name_kana": null,
+      "last_name_kanji": null,
+      "metadata": {},
+      "relationship": {
+        "director": false,
+        "executive": false,
+        "owner": false,
+        "percent_ownership": null,
+        "representative": false,
+        "title": null
+      },
+      "requirements": {
+        "currently_due": [],
+        "eventually_due": [],
+        "past_due": [],
+        "pending_verification": []
+      },
+      "verification": {
+        "additional_document": {
+          "back": null,
+          "details": null,
+          "details_code": null,
+          "front": null
+        },
+        "details": null,
+        "details_code": null,
+        "document": {
+          "back": null,
+          "details": null,
+          "details_code": null,
+          "front": null
+        },
+        "status": "unverified"
+      }
+    }
 
 =head1 HISTORY
 

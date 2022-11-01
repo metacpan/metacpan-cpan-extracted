@@ -1,6 +1,11 @@
 Revision history for Perl extension Net::DNS::Resolver::Unbound.
 
 
+**** 1.20  Nov 1, 2022
+	Include -I flags from Config{cppflags}.
+	Make feature detection work for XS package.
+
+
 **** 1.19  Oct 3, 2022
 	Improve test coverage.
 	Make Makefile.PL also work properly on MSWin32.

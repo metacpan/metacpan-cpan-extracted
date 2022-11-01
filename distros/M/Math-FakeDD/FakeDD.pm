@@ -88,7 +88,7 @@ my @tags = qw(
 
 %Math::FakeDD::EXPORT_TAGS = (all => [@tags]);
 
-$Math::FakeDD::VERSION =  '0.06';
+$Math::FakeDD::VERSION =  '0.07';
 
 # Whenever dd_repro($obj) returns its string representation of
 # the value of $obj, $Math::FakeDD::REPRO_PREC is set to the
@@ -105,7 +105,7 @@ $Math::FakeDD::DD_MAX = Math::FakeDD->new(Rmpfr_get_d(Math::MPFR->new('1.fffffff
 
 sub new {
 
-  my %h = ('msd' => 0, 'lsd' => 0);
+  my %h = ('msd' => 0.0, 'lsd' => 0.0);
   return bless(\%h) unless @_;
 
   if(!ref($_[0]) && $_[0] eq "Math::FakeDD") {
@@ -1459,9 +1459,9 @@ sub mpfr2dd {
   # $msd could be an Inf or Zero, even though $mpfr was not.
   # Also cater for the possibility that $msd is Nan - though
   # I don't think that can happen.
-  if($msd == 0 || $msd != $msd || $msd / $msd != 1) { # $msd is zero, nan, or inf.
+  if(!$msd || _is_nan($msd) || _is_inf($msd)) { # $msd is zero, nan, or inf.
     $h{msd} = $msd;
-    $h{lsd} = 0;
+    $h{lsd} = 0.0;
     return bless(\%h);
   }
 
@@ -1473,7 +1473,7 @@ sub mpfr2dd {
   # an Inf that has the same sign as $msd.
   # This is a bit murky. See:
   # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=61399
-  if(abs($msd) == M_FDD_DBL_MAX && abs($lsd) == M_FDD_P2_970) {
+  if(_return_inf($msd, $lsd)) {
     if($msd < 0 && $lsd < 0) { return dd_inf(-1) }
     if($msd > 0 && $lsd > 0) { return dd_inf()   }
   }
@@ -1795,6 +1795,28 @@ sub is_subnormal {
     unless Math::MPFR::_itsa($d) == 3;
   # NOTE:  # We return 1 if $d == 0.
   return 1 if((hex(substr(unpack("H*", pack("d>", $d)), 0, 3)) & 2047) == 0);
+  return 0;
+}
+
+sub _is_nan {
+  # Test with a copy of the arg  to
+  # avoid altering the arg's numeric flags
+  my $t = shift;
+  return 1 if $t != $t;
+  return 0;
+}
+
+sub _is_inf {
+  # Test with a copy of the arg  to
+  # avoid altering the arg's numeric flags
+  my $t = shift;
+  return 1 if $t && $t / $t != 1;
+  return 0;
+}
+
+sub _return_inf {
+  my ($msd, $lsd) = (shift, shift);
+  return 1 if(abs($msd) == M_FDD_DBL_MAX && abs($lsd) == M_FDD_P2_970);
   return 0;
 }
 

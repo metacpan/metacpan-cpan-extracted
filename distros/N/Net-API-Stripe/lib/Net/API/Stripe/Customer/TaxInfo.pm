@@ -2,7 +2,7 @@
 ## Stripe API - ~/lib/Net/API/Stripe/Customer/TaxInfo.pm
 ## Version v0.100.0
 ## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2020/05/15
 ## 
@@ -11,13 +11,18 @@ package Net::API::Stripe::Customer::TaxInfo;
 BEGIN
 {
     use strict;
+    use warnings;
     use parent qw( Net::API::Stripe::Generic );
+    use vars qw( $VERSION );
     our( $VERSION ) = 'v0.100.0';
 };
 
-sub tax_id { shift->_set_get_scalar( 'tax_id', @_ ); }
+use strict;
+use warnings;
 
-sub type { shift->_set_get_scalar( 'type', @_ ); }
+sub tax_id { return( shift->_set_get_scalar( 'tax_id', @_ ) ); }
+
+sub type { return( shift->_set_get_scalar( 'type', @_ ) ); }
 
 1;
 
@@ -49,77 +54,69 @@ This is instantiated by method B<tax_info> in module L<Net::API::Stripe::Custome
 
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>( %ARG )
+=head2 new( %ARG )
 
 Creates a new L<Net::API::Stripe::Customer::TaxInfo> object.
 It may also take an hash like arguments, that also are method of the same name.
 
-=back
-
 =head1 METHODS
 
-=over 4
-
-=item B<tax_id> required
+=head2 tax_id required
 
 The customer’s tax ID number.
 
-=item B<type> required
+=head2 type required
 
 The type of ID number. The only possible value is vat
 
-=back
-
 =head1 API SAMPLE
 
-	{
-	  "id": "cus_fake123456789",
-	  "object": "customer",
-	  "address": null,
-	  "balance": 0,
-	  "created": 1572264551,
-	  "currency": "jpy",
-	  "default_source": null,
-	  "delinquent": false,
-	  "description": "Customer for jenny.rosen@example.com",
-	  "discount": null,
-	  "email": null,
-	  "invoice_prefix": "BC0DE60",
-	  "invoice_settings": {
-		"custom_fields": null,
-		"default_payment_method": null,
-		"footer": null
-	  },
-	  "livemode": false,
-	  "metadata": {},
-	  "name": null,
-	  "phone": null,
-	  "preferred_locales": [],
-	  "shipping": null,
-	  "sources": {
-		"object": "list",
-		"data": [],
-		"has_more": false,
-		"url": "/v1/customers/cus_fake123456789/sources"
-	  },
-	  "subscriptions": {
-		"object": "list",
-		"data": [],
-		"has_more": false,
-		"url": "/v1/customers/cus_fake123456789/subscriptions"
-	  },
-	  "tax_exempt": "none",
-	  "tax_ids": {
-		"object": "list",
-		"data": [],
-		"has_more": false,
-		"url": "/v1/customers/cus_fake123456789/tax_ids"
-	  },
-	  "tax_info": null,
-	  "tax_info_verification": null
-	}
+    {
+      "id": "cus_fake123456789",
+      "object": "customer",
+      "address": null,
+      "balance": 0,
+      "created": 1572264551,
+      "currency": "jpy",
+      "default_source": null,
+      "delinquent": false,
+      "description": "Customer for jenny.rosen@example.com",
+      "discount": null,
+      "email": null,
+      "invoice_prefix": "BC0DE60",
+      "invoice_settings": {
+        "custom_fields": null,
+        "default_payment_method": null,
+        "footer": null
+      },
+      "livemode": false,
+      "metadata": {},
+      "name": null,
+      "phone": null,
+      "preferred_locales": [],
+      "shipping": null,
+      "sources": {
+        "object": "list",
+        "data": [],
+        "has_more": false,
+        "url": "/v1/customers/cus_fake123456789/sources"
+      },
+      "subscriptions": {
+        "object": "list",
+        "data": [],
+        "has_more": false,
+        "url": "/v1/customers/cus_fake123456789/subscriptions"
+      },
+      "tax_exempt": "none",
+      "tax_ids": {
+        "object": "list",
+        "data": [],
+        "has_more": false,
+        "url": "/v1/customers/cus_fake123456789/tax_ids"
+      },
+      "tax_info": null,
+      "tax_info_verification": null
+    }
 
 =head1 HISTORY
 

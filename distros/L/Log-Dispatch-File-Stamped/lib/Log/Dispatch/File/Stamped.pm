@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Log::Dispatch::File::Stamped; # git description: v0.18-4-g0cbd394
+package Log::Dispatch::File::Stamped; # git description: v0.20-2-g046d6cc
 # vim: set ts=8 sts=4 sw=4 tw=115 et :
 # ABSTRACT: Logging to date/time stamped files
 # KEYWORDS: log logging output file timestamp date rolling rotate
 
-our $VERSION = '0.19';
+our $VERSION = '0.21';
 
 use File::Basename        qw(fileparse);
 use File::Spec::Functions qw(catfile);
@@ -14,10 +14,18 @@ use POSIX                 qw(strftime);
 use Log::Dispatch::File 2.38;
 use parent 'Log::Dispatch::File';
 
-use Params::Validate qw(validate SCALAR);
-Params::Validate::validation_options( allow_extra => 1 );
+use Params::ValidationCompiler qw(validation_for);
+
+use Specio::Library::Builtins;
+use Specio::Library::String;
+use Specio::Declare 0.48;
 
 use namespace::clean 0.19;
+
+enum(
+    'TimeFunctions',
+    values => [qw(localtime gmtime)],
+);
 
 sub _basic_init
 {
@@ -25,22 +33,27 @@ sub _basic_init
 
     $self->SUPER::_basic_init(@_);
 
-    my %p = validate(
-        @_,
-        {
+    my $validator = validation_for(
+        params => {
             stamp_fmt => {
-                type => SCALAR,
+                type => t('SimpleStr'),
                 default => '%Y%m%d',
             },
+            stamp_sep => {
+                type => t('SimpleStr'),
+                default => '-',
+            },
             time_function => {
-                type => SCALAR,
-                regex => qr/^(?:local|gm)time$/,
+                type => t('TimeFunctions'),
                 default => 'localtime',
             },
         },
+        slurpy => 1,
     );
+    my %p = $validator->(@_);
 
     $self->{stamp_fmt} = $p{stamp_fmt};
+    $self->{stamp_sep} = $p{stamp_sep};
     $self->{time_function} = $p{time_function};
 
     # cache of last timestamp used
@@ -70,7 +83,7 @@ sub _make_filename
 
     $self->{filename} = catfile(
         $self->{_path},
-        join('-', $self->{_name}, $stamp) . ($self->{_ext} ? $self->{_ext} : '')
+        join($self->{stamp_sep}, $self->{_name}, $stamp) . ($self->{_ext} ? $self->{_ext} : '')
     );
 }
 
@@ -106,7 +119,7 @@ Log::Dispatch::File::Stamped - Logging to date/time stamped files
 
 =head1 VERSION
 
-version 0.19
+version 0.21
 
 =head1 SYNOPSIS
 
@@ -117,6 +130,7 @@ version 0.19
     min_level => 'info',
     filename  => 'Somefile.log',
     stamp_fmt => '%Y%m%d',
+    stamp_sep => ':',
     time_function => 'localtime',
     mode      => 'append',
   );
@@ -153,6 +167,12 @@ Refer to your platform's C<strftime> documentation for the list of allowed
 tokens.
 
 Defaults to C<%Y%m%d>.
+
+=item * stamp_sep ($)
+
+The separator character(s) used between components in the log filename.
+
+Defaults to C<->.
 
 =item * time_function ($)
 
@@ -247,6 +267,12 @@ Eric Cholet <cholet@logilune.com>
 Karen Etheridge <ether@cpan.org>
 
 =back
+
+=head1 CONTRIBUTOR
+
+=for stopwords Sven Willenbuecher
+
+Sven Willenbuecher <sven.willenbuecher@kuehne-nagel.com>
 
 =head1 COPYRIGHT AND LICENCE
 

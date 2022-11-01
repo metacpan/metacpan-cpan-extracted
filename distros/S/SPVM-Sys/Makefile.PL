@@ -5,6 +5,28 @@ use warnings;
 use Config;
 use SPVM::Builder::Util::API;
 
+# Check supported environment
+{
+  my $myuname = $Config{myuname};
+  # Free BSD myyname examples
+  # "freebsd www3301.sakura.ne.jp 9.1-release-p24 freebsd 9.1-release-p24 #0: thu feb 5 10:03:29 jst 2015 root@www3304.sakura.ne.jp:usrobjusrsrcsyssakura17 amd64"
+  # "freebsd cloud2.bbbike.org 14.0-current freebsd 14.0-current #1 main-n249154-312f5f8a4fb9: sat sep 4 21:10:11 utc 2021 root@cloud2.bbbike.org:usrobjusrhomeprojectsfreebsdamd64.amd64sysgeneric amd64"
+  if ($myuname =~ /\bfreebsd\b/i) {
+    my ($major_version, $minor_version);
+    if ($myuname =~ /\bfreebsd\s+(\d+)\.(\d+)/) {
+      $major_version = $1;
+      $minor_version = $2;
+    }
+    unless ($major_version >= 10) {
+      warn "SPVM::Sys only supports FreeBSD 10+ because the following tests couldn't be fixed by us. http://www.cpantesters.org/cpan/report/b26888fa-55bd-11ed-9ef0-b2246e8775ea";
+      die "OS unsupported\n";
+    }
+  }
+}
+
+# http://www.cpantesters.org/cpan/report/b26888fa-55bd-11ed-9ef0-b2246e8775ea
+
+
 WriteMakefile(
   NAME              => 'SPVM::Sys',
   VERSION_FROM      => 'lib/SPVM/Sys.pm',
@@ -29,7 +51,7 @@ WriteMakefile(
   },
   # SPVM::Builder::Util::API is needed for Makefile.PL
   CONFIGURE_REQUIRES => {
-    'SPVM'              => '0.9654',
+    'SPVM'              => '0.9657',
   },
   PREREQ_PM         => {
     'SPVM::Errno' => '0.06',

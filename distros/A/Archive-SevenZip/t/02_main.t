@@ -83,6 +83,8 @@ if( $version <= 9.20) {
 # new	# Archive::Zip
 # new	# Archive::Zip::Archive
 my $zip = Archive::SevenZip->archiveZipApi();
+$zip->{sevenZip}->{verbose} = $ENV{TEST_ARCHIVE_7Z_VERBOSE};
+
 isa_ok($zip, 'Archive::SevenZip::API::ArchiveZip');
 
 # members	# Archive::Zip::Archive
@@ -94,7 +96,7 @@ my $numberOfMembers = $zip->numberOfMembers();
 is($numberOfMembers, 0, '->numberofMembers is 0');
 
 # writeToFileNamed	# Archive::Zip::Archive
-my $status = $zip->writeToFileNamed(OUTPUTZIP());
+   $status = $zip->writeToFileNamed(OUTPUTZIP());
 is($status, AZ_OK, '->writeToFileNames ok');
 
 my $zipout;
@@ -128,14 +130,16 @@ my $member = $zip->addDirectory($memberName);
 ok(defined($member));
 is($member->fileName(), $memberName);
 
+note "Here";
 # On some (Windows systems) the modification time is
 # corrupted. Save this to check late.
 my $dir_time = $member->lastModFileDateTime();
+note "Time is $dir_time";
 
 # members	# Archive::Zip::Archive
 @members = $zip->members();
-is(scalar(@members), 1);
-is($members[0]->fileName,      $member->fileName);
+is(scalar(@members), 1, "We have one member");
+is($members[0]->fileName,      $member->fileName, "... with the correct filename");
 
 # numberOfMembers	# Archive::Zip::Archive
 $numberOfMembers = $zip->numberOfMembers();

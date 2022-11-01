@@ -50,7 +50,7 @@
             "Getopt::Long::Complete" : "0",
             "Getopt::Long::Dump" : "0.112",
             "Getopt::Long::EvenLess::Dump" : "0",
-            "Getopt::Long::Util" : "0.893",
+            "Getopt::Long::Util" : "0.896",
             "Getopt::Std::Dump" : "0",
             "Log::ger" : "0.038",
             "Perinci::CmdLine::Any" : "0.09",
@@ -76,7 +76,7 @@
    "provides" : {
       "App::shcompgen" : {
          "file" : "lib/App/shcompgen.pm",
-         "version" : "0.323"
+         "version" : "0.324"
       }
    },
    "release_status" : "stable",
@@ -91,7 +91,7 @@
          "web" : "https://github.com/perlancar/perl-App-shcompgen"
       }
    },
-   "version" : "0.323",
+   "version" : "0.324",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

@@ -112,7 +112,7 @@ Math::NV - compare the NV values that perl assigns with C and MPFR
 
     For example, nv_mpfr('1e+127', 53) returns 5a4d8ba7f519c84f.
     This is the same as will be returned by
-    scalar(reverse(unpack("h*", pack("d<", 1e+127))))
+    unpack("H*", pack("d>", 1e+127))
     if the assignment of 1e+127 to a double has been done correctly.
 
     For the double-double, the returned scalar is a reference to a list
@@ -200,6 +200,24 @@ Math::NV - compare the NV values that perl assigns with C and MPFR
     $buffer_size specifies a large enough number of characters to
     accommodate C's sprintf formatting of $nv.
 
+   $ternary = cmp_2($str1, $str2);
+    The main purpose here is to be able to determine (eg) whether:
+    0x1.7ap4 == 0b0.10111101e5
+    or:
+    0x1.6a09e667f3bcc908p+0 == 0xb.504f333f9de6484p-3
+    The 2 args begin with an (optional) + or - sign, followed by
+    (case-insensitive) '0b', '0x', 'nan' or 'inf'. That is, they must
+    match:  /^(\-|\+)?0b|^(\-|\+)?0x|^(\-|\+)?nan|^(\-|\+)?inf/i
+    The spaceship operator (<=>) is then used to compare the numeric
+    values of the two strings, the result of which is returned.
+    A negative return indicates that $str1 < $str2; a positive return
+    indicates that $str1 > $str2; a return of zero indicates that
+    $str1 == $str2; a return of undef indicates that $str1 and/or
+    $str2 is a NaN.
+    The values of the 2 args are calculated to their full precisions,
+    even if  either/both of those precisions exceed the precision of
+    perl's floating point type (NV).
+
 =head1 PACKAGE VARIABLES
 
    $Math::NV::no_warn
@@ -216,7 +234,7 @@ Math::NV - compare the NV values that perl assigns with C and MPFR
 
    This program is free software; you may redistribute it and/or modify
    it under the same terms as Perl itself.
-   Copyright 2013-16, 2018-20 Sisyphus
+   Copyright 2013-16, 2018-22 Sisyphus
 
 
 =head1 AUTHOR

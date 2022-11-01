@@ -1,12 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.44;
+use Object::Pad 0.66 ':experimental(init_expr)';
 
-package Tangence::Meta::Property 0.29;
+package Tangence::Meta::Property 0.30;
 class Tangence::Meta::Property :strict(params);
 
 use Syntax::Keyword::Match;
@@ -61,11 +61,11 @@ Optional. If true, marks that the property is smashed.
 
 =cut
 
-has $class     :param :weak :reader;
-has $name      :param       :reader;
-has $dimension :param       :reader;
-has $type      :param       :reader;
-has $smashed   :param       :reader = 0;
+field $class     :param :weak :reader;
+field $name      :param       :reader;
+field $dimension :param       :reader;
+field $type      :param       :reader;
+field $smashed   :param       :reader { 0 };
 
 =head1 ACCESSORS
 
@@ -114,7 +114,7 @@ a list of the element type.
 
 =cut
 
-has $_overall_type;
+field $_overall_type;
 
 method overall_type
 {

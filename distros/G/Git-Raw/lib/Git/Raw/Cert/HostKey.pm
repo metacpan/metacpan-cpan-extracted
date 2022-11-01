@@ -1,5 +1,5 @@
 package Git::Raw::Cert::HostKey;
-$Git::Raw::Cert::HostKey::VERSION = '0.88';
+$Git::Raw::Cert::HostKey::VERSION = '0.90';
 use strict;
 use warnings;
 
@@ -9,7 +9,7 @@ Git::Raw::Cert::HostKey - Git hostkey class
 
 =head1 VERSION
 
-version 0.88
+version 0.90
 
 =head1 DESCRIPTION
 
@@ -34,7 +34,7 @@ MD5 hostkey hash or C<undef> if not available.
 
 =head1 AUTHOR
 
-Jacques Germishuys <jacquesg@striata.com>
+Jacques Germishuys <jacquesg@cpan.org>
 
 =head1 LICENSE AND COPYRIGHT
 

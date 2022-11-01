@@ -103,7 +103,7 @@ FORK:
     ok $pid, "Have read daemon PID";
     BAIL_OUT("No PID file, can't continue") unless $pid;
     ok !File::Flock::Tiny->trylock($pidfile), "Pidfile is locked";
-    ok kill(0 => $pid), "Grandchild process is running";
+    ok kill(0 => $pid),                       "Grandchild process is running";
     throws_ok { Test::Daemon->new->run } qr/another copy of this daemon already running/, "Can not start second copy";
     ok kill(INT => $pid), "Able to send SIGINT signal to process";
 
@@ -144,7 +144,7 @@ if ($> == 0) {
                 user  => 'nobody',
                 group => 'nogroup',
             },
-            )->run,
+        )->run,
         0,
         "Test daemon spawns detached child process"
     );

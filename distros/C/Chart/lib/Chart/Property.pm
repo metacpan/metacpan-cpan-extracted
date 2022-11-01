@@ -4,7 +4,7 @@
 use v5.12;
 
 package Chart::Property;
-our $VERSION = 'v2.403.7';
+our $VERSION = 'v2.403.8';
 
 use Carp;
 

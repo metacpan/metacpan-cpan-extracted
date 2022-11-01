@@ -6,7 +6,7 @@ use 5.008004;
 use FFI::Platypus;
 
 # ABSTRACT: Platypus custom type for arrays of strings
-our $VERSION = '2.01'; # VERSION
+our $VERSION = '2.03'; # VERSION
 
 
 use constant _incantation =>
@@ -125,7 +125,7 @@ FFI::Platypus::Type::StringArray - Platypus custom type for arrays of strings
 
 =head1 VERSION
 
-version 2.01
+version 2.03
 
 =head1 SYNOPSIS
 

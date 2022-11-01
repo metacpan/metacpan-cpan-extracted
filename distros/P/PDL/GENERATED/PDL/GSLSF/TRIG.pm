@@ -49,7 +49,7 @@ This is an interface to the Special Function package present in the GNU Scientif
 
 
 
-#line 948 "../../../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -74,14 +74,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_sin = \&PDL::gsl_sf_sin;
 #line 81 "TRIG.pm"
 
 
 
-#line 948 "../../../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -106,14 +106,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_cos = \&PDL::gsl_sf_cos;
 #line 113 "TRIG.pm"
 
 
 
-#line 948 "../../../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -138,14 +138,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_hypot = \&PDL::gsl_sf_hypot;
 #line 145 "TRIG.pm"
 
 
 
-#line 948 "../../../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -170,14 +170,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_complex_sin = \&PDL::gsl_sf_complex_sin;
 #line 177 "TRIG.pm"
 
 
 
-#line 948 "../../../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -202,14 +202,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_complex_cos = \&PDL::gsl_sf_complex_cos;
 #line 209 "TRIG.pm"
 
 
 
-#line 948 "../../../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -234,14 +234,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_complex_logsin = \&PDL::gsl_sf_complex_logsin;
 #line 241 "TRIG.pm"
 
 
 
-#line 948 "../../../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -266,14 +266,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_lnsinh = \&PDL::gsl_sf_lnsinh;
 #line 273 "TRIG.pm"
 
 
 
-#line 948 "../../../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -298,14 +298,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_lncosh = \&PDL::gsl_sf_lncosh;
 #line 305 "TRIG.pm"
 
 
 
-#line 948 "../../../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -330,14 +330,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_polar_to_rect = \&PDL::gsl_sf_polar_to_rect;
 #line 337 "TRIG.pm"
 
 
 
-#line 948 "../../../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -362,14 +362,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_rect_to_polar = \&PDL::gsl_sf_rect_to_polar;
 #line 369 "TRIG.pm"
 
 
 
-#line 948 "../../../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -394,14 +394,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_angle_restrict_symm = \&PDL::gsl_sf_angle_restrict_symm;
 #line 401 "TRIG.pm"
 
 
 
-#line 948 "../../../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -426,14 +426,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_angle_restrict_pos = \&PDL::gsl_sf_angle_restrict_pos;
 #line 433 "TRIG.pm"
 
 
 
-#line 948 "../../../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -458,14 +458,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_sin_err = \&PDL::gsl_sf_sin_err;
 #line 465 "TRIG.pm"
 
 
 
-#line 948 "../../../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -490,7 +490,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *gsl_sf_cos_err = \&PDL::gsl_sf_cos_err;
 #line 497 "TRIG.pm"

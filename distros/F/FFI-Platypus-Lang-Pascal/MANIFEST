@@ -1,4 +1,4 @@
-.travis.yml
+.github/workflows/linux.yml
 Changes
 CONTRIBUTING
 examples/add.pas

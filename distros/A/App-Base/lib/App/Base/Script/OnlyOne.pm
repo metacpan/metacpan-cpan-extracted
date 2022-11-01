@@ -6,7 +6,7 @@ use Moose::Role;
 use Path::Tiny;
 use File::Flock::Tiny;
 
-our $VERSION = '0.07';    ## VERSION
+our $VERSION = '0.08';    ## VERSION
 
 =head1 NAME
 

@@ -1,11 +1,18 @@
 #!/usr/local/bin/perl
 BEGIN
 {
+    use strict;
+    use warnings;
     use Test::More qw( no_plan );
     use lib './lib';
+    use vars qw( $DEBUG );
     use_ok( 'Apache2::SSI::File::Type' ) || BAIL_OUT( "Unable to load Apache2::SSI::File" );
-    our $DEBUG = 0;
+    use URI::file;
+    our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
+
+use strict;
+use warnings;
 
 ## my $m = Apache2::SSI::File::Type->new( '/etc/apache2/magic', debug => $DEBUG );
 my $m = Apache2::SSI::File::Type->new( debug => $DEBUG );

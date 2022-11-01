@@ -1,5 +1,21 @@
 Revision history for Perl extension SMS::Send::NANP::Twilio
 
+0.06 2022-11-01
+  - Update license from Perl to MIT
+  - Updated scripts/perl-SMS-Send-NANP-Twilio-send_sms.pl to add command line options for AccountSid, AuthToken, MessagingServiceSid, and From
+  - Added GitHub repository
+  - Moved README to README.md
+  - Added LICENSE file
+  - Added CONTRIBUTING.md file
+  - Updated Makefile.PL to add meta merge github properties
+ 
+0.05 2018-05-29
+  - Note: This version was never pushed to CPAN
+  - Updated lib/SMS/Send/NANP/Twilio.pm
+    - Moved from username to AccountSid
+    - Moved from password to AuthToken
+    - Added url override capabiltiy
+
 0.04 2018-03-02
   - Added DateTime as build time requirement - RT 124633 (ANDK@cpan.org)
     - Updated Makefile.PL

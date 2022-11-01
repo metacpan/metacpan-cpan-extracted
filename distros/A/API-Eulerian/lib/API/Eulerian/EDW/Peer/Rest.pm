@@ -429,13 +429,14 @@ sub download
       # Handle errors
       if( ! $status->error() ) {
         my $encoding = $status->{ 'encoding' };
-        
-        if( defined( $encoding ) && ( $encoding == 'gzip' ) ) {
+        if( defined( $encoding ) && ( $encoding eq 'gzip' ) ) {
           rename $path, "$path.gz";
           $status->{ path } = $self->unzip( "$path.gz" );
         } else {
           $status->{ path } = $path;
         }
+      } else {
+        print "ERROR : " . $status->{ _CODE } . "\n";
       }
     }
 
@@ -493,6 +494,7 @@ sub parse
 # @param $self - Eulerian Data Warehouse Peer.
 # @param $command - Eulerian Data Warehouse Command.
 #
+use Data::Dumper;
 sub request
 {
   my ( $self, $command ) = @_;
@@ -526,6 +528,8 @@ sub request
       $bench->stage( 'parse' );
     }
     $status->{ bench } = $bench;
+  } else {
+    print "ERROR : " . Dumper( $status ) . "\n";
   }
 
   return $status;
@@ -560,6 +564,35 @@ sub cancel
       $status = API::Eulerian::EDW::Request->get( $url, $headers );
 
     }
+  }
+
+  return $status;
+}
+#
+# @brief Drop Eulerian Data Warehouse Object Events.
+#
+# @param $self - Peer.
+# @param $what - Object Path.
+# @param $site - Site.
+# @param $from - Day begin.
+# @param $end  - Day end.
+#
+sub drop
+{
+  my ( $self, $what, $site, $from, $to ) = @_;
+  my $status;
+
+  # Get HTTP request headers
+  $status = $self->headers();
+  if( ! $status->error() ) {
+    my $headers = $status->{ headers };
+    my $url = $self->url() . '/edw/store';
+    my $cmd = "DROP $what\@$site FROM $from TO $to;";
+    delete $status->{ headers };
+    # Send Cancel request to remote host
+    $status = API::Eulerian::EDW::Request->post(
+      $url, $headers, $self->body( $cmd )
+      );
   }
 
   return $status;

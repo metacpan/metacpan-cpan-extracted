@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.28.3
+## Version v0.28.4
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2022/09/25
+## Modified 2022/09/27
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -43,7 +43,7 @@ BEGIN
     our @EXPORT      = qw( );
     our @EXPORT_OK   = qw( subclasses );
     our %EXPORT_TAGS = ();
-    our $VERSION     = 'v0.28.3';
+    our $VERSION     = 'v0.28.4';
     # local $^W;
     # mod_perl/2.0.10
     if( exists( $ENV{MOD_PERL} )
@@ -1073,9 +1073,9 @@ sub init
     $this->{colour_close} = COLOUR_CLOSE if( !length( $this->{colour_close} ) );
     $this->{_exception_class} = 'Module::Generic::Exception' unless( CORE::defined( $this->{_exception_class} ) && CORE::length( $this->{_exception_class} ) );
     $this->{_init_params_order} = [] unless( ref( $this->{_init_params_order} ) );
-    ## If no debug level was provided when calling message, this level will be assumed
-    ## Example: message( "Hello" );
-    ## If _message_default_level was set to 3, this would be equivalent to message( 3, "Hello" )
+    # If no debug level was provided when calling message, this level will be assumed
+    # Example: message( "Hello" );
+    # If _message_default_level was set to 3, this would be equivalent to message( 3, "Hello" )
     $this->{_init_strict_use_sub} = 0 unless( length( $this->{_init_strict_use_sub} ) );
     $this->{_log_handler} = '' unless( length( $this->{_log_handler} ) );
     $this->{_message_default_level} = 0;
@@ -1088,7 +1088,7 @@ sub init
         $data = $this->{ $this->{_data_repo} };
     }
     
-    ## If the calling module wants to set up object cleanup
+    # If the calling module wants to set up object cleanup
     if( $this->{_mod_perl_cleanup} && $MOD_PERL )
     {
         try
@@ -6678,7 +6678,7 @@ Module::Generic - Generic Module to inherit from
 
 =head1 VERSION
 
-    v0.28.3
+    v0.28.4
 
 =head1 DESCRIPTION
 
@@ -8046,6 +8046,107 @@ This ensures the module object is an hash reference, such as when the module obj
 =head2 _parse_timestamp
 
 Provided with a string representing a date or datetime, and this will try to parse it and return a L<DateTime> object. It will also create a L<DateTime::Format::Strptime> to preserve the original date/datetime string representation and assign it to the L<DateTime> object. So when the L<DateTime> object is stringified, it displays the same string that was originally parsed.
+
+Supported formats are:
+
+=over 4
+
+=item C<2019-10-03 19-44+0000> or C<2019-10-03 19:44:01+0000>
+
+Found in GNU PO files for example.
+
+=item C<2019-06-19 23:23:57.000000000+0900>
+
+Found in PostgreSQL
+
+=item C<2019-06-20T11:08:27>
+
+Matching ISO8601 format
+
+=item C<2019-06-20 02:03:14>
+
+Found in SQLite
+
+=item C<2019-06-20 11:04:01>
+
+Found in MySQL
+
+=item C<Sun, 06 Oct 2019 06:41:11 GMT>
+
+Standard HTTP dates
+
+=item C<12 March 2001 17:07:30 JST>
+
+=item C<12-March-2001 17:07:30 JST>
+
+=item C<12/March/2001 17:07:30 JST>
+
+=item C<12 March 2001 17:07>
+
+=item C<12 March 2001 17:07 JST>
+
+=item C<12 March 2001 17:07:30+0900>
+
+=item C<12 March 2001 17:07:30 +0900>
+
+=item C<Monday, 12 March 2001 17:07:30 JST>
+
+=item C<Monday, 12 Mar 2001 17:07:30 JST>
+
+=item C<03/Feb/1994:00:00:00 0000>
+
+=item C<2019-06-20>
+
+=item C<2019/06/20>
+
+=item C<2016.04.22>
+
+=item C<2014, Feb 17>
+
+=item C<17 Feb, 2014>
+
+=item C<February 17, 2009>
+
+=item C<15 July 2021>
+
+=item C<22.04.2016>
+
+=item C<22-04-2016>
+
+=item C<17. 3. 2018.>
+
+=item C<17.III.2020>
+
+=item C<17. III. 2018.>
+
+=item C<20030613>
+
+=item C<2021年7月14日>
+
+Japanese regular date using occidental years
+
+=item C<令和3年7月14日>
+
+Japanese regular date using Japanese era years
+
+=item Unix timestamp possibly followed by a dot and milliseconds
+
+=item Relative date to current date and time
+
+Example:
+
+    -5Y - 5 years
+    +2M + 2 months
+    +3D + 3 days
+    -2h - 2 hours
+    -4m - 4 minutes
+    -10s - 10 seconds
+
+=item 'now'
+
+The word now will set the return value to the current date and time
+
+=back
 
 =head2 _set_get
 

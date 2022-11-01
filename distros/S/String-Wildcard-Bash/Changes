@@ -1,11 +1,18 @@
+0.045   2022-08-12  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Update Synopsis and description to show the new
+          contains_*_wildcard() functions.
+
+
 0.044   2022-08-06  Released-By: PERLANCAR; Urgency: medium
 
         - Add functions:
           contains_{brace,joker,class,qmark,glob,globstar}_wildcard.
 
-        - [function convert_wildcard_to_re] Add option: path_separator.
-
-        - [function convert_wildcard_to_re] Add option: globstar.
+        - [function convert_wildcard_to_re] Add options: globstar,
+          path_separator.
 
         - Better compliance with bash: joker/glob does not match across
           subdirectory level, e.g. '*' matches 'aaa' but not 'aaa/bbb'.
@@ -21,7 +28,7 @@
 	- [doc] Some rewording.
 
 
-0.042   2019-07-27  Released-By: PERLANCAR; Urgency: medium
+0.042   2019-07-27  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
 	- [incompatible change] instead of passing the construct as-is,
 	  convert_wildcard_to_sql() now dies when given a wildcard

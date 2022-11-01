@@ -3,18 +3,16 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Access to the getsongbpm.com API
 
-our $VERSION = '0.0400';
+our $VERSION = '0.0401';
 
-use Moo;
 use strictures 2;
-use namespace::clean;
-
-use Carp;
-use Mojo::UserAgent;
-use Mojo::JSON::MaybeXS;
-use Mojo::JSON qw( decode_json );
-use Mojo::URL;
+use Carp qw(croak);
+use Mojo::UserAgent ();
+use Mojo::JSON qw(decode_json);
+use Mojo::URL ();
+use Moo;
 use Try::Tiny;
+use namespace::clean;
 
 
 has api_key => (
@@ -144,7 +142,7 @@ WebService::GetSongBPM - Access to the getsongbpm.com API
 
 =head1 VERSION
 
-version 0.0400
+version 0.0401
 
 =head1 SYNOPSIS
 
@@ -233,7 +231,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Gene Boggs.
+This software is copyright (c) 2022 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

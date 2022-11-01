@@ -3,16 +3,16 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Chromatic and diatonic melodic ornamentation
 
-our $VERSION = '0.0701';
+our $VERSION = '0.0702';
 
+use strictures 2;
 use Carp qw(croak);
 use Data::Dumper::Compact qw(ddc);
 use List::SomeUtils qw(first_index);
 use MIDI::Simple ();
-use Music::Duration;
-use Music::Scales qw(get_scale_MIDI is_scale);
 use Moo;
-use strictures 2;
+use Music::Duration ();
+use Music::Scales qw(get_scale_MIDI is_scale);
 use namespace::clean;
 
 with('Music::PitchNum');
@@ -250,7 +250,7 @@ Music::MelodicDevice::Ornamentation - Chromatic and diatonic melodic ornamentati
 
 =head1 VERSION
 
-version 0.0701
+version 0.0702
 
 =head1 SYNOPSIS
 

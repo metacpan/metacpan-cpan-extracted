@@ -1,5 +1,10 @@
 Revision history for Alien-Meson
 
+0.03      2022-11-01 15:46:12-04:00 America/New_York
+  - Switch to using Download::GitHub plugin.
+    See <https://github.com/PerlAlien/Alien-Meson/pull/10>,
+    <https://github.com/PerlAlien/Alien-Meson/pull/11>.
+
 0.02      2022-01-20 20:21:33-05:00 America/New_York
   - No change from v0.01_03.
 

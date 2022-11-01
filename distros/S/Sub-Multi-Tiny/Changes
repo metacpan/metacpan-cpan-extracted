@@ -1,8 +1,12 @@
 Revision history for Perl extension Sub-Multi-Tiny
 
+0.000013 2022-10-30T01:15:39Z
+
+    - Update per upstream Type::Params changes (#10; thanks to TOBYINK)
+
 0.000012 2019-09-24T01:52:46Z
 
-    - Internal improvements for robustness.  
+    - Internal improvements for robustness.
     - S::M::T::Util::_complete_dispatcher now adds strict and warnings
       to the top of the generated dispatcher.
 

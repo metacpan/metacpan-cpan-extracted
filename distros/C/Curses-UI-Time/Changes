@@ -1,3 +1,15 @@
+0.06 2022-10-23T10:44:53+02:00
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SYNOPSIS section in doc.
+ - Makefile.PL fails with no '.' in @INC.
+ - Rename example to better names.
+ - Rewrite from Encode to Unicode::UTF8.
+ - Update .travis.yml.
+ - Update Module::Install to 1.19 version.
+ - Update author github username.
+ - Update author name.
+ - Update copyright years.
+
 0.05 2015-10-13T23:50:53+02:00
  - Improve LICENSE AND COPYRIGHT section in doc.
  - Improve SEE ALSO section in doc.

@@ -1,5 +1,8 @@
 Revision history for Perl module Math::FakeDD
 
+0.07
+ - Bug fix for https://rt.cpan.org/Public/Bug/Display.html?id=144891
+
 0.06
  - Doc fix for FakeDD.pod -see https://github.com/sisyphus/math-fakedd/issues/1
    Thanks, Peter Acklam.

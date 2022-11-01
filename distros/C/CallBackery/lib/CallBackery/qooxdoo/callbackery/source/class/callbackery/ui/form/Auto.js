@@ -177,7 +177,7 @@ qx.Class.define("callbackery.ui.form.Auto", {
                     break;
             }
             if (s.key) {
-                form.addOwnedQxObject(s.widget, s.key);
+                form.addOwnedQxObject(control, s.key);
             }
             if (s.autocomplete) {
                 var el = control.getContentElement();

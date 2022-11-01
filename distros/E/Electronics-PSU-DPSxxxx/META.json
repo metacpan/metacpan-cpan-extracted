@@ -24,13 +24,13 @@
             "Future::AsyncAwait" : "0",
             "Future::IO" : "0",
             "IO::Termios" : "0",
-            "Object::Pad" : "0",
+            "Object::Pad" : "0.70",
             "perl" : "5.026"
          }
       },
       "test" : {
          "requires" : {
-            "Test::Future::IO" : "0",
+            "Test::Future::IO" : "0.04",
             "Test::More" : "0.88"
          }
       }
@@ -38,7 +38,7 @@
    "provides" : {
       "Electronics::PSU::DPSxxxx" : {
          "file" : "lib/Electronics/PSU/DPSxxxx.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -47,6 +47,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

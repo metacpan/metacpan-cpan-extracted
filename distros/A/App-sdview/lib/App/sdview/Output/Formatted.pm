@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
 use utf8;
 
-use Object::Pad;
+use Object::Pad 0.66;
 
-package App::sdview::Output::Formatted 0.07;
+package App::sdview::Output::Formatted 0.08;
 class App::sdview::Output::Formatted :strict(params);
 
 # This isn't itself an output module; but a base class to build them on
@@ -40,7 +40,7 @@ my %PARASTYLES = (
    head1    => { fg => Convert::Color->new( "vga:yellow" ), bold => 1 },
    head2    => { fg => Convert::Color->new( "vga:cyan" ), bold => 1, indent => 2 },
    head3    => { fg => Convert::Color->new( "vga:green" ), bold => 1, indent => 4 },
-   # TODO head4
+   head4    => { fg => Convert::Color->new( "xterm:217" ), under => 1, indent => 5 },
    plain    => { indent => 6, blank_after => 1 },
    verbatim => { indent => 8, blank_after => 1, $FORMATSTYLES{C}->%* },
    list     => { indent => 6 },
@@ -50,8 +50,8 @@ my %PARASTYLES = (
 );
 $PARASTYLES{item} = $PARASTYLES{plain};
 
-has $_TERMWIDTH;
-has $_nextblank;
+field $_TERMWIDTH;
+field $_nextblank;
 
 method output ( @paragraphs )
 {

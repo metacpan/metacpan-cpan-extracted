@@ -873,34 +873,50 @@ All parameters set in the Constructor (method new) are defined as Global Paramet
 
 =over
 
-=item B<commit:> Enable/disable commit after updates.
+=item B<commit:>
+
+Enable/disable commit after updates.
+
 Do not to be confused with the I<commit> available in the options for B<interface driver> (see L<DBI>), it has an other escope.
 
 Defaults: The default value is disabled.
 
-=item B<db:> The name of database name. The value depend of type of interface and driver option. see L<DBI> module.
+=item B<db:>
+
+The name of database name. The value depend of type of interface and driver option. see L<DBI> module.
 
 Defaults: no defaults
 
-=item B<driver:> Sets the name of database engine. see L<DBI> module.
+=item B<driver:>
+
+Sets the name of database engine. see L<DBI> module.
 
 Defaults: no defaults
 
-=item B<interface:> Sets the interface module to use.
+=item B<interface:>
+
+Sets the interface module to use.
 The current version support only C<interface=dbi>.
 
 Defaults: The defaul value is C<dbi>.
 
-=item B<interface_options:> See options for L<DBI> module.
+=item B<interface_options:>
+
+See options for L<DBI> module.
 
 Defaults: The default values for C<interface=dbi> are: C<RaiseError=0> and C<PrintError=0>.
 
-=item B<login:> Sets the user/profile login for authenticated connection.
+=item B<login:>
+
+Sets the user/profile login for authenticated connection.
+
 For security reasons and best practices, the module expects that all connections will be authenticated. 
 
 Defaults: no defaults
 
-=item B<message_log:> Sets message log mode, can be:
+=item B<message_log:>
+
+Sets message log mode, can be:
 
   SQL_SIMPLE_LOG_OFF:	No message will be shown. Use getMessage required to get the messages;
   SQL_SIMPLE_LOG_SYS:	Write messages on System Syslog Services;
@@ -911,21 +927,30 @@ Defaults: The default value is C<SQL_SIMPLE_LOG_STD>.
 
 B<NOTE:> You can enable Syslog and C<STDERR> simultanely. Use the C<SQL_SIMPLE_LOG_ALL>.
 
-=item B<message_syslog_service:> Sets an identifier string on the System Syslog Messages.
-see: L<Sys::Syslg>
+=item B<message_syslog_service:>
+
+Sets an identifier string on the System Syslog Messages.
+See: L<Sys::Syslg>
 
 Defaults: The default value is C<message_syslog_service=SQL-SimpleOps>
 
-=item B<message_syslog_facility:> Sets the Syslog Facility for the messages on the System Syslog Messages, must be: C<local0> to C<local7>.
-see: L<Sys::Syslg>
+=item B<message_syslog_facility:>
+
+Sets the Syslog Facility for the messages on the System Syslog Messages, must be: C<local0> to C<local7>.
+See: L<Sys::Syslg>
 
 Defaults: The default value is C<local0>.
 
-=item B<password:> The password/profile for authentication process.
+=item B<password:>
+
+The password/profile for authentication process.
 
 Defaults: no defaults
 
-=item B<port:> This option consists the TCP Port to use for connection.
+=item B<port:>
+
+This option consists the TCP Port to use for connection.
+
 The option is not mandatory because it is common to use the default database port,
 however some installations may modify the default port. The following defaul pors are known:
 
@@ -938,15 +963,21 @@ however some installations may modify the default port. The following defaul por
 
 Defaults: The default value depend of database engine.
 
-=item B<quote:> Sets the quote caracter on string commands (see C<setQuote> method), must be: apostrophe or quote.
+=item B<quote:>
+
+Sets the quote caracter on string commands (see C<setQuote> method), must be: apostrophe or quote.
 
 Defaults: apostrophe.
 
-=item B<server:> Sets the hostname or ip address of hosted database server.
+=item B<server:>
+
+Sets the hostname or ip address of hosted database server.
 
 Defaults: no defaults.
 
-=item B<sql_save:> Sets the SQL log file mode, can be:
+=item B<sql_save:>
+
+Sets the SQL log file mode, can be:
 
   SQL_SIMPLE_CMD_OFF:	No log file will be written;
   SQL_SIMPLE_CMD_ON:	Write only update commands;
@@ -958,28 +989,38 @@ Examples: Archive Logs, Backup Mode, and Others.
 
 Defaults: The default value is C<SQL_SIMPLE_CMD_OFF>.
  
-=item B<sql_save_bydate:> Sets enable/disable writing log files into distinct folders.
+=item B<sql_save_bydate:>
+
+Sets enable/disable writing log files into distinct folders.
 The folder will be create as:
 
 F<[sql_save_dir]/C<YYYY/YYYYmm/YYYYmmdd>/[logfile]>
 
 Defaults: The option is disabled. See C<sql_save_dir> option.
 
-=item B<sql_save_dir:> Sets the folder for writes log file process.
+=item B<sql_save_dir:>
+
+Sets the folder for writes log file process.
 
 Defaults: (unix/linux) F</var/spool/sql/> or (windows) F<c:\windows\temp>
 
 B<NOTE:> You must create the F</var/spool/sql/> as I<mode drwxrwxrwt>.
 
-=item B<sql_save_name:> Sets the filename string  for writes log file process.
+=item B<sql_save_name:>
+
+Sets the filename string  for writes log file process.
 
 Defaults: The default value is C<sql>.
 
-=item B<sql_save_ignore:> Sets enable/disable option to abort if there are errors wrtten to the Log File.
+=item B<sql_save_ignore:>
+
+Sets enable/disable option to abort if there are errors wrtten to the Log File.
 
 Defaults: The default value is disabled. If errors the return code will be C<SQL_SIMPLE_RC_ERROR>.
 
-=item B<tables:> Sets the list of aliases rules for the tables and fields. See L<Aliases Table>.
+=item B<tables:>
+
+Sets the list of aliases rules for the tables and fields. See L<Aliases Table>.
 
 Defaults: no defaults.
 
@@ -989,13 +1030,21 @@ The follow options can be temporarily modified by the methods:
 
 =over
 
-=item B<commit:> Enable/Disable the commit after a specific update command.
+=item B<commit:>
 
-=item B<message_log:> Enable/Disable the written on System Syslog Services.
+Enable/Disable the commit after a specific update command.
 
-=item B<quote:> Change the quote character.
+=item B<message_log:>
 
-=item B<sql_save:> Enable/Disable the written for SQL Log Files.
+Enable/Disable the written on System Syslog Services.
+
+=item B<quote:>
+
+Change the quote character.
+
+=item B<sql_save:>
+
+Enable/Disable the written for SQL Log Files.
 
 This Options can be modified with each SQL Command execution.
 These changes will be valid only in this process,
@@ -1060,15 +1109,25 @@ Where:
 
 =over
 
-=item B<sql_save_name:> Consists in the C<sql_save_name> option value.
+=item B<sql_save_name:>
 
-=item B<database_name:> Consists in the C<my_db> database value.
+Consists in the C<sql_save_name> option value.
 
-=item B<today:> Current day formated as C<YYYYmmdd> (year+month+day).
+=item B<database_name:>
 
-=item B<pid:> Current Pid (system process identifier) in execution.
+Consists in the C<my_db> database value.
 
-=item B<counter:> Indexer for each SQL Command executed by the Current Pid.
+=item B<today:>
+
+Current day formated as C<YYYYmmdd> (year+month+day).
+
+=item B<pid:>
+
+Current Pid (system process identifier) in execution.
+
+=item B<counter:>
+
+Indexer for each SQL Command executed by the Current Pid.
 A Pid that runs multiple commands will have the multiple SQL Log Files.
 
 =back
@@ -1533,43 +1592,61 @@ B<NOTE:> The C<notfound> option is not required.
 
 =over
 
-=item B<cursor_command:> Sets the type of command to be executed in the search, must be:
+=item B<cursor_command:>
+
+Sets the type of command to be executed in the search, must be:
 
 =over
 
-=item B<SQL_SIMPLE_CURSOR_TOP:> Go to the first page of the search.
+=item B<SQL_SIMPLE_CURSOR_TOP:>
+
+Go to the first page of the search.
 No C<cursor_info> will be used.
 
-=item B<SQL_SIMPLE_CURSOR_LAST:> Go to the last page search.
+=item B<SQL_SIMPLE_CURSOR_LAST:>
+
+Go to the last page search.
 No C<cursor_info> will be used.
 
-=item B<SQL_SIMPLE_CURSOR_NEXT:> Go to the next search page.
+=item B<SQL_SIMPLE_CURSOR_NEXT:>
+
+Go to the next search page.
 Will use the 'first' info on C<cursor_info> option.
 If 'cursor' is missing (or undef) the module will search as 'SQL_SIMPLE_CURSOR_TOP' command.
 
-=item B<SQL_SIMPLE_CURSOR_BACK:> Go to the pervious search page.
+=item B<SQL_SIMPLE_CURSOR_BACK:>
+
+Go to the pervious search page.
 Will use the 'first' info on C<cursor_info> option.
 If 'cursor' is missing (or undef) the module will search as 'SQL_SIMPLE_CURSOR_LAST' command.
 
-=item B<SQL_SIMPLE_CURSOR_RELOAD:> Reload current cursor.
+=item B<SQL_SIMPLE_CURSOR_RELOAD:>
+
+Reload current cursor.
 Will use the 'first' info on C<cursor_info> option.
 
 =back
 
 Defaults: C<SQL_SIMPLE_CURSOR_TOP>
 
-=item B<cursor:> Sets an specific starter cursor value for the search.
+=item B<cursor:>
+
+Sets an specific starter cursor value for the search.
 This options is not mandatory.
 
 The method use the C<cursor_info> option as base to scan the pages,
 however, the C<cursor> option have preference if presented.
 
-=item B<cursor_key:> Sets the key that will use to search.
+=item B<cursor_key:>
+
+Sets the key that will use to search.
 You must use only one key, multiple keys are not supported.
 
 Defaults: no defaults
 
-=item B<cursor_info:> Sets the return buffer to getting the page controls.
+=item B<cursor_info:>
+
+Sets the return buffer to getting the page controls.
 This informantion should be used in the paging process.
 
 We highly recommend using this option to help the pagination process.
@@ -1599,19 +1676,29 @@ The C<rc>, C<no_lines>, C<first_key> and C<last_key> values has present for all 
 
 =over
 
-=item B<rc:> Consists the return code of SQL Command.
+=item B<rc:>
 
-=item B<no_lines:> Consists the number of extracted lines.
+Consists the return code of SQL Command.
 
-=item B<first:> Consists the first key value.
+=item B<no_lines:>
 
-=item B<last:> Consists the last key value.
+Consists the number of extracted lines.
+
+=item B<first:>
+
+Consists the first key value.
+
+=item B<last:>
+
+Consists the last key value.
 
 =back
 
 B<BEWARE:> For keys that use I<space values> do not use the I<scalar_ref> format to capture the C<first_key> and C<last_key>.
 
-=item B<limit:> Sets the maximum number of lines to retrieve.
+=item B<limit:>
+
+Sets the maximum number of lines to retrieve.
 The option must be specified.
 Use '0' (zero) for unlimited lines.
 
@@ -1727,9 +1814,13 @@ It is owner of the process to preparation, execution and written the data on the
 
 =over
 
-=item B<command:> Consists of the SQL Command to be executed (fully formatted)
+=item B<command:>
 
-=item B<buffer:> Consists of the Return Buffer Area, where the method will written the columns and rows, can be:
+Consists of the SQL Command to be executed (fully formatted)
+
+=item B<buffer:>
+
+Consists of the Return Buffer Area, where the method will written the columns and rows, can be:
 
   hash_ref	Address of HASH;
   array_ref	Address of ARRAY;
@@ -1918,9 +2009,9 @@ The send messages does not abort the module.
 
 We recommended using the I<Syslog Service> for complexed applications.
 
-  SQL_SIMPLE_LOG_OFF		# Log is disabled (default)
+  SQL_SIMPLE_LOG_OFF		# Log is disabled
   SQL_SIMPLE_LOG_SYS		# Log is enabled for syslog service
-  SQL_SIMPLE_LOG_STD		# Log is enabled for STDERR
+  SQL_SIMPLE_LOG_STD		# Log is enabled for STDERR (default)
   SQL_SIMPLE_LOG_ALL		# Log is enabled for STDERR/Syslog
 
   my $mymod = SQL::SimpleOps->new
@@ -1939,9 +2030,9 @@ Default: C<SQL_SIMPLE_LOG_STD>
 
 B<NOTE:> You can override (temporary) this option on each SQL execution (valid for all command).
 
-  SQL::SimpleOps->Select( sql_save => 1, ... );		# (if global disabled)
+  SQL::SimpleOps->Select( message_log => 1, ... );		# (if global disabled)
   or
-  SQL::SimpleOps->Select( sql_save => 0, ... );		# (if global enabled)
+  SQL::SimpleOps->Select( message_log => 0, ... );		# (if global enabled)
 
 =item I<cursor_command> option
 
@@ -2783,9 +2874,9 @@ B<System:> The Save Option was been aborted with system error during make folder
 
 B<Action:> Check the C<system-message> to fix. Common errors:
 
-  a) C<Permission denied>: Check the folder ACL;
-  b) C<No left space>: Check the folder free space or quota;
-  c) C<Invalid filename>: Check the filename and use supported characters for your system.
+  a) Permission denied: Check the folder ACL;
+  b) No left space: Check the folder free space or quota;
+  c) Invalid filename: Check the filename and use supported characters for your system.
 
 =item *
 
@@ -2806,10 +2897,10 @@ B<System:> The Save Option was been aborted with system errors during open file 
 
 B<Action:> Check the C<system-message> to fix. Common errors:
 
-  a) C<Permission denied>: Check the Folder ACL;
-  b) C<Permission denied>: Check if filer already using an onther ACL;
-  c) C<No left space>: Check the folder free space or quota;
-  d) C<Invalid filename>: Check the filename and use supported characters for your system.
+  a) Permission denied: Check the Folder ACL;
+  b) Permission denied: Check if filer already using an onther ACL;
+  c) No left space: Check the folder free space or quota;
+  d) Invalid filename: Check the filename and use supported characters for your system.
 
 B<Command:> Select, Delete, Insert, Update and Call
 

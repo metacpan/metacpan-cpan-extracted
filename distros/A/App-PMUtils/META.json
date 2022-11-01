@@ -103,15 +103,15 @@
    "provides" : {
       "App::ModuleUtils" : {
          "file" : "lib/App/ModuleUtils.pm",
-         "version" : "0.739"
+         "version" : "0.740"
       },
       "App::PMUtils" : {
          "file" : "lib/App/PMUtils.pm",
-         "version" : "0.739"
+         "version" : "0.740"
       },
       "App::pmgrep" : {
          "file" : "lib/App/pmgrep.pm",
-         "version" : "0.739"
+         "version" : "0.740"
       }
    },
    "release_status" : "stable",
@@ -126,7 +126,7 @@
          "web" : "https://github.com/perlancar/perl-App-PMUtils"
       }
    },
-   "version" : "0.739",
+   "version" : "0.740",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

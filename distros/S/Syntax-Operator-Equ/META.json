@@ -22,12 +22,12 @@
       "configure" : {
          "requires" : {
             "Module::Build" : "0.4004",
-            "XS::Parse::Infix::Builder" : "0.15"
+            "XS::Parse::Infix::Builder" : "0.26"
          }
       },
       "runtime" : {
          "requires" : {
-            "XS::Parse::Infix" : "0.15",
+            "XS::Parse::Infix" : "0.26",
             "perl" : "5.014"
          }
       },
@@ -40,7 +40,7 @@
    "provides" : {
       "Syntax::Operator::Equ" : {
          "file" : "lib/Syntax/Operator/Equ.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -50,6 +50,6 @@
       ],
       "x_IRC" : "irc://irc.perl.org/#io-async"
    },
-   "version" : "0.03",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

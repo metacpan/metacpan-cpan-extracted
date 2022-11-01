@@ -1,5 +1,5 @@
 package Git::Raw::Cert;
-$Git::Raw::Cert::VERSION = '0.88';
+$Git::Raw::Cert::VERSION = '0.90';
 use strict;
 use warnings;
 
@@ -9,7 +9,7 @@ Git::Raw::Cert - Git certificate class
 
 =head1 VERSION
 
-version 0.88
+version 0.90
 
 =head1 DESCRIPTION
 
@@ -26,7 +26,7 @@ Type of certificate, C<"x509">, C<"hostkey">, C<"strarray"> or C<"none">.
 
 =head1 AUTHOR
 
-Jacques Germishuys <jacquesg@striata.com>
+Jacques Germishuys <jacquesg@cpan.org>
 
 =head1 LICENSE AND COPYRIGHT
 

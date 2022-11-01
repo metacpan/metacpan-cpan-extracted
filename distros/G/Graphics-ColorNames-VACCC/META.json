@@ -1,0 +1,87 @@
+{
+   "abstract" : "VisiBone Anglo-Centric Color Codes",
+   "author" : [
+      "Robert Rothenberg <rrwo@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [
+      "color"
+   ],
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Graphics-ColorNames-VACCC",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::EOF" : "0",
+            "Test::EOL" : "0",
+            "Test::MinimumVersion" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::LinkCheck" : "0",
+            "Test::Portability::Files" : "0",
+            "Test::TrailingSpace" : "0.0203"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "5.57",
+            "integer" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "File::Spec" : "0",
+            "Graphics::ColorNames" : "0",
+            "Module::Metadata" : "0",
+            "Test" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Graphics::ColorNames::VACCC" : {
+         "file" : "lib/Graphics/ColorNames/VACCC.pm",
+         "version" : "1.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/robrwo/Graphics-ColorNames-VACCC/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/robrwo/Graphics-ColorNames-VACCC.git",
+         "web" : "https://github.com/robrwo/Graphics-ColorNames-VACCC"
+      }
+   },
+   "version" : "1.03",
+   "x_authority" : "cpan:RRWO",
+   "x_contributors" : [
+      "Spoon Reloaded <spoon.reloaded@gmail.com>"
+   ],
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.31",
+   "x_spdx_expression" : "Artistic-2.0"
+}
+

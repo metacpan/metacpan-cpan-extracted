@@ -1,0 +1,122 @@
+Revision history for Perl extension pEFL.
+
+0.6  Tu Dec  28 22:30:33 2021
+	- first published version
+	- this is still a work-in-progress version, even if the Elementary part seems to be usable
+0.61 Thu Jan 06 09:21:00 2022
+	- Add pEFL::ev_info2obj()
+	- Add the following Event_Info structs to use with pEFL::ev_info2obj:
+		- Elm_Entry_Anchor_Info (aka pEFL::Elm::EntryAnchorInfo)
+		- Elm_Image_Progress (aka pEFL::Elm::ImageProgress)
+		- Elm_Panel_Scroll_Info (aka pEFL::Elm::PanelScrollInfo)
+	- Add pEFL::Elm::ColorselectorPaletteItem
+	- Add example for colorselector.pl
+	- Add pEFL::Evas::Coord::Rectangle (= c struct Evas_Coord_Rectangle)
+0.62 Fri Jan 21 00:29::00 2022
+	- Fix examples (use the right CONSTANTS)
+	- Fix pEFL::Elm::List->add($parent), pEFL::Elm::Panes->add($parent) and pEFL::Elm::Radio->add($parent)
+	- Add pEFL::Evas::Modifier and pEFL::Evas::Lock
+	- Add pEFL::Evas::Event::MouseDown, pEFL::Evas::Event::MouseUp, pEFL::Evas::Event::MouseIn, pEFL::Evas::Event::MouseOut, pEFL::Evas::Event::MouseMove, pEFL::Evas::Event::MouseWheel, pEFL::Evas::Event::KeyDown, pEFL::Evas::Event::KeyUp, pEFL::Evas::Event::Hold
+	- Print Debug Messages only if $pEFL::Debug is set.
+0.63 Sat Jul 02 06:00:00 2022
+	- Add pEFL::Evas::Text
+	- Add pEFL::Evas::Textblock,pEFL::Evas::TextblockCursor,pEFL::Evas::TextblockStyle,pEFL::Evas::TextblockNodeFormat
+	- Add a simple constructor to pEFL::Text
+	- POD corrections and amendments
+0.64
+	- POD amendemnts
+	- export all constants in Evas.pm and Elm.pm
+0.65
+	- Add evas_object_freeze_events_set|get and evas_object_pass_events_set|get
+	- Add elm_object_scroll_freeze_*|hold_*|lock_*|item_loop_enabled_* etc.
+	- Add pEFL::Ecore::EventHandler, pEFL::Ecore::Event and some basic Ecore stuff
+0.66
+	- Add multi member to pEFL::Ecore::Event::MouseButton and pEFL::Ecore::EventMouseWheel (but member of multi root is missing)
+0.67 Wed Aug 10 22:33:00 2022
+	- Add pEFL::Elm::Player and pEFL::Elm::Video widget (but elm_video_emotion_get(obj) is still missing!!)
+	- Minor code cleaning and Bugfixes (pEFL::Elm::Video and pEFL::Elm::Toolbar)
+	- Add constants of pEFL::Elm::Toolbar
+	- add elm_object_focus_set|get
+	- automatically cleanup c struct and GenItem hash, if a pEFL::Elm::ToolbarItem is deleted 
+		(by setting elm_object_item_del_cb_set to call_perl_gen_del at inserting/appending/prepending)
+		(TODO: Do the same for other WidgetItems/ObjectItems, e.g. ElmIndex, ElmList) 
+	- Correct inheritance of the scrollable widgets pEFL::Elm::Entry, pEFL::Elm::Genlist and pEFL::Elm::Toolbar 
+		(inherit from ElmSrollablePtr, too)
+	- Correct inheritance of the WidgetItems pEFL::Elm::CtxpopupItem, pEFL::Elm::GenlistItem, pEFL::Elm::IndexItem,
+		pEFL::Elm::ListItem, pEFL::Elm::MenuItem, pEFL::Elm::NaviframeItem, pEFL::Elm::SegmentItem, pEFL::Elm::ToolbarItem
+		(inherit only from ElmObjectItemPtr)
+	- remove (at the moment not working) functions elm_object_item_del_cb_set and elm_object_item_signal_callback_add
+		(TODO: Implement callbacks of ElmWidgetItemPtr)
+	- remove (at the moment not working) function elm_object_signal_callback_add
+	- remove (at the moment not working) functions ecore_event_add (TODO: Implement this!)
+	- remove (at the moment not working) functions elm_genlist_item_tooltip_content_cb_set() (TODO: Implement this!)
+	- Let $win->main_menu_get() return an pEFL::Elm::Menu object
+	- Correct pEFL::Elm::Inwin->add()
+	- ADD evas_object_size_hint_aspect_set|get
+	- Fix GenlistItemClass functions (obj must be GenlistItemPtr)
+0.68 Sat Sep 12 06:20:00 2022
+	- Add Ecore Modifiers constants
+	- Fix elm_entry_utf8_to_markup
+	- Add all macros of elm_object_item.h
+	- Implement elm_object_signal_callback_add|del and automatic cleanup of signals 
+		(TODO: Check which widgets really can have signal callbacks? Only Layout and Edje object?) 
+	- automatically cleanup c struct and GenItem hash, if a pEFL::Elm::CtxPopupItem|IndexItem|ListItem|HoverselItem|MenuItem| 
+		PopupItem is deleted
+		(TODO: Do the same with ColorpaletteItem, SegmentItem?)
+	- implement elm_object_item_signal_callback_add|del and automatic cleanup of signal when parent widget is deleted
+		(TODO: Check which widgets really can have signal callbacks? Only Layout and Edje object?) 
+	- passing function possible to Elm::List->item_insert_*|item_append|item_prepend, Elm::Ctypopup->item_append, 
+		Elm::Popup->item_append 
+	- add EVAS_ASPECT_CONTROL_* Constants
+	- minor fixes in examples and add new examples
+	- Add the special version of $naviframe->item_pop_pv, $object->(part_)content_get_pv and 
+		$object_item->(part_)content_get_pv that tries to bless the returned EvasObject to the appropriate perl class
+		(TODO: Perhaps a own function pEFL::Elm::widgetType2pclass()?)
+	- Fixes with the automatical cleanup of cstruct and GenItem hash, if a pEFL::Elm::GenlistItem is deleted, and the 
+		cleanup of all GenlistItems when Genlist is deleted
+		(Note: The del_cb of the GenlistItc class is always predefined to call_perl_gen_del. There the Genlistitem hash
+		and c struct are deleted and a user-defined del_cb is called. Therefore for cleaning up the GenlistItems in 
+		pEFL::Elm::PLSide::cleanup_genitems it is sufficient to clear the Genlist
+		TODO: Check whether this is a way for all "GenWidgets" (e.g. Toolbar, CtxPopupItem, IndexItem, ListItem, 
+		HoverselItem, MenuItem, PopupItem))
+	- minor fixes
+	- Adjust automatical cleanup of IndexItem, ListItem, ToolbarItem, HoverselItem, MenuItem 
+		according to GenlistItem (see above) because there occured problems (with Menu and Hoversel)
+	- Leave automatical cleanup as is at ElmPopupItems and ElmCtxpopupItems
+		(Note: The disadvantage is, that manual deleting don't cleanup things on the perl/xs side)
+	- Add elm_entry_context_menu_item_add
+	- Add EINA_TRUE|FALSE constants
+	- Unify storage of callback data (always use c pointer adress as key instead of refadress of perl object)
+	- Add a warning to evas_object_smart_callback_call that passing event_info is not possible at the moment
+		(TODO: How make it possible? In the python binding. it is for example always a (pure?) python object)
+	- Add pEFL::Elm::Combobox widget 
+		(TODO: Add to Genlist the filter_get functionality; but is the void* pointer key always of type char*?)
+	- Add pEFL::Elm::Config
+	- Add ELM_CNP_MODE_MARKUP|PLAINTEXT|NO_IMAGE constants and fix Constants	
+	- Add example of ElmPopup with ElmPopupItems
+	- Use alwalys $widget->even_callback_add(EVAS_CALLBACK_DEL..) for registering cleanup callbacks
+		(the smart callback version sometimes wasn't triggered (Genlist, Layout, List, Fileselector Index etc.)  
+		and/or one couldn't register an own "del" smart event (Frame, Box etc)???)
+	- (still) TODO: Deleting c struct in Format_Cbs 
+0.69
+	- POD additions and corrections
+	- cleanup code in basic Ecore-Evas example
+	- Add $naviframe_item->pop_cb_set()
+		(TODO: automatical call of item_del_cb doesn't work with NaviframeItem;
+		generally (and not only for NaviframeItem), registering del_cb by user should be possible; 
+		therefore item_data_set/data_get functionality might be required?)
+	- Add Emotion multimedia library
+	- Add multimedia example
+	- Add shortcut vor $evas_textblock_cursor->text_markup_prepend()
+	- Fix problems with Eina::list2array()
+	- Add various shortcut-methods and perl-value methods to EvasTextblock and EvasTextblockCursor
+	- Add perl-style constructors to pEFL::Ecore::Evas
+	- Add several missing methods to pEFL::Evas::Object
+0.70 Sat Oct 29 15:30:00 2022
+	- Release on CPAN
+	- Rename Efl distribution to pEFL to avoid a name conflict with old EFL distribution
+	- Add pEFL::Evas::Canvas::font_path_list_pv and pEFL::Evas::Canvas::font_available_list_pv
+0.71 Tue Nov 01 13:35:00 2022
+	- POD corrections
+	- Fix pEfl::Evas::Textblock->range_geometry_get_pv and add pEFL::Evas::Textblock::Rectangle
+	- Improve Makefile.PL (add ExtUtils::PkgConf as prereq and add META_MERGE)

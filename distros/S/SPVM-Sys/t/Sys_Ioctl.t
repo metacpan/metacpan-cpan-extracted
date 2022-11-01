@@ -15,15 +15,10 @@ use TestUtil::Socket;
 use SPVM 'Sys::Ioctl';
 use SPVM 'TestCase::Sys::Ioctl';
 
-my $localhost = "127.0.0.1";
-
 # Start objects count
 my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 
-# Port
-my $port = TestUtil::Socket::search_available_port;
-
-ok(SPVM::TestCase::Sys::Ioctl->ioctl($port));
+ok(SPVM::TestCase::Sys::Ioctl->ioctl);
 
 SPVM::set_exception(undef);
 

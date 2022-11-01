@@ -25,7 +25,7 @@ Sub::Multi::Tiny - Multisubs/multimethods (multiple dispatch) yet another way!
 
 The default dispatcher dispatches solely by arity, and only one
 candidate can have each arity.  For more flexible dispatching, see
-[Sub::Multi::Tiny::Dispatcher::TypeParams](https://metacpan.org/pod/Sub::Multi::Tiny::Dispatcher::TypeParams).
+[Sub::Multi::Tiny::Dispatcher::TypeParams](https://metacpan.org/pod/Sub%3A%3AMulti%3A%3ATiny%3A%3ADispatcher%3A%3ATypeParams).
 
 # DESCRIPTION
 
@@ -37,7 +37,7 @@ preserved but not used specifically by Sub::Multi::Tiny.
 
 Within a multisub package, the name of the sub being defined is available
 for recursion.  For example (using `where`, supported by
-[Sub::Multi::Tiny::Dispatcher::TypeParams](https://metacpan.org/pod/Sub::Multi::Tiny::Dispatcher::TypeParams)):
+[Sub::Multi::Tiny::Dispatcher::TypeParams](https://metacpan.org/pod/Sub%3A%3AMulti%3A%3ATiny%3A%3ADispatcher%3A%3ATypeParams)):
 
     {
         package main::fib;
@@ -62,7 +62,7 @@ in the multisub implementations.
 A parameter `D:Dispatcher` can also be given to specify the dispatcher to
 use --- see ["CUSTOM DISPATCH"](#custom-dispatch).
 
-Also sets ["$VERBOSE" in Sub::Multi::Tiny::Util](https://metacpan.org/pod/Sub::Multi::Tiny::Util#VERBOSE) if the environment variable
+Also sets ["$VERBOSE" in Sub::Multi::Tiny::Util](https://metacpan.org/pod/Sub%3A%3AMulti%3A%3ATiny%3A%3AUtil#VERBOSE) if the environment variable
 `SUB_MULTI_TINY_VERBOSE` has a truthy value.  If the `SUB_MULTI_TINY_VERBOSE`
 value is numeric, `$VERBOSE` is set to that value; otherwise, `$VERBOSE` is
 set to 1.
@@ -70,7 +70,7 @@ set to 1.
 # CUSTOM DISPATCH
 
 This module includes a default dispatcher (implemented in
-[Sub::Multi::Tiny::Dispatcher::Default](https://metacpan.org/pod/Sub::Multi::Tiny::Dispatcher::Default).  To use a different dispatcher,
+[Sub::Multi::Tiny::Dispatcher::Default](https://metacpan.org/pod/Sub%3A%3AMulti%3A%3ATiny%3A%3ADispatcher%3A%3ADefault).  To use a different dispatcher,
 define or import a sub `MakeDispatcher()` into the package before
 compilation ends.  That sub will be called to create the dispatcher.
 For example:
@@ -100,7 +100,7 @@ use dispatcher `Bar::Quux`.  If `Foo` does not include a double-colon,
 
 # DEBUGGING
 
-For extra debug output, set ["$VERBOSE" in Sub::Multi::Tiny::Util](https://metacpan.org/pod/Sub::Multi::Tiny::Util#VERBOSE) to a positive
+For extra debug output, set ["$VERBOSE" in Sub::Multi::Tiny::Util](https://metacpan.org/pod/Sub%3A%3AMulti%3A%3ATiny%3A%3AUtil#VERBOSE) to a positive
 integer.  This has to be set at compile time to have any effect.  For example,
 before creating any multisubs, do:
 
@@ -118,16 +118,16 @@ compatible with those Perls.
 
 I looked at these but decided not to use them for the following reasons:
 
-- [Class::Multimethods](https://metacpan.org/pod/Class::Multimethods)
+- [Class::Multimethods](https://metacpan.org/pod/Class%3A%3AMultimethods)
 
     I wanted a syntax that used normal `sub` definitions as much as possible.
     Also, I was a bit concerned by LPALMER's experience that it "does what you
     don't want sometimes without saying a word"
-    (["Semantics" in Class::Multimethods::Pure](https://metacpan.org/pod/Class::Multimethods::Pure#Semantics)).
+    (["Semantics" in Class::Multimethods::Pure](https://metacpan.org/pod/Class%3A%3AMultimethods%3A%3APure#Semantics)).
 
     Other than that, I think this looks pretty decent (but haven't tried it).
 
-- [Class::Multimethods::Pure](https://metacpan.org/pod/Class::Multimethods::Pure)
+- [Class::Multimethods::Pure](https://metacpan.org/pod/Class%3A%3AMultimethods%3A%3APure)
 
     Same desire for `sub` syntax.  Additionally, the last update was in 2007,
     and the maintainer hasn't uploaded anything since.  Other than that, I think
@@ -142,25 +142,25 @@ I looked at these but decided not to use them for the following reasons:
     This one is fairly clean, but uses a source filter.  I have not had much
     experience with source filters, so am reluctant.
 
-- [Kavorka::Manual::MultiSubs](https://metacpan.org/pod/Kavorka::Manual::MultiSubs) (and [Moops](https://metacpan.org/pod/Moops))
+- [Kavorka::Manual::MultiSubs](https://metacpan.org/pod/Kavorka%3A%3AManual%3A%3AMultiSubs) (and [Moops](https://metacpan.org/pod/Moops))
 
     Requires Perl 5.14+.
 
-- [MooseX::MultiMethods](https://metacpan.org/pod/MooseX::MultiMethods)
+- [MooseX::MultiMethods](https://metacpan.org/pod/MooseX%3A%3AMultiMethods)
 
     I am not ready to move to full [Moose](https://metacpan.org/pod/Moose)!
 
-- [MooseX::Params](https://metacpan.org/pod/MooseX::Params)
+- [MooseX::Params](https://metacpan.org/pod/MooseX%3A%3AParams)
 
     As above.
 
-- [Sub::Multi](https://metacpan.org/pod/Sub::Multi)
+- [Sub::Multi](https://metacpan.org/pod/Sub%3A%3AMulti)
 
     The original inspiration for this module, whence this module's name.
     `Sub::Multi` uses coderefs, and I wanted a syntax that used normal
     `sub` definitions as much as possible.
 
-- [Sub::SmartMatch](https://metacpan.org/pod/Sub::SmartMatch)
+- [Sub::SmartMatch](https://metacpan.org/pod/Sub%3A%3ASmartMatch)
 
     This one looks very interesting, but I haven't used smartmatch enough
     to be fully comfortable with it.
@@ -179,7 +179,7 @@ You can also look for information at:
 
 - MetaCPAN
 
-    [Sub::Multi::Tiny](https://metacpan.org/pod/Sub::Multi::Tiny)
+    [Sub::Multi::Tiny](https://metacpan.org/pod/Sub%3A%3AMulti%3A%3ATiny)
 
 - This distribution
 

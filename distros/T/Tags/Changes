@@ -1,3 +1,12 @@
+0.12 2022-10-25T16:12:31+02:00
+ [Common]
+ - Update copyright years.
+
+ [Tags::Output]
+ - Add 'no_data_callback' parameter to set list of elements which not
+   process 'data_callback'. Example is 'script' in which we don't need HTML
+   escaping.
+
 0.11 2021-02-20T18:31:32+01:00
  [Common]
  - Add blank lines after arguments and before return.

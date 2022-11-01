@@ -29,12 +29,15 @@ Files: Changes
  lib/Sub/HandlesVia/Toolkit/Moose.pm.mite.pm
  lib/Sub/HandlesVia/Toolkit/Mouse.pm
  lib/Sub/HandlesVia/Toolkit/Mouse.pm.mite.pm
+ lib/Sub/HandlesVia/Toolkit/ObjectPad.pm
+ lib/Sub/HandlesVia/Toolkit/ObjectPad.pm.mite.pm
  lib/Sub/HandlesVia/Toolkit/Plain.pm
  lib/Sub/HandlesVia/Toolkit/Plain.pm.mite.pm
  t/00begin.t
  t/02moo.t
  t/03moo_mxtt.t
  t/04moose.t
+ t/04moose/role.t
  t/04moose/trait_array.t
  t/04moose/trait_bool.t
  t/04moose/trait_code.t
@@ -88,6 +91,11 @@ Files: Changes
  t/40mite/number.t
  t/40mite/scalar.t
  t/40mite/string.t
+ t/50objectpad.t
+ t/60detect.t
+ t/61moosemetagubbins.t
+ t/62mousemetagubbins.t
+ t/80beam.t
  t/94cmp.t
  t/96foreach.t
  t/99headtail.t
@@ -110,7 +118,6 @@ Files: t/02moo/role.t
  t/03moo_mxtt/trait_hash.t
  t/03moo_mxtt/trait_number.t
  t/03moo_mxtt/trait_string.t
- t/04moose/role.t
  t/05moose_nativetypes.t
  t/05moose_nativetypes/role.t
  t/05moose_nativetypes/trait_bool.t
@@ -144,6 +151,24 @@ Files: t/02moo/role.t
 Copyright: Copyright 2020 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
+Files: lib/Sub/HandlesVia/Declare.pm
+ lib/Sub/HandlesVia/HandlerLibrary/Blessed.pm
+ lib/Sub/HandlesVia/Manual/Advanced.pod
+ lib/Sub/HandlesVia/Manual/Comparison.pod
+ lib/Sub/HandlesVia/Manual/WithClassTiny.pod
+ lib/Sub/HandlesVia/Manual/WithGeneric.pod
+ lib/Sub/HandlesVia/Manual/WithMite.pod
+ lib/Sub/HandlesVia/Manual/WithMoo.pod
+ lib/Sub/HandlesVia/Manual/WithMoose.pod
+ lib/Sub/HandlesVia/Manual/WithMouse.pod
+ lib/Sub/HandlesVia/Manual/WithObjectPad.pod
+ t/20moosex_extended.t
+ t/31egpod_dummy.t
+ t/40mite/00-basic.t
+ t/40mite/01-roles.t
+Copyright: This software is copyright (c) 2022 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 Files: README
  lib/Sub/HandlesVia.pm
  lib/Sub/HandlesVia/CodeGenerator.pm
@@ -166,13 +191,6 @@ Files: INSTALL
  t/40mite/.mite/config
 Copyright: Unknown
 License: Unknown
-
-Files: t/20moosex_extended.t
- t/31egpod_dummy.t
- t/40mite/00-basic.t
- t/40mite/01-roles.t
-Copyright: This software is copyright (c) 2022 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
 
 Files: COPYRIGHT
  CREDITS

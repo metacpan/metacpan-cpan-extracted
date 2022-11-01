@@ -31,40 +31,40 @@ no_index:
 provides:
   Weather::GHCN::App::Extremes:
     file: lib/Weather/GHCN/App/Extremes.pm
-    version: v0.0.8
+    version: v0.0.9
   Weather::GHCN::App::Fetch:
     file: lib/Weather/GHCN/App/Fetch.pm
-    version: v0.0.8
+    version: v0.0.9
   Weather::GHCN::App::StationCounts:
     file: lib/Weather/GHCN/App/StationCounts.pm
-    version: v0.0.8
+    version: v0.0.9
   Weather::GHCN::CacheURI:
     file: lib/Weather/GHCN/CacheURI.pm
-    version: v0.0.8
+    version: v0.0.9
   Weather::GHCN::Common:
     file: lib/Weather/GHCN/Common.pm
-    version: v0.0.8
+    version: v0.0.9
   Weather::GHCN::CountryCodes:
     file: lib/Weather/GHCN/CountryCodes.pm
-    version: v0.0.8
+    version: v0.0.9
   Weather::GHCN::Fetch:
     file: lib/Weather/GHCN/Fetch.pm
-    version: v0.0.8
+    version: v0.0.9
   Weather::GHCN::Measures:
     file: lib/Weather/GHCN/Measures.pm
-    version: v0.0.8
+    version: v0.0.9
   Weather::GHCN::Options:
     file: lib/Weather/GHCN/Options.pm
-    version: v0.0.8
+    version: v0.0.9
   Weather::GHCN::Station:
     file: lib/Weather/GHCN/Station.pm
-    version: v0.0.8
+    version: v0.0.9
   Weather::GHCN::StationTable:
     file: lib/Weather/GHCN/StationTable.pm
-    version: v0.0.8
+    version: v0.0.9
   Weather::GHCN::TimingStats:
     file: lib/Weather/GHCN/TimingStats.pm
-    version: v0.0.8
+    version: v0.0.9
 requires:
   Carp: '0'
   Const::Fast: '0'
@@ -88,7 +88,7 @@ requires:
   Set::IntSpan::Fast: '0'
   Text::Abbrev: '0'
   Time::HiRes: '0'
-  Time::Piece: '0'
+  Time::Piece: '1.32'
   Try::Tiny: '0'
   YAML::Tiny: '0'
   base: '0'
@@ -102,7 +102,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Weather-GHCN-Fetch
   homepage: https://github.com/jgpuckering/Weather-GHCN-Fetch/wiki
   repository: git://github.com/jgpuckering/Weather-GHCN-Fetch.git
-version: v0.0.008
+version: v0.0.009
 x_generated_by_perl: v5.32.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

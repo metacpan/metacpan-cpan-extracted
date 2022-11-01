@@ -7,6 +7,11 @@ system:
       isa: Str
       default: "dummy@email.com"
       global: 1
+    refresh:
+      description: "System refresh rate"
+      isa: Num
+      default: 10
+      global: 1
     admins:
       description: "Admin list"
       isa: ArrayRef

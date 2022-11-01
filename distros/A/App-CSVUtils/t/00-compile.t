@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 35 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 36 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/CSVUtils.pm'
@@ -45,6 +45,7 @@ my @scripts = (
     'script/csv2ltsv',
     'script/csv2td',
     'script/csv2tsv',
+    'script/csv2vcf',
     'script/dump-csv',
     'script/tsv2csv'
 );

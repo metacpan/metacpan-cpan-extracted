@@ -3,7 +3,7 @@ package DateTime::Locale::Catalog;
 use strict;
 use warnings;
 
-our $VERSION = '1.36';
+our $VERSION = '1.37';
 
 1;
 
@@ -21,7 +21,7 @@ DateTime::Locale::Catalog - Provides a catalog of all valid locale names
 
 =head1 VERSION
 
-version 1.36
+version 1.37
 
 =head1 DESCRIPTION
 
@@ -58,6 +58,8 @@ The available locales are:
  ak-GH            Akan Ghana                                  Akan Gaana
  am               Amharic                                     አማርኛ
  am-ET            Amharic Ethiopia                            አማርኛ ኢትዮጵያ
+ ann              Obolo                                       Obolo
+ ann-NG           Obolo Nigeria                               Obolo NG
  ar               Arabic                                      العربية
  ar-001           Arabic world                                العربية العالم
  ar-AE            Arabic United Arab Emirates                 العربية الإمارات العربية المتحدة
@@ -109,6 +111,10 @@ The available locales are:
  bez-TZ           Bena Tanzania                               Hibena Hutanzania
  bg               Bulgarian                                   български
  bg-BG            Bulgarian Bulgaria                          български България
+ bgc              Haryanvi                                    हरियाणवी
+ bgc-IN           Haryanvi India                              हरियाणवी भारत
+ bho              Bhojpuri                                    भोजपुरी
+ bho-IN           Bhojpuri India                              भोजपुरी भारत
  bm               Bambara                                     bamanakan
  bm-ML            Bambara Mali                                bamanakan Mali
  bn               Bangla                                      বাংলা
@@ -137,8 +143,8 @@ The available locales are:
  ccp-IN           Chakma India                                𑄌𑄋𑄴𑄟𑄳𑄦 𑄞𑄢𑄧𑄖𑄴
  ce               Chechen                                     нохчийн
  ce-RU            Chechen Russia                              нохчийн Росси
- ceb              Cebuano                                     Binisaya
- ceb-PH           Cebuano Philippines                         Binisaya Pilipinas
+ ceb              Cebuano                                     Cebuano
+ ceb-PH           Cebuano Philippines                         Cebuano Pilipinas
  cgg              Chiga                                       Rukiga
  cgg-UG           Chiga Uganda                                Rukiga Uganda
  chr              Cherokee                                    ᏣᎳᎩ
@@ -148,6 +154,8 @@ The available locales are:
  ckb-IR           Central Kurdish Iran                        کوردیی ناوەندی ئێران
  cs               Czech                                       čeština
  cs-CZ            Czech Czechia                               čeština Česko
+ cv               Chuvash                                     чӑваш
+ cv-RU            Chuvash Russia                              чӑваш Раҫҫей
  cy               Welsh                                       Cymraeg
  cy-GB            Welsh United Kingdom                        Cymraeg Y Deyrnas Unedig
  da               Danish                                      dansk
@@ -233,9 +241,9 @@ The available locales are:
  en-JM            English Jamaica                             English Jamaica
  en-KE            English Kenya                               English Kenya
  en-KI            English Kiribati                            English Kiribati
- en-KN            English St. Kitts & Nevis                   English St. Kitts & Nevis
+ en-KN            English St. Kitts & Nevis                   English St Kitts & Nevis
  en-KY            English Cayman Islands                      English Cayman Islands
- en-LC            English St. Lucia                           English St. Lucia
+ en-LC            English St. Lucia                           English St Lucia
  en-LR            English Liberia                             English Liberia
  en-LS            English Lesotho                             English Lesotho
  en-MG            English Madagascar                          English Madagascar
@@ -267,7 +275,7 @@ The available locales are:
  en-SD            English Sudan                               English Sudan
  en-SE            English Sweden                              English Sweden
  en-SG            English Singapore                           English Singapore
- en-SH            English St. Helena                          English St. Helena
+ en-SH            English St. Helena                          English St Helena
  en-SI            English Slovenia                            English Slovenia
  en-SL            English Sierra Leone                        English Sierra Leone
  en-SS            English South Sudan                         English South Sudan
@@ -282,7 +290,7 @@ The available locales are:
  en-UG            English Uganda                              English Uganda
  en-UM            English U.S. Outlying Islands               English U.S. Outlying Islands
  en-US            English United States                       English United States
- en-VC            English St. Vincent & Grenadines            English St. Vincent & Grenadines
+ en-VC            English St. Vincent & Grenadines            English St Vincent & the Grenadines
  en-VG            English British Virgin Islands              English British Virgin Islands
  en-VI            English U.S. Virgin Islands                 English U.S. Virgin Islands
  en-VU            English Vanuatu                             English Vanuatu
@@ -330,33 +338,33 @@ The available locales are:
  fa               Persian                                     فارسی
  fa-AF            Persian Afghanistan                         فارسی افغانستان
  fa-IR            Persian Iran                                فارسی ایران
- ff               Fulah                                       Pulaar
- ff-Adlm          Fulah Adlam                                 𞤆𞤵𞤤𞤢𞤪 𞤀𞤁𞤂𞤢𞤃
- ff-Adlm-BF       Fulah Burkina Faso Adlam                    𞤆𞤵𞤤𞤢𞤪 𞤄𞤵𞤪𞤳𞤭𞤲𞤢 𞤊𞤢𞤧𞤮𞥅 𞤀𞤁𞤂𞤢𞤃
- ff-Adlm-CM       Fulah Cameroon Adlam                        𞤆𞤵𞤤𞤢𞤪 𞤑𞤢𞤥𞤢𞤪𞤵𞥅𞤲 𞤀𞤁𞤂𞤢𞤃
- ff-Adlm-GH       Fulah Ghana Adlam                           𞤆𞤵𞤤𞤢𞤪 𞤘𞤢𞤲𞤢 𞤀𞤁𞤂𞤢𞤃
- ff-Adlm-GM       Fulah Gambia Adlam                          𞤆𞤵𞤤𞤢𞤪 𞤘𞤢𞤥𞤦𞤭𞤴𞤢 𞤀𞤁𞤂𞤢𞤃
- ff-Adlm-GN       Fulah Guinea Adlam                          𞤆𞤵𞤤𞤢𞤪 𞤘𞤭𞤲𞤫 𞤀𞤁𞤂𞤢𞤃
- ff-Adlm-GW       Fulah Guinea-Bissau Adlam                   𞤆𞤵𞤤𞤢𞤪 𞤘𞤭𞤲𞤫-𞤄𞤭𞤧𞤢𞤱𞤮𞥅 𞤀𞤁𞤂𞤢𞤃
- ff-Adlm-LR       Fulah Liberia Adlam                         𞤆𞤵𞤤𞤢𞤪 𞤂𞤢𞤦𞤭𞤪𞤭𞤴𞤢𞥄 𞤀𞤁𞤂𞤢𞤃
- ff-Adlm-MR       Fulah Mauritania Adlam                      𞤆𞤵𞤤𞤢𞤪 𞤃𞤮𞤪𞤼𞤢𞤲𞤭𞥅 𞤀𞤁𞤂𞤢𞤃
- ff-Adlm-NE       Fulah Niger Adlam                           𞤆𞤵𞤤𞤢𞤪 𞤐𞤭𞥅𞤶𞤫𞤪 𞤀𞤁𞤂𞤢𞤃
- ff-Adlm-NG       Fulah Nigeria Adlam                         𞤆𞤵𞤤𞤢𞤪 𞤐𞤢𞤶𞤫𞤪𞤭𞤴𞤢𞥄 𞤀𞤁𞤂𞤢𞤃
- ff-Adlm-SL       Fulah Sierra Leone Adlam                    𞤆𞤵𞤤𞤢𞤪 𞤅𞤢𞤪𞤢𞤤𞤮𞤲 𞤀𞤁𞤂𞤢𞤃
- ff-Adlm-SN       Fulah Senegal Adlam                         𞤆𞤵𞤤𞤢𞤪 𞤅𞤫𞤲𞤫𞤺𞤢𞥄𞤤 𞤀𞤁𞤂𞤢𞤃
- ff-Latn          Fulah Latin                                 Pulaar Latn
- ff-Latn-BF       Fulah Burkina Faso Latin                    Pulaar Burkibaa Faaso Latn
- ff-Latn-CM       Fulah Cameroon Latin                        Pulaar Kameruun Latn
- ff-Latn-GH       Fulah Ghana Latin                           Pulaar Ganaa Latn
- ff-Latn-GM       Fulah Gambia Latin                          Pulaar Gammbi Latn
- ff-Latn-GN       Fulah Guinea Latin                          Pulaar Gine Latn
- ff-Latn-GW       Fulah Guinea-Bissau Latin                   Pulaar Gine-Bisaawo Latn
- ff-Latn-LR       Fulah Liberia Latin                         Pulaar Liberiyaa Latn
- ff-Latn-MR       Fulah Mauritania Latin                      Pulaar Muritani Latn
- ff-Latn-NE       Fulah Niger Latin                           Pulaar Nijeer Latn
- ff-Latn-NG       Fulah Nigeria Latin                         Pulaar Nijeriyaa Latn
- ff-Latn-SL       Fulah Sierra Leone Latin                    Pulaar Seraa liyon Latn
- ff-Latn-SN       Fulah Senegal Latin                         Pulaar Senegaal Latn
+ ff               Fula                                        Pulaar
+ ff-Adlm          Fula Adlam                                  𞤆𞤵𞤤𞤢𞤪 𞤀𞤁𞤂𞤢𞤃
+ ff-Adlm-BF       Fula Burkina Faso Adlam                     𞤆𞤵𞤤𞤢𞤪 𞤄𞤵𞤪𞤳𞤭𞤲𞤢 𞤊𞤢𞤧𞤮𞥅 𞤀𞤁𞤂𞤢𞤃
+ ff-Adlm-CM       Fula Cameroon Adlam                         𞤆𞤵𞤤𞤢𞤪 𞤑𞤢𞤥𞤢𞤪𞤵𞥅𞤲 𞤀𞤁𞤂𞤢𞤃
+ ff-Adlm-GH       Fula Ghana Adlam                            𞤆𞤵𞤤𞤢𞤪 𞤘𞤢𞤲𞤢 𞤀𞤁𞤂𞤢𞤃
+ ff-Adlm-GM       Fula Gambia Adlam                           𞤆𞤵𞤤𞤢𞤪 𞤘𞤢𞤥𞤦𞤭𞤴𞤢 𞤀𞤁𞤂𞤢𞤃
+ ff-Adlm-GN       Fula Guinea Adlam                           𞤆𞤵𞤤𞤢𞤪 𞤘𞤭𞤲𞤫 𞤀𞤁𞤂𞤢𞤃
+ ff-Adlm-GW       Fula Guinea-Bissau Adlam                    𞤆𞤵𞤤𞤢𞤪 𞤘𞤭𞤲𞤫-𞤄𞤭𞤧𞤢𞤱𞤮𞥅 𞤀𞤁𞤂𞤢𞤃
+ ff-Adlm-LR       Fula Liberia Adlam                          𞤆𞤵𞤤𞤢𞤪 𞤂𞤢𞤦𞤭𞤪𞤭𞤴𞤢𞥄 𞤀𞤁𞤂𞤢𞤃
+ ff-Adlm-MR       Fula Mauritania Adlam                       𞤆𞤵𞤤𞤢𞤪 𞤃𞤮𞤪𞤼𞤢𞤲𞤭𞥅 𞤀𞤁𞤂𞤢𞤃
+ ff-Adlm-NE       Fula Niger Adlam                            𞤆𞤵𞤤𞤢𞤪 𞤐𞤭𞥅𞤶𞤫𞤪 𞤀𞤁𞤂𞤢𞤃
+ ff-Adlm-NG       Fula Nigeria Adlam                          𞤆𞤵𞤤𞤢𞤪 𞤐𞤢𞤶𞤫𞤪𞤭𞤴𞤢𞥄 𞤀𞤁𞤂𞤢𞤃
+ ff-Adlm-SL       Fula Sierra Leone Adlam                     𞤆𞤵𞤤𞤢𞤪 𞤅𞤢𞤪𞤢𞤤𞤮𞤲 𞤀𞤁𞤂𞤢𞤃
+ ff-Adlm-SN       Fula Senegal Adlam                          𞤆𞤵𞤤𞤢𞤪 𞤅𞤫𞤲𞤫𞤺𞤢𞥄𞤤 𞤀𞤁𞤂𞤢𞤃
+ ff-Latn          Fula Latin                                  Pulaar Latn
+ ff-Latn-BF       Fula Burkina Faso Latin                     Pulaar Burkibaa Faaso Latn
+ ff-Latn-CM       Fula Cameroon Latin                         Pulaar Kameruun Latn
+ ff-Latn-GH       Fula Ghana Latin                            Pulaar Ganaa Latn
+ ff-Latn-GM       Fula Gambia Latin                           Pulaar Gammbi Latn
+ ff-Latn-GN       Fula Guinea Latin                           Pulaar Gine Latn
+ ff-Latn-GW       Fula Guinea-Bissau Latin                    Pulaar Gine-Bisaawo Latn
+ ff-Latn-LR       Fula Liberia Latin                          Pulaar Liberiyaa Latn
+ ff-Latn-MR       Fula Mauritania Latin                       Pulaar Muritani Latn
+ ff-Latn-NE       Fula Niger Latin                            Pulaar Nijeer Latn
+ ff-Latn-NG       Fula Nigeria Latin                          Pulaar Nijeriyaa Latn
+ ff-Latn-SL       Fula Sierra Leone Latin                     Pulaar Seraa liyon Latn
+ ff-Latn-SN       Fula Senegal Latin                          Pulaar Senegaal Latn
  fi               Finnish                                     suomi
  fi-FI            Finnish Finland                             suomi Suomi
  fil              Filipino                                    Filipino
@@ -411,6 +419,8 @@ The available locales are:
  fr-VU            French Vanuatu                              français Vanuatu
  fr-WF            French Wallis & Futuna                      français Wallis-et-Futuna
  fr-YT            French Mayotte                              français Mayotte
+ frr              Northern Frisian                            Nordfriisk
+ frr-DE           Northern Frisian Germany                    Nordfriisk DE
  fur              Friulian                                    furlan
  fur-IT           Friulian Italy                              furlan Italie
  fy               Western Frisian                             Frysk
@@ -435,7 +445,7 @@ The available locales are:
  ha               Hausa                                       Hausa
  ha-GH            Hausa Ghana                                 Hausa Gana
  ha-NE            Hausa Niger                                 Hausa Nijar
- ha-NG            Hausa Nigeria                               Hausa Najeriya
+ ha-NG            Hausa Nigeria                               Hausa Nijeriya
  haw              Hawaiian                                    ʻŌlelo Hawaiʻi
  haw-US           Hawaiian United States                      ʻŌlelo Hawaiʻi ʻAmelika Hui Pū ʻIa
  he               Hebrew                                      עברית
@@ -510,10 +520,10 @@ The available locales are:
  kok              Konkani                                     कोंकणी
  kok-IN           Konkani India                               कोंकणी भारत
  ks               Kashmiri                                    کٲشُر
- ks-Arab          Kashmiri Arabic                             کٲشُر اَربی
- ks-Arab-IN       Kashmiri India Arabic                       کٲشُر ہِندوستان اَربی
+ ks-Arab          Kashmiri Arabic                             کٲشُر عربی
+ ks-Arab-IN       Kashmiri India Arabic                       کٲشُر ہِندوستان عربی
  ks-Deva          Kashmiri Devanagari                         कॉशुर देवनागरी
- ks-Deva-IN       Kashmiri India Devanagari                   कॉशुर भारत देवनागरी
+ ks-Deva-IN       Kashmiri India Devanagari                   कॉशुर हिंदोस्तान देवनागरी
  ksb              Shambala                                    Kishambaa
  ksb-TZ           Shambala Tanzania                           Kishambaa Tanzania
  ksf              Bafia                                       rikpa
@@ -559,6 +569,8 @@ The available locales are:
  mas              Masai                                       Maa
  mas-KE           Masai Kenya                                 Maa Kenya
  mas-TZ           Masai Tanzania                              Maa Tansania
+ mdf              Moksha                                      мокшень кяль
+ mdf-RU           Moksha Russia                               мокшень кяль RU
  mer              Meru                                        Kĩmĩrũ
  mer-KE           Meru Kenya                                  Kĩmĩrũ Kenya
  mfe              Morisyen                                    kreol morisien
@@ -569,8 +581,8 @@ The available locales are:
  mgh-MZ           Makhuwa-Meetto Mozambique                   Makua Umozambiki
  mgo              Metaʼ                                       metaʼ
  mgo-CM           Metaʼ Cameroon                              metaʼ Kamalun
- mi               Māori                                       te reo Māori
- mi-NZ            Māori New Zealand                           te reo Māori Aotearoa
+ mi               Māori                                       Māori
+ mi-NZ            Māori New Zealand                           Māori Aotearoa
  mk               Macedonian                                  македонски
  mk-MK            Macedonian North Macedonia                  македонски Северна Македонија
  ml               Malayalam                                   മലയാളം
@@ -627,6 +639,9 @@ The available locales are:
  nus-SS           Nuer South Sudan                            Thok Nath SS
  nyn              Nyankole                                    Runyankore
  nyn-UG           Nyankole Uganda                             Runyankore Uganda
+ oc               Occitan                                     oc
+ oc-ES            Occitan Spain                               oc ES
+ oc-FR            Occitan France                              oc FR
  om               Oromo                                       Oromoo
  om-ET            Oromo Ethiopia                              Oromoo Itoophiyaa
  om-KE            Oromo Kenya                                 Oromoo Keeniyaa
@@ -642,6 +657,8 @@ The available locales are:
  pa-Guru-IN       Punjabi India Gurmukhi                      ਪੰਜਾਬੀ ਭਾਰਤ ਗੁਰਮੁਖੀ
  pcm              Nigerian Pidgin                             Naijíriá Píjin
  pcm-NG           Nigerian Pidgin Nigeria                     Naijíriá Píjin Naijíria
+ pis              Pijin                                       Pijin
+ pis-SB           Pijin Solomon Islands                       Pijin Solomon Aelan
  pl               Polish                                      polski
  pl-PL            Polish Poland                               polski Polska
  ps               Pashto                                      پښتو
@@ -664,6 +681,8 @@ The available locales are:
  qu-BO            Quechua Bolivia                             Runasimi Bolivia
  qu-EC            Quechua Ecuador                             Runasimi Ecuador
  qu-PE            Quechua Peru                                Runasimi Perú
+ raj              Rajasthani                                  राजस्थानी
+ raj-IN           Rajasthani India                            राजस्थानी भारत
  rm               Romansh                                     rumantsch
  rm-CH            Romansh Switzerland                         rumantsch Svizra
  rn               Rundi                                       Ikirundi
@@ -686,8 +705,8 @@ The available locales are:
  rwk-TZ           Rwa Tanzania                                Kiruwa Tanzania
  sa               Sanskrit                                    संस्कृत भाषा
  sa-IN            Sanskrit India                              संस्कृत भाषा भारतः
- sah              Sakha                                       саха тыла
- sah-RU           Sakha Russia                                саха тыла Арассыыйа
+ sah              Yakut                                       саха тыла
+ sah-RU           Yakut Russia                                саха тыла Арассыыйа
  saq              Samburu                                     Kisampur
  saq-KE           Samburu Kenya                               Kisampur Kenya
  sat              Santali                                     ᱥᱟᱱᱛᱟᱲᱤ
@@ -725,6 +744,8 @@ The available locales are:
  sl-SI            Slovenian Slovenia                          slovenščina Slovenija
  smn              Inari Sami                                  anarâškielâ
  smn-FI           Inari Sami Finland                          anarâškielâ Suomâ
+ sms              Skolt Sami                                  sms
+ sms-FI           Skolt Sami Finland                          sms FI
  sn               Shona                                       chiShona
  sn-ZW            Shona Zimbabwe                              chiShona Zimbabwe
  so               Somali                                      Soomaali
@@ -749,7 +770,7 @@ The available locales are:
  sr-Latn-XK       Serbian Kosovo Latin                        srpski Kosovo latinica
  su               Sundanese                                   Basa Sunda
  su-Latn          Sundanese Latin                             Basa Sunda Latin
- su-Latn-ID       Sundanese Indonesia Latin                   Basa Sunda ID Latin
+ su-Latn-ID       Sundanese Indonesia Latin                   Basa Sunda Indonesia Latin
  sv               Swedish                                     svenska
  sv-AX            Swedish Åland Islands                       svenska Åland
  sv-FI            Swedish Finland                             svenska Finland
@@ -780,6 +801,8 @@ The available locales are:
  tk-TM            Turkmen Turkmenistan                        türkmen dili Türkmenistan
  to               Tongan                                      lea fakatonga
  to-TO            Tongan Tonga                                lea fakatonga Tonga
+ tok              Toki Pona                                   Toki Pona
+ tok-001          Toki Pona world                             Toki Pona 001
  tr               Turkish                                     Türkçe
  tr-CY            Turkish Cyprus                              Türkçe Kıbrıs
  tr-TR            Turkish Turkey                              Türkçe Türkiye
@@ -817,8 +840,8 @@ The available locales are:
  wae-CH           Walser Switzerland                          Walser Schwiz
  wo               Wolof                                       Wolof
  wo-SN            Wolof Senegal                               Wolof Senegaal
- xh               Xhosa                                       isiXhosa
- xh-ZA            Xhosa South Africa                          isiXhosa eMzantsi Afrika
+ xh               Xhosa                                       IsiXhosa
+ xh-ZA            Xhosa South Africa                          IsiXhosa EMzantsi Afrika
  xog              Soga                                        Olusoga
  xog-UG           Soga Uganda                                 Olusoga Yuganda
  yav              Yangben                                     nuasue

@@ -1,3 +1,16 @@
+1.02    2022-10-29  lichtkind
+-------
+    * = fixes
+    * + sub color {} as importable constructor shortcut
+    * ? cleaned some constructor related bits in POD
+    * ! normalize constructor input color_name in 'palette_name:color_name' same as 'color_name'
+
+1.01    2022-10-27  lichtkind
+-------
+    * = fixes
+    * ? mention VACCC and other additional color palettes
+    * ! loading from Graphics::ColorNames::* via 'palette_name:color_name' was actually broken
+    
 
 1.0     2022-10-04  lichtkind
 -------

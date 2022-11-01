@@ -1,0 +1,10 @@
+{
+   "address" : null,
+   "email" : "jenny.rosen@example.com",
+   "name" : null,
+   "phone" : null,
+   "verified_address" : null,
+   "verified_email" : null,
+   "verified_name" : null,
+   "verified_phone" : null
+}

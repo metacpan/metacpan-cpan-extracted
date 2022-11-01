@@ -54,6 +54,7 @@ my %module = (
         'Encode'      => 0,
         'File::Basename' => 0,
         'Time::Piece' => 0,
+        'Archive::Zip::Member' => 0,
     },
     TEST_REQUIRES => {
         'Test::More'   => 0,
@@ -127,7 +128,7 @@ tool you use to manage your installation of Perl, e.g. any of
   cpan  .
   cpanp -i .
 
-Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Consult https://www.cpan.org/modules/INSTALL.html for further instruction.
 Should you wish to install this module manually, the procedure is
 
   perl Makefile.PL

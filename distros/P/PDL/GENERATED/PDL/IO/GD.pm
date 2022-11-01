@@ -80,7 +80,7 @@ ndarray variables. It's deceptively useful, however.
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -107,14 +107,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *write_png = \&PDL::write_png;
 #line 114 "GD.pm"
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -138,14 +138,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *write_png_ex = \&PDL::write_png_ex;
 #line 145 "GD.pm"
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -171,14 +171,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *write_true_png = \&PDL::write_true_png;
 #line 178 "GD.pm"
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -202,7 +202,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *write_true_png_ex = \&PDL::write_true_png_ex;
 #line 209 "GD.pm"
@@ -318,42 +318,42 @@ sub read_true_png
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *_read_true_png = \&PDL::_read_true_png;
 #line 325 "GD.pm"
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *_read_png = \&PDL::_read_png;
 #line 332 "GD.pm"
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *_gd_image_to_pdl_true = \&PDL::_gd_image_to_pdl_true;
 #line 339 "GD.pm"
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *_gd_image_to_pdl = \&PDL::_gd_image_to_pdl;
 #line 346 "GD.pm"
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *_pdl_to_gd_image_true = \&PDL::_pdl_to_gd_image_true;
 #line 353 "GD.pm"
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *_pdl_to_gd_image_lut = \&PDL::_pdl_to_gd_image_lut;
 #line 360 "GD.pm"
@@ -381,77 +381,77 @@ sub read_png_lut
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *_read_png_lut = \&PDL::_read_png_lut;
 #line 388 "GD.pm"
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *_gdImageColorAllocates = \&PDL::_gdImageColorAllocates;
 #line 395 "GD.pm"
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *_gdImageColorAllocateAlphas = \&PDL::_gdImageColorAllocateAlphas;
 #line 402 "GD.pm"
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *_gdImageSetPixels = \&PDL::_gdImageSetPixels;
 #line 409 "GD.pm"
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *_gdImageLines = \&PDL::_gdImageLines;
 #line 416 "GD.pm"
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *_gdImageDashedLines = \&PDL::_gdImageDashedLines;
 #line 423 "GD.pm"
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *_gdImageRectangles = \&PDL::_gdImageRectangles;
 #line 430 "GD.pm"
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *_gdImageFilledRectangles = \&PDL::_gdImageFilledRectangles;
 #line 437 "GD.pm"
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *_gdImageFilledArcs = \&PDL::_gdImageFilledArcs;
 #line 444 "GD.pm"
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *_gdImageArcs = \&PDL::_gdImageArcs;
 #line 451 "GD.pm"
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *_gdImageFilledEllipses = \&PDL::_gdImageFilledEllipses;
 #line 458 "GD.pm"

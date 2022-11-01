@@ -1,5 +1,15 @@
 Revision history for Perl module Getopt::Class
 
+v0.103.2 2022-10-26T13:42:02+0900
+    - Improved method postprocess() for the parsing of the dat or datetime, now using _parse_timestamp() from Module::Generic.
+
+v0.103.1 2022-10-24T15:01:03Z +0900
+    - Small improvement in postprocess() following test report.
+
+v0.103.0 2022-10-23T08:32:02Z +0900
+    - Corrected issue with using 'local' on DateTime 'time_zone'
+    - Stricter code and code improvements
+
 v0.102.7 2022-06-19T08:30:15Z +0900
     - Added method postprocess()
     - Added support for array and scalar objects

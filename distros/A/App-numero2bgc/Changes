@@ -1,0 +1,6 @@
+Revision history for the module "App::numero2bgc" : 
+
+----- 以前のバージョンあり。2020年頃から作っている。colorbackという名前で。
+0.020  2022-10-29 (sat) 一旦機能するものを作成。
+0.020  2022-10-29 (sat) デバグ。STDERRに出すべきものが一部STDOUTになっていた。
+

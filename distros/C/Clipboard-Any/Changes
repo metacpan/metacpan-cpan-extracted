@@ -1,3 +1,9 @@
+0.004   2022-10-25  Released-By: PERLANCAR; Urgency: medium
+
+        - [func add-clipboard-content][ux] Tweak Rinci metadata: get
+          content from stdin if arg not specified.
+
+
 0.003   2022-10-09  Released-By: PERLANCAR; Urgency: medium
 
         - Add functions: add_clipboard_content(),

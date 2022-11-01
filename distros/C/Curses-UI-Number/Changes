@@ -1,3 +1,13 @@
+0.07 2022-10-23T10:40:12+02:00
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SYNOPSIS section in doc.
+ - Makefile.PL fails with no '.' in @INC.
+ - Rename examples to better names.
+ - Rewrite from Encode to Unicode::UTF8.
+ - Update Module::Install to 1.19 version.
+ - Update author github username.
+ - Update author name.
+
 0.06 2015-10-14T07:59:32+02:00
  - Fix -char parameter description in doc.
  - Improve LICENSE AND COPYRIGHT section in doc.

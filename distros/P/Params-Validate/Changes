@@ -1,3 +1,9 @@
+1.31    2022-10-22
+
+- Require Devel::PPPort 3.68+ for compatibility with Perls <= 5.8.5. Patch by
+  Graham Knop. PR #25.
+
+
 1.30    2020-10-18
 
 - Support pure Perl builds via the standard incantation of `perl Build.PL

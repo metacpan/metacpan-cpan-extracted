@@ -21,7 +21,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.008",
   "NAME" => "Geo::TCX",
   "PREREQ_PM" => {
-    "DateTime" => 0,
+    "DateTime" => "1.44",
     "DateTime::Format::ISO8601" => 0,
     "Geo::Calc" => 0,
     "Geo::Gpx" => "1.02",
@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Test::More" => 0
   },
-  "VERSION" => "1.01",
+  "VERSION" => "1.02",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,7 +38,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "DateTime" => 0,
+  "DateTime" => "1.44",
   "DateTime::Format::ISO8601" => 0,
   "Geo::Calc" => 0,
   "Geo::Gpx" => "1.02",

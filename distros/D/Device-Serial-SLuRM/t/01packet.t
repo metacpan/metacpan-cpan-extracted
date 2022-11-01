@@ -6,6 +6,8 @@ use warnings;
 use Test::More;
 use Test::Future::IO;
 
+use constant HAVE_TEST_METRICS_ANY => eval { require Test::Metrics::Any };
+
 use Future::AsyncAwait;
 
 use Device::Serial::SLuRM;
@@ -29,6 +31,13 @@ sub with_crc8
 
    is_deeply( [ await $slurm->recv_packet ], [ 0x10, "ABC" ],
       'One packet received by ->recv_packet' );
+
+   if( HAVE_TEST_METRICS_ANY ) {
+      Test::Metrics::Any::is_metrics( {
+         # SYNC + 2*header + CRC + 3*body + CRC = 8
+         "slurm_serial_bytes dir:rx" => 8,
+      }, '->recv_packet increments byte-counter metric' );
+   }
 
    $controller->check_and_clear( '->recv_packet' );
 
@@ -64,6 +73,13 @@ sub with_crc8
    $controller->expect_syswrite( "DummyFH", "\x55" . with_crc8( with_crc8( "\x18\x03" ) . "DEF" ) );
 
    await $slurm->send_packet( 0x18, "DEF" );
+
+   if( HAVE_TEST_METRICS_ANY ) {
+      Test::Metrics::Any::is_metrics( {
+         # SYNC + 2*header + CRC + 3*body + CRC = 8
+         "slurm_serial_bytes dir:tx" => 8,
+      }, '->send_packet increments byte-counter metric' );
+   }
 
    $controller->check_and_clear( '->send_packet' );
 }

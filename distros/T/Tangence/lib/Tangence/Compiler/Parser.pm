@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.57;
 
-package Tangence::Compiler::Parser 0.29;
+package Tangence::Compiler::Parser 0.30;
 class Tangence::Compiler::Parser :isa(Parser::MGC);
 
 use Syntax::Keyword::Dynamically;
@@ -69,7 +69,7 @@ The contents of the struct block will be a list of C<field> declarations.
 
 =cut
 
-has $_package;
+field $_package;
 
 # Parser::MGC version 0.20 adds this method. Before then, this workaround is
 # known to be safe

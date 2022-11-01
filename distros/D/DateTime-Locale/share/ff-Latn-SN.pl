@@ -137,7 +137,7 @@
   glibc_datetime_format => "%a %b %e %H:%M:%S %Y",
   glibc_time_12_format => "%I:%M:%S %p",
   glibc_time_format => "%H:%M:%S",
-  language => "Fulah",
+  language => "Fula",
   month_format_abbreviated => [
     "sii",
     "col",
@@ -222,7 +222,7 @@
     "jolal",
     "bowte",
   ],
-  name => "Fulah Senegal Latin",
+  name => "Fula Senegal Latin",
   native_language => "Pulaar",
   native_name => "Pulaar Senegaal Latn",
   native_script => "Latn",
@@ -271,5 +271,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 41,
+  version => 42,
 }

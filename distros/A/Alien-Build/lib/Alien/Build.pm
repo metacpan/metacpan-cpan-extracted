@@ -12,7 +12,7 @@ use Config ();
 use Alien::Build::Log;
 
 # ABSTRACT: Build external dependencies for use in CPAN
-our $VERSION = '2.71'; # VERSION
+our $VERSION = '2.72'; # VERSION
 
 
 sub _path { goto \&Path::Tiny::path }
@@ -614,7 +614,6 @@ sub fetch
 
   my $secure = 0;
 
-  $DB::single = 1;
   if(defined $url && ($url =~ /^(https|file):/ || $url !~ /:/))
   {
     # considered secure when either https or a local file
@@ -1401,7 +1400,7 @@ Alien::Build - Build external dependencies for use in CPAN
 
 =head1 VERSION
 
-version 2.71
+version 2.72
 
 =head1 SYNOPSIS
 

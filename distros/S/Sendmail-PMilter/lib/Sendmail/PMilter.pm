@@ -41,11 +41,10 @@ package Sendmail::PMilter;
 use 5.014;	# Don't use 5.016 yet.  That would enable feature 'unicode_strings', and we
 		# probably aren't quite ready for that.  We're counting *characters* passed
 		# between us and Sendmail, and Sendmail thinks that they're *bytes*.
-use parent 'Exporter';
 
+use parent 'Exporter';
 use strict;
 use warnings;
-
 use Carp;
 use Errno;
 use IO::Select;
@@ -54,7 +53,7 @@ use Socket;
 use Symbol;
 use UNIVERSAL;
 
-our $VERSION = '1.21';
+our $VERSION = '1.23';
 $VERSION = eval $VERSION;
 
 our $DEBUG = 0;
@@ -85,7 +84,7 @@ pure Perl code to filter and modify mail during an SMTP connection.
 Over the years, the protocol which governs the communication between
 qSendmail and its milters has passed through a number of revisions.
 
-This documentation is for Sendmail::PMilter versions 1.21 and later,
+This documentation is for Sendmail::PMilter versions 1.20 and later,
 which now supports Milter Protocol Version 6.  This is a substantial
 upgrade from earlier versions, which at best supported up to Milter
 Protocol Version 2 - this was first seen in Sendmail version 8.14.0
@@ -125,6 +124,7 @@ use constant SMFIS_REJECT	=> 101;
 use constant SMFIS_DISCARD	=> 102;
 use constant SMFIS_ACCEPT	=> 103;
 use constant SMFIS_TEMPFAIL	=> 104;
+use constant SMFIS_MSG_LOOP	=> 105;
 use constant SMFIS_ALL_OPTS	=> 110;
 
 # Milter progessing 'places' (see mfapi.h, values are the same).
@@ -181,6 +181,14 @@ use constant SMFIP_HDR_LEADSPC	=> 0x00100000;	# header value leading space
 use constant SMFIP_MDS_256K	=> 0x10000000;	# MILTER_MAX_DATA_SIZE=256K
 use constant SMFIP_MDS_1M	=> 0x20000000;	# MILTER_MAX_DATA_SIZE=1M
 ######################################################################
+# If no negotiate callback is registered, these are the defaults.  Basically
+# everything is enabled except SMFIP_RCPT_REJ and MILTER_MAX_DATA_SIZE_*
+# Sendmail and Postfix behave differently:
+#   Postfix does not use the constants SMFIP_MDS_256K and SMFIP_MDS_1M.
+use constant SMFIP_ALL_NO_CB	=> (SMFIP_NOCONNECT|SMFIP_NOHELO|SMFIP_NOMAIL|SMFIP_NORCPT|SMFIP_NOBODY|SMFIP_NOHDRS|SMFIP_NOEOH|SMFIP_NOUNKNOWN|SMFIP_NODATA|SMFIP_SKIP|SMFIP_HDR_LEADSPC);
+use constant SMFIP_ALL_NO_REPLY	=> (SMFIP_NR_HDR|SMFIP_NR_CONN|SMFIP_NR_HELO|SMFIP_NR_MAIL|SMFIP_NR_RCPT|SMFIP_NR_DATA|SMFIP_NR_UNKN|SMFIP_NR_EOH|SMFIP_NR_BODY);
+use constant SMFIP_DEFAULTS	=> ~(SMFIP_ALL_NO_CB|SMFIP_ALL_NO_REPLY);
+######################################################################
 # Taken from .../sendmail-8.15.2/include/libmilter/mfapi.h, and
 # reformatted a little.
 ######################################################################
@@ -225,76 +233,38 @@ use constant MAXREPLIES		=> 32;
 
 ##### Symbols exported to the caller
 
-my @smflags = qw(
-	SMFIP_NOCONNECT
-	SMFIP_NOHELO
-	SMFIP_NOMAIL
-	SMFIP_NORCPT
-	SMFIP_NOBODY
-	SMFIP_NOHDRS
-	SMFIP_NOEOH
-	SMFIP_NOUNKNOWN
-	SMFIP_NODATA
-	SMFIP_RCPT_REJ
-	SMFIP_SKIP
-	SMFIP_NR_CONN
-	SMFIP_NR_HELO
-	SMFIP_NR_MAIL
-	SMFIP_NR_RCPT
-	SMFIP_NR_DATA
-	SMFIP_NR_HDR
-	SMFIP_NR_EOH
-	SMFIP_NR_BODY
-	SMFIP_NR_UNKN
-	SMFIP_HDR_LEADSPC
-	SMFIP_MDS_256K
-	SMFIP_MDS_1M
+my $smflags =
+'   SMFIP_DEFAULTS SMFIP_NOCONNECT SMFIP_NOHELO SMFIP_NOMAIL SMFIP_NORCPT SMFIP_NOBODY SMFIP_NOHDRS SMFIP_NOEOH SMFIP_NOUNKNOWN SMFIP_NODATA SMFIP_RCPT_REJ SMFIP_SKIP
+    SMFIP_NR_CONN SMFIP_NR_HELO SMFIP_NR_MAIL SMFIP_NR_RCPT SMFIP_NR_DATA SMFIP_NR_HDR SMFIP_NR_EOH SMFIP_NR_BODY SMFIP_NR_UNKN SMFIP_HDR_LEADSPC SMFIP_MDS_256K SMFIP_MDS_1M
+    SMFIM_CONNECT SMFIM_HELO SMFIM_ENVFROM SMFIM_ENVRCPT SMFIM_DATA SMFIM_EOM SMFIM_EOH
+    SMFIS_CONTINUE SMFIS_REJECT SMFIS_DISCARD SMFIS_ACCEPT SMFIS_TEMPFAIL SMFIS_MSG_LOOP SMFIS_ALL_OPTS
+    SMFIF_NONE SMFIF_ADDHDRS SMFIF_CHGBODY SMFIF_ADDRCPT SMFIF_DELRCPT SMFIF_CHGHDRS SMFIF_QUARANTINE SMFIF_CHGFROM SMFIF_ADDRCPT_PAR SMFIF_SETSYMLIST
+    SMFI_V2_ACTS SMFI_V6_ACTS SMFI_CURR_ACTS SMFI_V2_PROT SMFI_V6_PROT SMFI_CURR_PROT
+    MAXREPLYLEN MAXREPLIES
+';
+my @smflags = eval "qw/ $smflags /;";
+my @dispatchers =  qw/ ithread_dispatcher postfork_dispatcher prefork_dispatcher sequential_dispatcher /;
+my @callback_names = qw/ negotiate connect helo envfrom envrcpt data header eoh body eom close abort unknown /;
+my %DEFAULT_CALLBACKS = map { $_ => $_.'_callback' } @callback_names;
+# Don't export anything by default.
+our @EXPORT = ();
+# Everything else is OK.  I have tried.
+our @EXPORT_OK = qw/
+    SMFIP_DEFAULTS SMFIP_NOCONNECT SMFIP_NOHELO SMFIP_NOMAIL SMFIP_NORCPT SMFIP_NOBODY SMFIP_NOHDRS SMFIP_NOEOH SMFIP_NOUNKNOWN SMFIP_NODATA SMFIP_RCPT_REJ SMFIP_SKIP
+    SMFIP_NR_CONN SMFIP_NR_HELO SMFIP_NR_MAIL SMFIP_NR_RCPT SMFIP_NR_DATA SMFIP_NR_HDR SMFIP_NR_EOH SMFIP_NR_BODY SMFIP_NR_UNKN SMFIP_HDR_LEADSPC SMFIP_MDS_256K SMFIP_MDS_1M
+    SMFIM_CONNECT SMFIM_HELO SMFIM_ENVFROM SMFIM_ENVRCPT SMFIM_DATA SMFIM_EOM SMFIM_EOH
+    SMFIS_CONTINUE SMFIS_REJECT SMFIS_DISCARD SMFIS_ACCEPT SMFIS_TEMPFAIL SMFIS_MSG_LOOP SMFIS_ALL_OPTS
+    SMFIF_NONE SMFIF_ADDHDRS SMFIF_CHGBODY SMFIF_ADDRCPT SMFIF_DELRCPT SMFIF_CHGHDRS SMFIF_QUARANTINE SMFIF_CHGFROM SMFIF_ADDRCPT_PAR SMFIF_SETSYMLIST
+    SMFI_V2_ACTS SMFI_V6_ACTS SMFI_CURR_ACTS SMFI_V2_PROT SMFI_V6_PROT SMFI_CURR_PROT
+    MAXREPLYLEN MAXREPLIES
+    ithread_dispatcher postfork_dispatcher prefork_dispatcher sequential_dispatcher
+    negotiate_callback connect_callback helo_callback envfrom_callback envrcpt_callback data_callback header_callback eoh_callback body_callback eom_callback close_callback abort_callback unknown_callback
+/;
 
-	SMFIM_CONNECT
-	SMFIM_HELO
-	SMFIM_ENVFROM
-	SMFIM_ENVRCPT
-	SMFIM_DATA
-	SMFIM_EOM
-	SMFIM_EOH
+# Three export tags for flags, dispatchers and callbacks.
+our %EXPORT_TAGS = ( all => [ @smflags ], dispatchers => [ @dispatchers ], callbacks => [ (values %DEFAULT_CALLBACKS) ] );
 
-	SMFIS_CONTINUE
-	SMFIS_REJECT
-	SMFIS_DISCARD
-	SMFIS_ACCEPT
-	SMFIS_TEMPFAIL
-	SMFIS_ALL_OPTS
-
-	SMFIF_NONE
-	SMFIF_ADDHDRS
-	SMFIF_CHGBODY
-	SMFIF_ADDRCPT
-	SMFIF_DELRCPT
-	SMFIF_CHGHDRS
-	SMFIF_QUARANTINE
-	SMFIF_CHGFROM
-	SMFIF_ADDRCPT_PAR
-	SMFIF_SETSYMLIST
-
-	SMFI_V2_ACTS
-	SMFI_V6_ACTS
-	SMFI_CURR_ACTS
-
-	SMFI_V2_PROT
-	SMFI_V6_PROT
-	SMFI_CURR_PROT
-
-	MAXREPLYLEN
-	MAXREPLIES
-);
-our @EXPORT_OK = (@smflags, qw(
-	%DEFAULT_CALLBACKS
-));
-our %EXPORT_TAGS = ( all => [ @smflags ] );
 our $enable_chgfrom = 0;
-
-my @callback_names = qw(negotiate connect helo envfrom envrcpt data header eoh body eom close abort unknown);
-our %DEFAULT_CALLBACKS = map { $_ => $_.'_callback' } @callback_names;
 
 ##### Methods
 
@@ -501,7 +471,7 @@ should be specified.
 =item inet6:PORT[@HOST]
 
 An IPv6 socket, bound to address HOST (default INADDR_ANY), on port PORT.  
-This requires IPv6 support and the Perl INET6 package to be installed.
+This requires IPv6 support and the Perl IO::Socket::IP package to be installed.
 It is not recommended to open milter engines to the world, so the @HOST part
 should be specified.
 
@@ -565,14 +535,14 @@ sub setconn ($$) {
 			LocalAddr => $3
 		);
 	} elsif ($1 eq 'inet6') {
-		require IO::Socket::INET6;
+		require IO::Socket::IP;
 
-		$socket = IO::Socket::INET6->new(
+		$socket = IO::Socket::IP->new(
 			Proto => 'tcp',
 			ReuseAddr => 1,
 			Listen => $backlog,
-			LocalPort => $2,
-			LocalAddr => $3
+			LocalService => $2,
+			LocalHost => $3
 		);
 	} else {
 		croak "setconn: $conn: unknown protocol";
@@ -1233,6 +1203,7 @@ or referenced as part of the C<Sendmail::PMilter::> package.
   SMFIS_DISCARD - accept, but discard the message
   SMFIS_ACCEPT - accept the message without further processing
   SMFIS_TEMPFAIL - reject the message with a 4xx error
+  SMFIS_MSG_LOOP - send a never-ending response to the HELO command
 
 In the C<envrcpt> callback, SMFIS_REJECT and SMFIS_TEMPFAIL will reject
 only the current recipient.  Message processing will continue for any

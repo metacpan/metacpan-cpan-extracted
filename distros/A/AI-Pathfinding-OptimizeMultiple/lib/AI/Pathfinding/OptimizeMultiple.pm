@@ -1,5 +1,5 @@
 package AI::Pathfinding::OptimizeMultiple;
-$AI::Pathfinding::OptimizeMultiple::VERSION = '0.0.16';
+$AI::Pathfinding::OptimizeMultiple::VERSION = '0.0.17';
 use strict;
 use warnings;
 
@@ -26,10 +26,10 @@ has _selected_scans =>
 has _status => ( isa => 'Str',           is => 'rw' );
 has _quotas => ( isa => 'ArrayRef[Int]', is => 'ro', init_arg => 'quotas' );
 has _total_boards_solved => ( isa => 'Int', is => 'rw' );
-has _total_iters         => ( isa => 'Int', is => 'rw' );
-has _trace_cb            =>
+has _total_iters         => ( is  => 'rw' );
+has _trace_cb =>
     ( isa => 'Maybe[CodeRef]', is => 'ro', init_arg => 'trace_cb' );
-has _scans_meta_data  => ( isa => 'ArrayRef', is => 'ro', init_arg => 'scans' );
+has _scans_meta_data => ( isa => 'ArrayRef', is => 'ro', init_arg => 'scans' );
 has _scans_iters_pdls =>
     ( isa => 'HashRef', is => 'rw', init_arg => 'scans_iters_pdls' );
 has _stats_factors => (
@@ -259,8 +259,7 @@ sub _get_selected_scan
 
     my $iter_state =
         AI::Pathfinding::OptimizeMultiple::IterState->new(
-        $self->_get_iter_state_params(),
-        );
+        $self->_get_iter_state_params(), );
 
     $iter_state->attach_to($self);
 
@@ -660,7 +659,7 @@ set of initial conditions (for better average performance).
 
 =head1 VERSION
 
-version 0.0.16
+version 0.0.17
 
 =head1 SYNOPSIS
 
@@ -903,7 +902,7 @@ Shlomi Fish <shlomif@cpan.org>
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/ai-pathfinding-optimizemultiple/issues>
+L<https://github.com/shlomif/fc-solve/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

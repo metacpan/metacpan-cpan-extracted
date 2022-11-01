@@ -1,5 +1,8 @@
 Revision history for WebService-YTSearch
 
+0.0304 2022-10-26 18:32:31
+    - Avoid implicit imports.
+
 0.0303 2022-06-09 21:12:12
     - Improve documentation.
 

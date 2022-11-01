@@ -25,6 +25,7 @@ lib/JSON/Schema/Modern/Vocabulary/MetaData.pm
 lib/JSON/Schema/Modern/Vocabulary/Unevaluated.pm
 lib/JSON/Schema/Modern/Vocabulary/Validation.pm
 script/json-schema-eval
+share/LICENSE
 share/draft2019-09/meta/applicator.json
 share/draft2019-09/meta/content.json
 share/draft2019-09/meta/core.json

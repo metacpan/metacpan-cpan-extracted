@@ -12,7 +12,7 @@ use Alien::Build::Plugin::Download::Negotiate;
 use Alien::Build::Plugin::Extract::Negotiate;
 
 # ABSTRACT: Alien::Build plugin to download from GitHub
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 
 has github_user => sub { croak("github_user is required") };
@@ -54,17 +54,20 @@ sub init
     version => $self->version,
   );
 
-  if($self->asset && $self->asset_format)
+  if($self->asset_format ne 'none')
   {
-    $meta->apply_plugin('Extract',
-      format  => $self->asset_format,
-    );
-  }
-  else
-  {
-    $meta->apply_plugin('Extract',
-      format  => 'tar.gz',
-    );
+    if($self->asset && $self->asset_format)
+    {
+      $meta->apply_plugin('Extract',
+        format  => $self->asset_format,
+      )
+    }
+    else
+    {
+      $meta->apply_plugin('Extract',
+        format  => 'tar.gz',
+      );
+    }
   }
 
   my %gh_fetch_options;
@@ -117,7 +120,7 @@ sub init
         }
         elsif($res->{path})
         {
-          $rel = decode_json path($res->{path})->slurp;
+          $rel = decode_json path($res->{path})->slurp_raw;
         }
         else
         {
@@ -235,7 +238,7 @@ Alien::Build::Plugin::Download::GitHub - Alien::Build plugin to download from Gi
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 
@@ -342,6 +345,11 @@ Regular expression which the asset name should match.  The default is C<qr/\.tar
 
 The format of the asset.  This is passed to L<Alien::Build::Plugin::Extract::Negotiate>
 so any format supported by that is valid.
+
+[version 0.10]
+
+If this is set to C<none> then no extractor will be added.  This allows for you to write
+your own extractor code, or use a non-standard one.
 
 =head2 asset_convert_version
 

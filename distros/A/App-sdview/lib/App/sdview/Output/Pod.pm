@@ -1,24 +1,25 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
 
-use Object::Pad;
+use Object::Pad 0.66;
 
-package App::sdview::Output::Pod 0.07;
+package App::sdview::Output::Pod 0.08;
 class App::sdview::Output::Pod
    does App::sdview::Output
    :strict(params);
 
 use constant format => "POD";
 
-has $_printed_pod;
+field $_printed_pod;
 
 method output_head1 ( $para ) { $self->_output_head( "=head1", $para ); }
 method output_head2 ( $para ) { $self->_output_head( "=head2", $para ); }
 method output_head3 ( $para ) { $self->_output_head( "=head3", $para ); }
+method output_head4 ( $para ) { $self->_output_head( "=head4", $para ); }
 
 method _output_head ( $leader, $para )
 {

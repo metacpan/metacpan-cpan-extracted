@@ -116,6 +116,13 @@ sub new {
     $self;
 }
 
+sub SetCallBack {    
+    my ( $self, $code) = @_;
+    return unless ref $code eq 'CODE';
+    $self->{'callback'} = $code;
+    $self->{ $_ }->SetCallBack( $code ) for qw /radius radius_damp radius_damp_acc frequency freq_dez freq_damp offset/;
+}
+
 sub init {
     my ( $self ) = @_;
     $self->set_data ({ on => $self->{'initially_on'}, radius => 1, frequency => 1, freq_factor => 1, offset => 0,
@@ -143,14 +150,6 @@ sub get_data {
         radius_damp_acc_type  => $self->{'radius_damp_acc_type'}->GetValue,
     }
 }
-
-sub SetCallBack {    
-    my ( $self, $code) = @_;
-    return unless ref $code eq 'CODE';
-    $self->{'callback'} = $code;
-    $self->{ $_ }->SetCallBack( $code ) for qw /radius radius_damp radius_damp_acc frequency freq_dez freq_damp offset/;
-}
-
 
 sub set_data {
     my ( $self, $data ) = @_;

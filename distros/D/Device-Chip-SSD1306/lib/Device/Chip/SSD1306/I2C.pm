@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.57;
 
-package Device::Chip::SSD1306::I2C 0.11;
+package Device::Chip::SSD1306::I2C 0.12;
 class Device::Chip::SSD1306::I2C
    :isa(Device::Chip::SSD1306);
 

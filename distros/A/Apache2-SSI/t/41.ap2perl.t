@@ -1,10 +1,17 @@
 #!/usr/local/bin/perl
 BEGIN
 {
+    use strict;
+    use warnings;
     use lib './lib';
+    use vars qw( $DEBUG );
     use Test::More qw( no_plan );
     require( "./t/functions.pl" ) || BAIL_OUT( "Unable to find library \"functions.pl\"." );
+    our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
+
+use strict;
+use warnings;
 
 my $tests = 
 [

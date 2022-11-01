@@ -1131,6 +1131,10 @@ inkwell, ultimategray, buttercream, desertmist, willow
 <img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/function/color/table/color_table3.png" alt="color table 4">
 </p>
 
+=head1 SEE ALSO
+
+L<Graphics::ColorNamesLite::All>
+
 =head1 COPYRIGHT & LICENSE
 
 Copyright 2022 Herbert Breunung.

@@ -32,7 +32,6 @@
       },
       "develop" : {
          "requires" : {
-            "Clone" : "0",
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
@@ -52,8 +51,9 @@
          },
          "requires" : {
             "Carp" : "0",
+            "Clone" : "0.46",
             "Compress::Raw::Bzip2" : "0",
-            "Compress::Raw::Zlib" : "0",
+            "Compress::Raw::Zlib" : "2.062",
             "Encode" : "3.01",
             "Encode::Locale" : "1",
             "Exporter" : "5.57",
@@ -63,8 +63,6 @@
             "IO::Compress::Deflate" : "0",
             "IO::Compress::Gzip" : "0",
             "IO::HTML" : "0",
-            "IO::Uncompress::Bunzip2" : "2.021",
-            "IO::Uncompress::Gunzip" : "0",
             "IO::Uncompress::Inflate" : "0",
             "IO::Uncompress::RawInflate" : "0",
             "LWP::MediaTypes" : "6",
@@ -75,9 +73,6 @@
             "perl" : "5.008001",
             "strict" : "0",
             "warnings" : "0"
-         },
-         "suggests" : {
-            "Clone" : "0"
          }
       },
       "test" : {
@@ -116,7 +111,7 @@
       "x_IRC" : "irc://irc.perl.org/#lwp",
       "x_MailingList" : "mailto:libwww@perl.org"
    },
-   "version" : "6.42",
+   "version" : "6.44",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.036000"
@@ -481,7 +476,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.38.0",
+                  "git_version" : "2.38.1",
                   "repo_root" : "."
                }
             },
@@ -492,7 +487,7 @@
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.38.0",
+                  "git_version" : "2.38.1",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "name",
@@ -601,7 +596,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.38.0",
+                  "git_version" : "2.38.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -618,12 +613,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v6.42",
+                  "tag" : "v6.44",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.38.0",
+                  "git_version" : "2.38.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -674,7 +669,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.38.0",
+                  "git_version" : "2.38.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -694,29 +689,12 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.38.0",
+                  "git_version" : "2.38.1",
                   "repo_root" : "."
                }
             },
             "name" : "@Author::OALDERS/Git::Push",
             "version" : "2.048"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::Prereqs::Soften",
-            "config" : {
-               "Dist::Zilla::Plugin::Prereqs::Soften" : {
-                  "copy_to" : [
-                     "develop.requires"
-                  ],
-                  "modules" : [
-                     "Clone"
-                  ],
-                  "modules_from_features" : null,
-                  "to_relationship" : "suggests"
-               }
-            },
-            "name" : "Prereqs::Soften",
-            "version" : "0.006003"
          },
          {
             "class" : "Dist::Zilla::Plugin::Prereqs::Soften",
@@ -862,6 +840,7 @@
       "Hans-H. Froehlich <hfroehlich@co-de-co.de>",
       "Ian Kilgore <iank@cpan.org>",
       "Jacob J <waif@chaos2.org>",
+      "Jakub Skory <jakub.skory@atos.net>",
       "Jakub Wilk <jwilk@jwilk.net>",
       "James Raspass <jraspass@gmail.com>",
       "jefflee <shaohua@gmail.com>",

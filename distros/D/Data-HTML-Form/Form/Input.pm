@@ -13,7 +13,7 @@ Readonly::Array our @TYPES => qw(button checkbox color date datetime-local
 	email file hidden image month number password radio range reset search
 	submit tel text time url week);
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 has checked => (
 	is => 'ro',

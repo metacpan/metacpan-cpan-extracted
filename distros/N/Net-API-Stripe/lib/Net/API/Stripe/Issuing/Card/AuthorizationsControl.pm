@@ -2,7 +2,7 @@
 ## Stripe API - ~/lib/Net/API/Stripe/Issuing/Card/AuthorizationsControl.pm
 ## Version v0.100.0
 ## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2020/05/15
 ## 
@@ -11,9 +11,14 @@ package Net::API::Stripe::Issuing::Card::AuthorizationsControl;
 BEGIN
 {
     use strict;
+    use warnings;
     use parent qw( Net::API::Stripe::Generic );
+    use vars qw( $VERSION );
     our( $VERSION ) = 'v0.100.0';
 };
+
+use strict;
+use warnings;
 
 sub allowed_categories { return( shift->_set_get_array( 'allowed_categories', @_ ) ); }
 
@@ -46,16 +51,16 @@ Net::API::Stripe::Issuing::Card::AuthorizationsControl - An interface to Stripe 
         blocked_categories => [],
         spending_limits => 
         [
-			{
-			amount => 2000000,
-			categories => '',
-			interval => 'monthly',
-			},
-			{
-			amount => 200000,
-			categories => '',
-			interval => 'weekly',
-			},
+            {
+            amount => 2000000,
+            categories => '',
+            interval => 'monthly',
+            },
+            {
+            amount => 200000,
+            categories => '',
+            interval => 'weekly',
+            },
         ],
         spending_limits_currency => 'jpy',
     });
@@ -70,76 +75,68 @@ This is instantiated by method B<authorization_controls> in module L<Net::API::S
 
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>( %ARG )
+=head2 new( %ARG )
 
 Creates a new L<Net::API::Stripe::Issuing::Card::AuthorizationsControl> object.
 
-=back
-
 =head1 METHODS
 
-=over 4
-
-=item B<allowed_categories> array
+=head2 allowed_categories array
 
 Array of strings containing categories of authorizations permitted on this card.
 
-=item B<blocked_categories> array
+=head2 blocked_categories array
 
 Array of strings containing categories of authorizations to always decline on this card.
 
-=item B<spending_limits> array of hashes
+=head2 spending_limits array of hashes
 
 Limit the spending with rules based on time intervals and categories.
 
 This is an array of L<Net::API::Stripe::Issuing::Card::AuthorizationsControl::SpendingLimit> objects.
 
-=item B<spending_limits_currency> currency
+=head2 spending_limits_currency currency
 
 Currency for the amounts within spending_limits.
 
-=back
-
 =head1 API SAMPLE
 
-	{
-	  "id": "ich_fake123456789",
-	  "object": "issuing.cardholder",
-	  "authorization_controls": {
-		"allowed_categories": [],
-		"blocked_categories": [],
-		"spending_limits": [],
-		"spending_limits_currency": null
-	  },
-	  "billing": {
-		"address": {
-		  "city": "Beverly Hills",
-		  "country": "US",
-		  "line1": "123 Fake St",
-		  "line2": "Apt 3",
-		  "postal_code": "90210",
-		  "state": "CA"
-		},
-		"name": "Jenny Rosen"
-	  },
-	  "company": null,
-	  "created": 1540111055,
-	  "email": "jenny@example.com",
-	  "individual": null,
-	  "is_default": false,
-	  "livemode": false,
-	  "metadata": {},
-	  "name": "Jenny Rosen",
-	  "phone_number": "+18008675309",
-	  "requirements": {
-		"disabled_reason": null,
-		"past_due": []
-	  },
-	  "status": "active",
-	  "type": "individual"
-	}
+    {
+      "id": "ich_fake123456789",
+      "object": "issuing.cardholder",
+      "authorization_controls": {
+        "allowed_categories": [],
+        "blocked_categories": [],
+        "spending_limits": [],
+        "spending_limits_currency": null
+      },
+      "billing": {
+        "address": {
+          "city": "Beverly Hills",
+          "country": "US",
+          "line1": "123 Fake St",
+          "line2": "Apt 3",
+          "postal_code": "90210",
+          "state": "CA"
+        },
+        "name": "Jenny Rosen"
+      },
+      "company": null,
+      "created": 1540111055,
+      "email": "jenny@example.com",
+      "individual": null,
+      "is_default": false,
+      "livemode": false,
+      "metadata": {},
+      "name": "Jenny Rosen",
+      "phone_number": "+18008675309",
+      "requirements": {
+        "disabled_reason": null,
+        "past_due": []
+      },
+      "status": "active",
+      "type": "individual"
+    }
 
 =head1 HISTORY
 

@@ -7,7 +7,6 @@ MANIFEST
 META.json
 META.yml
 Makefile.PL
-Makefile.bak
 README.md
 dist.ini
 lib/Geo/TCX.pm
@@ -23,3 +22,4 @@ t/03_courses.t
 t/2014-08-11-10-25-15.tcx
 t/2022-08-21-00-34-06.tcx
 t/2022-08-21-00-34-06_rwg_course.tcx
+t/set.t

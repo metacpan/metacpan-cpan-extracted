@@ -1,5 +1,7 @@
 Revision history for Test-File-Cmp
 
+0.03    2022/10/27
+        Adapted META.yml
 0.02    2022/03/07
         Read into string, then split instead of s///.
 0.01    2022/03/06

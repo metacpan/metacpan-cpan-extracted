@@ -6,4 +6,4 @@ use Test::More 'tests' => 2;
 use Test::NoWarnings;
 
 # Test.
-is($Tags::Utils::Preserve::VERSION, 0.11, 'Version.');
+is($Tags::Utils::Preserve::VERSION, 0.12, 'Version.');

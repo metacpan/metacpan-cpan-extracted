@@ -17,10 +17,14 @@ BEGIN
     use warnings;
     use warnings::register;
     use parent qw( Module::Generic );
+    use vars qw( $VERSION );
     use Regexp::Common qw( Apache2 );
     use PPI;
     our $VERSION = 'v0.1.0';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -49,19 +53,16 @@ sub parse
     }
     pos( $data ) = 0;
     my $prefix = $self->legacy ? 'Legacy' : $self->trunk ? 'Trunk' : '';
-    $self->message( 3, "Using prefix '$prefix'." );
     my @callinfo = caller(0);
     $opts->{top} = 0;
     $opts->{top} = 1 if( $callinfo[0] ne ref( $self ) || ( $callinfo[0] eq ref( $self ) && substr( (caller(1))[3], rindex( (caller(1))[3], ':' ) + 1 ) ne 'parse' ) );
-    $self->message( 3, "Parsing expression '$data'. Called from file $callinfo[1] at line $callinfo[2] and from sub ", (caller(1))[3], ". top is set to '$opts->{top}'" );
-    ## This is used to avoid looping when an expression drills down its substring by calling parse again
+    # This is used to avoid looping when an expression drills down its substring by calling parse again
     my $skip = {};
     if( ref( $opts->{skip} ) eq 'ARRAY' &&
         scalar( @{$opts->{skip}} ) )
     {
         @$skip{ @{$opts->{skip}} } = ( 1 ) x scalar( @{$opts->{skip}} )
     }
-    $self->message( 3, "Skip contains: ", sub{ $self->dump( $skip ) });
     my $p = {};
     $p->{is_negative} = 0;
     my $elems = [];
@@ -74,11 +75,8 @@ sub parse
     PARSE:
     {
         my $pos = pos( $data );
-        $self->message( 3, "Nothing more to parse at pos '$pos'. End of data." ), last PARSE if( pos( $data ) == length( $data ) );
-        $self->message( 3, "Parsing ", length( $data ), " bytes of data starting at '$pos' in string '$data'" );
         if( $data =~ m/\G\r?\n$/ )
         {
-            $self->message( 3, "End of string new line detected, skipping." );
             redo PARSE;
         }
         elsif( $self->message( 3, "Trying with legacy variable." ) && 
@@ -86,9 +84,7 @@ sub parse
                length( $+{variable} ) )
         {
             my $re = { %+ };
-            $self->message( 3, "Got here in legacy variable." );
             $self->whereami( \$data, pos( $data ) );
-            $self->message( 3, "variable => capture groups for $+{variable} are: ", sub{ $self->dump( $re ) });
             my $def =
             {
             elements => [],
@@ -132,9 +128,7 @@ sub parse
                length( $+{cond} ) )
         {
             my $re = { %+ };
-            $self->message( 3, "Got here in condition." );
             $self->whereami( \$data, pos( $data ) );
-            $self->message( 3, "condition => capture groups for '$+{cond}' in data '$data' are: ", sub{ $self->dump( $re ) });
             my $def =
             {
             elements => [],
@@ -148,7 +142,7 @@ sub parse
             {
                 $def->{subtype} = 'variable';
                 $def->{variable_def} = [];
-                ## Avoid looping
+                # Avoid looping
                 unless( $re->{cond_variable} eq $data )
                 {
                     my $this = $self->parse( $re->{cond_variable} );
@@ -200,7 +194,7 @@ sub parse
                 $def->{elements} = $this->{elements};
                 $def->{comp_def} = $this->{elements};
             }
-            ## e.g. when the condition is just true or false
+            # e.g. when the condition is just true or false
             elsif( length( $re->{cond_true} ) || length( $re->{cond_false} ) )
             {
                 $def->{subtype} = 'boolean';
@@ -221,9 +215,7 @@ sub parse
                length( $+{stringcomp} ) )
         {
             my $re = { %+ };
-            $self->message( 3, "Got here in string comp." );
             $self->whereami( \$data, pos( $data ) );
-            $self->message( 3, "stringcomp => capture groups for $+{stringcomp} are: ", sub{ $self->dump( $re ) });
             my $def =
             {
             elements    => [],
@@ -256,9 +248,7 @@ sub parse
                length( $+{integercomp} ) )
         {
             my $re = { %+ };
-            $self->message( 3, "Got here in integer comp." );
             $self->whereami( \$data, pos( $data ) );
-            $self->message( 3, "integercomp => capture groups for $+{integercomp} are: ", sub{ $self->dump( $re ) });
             my $def =
             {
             elements    => [],
@@ -300,10 +290,8 @@ sub parse
 #         {
             my $re = { %+ };
             my $cur_pos = pos( $data );
-            $self->message( 3, "Got here in comp." );
             $self->whereami( \$data, $cur_pos );
-            $self->message( 3, "comparison => capture groups for $+{comp} are: ", sub{ $self->dump( $re ) });
-            ## next PARSE unless( length( $re->{comp} ) );
+            # next PARSE unless( length( $re->{comp} ) );
             my $def =
             {
             elements => [],
@@ -315,7 +303,6 @@ sub parse
             my $chunk = $re->{comp};
             if( length( $re->{comp_unary} ) )
             {
-                $self->message( 3, "Found unary operation." );
                 $def->{subtype} = 'unary';
                 $def->{op} = $re->{comp_unaryop};
                 $def->{word} = $re->{comp_word};
@@ -329,7 +316,6 @@ sub parse
             }
             elsif( length( $re->{comp_binary} ) )
             {
-                $self->message( 3, "Found binary operation." );
                 $def->{subtype} = 'binary';
                 $def->{op}      = $re->{comp_binaryop};
                 $def->{is_negative} = ( defined( $re->{comp_binary_is_neg} ) ? length( $re->{comp_binary_is_neg} ) > 0 ? 1 : 0 : 0 );
@@ -352,7 +338,6 @@ sub parse
             }
             elsif( length( $re->{comp_word_in_listfunc} ) )
             {
-                $self->message( 3, "Found function." );
                 $def->{subtype} = 'function';
                 $def->{word}    = $re->{comp_word};
                 $def->{function}    = $re->{comp_listfunc};
@@ -370,7 +355,6 @@ sub parse
             }
             elsif( length( $re->{comp_in_regexp} ) || length( $re->{comp_in_regexp_legacy} ) )
             {
-                $self->message( 3, "Found regular expression." );
                 $def->{subtype} = 'regexp';
                 $def->{word}    = $re->{comp_word};
                 $def->{op}      = $re->{comp_regexp_op};
@@ -378,7 +362,7 @@ sub parse
                 $def->{word_def}    = [];
                 $def->{regexp_def}  = [];
                 my $str = $def->{word} . '';
-                ## Break down the word being compared as well as the regular expression
+                # Break down the word being compared as well as the regular expression
                 if( length( $str ) )
                 {
                     my $this1 = $self->parse( $str );
@@ -394,7 +378,6 @@ sub parse
             }
             elsif( length( $re->{comp_word_in_list} ) )
             {
-                $self->message( 3, "Found comparison to list." );
                 $def->{subtype} = 'list';
                 $def->{word}    = $re->{comp_word};
                 $def->{list}    = $re->{com_list};
@@ -419,7 +402,6 @@ sub parse
             }
             else
             {
-                $self->message( 3, "No match found in comparison." );
             }
             if( defined( $this ) && scalar( keys( %$this ) ) )
             {
@@ -430,16 +412,14 @@ sub parse
             # redo PARSE unless( !length( $re->{comp} ) && ++$looping > 1 );
             redo PARSE;
         }
-        ## Trunk function
+        # Trunk function
         elsif( $self->message( 3, "Trying with trunk join." ) && 
                $prefix eq 'Trunk' &&
                ( ( $pos == 0 && $data =~ /\A$RE{Apache2}{"${prefix}Join"}\Z/gms ) || $data =~ /\G$RE{Apache2}{"${prefix}Join"}/gmcs ) && 
                length( $+{join} ) )
         {
             my $re = { %+ };
-            $self->message( 3, "Got here in join for string '$data'." );
             $self->whereami( \$data, pos( $data ) );
-            $self->message( 3, "join => capture groups for $+{join} are: ", sub{ $self->dump( $re ) });
             my $def =
             {
             elements    => [],
@@ -449,7 +429,7 @@ sub parse
             word        => $re->{join_word},
             list        => $re->{join_list},
             };
-            ## word is optional
+            # word is optional
             if( length( $def->{word} ) )
             {
                 my $this = $self->parse( $def->{word} );
@@ -476,9 +456,7 @@ sub parse
                length( $+{split} ) )
         {
             my $re = { %+ };
-            $self->message( 3, "Got here in split for string '$data'." );
             $self->whereami( \$data, pos( $data ) );
-            $self->message( 3, "split => capture groups for $+{split} are: ", sub{ $self->dump( $re ) });
             my $def =
             {
             elements    => [],
@@ -489,7 +467,7 @@ sub parse
             word        => $re->{split_word},
             list        => $re->{split_list},
             };
-            ## It is either a word or a list as parameter
+            # It is either a word or a list as parameter
             if( length( $def->{word} ) )
             {
                 my $this = $self->parse( $def->{word} );
@@ -516,9 +494,7 @@ sub parse
                length( $+{sub} ) )
         {
             my $re = { %+ };
-            $self->message( 3, "Got here in sub for string '$data'." );
             $self->whereami( \$data, pos( $data ) );
-            $self->message( 3, "sub => capture groups for $+{split} are: ", sub{ $self->dump( $re ) });
             my $def =
             {
             elements    => [],
@@ -548,9 +524,7 @@ sub parse
                length( $+{function} ) )
         {
             my $re = { %+ };
-            $self->message( 3, "Got here in function for string '$data'." );
             $self->whereami( \$data, pos( $data ) );
-            $self->message( 3, "function => capture groups for $+{function} are: ", sub{ $self->dump( $re ) });
             my $def =
             {
             elements    => [],
@@ -579,9 +553,7 @@ sub parse
                length( $+{listfunc} ) )
         {
             my $re = { %+ };
-            $self->message( 3, "Got here in listfunc." );
             $self->whereami( \$data, pos( $data ) );
-            $self->message( 3, "listfunc => capture groups for $+{listfunc} are: ", sub{ $self->dump( $re ) });
             my $def =
             {
             elements => [],
@@ -610,9 +582,7 @@ sub parse
                length( $+{regex} ) )
         {
             my $re = { %+ };
-            $self->message( 3, "Got here in regex." );
             $self->whereami( \$data, pos( $data ) );
-            $self->message( 3, "regex => capture groups for $+{regex} are: ", sub{ $self->dump( $re ) });
             my $def =
             {
             elements    => [],
@@ -626,16 +596,14 @@ sub parse
             push( @$elems, $def );
             redo PARSE;
         }
-        ## Trunk only
+        # Trunk only
         elsif( $self->message( 3, "Trying with regex any." ) && 
                $prefix eq 'Trunk' &&
                ( ( $pos == 0 && $data =~ /\A$RE{Apache2}{"${prefix}Regany"}\Z/gms ) || $data =~ /\G$RE{Apache2}{"${prefix}Regany"}/gmcs ) && 
                length( $+{regany} ) )
         {
             my $re = { %+ };
-            $self->message( 3, "Got here in regany." );
             $self->whereami( \$data, pos( $data ) );
-            $self->message( 3, "regany => capture groups for $+{regany} are: ", sub{ $self->dump( $re ) });
             my $def =
             {
             elements    => [],
@@ -648,16 +616,14 @@ sub parse
             push( @$elems, $def );
             redo PARSE;
         }
-        ## Trunk only
+        # Trunk only
         elsif( $self->message( 3, "Trying with regsub." ) && 
                $prefix eq 'Trunk' &&
                ( ( $pos == 0 && $data =~ /\A$RE{Apache2}{"${prefix}Regsub"}\Z/gms ) || $data =~ /\G$RE{Apache2}{"${prefix}Regsub"}/gmcs ) && 
                length( $+{regsub} ) )
         {
             my $re = { %+ };
-            $self->message( 3, "Got here in regsub." );
             $self->whereami( \$data, pos( $data ) );
-            $self->message( 3, "regsub => capture groups for $+{regsub} are: ", sub{ $self->dump( $re ) });
             my $def =
             {
             elements    => [],
@@ -678,9 +644,7 @@ sub parse
                length( $+{words} ) )
         {
             my $re = { %+ };
-            $self->message( 3, "Got here in words." );
             $self->whereami( \$data, pos( $data ) );
-            $self->message( 3, "words => capture groups for $+{words} are: ", sub{ $self->dump( $re ) });
             my $def =
             {
             elements => [],
@@ -697,7 +661,6 @@ sub parse
                 $def->{elements} = $this2->{elements};
                 $def->{list_def} = $this2->{elements};
                 $def->{words_def} = [];
-                $self->message( "Found list word '$def->{word}' with sublist '$def->{sublist}'" );
                 my $this = $self->parse( $def->{word}, skip => [qw( words )] );
                 push( @{$def->{words_def}}, @{$this->{elements}} );
                 
@@ -707,7 +670,6 @@ sub parse
                     my $re2 = { %+ };
                     $re2->{words_word} = '' if( !exists( $re2->{words_word} ) );
                     $re2->{words_sublist} = '' if( !exists( $re2->{words_sublist} ) );
-                    $self->message( "Found list word '$re2->{words_word}' with sublist '$re2->{words_sublist}" );
                     my $this = $self->parse( $re2->{words_word}, skip => [qw( words )] );
                     push( @{$def->{words_def}}, @{$this->{elements}} );
                     $tmp = $re2->{words_sublist} if( $re2->{words_sublist} );
@@ -729,9 +691,7 @@ sub parse
                length( $+{word} ) )
         {
             my $re = { %+ };
-            $self->message( 3, "Got here in word." );
             $self->whereami( \$data, pos( $data ) );
-            $self->message( 3, "word => capture groups for '$+{word}' are: ", sub{ $self->dump( $re ) });
             my $def =
             {
             elements => [],
@@ -741,7 +701,7 @@ sub parse
             };
             if( length( $re->{word_digits} ) )
             {
-                ## We keep whatever quote was used
+                # We keep whatever quote was used
                 $def->{subtype} = 'digits';
                 $def->{value} = $re->{word_digits};
             }
@@ -762,13 +722,13 @@ sub parse
                 elsif( length( $re->{word_parens_open} ) )
                 {
                     $def->{subtype} = 'parens';
-                    ## If the enclosing elements are parenthesis
+                    # If the enclosing elements are parenthesis
                     $def->{parens} = [$re->{word_parens_open}, $re->{word_parens_close}];
                     my $this = $self->parse( $def->{word} );
                     push( @{$def->{elements}}, @{$this->{elements}} );
                     $def->{word_def} = $this->{elements};
                 }
-                # XXX Should probably make a run on the enclosed word as it could be a variable
+                # NOTE: Should probably make a run on the enclosed word as it could be a variable
                 # For example: "Go back to %{REQUEST_URI}"
             }
             elsif( length( $re->{word_function} ) || length( $re->{word_variable} ) )
@@ -835,9 +795,7 @@ sub parse
                length( $+{string} ) )
         {
             my $re = { %+ };
-            $self->message( 3, "Got here in string." );
             $self->whereami( \$data, pos( $data ) );
-            $self->message( 3, "string => capture groups for $+{string} are: ", sub{ $self->dump( $re ) });
             my $def =
             {
             elements => [],
@@ -850,11 +808,8 @@ sub parse
         }
         else
         {
-            $self->message( 3, "Do not know what to do with '$data'." );
         }
-        $self->message( 3, "Nothing found." );
-        $self->message( 3, "Looping detected now exiting parsing." ) && last PARSE if( ++$looping > 1 );
-        ## We arrived here, which means we could not find anything suitable in our parser, instead of returning a result for part of the data parsed, we return the original string marking it as nomatch string.
+        # We arrived here, which means we could not find anything suitable in our parser, instead of returning a result for part of the data parsed, we return the original string marking it as nomatch string.
         if( $opts->{top} )
         {
             @$elems =
@@ -864,26 +819,22 @@ sub parse
             raw => $data,
             pos => $pos,
             });
-            $self->message( 3, "Failed to complete parsing, so returning original data as string: ", sub{ $self->dump( $elems ) } );
             last PARSE;
         }
     };
-    $self->message( 3, "Returning hash: ", sub{ $self->dump( $hash ) } );
     return( scalar( @$elems ) ? $hash : {} );
 }
 
 sub parse_args
 {
     my $self = shift( @_ );
-    ## String
+    # String
     my $args = shift( @_ );
-    $self->message( 3, "Parsing arguments: '$args'." );
     my $doc = PPI::Document->new( \$args, readonly => 1 ) || 
         return( "Unable to parse: ", PPI::Document->errstr, "\n$args" );
-    ## Nothing found as argument
+    # Nothing found as argument
     return( () ) if( !scalar( @{$doc->{children}} ) );
     return( $self->error( "Was expecting a statement, but got ", ($doc->elements)[0]->class ) ) if( ($doc->elements)[0]->class ne 'PPI::Statement' );
-    $self->message( 3, "Arguments contains the following PPI structure: ", sub{ $self->dump( $doc->{children} ) });
     my $st = ($doc->elements)[0];
     my @children = $st->elements;
     my $op_skip = 
@@ -891,30 +842,31 @@ sub parse_args
     ',' => 1,
     };
     my $expect = 0;
-    local $recur = sub
+    my $recur;
+    $recur = sub
     {
         my @elems = @_;
-        ## We need space, so we do not remove them
-        ## For example, md5("some string") is not the same as md5, ("some string")
+        # We need space, so we do not remove them
+        # For example, md5("some string") is not the same as md5, ("some string")
         my $argv = [];
         for( my $i = 0; $i < scalar( @elems ); $i++ )
         {
             my $e = $elems[$i];
             my @expr;
-            ## Hopefully those below should cover all of our needs
+            # Hopefully those below should cover all of our needs
             if( 
                 $e->class eq 'PPI::Token::ArrayIndex' ||
-                ## Including PPI::Token::Number::Float
+                # Including PPI::Token::Number::Float
                 $e->isa( 'PPI::Token::Number' ) ||
-                ## operators like ==, !=, =~
+                # operators like ==, !=, =~
                 ( $e->class eq 'PPI::Token::Operator' && !exists( $op_skip->{ $e->content } ) ) ||
-                ## including, PPI::Token::Quote::Double, PPI::Token::Quote::Interpolate, PPI::Token::Quote::Literal and PPI::Token::Quote::Single
-                ## Example q{foo bar}
+                # including, PPI::Token::Quote::Double, PPI::Token::Quote::Interpolate, PPI::Token::Quote::Literal and PPI::Token::Quote::Single
+                # Example q{foo bar}
                 $e->isa( 'PPI::Token::Quote' ) ||
                 $e->isa( 'PPI::Token::QuoteLike' ) ||
-                ## Including PPI::Token::Regexp::Match, PPI::Token::Regexp::Substitute, PPI::Token::Regexp::Transliterate
+                # Including PPI::Token::Regexp::Match, PPI::Token::Regexp::Substitute, PPI::Token::Regexp::Transliterate
                 $e->isa( 'PPI::Token::Regexp' ) ||
-                ## Including for example PPI::Token::Magic
+                # Including for example PPI::Token::Magic
                 $e->isa( 'PPI::Token::Symbol' ) ||
                 $e->class eq 'PPI::Token::Word'
             )
@@ -923,10 +875,9 @@ sub parse_args
             }
             elsif( $e->class eq 'PPI::Token::Operator' && $e->content eq ',' )
             {
-                $self->message( 3, "Found a comma separating argument '", ( ( $i - 1 ) >= 0 ? $elems[$i-1]->content : '' ), "' and '", ( ( $i + 1 ) <= scalar( @elems ) ? $elems[$i+1]->content : '' ), "'." );
             }
-            ## Either this is arguments for the previous function found, or this is expressions embedded within parenthesis
-            # XXX Need to implement also PPI::Token::Structure, i.e. [], {}
+            # Either this is arguments for the previous function found, or this is expressions embedded within parenthesis
+            # NOTE: Need to implement also PPI::Token::Structure, i.e. [], {}
             elsif( $e->class eq 'PPI::Structure::List' )
             {
                 if( ref( $elems[$i - 1] ) && 
@@ -947,17 +898,15 @@ sub parse_args
                     push( @$argv, [$e->finish] );
                 }
             }
-            ## else we are not interested
+            # else we are not interested
             else
             {
-                $self->message( 3, "Clueless about what I should do with element of class '", $e->class, "' and value '", $e->content, "'." );
             }
         }
         return( @$argv );
     };
     my @objects = $recur->( @children );
-    $self->message( 3, "Objects found: ", sub{ $self->dump( @objects ) } );
-    ## Stringify result
+    # Stringify result
     my @result = map( join( '', map( $_->content, @$_ ) ), @objects );
     return( @result );
 }
@@ -968,7 +917,7 @@ sub whereami
 {
     my $self = shift( @_ );
     my( $ref, $pos ) = @_;
-    ## How far back should we look?
+    # How far back should we look?
     my $lookback = 10;
     $lookback = $pos if( $pos < $lookback );
     my $lookahead = 20;
@@ -977,10 +926,9 @@ sub whereami
     $lookback += () = substr( $$ref, $start, $lookback ) =~ /\n/gs;
     $first_line =~ s/\n/\\n/gs;
     my $sec_line = ( '.' x $lookback ) . '^' . ( '.' x $lookahead );
-    $self->message( 3, "Cusrsor is now here at position '$pos':\n$first_line\n$sec_line" );
 }
 
-## PPI object manipulation
+# PPI object manipulation
 sub _find_expression
 {
     my $self = shift( @_ );
@@ -993,7 +941,7 @@ sub _find_expression
     return( @found );
 }
 
-## PPI object manipulation
+# PPI object manipulation
 sub _trim
 {
     my $self = shift( @_ );

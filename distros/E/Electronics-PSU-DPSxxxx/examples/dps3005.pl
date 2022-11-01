@@ -20,7 +20,7 @@ await $psu->set_current( shift @ARGV or 0.456 );
 await $psu->set_output_state( 1 );
 
 $SIG{INT} = $SIG{TERM} = sub { exit };
-END { $psu->set_output_state( 0 )->get; }
+END { $psu and $psu->set_output_state( 0 )->get; }
 
 while(1) {
    printf "Output: %.2fV; %0.3fA %s\n",

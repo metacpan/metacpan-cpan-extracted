@@ -250,7 +250,7 @@ index 0000000..7b79d2f
 +this is a second test
 \\ No newline at end of file
 --
-libgit2 1.1.0
+libgit2 1.5.0
 };
 
 is $patch, $expected_patch;
@@ -280,7 +280,7 @@ index 0000000..7b79d2f
 +this is a second test
 \\ No newline at end of file
 --
-libgit2 1.1.0
+libgit2 1.5.0
 };
 
 is $patch, $expected_patch;
@@ -293,7 +293,7 @@ $patch = "\n".join("\n", grep { $_ !~ /^Date/ } split (/\n/, $commit2 -> as_emai
 $expected_patch = qq{
 From $commit2_id Mon Sep 17 00:00:00 2001
 From: Git::Raw author <git-xs\@example.com>
-Subject: second commit
+Subject: [1/2] second commit
 
 ---
  test2 | 1 +
@@ -309,7 +309,7 @@ index 0000000..7b79d2f
 +this is a second test
 \\ No newline at end of file
 --
-libgit2 1.1.0
+libgit2 1.5.0
 };
 
 is $patch, $expected_patch;
@@ -550,8 +550,8 @@ ok $entry_count >= 2;
 @entries = $reflog -> entries(0, 2);
 is scalar(@entries), 2;
 like $entries[0] -> message, qr/^checkout: moving from /;
-like $entries[0] -> message, qr/to master$/;
-like $entries[1] -> message, qr/^checkout: moving from master to/;
+like $entries[0] -> message, qr/to main$/;
+like $entries[1] -> message, qr/^checkout: moving from main to/;
 
 ok (!eval {$repo -> detach_head()});
 

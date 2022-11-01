@@ -4,7 +4,7 @@ Params::Validate - Validate method/function parameters
 
 # VERSION
 
-version 1.30
+version 1.31
 
 # SYNOPSIS
 
@@ -755,9 +755,7 @@ figures out how to do this, please let me know.
 
 # SUPPORT
 
-Bugs may be submitted at [https://rt.cpan.org/Public/Dist/Display.html?Name=Params-Validate](https://rt.cpan.org/Public/Dist/Display.html?Name=Params-Validate) or via email to [bug-params-validate@rt.cpan.org](mailto:bug-params-validate@rt.cpan.org).
-
-I am also usually active on IRC as 'autarch' on `irc://irc.perl.org`.
+Bugs may be submitted at [https://github.com/houseabsolute/Params-Validate/issues](https://github.com/houseabsolute/Params-Validate/issues).
 
 # SOURCE
 
@@ -778,7 +776,7 @@ software much more, unless I get so many donations that I can consider working
 on free software full time (let's all have a chuckle at that together).
 
 To donate, log into PayPal and send money to autarch@urth.org, or use the
-button at [https://www.urth.org/fs-donation.html](https://www.urth.org/fs-donation.html).
+button at [https://houseabsolute.com/foss-donations/](https://houseabsolute.com/foss-donations/).
 
 # AUTHORS
 
@@ -790,6 +788,7 @@ button at [https://www.urth.org/fs-donation.html](https://www.urth.org/fs-donati
 - Andy Grundman <andyg@activestate.com>
 - Diab Jerius <djerius@cfa.harvard.edu>
 - E. Choroba <choroba@matfyz.cz>
+- Graham Knop <haarg@haarg.org>
 - Ivan Bessarabov <ivan@bessarabov.ru>
 - J.R. Mash <jmash.code@gmail.com>
 - Karen Etheridge <ether@cpan.org>
@@ -800,7 +799,7 @@ button at [https://www.urth.org/fs-donation.html](https://www.urth.org/fs-donati
 
 # COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2001 - 2020 by Dave Rolsky and Ilya Martynov.
+This software is Copyright (c) 2001 - 2022 by Dave Rolsky and Ilya Martynov.
 
 This is free software, licensed under:
 

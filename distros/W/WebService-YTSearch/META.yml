@@ -34,7 +34,7 @@ requires:
 resources:
   homepage: https://github.com/ology/WebService-YTSearch
   repository: https://github.com/ology/WebService-YTSearch.git
-version: '0.0303'
+version: '0.0304'
 x_Dist_Zilla:
   perl:
     version: '5.032001'

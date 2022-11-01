@@ -28,8 +28,8 @@ The interface to the running MTA follows the 'milter protocol'.  This
 protocol is driven by the MTA.  It is effected by messages of a simple
 structure which are passed between the MTA and the milter via a socket
 connection.  Over the years the Milter Protocol has progressed through
-several versions, and seems now (July 2019) to be fairly well settled
-at Milter Protocol Version 6.
+several versions, and seems now (October 2022 2019) to be fairly well
+settled at Milter Protocol Version 6.
 
 Choose "yes" below to install Sendmail::PMilter from this package.
 
@@ -45,7 +45,7 @@ my %PM = (
 
 WriteMakefile(
     ABSTRACT_FROM	=> 'lib/Sendmail/PMilter.pm',
-    AUTHOR		=> 'Ged Haywood <pause.2022.07@fixmymail.uk>',
+    AUTHOR		=> 'Ged Haywood <pause.2022.10@fixmymail.uk>',
     PM			=>  \%PM,
     NAME		=> 'Sendmail::PMilter',
     VERSION_FROM	=> 'lib/Sendmail/PMilter.pm',

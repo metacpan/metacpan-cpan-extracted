@@ -97,13 +97,17 @@ else { print "Not defining GMPF_PV_NV_BUG as perl version >= 5.035010\n\n" }
 
 if($^O =~ /MSWin32/i && $] < 5.022) {$defines .= " -D_WIN32_BIZARRE_INFNAN"}
 
+my $libopts = '-lgmp';
+$libopts    = '-lquadmath -lgmp'
+  if ($^O eq 'cygwin' && $use_quadmath);
+
 my %options = (
   NAME => 'Math::GMPf',
   AUTHOR => 'Sisyphus (sisyphus at (@) cpan dot (.) org)',
   ABSTRACT => 'Perl interface to the GMP floating point functions',
   DEFINE   => $defines,
   LIBS => [
-    '-lgmp'
+    $libopts
   ],
   LICENSE  => 'perl',
   VERSION_FROM => 'GMPf.pm',

@@ -1,8 +1,11 @@
 #!/usr/local/bin/perl
 BEGIN
 {
+    use strict;
+    use warnings;
     use Test::More qw( no_plan );
     use lib './lib';
+    use vars qw( $DEBUG );
     use_ok( 'Apache2::SSI::URI' ) || BAIL_OUT( "Unable to load Apache2::SSI::URI" );
     use Encode ();
     use URI;
@@ -16,8 +19,11 @@ BEGIN
         use_ok( 'Apache::TestRequest' ) || BAIL_OUT( "Unable to load Apache::TestRequest" );
         use_ok( 'Apache2::Const', '-compile', qw( :common :http ) ) || BAIL_OUT( "Unable to load Apache2::Cons" );
     }
-    our $DEBUG = 0;
+    our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
+
+use strict;
+use warnings;
 
 my $uri = './ssi/include.cgi';
 my $doc_root = './t/htdocs';
@@ -140,7 +146,7 @@ sub make_request
 {
     my $uri = shift( @_ );
     my $resp = GET( $uri );
-    $result = [split( /\n/, Encode::decode( 'utf8', $resp->content ) )];
+    my $result = [split( /\n/, Encode::decode( 'utf8', $resp->content ) )];
     return( wantarray() ? ( $result, $resp ) : $result );
 }
 

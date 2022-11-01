@@ -6,8 +6,8 @@ subtest no_params => sub {
     my $result = $api->competitor->fights_statistics;
 
     is $result,
-      { error => 'id parameter is required' },
-      'Returns error if no ID provided.';
+        { error => 'id parameter is required' },
+        'Returns error if no ID provided.';
 };
 
 subtest valid_params => sub {
@@ -17,7 +17,7 @@ subtest valid_params => sub {
     my $result = $api->competitor->fights_statistics( id => 7350 );
 
     is $result,
-      {
+        {
         longest_winning_fights   => E,
         total_duration_sec       => E,
         shortest_fight_win_date  => E,
@@ -60,8 +60,8 @@ subtest valid_params => sub {
         num_win_by_ippon_proc  => E,
         current_winning_period => E,
         num_win                => E,
-      },
-      'Returns data structure for valid competitor';
+        },
+        'Returns data structure for valid competitor';
 };
 
 subtest invalid_params => sub {
@@ -70,8 +70,8 @@ subtest invalid_params => sub {
     my $result = $api->competitor->fights_statistics( id => 0 );
 
     is $result,
-      { error => 'statistics.error.id_person_not_given', },
-      'Returns error for invalid or not found competitor';
+        { error => 'statistics.error.id_person_not_given', },
+        'Returns error for invalid or not found competitor';
 };
 
 done_testing;

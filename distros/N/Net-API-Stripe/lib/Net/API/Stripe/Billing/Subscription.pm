@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Billing/Subscription.pm
-## Version v0.300.1
+## Version v0.301.0
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
-## Modified 2020/05/16
+## Modified 2022/10/29
 ## 
 ##----------------------------------------------------------------------------
 ## https://stripe.com/docs/api/subscriptions
@@ -12,15 +12,27 @@ package Net::API::Stripe::Billing::Subscription;
 BEGIN
 {
     use strict;
+    use warnings;
     use parent qw( Net::API::Stripe::Generic );
-    our( $VERSION ) = 'v0.300.1';
+    use vars qw( $VERSION );
+    our( $VERSION ) = 'v0.301.0';
 };
+
+use strict;
+use warnings;
 
 sub id { return( shift->_set_get_scalar( 'id', @_ ) ); }
 
 sub object { return( shift->_set_get_scalar( 'object', @_ ) ); }
 
+sub application { return( shift->_set_get_scalar_or_object( 'application', 'Net::API::Stripe::Connect::Account', @_ ) ); }
+
 sub application_fee_percent { return( shift->_set_get_number( 'application_fee_percent', @_ ) ); }
+
+sub automatic_tax { return( shift->_set_get_class( 'automatic_tax',
+{
+    enabled => { type => 'boolean' },
+}, @_ ) ); }
 
 sub backdate_start_date { return( shift->_set_get_datetime( 'backdate_start_date', @_ ) ); }
 
@@ -42,6 +54,8 @@ sub coupon { return( shift->_set_get_scalar( 'coupon', @_ ) ); }
 
 sub created { return( shift->_set_get_datetime( 'created', @_ ) ); }
 
+sub currency { return( shift->_set_get_number( 'currency', @_ ) ); }
+
 sub current_period_end { return( shift->_set_get_datetime( 'current_period_end', @_ ) ); }
 
 sub current_period_start { return( shift->_set_get_datetime( 'current_period_start', @_ ) ); }
@@ -56,14 +70,17 @@ sub default_source { return( shift->_set_get_scalar_or_object( 'default_source',
 
 sub default_tax_rates { return( shift->_set_get_object_array( 'default_tax_rates', 'Net::API::Stripe::Tax::Rate', @_ ) ); }
 
+sub description { return( shift->_set_get_scalar( 'description', @_ ) ); }
+
 sub discount { return( shift->_set_get_object( 'discount', 'Net::API::Stripe::Billing::Discount', @_ ) ); }
 
 sub ended_at { return( shift->_set_get_datetime( 'ended_at', @_ ) ); }
 
 ## To cancel subscriptions
-sub invoice_now { return( shift->_set_get_boolean( 'invoice_now', @_ ) ); }
 
 sub invoice_customer_balance_settings { return( shift->_set_get_hash_as_object( 'invoice_customer_balance_settings', 'Net::API::Stripe::Billing::Invoice::BalanceSettings', @_ ) ); }
+
+sub invoice_now { return( shift->_set_get_boolean( 'invoice_now', @_ ) ); }
 
 sub items { return( shift->_set_get_object( 'items', 'Net::API::Stripe::Billing::Subscription::Items', @_ ) ); }
 
@@ -79,14 +96,16 @@ sub off_session { return( shift->_set_get_boolean( 'off_session', @_ ) ); }
 
 sub pause_collection 
 {
-	return( shift->_set_get_class( 'pause_collection',
-	{
-	behavior => { type => 'scalar' },
-	resumes_at => { type => 'datetime' },
-	}, @_ ) );
+    return( shift->_set_get_class( 'pause_collection',
+    {
+    behavior => { type => 'scalar' },
+    resumes_at => { type => 'datetime' },
+    }, @_ ) );
 }
 
 sub payment_behavior { return( shift->_set_get_scalar( 'payment_behavior', @_ ) ); }
+
+sub payment_settings { return( shift->_set_get_object( 'payment_settings', 'Net::API::Stripe::Payment::Settings', @_ ) ); }
 
 sub pending_invoice_item_interval { return( shift->_set_get_object( 'pending_invoice_item_interval', 'Net::API::Stripe::Billing::Plan', @_ ) ); }
 
@@ -94,14 +113,14 @@ sub pending_setup_intent { return( shift->_set_get_scalar_or_object( 'pending_se
 
 sub pending_update
 {
-	return( shift->_set_get_class( 'pending_update',
-	{
-	billing_cycle_anchor => { type => 'datetime' },
-	expires_at => { type => 'datetime' },
-	subscription_items => { type => 'object_array_object', class => 'Net::API::Stripe::Billing::Subscription::Item' },
-	trial_end => { type => 'datetime' },
-	trial_from_plan => { type => 'boolean' },
-	}, @_ ) );
+    return( shift->_set_get_class( 'pending_update',
+    {
+    billing_cycle_anchor    => { type => 'datetime' },
+    expires_at              => { type => 'datetime' },
+    subscription_items      => { type => 'object_array_object', class => 'Net::API::Stripe::Billing::Subscription::Item' },
+    trial_end               => { type => 'datetime' },
+    trial_from_plan         => { type => 'boolean' },
+    }, @_ ) );
 }
 
 sub plan { return( shift->_set_get_object( 'plan', 'Net::API::Stripe::Billing::Plan', @_ ) ); }
@@ -121,6 +140,17 @@ sub start_date { return( shift->_set_get_datetime( 'start_date', @_ ) ); }
 sub status { return( shift->_set_get_scalar( 'status', @_ ) ); }
 
 sub tax_percent { return( shift->_set_get_number( 'tax_percent', @_ ) ); }
+
+sub test_clock { return( shift->_set_get_scalar_or_object( 'test_clock', 'Net::API::Stripe::Billing::TestClock', @_ ) ); }
+
+sub transfer_data
+{
+    return( shift->_set_get_class( 'transfer_data',
+    {
+    amount_percent  => { type => 'number' },
+    destination     => { type => 'object', class => 'Net::API::Stripe::Connect::Account' },
+    }, @_ ) );
+}
 
 sub trial_end { return( shift->_set_get_datetime( 'trial_end', @_ ) ); }
 
@@ -161,7 +191,7 @@ Net::API::Stripe::Billing::Subscription - A Stripe Subscription Object
 
 =head1 VERSION
 
-    v0.300.1
+    v0.301.0
 
 =head1 DESCRIPTION
 
@@ -169,60 +199,56 @@ Subscriptions allow you to charge a customer on a recurring basis.
 
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>( %ARG )
+=head2 new( %ARG )
 
 Creates a new L<Net::API::Stripe::Billing::Subscription> object.
 It may also take an hash like arguments, that also are method of the same name.
 
-=back
-
 =head1 METHODS
 
-=over 4
-
-=item B<id> string
+=head2 id string
 
 Unique identifier for the object.
 
-=item B<object> string, value is "subscription"
+=head2 object string, value is "subscription"
 
 String representing the object’s type. Objects of the same type share the same value.
 
-=item B<application_fee_percent> decimal
+=head2 application_fee_percent decimal
 
 A non-negative decimal between 0 and 100, with at most two decimal places. This represents the percentage of the subscription invoice subtotal that will be transferred to the application owner’s Stripe account.
 
-=item B<backdate_start_date>
+=head2 backdate_start_date
 
 For new subscriptions, a past timestamp to backdate the subscription’s start date to. If set, the first invoice will contain a proration for the timespan between the start date and the current time. Can be combined with trials and the billing cycle anchor.
 
-=item B<billing>()
+=head2 billing
 
-=item B<billing_cycle_anchor> timestamp
+String like C<charge_automatically>, but not documented.
+
+=head2 billing_cycle_anchor timestamp
 
 Determines the date of the first full invoice, and, for plans with month or year intervals, the day of the month for subsequent invoices.
 
-=item B<billing_thresholds> hash
+=head2 billing_thresholds hash
 
 Define thresholds at which an invoice will be sent, and the subscription advanced to a new billing period
 
 This is a L<Net::API::Stripe::Billing::Thresholds> object.
 
-=over 8
+=over 4
 
-=item B<amount_gte> integer
+=item I<amount_gte> integer
 
 Monetary threshold that triggers the subscription to create an invoice
 
-=item B<reset_billing_cycle_anchor> boolean
+=item I<reset_billing_cycle_anchor> boolean
 
 Indicates if the billing_cycle_anchor should be reset when a threshold is reached. If true, billing_cycle_anchor will be updated to the date/time the threshold was last reached; otherwise, the value will remain unchanged. This value may not be true if the subscription contains items with plans that have aggregate_usage=last_ever.
 
 =back
 
-=item B<cancel_at> timestamp
+=head2 cancel_at timestamp
 
 This is an undocumented property returned by Stripe, and I assume this is a duplicate to the B<canceled_at> one.
 
@@ -232,109 +258,119 @@ According to Stripe support as of 2019-11-07, this is:
 
 If the associated subscription has been set up to be canceled at a future date, the ‘cancel_at’ property is used to specify the future timestamp of when it will be canceled.
 
-=item B<cancel_at_period_end> boolean
+=head2 cancel_at_period_end boolean
 
 If the subscription has been canceled with the at_period_end flag set to true, cancel_at_period_end on the subscription will be true. You can use this attribute to determine whether a subscription that has a status of active is scheduled to be canceled at the end of the current period.
 
-=item B<canceled_at> timestamp
+=head2 canceled_at timestamp
 
 If the subscription has been canceled, the date of that cancellation. If the subscription was canceled with cancel_at_period_end, canceled_at will still reflect the date of the initial cancellation request, not the end of the subscription period when the subscription is automatically moved to a canceled state.
 
-=item B<collection_method> string
+=head2 collection_method string
 
 Either charge_automatically, or send_invoice. When charging automatically, Stripe will attempt to pay this subscription at the end of the cycle using the default source attached to the customer. When sending an invoice, Stripe will email your customer an invoice with payment instructions.
 
-=item B<coupon> string
+=head2 coupon string
 
 The code of the coupon to apply to this subscription. A coupon applied to a subscription will only affect invoices created for that particular subscription.
 
-=item B<created> timestamp
+=head2 created timestamp
 
 Time at which the object was created. Measured in seconds since the Unix epoch.
 
-=item B<current_period_end> timestamp
+=head2 currency currency
+
+Three-letter L<ISO currency code|https://www.iso.org/iso-4217-currency-codes.html>, in lowercase. Must be a L<supported currency|https://stripe.com/docs/currencies>.
+
+=head2 current_period_end timestamp
 
 End of the current period that the subscription has been invoiced for. At the end of this period, a new invoice will be created.
 
-=item B<current_period_start> timestamp
+=head2 current_period_start timestamp
 
 Start of the current period that the subscription has been invoiced for.
 
-=item B<customer> string (expandable)
+=head2 customer string (expandable)
 
 ID of the customer who owns the subscription. When expanded, this is a L<Net::API::Stripe::Customer> object.
 
-=item B<days_until_due> integer
+=head2 days_until_due integer
 
 Number of days a customer has to pay invoices generated by this subscription. This value will be null for subscriptions where collection_method=charge_automatically.
 
-=item B<default_payment_method> string (expandable)
+=head2 default_payment_method string (expandable)
 
 ID of the default payment method for the subscription. It must belong to the customer associated with the subscription. If not set, invoices will use the default payment method in the customer’s invoice settings.
 
 When expanded, this is a L<Net::API::Stripe::Payment::Method> object.
 
-=item B<default_source> string (expandable)
+=head2 default_source string (expandable)
 
 ID of the default payment source for the subscription. It must belong to the customer associated with the subscription and be in a chargeable state. If not set, defaults to the customer’s default source.
 
 When expanded, this is a L<Net::API::Stripe::Payment::Source> object.
 
-=item B<default_tax_rates> array of hashes
+=head2 default_tax_rates array of hashes
 
 The tax rates that will apply to any subscription item that does not have tax_rates set. Invoices created will have their default_tax_rates populated from the subscription.
 
 This is an array of L<Net::API::Stripe::Tax::Rate> objects.
 
-=item B<discount> hash, discount object
+=head2 discount hash, discount object
 
 Describes the current discount applied to this subscription, if there is one. When billing, a discount applied to a subscription overrides a discount applied on a customer-wide basis.
 
 This is a L<Net::API::Stripe::Billing::Discount> object.
 
-=item B<ended_at> timestamp
+=head2 ended_at timestamp
 
 If the subscription has ended, the date the subscription ended.
 
-=item B<invoice_now> boolean
+=head2 invoice_customer_balance_settings
+
+This is a L<Net::API::Stripe::Billing::Invoice::BalanceSettings> object.
+
+=head2 invoice_now boolean
 
 Will generate a final invoice that invoices for any un-invoiced metered usage and new/pending proration invoice items.
 
 This is used to cancel a subscription. See here: L<https://stripe.com/docs/api/subscriptions/cancel>
 
-=item B<invoice_customer_balance_settings>()
-
-=item B<items> list
+=head2 items list
 
 List of subscription items, each with an attached plan.
 
 This is a L<Net::API::Stripe::Billing::Subscription::Items> object.
 
-=item B<latest_invoice> string (expandable)
+=head2 latest_invoice string (expandable)
 
 The most recent invoice this subscription has generated.
 
 When expanded, this is a L<Net::API::Stripe::Billing::Invoice> object.
 
-=item B<livemode> boolean
+=head2 livemode boolean
 
 Has the value true if the object exists in live mode or the value false if the object exists in test mode.
 
-=item B<metadata> hash
+=head2 metadata hash
 
 Set of key-value pairs that you can attach to an object. This can be useful for storing additional information about the object in a structured format.
 
-=item B<next_pending_invoice_item_invoice>
+=head2 next_pending_invoice_item_invoice
 
 This is an undocumented property on Stripe, but found in its sample data.
 
 This is managed with a virtual module L<Net::API::Billing::Subscription::Item::Invoice>
 
-=item B<pause_collection> hash
+=head2 off_session boolean
+
+Indicates if a customer is on or off-session while an invoice payment is attempted.
+
+=head2 pause_collection hash
 
 If specified, payment collection for this subscription will be paused.
 
-=over 8
+=over 4
 
 =item I<pause_collection.behavior> string
 
@@ -346,11 +382,7 @@ The time after which the subscription will resume collecting payments.
 
 =back
 
-=item B<off_session> boolean
-
-Indicates if a customer is on or off-session while an invoice payment is attempted.
-
-=item B<payment_behavior> string
+=head2 payment_behavior string
 
 Use I<allow_incomplete> to create subscriptions with status=incomplete if the first invoice cannot be paid. Creating subscriptions with this status allows you to manage scenarios where additional user actions are needed to pay a subscription’s invoice. For example, SCA regulation may require 3DS authentication to complete payment. See the SCA Migration Guide for Billing to learn more. This is the default behavior.
 
@@ -359,7 +391,7 @@ Use I<error_if_incomplete> if you want Stripe to return an HTTP 402 status code 
 I<pending_if_incomplete> is only used with updates and cannot be passed when creating a subscription.
 Possible enum values
 
-=over 8
+=over 4
 
 =item I<allow_incomplete>
 
@@ -369,11 +401,11 @@ Possible enum values
 
 =back
 
-=item B<pending_invoice_item_interval>()
+=head2 pending_invoice_item_interval
 
 Specifies an interval for how often to bill for any pending invoice items. It is analogous to calling Create an invoice for the given subscription at the specified interval.
 
-=over 8
+=over 4
 
 =item I<interval> required
 
@@ -385,17 +417,17 @@ The number of intervals between invoices. For example, interval=month and interv
 
 =back
 
-=item B<pending_setup_intent> string (expandable)
+=head2 pending_setup_intent string (expandable)
 
 You can use this SetupIntent to collect user authentication when creating a subscription without immediate payment or updating a subscription’s payment method, allowing you to optimize for off-session payments. Learn more in the SCA Migration Guide.
 
 When expanded, this is a L<Net::API::Stripe::Payment::Intent::Setup> object.
 
-=item B<pending_update>() hash
+=head2 pending_update hash
 
 If specified, pending updates that will be applied to the subscription once the latest_invoice has been paid.
 
-=over 8
+=over 4
 
 =item I<billing_cycle_anchor> timestamp
 
@@ -419,39 +451,39 @@ Indicates if a plan’s trial_period_days should be applied to the subscription.
 
 =back
 
-=item B<plan> hash, plan object
+=head2 plan hash, plan object
 
 Hash describing the plan the customer is subscribed to. Only set if the subscription contains a single plan.
 
 This is a L<Net::API::Stripe::Billing::Plan> object.
 
-=item B<prorate> boolean (deprecated)
+=head2 prorate boolean (deprecated)
 
 Boolean (defaults to true) telling us whether to credit for unused time when the billing cycle changes (e.g. when switching plans, resetting billing_cycle_anchor=now, or starting a trial), or if an item’s quantity changes. If false, the anchor period will be free (similar to a trial) and no proration adjustments will be created. This field has been deprecated and will be removed in a future API version. Use proration_behavior=create_prorations as a replacement for prorate=true and proration_behavior=none for prorate=false.
 
-=item B<proration_behavior> string
+=head2 proration_behavior string
 
 Determines how to handle prorations resulting from the billing_cycle_anchor. Valid values are I<create_prorations> or I<none>.
 
 Passing I<create_prorations> will cause proration invoice items to be created when applicable. Prorations can be disabled by passing I<none>. If no value is passed, the default is create_prorations.
 
-=item B<quantity> integer
+=head2 quantity integer
 
 The quantity of the plan to which the customer is subscribed. For example, if your plan is $10/user/month, and your customer has 5 users, you could pass 5 as the quantity to have the customer charged $50 (5 x $10) monthly. Only set if the subscription contains a single plan.
 
-=item B<schedule> string expandable
+=head2 schedule string expandable
 
 The schedule attached to the subscription. When expanded, this is a L<Net::API::Stripe::Billing::Subscription::Schedule> object.
 
-=item B<start> timestamp
+=head2 start timestamp
 
 Date of the last substantial change to this subscription. For example, a change to the items array, or a change of status, will reset this timestamp.
 
-=item B<start_date> timestamp
+=head2 start_date timestamp
 
 Date when the subscription was first created. The date might differ from the created date due to backdating.
 
-=item B<status> string
+=head2 status string
 
 Possible values are incomplete, incomplete_expired, trialing, active, past_due, canceled, or unpaid.
 
@@ -463,123 +495,139 @@ If subscription collection_method=charge_automatically it becomes past_due when 
 
 If subscription collection_method=send_invoice it becomes past_due when its invoice is not paid by the due date, and canceled or unpaid if it is still not paid by an additional deadline after that. Note that when a subscription has a status of unpaid, no subsequent invoices will be attempted (invoices will be created, but then immediately automatically closed). After receiving updated payment information from a customer, you may choose to reopen and pay their closed invoices.
 
-=item B<tax_percent> decimal (deprecated)
+=head2 tax_percent decimal (deprecated)
 
 A non-negative decimal (with at most four decimal places) between 0 and 100. This represents the percentage of the subscription invoice subtotal that will be calculated and added as tax to the final amount in each billing period. For example, a plan which charges $10/month with a tax_percent of 20.0 will charge $12 per invoice. To unset a previously-set value, pass an empty string. This field has been deprecated and will be removed in a future API version, for further information view the migration docs for tax_rates.
 
-=item B<trial_end> timestamp
+=head2 transfer_data hash
 
-If the subscription has a trial, the end of that trial.
+This is for Connect only.
 
-=item B<trial_from_plan> boolean
+The account (if any) the subscription’s payments will be attributed to for tax reporting, and where funds from each payment will be transferred to for each of the subscription’s invoices.
 
-Indicates if a plan’s trial_period_days should be applied to the subscription. Setting trial_end per subscription is preferred, and this defaults to false. Setting this flag to true together with trial_end is not allowed.
+=over 4
 
-=item B<trial_period_days> integer
+=item I<amount_percent> decimal
 
-Integer representing the number of trial period days before the customer is charged for the first time. This will always overwrite any trials that might apply via a subscribed plan.
+A non-negative decimal between 0 and 100, with at most two decimal places. This represents the percentage of the subscription invoice subtotal that will be transferred to the destination account. By default, the entire amount is transferred to the destination.
 
-=item B<trial_start> timestamp
+=item I<destination> string expandable
 
-If the subscription has a trial, the beginning of that trial.
+The account where funds from the payment will be transferred to upon payment success.
 
 =back
 
+=head2 trial_end timestamp
+
+If the subscription has a trial, the end of that trial.
+
+=head2 trial_from_plan boolean
+
+Indicates if a plan’s trial_period_days should be applied to the subscription. Setting trial_end per subscription is preferred, and this defaults to false. Setting this flag to true together with trial_end is not allowed.
+
+=head2 trial_period_days integer
+
+Integer representing the number of trial period days before the customer is charged for the first time. This will always overwrite any trials that might apply via a subscribed plan.
+
+=head2 trial_start timestamp
+
+If the subscription has a trial, the beginning of that trial.
+
 =head1 API SAMPLE
 
-	{
-	  "id": "sub_fake123456789",
-	  "object": "subscription",
-	  "application_fee_percent": null,
-	  "billing": "charge_automatically",
-	  "billing_cycle_anchor": 1551492959,
-	  "billing_thresholds": null,
-	  "cancel_at_period_end": false,
-	  "canceled_at": 1555726796,
-	  "collection_method": "charge_automatically",
-	  "created": 1551492959,
-	  "current_period_end": 1556763359,
-	  "current_period_start": 1554171359,
-	  "customer": "cus_fake123456789",
-	  "days_until_due": null,
-	  "default_payment_method": null,
-	  "default_source": null,
-	  "default_tax_rates": [],
-	  "discount": null,
-	  "ended_at": 1555726796,
-	  "items": {
-		"object": "list",
-		"data": [
-		  {
-			"id": "si_fake123456789",
-			"object": "subscription_item",
-			"billing_thresholds": null,
-			"created": 1551492959,
-			"metadata": {},
-			"plan": {
-			  "id": "professional-monthly-jpy",
-			  "object": "plan",
-			  "active": true,
-			  "aggregate_usage": null,
-			  "amount": 8000,
-			  "amount_decimal": "8000",
-			  "billing_scheme": "per_unit",
-			  "created": 1541833564,
-			  "currency": "jpy",
-			  "interval": "month",
-			  "interval_count": 1,
-			  "livemode": false,
-			  "metadata": {},
-			  "nickname": null,
-			  "product": "prod_fake123456789",
-			  "tiers": null,
-			  "tiers_mode": null,
-			  "transform_usage": null,
-			  "trial_period_days": null,
-			  "usage_type": "licensed"
-			},
-			"quantity": 1,
-			"subscription": "sub_fake123456789",
-			"tax_rates": []
-		  }
-		],
-		"has_more": false,
-		"url": "/v1/subscription_items?subscription=sub_fake123456789"
-	  },
-	  "latest_invoice": "in_fake123456789",
-	  "livemode": false,
-	  "metadata": {},
-	  "pending_setup_intent": null,
-	  "plan": {
-		"id": "professional-monthly-jpy",
-		"object": "plan",
-		"active": true,
-		"aggregate_usage": null,
-		"amount": 8000,
-		"amount_decimal": "8000",
-		"billing_scheme": "per_unit",
-		"created": 1541833564,
-		"currency": "jpy",
-		"interval": "month",
-		"interval_count": 1,
-		"livemode": false,
-		"metadata": {},
-		"nickname": null,
-		"product": "prod_fake123456789",
-		"tiers": null,
-		"tiers_mode": null,
-		"transform_usage": null,
-		"trial_period_days": null,
-		"usage_type": "licensed"
-	  },
-	  "quantity": 1,
-	  "start": 1554430777,
-	  "start_date": 1551492959,
-	  "status": "canceled",
-	  "tax_percent": null,
-	  "trial_end": null,
-	  "trial_start": null
-	}
+    {
+      "id": "sub_fake123456789",
+      "object": "subscription",
+      "application_fee_percent": null,
+      "billing": "charge_automatically",
+      "billing_cycle_anchor": 1551492959,
+      "billing_thresholds": null,
+      "cancel_at_period_end": false,
+      "canceled_at": 1555726796,
+      "collection_method": "charge_automatically",
+      "created": 1551492959,
+      "current_period_end": 1556763359,
+      "current_period_start": 1554171359,
+      "customer": "cus_fake123456789",
+      "days_until_due": null,
+      "default_payment_method": null,
+      "default_source": null,
+      "default_tax_rates": [],
+      "discount": null,
+      "ended_at": 1555726796,
+      "items": {
+        "object": "list",
+        "data": [
+          {
+            "id": "si_fake123456789",
+            "object": "subscription_item",
+            "billing_thresholds": null,
+            "created": 1551492959,
+            "metadata": {},
+            "plan": {
+              "id": "professional-monthly-jpy",
+              "object": "plan",
+              "active": true,
+              "aggregate_usage": null,
+              "amount": 8000,
+              "amount_decimal": "8000",
+              "billing_scheme": "per_unit",
+              "created": 1541833564,
+              "currency": "jpy",
+              "interval": "month",
+              "interval_count": 1,
+              "livemode": false,
+              "metadata": {},
+              "nickname": null,
+              "product": "prod_fake123456789",
+              "tiers": null,
+              "tiers_mode": null,
+              "transform_usage": null,
+              "trial_period_days": null,
+              "usage_type": "licensed"
+            },
+            "quantity": 1,
+            "subscription": "sub_fake123456789",
+            "tax_rates": []
+          }
+        ],
+        "has_more": false,
+        "url": "/v1/subscription_items?subscription=sub_fake123456789"
+      },
+      "latest_invoice": "in_fake123456789",
+      "livemode": false,
+      "metadata": {},
+      "pending_setup_intent": null,
+      "plan": {
+        "id": "professional-monthly-jpy",
+        "object": "plan",
+        "active": true,
+        "aggregate_usage": null,
+        "amount": 8000,
+        "amount_decimal": "8000",
+        "billing_scheme": "per_unit",
+        "created": 1541833564,
+        "currency": "jpy",
+        "interval": "month",
+        "interval_count": 1,
+        "livemode": false,
+        "metadata": {},
+        "nickname": null,
+        "product": "prod_fake123456789",
+        "tiers": null,
+        "tiers_mode": null,
+        "transform_usage": null,
+        "trial_period_days": null,
+        "usage_type": "licensed"
+      },
+      "quantity": 1,
+      "start": 1554430777,
+      "start_date": 1551492959,
+      "status": "canceled",
+      "tax_percent": null,
+      "trial_end": null,
+      "trial_start": null
+    }
 
 =head1 HISTORY
 

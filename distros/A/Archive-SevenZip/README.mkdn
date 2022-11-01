@@ -121,6 +121,15 @@ Adds an empty directory
 This currently ignores the directory date and time if the directory
 exists
 
+## `$ar->add`
+
+    $ar->add( items => ["real_etc" => "name_in_archive" ] );
+
+Adds elements to an archive
+
+This currently ignores the directory date and time if the directory
+exists
+
 ## `->archiveZipApi`
 
     my $ar = Archive::SevenZip->archiveZipApi(
@@ -149,7 +158,7 @@ See also [Archive::SevenZip::API::ArchiveTar](https://metacpan.org/pod/Archive%3
 
 # NAME
 
-Path::Class::Archive - treat archives as directories
+Path::Class::Archive::Handle - treat archives as directories
 
 # CAUTION
 

@@ -21,8 +21,10 @@ lib/App/GUI/Harmonograph/Frame/Part/Board.pm
 lib/App/GUI/Harmonograph/Frame/Part/ColorBrowser.pm
 lib/App/GUI/Harmonograph/Frame/Part/ColorFlow.pm
 lib/App/GUI/Harmonograph/Frame/Part/ColorPicker.pm
+lib/App/GUI/Harmonograph/Frame/Part/ModMatrix.pm
 lib/App/GUI/Harmonograph/Frame/Part/PenLine.pm
 lib/App/GUI/Harmonograph/Frame/Part/Pendulum.pm
+lib/App/GUI/Harmonograph/Function.pm
 lib/App/GUI/Harmonograph/Settings.pm
 lib/App/GUI/Harmonograph/Widget/ColorDisplay.pm
 lib/App/GUI/Harmonograph/Widget/ProgressBar.pm

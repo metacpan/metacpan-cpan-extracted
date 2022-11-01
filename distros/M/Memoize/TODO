@@ -1,7 +1,5 @@
 =pod
 
-=head1 TO DO
-
 =over 4
 
 =item * 
@@ -15,27 +13,6 @@ detect the problem at TIE time and throw a fatal error.
 
 Try out MLDBM here and document it if it works.
 
-=item *
-
-We should extend the benchmarking module to allow
-
-	timethis(main, { MEMOIZED => [ suba, subb ] })
-
-What would this do?  It would time C<main> three times, once with
-C<suba> and C<subb> unmemoized, twice with them memoized.
-
-Why would you want to do this?  By the third set of runs, the memo
-tables would be fully populated, so all calls by C<main> to C<suba>
-and C<subb> would return immediately.  You would be able to see how
-much of C<main>'s running time was due to time spent computing in
-C<suba> and C<subb>.  If that was just a little time, you would know
-that optimizing or improving C<suba> and C<subb> would not have a
-large effect on the performance of C<main>.  But if there was a big
-difference, you would know that C<suba> or C<subb> was a good
-candidate for optimization if you needed to make C<main> go faster.
-
-Done.
-
 =item * 
 
 Perhaps C<memoize> should return a reference to the original function
@@ -48,15 +25,6 @@ accessor methods for getting to the original function, the options,
 the memo table, etc.
 
 Naah.
-
-=item *
-
-The TODISK feature is not ready yet.  It will have to be rather
-complicated, providing options for which disk method to use (GDBM?
-DB_File?  Flat file?  Storable?  User-supplied?) and which stringizing
-method to use (FreezeThaw?  Marshal?  User-supplied?)
-
-Done!
 
 =item *
 
@@ -91,51 +59,7 @@ example than C<fibo>.
 
 =item *
 
-Add more regression tests for normalizers.
-
-=item *
-
-Maybe resolve normalizer function to code-ref at memoize time instead
-of at function call time for efficiency?  I think there was some
-reason not to do this, but I can't remember what it was.
-
-=item *
-
-Add more array value tests to the test suite.
-
-Does it need more now?
-
-=item *
-
-Fix that `Subroutine u redefined ... line 484' message.
-
-Fixed, I think.
-
-=item *
-
-Get rid of any remaining *{$ref}{CODE} or similar magic hashes. 
-
-=item *
-
-There should be an option to dump out the memoized values or to
-otherwise traverse them.
-
-What for?
-
-Maybe the tied hash interface taskes care of this anyway?
-
-=item *
-
 Include an example that caches DNS lookups.
-
-=item *
-
-Make tie for Storable (Memoize::Storable)
-
-A prototype of Memoize::Storable is finished.  Test it and add to the
-test suite.
-
-Done.
 
 =item *
 
@@ -143,67 +67,7 @@ Make tie for DBI  (Memoize::DBI)
 
 =item *
 
-I think there's a bug.  See `###BUG'.
-
-=item * 
-
-Storable probably can't be done, because it doesn't allow updating.
-Maybe a different interface that supports readonly caches fronted by a
-writable in-memory cache?  A generic tied hash maybe?
-
-	FETCH {
-	  if (it's in the memory hash) {
-	    return it
-	  } elsif (it's in the readonly disk hash) {
-	    return it
-	  } else { 
-	    not-there
-	  }
-	}
-
-	STORE {
-	  put it into the in-memory hash
-	}
-
-Maybe `save' and `restore' methods?
-
-It isn't working right because the destructor doesn't get called at
-the right time.
-
-This is fixed.  `use strict vars' would have caught it immediately.  Duh.
-
-=item *
-
-Don't forget about generic interface to Storable-like packages
-
-20010627 It would appear that you put this into 0.51.
-
-=item * 
-
-Maybe add in TODISK after all, with TODISK => 'filename' equivalent to
-
-	SCALAR_CACHE => [TIE, Memoize::SDBM_File, $filename, O_RDWR|O_CREAT, 0666],
-	LIST_CACHE => MERGE
-
-=item *
-
 Maybe the default for LIST_CACHE should be MERGE anyway.
-
-=item *
-
-There's some terrible bug probably related to use under threaded perl,
-possibly connected with line 56:
-
-    my $wrapper = eval "sub { unshift \@_, qq{$cref}; goto &_memoizer; }";
-
-I think becayse C<@_> is lexically scoped in threadperl, the effect of
-C<unshift> never makes it into C<_memoizer>.  That's probably a bug in
-Perl, but maybe I should work around it.   Can anyone provide more
-information here, or lend me a machine with threaded Perl where I can
-test this theory?  Line 59, currently commented out, may fix the
-problem.  
-
-20010623 Working around this in 0.65, but it still blows.
 
 =item * 
 
@@ -327,6 +191,8 @@ return values actually match the memoized values.
 accumulates statistics.  Variation:  Have it automatically unmemoize
 the function if performance is bad.
 
+20220828 Nah. This is way overcomplicated.
+
 =item *
 
 20010517 Option to have normalizer I<modify> @_ for use by memoized
@@ -337,9 +203,11 @@ normalizer could make the adjustments and save the changes in @_, you
 wouldn't have to do it twice. 
 
 =item *
+
 20010623 Add CLEAR methods to tied hash modules.
 
 =item *
+
 20010623 You get a warning if you try to use DB_File as LIST_CACHE,
 because it won't store lists.  But if you use it as the underlying
 cache with an expiration manager in the middle, no warning---the
@@ -347,9 +215,6 @@ expiration manager doesn't know it's managing a list cache, and
 memoize doesn't know that DB_File is underlying.  Is this fixable?
 Probably not, but think about it.
 
-=item *
-There was probably some other stuff that I forgot.
-
-
-
 =back
+
+=cut

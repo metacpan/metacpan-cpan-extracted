@@ -1,11 +1,13 @@
 package App::DistUtils;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-27'; # DATE
-our $DIST = 'App-DistUtils'; # DIST
-our $VERSION = '0.151'; # VERSION
-
 use 5.010001;
+use strict;
+use warnings;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-08-21'; # DATE
+our $DIST = 'App-DistUtils'; # DIST
+our $VERSION = '0.152'; # VERSION
 
 our %dist_arg_single = (
     dist => {
@@ -49,7 +51,7 @@ App::DistUtils - Collection of utilities related to Perl distributions
 
 =head1 VERSION
 
-This document describes version 0.151 of App::DistUtils (from Perl distribution App-DistUtils), released on 2021-07-27.
+This document describes version 0.152 of App::DistUtils (from Perl distribution App-DistUtils), released on 2022-08-21.
 
 =head1 SYNOPSIS
 
@@ -92,12 +94,6 @@ distributions:
 
 The main feature of these utilities is tab completion.
 
-=head1 CONTRIBUTOR
-
-=for stopwords perlancar (@pc-office)
-
-perlancar (@pc-office) <perlancar@gmail.com>
-
 =head1 FAQ
 
 =head2 What is the purpose of this distribution? Haven't other similar utilities existed?
@@ -116,14 +112,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-DistUt
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-App-DistUtils>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-DistUtils>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 SEE ALSO
 
@@ -154,11 +142,37 @@ L<App::WeaverUtils>, utilities related to L<Pod::Weaver>.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2020, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-DistUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

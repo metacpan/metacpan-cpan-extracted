@@ -1,5 +1,10 @@
 Revision history for Device-Serial-SLuRM
 
+0.03    2022-10-29
+        [CHANGES]
+         * Fixes and improvements to metrics
+         * Use ADJUST :params from Object::Pad v0.70
+
 0.02    2022-10-11
         [CHANGES]
          * Export metrics using Metrics::Any

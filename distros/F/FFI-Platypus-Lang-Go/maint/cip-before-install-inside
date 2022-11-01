@@ -4,7 +4,7 @@ set -ex
 
 mkdir -p ~/tmp
 cd $(env TMPDIR=$HOME/tmp mktemp -d)
-curl -L https://github.com/Perl5-FFI/FFI-Platypus/tarball/master | tar zxf -
+curl -L https://github.com/PerlFFI/FFI-Platypus/tarball/main | tar zxf -
 cd $(ls -1)
 dzil-dzil authordeps --missing | dzil-cpanm -n
 dzil-dzil build

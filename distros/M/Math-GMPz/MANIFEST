@@ -16,6 +16,7 @@ README
 demos/imp_exp.p
 demos/dec2rat.p
 demos/solitaire.p
+f128.in
 t/_1aaa_v.t
 t/_1basic.t
 t/_itsa.t

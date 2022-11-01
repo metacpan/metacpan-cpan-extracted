@@ -11,7 +11,7 @@ class TestCase::Sys::Ioctl {
   
   use TestUtil::SocketAutoClose;
   
-  static method ioctl : int ($port : int) {
+  static method ioctl : int () {
     # Socket
     my $socket = Sys::Socket->socket(SOCKET->AF_INET, SOCKET->SOCK_STREAM, 0);
     
@@ -21,14 +21,6 @@ class TestCase::Sys::Ioctl {
 
     # Close socket at the end of this scope
     my $socket_auto_close = TestUtil::SocketAutoClose->new($socket);
-    
-    # IPv4 address
-    my $address = Sys::Socket::Sockaddr::In->new;
-    $address->set_sin_family((byte)SOCKET->AF_INET);
-    $address->set_sin_port(Sys::Socket->htons((short)$port));
-    my $sin_addr = $address->copy_sin_addr;
-    $sin_addr->set_s_addr(Sys::Socket->htonl(SOCKET->INADDR_ANY));
-    $address->set_sin_addr($sin_addr);
     
     my $value = (Int)1;
     my $status_ioctl = 0;

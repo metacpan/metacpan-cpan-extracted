@@ -1,7 +1,7 @@
 {
   am_pm_abbreviated => [
-    "Luma lwa K",
-    "luma lwa p",
+    "Luma\N{U+202f}lwa\N{U+202f}K",
+    "luma\N{U+202f}lwa\N{U+202f}p",
   ],
   available_formats => {
     Bh => "h B",
@@ -36,7 +36,7 @@
     Md => "M/d",
     d => "d",
     h => "h a",
-    hm => "h:mm a",
+    hm => "h:mm\N{U+202f}a",
     hms => "h:mm:ss a",
     hmsv => "h:mm:ss a v",
     hmv => "h:mm a v",
@@ -268,5 +268,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 41,
+  version => 42,
 }

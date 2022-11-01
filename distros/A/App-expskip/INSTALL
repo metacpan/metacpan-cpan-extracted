@@ -1,0 +1,11 @@
+
+INSTALL memo for "App::expskip" : 
+
+   cpanm App::expksip  # For installing (^_^)
+
+   cpanm -U App::expandskip # For uninstalling (;_;)
+
+   
+Perhaps you need to another module as follows : 
+
+   cpanm PerlIO::gzip  # This may not be necessary. 

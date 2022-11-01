@@ -8,6 +8,7 @@ lib/Metabrik/Antivirus/Clamav.pm
 lib/Metabrik/Api/Abuseipdb.pm
 lib/Metabrik/Api/Bluecoat.pm
 lib/Metabrik/Api/Cvesearch.pm
+lib/Metabrik/Api/Geonames.pm
 lib/Metabrik/Api/Shodan.pm
 lib/Metabrik/Api/Splunk.pm
 lib/Metabrik/Api/Virustotal.pm

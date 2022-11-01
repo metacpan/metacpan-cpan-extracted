@@ -1,3 +1,5 @@
+1.02 2022-10-22
+    * Imported @uhle's pull request expanding exports and fixing docs
 1.01 2019-11-10
 	* Support IDN2_NO_TR46 and IDN2_NO_ALABEL_ROUNDTRIP
 	* Make detailed result error code available to Perl code

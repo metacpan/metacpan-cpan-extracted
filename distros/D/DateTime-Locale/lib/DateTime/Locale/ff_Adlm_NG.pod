@@ -19,12 +19,12 @@
 
 =head1 NAME
 
-DateTime::Locale::ff_Adlm_NG - Locale data examples for the Fulah Nigeria Adlam (ff-Adlm-NG) locale
+DateTime::Locale::ff_Adlm_NG - Locale data examples for the Fula Nigeria Adlam (ff-Adlm-NG) locale
 
 =head1 DESCRIPTION
 
 This pod file contains examples of the locale data available for the
-Fulah Nigeria Adlam locale.
+Fula Nigeria Adlam locale.
 
 =head2 Days
 
@@ -302,15 +302,15 @@ Fulah Nigeria Adlam locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = 𞤃𞤢𞤱𞤦𞤢𞥄𞤪𞤫 5 𞤕𞤮𞤤𞤼𞤮⹁ 2008 𞤉 18:30:30 UTC
-   1995-12-22T09:05:02 = 𞤃𞤢𞤱𞤲𞤣𞤫 22 𞤄𞤮𞤱𞤼𞤮⹁ 1995 𞤉 09:05:02 UTC
-  -0010-09-15T04:44:23 = 𞤖𞤮𞤪𞤦𞤭𞤪𞥆𞤫 15 𞤅𞤭𞤤𞤼𞤮⹁ -10 𞤉 04:44:23 UTC
+   2008-02-05T18:30:30 = 𞤃𞤢𞤱𞤦𞤢𞥄𞤪𞤫 5 𞤕𞤮𞤤𞤼𞤮⹁ 2008 18:30:30 UTC
+   1995-12-22T09:05:02 = 𞤃𞤢𞤱𞤲𞤣𞤫 22 𞤄𞤮𞤱𞤼𞤮⹁ 1995 09:05:02 UTC
+  -0010-09-15T04:44:23 = 𞤖𞤮𞤪𞤦𞤭𞤪𞥆𞤫 15 𞤅𞤭𞤤𞤼𞤮⹁ -10 04:44:23 UTC
 
 =head3 Long
 
-   2008-02-05T18:30:30 = 5 𞤕𞤮𞤤𞤼𞤮⹁ 2008 𞤉 18:30:30 UTC
-   1995-12-22T09:05:02 = 22 𞤄𞤮𞤱𞤼𞤮⹁ 1995 𞤉 09:05:02 UTC
-  -0010-09-15T04:44:23 = 15 𞤅𞤭𞤤𞤼𞤮⹁ -10 𞤉 04:44:23 UTC
+   2008-02-05T18:30:30 = 5 𞤕𞤮𞤤𞤼𞤮⹁ 2008 18:30:30 UTC
+   1995-12-22T09:05:02 = 22 𞤄𞤮𞤱𞤼𞤮⹁ 1995 09:05:02 UTC
+  -0010-09-15T04:44:23 = 15 𞤅𞤭𞤤𞤼𞤮⹁ -10 04:44:23 UTC
 
 =head3 Medium
 

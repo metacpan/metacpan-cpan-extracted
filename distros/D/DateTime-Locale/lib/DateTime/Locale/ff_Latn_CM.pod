@@ -19,12 +19,12 @@
 
 =head1 NAME
 
-DateTime::Locale::ff_Latn_CM - Locale data examples for the Fulah Cameroon Latin (ff-Latn-CM) locale
+DateTime::Locale::ff_Latn_CM - Locale data examples for the Fula Cameroon Latin (ff-Latn-CM) locale
 
 =head1 DESCRIPTION
 
 This pod file contains examples of the locale data available for the
-Fulah Cameroon Latin locale.
+Fula Cameroon Latin locale.
 
 =head2 Days
 

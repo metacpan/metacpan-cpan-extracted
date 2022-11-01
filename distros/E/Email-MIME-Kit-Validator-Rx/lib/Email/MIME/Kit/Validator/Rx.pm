@@ -1,7 +1,4 @@
-package Email::MIME::Kit::Validator::Rx;
-{
-  $Email::MIME::Kit::Validator::Rx::VERSION = '0.200001';
-}
+package Email::MIME::Kit::Validator::Rx 0.200002;
 use Moose;
 with 'Email::MIME::Kit::Role::Validator';
 # ABSTRACT: validate assembly stash with Rx (from JSON in kit)
@@ -12,6 +9,72 @@ use JSON;
 use Moose::Util::TypeConstraints;
 use Try::Tiny;
 
+#pod =head1 SYNOPSIS
+#pod
+#pod Email::MIME::Kit::Validator::Rx is a Validator plugin for Email::MIME::Kit that
+#pod allows an Rx schema to be used to validate kit assembly data.
+#pod
+#pod A simple mkit's manifest might include the following:
+#pod
+#pod   {
+#pod     "renderer" : "TT",
+#pod     "validator": "Rx",
+#pod     "header"   : [ ... mail headers ... ],
+#pod     "type"     : "text/plain",
+#pod     "path"     : "path/to/template.txt"
+#pod   }
+#pod
+#pod In this simple configuration, the use of "Rx" as the validator will load the
+#pod plugin in its simplest configuration.  It will look for a file called
+#pod F<rx.json> in the kit and will load its contents (as JSON) and use them as a
+#pod schema to validate the data passed to the it's C<assemble> method.
+#pod
+#pod More complex configurations are simple.
+#pod
+#pod This configuration supplies an alternate filename for the JSON file:
+#pod
+#pod   "validator": [ "Rx", { "path": "rx-schema.json" } ],
+#pod
+#pod This configuration supplies the schema definition inline:
+#pod
+#pod   "validator": [
+#pod     "Rx",
+#pod     {
+#pod       "schema": {
+#pod         "type"   : "//rec",
+#pod         "required": {
+#pod           "subject": "//str",
+#pod           "rcpt"   : { "type": "/perl/obj", "isa": "Email::Address" }
+#pod         }
+#pod       }
+#pod     }
+#pod   ]
+#pod
+#pod Notice, above, the C</perl/> prefix.  By default,
+#pod L<Data::Rx::TypeBundle::Perl|Data::Rx::TypeBundle::Perl> is loaded along with
+#pod the core types.
+#pod
+#pod If a C<combine> argument is given, multiple schema definitions may be provided.
+#pod They will be combined with the logic named by the combine argument.  In this
+#pod release, only "all" is valid, and will require all schemata to match.  Here is
+#pod an example:
+#pod
+#pod   "validator": [
+#pod     "Rx",
+#pod     {
+#pod       "combine": "all",
+#pod       "path"   : "rx.json",
+#pod       "schema" : [
+#pod         { "type": "//rec", "rest": "//any", "required": { "foo": "//int" } },
+#pod         { "type": "//rec", "rest": "//any", "required": { "bar": "//int" } },
+#pod       ]
+#pod     }
+#pod   ]
+#pod
+#pod This definition will create an C<//all> schema with three entries: the schema
+#pod found in F<rx.json> and the two schemata given in the array value of C<schema>.
+#pod
+#pod =cut
 
 has prefix => (
   is  => 'ro',
@@ -157,13 +220,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Email::MIME::Kit::Validator::Rx - validate assembly stash with Rx (from JSON in kit)
 
 =head1 VERSION
 
-version 0.200001
+version 0.200002
 
 =head1 SYNOPSIS
 
@@ -230,13 +295,31 @@ an example:
 This definition will create an C<//all> schema with three entries: the schema
 found in F<rx.json> and the two schemata given in the array value of C<schema>.
 
+=head1 PERL VERSION
+
+This module should work on any version of perl still receiving updates from
+the Perl 5 Porters.  This means it should work on any version of perl released
+in the last two to three years.  (That is, if the most recently released
+version is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <cpan@semiotic.systems>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Ricardo Signes
+
+Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Ricardo SIGNES.
+This software is copyright (c) 2022 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

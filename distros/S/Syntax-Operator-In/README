@@ -1,13 +1,10 @@
 NAME
 
-    Syntax::Operator::In - placeholder module for infix element-of-list
-    meta-operator
+    Syntax::Operator::In - infix element-of-list meta-operator
 
-DESCRIPTION
+SYNOPSIS
 
-    This empty module is a placeholder for eventually implementing syntax
-    for a generic element-of-list meta-operator, perhaps using syntax such
-    as the following:
+    On a suitably-patched perl:
 
        use Syntax::Operator::In;
     
@@ -15,12 +12,36 @@ DESCRIPTION
           say "x is one of the given strings";
        }
 
-    It is currently empty, because the underlying syntax parsing module,
-    XS::Parse::Infix, does not yet support the additional syntax required
-    to parameterize this meta-operator.
+DESCRIPTION
 
-    Instead, for operators that already specialize on string or numerical
-    equality, see instead Syntax::Operator::Elem.
+    This module provides an infix meta-operator that implements a
+    element-of-list test on either strings or numbers.
+
+    Current versions of perl do not directly support custom infix
+    operators. The documentation of XS::Parse::Infix describes the
+    situation, with reference to a branch experimenting with this new
+    feature. This module is therefore almost entirely useless on standard
+    perl builds. While the regular parser does not support custom infix
+    operators, they are supported via XS::Parse::Infix and hence
+    XS::Parse::Keyword, and so custom keywords which attempt to parse
+    operator syntax may be able to use it.
+
+    For operators that already specialize on string or numerical equality,
+    see instead Syntax::Operator::Elem.
+
+OPERATORS
+
+ in
+
+       my $present = $lhs in<OP> @rhs;
+
+    Yields true if the value on the lefhand side is equal to any of the
+    values in the list on the right, according to some equality test
+    operator OP.
+
+    This test operator must be either eq for string match, or == for number
+    match, or any other custom infix operator that is registered in the
+    XPI_CLS_EQUALITY classification.
 
 TODO
 
@@ -28,8 +49,15 @@ TODO
       strings, by detecting when the RHS contains string constants and
       convert it into a hash lookup.
 
-      * The real in meta-operator. This first requires more extensive
-      parsing support from XS::Parse::Infix.
+      * Consider further on the syntax for this operator. Maybe instead of
+      the circumfix anglebrackets, a single colon might look nicer?
+
+         $lhs in:OP @rhs
+      
+         $x in:== @numbers
+         $x in:eq @strings
+
+      Does the lacking of end marker make parsing harder though?
 
       * Consider cross-module integration with Syntax::Keyword::Match,
       permitting

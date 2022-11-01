@@ -4,7 +4,7 @@
       "Tokuhiro Matsuno <tokuhirom@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.10",
+   "generated_by" : "Minilla/v3.1.19",
    "license" : [
       "perl_5"
    ],
@@ -99,6 +99,7 @@
             "AnyEvent::Socket" : "0",
             "App::Prove" : "0",
             "App::cpanminus" : "0",
+            "Crypt::Rijndael" : "0",
             "DBD::SQLite" : "0",
             "File::Which" : "0",
             "File::pushd" : "0",
@@ -128,7 +129,7 @@
    "provides" : {
       "Amon2" : {
          "file" : "lib/Amon2.pm",
-         "version" : "6.15"
+         "version" : "6.16"
       },
       "Amon2::Config::Simple" : {
          "file" : "lib/Amon2/Config/Simple.pm"
@@ -166,9 +167,6 @@
       "Amon2::Setup::Asset::Bootstrap" : {
          "file" : "lib/Amon2/Setup/Asset/Bootstrap.pm"
       },
-      "Amon2::Setup::Asset::ES5Shim" : {
-         "file" : "lib/Amon2/Setup/Asset/ES5Shim.pm"
-      },
       "Amon2::Setup::Asset::MicroDispatcherJS" : {
          "file" : "lib/Amon2/Setup/Asset/MicroDispatcherJS.pm"
       },
@@ -195,15 +193,15 @@
       },
       "Amon2::Setup::Flavor::Basic" : {
          "file" : "lib/Amon2/Setup/Flavor/Basic.pm",
-         "version" : "6.15"
+         "version" : "6.16"
       },
       "Amon2::Setup::Flavor::Large" : {
          "file" : "lib/Amon2/Setup/Flavor/Large.pm",
-         "version" : "6.15"
+         "version" : "6.16"
       },
       "Amon2::Setup::Flavor::Minimum" : {
          "file" : "lib/Amon2/Setup/Flavor/Minimum.pm",
-         "version" : "6.15"
+         "version" : "6.16"
       },
       "Amon2::Setup::VC::Git" : {
          "file" : "lib/Amon2/Setup/VC/Git.pm"
@@ -246,11 +244,12 @@
       },
       "homepage" : "https://github.com/tokuhirom/Amon",
       "repository" : {
-         "url" : "git://github.com/tokuhirom/Amon.git",
+         "type" : "git",
+         "url" : "https://github.com/tokuhirom/Amon.git",
          "web" : "https://github.com/tokuhirom/Amon"
       }
    },
-   "version" : "6.15",
+   "version" : "6.16",
    "x_contributors" : [
       "Adrian <adrian@investometrica.com>",
       "Fuji, Goro <g.psy.va@gmail.com>",
@@ -290,6 +289,6 @@
       "tokubass <tokubass@cpan.org>",
       "wata <w.nagasawa@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.02",
+   "x_serialization_backend" : "JSON::PP version 4.07",
    "x_static_install" : 1
 }

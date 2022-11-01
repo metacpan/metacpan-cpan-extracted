@@ -714,7 +714,7 @@ class TestCase::Sys::Socket {
       return 0;
     }
     
-    unless (Sys::Socket->ntohs($result_address->sin_port) == 20000) {
+    unless (Sys::Socket->ntohs($result_address->sin_port) == $port) {
       return 0;
     }
     

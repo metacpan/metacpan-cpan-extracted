@@ -7,8 +7,7 @@ $|++;
 
 use Webservice::Judobase;
 use Data::Dumper;
-$Data::Dumper::Sortkeys=1;
-
+$Data::Dumper::Sortkeys = 1;
 
 my $srv = Webservice::Judobase->new;
 
@@ -69,7 +68,7 @@ my @countries = (
         GBR
         VAN
         ZAM
-    /
+        /
 );
 # loop through events:
 #        1039 to 1753
@@ -82,41 +81,39 @@ for my $event_id ( 1039 .. 1039 ) {
     my $contests = $srv->contests->competition( id => $event_id );
     next unless scalar @{$contests};
 
-    
-
     for ( @{$contests} ) {
         #print ".";
         my $white_nation = $_->{country_short_white};
-        my $blue_nation = $_->{country_short_blue};
+        my $blue_nation  = $_->{country_short_blue};
 
         if ( $blue_nation && grep /^$blue_nation$/, @countries ) {
-            # say Dumper $_;
-            #say "$_->{country_short_blue},$_->{family_name_blue},$_->{given_name_blue}";    
-	        $data{years}{$blue_nation}{$_->{comp_year}}++;        
-            $data{$blue_nation}{"$_->{family_name_blue} $_->{given_name_blue}"}++;
+ # say Dumper $_;
+ #say "$_->{country_short_blue},$_->{family_name_blue},$_->{given_name_blue}";
+            $data{years}{$blue_nation}{ $_->{comp_year} }++;
+            $data{$blue_nation}
+                {"$_->{family_name_blue} $_->{given_name_blue}"}++;
         }
 
         if ( $white_nation && grep /^$white_nation$/, @countries ) {
-            # say Dumper $_;
-            # say "$_->{country_short_white},$_->{family_name_white},$_->{given_name_white}";            
-	        $data{years}{$white_nation}{$_->{comp_year}}++;        
-            $data{$white_nation}{"$_->{family_name_white} $_->{given_name_white}"}++;
-        } 
-
+# say Dumper $_;
+# say "$_->{country_short_white},$_->{family_name_white},$_->{given_name_white}";
+            $data{years}{$white_nation}{ $_->{comp_year} }++;
+            $data{$white_nation}
+                {"$_->{family_name_white} $_->{given_name_white}"}++;
+        }
 
         $data{All}{Athletes}++;
-        $data{years}{All}{$_->{comp_year}}++;
+        $data{years}{All}{ $_->{comp_year} }++;
 
     }
-
 
 }
 
 #say Dumper \%data;
 
-for my $nation (keys %data) {
+for my $nation ( keys %data ) {
     next if $nation eq "years";
-    for my $athlete (keys %{$data{$nation}}) {
+    for my $athlete ( keys %{ $data{$nation} } ) {
         say "$nation,$athlete,$data{$nation}{$athlete}";
     }
 }

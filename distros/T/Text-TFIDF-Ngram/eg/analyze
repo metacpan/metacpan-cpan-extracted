@@ -16,7 +16,7 @@ my %opts = (
     stop   => 1,
     phrase => '',
     type   => 'txt',
-    punc   => '[-!"#$%&()*+,.\/\\:;<=>?@\[\]^_`{|}~]',
+    punc   => "(?!')[[:punct:]]",
     lc     => 0,
     proper => 0,
 );
@@ -56,6 +56,8 @@ if ( $opts{top} ) {
 
     my $i = 0;
 
+    my $width = length $opts{top};
+
     for my $file ( sort keys %$x ) {
         $i++;
 
@@ -63,12 +65,12 @@ if ( $opts{top} ) {
 
         my $n = 0;
 
-        for my $p ( sort { $x->{$file}{$b} <=> $x->{$file}{$a} } keys %{ $x->{$file} } ) {
+        for my $p ( sort { $x->{$file}{$b} <=> $x->{$file}{$a} || $a cmp $b } keys %{ $x->{$file} } ) {
             next if $opts{proper} && $p =~ /[A-Z]/;
 
             last if ++$n > $opts{top};
 
-            printf "\t%d. %s = %.10f\n", $n, $p, $x->{$file}{$p};
+            printf "\t%*d. %.10f = %s\n", $width, $n, $x->{$file}{$p}, $p;
         }
     }
 }
@@ -167,7 +169,7 @@ Default: C<txt>
 A string defining a regular expression of characters to exclude from results.
 Giving C<0> as the value for this will not exclude any characters.
 
-Default: [-!"#$%&()*+,.\/\\:;<=>?@\[\]^_`{|}~]
+Default: (?!')[[:punct:]]
 
 Note that the single quote is not excluded by default.
 

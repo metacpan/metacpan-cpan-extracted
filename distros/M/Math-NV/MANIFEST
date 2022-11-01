@@ -5,6 +5,7 @@ NV.pm
 NV.pod
 NV.xs
 Makefile.PL
+demo/bytes.p
 demo/nv.p
 t/01load.t
 t/02mant_dig.t
@@ -15,6 +16,7 @@ t/06is_eq.t
 t/07nv_mpfr.t
 t/08subnormal_mpfr.t
 t/09subnormal_mpfr_alt.t
+t/10cmp_2.t
 t/11sprintf.t
 t/pod.t
 

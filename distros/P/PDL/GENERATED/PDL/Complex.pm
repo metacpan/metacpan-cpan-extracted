@@ -378,7 +378,7 @@ sub real($) {
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -403,7 +403,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 950 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 undef &PDL::r2C;
@@ -417,7 +417,7 @@ sub PDL::Complex::r2C {
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*r2C = \&PDL::Complex::r2C;
 }
@@ -425,7 +425,7 @@ BEGIN {*r2C = \&PDL::Complex::r2C;
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -450,14 +450,14 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 950 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 undef &PDL::i2C; *PDL::i2C = \&PDL::Complex::i2C; sub PDL::Complex::i2C { my $r = __PACKAGE__->initialize; &PDL::Complex::_i2C_int($_[0], $r); $r }
 #line 457 "Complex.pm"
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*i2C = \&PDL::Complex::i2C;
 }
@@ -465,7 +465,7 @@ BEGIN {*i2C = \&PDL::Complex::i2C;
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -490,7 +490,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Cr2p = \&PDL::Complex::Cr2p;
 }
@@ -498,7 +498,7 @@ BEGIN {*Cr2p = \&PDL::Complex::Cr2p;
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -523,7 +523,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Cp2r = \&PDL::Complex::Cp2r;
 }
@@ -531,7 +531,7 @@ BEGIN {*Cp2r = \&PDL::Complex::Cp2r;
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Cadd = \&PDL::Complex::Cadd;
 }
@@ -539,7 +539,7 @@ BEGIN {*Cadd = \&PDL::Complex::Cadd;
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Csub = \&PDL::Complex::Csub;
 }
@@ -547,7 +547,7 @@ BEGIN {*Csub = \&PDL::Complex::Csub;
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -572,7 +572,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Cmul = \&PDL::Complex::Cmul;
 }
@@ -580,7 +580,7 @@ BEGIN {*Cmul = \&PDL::Complex::Cmul;
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -605,7 +605,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Cprodover = \&PDL::Complex::Cprodover;
 }
@@ -613,7 +613,7 @@ BEGIN {*Cprodover = \&PDL::Complex::Cprodover;
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -638,7 +638,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Cscale = \&PDL::Complex::Cscale;
 }
@@ -646,7 +646,7 @@ BEGIN {*Cscale = \&PDL::Complex::Cscale;
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -671,7 +671,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Cdiv = \&PDL::Complex::Cdiv;
 }
@@ -679,7 +679,7 @@ BEGIN {*Cdiv = \&PDL::Complex::Cdiv;
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -704,7 +704,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 950 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 sub PDL::Complex::Ceq {
     my @args = !$_[2] ? @_[1,0] : @_[0,1];
@@ -716,7 +716,7 @@ sub PDL::Complex::Ceq {
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Ceq = \&PDL::Complex::Ceq;
 }
@@ -724,7 +724,7 @@ BEGIN {*Ceq = \&PDL::Complex::Ceq;
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -749,7 +749,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Cconj = \&PDL::Complex::Cconj;
 }
@@ -757,7 +757,7 @@ BEGIN {*Cconj = \&PDL::Complex::Cconj;
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -782,7 +782,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 950 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 sub PDL::Complex::Cabs($) {
            my $pdl= shift;
@@ -794,7 +794,7 @@ sub PDL::Complex::Cabs($) {
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Cabs = \&PDL::Complex::Cabs;
 }
@@ -802,7 +802,7 @@ BEGIN {*Cabs = \&PDL::Complex::Cabs;
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -827,7 +827,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 950 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 sub PDL::Complex::Cabs2($) {
            my $pdl= shift;
@@ -839,7 +839,7 @@ sub PDL::Complex::Cabs2($) {
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Cabs2 = \&PDL::Complex::Cabs2;
 }
@@ -847,7 +847,7 @@ BEGIN {*Cabs2 = \&PDL::Complex::Cabs2;
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -872,7 +872,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 950 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 sub PDL::Complex::Carg($) {
            my $pdl= shift;
@@ -884,7 +884,7 @@ sub PDL::Complex::Carg($) {
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Carg = \&PDL::Complex::Carg;
 }
@@ -892,7 +892,7 @@ BEGIN {*Carg = \&PDL::Complex::Carg;
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -917,7 +917,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Csin = \&PDL::Complex::Csin;
 }
@@ -925,7 +925,7 @@ BEGIN {*Csin = \&PDL::Complex::Csin;
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -950,7 +950,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Ccos = \&PDL::Complex::Ccos;
 }
@@ -978,7 +978,7 @@ sub Ctan($) { Csin($_[0]) / Ccos($_[0]) }
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1003,7 +1003,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Cexp = \&PDL::Complex::Cexp;
 }
@@ -1011,7 +1011,7 @@ BEGIN {*Cexp = \&PDL::Complex::Cexp;
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1036,7 +1036,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Clog = \&PDL::Complex::Clog;
 }
@@ -1044,7 +1044,7 @@ BEGIN {*Clog = \&PDL::Complex::Clog;
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1069,7 +1069,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Cpow = \&PDL::Complex::Cpow;
 }
@@ -1077,7 +1077,7 @@ BEGIN {*Cpow = \&PDL::Complex::Cpow;
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1102,7 +1102,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Csqrt = \&PDL::Complex::Csqrt;
 }
@@ -1110,7 +1110,7 @@ BEGIN {*Csqrt = \&PDL::Complex::Csqrt;
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1135,7 +1135,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Casin = \&PDL::Complex::Casin;
 }
@@ -1143,7 +1143,7 @@ BEGIN {*Casin = \&PDL::Complex::Casin;
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1168,7 +1168,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Cacos = \&PDL::Complex::Cacos;
 }
@@ -1197,7 +1197,7 @@ sub Catan($) {
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1222,7 +1222,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Csinh = \&PDL::Complex::Csinh;
 }
@@ -1230,7 +1230,7 @@ BEGIN {*Csinh = \&PDL::Complex::Csinh;
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1255,7 +1255,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Ccosh = \&PDL::Complex::Ccosh;
 }
@@ -1263,7 +1263,7 @@ BEGIN {*Ccosh = \&PDL::Complex::Ccosh;
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1288,7 +1288,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Ctanh = \&PDL::Complex::Ctanh;
 }
@@ -1296,7 +1296,7 @@ BEGIN {*Ctanh = \&PDL::Complex::Ctanh;
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1321,7 +1321,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Casinh = \&PDL::Complex::Casinh;
 }
@@ -1329,7 +1329,7 @@ BEGIN {*Casinh = \&PDL::Complex::Casinh;
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1354,7 +1354,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Cacosh = \&PDL::Complex::Cacosh;
 }
@@ -1362,7 +1362,7 @@ BEGIN {*Cacosh = \&PDL::Complex::Cacosh;
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1387,7 +1387,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Catanh = \&PDL::Complex::Catanh;
 }
@@ -1395,7 +1395,7 @@ BEGIN {*Catanh = \&PDL::Complex::Catanh;
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1420,7 +1420,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Cproj = \&PDL::Complex::Cproj;
 }
@@ -1428,7 +1428,7 @@ BEGIN {*Cproj = \&PDL::Complex::Cproj;
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1453,7 +1453,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 950 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 sub PDL::Complex::Croots($$) {
            my ($pdl, $n) = @_;
@@ -1465,7 +1465,7 @@ sub PDL::Complex::Croots($$) {
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*Croots = \&PDL::Complex::Croots;
 }
@@ -1502,7 +1502,7 @@ sub slice :lvalue {
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -1527,7 +1527,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 950 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 sub rCpolynomial {
@@ -1541,7 +1541,7 @@ sub rCpolynomial {
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 BEGIN {*rCpolynomial = \&PDL::Complex::rCpolynomial;
 }

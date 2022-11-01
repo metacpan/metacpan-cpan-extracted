@@ -6,7 +6,7 @@ use Rose::HTML::Object::Errors qw(:number);
 
 BEGIN
 {
-  use Test::More tests => 42;
+  use Test::More tests => 46;
   use_ok('Rose::HTML::Form::Field::Integer');
 }
 
@@ -22,22 +22,22 @@ ok($field->validate, 'validate() 0');
 
 ok(ref $field eq 'Rose::HTML::Form::Field::Integer', 'new()');
 
-is($field->html_field, '<input maxlength="7" name="num" size="6" type="text" value="123">', 'html_field() 1');
-is($field->xhtml_field, '<input maxlength="7" name="num" size="6" type="text" value="123" />', 'xhtml_field() 1');
+is($field->html_field, '<input maxlength="7" name="num" size="6" step="1" type="number" value="123">', 'html_field() 1');
+is($field->xhtml_field, '<input maxlength="7" name="num" size="6" step="1" type="number" value="123" />', 'xhtml_field() 1');
 
 $field->clear;
 
 is($field->internal_value, undef, 'clear()');
 
-is($field->html_field, '<input maxlength="7" name="num" size="6" type="text" value="">', 'html_field() 2');
-is($field->xhtml_field, '<input maxlength="7" name="num" size="6" type="text" value="" />', 'xhtml_field() 2');
+is($field->html_field, '<input maxlength="7" name="num" size="6" step="1" type="number" value="">', 'html_field() 2');
+is($field->xhtml_field, '<input maxlength="7" name="num" size="6" step="1" type="number" value="" />', 'xhtml_field() 2');
 
 $field->reset;
 
 is($field->internal_value, '456', 'reset()');
 
-is($field->html_field, '<input maxlength="7" name="num" size="6" type="text" value="456">', 'html_field() 3');
-is($field->xhtml_field, '<input maxlength="7" name="num" size="6" type="text" value="456" />', 'xhtml_field() 3');
+is($field->html_field, '<input maxlength="7" name="num" size="6" step="1" type="number" value="456">', 'html_field() 3');
+is($field->xhtml_field, '<input maxlength="7" name="num" size="6" step="1" type="number" value="456" />', 'xhtml_field() 3');
 
 $field->input_value('123');
 
@@ -45,8 +45,16 @@ $field->class('foo');
 $field->id('bar');
 $field->style('baz');
 
-is($field->html_field, '<input class="foo" id="bar" maxlength="7" name="num" size="6" style="baz" type="text" value="123">', 'html_field() 4');
-is($field->xhtml_field, '<input class="foo" id="bar" maxlength="7" name="num" size="6" style="baz" type="text" value="123" />', 'xhtml_field() 4');
+is($field->html_field, '<input class="foo" id="bar" maxlength="7" name="num" size="6" step="1" style="baz" type="number" value="123">', 'html_field() 4');
+is($field->xhtml_field, '<input class="foo" id="bar" maxlength="7" name="num" size="6" step="1" style="baz" type="number" value="123" />', 'xhtml_field() 4');
+
+$field->step('any');
+is($field->html_field, '<input class="foo" id="bar" maxlength="7" name="num" size="6" step="any" style="baz" type="number" value="123">', 'html_field() 4.1');
+is($field->xhtml_field, '<input class="foo" id="bar" maxlength="7" name="num" size="6" step="any" style="baz" type="number" value="123" />', 'xhtml_field() 4.1');
+
+$field->step(2);
+is($field->html_field, '<input class="foo" id="bar" maxlength="7" name="num" size="6" step="2" style="baz" type="number" value="123">', 'html_field() 4.2');
+is($field->xhtml_field, '<input class="foo" id="bar" maxlength="7" name="num" size="6" step="2" style="baz" type="number" value="123" />', 'xhtml_field() 4.2');
 
 $field->input_value('bad');  
 ok(!$field->validate, 'validate() 1');

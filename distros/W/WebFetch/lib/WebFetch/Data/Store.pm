@@ -23,7 +23,7 @@ use utf8;
 ## use critic (Modules::RequireExplicitPackage)
 
 package WebFetch::Data::Store;
-$WebFetch::Data::Store::VERSION = '0.15.4';
+$WebFetch::Data::Store::VERSION = '0.15.5';
 use strict;
 use warnings;
 use WebFetch;
@@ -243,7 +243,7 @@ WebFetch::Data::Store - WebFetch Embedding API top-level data store
 
 =head1 VERSION
 
-version 0.15.4
+version 0.15.5
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
 package Git::Raw::Diff::Hunk;
-$Git::Raw::Diff::Hunk::VERSION = '0.88';
+$Git::Raw::Diff::Hunk::VERSION = '0.90';
 use strict;
 use warnings;
 
@@ -11,7 +11,7 @@ Git::Raw::Diff::Hunk - Git diff hunk class
 
 =head1 VERSION
 
-version 0.88
+version 0.90
 
 =head1 DESCRIPTION
 
@@ -46,7 +46,7 @@ Header text.
 
 Alessandro Ghedini <alexbio@cpan.org>
 
-Jacques Germishuys <jacquesg@striata.com>
+Jacques Germishuys <jacquesg@cpan.org>
 
 =head1 LICENSE AND COPYRIGHT
 

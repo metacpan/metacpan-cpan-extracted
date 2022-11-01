@@ -1,5 +1,8 @@
 Revision history for WebService-LastFM-TrackInfo
 
+0.0206 2022-10-26 18:29:05
+    - Avoid implicit imports.
+
 0.0205 2022-06-06 22:13:33
     - Improve documentation slightly.
     - Make the ".getInfo" part of the method an internal thing.

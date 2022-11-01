@@ -8,13 +8,13 @@ my $build = Module::Build->new(
    requires => {
       'perl' => '5.026',
       'Future::AsyncAwait' => 0,
-      'Object::Pad' => 0,
+      'Object::Pad' => '0.70',
 
       'Future::IO' => 0,
       'IO::Termios' => 0,
    },
    test_requires => {
-      'Test::Future::IO' => 0,
+      'Test::Future::IO' => '0.04',
       'Test::More' => '0.88', # done_testing
    },
    configure_requires => {

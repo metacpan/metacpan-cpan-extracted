@@ -19,19 +19,18 @@ my %module_build_args = (
     "Patrick Joly <patjol\@cpan.org>"
   ],
   "dist_name" => "Geo-Gpx",
-  "dist_version" => "1.04",
+  "dist_version" => "1.07",
   "license" => "perl",
   "module_name" => "Geo::Gpx",
   "recursive_test_files" => 1,
   "requires" => {
-    "DateTime" => 0,
-    "DateTime::Format::ISO8601" => 0,
+    "DateTime" => "1.44",
+    "DateTime::Format::ISO8601" => "0.16",
     "Geo::Calc" => 0,
     "Geo::Coordinates::Transform" => 0,
     "HTML::Entities" => 0,
     "Scalar::Util" => 0,
     "Test::More" => 0,
-    "Time::Local" => 0,
     "XML::Descent" => 0,
     "perl" => "5.008",
     "version" => 0

@@ -1,13 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
 
-use Object::Pad 0.43;  # :strict(params)
+use Object::Pad 0.66;
 
-package App::sdview::Parser::Markdown 0.07;
+package App::sdview::Parser::Markdown 0.08;
 class App::sdview::Parser::Markdown
    does App::sdview::Parser
    :strict(params);
@@ -28,7 +28,7 @@ method parse_file ( $fh )
    return $self->parse_string( read_text $fh );
 }
 
-has @_paragraphs;
+field @_paragraphs;
 
 sub _split_table_row ( $str )
 {

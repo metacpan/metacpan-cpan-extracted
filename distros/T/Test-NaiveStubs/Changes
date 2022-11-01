@@ -1,5 +1,8 @@
 Revision history for Test-NaiveStubs
 
+0.0703 2022-10-26 17:37:55
+    - Avoid implicit imports.
+
 0.0702 2019-01-02 12:40:52
     - Enhanced eg/stub.
 

@@ -36,10 +36,10 @@ foreach my $iteration (1..2)
 {
   subtest "iteration $iteration" => sub {
     plan tests => 6;
-  
+
     my $foo = 0;
     my @cb_args;
-  
+
     my $ret = $ipc->run($^X, File::Spec->catfile($dir, 'child.pl'), 'arg1', 'arg2', sub { $foo = $iteration; @cb_args = @_ });
     isa_ok $ret, 'AnyEvent::Open3::Simple';
 
@@ -54,7 +54,7 @@ foreach my $iteration (1..2)
 
     is $prog, $^X, 'prog';
     is_deeply \@args, [File::Spec->catfile($dir, 'child.pl'), 'arg1', 'arg2'], 'args';
-    
+
     is_deeply [map { ref } @cb_args], [qw( AnyEvent::Open3::Simple::Process )], 'arguments to run call back are a single $proc object';
     is $foo, $iteration, "foo set to iteration ($foo = $iteration)";
   };

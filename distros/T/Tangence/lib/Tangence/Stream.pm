@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2011-2020 -- leonerd@leonerd.org.uk
 
-package Tangence::Stream 0.29;
+package Tangence::Stream 0.30;
 
 use v5.26;
 use warnings;

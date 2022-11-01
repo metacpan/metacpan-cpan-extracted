@@ -7,6 +7,7 @@ use lib "$FindBin::Bin/lib";
 BEGIN { $ENV{SPVM_BUILD_DIR} = "$FindBin::Bin/.spvm_build"; }
 
 use SPVM 'Sys::Time';
+use SPVM 'Sys';
 
 use SPVM 'TestCase::Sys::Time';
 
@@ -45,13 +46,34 @@ else {
   ok(SPVM::TestCase::Sys::Time->times);
 }
 
+{
+  my $clock_nanosleep_supported;
+  
+  my $obj_major_version = SPVM::Int->new(0);
 
-if ($^O eq 'darwin') {
-  eval { SPVM::Sys::Time->clock_nanosleep(0, 0, undef, undef) };
-  like($@, qr/not supported/);
-}
-else {
-  ok(SPVM::TestCase::Sys::Time->clock_nanosleep);
+  if (SPVM::Sys->defined('__APPLE__')) {
+    $clock_nanosleep_supported = 0;
+  }
+  elsif (SPVM::Sys->defined('__FreeBSD__', $obj_major_version)) {
+    my $major_version = $obj_major_version->value;
+    if ($major_version >= 13) {
+      $clock_nanosleep_supported = 1;
+    }
+    else {
+      $clock_nanosleep_supported = 0;
+    }
+  }
+  else {
+    $clock_nanosleep_supported = 1;
+  }
+  
+  if (!$clock_nanosleep_supported) {
+    eval { SPVM::Sys::Time->clock_nanosleep(0, 0, undef, undef) };
+    like($@, qr/not supported/);
+  }
+  else {
+    ok(SPVM::TestCase::Sys::Time->clock_nanosleep);
+  }
 }
 
 ok(SPVM::TestCase::Sys::Time->nanosleep);

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Apache2 Server Side Include Parser - ~/lib/Apache2/SSI/File/Type.pm
-## Version v0.1.0
+## Version v0.1.1
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/27
-## Modified 2021/03/29
+## Modified 2022/10/21
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -17,15 +17,17 @@ BEGIN
     use warnings;
     use warnings::register;
     use parent qw( Module::Generic );
+    use vars qw( $VERSION $TEMPLATES $ESC $MAGIC_DATA $MAGIC_DATA_SOURCE );
     use Digest::MD5;
     use File::Basename ();
     use File::Spec ();
     use IO::File;
+    use JSON;
     use Nice::Try;
     use Scalar::Util ();
     use URI::file;
-    our $VERSION = 'v0.1.0';
-    ## Translation of type in magic file to unpack template and byte count
+    our $VERSION = 'v0.1.1';
+    # Translation of type in magic file to unpack template and byte count
     our $TEMPLATES = 
     {
     'byte'      => [ 'c', 1 ],
@@ -50,7 +52,7 @@ BEGIN
     'string'    => undef(),
     };
     
-    ## For letter escapes in magic file
+    # For letter escapes in magic file
     our $ESC = 
     {
     'n' => "\n",
@@ -59,11 +61,14 @@ BEGIN
     't' => "\t",
     'f' => "\f"
     };
-    ## Cache
+    # Cache
     our $MAGIC_DATA = [];
-    ## Keep a record of the source data file, if any, so we can re-use this cached data instead of re-reading from it
+    # Keep a record of the source data file, if any, so we can re-use this cached data instead of re-reading from it
     our $MAGIC_DATA_SOURCE = '';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -74,15 +79,15 @@ sub init
     $opts->{magic} = $file if( length( $file ) );
     $self->{follow_links} = 1;
     $self->{check_magic}  = 0;
-    ## If there is an error or file is empty, it returns undef instead of application/octet-stream
+    # If there is an error or file is empty, it returns undef instead of application/octet-stream
     $self->{error_returns_undef} = 0;
-    ## Default to returns text/plain. If not, it will return an empty string and leave the caller to set the default mime-type.
+    # Default to returns text/plain. If not, it will return an empty string and leave the caller to set the default mime-type.
     $self->{default_type} = 'text/plain';
     $self->{_init_strict_use_sub} = 1;
     $self->SUPER::init( @_ );
     $self->{magic}        = {};
     $self->{magic_data}   = [];
-    local $load_json_data = sub
+    my $load_json_data = sub
     {
         my $json_file = shift( @_ ) || return;
         my $io = IO::File->new( "<$json_file" ) ||
@@ -106,10 +111,8 @@ sub init
     {
         $file = $opts->{magic};
         my $file_abs = URI::file->new_abs( $file )->file( $^O );
-        $self->message( 3, "Magic file \"$file\" ($file_abs) provided. slurping it." );
         if( $file_abs eq $MAGIC_DATA_SOURCE && scalar( @$MAGIC_DATA ) )
         {
-            $self->message( 3, "Data for magic file \"$file\" ($file_abs) is already loaded, re-using it." );
             $self->{magic_data} = $MAGIC_DATA;
         }
         else
@@ -119,7 +122,6 @@ sub init
             my $path = File::Spec->catpath( File::Spec->tmpdir, $base . "_${checksum}.json" );
             if( -e( $path ) && -s( $path ) )
             {
-                $self->message( 3, "Found previous magic json data file \"$path\", loading it instead." );
                 $load_json_data->( $path ) || return;
             }
             else
@@ -131,7 +133,6 @@ sub init
                 $self->parse_magic_file( $io );
                 $MAGIC_DATA = $self->{magic_data};
                 $io->close;
-                $self->message( 3, "Saving magic data to json cache file \"$path\"." );
                 my $json = $self->as_json || return;
                 my $fh = IO::File->new( ">$path" ) || 
                     return( $self->error( "Unable to write to magic cache json data file \"$path\": $!" ) );
@@ -150,13 +151,12 @@ sub init
     {
         $file = __FILE__;
         $file =~ s/\.pm/\.json/;
-        $self->message( 3, "No magic file specified, reading our magic json data from \"$file\"" );
         return( $self->error( "Apache2::SSI magic file \"$file\" does not exist." ) ) if( !-e( $file ) );
         $load_json_data->( $file ) || return;
     }
     
-    ## From the BSD names.h, some tokens for hard-coded checks of different texts.
-    ## This isn't rocket science. It's prone to failure so these checks are only a last resort.
+    # From the BSD names.h, some tokens for hard-coded checks of different texts.
+    # This isn't rocket science. It's prone to failure so these checks are only a last resort.
     $self->{SPECIALS} = 
     {
         'message/rfc822' => 
@@ -233,7 +233,7 @@ sub check
     my $data = [];
     while( !$io->eof() )
     {
-    	$self->read_magic_entry( $data );
+        $self->read_magic_entry( $data );
     }
     $io->close();
     $self->dump( $data );
@@ -256,8 +256,8 @@ sub data
     
     $type = $self->with_magic( $data );
     
-    ## 4) Check if it's text or binary.
-    ## If it's text, then do a bunch of searching for special tokens
+    # 4) Check if it's text or binary.
+    # If it's text, then do a bunch of searching for special tokens
     if( !defined( $type ) ) 
     {
         $type = $self->with_data( $data );
@@ -271,8 +271,8 @@ sub data
 
 sub default_type { return( shift->_set_get_scalar( 'default_type', @_ ) ); }
 
-## Recursively write the magic file to stderr.
-## Numbers are written in decimal.
+# Recursively write the magic file to stderr.
+# Numbers are written in decimal.
 sub dump
 {
     my $self  = shift( @_ );
@@ -285,10 +285,9 @@ sub dump
     $err->fdopen( fileno( STDERR ), 'w' ) || return( $self->error( "Cannot write to STDERR: $!" ) );
     $err->binmode;
 
-    $self->messagef( 3, "There are %d entries in \$data", scalar( @$data ) );
     foreach my $entry ( @$data )
     {
-        ## Delayed evaluation.
+        # Delayed evaluation.
         $entry = $self->parse_magic_line( @$entry ) if( scalar( @$entry ) == 3 );
         next if( !defined( $entry ) );
         my( $offtype, $offset, $numbytes, $type, $mask, $op, $testval, $template, $message, $subtests ) = @$entry;
@@ -304,7 +303,7 @@ sub dump
         }
         else 
         {
-            ## offtype == 0
+            # offtype == 0
             $err->print( $offset );
         }
         $err->print( "\t", $type );
@@ -326,7 +325,10 @@ sub error_returns_undef { return( shift->_set_get_boolean( 'error_returns_undef'
 sub file 
 {
     my $self = shift( @_ );
-    ## Iterate over each file explicitly so we can seek
+    # The description line. append info to this string
+    my $desc = '';
+    my $type = '';
+    # Iterate over each file explicitly so we can seek
     my $file = shift( @_ ) || do
     {
         if( $self->{error_returns_undef} )
@@ -339,13 +341,10 @@ sub file
             return( "x-system/x-error; $desc" );
         }
     };
-    ## The description line. append info to this string
-    my $desc = '';
-    my $type = '';
     
-    ## No need to let everybody know what is our server file system
+    # No need to let everybody know what is our server file system
     my $base_file = File::Basename::basename( $file );
-    ## 0) Check existence
+    # 0) Check existence
     if( !-e( $file ) )
     {
         if( $self->{error_returns_undef} )
@@ -358,7 +357,7 @@ sub file
             return( "x-system/x-error; $desc" );
         }
     }
-    ## 1) Check permission
+    # 1) Check permission
     elsif( !-r( $file ) ) 
     {
         if( $self->{error_returns_undef} )
@@ -372,7 +371,7 @@ sub file
         }
     }
     
-    ## 2) Check for various special files first
+    # 2) Check for various special files first
     if( $self->follow_links ) 
     {
         CORE::stat( $file ); 
@@ -381,7 +380,7 @@ sub file
     {
         CORE::lstat( $file );
     }
-    ## Avoid doing many useless redondant system stat, use '_'. See perlfunc man page
+    # Avoid doing many useless redondant system stat, use '_'. See perlfunc man page
     if( !-f( _ ) || -z( _ ) ) 
     {
         if( !$self->follow_links && -l( _ ) ) 
@@ -390,12 +389,12 @@ sub file
             return( 'application/x-link' );
         }
         elsif( -d( _ ) ) { return( 'application/x-directory' ); }
-        ## Named pipe
+        # Named pipe
         elsif( -p( _ ) ) { return( 'application/x-pipe' ); }
         elsif( -S( _ ) ) { return( 'application/x-socket' ); }
-        ## Block special file
+        # Block special file
         elsif( -b( _ ) ) { return( 'application/x-block' ); }
-        ## Character special file
+        # Character special file
         elsif( -c( _ ) ) { return( 'application/x-character' ); }
         elsif( -z( _ ) ) { return( 'application/x-empty' ); }
         else 
@@ -404,8 +403,7 @@ sub file
         }
     }
     
-    ## Current file handle. or undef if check_magic (-c option) is true.
-    $self->message( 3, "Opening file \"$file\" to have a peek." );
+    # Current file handle. or undef if check_magic (-c option) is true.
     my $io;
     $io = IO::File->new( "<$file" ) || do
     {
@@ -420,28 +418,26 @@ sub file
     };
     $io->binmode;
     
-    ## 3) Check for script
-    ## if( ( -x( $file ) || ( $^O =~ /^(dos|mswin32|NetWare|symbian|win32)$/i && $file =~ /\.(?:pl|cgi)$/ ) ) && 
+    # 3) Check for script
+    # if( ( -x( $file ) || ( $^O =~ /^(dos|mswin32|NetWare|symbian|win32)$/i && $file =~ /\.(?:pl|cgi)$/ ) ) && 
 #     if( ( -x( $file ) || $file =~ /\.(?:cgi|pl|t)$/ ) && 
 #         -T( _ ) ) 
     my $default;
     if( -x( $file ) && -T( _ ) ) 
     {
-        ## Note, some magic files include elaborate attempts to match #! header lines 
-        ## and return pretty responses but this slows down matching and is unnecessary.
+        # Note, some magic files include elaborate attempts to match #! header lines 
+        # and return pretty responses but this slows down matching and is unnecessary.
         my $line1 = $io->getline;
         if( $line1 =~ /^\#![[:blank:]\h]*(\S+)/ ) 
         {
-            ## Returns the binary name, without file path
+            # Returns the binary name, without file path
             my $bin_name = File::Basename::basename( $1 );
             #$desc .= " executable $bin_name script text";
-            ## $io->close;
-            ## return( "text/x-${bin_name}" );
+            # $io->close;
+            # return( "text/x-${bin_name}" );
             $default = "text/x-${bin_name}";
         }
     }
-    $self->message( 3, "Using file data to find content-type for file '$file'." );
-    ## $self->messagef( 3, "There are %d entries in \$self->{magic_data}", scalar( @{$self->{magic_data}} ) );
     my $out = $self->handle( $io, $desc, { default => $default } );
     $io->close;
     return( $out );
@@ -458,19 +454,15 @@ sub handle
     $opts->{default} = $self->default_type if( !length( $opts->{default} ) );
     my $type = '';
     
-    ## $self->message( 5, "Is file handle '$io' active ? ", ( Scalar::Util::blessed( $io ) && $io->opened ) ? 'Yes' : 'No' );
-    ## 3) Iterate over each magic entry.
+    # 3) Iterate over each magic entry.
     my $match_found = 0;
-    ## $self->messagef( 3, "\$self->{magic_data} contains %d entries.", scalar( @{$self->{magic_data}} ) );
     for( my $m = 0; $m <= $#{ $self->{magic_data} }; $m++ ) 
     {
-        ## Check if the m-th magic entry matches and if it does, then $desc will contain 
-        ## an updated description
-        ## $self->message( 5, "Checking entry $m: (", scalar( @{$self->{magic_data}->[$m]} ), " elements)" ) if( scalar( @{$self->{magic_data}->[$m]} ) );
+        # Check if the m-th magic entry matches and if it does, then $desc will contain 
+        # an updated description
         my $test;
         if( ( $test = $self->_magic_match( $self->{magic_data}->[$m], \$desc, $io ) ) ) 
         {
-            ## $self->message( 4, "Found entry at position '$m'\n" );
             if( defined( $desc ) && $desc ne '' ) 
             {
                 $match_found = 1;
@@ -483,20 +475,19 @@ sub handle
             warnings::warn( "Error occurred while checking for match: ", $self->error ) if( warnings::enabled() && $self->debug );
         }
     
-        ## Read another entry from the magic file if we've exhausted all the entries 
-        ## already buffered. read_magic_entry will add to the end of the array 
-        ## if there are more.
+        # Read another entry from the magic file if we've exhausted all the entries 
+        # already buffered. read_magic_entry will add to the end of the array 
+        # if there are more.
         if( $m == $#{ $self->{magic_data} } &&
             $self->{magic}->{io} && 
             !$self->{magic}->{io}->eof )
         {
             $self->read_magic_entry();
-            #$self->message( 4, "\$self->{magic_data} is now %d items big.\n", scalar( @{$self->{magic_data}} ) );
         }
     }
     
-    ## 4) Check if it's text or binary.
-    ## if It's text, then do a bunch of searching for special tokens
+    # 4) Check if it's text or binary.
+    # if It's text, then do a bunch of searching for special tokens
     if( !$match_found ) 
     {
         my $data = '';
@@ -515,7 +506,7 @@ sub parse_magic_file
 {
     my $self = shift( @_ );
     my $io   = shift( @_ );
-    ##----{ Initialize values
+    #----{ Initialize values
     $self->{magic}->{io}     = $io;
     $self->{magic}->{buffer} = undef();
     $self->{magic}->{count}  = 0;
@@ -526,35 +517,35 @@ sub parse_magic_file
     seek( $io, 0, 0 );
 }
 
-## parse_magic_line( $line, $line_num, $subtests )
-##
-## Parses the match info out of $line.  Returns a reference to an array.
-##
-##  Format is:
-##
-## [ offset, bytes, type, mask, operator, testval, template, sprintf, subtests ]
-##     0      1      2       3        4         5        6        7      8
-##
-## subtests is an array like @$data.
+# parse_magic_line( $line, $line_num, $subtests )
+#
+# Parses the match info out of $line.  Returns a reference to an array.
+#
+#  Format is:
+#
+# [ offset, bytes, type, mask, operator, testval, template, sprintf, subtests ]
+#     0      1      2       3        4         5        6        7      8
+#
+# subtests is an array like @$data.
 sub parse_magic_line 
 {
     my $self = shift( @_ );
     my( $line, $line_num, $subtests ) = @_;
     my( $offtype, $offset, $numbytes, $type, $mask, $operator, $testval, $template, $message );
     
-    ## This would be easier if escaped whitespace wasn't allowed.
+    # This would be easier if escaped whitespace wasn't allowed.
     
-    ## Grab the offset and type.  offset can either be a decimal, oct, or hex offset or 
-    ## an indirect offset specified in parenthesis like (x[.[bsl]][+-][y]), or a relative 
-    ## offset specified by &. offtype : 0 = absolute, 1 = indirect, 2 = relative
+    # Grab the offset and type.  offset can either be a decimal, oct, or hex offset or 
+    # an indirect offset specified in parenthesis like (x[.[bsl]][+-][y]), or a relative 
+    # offset specified by &. offtype : 0 = absolute, 1 = indirect, 2 = relative
     if( $line =~ s/^>*([&\(]?[a-flsx\.\+\-\d]+\)?)[[:blank:]\h]+(\S+)[[:blank:]\h]+// ) 
     {
         ( $offset, $type ) = ( $1, $2 );
         if( $offset =~ /^\(/ ) 
         {
-            ## Indirect offset.
+            # Indirect offset.
             $offtype = 1;
-            ## Store as a reference [ offset1 type template offset2 ]
+            # Store as a reference [ offset1 type template offset2 ]
             my( $o1, $type, $o2 );
             if( ( $o1, $type, $o2 ) = ( $offset =~ /\((\d+)(\.[bsl])?([\+\-]?\d+)?\)/ ) )
             {
@@ -562,11 +553,11 @@ sub parse_magic_line
                 $o2 = oct( $o2 ) if( $o2 =~ /^0/o );
         
                 $type =~ s/\.//;
-                ## Default to long
+                # Default to long
                 $type = 'l' if( $type eq '' );
-                ## Type will be template for unpack
+                # Type will be template for unpack
                 $type =~ tr/b/c/;
-                ## Number of bytes
+                # Number of bytes
                 my $sz = $type;
                 $sz =~ tr/csl/124/;
         
@@ -579,7 +570,7 @@ sub parse_magic_line
         }
         elsif( $offset =~ /^&/o ) 
         {
-            ## Relative offset
+            # Relative offset
             $offtype = 2;
         
             $offset = substr( $offset, 1 );
@@ -587,10 +578,10 @@ sub parse_magic_line
         }
         else 
         {
-            ## Mormal absolute offset
+            # Mormal absolute offset
             $offtype = 0;
         
-            ## Convert if needed
+            # Convert if needed
             $offset = oct( $offset ) if( $offset =~ /^0/o );
         }
     }
@@ -599,21 +590,21 @@ sub parse_magic_line
         return( $self->error( "Bad Offset/Type at line $line_num. '$line'" ) );
     }
     
-    ## Check for & operator on type
+    # Check for & operator on type
     if( $type =~ s/&(.*)// ) 
     {
         $mask = $1;
-        ## Convert if needed
+        # Convert if needed
         $mask = oct( $mask ) if( $mask =~ /^0/o );
     }
     
-    ## Check if type is valid
+    # Check if type is valid
     if( !exists( $TEMPLATES->{ $type } ) ) 
     {
         return( $self->error( "Invalid type '$type' at line $line_num" ) );
     }
     
-    ## Take everything after the first non-escaped space
+    # Take everything after the first non-escaped space
     if( $line =~ s/([^\\])\s+(.*)/$1/ ) 
     {
         $message = $2;
@@ -623,10 +614,10 @@ sub parse_magic_line
         return( $self->error( "Missing or invalid test condition/message at line $line_num" ) );
     }
     
-    ## Remove the return if it is still there
+    # Remove the return if it is still there
     $line =~ s/\n$//o;
 
-    ## Get the operator. If 'x', must be alone. Default is '='.
+    # Get the operator. If 'x', must be alone. Default is '='.
     if( $line =~ s/^([><&^=!])//o ) 
     {
         $operator = $1;
@@ -644,14 +635,14 @@ sub parse_magic_line
     {
         $testval = $line;
     
-        ## Do octal/hex conversion
+        # Do octal/hex conversion
         $testval =~ s/\\([x0-7][0-7]?[0-7]?)/chr( oct( $1 ) )/eg;
     
-        ## Do single char escapes
+        # Do single char escapes
         $testval =~ s/\\(.)/$ESC->{ $1 }||$1/eg;
     
-        ## Put the number of bytes to read in numbytes.
-        ## '0' means read to \0 or \n.
+        # Put the number of bytes to read in numbytes.
+        # '0' means read to \0 or \n.
         if( $operator =~ /[>x]/o ) 
         {
             $numbytes = 0;
@@ -662,26 +653,26 @@ sub parse_magic_line
         }
         elsif( $operator eq '!' )
         {
-            ## Annoying special case. ! operator only applies to numerics so put it back.
+            # Annoying special case. ! operator only applies to numerics so put it back.
             $testval  = $operator . $testval;
             $numbytes = length( $testval );
             $operator = '=';
         }
         else 
         {
-            ## There's a bug in my magic file where there's a line that says
-            ## "0    string    ^!<arc..." and the BSD file program treats the argument 
-            ## like a numeric. To minimize hassles, complain about bad ops only if -c is set.
+            # There's a bug in my magic file where there's a line that says
+            # "0    string    ^!<arc..." and the BSD file program treats the argument 
+            # like a numeric. To minimize hassles, complain about bad ops only if -c is set.
             return( $self->error( "Invalid operator '$operator' for type 'string' at line $line_num." ) );
         }
     }
     else 
     {
-        ## Numeric
+        # Numeric
         if( $operator ne 'x' ) 
         {
-            ## This conversion is very forgiving. Tt's faster and it doesn't complain 
-            ## about bugs in popular magic files, but it will silently turn a string into zero.
+            # This conversion is very forgiving. Tt's faster and it doesn't complain 
+            # about bugs in popular magic files, but it will silently turn a string into zero.
             if( $line =~ /^0/o ) 
             {
                 $testval = oct( $line );
@@ -694,7 +685,7 @@ sub parse_magic_line
     
         ( $template, $numbytes ) = @{$TEMPLATES->{ $type }};
     
-        ## Unset coercion of $unsigned unless we're doing order comparison
+        # Unset coercion of $unsigned unless we're doing order comparison
         if( ref( $template ) ) 
         {
             $template = $template->[0] unless( $operator eq '>' || $operator eq '<' );
@@ -703,16 +694,16 @@ sub parse_magic_line
     return( [ $offtype, $offset, $numbytes, $type, $mask, $operator, $testval, $template, $message, $subtests ] );
 }
 
-## read_magic_entry( $magic_data, $depth )
-##
-## Reads the next entry from the magic file and stores it as a ref to an array at the 
-## end of @$magic_data.
-##
-## $magic = { filehandle, last buffered line, line count }
-##
-## This is called recursively with increasing $depth to read in sub-clauses
-##
-## Returns the depth of the current buffered line.
+# read_magic_entry( $magic_data, $depth )
+#
+# Reads the next entry from the magic file and stores it as a ref to an array at the 
+# end of @$magic_data.
+#
+# $magic = { filehandle, last buffered line, line count }
+#
+# This is called recursively with increasing $depth to read in sub-clauses
+#
+# Returns the depth of the current buffered line.
 sub read_magic_entry 
 {
     my $self  = shift( @_ );
@@ -721,18 +712,17 @@ sub read_magic_entry
     my $magic = $self->{magic};
     
     my $io = $magic->{io};
-    ## A ref to an array containing a magic line's components
+    # A ref to an array containing a magic line's components
     my $entry = [];
     my $line  = '';
     
-    ## Buffered last line
+    # Buffered last line
     $line = $magic->{buffer};
     while( 1 ) 
     {
         $line = '' if( !defined( $line ) );
         if( $line =~ /^\#/ || $line =~ /^[[:blank:]\h]*$/ ) 
         {
-            #$self->message( 4, "Line is a comment or is empty." );
             last if( $io->eof );
             $line = <$io>;
             $magic->{count}++;
@@ -743,17 +733,15 @@ sub read_magic_entry
         $this_depth    = '' if( !defined( $this_depth ) );
         $depth         = 0 if( !defined( $depth ) );
     
-        $self->message( 4, "\$this_depth ($this_depth), \$depth ($depth)" );
         if( length( $this_depth ) > $depth ) 
         {
             $magic->{buffer} = $line;
         
-            ## Call ourselves recursively.  will return the depth of the entry following 
-            ## the nested group.
+            # Call ourselves recursively.  will return the depth of the entry following 
+            # the nested group.
             if( $self->read_magic_entry( $entry->[2], $depth + 1 ) < $depth || 
                 $io->eof )
             {
-                $self->message( 4, "\$this_depth is greater than \$depth. Returning nothing" );
                 return;
             }
             $line = $magic->{buffer};
@@ -761,40 +749,35 @@ sub read_magic_entry
         elsif( length( $this_depth ) < $depth ) 
         {
             $magic->{buffer} = $line;
-            $self->message( 4, "\$this_depth is less than \$depth. Returning length( \$this_depth )" );
             return( length( $this_depth ) );
         }
         elsif( @$entry ) 
         {
-            $self->message( 4, "\@\$entry is defined. Returning length( \$this_depth )" );
-            ## Already have an entry. This is not a continuation. Save this line for the 
-            ## next call and exit.
+            # Already have an entry. This is not a continuation. Save this line for the 
+            # next call and exit.
             $magic->{buffer} = $line;
             return( length( $this_depth ) );
         }
         else 
         {
-            $self->message( 4, "Other: Setting \$entry and adding it to \@\$data. Ending loop (possibly). Fetching line" );
-            ## We're here if the number of '>' is the same as the current depth and we 
-            ## haven't read a magic line yet.
+            # We're here if the number of '>' is the same as the current depth and we 
+            # haven't read a magic line yet.
 
-            ## Create temp entry later, if we ever get around to evaluating this condition,
-            ## we'll replace @$entry with the results from parse_magic_line.
+            # Create temp entry later, if we ever get around to evaluating this condition,
+            # we'll replace @$entry with the results from parse_magic_line.
             $entry = [ $line , $magic->{count}, [] ];
 
-            ## Add to list
+            # Add to list
             push( @$data, $entry );
 
-            ## Read the next line
-            $self->message( 4, "We reached end of file $io->eof()\n" ) if( $io->eof() );
+            # Read the next line
             last if( $io->eof() );
             $line = <$io>;
             my $tmp = $line;
             $tmp =~ s/\n$//gs;
-            $self->message( 4, "(2) Fetched line '$tmp'\n" );
             $magic->{count}++;
         }
-        ## print( STDERR "$line" );
+        # print( STDERR "$line" );
     }
 }
 
@@ -807,11 +790,11 @@ sub with_magic
     
     return( 'application/octet-stream' ) if( length( $data ) <= 0 );
     
-    ## 3) Iterate over each magic entry.
+    # 3) Iterate over each magic entry.
     for( my $m = 0; $m <= $#{ $self->{magic_data} }; $m++ ) 
     {
-        ## Check if the m-th magic entry matches and if it does, then $desc will contain 
-        ## an updated description
+        # Check if the m-th magic entry matches and if it does, then $desc will contain 
+        # an updated description
         if( $self->_magic_match_str( $self->{magic_data}->[ $m ], \$desc, $data ) ) 
         {
             if( defined( $desc ) && $desc ne '' ) 
@@ -821,9 +804,9 @@ sub with_magic
             }
         }
     
-        ## Read another entry from the magic file if we've exhausted all the entries 
-        ## already buffered. read_magic_entry will add to the end of the array if 
-        ## there are more.
+        # Read another entry from the magic file if we've exhausted all the entries 
+        # already buffered. read_magic_entry will add to the end of the array if 
+        # there are more.
         if( $m == $#{ $self->{magic_data} } && !$self->{magic}->{io}->eof() )
         {
             $self->read_magic_entry();
@@ -840,7 +823,7 @@ sub with_data
     
     return if( length( $data ) <= 0 );
     
-    ## Truncate data
+    # Truncate data
     $data = substr( $data, 0, 0x8564 );
     
     if( _is_binary( $data ) ) 
@@ -849,8 +832,8 @@ sub with_data
     } 
     else 
     {
-        ## In BSD's version, there's an effort to search from more specific to less, 
-        ## but I don't do that.
+        # In BSD's version, there's an effort to search from more specific to less, 
+        # but I don't do that.
         my( $token, %val );
         foreach my $type ( keys( %{$self->{SPECIALS}} ) ) 
         {
@@ -861,17 +844,17 @@ sub with_data
                 $val{ $type } = pos( $tdata );
             }
         }
-        ## Search latest match
+        # Search latest match
         if( scalar( keys( %val ) ) )
         {
             my @skeys = sort{ $val{ $a } <=> $val{ $b } } keys( %val );
             $type = $skeys[0];
         }
     
-        ## ALLDONE:
-        ## $type = 'text/plain' if( !defined( $type ) );
+        # ALLDONE:
+        # $type = 'text/plain' if( !defined( $type ) );
     }
-    ## $type = 'text/plain' if( !defined( $type ) );
+    # $type = 'text/plain' if( !defined( $type ) );
     return( $type );
 }
 
@@ -890,7 +873,7 @@ sub with_filename
             if( ( defined( $type ) && $type !~ /;/ ) || 
                 !defined( $type ) ) 
             {
-                ## has no x-type param
+                # has no x-type param
                 $type = $self->{FILE_EXTS}->{ $regex };
             }
         }
@@ -902,57 +885,52 @@ sub _is_binary
 {
     my( $data ) = @_;
     my $len = length( $data );
-    ## Exclude TAB, ESC, nl, cr
+    # Exclude TAB, ESC, nl, cr
     my $count = ( $data =~ tr/[\x00-\x08\x0b-\x0c\x0e-\x1a\x1c-\x1f]// );
-    ## No contents
+    # No contents
     return( 1 ) if( $len <= 0 );
-    ## Binary
+    # Binary
     return( 1 ) if( ( $count / $len ) > 0.1 );
     return( 0 );
 }
 
-## Compare the magic item with the filehandle.
-## If success, print info and return true, otherwise return undef.
-##
-## This is called recursively if an item has subitems.
+# Compare the magic item with the filehandle.
+# If success, print info and return true, otherwise return undef.
+#
+# This is called recursively if an item has subitems.
 sub _magic_match
 {
     my $self = shift( @_ );
-    ## $io is the file handle of the file being inspected
+    # $io is the file handle of the file being inspected
     my( $item, $p_desc, $io ) = @_;
     
-    ## Delayed evaluation. If this is our first time considering this item, then parse out 
-    ## its structure. @$item is just the raw string, line number, and subtests until we 
-    ## need the real info. This saves time otherwise wasted parsing unused subtests.
+    # Delayed evaluation. If this is our first time considering this item, then parse out 
+    # its structure. @$item is just the raw string, line number, and subtests until we 
+    # need the real info. This saves time otherwise wasted parsing unused subtests.
     $item = $self->parse_magic_line( @$item ) if( @$item == 3 );
     
-    ## $item could be undef if we ran into troubles while reading the entry.
+    # $item could be undef if we ran into troubles while reading the entry.
     return unless( defined( $item ) );
     
-    ## $io is not defined if -c. That way we always return false for every item which 
-    ## allows reading/checking the entire magic file.
+    # $io is not defined if -c. That way we always return false for every item which 
+    # allows reading/checking the entire magic file.
     return( $self->error( "File handle is not defined." ) ) unless( defined( $io ) );
-    ## return unless( defined( fileno( $io ) ) );
-    # $self->message( 3, "Is file handle '$io' active ? (", Scalar::Util::openhandle( $io ) ? 'yes' : 'no', ")." );
+    # return unless( defined( fileno( $io ) ) );
     # return unless( Scalar::Util::openhandle( $io ) );
-    # $self->message( 3, "Is file handle '$io' active ? (", ( defined( $io ) && $io->opened ) ? 'yes' : 'no', ")." );
     
     my( $offtype, $offset, $numbytes, $type, $mask, $op, $testval, $template, $message, $subtests ) = @$item;
-    ## $self->message( 5, "Checking item for description $$p_desc: ", sub{ $self->SUPER::dump( $item ) }) if( scalar( @$item ) );
     $self->{trick}++;
     if( $self->{trick} > 186 && $self->{trick} < 192 )
     {
-        ## $self->message( 4, "$item\n" );
         my $c = -1;
-        ## $self->message( 4, join( "\n", map{ sprintf( "%s: %s", $_, $item->[ ++$c ] ) } qw( offtype offset numbytes type mask op testval template message subtests ) ), "\n--------\n" );
     }
-    ## Bytes from file
+    # Bytes from file
     my $data = '';
 
-    ## Set to true if match
+    # Set to true if match
     my $match = 0;
     
-    ## offset = [ off1, sz, template, off2 ] for indirect offset
+    # offset = [ off1, sz, template, off2 ] for indirect offset
     if( $offtype == 1 ) 
     {
         my( $off1, $sz, $template, $off2 ) = @$offset;
@@ -964,25 +942,24 @@ sub _magic_match
     }
     elsif( $offtype == 2 ) 
     {
-        ## Relative offsets from previous seek
+        # Relative offsets from previous seek
         $io->seek( $offset, 1 ) || return( $self->error( "Unable to seek to offset $offset in file" ) );
     }
     else 
     {
-        ## Absolute offset
+        # Absolute offset
         $io->seek( $offset, 0 ) || return( $self->error( "Unable to seek to offset $offset in file" ) );
     }
     
     if( $type eq 'string' ) 
     {
-        ## Read the length of the match string unless the comparison is 
-        ## '>' ($numbytes == 0), in which case read to the next null or "\n".
-        ## (that's what BSD's file does)
+        # Read the length of the match string unless the comparison is 
+        # '>' ($numbytes == 0), in which case read to the next null or "\n".
+        # (that's what BSD's file does)
         if( $numbytes > 0 ) 
         {
             # return( $self->error( "Unable to read $numbytes bytes of data from file. Buffer is only ", length( $data ), " bytes." ) ) if( $io->read( $data, $numbytes ) != $numbytes );
             return if( $io->read( $data, $numbytes ) != $numbytes );
-            ## $self->message( 5, "Data now contains '$data'." );
         }
         else 
         {
@@ -993,9 +970,8 @@ sub _magic_match
                 $ch = $io->getc();
             }
         }
-        ## $self->message( 4, "Checking data '$data' against test value '$testval'\n" );
     
-        ## Now do the comparison
+        # Now do the comparison
         if( $op eq '=' ) 
         {
             $match = ( $data eq $testval );
@@ -1008,7 +984,7 @@ sub _magic_match
         {
             $match = ( $data gt $testval );
         }
-        ## Else bogus op, but don't die, just skip
+        # Else bogus op, but don't die, just skip
         if( $self->check_magic ) 
         {
             print( STDERR "STRING: $data $op $testval => $match\n" );
@@ -1016,14 +992,14 @@ sub _magic_match
     }
     else 
     {
-        ## Numeric
-        ## Read up to 4 bytes
+        # Numeric
+        # Read up to 4 bytes
         # return( $self->error( "Unable to read $numbytes bytes of data from file. Buffer is only ", length( $data ), " bytes." ) ) if( $io->read( $data, $numbytes ) != $numbytes );
         return if( $io->read( $data, $numbytes ) != $numbytes );
     
-        ## If template is a ref to an array of 3 letters, then this is an endian number
-        ## which must be first unpacked into an unsigned and then coerced into a signed.
-        ## Is there a better way?
+        # If template is a ref to an array of 3 letters, then this is an endian number
+        # which must be first unpacked into an unsigned and then coerced into a signed.
+        # Is there a better way?
         if( ref( $template ) ) 
         {
             $data = unpack( $template->[2], pack( $template->[1], unpack( $template->[0], $data ) ) );
@@ -1033,13 +1009,13 @@ sub _magic_match
             $data = unpack( $template, $data );
         }
     
-        ## If mask
+        # If mask
         if( defined( $mask ) ) 
         {
             $data &= $mask;
         }
     
-        ## Now do the check
+        # Now do the check
         if( $op eq '=' ) 
         {
             $match = ( $data == $testval );
@@ -1068,7 +1044,7 @@ sub _magic_match
         {
             $match = ( $data > $testval );
         }
-        ## Else bogus entry that we're ignoring
+        # Else bogus entry that we're ignoring
         if( $self->check_magic ) 
         {
             print( STDERR "NUMERIC: $data $op $testval => $match\n" );
@@ -1077,15 +1053,15 @@ sub _magic_match
     
     if( $match ) 
     {
-        ## It's pretty common to find "\b" in the message, but sprintf doesn't insert a 
-        ## backspace. If it's at the beginning (typical) then don't include separator space.
+        # It's pretty common to find "\b" in the message, but sprintf doesn't insert a 
+        # backspace. If it's at the beginning (typical) then don't include separator space.
         if( $message =~ s/^\\b// ) 
         {
             $$p_desc .= ( index( $message, '%s' ) != -1 ? sprintf( $message, $data ) : $message );
         }
         else 
         {
-            ## $$p_desc .= ' ' . sprintf( $message, $data ) if( $message );
+            # $$p_desc .= ' ' . sprintf( $message, $data ) if( $message );
             $$p_desc .= ( index( $message, '%s' ) != -1 ? sprintf( $message, $data ) : $message ) if( $message );
         }
     
@@ -1103,29 +1079,29 @@ sub _magic_match_str
     my( $item, $p_desc, $str ) = @_;
     my $origstr = $str;
     
-    ## Delayed evaluation. If this is our first time considering this item, then parse out 
-    ## its structure. @$item is just the raw string, line number, and subtests until we 
-    ## need the real info. This saves time otherwise wasted parsing unused subtests.
+    # Delayed evaluation. If this is our first time considering this item, then parse out 
+    # its structure. @$item is just the raw string, line number, and subtests until we 
+    # need the real info. This saves time otherwise wasted parsing unused subtests.
     $item = $self->parse_magic_line( @$item ) if( @$item == 3 );
     
-    ## $item could be undef if we ran into troubles while reading the entry.
+    # $item could be undef if we ran into troubles while reading the entry.
     return unless( defined( $item ) );
     
-    ## $fh is not be defined if -c. That way we always return false for every item which 
-    ## allows reading/checking the entire magic file.
+    # $fh is not be defined if -c. That way we always return false for every item which 
+    # allows reading/checking the entire magic file.
     return unless( defined( $str ) );
     return if( $str eq '' );
     
     my( $offtype, $offset, $numbytes, $type, $mask, $op, $testval, $template, $message, $subtests ) = @$item;
     return unless( defined( $op ) );
     
-    ## Bytes from file
+    # Bytes from file
     my $data = '';
     
-    ## Set to true if match
+    # Set to true if match
     my $match = 0;
     
-    ## offset = [ off1, sz, template, off2 ] for indirect offset
+    # offset = [ off1, sz, template, off2 ] for indirect offset
     if( $offtype == 1 ) 
     {
         my( $off1, $sz, $template, $off2 ) = @$offset;
@@ -1136,21 +1112,21 @@ sub _magic_match_str
     }
     elsif( $offtype == 2 ) 
     {
-        ## Unable to handle relative offsets from previous seek
+        # Unable to handle relative offsets from previous seek
         return;
     }
     else 
     {
-        ## Absolute offset
+        # Absolute offset
         return if( $offset > length( $str ) );
         $str = substr( $str, $offset );
     }
     
     if( $type eq 'string' ) 
     {
-        ## Read the length of the match string unless the comparison is 
-        ## '>' ($numbytes == 0), in which case read to the next null or "\n".
-        ## (that's what BSD's file does)
+        # Read the length of the match string unless the comparison is 
+        # '>' ($numbytes == 0), in which case read to the next null or "\n".
+        # (that's what BSD's file does)
         if( $numbytes > 0 ) 
         {
             $data = pack( "a$numbytes", $str );
@@ -1161,7 +1137,7 @@ sub _magic_match_str
             $data = $1;
         }
 
-        ## Now do the comparison
+        # Now do the comparison
         if( $op eq '=' ) 
         {
             $match = ( $data eq $testval );
@@ -1174,7 +1150,7 @@ sub _magic_match_str
         {
             $match = ( $data gt $testval );
         }
-        ## Else bogus op, but don't die, just skip
+        # Else bogus op, but don't die, just skip
     
         if( $self->check_magic ) 
         {
@@ -1183,13 +1159,13 @@ sub _magic_match_str
     }
     else 
     {
-        ## Numeric
-        ## Read up to 4 bytes
+        # Numeric
+        # Read up to 4 bytes
         $data = substr( $str, 0, 4 );
     
-        ## If template is a ref to an array of 3 letters, then this is an endian number 
-        ## which must be first unpacked into an unsigned and then coerced into a signed.
-        ## Is there a better way?
+        # If template is a ref to an array of 3 letters, then this is an endian number 
+        # which must be first unpacked into an unsigned and then coerced into a signed.
+        # Is there a better way?
         if( ref( $template ) ) 
         {
             $data = unpack( $template->[2], pack( $template->[1], unpack( $template->[0], $data ) ) );
@@ -1199,13 +1175,13 @@ sub _magic_match_str
             $data = unpack( $template, $data );
         }
     
-        ## If mask
+        # If mask
         if( defined( $mask ) ) 
         {
             $data &= $mask;
         }
     
-        ## Now do the check
+        # Now do the check
         if( $op eq '=' ) 
         {
             $match = ( $data == $testval );
@@ -1234,7 +1210,7 @@ sub _magic_match_str
         {
             $match = ( $data > $testval );
         }
-        ## else bogus entry that we're ignoring
+        # else bogus entry that we're ignoring
         if( $self->check_magic ) 
         {
             print( STDERR "NUMERIC: $data $op $testval => $match\n" );
@@ -1243,27 +1219,27 @@ sub _magic_match_str
     
     if( $match ) 
     {
-        ## It's pretty common to find "\b" in the message, but sprintf doesn't insert a
-        ## backspace. If it's at the beginning (typical) then don't include separator space.
+        # It's pretty common to find "\b" in the message, but sprintf doesn't insert a
+        # backspace. If it's at the beginning (typical) then don't include separator space.
         if( $message =~ s/^\\b// ) 
         {
             $$p_desc .= sprintf( $message, $data );
         }
         else 
         {
-            ## $$p_desc .= ' ' . sprintf( $message, $data ) if( $message );
+            # $$p_desc .= ' ' . sprintf( $message, $data ) if( $message );
             $$p_desc .= sprintf( $message, $data ) if( $message );
         }
         foreach my $subtest ( @$subtests ) 
         {
-            ## Finish evaluation when matched.
+            # Finish evaluation when matched.
             $self->_magic_match_str( $subtest, $p_desc, $origstr );
         }
         return( 1 );
     }
 }
 
-## Obsolete routines
+# Obsolete routines
 sub add_specials 
 {
     my $self = shift( @_ );

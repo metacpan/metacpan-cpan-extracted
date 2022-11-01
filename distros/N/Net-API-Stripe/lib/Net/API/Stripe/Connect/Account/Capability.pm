@@ -1,25 +1,32 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Connect/Account/Capability.pm
-## Version v0.100.0
+## Version v0.101.0
 ## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
-## Modified 2020/05/15
+## Modified 2022/10/29
 ## 
 ##----------------------------------------------------------------------------
 package Net::API::Stripe::Connect::Account::Capability;
 BEGIN
 {
-	use strict;
-	use parent qw( Net::API::Stripe::Generic );
-	our( $VERSION ) = 'v0.100.0';
+    use strict;
+    use warnings;
+    use parent qw( Net::API::Stripe::Generic );
+    use vars qw( $VERSION );
+    our( $VERSION ) = 'v0.101.0';
 };
+
+use strict;
+use warnings;
 
 sub id { return( shift->_set_get_scalar( 'id', @_ ) ); }
 
 sub object { return( shift->_set_get_scalar( 'object', @_ ) ); }
 
 sub account { return( shift->_set_get_scalar_or_object( 'account', 'Net::API::Stripe::Connect::Account', @_ ) ); }
+
+sub future_requirements { return( shift->_set_get_object( 'future_requirements', 'Net::API::Stripe::Connect::Account::Requirements', @_ ) ); }
 
 sub requested { return( shift->_set_get_boolean( 'requested', @_ ) ); }
 
@@ -28,6 +35,7 @@ sub requested_at { return( shift->_set_get_datetime( 'requested_at', @_ ) ); }
 sub requirements { return( shift->_set_get_object( 'requirements', 'Net::API::Stripe::Connect::Account::Requirements', @_ ) ); }
 
 ## active, inactive, pending, or unrequested.
+
 sub status { return( shift->_set_get_scalar( 'status', @_ ) ); }
 
 1;
@@ -51,7 +59,7 @@ Net::API::Stripe::Connect::Account::Capability - A Stripe Account Capability Obj
 
 =head1 VERSION
 
-    v0.100.0
+    v0.101.0
 
 =head1 DESCRIPTION
 
@@ -59,71 +67,69 @@ A hash containing the set of capabilities that was requested for this account an
 
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>( %ARG )
+=head2 new( %ARG )
 
 Creates a new L<Net::API::Stripe::Connect::Account::Capability> object.
 It may also take an hash like arguments, that also are method of the same name.
 
-=back
-
 =head1 METHODS
 
-=over 4
-
-=item B<id> string
+=head2 id string
 
 The identifier for the capability.
 
-=item B<object> string, value is "capability"
+=head2 object string, value is "capability"
 
 String representing the object’s type. Objects of the same type share the same value.
 
-=item B<account> string (expandable)
+=head2 account string (expandable)
 
 The account for which the capability enables functionality.
 
 When expanded, this is a L<Net::API::Stripe::Connect::Account> object.
 
-=item B<requested> boolean
+=head2 future_requirements object
+
+Information about the upcoming new requirements for the capability, including what information needs to be collected, and by when.
+
+This is a L<Net::API::Stripe::Connect::Account::Requirements> object.
+
+=head2 requested boolean
 
 Whether the capability has been requested.
 
-=item B<requested_at> timestamp
+=head2 requested_at timestamp
 
 Time at which the capability was requested. Measured in seconds since the Unix epoch.
 
-=item B<requirements> hash
+=head2 requirements hash
 
 Information about the requirements for the capability, including what information needs to be collected, and by when.
 
 This is a L<Net::API::Stripe::Connect::Account::Requirements> object.
 
-=item B<status> string
+=head2 status string
 
 The status of the capability. Can be active, inactive, pending, or unrequested.
 
-=back
-
 =head1 API SAMPLE
 
-	{
-	  "id": "card_payments",
-	  "object": "capability",
-	  "account": "acct_fake123456789",
-	  "requested": true,
-	  "requested_at": 1571480455,
-	  "requirements": {
-		"current_deadline": null,
-		"currently_due": [],
-		"disabled_reason": null,
-		"eventually_due": [],
-		"past_due": [],
-		"pending_verification": []
-	  },
-	  "status": "active"
-	}
+    {
+      "id": "card_payments",
+      "object": "capability",
+      "account": "acct_fake123456789",
+      "requested": true,
+      "requested_at": 1571480455,
+      "requirements": {
+        "current_deadline": null,
+        "currently_due": [],
+        "disabled_reason": null,
+        "eventually_due": [],
+        "past_due": [],
+        "pending_verification": []
+      },
+      "status": "active"
+    }
 =head1 HISTORY
 
 =head2 v0.1

@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 341;
+plan tests => 338;
 
 my @module_files = (
     'DateTime/TimeZone.pm',
@@ -113,7 +113,6 @@ my @module_files = (
     'DateTime/TimeZone/America/Monterrey.pm',
     'DateTime/TimeZone/America/Montevideo.pm',
     'DateTime/TimeZone/America/New_York.pm',
-    'DateTime/TimeZone/America/Nipigon.pm',
     'DateTime/TimeZone/America/Nome.pm',
     'DateTime/TimeZone/America/Noronha.pm',
     'DateTime/TimeZone/America/North_Dakota/Beulah.pm',
@@ -129,7 +128,6 @@ my @module_files = (
     'DateTime/TimeZone/America/Porto_Velho.pm',
     'DateTime/TimeZone/America/Puerto_Rico.pm',
     'DateTime/TimeZone/America/Punta_Arenas.pm',
-    'DateTime/TimeZone/America/Rainy_River.pm',
     'DateTime/TimeZone/America/Rankin_Inlet.pm',
     'DateTime/TimeZone/America/Recife.pm',
     'DateTime/TimeZone/America/Regina.pm',
@@ -145,7 +143,6 @@ my @module_files = (
     'DateTime/TimeZone/America/Swift_Current.pm',
     'DateTime/TimeZone/America/Tegucigalpa.pm',
     'DateTime/TimeZone/America/Thule.pm',
-    'DateTime/TimeZone/America/Thunder_Bay.pm',
     'DateTime/TimeZone/America/Tijuana.pm',
     'DateTime/TimeZone/America/Toronto.pm',
     'DateTime/TimeZone/America/Vancouver.pm',

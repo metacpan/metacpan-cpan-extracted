@@ -18,7 +18,6 @@ no_index:
     - t
     - inc
 requires:
-  DBD::SQLite: '0'
   DBI: '0'
   Date::Calc: '0'
   File::Path: '0'
@@ -26,5 +25,5 @@ requires:
   IO::File: '0'
   JSON: '0'
   Sys::Syslog: '0'
-version: v2022.266.1
+version: v2022.301.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

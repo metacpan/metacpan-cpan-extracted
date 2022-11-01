@@ -3,18 +3,18 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Find the top repeated note phrases of MIDI files
 
-our $VERSION = '0.1807';
+our $VERSION = '0.1808';
+
+use Carp qw(croak);
+use Lingua::EN::Ngram ();
+use List::Util qw( shuffle uniq );
+use List::Util::WeightedChoice qw( choose_weighted );
+use MIDI::Util qw(setup_score set_chan_patch);
+use Music::Note ();
 
 use Moo;
 use strictures 2;
 use namespace::clean;
-
-use Carp;
-use Lingua::EN::Ngram;
-use List::Util qw( shuffle uniq );
-use List::Util::WeightedChoice qw( choose_weighted );
-use MIDI::Util qw(setup_score set_chan_patch);
-use Music::Note;
 
 
 has in_file => (
@@ -662,7 +662,7 @@ MIDI::Ngram - Find the top repeated note phrases of MIDI files
 
 =head1 VERSION
 
-version 0.1807
+version 0.1808
 
 =head1 SYNOPSIS
 
@@ -932,7 +932,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Gene Boggs.
+This software is copyright (c) 2022 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

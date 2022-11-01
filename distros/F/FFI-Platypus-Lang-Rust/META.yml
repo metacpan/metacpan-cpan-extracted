@@ -4,16 +4,19 @@ author:
   - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
   Capture::Tiny: '0'
+  Test2::V0: '0.000121'
   Test::Script: '0'
+  perl: '5.008001'
 configure_requires:
-  ExtUtils::MakeMaker: '6.64'
+  ExtUtils::MakeMaker: '0'
   FFI::Build::MM: '1.00'
   FFI::CheckLib: '0.11'
   File::Which: '0'
   File::chdir: '0'
   Path::Tiny: '0'
-dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'
+  perl: '5.008001'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,18 +24,27 @@ meta-spec:
 name: FFI-Platypus-Lang-Rust
 no_index:
   directory:
-    - t
-    - inc
     - examples
 requires:
+  Env::ShellWords: '0'
+  FFI::Build::File::Base: '1.00'
   FFI::CheckLib: '0.11'
-  FFI::Platypus: '1.00'
+  FFI::Platypus: '0'
+  File::Which: '0'
   File::chdir: '0'
   Path::Tiny: '0'
+  base: '0'
   perl: '5.008001'
 resources:
   IRC: irc://irc.perl.org/#native
-  bugtracker: https://github.com/Perl5-FFI/FFI-Platypus-Lang-Rust/issues
-  repository: https://github.com/Perl5-FFI/FFI-Platypus-Lang-Rust.git
-version: '0.09'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+  bugtracker: https://github.com/PerlFFI/FFI-Platypus-Lang-Rust/issues
+  homepage: https://metacpan.org/pod/FFI::Platypus::Lang::Rust
+  repository: git://github.com/PerlFFI/FFI-Platypus-Lang-Rust.git
+version: '0.12'
+x_contributors:
+  - 'Graham Ollis <plicease@cpan.org>'
+  - 'Andrew Grangaard (SPAZM)'
+x_generated_by_perl: v5.37.5
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_use_unsafe_inc: 0

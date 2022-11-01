@@ -1,6 +1,4 @@
-use strict;
-use warnings;
-use Test::More;
+use Test2::V0 -no_srand => 1;
 use Test::Script;
 use File::chdir;
 use File::Which   qw( which);
@@ -9,58 +7,58 @@ use Capture::Tiny qw( capture_merged );
 
 my $rustc = which 'rustc';
 
-plan skip_all => 'Test requirest a rust compiler' unless $rustc;
+foreach my $dir (qw( examples examples/old examples/string examples/string/return ))
+{
 
-subtest 'compile rust' => sub {
-  local $CWD = 'examples';
+  subtest $dir => sub {
+    local $CWD = $dir;
 
-  my @rust_source_files = bsd_glob '*.rs';
+    subtest 'compile rust' => sub {
 
-  plan tests => 0+@rust_source_files;
+      my @rust_source_files = bsd_glob '*.rs';
 
-  foreach my $rust_source_file (@rust_source_files)
-  {
-    my @cmd = ($rustc, $rust_source_file);
+      plan tests => 0+@rust_source_files;
 
-    my($out, $ret) = capture_merged {
-      print "+@cmd";
-      system @cmd;
-      $?;
+      foreach my $rust_source_file (@rust_source_files)
+      {
+        my @cmd = ($rustc, $rust_source_file);
+
+        my($out, $ret) = capture_merged {
+          print "+@cmd";
+          system @cmd;
+          $?;
+        };
+
+        ok($ret == 0, "@cmd")
+          ? note $out
+          : diag $out;
+      }
+
     };
 
-    ok($ret == 0, "@cmd")
-      ? note $out
-      : diag $out;
-  }
+    subtest 'perl ffi scripts' => sub {
 
-};
+      my @scripts = bsd_glob '*.pl';
 
-subtest 'perl ffi scripts' => sub {
+      plan skip_all => 'test not supported on Windows' if $^O eq 'MSWin32';
+      plan tests => 0+@scripts;
 
-  local $CWD = 'examples';
+      foreach my $script (@scripts)
+      {
+        subtest $script => sub {
+          script_compiles $script;
 
-  my @scripts = bsd_glob '*.pl';
+          my($out, $err) = ('','');
+          script_runs $script, { stdout => \$out, stderr => \$err };
 
-  plan skip_all => 'test not supported on Windows' if $^O eq 'MSWin32';
-  plan tests => 0+@scripts;
+          note "[out]\n$out" if $out;
+          note "[err]\n$out" if $err;
+        }
+      }
+    };
 
-  foreach my $script (@scripts)
-  {
-    subtest $script => sub {
-      script_compiles $script;
-
-      my($out, $err) = ('','');
-      script_runs $script, { stdout => \$out, stderr => \$err };
-
-      note "[out]\n$out" if $out;
-      note "[err]\n$out" if $err;
-    }
-  }
-};
-
-{
-  local $CWD = 'examples';
-  unlink $_ for map { bsd_glob $_ } qw( *.so *.dylib *.dll );
+    unlink $_ for map { bsd_glob $_ } qw( *.so *.dylib *.dll );
+  };
 }
 
 done_testing;

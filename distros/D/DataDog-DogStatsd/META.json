@@ -1,12 +1,12 @@
 {
    "abstract" : "A Perl client for DogStatsd",
    "author" : [
-      "Stefan Goethals <stefan@zipkid.eu>, Fayland Lam <fayland@binary.com>"
+      "binary.com <BINARY@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Milla version v1.0.20, Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "apache_2_0"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -16,9 +16,8 @@
    "no_index" : {
       "directory" : [
          "eg",
-         "examples",
-         "inc",
          "share",
+         "shares",
          "t",
          "xt"
       ]
@@ -26,7 +25,7 @@
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "7.64"
          },
          "suggests" : {
             "JSON::PP" : "2.27300"
@@ -34,19 +33,61 @@
       },
       "develop" : {
          "requires" : {
-            "Dist::Milla" : "v1.0.20",
-            "Test::Pod" : "1.41"
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::Plugin::PerlTidy" : "0",
+            "Dist::Zilla::Plugin::Test::Perl::Critic" : "0",
+            "Dist::Zilla::PluginBundle::Author::DERIV" : "0",
+            "Software::License::Perl_5" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
+            "Test::EOL" : "0",
+            "Test::MinimumVersion" : "0",
+            "Test::Mojibake" : "0",
+            "Test::More" : "0.96",
+            "Test::NoTabs" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Portability::Files" : "0",
+            "Test::Version" : "1"
          }
       },
       "runtime" : {
          "requires" : {
-            "IO::Socket::INET" : "0"
+            "Exporter" : "0",
+            "IO::Socket::INET" : "0",
+            "Time::HiRes" : "0",
+            "base" : "0",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
          "requires" : {
-            "Test::More" : "0.96"
+            "ExtUtils::MakeMaker" : "0",
+            "File::Basename" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IO::Select" : "0",
+            "IPC::Open3" : "0",
+            "Test::CheckDeps" : "0.010",
+            "Test::More" : "0.96",
+            "lib" : "0",
+            "perl" : "5.006",
+            "vars" : "0"
          }
+      }
+   },
+   "provides" : {
+      "DataDog::DogStatsd" : {
+         "file" : "lib/DataDog/DogStatsd.pm",
+         "version" : "0.07"
+      },
+      "DataDog::DogStatsd::Helper" : {
+         "file" : "lib/DataDog/DogStatsd/Helper.pm",
+         "version" : "0.07"
       }
    },
    "release_status" : "stable",
@@ -61,21 +102,23 @@
          "web" : "https://github.com/binary-com/dogstatsd-perl"
       }
    },
-   "version" : "0.06",
+   "version" : "0.07",
+   "x_authority" : "cpan:DERIV",
    "x_contributors" : [
-      "Amin Marashi <marashi.s.amin@gmail.com>",
-      "Chylli <chylli@binary.com>",
       "Fayland Lam <fayland@gmail.com>",
+      "Nael Alolwani <nael@binary.com>",
+      "chylli-binary <chylli@binary.com>",
+      "Stefan Goethals <stefan@zipkid.eu>",
+      "Amin Marashi <marashi.s.amin@gmail.com>",
       "Jean-Yves Sireau <jy@binary.com>",
       "Lee Aylward <laylward@fastly.com>",
-      "Mohanad Zarzour <51309057+Binary-Mohanad@users.noreply.github.com>",
-      "Nael Alolwani <nael@binary.com>",
       "Tom Molesworth <tom@binary.com>",
+      "Mohanad Zarzour <51309057+Binary-Mohanad@users.noreply.github.com>",
       "Torsten F\u00f6rtsch <torsten@binary.com>",
       "Zak B. Elep <zakame@zakame.net>"
    ],
    "x_generated_by_perl" : "v5.26.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.11",
-   "x_static_install" : 1
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

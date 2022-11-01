@@ -15,9 +15,9 @@ use Test::More;
 
 # constants
 my @packagers = qw(Alpine Arch Debian RPM Suse);
-my @required_methods = qw(ping pkgcmd modpkg find install is_installed);
+my @required_methods = qw(ping sudo_check pkgcmd modpkg find install is_installed);
 
-plan tests => (scalar @packagers) * (3 + scalar @required_methods);
+plan tests => (scalar @packagers) * (5 + scalar @required_methods);
 
 my $ospkg = Sys::OsPackage->instance(quiet => 1);
 foreach my $packager (sort @packagers) {
@@ -35,4 +35,13 @@ foreach my $packager (sort @packagers) {
     foreach my $req (sort @required_methods) {
         ok($driver->can($req), "driver $driver implements $req method");
     }
+
+    # run sudo_check() test with flag off and on
+    $ospkg->sysenv("root", 0); # force root flag to false to prevent interference
+    $ospkg->{_config}{sudo} = 0;
+    my @list = $ospkg->call_pkg_driver(op => "sudo_check");
+    is_deeply(\@list, [undef], "driver $driver receives sudo flag when off");
+    $ospkg->{_config}{sudo} = 1;
+    @list = $ospkg->call_pkg_driver(op => "sudo_check");
+    is_deeply(\@list, ["sudo"], "driver $driver receives sudo flag when on");
 }

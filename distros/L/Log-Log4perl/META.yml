@@ -34,5 +34,5 @@ resources:
   MailingList: mailto:log4perl-devel@lists.sourceforge.net
   bugtracker: https://github.com/mschilli/log4perl/issues
   repository: https://github.com/mschilli/log4perl
-version: '1.56'
+version: '1.57'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

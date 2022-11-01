@@ -2,7 +2,7 @@ package PESEL::Generator;
 
 #-----------------------------------------------------------------------
 use vars qw( $VERSION );
-$VERSION = 1.3;
+$VERSION = 1.4;
 #-----------------------------------------------------------------------
 use warnings;
 use strict;
@@ -16,10 +16,10 @@ sub new {
 #=======================================================================
 sub pesel {
 	while( 1 ){
-		my $psl = 	sprintf( '%02d', rand 100 			) .
-					sprintf( '%02d', rand 13 			) .
-					sprintf( '%02d', rand 28 			) .
-					sprintf( '%03d', rand 1000 			) .
+		my $psl = 	sprintf( '%02d', 1 + rand 99 		) .
+					sprintf( '%02d', 1 + rand 12 		) .
+					sprintf( '%02d', 1 + rand 27 		) .
+					sprintf( '%03d', 1 + rand 999		) .
 					sprintf( '%d'  , rand > 0.5 ? 1 : 0 ) ;
 					
 		my @dig = split( //, $psl );

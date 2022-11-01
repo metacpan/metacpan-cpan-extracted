@@ -1,5 +1,5 @@
 {
-   "abstract" : "placeholder module for infix element-of-list meta-operator",
+   "abstract" : "infix element-of-list meta-operator",
    "author" : [
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
@@ -22,12 +22,12 @@
       "configure" : {
          "requires" : {
             "Module::Build" : "0.4004",
-            "XS::Parse::Infix::Builder" : "0.16"
+            "XS::Parse::Infix::Builder" : "0.27"
          }
       },
       "runtime" : {
          "requires" : {
-            "XS::Parse::Infix" : "0.16",
+            "XS::Parse::Infix" : "0.26",
             "perl" : "5.014"
          }
       },
@@ -40,11 +40,11 @@
    "provides" : {
       "Syntax::Operator::Elem" : {
          "file" : "lib/Syntax/Operator/Elem.pm",
-         "version" : "0.01"
+         "version" : "0.03"
       },
       "Syntax::Operator::In" : {
          "file" : "lib/Syntax/Operator/In.pm",
-         "version" : "0.01"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -54,6 +54,6 @@
       ],
       "x_IRC" : "irc://irc.perl.org/#io-async"
    },
-   "version" : "0.01",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

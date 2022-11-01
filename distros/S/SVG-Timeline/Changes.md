@@ -1,10 +1,36 @@
 # Change Log
 
+## [0.1.3] - 2022-11-01
+
+### Fixed
+
+- Bump required Perl version
+
+## [0.1.2] - 2022-10-31
+
+### Fixed
+
+- Add DateTime::Format::Strptime as pre-req
+
+## [0.1.1] - 2022-10-31
+
+### Fixed
+
+- Switch from Time::Piece to DateTime because it handles
+  older dates.
+
+## [0.1.0] - 2022-10-30
+
+### Improved
+
+- Support full dates (YYYY-MM-DD) instead of just years for
+  start and end events (thanks simbabque and tcheukueppo).
+
 ## [0.0.10] - 2022-06-14
 
 ### Fixed
 
-- Fixed to the way that we interact with the underlying
+- Fixes to the way that we interact with the underlying
   SVG object (thanks choroba)
 
 ## [0.0.9] - 2020-12-22

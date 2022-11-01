@@ -1,4 +1,4 @@
-package Email::Sender::Success::Partial 2.500;
+package Email::Sender::Success::Partial 2.600;
 # ABSTRACT: a report of partial success when delivering
 
 use Moo;
@@ -37,7 +37,7 @@ Email::Sender::Success::Partial - a report of partial success when delivering
 
 =head1 VERSION
 
-version 2.500
+version 2.600
 
 =head1 DESCRIPTION
 
@@ -57,11 +57,11 @@ the minimum required perl.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Ricardo Signes.
+This software is copyright (c) 2022 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

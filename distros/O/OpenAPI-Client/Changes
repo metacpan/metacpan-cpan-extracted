@@ -1,5 +1,8 @@
 Revision history for perl distribution OpenAPI-Client
 
+1.07 2022-10-26T22:31:59
+ - No need to run t/00-project.t on install #40
+
 1.06 2022-09-11T09:05:17
  - Fix "Use of uninitialized value" warning
  - Specified Perl version

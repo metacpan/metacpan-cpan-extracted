@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File/Cache.pm
-## Version v0.2.5
+## Version v0.2.6
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/03/16
-## Modified 2022/09/27
+## Modified 2022/09/28
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -28,7 +28,7 @@ BEGIN
     $CACHE_REPO = [];
     $CACHE_TO_OBJECT = {};
     $DEBUG = 0;
-    our $VERSION = 'v0.2.5';
+    our $VERSION = 'v0.2.6';
 };
 
 use strict;
@@ -412,7 +412,13 @@ sub remove
         $self->{_cache_file} = '';
         $self->id( undef() );
     }
-    $self->{_cache_dir}->remove if( $self->{_cache_dir} && $self->{_cache_dir}->is_empty );
+    
+    if( $self->{_cache_dir} && 
+        $self->{_cache_dir}->exists && 
+        $self->{_cache_dir}->is_empty )
+    {
+        $self->{_cache_dir}->remove;
+    }
     return( $rv ? 1 : 0 );
 }
 
@@ -873,7 +879,7 @@ Module::Generic::File::Cache - File-based Cache
 
 =head1 VERSION
 
-    v0.2.5
+    v0.2.6
 
 =head1 DESCRIPTION
 

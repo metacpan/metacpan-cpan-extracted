@@ -21,8 +21,8 @@ if ( grep /\P{ASCII}/ => @ARGV ) {
 
 # Useful common code
 use autodie;
-use Carp qw( carp croak confess cluck );
-use English qw( -no_match_vars );
+use Carp         qw( carp croak confess cluck );
+use English      qw( -no_match_vars );
 use Data::Dumper qw( Dumper );
 
 # give a full stack dump on any untrapped exceptions
@@ -58,8 +58,11 @@ sub new {
 }
 
 sub as_text {
-    my $self    = shift;
-    my $arg     = $self->{ 'arg' }->as_text;
+    my $self = shift;
+    my $arg  = $self->{ 'arg' }->as_text;
+    if ( ref( $self->{ 'arg' } ) =~ m{\APg::SQL::PrettyPrinter::Node::(?:A_|Bool)Expr\z} ) {
+        $arg = "( $arg )";
+    }
     my $typname = join( '.', map { $_->as_ident } @{ $self->{ 'typeName' }->{ 'names' } } );
 
     if ( $typname eq 'pg_catalog.bool' ) {

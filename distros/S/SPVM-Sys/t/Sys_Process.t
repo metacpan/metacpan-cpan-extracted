@@ -16,14 +16,6 @@ use SPVM 'TestCase::Sys::Process';
 my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 
 if ($^O eq 'MSWin32') {
-  eval { SPVM::Sys::Process->alarm(0) };
-  like($@, qr/not supported/);
-}
-else {
-  ok(SPVM::TestCase::Sys::Process->alarm);
-}
-
-if ($^O eq 'MSWin32') {
   eval { SPVM::Sys::Process->fork };
   like($@, qr/not supported/);
 }
@@ -46,8 +38,6 @@ if ($^O eq 'MSWin32') {
 else {
   ok(SPVM::TestCase::Sys::Process->setpriority);
 }
-
-ok(SPVM::TestCase::Sys::Process->sleep);
 
 if ($^O eq 'MSWin32') {
   eval { SPVM::Sys::Process->kill(0, 0) };
@@ -153,16 +143,13 @@ unless ($^O eq 'MSWin32') {
   SPVM::Sys::Process->WCOREDUMP(0);
 }
 
-ok(SPVM::TestCase::Sys::Process->usleep);
+warn "[Test Output]sleep";
 
-if ($^O eq 'MSWin32') {
-  eval { SPVM::Sys::Process->ualarm(0, 0) };
-  like($@, qr/not supported/);
-}
-else {
-  local $SIG{ALRM} = sub {};
-  ok(SPVM::TestCase::Sys::Process->ualarm);
-}
+ok(SPVM::TestCase::Sys::Process->sleep);
+
+warn "[Test Output]usleep";
+
+ok(SPVM::TestCase::Sys::Process->usleep);
 
 SPVM::set_exception(undef);
 

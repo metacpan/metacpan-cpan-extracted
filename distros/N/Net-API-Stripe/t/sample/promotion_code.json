@@ -1,0 +1,39 @@
+{
+   "active" : 1,
+   "code" : "TS0EQJHH",
+   "coupon" : {
+      "amount_off" : null,
+      "created" : "1507799684",
+      "currency" : null,
+      "duration" : "repeating",
+      "duration_in_months" : "3",
+      "id" : "123",
+      "livemode" : 0,
+      "max_redemptions" : "14",
+      "metadata" : {
+         "teste" : "test"
+      },
+      "name" : null,
+      "object" : "coupon",
+      "percent_off" : "34.0",
+      "redeem_by" : null,
+      "times_redeemed" : "0",
+      "valid" : 1
+   },
+   "created" : "1599060617",
+   "customer" : null,
+   "expires_at" : null,
+   "id" : "promo_1HMxuf2eZvKYlo2CmGXSyhRx",
+   "livemode" : 0,
+   "max_redemptions" : null,
+   "metadata" : {
+      "order_id" : "1"
+   },
+   "object" : "promotion_code",
+   "restrictions" : {
+      "first_time_transaction" : 0,
+      "minimum_amount" : null,
+      "minimum_amount_currency" : null
+   },
+   "times_redeemed" : "0"
+}

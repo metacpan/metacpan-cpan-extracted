@@ -2,12 +2,17 @@
 BEGIN
 {
     use strict;
+    use warnings;
     use warnings FATAL => 'all';
     use lib './lib';
+    use vars qw( $DEBUG );
     use Test::More;
     use_ok( 'Apache2::SSI::Common' );
-    our $DEBUG => 0;
+    our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
+
+use strict;
+use warnings;
 
 {
     # Based on RFC 3986 sectin 5.2.4 algorithm, flattening the dots such as '.' and '..' in uri path

@@ -19,8 +19,17 @@ If a field's value is another object, "TO_HASH" will automatically turn
 that into a hash if it has its own "TO_HASH" method (you can also
 prevent that).
 
-By applying a method modifier to the TO_HASH method, you can modify its
-output after the conversion.
+  Modifying the generated hash
+
+[Originally, this module recommended using a method modifier to the
+TO_HASH method, this is no longer recommended. See discussion under
+"DEPRECATED BEHAVIOR" below.].
+
+If the class provides a "modify_hashr" method, it will be called as
+
+    $self->modify_hashr( \%hash );
+
+and should modify the passed hash in place.
 
   Usage
 

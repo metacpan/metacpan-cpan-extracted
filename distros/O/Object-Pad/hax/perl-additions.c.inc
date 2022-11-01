@@ -234,18 +234,6 @@ static bool MY_lex_consume_unichar(pTHX_ U32 c)
   return TRUE;
 }
 
-#if HAVE_PERL_VERSION(5, 16, 0)
-#  define sv_derived_from_hv(sv, hv)  MY_sv_derived_from_hv(aTHX_ sv, hv)
-static bool MY_sv_derived_from_hv(pTHX_ SV *sv, HV *hv)
-{
-  char *hvname = HvNAME(hv);
-  if(!hvname)
-    return FALSE;
-
-  return sv_derived_from_pvn(sv, hvname, HvNAMELEN(hv), HvNAMEUTF8(hv) ? SVf_UTF8 : 0);
-}
-#endif
-
 #define av_push_from_av_inc(dst, src)    S_av_push_from_av(aTHX_ dst, src, TRUE)
 #define av_push_from_av_noinc(dst, src)  S_av_push_from_av(aTHX_ dst, src, FALSE)
 static void S_av_push_from_av(pTHX_ AV *dst, AV *src, bool refcnt_inc)

@@ -26,6 +26,7 @@
       "build" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
+            "ExtUtils::ParseXS" : "3.21",
             "File::Path" : "0",
             "Pod::Select" : "0"
          }
@@ -40,8 +41,8 @@
             "Devel::CheckLib" : "1.01",
             "ExtUtils::Depends" : "0.402",
             "ExtUtils::MakeMaker" : "7.12",
-            "ExtUtils::ParseXS" : "3.01",
-            "File::Path" : "0"
+            "File::Path" : "0",
+            "File::Which" : "0"
          }
       },
       "runtime" : {
@@ -95,6 +96,6 @@
       },
       "x_IRC" : "irc://irc.perl.org/#pdl"
    },
-   "version" : "2.080",
+   "version" : "2.081",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -2,8 +2,8 @@ NAME
     Clipboard::Any - Common interface to clipboard manager functions
 
 VERSION
-    This document describes version 0.003 of Clipboard::Any (from Perl
-    distribution Clipboard-Any), released on 2022-10-09.
+    This document describes version 0.004 of Clipboard::Any (from Perl
+    distribution Clipboard-Any), released on 2022-10-25.
 
 DESCRIPTION
     This module provides a common interface to interact with clipboard.
@@ -51,7 +51,9 @@ FUNCTIONS
         The default, when left undef, is to detect what clipboard manager is
         running.
 
-    *   content* => *str*
+    *   content => *str*
+
+        (No description)
 
     Returns an enveloped result (an array).
 

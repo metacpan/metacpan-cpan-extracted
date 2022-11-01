@@ -14,7 +14,7 @@ Alien::Build::Plugin::Extract - Extract Alien::Build plugins
 
 =head1 VERSION
 
-version 2.71
+version 2.72
 
 =head1 SYNOPSIS
 

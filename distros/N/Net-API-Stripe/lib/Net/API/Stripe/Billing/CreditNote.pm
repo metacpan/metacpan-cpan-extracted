@@ -1,20 +1,28 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Billing/CreditNote.pm
-## Version v0.200.0
+## Version v0.201.0
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
-## Modified 2020/05/15
+## Modified 2022/10/29
+## All rights reserved
 ## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 ## https://stripe.com/docs/api/credit_notes
 package Net::API::Stripe::Billing::CreditNote;
 BEGIN
 {
-	use strict;
-	use parent qw( Net::API::Stripe::Generic );
-	our( $VERSION ) = 'v0.200.0';
+    use strict;
+    use warnings;
+    use parent qw( Net::API::Stripe::Generic );
+    use vars qw( $VERSION );
+    our( $VERSION ) = 'v0.201.0';
 };
+
+use strict;
+use warnings;
 
 sub id { return( shift->_set_get_scalar( 'id', @_ ) ); }
 
@@ -29,6 +37,13 @@ sub currency { return( shift->_set_get_scalar( 'currency', @_ ) ); }
 sub customer { return( shift->_set_get_scalar_or_object( 'customer', 'Net::API::Stripe::Customer', @_ ) ); }
 
 sub customer_balance_transaction { return( shift->_set_get_scalar_or_object( 'customer_balance_transaction', 'Net::API::Stripe::Balance::Transaction', @_ ) ); }
+
+sub discount_amount { return( shift->_set_get_number( 'discount_amount', @_ ) ); }
+
+sub discount_amounts { return( shift->_set_get_class_array( 'discount_amounts', {
+    amount => { type => "number" },
+    discount => { type => "scalar" },
+}, @_ ) ); }
 
 sub invoice { return( shift->_set_get_scalar_or_object( 'invoice', 'Net::API::Stripe::Billing::Invoice', @_ ) ); }
 
@@ -54,17 +69,21 @@ sub status { return( shift->_set_get_scalar( 'status', @_ ) ); }
 
 sub subtotal { return( shift->_set_get_number( 'subtotal', @_ ) ); }
 
+sub subtotal_excluding_tax { return( shift->_set_get_number( 'subtotal_excluding_tax', @_ ) ); }
+
 sub tax_amounts
 {
-	return( shift->_set_get_class( 'tax_amounts',
-	{
-	amount		=> { type => 'number' },
-	inclusive	=> { type => 'boolean' },
-	tax_rate	=> { type => 'scalar_or_object', class => 'Net::API::Stripe::Tax::Rate' },
-	}, @_ ) );
+    return( shift->_set_get_class_array( 'tax_amounts',
+    {
+    amount        => { type => 'number' },
+    inclusive    => { type => 'boolean' },
+    tax_rate    => { type => 'scalar_or_object', class => 'Net::API::Stripe::Tax::Rate' },
+    }, @_ ) );
 }
 
 sub total { return( shift->_set_get_number( 'total', @_ ) ); }
+
+sub total_excluding_tax { return( shift->_set_get_number( 'total_excluding_tax', @_ ) ); }
 
 sub type { return( shift->_set_get_scalar( 'type', @_ ) ); }
 
@@ -95,7 +114,7 @@ Net::API::Stripe::Billing::CreditNote - A Stripe Credit Note Object
 
 =head1 VERSION
 
-    v0.200.0
+    v0.201.0
 
 =head1 DESCRIPTION
 
@@ -121,108 +140,124 @@ You may issue multiple credit notes for an invoice. Each credit note will increm
 
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>( %ARG )
+=head2 new( %ARG )
 
 Creates a new L<Net::API::Stripe::Billing::CreditNote> object.
 It may also take an hash like arguments, that also are method of the same name.
 
-=back
-
 =head1 METHODS
 
-=over 4
-
-=item B<id> string
+=head2 id string
 
 Unique identifier for the object.
 
-=item B<object> string, value is "credit_note"
+=head2 object string, value is "credit_note"
 
 String representing the object’s type. Objects of the same type share the same value.
 
-=item B<amount> integer
+=head2 amount integer
 
 The integer amount in JPY representing the total amount of the credit note, including tax.
 
-=item B<created> timestamp
+=head2 created timestamp
 
 Time at which the object was created. Measured in seconds since the Unix epoch.
 
-=item B<currency> currency
+=head2 currency currency
 
 Three-letter ISO currency code, in lowercase. Must be a supported currency.
 
-=item B<customer> string (expandable)
+=head2 customer string (expandable)
 
 ID of the customer. When expanded, this is a L<Net::API::Stripe::Customer> object.
 
-=item B<customer_balance_transaction> string (expandable)
+=head2 customer_balance_transaction string (expandable)
 
 Customer balance transaction related to this credit note. When expanded, this is a L<Net::API::Stripe::Balance::Transaction> object.
 
-=item B<invoice> string (expandable)
+=head2 discount_amount integer
+
+The integer amount in JPY representing the total amount of discount that was credited.
+
+=head2 discount_amounts array of hash
+
+The aggregate amounts calculated per discount for all line items.
+
+It has the following properties:
+
+=over 4
+
+=item I<amount> integer
+
+The amount, in JPY, of the discount.
+
+=item I<discount> string
+
+The discount that was applied to get this discount amount.
+
+=back
+
+=head2 invoice string (expandable)
 
 ID of the invoice. When expanded, this is a L<Net::API::Stripe::Billing::Invoice> object.
 
-=item B<lines>() list
+=head2 lines() list
 
 Line items that make up the credit note.
 
 This is a L<Net::API::Stripe::List> object with a list of L<Net::API::Stripe::Billing::CreditNote::LineItem>
 
-=item B<livemode> boolean
+=head2 livemode boolean
 
 Has the value true if the object exists in live mode or the value false if the object exists in test mode.
 
-=item B<memo> string
+=head2 memo string
 
 Customer-facing text that appears on the credit note PDF.
 
-=item B<metadata> hash
+=head2 metadata hash
 
 Set of key-value pairs that you can attach to an object. This can be useful for storing additional information about the object in a structured format.
 
-=item B<number> string
+=head2 number string
 
 A unique number that identifies this particular credit note and appears on the PDF of the credit note and its associated invoice.
 
-=item B<out_of_band_amount>() integer
+=head2 out_of_band_amount() integer
 
 Amount that was credited outside of Stripe.
 
-=item B<pdf> string
+=head2 pdf string
 
 The link to download the PDF of the credit note.
 
-=item B<reason> string
+=head2 reason string
 
 Reason for issuing this credit note, one of duplicate, fraudulent, order_change, or product_unsatisfactory
 
-=item B<refund> string (expandable)
+=head2 refund string (expandable)
 
 Refund related to this credit note. When expanded, this is a L<Net::API::Stripe::Refund> object.
 
-=item B<status> string
+=head2 status string
 
 Status of this credit note, one of issued or void. Learn more about voiding credit notes.
 
-=item B<subtotal>() integer
+=head2 subtotal() integer
 
 The integer amount in JPY representing the amount of the credit note, excluding tax and discount.
 
-=item B<total>() integer
+=head2 subtotal_excluding_tax integer
 
-The integer amount in JPY representing the total amount of the credit note, including tax and discount.
+The integer amount in JPY representing the amount of the credit note, excluding all tax and invoice level discounts.
 
-=item B<tax_amounts>() array of objects
+=head2 tax_amounts() array of objects
 
 The amount of tax calculated per tax rate for this line item.
 
 This is a dynamic class with the following properties:
 
-=over 8
+=over 4
 
 =item I<amount> integer
 
@@ -240,38 +275,44 @@ When expanded, this is a L<Net::API::Stripe::Tax::Rate> object.
 
 =back
 
-=item B<type> string
+=head2 total() integer
+
+The integer amount in JPY representing the total amount of the credit note, including tax and discount.
+
+=head2 total_excluding_tax integer
+
+The integer amount in JPY representing the total amount of the credit note, excluding tax, but including discounts.
+
+=head2 type string
 
 Type of this credit note, one of post_payment or pre_payment. A pre_payment credit note means it was issued when the invoice was open. A post_payment credit note means it was issued when the invoice was paid.
 
-=item B<voided_at> timestamp
+=head2 voided_at timestamp
 
 The time that the credit note was voided. This is a C<DateTime> object.
 
-=back
-
 =head1 API SAMPLE
 
-	{
-	  "id": "cn_fake124567890",
-	  "object": "credit_note",
-	  "amount": 1690,
-	  "created": 1571397911,
-	  "currency": "jpy",
-	  "customer": "cus_fake124567890",
-	  "customer_balance_transaction": null,
-	  "invoice": "in_fake124567890",
-	  "livemode": false,
-	  "memo": null,
-	  "metadata": {},
-	  "number": "ABCD-1234-CN-01",
-	  "pdf": "https://pay.stripe.com/credit_notes/acct_19eGgRCeyNCl6fY2/cnst_123456789/pdf",
-	  "reason": null,
-	  "refund": null,
-	  "status": "issued",
-	  "type": "pre_payment",
-	  "voided_at": null
-	}
+    {
+      "id": "cn_fake124567890",
+      "object": "credit_note",
+      "amount": 1690,
+      "created": 1571397911,
+      "currency": "jpy",
+      "customer": "cus_fake124567890",
+      "customer_balance_transaction": null,
+      "invoice": "in_fake124567890",
+      "livemode": false,
+      "memo": null,
+      "metadata": {},
+      "number": "ABCD-1234-CN-01",
+      "pdf": "https://pay.stripe.com/credit_notes/acct_19eGgRCeyNCl6fY2/cnst_123456789/pdf",
+      "reason": null,
+      "refund": null,
+      "status": "issued",
+      "type": "pre_payment",
+      "voided_at": null
+    }
 
 =head1 HISTORY
 

@@ -3,18 +3,18 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Generate walking basslines
 
-our $VERSION = '0.0504';
+our $VERSION = '0.0505';
 
 use Data::Dumper::Compact qw(ddc);
 use Carp qw(croak);
 use List::SomeUtils qw(first_index);
 use List::Util qw(any min uniq);
-use Music::Chord::Note;
-use Music::Note;
+use Music::Chord::Note ();
+use Music::Note ();
 use Music::Scales qw(get_scale_notes get_scale_MIDI);
-use Music::VoiceGen;
+use Music::VoiceGen ();
+use Set::Array ();
 use Moo;
-use Set::Array;
 use strictures 2;
 use namespace::clean;
 
@@ -281,7 +281,7 @@ MIDI::Bassline::Walk - Generate walking basslines
 
 =head1 VERSION
 
-version 0.0504
+version 0.0505
 
 =head1 SYNOPSIS
 

@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
     "Getopt::Long::Complete" => 0,
     "Getopt::Long::Dump" => "0.112",
     "Getopt::Long::EvenLess::Dump" => 0,
-    "Getopt::Long::Util" => "0.893",
+    "Getopt::Long::Util" => "0.896",
     "Getopt::Std::Dump" => 0,
     "Log::ger" => "0.038",
     "Perinci::CmdLine::Any" => "0.09",
@@ -55,7 +55,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.323",
+  "VERSION" => "0.324",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -81,7 +81,7 @@ my %FallbackPrereqs = (
   "Getopt::Long::Complete" => 0,
   "Getopt::Long::Dump" => "0.112",
   "Getopt::Long::EvenLess::Dump" => 0,
-  "Getopt::Long::Util" => "0.893",
+  "Getopt::Long::Util" => "0.896",
   "Getopt::Std::Dump" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,

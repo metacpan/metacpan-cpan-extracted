@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 0.87
+    version 0.88
 
 SYNOPSIS
 
@@ -21,7 +21,7 @@ SYNOPSIS
          my @args = @_;          # list of arguments
          say 'child PID: ', $proc->pid;
        },
-       on_stdout => sub { 
+       on_stdout => sub {
          my $proc = shift;       # isa AnyEvent::Open3::Simple::Process
          my $line = shift;       # string
          say 'out: ', $string;
@@ -200,7 +200,7 @@ CAVEATS
 
     Some AnyEvent implementations may not work properly with the method
     used by AnyEvent::Open3::Simple to wait for the child process to
-    terminate. See "CHILD-PROCESS-WATCHERS" in AnyEvent for details.
+    terminate. See "CHILD PROCESS WATCHERS" in AnyEvent for details.
 
     This module uses an idle watcher instead of a child watcher to detect
     program termination on Microsoft Windows (but not Cygwin). This is
@@ -217,7 +217,7 @@ CAVEATS
     AnyEvent::Impl::EV, AnyEvent::Impl::Event and AnyEvent::Impl::Perl
     (possibly others), although in the past they have either not worked or
     had limitations placed on them. Because the author of AnyEvent does not
-    hold the native Windows port of Perl in high regard problems such as
+    hold the native Windows port of Perl in high regard: problems such as
     this may pop up again in the future and may not be addressed, and may
     be out of the control of the author of this module.
 
@@ -263,7 +263,18 @@ CAVEATS
 
 SEE ALSO
 
-    AnyEvent::Subprocess, AnyEvent::Util, AnyEvent::Run.
+    AnyEvent::Open3::Simple::Process
+
+      Represents a process being run by this module, typically passed into
+      the callbacks.
+
+    AnyEvent::Subprocess
+
+      Alternative to this module.
+
+    AnyEvent::Run
+
+      Alternative to this module.
 
 AUTHOR
 
@@ -277,7 +288,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2012-2019 by Graham Ollis.
+    This software is copyright (c) 2012-2022 by Graham Ollis.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

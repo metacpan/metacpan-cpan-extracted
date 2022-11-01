@@ -10,9 +10,9 @@ use App::shcompgen;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-10'; # DATE
+our $DATE = '2022-08-11'; # DATE
 our $DIST = 'App-shcompgen'; # DIST
-our $VERSION = '0.323'; # VERSION
+our $VERSION = '0.324'; # VERSION
 
 my $urlprefix = '/App/shcompgen/';
 Perinci::CmdLine::Any->new(
@@ -44,7 +44,7 @@ shcompgen - Generate shell completion scripts
 
 =head1 VERSION
 
-This document describes version 0.323 of shcompgen (from Perl distribution App-shcompgen), released on 2022-08-10.
+This document describes version 0.324 of shcompgen (from Perl distribution App-shcompgen), released on 2022-08-11.
 
 =head1 SYNOPSIS
 
@@ -214,6 +214,28 @@ L<Getopt::Long::Subcommand>, we know that it can complete itself. Thus,
 C<shcompgen> will generate this completion script (e.g. for bash):
 
  complete -C foo foo
+
+=item * Getopt::Long-based CLI scripts
+
+If a script C<foo> is detected as a Perl script using L<Getopt::Long>,
+C<shcompgen> will try to extract the Getopt::Long spec specified by
+C<GetOptions>, which can then tell it what options a script accepts. The
+completion script cannot complete option values or arguments though, as there is
+not enough information to do that. If you write the script, you might want to
+switch to L<Getopt::Long::Complete> or L<Getopt::Long::Subcommand> for better
+tab completion support.
+
+=item * Getopt::Long::EvenLess-based CLI scripts
+
+Basically the same as Getopt::Long-based scripts.
+
+=item * Getopt::Long::Descriptive-based CLI scripts
+
+Basically the same as Getopt::Long-based scripts.
+
+=item * Getopt::Std-based CLI scripts
+
+Basically the same as Getopt::Long-based scripts.
 
 =item * Perinci::CmdLine-based CLI scripts
 

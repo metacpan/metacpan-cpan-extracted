@@ -42,6 +42,23 @@ B<Beta quality>: interface is not yet stable before version 1.000.
 
 =head2 Properties
 
+=head3 base
+
+Base object or package to use. Objects produced by Test::Spy will mimic the
+interface of its base object.
+
+If an object is passed, it will be used directly. Otherwise, C<< $base->new >>
+will be called.
+
+Test::Spy will only work properly with objects that are B<blessed hash references>
+with no extra behavior like inside-out objects.
+
+I<optional on the constructor with name:> C<base>
+
+I<writer:> C<set_base>
+
+I<predicate:> C<has_base>
+
 =head3 interface
 
 Strictness of the object interface. Can be any of:
@@ -60,12 +77,8 @@ I<optional on the constructor with name:> C<interface>
 
 =head3 object
 
-The actual object with mocked interface. Its gets cached after generation, so
-you will always get the same reference, but adding methods after you've called
-this method will not update already existing objects - those will have to be
-generated again.
-
-The workflow is always: call C<< ->object >> after adding new methods.
+The actual object with mocked interface. Its gets cached after generation and
+must be generated again after changing L</base>.
 
 =head3 context
 
@@ -108,12 +121,19 @@ L<Test::Spy::Method/should_return> for more details.
 
 Return value is an object of L<Test::Spy::Method>.
 
+=head3 add_observer
+
+Same as L</add_method>, but observers don't return and do not interrupt calls
+to methods of the base object.
+
+Return value is an object of L<Test::Spy::Observer>.
+
 =head3 method
 
 	my $method = $spy->method($name);
 
-Returns an object of L<Test::Spy::Method> that was added with L</add_method> as
-C<$name>.
+Returns an object of L<Test::Spy::Method> or L<Test::Spy::Observer> that was
+added with L</add_method> or L</add_observer> as C<$name>.
 
 Throws an exception if there is no such method.
 
@@ -234,16 +254,6 @@ Can return C<undef> if there was no such call data.
 =head3 clear
 
 Clears all call and iterator data B<from the method>.
-
-=head1 TODO
-
-=over
-
-=item * Mimic given class interface
-
-=item * Proper handling of can, does and isa
-
-=back
 
 =head1 SEE ALSO
 

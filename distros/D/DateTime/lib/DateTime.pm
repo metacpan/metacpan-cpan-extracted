@@ -8,7 +8,7 @@ use warnings;
 use warnings::register;
 use namespace::autoclean 0.19;
 
-our $VERSION = '1.58';
+our $VERSION = '1.59';
 
 use Carp;
 use DateTime::Duration;
@@ -16,10 +16,10 @@ use DateTime::Helpers;
 use DateTime::Locale 1.06;
 use DateTime::TimeZone 2.44;
 use DateTime::Types;
-use POSIX qw( floor fmod );
+use POSIX                           qw( floor fmod );
 use Params::ValidationCompiler 0.26 qw( validation_for );
-use Scalar::Util qw( blessed );
-use Specio::Subs qw( Specio::Library::Builtins );
+use Scalar::Util                    qw( blessed );
+use Specio::Subs                    qw( Specio::Library::Builtins );
 use Try::Tiny;
 
 ## no critic (Variables::ProhibitPackageVars)
@@ -1245,7 +1245,7 @@ sub jd { $_[0]->mjd + 2_400_000.5 }
             $y2 *= -1 if $year < 0;
             $_[0]->_zero_padded_number( 'yy', $y2 );
         },
-        qr/y/    => sub { $_[0]->year },
+        qr/y/    => 'year',
         qr/(u+)/ => sub { $_[0]->_zero_padded_number( $1, $_[0]->year ) },
         qr/(Y+)/ =>
             sub { $_[0]->_zero_padded_number( $1, $_[0]->week_year ) },
@@ -1346,8 +1346,8 @@ sub jd { $_[0]->mjd + 2_400_000.5 }
         qr/A+/   =>
             sub { ( $_[0]->{local_rd_secs} * 1000 ) + $_[0]->millisecond },
 
-        qr/zzzz/   => sub { $_[0]->time_zone_long_name },
-        qr/z{1,3}/ => sub { $_[0]->time_zone_short_name },
+        qr/zzzz/   => 'time_zone_long_name',
+        qr/z{1,3}/ => 'time_zone_short_name',
         qr/ZZZZZ/  => sub {
             DateTime::TimeZone->offset_as_string( $_[0]->offset, q{:} );
         },
@@ -1357,10 +1357,10 @@ sub jd { $_[0]->mjd + 2_400_000.5 }
         },
         qr/Z{1,3}/ =>
             sub { DateTime::TimeZone->offset_as_string( $_[0]->offset ) },
-        qr/vvvv/   => sub { $_[0]->time_zone_long_name },
-        qr/v{1,3}/ => sub { $_[0]->time_zone_short_name },
-        qr/VVVV/   => sub { $_[0]->time_zone_long_name },
-        qr/V{1,3}/ => sub { $_[0]->time_zone_short_name },
+        qr/vvvv/   => 'time_zone_long_name',
+        qr/v{1,3}/ => 'time_zone_short_name',
+        qr/VVVV/   => 'time_zone_long_name',
+        qr/V{1,3}/ => 'time_zone_short_name',
     );
 
     sub _zero_padded_number {
@@ -2375,7 +2375,7 @@ DateTime - A date and time object for Perl
 
 =head1 VERSION
 
-version 1.58
+version 1.59
 
 =head1 SYNOPSIS
 
@@ -2753,8 +2753,8 @@ microsecond.
 By default, the returned object will be in the UTC time zone.
 
 If you pass a C<time_zone>, then this time zone will be applied I<after> the
-object is constructed. In other words, the epoch value is always interpreted
-as being in the UTC time zone. Here's an example:
+object is constructed. In other words, the epoch value is always interpreted as
+being in the UTC time zone. Here's an example:
 
     my $dt = DateTime->from_epoch(
         epoch     => 0,
@@ -4614,9 +4614,8 @@ will be fixed (perhaps) in future versions.
 
 =head1 SEE ALSO
 
-L<A Date with
-Perl|http://presentations.houseabsolute.com/a-date-with-perl/> - a talk
-I've given at a few YAPCs.
+L<A Date with Perl|http://presentations.houseabsolute.com/a-date-with-perl/> -
+a talk I've given at a few YAPCs.
 
 L<datetime@perl.org mailing list|http://lists.perl.org/list/datetime.html>
 
@@ -4646,7 +4645,7 @@ software much more, unless I get so many donations that I can consider working
 on free software full time (let's all have a chuckle at that together).
 
 To donate, log into PayPal and send money to autarch@urth.org, or use the
-button at L<https://www.urth.org/fs-donation.html>.
+button at L<https://houseabsolute.com/foss-donations/>.
 
 =head1 AUTHOR
 
@@ -4654,7 +4653,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Ben Bennett Christian Hansen Daisuke Maki Dan Book Stewart David Dyck E. Wheeler Precious Doug Bell Flávio Soibelmann Glock Gianni Ceccarelli Gregory Oschwald Hauke D Iain Truskett Jason McIntosh Joshua Hoblitt Karen Etheridge Mark Overmeer Michael Conrad R. Davis Mohammad S Anwar M Somerville Nick Tonkin Olaf Alders Ovid Paul Howarth Philippe Bruhat (BooK) philip r brenan Ricardo Signes Richard Bowen Ron Hill Sam Kington viviparous
+=for stopwords Ben Bennett Christian Hansen Daisuke Maki Dan Book Stewart David Dyck E. Wheeler Precious Doug Bell Flávio Soibelmann Glock Gianni Ceccarelli Gregory Oschwald Hauke D Iain Truskett James Raspass Jason McIntosh Joshua Hoblitt Karen Etheridge Mark Overmeer Michael Conrad R. Davis Mohammad S Anwar M Somerville Nick Tonkin Olaf Alders Ovid Paul Howarth Philippe Bruhat (BooK) philip r brenan Ricardo Signes Richard Bowen Ron Hill Sam Kington viviparous
 
 =over 4
 
@@ -4713,6 +4712,10 @@ Hauke D <haukex@zero-g.net>
 =item *
 
 Iain Truskett <deceased>
+
+=item *
+
+James Raspass <jraspass@gmail.com>
 
 =item *
 

@@ -11,7 +11,7 @@ use Memoize::HashKey::Ignore;
 my $expensive_count = 0;
 
 tie my %scalar_cache => 'Memoize::HashKey::Ignore',
-    IGNORE         => sub { return shift == 7; };
+    IGNORE           => sub { return shift == 7; };
 tie my %list_cache => 'Memoize::HashKey::Ignore',
     IGNORE         => sub { return shift == 7; };
 

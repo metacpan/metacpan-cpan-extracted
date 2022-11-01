@@ -73,8 +73,7 @@ KEYWORDS
 
     See also "class" in Object::Pad.
 
-    Attributes are not supported. In particular, there is no ability to
-    declare a superclass with :isa nor any roles with :does. The legacy
+    There is no ability to declare any roles with :does. The legacy
     subkeywords for these are equally not supported.
 
     The :repr attribute is also not supported; the default representation
@@ -84,6 +83,32 @@ KEYWORDS
     classes will behave as if the attribute had been declared. Every
     generated constructor will check its parameters for key names left
     unhandled by ADJUST blocks, and throw an exception if any remain.
+
+    The following class attributes are supported:
+
+  :isa
+
+       :isa(CLASS)
+    
+       :isa(CLASS CLASSVER)
+
+    Since version 0.02.
+
+    Declares a superclass that this class extends. At most one superclass
+    is supported.
+
+    If the package providing the superclass does not exist, an attempt is
+    made to load it by code equivalent to
+
+       require CLASS ();
+
+    and thus it must either already exist, or be locatable via the usual
+    @INC mechanisms.
+
+    An optional version check can also be supplied; it performs the
+    equivalent of
+
+       BaseClass->VERSION( $ver )
 
  method
 
@@ -124,6 +149,9 @@ KEYWORDS
        ADJUST { ... }
 
     See also "ADJUST" in Object::Pad.
+
+    Attributes are not supported; in particular the :params attribute of
+    Object::Pad v0.70.
 
  Other Keywords
 

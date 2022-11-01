@@ -7,7 +7,7 @@ use Class::Utils qw(set_params);
 use Encode;
 use Error::Pure qw(err);
 
-our $VERSION = 0.11;
+our $VERSION = 0.12;
 
 # Constructor.
 sub new {
@@ -627,12 +627,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2005-2021 Michal Josef Špaček
+© 2005-2022 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.11
+0.12
 
 =cut

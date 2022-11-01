@@ -8,9 +8,9 @@ use Log::ger;
 use Hash::Subset qw(hash_subset);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-09'; # DATE
+our $DATE = '2022-10-25'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '0.045'; # VERSION
+our $VERSION = '0.046'; # VERSION
 
 our %SPEC;
 
@@ -607,6 +607,21 @@ our %argspecsopt_field_selection = (
     },
 );
 
+our %argspecsopt_vcf = (
+    name_vcf_field => {
+        summary => 'Select field to use as VCF N (name) field',
+        schema => 'str*',
+    },
+    cell_vcf_field => {
+        summary => 'Select field to use as VCF CELL field',
+        schema => 'str*',
+    },
+    email_vcf_field => {
+        summary => 'Select field to use as VCF EMAIL field',
+        schema => 'str*',
+    },
+);
+
 our %arg_eval_1 = (
     eval => {
         summary => 'Perl code to do munging',
@@ -788,6 +803,7 @@ $SPEC{csvutil} = {
                 'freqtable',
                 'get-cells',
                 'fill-template',
+                'convert-to-vcf',
             ]],
             req => 1,
             pos => 0,
@@ -799,6 +815,7 @@ $SPEC{csvutil} = {
         %argopt_eval,
         %argopt_field,
         %argspecsopt_field_selection,
+        %argspecsopt_vcf,
     },
     args_rels => {
     },
@@ -840,6 +857,12 @@ sub csvutil {
 
     # for action=split
     my ($split_fh, $split_filename, $split_lines);
+
+    # for action convert-to-vcf
+    my %fields_for;
+    $fields_for{N}     = $args{name_vcf_field};
+    $fields_for{CELL}  = $args{cell_vcf_field};
+    $fields_for{EMAIL} = $args{email_vcf_field};
 
     my $row0;
     my $code_getline = sub {
@@ -911,6 +934,31 @@ sub csvutil {
                 }
                 $row_spec_sub = eval 'sub { my $i = shift; '.join(" || ", @codestr).' }'; ## no critic: BuiltinFunctions::ProhibitStringyEval
                 return [400, "BUG: Invalid row_spec code: $@"] if $@;
+            }
+            if ($action eq 'convert-to-vcf') {
+                for my $field (@$fields) {
+                    if ($field =~ /name/i && !defined($fields_for{N})) {
+                        log_info "Will be using field '$field' for VCF field 'N' (name)";
+                        $fields_for{N} = $field;
+                    }
+                    if ($field =~ /(e-?)?mail/i && !defined($fields_for{EMAIL})) {
+                        log_info "Will be using field '$field' for VCF field 'EMAIL'";
+                        $fields_for{EMAIL} = $field;
+                    }
+                    if ($field =~ /cell|hp|phone|wa|whatsapp/i && !defined($fields_for{CELL})) {
+                        log_info "Will be using field '$field' for VCF field 'CELL' (cellular phone)";
+                        $fields_for{CELL} = $field;
+                    }
+                }
+                if (!defined($fields_for{N})) {
+                    return [412, "Can't convert to VCF because we cannot determine which field to use as the VCF N (name) field"];
+                }
+                if (!defined($fields_for{EMAIL})) {
+                    log_warn "We cannot determine which field to use as the VCF EMAIL field";
+                }
+                if (!defined($fields_for{CELL})) {
+                    log_warn "We cannot determine which field to use as the VCF CELL (cellular phone) field";
+                }
             }
         } # if i==1 (header row)
 
@@ -1177,6 +1225,19 @@ sub csvutil {
                     $cells[$j] = $row->[$field_idxs{$coord_col}];
                 }
             }
+        } elsif ($action eq 'convert-to-vcf') {
+            unless ($i == 1) {
+                my $vcard = join(
+                    "",
+                    "BEGIN:VCARD\n",
+                    "VERSION:3.0\n",
+                    "N:", $row->[$field_idxs{ $fields_for{N} }], "\n",
+                    (defined $fields_for{EMAIL} ? ("EMAIL;type=INTERNET;type=WORK;pref:", $row->[$field_idxs{ $fields_for{EMAIL} }], "\n") : ()),
+                    (defined $fields_for{CELL} ? ("TEL;type=CELL:", $row->[$field_idxs{ $fields_for{CELL} }], "\n") : ()),
+                    "END:VCARD\n\n",
+                );
+                push @$rows, $vcard;
+            }
         } else {
             return [400, "Unknown action '$action'"];
         }
@@ -1205,8 +1266,16 @@ sub csvutil {
         return [200, "OK", $hash];
     }
 
+    if ($action eq 'convert-to-hash') {
+        return [200, "OK", join("", @$rows)];
+    }
+
     if ($action eq 'convert-to-td') {
         return [200, "OK", $rows, {'table.fields'=>$fields}];
+    }
+
+    if ($action eq 'convert-to-vcf') {
+        return [200, "OK", join("", @$rows)];
     }
 
     if ($action eq 'sum') {
@@ -2085,6 +2154,28 @@ sub csv2td {
     csvutil(%args, action=>'convert-to-td');
 }
 
+$SPEC{csv2vcf} = {
+    v => 1.1,
+    summary => 'Create a VCF from selected fields of the CSV',
+    description => <<'_',
+
+You can set which CSV fields to use for name, cell phone, and email. If unset,
+will guess from the field name. If that also fails, will warn/bail out.
+
+_
+    args => {
+        %args_common,
+        %arg_filename_0,
+        %argspecsopt_vcf,
+    },
+    description => '' . $common_desc,
+};
+sub csv2vcf {
+    my %args = @_;
+
+    csvutil(%args, action=>'convert-to-vcf');
+}
+
 $SPEC{csv_concat} = {
     v => 1.1,
     summary => 'Concatenate several CSV files together, '.
@@ -2875,7 +2966,7 @@ App::CSVUtils - CLI utilities related to CSV
 
 =head1 VERSION
 
-This document describes version 0.045 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2022-10-09.
+This document describes version 0.046 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2022-10-25.
 
 =head1 DESCRIPTION
 
@@ -2947,6 +3038,8 @@ This distribution contains the following CLI utilities:
 
 =item * L<csv2tsv>
 
+=item * L<csv2vcf>
+
 =item * L<dump-csv>
 
 =item * L<tsv2csv>
@@ -2995,6 +3088,93 @@ field names (and the second row contains the first data row). When you declare
 that CSV does not have header row (C<--no-header>), the first row of the CSV is
 assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
 and so on.
+
+=item * B<quote_char> => I<str>
+
+Specify field quote character in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to C<"> (double quote). Overrides C<--tsv> option.
+
+=item * B<sep_char> => I<str>
+
+Specify field separator character in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to C<,> (comma). Overrides C<--tsv> option.
+
+=item * B<tsv> => I<bool>
+
+Inform that input file is in TSV (tab-separated) format instead of CSV.
+
+Overriden by C<--sep-char>, C<--quote-char>, C<--escape-char> options. If one of
+those options is specified, then C<--tsv> will be ignored.
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
+=head2 csv2vcf
+
+Usage:
+
+ csv2vcf(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Create a VCF from selected fields of the CSV.
+
+I<Common notes for the utilities>
+
+Encoding: The utilities in this module/distribution accept and emit UTF8 text.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<cell_vcf_field> => I<str>
+
+Select field to use as VCF CELL field.
+
+=item * B<email_vcf_field> => I<str>
+
+Select field to use as VCF EMAIL field.
+
+=item * B<escape_char> => I<str>
+
+Specify character to escape value in field in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to C<\\> (backslash). Overrides C<--tsv> option.
+
+=item * B<filename>* => I<filename>
+
+Input CSV file or URL.
+
+Use C<-> to read from stdin, use C<clipboard:> to read from clipboard.
+
+=item * B<header> => I<bool> (default: 1)
+
+Whether input CSV has a header row.
+
+By default (C<--header>), the first row of the CSV will be assumed to contain
+field names (and the second row contains the first data row). When you declare
+that CSV does not have header row (C<--no-header>), the first row of the CSV is
+assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
+and so on.
+
+=item * B<name_vcf_field> => I<str>
+
+Select field to use as VCF N (name) field.
 
 =item * B<quote_char> => I<str>
 
@@ -4109,6 +4289,8 @@ Defaults to C<,> (comma). Overrides C<--tsv> option.
 
 =item * B<template_filename>* => I<filename>
 
+(No description)
+
 =item * B<tsv> => I<bool>
 
 Inform that input file is in TSV (tab-separated) format instead of CSV.
@@ -4668,6 +4850,8 @@ Defaults to C<\\> (backslash). Overrides C<--tsv> option.
 
 =item * B<fill_fields>* => I<str>
 
+(No description)
+
 =item * B<header> => I<bool> (default: 1)
 
 Whether input CSV has a header row.
@@ -4680,7 +4864,11 @@ and so on.
 
 =item * B<ignore_case> => I<bool>
 
+(No description)
+
 =item * B<lookup_fields>* => I<str>
+
+(No description)
 
 =item * B<output_escape_char> => I<str>
 
@@ -5328,6 +5516,8 @@ those options is specified, then C<--tsv> will be ignored.
 
 =item * B<with> => I<str> (default: " ")
 
+(No description)
+
 
 =back
 
@@ -5725,6 +5915,8 @@ Arguments ('*' denotes required arguments):
 
 =item * B<compare_fields> => I<str>
 
+(No description)
+
 =item * B<escape_char> => I<str>
 
 Specify character to escape value in field in input CSV, will be passed to Text::CSV_XS.
@@ -5748,6 +5940,8 @@ assumed to contain the first data row. Fields will be named C<field1>, C<field2>
 and so on.
 
 =item * B<ignore_case> => I<bool>
+
+(No description)
 
 =item * B<op>* => I<str>
 
@@ -5817,6 +6011,8 @@ Defaults to C<"> (double quote). Overrides C<--tsv> option.
 
 =item * B<result_fields> => I<str>
 
+(No description)
+
 =item * B<sep_char> => I<str>
 
 Specify field separator character in input CSV, will be passed to Text::CSV_XS.
@@ -5880,6 +6076,8 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<ci> => I<bool>
+
+(No description)
 
 =item * B<escape_char> => I<str>
 
@@ -5970,6 +6168,8 @@ Specify field quote character in input CSV, will be passed to Text::CSV_XS.
 Defaults to C<"> (double quote). Overrides C<--tsv> option.
 
 =item * B<reverse> => I<bool>
+
+(No description)
 
 =item * B<sep_char> => I<str>
 
@@ -6121,6 +6321,8 @@ be compared against.
 
 =item * B<ci> => I<bool>
 
+(No description)
+
 =item * B<escape_char> => I<str>
 
 Specify character to escape value in field in input CSV, will be passed to Text::CSV_XS.
@@ -6222,6 +6424,8 @@ Defaults to C<"> (double quote). Overrides C<--tsv> option.
 
 =item * B<reverse> => I<bool>
 
+(No description)
+
 =item * B<sep_char> => I<str>
 
 Specify field separator character in input CSV, will be passed to Text::CSV_XS.
@@ -6306,6 +6510,8 @@ assumed to contain the first data row. Fields will be named C<field1>, C<field2>
 and so on.
 
 =item * B<lines> => I<uint> (default: 1000)
+
+(No description)
 
 =item * B<output_escape_char> => I<str>
 

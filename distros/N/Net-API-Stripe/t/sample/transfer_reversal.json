@@ -1,0 +1,12 @@
+{
+   "amount" : "100",
+   "balance_transaction" : "txn_1LOIlS2eZvKYlo2CqVLqZUir",
+   "created" : "1658484442",
+   "currency" : "usd",
+   "destination_payment_refund" : "pyr_1LOIlSI9Pbw6jkMZi6TfasGy",
+   "id" : "trr_1LOIlS2eZvKYlo2C4uzbNRsJ",
+   "metadata" : {},
+   "object" : "transfer_reversal",
+   "source_refund" : null,
+   "transfer" : "tr_3LCspD2eZvKYlo2C02wegtL1"
+}

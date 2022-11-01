@@ -1,3 +1,7 @@
+0.007           2022-10-30
+   - Bump dependencies
+   - Apply "dzil perltidy" to repo
+
 0.006           2022-03-15
     - Add another example script
     - Migrate to JSON::MaybeXS

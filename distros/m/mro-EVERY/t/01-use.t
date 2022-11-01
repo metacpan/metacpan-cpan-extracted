@@ -9,5 +9,8 @@ my $method  = 'import';
 
 use_ok $madness; 
 can_ok $madness, $method;
+can_ok $madness, 'VERSION';
+
+ok $madness->VERSION, "$madness has a VERSION";
 
 done_testing;

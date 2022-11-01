@@ -1,0 +1,366 @@
+#!/usr/bin/env perl
+# t/010_fetch_reqs.t - test bin/fetch-reqs.pl script
+use strict;
+use warnings;
+use utf8;
+use autodie;
+use open ':std', ':encoding(utf8)';
+use Carp qw(croak);
+use Readonly;
+use File::Temp;
+use File::Path qw(make_path);
+use File::Basename qw(basename);
+use File::Slurp qw(slurp);
+use Cwd qw(abs_path);
+use Test::More;
+
+# configuration & constants
+Readonly::Scalar my $script_name => "bin/fetch-reqs.pl";
+Readonly::Scalar my $debug_mode => (exists $ENV{SYS_OSPACKAGE_DEBUG} and $ENV{SYS_OSPACKAGE_DEBUG}) ? 1 : 0;
+Readonly::Scalar my $input_dir => "t/test-inputs/".basename($0, ".t");
+Readonly::Scalar my $tmpdir_template => "Sys-OsPackage-XXXXXXXXXX";
+Readonly::Scalar my $new_dir_perms => oct('770');
+Readonly::Scalar my $new_file_perms => oct('660');
+Readonly::Scalar my $xdg_data_home => ".local/share";
+Readonly::Scalar my $cpan_home_subpath => ".cpan";
+Readonly::Array my @cpan_home_subdirs => qw(build  CPAN prefs  sources);
+Readonly::Array my @local_lib_vars => qw(HOME PERL_MM_OPT PERL_MB_OPT PERL5LIB PERL_LOCAL_LIB_ROOT PATH MANPATH);
+Readonly::Array my @local_lib_clear => qw(PERL_MM_OPT PERL_MB_OPT PERL_LOCAL_LIB_ROOT);
+Readonly::Hash my %tests => (
+    existent => {
+        'Acme' => {
+            files => [qw(
+                man/man3/Acme.3pm
+                man/man3/Spiffy.3pm
+                lib/perl5/Acme.pod
+                lib/perl5/Acme.pm
+                lib/perl5/Spiffy.pm
+                lib/perl5/Spiffy.pod
+                lib/perl5/Spiffy/mixin.pm
+            )],
+        },
+        'Acme::Boom' => {
+            files => [qw(
+                man/man3/Acme::Boom.3pm
+                lib/perl5/Acme/Boom.pm
+            )],
+        },
+        'List::Util::MaybeXS' => {
+            files => [qw(
+                man/man3/List::Util::MaybeXS.3pm
+                man/man3/List::Util::PP.3pm
+                lib/perl5/List/Util/MaybeXS.pm
+                lib/perl5/List/Util/PP.pm
+            )],
+        },
+    },
+    nonexistent => {
+        # make up new non-existent module(s) if any get created in CPAN
+        # "Smackme" = word play on Acme, except doesn't exist in CPAN
+        Smackme => {},
+    },
+);
+Readonly::Scalar my $tests_per_exist => 2;
+Readonly::Scalar my $tests_per_nonexist => 1;
+Readonly::Scalar my $flag_variants => 2; # flag variants: --notest (2)
+Readonly::Scalar my $param_variants => 2; # variants by param/pipe (2)
+
+# remove duplicates from a colon-delimited path (i.e. $PATH, $PERL5LIB, $MANPATH, etc)
+# also omit directories which do not exist
+sub deduplicate_path
+{
+    my $in_path = shift;
+    my ( @path, %path_seen );
+    foreach my $dir ( split /:/, $in_path ) {
+        # skip dot "." for security
+        if ( $dir eq "." or $dir eq "" or not defined $dir ) {
+            next;
+        }
+
+        # skip if the path doesn't exist or isn't a directory
+        if (not -e $dir or not -d $dir) {
+            next
+        }
+
+        # convert to canonical path
+        my $abs_dir = abs_path($dir);
+
+        # add the path if it hasn't already been seen, and it exists
+        if (not exists $path_seen{$abs_dir} and -d $abs_dir) {
+            push @path, $abs_dir;
+        }
+        $path_seen{$abs_dir} = 1;
+    }
+    return join ':', @path;
+}
+
+# make CPAN/MyConfig.pm in the temp directory
+sub make_myconfig
+{
+    my $paths_ref = shift;
+
+    # get current CPAN config
+    my @cpan_config;
+    if ( open ( my $config_fh, "-|", "cpan -J" )) {
+        while (my $line = <$config_fh>) {
+            chomp $line;
+
+            # if we found cpan_home, save it in paths_ref as old_cpan_home
+            if ( $line =~ /^\s*\'cpan_home\'\s*=>/ ) {
+                # need to evaluate the string
+                ## no critic (BuiltinFunctions::ProhibitStringyEval)
+                my %attr = eval "(".$line.")";
+                ## critic (BuiltinFunctions::ProhibitStringyEval)
+
+                if (exists $attr{cpan_home}) {
+                    $paths_ref->{old_cpan_home} = $attr{cpan_home};
+                }
+                $line =~ s/=>.*,$/=> \$cpan_home,/;
+            }
+            push @cpan_config, $line;
+        }
+        close $config_fh;
+    } else {
+        # bail out if we couldn't open the pipe
+        return 0;
+    }
+
+    # bail out if we couldn't find the old_cpan_home
+    if (not exists $paths_ref->{old_cpan_home}) {
+        return 0;
+    }
+
+    # scan the configuration replacing old cpan & user home with variables for new data
+    for (my $i=0; $i < scalar @cpan_config; $i++) {
+        my $pos;
+        if ( $cpan_config[$i] =~ /^\s*\'make_install_arg\'\s*=>/ ) {
+            $cpan_config[$i] =~ s/=>.*,$/=> 'INSTALL_BASE='.\$install_base,/;
+            next;
+        }
+        if ( $cpan_config[$i] =~ /^\s*\'mbuild_install_arg\'\s*=>/ ) {
+            $cpan_config[$i] =~ s/=>.*,$/=> '--install_base "'.\$install_base.'"',/;
+            next;
+        }
+        if (( $pos = index $cpan_config[$i], "'".$paths_ref->{old_cpan_home}) != -1 ) {
+            substr $cpan_config[$i], $pos, length($paths_ref->{old_cpan_home})+1, "\$cpan_home.'";
+            next;
+        }
+        if (( $pos = index $cpan_config[$i], "q[".$paths_ref->{old_cpan_home}) != -1 ) {
+            substr $cpan_config[$i], $pos, length($paths_ref->{old_cpan_home})+2, "\$cpan_home.q[";
+            next;
+        }
+        if (( $pos = index $cpan_config[$i], "'".$paths_ref->{old_user_home}) != -1 ) {
+            substr $cpan_config[$i], $pos, length($paths_ref->{old_user_home})+1, "\$user_home.'";
+            next;
+        }
+        if (( $pos = index $cpan_config[$i], "q[".$paths_ref->{old_user_home}) != -1 ) {
+            substr $cpan_config[$i], $pos, length($paths_ref->{old_user_home})+2, "\$user_home.q[";
+            next;
+        }
+    }
+
+    # prepend definitions for the $cpan_home and $user_home variables that were inserted in the config
+    unshift @cpan_config,
+        "use strict;",
+        "use warnings qw(all -once);",
+        "",
+        "my \$user_home = '".$paths_ref->{user_home}."';",
+        "my \$cpan_home = '".$paths_ref->{cpan_home}."';",
+        "my \$install_base = '".$paths_ref->{install_base}."';",
+        "";
+
+    # save the MyConfig.pm file
+    open my $config_out_fh, ">", $paths_ref->{cpan_home}."/CPAN/MyConfig.pm"
+        or return 0;
+    foreach my $line ( @cpan_config ) {
+        print $config_out_fh $line."\n";
+    }
+    close $config_out_fh;
+
+    return 1;
+}
+
+# set up temporary directory
+# In order to test CPAN activity, we have to contain it into its own test directory with its own configuration.
+# Borrow most of the CPAN configuration from the running user/machine if available.
+# Returns a hash with paths used by the test environment.
+sub init_tempdir
+{
+    my %paths;
+
+    # if debug mode was set by SYS_OSPACKAGE_DEBUG in environment, don't delete it after test
+    $paths{temp_dir} = File::Temp->newdir(TEMPLATE => $tmpdir_template, CLEANUP => ($debug_mode ? 0 : 1),
+        PERMS => $new_dir_perms, TMPDIR => 1);
+    $paths{current_link} = $paths{temp_dir}."/current";
+    $paths{user_home} = $paths{temp_dir};
+    $paths{install_base} = $paths{current_link};
+
+    # dump original CPAN config for this user/machine into the test directory, if it existed
+    $paths{old_user_home} = $ENV{HOME};
+    $paths{cpan_home} = $paths{temp_dir}."/".$xdg_data_home."/".$cpan_home_subpath;
+    make_path ($paths{cpan_home}, { mode => $new_dir_perms });
+    foreach my $subdir ( @cpan_home_subdirs ) {
+        mkdir $paths{cpan_home}."/".$subdir, $new_dir_perms;
+    }
+    my $myconfig_status = make_myconfig(\%paths);
+
+    # reset HOME and CPAN config to prevent interference from user environment when running manually
+    $ENV{HOME} = $paths{temp_dir};
+    $ENV{XDG_DATA_HOME} = $paths{temp_dir}."/".$xdg_data_home;
+    $ENV{TMPDIR} = $paths{temp_dir}; # capture CPAN::Shell's temporary files in our log directory
+
+    return \%paths;
+}
+
+# get test directory
+# rotate in a new test directory - use "current" symlink at the same name each round
+sub get_test_dir
+{
+    my ( $paths_ref, $test_num ) = @_;
+
+    # generate test-specific directory path and create the directory
+    my $test_path = sprintf "%s/%03d", $paths_ref->{temp_dir}, $test_num;
+    mkdir $test_path, $new_dir_perms;
+
+    # make a "current" symlink to the current test directory
+    if ( -e $paths_ref->{current_link} ) {
+        unlink $paths_ref->{current_link};
+    }
+    symlink $test_path, $paths_ref->{current_link};
+
+    # clear %ENV variables from local::lib and XDG_* which may interfere with CPAN in a test environment
+    my @xdg_env_clear = grep { /^XDG_/ } keys %ENV;
+    foreach my $clearname ( @local_lib_clear, @xdg_env_clear ) {
+        delete $ENV{$clearname};
+    }
+
+    # use local::lib to set test environment
+    require local::lib;
+    local::lib->import('--quiet', $paths_ref->{current_link});
+    #if ( $debug_mode ) {
+    #    foreach my $varname ( sort @local_lib_vars ) {
+    #        printf STDERR "%03d: %s = %s\n", $test_num, $varname, $ENV{$varname};
+    #    }
+    #}
+    return $paths_ref->{current_link};
+}
+
+# run test on existing module
+sub test_exist
+{
+    my ( $paths_ref, $test_num, $mod, $params ) = @_;
+    my $test_dir = get_test_dir($paths_ref, $test_num);
+
+    # test install
+    my $use_pipe = (( exists $params->{use_pipe}) and $params->{use_pipe});
+    my $pipe_label = $use_pipe ? "pipe" : "param";
+    my $use_notest = (( exists $params->{use_pipe}) and $params->{use_notest});
+    my $notest_param = $use_notest ? " --notest" : "";
+    my $notest_label = $use_notest ? "notest" : "test";
+    my $log_file = $test_dir."/output-log";
+    my $test_cmd = $use_pipe
+        ? "$script_name$notest_param $mod >$log_file 2>&1"
+        : "echo $mod |$script_name$notest_param >$log_file 2>&1";
+    my $retval = system $test_cmd;
+    my $child_error = $?;
+    my $err_msg = $!;
+    if ($child_error == -1) {
+        printf STDERR "test %03d: failed to execute: %s\n", $test_num, $err_msg;
+    } elsif ($child_error & 127) {
+        printf STDERR "test %03d: child died with signal %d, %s coredump\n", $test_num,
+            ($child_error & 127),  ($child_error & 128) ? 'with' : 'without';
+    } elsif ($child_error != 0) {
+        printf STDERR "test %03d: child exited with value %d\n", $test_num, ($child_error >> 8);
+    }
+    is ( $retval, 0, sprintf("%03d/%s/%s: install %s, install should work", $test_num, $pipe_label, $notest_label,
+        $mod ));
+
+    # check if tests were run as expected
+    my $has_no_tests = (( exists $params->{has_no_tests}) and $params->{has_no_tests});
+    SKIP: {
+        skip "$mod has no tests to check", 1 if $has_no_tests;
+        my $log_content = slurp($log_file);
+        if ( $use_notest ) {
+            ok ( not( $log_content =~ qr/Result: (PASS|FAIL)/), sprintf("%03d/%s/%s: tests inhibited as expected",
+                $test_num, $pipe_label, $notest_label ));
+        } else {
+            ok ( $log_content =~ qr/Result: (PASS|FAIL)/, sprintf("%03d/%s/%s: tests ran as expected", $test_num,
+                $pipe_label, $notest_label ));
+        }
+    }
+
+    # check if expected files exist
+    if (( exists $params->{files}) and ref $params->{files} eq "ARRAY" ) {
+        foreach my $filepath (@{$params->{files}}) {
+            ok( -e $paths_ref->{current_link}."/".$filepath, sprintf "%03d/%s/%s: found %s", $test_num,
+                $pipe_label, $notest_label, $filepath );
+        }
+    }
+
+    return;
+}
+
+# run test on non-existent module
+sub test_nonexist
+{
+    my ( $paths_ref, $test_num, $mod, $params ) = @_;
+    my $test_dir = get_test_dir($paths_ref, $test_num);
+
+    # test install
+    my $use_pipe = (( exists $params->{use_pipe}) and $params->{use_pipe});
+    my $pipe_label = $use_pipe ? "pipe" : "param";
+    my $log_file = $test_dir."/output-log";
+    my $test_cmd = $use_pipe
+        ? "$script_name $mod >$log_file 2>&1"
+        : "echo $mod |$script_name >$log_file 2>&1";
+    my $retval = system $test_cmd;
+    is ( $retval >> 8, 1, sprintf("%03d/%s: non-existent %s install fails as expected", $test_num, $pipe_label,
+        $mod ));
+    return;
+}
+
+# count total tests for Test::More plan()
+sub count_tests
+{
+    my $total_tests = (scalar keys %{$tests{existent}}) * $tests_per_exist * $param_variants * $flag_variants +
+        (scalar keys %{$tests{nonexistent}}) * $tests_per_nonexist * $param_variants;
+    foreach my $key (keys %{$tests{existent}}) {
+        if (( exists $tests{existent}{$key}{files}) and ref $tests{existent}{$key}{files} eq "ARRAY" ) {
+            $total_tests += (scalar @{$tests{existent}{$key}{files}}) * $param_variants * $flag_variants;
+        }
+    }
+    return $total_tests;
+}
+
+#
+# main
+#
+
+# count tests
+plan tests => count_tests();
+
+# create temporary directory for tests
+my $paths_ref = init_tempdir();
+
+# run tests
+my $test_num = 1;
+
+# tests for modules that exist
+foreach my $mod ( sort keys %{$tests{existent}} ) {
+    my $params = $tests{existent}{$mod};
+    foreach my $use_pipe ( qw(0 1) ) {
+        foreach my $use_notest ( qw(0 1) ) {
+            test_exist ( $paths_ref, $test_num++, $mod,
+                { %$params, use_pipe => $use_pipe, use_notest => $use_notest } );
+        }
+    }
+}
+
+# tests for modules that do not exist
+foreach my $mod ( sort keys %{$tests{nonexistent}} ) {
+    my $params = $tests{nonexistent}{$mod};
+    foreach my $use_pipe ( qw(0 1) ) {
+        test_nonexist ( $paths_ref, $test_num++, $mod, { %$params, use_pipe => $use_pipe } );
+    }
+}
+

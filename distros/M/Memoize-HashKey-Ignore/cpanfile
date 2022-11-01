@@ -1,5 +1,5 @@
 requires 'Memoize';
-requires 'Try::Tiny';
+requires 'Syntax::Keyword::Try';
 requires 'perl', '5.006';
 
 on configure => sub {

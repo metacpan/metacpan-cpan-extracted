@@ -1,0 +1,18 @@
+#!/bin/bash
+
+set -ex
+
+cip pkg rust
+
+cip sudo apt-get update
+cip sudo apt-get install memcached
+
+if [[ $CIP_ENV =~ MEMCACHED_RATELIMIT_TEST ]]; then
+  ARGS=$( cip exec perl -E 'my($host, $port) = split /:/, $ENV{MEMCACHED_RATELIMIT_TEST}; say "-l $host -p $port"' )
+  cip exec memcached $ARGS -d
+fi
+
+if [[ $CIP_ENV =~ MEMCACHED_RATELIMIT_TLS_TEST ]]; then
+  ARGS=$( cip exec perl -E 'my($host, $port) = split /:/, $ENV{MEMCACHED_RATELIMIT_TLS_TEST}; say "-l $host -p $port"' )
+  cip exec memcached $ARGS -d -Z -o "ssl_key=/work/maint/localhost.key,ssl_chain_cert=/work/maint/localhost.crt"
+fi

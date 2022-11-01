@@ -1,5 +1,12 @@
 Revision history for Geo-TCX
 
+1.02 [2022-10-27]
+    Geo::Gpx::Trackpoint->DistanceMeters():
+        - new accessor to get (but not set) the value of the DistanceMeters key
+        - removed DistanceMeters from the list of AUTOLOAD'ables
+
+    Require version 1.44 of DateTime for the stringify() method
+
 1.01 [2022-10-13]
     Fixed bug in 01_main.t test file
     Changed time- and distance-related methods in Geo::GPX::Trackpoint

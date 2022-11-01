@@ -1,5 +1,8 @@
 Revision history for Music-Duration-Partition
 
+0.0708 2022-10-23 12:33:49
+    - Avoid implicit imports.
+
 0.0707 2022-05-20 10:27:24
     - Improve the eg/three-eight program.
     - Fix the pool_select callback.

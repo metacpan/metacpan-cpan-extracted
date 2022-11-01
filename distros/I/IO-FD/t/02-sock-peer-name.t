@@ -10,7 +10,7 @@ use Errno qw<EINTR EAGAIN :POSIX>;
 use Time::HiRes qw<sleep>;
 
 ok defined IO::FD::socket(my $socket, AF_INET, SOCK_STREAM, 0), "Create socket";
-ok defined IO::FD::setsockopt($socket, SOL_SOCKET, SO_REUSEADDR,1);
+ok defined IO::FD::setsockopt($socket, SOL_SOCKET, SO_REUSEADDR, 1);
 
 #ok defined IO::FD::fcntl($socket, F_SETFL, O_NONBLOCK);
 
@@ -31,7 +31,7 @@ ok defined($error=IO::FD::listen($socket, 10)), "Listening";
 die "Could not listen: $!" unless $error;
 
 my $port;
-($error,undef,$port)=getnameinfo($addr);
+($error,undef,$port)=getnameinfo($addr, NI_NUMERICHOST);
 
 die "Could not get name info: $error" if $error;
 #now connect to the listening socket

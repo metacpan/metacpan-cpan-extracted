@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.19, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,7 +27,7 @@ no_index:
 provides:
   Amon2:
     file: lib/Amon2.pm
-    version: '6.15'
+    version: '6.16'
   Amon2::Config::Simple:
     file: lib/Amon2/Config/Simple.pm
   Amon2::ContextGuard:
@@ -52,8 +52,6 @@ provides:
     file: lib/Amon2/Setup/Asset/Blueprint.pm
   Amon2::Setup::Asset::Bootstrap:
     file: lib/Amon2/Setup/Asset/Bootstrap.pm
-  Amon2::Setup::Asset::ES5Shim:
-    file: lib/Amon2/Setup/Asset/ES5Shim.pm
   Amon2::Setup::Asset::MicroDispatcherJS:
     file: lib/Amon2/Setup/Asset/MicroDispatcherJS.pm
   Amon2::Setup::Asset::MicroLocationJS:
@@ -72,13 +70,13 @@ provides:
     file: lib/Amon2/Setup/Flavor.pm
   Amon2::Setup::Flavor::Basic:
     file: lib/Amon2/Setup/Flavor/Basic.pm
-    version: '6.15'
+    version: '6.16'
   Amon2::Setup::Flavor::Large:
     file: lib/Amon2/Setup/Flavor/Large.pm
-    version: '6.15'
+    version: '6.16'
   Amon2::Setup::Flavor::Minimum:
     file: lib/Amon2/Setup/Flavor/Minimum.pm
-    version: '6.15'
+    version: '6.16'
   Amon2::Setup::VC::Git:
     file: lib/Amon2/Setup/VC/Git.pm
   Amon2::Trigger:
@@ -138,8 +136,8 @@ requires:
 resources:
   bugtracker: https://github.com/tokuhirom/Amon/issues
   homepage: https://github.com/tokuhirom/Amon
-  repository: git://github.com/tokuhirom/Amon.git
-version: '6.15'
+  repository: https://github.com/tokuhirom/Amon.git
+version: '6.16'
 x_contributors:
   - 'Adrian <adrian@investometrica.com>'
   - 'Fuji, Goro <g.psy.va@gmail.com>'

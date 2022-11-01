@@ -45,6 +45,7 @@ struct ClassMeta {
   CV *methodscope;     /* a temporary CV used just during compilation of a `method` */
 
   SuspendedCompCVBuffer initfields_compcv; /* temporary PL_compcv + associated state during initfields */
+  OP *initfields_lines;                    /* temporary OP_LINESEQ to contain the initfield ops */
 
   union {
     /* Things that only true classes have */
@@ -82,8 +83,22 @@ struct MethodMeta {
 
 typedef struct ParamMeta {
   SV *name;
-  FieldMeta *field;
-  FIELDOFFSET fieldix;
+  ClassMeta *class;
+  enum {
+    PARAM_FIELD,
+    PARAM_ADJUST,
+  } type;
+  union {
+    struct {
+      FieldMeta *fieldmeta;
+      FIELDOFFSET fieldix;
+    } field;
+    struct {
+      /* TODO: store the block itself sometime?? */
+      PADOFFSET padix;
+      OP *defexpr;
+    } adjust;
+  };
 } ParamMeta;
 
 #define MOP_CLASS_RUN_HOOKS(classmeta, func, ...)                                         \
@@ -102,6 +117,24 @@ RoleEmbedding **ObjectPad_mop_class_get_direct_roles(pTHX_ const ClassMeta *meta
 #define mop_class_get_all_roles(class, embeddings)  ObjectPad_mop_class_get_all_roles(aTHX_ class, embeddings)
 RoleEmbedding **ObjectPad_mop_class_get_all_roles(pTHX_ const ClassMeta *meta, U32 *nroles);
 
+#define prepare_method_parse(meta)  ObjectPad__prepare_method_parse(aTHX_ meta)
+void ObjectPad__prepare_method_parse(pTHX_ ClassMeta *meta);
+
+#define start_method_parse(meta, is_common)  ObjectPad__start_method_parse(aTHX_ meta, is_common)
+void ObjectPad__start_method_parse(pTHX_ ClassMeta *meta, bool is_common);
+
+#define finish_method_parse(meta, is_common, body)  ObjectPad__finish_method_parse(aTHX_ meta, is_common, body)
+OP *ObjectPad__finish_method_parse(pTHX_ ClassMeta *meta, bool is_common, OP *body);
+
+#define newop_croak_from_constructor(message)  ObjectPad__newop_croak_from_constructor(aTHX_ message)
+OP *ObjectPad__newop_croak_from_constructor(pTHX_ SV *message);
+
+#define check_colliding_param(classmeta, paramname)  ObjectPad__check_colliding_param(aTHX_ classmeta, paramname)
+void ObjectPad__check_colliding_param(pTHX_ ClassMeta *classmeta, SV *paramname);
+
 void ObjectPad__boot_classes(pTHX);
+
+/* Empty role embedding that is applied to all invokable role methods */
+extern struct RoleEmbedding ObjectPad__embedding_standalone;
 
 #endif

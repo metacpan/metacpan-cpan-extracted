@@ -1,5 +1,9 @@
 Revision history for MIDI-Ngram
 
+0.1808 2022-10-23 09:11:14
+    - Avoid implicit imports.
+    - Add subtests.
+
 0.1807 2021-03-16 10:12:46
     - Use MIDI::Util explicitly imported functions.
 

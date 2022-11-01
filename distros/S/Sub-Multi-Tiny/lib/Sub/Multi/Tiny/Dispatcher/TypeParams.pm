@@ -14,7 +14,7 @@ use Sub::Multi::Tiny::Util qw(_hlog _line_mark_string _make_positional_copier
 use Type::Params qw(multisig);
 use Type::Tiny ();
 
-our $VERSION = '0.000012'; # TRIAL
+our $VERSION = '0.000013';
 
 # Documentation {{{1
 
@@ -131,8 +131,8 @@ sub MakeDispatcher {
             @_ = $data[0]->(@_);      # $checker.  Dies on error.
                 # NOTE: this change can't be `local`ized because `goto`
                 # undoes the `local` - see #8
-            $candidate = $data[1]->[${^TYPE_PARAMS_MULTISIG}];   # impls
-            $copier = $data[2]->[${^TYPE_PARAMS_MULTISIG}];      # copiers
+            $candidate = $data[1]->[${^_TYPE_PARAMS_MULTISIG}];   # impls
+            $copier = $data[2]->[${^_TYPE_PARAMS_MULTISIG}];      # copiers
 EOT
 
     return _complete_dispatcher($hr, $code, $checker, \@impls, \@copiers);

@@ -37,16 +37,10 @@ my $unicycle = Local::Unicycle->new;
 die if eval { $unicycle->wheel };
 die if eval { $unicycle->{wheel}->colour };
 
-require B::Deparse;
-for my $method (qw/ spin wheel_ref wheel_colour /) {
-	my $coderef = $unicycle->can($method);
-	if ($coderef) {
-		note("sub $method");
-		note(B::Deparse->new->coderef2text($coderef));
-	}
-	else {
-		note "NO METHOD $method";
-	}
+for my $method (qw/spin wheel_ref wheel_colour/) {
+	local $Data::Dumper::Deparse = 1;
+	note "==== Local::Unicycle::$method ====";
+	note explain( $unicycle->can($method) );
 }
 
 is(
@@ -70,5 +64,50 @@ is(
 	'yay',
 );
 
+{
+	package Local::Bike;
+	use Moo;
+	use Sub::HandlesVia;
+	use Types::Standard qw( Object );
+	has front_wheel => (
+		is        => 'bare',
+		isa       => Object,
+		traits    => ['Blessed'],
+		handles   => {
+			spin_front   => 'spin',
+			colour_front => [ 'Hash->get' => 'colour' ],
+			bleh         => '123foo',
+		},
+		default   => sub { Local::Wheel->new },
+	);
+	has back_wheel => (
+		is        => 'bare',
+		isa       => Object,
+		traits    => ['Blessed'],
+		handles   => {
+			spin_back    => 'spin',
+			colour_back  => [ 'Hash->get' => 'colour' ],
+		},
+		default   => sub { Local::Wheel->new },
+	);
+}
+
+{
+	no strict 'refs';
+	*{'Local::Wheel::123foo'} = sub { 'wow' };
+}
+
+my $bike = Local::Bike->new;
+is( $bike->spin_front,   'spinning' );
+is( $bike->spin_back,    'spinning' );
+is( $bike->colour_front, 'black' );
+is( $bike->colour_back,  'black' );
+is( $bike->bleh,         'wow' );
+
+for my $method (qw/spin_front spin_back colour_front colour_back bleh/) {
+	local $Data::Dumper::Deparse = 1;
+	note "==== Local::Bike::$method ====";
+	note explain( $bike->can($method) );
+}
 
 done_testing;

@@ -4,6 +4,7 @@ MANIFEST
 Makefile.PL
 README
 README.md
+lib/PDL/IO/MDIF.pm
 lib/PDL/IO/Touchstone.pm
 t/00-load.t
 t/01-snp-tests.t
@@ -13,6 +14,7 @@ t/04-yparams.t
 t/05-zparams.t
 t/06-aparams.t
 t/10-s_port_z.t
+t/100-mdif-rewrite.t
 t/11-m_interpolate.t
 t/20-y_calcs.t
 t/manifest.t
@@ -33,6 +35,7 @@ t/test-data/muRata/ind-choke-muRata-LQW15CA2R0K00.s2p
 t/test-data/muRata/ind-choke-muRata-LQW15DN150M00.s2p
 t/test-data/muRata/ind-muRata-LQW15AN3N8C10.s2p
 t/test-data/muRata/ind-muRata-LQW15AN9N9G00.s2p
+t/test-data/muRata/muRata-GQM-0402.mdf
 xt/boilerplate.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

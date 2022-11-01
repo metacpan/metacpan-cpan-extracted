@@ -1,5 +1,10 @@
 Revision history for String-Flogger
 
+1.101246  2022-10-29 21:51:45-04:00 America/New_York
+        - add some tests
+        - update to require newer perl
+        - update package metadata
+
 1.101245  2014-08-08 18:43:38-04:00 America/New_York
         - switch from JSON to JSON::MaybeXS
 

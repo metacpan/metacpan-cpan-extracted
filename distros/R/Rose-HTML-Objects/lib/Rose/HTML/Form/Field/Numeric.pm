@@ -6,7 +6,7 @@ use Rose::HTML::Object::Errors qw(:number);
 
 use base 'Rose::HTML::Form::Field::Text';
 
-our $VERSION = '0.606';
+our $VERSION = '0.624';
 
 # use Rose::Object::MakeMethods::Generic
 # (
@@ -14,6 +14,10 @@ our $VERSION = '0.606';
 # );
 
 __PACKAGE__->default_html_attr_value(size  => 6);
+
+__PACKAGE__->add_required_html_attrs({
+	type  => 'number',
+});
 
 sub positive
 {

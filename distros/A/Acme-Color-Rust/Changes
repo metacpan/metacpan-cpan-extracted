@@ -1,5 +1,8 @@
 Revision history for Acme-Color-Rust
 
+0.04      2022-10-25 07:29:33 -0600
+  - Rustfmt rust source (gh#4)
+
 0.03      2022-10-16 05:58:38 -0600
   - Fix bug where binaries were incorrectly
     included in dist tarball

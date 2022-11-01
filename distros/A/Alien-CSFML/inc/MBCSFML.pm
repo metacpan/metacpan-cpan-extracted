@@ -169,7 +169,7 @@ sub build_libs {
             )
         ) {
             print "# $cmd\n";
-            system $cmd;
+            system($cmd) == 0 or die "system failed: $?";    # quick
             if ( $? == -1 ) {
                 die "# failed to execute: $!\n";
             }
@@ -177,8 +177,8 @@ sub build_libs {
                 die sprintf "# child died with signal %d, %s coredump\n", ( $? & 127 ),
                     ( $? & 128 ) ? 'with' : 'without';
             }
-            else {
-                printf "# child exited with value %d\n", $? >> 8;
+            elsif ( $? != 0 ) {
+                die sprintf "# system call failed: %d\n", $?;
             }
         }
     }

@@ -2,7 +2,7 @@
 ## Stripe API - ~/lib/Net/API/Stripe/Payment/Source/ACHCreditTransfer.pm
 ## Version v0.100.0
 ## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2020/05/15
 ## 
@@ -11,19 +11,24 @@ package Net::API::Stripe::Payment::Source::ACHCreditTransfer;
 BEGIN
 {
     use strict;
+    use warnings;
     use parent qw( Net::API::Stripe::Generic );
+    use vars qw( $VERSION );
     our( $VERSION ) = 'v0.100.0';
 };
 
-sub account_number { shift->_set_get_scalar( 'account_number', @_ ); }
+use strict;
+use warnings;
 
-sub bank_name { shift->_set_get_scalar( 'bank_name', @_ ); }
+sub account_number { return( shift->_set_get_scalar( 'account_number', @_ ) ); }
 
-sub fingerprint { shift->_set_get_scalar( 'fingerprint', @_ ); }
+sub bank_name { return( shift->_set_get_scalar( 'bank_name', @_ ) ); }
 
-sub routing_number { shift->_set_get_scalar( 'routing_number', @_ ); }
+sub fingerprint { return( shift->_set_get_scalar( 'fingerprint', @_ ) ); }
 
-sub swift_code { shift->_set_get_scalar( 'swift_code', @_ ); }
+sub routing_number { return( shift->_set_get_scalar( 'routing_number', @_ ) ); }
+
+sub swift_code { return( shift->_set_get_scalar( 'swift_code', @_ ) ); }
 
 1;
 
@@ -57,36 +62,28 @@ This is instantiated by method B<ach_credit_transfer> in module L<Net::API::Stri
 
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>( %ARG )
+=head2 new( %ARG )
 
 Creates a new L<Net::API::Stripe::Payment::Source::ACHCreditTransfer> object.
 It may also take an hash like arguments, that also are method of the same name.
 
-=back
-
 =head1 METHODS
 
-=over 4
-
-=item B<account_number> string
+=head2 account_number string
 
 Account number to transfer funds to.
 
-=item B<bank_name> string
+=head2 bank_name string
 
 Name of the bank associated with the routing number.
 
-=item B<routing_number> string
+=head2 routing_number string
 
 Routing transit number for the bank account to transfer funds to.
 
-=item B<swift_code> string
+=head2 swift_code string
 
 SWIFT code of the bank associated with the routing number.
-
-=back
 
 =head1 HISTORY
 

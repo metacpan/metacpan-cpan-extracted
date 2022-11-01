@@ -1566,7 +1566,7 @@ Get or set the field's rank.  This value can be used for any purpose that suits 
 
 =item B<required [BOOL]>
 
-Get to set a boolean flag that indicates whether or not a field is "required." See L<validate()|/validate> for more on what "required" means.
+Get or set a boolean flag that indicates whether or not a field is "required." See L<validate()|/validate> for more on what "required" means.
 
 =item B<reset>
 

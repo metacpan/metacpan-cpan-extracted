@@ -1,3 +1,8 @@
+4.06
+
+- No user facing changes: The client certificate using extensions are
+  no longer tested by default.
+
 4.05
 
 - Uploading of text/gemini is now treated like text/plain, resulting

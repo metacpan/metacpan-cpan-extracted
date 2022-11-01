@@ -1,15 +1,15 @@
-##----------------------------------------------------------------------------
-## Apache2 Server Side Include Parser - ~/lib/Apache2/SSI/File.pm
-## Version v0.1.0
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <jack@deguest.jp>
-## Created 2020/12/18
-## Modified 2021/01/13
-## All rights reserved
-## 
-## This program is free software; you can redistribute  it  and/or  modify  it
-## under the same terms as Perl itself.
-##----------------------------------------------------------------------------
+#----------------------------------------------------------------------------
+# Apache2 Server Side Include Parser - ~/lib/Apache2/SSI/File.pm
+# Version v0.1.1
+# Copyright(c) 2021 DEGUEST Pte. Ltd.
+# Author: Jacques Deguest <jack@deguest.jp>
+# Created 2020/12/18
+# Modified 2022/10/21
+# All rights reserved
+# 
+# This program is free software; you can redistribute  it  and/or  modify  it
+# under the same terms as Perl itself.
+#----------------------------------------------------------------------------
 package Apache2::SSI::File;
 BEGIN
 {
@@ -17,6 +17,7 @@ BEGIN
     use warnings;
     use warnings::register;
     use parent qw( Apache2::SSI::Common );
+    use vars qw( $DEBUG $VERSION $DIR_SEP );
     use Apache2::SSI::Finfo;
     use File::Spec ();
     use Scalar::Util ();
@@ -32,16 +33,19 @@ BEGIN
         require APR::Const;
         APR::Const->import( -compile => qw( :filetype FINFO_NORM ) );
     }
-    ## use Devel::Confess;
+    # use Devel::Confess;
     our( $DEBUG );
     use overload (
         q{""}    => sub    { $_[0]->filename },
         bool     => sub () { 1 },
         fallback => 1,
     );
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.1.1';
     our $DIR_SEP = $Apache2::SSI::Common::DIR_SEP;
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -55,7 +59,6 @@ sub init
     $self->{finfo}          = '';
     $self->{_init_strict_use_sub} = 1;
     $self->SUPER::init( @_ ) || return;
-    $self->message( 3, "Returning object for file \"$file\"." );
     my $base_dir = '';
     if( length( $self->{base_file} ) )
     {
@@ -108,7 +111,6 @@ sub code
     else
     {
         $self->{code} = shift( @_ ) if( @_ );
-        $self->message( 3, "Returning code '$self->{code}'" );
         return( $self->{code} );
     }
 }
@@ -128,31 +130,26 @@ sub filename
     {
         if( defined( $newfile ) )
         {
-            $self->message( 3, "Setting new file path '$newfile'. Looking up file." );
             $r = $r->is_initial_req ? $r : $r->main;
             my $rr = $r->lookup_file( $newfile );
-            $self->message( 3, "File found \"", $rr->filename, "\" has status '", $rr->status, "' and file type '", ( ( $rr->finfo && $rr->finfo->filetype ) || '' ), "'." );
-            ## Amazingly, lookup_file will return ok  even if it does not find the file
-            if( $rr->status == Apache2::Const::HTTP_OK &&
+            # Amazingly, lookup_file will return ok  even if it does not find the file
+            if( $rr->status == &Apache2::Const::HTTP_OK &&
                 $rr->finfo && 
-                $rr->finfo->filetype != APR::Const::FILETYPE_NOFILE )
+                $rr->finfo->filetype != &APR::Const::FILETYPE_NOFILE )
             {
                 $self->apache_request( $rr );
                 $newfile = $rr->filename;
-                $self->message( 3, "File found and resolved to: '$newfile' with code '", $rr->status, "' with finfo object '", $r->finfo, "'." );
                 my $finfo = $rr->finfo;
                 if( $finfo )
                 {
-                    $self->message( 3, "File type is '", $finfo->filetype, "'." );
                 }
             }
             else
             {
-                $self->message( 3, "File is not found." );
                 $self->code( 404 );
                 $newfile = $self->collapse_dots( $newfile, { separator => $DIR_SEP });
-                ## We don't pass it the Apache2::RequestRec object, because it would trigger a fatal error since the file does not exist. Instead, we use the api without Apache2::RequestRec which is more tolerant
-                ## We do this so the user can call our object $file->finfo->filetype == Apache2::SSI::Finfo::FILETYPE_NOFILE
+                # We don't pass it the Apache2::RequestRec object, because it would trigger a fatal error since the file does not exist. Instead, we use the api without Apache2::RequestRec which is more tolerant
+                # We do this so the user can call our object $file->finfo->filetype == Apache2::SSI::Finfo::FILETYPE_NOFILE
                 $self->{finfo} = Apache2::SSI::Finfo->new( $newfile );
             }
             $self->{filename} = $newfile;
@@ -168,28 +165,23 @@ sub filename
         {
             my $base_dir = $self->base_dir;
             $base_dir .= $DIR_SEP unless( substr( $base_dir, -length( $DIR_SEP ), length( $DIR_SEP ) ) eq $DIR_SEP );
-            $self->message( 3, "New file path provided is: '$newfile' and base directory is '$base_dir' and directory separator is '$DIR_SEP'" );
-            ## If we provide a string for the abs() method it works on Unix, but not on Windows
-            ## By providing an object, we make it work
+            # If we provide a string for the abs() method it works on Unix, but not on Windows
+            # By providing an object, we make it work
             $newfile = URI::file->new( $newfile )->abs( URI::file->new( $base_dir ) )->file( $^O );
-            $self->message( 3, "Getting the new file real path: '$newfile'" );
             $self->{filename} = $self->collapse_dots( $newfile, { separator => $DIR_SEP })->file( $^O );
-            $self->message( 3, "Filename after dot collapsing is: '$self->{filename}'" );
             $self->finfo( $newfile );
             my $finfo = $self->finfo;
-            $self->message( 3, "finfo is '", overload::StrVal( $finfo ), "'." );
             if( !$finfo->exists )
             {
                 $self->code( 404 );
             }
-            ## Force to create new Apache2::SSI::URI object
+            # Force to create new Apache2::SSI::URI object
         }
     }
-    $self->message( 3, "Returning filename '$self->{filename}'" );
     return( $self->{filename} );
 }
 
-## Alias
+# Alias
 sub filepath { return( shift->filename( @_ ) ); }
 
 sub finfo
@@ -205,18 +197,14 @@ sub finfo
     elsif( !$self->{finfo} )
     {
         $newfile = $self->filename;
-        $self->message( 3, "Initiating finfo object using filename '$newfile'." );
         return( $self->error( "No file path set. This should not happen." ) ) if( !$newfile );
     }
     
     if( defined( $newfile ) )
     {
         $self->{finfo} = Apache2::SSI::Finfo->new( $newfile, ( $r ? ( apache_request => $r ) : () ), debug => $self->debug );
-        $self->message( 3, "finfo object is now '", overload::StrVal( $self->{finfo} ), "'" );
-        $self->message( 3, "Error occurred: ", Apache2::SSI::Finfo->error ) if( !$self->{finfo} );
         return( $self->pass_error( Apache2::SSI::Finfo->error ) ) if( !$self->{finfo} );
     }
-    $self->message( 3, "Returning finfo object '", overload::StrVal( $self->{finfo} ), "' for file '$self->{finfo}'." );
     return( $self->{finfo} );
 }
 
@@ -224,19 +212,16 @@ sub parent
 {
     my $self = shift( @_ );
     my $r = $self->apache_request;
-    ## I deliberately did not do split( '/', $path, -1 ) so that if there is a trailing '/', it will not be counted
-    ## 2021-03-27: Was working well, but only on Unix systems...
-    ## my @segments = split( '/', $self->filename, -1 );
+    # I deliberately did not do split( '/', $path, -1 ) so that if there is a trailing '/', it will not be counted
+    # 2021-03-27: Was working well, but only on Unix systems...
+    # my @segments = split( '/', $self->filename, -1 );
     my( $vol, $parent, $file ) = File::Spec->splitpath( $self->filename );
     $vol //= '';
     $file //= '';
-    $self->message( 3, "Filename is '", $self->filename, "', volume is '$vol', parent '$parent' and file is '$file'." );
     my @segments = File::Spec->splitpath( File::Spec->catfile( $parent, $file ) );
-    ## $self->message( 3, "Path segments are: ", sub{ $self->dump( \@segments )} );
     pop( @segments );
     return( $self ) if( !scalar( @segments ) );
-    $self->message( 3, "Creating new object with document uri '", $vol . File::Spec->catdir( @segments ), "'." );
-    ## return( $self->new( join( '/', @segments ), ( $r ? ( apache_request => $r ) : () ) ) );
+    # return( $self->new( join( '/', @segments ), ( $r ? ( apache_request => $r ) : () ) ) );
     return( $self->new( $vol . File::Spec->catdir( @segments ), ( $r ? ( apache_request => $r ) : () ) ) );
 }
 
@@ -247,17 +232,15 @@ sub _make_abs
     if( @_ )
     {
         my $this = shift( @_ );
-        $self->message( 3, "Setting $field to '$this'." );
         if( Scalar::Util::blessed( $this ) && $this->isa( 'URI::file' ) )
         {
             $this = URI->new_abs( $this )->file( $^O );
         }
-        ## elsif( substr( $this, 0, 1 ) ne '/' )
+        # elsif( substr( $this, 0, 1 ) ne '/' )
         elsif( !File::Spec->file_name_is_absolute( $this ) )
         {
             $this = URI::file->new_abs( $this )->file( $^O );
         }
-        $self->message( 3, "$field is now '$this'" );
         $self->{ $field } = $this;
     }
     return( $self->{ $field } );
@@ -298,7 +281,7 @@ Apache2::SSI::File - Apache2 Server Side Include File Object Class
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.1
 
 =head1 DESCRIPTION
 
@@ -437,4 +420,3 @@ You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.
 
 =cut
-

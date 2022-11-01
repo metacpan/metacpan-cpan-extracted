@@ -2,9 +2,9 @@
 package Rinci;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-04-22'; # DATE
+our $DATE = '2022-10-21'; # DATE
 our $DIST = 'Rinci'; # DIST
-our $VERSION = '1.1.102'; # VERSION
+our $VERSION = '1.1.103'; # VERSION
 
 1;
 # ABSTRACT: Language-neutral metadata for your code
@@ -21,7 +21,7 @@ Rinci - Language-neutral metadata for your code
 
 =head1 VERSION
 
-This document describes version 1.1.102 of Rinci (from Perl distribution Rinci), released on 2022-04-22.
+This document describes version 1.1.103 of Rinci (from Perl distribution Rinci), released on 2022-10-21.
 
 =head1 HOMEPAGE
 
@@ -54,9 +54,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

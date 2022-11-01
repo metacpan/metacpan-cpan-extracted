@@ -1,0 +1,25 @@
+{
+   "accountholder" : {
+      "account" : "acct_1KdUF8RhmIBPIfCO",
+      "type" : "account"
+   },
+   "client_secret" : "fcsess_client_secret_PZri8EdhlStQTdnecntKdjnx",
+   "filters" : {
+      "countries" : [
+         "US"
+      ]
+   },
+   "id" : "fcsess_1LE8to2eZvKYlo2CeCL5ftCO",
+   "linked_accounts" : {
+      "data" : [],
+      "has_more" : 0,
+      "object" : "list",
+      "url" : "/v1/linked_accounts"
+   },
+   "livemode" : 0,
+   "object" : "link_account_session",
+   "permissions" : [
+      "ownership",
+      "payment_method"
+   ]
+}

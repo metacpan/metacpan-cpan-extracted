@@ -7,11 +7,8 @@
 
 requires 'Clone';
 requires 'Digest::SHA';
-requires 'HOP::Lexer';
 requires 'JSON::MaybeXS';
 requires 'List::Util', '>= 1.44';
-requires 'XML::Simple';
-requires 'YAML::XS', '>= 0.83';
 
 # To install develop dependencies, run:
 # cpanm --local-lib ~/perl5 --with-develop --installdeps .
@@ -23,8 +20,9 @@ on 'develop' => sub {
     requires 'FindBin';
     requires 'Pod::Coverage';
     requires 'Test::CheckManifest';
-    requires 'Test::Deep';
     requires 'Test::Exception';
+    requires 'Test::PerlTidy';
+    requires 'Test::Perl::Critic';
     requires 'Test::Pod';
     requires 'Test::Pod::Coverage';
 };

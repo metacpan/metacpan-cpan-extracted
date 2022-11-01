@@ -1,0 +1,11 @@
+{
+   "created" : "1662261086",
+   "id" : "fcaowns_1Le9F42eZvKYlo2CfwkUGxZt",
+   "object" : "linked_account_ownership",
+   "owners" : {
+      "data" : [],
+      "has_more" : 0,
+      "object" : "list",
+      "url" : "/v1/linked_accounts/fca_1Le9F42eZvKYlo2CEjemQrlf/owners?ownership=fcaowns_1Le9F42eZvKYlo2CfwkUGxZt"
+   }
+}

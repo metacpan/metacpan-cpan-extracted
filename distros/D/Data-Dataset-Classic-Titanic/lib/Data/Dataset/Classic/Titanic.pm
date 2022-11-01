@@ -3,12 +3,12 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Provide the classic Titanic survivor dataset
 
-our $VERSION = '0.0102';
+our $VERSION = '0.0103';
 
 use strict;
 use warnings;
 
-use Text::CSV_XS;
+use Text::CSV_XS ();
 use File::ShareDir qw(dist_dir);
 
 
@@ -114,7 +114,7 @@ Data::Dataset::Classic::Titanic - Provide the classic Titanic survivor dataset
 
 =head1 VERSION
 
-version 0.0102
+version 0.0103
 
 =head1 SYNOPSIS
 
@@ -151,7 +151,7 @@ The headers are not included in the returned data.  See the C<headers> function.
 
 =head2 as_hash
 
-  $data = Data::Dataset::Classic::Titanic::as_hash();
+  %data = Data::Dataset::Classic::Titanic::as_hash();
 
 Return the Titanic data as a hash.
 
@@ -187,7 +187,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Gene Boggs.
+This software is copyright (c) 2022 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -107,25 +107,16 @@ of play.  The author uses his own custom all-purpose media player called
 audio player).  "fauxdacious" can incorporate this module to decode and play 
 Tunein.com streams.  One or more streams can be returned for each station.  
 
-NOTE:  Tunein uses youtube-dl to extract the actual stream and only returns a 
-SINGLE valid stream URL for a station based on a boilerplate URL based on 
-the station's ID.  However, youtube-dl does NOT return the metadata, which 
-we're able to extract here.  This may or may NOT work for a given station 
-(particularly non-free / subscription-required stations, ymmv)!  For podcasts, 
-and perhaps some stations, we're able to extract a stream without 
-calling youtube-dl.
-
 Depends:  
 
-L<URI::Escape>, L<HTML::Entities>, L<LWP::UserAgent>, 
-and the separate application program:  youtube-dl, or a compatable program 
-such as yt-dlp.
+L<URI::Escape>, L<HTML::Entities>, L<LWP::UserAgent>
 
 =head1 SUBROUTINES/METHODS
 
 =over 4
 
 =item B<new>(I<ID>|I<ID/ID>|I<url> [, I<-notrim> [ => 0|1 ]]
+[, I<-formats> => "type1,type2?..." | [type1,type2?...] ] 
 [, I<-secure> [ => 0|1 ]] [, I<-debug> [ => 0|1|2 ]])
 
 Accepts a tunein.com station / podcast ID or URL and creates and returns a new 
@@ -137,34 +128,39 @@ or just I<station-id> or I<podcast-id>/I<episode-id>.  NOTE:  For podcasts,
 you must also include the I<episode-id>, otherwise, the I<podcast-id> will be 
 interpreted as a I<station-id> and you'll likely get no streams!
 
-The optional I<-notrim> argument can be either 0 or 1 (I<false> or I<true>).  If 0 
-(I<false>) then stream URLs are trimmed of excess "ad" parameters (everything 
-after the first "?" character, ie. "?ads.cust_params=premium" is removed, 
-including the "?".  Otherwise, the stream URLs are returned as-is.  
+The optional I<-notrim> argument can be either 0 or 1 (I<false> or I<true>).  
+If 0 (I<false>) then stream URLs are trimmed of excess "ad" parameters 
+(everything after the first "?" character, ie. "?ads.cust_params=premium" is 
+removed, including the "?".  Otherwise, the stream URLs are returned as-is.  
 
 DEFAULT I<-notrim> (if not given) is 0 (I<false>) and URLs are trimmed.  If 
 I<-notrim> is specified without argument, the default is 1 (I<true>).  Try 
 using I<-notrim> if stream will not play without the extra arguments.
 
-The optional I<-secure> argument can be either 0 or 1 (I<false> or I<true>).  If 1 
-then only secure ("https://") streams will be returned.
+The optional I<-formats> argument can be either a comma-separated string or an 
+array reference ([...]) of stream types to keep (include) and returned in 
+order specified (type1, type2...).  Each "type" can be an extension 
+(ie. mp3, acc, pls, etc.), or ("any" or "all" to keep all formats).
+
+DEFAULT I<-formats> list is:  'all', meaning that all streams are accepted. 
+
+NOTE:  I<-formats> only applies to streaming stations and is ignored for podcasts.
+
+The optional I<-secure> argument can be either 0 or 1 (I<false> or I<true>).  
+If 1 then only secure ("https://") streams will be returned.
 
 DEFAULT I<-secure> is 0 (false) - return all streams (http and https).
 
-Additional options:
+WARNING!:  As of the latest StreamFinder release, almost ALL Tunein radio 
+station streams are "insecure" (http)!
 
-Certain youtube-dl (L<StreamFinder::Youtube>) configuration options, 
-namely I<-format>, I<-formatonly>, I<-youtube-dl-args>, 
-and I<-youtube-dl-add-args> can be overridden here by specifying 
-I<-youtube-format>, I<-youtube-formatonly>, I<-youtube-dl-args>, 
-and I<-youtube-dl-add-args> arguments respectively.  It is however, 
-recommended to specify these in the Tunein-specific configuration file 
-(see B<CONFIGURATION FILES> below.
+Additional options:
 
 I<-log> => "I<logfile>"
 
-Specify path to a log file.  If a valid and writable file is specified, A line will be 
-appended to this file every time one or more streams is successfully fetched for a url.
+Specify path to a log file.  If a valid and writable file is specified, A line 
+will be appended to this file every time one or more streams is successfully 
+fetched for a url.
 
 DEFAULT I<-none-> (no logging).
 
@@ -172,11 +168,11 @@ I<-logfmt> specifies a format string for lines written to the log file.
 
 DEFAULT "I<[time] [url] - [site]: [title] ([total])>".  
 
-The valid field I<[variables]> are:  [stream]: The url of the first/best stream found.  
-[site]:  The site name (Tunein).  [url]:  The url searched for streams.  
-[time]: Perl timestamp when the line was logged.  [title], [artist], [album], 
-[description], [year], [genre], [total], [albumartist]:  The corresponding field data 
-returned (or "I<-na->", if no value).
+The valid field I<[variables]> are:  [stream]: The url of the first/best 
+stream found.  [site]:  The site name (Tunein).  [url]:  The url searched 
+for streams.  [time]: Perl timestamp when the line was logged.  [title], 
+[artist], [album], [description], [year], [genre], [total], [albumartist]:  
+The corresponding field data returned (or "I<-na->", if no value).
 
 =item $station->B<get>()
 
@@ -263,12 +259,12 @@ I<-debug> => [0|1|2] and most of the L<LWP::UserAgent> options.
 
 Options specified here override any specified in I<~/.config/StreamFinder/config>.
 
-Among options valid for Tunein streams is the I<-notrim> and 
-I<-youtube> options described in the B<new()> function.  Also, 
-various youtube-dl (L<StreamFinder::Youtube>) configuration options, 
-namely I<format>, I<formatonly>, I<youtube-dl-args>, and I<youtube-dl-add-args> 
-can be overridden here by specifying I<youtube-format>, I<youtube-formatonly>, 
-I<youtube-dl-args>, and I<youtube-dl-add-args> arguments respectively.  
+Among options valid for Tunein streams is the I<-notrim> described in the 
+B<new()> function.  Also, various youtube-dl (L<StreamFinder::Youtube>) 
+configuration options, namely I<format>, I<formatonly>, I<youtube-dl-args>, 
+and I<youtube-dl-add-args> can be overridden here by specifying 
+I<youtube-format>, I<youtube-formatonly>, I<youtube-dl-args>, and 
+I<youtube-dl-add-args> arguments respectively.  
 
 =item ~/.config/StreamFinder/config
 
@@ -397,7 +393,23 @@ sub new
 	my $self = $class->SUPER::new('Tunein', @_);
 	$DEBUG = $self->{'debug'}  if (defined $self->{'debug'});
 
+	my $okStreams;
 	$self->{'notrim'} = 0;
+	while (@_) {
+		if ($_[0] =~ /^\-?formats$/o) {
+			shift;
+			if (defined $_[0]) {
+				my $keeporder = shift;
+				$okStreams = (ref($keeporder) =~ /ARRAY/) ? join(',',@{$keeporder}) : $keeporder;
+			}
+		} elsif ($_[0] =~ /^\-?notrim$/o) {
+			shift;
+			$self->{'notrim'} = (defined $_[0]) ? shift : 1;
+		} else {
+			shift;
+		}
+	}
+	$okStreams = 'all'  unless ($okStreams);
 	while (@_) {
 		if ($_[0] =~ /^\-?notrim$/o) {
 			shift;
@@ -507,32 +519,35 @@ TRYIT:
 		++$tried;
 		goto TRYIT;
 	} elsif (!$tried) {  #(USUALLY) NO STREAMS / PODCASTS EPISODES FOUND, TRY youtube-dl! (PBLY. A STATION):
-		my $haveYoutube = 0;
-		eval { require 'StreamFinder/Youtube.pm'; $haveYoutube = 1; };
-		if ($haveYoutube) {
-			my $tryStream = "http://opml.radiotime.com/Tune.ashx?id=$stationID";
-			my %globalArgs = ('-noiframes' => 1, '-fast' => 1, '-format' => 'any',
-					-debug => $DEBUG
-			);
-			foreach my $arg (qw(secure log logfmt youtube-format youtube-formatonly
-					youtube-dl-args youtube-dl-add-args)) {
-				(my $arg0 = $arg) =~ s/^youtube\-(?!dl)//o;
-				$globalArgs{$arg0} = $self->{$arg}  if (defined $self->{$arg});
+		#SEE:  https://stackoverflow.com/questions/52754263/playing-a-live-tunein-radio-url-ios-swift
+		#ALSO: https://github.com/core-hacked/tunein-api/commit/a1bebe327f46cdaab0f1306741546438020584b9
+		my $tryStream = "https://opml.radiotime.com/Tune.ashx?id=$stationID&render=json";
+		print STDERR "-2 (we're a station) FETCHING URL=$tryStream=\n"  if ($DEBUG);
+		my $response = $ua->get($tryStream);
+		if ($response->is_success) {
+			$html = $response->decoded_content;
+		} else {
+			print STDERR $response->status_line  if ($DEBUG);
+			my $no_wget = system('wget','-V');
+			unless ($no_wget) {
+				print STDERR "\n..trying wget...\n"  if ($DEBUG);
+				$html = `wget -t 2 -T 20 -O- -o /dev/null \"$url2fetch\" 2>/dev/null `;
 			}
-			my $yt = new StreamFinder::Youtube($tryStream, %globalArgs);
-			if ($yt && $yt->count() > 0) {
-				my @ytStreams = $yt->get();
-				unless ($self->{'notrim'}) {
-					for (my $i=0;$i<=$#ytStreams;$i++) {
-						$ytStreams[$i] =~ s/\.(mp3|pls)\?.*$/\.$1/;  #CLEAN UP TUNEIN PLS PLAYLISTS.
+		}
+
+		if ($html) {
+			print STDERR "-2a opml.radiotime.com returned HTML==>$html<==\n"  if ($DEBUG > 1);
+			while ($html =~ s#\"url\"\:\s*\"([^\"]+)\"##so) {
+				my $stream = $1;
+				$stream =~ s/\.(mp3|pls)\?.*$/\.$1/  unless ($self->{'notrim'});
+				unless ($self->{'secure'} && $stream !~ /^https/o) {
+					my $ext = $1  if ($stream =~ m#\.(\w+)#);
+					if ($okStreams =~ m#(?:any|all)#io || (defined($ext) && $okStreams =~ m#$ext#i)) {
+						print STDERR "---ADDING STREAM=$stream=\n"  if ($DEBUG);
+						push @{$self->{'streams'}}, $stream;
+						$self->{'cnt'}++;
 					}
 				}
-				foreach my $field (qw(title description)) {
-					$self->{$field} ||= $yt->{$field}  if (defined($yt->{$field}) && $yt->{$field});
-				}
-				print STDERR "i:Found stream(s) (".join('|',@ytStreams).") via youtube-dl.\n"  if ($DEBUG);
-				@{$self->{'streams'}} = @ytStreams;
-				$self->{'cnt'} = scalar @ytStreams;
 			}
 		}
 		$self->{'album'} = $self->{'artist'};
@@ -547,7 +562,7 @@ TRYIT:
 	$self->{'Url'} = ($self->{'total'} > 0) ? $self->{'streams'}->[0] : '';
 	print STDERR "--SUCCESS: 1st stream=".$self->{'Url'}."= total=".$self->{'total'}."=\n"
 			if ($DEBUG && $self->{'cnt'} > 0);
-	print STDERR "\n--ID=".$self->{'id'}."=\n--TITLE=".$self->{'title'}."\n--ARTIST=".$self->{'artist'}."=\n--STREAMS=".join('|',@{$self->{'streams'}})."=\n"  if ($DEBUG);
+	print STDERR "\n--ID=".$self->{'id'}."=\n--TITLE=".$self->{'title'}."\n--ARTIST=".$self->{'artist'}."=\n--GENRE=".$self->{'genre'}."=\n--ICON=".$self->{'iconurl'}."=\n--IMAGE=".$self->{'imageurl'}."=\n--STREAMS=".join('|',@{$self->{'streams'}})."=\n"  if ($DEBUG);
 	$self->_log($url);
 
 	bless $self, $class;   #BLESS IT!

@@ -1,0 +1,15 @@
+Revision history for Syntax-Operator-In
+
+0.03    2022-10-31
+        [CHANGES]
+         * Use XS::Parse::Infix v0.27 to handle recursion into the infix
+           operator parser, permitting use of other infix equality operators
+
+0.02    2022-10-24
+        [CHANGES]
+         * Updates for XS::Parse::Infix v0.26
+         * Added an actual initial implementation of the in<OP> meta-operator
+           syntax
+
+0.01    2022-06-24
+        First version, released on an unsuspecting world.

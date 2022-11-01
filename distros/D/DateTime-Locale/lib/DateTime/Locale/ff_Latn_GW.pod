@@ -19,12 +19,12 @@
 
 =head1 NAME
 
-DateTime::Locale::ff_Latn_GW - Locale data examples for the Fulah Guinea-Bissau Latin (ff-Latn-GW) locale
+DateTime::Locale::ff_Latn_GW - Locale data examples for the Fula Guinea-Bissau Latin (ff-Latn-GW) locale
 
 =head1 DESCRIPTION
 
 This pod file contains examples of the locale data available for the
-Fulah Guinea-Bissau Latin locale.
+Fula Guinea-Bissau Latin locale.
 
 =head2 Days
 

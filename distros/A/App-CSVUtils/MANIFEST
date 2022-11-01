@@ -42,6 +42,7 @@ script/csv2csv
 script/csv2ltsv
 script/csv2td
 script/csv2tsv
+script/csv2vcf
 script/dump-csv
 script/tsv2csv
 t/00-compile.t

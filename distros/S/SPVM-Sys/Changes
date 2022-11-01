@@ -1,3 +1,63 @@
+0.23 2022-11-01
+  [Bug Fix]
+    * Fixed the bug that the get_osname method in the Sys class returned "sunos", not "solaris" in Soralis.
+  [Incompatible Changes]
+    * Removed the alarm and ualarm method of the Sys::Process class,
+      because the features of the signal is too difficult to understand for me.
+      In future, the features of the signal will be porting to Sys::Signal on CPAN module.
+0.22 2022-10-31
+  [New Features]
+    * The defined method in the Sys supports __sun.
+    * The get_osname method in the Sys supports sunos.
+  [Test Fix]
+    * Separate the tests of alarm and ualarm to other files in order to separate the effects of sleep
+      The failed test is the following.
+
+      t/Sys_Process.t     (Wstat: 14 Tests: 27 Failed: 0)
+      Non-zero wait status: 14
+      http://www.cpantesters.org/cpan/report/5535c44e-5730-11ed-8d66-ab3f8ac1dfec
+  [OS Support]
+    * Support Solaris and SunOS again.
+  [Bug Fix]
+    * Fixed the bug that SunOS didn't have tv_nsec in stat strcuture.
+    The failed test is the following.
+    http://www.cpantesters.org/cpan/report/38989036-56f5-11ed-aba6-9a79f339625c
+    * Fixed the bug that OpenBSD couldn't compile Sys::Time. The link to "rt" in the config of Sys::Time is needed for some linux environments.
+0.21 2022-10-28
+  [Bug Fix]
+    * Fixed the following bug "undefined symbol: clock_gettime".
+      http://www.cpantesters.org/cpan/report/bd054802-55bd-11ed-9ef0-b2246e8775ea
+    * Fixed the following bug "F_OK is not defined on this system".
+      http://www.cpantesters.org/cpan/report/ca95477e-55bd-11ed-b10d-6ad02691c3e1
+  [OS Support Drop]
+    * SPVM::Sys only supports FreeBSD 10+ because the following tests couldn't be fixed.
+      http://www.cpantesters.org/cpan/report/b26888fa-55bd-11ed-9ef0-b2246e8775ea
+    * SPVM::Sys doens't supports Solaris.
+      SPVM::Sys only supports Solaris because the following tests couldn't be fixed by us.
+      http://www.cpantesters.org/cpan/report/4632b772-5587-11ed-aba6-9a79f339625c
+0.20 2022-10-27
+  [Test Fix]
+    * Fixed the testing bug that the test of the getpeername method in the Sys::Socket failed in a different port.
+    * Fixed the testing bug that the test of the status of the waitpid method was checked wrongly.
+0.19 2022-10-26
+  [Test Fix]
+    * Fixed the bug of the testing function search_available_port.
+0.18 2022-10-25
+  [Test Improvement]
+    * Added the tests of the test server.
+0.17 2022-10-24
+  [Test Improvement]
+    * Simplify t/Ioctl.t
+    * Added the tests of the test server.
+0.16 2022-10-24
+  [Prerequirement Change]
+    * Need SPVM 0.9657+.
+  [Bug Fix]
+    * Fixed the bug that FreeBSD can't find WNOHANG symbol adding sys/types.h header.
+    * Fixed the bug that FreeBSD that major version is less than 13 doesn't support clock_nanosleep.
+    * Fixed the bug that OpenBSD doesn't support struct ip_mreq_source.
+  [Test Improvement]
+    * Added the stack trace in the TestUtil::Socket module.
 0.15 2022-10-21
   [Bug Fix]
     * Fixed the bug that FreeBSD can't compile SPVM::Sys for the following error.

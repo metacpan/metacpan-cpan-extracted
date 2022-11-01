@@ -2,7 +2,7 @@
 ## Stripe API - ~/lib/Net/API/Stripe/Billing/UsageRecord.pm
 ## Version v0.100.0
 ## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2020/05/15
 ## 
@@ -12,21 +12,26 @@ package Net::API::Stripe::Billing::UsageRecord;
 BEGIN
 {
     use strict;
+    use warnings;
     use parent qw( Net::API::Stripe::Generic );
+    use vars qw( $VERSION );
     our( $VERSION ) = 'v0.100.0';
 };
 
-sub id { shift->_set_get_scalar( 'id', @_ ); }
+use strict;
+use warnings;
 
-sub object { shift->_set_get_scalar( 'object', @_ ); }
+sub id { return( shift->_set_get_scalar( 'id', @_ ) ); }
 
-sub livemode { shift->_set_get_boolean( 'livemode', @_ ); }
+sub object { return( shift->_set_get_scalar( 'object', @_ ) ); }
 
-sub quantity { shift->_set_get_number( 'quantity', @_ ); }
+sub livemode { return( shift->_set_get_boolean( 'livemode', @_ ) ); }
 
-sub subscription_item { shift->_set_get_scalar( 'subscription_item', @_ ); }
+sub quantity { return( shift->_set_get_number( 'quantity', @_ ) ); }
 
-sub timestamp { shift->_set_get_datetime( 'timestamp', @_ ); }
+sub subscription_item { return( shift->_set_get_scalar( 'subscription_item', @_ ) ); }
+
+sub timestamp { return( shift->_set_get_datetime( 'timestamp', @_ ) ); }
 
 1;
 
@@ -57,55 +62,47 @@ Usage records allow you to report customer usage and metrics to Stripe for meter
 
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>( %ARG )
+=head2 new( %ARG )
 
 Creates a new L<Net::API::Stripe::Billing::UsageRecord> object.
 It may also take an hash like arguments, that also are method of the same name.
 
-=back
-
 =head1 METHODS
 
-=over 4
-
-=item B<id> string
+=head2 id string
 
 Unique identifier for the object.
 
-=item B<object> string, value is "usage_record"
+=head2 object string, value is "usage_record"
 
 String representing the object’s type. Objects of the same type share the same value.
 
-=item B<livemode> boolean
+=head2 livemode boolean
 
 Has the value true if the object exists in live mode or the value false if the object exists in test mode.
 
-=item B<quantity> positive integer or zero
+=head2 quantity positive integer or zero
 
 The usage quantity for the specified date.
 
-=item B<subscription_item> string
+=head2 subscription_item string
 
 The ID of the subscription item this usage record contains data for.
 
-=item B<timestamp> timestamp
+=head2 timestamp timestamp
 
 The timestamp when this usage occurred.
 
-=back
-
 =head1 API SAMPLE
 
-	{
-	  "id": "mbur_fake123456789",
-	  "object": "usage_record",
-	  "livemode": false,
-	  "quantity": 100,
-	  "subscription_item": "si_fake123456789",
-	  "timestamp": 1571397911
-	}
+    {
+      "id": "mbur_fake123456789",
+      "object": "usage_record",
+      "livemode": false,
+      "quantity": 100,
+      "subscription_item": "si_fake123456789",
+      "timestamp": 1571397911
+    }
 
 =head1 HISTORY
 

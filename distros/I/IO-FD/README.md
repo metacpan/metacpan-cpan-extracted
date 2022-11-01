@@ -1,6 +1,6 @@
 # NAME
 
-IO::FD - faster accept, socket, listen, read, write and friends with file descriptors, not handles
+IO::FD - Faster accept, socket, listen, read, write and friends with file descriptors, not handles
 
 # SYNOPSIS
 
@@ -320,6 +320,8 @@ Alias to ioctl
 
 ### IO::FD::select
 
+Broken. Probably will be removed as core perl has this already.
+
 ### IO::FD::poll
 
 Constants for use with poll are available via  `IO::FD:Constants`
@@ -328,6 +330,7 @@ Constants for use with poll are available via  `IO::FD:Constants`
 
 ### IO::FD::kevent
 
+This is broken ok 32 bit BSD at the moment.
 Constants for use with kevent are available via  `IO::FD:Constants`
 
 ### IO::FD::pack\_kevent

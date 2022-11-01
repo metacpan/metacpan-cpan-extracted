@@ -1,5 +1,23 @@
 Revision history for MooX-Tag-TO_HASH
 
+0.03      2022-10-29 22:06:53-04:00 America/New_York
+
+  [BUG FIX]
+
+    * The suggested method for modifying TO_HASH and TO_JSON output
+      (by applying a method modifier) doesn't work in all cases because
+      of Moo::Role's policy for overriding methods in subclasses.
+
+0.02      2022-10-23 22:45:34-04:00 America/New_York
+
+  [BUG FIX]
+
+    * TO_HASH recursive operation was broken (as was test for it).
+
+  [EHANCEMENT]
+
+    * add sibling package MooX::Tag::TO_JSON
+
 0.01      2022-10-06 13:43:10-04:00 America/New_York
 
 * First release upon an unsuspecting world.

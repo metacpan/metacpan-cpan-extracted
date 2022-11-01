@@ -1,0 +1,87 @@
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number:
+            da:33:fa:0a:bf:4a:ac:c2:0e:ff:43:77:95:78:9d:c4
+        Signature Algorithm: sha256WithRSAEncryption
+        Issuer: CN=Snakeoil Swirl CA
+        Validity
+            Not Before: Oct  4 10:57:17 2022 GMT
+            Not After : Jan  6 10:57:17 2025 GMT
+        Subject: CN=localhost
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+                RSA Public-Key: (2048 bit)
+                Modulus:
+                    00:be:2e:eb:40:44:14:e5:48:c4:e0:3c:a4:c2:6e:
+                    b3:c6:b7:eb:e6:25:4f:ed:87:33:85:58:43:a0:e1:
+                    d2:23:8b:70:ad:ad:3c:91:2e:8f:f3:bf:e4:b3:01:
+                    cb:9c:d8:d5:45:c9:27:1e:d3:e6:21:d3:b8:89:59:
+                    d0:9c:8f:24:a6:07:8a:89:c0:c4:00:a0:3e:c4:15:
+                    c1:03:a1:d5:0d:b5:f4:5e:54:b2:f0:88:a6:5f:9d:
+                    1e:87:a4:0e:26:7e:e0:2c:49:7e:f6:39:43:79:46:
+                    81:d3:04:f4:fb:06:fc:ee:9f:5b:7e:3c:8b:23:bd:
+                    e0:80:d4:52:86:e0:61:3a:d3:24:ae:f4:a0:44:d4:
+                    cb:9a:d2:a0:f4:0f:10:57:ed:2a:17:e4:26:da:77:
+                    94:8e:7e:a6:2a:d5:4f:12:ab:14:06:a6:10:89:a4:
+                    60:dc:eb:ab:6f:96:86:46:b4:91:16:95:0d:49:5f:
+                    10:42:e2:d6:5b:96:0d:31:d2:42:8d:77:49:fc:2e:
+                    2c:10:79:8f:76:f9:38:be:95:68:90:8c:8a:d2:6d:
+                    ae:9e:f0:58:fc:88:b7:c2:2e:88:aa:d8:be:77:b2:
+                    d5:55:22:72:77:59:32:fb:e8:69:3f:6a:cf:bb:89:
+                    9c:32:80:78:59:c3:73:a9:ce:87:ec:4e:c1:7f:98:
+                    a2:cd
+                Exponent: 65537 (0x10001)
+        X509v3 extensions:
+            X509v3 Basic Constraints:
+                CA:FALSE
+            X509v3 Subject Key Identifier:
+                03:27:6E:C3:E3:19:7C:F5:C3:56:29:38:B2:C2:67:A6:CB:3B:FD:19
+            X509v3 Authority Key Identifier:
+                keyid:22:37:AC:96:19:85:4B:F4:1B:CB:C7:6E:33:47:C5:6A:39:52:D7:A2
+                DirName:/CN=Snakeoil Swirl CA
+                serial:6F:34:03:22:8A:8A:75:BF:6E:76:88:F2:53:C3:79:E9:8C:E3:39:F0
+
+            X509v3 Extended Key Usage:
+                TLS Web Server Authentication
+            X509v3 Key Usage:
+                Digital Signature, Key Encipherment
+            X509v3 Subject Alternative Name:
+                DNS:localhost
+    Signature Algorithm: sha256WithRSAEncryption
+         06:de:0e:ca:64:ed:55:0e:ad:8c:22:45:93:8f:71:6a:2f:09:
+         0c:e7:c4:c8:85:6e:d8:5a:b1:5f:e4:67:be:79:05:8b:42:5d:
+         09:91:49:79:99:44:74:84:b6:1c:b2:e8:7e:a9:22:50:41:b2:
+         1a:2b:8a:ae:6e:86:40:6e:71:a9:32:73:44:23:41:6b:d0:a4:
+         c1:0f:94:a0:1e:bd:ce:47:7e:bd:ca:49:11:58:d2:18:12:f7:
+         c6:b0:f7:52:14:1b:6b:98:34:8f:cc:77:31:09:64:89:5f:bf:
+         fb:80:53:48:8d:d7:39:0b:22:fb:74:58:3c:f8:bf:1e:b4:88:
+         0d:b8:82:96:eb:06:6e:d5:b6:fb:6a:e2:2d:0a:a4:36:5c:be:
+         ae:a8:c8:2e:c3:de:e0:d8:1c:e1:e9:8a:11:57:1a:8e:a3:f1:
+         91:db:f6:3b:4f:50:3e:ef:93:77:67:bc:40:2b:39:e7:ce:dd:
+         c8:bc:15:99:a2:23:68:d0:4d:3b:a2:ea:bf:eb:13:a1:f7:40:
+         ed:19:ae:00:a8:80:a9:eb:36:ce:7c:07:c7:70:6c:07:e1:02:
+         9a:fa:43:c9:2c:13:d7:9e:5e:ed:e1:98:51:f5:8e:34:64:87:
+         d3:19:b0:97:4c:ad:00:69:27:fe:49:ca:12:c4:f6:b4:f6:78:
+         92:07:3b:b4
+-----BEGIN CERTIFICATE-----
+MIIDejCCAmKgAwIBAgIRANoz+gq/SqzCDv9Dd5V4ncQwDQYJKoZIhvcNAQELBQAw
+HDEaMBgGA1UEAwwRU25ha2VvaWwgU3dpcmwgQ0EwHhcNMjIxMDA0MTA1NzE3WhcN
+MjUwMTA2MTA1NzE3WjAUMRIwEAYDVQQDDAlsb2NhbGhvc3QwggEiMA0GCSqGSIb3
+DQEBAQUAA4IBDwAwggEKAoIBAQC+LutARBTlSMTgPKTCbrPGt+vmJU/thzOFWEOg
+4dIji3CtrTyRLo/zv+SzAcuc2NVFySce0+Yh07iJWdCcjySmB4qJwMQAoD7EFcED
+odUNtfReVLLwiKZfnR6HpA4mfuAsSX72OUN5RoHTBPT7Bvzun1t+PIsjveCA1FKG
+4GE60ySu9KBE1Mua0qD0DxBX7SoX5Cbad5SOfqYq1U8SqxQGphCJpGDc66tvloZG
+tJEWlQ1JXxBC4tZblg0x0kKNd0n8LiwQeY92+Ti+lWiQjIrSba6e8Fj8iLfCLoiq
+2L53stVVInJ3WTL76Gk/as+7iZwygHhZw3OpzofsTsF/mKLNAgMBAAGjgb4wgbsw
+CQYDVR0TBAIwADAdBgNVHQ4EFgQUAyduw+MZfPXDVik4ssJnpss7/RkwVwYDVR0j
+BFAwToAUIjeslhmFS/Qby8duM0fFajlS16KhIKQeMBwxGjAYBgNVBAMMEVNuYWtl
+b2lsIFN3aXJsIENBghRvNAMiiop1v252iPJTw3npjOM58DATBgNVHSUEDDAKBggr
+BgEFBQcDATALBgNVHQ8EBAMCBaAwFAYDVR0RBA0wC4IJbG9jYWxob3N0MA0GCSqG
+SIb3DQEBCwUAA4IBAQAG3g7KZO1VDq2MIkWTj3FqLwkM58TIhW7YWrFf5Ge+eQWL
+Ql0JkUl5mUR0hLYcsuh+qSJQQbIaK4quboZAbnGpMnNEI0Fr0KTBD5SgHr3OR369
+ykkRWNIYEvfGsPdSFBtrmDSPzHcxCWSJX7/7gFNIjdc5CyL7dFg8+L8etIgNuIKW
+6wZu1bb7auItCqQ2XL6uqMguw97g2Bzh6YoRVxqOo/GR2/Y7T1A+75N3Z7xAKznn
+zt3IvBWZoiNo0E07ouq/6xOh90DtGa4AqICp6zbOfAfHcGwH4QKa+kPJLBPXnl7t
+4ZhR9Y40ZIfTGbCXTK0AaSf+ScoSxPa09niSBzu0
+-----END CERTIFICATE-----

@@ -2,6 +2,8 @@
 use strict;
 use warnings;
 
+use open qw(:std :encoding(UTF-8));
+
 use Storable qw(store);
 use WebService::YTSearch;
 

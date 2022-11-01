@@ -1,5 +1,29 @@
 Revision history for Object-Pad
 
+0.71    2022-11-01
+        [CHANGES]
+         * Add a =head2 heading to docs on `ADJUST :params` for ease of
+           linking
+         * Support latest blead-perl which adds the xV_FROM_REF macros
+
+        [BUGFIXES]
+         * Make sure to deref the CODE reference to ->add_method before
+           stuffing it into the GV (RT144975)
+         * Avoid C99-style for() loop variable, to keep older MSWin32
+           compilers happy
+
+0.70    2022-10-29
+        [CHANGES]
+         * Added `ADJUST :params`, which permits named parameters to ADJUST
+           blocks (currently experimental)
+
+0.69    2022-10-25
+        [CHANGES]
+         * Internal tidying to the way the initfields stage of the constructor
+           works
+         * Support for Feature::Compat::Class to enable the :isa class
+           attribute alone
+
 0.68    2022-08-13
         [BUGFIXES]
          * Wording fix in new Object::Pad::MetaFunctions docs

@@ -49,18 +49,18 @@ my $inc = '';
 my $lib = '-lunbound';
 my $nul = MSWin32 ? 'nul' : '/dev/null';
 
-if ( my $dir = $ENV{UNBOUND_PREFIX} ) {
-	chomp $dir;
-	$inc = "-I$dir/include";
-	$lib = "-L$dir/lib -lunbound";
-
-} elsif (`pkg-config --modversion libunbound 2>$nul`) {
+if (`pkg-config --modversion libunbound 2>$nul`) {
 	$inc = `pkg-config --cflags libunbound 2>$nul`;
 	$lib = `pkg-config --libs   libunbound 2>$nul`;
-
 } elsif (MSWin32) {
 	$lib = '-llibunbound' if $Config{cc} =~ /cl/;
 	$lib = '-lunbound'    if $Config{cc} =~ /gcc/;
+}
+
+if ( my $dir = $ENV{UNBOUND_PREFIX} ) {
+	chomp $dir;
+	$inc = "-I$dir/include";
+	$lib = "-L$dir/lib $lib";
 }
 
 $inc = $ENV{UNBOUND_INCLUDE} if $ENV{UNBOUND_INCLUDE};
@@ -71,12 +71,12 @@ chomp $_ foreach ( $inc, $lib );
 my @header = qw(unbound.h);					# library headers
 
 if ( my $cpp = $Config{cppstdin} ) {
+	my @flag = grep /^-I/, split /\s+(?=\-)/, $Config{cppflags};
 	my $last = $Config{cppminus};
-	my $echo = $Config{echo} || qq[perl -e 'print "\@ARGV\\n"'];
+	my $echo = $Config{echo} || 'echo';
 	foreach my $header (@header) {
-		my $scriptlet = qq[$echo "#include <$header>" | $cpp $inc $last -o -];
-		$scriptlet = qq[$echo | $cpp $inc -include $header $last] if MSWin32;
-		next unless scalar(`$echo "#include <$header>" 2>$nul`);
+		my $scriptlet = qq[$echo "#include <$header>" | $cpp @flag $inc -o - $last];
+		$scriptlet = qq[$echo | $cpp @flag $inc -include $header $last] if MSWin32;
 		next unless scalar( my @text = `$scriptlet 2>$nul` );
 		die "$header  file not found" unless grep /$header/i, @text;
 	}

@@ -1,6 +1,6 @@
 =head1 NAME
 
-IO::FD - faster accept, socket, listen, read, write and friends with file descriptors, not handles
+IO::FD - Faster accept, socket, listen, read, write and friends with file descriptors, not handles
 
 =head1 SYNOPSIS
 
@@ -314,6 +314,8 @@ Alias to ioctl
 
 =head3 IO::FD::select
 
+Broken. Probably will be removed as core perl has this already.
+
 =head3 IO::FD::poll
 
 Constants for use with poll are available via  C<IO::FD:Constants>
@@ -322,6 +324,7 @@ Constants for use with poll are available via  C<IO::FD:Constants>
 
 =head3 IO::FD::kevent
 
+This is broken ok 32 bit BSD at the moment.
 Constants for use with kevent are available via  C<IO::FD:Constants>
 
 =head3 IO::FD::pack_kevent

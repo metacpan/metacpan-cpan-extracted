@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Modern
 
-our $VERSION = '0.556';
+our $VERSION = '0.557';
 
 use 5.020;
 use strictures 2;
@@ -15,7 +15,7 @@ no if "$]" >= 5.033001, feature => 'multidimensional';
 no if "$]" >= 5.033006, feature => 'bareword_filehandles';
 use B;
 use Carp 'croak';
-use JSON::MaybeXS 1.004001 'is_bool';
+use JSON::MaybeXS 1.004004 'is_bool';
 use Ref::Util 0.100 qw(is_ref is_plain_arrayref is_plain_hashref);
 use Scalar::Util 'blessed';
 use Storable 'dclone';
@@ -364,7 +364,7 @@ JSON::Schema::Modern::Utilities - Internal utilities for JSON::Schema::Modern
 
 =head1 VERSION
 
-version 0.556
+version 0.557
 
 =head1 SYNOPSIS
 

@@ -2,8 +2,8 @@ NAME
     App::CSVUtils - CLI utilities related to CSV
 
 VERSION
-    This document describes version 0.045 of App::CSVUtils (from Perl
-    distribution App-CSVUtils), released on 2022-10-09.
+    This document describes version 0.046 of App::CSVUtils (from Perl
+    distribution App-CSVUtils), released on 2022-10-25.
 
 DESCRIPTION
     This distribution contains the following CLI utilities:
@@ -72,6 +72,8 @@ DESCRIPTION
 
     *   csv2tsv
 
+    *   csv2vcf
+
     *   dump-csv
 
     *   tsv2csv
@@ -115,6 +117,93 @@ FUNCTIONS
         row). When you declare that CSV does not have header row
         ("--no-header"), the first row of the CSV is assumed to contain the
         first data row. Fields will be named "field1", "field2", and so on.
+
+    *   quote_char => *str*
+
+        Specify field quote character in input CSV, will be passed to
+        Text::CSV_XS.
+
+        Defaults to """ (double quote). Overrides "--tsv" option.
+
+    *   sep_char => *str*
+
+        Specify field separator character in input CSV, will be passed to
+        Text::CSV_XS.
+
+        Defaults to "," (comma). Overrides "--tsv" option.
+
+    *   tsv => *bool*
+
+        Inform that input file is in TSV (tab-separated) format instead of
+        CSV.
+
+        Overriden by "--sep-char", "--quote-char", "--escape-char" options.
+        If one of those options is specified, then "--tsv" will be ignored.
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  csv2vcf
+    Usage:
+
+     csv2vcf(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    Create a VCF from selected fields of the CSV.
+
+    *Common notes for the utilities*
+
+    Encoding: The utilities in this module/distribution accept and emit UTF8
+    text.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   cell_vcf_field => *str*
+
+        Select field to use as VCF CELL field.
+
+    *   email_vcf_field => *str*
+
+        Select field to use as VCF EMAIL field.
+
+    *   escape_char => *str*
+
+        Specify character to escape value in field in input CSV, will be
+        passed to Text::CSV_XS.
+
+        Defaults to "\\" (backslash). Overrides "--tsv" option.
+
+    *   filename* => *filename*
+
+        Input CSV file or URL.
+
+        Use "-" to read from stdin, use "clipboard:" to read from clipboard.
+
+    *   header => *bool* (default: 1)
+
+        Whether input CSV has a header row.
+
+        By default ("--header"), the first row of the CSV will be assumed to
+        contain field names (and the second row contains the first data
+        row). When you declare that CSV does not have header row
+        ("--no-header"), the first row of the CSV is assumed to contain the
+        first data row. Fields will be named "field1", "field2", and so on.
+
+    *   name_vcf_field => *str*
+
+        Select field to use as VCF N (name) field.
 
     *   quote_char => *str*
 
@@ -1249,6 +1338,8 @@ FUNCTIONS
 
     *   template_filename* => *filename*
 
+        (No description)
+
     *   tsv => *bool*
 
         Inform that input file is in TSV (tab-separated) format instead of
@@ -1810,6 +1901,8 @@ FUNCTIONS
 
     *   fill_fields* => *str*
 
+        (No description)
+
     *   header => *bool* (default: 1)
 
         Whether input CSV has a header row.
@@ -1822,7 +1915,11 @@ FUNCTIONS
 
     *   ignore_case => *bool*
 
+        (No description)
+
     *   lookup_fields* => *str*
+
+        (No description)
 
     *   output_escape_char => *str*
 
@@ -2489,6 +2586,8 @@ FUNCTIONS
 
     *   with => *str* (default: " ")
 
+        (No description)
+
     Returns an enveloped result (an array).
 
     First element ($status_code) is an integer containing HTTP-like status
@@ -2893,6 +2992,8 @@ FUNCTIONS
 
     *   compare_fields => *str*
 
+        (No description)
+
     *   escape_char => *str*
 
         Specify character to escape value in field in input CSV, will be
@@ -2917,6 +3018,8 @@ FUNCTIONS
         first data row. Fields will be named "field1", "field2", and so on.
 
     *   ignore_case => *bool*
+
+        (No description)
 
     *   op* => *str*
 
@@ -2991,6 +3094,8 @@ FUNCTIONS
 
     *   result_fields => *str*
 
+        (No description)
+
     *   sep_char => *str*
 
         Specify field separator character in input CSV, will be passed to
@@ -3052,6 +3157,8 @@ FUNCTIONS
     Arguments ('*' denotes required arguments):
 
     *   ci => *bool*
+
+        (No description)
 
     *   escape_char => *str*
 
@@ -3148,6 +3255,8 @@ FUNCTIONS
         Defaults to """ (double quote). Overrides "--tsv" option.
 
     *   reverse => *bool*
+
+        (No description)
 
     *   sep_char => *str*
 
@@ -3300,6 +3409,8 @@ FUNCTIONS
 
     *   ci => *bool*
 
+        (No description)
+
     *   escape_char => *str*
 
         Specify character to escape value in field in input CSV, will be
@@ -3407,6 +3518,8 @@ FUNCTIONS
 
     *   reverse => *bool*
 
+        (No description)
+
     *   sep_char => *str*
 
         Specify field separator character in input CSV, will be passed to
@@ -3490,6 +3603,8 @@ FUNCTIONS
         first data row. Fields will be named "field1", "field2", and so on.
 
     *   lines => *uint* (default: 1000)
+
+        (No description)
 
     *   output_escape_char => *str*
 

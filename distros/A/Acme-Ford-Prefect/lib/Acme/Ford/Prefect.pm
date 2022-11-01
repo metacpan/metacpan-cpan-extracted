@@ -5,7 +5,7 @@ use warnings;
 use XSLoader;
 
 # ABSTRACT: Test Module for Alien::Base
-our $VERSION = '2.6500'; # VERSION
+our $VERSION = '2.7200'; # VERSION
 
 XSLoader::load(__PACKAGE__, $VERSION);
 
@@ -23,7 +23,7 @@ Acme::Ford::Prefect - Test Module for Alien::Base
 
 =head1 VERSION
 
-version 2.6500
+version 2.7200
 
 =head1 SYNOPSIS
 

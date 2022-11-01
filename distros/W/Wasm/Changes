@@ -1,4 +1,8 @@
-Revision history for Wasm},
+Revision history for Wasm,
+
+0.22      2022-10-26 13:13:48 -0600
+  - Require Alien::wasmtime 0.16 or wasmtime 0.22.1 (gh#98)
+  - Experimental compatability for wasmtime 0.23.0 (gh#109, gh#111)
 
 0.21      2020-11-06 03:57:12 -0700
   - Require Alien::wasmtime 0.15 or wasmtime 0.21.0 (gh#96)

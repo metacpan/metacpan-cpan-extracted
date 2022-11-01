@@ -3,7 +3,7 @@ use 5.010;
 use Moose::Role;
 with 'App::Base::Script::Common';
 
-our $VERSION = '0.07';    ## VERSION
+our $VERSION = '0.08';    ## VERSION
 
 =head1 NAME
 
@@ -87,7 +87,7 @@ Do not produce warnings, silent mode
 =cut
 
 use namespace::autoclean;
-use Try::Tiny;
+use Syntax::Keyword::Try;
 use Path::Tiny;
 
 =head2 daemon_run
@@ -162,7 +162,7 @@ sub _build_pid_file {
     my $self = shift;
     my $file = $self->getOption('pid-file');
     unless ($file) {
-        my $class = ref $self;
+        my $class  = ref $self;
         my $piddir = $ENV{APP_BASE_DAEMON_PIDDIR} || '/var/run';
         $file = path($piddir)->child("$class.pid");
     }
@@ -229,7 +229,7 @@ sub __run {
         $pid = File::Flock::Tiny->trylock($self->pid_file);
         unless ($pid) {
             if ($self->can_do_hot_reload) {
-                chomp(my $pid = try { my $fh = path($self->pid_file)->openr; <$fh>; });
+                chomp(my $pid = eval { my $fh = path($self->pid_file)->openr; <$fh>; });
                 if ($pid and kill USR2 => $pid) {
                     warn("Daemon is alredy running, initiated hot reload") unless $self->getOption('no-warn');
                     exit 0;
@@ -281,9 +281,9 @@ sub __run {
 
     my $result;
     try { $result = $self->daemon_run(@{$self->parsed_args}); }
-    catch {
-        $self->error($_);
-    };
+    catch ($e) {
+        $self->error($e);
+    }
 
     undef $pid;
 

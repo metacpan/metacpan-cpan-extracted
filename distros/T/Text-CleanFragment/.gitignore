@@ -7,5 +7,6 @@ blib/
 Text-CleanFragment-*/
 Text-CleanFragment-*
 .releaserc
+.prove
 cover_db
 MYMETA.*

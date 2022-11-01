@@ -8,7 +8,7 @@ Weather::GHCN::StationTable - collect station objects and weather data
 
 =head1 VERSION
 
-version v0.0.008
+version v0.0.009
 
 =head1 SYNOPSIS
 
@@ -69,7 +69,7 @@ use Object::Pad 0.66 qw( :experimental(init_expr) );
 package Weather::GHCN::StationTable;
 class   Weather::GHCN::StationTable;
 
-our $VERSION = 'v0.0.008';
+our $VERSION = 'v0.0.009';
 
 # directly used by this module
 use Carp                qw( carp croak );

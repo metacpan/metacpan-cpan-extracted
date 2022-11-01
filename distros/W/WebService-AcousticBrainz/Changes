@@ -1,5 +1,8 @@
 Revision history for WebService-AcousticBrainz
 
+0.0602 2022-10-26 18:17:36
+    - Avoid implicit imports.
+
 0.0601 2022-01-19 19:42:31
     - The query argument is optional!
 

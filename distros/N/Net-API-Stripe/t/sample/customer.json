@@ -1,0 +1,49 @@
+{
+   "address" : {
+      "city" : null,
+      "country" : "HN",
+      "line1" : null,
+      "line2" : null,
+      "postal_code" : null,
+      "state" : null
+   },
+   "balance" : "0",
+   "created" : "1489794866",
+   "currency" : "usd",
+   "default_source" : "card_1LVepd2eZvKYlo2C2BTxeOQu",
+   "delinquent" : 0,
+   "description" : null,
+   "discount" : null,
+   "email" : "stripe@test.com",
+   "id" : "cus_AJ78ZaALpqgiuZ",
+   "invoice_prefix" : "AB94287",
+   "invoice_settings" : {
+      "custom_fields" : null,
+      "default_payment_method" : null,
+      "footer" : null,
+      "rendering_options" : null
+   },
+   "livemode" : 0,
+   "metadata" : {
+      "order_id" : "6735"
+   },
+   "name" : null,
+   "next_invoice_sequence" : "213826",
+   "object" : "customer",
+   "phone" : "''",
+   "preferred_locales" : [],
+   "shipping" : {
+      "address" : {
+         "city" : "Vadodara",
+         "country" : "India",
+         "line1" : "address1",
+         "line2" : "address2",
+         "postal_code" : "390001",
+         "state" : "Gujarat"
+      },
+      "name" : "asdasda",
+      "phone" : ""
+   },
+   "tax_exempt" : "none",
+   "test_clock" : null
+}

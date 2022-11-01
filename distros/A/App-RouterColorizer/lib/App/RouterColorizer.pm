@@ -12,7 +12,7 @@ use strict;
 use warnings;
 
 package App::RouterColorizer;
-$App::RouterColorizer::VERSION = '1.222772';
+$App::RouterColorizer::VERSION = '1.222970';
 use Moose;
 
 use feature 'signatures';
@@ -515,6 +515,53 @@ s/ ^ ( \| \s+ [0-9]* \s* \| ) ( \Q Span Loss (dB)\E \s* ) ( \| ) ( \s+ $NUM \s+ 
     # Errors
     $line =~ s/ ^ ( \QSHELL \E \S+ \Q FAILURE\E \N+ ) $/$self->_colorize($1, $RED)/exx;
 
+    # ptp show
+    $line =~ s/ ^ ( \| ) ( [^|]+ ) ( \| ) ( \Q Ena \E  ) ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ )
+                  ( \| ) ( [^|]+ ) ( \| ) ( \QUp\E \s+ ) ( \| ) ( [^|]+ )
+                  ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ ) ( \| ) /
+        $1.$self->_colorize($2, $GREEN).
+        $3.$self->_colorize($4, $GREEN).
+        $5.$self->_colorize($6, $GREEN).
+        $7.$self->_colorize($8, $GREEN).
+        $9.$self->_colorize($10, $GREEN).
+        $11.$self->_colorize($12, $GREEN).
+        $13.$self->_colorize($14, $GREEN).
+        $15.$self->_colorize($16, $GREEN).
+        $17.$self->_colorize($18, $GREEN).
+        $19.$self->_colorize($20, $GREEN).
+        $21.$self->_colorize($22, $GREEN).
+        $23/exx;
+    $line =~ s/ ^ ( \| ) ( [^|]+ ) ( \| ) ( \Q Ena \E  ) ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ )
+                  ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ )
+                  ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ ) ( \| ) /
+        $1.$self->_colorize($2, $RED).
+        $3.$self->_colorize($4, $RED).
+        $5.$self->_colorize($6, $RED).
+        $7.$self->_colorize($8, $RED).
+        $9.$self->_colorize($10, $RED).
+        $11.$self->_colorize($12, $RED).
+        $13.$self->_colorize($14, $RED).
+        $15.$self->_colorize($16, $RED).
+        $17.$self->_colorize($18, $RED).
+        $19.$self->_colorize($20, $RED).
+        $21.$self->_colorize($22, $RED).
+        $23/exx;
+    $line =~ s/ ^ ( \| ) ( [^|]+ ) ( \| ) ( \Q Dis \E  ) ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ )
+                  ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ )
+                  ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ ) ( \| ) /
+        $1.$self->_colorize($2, $INFO).
+        $3.$self->_colorize($4, $INFO).
+        $5.$self->_colorize($6, $INFO).
+        $7.$self->_colorize($8, $INFO).
+        $9.$self->_colorize($10, $INFO).
+        $11.$self->_colorize($12, $INFO).
+        $13.$self->_colorize($14, $INFO).
+        $15.$self->_colorize($16, $INFO).
+        $17.$self->_colorize($18, $INFO).
+        $19.$self->_colorize($20, $INFO).
+        $21.$self->_colorize($22, $INFO).
+        $23/exx;
+
     return $line;
 }
 
@@ -606,7 +653,7 @@ App::RouterColorizer - Colorize router CLI output
 
 =head1 VERSION
 
-version 1.222772
+version 1.222970
 
 =head1 DESCRIPTION
 

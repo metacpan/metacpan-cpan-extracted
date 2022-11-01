@@ -30,13 +30,13 @@ Estonian Estonia locale.
 
 =head3 Wide (format)
 
-  Esmaspäev
-  Teisipäev
-  Kolmapäev
-  Neljapäev
-  Reede
-  Laupäev
-  Pühapäev
+  esmaspäev
+  teisipäev
+  kolmapäev
+  neljapäev
+  reede
+  laupäev
+  pühapäev
 
 =head3 Abbreviated (format)
 
@@ -61,13 +61,13 @@ Estonian Estonia locale.
 
 =head3 Wide (stand-alone)
 
-  Esmaspäev
-  Teisipäev
-  Kolmapäev
-  Neljapäev
-  Reede
-  Laupäev
-  Pühapäev
+  esmaspäev
+  teisipäev
+  kolmapäev
+  neljapäev
+  reede
+  laupäev
+  pühapäev
 
 =head3 Abbreviated (stand-alone)
 
@@ -248,9 +248,9 @@ Estonian Estonia locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = Teisipäev, 5. veebruar 2008
-   1995-12-22T09:05:02 = Reede, 22. detsember 1995
-  -0010-09-15T04:44:23 = Laupäev, 15. september -10
+   2008-02-05T18:30:30 = teisipäev, 5. veebruar 2008
+   1995-12-22T09:05:02 = reede, 22. detsember 1995
+  -0010-09-15T04:44:23 = laupäev, 15. september -10
 
 =head3 Long
 
@@ -302,9 +302,9 @@ Estonian Estonia locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = Teisipäev, 5. veebruar 2008 18:30:30 UTC
-   1995-12-22T09:05:02 = Reede, 22. detsember 1995 09:05:02 UTC
-  -0010-09-15T04:44:23 = Laupäev, 15. september -10 04:44:23 UTC
+   2008-02-05T18:30:30 = teisipäev, 5. veebruar 2008 18:30:30 UTC
+   1995-12-22T09:05:02 = reede, 22. detsember 1995 09:05:02 UTC
+  -0010-09-15T04:44:23 = laupäev, 15. september -10 04:44:23 UTC
 
 =head3 Long
 
@@ -381,17 +381,17 @@ Estonian Estonia locale.
    1995-12-22T09:05:02 = R, 22
   -0010-09-15T04:44:23 = L, 15
 
-=head3 Ehm (E h:mm a)
+=head3 Ehm (E h:mm a)
 
-   2008-02-05T18:30:30 = T 6:30 PM
-   1995-12-22T09:05:02 = R 9:05 AM
-  -0010-09-15T04:44:23 = L 4:44 AM
+   2008-02-05T18:30:30 = T 6:30 PM
+   1995-12-22T09:05:02 = R 9:05 AM
+  -0010-09-15T04:44:23 = L 4:44 AM
 
-=head3 Ehms (E h:mm:ss a)
+=head3 Ehms (E h:mm:ss a)
 
-   2008-02-05T18:30:30 = T 6:30:30 PM
-   1995-12-22T09:05:02 = R 9:05:02 AM
-  -0010-09-15T04:44:23 = L 4:44:23 AM
+   2008-02-05T18:30:30 = T 6:30:30 PM
+   1995-12-22T09:05:02 = R 9:05:02 AM
+  -0010-09-15T04:44:23 = L 4:44:23 AM
 
 =head3 Gy (y G)
 
@@ -519,35 +519,35 @@ Estonian Estonia locale.
    1995-12-22T09:05:02 = 22
   -0010-09-15T04:44:23 = 15
 
-=head3 h (h a)
+=head3 h (h a)
 
-   2008-02-05T18:30:30 = 6 PM
-   1995-12-22T09:05:02 = 9 AM
-  -0010-09-15T04:44:23 = 4 AM
+   2008-02-05T18:30:30 = 6 PM
+   1995-12-22T09:05:02 = 9 AM
+  -0010-09-15T04:44:23 = 4 AM
 
-=head3 hm (h:mm a)
+=head3 hm (h:mm a)
 
-   2008-02-05T18:30:30 = 6:30 PM
-   1995-12-22T09:05:02 = 9:05 AM
-  -0010-09-15T04:44:23 = 4:44 AM
+   2008-02-05T18:30:30 = 6:30 PM
+   1995-12-22T09:05:02 = 9:05 AM
+  -0010-09-15T04:44:23 = 4:44 AM
 
-=head3 hms (h:mm:ss a)
+=head3 hms (h:mm:ss a)
 
-   2008-02-05T18:30:30 = 6:30:30 PM
-   1995-12-22T09:05:02 = 9:05:02 AM
-  -0010-09-15T04:44:23 = 4:44:23 AM
+   2008-02-05T18:30:30 = 6:30:30 PM
+   1995-12-22T09:05:02 = 9:05:02 AM
+  -0010-09-15T04:44:23 = 4:44:23 AM
 
-=head3 hmsv (h:mm:ss a v)
+=head3 hmsv (h:mm:ss a v)
 
-   2008-02-05T18:30:30 = 6:30:30 PM UTC
-   1995-12-22T09:05:02 = 9:05:02 AM UTC
-  -0010-09-15T04:44:23 = 4:44:23 AM UTC
+   2008-02-05T18:30:30 = 6:30:30 PM UTC
+   1995-12-22T09:05:02 = 9:05:02 AM UTC
+  -0010-09-15T04:44:23 = 4:44:23 AM UTC
 
-=head3 hmv (h:mm a v)
+=head3 hmv (h:mm a v)
 
-   2008-02-05T18:30:30 = 6:30 PM UTC
-   1995-12-22T09:05:02 = 9:05 AM UTC
-  -0010-09-15T04:44:23 = 4:44 AM UTC
+   2008-02-05T18:30:30 = 6:30 PM UTC
+   1995-12-22T09:05:02 = 9:05 AM UTC
+  -0010-09-15T04:44:23 = 4:44 AM UTC
 
 =head3 mmss (mm:ss)
 
@@ -642,7 +642,7 @@ Yes
 
 =head3 Local first day of the week
 
-1 (Esmaspäev)
+1 (esmaspäev)
 
 =head2 Strftime Patterns
 

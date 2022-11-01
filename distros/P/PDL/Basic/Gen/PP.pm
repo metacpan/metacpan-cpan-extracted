@@ -381,7 +381,7 @@ sub dosubst_private {
       @pairs,
       ((ref $src) ? %{$src->[1]} : ()),
       PRIV => sub {return "$sname->$_[0]"},
-      COMP => sub {return "$pname->$_[0]"},
+      COMP => sub {my $r="$pname->$_[0]";$sig->other_is_out($_[0])?"(*($r))":$r},
       CROAK => sub {PDL::PP::pp_line_numbers(__LINE__-1, "return PDL->make_error(PDL_EUSERERROR, \"Error in $name:\" @{[join ',', @_]})")},
       NAME => sub {return $name},
       MODULE => sub {return $::PDLMOD},
@@ -466,6 +466,8 @@ our $VERSION = "2.3";
 $VERSION = eval $VERSION;
 
 our $macros_xs = <<'EOF';
+#include "pdlperl.h"
+
 #define PDL_XS_PREAMBLE \
   char *objname = "PDL"; /* XXX maybe that class should actually depend on the value set \
                             by pp_bless ? (CS) */ \
@@ -560,7 +562,6 @@ PDL_COMMENT("   /* Memory access */                                         ")
 #define PDL %s
 extern Core* PDL; PDL_COMMENT("Structure hold core C functions")
 static int __pdl_boundscheck = 0;
-static SV* CoreSV;       PDL_COMMENT("Gets pointer to perl var holding core structure")
 
 #if ! %s
 # define PP_INDTERM(max, at) at
@@ -574,7 +575,7 @@ Core* PDL = NULL; PDL_COMMENT("Structure hold core C functions")
 
 MODULE = %1$s PACKAGE = %1$s
 
-PROTOTYPES: ENABLE
+PROTOTYPES: DISABLE
 
 int
 set_boundscheck(i)
@@ -1001,103 +1002,17 @@ EOF
   pp_addpm {At => 'Top'}, <<EOF;
 warn \"$warning_main\n$warning_suppression_runtime\" unless \$ENV{$envvar};
 EOF
-
-
 }
 
 use Carp;
 $SIG{__DIE__} = \&Carp::confess if $::PP_VERBOSE;
 
-$|=1;
-
-#
-# This is ripped from xsubpp to ease the parsing of the typemap.
-#
-our $proto_re = "[" . quotemeta('\$%&*@;[]') . "]" ;
-
-sub ValidProtoString ($)
-{
-    my($string) = @_ ;
-
-    if ( $string =~ /^$proto_re+$/ ) {
-        return $string ;
-    }
-
-    return 0 ;
-}
-
-sub C_string ($)
-{
-    my($string) = @_ ;
-
-    $string =~ s[\\][\\\\]g ;
-    $string ;
-}
-
-sub TrimWhitespace
-{
-    $_[0] =~ s/^\s+|\s+$//go ;
-}
-sub TidyType
-{
-    local ($_) = @_ ;
-
-    # rationalise any '*' by joining them into bunches and removing whitespace
-    s#\s*(\*+)\s*#$1#g;
-    s#(\*+)# $1 #g ;
-
-    # change multiple whitespace into a single space
-    s/\s+/ /g ;
-
-    # trim leading & trailing whitespace
-    TrimWhitespace($_) ;
-
-    $_ ;
-}
-
-
-
-#------------------------------------------------------------------------------
-# Typemap handling in PP.
-#
-# This subroutine does limited input typemap conversion.
-# Given a variable name (to set), its type, and the source
-# for the variable, returns the correct input typemap entry.
-# Original version: D. Hunt 4/13/00  - Current version J. Brinchmann (06/05/05)
-#
-# The code loads the typemap from the Perl typemap using the loading logic of
-# xsubpp. Do note that I  made the assumption that
-# $Config{installprivlib}/ExtUtils was the right root directory for the search.
-# This could break on some systems?
-#
-# Also I do _not_ parse the Typemap argument from ExtUtils::MakeMaker because I don't
-# know how to catch it here! This would be good to fix! It does look for a file
-# called typemap in the current directory however.
-#
-# The parsing of the typemap is mechanical and taken straight from xsubpp and
-# the resulting hash lookup is then used to convert the input type to the
-# necessary outputs (as seen in the old code above)
-#
-# JB 06/05/05
-#
-sub typemap {
-  my $oname  = shift;
-  my $type   = shift;
-  my $arg    = shift;
-
-  # Modification to parse Perl's typemap here.
-  #
-  # The default search path for the typemap taken from xsubpp. It seems it is
-  # necessary to prepend the installprivlib/ExtUtils directory to find the typemap.
-  # It is not clear to me how this is to be done.
-  #
-  my ($typemap, $mode, $junk, $current, %input_expr,
-      %proto_letter, %output_expr, %type_kind);
-
+my $typemap_obj;
+sub _load_typemap {
+  require ExtUtils::Typemaps;
   # according to MM_Unix 'privlibexp' is the right directory
   #     seems to work even on OS X (where installprivlib breaks things)
   my $_rootdir = $Config{privlibexp}.'/ExtUtils/';
-
   # First the system typemaps..
   my @tm = ($_rootdir.'../../../../lib/ExtUtils/typemap',
 	    $_rootdir.'../../../lib/ExtUtils/typemap',
@@ -1105,72 +1020,28 @@ sub typemap {
 	    $_rootdir.'../../../typemap',
 	    $_rootdir.'../../typemap', $_rootdir.'../typemap',
 	    $_rootdir.'typemap');
-  # Note that the OUTPUT typemap is unlikely to be of use here, but I have kept
-  # the source code from xsubpp for tidiness.
   push @tm, &PDL::Core::Dev::PDL_TYPEMAP, '../../typemap', '../typemap', 'typemap';
-  carp "**CRITICAL** PP found no typemap in $_rootdir/typemap; this will cause problems..."
+  carp "**CRITICAL** PP found no typemaps in (@tm)"
       unless my @typemaps = grep -f $_ && -T _, @tm;
-  foreach $typemap (@typemaps) {
-    open(my $fh, $typemap)
-      or warn("Warning: could not open typemap file '$typemap': $!\n"), next;
-    $mode = 'Typemap';
-    $junk = "" ;
-    $current = \$junk;
-    local $_; # else get "Modification of a read-only value attempted"
-    while (<$fh>) {
-	next if /^\s*#/;
-        my $line_no = $. + 1;
-	if (/^INPUT\s*$/)   { $mode = 'Input';   $current = \$junk;  next; }
-	if (/^OUTPUT\s*$/)  { $mode = 'Output';  $current = \$junk;  next; }
-	if (/^TYPEMAP\s*$/) { $mode = 'Typemap'; $current = \$junk;  next; }
-	if ($mode eq 'Typemap') {
-	    chomp;
-	    my $line = $_ ;
-            TrimWhitespace($_) ;
-	    # skip blank lines and comment lines
-	    next if /^$/ or /^#/ ;
-	    my($t_type,$kind, $proto) = /^\s*(.*?\S)\s+(\S+)\s*($proto_re*)\s*$/ or
-		warn("Warning: File '$typemap' Line $. '$line' TYPEMAP entry needs 2 or 3 columns\n"), next;
-            $t_type = TidyType($t_type) ;
-	    $type_kind{$t_type} = $kind ;
-            # prototype defaults to '$'
-            $proto = "\$" unless $proto ;
-            warn("Warning: File '$typemap' Line $. '$line' Invalid prototype '$proto'\n")
-                unless ValidProtoString($proto) ;
-            $proto_letter{$t_type} = C_string($proto) ;
-	}
-	elsif (/^\s/) {
-	    $$current .= $_;
-	}
-	elsif ($mode eq 'Input') {
-	    s/\s+$//;
-	    $input_expr{$_} = '';
-	    $current = \$input_expr{$_};
-	}
-	else {
-	    s/\s+$//;
-	    $output_expr{$_} = '';
-	    $current = \$output_expr{$_};
-	}
-    }
-    close $fh;
-  }
-
-  #
-  # Do checks...
-  #
-  # First reconstruct the type declaration to look up in type_kind
-  my $full_type=TidyType($type->get_decl('', {VarArrays2Ptrs=>1})); # Skip the variable name
-  die "The type =$full_type= does not have a typemap entry!\n" unless exists($type_kind{$full_type});
-  my $typemap_kind = $type_kind{$full_type};
-  # Look up the conversion from the INPUT typemap. Note that we need to do some
-  # massaging of this.
-  my $input = $input_expr{$typemap_kind};
-  $input =~ s/^(.*?)=\s*//s; # Remove all before =
-  $input =~ s/\$(var|\{var\})/$oname/g;
-  $input =~ s/\$(arg|\{arg\})/$arg/g;
-  $input =~ s/\$(type|\{type\})/$full_type/g;
-  return ($input);
+  $typemap_obj = ExtUtils::Typemaps->new;
+  $typemap_obj->merge(file => $_, replace => 1) for @typemaps;
+  $typemap_obj;
+}
+sub typemap {
+  my ($type, $method) = @_;
+  $typemap_obj ||= _load_typemap();
+  $type=ExtUtils::Typemaps::tidy_type($type);
+  my $inputmap = $typemap_obj->$method(ctype => $type);
+  die "The type =$type= does not have a typemap entry!\n" unless $inputmap;
+  ($inputmap->code, $type);
+}
+sub typemap_eval { # lifted from ExtUtils::ParseXS::Eval, ignoring eg $ALIAS
+  my ($code, $varhash) = @_;
+  my ($var, $type, $num, $init, $printed_name, $arg, $ntype, $argoff, $subtype)
+    = @$varhash{qw(var type num init printed_name arg ntype argoff subtype)};
+  my $rv = eval qq("$code");
+  die $@ if $@;
+  $rv;
 }
 
 sub make_xs_code {
@@ -1199,18 +1070,10 @@ sub indent($$) {
 # This subroutine generates the XS code needed to call the perl 'initialize'
 # routine in order to create new output PDLs
 sub callPerlInit {
-    my $names = shift; # names of variables to initialize
-    my $ci    = shift; # current indenting
-    my $callcopy = $#_ > -1 ? shift : 0;
-    my $ret = '';
-    foreach my $name (@$names) {
-	my ($to_push, $method) = $callcopy
-	    ? ('parent', 'copy')
-	    : ('sv_2mortal(newSVpv(objname, 0))', 'initialize');
-	$ret .= PDL::PP::pp_line_numbers(__LINE__-1, "PDL_XS_PERLINIT($name, $to_push, $method)\n");
-    }
-    indent($ret,$ci);
-} #sub callPerlInit()
+    my ($names, $callcopy) = @_;
+    my $args = $callcopy ? 'parent, copy' : 'sv_2mortal(newSVpv(objname, 0)), initialize';
+    join '', map PDL::PP::pp_line_numbers(__LINE__-1, "PDL_XS_PERLINIT($_, $args)\n"), @$names;
+}
 
 ###########################################################
 # Name       : extract_signature_from_fulldoc
@@ -1695,8 +1558,8 @@ EOD
       sub {
         my($name,$sig,
            $hdrcode,$inplacecode,$inplacecheck,$callcopy,$defaults) = @_;
-        my $optypes = $sig->otherobjs(1);
-        my @args = $sig->alldecls(0, 1);
+        my $optypes = $sig->otherobjs;
+        my @args = @{ $sig->allnames(1) };
         my %other  = map +($_ => exists($$optypes{$_})), @args;
         if (keys %{ $defaults ||= {} } < keys %other) {
           my $default_seen = '';
@@ -1707,9 +1570,10 @@ EOD
           }
         }
         my $ci = '  ';  # current indenting
-        my $pars = join "\n",map "$ci$_ = 0;", $sig->alldecls(1, 0);
+        my %ptypes = map +($_=>$$optypes{$_} ? $$optypes{$_}->get_decl('', {VarArrays2Ptrs=>1}) : 'pdl *'), @args;
         my %out = map +($_=>1), $sig->names_out_nca;
         my %outca = map +($_=>1), $sig->names_oca;
+        my %other_out = map +($_=>1), $sig->other_out;
         my %tmp = map +($_=>1), $sig->names_tmp;
         # remember, otherpars *are* input vars
         my $nout   = grep $_, values %out;
@@ -1726,55 +1590,54 @@ EOD
         # Generate declarations for SV * variables corresponding to pdl * output variables.
         # These are used in creating output variables.  One variable (ex: SV * outvar1_SV;)
         # is needed for each output and output create always argument
-        my $svdecls = join "\n", map "${ci}SV *${_}_SV = NULL;", $sig->names_out;
-        my $clause_inputs = ''; my %already_read; my $cnt = 0;
+        my $svdecls = join "\n", map indent("SV *${_}_SV = NULL;",$ci), $sig->names_out;
+        my ($xsargs, $xsdecls) = ('', ''); my %already_read; my $cnt = 0; my %outother2cnt;
         foreach my $x (@args) {
-            last if $out{$x} || $outca{$x} || $other{$x};
+            next if $outca{$x};
+            last if $out{$x} || ($other{$x} && exists $defaults->{$x});
             $already_read{$x} = 1;
-            $clause_inputs .= "$ci$x = PDL->SvPDLV(ST($cnt));\n";
+            $xsargs .= "$x, "; $xsdecls .= "\n\t$ptypes{$x}$x";
+            $outother2cnt{$x} = $cnt if $other{$x} && $other_out{$x};
             $cnt++;
         }
+        my $pars = join "\n",map indent("$_;",$ci), $sig->alldecls(0, 0, \%already_read);
+        $svdecls = join "\n", grep length, $svdecls, map indent(qq{SV *${_}_SV = @{[defined($outother2cnt{$_})?"ST($outother2cnt{$_})":'NULL']};},$ci), $sig->other_out;
         my @create = ();  # The names of variables which need to be created by calling
                           # the 'initialize' perl routine from the correct package.
         $ci = '    ';  # Current indenting
         # clause for reading in all variables
         my $clause1 = $inplacecheck; $cnt = 0;
         foreach my $x (@args) {
-            if ($other{$x}) {  # other par
-                $clause1 .= "$ci$x = " . typemap($x, $$optypes{$x}, "ST($cnt)") . ";\n";
-                $cnt++;
-            } elsif ($outca{$x}) {
-                push (@create, $x);
+            if ($outca{$x}) {
+                push @create, $x;
             } else {
-                $clause1 .= "$ci$x = PDL->SvPDLV(".
-		  ($out{$x} ? "${x}_SV = " : '').
-		  "ST($cnt));\n" if !$already_read{$x};
+                my ($setter, $type) = typemap($ptypes{$x}, 'get_inputmap');
+                $setter = typemap_eval($setter, {var=>$x, type=>$type, arg=>($out{$x}||$other_out{$x} ? "${x}_SV = " : '')."ST($cnt)"});
+                $setter =~ s/.*?(?=$x\s*=\s*)//s; # zap any declarations like whichdims_count
+                $clause1 .= indent("$setter;\n",$ci) if !$already_read{$x};
                 $cnt++;
             }
         }
         # Add code for creating output variables via call to 'initialize' perl routine
-        $clause1 .= callPerlInit (\@create, $ci, $callcopy);
+        $clause1 .= indent(callPerlInit(\@create, $callcopy),$ci);
         @create = ();
         # clause for reading in input and creating output vars
         my $clause3 = '';
         my $defaults_rawcond = $ndefault ? "items == ($nin-$ndefault)" : '';
         $cnt = 0;
         foreach my $x (@args) {
-            if ($other{$x}) {
-                my $setter = typemap($x, $$optypes{$x}, "ST($cnt)");
-                $clause3 .= "$ci$x = " . (exists $defaults->{$x}
-                  ? "($defaults_rawcond) ? ($defaults->{$x}) : ($setter)"
-                  : $setter) . ";\n";
-                $cnt++;
-            } elsif ($out{$x} || $outca{$x}) {
-                push (@create, $x);
+            if ($out{$x} || $outca{$x}) {
+                push @create, $x;
             } else {
-                $clause3 .= "$ci$x = PDL->SvPDLV(ST($cnt));\n" if !$already_read{$x};
+                my ($setter, $type) = typemap($ptypes{$x}, 'get_inputmap');
+                $setter = typemap_eval($setter, {var=>$x, type=>$type, arg=>($other_out{$x} ? "${x}_SV = " : '')."ST($cnt)"});
+                $setter =~ s/^(.*?)=\s*//s, $setter = "$x = ($defaults_rawcond) ? ($defaults->{$x}) : ($setter)" if exists $defaults->{$x};
+                $clause3 .= indent("$setter;\n",$ci) if !$already_read{$x};
                 $cnt++;
             }
         }
         # Add code for creating output variables via call to 'initialize' perl routine
-        $clause3 .= callPerlInit (\@create, $ci, $callcopy); @create = ();
+        $clause3 .= indent(callPerlInit(\@create, $callcopy),$ci); @create = ();
         my $defaults_cond = $ndefault ? " || $defaults_rawcond" : '';
         $clause3 = <<EOF . $clause3;
   else if (items == $nin$defaults_cond) { PDL_COMMENT("only input variables on stack, create outputs")
@@ -1783,9 +1646,8 @@ EOF
         $clause3 = '' if $nmaxonstack == $nin;
         my $clause3_coda = $clause3 ? '  }' : '';
         PDL::PP::pp_line_numbers(__LINE__, <<END);
-
-void
-$name(...)
+\nvoid
+$name($xsargs...)$xsdecls
  PREINIT:
   PDL_XS_PREAMBLE
 $svdecls
@@ -1794,7 +1656,6 @@ $pars
   if (items != $nmaxonstack && !(items == $nin$defaults_cond) && items != $ninout)
     croak (\"Usage:  PDL::$name($usageargs) (you may leave output variables out of list)\");
   PDL_XS_PACKAGEGET
-$clause_inputs
   if (items == $nmaxonstack) { PDL_COMMENT("all variables on stack, read in output vars")
     nreturn = $noutca;
 $clause1
@@ -1811,19 +1672,32 @@ END
       ["SignatureObj"],
       "Generate XS trailer to return output variables or leave them as modified input variables",
       sub {
-        my @outs = $_[0]->names_out; # names of output variables (in calling order)
+        my ($sig) = @_;
+        my @outs = $sig->names_out; # names of output ndarrays in calling order
         my $clause1 = join ';', map "ST($_) = $outs[$_]_SV", 0 .. $#outs;
-        PDL::PP::pp_line_numbers(__LINE__-1, "PDL_XS_RETURN($clause1)");
+        $clause1 = PDL::PP::pp_line_numbers(__LINE__-1, "PDL_XS_RETURN($clause1)");
+        my @other_out = $sig->other_out;
+        my $optypes = $sig->otherobjs;
+        my %ptypes = map +($_=>$$optypes{$_}->get_decl('', {VarArrays2Ptrs=>1})), @other_out;
+        for my $x (@other_out) {
+          my ($setter, $type) = typemap($ptypes{$x}, 'get_outputmap');
+          $setter = typemap_eval($setter, {var=>$x, type=>$type, arg=>"tsv"});
+          $clause1 = <<EOF . $clause1;
+{ SV *tsv = NULL;
+$setter
+sv_setsv(${x}_SV, tsv); sv_2mortal(tsv); }
+EOF
+        }
+        $clause1;
       }),
 
    PDL::PP::Rule->new("NewXSHdr", ["NewXSName","SignatureObj"],
       sub {
         my($name,$sig) = @_;
-        my $shortpars = join ',', $sig->alldecls(0, 1);
-        my $longpars = join "\n", map "\t$_", $sig->alldecls(1, 1);
+        my $shortpars = join ',', @{ $sig->allnames(1) };
+        my $longpars = join "\n", map "\t$_", $sig->alldecls(1, 0);
         return<<END;
-
-void
+\nvoid
 $name($shortpars)
 $longpars
 END
@@ -1832,7 +1706,7 @@ END
    PDL::PP::Rule->new("NewXSCHdrs", ["RunFuncName","SignatureObj","GlobalNew"],
       sub {
         my($name,$sig,$gname) = @_;
-        my $longpars = join ",", $sig->alldecls(1, 0);
+        my $longpars = join ",", $sig->alldecls(0, 1);
         my $opening = 'pdl_error PDL_err = {0, NULL, 0};';
         my $closing = 'return PDL_err;';
         return ["pdl_error $name($longpars) {$opening","$closing}",
@@ -1840,8 +1714,8 @@ END
       }),
    PDL::PP::Rule->new(["RunFuncCall","RunFuncHdr"],["RunFuncName","SignatureObj"], sub {
         my ($func_name,$sig) = @_;
-        my $shortpars = join ',', $sig->alldecls(0, 0);
-        my $longpars = join ",", $sig->alldecls(1, 0);
+        my $shortpars = join ',', map $sig->other_is_out($_)?"&$_":$_, @{ $sig->allnames(0) };
+        my $longpars = join ",", $sig->alldecls(0, 1);
         (PDL::PP::pp_line_numbers(__LINE__-1, "PDL->barf_if_error($func_name($shortpars));"),
           "pdl_error $func_name($longpars)");
       }),
@@ -1867,7 +1741,7 @@ EOF
    PDL::PP::Rule->new("NewXSSetTransPDLs", ["SignatureObj","StructName"], sub {
       my($sig,$trans) = @_;
       join '',
-        map PDL::PP::pp_line_numbers(__LINE__, "$trans->pdls[$_->[0]] = $_->[2];\n"),
+        map PDL::PP::pp_line_numbers(__LINE__-1, "$trans->pdls[$_->[0]] = $_->[2];\n"),
         grep !$_->[1], $sig->names_sorted_tuples;
    }),
 
@@ -1921,7 +1795,7 @@ sub make_vfn_args {
 }
 ()},
 
-   PDL::PP::Rule->new("MakeCompOther", "SignatureObj", sub { $_[0]->getcopy }),
+   PDL::PP::Rule->new("MakeCompOther", [qw(SignatureObj ParamStructName)], sub { $_[0]->getcopy("$_[1]->%s") }),
    PDL::PP::Rule->new("MakeCompTotal", ["MakeCompOther", \"MakeComp"], sub { join "\n", grep $_, @_ }),
    PDL::PP::Rule::Substitute->new("MakeCompiledReprSubd", "MakeCompTotal"),
 
@@ -2031,9 +1905,10 @@ EOF
       sub {
         my( $sname, $vtable, $pname, $ptype ) = @_;
         PDL::PP::pp_line_numbers(__LINE__, <<EOF);
-if (!PDL) croak("PDL core struct is NULL, can't continue");
+if (!PDL) return (pdl_error){PDL_EFATAL, "PDL core struct is NULL, can't continue",0};
 pdl_trans *$sname = PDL->create_trans(&$vtable);
-@{[$ptype ? "  $ptype *$pname = $sname->params;" : ""]}
+if (!$sname) return PDL->make_error_simple(PDL_EFATAL, "Couldn't create trans");
+@{[$ptype ? "$ptype *$pname = $sname->params;" : ""]}
 EOF
       }),
 
@@ -2095,6 +1970,7 @@ EOF
         push @op_flags, 'PDL_TRANS_BADPROCESS' if $badflag;
         push @op_flags, 'PDL_TRANS_BADIGNORE' if defined $badflag and !$badflag;
         push @op_flags, 'PDL_TRANS_NO_PARALLEL' if $noPthreadFlag;
+        push @op_flags, 'PDL_TRANS_OUTPUT_OTHERPAR' if $sig->other_any_out;
         my $op_flags = join('|', @op_flags) || '0';
         my $iflags = join('|', grep $_, $affflag, $revflag, $flowflag) || '0';
         my $gentypes_txt = join(", ", (map PDL::Type->new($_)->sym, @$gentypes), '-1');

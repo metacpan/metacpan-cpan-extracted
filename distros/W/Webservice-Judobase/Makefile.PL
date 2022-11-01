@@ -17,9 +17,9 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010000",
   "NAME" => "Webservice::Judobase",
   "PREREQ_PM" => {
-    "HTTP::Request" => "0.080",
+    "HTTP::Request" => "6.44",
     "JSON::Tiny" => "0.58",
-    "LWP::UserAgent" => "6.61",
+    "LWP::UserAgent" => "6.67",
     "Moo" => "2.005004",
     "namespace::clean" => "0.27"
   },
@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
     "Test2::V0" => "0.000145",
     "Test::More" => 0
   },
-  "VERSION" => "0.07",
+  "VERSION" => "0.08",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,11 +39,11 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "File::Spec" => 0,
-  "HTTP::Request" => "0.080",
+  "HTTP::Request" => "6.44",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "JSON::Tiny" => "0.58",
-  "LWP::UserAgent" => "6.61",
+  "LWP::UserAgent" => "6.67",
   "Moo" => "2.005004",
   "Test2::V0" => "0.000145",
   "Test::More" => 0,

@@ -8,6 +8,7 @@ use Exporter "import";
 our %EXPORT_TAGS = ( 'all' => [ qw(
 	socket
 	socketpair
+	shutdown
 	bind
 	listen
 	accept
@@ -52,6 +53,9 @@ sub socket :prototype($$$$)
 
 sub socketpair:prototype($$$$$) 
 	{ref($_[0]) ? &CORE::socketpair : &IO::FD::socketpair; }
+
+sub shutdown:prototype($$)
+	{ref($_[0]) ? &CORE::shutdown : &IO::FD::shutdown; }
 
 sub bind:prototype($$) 
 	{ref($_[0]) ? &CORE::bind : &IO::FD::bind; }

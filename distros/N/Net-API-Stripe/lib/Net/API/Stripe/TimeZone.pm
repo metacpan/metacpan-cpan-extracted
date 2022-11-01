@@ -2,7 +2,7 @@
 ## Stripe API - ~/lib/Net/API/Stripe/TimeZone.pm
 ## Version v0.100.0
 ## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2020/05/15
 ## 
@@ -10,32 +10,46 @@
 package Net::API::Stripe::TimeZone;
 BEGIN
 {
-	use strict;
-	use DateTime::TimeZone;
-	use overload ('""'     => 'name',
-				  '=='     => sub { _obj_eq(@_) },
-				  '!='     => sub { !_obj_eq(@_) },
-				  fallback => 1,
-				 );
-	our( $VERSION ) = 'v0.100.0';
+    use strict;
+    use warnings;
+    use vars qw( $VERSION );
+    use parent qw( Module::Generic );
+    use DateTime::TimeZone;
+    use Nice::Try;
+    use overload ('""'     => 'name',
+                  '=='     => sub { _obj_eq(@_) },
+                  '!='     => sub { !_obj_eq(@_) },
+                  fallback => 1,
+                 );
+    our( $VERSION ) = 'v0.100.0';
 };
 
-sub new
+use strict;
+use warnings;
+
+sub init
 {
-	my $this = shift( @_ );
-	my $class = ref( $this ) || $this;
-	my $init = shift( @_ );
-	my $value = shift( @_ );
-	my $tz = DateTime::TimeZone->new( name => $value, @_ );
-	my $self = { tz => $tz };
-	return( bless( $self => $class ) );
+    my $self = shift( @_ );
+    my $init = shift( @_ );
+    my $value = shift( @_ );
+    my $tz;
+    try
+    {
+        $tz = DateTime::TimeZone->new( name => $value, @_ );
+    }
+    catch( $e )
+    {
+        return( $self->error( "Invalid time zone '${tz}': $e" ) );
+    }
+    $self->{tz} = $tz;
+    return( $self->SUPER::init( @_ ) );
 }
 
 sub name { return( shift->{tz}->name ); }
 
 sub _obj_eq 
 {
-    ##return overload::StrVal( $_[0] ) eq overload::StrVal( $_[1] );
+    # return overload::StrVal( $_[0] ) eq overload::StrVal( $_[1] );
     no overloading;
     my $self = shift( @_ );
     my $other = shift( @_ );
@@ -49,15 +63,15 @@ sub _obj_eq
 
 AUTOLOAD
 {
-	my( $method ) = our $AUTOLOAD =~ /([^:]+)$/;
-	my $self = shift( @_ );
-	return( $self->{tz}->$method( @_ ) );
+    my( $method ) = our $AUTOLOAD =~ /([^:]+)$/;
+    my $self = shift( @_ );
+    return( $self->{tz}->$method( @_ ) );
 };
 
 DESTROY {};
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf8
@@ -74,7 +88,7 @@ Net::API::Stripe::TimeZone - A Time Zone Object
     # Asia/Tokyo
     print( "Time zone is $tz\n" );
     # produces: Time zone is Asia/Tokyo
-    
+
     my $tz2 = $stripe->account->settings->dashboard->timezone( 'local' );
     print( "$tz is same as $tz2? ", $tz eq $tz2 ? 'yes' : 'no', "\n" );
 
@@ -88,23 +102,15 @@ This is a wrapper around L<DateTime::TimeZone> to provide stringification. L<Net
 
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>( hash init, timezone )
+=head2 new( hash init, timezone )
 
 Creates a new L<Net::API::Stripe::TimeZone> object.
 
-=back
-
 =head1 METHODS
 
-=over 4
-
-=item B<name>
+=head2 name
 
 This is read only. It returns the current value of the time zone.
-
-=back
 
 For all other methods, see the manual page of L<DateTime::TimeZone>
 

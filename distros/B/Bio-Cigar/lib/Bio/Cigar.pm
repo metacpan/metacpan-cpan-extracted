@@ -17,9 +17,14 @@ Bio::Cigar - Parse CIGAR strings and translate coordinates to/from reference/que
     my $cigar = Bio::Cigar->new("2M1D1M1I4M");
     say "Query length is ", $cigar->query_length;
     say "Reference length is ", $cigar->reference_length;
-    
+
     my ($qpos, $op) = $cigar->rpos_to_qpos(3);
     say "Alignment operation at reference position 3 is $op";
+
+    my $query = "GCAAATGC";
+    my $ref   = "AAAAGCAAATGC";
+    my $aln   = $cigar->align($query, $ref, 5);  # align query to pos 5 of ref
+    say foreach @$aln;
 
 =head1 DESCRIPTION
 
@@ -58,7 +63,7 @@ Lengths are integers, L<possible operations are below|/"CIGAR operations">.
 
 =cut
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 use Moo;
 use Types::Standard qw< ArrayRef Tuple Int Enum StrMatch >;
@@ -70,7 +75,7 @@ use namespace::clean;
 
 The CIGAR operations are given in the following table, taken from the SAM v1
 spec:
-    
+
     Op  Description
     ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾
     M   alignment match (can be a sequence match or mismatch)
@@ -186,6 +191,27 @@ Takes a query position and returns the operation at that position.  Simply
 a shortcut for calling L</qpos_to_rpos> in list context and discarding the
 first return value.
 
+=head2 reversed
+
+Returns a new Bio::Cigar object with a CIGAR string that's the reverse of this
+one, i.e. the last operation becomes the first, the second-to-last the second,
+etc. until the first operation becomes the last.
+
+=head2 align($query, $reference, $start_pos=1, $reversed=0)
+
+Takes a query sequence and a reference sequence and aligns them according to
+the CIGAR string, using gap characters (C<->) for indels and spaces for soft
+clipping.  This is pure string manipulation and as such the match and mismatch
+operators (C<=> and C<X>) are assumed to be correct for the given input
+sequences and not verified.  Returns an array ref of C<[query seq, ref seq]>.
+
+Optionally, the leftmost reference position (origin 1) can be passed, i.e. the
+query is aligned starting at that position.
+
+When C<$reversed> is given a true value, the reverse complement of the passed
+query sequence is used to generate the alignment.  B<Only the IUPAC nucleotide
+codes C<ATCGU> are currently supported for reverse complementation.>
+
 =cut
 
 # Consumption table based on
@@ -298,9 +324,88 @@ sub op_at_qpos {
     return $type;
 }
 
+sub reversed {
+    my $self = shift;
+    return Bio::Cigar->new(join "", map { join "", @$_ } reverse @{$self->ops});
+}
+
+sub align {
+    my ($self, $query, $ref, $ref_start, $reversed) = @_;
+    $ref_start //= 1;                       # default to first posiiton
+
+    ### Sanity checks
+    # Note: The match/mismatch operators (=/X) are currently not verified to
+    # be correct for the given input sequences.
+    #
+    # Note: The reference length will likely not match because it is often
+    # longer than the query and the CIGAR string doesn't account for that. The
+    # best matching thing would be N, but it seems to be mainly used for
+    # introns.
+
+    # Reference start position
+    croak "Reference start position must be positive, but $ref_start given"
+        unless $ref_start > 0;
+
+    # Query length
+    my $query_len = $self->query_length;
+    croak "Query was expected to have length $query_len, but has length ",
+          length($query), " instead"
+        unless $query_len == length($query);
+
+    ### Variables
+    my (@query_aln, @ref_aln);          # stores chunks of aligned sequences
+    my ($query_pos, $ref_pos) = (0, 0); # current position in sequences
+
+    ### Handle optional arguments.
+    # Handle reference start position.
+    $ref_pos += $ref_start - 1;         # convert 1-based start to 0-based pos
+    push @query_aln, ' ' x $ref_pos;    # start at correct position
+    push @ref_aln, substr $ref, 0, $ref_pos;
+
+    # Handle reversed query matches.
+    if ($reversed) {
+        $query = reverse $query =~ tr/ATGCU/TACGA/r;    # reverse complement
+    }
+
+    ### Iterate CIGAR ops and generate alignment chunks.
+    foreach my $op (@{$self->ops}) {
+        my ($op_len, $op_type) = @$op;
+        my ($consumes_query, $consumes_ref) = @{ $op_consumes{$op_type} };
+
+        # Get next chunk of respective sequence and update position. Insert
+        # gaps in the other sequence if necessary.
+        if ($consumes_query) {
+            push @query_aln, substr $query, $query_pos, $op_len;
+            $query_pos += $op_len;
+
+            unless ($consumes_ref) {
+                # Use spaces for soft clips, and dashes for indels etc.
+                my $gap_char = $op_type eq 'S' ? ' ' : '-';
+                push @ref_aln, $gap_char x $op_len;
+            }
+        }
+        if ($consumes_ref) {
+            push @ref_aln, substr $ref, $ref_pos, $op_len;
+            $ref_pos += $op_len;
+
+            unless ($consumes_query) {
+                push @query_aln, '-' x $op_len;
+            }
+        }
+    }
+
+    # Join chunks and return aligned sequences.
+    my $query_aln = join '', @query_aln;
+    my $ref_aln   = join '',   @ref_aln;
+
+    return [$query_aln, $ref_aln];
+}
+
 =head1 AUTHOR
 
 Thomas Sibley E<lt>trsibley@uw.eduE<gt>
+
+Felix Kühnl E<lt>felix@bioinf.uni-leipzig.deE<gt>
 
 =head1 COPYRIGHT
 

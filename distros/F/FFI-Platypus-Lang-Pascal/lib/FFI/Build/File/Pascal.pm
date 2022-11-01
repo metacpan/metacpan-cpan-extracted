@@ -11,7 +11,7 @@ use File::chdir;
 use FFI::CheckLib qw( find_lib_or_die );
 use File::Copy qw( copy );
 
-our $VERSION = '0.09';
+our $VERSION = '0.11';
 
 =head1 NAME
 
@@ -105,7 +105,7 @@ sub build_item
   my @cmd = ($self->fpc, $self->fpc_flags, $pas->basename);
   print "+@cmd\n";
   system @cmd;
-  exit 2 if $?;
+  die "error compiling or linking Pascal" if $?;
 
   my($dl) = find_lib_or_die(
     lib => '*',

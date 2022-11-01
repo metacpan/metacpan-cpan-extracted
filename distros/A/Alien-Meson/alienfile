@@ -14,6 +14,11 @@ plugin 'Probe::CommandLine' => (
   version => qr/([0-9\.]+)/,
 ) for qw( meson.py meson );
 
+my %github_info = (
+  github_user => 'mesonbuild',
+  github_repo => 'meson',
+);
+
 my $python_bin;
 sub can_source {
   for my $test_python_bin ( qw(python3 python) ) {
@@ -34,11 +39,12 @@ sub can_source {
 
 sub do_source {
   # Python source
-  plugin Download => (
-    filter  => qr/^meson-.*\.tar\.gz$/,
-    version => qr/([0-9\.]+)/,
+  plugin 'Download::GitHub' => (
+    %github_info,
+    asset       => 1,
+    asset_name  => qr/^meson-([0-9\.]+)\.tar\.gz$/,
+    version     => qr/([0-9\.]+)/,
   );
-  plugin 'Extract::CommandLine' => 'tar.gz';
   patch sub {
     my @tests = Path::Tiny::path('.')->children( qr/.*test.*/ );
     $_->remove_tree for @tests;
@@ -75,9 +81,12 @@ sub can_binary {
 }
 
 sub do_binary {
-  plugin Download => (
-    filter  => $binary_release_name_re,
-    version => qr/([0-9\.]+)/,
+  plugin 'Download::GitHub' => (
+    %github_info,
+    asset        => 1,
+    asset_name   => $binary_release_name_re,
+    asset_format => 'none',
+    version      => qr/([0-9\.]+)/,
   );
 
   if( $binary_release_format eq '.msi' ) {
@@ -148,9 +157,6 @@ share {
   requires 'Capture::Tiny';
   requires 'Alien::Build::CommandSequence';
   requires 'File::Copy::Recursive';
-
-  # same URL used for both source and binary releases
-  start_url 'https://github.com/mesonbuild/meson/releases';
 
   $ENV{ALIEN_MESON_SHARE_PREFER} ||= 'auto';
 

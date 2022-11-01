@@ -10,14 +10,43 @@ See L<SVG::Timeline>.
 
 package SVG::Timeline::Event;
 
-use 5.010;
+use 5.014;
 
 use Moose;
 use Moose::Util::TypeConstraints;
+use DateTime::Format::Strptime;
 
 coerce __PACKAGE__,
   from 'HashRef',
   via  { __PACKAGE__->new($_) };
+
+# Chosen format: yyyy-mm-dd
+subtype 'SVG::Timeline::DateStr',
+  as 'Str',
+  where   { m/ \d{4}-\d{2}-\d{2} /ax };
+
+subtype 'SVG::Timeline::YearMonthStr',
+  as 'Str',
+  where   { m/ \d{4}-\d{2} /ax };
+
+subtype 'SVG::Timeline::YearStr',
+  as 'Str',
+  where   { m/ \d{4} /as };
+
+subtype 'SVG::Timeline::Num',
+  as 'Num';
+
+coerce 'SVG::Timeline::DateStr',
+  from 'SVG::Timeline::YearStr',
+  via  { $_ . '-01-01' };
+
+coerce 'SVG::Timeline::DateStr',
+  from 'SVG::Timeline::YearMonthStr',
+  via  { $_ . '-01' };
+
+coerce 'SVG::Timeline::Num',
+  from 'SVG::Timeline::DateStr',
+  via  \&str2num;
 
 has index => (
   is => 'ro',
@@ -31,16 +60,27 @@ has text => (
   required => 1,
 );
 
+sub str2num {
+  my ($datestr) = @_;
+
+  my $date = DateTime::Format::Strptime->new( pattern => '%Y-%m-%d' )
+               ->parse_datetime($datestr);
+
+  return $date->year + ( $date->day_of_year / ($date->is_leap_year ? 366 : 365) );
+}
+
 has start => (
   is => 'ro',
-  isa => 'Int',
+  isa => 'SVG::Timeline::Num',
   required => 1,
+  coerce => 1,
 );
 
 has end => (
   is => 'ro',
-  isa => 'Int',
+  isa => 'SVG::Timeline::Num',
   required => 1,
+  coerce => 1,
 );
 
 has colour => (

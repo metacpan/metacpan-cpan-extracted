@@ -1,5 +1,9 @@
 Revision history for MIDI-Tab
 
+0.0402 2022-10-23 10:42:23
+    - Fixed copyright.
+    - Only import what is necessary from M::S.
+
 0.0401 2014-08-30
     - Enhanced dzil distribution
     - Fixed egregious spelling errors (exposed by Test::PodSpelling).

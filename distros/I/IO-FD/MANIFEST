@@ -13,21 +13,17 @@ const-xs.inc
 fallback/const-c.inc
 fallback/const-xs.inc
 FD.bs
-FD.c
-FD.o
 FD.xs
-IO-FD-0.1.1.tar
 lib/IO/FD.pm
 lib/IO/FD.pod
 lib/IO/FD/Constants.pm
 lib/IO/FD/DWIM.pm
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
 MANIFEST.SKIP
 ppport.h
 README
 README.md
-t/00-file-basic.t
 t/00-IO-FD.t
 t/01-file-basic.t
 t/01-pipe.t
@@ -38,9 +34,9 @@ t/02-sock-peer-name.t
 t/02-socketpair.t
 t/03-select.t
 t/04-poll.t
-t/05-kqueue.t
+t/05-kqueue.t.dis
 t/06-stat.t
 t/07-dwim.t
-t/IO-FD.t
+t/08-shutdown.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

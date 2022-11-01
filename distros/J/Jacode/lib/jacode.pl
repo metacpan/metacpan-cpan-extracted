@@ -1,4 +1,5 @@
 package jacode;
+'有朋自遠方来不亦楽乎'=~/^\xE6\x9C\x89/ or die "Perl script '@{[__FILE__]}' must be UTF-8 encoding.\n";
 ######################################################################
 #
 # jacode.pl - Perl program for Japanese character code conversion
@@ -139,7 +140,7 @@ sub BEGIN {
 
 $support_jcode_package_too = 1;
 
-$VERSION = '2.13.4.28';
+$VERSION = '2.13.4.29';
 $VERSION = $VERSION;
 $rcsid = sprintf(q$Id: jacode.pl,v %s branched from jcode.pl,v 2.13 2000/09/29 16:10:05 utashiro Exp $, $VERSION);
 
@@ -1460,11 +1461,41 @@ sub getcode {
 
     # 3 or more octet character should be 'utf8', 'sjis', 'euc', or 'binary'
     else {
-        local (%parsee) = ( 'binary', $s );
-        $parsee{'binary'} =~ s/^[\x00-\x7f]+//;
-        $parsee{'sjis'  } =
-        $parsee{'euc'   } =
-        $parsee{'utf8'  } = $parsee{'binary'};
+        local (%parsee) = ();
+        local ($_) = $s;
+
+        s/^[\x00-\x7f]+//;
+        $parsee{'binary'} = $_;
+        $parsee{'sjis'  } = $_;
+        $parsee{'euc'   } = $_;
+        $parsee{'utf8'  } = $_;
+        study($_);
+
+        # never 'sjis'
+        if (
+            /[\xfd-\xff]/
+        ) {
+            $parsee{'sjis'  } = "\xff" x length($_);
+        }
+
+        # never 'euc'
+        if (
+            /[\x80-\x8d\x90-\xa0\xff]/           ||
+            /[\x8e][^\xa1-\xdf]/                 ||
+            /[\x8f]([^\xa1-\xfe]|.[^\xa1-\xfe])/
+        ) {
+            $parsee{'euc'   } = "\xff" x length($_);
+        }
+
+        # never 'utf8'
+        if (
+            /[\xc0\xc1\xf5-\xff]/                                    ||
+            /[\xc2-\xdf][^\x80-\xbf]/                                ||
+            /[\xe0-\xef]([^\x80-\xbf]|.[^\x80-\xbf])/                ||
+            /[\xf0-\xf4]([^\x80-\xbf]|.[^\x80-\xbf]|..[^\x80-\xbf])/
+        ) {
+            $parsee{'utf8'  } = "\xff" x length($_);
+        }
 
         # parsing "$s" in each encoding little by little, to find out the winning encoding
         # in many cases, 16 characters are enough to detect encoding
@@ -1496,9 +1527,9 @@ sub getcode {
 
             # less character's type or
             || (
-                &count_ctype($a, substr($parsee{'binary'}, 0, length($parsee{'binary'})-length($parsee{$a})))
+                &_count_ctype($a, substr($_, 0, length($_)-length($parsee{$a})))
                 <=>
-                &count_ctype($b, substr($parsee{'binary'}, 0, length($parsee{'binary'})-length($parsee{$b})))
+                &_count_ctype($b, substr($_, 0, length($_)-length($parsee{$b})))
             )
 
             # high priority
@@ -1515,12 +1546,12 @@ sub getcode {
             if ( length($parsee{'sjis'}) == length($parsee{'euc'}) ) {
 
                 # 8E..8E..8E..
-                if ( $parsee{'binary'} =~ /(\x8e[\xb1-\xdd]){3,}/ ) {
+                if ( /(\x8e[\xb1-\xdd]){3}/ ) {
                     $encoding = 'euc';
                 }
 
                 # 8E..8E.. (only two 8E.. by not popular sjis codepoints)
-                elsif ( $parsee{'binary'} =~ /(\x8e[\xb1\xb2\xb3\xb4\xb6\xb9\xbb\xbd\xbe\xc1\xc2\xc3\xc4\xc6\xc7\xc8\xcd\xce\xd1\xd5\xd6\xd9\xda\xdb\xdc\xdd]){2}/ ) {
+                elsif ( /(\x8e[\xb1\xb2\xb3\xb4\xb6\xb9\xbb\xbd\xbe\xc1\xc2\xc3\xc4\xc6\xc7\xc8\xcd\xce\xd1\xd5\xd6\xd9\xda\xdb\xdc\xdd]){2}/ ) {
                     $encoding = 'euc';
                 }
             }
@@ -1536,7 +1567,7 @@ sub getcode {
 #---------------------------------------------------------------------
 # Count ctype of string
 #---------------------------------------------------------------------
-sub count_ctype {
+sub _count_ctype {
     local ( $encoding, $_ ) = @_;
     local ($count_ctype) = 0;
 
@@ -1823,50 +1854,35 @@ sub sjis2euc {
 
 #---------------------------------------------------------------------
 sub s2e {
-    local ( $c1, $c2, $code );
-    ( $c1, $c2 ) = unpack( 'CC', $code = shift );
+    local ($code) = @_;
+    local ( $c1, $c2 ) = unpack( 'CC', $code );
     if ( $code =~ /^$re_ascii/ ) {
-        $code;
+        return $code;
     }
     elsif ($s2e{$code}) {
-        $s2e{$code};
+        return $s2e{$code};
     }
     elsif ( $code gt "\xea\xa4" ) {
-        $undef_euc;
+        return $undef_euc;
     }
     else {
-        if ( 0xa1 <= $c1 && $c1 <= 0xdf ) {
+        if ( (0xa1 <= $c1) && ($c1 <= 0xdf) ) {
             $c2 = $c1;
             $c1 = 0x8e;
         }
-
         elsif ( $Ken_Lunde_CJKV_AppA_sjis2euc2nd_a{$c2} ) {
-            ( $c1, $c2 ) = (
-                $Ken_Lunde_CJKV_AppA_sjis2euc1st_a{$c1},
-                $Ken_Lunde_CJKV_AppA_sjis2euc2nd_a{$c2},
-            );
+            $c1 = $Ken_Lunde_CJKV_AppA_sjis2euc1st_a{$c1};
+            $c2 = $Ken_Lunde_CJKV_AppA_sjis2euc2nd_a{$c2};
         }
         elsif ( $Ken_Lunde_CJKV_AppA_sjis2euc2nd_b{$c2} ) {
-            ( $c1, $c2 ) = (
-                $Ken_Lunde_CJKV_AppA_sjis2euc1st_b{$c1},
-                $Ken_Lunde_CJKV_AppA_sjis2euc2nd_b{$c2},
-            );
+            $c1 = $Ken_Lunde_CJKV_AppA_sjis2euc1st_b{$c1};
+            $c2 = $Ken_Lunde_CJKV_AppA_sjis2euc2nd_b{$c2};
         }
-
-        elsif ( 0x9f <= $c2 ) {
-            $c1 = $c1 * 2 - ( $c1 >= 0xe0 ? 0xe0 : 0x60 );
-            $c2 += 2;
-        }
-        else {
-            $c1 = $c1 * 2 - ( $c1 >= 0xe0 ? 0xe1 : 0x61 );
-            $c2 += 0x60 + ( $c2 < 0x7f );
-        }
-
         if ($cache) {
-            $s2e{$code} = pack( 'CC', $c1, $c2 );
+            return $s2e{$code} = pack( 'CC', $c1, $c2 );
         }
         else {
-            pack( 'CC', $c1, $c2 );
+            return pack( 'CC', $c1, $c2 );
         }
     }
 }
@@ -1884,8 +1900,8 @@ sub euc2sjis {
 
 #---------------------------------------------------------------------
 sub e2s {
-    local ( $c1, $c2, $code );
-    ( $c1, $c2 ) = unpack( 'CC', $code = shift );
+    local ($code) = @_;
+    local ( $c1, $c2 ) = unpack( 'CC', $code );
     if ( $code =~ /^$re_ascii/ ) {
         return $code;
     }
@@ -1898,36 +1914,21 @@ sub e2s {
     elsif ( $c1 == 0x8f ) {    # SS3
         return $undef_sjis;
     }
-
     elsif ( $Ken_Lunde_CJKV_AppA_euc2sjis1st{$c1} ) {
         if ($c1 & 0x01) {
-            ( $c1, $c2 ) = (
-                $Ken_Lunde_CJKV_AppA_euc2sjis1st    {$c1},
-                $Ken_Lunde_CJKV_AppA_euc2sjis2nd_odd{$c2},
-            );
+            $c1 = $Ken_Lunde_CJKV_AppA_euc2sjis1st    {$c1};
+            $c2 = $Ken_Lunde_CJKV_AppA_euc2sjis2nd_odd{$c2};
         }
         else {
-            ( $c1, $c2 ) = (
-                $Ken_Lunde_CJKV_AppA_euc2sjis1st     {$c1},
-                $Ken_Lunde_CJKV_AppA_euc2sjis2nd_even{$c2},
-            );
+            $c1 = $Ken_Lunde_CJKV_AppA_euc2sjis1st     {$c1};
+            $c2 = $Ken_Lunde_CJKV_AppA_euc2sjis2nd_even{$c2};
         }
-    }
-
-    elsif ( $c1 % 2 ) {
-        $c1 = ( $c1 >> 1 ) + ( $c1 < 0xdf ? 0x31 : 0x71 );
-        $c2 -= 0x60 + ( $c2 < 0xe0 );
-    }
-    else {
-        $c1 = ( $c1 >> 1 ) + ( $c1 < 0xdf ? 0x30 : 0x70 );
-        $c2 -= 2;
-    }
-
-    if ($cache) {
-        $e2s{$code} = pack( 'CC', $c1, $c2 );
-    }
-    else {
-        pack( 'CC', $c1, $c2 );
+        if ($cache) {
+            return $e2s{$code} = pack( 'CC', $c1, $c2 );
+        }
+        else {
+            return pack( 'CC', $c1, $c2 );
+        }
     }
 }
 
@@ -11020,7 +11021,7 @@ works as 'pkf' command on command line (shows help)
 
   $ perl jacode.pl
 
-=head1 INSTALL OF "jacode.pl"
+=head1 INSTALL of "jacode.pl"
 
 =over 2
 
@@ -11232,31 +11233,31 @@ You don't have to call this when using "jocde.pl" by "do" or "require" interface
 
 =head1 Other SUBROUTINES and VARIABLES
 
-=head2 C<$converted_char_count = jacode::xxx2yyy(\$line [, $option])>
+=head2 C<jacode::xxx2yyy(\$line [, $option])>
 
 Converts encoding of "$line" from "xxx" to "yyy" then overwrites "$line".
 
 "xxx" and "yyy" can be "jis", "euc", "sjis" or "utf8".
 
-  $converted_char_count = jacode::euc2euc(\$line [, $option])
-  $converted_char_count = jacode::euc2jis(\$line [, $option])
-  $converted_char_count = jacode::euc2sjis(\$line [, $option])
-  $converted_char_count = jacode::euc2utf8(\$line [, $option])
+  jacode::euc2euc(\$line [, $option])
+  jacode::euc2jis(\$line [, $option])
+  jacode::euc2sjis(\$line [, $option])
+  jacode::euc2utf8(\$line [, $option])
   
-  $converted_char_count = jacode::jis2euc(\$line [, $option])
-  $converted_char_count = jacode::jis2jis(\$line [, $option])
-  $converted_char_count = jacode::jis2sjis(\$line [, $option])
-  $converted_char_count = jacode::jis2utf8(\$line [, $option])
+  jacode::jis2euc(\$line [, $option])
+  jacode::jis2jis(\$line [, $option])
+  jacode::jis2sjis(\$line [, $option])
+  jacode::jis2utf8(\$line [, $option])
   
-  $converted_char_count = jacode::sjis2euc(\$line [, $option])
-  $converted_char_count = jacode::sjis2jis(\$line [, $option])
-  $converted_char_count = jacode::sjis2sjis(\$line [, $option])
-  $converted_char_count = jacode::sjis2utf8(\$line [, $option])
+  jacode::sjis2euc(\$line [, $option])
+  jacode::sjis2jis(\$line [, $option])
+  jacode::sjis2sjis(\$line [, $option])
+  jacode::sjis2utf8(\$line [, $option])
   
-  $converted_char_count = jacode::utf82euc(\$line [, $option])
-  $converted_char_count = jacode::utf82jis(\$line [, $option])
-  $converted_char_count = jacode::utf82sjis(\$line [, $option])
-  $converted_char_count = jacode::utf82utf8(\$line [, $option])
+  jacode::utf82euc(\$line [, $option])
+  jacode::utf82jis(\$line [, $option])
+  jacode::utf82sjis(\$line [, $option])
+  jacode::utf82utf8(\$line [, $option])
 
 "$option" can be omit or "h" or "z".
 
@@ -11272,7 +11273,11 @@ Returns coount of converted characters.
 
 =head2 C<$line_by_OUTPUT_encoding = jacode::to($OUTPUT_encoding, $line, $INPUT_encoding [, $option])>
 
-This subroutine works as "jacode::convert(@_); return $_[0]".
+This subroutine works as following.
+
+  local ( $OUTPUT_encoding, $s, $INPUT_encoding, $option ) = @_;
+  &convert( *s, $OUTPUT_encoding, $INPUT_encoding, $option );
+  $s;
 
 This subroutine is easy to use in "s///e" operator or other place since return by value.
 
@@ -11582,37 +11587,6 @@ On Perl4 uses globs like this "*line", not references.
   &jcode'tr(*line, $from, $to [, $option])
   &jcode'trans($line, $from, $to [, $option])
 
-=head1 INSTALL OF "Jacode.pm"
-
-=over 2
-
-=item 1. Open URL of "Jacode.pm"
-
-L<https://metacpan.org/pod/Jacode>
-
-=item 2. Click This
-
-  ----------------------------------
-  Source (raw) <--- Click this (raw)
-  Browse (raw)
-  Changes
-  How to Contribute
-  Repository
-  Issues
-  Testers (NNN / NNN / NNN)
-  Kwalitee
-  Bus factor: NN
-  NN.NN% Coverage
-  License: perl_5
-  Perl: v5.5.30
-  ----------------------------------
-
-=item 3. Select All Text of Page
-
-=item 4. Save Text as "Jacode.pm"
-
-=back
-
 =head1 Old Interface on Perl5
 
 On Perl5, "&" is not required to call subroutines.
@@ -11772,6 +11746,170 @@ If you have an idea that could make this a more useful tool, please let everyone
   2120 Perl5.232                  :          :         :               :          
     :     :                       V          V         V               V          
   --------------------------------------------------------------------------------
+
+=head1 Removed jcode.pl's Bug
+
+jacode.pl removed following 2 bugs that jcode.pl had.
+
+=head2 Bad $n count in jcode'_jis2sjis()
+
+Implementation of "jcode.pl 2.13"
+
+  sub _jis2sjis {
+      local($esc, $s) = @_;
+      if ($esc =~ /^$re_jis0212/o) {
+          $s =~ s/../$undef_sjis/g;
+          $n = length; # *** here ***
+      }
+      elsif ($esc !~ /^$re_asc/o) {
+          $n += $s =~ tr/\041-\176/\241-\376/;
+          if ($esc =~ /^$re_jp/o) {
+              $s =~ s/($re_euc_c)/$e2s{$1}||&e2s($1)/geo;
+          }
+      }
+      $s;
+  }
+
+Implementation of "jacode.pl"
+
+  sub _jis2sjis {
+      local ( $esc, $s ) = @_;
+      if ( $esc =~ /^$re_esc_asc/o ) {
+      }
+      elsif ( $esc =~ /^$re_esc_kana/o ) {
+          $s =~ tr/\x21-\x7e/\xa1-\xfe/;
+          $n += length($s);
+      }
+      elsif ( $esc =~ /^$re_esc_jis0212/o ) {
+          $s =~ s/[\x00-\xff][\x00-\xff]/$n++, $undef_sjis/ge; # *** here ***
+      }
+      else {
+          $s =~ tr/\x21-\x7e/\xa1-\xfe/;
+          $s =~ s/($re_euc_c)/$n++, ($e2s{$1}||&e2s($1))/geo;
+      }
+      $s;
+  }
+
+=head2 jcode'tr() was ignoring options
+
+Implementation of "jcode.pl 2.13"
+
+  sub tr {
+      # $prev_from, $prev_to, %table are persistent variables
+      local(*s, $from, $to, $opt) = @_;
+      local(@from, @to);
+      local($jis, $n) = (0, 0);
+      $jis++, &jis2euc(*s) if $s =~ /$re_jp|$re_asc|$re_kana/o;
+      $jis++ if $to =~ /$re_jp|$re_asc|$re_kana/o;
+      if (!defined($prev_from) || $from ne $prev_from || $to ne $prev_to) { # *** here (1of2) ***
+          ($prev_from, $prev_to) = ($from, $to); # *** here (2of2) ***
+          undef %table;
+          &_maketable;
+      }
+      $s =~ s/([\200-\377][\000-\377]|[\000-\377])/
+          defined($table{$1}) && ++$n ? $table{$1} : $1
+      /ge;
+      &euc2jis(*s) if $jis;
+      $n;
+  }
+
+Implementation of "jacode.pl"
+
+  sub tr {
+      # $prev_from, $prev_to, %table are persistent variables
+      local ( *s, $from, $to, $option ) = @_;
+      local ( @from, @to );
+      local ( $jis, $n ) = ( 0, 0 );
+      $jis++, &jis2euc(*s) if $s =~ /$re_esc_jp|$re_esc_asc|$re_esc_kana/o;
+      $jis++ if $to =~ /$re_esc_jp|$re_esc_asc|$re_esc_kana/o;
+      if (   !defined($prev_from)
+          || $from   ne $prev_from
+          || $to     ne $prev_to
+          || $option ne $prev_opt ) # *** here (1of2) ***
+      {
+          ( $prev_from, $prev_to, $prev_opt ) = ( $from, $to, $option ); # *** here (2of2) ***
+          undef %table;
+          &_maketable;
+      }
+      $s =~ s/([\x80-\xff][\x00-\xff]|[\x00-\xff])/
+      defined($table{$1}) && ++$n ? $table{$1} : $1
+      /ge;
+      &euc2jis(*s) if $jis;
+      $n;
+  }
+
+=head1 Fixed Issue: defined(%hash) is deprecated at ./jcode.pl line nnn
+
+jcode.pl makes fatal errors on perl 5.22 or later.
+jacode.pl removed this issue.
+
+=head2 Stashes are now always defined
+
+L<https://metacpan.org/release/JESSE/perl-5.14.0/view/pod/perldelta.pod#Stashes-are-now-always-defined>
+
+=head2 defined(@array) and defined(%hash) are now fatal errors
+
+L<https://metacpan.org/release/RJBS/perl-5.22.0/view/pod/perldelta.pod#defined(@array)-and-defined(%hash)-are-now-fatal-errors>
+
+Implementation of "jcode.pl 2.13"
+
+  sub z2h_euc {
+      local(*s, $n) = @_;
+      &init_z2h_euc unless defined %z2h_euc; # *** here ***
+      $s =~ s/($re_euc_c|$re_euc_kana)/
+          $z2h_euc{$1} ? ($n++, $z2h_euc{$1}) : $1
+      /geo;
+      $n;
+  }
+  
+  sub z2h_sjis {
+      local(*s, $n) = @_;
+      &init_z2h_sjis unless defined %z2h_sjis; # *** here ***
+      $s =~ s/($re_sjis_c)/$z2h_sjis{$1} ? ($n++, $z2h_sjis{$1}) : $1/geo;
+      $n;
+  }
+
+Implementation of "jacode.pl"
+
+  sub z2h_euc {
+      local ( *s, $n ) = @_;
+      &init_z2h_euc unless %z2h_euc; # *** here ***
+      $s =~ s/($re_euc_c|$re_euc_kana)/
+      $z2h_euc{$1} ? ($n++, $z2h_euc{$1}) : $1
+      /geo;
+      $n;
+  }
+  
+  sub z2h_sjis {
+      local ( *s, $n ) = @_;
+      &init_z2h_sjis unless %z2h_sjis; # *** here ***
+      $s =~ s/($re_sjis_c)/$z2h_sjis{$1} ? ($n++, $z2h_sjis{$1}) : $1/geo;
+      $n;
+  }
+
+=head1 Let's ask your teachers
+
+=over 2
+
+=item * Why is this written in Perl4?
+
+=item * Why filename is "jacode.pl" not "jcode.pl" ?
+
+=item * Why package "jcode" supported also?
+
+=item * Why passing $line is by reference not by value to jacode::convert() ?
+
+=item * Why argument order of jacode::convert() is $OUTPUT_encoding, then $INPUT_encoding?
+
+=item * Why jacode::getcode supports halfwidth KATAKANA?
+
+=item * Why conversion between UTF-8 and SJIS needs table ?
+
+=item * Why is its table embedded in "jacode.pl"?
+
+=item * Why 'sjis' means CP932 not Shift_JIS?
+
+=back
 
 =head1 AUTHOR
 

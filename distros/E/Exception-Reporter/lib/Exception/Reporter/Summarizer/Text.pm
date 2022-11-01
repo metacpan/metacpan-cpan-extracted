@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-package Exception::Reporter::Summarizer::Text;
+package Exception::Reporter::Summarizer::Text 0.015;
 # ABSTRACT: a summarizer for plain text strings
-$Exception::Reporter::Summarizer::Text::VERSION = '0.014';
+
 use parent 'Exception::Reporter::Summarizer';
 
 #pod =head1 OVERVIEW
@@ -69,7 +69,7 @@ Exception::Reporter::Summarizer::Text - a summarizer for plain text strings
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 OVERVIEW
 
@@ -79,9 +79,21 @@ fails, they will be used verbatim, possibly with strange results.
 
 The summary's C<ident> will be the first non-blank line of the string.
 
+=head1 PERL VERSION
+
+This module should work on any version of perl still receiving updates from
+the Perl 5 Porters.  This means it should work on any version of perl released
+in the last two to three years.  (That is, if the most recently released
+version is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

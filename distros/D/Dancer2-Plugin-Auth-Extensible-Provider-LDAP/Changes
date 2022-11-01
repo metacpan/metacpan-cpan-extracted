@@ -1,5 +1,12 @@
 Revision history for Dancer2-Plugin-Auth-Extensible-Provider-LDAP
 
+0.706 Thu 27 Oct 12:04:46 CEST 2022
+
+    [BUG FIXES]
+
+    * Ensure that only one ldap object is created (Frank Förster GH#8,
+      DanK96 GH#11, Peter Mottram GH#12)
+
 0.705 Sat  9 May 16:02:07 CEST 2020
 
     * Bump dependency on D2PAE to version which handles Dancer2's switch

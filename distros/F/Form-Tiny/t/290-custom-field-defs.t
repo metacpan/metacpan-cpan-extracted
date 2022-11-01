@@ -4,6 +4,7 @@ use warnings;
 use Test::More;
 
 {
+
 	package FieldDefinitionSubtype;
 
 	use Moo;
@@ -16,14 +17,17 @@ use Test::More;
 }
 
 {
+
 	package TestForm;
 
 	use Form::Tiny;
 
-	form_field (FieldDefinitionSubtype->new(
-		name => 'static',
-		something_else => 'here1',
-	));
+	form_field(
+		FieldDefinitionSubtype->new(
+			name => 'static',
+			something_else => 'here1',
+		)
+	);
 
 	form_field sub {
 		FieldDefinitionSubtype->new(
@@ -47,7 +51,6 @@ subtest 'testing fields' => sub {
 	is $defs[1]->name, 'dynamic', 'second field definition name ok';
 	is $defs[1]->something_else, 'here2', 'second field definition custom attribute ok';
 };
-
 
 done_testing;
 

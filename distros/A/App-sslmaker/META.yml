@@ -21,8 +21,8 @@ no_index:
     - examples
     - t
 requires:
-  Applify: '0.12'
   File::umask: '0.01'
+  Getopt::App: '0.10'
   IO::Socket::IP: '0.38'
   Path::Tiny: '0.05'
   perl: '5.016'
@@ -34,6 +34,6 @@ resources:
   homepage: https://github.com/jhthorsen/app-sslmaker
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/jhthorsen/app-sslmaker.git
-version: '0.17'
+version: '0.18'
 x_contributors: []
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

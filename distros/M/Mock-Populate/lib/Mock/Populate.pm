@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Mock data creation
 
-our $VERSION = '0.1701';
+our $VERSION = '0.1702';
 
 use strict;
 use warnings;
@@ -13,15 +13,15 @@ use constant PREC  => 2;
 use constant DOF   => 2;
 use constant SIZE  => 8;
 
-use Data::SimplePassword;
-use Date::Range;
+use Data::SimplePassword ();
+use Date::Range ();
 use Date::Simple qw(date today);
-use Image::Dot;
-use Mock::Person;
-use Statistics::Distributions;
-use Text::Password::Pronounceable;
-use Text::Unidecode;
-use Time::Local;
+use Image::Dot qw(dot_PNG_RGB);
+use Mock::Person ();
+use Statistics::Distributions ();
+use Text::Password::Pronounceable ();
+use Text::Unidecode qw(unidecode);
+use Time::Local qw(timegm);
 
 
 sub date_ranger {
@@ -383,7 +383,7 @@ Mock::Populate - Mock data creation
 
 =head1 VERSION
 
-version 0.1701
+version 0.1702
 
 =head1 SYNOPSIS
 
@@ -614,7 +614,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Gene Boggs.
+This software is copyright (c) 2022 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

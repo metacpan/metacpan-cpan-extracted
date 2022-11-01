@@ -1,11 +1,12 @@
 package Archive::SevenZip::Entry;
 use strict;
 
+use Archive::Zip::Member;
 use Time::Piece; # for strptime
 use File::Basename ();
 use Path::Class ();
 
-our $VERSION= '0.13';
+our $VERSION= '0.15';
 
 sub new {
     my( $class, %options) = @_;
@@ -43,8 +44,12 @@ sub components {
     $cp->components()
 }
 
+sub lastModTime {
+    Time::Piece->strptime($_[0]->{Modified}, '%Y-%m-%d %H:%M:%S')->epoch;
+}
+
 sub lastModFileDateTime {
-    0
+    Archive::Zip::Member::_unixToDosTime($_[0]->lastModTime())
 }
 
 sub crc32 {

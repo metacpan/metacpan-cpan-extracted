@@ -27,7 +27,7 @@ plan tests => scalar @modules;
 
 my %trustme = (
              'App::perlimports::Role::Logger' => [
-                                                   undef
+                                                   qr/.*/
                                                  ]
            );
 

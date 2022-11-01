@@ -23,6 +23,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Capture::Tiny" => 0,
     "Class::Inspector" => "1.36",
+    "Cpanel::JSON::XS" => 0,
     "Data::Dumper" => 0,
     "Data::UUID" => 0,
     "File::Basename" => 0,
@@ -74,7 +75,7 @@ my %WriteMakefileArgs = (
     "Test::Warnings" => 0,
     "lib" => 0
   },
-  "VERSION" => "0.000048",
+  "VERSION" => "0.000049",
   "test" => {
     "TESTS" => "t/*.t t/ExportInspector/*.t t/cpan-modules/*.t"
   }
@@ -84,6 +85,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Capture::Tiny" => 0,
   "Class::Inspector" => "1.36",
+  "Cpanel::JSON::XS" => 0,
   "DDP" => 0,
   "Data::Dumper" => 0,
   "Data::UUID" => 0,

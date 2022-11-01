@@ -1,19 +1,12 @@
 package Test::Spy::Method;
-$Test::Spy::Method::VERSION = '0.002';
+$Test::Spy::Method::VERSION = '0.004';
 use v5.10;
 use strict;
 use warnings;
 
 use Moo;
-use Mooish::AttributeBuilder;
+use Mooish::AttributeBuilder -standard;
 use Carp qw(croak);
-
-has param 'method_name';
-
-has field 'call_history' => (
-	clearer => -hidden,
-	lazy => sub { [] },
-);
 
 has field '_throws' => (
 	writer => 1,
@@ -35,7 +28,7 @@ has field '_returns_list' => (
 	clearer => 1,
 );
 
-with qw(Test::Spy::Interface);
+extends 'Test::Spy::Observer';
 
 sub _forget
 {
@@ -94,7 +87,7 @@ sub _called
 {
 	my ($self, $inner_self, @params) = @_;
 
-	push @{$self->call_history}, [@params];
+	$self->SUPER::_called($inner_self, @params);
 
 	die $self->_throws
 		if defined $self->_throws;

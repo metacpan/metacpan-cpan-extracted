@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2010-2016 -- leonerd@leonerd.org.uk
 
-package Tangence::Constants 0.29;
+package Tangence::Constants 0.30;
 
 use v5.26;
 use warnings;

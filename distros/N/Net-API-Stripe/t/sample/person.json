@@ -1,0 +1,57 @@
+{
+   "account" : "acct_1032D82eZvKYlo2C",
+   "created" : "1662261085",
+   "dob" : {
+      "day" : null,
+      "month" : null,
+      "year" : null
+   },
+   "first_name" : null,
+   "future_requirements" : {
+      "alternatives" : [],
+      "currently_due" : [],
+      "errors" : [],
+      "eventually_due" : [],
+      "past_due" : [],
+      "pending_verification" : []
+   },
+   "id" : "person_1Le9F32eZvKYlo2C4c1PgwR3",
+   "id_number_provided" : 0,
+   "last_name" : null,
+   "metadata" : {},
+   "object" : "person",
+   "relationship" : {
+      "director" : 0,
+      "executive" : 0,
+      "owner" : 0,
+      "percent_ownership" : null,
+      "representative" : 0,
+      "title" : null
+   },
+   "requirements" : {
+      "alternatives" : [],
+      "currently_due" : [],
+      "errors" : [],
+      "eventually_due" : [],
+      "past_due" : [],
+      "pending_verification" : []
+   },
+   "ssn_last_4_provided" : 0,
+   "verification" : {
+      "additional_document" : {
+         "back" : null,
+         "details" : null,
+         "details_code" : null,
+         "front" : null
+      },
+      "details" : null,
+      "details_code" : null,
+      "document" : {
+         "back" : null,
+         "details" : null,
+         "details_code" : null,
+         "front" : null
+      },
+      "status" : "unverified"
+   }
+}

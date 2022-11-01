@@ -1,3 +1,6 @@
+0.008		2022-10-23	T. R. Wyant
+    Specify Test2::API::Context (and friends) version number.
+
 0.007		2021-09-24	T. R. Wyant
     Correct generation of 'provides' metadata.  Thanks to Favio Poletti
     for blogging

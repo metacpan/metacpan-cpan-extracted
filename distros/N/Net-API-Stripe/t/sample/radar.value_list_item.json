@@ -1,0 +1,9 @@
+{
+   "created" : "1662261085",
+   "created_by" : "jenny@example.com",
+   "id" : "rsli_1Le9F32eZvKYlo2CaoAtIGpn",
+   "livemode" : 0,
+   "object" : "radar.value_list_item",
+   "value" : "1.2.3.4",
+   "value_list" : "rsl_1Le9F32eZvKYlo2CTTnYFGF3"
+}

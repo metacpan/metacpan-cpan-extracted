@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Infix 0.25;
+package XS::Parse::Infix 0.27;
 
 use v5.14;
 use warnings;
@@ -68,6 +68,15 @@ requirement; e.g.
 
    boot_xs_parse_infix(0.14);
 
+=head2 parse_infix
+
+   bool parse_infix(enum XSParseInfixSelection select, struct XSParseInfixInfo **infop);
+
+This function attempts to parse syntax for an infix operator from the current
+parser position. If it is successful, it fills in the variable pointed to by
+I<infop> with a pointer to the actual information structure and returns
+C<true>. If no suitable operator is found, returns C<false>.
+
 =head2 xs_parse_infix_new_op
 
    OP *xs_parse_infix_new_op(const struct XSParseInfixInfo *info, U32 flags,
@@ -79,7 +88,7 @@ perl's C<newBINOP> function.
 
 The C<info> structure pointer would be obtained from the C<infix> field of the
 result of invoking the various C<XPK_INFIX_*> token types from
-C<XS::Parse::Keyword>.
+C<XS::Parse::Keyword>, or by calling L</parse_infix> directly.
 
 =head2 register_xs_parse_infix
 
@@ -88,8 +97,8 @@ C<XS::Parse::Keyword>.
 
 This function installs a set of parsing hooks to be associated with the given
 operator name. This new operator will then be available via
-L<XS::Parse::Keyword> by the various C<XPK_INFIX_*> token types, or to core
-perl's C<PL_infix_plugin> if availble.
+L<XS::Parse::Keyword> by the various C<XPK_INFIX_*> token types,
+L</parse_infix>, or to core perl's C<PL_infix_plugin> if available.
 
 These tokens will all yield an info structure, with the following fields:
 
@@ -123,8 +132,11 @@ used at various stages of parsing.
       const char *permit_hintkey;
       bool (*permit)(pTHX_ void *hookdata);
 
-      OP *(*new_op)(pTHX_ U32 flags, OP *lhs, OP *rhs, void *hookdata);
+      OP *(*new_op)(pTHX_ U32 flags, OP *lhs, OP *rhs, ANY *parsedata, void *hookdata);
       OP *(*ppaddr)(pTHX);
+
+      /* optional */
+      void (*parse)(pTHX_ U32 flags, ANY *parsedata, void *hookdata);
    };
 
 =head2 Flags
@@ -132,31 +144,29 @@ used at various stages of parsing.
 The C<flags> field is currently ignored. It is defined simply to reserve the
 space in case used in a later version. It should be set to zero.
 
-The C<rhs_flags> field gives details on how to parse and handle the right-hand
-side of the operator syntax. It should be set to one of the following constants:
+The C<lhs_flags> and C<rhs_flags> fields give details on how to handle the
+left- and right-hand side operands, respectively.
+
+It should be set to one of the following constants, or left as zero:
 
 =over 4
 
-=item XPI_OPERAND_ARITH
-
-The operand is an arithmetic expression.
-
-=item XPI_OPERAND_TERM
-
-The operand is a term expression.
-
 =item XPI_OPERAND_TERM_LIST
 
-The operand is a term expression. It will be foced into list context,
-preserving the C<OP_PUSHMARK> at the beginning. This means that the ppfunc for
-this infix operator will have to C<POPMARK> to find that.
+The operand will be foced into list context, preserving the C<OP_PUSHMARK> at
+the beginning. This means that the ppfunc for this infix operator will have to
+C<POPMARK> to find that.
 
 =item XPI_OPERAND_LIST
 
-The operand is a list expression. It will be forced into list context, the
-same as above.
+The same as above.
 
 =back
+
+Older versions used to provide constants named C<XPI_OPERAND_ARITH> and
+C<XPI_OPERAND_TERM> but they related to an older version of the core perl
+branch. These names are now aliases for zero, and can be removed from new
+code.
 
 In addition the following extra bitflags are defined:
 
@@ -183,12 +193,6 @@ the values passed.
 
 =back
 
-The C<lhs_flags> field gives details on how to handle the left-hand side of
-the operator syntax. It takes similar values to C<rhs_flags>, except that it
-does not accept the C<XPI_OPERAND_LIST> value. Parsing always happens on just
-a term expression, though it may be placed into list context (which therefore
-still permits things like parenthesized lists, or array variables).
-
 =head2 The Selection Stage
 
 The C<cls> field gives a "classification" of the operator, suggesting what
@@ -214,6 +218,18 @@ Both the string and the function are optional. Either or both may be present.
 If neither is present then the keyword is always permitted - which is likely
 not what you wanted to do.
 
+=head2 The C<parse> Stage
+
+If the optional C<parse> hook function is present, it is called immediately
+after the parser has recognised the presence of the named operator itself but
+before it attempts to consume the right-hand side term. This hook function can
+attempt further parsing, in order to implement more complex syntax such as
+hyper-operators.
+
+When invoked, it is passed a pointer to an C<ANY>-typed storage variable. It
+is free to use whichever field of this variable it desires to store a result,
+which will then later be made available to the C<new_op> function.
+
 =head2 The Op Generation Stage
 
 If the infix operator is going to be used, then one of the C<new_op> or the
@@ -221,8 +237,14 @@ C<ppaddr> fields explain how to create a new optree fragment.
 
 If C<new_op> is defined then it will be used, and is expected to return an
 optree fragment that consumes the LHS and RHS arguments to implement the
-semantics of the operator. If this is not present, then the C<ppaddr> will be
-used instead to construct a new BINOP of the C<OP_CUSTOM> type.
+semantics of the operator. If the optional C<parse> stage had been present
+earlier, the C<ANY> pointer passed here will point to the same storage that
+C<parse> had previously had access to, so it can retrieve the results.
+
+If C<new_op> is not present, then the C<ppaddr> will be used instead to
+construct a new BINOP of the C<OP_CUSTOM> type. If an earlier C<parse> stage
+had stored additional results into the C<ANY> variable these will be lost
+here.
 
 =head2 The Wrapper Function
 
@@ -321,6 +343,11 @@ infix operator to have multiple spellings of its name; for example to allow
 both a real Unicode and a fallback ASCII transliteration of the same operator.
 The first registration will create the wrapper function; the subsequent one
 will skip it because it would otherwise be identical.
+
+Note that when generating an optree for a wrapper function call, the C<new_op>
+hook function will be invoked with a C<NULL> pointer for the C<ANY>-typed
+parse data storage, as there won't be an opporunity for the C<parse> hook to
+run in this case.
 
 =cut
 
@@ -422,6 +449,12 @@ sub B::Deparse::_deparse_infix_named
 Have the entersub checker for list/list operators unwrap arrayref or
 anon-array argument forms (C<WRAPPERFUNC( \@lhs, \@rhs )> or
 C<WRAPPERFUNC( [LHS], [RHS] )>).
+
+=item *
+
+Further thoughts about how infix operators with C<parse> hooks will work with
+automatic deparse, and also how to integrate them with L<XS::Parse::Keyword>'s
+grammar piece.
 
 =back
 

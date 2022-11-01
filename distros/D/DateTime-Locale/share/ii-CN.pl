@@ -127,7 +127,7 @@
     "\N{U+a0c5}\N{U+a2ca}\N{U+a0bf}",
     "\N{U+a0c5}\N{U+a2ca}\N{U+a282}",
   ],
-  first_day_of_week => 7,
+  first_day_of_week => 1,
   glibc_date_1_format => "%a %b %e %H:%M:%S %Z %Y",
   glibc_date_format => "%m/%d/%y",
   glibc_datetime_format => "%a %b %e %H:%M:%S %Y",
@@ -267,5 +267,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 41,
+  version => 42,
 }

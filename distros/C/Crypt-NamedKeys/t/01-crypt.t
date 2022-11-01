@@ -17,17 +17,17 @@ my $test_data = {
 
 subtest "encrypt data" => sub {
     my $crypt = Crypt::NamedKeys->new(keyname => 'test');
-    my $res = $crypt->encrypt_data(data => $test_data);
+    my $res   = $crypt->encrypt_data(data => $test_data);
     is ref $res, 'HASH', "encrypted_json returned hash reference";
     eq_or_diff [sort keys %$res], [sort qw(data mac)], "  ... with data and mac values";
 
     my $decrypt = Crypt::NamedKeys->new(keyname => 'test');
-    my $data = $decrypt->decrypt_data(%$res);
+    my $data    = $decrypt->decrypt_data(%$res);
     eq_or_diff $data, $test_data, "successfully restored data with correct password";
     $data = Crypt::NamedKeys->new(keyname => 'fail_test')->decrypt_data(%$res);
     ok !$data, "couldn't decrypt with the wrong password";
 
-    my $subst = substr($res->{mac}, 2, 1) eq 'a' ? 'b' : 'a';
+    my $subst        = substr($res->{mac}, 2, 1) eq 'a' ? 'b' : 'a';
     my $modified_mac = $res->{mac};
     substr $modified_mac, 2, 1, $subst;
     $data = $decrypt->decrypt_data(
@@ -61,14 +61,14 @@ subtest 'sanity check our encryption doesnt change over time' => sub {
         'mac'  => 'tlfRE0erpuaSoYEyqMTF3fMqz/6FxGYeyRq0YX4RRa8'
     };
     my $decrypt = Crypt::NamedKeys->new(keyname => 'test');
-    my $data = $decrypt->decrypt_data(%$sample);
+    my $data    = $decrypt->decrypt_data(%$sample);
 
     eq_or_diff $data, $test_data, 'Decrypted sample data correctly';
 
 };
 
 subtest "encrypt payload" => sub {
-    my $crypt = Crypt::NamedKeys->new(keyname => 'test');
+    my $crypt  = Crypt::NamedKeys->new(keyname => 'test');
     my $cookie = $crypt->encrypt_payload(data => $test_data);
     ok $cookie, "got something in encrypted cookie";
     like $cookie, qr/^\w+\*[A-Za-z0-9+\/]+\.[A-Za-z0-9+\/]+$/, "looks like what we expect";
@@ -82,7 +82,7 @@ subtest "encrypt payload" => sub {
     substr $cookie, 12, 1, $subst;
     $data = $crypt->decrypt_payload(value => $cookie);
     ok !$data, "couldn't decrypt the mangled data";
-    my $teststring = 'Hello World';
+    my $teststring   = 'Hello World';
     my $cypherstring = $crypt->encrypt_payload(data => $teststring);
     ok $cypherstring, 'Have a valid cypherstring';
     is $crypt->decrypt_payload(value => $cypherstring), $teststring, 'decrypted string';

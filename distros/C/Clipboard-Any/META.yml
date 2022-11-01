@@ -19,7 +19,7 @@ name: Clipboard-Any
 provides:
   Clipboard::Any:
     file: lib/Clipboard/Any.pm
-    version: '0.003'
+    version: '0.004'
 requires:
   Exporter::Rinci: '0'
   File::Which: '0'
@@ -32,7 +32,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Clipboard-Any
   homepage: https://metacpan.org/release/Clipboard-Any
   repository: git://github.com/perlancar/perl-Clipboard-Any.git
-version: '0.003'
+version: '0.004'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

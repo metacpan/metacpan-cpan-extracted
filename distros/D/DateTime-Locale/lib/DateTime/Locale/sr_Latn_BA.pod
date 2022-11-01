@@ -42,7 +42,7 @@ Serbian Bosnia & Herzegovina Latin locale.
 
   pon
   uto
-  sre
+  sri
   čet
   pet
   sub
@@ -381,17 +381,17 @@ Serbian Bosnia & Herzegovina Latin locale.
    1995-12-22T09:05:02 = pet 22.
   -0010-09-15T04:44:23 = sub 15.
 
-=head3 Ehm (E h:mm a)
+=head3 Ehm (E h:mm a)
 
-   2008-02-05T18:30:30 = uto 6:30 po podne
-   1995-12-22T09:05:02 = pet 9:05 prije podne
-  -0010-09-15T04:44:23 = sub 4:44 prije podne
+   2008-02-05T18:30:30 = uto 6:30 po podne
+   1995-12-22T09:05:02 = pet 9:05 prije podne
+  -0010-09-15T04:44:23 = sub 4:44 prije podne
 
-=head3 Ehms (E h:mm:ss a)
+=head3 Ehms (E h:mm:ss a)
 
-   2008-02-05T18:30:30 = uto 6:30:30 po podne
-   1995-12-22T09:05:02 = pet 9:05:02 prije podne
-  -0010-09-15T04:44:23 = sub 4:44:23 prije podne
+   2008-02-05T18:30:30 = uto 6:30:30 po podne
+   1995-12-22T09:05:02 = pet 9:05:02 prije podne
+  -0010-09-15T04:44:23 = sub 4:44:23 prije podne
 
 =head3 Gy (y. G)
 
@@ -459,11 +459,11 @@ Serbian Bosnia & Herzegovina Latin locale.
    1995-12-22T09:05:02 = 12
   -0010-09-15T04:44:23 = 9
 
-=head3 MEd (E, d.M.)
+=head3 MEd (E, d. M.)
 
-   2008-02-05T18:30:30 = uto, 5.2.
-   1995-12-22T09:05:02 = pet, 22.12.
-  -0010-09-15T04:44:23 = sub, 15.9.
+   2008-02-05T18:30:30 = uto, 5. 2.
+   1995-12-22T09:05:02 = pet, 22. 12.
+  -0010-09-15T04:44:23 = sub, 15. 9.
 
 =head3 MMM (LLL)
 
@@ -525,11 +525,11 @@ Serbian Bosnia & Herzegovina Latin locale.
    1995-12-22T09:05:02 = 22.12.
   -0010-09-15T04:44:23 = 15.09.
 
-=head3 Md (d.M.)
+=head3 Md (d. M.)
 
-   2008-02-05T18:30:30 = 5.2.
-   1995-12-22T09:05:02 = 22.12.
-  -0010-09-15T04:44:23 = 15.9.
+   2008-02-05T18:30:30 = 5. 2.
+   1995-12-22T09:05:02 = 22. 12.
+  -0010-09-15T04:44:23 = 15. 9.
 
 =head3 d (d)
 
@@ -537,35 +537,35 @@ Serbian Bosnia & Herzegovina Latin locale.
    1995-12-22T09:05:02 = 22
   -0010-09-15T04:44:23 = 15
 
-=head3 h (h a)
+=head3 h (h a)
 
-   2008-02-05T18:30:30 = 6 po podne
-   1995-12-22T09:05:02 = 9 prije podne
-  -0010-09-15T04:44:23 = 4 prije podne
+   2008-02-05T18:30:30 = 6 po podne
+   1995-12-22T09:05:02 = 9 prije podne
+  -0010-09-15T04:44:23 = 4 prije podne
 
-=head3 hm (h:mm a)
+=head3 hm (h:mm a)
 
-   2008-02-05T18:30:30 = 6:30 po podne
-   1995-12-22T09:05:02 = 9:05 prije podne
-  -0010-09-15T04:44:23 = 4:44 prije podne
+   2008-02-05T18:30:30 = 6:30 po podne
+   1995-12-22T09:05:02 = 9:05 prije podne
+  -0010-09-15T04:44:23 = 4:44 prije podne
 
-=head3 hms (h:mm:ss a)
+=head3 hms (h:mm:ss a)
 
-   2008-02-05T18:30:30 = 6:30:30 po podne
-   1995-12-22T09:05:02 = 9:05:02 prije podne
-  -0010-09-15T04:44:23 = 4:44:23 prije podne
+   2008-02-05T18:30:30 = 6:30:30 po podne
+   1995-12-22T09:05:02 = 9:05:02 prije podne
+  -0010-09-15T04:44:23 = 4:44:23 prije podne
 
-=head3 hmsv (h:mm:ss a v)
+=head3 hmsv (h:mm:ss a v)
 
-   2008-02-05T18:30:30 = 6:30:30 po podne UTC
-   1995-12-22T09:05:02 = 9:05:02 prije podne UTC
-  -0010-09-15T04:44:23 = 4:44:23 prije podne UTC
+   2008-02-05T18:30:30 = 6:30:30 po podne UTC
+   1995-12-22T09:05:02 = 9:05:02 prije podne UTC
+  -0010-09-15T04:44:23 = 4:44:23 prije podne UTC
 
-=head3 hmv (h:mm a v)
+=head3 hmv (h:mm a v)
 
-   2008-02-05T18:30:30 = 6:30 po podne UTC
-   1995-12-22T09:05:02 = 9:05 prije podne UTC
-  -0010-09-15T04:44:23 = 4:44 prije podne UTC
+   2008-02-05T18:30:30 = 6:30 po podne UTC
+   1995-12-22T09:05:02 = 9:05 prije podne UTC
+  -0010-09-15T04:44:23 = 4:44 prije podne UTC
 
 =head3 ms (mm:ss)
 
@@ -579,17 +579,17 @@ Serbian Bosnia & Herzegovina Latin locale.
    1995-12-22T09:05:02 = 1995.
   -0010-09-15T04:44:23 = -10.
 
-=head3 yM (M.y.)
+=head3 yM (M. y.)
 
-   2008-02-05T18:30:30 = 2.2008.
-   1995-12-22T09:05:02 = 12.1995.
-  -0010-09-15T04:44:23 = 9.-10.
+   2008-02-05T18:30:30 = 2. 2008.
+   1995-12-22T09:05:02 = 12. 1995.
+  -0010-09-15T04:44:23 = 9. -10.
 
-=head3 yMEd (E, d.M.y.)
+=head3 yMEd (E, d. M. y.)
 
-   2008-02-05T18:30:30 = uto, 5.2.2008.
-   1995-12-22T09:05:02 = pet, 22.12.1995.
-  -0010-09-15T04:44:23 = sub, 15.9.-10.
+   2008-02-05T18:30:30 = uto, 5. 2. 2008.
+   1995-12-22T09:05:02 = pet, 22. 12. 1995.
+  -0010-09-15T04:44:23 = sub, 15. 9. -10.
 
 =head3 yMM (MM.y.)
 
@@ -627,11 +627,11 @@ Serbian Bosnia & Herzegovina Latin locale.
    1995-12-22T09:05:02 = 22.12.1995.
   -0010-09-15T04:44:23 = 15.09.-10.
 
-=head3 yMd (d.M.y.)
+=head3 yMd (d. M. y.)
 
-   2008-02-05T18:30:30 = 5.2.2008.
-   1995-12-22T09:05:02 = 22.12.1995.
-  -0010-09-15T04:44:23 = 15.9.-10.
+   2008-02-05T18:30:30 = 5. 2. 2008.
+   1995-12-22T09:05:02 = 22. 12. 1995.
+  -0010-09-15T04:44:23 = 15. 9. -10.
 
 =head3 yQQQ (QQQ y.)
 

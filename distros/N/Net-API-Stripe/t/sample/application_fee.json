@@ -1,0 +1,54 @@
+{
+   "account" : "acct_164wxjKbnvuxQXGu",
+   "amount" : "105",
+   "amount_refunded" : "105",
+   "application" : "ca_32D88BD1qLklliziD7gYQvctJIhWBSQ7",
+   "balance_transaction" : "txn_1032HU2eZvKYlo2CEPtcnUvl",
+   "charge" : "ch_1B73DOKbnvuxQXGurbwPqzsu",
+   "created" : "1506609734",
+   "currency" : "gbp",
+   "id" : "fee_1B73DOKbnvuxQXGuhY8Aw0TN",
+   "livemode" : 0,
+   "object" : "application_fee",
+   "originating_transaction" : null,
+   "refunded" : 1,
+   "refunds" : {
+      "data" : [
+         {
+            "amount" : "0",
+            "balance_transaction" : null,
+            "created" : "1625738880",
+            "currency" : "usd",
+            "fee" : "fee_1B73DOKbnvuxQXGuhY8Aw0TN",
+            "id" : "fr_1JAu9EKbnvuxQXGuRdZYkxVW",
+            "metadata" : {
+               "order_id" : "6735"
+            },
+            "object" : "fee_refund"
+         },
+         {
+            "amount" : "0",
+            "balance_transaction" : null,
+            "created" : "1602005482",
+            "currency" : "usd",
+            "fee" : "fee_1B73DOKbnvuxQXGuhY8Aw0TN",
+            "id" : "fr_1HZK0UKbnvuxQXGuS428gH0W",
+            "metadata" : {},
+            "object" : "fee_refund"
+         },
+         {
+            "amount" : "138",
+            "balance_transaction" : "txn_1CaqNg2eZvKYlo2C75cA3Euk",
+            "created" : "1528486576",
+            "currency" : "usd",
+            "fee" : "fee_1B73DOKbnvuxQXGuhY8Aw0TN",
+            "id" : "fr_D0s7fGBKB40Twy",
+            "metadata" : {},
+            "object" : "fee_refund"
+         }
+      ],
+      "has_more" : 0,
+      "object" : "list",
+      "url" : "/v1/application_fees/fee_1B73DOKbnvuxQXGuhY8Aw0TN/refunds"
+   }
+}

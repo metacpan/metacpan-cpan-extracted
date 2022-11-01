@@ -5,6 +5,7 @@ BEGIN
     use warnings;
     use Test::More;
     use lib './lib';
+    use vars qw( $IS_SUPPORTED $DEBUG );
     use_ok( 'Apache2::SSI::Notes' ) || BAIL_OUT( "Unable to load Apache2::SSI::Notes" );
     use_ok( 'Apache2::SSI::SharedMem' ) || BAIL_OUT( "Unable to load Apache2::SSI::SharedMem" );
     our $IS_SUPPORTED = 1;
@@ -13,7 +14,7 @@ BEGIN
         # plan skip_all => 'IPC::SysV not supported on this system';
         $IS_SUPPORTED = 0;
     }
-    our $DEBUG = 0;
+    our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
 
 SKIP:

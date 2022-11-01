@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Asynchronous HTTP Request and Promise - ~/lib/HTTP/Promise.pm
-## Version v0.2.0
+## Version v0.2.1
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/06
-## Modified 2022/08/20
+## Modified 2022/08/24
 ## All rights reserved.
 ## 
 ## 
@@ -59,7 +59,7 @@ BEGIN
     our $EXTENSION_VARY = 1;
     our $DEFAULT_MIME_TYPE = 'application/octet-stream';
     our $SERIALISER = $Promise::Me::SERIALISER;
-    our $VERSION = 'v0.2.0';
+    our $VERSION = 'v0.2.1';
 };
 
 use strict;
@@ -87,17 +87,20 @@ sub init
     $self->{max_headers_size}       = $MAX_HEADERS_SIZE;
     $self->{max_redirect}           = 7;
     $self->{max_size}               = undef;
+    $self->{medium}                 = $Promise::Me::SHARE_MEDIUM;
     $self->{no_proxy}               = [];
     $self->{proxy}                  = $ENV{http_proxy} || $ENV{HTTP_PROXY} || undef;
     $self->{proxy_authorization}    = undef;
     $self->{requests_redirectable}  = [qw( GET HEAD )];
     $self->{send_te}                = 1;
     $self->{serialiser}             = $SERIALISER;
+    $self->{shared_mem_size}        = $Promise::Me::RESULT_MEMORY_SIZE;
     $self->{stop_if}                = sub{};
     $self->{threshold}              = $CONTENT_SIZE_THRESHOLD;
     # 3 minutes
     $self->{timeout}                = 180;
     $self->{use_content_file}       = 0;
+    $self->{use_promise}            = 1;
     $self->{_init_strict_use_sub}   = 1;
     $self->{_exception_class}       = $EXCEPTION_CLASS;
     $self->SUPER::init( @_ ) || return( $self->pass_error );
@@ -145,14 +148,32 @@ sub default_protocol { return( shift->_set_get_scalar_as_object( 'default_protoc
 sub delete
 {
     my $self = shift( @_ );
-    return( Promise::Me->new(sub
+    if( $self->use_promise )
     {
-        my( $resolve, $reject ) = @$_;
+        my $prom = Promise::Me->new(sub
+        {
+            my( $resolve, $reject ) = @$_;
+            my $req = HTTP::Promise::Request->new( 'DELETE' => @_ ) ||
+            return( $reject->( HTTP::Promise::Request->error ) );
+            my $resp = $self->send( $req ) || return( $reject->( $self->error ) );
+            return( $resolve->( $resp ) );
+        },
+        {
+            args => [@_],
+            ( defined( $self->{serialiser} ) ? ( serialiser => $self->{serialiser} ) : () ),
+            ( defined( $self->{medium} ) ? ( medium => $self->{medium} ) : () ),
+            ( defined( $self->{shared_mem_size} ) ? ( result_shared_mem_size => $self->{shared_mem_size} ) : () ),
+        }) || return( $self->pass_error( Promise::Me->error ) );
+        return( $prom );
+    }
+    else
+    {
         my $req = HTTP::Promise::Request->new( 'DELETE' => @_ ) ||
-        return( $reject->( HTTP::Promise::Request->error ) );
-        my $resp = $self->send( $req ) || return( $reject->( $self->error ) );
-        return( $resolve->( $resp ) );
-    }, { args => [@_], ( defined( $self->{serialiser} ) ? ( serialiser => $self->{serialiser} ) : () ) } ) );
+            return( $self->pass_error( HTTP::Promise::Request->error ) );
+        my $resp = $self->send( $req ) ||
+            return( $self->pass_error );
+        return( $resp );
+    }
 }
 
 sub dnt { return( shift->_set_get_boolean( 'dnt', @_ ) ); }
@@ -196,30 +217,66 @@ sub from { return( shift->_set_get_scalar_as_object( 'from', @_ ) ); }
 sub get
 {
     my $self = shift( @_ );
-    my $prom = Promise::Me->new(sub
+    if( $self->use_promise )
     {
-        my( $resolve, $reject ) = @$_;
+        my $prom = Promise::Me->new(sub
+        {
+            my( $resolve, $reject ) = @$_;
+            my $req = $self->_make_request_query( GET => @_ ) ||
+            return( $reject->( HTTP::Promise::Request->error ) );
+            my $resp = $self->send( $req ) || return( $reject->( $self->error ) );
+            return( $resolve->( $resp ) );
+        },
+        {
+            args => [@_],
+            ( defined( $self->{serialiser} ) ? ( serialiser => $self->{serialiser} ) : () ),
+            ( defined( $self->{medium} ) ? ( medium => $self->{medium} ) : () ),
+            ( defined( $self->{shared_mem_size} ) ? ( result_shared_mem_size => $self->{shared_mem_size} ) : () ),
+        }) || return( $self->pass_error( Promise::Me->error ) );
+        return( $prom );
+    }
+    else
+    {
         my $req = $self->_make_request_query( GET => @_ ) ||
-        return( $reject->( HTTP::Promise::Request->error ) );
-        my $resp = $self->send( $req ) || return( $reject->( $self->error ) );
-        return( $resolve->( $resp ) );
-    }, { args => [@_], ( defined( $self->{serialiser} ) ? ( serialiser => $self->{serialiser} ) : () ) } ) ||
-        return( $self->pass_error( Promise::Me->error ) );
-    return( $prom );
+            return( $self->pass_error( HTTP::Promise::Request->error ) );
+        my $resp = $self->send( $req ) ||
+            return( $self->pass_error );
+        return( $resp );
+    }
 }
 
 sub head
 {
     my $self = shift( @_ );
-    return( Promise::Me->new(sub
+    if( $self->use_promise )
     {
-        my( $resolve, $reject ) = @$_;
+        my $prom = Promise::Me->new(sub
+        {
+            my( $resolve, $reject ) = @$_;
+            my $req = $self->_make_request_query( HEAD => @_ ) ||
+            return( $reject->( HTTP::Promise::Request->error ) );
+            my $resp = $self->send( $req ) || return( $reject->( $self->error ) );
+            return( $resolve->( $resp ) );
+        },
+        {
+            args => [@_],
+            ( defined( $self->{serialiser} ) ? ( serialiser => $self->{serialiser} ) : () ),
+            ( defined( $self->{medium} ) ? ( medium => $self->{medium} ) : () ),
+            ( defined( $self->{shared_mem_size} ) ? ( result_shared_mem_size => $self->{shared_mem_size} ) : () ),
+        }) || return( $self->pass_error( Promise::Me->error ) );
+        return( $prom );
+    }
+    else
+    {
         my $req = $self->_make_request_query( HEAD => @_ ) ||
-        return( $reject->( HTTP::Promise::Request->error ) );
-        my $resp = $self->send( $req ) || return( $reject->( $self->error ) );
-        return( $resolve->( $resp ) );
-    }, { args => [@_], ( defined( $self->{serialiser} ) ? ( serialiser => $self->{serialiser} ) : () ) } ) );
+            return( $self->pass_error( HTTP::Promise::Request->error ) );
+        my $resp = $self->send( $req ) ||
+            return( $self->pass_error );
+        return( $resp );
+    }
 }
+
+sub httpize_datetime { return( shift->_datetime( @_ ) ); }
 
 sub inactivity_timeout { return( shift->_set_get_number( 'inactivity_timeout', @_ ) ); }
 
@@ -261,29 +318,173 @@ sub max_redirect { return( shift->_set_get_number( 'max_redirect', @_ ) ); }
 # NOTE: request parameter
 sub max_size { return( shift->_set_get_number( 'max_size', @_ ) ); }
 
+# NOTE: medium method for Promise::Me
+sub medium { return( shift->_set_get_scalar( 'medium', @_ ) ); }
+
 # TODO: mirror
 sub mirror
 {
     my $self = shift( @_ );
     my( $url, $file ) = @_;
-    return( Promise::Me->new(sub
+    if( $self->use_promise )
     {
-        my( $resolve, $reject ) = @$_;
-        return( $reject->( HTTP::Promise::Exception->new({
+        return( Promise::Me->new(sub
+        {
+            my( $resolve, $reject ) = @$_;
+            return( $reject->( HTTP::Promise::Exception->new({
+                code => 500,
+                message => 'Local file name is missing',
+            }) ) ) unless( defined( $file ) && length( $file ) );
+
+            my $request = HTTP::Promise::Request->new( 'GET' => $url ) ||
+                return( $reject->( HTTP::Promise::Exception->new({
+                    code => 500,
+                    message => HTTP::Promise::Request->error->message
+                }) ) );
+            $file = $self->new_file( $file ) ||
+                return( $reject->( HTTP::Promise::Exception->new({
+                    code => 500,
+                    message => $self->error->message,
+                }) ) );
+            # If the file exists, add a cache-related header
+            if( $file->exists )
+            {
+                # Module::Generic::Finfo->mtime returns a Module::Generic::DateTime object
+                my $mtime = $file->mtime;
+                if( $mtime )
+                {
+                    my $strtime = $self->_datetime( $mtime ) ||
+                        return( $reject->( HTTP::Promise::Exception->new({
+                            code => 500,
+                            message => $self->error->message,
+                        }) ) );
+                    $request->header( 'If-Modified-Since' => $strtime );
+                }
+            }
+
+            my $tmpfile = $self->new_tempfile;
+            $tmpfile->touch || return( $reject->( $tmpfile->error ) );
+
+            my $response = $self->send( $request ) || return( $reject->( $self->pass_error ) );
+    
+            if( $response->header( 'X-Died' ) )
+            {
+                $tmpfile->unlink;
+                return( $reject->( HTTP::Promise::Exception->new({
+                    code => 500,
+                    message => $response->header( 'X-Died' ),
+                }) ) );
+            }
+
+            # Only fetching a fresh copy of the file would be considered success.
+            # If the file was not modified, "304" would returned, which
+            # is considered by HTTP::Status to be a "redirect", /not/ "success"
+            if( $response->is_success )
+            {
+                my $body = $response->entity->body;
+                return( $reject->( HTTP::Promise::Exception->new({
+                    code => 500,
+                    message => "No body set for this HTTP message entity.",
+                }) ) ) if( !$body );
+                my $io = $body->open( '<' ) ||
+                    return( $reject->( HTTP::Promise::Exception->new({
+                        code => 500,
+                        message => "Unable to open HTTP message entity body: " . $body->error,
+                    }) ) ) if( !$body );
+                my $out = $tmpfile->open( '>', { autoflush => 1 } ) ||
+                    return( $reject->( HTTP::Promise::Exception->new({
+                        code => 500,
+                        message => "Unable to open temporary file \"$tmpfile\" in write mode: " . $tmpfile->error,
+                    }) ) ) if( !$body );
+                while( $io->read( my $buff, 8192 ) )
+                {
+                    $out->print( $buff ) ||
+                    return( $reject->( HTTP::Promise::Exception->new({
+                        code => 500,
+                        message => "Unable to write to temporary file \"$tmpfile\": " . $out->error,
+                    }) ) ) if( !$body );
+                }
+                $io->close;
+                $out->close;
+                my $stat = $tmpfile->stat or 
+                    return( $reject->( HTTP::Promise::Exception->new({
+                        code => 500,
+                        message => "Could not stat tmpfile '$tmpfile': " . $tmpfile->error,
+                    }) ) );
+                my $file_length = $stat->size;
+                my( $content_length ) = $response->header( 'Content-length' );
+
+                if( defined( $content_length ) and $file_length < $content_length )
+                {
+                    $tmpfile->unlink;
+                    return( $reject->( HTTP::Promise::Exception->new({
+                        code => 500,
+                        message => "Transfer truncated: only $file_length out of $content_length bytes received",
+                    }) ) );
+                }
+                elsif( defined( $content_length ) and $file_length > $content_length )
+                {
+                    $tmpfile->unlink;
+                    return( $reject->( HTTP::Promise::Exception->new({
+                        code => 500,
+                        message => "Content-length mismatch: expected $content_length bytes, got $file_length",
+                    }) ) );
+                }
+                # The file was the expected length.
+                else
+                {
+                    # Replace the stale file with a fresh copy
+                    # File::Copy will attempt to do it atomically,
+                    # and fall back to a delete + copy if that fails.
+                    $file = $tmpfile->move( $file, overwrite => 1 ) || 
+                        return( $reject->( HTTP::Promise::Exception->new({
+                            code => 500,
+                            message => "Cannot copy '$tmpfile' to '$file': $!",
+                        }) ) );
+
+                    # Set standard file permissions if umask is supported.
+                    # If not, leave what Module::Generic::File created in effect.
+                    if( defined( my $umask = umask() ) )
+                    {
+                        my $mode = 0666 &~ $umask;
+                        $file->chmod( $mode ) ||
+                            return( $reject->( HTTP::Promise::Exception->new({
+                                code => 500,
+                                message => sprintf( "Cannot chmod %o '%s': %s", $mode, $file, $file->error ),
+                            }) ) );
+                    }
+
+                    # make sure the file has the same last modification time
+                    if( my $lm = $response->last_modified )
+                    {
+                        $file->utime( $lm, $lm ) || do
+                        {
+                            warn( "Warning: cannot update modification time for file '$file': $!\n" ) if( $self->_warnings_is_enabled );
+                        };
+                    }
+                }
+            }
+            # The local copy is fresh enough, so just delete the temp file
+            else
+            {
+                $tmpfile->unlink;
+            }
+            return( $resolve->( $response ) );
+        }, { ( defined( $self->{serialiser} ) ? ( serialiser => $self->{serialiser} ) : () ) } ) );
+    }
+    else
+    {
+        return( $self->error({
             code => 500,
             message => 'Local file name is missing',
-        }) ) ) unless( defined( $file ) && length( $file ) );
+        }) ) unless( defined( $file ) && length( $file ) );
 
         my $request = HTTP::Promise::Request->new( 'GET' => $url ) ||
-            return( $reject->( HTTP::Promise::Exception->new({
+            return( $self->error({
                 code => 500,
                 message => HTTP::Promise::Request->error->message
-            }) ) );
-        $file = $self->new_file( $file ) ||
-            return( $reject->( HTTP::Promise::Exception->new({
-                code => 500,
-                message => $self->error->message,
-            }) ) );
+            }) );
+        $file = $self->new_file( $file ) || return( $self->pass_error );
         # If the file exists, add a cache-related header
         if( $file->exists )
         {
@@ -292,26 +493,23 @@ sub mirror
             if( $mtime )
             {
                 my $strtime = $self->_datetime( $mtime ) ||
-                    return( $reject->( HTTP::Promise::Exception->new({
-                        code => 500,
-                        message => $self->error->message,
-                    }) ) );
+                    return( $self->pass_error );
                 $request->header( 'If-Modified-Since' => $strtime );
             }
         }
 
         my $tmpfile = $self->new_tempfile;
-        $tmpfile->touch || return( $reject->( $tmpfile->error ) );
+        $tmpfile->touch || return( $self->pass_error( $tmpfile->error ) );
 
-        my $response = $self->send( $request ) || return( $reject->( $self->pass_error ) );
-    
+        my $response = $self->send( $request ) || return( $self->pass_error );
+
         if( $response->header( 'X-Died' ) )
         {
             $tmpfile->unlink;
-            return( $reject->( HTTP::Promise::Exception->new({
+            return( $self->error({
                 code => 500,
                 message => $response->header( 'X-Died' ),
-            }) ) );
+            }) );
         }
 
         # Only fetching a fresh copy of the file would be considered success.
@@ -320,53 +518,53 @@ sub mirror
         if( $response->is_success )
         {
             my $body = $response->entity->body;
-            return( $reject->( HTTP::Promise::Exception->new({
+            return( $self->error({
                 code => 500,
                 message => "No body set for this HTTP message entity.",
-            }) ) ) if( !$body );
+            }) ) if( !$body );
             my $io = $body->open( '<' ) ||
-                return( $reject->( HTTP::Promise::Exception->new({
+                return( $self->error({
                     code => 500,
                     message => "Unable to open HTTP message entity body: " . $body->error,
-                }) ) ) if( !$body );
+                }) ) if( !$body );
             my $out = $tmpfile->open( '>', { autoflush => 1 } ) ||
-                return( $reject->( HTTP::Promise::Exception->new({
+                return( $self->error({
                     code => 500,
                     message => "Unable to open temporary file \"$tmpfile\" in write mode: " . $tmpfile->error,
-                }) ) ) if( !$body );
+                }) ) if( !$body );
             while( $io->read( my $buff, 8192 ) )
             {
                 $out->print( $buff ) ||
-                return( $reject->( HTTP::Promise::Exception->new({
+                return( $self->error({
                     code => 500,
                     message => "Unable to write to temporary file \"$tmpfile\": " . $out->error,
-                }) ) ) if( !$body );
+                }) ) if( !$body );
             }
             $io->close;
             $out->close;
             my $stat = $tmpfile->stat or 
-                return( $reject->( HTTP::Promise::Exception->new({
+                return( $self->error({
                     code => 500,
                     message => "Could not stat tmpfile '$tmpfile': " . $tmpfile->error,
-                }) ) );
+                }) );
             my $file_length = $stat->size;
             my( $content_length ) = $response->header( 'Content-length' );
 
             if( defined( $content_length ) and $file_length < $content_length )
             {
                 $tmpfile->unlink;
-                return( $reject->( HTTP::Promise::Exception->new({
+                return( $self->error({
                     code => 500,
                     message => "Transfer truncated: only $file_length out of $content_length bytes received",
-                }) ) );
+                }) );
             }
             elsif( defined( $content_length ) and $file_length > $content_length )
             {
                 $tmpfile->unlink;
-                return( $reject->( HTTP::Promise::Exception->new({
+                return( $self->error({
                     code => 500,
                     message => "Content-length mismatch: expected $content_length bytes, got $file_length",
-                }) ) );
+                }) );
             }
             # The file was the expected length.
             else
@@ -375,10 +573,10 @@ sub mirror
                 # File::Copy will attempt to do it atomically,
                 # and fall back to a delete + copy if that fails.
                 $file = $tmpfile->move( $file, overwrite => 1 ) || 
-                    return( $reject->( HTTP::Promise::Exception->new({
+                    return( $self->error({
                         code => 500,
                         message => "Cannot copy '$tmpfile' to '$file': $!",
-                    }) ) );
+                    }) );
 
                 # Set standard file permissions if umask is supported.
                 # If not, leave what Module::Generic::File created in effect.
@@ -386,17 +584,19 @@ sub mirror
                 {
                     my $mode = 0666 &~ $umask;
                     $file->chmod( $mode ) ||
-                        return( $reject->( HTTP::Promise::Exception->new({
+                        return( $self->error({
                             code => 500,
                             message => sprintf( "Cannot chmod %o '%s': %s", $mode, $file, $file->error ),
-                        }) ) );
+                        }) );
                 }
 
                 # make sure the file has the same last modification time
                 if( my $lm = $response->last_modified )
                 {
-                    $file->utime( $lm, $lm ) ||
+                    $file->utime( $lm, $lm ) || do
+                    {
                         warn( "Warning: cannot update modification time for file '$file': $!\n" ) if( $self->_warnings_is_enabled );
+                    };
                 }
             }
         }
@@ -405,8 +605,8 @@ sub mirror
         {
             $tmpfile->unlink;
         }
-        return( $resolve->( $response ) );
-    }, { ( defined( $self->{serialiser} ) ? ( serialiser => $self->{serialiser} ) : () ) } ) );
+        return( $response );
+    }
 }
 
 # NOTE: request parameter
@@ -415,40 +615,94 @@ sub no_proxy { return( shift->_set_get_array_as_object( 'no_proxy', @_ ) ); }
 sub options
 {
     my $self = shift( @_ );
-    return( Promise::Me->new(sub
+    if( $self->use_promise )
     {
-        my( $resolve, $reject ) = @$_;
+        my $prom = Promise::Me->new(sub
+        {
+            my( $resolve, $reject ) = @$_;
+            my $req = $self->_make_request_data( OPTIONS => @_ ) ||
+                die( HTTP::Promise::Request->error );
+            my $resp = $self->send( $req ) || return( $reject->( $self->error ) );
+            return( $resolve->( $resp ) );
+        },
+        {
+            args => [@_],
+            ( defined( $self->{serialiser} ) ? ( serialiser => $self->{serialiser} ) : () ),
+            ( defined( $self->{medium} ) ? ( medium => $self->{medium} ) : () ),
+            ( defined( $self->{shared_mem_size} ) ? ( result_shared_mem_size => $self->{shared_mem_size} ) : () ),
+        }) || return( $self->pass_error( Promise::Me->error ) );
+        return( $prom );
+    }
+    else
+    {
         my $req = $self->_make_request_data( OPTIONS => @_ ) ||
-            die( HTTP::Promise::Request->error );
-        my $resp = $self->send( $req ) || return( $reject->( $self->error ) );
-        return( $resolve->( $resp ) );
-    }, { args => [@_], ( defined( $self->{serialiser} ) ? ( serialiser => $self->{serialiser} ) : () ) } ) );
+            return( $self->pass_error( HTTP::Promise::Request->error ) );
+        my $resp = $self->send( $req ) ||
+            return( $self->pass_error );
+        return( $resp );
+    }
 }
 
 sub patch
 {
     my $self = shift( @_ );
-    return( Promise::Me->new(sub
+    if( $self->use_promise )
     {
-        my( $resolve, $reject ) = @$_;
+        my $prom = Promise::Me->new(sub
+        {
+            my( $resolve, $reject ) = @$_;
+            my $req = $self->_make_request_data( PATCH => @_ ) ||
+                die( HTTP::Promise::Request->error );
+            my $resp = $self->send( $req ) || return( $reject->( $self->error ) );
+            return( $resolve->( $resp ) );
+        },
+        {
+            args => [@_],
+            ( defined( $self->{serialiser} ) ? ( serialiser => $self->{serialiser} ) : () ),
+            ( defined( $self->{medium} ) ? ( medium => $self->{medium} ) : () ),
+            ( defined( $self->{shared_mem_size} ) ? ( result_shared_mem_size => $self->{shared_mem_size} ) : () ),
+        }) || return( $self->pass_error( Promise::Me->error ) );
+        return( $prom );
+    }
+    else
+    {
         my $req = $self->_make_request_data( PATCH => @_ ) ||
-            die( HTTP::Promise::Request->error );
-        my $resp = $self->send( $req ) || return( $reject->( $self->error ) );
-        return( $resolve->( $resp ) );
-    }, { args => [@_], ( defined( $self->{serialiser} ) ? ( serialiser => $self->{serialiser} ) : () ) } ) );
+            return( $self->pass_error( HTTP::Promise::Request->error ) );
+        my $resp = $self->send( $req ) ||
+            return( $self->pass_error );
+        return( $resp );
+    }
 }
 
 sub post
 {
     my $self = shift( @_ );
-    return( Promise::Me->new(sub
+    if( $self->use_promise )
     {
-        my( $resolve, $reject ) = @$_;
+        my $prom = Promise::Me->new(sub
+        {
+            my( $resolve, $reject ) = @$_;
+            my $req = $self->_make_request_data( POST => @_ ) ||
+                die( HTTP::Promise::Request->error );
+            my $resp = $self->send( $req ) || return( $reject->( $self->error ) );
+            return( $resolve->( $resp ) );
+        },
+        {
+            args => [@_],
+            ( defined( $self->{serialiser} ) ? ( serialiser => $self->{serialiser} ) : () ),
+            ( defined( $self->{medium} ) ? ( medium => $self->{medium} ) : () ),
+            ( defined( $self->{shared_mem_size} ) ? ( result_shared_mem_size => $self->{shared_mem_size} ) : () ),
+        }) || return( $self->pass_error( Promise::Me->error ) );
+        return( $prom );
+    }
+    else
+    {
         my $req = $self->_make_request_data( POST => @_ ) ||
-            die( HTTP::Promise::Request->error );
-        my $resp = $self->send( $req ) || return( $reject->( $self->error ) );
-        return( $resolve->( $resp ) );
-    }, { args => [@_], ( defined( $self->{serialiser} ) ? ( serialiser => $self->{serialiser} ) : () ) } ) );
+            return( $self->pass_error( HTTP::Promise::Request->error ) );
+        my $resp = $self->send( $req ) ||
+            return( $self->pass_error );
+        return( $resp );
+    }
 }
 
 sub prepare_headers
@@ -513,14 +767,32 @@ sub proxy_authorization { return( shift->_set_get_scalar_as_object( 'proxy_autho
 sub put
 {
     my $self = shift( @_ );
-    return( Promise::Me->new(sub
+    if( $self->use_promise )
     {
-        my( $resolve, $reject ) = @$_;
+        my $prom = Promise::Me->new(sub
+        {
+            my( $resolve, $reject ) = @$_;
+            my $req = $self->_make_request_data( PUT => @_ ) ||
+                die( HTTP::Promise::Request->error );
+            my $resp = $self->send( $req ) || return( $reject->( $self->error ) );
+            return( $resolve->( $resp ) );
+        },
+        {
+            args => [@_],
+            ( defined( $self->{serialiser} ) ? ( serialiser => $self->{serialiser} ) : () ),
+            ( defined( $self->{medium} ) ? ( medium => $self->{medium} ) : () ),
+            ( defined( $self->{shared_mem_size} ) ? ( result_shared_mem_size => $self->{shared_mem_size} ) : () ),
+        }) || return( $self->pass_error( Promise::Me->error ) );
+        return( $prom );
+    }
+    else
+    {
         my $req = $self->_make_request_data( PUT => @_ ) ||
-            die( HTTP::Promise::Request->error );
-        my $resp = $self->send( $req ) || return( $reject->( $self->error ) );
-        return( $resolve->( $resp ) );
-    }, { args => [@_], ( defined( $self->{serialiser} ) ? ( serialiser => $self->{serialiser} ) : () ) } ) );
+            return( $self->pass_error( HTTP::Promise::Request->error ) );
+        my $resp = $self->send( $req ) ||
+            return( $self->pass_error );
+        return( $resp );
+    }
 }
 
 sub request
@@ -529,17 +801,33 @@ sub request
     my $req  = shift( @_ );
     my $opts = $self->_get_args_as_hash( @_ );
     $opts->{read_size} //= 0;
-    return( Promise::Me->new(sub
+    if( $self->use_promise )
     {
-        my( $resolve, $reject ) = @$_;
-        return( $reject->( HTTP::Promise::Exception->new({
-            code => 500,
-            message => "No request object was provided."
-        }) ) ) if( !$req );
+        my $prom = Promise::Me->new(sub
+        {
+            my( $resolve, $reject ) = @$_;
+            return( $reject->( HTTP::Promise::Exception->new({
+                code => 500,
+                message => "No request object was provided."
+            }) ) ) if( !$req );
+            $self->use_content_file( $opts->{use_content_file} ) if( exists( $opts->{use_content_file} ) );
+            my $resp = $self->send( $req, $opts ) || return( $reject->( $self->pass_error ) );
+            return( $resolve->( $resp ) );
+        },
+        {
+            ( defined( $self->{serialiser} ) ? ( serialiser => $self->{serialiser} ) : () ),
+            ( defined( $self->{medium} ) ? ( medium => $self->{medium} ) : () ),
+            ( defined( $self->{shared_mem_size} ) ? ( result_shared_mem_size => $self->{shared_mem_size} ) : () ),
+        }) || return( $self->pass_error( Promise::Me->error ) );
+        return( $prom );
+    }
+    else
+    {
+        return( $self->error( "No request object was provided." ) ) if( !$req );
         $self->use_content_file( $opts->{use_content_file} ) if( exists( $opts->{use_content_file} ) );
-        my $resp = $self->send( $req, $opts ) || return( $reject->( $self->pass_error ) );
-        return( $resolve->( $resp ) );
-    }) );
+        my $resp = $self->send( $req, $opts ) || return( $$self->pass_error );
+        return( $resp );
+    }
 }
 
 # NOTE: request parameter
@@ -730,7 +1018,7 @@ sub send
         {
             $connection_header = 'close';
         }
-        elsif( $req->version > 1.0 )
+        elsif( $req->version && $req->version > 1.0 )
         {
             $connection_header = 'keep-alive';
         }
@@ -1117,7 +1405,11 @@ sub send
 # NOTE: request parameter
 sub send_te { return( shift->_set_get_boolean( 'send_te', @_ ) ); }
 
+# NOTE: serialiser method for Promise::Me
 sub serialiser { return( shift->_set_get_scalar( 'serialiser', @_ ) ); }
+
+# NOTE: shared_mem_size method for Promise::Me
+sub shared_mem_size { return( shift->_set_get_scalar( 'shared_mem_size', @_ ) ); }
 
 sub simple_request
 {
@@ -1125,18 +1417,29 @@ sub simple_request
     my $req  = shift( @_ );
     my $opts = $self->_get_args_as_hash( @_ );
     $opts->{read_size} //= 0;
-    return( Promise::Me->new(sub
+    if( $self->use_promise )
     {
-        my( $resolve, $reject ) = @$_;
-        return( $reject->( HTTP::Promise::Exception->new({
-            code => 500,
-            message => "No request object was provided."
-        }) ) ) if( !$req );
+        return( Promise::Me->new(sub
+        {
+            my( $resolve, $reject ) = @$_;
+            return( $reject->( HTTP::Promise::Exception->new({
+                code => 500,
+                message => "No request object was provided."
+            }) ) ) if( !$req );
+            $self->use_content_file( $opts->{use_content_file} ) if( exists( $opts->{use_content_file} ) );
+            $opts->{max_redirect} = 0;
+            my $resp = $self->send( $req, $opts ) || return( $reject->( $self->pass_error ) );
+            return( $resolve->( $resp ) );
+        }) );
+    }
+    else
+    {
+        return( $self->error( "No request object was provided." ) ) if( !$req );
         $self->use_content_file( $opts->{use_content_file} ) if( exists( $opts->{use_content_file} ) );
         $opts->{max_redirect} = 0;
-        my $resp = $self->send( $req, $opts ) || return( $reject->( $self->pass_error ) );
-        return( $resolve->( $resp ) );
-    }) );
+        my $resp = $self->send( $req, $opts ) || return( $self->pass_error );
+        return( $resp );
+    }
 }
 
 sub stop_if { return( shift->_set_get_code( 'stop_if', @_ ) ); }
@@ -1154,6 +1457,8 @@ sub uri_escape { return( URI::Escape::XS::uri_escape( $_[1] ) ); }
 sub uri_unescape { return( URI::Escape::XS::uri_unescape( $_[1] ) ); }
 
 sub use_content_file { return( shift->_set_get_boolean( 'use_content_file', @_ ) ); }
+
+sub use_promise { return( shift->_set_get_boolean( 'use_promise', @_ ) ); }
 
 sub _datetime
 {
@@ -1800,14 +2105,19 @@ HTTP::Promise - Asynchronous HTTP Request and Promise
         # 8Kb
         max_headers_size => 8192,
         max_redirect => 3,
+        # For Promise::Me
+        medium => 'mmap',
         proxy => 'https://proxy.example.org:8080',
         # The serialiser to use for the promise in Promise::Me
         # Defaults to storable, but can also be cbor and sereal
         serialiser => 'sereal',
+        shared_mem_size => 1048576,
         # You can also use decimals with Time::HiRes
         timeout => 15,
         # force the use of files to store the response content
         use_content_file => 1,
+        # Should we use promise?
+        # use_promise => 0,
     );
     my $prom = $p->get( 'https://www.example.org', $hash_of_query_params )->then(sub
     {
@@ -1825,7 +2135,7 @@ HTTP::Promise - Asynchronous HTTP Request and Promise
 
 =head1 VERSION
 
-    v0.2.0
+    v0.2.1
 
 =head1 DESCRIPTION
 
@@ -1964,6 +2274,12 @@ Integer. Set the size limit for response content. If the response content exceed
 
 See also the C<threshold> option.
 
+=item * C<medium>
+
+This can be either C<file>, C<mmap> or C<memory>. This will be passed on to L<Promise::Me> as C<result_shared_mem_size> to store resulting data between processes. See L<Promise::Me> for more details.
+
+It defaults to C<$Promise::Me::SHARE_MEDIUM>
+
 =item * C<no_proxy>
 
 Array reference. Do not proxy requests to the given domains.
@@ -1981,6 +2297,12 @@ Array reference. This sets the list of http methods that are allowed to be redir
 String. Specify the serialiser to use for L<Promise::Me>. Possible values are: L<cbor|CBOR::XS>, L<sereal|Sereal> or L<storable|Storable::Improved>
 
 By default it uses the value set in the global variable C<$SERIALISER>, which is a copy of the C<$SERIALISER> in L<Promise::Me>, which should be by default C<storable>
+
+=item * C<shared_mem_size>
+
+Integer. This will be passed on to L<Promise::Me>. See L<Promise::Me> for more details.
+
+It defaults to C<$Promise::Me::RESULT_MEMORY_SIZE>
 
 =item * C<ssl_opts>
 
@@ -2031,6 +2353,10 @@ Integer. Sets the timeout value. Defaults to 180 seconds, i.e. 3 minutes.
 =item * C<use_content_file>
 
 Boolean. Enables the use of a temporary local file to store the response content, no matter the size o the response content.
+
+=item * C<use_promise>
+
+Boolean. When true, this will have L<HTTP::Promise> HTTP methods return a L<HTTP::Promise|promise>, and when false, it returns directly the L<HTTP::Promise::Response|response object>. Defaults to true.
 
 =back
 
@@ -2148,6 +2474,8 @@ It returns a L<promise|Promise::Me>, which can be used to call one or more L<the
         say( "Error code; ", $ex->code, " and message: ", $ex->message );
     });
 
+However, if L</use_promise> is set to false, this will return an L<HTTP::Promise::Response> object directly.
+
 =head2 dnt
 
 Boolean. If set to a true value, this will set the C<DNT> header to C<1>
@@ -2205,6 +2533,8 @@ It returns a L<promise|Promise::Me>, which can be used to call one or more L<the
         say( "Error code; ", $ex->code, " and message: ", $ex->message );
     });
 
+However, if L</use_promise> is set to false, this will return an L<HTTP::Promise::Response> object directly.
+
 =head2 head
 
 Provided with an C<uri> and an optional hash of header name/value pairs, and this will issue a C<HEAD> http request to the given C<uri>.
@@ -2224,6 +2554,14 @@ It returns a L<promise|Promise::Me>, which can be used to call one or more L<the
         # An HTTP::Promise::Exception object is passed with an error code
         say( "Error code; ", $ex->code, " and message: ", $ex->message );
     });
+
+However, if L</use_promise> is set to false, this will return an L<HTTP::Promise::Response> object directly.
+
+=head2 httpize_datetime
+
+Provided with a L<DateTime> or L<Module::Generic::DateTime> object, and this will ensure the C<DateTime> object stringifies to a valid HTTP datetime.
+
+It returns the C<DateTime> object provided upon success, or upon error, sets an L<error|Module::Generic/error> and returns C<undef>
 
 =head2 inactivity_timeout
 
@@ -2301,6 +2639,8 @@ It can then be used to call one or more L<then|Promise::Me/then> and L<catch|Pro
         say( "Error code; ", $ex->code, " and message: ", $ex->message );
     });
 
+However, if L</use_promise> is set to false, this will return an L<HTTP::Promise::Response> object directly.
+
 =head2 no_proxy
 
 Sets or gets a list of domain names for which the proxy will not apply. By default this is empty.
@@ -2332,6 +2672,8 @@ It returns a L<promise|Promise::Me>, which can be used to call one or more L<the
         say( "Error code; ", $ex->code, " and message: ", $ex->message );
     });
 
+However, if L</use_promise> is set to false, this will return an L<HTTP::Promise::Response> object directly.
+
 =head2 patch
 
 Provided with an C<uri> and an optional hash of form data, followed by an hash of header name/value pairs and this will issue a C<PATCH> http request to the given C<uri>.
@@ -2357,6 +2699,8 @@ It returns a L<promise|Promise::Me>, which can be used to call one or more L<the
         # An HTTP::Promise::Exception object is passed with an error code
         say( "Error code; ", $ex->code, " and message: ", $ex->message );
     });
+
+However, if L</use_promise> is set to false, this will return an L<HTTP::Promise::Response> object directly.
 
 =head2 post
 
@@ -2386,6 +2730,8 @@ It returns a L<promise|Promise::Me>, which can be used to call one or more L<the
         # An HTTP::Promise::Exception object is passed with an error code
         say( "Error code; ", $ex->code, " and message: ", $ex->message );
     });
+
+However, if L</use_promise> is set to false, this will return an L<HTTP::Promise::Response> object directly.
 
 =head2 prepare_headers
 
@@ -2468,6 +2814,8 @@ It returns a L<promise|Promise::Me>, which can be used to call one or more L<the
         say( "Error code; ", $ex->code, " and message: ", $ex->message );
     });
 
+However, if L</use_promise> is set to false, this will return an L<HTTP::Promise::Response> object directly.
+
 =head2 request
 
 This method will issue the propre request in accordance with the request object provided. It will process redirects and authentication responses transparently. This means it may end up sending multiple request, up to the limit set with the object option L</max_redirect>
@@ -2515,6 +2863,8 @@ For example:
         my $ex = shift( @_ );
         say "Got an error code ", $ex->code, " with message: ", $ex->message;
     });
+
+However, if L</use_promise> is set to false, this will return an L<HTTP::Promise::Response> object directly.
 
 =head2 requests_redirectable
 
@@ -2589,6 +2939,8 @@ For example:
         my $ex = shift( @_ );
         say "Got an error code ", $ex->code, " with message: ", $ex->message;
     });
+
+However, if L</use_promise> is set to false, this will return an L<HTTP::Promise::Response> object directly.
 
 =head2 ssl_opts
 
@@ -2672,6 +3024,10 @@ Boolean. Enables or disables the use of a temporary file to store the response c
 
 When true, the response content will be stored into a temporary file, whose object is a L<Module::Generic::File> object and can be retrieved with L</file>.
 
+=head2 use_promise
+
+Boolean. When true, this will have L<HTTP::Promise> HTTP methods return a L<HTTP::Promise|promise>, and when false, it returns directly the L<HTTP::Promise::Response|response object>. Defaults to true.
+
 =head1 CLASS FUNCTIONS
 
 =head2 fetch
@@ -2698,6 +3054,8 @@ You can also call it with an object, such as:
     my $prom = $http->fetch( 'http://example.com/something.json' );
 
 C<fetch> performs the same way as L</get>, by default, and accepts the same possible parameters. It sets an error and returns C<undef> upon error, or return a L<promise|Promise::Me>
+
+However, if L</use_promise> is set to false, this will return an L<HTTP::Promise::Response> object directly.
 
 You can, however, specify, another method by providing the C<method> option with value being an HTTP method, i.e. C<DELETE>, C<GET>, C<HEAD>, C<OPTIONS>, C<PATCH>, C<POST>, C<PUT>.
 

@@ -1,7 +1,7 @@
 /*  You may distribute under the terms of either the GNU General Public License
  *  or the Artistic License (the same terms as Perl itself)
  *
- *  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
+ *  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
  */
 #include "EXTERN.h"
 #include "perl.h"
@@ -66,10 +66,11 @@ static OP *pp_zip(pTHX)
 }
 
 struct XSParseInfixHooks infix_zip = {
+  /* Parse this at ADD precedence, so that (LIST)xCOUNT can be used on RHS */
+  .cls       = XPI_CLS_ADD_MISC,
   .lhs_flags = XPI_OPERAND_TERM_LIST|XPI_OPERAND_ONLY_LOOK,
   .rhs_flags = XPI_OPERAND_TERM_LIST|XPI_OPERAND_ONLY_LOOK,
   .permit_hintkey = "Syntax::Operator::Zip/Z",
-  .cls = 0,
 
   .wrapper_func_name = "Syntax::Operator::Zip::zip",
 
@@ -147,10 +148,10 @@ static OP *pp_mesh(pTHX)
 }
 
 struct XSParseInfixHooks infix_mesh = {
+  .cls       = XPI_CLS_ADD_MISC,
   .lhs_flags = XPI_OPERAND_TERM_LIST|XPI_OPERAND_ONLY_LOOK,
   .rhs_flags = XPI_OPERAND_TERM_LIST|XPI_OPERAND_ONLY_LOOK,
   .permit_hintkey = "Syntax::Operator::Zip/Z",
-  .cls = 0,
 
   .wrapper_func_name = "Syntax::Operator::Zip::mesh",
 
@@ -160,7 +161,7 @@ struct XSParseInfixHooks infix_mesh = {
 MODULE = Syntax::Operator::Zip    PACKAGE = Syntax::Operator::Zip
 
 BOOT:
-  boot_xs_parse_infix(0.18);
+  boot_xs_parse_infix(0.26);
 
   register_xs_parse_infix("Z", &infix_zip, NULL);
   register_xs_parse_infix("M", &infix_mesh, NULL);

@@ -170,7 +170,8 @@ eval {$ret = $fr * $inf;};
 
 if($@ =~ /supplied to Math::GMPf::overload_mul/ ||
    $@ =~ /In Rmpf_set_d, cannot coerce an Inf to a Math::GMPf object/ ||
-   $@ =~ /In _Rmpf_set_ld, cannot coerce/) {print "ok 16\n"}
+   $@ =~ /In _Rmpf_set_ld, cannot coerce/ ||
+   $@ =~ /In _Rmpf_set_float128, cannot coerce/ ) {print "ok 16\n"}
 else {
   warn "\n \$\@: $@\n";
   print "not ok 16\n";
@@ -188,7 +189,8 @@ eval {$ret = $fr + $inf;};
 
 if($@ =~ /supplied to Math::GMPf::overload_add/ ||
    $@ =~ /In Rmpf_set_d, cannot coerce an Inf to a Math::GMPf object/ ||
-   $@ =~ /In _Rmpf_set_ld, cannot coerce/) {print "ok 18\n"}
+   $@ =~ /In _Rmpf_set_ld, cannot coerce/ ||
+   $@ =~ /In _Rmpf_set_float128, cannot coerce/ ) {print "ok 18\n"}
 else {
   warn "\n \$\@: $@\n";
   print "not ok 18\n";
@@ -206,7 +208,8 @@ eval {$ret = $fr - $inf;};
 
 if($@ =~ /supplied to Math::GMPf::overload_sub/ ||
    $@ =~ /In Rmpf_set_d, cannot coerce an Inf to a Math::GMPf object/ ||
-   $@ =~ /In _Rmpf_set_ld, cannot coerce/) {print "ok 20\n"}
+   $@ =~ /In _Rmpf_set_ld, cannot coerce/ ||
+   $@ =~ /In _Rmpf_set_float128, cannot coerce/ ) {print "ok 20\n"}
 else {
   warn "\n \$\@: $@\n";
   print "not ok 20\n";
@@ -224,7 +227,8 @@ eval {$ret = $fr / $inf;};
 
 if($@ =~ /supplied to Math::GMPf::overload_div/ ||
    $@ =~ /In Rmpf_set_d, cannot coerce an Inf to a Math::GMPf object/ ||
-   $@ =~ /In _Rmpf_set_ld, cannot coerce/) {print "ok 22\n"}
+   $@ =~ /In _Rmpf_set_ld, cannot coerce/ ||
+   $@ =~ /In _Rmpf_set_float128, cannot coerce/ ) {print "ok 22\n"}
 else {
   warn "\n \$\@: $@\n";
   print "not ok 22\n";
@@ -258,7 +262,8 @@ eval {$fr *= $inf;};
 
 if($@ =~ /supplied to Math::GMPf::overload_mul_eq/ ||
    $@ =~ /In Rmpf_set_d, cannot coerce an Inf to a Math::GMPf object/ ||
-   $@ =~ /In _Rmpf_set_ld, cannot coerce/) {print "ok 26\n"}
+   $@ =~ /In _Rmpf_set_ld, cannot coerce/ ||
+   $@ =~ /In _Rmpf_set_float128, cannot coerce/ ) {print "ok 26\n"}
 else {
   warn "\n \$\@: $@\n";
   print "not ok 26\n";
@@ -276,7 +281,8 @@ eval {$fr += $inf;};
 
 if($@ =~ /supplied to Math::GMPf::overload_add_eq/ ||
    $@ =~ /In Rmpf_set_d, cannot coerce an Inf to a Math::GMPf object/ ||
-   $@ =~ /In _Rmpf_set_ld, cannot coerce/) {print "ok 28\n"}
+   $@ =~ /In _Rmpf_set_ld, cannot coerce/ ||
+   $@ =~ /In _Rmpf_set_float128, cannot coerce/ ) {print "ok 28\n"}
 else {
   warn "\n \$\@: $@\n";
   print "not ok 28\n";
@@ -294,7 +300,8 @@ eval {$fr -= $inf;};
 
 if($@ =~ /supplied to Math::GMPf::overload_sub_eq/ ||
    $@ =~ /In Rmpf_set_d, cannot coerce an Inf to a Math::GMPf object/ ||
-   $@ =~ /In _Rmpf_set_ld, cannot coerce/) {print "ok 30\n"}
+   $@ =~ /In _Rmpf_set_ld, cannot coerce/ ||
+   $@ =~ /In _Rmpf_set_float128, cannot coerce/ ) {print "ok 30\n"}
 else {
   warn "\n \$\@: $@\n";
   print "not ok 30\n";
@@ -312,7 +319,8 @@ eval {$fr /= $inf;};
 
 if($@ =~ /supplied to Math::GMPf::overload_div_eq/ ||
    $@ =~ /In Rmpf_set_d, cannot coerce an Inf to a Math::GMPf object/ ||
-   $@ =~ /In _Rmpf_set_ld, cannot coerce/) {print "ok 32\n"}
+   $@ =~ /In _Rmpf_set_ld, cannot coerce/ ||
+   $@ =~ /In _Rmpf_set_float128, cannot coerce/ ) {print "ok 32\n"}
 else {
   warn "\n \$\@: $@\n";
   print "not ok 32\n";

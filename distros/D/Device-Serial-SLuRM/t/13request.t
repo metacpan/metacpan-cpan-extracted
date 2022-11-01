@@ -58,10 +58,10 @@ sub with_crc8
 
    if( HAVE_TEST_METRICS_ANY ) {
       Test::Metrics::Any::is_metrics( {
-         "slurm_packets_sent type:REQUEST"      => 1,
-         "slurm_packets_received type:RESPONSE" => 1,
-         "slurm_packets_sent type:ACK"          => 2,
-         "slurm_request_retries[0]"             => 1,
+         "slurm_packets dir:tx type:REQUEST"  => 1,
+         "slurm_packets dir:rx type:RESPONSE" => 1,
+         "slurm_packets dir:tx type:ACK"      => 2,
+         "slurm_request_success_attempts[1]"  => 1,
       }, 'Request/response transaction increments metrics' );
    }
 
@@ -120,7 +120,7 @@ sub with_crc8
    if( HAVE_TEST_METRICS_ANY ) {
       Test::Metrics::Any::is_metrics( {
          "slurm_retransmits" => 1,
-         "slurm_request_retries[1]" => 1,
+         "slurm_request_success_attempts[2]" => 1,
       }, 'Packet retransmit increments metrics' );
    }
 

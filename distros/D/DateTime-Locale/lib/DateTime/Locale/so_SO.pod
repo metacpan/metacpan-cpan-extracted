@@ -146,11 +146,11 @@ Somali Somalia locale.
   May
   Juun
   Luuliyo
-  Ogost
-  Sebtembar
+  Ogosto
+  Sebteembar
   Oktoobar
-  Nofembar
-  Desembar
+  Noofeembar
+  Diseembar
 
 =head3 Abbreviated (stand-alone)
 
@@ -275,54 +275,54 @@ Somali Somalia locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = 6:30:30 GD UTC
-   1995-12-22T09:05:02 = 9:05:02 GH UTC
-  -0010-09-15T04:44:23 = 4:44:23 GH UTC
+   2008-02-05T18:30:30 = 6:30:30 GD UTC
+   1995-12-22T09:05:02 = 9:05:02 GH UTC
+  -0010-09-15T04:44:23 = 4:44:23 GH UTC
 
 =head3 Long
 
-   2008-02-05T18:30:30 = 6:30:30 GD UTC
-   1995-12-22T09:05:02 = 9:05:02 GH UTC
-  -0010-09-15T04:44:23 = 4:44:23 GH UTC
+   2008-02-05T18:30:30 = 6:30:30 GD UTC
+   1995-12-22T09:05:02 = 9:05:02 GH UTC
+  -0010-09-15T04:44:23 = 4:44:23 GH UTC
 
 =head3 Medium
 
-   2008-02-05T18:30:30 = 6:30:30 GD
-   1995-12-22T09:05:02 = 9:05:02 GH
-  -0010-09-15T04:44:23 = 4:44:23 GH
+   2008-02-05T18:30:30 = 6:30:30 GD
+   1995-12-22T09:05:02 = 9:05:02 GH
+  -0010-09-15T04:44:23 = 4:44:23 GH
 
 =head3 Short
 
-   2008-02-05T18:30:30 = 6:30 GD
-   1995-12-22T09:05:02 = 9:05 GH
-  -0010-09-15T04:44:23 = 4:44 GH
+   2008-02-05T18:30:30 = 6:30 GD
+   1995-12-22T09:05:02 = 9:05 GH
+  -0010-09-15T04:44:23 = 4:44 GH
 
 
 =head2 Datetime Formats
 
 =head3 Full
 
-   2008-02-05T18:30:30 = Talaado, Bisha Labaad 5, 2008 ee 6:30:30 GD UTC
-   1995-12-22T09:05:02 = Jimco, Bisha Laba iyo Tobnaad 22, 1995 ee 9:05:02 GH UTC
-  -0010-09-15T04:44:23 = Sabti, Bisha Sagaalaad 15, -10 ee 4:44:23 GH UTC
+   2008-02-05T18:30:30 = Talaado, Bisha Labaad 5, 2008 6:30:30 GD UTC
+   1995-12-22T09:05:02 = Jimco, Bisha Laba iyo Tobnaad 22, 1995 9:05:02 GH UTC
+  -0010-09-15T04:44:23 = Sabti, Bisha Sagaalaad 15, -10 4:44:23 GH UTC
 
 =head3 Long
 
-   2008-02-05T18:30:30 = Bisha Labaad 5, 2008 ee 6:30:30 GD UTC
-   1995-12-22T09:05:02 = Bisha Laba iyo Tobnaad 22, 1995 ee 9:05:02 GH UTC
-  -0010-09-15T04:44:23 = Bisha Sagaalaad 15, -10 ee 4:44:23 GH UTC
+   2008-02-05T18:30:30 = Bisha Labaad 5, 2008 6:30:30 GD UTC
+   1995-12-22T09:05:02 = Bisha Laba iyo Tobnaad 22, 1995 9:05:02 GH UTC
+  -0010-09-15T04:44:23 = Bisha Sagaalaad 15, -10 4:44:23 GH UTC
 
 =head3 Medium
 
-   2008-02-05T18:30:30 = 05-Feb-2008 ee 6:30:30 GD
-   1995-12-22T09:05:02 = 22-Dis-1995 ee 9:05:02 GH
-  -0010-09-15T04:44:23 = 15-Seb--10 ee 4:44:23 GH
+   2008-02-05T18:30:30 = 05-Feb-2008 6:30:30 GD
+   1995-12-22T09:05:02 = 22-Dis-1995 9:05:02 GH
+  -0010-09-15T04:44:23 = 15-Seb--10 4:44:23 GH
 
 =head3 Short
 
-   2008-02-05T18:30:30 = 05/02/08 6:30 GD
-   1995-12-22T09:05:02 = 22/12/95 9:05 GH
-  -0010-09-15T04:44:23 = 15/09/-10 4:44 GH
+   2008-02-05T18:30:30 = 05/02/08 6:30 GD
+   1995-12-22T09:05:02 = 22/12/95 9:05 GH
+  -0010-09-15T04:44:23 = 15/09/-10 4:44 GH
 
 
 =head2 Available Formats
@@ -537,11 +537,11 @@ Somali Somalia locale.
    1995-12-22T09:05:02 = 9:05:02 GH
   -0010-09-15T04:44:23 = 4:44:23 GH
 
-=head3 hmsv (h:mm:ss a v)
+=head3 hmsv (h:mm:ss a v)
 
-   2008-02-05T18:30:30 = 6:30:30 GD UTC
-   1995-12-22T09:05:02 = 9:05:02 GH UTC
-  -0010-09-15T04:44:23 = 4:44:23 GH UTC
+   2008-02-05T18:30:30 = 6:30:30 GD UTC
+   1995-12-22T09:05:02 = 9:05:02 GH UTC
+  -0010-09-15T04:44:23 = 4:44:23 GH UTC
 
 =head3 hmv (h:mm a v)
 

@@ -8,7 +8,7 @@ Weather::GHCN::Options - create and manage option lists/objects used by GHCN mod
 
 =head1 VERSION
 
-version v0.0.008
+version v0.0.009
 
 =head1 SYNOPSIS
 
@@ -37,7 +37,7 @@ use Object::Pad 0.66 qw( :experimental(init_expr) );
 package Weather::GHCN::Options;
 class   Weather::GHCN::Options;
 
-our $VERSION = 'v0.0.008';
+our $VERSION = 'v0.0.009';
 
 use Carp                qw(carp croak);
 use Const::Fast;
@@ -269,19 +269,20 @@ method get_getopt_list :common () {
         next if ref $row ne 'ARRAY';
 
         # pick off the first three values, then slurp the rest
-        my ($opt_kw, $opt_type, $default, @others) = $row->@*;
+        my ($opt_kw, $opt_type, $default, @other) = $row->@*;
         # skip the group dividers
         next if not $opt_kw;
 
-        # now figure out whether the slurped values are a hash of
-        # other options (including label) or just a pair of scalars
-        # ('label' and label value with no other options).
         my %h;
-        if (@others > 1 && ref $others[0] eq 'HASH') {
-            %h = @others;
-        }
-        elsif (@others > 1 && $others[0] eq 'label') {
-            $h{'label'} = $others[2];
+        while (my $item = shift @other) {
+            if (ref $item eq 'HASH') {
+                while (my ($k,$v) = each $item->%*) {
+                    $h{$k} = $v;
+                }
+            } else {
+                my $value = shift @other;
+                $h{$item} = $value;
+            }
         }
 
         my $label = $h{'label'} // $SPACE;

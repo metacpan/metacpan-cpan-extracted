@@ -14,7 +14,7 @@ use strict;
 use warnings;
 
 use Media::Convert;
-use Media::Convert::ProfileFactory;
+use Media::Convert::Asset::ProfileFactory;
 use Media::Convert::Pipe;
 use File::Basename qw/dirname basename/;
 use Getopt::Long;
@@ -80,7 +80,7 @@ sub progress {
 }
 
 my $input = Media::Convert->new(url => $inputname);
-my $profile = Media::Convert::ProfileFactory->create($profilename, $input);
+my $profile = Media::Convert::Asset::ProfileFactory->create($profilename, $input);
 if(!defined($outputname)) {
 	$outputname = $inputname;
 	$outputname =~ s/\.[^\.]*$//g;

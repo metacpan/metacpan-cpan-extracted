@@ -1,5 +1,8 @@
 Revision history for Test-SQLite
 
+0.0410 2022-10-26 17:44:47
+    - Avoid implicit imports.
+
 0.0409 2020-03-20 20:49:43
     - Do not document the BUILD method.
 

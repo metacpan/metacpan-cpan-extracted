@@ -5,92 +5,92 @@ package DataDog::DogStatsd;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use IO::Socket::INET;
 
 my %OPTS_KEYS = (
-	date_happened    => 'd',
-	hostname         => 'h',
-	aggregation_key  => 'k',
-	priority         => 'p',
-	source_type_name => 's',
-	alert_type       => 't'
+    date_happened    => 'd',
+    hostname         => 'h',
+    aggregation_key  => 'k',
+    priority         => 'p',
+    source_type_name => 's',
+    alert_type       => 't'
 );
 
-sub new {
-	my $classname = shift;
-	my $class = ref( $classname ) || $classname;
-	my %p = @_ % 2 ? %{$_[0]} : @_;
+sub new {    ## no critic (Subroutines::RequireArgUnpacking)
+    my $classname = shift;
+    my $class     = ref($classname) || $classname;
+    my %p         = @_ % 2 ? %{$_[0]} : @_;
 
-	$p{host} ||= '127.0.0.1';
-	$p{port} ||= 8125;
-	$p{namespace} ||= '';
+    $p{host}      ||= '127.0.0.1';
+    $p{port}      ||= 8125;
+    $p{namespace} ||= '';
 
-	return bless \%p, $class;
+    return bless \%p, $class;
 }
 
 sub _socket {
-	my $self = shift;
-	return $self->{_socket} if $self->{_socket};
-	$self->{_socket} = IO::Socket::INET->new(
-		PeerAddr => $self->{'host'},
-		PeerPort => $self->{'port'},
-		Proto    => 'udp'
-	);
-	return $self->{_socket};
+    my $self = shift;
+    return $self->{_socket} if $self->{_socket};
+    $self->{_socket} = IO::Socket::INET->new(
+        PeerAddr => $self->{'host'},
+        PeerPort => $self->{'port'},
+        Proto    => 'udp'
+    );
+    return $self->{_socket};
 }
 
 sub namespace {
-	my $self = shift;
-        return $self->{'namespace'} unless @_;
-	$self->{'namespace'} = shift;
+    my $self = shift;
+    return $self->{'namespace'} unless @_;
+    $self->{'namespace'} = shift;
 }
 
 sub increment {
-	my $self = shift;
-	my $stat = shift;
-	my $opts = shift || {};
-	$self->count( $stat, 1, $opts );
+    my $self = shift;
+    my $stat = shift;
+    my $opts = shift || {};
+    $self->count($stat, 1, $opts);
 }
 
 sub decrement {
-	my $self = shift;
-	my $stat = shift;
-	my $opts = shift || {};
-	$self->count( $stat, -1, $opts );
+    my $self = shift;
+    my $stat = shift;
+    my $opts = shift || {};
+    $self->count($stat, -1, $opts);
 }
 
 sub count {
-	my $self  = shift;
-	my $stat  = shift;
-	my $count = shift;
-	my $opts  = shift || {};
-	$self->send_stats( $stat, $count, 'c', $opts );
+    my $self  = shift;
+    my $stat  = shift;
+    my $count = shift;
+    my $opts  = shift || {};
+    $self->send_stats($stat, $count, 'c', $opts);
 }
 
 sub gauge {
-	my $self  = shift;
-	my $stat  = shift;
-	my $value = shift;
-	my $opts  = shift || {};
-	$self->send_stats( $stat, $value, 'g', $opts );
+    my $self  = shift;
+    my $stat  = shift;
+    my $value = shift;
+    my $opts  = shift || {};
+    $self->send_stats($stat, $value, 'g', $opts);
 }
 
 sub histogram {
-	my $self  = shift;
-	my $stat  = shift;
-	my $value = shift;
-	my $opts  = shift || {};
-	$self->send_stats( $stat, $value, 'h', $opts );
+    my $self  = shift;
+    my $stat  = shift;
+    my $value = shift;
+    my $opts  = shift || {};
+    $self->send_stats($stat, $value, 'h', $opts);
 }
 
 sub timing {
-	my $self = shift;
-	my $stat = shift;
-	my $ms   = shift;
-	my $opts = shift || {};
-	$self->send_stats( $stat, sprintf("%d", $ms), 'ms', $opts );
+    my $self = shift;
+    my $stat = shift;
+    my $ms   = shift;
+    my $opts = shift || {};
+    $self->send_stats($stat, sprintf("%d", $ms), 'ms', $opts);
 }
 
 # Reports execution time of the provided block using {#timing}.
@@ -111,82 +111,81 @@ sub timing {
 ##end
 
 sub set {
-	my $self  = shift;
-	my $stat  = shift;
-	my $value = shift;
-	my $opts  = shift || {};
-	$self->send_stats( $stat, $value, 's', $opts );
+    my $self  = shift;
+    my $stat  = shift;
+    my $value = shift;
+    my $opts  = shift || {};
+    $self->send_stats($stat, $value, 's', $opts);
 }
 
 sub event {
-	my $self  = shift;
-	my $title = shift;
-	my $text  = shift;
-	my $opts  = shift || {};
+    my $self  = shift;
+    my $title = shift;
+    my $text  = shift;
+    my $opts  = shift || {};
 
-	my $event_string = format_event( $title, $text, $opts );
+    my $event_string = format_event($title, $text, $opts);
 
-	$self->send_to_socket($event_string);
+    $self->send_to_socket($event_string);
 }
 
 sub format_event {
-	my $title = shift;
-	my $text  = shift;
-	my $opts  = shift || {};
+    my $title = shift;
+    my $text  = shift;
+    my $opts  = shift || {};
 
-	my $tags = delete $opts->{tags};
+    my $tags = delete $opts->{tags};
 
-	$title =~ s/\n/\\n/g;
-	$text =~ s/\n/\\n/g;
+    $title =~ s/\n/\\n/g;
+    $text  =~ s/\n/\\n/g;
 
-	my $event_string_data = sprintf "_e{%d,%d}:%s|%s",
-	length($title), length($text), $title, $text;
+    my $event_string_data = sprintf "_e{%d,%d}:%s|%s", length($title), length($text), $title, $text;
 
-	for my $opt ( keys %$opts ) {
-		if ( my $key = $OPTS_KEYS{$opt} ) {
-			$opts->{$opt} =~ s/|//g;
-			$event_string_data .= "|$key:$opts->{$opt}";
-		}
-	}
+    for my $opt (keys %$opts) {
+        if (my $key = $OPTS_KEYS{$opt}) {
+            $opts->{$opt} =~ s/|//g;
+            $event_string_data .= "|$key:$opts->{$opt}";
+        }
+    }
 
-	if ($tags) {
-		$event_string_data .= "|#" . join ",", map { s/|//g; $_ } @$tags;
-	}
+    if ($tags) {
+        $event_string_data .= "|#" . join ",", map { s/|//g; $_ } @$tags;    ## no critic (ControlStructures::ProhibitMutatingListFunctions)
+    }
 
-	return $event_string_data;
+    return $event_string_data;
 }
 
 sub send_stats {
-	my $self  = shift;
-	my $stat  = shift;
-	my $delta = shift;
-	my $type  = shift;
-	my $opts  = shift || {};
+    my $self  = shift;
+    my $stat  = shift;
+    my $delta = shift;
+    my $type  = shift;
+    my $opts  = shift || {};
 
-	my $sample_rate = defined $opts->{'sample_rate'} ? $opts->{'sample_rate'} : 1;
-	if( $sample_rate == 1 || rand() <= $sample_rate ) {
-		$stat =~ s/::/./g;
-		$stat =~ s/[:|@]/_/g;
-		my $rate = '';
-		$rate = "|\@${sample_rate}" unless $sample_rate == 1;
-		my $tags = '';
-		$tags = "|#".join(',',@{$opts->{'tags'}}) if $opts->{'tags'};
-		my $message = $self->{'namespace'}."${stat}:${delta}|${type}${rate}${tags}";
-		return $self->send_to_socket( $message );
-	}
+    my $sample_rate = defined $opts->{'sample_rate'} ? $opts->{'sample_rate'} : 1;
+    if ($sample_rate == 1 || rand() <= $sample_rate) {
+        $stat =~ s/::/./g;
+        $stat =~ s/[:|@]/_/g;
+        my $rate = '';
+        $rate = "|\@${sample_rate}" unless $sample_rate == 1;
+        my $tags = '';
+        $tags = "|#" . join(',', @{$opts->{'tags'}}) if $opts->{'tags'};
+        my $message = $self->{'namespace'} . "${stat}:${delta}|${type}${rate}${tags}";
+        return $self->send_to_socket($message);
+    }
 }
 
 sub send_to_socket {
-	my ($self, $message) = @_;
+    my ($self, $message) = @_;
 
-	my $r = send($self->_socket(), $message, 0);
-	if (! defined $r) {
-		return 0;
-	} elsif ($r != length($message)) {
-		return 0;
-	}
+    my $r = send($self->_socket(), $message, 0);
+    if (!defined $r) {
+        return 0;
+    } elsif ($r != length($message)) {
+        return 0;
+    }
 
-	return 1;
+    return 1;
 }
 
 1;
@@ -262,7 +261,7 @@ Sends an arbitrary count for the given stat to the statsd server.
 	$statsd->gauge('users.online', 100);
 	$statsd->gauge('users.online', 100, { tags => ['tag1', 'tag2'] });
 
-Sends an arbitary gauge value for the given stat to the statsd server.
+Sends an arbitrary gauge value for the given stat to the statsd server.
 
 This is useful for recording things like available disk space, memory usage, and the like, which have different semantics than counters.
 
@@ -290,7 +289,7 @@ Sends a value to be tracked as a set to the statsd server.
 	$statsd->event('event title', 'event text', { tags => ['tag1, 'tag2'] });
 	$statsd->event('event title', 'event text', { tags => ['tag1', 'tag2'], alert_type => 'error'});
 
-Sends an event indicating a specific incident occurring. 
+Sends an event indicating a specific incident occurring.
 
 Use alert_type option to specify the kind of event, available options are error, warning, info, and success.
 

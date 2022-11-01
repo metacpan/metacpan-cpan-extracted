@@ -6,7 +6,7 @@ use 5.008004;
 use Wasm::Wasmtime::FFI;
 
 # ABSTRACT: Global configuration for Wasm::Wasmtime::Engine
-our $VERSION = '0.21'; # VERSION
+our $VERSION = '0.22'; # VERSION
 
 
 $ffi_prefix = 'wasm_config_';
@@ -138,6 +138,30 @@ $ffi->attach( [ 'wasmtime_config_cache_config_load' => 'cache_config_default' ] 
   $self;
 });
 
+
+if(_v0_23_0())
+{
+  $ffi->attach( ['wasmtime_config_consume_fuel_set' => 'consume_fuel' ] => [ 'wasm_config_t', 'bool' ] => sub {
+    my($xsub, $self, $value) = @_;
+    $xsub->($self, $value);
+    $self;
+  });
+  $ffi->attach( ['wasmtime_config_max_instances_set' => 'max_instances' ] => [ 'wasm_config_t', 'size_t' ] => sub {
+    my($xsub, $self, $value) = @_;
+    $xsub->($self, $value);
+    $self;
+  });
+}
+else
+{
+  *consume_fuel = sub {
+    Carp::croak("unimplemented, upgrade wasmtime to 0.23.0");
+  };
+  *max_instances = sub {
+    Carp::croak("unimplemented, upgrade wasmtime to 0.23.0");
+  };
+}
+
 1;
 
 __END__
@@ -152,7 +176,7 @@ Wasm::Wasmtime::Config - Global configuration for Wasm::Wasmtime::Engine
 
 =head1 VERSION
 
-version 0.21
+version 0.22
 
 =head1 SYNOPSIS
 
@@ -327,6 +351,18 @@ Path to the cache configuration TOML file.
 
 Enable the default caching configuration.
 
+=head2 consume_fuel
+
+ $config->consume_fuel($bool);
+
+Whether or not fuel is enabled for generated code.
+
+=head2 max_instances
+
+ $confog->max_instances($size);
+
+Configures the maximum number of instances that can be created.
+
 =head1 SEE ALSO
 
 =over 4
@@ -343,7 +379,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Graham Ollis.
+This software is copyright (c) 2020-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

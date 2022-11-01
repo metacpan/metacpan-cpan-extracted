@@ -116,15 +116,23 @@ BEGIN {
 my $kevent_packer;
 my $poll_packer;
 BEGIN {
+	#Max integer size
+	my $int_size= log(~0 +1)/log(2)/8;
+
 	$kevent_packer=do {
 		if($^O =~ /darwin/){
 			#ON darwin we use the kevent64_s type
-			"QsSLqQQQ"
+			$packer=
+			$int_size==8
+				? "QsSLqQQQ"
+				: "LsSLlLLL";
 
 		}
 		elsif($^O=~ /bsd/){
 			#bsd kqueue only has this type
-			"QsSLqQQQQQ"
+			$int_size==8
+				? "QsSLqQQQQQ"
+				: "LsSLlLLLLL"
 
 		}
 		else {

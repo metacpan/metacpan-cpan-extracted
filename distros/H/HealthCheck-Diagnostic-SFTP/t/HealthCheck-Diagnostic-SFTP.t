@@ -17,7 +17,7 @@ $mock->mock( new => sub {
         if $host eq 'inaccessible-host';
 
     # Slow hosts should be successfully timed out.
-    sleep 5 if $host eq 'slow-host';
+    sleep 3 if $host eq 'slow-host';
 
     $last_sftp = bless( \%params, 'Net::SFTP' );
     return $last_sftp;
@@ -144,10 +144,10 @@ my $run_check_or_error = sub {
     like $result->[1], qr/Net::SSH: Bad host name: inaccessible-host/,
         'Connection error is displayed in info message.';
 
-    $result = $run_check_or_error->( host => 'slow-host' );
+    $result = $run_check_or_error->( host => 'slow-host', timeout => 2 );
     is $result->[0], 'CRITICAL',
         'Connection timeout brings up CRITICAL status.';
-    like $result->[1], qr/Error for slow-host SFTP: timeout after 3 seconds\./,
+    like $result->[1], qr/Error for slow-host SFTP: timeout after 2 seconds\./,
         'Connection timeout error is displayed in info message.';
 }
 
@@ -198,7 +198,7 @@ SKIP: {
         host => 'host-with-default-timeout-and-no-ssh-args',
     );
     $diagnostic->check;
-    eq_or_diff $last_sftp->{ssh_args}, { options => [ 'ConnectTimeout 3' ] },
+    eq_or_diff $last_sftp->{ssh_args}, { options => [ 'ConnectTimeout 10' ] },
         'Set default ConnectTimeout value with no other options.';
 
     $diagnostic = HealthCheck::Diagnostic::SFTP->new(
@@ -213,7 +213,7 @@ SKIP: {
         some_net_ssh_perl_option => 'foo',
         options                  => [
             'UserKnownHostsFile /tmp',
-            'ConnectTimeout 3',
+            'ConnectTimeout 10',
         ],
     }, 'Set custom ConnectTimeout value with existing options.';
 

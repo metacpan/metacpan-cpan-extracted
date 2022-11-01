@@ -1,18 +1,19 @@
 Build.PL
 Changes
 lib/Feature/Compat/Class.pm
+LICENSE
 MANIFEST			This list of files
+META.json
+META.yml
+README
 t/00use.t
 t/01method.t
 t/02fields.t
 t/03create.t
+t/05subclass.t
 t/11method-signatures.t
 t/12fields-capture.t
 t/31pad-outside.t
 t/50croak-method.t
 t/52croak-scope.t
 t/99pod.t
-README
-LICENSE
-META.yml
-META.json

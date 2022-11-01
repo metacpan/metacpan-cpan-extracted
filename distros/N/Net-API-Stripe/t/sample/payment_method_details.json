@@ -1,0 +1,23 @@
+{
+   "card" : {
+      "brand" : "visa",
+      "checks" : {
+         "address_line1_check" : null,
+         "address_postal_code_check" : null,
+         "cvc_check" : null
+      },
+      "country" : "US",
+      "exp_month" : "8",
+      "exp_year" : "2023",
+      "fingerprint" : "Xt5EWLLDS7FJjR1c",
+      "funding" : "credit",
+      "installments" : null,
+      "last4" : "4242",
+      "mandate" : null,
+      "moto" : null,
+      "network" : "visa",
+      "three_d_secure" : null,
+      "wallet" : null
+   },
+   "type" : "card"
+}

@@ -16,6 +16,7 @@ my $base = dirname($0) . '/data';
 my $archivename = "$base/def.zip";
 my $ar = Archive::7zip->new(
     archivename => $archivename,
+    verbose => $ENV{TEST_ARCHIVE_7Z_VERBOSE},
 );
 
 # Check that extraction to scalar and extraction to file

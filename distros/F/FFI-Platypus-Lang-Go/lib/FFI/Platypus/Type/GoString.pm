@@ -7,7 +7,7 @@ use FFI::Go::String;
 use Ref::Util qw( is_blessed_ref );
 
 # ABSTRACT: Go String type for Platypus
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.02'; # VERSION
 
 
 sub ffi_custom_type_api_1
@@ -36,12 +36,12 @@ FFI::Platypus::Type::GoString - Go String type for Platypus
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
  use FFI::Platypus 1.00;
-
+ 
  my $ffi = FFI::Platypus->new( api => 1 );
  $ffi->load_custom_type('::GoString' => 'gostring');
  $ffi->function( some_go_function => [ 'gostring' ] )->call("hello there!");
@@ -69,7 +69,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Graham Ollis.
+This software is copyright (c) 2018-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

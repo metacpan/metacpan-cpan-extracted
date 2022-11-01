@@ -2,7 +2,7 @@
 ## Stripe API - ~/lib/Net/API/Stripe/Order/SKU.pm
 ## Version v0.100.0
 ## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2020/05/15
 ## 
@@ -12,37 +12,42 @@ package Net::API::Stripe::Order::SKU;
 BEGIN
 {
     use strict;
+    use warnings;
     use parent qw( Net::API::Stripe::Generic );
+    use vars qw( $VERSION );
     our( $VERSION ) = 'v0.100.0';
 };
 
-sub id { shift->_set_get_scalar( 'id', @_ ); }
+use strict;
+use warnings;
 
-sub object { shift->_set_get_scalar( 'object', @_ ); }
+sub id { return( shift->_set_get_scalar( 'id', @_ ) ); }
 
-sub active { shift->_set_get_boolean( 'active', @_ ); }
+sub object { return( shift->_set_get_scalar( 'object', @_ ) ); }
 
-sub attributes { shift->_set_get_hash( 'attributes', @_ ); }
+sub active { return( shift->_set_get_boolean( 'active', @_ ) ); }
 
-sub created { shift->_set_get_datetime( 'created', @_ ); }
+sub attributes { return( shift->_set_get_hash( 'attributes', @_ ) ); }
 
-sub currency { shift->_set_get_scalar( 'currency', @_ ); }
+sub created { return( shift->_set_get_datetime( 'created', @_ ) ); }
 
-sub image { shift->_set_get_uri( 'image', @_ ); }
+sub currency { return( shift->_set_get_scalar( 'currency', @_ ) ); }
 
-sub inventory { shift->_set_get_object( 'inventory', 'Net::API::Stripe::Order::SKU::Inventory', @_ ); }
+sub image { return( shift->_set_get_uri( 'image', @_ ) ); }
 
-sub livemode { shift->_set_get_boolean( 'livemode', @_ ); }
+sub inventory { return( shift->_set_get_object( 'inventory', 'Net::API::Stripe::Order::SKU::Inventory', @_ ) ); }
 
-sub metadata { shift->_set_get_hash( 'metadata', @_ ); }
+sub livemode { return( shift->_set_get_boolean( 'livemode', @_ ) ); }
 
-sub package_dimensions { shift->_set_get_object( 'package_dimensions', 'Net::API::Stripe::Order::SKU::PackageDimensions', @_ ); }
+sub metadata { return( shift->_set_get_hash( 'metadata', @_ ) ); }
 
-sub price { shift->_set_get_number( 'price', @_ ); }
+sub package_dimensions { return( shift->_set_get_object( 'package_dimensions', 'Net::API::Stripe::Order::SKU::PackageDimensions', @_ ) ); }
 
-sub product { shift->_set_get_scalar_or_object( 'product', 'Net::API::Stripe::Product', @_ ); }
+sub price { return( shift->_set_get_number( 'price', @_ ) ); }
 
-sub updated { shift->_set_get_datetime( 'updated', @_ ); }
+sub product { return( shift->_set_get_scalar_or_object( 'product', 'Net::API::Stripe::Product', @_ ) ); }
+
+sub updated { return( shift->_set_get_datetime( 'updated', @_ ) ); }
 
 1;
 
@@ -70,11 +75,11 @@ Net::API::Stripe::Order::SKU - A Stripe SKU Object
         package_dimensions =>
         {
             # In inches
-			height => 6,
-			length => 20,
-			# Ounce
-			weight => 21
-			width => 12
+            height => 6,
+            length => 20,
+            # Ounce
+            weight => 21
+            width => 12
         },
         price => 2000,
         product => $product_object,
@@ -94,108 +99,102 @@ Can also be used to manage inventory.
 
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>( %ARG )
+=head2 new( %ARG )
 
 Creates a new L<Net::API::Stripe::Order::SKU> object.
 It may also take an hash like arguments, that also are method of the same name.
 
-=back
-
 =head1 METHODS
 
-=over 4
-
-=item B<id> string
+=head2 id string
 
 Unique identifier for the object.
 
-=item B<object> string, value is "sku"
+=head2 object string, value is "sku"
 
 String representing the object’s type. Objects of the same type share the same value.
 
-=item B<active> boolean
+=head2 active boolean
 
 Whether the SKU is available for purchase.
 
-=item B<attributes> hash
+=head2 attributes hash
 
 A dictionary of attributes and values for the attributes defined by the product. If, for example, a product’s attributes are ["size", "gender"], a valid SKU has the following dictionary of attributes: {"size": "Medium", "gender": "Unisex"}.
 
-=item B<created> timestamp
+=head2 created timestamp
 
 Time at which the object was created. Measured in seconds since the Unix epoch.
 
-=item B<currency> currency
+=head2 currency currency
 
 Three-letter ISO currency code, in lowercase. Must be a supported currency.
 
-=item B<image> string
+=head2 image string
 
 The URL of an image for this SKU, meant to be displayable to the customer.
 
 This is a L<URI> object.
 
-=item B<inventory> hash
+=head2 inventory hash
 
 Description of the SKU’s inventory.
 
 This is a L<Net::API::Stripe::Order::SKU::Inventory> object.
 
-=item B<livemode> boolean
+=head2 livemode boolean
 
 Has the value true if the object exists in live mode or the value false if the object exists in test mode.
 
-=item B<metadata> hash
+=head2 metadata hash
 
 Set of key-value pairs that you can attach to an object. This can be useful for storing additional information about the object in a structured format.
 
-=item B<package_dimensions> hash
+=head2 package_dimensions hash
 
 The dimensions of this SKU for shipping purposes.
 
 This is a L<Net::API::Stripe::Order::SKU::PackageDimensions> object.
 
-=item B<price> positive integer or zero
+=head2 price positive integer or zero
 
 The cost of the item as a positive integer in the smallest currency unit (that is, 100 cents to charge $1.00, or 100 to charge ¥100, Japanese Yen being a zero-decimal currency).
 
-=item B<product> string (expandable)
+=head2 product string (expandable)
 
 The ID of the product this SKU is associated with. The product must be currently active.
 
 When expanded, this is a L<Net::API::Stripe::Product> object.
 
-=item B<updated> timestamp
+=head2 updated timestamp
 
-=back
+Time at which the object was last updated. Measured in seconds since the Unix epoch.
 
 =head1 API SAMPLE
 
-	{
-	  "id": "sku_fake123456789",
-	  "object": "sku",
-	  "active": true,
-	  "attributes": {
-		"size": "Medium",
-		"gender": "Unisex"
-	  },
-	  "created": 1571480453,
-	  "currency": "jpy",
-	  "image": null,
-	  "inventory": {
-		"quantity": 50,
-		"type": "finite",
-		"value": null
-	  },
-	  "livemode": false,
-	  "metadata": {},
-	  "package_dimensions": null,
-	  "price": 1500,
-	  "product": "prod_fake123456789",
-	  "updated": 1571480453
-	}
+    {
+      "id": "sku_fake123456789",
+      "object": "sku",
+      "active": true,
+      "attributes": {
+        "size": "Medium",
+        "gender": "Unisex"
+      },
+      "created": 1571480453,
+      "currency": "jpy",
+      "image": null,
+      "inventory": {
+        "quantity": 50,
+        "type": "finite",
+        "value": null
+      },
+      "livemode": false,
+      "metadata": {},
+      "package_dimensions": null,
+      "price": 1500,
+      "product": "prod_fake123456789",
+      "updated": 1571480453
+    }
 
 =head1 HISTORY
 

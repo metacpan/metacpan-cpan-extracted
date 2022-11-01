@@ -1,5 +1,8 @@
 Revision history for Music-Cadence
 
+0.1506 2022-10-23 12:24:27
+    - Avoid implicit imports.
+
 0.1505 2022-06-16 20:42:22
     - Use Music::PitchNum.
 

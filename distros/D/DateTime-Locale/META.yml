@@ -36,22 +36,22 @@ no_index:
 provides:
   DateTime::Locale:
     file: lib/DateTime/Locale.pm
-    version: '1.36'
+    version: '1.37'
   DateTime::Locale::Base:
     file: lib/DateTime/Locale/Base.pm
-    version: '1.36'
+    version: '1.37'
   DateTime::Locale::Catalog:
     file: lib/DateTime/Locale/Catalog.pm
-    version: '1.36'
+    version: '1.37'
   DateTime::Locale::Data:
     file: lib/DateTime/Locale/Data.pm
-    version: '1.36'
+    version: '1.37'
   DateTime::Locale::FromData:
     file: lib/DateTime/Locale/FromData.pm
-    version: '1.36'
+    version: '1.37'
   DateTime::Locale::Util:
     file: lib/DateTime/Locale/Util.pm
-    version: '1.36'
+    version: '1.37'
 requires:
   Carp: '0'
   Dist::CheckConflicts: '0.02'
@@ -72,7 +72,7 @@ resources:
   bugtracker: https://github.com/houseabsolute/DateTime-Locale/issues
   homepage: https://metacpan.org/release/DateTime-Locale
   repository: git://github.com/houseabsolute/DateTime-Locale.git
-version: '1.36'
+version: '1.37'
 x_Dist_Zilla:
   perl:
     version: '5.032001'
@@ -80,7 +80,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::DROLSKY::BundleAuthordep
       name: '@DROLSKY/DROLSKY::BundleAuthordep'
-      version: '1.20'
+      version: '1.22'
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
       config:
@@ -322,6 +322,7 @@ x_Dist_Zilla:
             - Bh
             - Bhm
             - Bhms
+            - Bhojpuri
             - Blin
             - Bodo
             - Bokmål
@@ -391,7 +392,7 @@ x_Dist_Zilla:
             - Faso
             - Fonyi
             - Friulian
-            - Fulah
+            - Fula
             - Futuna
             - GF
             - GG
@@ -431,6 +432,7 @@ x_Dist_Zilla:
             - HK
             - HN
             - Hant
+            - Haryanvi
             - Hm
             - Hmm
             - Hms
@@ -560,6 +562,7 @@ x_Dist_Zilla:
             - Maithili
             - Makhuwa
             - Makonde
+            - Mande
             - Manipuri
             - Mantaxtsees
             - Marino
@@ -575,6 +578,7 @@ x_Dist_Zilla:
             - Miquelon
             - Mmantaha
             - Mohndaach
+            - Moksha
             - Montag
             - Moondaach
             - Morisyen
@@ -608,6 +612,7 @@ x_Dist_Zilla:
             - Nyanja
             - Nyankole
             - Nynorsk
+            - Obolo
             - Occitan
             - Odia
             - Ol
@@ -625,6 +630,8 @@ x_Dist_Zilla:
             - PayPal
             - PayPal
             - Pazartesi
+            - Pijin
+            - Pona
             - Ponedjeljak
             - Príncipe
             - Puerto
@@ -634,6 +641,8 @@ x_Dist_Zilla:
             - QQQy
             - Qidaame
             - Qunxa
+            - Rajasthani
+            - Raviwaar
             - Rica
             - Ridas
             - Rolsky
@@ -672,7 +681,9 @@ x_Dist_Zilla:
             - Sidamo
             - Sinhala
             - Sint
+            - Skolt
             - Soga
+            - Somwaar
             - Sondag
             - Sonto
             - Sorbian
@@ -707,6 +718,7 @@ x_Dist_Zilla:
             - Timor
             - Tnejn
             - Tokelau
+            - Toki
             - Tomé
             - Tsonga
             - Tunga
@@ -754,6 +766,7 @@ x_Dist_Zilla:
             - astea
             - astelehena
             - ataasinngorneq
+            - atejn
             - ay
             - aynas
             - bazar
@@ -810,12 +823,14 @@ x_Dist_Zilla:
             - hétfő
             - hënë
             - ika
+            - il
             - im
             - ime
             - ing
             - iyax
             - jimweri
             - jumwa
+            - kaa
             - ke
             - killapa
             - kuni
@@ -1003,7 +1018,7 @@ x_Dist_Zilla:
             - zh
             - Åland
             - ûse
-            - ġimgħa
+            - ġimg
             - ži
             - Ọjọ
             - ọjọ
@@ -1070,7 +1085,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Test::Portability:
           options: ''
       name: '@DROLSKY/Test::Portability'
-      version: '2.001000'
+      version: '2.001001'
     -
       class: Dist::Zilla::Plugin::Test::Compile
       config:
@@ -1100,16 +1115,16 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::DROLSKY::Test::Precious
       name: '@DROLSKY/DROLSKY::Test::Precious'
-      version: '1.20'
+      version: '1.22'
     -
       class: Dist::Zilla::Plugin::DROLSKY::Contributors
       name: '@DROLSKY/DROLSKY::Contributors'
-      version: '1.20'
+      version: '1.22'
     -
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.37.2
+          git_version: 2.38.1
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -1239,7 +1254,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::DROLSKY::WeaverConfig
       name: '@DROLSKY/DROLSKY::WeaverConfig'
-      version: '1.20'
+      version: '1.22'
     -
       class: Dist::Zilla::Plugin::ReadmeAnyFromPod
       config:
@@ -1294,7 +1309,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::DROLSKY::License
       name: '@DROLSKY/DROLSKY::License'
-      version: '1.20'
+      version: '1.22'
     -
       class: Dist::Zilla::Plugin::CheckStrictVersion
       name: '@DROLSKY/CheckStrictVersion'
@@ -1318,10 +1333,10 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::DROLSKY::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.37.2
+          git_version: 2.38.1
           repo_root: .
       name: '@DROLSKY/DROLSKY::Git::CheckFor::CorrectBranch'
-      version: '1.20'
+      version: '1.22'
     -
       class: Dist::Zilla::Plugin::EnsureChangesHasContent
       name: '@DROLSKY/EnsureChangesHasContent'
@@ -1330,22 +1345,22 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.37.2
+          git_version: 2.38.1
           repo_root: .
       name: '@DROLSKY/Git::CheckFor::MergeConflicts'
       version: '0.014'
     -
       class: Dist::Zilla::Plugin::DROLSKY::PerlLinterConfigFiles
       name: '@DROLSKY/DROLSKY::PerlLinterConfigFiles'
-      version: '1.20'
+      version: '1.22'
     -
       class: Dist::Zilla::Plugin::DROLSKY::DevTools
       name: '@DROLSKY/DROLSKY::DevTools'
-      version: '1.20'
+      version: '1.22'
     -
       class: Dist::Zilla::Plugin::DROLSKY::Precious
       name: '@DROLSKY/DROLSKY::Precious'
-      version: '1.20'
+      version: '1.22'
     -
       class: Dist::Zilla::Plugin::Git::Check
       config:
@@ -1364,7 +1379,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.37.2
+          git_version: 2.38.1
           repo_root: .
       name: '@DROLSKY/Git::Check'
       version: '2.048'
@@ -1388,7 +1403,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.37.2
+          git_version: 2.38.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -1401,11 +1416,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v1.36
+          tag: v1.37
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.37.2
+          git_version: 2.38.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -1419,7 +1434,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.37.2
+          git_version: 2.38.1
           repo_root: .
       name: '@DROLSKY/Git::Push'
       version: '2.048'
@@ -1449,7 +1464,7 @@ x_Dist_Zilla:
             - (?^:.+)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.37.2
+          git_version: 2.38.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -1463,7 +1478,7 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.37.2
+          git_version: 2.38.1
           repo_root: .
       name: '@DROLSKY/Push version bump'
       version: '2.048'
@@ -1479,7 +1494,7 @@ x_Dist_Zilla:
           default_jobs: '12'
           version: '6.025'
       name: '@DROLSKY/DROLSKY::MakeMaker'
-      version: '1.20'
+      version: '1.22'
     -
       class: Dist::Zilla::Plugin::MetaResources
       name: MetaResources

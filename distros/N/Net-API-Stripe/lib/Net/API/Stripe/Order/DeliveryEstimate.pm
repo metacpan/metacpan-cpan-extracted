@@ -2,7 +2,7 @@
 ## Stripe API - ~/lib/Net/API/Stripe/Order/DeliveryEstimate.pm
 ## Version v0.100.0
 ## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2020/05/15
 ## 
@@ -11,17 +11,22 @@ package Net::API::Stripe::Order::DeliveryEstimate;
 BEGIN
 {
     use strict;
+    use warnings;
     use parent qw( Net::API::Stripe::Generic );
+    use vars qw( $VERSION );
     our( $VERSION ) = 'v0.100.0';
 };
 
-sub date { shift->_set_get_datetime( 'date', @_ ); }
+use strict;
+use warnings;
 
-sub earliest { shift->_set_get_datetime( 'earliest', @_ ); }
+sub date { return( shift->_set_get_datetime( 'date', @_ ) ); }
 
-sub latest { shift->_set_get_datetime( 'latest', @_ ); }
+sub earliest { return( shift->_set_get_datetime( 'earliest', @_ ) ); }
 
-sub type { shift->_set_get_scalar( 'type', @_ ); }
+sub latest { return( shift->_set_get_datetime( 'latest', @_ ) ); }
+
+sub type { return( shift->_set_get_scalar( 'type', @_ ) ); }
 
 1;
 
@@ -54,101 +59,93 @@ This is instantiated by method B<delivery_estimate> in module L<Net::API::Stripe
 
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>( %ARG )
+=head2 new( %ARG )
 
 Creates a new L<Net::API::Stripe::Order::DeliveryEstimate> object.
 It may also take an hash like arguments, that also are method of the same name.
 
-=back
-
 =head1 METHODS
 
-=over 4
-
-=item B<date> string
+=head2 date string
 
 If type is "exact", date will be the expected delivery date in the format YYYY-MM-DD.
 
 When set, this returns a C<DateTime> object.
 
-=item B<earliest> string
+=head2 earliest string
 
 If type is "range", earliest will be be the earliest delivery date in the format YYYY-MM-DD.
 
 When set, this returns a C<DateTime> object.
 
-=item B<latest> string
+=head2 latest string
 
 If type is "range", latest will be the latest delivery date in the format YYYY-MM-DD.
 
 When set, this returns a C<DateTime> object.
 
-=item B<type> string
+=head2 type string
 
 The type of estimate. Must be either "range" or "exact".
 
-=back
-
 =head1 API SAMPLE
 
-	{
-	  "id": "or_fake123456789",
-	  "object": "order",
-	  "amount": 1500,
-	  "amount_returned": null,
-	  "application": null,
-	  "application_fee": null,
-	  "charge": null,
-	  "created": 1571480453,
-	  "currency": "jpy",
-	  "customer": null,
-	  "email": null,
-	  "items": [
-		{
-		  "object": "order_item",
-		  "amount": 1500,
-		  "currency": "jpy",
-		  "description": "T-shirt",
-		  "parent": "sk_fake123456789",
-		  "quantity": null,
-		  "type": "sku"
-		}
-	  ],
-	  "livemode": false,
-	  "metadata": {},
-	  "returns": {
-		"object": "list",
-		"data": [],
-		"has_more": false,
-		"url": "/v1/order_returns?order=or_fake123456789"
-	  },
-	  "selected_shipping_method": null,
-	  "shipping": {
-		"address": {
-		  "city": "Anytown",
-		  "country": "US",
-		  "line1": "1234 Main street",
-		  "line2": null,
-		  "postal_code": "123456",
-		  "state": null
-		},
-		"carrier": null,
-		"name": "Jenny Rosen",
-		"phone": null,
-		"tracking_number": null
-	  },
-	  "shipping_methods": null,
-	  "status": "created",
-	  "status_transitions": {
-		"canceled": null,
-		"fulfiled": null,
-		"paid": null,
-		"returned": null
-	  },
-	  "updated": 1571480453
-	}
+    {
+      "id": "or_fake123456789",
+      "object": "order",
+      "amount": 1500,
+      "amount_returned": null,
+      "application": null,
+      "application_fee": null,
+      "charge": null,
+      "created": 1571480453,
+      "currency": "jpy",
+      "customer": null,
+      "email": null,
+      "items": [
+        {
+          "object": "order_item",
+          "amount": 1500,
+          "currency": "jpy",
+          "description": "T-shirt",
+          "parent": "sk_fake123456789",
+          "quantity": null,
+          "type": "sku"
+        }
+      ],
+      "livemode": false,
+      "metadata": {},
+      "returns": {
+        "object": "list",
+        "data": [],
+        "has_more": false,
+        "url": "/v1/order_returns?order=or_fake123456789"
+      },
+      "selected_shipping_method": null,
+      "shipping": {
+        "address": {
+          "city": "Anytown",
+          "country": "US",
+          "line1": "1234 Main street",
+          "line2": null,
+          "postal_code": "123456",
+          "state": null
+        },
+        "carrier": null,
+        "name": "Jenny Rosen",
+        "phone": null,
+        "tracking_number": null
+      },
+      "shipping_methods": null,
+      "status": "created",
+      "status_transitions": {
+        "canceled": null,
+        "fulfiled": null,
+        "paid": null,
+        "returned": null
+      },
+      "updated": 1571480453
+    }
 
 =head1 HISTORY
 

@@ -122,5 +122,8 @@ t/case-insensitive.t
 lib/Devel/AssertOS/Alias/MacOS.pm
 t/alias-macos.t
 lib/Devel/AssertOS/MacOSX/v12.pm
+lib/Devel/AssertOS/HWCapabilities/Int64.pm
+t/int-size.t
+lib/Devel/AssertOS/HWCapabilities/Int32.pm
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

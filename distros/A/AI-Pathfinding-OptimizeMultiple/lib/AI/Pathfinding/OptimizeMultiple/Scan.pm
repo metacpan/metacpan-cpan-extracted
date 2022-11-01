@@ -1,5 +1,5 @@
 package AI::Pathfinding::OptimizeMultiple::Scan;
-$AI::Pathfinding::OptimizeMultiple::Scan::VERSION = '0.0.16';
+$AI::Pathfinding::OptimizeMultiple::Scan::VERSION = '0.0.17';
 use strict;
 use warnings;
 
@@ -44,7 +44,7 @@ AI::Pathfinding::OptimizeMultiple::Scan
 
 =head1 VERSION
 
-version 0.0.16
+version 0.0.17
 
 =head1 SLOTS
 
@@ -160,7 +160,7 @@ Shlomi Fish <shlomif@cpan.org>
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/ai-pathfinding-optimizemultiple/issues>
+L<https://github.com/shlomif/fc-solve/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version v1.4.2
+    version v1.5.0
 
 SYNOPSIS
 
@@ -15,7 +15,7 @@ SYNOPSIS
         HealthCheck::Diagnostic::SFTP->check(
             host    => 'sftp.example.com',
             user    => 'auser',
-            timeout => 3, # default
+            timeout => 10, # default
         );
     
         # Check that the './history' file exists on the host.
@@ -83,7 +83,7 @@ ATTRIBUTES
  timeout
 
     Sets up an ALRM signal handler used to timeout the initial connection
-    attempt after the number of seconds provided. Defaults to 3.
+    attempt after the number of seconds provided. Defaults to 10.
 
 DEPENDENCIES
 

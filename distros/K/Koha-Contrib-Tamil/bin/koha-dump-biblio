@@ -54,7 +54,7 @@ koha-dump-biblio - Dump a Koha Catalog
 
 =head1 VERSION
 
-version 0.068
+version 0.069
 
 =head1 DESCRIPTION
 

@@ -18,7 +18,7 @@ subtest CHKHVIMIANI_LAI_WORLDS_2019 => sub {
     is $result, [
         {
 
-            'weight' => '-60',
+            'weight'                 => '-60',
             'personal_picture_white' =>
                 'https://www.judobase.org/files/persons//2019/02//15116_1550581155.jpg',
             'picture_filename_1' => '15116_1550581155.jpg',
@@ -43,26 +43,28 @@ subtest CHKHVIMIANI_LAI_WORLDS_2019 => sub {
             'ippon'               => '1',
             'round_name'          => 'Round 1',
             'medias'              => [
-                {   'id_fight_media'       => '63830',
-                    'camera_short'         => 'front',
-                    'id_camera'            => '1',
-                    'thumbnail'            => undef,
-                    'contest_start_offset' => '16',
-                    'linked_at'            => '2019-08-25 02:30:06',
-                    'published_at'         => '2019-08-25 02:28:27',
-                    'url_dash'             => undef,
-                    'media_ext_id'         => 'aTQ-jvodRU4',
+                {   'camera_short'         => 'front',
                     'camera'               => 'Front',
-                    'media_type'           => 'yt',
-                    'status'               => '0',
                     'contest_code'         => 'wc_sen2019_m_0060_0010',
-                    'url_m3u8'             => undef
+                    'contest_start_offset' => '16',
+                    'id_camera'            => '1',
+                    'id_fight_media'       => '63830',
+                    'id_policy'            => undef,
+                    'linked_at'            => '2019-08-25 02:30:06',
+                    'media_ext_id'         => 'aTQ-jvodRU4',
+                    'media_type'           => 'yt',
+                    'published_at'         => '2019-08-25 02:28:27',
+                    'status'               => '0',
+                    'thumbnail'            => undef,
+                    'url_dash'             => undef,
+                    'url_m3u8'             => undef,
+                    'video_status'         => 2,
                 }
             ],
             'id_fight'               => '497339',
             'penalty_b'              => '2',
             'id_person_white'        => '15116',
-            'timestamp_version_blue' => 'v1577212241',
+            'timestamp_version_blue' => 'v1658384618',
             'country_short_white'    => 'GEO',
             'media'                  => 'yt*aTQ-jvodRU4*00:00:16',
             'id_country_blue'        => '131',
@@ -74,6 +76,8 @@ subtest CHKHVIMIANI_LAI_WORLDS_2019 => sub {
             'ippon_b'                => '0',
             'scores'                 => [],
             'penalty'                => '2',
+            'hsk_b'                  => 0,
+            'hsk_w'                  => 0,
             'events'                 => [
                 {   'public'   => '1',
                     'official' => '1',
@@ -302,11 +306,11 @@ subtest CHKHVIMIANI_LAI_WORLDS_2019 => sub {
             'competition_date'        => '2019-08-25',
             'kodokan_tagged'          => '2',
             'bye'                     => '0',
-            'personal_picture_blue' =>
+            'personal_picture_blue'   =>
                 'https://www.judobase.org/files/persons//2019/12//34360_1577212241.jpg',
             'date_start_ts'      => '1566698879506',
             'waza_b'             => '0',
-            'updated_at'         => '2020-05-04 05:57:46',
+            'updated_at'         => '2022-05-11 13:18:06',
             'id_winner'          => '15116',
             'picture_filename_2' => '34360_1577212241.jpg',
             'country_white'      => 'Georgia',

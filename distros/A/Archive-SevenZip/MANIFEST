@@ -48,6 +48,7 @@ t/data/storestr.zip
 t/data/streamed.zip
 t/data/winzip.zip
 t/data/zip64.zip
+testrules.yml
 xt/99-changes.t
 xt/99-compile.t
 xt/99-manifest.t

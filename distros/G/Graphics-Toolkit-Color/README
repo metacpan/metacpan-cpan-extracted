@@ -1,5 +1,5 @@
 NAME
-    Graphics::Toolkit::Color - color palette creation tool
+    Graphics::Toolkit::Color - color palette creation helper
 
 SYNOPSIS
         my $red = Graphics::Toolkit::Color->new('red');
@@ -23,21 +23,23 @@ CONSTRUCTOR
     HSL color space.
 
   new( 'name' )
-    Get a color by providing a name from the X11 or HTML (SVG) standard or a
-    Pantone report. Upper/Camel case will be treated as lower case and
-    inserted underscore letters ('_') will be ignored as perl does in
-    numbers (1_000 == 1000) (see more under
-    Graphics::Toolkit::Color::Constant).
+    Get a color by providing a name from the X11, HTML (CSS) or SVG standard
+    or a Pantone report. UPPER or CamelCase will be normalized to lower case
+    and inserted underscore letters ('_') will be ignored as perl does in
+    numbers (1_000 == 1000). All available names are listed under
+    Graphics::Toolkit::Color::Constant.s
 
         my $color = Graphics::Toolkit::Color->new('Emerald');
         my @names = Graphics::Toolkit::Color::Constant::all_names(); # select from these
 
-  new( 'standard:color' )
-    Get a color by name from a specific standard as provided by an external
-    module Graphics::ColorNames::* , which has to be installed separately. *
-    is a placeholder for the pallet name, which might be: Crayola, CSS,
-    EmergyC, GrayScale, HTML, IE, SVG, Werner, WWW or X. In ladder case
-    Graphics::ColorNames::X has to be installed.
+  new( 'pallet:color' )
+    Get a color by name from a specific pallet or standard as provided by an
+    external module Graphics::ColorNames::* , which has to be installed
+    separately. * is a placeholder for the pallet name, which might be:
+    Crayola, CSS, EmergyC, GrayScale, HTML, IE, Mozilla, Netscape, Pantone,
+    PantoneReport, SVG, VACCC, Werner, Windows, WWW or X. In ladder case
+    Graphics::ColorNames::X has to be installed. The color name will be
+    normalized as above.
 
         my $color = Graphics::Toolkit::Color->new('SVG:green');
         my @s = Graphics::ColorNames::all_schemes();    # installed pallets
@@ -75,6 +77,15 @@ CONSTRUCTOR
         my $red = Graphics::Toolkit::Color->new( h =>   0, s => 100, b => 50 );
         my $red = Graphics::Toolkit::Color->new({h =>   0, s => 100, b => 50}); # good too
         ... ->new( Hue => 0, Saturation => 100, Lightness => 50 ); # also fine
+
+  color
+    If writing "Graphics::Toolkit::Color-"new(...> is too much typing for
+    you or takes to much space, import the subroutine "color", which takes
+    all the same arguments as described above.
+
+        use Graphics::Toolkit::Color qw/color/;
+        my $green = color('green');
+        my $darkblue = color([20, 20, 250]);
 
 GETTER / ATTRIBUTES
     are all read only methods - giving access to different parts of the
@@ -240,13 +251,13 @@ METHODS
 SEE ALSO
     *   Color::Scheme
 
+    *   Color::Library
+
     *   Graphics::ColorUtils
 
     *   Graphics::ColorObject
 
     *   Convert::Color
-
-    *   Graphics::ColorNames
 
     *   Color::Similarity
 

@@ -3,7 +3,7 @@ package App::perlimports::Document;
 use Moo;
 use utf8;
 
-our $VERSION = '0.000048';
+our $VERSION = '0.000049';
 
 use App::perlimports::Annotations     ();
 use App::perlimports::ExportInspector ();
@@ -104,6 +104,23 @@ has interpolated_symbols => (
     isa     => HashRef,
     lazy    => 1,
     builder => '_build_interpolated_symbols',
+);
+
+has json => (
+    is      => 'ro',
+    isa     => Bool,
+    lazy    => 1,
+    default => 0,
+);
+
+has _json_encoder => (
+    is      => 'ro',
+    isa     => InstanceOf ['Cpanel::JSON::XS'],
+    lazy    => 1,
+    default => sub {
+        require Cpanel::JSON::XS;
+        return Cpanel::JSON::XS->new;
+    },
 );
 
 has lint => (
@@ -253,6 +270,7 @@ my %default_ignore = (
     'Exporter'                       => 1,
     'Exporter::Lite'                 => 1,
     'Feature::Compat::Try'           => 1,
+    'Filter::Simple'                 => 1,
     'Git::Sub'                       => 1,
     'HTTP::Message::PSGI'            => 1,    # HTTP::Request::(to|from)_psgi
     'Import::Into'                   => 1,
@@ -334,6 +352,7 @@ sub _build_includes {
     #
     # We check for type so that we can filter out undef types or "no".
 
+    ## no critic (Subroutines::ProhibitCallsToUnexportedSubs)
     return $self->_ppi_selection->find(
         sub {
             $_[1]->isa('PPI::Statement::Include')
@@ -350,7 +369,7 @@ sub _build_includes {
                 );
         }
     ) || [];
-
+    ## use critic
 }
 
 sub _build_possible_imports {
@@ -934,6 +953,7 @@ INCLUDE:
             }
         }
 
+        ## no critic (Subroutines::ProhibitCallsToUnexportedSubs)
         # Let's see if the import itself might break something
         if ( my $err
             = App::perlimports::Sandbox::eval_pkg( $elem->module, "$elem" ) )
@@ -945,6 +965,7 @@ INCLUDE:
             );
             next INCLUDE;
         }
+        ## use critic
 
         my $inserted = $include->replace($elem);
         if ( !$inserted ) {
@@ -1007,11 +1028,34 @@ sub _warn_diff_for_linter {
     my $after         = shift;
     my $after_deleted = !$after;
 
-    my $justification = sprintf(
-        '❌ %s (%s) at %s line %i',
-        $include->module, $reason, $self->_filename, $include->line_number
-    );
-    $self->logger->error($justification);
+    my $json;
+    my $justification;
+
+    if ( $self->json ) {
+
+        my $loc     = { start => { line => $include->line_number } };
+        my $content = $include->content;
+        my @lines   = split( m{\n}, $content );
+
+        if ( $lines[0] =~ m{[^\s]} ) {
+            $loc->{start}->{column} = @-;
+        }
+        $loc->{end}->{line}   = $include->line_number + @lines - 1;
+        $loc->{end}->{column} = length( $lines[-1] );
+
+        $json = {
+            filename => $self->_filename,
+            location => $loc,
+            module   => $include->module,
+            reason   => $reason,
+        };
+    }
+    else {
+        $justification = sprintf(
+            '❌ %s (%s) at %s line %i',
+            $include->module, $reason, $self->_filename, $include->line_number
+        );
+    }
 
     my $padding = $include->line_number - 1;
     $before = sprintf( "%s%s\n", "\n" x $padding, $before );
@@ -1026,7 +1070,14 @@ sub _warn_diff_for_linter {
         }
     );
 
-    $self->logger->error($diff);
+    if ( $self->json ) {
+        $json->{diff} = $diff;
+        $self->logger->error( $self->_json_encoder->encode($json) );
+    }
+    else {
+        $self->logger->error($justification);
+        $self->logger->error($diff);
+    }
 }
 
 sub _remove_with_trailing_characters {
@@ -1110,7 +1161,7 @@ App::perlimports::Document - Make implicit imports explicit
 
 =head1 VERSION
 
-version 0.000048
+version 0.000049
 
 =head1 MOTIVATION
 

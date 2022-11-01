@@ -1,0 +1,150 @@
+Revision history for Perl module Net::API::Stripe
+
+v2.0.1 2022-10-29T22:27:26+0900
+    - Resubmission to CPAN
+
+v2.0.0 2022-10-29T21:15:12Z +0900
+    - Major changes to Net::API::Stripe with all of the API methods loaded on demand due to their important number
+    - Minor improvements to Net::API::Stripe::List
+    - Switched to using HTTP::Promise instead of LWP::UserAgent
+    - This Library is now fully auto-generated based on Stripe API
+    - 22 new modules: Net::API::Stripe::Billing::TestHelpersTestClock, Net::API::Stripe::Billing::UserRecord::Summary, Net::API::Stripe::Connect::AppsSecret, Net::API::Stripe::Financial::Connections::Account, Net::API::Stripe::Financial::Connections::AccountOwner, Net::API::Stripe::Financial::Connections::AccountOwnership, Net::API::Stripe::Financial::Connections::Session, Net::API::Stripe::Identity::VerificationReport, Net::API::Stripe::Identity::VerificationSession, Net::API::Stripe::Issuing::FundingInstructions, Net::API::Stripe::Terminal::Configuration, Net::API::Stripe::Treasury::CreditReversal, Net::API::Stripe::Treasury::DebitReversal, Net::API::Stripe::Treasury::FinancialAccount, Net::API::Stripe::Treasury::FinancialAccountFeatures, Net::API::Stripe::Treasury::InboundTransfer, Net::API::Stripe::Treasury::OutboundPayment, Net::API::Stripe::Treasury::OutboundTransfer, Net::API::Stripe::Treasury::ReceivedCredit, Net::API::Stripe::Treasury::ReceivedDebit, Net::API::Stripe::Treasury::Transaction, Net::API::Stripe::Treasury::TransactionEntry
+    - 21 updated modules: Net::API::Stripe::Billing::Invoice, Net::API::Stripe::Billing::PortalConfiguration, Net::API::Stripe::Billing::Quote, Net::API::Stripe::Billing::Subscription, Net::API::Stripe::Cash::Balance, Net::API::Stripe::Charge, Net::API::Stripe::Connect::ApplicationFee, Net::API::Stripe::Connect::CountrySpec::VerificationFields, Net::API::Stripe::Connect::Person, Net::API::Stripe::Customer, Net::API::Stripe::Mandate, Net::API::Stripe::Payment::Intent, Net::API::Stripe::Payment::Intent::Setup, Net::API::Stripe::Payment::Link, Net::API::Stripe::Payment::Method, Net::API::Stripe::Payment::Method::Details, Net::API::Stripe::Product, Net::API::Stripe::Reporting::ReportRun, Net::API::Stripe::SetupAttempt, Net::API::Stripe::Sigma::ScheduledQueryRun, Net::API::Stripe::Token
+    - 41 modules with 89 missing methods: Net::API::Stripe::Billing::Coupon, Net::API::Stripe::Billing::CreditNote, Net::API::Stripe::Billing::CreditNote::LineItem, Net::API::Stripe::Billing::Invoice::Settings, Net::API::Stripe::Billing::PortalConfiguration, Net::API::Stripe::Billing::Subscription, Net::API::Stripe::Billing::Subscription::Schedule, Net::API::Stripe::Charge, Net::API::Stripe::Checkout::Session, Net::API::Stripe::Connect::Account, Net::API::Stripe::Connect::Account::Capability, Net::API::Stripe::Connect::Account::Company, Net::API::Stripe::Connect::Account::Document, Net::API::Stripe::Connect::Account::Requirements, Net::API::Stripe::Connect::Account::Settings, Net::API::Stripe::Connect::Account::Settings::CardPayments, Net::API::Stripe::Connect::Account::Settings::Payments, Net::API::Stripe::Connect::ExternalAccount::Card, Net::API::Stripe::Connect::Person, Net::API::Stripe::Customer, Net::API::Stripe::Customer::Card, Net::API::Stripe::Fraud, Net::API::Stripe::Issuing::Card, Net::API::Stripe::Issuing::MerchantData, Net::API::Stripe::Issuing::Transaction, Net::API::Stripe::List::Item, Net::API::Stripe::Payment::Intent, Net::API::Stripe::Payment::Intent::NextAction, Net::API::Stripe::Payment::Intent::Setup, Net::API::Stripe::Payment::Link, Net::API::Stripe::Payment::Method, Net::API::Stripe::Payment::Method::Details, Net::API::Stripe::Price, Net::API::Stripe::Product, Net::API::Stripe::Refund, Net::API::Stripe::Reporting::ReportType, Net::API::Stripe::SetupAttempt, Net::API::Stripe::Shipping, Net::API::Stripe::Tax::Rate, Net::API::Stripe::Terminal::Location, Net::API::Stripe::Terminal::Reader - Net::API::Stripe::Billing::Coupon: currency_options - Net::API::Stripe::Billing::CreditNote: subtotal_excluding_tax, total_excluding_tax - Net::API::Stripe::Billing::CreditNote::LineItem: amount_excluding_tax, unit_amount_excluding_tax - Net::API::Stripe::Billing::Invoice::Settings: rendering_options, days_until_due - Net::API::Stripe::Billing::PortalConfiguration: login_page - Net::API::Stripe::Billing::Subscription: currency - Net::API::Stripe::Billing::Subscription::Schedule: application, test_clock - Net::API::Stripe::Charge: failure_balance_transaction, radar_options - Net::API::Stripe::Checkout::Session: payment_method_collection, shipping_cost, shipping_details - Net::API::Stripe::Connect::Account: controller, future_requirements - Net::API::Stripe::Connect::Account::Capability: future_requirements - Net::API::Stripe::Connect::Account::Company: ownership_declaration, additional, minimum - Net::API::Stripe::Connect::Account::Document: address, dob, expiration_date, files, first_name, issued_date, issuing_country, last_name, number, status, type - Net::API::Stripe::Connect::Account::Requirements: alternatives - Net::API::Stripe::Connect::Account::Settings: card_issuing, sepa_debit_payments - Net::API::Stripe::Connect::Account::Settings::CardPayments: statement_descriptor_prefix_kana, statement_descriptor_prefix_kanji - Net::API::Stripe::Connect::Account::Settings::Payments: statement_descriptor_prefix_kana, statement_descriptor_prefix_kanji - Net::API::Stripe::Connect::ExternalAccount::Card: status, amount_authorized, capture_before, incremental_authorization_supported, mandate, overcapture_supported - Net::API::Stripe::Connect::Person: additional, full_name_aliases, future_requirements, id_number_secondary_provided, minimum, nationality, registered_address, full_name_aliases, future_requirements, id_number_secondary_provided, nationality, registered_address - Net::API::Stripe::Customer: cash_balance, invoice_credit_balance, tax, test_clock - Net::API::Stripe::Customer::Card: mandate - Net::API::Stripe::Fraud: payment_intent - Net::API::Stripe::Issuing::Card: wallets, expires_after_days, setup_future_usage - Net::API::Stripe::Issuing::MerchantData: category_code - Net::API::Stripe::Issuing::Transaction: wallet - Net::API::Stripe::List::Item: amount_discount, amount_tax - Net::API::Stripe::Payment::Intent: amount_details, automatic_payment_methods, processing - Net::API::Stripe::Payment::Intent::NextAction: boleto_display_details, card_await_notification, display_bank_transfer_instructions, konbini_display_details, paynow_display_qr_code, promptpay_display_qr_code, verify_with_microdeposits, wechat_pay_display_qr_code, wechat_pay_redirect_to_android_app, wechat_pay_redirect_to_ios_app, boleto_display_details, card_await_notification, display_bank_transfer_instructions, konbini_display_details, paynow_display_qr_code, promptpay_display_qr_code, verify_with_microdeposits, wechat_pay_display_qr_code, wechat_pay_redirect_to_android_app, wechat_pay_redirect_to_ios_app - Net::API::Stripe::Payment::Intent::Setup: attach_to_self, flow_directions - Net::API::Stripe::Payment::Link: currency, payment_method_collection - Net::API::Stripe::Payment::Method: link, paynow, promptpay, radar_options, wechat_pay, link, paynow, promptpay, radar_options, wechat_pay - Net::API::Stripe::Payment::Method::Details: link, paynow, promptpay, wechat_pay, link - Net::API::Stripe::Price: currency_options, custom_unit_amount, tax_behavior, currency_options, custom_unit_amount, tax_behavior - Net::API::Stripe::Product: default_price, tax_code - Net::API::Stripe::Refund: instructions_email, next_action - Net::API::Stripe::Reporting::ReportType: livemode - Net::API::Stripe::SetupAttempt: attach_to_self, flow_directions - Net::API::Stripe::Shipping: customs, phone_number - Net::API::Stripe::Tax::Rate: country, state - Net::API::Stripe::Terminal::Location: configuration_overrides - Net::API::Stripe::Terminal::Reader: action
+
+v1.2.0 2022-01-30T08:00:43Z +0900
+    - Added methods after_expiration, automatic_tax, consent, consent_collection, customer_creation, customer_details, expires_at, payment_link, payment_method_options, recovered_from, shipping_options in Net::API::Stripe::Checkout::Session
+    - Added methods charge_search, customer_search, payment_intent_increment, payment_intent_reconcile, payment_intent_search, payment_intent_verify, setup_intent_verify, setup_attempts, refund_cancel, customer_bank_accounts, customer_bank_account, customer_bank_account_create, customer_bank_account_retrieve, customer_bank_account_update, customer_bank_account_delete, customer_bank_account_verify, customer_bank_account_list, customer_payment_method, customer_payment_methods, customer_cash_balance, customer_cash_balance_transaction, product_search, price_search, session_retrieve_items, payment_link_items, customer_balance_transaction_create, customer_balance_transaction_retrieve, customer_balance_transaction_update, customer_balance_transaction_list, , portal_configurations, portal_configuration_create, portal_configuration_list, portal_configuration_retrieve, portal_configuration_update, portal_session, portal_sessions, portal_session_create, invoice_items, invoice_item_create, invoice_item_delete, invoice_item_list, invoice_item_retrieve, invoice_item_update, invoice_search, quote, quotes, quote_accept, quote_cancel, quote_create, quote_download, quote_finalize, quote_lines, quote_list, quote_pdf, quote_retrieve, quote_update, quote_upfront_lines in Net::API::Stripe
+    - Updated the methods invoice_create, invoice_upcoming in Net::API::Stripe
+    - Added new module Net::API::Stripe::Customer::BankAccount
+    - Improved all modules by making the code stricter.
+    - Added new methods to Net::API::Stripe::Payment::Link class
+    - Updated Net::API::Stripe::Billing::PortalConfiguration to include new methods added on Stripe API
+    - Created Net::API::Stripe::Billing::PortalSession
+    - Implemented method test_clock added by Stripe in Net::API::Stripe::Billing::Invoice::Item
+    - Updated the Net::API::Stripe::Billing::Invoice
+    - Updated the Net::API::Stripe::Billing::Invoice::LineItem
+    - Added methods interval and interval_count in Net::API::Stripe::Checkout::Session
+    - Added application, test_clock in Net::API::Billing::Quote
+    - Updated method total_details in Net::API::Billing::Quote
+    - Added constant FILES_BASE for files.stripe.com api endpoints (for pdf quotes)
+    - Added methods application, automatic_tax, description, payment_settings, test_clock in Net::API::Stripe::Billing::Subscription
+
+v1.1.0 2020-11-30T19:38:35Z +0900
+    - Updated the Stripe class to package and added few new modules
+    - Added missing packge Net::API::Stripe::Payment::Source::Types
+    - Added missing method account in Net::API::Stripe::Event
+    - Added method payment_intent in Net::API::Stripe::Dispute
+    - Added method applies_to in Net::API::Stripe::Billing::Coupon
+    - Added methods allow_promotion_codes, amount_subtotal, amount_total, currency, metadata, payment_status, shipping, shipping_address_collection and shipping_address_collection in Net::API::Stripe::Checkout::Session
+    - Added methods description, iin and issuer in Net::API::Stripe::Connect::ExternalAccount::Card
+    - Added new methods in Net::API::Stripe::Balance::Transaction
+    - Added new methods in Net::API::Stripe::Balance
+    - Added methods discounts, last_finalization_error and transfer_data in Net::API::Stripe::Billing::Invoice
+    - Added methods amount, amount_details, currency, merchant_amount, merchant_currency, pending_request and wallet in Net::API::Stripe::Issuing::Authorization
+    - Added methods cancellation_reason, cvc, number and replaced_by in Net::API::Stripe::Issuing::Card
+    - Added methods in Net::API::Stripe::Payment::Intent
+    - Added package Net::API::Stripe::Billing::PortalSession. See <https://stripe.com/docs/api/customer_portal>
+    - Added package Net::API::Stripe::Billing::PromotionCode. See <https://stripe.com/docs/api/promotion_codes>
+    - Added package Net::API::Stripe::SetupAttempt. See <https://stripe.com/docs/api/setup_attempts>
+    - Added package Net::API::Payment::Source::Types.
+    - Changed method handler for discounts() in Net::API::Stripe::Billing::Invoice from _set_get_scalar_or_object to _set_get_scalar_or_object_array
+    - Corrected method handler for currency() in Net::API::Stripe::Payment::Intent from _set_get_number to _set_get_scalar
+    - Added method request_three_d_secure to Net::API::Stripe::Connect::ExternalAccount::Card. See <https://stripe.com/docs/api/payment_intents/object#payment_intent_object-payment_method_options-card-request_three_d_secure>>
+    - Corrected method helper for tax_amounts in Net::API::Stripe::Billing::CreditNote from _set_get_class to _set_get_class_array as it should
+    - Corrected method helper for tax_amounts in Net::API::Stripe::Billing::CreditNote::LineItem from _set_get_class to _set_get_class_array as it should
+    - Corrected method redirect_to_url in Net::API::Stripe::Payment::Intent::NextAction which was missing a parameter.
+    - Added method grabpay in Net::API::Stripe::Payment::Method
+    - Corrected a typo in method three_d_secure_usage in package Net::API::Stripe::Connect::ExternalAccount::Card
+    - Added a missing parameter 'class' in phrases->add_invoice_items->price in Net::API::Stripe::Billing::Subscription::Schedule
+    - Added the property 'expires_after_days' to the method oxxo in Net::API::Stripe::Payment::Method
+    - Added the property 'preferred_language' to the method sofort in Net::API::Stripe::Payment::Method
+    - Changed helper method for three_d_secure and wallet in Net::API::Stripe::Connect::ExternalAccount::Card from _set_get_hash_as_object to _set_get_class
+    - Updated the methods customer_acceptance and payment_method_details in Net::API::Stripe::Mandate
+    - Updated inner working of methods alipay, au_becs_debit, bancontact, card, card_present, eps, fpx, giropay, ideal, multibanco, p24, and sofort in Net::API::Stripe::Payment::Method::Details
+    - Updated methods with additional properties set by Stripe in Net::API::Stripe::Payment::Method::Details
+    - Added property timezone in method parameters in package Net::API::Stripe::Reporting::ReportRun
+    - Added method bacs_debit_payments in Net::API::Stripe::Connect::Account::Settings
+    - Added method service_agreement to Net::API::Stripe::Connect::Account::TosAcceptance
+    - Added methods cardholder_name and read_method to Net::API::Stripe::Connect::ExternalAccount::Card
+    - Added methods amount, amount_details, currency, merchant_amount and merchant_currency in Net::API::Stripe::Issuing::Authorization::RequestHistory
+    - Added methods canceled, duplicate, merchandise_not_as_described, not_received, reason and service_not_as_described in package Net::API::Stripe::Issuing::Dispute::Evidence
+    - Added methods additional_documentation and explanation in package Net::API::Stripe::Issuing::Dispute::Evidence::Fraudulent
+    - Added methods additional_documentation, explanation, product_description and product_type to package Net::API::Stripe::Issuing::Dispute::Evidence::Other
+    - Added methods available_plans and enabled to package Net::API::Stripe::Payment::Installment
+    - Added methods bacs_debit, grabpay, interac_present and oxxo to package Net::API::Stripe::Payment::Method::Details
+    - Added methods mandate_options, preferred_locales, reference and url to Net::API::Stripe::Connect::ExternalAccount::Card
+    - Added method _set_get_scalar_or_object_array to Net::API::Stripe::Generic to meet the demand of array containing expandable objects such as in Net::API::Stripe::Invoice::LineItem::discounts method. See Stripe api documentation here: <https://stripe.com/docs/api/invoices/line_item#invoice_line_item_object-discounts>
+    - Corrected an omission to return undef in Net::API::Stripe::Generic::init when the object initialisation failed so as to report the error properly to the caller.
+    - Improved private method _check_parameters in Net::API::Stripe to better handle required propertiess
+    - Updated method _check_parameters where the array reference of expandable properties was used and altered for *_list methods like customer_list having a 'data.' prefix added to its entries which would then create problem for non list methods afterward
+
+v1.0.9 2020-10-14T21:12:13Z +0900
+    - Added method networks and receipt to Net::API::Stripe::Connect::ExternalAccount::Card in line with Stripe API change.
+    - Update method subscription_create to make it compliant with Stripe new price object
+    - Modified method _set_get_number in Net::API::Stripe::Generic to avoid calling Module::Generic::Number when there is no value to create the object
+    - Added methods account_tax_ids and total_discount_amounts to Net::API::Stripe::Billing::Invoice
+    - Added methods discounts and price to Net::API::Stripe::Billing::Invoice::Item
+    - Added method discount_amounts to Net::API::Stripe::Billing::Invoice::LineItem
+    - Added method transfer_data to Net::API::Stripe::Billing::Subscription
+    - Added methods amount_captured and calculated_statement_descriptor and disputed to Net::API::Stripe::Charge
+    - Corrected method invoice in Net::API::Stripe::Payment::Intent, which was not pointing to the proper class
+    - In Net::APi::Stripe::PaymentMethod, the method sepa_debit is now an object of Net::API::Stripe::Connect::ExternalAccount::Card instead of being a dynamically created package. Still, Net::API::Stripe::Connect::ExternalAccount::Card is increasingly becoming a catch-all that will need soem clean-up in the future.
+    - Method bacs_debit in Net::APi::Stripe::PaymentMethod has been updated with more properties reflecting change in Stripe api.
+    - Added the methods bank_code and branch_code to Net::API::Stripe::Connect::ExternalAccount::Card
+    - Added the method setup_attempt in Net::API::Stripe::Payment::GeneratedFrom
+
+v1.0.8 2020-05-28T05:23:32Z +0900
+    - New release due to version conflict for Net::API::Stripe::WebHook
+
+v1.0.7 2020-05-28T05:00:59Z +0900
+    - Forgot to remove an obsolote and removed module in a test unit. Fix bug RT #132718
+
+v1.0.6 2020-05-28T03:45:29Z +0900
+    - Forgot to remove Net::API::REST as a dependency in the Makefile.PL. Fix bug RT #132717
+
+v1.0.5 2020-05-27T20:25:10Z +0900
+    - Decoupled Net::API::Stripe::WebHook frm the rest to avoid creating a requirement on installing mod_perl2. Fix bug RT #132713
+
+v1.0.4 2020-05-17
+    - Added invoice_now method to Net::API::Stripe::Billing::Subscription used in cancelling subscriptions
+    - Change from TryCatch to Nice::Try because TryCatch got broken with release of Devel::Declare version 0.006020
+
+v1.0.3 2020-05-16
+    - Minor changes to documentation
+
+v1.0.2 2020-05-16
+
+v1.0.1 2020-05-14
+    - Replaced Net::API::Stripe::Number and Net::API::Stripe::Number::Format by Module::Generic::Number
+    - Added the new Net::API::Stripe::Price added to the Stripe api.
+
+v1.0 2020-04-25
+    - Updated the formatting of the documentation	 Added the Net::API::Stripe::Number::Format in replacement of the dependence on Number::Format due to obscure bug under modperl and that Number::Format croaks
+
+v0.9.1 2020-04-24
+
+v0.9 2020-04-03 Corrected mistakes in parameters definition for dispute_list in Net::API::Stripe
+    - Added session_list method to list all checkout sessions in Net::API::Stripe
+    - Added missing documentation in Net::API::Stripe
+    - Improved documentation of Net::API::Stripe::Number
+    - Created missing synopsis in all documentation
+    - Created a convenient alias zip_code for postal_Code subroutine in Net::API::Stripe::Address
+    - Change the helper method for default_for_currency in Net::API::Stripe::Connect::ExternalAccount::Bank to use boolean instead of scalar.
+    - Added Stripe api calls for bank accounts
+    - Change helper method for B<approved> from B<_set_get_scalar> to B<_set_get_boolean> in Net::API::Stripe::Issuing::Authorization::RequestHistory
+    - Removed Net::API::Stripe::Customer::Subscription being replaced directly Net::API::Stripe::List
+    - Removed Net::API::Stripe::Balance::Transaction::List used to handle the list of balance_transactions and replaced it directly by Net::API::Stripe::List from which it inherited
+    - Removed Net::API::Stripe::Hash since it was not used anymore and used instead Module::Generic _set_get_hash, _set_get_class, etc
+    - Removed Net::API::Stripe::Session because its namespace was to high and generic for its particular purpose.
+
+v0.8.8 2020-04-15
+
+v0.8 2020-03-30 Working submission to CPAN
+
+v0.7 2020-03-29
+
+v0.2 to 0.7 Alpha versions
+
+v0.1 2019-10-15T09:54:59+09:00
+    - original version; created by ExtUtils::ModuleMaker 0.63

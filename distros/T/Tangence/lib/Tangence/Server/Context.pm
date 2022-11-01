@@ -1,27 +1,27 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.41;
+use Object::Pad 0.66;
 
-package Tangence::Server::Context 0.29;
+package Tangence::Server::Context 0.30;
 class Tangence::Server::Context;
 
 use Carp;
 
 use Tangence::Constants;
 
-has $stream :param :reader;
-has $token  :param;
+field $stream :param :reader;
+field $token  :param;
 
 sub BUILDARGS ( $class, $stream, $token )
 {
    return ( stream => $stream, token => $token );
 }
 
-has $responded;
+field $responded;
 
 # TODO: Object::Pad probably should do this bit
 method DESTROY

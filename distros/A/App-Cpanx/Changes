@@ -1,5 +1,16 @@
 Revision history for App::Cpanx
 
+1.00 Sat Oct 29 23:30:29 CDT 2022
+   - Options of the form -m=url now must be -m url
+   - Any extra data in the .cpanx/ dir is in the .cpanx/data/ folder,
+     the rest are just the modules
+   - The script chdir's into .cpanx/ while running, and assumes that
+     it's there while running commands
+   - Add -g option to list all installed modules
+   - Add -G option to list all installed packages
+   - Add -w and -W options to show where a module is located
+   - Add -V option to show counts of modules in listed dirs
+
 0.10 Tue Oct 27 23:22:54 CDT 2020
     - Do not install testing and Dist::Zilla prerequisits
 

@@ -3,14 +3,13 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Convert notes and chords to Roman numeral notation
 
-our $VERSION = '0.1900';
-
-use List::MoreUtils qw/ any first_index /;
-use Moo;
-use Music::Note;
-use Music::Scales;
+our $VERSION = '0.1901';
 
 use strictures 2;
+use List::MoreUtils qw/ any first_index /;
+use Moo;
+use Music::Note ();
+use Music::Scales qw(get_scale_notes);
 use namespace::clean;
 
 
@@ -363,7 +362,7 @@ Music::ToRoman - Convert notes and chords to Roman numeral notation
 
 =head1 VERSION
 
-version 0.1900
+version 0.1901
 
 =head1 SYNOPSIS
 
@@ -557,7 +556,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Gene Boggs.
+This software is copyright (c) 2022 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

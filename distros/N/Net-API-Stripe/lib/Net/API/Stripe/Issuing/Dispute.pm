@@ -2,7 +2,7 @@
 ## Stripe API - ~/lib/Net/API/Stripe/Issuing/Dispute.pm
 ## Version v0.100.0
 ## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2020/05/15
 ## 
@@ -12,31 +12,40 @@ package Net::API::Stripe::Issuing::Dispute;
 BEGIN
 {
     use strict;
+    use warnings;
     use parent qw( Net::API::Stripe::Generic );
+    use vars qw( $VERSION );
     our( $VERSION ) = 'v0.100.0';
 };
 
-sub id { shift->_set_get_scalar( 'id', @_ ); }
+use strict;
+use warnings;
 
-sub object { shift->_set_get_scalar( 'object', @_ ); }
+sub id { return( shift->_set_get_scalar( 'id', @_ ) ); }
 
-sub amount { shift->_set_get_number( 'amount', @_ ); }
+sub object { return( shift->_set_get_scalar( 'object', @_ ) ); }
 
-sub created { shift->_set_get_datetime( 'created', @_ ); }
+sub amount { return( shift->_set_get_number( 'amount', @_ ) ); }
 
-sub currency { shift->_set_get_scalar( 'currency', @_ ); }
+sub balance_transactions { return( shift->_set_get_array( 'balance_transactions', @_ ) ); }
 
-sub disputed_transaction { shift->_set_get_scalar_or_object( 'disputed_transaction', 'Net::API::Stripe::Issuing::Transaction', @_ ); }
+sub created { return( shift->_set_get_datetime( 'created', @_ ) ); }
 
-sub evidence { shift->_set_get_object( 'evidence', 'Net::API::Stripe::Issuing::Dispute::Evidence', @_ ); }
+sub currency { return( shift->_set_get_scalar( 'currency', @_ ) ); }
 
-sub livemode { shift->_set_get_boolean( 'livemode', @_ ); }
+sub disputed_transaction { return( shift->_set_get_scalar_or_object( 'disputed_transaction', 'Net::API::Stripe::Issuing::Transaction', @_ ) ); }
 
-sub metadata { shift->_set_get_hash( 'metadata', @_ ); }
+sub evidence { return( shift->_set_get_object( 'evidence', 'Net::API::Stripe::Issuing::Dispute::Evidence', @_ ) ); }
 
-sub reason { shift->_set_get_scalar( 'reason', @_ ); }
+sub livemode { return( shift->_set_get_boolean( 'livemode', @_ ) ); }
 
-sub status { shift->_set_get_scalar( 'status', @_ ); }
+sub metadata { return( shift->_set_get_hash( 'metadata', @_ ) ); }
+
+sub reason { return( shift->_set_get_scalar( 'reason', @_ ) ); }
+
+sub status { return( shift->_set_get_scalar( 'status', @_ ) ); }
+
+sub transaction { return( shift->_set_get_scalar_or_object( 'transaction', 'Net::API::Stripe::Issuing::Transaction', @_ ) ); }
 
 1;
 
@@ -75,90 +84,92 @@ This module looks similar to the L<Net::API::Stripe::Dispute> and has overlappin
 
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>( %ARG )
+=head2 new( %ARG )
 
 Creates a new L<Net::API::Stripe::Issuing::Dispute> object.
 It may also take an hash like arguments, that also are method of the same name.
 
-=back
-
 =head1 METHODS
 
-=over 4
-
-=item B<id> string
+=head2 id string
 
 Unique identifier for the object.
 
-=item B<object> string, value is "issuing.dispute"
+=head2 object string, value is "issuing.dispute"
 
 String representing the object’s type. Objects of the same type share the same value.
 
-=item B<amount> integer
+=head2 amount integer
 
 Disputed amount. Usually the amount of the disputed_transaction, but can differ (usually because of currency fluctuation or because only part of the order is disputed).
 
-=item B<created> timestamp
+=head2 balance_transactions array
+
+List of balance transactions associated with the dispute.
+
+=head2 created timestamp
 
 Time at which the object was created. Measured in seconds since the Unix epoch.
 
-=item B<currency> currency
+=head2 currency currency
 
 The currency the disputed_transaction was made in.
 
-=item B<disputed_transaction> string (expandable)
+=head2 disputed_transaction string (expandable)
 
 The transaction being disputed.
 
 When expanded, this is a L<Net::API::Stripe::Issuing::Transaction> object.
 
-=item B<evidence> hash
+=head2 evidence hash
 
 Evidence related to the dispute. This hash will contain exactly one non-null value, containing an evidence object that matches its reason
 
 This is a L<Net::API::Stripe::Issuing::Dispute::Evidence> object.
 
-=item B<livemode> boolean
+=head2 livemode boolean
 
 Has the value true if the object exists in live mode or the value false if the object exists in test mode.
 
-=item B<metadata> hash
+=head2 metadata hash
 
 Set of key-value pairs that you can attach to an object. This can be useful for storing additional information about the object in a structured format. Individual keys can be unset by posting an empty value to them. All keys can be unset by posting an empty value to metadata.
 
-=item B<reason> string
+=head2 reason string
 
 Reason for this dispute. One of other or fraudulent.
 
-=item B<status> string
+=head2 status string
 
 Current status of dispute. One of lost, under_review, unsubmitted, or won.
 
-=back
+=head2 transaction expandable
+
+The transaction being disputed.
+
+When expanded this is an L<Net::API::Stripe::Issuing::Transaction> object.
 
 =head1 API SAMPLE
 
-	{
-	  "id": "idp_fake123456789",
-	  "object": "issuing.dispute",
-	  "amount": 100,
-	  "created": 1571480456,
-	  "currency": "usd",
-	  "disputed_transaction": "ipi_fake123456789",
-	  "evidence": {
-		"fraudulent": {
-		  "dispute_explanation": "Fraud; card reported lost on 10/19/2019",
-		  "uncategorized_file": null
-		},
-		"other": null
-	  },
-	  "livemode": false,
-	  "metadata": {},
-	  "reason": "fraudulent",
-	  "status": "under_review"
-	}
+    {
+      "id": "idp_fake123456789",
+      "object": "issuing.dispute",
+      "amount": 100,
+      "created": 1571480456,
+      "currency": "usd",
+      "disputed_transaction": "ipi_fake123456789",
+      "evidence": {
+        "fraudulent": {
+          "dispute_explanation": "Fraud; card reported lost on 10/19/2019",
+          "uncategorized_file": null
+        },
+        "other": null
+      },
+      "livemode": false,
+      "metadata": {},
+      "reason": "fraudulent",
+      "status": "under_review"
+    }
 
 =head1 HISTORY
 

@@ -2,7 +2,7 @@
 ## Stripe API - ~/lib/Net/API/Stripe/Terminal/ConnectionToken.pm
 ## Version v0.100.0
 ## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2020/05/15
 ## 
@@ -12,9 +12,14 @@ package Net::API::Stripe::Terminal::ConnectionToken;
 BEGIN
 {
     use strict;
+    use warnings;
     use parent qw( Net::API::Stripe::Generic );
+    use vars qw( $VERSION );
     our( $VERSION ) = 'v0.100.0';
 };
+
+use strict;
+use warnings;
 
 sub object { return( shift->_set_get_scalar( 'object', @_ ) ); }
 
@@ -23,7 +28,7 @@ sub location { return( shift->_set_get_scalar( 'location', @_ ) ); }
 sub secret { return( shift->_set_get_scalar( 'secret', @_ ) ); }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf8
@@ -52,39 +57,31 @@ A Connection Token is used by the Stripe Terminal SDK to connect to a reader.
 
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>( %ARG )
+=head2 new( %ARG )
 
 Creates a new L<Net::API::Stripe::Terminal::ConnectionToken> object.
 It may also take an hash like arguments, that also are method of the same name.
 
-=back
-
 =head1 METHODS
 
-=over 4
-
-=item B<object> string, value is "terminal.connection_token"
+=head2 object string, value is "terminal.connection_token"
 
 String representing the object’s type. Objects of the same type share the same value.
 
-=item B<location> string
+=head2 location string
 
 The id of the location that this connection token is scoped to. If specified the connection token will only be usable with readers assigned to that location, otherwise the connection token will be usable with all readers.
 
-=item B<secret> string
+=head2 secret string
 
 Your application should pass this token to the Stripe Terminal SDK.
 
-=back
-
 =head1 API SAMPLE
 
-	{
-	  "object": "terminal.connection_token",
-	  "secret": "pst_test_fake123456789"
-	}
+    {
+      "object": "terminal.connection_token",
+      "secret": "pst_test_fake123456789"
+    }
 
 =head1 HISTORY
 

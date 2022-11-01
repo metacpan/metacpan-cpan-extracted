@@ -1,0 +1,217 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Sub::HandlesVia::Manual::Advanced - misc advanced documentation
+
+=head1 MANUAL
+
+The following information applies no matter which OO toolkit you are using.
+
+=head2 Method Chaining
+
+Say you have the following
+
+     handles_via => 'Array',
+     handles     => {
+       'add_food'    => 'push',
+       'find_food'   => 'grep',
+       'remove_food' => 'pop',
+     },
+
+Now C<< $kitchen->remove_food >> will remove the last food on the list and
+return it. But what if we don't care about what food was removed? We just
+want to remove the food and discard it. You can do this:
+
+     handles_via => 'Array',
+     handles     => {
+       'add_food'    => 'push',
+       'find_food'   => 'grep',
+       'remove_food' => 'pop...',
+     },
+
+Now the C<remove_food> method will return the kitchen object instead of
+returning the food. This makes it suitable for chaining method calls:
+
+  # remove the three most recent foods
+  $kitchen->remove_food->remove_food->remove_food;
+
+=head2 Delegating to CodeRefs
+
+You can delegate to coderefs:
+
+     handles_via => 'Array',
+     handles    => {
+       'find_healthiest' => sub { my $foods = shift; ... },
+     }
+
+=head2 Delegating to Named Methods
+
+The L<Sub::HandlesVia::HandlerLibrary::Blessed> handler library allows
+you to delegate to named methods of a blessed object.
+
+     isa         => InstanceOf['HTTP::Tiny'],
+     handles_via => 'Blessed',
+     handles     => {
+       'http_get'   => 'get',
+       'http_post'  => 'post',
+     },
+
+However, in L<Moo>, L<Moose>, L<Mouse>, and L<Mite>, this kind of
+delegation is baked in, so you don't even need Sub::HandlesVia!
+
+     isa         => InstanceOf['HTTP::Tiny'],
+     handles     => {
+       'http_get'   => 'get',
+       'http_post'  => 'post',
+     },
+
+Still, the L<Sub::HandlesVia::HandlerLibrary::Blessed> handler
+library may still be useful if you wish to use other Sub::HandlesVia
+features like chaining, or if you're using a different OO toolkit.
+
+An example of combining delegation to named methods with "native trait"
+style delegation... let's say "FoodList" is a class where instances
+are blessed arrayrefs of strings.
+
+     isa         => InstanceOf['FoodList'],
+     handles_via => 'Array', 'Blessed',
+     handles     => {
+       'find_food'             => 'grep',
+       'find_healthiest_food'  => 'find_healthiest',
+     },
+
+Now C<< $kitchen->find_food($coderef) >> does this (which breaks
+encapsulation ):
+
+  my @result = grep $coderef->(), @{ $kitchen->food };
+
+But because C<find_healthiest> isn't one of the methods offered
+by L<Sub::HandlesVia::HandlerList::Array>, Sub::HandlesVia assumes
+you want to call it on the arrayref like a proper method, so
+C<< $kitchen->find_healthiest_food >> does this:
+
+  $kitchen->food->find_healthiest
+
+It can be useful to be explicit about which methods you wish to
+delegate to a "native trait" style array and which are named methods
+to be called on a blessed object:
+
+     isa         => InstanceOf['FoodList'],
+     handles_via => [ 'Array', 'Blessed' ],
+     handles     => {
+       'find_food'             => 'Array->grep',
+       'find_healthiest_food'  => 'Blessed->find_healthiest',
+     },
+
+See L</Delegating to Multiple Handler Libraries>.
+
+=head2 Curried Arguments
+
+All this talk of food is making me hungry, but as much as I'd like to eat a
+curry right now, that's not the kind of currying we're talking about.
+
+     handles_via => 'Array',
+     handles     => {
+       'get_food'   => 'get',
+     },
+
+C<< $kitchen->get_food(0) >> will return the first item on the list.
+C<< $kitchen->get_food(1) >> will return the second item on the list.
+And so on.
+
+     handles_via => 'Array',
+     handles     => {
+       'first_food'   => [ 'get' => 0 ],
+       'second_food'  => [ 'get' => 1 ],
+     },
+
+I think you already know what this does. Right?
+
+And yes, currying works with coderefs.
+
+     handles_via => 'Array',
+     handles     => {
+       'blargy'       => [ sub { ... }, @curried ],
+     },
+
+=head2 Looser Argument Checking
+
+Sub::HandlesVia tries to be strict by default. For example, if your attribute
+specifies C<< isa => ArrayRef[Int] >> then your method which delegates to
+C<push> will check that its arguments are integers.
+
+You can tell it to be less rigourous checking method arguments using the
+C<< ~ >> prefix:
+
+     handles_via => 'Array',
+     handles     => {
+       'find_food'   => '~grep',
+     },
+
+=head2 Delegating to Multiple Handler Libraries
+
+Sometimes you may wish to pick methods to delegate to from multiple
+handler libraries. This is possible by setting C<handles_via> to an
+arrayref.
+
+    isa         => ArrayRef|HashRef,
+    handles_via => [ 'Array', 'Hash' ],
+    handles     => {
+      the_keys     => 'keys',
+      ship_shape   => 'sort_in_place',
+    }
+
+Here you have an attribute which might be an arrayref or a hashref.
+When it's an arrayref, C<< $object->ship_shape >> will work nicely,
+but C<< $object->the_keys >> will fail badly.
+
+Still, this sort of thing I<can> kind of make sense if you have an
+object that overloads both C<< @{} >> and C<< %{} >>.
+
+In particular, the L<Sub::HandlesVia::HandlerLibrary::Scalar> library
+often makes sense to combine with the other libraries because strings,
+integers, numbers, booleans, and even arrayrefs, hashrefs, and coderefs,
+are all scalars.
+
+Sometimes a method name will be ambiguous. For example, there's a
+C<get> method for both hashes and arrays. In this case, the array
+one will win because you listed it first in C<handles_via>.
+
+But you can be specific:
+
+     isa         => ArrayRef|HashRef,
+     handles_via => [ 'Array', 'Hash' ],
+     handles     => {
+       get_by_index => 'Array->get',
+       get_by_key   => 'Hash->get',
+     }
+
+=head1 BUGS
+
+Please report any bugs to
+L<https://github.com/tobyink/p5-sub-handlesvia/issues>.
+
+=head1 SEE ALSO
+
+L<Sub::HandlesVia>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2022 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

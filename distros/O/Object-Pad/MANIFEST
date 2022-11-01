@@ -41,6 +41,7 @@ t/00use.t
 t/01method.t
 t/02fields.t
 t/03create.t
+t/04adjust.t
 t/04extend-classical.t
 t/05subclass.t
 t/06subclass-foreign-HASH.t
@@ -70,6 +71,7 @@ t/51pragmata.t
 t/52croak-scope.t
 t/53croak-override.t
 t/54croak-role.t
+t/55croak-params.t
 t/60mop-class.t
 t/61mop-create-class.t
 t/62mop-field.t

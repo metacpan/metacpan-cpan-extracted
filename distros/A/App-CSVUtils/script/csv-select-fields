@@ -1,7 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/CSVUtils/csv_select_fields
-# and generated automatically using Perinci::CmdLine::Gen version 0.501
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
 use strict;
@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-09'; # DATE
+our $DATE = '2022-10-25'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '0.045'; # VERSION
+our $VERSION = '0.046'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/CSVUtils/csv_select_fields",
@@ -39,11 +39,15 @@ csv-select-fields - Only output selected field(s)
 
 =head1 VERSION
 
-This document describes version 0.045 of csv-select-fields (from Perl distribution App-CSVUtils), released on 2022-10-09.
+This document describes version 0.046 of csv-select-fields (from Perl distribution App-CSVUtils), released on 2022-10-25.
 
 =head1 SYNOPSIS
 
-B<csv-select-fields> [B<--escape-char>=I<str>] [B<--exclude-field-pat>=I<re>|B<--exclude-all-fields>] [(B<--exclude-field>=I<str>)+|B<--exclude-fields-json>=I<json>|(B<-F>=I<str>)+] [B<--format>=I<name>|B<--json>] [B<--header>|B<--input-header>|B<--no-header>|B<--noheader>] [B<--ignore-unknown-fields>|B<--no-ignore-unknown-fields>|B<--noignore-unknown-fields>] [B<--include-field-pat>=I<re>|B<--field-pat>=I<re>|B<--include-all-fields>] [(B<--include-field>=I<str>)+|B<--include-fields-json>=I<json>|(B<-f>=I<str>)+|(B<--field>=I<str>)+] [B<--(no)naked-res>] [B<--output-escape-char>=I<str>] [B<--output-header>|B<--no-output-header>|B<--nooutput-header>] [B<--output-quote-char>=I<str>] [B<--output-sep-char>=I<str>] [B<--output-tsv>|B<--no-output-tsv>|B<--nooutput-tsv>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--quote-char>=I<str>] [B<--sep-char>=I<str>] [B<--show-selected-fields>] [B<--tsv>|B<--input-tsv>|B<--no-tsv>|B<--notsv>] -- E<lt>I<filename>E<gt>
+B<csv-select-fields> L<--help|/"--help, -h, -v"> (or L<-h|/"--help, -h, -v">, L<-?|/"--help, -h, -v">)
+
+B<csv-select-fields> L<--version|/"--version, -v"> (or L<-v|/"--version, -v">)
+
+B<csv-select-fields> [L<--escape-char|/"--escape-char=s">=I<str>] [L<--exclude-field-pat|/"--exclude-field-pat=s">=I<re>|L<--exclude-all-fields|/"--exclude-field-pat=s">] [(L<--exclude-field|/"--exclude-fields-json=s">=I<str>)+|L<--exclude-fields-json|/"--exclude-fields-json=s">=I<json>|(L<-F|/"--exclude-fields-json=s">=I<str>)+] [L<--format|/"--format=s">=I<name>|L<--json|/"--json">] [L<--header|/"--no-header, --input-header">|L<--input-header|/"--no-header, --input-header">|L<--no-header|/"--no-header, --input-header">|L<--noheader|/"--no-header, --input-header">] [L<--ignore-unknown-fields|/"--ignore-unknown-fields">|L<--no-ignore-unknown-fields|/"--ignore-unknown-fields">|L<--noignore-unknown-fields|/"--ignore-unknown-fields">] [L<--include-field-pat|/"--include-field-pat=s, --field-pat">=I<re>|L<--field-pat|/"--include-field-pat=s, --field-pat">=I<re>|L<--include-all-fields|/"--include-field-pat=s, --field-pat">] [(L<--include-field|/"--include-fields-json=s">=I<str>)+|L<--include-fields-json|/"--include-fields-json=s">=I<json>|(L<-f|/"--include-fields-json=s">=I<str>)+|(L<--field|/"--include-fields-json=s">=I<str>)+] [L<--(no)naked-res|/"--naked-res">] [L<--output-escape-char|/"--output-escape-char=s">=I<str>] [L<--output-header|/"--output-header">|L<--no-output-header|/"--output-header">|L<--nooutput-header|/"--output-header">] [L<--output-quote-char|/"--output-quote-char=s">=I<str>] [L<--output-sep-char|/"--output-sep-char=s">=I<str>] [L<--output-tsv|/"--output-tsv">|L<--no-output-tsv|/"--output-tsv">|L<--nooutput-tsv|/"--output-tsv">] [L<--overwrite|/"--overwrite, -O">|L<-O|/"--overwrite, -O">|L<--no-overwrite|/"--overwrite, -O">|L<--nooverwrite|/"--overwrite, -O">] [L<--page-result|/"--page-result">[=I<program>]|L<--view-result|/"--view-result">[=I<program>]] [L<--quote-char|/"--quote-char=s">=I<str>] [L<--sep-char|/"--sep-char=s">=I<str>] [L<--show-selected-fields|/"--show-selected-fields">] [L<--tsv|/"--tsv, --input-tsv">|L<--input-tsv|/"--tsv, --input-tsv">|L<--no-tsv|/"--tsv, --input-tsv">|L<--notsv|/"--tsv, --input-tsv">] -- E<lt>L<filename|/"--filename=s*">E<gt> [L<output_filename|/"--output-filename=s, -o">]
 
 =head1 DESCRIPTION
 
@@ -224,6 +228,16 @@ This is like C<--escape-char> option but for output instead of input.
 Defaults to C<\\> (backslash). Overrides C<--output-tsv> option.
 
 
+=item B<--output-filename>=I<s>, B<-o>
+
+Output filename or URL.
+
+Use C<-> to output to stdout (the default if you don't specify this option), use
+C<clipboard:> to write to clipboard.
+
+
+Can also be specified as the 2nd command-line argument.
+
 =item B<--output-header>
 
 Whether output CSV should have a header row.
@@ -264,6 +278,10 @@ Overriden by C<--output-sep-char>, C<--output-quote-char>, C<--output-escape-cha
 options. If one of those options is specified, then C<--output-tsv> will be
 ignored.
 
+
+=item B<--overwrite>, B<-O>
+
+Whether to override existing output file.
 
 =item B<--page-result>
 

@@ -13,7 +13,7 @@ use Music::Scales;
 use Music::VoiceGen;
 use Music::Duration::Partition;
 
-my $bars   = shift || 16;
+my $bars   = shift || 32;
 my $bpm    = shift || 70;
 my $note   = shift || 'A';
 my $tscale = shift || 'dorian';
@@ -30,8 +30,8 @@ my $d = MIDI::Drummer::Tiny->new(
     reverb    => 15,
     signature => '3/8',
     bars      => $bars,
-    kick      => 'n36', # Override default patch
-    snare     => 'n40', # "
+    kick      => 36, # Override default patch
+    snare     => 40, # "
 );
 
 $d->score->synch(
@@ -46,9 +46,9 @@ sub bass {
     set_chan_patch($d->score, 1, $bpatch);
 
     my $mdp = Music::Duration::Partition->new(
-        size => 1.5,
-        pool => [qw(dqn qn en sn)],
-        weights => [1,  2, 2, 1],
+        size    => 1.5,
+        pool    => [qw(dqn qn en sn)],
+        weights => [   1,  2, 2, 1  ],
     );
     my @motifs = map { $mdp->motif } 1 .. 4;
 
@@ -67,9 +67,9 @@ sub top {
     set_chan_patch($d->score, 0, $tpatch);
 
     my $mdp = Music::Duration::Partition->new(
-        size => 1.5,
-        pool => [qw(qn en sn)],
-        weights => [1, 2, 3],
+        size    => 1.5,
+        pool    => [qw(qn en sn)],
+        weights => [   1, 2, 3  ],
     );
     my @motifs = map { $mdp->motif } 1 .. 8;
 
@@ -103,5 +103,5 @@ sub add_notes {
 }
 
 sub drums {
-    $d->metronome38($d->bars);
+    $d->metronome38;
 }

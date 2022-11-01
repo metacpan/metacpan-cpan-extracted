@@ -6,8 +6,8 @@ subtest no_params => sub {
     my $result = $api->competitor->wrl_current;
 
     is $result,
-      { error => 'id parameter is required' },
-      'Returns error if no ID provided.';
+        { error => 'id parameter is required' },
+        'Returns error if no ID provided.';
 };
 
 subtest valid_params => sub {
@@ -17,7 +17,7 @@ subtest valid_params => sub {
     my $result = $api->competitor->wrl_current( id => 7350 );
 
     is $result,
-      {
+        {
         points         => E,
         place          => E,
         id_weight      => E,
@@ -26,8 +26,8 @@ subtest valid_params => sub {
         ogq_place      => E,
         ogq_sum_points => E,
         q_status       => E,
-      },
-      'Returns data structure for valid competitor';
+        },
+        'Returns data structure for valid competitor';
 };
 
 subtest invalid_params => sub {
@@ -36,8 +36,8 @@ subtest invalid_params => sub {
     my $result = $api->competitor->wrl_current( id => 0 );
 
     is $result,
-      { error => 'wrl.error.id_person_not_given', },
-      'Returns error for invalid or not found competitor';
+        { error => 'wrl.error.id_person_not_given', },
+        'Returns error for invalid or not found competitor';
 };
 
 done_testing;

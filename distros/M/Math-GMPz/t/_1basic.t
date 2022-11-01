@@ -21,9 +21,10 @@ warn "# MATH_GMPz_HAS_MAGICEXT is ", Math::GMPz::_magic_status(), "\n" if define
 warn "# MATH_GMPz_IV_MAX is ", MATH_GMPz_IV_MAX(), "\n";
 warn "# MATH_GMPz_IV_MIN is ", MATH_GMPz_IV_MIN(), "\n";
 warn "# MATH_GMPz_UV_MAX is ", MATH_GMPz_UV_MAX(), "\n";
+warn "# LD_PRINTF_BROKEN is ", Math::GMPz::_ld_printf_broken(), "\n";
 
-if($Math::GMPz::VERSION eq '0.54' && $Math::GMPz::Random::VERSION eq '0.54' &&
-   $Math::GMPz::V::VERSION eq '0.54' &&
+if($Math::GMPz::VERSION eq '0.55' && $Math::GMPz::Random::VERSION eq '0.55' &&
+   $Math::GMPz::V::VERSION eq '0.55' &&
    Math::GMPz::_get_xs_version() eq $Math::GMPz::VERSION) {print "ok 1\n"}
 else {
   print "not ok 1\n";

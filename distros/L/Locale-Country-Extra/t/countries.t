@@ -50,6 +50,10 @@ subtest 'country_extra' => sub {
     is $countries->code_from_country("Réunion"),                           "re", "Réunion is re";
     is $countries->code_from_country("taiwan"),                            "tw", "taiwan is tw";
     is $countries->code_from_country("Curacao"),                           "cw", "Curaçao is cw";
+    is $countries->code_from_country("Côte D'Ivoire"),                     "ci", "Cote d'Ivoire is ci";
+    is $countries->code_from_country("Côte d’Ivoire"),                     "ci", "Cote d'Ivoire is ci";
+    is $countries->code_from_country("Eswatini"),                          "sz", "Eswatini is sz";
+    is $countries->code_from_country("Trinidad & Tobago"),                 "tt", "Trinidad & Tobago is tt";
 };
 
 subtest 'idd_from_code' => sub {

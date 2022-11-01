@@ -2,7 +2,7 @@ package Cache::RedisDB;
 
 use 5.010;
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 use Carp;
 use RedisDB 2.14;
 use Sereal qw(looks_like_sereal);
@@ -22,7 +22,7 @@ extended options in ->set().
 
 =cut
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 =head1 SYNOPSIS
 
@@ -30,11 +30,14 @@ our $VERSION = '0.12';
     Cache::RedisDB->set("namespace", "key", "value");
     Cache::RedisDB->get("namespace", "key");
 
-=head1 SUBROUTINES/METHODS
+=head1 METHODS
 
 =head2 redis_uri
 
-Returns redis uri
+Returns a C<< redis:// >> redis URI which will be used for the initial Redis connection.
+
+This will default to localhost on the standard port, and can be overridden with the
+C<REDIS_CACHE_SERVER> environment variable.
 
 =cut
 
@@ -50,7 +53,7 @@ sub redis_uri {
 
 =head2 redis_connection
 
-Creates new connection to redis-server and returns corresponding RedisDB object.
+Creates new connection to a Redis server and returns the corresponding L<RedisDB> object.
 
 =cut
 
@@ -65,7 +68,7 @@ sub redis_connection {
 
 =head2 redis
 
-Returns RedisDB object connected to the correct redis server.
+Returns a singleton L<RedisDB> instance.
 
 =cut
 
@@ -75,15 +78,19 @@ sub redis {
     return $redis;
 }
 
-=head2 get($namespace, $key)
+=head2 get
 
-Retrieve I<$key> value from the cache.
+Takes a C<$namespace> and C<$key> parameter, and returns the scalar value
+corresponding to that cache entry.
+
+This will automatically deserialise data stored with L<Sereal>. If no data
+is found, this will return C<undef>.
 
 =cut
 
 sub get {
     my ($self, $namespace, $key) = @_;
-    my $res = redis->get(_cache_key($namespace, $key));
+    my $res = redis()->get(_cache_key($namespace, $key));
     if (looks_like_sereal($res)) {
         state $decoder = Sereal::Decoder->new();
         $res = $decoder->decode($res);
@@ -91,10 +98,34 @@ sub get {
     return $res;
 }
 
-=head2 set($namespace, $key, $value[, $exptime])
+=head2 mget
 
-Assigns I<$value> to the I<$key>. I<$value> should be scalar value.
-If I<$exptime> specified, it is expiration time in seconds.
+Retrieve values for multiple keys in a single call.
+
+Similar to L</get>, this takes a C<$namespace> as the first parameter,
+but it also accepts a list of C<@keys> to look up.
+
+Returns an arrayref in the same order as the original keys. For any
+key that had no value, the resulting arrayref will contain C<undef>.
+
+=cut
+
+sub mget {
+    my ($self, $namespace, @keys) = @_;
+    my $res = Cache::RedisDB::redis()->mget(map { Cache::RedisDB::_cache_key($namespace, $_) } @keys);
+    state $decoder = Sereal::Decoder->new();
+    return [map { ($_ && looks_like_sereal($_)) ? $decoder->decode($_) : $_ } @$res];
+}
+
+=head2 set
+
+Creates or updates a Redis key under C<$namespace>, C<$key> using the scalar C<$value>.
+Also takes an optional C<$exptime> as expiration time in seconds.
+
+ $redis->set($namespace, $key, $value);
+ $redis->set($namespace, $key, $value, $expiry_time);
+
+Can also be provided a callback which will be executed once the command completes.
 
 =cut
 
@@ -110,16 +141,16 @@ sub set {
     if (defined $exptime) {
         $exptime = int(1000 * $exptime);
         # PX milliseconds -- Set the specified expire time, in milliseconds
-        return redis->set($cache_key, $value, "PX", $exptime, $callback // ());
+        return redis()->set($cache_key, $value, "PX", $exptime, $callback // ());
     } else {
-        return redis->set($cache_key, $value, $callback // ());
+        return redis()->set($cache_key, $value, $callback // ());
     }
 }
 
 =head2 set_nw($namespace, $key, $value[, $exptime])
 
-Same as I<set> but do not wait confirmation from server. If server will return
-error, there's no way to catch it.
+Same as I<set> but do not wait confirmation from server. If the server returns
+an error, it will be ignored.
 
 =cut
 
@@ -142,15 +173,15 @@ sub del {
 
 =head2 keys($namespace)
 
-Return a list of all known keys in the provided I<$namespace>.
+Return an arrayref of all known keys in the provided C<$namespace>.
 
 =cut
 
-sub keys {    ## no critic (ProhibitBuiltinHomonyms)
+sub keys : method {    ## no critic (ProhibitBuiltinHomonyms)
     my ($self, $namespace) = @_;
     my $prefix = _cache_key($namespace, undef);
-    my $pl = length($prefix);
-    return [map { substr($_, $pl) } @{redis->keys($prefix . '*')}];
+    my $pl     = length($prefix);
+    return [map { substr($_, $pl) } @{redis()->keys($prefix . '*')}];
 }
 
 =head2 ttl($namespace, $key)
@@ -162,7 +193,7 @@ Return the Time To Live (in seconds) of a key in the provided I<$namespace>.
 sub ttl {
     my ($self, $namespace, $key) = @_;
 
-    my $ms = redis->pttl(_cache_key($namespace, $key));
+    my $ms = redis()->pttl(_cache_key($namespace, $key));
     # We pessimistically round to the start of the second where it
     # will disappear.  While slightly wrong, it is likely less confusing.
     # Nonexistent (or already expired) keys should return 0;
@@ -184,12 +215,12 @@ Delete all keys and associated values from the cache.
 =cut
 
 sub flushall {
-    return redis->flushall();
+    return redis()->flushall();
 }
 
 =head1 AUTHOR
 
-binary.com, C<< <rakesh at binary.com> >>
+binary.com, C<< <perl at binary.com> >>
 
 =head1 BUGS
 
@@ -197,15 +228,11 @@ Please report any bugs or feature requests to C<bug-cache-redisdb at rt.cpan.org
 the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Cache-RedisDB>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
-
-
-
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
 
     perldoc Cache::RedisDB
-
 
 You can also look for information at:
 

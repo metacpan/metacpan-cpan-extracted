@@ -1,0 +1,38 @@
+{
+   "created" : "1614940206",
+   "error" : null,
+   "id" : "frr_1IRav42eZvKYlo2COAZmOkXO",
+   "livemode" : 0,
+   "object" : "reporting.report_run",
+   "parameters" : {
+      "columns" : [
+         "created",
+         "reporting_category",
+         "net"
+      ],
+      "interval_end" : "1580544000",
+      "interval_start" : "1577865600",
+      "timezone" : "America/Los_Angeles"
+   },
+   "report_type" : "balance_change_from_activity.itemized.3",
+   "result" : {
+      "created" : "1614940219",
+      "expires_at" : "1646476219",
+      "filename" : "frr_1IRav42eZvKYlo2COAZmOkXO.csv",
+      "id" : "file_1IRavH2eZvKYlo2CKvrocByo",
+      "links" : {
+         "data" : [],
+         "has_more" : 0,
+         "object" : "list",
+         "url" : "/v1/file_links?file=file_1IRavH2eZvKYlo2CKvrocByo"
+      },
+      "object" : "file",
+      "purpose" : "finance_report_run",
+      "size" : "15053859",
+      "title" : "FinanceReportRun frr_1IRav42eZvKYlo2COAZmOkXO",
+      "type" : "csv",
+      "url" : null
+   },
+   "status" : "succeeded",
+   "succeeded_at" : "1614940219"
+}

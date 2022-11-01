@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.66;  # field
 
-package Test::Device::Chip::Adapter 0.24;
+package Test::Device::Chip::Adapter 0.25;
 class Test::Device::Chip::Adapter
    :does(Device::Chip::Adapter);
 

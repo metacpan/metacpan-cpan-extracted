@@ -1,5 +1,10 @@
 Revision history for Device-Chip-MAX7219
 
+0.07    2022-10-29
+        [CHANGES]
+         * Updates for Object::Pad v0.70
+            + `ADJUST :params`
+
 0.06    2022-01-31
         [CHANGES]
          * Added Device::Chip::MAX7219Panel module for driving a whole matrix

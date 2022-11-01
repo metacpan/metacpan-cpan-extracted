@@ -23,7 +23,7 @@
          "requires" : {
             "Device::Chip" : "0.03",
             "Future::AsyncAwait" : "0.47",
-            "Object::Pad" : "0.57",
+            "Object::Pad" : "0.70",
             "perl" : "5.026"
          }
       },
@@ -37,11 +37,11 @@
    "provides" : {
       "Device::Chip::MAX7219" : {
          "file" : "lib/Device/Chip/MAX7219.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       },
       "Device::Chip::MAX7219Panel" : {
          "file" : "lib/Device/Chip/MAX7219Panel.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       }
    },
    "release_status" : "stable",
@@ -50,6 +50,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.06",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.07",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

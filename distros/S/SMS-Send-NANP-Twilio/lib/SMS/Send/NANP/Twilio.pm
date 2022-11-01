@@ -5,7 +5,7 @@ use URI;
 use JSON::XS qw{decode_json};
 use base qw{SMS::Send::Driver::WebService};
 
-our $VERSION = '0.04';
+our $VERSION = '0.06';
 
 =head1 NAME
 
@@ -16,10 +16,10 @@ SMS::Send::NANP::Twilio - SMS::Send driver for Twilio
   Configure /etc/SMS-Send.ini
 
   [NANP::Twilio]
-  username=accountSid
-  password=authToken
+  AccountSid=AccountSid
+  AuthToken=AuthToken
   MessagingServiceSid=String
-  ;From=+12025551212
+  ;From=+12025550123
   ;StatusCallback=URL
   ;ApplicationSid=String
   ;MaxPrice=USD
@@ -28,11 +28,11 @@ SMS::Send::NANP::Twilio - SMS::Send driver for Twilio
 
   use SMS::Send;
   my $sms     = SMS::Send->new('NANP::Twilio');
-  my $success = $sms->send_sms(text=> 'Hello World!', to =>'+17035551212');
+  my $success = $sms->send_sms(text=> 'Hello World!', to =>'+17035550123');
 
   use SMS::Send::NANP::Twilio;
   my $sms     = SMS::Send::NANP::Twilio->new;
-  my $success = $sms->send_sms(text=> 'Hello World!', to =>'+17035551212');
+  my $success = $sms->send_sms(text=> 'Hello World!', to =>'+17035550123');
   my $json    = $sms->{__content};
   my $href    = $sms->{__data};
 
@@ -46,16 +46,16 @@ SMS::Send driver for Twilio
 
 Sends SMS Message via Twilio web service and returns 1 or 0. Method dies on critical error.
 
-  my $status = $sms->send_sms(to =>'+17035551212', text=> 'Hello World!');
-  my $status = $sms->send_sms(to =>'+17035551212', text=> 'Image Attached', MediaUrl=>'https://...');
+  my $status = $sms->send_sms(to =>'+17035550123', text=> 'Hello World!');
+  my $status = $sms->send_sms(to =>'+17035550123', text=> 'Image Attached', MediaUrl=>'https://...');
 
 =over
 
 =item to
 
-Passed as "To" in the posted form data. The destination phone number for SMS/MMS or a Channel user address for other 3rd party channels. Destination phone numbers should be formatted with a '+' and country code e.g., +16175551212 (E.164 format).
+Passed as "To" in the posted form data. The destination phone number for SMS/MMS or a Channel user address for other 3rd party channels. Destination phone numbers should be formatted with a '+' and country code e.g., +16175550123 (E.164 format).
 
-  to => "+17035551212"
+  to => "+17035550123"
 
 =item text
 
@@ -84,7 +84,7 @@ sub send_sms {
 
   my $MediaUrl            = $argv{'MediaUrl'} || [];
   $MediaUrl               = [$MediaUrl] unless ref($MediaUrl) eq 'ARRAY';
-  die("Error: MediaUrl - You may include up to 10 MediaUrls per message.") if @$MediaUrl > 10;
+  die('Error: MediaUrl - You may include up to 10 MediaUrls per message.') if @$MediaUrl > 10;
   push @form, MediaUrl => $_ foreach @$MediaUrl;
 
   my $status_response;
@@ -107,7 +107,7 @@ sub send_sms {
   push @form, ValidityPeriod  => $self->ValidityPeriod  if $self->ValidityPeriod;
 
   my $response            = $self->uat->post_form($self->_url, \@form); #isa HASH from HTTP::Tiny
-  die(sprintf("HTTP Error: %s %s", $response->{'status'}, $response->{'reason'})) unless $response->{'success'};
+  die(sprintf('HTTP Error: %s %s', $response->{'status'}, $response->{'reason'})) unless $response->{'success'};
   $self->{'__content'}    = $response->{'content'};
   my $data                = decode_json($response->{'content'});
   $self->{'__data'}       = $data;
@@ -116,8 +116,8 @@ sub send_sms {
 
 sub _url {
   my $self = shift;
-  my $url  = URI->new(join '/', 'https://api.twilio.com/2010-04-01/Accounts', $self->username, 'Messages.json');
-  $url->userinfo(join ':', $self->username, $self->password);
+  my $url  = URI->new(join '/', $self->url, 'Accounts', $self->AccountSid, 'Messages.json');
+  $url->userinfo(join ':', $self->AccountSid, $self->AuthToken);
   return $url;
 }
 
@@ -125,21 +125,59 @@ sub _url {
 
 Properties may be stored in Current Directory, /etc/SMS-Send.ini or C:\Windows\SMS-Send.ini. See L<SMS::Send::Driver::WebService>->cfg_path
 
-=head2 username
+=head2 url
 
-The "Account SID" is passed on the URL and sent as the username for basic authentication credentials
+Returns the url for the Twilio versioned service.
 
-=cut
-
-#see SMS::Send::Driver::WebService->username
-
-=head2 password
-
-The "Auth Token" sent as password for basic authentication credentials
+  Default: https://api.twilio.com/2010-04-01
 
 =cut
 
-#see SMS::Send::Driver::WebService->password
+#see SMS::Send::Driver::WebService->url
+
+sub _url_default {'https://api.twilio.com/2010-04-01'};
+sub _host_default {'api.twilio.com'};
+sub _protocol_default {'https'};
+sub _port_default {'443'};
+sub _script_name_default {'/2010-04-01'};
+
+=head2 AccountSid
+
+The "AccountSID" is passed on the URL and sent as the username for basic authentication credentials
+
+=cut
+
+sub AccountSid {
+  my $self              = shift;
+  $self->{'AccountSid'} = shift if @_;
+  unless (defined $self->{'AccountSid'}) {
+    $self->{'AccountSid'} = $self->cfg_property('AccountSid', $self->_AccountSid_default)
+                          || $self->cfg_property('username', $self->_username_default); #pre 0.04
+  }
+  die('Error: AccountSid property required') unless defined $self->{'AccountSid'};
+  return $self->{'AccountSid'};
+}
+
+sub _AccountSid_default {undef};
+
+=head2 AuthToken
+
+The "AuthToken" sent as password for basic authentication credentials
+
+=cut
+
+sub AuthToken {
+  my $self             = shift;
+  $self->{'AuthToken'} = shift if @_;
+  unless (defined $self->{'AuthToken'}) {
+    $self->{'AuthToken'} = $self->cfg_property('AuthToken', $self->_AuthToken_default)
+                         || $self->cfg_property('password', $self->_password_default); #pre 0.04
+  }
+  die('Error: AuthToken property required') unless defined $self->{'AuthToken'};
+  return $self->{'AuthToken'};
+}
+
+sub _AuthToken_default {undef};
 
 =head2 From
 
@@ -213,7 +251,7 @@ sub _ApplicationSid_default {undef};
 
 The "MaxPrice" parameter passed in the posted form
 
-The total maximum price up to the fourth decimal (0.0001) in US dollars acceptable for the message to be delivered. All messages regardless of the price point will be queued for delivery. A POST request will later be made to your Status Callback URL with a status change of 'Sent' or 'Failed'. When the price of the message is above this value the message will fail and not be sent. When MaxPrice is not set, all prices for the message is accepted.
+The total maximum price up to the fourth decimal (0.0001) in US dollars acceptable for the message to be delivered. All messages regardless of the price point will be queued for delivery. A POST request will later be made to your Status Callback URL with a status change of "Sent" or "Failed". When the price of the message is above this value the message will fail and not be sent. When MaxPrice is not set, all prices for the message is accepted.
 
 =cut
 
@@ -270,9 +308,9 @@ Michael R. Davis
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2018 by Michael R. Davis
+MIT License
 
-This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself, either Perl version 5.10.1 or, at your option, any later version of Perl 5 you may have available.
+Copyright (c) 2022 Michael R. Davis
 
 =cut
 

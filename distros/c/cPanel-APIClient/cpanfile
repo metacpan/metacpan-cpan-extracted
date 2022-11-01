@@ -26,6 +26,9 @@ on test => sub {
     recommends 'IO::Async';
     recommends 'IPC::Run';
 
+    recommends 'HTTP::Request';
+    recommends 'HTTP::Response';
+
     # We omit Mojolicious because it requires a newer Perl version
     # than we do.
 };

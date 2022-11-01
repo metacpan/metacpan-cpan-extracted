@@ -6,7 +6,7 @@ use FindBin;
 
 package App::GUI::Harmonograph;
 our $NAME = __PACKAGE__;
-our $VERSION = '0.56';
+our $VERSION = '0.57';
 
 use base qw/Wx::App/;
 use App::GUI::Harmonograph::Frame;
@@ -39,11 +39,11 @@ App::GUI::Harmonograph - sculpting beautiful circular drawings
 
 =item 1.
 
-start the program (harmonograph)
+read this POD or check dialogs from help menu
 
 =item 2.
 
-read this POD or check dialogs from help menu
+start the program (C<harmonograph>)
 
 =item 3.
 
@@ -52,25 +52,25 @@ an interesting configuration
 
 =item 4.
 
-push "Draw" (below drawing board or Ctrl+D) to produce full image
+push I<Draw> (right below drawing board or C<Ctrl+D>) to produce full image
 
 =item 5.
 
-choose "Save" in Image menu (or Ctrl+S) to store image in a PNG / JPEG / SVG file
+choose I<Save> in I<Image> menu (or C<Ctrl+S>) to store image in a PNG / JPEG / SVG file
 
 =item 6.
 
-choose "Write" in settings menu (Ctrl+W) to save settings into an
+choose I<Write> in settings menu (C<Ctrl+W>) to save settings into an
 INI file for tweaking them later
 
 =back
 
 Please note that quick preview gets only triggered by the pendulum
-controls (section X, Y Z and R).
+controls (section X, Y, Z and R).
 
-After first use of the program, a config file .harmonograph will be
-created in you home directory. You may move it into "Documents" or your
-local directory you start the app from.
+After first use of the program, a config file I<.harmonograph> will be
+created in you home directory. You may move it into your I<Documents>
+or your local directory, from where the app is started.
 
 
 =head1 DESCRIPTION
@@ -80,11 +80,12 @@ creating together spiraling pictures :
 
 
 =for HTML <p>
-<img src="https://raw.githubusercontent.com/lichtkind/App-GUI-Harmonograph/main/examples/wirbel.jpg"    alt=""  width="300" height="300">
 <img src="https://raw.githubusercontent.com/lichtkind/App-GUI-Harmonograph/main/examples/baum.png"      alt=""  width="300" height="300">
+<img src="https://raw.githubusercontent.com/lichtkind/App-GUI-Harmonograph/main/examples/wirbel.jpg"    alt=""  width="300" height="300">
 <img src="https://raw.githubusercontent.com/lichtkind/App-GUI-Harmonograph/main/examples/hose.png"      alt=""  width="300" height="300">
 <img src="https://raw.githubusercontent.com/lichtkind/App-GUI-Harmonograph/main/examples/wirbel_4.png"  alt=""  width="300" height="300">
 <img src="https://raw.githubusercontent.com/lichtkind/App-GUI-Harmonograph/main/examples/wolke.png"     alt=""  width="300" height="300">
+<img src="https://raw.githubusercontent.com/lichtkind/App-GUI-Harmonograph/main/examples/df.png"     alt=""  width="300" height="300">
 </p>
 
 
@@ -99,15 +100,15 @@ third pendulum can rotate
 
 =item *
 
-pendula can oscillate at none integer frequencies
+pendula can oscillate at none integer frequencies 
 
 =item *
 
-changeable amplitude and damping
+separate complex amplitude and frequency damping
 
 =item *
 
-changeable dot density and dot size
+draw lines or dots with changeable density and size
 
 =item *
 
@@ -118,10 +119,9 @@ changeable dot density and dot size
 
 =head1 Mechanics
 
-The classic Harmonograph is sturdy metal rack which does not move 
-while 3 pendula swing independently.
-Let us call the first pendulum X, because it only moves along the x-axis
-(left to right and back).
+The classic Harmonograph is sturdy metal rack which does not move while
+3 pendula swing independently. Let us call the first pendulum X,
+because it only moves along the x-axis (left to right and back).
 In the same fashion the second (Y) only moves up and down.
 When both are connected to a pen, we get a combination of both movements.
 As long as X and Y swing at the same speed, the result is a diagonal line.
@@ -132,14 +132,15 @@ In other words: we added an offset of 90 degrees to Y (or X).
 Our third pendulum Z moves the paper and does exactly 
 the already described circular movement without rotating around its center.
 If both circular movements (of X, Y and Z) are concurrent - 
-the pen just stays at one point, If both are countercurrent - 
+the pen just stays at one point over the paper, If both are countercurrent - 
 we get a circle. Interesting things start to happen, if we alter
 the speed of of X, Y and Z. Than famous harmonic pattern appear.
 And for even more complex drawings I added R, which is not really
 a pendulum, but an additional rotary movement of Z around its center.
-The pendula out of metal do of course fizzle out with time, 
+The pendula out of metal do of course fizzle out over time, 
 which you can see in the drawing, in a spiraling movement toward the center.
-We emulate this with a damping factor.
+We emulate this with two damping factors: one for amplitude and one for
+the frequency (speed).
 
 
 =head1 GUI
@@ -160,30 +161,32 @@ In the left upper corner is the drawing board - showing the result of the Harmon
 =item 2
 
 The whole right half of the window contains the settings, which guide the drawing operation.
-These are divided into two tabs - roughly devided in form and decoration.
+These are divided into four tabs - roughly devided in form (3) and decoration (last one).
 
 =item 3
 
-The lower left side contains buttons which are a few commands,
-mostly for mass productions of image files, but most commands are in 
-the main menu.
+The lower left side contains buttons which trigger a few commands,
+mostly for mass productions of image files. All the other commands are
+only reachable in the main menu or by keyboard 
+(key combinations are displayed in the menu).
 
 =back
 
 Please mind the tool tips - short help texts which appear if the mouse
 stands still over a button or slider. Also helpful are messages in the
-status bar at the bottom: on left regarding images and right about settings.
-When brwosing the main menu, a help texts about the highlighted item
-also appears in the status bar. The Menu can completely navigated with
+status bar at the bottom - on bottom left regarding images and bottom 
+right about settings.
+When brwosing the main menu, help texts about the highlighted item
+also appears in the status bar. The Menu can be completely navigated with
 the keyboard. Just hold Alt and use the direction keys (up, down, left
 and right) or the highlighted letters. When holding the Alt key you can
 also see which Alt + letter combinations trigger which button.
 
 =head2 Pendulum
 
-The first tab contains the settings that define the properties
-of the pendula (X and Y), which move along the x and y axis in a lateral
-manner. On the second Tab are identical controls for the Pendula Z and R
+The first tab contains the settings that define the properties of the
+lateral pendula (X and Y), which move along the x and y axis in a straight
+manner. On the second tab are identical controls for the pendula Z and R
 which together with X and Y determine the shape of the drawing.
 Z does a circling movement, R is a rotation (around Z's axis or origin).
 
@@ -220,29 +223,38 @@ offsets of an half (180 degree) or quarter (90 degree) rotation can be
 activated by checkbox (to the right of the slider). The final offset is
 the sum of the checked.
 
+=head2 Mod Matrix
+
+The third tab allows the deepest alterations to the drawing, which leave
+the original concept of a Harmonograph. For instance the X - Pendulum
+is basically a little more than the a cosine function to the time variable.
+Here you can change that to sine, tangent or other trigonometric functions.
+Same goes for Y and Z. R is a function of an rotation matrix. Here you
+can change every of its four elements (with next version).
+
 =head2 Line
 
 =for HTML <p>
 <img src="https://raw.githubusercontent.com/lichtkind/App-GUI-Harmonograph/main/examples/GUI2.png"   alt=""  width="630" height="410">
 </p>
 
-The third tab on the right side has knobs that set the properties of the pen.
-In left upper corder ist the slide to set the amount of rotations to be
-drawn. Right beside is the distance between dots. 
-Greater distances, together with color changes, help to clearify
-muddled up drawings. Also - many rotations and little distance between
-dots will slow down the computation. In the second row left is a checkbox
-to answer if the dots should be connected. 
-The fourth selector sets the dot size in pixel. Zero mens here very thin
-= one half of an pixel - which is still somewhat visible, but very airy.
+The last tab on the right contains the visual properties (of the pen).
+In left upper corner yo set the amount of rotations (swings) to be drawn.
+Right beside is the distance between dots. Greater distances,
+together with color changes, help to clearify muddled up drawings.
+Also - many rotations and little distance between dots will slow down
+the computation. In the second row left is a checkbox to answer if the
+dots should be connected. The fourth selector sets the dot size in pixel.
+Zero mens here very thin = one half of an pixel - which is still  visible,
+but very airy.
 
 =head2 Colors
 
-Below that on the second tab are the options for colorization and this
+Below that on the last tab are the options for colorization and this
 has in itself three parts.
-Topmost are the settings for the color change, which is set on default to "no".
-In that case only the start (upper) color (below the color change section)
-will be used, and not the end (target) color (which is even below that).
+Topmost are the settings for the color change, which is set on default to I<no>.
+In that case only the upper I<start color> (below the color change section)
+will be used, and not the I<end color> (target - which is even below that).
 
 Both colors can be changed via controls for the red, green and blue value
 (see labels "R", "G" and "B" ) or hue, saturation and lightness (HSL).
@@ -254,10 +266,10 @@ around the rainbow through a complement color with saturation and lightness
 of the target settings.
 Steps size refers always to how maby circles are draw before the color changes.
 
-The third part on the second tab grants you access to the color store of
-config file .harmonograph. There you can store your favorite colors under
-a name and reload or delet them later. The upper row is for interactions
-with the sart color and the lower with the end color.
+The third part of the tab grants you access to the color section of the
+config file C<.harmonograph>. There you can store your favorite colors under
+a name and reload or delete them later. The upper row is for interactions
+with the I<start color> and the lower with the I<end color>.
 
 =head2 Commands
 
@@ -266,20 +278,22 @@ commands are in the menu.
 
 The upper row has only one button for making a full drawing. This
 might take some time if line length and dot density are high.
-For that reason - changes on the pendulum settings (first tab)
-(and only these) produce an immediate drawing to better understand the
-nature of your changes. In the interest of time, these are only sketches.
+For that reason - only changes on the pendulum settings (first two tabs)
+produce an sketch drawing, helping the user understand the nature his
+changes. A sketch contains only the first five pendulum swings,
+so it can be drawn fast enough for almost immediate interactions.
 For a full drawing that takes all settings into account you need to push
-the "Draw" button or Press Ctrl + D.
+I<Draw> button or Press C<Ctrl + D>.
 
 The second row has commands to quickly save many files.
-First push "Dir" to select the directory and then type directly into the
-secand text fiel the file base name - the index is found automatically.
-Every time you now press "Save" a file with the current image is saved
-under the path: dir + base name + index + ending (set in config). 
-The index automatically autoincrements when changing the settings.
-Push "INI" next to it to also save the settings of the current state
-under same file name, but with the ending .ini.
+First push I<Dir> to select the directory and then type directly into the
+second text field the file base name. The index in the next one
+is found automatically. Every time you now press I<Save> a file with the
+current image is saved under the path: dir + base name + index + ending
+(set in Menu: Image &gt; Format and saved in configs). 
+The index automatically autoincrements when producing a file.
+Push button I<INI> next to it to also save the settings of the current
+state under same file name, but with the ending C<.ini>.
 
 
 =head2 Menu
@@ -290,15 +304,17 @@ command and while hovering over an menu item you see a short help text
 the left status bar field.
 
 The first menu is for loading and storing setting files with arbitrary 
-names. Also a sub menu allows a quick load of the recently used files.
+names. I recommend giving them the file ending C<.ini> for transparency
+reasons. A submenu allows a quick load of the recently used files.
 The first entry lets you reset the whole program to the starting state
 and the last is just to exit (safely with saving the configs).
 
 The second menu has only two commands for drawing an complete image
 and saving it in an arbitrary named PNG, JPG or SVG file (the file ending decides).
-The submenu above onle set the preferred format, which is the format
-of serial images and the first wild card in dialog. Above that is another
-submenu for setting the image size.
+The submenu above only sets the preferred format, which is the format
+of the serially save images by the command buttons in the left lower corner.
+The preferred file format is also the first wild card in the save dialog.
+Above that is another submenu for setting the image size.
 
 The third menu has some dialogs with documentation and additional information.
 

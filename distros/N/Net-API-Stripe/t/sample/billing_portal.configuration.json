@@ -1,0 +1,53 @@
+{
+   "active" : 1,
+   "application" : null,
+   "business_profile" : {
+      "headline" : null,
+      "privacy_policy_url" : "https://example.com/privacy",
+      "terms_of_service_url" : "https://example.com/terms"
+   },
+   "created" : "1662261084",
+   "default_return_url" : null,
+   "features" : {
+      "customer_update" : {
+         "allowed_updates" : [
+            "email",
+            "tax_id"
+         ],
+         "enabled" : 1
+      },
+      "invoice_history" : {
+         "enabled" : 1
+      },
+      "payment_method_update" : {
+         "enabled" : 0
+      },
+      "subscription_cancel" : {
+         "cancellation_reason" : {
+            "enabled" : 0,
+            "options" : []
+         },
+         "enabled" : 0,
+         "mode" : "at_period_end",
+         "proration_behavior" : "none"
+      },
+      "subscription_pause" : {
+         "enabled" : 0
+      },
+      "subscription_update" : {
+         "default_allowed_updates" : [],
+         "enabled" : 0,
+         "proration_behavior" : "none"
+      }
+   },
+   "id" : "bpc_1Le9F22eZvKYlo2CT0Eg0n9Q",
+   "is_default" : 1,
+   "livemode" : 1,
+   "login_page" : {
+      "enabled" : 0,
+      "url" : null
+   },
+   "metadata" : null,
+   "object" : "billing_portal.configuration",
+   "updated" : "1662261084"
+}

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 26;
+use Test::More tests => 28;
 use Test::Trap
     qw( trap $trap :flow:stderr(systemsafe):stdout(systemsafe):warn );
 
@@ -455,3 +455,41 @@ qr{Docmake version.*^A tool to convert DocBook/XML to other formats.*^Available 
         "Testing xhtml5 trailing slash",
     );
 }
+
+{
+    my $docmake = MyTest::DocmakeAppDebug->new(
+        {
+            argv => [
+                "-v",            "--ns",
+                "--stringparam", "empty.param=",
+                "-o",            "my-output-dir",
+                "xhtml5",        "input.xml",
+            ]
+        }
+    );
+
+    # TEST
+    ok( $docmake, "xhtml5 namespacesed docmake was constructed successfully" );
+
+    $docmake->run();
+
+    # TEST
+    is_deeply(
+        MyTest::DocmakeAppDebug->debug_commands(),
+        [
+            [
+                "xsltproc",
+                "--nonet",
+                "-o",
+                "my-output-dir/",
+                "--stringparam",
+                "empty.param",
+                "",
+"http://docbook.sourceforge.net/release/xsl-ns/current/xhtml5/docbook.xsl",
+                "input.xml",
+            ]
+        ],
+        "Testing xhtml5 namespacesed",
+    );
+}
+

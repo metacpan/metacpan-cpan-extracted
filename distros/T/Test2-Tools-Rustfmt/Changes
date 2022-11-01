@@ -1,0 +1,13 @@
+Revision history for Test2-Tools-Rustfmt
+
+0.03      2022-10-25 13:46:22 -0600
+  - Fix bug where Makefile.PL would happily not exit 0
+    when rustfmt and cargo are not available (gh#3, gh#4)
+
+0.02      2022-10-25 07:26:23 -0600
+  - Added missing synopsis (gh#2)
+
+0.01      2022-10-25 06:51:07 -0600
+  - initial version
+
+

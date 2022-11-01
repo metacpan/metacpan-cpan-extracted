@@ -1,12 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2016 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.41;
+use Object::Pad 0.66;
 
-package Tangence::Property 0.29;
+package Tangence::Property 0.30;
 
 use warnings;
 use base qw( Tangence::Meta::Property );
@@ -259,9 +259,9 @@ class # hide from CPAN
 
    use Tangence::Constants;
 
-   has $queue :param :reader;
-   has $prop  :param :reader;
-   has $idx   :param :mutator;
+   field $queue :param :reader;
+   field $prop  :param :reader;
+   field $idx   :param :mutator;
 
    sub BUILDARGS ( $class, $queue, $prop, $idx )
    {

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Webservice::Judobase::General;
-$Webservice::Judobase::General::VERSION = '0.07';
+$Webservice::Judobase::General::VERSION = '0.08';
 # VERSION
 
 use Moo;
@@ -64,7 +64,8 @@ sub competitions {
 
 sub competitors {
     my ( $self, %args ) = @_;
-    return { error => 'event_id parameter is required' } unless defined $args{event_id};
+    return { error => 'event_id parameter is required' }
+        unless defined $args{event_id};
 
     my $url
         = $self->url
@@ -76,26 +77,23 @@ sub competitors {
 
     my $response = $self->ua->request($request);
 
-    my @competitors =();
-    if ($response->code == 200) {
+    my @competitors = ();
+    if ( $response->code == 200 ) {
         my $info = decode_json $response->content;
 
-        for my $gender (values %{$info->{categories}}) {
-            for my $cat (values %$gender) {
-               for my $person (values %{$cat->{persons}}) {
-                   push @competitors, $person;
-               }
+        for my $gender ( values %{ $info->{categories} } ) {
+            for my $cat ( values %$gender ) {
+                for my $person ( values %{ $cat->{persons} } ) {
+                    push @competitors, $person;
+                }
             }
         }
 
         return \@competitors;
-    } else {
+    }
+    else {
         return { error => 'Error retreiving competitors info' };
     }
 }
-
-
-
-
 
 1;

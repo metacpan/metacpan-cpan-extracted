@@ -76,16 +76,19 @@ subtest 'country => 188 (UK)' => sub {
 
 subtest 'age => "c" (43-49)' => sub {
     $leaderboard = $sr->get_leaderboard( age => 'c' );
-    like $leaderboard->{records}[0]{age_class}, 'C (43-49)', 'age_class - C returned';
+    like $leaderboard->{records}[0]{age_class}, 'C (43-49)',
+        'age_class - C returned';
 };
 
 subtest 'gender => "f" (female)' => sub {
     $leaderboard = $sr->get_leaderboard( gender => 'f' );
-    like $leaderboard->{records}[0]{gender}, 'Female', 'gender - Female returned';
+    like $leaderboard->{records}[0]{gender}, 'Female',
+        'gender - Female returned';
 };
 
 subtest 'weight => "l" (light)' => sub {
     $leaderboard = $sr->get_leaderboard( weight => 'l' );
-    like $leaderboard->{records}[0]{weight_class}, 'LW', 'weight_class - Lightweight returned returned';
+    like $leaderboard->{records}[0]{weight_class}, 'LW',
+        'weight_class - Lightweight returned returned';
 };
 done_testing;

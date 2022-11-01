@@ -3,14 +3,13 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Generate test stubs for methods and functions
 
-our $VERSION = '0.0702';
+our $VERSION = '0.0703';
 
-use Moo;
 use strictures 2;
-use namespace::clean;
-
-use Package::Stash;
+use Moo;
+use Package::Stash ();
 use Sub::Identify 'stash_name';
+use namespace::clean;
 
 
 has module => (
@@ -139,7 +138,7 @@ Test::NaiveStubs - Generate test stubs for methods and functions
 
 =head1 VERSION
 
-version 0.0702
+version 0.0703
 
 =head1 SYNOPSIS
 
@@ -258,7 +257,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Gene Boggs.
+This software is copyright (c) 2022 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

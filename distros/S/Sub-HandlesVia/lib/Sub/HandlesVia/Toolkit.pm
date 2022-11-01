@@ -5,12 +5,12 @@ use warnings;
 package Sub::HandlesVia::Toolkit;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.038';
+our $VERSION   = '0.044';
 
 use Sub::HandlesVia::Mite;
 
 use Type::Params qw(compile_named_oo);
-use Types::Standard qw( ArrayRef HashRef Str Num Int CodeRef Bool Item );
+use Types::Standard qw( ArrayRef HashRef Str Num Int CodeRef Bool Item Object );
 use Types::Standard qw( assert_HashRef is_ArrayRef is_CodeRef is_Str );
 
 my $sig;
@@ -48,6 +48,7 @@ sub install_delegations {
 
 my %native = qw(
 	Array           1
+	Blessed         1
 	Bool            1
 	Code            1
 	Counter         1
@@ -70,6 +71,7 @@ my %default_type = (
 	Code      => CodeRef,
 	Bool      => Bool,
 	Scalar    => Item,
+	Blessed   => Object,
 );
 
 sub clean_spec {

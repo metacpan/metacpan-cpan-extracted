@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.555-12-g5cd1dee9
+package JSON::Schema::Modern; # git description: v0.556-9-gff35211a
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema
 # KEYWORDS: JSON Schema validator data validation structure specification
 
-our $VERSION = '0.556';
+our $VERSION = '0.557';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -309,6 +309,9 @@ sub evaluate ($self, $data, $schema_reference, $config_override = {}) {
     effective_base_uri => $effective_base_uri, # resolve locations against this for errors and annotations
     errors => [],
   };
+
+  exists $config_override->{$_} and die $_.' not supported as a config override'
+    foreach qw(output_format specification_version);
 
   my $valid;
   try {
@@ -909,7 +912,7 @@ has _media_type => (
   lazy => 1,
   default => sub ($self) {
     my $_json_media_type = sub ($content_ref) {
-      \ JSON::MaybeXS->new(allow_nonref => 1, utf8 => 0)->decode($content_ref->$*);
+      \ JSON::MaybeXS->new(allow_nonref => 1, utf8 => 1)->decode($content_ref->$*);
     };
     +{
       # note: utf-8 decoding is NOT done, as we can't be sure that's the correct charset!
@@ -947,7 +950,7 @@ has _encoding => (
     +{
       identity => sub ($content_ref) { $content_ref },
       base64 => sub ($content_ref) {
-        die "invalid characters in base64 string"
+        die "invalid characters\n"
           if $content_ref->$* =~ m{[^A-Za-z0-9+/=]} or $content_ref->$* =~ m{=(?=[^=])};
         require MIME::Base64; \ MIME::Base64::decode($content_ref->$*);
       },
@@ -955,6 +958,7 @@ has _encoding => (
   },
 );
 
+# callback hook for Sereal::Encode
 sub FREEZE ($self, $serializer) {
   my $data = +{ %$self };
   # Cpanel::JSON::XS doesn't serialize: https://github.com/Sereal/Sereal/issues/266
@@ -963,6 +967,7 @@ sub FREEZE ($self, $serializer) {
   return $data;
 }
 
+# callback hook for Sereal::Decode
 sub THAW ($class, $serializer, $data) {
   my $self = bless($data, $class);
 
@@ -988,7 +993,7 @@ JSON::Schema::Modern - Validate data against a schema
 
 =head1 VERSION
 
-version 0.556
+version 0.557
 
 =head1 SYNOPSIS
 

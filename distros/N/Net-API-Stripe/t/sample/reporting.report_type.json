@@ -1,0 +1,16 @@
+{
+   "data_available_end" : "1662206400",
+   "data_available_start" : "1385769600",
+   "default_columns" : [
+      "category",
+      "description",
+      "net_amount",
+      "currency"
+   ],
+   "id" : "balance.summary.1",
+   "livemode" : 1,
+   "name" : "Balance summary",
+   "object" : "reporting.report_type",
+   "updated" : "1662238488",
+   "version" : "1"
+}

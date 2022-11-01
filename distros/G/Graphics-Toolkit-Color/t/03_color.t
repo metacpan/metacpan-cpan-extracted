@@ -2,7 +2,7 @@
 #
 use v5.12;
 use warnings;
-use Test::More tests => 303;
+use Test::More tests => 310;
 use Test::Warn;
 
 BEGIN { unshift @INC, 'lib', '../lib'}
@@ -368,5 +368,19 @@ is( $g[1]->saturation+4,                    $g[2]->saturation,   "saturation mov
 is( $g[1]->lightness -8,                     $g[0]->lightness,   "lightness moves on odd and skewed circle as predicted fore");
 is( $g[1]->lightness +8,                     $g[2]->lightness,   "lightness moves on odd and skewed circle as predicted back");
 
+eval "color('blue')";
+is( substr($@, 0, 20),  'Undefined subroutine', 'sub not there when not imported');
+
+package New;
+
+use Graphics::Toolkit::Color qw/color/;
+use Test::More;
+
+is (ref color('blue'), $module,                    'sub there when imported');
+is (ref color('#ABC'), $module,                    'works also with short hex input');
+is (ref color('#AABBCC'), $module,                 'works also with long hex input');
+is (ref color([1,2,3]),   $module,                 'Array Input');
+is (ref color({r => 1, g => 2, b => 3,}), $module, 'RGB hash');
+is (ref color({h => 1, s => 2, l => 3,}), $module, 'HSL hash');
 
 exit 0;

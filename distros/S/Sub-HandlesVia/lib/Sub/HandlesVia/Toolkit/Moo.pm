@@ -5,7 +5,7 @@ use warnings;
 package Sub::HandlesVia::Toolkit::Moo;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.038';
+our $VERSION   = '0.044';
 
 use Sub::HandlesVia::Mite;
 extends 'Sub::HandlesVia::Toolkit';
@@ -78,7 +78,7 @@ sub code_generator_for_attribute {
 		$coerce = 1;
 	}
 	
-	my ($slot) = sub {
+	my $slot = sub {
 		my $gen = shift;
 		my ($code) = $maker->generate_simple_get($gen->generate_self, $attrname, $spec);
 		$code;

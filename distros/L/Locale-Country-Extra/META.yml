@@ -1,7 +1,7 @@
 ---
 abstract: 'Standard and IDD codes for Country identification, with Multilingual support'
 author:
-  - 'binary.com <cpan@binary.com>'
+  - 'binary.com <BINARY@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
@@ -11,22 +11,56 @@ build_requires:
   Test::Exception: '0'
   Test::More: '0.94'
   Test::NoWarnings: '0'
-  perl: '5.014000'
+  lib: '0'
+  perl: '5.006'
 configure_requires:
-  ExtUtils::MakeMaker: '6.48'
+  ExtUtils::MakeMaker: '7.64'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Locale-Country-Extra
+no_index:
+  directory:
+    - eg
+    - share
+    - shares
+    - t
+    - xt
+provides:
+  Locale::Country::Extra:
+    file: lib/Locale/Country/Extra.pm
+    version: '1.06'
 requires:
   Locale::Codes: '3.66'
+  Locale::Country: '0'
   Locale::Country::Multilingual: '0'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
 resources:
   bugtracker: https://github.com/binary-com/perl-Locale-Country-Extra/issues
-  repository: git://github.com/binary-com/perl-Locale-Country-Extra.git
-version: 1.0.4
+  homepage: https://github.com/binary-com/perl-Locale-Country-Extra
+  repository: https://github.com/binary-com/perl-Locale-Country-Extra.git
+version: '1.06'
+x_authority: cpan:DERIV
+x_contributors:
+  - 'liu <qiangliu@binary.com>'
+  - 'Rohan Almeida <rohan@binary.com>'
+  - 'Jean-Yves Sireau <jy@binary.com>'
+  - 'chylli-binary <chylli@binary.com>'
+  - 'lq <liuqiang1981@gmail.com>'
+  - 'Raunak Kathuria <raunakkathuria@gmail.com>'
+  - 'Chris Travers <christravers@binary.com>'
+  - 'Zak B. Elep <zakame@zakame.net>'
+  - 'keanfei-binary <61964799+keanfei-binary@users.noreply.github.com>'
+  - 'Nick Patch <patch@cpan.org>'
+  - 'Chris Travers <chris.travers@gmail.com>'
+  - 'Lee Zhen Yong <32833572+bruce-binary@users.noreply.github.com>'
+  - 'Reginaldo Costa <regcostajr@gmail.com>'
+  - 'Rohan Almeida <almeida@aarohan.biz>'
 x_generated_by_perl: v5.26.2
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

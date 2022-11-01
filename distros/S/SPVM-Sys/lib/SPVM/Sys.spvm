@@ -19,6 +19,9 @@ class Sys {
     elsif (&defined("__solaris")) {
       $osname = "solaris";
     }
+    elsif (&defined("__sun")) {
+      $osname = "sunos";
+    }
     elsif (&defined("__APPLE__")) {
       $osname = "darwin";
     }

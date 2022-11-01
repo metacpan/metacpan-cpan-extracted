@@ -2,7 +2,7 @@
 ## Stripe API - ~/lib/Net/API/Stripe/Balance/Transaction/FeeDetails.pm
 ## Version v0.100.0
 ## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2020/05/15
 ## 
@@ -11,19 +11,24 @@ package Net::API::Stripe::Balance::Transaction::FeeDetails;
 BEGIN
 {
     use strict;
+    use warnings;
     use parent qw( Net::API::Stripe::Generic );
+    use vars qw( $VERSION );
     our( $VERSION ) = 'v0.100.0';
 };
 
-sub amount { shift->_set_get_number( 'amount', @_ ); }
+use strict;
+use warnings;
 
-sub application { shift->_set_get_scalar( 'application', @_ ); }
+sub amount { return( shift->_set_get_number( 'amount', @_ ) ); }
 
-sub currency { shift->_set_get_scalar( 'currency', @_ ); }
+sub application { return( shift->_set_get_scalar( 'application', @_ ) ); }
 
-sub description { shift->_set_get_scalar( 'description', @_ ); }
+sub currency { return( shift->_set_get_scalar( 'currency', @_ ) ); }
 
-sub type { shift->_set_get_scalar( 'type', @_ ); }
+sub description { return( shift->_set_get_scalar( 'description', @_ ) ); }
+
+sub type { return( shift->_set_get_scalar( 'type', @_ ) ); }
 
 1;
 
@@ -37,12 +42,12 @@ Net::API::Stripe::Balance::Transaction::FeeDetails - A Stripe Fee Details Object
 
 =head1 SYNOPSIS
 
-	my $fee_details = Net::API::Stripe::Balance::Transaction::FeeDetails->new({
-	    amount => 2000,
-	    currency => 'eur',
-	    description => 'Some transaction',
-	    type => 'application_fee',
-	});
+    my $fee_details = Net::API::Stripe::Balance::Transaction::FeeDetails->new({
+        amount => 2000,
+        currency => 'eur',
+        description => 'Some transaction',
+        type => 'application_fee',
+    });
 
 =head1 VERSION
 
@@ -54,65 +59,59 @@ This is called from within L<Net::API::Stripe::Transaction> from method B<fee_de
 
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>( %ARG )
+=head2 new( %ARG )
 
 Creates a new L<Net::API::Stripe::Balance::Transaction::FeeDetails> object.
 It may also take an hash like arguments, that also are method of the same name.
 
-=back
-
 =head1 METHODS
 
-=over 4
-
-=item B<amount> integer
+=head2 amount integer
 
 Amount of the fee, in cents.
 
-=item B<application> string
+=head2 application string
 
-=item B<currency> currency
+ID of the Connect application that earned the fee.
+
+=head2 currency currency
 
 Three-letter ISO currency code, in lowercase. Must be a supported currency.
 
-=item B<description> string
+=head2 description string
 
 An arbitrary string attached to the object. Often useful for displaying to users.
 
-=item B<type> string
+=head2 type string
 
 Type of the fee, one of: application_fee, stripe_fee or tax.
 
-=back
-
 =head1 API SAMPLE
 
-	{
-	  "id": "txn_fake124567890",
-	  "object": "balance_transaction",
-	  "amount": 8000,
-	  "available_on": 1571443200,
-	  "created": 1571128827,
-	  "currency": "jpy",
-	  "description": "Invoice 123456-0039",
-	  "exchange_rate": null,
-	  "fee": 288,
-	  "fee_details": [
-		{
-		  "amount": 288,
-		  "application": null,
-		  "currency": "jpy",
-		  "description": "Stripe processing fees",
-		  "type": "stripe_fee"
-		}
-	  ],
-	  "net": 7712,
-	  "source": "ch_fake124567890",
-	  "status": "pending",
-	  "type": "charge"
-	}
+    {
+      "id": "txn_fake124567890",
+      "object": "balance_transaction",
+      "amount": 8000,
+      "available_on": 1571443200,
+      "created": 1571128827,
+      "currency": "jpy",
+      "description": "Invoice 123456-0039",
+      "exchange_rate": null,
+      "fee": 288,
+      "fee_details": [
+        {
+          "amount": 288,
+          "application": null,
+          "currency": "jpy",
+          "description": "Stripe processing fees",
+          "type": "stripe_fee"
+        }
+      ],
+      "net": 7712,
+      "source": "ch_fake124567890",
+      "status": "pending",
+      "type": "charge"
+    }
 
 =head1 HISTORY
 

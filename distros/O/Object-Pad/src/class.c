@@ -39,6 +39,8 @@ void ObjectPad__need_PLparser(pTHX); /* in Object/Pad.xs */
 /* Empty MGVTBL simply for locating instance backing AV */
 static MGVTBL vtbl_backingav = {};
 
+RoleEmbedding ObjectPad__embedding_standalone = {};
+
 typedef struct ClassAttributeRegistration ClassAttributeRegistration;
 
 struct ClassAttributeRegistration {
@@ -302,6 +304,306 @@ RoleEmbedding **ObjectPad_mop_class_get_all_roles(pTHX_ const ClassMeta *meta, U
   AV *roles = meta->cls.embedded_roles;
   *nroles = av_count(roles);
   return (RoleEmbedding **)AvARRAY(roles);
+}
+
+void ObjectPad__prepare_method_parse(pTHX_ ClassMeta *meta)
+{
+  /* Save the methodscope for this subparse, in case of nested methods
+   *   (RT132321)
+   */
+  SAVESPTR(meta->methodscope);
+
+  /* While creating the new scope CV we need to ENTER a block so as not to
+   * break any interpvars
+   */
+  ENTER;
+  SAVESPTR(PL_comppad);
+  SAVESPTR(PL_comppad_name);
+  SAVESPTR(PL_curpad);
+
+  CV *methodscope = meta->methodscope = MUTABLE_CV(newSV_type(SVt_PVCV));
+  CvPADLIST(methodscope) = pad_new(padnew_SAVE);
+
+  PL_comppad = PadlistARRAY(CvPADLIST(methodscope))[1];
+  PL_comppad_name = PadlistNAMES(CvPADLIST(methodscope));
+  PL_curpad  = AvARRAY(PL_comppad);
+
+  AV *fields = meta->direct_fields;
+  U32 nfields = av_count(fields);
+
+  U32 i;
+  for(i = 0; i < nfields; i++) {
+    FieldMeta *fieldmeta = (FieldMeta *)AvARRAY(fields)[i];
+
+    /* Skip the anonymous ones */
+    if(SvCUR(fieldmeta->name) < 2)
+      continue;
+
+    /* Claim these are all STATE variables just to quiet the "will not stay
+     * shared" warning */
+    pad_add_name_sv(fieldmeta->name, padadd_STATE, NULL, NULL);
+  }
+
+  intro_my();
+
+  LEAVE;
+}
+
+void ObjectPad__start_method_parse(pTHX_ ClassMeta *meta, bool is_common)
+{
+  /* Splice in the field scope CV in */
+  CV *methodscope = meta->methodscope;
+
+  if(CvANON(PL_compcv))
+    CvANON_on(methodscope);
+
+  CvOUTSIDE    (methodscope) = CvOUTSIDE    (PL_compcv);
+  CvOUTSIDE_SEQ(methodscope) = CvOUTSIDE_SEQ(PL_compcv);
+
+  CvOUTSIDE(PL_compcv) = methodscope;
+
+  if(!is_common)
+    /* instance method */
+    extend_pad_vars(meta);
+  else {
+    /* :common method */
+    PADOFFSET padix;
+
+    padix = pad_add_name_pvs("$class", 0, NULL, NULL);
+    if(padix != PADIX_SELF)
+      croak("ARGH: Expected that padix[$class] = 1");
+  }
+
+  if(meta->type == METATYPE_ROLE) {
+    PAD *pad1 = PadlistARRAY(CvPADLIST(PL_compcv))[1];
+
+    if(meta->role_is_invokable) {
+      SV *sv = PadARRAY(pad1)[PADIX_EMBEDDING];
+      sv_setpvn(sv, "", 0);
+      SvPVX(sv) = (void *)&ObjectPad__embedding_standalone;
+    }
+    else {
+      SvREFCNT_dec(PadARRAY(pad1)[PADIX_EMBEDDING]);
+      PadARRAY(pad1)[PADIX_EMBEDDING] = &PL_sv_undef;
+    }
+  }
+
+  intro_my();
+}
+
+#define find_padix_for_field(fieldmeta)  S_find_padix_for_field(aTHX_ fieldmeta)
+static PADOFFSET S_find_padix_for_field(pTHX_ FieldMeta *fieldmeta)
+{
+  const char *fieldname = SvPVX(fieldmeta->name);
+#if HAVE_PERL_VERSION(5, 20, 0)
+  const PADNAMELIST *nl = PadlistNAMES(CvPADLIST(PL_compcv));
+  PADNAME **names = PadnamelistARRAY(nl);
+  PADOFFSET padix;
+
+  for(padix = 1; padix <= PadnamelistMAXNAMED(nl); padix++) {
+    PADNAME *name = names[padix];
+
+    if(!name || !PadnameLEN(name))
+      continue;
+
+    const char *pv = PadnamePV(name);
+    if(!pv)
+      continue;
+
+    /* field names are all OUTER vars. This is necessary so we don't get
+     * confused by signatures params of the same name
+     *   https://rt.cpan.org/Ticket/Display.html?id=134456
+     */
+    if(!PadnameOUTER(name))
+      continue;
+    if(!strEQ(pv, fieldname))
+      continue;
+
+    /* TODO: for extra robustness we could compare the SV * in the pad itself */
+
+    return padix;
+  }
+
+  return NOT_IN_PAD;
+#else
+  /* Before the new pad API, the best we can do is call pad_findmy_pv()
+   * It won't get confused about signatures params because these perls are too
+   * old for signatures anyway
+   */
+  return pad_findmy_pv(fieldname, 0);
+#endif
+}
+
+OP *ObjectPad__finish_method_parse(pTHX_ ClassMeta *meta, bool is_common, OP *body)
+{
+  PADNAMELIST *fieldnames = PadlistNAMES(CvPADLIST(meta->methodscope));
+  I32 nfields = av_count(meta->direct_fields);
+  PADNAME **snames = PadnamelistARRAY(fieldnames);
+  PADNAME **padnames = PadnamelistARRAY(PadlistNAMES(CvPADLIST(PL_compcv)));
+
+  /* If we have no body that means this was a bodyless method
+   * declaration; a required method for a role
+   */
+  if(body && !is_common) {
+    OP *fieldops = NULL, *methstartop;
+#if HAVE_PERL_VERSION(5, 22, 0)
+    U32 cop_seq_low = COP_SEQ_RANGE_LOW(padnames[PADIX_SELF]);
+#endif
+
+#ifdef METHSTART_CONTAINS_FIELD_BINDINGS
+    AV *fieldmap = newAV();
+    U32 fieldcount = 0, max_fieldix = 0;
+
+    SAVEFREESV((SV *)fieldmap);
+#endif
+
+    {
+      ENTER;
+      SAVEVPTR(PL_curcop);
+
+      /* See https://rt.cpan.org/Ticket/Display.html?id=132428
+       *   https://github.com/Perl/perl5/issues/17754
+       */
+      PADOFFSET padix;
+      for(padix = PADIX_SELF + 1; padix <= PadnamelistMAX(PadlistNAMES(CvPADLIST(PL_compcv))); padix++) {
+        PADNAME *pn = padnames[padix];
+
+        if(PadnameIsNULL(pn) || !PadnameLEN(pn))
+          continue;
+
+        const char *pv = PadnamePV(pn);
+        if(!pv || !strEQ(pv, "$self"))
+          continue;
+
+        COP *padcop = NULL;
+        if(find_cop_for_lvintro(padix, body, &padcop))
+          PL_curcop = padcop;
+        warn("\"my\" variable $self masks earlier declaration in same scope");
+      }
+
+      LEAVE;
+    }
+
+    fieldops = op_append_list(OP_LINESEQ, fieldops,
+      newSTATEOP(0, NULL, NULL));
+    fieldops = op_append_list(OP_LINESEQ, fieldops,
+      (methstartop = newMETHSTARTOP(0 |
+        (meta->type == METATYPE_ROLE ? OPf_SPECIAL : 0) |
+        (meta->repr << 8))));
+
+    int i;
+    for(i = 0; i < nfields; i++) {
+      FieldMeta *fieldmeta = (FieldMeta *)AvARRAY(meta->direct_fields)[i];
+      PADNAME *fieldname = snames[i + 1];
+
+      if(!fieldname
+#if HAVE_PERL_VERSION(5, 22, 0)
+        /* On perl 5.22 and above we can use PadnameREFCNT to detect which pad
+         * slots are actually being used
+         */
+         || PadnameREFCNT(fieldname) < 2
+#endif
+        )
+          continue;
+
+      FIELDOFFSET fieldix = fieldmeta->fieldix;
+      PADOFFSET padix = find_padix_for_field(fieldmeta);
+
+      if(padix == NOT_IN_PAD)
+        continue;
+
+      U8 private = 0;
+      switch(SvPV_nolen(fieldmeta->name)[0]) {
+        case '$': private = OPpFIELDPAD_SV; break;
+        case '@': private = OPpFIELDPAD_AV; break;
+        case '%': private = OPpFIELDPAD_HV; break;
+      }
+
+#ifdef METHSTART_CONTAINS_FIELD_BINDINGS
+      assert((fieldix & ~FIELDIX_MASK) == 0);
+      av_store(fieldmap, padix, newSVuv(((UV)private << FIELDIX_TYPE_SHIFT) | fieldix));
+      fieldcount++;
+      if(fieldix > max_fieldix)
+        max_fieldix = fieldix;
+#else
+      fieldops = op_append_list(OP_LINESEQ, fieldops,
+        /* alias the padix from the field */
+        newFIELDPADOP(private << 8, padix, fieldix));
+#endif
+
+#if HAVE_PERL_VERSION(5, 22, 0)
+      /* Unshare the padname so the one in the methodscope pad returns to refcount 1 */
+      PADNAME *newpadname = newPADNAMEpvn(PadnamePV(fieldname), PadnameLEN(fieldname));
+      PadnameREFCNT_dec(padnames[padix]);
+      padnames[padix] = newpadname;
+
+      /* Turn off OUTER and set a valid COP sequence range, so the lexical is
+       * visible to eval(), PadWalker, perldb, etc.. */
+      PadnameOUTER_off(newpadname);
+      COP_SEQ_RANGE_LOW(newpadname) = cop_seq_low;
+      COP_SEQ_RANGE_HIGH(newpadname) = PL_cop_seqmax;
+#endif
+    }
+
+#ifdef METHSTART_CONTAINS_FIELD_BINDINGS
+    if(fieldcount) {
+      UNOP_AUX_item *aux;
+      Newx(aux, 2 + fieldcount*2, UNOP_AUX_item);
+      cUNOP_AUXx(methstartop)->op_aux = aux;
+
+      (aux++)->uv = fieldcount;
+      (aux++)->uv = max_fieldix;
+
+      for(Size_t i = 0; i < av_count(fieldmap); i++) {
+        if(!AvARRAY(fieldmap)[i] || !SvOK(AvARRAY(fieldmap)[i]))
+          continue;
+
+        (aux++)->uv = i;
+        (aux++)->uv = SvUV(AvARRAY(fieldmap)[i]);
+      }
+    }
+#endif
+    body = op_append_list(OP_LINESEQ, fieldops, body);
+  }
+  else if(body && is_common) {
+    body = op_append_list(OP_LINESEQ,
+      newCOMMONMETHSTARTOP(0 | (meta->repr << 8)),
+      body);
+  }
+
+  meta->methodscope = NULL;
+
+  /* Restore CvOUTSIDE(PL_compcv) back to where it should be */
+  {
+    CV *outside = CvOUTSIDE(PL_compcv);
+    PADNAMELIST *pnl = PadlistNAMES(CvPADLIST(PL_compcv));
+    PADNAMELIST *outside_pnl = PadlistNAMES(CvPADLIST(outside));
+
+    /* Lexical captures will need their parent pad index fixing
+     * Technically these only matter for CvANON because they're only used when
+     * reconstructing the parent pad captures by OP_ANONCODE. But we might as
+     * well be polite and fix them for all CVs
+     */
+    PADOFFSET padix;
+    for(padix = 1; padix <= PadnamelistMAX(pnl); padix++) {
+      PADNAME *pn = PadnamelistARRAY(pnl)[padix];
+      if(PadnameIsNULL(pn) ||
+         !PadnameOUTER(pn) ||
+         !PARENT_PAD_INDEX(pn))
+        continue;
+
+      PADNAME *outside_pn = PadnamelistARRAY(outside_pnl)[PARENT_PAD_INDEX(pn)];
+
+      PARENT_PAD_INDEX_set(pn, PARENT_PAD_INDEX(outside_pn));
+      if(!PadnameOUTER(outside_pn))
+        PadnameOUTER_off(pn);
+    }
+
+    CvOUTSIDE(PL_compcv)     = CvOUTSIDE(outside);
+    CvOUTSIDE_SEQ(PL_compcv) = CvOUTSIDE_SEQ(outside);
+  }
+
+  return body;
 }
 
 MethodMeta *ObjectPad_mop_class_add_method(pTHX_ ClassMeta *meta, SV *methodname)
@@ -649,8 +951,21 @@ static void S_mop_class_apply_role(pTHX_ RoleEmbedding *embedding)
       ParamMeta *classparammeta;
       Newx(classparammeta, 1, struct ParamMeta);
 
-      classparammeta->field   = roleparammeta->field;
-      classparammeta->fieldix = roleparammeta->fieldix + embedding->offset;
+      classparammeta->name  = SvREFCNT_inc(roleparammeta->name);
+      classparammeta->class = roleparammeta->class;
+      classparammeta->type  = roleparammeta->type;
+
+      switch(roleparammeta->type) {
+        case PARAM_FIELD:
+          classparammeta->field.fieldmeta = roleparammeta->field.fieldmeta;
+          classparammeta->field.fieldix   = roleparammeta->field.fieldix + embedding->offset;
+          break;
+
+        case PARAM_ADJUST:
+          classparammeta->adjust.padix   = roleparammeta->adjust.padix;
+          classparammeta->adjust.defexpr = roleparammeta->adjust.defexpr; /* no refcnt on optrees */
+          break;
+      }
 
       if(klen < 0)
         hv_store_ent(dst, HeSVKEY(iter), (SV *)classparammeta, HeHASH(iter));
@@ -696,10 +1011,29 @@ static void S_apply_roles(pTHX_ ClassMeta *dstmeta, ClassMeta *srcmeta)
   }
 }
 
+void ObjectPad__check_colliding_param(pTHX_ ClassMeta *classmeta, SV *paramname)
+{
+  HV *parammap = classmeta->parammap;
+  assert(parammap);
+
+  HE *he = hv_fetch_ent(parammap, paramname, 0, 0);
+  if(!he)
+    return;
+
+  ParamMeta *colliding_parammeta = (ParamMeta *)HeVAL(he);
+  ClassMeta *origclassmeta = colliding_parammeta->class;
+
+  if(origclassmeta != classmeta)
+    croak("Already have a named constructor parameter called '%" SVf "' inherited from %" SVf,
+        SVfARG(paramname), SVfARG(origclassmeta->name));
+  else
+    croak("Already have a named constructor parameter called '%" SVf "'", SVfARG(paramname));
+}
+
 static OP *pp_alias_params(pTHX)
 {
   dSP;
-  PADOFFSET padix = PADIX_INITFIELDS_PARAMS;
+  PADOFFSET padix = PADIX_PARAMS;
 
   SV *params = POPs;
 
@@ -711,27 +1045,6 @@ static OP *pp_alias_params(pTHX)
   save_freesv(params);
 
   RETURN;
-}
-
-static OP *pp_croak_from_constructor(pTHX)
-{
-  dSP;
-
-  /* Walk up the caller stack to find the COP of the first caller; i.e. the
-   * first one that wasn't in src/class.c
-   */
-  I32 count = 0;
-  const PERL_CONTEXT *cx;
-  while((cx = caller_cx(count, NULL))) {
-    const char *copfile = CopFILE(cx->blk_oldcop);
-    if(!copfile|| strNE(copfile, "src/class.c")) {
-      PL_curcop = cx->blk_oldcop;
-      break;
-    }
-    count++;
-  }
-
-  croak_sv(POPs);
 }
 
 static void S_generate_initfields_method(pTHX_ ClassMeta *meta)
@@ -800,7 +1113,7 @@ static void S_generate_initfields_method(pTHX_ ClassMeta *meta)
     op = op_append_list(OP_LIST, op,
       newPADxVOP(OP_PADSV, 0, PADIX_SELF));
     op = op_append_list(OP_LIST, op,
-      newPADxVOP(OP_PADHV, OPf_REF, PADIX_INITFIELDS_PARAMS));
+      newPADxVOP(OP_PADHV, OPf_REF, PADIX_PARAMS));
     op = op_append_list(OP_LIST, op,
       newSVOP(OP_CONST, 0, (SV *)supermeta->initfields));
 
@@ -808,112 +1121,9 @@ static void S_generate_initfields_method(pTHX_ ClassMeta *meta)
       op_convert_list(OP_ENTERSUB, OPf_WANT_VOID|OPf_STACKED, op));
   }
 
-  AV *fields = meta->direct_fields;
-  I32 nfields = av_count(fields);
-
-  {
-    for(i = 0; i < nfields; i++) {
-      FieldMeta *fieldmeta = (FieldMeta *)AvARRAY(fields)[i];
-      char sigil = SvPV_nolen(fieldmeta->name)[0];
-      OP *op = NULL;
-      SV *defaultsv;
-
-      switch(sigil) {
-        case '$':
-        {
-          DEBUG_SET_CURCOP_LINE(__LINE__);
-
-          OP *valueop = NULL;
-
-          if(fieldmeta->defaultexpr) {
-            valueop = fieldmeta->defaultexpr;
-          }
-          else if((defaultsv = mop_field_get_default_sv(fieldmeta))) {
-            /* An OP_CONST whose op_type is OP_CUSTOM.
-             * This way we avoid the opchecker and finalizer doing bad things
-             * to our defaultsv SV by setting it SvREADONLY_on()
-             */
-            valueop = newSVOP_CUSTOM(PL_ppaddr[OP_CONST], 0, defaultsv);
-          }
-
-          if(fieldmeta->paramname) {
-            SV *paramname = fieldmeta->paramname;
-
-            if(!valueop)
-              valueop = newUNOP_CUSTOM(&pp_croak_from_constructor, 0,
-                newSVOP(OP_CONST, 0,
-                  newSVpvf("Required parameter '%" SVf "' is missing for %" SVf " constructor",
-                    SVfARG(paramname), SVfARG(meta->name))));
-
-            valueop = newCONDOP(0,
-              /* exists $params{$paramname} */
-              newUNOP(OP_EXISTS, 0,
-                newBINOP(OP_HELEM, 0,
-                  newPADxVOP(OP_PADHV, OPf_REF, PADIX_INITFIELDS_PARAMS),
-                  newSVOP(OP_CONST, 0, SvREFCNT_inc(paramname)))),
-
-              /* ? delete $params{$paramname} */
-              newUNOP(OP_DELETE, 0,
-                newBINOP(OP_HELEM, 0,
-                  newPADxVOP(OP_PADHV, OPf_REF, PADIX_INITFIELDS_PARAMS),
-                  newSVOP(OP_CONST, 0, SvREFCNT_inc(paramname)))),
-
-              /* : valueop or die */
-              valueop);
-          }
-
-          if(valueop)
-            op = newBINOP(OP_SASSIGN, 0,
-              valueop,
-              /* $fields[$idx] */
-              newAELEMOP(OPf_MOD,
-                newPADxVOP(OP_PADAV, OPf_MOD|OPf_REF, PADIX_SLOTS),
-                fieldmeta->fieldix));
-          break;
-        }
-        case '@':
-        case '%':
-        {
-          DEBUG_SET_CURCOP_LINE(__LINE__);
-
-          OP *valueop = NULL;
-          U16 coerceop = (sigil == '%') ? OP_RV2HV : OP_RV2AV;
-
-          if(fieldmeta->defaultexpr) {
-            valueop = fieldmeta->defaultexpr;
-          }
-          else if((defaultsv = mop_field_get_default_sv(fieldmeta))) {
-            valueop = newUNOP(coerceop, 0,
-                newSVOP_CUSTOM(PL_ppaddr[OP_CONST], 0, defaultsv));
-          }
-
-          if(valueop) {
-            /* $fields[$idx]->@* or ->%* */
-            OP *lhs = force_list_keeping_pushmark(newUNOP(coerceop, OPf_MOD|OPf_REF,
-                        newAELEMOP(0,
-                          newPADxVOP(OP_PADAV, OPf_MOD|OPf_REF, PADIX_SLOTS),
-                          fieldmeta->fieldix)));
-
-            op = newBINOP(OP_AASSIGN, 0,
-                force_list_keeping_pushmark(valueop),
-                lhs);
-          }
-          break;
-        }
-
-        default:
-          croak("ARGH: not sure how to handle a field sigil %c\n", sigil);
-      }
-
-      if(!op)
-        continue;
-
-      /* TODO: grab a COP at the initexpr time */
-      ops = op_append_list(OP_LINESEQ, ops,
-        newSTATEOP(0, NULL, NULL));
-      ops = op_append_list(OP_LINESEQ, ops,
-        op);
-    }
+  if(meta->initfields_lines) {
+    ops = op_append_list(OP_LINESEQ, ops,
+      meta->initfields_lines);
   }
 
   if(meta->type == METATYPE_CLASS) {
@@ -939,7 +1149,7 @@ static void S_generate_initfields_method(pTHX_ ClassMeta *meta)
       op = op_append_list(OP_LIST, op,
         newPADxVOP(OP_PADSV, 0, PADIX_SELF));
       op = op_append_list(OP_LIST, op,
-        newPADxVOP(OP_PADHV, OPf_REF, PADIX_INITFIELDS_PARAMS));
+        newPADxVOP(OP_PADHV, OPf_REF, PADIX_PARAMS));
       op = op_append_list(OP_LIST, op,
         newSVOP(OP_CONST, 0, (SV *)embed_cv(rolemeta->initfields, embedding)));
 
@@ -1376,11 +1586,12 @@ XS_INTERNAL(injected_constructor)
     /* Concat all the param names, in no particular order
      * TODO: consider sorting them but that's quite expensive and tricky in XS */
 
-    SV *params = newSVsv(HeSVKEY_force(he));
+    SV *params = newSVpvn("", 0);
     SAVEFREESV(params);
+    sv_catpvf(params, "'%" SVf "'", SVfARG(HeSVKEY_force(he)));
 
     while((he = hv_iternext(paramhv)))
-      sv_catpvf(params, ", %" SVf, SVfARG(HeSVKEY_force(he)));
+      sv_catpvf(params, ", '%" SVf "'", SVfARG(HeSVKEY_force(he)));
 
 #ifdef DEBUG_OVERRIDE_PLCURCOP
     PL_curcop = prevcop;
@@ -1480,6 +1691,33 @@ XS_INTERNAL(injected_DOES)
   XSRETURN_NO;
 }
 
+static OP *pp_croak_from_constructor(pTHX)
+{
+  dSP;
+
+  /* Walk up the caller stack to find the COP of the first caller; i.e. the
+   * first one that wasn't in src/class.c
+   */
+  I32 count = 0;
+  const PERL_CONTEXT *cx;
+  while((cx = caller_cx(count, NULL))) {
+    const char *copfile = CopFILE(cx->blk_oldcop);
+    if(!copfile|| strNE(copfile, "src/class.c")) {
+      PL_curcop = cx->blk_oldcop;
+      break;
+    }
+    count++;
+  }
+
+  croak_sv(POPs);
+}
+
+OP *ObjectPad__newop_croak_from_constructor(pTHX_ SV *message)
+{
+  return newUNOP_CUSTOM(&pp_croak_from_constructor, 0,
+    newSVOP(OP_CONST, 0, message));
+}
+
 ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name)
 {
   assert(type == METATYPE_CLASS || type == METATYPE_ROLE);
@@ -1554,7 +1792,7 @@ ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name)
       pad_add_name_pvs("", 0, NULL, NULL);
 
     PADOFFSET padix = pad_add_name_pvs("%params", 0, NULL, NULL);
-    if(padix != PADIX_INITFIELDS_PARAMS)
+    if(padix != PADIX_PARAMS)
       croak("ARGH: Expected that padix[%%params] = 4");
 
     intro_my();
@@ -1568,6 +1806,8 @@ ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name)
   CopFILE_set(meta->tmpcop, __FILE__);
 
   meta->methodscope = NULL;
+
+  meta->initfields_lines = NULL;
 
   {
     /* Inject the constructor */

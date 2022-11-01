@@ -8,9 +8,12 @@ use Class::Utils qw(set_params split_params);
 use Data::HTML::Button;
 use Data::HTML::Form;
 use Error::Pure qw(err);
+use List::Util qw(first);
 use Scalar::Util qw(blessed);
+use Tags::HTML::Form::Input;
+use Tags::HTML::Form::Select;
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Constructor.
 sub new {
@@ -18,7 +21,7 @@ sub new {
 
 	# Create object.
 	my ($object_params_ar, $other_params_ar) = split_params(
-		['form', 'submit'], @params);
+		['form', 'input', 'select', 'submit'], @params);
 	my $self = $class->SUPER::new(@{$other_params_ar});
 
 	# Form.
@@ -26,11 +29,18 @@ sub new {
 		'css_class' => 'form',
 	);
 
+	# Input object.
+	$self->{'input'} = undef;
+
+	# Select object.
+	$self->{'select'} = undef;
+
 	# Submit.
 	$self->{'submit'} = Data::HTML::Button->new(
 		'data' => [
 			['d', 'Save'],
 		],
+		'data_type' => 'tags',
 		'type' => 'submit',
 	);
 
@@ -64,6 +74,30 @@ sub new {
 		err "Parameter 'submit' instance has bad type.";
 	}
 
+	# Input object.
+	if (! defined $self->{'input'}) {
+		$self->{'input'} = Tags::HTML::Form::Input->new(
+			'css' => $self->{'css'},
+			'tags' => $self->{'tags'},
+		);
+	} else {
+		if (! blessed($self->{'input'}) || $self->{'input'}->isa('Tags::HTML::Form::Input')) {
+			err "Parameter 'input' must be a 'Tags::HTML::Form::Input' instance.";
+		}
+	}
+
+	# Select object.
+	if (! defined $self->{'select'}) {
+		$self->{'select'} = Tags::HTML::Form::Select->new(
+			'css' => $self->{'css'},
+			'tags' => $self->{'tags'},
+		),
+	} else {
+		if (! blessed($self->{'select'}) || $self->{'select'}->isa('Tags::HTML::Form::Select')) {
+			err "Parameter 'select' must be a 'Tags::HTML::Form::Select' instance.";
+		}
+	}
+
 	# Object.
 	return $self;
 }
@@ -77,9 +111,11 @@ sub _process {
 		if (! defined $field
 			|| ! blessed($field)
 			|| (! $field->isa('Data::HTML::Form::Input')
-			&& ! $field->isa('Data::HTML::Textarea'))) {
+			&& ! $field->isa('Data::HTML::Textarea')
+			&& ! $field->isa('Data::HTML::Form::Select'))) {
 
-			err "Form item must be a 'Data::HTML::Form::Input' instance.";
+			err "Form item must be a 'Data::HTML::Form::Input', ".
+				"'Data::HTML::Textarea' or 'Data::HTML::Form::Select' instance.";
 		}
 	}
 
@@ -123,13 +159,15 @@ sub _process {
 				) : (),
 				['e', 'label'],
 			) : (),
-
-			$field->isa('Data::HTML::Form::Input') ? (
-				$self->_tags_input($field),
-			) : (
-				$self->_tags_textarea($field),
-			),
 		);
+
+		if ($field->isa('Data::HTML::Form::Input')) {
+			$self->{'input'}->process($field);
+		} elsif ($field->isa('Data::HTML::Form::Select')) {
+			$self->{'select'}->process($field);
+		} else {
+			$self->_tags_textarea($field);
+		}
 	}
 
 	if (@fields) {
@@ -140,11 +178,13 @@ sub _process {
 
 	$self->{'tags'}->put(
 		['b', 'p'],
-		$self->{'submit'}->isa('Data::HTML::Form::Input') ? (
-			$self->_tags_input($self->{'submit'}),
-		) : (
-			$self->_tags_button($self->{'submit'}),
-		),
+	);
+	if ($self->{'submit'}->isa('Data::HTML::Form::Input')) {
+		$self->{'input'}->process($self->{'submit'});
+	} else {
+		$self->_tags_button($self->{'submit'});
+	}
+	$self->{'tags'}->put(
 		['e', 'p'],
 
 		$self->{'form'}->{'label'} ? (
@@ -157,7 +197,7 @@ sub _process {
 }
 
 sub _process_css {
-	my $self = shift;
+	my ($self, @fields) = @_;
 
 	$self->{'css'}->put(
 		['s', '.'.$self->{'form'}->css_class],
@@ -166,22 +206,7 @@ sub _process_css {
 		['d', 'padding', '20px'],
 		['e'],
 
-		['s', '.'.$self->{'form'}->css_class.' input[type=submit]:hover'],
-		['d', 'background-color', '#45a049'],
-		['e'],
-
-		['s', '.'.$self->{'form'}->css_class.' input[type=submit]'],
-		['d', 'width', '100%'],
-		['d', 'background-color', '#4CAF50'],
-		['d', 'color', 'white'],
-		['d', 'padding', '14px 20px'],
-		['d', 'margin', '8px 0'],
-		['d', 'border', 'none'],
-		['d', 'border-radius', '4px'],
-		['d', 'cursor', 'pointer'],
-		['e'],
-
-		['s', '.'.$self->{'form'}->css_class.' input, select, textarea'],
+		['s', '.'.$self->{'form'}->css_class.' textarea'],
 		['d', 'width', '100%'],
 		['d', 'padding', '12px 20px'],
 		['d', 'margin', '8px 0'],
@@ -196,71 +221,50 @@ sub _process_css {
 		['e'],
 	);
 
+	# TODO Different objects and different CSS?
+	my $first_input = first { ref $_ eq 'Data::HTML::Form::Input' } @fields;
+	if (defined $first_input) {
+		$self->{'input'}->process_css($first_input);
+	}
+	my $first_select = first { ref $_ eq 'Data::HTML::Form::Select' } @fields;
+	if (defined $first_select) {
+		$self->{'select'}->process_css($first_select);
+	}
+
 	return;
 }
 
 sub _tags_button {
 	my ($self, $object) = @_;
 
-	return (
+	$self->{'tags'}->put(
 		['b', 'button'],
-		['a', 'type', $self->{'submit'}->type],
-		defined $self->{'submit'}->name ? (
-			['a', 'name', $self->{'submit'}->name],
-		) : (),
-		defined $self->{'submit'}->value ? (
-			['a', 'value', $self->{'submit'}->value],
-		) : (),
-		@{$self->{'submit'}->data},
-		['e', 'button'],
-	);
-}
-
-sub _tags_input {
-	my ($self, $object) = @_;
-
-	return (
-		['b', 'input'],
-		defined $object->css_class ? (
-			['a', 'class', $object->css_class],
-		) : (),
 		['a', 'type', $object->type],
-		defined $object->id ? (
-			['a', 'name', $object->id],
-			['a', 'id', $object->id],
+		defined $object->name ? (
+			['a', 'name', $object->name],
 		) : (),
 		defined $object->value ? (
 			['a', 'value', $object->value],
 		) : (),
-		$object->checked ? (
-			['a', 'checked', 'checked'],
-		) : (),
-		defined $object->placeholder ? (
-			['a', 'placeholder', $object->placeholder],
-		) : (),
-		defined $object->size ? (
-			['a', 'size', $object->size],
-		) : (),
-		defined $object->readonly ? (
-			['a', 'readonly', 'readonly'],
-		) : (),
-		defined $object->disabled ? (
-			['a', 'disabled', 'disabled'],
-		) : (),
-		defined $object->min ? (
-			['a', 'min', $object->min],
-		) : (),
-		defined $object->max ? (
-			['a', 'max', $object->max],
-		) : (),
-		['e', 'input'],
 	);
+	if ($object->data_type eq 'tags') {
+		$self->{'tags'}->put(@{$object->data});
+	} else {
+		$self->{'tags'}->put(
+			['d', $object->data],
+		);
+	}
+	$self->{'tags'}->put(
+		['e', 'button'],
+	);
+
+	return;
 }
 
 sub _tags_textarea {
 	my ($self, $object) = @_;
 
-	return (
+	$self->{'tags'}->put(
 		['b', 'textarea'],
 		defined $object->css_class ? (
 			['a', 'class', $object->css_class],
@@ -289,6 +293,8 @@ sub _tags_textarea {
 		) : (),
 		['e', 'textarea'],
 	);
+
+	return;
 }
 
 1;
@@ -388,6 +394,7 @@ Returns undef.
          Parameter 'form' is required.
          Parameter 'form' must be a 'Data::HTML::Form' instance.
          Parameter 'form' must define 'css_class' parameter.
+         Parameter 'input' must be a 'Tags::HTML::Form::Input' instance.
          Parameter 'submit' instance has bad type.
          Parameter 'submit' is required.
          Parameter 'submit' must be a 'Data::HTML::Form::Input' instance.
@@ -475,8 +482,11 @@ L<Class::Utils>,
 L<Data::HTML::Form>,
 L<Data::HTML::Button>,
 L<Error::Pure>,
+L<List::Util>,
 L<Scalar::Util>,
-L<Tags::HTML>.
+L<Tags::HTML>,
+L<Tags::HTML::Form::Input>,
+L<Tags::HTML::Form::Select>.
 
 =head1 REPOSITORY
 
@@ -496,6 +506,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

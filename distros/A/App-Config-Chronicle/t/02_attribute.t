@@ -53,11 +53,11 @@ subtest 'get' => sub {
         ok $attribute, "Attribute created";
         is $attribute->path,    'tests.get';
         is $attribute->value,   'a', 'Got from default';
-        is $attribute->version, 1, 'Version set to data_set version';
+        is $attribute->version, 1,   'Version set to data_set version';
     };
 
     subtest 'from app_config' => sub {
-        my $data = {tests => {get => 'b'}};
+        my $data       = {tests => {get => 'b'}};
         my $app_config = Data::Hash::DotNotation->new(data => $data);
 
         my $attribute = App::Config::Chronicle::Attribute->new(
@@ -73,17 +73,17 @@ subtest 'get' => sub {
             },
         )->build;
 
-        ok $attribute, "Attribute created";
+        ok $attribute,           "Attribute created";
         ok !$attribute->version, 'Version not yet set';
         is $attribute->path,    'tests.get';
         is $attribute->value,   'b', 'Got from app_config';
-        is $attribute->version, 1, 'Version set to data_set version';
+        is $attribute->version, 1,   'Version set to data_set version';
     };
 };
 
 subtest 'set' => sub {
     subtest 'set after access' => sub {
-        my $data = {tests => {get => 'b'}};
+        my $data       = {tests => {get => 'b'}};
         my $app_config = Data::Hash::DotNotation->new(data => $data);
 
         my $data_set = {
@@ -113,7 +113,7 @@ subtest 'set' => sub {
     };
 
     subtest 'set before access' => sub {
-        my $data = {tests => {get => 'b'}};
+        my $data       = {tests => {get => 'b'}};
         my $app_config = Data::Hash::DotNotation->new(data => $data);
 
         my $data_set = {

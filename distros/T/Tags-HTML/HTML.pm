@@ -7,7 +7,7 @@ use Class::Utils qw(set_params);
 use Error::Pure qw(err);
 use Scalar::Util qw(blessed);
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
 
 # Constructor.
 sub new {
@@ -46,6 +46,24 @@ sub new {
 	return $self;
 }
 
+# Cleanup after dynamic part.
+sub cleanup {
+	my ($self, @params) = @_;
+
+	$self->_cleanup(@params);
+
+	return;
+}
+
+# Initialize before dynamic part.
+sub init {
+	my ($self, @params) = @_;
+
+	$self->_init(@params);
+
+	return;
+}
+
 # Process 'Tags'.
 sub process {
 	my ($self, @params) = @_;
@@ -73,6 +91,22 @@ sub process_css {
 	}
 
 	$self->_process_css(@params);
+
+	return;
+}
+
+sub _cleanup {
+	my ($self, @params) = @_;
+
+	# Default is no special code.
+
+	return;
+}
+
+sub _init {
+	my ($self, @params) = @_;
+
+	# Default is no special code.
 
 	return;
 }
@@ -110,6 +144,8 @@ Tags::HTML - Tags helper abstract class.
  use Tags::HTML;
 
  my $obj = Tags::HTML->new(%params);
+ $obj->cleanup(@params);
+ $obj->init(@params);
  $obj->process;
  $obj->process_css;
 
@@ -145,6 +181,22 @@ Default value is 0.
 Default value is undef.
 
 =back
+
+=head2 C<cleanup>
+
+ $obj->cleanup(@params);
+
+Process cleanup after page run.
+
+Returns undef.
+
+=head2 C<init>
+
+ $obj->init(@params);
+
+Process initialization before page run.
+
+Returns undef.
 
 =head2 C<process>
 
@@ -201,12 +253,36 @@ Returns undef.
          return $self;
  }
 
+ sub _cleanup {
+         my $self = shift;
+
+         delete $self->{'_data'};
+
+         return;
+ }
+
+ sub _init {
+         my ($self, @variables) = @_;
+
+         $self->{'_data'} = \@variables;
+
+         return;
+ }
+
  sub _process {
-         my ($self, $value) = @_;
+         my $self = shift;
 
          $self->{'tags'}->put(
                  ['b', 'div'],
-                 ['d', $value],
+         );
+         foreach my $variable (@{$self->{'_data'}}) {
+                 $self->{'tags'}->put(
+                         ['b', 'div'],
+                         ['d', $variable],
+                         ['e', 'div'],
+                 );
+         }
+         $self->{'tags'}->put(
                  ['e', 'div'],
          );
 
@@ -223,8 +299,11 @@ Returns undef.
          'tags' => $tags,
  );
 
- # Process indicator.
- $obj->process('value');
+ # Init data.
+ $obj->init('foo', 'bar', 'baz');
+
+ # Process.
+ $obj->process;
 
  # Print out.
  print "HTML\n";
@@ -233,7 +312,15 @@ Returns undef.
  # Output:
  # HTML
  # <div>
- #   value
+ #   <div>
+ #     foo
+ #   </div>
+ #   <div>
+ #     bar
+ #   </div>
+ #   <div>
+ #     baz
+ #   </div>
  # </div>
 
 =head1 EXAMPLE2
@@ -343,6 +430,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.06
 
 =cut

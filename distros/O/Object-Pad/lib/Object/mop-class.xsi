@@ -215,7 +215,9 @@ add_method(self, mname, ...)
   {
     if(items < 3)
       croak_xs_usage(cv, "self, mname, ..., code");
-    CV *code = (CV *)ST(items-1); items--;
+    SV *ref = ST(items-1); items--;
+    if(!SvROK(ref) || SvTYPE(SvRV(ref)) != SVt_PVCV)
+      croak("Expected CODE reference");
 
     dKWARG(2);
 
@@ -251,7 +253,7 @@ add_method(self, mname, ...)
     gv_init_sv(*gvp, meta->stash, mname, 0);
     GvMULTI_on(*gvp);
 
-    GvCV_set(*gvp, (CV *)SvREFCNT_inc(code));
+    GvCV_set(*gvp, (CV *)SvREFCNT_inc(CV_FROM_REF(ref)));
 
     RETVAL = newSV(0);
     sv_setref_uv(RETVAL, "Object::Pad::MOP::Method", PTR2UV(methodmeta));
@@ -377,9 +379,7 @@ add_field(self, fieldname, ...)
     while(KWARG_NEXT(args)) {
       switch(kwarg) {
         case 0: /* default */
-          if(fieldmeta->defaultsv)
-            SvREFCNT_dec(fieldmeta->defaultsv);
-          fieldmeta->defaultsv = newSVsv(kwval);
+          mop_field_set_default_sv(fieldmeta, newSVsv(kwval));
           break;
 
         case 1: /* param */

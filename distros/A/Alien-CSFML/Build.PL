@@ -10,7 +10,7 @@ use Module::Build::Tiny 0.035;
 
 use Devel::CheckBin;
 
-check_bin('sh');
+check_bin('perl')if 0;
 use lib 'inc';
 use MBCSFML;
 ('1');

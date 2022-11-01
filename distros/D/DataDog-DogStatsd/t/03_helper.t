@@ -15,6 +15,6 @@ pass "stats_count";
 stats_event('event title', 'event text');
 pass "stats_event";
 
-stats_inc('test.stats.tags', { tags => ['tagC', 'tagD'] });
+stats_inc('test.stats.tags', {tags => ['tagC', 'tagD']});
 
 done_testing;

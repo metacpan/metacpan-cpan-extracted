@@ -34,6 +34,8 @@ lib/DateTime/Locale/ak.pod
 lib/DateTime/Locale/ak_GH.pod
 lib/DateTime/Locale/am.pod
 lib/DateTime/Locale/am_ET.pod
+lib/DateTime/Locale/ann.pod
+lib/DateTime/Locale/ann_NG.pod
 lib/DateTime/Locale/ar.pod
 lib/DateTime/Locale/ar_001.pod
 lib/DateTime/Locale/ar_AE.pod
@@ -85,6 +87,10 @@ lib/DateTime/Locale/bez.pod
 lib/DateTime/Locale/bez_TZ.pod
 lib/DateTime/Locale/bg.pod
 lib/DateTime/Locale/bg_BG.pod
+lib/DateTime/Locale/bgc.pod
+lib/DateTime/Locale/bgc_IN.pod
+lib/DateTime/Locale/bho.pod
+lib/DateTime/Locale/bho_IN.pod
 lib/DateTime/Locale/bm.pod
 lib/DateTime/Locale/bm_ML.pod
 lib/DateTime/Locale/bn.pod
@@ -124,6 +130,8 @@ lib/DateTime/Locale/ckb_IQ.pod
 lib/DateTime/Locale/ckb_IR.pod
 lib/DateTime/Locale/cs.pod
 lib/DateTime/Locale/cs_CZ.pod
+lib/DateTime/Locale/cv.pod
+lib/DateTime/Locale/cv_RU.pod
 lib/DateTime/Locale/cy.pod
 lib/DateTime/Locale/cy_GB.pod
 lib/DateTime/Locale/da.pod
@@ -387,6 +395,8 @@ lib/DateTime/Locale/fr_TN.pod
 lib/DateTime/Locale/fr_VU.pod
 lib/DateTime/Locale/fr_WF.pod
 lib/DateTime/Locale/fr_YT.pod
+lib/DateTime/Locale/frr.pod
+lib/DateTime/Locale/frr_DE.pod
 lib/DateTime/Locale/fur.pod
 lib/DateTime/Locale/fur_IT.pod
 lib/DateTime/Locale/fy.pod
@@ -535,6 +545,8 @@ lib/DateTime/Locale/mai_IN.pod
 lib/DateTime/Locale/mas.pod
 lib/DateTime/Locale/mas_KE.pod
 lib/DateTime/Locale/mas_TZ.pod
+lib/DateTime/Locale/mdf.pod
+lib/DateTime/Locale/mdf_RU.pod
 lib/DateTime/Locale/mer.pod
 lib/DateTime/Locale/mer_KE.pod
 lib/DateTime/Locale/mfe.pod
@@ -603,6 +615,9 @@ lib/DateTime/Locale/nus.pod
 lib/DateTime/Locale/nus_SS.pod
 lib/DateTime/Locale/nyn.pod
 lib/DateTime/Locale/nyn_UG.pod
+lib/DateTime/Locale/oc.pod
+lib/DateTime/Locale/oc_ES.pod
+lib/DateTime/Locale/oc_FR.pod
 lib/DateTime/Locale/om.pod
 lib/DateTime/Locale/om_ET.pod
 lib/DateTime/Locale/om_KE.pod
@@ -618,6 +633,8 @@ lib/DateTime/Locale/pa_Guru.pod
 lib/DateTime/Locale/pa_Guru_IN.pod
 lib/DateTime/Locale/pcm.pod
 lib/DateTime/Locale/pcm_NG.pod
+lib/DateTime/Locale/pis.pod
+lib/DateTime/Locale/pis_SB.pod
 lib/DateTime/Locale/pl.pod
 lib/DateTime/Locale/pl_PL.pod
 lib/DateTime/Locale/ps.pod
@@ -640,6 +657,8 @@ lib/DateTime/Locale/qu.pod
 lib/DateTime/Locale/qu_BO.pod
 lib/DateTime/Locale/qu_EC.pod
 lib/DateTime/Locale/qu_PE.pod
+lib/DateTime/Locale/raj.pod
+lib/DateTime/Locale/raj_IN.pod
 lib/DateTime/Locale/rm.pod
 lib/DateTime/Locale/rm_CH.pod
 lib/DateTime/Locale/rn.pod
@@ -701,6 +720,8 @@ lib/DateTime/Locale/sl.pod
 lib/DateTime/Locale/sl_SI.pod
 lib/DateTime/Locale/smn.pod
 lib/DateTime/Locale/smn_FI.pod
+lib/DateTime/Locale/sms.pod
+lib/DateTime/Locale/sms_FI.pod
 lib/DateTime/Locale/sn.pod
 lib/DateTime/Locale/sn_ZW.pod
 lib/DateTime/Locale/so.pod
@@ -756,6 +777,8 @@ lib/DateTime/Locale/tk.pod
 lib/DateTime/Locale/tk_TM.pod
 lib/DateTime/Locale/to.pod
 lib/DateTime/Locale/to_TO.pod
+lib/DateTime/Locale/tok.pod
+lib/DateTime/Locale/tok_001.pod
 lib/DateTime/Locale/tr.pod
 lib/DateTime/Locale/tr_CY.pod
 lib/DateTime/Locale/tr_TR.pod
@@ -839,6 +862,8 @@ share/ak-GH.pl
 share/ak.pl
 share/am-ET.pl
 share/am.pl
+share/ann-NG.pl
+share/ann.pl
 share/ar-001.pl
 share/ar-AE.pl
 share/ar-BH.pl
@@ -889,6 +914,10 @@ share/bez-TZ.pl
 share/bez.pl
 share/bg-BG.pl
 share/bg.pl
+share/bgc-IN.pl
+share/bgc.pl
+share/bho-IN.pl
+share/bho.pl
 share/bm-ML.pl
 share/bm.pl
 share/bn-BD.pl
@@ -928,6 +957,8 @@ share/ckb-IR.pl
 share/ckb.pl
 share/cs-CZ.pl
 share/cs.pl
+share/cv-RU.pl
+share/cv.pl
 share/cy-GB.pl
 share/cy.pl
 share/da-DK.pl
@@ -1187,6 +1218,8 @@ share/fr-VU.pl
 share/fr-WF.pl
 share/fr-YT.pl
 share/fr.pl
+share/frr-DE.pl
+share/frr.pl
 share/fur-IT.pl
 share/fur.pl
 share/fy-NL.pl
@@ -1333,6 +1366,8 @@ share/mai.pl
 share/mas-KE.pl
 share/mas-TZ.pl
 share/mas.pl
+share/mdf-RU.pl
+share/mdf.pl
 share/mer-KE.pl
 share/mer.pl
 share/mfe-MU.pl
@@ -1401,6 +1436,9 @@ share/nus-SS.pl
 share/nus.pl
 share/nyn-UG.pl
 share/nyn.pl
+share/oc-ES.pl
+share/oc-FR.pl
+share/oc.pl
 share/om-ET.pl
 share/om-KE.pl
 share/om.pl
@@ -1416,6 +1454,8 @@ share/pa-Guru.pl
 share/pa.pl
 share/pcm-NG.pl
 share/pcm.pl
+share/pis-SB.pl
+share/pis.pl
 share/pl-PL.pl
 share/pl.pl
 share/ps-AF.pl
@@ -1437,6 +1477,8 @@ share/qu-BO.pl
 share/qu-EC.pl
 share/qu-PE.pl
 share/qu.pl
+share/raj-IN.pl
+share/raj.pl
 share/rm-CH.pl
 share/rm.pl
 share/rn-BI.pl
@@ -1499,6 +1541,8 @@ share/sl-SI.pl
 share/sl.pl
 share/smn-FI.pl
 share/smn.pl
+share/sms-FI.pl
+share/sms.pl
 share/sn-ZW.pl
 share/sn.pl
 share/so-DJ.pl
@@ -1554,6 +1598,8 @@ share/tk-TM.pl
 share/tk.pl
 share/to-TO.pl
 share/to.pl
+share/tok-001.pl
+share/tok.pl
 share/tr-CY.pl
 share/tr-TR.pl
 share/tr.pl

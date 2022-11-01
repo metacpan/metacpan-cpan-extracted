@@ -1,7 +1,7 @@
 /*  You may distribute under the terms of either the GNU General Public License
  *  or the Artistic License (the same terms as Perl itself)
  *
- *  (C) Paul Evans, 2019-2021 -- leonerd@leonerd.org.uk
+ *  (C) Paul Evans, 2019-2022 -- leonerd@leonerd.org.uk
  */
 #define PERL_NO_GET_CONTEXT
 
@@ -52,6 +52,15 @@
 
 #define warn_deprecated(...)  Perl_ck_warner(aTHX_ packWARN(WARN_DEPRECATED), __VA_ARGS__)
 
+#if HAVE_PERL_VERSION(5, 22, 0)
+#  define COP_SEQ_RANGE_LOW_set(sv,val)  \
+      STMT_START { (sv)->xpadn_low = (val); } STMT_END
+#else
+  /* Before Perl 5.22, padnames were just normal SVs with some weird fields in them */
+#  define COP_SEQ_RANGE_LOW_set(sv,val)  \
+      STMT_START { ((XPVNV*)SvANY(sv))->xnv_u.xpad_cop_seq.xlow = (val); } STMT_END
+#endif
+
 typedef void MethodAttributeHandler(pTHX_ MethodMeta *meta, const char *value, void *data);
 
 struct MethodAttributeDefinition {
@@ -64,9 +73,6 @@ struct MethodAttributeDefinition {
 /**********************************
  * Class and Field Implementation *
  **********************************/
-
-/* Empty role embedding that is applied to all invokable role methods */
-static RoleEmbedding embedding_standalone = {};
 
 void ObjectPad_extend_pad_vars(pTHX_ const ClassMeta *meta)
 {
@@ -87,49 +93,6 @@ void ObjectPad_extend_pad_vars(pTHX_ const ClassMeta *meta)
     if(padix != PADIX_EMBEDDING)
       croak("ARGH: Expected that padix[(embedding)] = 3");
   }
-}
-
-#define find_padix_for_field(fieldmeta)  S_find_padix_for_field(aTHX_ fieldmeta)
-static PADOFFSET S_find_padix_for_field(pTHX_ FieldMeta *fieldmeta)
-{
-  const char *fieldname = SvPVX(fieldmeta->name);
-#if HAVE_PERL_VERSION(5, 20, 0)
-  const PADNAMELIST *nl = PadlistNAMES(CvPADLIST(PL_compcv));
-  PADNAME **names = PadnamelistARRAY(nl);
-  PADOFFSET padix;
-
-  for(padix = 1; padix <= PadnamelistMAXNAMED(nl); padix++) {
-    PADNAME *name = names[padix];
-
-    if(!name || !PadnameLEN(name))
-      continue;
-
-    const char *pv = PadnamePV(name);
-    if(!pv)
-      continue;
-
-    /* field names are all OUTER vars. This is necessary so we don't get
-     * confused by signatures params of the same name
-     *   https://rt.cpan.org/Ticket/Display.html?id=134456
-     */
-    if(!PadnameOUTER(name))
-      continue;
-    if(!strEQ(pv, fieldname))
-      continue;
-
-    /* TODO: for extra robustness we could compare the SV * in the pad itself */
-
-    return padix;
-  }
-
-  return NOT_IN_PAD;
-#else
-  /* Before the new pad API, the best we can do is call pad_findmy_pv()
-   * It won't get confused about signatures params because these perls are too
-   * old for signatures anyway
-   */
-  return pad_findmy_pv(fieldname, 0);
-#endif
 }
 
 #define bind_field_to_pad(sv, fieldix, private, padix)  S_bind_field_to_pad(aTHX_ sv, fieldix, private, padix)
@@ -179,7 +142,7 @@ static OP *pp_methstart(pTHX)
 
     if(embeddingsv && embeddingsv != &PL_sv_undef &&
        (embedding = (RoleEmbedding *)SvPVX(embeddingsv))) {
-      if(embedding == &embedding_standalone) {
+      if(embedding == &ObjectPad__embedding_standalone) {
         classstash = NULL;
         offset     = 0;
       }
@@ -198,7 +161,7 @@ static OP *pp_methstart(pTHX)
   }
 
   if(classstash) {
-    if(!HvNAME(classstash) || !sv_derived_from_hv(self, classstash))
+    if(!sv_derived_from_hv(self, classstash))
       croak("Cannot invoke foreign method on non-derived instance");
   }
 
@@ -208,7 +171,7 @@ static OP *pp_methstart(pTHX)
   AV *backingav;
 
   if(is_role) {
-    if(embedding == &embedding_standalone) {
+    if(embedding == &ObjectPad__embedding_standalone) {
       backingav = NULL;
     }
     else {
@@ -541,10 +504,16 @@ static int build_classlike(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t n
     if(hv_fetchs(GvHV(PL_hintgv), "Object::Pad/configure(no_class_attrs)", 0))
       croak("Class/role attributes are not permitted");
 
+    SV **svp = hv_fetchs(GvHV(PL_hintgv), "Object::Pad/configure(only_class_attrs)", 0);
+    HV *only_class_attrs = svp && SvROK(*svp) ? HV_FROM_REF(*svp) : NULL;
+
     int i;
     for(i = 0; i < nattrs; i++) {
       SV *attrname = args[argi]->attr.name;
       SV *attrval  = args[argi]->attr.value;
+
+      if(only_class_attrs && !hv_fetch_ent(only_class_attrs, attrname, 0, 0))
+        croak("Class/role attribute :%" SVf " is not permitted", SVfARG(attrname));
 
       inplace_trim_whitespace(attrval);
 
@@ -733,7 +702,6 @@ static int build_field(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs
       OP *op = args[argi++]->op;
 
       SV *defaultsv = newSV(0);
-      mop_field_set_default_sv(fieldmeta, defaultsv);
 
       /* An OP_CONST whose op_type is OP_CUSTOM.
        * This way we avoid the opchecker and finalizer doing bad things to our
@@ -765,6 +733,8 @@ field_array_hash_common:
             force_list_keeping_pushmark(lhs));
           break;
       }
+
+      mop_field_set_default_sv(fieldmeta, defaultsv);
     }
     break;
 
@@ -860,11 +830,13 @@ enum PhaserType {
   PHASER_NONE, /* A normal `method`; i.e. not a phaser */
   PHASER_BUILD,
   PHASER_ADJUST,
+  PHASER_ADJUSTPARAMS, /* exactly like ADJUST, just warns that it's deprecated */
 };
 
 static const char *phasertypename[] = {
-  [PHASER_BUILD]  = "BUILD",
-  [PHASER_ADJUST] = "ADJUST",
+  [PHASER_BUILD]        = "BUILD",
+  [PHASER_ADJUST]       = "ADJUST",
+  [PHASER_ADJUSTPARAMS] = "ADJUST",
 };
 
 static bool parse_method_permit(pTHX_ void *hookdata)
@@ -882,9 +854,6 @@ static bool parse_method_permit(pTHX_ void *hookdata)
 static void parse_method_pre_subparse(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata)
 {
   enum PhaserType type = PTR2UV(hookdata);
-  U32 i;
-  AV *fields = compclassmeta->direct_fields;
-  U32 nfields = av_count(fields);
 
   /* XS::Parse::Sublike doesn't support lexical `method $foo`, but we can hack
    * it up here
@@ -913,6 +882,11 @@ static void parse_method_pre_subparse(pTHX_ struct XSParseSublikeContext *ctx, v
     case PHASER_BUILD:
     case PHASER_ADJUST:
       break;
+
+    case PHASER_ADJUSTPARAMS:
+      if(0)
+        warn("ADJUSTPARAMS is now the same as ADJUST; you should use ADJUST instead");
+      break;
   }
 
   if(type != PHASER_NONE)
@@ -921,39 +895,7 @@ static void parse_method_pre_subparse(pTHX_ struct XSParseSublikeContext *ctx, v
      */
     ctx->actions &= ~XS_PARSE_SUBLIKE_ACTION_CVf_ANON;
 
-  /* Save the methodscope for this subparse, in case of nested methods
-   *   (RT132321)
-   */
-  SAVESPTR(compclassmeta->methodscope);
-
-  /* While creating the new scope CV we need to ENTER a block so as not to
-   * break any interpvars
-   */
-  ENTER;
-  SAVESPTR(PL_comppad);
-  SAVESPTR(PL_comppad_name);
-  SAVESPTR(PL_curpad);
-
-  CV *methodscope = compclassmeta->methodscope = MUTABLE_CV(newSV_type(SVt_PVCV));
-  CvPADLIST(methodscope) = pad_new(padnew_SAVE);
-
-  PL_comppad = PadlistARRAY(CvPADLIST(methodscope))[1];
-  PL_comppad_name = PadlistNAMES(CvPADLIST(methodscope));
-  PL_curpad  = AvARRAY(PL_comppad);
-
-  for(i = 0; i < nfields; i++) {
-    FieldMeta *fieldmeta = (FieldMeta *)AvARRAY(fields)[i];
-
-    /* Skip the anonymous ones */
-    if(SvCUR(fieldmeta->name) < 2)
-      continue;
-
-    /* Claim these are all STATE variables just to quiet the "will not stay
-     * shared" warning */
-    pad_add_name_sv(fieldmeta->name, padadd_STATE, NULL, NULL);
-  }
-
-  intro_my();
+  prepare_method_parse(compclassmeta);
 
   MethodMeta *compmethodmeta;
   Newx(compmethodmeta, 1, MethodMeta);
@@ -964,8 +906,6 @@ static void parse_method_pre_subparse(pTHX_ struct XSParseSublikeContext *ctx, v
   compmethodmeta->is_common = false;
 
   hv_stores(ctx->moddata, "Object::Pad/compmethodmeta", newSVuv(PTR2UV(compmethodmeta)));
-
-  LEAVE;
 }
 
 static bool parse_method_filter_attr(pTHX_ struct XSParseSublikeContext *ctx, SV *attr, SV *val, void *hookdata)
@@ -988,222 +928,227 @@ static bool parse_method_filter_attr(pTHX_ struct XSParseSublikeContext *ctx, SV
   return false;
 }
 
+static bool parse_phaser_filter_attr(pTHX_ struct XSParseSublikeContext *ctx, SV *attr, SV *val, void *hookdata)
+{
+  enum PhaserType type = PTR2UV(hookdata);
+  HV *hints = GvHV(PL_hintgv);
+
+  if(hv_fetchs(hints, "Object::Pad/configure(no_adjust_attrs)", 0))
+    croak("ADJUST block attributes are not permitted");
+
+  if(strEQ(SvPVX(attr), "params")) {
+    if(type != PHASER_ADJUST)
+      croak("Cannot set :params for a phaser block other than ADJUST");
+
+    if(!hints || !hv_fetchs(hints, "Object::Pad/experimental(adjust_params)", 0))
+      Perl_ck_warner(aTHX_ packWARN(WARN_EXPERIMENTAL),
+        "ADJUST :params is experimental and may be changed or removed without notice");
+
+    hv_stores(ctx->moddata, "Object::Pad/ADJUST:params", newRV_noinc((SV *)newAV()));
+    return true;
+  }
+
+  return false;
+}
+
 static void parse_method_post_blockstart(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata)
 {
+  enum PhaserType type = PTR2UV(hookdata);
+
   MethodMeta *compmethodmeta = NUM2PTR(MethodMeta *, SvUV(*hv_fetchs(ctx->moddata, "Object::Pad/compmethodmeta", 0)));
 
-  /* Splice in the field scope CV in */
-  CV *methodscope = compclassmeta->methodscope;
+  start_method_parse(compclassmeta, compmethodmeta->is_common);
 
-  if(CvANON(PL_compcv))
-    CvANON_on(methodscope);
+  SV **svp;
 
-  CvOUTSIDE    (methodscope) = CvOUTSIDE    (PL_compcv);
-  CvOUTSIDE_SEQ(methodscope) = CvOUTSIDE_SEQ(PL_compcv);
+  if(type == PHASER_ADJUST && (svp = hv_fetchs(ctx->moddata, "Object::Pad/ADJUST:params", 0))) {
+    AV *params = AV_FROM_REF(*svp);
 
-  CvOUTSIDE(PL_compcv) = methodscope;
+    if(!compclassmeta->parammap)
+      compclassmeta->parammap = newHV();
 
-  if(!compmethodmeta->is_common)
-    /* instance method */
-    extend_pad_vars(compclassmeta);
-  else {
-    /* :common method */
-    PADOFFSET padix;
+    HV *parammap = compclassmeta->parammap;
 
-    padix = pad_add_name_pvs("$class", 0, NULL, NULL);
-    if(padix != PADIX_SELF)
-      croak("ARGH: Expected that padix[$class] = 1");
-  }
+    /* This is a custom parser because XPK won't handle this */
+    if(lex_peek_unichar(0) != '(')
+      croak("Expected ADJUST :params signature in parens");
+    lex_read_unichar(0);
 
-  if(compclassmeta->type == METATYPE_ROLE) {
-    PAD *pad1 = PadlistARRAY(CvPADLIST(PL_compcv))[1];
+    /* Skip the PADIX_EMBEDDING slot */
+    pad_add_name_pvs("", 0, NULL, NULL);
 
-    if(compclassmeta->role_is_invokable) {
-      SV *sv = PadARRAY(pad1)[PADIX_EMBEDDING];
-      sv_setpvn(sv, "", 0);
-      SvPVX(sv) = (void *)&embedding_standalone;
+    {
+      PADOFFSET params_padix = pad_add_name_pvs("%(params)", 0, NULL, NULL);
+      assert(params_padix == PADIX_PARAMS);
+      PERL_UNUSED_VAR(params_padix);
     }
-    else {
-      SvREFCNT_dec(PadARRAY(pad1)[PADIX_EMBEDDING]);
-      PadARRAY(pad1)[PADIX_EMBEDDING] = &PL_sv_undef;
-    }
-  }
 
-  intro_my();
+    intro_my();
+
+    bool seen_slurpy = false;
+
+    while(1) {
+      lex_read_space(0);
+
+      /* Should now follow a sequence of comma-separated elements; each element is
+       *   :$NAME    or
+       *   :$NAME = EXPR
+       * The final one may also be
+       *   %NAME
+       */
+      char c = lex_peek_unichar(0);
+      if(c == ')')
+        break;
+      else if(c == ':') {
+        if(seen_slurpy)
+          croak("Cannot have more parameters after the final slurpy one");
+
+        lex_read_unichar(0);
+        lex_read_space(0);
+
+        SV *varname = lex_scan_lexvar();
+        lex_read_space(0);
+
+        if(SvPVX(varname)[0] != '$')
+          croak("Expected a named scalar parameter");
+
+        SV *paramname = newSVpvn(SvPVX(varname)+1, SvCUR(varname)-1);
+
+        check_colliding_param(compclassmeta, paramname);
+
+        PADOFFSET padix = pad_add_name_sv(varname, 0, NULL, NULL);
+
+        ParamMeta *parammeta;
+        Newx(parammeta, 1, struct ParamMeta);
+
+        parammeta->name = paramname;
+        parammeta->class = compclassmeta;
+        parammeta->type = PARAM_ADJUST;
+        parammeta->adjust.padix   = padix;
+        parammeta->adjust.defexpr = NULL;
+
+        av_push(params, newSVuv(PTR2UV((SV *)parammeta)));
+        hv_store_ent(parammap, paramname, (SV *)parammeta, 0);
+
+        if(lex_peek_unichar(0) == '=') {
+          lex_read_unichar(0);
+          lex_read_space(0);
+
+          parammeta->adjust.defexpr = parse_termexpr(0);
+        }
+
+        intro_my();
+      }
+      else if(c == '%') {
+        if(seen_slurpy)
+          croak("Cannot have more parameters after the final slurpy one");
+
+        SV *varname = lex_scan_lexvar();
+
+        /* Lets now be evil and simply rename %(params) to this. Due to the way
+         * that the PADNAME structure itself contains the string, we can't
+         * just change the name *inside* it. Instead we'll have to allocate a
+         * new one and swap it in.
+         */
+        PADNAME **pnp = &PadnamelistARRAY(PL_comppad_name)[PADIX_PARAMS];
+
+        PADNAME *new_pn = newPADNAMEpvn(SvPVX(varname), SvCUR(varname));
+        COP_SEQ_RANGE_LOW_set(new_pn, COP_SEQ_RANGE_LOW(*pnp));
+
+        PadnameREFCNT_dec(*pnp);
+        *pnp = new_pn;
+
+        /* Don't need to intro_my() because the padname has already been
+         * introduced
+         */
+
+        seen_slurpy = true;
+      }
+      else
+        croak("Expected a named scalar parameter or slurpy hash");
+
+      lex_read_space(0);
+      c = lex_peek_unichar(0);
+
+      if(c == ')')
+        break;
+      if(c != ',')
+        croak("Expected , or end of signature parens");
+
+      lex_read_unichar(0);
+    }
+
+    /* consume the ')' */
+    lex_read_unichar(0);
+
+    lex_read_space(0);
+  }
+}
+
+static OP *pp_bind_params_hv(pTHX)
+{
+  HV *params = HV_FROM_REF(*av_fetch(GvAV(PL_defgv), 0, 0));
+
+  SAVESPTR(PAD_SVl(PADIX_PARAMS));
+  PAD_SVl(PADIX_PARAMS) = SvREFCNT_inc(params);
+  save_freesv((SV *)params);
+
+  return NORMAL;
 }
 
 static void parse_method_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata)
 {
   enum PhaserType type = PTR2UV(hookdata);
-  PADNAMELIST *fieldnames = PadlistNAMES(CvPADLIST(compclassmeta->methodscope));
-  I32 nfields = av_count(compclassmeta->direct_fields);
-  PADNAME **snames = PadnamelistARRAY(fieldnames);
-  PADNAME **padnames = PadnamelistARRAY(PadlistNAMES(CvPADLIST(PL_compcv)));
 
   MethodMeta *compmethodmeta = NUM2PTR(MethodMeta *, SvUV(*hv_fetchs(ctx->moddata, "Object::Pad/compmethodmeta", 0)));
 
-  /* If we have no ctx->body that means this was a bodyless method
-   * declaration; a required method for a role
-   */
-  if(ctx->body && !compmethodmeta->is_common) {
-    OP *fieldops = NULL, *methstartop;
-#if HAVE_PERL_VERSION(5, 22, 0)
-    U32 cop_seq_low = COP_SEQ_RANGE_LOW(padnames[PADIX_SELF]);
-#endif
+  SV **svp;
 
-#ifdef METHSTART_CONTAINS_FIELD_BINDINGS
-    AV *fieldmap = newAV();
-    U32 fieldcount = 0, max_fieldix = 0;
+  if(type == PHASER_ADJUST && (svp = hv_fetchs(ctx->moddata, "Object::Pad/ADJUST:params", 0))) {
+    AV *params = AV_FROM_REF(*svp);
 
-    SAVEFREESV((SV *)fieldmap);
-#endif
+    OP *paramsops = NULL;
 
-    {
-      ENTER;
-      SAVEVPTR(PL_curcop);
+    paramsops = op_append_elem(OP_LINESEQ, paramsops,
+      newOP_CUSTOM(&pp_bind_params_hv, 0));
 
-      /* See https://rt.cpan.org/Ticket/Display.html?id=132428
-       *   https://github.com/Perl/perl5/issues/17754
-       */
-      PADOFFSET padix;
-      for(padix = PADIX_SELF + 1; padix <= PadnamelistMAX(PadlistNAMES(CvPADLIST(PL_compcv))); padix++) {
-        PADNAME *pn = padnames[padix];
+    for(U32 i = 0; i < av_count(params); i++) {
+      ParamMeta *parammeta = NUM2PTR(ParamMeta *, SvUV(AvARRAY(params)[i]));
 
-        if(PadnameIsNULL(pn) || !PadnameLEN(pn))
-          continue;
+      SV *paramname = parammeta->name;
+      OP *defexpr   = parammeta->adjust.defexpr;
 
-        const char *pv = PadnamePV(pn);
-        if(!pv || !strEQ(pv, "$self"))
-          continue;
+      if(!defexpr)
+        defexpr = newop_croak_from_constructor(
+          newSVpvf("Required parameter '%" SVf "' is missing for %" SVf " constructor",
+            SVfARG(paramname), SVfARG(compclassmeta->name)));
 
-        COP *padcop = NULL;
-        if(find_cop_for_lvintro(padix, ctx->body, &padcop))
-          PL_curcop = padcop;
-        warn("\"my\" variable $self masks earlier declaration in same scope");
-      }
-
-      LEAVE;
+      paramsops = op_append_elem(OP_LINESEQ, paramsops,
+        /* $var = exists $(params){KEY} ? delete $(params){KEY} : DEFEXPR; */
+        newBINOP(OP_SASSIGN, 0,
+          newCONDOP(0,
+            /* first */
+            /* OP_EXISTS has to be created a weird way... */
+            newUNOP(OP_EXISTS, 0,
+              newBINOP(OP_HELEM, 0,
+                newPADxVOP(OP_PADHV, OPf_REF, PADIX_PARAMS),
+                newSVOP(OP_CONST, 0, SvREFCNT_inc(paramname)))),
+            /* trueop */
+            newUNOP(OP_DELETE, 0,
+              newBINOP(OP_HELEM, 0,
+                newPADxVOP(OP_PADHV, OPf_REF, PADIX_PARAMS),
+                newSVOP(OP_CONST, 0, SvREFCNT_inc(paramname)))),
+            /* falseop */
+            defexpr),
+          newPADxVOP(OP_PADSV, OPf_MOD|OPf_REF, parammeta->adjust.padix)));
     }
 
-    fieldops = op_append_list(OP_LINESEQ, fieldops,
-      newSTATEOP(0, NULL, NULL));
-    fieldops = op_append_list(OP_LINESEQ, fieldops,
-      (methstartop = newMETHSTARTOP(0 |
-        (compclassmeta->type == METATYPE_ROLE ? OPf_SPECIAL : 0) |
-        (compclassmeta->repr << 8))));
-
-    int i;
-    for(i = 0; i < nfields; i++) {
-      FieldMeta *fieldmeta = (FieldMeta *)AvARRAY(compclassmeta->direct_fields)[i];
-      PADNAME *fieldname = snames[i + 1];
-
-      if(!fieldname
-#if HAVE_PERL_VERSION(5, 22, 0)
-        /* On perl 5.22 and above we can use PadnameREFCNT to detect which pad
-         * slots are actually being used
-         */
-         || PadnameREFCNT(fieldname) < 2
-#endif
-        )
-          continue;
-
-      FIELDOFFSET fieldix = fieldmeta->fieldix;
-      PADOFFSET padix = find_padix_for_field(fieldmeta);
-
-      if(padix == NOT_IN_PAD)
-        continue;
-
-      U8 private = 0;
-      switch(SvPV_nolen(fieldmeta->name)[0]) {
-        case '$': private = OPpFIELDPAD_SV; break;
-        case '@': private = OPpFIELDPAD_AV; break;
-        case '%': private = OPpFIELDPAD_HV; break;
-      }
-
-#ifdef METHSTART_CONTAINS_FIELD_BINDINGS
-      assert((fieldix & ~FIELDIX_MASK) == 0);
-      av_store(fieldmap, padix, newSVuv(((UV)private << FIELDIX_TYPE_SHIFT) | fieldix));
-      fieldcount++;
-      if(fieldix > max_fieldix)
-        max_fieldix = fieldix;
-#else
-      fieldops = op_append_list(OP_LINESEQ, fieldops,
-        /* alias the padix from the field */
-        newFIELDPADOP(private << 8, padix, fieldix));
-#endif
-
-#if HAVE_PERL_VERSION(5, 22, 0)
-      /* Unshare the padname so the one in the methodscope pad returns to refcount 1 */
-      PADNAME *newpadname = newPADNAMEpvn(PadnamePV(fieldname), PadnameLEN(fieldname));
-      PadnameREFCNT_dec(padnames[padix]);
-      padnames[padix] = newpadname;
-
-      /* Turn off OUTER and set a valid COP sequence range, so the lexical is
-       * visible to eval(), PadWalker, perldb, etc.. */
-      PadnameOUTER_off(newpadname);
-      COP_SEQ_RANGE_LOW(newpadname) = cop_seq_low;
-      COP_SEQ_RANGE_HIGH(newpadname) = PL_cop_seqmax;
-#endif
-    }
-
-#ifdef METHSTART_CONTAINS_FIELD_BINDINGS
-    if(fieldcount) {
-      UNOP_AUX_item *aux;
-      Newx(aux, 2 + fieldcount*2, UNOP_AUX_item);
-      cUNOP_AUXx(methstartop)->op_aux = aux;
-
-      (aux++)->uv = fieldcount;
-      (aux++)->uv = max_fieldix;
-
-      for(Size_t i = 0; i < av_count(fieldmap); i++) {
-        if(!AvARRAY(fieldmap)[i] || !SvOK(AvARRAY(fieldmap)[i]))
-          continue;
-
-        (aux++)->uv = i;
-        (aux++)->uv = SvUV(AvARRAY(fieldmap)[i]);
-      }
-    }
-#endif
-    ctx->body = op_append_list(OP_LINESEQ, fieldops, ctx->body);
-  }
-  else if(ctx->body && compmethodmeta->is_common) {
     ctx->body = op_append_list(OP_LINESEQ,
-      newCOMMONMETHSTARTOP(0 |
-        (compclassmeta->repr << 8)),
+      paramsops,
       ctx->body);
   }
 
-  compclassmeta->methodscope = NULL;
-
-  /* Restore CvOUTSIDE(PL_compcv) back to where it should be */
-  {
-    CV *outside = CvOUTSIDE(PL_compcv);
-    PADNAMELIST *pnl = PadlistNAMES(CvPADLIST(PL_compcv));
-    PADNAMELIST *outside_pnl = PadlistNAMES(CvPADLIST(outside));
-
-    /* Lexical captures will need their parent pad index fixing
-     * Technically these only matter for CvANON because they're only used when
-     * reconstructing the parent pad captures by OP_ANONCODE. But we might as
-     * well be polite and fix them for all CVs
-     */
-    PADOFFSET padix;
-    for(padix = 1; padix <= PadnamelistMAX(pnl); padix++) {
-      PADNAME *pn = PadnamelistARRAY(pnl)[padix];
-      if(PadnameIsNULL(pn) ||
-         !PadnameOUTER(pn) ||
-         !PARENT_PAD_INDEX(pn))
-        continue;
-
-      PADNAME *outside_pn = PadnamelistARRAY(outside_pnl)[PARENT_PAD_INDEX(pn)];
-
-      PARENT_PAD_INDEX_set(pn, PARENT_PAD_INDEX(outside_pn));
-      if(!PadnameOUTER(outside_pn))
-        PadnameOUTER_off(pn);
-    }
-
-    CvOUTSIDE(PL_compcv)     = CvOUTSIDE(outside);
-    CvOUTSIDE_SEQ(PL_compcv) = CvOUTSIDE_SEQ(outside);
-  }
+  ctx->body = finish_method_parse(compclassmeta, compmethodmeta->is_common, ctx->body);
 
   if(type != PHASER_NONE)
     /* We need to remove the name now to stop newATTRSUB() from creating this
@@ -1250,6 +1195,7 @@ static void parse_method_post_newcv(pTHX_ struct XSParseSublikeContext *ctx, voi
       break;
 
     case PHASER_ADJUST:
+    case PHASER_ADJUSTPARAMS:
       mop_class_add_ADJUST(compclassmeta, ctx->cv); /* steal CV */
       break;
   }
@@ -1290,10 +1236,12 @@ static struct XSParseSublikeHooks parse_method_hooks = {
 };
 
 static struct XSParseSublikeHooks parse_phaser_hooks = {
-  .flags           = XS_PARSE_SUBLIKE_COMPAT_FLAG_DYNAMIC_ACTIONS,
-  .skip_parts      = XS_PARSE_SUBLIKE_PART_NAME|XS_PARSE_SUBLIKE_PART_ATTRS,
+  .flags           = XS_PARSE_SUBLIKE_FLAG_FILTERATTRS |
+                     XS_PARSE_SUBLIKE_COMPAT_FLAG_DYNAMIC_ACTIONS,
+  .skip_parts      = XS_PARSE_SUBLIKE_PART_NAME,
   /* no permit */
   .pre_subparse    = parse_method_pre_subparse,
+  .filter_attr     = parse_phaser_filter_attr,
   .post_blockstart = parse_method_post_blockstart,
   .pre_blockend    = parse_method_pre_blockend,
   .post_newcv      = parse_method_post_newcv,
@@ -1382,6 +1330,33 @@ static void dump_methodmeta(pTHX_ DMDContext *ctx, MethodMeta *methodmeta)
   );
 }
 
+static void dump_parammeta(pTHX_ DMDContext *ctx, ParamMeta *parammeta)
+{
+  switch(parammeta->type) {
+    case PARAM_FIELD:
+      DMD_DUMP_STRUCT(ctx, "Object::Pad/ParamMeta.field", parammeta, sizeof(ParamMeta),
+        4, ((const DMDNamedField []){
+          {"the name SV", DMD_FIELD_PTR,  .ptr = parammeta->name},
+          {"the class",   DMD_FIELD_PTR,  .ptr = parammeta->class},
+          {"the field",   DMD_FIELD_PTR,  .ptr = parammeta->field.fieldmeta},
+          {"fieldix",     DMD_FIELD_UINT, .n   = parammeta->field.fieldix},
+        })
+      );
+      break;
+
+    case PARAM_ADJUST:
+      DMD_DUMP_STRUCT(ctx, "Object::Pad/ParamMeta.adjust", parammeta, sizeof(ParamMeta),
+        3, ((const DMDNamedField []){
+          {"the name SV",      DMD_FIELD_PTR,  .ptr = parammeta->name},
+          {"the class",        DMD_FIELD_PTR,  .ptr = parammeta->class},
+          {"padix",            DMD_FIELD_UINT, .n   = parammeta->adjust.padix},
+          /* No point dumping the defexpr because Devel::MAT can't peek into them */
+        })
+      );
+      break;
+  }
+}
+
 static void dump_adjustblock(pTHX_ DMDContext *ctx, AdjustBlock *adjustblock)
 {
   DMD_DUMP_STRUCT(ctx, "Object::Pad/AdjustBlock", adjustblock, sizeof(AdjustBlock),
@@ -1467,6 +1442,18 @@ static void dump_classmeta(pTHX_ DMDContext *ctx, ClassMeta *classmeta)
     MethodMeta *methodmeta = (MethodMeta *)AvARRAY(classmeta->direct_methods)[i];
 
     dump_methodmeta(aTHX_ ctx, methodmeta);
+  }
+
+  {
+    HV *parammap = classmeta->parammap;
+    hv_iterinit(parammap);
+
+    HE *iter;
+    while((iter = hv_iternext(parammap))) {
+      ParamMeta *parammeta = (ParamMeta *)HeVAL(iter);
+
+      dump_parammeta(aTHX_ ctx, parammeta);
+    }
   }
 
   for(i = 0; classmeta->adjustblocks && i < av_count(classmeta->adjustblocks); i++) {
@@ -1589,11 +1576,11 @@ static U32 S_deconstruct_object_class(pTHX_ AV *backingav, ClassMeta *classmeta,
         break;
 
       case '@':
-        value = newRV_noinc((SV *)newAVav((AV *)SvRV(value)));
+        value = newRV_noinc((SV *)newAVav(AV_FROM_REF(value)));
         break;
 
       case '%':
-        value = newRV_noinc((SV *)newHVhv((HV *)SvRV(value)));
+        value = newRV_noinc((SV *)newHVhv(HV_FROM_REF(value)));
         break;
     }
 
@@ -1853,7 +1840,7 @@ BOOT:
 
   register_xs_parse_keyword("BUILD",        &kwhooks_BUILD, (void *)PHASER_BUILD);
   register_xs_parse_keyword("ADJUST",       &kwhooks_ADJUST, (void *)PHASER_ADJUST);
-  register_xs_parse_keyword("ADJUSTPARAMS", &kwhooks_ADJUST, (void *)PHASER_ADJUST);
+  register_xs_parse_keyword("ADJUSTPARAMS", &kwhooks_ADJUST, (void *)PHASER_ADJUSTPARAMS);
 
   register_xs_parse_keyword("requires", &kwhooks_requires, NULL);
 

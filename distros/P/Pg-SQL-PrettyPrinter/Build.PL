@@ -14,12 +14,16 @@ my $builder = Module::Build->new(
     build_requires => {
         'autodie'         => 0,
         'Test::More'      => 0,
-        'Test::Deep'      => 0,
         'Test::Exception' => 0,
     },
     add_to_cleanup => [ 'Pg-SQL-PrettyPrinter-*' ],
-    requires       => { 'JSON::MaybeXS' => 0, },
-    meta_merge     => {
+    requires       => {
+        'Clone'           => 0,
+        'HTTP::Tiny'      => 0,
+        'JSON::MaybeXS'   => 0,
+        'Module::Runtime' => 0,
+    },
+    meta_merge => {
         'meta-spec' => {
             version => 2,
         },

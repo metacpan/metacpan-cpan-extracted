@@ -1,5 +1,14 @@
 Revision history for Tk-Markdown
 
+0.08    2022-10-31
+        no functional changes
+        Improve README
+        Release including updated changes file
+
+0.07    2022-10-31
+        Various POD fixes and improvements, no functional changes
+        Added sample script
+
 0.06    2021-09-18
         Added Github repo
         Cosmetic changes to POD and code only, no functional changes

@@ -19,12 +19,12 @@
 
 =head1 NAME
 
-DateTime::Locale::ff_Latn_NE - Locale data examples for the Fulah Niger Latin (ff-Latn-NE) locale
+DateTime::Locale::ff_Latn_NE - Locale data examples for the Fula Niger Latin (ff-Latn-NE) locale
 
 =head1 DESCRIPTION
 
 This pod file contains examples of the locale data available for the
-Fulah Niger Latin locale.
+Fula Niger Latin locale.
 
 =head2 Days
 

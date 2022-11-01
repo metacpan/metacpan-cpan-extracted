@@ -1,5 +1,9 @@
 Revision history for Perl extension SQL::SimpleOps.
 
+2022.301.1 Fri Oct 28 12:37:49 2022
+	- fix: invalid first/last for scalar cursor_info; by CCELSO
+	- fix: mismatch limit=1 search; by CCELSO
+
 2022.266.1 Fri Sep 23 22:53:40 2022
 	- tester t/testDB.t fix for SQLite (required); by CCELSO
 	- tester t/testSQL.t fix; force /tmp as workdir to test; by CCELSO

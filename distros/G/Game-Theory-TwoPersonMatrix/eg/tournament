@@ -6,7 +6,6 @@ use warnings;
 # And https://medium.com/thinking-is-hard/a-prisoners-dilemma-cheat-sheet-4d85fe289d87
 # And http://www.prisoners-dilemma.com/strategies.html
 
-use lib '/Users/gene/sandbox/Game-Theory-TwoPersonMatrix/lib';
 use Game::Theory::TwoPersonMatrix;
 use Algorithm::Combinatorics qw/ combinations /;
 use List::Util::WeightedChoice qw/ choose_weighted /;
@@ -19,18 +18,18 @@ my $max = shift || 200;
 
 my $players = {
     jesus   => [ \&cooperate, \&cooperate ],
-    lucifer => [ \&defect, \&defect ],
-    random  => [ \&random, \&random ],
+    lucifer => [ \&defect,    \&defect ],
+    random  => [ \&random,    \&random ],
     tft     => [ \&cooperate, \&tit_for_tat ],
-    atft    => [ \&defect, \&tit_for_tat ], # "Agressive tit-for-tat"
-    rtft    => [ \&defect, \&rev_tit_for_tat ],
+    atft    => [ \&defect,    \&tit_for_tat ], # "Agressive tit-for-tat"
+    rtft    => [ \&defect,    \&rev_tit_for_tat ],
     tftt    => [ \&cooperate, \&tit_for_two_tats ],
     gtft    => [ \&cooperate, \&generous_tit_for_tat ],
     grim    => [ \&cooperate, \&grim ],
     fbf     => [ \&cooperate, \&firm_but_fair ],
     pavlov  => [ \&cooperate, \&pavlov ],
     sm      => [ \&cooperate, \&soft_majority ],
-    hm      => [ \&defect, \&hard_majority ],
+    hm      => [ \&defect,    \&hard_majority ],
 };
 
 my $population = [

@@ -11,12 +11,11 @@ plugin 'PkgConfig'    => 'libffi';
 
 share {
 
-  plugin Download => (
-    url     => 'https://sourceware.org/pub/libffi/',
-    version => qr/^libffi-([0-9\.]+)\.tar\.gz$/,
+  plugin 'Download::GitHub' => (
+    github_user => 'libffi',
+    github_repo => 'libffi',
+    asset => 1,
   );
-
-  plugin Extract => 'tar.gz';
 
   plugin 'Build::Autoconf' => ();
 
@@ -110,6 +109,27 @@ share {
     }
   }
 
+  if($Config{archname} =~ /^aarch64-linux/)
+  {
+    # libffi 3.4.3 broke Linux Arm64
+    # https://github.com/PerlFFI/FFI-Platypus/issues/374
+    # For now not black listing it for other Arm64
+    # systems (like macOS) because I did not see the
+    # errors there.
+    meta->around_hook( prefer => sub {
+      my $orig = shift;
+
+      my $ret = $orig->(@_);
+
+      $ret->{list} = [
+        grep { $_->{version} ne '3.4.3' }
+        @{ $ret->{list} }
+      ];
+
+      $ret;
+    });
+  }
+
   if($Config{archname} =~ /^i[3456]86/)
   {
     my %flags;
@@ -119,7 +139,7 @@ share {
     {
       my $fh;
       open($fh, '<', '/proc/cpuinfo');
-      my($flags) = map { s/^.*:\s+//; $_ } grep /^flags/, <$fh>;
+      my($flags) = map { my $x = $_; $x =~ s/^.*:\s+//; $x } grep /^flags/, <$fh>;
       close $fh;
       chomp $flags;
       %flags = map { $_ => 1 } split /\s+/, $flags;
@@ -128,15 +148,15 @@ share {
     if($flags{avx} && $flags{aes})
     {
       log "You seem to have avx and aes flags, allowing libffi to detect the CPU";
-      log "see https://github.com/Perl5-FFI/Alien-FFI/issues/6"
+      log "see https://github.com/PerlFFI/Alien-FFI/issues/6"
     }
     else
     {
       # disable avx and aes instructions as the detection logic for libffi seems
-      # to be broken.  See https://github.com/Perl5-FFI/Alien-FFI/issues/6
+      # to be broken.  See https://github.com/PerlFFI/Alien-FFI/issues/6
       log "Could not detect avx and aes flags.  The detection logic is pretty dumb, and may be wrong.";
       log "Please let us know if we got it wrong, and how we can improve it.";
-      log "see https://github.com/Perl5-FFI/Alien-FFI/issues/6";
+      log "see https://github.com/PerlFFI/Alien-FFI/issues/6";
       $configure .= " --with-gcc-arch=pentium4";
     }
   }

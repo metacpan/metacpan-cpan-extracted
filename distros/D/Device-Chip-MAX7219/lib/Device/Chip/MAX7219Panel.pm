@@ -4,9 +4,9 @@
 #  (C) Paul Evans, 2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.57;
+use Object::Pad 0.70 ':experimental(adjust_params)';
 
-package Device::Chip::MAX7219Panel 0.06;
+package Device::Chip::MAX7219Panel 0.07;
 class Device::Chip::MAX7219Panel
    :isa(Device::Chip);
 
@@ -116,10 +116,9 @@ it is mounted upside-down.
 
 =cut
 
-ADJUSTPARAMS ( $params )
-{
-   my $geom = delete $params->{geom} // "32x8";
-
+ADJUST :params (
+   :$geom = "32x8",
+) {
    ( $_columns, $_rows ) = $geom =~ m/^(\d+)x(\d+)/ or
       croak "Unable to parse rows/columns from geometry argument $geom";
 

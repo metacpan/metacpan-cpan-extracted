@@ -42,7 +42,7 @@ sub common_config {
     ::common_config(),
     senders     => [
       Exception::Reporter::Sender::Email->new({
-        from => 'root',
+        from => 'root@example.com',
         to   => 'Example Sysadmins <sysadmins@example.com>',
       }),
     ],
@@ -191,7 +191,7 @@ subtest "subject and reporter behavior" => sub {
   my $reporter = Exception::Reporter->new({
     senders     => [
       Exception::Reporter::Sender::Email->new({
-        from => 'root',
+        from => 'root@example.com',
         to   => 'Example Sysadmins <sysadmins@example.com>',
       }),
     ],

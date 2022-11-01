@@ -14,7 +14,6 @@ my $crops = pdl(indx,
   [1,3,1,2],
 );
 my $got = crop($mask->slice(':,:,(1)'));
-diag $got;
 ok all($got == $crops->slice(':,(1)')), 'mask non-broadcast' or diag "got=$got";
 $got = crop($mask);
 ok all($got == $crops), 'mask broadcast' or diag "got=$got";
@@ -92,6 +91,38 @@ ok all( approx( conv2d($pb,$pa,{Boundary => 'Replicate'}), $ans )), "conv2d repl
 my $ans = pdl ([8,15,12],[21,36,27],[20,33,24]);
 ok all( approx( conv2d($pb,$pa,{Boundary => 'Truncate'}), $ans )), "conv2d truncate"; #5
 }
+}
+
+{
+  my $realmask=ones(3,3)/9;
+  my $realseq=sequence(3,3);
+  my $imagmask=$realmask*i();
+  my $imagseq=$realseq*i();
+  my $real_exp = <<EOF;
+\n[
+ [4 4 4]
+ [4 4 4]
+ [4 4 4]
+]
+EOF
+  my $neg_exp = <<EOF;
+\n[
+ [-4 -4 -4]
+ [-4 -4 -4]
+ [-4 -4 -4]
+]
+EOF
+  my $imag_exp = <<EOF;
+\n[
+ [4i 4i 4i]
+ [4i 4i 4i]
+ [4i 4i 4i]
+]
+EOF
+  is $realseq->conv2d($realmask).'', $real_exp, "Real matrix real mask";
+  is $imagseq->conv2d($realmask).'', $imag_exp, "Imag matrix real mask";
+  is $realseq->conv2d($imagmask).'', $imag_exp, "Real matrix imag mask";
+  is $imagseq->conv2d($imagmask).'', $neg_exp, "Imag matrix imag mask";
 }
 
 {

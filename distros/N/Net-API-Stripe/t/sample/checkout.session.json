@@ -1,0 +1,51 @@
+{
+   "after_expiration" : null,
+   "allow_promotion_codes" : null,
+   "amount_subtotal" : null,
+   "amount_total" : null,
+   "automatic_tax" : {
+      "enabled" : 0,
+      "status" : null
+   },
+   "billing_address_collection" : null,
+   "cancel_url" : "https://example.com/cancel",
+   "client_reference_id" : null,
+   "consent" : null,
+   "consent_collection" : null,
+   "currency" : null,
+   "customer" : null,
+   "customer_creation" : null,
+   "customer_details" : null,
+   "customer_email" : null,
+   "expires_at" : "1662261084",
+   "id" : "cs_test_a1o8C8459MaCWlTk9yrixr8lnwGZCV1j6ZaIJQUKR8wdiCL7nTP8NtTgEr",
+   "livemode" : 0,
+   "locale" : null,
+   "metadata" : {},
+   "mode" : "payment",
+   "object" : "checkout.session",
+   "payment_intent" : "pi_1DsTej2eZvKYlo2C5PX0hXuO",
+   "payment_link" : null,
+   "payment_method_collection" : null,
+   "payment_method_options" : {},
+   "payment_method_types" : [
+      "card"
+   ],
+   "payment_status" : "unpaid",
+   "phone_number_collection" : {
+      "enabled" : 0
+   },
+   "recovered_from" : null,
+   "redaction" : null,
+   "setup_intent" : null,
+   "shipping_address_collection" : null,
+   "shipping_cost" : null,
+   "shipping_details" : null,
+   "shipping_options" : [],
+   "status" : "expired",
+   "submit_type" : null,
+   "subscription" : null,
+   "success_url" : "https://example.com/success",
+   "total_details" : null,
+   "url" : null
+}

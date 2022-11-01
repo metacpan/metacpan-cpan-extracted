@@ -59,8 +59,8 @@
   date_format_long => "d MMMM\N{U+2e41} y",
   date_format_medium => "d MMM\N{U+2e41} y",
   date_format_short => "d-M-y",
-  datetime_format_full => "{1} \N{U+1e909} {0}",
-  datetime_format_long => "{1} \N{U+1e909} {0}",
+  datetime_format_full => "{1} {0}",
+  datetime_format_long => "{1} {0}",
   datetime_format_medium => "{1} {0}",
   datetime_format_short => "{1} {0}",
   day_format_abbreviated => [
@@ -135,7 +135,7 @@
   glibc_datetime_format => "%a %b %e %H:%M:%S %Y",
   glibc_time_12_format => "%I:%M:%S %p",
   glibc_time_format => "%H:%M:%S",
-  language => "Fulah",
+  language => "Fula",
   month_format_abbreviated => [
     "\N{U+1e905}\N{U+1e92d}\N{U+1e945}\N{U+1e924}\N{U+1e92e}",
     "\N{U+1e915}\N{U+1e92e}\N{U+1e924}\N{U+1e93c}\N{U+1e92e}",
@@ -220,7 +220,7 @@
     "\N{U+1e914}\N{U+1e92e}\N{U+1e924}\N{U+1e92e}",
     "\N{U+1e904}\N{U+1e92e}\N{U+1e931}\N{U+1e93c}\N{U+1e92e}",
   ],
-  name => "Fulah Ghana Adlam",
+  name => "Fula Ghana Adlam",
   native_language => "\N{U+1e906}\N{U+1e935}\N{U+1e924}\N{U+1e922}\N{U+1e92a}",
   native_name => "\N{U+1e906}\N{U+1e935}\N{U+1e924}\N{U+1e922}\N{U+1e92a} \N{U+1e918}\N{U+1e922}\N{U+1e932}\N{U+1e922} \N{U+1e900}\N{U+1e901}\N{U+1e902}\N{U+1e922}\N{U+1e903}",
   native_script => "\N{U+1e900}\N{U+1e901}\N{U+1e902}\N{U+1e922}\N{U+1e903}",
@@ -269,5 +269,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 41,
+  version => 42,
 }

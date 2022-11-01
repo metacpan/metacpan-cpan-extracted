@@ -2,20 +2,32 @@ NAME
     String::Wildcard::Bash - Bash wildcard string routines
 
 VERSION
-    This document describes version 0.044 of String::Wildcard::Bash (from
-    Perl distribution String-Wildcard-Bash), released on 2022-08-06.
+    This document describes version 0.045 of String::Wildcard::Bash (from
+    Perl distribution String-Wildcard-Bash), released on 2022-08-12.
 
 SYNOPSIS
         use String::Wildcard::Bash qw(
             $RE_WILDCARD_BASH
+
             contains_wildcard
+            contains_brace_wildcard
+            contains_class_wildcard
+            contains_joker_wildcard
+            contains_qmark_wildcard
+            contains_glob_wildcard
+            contains_globstar_wildcard
+
             convert_wildcard_to_sql
             convert_wildcard_to_re
         );
 
-        say 1 if contains_wildcard(""));      # -> 0
+        say 1 if contains_wildcard(""));      # ->
         say 1 if contains_wildcard("ab*"));   # -> 1
-        say 1 if contains_wildcard("ab\\*")); # -> 0
+        say 1 if contains_wildcard("ab\\*")); # ->
+
+        say 1 if contains_glob_wildcard("ab*"));   # -> 1
+        say 1 if contains_glob_wildcard("ab?"));   # ->
+        say 1 if contains_qmark_wildcard("ab?"));  # -> 1
 
         say convert_wildcard_to_sql("foo*");  # -> "foo%"
 
@@ -49,7 +61,8 @@ FUNCTIONS
 
     For more specific needs, e.g. you want to check if a string just
     contains joker and not other types of wildcard patterns, use
-    "$RE_WILDCARD_BASH" directly.
+    "$RE_WILDCARD_BASH" directly or one of the "contains_*_wildcard"
+    functions.
 
   contains_brace_wildcard
     Like "contains_wildcard", but only return true if string contains brace
@@ -180,10 +193,10 @@ CONTRIBUTING
 
     If you want to build the distribution (e.g. to try to install it locally
     on your system), you can install Dist::Zilla,
-    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
-    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
-    steps required beyond that are considered a bug and can be reported to
-    me.
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
     This software is copyright (c) 2022, 2019, 2015, 2014 by perlancar

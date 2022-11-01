@@ -1,5 +1,14 @@
 Release history for Memoize
 
+1.15  Sun 23 Oct 2022
+  * Cleaner initialization logic in memoize(), with some added tests
+  * No more double wrapping of memoized functions, at the cost of loading Scalar::Util
+  * No more double stack frame and double return on threaded perls
+  * No more loading Config.pm, though Scalar::Util is required instead
+  * No more hash lookups in the wrapper
+  * Slightly less internal memory use
+  * Old history restored into Changes
+
 1.14  Sun 16 Oct 2022
   * No recursion depth warning from the Memoize wrapper function.
     This was a backcompat breakage in 1.09
@@ -65,7 +74,177 @@ Release history for Memoize
   * Documentation fixes
 
 1.02  Mon 29 Nov 2010
-  * First release with a changelog, woo!
   * Synchronise with changes in bleadperl up to version 1.01_03.
   * Memoize::Saves, an experimental example module previously included in this
     distribution, has been removed and put into its own distribution on CPAN.
+
+1.01  Fri 12 Jul 2002
+  * Support for pre-5.6 perls (use of warnings pragma from 1.00 reverted)
+  * Better temporary file cleanup in t/errors.t
+  * Memoize::Expire test fixes
+
+1.00  Fri 29 Mar 2002
+  * Minor documentation and test changes only.
+
+0.66  Wed 12 Sep 2001
+  * Test changes only.
+  * 0.62 was the fist version that would be distributed with Perl.
+    I got so absorbed in integrating it that I wrote some tests
+    that used Time::HiRes. I knew this was safe because Time::HiRes
+    is also distributed with the same versions of Perl. I totally
+    forgot that some people will get the module off of CPAN without
+    Perl and they may not have Time::HiRes.
+    Sorry!
+
+0.65  Sun 24 Jun 2001
+  *                           N O T I C E !
+    ****************************************************************
+    **                                                            **
+    **   The TIE option is now strongly deprecated. It will be    **
+    **   permanently removed in the NEXT release of Memoize.      **
+    **   Please convert all extant software to use HASH instead.  **
+    **                                                            **
+    **   See the manual for details.                              **
+    **                                                            **
+    ****************************************************************
+
+    I'm sorry about this. I hate making incompatible changes. But as of
+    v0.65, Memoize is included in the Perl core. It is about to become
+    much more difficult to make incompatible interface changes; if I don't
+    get rid of TIE now, I may not get another chance.
+
+    TIE presented serious problems. First, it had a bizarre syntax. But
+    the big problem was that it was difficult and complicated for
+    expiration manager authors to support; evern expiration manager had to
+    duplicate the logic for handling TIE. HASH is much simpler to use,
+    more powerful, and is trivial for expiration managers to support.
+
+  * Many long-awaited cleanups and bug fixes.
+  * Memoize now works under threaded perl
+  * Slow tests speeded up. More test file improvements.
+  * Long-standing LIST_CACHE bug cleared up---it turns out that there
+    never was a bug. I put in tests for it anyway.
+  * Manual increased.
+
+0.62  Tue 24 Oct 2000
+  * No functional changes
+  * No more Memoize version check in ExpireFile test
+
+0.61  Tue 24 Oct 2000
+  * Tests for flush_cache()
+
+0.60  Mon 23 Oct 2000
+  * New Memoize::ExpireFile cache policy module
+  * flush_cache()
+  * [Various internal changes? --Ed.]
+
+0.52  Mon 20 Sep 1999
+  * New Memoize::Saves cache policy module which allows specifying that
+    certain function values whould always be looked up afresh
+
+0.51  Sat 18 Sep 1999
+  * Just a maintenance release. I made the tests a little more robust, and
+    I included the Memoization article that I forgot to put into 0.48.
+
+0.49  Fri 17 Sep 1999
+  * You can now expire data from the memoization cache according to any
+    expiration policy you desire. A sample policy is provided in the
+    Memoize::Expire module. It supports expiration of items that have been
+    in the cache a certain number of seconds and items that have been
+    accessed a certain number of times. When you call a memoized function,
+    and Memoize discovers that a cache item has expired, it calls the real
+    function and stores the result in the cache, just as if the data had
+    not been in the cache in the first place.
+
+    Many people asked for a cache expiration feature, and some people even
+    sent patches. Thanks for the patches! But I did not accept them,
+    because they all added the expiration stuff into the module, and I was
+    sure that this was a bad way to do it. Everyone had a different idea
+    of what useful expiration behavior was, so I foresaw an endless series
+    of creeeping features and an expiration mechansim that got more and
+    more and more complicated and slower and slower and slower.
+
+    The new expiration policy mechanism makes use of the TIE feature. You
+    write a cache policy module ( which might be very simple) and use the
+    TIE feature to insert it between memoize and the real cache. The
+    Memoize::Expire module. included in this package, is a useful example
+    of this that might satisfy many people. The documentation for that
+    module includes an even simpler module for those who would like to
+    implement their own expiration policies.
+
+    Big win: If you don't use the expiration feature, you don't pay for
+    it. Memoize 0.49 with expiration turned off runs *exactly* as fast as
+    Memoize 0.48 did. Not one line of code has been changed.
+
+    Moral of the story: Sometimes, there is a Right Way to Do Things that
+    really is better than the obvious way. It might not be obvious at
+    first, and sometimes you have to make people wait for features so that
+    the Right Way to Do Things can make itself known.
+
+    Many thanks to Mike Cariaso for helping me figure out The Right Way to
+    Do Things.
+
+    Also: If you try to use ODBM_File, NDBM_File, SDBM_File, GDBM_File, or
+    DB_File for the LIST_CACHE, you get an error right away, because those
+    kinds of files will only store strings. Thanks to Jonathan Roy for
+    suggesting this. If you want to store list values in a persistent
+    cache, try Memoize::Storable.
+
+0.48  Fri 15 Jan 1999
+  * Support for prototypes on memoized subs
+  * Attempt at a fix of wrapper bug under threaded perls
+
+0.47  Tue 15 Sep 1998
+  * Caching of function return values into NDBM files is now supported.
+    You can cache function return values into Memoize::AnyDBM files, which
+    is a pseudo-module that selects the "best" available DBM
+    implementation.
+  * Bug fix: Prototyped functions are now memoized correctly; memoizing
+    used to remove the prototype and issue a warning. Also new tests for
+    this feature. (Thanks Alex Dudkevich)
+  * New test suites for SDBM and NDBM caching and prototyped functions.
+  * Various small fixes in the test suite.
+  * Various documentation enhancements and fixes.
+
+0.46  Tue 08 Sep 1998
+  * Now has an interface to Storable. This wasn't formerly possible,
+    because the base package can only store caches via modules that
+    present a tied hash interface, and Storable doesn't. Solution:
+    Memoize::Storable is a tied hash interface to Storable.
+
+0.45  Sat 05 Sep 1998
+  * Storage of cached function return values in a static file is now
+    tentatively supported. memoize() now accepts new options SCALAR_CACHE
+    and LIST_CACHE to specify the destination and protocol for saving
+    cached values to disk.
+    Consider these features alpha, and please report bugs.
+  * The beta version is awaiting a more complete test suite.
+  * Much new documentation to support all this.
+
+0.06  Mon 23 Feb 1998
+  * Calling syntax is now
+      memoize(function, OPTION1 => VALUE1, ...)
+    instead of
+      memoize(function, { OPTION1 => VALUE1, ... })
+  * Functions that return lists can now be memoized.
+  * New tests for list-returning functions and their normalizers.
+  * Various documentation changes.
+  * Return value from unmemoize() is now the resulting unmemoized
+    function, instead of the constant 1. It was already docmuented
+    to do so.
+
+0.05  Thu 19 Feb 1998
+  * No changes
+
+0.04  Thu 19 Feb 1998
+  * INSTALL option to control name under which memoized sub is installed
+  * unmemoize function
+  * More documentation
+
+0.03  Thu 05 Feb 1998
+  * No sub redefinition warning when memoizing a named sub
+  * No undefined warning when normalizer returns undef
+  * A basic test suite
+
+0.02  Wed 04 Feb 1998
+  * Initial release

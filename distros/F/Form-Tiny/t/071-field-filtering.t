@@ -23,16 +23,20 @@ use Test::More;
 	form_field 'f3';
 
 	# use classes (deprecated)
-	field_filter (Form::Tiny::Filter->new(
-		type => Str,
-		code => sub { pop() . '+' }
-	));
+	field_filter(
+		Form::Tiny::Filter->new(
+			type => Str,
+			code => sub { pop() . '+' }
+		)
+	);
 
 	# use classes (current)
-	field_filter (Form::Tiny::Plugin::Filtered::Filter->new(
-		type => Str,
-		code => sub { pop() . '-' }
-	));
+	field_filter(
+		Form::Tiny::Plugin::Filtered::Filter->new(
+			type => Str,
+			code => sub { pop() . '-' }
+		)
+	);
 }
 
 my @data = (

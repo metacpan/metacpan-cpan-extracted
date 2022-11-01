@@ -3,7 +3,7 @@ Archive::SevenZip - Read/write 7z , zip , ISO9960 and other archives
 SYNOPSIS
 NAME
 
-Path::Class::Archive - treat archives as directories
+Path::Class::Archive::Handle - treat archives as directories
 
 
 
@@ -16,7 +16,7 @@ tool you use to manage your installation of Perl, e.g. any of
   cpan  .
   cpanp -i .
 
-Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Consult https://www.cpan.org/modules/INSTALL.html for further instruction.
 Should you wish to install this module manually, the procedure is
 
   perl Makefile.PL

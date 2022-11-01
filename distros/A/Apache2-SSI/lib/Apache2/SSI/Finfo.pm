@@ -1,11 +1,11 @@
 ## <https://perl.apache.org/docs/2.0/api/APR/Finfo.html>
 ##----------------------------------------------------------------------------
 ## Apache2 Server Side Include Parser - ~/lib/Apache2/SSI/Finfo.pm
-## Version v0.1.1
+## Version v0.1.2
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/12/18
-## Modified 2021/03/29
+## Modified 2022/10/21
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -18,13 +18,14 @@ BEGIN
     use warnings;
     use warnings::register;
     use parent qw( Module::Generic );
+    use vars qw( $VERSION $AUTOLOAD %EXPORT_TAGS @EXPORT_OK $ERROR );
     use Apache2::SSI::File::Type;
     use Exporter qw( import );
     use DateTime;
     use DateTime::Format::Strptime;
     use File::Basename ();
     use Nice::Try;
-    our( $AUTOLOAD );
+    our( $AUTOLOAD, $ERROR );
     use overload (
         q{""}    => sub    { $_[0]->{filepath} },
         bool     => sub () { 1 },
@@ -50,35 +51,38 @@ BEGIN
     use constant FINFO_CTIME => 10;
     use constant FINFO_BLOCK_SIZE => 11;
     use constant FINFO_BLOCKS => 12;
-    ## Sames constant value as in APR::Const
-    ##  the file type is undetermined.
+    # Sames constant value as in APR::Const
+    #  the file type is undetermined.
     use constant FILETYPE_NOFILE => 0;
-    ## a file is a regular file.
+    # a file is a regular file.
     use constant FILETYPE_REG => 1;
-    ## a file is a directory
+    # a file is a directory
     use constant FILETYPE_DIR => 2;
-    ## a file is a character device
+    # a file is a character device
     use constant FILETYPE_CHR => 3;
-    ## a file is a block device
+    # a file is a block device
     use constant FILETYPE_BLK => 4;
-    ## a file is a FIFO or a pipe.
+    # a file is a FIFO or a pipe.
     use constant FILETYPE_PIPE => 5;
-    ## a file is a symbolic link
+    # a file is a symbolic link
     use constant FILETYPE_LNK => 6;
-    ## a file is a [unix domain] socket.
+    # a file is a [unix domain] socket.
     use constant FILETYPE_SOCK => 7;
-    ## a file is of some other unknown type or the type cannot be determined.
+    # a file is of some other unknown type or the type cannot be determined.
     use constant FILETYPE_UNKFILE => 127;
     our %EXPORT_TAGS = ( all => [qw( FILETYPE_NOFILE FILETYPE_REG FILETYPE_DIR FILETYPE_CHR FILETYPE_BLK FILETYPE_PIPE FILETYPE_LNK FILETYPE_SOCK FILETYPE_UNKFILE )] );
     our @EXPORT_OK = qw( FILETYPE_NOFILE FILETYPE_REG FILETYPE_DIR FILETYPE_CHR FILETYPE_BLK FILETYPE_PIPE FILETYPE_LNK FILETYPE_SOCK FILETYPE_UNKFILE );
-    our $VERSION = 'v0.1.1';
+    our $VERSION = 'v0.1.2';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
     my $self = shift( @_ );
     my $file = shift( @_ ) || return( $self->error( "No file provided to instantiate a ", ref( $self ), " object." ) );
-    ## return( $self->error( "File or directory \"$file\" does not exist." ) ) if( !-e( $file ) );
+    # return( $self->error( "File or directory \"$file\" does not exist." ) ) if( !-e( $file ) );
     $self->{apache_request} = '';
     $self->{apr_finfo} = '';
     $self->{_init_strict_use_sub} = 1;
@@ -88,7 +92,7 @@ sub init
     my $r = $self->{apache_request};
     if( $r )
     {
-        ## <https://perl.apache.org/docs/2.0/api/Apache2/RequestRec.html#toc_C_filename_>
+        # <https://perl.apache.org/docs/2.0/api/Apache2/RequestRec.html#toc_C_filename_>
         try
         {
             my $finfo;
@@ -98,14 +102,14 @@ sub init
             }
             else
             {
-                $finfo = APR::Finfo::stat( $file, APR::Const::FINFO_NORM, $r->pool );
+                $finfo = APR::Finfo::stat( $file, &APR::Const::FINFO_NORM, $r->pool );
                 $r->finfo( $finfo );
             }
             $self->{apr_finfo} = $finfo;
         }
         catch( $e )
         {
-            ## This makes it possible to query this api even if provided with a non-existing file
+            # This makes it possible to query this api even if provided with a non-existing file
             if( $e =~ /No[[:blank:]\h]+such[[:blank:]\h]+file[[:blank:]\h]+or[[:blank:]\h]+directory/i )
             {
                 $self->{_data} = [];
@@ -227,7 +231,7 @@ sub device
 
 sub exists { return( shift->filetype == FILETYPE_NOFILE ? 0 : 1 ); }
 
-## Read-only
+# Read-only
 sub filepath { return( shift->_set_get_scalar( 'filepath' ) ); }
 
 sub filetype
@@ -241,7 +245,6 @@ sub filetype
     else
     {
         my $file = $self->{filepath};
-        $self->message( 3, "Stating file '$file'" );
         CORE::stat( $file );
         if( !-e( _ ) )
         {
@@ -426,7 +429,7 @@ sub protection
     my $f = $self->apr_finfo;
     if( $f )
     {
-        ## Will return something like 1860 (i.e. 744 = hex(1860))
+        # Will return something like 1860 (i.e. 744 = hex(1860))
         return( $f->protection );
     }
     else
@@ -519,11 +522,13 @@ sub _datetime
     }
 }
 
+# NOTE: Apache2::SSI::Datetime class
 package Apache2::SSI::Datetime;
 BEGIN
 {
     use strict;
     use warnings;
+    use vars qw( $ERROR );
     use overload (
         q{""}    => sub    { $_[0]->{dt}->stringify },
         bool     => sub () { 1 },
@@ -531,6 +536,9 @@ BEGIN
     );
     our( $ERROR );
 };
+
+use strict;
+use warnings;
 
 sub new
 {
@@ -545,6 +553,7 @@ sub error
     my $self = shift( @_ );
     if( @_ )
     {
+
         $self->{error} = $ERROR = join( '', @_ );
         return;
     }
@@ -667,7 +676,7 @@ Apache2::SSI::Finfo - Apache2 Server Side Include File Info Object Class
 
 =head1 VERSION
 
-    v0.1.1
+    v0.1.2
 
 =head1 DESCRIPTION
 

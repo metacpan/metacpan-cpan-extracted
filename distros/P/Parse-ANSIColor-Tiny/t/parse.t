@@ -55,6 +55,17 @@ eq_or_diff
   ],
   'no numbers at all means zero/clear';
 
+eq_or_diff
+  $p->parse(e "x\033[38;5;110;48;5;112mboth\033[49mfg\e[39mnone"),
+  [
+    [ [], 'x' ],
+    [ ['rgb234', 'on_rgb240' ], 'both' ],
+    [ ['rgb234'], 'fg' ],
+    [ [], 'none' ],
+  ],
+  'reset foreground and background with rgb colors';
+
+
 my $rev_then_blank = e "foo\033[01;31mbar\033[07m\033[32mbaz\033[00m";
 
 eq_or_diff

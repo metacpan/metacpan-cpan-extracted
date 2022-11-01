@@ -2,7 +2,7 @@
 ## Stripe API - ~/lib/Net/API/Stripe/Payment/Source/Owner.pm
 ## Version v0.100.0
 ## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2020/05/15
 ## 
@@ -11,37 +11,42 @@ package Net::API::Stripe::Payment::Source::Owner;
 BEGIN
 {
     use strict;
+    use warnings;
     use parent qw( Net::API::Stripe::Generic );
+    use vars qw( $VERSION );
     our( $VERSION ) = 'v0.100.0';
 };
 
-sub address { shift->_set_get_object( 'address', 'Net::API::Stripe::Address', @_ ); }
+use strict;
+use warnings;
 
-sub email { shift->_set_get_scalar( 'email', @_ ); }
+sub address { return( shift->_set_get_object( 'address', 'Net::API::Stripe::Address', @_ ) ); }
 
-sub name { shift->_set_get_scalar( 'name', @_ ); }
+sub email { return( shift->_set_get_scalar( 'email', @_ ) ); }
 
-sub phone { shift->_set_get_scalar( 'phone', @_ ); }
+sub name { return( shift->_set_get_scalar( 'name', @_ ) ); }
 
-sub verified_address { shift->_set_get_object( 'verified_address', 'Net::API::Stripe::Address', @_ ); }
+sub phone { return( shift->_set_get_scalar( 'phone', @_ ) ); }
 
-sub verified_email { shift->_set_get_scalar( 'verified_email', @_ ); }
+sub verified_address { return( shift->_set_get_object( 'verified_address', 'Net::API::Stripe::Address', @_ ) ); }
 
-sub verified_name { shift->_set_get_scalar( 'verified_name', @_ ); }
+sub verified_email { return( shift->_set_get_scalar( 'verified_email', @_ ) ); }
 
-sub verified_phone { shift->_set_get_scalar( 'verified_phone', @_ ); }
+sub verified_name { return( shift->_set_get_scalar( 'verified_name', @_ ) ); }
 
-sub receiver { shift->_set_get_object( 'receiver', 'Net::API::Stripe::Payment::Source::Receiver', @_ ); }
+sub verified_phone { return( shift->_set_get_scalar( 'verified_phone', @_ ) ); }
 
-sub redirect { shift->_set_get_object( 'redirect', 'Net::API::Stripe::Payment::Source::Redirect', @_ ); }
+sub receiver { return( shift->_set_get_object( 'receiver', 'Net::API::Stripe::Payment::Source::Receiver', @_ ) ); }
 
-sub statement_descriptor { shift->_set_get_scalar( 'statement_descriptor', @_ ); }
+sub redirect { return( shift->_set_get_object( 'redirect', 'Net::API::Stripe::Payment::Source::Redirect', @_ ) ); }
 
-sub status { shift->_set_get_scalar( 'status', @_ ); }
+sub statement_descriptor { return( shift->_set_get_scalar( 'statement_descriptor', @_ ) ); }
 
-sub type { shift->_set_get_scalar( 'type', @_ ); }
+sub status { return( shift->_set_get_scalar( 'status', @_ ) ); }
 
-sub usage { shift->_set_get_scalar( 'usage', @_ ); }
+sub type { return( shift->_set_get_scalar( 'type', @_ ) ); }
+
+sub usage { return( shift->_set_get_scalar( 'usage', @_ ) ); }
 
 1;
 
@@ -74,107 +79,99 @@ This is part of the L<Net::API::Stripe::Payment::Source> object
 
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>( %ARG )
+=head2 new( %ARG )
 
 Creates a new L<Net::API::Stripe::Payment::Source::Owner> object.
 It may also take an hash like arguments, that also are method of the same name.
 
-=back
-
 =head1 METHODS
 
-=over 4
-
-=item B<address> hash
+=head2 address hash
 
 Owner’s address.
 
 This is a L<Net::API::Stripe::Address> object.
 
-=item B<email> string
+=head2 email string
 
 Owner’s email address.
 
-=item B<name> string
+=head2 name string
 
 Owner’s full name.
 
-=item B<phone> string
+=head2 phone string
 
 Owner’s phone number (including extension).
 
-=item B<receiver> obsolete?
+=head2 receiver obsolete?
 
 This is a L<Net::API::Stripe::Payment::Source::Receiver> object, but it seems it was removed from the documentation.
 
-=item B<redirect> obsolete?
+=head2 redirect obsolete?
 
 This is a L<Net::API::Stripe::Payment::Source::Redirect> object, but it seems it was removed from the documentation.
 
-=item B<verified_address> hash
+=head2 verified_address hash
 
 Verified owner’s address. Verified values are verified or provided by the payment method directly (and if supported) at the time of authorization or settlement. They cannot be set or mutated.
 
 This is a L<Net::API::Stripe::Address> object.
 
-=item B<verified_email> string
+=head2 verified_email string
 
 Verified owner’s email address. Verified values are verified or provided by the payment method directly (and if supported) at the time of authorization or settlement. They cannot be set or mutated.
 
-=item B<verified_name> string
+=head2 verified_name string
 
 Verified owner’s full name. Verified values are verified or provided by the payment method directly (and if supported) at the time of authorization or settlement. They cannot be set or mutated.
 
-=item B<verified_phone> string
+=head2 verified_phone string
 
 Verified owner’s phone number (including extension). Verified values are verified or provided by the payment method directly (and if supported) at the time of authorization or settlement. They cannot be set or mutated.
 
-=back
-
 =head1 API SAMPLE
 
-	{
-	  "id": "src_fake123456789",
-	  "object": "source",
-	  "ach_credit_transfer": {
-		"account_number": "test_52796e3294dc",
-		"routing_number": "110000000",
-		"fingerprint": "ecpwEzmBOSMOqQTL",
-		"bank_name": "TEST BANK",
-		"swift_code": "TSTEZ122"
-	  },
-	  "amount": null,
-	  "client_secret": "src_client_secret_fake123456789",
-	  "created": 1571314413,
-	  "currency": "jpy",
-	  "flow": "receiver",
-	  "livemode": false,
-	  "metadata": {},
-	  "owner": {
-		"address": null,
-		"email": "jenny.rosen@example.com",
-		"name": null,
-		"phone": null,
-		"verified_address": null,
-		"verified_email": null,
-		"verified_name": null,
-		"verified_phone": null
-	  },
-	  "receiver": {
-		"address": "121042882-38381234567890123",
-		"amount_charged": 0,
-		"amount_received": 0,
-		"amount_returned": 0,
-		"refund_attributes_method": "email",
-		"refund_attributes_status": "missing"
-	  },
-	  "statement_descriptor": null,
-	  "status": "pending",
-	  "type": "ach_credit_transfer",
-	  "usage": "reusable"
-	}
+    {
+      "id": "src_fake123456789",
+      "object": "source",
+      "ach_credit_transfer": {
+        "account_number": "test_52796e3294dc",
+        "routing_number": "110000000",
+        "fingerprint": "ecpwEzmBOSMOqQTL",
+        "bank_name": "TEST BANK",
+        "swift_code": "TSTEZ122"
+      },
+      "amount": null,
+      "client_secret": "src_client_secret_fake123456789",
+      "created": 1571314413,
+      "currency": "jpy",
+      "flow": "receiver",
+      "livemode": false,
+      "metadata": {},
+      "owner": {
+        "address": null,
+        "email": "jenny.rosen@example.com",
+        "name": null,
+        "phone": null,
+        "verified_address": null,
+        "verified_email": null,
+        "verified_name": null,
+        "verified_phone": null
+      },
+      "receiver": {
+        "address": "121042882-38381234567890123",
+        "amount_charged": 0,
+        "amount_received": 0,
+        "amount_returned": 0,
+        "refund_attributes_method": "email",
+        "refund_attributes_status": "missing"
+      },
+      "statement_descriptor": null,
+      "status": "pending",
+      "type": "ach_credit_transfer",
+      "usage": "reusable"
+    }
 
 =head1 HISTORY
 

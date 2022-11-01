@@ -1,8 +1,53 @@
 package Graphics::ColorNames::VACCC;
 
+# ABSTRACT: VisiBone Anglo-Centric Color Codes
+
+
+require 5.006;
+
+use strict;
+use warnings;
+
+our $VERSION = '1.03';
+
+my %RgbColors = ();
+
+sub NamesRgbTable() {
+    use integer;
+    unless ( keys %RgbColors ) {
+        while ( my $line = <DATA> ) {
+            chomp($line);
+            if ($line) {
+                my $rgb = hex substr( $line, 0, 6 );
+                my $short = lc( substr( $line, 8, 3 ) );
+                $short =~ s/\s+$//;
+                my $long = lc( substr( $line, 11 ) );
+                $long =~ s/^\s+//;
+                $RgbColors{$short} = $rgb;
+                $RgbColors{$long}  = $rgb;
+                $long =~ s/\s+//g;
+                $RgbColors{$long} = $rgb;
+                $long =~ s/\-//g;
+                $RgbColors{$long} = $rgb;
+            }
+        }
+    }
+    return \%RgbColors;
+}
+
+1;
+
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
-Graphics::ColorNames::VACCC - VisiBone Anglo-Centric Color Codes for Graphics::ColorNames
+Graphics::ColorNames::VACCC - VisiBone Anglo-Centric Color Codes
+
+=head1 VERSION
+
+version 1.03
 
 =head1 SYNOPSIS
 
@@ -22,9 +67,29 @@ the L<Graphics::ColorNames> package.
 A description of this color scheme can be found at
 L<http://www.visibone.com/vaccc/>.
 
+=head1 SOURCE
+
+The development version is on github at L<https://github.com/robrwo/Graphics-ColorNames-VACCC>
+and may be cloned from L<git://github.com/robrwo/Graphics-ColorNames-VACCC.git>
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/robrwo/Graphics-ColorNames-VACCC/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
 =head1 AUTHOR
 
-Robert Rothenberg <rrwo at cpan.org>
+Robert Rothenberg <rrwo@cpan.org>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Spoon Reloaded
+
+Spoon Reloaded <spoon.reloaded@gmail.com>
 
 =head2 Acknowledgements
 
@@ -37,46 +102,15 @@ Afterwards I had lost the original E-mail.
 
 This version of the module was implemented separately.
 
-=head1 LICENSE
+=head1 COPYRIGHT AND LICENSE
 
-Copyright (c) 2004 Robert Rothenberg. All rights reserved.
-This program is free software; you can redistribute it and/or
-modify it under the same terms as Perl itself.
+This software is Copyright (c) 2004,2022 by Robert Rothenberg.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
 
 =cut
-
-require 5.006;
-
-use strict;
-use warnings;
-
-our $VERSION = '1.02';
-
-my %RgbColors   = ( );
-
-sub NamesRgbTable() {
-  use integer;
-  unless (keys %RgbColors) {
-    while (my $line = <DATA>) {
-      chomp($line);
-      if ($line) {
-	my $rgb   = eval "0x" . substr($line, 0, 6);
-#	die, unless ($rgb =~ /^\d+$/);
-	my $short = lc(substr($line, 8, 3)); $short =~ s/\s+$//;
-	my $long  = lc(substr($line, 11));   $long  =~ s/^\s+//;
-	$RgbColors{$short} = $rgb;
-	$RgbColors{$long}  = $rgb;
-	$long =~ s/\s+//g;
-	$RgbColors{$long}  = $rgb;
-	$long =~ s/\-//g;
-	$RgbColors{$long}  = $rgb;
-      }
-    }
-  }
-  return \%RgbColors;
-}
-
-1;
 
 __DATA__
 
@@ -296,4 +330,3 @@ CC3366 	MPR 	Medium Pink-Red
 FF3366 	LRP 	Light Red-Pink
 CC0033 	DRP 	Dark Red-Pink
 FF0033 	RRP 	Red-Red-Pink
-

@@ -10,7 +10,7 @@ use Perinci::CmdLine::Any;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-08-12'; # DATE
 our $DIST = 'App-PMUtils'; # DIST
-our $VERSION = '0.739'; # VERSION
+our $VERSION = '0.740'; # VERSION
 
 our %SPEC;
 $SPEC{pmlist} = {
@@ -82,8 +82,8 @@ _
             schema => 'bool',
             description => <<'_',
 
-By default, Perl usually adds `.` (the current directory) in the search dir.
-This option removes it.
+Older perls still include "." in default `@INC`. This option removes "." from
+`@INC`. In newer perls this option should be unnecessary.
 
 _
             tags => ['category:filtering'],
@@ -196,7 +196,7 @@ pmlist - List Perl modules (and PODs, and module prefixes)
 
 =head1 VERSION
 
-This document describes version 0.739 of pmlist (from Perl distribution App-PMUtils), released on 2022-08-12.
+This document describes version 0.740 of pmlist (from Perl distribution App-PMUtils), released on 2022-08-12.
 
 =head1 SYNOPSIS
 
@@ -205,6 +205,8 @@ Basic usage:
  % pmlist Mo      ; # search Mo.pm
  % pmlist Mo::    ; # search one level deep
  % pmlist Mo:: -R ; # search recursively (multiple levels)
+
+ % pmlist Mo:: -l ; # list detailed records e.g. path (much like 'ls -l' equivanet instead of just 'ls')
 
  % pmlist Type::Tiny -R --pod        ; # search .pm as well as .pod
  % pmlist Type::Tiny -R --pod --nopm ; # search .pod only
@@ -258,8 +260,8 @@ Only search in core directories.
 
 Do not include "." in search dir.
 
-By default, Perl usually adds C<.> (the current directory) in the search dir.
-This option removes it.
+Older perls still include "." in default C<@INC>. This option removes "." from
+C<@INC>. In newer perls this option should be unnecessary.
 
 
 =item B<--no-pm>

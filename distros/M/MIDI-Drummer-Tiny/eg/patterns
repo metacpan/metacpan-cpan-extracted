@@ -5,15 +5,19 @@ use warnings;
 use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(MIDI-Drummer-Tiny);
 use MIDI::Drummer::Tiny;
 
-my $d = MIDI::Drummer::Tiny->new( file => "$0.mid" );
+my $d = MIDI::Drummer::Tiny->new(
+    file    => "$0.mid",
+    bpm     => 90,
+    verbose => 1,
+);
 
 $d->count_in(1);
 
-$d->sync_patterns(
-    $d->closed_hh => [ ('11111111') x $d->bars ],
-    $d->snare     => [ ('0101') x $d->bars ],
-    $d->kick      => [ ('1010') x $d->bars ],
-);
+#$d->sync_patterns(
+#    $d->closed_hh => [ ('11111111') x $d->bars ],
+#    $d->snare     => [ ('0101') x $d->bars ],
+#    $d->kick      => [ ('1010') x $d->bars ],
+#);
 
 # For finer-grain control:
 #$d->sync(
@@ -21,5 +25,20 @@ $d->sync_patterns(
 #   sub { $d->pattern( instrument => $d->snare,     patterns => [ ('0101') x $d->bars ] ) },
 #   sub { $d->pattern( instrument => $d->kick,      patterns => [ ('1010') x $d->bars ] ) },
 #);
+
+$d->add_fill(
+    sub {
+        my $self = shift;
+        return {
+          duration         => 16,   # sixteenth note fill
+          $self->closed_hh => '00000000',
+          $self->snare     => '11111111',
+          $self->kick      => '00000000',
+        };
+    },
+    $d->closed_hh => [ '11111111' ],  # example phrase
+    $d->snare     => [ '0101' ],      # "
+    $d->kick      => [ '1010' ],      # "
+);
 
 $d->write;

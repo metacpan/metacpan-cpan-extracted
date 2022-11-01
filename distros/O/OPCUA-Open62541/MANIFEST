@@ -28,6 +28,7 @@ script/client-server-read-write.pl
 script/constant.pl
 script/destroy.pl
 script/packed-type.pl
+script/patch-tools_generate_datatypes_py
 t/client-browse-async.t
 t/client-browse.t
 t/client-browsenext-async.t
@@ -81,6 +82,7 @@ t/server-read.t
 t/server-references.t
 t/server-running.t
 t/server-variable.t
+t/server-write-error.t
 t/server.t
 t/statuscodes.t
 t/strict.t
@@ -93,6 +95,7 @@ t/types.t
 t/unicode.t
 t/variant-array.t
 t/variant-guid.t
+t/variant-leak.t
 t/variant-scalar.t
 t/variant.t
 typemap

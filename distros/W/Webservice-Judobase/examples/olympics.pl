@@ -37,7 +37,7 @@ for my $event_id ( keys %events ) {
         $stats{$event_id}{shido}  += $contest->{penalty};
 
         my @sections = split( ":", $contest->{duration} );
-        my $time = ( $sections[1] * 60 ) + $sections[2];
+        my $time     = ( $sections[1] * 60 ) + $sections[2];
         push @{ $stats{$event_id}{duration} }, $time;
 
     }

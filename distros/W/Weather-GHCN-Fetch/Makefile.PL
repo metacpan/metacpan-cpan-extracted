@@ -44,7 +44,7 @@ my %WriteMakefileArgs = (
     "Set::IntSpan::Fast" => 0,
     "Text::Abbrev" => 0,
     "Time::HiRes" => 0,
-    "Time::Piece" => 0,
+    "Time::Piece" => "1.32",
     "Try::Tiny" => 0,
     "YAML::Tiny" => 0,
     "base" => 0,
@@ -64,7 +64,7 @@ my %WriteMakefileArgs = (
     "Time::Local" => 0,
     "lib" => 0
   },
-  "VERSION" => "v0.0.008",
+  "VERSION" => "v0.0.009",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -101,7 +101,7 @@ my %FallbackPrereqs = (
   "Text::Abbrev" => 0,
   "Time::HiRes" => 0,
   "Time::Local" => 0,
-  "Time::Piece" => 0,
+  "Time::Piece" => "1.32",
   "Try::Tiny" => 0,
   "YAML::Tiny" => 0,
   "base" => 0,

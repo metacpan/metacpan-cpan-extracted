@@ -59,23 +59,23 @@ static OP *pp_equ_stringy(pTHX)
 }
 
 static const struct XSParseInfixHooks hooks_numeric = {
-  .cls = XPI_CLS_EQUALITY,
+  .cls               = XPI_CLS_EQUALITY,
   .wrapper_func_name = "Syntax::Operator::Equ::is_numequ",
-  .permit_hintkey = "Syntax::Operator::Equ/equ",
-  .ppaddr         = &pp_equ_numeric,
+  .permit_hintkey    = "Syntax::Operator::Equ/equ",
+  .ppaddr            = &pp_equ_numeric,
 };
 
 static const struct XSParseInfixHooks hooks_stringy = {
-  .cls = XPI_CLS_EQUALITY,
+  .cls               = XPI_CLS_EQUALITY,
   .wrapper_func_name = "Syntax::Operator::Equ::is_strequ",
-  .permit_hintkey = "Syntax::Operator::Equ/equ",
-  .ppaddr         = &pp_equ_stringy,
+  .permit_hintkey    = "Syntax::Operator::Equ/equ",
+  .ppaddr            = &pp_equ_stringy,
 };
 
 MODULE = Syntax::Operator::Equ    PACKAGE = Syntax::Operator::Equ
 
 BOOT:
-  boot_xs_parse_infix(0.15);
+  boot_xs_parse_infix(0.26);
 
   register_xs_parse_infix("===", &hooks_numeric, NULL);
   register_xs_parse_infix("equ", &hooks_stringy, NULL);

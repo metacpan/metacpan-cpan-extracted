@@ -51,6 +51,26 @@ OPERATORS
     denominator. This is implemented by using the % modulus operator and
     testing if the remainder is zero.
 
+FUNCTIONS
+
+    As a convenience, the following functions may be imported which
+    implement the same behaviour as the infix operators, though are
+    accessed via regular function call syntax.
+
+    These wrapper functions are implemented using XS::Parse::Infix, and
+    thus have an optimising call-checker attached to them. In most cases,
+    code which calls them should not in fact have the full runtime overhead
+    of a function call because the underlying test operator will get
+    inlined into the calling code at compiletime. In effect, code calling
+    these functions should run with the same performance as code using the
+    infix operators directly.
+
+ is_divisor
+
+       my $divides = is_divisor( $numerator, $denominator );
+
+    A function version of the "%%" operator.
+
 AUTHOR
 
     Paul Evans <leonerd@leonerd.org.uk>

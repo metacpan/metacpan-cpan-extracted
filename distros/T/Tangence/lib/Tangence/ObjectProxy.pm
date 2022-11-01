@@ -1,12 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.41;
+use Object::Pad 0.66;
 
-package Tangence::ObjectProxy 0.29;
+package Tangence::ObjectProxy 0.30;
 class Tangence::ObjectProxy;
 
 use Carp;
@@ -41,14 +41,14 @@ object.
 
 =cut
 
-has $_client :param :weak :reader;
-has $_id     :param       :reader;
-has $_class  :param       :reader;
+field $_client :param :weak :reader;
+field $_id     :param       :reader;
+field $_class  :param       :reader;
 
-has $_destroyed;
+field $_destroyed;
 
-has %_subscriptions;
-has %_props;
+field %_subscriptions;
+field %_props;
 
 method destroy
 {
@@ -846,9 +846,9 @@ by the C<watch_property_with_cursor> method.
 
 =cut
 
-   has $obj          :param :reader;
-   has $id           :param :reader;
-   has $element_type :param;
+   field $obj          :param :reader;
+   field $id           :param :reader;
+   field $element_type :param;
 
    sub BUILDARGS ( $class, $obj, $id, $element_type )
    {

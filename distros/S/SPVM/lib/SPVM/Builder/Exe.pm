@@ -486,6 +486,9 @@ sub create_bootstrap_header_source {
 #include <inttypes.h>
 #include <assert.h>
 
+// Only used for _setmode function and _O_BINARY
+#include <fcntl.h>
+
 #include "spvm_native.h"
 
 EOS
@@ -560,8 +563,15 @@ sub create_bootstrap_main_func_source {
 
 int32_t main(int32_t command_args_length, const char *command_args[]) {
 
+  // Binary mode in all systems
+#ifdef _WIN32
+  _setmode(stdout, _O_BINARY);
+  _setmode(stderr, _O_BINARY);
+  _setmode(stdin, _O_BINARY);
+#endif
+  
   SPVM_ENV* env = SPVM_NATIVE_new_env_prepared();
-
+  
   // Class name
   const char* class_name = "$class_name";
   

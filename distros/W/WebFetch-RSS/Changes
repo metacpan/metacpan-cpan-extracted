@@ -1,0 +1,34 @@
+Revision history for WebFetch::Input::RSS
+
+0.3.0 2022-10-25T23:42:57-07:00 America/Los_Angeles
+ [MINOR]
+ - renamed WebFetch::Input::RSS to WebFetch::RSS since the code reorg is
+   for output too
+ - WebFetch::Input::RSS remains as an alias for WebFetch::RSS for backward
+   compatibility
+
+ [REVISION]
+ - update tests against RSS spec samples to test usage as WebFetch::RSS and
+   WebFetch::Input::RSS
+ - update test data to follow WebFetch::Output::Capture fix in WebFetch
+   0.15.4
+
+0.2.1 2022-09-21T11:41:58-07:00 America/Los_Angeles
+ [BUG FIXES]
+ - bump WebFetch prerequisite to 0.15.3 to fix test problems observed by
+   CPAN Testers
+
+0.2.0 2022-09-19T21:38:44-07:00 America/Los_Angeles
+ [MINOR]
+ - submodules now use Config store to add CLI/API options & usage to
+   WebFetch
+
+ [REVISION]
+ - code modernization: update Perl Best Practices conformance to
+   Perl::Critic's "harsh" warning level
+ - code modernization: formatting with perltidy
+
+0.1.0 2022-07-18T23:55:47-07:00 America/Los_Angeles
+ [MINOR]
+ - reorg out from WebFetch distro to new module to separate its
+   dependencies

@@ -1,3 +1,9 @@
+0.08 2022-10-25T16:13:46+02:00
+ - Add 'no_data_callback' parameter to set list of elements which not
+   process 'data_callback'. Example is 'script' in which we don't need HTML
+   escaping.
+ - Update copyright years.
+
 0.07 2020-10-14T01:01:50+02:00
  - Add 'input_tags_item_callback' for processing before 'Tags' put().
  - Fix Makefile.PL fails with no '.' in @INC.

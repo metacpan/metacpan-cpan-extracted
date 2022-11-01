@@ -109,6 +109,16 @@ re-create the original file format by calling `wsnp()`:
 
 - `$orig_funit` - The frequency unit used by the original input file.
 
+## `rsnp_fh($fh, $options)` - Read touchstone file
+
+This is the same as `rsnp` except that it takes a file handle instead of a
+filename.  Additionally, `$options` accepts the following additional values:
+
+- `filename` - the original filename to facilitate more verbose error output.
+- `EOF_REGEX` - a regular expression that, when matched, will cause `rsnp_fh` to stop reading data.
+
+    This is used by [PDL::IO::MDIF](https://metacpan.org/pod/PDL::IO::MDIF) when loading multiple touchstone files from a single MDIF file.
+
 ## `wsnp($filename, $f, $m, $param_type, $z0, $comments, $fmt, $from_hz, $to_hz)`
 
 ### Arguments
@@ -308,11 +318,14 @@ MHz (inclusive):
           quiet => 1 # optional
         } )
 
-This function returns `$f` and `$m` verbatim if no `$args` are passed.
+This function returns `$f` and `$m` without interpolation if no `$args` are passed.
 
 - freq\_min\_hz: the minimum frequency at which to interpolate
 - freq\_max\_hz: the maximum frequency at which to interpolate
-- freq\_count: the total number of frequencies sampled
+- freq\_count: the total number of frequencies sampled.
+
+    If `freq_count` is `1` then only `freq_min_hz` is returned.
+
 - quiet: suppress warnings when interpolating beyond the available frequency range
 
 ## `$max_diff = f_uniformity($f)` - Return maximum frequency deviation.
@@ -361,14 +374,35 @@ For example, re-compose $T from the `m_to_pos_vecs` example.
 
         $T = pos_vecs_to_m($T11, $T12, $T21, $T22)
 
+## `%h = rsnp_hash(rsnp(...))` - Create a named hash from the return values of rsnp
+
+It is sometimes more familiar and readable to work with a hash of names instead
+of an index of arrays.  This function converts the return value of `rsnp` into
+a hash with the following fields.  The `[n]` values are the array index order
+into the list that `rsnp` returns.
+
+    %h = rsnp_hash(rsnp($filename, ...));
+
+    %h = rsnp_hash(rsnp_fh($filehandle, ...));
+
+- \[0\] freqs
+- \[1\] m
+- \[2\] param\_type
+- \[3\] z0\_ref
+- \[4\] comments
+- \[5\] output\_fmt
+- \[6\] funit
+- \[7\] orig\_f\_unit
+
 # SEE ALSO
 
+- [PDL::IO::MDIF](https://metacpan.org/pod/PDL::IO::MDIF) - A [PDL](https://metacpan.org/pod/PDL) IO module to load Measurement Data Interchange Format (\*.mdf) files.
 - [RF::Component](https://metacpan.org/pod/RF::Component) - An object-oriented encapsulation of `PDL::IO::Touchstone`.
 - Touchstone specification: [https://ibis.org/connector/touchstone\_spec11.pdf](https://ibis.org/connector/touchstone_spec11.pdf)
 - S-parameter matrix transform equations: [http://qucs.sourceforge.net/tech/node98.html](http://qucs.sourceforge.net/tech/node98.html)
-- Building MDF files from multiple S2P files: [https://youtu.be/q1ixcb\_mgeM](https://youtu.be/q1ixcb_mgeM), [https://github.com/KJ7NLL/mdf/](https://github.com/KJ7NLL/mdf/)
+- Building MDIF/MDF files from multiple S2P files: [https://youtu.be/q1ixcb\_mgeM](https://youtu.be/q1ixcb_mgeM), [https://github.com/KJ7NLL/mdf/](https://github.com/KJ7NLL/mdf/)
 - Optimizing amplifer impedance match circuits with MDF files: [https://youtu.be/nx2jy7EHzxw](https://youtu.be/nx2jy7EHzxw)
-- MDF file format: [https://awrcorp.com/download/faq/english/docs/users\_guide/data\_file\_formats.html#i489154](https://awrcorp.com/download/faq/english/docs/users_guide/data_file_formats.html#i489154)
+- MDIF file format: [https://awrcorp.com/download/faq/english/docs/users\_guide/data\_file\_formats.html#i489154](https://awrcorp.com/download/faq/english/docs/users_guide/data_file_formats.html#i489154)
 - "Conversions Between S, Z, Y, h, ABCD, and T Parameters which are Valid
 for Complex Source and Load Impedances" March 1994 IEEE Transactions on
 Microwave Theory and Techniques 42(2):205 - 211 [https://www.researchgate.net/publication/3118645](https://www.researchgate.net/publication/3118645)

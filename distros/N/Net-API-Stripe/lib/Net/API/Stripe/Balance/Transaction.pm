@@ -1,51 +1,61 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Balance/Transaction.pm
-## Version v0.100.0
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Version v0.101.0
+## Copyright(c) 2020 DEGUEST Pte. Ltd.
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
-## Modified 2020/05/15
+## Modified 2020/11/15
+## All rights reserved
 ## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 ## https://stripe.com/docs/api/balance/balance_transaction
 package Net::API::Stripe::Balance::Transaction;
 BEGIN
 {
     use strict;
+    use warnings;
     use parent qw( Net::API::Stripe::Generic );
-    our( $VERSION ) = 'v0.100.0';
+    use vars qw( $VERSION );
+    our( $VERSION ) = 'v0.101.0';
 };
 
-sub id { shift->_set_get_scalar( 'id', @_ ); }
+use strict;
+use warnings;
 
-sub object { shift->_set_get_scalar( 'object', @_ ); }
+sub id { return( shift->_set_get_scalar( 'id', @_ ) ); }
 
-sub amount { shift->_set_get_number( 'amount', @_ ); }
+sub object { return( shift->_set_get_scalar( 'object', @_ ) ); }
 
-sub available_on { shift->_set_get_datetime( 'available_on', @_ ); }
+sub amount { return( shift->_set_get_number( 'amount', @_ ) ); }
 
-sub created { shift->_set_get_datetime( 'created', @_ ); }
+sub available_on { return( shift->_set_get_datetime( 'available_on', @_ ) ); }
 
-sub currency { shift->_set_get_scalar( 'currency', @_ ); }
+sub created { return( shift->_set_get_datetime( 'created', @_ ) ); }
 
-sub description { shift->_set_get_scalar( 'description', @_ ); }
+sub currency { return( shift->_set_get_scalar( 'currency', @_ ) ); }
 
-sub exchange_rate { shift->_set_get_number( 'exchange_rate', @_ ); }
+sub description { return( shift->_set_get_scalar( 'description', @_ ) ); }
 
-sub fee { shift->_set_get_number( 'fee', @_ ); }
+sub exchange_rate { return( shift->_set_get_number( 'exchange_rate', @_ ) ); }
+
+sub fee { return( shift->_set_get_number( 'fee', @_ ) ); }
 
 ## Array of Net::API::Stripe::Balance::Transaction::FeeDetails
-sub fee_details { shift->_set_get_object_array( 'fee_details', 'Net::API::Stripe::Balance::Transaction::FeeDetails', @_ ); }
+sub fee_details { return( shift->_set_get_object_array( 'fee_details', 'Net::API::Stripe::Balance::Transaction::FeeDetails', @_ ) ); }
 
-sub net { shift->_set_get_number( 'net', @_ ); }
+sub net { return( shift->_set_get_number( 'net', @_ ) ); }
 
-sub source { shift->_set_get_scalar_or_object_variant( 'source', @_ ); }
+sub reporting_category { return( shift->_set_get_scalar( 'reporting_category', @_ ) ); }
+
+sub source { return( shift->_set_get_scalar_or_object_variant( 'source', @_ ) ); }
 
 sub sourced_transfers { return( shift->_set_get_object( 'sourced_transfers', 'Net::API::Stripe::List', @_ ) ); }
 
-sub status { shift->_set_get_scalar( 'status', @_ ); }
+sub status { return( shift->_set_get_scalar( 'status', @_ ) ); }
 
-sub type { shift->_set_get_scalar( 'type', @_ ); }
+sub type { return( shift->_set_get_scalar( 'type', @_ ) ); }
 
 1;
 
@@ -66,19 +76,19 @@ Net::API::Stripe::Balance::Transaction - The Balance Transaction object
         currency => 'jpy',
         description => 'Customer account credit',
         fee_details => Net::API::Stripe::Balance::Transaction::FeeDetails->new({
-			amount => 40,
-			currency => 'eur',
-			description => 'Some transaction',
-			type => 'application_fee',
-		}),
-		net => 1960,
-		status => 'available',
-		type => 'application_fee',
+            amount => 40,
+            currency => 'eur',
+            description => 'Some transaction',
+            type => 'application_fee',
+        }),
+        net => 1960,
+        status => 'available',
+        type => 'application_fee',
     }) || die( $stripe->error );
 
 =head1 VERSION
 
-    v0.100.0
+    v0.101.0
 
 =head1 DESCRIPTION
 
@@ -86,89 +96,87 @@ Balance transactions represent funds moving through your Stripe account. They're
 
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>( %ARG )
+=head2 new( %ARG )
 
 Creates a new L<Net::API::Stripe::Balance::Transaction> object
 
-=back
-
 =head1 METHODS
 
-=over 4
-
-=item B<id> string
+=head2 id string
 
 Unique identifier for the object.
 
-=item B<object> string, value is "balance_transaction"
+=head2 object string, value is "balance_transaction"
 
 String representing the object’s type. Objects of the same type share the same value.
 
-=item B<amount> integer
+=head2 amount integer
 
 Gross amount of the transaction, in JPY.
 
-=item B<available_on> timestamp
+=head2 available_on timestamp
 
 The date the transaction’s net funds will become available in the Stripe balance.
 
-=item B<created> timestamp
+=head2 created timestamp
 
 Time at which the object was created. Measured in seconds since the Unix epoch.
 
-=item B<currency> currency
+=head2 currency currency
 
 Three-letter ISO currency code, in lowercase. Must be a supported currency (L<https://stripe.com/docs/currencies>).
 
-=item B<description> string
+=head2 description string
 
 An arbitrary string attached to the object. Often useful for displaying to users.
 
-=item B<exchange_rate> decimal
+=head2 exchange_rate decimal
 
 fee integer
 
 Fees (in JPY) paid for this transaction.
 
-=item B<fee_details> array of L<Net::API::Stripe::Balance::Transaction::FeeDetails> objects
+=head2 fee_details array of L<Net::API::Stripe::Balance::Transaction::FeeDetails> objects
 
 Detailed breakdown of fees (in JPY) paid for this transaction.
 
-=over 8
+=over 4
 
-=item B<amount> integer
+=item I<amount> integer
 
 Amount of the fee, in cents.
 
-=item B<application> string
+=item I<application> string
 
-=item B<currency> currency
+=item I<currency> currency
 
 Three-letter ISO currency code, in lowercase. Must be a supported currency.
 
-=item B<description> string
+=item I<description> string
 
 An arbitrary string attached to the object. Often useful for displaying to users.
 
-=item B<type> string
+=item I<type> string
 
 Type of the fee, one of: application_fee, stripe_fee or tax.
 
 =back
 
-=item B<net> integer
+=head2 net integer
 
 Net amount of the transaction, in JPY.
 
-=item B<source> string (expandable)
+=head2 reporting_category string
+
+L<Learn more|https://stripe.com/docs/reports/reporting-categories> about how reporting categories can help you understand balance transactions from an accounting perspective.
+
+=head2 source string (expandable)
 
 The Stripe object to which this transaction is related.
 
 For example, a charge object. This is managed with L<Net::API::Stripe::Generic/"_set_get_scalar_or_object_variant"> method. It will check if this is a hash, array or string, and will find out the proper associated class by peeking into the data.
 
-=item B<sourced_transfers> array
+=head2 sourced_transfers array
 
 This is a list of object, but according to Stripe and its support, it is deprecated.
 
@@ -176,15 +184,15 @@ The "sourced_transfers parameters used to include any charges or ACH payments to
 
 See L<https://stripe.com/docs/upgrades#2017-01-27>
 
-=item B<status> string
+=head2 status string
 
 If the transaction’s net funds are available in the Stripe balance yet. Either available or pending.
 
-=item B<type> string
+=head2 type string
 
 Transaction type:
 
-=over 8
+=over 4
 
 =item I<adjustment>
 
@@ -246,34 +254,32 @@ Transaction type:
 
 =back
 
-=back
-
 =head1 API SAMPLE
 
-	{
-	  "id": "txn_1FTlZvCeyNCl6fY2qIteNrPe",
-	  "object": "balance_transaction",
-	  "amount": 8000,
-	  "available_on": 1571443200,
-	  "created": 1571128827,
-	  "currency": "jpy",
-	  "description": "Invoice 409CD54-0039",
-	  "exchange_rate": null,
-	  "fee": 288,
-	  "fee_details": [
-		{
-		  "amount": 288,
-		  "application": null,
-		  "currency": "jpy",
-		  "description": "Stripe processing fees",
-		  "type": "stripe_fee"
-		}
-	  ],
-	  "net": 7712,
-	  "source": "ch_1FTlZvCeyNCl6fY2YAZ8thLx",
-	  "status": "pending",
-	  "type": "charge"
-	}
+    {
+      "id": "txn_fake1234567890",
+      "object": "balance_transaction",
+      "amount": 8000,
+      "available_on": 1571443200,
+      "created": 1571128827,
+      "currency": "jpy",
+      "description": "Invoice 409CD54-0039",
+      "exchange_rate": null,
+      "fee": 288,
+      "fee_details": [
+        {
+          "amount": 288,
+          "application": null,
+          "currency": "jpy",
+          "description": "Stripe processing fees",
+          "type": "stripe_fee"
+        }
+      ],
+      "net": 7712,
+      "source": "ch_fake1234567890",
+      "status": "pending",
+      "type": "charge"
+    }
 
 =head1 HISTORY
 

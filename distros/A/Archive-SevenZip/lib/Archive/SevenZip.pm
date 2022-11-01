@@ -31,7 +31,7 @@ Archive::SevenZip - Read/write 7z , zip , ISO9960 and other archives
 
 =cut
 
-our $VERSION= '0.13';
+our $VERSION= '0.15';
 
 # Archive::Zip API
 # Error codes
@@ -383,11 +383,15 @@ sub extractMember {
     };
     if( basename $memberOrName ne $target_name ) {
         my $org = basename($memberOrName);
-        if( $^O !~ /mswin/i) {
-            $org = encode('UTF-8', $org);
-        };
-        rename "$target_dir/" . $org => $extractedName
-            or croak "Couldn't move '$memberOrName' to '$extractedName': $!";
+
+        # Maybe, _maybe_, we need to look for the file using UTF-8
+        # encoded filenames, but also, maybe not. So let's try both...
+        my $src = "$target_dir/$org";
+        if( ! -f $src ) {
+            $src = "$target_dir/" . encode('UTF-8', $org);
+        }
+        rename $src => $extractedName
+            or croak "Couldn't move '$src' ('$memberOrName') to '$extractedName': $!";
     };
 
     return AZ_OK;
@@ -656,6 +660,17 @@ sub add_directory {
     #);
 };
 
+=head2 C<< $ar->add >>
+
+    $ar->add( items => ["real_etc" => "name_in_archive" ] );
+
+Adds elements to an archive
+
+This currently ignores the directory date and time if the directory
+exists
+
+=cut
+
 sub add {
     my( $self, %options )= @_;
 
@@ -768,7 +783,7 @@ use strict;
 
 =head1 NAME
 
-Path::Class::Archive - treat archives as directories
+Path::Class::Archive::Handle - treat archives as directories
 
 =cut
 

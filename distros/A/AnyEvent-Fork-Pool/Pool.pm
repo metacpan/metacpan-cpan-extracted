@@ -48,10 +48,10 @@ L<AnyEvent::Fork::Remote>) and the RPC protocol implement in
 L<AnyEvent::Fork::RPC> to create a load-balanced pool of processes that
 handles jobs.
 
-Understanding of L<AnyEvent::Fork> is helpful but not critical to be able
-to use this module, but a thorough understanding of L<AnyEvent::Fork::RPC>
-is, as it defines the actual API that needs to be implemented in the
-worker processes.
+Understanding L<AnyEvent::Fork> is helpful but not required to use this
+module, but a thorough understanding of L<AnyEvent::Fork::RPC> is, as
+it defines the actual API that needs to be implemented in the worker
+processes.
 
 =head1 PARENT USAGE
 
@@ -96,7 +96,7 @@ use AnyEvent::Fork::RPC;
 my $magic0 = ':t6Z@HK1N%Dx@_7?=~-7NQgWDdAs6a,jFN=wLO0*jD*1%P';
 my $magic1 = '<~53rexz.U`!]X[A235^"fyEoiTF\T~oH1l/N6+Djep9b~bI9`\1x%B~vWO1q*';
 
-our $VERSION = 1.2;
+our $VERSION = 1.3;
 
 =item my $pool = AnyEvent::Fork::Pool::run $fork, $function, [key => value...]
 

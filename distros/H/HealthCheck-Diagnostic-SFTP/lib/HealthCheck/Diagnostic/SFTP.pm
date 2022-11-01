@@ -3,7 +3,7 @@ use parent 'HealthCheck::Diagnostic';
 
 # ABSTRACT: Check for SFTP access and operations in a HealthCheck
 use version;
-our $VERSION = 'v1.4.2'; # VERSION
+our $VERSION = 'v1.5.0'; # VERSION
 
 use strict;
 use warnings;
@@ -53,7 +53,7 @@ sub run {
     my $port        = $ssh_args->{port};
     my $user        = $params{user};
     my $name        = $params{name};
-    my $timeout     = $params{timeout} // 3;
+    my $timeout     = $params{timeout} // 10;
     my $target      = sprintf(
         "%s%s%s",
         $user ? $user . '@' : '',
@@ -131,7 +131,7 @@ HealthCheck::Diagnostic::SFTP - Check for SFTP access and operations in a Health
 
 =head1 VERSION
 
-version v1.4.2
+version v1.5.0
 
 =head1 SYNOPSIS
 
@@ -141,7 +141,7 @@ version v1.4.2
     HealthCheck::Diagnostic::SFTP->check(
         host    => 'sftp.example.com',
         user    => 'auser',
-        timeout => 3, # default
+        timeout => 10, # default
     );
 
     # Check that the './history' file exists on the host.
@@ -212,7 +212,7 @@ Additional SSH connection arguments.
 
 Sets up an C<ALRM> signal handler used to timeout the initial connection attempt
 after the number of seconds provided.
-Defaults to 3.
+Defaults to 10.
 
 =head1 DEPENDENCIES
 

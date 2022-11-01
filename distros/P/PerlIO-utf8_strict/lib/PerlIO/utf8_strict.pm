@@ -1,5 +1,5 @@
 package PerlIO::utf8_strict;
-$PerlIO::utf8_strict::VERSION = '0.009';
+$PerlIO::utf8_strict::VERSION = '0.010';
 use strict;
 use warnings;
 
@@ -23,7 +23,7 @@ PerlIO::utf8_strict - Fast and correct UTF-8 IO
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 

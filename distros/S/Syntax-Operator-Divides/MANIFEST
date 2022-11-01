@@ -6,6 +6,7 @@ lib/Syntax/Operator/Divides.xs
 MANIFEST			This list of files
 t/00use.t
 t/01divides.t
+t/11func.t
 t/80match-divides.t
 t/99pod.t
 README

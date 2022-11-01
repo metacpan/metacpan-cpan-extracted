@@ -1,0 +1,251 @@
+---
+countries:
+  AT:
+    CONCAT: []
+    country: AUSTRIA
+  BG:
+    Bulgarian Personal Number:
+      - Passport
+      - National ID
+      - Driving licence
+    CONCAT: []
+    country: BULGARIA
+  CY:
+    National Passport Number:
+      - Passport
+    CONCAT: []
+    country: CYPRUS
+  CZ:
+    CONCAT: []
+    National Identification Number:
+      - National ID
+      - Driving licence
+    Passport number:
+      - Passport
+    country: CZECH REPUBLIC
+  DE:
+    CONCAT: []
+    country: GERMANY
+  DK:
+    CONCAT: []
+    Personal Identity Code:
+      - Passport
+      - Health care card
+      - Driving licence
+    country: DENMARK
+  EE:
+    Estonian Personal Identification Code:
+      - Passport
+      - National ID
+      - Driving licence
+    country: ESTONIA
+  ES:
+    Tax identification number:
+      - CRS form
+      - National ID
+      - Driving licence
+      - Social Security Card
+    country: SPAIN
+  FI:
+    CONCAT: []
+    Personal Identity Code:
+      - Passport
+      - National ID
+      - Driving licence
+    country: FINLAND
+  FR:
+    CONCAT: []
+    country: FRANCE
+  GB:
+    CONCAT: []
+    UK National Insurance Number:
+      - National Insurance Card
+      - Payslip
+      - Form P60
+      - Tax return
+    country: UNITED KINGDOM
+  GR:
+    CONCAT: []
+    DSS investor share: []
+    country: GREECE
+  HR:
+    CONCAT: []
+    Personal Identification Number:
+      - National ID
+    country: CROATIA
+  HU:
+    CONCAT: []
+    country: HUNGARY
+  IE:
+    CONCAT: []
+    country: IRELAND
+  IS:
+    Personal Identity Code:
+      - Passport
+      - National ID
+      - Driving licence
+    country: ICELAND
+  IT:
+    Fiscal code:
+      - CRS form
+      - Can also be found on National Health Service card
+    country: ITALY
+  LI:
+    CONCAT: []
+    National ID Card Number:
+      - National ID
+    National Passport Number:
+      - Passport
+    country: LICHTENSTEIN
+  LT:
+    CONCAT: []
+    National Passport Number:
+      - Passport
+      - National ID
+    Personal Code:
+      - Passport
+      - National ID
+      - Driving licence
+    country: LITHUANIA
+  LV:
+    CONCAT: []
+    Personal Code:
+      - Passport
+      - National ID
+    country: LATVIA
+  LX:
+    CONCAT: []
+    country: LUXEMBOURG
+  MT:
+    National Identification Number:
+      - National ID
+    National Passport Number:
+      - Passport
+    country: MALTA
+  NL:
+    CONCAT: []
+    National Identity Card:
+      - National ID
+    National Passport Number:
+      - Passport
+    country: NETHERLANDS
+  NO:
+    CONCAT: []
+    Personal ID (Foedselsnummer):
+      - Passport
+      - National ID
+      - Driving licence
+    country: NORWAY
+  PL:
+    National Identification Number:
+      - National ID
+      - Driving licence
+      - Birth certificate
+    Tax Number (NIP):
+      - CRS form
+      - Can also be found on PIT8 form
+    country: POLAND
+  PT:
+    CONCAT: []
+    National Passport Number:
+      - Passport
+    Tax Number:
+      - CRS form
+    country: PORTUGAL
+  RO:
+    CONCAT: []
+    National Identification Number:
+      - National ID
+      - Driving licence
+      - Birth certificate
+    National Passport Number:
+      - Passport
+    country: ROMANIA
+  SE:
+    CONCAT: []
+    Personal Identity Number:
+      - Passport
+      - Driving licence
+      - Health care card
+    country: SWEDEN
+  SK:
+    CONCAT: []
+    National Passport Number:
+      - Passport
+    Personal Number:
+      - National ID
+      - Driving licence
+      - Birth certificate
+    country: SLOVAKIA
+  SL:
+    CONCAT: []
+    Personal Identification Number:
+      - Passport
+      - National ID
+    country: SLOVENIA
+prefixes:
+  - mhic giolla
+  - auf dem
+  - aus der
+  - van den
+  - van der
+  - von dem
+  - von den
+  - von der
+  - van de
+  - de l'
+  - de la
+  - de le
+  - mhac
+  - mhíc
+  - auf
+  - del
+  - dos
+  - mac
+  - mic
+  - níc
+  - van
+  - vom
+  - von
+  - am
+  - da
+  - de
+  - di
+  - do
+  - du
+  - im
+  - la
+  - le
+  - mc
+  - ni
+  - ní
+  - ua
+  - ui
+  - uí
+  - d
+  - o
+  - ó
+titles:
+  - atty
+  - coach
+  - dame
+  - dr
+  - fr
+  - gov
+  - honorable
+  - madame
+  - madam
+  - maid
+  - master
+  - miss
+  - monsieur
+  - mr
+  - mrs
+  - ms
+  - mx
+  - ofc
+  - ph.d
+  - pres
+  - prof
+  - rev
+  - sir

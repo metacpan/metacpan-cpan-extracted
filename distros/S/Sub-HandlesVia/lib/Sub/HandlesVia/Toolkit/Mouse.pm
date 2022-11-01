@@ -5,7 +5,7 @@ use warnings;
 package Sub::HandlesVia::Toolkit::Mouse;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.038';
+our $VERSION   = '0.044';
 
 use Sub::HandlesVia::Mite;
 extends 'Sub::HandlesVia::Toolkit';
@@ -16,8 +16,28 @@ sub setup_for {
 	
 	require Mouse::Util;
 	my $meta = Mouse::Util::find_meta($target);
-	Role::Tiny->apply_roles_to_object($meta, $me->package_trait);
-	Role::Tiny->apply_roles_to_object($meta, $me->role_trait) if $meta->isa('Mouse::Meta::Role');
+	$me->meta_hack( $meta );
+}
+
+sub meta_hack {
+	my ( $me, $meta ) = ( shift, @_ );
+	
+	require Mouse::Util::MetaRole;
+	
+	if ( $meta->isa('Mouse::Meta::Role') ) {
+		
+		return Mouse::Util::MetaRole::apply_metaroles(
+			for             => $meta,
+			role_metaroles  => { role => [ $me->package_trait, $me->role_trait ] },
+		);
+	}
+	else {
+		
+		return Mouse::Util::MetaRole::apply_metaroles(
+			for             => $meta,
+			class_metaroles => { class => [ $me->package_trait ] },
+		);
+	}
 }
 
 sub package_trait {
@@ -155,9 +175,9 @@ sub code_generator_for_attribute {
 package Sub::HandlesVia::Toolkit::Mouse::PackageTrait;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.038';
+our $VERSION   = '0.044';
 
-use Role::Tiny;
+use Mouse::Role;
 
 sub _shv_toolkit {
 	'Sub::HandlesVia::Toolkit::Mouse',
@@ -193,28 +213,15 @@ around add_attribute => sub {
 package Sub::HandlesVia::Toolkit::Mouse::RoleTrait;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.038';
+our $VERSION   = '0.044';
 
-use Role::Tiny;
+use Mouse::Role;
+requires '_shv_toolkit';
 
 around apply => sub {
 	my ($next, $self, $other, %args) = (shift, shift, @_);
-	
-	if ($other->isa('Mouse::Meta::Role')) {
-		Role::Tiny->apply_roles_to_object(
-			$other,
-			$self->_shv_toolkit->package_trait,
-			$self->_shv_toolkit->role_trait,
-		);
-	}
-	else {
-		Role::Tiny->apply_roles_to_object(
-			$other,
-			$self->_shv_toolkit->package_trait,
-		);
-	}
-	
-	$self->$next(@_);
+	$other = $self->_shv_toolkit->meta_hack( $other );
+	$self->$next( $other, %args );
 };
 
 1;

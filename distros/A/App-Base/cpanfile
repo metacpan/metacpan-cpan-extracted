@@ -5,7 +5,7 @@ requires 'Moose::Role';
 requires 'MooseX::Types';
 requires 'Path::Tiny';
 requires 'Text::Reform';
-requires 'Try::Tiny';
+requires 'Syntax::Keyword::Try';
 requires 'namespace::autoclean';
 requires 'perl', '5.01';
 

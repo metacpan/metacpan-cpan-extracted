@@ -2,7 +2,7 @@
 ## Stripe API - ~/lib/Net/API/Stripe/Token.pm
 ## Version v0.100.0
 ## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2020/05/15
 ## 
@@ -12,31 +12,36 @@ package Net::API::Stripe::Token;
 BEGIN
 {
     use strict;
+    use warnings;
     use parent qw( Net::API::Stripe::Generic );
+    use vars qw( $VERSION );
     our( $VERSION ) = 'v0.100.0';
 };
 
-sub id { shift->_set_get_scalar( 'id', @_ ); }
+use strict;
+use warnings;
 
-sub object { shift->_set_get_scalar( 'object', @_ ); }
+sub id { return( shift->_set_get_scalar( 'id', @_ ) ); }
 
-sub bank_account { shift->_set_get_object( 'bank_account', 'Net::API::Stripe::Payment::BankAccount', @_ ); }
+sub object { return( shift->_set_get_scalar( 'object', @_ ) ); }
 
-sub card { shift->_set_get_object( 'card', 'Net::API::Stripe::Payment::Card', @_ ); }
+sub bank_account { return( shift->_set_get_object( 'bank_account', 'Net::API::Stripe::Payment::BankAccount', @_ ) ); }
 
-sub client_ip { shift->_set_get_scalar( 'client_ip', @_ ); }
+sub card { return( shift->_set_get_object( 'card', 'Net::API::Stripe::Payment::Card', @_ ) ); }
 
-sub created { shift->_set_get_datetime( 'created', @_ ); }
+sub client_ip { return( shift->_set_get_scalar( 'client_ip', @_ ) ); }
 
-sub livemode { shift->_set_get_boolean( 'livemode', @_ ); }
+sub created { return( shift->_set_get_datetime( 'created', @_ ) ); }
+
+sub livemode { return( shift->_set_get_boolean( 'livemode', @_ ) ); }
 
 ## account, bank_account, card, person, or pii
-sub type { shift->_set_get_scalar( 'type', @_ ); }
+sub type { return( shift->_set_get_scalar( 'type', @_ ) ); }
 
-sub used { shift->_set_get_boolean( 'used', @_ ); }
+sub used { return( shift->_set_get_boolean( 'used', @_ ) ); }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf8
@@ -71,96 +76,88 @@ Tokens cannot be stored or used more than once. To store card or bank account in
 
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>( %ARG )
+=head2 new( %ARG )
 
 Creates a new L<Net::API::Stripe::Token> object.
 It may also take an hash like arguments, that also are method of the same name.
 
-=back
-
 =head1 METHODS
 
-=over 4
-
-=item B<id> string
+=head2 id string
 
 Unique identifier for the object.
 
-=item B<object> string, value is "token"
+=head2 object string, value is "token"
 
 String representing the object’s type. Objects of the same type share the same value.
 
-=item B<bank_account> hash
+=head2 bank_account hash
 
 Hash describing the bank account.
 
 This is a L<Net::API::Stripe::Payment::BankAccount> object.
 
-=item B<card> hash
+=head2 card hash
 
 Hash describing the card used to make the charge.
 
 This is a L<Net::API::Stripe::Payment::Card> object.
 
-=item B<client_ip> string
+=head2 client_ip string
 
 IP address of the client that generated the token.
 
-=item B<created> timestamp
+=head2 created timestamp
 
 Time at which the object was created. Measured in seconds since the Unix epoch.
 
-=item B<livemode> boolean
+=head2 livemode boolean
 
 Has the value true if the object exists in live mode or the value false if the object exists in test mode.
 
-=item B<type> string
+=head2 type string
 
 Type of the token: account, bank_account, card, or pii.
 
-=item B<used> boolean
+=head2 used boolean
 
 Whether this token has already been used (tokens can be used only once).
 
-=back
-
 =head1 API SAMPLE
 
-	{
-	  "id": "tok_fake123456789",
-	  "object": "token",
-	  "card": {
-		"id": "card_fake123456789",
-		"object": "card",
-		"address_city": null,
-		"address_country": null,
-		"address_line1": null,
-		"address_line1_check": null,
-		"address_line2": null,
-		"address_state": null,
-		"address_zip": null,
-		"address_zip_check": null,
-		"brand": "Visa",
-		"country": "US",
-		"cvc_check": null,
-		"dynamic_last4": null,
-		"exp_month": 8,
-		"exp_year": 2020,
-		"fingerprint": "x18XyLUPM6hub5xz",
-		"funding": "credit",
-		"last4": "4242",
-		"metadata": {},
-		"name": null,
-		"tokenization_method": null
-	  },
-	  "client_ip": null,
-	  "created": 1571314413,
-	  "livemode": false,
-	  "type": "card",
-	  "used": false
-	}
+    {
+      "id": "tok_fake123456789",
+      "object": "token",
+      "card": {
+        "id": "card_fake123456789",
+        "object": "card",
+        "address_city": null,
+        "address_country": null,
+        "address_line1": null,
+        "address_line1_check": null,
+        "address_line2": null,
+        "address_state": null,
+        "address_zip": null,
+        "address_zip_check": null,
+        "brand": "Visa",
+        "country": "US",
+        "cvc_check": null,
+        "dynamic_last4": null,
+        "exp_month": 8,
+        "exp_year": 2020,
+        "fingerprint": "x18XyLUPM6hub5xz",
+        "funding": "credit",
+        "last4": "4242",
+        "metadata": {},
+        "name": null,
+        "tokenization_method": null
+      },
+      "client_ip": null,
+      "created": 1571314413,
+      "livemode": false,
+      "type": "card",
+      "used": false
+    }
 
 =head1 HISTORY
 

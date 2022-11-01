@@ -1,5 +1,8 @@
 Revision history for perl distribution Getopt-App
 
+0.10 2022-10-23T10:59:27
+ - Add support for specifying code refs in subcommands
+
 0.09 2022-10-14T12:03:24
  - Fix not setting $0
  - Add $Getopt::App::SUBCOMMAND

@@ -2,8 +2,8 @@ NAME
     App::ClipboardUtils - CLI utilities related to clipboard
 
 VERSION
-    This document describes version 0.003 of App::ClipboardUtils (from Perl
-    distribution App-ClipboardUtils), released on 2022-10-09.
+    This document describes version 0.005 of App::ClipboardUtils (from Perl
+    distribution App-ClipboardUtils), released on 2022-10-25.
 
 DESCRIPTION
     This distribution contains the following CLI utilities related to
@@ -14,6 +14,10 @@ DESCRIPTION
     *   clear-clipboard-content
 
     *   clear-clipboard-history
+
+    *   clipadd
+
+    *   clipget
 
     *   detect-clipboard-manager
 

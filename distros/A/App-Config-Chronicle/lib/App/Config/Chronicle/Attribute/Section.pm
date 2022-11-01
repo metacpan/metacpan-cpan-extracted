@@ -4,7 +4,7 @@ use Moose;
 use namespace::autoclean;
 extends 'App::Config::Chronicle::Node';
 
-our $VERSION = '0.06';    ## VERSION
+our $VERSION = '0.07';    ## VERSION
 
 =head1 NAME
 

@@ -1,5 +1,8 @@
 Revision history for Music-ScaleNote
 
+0.0704 2022-10-23 13:02:27
+    - Avoid implicit imports.
+
 0.0703 2020-01-29 22:49:27
     - Call print, not warn when verbose.
 

@@ -1,0 +1,24 @@
+{
+   "active" : 1,
+   "created" : "1662242852",
+   "default_price" : null,
+   "description" : "Original Art",
+   "id" : "prod_MMo7cQ1sXKxYZA",
+   "images" : [],
+   "livemode" : 0,
+   "metadata" : {},
+   "name" : "Jewel of the Nile",
+   "object" : "product",
+   "package_dimensions" : {
+      "height" : "24.0",
+      "length" : "10.0",
+      "weight" : "15.0",
+      "width" : "2.0"
+   },
+   "shippable" : 1,
+   "statement_descriptor" : "Shipped in a Strongbox",
+   "tax_code" : null,
+   "unit_label" : null,
+   "updated" : "1662242852",
+   "url" : null
+}

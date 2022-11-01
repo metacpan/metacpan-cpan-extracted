@@ -2,7 +2,7 @@
 ## Stripe API - ~/lib/Net/API/Stripe/Address.pm
 ## Version v0.100.0
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2020/05/15
 ## 
@@ -11,25 +11,33 @@ package Net::API::Stripe::Address;
 BEGIN
 {
     use strict;
+    use warnings;
     use parent qw( Net::API::Stripe::Generic );
+    use vars qw( $VERSION );
     our( $VERSION ) = 'v0.100.0';
 };
 
-sub city { shift->_set_get_scalar( 'city', @_ ); }
+use strict;
+use warnings;
 
-sub country { shift->_set_get_scalar( 'country', @_ ); }
+sub city { return( shift->_set_get_scalar( 'city', @_ ) ); }
 
-sub line1 { shift->_set_get_scalar( 'line1', @_ ); }
+sub country { return( shift->_set_get_scalar( 'country', @_ ) ); }
 
-sub line2 { shift->_set_get_scalar( 'line2', @_ ); }
+sub line1 { return( shift->_set_get_scalar( 'line1', @_ ) ); }
 
-sub postal_code { shift->_set_get_scalar( 'postal_code', @_ ); }
+sub line2 { return( shift->_set_get_scalar( 'line2', @_ ) ); }
 
-sub state { shift->_set_get_scalar( 'state', @_ ); }
+sub postal_code { return( shift->_set_get_scalar( 'postal_code', @_ ) ); }
+
+sub state { return( shift->_set_get_scalar( 'state', @_ ) ); }
 
 sub town { return( shift->_set_get_scalar( 'town', @_ ) ); }
 
-*zip_code = \&postal_code;
+{
+    no warnings 'once';
+    *zip_code = \&postal_code;
+}
 
 1;
 
@@ -61,44 +69,36 @@ This is an Address module used everywhere in Stripe API.
 
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>( %ARG )
+=head2 new( %ARG )
 
 Creates a new L<Net::API::Stripe::Address> object.
 It may also take an hash like arguments, that also are method of the same name.
 
-=back
-
 =head1 METHODS
 
-=over 4
-
-=item B<city> string
+=head2 city string
 
 City/District/Suburb/Town/Village.
 
-=item B<country> string
+=head2 country string
 
 2-letter country code.
 
-=item B<line1> string
+=head2 line1 string
 
 Address line 1 (Street address/PO Box/Company name).
 
-=item B<line2> string
+=head2 line2 string
 
 Address line 2 (Apartment/Suite/Unit/Building).
 
-=item B<postal_code> string
+=head2 postal_code string
 
 ZIP or postal code.
 
-=item B<state> string
+=head2 state string
 
 State/County/Province/Region.
-
-=back
 
 =head1 HISTORY
 

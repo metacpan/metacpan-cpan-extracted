@@ -74,7 +74,7 @@ exit;
 
 
 END {
-	eval { Net::DNS::SEC::libcrypto::croak_memory_wrap() }	# paper over crack in Devel::Cover
+	eval { Net::DNS::Resolver::libunbound::croak_memory_wrap() }	# paper over crack in Devel::Cover
 }
 
 

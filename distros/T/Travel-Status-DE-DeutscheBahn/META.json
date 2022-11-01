@@ -1,7 +1,7 @@
 {
    "abstract" : "Interface to the online arrival/departure",
    "author" : [
-      "Copyright (C) 2015-2017 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>"
+      "Copyright (C) 2015-2022 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "Module::Build version 0.4231",
@@ -32,14 +32,13 @@
             "Class::Accessor" : "0.16",
             "DateTime" : "0",
             "DateTime::Format::Strptime" : "0",
+            "Digest::MD5" : "0",
             "Getopt::Long" : "0",
             "JSON" : "0",
             "LWP::Protocol::https" : "0",
             "LWP::UserAgent" : "0",
             "List::MoreUtils" : "0",
             "List::Util" : "0",
-            "POSIX" : "0",
-            "XML::LibXML" : "1.70",
             "perl" : "v5.14.0"
          }
       }
@@ -47,19 +46,27 @@
    "provides" : {
       "Travel::Status::DE::DeutscheBahn" : {
          "file" : "lib/Travel/Status/DE/DeutscheBahn.pm",
-         "version" : "3.01"
+         "version" : "4.01"
       },
       "Travel::Status::DE::HAFAS" : {
          "file" : "lib/Travel/Status/DE/HAFAS.pm",
-         "version" : "3.01"
+         "version" : "4.01"
       },
-      "Travel::Status::DE::HAFAS::Result" : {
-         "file" : "lib/Travel/Status/DE/HAFAS/Result.pm",
-         "version" : "3.01"
+      "Travel::Status::DE::HAFAS::Journey" : {
+         "file" : "lib/Travel/Status/DE/HAFAS/Journey.pm",
+         "version" : "4.01"
+      },
+      "Travel::Status::DE::HAFAS::Message" : {
+         "file" : "lib/Travel/Status/DE/HAFAS/Message.pm",
+         "version" : "4.01"
+      },
+      "Travel::Status::DE::HAFAS::Polyline" : {
+         "file" : "lib/Travel/Status/DE/HAFAS/Polyline.pm",
+         "version" : "4.00"
       },
       "Travel::Status::DE::HAFAS::StopFinder" : {
          "file" : "lib/Travel/Status/DE/HAFAS/StopFinder.pm",
-         "version" : "3.01"
+         "version" : "4.01"
       }
    },
    "release_status" : "stable",
@@ -71,6 +78,6 @@
          "url" : "https://github.com/derf/Travel-Status-DE-DeutscheBahn"
       }
    },
-   "version" : "3.01",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "4.01",
+   "x_serialization_backend" : "JSON::PP version 4.12"
 }

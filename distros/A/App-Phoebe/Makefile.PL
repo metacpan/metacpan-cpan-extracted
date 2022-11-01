@@ -66,6 +66,7 @@ check:
 # from the test directory. Don't use them in production. See the cert
 # target to make your own. :)
 start:
+	./t/cert.pl
 	./script/phoebe \
 	  --cert_file=./t/cert.pem \
 	  --key_file=./t/key.pem
@@ -75,6 +76,7 @@ start:
 # requires the use of 'sudo'; the --user and --group options make sure
 # that it drops priviledges to the current user as soon as it started.
 web:
+	./t/cert.pl
 	sudo ./script/phoebe \
 	  --cert_file=./t/cert.pem \
 	  --key_file=./t/key.pem \

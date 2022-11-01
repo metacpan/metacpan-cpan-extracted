@@ -24,7 +24,7 @@ for my $session (@$workouts) {
         $pbs{ $session->{distance} }{time}  = $session->{elapsed_seconds};
         $pbs{ $session->{distance} }{power} = $session->{p_ave};
         $pbs{ $session->{distance} }{split} = $session->{calc_ave_split};
-        $pbs{ $session->{distance} }{date} = $session->{created};
+        $pbs{ $session->{distance} }{date}  = $session->{created};
 
     }
 }
@@ -33,9 +33,8 @@ print "Personal Bests\n";
 for my $key ( sort keys %pbs ) {
     print sprintf(
         "%sM:  %.02f minutes  (%s, %d watts, %.02f/500m)\n",
-        $key,              $pbs{$key}{time} / 60,
-        $pbs{$key}{date},
-        $pbs{$key}{power}, $pbs{$key}{split} / 60
+        $key, $pbs{$key}{time} / 60,
+        $pbs{$key}{date}, $pbs{$key}{power}, $pbs{$key}{split} / 60
     );
 }
 

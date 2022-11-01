@@ -6,9 +6,9 @@
 use v5.26;
 use warnings;
 
-use Object::Pad 0.51;
+use Object::Pad 0.70 ':experimental(adjust_params)';
 
-package Electronics::PSU::DPSxxxx 0.02;
+package Electronics::PSU::DPSxxxx 0.03;
 class Electronics::PSU::DPSxxxx;
 
 use Carp;
@@ -64,11 +64,10 @@ like L<DBI>, or L<Device::Chip>, so there should be plenty of ideas to borrow.
 has $_fh   :param = undef;
 has $_addr :param = 1;
 
-ADJUSTPARAMS ( $params )
-{
+ADJUST :params (
+   :$dev = undef,
+) {
    unless( $_fh ) {
-      my $dev = delete $params->{dev};
-
       $_fh = IO::Termios->open( $dev, "9600,8,n,1", O_NOCTTY, O_NDELAY ) or
          croak "Cannot open $dev - $!";
 

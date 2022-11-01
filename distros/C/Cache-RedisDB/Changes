@@ -1,38 +1,41 @@
 Revision history for Cache-RedisDB
 
-0.11      2017-02-20 01:59:11+00:00 UTC
+0.13      2022-10-25 06:27:44+00:00 UTC
+    - add mget
+
+0.12      2017-02-20 01:59:11+00:00 UTC
     Switch to dzil
 
-0.11
+0.11    2017-02-20 01:59:11+00:00 UTC
 
-0.10    07/25/2016
+0.10    2016-07-25 01:59:11+00:00 UTC
         No 'protocol_version' of Sereal assigned
 
-0.09	  09/09/2015
+0.09	  2015-09-09 01:59:11+00:00 UTC
         Better documentation and test fixes for Redis before extended options
 
-0.08    08/04/2015
+0.08    2015-04-08 01:59:11+00:00 UTC
         Fixed tests running on old redis server.
 
-0.07    24/01/2015
+0.07    2015-01-24 01:59:11+00:00 UTC
         Add "ttl" command for namespaces.
 
-0.06    18/01/2015
+0.06    2015-01-18 01:59:11+00:00 UTC
         Add "keys" command for namespaces.
 
-0.05    18/11/2014
+0.05    2014-11-18 01:59:11+00:00 UTC
         Pinning encoding protocol to version 2.
 
-0.04    30/08/2014
+0.04    2014-08-30 01:59:11+00:00 UTC
         Instead of eval use RedisDB feature to check fail test
 
-0.03    27/08/2014
+0.03    2014-08-27 01:59:11+00:00 UTC
         Issue solved where test was flushing the all user data.
 
-0.02    25/08/2014
+0.02    2014-08-25 01:59:11+00:00 UTC
         Test case update
 
-0.01    21/08/2014
+0.01    2014-08-21 01:59:11+00:00 UTC
         First version, released on an unsuspecting world.
 
 

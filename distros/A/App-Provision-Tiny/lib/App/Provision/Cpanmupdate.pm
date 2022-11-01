@@ -1,5 +1,5 @@
 package App::Provision::Cpanmupdate;
-$App::Provision::Cpanmupdate::VERSION = '0.0404';
+$App::Provision::Cpanmupdate::VERSION = '0.0405';
 our $AUTHORITY = 'cpan:GENE';
 use strict;
 use warnings;
@@ -41,7 +41,7 @@ App::Provision::Cpanmupdate
 
 =head1 VERSION
 
-version 0.0404
+version 0.0405
 
 =head1 FUNCTIONS
 

@@ -97,6 +97,11 @@ else {
   }
   else {
     if($val =~ /^(0+)?41a4ec5d3fa8ce427b00$/i) {print "ok 9\n"}
+    elsif($^O =~ /cygwin/i && $] < 5.36 &&  $val =~ /41a4ec5d3fa8ce427b00$/i) {
+      # Workaround http://www.cpantesters.org/cpan/report/11f57da5-6cc2-1014-925a-fc20b98cc827
+      # by ignoring the inclusion of non-zero leading bytes in the leading 6 (unused) bytes.
+      print "ok 9\n";
+    }
     else {
       warn "expected \"41a4ec5d3fa8ce427b00\", got ", lc($val), "\n";
       print "not ok 9\n";

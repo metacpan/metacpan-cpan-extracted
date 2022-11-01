@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-package Exception::Reporter::Sender::Dir;
+package Exception::Reporter::Sender::Dir 0.015;
 # ABSTRACT: a report sender that writes to directories on the filesystem
-$Exception::Reporter::Sender::Dir::VERSION = '0.014';
+
 use parent 'Exception::Reporter::Sender';
 
 #pod =head1 SYNOPSIS
@@ -167,7 +167,7 @@ Exception::Reporter::Sender::Dir - a report sender that writes to directories on
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SYNOPSIS
 
@@ -202,9 +202,21 @@ reporter.
 
 The return value of C<send_report> is not defined.
 
+=head1 PERL VERSION
+
+This module should work on any version of perl still receiving updates from
+the Perl 5 Porters.  This means it should work on any version of perl released
+in the last two to three years.  (That is, if the most recently released
+version is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

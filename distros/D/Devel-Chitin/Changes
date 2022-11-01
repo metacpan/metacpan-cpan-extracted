@@ -1,8 +1,14 @@
+0.21      2022-10-26 15:23:25-05:00 America/Chicago
+    * Handle deparsing constructs like "my $a = sub { ... }" after changes
+      in 5.37.5
+
 0.20      2022-10-17 15:44:26-05:00 America/Chicago
     * Support deparsing new OPs pp_padsv_store and pp_aelemfastlex_store
     * Support deparsing new undef-OP related optimizations
 
 0.19      2022-03-08 16:39:39-06:00 America/Chicago
+    * stepout() now accepts a callback, invoked after the sub returns but
+      before the caller regains control, and can alter the return value.
     * Fix dual-var deparse bug exposed in 5.35.10
 
 0.18      2018-10-25 17:54:58-05:00 America/Chicago

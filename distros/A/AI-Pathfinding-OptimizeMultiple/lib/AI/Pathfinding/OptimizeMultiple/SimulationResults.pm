@@ -1,5 +1,5 @@
 package AI::Pathfinding::OptimizeMultiple::SimulationResults;
-$AI::Pathfinding::OptimizeMultiple::SimulationResults::VERSION = '0.0.16';
+$AI::Pathfinding::OptimizeMultiple::SimulationResults::VERSION = '0.0.17';
 use strict;
 use warnings;
 
@@ -9,7 +9,7 @@ use MooX qw/late/;
 
 has status      => ( isa => 'Str', is => 'ro', required => 1, );
 has total_iters => ( isa => 'Int', is => 'ro', required => 1, );
-has scan_runs   => (
+has scan_runs => (
     isa      => 'ArrayRef[AI::Pathfinding::OptimizeMultiple::ScanRun]',
     is       => 'ro',
     required => 1,
@@ -39,7 +39,7 @@ AI::Pathfinding::OptimizeMultiple::SimulationResults - the simulation results.
 
 =head1 VERSION
 
-version 0.0.16
+version 0.0.17
 
 =head1 SYNOPSIS
 
@@ -161,7 +161,7 @@ Shlomi Fish <shlomif@cpan.org>
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/shlomif/ai-pathfinding-optimizemultiple/issues>
+L<https://github.com/shlomif/fc-solve/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

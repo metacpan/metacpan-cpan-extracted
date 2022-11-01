@@ -93,11 +93,11 @@ ok($variant->hasArrayType(TYPES_BOOLEAN), "TYPES_BOOLEAN variant");
 is($variant->getType(), TYPES_BOOLEAN, "TYPES_BOOLEAN type");
 
 $variant->setArray([0, -128, 127], TYPES_SBYTE);
-throws_ok { $variant->setArray([-129, 128], TYPES_SBYTE) }
+throws_ok { $variant->setArray([1, -129, 128], TYPES_SBYTE) }
     (qr/Integer value /, "TYPES_SBYTE croak");
-no_leaks_ok { eval { $variant->setArray([-129, 128], TYPES_SBYTE) } }
+no_leaks_ok { eval { $variant->setArray([1, -129, 128], TYPES_SBYTE) } }
     "TYPES_SBYTE leak";
-is_deeply($variant->getArray(), [0, -128, 127], "TYPES_SBYTE array");
+is_deeply($variant->getArray(), [1, 127, 0], "TYPES_SBYTE array");
 ok($variant->hasArrayType(TYPES_SBYTE), "TYPES_SBYTE variant");
 is($variant->getType(), TYPES_SBYTE, "TYPES_SBYTE type");
 
@@ -106,7 +106,7 @@ throws_ok { $variant->setArray([256], TYPES_BYTE) }
     (qr/Unsigned value /, "TYPES_BYTE croak");
 no_leaks_ok { eval { $variant->setArray([256], TYPES_BYTE) } }
     "TYPES_BYTE leak";
-is_deeply($variant->getArray(), [0, 255], "TYPES_BYTE array");
+is_deeply($variant->getArray(), [0], "TYPES_BYTE array");
 ok($variant->hasArrayType(TYPES_BYTE), "TYPES_BYTE variant");
 is($variant->getType(), TYPES_BYTE, "TYPES_BYTE type");
 

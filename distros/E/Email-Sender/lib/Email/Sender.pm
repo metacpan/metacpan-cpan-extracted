@@ -1,4 +1,4 @@
-package Email::Sender 2.500;
+package Email::Sender 2.600;
 # ABSTRACT: a library for sending email
 
 use Moo::Role;
@@ -68,7 +68,7 @@ Email::Sender - a library for sending email
 
 =head1 VERSION
 
-version 2.500
+version 2.600
 
 =head1 SYNOPSIS
 
@@ -129,11 +129,11 @@ L<Email::Sender::Failure> on failure.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alex Efros Aristotle Pagaltzis Bernhard Graf Christian Walde David Golden Steinbrunner Hans Dieter Pearcey HIROSE Masaaki James E Keenan Justin Hunter Karen Etheridge Kenichi Ishigaki kga Kris Matthews Marc Bradshaw Stefan Hornburg (Racke) William Blunn
+=for stopwords Alex Efros Aristotle Pagaltzis Bernhard Graf Christian Walde David Golden Steinbrunner Hans Dieter Pearcey HIROSE Masaaki James E Keenan Justin Hunter Karen Etheridge Kenichi Ishigaki kga Kris Matthews Marc Bradshaw Ricardo Signes Stefan Hornburg (Racke) William Blunn
 
 =over 4
 
@@ -199,6 +199,10 @@ Marc Bradshaw <marc@marcbradshaw.net>
 
 =item *
 
+Ricardo Signes <rjbs@semiotic.systems>
+
+=item *
+
 Stefan Hornburg (Racke) <racke@linuxia.de>
 
 =item *
@@ -209,7 +213,7 @@ William Blunn <zgpmax@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Ricardo Signes.
+This software is copyright (c) 2022 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

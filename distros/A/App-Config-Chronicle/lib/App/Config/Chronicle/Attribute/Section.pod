@@ -1,0 +1,34 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with App::Config::Chronicle::Attribute::Section
+at lib/App/Config/Chronicle/Attribute/Section.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+App::Config::Chronicle::Attribute::Section
+
+=head1 NOTE
+
+This class isn't intended for consumption outside of App::Config::Chronicle.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<App::Config::Chronicle::Node>
+
+L<clear_path|App::Config::Chronicle::Node/clear_path>, L<data_set|App::Config::Chronicle::Node/data_set>, L<definition|App::Config::Chronicle::Node/definition>, L<has_path|App::Config::Chronicle::Node/has_path>, L<name|App::Config::Chronicle::Node/name>, L<parent_path|App::Config::Chronicle::Node/parent_path>, L<path|App::Config::Chronicle::Node/path>
+
+=item L<Moose::Object>
+
+L<BUILDALL|Moose::Object/BUILDALL>, L<BUILDARGS|Moose::Object/BUILDARGS>, L<DEMOLISHALL|Moose::Object/DEMOLISHALL>, L<DOES|Moose::Object/DOES>, L<does|Moose::Object/does>, L<dump|Moose::Object/dump>
+
+=back
+

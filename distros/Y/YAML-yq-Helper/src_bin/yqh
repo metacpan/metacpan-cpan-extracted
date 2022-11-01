@@ -1,0 +1,287 @@
+#!perl
+
+use strict;
+use warnings;
+use Getopt::Long;
+use YAML::yq::Helper;
+
+sub version {
+	print "yqh v. 0.1.0\n";
+}
+
+sub help {
+	&version;
+
+	print '
+
+-f <file>         Config INI file.
+                  Default :: undef
+
+-a <action>       Action to perform.
+                  Default :: undef
+
+--var <string>    Variable to set.
+                  Default :: undef
+
+--vals <string>   Comma seperate list of array values.
+                  Default :: undef
+
+--hash <string>   Comma seperate list of hash values. Each
+                  value is a sub string with key/value seperate
+                  by a /=/.
+                  Default :: undef
+
+--dedup <bool>    If it should dedup the data for the op.
+                  Default :: 1
+
+Action :: is_array
+Description :: Returns 0 or 1 based on if it is a array.
+Requires :: --var
+
+Action :: is_hash
+Description :: Returns 0 or 1 based on if it is a hash.
+Requires :: --var
+
+Action :: is_defined
+Description :: Returns 0 or 1 based on if it is defined.
+Requires :: --var
+
+Action :: clear_array
+Description :: Clears the specified array.
+Requires :: --var
+
+Action :: clear_hash
+Description :: Clears the specified hash.
+Requires :: --var
+
+Action :: create_array
+Description :: Creates the specified array if it does not exist.
+Requires :: --var
+Optional :: --vals
+
+Action :: create_hash
+Description :: Creates the specified hash if it does not exist.
+Requires :: --var
+
+Action :: dedup_array
+Description :: Deduplicates an array.
+Requires :: --var
+
+Action :: delete
+Description :: Deletes the var without checking the type.
+Requires :: --var
+
+Action :: delete_array
+Description :: Deletes the specified array.
+Requires :: --var
+
+Action :: delete_hash
+Description :: Deletes the specified hash.
+Requires :: --var
+
+Action :: push_array
+Description :: Pushes a set of items onto an array.
+Requires :: --var,--vals
+
+Action :: set_array
+Description :: Clears the array and sets it to specified values.
+Requires :: --var,--vals
+
+Action :: set_hash
+Description :: Clears the hash and sets it to specified values.
+Requires :: --var,--hash
+
+Action :: set_in_array
+Description :: Make sure a set of values exist in a array and if not add them.
+Requires :: --var,--vals
+Optional :: --dedup
+';
+}
+
+# get the commandline options
+my $help    = 0;
+my $version = 0;
+my $file;
+my $var;
+my $action;
+my $vals_string;
+my $val_string;
+my $vals_sep = ',';
+my $key;
+my $hash_string;
+my $val;
+my $dedup=1;
+Getopt::Long::Configure('no_ignore_case');
+Getopt::Long::Configure('bundling');
+GetOptions(
+	'version' => \$version,
+	'v'       => \$version,
+	'help'    => \$help,
+	'h'       => \$help,
+	'f=s'     => \$file,
+	'a=s'     => \$action,
+	'var=s'   => \$var,
+	'sep=s'   => \$vals_sep,
+	'vals=s'  => \$vals_string,
+	'hash=s'  => \$hash_string,
+	'val=s'   => \$val_string,
+		   'k=s'     => \$key,
+		   'dedup=s' =>\$dedup,
+);
+
+$vals_sep = quotemeta($vals_sep);
+
+#
+# make sure we've not been passed ' or " to make things simpler to handle
+#
+if ( defined($var) ) {
+	if ( $var =~ /[\'\"]/ ) {
+		die('--var may not contain \' or "');
+	}
+}
+
+if ( defined($val_string) ) {
+	if ( $val_string =~ /[\'\"]/ ) {
+		die('--val may not contain \' or "');
+	}
+}
+
+if ( defined($hash_string) ) {
+	if ( $hash_string =~ /[\'\"]/ ) {
+		die('--hash may not contain \' or "');
+	}
+}
+
+#
+# break up the array vals string if passed
+#
+my @vals;
+if ( defined($vals_string) ) {
+	if ( $vals_string =~ /[\'\"]/ ) {
+		die('--vals may not contain \' or "');
+	}
+
+	@vals = split( /$vals_sep/, $vals_string );
+}
+
+#
+# break up the hash string if passed
+#
+my $hash = {};
+if ( defined($hash_string) ) {
+	if ( $hash_string =~ /[\'\"]/ ) {
+		die('--hash may not contain \' or "');
+	}
+
+	my @items = split( /$vals_sep/, $hash_string );
+	foreach my $item (@items) {
+		my ( $item_key, $item_val ) = split( /\=/, $item );
+		if ( defined($item_key) and $item_key ne '' ) {
+			$hash->{$item_key} = $item_val;
+		}
+		elsif ( defined($item_key) and $item_key eq '' ) {
+			die('--hash contains a key that matches ""');
+		}
+	}
+}
+
+# print version or help if requested
+if ($help) {
+	&help;
+	exit 42;
+}
+if ($version) {
+	&version;
+	exit 42;
+}
+
+if ( !defined($action) ) {
+	die('No action defined for -a');
+}
+
+my $yq = YAML::yq::Helper->new( file => $file );
+
+if ( $action eq 'is_array' ) {
+	print $yq->is_array( var => $var ) . "\n";
+	exit 0;
+}
+
+if ( $action eq 'is_hash' ) {
+	print $yq->is_hash( var => $var ) . "\n";
+	exit 0;
+}
+
+if ( $action eq 'is_defined' ) {
+	print $yq->is_defined( var => $var ) . "\n";
+	exit 0;
+}
+
+if ( $action eq 'clear_array' ) {
+	$yq->clear_array( var => $var );
+	exit 0;
+}
+
+if ( $action eq 'clear_hash' ) {
+	$yq->clear_hash( var => $var );
+	exit 0;
+}
+
+if ( $action eq 'delete_array' ) {
+	$yq->delete_array( var => $var );
+	exit 0;
+}
+
+if ( $action eq 'delete_hash' ) {
+	$yq->delete_hash( var => $var );
+	exit 0;
+}
+
+if ( $action eq 'delete' ) {
+	$yq->delete( var => $var );
+	exit 0;
+}
+
+if ( $action eq 'set_array' ) {
+	$yq->set_array( var => $var, vals => \@vals );
+	exit 0;
+}
+
+if ( $action eq 'set_hash' ) {
+	$yq->set_hash( var => $var, hash => $hash );
+	exit 0;
+}
+
+if ( $action eq 'set_val' ) {
+	$yq->set_val( var => $var, val => $val );
+	exit 0;
+}
+
+if ( $action eq 'set_in_array' ) {
+	$yq->set_in_array( var => $var, vals => \@vals, dedup=>$dedup );
+	exit 0;
+}
+
+if ( $action eq 'push_array' ) {
+	$yq->push_array( var => $var, vals => \@vals,  );
+	exit 0;
+}
+
+if ( $action eq 'dedup_array' ) {
+	$yq->dedup_array( var => $var );
+	exit 0;
+}
+
+if ( $action eq 'create_array' ) {
+	$yq->create_array( var => $var, vals => \@vals );
+	exit 0;
+}
+
+if ( $action eq 'create_hash' ) {
+	$yq->create_hash( var => $var );
+	exit 0;
+}
+
+#
+# means we did not match anything
+#
+die( 'No matching action, -a, found for "' . $action . '"' );

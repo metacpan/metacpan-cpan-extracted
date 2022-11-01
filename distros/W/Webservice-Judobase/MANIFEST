@@ -9,7 +9,6 @@ Makefile.PL
 README
 README.POD
 cpanfile
-cpanfile.snapshot
 dist.ini
 examples/CommonwealthNations/commonwealth_athletes.csv
 examples/CommonwealthNations/commonwealth_athletes.ods

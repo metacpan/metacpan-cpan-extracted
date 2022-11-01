@@ -1,0 +1,32 @@
+=head1 NAME
+
+Test::Spy::Observer - method observer
+
+=head1 SYNOPSIS
+
+	$spy->set_base($base_object);
+	my $method = $spy->add_observer('method_name');
+
+	ok !$method->was_called;
+
+=head1 DESCRIPTION
+
+This class objects let you examine call data of a specific method without
+actually replacing its behavior.
+
+Observer is similar to L<Test::Spy::Method>, but it does not actually mock what
+the method is doing, only attaches itself to what already exists. For this
+reason, it makes sense to use it together with L<Test::Spy/base>.
+
+=head2 Call history methods
+
+These methods are the same as documented in L<Test::Spy/Call history methods>,
+but when called on this class objects, you don't need to setup
+L<Test::Spy/context>.
+
+=head1 SEE ALSO
+
+L<Test::Spy::Method>
+
+L<Test::Spy>
+

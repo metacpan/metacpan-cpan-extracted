@@ -166,6 +166,7 @@ sub post
 #
 # @return API::Eulerian::EDW::Status instance.
 #
+use Data::Dumper;
 sub _request
 {
   my ( $class, $method, $url, $headers, $what, $type, $file ) = @_;
@@ -212,6 +213,8 @@ sub _request
   # writen into local file.
   my $response = $endpoint->request( $request, $file );
   my $json = API::Eulerian::EDW::Request->json( $response );
+  
+  $status->{ response } = $response;
 
   if( $response->code != HTTP_OK ) {
     $status->error( 1 );
@@ -221,7 +224,6 @@ sub _request
         encode_json( $json ) : $response->content()
       );
   } else {
-    $status->{ response } = $response;
     if( defined( $response->header( 'content-encoding' ) ) ) {
       $status->{ encoding } = $response->header( 'content-encoding' );
     }

@@ -17,18 +17,19 @@ delete $ENV{OPENSSL_CONF};
 
 subtest 'silent' => sub {
   local @ARGV = qw(--silent);
-  $script = do './script/sslmaker' or plan skip_all => $@;
-  $script->bits(1024);    # speed up testing
-  $script->silent(1);
+  do './script/sslmaker' or plan skip_all => $@;
+  $script           = App::sslmaker::script->new;
+  $script->{bits}   = 1024;                         # speed up testing
+  $script->{silent} = 1;
   $home->remove_tree({safe => 0});
   $home->mkpath;
   ok !-d $home->child('root'), 'nothing exists';
 };
 
 subtest 'sslmaker root' => sub {
-  $script->home($home);
-  $script->subject('/C=US/ST=Texas/L=Dallas/O=Company/OU=Department/CN=superduper');
-  is eval { $script->run('root') }, 0, 'ran' or diag $@;
+  $script->{home}    = $home;
+  $script->{subject} = '/C=US/ST=Texas/L=Dallas/O=Company/OU=Department/CN=superduper';
+  is eval { $script->subcommand_root }, 0, 'ran' or diag $@;
   ok -e $home->child('root/ca.cert.pem'), 'root/ca.cert.pem';
   ok -e $home->child('root/index.txt'),   'index.txt';
   ok -e $home->child('root/ca.key.pem'),  'root/ca.key.pem';
@@ -37,8 +38,8 @@ subtest 'sslmaker root' => sub {
 };
 
 subtest 'sslmaker intermediate' => sub {
-  $script->subject('');    # read subject from root CA
-  is eval { $script->run('intermediate') }, 0, 'ran' or diag $@;
+  $script->{subject} = '';    # read subject from root CA
+  is eval { $script->subcommand_intermediate }, 0, 'ran' or diag $@;
 
   ok -e $home->child('root/ca.cert.pem'), 'root/ca.cert.pem';
   ok -e $home->child('root/index.txt'),   'root/index.txt';
@@ -56,19 +57,17 @@ subtest 'sslmaker intermediate' => sub {
 };
 
 subtest 'sslmaker generate example.com' => sub {
-  is eval { $script->run(qw(generate client1.example.com)) }, 0, 'ran' or diag $@;
-  is eval { $script->run(qw(generate client2.example.com)) }, 0, 'ran' or diag $@;
-  ok -e 'client1.example.com.key.pem', 'client1.example.com.key.pem';
-  ok -e 'client1.example.com.csr.pem', 'client1.example.com.csr.pem';
-  ok !-e 'client1.example.com.cert.pem',
-    'client1.example.com.cert.pem need to be created from intermediate';
+  is eval { $script->subcommand_generate('client1.example.com') }, 0, 'ran' or diag $@;
+  is eval { $script->subcommand_generate('client2.example.com') }, 0, 'ran' or diag $@;
+  ok -e 'client1.example.com.key.pem',   'client1.example.com.key.pem';
+  ok -e 'client1.example.com.csr.pem',   'client1.example.com.csr.pem';
+  ok !-e 'client1.example.com.cert.pem', 'client1.example.com.cert.pem need to be created from intermediate';
 };
 
 subtest 'sslmaker sign example.com.csr.pem' => sub {
-  is eval { $script->run(qw(sign client1.example.com.csr.pem)) }, 0, 'ran' or diag $@;
-  is eval { $script->run(qw(sign client2.example.com.csr.pem)) }, 0, 'ran' or diag $@;
-  ok -e 'client2.example.com.cert.pem',
-    'client2.example.com.cert.pem was created from intermediate';
+  is eval { $script->subcommand_sign('client1.example.com.csr.pem') }, 0, 'ran' or diag $@;
+  is eval { $script->subcommand_sign('client2.example.com.csr.pem') }, 0, 'ran' or diag $@;
+  ok -e 'client2.example.com.cert.pem', 'client2.example.com.cert.pem was created from intermediate';
 
   my $index = $home->child('index.txt')->slurp;
   like $index, qr{^V.*CN=client1\.example\.com$}m, 'index.txt has V client1.example.com';
@@ -76,8 +75,8 @@ subtest 'sslmaker sign example.com.csr.pem' => sub {
 };
 
 subtest 'sslmaker revoke example.com' => sub {
-  is eval { $script->run(qw(revoke client2.example.com.cert.pem)) }, 0, 'ran' or diag $@;
-  is eval { $script->run(qw(revoke client1.example.com.cert.pem)) }, 0, 'ran' or diag $@;
+  is eval { $script->subcommand_revoke('client2.example.com.cert.pem') }, 0, 'ran' or diag $@;
+  is eval { $script->subcommand_revoke('client1.example.com.cert.pem') }, 0, 'ran' or diag $@;
 
   my $index = $home->child('index.txt')->slurp;
   like $index, qr{^R.*CN=client1\.example\.com$}m, 'index.txt has R client1.example.com';

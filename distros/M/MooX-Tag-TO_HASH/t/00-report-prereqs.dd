@@ -72,8 +72,10 @@ do { my $x = {
                     },
        'runtime' => {
                       'requires' => {
+                                      'JSON::MaybeXS' => '0',
                                       'Moo::Role' => '0',
                                       'MooX::TaggedAttributes' => '0.18',
+                                      'Ref::Util' => '0',
                                       'Safe::Isa' => '0',
                                       'Sub::Util' => '1.40',
                                       'namespace::clean' => '0',

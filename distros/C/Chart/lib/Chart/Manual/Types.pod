@@ -151,16 +151,16 @@ But they still all sets have to have the same length.
     my $g = Chart::Direction->new( 500, 500 );
     
     $g->add_dataset( 210, 220, 200, 215, 225, 200 );
-    $g->add_dataset( 30,  40,  20,  35,  45,  20 );
+    $g->add_dataset(  30,  40,  20,  35,  45,  20 );
 
     $g->add_dataset( 30, 40, 20, 35, 45, 20 );
     $g->add_dataset( 30, 40, 20, 35, 45, 20 );
 
     $g->add_dataset( 120, 130, 110, 125, 135, 110 );
-    $g->add_dataset( 30,  40,  20,  35,  45,  20 );
+    $g->add_dataset(  30,  40,  20,  35,  45,  20 );
 
     $g->add_dataset( 300, 310, 290, 305, 315, 290 );
-    $g->add_dataset( 30,  40,  20,  35,  45,  20 );
+    $g->add_dataset(  30,  40,  20,  35,  45,  20 );
 
     $g->set(
         title           => 'Direction Demo',
@@ -202,9 +202,9 @@ For better readability C<'both'> L<y_axes|Chart::Manual::Properties/y_axes> were
 
     use Chart::ErrorBars;
 
-    my $g = Chart::ErrorBars->new();
+    my $g = Chart::ErrorBars->new( 500, 400 );
     $g->add_dataset(qw(1   1.1  1.2  1.3  1.4  1.5  1.6  1.7  1.8  1.9  2   2.1 2.2 2.3 2.4 2.5));
-    $g->add_dataset(qw(1   1.1  1.2  1.1  1.14 1.15 1.26 1.2 1.1  1.19 1.2 1.4 1.6 2.0 2.5 3.1));
+    $g->add_dataset(qw(1   1.1  1.2  1.1  1.14 1.15 1.26 1.2  1.1  1.19 1.2 1.4 1.6 2.0 2.5 3.1));
     $g->add_dataset(qw(0.4 0.1  0.2  0.1  0.14 0.15 0.26 0.27 0.1  0.19 0.2 0.1 0.1 0.2 0.1 0.3));
     $g->add_dataset(qw(0.2 0.11 0.12 0.11 0.2  0.3  0.12 0.27 0.11 0.3  0.2 0.2 0.2 0.1 0.1 0.2));
     $g->set(
@@ -261,7 +261,7 @@ Deactivating the grey background of the plot just adds a little friendliness.
     $g->png("hbars.png");
 
 
-=head1 Lines
+=head2 Lines
 
 =for HTML <p>
 <img src="https://raw.githubusercontent.com/lichtkind/Chart/main/dev/example/manual/lines.png" alt="xy chart with lines">
@@ -647,7 +647,7 @@ under same terms as Perl itself.
 
 =head1 AUTHOR
 
-David Bonner, <chartgrp@web.de>
+David Bonner,
 
 Herbert Breunung, <lichtkind@cpan.org>
 

@@ -47,27 +47,30 @@ sub new {
   my $i=0; my %ind2index = map +($_=>$i++), @{$this->{IndNamesSorted}};
   $this->{Ind2Index} = \%ind2index;
   $ind2obj{$_}->set_index($ind2index{$_}) for sort keys %ind2index;
-  @$this{qw(OtherNames OtherObjs)} = $this->_otherPars_nft($otherpars||'');
+  @$this{qw(OtherNames OtherObjs OtherAnyOut OtherFlags)} = $this->_otherPars_nft($otherpars||'');
   $this;
 }
 
 sub _otherPars_nft {
     my ($sig,$otherpars) = @_;
     my $dimobjs = $sig && $sig->dims_obj;
-    my(@names,%types,$type);
-    # support 'int ndim => n;' syntax
+    my (@names,%types,$type,$any_out,%allflags);
     for (nospacesplit(';',$otherpars)) {
-	if (/^\s*([^=]+)\s*=>\s*(\S+)\s*$/) {
+	my (%flags);
+	if (s/^\s*$PDL::PP::PdlParObj::sqbr_re\s*//) {
+	  %flags = my %lflags = map +($_=>1), split /\s*,\s*/, my $opts = $1;
+	  my $this_out = delete $lflags{o};
+	  die "Invalid options '$opts' in '$_'" if keys %lflags;
+	  $any_out ||= $this_out;
+	}
+	if (/^\s*([^=]+?)\s*=>\s*(\S+)\s*$/) {
+	    # support 'int ndim => n;' syntax
 	    my ($ctype,$dim) = ($1,$2);
-	    $ctype =~ s/\s+$//; # get rid of trailing ws
 	    print "OtherPars: setting dim '$dim' from '$ctype'\n" if $::PP_VERBOSE;
-	    $type = PDL::PP::CType->new($ctype);
 	    croak "can't set unknown dimension '$dim' from '$otherpars'"
 		unless defined($dimobjs->{$dim});
+	    $type = PDL::PP::CType->new($ctype);
 	    $dimobjs->{$dim}->set_from($type);
-	} elsif(/^\s*\(\s*void\s*\)/) {
-	    # suppressing unused param warning - skip
-	    next;
 	} else {
 	    $type = PDL::PP::CType->new($_);
 	}
@@ -76,11 +79,11 @@ sub _otherPars_nft {
 	  if $PDL::PP::PdlParObj::INVALID_PAR{$name};
 	push @names,$name;
 	$types{$name} = $type;
+	$types{"${name}_count"} = PDL::PP::CType->new("PDL_Indx ${name}_count") if $type->is_array;
+	$allflags{$name} = \%flags;
     }
-    return (\@names,\%types);
+    (\@names,\%types,$any_out,\%allflags);
 }
-
-*with = \&new;
 
 =head1 AUTHOR
 
@@ -118,50 +121,52 @@ sub ind_names_sorted { @{$_[0]{IndNamesSorted}} }
 sub ind_index { $_[0]{Ind2Index}{$_[1]} }
 
 sub othernames {
-  my ($self, $for_xs) = @_;
-  return $self->{OtherNames} if $for_xs;
-  my $objs = $self->otherobjs($for_xs);
-  my @raw_names = @{$self->{OtherNames}};
-  [ map $objs->{$_}->is_array ? ($_, "${_}_count") : $_, @raw_names ];
+  my ($self, $omit_count, $except) = @_;
+  $except ||= {};
+  return $self->{OtherNames} if $omit_count && !keys %$except;
+  my $objs = $self->otherobjs;
+  my @raw_names = grep !$except->{$_}, @{$self->{OtherNames}};
+  @raw_names = map $objs->{$_}->is_array ? ($_, "${_}_count") : $_, @raw_names if !$omit_count;
+  \@raw_names;
 }
-sub otherobjs {
-  my ($self, $for_xs) = @_;
-  return $self->{OtherObjs} if $for_xs;
-  my $objs = $self->{OtherObjs};
-  my @raw_names = @{$self->{OtherNames}};
-  +{ map $objs->{$_}->is_array
-      ? ($_=>$objs->{$_}, "${_}_count"=>PDL::PP::CType->new("PDL_Indx ${_}_count"))
-      : ($_=>$objs->{$_}),
-      @raw_names };
-}
+sub otherobjs { $_[0]{OtherObjs} }
+sub other_any_out { $_[0]{OtherAnyOut} }
+sub other_is_out { $_[0]{OtherFlags}{$_[1]} && $_[0]{OtherFlags}{$_[1]}{o} }
+sub other_out { grep $_[0]->other_is_out($_), @{$_[0]{OtherNames}} }
 
-sub allnames { [(grep !$_[0]{Objects}{$_}{FlagTemp}, @{$_[0]{Names}}), @{$_[0]->othernames($_[1])}] }
+sub allnames { [
+  (grep +(!$_[2] || !$_[2]{$_}) && !$_[0]{Objects}{$_}{FlagTemp}, @{$_[0]{Names}}),
+  @{$_[0]->othernames(@_[1,2])},
+] }
 sub allobjs {
   my $pdltype = PDL::PP::CType->new("pdl *__foo__");
-  +{ ( map +($_,$pdltype), @{$_[0]{Names}} ), %{$_[0]->otherobjs($_[1])} };
+  +{ ( map +($_,$pdltype), @{$_[0]{Names}} ), %{$_[0]->otherobjs} };
 }
 sub alldecls {
-  my ($self, $long, $for_xs) = @_;
-  return @{$self->allnames($for_xs)} if !$long;
-  my $objs = $self->allobjs($for_xs);
-  map $objs->{$_}->get_decl($_, {VarArrays2Ptrs=>1}), @{$self->allnames($for_xs)};
+  my ($self, $omit_count, $indirect, $except) = @_;
+  my $objs = $self->allobjs;
+  my @names = @{$self->allnames($omit_count, $except)};
+  $indirect = $indirect ? { map +($_=>$self->other_is_out($_)), @names } : {};
+  map $objs->{$_}->get_decl($_, {VarArrays2Ptrs=>1,AddIndirect=>$indirect->{$_}}), @names;
 }
 sub getcomp {
   my ($self) = @_;
-  my $objs = $self->otherobjs(0);
-  join '', map "$_;", grep $_, map $objs->{$_}->get_decl($_, {VarArrays2Ptrs=>1}), @{$self->othernames(0)};
+  my $objs = $self->otherobjs;
+  my @names = @{$self->othernames(0)};
+  my $indirect = { map +($_=>$self->other_is_out($_)), @names };
+  join '', map "$_;", grep $_, map $objs->{$_}->get_decl($_, {VarArrays2Ptrs=>1,AddIndirect=>$indirect->{$_}}), @names;
 }
 sub getfree {
   my ($self,$symbol) = @_;
-  my $objs = $self->otherobjs(0);
+  my $objs = $self->otherobjs;
   join '', map $objs->{$_}->get_free("\$$symbol($_)",
     { VarArrays2Ptrs => 1 }), @{$self->othernames(0)};
 }
 sub getcopy {
-  my ($self) = @_;
-  my $objs = $self->otherobjs(0);
+  my ($self, $to_pat) = @_;
+  my $objs = $self->otherobjs;
   PDL::PP::pp_line_numbers(__LINE__,
-    join '', map $objs->{$_}->get_copy($_,"\$COMP($_)"), @{$self->othernames(0)}
+    join '', map $objs->{$_}->get_copy($_,sprintf $to_pat,$_), @{$self->othernames(0)}
   );
 }
 

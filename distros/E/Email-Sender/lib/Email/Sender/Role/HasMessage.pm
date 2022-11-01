@@ -1,4 +1,4 @@
-package Email::Sender::Role::HasMessage 2.500;
+package Email::Sender::Role::HasMessage 2.600;
 # ABSTRACT: an object that has a message
 
 use Moo::Role;
@@ -29,7 +29,7 @@ Email::Sender::Role::HasMessage - an object that has a message
 
 =head1 VERSION
 
-version 2.500
+version 2.600
 
 =head1 PERL VERSION
 
@@ -49,11 +49,11 @@ This attribute is a message associated with the object.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Ricardo Signes.
+This software is copyright (c) 2022 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

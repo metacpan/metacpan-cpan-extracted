@@ -17,6 +17,8 @@ use Modern::Perl;
 use Test::More;
 use URI::Escape;
 
+plan skip_all => 'This is an author test. Set $ENV{TEST_AUTHOR} to a true value to run.' unless $ENV{TEST_AUTHOR};
+
 our $example = 1;
 
 require './t/test.pl';

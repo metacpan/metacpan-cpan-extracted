@@ -20,27 +20,27 @@ docmake - a tool to render DocBook/XML into various output formats.
 
 =head1 VERSION
 
-version 0.1004
+version 0.1100
 
 =head1 SYNOPSIS
 
     # To render input.xml file into XHTML
-    docmake -o output.xhtml xhtml input.xml
+    docmake --ns -o output.xhtml xhtml input.xml
 
     # Same with more verbose output
-    docmake -v -o output.xhtml xhtml input.xml
+    docmake -v ---ns o output.xhtml xhtml input.xml
 
     # Avoid trailing slash when emitting to a dummy file in a dir
-    docmake --trailing-slash=0 -o output/notneeded.xhtml xhtml5 input.xml
+    docmake ---ns -trailing-slash=0 -o output/notneeded.xhtml xhtml5 input.xml
 
     # Render into pdf
-    docmake -v -o output.pdf pdf input.xml
+    docmake -v --ns -o output.pdf pdf input.xml
 
     # Same while not rebuilding if not necessary
-    docmake -v --make -o output.pdf pdf input.xml
+    docmake -v --ns --make -o output.pdf pdf input.xml
 
     # Render using a Stylesheet
-    docmake -v -o output.xhtml -x my-stylesheets.xsl xhtml input.xml
+    docmake -v --ns -o output.xhtml -x my-stylesheets.xsl xhtml input.xml
 
 =head1 DESCRIPTION
 
@@ -102,6 +102,12 @@ Display some rudimentary help.
 Display the man page.
 
 =item * -v ; --verbose
+
+Verbose - output the commands' invocation as they are executed.
+
+=item * --ns
+
+Use the DocBook xsl-ns ( namespaces ) URLs.
 
 Verbose - output the commands' invocation as they are executed.
 

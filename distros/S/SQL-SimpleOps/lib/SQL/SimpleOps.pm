@@ -84,7 +84,7 @@
 		$err
 	);
 
-	our $VERSION = "2022.266.1";
+	our $VERSION = "2022.301.1";
 
 	our @EXPORT_OK = @EXPORT;
 
@@ -219,7 +219,7 @@ sub new()
 	$self->{argv}{port} = "" if (!defined($self->{argv}{port}));
 
 	## mandatory itens
-       	if (!grep(/^$self->{argv}{interface}$/i,"dbi"))
+    if (!grep(/^$self->{argv}{interface}$/i,"dbi"))
 	{
 		&setMessage($self,"new",SQL_SIMPLE_RC_SYNTAX,"003");
 	       	return undef;
@@ -486,7 +486,7 @@ sub _SelectCursor()
 		return SQL_SIMPLE_RC_SYNTAX;
 	}
 
-	## haver order by?
+	## have order by?
 	my @order;
 	if	(!defined($argv->{order_by})) {}
 	elsif	(ref($argv->{order_by}) eq "") { @order = ($argv->{order_by}); }
@@ -563,7 +563,8 @@ sub _SelectCursor()
 	}
 	elsif (ref($argv->{cursor_info}) eq "SCALAR")
 	{
-		$argv->{cursor_info} = $self->{init}{cursor}{rc}." ".$self->{init}{cursor}{lines}." ".$argv->{cursor_info}->{first}." ".$argv->{cursor_info}->{last};
+		my @a = split(" ",${$argv->{cursor_info}});
+		$argv->{cursor_info} = $self->{init}{cursor}{rc}." ".$self->{init}{cursor}{lines}." ".$a[2]." ".$a[3];
 	}
 	return SQL_SIMPLE_RC_OK;
 }
@@ -630,8 +631,8 @@ sub _Select()
 			}
 			$tables_tmp{$table}=1;
 		}
-	       	@tables_work = @{$argv->{table}};
-       	}
+	    @tables_work = @{$argv->{table}};
+    }
 	else
 	{
 		$self->setMessage("select",SQL_SIMPLE_RC_SYNTAX,"006");
@@ -828,7 +829,7 @@ sub _Select()
 	$sql .= " WHERE ".$where if ($where);
 	$sql .= " GROUP BY ".join(", ",@group_work) if (@group_work);
 	$sql .= " ORDER BY ".join(", ",@order) if (@order);
-	$sql .= " LIMIT ".$argv->{limit} if (defined($argv->{limit}) && $argv->{limit} > 1);
+	$sql .= " LIMIT ".$argv->{limit} if (defined($argv->{limit}) && $argv->{limit} > 0);
 
 	## execute
 	return SQL_SIMPLE_RC_ERROR if ($self->_Call(

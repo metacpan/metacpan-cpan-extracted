@@ -12,23 +12,46 @@ build_requires:
   Test::FailWarnings: '0'
   Test::More: '0.94'
   Test::NoWarnings: '0'
-  perl: '5.014000'
 configure_requires:
-  ExtUtils::MakeMaker: '6.48'
+  ExtUtils::MakeMaker: '7.64'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Memoize-HashKey-Ignore
+no_index:
+  directory:
+    - eg
+    - share
+    - shares
+    - t
+    - xt
+provides:
+  Memoize::HashKey::Ignore:
+    file: lib/Memoize/HashKey/Ignore.pm
+    version: '0.05'
 requires:
   Memoize: '0'
-  Try::Tiny: '0'
-  perl: '5.014000'
+  Syntax::Keyword::Try: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
 resources:
   bugtracker: https://github.com/binary-com/perl-Memoize-HashKey-Ignore/issues
-  repository: git://github.com/binary-com/perl-Memoize-HashKey-Ignore.git
-version: '0.04'
-x_generated_by_perl: v5.14.2
+  homepage: https://github.com/binary-com/perl-Memoize-HashKey-Ignore
+  repository: https://github.com/binary-com/perl-Memoize-HashKey-Ignore.git
+version: '0.05'
+x_authority: cpan:DERIV
+x_contributors:
+  - 'Jean-Yves Sireau <jy@binary.com>'
+  - 'Chylli <chylli@binary.com>'
+  - 'Rakesh Kumar Shardiwal <rakesh.shardiwal@gmail.com>'
+  - 'Zak B. Elep <zakame@zakame.net>'
+  - 'chylli-binary <52912308+chylli-binary@users.noreply.github.com>'
+  - 'Chylli <chylli.email@gmail.com>'
+  - 'Tom Molesworth <tom@binary.com>'
+x_generated_by_perl: v5.26.2
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

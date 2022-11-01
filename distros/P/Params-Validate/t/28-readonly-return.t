@@ -2,8 +2,8 @@ use strict;
 use warnings;
 use Test::More;
 
-use Devel::Peek qw( SvREFCNT );
-use File::Temp qw( tempfile );
+use Devel::Peek      qw( SvREFCNT );
+use File::Temp       qw( tempfile );
 use Params::Validate qw( validate SCALAR HANDLE );
 
 {
@@ -17,7 +17,7 @@ use Params::Validate qw( validate SCALAR HANDLE );
 
     eval { $ref->{foo} = 2 };
     ok( !$@, 'returned hashref values are not read only' );
-    is( $ref->{foo}, 2, 'double check that setting value worked' );
+    is( $ref->{foo}, 2,   'double check that setting value worked' );
     is( $fh, $ref->{bar}, 'filehandle is not copied during validation' );
 }
 

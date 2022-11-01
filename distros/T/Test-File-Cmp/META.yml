@@ -1,23 +1,24 @@
---- #YAML:1.0
-name:               Test-File-Cmp
-version:            0.02
-abstract:           Test routine for file comparison independent of CRLF or LF line endings.
+---
+abstract: 'Test routine for file comparison independent of CRLF or LF line endings.'
 author:
-    - Abdul al Hazred <451@gmx.eu>
-license:            perl_5
-distribution_type:  module
-configure_requires:
-    ExtUtils::MakeMaker:  0
+  - 'Abdul al Hazred <451@gmx.eu>'
 build_requires:
-    ExtUtils::MakeMaker:  0
-requires:
-    perl:        5.010
-    Test::More:  0
-no_index:
-    directory:
-        - t
-        - inc
-generated_by:       ExtUtils::MakeMaker version 6.55_02
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.48, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
-    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
-    version:  1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Test-File-Cmp
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.010'
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

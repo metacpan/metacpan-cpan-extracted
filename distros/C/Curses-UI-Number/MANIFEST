@@ -1,6 +1,6 @@
 Changes
-examples/ex1.pl
-examples/ex2.pl
+examples/curses_ui_five.pl
+examples/curses_ui_timer.pl
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm

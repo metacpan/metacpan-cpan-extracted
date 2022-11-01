@@ -1,7 +1,7 @@
 #ifndef __XS_PARSE_INFIX_H__
 #define __XS_PARSE_INFIX_H__
 
-#define XSPARSEINFIX_ABI_VERSION 1
+#define XSPARSEINFIX_ABI_VERSION 2
 
 /* Infix operator classifications */
 /* No built-in operators use the _MISC categories, but they are provided for
@@ -16,6 +16,10 @@ enum XSParseInfixClassification {
   XPI_CLS_ISA,         /*  ... the predicate instance of (isa) */
   XPI_CLS_MATCH_MISC,  /*  ... any other match-like predicate */
   XPI_CLS_ORDERING,    /* cmp or <=> */
+
+  XPI_CLS_ADD_MISC,    /* an operator at addition-like precedence */
+  XPI_CLS_MUL_MISC,    /* an operator at multiplication-like precedence */
+  XPI_CLS_POW_MISC,    /* an operator at power exponentiation-like precedence */
 };
 
 enum XSParseInfixSelection {
@@ -31,16 +35,16 @@ enum XSParseInfixSelection {
 
 /* lhs_flags, rhs_flags */
 enum {
-  /* other space reserved for other scalar types */
-  XPI_OPERAND_ARITH     = 2,
-  XPI_OPERAND_TERM      = 4,
   XPI_OPERAND_TERM_LIST = 6, /* term in list context */
   XPI_OPERAND_LIST      = 7, /* list in list context */
 
   /* Other bitflags */
   XPI_OPERAND_ONLY_LOOK = (1<<3),
-  XPI_OPERAND_CUSTOM    = (1<<7), /* rhs_flags only */
 };
+// No longer used
+#define XPI_OPERAND_ARITH 0
+#define XPI_OPERAND_TERM  0
+#define XPI_OPERAND_CUSTOM (1<<7)
 
 struct XSParseInfixHooks {
   U16 flags;
@@ -54,11 +58,11 @@ struct XSParseInfixHooks {
   bool (*permit) (pTHX_ void *hookdata);
 
   /* These hooks are alternatives; the first one defined is used */
-  OP *(*new_op)(pTHX_ U32 flags, OP *lhs, OP *rhs, void *hookdata);
+  OP *(*new_op)(pTHX_ U32 flags, OP *lhs, OP *rhs, SV **parsedata, void *hookdata);
   OP *(*ppaddr)(pTHX); /* A pp func used directly in newBINOP_custom() */
 
-  /* Used if rhs_flags & XPI_OPERAND_CUSTOM */
-  OP *(*parse_rhs)(pTHX_ void *hookdata);
+  /* optional */
+  void (*parse)(pTHX_ U32 flags, SV **parsedata, void *hookdata);
 };
 
 struct XSParseInfixInfo {
@@ -68,6 +72,18 @@ struct XSParseInfixInfo {
   const struct XSParseInfixHooks *hooks;
   void *hookdata;
 };
+
+static bool (*parse_infix_func)(pTHX_ enum XSParseInfixSelection select, struct XSParseInfixInfo **infop);
+#define parse_infix(select, infop) S_parse_infix(aTHX_ select, infop)
+static bool S_parse_infix(pTHX_ enum XSParseInfixSelection select, struct XSParseInfixInfo **infop)
+{
+  if(!parse_infix_func)
+    croak("Must call boot_xs_parse_infix() first");
+
+  struct XSParseInfixInfo *infocopy;
+
+  return (*parse_infix_func)(aTHX_ select, infop);
+}
 
 static OP *(*xs_parse_infix_new_op_func)(pTHX_ const struct XSParseInfixInfo *info, U32 flags, OP *lhs, OP *rhs);
 #define xs_parse_infix_new_op(info, flags, lhs, rhs)  S_xs_parse_infix_new_op(aTHX_ info, flags, lhs, rhs)
@@ -111,10 +127,12 @@ static void S_boot_xs_parse_infix(pTHX_ double ver) {
     croak("XS::Parse::Infix ABI version mismatch - library supports <= %d, compiled for %d",
         abi_ver, XSPARSEINFIX_ABI_VERSION);
 
+  parse_infix_func = INT2PTR(bool (*)(pTHX_ enum XSParseInfixSelection, struct XSParseInfixInfo **),
+      SvUV(*hv_fetchs(PL_modglobal, "XS::Parse::Infix/parse()@2", 0)));
   xs_parse_infix_new_op_func = INT2PTR(OP *(*)(pTHX_ const struct XSParseInfixInfo *, U32, OP *, OP *),
       SvUV(*hv_fetchs(PL_modglobal, "XS::Parse::Infix/new_op()@0", 0)));
   register_xs_parse_infix_func = INT2PTR(void (*)(pTHX_ const char *, const struct XSParseInfixHooks *, void *),
-      SvUV(*hv_fetchs(PL_modglobal, "XS::Parse::Infix/register()@1", 0)));
+      SvUV(*hv_fetchs(PL_modglobal, "XS::Parse::Infix/register()@2", 0)));
 }
 
 #endif

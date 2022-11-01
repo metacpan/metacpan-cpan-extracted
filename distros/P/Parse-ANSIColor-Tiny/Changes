@@ -1,5 +1,9 @@
 Revision history for Parse-ANSIColor-Tiny
 
+0.700     2022-10-22T17:50:58Z
+
+  - Fix reset_foreground/reset_background to work with the 256 set of colors.
+
 0.601     2017-09-06T14:43:42Z
 
   - Update meta files.  No code changes.

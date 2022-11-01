@@ -6,11 +6,11 @@ our $AUTHORITY = 'cpan:GENE';
 use strict;
 use warnings;
 
-our $VERSION = '0.2206';
+our $VERSION = '0.2207';
 
-use Carp;
+use Carp qw( carp );
 use Algorithm::Combinatorics qw( permutations );
-use Array::Transpose;
+use Array::Transpose qw( transpose );
 use List::SomeUtils qw( all zip );
 use List::Util qw( max min sum0 );
 use List::Util::WeightedChoice qw( choose_weighted );
@@ -512,7 +512,7 @@ Game::Theory::TwoPersonMatrix - Analyze a 2 person matrix game
 
 =head1 VERSION
 
-version 0.2206
+version 0.2207
 
 =head1 SYNOPSIS
 
@@ -752,7 +752,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Gene Boggs.
+This software is copyright (c) 2022 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

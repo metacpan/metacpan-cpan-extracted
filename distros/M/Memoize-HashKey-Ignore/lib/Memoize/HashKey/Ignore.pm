@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings FATAL => 'all';
 
-use Try::Tiny;
+use Syntax::Keyword::Try;
 use Memoize;
 
 =head1 NAME
@@ -13,7 +13,7 @@ Memoize::HashKey::Ignore - allow certain keys not to be memoized.
 
 =cut
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 =head1 SYNOPSIS
 
@@ -46,9 +46,9 @@ sub TIEHASH {
         my $modulefile = $module . '.pm';
         $modulefile =~ s{::}{/}g;
         try { require $modulefile }
-        catch {
-            die 'Memoize::HashKey::Ignore: Could not load hash tie module "' . $module . '": ' . $_;
-        };
+        catch ($e) {
+            die 'Memoize::HashKey::Ignore: Could not load hash tie module "' . $module . '": ' . $e;
+        }
         my $rc = (
             tie %$cache => $module,
             @opts

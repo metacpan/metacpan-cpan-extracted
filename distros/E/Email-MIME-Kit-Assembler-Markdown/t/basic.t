@@ -58,4 +58,44 @@ subtest "encode_entities" => sub {
   like($parts[1]->body, qr{&lt;b&gt;awesome&lt;/b&gt;}, "did encode entities in html");
 };
 
+subtest "rendering_html" => sub {
+  my $path = "t/kit/sample-ifhtml.mkit";
+  my $kit = Email::MIME::Kit->new({ source => $path });
+
+  my $email = $kit->assemble({});
+
+  my @parts = $email->subparts;
+
+  like($email->content_type, qr{multipart/alternative}, "message is mp/a");
+
+  like($parts[0]->content_type, qr{text/plain},     "1st alternative is txt");
+  like($parts[0]->body,   qr{Survey says:\s+text},  "render type: text");
+  unlike($parts[0]->body, qr{Survey says:\s+html},  "render type: !html");
+  like($parts[0]->body,   qr{type:\s+text},         "w.render type: text");
+  unlike($parts[0]->body, qr{type:\s+html},         "w.render type: !html");
+
+  like($parts[1]->content_type, qr{text/html},      "2nd alternative is html");
+  like($parts[1]->body,   qr{Survey says:\s+html},  "render type: html");
+  unlike($parts[1]->body, qr{Survey says:\s+text},  "render type: !text");
+  like($parts[1]->body,   qr{type:\s+html},         "w.render type: html");
+  unlike($parts[1]->body, qr{type:\s+text},         "w.render type: !text");
+};
+
+subtest "line-skip marker" => sub {
+  my $kit = Email::MIME::Kit->new({ source => "t/kit/sample-skip.mkit" });
+  my $email = $kit->assemble({});
+
+  my ($plain, $html) = $email->subparts;
+
+  my @html_hunks = qw( <center> </center> <bold> </bold> );
+
+  for my $hunk (@html_hunks) {
+    unlike($plain->body_str, qr{\Q$hunk}, "plain does not contain $hunk");
+    like($html->body_str, qr{\Q$hunk}, "html does contain $hunk");
+  }
+
+  unlike($plain->body_str, qr{SKIP.LINE}, "skip marker is not in plain text");
+  unlike($html->body_str,  qr{SKIP.LINE}, "skip marker is not in html");
+};
+
 done_testing;

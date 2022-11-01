@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2011-2021 -- leonerd@leonerd.org.uk
 
-package Tangence::Server 0.29;
+package Tangence::Server 0.30;
 
 use v5.26;
 use warnings;

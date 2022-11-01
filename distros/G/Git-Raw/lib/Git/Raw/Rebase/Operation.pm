@@ -1,5 +1,5 @@
 package Git::Raw::Rebase::Operation;
-$Git::Raw::Rebase::Operation::VERSION = '0.88';
+$Git::Raw::Rebase::Operation::VERSION = '0.90';
 use strict;
 use warnings;
 use Carp;
@@ -29,7 +29,7 @@ Git::Raw::Rebase::Operation - Git rebase operation class
 
 =head1 VERSION
 
-version 0.88
+version 0.90
 
 =head1 DESCRIPTION
 
@@ -88,7 +88,7 @@ No commit will be cherry-picked. The client should run the given command and
 
 =head1 AUTHOR
 
-Jacques Germishuys <jacquesg@striata.com>
+Jacques Germishuys <jacquesg@cpan.org>
 
 =head1 LICENSE AND COPYRIGHT
 

@@ -2,7 +2,7 @@
 ## Stripe API - ~/lib/Net/API/Stripe/WebHook/Object.pm
 ## Version v0.1.0
 ## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2020/05/15
 ## 
@@ -10,13 +10,19 @@
 package Net::API::Stripe::WebHook::Object;
 BEGIN
 {
-	use strict;
-	use parent qw( Net::API::Stripe::Generic );
+    use strict;
+    use warnings;
+    use parent qw( Net::API::Stripe::Generic );
+    use vars qw( $VERSION );
+    our( $VERSION ) = 'v0.1.0';
 };
+
+use strict;
+use warnings;
 
 sub id { return( shift->_set_get_scalar( 'id', @_ ) ); }
 
-## Should be webhook_endpoint
+# Should be webhook_endpoint
 sub object { return( shift->_set_get_scalar( 'object', @_ ) ); }
 
 sub api_version { return( shift->_set_get_scalar( 'api_version', @_ ) ); }
@@ -25,10 +31,14 @@ sub application { return( shift->_set_get_scalar( 'application', @_ ) ); }
 
 sub created { return( shift->_set_get_datetime( 'created', @_ ) ); }
 
-## * to enable all event, other array of event types
+sub description { return( shift->_set_get_scalar( 'description', @_ ) ); }
+
+# * to enable all event, other array of event types
 sub enabled_events { return( shift->_set_get_array( 'enabled_events', @_ ) ); }
 
 sub livemode { return( shift->_set_get_boolean( 'livemode', @_ ) ); }
+
+sub metadata { return( shift->_set_get_hash( 'metadata', @_ ) ); }
 
 sub secret { return( shift->_set_get_scalar( 'secret', @_ ) ); }
 
@@ -38,7 +48,7 @@ sub status { return( shift->_set_get_scalar( 'status', @_ ) ); }
 sub url { return( shift->_set_get_uri( 'url', @_ ) ); }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf8
@@ -70,78 +80,78 @@ This is a Stripe webhook endpoint object.
 
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>( %ARG )
+=head2 new( %ARG )
 
 Creates a new L<Net::API::Stripe::WebHook::Object> object.
 It may also take an hash like arguments, that also are method of the same name.
 
-=back
-
 =head1 METHODS
 
-=over 4
-
-=item B<id> string
+=head2 id string
 
 Unique identifier for the object.
 
-=item B<object> string, value is "webhook_endpoint"
+=head2 object string, value is "webhook_endpoint"
 
 String representing the object’s type. Objects of the same type share the same value.
 
-=item B<api_version> string
+=head2 api_version string
 
 The API version events are rendered as for this webhook endpoint.
 
-=item B<application> string
+=head2 application string
 
 The ID of the associated Connect application.
 
-=item B<created> timestamp
+=head2 created timestamp
 
 Time at which the object was created. Measured in seconds since the Unix epoch.
 
-=item B<enabled_events> array containing strings
+=head2 description string
+
+An optional description of what the webhook is used for.
+
+=head2 enabled_events array containing strings
 
 The list of events to enable for this endpoint. You may specify ['*'] to enable all events.
 
-=item B<livemode> boolean
+=head2 livemode boolean
 
 Has the value true if the object exists in live mode or the value false if the object exists in test mode.
 
-=item B<secret> string
+=head2 metadata hash
+
+Set of L<key-value pairs|https://stripe.com/docs/api/metadata> that you can attach to an object. This can be useful for storing additional information about the object in a structured format.
+
+=head2 secret string
 
 The endpoint’s secret, used to generate webhook signatures. Only returned at creation.
 
-=item B<status> string
+=head2 status string
 
 The status of the webhook. It can be enabled or disabled.
 
-=item B<url> string
+=head2 url string
 
 The URL of the webhook endpoint.
 
-=back
-
 =head1 API SAMPLE
 
-	{
-	  "id": "we_fake123456789",
-	  "object": "webhook_endpoint",
-	  "api_version": "2017-02-14",
-	  "application": null,
-	  "created": 1542006805,
-	  "enabled_events": [
-		"invoice.created",
-		"invoice.payment_failed",
-		"invoice.payment_succeeded"
-	  ],
-	  "livemode": false,
-	  "status": "enabled",
-	  "url": "http://expugno.serveo.net/stripe/invoice"
-	}
+    {
+      "id": "we_fake123456789",
+      "object": "webhook_endpoint",
+      "api_version": "2017-02-14",
+      "application": null,
+      "created": 1542006805,
+      "enabled_events": [
+        "invoice.created",
+        "invoice.payment_failed",
+        "invoice.payment_succeeded"
+      ],
+      "livemode": false,
+      "status": "enabled",
+      "url": "http://expugno.serveo.net/stripe/invoice"
+    }
 
 =head1 HISTORY
 

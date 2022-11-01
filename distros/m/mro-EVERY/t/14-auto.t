@@ -82,8 +82,6 @@ for( @testz )
 
     @$found = ();
 
-$DB::single = 1;
-
     $pkg->$dispatch;
 
     is_deeply $found, $expect, "$pkg, $prefix"

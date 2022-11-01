@@ -21,6 +21,7 @@ lib/Sys/OsPackage/Driver/Suse.pm
 t/001_module_load.t
 t/002_basic.t
 t/003_driver.t
+t/010_fetch_reqs.t
 t/101_alpine.t
 t/102_arch.t
 t/103_debian.t

@@ -17,6 +17,7 @@ maint/cip-before-install
 perlcriticrc
 t/00_diag.t
 t/acme_color_rust.t
+t/rustfmt.t
 xt/author/critic.t
 xt/author/eol.t
 xt/author/no_tabs.t

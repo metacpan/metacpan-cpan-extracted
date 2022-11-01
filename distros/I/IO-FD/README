@@ -1,5 +1,5 @@
 NAME
-    IO::FD - faster accept, socket, listen, read, write and friends with
+    IO::FD - Faster accept, socket, listen, read, write and friends with
     file descriptors, not handles
 
 SYNOPSIS
@@ -256,12 +256,15 @@ APIs
 
    IO::FD::clock_gettime_monotonic
    IO::FD::select
+    Broken. Probably will be removed as core perl has this already.
+
    IO::FD::poll
     Constants for use with poll are available via "IO::FD:Constants"
 
    IO::FD::kqueue
    IO::FD::kevent
-    Constants for use with kevent are available via "IO::FD:Constants"
+    This is broken ok 32 bit BSD at the moment. Constants for use with
+    kevent are available via "IO::FD:Constants"
 
    IO::FD::pack_kevent
    IO::FD::sv_to_pointer

@@ -18,5 +18,5 @@ else
 fi
 
 cip sudo chown -R cip.cip /home/cip/dzil
-cip exec ./maint/cip-before-install-inside
 
+cip exec dzil-cpanm -n Alien::Build::Plugin::Download::GitHub

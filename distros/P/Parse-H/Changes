@@ -1,0 +1,13 @@
+Revision history for Parse-H
+
+2022-10-31	Bogdan Drozdowski <bogdro \at\ cpan . org>
+
+	* Version 0.11
+	* t/z_parse_file.t: Added missing imports.
+
+2022-10-17	Bogdan Drozdowski <bogdro \at\ cpan . org>
+
+	* Version 0.10
+	  Initial version. Parsing structures, unions, enumerations,
+	  preprocessor statements, comments, typedefs and external
+	  declarations. Accepting configuration hashes.

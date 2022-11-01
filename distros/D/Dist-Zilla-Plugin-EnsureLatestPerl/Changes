@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-EnsureLatestPerl
 
+0.009     2022-10-23 17:58:16Z
+          - adjust artificial $] in tests so postderef still works (RT#144904)
+
 0.008     2018-06-19 23:05:30Z
           - soften Module::CoreList requirement to allow a 3 month delay
             between releases, rather than 2 months (RT#125632)

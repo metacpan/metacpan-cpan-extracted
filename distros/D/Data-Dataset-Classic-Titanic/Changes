@@ -1,5 +1,9 @@
 Revision history for Data-Dataset-Classic-Titanic
 
+0.0103 2022-10-21 20:58:05
+    - Fix typo.
+    - Avoid implicit imports.
+
 0.0102 2020-05-16 16:07:52
     - Remove unneeded "or die" code.
 

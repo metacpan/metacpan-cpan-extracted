@@ -1,0 +1,114 @@
+#!/usr/bin/perl
+
+use 5.012 ;
+use strict ; 
+use warnings ; 
+use Getopt::Std ; getopts '~2:M:r:u:' , \my%o ;
+use Regexp::Common qw [ number ] ; 
+use Term::ANSIColor qw[ :constants color ] ; $Term::ANSIColor::AUTORESET = 1 ;
+use List::Util qw [ min max uniq ] ;
+use Data::Dumper ;
+use POSIX qw [floor ceil ] ;
+my $M = $o{M} // 15 ; # 段階の数
+my ($v1,$v2,$v3) = split /,/, $o{r} //''  , 3 ; # -r から抽出。全てまたは末尾1個がundefの場合あり。
+
+sub numExtract ($) { 
+  my @tmp = grep /$RE{num}{real}/o , @{$_[0]} ;
+  @tmp = grep { $v1 <= $_ && $_ <= $v2 } @tmp if defined $v1 ;
+  @tmp = sort { $a <=> $b } @tmp ;
+  @tmp = uniq @tmp if 0 ne ($o{u}//'') ;
+  return @tmp ;
+}
+
+undef $/ ; 
+my $text = <> ; 
+my @parts = split /($RE{num}{real})/o , $text , -1 ; # 読んだテキストを、数値の部分とそれ以外にバラバラに。
+my @nums = numExtract \@parts ; 
+my @chop = ('-inf', map $nums[ $#nums * (2*$_-1)/(2*$M-2) ] , 1..$M-1 ) ; # <-- - $M==1の時??  
+#say CYAN join ":" , @chop ; 
+my %n2c ;#= do{ my $c=0; map{while($chop[$c++]>$_){1}; say($_,":",$c-1) } uniq @nums }; # 数値を色レベルに変換するためのハッシュ
+do { my $c = 0 ; # 色の段階の初期値
+  for ( uniq @nums ) { 
+    $c++ while $c <= $#chop && $chop [ $c ] < $_ ; # <= は < だと不都合っぽい。
+    $n2c { $_ } = $c - 1 ; 
+  }
+} ;
+#for ( sort {$a<=>$b} keys %n2c ) { say CYAN "$_ : $n2c{$_}"} ; exit ;
+
+my %usedC ; #使われた色を記録
+for ( @parts ) { 
+  if ( /$RE{num}{real}/o ){ 
+    my $c ;
+    if ( defined $v1 and $_ < $v1 || $v2 < $_ ) { 
+      do { print ; next } if 0 eq ( $v3 // '' ) ;
+      $c = $_ < $v1 ? 0 : $M - 1 ;
+    }
+    $c //= $n2c{$_} ;#say RED $c ;
+    my $R = ceil max 0 , min 5 , $c - ($M/2-.5)  ; 
+    my $G = max 0, ceil min 2 , ($M/2-.5) - abs ( ($M/2-.5) - $c )  ;
+    my $B = ceil max 0 , min 5, ($M/2-.5) - $c  ;
+    ($R,$B)=($B,$R) if $o{'~'} ; 
+    my $color = "bold on_rgb$R$G$B" ;
+    $usedC { $color }++;
+    #print "$R$G$B"; 
+    #print "$c-$R$G$B" .color( 'reset' ) ;
+    #print "$_:$c-$R$G$B" .color( 'reset' ) ;
+    #print color( $color ) . "$_:$c-$R$G$B" .color( 'reset' ) ;
+    print color( "$color" ) . "$_" .color( 'reset' ) ;
+  } else { 
+    print $_ ;
+  }
+}
+END { 
+  exit if 0 eq ($o{2}//'') ;
+  #my @tmp = sort {$a <=> $b } values %n2c ;
+  #@tmp = uniq @tmp ; 
+  #my $difc = scalar @tmp ;
+  my $difc = scalar keys %usedC ;
+  select STDERR ; # 以降の出力は STDERR とする。
+  print FAINT "$difc different background colors used ; " ;
+  #my $alv = scalar uniq @chop  ; 
+  #print STDERR FAINT "Different $alv are prepared ; " ;
+  print FAINT "Threadsholds = { " . join(" : ",@chop[1..$#chop])." } with the length $#chop." ; 
+  say FAINT " ($0)" ; 
+} ; #exit ;
+exit ;
+
+## ヘルプとバージョン情報
+
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if $ARGV[1] eq 'opt' ? m/^\ +\-/ : s/^=head1// .. s/^=cut// ;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+=encoding utf8 
+
+=head1
+
+ $0 
+
+   入力のテキストを読み取り、数値の部分を (Regexp::Commons::number を使って)
+   抽出して、背景に ANSIエスケープシーケンスによる色を付ける。
+   最小値は青、緑を経由して、最大値は赤。15段階。
+   (出現数値をuniq化した上で、28分位点をとり、奇数番目の値14個を抽出して、
+   それを閾値として、色は段階的に変化させる。)
+
+   閾値に対して、数値の色づけは、「以下」で判定。「未満」による判定ではない。
+
+  オプション: 
+
+   -u 0 : 数値に対して uniq の処理をしない。
+   -g L,U[,0] : 着色する数値範囲を指定する。3番目に0を入れると、範囲外の数値は着色をしない。
+   -~ : 色の、赤と青の傾向を反転する。
+
+   -M num ; numは色の個数。最大15。
+   -2 0 ; 2次情報の出力の抑制
+
+=cut 

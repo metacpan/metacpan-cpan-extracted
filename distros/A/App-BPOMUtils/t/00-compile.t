@@ -6,15 +6,26 @@ use warnings;
 
 use Test::More;
 
-plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 18 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
-    'App/BPOMUtils.pm'
+    'App/BPOMUtils.pm',
+    'App/BPOMUtils/Table.pm'
 );
 
 my @scripts = (
+    'script/bpom-daftar-bahan-baku-pangan',
+    'script/bpom-daftar-bahan-tambahan-pangan',
+    'script/bpom-daftar-cemaran-logam-pangan',
+    'script/bpom-daftar-cemaran-mikroba-pangan',
     'script/bpom-daftar-jenis-pangan',
+    'script/bpom-daftar-kategori-pangan',
     'script/bpom-daftar-kode-prefiks-reg',
+    'script/bpom-list-food-additives',
+    'script/bpom-list-food-categories',
+    'script/bpom-list-food-ingredients',
+    'script/bpom-list-food-inputs',
+    'script/bpom-list-food-microbe-inputs',
     'script/bpom-list-food-types',
     'script/bpom-list-reg-code-prefixes',
     'script/bpom-show-nutrition-facts',

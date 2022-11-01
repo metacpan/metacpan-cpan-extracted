@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Product.pm
-## Version v0.100.0
+## Version v0.101.0
 ## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
-## Modified 2020/05/15
+## Modified 2022/10/29
 ## 
 ##----------------------------------------------------------------------------
 ## "A list of up to 5 attributes that each SKU can provide values for (e.g., ["color", "size"]). Only applicable to products of type=good."
@@ -12,52 +12,62 @@ package Net::API::Stripe::Product;
 BEGIN
 {
     use strict;
+    use warnings;
     use parent qw( Net::API::Stripe::Generic );
-    our( $VERSION ) = 'v0.100.0';
+    use vars qw( $VERSION );
+    our( $VERSION ) = 'v0.101.0';
 };
 
-sub id { shift->_set_get_scalar( 'id', @_ ); }
+use strict;
+use warnings;
 
-sub object { shift->_set_get_scalar( 'object', @_ ); }
+sub id { return( shift->_set_get_scalar( 'id', @_ ) ); }
 
-sub active { shift->_set_get_boolean( 'active', @_ ); }
+sub object { return( shift->_set_get_scalar( 'object', @_ ) ); }
 
-sub attributes { shift->_set_get_array( 'attributes', @_ ); }
+sub active { return( shift->_set_get_boolean( 'active', @_ ) ); }
 
-sub caption { shift->_set_get_scalar( 'caption', @_ ); }
+sub attributes { return( shift->_set_get_array( 'attributes', @_ ) ); }
 
-sub created { shift->_set_get_datetime( 'created', @_ ); }
+sub caption { return( shift->_set_get_scalar( 'caption', @_ ) ); }
 
-sub deactivate_on { shift->_set_get_array( 'deactivate_on', @_ ); }
+sub created { return( shift->_set_get_datetime( 'created', @_ ) ); }
+
+sub deactivate_on { return( shift->_set_get_array( 'deactivate_on', @_ ) ); }
+
+sub default_price { return( shift->_set_get_scalar_or_object( 'default_price', 'Net::API::Stripe::Price', @_ ) ); }
 
 sub deleted { return( shift->_set_get_boolean( 'deleted', @_ ) ); }
 
-sub description { shift->_set_get_scalar( 'description', @_ ); }
+sub description { return( shift->_set_get_scalar( 'description', @_ ) ); }
 
-sub images { shift->_set_get_array( 'images', @_ ); }
+sub images { return( shift->_set_get_array( 'images', @_ ) ); }
 
-sub livemode { shift->_set_get_boolean( 'livemode', @_ ); }
+sub livemode { return( shift->_set_get_boolean( 'livemode', @_ ) ); }
 
-sub metadata { shift->_set_get_hash( 'metadata', @_ ); }
+sub metadata { return( shift->_set_get_hash( 'metadata', @_ ) ); }
 
-sub name { shift->_set_get_scalar( 'name', @_ ); }
+sub name { return( shift->_set_get_scalar( 'name', @_ ) ); }
 
-sub package_dimensions { shift->_set_get_object( 'package_dimensions', 'Net::API::Stripe::Product::PackageDimension', @_ ); }
+sub package_dimensions { return( shift->_set_get_object( 'package_dimensions', 'Net::API::Stripe::Product::PackageDimension', @_ ) ); }
 
-sub shippable { shift->_set_get_scalar( 'shippable', @_ ); }
+sub shippable { return( shift->_set_get_scalar( 'shippable', @_ ) ); }
 
 ## List of Net::API::Stripe::Order::SKU objects
+
 sub skus { return( shift->_set_get_object( 'Net::API::Stripe::List', @_ ) ); }
 
-sub statement_descriptor { shift->_set_get_scalar( 'statement_descriptor', @_ ); }
+sub statement_descriptor { return( shift->_set_get_scalar( 'statement_descriptor', @_ ) ); }
 
-sub type { shift->_set_get_scalar( 'type', @_ ); }
+sub tax_code { return( shift->_set_get_scalar_or_object( 'tax_code', 'Net::API::Stripe::Product::TaxCode', @_ ) ); }
 
-sub unit_label { shift->_set_get_scalar( 'unit_label', @_ ); }
+sub type { return( shift->_set_get_scalar( 'type', @_ ) ); }
 
-sub updated { shift->_set_get_datetime( 'updated', @_ ); }
+sub unit_label { return( shift->_set_get_scalar( 'unit_label', @_ ) ); }
 
-sub url { shift->_set_get_uri( 'url', @_ ); }
+sub updated { return( shift->_set_get_datetime( 'updated', @_ ) ); }
+
+sub url { return( shift->_set_get_uri( 'url', @_ ) ); }
 
 1;
 
@@ -86,7 +96,7 @@ Net::API::Stripe::Product - A Stripe Product Object
         name => 'Limited Edition Shirt',
         package_dimensions =>
         {
-        	use_metric => 1,
+            use_metric => 1,
             width => 30,
             length => 50,
             height => 15,
@@ -101,7 +111,7 @@ See documentation in L<Net::API::Stripe> for example to make api calls to Stripe
 
 =head1 VERSION
 
-    v0.100.0
+    v0.101.0
 
 =head1 DESCRIPTION
 
@@ -111,131 +121,137 @@ Documentation on Products for use with Subscriptions can be found at L<Subscript
 
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>( %ARG )
+=head2 new( %ARG )
 
 Creates a new L<Net::API::Stripe::Product> object.
 
-=back
-
 =head1 METHODS
 
-=over 4
-
-=item B<id> string
+=head2 id string
 
 Unique identifier for the object.
 
-=item B<object> string, value is "product"
+=head2 object string, value is "product"
 
 String representing the object’s type. Objects of the same type share the same value.
 
-=item B<active> boolean
+=head2 active boolean
 
 Whether the product is currently available for purchase.
 
-=item B<attributes> array containing strings
+=head2 attributes array containing strings
 
 A list of up to 5 attributes that each SKU can provide values for (e.g., ["color", "size"]). Only applicable to products of type=good.
 
-=item B<caption> string
+=head2 caption string
 
 A short one-line description of the product, meant to be displayable to the customer. Only applicable to products of type=good.
 
-=item B<created> timestamp
+=head2 created timestamp
 
 Time at which the object was created. Measured in seconds since the Unix epoch.
 
-=item B<deactivate_on> array containing strings
+=head2 deactivate_on array containing strings
 
 An array of connect application identifiers that cannot purchase this product. Only applicable to products of type=good.
 
-=item B<deleted> boolean
+=head2 default_price expandable
+
+The ID of the L<Price|https://stripe.com/docs/api/prices> object that is the default price for this product.
+
+When expanded this is an L<Net::API::Stripe::Price> object.
+
+=head2 deleted boolean
 
 Set to true when the product has been deleted.
 
-=item B<description> string
+=head2 description string
 
 The product’s description, meant to be displayable to the customer. Only applicable to products of type=good.
 
-=item B<images> array containing strings
+=head2 images array containing strings
 
 A list of up to 8 URLs of images for this product, meant to be displayable to the customer. Only applicable to products of type=good.
 
-=item B<livemode> boolean
+=head2 livemode boolean
 
 Has the value true if the object exists in live mode or the value false if the object exists in test mode.
 
-=item B<metadata> hash
+=head2 metadata hash
 
 Set of key-value pairs that you can attach to an object. This can be useful for storing additional information about the object in a structured format.
 
-=item B<name> string
+=head2 name string
 
 The product’s name, meant to be displayable to the customer. Applicable to both service and good types.
 
-=item B<package_dimensions> hash
+=head2 package_dimensions hash
 
 The dimensions of this product for shipping purposes. A SKU associated with this product can override this value by having its own package_dimensions. Only applicable to products of type=good.
 
 This is a L<Net::API::Stripe::Product::PackageDimension> object.
 
-=item B<shippable> boolean
+=head2 shippable boolean
 
 Whether this product is a shipped good. Only applicable to products of type=good.
 
-=item B<skus> list
+=head2 skus list
 
 This is a list (L<Net::API::Stripe::List>) of L<Net::API::Stripe::Order::SKU> objects.
 
 This is an undocumented property.
 
-=item B<statement_descriptor> string
+=head2 statement_descriptor string
 
 Extra information about a product which will appear on your customer’s credit card statement. In the case that multiple products are billed at once, the first statement descriptor will be used. Only available on products of type=service.
 
-=item B<type> string
+=head2 tax_code expandable
+
+A L<tax code|https://stripe.com/docs/tax/tax-categories> ID.
+
+When expanded this is an L<Net::API::Stripe::Product::TaxCode> object.
+
+=head2 type string
 
 The type of the product. The product is either of type good, which is eligible for use with Orders and SKUs, or service, which is eligible for use with Subscriptions and Plans.
 
-=item B<unit_label> string
+=head2 unit_label string
 
 A label that represents units of this product, such as seat(s), in Stripe and on customers’ receipts and invoices. Only available on products of type=service.
 
-=item B<updated> timestamp
+=head2 updated timestamp
 
-=item B<url> string
+Time at which the object was last updated. Measured in seconds since the Unix epoch.
+
+=head2 url string
 
 A URL of a publicly-accessible webpage for this product. Only applicable to products of type=good
 
 This returns a L<URI> object.
 
-=back
-
 =head1 API SAMPLE
 
-	{
-	  "id": "prod_fake123456789",
-	  "object": "product",
-	  "active": true,
-	  "attributes": [],
-	  "caption": null,
-	  "created": 1541833574,
-	  "deactivate_on": [],
-	  "description": null,
-	  "images": [],
-	  "livemode": false,
-	  "metadata": {},
-	  "name": "Provider, Inc investor yearly membership",
-	  "package_dimensions": null,
-	  "shippable": null,
-	  "statement_descriptor": null,
-	  "type": "service",
-	  "unit_label": null,
-	  "updated": 1565089803,
-	  "url": null
-	}
+    {
+      "id": "prod_fake123456789",
+      "object": "product",
+      "active": true,
+      "attributes": [],
+      "caption": null,
+      "created": 1541833574,
+      "deactivate_on": [],
+      "description": null,
+      "images": [],
+      "livemode": false,
+      "metadata": {},
+      "name": "Provider, Inc investor yearly membership",
+      "package_dimensions": null,
+      "shippable": null,
+      "statement_descriptor": null,
+      "type": "service",
+      "unit_label": null,
+      "updated": 1565089803,
+      "url": null
+    }
 
 =head1 HISTORY
 

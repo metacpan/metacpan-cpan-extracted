@@ -6,7 +6,7 @@ use Carp qw( croak );
 use FFI::Platypus;
 use FFI::ExtractSymbols;
 
-our $VERSION = '0.09';
+our $VERSION = '0.11';
 
 =head1 NAME
 

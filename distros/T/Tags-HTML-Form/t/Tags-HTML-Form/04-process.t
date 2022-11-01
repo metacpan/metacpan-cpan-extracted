@@ -42,6 +42,7 @@ $obj = Tags::HTML::Form->new(
 		'data' => [
 			['d', 'Custom save'],
 		],
+		'data_type' => 'tags',
 		'type' => 'submit',
 	),
 	'tags' => $tags,
@@ -176,6 +177,6 @@ $obj = Tags::HTML::Form->new(
 eval {
 	$obj->process('bad');
 };
-is($EVAL_ERROR, "Form item must be a 'Data::HTML::Form::Input' instance.\n",
-	"Form item must be a 'Data::HTML::Form::Input' instance.");
+is($EVAL_ERROR, "Form item must be a 'Data::HTML::Form::Input', 'Data::HTML::Textarea' or 'Data::HTML::Form::Select' instance.\n",
+	"Form item must be a 'Data::HTML::Form::Input', 'Data::HTML::Textarea' or 'Data::HTML::Form::Select' instance.");
 clean();

@@ -1,5 +1,8 @@
 Revision history for PerlIO-utf8_strict
 
+0.010     2022-10-26 18:57:45+02:00 Europe/Amsterdam
+          - Re-release with updated pport.h for 5.8.5 compatibility
+
 0.009     2022-01-08 17:26:23+01:00 Europe/Amsterdam
           - Mark functions that croak as noreturn
 

@@ -5,7 +5,7 @@ use warnings;
 use 5.006;
 
 # ABSTRACT: Process run using AnyEvent::Open3::Simple
-our $VERSION = '0.87'; # VERSION
+our $VERSION = '0.88'; # VERSION
 
 
 sub new
@@ -64,7 +64,7 @@ AnyEvent::Open3::Simple::Process - Process run using AnyEvent::Open3::Simple
 
 =head1 VERSION
 
-version 0.87
+version 0.88
 
 =head1 DESCRIPTION
 
@@ -120,7 +120,7 @@ Version 0.77
  my $user_data = $proc->user;
 
 Get or set user defined data tied to the process object.  Any
-Perl data structure may be used.  Useful for persisting data 
+Perl data structure may be used.  Useful for persisting data
 between callbacks, for example:
 
  AnyEvent::Open3::Simple->new(
@@ -135,6 +135,14 @@ between callbacks, for example:
    },
  );
 
+=head1 SEE ALSO
+
+=over 4
+
+=item L<AnyEvent::Open3::Simple>
+
+=back
+
 =head1 AUTHOR
 
 Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
@@ -147,7 +155,7 @@ Scott Wiersdorf
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012-2019 by Graham Ollis.
+This software is copyright (c) 2012-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

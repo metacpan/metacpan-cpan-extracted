@@ -8,4 +8,5 @@ t/manifest.t
 t/pod-coverage.t
 t/pod.t
 META.yml                                 Module meta-data (added by MakeMaker)
+eg/tk-marktown-sample.pl
 META.json                                Module JSON meta-data (added by MakeMaker)

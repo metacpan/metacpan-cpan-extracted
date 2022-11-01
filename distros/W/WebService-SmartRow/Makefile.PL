@@ -17,8 +17,8 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010000",
   "NAME" => "WebService::SmartRow",
   "PREREQ_PM" => {
-    "HTTP::Tiny" => "0.080",
-    "JSON::MaybeXS" => "1.004003",
+    "HTTP::Tiny" => "0.082",
+    "JSON::MaybeXS" => "1.004004",
     "Moo" => "2.005004",
     "namespace::clean" => "0.27"
   },
@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
     "Test2::V0" => "0.000145",
     "Test::More" => 0
   },
-  "VERSION" => "0.006",
+  "VERSION" => "0.007",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -38,10 +38,10 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "File::Spec" => 0,
-  "HTTP::Tiny" => "0.080",
+  "HTTP::Tiny" => "0.082",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
-  "JSON::MaybeXS" => "1.004003",
+  "JSON::MaybeXS" => "1.004004",
   "Moo" => "2.005004",
   "Test2::V0" => "0.000145",
   "Test::More" => 0,

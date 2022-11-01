@@ -14,7 +14,7 @@ use utf8;
 ## use critic (Modules::RequireExplicitPackage)
 
 package Sys::OsPackage::Driver;
-$Sys::OsPackage::Driver::VERSION = '0.1.6';
+$Sys::OsPackage::Driver::VERSION = '0.3.0';
 # demonstrate module is accessible without launching packaging commands
 # all drivers inherit this to respond to ping for testing
 sub ping
@@ -29,6 +29,16 @@ sub ping
     return $class;
 }
 
+# demonstrate modules are able to read the sudo flag via Sys::OsPackage's class interface
+# returns "sudo" if the sudo flag is set and user is not already root, otherwise an empty list
+sub sudo_check
+{
+    my ($class, $ospkg ) = @_;
+
+    my $cmd = $ospkg->sudo_cmd();
+    return $cmd;
+}
+
 1;
 
 =pod
@@ -41,7 +51,7 @@ Sys::OsPackage::Driver - parent class for packaging handler drivers for Sys::OsP
 
 =head1 VERSION
 
-version 0.1.6
+version 0.3.0
 
 =head1 SYNOPSIS
 

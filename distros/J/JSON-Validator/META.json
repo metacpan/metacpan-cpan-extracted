@@ -37,7 +37,7 @@
             "List::Util" : "1.45",
             "Mojolicious" : "7.28",
             "YAML::XS" : "0.67",
-            "perl" : "5.010001"
+            "perl" : "5.016"
          }
       },
       "test" : {
@@ -50,19 +50,58 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/mojolicious/json-validator/issues"
+         "web" : "https://github.com/jhthorsen/json-validator/issues"
       },
-      "homepage" : "https://mojolicious.org",
+      "homepage" : "https://github.com/jhthorsen/json-validator",
       "license" : [
          "http://www.opensource.org/licenses/artistic-license-2.0"
       ],
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/mojolicious/json-validator.git",
-         "web" : "https://github.com/mojolicious/json-validator"
+         "url" : "https://github.com/jhthorsen/json-validator.git",
+         "web" : "https://github.com/jhthorsen/json-validator"
       },
-      "x_IRC" : "ircs://irc.libera.chat:6697/#perl-openapi"
+      "x_IRC" : {
+         "url" : "irc://irc.libera.chat/#perl-openapi",
+         "web" : "https://web.libera.chat/#perl-openapi"
+      }
    },
-   "version" : "5.11",
+   "version" : "5.12",
+   "x_contributors" : [
+      "Aleksandr Orlenko <zxteam@gmail.com>",
+      "Alexander Hartmaier <alexander.hartmaier@t-systems.at>",
+      "Alexander Karelas <karjala@cpan.org>",
+      "Bernhard Graf <augensalat@gmail.com>",
+      "Brad Barden <brad+github@13os.net>",
+      "Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>",
+      "Daniel Böhmer <boehmer@strato.de>",
+      "David Cantrell <david@cantrell.org.uk>",
+      "Ed J <mohawk2@users.noreply.github.com>",
+      "Ere Maijala <ere.maijala@helsinki.fi>",
+      "Fabrizio Gennari <fabrizio.ge@tiscali.it>",
+      "Ilya Rassadin <elcamlost@gmail.com>",
+      "Jan Henning Thorsen <jhthorsen@cpan.org>",
+      "Jason Cooper <J.L.Cooper@lboro.ac.uk>",
+      "Karen Etheridge <ether@cpan.org>",
+      "Kenichi Ishigaki <ishigaki@cpan.org>",
+      "Kevin M. Goess <kgoess@craigslist.org>",
+      "Kirill Matusov <freetransform@gmail.com>",
+      "Krasimir Berov <k.berov@gmail.com>",
+      "Lari Taskula <lari.taskula@jns.fi>",
+      "Lee Johnson <lee@givengain.ch>",
+      "Martin Renvoize <martin.renvoize@gmail.com>",
+      "Mattias Päivärinta <mattias.paivarinta@iis.se>",
+      "Michael Jemmeson <mjemmeson@cpan.org>",
+      "Michael Schout <mschout@gkg.net>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
+      "Nick Morrott <knowledgejunkie@gmail.com>",
+      "Pierre-Aymeric Masse <pamasse@afnic.fr>",
+      "Roy Storey <kiwiroy@users.noreply.github.com>",
+      "Russell Jenkins <russell.jenkins@strategicdata.com.au>",
+      "Sebastian Riedel <sri@cpan.org>",
+      "Stephan Hradek <github@hradek.net>",
+      "Tim Stallard <tim@mythic-beasts.com>",
+      "Zoffix Znet <cpan@zoffix.com>"
+   ],
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

@@ -163,7 +163,7 @@ for my $chunksize (64 * 1024, 64, 13, 3, 1, "file", "filehandle") {
         "|>>body<<|\n\n|",
         )
     {
-        if (index($res, $_) < 0) {
+        if ($res !~ /\Q$_\E/) {
             diag "Can't find '$_' in parsed document";
             $bad++;
         }

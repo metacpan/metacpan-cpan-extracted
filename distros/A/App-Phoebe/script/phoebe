@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# Copyright (C) 2017–2021  Alex Schroeder <alex@gnu.org>
+# Copyright (C) 2017–2022  Alex Schroeder <alex@gnu.org>
 
 # This program is free software: you can redistribute it and/or modify it under
 # the terms of the GNU Affero General Public License as published by the Free
@@ -394,7 +394,8 @@ own F<config> file.
       the Internet; if you use it multiple times, each host gets its own wiki
       space (see C<--wiki_space> below)
 
-=item * C<--port> is the port to use; the default is 1965
+=item * C<--port> is the port to use; the default is 1965; if you use it
+      multiple times on the same host, they all share the same wiki space
 
 =item * C<--wiki_dir> is the wiki data directory to use; the default is either
       the value of the C<PHOEBE_DATA_DIR> environment variable, or the "./wiki"
@@ -424,6 +425,32 @@ own F<config> file.
       means that STDERR is used
 
 =back
+
+When looking at the command line, Phoebe accumulates hostnames (C<--host>)and
+ports (C<--port>) until both a certificate (C<--cert_file>) and a private key
+(C<--key_file>) have been provided, or you have indicated that no TLS is
+required (C<--no_cert>), at which point the process starts again.
+
+Here is an example that is problematic:
+
+    phoebe --host transjovian.org \
+      --port 1965 --port 443 --cert_file cert.pem --key_file key.pem
+
+This serves the host on both ports, using the same certificate. This is probably
+not what you want if your certificates are signed by Let's Encrypt or some other
+service that make you renew the certificate every now and then. This breaks the
+TOFU model as Gemini clients will warn users everytime the certificate has
+changed, asking them to confirm the change. This is very annoying. Most likely
+you want different certificates!
+
+Something like the following probably better suited. The web certificate and web
+private key is what you get from Let's Encrypt (and if you do, restart Phoebe),
+and the regular certificate and key file is what you generated yourself for
+Gemini. Just make sure you replace those before they expire!
+
+    phoebe --host transjovian.org \
+      --port 1965 --cert_file cert.pem --key_file key.pem \
+      --port 443 --cert_file web_cert.pem --key_file web_key.pem
 
 =head2 UPLOADS
 
@@ -503,30 +530,21 @@ Here's what my F<phoebe.service> file actually looks like:
     MemoryMax=100M
     MemoryHigh=90M
     ExecStart=/home/alex/src/phoebe/script/phoebe \
-     --port=1965 \
-     --log_level=debug \
      --wiki_dir=/home/alex/phoebe \
+     --log_level=debug \
      --host=transjovian.org \
+     --port=443 \
      --cert_file=/var/lib/dehydrated/certs/transjovian.org/fullchain.pem \
      --key_file=/var/lib/dehydrated/certs/transjovian.org/privkey.pem \
+     --port=1965 \
      --host=toki.transjovian.org \
-     --cert_file=/var/lib/dehydrated/certs/transjovian.org/fullchain.pem \
-     --key_file=/var/lib/dehydrated/certs/transjovian.org/privkey.pem \
      --host=vault.transjovian.org \
-     --cert_file=/var/lib/dehydrated/certs/transjovian.org/fullchain.pem \
-     --key_file=/var/lib/dehydrated/certs/transjovian.org/privkey.pem \
      --host=communitywiki.org \
-     --cert_file=/var/lib/dehydrated/certs/communitywiki.org/fullchain.pem \
-     --key_file=/var/lib/dehydrated/certs/communitywiki.org/privkey.pem \
      --host=alexschroeder.ch \
-     --cert_file=/var/lib/dehydrated/certs/alexschroeder.ch/fullchain.pem \
-     --key_file=/var/lib/dehydrated/certs/alexschroeder.ch/privkey.pem \
      --host=next.oddmuse.org \
-     --cert_file=/var/lib/dehydrated/certs/oddmuse.org/fullchain.pem \
-     --key_file=/var/lib/dehydrated/certs/oddmuse.org/privkey.pem \
      --host=emacswiki.org \
-     --cert_file=/var/lib/dehydrated/certs/emacswiki.org/fullchain.pem \
-     --key_file=/var/lib/dehydrated/certs/emacswiki.org/privkey.pem \
+     --cert_file=/home/alex/phoebe/cert.pem \
+     --key_file=/home/alex/phoebe/key.pem \
      --wiki_main_page=Welcome \
      --wiki_page=About \
      --wiki_mime_type=image/png \
@@ -709,11 +727,11 @@ use for the hosts.
 For example:
 
     phoebe --host=transjovian.org \
-        --cert_file=/var/lib/dehydrated/certs/transjovian.org/cert.pem \
-        --key_file=/var/lib/dehydrated/certs/transjovian.org/privkey.pem \
+        --cert_file=/home/alex/phoebe/transjovian-cert.pem \
+        --key_file=/home/alex/phoebe/transjovian-key.pem \
         --host=alexschroeder.ch \
-        --cert_file=/var/lib/dehydrated/certs/alexschroeder.ch/cert.pem \
-        --key_file=/var/lib/dehydrated/certs/alexschroeder.ch/privkey.pem
+        --cert_file=/home/alex/phoebe/alexschroeder-cert.pem \
+        --key_file=/home/alex/phoebe/alexschroeder-key.pem
 
 =head1 SEE ALSO
 
@@ -750,8 +768,8 @@ GetOptions(
   'no_cert' => \&host_setup,
   'cert_file=s' => \&host_setup,
   'key_file=s' => \&host_setup,
-  'host=s' => \&host_setup,
-  'port=i@', # same ports for all hosts!
+  'host=s@' => \&host_setup,
+  'port=i@' => \&host_setup,
   'wiki_dir=s',
   'wiki_space=s@' => \&utf8_list_item,
   'wiki_token=s@' => \&utf8_list_item,
@@ -766,40 +784,53 @@ sub utf8_item { my ($key, $value) = @_; $server->{$key} = decode(locale => $valu
 
 {
   # use a block so that these variables stay local
-  my ($cert_file, $key_file, @host);
+  my ($cert_file, $key_file, @host, @port);
 
   sub host_setup {
     my ($opt, $val) = @_;
     if ($opt eq 'host') {
-      push @host, decode(locale => $val);
+      push @host, map { decode(locale => $_) } $val;
+      return;
+    } elsif ($opt eq 'port') {
+      push @port, $val;
       return;
     } elsif ($opt eq 'no_cert') {
+      push @port, 1965 unless @port;
       if (not @host and not $server->{host}->{'localhost'}) {
 	$server->{host}->{'localhost'} = 1;
+	$server->{port}->{'localhost'} = [@port];
       }
-      for (@host) {
-	$server->{host}->{$_} = 1;
+      for my $host (@host) {
+	$server->{host}->{$host} = 1;
+	push(@{$server->{port}->{$host}}, @port);
 	# no $server->{cert_file} and $server->{key_file}
       }
-      @host = ();
+      @host = @port = ();
       return;
     }
     die "$val does not exist\n" unless -f $val;
     if ($opt eq 'cert_file') { $cert_file = $val }
     elsif ($opt eq 'key_file') { $key_file = $val }
     if ($cert_file and $key_file) {
+      push @port, 1965 unless @port;
       if (not @host) {
 	$server->{host}->{'localhost'} = 1;
-	$server->{cert_file}->{'localhost'} = $cert_file;
-	$server->{key_file}->{'localhost'} = $key_file;
+	push(@{$server->{port}->{'localhost'}}, @port);
+	for my $port (@port) {
+	  $server->{cert_file}->{"localhost:$port"} = $cert_file;
+	  $server->{key_file}->{"localhost:$port"} = $key_file;
+	}
       }
-      for (@host) {
-	$server->{host}->{$_} = 1;
-	$server->{cert_file}->{$_} = $cert_file;
-	$server->{key_file}->{$_} = $key_file;
+      for my $host (@host) {
+	$server->{host}->{$host} = 1;
+	push(@{$server->{port}->{$host}}, @port);
+	for my $port (@port) {
+	  $server->{cert_file}->{"$host:$port"} = $cert_file;
+	  $server->{key_file}->{"$host:$port"} = $key_file;
+	}
       }
       $cert_file = $key_file = undef;
-      @host = ();
+      @host = @port = ();
     }
   }
 
@@ -808,24 +839,35 @@ sub utf8_item { my ($key, $value) = @_; $server->{$key} = decode(locale => $valu
     die "I must have both --key_file and --cert_file\n";
   }
 
+  push @port, 1965 unless @port;
+
   # let's see if we need to generate certificates
   my $default_certs = 0;
 
   # if, at the end, we have some hosts but no certs and keys
-  for (@host) {
+  for my $host (@host) {
     $default_certs = 1;
-    $server->{host}->{$_} = 1;
-    $server->{cert_file}->{$_} = 'cert.pem';
-    $server->{key_file}->{$_} = 'key.pem';
+    $server->{host}->{$host} = 1;
+    push(@{$server->{port}->{$host}}, @port);
+    for my $port (@port) {
+      $server->{cert_file}->{"$host:$port"} = 'cert.pem';
+      $server->{key_file}->{"$host:$port"} = 'key.pem';
+    }
   }
 
   # if, at the end, we had no hosts at all, the default still needs cert and key
   if (not keys %{$server->{host}}) {
     $default_certs = 1;
     $server->{host}->{localhost} = 1;
-    $server->{cert_file}->{localhost} = 'cert.pem';
-    $server->{key_file}->{localhost} = 'key.pem';
+    push(@{$server->{port}->{localhost}}, @port);
+    for my $port (@port) {
+      $server->{cert_file}->{"localhost:$port"} = 'cert.pem';
+      $server->{key_file}->{"localhost:$port"} = 'key.pem';
+    }
   }
+
+  # use Data::Dumper;
+  # warn Dumper($server);
 
   # if the certs don't exist, generate them
   if ($default_certs
@@ -870,7 +912,6 @@ sub verify_fingerprint {
 }
 
 # defaults
-$server->{port} ||= [1965];
 $server->{wiki_token} ||= ['hello'];
 $server->{wiki_space} ||= [];
 $server->{wiki_mime_type} ||= [];
@@ -902,9 +943,7 @@ sub configure {
   }
   # summarize config results
   $log->info("PID: $$");
-  $log->info("Host: " . join(" ", keys %{$server->{host}}));
-  $log->info("Port: @{$server->{port}}");
-    $log->info("Space: @{$server->{wiki_space}}");
+  $log->info("Space: @{$server->{wiki_space}}");
   if (keys %{$server->{host}} > 1) {
     my $hosts = host_regex();
     for (grep(!/^$hosts\//, @{$server->{wiki_space}})) {
@@ -928,44 +967,65 @@ sub start_servers {
   # If it is called under a different name, it's probably just being loaded as a
   # library, in which case we don't want to start the servers.
   if ($0 eq __FILE__) {
+    # On every address, on every port, figure out what hosts to listen to.
     for my $host (keys %{$server->{host}}) {
       for my $address (get_ip_numbers($host)) {
-	$server->{address}->{$address} = $host;
-	for my $port (@{$server->{port}}) {
-	  my %args = (address => $address, port => $port);
-	  my $msg;
-	  if ($server->{cert_file}->{$host}) {
-	    $msg = "$host: listening on $address:$port (Gemini)";
-	    # only add TLS if we have a cert file!
-	    $args{tls} = 1;
-	    $args{tls_cert} = $server->{cert_file};
-	    $args{tls_key} = $server->{key_file};
-	    $args{tls_options} = {
-	      # request client certificates and accept them
-	      SSL_verify_mode => SSL_VERIFY_PEER,
-	      SSL_verify_callback => \&verify_fingerprint,
-	      SSL_create_ctx_callback => sub {
-		my $ctx = shift;
-		Net::SSLeay::CTX_sess_set_cache_size($ctx, 64);
-	      }
-	    };
-	  } else {
-	    $msg = "$host: listening on $address:$port (Gemini without TLS)";
-	  }
-	  eval {
-	    Mojo::IOLoop->server(\%args => sub {
-	      my ($loop, $stream) = @_;
-	      my $data = { buffer => '', handler => \&handle_request };
-	      $stream->on(read => sub {
-		my ($stream, $bytes) = @_;
-		$log->debug("Received " . length($bytes) . " bytes");
-		$data->{buffer} .= $bytes;
-		$data->{handler}->($stream, $data)})});
-	    # report success after the fact!
-	    $log->info($msg);
-	  };
-	  $log->error("$host: unable to listen on $address:$port: $@") if $@;
+	$server->{address}->{$address} //= {};
+	for my $port (@{$server->{port}->{$host}}) {
+	  $server->{address}->{$address}->{$port} //= [];
+	  push(@{$server->{address}->{$address}->{$port}}, $host);
+	  $log->debug("planning to listen for $host on $address:$port");
 	}
+      }
+    }
+    for my $address (keys %{$server->{address}}) {
+      for my $port (keys %{$server->{address}->{$address}}) {
+	my @hosts = @{$server->{address}->{$address}->{$port}};
+	my %args = (address => $address, port => $port);
+	my $msg = "@hosts: listening on $address:$port";
+	$args{tls} = 1;
+	$args{tls_cert} = {};
+	$args{tls_key} = {};
+	my @hosts_without_cert;
+	for my $host (@hosts) {
+	  $args{tls_cert}->{$host} = $server->{cert_file}->{"$host:$port"};
+	  $args{tls_key}->{$host} = $server->{key_file}->{"$host:$port"};
+	  if ($args{tls_cert}->{$host} and $args{tls_key}->{$host}) {
+	    $log->debug("$host uses $args{tls_cert}->{$host} and $args{tls_key}->{$host}");
+	  } else {
+	    push(@hosts_without_cert, $host);
+	  }
+	}
+	if (@hosts_without_cert == 0) {
+	  $msg .= " (TLS)";
+	  $args{tls_options} = {
+	    # request client certificates and accept them
+	    SSL_verify_mode => SSL_VERIFY_PEER,
+	    SSL_verify_callback => \&verify_fingerprint,
+	    SSL_create_ctx_callback => sub {
+	      my $ctx = shift;
+	      Net::SSLeay::CTX_sess_set_cache_size($ctx, 64);
+	    }
+	  };
+	} elsif (@hosts_without_cert == @hosts) {
+	  $msg .= " (no TLS)";
+	  $args{tls} = 0;
+	} else {
+	  die "Cannot mix with and without TLS on $address:$port (no cert: @hosts_without_cert)\n";
+	}
+	eval {
+	  Mojo::IOLoop->server(\%args => sub {
+	    my ($loop, $stream) = @_;
+	    my $data = { buffer => '', handler => \&handle_request };
+	    $stream->on(read => sub {
+	      my ($stream, $bytes) = @_;
+	      $log->debug("Received " . length($bytes) . " bytes");
+	      $data->{buffer} .= $bytes;
+	      $data->{handler}->($stream, $data)})});
+	  # report success after the fact!
+	  $log->info($msg);
+	};
+	$log->error("@hosts: unable to listen on $address:$port: $@") if $@;
       }
     }
 

@@ -117,7 +117,7 @@ json-schema-eval - A command-line interface to JSON::Schema::Modern::evaluate()
 
 =head1 VERSION
 
-version 0.556
+version 0.557
 
 =head1 SYNOPSIS
 
@@ -141,11 +141,11 @@ A command-line interface to L<JSON::Schema::Modern/evaluate>.
 
 F<data.json> contains:
 
-  {"hello": 42}
+  {"hello": 42.1}
 
 F<schema.json> contains:
 
-  {"type": ["string", "number"]}
+  {"properties": {"hello": {"type": ["string", "integer"]}}}
 
 Run:
 
@@ -154,14 +154,19 @@ Run:
 produces output:
 
   {
-    "valid": false,
-    "errors": [
+    "errors" : [
       {
-        "instanceLocation": "",
-        "keywordLocation": "/type",
-        "error": "got integer, not one of string, number"
+        "error" : "got number, not one of string, integer",
+        "instanceLocation" : "/hello",
+        "keywordLocation" : "/properties/hello/type"
+      },
+      {
+        "error" : "not all properties are valid",
+        "instanceLocation" : "",
+        "keywordLocation" : "/properties"
       }
-    ]
+    ],
+    "valid" : false
   }
 
 Or run:

@@ -25,7 +25,7 @@ use Test::More;
 
 {
     my $object = bless {}, 'ClassCan';
-    my @p = ( foo => $object );
+    my @p      = ( foo => $object );
 
     eval { validate( @p, { foo => { can => 'cancan' } }, ); };
 
@@ -50,7 +50,7 @@ use Test::More;
 
 {
     my $object = bless {}, 'SubClass';
-    my @p = ( foo => $object );
+    my @p      = ( foo => $object );
 
     eval { validate( @p, { foo => { can => 'cancan' } }, ); };
 

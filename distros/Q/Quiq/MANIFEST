@@ -145,6 +145,7 @@ lib/Quiq/LaTeX/Code.pm
 lib/Quiq/LaTeX/Document.pm
 lib/Quiq/LaTeX/Figure.pm
 lib/Quiq/LaTeX/LongTable.pm
+lib/Quiq/Ldap/Client.pm
 lib/Quiq/LineProcessor.pm
 lib/Quiq/LineProcessor/Line.pm
 lib/Quiq/List.pm
@@ -381,6 +382,7 @@ t/bin/Quiq/LaTeX/Code.t
 t/bin/Quiq/LaTeX/Document.t
 t/bin/Quiq/LaTeX/Figure.t
 t/bin/Quiq/LaTeX/LongTable.t
+t/bin/Quiq/Ldap/Client.t
 t/bin/Quiq/LineProcessor.t
 t/bin/Quiq/LineProcessor/Line.t
 t/bin/Quiq/List.t

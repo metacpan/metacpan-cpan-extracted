@@ -1,5 +1,5 @@
 package App::Provision::Sequelpro;
-$App::Provision::Sequelpro::VERSION = '0.0404';
+$App::Provision::Sequelpro::VERSION = '0.0405';
 our $AUTHORITY = 'cpan:GENE';
 use strict;
 use warnings;
@@ -57,7 +57,7 @@ App::Provision::Sequelpro
 
 =head1 VERSION
 
-version 0.0404
+version 0.0405
 
 =head1 FUNCTIONS
 

@@ -62,15 +62,11 @@ library.
     $ sslmaker revoke /etc/ssl/sslmaker/newcerts/1000.pem
 
     # 4. Utility commands
-    # 4a. Show certificate details
-    $ sslmaker show <infile>
-    $ sslmaker show /etc/ssl/sslmaker/newcerts/1000.pem
-
-    # 4b. Create dhparam file
+    # 4a. Create dhparam file
     $ sslmaker dhparam
     $ sslmaker dhparam /etc/ssl/sslmaker/dhparam.pem 2048
 
-    # 4c. Show the manual for App::sslmaker
+    # 4b. Show the manual for App::sslmaker
     $ sslmaker man
 
 # ENVIRONMENT VARIABLES

@@ -1,5 +1,10 @@
 Revision history for MIDI-Drummer
 
+0.4002 2022-10-23 08:17:44
+    - Add actual tests for add_fill().
+    - Add * note to the not-yet-ready-for-primetime add_fill() method.
+    - Avoid implicit imports.
+
 0.4001 2022-05-30 12:11:34
     - Improve documentation.
     - Actually add the fill-replaced phrase to the score. Whoops :)

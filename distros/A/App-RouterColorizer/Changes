@@ -1,17 +1,21 @@
+1.222970  2022-10-24 20:15:22+00:00 UTC
+ Joelle Maslak <jmaslak@antelope.net>
+ * [feature] Colorize Ciena "ptp show"
+
 1.222772  2022-10-04 23:33:30+00:00 UTC
- Joelle Maslak <jmaslak@antelope.ent>
+ Joelle Maslak <jmaslak@antelope.net>
  * [bugfix] Do not try to underline numbers in meta-mode xterm escape sequence
 
 1.222771  2022-10-04 17:48:52+00:00 UTC
- Joelle Maslak <jmaslak@antelope.ent>
+ Joelle Maslak <jmaslak@antelope.net>
  * [feature] Highlight additional interface types on JunOS "show int terse"
 
 1.222770  2022-10-04 15:10:08+00:00 UTC
- Joelle Maslak <jmaslak@antelope.ent>
+ Joelle Maslak <jmaslak@antelope.net>
  * [feature] Highlight (info color) JunOS "last flapped" in "show int"
 
 1.222681  2022-09-25 21:51:48+00:00 UTC
- Joelle Maslak <jmaslak@antelope.ent>
+ Joelle Maslak <jmaslak@antelope.net>
  * [bugfix] Ciena alarm colorization swapped colors for acked and
    non-acked alarms, fixed.
 

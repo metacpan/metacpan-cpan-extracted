@@ -1,0 +1,47 @@
+---
+abstract: 'compatibility mode to access WebFetch::RSS under its previous name'
+author:
+  - 'Ian Kluft <https://github.com/ikluft>'
+build_requires:
+  Data::Dumper: '0'
+  DateTime::Format::ISO8601: '0'
+  File::Basename: '0'
+  File::Compare: '0'
+  File::Temp: '0'
+  FindBin: '0'
+  Getopt::Long: '0'
+  Module::Build: '0.3601'
+  Test::More: '0'
+  YAML::XS: '0'
+  autodie: '0'
+  feature: '0'
+configure_requires:
+  Module::Build: '0.3601'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebFetch-RSS
+requires:
+  Carp: '0'
+  Date::Calc: '0'
+  Exception::Class: '0'
+  LWP::UserAgent: '0'
+  Readonly: '0'
+  Scalar::Util: '0'
+  Try::Tiny: '0'
+  WebFetch: v0.15.5
+  XML::RSS: '0'
+  base: '0'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/ikluft/WebFetch/issues
+  repository: git://github.com/ikluft/WebFetch.git
+version: 0.3.0
+x_generated_by_perl: v5.34.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: GPL-3.0-only

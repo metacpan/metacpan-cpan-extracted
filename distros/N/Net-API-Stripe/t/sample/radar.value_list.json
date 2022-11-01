@@ -1,0 +1,17 @@
+{
+   "alias" : "custom_ip_blocklist",
+   "created" : "1662261085",
+   "created_by" : "jenny@example.com",
+   "id" : "rsl_1Le9F32eZvKYlo2CWsVfMmYL",
+   "item_type" : "ip_address",
+   "list_items" : {
+      "data" : [],
+      "has_more" : 0,
+      "object" : "list",
+      "url" : "/v1/radar/value_list_items?value_list=rsl_1Le9F32eZvKYlo2CWsVfMmYL"
+   },
+   "livemode" : 0,
+   "metadata" : {},
+   "name" : "Custom IP Blocklist",
+   "object" : "radar.value_list"
+}

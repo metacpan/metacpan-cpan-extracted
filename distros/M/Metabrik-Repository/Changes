@@ -1,5 +1,8 @@
 Revision history for Perl extension Metabrik::Repository.
 
+1.43.0 Sat 22 Oct 09:22:18 CEST 2022
+   - update: add api::geonames to MANIFEST
+
 1.42.0 Sun 16 Jan 15:12:29 CET 2022
    - update: latest bugfixes from Metabrik Repositoru
    - update: copyright notice

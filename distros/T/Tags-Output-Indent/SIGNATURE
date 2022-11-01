@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.83.
+signed via the Module::Signature module, version 0.87.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,15 +12,15 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA512
+Hash: RIPEMD160
 
-SHA256 8e769031d6389bdcf01153e26ddc8f9a2655677c312b3a13794eb498070a10c1 Changes
-SHA256 92839174b9338e3be7d9225e1cb6ca835115bcdcf52fa5c305d233a18b881e94 Indent.pm
-SHA256 0ed14285b9b297d9a1db9f6515c0ad85608e60cc12362323475c8c10d8606d15 LICENSE
-SHA256 cde0b8e9fe3118b8bba722b75ed253fb083fef2bf0e032ea4d8cf1916deac030 MANIFEST
-SHA256 21108249392b2daff345c0664aa623fbdfd2cdad10d546277c6b6b5fe2d247fc META.yml
-SHA256 f1f43ae1a37448f29a226314c292b1a668fe7f457eefeb8189f4b68ca4e79aa6 Makefile.PL
-SHA256 be1b076def6e237826e22eea9aaac01571ca359b9474ca554a057dfd83e94360 README
+SHA256 e6c46dcc1c9188a69912c99ca16ba8d5a9320e5d6256f3e32c1daef40fe476fe Changes
+SHA256 04922aac08b29dc042dabea618303489b07b1035fe6d047e408670f75990e70f Indent.pm
+SHA256 8ebb10af47248f88f89264d3050454c8a171886550033a42f7ee5aa925e4aee8 LICENSE
+SHA256 6dbe725e9a3b0ff8f53c2497a81112916787e543f41ca7235c324e913b49acd6 MANIFEST
+SHA256 93fb88c191590eb11b85b1021783f1b7490d916abf08fab381ccec09c5e9f048 META.yml
+SHA256 d2da4654601ff6c9e5abf87cfed4042ae2b5fcf5092b8388ef12226e8fa1e469 Makefile.PL
+SHA256 bc45cb1c7cebf28fdb97fba47bf732777432811b7e238fe8a8a1abfea31a3898 README
 SHA256 783571c585ebd15166b4bff2651dfb202830bd50f9fefe02f78a93efbf3d1b07 examples/ex1.pl
 SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
 SHA256 8bd506c33fb78f10f6451413e931ca23541fcc4eebe05fcb7c7c9577341223c4 inc/Module/Install/AuthorRequires.pm
@@ -34,7 +34,7 @@ SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Modu
 SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
 SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
 SHA256 087f0bf16fb00fe18c100b7dc0160486ffdb3e934ba10aeed8e07bc295c4ae13 t/Tags-Output-Indent/01-use.t
-SHA256 10de936d6ada94121d797ce83d8b1e8cac44d2374fb564d4a4812bfd6fa35810 t/Tags-Output-Indent/02-version.t
+SHA256 64a89645fdc0562aff89f340d0686b4baaa894bc7e7c6ff60d8a1b4cbac31795 t/Tags-Output-Indent/02-version.t
 SHA256 2a9d121328923c1319d66ee3caa6fffd223c7fa88231bde8bf173afb9194953a t/Tags-Output-Indent/03-new.t
 SHA256 89f1b4d6270050b5eaa93c23dbc901732010bc0d3ca06a4470b276f75cec9fe3 t/Tags-Output-Indent/04-finalize.t
 SHA256 a1e23f57644a8ba5629e4c8b48104f349ff58fbdf81f0cd2f2462c9fe3335c42 t/Tags-Output-Indent/05-open_elements.t
@@ -45,23 +45,27 @@ SHA256 f4bc3b92e765066cb59d4a0bc3360b1358d0be94ff84006ef875feabd071b0fe t/Tags-O
 SHA256 28f5c024d2b762deb9c2bb1f7577b35da7a5242f9d447ff551c0711ae62178f1 t/Tags-Output-Indent/10-put-preserve_from_constructor.t
 SHA256 ef2cde2258e7c456765407c68f848cbcd13f91c8f61ab47619f9f2e687256110 t/Tags-Output-Indent/11-put-tag.t
 SHA256 d869b1ce533c9a039ca199a842789c6773573ca891af317fcecd8a3f9f01c573 t/Tags-Output-Indent/12-put-tags_combine.t
-SHA256 a8eb144110c5742538be48d145bee30194db000786074f870d3292112e740682 t/Tags-Output-Indent/13-put-no_simple.t
-SHA256 735f22923ae6ed01683b2c0fdba6f250397c299596b4404fb90a04ac0a21d2c7 t/Tags-Output-Indent/14-put-raw.t
-SHA256 b1f23cc1516e95fca3fc7f4e5353162fdbd9b3f57261c85bdcbac08cc0c20ec3 t/Tags-Output-Indent/15-put-cdata.t
-SHA256 2c8e00b55d4296749b0f0fc28a699d59529c276440b7e224c103723b23d77461 t/Tags-Output-Indent/16-put-auto_flush.t
-SHA256 bd8cd239f41d1bb97b968583bcfcc54a61feb2e841a82294193a28f30b7a879c t/Tags-Output-Indent/17-put-attributes.t
-SHA256 ad2e634c544eefccee6a9fcc2cc1c796fcec66784a20b09e53ed47b49dfeaffa t/Tags-Output-Indent/18-put-instruction.t
-SHA256 4b8ace6c6b257ee0bafaba17781696e92480168e3ff42ed2b270bd082efbbfeb t/Tags-Output-Indent/19-put-data_callback.t
+SHA256 37ba37cdd6ecd8556a52fdee914262fa490cafbd8cc93d71cf9ba8a856f3e1ed t/Tags-Output-Indent/13-put-no_data_callback.t
+SHA256 a8eb144110c5742538be48d145bee30194db000786074f870d3292112e740682 t/Tags-Output-Indent/14-put-no_simple.t
+SHA256 735f22923ae6ed01683b2c0fdba6f250397c299596b4404fb90a04ac0a21d2c7 t/Tags-Output-Indent/15-put-raw.t
+SHA256 b1f23cc1516e95fca3fc7f4e5353162fdbd9b3f57261c85bdcbac08cc0c20ec3 t/Tags-Output-Indent/16-put-cdata.t
+SHA256 2c8e00b55d4296749b0f0fc28a699d59529c276440b7e224c103723b23d77461 t/Tags-Output-Indent/17-put-auto_flush.t
+SHA256 bd8cd239f41d1bb97b968583bcfcc54a61feb2e841a82294193a28f30b7a879c t/Tags-Output-Indent/18-put-attributes.t
+SHA256 ad2e634c544eefccee6a9fcc2cc1c796fcec66784a20b09e53ed47b49dfeaffa t/Tags-Output-Indent/19-put-instruction.t
+SHA256 4b8ace6c6b257ee0bafaba17781696e92480168e3ff42ed2b270bd082efbbfeb t/Tags-Output-Indent/20-put-data_callback.t
 SHA256 f04411b25045d9b0b1d1b78ffe74874d7ff51a7da0b71f6e35ca34141464150d xt/Tags-Output-Indent/01-pod_coverage.t
 SHA256 75e157573b2cbfba4528d2e4fc8363d02c1708b592bd694afb14bc424cf50dce xt/Tags-Output-Indent/02-pod.t
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCgAdFiEEAxWqUSy7qDLVZJQKKyiOZjWerHYFAl+GMeEACgkQKyiOZjWe
-rHasNAf+NzYUXyacbAkj/ZAoaVgQez869zOdwIq+Qmj9x2H167PIGu7rcAmpqUrI
-wQDF7oR2Fk/G4eDk/Zf96Yj4Kd4PDnDE9hmjz4wS3e0EHCQKqRZRvN3BoKd2SZ+j
-mYOqRXcpBZbO/edlb5ilpYJ074FgSWN8fN3zPiEs7eenXCf6twDYnSki+Jsb1ZMC
-RR8GH7n/z8mwOnfdKe0Zz2Ik+7WXPWf/VImyTwj/5Qp1eCNwRDKn47nmAZBJBa9C
-63d82GseApFdLc50qABO0WvqS+fwiN7d3h8PZuEgLBI0X4idbjMsWMxYPgBFH0si
-RhEA5Z9LIpiMnLNA+JVx3TuEBwf+vQ==
-=xotK
+iQGzBAEBAwAdFiEERTLc1QTxqWhVvPeegmqNLzlXaRcFAmNX7xsACgkQgmqNLzlX
+aRd2Ggv/Yt+r/x10Ib78zPHLI7uVXUyGyXQxpznzrDIcESKhM+oLa5sv2mzcS2GA
+BdV2RdxKYaM6QSZX5IXusgDzWrrASvtoGGytST+KkYYUs1oha1MzYrgCA32z6zsw
+R4gUHCjAgZHvhDMptQEhg7a7HdbW5xPh5RfQp+c6s0rMBph77MegRSZBZ9cG99CN
+eAwQNhS6ywG6ajwVx85c7p6x8Sk1wWFG0cCgbCTXd1nKGwBqVNJMut7sLRszBPBU
+ZgcqJcOqLIGISde/Ae7V9JWkBfJxbMaldbNkXbCEuMyxGu0oysYXXdT3UTJ4+rbr
+UI/F7c8sxrQqofqYi4NRH0VanzAsPm3BLaOuhvZ/zEVhU0KH4fknuTfuxSxd2th+
+ZQCunb9Jr8fppwdG9lNAG9+shU4ApCxgBC8ZhdF6DoVc7qUfxvObawC3TISx62aQ
+1nT563rI2GKvwWT7gTER4mGWqwz6AT2GRIk8/ej8Zwmv7y5RINUS5rwb3DGwZXR7
+uzcMTJJ9
+=KGyl
 -----END PGP SIGNATURE-----

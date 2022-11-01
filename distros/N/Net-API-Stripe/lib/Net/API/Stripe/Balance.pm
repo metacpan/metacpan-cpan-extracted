@@ -1,33 +1,48 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Balance.pm
-## Version v0.100.0
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Version v0.101.0
+## Copyright(c) 2020 DEGUEST Pte. Ltd.
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
-## Modified 2020/05/15
+## Modified 2020/11/15
+## All rights reserved
 ## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 ## https://stripe.com/docs/api/balance/balance_object
 package Net::API::Stripe::Balance;
 BEGIN
 {
     use strict;
+    use warnings;
     use parent qw( Net::API::Stripe::Generic );
-    our( $VERSION ) = 'v0.100.0';
+    use vars qw( $VERSION );
+    our( $VERSION ) = 'v0.101.0';
 };
 
-sub object { shift->_set_get_scalar( 'object', @_ ); }
+use strict;
+use warnings;
+
+sub object { return( shift->_set_get_scalar( 'object', @_ ) ); }
 
 ## Array of Net::API::Stripe::Connect::Transfer
-sub available { shift->_set_get_object_array( 'available', 'Net::API::Stripe::Connect::Transfer', @_ ); }
+sub available { return( shift->_set_get_object_array( 'available', 'Net::API::Stripe::Connect::Transfer', @_ ) ); }
 
 ## Array of Net::API::Stripe::Balance::ConnectReserved
-sub connect_reserved { shift->_set_get_object_array( 'connect_reserved', 'Net::API::Stripe::Balance::ConnectReserved', @_ ); }
+sub connect_reserved { return( shift->_set_get_object_array( 'connect_reserved', 'Net::API::Stripe::Balance::ConnectReserved', @_ ) ); }
 
-sub livemode { shift->_set_get_boolean( 'livemode', @_ ); }
+sub instant_available { return( shift->_set_get_object_array( 'instant_available', 'Net::API::Stripe::Balance::Pending', @_ ) ); }
 
-## Array of Net::API::Stripe::Balance::Pending
-sub pending { shift->_set_get_object_array( 'pending', 'Net::API::Stripe::Balance::Pending', @_ ); }
+sub issuing { return( shift->_set_get_class( 'issuing',
+    {
+    available   => { type => 'object', package => 'Net::API::Stripe::Balance::Pending' },
+    }, @_ ) ); }
+
+sub livemode { return( shift->_set_get_boolean( 'livemode', @_ ) ); }
+
+# Array of Net::API::Stripe::Balance::Pending
+sub pending { return( shift->_set_get_object_array( 'pending', 'Net::API::Stripe::Balance::Pending', @_ ) ); }
 
 1;
 
@@ -41,11 +56,11 @@ Net::API::Stripe::Balance - The Balance object
 
 =head1 SYNOPSIS
 
-	my $object = $stripe->balances( 'retrieve' ) || die( $stripe->error );
+    my $object = $stripe->balances( 'retrieve' ) || die( $stripe->error );
 
 =head1 VERSION
 
-    v0.100.0
+    v0.101.0
 
 =head1 DESCRIPTION
 
@@ -57,43 +72,35 @@ The available and pending amounts for each currency are broken down further by p
 
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>( %ARG )
+=head2 new( %ARG )
 
 Creates a new L<Net::API::Stripe::Balance> object.
 
-=back
-
 =head1 METHODS
 
-=over 4
-
-=item B<object> string, value is "balance"
+=head2 object string, value is "balance"
 
 String representing the object’s type. Objects of the same type share the same value.
 
-=item B<available> array of L<Net::API::Stripe::Connect::Transfer>
+=head2 available array of L<Net::API::Stripe::Connect::Transfer>
 
 Funds that are available to be transferred or paid out, whether automatically by Stripe or explicitly via the Transfers API or Payouts API. The available balance for each currency and payment type can be found in the source_types property.
 
 Currently this is an array of L<Net::API::Stripe::Connect::Transfer>, but I am considering revising that in light of the documentation of the Stripe API.
 
-=over 8
-
-=item B<amount> integer
+=head2 amount integer
 
 Balance amount.
 
-=item B<currency> currency
+=head2 currency currency
 
 Three-letter ISO currency code, in lowercase. Must be a supported currency.
 
-=item B<source_types> hash
+=head2 source_types hash
 
 Breakdown of balance by source types.
 
-=over 12
+=over 4
 
 =item I<bank_account> integer
 
@@ -105,88 +112,178 @@ Amount for card.
 
 =back
 
-=back
-
-=item B<connect_reserved> array of L<Net::API::Stripe::Balance::ConnectReserved> objects.
+=head2 connect_reserved array of L<Net::API::Stripe::Balance::ConnectReserved> objects.
 
 Funds held due to negative balances on connected Custom accounts. The connect reserve balance for each currency and payment type can be found in the source_types property.
 
-=over 8
+=over 4
 
-=item B<amount> integer
+=item I<amount> integer
 
 Balance amount.
 
-=item B<currency> currency
+=item I<currency> currency
 
 Three-letter ISO currency code, in lowercase. Must be a supported currency.
 
-=item B<source_types> hash
+=item I<source_types> hash
 
 Breakdown of balance by source types.
 
 =back
 
-=item B<livemode> boolean
+=head2 instant_available array of hashes
+
+Funds that can be paid out using Instant Payouts.
+
+This is a L<Net::API::Stripe::Balance::Pending> object.
+
+It contains the following properties:
+
+=over 4
+
+=item I<amount> integer
+
+Balance amount.
+
+=item I<currency> number
+
+Three-letter ISO currency code, in lowercase. Must be a supported currency.
+
+=item I<source_types> hash
+
+Breakdown of balance by source types.
+
+It contains the following sub properties:
+
+=over 8
+
+=item I<bank_account> integer
+
+Amount for bank account.
+
+=item I<card> integer
+
+Amount for card.
+
+=item I<fpx> integer
+
+Amount for FPX.
+
+=back
+
+=back
+
+=head2 issuing hash
+
+Funds that can be spent on your Issued Cards.
+
+It has the following properties:
+
+=over 4
+
+=item I<available> array
+
+Funds that are available for use.
+
+When expanded, this is a L<Net::API::Stripe::Balance::Pending> object.
+
+It has the following properties:
+
+=over 8
+
+=item I<amount> integer
+
+Balance amount.
+
+=item I<currency> number
+
+Three-letter ISO currency code, in lowercase. Must be a supported currency.
+
+=item I<source_types> hash
+
+Breakdown of balance by source types.
+
+It contains the following sub properties:
+
+=over 12
+
+=item I<bank_account> integer
+
+Amount for bank account.
+
+=item I<card> integer
+
+Amount for card.
+
+=item I<fpx> integer
+
+Amount for FPX.
+
+=back
+
+=back
+
+=back
+
+=head2 livemode boolean
 
 Has the value true if the object exists in live mode or the value false if the object exists in test mode.
 
-=item B<pending> array of L<Net::API::Stripe::Balance::Pending> objects.
+=head2 pending array of L<Net::API::Stripe::Balance::Pending> objects.
 
 Funds that are not yet available in the balance, due to the 7-day rolling pay cycle. The pending balance for each currency, and for each payment type, can be found in the source_types property.
 
-=over 8
+=over 4
 
-=item B<amount> integer
+=item I<amount> integer
 
 Balance amount.
 
-=item B<currency> currency
+=item I<currency> currency
 
 Three-letter ISO currency code, in lowercase. Must be a supported currency.
 
-=item B<source_types> hash
+=item I<source_types> hash
 
 Breakdown of balance by source types.
-
-=back
 
 =back
 
 =head1 API SAMPLE
 
-	{
-	  "object": "balance",
-	  "available": [
-		{
-		  "amount": 0,
-		  "currency": "jpy",
-		  "source_types": {
-			"card": 0
-		  }
-		}
-	  ],
-	  "connect_reserved": [
-		{
-		  "amount": 0,
-		  "currency": "jpy"
-		}
-	  ],
-	  "livemode": false,
-	  "pending": [
-		{
-		  "amount": 7712,
-		  "currency": "jpy",
-		  "source_types": {
-			"card": 7712
-		  }
-		}
-	  ]
-	}
+    {
+      "object": "balance",
+      "available": [
+        {
+          "amount": 0,
+          "currency": "jpy",
+          "source_types": {
+            "card": 0
+          }
+        }
+      ],
+      "connect_reserved": [
+        {
+          "amount": 0,
+          "currency": "jpy"
+        }
+      ],
+      "livemode": false,
+      "pending": [
+        {
+          "amount": 7712,
+          "currency": "jpy",
+          "source_types": {
+            "card": 7712
+          }
+        }
+      ]
+    }
 
 =head1 HISTORY
 
-=head2 v0.1
+=head2 v0.100.0
 
 Initial version
 

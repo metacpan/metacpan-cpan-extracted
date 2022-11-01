@@ -16,7 +16,6 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Test::Deep" : "0",
             "Test::Exception" : "0",
             "Test::More" : "0",
             "autodie" : "0"
@@ -29,14 +28,17 @@
       },
       "runtime" : {
          "requires" : {
-            "JSON::MaybeXS" : "0"
+            "Clone" : "0",
+            "HTTP::Tiny" : "0",
+            "JSON::MaybeXS" : "0",
+            "Module::Runtime" : "0"
          }
       }
    },
    "provides" : {
       "Pg::SQL::PrettyPrinter" : {
          "file" : "lib/Pg/SQL/PrettyPrinter.pm",
-         "version" : "0.4"
+         "version" : "0.5"
       },
       "Pg::SQL::PrettyPrinter::Node" : {
          "file" : "lib/Pg/SQL/PrettyPrinter/Node.pm"
@@ -179,6 +181,9 @@
       "Pg::SQL::PrettyPrinter::Node::SubLink" : {
          "file" : "lib/Pg/SQL/PrettyPrinter/Node/SubLink.pm"
       },
+      "Pg::SQL::PrettyPrinter::Node::TransactionStmt" : {
+         "file" : "lib/Pg/SQL/PrettyPrinter/Node/TransactionStmt.pm"
+      },
       "Pg::SQL::PrettyPrinter::Node::TypeCast" : {
          "file" : "lib/Pg/SQL/PrettyPrinter/Node/TypeCast.pm"
       },
@@ -207,6 +212,6 @@
          "web" : "https://gitlab.com/depesz/pg-sql-prettyprinter"
       }
    },
-   "version" : "0.4",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.5",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

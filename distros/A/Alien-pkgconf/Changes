@@ -1,5 +1,9 @@
 Revision history for Alien-pkgconf
 
+0.19 2022-10-24 11:36:33 -0600
+  - Improve detection logic: Amazon Linux should now be recognized as
+    RedHat like (gh#15, gh#16)
+
 0.18 2022-08-08 08:55:29 -0600
   - Removing pkgconf 1.9.x for now, as it contains breaking
     ABI changes that are not easy to reconsile for PkgConfig::LibPkgConf

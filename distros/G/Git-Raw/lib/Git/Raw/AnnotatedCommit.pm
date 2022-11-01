@@ -1,5 +1,5 @@
 package Git::Raw::AnnotatedCommit;
-$Git::Raw::AnnotatedCommit::VERSION = '0.88';
+$Git::Raw::AnnotatedCommit::VERSION = '0.90';
 use strict;
 use warnings;
 use overload
@@ -14,7 +14,7 @@ Git::Raw::AnnotatedCommit - Git note class
 
 =head1 VERSION
 
-version 0.88
+version 0.90
 
 =head1 DESCRIPTION
 
@@ -35,7 +35,7 @@ Create a L<Git::Raw::Annotated::Commit> from the given commit C<$id>.
 
 =head1 AUTHOR
 
-Jacques Germishuys <jacquesg@striata.com>
+Jacques Germishuys <jacquesg@cpan.org>
 
 =head1 LICENSE AND COPYRIGHT
 

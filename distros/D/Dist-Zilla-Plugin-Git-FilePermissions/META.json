@@ -6,7 +6,7 @@
    "dynamic_config" : 0,
    "generated_by" : "Dist::Zilla, CPAN::Meta::Converter",
    "license" : [
-      "freebsd"
+      "open_source"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -68,7 +68,6 @@
          "web" : "https://github.com/skirmess/Dist-Zilla-Plugin-Git-FilePermissions"
       }
    },
-   "version" : "1.001",
-   "x_spdx_expression" : "BSD-2-Clause-FreeBSD"
+   "version" : "1.002"
 }
 

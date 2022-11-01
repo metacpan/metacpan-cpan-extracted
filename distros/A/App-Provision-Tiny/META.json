@@ -62,7 +62,7 @@
          "web" : "https://github.com/ology/App-Provision-Tiny"
       }
    },
-   "version" : "0.0404",
+   "version" : "0.0405",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.032001"

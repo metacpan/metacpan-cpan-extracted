@@ -6,11 +6,11 @@ our $AUTHORITY = 'cpan:GENE';
 use strict;
 #use warnings;
 
-our $VERSION = '0.5503';
+our $VERSION = '0.5504';
 
-use Carp;
-use Math::BigInt;
-use Math::BigFloat;
+use Carp qw(croak);
+use Math::BigInt ();
+use Math::BigFloat ();
 use overload
   '+'      => 'add',
   '-'      => 'sub',
@@ -851,7 +851,7 @@ Math::FractionManip - Manipulate fractions
 
 =head1 VERSION
 
-version 0.5503
+version 0.5504
 
 =head1 SYNOPSIS
 
@@ -1250,7 +1250,7 @@ Kevin Atkinson <kevina@clark.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Gene Boggs.
+This software is copyright (c) 2022 by Kevin Atkinson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,12 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2012-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.43;
+use Object::Pad 0.66 ':experimental(init_expr)';
 
-package Tangence::Meta::Struct 0.29;
+package Tangence::Meta::Struct 0.30;
 class Tangence::Meta::Struct :strict(params);
 
 use Carp;
@@ -35,10 +35,10 @@ Returns a new instance representing the given name.
 
 =cut
 
-has $name    :param :reader;
-has $defined        :reader = 0;
+field $name    :param :reader;
+field $defined        :reader { 0 };
 
-has @fields;
+field @fields;
 
 =head2 define
 

@@ -1,13 +1,19 @@
-1.0.3     2021-01-26 08:00:51+00:00 UTC
-1.0.3   2019-02-19
+1.06      2022-11-01 12:44:14+00:00 UTC
+	- Added alias name for Côte d’Ivoire (with right quotation mark ,ASCII 8217)
+
+1.05  2021-11-24 08:00:51+00:00 UTC
+	- Added alias names for Eswatini, Trinidad & Tobago, Côte D'Ivoire (with apostrophe, ASCII 39)
+1.0.4 2021-01-26 08:00:51+00:00 UTC
+	- Add idd code for South Sudan
+1.0.3 2019-02-19  08:00:51+00:00 UTC
 	- Add alias names for code_from_country
 	- Update code_from_country to case insenstive
-1.0.2	
+1.0.2  2019-01-24 10:23:49 +0800	
 	Switch to dzil
 
-1.0.1	2018-12-02
+1.0.1	2018-12-02 00:00:00
 	Update duplicated phone code for im
 
-1.0.0	2015-04-16
+1.0.0	2015-04-16 00:00:00
 	Initial full version released unto the world following approval of
 	CPANTesters everywhere

@@ -108,27 +108,27 @@
    "provides" : {
       "DateTime::Locale" : {
          "file" : "lib/DateTime/Locale.pm",
-         "version" : "1.36"
+         "version" : "1.37"
       },
       "DateTime::Locale::Base" : {
          "file" : "lib/DateTime/Locale/Base.pm",
-         "version" : "1.36"
+         "version" : "1.37"
       },
       "DateTime::Locale::Catalog" : {
          "file" : "lib/DateTime/Locale/Catalog.pm",
-         "version" : "1.36"
+         "version" : "1.37"
       },
       "DateTime::Locale::Data" : {
          "file" : "lib/DateTime/Locale/Data.pm",
-         "version" : "1.36"
+         "version" : "1.37"
       },
       "DateTime::Locale::FromData" : {
          "file" : "lib/DateTime/Locale/FromData.pm",
-         "version" : "1.36"
+         "version" : "1.37"
       },
       "DateTime::Locale::Util" : {
          "file" : "lib/DateTime/Locale/Util.pm",
-         "version" : "1.36"
+         "version" : "1.37"
       }
    },
    "release_status" : "stable",
@@ -144,7 +144,7 @@
       },
       "x_MailingList" : "datetime@perl.org"
    },
-   "version" : "1.36",
+   "version" : "1.37",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.032001"
@@ -153,7 +153,7 @@
          {
             "class" : "Dist::Zilla::Plugin::DROLSKY::BundleAuthordep",
             "name" : "@DROLSKY/DROLSKY::BundleAuthordep",
-            "version" : "1.20"
+            "version" : "1.22"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::GatherDir",
@@ -452,6 +452,7 @@
                      "Bh",
                      "Bhm",
                      "Bhms",
+                     "Bhojpuri",
                      "Blin",
                      "Bodo",
                      "Bokm\u00e5l",
@@ -521,7 +522,7 @@
                      "Faso",
                      "Fonyi",
                      "Friulian",
-                     "Fulah",
+                     "Fula",
                      "Futuna",
                      "GF",
                      "GG",
@@ -561,6 +562,7 @@
                      "HK",
                      "HN",
                      "Hant",
+                     "Haryanvi",
                      "Hm",
                      "Hmm",
                      "Hms",
@@ -690,6 +692,7 @@
                      "Maithili",
                      "Makhuwa",
                      "Makonde",
+                     "Mande",
                      "Manipuri",
                      "Mantaxtsees",
                      "Marino",
@@ -705,6 +708,7 @@
                      "Miquelon",
                      "Mmantaha",
                      "Mohndaach",
+                     "Moksha",
                      "Montag",
                      "Moondaach",
                      "Morisyen",
@@ -738,6 +742,7 @@
                      "Nyanja",
                      "Nyankole",
                      "Nynorsk",
+                     "Obolo",
                      "Occitan",
                      "Odia",
                      "Ol",
@@ -755,6 +760,8 @@
                      "PayPal",
                      "PayPal",
                      "Pazartesi",
+                     "Pijin",
+                     "Pona",
                      "Ponedjeljak",
                      "Pr\u00edncipe",
                      "Puerto",
@@ -764,6 +771,8 @@
                      "QQQy",
                      "Qidaame",
                      "Qunxa",
+                     "Rajasthani",
+                     "Raviwaar",
                      "Rica",
                      "Ridas",
                      "Rolsky",
@@ -802,7 +811,9 @@
                      "Sidamo",
                      "Sinhala",
                      "Sint",
+                     "Skolt",
                      "Soga",
+                     "Somwaar",
                      "Sondag",
                      "Sonto",
                      "Sorbian",
@@ -837,6 +848,7 @@
                      "Timor",
                      "Tnejn",
                      "Tokelau",
+                     "Toki",
                      "Tom\u00e9",
                      "Tsonga",
                      "Tunga",
@@ -884,6 +896,7 @@
                      "astea",
                      "astelehena",
                      "ataasinngorneq",
+                     "atejn",
                      "ay",
                      "aynas",
                      "bazar",
@@ -940,12 +953,14 @@
                      "h\u00e9tf\u0151",
                      "h\u00ebn\u00eb",
                      "ika",
+                     "il",
                      "im",
                      "ime",
                      "ing",
                      "iyax",
                      "jimweri",
                      "jumwa",
+                     "kaa",
                      "ke",
                      "killapa",
                      "kuni",
@@ -1133,7 +1148,7 @@
                      "zh",
                      "\u00c5land",
                      "\u00fbse",
-                     "\u0121img\u0127a",
+                     "\u0121img",
                      "\u017ei",
                      "\u1eccj\u1ecd",
                      "\u1ecdj\u1ecd"
@@ -1226,7 +1241,7 @@
                }
             },
             "name" : "@DROLSKY/Test::Portability",
-            "version" : "2.001000"
+            "version" : "2.001001"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::Compile",
@@ -1264,18 +1279,18 @@
          {
             "class" : "Dist::Zilla::Plugin::DROLSKY::Test::Precious",
             "name" : "@DROLSKY/DROLSKY::Test::Precious",
-            "version" : "1.20"
+            "version" : "1.22"
          },
          {
             "class" : "Dist::Zilla::Plugin::DROLSKY::Contributors",
             "name" : "@DROLSKY/DROLSKY::Contributors",
-            "version" : "1.20"
+            "version" : "1.22"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Contributors",
             "config" : {
                "Dist::Zilla::Plugin::Git::Contributors" : {
-                  "git_version" : "2.37.2",
+                  "git_version" : "2.38.1",
                   "include_authors" : 0,
                   "include_releaser" : 1,
                   "order_by" : "name",
@@ -1441,7 +1456,7 @@
          {
             "class" : "Dist::Zilla::Plugin::DROLSKY::WeaverConfig",
             "name" : "@DROLSKY/DROLSKY::WeaverConfig",
-            "version" : "1.20"
+            "version" : "1.22"
          },
          {
             "class" : "Dist::Zilla::Plugin::ReadmeAnyFromPod",
@@ -1512,7 +1527,7 @@
          {
             "class" : "Dist::Zilla::Plugin::DROLSKY::License",
             "name" : "@DROLSKY/DROLSKY::License",
-            "version" : "1.20"
+            "version" : "1.22"
          },
          {
             "class" : "Dist::Zilla::Plugin::CheckStrictVersion",
@@ -1544,12 +1559,12 @@
             "class" : "Dist::Zilla::Plugin::DROLSKY::Git::CheckFor::CorrectBranch",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.37.2",
+                  "git_version" : "2.38.1",
                   "repo_root" : "."
                }
             },
             "name" : "@DROLSKY/DROLSKY::Git::CheckFor::CorrectBranch",
-            "version" : "1.20"
+            "version" : "1.22"
          },
          {
             "class" : "Dist::Zilla::Plugin::EnsureChangesHasContent",
@@ -1560,7 +1575,7 @@
             "class" : "Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts",
             "config" : {
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.37.2",
+                  "git_version" : "2.38.1",
                   "repo_root" : "."
                }
             },
@@ -1570,17 +1585,17 @@
          {
             "class" : "Dist::Zilla::Plugin::DROLSKY::PerlLinterConfigFiles",
             "name" : "@DROLSKY/DROLSKY::PerlLinterConfigFiles",
-            "version" : "1.20"
+            "version" : "1.22"
          },
          {
             "class" : "Dist::Zilla::Plugin::DROLSKY::DevTools",
             "name" : "@DROLSKY/DROLSKY::DevTools",
-            "version" : "1.20"
+            "version" : "1.22"
          },
          {
             "class" : "Dist::Zilla::Plugin::DROLSKY::Precious",
             "name" : "@DROLSKY/DROLSKY::Precious",
-            "version" : "1.20"
+            "version" : "1.22"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Check",
@@ -1603,7 +1618,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.37.2",
+                  "git_version" : "2.38.1",
                   "repo_root" : "."
                }
             },
@@ -1633,7 +1648,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.37.2",
+                  "git_version" : "2.38.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1650,12 +1665,12 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v1.36",
+                  "tag" : "v1.37",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.37.2",
+                  "git_version" : "2.38.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1675,7 +1690,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.37.2",
+                  "git_version" : "2.38.1",
                   "repo_root" : "."
                }
             },
@@ -1716,7 +1731,7 @@
                   "changelog" : "Changes"
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.37.2",
+                  "git_version" : "2.38.1",
                   "repo_root" : "."
                },
                "Dist::Zilla::Role::Git::StringFormatter" : {
@@ -1736,7 +1751,7 @@
                   "remotes_must_exist" : 1
                },
                "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.37.2",
+                  "git_version" : "2.38.1",
                   "repo_root" : "."
                }
             },
@@ -1759,7 +1774,7 @@
                }
             },
             "name" : "@DROLSKY/DROLSKY::MakeMaker",
-            "version" : "1.20"
+            "version" : "1.22"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaResources",

@@ -1,3 +1,9 @@
+1.001 Oct 31 2022
+	- add an ability to add custom shortcuts
+	- no longer uses Exporter
+	- add -standard flag to avoid using custom behavior
+	- internal refactoring
+
 1.000 Oct 16 2022
 	- stable release
 	- improve the way the module handles arrays of attributes

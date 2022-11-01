@@ -182,8 +182,7 @@ T_PTROBJ_PACKED
 		DPRINTF(\"${(my $ntt=lc($ntype))=~s/.*_//g;\$ntt} %p\", $var);
 		sv_setref_pv(svm_$var,
 		    \"${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\", $var);
-		*$var =
-		    XS_unpack_UA_${(my $ntt=$ntype)=~s/.*_//g;\$ntt}($arg);
+		unpack_UA_${(my $ntt=$ntype)=~s/.*_//g;\$ntt}($var, $arg);
 	} else {
 		CROAK(\"Parameter %s is not scalar or array or hash\",
 		    \"$var\");
@@ -229,7 +228,7 @@ T_PTROBJ_SPECIAL
 #############################################################################
 OUTPUT
 T_RETVAL_PACKED
-	XS_pack_$ntype($arg, $var);
+	pack_$ntype($arg, &$var);
 	UA_${(my $ntt=$ntype)=~s/.*_//g;\$ntt}_clear(&$var);
 T_PTROBJ_PACKED
 	sv_setref_pv($arg, \"${(my $ntt=$ntype)=~s/_/::/g;\$ntt}\", $var);

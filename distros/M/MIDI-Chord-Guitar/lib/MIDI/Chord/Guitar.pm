@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: MIDI pitches for guitar chord voicings
 
-our $VERSION = '0.0704';
+our $VERSION = '0.0705';
 
 use strict;
 use warnings;
@@ -11,7 +11,7 @@ use warnings;
 use Carp qw(croak);
 use File::ShareDir qw(dist_dir);
 use List::Util qw(any zip);
-use Music::Note;
+use Music::Note ();
 use Text::CSV_XS ();
 use Moo;
 use strictures 2;
@@ -227,7 +227,7 @@ MIDI::Chord::Guitar - MIDI pitches for guitar chord voicings
 
 =head1 VERSION
 
-version 0.0704
+version 0.0705
 
 =head1 SYNOPSIS
 

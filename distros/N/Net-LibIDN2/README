@@ -1,4 +1,4 @@
-Net/LibIDN2 version 1.01
+Net/LibIDN2 version 1.02
 ========================
 
 This module provides Perl bindings for GNU Libidn2 by Simon Josefsson

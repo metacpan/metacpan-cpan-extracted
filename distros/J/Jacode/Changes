@@ -1,5 +1,12 @@
 Revision history for this software.
 
+2.13.4.29 2022-10-24 00:00:00
+  - update jacode::getcode()
+  - update jacode::s2e()
+  - update jacode::e2s()
+  - update POD
+  - created by INABA Hitoshi
+
 2.13.4.28 2022-10-14 00:00:00
   - update jacode::getcode()
   - created by INABA Hitoshi

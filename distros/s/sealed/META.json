@@ -33,11 +33,12 @@
       "runtime" : {
          "requires" : {
             "B::Generate" : "0",
+            "ModPerl::RegistryCooker" : "0",
             "perl" : "5.022000"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "v4.1.8",
+   "version" : "v4.1.9",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

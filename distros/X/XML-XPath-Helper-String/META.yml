@@ -1,14 +1,24 @@
---- #YAML:1.0
-name:                XML-XPath-Helper-String
-version:             1.01
-abstract:            Helper functions for xpath expression.
-license:             perl_5
-author:              
-    - Abdul al Hazred <451@gmx.eu>
-generated_by:        ExtUtils::MakeMaker version 6.44
-distribution_type:   module
-requires:     
-    Test::More:                    0
+---
+abstract: 'Helper functions for xpath expression.'
+author:
+  - 'Abdul al Hazred <451@gmx.eu>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.48, CPAN::Meta::Converter version 2.150010'
+license: perl
 meta-spec:
-    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
-    version: 1.3
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: XML-XPath-Helper-String
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.008'
+version: '1.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

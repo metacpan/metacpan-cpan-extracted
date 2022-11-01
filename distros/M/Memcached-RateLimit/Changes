@@ -1,0 +1,25 @@
+Revision history for Memcached-RateLimit
+
+0.06      2022-10-31 12:26:26 -0600
+  - connect_timeout and fractional timeouts are no longer
+    experimental (gh#2, gh#13)
+
+0.05      2022-10-30 06:26:50 -0600
+  - Fixed bug where sum could be miscalculated over the
+    rate_seconds period (gh#12)
+  - Breaking change: the keys used internally have altered
+    slightly to make it easier to debug
+
+0.04      2022-10-25 19:40:17 -0600
+  - Optional retries added (gh#11)
+
+0.03      2022-10-25 13:06:39 -0600
+  - Constructor can now take a config hash reference
+    instead of a URL (gh#10)
+
+0.02      2022-10-25 09:05:27 -0600
+  - Experimental support for connection timeout,
+    and fractional timeouts (gh#1, gh#9)
+
+0.01      2022-10-25 07:32:27 -0600
+  - initial version

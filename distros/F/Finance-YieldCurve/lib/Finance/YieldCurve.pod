@@ -1,0 +1,85 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Finance::YieldCurve
+at lib/Finance/YieldCurve.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Finance::YieldCurve - provides methods for interpolation on interest rates or dividends
+
+=head1 SYNOPSIS
+
+ use Finance::YieldCurve;
+
+ my $rates = Finance::YieldCurve->new(
+  data => {
+   1  => 0.014,
+   7  => 0.011,
+   14 => 0.012,
+  },
+  asset => 'USD',
+ );
+ # For dividends, we return the closest value with no interpolation
+ my $dividend_rate = $rates->find_closest_to(7 * 24 * 60 * 60);
+ # For interest rates, we interpolate linearly between the points
+ my $interest_rate = $rates->interpolate(7 * 24 * 60 * 60);
+
+=head1 DESCRIPTION
+
+Handles interpolation methods for different types of yield curve.
+
+Instantiate with a set of data points, then use either the L</find_closest_to>
+or L</interpolate> methods to find the appropriate value for a given time (measured
+in years).
+
+=head1 ATTRIBUTES
+
+=head2 data
+
+The data points, as a hashref of days => value.
+
+=head2 asset
+
+String representing the currency, stock or index, for example C<USD>.
+
+=head1 METHODS
+
+=head2 interpolate
+
+Get the interpolated rate for this yield curve over the given time period (fractional years).
+
+Example:
+
+ my $rate = $curve->interpolate(7 * 24 * 60 * 60);
+
+=head2 find_closest_to
+
+Returns the closest point to the request value.
+
+Example:
+
+ my $rate = $curve->find_closest_to(7 * 24 * 60 * 60);
+
+=head2 day_count
+
+Returns the day count for our asset.
+
+This is an integer value, and will either be 365 or 360.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Moo::Object>
+
+L<BUILDALL|Moo::Object/BUILDALL>, L<BUILDARGS|Moo::Object/BUILDARGS>, L<DEMOLISHALL|Moo::Object/DEMOLISHALL>, L<does|Moo::Object/does>, L<meta|Moo::Object/meta>
+
+=back
+

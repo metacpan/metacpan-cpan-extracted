@@ -4,13 +4,13 @@
       "Thomas Jacob <gnuthor@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4005, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Net-LibIDN2",
    "prereqs" : {
@@ -23,7 +23,7 @@
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.40"
+            "Module::Build" : "0.42"
          }
       },
       "runtime" : {
@@ -35,7 +35,7 @@
    "provides" : {
       "Net::LibIDN2" : {
          "file" : "lib/Net/LibIDN2.pm",
-         "version" : "1.01"
+         "version" : "1.02"
       }
    },
    "release_status" : "stable",
@@ -51,5 +51,6 @@
          "url" : "https://github.com/gnuthor/Net--LibIDN2"
       }
    },
-   "version" : "1.01"
+   "version" : "1.02",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

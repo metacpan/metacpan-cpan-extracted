@@ -1,0 +1,60 @@
+{
+   "application" : null,
+   "canceled_at" : "1637053645",
+   "completed_at" : null,
+   "created" : "1636545743",
+   "current_phase" : null,
+   "customer" : "cus_AJ78ZaALpqgiuZ",
+   "default_settings" : {
+      "application_fee_percent" : null,
+      "automatic_tax" : {
+         "enabled" : 0
+      },
+      "billing_cycle_anchor" : "automatic",
+      "billing_thresholds" : null,
+      "collection_method" : "charge_automatically",
+      "default_payment_method" : null,
+      "description" : null,
+      "invoice_settings" : null,
+      "transfer_data" : null
+   },
+   "end_behavior" : "release",
+   "id" : "sub_sched_1JuFVT2eZvKYlo2CSOQvG7P6",
+   "livemode" : 0,
+   "metadata" : {},
+   "object" : "subscription_schedule",
+   "phases" : [
+      {
+         "add_invoice_items" : [],
+         "application_fee_percent" : null,
+         "billing_cycle_anchor" : null,
+         "billing_thresholds" : null,
+         "collection_method" : null,
+         "coupon" : null,
+         "currency" : "usd",
+         "default_payment_method" : null,
+         "default_tax_rates" : [],
+         "description" : null,
+         "end_date" : "1668685170",
+         "invoice_settings" : null,
+         "items" : [
+            {
+               "billing_thresholds" : null,
+               "price" : "plan_JiX4v6L7JY0Vyt",
+               "quantity" : "1",
+               "tax_rates" : []
+            }
+         ],
+         "metadata" : {},
+         "proration_behavior" : "create_prorations",
+         "start_date" : "1637149170",
+         "transfer_data" : null,
+         "trial_end" : null
+      }
+   ],
+   "released_at" : null,
+   "released_subscription" : null,
+   "status" : "canceled",
+   "subscription" : null,
+   "test_clock" : null
+}

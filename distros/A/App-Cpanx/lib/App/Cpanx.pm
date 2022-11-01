@@ -3,7 +3,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = "0.10";
+our $VERSION = "1.00";
 
 1;
 
@@ -19,29 +19,33 @@ cpanx - A CPAN downloader script
 
 =head1 OPTIONS
 
-    -h         displays this help text
-    -l         look at module's contents in a shell
-    -i         displays info about the module
-    -f         displays info about what files would be installed
-    -p         display perldoc for the module
-    -u         uninstalls module
-    -n         not interactive
-    -S         do not use sudo
-    -r         reinstall even if module is installed
-    -T         do not run tests
-    -d         dependencies only
-    -m=<url>   sets the cpan mirror. default www.cpan.org
-    -M         choose a cpan mirror
     -c         clean module cache
+    -d         dependencies only
+    -f         displays info about what files would be installed
+    -g         displays a list of globally installed modules
+    -G         displays a list of globally installed packages
+    -h         displays this help text
+    -i         displays info about the module
+    -l         look at module's contents in a shell
+    -m <url>   sets the cpan mirror. default www.cpan.org
+    -M         choose a cpan mirror
+    -n         not interactive
+    -p         display perldoc for the module
+    -r         reinstall even if module is installed
+    -S         do not use sudo
+    -T         do not run tests
+    -u         uninstalls module
     -v         displays version
+    -w         displays where a module is located
+    -W         displays all locations where a module is located
 
-    -I=<loc>   sets install base path. e.g. /usr/local
-    -L=<loc>   sets library install path. e.g. /Library/Perl/5.18
-    -LL=<loc>  sets library install path including the architecture dependent dirs.
-    -B=<loc>   sets the binary install path. e.g. ~/bin
-    -SC=<loc>  sets the script install path. e.g. ~/scripts
-    -M1=<loc>  sets the man1 install path e.g. /usr/share/man/man1
-    -M3=<loc>  sets the man3 install path e.g. /usr/share/man/man3
+    -I <loc>   sets install base path. e.g. /usr/local
+    -L <loc>   sets library install path. e.g. /Library/Perl/5.18
+    -LL <loc>  sets library install path including the architecture dependent dirs.
+    -B <loc>   sets the binary install path. e.g. ~/bin
+    -SC <loc>  sets the script install path. e.g. ~/scripts
+    -M1 <loc>  sets the man1 install path e.g. /usr/share/man/man1
+    -M3 <loc>  sets the man3 install path e.g. /usr/share/man/man3
 
     <module>   name of the module you want to install
                e.g. DBD::mysql or DBD-mysql-4.046.tar.gz or ./
@@ -83,7 +87,7 @@ then you can look around.
 Use the -p option to open perldoc for the module.
 
 The -f option can be used to display what files will be installed.
-Use along with the -I, -L, -B, -SC, -M1, -M3 or the PERL_MM_OPT or
+Use along with the -I, -L, -LL, -B, -SC, -M1, -M3 or the PERL_MM_OPT or
 PERL_MB_OPT environment variables, to make sure you set the right
 settings before you install.
 

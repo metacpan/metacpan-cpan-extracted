@@ -1,5 +1,5 @@
 package Git::Raw::Object;
-$Git::Raw::Object::VERSION = '0.88';
+$Git::Raw::Object::VERSION = '0.90';
 use strict;
 use warnings;
 use Carp;
@@ -29,7 +29,7 @@ Git::Raw::Object - Git object
 
 =head1 VERSION
 
-version 0.88
+version 0.90
 
 =head1 DESCRIPTION
 
@@ -80,7 +80,7 @@ Annotated tag
 
 =head1 AUTHOR
 
-Jacques Germishuys <jacquesg@striata.com>
+Jacques Germishuys <jacquesg@cpan.org>
 
 =head1 LICENSE AND COPYRIGHT
 

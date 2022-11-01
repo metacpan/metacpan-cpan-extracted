@@ -1,5 +1,11 @@
 Revision history for Electronics-PSU-DPSxxxx
 
+0.03    2022-10-29
+        [CHANGES]
+         * Updates for Object::Pad v0.70
+            + `ADJUST :params`
+         * Updates for Test::Future::IO v0.04
+
 0.02    2022-04-13
         [CHANGES]
          * Renamed `measure_` methods to `read_...`

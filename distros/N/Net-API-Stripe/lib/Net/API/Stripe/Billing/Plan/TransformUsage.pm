@@ -2,7 +2,7 @@
 ## Stripe API - ~/lib/Net/API/Stripe/Billing/Plan/TransformUsage.pm
 ## Version v0.100.0
 ## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2020/05/15
 ## 
@@ -11,13 +11,18 @@ package Net::API::Stripe::Billing::Plan::TransformUsage;
 BEGIN
 {
     use strict;
+    use warnings;
     use parent qw( Net::API::Stripe::Generic );
+    use vars qw( $VERSION );
     our( $VERSION ) = 'v0.100.0';
 };
 
-sub divide_by { shift->_set_get_scalar( 'divide_by', @_ ); }
+use strict;
+use warnings;
 
-sub round { shift->_set_get_scalar( 'round', @_ ); }
+sub divide_by { return( shift->_set_get_scalar( 'divide_by', @_ ) ); }
+
+sub round { return( shift->_set_get_scalar( 'round', @_ ) ); }
 
 1;
 
@@ -48,53 +53,45 @@ Called from method B<transform_usage> in L<Net::API::Stripe::Billing::Plan>
 
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>( %ARG )
+=head2 new( %ARG )
 
 Creates a new L<Net::API::Stripe::Billing::Plan::TransformUsage> object.
 It may also take an hash like arguments, that also are method of the same name.
 
-=back
-
 =head1 METHODS
 
-=over 4
-
-=item B<divide_by> integer
+=head2 divide_by integer
 
 Divide usage by this number.
 
-=item B<round> string
+=head2 round string
 
 After division, either round the result up or down.
 
-=back
-
 =head1 API SAMPLE
 
-	{
-	  "id": "expert-monthly-jpy",
-	  "object": "plan",
-	  "active": true,
-	  "aggregate_usage": null,
-	  "amount": 8000,
-	  "amount_decimal": "8000",
-	  "billing_scheme": "per_unit",
-	  "created": 1507273129,
-	  "currency": "jpy",
-	  "interval": "month",
-	  "interval_count": 1,
-	  "livemode": false,
-	  "metadata": {},
-	  "nickname": null,
-	  "product": "prod_fake123456789",
-	  "tiers": null,
-	  "tiers_mode": null,
-	  "transform_usage": null,
-	  "trial_period_days": null,
-	  "usage_type": "licensed"
-	}
+    {
+      "id": "expert-monthly-jpy",
+      "object": "plan",
+      "active": true,
+      "aggregate_usage": null,
+      "amount": 8000,
+      "amount_decimal": "8000",
+      "billing_scheme": "per_unit",
+      "created": 1507273129,
+      "currency": "jpy",
+      "interval": "month",
+      "interval_count": 1,
+      "livemode": false,
+      "metadata": {},
+      "nickname": null,
+      "product": "prod_fake123456789",
+      "tiers": null,
+      "tiers_mode": null,
+      "transform_usage": null,
+      "trial_period_days": null,
+      "usage_type": "licensed"
+    }
 
 =head1 HISTORY
 

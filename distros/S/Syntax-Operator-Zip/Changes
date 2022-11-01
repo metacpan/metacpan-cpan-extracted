@@ -1,5 +1,9 @@
 Revision history for Syntax-Operator-Zip
 
+0.05    2022-10-24
+        [CHANGES]
+         * Updates for XS::Parse::Infix v0.26
+
 0.04    2022-08-23
         [BUGFIXES]
          * Need to use `GIMME_V` to test for `G_VOID`, not `GIMME`

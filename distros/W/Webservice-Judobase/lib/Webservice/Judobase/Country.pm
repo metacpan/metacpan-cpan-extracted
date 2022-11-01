@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package Webservice::Judobase::Country;
-$Webservice::Judobase::Country::VERSION = '0.07';
+$Webservice::Judobase::Country::VERSION = '0.08';
 # ABSTRACT: This module wraps the www.judobase.org website API.
 # VERSION
 
@@ -25,17 +25,19 @@ has 'url' => (
 
 sub competitors_list {
     my ( $self, %args ) = @_;
-    return { error => 'id_country parameter is required' } unless defined $args{id_country};
-    return { error => 'id_country parameter must be an integer' } unless ($args{id_country} =~ /\d+/);
+    return { error => 'id_country parameter is required' }
+        unless defined $args{id_country};
+    return { error => 'id_country parameter must be an integer' }
+        unless ( $args{id_country} =~ /\d+/ );
 
-     my $url
+    my $url
         = $self->url
         . '?params[action]=country.competitors_list'
         . '&params[id_country]='
         . $args{id_country};
 
-     my $request = HTTP::Request->new( GET => $url );
-     my $response = $self->ua->request($request);
+    my $request  = HTTP::Request->new( GET => $url );
+    my $response = $self->ua->request($request);
 
     if ( $response->code == 200 ) {
         my $data = decode_json $response->content;
@@ -47,12 +49,9 @@ sub competitors_list {
 
 }
 
-
 sub get_list {
     my $self = shift;
-    my $url
-        = $self->url
-        . '?params[action]=country.get_list';
+    my $url  = $self->url . '?params[action]=country.get_list';
 
     my $request = HTTP::Request->new( GET => $url );
 
@@ -66,7 +65,5 @@ sub get_list {
 
     return { error => 'Error retreiving country info' };
 }
-
-
 
 1;

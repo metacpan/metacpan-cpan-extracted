@@ -8,10 +8,11 @@
 #include <assert.h>
 
 #ifdef _WIN32
-
+  // None
 #else
-#include <sys/resource.h>
-#include <sys/wait.h>
+  #include <sys/types.h>
+  #include <sys/resource.h>
+  #include <sys/wait.h>
 #endif
 
 const char* FILE_NAME = "Sys/Process.c";

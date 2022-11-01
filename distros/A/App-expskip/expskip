@@ -1,0 +1,172 @@
+#!/usr/bin/perl # #! env perl
+
+#  expskip 
+#    Producec by Toshiyuki Shimono, Tokyo., 2016-01 ~ 07 , 2018-3, 2022-10
+#    最初は、ファイルの先頭と最後の3行のみを出していたが、
+#    途中を指数関数的な行番号を出すようにしてみた。
+#     ファイル名は headtail, pickall, expskip と変遷している。
+#    作成者: 下野寿之 bin4tsv@gmail.com
+
+use 5.014 ; use warnings ;
+use Getopt::Std ;
+use Term::ANSIColor qw[ color :constants ] ; $Term::ANSIColor::AUTORESET = 1 ; 
+use FindBin qw [ $Script ] ; 
+
+# テスト/デモ test/demo
+if ( exists $ARGV[0] && $ARGV[0] =~ m/^-T/ ) {
+  my $A0 = 1 ;
+  my $arg = do { $ARGV[0] =~ m/^-T(.+)$/ && $1 || undef } // do { $A0 ++ ; $ARGV[1] } ; # -T のパラメータを抽出。
+  do { say STDERR RED "Specify the parameter for `-T' such as `$0 -T 1m'."  ; exit } if ! defined $arg ;
+  my $cmd = '' ;
+  do { 
+    no warnings 'experimental::smartmatch' ;
+    $cmd = "seq 20 | $0"           when '20' ; # -T 20 で "expskip" に seq 20 の結果を与える。
+    $cmd = "seq 20 | $0 -f5"       when 'f5' ; # -T f5 で "expskip -f5" をシミュレート
+    $cmd = "seq 20 | $0 -p0"       when 'p0' ; # -T p0 で "expskip -p0" をシミュレート
+    $cmd = "$0 <(seq 4) <(seq 10)" when 'm2' ; # -T m2 で、複数のファイルを与える。
+    $cmd = "seq 1e6 | $0"          when '1m' ; # -T 1m で "expskip" に 100万までの数を与える。
+    $cmd = "seq 1e5 | $0 -e0"      when 'e0' ; # -T e0
+    $cmd = "seq 1e5 | $0 -f5"      when 'f5' ; # -T f5
+    $cmd = "seq 100 | tr 0-9 A-H | $0 -: 'yellow green bold italic'" ; # -T ac で、数字以外と行番号の色づけを同時にテスト。
+    $cmd = "seq 1e7 | $0"          when 'E7' ; # -T E7 で 1000万までの数を与える。なお、seq 1e7が1e7+1の数を与える。
+  } for $arg ; 
+  $cmd = join " " , $cmd , @ARGV [ $A0 .. $#ARGV ] ;  # <-- @ARGV に'や"があると思ったように動作しないであろう。
+  say STDERR YELLOW BOLD ">  $cmd" ;
+  system $cmd ;
+  exit ;
+}
+
+getopts "::2:b:e:f:tp:zA:B:T:",\my%o ; # <-- -T以外のオプションを読み取る。(ただし動作検証のため、Tはここに残した。)
+eval "use PerlIO::gzip;1" or die "Can't import PerlIO::gzip despite -z instruction. ($Script)\n" if $o{z} ; 
+sub lineOut ( $ ) ; # lineOutのような関数名いくつかのうち、どれかが使われる。
+sub eachFile ( $ ) ; 
+sub fitCheck ( $ ) ; 
+$| = 1 ; #  <- 毎回フラッシュ(使われる状況を考えると多分これで良いと思われる。) 
+$o{b} //= 10 ; # 基数の指定。base 
+$o{e} //= 2 ;  # 最初と最後のそれぞれ何行を出力するか。Edge 
+$o{f} ||= 1 ;  # 開始行を指定する。0でもundefでも値が1になるようにする。from 
+$o{A} //= 0 ;  # 合致する行の何行後までさらに続けて出力するか After 
+$o{B} //= 0 ;  # 合致する行の何行前にさかのぼって続けて出力するか Before
+my (@nums0, @nums) ; # 何行目を-bと-pの機能で出力するかについての行番号を保管。0はマスターを意味する。
+my $oc ; # 各ファイルで出力した行を数える。
+
+# (出力する)書式の指定 : 各関数は、どれも、1個だけの引数だが、それが無名配列の[行番号,その行の文字列]である。
+sub lineOutFnc ( $ ) ; # lineOutのような関数名いくつかのうち、どれかが使われる。テンプレート..と言えば良いかな.
+sub lineOutColon ( $ ) { $oc++ ; $_[0][0], ":\t", $_[0][1] }   # 行番号にコロン(:) を付加して出力
+sub lineOutCouleur ( $ ) { $oc++ ; color($o{':'}) . "$_[0][0]:" . color('reset') . "\t", $_[0][1] }    # G 
+sub lineOutBlunt ( $ ) { $oc++ ; $_[0][1] }   
+sub lineOutTime ( $ ) { sprintf("%02d:%02d:%02d\t", @{[localtime]}[2,1,0]), lineOutFnc $_[0] } # <- これだけlineOutFncを中に含む。
+* lineOutFnc = ($o{':'}//'')eq"0"? * lineOutBlunt : (exists$o{':'}) ? * lineOutCouleur : * lineOutColon ; 
+* lineOut = $o{t}? *lineOutTime : * lineOutFnc ;
+
+@nums0 = do { 
+  my %t =(0=>['Inf'],1=>[1],2=>[1,2,4,8],5=>[1,2,5],7=>[1,1.5,2,3,5,7],8=>[1,1.5,2,3,5,8],9=>[1..$o{b}-1]) ; 
+  do { say STDERR BOLD RED "-p should has a parameter in {0,1,2,5,7,8,9}" ; exit } if exists $o{p} && !defined $t{$o{p}} ; 
+  my @t = @{$t{$o{p}//1}} ; 
+  grep {$_ < $o{b} || $_ == 'Inf'} @t 
+} ;
+
+& procFiles ; # 複数のファイルも想定して処理。
+exit 0 ;
+
+sub procFiles ( ) { # 複数のファイルも想定して処理
+  my $files = @ARGV ;
+  do {
+    my $fileName = shift @ARGV  ; # ファイル名
+    my $FH ; # ファイルハンドル
+    open $FH , "<" , $fileName or warn "File `$fileName' does not open." and next if defined $fileName ; 
+    $FH = *STDIN if ! defined $fileName ; 
+    binmode $FH , ":gzip(autopop)" if $o{z}  ; # <-- autopop とは?
+    say UNDERLINE $fileName if $files >= 2 ; # ファイルが2個以上指定されていたら、ファイル名を表示する。
+    & eachFile ( $FH ) ; 
+  } while @ARGV 
+}
+
+sub eachFile ( $ ) { # 1個のファイルに対する処理(引数はファイルハンドル。STDINの場合もある。)
+  @nums = @nums0 ;
+  my $FH = $_[0] ; 
+  my $ready ; # この数が正なら出力する。→ 仕組みは、キリの良い数などのトリガーにより、一定値が格納されて、1ずつ減る。
+  my @stockLines = () ; # いくつかの行の、文字列を格納する。
+  $oc = 0 ; # 出力した行の数を数えるのでここでリセット。
+  # 1. 最初の方は、まず一定量読む。
+  do { while ( <$FH> ) { last if $. +1 >= $o{f} } } if $o{f} >= 2 ; 
+  do { while ( <$FH> ) { push @stockLines , [ $. , $_ ] ; last if @stockLines >= $o{e} } } if $o{e} > 0 ; 
+  print lineOut $_ for @stockLines ;
+  my $firstEnd = @stockLines ? $stockLines[-1][0] : 0 ; # 最初の段階で読んだ最後の行の行番号
+  # 2. 条件に一致するもののみ出力する。
+  while ( <$FH> ) { 
+     push @stockLines , [ $. , $_ ]  ; # pushとshiftを対にしてFIFOのような仕組み
+     my $theNext = shift @stockLines ; 
+     $ready = fitCheck $$theNext[0] ? $o{A} + 1 : 0 ;
+     print lineOut $theNext if $ready -- > 0  &&  $$theNext[0] > $firstEnd ; 
+  }
+  # 3. 残っているものを書き出す
+  print lineOut $_ for grep { $$_[0] > $o{e} } @stockLines ; 
+  # 4. 標準エラー出力に二次情報を書き出す。
+  my $n = $. =~ s/(?<=\d)(?=(\d\d\d)+($|\D))/,/gr ;
+  my $msg = "-- $n lines are read and $oc lines are output. To suppress this message on STDERR, run as `$Script -20'. " ;
+  say STDERR FAINT BOLD $msg if 0 ne ($o{2}//'') ;
+}
+
+sub fitCheck ( $ ) { # 行番号を引数に与える。すると、それが出力可能に該当するかを判定する。@numsを暗黙に操作している。
+    my $head = shift @nums ;    # 数珠を回すようなイメージで処理をする
+    while ( $head < $_[0] ) { push @nums , $head * $o{b} ; $head = shift @nums }
+    if ( $head < $_[0] + 1 ) { push @nums , $head * $o{b} ; return $_[0] >= $o{f} } # 
+    unshift @nums, $head ; 
+    return $_[0] >= $head - $o{B} && $_[0] <= $head + $o{A} && $_[0] >= $o{f} ;  
+}
+
+## ヘルプの扱い
+sub VERSION_MESSAGE {}
+sub HELP_MESSAGE {
+    use FindBin qw[ $Script ] ; 
+    $ARGV[1] //= '' ;
+    open my $FH , '<' , $0 ;
+    while(<$FH>){
+        s/\$0/$Script/g ;
+        print $_ if s/^=head1// .. s/^=cut// and $ARGV[1] =~ /^o(p(t(i(o(ns?)?)?)?)?)?$/i ? m/^\s+\-/ : 1;
+    }
+    close $FH ;
+    exit 0 ;
+}
+
+=encoding utf8
+
+=head1
+
+ $0 [-z] [-B 0] [-A 0] [-p 1] [-f 1] [-e 2]  
+
+   大きなテキストファイルの全体を把握しやすくするため、
+   最初と最後の数行と途中の 1, 10, 100, 1000 .. 行目などを出力する。どう出力するかは、オプションで指定可能。
+
+オプション: 
+   -b N :次の説明の 10,100,1000,.. の数の部分を変更して N のべき乗になる。さらに「」内の数の内N以下のみに限定。(base)
+   -p 1 : キリの良い数を 1, 10, 100, 1000 .. 行に限定する。(-bの設定で別の数のべき乗に変更可能。)
+   -p 2 : キリの良い数を 1, 2, 4, 8,  10, 20, 40, 80 .. と、「1,2,4,8」の1倍,10倍,100倍.. とする。
+   -p 7 : キリの良い数を 「1, 1.5, 2, 3, 5, 7 」の1倍,10倍,100倍.. とする。
+   -p 8 : キリの良い数を 「1, 1.5, 2, 3, 5, 8 」の1倍,10倍,100倍.. とする。
+   -p 9 : キリの良い数を 上1桁以外が全て0の数と見なす(「1,2,3,4,5,6,7,8,9」の1倍,10倍,100倍..)。
+   -p 0 : 上記の動作をしない。次の -e で指定される部分のみを出力。
+   -e num : 入力全体の最初と最後も num 行出力するようにする。未指定であれば num = 2。0も指定可能。 (edge)
+   -f num : 開始行の指定 (from)
+
+   -: [0|colorname] : 行番号のみ色を着色する指定。blue や "bold yellow"などを指定可能。0 を指定すると行番号を出力しない。
+   -B num きりの良い数の何行前から表示するか。連続表示に用いる。(grepコマンドの -B と同様な動作)
+   -A num きりの良い数の何行後まで表示するか。連続表示に用いる。(grepコマンドの -A と同様な動作)
+
+   -2 0 : 「何行読んで何行出力したか」を標準エラー出力に出しているのを抑制する。
+   -t : 出力時の時刻情報を 行頭に付加。
+   -z : 入力が、gzipの形式で圧縮されていることを指定する。
+
+  --help : この $0 のヘルプメッセージを出す。  perldoc -t $0 | cat でもほぼ同じ。
+  --help opt : オプションのみのヘルプを出す。opt以外でも options と先頭が1文字以上一致すれば良い。
+
+ 開発上のメモ: 
+   * キーボードからの入力待ちの場合は、-tで検出して、ALRMシグナルで受付を促すようにしたい。
+   * -: [colorName|0] で行番号の出力を制御したい。-g と -q の機能を一つにすることになる。
+   * -bと-pを統合したい。-b n1,n2 として n1が基数、n2が既に-pで指定された通りにしたい。
+   * 複数のファイルの中身を出すときに、ファイル名に下線を引くようにしたが、下線にするにもオプションで変更可能にしたいかも。
+   * 時刻情報をもっと正確に出したいかも。Time::HiResを使って。コアモジュールかどうかも確かめた上で実装したい。
+ 
+=cut
+

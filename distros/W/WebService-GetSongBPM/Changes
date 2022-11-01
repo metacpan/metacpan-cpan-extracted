@@ -1,5 +1,8 @@
 Revision history for WebService-GetSongBPM
 
+0.0401 2022-10-26 18:22:14
+    - Avoid implicit imports.
+
 0.0400 2021-11-17 10:18:27
     - Fix query logic.
     - Improve tests.

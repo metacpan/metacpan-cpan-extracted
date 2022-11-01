@@ -7,82 +7,56 @@ use v5.10;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 use Safe::Isa;
-use Sub::Util qw( set_subname );
+use Ref::Util qw( is_ref is_blessed_ref is_arrayref is_hashref );
+use MooX::Tag::TO_HASH::Util ':all';
 
-use constant ( {
-    map { uc( $_ ) => $_ } 'omit_if_empty', 'if_exists',
-    'if_defined',                           'no_recurse',
-    'alt_name',                             'predicate'
-} );
-use constant ( { FTO_HASH => 'to_hash' } );
+sub _process_value {
 
-our %ALLOWED
-  = ( map { $_ => undef } OMIT_IF_EMPTY, IF_EXISTS, IF_DEFINED, NO_RECURSE );
+    return \$_[0] unless is_ref( $_[0] );    ## no critic
 
-sub _croak {
-    require Carp;
-    goto \&Carp::croak;
-}
+    my $ref   = $_[0];
+    my $value = $ref;
 
-sub make_tag_handler {
-
-    set_subname __PACKAGE__ . '::tag_handler' => sub {
-        my ( $orig, $attrs, %opt ) = @_;
-        my $spec = $opt{ +FTO_HASH };
-
-       # if no to_hash, or to_hash has been processed (e.g. it's now a hash ref)
-       # pass on to original routine.
-        return $orig->( $attrs, %opt )
-          if !defined $spec || ref( $spec );
-
-        my %spec;
-        if ( $spec ne '1' ) {
-            my ( $alt_name, @stuff ) = split( ',', $spec );
-            defined $_ and _croak( "unknown option: $_ " )
-              for grep { !exists $ALLOWED{$_} } @stuff;
-            $spec{ +ALT_NAME } = $alt_name if length( $alt_name );
-            $spec{$_} = 1 for @stuff;
-
-            # consistency checks if more than one attribute is passed to has.
-            if ( ref $attrs && @{$attrs} > 1 ) {
-                _croak(
-                    "can't specify alternate name if more than one attribute is defined"
-                ) if exists $spec{ +ALT_NAME };
-                _croak(
-                    "can't specify predicate name if more than one attribute is defined"
-                ) if defined $opt{ +PREDICATE } && $opt{ +PREDICATE } ne '1';
-            }
-
-            $spec{ +IF_EXISTS } = delete $spec{ +OMIT_IF_EMPTY }
-              if exists $spec{ +OMIT_IF_EMPTY };
-
-            $opt{ +PREDICATE } //= '1'
-              if $spec{ +IF_EXISTS };
+    if ( is_blessed_ref( $ref ) ) {
+        # turtles all the way down...
+        my $mth = $ref->$_can( UC_TO_HASH );
+        $value = $ref->$mth if defined $mth;
+    }
+    elsif ( is_arrayref( $ref ) ) {
+        my %new;
+        for my $idx ( 0 .. @{$ref} - 1 ) {
+            my $ref = _process_value( $ref->[$idx] );
+            $new{$idx} = $$ref if defined $ref;
         }
-
-        my %to_hash;
-        for my $attr ( ref $attrs ? @{$attrs} : $attrs ) {
-            $to_hash{$attr} = {%spec};
-            if ( $spec{ +IF_EXISTS } ) {
-                $opt{ +PREDICATE } //= 1;
-                $to_hash{$attr}{ +PREDICATE }
-                  = $opt{ +PREDICATE } eq '1'
-                  ? 'has_' . $attr
-                  : $opt{ +PREDICATE };
-            }
+        if ( keys %new ) {
+            my @replace = @$ref;
+            $replace[$_] = delete $new{$_} for keys %new;
+            $value = \@replace;
         }
-        $opt{ +FTO_HASH } = \%to_hash;
-        return $orig->( $attrs, %opt );
-    };
+    }
+    elsif ( is_hashref( $ref ) ) {
+        my %new;
+        for my $key ( keys %$ref ) {
+            my $ref = _process_value( $ref->{$key} );
+            $new{$key} = $$ref if defined $ref;
+        }
+        if ( keys %new ) {
+            my %replace = %$ref;
+            $replace{$_} = delete $new{$_} for keys %new;
+            $value = \%replace;
+        }
+    }
+
+    return \$value;
 }
 
 use Moo::Role;
 use MooX::TaggedAttributes -propagate,
-  -tags    => 'to_hash',
-  -handler => \&make_tag_handler;
+  -tags    => LC_TO_HASH,
+  -handler => sub { make_tag_handler( LC_TO_HASH ) };
 
 use namespace::clean -except => [ '_tags', '_tag_list' ];
 
@@ -97,7 +71,7 @@ use namespace::clean -except => [ '_tags', '_tag_list' ];
 sub TO_HASH {
     my $self = shift;
 
-    my $to_hash = $self->_tags->tag_attr_hash->{to_hash} // {};
+    my $to_hash = $self->_tags->tag_attr_hash->{ +LC_TO_HASH } // {};
 
     # the structure of %to_hash is complicated because has() may take
     # multiple attributes.  For example,
@@ -122,28 +96,37 @@ sub TO_HASH {
         # check if key exists before querying it to avoid an exception
         next
           if exists $opt->{ +IF_EXISTS }
-          && $opt->{ +IF_EXISTS }
           && !$self->${ \$opt->{ +PREDICATE } };
 
         next
           if exists $opt->{ +IF_DEFINED }
-          && $opt->{ +IF_DEFINED }
           && !defined $self->${ \$attr };
 
-        my $alt_name
+        my $name
           = exists $opt->{ +ALT_NAME }
           ? $opt->{ +ALT_NAME } // $attr
           : $attr;
+
         my $value = $self->$attr;
-        if ( exists $opt->{ +NO_RECURSE } && $opt->{ +NO_RECURSE } ) {
-            $hash{$alt_name} = $value;
+
+        # return 'as is' if we're not supposed to recurse, or $value
+        # is a normal scalar
+        if ( exists $opt->{ +NO_RECURSE } ) {
+            # do nothing
         }
+        # possibly turtles all the way down...
         else {
-            # turtles all the way down...
-            my $mth = $value->$_can( FTO_HASH );
-            $hash{$alt_name} = defined $mth ? $value->$mth : $value;
+            my $ref_to_value = _process_value( $value );
+            $value = ${$ref_to_value} if defined $ref_to_value;
         }
+
+        $hash{$name} = $value;
     }
+
+    if ( defined ( my $mth = $self->can( 'modify_hashr' ) ) ) {
+        $self->$mth( \%hash );
+    }
+
     return \%hash;
 }
 
@@ -174,7 +157,7 @@ MooX::Tag::TO_HASH - Controlled translation of Moo objects into Hashes
 
 =head1 VERSION
 
-version 0.01
+version 0.03
 
 =head1 SYNOPSIS
 
@@ -203,8 +186,8 @@ version 0.01
 # resulting in
 
  $VAR1 = {
-           'hen' => undef,
            'cow' => 'Daisy',
+           'hen' => undef,
            'goose' => 'Frank'
          };
 
@@ -229,8 +212,17 @@ If a field's value is another object, L</TO_HASH> will automatically
 turn that into a hash if it has its own C<TO_HASH> method (you can
 also prevent that).
 
-By applying a method modifier to the L<TO_HASH> method, you can modify
-its output after the conversion.
+=head2 Modifying the generated hash
+
+[Originally, this module recommended using a method modifier to the
+L<TO_HASH> method, this is no longer recommended. See discussion
+under L<DEPRECATED BEHAVIOR> below.].
+
+If the class provides a C<modify_hashr> method, it will be called as
+
+    $self->modify_hashr( \%hash );
+
+and should modify the passed hash in place.
 
 =head2 Usage
 
@@ -302,11 +294,9 @@ This method is added to the consuming class or role.
  has secret_admirer => ( is => 'ro', );
  
  # upper case the hash keys
- around TO_HASH => sub {
-     my ( $orig, $obj ) = @_;
-     my $hash = $obj->$orig;
-     $hash->{ uc $_ } = delete $hash->{$_} for keys %$hash;
-     return $hash;
+ sub modify_hashr {
+     my ( $self, $hashr ) = @_;
+     $hashr->{ uc $_ } = delete $hashr->{$_} for keys %$hashr;
  };
  
  # and elsewhere:
@@ -325,11 +315,48 @@ This method is added to the consuming class or role.
 # resulting in
 
  $VAR1 = {
-           'COW' => 'Daisy',
-           'HEN' => 'Ruby',
+           'HORSE' => 'Ed',
            'GOOSE' => 'Donald',
-           'HORSE' => 'Ed'
+           'COW' => 'Daisy',
+           'HEN' => 'Ruby'
          };
+
+=head1 DEPRECATED BEHAVIOR
+
+=head2 Using method modifiers to modify the results
+
+Previously it was suggested that the C<around> method modifier be used
+to modify the resultant hash. However, if both a child and parent
+class consume the C<MooX::Tag::TO_HASH> role and the parent has
+modified C<TO_HASH>, the parent's modified C<TO_HASH> will not be run;
+instead the original C<TO_HASH> will. For example
+
+ package Role {
+     use Moo::Role;
+     sub foo { print "Role\n" }
+ }
+ 
+ package Parent {
+     use Moo;
+     with 'Role';
+     before 'foo' => sub { print "Parent\n" };
+ }
+ 
+ package Child {
+     use Moo;
+     extends 'Parent';
+     with 'Role';
+     before 'foo' => sub { print "Child\n" };
+ }
+ 
+ Child->new->foo;
+
+results in
+
+ Child
+ Role
+
+Note it does not output C<Parent>.
 
 =head1 SUPPORT
 
@@ -352,6 +379,10 @@ and may be cloned from
 Please see those modules/websites for more information related to this module.
 
 =over 4
+
+=item *
+
+L<MooX::Tag::TO_JSON - the sibling class to this one.|MooX::Tag::TO_JSON - the sibling class to this one.>
 
 =item *
 

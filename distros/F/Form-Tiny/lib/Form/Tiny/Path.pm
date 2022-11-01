@@ -1,5 +1,5 @@
 package Form::Tiny::Path;
-$Form::Tiny::Path::VERSION = '2.14';
+$Form::Tiny::Path::VERSION = '2.15';
 use v5.10;
 use strict;
 use warnings;
@@ -60,12 +60,12 @@ sub from_name
 	croak 'path specified was empty'
 		unless length $name;
 
+	# use custom escape character for path building
+	# (won't be mistaken for literal backslash)
 	my $escape = "\x00";
 	$name =~ s/(\Q$escape_character\E{1,2})/length $1 == 2 ? $escape_character : $escape/ge;
 
-	my $arr = quotemeta $array_marker;
-	my $sep = quotemeta $nesting_separator;
-	my @parts = split /(?<!$escape)$sep/, $name, -1;
+	my @parts = split /(?<!$escape)\Q$nesting_separator\E/, $name, -1;
 	my @meta;
 
 	for my $part (@parts) {
@@ -76,7 +76,11 @@ sub from_name
 			push @meta, 'HASH';
 		}
 	}
-	@parts = map { s/$escape($sep|$arr)/$1/ge; $_ } @parts;
+
+	@parts = map {
+		s{ $escape ( \Q$nesting_separator\E | \Q$array_marker\E ) }{$1}gx;
+		$_
+	} @parts;
 
 	return $self->new(path => \@parts, meta => \@meta);
 }
@@ -131,6 +135,39 @@ sub join
 {
 	my ($self, $prefix) = @_;
 	return join $nesting_separator, $self->make_name_path($prefix);
+}
+
+sub follow
+{
+	my ($self, $structure) = @_;
+
+	return undef if !ref $structure;
+
+	my @found = ($structure);
+	my @path = @{$self->path};
+	my @meta = @{$self->meta};
+	my $has_array = 0;
+
+	for my $ind (0 .. $#path) {
+		my $is_array = $meta[$ind] eq 'ARRAY';
+		my @new_found;
+
+		for my $item (@found) {
+			if ($is_array && ref $item eq 'ARRAY') {
+				push @new_found, @{$item};
+			}
+			elsif (ref $item eq 'HASH' && exists $item->{$path[$ind]}) {
+				push @new_found, $item->{$path[$ind]};
+			}
+		}
+
+		@found = @new_found;
+		$has_array ||= $is_array;
+	}
+
+	return $has_array
+		? \@found
+		: $found[0];
 }
 
 1;

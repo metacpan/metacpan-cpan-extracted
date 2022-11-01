@@ -1,0 +1,11 @@
+{
+   "available" : {
+      "eur" : "10000"
+   },
+   "customer" : "cus_AJ78ZaALpqgiuZ",
+   "livemode" : 0,
+   "object" : "cash_balance",
+   "settings" : {
+      "reconciliation_mode" : "automatic"
+   }
+}

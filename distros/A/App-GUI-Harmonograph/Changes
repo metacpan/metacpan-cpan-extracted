@@ -1,3 +1,14 @@
+0.57  2022-10-25  lichtkind
+-------
+    * = maintenance and starting mod matrix
+    * + change main function of X and Y pendulum
+    * + sped up sketch drawing
+    * ? cleanep up POD from incorrect leftover bits
+    * ? added some POD
+    * " cleaned left lower corner of GUI
+    * " made all comboboxes readonly (were never meant to be editable, but select only)
+    * " deactivated help dialogs
+
 0.56  2022-10-18  lichtkind
 -------
     * = maintenance

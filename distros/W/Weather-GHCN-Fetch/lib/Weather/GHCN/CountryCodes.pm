@@ -8,7 +8,7 @@ Weather::GHCN::CountryCodes - convert between various country codes
 
 =head1 VERSION
 
-version v0.0.008
+version v0.0.009
 
 =head1 SYNOPSIS
 
@@ -42,7 +42,7 @@ no warnings 'experimental::signatures';
 
 package Weather::GHCN::CountryCodes;
 
-our $VERSION = 'v0.0.008';
+our $VERSION = 'v0.0.009';
 
 use Carp        qw(carp croak cluck confess);
 use English     qw(-no_match_vars);

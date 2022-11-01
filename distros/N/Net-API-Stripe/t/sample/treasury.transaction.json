@@ -1,0 +1,22 @@
+{
+   "amount" : "-100",
+   "balance_impact" : {
+      "cash" : "-100",
+      "inbound_pending" : "0",
+      "outbound_pending" : "100"
+   },
+   "created" : "1662261085",
+   "currency" : "usd",
+   "description" : "Jane Austen (6789) | Outbound transfer | transfer",
+   "financial_account" : "fa_1Le9F32eZvKYlo2CjbQcDQUE",
+   "flow" : "obt_1Le9F32eZvKYlo2CPQD5jo2F",
+   "flow_type" : "outbound_transfer",
+   "id" : "trxn_1Le9F32eZvKYlo2C2dtkse82",
+   "livemode" : 0,
+   "object" : "treasury.transaction",
+   "status" : "open",
+   "status_transitions" : {
+      "posted_at" : null,
+      "void_at" : null
+   }
+}

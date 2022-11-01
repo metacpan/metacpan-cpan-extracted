@@ -2,8 +2,12 @@
 
 #include <stdlib.h>
 
-#ifndef _WIN32
+#ifdef _WIN32
+  // None
+#else
+  #include <sys/types.h>
   #include <sys/resource.h>
+  #include <sys/wait.h>
 #endif
 
 static const char* FILE_NAME = "Sys/Process/Constant.c";

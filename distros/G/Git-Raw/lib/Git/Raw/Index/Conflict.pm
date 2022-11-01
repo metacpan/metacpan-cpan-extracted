@@ -1,5 +1,5 @@
 package Git::Raw::Index::Conflict;
-$Git::Raw::Index::Conflict::VERSION = '0.88';
+$Git::Raw::Index::Conflict::VERSION = '0.90';
 use strict;
 use warnings;
 
@@ -11,7 +11,7 @@ Git::Raw::Index::Conflict - Git index conflict class
 
 =head1 VERSION
 
-version 0.88
+version 0.90
 
 =head1 DESCRIPTION
 
@@ -39,7 +39,7 @@ or C<undef> if not applicable.
 
 =head1 AUTHOR
 
-Jacques Germishuys <jacquesg@striata.com>
+Jacques Germishuys <jacquesg@cpan.org>
 
 =head1 LICENSE AND COPYRIGHT
 

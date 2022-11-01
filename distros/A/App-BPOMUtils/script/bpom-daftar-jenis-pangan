@@ -1,7 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/BPOMUtils/bpom_list_food_types
-# and generated automatically using Perinci::CmdLine::Gen version 0.501
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
 use strict;
@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-12'; # DATE
+our $DATE = '2022-11-01'; # DATE
 our $DIST = 'App-BPOMUtils'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/BPOMUtils/bpom_list_food_types",
@@ -40,11 +40,15 @@ bpom-daftar-jenis-pangan - List food types in BPOM processed food division
 
 =head1 VERSION
 
-This document describes version 0.007 of bpom-daftar-jenis-pangan (from Perl distribution App-BPOMUtils), released on 2022-10-12.
+This document describes version 0.012 of bpom-daftar-jenis-pangan (from Perl distribution App-BPOMUtils), released on 2022-11-01.
 
 =head1 SYNOPSIS
 
-B<bpom-daftar-jenis-pangan> [L<--code-contains|/"--code-contains=s">=I<str>] [(L<--code-in|/"--code-in=s@">=I<str>)+|L<--code-in-json|/"--code-in=s@">=I<json>] [L<--code-is|/"--code-is=s">=I<str>] [L<--code-isnt|/"--code-isnt=s">=I<str>] [L<--code-max|/"--code-max=s">=I<str>] [L<--code-min|/"--code-min=s">=I<str>] [L<--code-not-contains|/"--code-not-contains=s">=I<str>] [(L<--code-not-in|/"--code-not-in=s@">=I<str>)+|L<--code-not-in-json|/"--code-not-in=s@">=I<json>] [L<--code-xmax|/"--code-xmax=s">=I<str>] [L<--code-xmin|/"--code-xmin=s">=I<str>] [L<--code|/"--code=s">=I<str>] [L<--debug|/"--debug">|L<--log-level|/"--log-level=s">=I<level>|L<--quiet|/"--quiet">|L<--trace|/"--trace">|L<--verbose|/"--verbose">] [L<--detail|/"--detail, -l">|L<-l|/"--detail, -l">|L<--no-detail|/"--detail, -l">|L<--nodetail|/"--detail, -l">] [(L<--exclude-field|/"--exclude-fields-json=s">=I<str>)+|L<--exclude-fields-json|/"--exclude-fields-json=s">=I<json>] [(L<--field|/"--fields-json=s">=I<str>)+|L<--fields-json|/"--fields-json=s">=I<json>] [L<--format|/"--format=s">=I<name>|L<--json|/"--json">] [L<--(no)naked-res|/"--naked-res">] [L<--page-result|/"--page-result">[=I<program>]|L<--view-result|/"--view-result">[=I<program>]] [L<--random|/"--random">|L<--no-random|/"--random">|L<--norandom|/"--random">] [L<--result-limit|/"--result-limit=s">=I<int>] [L<--result-start|/"--result-start=s">=I<int>] [(L<--sort|/"--sort=s@">=I<str>)+|L<--sort-json|/"--sort=s@">=I<json>] [L<--summary-contains|/"--summary-contains=s">=I<str>] [(L<--summary-in|/"--summary-in=s@">=I<str>)+|L<--summary-in-json|/"--summary-in=s@">=I<json>] [L<--summary-is|/"--summary-is=s">=I<str>] [L<--summary-isnt|/"--summary-isnt=s">=I<str>] [L<--summary-max|/"--summary-max=s">=I<str>] [L<--summary-min|/"--summary-min=s">=I<str>] [L<--summary-not-contains|/"--summary-not-contains=s">=I<str>] [(L<--summary-not-in|/"--summary-not-in=s@">=I<str>)+|L<--summary-not-in-json|/"--summary-not-in=s@">=I<json>] [L<--summary-xmax|/"--summary-xmax=s">=I<str>] [L<--summary-xmin|/"--summary-xmin=s">=I<str>] [L<--summary|/"--summary=s">=I<str>] [L<--with-field-names|/"--with-field-names">|L<--without-field-names|/"--with-field-names">] -- [L<query|/"--query=s, -q">]
+B<bpom-daftar-jenis-pangan> L<--help|/"--help, -h, -v"> (or L<-h|/"--help, -h, -v">, L<-?|/"--help, -h, -v">)
+
+B<bpom-daftar-jenis-pangan> L<--version|/"--version, -v"> (or L<-v|/"--version, -v">)
+
+B<bpom-daftar-jenis-pangan> [L<--code-contains|/"--code-contains=s">=I<str>] [(L<--code-in|/"--code-in=s@">=I<str>)+|L<--code-in-json|/"--code-in=s@">=I<json>] [L<--code-is|/"--code-is=s">=I<str>] [L<--code-isnt|/"--code-isnt=s">=I<str>] [L<--code-matches|/"--code-matches=s">=I<str>] [L<--code-max|/"--code-max=s">=I<str>] [L<--code-min|/"--code-min=s">=I<str>] [L<--code-not-contains|/"--code-not-contains=s">=I<str>] [(L<--code-not-in|/"--code-not-in=s@">=I<str>)+|L<--code-not-in-json|/"--code-not-in=s@">=I<json>] [L<--code-not-matches|/"--code-not-matches=s">=I<str>] [L<--code-xmax|/"--code-xmax=s">=I<str>] [L<--code-xmin|/"--code-xmin=s">=I<str>] [L<--code|/"--code=s">=I<str>] [L<--debug|/"--debug">|L<--log-level|/"--log-level=s">=I<level>|L<--quiet|/"--quiet">|L<--trace|/"--trace">|L<--verbose|/"--verbose">] [L<--detail|/"--detail, -l">|L<-l|/"--detail, -l">|L<--no-detail|/"--detail, -l">|L<--nodetail|/"--detail, -l">] [(L<--exclude-field|/"--exclude-fields-json=s">=I<str>)+|L<--exclude-fields-json|/"--exclude-fields-json=s">=I<json>] [(L<--field|/"--fields-json=s">=I<str>)+|L<--fields-json|/"--fields-json=s">=I<json>] [L<--format|/"--format=s">=I<name>|L<--json|/"--json">] [L<--(no)naked-res|/"--naked-res">] [L<--page-result|/"--page-result">[=I<program>]|L<--view-result|/"--view-result">[=I<program>]] [L<--random|/"--random">|L<--no-random|/"--random">|L<--norandom|/"--random">] [L<--result-limit|/"--result-limit=s">=I<int>] [L<--result-start|/"--result-start=s">=I<int>] [(L<--sort|/"--sort=s@">=I<str>)+|L<--sort-json|/"--sort=s@">=I<json>] [L<--summary-contains|/"--summary-contains=s">=I<str>] [(L<--summary-in|/"--summary-in=s@">=I<str>)+|L<--summary-in-json|/"--summary-in=s@">=I<json>] [L<--summary-is|/"--summary-is=s">=I<str>] [L<--summary-isnt|/"--summary-isnt=s">=I<str>] [L<--summary-matches|/"--summary-matches=s">=I<str>] [L<--summary-max|/"--summary-max=s">=I<str>] [L<--summary-min|/"--summary-min=s">=I<str>] [L<--summary-not-contains|/"--summary-not-contains=s">=I<str>] [(L<--summary-not-in|/"--summary-not-in=s@">=I<str>)+|L<--summary-not-in-json|/"--summary-not-in=s@">=I<json>] [L<--summary-not-matches|/"--summary-not-matches=s">=I<str>] [L<--summary-xmax|/"--summary-xmax=s">=I<str>] [L<--summary-xmin|/"--summary-xmin=s">=I<str>] [L<--summary|/"--summary=s">=I<str>] [L<--with-field-names|/"--with-field-names">|L<--without-field-names|/"--with-field-names">] -- [L<query|/"--query=s, -q">]
 
 =head1 OPTIONS
 
@@ -124,6 +128,10 @@ Only return records where the 'code' field equals specified value.
 
 Only return records where the 'code' field does not equal specified value.
 
+=item B<--code-matches>=I<s>
+
+Only return records where the 'code' field matches specified regular expression pattern.
+
 =item B<--code-max>=I<s>
 
 Only return records where the 'code' field is less than or equal to specified value.
@@ -147,6 +155,10 @@ See C<--code-not-in>.
 Only return records where the 'code' field is not in the specified values.
 
 Can be specified multiple times.
+
+=item B<--code-not-matches>=I<s>
+
+Only return records where the 'code' field does not match specified regular expression.
 
 =item B<--code-xmax>=I<s>
 
@@ -190,6 +202,10 @@ Only return records where the 'summary' field equals specified value.
 
 Only return records where the 'summary' field does not equal specified value.
 
+=item B<--summary-matches>=I<s>
+
+Only return records where the 'summary' field matches specified regular expression pattern.
+
 =item B<--summary-max>=I<s>
 
 Only return records where the 'summary' field is less than or equal to specified value.
@@ -213,6 +229,10 @@ See C<--summary-not-in>.
 Only return records where the 'summary' field is not in the specified values.
 
 Can be specified multiple times.
+
+=item B<--summary-not-matches>=I<s>
+
+Only return records where the 'summary' field does not match specified regular expression.
 
 =item B<--summary-xmax>=I<s>
 

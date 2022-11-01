@@ -83,7 +83,6 @@ lib/Amon2/Plugin/Web/Streaming.pm
 lib/Amon2/Plugin/Web/WebSocket.pm
 lib/Amon2/Setup/Asset/Blueprint.pm
 lib/Amon2/Setup/Asset/Bootstrap.pm
-lib/Amon2/Setup/Asset/ES5Shim.pm
 lib/Amon2/Setup/Asset/MicroDispatcherJS.pm
 lib/Amon2/Setup/Asset/MicroLocationJS.pm
 lib/Amon2/Setup/Asset/MicroTemplateJS.pm

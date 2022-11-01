@@ -14,18 +14,23 @@ my $resolver = Net::DNS::Resolver::Unbound->new(
 	);
 
 plan skip_all => 'no local nameserver' unless $resolver->nameservers;
-plan tests    => 3;
+plan tests    => 4;
+
+my ( $name, $domain ) = qw(ns net-dns.org);
+
+ok( $resolver->send("$name.$domain"), "resolver->send('$name.$domain')" );
 
 
-ok( $resolver->send('ns.net-dns.org.'), '$resolver->send(ns.net-dns.org.)' );
+$resolver->domain($domain);
+ok( $resolver->query($name), "resolver->query('$name')" );
 
 
-$resolver->domain('net-dns.org');
-ok( $resolver->query('ns'), '$resolver->query(ns)' );
+$resolver->searchlist( "nxd.$domain", $domain );
+ok( $resolver->search($name), "resolver->search('$name')" );
 
 
-$resolver->searchlist( 'nxd.net-dns.org', 'net-dns.org' );
-ok( $resolver->search('ns'), '$resolver->search(ns)' );
+my $packet = Net::DNS::Packet->new("$name.$domain");
+ok( $resolver->send($packet), 'resolver->search( $packet )' );
 
 
 exit;

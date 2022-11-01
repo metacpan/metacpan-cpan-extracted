@@ -1,5 +1,9 @@
 Revision history for Perl module Module::Extract::Version
 
+1.116 2022-10-25T12:36:09Z
+	* Fix problem with Safe compartment. Don't import version:: since 
+	Safe already does that. Thanks to Graham Knopp (#16).
+
 1.115 2022-01-08T23:56:54Z
 	* No code changes. Fix link in README.pod.
 

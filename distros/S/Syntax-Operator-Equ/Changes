@@ -1,5 +1,9 @@
 Revision history for Syntax-Operator-Equ
 
+0.04    2022-10-24
+        [CHANGES]
+         * Updates for XS::Parse::Infix v0.26
+
 0.03    2022-06-26
         [CHANGES]
          * Use the new Perl API functions sv_numeq_flags() and

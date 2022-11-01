@@ -13,7 +13,7 @@ Weather::GHCN::TimingStats - collect timing statistics for GHCN modules and scri
 
 =head1 VERSION
 
-version v0.0.008
+version v0.0.009
 
 =head1 SYNOPSIS
 
@@ -40,7 +40,7 @@ use Object::Pad 0.66 qw( :experimental(init_expr) );
 package Weather::GHCN::TimingStats;
 class   Weather::GHCN::TimingStats;
 
-our $VERSION = 'v0.0.008';
+our $VERSION = 'v0.0.009';
 
 use Carp;
 use Const::Fast;

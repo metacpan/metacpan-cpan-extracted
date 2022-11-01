@@ -467,3 +467,7 @@ Revision history for StreamFinder
         artist or albumartist.  NOTE:  May get renamed to StreamFinder::UGetube 
         in future, as it appears that BrandNewTube.com seems to be withering.
         - StreamFinder::SoundCloud - Fix up documentation a bit.
+1.93    2022/10/21
+        - StreamFinder::Tunein - Use https://opml.radiotime.com/Tune.ashx 
+        JSON API instead of youtube-dl/yt-dlp to extract radio streams.
+        (Removes dependency on youtube-dl)

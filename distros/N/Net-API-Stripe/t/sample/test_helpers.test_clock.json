@@ -1,0 +1,10 @@
+{
+   "created" : "1662261084",
+   "deletes_after" : "1662865884",
+   "frozen_time" : "1577836800",
+   "id" : "clock_1Le9F22eZvKYlo2CqGgA3AzY",
+   "livemode" : 0,
+   "name" : null,
+   "object" : "test_helpers.test_clock",
+   "status" : "ready"
+}

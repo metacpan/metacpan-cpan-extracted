@@ -88,7 +88,7 @@ my $switches = qq{--baz              The baz option
 };
 my $scswitches = $sc->switches;
 $scswitches =~ s/\s+/ /g;
-$switches =~ s/\s+/ /g;
+$switches   =~ s/\s+/ /g;
 
 is($sc->getOption('help'), undef,           'help was not requested');
 is($sc->run,               0,               'run() returns 0');

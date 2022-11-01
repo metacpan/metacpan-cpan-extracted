@@ -3,7 +3,6 @@ abstract: 'Pretty printer for SQL queries'
 author:
   - 'hubert depesz lubaczewski <depesz@depesz.com>'
 build_requires:
-  Test::Deep: '0'
   Test::Exception: '0'
   Test::More: '0'
   autodie: '0'
@@ -19,7 +18,7 @@ name: Pg-SQL-PrettyPrinter
 provides:
   Pg::SQL::PrettyPrinter:
     file: lib/Pg/SQL/PrettyPrinter.pm
-    version: '0.4'
+    version: '0.5'
   Pg::SQL::PrettyPrinter::Node:
     file: lib/Pg/SQL/PrettyPrinter/Node.pm
   Pg::SQL::PrettyPrinter::Node::A_ArrayExpr:
@@ -114,6 +113,8 @@ provides:
     file: lib/Pg/SQL/PrettyPrinter/Node/String.pm
   Pg::SQL::PrettyPrinter::Node::SubLink:
     file: lib/Pg/SQL/PrettyPrinter/Node/SubLink.pm
+  Pg::SQL::PrettyPrinter::Node::TransactionStmt:
+    file: lib/Pg/SQL/PrettyPrinter/Node/TransactionStmt.pm
   Pg::SQL::PrettyPrinter::Node::TypeCast:
     file: lib/Pg/SQL/PrettyPrinter/Node/TypeCast.pm
   Pg::SQL::PrettyPrinter::Node::UpdateStmt:
@@ -123,11 +124,14 @@ provides:
   Pg::SQL::PrettyPrinter::Node::XmlSerialize:
     file: lib/Pg/SQL/PrettyPrinter/Node/XmlSerialize.pm
 requires:
+  Clone: '0'
+  HTTP::Tiny: '0'
   JSON::MaybeXS: '0'
+  Module::Runtime: '0'
 resources:
   bugtracker: https://gitlab.com/depesz/pg-sql-prettyprinter/-/issues
   homepage: https://gitlab.com/depesz/pg-sql-prettyprinter
   license: http://opensource.org/licenses/BSD-3-Clause
   repository: https://gitlab.com/depesz/pg-sql-prettyprinter.git
-version: '0.4'
+version: '0.5'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

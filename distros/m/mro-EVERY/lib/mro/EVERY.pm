@@ -2,7 +2,7 @@
 # housekeeping
 ########################################################################
 
-package mro::EVERY v1.0.0;
+package mro::EVERY v1.0.1;
 use v5.24;
 use mro;
 
@@ -123,8 +123,6 @@ my $finder  = $find_name;
 
 sub import
 {
-$DB::single = 1;
-
     shift;
     my $caller  = caller;
 
@@ -176,8 +174,6 @@ our $AUTOLOAD   = '';
 
 AUTOLOAD
 {
-$DB::single = 1;
-
     my $proto   = shift
     or croak "Bogus EVERY, called without an object.";
 
@@ -197,8 +193,6 @@ our $AUTOLOAD   = '';
 
 AUTOLOAD
 {
-$DB::single = 1;
-
     my $proto   = shift
     or croak "Bogus EVERY::LAST, called without an object.";
 

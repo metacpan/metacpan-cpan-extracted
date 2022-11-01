@@ -1,5 +1,12 @@
 Revision history for Perl module Module::Generic
 
+v0.28.4 2022-09-27T18:38:27+0900
+    - Added method can_exec() in Module::Generic::File
+    - Improved method remove() in Module::Generic::File::Cache
+    - Improved Module::Generic::Array with cleanup upon object destruction
+    - Improved unload_json() in Module::Generic::File to allow any JSON supported options.
+    - Added methods load_perl() and unload_perl() in Module::Generic::File
+
 v0.28.3 2022-09-25T17:03:10+0900
     - Added method unchomp to Module::Generic::Array
     - Better sanity check on the file cache directory in method 'open' in module Module::Generic::File::Cache
@@ -14,7 +21,7 @@ v0.28.2 2022-09-18T21:18:30+0900
 v0.28.1 2022-08-30T06:16:26+0900
     - Corrected missing POSIX module use (#4 thanks to Nicholas R.)
 
-v0.28.0 2022-08-29T17:13:47Z+0900
+v0.28.0 2022-08-29T17:13:47+0900
     - Added support in serialise() and deserialise() for CBOR::Free
     - Improved support check in Module::Generic::SharedMem
     - Improved unit tests

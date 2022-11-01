@@ -26,14 +26,24 @@ OP *pp_add(pTHX)
 }
 
 static const struct XSParseInfixHooks hooks_add = {
-  .lhs_flags = XPI_OPERAND_TERM,
-  .rhs_flags = XPI_OPERAND_TERM,
+  .cls = XPI_CLS_ADD_MISC,
   .permit_hintkey = hintkey,
-  .cls = 0,
 
   .wrapper_func_name = "t::infix::addfunc",
 
   .ppaddr = &pp_add,
+};
+
+OP *pp_mul(pTHX)
+{
+  croak("TODO"); /* We never actually call code with this so it doesn't matter */
+}
+
+static const struct XSParseInfixHooks hooks_mul = {
+  .cls = XPI_CLS_MUL_MISC,
+  .permit_hintkey = hintkey,
+
+  .ppaddr = &pp_mul,
 };
 
 OP *pp_xor(pTHX)
@@ -46,10 +56,8 @@ OP *pp_xor(pTHX)
 }
 
 static const struct XSParseInfixHooks hooks_xor = {
-  .lhs_flags = XPI_OPERAND_TERM,
-  .rhs_flags = XPI_OPERAND_TERM,
+  .cls = XPI_CLS_ADD_MISC,
   .permit_hintkey = hintkey,
-  .cls = 0,
 
   .ppaddr = &pp_xor,
 };
@@ -86,10 +94,9 @@ OP *pp_intersperse(pTHX)
 }
 
 static const struct XSParseInfixHooks hooks_intersperse = {
-  .lhs_flags = XPI_OPERAND_TERM,
+  .cls = XPI_CLS_ADD_MISC,
   .rhs_flags = XPI_OPERAND_LIST,
   .permit_hintkey = hintkey,
-  .cls = 0,
 
   .wrapper_func_name = "t::infix::interspersefunc",
 
@@ -124,10 +131,10 @@ OP *pp_addpairs(pTHX)
 }
 
 static const struct XSParseInfixHooks hooks_addpairs = {
-  .lhs_flags = XPI_OPERAND_TERM_LIST,
-  .rhs_flags = XPI_OPERAND_TERM_LIST|XPI_OPERAND_ONLY_LOOK, /* only on RHS so we can test the logic */
+  .cls = XPI_CLS_ADD_MISC,
+  .lhs_flags = XPI_OPERAND_LIST,
+  .rhs_flags = XPI_OPERAND_LIST|XPI_OPERAND_ONLY_LOOK, /* only on RHS so we can test the logic */
   .permit_hintkey = hintkey,
-  .cls = 0,
 
   .wrapper_func_name = "t::infix::addpairsfunc",
 
@@ -140,6 +147,7 @@ BOOT:
   boot_xs_parse_infix(0);
 
   register_xs_parse_infix("add", &hooks_add, NULL);
+  register_xs_parse_infix("mul", &hooks_mul, NULL);
 
   register_xs_parse_infix("⊕", &hooks_xor, NULL);
 

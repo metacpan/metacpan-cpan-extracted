@@ -1,5 +1,3 @@
-! on Linux: gfortran -shared -fPIC -o libfib.so fib.f90
-
 recursive function fib(x) result(ret)
   integer, intent(in) :: x
   integer :: ret

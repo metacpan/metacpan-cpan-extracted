@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.66;
 
-package Device::Chip 0.24;
+package Device::Chip 0.25;
 class Device::Chip :repr(HASH);
 
 use Carp;

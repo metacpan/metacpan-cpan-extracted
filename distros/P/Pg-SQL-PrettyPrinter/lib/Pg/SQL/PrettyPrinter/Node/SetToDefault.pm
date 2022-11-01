@@ -21,8 +21,8 @@ if ( grep /\P{ASCII}/ => @ARGV ) {
 
 # Useful common code
 use autodie;
-use Carp qw( carp croak confess cluck );
-use English qw( -no_match_vars );
+use Carp         qw( carp croak confess cluck );
+use English      qw( -no_match_vars );
 use Data::Dumper qw( Dumper );
 
 # give a full stack dump on any untrapped exceptions

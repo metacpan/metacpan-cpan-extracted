@@ -440,6 +440,8 @@ sub can_append
     }
 }
 
+sub can_exec { return( shift->finfo->can_exec( @_ ) ); }
+
 sub can_read
 {
     my $self = shift( @_ );
@@ -1824,6 +1826,28 @@ sub load_json
     }
 }
 
+sub load_perl
+{
+    my $self = shift( @_ );
+    try
+    {
+        my $v = do( $self->filepath );
+        if( !defined( $v ) && $@ )
+        {
+            return( $self->error( "Error while loading ", $self->length, " bytes of perl data: $@" ) );
+        }
+        elsif( !defined( $v ) && $! )
+        {
+            return( $self->error( "Error while loading ", $self->length, " bytes of perl data: $1" ) );
+        }
+        return( $v );
+    }
+    catch( $e )
+    {
+        return( $self->error( "Error while loading ", $self->length, " bytes of perl data: $e" ) );
+    }
+}
+
 sub load_utf8
 {
     my $self = shift( @_ );
@@ -3080,16 +3104,53 @@ sub unload_json
     my $data = shift( @_ );
     my $opts = $self->_get_args_as_hash( @_ );
     my $j = $self->new_json || return( $self->pass_error );
+    my $equi =
+    {
+        ordered => 'canonical',
+    };
+    
     try
     {
-        $j->pretty(1) if( $opts->{pretty} );
-        $j->canonical(1) if( $opts->{ordered} || $opts->{canonical} );
+        foreach my $opt ( keys( %$opts ) )
+        {
+            my $ref;
+            $ref = $j->can( exists( $equi->{ $opt } ) ? $equi->{ $opt } : $opt ) || do
+            {
+                warn( "Unknown JSON option '${opt}'\n" ) if( $self->_warnings_is_enabled );
+                next;
+            };
+            $ref->( $j, $opts->{ $opt } );
+        }
         my $json = $j->encode( $data );
-        $self->unload_utf8( $json );
+        $self->unload_utf8( $json ) || return( $self->pass_error );
+    }
+    catch( $e where { /perl[[:blank:]\h]+structure[[:blank:]\h]+exceeds[[:blank:]\h]+maximum[[:blank:]\h]+nesting[[:blank:]\h]+level/i } )
+    {
+        my $max = $j->get_max_depth;
+        return( $self->error( "Unable to encode perl data to json: $e (max_depth value is ${max})" ) );
     }
     catch( $e )
     {
         return( $self->error( "Unable to encode perl data to json: $e" ) );
+    }
+}
+
+sub unload_perl
+{
+    my $self = shift( @_ );
+    my $data = shift( @_ );
+    my $opts = $self->_get_args_as_hash( @_ );
+    try
+    {
+        require Data::Dump;
+        local $Data::Dump::INDENT = $opts->{indent} if( exists( $opts->{indent} ) );
+        local $Data::Dump::TRY_BASE64 = $opts->{max_binary_size} if( exists( $opts->{max_binary_size} ) );
+        local $Data::Dump::LINEWIDTH = $opts->{max_width} if( exists( $opts->{max_width} ) );
+        $self->unload_utf8( Data::Dump::dump( $data ) ) || return( $self->pass_error );
+    }
+    catch( $e )
+    {
+        return( $self->error( "Unable to dump perl data to file: $e" ) );
     }
 }
 
@@ -4050,6 +4111,7 @@ Module::Generic::File - File Object Abstraction Class
     my $io = $f->open;
     say "Can read" if( $f->can_read );
     say "Can write" if( $f->can_write );
+    say "Can execute" if( $f->can_exec );
     $f->close if( $f->opened );
     say "File is ", $f->length, " bytes big.";
     
@@ -4100,6 +4162,10 @@ Module::Generic::File - File Object Abstraction Class
         no_magic => 1,
         sort => 1,
     });
+
+    my $data = $file->load_perl || die( $file->error );
+    $file->unload_perl( $data, { indent => 4, max_binary_size => 1024, max_width => 60 } ) ||
+        die( $file->error );
 
 =head1 VERSION
 
@@ -4267,6 +4333,10 @@ This is a shortcut to L<Module::Generic::Finfo/blocks>
 Returns true if the file or directory are writable, and data can be added to it. False otherwise.
 
 If an error occurred, undef will be returned an an exception will be set.
+
+=head2 can_exec
+
+This is an alias for L<Module::Generic::Finfo/can_exec>
 
 =head2 can_read
 
@@ -4984,6 +5054,12 @@ This requires the L<JSON> module to be installed or it will set an L<error|Modul
 
 If an eror occurs during decoding, this will set an L<error|Module::Generic/error> and return undef.
 
+=head2 load_perl
+
+This will load perl's data structure from file using L<perlfunc/do> and return the resulting perl data.
+
+It sets an L<error|Module::Generic/error> and returns C<undef> if an error occurred.
+
 =head2 load_utf8
 
 This does the same as L</load>, but ensure the binmode used is C<:utf8> before proceeding.
@@ -5663,23 +5739,97 @@ Provided some perl data and an optional hash or hash reference of options and th
 
 If the L<JSON> module is not installed or an error occurs during JSON encoding, this sets an L<error|Module::Generic/error> and returns undef.
 
-Supported options are:
+The L<JSON> object provided by L<Module::Generic/new_json> already has the following options enabled: C<allow_nonref>, C<allow_blessed>, C<convert_blessed> and C<relaxed>
+
+Supported options are as follows, including any of the L<JSON> supported options:
 
 =over 4
 
-=item canonical or ordered
+=item C<allow_blessed>
+
+Boolean. When enabled, this will not return an error when it encounters a blessed reference that L<JSON> cannot convert otherwise. Instead, a JSON C<null> value is encoded instead of the object.
+
+=item C<allow_nonref>
+
+Boolean. When enabled, this will convert a non-reference into its corresponding string, number or null L<JSON> value. Default is enabled.
+
+=item C<allow_tags>
+
+Boolean. When enabled, upon encountering a blessed object, this will check for the availability of the C<FREEZE> method on the object's class. If found, it will be used to serialise the object into a nonstandard tagged L<JSON> value (that L<JSON> decoders cannot decode). 
+
+=item C<allow_unknown>
+
+Boolean. When enabled, this will not return an error when L<JSON> encounters values it cannot represent in JSON (for example, filehandles) but instead will encode a L<JSON> "null" value.
+
+=item C<ascii>
+
+Boolean. When enabled, will not generate characters outside the code range 0..127 (which is ASCII).
+
+=item C<canonical> or C<ordered>
 
 Boolean value. If true, the JSON data will be ordered. Note that it will be slower, especially on a large set of data.
 
-=item pretty
+=item C<convert_blessed>
+
+Boolean. When enabled, upon encountering a blessed object, L<JSON> will check for the availability of the C<TO_JSON> method on the object's class. If found, it will be called in scalar context and the resulting scalar will be encoded instead of the object.
+
+=item C<indent>
+
+Boolean. When enabled, this will use a multiline format as output, putting every array member or object/hash key-value pair into its own line, indenting them properly.
+
+=item C<latin1>
+
+Boolean. When enabled, this will encode the resulting L<JSON> text as latin1 (or iso-8859-1),
+
+=item C<max_depth>
+
+Integer. This sets the maximum nesting level (default 512) accepted while encoding or decoding. When the limit is reached, this will return an error.
+
+=item C<pretty>
 
 Boolean value. If true, the JSON data will be generated in a human readable format. Note that this will take considerably more space.
+
+=item C<space_after>
+
+Boolean. When enabled, this will add an extra optional space after the ":" separating keys from values.
+
+=item C<space_before>
+
+Boolean. When enabled, this will add an extra optional space before the ":" separating keys from values.
+
+=item C<utf8>
+
+Boolean. When enabled, this will encode the L<JSON> result into UTF-8.
+
+=back
+
+=head2 unload_perl
+
+Just like L</unload>, this takes some perl data structure (most likely an hash or an array), and some options passed as a list or as an hash reference and will open the file using C<:utf8> for L<perlfunc/binmode> and save the perl data structure to it using L<Data::Dump>
+
+If L<Data::Dump> is not installed, this will return an error.
+
+The following options are supported:
+
+=over 4
+
+=item C<indent>
+
+Integer. This is the number of spaces to use as indentation of lines. By default, L<Data::Dump> uses 2 spaces.
+
+=item C<max_binary_size>
+
+Integer. This is the size threshold of binary data above which it will be converted into base64.
+
+=item C<max_width>
+
+Integer. This is the line width threshold after which a new line will be inserted by L<Data::Dump>
 
 =back
 
 =head2 unload_utf8
 
-Just like L</unload>, this takes some data and some options passed as a list or as an hash reference and will open the file using C<:utf8> for L<perlfunc/binmode>
+Just like L</unload>, this takes some data and some options passed as a list or as an hash reference and will open the file using C<:utf8> for L<perlfunc/binmode> and save the data to it.
 
 =head2 unlock
 

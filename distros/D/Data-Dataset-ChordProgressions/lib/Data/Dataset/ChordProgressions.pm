@@ -3,12 +3,12 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Provide access to hundreds of possible chord progressions
 
-our $VERSION = '0.0108';
+our $VERSION = '0.0109';
 
 use strict;
 use warnings;
 
-use Text::CSV_XS;
+use Text::CSV_XS ();
 use File::ShareDir qw(dist_dir);
 
 
@@ -77,7 +77,7 @@ Data::Dataset::ChordProgressions - Provide access to hundreds of possible chord 
 
 =head1 VERSION
 
-version 0.0108
+version 0.0109
 
 =head1 SYNOPSIS
 
@@ -136,7 +136,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Gene Boggs.
+This software is copyright (c) 2022 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

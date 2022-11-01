@@ -18,6 +18,7 @@ my %META = (
 		runtime => {
 			requires => {qw(
 				perl 5.006
+				Scalar::Util 1.11
 			)},
 			suggests => {qw(
 				Storable 1.002

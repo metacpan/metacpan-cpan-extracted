@@ -73,6 +73,7 @@ ERRORS
              Parameter 'form' is required.
              Parameter 'form' must be a 'Data::HTML::Form' instance.
              Parameter 'form' must define 'css_class' parameter.
+             Parameter 'input' must be a 'Tags::HTML::Form::Input' instance.
              Parameter 'submit' instance has bad type.
              Parameter 'submit' is required.
              Parameter 'submit' must be a 'Data::HTML::Form::Input' instance.
@@ -153,7 +154,8 @@ EXAMPLE
 
 DEPENDENCIES
     Class::Utils, Data::HTML::Form, Data::HTML::Button, Error::Pure,
-    Scalar::Util, Tags::HTML.
+    List::Util, Scalar::Util, Tags::HTML, Tags::HTML::Form::Input,
+    Tags::HTML::Form::Select.
 
 REPOSITORY
     <https://github.com/michal-josef-spacek/Tags-HTML-Form>
@@ -169,5 +171,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.04
+    0.05
 

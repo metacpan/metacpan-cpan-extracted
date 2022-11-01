@@ -1,0 +1,32 @@
+---
+abstract: 'Validate and untaint input parameters via OpenAPI schema'
+author:
+  - 'Andrius Merkys <merkys@cpan.org>'
+build_requires:
+  JSON: '0'
+  Test::Deep: '0'
+  Test::More: '0'
+  Test::Taint: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Validate-OpenAPI
+requires:
+  Data::Validate: '0'
+  Data::Validate::Email: '0'
+  Data::Validate::IP: '0'
+  Data::Validate::URI: '0'
+  DateTime::Format::RFC3339: '0'
+  OpenAPI::Render: '0'
+resources:
+  bugtracker: https://github.com/merkys/data-validate-openapi/issues
+  homepage: https://search.cpan.org/dist/Data-Validate-OpenAPI
+  repository: git://github.com/merkys/data-validate-openapi.git
+version: 0.1.0
+x_generated_by_perl: v5.30.0
+x_serialization_backend: 'YAML::Tiny version 1.73'

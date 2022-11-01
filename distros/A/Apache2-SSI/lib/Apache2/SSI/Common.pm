@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Apache2 Server Side Include Parser - ~/lib/Apache2/SSI/Common.pm
-## Version v0.1.0
+## Version v0.1.1
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/01/13
-## Modified 2021/01/13
+## Modified 2022/10/21
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -16,14 +16,15 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Module::Generic );
+    use vars qw( $VERSION $OS2SEP $DIR_SEP );
     use File::Spec ();
     use IO::File;
     use Nice::Try;
     use Scalar::Util ();
     use URI;
-    our $VERSION = 'v0.1.0';
-    ## https://en.wikipedia.org/wiki/Path_(computing)
-    ## perlport
+    our $VERSION = 'v0.1.1';
+    # https://en.wikipedia.org/wiki/Path_(computing)
+    # perlport
     our $OS2SEP  =
     {
     amigaos     => '/',
@@ -61,7 +62,7 @@ BEGIN
     nto         => '/',
     openbsd     => '/',
     os2         => '/',
-    ## Extended Binary Coded Decimal Interchange Code
+    # Extended Binary Coded Decimal Interchange Code
     os390       => '/',
     os400       => '/',
     qnx         => '/',
@@ -82,37 +83,38 @@ BEGIN
     our $DIR_SEP = $OS2SEP->{ lc( $^O ) };
 };
 
-## RFC 3986 section 5.2.4
-## This is aimed for web URI initially, but is also used for filesystems in a simple way
+use strict;
+use warnings;
+
+# RFC 3986 section 5.2.4
+# This is aimed for web URI initially, but is also used for filesystems in a simple way
 sub collapse_dots
 {
     my $self = shift( @_ );
     my $path = shift( @_ );
     my $opts = $self->_get_args_as_hash( @_ );
-    ## To avoid warnings
+    # To avoid warnings
     $opts->{separator} //= '';
-    ## A path separator is provided when dealing with filesystem and not web URI
-    ## We use this to know what to return and how to behave
+    # A path separator is provided when dealing with filesystem and not web URI
+    # We use this to know what to return and how to behave
     my $sep  = length( $opts->{separator} ) ? $opts->{separator} : '/';
     return( '' ) if( !length( $path ) );
     my $u = $opts->{separator} ? URI::file->new( $path ) : URI->new( $path );
     my( @callinfo ) = caller;
-    $self->message( 4, "URI based on '$path' is '$u' (", overload::StrVal( $u ), ") and separator to be used is '$sep' and uri path is '", $u->path, "' called from $callinfo[0] in file $callinfo[1] at line $callinfo[2]." );
     $path = $opts->{separator} ? $u->file( $^O ) : $u->path;
     my @new = ();
     my $len = length( $path );
     
-    ## "If the input buffer begins with a prefix of "../" or "./", then remove that prefix from the input buffer"
+    # "If the input buffer begins with a prefix of "../" or "./", then remove that prefix from the input buffer"
     if( substr( $path, 0, 2 ) eq ".${sep}" )
     {
         substr( $path, 0, 2 ) = '';
-        ## $self->message( 3, "Removed './'. Path is now '", substr( $path, 0 ), "'." );
     }
     elsif( substr( $path, 0, 3 ) eq "..${sep}" )
     {
         substr( $path, 0, 3 ) = '';
     }
-    ## "if the input buffer begins with a prefix of "/./" or "/.", where "." is a complete path segment, then replace that prefix with "/" in the input buffer"
+    # "if the input buffer begins with a prefix of "/./" or "/.", where "." is a complete path segment, then replace that prefix with "/" in the input buffer"
     elsif( substr( $path, 0, 3 ) eq "${sep}.${sep}" )
     {
         substr( $path, 0, 3 ) = $sep;
@@ -130,13 +132,12 @@ sub collapse_dots
         return( $u );
     }
     
-    ## -1 is used to ensure trailing blank entries do not get removed
+    # -1 is used to ensure trailing blank entries do not get removed
     my @segments = split( "\Q$sep\E", $path, -1 );
-    $self->message( 3, "Found ", scalar( @segments ), " segments: ", sub{ $self->dump( \@segments ) } );
     for( my $i = 0; $i < scalar( @segments ); $i++ )
     {
         my $segment = $segments[$i];
-        ## "if the input buffer begins with a prefix of "/../" or "/..", where ".." is a complete path segment, then replace that prefix with "/" in the input buffer and remove the last segment and its preceding "/" (if any) from the output buffer"
+        # "if the input buffer begins with a prefix of "/../" or "/..", where ".." is a complete path segment, then replace that prefix with "/" in the input buffer and remove the last segment and its preceding "/" (if any) from the output buffer"
         if( $segment eq '..' )
         {
             pop( @new );
@@ -150,11 +151,10 @@ sub collapse_dots
             push( @new, ( defined( $segment ) ? $segment : '' ) );
         }
     }
-    ## Finally, the output buffer is returned as the result of remove_dot_segments.
+    # Finally, the output buffer is returned as the result of remove_dot_segments.
     my $new_path = join( $sep, @new );
     # substr( $new_path, 0, 0 ) = $sep unless( substr( $new_path, 0, 1 ) eq '/' );
     substr( $new_path, 0, 0 ) = $sep unless( File::Spec->file_name_is_absolute( $new_path ) );
-    $self->message( 4, "Adding back new path '$new_path' to uri '$u'." );
     if( $opts->{separator} )
     {
         $u = URI::file->new( $new_path );
@@ -163,11 +163,10 @@ sub collapse_dots
     {
         $u->path( $new_path );
     }
-    $self->message( 4, "Returning uri '$u' (", ( $opts->{separator} ? $u->file( $^O ) : 'same' ), ")." );
     return( $u );
 }
 
-## Credits: Path::Tiny
+# Credits: Path::Tiny
 sub slurp
 {
     my $self = shift( @_ );
@@ -235,7 +234,7 @@ Apache2::SSI::Common - Apache2 Server Side Include Common Resources
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.1
 
 =head1 SYNOPSIS
 
@@ -307,4 +306,3 @@ You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.
 
 =cut
-

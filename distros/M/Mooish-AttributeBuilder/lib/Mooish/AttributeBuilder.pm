@@ -1,93 +1,268 @@
 package Mooish::AttributeBuilder;
-$Mooish::AttributeBuilder::VERSION = '1.000';
+$Mooish::AttributeBuilder::VERSION = '1.001';
 use v5.10;
 use strict;
 use warnings;
 
-use Exporter qw(import);
 use Carp qw(croak);
 use Scalar::Util qw(blessed);
 
-our @EXPORT = qw(
-	field
-	param
-	option
-	extended
-);
+### These subs can be extended in subclasses
 
-our $PROTECTED_PREFIX = '';
-our %PROTECTED_METHODS = map { $_ => 1 } qw(builder trigger);
-our %METHOD_PREFIXES = (
-	reader => 'get',
-	writer => 'set',
-	clearer => 'clear',
-	predicate => 'has',
-	builder => 'build',
-	trigger => 'trigger',
-	init_arg => undef,
-);
-
-sub field
+# List of available attribute types. May be extended if a custom function will
+# call expand_shortcuts
+sub attribute_types
 {
-	my ($name, %args) = @_;
+	return {
+		field => {
+			is => 'ro',
+			init_arg => undef,
+		},
+		param => {
+			is => 'ro',
+			required => 1,
+		},
+		option => {
+			is => 'ro',
+			required => 0,
+			predicate => 1,
+		},
+		extended => {},
+	};
+}
 
-	%args = (
-		is => 'ro',
+# Prefix of hidden methods. Will be joined with the rest of the method name
+# with an underscore, so an empty prefix means starting with an underscore
+sub hidden_prefix
+{
+	return '';
+}
+
+# The list of methods which are hidden by default
+sub hidden_methods
+{
+	return {
+		builder => 1,
+		trigger => 1,
+	};
+}
+
+# The list of method name prefixes. Undef means no prefix at all, just use
+# attribute name
+sub method_prefixes
+{
+	return {
+		reader => 'get',
+		writer => 'set',
+		clearer => 'clear',
+		predicate => 'has',
+		builder => 'build',
+		trigger => 'trigger',
 		init_arg => undef,
-		%args,
-	);
-
-	return ($name, expand_shortcuts($name, %args));
+	};
 }
 
-sub param
+### General functions called in sub context
+
+sub import
 {
-	my ($name, %args) = @_;
+	my ($self, $caller) = (shift, scalar caller);
 
-	%args = (
-		is => 'ro',
-		required => 1,
-		%args,
-	);
+	my %flags = map { $_ => 1 } @_;
 
-	return ($name, expand_shortcuts($name, %args));
-}
+	foreach my $type (keys %{$self->attribute_types}) {
+		my $function = sub {
+			my ($name, %args) = @_;
+			return $self->expand_shortcuts($flags{-standard}, $type => $name, %args);
+		};
 
-sub option
-{
-	my ($name, %args) = @_;
-
-	return param $name,
-		required => 0,
-		predicate => 1,
-		%args;
-}
-
-sub extended
-{
-	my ($name, %args) = @_;
-
-	my $extended_name;
-	if (ref $name eq 'ARRAY') {
-		$extended_name = [map { "+$_" } @{$name}];
+		NO_STRICT: {
+			no strict 'refs';
+			*{"${caller}::${type}"} = $function;
+		}
 	}
-	else {
-		$extended_name = "+$name";
-	}
-
-	return ($extended_name, expand_shortcuts($name, %args));
 }
 
-# Helpers - not part of the interface
+my @custom_shortcuts;
 
-sub check_and_replace
+sub custom_shortcuts
 {
-	my ($hash_ref, $name, $key, $value) = @_;
+	return [@custom_shortcuts];
+}
 
-	croak "Could not expand shortcut: $key already exists for $name"
-		if exists $hash_ref->{$key};
+sub add_shortcut
+{
+	my ($sub) = @_;
 
-	$hash_ref->{$key} = $value;
+	croak 'Custom shortcut passed to add_shortcut must be a coderef'
+		unless ref $sub eq 'CODE';
+
+	push @custom_shortcuts, $sub;
+	return;
+}
+
+sub standard_shortcuts
+{
+	my ($self) = @_;
+
+	return [
+		# expand attribute type
+		sub {
+			my ($name, %args) = @_;
+			my $type = delete $args{_type};
+
+			if ($type && $self->attribute_types->{$type}) {
+				%args = (
+					%{$self->attribute_types->{$type}},
+					%args,
+				);
+			}
+
+			return %args;
+		},
+
+		# merge lazy + default / lazy + builder
+		sub {
+			my ($name, %args) = @_;
+
+			if ($args{lazy}) {
+				my $lazy = $args{lazy};
+				$args{lazy} = 1;
+
+				if (ref $lazy eq 'CODE') {
+					check_and_set(\%args, $name, default => $lazy);
+				}
+				else {
+					check_and_set(\%args, $name, builder => $lazy);
+				}
+			}
+
+			return %args;
+		},
+
+		# merge coerce + isa
+		sub {
+			my ($name, %args) = @_;
+
+			if (blessed $args{coerce}) {
+				check_and_set(\%args, $name, isa => $args{coerce});
+				$args{coerce} = 1;
+			}
+
+			return %args;
+		},
+
+		# make sure params with defaults are not required
+		sub {
+			my ($name, %args) = @_;
+
+			if ($args{required} && (exists $args{default} || $args{builder})) {
+				delete $args{required};
+			}
+
+			return %args;
+		},
+
+		# method names from shortcuts
+		sub {
+			my ($name, %args) = @_;
+
+			# initialized lazily
+			my $normalized_name;
+			my $hidden_field;
+
+			# inflate names from shortcuts
+			my %prefixes = %{$self->method_prefixes};
+			foreach my $method_type (keys %prefixes) {
+				next unless defined $args{$method_type};
+				next if ref $args{$method_type};
+				next unless grep { $_ eq $args{$method_type} } '1', -public, -hidden;
+
+				$normalized_name //= get_normalized_name($name, $method_type);
+				$hidden_field //= $name ne $normalized_name;
+
+				my $is_hidden =
+					$args{$method_type} eq -hidden
+					|| (
+						$args{$method_type} eq '1'
+						&& ($hidden_field || $self->hidden_methods->{$method_type})
+					);
+
+				$args{$method_type} = join '_', grep { defined }
+					($is_hidden ? $self->hidden_prefix : undef),
+					$prefixes{$method_type},
+					$normalized_name;
+			}
+
+			# special treatment for trigger
+			if ($args{trigger} && !ref $args{trigger}) {
+				my $trigger = $args{trigger};
+				$args{trigger} = sub {
+					return shift->$trigger(@_);
+				};
+			}
+
+			return %args;
+		},
+
+		# literal parameters (prepended with -)
+		sub {
+			my ($name, %args) = @_;
+
+			foreach my $literal (keys %args) {
+				if ($literal =~ m{\A - (.+) \z}x) {
+					$args{$1} = delete $args{$literal};
+				}
+			}
+
+			return %args;
+		},
+	];
+}
+
+sub expand_shortcuts
+{
+	my ($self, $standard, $attribute_type, $name, %args) = @_;
+
+	$args{_type} = $attribute_type;
+
+	# NOTE: don't use custom shortcuts if we stick to the standard
+	my @filters;
+	push @filters, @{$self->custom_shortcuts} unless $standard;
+	push @filters, @{$self->standard_shortcuts};
+
+	# NOTE: builtin shortcuts are executed after custom shortcuts
+	foreach my $sub (@filters) {
+		%args = $sub->($name, %args);
+	}
+
+	# TODO: dirty hack for 'extended' attribute. Can be done better?
+	if ($attribute_type eq 'extended') {
+		if (ref $name eq 'ARRAY') {
+			$name = [map { "+$_" } @{$name}];
+		}
+		else {
+			$name = "+$name";
+		}
+	}
+
+	return ($name, %args);
+}
+
+### Helpers - not called in pkg context
+
+sub check_and_set
+{
+	my ($hash_ref, $name, %pairs) = @_;
+
+	foreach my $key (keys %pairs) {
+		croak "Could not expand shortcut: $key already exists for $name"
+			if exists $hash_ref->{$key};
+
+		$hash_ref->{$key} = $pairs{$key};
+	}
+
+	return;
 }
 
 sub get_normalized_name
@@ -99,88 +274,6 @@ sub get_normalized_name
 
 	$name =~ s/^_//;
 	return $name;
-}
-
-sub expand_method_names
-{
-	my ($name, %args) = @_;
-
-	# initialized lazily
-	my $normalized_name;
-	my $protected_field;
-
-	# inflate names from shortcuts
-	for my $method_type (keys %METHOD_PREFIXES) {
-		next unless defined $args{$method_type};
-		next if ref $args{$method_type};
-		next unless grep { $_ eq $args{$method_type} } '1', -public, -hidden;
-
-		$normalized_name //= get_normalized_name($name, $method_type);
-		$protected_field //= $name ne $normalized_name;
-
-		my $is_protected =
-			$args{$method_type} eq -hidden
-			|| (
-				$args{$method_type} eq '1'
-				&& ($protected_field || $PROTECTED_METHODS{$method_type})
-			);
-
-		$args{$method_type} = join '_', grep { defined }
-			($is_protected ? $PROTECTED_PREFIX : undef),
-			$METHOD_PREFIXES{$method_type},
-			$normalized_name;
-	}
-
-	# special treatment for trigger
-	if ($args{trigger} && !ref $args{trigger}) {
-		my $trigger = $args{trigger};
-		$args{trigger} = sub {
-			return shift->$trigger(@_);
-		};
-	}
-
-	return %args;
-}
-
-sub expand_shortcuts
-{
-	my ($name, %args) = @_;
-
-	# merge lazy + default / lazy + builder
-	if ($args{lazy}) {
-		my $lazy = $args{lazy};
-		$args{lazy} = 1;
-
-		if (ref $lazy eq 'CODE') {
-			check_and_replace \%args, $name, default => $lazy;
-		}
-		else {
-			check_and_replace \%args, $name, builder => $lazy;
-		}
-	}
-
-	# merge coerce + isa
-	if (blessed $args{coerce}) {
-		check_and_replace \%args, $name, isa => $args{coerce};
-		$args{coerce} = 1;
-	}
-
-	# make sure params with defaults are not required
-	if ($args{required} && (exists $args{default} || $args{builder})) {
-		delete $args{required};
-	}
-
-	# method names from shortcuts
-	%args = expand_method_names($name, %args);
-
-	# literal parameters (prepended with -)
-	for my $literal (keys %args) {
-		if ($literal =~ m{\A - (.+) \z}x) {
-			$args{$1} = delete $args{$literal};
-		}
-	}
-
-	return %args;
 }
 
 1;

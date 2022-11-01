@@ -2,7 +2,7 @@ use strict;
 use warnings;
 ## skip Test::Tabs
 use Test::More;
-use Test::Requires '5.010001';
+use Test::Requires '5.008001';
 use Test::Fatal;
 use FindBin qw($Bin);
 use lib "$Bin/lib";

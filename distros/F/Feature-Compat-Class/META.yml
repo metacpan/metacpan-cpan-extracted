@@ -17,11 +17,11 @@ name: Feature-Compat-Class
 provides:
   Feature::Compat::Class:
     file: lib/Feature/Compat/Class.pm
-    version: '0.01'
+    version: '0.03'
 requires:
-  Object::Pad: '0.66'
+  Object::Pad: '0.70'
   perl: '5.014'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.01'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

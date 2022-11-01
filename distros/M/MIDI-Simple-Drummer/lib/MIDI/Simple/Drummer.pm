@@ -3,13 +3,13 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: An algorithmic MIDI drummer
 
-our $VERSION = '0.0810';
+our $VERSION = '0.0811';
 
 use strict;
 use warnings;
 
 use MIDI::Simple ();
-use Music::Duration;
+use Music::Duration ();
 
 BEGIN {
     # Define a division structure to use for durations.
@@ -563,7 +563,7 @@ MIDI::Simple::Drummer - An algorithmic MIDI drummer
 
 =head1 VERSION
 
-version 0.0810
+version 0.0811
 
 =head1 SYNOPSIS
 
@@ -1091,7 +1091,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Gene Boggs.
+This software is copyright (c) 2022 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

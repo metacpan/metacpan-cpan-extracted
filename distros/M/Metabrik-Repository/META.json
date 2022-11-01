@@ -48,6 +48,9 @@
       "Metabrik::Api::Cvesearch" : {
          "file" : "lib/Metabrik/Api/Cvesearch.pm"
       },
+      "Metabrik::Api::Geonames" : {
+         "file" : "lib/Metabrik/Api/Geonames.pm"
+      },
       "Metabrik::Api::Shodan" : {
          "file" : "lib/Metabrik/Api/Shodan.pm"
       },
@@ -530,7 +533,7 @@
       },
       "Metabrik::Repository" : {
          "file" : "lib/Metabrik/Repository.pm",
-         "version" : "1.42"
+         "version" : "1.43"
       },
       "Metabrik::Server::Dns" : {
          "file" : "lib/Metabrik/Server/Dns.pm"
@@ -809,6 +812,6 @@
          "http://opensource.org/licenses/BSD-3-Clause"
       ]
    },
-   "version" : "1.42",
+   "version" : "1.43",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

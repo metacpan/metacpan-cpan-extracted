@@ -1,7 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/CSVUtils/csv_map
-# and generated automatically using Perinci::CmdLine::Gen version 0.501
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
 use strict;
@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-09'; # DATE
+our $DATE = '2022-10-25'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '0.045'; # VERSION
+our $VERSION = '0.046'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/CSVUtils/csv_map",
@@ -39,11 +39,15 @@ csv-map - Return result of Perl code for every row
 
 =head1 VERSION
 
-This document describes version 0.045 of csv-map (from Perl distribution App-CSVUtils), released on 2022-10-09.
+This document describes version 0.046 of csv-map (from Perl distribution App-CSVUtils), released on 2022-10-25.
 
 =head1 SYNOPSIS
 
-B<csv-map> [B<--add-newline>|B<--no-add-newline>|B<--noadd-newline>] [B<--escape-char>=I<str>] [B<--eval>=I<any>|B<--eval-json>=I<json>|B<-e>=I<any>] [B<--format>=I<name>|B<--json>] [B<--hash>|B<-H>] [B<--header>|B<--input-header>|B<--no-header>|B<--noheader>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--quote-char>=I<str>] [B<--sep-char>=I<str>] [B<--tsv>|B<--input-tsv>|B<--no-tsv>|B<--notsv>] -- E<lt>I<filename>E<gt>
+B<csv-map> L<--help|/"--help, -h, -v"> (or L<-h|/"--help, -h, -v">, L<-?|/"--help, -h, -v">)
+
+B<csv-map> L<--version|/"--version, -v"> (or L<-v|/"--version, -v">)
+
+B<csv-map> [L<--add-newline|/"--no-add-newline">|L<--no-add-newline|/"--no-add-newline">|L<--noadd-newline|/"--no-add-newline">] [L<--escape-char|/"--escape-char=s">=I<str>] [L<--eval|/"--eval=s*">=I<any>|L<--eval-json|/"--eval=s*">=I<json>|L<-e|/"--eval=s*">=I<any>] [L<--format|/"--format=s">=I<name>|L<--json|/"--json">] [L<--hash|/"--hash, -H">|L<-H|/"--hash, -H">] [L<--header|/"--no-header, --input-header">|L<--input-header|/"--no-header, --input-header">|L<--no-header|/"--no-header, --input-header">|L<--noheader|/"--no-header, --input-header">] [L<--(no)naked-res|/"--naked-res">] [L<--overwrite|/"--overwrite, -O">|L<-O|/"--overwrite, -O">|L<--no-overwrite|/"--overwrite, -O">|L<--nooverwrite|/"--overwrite, -O">] [L<--page-result|/"--page-result">[=I<program>]|L<--view-result|/"--view-result">[=I<program>]] [L<--quote-char|/"--quote-char=s">=I<str>] [L<--sep-char|/"--sep-char=s">=I<str>] [L<--tsv|/"--tsv, --input-tsv">|L<--input-tsv|/"--tsv, --input-tsv">|L<--no-tsv|/"--tsv, --input-tsv">|L<--notsv|/"--tsv, --input-tsv">] -- E<lt>L<filename|/"--filename=s*">E<gt> [L<output_filename|/"--output-filename=s, -o">]
 
 
 
@@ -88,6 +92,9 @@ Perl code.
 Provide row in $_ as hashref instead of arrayref.
 
 =item B<--no-add-newline>
+
+(No description)
+
 
 =back
 
@@ -186,6 +193,20 @@ C<--naked-res> so you just get:
 
  [1,2,3]
 
+
+=item B<--output-filename>=I<s>, B<-o>
+
+Output filename or URL.
+
+Use C<-> to output to stdout (the default if you don't specify this option), use
+C<clipboard:> to write to clipboard.
+
+
+Can also be specified as the 2nd command-line argument.
+
+=item B<--overwrite>, B<-O>
+
+Whether to override existing output file.
 
 =item B<--page-result>
 

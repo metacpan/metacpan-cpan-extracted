@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
 use utf8;
 
-use Object::Pad 0.57;  # :isa
+use Object::Pad 0.70 ':experimental(init_expr adjust_params)';
 
-package App::sdview::Parser 0.07;
+package App::sdview::Parser 0.08;
 role App::sdview::Parser;
 
 use String::Tagged;
@@ -16,33 +16,33 @@ use String::Tagged;
 # This package is empty but provides a bunch of helper classes
 
 class App::sdview::Para::Heading :strict(params) {
-   has $level :param :reader;
-   has $text  :param :reader;
+   field $level :param :reader;
+   field $text  :param :reader;
 
    method type { "head" . $level }
 }
 
 class App::sdview::Para::Plain :strict(params) {
-   has $text   :param :reader;
-   has $indent :param :reader = 0;
+   field $text   :param :reader;
+   field $indent :param :reader { 0 };
 
    method type { "plain" }
 }
 
 class App::sdview::Para::Verbatim :strict(params) {
-   has $text :param :reader;
-   has $indent :param :reader = 0;
+   field $text   :param :reader;
+   field $indent :param :reader { 0 };
 
    method type { "verbatim" }
 }
 
 class App::sdview::Para::List :strict(params) {
    # "bullet" | "number" | "text"
-   has $listtype :param :reader;
-   has $indent   :param :reader;
-   has $initial  :param :reader = 1;  # for number lists
+   field $listtype :param :reader;
+   field $indent   :param :reader;
+   field $initial  :param :reader { 1 };  # for number lists
 
-   has @items           :reader;
+   field @items           :reader;
 
    method push_item ( $item ) { push @items, $item; }
 
@@ -50,9 +50,9 @@ class App::sdview::Para::List :strict(params) {
 }
 
 class App::sdview::Para::ListItem :strict(params) {
-   has $listtype :param :reader;
-   has $term :param :reader = undef;
-   has $text :param :reader;
+   field $listtype :param :reader;
+   field $term     :param :reader { undef };
+   field $text     :param :reader;
 
    method type { "item" }
 }
@@ -60,15 +60,15 @@ class App::sdview::Para::ListItem :strict(params) {
 class App::sdview::Para::Table :strict(params) {
    method type { "table" }
 
-   has @rows :reader;
+   field @rows :reader;
 
-   ADJUSTPARAMS ( $params ) {
-      @rows = ( delete $params->{rows} )->@*;
+   ADJUST :params ( :$rows ) {
+      @rows = $rows->@*;
    }
 }
 
 class App::sdview::Para::TableCell :isa(App::sdview::Para::Plain) :strict(params) {
-   has $align :param :reader;
+   field $align :param :reader;
 
    method type { "table-cell" }
 }

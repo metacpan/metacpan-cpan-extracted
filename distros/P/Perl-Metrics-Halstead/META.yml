@@ -34,7 +34,7 @@ requires:
 resources:
   homepage: https://github.com/ology/Perl-Metrics-Halstead
   repository: https://github.com/ology/Perl-Metrics-Halstead.git
-version: '0.0616'
+version: '0.0617'
 x_Dist_Zilla:
   perl:
     version: '5.032001'

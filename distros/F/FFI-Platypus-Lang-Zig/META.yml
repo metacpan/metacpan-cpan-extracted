@@ -1,0 +1,45 @@
+---
+abstract: 'Documentation and tools for using Platypus with the Zig programming language'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Capture::Tiny: '0'
+  FFI::Build: '0'
+  FFI::Platypus: '2.03'
+  Test2::V0: '0.000121'
+  Test::Script: '0'
+  perl: '5.008004'
+configure_requires:
+  Capture::Tiny: '0'
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+  File::Which: '0'
+  File::chdir: '0'
+  Path::Tiny: '0'
+  perl: '5.008004'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: FFI-Platypus-Lang-Zig
+requires:
+  FFI::Build::File::Base: '0'
+  FFI::CheckLib: '0.11'
+  FFI::Platypus: '2.03'
+  File::ShareDir::Dist: '0'
+  File::chdir: '0'
+  Path::Tiny: '0'
+  parent: '0'
+  perl: '5.008004'
+resources:
+  IRC: irc://irc.perl.org/#native
+  bugtracker: https://github.com/PerlFFI/FFI-Platypus-Lang-Zig/issues
+  homepage: https://metacpan.org/pod/FFI::Platypus::Lang::Zig
+  repository: git://github.com/PerlFFI/FFI-Platypus-Lang-Zig.git
+version: '0.01'
+x_generated_by_perl: v5.37.5
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_use_unsafe_inc: 0

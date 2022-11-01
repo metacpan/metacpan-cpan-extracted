@@ -622,7 +622,7 @@ See [https://www.gnu.org/licenses/gpl-3.0-standalone.html](https://www.gnu.org/l
 [WebFetch::Input::PerlStruct.html"](https://metacpan.org/pod/WebFetch%3A%3AInput%3A%3APerlStruct.html%22)WebFetch::Input::PerlStruct>,
 [WebFetch::Input::SiteNews.html"](https://metacpan.org/pod/WebFetch%3A%3AInput%3A%3ASiteNews.html%22)WebFetch::Input::SiteNews>,
 [WebFetch::Input::Atom.html"](https://metacpan.org/pod/WebFetch%3A%3AInput%3A%3AAtom.html%22)WebFetch::Input::Atom>,
-[WebFetch::Input::RSS.html"](https://metacpan.org/pod/WebFetch%3A%3AInput%3A%3ARSS.html%22)WebFetch::Input::RSS>,
+[WebFetch::RSS.html"](https://metacpan.org/pod/WebFetch%3A%3AInput%3A%3ARSS.html%22)WebFetch::RSS>,
 [WebFetch::Input::Dump.html"](https://metacpan.org/pod/WebFetch%3A%3AInput%3A%3ADump.html%22)WebFetch::Input::Dump>,
 [WebFetch::Output::TT.html"](https://metacpan.org/pod/WebFetch%3A%3AOutput%3A%3ATT.html%22)WebFetch::Output::TT>,
 [WebFetch::Output::Dump.html"](https://metacpan.org/pod/WebFetch%3A%3AOutput%3A%3ADump.html%22)WebFetch::Output::Dump>,

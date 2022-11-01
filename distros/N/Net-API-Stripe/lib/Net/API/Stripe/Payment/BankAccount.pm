@@ -2,7 +2,7 @@
 ## Stripe API - ~/lib/Net/API/Stripe/Payment/BankAccount.pm
 ## Version v0.100.0
 ## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2020/05/15
 ## 
@@ -12,9 +12,14 @@ package Net::API::Stripe::Payment::BankAccount;
 BEGIN
 {
     use strict;
+    use warnings;
     use parent qw( Net::API::Stripe::Connect::ExternalAccount::Bank );
+    use vars qw( $VERSION );
     our( $VERSION ) = 'v0.100.0';
 };
+
+use strict;
+use warnings;
 
 1;
 

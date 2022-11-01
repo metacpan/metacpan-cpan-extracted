@@ -49,6 +49,10 @@ class AClass {
 {
    my $obj = AClass->new;
    is( $obj->method, "result", '->method works' );
+
+   my $can = $obj->can('method');
+   is( ref($can), 'CODE', '->can("method") returns coderef' );
+   is( $obj->$can, 'result', '... which works' );
 }
 
 # common method

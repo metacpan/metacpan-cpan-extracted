@@ -1,5 +1,8 @@
 Revision history for Game-Theory-TwoPersonMatrix
 
+0.2207 2022-10-21 21:05:17
+    - Avoid implicit imports.
+
 0.2206 2021-05-13 00:27:55
     - Improve test syntax.
 

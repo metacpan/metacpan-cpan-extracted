@@ -2,7 +2,7 @@ package SQL::Maker;
 use strict;
 use warnings;
 use 5.008001;
-our $VERSION = '1.21';
+our $VERSION = '1.22';
 use Class::Accessor::Lite 0.05 (
     ro => [qw/quote_char name_sep new_line strict driver select_class/],
 );
@@ -319,7 +319,13 @@ sub select_query {
         }
     }
     if (my $o = $opt->{index_hint}) {
-        $stmt->add_index_hint($table, $o);
+        if (defined $table) {
+            $stmt->add_index_hint($table, $o);
+        }
+        elsif (my $joins = $opt->{joins}) {
+            my $target_table = ref $joins->[0][0] eq 'ARRAY' ? $joins->[0][0][0] : $joins->[0][0];
+            $stmt->add_index_hint($target_table, $o);
+        }
     }
 
     $stmt->limit( $opt->{limit} )    if defined $opt->{limit};

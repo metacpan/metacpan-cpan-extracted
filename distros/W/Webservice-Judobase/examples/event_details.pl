@@ -8,18 +8,17 @@ use v5.10;
 
 use Webservice::Judobase;
 
-my $srv = Webservice::Judobase->new;
-my $event_id = $ARGV[0] || 1455;    # 2017 Europeans
+my $srv      = Webservice::Judobase->new;
+my $event_id = $ARGV[0] || 1455;            # 2017 Europeans
 
-my $event = $srv->general->competition( id => $event_id );
+my $event    = $srv->general->competition( id => $event_id );
 my $contests = $srv->contests->competition( id => $event_id );
 
 my $base_url = 'http://data.judobase.org/api/get_json?';
 
 my %categories;
 
-my $header = join ',',
-    qw/ category
+my $header = join ',', qw/ category
     round
     winner
     ijf_id_winner

@@ -1,0 +1,17 @@
+
+## Fantastic New Assembler!
+
+The new *Markdown* Assembler provides:
+
+<center> <!-- SKIP-LINE --> <bold>
+* awesome features
+* **colossal** hacks
+* a great demonstration of the need to refactor the std assembler
+* a guy reading _Finnegan's Wake_
+</bold> </center> <!-- SKIP-LINE -->
+
+Please enjoy!
+
+-- 
+Yours truly,
+Ricardo Signes

@@ -1,0 +1,18 @@
+{
+   "amount" : "1000",
+   "currency" : "usd",
+   "financial_account" : "fa_1Le9F32eZvKYlo2CjbQcDQUE",
+   "hosted_regulatory_receipt_url" : "https://payments.stripe.com/regulatory-receipt/CBQaFwoVYWNjdF8xMDMyRDgyZVp2S1lsbzJDKN6u0JgGMgZ5wklFW6A6NpM6vaRPqAA3MfviuxTVdP3EJG4azU5gXKVEXCmp3Kb06tC0LoZCqWCdfl0iQhcDzdQfLekmyQ",
+   "id" : "debrev_1Le9F42eZvKYlo2Cb7q6jmDW",
+   "linked_flows" : null,
+   "livemode" : 0,
+   "metadata" : {},
+   "network" : "ach",
+   "object" : "treasury.debit_reversal",
+   "received_debit" : "rd_1Le9F42eZvKYlo2C0TIJJqNP",
+   "status" : "processing",
+   "status_transitions" : {
+      "completed_at" : null
+   },
+   "transaction" : "trxn_1Le9F32eZvKYlo2C2dtkse82"
+}

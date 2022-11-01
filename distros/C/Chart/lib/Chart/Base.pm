@@ -5,14 +5,14 @@
 use v5.12;
 
 package Chart::Base;
-our $VERSION = 'v2.403.7';
+our $VERSION = 'v2.403.8';
 
 use FileHandle;
 use Carp;
 use GD;
 use GD::Image;
-use Chart::Color;
-#use Property::DataType::Font;
+use Chart::Property::DataType::Color;
+#use Chart::Property::DataType::Font;
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>#
 #  public methods          #
@@ -1162,7 +1162,7 @@ sub _color_role_to_index {
 
 sub _color_spec_to_rgb {
     my ($self, $role, $spec) = @_; # color role name (from set) for error msg
-    my $color = Chart::Color->new( $spec );
+    my $color = Chart::Property::DataType::Color->new( $spec );
     return croak "Unrecognized color for $role\n" unless ref $color;
     $color->rgb;
 }
@@ -1246,10 +1246,9 @@ sub _draw_title {
 
     # now loop through the rest of them
     # (the font is decreased in width and height by 1
-    if ( $w > 1 ) { $w--; }
-    if ( $h > 1 ) { $h--; }
-    for ( 1 .. $#lines )
-    {
+    if ( $w > 1 ) { $w-- }
+    if ( $h > 1 ) { $h-- }
+    for ( 1 .. $#lines ) {
         $self->{'curr_y_min'} += $self->{'text_space'} + $h;
         $x = ( $self->{'curr_x_max'} - $self->{'curr_x_min'} ) / 2 + $self->{'curr_x_min'} - ( length( $lines[$_] ) * $w ) / 2;
         $y = $self->{'curr_y_min'} + $self->{'text_space'};

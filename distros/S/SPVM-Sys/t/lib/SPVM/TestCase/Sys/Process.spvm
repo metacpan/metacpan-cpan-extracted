@@ -3,23 +3,6 @@ class TestCase::Sys::Process {
   use Sys::Process::Constant as PROCESS;
   use Time;
   
-  static method alarm : int () {
-    
-    my $rest1 = Sys::Process->alarm(5);
-    
-    unless ($rest1 == 0) {
-      return 0;
-    }
-    
-    my $rest2 = Sys::Process->alarm(5);
-    
-    unless ($rest2 == 5) {
-      return 0;
-    }
-    
-    return 1;
-  }
-
   static method fork : int () {
     
     my $child_process_id = Sys::Process->fork;
@@ -153,10 +136,6 @@ class TestCase::Sys::Process {
       }
     }
 
-    unless ($status == 0) {
-      return 0;
-    }
-    
     unless ($ret_child_process_id >= 0) {
       return 0;
     }
@@ -281,26 +260,6 @@ class TestCase::Sys::Process {
     unless (Time->time - $start >= 1) {
       return 0;
     }
-    
-    return 1;
-  }
-
-  static method ualarm : int () {
-    
-    my $rest1 = Sys::Process->ualarm(5_000, 0);
-      
-    unless ($rest1 >= 0) {
-      return 0;
-    }
-    
-    my $rest2 = Sys::Process->ualarm(5_000, 0);
-    
-    unless ($rest2 >= 4000 && $rest2 <= 5000) {
-      return 0;
-    }
-    
-    # Cancel alarm
-    Sys::Process->ualarm(0, 0);
     
     return 1;
   }

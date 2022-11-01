@@ -1,8 +1,8 @@
 use strict;
 use warnings;
-package Exception::Reporter;
+package Exception::Reporter 0.015;
 # ABSTRACT: a generic exception-reporting object
-$Exception::Reporter::VERSION = '0.014';
+
 #pod =head1 SYNOPSIS
 #pod
 #pod B<Achtung!>  This is an experimental refactoring of some long-standing internal
@@ -16,7 +16,7 @@ $Exception::Reporter::VERSION = '0.014';
 #pod     always_dump => { env => sub { \%ENV } },
 #pod     senders     => [
 #pod       Exception::Reporter::Sender::Email->new({
-#pod         from => 'root',
+#pod         from => 'root@example.com',
 #pod         to   => 'SysAdmins <sysadmins@example.com>',
 #pod       }),
 #pod     ],
@@ -277,7 +277,7 @@ Exception::Reporter - a generic exception-reporting object
 
 =head1 VERSION
 
-version 0.014
+version 0.015
 
 =head1 SYNOPSIS
 
@@ -292,7 +292,7 @@ accessible, like MyApp->reporter.
     always_dump => { env => sub { \%ENV } },
     senders     => [
       Exception::Reporter::Sender::Email->new({
-        from => 'root',
+        from => 'root@example.com',
         to   => 'SysAdmins <sysadmins@example.com>',
       }),
     ],
@@ -333,6 +333,18 @@ It does this with two kinds of plugins:  summarizers and senders.
 The summarizers' job is to convert each dumpable into a simple hashref
 describing it.  The senders' job is to take those hashrefs and send them to
 somebody who cares.
+
+=head1 PERL VERSION
+
+This module should work on any version of perl still receiving updates from
+the Perl 5 Porters.  This means it should work on any version of perl released
+in the last two to three years.  (That is, if the most recently released
+version is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 METHODS
 
@@ -428,17 +440,21 @@ wary though, because you could possibly create an endless loop...
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Matthew Horsfall Tomohiro Hosaka
+=for stopwords Matthew Horsfall Ricardo Signes Tomohiro Hosaka
 
 =over 4
 
 =item *
 
 Matthew Horsfall <wolfsage@gmail.com>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
 
 =item *
 

@@ -2,7 +2,7 @@
 ## Stripe API - ~/lib/Net/API/Stripe/Connect/Transfer.pm
 ## Version v0.100.0
 ## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2020/05/15
 ## 
@@ -12,46 +12,51 @@ package Net::API::Stripe::Connect::Transfer;
 BEGIN
 {
     use strict;
+    use warnings;
     use parent qw( Net::API::Stripe::Generic );
+    use vars qw( $VERSION );
     our( $VERSION ) = 'v0.100.0';
 };
 
-sub id { shift->_set_get_scalar( 'id', @_ ); }
+use strict;
+use warnings;
 
-sub object { shift->_set_get_scalar( 'object', @_ ); }
+sub id { return( shift->_set_get_scalar( 'id', @_ ) ); }
 
-sub amount { shift->_set_get_number( 'amount', @_ ); }
+sub object { return( shift->_set_get_scalar( 'object', @_ ) ); }
 
-sub amount_reversed { shift->_set_get_number( 'amount_reversed', @_ ); }
+sub amount { return( shift->_set_get_number( 'amount', @_ ) ); }
 
-sub balance_transaction { shift->_set_get_scalar_or_object( 'balance_transaction', 'Net::API::Stripe::Balance::Transaction', @_ ); }
+sub amount_reversed { return( shift->_set_get_number( 'amount_reversed', @_ ) ); }
 
-sub created { shift->_set_get_datetime( 'created', @_ ); }
+sub balance_transaction { return( shift->_set_get_scalar_or_object( 'balance_transaction', 'Net::API::Stripe::Balance::Transaction', @_ ) ); }
 
-sub currency { shift->_set_get_scalar( 'currency', @_ ); }
+sub created { return( shift->_set_get_datetime( 'created', @_ ) ); }
 
-sub description { shift->_set_get_scalar( 'description', @_ ); }
+sub currency { return( shift->_set_get_scalar( 'currency', @_ ) ); }
 
-sub destination { shift->_set_get_scalar_or_object( 'destination', 'Net::API::Stripe::Connect::Account', @_ ); }
+sub description { return( shift->_set_get_scalar( 'description', @_ ) ); }
 
-sub destination_payment { shift->_set_get_scalar_or_object( 'destination_payment', 'Net::API::Stripe::Connect::Transfer', @_ ); }
+sub destination { return( shift->_set_get_scalar_or_object( 'destination', 'Net::API::Stripe::Connect::Account', @_ ) ); }
 
-sub livemode { shift->_set_get_boolean( 'livemode', @_ ); }
+sub destination_payment { return( shift->_set_get_scalar_or_object( 'destination_payment', 'Net::API::Stripe::Connect::Transfer', @_ ) ); }
 
-sub metadata { shift->_set_get_hash( 'metadata', @_ ); }
+sub livemode { return( shift->_set_get_boolean( 'livemode', @_ ) ); }
 
-sub reversals { shift->_set_get_object( 'reversals', 'Net::API::Stripe::Connect::Transfer::Reversals', @_ ); }
+sub metadata { return( shift->_set_get_hash( 'metadata', @_ ) ); }
 
-sub reversed { shift->_set_get_boolean( 'reversed', @_ ); }
+sub reversals { return( shift->_set_get_object( 'reversals', 'Net::API::Stripe::Connect::Transfer::Reversals', @_ ) ); }
 
-sub source_transaction { shift->_set_get_scalar_or_object( 'source_transaction', 'Net::API::Stripe::Charge', @_ ); }
+sub reversed { return( shift->_set_get_boolean( 'reversed', @_ ) ); }
+
+sub source_transaction { return( shift->_set_get_scalar_or_object( 'source_transaction', 'Net::API::Stripe::Charge', @_ ) ); }
 
 ## As reference in the example data here https://stripe.com/docs/api/balance/balance_object
-sub source_type { shift->_set_get_scalar( 'source_type', @_ ); }
+sub source_type { return( shift->_set_get_scalar( 'source_type', @_ ) ); }
 
-sub source_types { shift->_set_get_hash( 'source_types', @_ ); }
+sub source_types { return( shift->_set_get_hash( 'source_types', @_ ) ); }
 
-sub transfer_group { shift->_set_get_scalar( 'transfer_group', @_ ); }
+sub transfer_group { return( shift->_set_get_scalar( 'transfer_group', @_ ) ); }
 
 1;
 
@@ -87,129 +92,121 @@ Before April 6, 2017, transfers also represented movement of funds from a Stripe
 
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>( %ARG )
+=head2 new( %ARG )
 
 Creates a new L<Net::API::Stripe::Connect::Transfer> object.
 It may also take an hash like arguments, that also are method of the same name.
 
-=back
-
 =head1 METHODS
 
-=over 4
-
-=item B<id> string
+=head2 id string
 
 Unique identifier for the object.
 
-=item B<object> string, value is "transfer"
+=head2 object string, value is "transfer"
 
 String representing the object’s type. Objects of the same type share the same value.
 
-=item B<amount> integer
+=head2 amount integer
 
 Amount in JPY to be transferred.
 
-=item B<amount_reversed> integer
+=head2 amount_reversed integer
 
 Amount in JPY reversed (can be less than the amount attribute on the transfer if a partial reversal was issued).
 
-=item B<balance_transaction> string (expandable)
+=head2 balance_transaction string (expandable)
 
 Balance transaction that describes the impact of this transfer on your account balance.
 
 When expanded, this is a L<Net::API::Stripe::Balance::Transaction> object.
 
-=item B<created> timestamp
+=head2 created timestamp
 
 Time that this record of the transfer was first created.
 
-=item B<currency> currency
+=head2 currency currency
 
 Three-letter ISO currency code, in lowercase. Must be a supported currency.
 
-=item B<description> string
+=head2 description string
 
 An arbitrary string attached to the object. Often useful for displaying to users.
 
-=item B<destination> string (expandable)
+=head2 destination string (expandable)
 
 ID of the Stripe account the transfer was sent to.
 
 When expanded, this is a L<Net::API::Stripe::Connect::Account> object.
 
-=item B<destination_payment> string (expandable)
+=head2 destination_payment string (expandable)
 
 If the destination is a Stripe account, this will be the ID of the payment that the destination account received for the transfer.
 
 When expanded, this is a L<Net::API::Stripe::Connect::Transfer> object.
 
-=item B<livemode> boolean
+=head2 livemode boolean
 
 Has the value true if the object exists in live mode or the value false if the object exists in test mode.
 
-=item B<metadata> hash
+=head2 metadata hash
 
 A set of key-value pairs that you can attach to a transfer object. It can be useful for storing additional information about the transfer in a structured format.
 
-=item B<reversals> list
+=head2 reversals list
 
 A list of reversals that have been applied to the transfer.
 
 This is a L<Net::API::Stripe::Connect::Transfer::Reversals> object.
 
-=item B<reversed> boolean
+=head2 reversed boolean
 
 Whether the transfer has been fully reversed. If the transfer is only partially reversed, this attribute will still be false.
 
-=item B<source_transaction> string (expandable)
+=head2 source_transaction string (expandable)
 
 ID of the charge or payment that was used to fund the transfer. If null, the transfer was funded from the available balance.
 
 When expanded, this is a L<Net::API::Stripe::Charge> object.
 
-=item B<source_type> string
+=head2 source_type string
 
 The source balance this transfer came from. One of card or bank_account.
 
-=item B<source_types> hash
+=head2 source_types hash
 
 This is undocumented, but found in Stripe API response.
 
-=item B<transfer_group> string
+=head2 transfer_group string
 
 A string that identifies this transaction as part of a group. See the Connect documentation for details.
 
-=back
-
 =head1 API SAMPLE
 
-	{
-	"id": "tr_fake123456789",
-	"object": "transfer",
-	"amount": 1100,
-	"amount_reversed": 0,
-	"balance_transaction": "txn_fake123456789",
-	"created": 1571197172,
-	"currency": "jpy",
-	"description": null,
-	"destination": "acct_fake123456789",
-	"destination_payment": "py_fake123456789",
-	"livemode": false,
-	"metadata": {},
-	"reversals": {
-		"object": "list",
-		"data": [],
-		"has_more": false,
-		"url": "/v1/transfers/tr_fake123456789/reversals"
-	},
-	"reversed": false,
-	"source_transaction": null,
-	"source_type": "card",
-	"transfer_group": null
-	}
+    {
+    "id": "tr_fake123456789",
+    "object": "transfer",
+    "amount": 1100,
+    "amount_reversed": 0,
+    "balance_transaction": "txn_fake123456789",
+    "created": 1571197172,
+    "currency": "jpy",
+    "description": null,
+    "destination": "acct_fake123456789",
+    "destination_payment": "py_fake123456789",
+    "livemode": false,
+    "metadata": {},
+    "reversals": {
+        "object": "list",
+        "data": [],
+        "has_more": false,
+        "url": "/v1/transfers/tr_fake123456789/reversals"
+    },
+    "reversed": false,
+    "source_transaction": null,
+    "source_type": "card",
+    "transfer_group": null
+    }
 
 =head1 HISTORY
 

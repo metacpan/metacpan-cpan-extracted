@@ -1,5 +1,12 @@
 Revision history for Pg-SQL-PrettyPrinter
 
+0.5     2022-11-01
+        - Fix display of E'\n' literals
+        - Fix generation of typecasts of expressions
+        - Fix dependencies
+        - Add handling of begin/commit/rollback
+          per report from Ben Davies
+
 0.4     2022-10-03
         Add handling of:
         - INSERT ... ON CONFLICT

@@ -1,0 +1,19 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use FindBin qw($RealBin);
+use File::Find;
+use feature 'say';
+
+find ({wanted =>\&wanted, follow => 1 }, ($RealBin . '/..', @INC));
+
+sub wanted {
+    if ($File::Find::name =~ m/App\/ipchgmon.pm$/) {
+        # Changed from "perl" to "$^X" per Slaven Rezic's advice
+        # in issue 144972. I wouldn't have got near this issue
+        # on my own. Many thanks, Slaven.
+        my $cmd = join " ", $^X, $File::Find::name, @ARGV;
+        say qx($cmd 2>&1); 
+        exit;
+    }
+}

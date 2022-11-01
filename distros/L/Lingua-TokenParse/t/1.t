@@ -1,11 +1,10 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
+use strict;
+use warnings;
 
-BEGIN {
-    use strict;
-    use warnings;
-    use Test::More tests => 12; #'no_plan';
-    use_ok 'Lingua::TokenParse';
-};
+use Test::More;
+
+use_ok 'Lingua::TokenParse';
 
 my $p = Lingua::TokenParse->new(
 #    verbose => 1,
@@ -44,3 +43,5 @@ $p->lexicon( {} );
 is scalar( keys %{ $p->lexicon } ), 0, 'lexicon cleared';
 $p->lexicon_cache( $lexicon );
 ok scalar( keys %{ $p->lexicon } ) > 0, 'lexicon retrieved';
+
+done_testing();

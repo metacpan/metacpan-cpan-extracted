@@ -10,9 +10,9 @@ use Perinci::Object;
 use Perinci::Sub::Util qw(err);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-10'; # DATE
+our $DATE = '2022-08-11'; # DATE
 our $DIST = 'App-shcompgen'; # DIST
-our $VERSION = '0.323'; # VERSION
+our $VERSION = '0.324'; # VERSION
 
 our %SPEC;
 
@@ -1156,7 +1156,7 @@ App::shcompgen - Generate shell completion scripts
 
 =head1 VERSION
 
-This document describes version 0.323 of App::shcompgen (from Perl distribution App-shcompgen), released on 2022-08-10.
+This document describes version 0.324 of App::shcompgen (from Perl distribution App-shcompgen), released on 2022-08-11.
 
 =head1 FUNCTIONS
 

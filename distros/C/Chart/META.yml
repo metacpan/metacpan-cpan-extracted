@@ -19,8 +19,8 @@ no_index:
   directory:
     - t
   namespace:
-    - Chart::Color
     - Chart::Manual
+    - Chart::Property
   package:
     - Chart::Base
     - Chart::BrushStyles
@@ -28,62 +28,57 @@ no_index:
 provides:
   Chart:
     file: lib/Chart.pm
-    version: v2.403.7
+    version: v2.403.8
   Chart::Bars:
     file: lib/Chart/Bars.pm
-    version: v2.403.7
-  Chart::Color:
-    file: lib/Chart/Color.pm
-    version: v2.403.7
+    version: v2.403.8
   Chart::Composite:
     file: lib/Chart/Composite.pm
-    version: v2.403.7
+    version: v2.403.8
   Chart::Direction:
     file: lib/Chart/Direction.pm
-    version: v2.403.7
+    version: v2.403.8
   Chart::ErrorBars:
     file: lib/Chart/ErrorBars.pm
-    version: v2.403.7
+    version: v2.403.8
   Chart::HorizontalBars:
     file: lib/Chart/HorizontalBars.pm
-    version: v2.403.7
+    version: v2.403.8
   Chart::Lines:
     file: lib/Chart/Lines.pm
-    version: v2.403.7
+    version: v2.403.8
   Chart::LinesPoints:
     file: lib/Chart/LinesPoints.pm
-    version: v2.403.7
+    version: v2.403.8
   Chart::Mountain:
     file: lib/Chart/Mountain.pm
-    version: v2.403.7
+    version: v2.403.8
   Chart::Pareto:
     file: lib/Chart/Pareto.pm
-    version: v2.403.7
+    version: v2.403.8
   Chart::Pie:
     file: lib/Chart/Pie.pm
-    version: v2.403.7
+    version: v2.403.8
   Chart::Points:
     file: lib/Chart/Points.pm
-    version: v2.403.7
+    version: v2.403.8
   Chart::Property:
     file: lib/Chart/Property.pm
-    version: v2.403.7
-  Chart::Property::DataType::Font:
-    file: lib/Chart/Property/DataType/Font.pm
-    version: v2.403.7
+    version: v2.403.8
   Chart::Split:
     file: lib/Chart/Split.pm
-    version: v2.403.7
+    version: v2.403.8
   Chart::StackedBars:
     file: lib/Chart/StackedBars.pm
-    version: v2.403.7
+    version: v2.403.8
 requires:
   Carp: '1.35'
   GD: '2'
+  Graphics::Toolkit::Color: '1'
   perl: v5.12.0
 resources:
   repository: git://github.com/lichtkind/Chart.git
-version: v2.403.7
+version: v2.403.8
 x_generated_by_perl: v5.30.0
 x_maintainers:
   - 'Herbert Breunung <lichtkind@cpan.org>'

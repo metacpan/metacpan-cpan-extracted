@@ -1,3 +1,10 @@
+1.1.103  2022-10-21  Released-By: PERLANCAR; Urgency: low
+
+         - No spec changes.
+
+         - Fix POD formatting.
+
+
 1.1.102  2022-04-22  Released-By: PERLANCAR; Urgency: medium
 
          - In function argument property 'deps' and for dep type 'prog',

@@ -1,5 +1,7 @@
 Revision history for Hash-Util-Exists-Tiny
 
+0.05    2022/10/27
+        Adapted META.yml
 0.04    2021/11/19
         Added functions defined_one_of, list_defined, num_defined
 0.03    2021/11/19

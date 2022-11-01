@@ -19,19 +19,19 @@ name: App-ClipboardUtils
 provides:
   App::ClipboardUtils:
     file: lib/App/ClipboardUtils.pm
-    version: '0.003'
+    version: '0.005'
 requires:
-  Clipboard::Any: '0.003'
-  Data::Sah::Compiler::perl::TH::str: '0.911'
+  Clipboard::Any: '0.004'
+  Data::Sah::Compiler::perl::TH::str: '0.914'
   Log::ger: '0.038'
-  Perinci::CmdLine::Any: '0.152'
-  Perinci::CmdLine::Lite: '1.915'
+  Perinci::CmdLine::Any: '0.154'
+  Perinci::CmdLine::Lite: '1.924'
   strict: '0'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-ClipboardUtils
   homepage: https://metacpan.org/release/App-ClipboardUtils
   repository: git://github.com/perlancar/perl-App-ClipboardUtils.git
-version: '0.003'
+version: '0.005'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -39,6 +39,14 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript add-clipboard-content'
+      version: '0.424'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript clipadd'
+      version: '0.424'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript clipget'
       version: '0.424'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript

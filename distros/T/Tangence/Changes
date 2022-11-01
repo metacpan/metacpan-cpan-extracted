@@ -1,5 +1,11 @@
 Revision history for Tangence
 
+0.30    2022-10-29
+        [CHANGES]
+         * Updates for Object::Pad v0.70:
+            + Use `ADJUST :params` instead of `ADJUSTPARAMS`
+            + Use `field` instead of `has`
+
 0.29    2022-06-06
         [CHANGES]
          * Look for `builtin::is_bool` now it's been renamed, and present in

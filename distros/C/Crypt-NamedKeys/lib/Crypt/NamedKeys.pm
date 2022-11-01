@@ -153,13 +153,13 @@ associated with the cyphertext, so we use this key.
 use Carp;
 use Crypt::CBC;
 use Digest::SHA qw(hmac_sha256_base64 sha256);
-use JSON;
+use Encode;
+use JSON::MaybeXS;
 use MIME::Base64;
 use String::Compare::ConstantTime;
-use Try::Tiny;
 use YAML::XS;
 
-our $VERSION = '1.1.2';
+our $VERSION = '1.13';
 
 =head1 CONFIGURATION PARAMETERS
 
@@ -288,11 +288,13 @@ Cypher to use (default: Rijndael)
 
 =cut
 
+my $json = JSON::MaybeXS->new;
+
 sub encrypt_data {
     my ($self, %args) = @_;
     croak "data argument is required and must be a reference" unless $args{data} and ref $args{data};
-    my $json_data = encode_json($args{data});
-    my $cypher = $args{cypher} || 'Rijndael';
+    my $json_data = Encode::encode_utf8($json->encode($args{data}));
+    my $cypher    = $args{cypher} || 'Rijndael';
     # Crypt::CBC generates random 8 bytes salt that it uses to
     # derive IV and encryption key from $args{secret}. It uses
     # the same algorythm as OpenSSL, the output is identical to
@@ -306,14 +308,14 @@ sub encrypt_data {
         -salt   => 1,
     );
     my $data = encode_base64($cbc->encrypt($json_data), '');
-    my $mac = hmac_sha256_base64(
+    my $mac  = hmac_sha256_base64(
         $data,
         &$mac_secret(
             keyname => $self->keyname,
             keynum  => $self->keynum
         ));
     $data =~ s/=/-/g if $Escape_Eq;
-    $mac =~ s/=/-/g  if $Escape_Eq;
+    $mac  =~ s/=/-/g if $Escape_Eq;
     return {
         data => $self->keynum . '*' . $data,
         mac  => $mac,
@@ -334,7 +336,7 @@ sub decrypt_data {
     # if the data was tampered do not try to decrypt it
 
     $args{data} =~ s/-/=/g;
-    $args{mac} =~ s/-/=/g;
+    $args{mac}  =~ s/-/=/g;
     my ($keynum, $cyphertext) = split /\*/, $args{data}, 2;
 
     if (!$cyphertext) {
@@ -364,7 +366,7 @@ sub decrypt_data {
     );
     my $decrypted = $cbc->decrypt(decode_base64($cyphertext));
     warn "Unable to decrypt $args{data} with keynum $keynum and keyname " . $self->keyname unless defined $decrypted;
-    my $data = decode_json($decrypted);
+    my $data = $json->decode(Encode::decode_utf8($decrypted));
     return $data;
 }
 

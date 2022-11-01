@@ -129,7 +129,7 @@
     "\N{U+0645}\N{U+0649}\N{U+0644}\N{U+0627}\N{U+062f}\N{U+0649}\N{U+064a}\N{U+06d5}\N{U+062f}\N{U+0649}\N{U+0646} \N{U+0628}\N{U+06c7}\N{U+0631}\N{U+06c7}\N{U+0646}",
     "\N{U+0645}\N{U+0649}\N{U+0644}\N{U+0627}\N{U+062f}\N{U+0649}\N{U+064a}\N{U+06d5}",
   ],
-  first_day_of_week => 7,
+  first_day_of_week => 1,
   glibc_date_1_format => "%a\N{U+060c} %d-%m-%Y\N{U+060c} %T",
   glibc_date_format => "%a\N{U+060c} %d-%m-%Y",
   glibc_datetime_format => "%a\N{U+060c} %d-%m-%Y\N{U+060c} %T",
@@ -269,5 +269,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 41,
+  version => 42,
 }

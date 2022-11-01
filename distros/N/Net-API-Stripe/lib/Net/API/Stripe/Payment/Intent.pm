@@ -1,109 +1,131 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Payment/Intent.pm
-## Version v0.100.0
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Version v0.102.0
+## Copyright(c) 2020 DEGUEST Pte. Ltd.
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
-## Modified 2020/05/15
+## Modified 2022/10/29
+## All rights reserved
 ## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 ## https://stripe.com/docs/api/payment_intents
 package Net::API::Stripe::Payment::Intent;
 BEGIN
 {
-	use strict;
-	use parent qw( Net::API::Stripe::Generic );
-	our( $VERSION ) = 'v0.100.0';
+    use strict;
+    use warnings;
+    use parent qw( Net::API::Stripe::Generic );
+    use vars qw( $VERSION );
+    our( $VERSION ) = 'v0.102.0';
 };
 
-sub id { shift->_set_get_scalar( 'id', @_ ); }
+use strict;
+use warnings;
 
-sub object { shift->_set_get_scalar( 'object', @_ ); }
+sub id { return( shift->_set_get_scalar( 'id', @_ ) ); }
+
+sub object { return( shift->_set_get_scalar( 'object', @_ ) ); }
 
 ## 2019-02-11
 ## Stripe: allowed_source_types has been renamed to payment_method_types.
-## sub allowed_source_types { shift->_set_get_scalar( 'allowed_source_types', @_ ); }
+## sub allowed_source_types { return( shift->_set_get_scalar( 'allowed_source_types', @_ ) ); }
+
 sub allowed_source_types { return( shift->payment_method_types( @_ ) ); }
+
+sub amount { return( shift->_set_get_number( 'amount', @_ ) ); }
+
+sub amount_capturable { return( shift->_set_get_number( 'amount_capturable', @_ ) ); }
+
+sub amount_details { return( shift->_set_get_class( 'amount_details',
+{
+  tip => {
+           package => "Net::API::Stripe::Balance::ConnectReserved",
+           type => "object",
+         },
+}, @_ ) ); }
+
+sub amount_received { return( shift->_set_get_number( 'amount_received', @_ ) ); }
+
+sub application { return( shift->_set_get_scalar_or_object( 'application', 'Net::API::Stripe::Connect::Account', @_ ) ); }
+
+sub application_fee_amount { return( shift->_set_get_number( 'application_fee_amount', @_ ) ); }
 
 ## 2019-02-11
 ## Stripe: authorize_with_url within has been renamed to redirect_to_url.
+
 sub authorize_with_url { return( shift->redirect_to_url( @_ ) ); }
 
-sub amount { shift->_set_get_number( 'amount', @_ ); }
+sub automatic_payment_methods { return( shift->_set_get_object( 'automatic_payment_methods', 'Net::API::Stripe::Payment::Installment', @_ ) ); }
 
-sub amount_capturable { shift->_set_get_number( 'amount_capturable', @_ ); }
+sub canceled_at { return( shift->_set_get_datetime( 'canceled_at', @_ ) ); }
 
-sub amount_received { shift->_set_get_number( 'amount_received', @_ ); }
+sub cancellation_reason { return( shift->_set_get_scalar( 'cancellation_reason', @_ ) ); }
 
-sub application { shift->_set_get_scalar_or_object( 'application', 'Net::API::Stripe::Connect::Account', @_ ); }
+sub capture_method { return( shift->_set_get_scalar( 'capture_method', @_ ) ); }
 
-sub application_fee_amount { shift->_set_get_number( 'application_fee_amount', @_ ); }
+sub charges { return( shift->_set_get_object( 'charges', 'Net::API::Stripe::Payment::Intent::Charges', @_ ) ); }
 
-sub canceled_at { shift->_set_get_datetime( 'canceled_at', @_ ); }
+sub client_secret { return( shift->_set_get_scalar( 'client_secret', @_ ) ); }
 
-sub cancellation_reason { shift->_set_get_scalar( 'cancellation_reason', @_ ); }
+sub confirmation_method { return( shift->_set_get_scalar( 'confirmation_method', @_ ) ); }
 
-sub capture_method { shift->_set_get_scalar( 'capture_method', @_ ); }
+sub created { return( shift->_set_get_datetime( 'created', @_ ) ); }
 
-sub charges { shift->_set_get_object( 'charges', 'Net::API::Stripe::Payment::Intent::Charges', @_ ); }
+sub currency { return( shift->_set_get_scalar( 'currency', @_ ) ); }
 
-sub client_secret { shift->_set_get_scalar( 'client_secret', @_ ); }
+sub customer { return( shift->_set_get_scalar_or_object( 'customer', 'Net::API::Stripe::Customer', @_ ) ); }
 
-sub confirmation_method { shift->_set_get_scalar( 'confirmation_method', @_ ); }
+sub description { return( shift->_set_get_scalar( 'description', @_ ) ); }
 
-sub created { shift->_set_get_datetime( 'created', @_ ); }
+sub invoice { return( shift->_set_get_scalar_or_object( 'invoice', 'Net::API::Stripe::Billing::Invoice', @_ ) ); }
 
-sub currency { shift->_set_get_scalar( 'currency', @_ ); }
+sub last_payment_error { return( shift->_set_get_object( 'last_payment_error', 'Net::API::Stripe::Error', @_ ) ); }
 
-sub customer { shift->_set_get_scalar_or_object( 'customer', 'Net::API::Stripe::Customer', @_ ); }
+sub livemode { return( shift->_set_get_boolean( 'livemode', @_ ) ); }
 
-sub description { shift->_set_get_scalar( 'description', @_ ); }
-
-sub invoice { return( shift->_set_get_scalar_or_object( 'invoice', '::API::Stripe::Billing::Invoice', @_ ) ); }
-
-sub last_payment_error { shift->_set_get_object( 'last_payment_error', 'Net::API::Stripe::Error', @_ ); }
-
-sub livemode { shift->_set_get_boolean( 'livemode', @_ ); }
-
-sub metadata { shift->_set_get_hash( 'metadata', @_ ); }
+sub metadata { return( shift->_set_get_hash( 'metadata', @_ ) ); }
 
 sub next_action { return( shift->_set_get_object( 'next_action', 'Net::API::Stripe::Payment::Intent::NextAction', @_ ) ); }
 
 # 2019-02-11
 # Stripe: The next_source_action property on PaymentIntent has been renamed to next_action
 # sub next_source_action { shift->_set_get_scalar( 'next_source_action', @_ ); }
+
 sub next_source_action { return( shift->next_action( @_ ) ); }
 
 sub on_behalf_of { return( shift->_set_get_scalar_or_object( 'on_behalf_of', 'Net::API::Stripe::Connect::Account', @_ ) ); }
 
-sub payment_method { return( shift->_set_get_scalar( 'payment_method', @_ ) ); }
+sub payment_method { return( shift->_set_get_scalar_or_object( 'payment_method', 'Net::API::Stripe::Payment::Method', @_ ) ); }
 
-sub payment_method_options { return( shift->_set_get_hash_as_object( 'payment_method_options', 'Net::API::Stripe::Payment::Method::Options', @_ ) ); }
+sub payment_method_options { return( shift->_set_get_object( 'payment_method_options', 'Net::API::Stripe::Payment::Method::Options', @_ ) ); }
 
 sub payment_method_types { return( shift->_set_get_array( 'payment_method_types', @_ ) ); }
 
-sub receipt_email { shift->_set_get_scalar( 'receipt_email', @_ ); }
+sub processing { return( shift->_set_get_object( 'processing', 'Net::API::Stripe::Issuing::Authorization::Transaction', @_ ) ); }
 
-sub return_url { shift->_set_get_uri( 'return_url', @_ ); }
+sub receipt_email { return( shift->_set_get_scalar( 'receipt_email', @_ ) ); }
 
-sub review { shift->_set_get_scalar_or_object( 'review', 'Net::API::Stripe::Fraud::Review', @_ ); }
+sub return_url { return( shift->_set_get_uri( 'return_url', @_ ) ); }
+
+sub review { return( shift->_set_get_scalar_or_object( 'review', 'Net::API::Stripe::Fraud::Review', @_ ) ); }
 
 sub setup_future_usage { return( shift->_set_get_scalar( 'setup_future_usage', @_ ) ); }
 
-sub shipping { shift->_set_get_object( 'shipping', 'Net::API::Stripe::Shipping', @_ ); }
+sub shipping { return( shift->_set_get_object( 'shipping', 'Net::API::Stripe::Shipping', @_ ) ); }
 
-sub source { shift->_set_get_scalar_or_object( 'source', 'Net::API::Stripe::Payment::Source', @_ ); }
+sub source { return( shift->_set_get_scalar_or_object( 'source', 'Net::API::Stripe::Payment::Source', @_ ) ); }
 
-sub statement_descriptor { shift->_set_get_scalar( 'statement_descriptor', @_ ); }
+sub statement_descriptor { return( shift->_set_get_scalar( 'statement_descriptor', @_ ) ); }
 
 sub statement_descriptor_suffix { return( shift->_set_get_scalar( 'statement_descriptor_suffix', @_ ) ); }
 
-## requires_payment_method, requires_confirmation, requires_action, processing, requires_capture, canceled, or succeeded
 sub status { return( shift->_set_get_scalar( 'status', @_ ) ); }
 
-sub transfer_data { shift->_set_get_object( 'transfer_data', 'Net::API::Stripe::Payment::Intent::TransferData', @_ ); }
+sub transfer_data { return( shift->_set_get_object( 'transfer_data', 'Net::API::Stripe::Connect::Transfer', @_ ) ); }
 
-sub transfer_group { shift->_set_get_scalar( 'transfer_group', @_ ); }
+sub transfer_group { return( shift->_set_get_scalar( 'transfer_group', @_ ) ); }
 
 1;
 
@@ -113,7 +135,7 @@ __END__
 
 =head1 NAME
 
-Net::API::Stripe::Payment::Intent - A Stripe Payment Intent Object
+Net::API::Stripe::PaymentIntent - The PaymentIntent object
 
 =head1 SYNOPSIS
 
@@ -134,13 +156,15 @@ See documentation in L<Net::API::Stripe> for example to make api calls to Stripe
 
 =head1 VERSION
 
-    v0.100.0
+    v0.102.0
 
 =head1 DESCRIPTION
 
-A PaymentIntent guides you through the process of collecting a payment from your customer. Stripe recommends that you create exactly one PaymentIntent for each order or customer session in your system. You can reference the PaymentIntent later to see the history of payment attempts for a particular session.
+A PaymentIntent guides you through the process of collecting a payment from your customer.
+We recommend that you create exactly one PaymentIntent for each order or customer session in your system. You can reference the PaymentIntent later to see the history of payment attempts for a particular session.
+A PaymentIntent transitions through L<multiple statuses|https://stripe.com/docs/payments/intents#intent-statuses> throughout its lifetime as it interfaces with Stripe.js to perform authentication flows and ultimately creates at most one successful charge.
 
-A PaymentIntent transitions through multiple statuses throughout its lifetime as it interfaces with Stripe.js to perform authentication flows and ultimately creates at most one successful charge.
+Related guide: L<Payment Intents API|https://stripe.com/docs/payments/payment-intents>.
 
 Creating payments takes five steps:
 
@@ -160,298 +184,298 @@ Creating payments takes five steps:
 
 More info here: L<https://stripe.com/docs/payments/payment-intents/web>
 
-=head1 CONSTRUCTOR
-
-=over 4
-
-=item B<new>( %ARG )
-
-Creates a new L<Net::API::Stripe::Payment::Intent> object.
-It may also take an hash like arguments, that also are method of the same name.
-
-=back
-
 =head1 METHODS
 
-=over 4
-
-=item B<id> retrievable with publishable key string
+=head2 id string
 
 Unique identifier for the object.
 
-=item B<object> retrievable with publishable key string, value is "payment_intent"
+=head2 object string
 
-String representing the object’s type. Objects of the same type share the same value.
+String representing the object's type. Objects of the same type share the same value.
 
-=item B<amount> retrievable with publishable key integer
+=head2 amount integer
 
-Amount intended to be collected by this PaymentIntent.
+Amount intended to be collected by this PaymentIntent. A positive integer representing how much to charge in the L<smallest currency unit|https://stripe.com/docs/currencies#zero-decimal> (e.g., 100 cents to charge $1.00 or 100 to charge ¥100, a zero-decimal currency). The minimum amount is $0.50 US or L<equivalent in charge currency|https://stripe.com/docs/currencies#minimum-and-maximum-charge-amounts>. The amount value supports up to eight digits (e.g., a value of 99999999 for a USD charge of $999,999.99).
 
-=item B<amount_capturable> integer
+=head2 amount_capturable integer
 
 Amount that can be captured from this PaymentIntent.
 
-=item B<amount_received> integer
+=head2 amount_details hash
+
+Details about items included in the amount
+
+It has the following properties:
+
+=over 4
+
+=item C<tip> hash
+
+Details about the tip.
+
+When expanded, this is a L<Net::API::Stripe::Balance::ConnectReserved> object.
+
+=back
+
+=head2 amount_received integer
 
 Amount that was collected by this PaymentIntent.
 
-=item B<application> string expandable "application"
+=head2 application expandable
 
 ID of the Connect application that created the PaymentIntent.
 
-This is a L<Net::API::Stripe::Connect::Account> object.
+When expanded this is an L<Net::API::Stripe::Connect::Account> object.
 
-=item B<application_fee_amount> integer
+=head2 application_fee_amount integer
 
-The amount of the application fee (if any) for the resulting payment. See the PaymentIntents use case for connected accounts for details.
+The amount of the application fee (if any) that will be requested to be applied to the payment and transferred to the application owner's Stripe account. The amount of the application fee collected will be capped at the total payment amount. For more information, see the PaymentIntents L<use case for connected accounts|https://stripe.com/docs/payments/connected-accounts>.
 
-=item B<canceled_at> retrievable with publishable key timestamp
+=head2 automatic_payment_methods object
 
-Populated when status is canceled, this is the time at which the PaymentIntent was canceled. Measured in seconds since the Unix epoch.
+Settings to configure compatible payment methods from the L<Stripe Dashboard|https://dashboard.stripe.com/settings/payment_methods>
 
-=item B<cancellation_reason> retrievable with publishable key string
+This is a L<Net::API::Stripe::Payment::Installment> object.
 
-Reason for cancellation of this PaymentIntent, either user-provided (duplicate, fraudulent, requested_by_customer, or abandoned) or generated by Stripe internally (failed_invoice, void_invoice, or automatic).
+=head2 canceled_at timestamp
 
-=item B<capture_method> retrievable with publishable key string
+Populated when C<status> is C<canceled>, this is the time at which the PaymentIntent was canceled. Measured in seconds since the Unix epoch.
 
-One of automatic (default) or manual.
+=head2 cancellation_reason string
 
-When the capture method is automatic, Stripe automatically captures funds when the customer authorizes the payment.
+Reason for cancellation of this PaymentIntent, either user-provided (C<duplicate>, C<fraudulent>, C<requested_by_customer>, or C<abandoned>) or generated by Stripe internally (C<failed_invoice>, C<void_invoice>, or C<automatic>).
 
-Change capture_method to manual if you wish to separate authorization and capture for payment methods that support this.
+=head2 capture_method string
 
-=item B<charges> list
+Controls when the funds will be captured from the customer's account.
+
+=head2 charges object
 
 Charges that were created by this PaymentIntent, if any.
 
-This is a L<Net::API::Stripe::Payment::Intent::Charges> object.
+This is a L<Net::API::Stripe::List> object.
 
-=item B<client_secret> retrievable with publishable key string
+=head2 client_secret string
 
-The client secret of this PaymentIntent. Used for client-side retrieval using a publishable key.
+The client secret of this PaymentIntent. Used for client-side retrieval using a publishable key. 
 
 The client secret can be used to complete a payment from your frontend. It should not be stored, logged, embedded in URLs, or exposed to anyone other than the customer. Make sure that you have TLS enabled on any page that includes the client secret.
 
-Please refer to L<Stripe quickstart guide|https://stripe.com/docs/payments/accept-a-payment> to learn about how client_secret should be handled.
-confirmation_method retrievable with publishable key string
+Refer to our docs to L<accept a payment|https://stripe.com/docs/payments/accept-a-payment?integration=elements> and learn about how C<client_secret> should be handled.
 
-One of automatic (default) or manual.
+=head2 confirmation_method string
 
-When the confirmation method is automatic, a PaymentIntent can be confirmed using a publishable key. After 
-next_actions are handled, no additional confirmation is required to complete the payment.
+Possible enum values
 
-When the confirmation method is manual, all payment attempts must be made using a secret key. The PaymentIntent returns to the requires_confirmation state after handling next_actions, and requires your server to initiate each payment attempt with an explicit confirmation.
+=over 4
 
-Learn more about the different confirmation flows.
+=item I<automatic>
 
-=item B<created> retrievable with publishable key timestamp
+(Default) PaymentIntent can be confirmed using a publishable key. After next_actions are handled, no additional confirmation is required to complete the payment.
+
+=item I<manual>
+
+All payment attempts must be made using a secret key. The PaymentIntent returns to the requires_confirmation state after handling next_actions, and requires your server to initiate each payment attempt with an explicit confirmation.
+
+=back
+
+=head2 created timestamp
 
 Time at which the object was created. Measured in seconds since the Unix epoch.
-currency retrievable with publishable key currency
 
-Three-letter ISO currency code, in lowercase. Must be a supported currency.
+=head2 currency currency
 
-=item B<customer> string (expandable)
+Three-letter L<ISO currency code|https://www.iso.org/iso-4217-currency-codes.html>, in lowercase. Must be a L<supported currency|https://stripe.com/docs/currencies>.
+
+=head2 customer expandable
 
 ID of the Customer this PaymentIntent belongs to, if one exists.
 
-If present, payment methods used with this PaymentIntent can only be attached to this Customer, and payment methods attached to other Customers cannot be used with this PaymentIntent.
+Payment methods attached to other Customers cannot be used with this PaymentIntent.
 
-This is a customer id or a L<Net::API::Stripe::Customer> object.
+If present in combination with L<setup_future_usage|https://stripe.com#payment_intent_object-setup_future_usage>, this PaymentIntent's payment method will be attached to the Customer after the PaymentIntent has been confirmed and any required actions from the user are complete.
 
-=item B<description> retrievable with publishable key string
+When expanded this is an L<Net::API::Stripe::Customer> object.
+
+=head2 description string
 
 An arbitrary string attached to the object. Often useful for displaying to users.
 
-=item B<invoice> string (expandable)
+=head2 invoice expandable
 
 ID of the invoice that created this PaymentIntent, if it exists.
 
-When expanded, this is a C<::API::Stripe::Billing::Invoice> object.
+When expanded this is an L<Net::API::Stripe::Billing::Invoice> object.
 
-=item B<last_payment_error> retrievable with publishable key hash
+=head2 last_payment_error hash
 
-The payment error encountered in the previous PaymentIntent confirmation.
+The payment error encountered in the previous PaymentIntent confirmation. It will be cleared if the PaymentIntent is later updated for any reason.
 
 This is a L<Net::API::Stripe::Error> object.
 
-=item B<livemode> retrievable with publishable key boolean
+=head2 livemode boolean
 
-Has the value true if the object exists in live mode or the value false if the object exists in test mode.
+Has the value C<true> if the object exists in live mode or the value C<false> if the object exists in test mode.
 
-=item B<metadata> hash
+=head2 metadata hash
 
-Set of key-value pairs that you can attach to an object. This can be useful for storing additional information about the object in a structured format. For more information, see the documentation.
+Set of L<key-value pairs|https://stripe.com/docs/api/metadata> that you can attach to an object. This can be useful for storing additional information about the object in a structured format. For more information, see the L<documentation|https://stripe.com/docs/payments/payment-intents/creating-payment-intents#storing-information-in-metadata>.
 
-=item B<next_action> retrievable with publishable key hash
+=head2 next_action object
 
 If present, this property tells you what actions you need to take in order for your customer to fulfill a payment using the provided source.
 
-This is a L<Net::API::Stripe::Payment::Intent::NextAction> object with the following properties:
+This is a L<Net::API::Stripe::Payment::Intent::NextAction> object.
 
-=over 8
+=head2 on_behalf_of expandable
 
-=item B<redirect_to_url> hash
+The account (if any) for which the funds of the PaymentIntent are intended. See the PaymentIntents L<use case for connected accounts|https://stripe.com/docs/payments/connected-accounts> for details.
 
-Contains instructions for authenticating a payment by redirecting your customer to another page or application.
+When expanded this is an L<Net::API::Stripe::Connect::Account> object.
 
-See module L<Net::API::Stripe::Payment::Intent::NextAction> for more information.
-
-=over 12
-
-=item I<return_url> string
-
-If the customer does not exit their browser while authenticating, they will be redirected to this specified URL after completion.
-
-=item I<url> string
-
-The URL you must redirect your customer to in order to authenticate the payment.
-
-=back
-
-=item B<type> string
-
-Type of the next action to perform, one of redirect_to_url or use_stripe_sdk.
-
-=item B<use_stripe_sdk> hash
-
-When confirming a PaymentIntent with Stripe.js, Stripe.js depends on the contents of this dictionary to invoke authentication flows. The shape of the contents is subject to change and is only intended to be used by Stripe.js.
-
-=back
-
-=item B<on_behalf_of> string (expandable)
-
-The account (if any) for which the funds of the PaymentIntent are intended. See the PaymentIntents use case for connected accounts for details.
-
-When expanded, this is a L<Net::API::Stripe::Connect::Account> object.
-
-=item B<payment_method> retrievable with publishable key string (expandable)
+=head2 payment_method expandable
 
 ID of the payment method used in this PaymentIntent.
 
-=item B<payment_method_options> hash
+When expanded this is an L<Net::API::Stripe::Payment::Method> object.
+
+=head2 payment_method_options object
 
 Payment-method-specific configuration for this PaymentIntent.
 
-This is a virtual L<Net::API::Stripe::Payment::Method::Options> object, ie a package created on the fly to allow the hash keys to be accessed as methods.
+This is a L<Net::API::Stripe::Payment::Method> object.
 
-=over 8
-
-=item B<card> hash
-
-If the PaymentIntent’s payment_method_types includes card, this hash contains the configurations that will be applied to each payment attempt of that type.
-
-=back
-
-=item B<payment_method_types> retrievable with publishable key array containing strings
+=head2 payment_method_types array of string
 
 The list of payment method types (e.g. card) that this PaymentIntent is allowed to use.
 
-=item B<receipt_email> retrievable with publishable key string
+=head2 processing object
 
-Email address that the receipt for the resulting payment will be sent to.
+If present, this property tells you about the processing state of the payment.
 
-=item B<review> string (expandable)
+This is a L<Net::API::Stripe::Issuing::Authorization::Transaction> object.
+
+=head2 receipt_email string
+
+Email address that the receipt for the resulting payment will be sent to. If C<receipt_email> is specified for a payment in live mode, a receipt will be sent regardless of your L<email settings|https://dashboard.stripe.com/account/emails>.
+
+=head2 review expandable
 
 ID of the review associated with this PaymentIntent, if any.
 
-This is a L<Net::API::Stripe::Fraud::Review> object.
+When expanded this is an L<Net::API::Stripe::Fraud::Review> object.
 
-=item B<setup_future_usage> retrievable with publishable key string
+=head2 setup_future_usage string
 
-Indicates that you intend to make future payments with this PaymentIntent’s payment method.
+Indicates that you intend to make future payments with this PaymentIntent's payment method.
 
-If present, the payment method used with this PaymentIntent can be attached to a Customer, even after the transaction completes.
+Providing this parameter will L<attach the payment method|https://stripe.com/docs/payments/save-during-payment> to the PaymentIntent's Customer, if present, after the PaymentIntent is confirmed and any required actions from the user are complete. If no Customer was provided, the payment method can still be L<attached|https://stripe.com/docs/api/payment_methods/attach> to a Customer after the transaction completes.
 
-Use on_session if you intend to only reuse the payment method when your customer is present in your checkout flow. Use off_session if your customer may or may not be in your checkout flow. See Saving card details after a payment to learn more.
+When processing card payments, Stripe also uses C<setup_future_usage> to dynamically optimize your payment flow and comply with regional legislation and network rules, such as L<SCA|https://stripe.com/docs/strong-customer-authentication>.
 
-Stripe uses setup_future_usage to dynamically optimize your payment flow and comply with regional legislation and network rules. For example, if your customer is impacted by SCA, using off_session will ensure that they are authenticated while processing this PaymentIntent. You will then be able to collect off-session payments for this customer.
-
-=item B<shipping> retrievable with publishable key hash
+=head2 shipping object
 
 Shipping information for this PaymentIntent.
 
 This is a L<Net::API::Stripe::Shipping> object.
 
-=item B<source>
+=head2 source
 
 This is a L<Net::API::Stripe::Payment::Source>, but it seems it is not documented on the Stripe API although it is found in its response.
 
-=item B<statement_descriptor> string
+=head2 statement_descriptor string
 
 For non-card charges, you can use this value as the complete description that appears on your customers’ statements. Must contain at least one letter, maximum 22 characters.
 
-=item B<statement_descriptor_suffix> string
+=head2 statement_descriptor_suffix string
 
 Provides information about a card payment that customers see on their statements. Concatenated with the prefix (shortened descriptor) or statement descriptor that’s set on the account to form the complete statement descriptor. Maximum 22 characters for the concatenated descriptor.
 
-=item B<status> retrievable with publishable key string
+=head2 status string
 
-Status of this PaymentIntent, one of requires_payment_method, requires_confirmation, requires_action, processing, requires_capture, canceled, or succeeded. Read more about each PaymentIntent status.
+Status of this PaymentIntent, one of C<requires_payment_method>, C<requires_confirmation>, C<requires_action>, C<processing>, C<requires_capture>, C<canceled>, or C<succeeded>. Read more about each PaymentIntent L<status|https://stripe.com/docs/payments/intents#intent-statuses>.
 
-=item B<transfer_data> hash
+=head2 transfer_data object
 
-The data with which to automatically create a Transfer when the payment is finalized. See the PaymentIntents use case for connected accounts for details.
+The data with which to automatically create a Transfer when the payment is finalized. See the PaymentIntents L<use case for connected accounts|https://stripe.com/docs/payments/connected-accounts> for details.
 
-This is a L<Net::API::Stripe::Payment::Intent::TransferData> object.
+This is a L<Net::API::Stripe::Connect::Transfer> object.
 
-=item B<transfer_group> string
+It uses the following methods:
 
-A string that identifies the resulting payment as part of a group. See the PaymentIntents use case for connected accounts for details.
+=over 4
+
+=item I<amount> integer
+
+Amount intended to be collected by this PaymentIntent. A positive integer representing how much to charge in the L<smallest currency unit|https://stripe.com/docs/currencies#zero-decimal> (e.g., 100 cents to charge $1.00 or 100 to charge ¥100, a zero-decimal currency). The minimum amount is $0.50 US or L<equivalent in charge currency|https://stripe.com/docs/currencies#minimum-and-maximum-charge-amounts>. The amount value supports up to eight digits (e.g., a value of 99999999 for a USD charge of $999,999.99).
+
+=item I<destination> string expandable
+
+The account (if any) the payment will be attributed to for tax reporting, and where funds from the payment will be transferred to upon
+payment success.
+
+When expanded this is an L<Net::API::Stripe::Connect::Account> object.
 
 =back
 
+=head2 transfer_group string
+
+A string that identifies the resulting payment as part of a group. See the PaymentIntents L<use case for connected accounts|https://stripe.com/docs/payments/connected-accounts> for details.
+
 =head1 API SAMPLE
 
-	{
-	  "id": "pi_fake123456789",
-	  "object": "payment_intent",
-	  "amount": 1099,
-	  "amount_capturable": 0,
-	  "amount_received": 0,
-	  "application": null,
-	  "application_fee_amount": null,
-	  "canceled_at": null,
-	  "cancellation_reason": null,
-	  "capture_method": "automatic",
-	  "charges": {
-		"object": "list",
-		"data": [],
-		"has_more": false,
-		"url": "/v1/charges?payment_intent=pi_fake123456789"
-	  },
-	  "client_secret": "pi_fake123456789_secret_nvsnvmsbfmsbfmbfm",
-	  "confirmation_method": "automatic",
-	  "created": 1556596976,
-	  "currency": "jpy",
-	  "customer": null,
-	  "description": null,
-	  "invoice": null,
-	  "last_payment_error": null,
-	  "livemode": false,
-	  "metadata": {},
-	  "next_action": null,
-	  "on_behalf_of": null,
-	  "payment_method": null,
-	  "payment_method_options": {},
-	  "payment_method_types": [
-		"card"
-	  ],
-	  "receipt_email": null,
-	  "review": null,
-	  "setup_future_usage": null,
-	  "shipping": null,
-	  "statement_descriptor": null,
-	  "statement_descriptor_suffix": null,
-	  "status": "requires_payment_method",
-	  "transfer_data": null,
-	  "transfer_group": null
-	}
+    {
+      "id": "pi_1Dik5W2eZvKYlo2CDeNJH1A5",
+      "object": "payment_intent",
+      "amount": 1999,
+      "amount_capturable": 0,
+      "amount_received": 0,
+      "application": null,
+      "application_fee_amount": null,
+      "canceled_at": null,
+      "cancellation_reason": null,
+      "capture_method": "automatic",
+      "charges": {
+        "object": "list",
+        "data": [
+        ],
+        "has_more": false,
+        "url": "/v1/charges?payment_intent=pi_1Dik5W2eZvKYlo2CDeNJH1A5"
+      },
+      "client_secret": "pi_1Dik5W2eZvKYlo2CDeNJH1A5_secret_YsxmIGlVxOrzmONrMv6KzeqGS",
+      "confirmation_method": "automatic",
+      "created": 1545145346,
+      "currency": "gbp",
+      "customer": null,
+      "description": null,
+      "invoice": null,
+      "last_payment_error": null,
+      "livemode": false,
+      "metadata": {
+      },
+      "next_action": null,
+      "on_behalf_of": null,
+      "payment_method": null,
+      "payment_method_options": {
+      },
+      "payment_method_types": [
+        "card"
+      ],
+      "receipt_email": null,
+      "review": null,
+      "setup_future_usage": null,
+      "shipping": null,
+      "statement_descriptor": null,
+      "statement_descriptor_suffix": null,
+      "status": "requires_payment_method",
+      "transfer_data": null,
+      "transfer_group": null
+    }
 
 =head1 HISTORY
 
-=head2 v0.1
+=head2 v0.1.0
 
 Initial version
 
@@ -483,4 +507,3 @@ You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.
 
 =cut
-

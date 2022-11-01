@@ -1,6 +1,6 @@
-package Email::MIME::Kit::Assembler::Markdown;
+package Email::MIME::Kit::Assembler::Markdown 0.100008;
 # ABSTRACT: build multipart/alternative messages from Markdown alone
-$Email::MIME::Kit::Assembler::Markdown::VERSION = '0.100006';
+
 use Moose;
 with 'Email::MIME::Kit::Role::Assembler';
 
@@ -67,6 +67,13 @@ use HTML::Entities ();
 #pod source text to be entity encoded in the HTML part (and passed through
 #pod unmodified in the plain text part)
 #pod
+#pod The comment C<< <!-- SKIP-LINE --> >> may be included on any line of the source
+#pod document.  Lines containing that substring will not be included in the final
+#pod plaintext part, but will be included in the HTML part.  (The comment itself
+#pod will be removed.)  This allows adding extra HTML to the Markdown without it
+#pod remaining, annoyingly, in the text part.  To change the exact text looked for
+#pod from C<SKIP-LINE>, you can set the C<skip_marker> attribute of the assembler.
+#pod
 #pod =cut
 
 has manifest => (
@@ -116,6 +123,8 @@ has renderer => (
 );
 
 has marker => (is => 'ro', isa => 'Str', default => 'CONTENT');
+
+has skip_marker => (is => 'ro', isa => 'Str', default => 'SKIP-LINE');
 
 has path => (
   is   => 'ro',
@@ -170,13 +179,29 @@ sub _prep_header {
 sub assemble {
   my ($self, $stash) = @_;
 
-  my $markdown = ${ $self->kit->get_decoded_kit_entry( $self->path ) };
+  my $markdown  = ${ $self->kit->get_decoded_kit_entry( $self->path ) };
+  my $plaintext = $markdown;
+
+
   if ($self->renderer) {
-    my $output_ref = $self->renderer->render(\$markdown, $stash);
-    $markdown = $$output_ref;
+    {
+      local $stash->{part_type} = 'text';
+      my $output = $self->renderer->render(\$markdown, $stash);
+      $plaintext = ${ $self->renderer->render(\$markdown, $stash) };
+    }
+
+    {
+      local $stash->{part_type} = 'html';
+      $markdown = ${ $self->renderer->render(\$markdown, $stash) };
+    }
   }
 
-  my $plaintext = $markdown;
+  # We'll remove any line containing <!-- SKIP-LINE --> from the plain text
+  # part.  Meanwhile, the comment is removed from the Markdown, but the rest of
+  # the line is left intact. -- rjbs, 2021-11-23
+  my $skip_marker = $self->skip_marker;
+  $plaintext =~ s{^.*<!--\s+\Q$skip_marker\E\s+-->.*$}{}mg;
+  $markdown  =~ s{<!--\s+\Q$skip_marker\E\s+-->}{}mg;
 
   if ($self->encode_entities) {
     $markdown = HTML::Entities::encode_entities($markdown);
@@ -203,7 +228,8 @@ sub assemble {
       my $wrapper = ${ $self->kit->get_decoded_kit_entry($wrapper_path) };
 
       if ($self->render_wrapper) {
-        $stash->{wrapped_content} = $content{$type};
+        local $stash->{wrapped_content} = $content{$type};
+        local $stash->{part_type}       = $type;
         my $output_ref = $self->renderer->render(\$wrapper, $stash);
         $content{$type} = $$output_ref;
       } else {
@@ -268,7 +294,7 @@ Email::MIME::Kit::Assembler::Markdown - build multipart/alternative messages fro
 
 =head1 VERSION
 
-version 0.100006
+version 0.100008
 
 =head1 SYNOPSIS
 
@@ -326,11 +352,30 @@ If given (and true), the C<encode_entities> option will cause HTML in the
 source text to be entity encoded in the HTML part (and passed through
 unmodified in the plain text part)
 
+The comment C<< <!-- SKIP-LINE --> >> may be included on any line of the source
+document.  Lines containing that substring will not be included in the final
+plaintext part, but will be included in the HTML part.  (The comment itself
+will be removed.)  This allows adding extra HTML to the Markdown without it
+remaining, annoyingly, in the text part.  To change the exact text looked for
+from C<SKIP-LINE>, you can set the C<skip_marker> attribute of the assembler.
+
+=head1 PERL VERSION
+
+This module should work on any version of perl still receiving updates from
+the Perl 5 Porters.  This means it should work on any version of perl released
+in the last two to three years.  (That is, if the most recently released
+version is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =for Pod::Coverage assemble BUILD
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 CONTRIBUTORS
 
@@ -354,7 +399,7 @@ Robert Norris <rob@eatenbyagrue.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017 by Ricardo Signes.
+This software is copyright (c) 2022 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

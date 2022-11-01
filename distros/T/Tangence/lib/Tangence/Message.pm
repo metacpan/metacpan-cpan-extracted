@@ -1,12 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2010-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2010-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.41;
+use Object::Pad 0.66;
 
-package Tangence::Message 0.29;
+package Tangence::Message 0.30;
 class Tangence::Message;
 
 use Carp;
@@ -31,9 +31,9 @@ use Scalar::Util qw( weaken blessed );
 # true value will sort keys first
 our $SORT_HASH_KEYS = 0;
 
-has $_stream  :param :reader;
-has $_code    :param :reader;
-has $_payload :param :reader;
+field $_stream  :param :reader;
+field $_code    :param :reader;
+field $_payload :param :reader;
 
 sub BUILDARGS ( $class, $stream, $code, $payload = "" )
 {

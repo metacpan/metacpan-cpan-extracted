@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
-## Apache2 Server Side Include Parser's Notes - ~/lib/Apache2/SSI/Notes.pm
-## Version v0.1.0
+## Apache2 Server Side Include Parser - ~/lib/Apache2/SSI/Notes.pm
+## Version v0.1.1
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/01/18
-## Modified 2021/01/19
+## Modified 2022/10/21
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -17,12 +17,16 @@ BEGIN
     use warnings;
     use warnings::register;
     use parent qw( Module::Generic );
-    ## 512Kb
+    use vars qw( $VERSION );
+    # 512Kb
     use constant MAX_SIZE => 524288;
     use Apache2::SSI::SharedMem ':all';
     use Nice::Try;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.1.1';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -34,9 +38,9 @@ sub init
     return( $self->error( "Notes under this system $^O are unsupported." ) ) if( !Apache2::SSI::SharedMem->supported );
     my $mem = Apache2::SSI::SharedMem->new(
         key => ( length( $self->{key} ) ? $self->{key} : 'ap2_ssi_notes' ),
-        ## 512 Kb max
+        # 512 Kb max
         size => $self->{size},
-        ## Create if necessary
+        # Create if necessary
         create => 1,
         debug => $self->debug,
     ) || return( $self->pass_error( Apache2::SSI::SharedMem->error ) );
@@ -69,13 +73,13 @@ sub do
         my $v = $data->{ $k };
         try
         {
-            ## Code can modify values in-place like:
-            ## sub
-            ## {
-            ##     $_[1] = 'new value' if( $_[0] eq 'some_key_name' );
-            ## }
+            # Code can modify values in-place like:
+            # sub
+            # {
+            #     $_[1] = 'new value' if( $_[0] eq 'some_key_name' );
+            # }
             $code->( $k, $v );
-            ## Store possibly updated value
+            # Store possibly updated value
             $data->{ $k_orig } = $v;
         }
         catch( $e )
@@ -83,7 +87,7 @@ sub do
             return( $self->error( "Callback died with error: $e" ) );
         }
     }
-    ## No need to bother if there was no keys in the first place
+    # No need to bother if there was no keys in the first place
     if( scalar( @keys ) )
     {
         $self->write_mem( $data ) || return;
@@ -101,7 +105,7 @@ sub get
         return( $self->error( "Key provided to retrieve is empty." ) ) if( !length( $key ) );
     }
     my $data = $self->read_mem || return;
-    ## As it is the case for the first time, before any write
+    # As it is the case for the first time, before any write
     $data = {} if( !ref( $data ) );
     return( $data ) if( !defined( $key ) );
     return( $data->{ $key } );
@@ -117,7 +121,6 @@ sub read_mem
     my $data;
     my $len = $shem->read( $data );
     return( $self->pass_error( $shem->error ) ) if( !defined( $len ) );
-    ## $self->message( 3, "Data read is: ", sub{ $self->dump( $data ) } );
     $data = {} unless( ref( $data ) eq 'HASH' );
     return( $data );
 }
@@ -140,9 +143,7 @@ sub set
     my $self = shift( @_ );
     my $data = $self->read_mem || return;
     my @callinfo = caller;
-    ## $self->message( 3, "Called from file $callinfo[1] at line $callinfo[2]" );
     my( $key, $value ) = @_;
-    ## $self->message( 3, "Set key '$key' with value '$value'" );
     return( $self->error( "Key provided to set value is empty." ) ) if( !length( $key ) );
     $data->{ $key } = $value;
     $self->write_mem( $data ) || return;
@@ -175,7 +176,6 @@ sub write_mem
     return( $self->error( "I was expecting an hash reference and got instead '$data'" ) ) if( ref( $data ) ne 'HASH' );
     if( !defined( $shem->lock( ( LOCK_EX | LOCK_NB ) ) ) )
     {
-        ## $self->message( 3, "Error setting a non-blocking lock on the semaphore" );
         return( $self->pass_error( $shem->error ) );
     }
     my $rc = $shem->write( $data );
@@ -234,7 +234,7 @@ Apache2::SSI::Notes - Apache2 Server Side Include Notes
 
 =head1 VERSION
 
-    v0.1.0
+    v0.1.1
 
 =head1 DESCRIPTION
 
@@ -392,4 +392,3 @@ You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.
 
 =cut
-

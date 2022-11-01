@@ -69,7 +69,7 @@
          "web" : "https://github.com/ology/Music-Cadence"
       }
    },
-   "version" : "0.1505",
+   "version" : "0.1506",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.032001"

@@ -2,7 +2,7 @@
 ## Stripe API - ~/lib/Net/API/Stripe/Checkout/Item.pm
 ## Version v0.200.0
 ## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2020/05/15
 ## 
@@ -10,18 +10,23 @@
 package Net::API::Stripe::Checkout::Item;
 BEGIN
 {
-	use strict;
-	use parent qw( Net::API::Stripe::Generic );
-	our( $VERSION ) = 'v0.200.0';
+    use strict;
+    use warnings;
+    use parent qw( Net::API::Stripe::List::Item );
+    use vars qw( $VERSION );
+    our( $VERSION ) = 'v0.200.0';
 };
 
-sub amount { return( shift->_set_get_number( 'amount', @_ ) ); }
+use strict;
+use warnings;
 
-sub currency { return( shift->_set_get_scalar( 'currency', @_ ) ); }
+# Method amount is inherited
+
+# Method currency is inherited
 
 sub custom { return( shift->_set_get_hash( 'custom', @_ ) ); }
 
-sub description { return( shift->_set_get_scalar( 'description', @_ ) ); }
+# Method description is inherited
 
 sub images { return( shift->_set_get_array( 'images', @_ ) ); }
 
@@ -29,11 +34,11 @@ sub name { return( shift->_set_get_scalar( 'name', @_ ) ); }
 
 sub plan { return( shift->_set_get_object( 'plan', 'Net::API::Stripe::Billing::Plan', @_ ) ); }
 
-sub quantity { return( shift->_set_get_number( 'quantity', @_ ) ); }
+# Method quantity is inherited
 
 sub sku { return( shift->_set_get_object( 'sku', 'Net::API::Stripe::Order::SKU', @_ ) ); }
 
-sub type { return( shift->_set_get_scalar( 'type', @_ ) ); }
+# Method type is inherited
 
 1;
 
@@ -68,32 +73,28 @@ The line items, plans, or SKUs purchased by the customer.
 
 This is part of the L<Net::API::Stripe::Checkout::Session> object an called from the method B<display_items>
 
+It inherits from L<Net::API::Stripe::List::Item>
+
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>( %ARG )
+=head2 new
 
 Creates a new L<Net::API::Stripe::Checkout::Item> object.
 It may also take an hash like arguments, that also are method of the same name.
 
-=back
-
 =head1 METHODS
 
-=over 4
-
-=item B<amount> integer
+=head2 amount integer
 
 Amount for the display item.
 
-=item B<currency> currency
+=head2 currency currency
 
 Three-letter ISO currency code, in lowercase. Must be a supported currency.
 
-=item B<custom> hash
+=head2 custom hash
 
-=over 8
+=over 4
 
 =item I<description> string
 
@@ -109,80 +110,78 @@ The name of the line item.
 
 =back
 
-=item B<description> string
+=head2 description string
 
 The description for the line item.  This is used in session checkout I<line_items>.
 
-=item B<images> string
+=head2 images string
 
 A list of images representing this line item.  This is used in session checkout I<line_items>.
 
-=item B<name> string
+=head2 name string
 
 The name for the line item.  This is used in session checkout I<line_items>.
 
-=item B<plan> hash, plan object
+=head2 plan hash, plan object
 
 This is a L<Net::API::Stripe::Billing::Plan> object.
 
-=item B<quantity> integer
+=head2 quantity integer
 
 Quantity of the display item being purchased.
 
-=item B<sku> hash, sku object
+=head2 sku hash, sku object
 
 This is a L<Net::API::Stripe::Order::SKU> object.
 
-=item B<type> string
+=head2 type string
 
 The type of display item. One of custom, plan or sku
 
-=back
-
 =head1 API SAMPLE
 
-	{
-	  "id": "ppage_fake123456789",
-	  "object": "checkout.session",
-	  "billing_address_collection": null,
-	  "cancel_url": "https://example.com/cancel",
-	  "client_reference_id": null,
-	  "customer": null,
-	  "customer_email": null,
-	  "display_items": [
-		{
-		  "amount": 1500,
-		  "currency": "usd",
-		  "custom": {
-			"description": "Comfortable cotton t-shirt",
-			"images": null,
-			"name": "T-shirt"
-		  },
-		  "quantity": 2,
-		  "type": "custom"
-		}
-	  ],
-	  "livemode": false,
-	  "locale": null,
-	  "mode": null,
-	  "payment_intent": "pi_fake123456789",
-	  "payment_method_types": [
-		"card"
-	  ],
-	  "setup_intent": null,
-	  "submit_type": null,
-	  "subscription": null,
-	  "success_url": "https://example.com/success",
-	  "line_items": [
-		{
-		  "name": "T-shirt",
-		  "description": "Comfortable cotton t-shirt",
-		  "amount": 1500,
-		  "currency": "jpy",
-		  "quantity": 2
-		}
-	  ]
-	}
+    {
+      "id": "ppage_fake123456789",
+      "object": "checkout.session",
+      "billing_address_collection": null,
+      "cancel_url": "https://example.com/cancel",
+      "client_reference_id": null,
+      "customer": null,
+      "customer_email": null,
+      "display_items": [
+        {
+          "amount": 1500,
+          "currency": "usd",
+          "custom": {
+            "description": "Comfortable cotton t-shirt",
+            "images": null,
+            "name": "T-shirt"
+          },
+          "quantity": 2,
+          "type": "custom"
+        }
+      ],
+      "livemode": false,
+      "locale": null,
+      "mode": null,
+      "payment_intent": "pi_fake123456789",
+      "payment_method_types": [
+        "card"
+      ],
+      "setup_intent": null,
+      "submit_type": null,
+      "subscription": null,
+      "success_url": "https://example.com/success",
+      "line_items": [
+        {
+          "name": "T-shirt",
+          "description": "Comfortable cotton t-shirt",
+          "amount": 1500,
+          "currency": "jpy",
+          "quantity": 2
+        }
+      ]
+    }
 
 =head1 HISTORY
 

@@ -3,15 +3,17 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Create network transition chord progressions
 
-our $VERSION = '0.0604';
+our $VERSION = '0.0605';
+
+use Moo;
+use strictures 2;
 
 use Carp qw(croak);
 use Data::Dumper::Compact qw(ddc);
-use Graph::Directed;
-use Music::Chord::Note;
+use Graph::Directed ();
+use Music::Chord::Note ();
 use Music::Scales qw(get_scale_notes);
-use Moo;
-use strictures 2;
+
 use namespace::clean;
 
 
@@ -332,7 +334,7 @@ Music::Chord::Progression - Create network transition chord progressions
 
 =head1 VERSION
 
-version 0.0604
+version 0.0605
 
 =head1 SYNOPSIS
 
@@ -461,7 +463,7 @@ Default: C<1>
 
 =head2 resolve
 
-Set the end the progression.
+Set the end of the progression.
 
 If this is given as C<1> the tonic chord ends the progression.  If
 given as C<0> a neighbor of the last chord is chosen.  If given as

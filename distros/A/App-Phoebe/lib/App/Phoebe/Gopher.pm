@@ -132,8 +132,8 @@ sub gopher_startup {
 	address => $address,
 	port => $port,
 	tls => $tls{$port},
-	tls_cert => $server->{cert_file},
-	tls_key  => $server->{key_file},
+	tls_cert => $server->{cert_file}->{"$gopher_host:$port"},
+	tls_key  => $server->{key_file}->{"$gopher_host:$port"},
       } => sub {
 	my ($loop, $stream) = @_;
 	my $buffer;

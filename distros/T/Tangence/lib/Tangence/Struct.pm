@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.57;
 
-package Tangence::Struct 0.29;
+package Tangence::Struct 0.30;
 class Tangence::Struct :isa(Tangence::Meta::Struct);
 
 use Carp;
@@ -93,7 +93,7 @@ sub for_perlname ( $class, $perlname )
    return $STRUCTS_BY_PERLNAME{$perlname} // croak "Unknown Tangence::Struct for '$perlname'";
 }
 
-has $perlname :writer(_set_perlname);
+field $perlname :writer(_set_perlname);
 
 method perlname
 {

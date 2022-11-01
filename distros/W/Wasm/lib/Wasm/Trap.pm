@@ -6,7 +6,7 @@ use Wasm::Wasmtime::Trap;
 use 5.008004;
 
 # ABSTRACT: Wasm trap class
-our $VERSION = '0.21'; # VERSION
+our $VERSION = '0.22'; # VERSION
 
 
 sub new
@@ -31,7 +31,7 @@ Wasm::Trap - Wasm trap class
 
 =head1 VERSION
 
-version 0.21
+version 0.22
 
 =head1 SYNOPSIS
 
@@ -57,7 +57,7 @@ relying on that is undefined behavior.  In order to catch a trap from
 WebAssembly, use this class name like so:
 
  use Ref::Util qw( is_blessed_ref );
-
+ 
  local $@ = '';
  eval {
    web_assembly_func();
@@ -76,7 +76,7 @@ WebAssembly, use this class name like so:
 To throw from Perl:
 
  use Wasm::Trap;
-
+ 
  sub perl_from_wasm
  {
    die Wasm::Trap->new("diagnostic\0");
@@ -119,7 +119,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Graham Ollis.
+This software is copyright (c) 2020-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

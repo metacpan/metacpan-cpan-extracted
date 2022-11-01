@@ -6,7 +6,7 @@ use Test::More;
 warn "\nmpfr version: ", MPFR_LIB_VERSION . " (", Math::MPFR::MPFR_VERSION_STRING .")\n";
 warn "min prec    : ", Math::MPFR::RMPFR_PREC_MIN(), "\n";
 
-cmp_ok($Math::FakeDD::VERSION, '==', 0.06, "Version number is correct");
+cmp_ok($Math::FakeDD::VERSION, '==', 0.07, "Version number is correct");
 
 eval { Math::FakeDD->new(1,2) };
 like($@, qr/Too many args given to new/, "method call: To many args");
@@ -19,8 +19,24 @@ my $obj = Math::FakeDD->new();
 cmp_ok($obj->{msd}, '==', 0, "msd == 0");
 cmp_ok($obj->{lsd}, '==', 0, "lsd == 0");
 
-cmp_ok(Math::MPFR::_itsa($obj->{msd}), '==', 2, "msd is IV");
-cmp_ok(Math::MPFR::_itsa($obj->{lsd}), '==', 2, "lsd is IV");
+cmp_ok(Math::MPFR::_itsa($obj->{msd}), '==', 3, "msd is NV");
+cmp_ok(Math::MPFR::_itsa($obj->{lsd}), '==', 3, "lsd is NV");
+
+$obj = Math::FakeDD->new(0);
+
+cmp_ok($obj->{msd}, '==', 0, "msd == 0");
+cmp_ok($obj->{lsd}, '==', 0, "lsd == 0");
+
+cmp_ok(Math::MPFR::_itsa($obj->{msd}), '==', 3, "msd is NV");
+cmp_ok(Math::MPFR::_itsa($obj->{lsd}), '==', 3, "lsd is NV");
+
+my $obj1 = Math::FakeDD->new(11234);
+
+cmp_ok($obj1->{msd}, '==', 11234, "msd == 11234");
+cmp_ok($obj1->{lsd}, '==', 0, "lsd == 0");
+
+cmp_ok(Math::MPFR::_itsa($obj1->{msd}), '==', 3, "msd is again NV");
+cmp_ok(Math::MPFR::_itsa($obj1->{lsd}), '==', 3, "lsd is again NV");
 
 my $obj2 = Math::FakeDD::new('1.3');
 

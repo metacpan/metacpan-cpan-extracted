@@ -1,0 +1,36 @@
+---
+abstract: 'a small gemini client'
+author:
+  - 'Jeremy Mates <jeremy.mates@gmail.com>'
+build_requires:
+  Test2::V0: '0.000060'
+  perl: v5.10.0
+configure_requires:
+  Module::Build: '0.4004'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Gemini
+provides:
+  Net::Gemini:
+    file: lib/Net/Gemini.pm
+    version: '0.03'
+  Net::Gemini::Server:
+    file: lib/Net/Gemini/Server.pm
+    version: '0.03'
+  Net::Gemini::URI:
+    file: lib/Net/Gemini/URI.pm
+    version: '0.03'
+requires:
+  Carp: '0'
+  Encode: '0'
+  IO::Socket::SSL: '1.985'
+  perl: v5.10.0
+resources:
+  license: http://opensource.org/licenses/BSD-3-Clause
+  repository: https://thrig.me/src/Net-Gemini.git
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

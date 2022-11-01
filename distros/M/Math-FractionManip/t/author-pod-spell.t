@@ -22,7 +22,6 @@ Atkinson
 Boggs
 FractionManip
 Fwiw
-Gene
 Kevin
 Math
 imho

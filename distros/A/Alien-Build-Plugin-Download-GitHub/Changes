@@ -1,5 +1,9 @@
 Revision history for Alien-Build-Plugin-Download-GitHub
 
+0.10      2022-10-31 06:43:24 -0600
+  - asset_format can be set to "none" to get no extractor added (gh#26, gh#27)
+  - Fixed bug where slurp had been used instead of slurp_raw (gh#25, gh#28)
+
 0.09      2022-09-23 13:31:18 -0600
   - Added options asset, asset_format and asset_name (gh#20, gh#23)
   - This plugin adds itself as a prereq when used by an alienfile

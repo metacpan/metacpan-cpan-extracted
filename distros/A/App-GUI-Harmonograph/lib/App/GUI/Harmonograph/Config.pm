@@ -13,6 +13,7 @@ my $default = {
     file_base_counter => 0,
     file_base_ending => 'png',
     image_size => 600,
+    precision => 4,
     open_dir => '~',
     save_dir => '~',
     write_dir => '~',

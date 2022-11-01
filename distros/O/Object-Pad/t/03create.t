@@ -64,46 +64,21 @@ class WithBuildargs {
 }
 
 {
-   my @called;
-   my $paramsref;
-
-   class WithAdjustParams {
-      ADJUST {
-         push @called, "ADJUST";
-      }
-
-      ADJUSTPARAMS {
-         my ( $href ) = @_;
-         push @called, "ADJUSTPARAMS";
-         $paramsref = $href;
-      }
-
-      ADJUST {
-         push @called, "ADJUST";
-      }
-   }
-
-   WithAdjustParams->new( key => "val" );
-   is_deeply( \@called, [qw( ADJUST ADJUSTPARAMS ADJUST )], 'ADJUST and ADJUSTPARAMS invoked together' );
-   is_deeply( $paramsref, { key => "val" }, 'ADJUSTPARAMS received HASHref' );
-}
-
-{
    my $paramvalue;
 
-   class StrictlyWithParams :strict(params) {
-      ADJUSTPARAMS {
+   class StrictParams :strict(params) {
+      ADJUST {
          my ($href) = @_;
          $paramvalue = delete $href->{param};
       }
    }
 
-   StrictlyWithParams->new( param => "thevalue" );
+   StrictParams->new( param => "thevalue" );
    is( $paramvalue, "thevalue", 'ADJUSTPARAMS captured the value' );
 
-   ok( !defined eval { StrictlyWithParams->new( unknown => "name" ) },
+   ok( !defined eval { StrictParams->new( unknown => "name" ) },
       ':strict(params) complains about unrecognised param' );
-   like( $@, qr/^Unrecognised parameters for StrictlyWithParams constructor: unknown at /,
+   like( $@, qr/^Unrecognised parameters for StrictParams constructor: 'unknown' at /,
       'message from unrecognised param to constructor' );
 }
 
@@ -112,8 +87,8 @@ class WithBuildargs {
    class NoParamsAtAll :strict(params) { }
 
    ok( !defined eval { NoParamsAtAll->new( unknown => 1 ) },
-      ':strict(params) complains even with no ADJUSTPARAMS block' );
-   like( $@, qr/^Unrecognised parameters for NoParamsAtAll constructor: unknown at /,
+      ':strict(params) complains even with no ADJUST block' );
+   like( $@, qr/^Unrecognised parameters for NoParamsAtAll constructor: 'unknown' at /,
       'message from unrecognised param to constructor' );
 }
 

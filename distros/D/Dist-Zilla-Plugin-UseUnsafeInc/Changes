@@ -1,4 +1,7 @@
 Revision history for Dist-Zilla-Plugin-UseUnsafeInc
 
+0.002     2022-10-23 17:58:58Z
+          - adjust artificial $] in tests so postderef still works (RT#144905)
+
 0.001     2017-05-13 12:10:24Z
           - Initial release.

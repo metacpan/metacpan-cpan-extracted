@@ -4,12 +4,12 @@
       "Toshio Ito <toshioito@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4205",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
-      "url" : "https://metacpan.org/pod/CPAN::Meta::Spec",
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
       "version" : 2
    },
    "name" : "Future-Q",
@@ -60,9 +60,11 @@
          "web" : "https://github.com/debug-ito/Future-Q/issues"
       },
       "repository" : {
+         "type" : "git",
          "url" : "git://github.com/debug-ito/Future-Q.git",
          "web" : "https://github.com/debug-ito/Future-Q"
       }
    },
-   "version" : "0.110"
+   "version" : "0.120",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

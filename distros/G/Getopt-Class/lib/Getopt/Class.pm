@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Getopt::Long with Class - ~/lib/Getopt/Class.pm
-## Version v0.102.7
+## Version v0.103.2
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/04/25
-## Modified 2022/06/19
+## Modified 2022/10/26
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -16,6 +16,7 @@ BEGIN
     use strict;
     use warnings;
     use parent qw( Module::Generic );
+    use vars qw( $VERSION );
     use DateTime;
     use DateTime::Format::Strptime;
 	use Devel::Confess;
@@ -25,8 +26,11 @@ BEGIN
     use Module::Generic::Scalar;
     use Nice::Try;
     use Scalar::Util;
-    our $VERSION = 'v0.102.7';
+    our $VERSION = 'v0.103.2';
 };
+
+use strict;
+use warnings;
 
 sub init
 {
@@ -44,20 +48,20 @@ sub init
     return( $self->error( "Dictionary provided is not a hash reference." ) ) if( !$self->_is_hash( $dict ) );
     $self->dictionary( $dict );
     
-    ## Set the aliases hash reference used to contain each of the option aliases,e ach pointing to the same dictionary definition
+    # Set the aliases hash reference used to contain each of the option aliases,e ach pointing to the same dictionary definition
     $self->{aliases} = {};
     
-    ## Tie'ing will make sure that values set for a key or its aliases are populated to other aliases
-    ## Getopt::Long already does it, but this takes care of synchronising values for all aliases AFTER Getopt::Long has processed the options
-    ## So that if the user change an option value using an alias:, e.g.:
-    ## last_name => { type => 'string', alias => [qw( surname )] }
-    ## last_name and surname would have the same value set thanks to Getopt::Long
-    ## --last-name = 'Einstein';
-    ## But if, after, the user does something like:
-    ## $opts->{surname} = 'Doe';
-    ## $opts->{last_name} would still be 'Einstein'
-    ## Getopt::Class::Alias ensures the values for aliases and original key are the same seamlessly
-    ## The way tie works means we must tie en empty hash, because we cannot tie an already populated hash sadly enough
+    # Tie'ing will make sure that values set for a key or its aliases are populated to other aliases
+    # Getopt::Long already does it, but this takes care of synchronising values for all aliases AFTER Getopt::Long has processed the options
+    # So that if the user change an option value using an alias:, e.g.:
+    # last_name => { type => 'string', alias => [qw( surname )] }
+    # last_name and surname would have the same value set thanks to Getopt::Long
+    # --last-name = 'Einstein';
+    # But if, after, the user does something like:
+    # $opts->{surname} = 'Doe';
+    # $opts->{last_name} would still be 'Einstein'
+    # Getopt::Class::Alias ensures the values for aliases and original key are the same seamlessly
+    # The way tie works means we must tie en empty hash, because we cannot tie an already populated hash sadly enough
     my %options = ();
     my $tie = tie( %options, 'Getopt::Class::Alias', 
     {
@@ -65,12 +69,11 @@ sub init
         aliases => $self->{aliases},
         debug => $self->{debug} 
     }) || return( $self->error( "Unable to get a Getopt::Class::Alias tie object: ", Getopt::Class::Alias->error ) );
-    $self->message( 3, "Tie object is: '$tie'." );
     
     $self->{configure_options} = [qw( no_ignore_case no_auto_abbrev auto_version auto_help )];
     my $opts = \%options;
     my $params = [];
-    ## Build the options parameters
+    # Build the options parameters
     foreach my $k ( sort( keys( %$dict ) ) )
     {
         my $k2_dash = $k;
@@ -81,28 +84,28 @@ sub init
         my $def = $dict->{ $k };
         
         my $opt_name = [ $k2_under ];
-        ## If the dictionary element is given with dash, e.g. some-thing, we replace it with some_thing, which is our standard
-        ## and we set some-thing as an alias
+        # If the dictionary element is given with dash, e.g. some-thing, we replace it with some_thing, which is our standard
+        # and we set some-thing as an alias
         if( CORE::index( $k, '-' ) != -1 && $k eq $k2_dash )
         {
             $dict->{ $k2_under } = CORE::delete( $dict->{ $k } );
             $k = $k2_under;
         }
-        ## Add the dash option as an alias if it is not the same as the underscore one, such as when this is just one word, e.g. version
+        # Add the dash option as an alias if it is not the same as the underscore one, such as when this is just one word, e.g. version
         CORE::push( @$opt_name, $k2_dash ) if( $k2_dash ne $k2_under );
         
         if( !ref( $def->{alias} ) && CORE::length( $def->{alias} ) )
         {
             $def->{alias} = [$def->{alias}];
         }
-        ## Add the given aliases, if any
+        # Add the given aliases, if any
         if( $self->_is_array( $def->{alias} ) )
         {
             push( @$opt_name, @{$def->{alias}} ) if( scalar( @{$def->{alias}} ) );
-            ## push( @$opt_name, $k2_under ) if( !scalar( grep( /^$k2_under$/, @{$def->{alias}} ) ) );
+            # push( @$opt_name, $k2_under ) if( !scalar( grep( /^$k2_under$/, @{$def->{alias}} ) ) );
         }
-        ## Now, also add the original key-something and key_something to the alias, so we can find them from one of the aliases
-        ## When we do exec, we'll be able to find all the aliases
+        # Now, also add the original key-something and key_something to the alias, so we can find them from one of the aliases
+        # When we do exec, we'll be able to find all the aliases
         $def->{alias} = [] if( !CORE::exists( $def->{alias} ) );
         CORE::push( @{$def->{alias}}, $k2_dash ) if( !scalar( grep( /^$k2_dash$/, @{$def->{alias}} ) ) );
         CORE::push( @{$def->{alias}}, $k2_under ) if( !scalar( grep( /^$k2_under$/, @{$def->{alias}} ) ) );
@@ -172,6 +175,7 @@ sub init
         {
             # If there is no max, it would be for example s{1,}
             # 2nd formatter is %s because it could be blank. %d would translate to 0 when blank.
+            no warnings 'uninitialized';
             $suff .= sprintf('{%d,%s}', @$def{ qw( min max ) } );
         }
         
@@ -194,12 +198,9 @@ sub check_class_data
     return( $self->error( "Class provided '$class' is not a string." ) ) if( ref( $class ) );
     my $p = {};
     $p = shift( @_ ) if( scalar( @_ ) && $self->_is_hash( $_[0] ) );
-    $self->message( 3, "Checking data for class '$class'." );
     my $dict = $self->class( $class ) || return;
-    $self->message( 3, "Dictionary data for class '$class' is: ", sub{ $self->dumper( $dict ) } );
     my $v = $self->get_class_values( $class ) || return;
-    $self->message( 3, "Collected data is: ", sub{ $self->dumper( $v ) } );
-    my $error = 
+    my $errors = 
     {
     missing => {},
     regexp => {},
@@ -223,12 +224,10 @@ sub check_class_data
         {
             if( $def->{type} eq 'string' && length( $v->{ $f } ) && $v->{ $f } !~ /$def->{re}/ )
             {
-                ## $self->message( 3, "Regular expression for $f is $def->{re}" );
                 $errors->{regexp}->{ $f } = "$f ($n) " . $def->{error};
             }
             elsif( $def->{type} eq 'array' )
             {
-                $self->message( 3, "Checking array data" );
                 my $sub_err = [];
                 foreach my $this ( @{$v->{ $f }} )
                 {
@@ -253,7 +252,6 @@ sub class
     my $self  = shift( @_ );
     my $class = shift( @_ ) || return( $self->error( "No class was provided to return its definition" ) );
     return( $self->error( "Class provided '$class' is not a string." ) ) if( ref( $class ) );
-    $self->message( 3, "Getting class dictionary for '$class'." );
     my $classes = $self->classes;
     return( $self->error( "I was expecting an hash reference for the classes dictionaries but got '$classes' instead." ) ) if( !ref( $classes ) );
     return( $self->error( "No class \"$class\" was found." ) ) if( scalar( keys( %$classes ) ) && !exists( $classes->{ $class } ) );
@@ -268,13 +266,12 @@ sub class
         $k2 =~ tr/-/_/;
         foreach my $class ( @$class_names )
         {
-            ## $self->message( 3, "Adding class $class" ) if( !exists( $classes->{ $class } ) );
-            ## Create the class if it doe snot exists yet
+            # Create the class if it doe snot exists yet
             $classes->{ $class } = {} if( !exists( $classes->{ $class } ) );
             my $this = $classes->{ $class };
-            ## Then add the property and it definition hash
+            # Then add the property and it definition hash
             $this->{ $k2 } = $def;
-            ## If there are any alias, we add them too
+            # If there are any alias, we add them too
             if( $def->{alias} && scalar( @{$def->{alias}} ) )
             {
                 foreach my $f ( @{$def->{alias}} )
@@ -297,7 +294,6 @@ sub class_properties
     my $self  = shift( @_ );
     my $class = shift( @_ );
     return( $self->error( "No class was provided to list its properties." ) ) if( !length( $class ) );
-    $self->message( "Showing all properties for class \"$class\"." );
     my $fields = [];
     my $ref = $self->class( $class );
     my $props = [ sort( keys( %$ref ) ) ];
@@ -308,11 +304,9 @@ sub configure
 {
     my $self = shift( @_ );
     return( $self ) if( $self->{configured} );
-    $self->message( 3, "Called to configure Getopt::Long" );
     my $conf = [];
     $conf = shift( @_ ) if( ref( $_[0] ) );
     $conf = $self->configure_options if( !scalar( @$conf ) );
-    $self->message( 3, "Using configuration parameters: '", join( "', '", @$conf ), "'." );
     my $getopt = $self->getopt || return( $self->error( "No Getopt::Long::Parser object found." ) );
     try
     {
@@ -363,9 +357,6 @@ sub exec
     };
     $self->configure_errors( $errors );
     
-    $self->message( 3, "Options data is: ", sub{ $self->dumper( $opts ) } );
-    $self->message( 3, "Params are: ", sub{ $self->dumper( $params ) } );
-    $self->message( 3, "Enabling aliasing." );
     $tie->enable(1);
     $getopt->getoptions( $opts, @$params ) || do
     {
@@ -406,18 +397,16 @@ sub exec
             $aliases->{ $a } = $def;
         }
     }
-    $self->message( 3, "Enabling aliasing." );
     $tie->enable(1);
     
     $self->postprocess;
     
-    $self->message( 3, "Options data are now: ", sub{ $self->dumper( $opts ) } );
-    ## return( $opts );
-    ## e return a Getopt::Class::Values object, so we can call the option values hash key as method:
-    ## $object->metadata / $object->metadata( $some_hash );
-    ## instead of:
-    ## $object->{metadata}
-    ## return( $opts );
+    # return( $opts );
+    # e return a Getopt::Class::Values object, so we can call the option values hash key as method:
+    # $object->metadata / $object->metadata( $some_hash );
+    # instead of:
+    # $object->{metadata}
+    # return( $opts );
     my $o = Getopt::Class::Values->new({
         data => $opts,
         dict => $dict,
@@ -440,7 +429,7 @@ sub get_class_values
     $v = shift( @_ ) if( scalar( @_ ) && $self->_is_hash( $_[0] ) );
     foreach my $f ( sort( keys( %$this_dict ) ) )
     {
-        my $ref = lc( Scalar::Util::reftype( $opts->{ $f } ) );
+        my $ref = lc( Scalar::Util::reftype( $opts->{ $f } ) // '' );
         if( $ref eq 'hash' )
         {
             $v->{ $f } = $opts->{ $f } if( scalar( keys( %{$opts->{ $f }} ) ) > 0 );
@@ -470,85 +459,17 @@ sub postprocess
     my $self = shift( @_ );
     my $dict = $self->dictionary;
     my $opts = $self->options;
-    $self->messagef( 3, "%d option keys found in dictionary.", scalar( keys( %$dict ) ) );
     foreach my $k ( sort( keys( %$dict ) ) )
     {
         my $def = $dict->{ $k };
-        $self->message( 3, "Checking if key \"$k\" exists in \$opts (", length( $opts->{ $k } ), ") or that default is set ($def->{default})." );
         next if( !length( $opts->{ $k } ) && !$def->{default} );
         return( $self->error( "Dictionary is malformed with entry $k value not being an hash reference." ) ) if( ref( $def ) ne 'HASH' );
         
         if( ( $def->{type} eq 'date' || $def->{type} eq 'datetime' ) && length( $opts->{ $k } ) )
         {
-            $self->message( 3, "Found a date/datetime field \"$k\"." );
-            if( $opts->{ $k } =~ /^\d+$/ )
-            {
-                try
-                {
-                    my $dt = DateTime->from_epoch( epoch => $opts->{ $k } );
-                    $opts->{ $k } = $dt;
-                }
-                catch( $e )
-                {
-                    return( $self->error( "An unexpected error occurred while converting date provided for \"$k\" (", $v->{ $k }, "): $e" ) );
-                }
-            }
-            elsif( $def->{type} eq 'date' && $opts->{ $k } =~ /^(?<year>\d{4})-(?<month>\d{1,2})-(?<day>\d{1,2})$/ )
-            {
-                try
-                {
-                    my $dt = DateTime->new(
-                        year => int( $+{year} ),
-                        month => int( $+{month} ),
-                        day => int( $+{day} ),
-                        hour => 0,
-                        minute => 0,
-                        second => 0,
-                        time_zone => 'local',
-                    );
-                    $opts->{ $k } = $dt;
-                }
-                catch( $e )
-                {
-                    return( $self->error( "An unexpected error occurred while converting date provided for \"$k\" (", $v->{ $k }, "): $e" ) );
-                }
-            }
-            elsif( $def->{type} eq 'datetime' && $opts->{ $k } =~ /^(?<year>\d{4})-(?<month>\d{1,2})-(?<day>\d{1,2})(?:T|\s)(?<hour>\d{1,2})\:(?<minute>\d{1,2})\:(?<second>\d{1,2})$/ )
-            {
-                try
-                {
-                    my $dt = DateTime->new(
-                        year => int( $+{year} ),
-                        month => int( $+{month} ),
-                        day => int( $+{day} ),
-                        hour => int( $+{hour} ),
-                        minute => int( $+{minute} ),
-                        second => int( $+{second} ),
-                        time_zone => 'local',
-                    );
-                    $opts->{ $k } = $dt;
-                }
-                catch( $e )
-                {
-                    return( $self->error( "An unexpected error occurred while converting date provided for \"$k\" (", $v->{ $k }, "): $e" ) );
-                }
-            }
-            elsif( $opts->{ $k } eq 'now' || $opts->{ $k } eq 'today' )
-            {
-                my $dt = DateTime->now( time_zone => 'local' );
-                $opts->{ $k } = $dt;
-            }
-            else
-            {
-                return( $self->error( "Unsuported value for date or datetime \"$k\": ", $v->{ $k }, ". Please use a unix timestamp (i.e. an integer) or an iso 8601 type like 2019-12-25 or 2019-12-25T07:30:10" ) );
-            }
-            ## Default format for stringification is the unix timestamp
-            my $fmt = DateTime::Format::Strptime->new(
-                pattern => '%s',
-                locale => 'en_GB',
-                time_zone => 'local',
-            );
-            $opts->{ $k }->set_formatter( $fmt );
+            my $dt = $self->_parse_timestamp( $opts->{ $k } );
+            return( $self->pass_error ) if( !defined( $dt ) );
+            $opts->{ $k } = $dt if( $dt );
         }
         elsif( $def->{type} eq 'array' )
         {
@@ -557,14 +478,11 @@ sub postprocess
         elsif( $def->{type} eq 'hash' ||
                $def->{type} eq 'string-hash' )
         {
-            $self->message( 3, "Setting hash as object for property '$k' and with data: ", sub{ $self->dumper( $opts->{ $k } ) } );
             $opts->{ $k } = $self->_set_get_hash_as_object( $k, $opts->{ $k } );
         }
         elsif( $def->{type} eq 'boolean' )
         {
-            $self->message( 3, "Processing boolean value for \"$k\" and current value '", $opts->{ $k }, "'." );
             $opts->{ $k } = ( $opts->{ $k } ? $self->true : $self->false );
-            $self->message( 3, "Setting boolean value for \"$k\" with value '", $opts->{ $k }, "'" );
         }
         elsif( $def->{type} eq 'string' )
         {
@@ -612,6 +530,9 @@ BEGIN
     use Devel::Confess;
 };
 
+use strict;
+use warnings;
+
 sub new
 {
     my $that = shift( @_ );
@@ -629,7 +550,7 @@ sub init
     $self->{data} = {};
     $self->{dict} = {};
     $self->{aliases} = {};
-    ## Can only set properties that exist
+    # Can only set properties that exist
     $self->{_init_strict} = 1;
     $self->SUPER::init( @_ ) || return( $self->pass_error( $self->error ) );
     return( $self->error( "No dictionary as provided." ) ) if( !$self->{dict} );
@@ -662,19 +583,24 @@ AUTOLOAD
     no overloading;
     my $self = shift( @_ );
     my $class = ref( $self ) || $self;
-    ## Options dictionary
+    # Options dictionary
     my $dict = $self->{dict};
-    ## Values provided on command line
+    # Values provided on command line
     my $data = $self->{data};
-    ## printf( STDERR "AUTOLOAD: \$data has %d items and property '$method' has value '%s'\n", scalar( keys( %$self ) ), $self->{ $method } );
-    ## return if( !CORE::exists( $data->{ $method } ) );
+    # printf( STDERR "AUTOLOAD: \$data has %d items and property '$method' has value '%s'\n", scalar( keys( %$self ) ), $self->{ $method } );
+    # return if( !CORE::exists( $data->{ $method } ) );
     return if( !CORE::exists( $self->{ $method } ) );
     my $f = $method;
-    ## Dictionary definition for this particular option field
+    # Dictionary definition for this particular option field
     my $def = $dict->{ $f };
-    if( $def->{type} eq 'boolean' || ( $self->_is_object( $self->{ $f } ) && $self->{ $f }->isa( 'Module::Generic::Boolean' ) ) )
+    if( !exists( $def->{type} ) || 
+        !defined( $def->{type} ) )
     {
-        $self->message( 3, "Returning boolean value for '$f': '", $data->{ $f }, "'." );
+        CORE::warn( "Property \"${f}\" has no defined type. Using scalar.\n" ) if( $self->{warnings} );
+        return( $self->_set_get_scalar( $f, @_ ) );
+    }
+    elsif( $def->{type} eq 'boolean' || ( $self->_is_object( $self->{ $f } ) && $self->{ $f }->isa( 'Module::Generic::Boolean' ) ) )
+    {
         return( $self->_set_get_boolean( $f, @_ ) );
     }
     elsif( $def->{type} eq 'string' ||
@@ -722,10 +648,10 @@ BEGIN
     use constant VALUES_CLASS => 'Getopt::Class::Value';
 };
 
-## tie( %self, 'Getopt::Class::Repository' );
-## Used by Getopt::Class::Values to ensure that whether the data are accessed as methods or as hash keys,
-## in either way it returns the option data
-## Actually option data are stored in the Getopt::Class::Values object data property
+# tie( %self, 'Getopt::Class::Repository' );
+# Used by Getopt::Class::Values to ensure that whether the data are accessed as methods or as hash keys,
+# in either way it returns the option data
+# Actually option data are stored in the Getopt::Class::Values object data property
 sub TIEHASH
 {
     my $self  = shift( @_ );
@@ -777,15 +703,15 @@ sub FETCH
     my $data = $self->{data};
     my $key  = shift( @_ );
     my $caller = caller;
-    ## print( STDERR "FETCH($caller)[enable=$self->{enable}] <- '$key''\n" );
+    # print( STDERR "FETCH($caller)[enable=$self->{enable}] <- '$key''\n" );
     if( caller eq VALUES_CLASS || !$self->{enable} )
     {
-        ## print( STDERR "FETCH($caller)[enable=$self->{enable}] <- '$key' <- '$self->{$key}'\n" );
+        # print( STDERR "FETCH($caller)[enable=$self->{enable}] <- '$key' <- '$self->{$key}'\n" );
         return( $self->{ $key } )
     }
     else
     {
-        ## print( STDERR "FETCH($caller)[enable=$self->{enable}] <- '$key' <- '$self->{$key}'\n" );
+        # print( STDERR "FETCH($caller)[enable=$self->{enable}] <- '$key' <- '$self->{$key}'\n" );
         return( $data->{ $key } );
     }
 }
@@ -834,15 +760,15 @@ sub STORE
     my $self  = shift( @_ );
     my $data = $self->{data};
     my( $key, $val ) = @_;
-    ## print( STDERR "STORE($caller)[enable=$self->{enable}] -> '$key'\n" );
+    # print( STDERR "STORE($caller)[enable=$self->{enable}] -> '$key'\n" );
     if( caller eq VALUES_CLASS || !$self->{enable} )
     {
-        ## print( STDERR "STORE($caller)[enable=$self->{enable}] -> '$key' -> '$val'\n" );
+        # print( STDERR "STORE($caller)[enable=$self->{enable}] -> '$key' -> '$val'\n" );
         $self->{ $key } = $val;
     }
     else
     {
-        ## print( STDERR "STORE($caller)[enable=$self->{enable}] -> '$key' -> '$val'\n" );
+        # print( STDERR "STORE($caller)[enable=$self->{enable}] -> '$key' -> '$val'\n" );
         $data->{ $key } = $val;
     }
 }
@@ -857,8 +783,8 @@ sub enable
     return( $self->{enable} );
 }
 
-## This is an alternative to perl feature of refealiasing
-## https://metacpan.org/pod/perlref#Assigning-to-References
+# This is an alternative to perl feature of refealiasing
+# https://metacpan.org/pod/perlref#Assigning-to-References
 package Getopt::Class::Alias;
 BEGIN
 {
@@ -869,35 +795,35 @@ BEGIN
     use Devel::Confess;
 };
 
-## tie( %$opts, 'Getopt::Class::Alias', $dictionary );
+# tie( %$opts, 'Getopt::Class::Alias', $dictionary );
 sub TIEHASH
 {
-    ## $this is actually the HASH tied
+    # $this is actually the HASH tied
     my $this  = shift( @_ );
     my $class = ref( $this ) || $this;
-    ## Valid options are:
-    ## dict: options dictionary
-    ## debug
+    # Valid options are:
+    # dict: options dictionary
+    # debug
     my $opts  = {};
     $opts = shift( @_ ) if( @_ );
-    ## print( STDERR __PACKAGE__ . "::TIEHASH() called with following arguments: '", join( ', ', @_ ), "'.\n" );
+    # print( STDERR __PACKAGE__ . "::TIEHASH() called with following arguments: '", join( ', ', @_ ), "'.\n" );
     my $call_offset = 0;
     while( my @call_data = caller( $call_offset ) )
     {
-        ## printf( STDERR "[$call_offset] In file $call_data[1] at line $call_data[2] from subroutine %s has bitmask $call_data[9]\n", (caller($call_offset+1))[3] );
+        # printf( STDERR "[$call_offset] In file $call_data[1] at line $call_data[2] from subroutine %s has bitmask $call_data[9]\n", (caller($call_offset+1))[3] );
         unless( $call_offset > 0 && $call_data[0] ne $class && (caller($call_offset-1))[0] eq $class )
         {
-            ## print( STDERR "Skipping package $call_data[0]\n" );
+            # print( STDERR "Skipping package $call_data[0]\n" );
             $call_offset++;
             next;
         }
         last if( $call_data[9] || ( $call_offset > 0 && (caller($call_offset-1))[0] ne $class ) );
         $call_offset++;
     }
-    ## print( STDERR "Using offset $call_offset with bitmask ", ( caller( $call_offset ) )[9], "\n" );
+    # print( STDERR "Using offset $call_offset with bitmask ", ( caller( $call_offset ) )[9], "\n" );
     my $bitmask = ( caller( $call_offset - 1 ) )[9];
     my $offset = $warnings::Offsets{uninitialized};
-    ## print( STDERR "Caller (2)'s bitmask is '$bitmask', warnings offset is '$offset' and vector is '", vec( $bitmask, $offset, 1 ), "'.\n" );
+    # print( STDERR "Caller (2)'s bitmask is '$bitmask', warnings offset is '$offset' and vector is '", vec( $bitmask, $offset, 1 ), "'.\n" );
     my $should_display_warning = vec( $bitmask, $offset, 1 );
     
     my $dict = $opts->{dict} || return( __PACKAGE__->error( "No dictionary was provided to Getopt::Class:Alias" ) );
@@ -933,7 +859,7 @@ sub TIEHASH
     aliases => $aliases,
     warnings => $should_display_warning,
     debug => ( $opts->{debug} || 0 ),
-    ## _data_repo => 'data',
+    # _data_repo => 'data',
     colour_open => '<',
     colour_close => '>',
     };
@@ -944,10 +870,9 @@ sub FETCH
 {
     my $self = shift( @_ );
     my $data = $self->{data};
-    ## my $dict = $self->{dict};
+    # my $dict = $self->{dict};
     my $key  = shift( @_ );
-    ## my $def = $dict->{ $key };
-    # $self->message( 3, "<<< Getting key \"$key\" values \"", $data->{ $key }, "\" (", ref( $data->{ $key } ), ")." );
+    # my $def = $dict->{ $key };
     return( $data->{ $key } );
 }
 
@@ -956,28 +881,25 @@ sub STORE
     my $self  = shift( @_ );
     my $class = ref( $self );
     my $data = $self->{data};
-    ## Aliases contains both the original dictionary key and all its aliases
+    # Aliases contains both the original dictionary key and all its aliases
     my $aliases = $self->{aliases};
     my( $pack, $file, $line ) = caller;
-    $self->message( 3, "Called with enabled='$self->{enable}' and with following parameters: '", join( "', '", @_ ), "'." );
     my( $key, $val ) = @_;
-    ## $self->message_colour( 3, "Called from line $line in file \"$file\" for property \"<green>$key</>\" with reference (<black on white>", ref( $val ), "</>) and value \"<red>$val</>\">" );
+    # $self->message_colour( 3, "Called from line $line in file \"$file\" for property \"<green>$key</>\" with reference (<black on white>", ref( $val ), "</>) and value \"<red>$val</>\">" );
     my $dict = $self->{dict};
     my $enabled = $self->{enable};
-    local $fallback = sub
+    my $fallback = sub
     {
         my( $k, $v ) = @_;
         $data->{ $k } = $v;
     };
     if( $enabled && CORE::exists( $aliases->{ $key } ) )
     {
-        $self->message( 3, "Aliasing is enabled. Value provided has reference (", ref( $val ), ")." );
         my $def = $aliases->{ $key } || do
         {
             CORE::warn( "No dictionary definition found for \"$key\".\n" ) if( $self->{warnings} );
             return( $fallback->( $key, $val ) );
         };
-        $self->messagef( 3, "Found dictionary definition '$def' for %s with %d properties.", $key, scalar( keys( %$def ) ) );
         if( !$self->_is_array( $def->{alias} ) )
         {
             CORE::warn( "I was expecting an array reference for this alias, but instead got '$def->{alias}'.\n" ) if( $self->{warnings} );
@@ -1000,7 +922,7 @@ sub STORE
         foreach my $a ( @$alias )
         {
             next if( $a eq $key );
-            ## We do not set the value, if for some reason, the user would have removed this key
+            # We do not set the value, if for some reason, the user would have removed this key
             $self->message_colour( 3, "Setting alias \"<green>${a}</>\" to value \"<val black on white>${val}</>\" (ref=", ref( $val ), ")." );
             # $data->{ $a } = $val if( CORE::exists( $data->{ $a } ) );
             $data->{ $a } = $val;
@@ -1008,7 +930,6 @@ sub STORE
     }
     else
     {
-        $self->message( 3, "$pack at line $line asking to set key \"$key\" it to \"$val\"." );
         $data->{ $key } = $val;
     }
 }
@@ -1091,7 +1012,7 @@ Getopt::Class - Extended dictionary version of Getopt::Long
 
 =head1 VERSION
 
-    v0.102.7
+    v0.103.2
 
 =head1 DESCRIPTION
 

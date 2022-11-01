@@ -1,0 +1,17 @@
+Changes
+lib/App/remotediff.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+script/remotediff
+t/00-load.t
+t/data/file1
+t/data/file2
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/remotediff.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

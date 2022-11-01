@@ -1,5 +1,8 @@
 Revision history for Perl extension Form::Tiny.
 
+2.15 Sun Oct 30 2022
+	- Add new method 'value' to forms
+
 2.14 Sun Sep 18 2022
 	- Form::Tiny import functionality is now implemented as core plugins
 	- added setters to many attributes in Form::Tiny::FieldDefinition

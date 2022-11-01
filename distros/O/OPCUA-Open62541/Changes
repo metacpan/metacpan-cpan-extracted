@@ -1,5 +1,24 @@
 Revision history for Perl extension OPCUA::Open62541.
 
+1.05 2022-10-27
+    - Create correct SIGNATURE file.
+
+1.04 2022-10-27
+    - github CI is building open62541 version 1.0.6, 1.1.6, 1.3.3.
+      Test with open62541 master does not terminate, disable for now.
+    - Include patch for the open62541 1.0.6 sources that allows to
+      generate the Open62541-packed XS file.
+    - Major rewrite of XS pack and unpack functions.  The nested
+      Perl hashes and UA objects are linked together before they
+      are filled with values.  If the latter croaks in the middle
+      of packing or unpacking, the partially created object has
+      references to the part that succeeded.  So destruction of the
+      object can free the sub structures.  This avoids memory leaks
+      in error cases.
+    - Set build info leaked the build info that was set before.
+    - Fix memory leak in variant get scalar and get array error
+      case.
+
 1.03 2022-07-19
     - github CI is building open62541 version 1.0.6, 1.1.6, 1.3.2,
       and master.  1.2 tests fail and there is no goal to fix them.

@@ -1,3 +1,26 @@
+0.037   2022-10-15  Released-By: PERLANCAR; Urgency: medium
+
+        - Tweaks.
+
+
+0.036   2022-10-15  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] In generated option's POD, use '(No description)' as
+          description when there is no description, to avoid ambiguity.
+
+
+0.035   2022-10-12  Released-By: PERLANCAR; Urgency: medium
+
+        - Show other usage lines (from common_opts that are to be used on
+          their own).
+
+
+0.034   2022-08-12  Released-By: PERLANCAR; Urgency: medium
+
+        - Tweak usage in Synopsis: remove shell prompt. Shell prompt is still
+          displayed in the Examples section.
+
+
 0.033   2022-07-29  Released-By: PERLANCAR; Urgency: medium
 
         - Render x.doc.faq.

@@ -63,7 +63,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '0.1.1';
+our $VERSION = '0.1.2';
 
 
 sub fileno :prototype($) {

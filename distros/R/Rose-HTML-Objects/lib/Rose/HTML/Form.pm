@@ -15,7 +15,7 @@ use Rose::HTML::Object::Errors qw(:form);
 our @ISA = qw(Rose::HTML::Object::WithWrapAroundChildren
               Rose::HTML::Form::Field Rose::HTML::Form::Field::Collection);
 
-our $VERSION = '0.616';
+our $VERSION = '0.624';
 
 # Avoid problems caused by circular dependencies by loading these
 # modules at runtime. XXX: This whole hierarchy needs an overhaul.
@@ -306,6 +306,8 @@ sub params_from_cgi
   }
 
   my %params;
+
+  local $CGI::LIST_CONTEXT_WARN = 0;
 
   foreach my $param ($cgi->param)
   {

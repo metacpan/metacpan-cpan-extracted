@@ -23,6 +23,8 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 # Port
 my $port = TestUtil::Socket::search_available_port;
 
+warn "[Test Output]$port";
+
 # poll
 {
   my $process_id = fork;

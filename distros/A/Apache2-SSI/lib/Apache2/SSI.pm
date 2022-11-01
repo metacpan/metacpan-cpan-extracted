@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Apache2 Server Side Include Parser - ~/lib/Apache2/SSI.pm
-## Version v0.2.5
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.2.7
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/12/17
-## Modified 2022/10/21
+## Modified 2022/10/23
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -17,6 +17,11 @@ BEGIN
     use warnings;
     use warnings::register;
     use parent qw( Module::Generic );
+    use vars qw(
+        $MOD_PERL $MOD_PERL_VERSION $SERVER_VERSION $VERSION
+        $ATTRIBUTES_RE $EXPR_RE $SUPPORTED_FUNCTIONS $FUNCTION_PARAMETERS_RE $IS_UTF8
+        $HAS_SSI_RE
+    );
     our( $MOD_PERL, $MOD_PERL_VERSION, $SERVER_VERSION );
     if( exists( $ENV{MOD_PERL} )
         &&
@@ -24,14 +29,14 @@ BEGIN
     {
         $MOD_PERL_VERSION = $1;
         select( ( select( STDOUT ), $| = 1 )[ 0 ] );
-        ## For exec cmd to check the user has permission to execute commands
+        # For exec cmd to check the user has permission to execute commands
         require Apache2::Access;
         require Apache2::Const;
         Apache2::Const->import( compile => qw( :common :http OK DECLINED CONN_KEEPALIVE ) );
         require Apache2::Filter;
         require Apache2::Connection;
         require Apache2::RequestRec;
-        ## For exec commands
+        # For exec commands
         require Apache2::SubProcess;
         require Apache2::SubRequest;
         require Apache2::RequestIO;
@@ -54,36 +59,26 @@ BEGIN
     use Apache2::SSI::Notes;
     use Apache2::SSI::URI;
     use Config;
-    use Cwd ();
-    use DateTime;
-    use DateTime::Format::Strptime;
-    # XXX Remove after debugging
-    # use Devel::Confess;
-    use Digest::MD5 ();
-    use Digest::SHA ();
     use Encode ();
-    use File::Which ();
     use HTML::Entities ();
     use IO::Select;
-    use MIME::Base64 ();
-    use Net::Subnet ();
     use Nice::Try;
     use Regexp::Common qw( net Apache2 );
     use Scalar::Util ();
     use URI;
-    ## Will use XS version automatically
-    use URL::Encode ();
-    use URI::Escape::XS ();
     use version;
-    our $VERSION = 'v0.2.5';
+    our $VERSION = 'v0.2.7';
     use constant PERLIO_IS_ENABLED => $Config{useperlio};
-    ## As of Apache 2.4.41 and mod perl 2.0.11 Apache2::SubProcess::spawn_proc_prog() is not working
+    # As of Apache 2.4.41 and mod perl 2.0.11 Apache2::SubProcess::spawn_proc_prog() is not working
     use constant MOD_PERL_SPAWN_PROC_PROG_WORKING => 0;
     our $HAS_SSI_RE = qr{<!--#(?:comment|config|echo|elif|else|endif|exec|flastmod|fsize|if|include|perl|printenv|set).*?-->}is;
 };
 
+use strict;
+use warnings;
+
 {
-    ## Compile it beforehand and keep it there
+    # Compile it beforehand and keep it there
     our $ATTRIBUTES_RE = qr/
         (
             (?<tag_attr>
@@ -93,8 +88,8 @@ BEGIN
                     [[:blank:]\h]*
                     =
                     [[:blank:]\h]*
-                    ## (?<!\\)(?<attr_val>[^\"\'[:blank:]\h]+)
-                    ## (?:(?<!\")|(?<!\'))(?<attr_val>[^[:blank:]\h]+)
+                    # (?<!\\)(?<attr_val>[^\"\'[:blank:]\h]+)
+                    # (?:(?<!\")|(?<!\'))(?<attr_val>[^[:blank:]\h]+)
                     (?!["'])(?<attr_val>[^[:blank:]\h]+)
                     [[:blank:]\h]*
                 )
@@ -111,7 +106,7 @@ BEGIN
                         |
                         (?<attr_val>(?>\\'|[^'])*+)
                     )
-                    ## (?>\\["']|[^"'])*+
+                    # (?>\\["']|[^"'])*+
                     \g{quote}
                     [[:blank:]\h]*
                 )
@@ -194,7 +189,7 @@ BEGIN
     /x;
 }
 
-## PerlResponseHandler
+# PerlResponseHandler
 sub handler : method
 {
     if( Scalar::Util::blessed( $_[1] ) && $_[1]->isa( 'Apache2::Filter' ) )
@@ -229,7 +224,6 @@ sub ap2perl_expr
     my $stype = '';
     $stype = $ref->{subtype} if( defined( $ref->{subtype} ) );
     my $elems = $ref->{elements};
-    $self->message( 3, "Processing expression breakdown for type '$type' with subtype '$stype', raw data '$ref->{raw}' and hash: ", sub{ $self->dump( $ref ) });
 
     my $prev_regexp_capture = $self->{_regexp_capture};
     my $r = $self->apache_request;
@@ -245,7 +239,7 @@ sub ap2perl_expr
     '>'     => 'gt',
     '>='    => 'ge',
     };
-    ## In perl, this is inverted, operators used for integers are used for strings and vice versa
+    # In perl, this is inverted, operators used for integers are used for strings and vice versa
     my $map_integer =
     {
     'eq'    => '==',
@@ -256,29 +250,28 @@ sub ap2perl_expr
     'ge'    => '>=',
     };
     
-    ## String and integer comparison are dealt with separately below
+    # String and integer comparison are dealt with separately below
     if( $type eq 'comp' )
     {
         my $op = '';
         $op = $ref->{op} if( defined( $ref->{op} ) );
-        $self->message( 3, "Processing type '$type' with operator '$op' and raw data '$ref->{raw}'." );
-        ## ==, =, !=, <, <=, >, >=, -ipmatch, -strmatch, -strcmatch, -fnmatch
+        # ==, =, !=, <, <=, >, >=, -ipmatch, -strmatch, -strcmatch, -fnmatch
         if( $stype eq 'binary' )
         {
             my $this1 = $self->ap2perl_expr( $ref->{worda_def}->[0], [] );
             my $this2 = $self->ap2perl_expr( $ref->{wordb_def}->[0], [] );
             push( @$buf, '!' ) if( $ref->{is_negative} );
-            ## "IP address matches address/netmask"
+            # "IP address matches address/netmask"
             if( $op eq 'ipmatch' )
             {
                 push( @$buf, $self->_ipmatch( $this2->[0], $this1->[0] ) );
             }
-            ## "left string matches pattern given by right string (containing wildcards *, ?, [])"
+            # "left string matches pattern given by right string (containing wildcards *, ?, [])"
             elsif( $op eq 'strmatch' || $op eq 'fnmatch' )
             {
                 push( @$buf, @$this1, qq{=~ /$this2->[0]/} );
             }
-            ## "same as -strmatch, but case insensitive"
+            # "same as -strmatch, but case insensitive"
             elsif( $op eq 'strcmatch' )
             {
                 push( @$buf, @$this1, qq{=~ /$this2->[0]/i} );
@@ -288,7 +281,7 @@ sub ap2perl_expr
                 push( @$buf, @$this1, $map_binary->{ $op }, @$this2 );
             }
         }
-        ## 192.168.1.10 in split( /\,/, $ip_list )
+        # 192.168.1.10 in split( /\,/, $ip_list )
         elsif( $stype eq 'function' )
         {
             my $this1 = $self->ap2perl_expr( $ref->{word_def}->[0], [] );
@@ -297,7 +290,7 @@ sub ap2perl_expr
             my $argv = $self->parse_expr_args( $func->{args_def} );
             push( @$buf, sprintf( "scalar( grep( %s eq \$_, ${func_name}\(${argv}\) ) )", $this1->[0] ) ); 
         }
-        ## e.g.: %{SOME_VALUE} in {"John", "Peter", "Paul"}
+        # e.g.: %{SOME_VALUE} in {"John", "Peter", "Paul"}
         elsif( $stype eq 'list' )
         {
             my $this1 = $self->ap2perl_expr( $ref->{word_def}->[0], [] );
@@ -306,7 +299,6 @@ sub ap2perl_expr
         }
         elsif( $stype eq 'regexp' )
         {
-            $self->message( 3, "Got here in regexp with operator '$op'." );
             my $this1 = $self->ap2perl_expr( $ref->{word_def}->[0], [] );
             my $this2 = $self->ap2perl_expr( $ref->{regexp_def}->[0], [] );
             my $map = 
@@ -322,21 +314,16 @@ sub ap2perl_expr
         elsif( $stype eq 'unary' )
         {
             my $this = $self->ap2perl_expr( $ref->{word_def}->[0], [] );
-            $self->message( 3, "\$ref returned contains: ", sub{ $self->dump( $ref ) });
             my $word = join( '', @$this );
-            ## check if the uri is accessible to all
+            # check if the uri is accessible to all
             if( $op eq 'A' || $op eq 'U' )
             {
                 my $url = $word;
-                ## Because we cannot do variable length lookbehind
-                $self->message( 3, "Checking accessibility of uri '$url'." );
+                # Because we cannot do variable length lookbehind
                 my $res;
                 my $req = $self->lookup_uri( $url );
-                $self->message( 3, "\$req is not defined: ", $self->error ) if( !defined( $req ) );
-                ## A lookup will give us a code 200, so we need to run it to check if file exists
-        #             $self->message( 3, "Returned code is '$rc', \$req->code is ", $req->code, "' and file name '", $req->filename, "'. Is it ok ? (", Apache2::Const::HTTP_OK, ") => ", ( ( $rc == Apache2::Const::HTTP_OK || $rc == Apache2::Const::OK ) ? 'yes' : 'no' ), "." );
+                # A lookup will give us a code 200, so we need to run it to check if file exists
                 my $file = $req->filename;
-                $self->message( 3, "Checking looked up file name '$file'." );
                 if( $req->code != 200 )
                 {
                     $res = 0;
@@ -351,12 +338,12 @@ sub ap2perl_expr
                 }
                 push( @$buf, $res );
             }
-            ## Those are the same as in perl so we pass through
+            # Those are the same as in perl so we pass through
             elsif( $op eq 'd' || $op eq 'e' || $op eq 'f' || $op eq 's' )
             {
+                my $req = $self->lookup_file( $word );
                 push( @$buf, "-${op} ${word}" );
                 my $file = $req->filename;
-                $self->message( 3, "Checking looked up file name '$file'." );
                 my $res = 1;
                 if( $req->code != 200 )
                 {
@@ -370,39 +357,35 @@ sub ap2perl_expr
             }
             elsif( $op eq 'F' )
             {
-                $self->message( 3, "Checking accessibility of file '$word'." );
                 my $req = $self->lookup_file( $word );
             }
             elsif( $op eq 'n' || $op eq 'z' )
             {
-                ## Because we cannot do variable length lookbehind
+                # Because we cannot do variable length lookbehind
                 push( @$buf, ( $op eq 'z' ? '!' : '' ) . "length( ${word} )" );
             }
-            ## <!--#if expr='-R "134.28.200"' -->
+            # <!--#if expr='-R "134.28.200"' -->
             elsif( $op eq 'R' )
             {
                 my $ip = $self->remote_ip;
                 my $subnet = $word;
-                ## We need to be careful because the subnet provided may ver well be 
-                ## a function or something else, and we would not want to surround 
-                ## it with double quotes.
+                # We need to be careful because the subnet provided may ver well be 
+                # a function or something else, and we would not want to surround 
+                # it with double quotes.
                 if( $self->_is_ip( $subnet ) )
                 {
                     $subnet = qq{"$subnet"};
                 }
 
-                $self->message( 3, "Checking ip '$ip' against subnet '$subnet'." );
                 push( @$buf, qq{\$self->_ipmatch( $subnet, "$ip" )} );
             }
             elsif( $op eq 'T' )
             {
-                $self->message( 3, "Checking if word '$word' is true." );
-                ## Because we cannot do variable length lookbehind
+                # Because we cannot do variable length lookbehind
                 my $val = length( $word )
                     ? $word
                     : '';
                 $val = $self->parse_eval_expr( $val ) if( length( $val ) );
-                $self->message( 3, "word is now, after being eval'ed: '$val'." );
                 $val = lc( $val );
                 my $res;
                 if( $val eq  '' || $val eq '0' || $val eq 'off' || $val eq 'false' || $val eq 'no' )
@@ -460,20 +443,19 @@ sub ap2perl_expr
     {
         my $func = $ref->{name};
         warn( "\$func is not defined! Hash refernece \$ref contains: ", $self->dump( $ref ), "\n" ) if( !defined( $func ) );
-        ## parse_expr_args returns a string of comma separated arguments
+        # parse_expr_args returns a string of comma separated arguments
         my $argv = $self->parse_expr_args( $ref->{args_def} );
-        ## https://httpd.apache.org/docs/current/expr.html
-        ## Functions
-        ## Example:
-        ## base64('Tous les êtres humains naissent libres (et égaux) en dignité et en droits.')
-        ## base64("Tous les êtres humains naissent libres et égaux en dignité et en droits.")
-        ## base64( $QUERY_STRING )
-        ## %{base64:'Tous les êtres humains naissent libres et égaux en dignité et en droits.'}
-        ## %{base64:"Tous les êtres humains naissent libres (et égaux) en dignité et en droits."}
-        ## Is this a standard Apache2 function ?
+        # https://httpd.apache.org/docs/current/expr.html
+        # Functions
+        # Example:
+        # base64('Tous les êtres humains naissent libres (et égaux) en dignité et en droits.')
+        # base64("Tous les êtres humains naissent libres et égaux en dignité et en droits.")
+        # base64( $QUERY_STRING )
+        # %{base64:'Tous les êtres humains naissent libres et égaux en dignité et en droits.'}
+        # %{base64:"Tous les êtres humains naissent libres (et égaux) en dignité et en droits."}
+        # Is this a standard Apache2 function ?
         if( $func =~ /^$SUPPORTED_FUNCTIONS$/i )
         {
-            $self->message( 3, "Calling function 'parse_func_${func}' with arguments '$argv'." );
             push( @$buf, "\$self->parse_func_${func}( ${argv} )" );
         }
         else
@@ -518,7 +500,6 @@ sub ap2perl_expr
         my $argv = $self->parse_expr_args( $args );
         if( $func =~ /^$SUPPORTED_FUNCTIONS$/i )
         {
-            $self->message( 3, "Calling function 'parse_func_${func}' with arguments '$argv'." );
             push( @$buf, "\$self->parse_func_${func}( ${argv} )" );
         }
         else
@@ -528,12 +509,12 @@ sub ap2perl_expr
     }
     elsif( $type eq 'regany' )
     {
-        ## Apache2 regular expressions work asis in perl, because they are PCRE
+        # Apache2 regular expressions work asis in perl, because they are PCRE
         push( @$buf, $ref->{raw} );
     }
     elsif( $type eq 'regex' )
     {
-        ## Apache2 regular expressions work asis in perl, because they are PCRE
+        # Apache2 regular expressions work asis in perl, because they are PCRE
         push( @$buf, $ref->{raw} );
     }
     elsif( $type eq 'regsub' )
@@ -556,19 +537,16 @@ sub ap2perl_expr
     }
     elsif( $type eq 'string' && $opts->{skip} ne 'string' )
     {
-        ## Search string for embedded variables
+        # Search string for embedded variables
         my $this = $ref->{raw};
-        ## my $reType = $self->legacy ? 'Legacy' : $self->trunk ? 'Trunk' : '';
+        # my $reType = $self->legacy ? 'Legacy' : $self->trunk ? 'Trunk' : '';
         my $reType = $self->trunk ? 'Trunk' : 'Legacy';
-        # $self->message( 3, qq[Using regex of type '$reType' for embedded variable finding: $RE{Apache2}{"${reType}Variable"}] );
-        $self->message( 3, qq[Using regex of type '$reType' for embedded variable] );
         $this =~ s
         {
             $RE{Apache2}{"${reType}Variable"}
         }
         {
             my $var = $+{variable};
-            $self->message( 3, "Parsing variable $+{variable} embedded into string." );
             my $res = $self->parse_expr( $var, { embedded => 1 } );
             $res //= '';
             $res;
@@ -609,7 +587,6 @@ sub ap2perl_expr
         my $var_name = $ref->{name};
         if( $stype eq 'function' )
         {
-            $self->message( 3, "Got here for function name '$ref->{name}'." );
             # push( @$buf, $ref->{name} . '(' . $self->parse_expr_args( $ref->{args_def} ) . ')' );
             $ref->{type} = 'function';
             my $this = $self->ap2perl_expr( $ref, [] );
@@ -617,25 +594,25 @@ sub ap2perl_expr
         }
         elsif( $stype eq 'rebackref' )
         {
-            $self->message( 3, "Got here for back reference value '$ref->{value}'." );
             my $val = $prev_regexp_capture->[ int( $ref->{value} ) - 1 ];
-            $self->message( 3, "Found regex back reference value '$val'." );
             push( @$buf, $self->_is_number( $val ) ? $val : "q{" . $val . "}" );
             # push( @$buf, $val );
         }
         elsif( $stype eq 'variable' )
         {
-            $self->message( 3, "\${}: Is there environment variable '$var_name'? '", $env->{ $var_name }, "'." );
             my $try = '';
             if( !length( $try ) && length( $env->{ $var_name } ) )
             {
                 $try = $env->{ $var_name };
             }
-            if( !length( $try ) && defined( ${ "main\::${var_name}" } ) )
+            # if( !length( $try ) && defined( ${ "main\::${var_name}" } ) )
+            no strict 'refs';
+            if( !length( $try ) && defined( ${ "main\::" }{ ${var_name} } ) )
             {
+                no strict 'refs';
                 $try = ${ "main\::${var_name}" };
             }
-            ## Last resort
+            # Last resort
             if( !length( $try ) )
             {
                 $try = $self->parse_echo({ var => $var_name });
@@ -657,7 +634,6 @@ sub ap2perl_expr
     }
     elsif( $type eq 'word' )
     {
-        $self->message( 3, "Got here with type '$type' and sub type '$stype'" );
         if( $stype eq 'digits' )
         {
             push( @$buf, $ref->{value} );
@@ -668,7 +644,6 @@ sub ap2perl_expr
         }
         elsif( $stype eq 'dotted' )
         {
-            $self->message( 3, "Adding '", 'q{' . $ref->{word} . '}', "." );
             push( @$buf, 'q{' . $ref->{word} . '}' );
         }
         elsif( $stype eq 'function' )
@@ -696,7 +671,7 @@ sub ap2perl_expr
         }
         elsif( $stype eq 'regex' )
         {
-            ## Apache2 regular expressions are PCRE so we use them asis
+            # Apache2 regular expressions are PCRE so we use them asis
             push( @$buf, $ref->{regex} );
         }
         elsif( $stype eq 'sub' )
@@ -716,7 +691,7 @@ sub ap2perl_expr
         {
             # my $this2 = $self->ap2perl_expr( $ref->{list_def}->[0], [] );
             my $tmp = [];
-            ## We go through each element of the list which can be composed of string, function or other
+            # We go through each element of the list which can be composed of string, function or other
             my $all_string = 1;
             if( ref( $ref->{words_def} ) )
             {
@@ -740,7 +715,6 @@ sub ap2perl_expr
             push( @$buf, @$this );
         }
     }
-    $self->message( 3, "Returning ", scalar( @$buf ), " items in array ref: ", sub{ $self->dump( $buf ) } );
     return( $buf );
 }
 
@@ -749,8 +723,8 @@ sub apache_response_handler
     my( $class, $r ) = @_;
     my $debug = int( $r->dir_config( 'Apache2_SSI_DEBUG' ) );
     $r->log->debug( "${class} [PerlResponseHandler]: Received request for uri '", $r->uri, "' with path info '", $r->path_info, "' and file name '", $r->filename, "', content type is '", $r->content_type, "' and arguments: '", join( "', '", @_ ), "'." ) if( $debug > 0 );
-    return( Apache2::Const::DECLINED ) unless( $r->content_type eq 'text/html' );
-    $r->status( Apache2::Const::HTTP_OK );
+    return( &Apache2::Const::DECLINED ) unless( $r->content_type eq 'text/html' );
+    $r->status( &Apache2::Const::HTTP_OK );
     $r->no_cache(1) if( ( $r->dir_config( 'Apache2_SSI_NO_CACHE' ) ) eq 'on' );
 #     $r->sendfile( $r->filename );
 #     return( Apache2::Const::OK );
@@ -785,49 +759,46 @@ sub apache_response_handler
     {
         $params->{trunk} = 1;
     }
-    ## new(9 will automatically set the value for uri() based on the Apache2::RequestRec->unparsed_uri
+    # new(9 will automatically set the value for uri() based on the Apache2::RequestRec->unparsed_uri
     my $self = $class->new( $params ) || do
     {
         $r->log->error( "Error instantiating ${class}: ", $class->error );
-        return( Apache2::Const::DECLINED );
+        return( &Apache2::Const::DECLINED );
     };
     
     my $u = $self->uri || do
     {
         $r->log->error( "No URI set. This should not happen." );
-        $r->status( Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
-        return( Apache2::Const::OK );
+        $r->status( &Apache2::Const::HTTP_INTERNAL_SERVER_ERROR );
+        return( &Apache2::Const::OK );
     };
-    unless( $u->code == Apache2::Const::HTTP_OK )
+    unless( $u->code == &Apache2::Const::HTTP_OK )
     {
         $r->log->error( "Cannot server uri \"$u\". http code is \"", $u->code, "\"." );
         $r->status( $u->code );
-        return( Apache2::Const::DECLINED );
+        return( &Apache2::Const::DECLINED );
     }
     my $file = $u->filename;
     my $max_length = int( $r->dir_config( 'Apache2_SSI_Max_Length' ) ) || 0;
     if( -s( $file ) >= $max_length )
     {
         $r->log->error( "HTML data exceeds our size threshold of $max_length. Rejecting the request." );
-        $r->status( Apache2::Const::HTTP_REQUEST_ENTITY_TOO_LARGE );
-        return( Apache2::Const::OK );
+        $r->status( &Apache2::Const::HTTP_REQUEST_ENTITY_TOO_LARGE );
+        return( &Apache2::Const::OK );
     }
     my $html = $u->slurp_utf8;
     if( !length( $html ) )
     {
-        $r->status( Apache2::Const::HTTP_NO_CONTENT );
-        return( Apache2::Const::OK );
+        $r->status( &Apache2::Const::HTTP_NO_CONTENT );
+        return( &Apache2::Const::OK );
     }
     
-    ## my $addr = $r->useragent_addr;
-    ## $self->message( 3, "Remote addr is: '$addr' (", $$addr, ")." );
-    $self->message( 3, "\$ENV{MOD_PERL} value is '$ENV{MOD_PERL}' and Apache2::Const::HTTP_OK value is '", Apache2::Const::HTTP_OK, "'" );
-    $self->message( 3, "Remote connection from '", sub{ $self->remote_ip }, "' for uri '", $r->uri, "'." );
+    # my $addr = $r->useragent_addr;
     my $res = $self->parse( $html );
     if( !defined( $res ) )
     {
         $r->log->error( "${class} is unable to process data: ", $self->error );
-        return( Apache2::Const::DECLINED );
+        return( &Apache2::Const::DECLINED );
     }
     else
     {
@@ -838,36 +809,34 @@ sub apache_response_handler
         catch( $e )
         {
             $r->log->error( "${class} encountered an error while trying to encode data into utf8: $e" );
-            return( Apache2::Const::DECLINED );
+            return( &Apache2::Const::DECLINED );
         }
         
         my $len = length( $res );
-        $self->message( 3, "Returning ${len} bytes of html data: '$res'" );
         try
         {
             $r->headers_out->set( 'Content-Length' => $len );
             my $sent = $r->print( $res );
-            $self->message( 3, "${sent} bytes sent out." );
         }
         catch( $e )
         {
             $r->log->error( "${class} encountered an error while sending resulting data via Apache2::Filter->print: $e" );
         }
-        return( Apache2::Const::OK );
+        return( &Apache2::Const::OK );
     }
 }
 
-## https://perl.apache.org/docs/2.0/user/handlers/filters.html#C_PerlOutputFilterHandler_
-## sub handler : FilterRequestHandler
-## sub handler : method
+# https://perl.apache.org/docs/2.0/user/handlers/filters.html#C_PerlOutputFilterHandler_
+# sub handler : FilterRequestHandler
+# sub handler : method
 sub apache_filter_handler
 {
-    ## my( $class, $f, $brigade, $mode, $type, $len ) = @_;
+    # my( $class, $f, $brigade, $mode, $type, $len ) = @_;
     my( $class, $f, $bb ) = @_;
     my $r = $f->r;
-    ## my $class = __PACKAGE__;
+    # my $class = __PACKAGE__;
     my $main = $r->is_initial_req ? $r : $r->main;
-    return( Apache2::Const::DECLINED ) unless( $r->is_initial_req && $main->content_type eq 'text/html' );
+    return( &Apache2::Const::DECLINED ) unless( $r->is_initial_req && $main->content_type eq 'text/html' );
     my $debug = int( $r->dir_config( 'Apache2_SSI_DEBUG' ) );
     $main->no_cache(1) if( ( $r->dir_config( 'Apache2_SSI_NO_CACHE' ) ) eq 'on' );
     $r->log->debug( "${class} [PerlOutputFilterHandler]: Received request for uri '", $r->uri, "' with path info '", $r->path_info, "'." ) if( $debug > 0 );
@@ -879,37 +848,37 @@ sub apache_filter_handler
         $r->headers_out->unset( 'Content-Length' );
     }
     
-    ## Then, we might get called multiple time, since there may be multiple brigade buckets
-    ## Here, we retrieve the last buffer we put in $f->ctx->{data} if any
+    # Then, we might get called multiple time, since there may be multiple brigade buckets
+    # Here, we retrieve the last buffer we put in $f->ctx->{data} if any
     my $html = exists( $ctx->{data} ) ? $ctx->{data} : '';
     $r->log->debug( "${class} [PerlOutputFilterHandler]: HTML data buffer set to '$html'." ) if( $debug > 0 );
     $ctx->{invoked}++;
     my $seen_eos = 0;
     my $max_length = int( $r->dir_config( 'Apache2_SSI_Max_Length' ) ) || 0;
     $r->log->debug( "${class} [PerlOutputFilterHandler]: Maximum length set to '$max_length'." ) if( $debug > 0 );
-    ## Get all the brigade buckets data
+    # Get all the brigade buckets data
     for( my $b = $bb->first; $b; $b = $bb->next( $b ) )
     {
         $seen_eos++, last if( $b->is_eos );
         $b->read( my $bdata );
         $html .= $bdata;
-        return( Apache2::Const::DECLINED ) if( $max_length && length( $html ) >= $max_length );
+        return( &Apache2::Const::DECLINED ) if( $max_length && length( $html ) >= $max_length );
     }
     
-    ## If we have not reached the special End-of-String bucket, we store our buffer in $f->ctx->{data} and return OK
+    # If we have not reached the special End-of-String bucket, we store our buffer in $f->ctx->{data} and return OK
     if( !$seen_eos )
     {
-        ## store context for all but the last invocation
+        # store context for all but the last invocation
         $r->log->debug( "${class} [PerlOutputFilterHandler]: Not reached the EOS bucket. Storing html to data buffer." ) if( $debug > 0 );
         $ctx->{data} = $html;
         $f->ctx( $ctx );
-        return( Apache2::Const::OK );
+        return( &Apache2::Const::OK );
     }
     
-    ## Let's behave well as per the doc
-    if( $f->c->keepalive == Apache2::Const::CONN_KEEPALIVE )
+    # Let's behave well as per the doc
+    if( $f->c->keepalive == &Apache2::Const::CONN_KEEPALIVE )
     {
-        $r->log->debug( "${class} [PerlOutputFilterHandler]: KeepAlive count (", $f->c->keepalive, ") reached the threshold of '", Apache2::Const::CONN_KEEPALIVE, "'." ) if( $debug > 0 );
+        $r->log->debug( "${class} [PerlOutputFilterHandler]: KeepAlive count (", $f->c->keepalive, ") reached the threshold of '", &Apache2::Const::CONN_KEEPALIVE, "'." ) if( $debug > 0 );
         $ctx->{data} = '';
         $f->ctx( $ctx );
     }
@@ -921,7 +890,7 @@ sub apache_filter_handler
     if( $size == 0 )
     {
         $r->log->debug( "${class} [PerlOutputFilterHandler]: Data received is empty. Nothing to do." );
-        return( Apache2::Const::OK );
+        return( &Apache2::Const::OK );
     }
     try
     {
@@ -930,7 +899,7 @@ sub apache_filter_handler
     catch( $e )
     {
         $r->log->error( "${class} [PerlOutputFilterHandler]: Failed to decode data from utf8: $e" );
-        return( Apache2::Const::DECLINED );
+        return( &Apache2::Const::DECLINED );
     }
     
     #W We just add that the charset is utf-8
@@ -970,17 +939,14 @@ sub apache_filter_handler
     my $self = $class->new( $params ) || do
     {
         $r->log->error( "Error instantiating ${class}: ", $class->error );
-        return( Apache2::Const::DECLINED );
+        return( &Apache2::Const::DECLINED );
     };
-    ## my $addr = $r->useragent_addr;
-    ## $self->message( 3, "Remote addr is: '$addr' (", $$addr, ")." );
-    $self->message( 3, "\$ENV{MOD_PERL} value is '$ENV{MOD_PERL}' and Apache2::Const::HTTP_OK value is '", Apache2::Const::HTTP_OK, "'" );
-    $self->message( 3, "Remote connection from '", sub{ $self->remote_ip }, "' for uri '", $r->uri, "'." );
+    # my $addr = $r->useragent_addr;
     my $res = $self->parse( $html );
     if( !defined( $res ) )
     {
         $r->log->error( "${class} [PerlOutputFilterHandler]: is unable to process data: ", $self->error );
-        return( Apache2::Const::DECLINED );
+        return( &Apache2::Const::DECLINED );
     }
     else
     {
@@ -991,12 +957,11 @@ sub apache_filter_handler
         catch( $e )
         {
             $r->log->error( "${class} [PerlOutputFilterHandler]: encountered an error while trying to encode data into utf8: $e" );
-            return( Apache2::Const::DECLINED );
+            return( &Apache2::Const::DECLINED );
         }
         
         # $r->headers_out->unset( 'Content-Length' );
         my $len = length( $res );
-        $self->message( 3, "Returning ${len} bytes of html data: '$res'" );
         try
         {
             $r->headers_out->set( 'Content-Length' => $len );
@@ -1005,12 +970,11 @@ sub apache_filter_handler
         }
         catch( $e )
         {
-            ## $self->message( 3, "An error has occured print data to web client: $e" );
             $r->log->error( "${class} encountered an error while sending resulting data via Apache2::Filter->print: $e" );
         }
-        ## This will cause a segfault
-        ## $r->rflush;
-        return( Apache2::Const::OK );
+        # This will cause a segfault
+        # $r->rflush;
+        return( &Apache2::Const::OK );
     }
 }
 
@@ -1033,7 +997,7 @@ sub init
     $self->{apache_filter}  = '';
     $self->{apache_request} = '';
     $self->{document_root}  = '';
-    ## e.g.: [Value Undefined]
+    # e.g.: [Value Undefined]
     $self->{echomsg}        = '';
     $self->{errmsg}         = '[an error occurred while processing this directive]';
     $self->{filename}       = '';
@@ -1047,23 +1011,23 @@ sub init
     $self->SUPER::init( %$args ) || return;
     $self->{_env}           = '';
     $self->{_path_info_processed} = 0;
-    ## Used to hold regular expression matches during eval in _eval_vars()
-    ## and make them available for the next evaluation
+    # Used to hold regular expression matches during eval in _eval_vars()
+    # and make them available for the next evaluation
     $self->{_regexp_capture}= [];
     $self->{_uri_reset}     = 0;
-    ## A stack reflecting the current state of if/else parser.
-    ## Each entry is 1 when we've seen a true condition in this if-chain,
-    ## 0 when we haven't. Initially it's as if we're in a big true 
-    ## if-block with no else.
+    # A stack reflecting the current state of if/else parser.
+    # Each entry is 1 when we've seen a true condition in this if-chain,
+    # 0 when we haven't. Initially it's as if we're in a big true 
+    # if-block with no else.
     $self->{if_state}       = [1];
     $self->{notes}          = '';
     $self->{suspend}        = [0];
-    ## undef means the current locale's default
+    # undef means the current locale's default
     $self->mod_perl( defined( $MOD_PERL ) ? length( $MOD_PERL ) > 0 : 0 );
     my $r = $self->apache_request;
     if( $MOD_PERL && !$r )
     {
-        # XXX Must check if GlobalRequest is set
+        # NOTE: Must check if GlobalRequest is set
         if( !( $r = $self->apache_request ) )
         {
             $r = Apache2::RequestUtil->request;
@@ -1079,7 +1043,6 @@ sub init
         }
     }
     my $p = {};
-    ## $self->message( 3, "Apache request object is: '$r' and \$uri is '$uri'. Args is: ", sub{ $self->dump( $args ) } );
     if( length( "$uri" ) )
     {
         $p->{document_uri} = "$uri";
@@ -1097,7 +1060,6 @@ sub init
         $p->{document_uri} = $self->env( 'REQUEST_URI' );
     }
     
-    ## $self->message( 3, "Document root is ($self->{document_root}) and Apache document root is '", ( $r ? $r->document_root : '' ), "'." );
     if( length( $self->{document_root} ) )
     {
         $p->{document_root} = $self->{document_root};
@@ -1152,7 +1114,6 @@ sub clone
     $params->{apache_request} = $self->apache_request if( $self->apache_request );
     $params->{document_uri} = $self->uri->document_uri;
     $params->{document_root} = $self->document_root;
-    $self->message( 3, "Current document root is '", $self->document_root, "' ($self->{document_root})" );
     my $new = $class->new( %$params ) || return( $self->error( "Unable to create a clone of our object: ", $class->error ) );
     return( $new );
 }
@@ -1163,17 +1124,16 @@ sub decode_base64
     try
     {
         my $v = join( '', @_ );
-        $self->message( 3, "Decoding: '$v'." );
         if( $self->mod_perl )
         {
             $v = APR::Base64::decode( $v );
         }
         else
         {
+            require MIME::Base64;
             $v = MIME::Base64::decode( $v );
         }
         $v = Encode::decode( 'utf8', $v ) if( $self->_has_utf8( $v ) );
-        $self->message( 3, "Returning: '", $v, "'. Does data contain utf8? ", ( $self->_has_utf8( $v ) ? 'yes' : 'no' ) );
         return( $v );
     }
     catch( $e )
@@ -1200,7 +1160,8 @@ sub decode_uri
     my $self = shift( @_ );
     try
     {
-        return( URI::Escape::uri_unescape( @_ ) );
+        require URI::Escape::XS;
+        return( URI::Escape::XS::uri_unescape( @_ ) );
     }
     catch( $e )
     {
@@ -1219,6 +1180,8 @@ sub decode_url
         }
         else
         {
+            # Will use XS version automatically
+            require URL::Encode;
             return( URL::Encode::url_decode_utf8( @_ ) );
         }
     }
@@ -1252,7 +1215,7 @@ sub document_root
     }
 }
 
-## A document uri is an absolute uri possibly with some path info and query string.
+# A document uri is an absolute uri possibly with some path info and query string.
 sub document_uri { return( shift->uri->document_uri( @_ ) ); }
 
 sub echomsg { return( shift->_set_get_scalar( 'echomsg', @_ ) ); }
@@ -1263,7 +1226,6 @@ sub encode_base64
     try
     {
         my $v = join( '', @_ );
-        # $self->message( 3, "Does data has utf8 flag on? ", ( Encode::is_utf8( $v ) ? 'yes' : 'no' ) );
         $v = Encode::encode( 'utf8', $v, Encode::FB_CROAK ) if( Encode::is_utf8( $v ) );
         if( $self->mod_perl )
         {
@@ -1271,6 +1233,7 @@ sub encode_base64
         }
         else
         {
+            require MIME::Base64;
             return( MIME::Base64::encode( $v, '' ) );
         }
     }
@@ -1298,8 +1261,8 @@ sub encode_md5
     my $self = shift( @_ );
     try
     {
+        require Digest::MD5;
         my $v = join( '', @_ );
-        ## $self->message( 3, "Does data has utf8 flag on? ", ( Encode::is_utf8( $v ) ? 'yes' : 'no' ) );
         $v = Encode::encode( 'utf8', $v, Encode::FB_CROAK ) if( Encode::is_utf8( $v ) );
         return( Digest::MD5::md5_hex( $v ) );
     }
@@ -1314,7 +1277,9 @@ sub encode_uri
     my $self = shift( @_ );
     try
     {
-        return( URI::Escape::uri_escape_utf8( join( '', @_ ) ) );
+        require URI::Escape::XS;
+        # return( URI::Escape::uri_escape_utf8( join( '', @_ ) ) );
+        return( URI::Escape::XS::uri_escape( join( '', @_ ) ) );
     }
     catch( $e )
     {
@@ -1334,6 +1299,8 @@ sub encode_url
         }
         else
         {
+            # Will use XS version automatically
+            require URL::Encode;
             return( URL::Encode::url_encode_utf8( join( '', @_ ) ) );
         }
     }
@@ -1346,7 +1313,7 @@ sub encode_url
 sub env
 {
     my $self = shift( @_ );
-    ## The user wants the entire hash reference
+    # The user wants the entire hash reference
     unless( @_ )
     {
         my $r = $self->apache_request;
@@ -1372,7 +1339,7 @@ sub env
         no warnings 'uninitialized';
         $opts = pop( @_ ) if( defined( $_[-1] ) && Scalar::Util::reftype( $_[-1] ) eq 'HASH' );
     }
-    ## return( $self->error( "Environment variable value provided is a reference data (", overload::StrVal( $val ), ")." ) ) if( ref( $val ) && ( !overload::Overloaded( $val ) || ( overload::Overloaded( $val ) && !overload::Method( $val, '""' ) ) ) );
+    # return( $self->error( "Environment variable value provided is a reference data (", overload::StrVal( $val ), ")." ) ) if( ref( $val ) && ( !overload::Overloaded( $val ) || ( overload::Overloaded( $val ) && !overload::Method( $val, '""' ) ) ) );
     my $r = $opts->{apache_request} || $self->apache_request;
     if( $r )
     {
@@ -1391,7 +1358,7 @@ sub env
         my $env = {};
         unless( ref( $self->{_env} ) )
         {
-            ## Make a copy of the environment variables
+            # Make a copy of the environment variables
             $self->{_env} = {%ENV};
         }
         $env = $self->{_env};
@@ -1410,7 +1377,7 @@ sub env
 
 sub errmsg { return( shift->_set_get_scalar( 'errmsg', @_ ) ); }
 
-## This is set by document_uri
+# This is set by document_uri
 sub filename { return( shift->uri->filename( @_ ) ); }
 
 sub find_file
@@ -1466,7 +1433,6 @@ sub lookup_file
 {
     my $self = shift( @_ );
     my $file = shift( @_ ) || return( $self->error( "No file provided to look up." ) );
-    $self->message( 3, "Looking up file \"$file\"." );
     my $r = $self->apache_request;
     my $f = Apache2::SSI::File->new(
         $file,
@@ -1476,7 +1442,7 @@ sub lookup_file
     ) || return( $self->error( "Unable to instantiate an Apache2::SSI::File object: ", Apache2::SSI::File->error ) );
     if( $f->code == 404 )
     {
-        ## Mimic the Apache error when the file does not exist
+        # Mimic the Apache error when the file does not exist
         $self->error( "unable to lookup information about \"$file\" in parsed file \"", $self->uri, "\"." );
     }
     return( $f );
@@ -1496,10 +1462,9 @@ sub lookup_uri
     ) || return( $self->error( "Unable to instantiate an Apache2::SSI::URI object: ", Apache2::SSI::URI->error ) );
     if( $u->code == 404 )
     {
-        ## Mimic the Apache error when the file does not exist
+        # Mimic the Apache error when the file does not exist
         $self->error( "unable to get information about uri \"$uri\" in parsed file ", $self->uri );
     }
-    $self->message( 3, "Resolved uri \"$uri\" to filename \"", $u->filename, "\"." );
     return( $u );
 }
 
@@ -1523,9 +1488,9 @@ sub new_uri
     return( $o );
 }
 
-## This makes use of Apache2::SSI::Notes which guarantees that notes are shared in and out of Apache framework
-## Notes are cleaned up at server shutdown with an handler set in startup.pl
-## See scripts/startup.pl and conf/extra.conf.in as an example
+# This makes use of Apache2::SSI::Notes which guarantees that notes are shared in and out of Apache framework
+# Notes are cleaned up at server shutdown with an handler set in startup.pl
+# See scripts/startup.pl and conf/extra.conf.in as an example
 sub notes
 {
     my $self = shift( @_ );
@@ -1541,7 +1506,7 @@ sub notes
         {
             return( $notes->get );
         }
-        ## We just return an empty hash to avoid error
+        # We just return an empty hash to avoid error
         else
         {
             return( {} );
@@ -1565,15 +1530,12 @@ sub notes
         try
         {
             $r->pnotes( $var => $new ) if( $new_value_set );
-            $self->message( 3, "Retrieving note '$var' => '", $r->pnotes( $var ), "'" );
             my $val = $r->pnotes( $var );
-            $self->message( 3, "Is pnotes value defined? ", defined( $val ) ? 'yes' : 'no' );
             $val //= $notes->get( $var ) if( $notes );
             return( $val );
         }
         catch( $e )
         {
-            $self->message( 3, "An error occurred trying to ", (defined( $new ) ? 'set/' : ''), " get the note value for variable \"${var}\"", (defined( $new ) ? " with value '${new}" : ''), ": $e" );
             return( $self->error( "An error occurred trying to ", (defined( $new ) ? 'set/' : ''), " get the note value for variable \"${var}\"", (defined( $new ) ? " with value '${new}" : ''), ": $e" ) );
         }
     }
@@ -1585,10 +1547,9 @@ sub parse
 {
     my $self = shift( @_ );
     my $html = @_ ? shift( @_ ) : $self->{html};
-    $self->message( 3, "Parsing html:\n'$html'" );
     return( $self->error( "No html data was provided to parse ssi." ) ) if( !length( $html ) );
     my @parts = split( m/($HAS_SSI_RE)/s, $html );
-    ## Nothing to do
+    # Nothing to do
     # return( Apache2::Const::DECLINED ) if( scalar( @parts ) <= 1 );
     my $out = '';
     my $ssi;
@@ -1597,7 +1558,7 @@ sub parse
         $out .= ( '', shift( @parts ) )[ 1 - $self->{suspend}->[0] ];
         last unless( @parts );
         $ssi = shift( @parts );
-        ## There's some weird 'uninitialized' warning on the next line, but I can't find it.
+        # There's some weird 'uninitialized' warning on the next line, but I can't find it.
         if( $ssi =~ m/^<!--#(.*)-->$/s )
         {
             my $res = $self->parse_ssi( $1 );
@@ -1608,23 +1569,21 @@ sub parse
             return( $self->error( 'Parse error' ) );
         }
     }
-    $self->message( 3, "Returning:\n'$out'" );
     return( $out );
 }
 
-## <!--#comment Blah Blah Blah -->
+# <!--#comment Blah Blah Blah -->
 sub parse_comment
 {
     my $self = shift( @_ );
     my $comment = shift( @_ );
-    ## comments are removed
+    # comments are removed
     return( '' );
 }
 
 sub parse_config
 {
     my( $self, $args ) = @_;
-    $self->message( 3, "Setting config values for arguments: ", sub{ $self->dump( $args ) });
     $self->{echomsg} =     $args->{echomsg}   if( exists( $args->{echomsg} ) );
     $self->{errmsg}  =     $args->{errmsg}    if( exists( $args->{errmsg} ) );
     $self->{sizefmt} = lc( $args->{sizefmt} ) if( exists( $args->{sizefmt} ) );
@@ -1636,16 +1595,15 @@ sub parse_echo
 {
     my( $self, $args ) = @_;
     my $var = $args->{var};
-    ## $self->_interp_vars( $var );
+    # $self->_interp_vars( $var );
     my $r = $self->apache_request;
     my $env = $self->env;
     my $value;
     no strict( 'refs' );
-    $self->message( 3, "Checking value for variable '$var'." );
     
     if( defined( $var ) && $r && defined( $value = $r->subprocess_env( $var ) ) )
     {
-        ## Ok then
+        # Ok then
     }
     elsif( defined( $var ) && $self->can( my $method = "parse_echo_\L$var\E" ) )
     {
@@ -1653,14 +1611,12 @@ sub parse_echo
     }
     elsif( defined( $var ) && exists( $env->{ $var } ) )
     {
-        $self->message( 3, "Returning variable \"$var\" with value \"$env->{$var}\"." );
         $value = $env->{ $var };
     }
     else
     {
         $value = $self->echomsg;
     }
-    $self->message( 3, "Value found is '$value'" );
     
     if( $args->{decoding} && lc( $args->{decoding} ) ne 'none' )
     {
@@ -1735,8 +1691,7 @@ sub parse_echo_document_name
     {
         $r = $r->is_initial_req ? $r : $r->main ? $r->main : $r;
         my $v = $r->subprocess_env( 'DOCUMENT_NAME' ) || $uri->finfo->name;
-        $self->message( 3, "Found value of '$v' and finfo name is '", $uri->finfo->name, "' for uri '$uri'." );
-        ## return( $self->_set_var( $r, 'DOCUMENT_NAME', basename $r->filename ) );
+        # return( $self->_set_var( $r, 'DOCUMENT_NAME', basename $r->filename ) );
         return( $v );
     }
     else
@@ -1762,7 +1717,6 @@ sub parse_echo_last_modified
     else
     {
         my $env = $self->env;
-        $self->message( 3, "LAST_MODIFIED value '", $env->{LAST_MODIFIED}, "' and document_filename mtime is '", $uri->finfo->mtime, "' and document file is '", $uri->document_filename, "'." );
         return( $env->{LAST_MODIFIED} || $self->_format_time( $uri->finfo->mtime ) );
     }
 }
@@ -1777,7 +1731,7 @@ sub parse_echo_query_string
 sub parse_elif
 {
     my( $self, $args ) = @_;
-    ## Make sure we're in an 'if' chain
+    # Make sure we're in an 'if' chain
     return( $self->error( "Malformed if..endif SSI structure" ) ) unless( @{$self->{if_state}} > 1 );
     return( '' ) if( $self->{suspend}->[1] );
     return( $self->_handle_ifs( $self->parse_eval_expr( $args->{expr} ) ) );
@@ -1786,7 +1740,7 @@ sub parse_elif
 sub parse_else
 {
     my $self = shift( @_ );
-    ## Make sure we're in an 'if' chain
+    # Make sure we're in an 'if' chain
     return( $self->error( "Malformed if..endif SSI structure" ) ) unless( @{$self->{if_state}} > 1 );
     return( '' ) if( $self->{suspend}->[1] );
     return( $self->_handle_ifs(1) );
@@ -1795,7 +1749,7 @@ sub parse_else
 sub parse_endif
 {
     my $self = shift( @_ );
-    ## Make sure we're in an 'if' chain
+    # Make sure we're in an 'if' chain
     return( $self->error( "Malformed if..endif SSI structure" ) ) unless( @{$self->{if_state}} > 1 );
     shift( @{$self->{if_state}} );
     shift( @{$self->{suspend}} );
@@ -1806,49 +1760,44 @@ sub parse_eval_expr
 {
     my $self = shift( @_ );
     my $text = shift( @_ );
-    $self->message( 3, "No expression to eval was provided." ) if( !length( $text ) );
     return( '' ) if( !length( $text ) );
     
     my $perl = $self->parse_expr( $text );
-    $self->message( 3, "Position after parsing is: ", pos( $text ) );
-    $self->message( 3, "Evaluating text '$perl'" );
     my $result;
     do
     {
-        ## Silence some warnings about bare words such as strings being eval'ed
+        no strict;
+        # Silence some warnings about bare words such as strings being eval'ed
         local $SIG{__WARN__} = sub{};
         # package main;
         no warnings 'uninitialized';
-        ## Only to test if this was a regular expression. If it was the array will contain successful match, other it will be empty
-        ## @rv will contain the regexp matches or the result of the eval
+        # Only to test if this was a regular expression. If it was the array will contain successful match, other it will be empty
+        # @rv will contain the regexp matches or the result of the eval
         local @matches = ();
         local @rv = ();
         my $eval = <<EOT;
 \@rv = ($perl);
 EOT
-        $eval .= <<EOT if( $perl =~ /[\=\!]\~/ );
+        if( $perl =~ /[\=\!]\~/ )
+        {
+            $eval .= <<EOT;
 \@matches = \@-;
 EOT
-        $self->message( 3, "Evaluating text:\n$eval" );
+        }
         eval( $eval );
         $result = $rv[0];
-        $self->message( 3, "\@- is: ", sub{ $self->dump( \@matches ) } );
-        ## Make any regular expression capture available for the next evaluation
+        # Make any regular expression capture available for the next evaluation
         $self->{_regexp_capture} = \@rv if( scalar( @matches ) );
-        $self->message( 3, "Potential regular expression matches found: ", sub{ $self->dump( $self->{_regexp_capture} ) } );
     };
     $result //= '';
-    $self->message( 3, "Eval error found: $@" ) if( $@ );
     return( $self->error( "Eval error for expression '$text' translated to '$perl': $@" ) ) if( $@ );
-    $self->message( 3, "Got an error: ", $self->error->message ) if( $self->error );
-    $self->message( 3, "Returning result: '$result'" );
     return( $result );
 }
 
 sub parse_exec
 {
     my( $self, $args ) = @_;
-    ## XXX did we check enough?
+    # NOTE: did we check enough?
     my $r = $self->apache_request;
     my $uri = $self->uri;
     my $filename;
@@ -1856,19 +1805,18 @@ sub parse_exec
     {
         $filename = $r->filename;
 
-        if( $r->allow_options & Apache2::Const::OPT_INCNOEXEC )
+        if( $r->allow_options & &Apache2::Const::OPT_INCNOEXEC )
         {
             $self->error( "httpd: exec used but not allowed in $filename" );
             return( $self->errmsg );
         }
     }
-    # XXX Need to improve on this
+    # TODO Need to improve on this
     if( exists( $args->{cmd} ) )
     {
-        $self->message( 3, "Executing command '$args->{cmd}'." );
-        ## https://metacpan.org/pod/Apache2::SubProcess
-        ## Fails to work: <https://rt.cpan.org/Public/Bug/Display.html?id=54153>
-        ## <https://rt.cpan.org/Public/Dist/Display.html?Status=Active;Name=mod_perl>
+        # https://metacpan.org/pod/Apache2::SubProcess
+        # Fails to work: <https://rt.cpan.org/Public/Bug/Display.html?id=54153>
+        # <https://rt.cpan.org/Public/Dist/Display.html?Status=Active;Name=mod_perl>
         if( $r && MOD_PERL_SPAWN_PROC_PROG_WORKING )
         {
             my $data;
@@ -1883,7 +1831,7 @@ sub parse_exec
         {
             my $env = $self->env;
             local %ENV = %$env;
-            ## What a shame to fork exec. Too bad spawn_proc_prog() does not work.
+            # What a shame to fork exec. Too bad spawn_proc_prog() does not work.
             return( scalar( qx( $args->{cmd} ) ) );
         }
     }
@@ -1894,13 +1842,11 @@ sub parse_exec
         return( $self->errmsg );
     }
     
-    ## Get a new Apache2::SSI::URI object
+    # Get a new Apache2::SSI::URI object
     my $cgi = $self->new_uri( $args->{cgi} ) || do
     {
-        $self->message( 3, "Unable to get a new Apache2::SSI::URI for cgi '$args->{cgi}': ", Apache2::SSI::URI->error );
         return( $self->errmsg );
     };
-    $self->message( 3, "CGI path to execute is: '$cgi'." );
     my $doc_root = $self->document_root || do
     {
         $self->error( "No document root set." );
@@ -1909,16 +1855,13 @@ sub parse_exec
     
     if( $cgi->code != 200 )
     {
-        $self->message( 3, "CGI file code is not 200 (", $cgi->code, ")." );
         $self->error( "Error including cgi: subrequest returned status '" . $cgi->code . "', not 200" );
         return( $self->errmsg );
     }
     
     my $finfo = $cgi->finfo;
-    $self->message( 3, "Checking permission for file \"", $cgi->filename, "\"." );
     if( !$finfo->exists )
     {
-        $self->message( 3, "CGI file does not exist." );
         $cgi->code( 404 );
         $self->error( "Error including cgi \"$args->{cgi}\". File not found. CGI resolved to \"", $cgi->filename, "\"" );
         return( $self->errmsg );
@@ -1927,14 +1870,12 @@ sub parse_exec
     {
         unless( $^O =~ /^(dos|mswin32|NetWare|symbian|win32)$/i && -T( "$finfo" ) )
         {
-            $self->message( 3, "CGI file is not executable." );
-            ## return( $self->error( "Error including cgi \"$args->{cgi}\". File is not executable by Apache user." ) );
+            # return( $self->error( "Error including cgi \"$args->{cgi}\". File is not executable by Apache user." ) );
             $self->error( "Error including cgi \"$args->{cgi}\". File is not executable by Apache user." );
             $cgi->code( 401 );
             return( $self->errmsg );
         }
     }
-    $self->message( 3, "Ok, file \"$cgi\" exists (code = '", $cgi->code, "')" );
         
     
     if( $r )
@@ -1942,15 +1883,12 @@ sub parse_exec
         my $rr = $cgi->apache_request;
 #         my $u = URI->new( $rr->uri . ( length( $cgi->path_info ) ? $cgi->path_info : length( $uri->path_info ) ? $uri->path_info : '' ) );
 #         $u->query( $uri->query_string ) if( !length( $cgi->query_string ) && length( $uri->query_string ) );
-        $self->message( 3, "Setting path info to '", $uri->path_info, "' and query string to '", $uri->query_string, "'." );
         $cgi->path_info( $uri->path_info ) if( !length( $cgi->path_info ) && length( $uri->path_info ) );
         $cgi->query_string( $uri->query_string ) if( !length( $cgi->query_string ) && length( $uri->query_string ) );
-        $self->message( 3, "Running cgi \"$cgi\" (", $cgi->filename, ")." );
         $rr->content_type( 'application/x-httpd-cgi' );
         $cgi->env( GATEWAY_INTERFACE => 'CGI/1.1' );
         $cgi->env( DOCUMENT_URI => "$cgi" );
         my( $content, $headers ) = $rr->fetch_uri( "$cgi" );
-        $self->message( 3, "Content found is:\n'$content'\nand headers are: ", sub{ $self->dump( $headers ) });
         return( $content );
     }
     else
@@ -1967,10 +1905,8 @@ sub parse_exec
             local $ENV{REQUEST_URI} = $cgi->document_uri;
             my $file = $cgi->filename;
             my $mime = $finfo->mime_type;
-            $self->message( 3, "Mime type for file '$file' is '$mime', OS is '$^O' an is it a plain text file ? ", ( -T( "$cgi" ) ? 'Yes' : 'No' ), "." );
             if( $^O =~ /^(dos|mswin32|NetWare|symbian|win32)$/i && $mime eq 'text/x-perl' )
             {
-                $self->message( 3, "Calling $^X $file" );
                 $buf = `$^X $file`;
             }
             else
@@ -1978,10 +1914,9 @@ sub parse_exec
                 $buf = qx( "$file" );
             }
         };
-        ## Failed to execute
+        # Failed to execute
         if( $? == -1 )
         {
-            $self->message( 3, "CGI exit value was not 0 but '$?'." );
             $cgi->code( 500 );
             return( $self->errmsg );
         }
@@ -1990,7 +1925,7 @@ sub parse_exec
         while( $buf =~ s/([^\012]*)\012// ) 
         {
             my $line = $1;
-            ## if we need to restore as content when illegal headers are found.
+            # if we need to restore as content when illegal headers are found.
             my $save = "$line\012"; 
     
             $line =~ s/\015$//;
@@ -1998,7 +1933,7 @@ sub parse_exec
     
             if( $line =~ /^([a-zA-Z0-9_\-.]+)\s*:\s*(.*)/ ) 
             {
-                ## $response->push_header( $key, $val ) if( $key );
+                # $response->push_header( $key, $val ) if( $key );
                 $headers->{ $key } = $val if( $key );
                 ( $key, $val ) = ( $1, $2 );
             } 
@@ -2008,13 +1943,12 @@ sub parse_exec
             } 
             else 
             {
-                ## $response->push_header( "Client-Bad-Header-Line" => $line );
+                # $response->push_header( "Client-Bad-Header-Line" => $line );
                 $headers->{ 'Client-Bad-Header-Line' } = $line;
             }
         }
-        ## $response->push_header( $key, $val ) if( $key );
+        # $response->push_header( $key, $val ) if( $key );
         $headers->{ $key } = $val if( $key );
-        $self->message( 3, "Headers found are: ", sub{ $self->dump( $headers ) } );
         return( $buf );
     }
 }
@@ -2035,7 +1969,6 @@ sub parse_expr
     $opts->{embedded} = 0 if( !exists( $opts->{embedded} ) );
     my $r = $self->apache_request;
     my $env = $self->env;
-    $self->message( 3, "Processing text '$text'." );
     my $prev_regexp_capture = $self->{_regexp_capture};
     unless( $self->{_exp} )
     {
@@ -2062,7 +1995,6 @@ sub parse_expr
         my $res2 = $self->ap2perl_expr( $this, [], $opts );
         push( @$res, @$res2 );
     }
-    $self->message( 3, "Returning '", join( ' ', @$res ), "'." );
     return( join( ' ', @$res ) );
 }
 
@@ -2080,24 +2012,20 @@ sub parse_flastmod
 sub parse_fsize
 { 
     my( $self, $args ) = @_;
-    ## $self->message( 3, "Got here with args: ", sub{ $self->dump( $args ) });
     my $f = $self->find_file( $args );
     unless( $f->code == 200 )
     {
-        $self->message( "Requested file \"", $f->filename, "\" not found." );
         return( $self->errmsg );
     }
     my $finfo = $f->finfo;
     my $size = $finfo->size;
-    $self->message( 3, "File \"$f\" size is: '$size'" );
     my $n = Module::Generic::Number->new( $size );
     if( $self->{sizefmt} eq 'bytes' )
     {
-        ## Not everyone is using a comma as thousand separator
-        ## 1 while( $size =~ s/^(\d+)(\d{3})/$1,$2/g );
-        ## return( $size );
+        # Not everyone is using a comma as thousand separator
+        # 1 while( $size =~ s/^(\d+)(\d{3})/$1,$2/g );
+        # return( $size );
         my $str = $n->format( 0 )->scalar;
-        $self->message( 3, "Returning \"$str\" (", overload::StrVal( $str ), ")." );
         undef( $n );
         return( '' ) if( !defined( $str ) );
         return( $str );
@@ -2118,19 +2046,18 @@ sub parse_fsize
     }
 }
 
-## Functions
-## See https://httpd.apache.org/docs/trunk/en/expr.html#page-header
+# Functions
+# See https://httpd.apache.org/docs/trunk/en/expr.html#page-header
 # base64|env|escape|http|ldap|md5|note|osenv|replace|req|reqenv|req_novary|resp|sha1|tolower|toupper|unbase64|unescape
 sub parse_func_base64 { return( shift->encode_base64( join( '', @_ ) ) ); }
 
-## Return first match of note, reqenv, osenv
+# Return first match of note, reqenv, osenv
 sub parse_func_env
 {
     my $self = shift( @_ );
     my $var  = shift( @_ );
     my $r = $self->apache_request;
     my $env = $self->env;
-    $self->message( 3, "Getting environment value for variable '${var}'." );
     if( $r )
     {
         try
@@ -2139,7 +2066,6 @@ sub parse_func_env
         }
         catch( $e )
         {
-            $self->message( 3, "An error occurred trying to get the environment value for variable \"${var}\": $e" );
             return( $self->error( "An error occurred trying to get the environment value for variable \"${var}\": $e" ) );
         }
     }
@@ -2161,7 +2087,7 @@ sub parse_func_http
         my $headers = $r->headers_in;
         return( $headers->{ $header_name } );
     }
-    ## No http header outside of Apache
+    # No http header outside of Apache
     else
     {
         my $env = $self->env;
@@ -2173,8 +2099,8 @@ sub parse_func_http
     }
 }
 
-## Apache documentation: "Escape characters as required by LDAP distinguished name escaping (RFC4514) and LDAP filter escaping (RFC4515)"
-## Taken from Net::LDAP::Util
+# Apache documentation: "Escape characters as required by LDAP distinguished name escaping (RFC4514) and LDAP filter escaping (RFC4515)"
+# Taken from Net::LDAP::Util
 sub parse_func_ldap
 {
     my $self = shift( @_ );
@@ -2185,7 +2111,7 @@ sub parse_func_ldap
 
 sub parse_func_md5 { return( shift->encode_md5( @_ ) ); }
 
-## Notes are stored in the ENV global hash so they can be shared across processes
+# Notes are stored in the ENV global hash so they can be shared across processes
 sub parse_func_note
 {
     my $self = shift( @_ );
@@ -2193,7 +2119,7 @@ sub parse_func_note
     return( $self->notes( $var ) );
 }
 
-## Essentially same as parse_func_note
+# Essentially same as parse_func_note
 sub parse_func_osenv
 {
     my $self = shift( @_ );
@@ -2237,10 +2163,9 @@ sub parse_func_resp
     if( $r )
     {
         my $headers = $r->headers_out;
-        $self->message( 3, "Checking http header '$header_name' => '", $headers->{ $header_name }, "'. Existing headers are: ", sub{ $self->dump( {%$headers} ) } );
         return( $headers->{ $header_name } );
     }
-    ## No http header outside of Apache
+    # No http header outside of Apache
     else
     {
         return( '' );
@@ -2251,6 +2176,7 @@ sub parse_func_sha1
 {
     my $self = shift( @_ );
     my $val  = join( '', @_ );
+    require Digest::SHA;
     return( Digest::SHA::sha1_hex( $val ) );
 }
 
@@ -2289,20 +2215,18 @@ sub parse_include
     my $f = $self->find_file( $args );
     unless( $f->code == 200 )
     {
-        $self->message( "File to include \"", $f->filename, "\" could not be found." );
         return( $self->errmsg );
     }
     my $filename = $f->filename;
     if( !-e( "$filename" ) )
     {
-        $self->message( 3, "File to include \"$filename\" does not exists." );
         return( $self->errmsg );
     }
     
-    # XXX This needs to be improved, as we should not assume the file encoding is utf8
-    ## It could be binary or some other text encoding like iso-2022-jp
-    ## So we should slurp it, parse the meta tags if this is an html and decode if the charset attribute is set or default to utf8
-    ## But this complicates things quite a bit, so for now, it is just utf8 simply
+    # TODO This needs to be improved, as we should not assume the file encoding is utf8
+    # It could be binary or some other text encoding like iso-2022-jp
+    # So we should slurp it, parse the meta tags if this is an html and decode if the charset attribute is set or default to utf8
+    # But this complicates things quite a bit, so for now, it is just utf8 simply
     my $html = $f->slurp_utf8;
     if( !defined( $html ) )
     {
@@ -2314,14 +2238,14 @@ sub parse_include
         warn( $self->error );
         return( $self->errmsg );
     };
-    ## share our environment variables with our clone so we pass it to included files.
-    ## If we are running under mod_perl, we'll use subprocess_env
+    # share our environment variables with our clone so we pass it to included files.
+    # If we are running under mod_perl, we'll use subprocess_env
     my $env = $self->env;
     $clone->{_env} = $env;
     return( $clone->parse( $html ) );
 }
 
-# XXX Legacy
+# NOTE: Legacy
 # http://perl.apache.org/docs/1.0/guide/snippets.html#Passing_Arguments_to_a_SSI_script
 sub parse_perl
 {
@@ -2354,7 +2278,7 @@ sub parse_perl
             {
                 push( @arg2, @a );
             }
-            ## Any unknown get passed as key-value pairs
+            # Any unknown get passed as key-value pairs
             else
             {
                 push( @arg2, @a );
@@ -2362,9 +2286,8 @@ sub parse_perl
         }
     }
 
-    $self->message( "sub is $sub, args are @arg1 & @arg2" );
     my $subref;
-    ## for <!--#perl sub="sub {print ++$Access::Cnt }" -->
+    # for <!--#perl sub="sub {print ++$Access::Cnt }" -->
     if( $sub =~ /^[[:blank:]\h]*sub[[:blank:]\h]/ )
     {
         $subref = eval( $sub );
@@ -2372,14 +2295,14 @@ sub parse_perl
         {
             $self->error( "Perl eval of '$sub' failed: $@" )
         }
-        ## return( $self->error( "sub=\"sub ...\" didn't return a reference" ) ) unless( ref( $subref ) );
+        # return( $self->error( "sub=\"sub ...\" didn't return a reference" ) ) unless( ref( $subref ) );
         unless( ref( $subref ) )
         {
             $self->error( "sub=\"sub ...\" didn't return a reference" );
             return( $self->errmsg );
         }
     }
-    ## for <!--#perl sub="package::subr" -->
+    # for <!--#perl sub="package::subr" -->
     else
     {
         no strict( 'refs' );
@@ -2395,7 +2318,6 @@ sub parse_perl
         $pass_r = 0 if( $r and lc( $r->dir_config( 'SSIPerlPass_Request' ) ) eq 'no' );
         unshift( @arg1, $r ) if( $pass_r );
     }
-    $self->message( 3, "sub is $subref, args are @arg1 & @arg2" );
     return( scalar( $subref->( @arg1, @arg2 ) ) );
 }
 
@@ -2411,11 +2333,10 @@ sub parse_set
     my( $self, $args ) = @_;
     my $r = $self->apache_request;
     my $env = $self->env;
-    $self->message( 3, "Setting variable \"$args->{var}\" to value \"$args->{value}\"." );
     
-    ## $self->_interp_vars( $args->{value} );
-    ## Do we need to decode and encode it?
-    ## Possible values are: none, url, urlencoded, base64 or entity
+    # $self->_interp_vars( $args->{value} );
+    # Do we need to decode and encode it?
+    # Possible values are: none, url, urlencoded, base64 or entity
     if( $args->{decoding} && lc( $args->{decoding} ) ne 'none' )
     {
         $args->{decoding} = lc( $args->{decoding} );
@@ -2492,7 +2413,7 @@ sub parse_ssi
 {
     my( $self, $html ) = @_;
     
-    ## For error reporting
+    # For error reporting
     my $orig = $html;
     if( $html =~ s/^(\w+)[[:blank:]\h]*// )
     {
@@ -2502,16 +2423,14 @@ sub parse_ssi
         my $code = $self->can( $method ) ||
             return( $self->error( "ssi function $tag is unsupported. No method $method found in package \"", ref( $self ), "\"." ) );
 
-        ## Special case for comment directive because there is no key-value pair, but just text
+        # Special case for comment directive because there is no key-value pair, but just text
         return( $self->$method( $html ) ) if( lc( $tag ) eq 'comment' );
-        $self->message( 3, "Parsing directive parameters for tag '$tag' and text '$html'" );
         my $args = {};
         pos( $html ) = 0;
         if( $html =~ /^expr[[:blank:]\h]*\=/ )
         {
             if( $html =~ /^$EXPR_RE$/ )
             {
-                $self->message( 3, "Found expression name '$+{attr_name}' and value '$+{attr_val}'." );
                 $args->{ $+{attr_name} } = $+{attr_val};
             }
             else
@@ -2526,7 +2445,6 @@ sub parse_ssi
                 $args->{ $+{attr_name} } = $+{attr_val};
             }
         }
-        $self->message( 3, "Calling method \"$method\" with args: ", sub{ $self->dump( $args ) } );
 #         return( $self->$method( {@$args}, $args ) );
         return( $self->$method( $args ) );
     }
@@ -2537,8 +2455,8 @@ sub path_info { return( shift->uri->path_info( @_ ) ); }
 
 sub query_string { return( shift->uri->query_string( @_ ) ); }
 
-## http://httpd.apache.org/docs/2.4/developer/new_api_2_4.html
-## https://github.com/eprints/eprints/issues/214
+# http://httpd.apache.org/docs/2.4/developer/new_api_2_4.html
+# https://github.com/eprints/eprints/issues/214
 sub remote_ip
 {
     my $self = shift( @_ );
@@ -2548,7 +2466,7 @@ sub remote_ip
     my $ip;
     if( $r )
     {
-        ## In Apache v2.4 or higher, client_ip is used instead of remote_ip
+        # In Apache v2.4 or higher, client_ip is used instead of remote_ip
         my $c = $r->connection;
         my $coderef = $c->can( 'client_ip' ) // $c->can( 'remote_ip' );
         try
@@ -2572,7 +2490,7 @@ sub remote_ip
     return( '' );
 }
 
-## Same as document_uri
+# Same as document_uri
 sub request_uri { return( shift->uri->document_uri( @_ ) ); }
 
 sub server_version
@@ -2587,7 +2505,6 @@ sub server_version
         try
         {
             my $desc = Apache2::ServerUtil::get_server_description();
-            $self->message( 3, "Apache description is: '$desc'" );
             if( $desc =~ /\bApache\/([\d\.]+)/ )
             {
                 $vers = $1;
@@ -2595,19 +2512,18 @@ sub server_version
         }
         catch( $e )
         {
-            $self->message( 3, "Failed getting version from Apache2::ServerUtil::get_server_description()" );
         }
-        $self->message( 3, "Found Apache version '$vers' from its description" );
     }
     
-    ## XXX to test our alternative approach
+    require File::Which;
+    # NOTE: to test our alternative approach
     if( !$vers && ( my $apxs = File::Which::which( 'apxs' ) ) )
     {
         $vers = qx( $apxs -q -v HTTPD_VERSION );
         chomp( $vers );
         $vers = '' unless( $vers =~ /^[\d\.]+$/ );
     }
-    ## Try apache2
+    # Try apache2
     if( !$vers )
     {
         foreach my $bin ( qw( apache2 httpd ) )
@@ -2624,7 +2540,6 @@ sub server_version
             }
         }
     }
-    $self->message( 3, "Returning version '$vers'." );
     if( $vers )
     {
         $self->{server_version} = $SERVER_VERSION = version->parse( $vers );
@@ -2652,7 +2567,6 @@ sub parse_expr_args
     my $env = $self->env;
     foreach my $this ( @$args )
     {
-        $self->message( 3, "Processing argument of type '", ( $this->{type} // '' ), "' and sub type '", ( $this->{subtype} // '' ), "'." );
         my $res = $self->ap2perl_expr( $this, [] );
         push( @$buff, @$res ) if( $res );
     }
@@ -2664,11 +2578,26 @@ sub _format_time
     my( $self, $time, $format, $tzone ) = @_;
     my $env = $self->env;
     $format ||= $self->{timefmt};
-    $self->message( 3, "Time provided is ", scalar( localtime( $time ) ) );
-    ## Quotes are important as they are used to stringify overloaded $time
+    # Quotes are important as they are used to stringify overloaded $time
     my $params = { epoch => "$time" };
     $params->{time_zone} = ( $tzone || 'local' );
     $params->{locale} = $env->{lang} if( length( $env->{lang} ) );
+    require DateTime;
+    require DateTime::Format::Strptime;
+    my $tz;
+    # DateTime::TimeZone::Local will die ungracefully if the local timezeon is not set with the error:
+    # "Cannot determine local time zone"
+    try
+    {
+        require DateTime::TimeZone;
+        $tz = DateTime::TimeZone->new( name => 'local' );
+    }
+    catch( $e )
+    {
+        $tz = DateTime::TimeZone->new( name => 'UTC' );
+        warn( "Your system is missing key timezone components. Reverting to UTC instead of local time zone.\n" );
+    }
+    
     try
     {
         my $dt = DateTime->from_epoch( %$params );
@@ -2676,7 +2605,7 @@ sub _format_time
         {
             my $fmt = DateTime::Format::Strptime->new(
                 pattern => $format,
-                time_zone => ( $params->{time_zone} || 'local' ),
+                time_zone => ( $params->{time_zone} || $tz ),
                 locale => $dt->locale->code,
             );
             $dt->set_formatter( $fmt );
@@ -2689,7 +2618,6 @@ sub _format_time
     }
     catch( $e )
     {
-        $self->message( 3, "An error occurred getting a DateTime object for time \"$time\" with format \"$format\": $e" );
         $self->error( "An error occurred getting a DateTime object for time \"$time\" with format \"$format\": $e" );
         return( $self->errmsg );
     }
@@ -2719,9 +2647,9 @@ sub _has_utf8
 
 sub _interp_vars
 {
-    ## Find all $var and ${var} expressions in the string and fill them in.
+    # Find all $var and ${var} expressions in the string and fill them in.
     my $self = shift( @_ );
-    ## Because ssi_echo may change $1, $2, ...
+    # Because ssi_echo may change $1, $2, ...
     my( $a, $b, $c );
     $_[0] =~ s{ (^|[^\\]) (\\\\)* \$(\{)?(\w+)(\})? }
               { ($a,$b,$c) = ($1,$2,$4);
@@ -2736,6 +2664,7 @@ sub _ipmatch
     try
     {
         local $SIG{__WARN__} = sub{};
+        require Net::Subnet;
         my $net = Net::Subnet::subnet_matcher( $subnet );
         my $res = $net->( $ip );
         return( $res ? 1 : 0 );
@@ -2752,7 +2681,7 @@ sub _is_ip
     my $self = shift( @_ );
     my $ip   = shift( @_ );
     return( 0 ) if( !length( $ip ) );
-    ## We need to return either 1 or 0. By default, perl return undef for false
+    # We need to return either 1 or 0. By default, perl return undef for false
     return( $ip =~ /^(?:$RE{net}{IPv4}|$RE{net}{IPv6})$/ ? 1 : 0 );
 }
 
@@ -2769,13 +2698,13 @@ sub _is_perl_script
     my $self = shift( @_ );
     my $file = shift( @_ );
     return( $self->error( "No file was provided to check if it looks like a perl script." ) ) if( !length( "$file" ) );
-    if( -T( "$finfo" ) )
+    if( -T( "$file" ) )
     {
         my $io = IO::File->new( "<$file" ) || return( $self->error( "Unable to open file \"$file\" in read mode: $!" ) );
         my $shebang = $io->getline;
         chomp( $shebang );
         $io->close;
-        ## We explicitly return 1 or 0, because otherwise upon failure perl would return undef which we reserve for errors
+        # We explicitly return 1 or 0, because otherwise upon failure perl would return undef which we reserve for errors
         return( $shebang =~ /^\#\!(.*?)\bperl\b/i ? 1 : 0 );
     }
     return( 0 );
@@ -2784,12 +2713,11 @@ sub _is_perl_script
 sub _lastmod                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
 {
     my( $self, $file, $format ) = @_;
-    $self->message( 3, "Formatting time for file \"$file\" with format '$format'." );
     return( $self->_format_time( ( stat( "$file" ) )[9], $format ) );
 }
 
-## This is different from the env() method. This one is obviously private
-## whereas the env() one has triggers that could otherwise create an infinite loop.
+# This is different from the env() method. This one is obviously private
+# whereas the env() one has triggers that could otherwise create an infinite loop.
 sub _set_env
 {
     my $self = shift( @_ );
@@ -2819,14 +2747,14 @@ sub _set_var
 
 sub _time_args
 {
-    ## This routine must respect the caller's wantarray() context.
+    # This routine must respect the caller's wantarray() context.
     my( $self, $time, $zone ) = @_;
     return( ( $zone && $zone =~ /GMT/ ) ? gmtime( $time ) : localtime( $time ) );
 }
 
-## Credits: Torsten Förtsch
+# Credits: Torsten Förtsch
 {
-    # XXX Apache2::SSI::Filter class
+    # NOTE: Apache2::SSI::Filter class
     package
         Apache2::SSI::Filter;
 
@@ -2851,7 +2779,7 @@ sub _time_args
         my $debug = int( $r->dir_config( 'Apache2_SSI_DEBUG' ) );
 
         my $eos = 0;
-        ## Cycling through APR::Bucket
+        # Cycling through APR::Bucket
 #         while( my $b = $bb->first )
 #         {
 #             $eos++ if( $b->is_eos );
@@ -2875,19 +2803,19 @@ sub _time_args
         return( $eos );
     }
     
-    ## We cannot declare it now. Instead we eval it so that it works under Apache and gets discarded outside
-    ## sub fetch_content_filter : FilterRequestHandler
+    # We cannot declare it now. Instead we eval it so that it works under Apache and gets discarded outside
+    # sub fetch_content_filter : FilterRequestHandler
     sub apache_filter_handler
     {
         my( $f, $bb ) = @_;
         my $r = $f->r;
         unless( $f->ctx )
         {
-            unless( $r->status == Apache2::Const::HTTP_OK or
+            unless( $r->status == &Apache2::Const::HTTP_OK or
                     $r->pnotes->{force_fetch_content} )
             {
                 $f->remove;
-                return( Apache2::Const::DECLINED );
+                return( &Apache2::Const::DECLINED );
             }
             $f->ctx(1);
         }
@@ -2910,14 +2838,14 @@ sub _time_args
         {
             $r->log->debug( __PACKAGE__ . ": request is declined because \$out is neither an array or code." ) if( $debug > 0 );
             $f->remove;
-            return( Apache2::Const::DECLINED );
+            return( &Apache2::Const::DECLINED );
         }
-        return( Apache2::Const::OK );
+        return( &Apache2::Const::OK );
     }
 }
 
 {
-    # XXX Apache2::RequestRec class
+    # NOTE: Apache2::RequestRec class
     package
         Apache2::RequestRec;
 
@@ -2974,9 +2902,9 @@ sub _time_args
         {
             $subr = $I->lookup_uri( $url );
         }
-        if( $subr->status == Apache2::Const::HTTP_OK and
+        if( $subr->status == &Apache2::Const::HTTP_OK and
             ( length( $subr->handler ) ||
-              $subr->finfo->filetype == APR::Const::FILETYPE_REG ) )
+              $subr->finfo->filetype == &APR::Const::FILETYPE_REG ) )
         {
             @{$subr->pnotes}{qw( out force_fetch_content )} = ( $outfn || $output, 1 );
             $subr->add_output_filter( \&Apache2::SSI::Filter::apache_filter_handler );
@@ -2994,7 +2922,7 @@ sub _time_args
                     $subr->headers_in->add( @$headers[ $i, $i + 1 ] );
                 }
             }
-            $subr->headers_in->add( 'User-Agent' => "Apache2::SSI/$VERSION" )
+            $subr->headers_in->add( 'User-Agent' => "Apache2::SSI/$Apache2::SSI::VERSION" )
                 unless( exists( $subr->headers_in->{'User-Agent'} ) );
             $_ = $I->headers_in->{Host} and $subr->headers_in->add( 'Host' => $_ )
                 unless( exists( $subr->headers_in->{'Host'} ) );
@@ -3020,8 +2948,8 @@ sub _time_args
         {
             my( %hout );
             $hout{STATUS} = $subr->status;
-            $hout{STATUS} = Apache2::Const::HTTP_NOT_FOUND
-                if( $hout{STATUS} == Apache2::Const::HTTP_OK );
+            $hout{STATUS} = &Apache2::Const::HTTP_NOT_FOUND
+                if( $hout{STATUS} == &Apache2::Const::HTTP_OK );
             $subr->headers_out->do(sub
             {
                 $hout{ lc( $_[0] ) } = $_[1];
@@ -3053,10 +2981,10 @@ Outside of Apache:
 
     use Apache2::SSI;
     my $ssi = Apache2::SSI->new(
-        ## If running outside of Apache
+        # If running outside of Apache
         document_root => '/path/to/base/directory'
-        ## Default error message to display when ssi failed to parse
-        ## Default to [an error occurred while processing this directive]
+        # Default error message to display when ssi failed to parse
+        # Default to [an error occurred while processing this directive]
         errmsg => '[Oops]'
     );
     my $fh = IO::File->new( "</some/file.html" ) || die( "$!\n" );
@@ -3095,10 +3023,10 @@ Inside Apache, in the VirtualHost configuration, for example:
             SetHandler perl-script
             AcceptPathInfo On
             PerlResponseHandler ModPerl::PerlRun
-            ## Even better for stable cgi scripts:
-            ## PerlResponseHandler ModPerl::Registry
-            ## Change this in mod_perl1 PerlSendHeader On to the following:
-            ## <https://perl.apache.org/docs/2.0/user/porting/compat.html#C_PerlSendHeader_>
+            # Even better for stable cgi scripts:
+            # PerlResponseHandler ModPerl::Registry
+            # Change this in mod_perl1 PerlSendHeader On to the following:
+            # <https://perl.apache.org/docs/2.0/user/porting/compat.html#C_PerlSendHeader_>
             PerlOptions +ParseHeaders
         </Files>
         <Files ~ "\.cgi$">
@@ -3422,7 +3350,7 @@ The default message to be returned for the C<echo> command when the variable cal
 Example:
 
     $ssi->echomsg( '[Value Undefined]' );
-    ## or in the document itself
+    # or in the document itself
     <!--#config echomsg="[Value Undefined]" -->
     <!--#echo var="NON_EXISTING" encoding="none" -->
 
@@ -3453,7 +3381,7 @@ Example:
 
 =head2 encode_uri
 
-Encode uri data. This uses L<URI::Escape/uri_escape_utf8>.
+Encode uri data. This uses L<URI::Escape::XS/uri_escape>.
 
 Not to be confused with x-www-form-urlencoded data. For that see L</encode_url>
 

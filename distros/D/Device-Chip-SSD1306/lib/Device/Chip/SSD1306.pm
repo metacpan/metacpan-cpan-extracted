@@ -1,12 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2015-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2015-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.57;
+use Object::Pad 0.70 ':experimental(adjust_params)';
 
-package Device::Chip::SSD1306 0.11;
+package Device::Chip::SSD1306 0.12;
 class Device::Chip::SSD1306
    :isa(Device::Chip)
    :strict(params);
@@ -161,11 +161,9 @@ has $_set_com_pins_arg;
 has $_xflip            :param = 0;
 has $_yflip            :param = 0;
 
-ADJUSTPARAMS ( $params )
+ADJUST :params ( :$model = "SSD1306-128x64" )
 {
-   my $model = delete $params->{model};
-   my $modelargs = $MODELS{ $model // "SSD1306-128x64" }
-      or croak "Unrecognised model $model";
+   my $modelargs = $MODELS{$model} or croak "Unrecognised model $model";
 
    ( $_rows, $_columns, $_column_offset, $_set_com_pins_arg ) =
       @{$modelargs}{qw( rows columns column_offset set_com_pins_arg )};

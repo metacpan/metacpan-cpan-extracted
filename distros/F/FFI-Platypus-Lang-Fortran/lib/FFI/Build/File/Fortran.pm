@@ -7,24 +7,8 @@ use base qw( FFI::Build::File::C );
 use constant default_suffix => '.f';
 use constant default_encoding => ':utf8';
 
-our $VERSION = '0.12';
-
-=head1 NAME
-
-FFI::Build::File::Fortran - Class to track Fortran source file in FFI::Build
-Fortran
-
-=head1 SYNOPSIS
-
- use FFI::Build::File::Fortran;
- 
- my $c = FFI::Build::File::C->new('src/foo.f');
-
-=head1 DESCRIPTION
-
-File class for Fortran source files.
-
-=cut
+# ABSTRACT: Class to track Fortran source file in FFI::Build
+our $VERSION = '0.14'; # VERSION
 
 sub accept_suffix
 {
@@ -45,7 +29,7 @@ sub ld
 
 sub _filter
 {
-  grep { $_ ne '-no-cpp-precomp' && $_ !~ /^-[DI]/ } @_;
+  grep { $_ ne '-no-cpp-precomp' && $_ !~ /^-[DI]/ } @_;  ## no critic (RegularExpressions::ProhibitUselessTopic)
 }
 
 # TODO: this should use a public interface
@@ -56,6 +40,30 @@ sub _base_args
 }
 
 1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+FFI::Build::File::Fortran - Class to track Fortran source file in FFI::Build
+
+=head1 VERSION
+
+version 0.14
+
+=head1 SYNOPSIS
+
+ use FFI::Build::File::Fortran;
+ 
+ my $c = FFI::Build::File::C->new('src/foo.f');
+
+=head1 DESCRIPTION
+
+File class for Fortran source files.
 
 =head1 SEE ALSO
 
@@ -73,11 +81,11 @@ Tool to build bundled libraries with your Perl dist.
 
 =head1 AUTHOR
 
-Graham Ollis E<lt>plicease@cpan.orgE<gt>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Graham Ollis
+This software is copyright (c) 2015-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

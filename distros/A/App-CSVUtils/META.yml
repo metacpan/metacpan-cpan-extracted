@@ -23,19 +23,19 @@ name: App-CSVUtils
 provides:
   App::CSVUtils:
     file: lib/App/CSVUtils.pm
-    version: '0.045'
+    version: '0.046'
 recommends:
   Sort::Sub: '0.120'
 requires:
   Complete::Util: '0.608'
-  Data::Sah::Compiler::perl::TH::any: '0.911'
-  Data::Sah::Compiler::perl::TH::array: '0.911'
-  Data::Sah::Compiler::perl::TH::bool: '0.911'
-  Data::Sah::Compiler::perl::TH::code: '0.911'
-  Data::Sah::Compiler::perl::TH::hash: '0.911'
-  Data::Sah::Compiler::perl::TH::int: '0.911'
-  Data::Sah::Compiler::perl::TH::re: '0.911'
-  Data::Sah::Compiler::perl::TH::str: '0.911'
+  Data::Sah::Compiler::perl::TH::any: '0.914'
+  Data::Sah::Compiler::perl::TH::array: '0.914'
+  Data::Sah::Compiler::perl::TH::bool: '0.914'
+  Data::Sah::Compiler::perl::TH::code: '0.914'
+  Data::Sah::Compiler::perl::TH::hash: '0.914'
+  Data::Sah::Compiler::perl::TH::int: '0.914'
+  Data::Sah::Compiler::perl::TH::re: '0.914'
+  Data::Sah::Compiler::perl::TH::str: '0.914'
   Data::Sah::Filter::perl::Path::expand_tilde_when_on_unix: '0'
   Data::Sah::Filter::perl::Path::strip_slashes_when_on_unix: '0'
   File::Slurper::Dash: '0'
@@ -44,8 +44,8 @@ requires:
   IO::Scalar: '0'
   LWP::UserAgent: '0'
   Log::ger: '0.038'
-  Perinci::CmdLine::Any: '0.152'
-  Perinci::CmdLine::Lite: '1.915'
+  Perinci::CmdLine::Any: '0.154'
+  Perinci::CmdLine::Lite: '1.924'
   Perinci::Sub::XCompletion::sortsub_spec: '0'
   Sah::Schema::filename: '0'
   Sah::Schema::true: '0'
@@ -62,7 +62,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-CSVUtils
   homepage: https://metacpan.org/release/App-CSVUtils
   repository: git://github.com/perlancar/perl-App-CSVUtils.git
-version: '0.045'
+version: '0.046'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -186,6 +186,10 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::GenPericmdScript
       name: 'GenPericmdScript csv2td'
+      version: '0.424'
+    -
+      class: Dist::Zilla::Plugin::GenPericmdScript
+      name: 'GenPericmdScript csv2vcf'
       version: '0.424'
     -
       class: Dist::Zilla::Plugin::GenPericmdScript

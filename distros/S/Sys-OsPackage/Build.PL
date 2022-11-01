@@ -18,16 +18,18 @@ my %module_build_args = (
     "Ian Kluft <cpan-dev\@iankluft.com>"
   ],
   "dist_name" => "Sys-OsPackage",
-  "dist_version" => "0.1.6",
+  "dist_version" => "0.3.0",
   "license" => "artistic_2",
   "module_name" => "Sys::OsPackage",
   "recursive_test_files" => 1,
   "requires" => {
     "Carp" => 0,
     "Data::Dumper" => 0,
+    "Getopt::Long" => 0,
     "Perl::PrereqScanner::NotQuiteLite" => 0,
     "Sys::OsRelease" => "v0.2.3",
     "Term::ANSIColor" => 0,
+    "Try::Tiny" => 0,
     "autodie" => 0,
     "base" => 0,
     "perl" => "5.006",
@@ -40,19 +42,31 @@ my %module_build_args = (
   ],
   "test_requires" => {
     "Cwd" => 0,
+    "File::Basename" => 0,
     "File::Copy::Recursive" => 0,
-    "Getopt::Long" => 0,
-    "Test::More" => 0
+    "File::Path" => 0,
+    "File::Slurp" => 0,
+    "File::Temp" => 0,
+    "Readonly" => 0,
+    "Test::More" => 0,
+    "local::lib" => 0,
+    "open" => 0
   }
 );
 
 
 my %fallback_build_requires = (
   "Cwd" => 0,
+  "File::Basename" => 0,
   "File::Copy::Recursive" => 0,
-  "Getopt::Long" => 0,
+  "File::Path" => 0,
+  "File::Slurp" => 0,
+  "File::Temp" => 0,
   "Module::Build" => "0.28",
-  "Test::More" => 0
+  "Readonly" => 0,
+  "Test::More" => 0,
+  "local::lib" => 0,
+  "open" => 0
 );
 
 

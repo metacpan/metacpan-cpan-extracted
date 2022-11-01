@@ -1,0 +1,24 @@
+{
+   "bank_transfer" : {
+      "country" : "DE",
+      "financial_addresses" : [
+         {
+            "iban" : {
+               "account_holder_name" : "Stripe Technology Europe Limited",
+               "bic" : "SXPYDEHH",
+               "country" : "DE",
+               "iban" : "DE00000000000000000001"
+            },
+            "supported_networks" : [
+               "sepa"
+            ],
+            "type" : "iban"
+         }
+      ],
+      "type" : "eu_bank_transfer"
+   },
+   "currency" : "eur",
+   "funding_type" : "bank_transfer",
+   "livemode" : 0,
+   "object" : "funding_instructions"
+}

@@ -1,0 +1,37 @@
+---
+abstract: 'Add sprintf logging to Mojo::Log'
+author:
+  - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test2::V0: '0.000145'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojo-Log-Role-Format
+no_index:
+  directory:
+    - t
+    - inc
+    - examples
+    - t
+requires:
+  Mojolicious: '9.00'
+  Role::Tiny: '2.000001'
+  perl: '5.016'
+resources:
+  IRC:
+    url: irc://irc.libera.chat/#convos
+    web: https://web.libera.chat/#convos
+  bugtracker: https://github.com/jhthorsen/mojo-log-role-format/issues
+  homepage: https://github.com/jhthorsen/mojo-log-role-format
+  license: http://www.opensource.org/licenses/artistic-license-2.0
+  repository: https://github.com/jhthorsen/mojo-log-role-format.git
+version: '0.02'
+x_contributors: []
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

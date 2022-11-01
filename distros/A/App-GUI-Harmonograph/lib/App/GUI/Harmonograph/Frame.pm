@@ -5,16 +5,17 @@ use Wx::AUI;
 
 package App::GUI::Harmonograph::Frame;
 use base qw/Wx::Frame/;
-use App::GUI::Harmonograph::Frame::Part::Pendulum;
-use App::GUI::Harmonograph::Frame::Part::ColorFlow;
-use App::GUI::Harmonograph::Frame::Part::ColorBrowser;
-use App::GUI::Harmonograph::Frame::Part::ColorPicker;
-use App::GUI::Harmonograph::Frame::Part::PenLine;
-use App::GUI::Harmonograph::Frame::Part::Board;
-use App::GUI::Harmonograph::Widget::ProgressBar;
 use App::GUI::Harmonograph::Dialog::Function;
 use App::GUI::Harmonograph::Dialog::Interface;
 use App::GUI::Harmonograph::Dialog::About;
+use App::GUI::Harmonograph::Frame::Part::Board;
+use App::GUI::Harmonograph::Frame::Part::ColorBrowser;
+use App::GUI::Harmonograph::Frame::Part::ColorFlow;
+use App::GUI::Harmonograph::Frame::Part::ColorPicker;
+use App::GUI::Harmonograph::Frame::Part::Pendulum;
+use App::GUI::Harmonograph::Frame::Part::PenLine;
+use App::GUI::Harmonograph::Frame::Part::ModMatrix;
+use App::GUI::Harmonograph::Widget::ProgressBar;
 use App::GUI::Harmonograph::Settings;
 use App::GUI::Harmonograph::Config;
 
@@ -33,6 +34,7 @@ sub new {
     $self->{'tabs'}             = Wx::AuiNotebook->new($self, -1, [-1,-1], [-1,-1], &Wx::wxAUI_NB_TOP );
     $self->{'tab'}{'linear'}    = Wx::Panel->new($self->{'tabs'});
     $self->{'tab'}{'circular'}  = Wx::Panel->new($self->{'tabs'});
+    $self->{'tab'}{'mod'}       = App::GUI::Harmonograph::Frame::Part::ModMatrix->new( $self->{'tabs'} );
     $self->{'tab'}{'pen'}       = Wx::Panel->new($self->{'tabs'});
     $self->{'tabs'}->AddPage( $self->{'tab'}{'linear'},   'Lateral Pendulum Settings');
     $self->{'tabs'}->AddPage( $self->{'tab'}{'circular'}, 'Rotary Pendulum Settings');
@@ -44,6 +46,7 @@ sub new {
     $self->{'pendulum'}{'z'}    = App::GUI::Harmonograph::Frame::Part::Pendulum->new( $self->{'tab'}{'circular'}, 'z','circular pendulum',        0, 100);
     $self->{'pendulum'}{'r'}    = App::GUI::Harmonograph::Frame::Part::Pendulum->new( $self->{'tab'}{'circular'}, 'R','rotating pendulum',        0, 100);
     $self->{'pendulum'}{$_}->SetCallBack( sub { $self->sketch( ) } ) for qw/x y z r/;
+    $self->{'tab'}{'mod'}->SetCallBack( sub { $self->sketch( ) } );
                                 
     $self->{'color'}{'start'}   = App::GUI::Harmonograph::Frame::Part::ColorBrowser->new( $self->{'tab'}{'pen'}, 'start', { red => 20, green => 20, blue => 110 } );
     $self->{'color'}{'end'}     = App::GUI::Harmonograph::Frame::Part::ColorBrowser->new( $self->{'tab'}{'pen'}, 'end',  { red => 110, green => 20, blue => 20 } );
@@ -76,6 +79,7 @@ sub new {
     $self->{'txt'}{'file_bname'}->SetToolTip("file base name (without ending) for a series of files you save (settings and images)");
     $self->{'txt'}{'file_bnr'}->SetToolTip("index of file base name,\nwhen pushing Next button, image or settings are saved under Dir + File + Index + Ending");
 
+    # Events
     Wx::Event::EVT_TEXT_ENTER( $self, $self->{'txt'}{'file_bname'}, sub { $self->update_base_name });
     Wx::Event::EVT_KILL_FOCUS(        $self->{'txt'}{'file_bname'}, sub { $self->update_base_name });
     
@@ -119,16 +123,13 @@ sub new {
         $_[1]->Skip(1) 
     });
 
-
-    # GUI layout assembly
-    
+    # Menu
     my $settings_menu = $self->{'setting_menu'} = Wx::Menu->new();
     $settings_menu->Append( 11100, "&Init\tCtrl+I", "put all settings to default" );
     $settings_menu->Append( 11200, "&Open\tCtrl+O", "load settings from an INI file" );
     $settings_menu->Append( 11400, "&Write\tCtrl+W", "store curent settings into an INI file" );
     $settings_menu->AppendSeparator();
     $settings_menu->Append( 11500, "&Quit\tAlt+Q", "save configs and close program" );
-
 
     my $image_size_menu = Wx::Menu->new();
     for (1 .. 20) {
@@ -160,11 +161,10 @@ sub new {
     $image_menu->Append( 12100, "S&ize",  $image_size_menu,   "set image size" );
     $image_menu->Append( 12200, "&Format",  $image_format_menu, "set default image formate" );
     $image_menu->Append( 12400, "&Save\tCtrl+S", "save currently displayed image" );
-
     
     my $help_menu = Wx::Menu->new();
-    $help_menu->Append( 13100, "&Function\tAlt+F", "Dialog with information how an Harmonograph works" );
-    $help_menu->Append( 13200, "&Knobs\tAlt+K", "Dialog explaining the layout and function of knobs" );
+    #$help_menu->Append( 13100, "&Function\tAlt+F", "Dialog with information how an Harmonograph works" );
+    #$help_menu->Append( 13200, "&Knobs\tAlt+K", "Dialog explaining the layout and function of knobs" );
     $help_menu->Append( 13300, "&About\tAlt+A", "Dialog with general information about the program" );
 
     my $menu_bar = Wx::MenuBar->new();
@@ -183,6 +183,7 @@ sub new {
     Wx::Event::EVT_MENU( $self, 13200, sub { $self->{'dialog'}{'interface'}->ShowModal });
     Wx::Event::EVT_MENU( $self, 13300, sub { $self->{'dialog'}{'about'}->ShowModal });
 
+    # GUI layout assembly
     my $std_attr = &Wx::wxALIGN_LEFT|&Wx::wxGROW|&Wx::wxALIGN_CENTER_HORIZONTAL;
     my $vert_attr = $std_attr | &Wx::wxTOP;
     my $vset_attr = $std_attr | &Wx::wxTOP| &Wx::wxBOTTOM;
@@ -190,7 +191,7 @@ sub new {
     my $all_attr    = $std_attr | &Wx::wxALL;
     my $line_attr    = $std_attr | &Wx::wxLEFT | &Wx::wxRIGHT ;
  
-     my $linear_sizer = Wx::BoxSizer->new(&Wx::wxVERTICAL);
+    my $linear_sizer = Wx::BoxSizer->new(&Wx::wxVERTICAL);
     $linear_sizer->AddSpacer(5);
     $linear_sizer->Add( $self->{'pendulum'}{'x'},   0, $vert_attr| &Wx::wxLEFT, 15);
     $linear_sizer->Add( Wx::StaticLine->new( $self->{'tab'}{'linear'}, -1, [-1,-1], [ 135, 2] ),  0, $vert_attr, 10);
@@ -199,7 +200,7 @@ sub new {
     $linear_sizer->Add( 0, 1, &Wx::wxEXPAND | &Wx::wxGROW);
     $self->{'tab'}{'linear'}->SetSizer( $linear_sizer );
 
-     my $circular_sizer = Wx::BoxSizer->new(&Wx::wxVERTICAL);
+    my $circular_sizer = Wx::BoxSizer->new(&Wx::wxVERTICAL);
     $circular_sizer->AddSpacer(5);
     $circular_sizer->Add( $self->{'pendulum'}{'z'},   0, $vert_attr| &Wx::wxLEFT, 15);
     $circular_sizer->Add( Wx::StaticLine->new( $self->{'tab'}{'circular'}, -1, [-1,-1], [ 135, 2] ),  0, $vert_attr, 10);
@@ -231,20 +232,22 @@ sub new {
     my $cmdi_sizer = Wx::BoxSizer->new( &Wx::wxHORIZONTAL );
     my $image_lbl = Wx::StaticText->new( $self, -1, 'Image:' );
     $cmdi_sizer->Add( $image_lbl,     0, $all_attr, 15 );
-    $cmdi_sizer->Add( $self->{'progress'},         0, &Wx::wxALIGN_LEFT | &Wx::wxALIGN_CENTER_VERTICAL| &Wx::wxALL, 10 );
+    $cmdi_sizer->Add( $self->{'progress'},         1, &Wx::wxALIGN_LEFT | &Wx::wxALIGN_CENTER_VERTICAL| &Wx::wxALL, 10 );
     $cmdi_sizer->AddSpacer(5);
     $cmdi_sizer->Add( $self->{'btn'}{'draw'},      0, $all_attr, 5 );
-    $cmdi_sizer->Add( 0, 0, &Wx::wxEXPAND | &Wx::wxGROW);
 
     my $cmds_sizer = Wx::BoxSizer->new( &Wx::wxHORIZONTAL );
     my $series_lbl = Wx::StaticText->new( $self, -1, 'Series:' );
     $cmds_sizer->Add( $series_lbl,     0, $all_attr, 15 );
+    $cmds_sizer->AddSpacer( 5 );
     $cmds_sizer->Add( $self->{'btn'}{'dir'},         0, $all_attr, 5 );
     $cmds_sizer->Add( $self->{'txt'}{'file_bdir'},   0, $all_attr, 5 );
     $cmds_sizer->Add( $self->{'txt'}{'file_bname'},  0, $all_attr, 5 );
     $cmds_sizer->Add( $self->{'txt'}{'file_bnr'},    0, $all_attr, 5 );
-    $cmds_sizer->Add( $self->{'btn'}{'save_next'},   0, $all_attr, 5 );
+    $cmds_sizer->AddSpacer( 10 );
     $cmds_sizer->Add( $self->{'btn'}{'write_next'},  0, $all_attr, 5 );
+    $cmds_sizer->AddSpacer( 10 );
+    $cmds_sizer->Add( $self->{'btn'}{'save_next'},   0, $all_attr, 5 );
     $cmds_sizer->Add( 0, 0, &Wx::wxEXPAND | &Wx::wxGROW);
 
     my $board_sizer = Wx::BoxSizer->new(&Wx::wxVERTICAL);
@@ -266,7 +269,6 @@ sub new {
 
     $self->SetSizer($main_sizer);
     $self->SetAutoLayout( 1 );
-    $self->{'btn'}{'draw'}->SetFocus;
     my $size = [1260, 820];
     $self->SetSize($size);
     $self->SetMinSize($size);
@@ -274,6 +276,7 @@ sub new {
   
     $self->update_recent_settings_menu();
     $self->init();
+    $self->{'btn'}{'draw'}->SetFocus;
     $self->{'last_file_settings'} = get_data( $self );
     $self;
 }
@@ -346,6 +349,7 @@ sub get_data {
         y => $self->{'pendulum'}{'y'}->get_data,
         z => $self->{'pendulum'}{'z'}->get_data,
         r => $self->{'pendulum'}{'r'}->get_data,
+        mod => $self->{'tab'}{'mod'}->get_data,
         start_color => $self->{'color'}{'start'}->get_data,
         end_color => $self->{'color'}{'end'}->get_data,
         color_flow => $self->{'color_flow'}->get_data,

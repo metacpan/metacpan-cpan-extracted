@@ -143,7 +143,6 @@ sub capsules {
   } elsif (($host) = $url =~ m!^gemini://($hosts)(?::$port)?/$capsule_space/?$!) {
     return serve_main_menu($stream, $host);
   }
-  $log->info("Capsules have no match for $url");
   return;
 }
 

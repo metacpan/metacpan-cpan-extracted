@@ -87,9 +87,30 @@ sub is_optree
       "infix_add_0xXXX[aelemfast, aelemfast]",
       'optree of call to infix operator';
 
+   # Check precedence of operator parsing by observing the following precedence
+   # ordering:
+   #   <--High      Low-->
+   #      **  *  +  &&
+
    is_optree sub { $_[0] * $_[1] add $_[2] * $_[3] },
       "infix_add_0xXXX[multiply[aelemfast, aelemfast], multiply[aelemfast, aelemfast]]",
-      'optree of call to infix operator at default precedence';
+      'optree binds add lower than *';
+   is_optree sub { $_[0] + $_[1] add $_[2] + $_[3] },
+      "add[infix_add_0xXXX[add[aelemfast, aelemfast], aelemfast], aelemfast]",
+      'optree binds add equal to +';
+   is_optree sub { $_[0] && $_[1] add $_[2] && $_[3] },
+      "and[and[aelemfast, infix_add_0xXXX[aelemfast, aelemfast]], aelemfast]",
+      'optree binds add higher than &&';
+
+   is_optree sub { $_[0] ** $_[1] mul $_[2] ** $_[3] },
+      "infix_mul_0xXXX[pow[aelemfast, aelemfast], pow[aelemfast, aelemfast]]",
+      'optree binds mul lower than **';
+   is_optree sub { $_[0] * $_[1] mul $_[2] * $_[3] },
+      "multiply[infix_mul_0xXXX[multiply[aelemfast, aelemfast], aelemfast], aelemfast]",
+      'optree binds mul equal to *';
+   is_optree sub { $_[0] + $_[1] mul $_[2] + $_[3] },
+      "add[add[aelemfast, infix_mul_0xXXX[aelemfast, aelemfast]], aelemfast]",
+      'optree binds mul higher than +';
 
    is_optree sub { $_[0] * ($_[1] add $_[2]) * $_[3] },
       "multiply[multiply[aelemfast, infix_add_0xXXX[aelemfast, aelemfast]], aelemfast]",
@@ -116,11 +137,11 @@ sub is_deparsed
 {
    is_deparsed sub { $_[0] add $_[1] },
       '$_[0] add $_[1];',
-      'deparsed call to infix operator';
+      'deparsed call to infix add operator';
 
    is_deparsed sub { $_[0] * $_[1] add $_[2] * $_[3] },
       '($_[0] * $_[1]) add ($_[2] * $_[3]);',
-      'deparsed call to infix operator at default precedence';
+      'deparsed call to infix add operator at default precedence';
 
    is_deparsed sub { $_[0] ⊕ $_[1] },
       '$_[0] ⊕ $_[1];',

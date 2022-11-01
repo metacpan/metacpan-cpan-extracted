@@ -4,9 +4,12 @@ Revision history for Perl extension Sendmail::PMilter V1.1x and later.
 
 https://rt.cpan.org/Public/Dist/Display.html?Name=Sendmail-PMilter
 
-1.21
-    Sun 03 Jul 11:00:00 BST 2022
-    - Released
+1.23
+    Sun 30 Oct 2022 18:01:50 GMT 2022 released
+    - [144401] Replace deprecated IO::Socket::INET6 with IO::Socket::IP
+    - [144971] ) Most callbacks were not recognized unless the appropriate
+    - [144273] ) flags were set during the negotiate callback
+    - [130084] Packaging improvements
 
 1.20_03
     Wed 17 Jul 09:42:32 BST 2019 developer release
@@ -27,6 +30,9 @@ https://rt.cpan.org/Public/Dist/Display.html?Name=Sendmail-PMilter
     - Propose to insist on Milter Protocol Version 6 in V1.21
     - Removed enable_chgfrom and some other some cruft
     - Comments invited via CPAN issues
+
+1.20  Sun 22 May 10:44:38 BST 2019 TRIAL2, not released.
+    - Partial support for negotiation
 
 1.10  Sun 15 Apr 15:05:24 BST 2018 TRIAL1, not released
     - New maintainership (CPAN/GWHAYWOOD)

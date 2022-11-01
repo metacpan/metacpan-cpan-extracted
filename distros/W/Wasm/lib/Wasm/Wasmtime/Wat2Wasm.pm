@@ -7,7 +7,7 @@ use Wasm::Wasmtime::FFI;
 use base qw( Exporter );
 
 # ABSTRACT: Convert WebAssembly Text to Wasm
-our $VERSION = '0.21'; # VERSION
+our $VERSION = '0.22'; # VERSION
 
 
 our @EXPORT = qw( wat2wasm );
@@ -46,7 +46,7 @@ Wasm::Wasmtime::Wat2Wasm - Convert WebAssembly Text to Wasm
 
 =head1 VERSION
 
-version 0.21
+version 0.22
 
 =head1 SYNOPSIS
 
@@ -86,7 +86,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Graham Ollis.
+This software is copyright (c) 2020-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

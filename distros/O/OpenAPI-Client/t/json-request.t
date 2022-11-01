@@ -13,7 +13,10 @@ post '/user' => sub {
 
 plugin OpenAPI => {url => 'data://main/test.json'};
 
-my $client = OpenAPI::Client->new('data://main/test.json', app => app);
+my $client = OpenAPI::Client->new('data://main/test.json', ua => app->ua);
+$client->base_url->host(undef)->scheme(undef)->port(undef);
+is $client->ua, app->ua, 'passed ua as argument, instead of app';
+
 my $tx = $client->addUser({user => {username => 'superwoman'}});
 is $tx->res->json->{user}{username}, 'superwoman', 'echo back username (b)';
 like $tx->req->headers->header('Content-Type'), qr{application/json}, 'application/json';

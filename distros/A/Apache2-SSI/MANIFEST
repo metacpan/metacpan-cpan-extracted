@@ -1,4 +1,4 @@
-Changes
+CHANGES
 CONTRIBUTING.md
 lib/Apache2/Expression.pm
 lib/Apache2/SSI.pm
@@ -112,3 +112,4 @@ t/SSITest.pm
 t/TEST.PL
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

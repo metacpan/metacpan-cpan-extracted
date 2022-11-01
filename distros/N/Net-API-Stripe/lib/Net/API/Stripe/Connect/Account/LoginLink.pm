@@ -2,7 +2,7 @@
 ## Stripe API - ~/lib/Net/API/Stripe/Connect/Account/LoginLink.pm
 ## Version v0.100.0
 ## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2020/05/15
 ## 
@@ -17,15 +17,20 @@ package Net::API::Stripe::Connect::Account::LoginLink;
 BEGIN
 {
     use strict;
+    use warnings;
     use parent qw( Net::API::Stripe::Generic );
+    use vars qw( $VERSION );
     our( $VERSION ) = 'v0.100.0';
 };
 
-sub object { shift->_set_get_scalar( 'object', @_ ); }
+use strict;
+use warnings;
 
-sub created { shift->_set_get_datetime( 'created', @_ ); }
+sub object { return( shift->_set_get_scalar( 'object', @_ ) ); }
 
-sub url { shift->_set_get_uri( 'url', @_ ); }
+sub created { return( shift->_set_get_datetime( 'created', @_ ) ); }
+
+sub url { return( shift->_set_get_uri( 'url', @_ ) ); }
 
 1;
 
@@ -53,40 +58,32 @@ Login link module as documented on the Stripe Account section
 
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>( %ARG )
+=head2 new( %ARG )
 
 Creates a new L<Net::API::Stripe::Connect::Account::LoginLink> object.
 It may also take an hash like arguments, that also are method of the same name.
 
-=back
-
 =head1 METHODS
 
-=over 4
-
-=item B<object> string, value is "login_link"
+=head2 object string, value is "login_link"
 
 String representing the object’s type. Objects of the same type share the same value.
 
-=item B<created> timestamp
+=head2 created timestamp
 
 Time at which the object was created. Measured in seconds since the Unix epoch.
 
-=item B<url> string
+=head2 url string
 
 The URL for the login link.
 
-=back
-
 =head1 API SAMPLE
 
-	{
-	  "object": "login_link",
-	  "created": 1571735987,
-	  "url": "https://connect.stripe.com/express/nnmcnbmzbcnm"
-	}
+    {
+      "object": "login_link",
+      "created": 1571735987,
+      "url": "https://connect.stripe.com/express/nnmcnbmzbcnm"
+    }
 
 =head1 HISTORY
 

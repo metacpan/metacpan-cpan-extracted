@@ -6,71 +6,221 @@ use Config;
 use POSIX ();
 use Cwd;
 use ExtUtils::MakeMaker;
+use Data::Dumper;
 
-our $VERSION = "0.10";
+our $VERSION = "1.00";
 
 my $cpan = "www.cpan.org";
-my $action = "install";
-my $main_module = {};
-my %download_hash;
-my %modules_hash;
-my $download_count = 0;
-my $got_package_details;
-my @install;
 my $cdir0 = "~/.cpanx";
 my $cdir = glob($cdir0);
+my $orig_cwd = Cwd::cwd();
+my %modules_hash;
+my $got_package_details;
+my @install;
 my $mm_opt = "";
 my $mb_opt = "";
-my $dependencies_only = 0;
-my $interactive = 1;
-my $sudo = 1;
-my $reinstall = 0;
-my $test = 1;
+my %file_hash;
+my %package_hash;
+my %packages;
+my %opts = (
+    action => "install",
+    test => 1,
+    sudo => 1,
+    interactive => 1,
+    dependencies_only => 0,
+);
 
+get_opts();
 setup_program();
 get_cpan_mirror();
-get_opts();
-do_action();
 
-sub do_action {
-    if ($action eq "mirror") {
-        choose_mirror();
-    }
-    elsif ($action eq "look") {
-        look_at_module();
-    }
-    elsif ($action eq "perldoc") {
-        display_perldoc();
-    }
-    elsif ($action eq "info") {
-        display_info_cmd();
-    }
-    elsif ($action eq "info2") {
-        display_info2_cmd();
-    }
-    elsif ($action eq "clean") {
-        clean_module_cache();
-    }
-    elsif ($action eq "version") {
-        display_version();
-    }
-    elsif ($action eq "install") {
-        install_module();
-    }
-    elsif ($action eq "uninstall") {
-        uninstall_module();
-    }
+if ($opts{action} eq "mirror") {
+    choose_mirror();
+}
+elsif ($opts{action} eq "look") {
+    look_at_module();
+}
+elsif ($opts{action} eq "perldoc") {
+    display_perldoc();
+}
+elsif ($opts{action} eq "info") {
+    display_info_cmd();
+}
+elsif ($opts{action} eq "display_installation_files") {
+    display_installation_files();
+}
+elsif ($opts{action} eq "clean") {
+    clean_module_cache();
+}
+elsif ($opts{action} eq "version") {
+    display_version();
+}
+elsif ($opts{action} eq "list_modules") {
+    list_modules();
+}
+elsif ($opts{action} eq "list_packages") {
+    list_packages();
+}
+elsif ($opts{action} eq "where") {
+    display_where();
+}
+elsif ($opts{action} eq "uninstall") {
+    uninstall_module();
+}
+elsif ($opts{action} eq "install") {
+    install_module();
 }
 
 sub setup_program {
+    if (!-e "$cdir") {
+        mkdir "$cdir" or die "Can't create $cdir directory: $!";
+    }
+    if (!-e "$cdir/data") {
+        mkdir "$cdir/data" or die "Can't create $cdir/data directory: $!";
+    }
+    chdir $cdir or die "Can't chdir to $cdir: $!";
+
     # Make sure END block is executed after ^C or a kill
     $SIG{INT} = sub {exit;};
     $SIG{TERM} = sub {exit;};
     END {
-        unlink "$cdir/output.$$";
-        unlink "$cdir/headers.$$";
-        unlink "$cdir/content.$$";
+        unlink "$cdir/data/output.$$";
+        unlink "$cdir/data/headers.$$";
+        unlink "$cdir/data/content.$$";
     }
+}
+
+sub display_where {
+    my $arg = $opts{module};
+    my $file = $arg;
+    $file =~ s{::}{/}g;
+    $file .= ".pm";
+    for my $dir (@INC) {
+        $dir =~ s{/+$}{};
+        next if $dir eq ".";
+        if (-e "$dir/$file") {
+            print "$dir/$file\n";
+            if (!$opts{all}) {
+                last;
+            }
+        }
+    }
+}
+
+sub list_modules_in_dir {
+    my ($dir, $top) = @_;
+    my $dh;
+    my $retval = opendir $dh, "$top$dir";
+    if (!$retval) {
+        print STDERR "Can't opendir '$top$dir': $!\n";
+        return;
+    }
+    for my $name (readdir $dh) {
+        next if $name =~ /^\.\.?$/;
+        my $file = "$top$dir/$name";
+        if (-d $file) {
+            if (!-l $file) {
+                list_modules_in_dir("$dir/$name", $top);
+            }
+        }
+        else {
+            next if $name !~ /\.(\w+)$/;
+            my $ext = $1;
+            if ($ext =~ /^(pm|pl|so|dylib|dll)$/) {
+                if ($modules_hash{"$dir/$name"}) {
+                    # duplicate
+                    # print "$dir/$name\n";
+                }
+                $modules_hash{"$dir/$name"} = 1;
+                if ($file_hash{$file}) {
+                    next;
+                }
+                $file_hash{$file} = 1;
+                print "$file\n";
+            }
+        }
+    }
+    close $dh;
+}
+
+sub list_modules {
+    for my $dir (@INC) {
+        next if $dir eq ".";
+        list_modules_in_dir("", $dir);
+    }
+}
+
+sub list_packages_in_dir {
+    my ($dir, $top) = @_;
+    my $dh;
+    my $retval = opendir $dh, "$top$dir";
+    if (!$retval) {
+        print STDERR "Can't opendir '$top$dir': $!\n";
+        return;
+    }
+    for my $name (readdir $dh) {
+        next if $name =~ /^\.\.?$/;
+        my $file = "$top$dir/$name";
+        if (-d $file) {
+            if (!-l $file) {
+                list_packages_in_dir("$dir/$name", $top);
+            }
+        }
+        else {
+            next if $name !~ /\.pm$/;
+            my $mname = "$dir/$name";
+            $mname =~ s{^/+}{};
+            $mname =~ s{/}{::}g;
+            $mname =~ s{\.pm$}{};
+            my $pname = $packages{$mname};
+            next if !$pname;
+            if ($package_hash{$pname}) {
+                next;
+            }
+            $package_hash{$pname} = 1;
+            print "$pname\n";
+        }
+    }
+    close $dh;
+}
+
+sub list_packages {
+    get_packages_details();
+    my $file = "data/02packages.details.txt";
+    open my $fh, "<", $file or die "Can't open $file: $!";
+    my $version;
+    my $path;
+    while (my $line = <$fh>) {
+        if ($line =~ /^(\S+)\s+(\S+)\s+(\S+)$/i) {
+            my $mname = $1;
+            my $mversion = $2;
+            my $path = $3;
+            if ($path =~ m{/([^/]+)$}) {
+                my $fname = $1;
+                if ($fname =~ /^([^.]+)-([\d.]+)\.([\w.]+)$/) {
+                    my $pname = $1;
+                    my $pversion = $2;
+                    my $ext = $3;
+                    $packages{$mname} = $pname;
+                }
+            }
+        }
+    }
+    close $fh;
+    for my $dir (@INC) {
+        next if $dir eq ".";
+        list_packages_in_dir("", $dir);
+    }
+}
+
+sub get_module_count {
+    my ($dir) = @_;
+    if ($dir eq ".") {
+        $dir = $orig_cwd;
+    }
+    my $count = `find -L $dir -name '*.pm' 2>/dev/null | wc -l`;
+    $count =~ s/\s+$//;
+    return $count;
 }
 
 sub display_version {
@@ -78,74 +228,86 @@ sub display_version {
     print "perl version $] location $^X\n\n";
 
     print "%Config:\n";
-    for my $key ("installarchlib", "installprivlib", "installbin",
-                 "installsitearch", "installsitelib", "installsitebin") {
+    my @keys = (
+        "installarchlib",    "installprivlib",   "installbin",
+        "installsitearch",   "installsitelib",   "installsitebin",
+        "installvendorarch", "installvendorlib", "installvendorbin"
+    );
+    for my $key (@keys) {
         my $value = $Config{$key} || "";
-        print "$key $value\n";
+        print "$key $value";
+        if ($opts{with_counts} && $key =~ /(arch|lib)$/) {
+            my $count = get_module_count($value);
+            print " ($count modules)";
+        }
+        print "\n";
     }
 
-    print "\n%ENV:\n";
-    for my $key (sort keys %ENV) {
-        next if $key !~ /^PERL/;
-        my $value = $ENV{$key} || "";
-        print "$key $value\n";
+    # print "\n%ENV:\n";
+    # for my $key (sort keys %ENV) {
+    #     next if $key !~ /^PERL/;
+    #     my $value = $ENV{$key} || "";
+    #     print "$key $value\n";
+    # }
+
+    my %perl5lib;
+    my $str = $ENV{PERL5LIB} || "";
+    for my $dir (split /:/, $str) {
+        $perl5lib{$dir} = 1;
     }
+    my $seen_non_perl5lib = 0;
 
     print "\n\@INC:\n";
     for my $dir (@INC) {
-        print "$dir\n";
+        if (!$seen_non_perl5lib && !$perl5lib{$dir}) {
+            $seen_non_perl5lib = 1;
+            print "--\n";
+        }
+        print "$dir";
+        if ($opts{with_counts}) {
+            my $count = get_module_count($dir);
+            print " ($count modules)";
+        }
+        print "\n";
     }
 }
 
 sub clean_module_cache {
-    chdir $cdir or die "Can't chdir to $cdir: $!";
-    system "find . ! -name . -maxdepth 1 \\( -type d -o -name '*.tar.gz' -o -name '*.tgz' \\) -exec rm -rvf {} \\;";
+    runcmd("find * -maxdepth 0 ! -name data -exec rm -rvf {} \\;");
 }
 
 sub display_perldoc {
     my $module = init_main_module();
-    chdir $module->{dir} or die "Can't chdir to $module->{dir}: $!";
-    my $file = "Makefile.PL";
-    open my $fh, "<", $file or die "Can't open $file: $!";
-    my $file2;
-    while (my $line = <$fh>) {
-        if ($line =~ /VERSION_FROM\b.+['"](.*)['"]/) {
-            $file2 = $1;
-            last;
-        }
+    if (!$module->{name}) {
+        get_meta_data($module);
     }
-    close $fh;
-    if (!$file2 || !-e $file2) {
+    my $file;
+    if ($module->{name}) {
+        $file = $module->{name};
+        $file =~ s{::}{/}g;
+        $file = "lib/$file.pm";
+    }
+    if (!$file || !-e $file) {
         my $output = `find *.pm lib -name '*.pm' 2>/dev/null | sort | head -1`;
         $output =~ s/^\s+|\s+$//g;
-        $file2 = $output;
+        $file = $output;
     }
-    if (!$file2) {
+    if (!$file) {
         die "Unable to find main module for this distribution.\n";
     }
-    print "Displaying perldoc for $file2\n";
-    system "perldoc $file2";
+    print "Displaying perldoc for $file\n";
+    system "perldoc $file";
 }
 
 sub uninstall_module {
-    my $module = $main_module;
-    my $arg = $module->{arg};
+    my $arg = $opts{module};
     if (!$arg) {
         die "A module is required.\n";
     }
     my $file = $arg;
     $file =~ s{::}{/}g;
     $file = "auto/$file/.packlist";
-    my $packlist;
-    for my $dir (@INC) {
-        $dir =~ s{/+$}{};
-        next if $dir eq ".";
-        my $file2 = "$dir/$file";
-        if (-e $file2) {
-            $packlist = $file2;
-            last;
-        }
-    }
+    my $packlist = find_file_in_INC($file);
     if (!$packlist) {
         die "Unable to find .packlist file\n";
     }
@@ -154,7 +316,7 @@ sub uninstall_module {
     close $fh;
     print "The following files will be removed:\n";
     print "$content$packlist\n";
-    if ($interactive) {
+    if ($opts{interactive}) {
         print STDERR "\nDo you want to uninstall? [n] ";
         my $input = <STDIN>;
         chomp $input;
@@ -165,12 +327,11 @@ sub uninstall_module {
         }
     }
     my $cmd = "(cat $packlist; echo $packlist) | xargs ";
-    if ($sudo) {
+    if ($opts{sudo}) {
         $cmd .= "sudo "
     }
     $cmd .= "rm -rvf";
-    print "$cmd\n";
-    system "$cmd";
+    runcmd($cmd);
 }
 
 sub install_module {
@@ -180,10 +341,10 @@ sub install_module {
     if (!@install) {
         exit;
     }
-    if (!$module->{install} && !$dependencies_only) {
+    if (!$module->{install} && !$opts{dependencies_only}) {
         exit;
     }
-    if ($interactive) {
+    if ($opts{interactive}) {
         print STDERR "\nDo you want to install? [n] ";
         my $input = <STDIN>;
         chomp $input;
@@ -200,27 +361,26 @@ sub install_module {
             run_configure($module);
         }
         run_make($module);
-        if ($test) {
+        if ($opts{test}) {
             run_tests($module);
         }
         run_make_install($module);
+        chdir $cdir or die "Can't chdir to $cdir: $!";
     }
 }
 
 sub get_module_info {
     my ($module) = @_;
-    chdir $module->{dir} or die "Can't chdir to $module->{dir}: $!";
+    get_meta_data($module);
     get_installed_version($module);
-    my $meta = get_meta_data($module);
-    $module->{meta} = $meta;
-    get_prereqs($module, $meta);
+    get_prereqs($module);
     for my $prereq (@{$module->{prereqs}}) {
         process_prereq($prereq);
     }
-    if (!$module->{installed_version} || $module->{installed_version} ne $module->{version} || $reinstall) {
+    if (!$module->{installed_version} || $module->{installed_version} ne $module->{version} || $opts{reinstall}) {
         $module->{install} = 1;
     }
-    if (!$dependencies_only) {
+    if (!$opts{dependencies_only}) {
         push @install, $module;
     }
 }
@@ -231,23 +391,20 @@ sub display_info_cmd {
     display_info($module);
 }
 
-sub display_info2_cmd {
+sub display_installation_files {
     my $module = init_main_module();
     get_module_info($module);
-    display_info2($module);
-}
-
-sub display_info2 {
-    my ($module) = @_;
+    print "\n";
     if (!$module->{install}) {
         my $inst = installed_str($module);
-        print "Nothing to install. $module->{metaname} is up to date ($inst)\n";
+        print "Nothing to install. $module->{name} is up to date ($inst)\n";
     }
     else {
         print "The following files will be installed:\n";
     }
     for my $module (@install) {
         print "\n";
+        print "$module->{name}\n";
         chdir $module->{dir} or die "Can't chdir to $module->{dir}: $!";
         if (!$module->{configured}) {
             eval {
@@ -271,6 +428,7 @@ sub display_info2 {
                 for my $dir (sort keys %args) {
                     next if $dir !~ /^blib\//;
                     my $dir2 = $args{$dir};
+                    next if $dir2 eq "none";
                     my $output2 = `find $dir -mindepth 1 -type f ! -name .exists`;
                     $output2 =~ s{^$dir}{$dir2}gm;
                     print "$output2";
@@ -292,19 +450,18 @@ sub display_info2 {
 
 sub run_make {
     my ($module, $quiet) = @_;
-    my $cmd2 = $quiet ? " >/dev/null 2>&1" : "";
     if (-e "Makefile") {
-        my $cmd = "make$cmd2";
-        print "$cmd\n" if !$quiet;
-        system "$cmd";
+        my $cmd = "make";
+        $cmd .= " >/dev/null 2>&1" if $quiet;
+        runcmd($cmd, undef, $quiet);
         if ($? != 0) {
             die "Make failed.\n";
         }
     }
     elsif (-e "Build") {
-        my $cmd = "$^X Build$cmd2";
-        print "$cmd\n" if !$quiet;
-        system "$cmd";
+        my $cmd = "$^X Build";
+        $cmd .= " >/dev/null 2>&1" if $quiet;
+        runcmd($cmd, undef, $quiet);
         if ($? != 0) {
             die "Build failed.\n";
         }
@@ -315,16 +472,14 @@ sub run_tests {
     my ($module) = @_;
     if (-e "Makefile") {
         my $cmd = "make test";
-        print "$cmd\n";
-        system "$cmd";
+        runcmd($cmd);
         if ($? != 0) {
             die "Make test failed.\n";
         }
     }
     elsif (-e "Build") {
         my $cmd = "$^X Build test";
-        print "$cmd\n";
-        system "$cmd";
+        runcmd($cmd);
         if ($? != 0) {
             die "Build test failed.\n";
         }
@@ -338,22 +493,20 @@ sub run_make_install {
     my ($module) = @_;
     if (-e "Makefile") {
         my $cmd = "make install";
-        if ($sudo) {
+        if ($opts{sudo}) {
             $cmd = "sudo $cmd";
         }
-        print "$cmd\n";
-        system "$cmd";
+        runcmd($cmd);
         if ($? != 0) {
             die "Make install failed.\n";
         }
     }
     elsif (-e "Build") {
         my $cmd = "$^X Build install";
-        if ($sudo) {
+        if ($opts{sudo}) {
             $cmd = "sudo $cmd";
         }
-        print "$cmd\n";
-        system "$cmd";
+        runcmd($cmd);
         if ($? != 0) {
             die "Build install failed.\n";
         }
@@ -394,13 +547,12 @@ sub display_info {
     }
     print "\nInstall Order:\n";
     if ($module->{install}) {
-        if ($dependencies_only && !@install) {
+        if ($opts{dependencies_only} && !@install) {
             print "Nothing. No uninstalled dependencies.\n";
         }
         for my $prereq (@install) {
             $inst = installed_str($prereq);
-            my $name = $prereq->{name} || $prereq->{metaname};
-            print "$name $prereq->{version} ($inst)\n";
+            print "$prereq->{metaname} $prereq->{version} ($inst)\n";
         }
     }
     else {
@@ -432,6 +584,8 @@ sub process_prereq {
     }
     $modules_hash{$module->{name}} = $module;
     $module->{install} = 1;
+
+    chdir $cdir or die "Can't chdir to $cdir: $!";
     eval {
         download_module_named($module);
     };
@@ -439,10 +593,10 @@ sub process_prereq {
         print $@;
         return;
     }
+
     chdir $module->{dir} or die "Can't chdir to $module->{dir}: $!";
-    my $meta = get_meta_data($module);
-    $module->{version} = $meta->{version};
-    get_prereqs($module, $meta);
+    get_meta_data($module);
+    get_prereqs($module);
     for my $prereq (@{$module->{prereqs}}) {
         process_prereq($prereq);
     }
@@ -468,7 +622,7 @@ sub get_installed_version {
             $module->{installed_version} = $];
         }
         else {
-            my $file = find_module($module->{name});
+            my $file = find_module_in_INC($module->{name});
             if ($file) {
                 my $installed_version = MM->parse_version($file);
                 $module->{installed_version} = $installed_version;
@@ -477,11 +631,8 @@ sub get_installed_version {
     }
 }
 
-sub find_module {
-    my ($name) = @_;
-    my $file = $name;
-    $file =~ s{::}{/}g;
-    $file .= ".pm";
+sub find_file_in_INC {
+    my ($file) = @_;
     for my $dir (@INC) {
         $dir =~ s{/+$}{};
         next if $dir eq ".";
@@ -492,9 +643,19 @@ sub find_module {
     return undef;
 }
 
+sub find_module_in_INC {
+    my ($name) = @_;
+    my $file = $name;
+    $file =~ s{::}{/}g;
+    $file .= ".pm";
+    my $file2 = find_file_in_INC($file);
+    return $file2;
+}
+
 sub get_prereqs {
-    my ($module, $meta) = @_;
-    my @prereqs2;
+    my ($module) = @_;
+    my $meta = $module->{meta};
+    my @prereqs;
     if ($meta->{prereqs}) {
         for my $type (keys %{$meta->{prereqs}}) {
             for my $type2 (keys %{$meta->{prereqs}{$type}}) {
@@ -502,7 +663,7 @@ sub get_prereqs {
                     my $version = $meta->{prereqs}{$type}{$type2}{$name};
                     my $prereq = {name => $name, version_needed => $version, type => $type};
                     $prereq->{opt} = 1 if $type2 ne "requires";
-                    push @prereqs2, $prereq;
+                    push @prereqs, $prereq;
                 }
             }
         }
@@ -514,61 +675,75 @@ sub get_prereqs {
             for my $name (keys %{$meta->{$key}}) {
                 my $version = $meta->{$key}{$name};
                 my $prereq = {name => $name, version_needed => $version, type => $type};
-                push @prereqs2, $prereq;
+                push @prereqs, $prereq;
             }
         }
     }
+
+    # There are prereqs for different types like test or runtime or
+    # develop, this loop will combine all types into one prereq with a
+    # list of it's types inside.
     my %prereqs;
-    for my $prereq2 (@prereqs2) {
-        next if $prereq2->{opt};
-        next if $prereq2->{type} && $prereq2->{type} =~ /^(develop|x_dist_zilla|test)$/i;
+    for my $tprereq (@prereqs) {
+        next if $tprereq->{opt};
+        my $type = $tprereq->{type} || "";
+        next if $type =~ /^(develop|x_dist_zilla)$/i;
         my $prereq;
-        if ($prereqs{$prereq2->{name}}) {
-            $prereq = $prereqs{$prereq2->{name}};
+        if ($prereqs{$tprereq->{name}}) {
+            $prereq = $prereqs{$tprereq->{name}};
         }
         else {
-            $prereq = {name => $prereq2->{name}, version_needed => $prereq2->{version_needed}, type => [], depth => $module->{depth} + 1};
-            $prereq->{opt} = 1 if $prereq2->{opt};
+            $prereq = {
+                name => $tprereq->{name},
+                version_needed => $tprereq->{version_needed},
+                type => [],
+                depth => $module->{depth} + 1,
+            };
+            $prereq->{opt} = 1 if $tprereq->{opt};
             $prereqs{$prereq->{name}} = $prereq;
         }
-        if ($prereq2->{type}) {
-            push @{$prereq->{type}}, $prereq2->{type};
+        if ($type) {
+            push @{$prereq->{type}}, $type;
         }
-        if (!$prereq2->{opt}) {
+        if (!$tprereq->{opt}) {
             delete $prereq->{opt};
         }
     }
-    my @prereqs;
+
+    my @prereqs_sorted;
     for my $name (sort keys %prereqs) {
-        push @prereqs, $prereqs{$name};
+        push @prereqs_sorted, $prereqs{$name};
     }
-    $module->{prereqs} = \@prereqs;
+    $module->{prereqs} = \@prereqs_sorted;
 }
 
-sub get_meta_data {
-    my ($module) = @_;
-    my $meta = get_meta_data2($module);
-    $module->{metaname} = $meta->{name};
+sub process_meta_data {
+    my ($module, $meta) = @_;
+    $module->{meta} = $meta;
     $module->{version} = $meta->{version};
-    return $meta;
+    if ($meta->{name}) {
+        my $name = $meta->{name};
+        $name =~ s/-/::/g;
+        $module->{name} ||= $name;
+        $module->{metaname} = $name;
+    }
 }
 
 sub run_configure {
     my ($module, $quiet) = @_;
-    my $cmd2 = $quiet ? " >/dev/null 2>&1 </dev/null" : "";
     $module->{configured} = 1;
     if (-e "Makefile.PL") {
-        my $cmd = "$^X Makefile.PL$mm_opt$cmd2";
-        print "$cmd\n" if !$quiet;
-        system $cmd;
+        my $cmd = "$^X Makefile.PL$mm_opt";
+        $cmd .= " >/dev/null </dev/null" if $quiet;
+        runcmd($cmd, undef, $quiet);
         if ($? != 0) {
             die "Configure failed.\n";
         }
     }
     elsif (-e "Build.PL") {
-        my $cmd = "$^X Build.PL$mb_opt$cmd2";
-        print "$cmd\n" if !$quiet;
-        system $cmd;
+        my $cmd = "$^X Build.PL$mb_opt";
+        $cmd .= " >/dev/null </dev/null" if $quiet;
+        runcmd($cmd, undef, $quiet);
         if ($? != 0) {
             die "Configure failed.\n";
         }
@@ -578,7 +753,7 @@ sub run_configure {
     }
 }
 
-sub get_meta_data2 {
+sub get_meta_data {
     my ($module) = @_;
     for my $file ("META.json", "MYMETA.json") {
         if (-e $file) {
@@ -590,6 +765,7 @@ sub get_meta_data2 {
                 $content =~ s/,\s*\}/\}/g;
             }
             my $meta = parse_json($content);
+            process_meta_data($module, $meta);
             return $meta;
         }
     }
@@ -599,6 +775,7 @@ sub get_meta_data2 {
         my $content = do {local $/; <$fh>};
         close $fh;
         my $meta = parse_yaml($content);
+        process_meta_data($module, $meta);
         return $meta;
     }
     run_configure($module);
@@ -608,6 +785,7 @@ sub get_meta_data2 {
         my $content = do {local $/; <$fh>};
         close $fh;
         my $meta = parse_json($content);
+        process_meta_data($module, $meta);
         return $meta;
     }
     die "Can't find META.json or MYMETA.json.\n";
@@ -615,36 +793,45 @@ sub get_meta_data2 {
 
 sub look_at_module {
     my $module = init_main_module();
-    return if !$module->{dir};
     print "Entering module's directory\n";
-    system "cd $module->{dir}; bash";
+    my $shell = $ENV{SHELL} || "sh";
+    system "$shell";
 }
 
 sub get_packages_details {
     return if $got_package_details;
     $got_package_details = 1;
-    my $retval = download("/modules/02packages.details.txt.gz");
-    if ($retval || !-e "$cdir/02packages.details.txt") {
-        system "gzip -d -c -f $cdir0/02packages.details.txt.gz >$cdir0/02packages.details.txt";
-    }
+
+    # We want it to fetch this file new even if the file exists locally
+    # because it's contents might have changed, but only do this the
+    # first time this function is called during the run of the script.
+    my $rfile = download("/modules/02packages.details.txt.gz", "data");
+    my $file = "data/02packages.details.txt";
+    my $cmd = "gzip -d -c -f $rfile >$file";
+    runcmd($cmd);
 }
 
 sub init_main_module {
-    my $module = $main_module;
-    my $arg = $module->{arg};
+    my $module = {};
+    my $arg = $opts{module};
     if (!$arg) {
         die "A module is required.\n";
     }
     $module->{main} = 1;
     $module->{depth} = 0;
-    if ($arg =~ m{^[./]}) {
+    if ($arg =~ m{^/|\./}) {
         # Local directory
-        if (-d $arg) {
-            $module->{dir} = Cwd::abs_path($arg);
+        my $dir = $arg;
+        if ($dir !~ m{^/}) {
+            $dir = "$orig_cwd/$dir";
         }
-        else {
-            die "Directory \"$arg\" does not exist.\n";
+        if (!-e $dir) {
+            die "Directory \"$dir\" does not exist.\n";
         }
+        elsif (!-d $dir) {
+            die "Arg \"$dir\" must be a directory.\n";
+        }
+        $module->{dir} = $dir;
     }
     elsif ($arg =~ m{^((\w)(\w)[^/]*)/(.*)}) {
         # Looks like AUTHOR/Module.tar.gz
@@ -671,6 +858,7 @@ sub init_main_module {
         $module->{name} = $arg;
         download_module_named($module);
     }
+    chdir $module->{dir} or die "Can't chdir to $module->{dir}: $!";
     return $module;
 }
 
@@ -680,7 +868,7 @@ sub download_module_named {
         die "Skipping $module->{name} module.\n";
     }
     get_packages_details();
-    my $file = "$cdir/02packages.details.txt";
+    my $file = "data/02packages.details.txt";
     open my $fh, "<", $file or die "Can't open $file: $!";
     my $version;
     my $path;
@@ -704,48 +892,54 @@ sub download_module_named {
     $module->{cpan} = $path;
 }
 
+# Given a cpan path like /modules/by-authors/id/foo-1.2.3.tar.gz
+# This will download it, extract it, then return a local relative path
+# like foo-1.2.3
 sub download_module {
     my ($path) = @_;
     $path =~ m{/([^/]+)$};
-    my $file = $1;
-    my $file2;
-    if ($file =~ /(.+)\.tar\.gz$/) {
-        $file2 = "$cdir/$1";
+    my $name = $1;
+    my $dir;
+    if ($name =~ /(.+)\.tar\.gz$/) {
+        $dir = $1;
     }
-    elsif ($file =~ /(.+)\.tgz$/) {
-        $file2 = "$cdir/$1";
+    elsif ($name =~ /(.+)\.tgz$/) {
+        $dir = $1;
     }
     else {
-        die "Unknown file format \"$file\".\n";
+        die "Unknown file format \"$name\".\n";
     }
-    my $retval = download($path, 1);
-    if ($retval || !-e $file2) {
-        print "tar -x -v -f $cdir0/$file -C $cdir0\n";
-        system "tar -x -v -f $cdir0/$file -C $cdir0";
+    my $rfile = download($path, "", 1);
+    if (!-e $dir) {
+        my $cmd = "tar -x -v -f $rfile";
+        runcmd($cmd);
     }
-    return $file2;
+    $dir = "$cdir/$dir";
+    return $dir;
 }
 
 sub choose_mirror {
-    download("/indices/mirrors.json");
-    my $file = "$cdir/mirrors.json";
+    # The mirror list seemed to have moved to http://mirrors.cpan.org/cpan-json.txt
+    # and is not inside the cpan repo anymore.
+    my $file = download("/indices/mirrors.json", "data");
     open my $fh, "<", $file or die "Can't open $file: $!";
     my %hash;
     my @mirrors;
-    my $i = 0;
+    my $index = 0;
     while (my $line = <$fh>) {
         if ($line =~ m{^\s*"http"\s*:\s*"([^"]+)"}m) {
             my $url = $1;
             $url =~ s{/+$}{};
             next if $hash{$url};
             $hash{$url} = 1;
-            $i++;
-            push @mirrors, {i => $i, url => $url};
+            $index++;
+            push @mirrors, {index => $index, url => $url};
         }
     }
     close $fh;
-    print "There are $i CPAN mirrors:\n\n";
-    $file = "$cdir/mirrorsping.txt";
+    print "There are $index CPAN mirrors:\n\n";
+
+    $file = "data/mirrorsping.txt";
     open $fh, ">", $file or die "Can't open $file: $!";
     my $max_children = 50;
     my $num_children = 0;
@@ -770,13 +964,13 @@ sub choose_mirror {
             if ($output =~ /ttl=(\d+) time=([\d\.]+) ms$/m) {
                 $ttl = $1;
                 $time = $2;
-                print "$mirror->{i} $mirror->{url} time=$time ms\n";
+                print "$mirror->{index} $mirror->{url} time=$time ms\n";
             }
             else {
                 $time = 999;
-                print "$mirror->{i} $mirror->{url} [timed out]\n";
+                print "$mirror->{index} $mirror->{url} [timed out]\n";
             }
-            print $fh "$time $mirror->{i} $mirror->{url}\n";
+            print $fh "$time $mirror->{index} $mirror->{url}\n";
             exit;
         }
     }
@@ -785,14 +979,14 @@ sub choose_mirror {
         wait();
         $num_children--;
     }
-    system "sort -n $file > $file.2; mv $file.2 $file;";
+    system "sort -n $file > $file.sorted; mv $file.sorted $file;";
     open $fh, "<", $file or die "Can't open $file: $!";
     while (my $line = <$fh>) {
         if ($line =~ /^([\d.]+)\s+(\d+)\s+(.*)/) {
             my $time = $1;
-            my $i = $2;
+            my $index = $2;
             my $url = $3;
-            $mirrors[$i - 1]{time} = $time;
+            $mirrors[$index - 1]{time} = $time;
         }
     }
     close $fh;
@@ -801,65 +995,67 @@ sub choose_mirror {
     } @mirrors;
 
     print "\nBest mirrors by response time:\n";
-    for my $i (0 .. 9) {
-        my $mirror = $mirrors2[$i];
+    for my $index (0 .. 9) {
+        my $mirror = $mirrors2[$index];
         last if !$mirror || $mirror->{timeout};
-        print "$mirror->{i} $mirror->{url} time=$mirror->{time} ms\n";
+        print "$mirror->{index} $mirror->{url} time=$mirror->{time} ms\n";
     }
-    print "\nWhich mirror do you want (number or url)? ";
+    print "\nWhich mirror do you want (number)? ";
     my $input = <STDIN>;
     $input =~ s/^\s+|\s+$//g;
 
     my $url = undef;
-    if ($input eq "") {
-        print "Making no changes.\n";
-    }
-    elsif ($input =~ /^(\d+)$/) {
-        my $i = $1;
-        my $mirror = $mirrors[$i - 1];
+    if ($input =~ /^(\d+)$/) {
+        my $index = $1;
+        my $mirror = $mirrors[$index - 1];
         if ($mirror) {
             $url = $mirror->{url};
         }
     }
     else {
-        $url = $input;
+        print "Making no changes.\n";
     }
 
     if ($url) {
         print "Setting mirror to $url\n";
-        my $file = "$cdir/mirror.txt";
+        my $file = "data/mirror.txt";
         open my $fh, ">", $file or die "Can't open $file: $!";
         print $fh "$url\n";
         close $fh;
     }
 }
 
+# Given a cpan path like /modules/by-authors/id/foo.tar.gz
+# This will download it to $dir/foo.tar.gz and return that file name
 sub download {
-    my ($path, $file_doesnt_change) = @_;
-    if ($download_hash{$path}) {
-        return 0;
-    }
-    $download_hash{$path} = 1;
-    $download_count++;
+    my ($path, $dir, $file_doesnt_change) = @_;
     $path =~ m{/([^/]+)$};
-    my $file = $1;
-    my $file2 = "$cdir/$file";
+    my $name = $1;
+    my $file = $name;
+    if ($dir) {
+        $file = "$dir/$file";
+    }
     my $newer = "";
 
-    if (-e $file2) {
+    if (-e $file) {
         if ($file_doesnt_change) {
-            print "Using cached $cpan$path\n";
-            return 0;
+            print "Using cached $file\n";
+            return $file;
         }
-        $newer .= "-z $file2 ";
+        $newer .= "-z $file ";
     }
 
-    my $ofile = "$cdir/output.$$";
-    my $hfile = "$cdir/headers.$$";
-    my $cfile = "$cdir/content.$$";
-    print "curl $cpan$path $newer-R\n";
-    my $cmd = "curl $cpan$path $newer-R -o $cfile -D $hfile 2>&1 | tee $ofile";
-    system $cmd;
+    my $ofile = "data/output.$$";
+    my $hfile = "data/headers.$$";
+    my $cfile = "data/content.$$";
+
+    # The -R option makes curl try to figure out the mtime of the remote
+    # file and give it to $cfile, so next time if we want to download
+    # the file it won't if it's not newer than what we have.
+    my $show_cmd = "curl $cpan$path";
+    my $cmd = "$show_cmd $newer-R --connect-timeout 5 -o $cfile -D $hfile 2>&1 | tee $ofile";
+    runcmd($cmd, $show_cmd);
+
     open my $fh, "<", $ofile or die "Can't open $ofile: $!";
     my $output = do {local $/; <$fh>};
     close $fh;
@@ -873,7 +1069,8 @@ sub download {
         my $code = $1;
         my $mesg = $3;
         if ($code == 304) {
-            return 0;
+            # Not Modified
+            return $file;
         }
         elsif ($code != 200) {
             my $mesg2 = $code;
@@ -881,16 +1078,25 @@ sub download {
             die "$mesg2\n";
         }
     }
-    rename $cfile, $file2 or die "Can't rename $cfile -> $file2: $!";
-    return 1;
+    rename $cfile, $file or die "Can't rename $cfile -> $file: $!";
+    return $file;
 }
 
 sub get_cpan_mirror {
-    if (!-e "$cdir") {
-        mkdir "$cdir" or die "Can't create $cdir directory: $!";
+    if ($opts{cpan}) {
+        $cpan = $opts{cpan};
     }
-    if (-e "$cdir/mirror.txt") {
-        $cpan = `cat $cdir/mirror.txt` or exit;
+    else {
+        my $file = "data/mirror.txt";
+        if (-e $file) {
+            $cpan = `cat $file` or exit;
+        }
+    }
+    if ($cpan =~ /(\S+)/) {
+        $cpan = $1;
+    }
+    if ($cpan !~ m{^\w+://}) {
+        $cpan = "http://$cpan";
     }
 }
 
@@ -1129,6 +1335,19 @@ sub clean_yaml {
     }
 }
 
+sub runcmd {
+    my ($cmd, $show_cmd, $quiet) = @_;
+    $show_cmd ||= $cmd;
+    if ($quiet) {
+        system $cmd;
+    }
+    else {
+        print "$show_cmd\n";
+        system $cmd;
+        print "\n";
+    }
+}
+
 sub add_configure_opt {
     my ($opt, $path) = @_;
     if (!defined $path) {
@@ -1176,54 +1395,69 @@ sub get_opts {
             push @args, @ARGV;
             last;
         }
-        elsif ($arg =~ /^(--?help|-h|-\?)$/) {
+        elsif ($arg =~ /^(--?help|-h)$/) {
             usage();
         }
-        elsif ($arg =~ /^-m(=(.*))?$/) {
-            $cpan = $1 ? $2 : shift(@ARGV);
+        elsif ($arg eq "-g") {
+            $opts{action} = "list_modules";
         }
-        elsif ($arg =~ /^-M$/) {
-            $action = "mirror";
+        elsif ($arg eq "-G") {
+            $opts{action} = "list_packages";
         }
-        elsif ($arg =~ /^-l$/) {
-            $action = "look";
+        elsif ($arg eq "-m") {
+            $opts{cpan} = shift(@ARGV);
         }
-        elsif ($arg =~ /^-p$/) {
-            $action = "perldoc";
+        elsif ($arg eq "-M") {
+            $opts{action} = "mirror";
         }
-        elsif ($arg =~ /^-i$/) {
-            $action = "info";
+        elsif ($arg eq "-l") {
+            $opts{action} = "look";
         }
-        elsif ($arg =~ /^-f$/) {
-            $action = "info2";
+        elsif ($arg eq "-p") {
+            $opts{action} = "perldoc";
         }
-        elsif ($arg =~ /^-c$/) {
-            $action = "clean";
+        elsif ($arg eq "-i") {
+            $opts{action} = "info";
         }
-        elsif ($arg =~ /^-v$/) {
-            $action = "version";
+        elsif ($arg eq "-f") {
+            $opts{action} = "display_installation_files";
         }
-        elsif ($arg =~ /^-u$/) {
-            $action = "uninstall";
+        elsif ($arg eq "-c") {
+            $opts{action} = "clean";
         }
-        elsif ($arg =~ /^-d$/) {
-            $dependencies_only = 1;
+        elsif ($arg =~ /^-[vV]$/) {
+            $opts{action} = "version";
+            if ($arg eq "-V") {
+                $opts{with_counts} = 1;
+            }
         }
-        elsif ($arg =~ /^-n$/) {
-            $interactive = 0;
+        elsif ($arg eq "-u") {
+            $opts{action} = "uninstall";
         }
-        elsif ($arg =~ /^-S$/) {
-            $sudo = 0;
+        elsif ($arg eq "-d") {
+            $opts{dependencies_only} = 1;
         }
-        elsif ($arg =~ /^-r$/) {
-            $reinstall = 1;
+        elsif ($arg eq "-n") {
+            $opts{interactive} = 0;
         }
-        elsif ($arg =~ /^-T$/) {
-            $test = 0;
+        elsif ($arg eq "-S") {
+            $opts{sudo} = 0;
         }
-        elsif ($arg =~ /^-(I|LL|L|B|SC|M1|M3)(=(.*))?$/) {
+        elsif ($arg eq "-r") {
+            $opts{reinstall} = 1;
+        }
+        elsif ($arg eq "-T") {
+            $opts{test} = 0;
+        }
+        elsif ($arg =~ /^-[wW]$/) {
+            $opts{action} = "where";
+            if ($arg eq "-W") {
+                $opts{all} = 1;
+            }
+        }
+        elsif ($arg =~ /^-(I|LL|L|B|SC|M1|M3)$/) {
             my $opt = $1;
-            my $path = $2 ? $3 : shift(@ARGV);
+            my $path = shift(@ARGV);
             add_configure_opt($opt, $path);
         }
         elsif ($arg =~ /^-/) {
@@ -1236,42 +1470,40 @@ sub get_opts {
     if (@args > 1) {
         die "Too many arguments\n";
     }
-    $main_module->{arg} = $args[0];
-    if ($cpan =~ /(\S+)/) {
-        $cpan = $1;
-    }
-    if ($cpan !~ m{^\w+://}) {
-        $cpan = "http://$cpan";
-    }
+    $opts{module} = $args[0];
 }
 
 sub usage {
     print <<EOUSAGE;
 Usage: cpanx [<options>] <module>
 
--h         displays this help text
--l         look at module's contents in a shell
--i         displays info about the module
--f         displays info about what files would be installed
--p         display perldoc for the module
--u         uninstalls module
--n         not interactive
--S         do not use sudo
--r         reinstall even if module is installed
--T         do not run tests
--d         dependencies only
--m=<url>   sets the cpan mirror. default www.cpan.org
--M         choose a cpan mirror
 -c         clean module cache
+-d         dependencies only
+-f         displays info about what files would be installed
+-g         displays list of globally installed modules
+-G         displays list of globally installed packages
+-h         displays this help text
+-i         displays info about the module
+-l         look at module's contents in a shell
+-m <url>   sets the cpan mirror. default www.cpan.org
+-M         choose a cpan mirror
+-n         not interactive
+-p         display perldoc for the module
+-r         reinstall even if module is installed
+-S         do not use sudo
+-T         do not run tests
+-u         uninstalls module
 -v         displays version
+-w         displays where a module is located
+-W         displays all locations where a module is located
 
--I=<loc>   sets install base path. e.g. /usr/local
--L=<loc>   sets library install path. e.g. /Library/Perl/5.18
--LL=<loc>  sets library install path including the architecture dependent dirs.
--B=<loc>   sets the binary install path. e.g. ~/bin
--SC=<loc>  sets the script install path. e.g. ~/scripts
--M1=<loc>  sets the man1 install path e.g. /usr/share/man/man1
--M3=<loc>  sets the man3 install path e.g. /usr/share/man/man3
+-I <loc>   sets install base path. e.g. /usr/local
+-L <loc>   sets library install path. e.g. /Library/Perl/5.18
+-LL <loc>  sets library install path including the architecture dependent dirs.
+-B <loc>   sets the binary install path. e.g. ~/bin
+-SC <loc>  sets the script install path. e.g. ~/scripts
+-M1 <loc>  sets the man1 install path e.g. /usr/share/man/man1
+-M3 <loc>  sets the man3 install path e.g. /usr/share/man/man3
 
 <module>   name of the module you want to install
            e.g. DBD::mysql or DBD-mysql-4.046.tar.gz or ./
@@ -1291,28 +1523,33 @@ cpanx - A CPAN downloader script
 
 =head1 OPTIONS
 
-    -h         displays this help text
-    -l         look at module's contents in a shell
-    -i         displays info about the module
-    -f         displays info about what files would be installed
-    -p         display perldoc for the module
-    -u         uninstalls module
-    -n         not interactive
-    -S         do not use sudo
-    -r         reinstall even if module is installed
-    -T         do not run tests
-    -d         dependencies only
-    -m=<url>   sets the cpan mirror. default www.cpan.org
-    -M         choose a cpan mirror
     -c         clean module cache
+    -d         dependencies only
+    -f         displays info about what files would be installed
+    -g         displays list of globally installed modules
+    -G         displays list of globally installed packages
+    -h         displays this help text
+    -i         displays info about the module
+    -l         look at module's contents in a shell
+    -m <url>   sets the cpan mirror. default www.cpan.org
+    -M         choose a cpan mirror
+    -n         not interactive
+    -p         display perldoc for the module
+    -r         reinstall even if module is installed
+    -S         do not use sudo
+    -T         do not run tests
+    -u         uninstalls module
     -v         displays version
+    -w         displays where a module is located
+    -W         displays all locations where a module is located
 
-    -I=<loc>   sets install base path. e.g. /usr/local
-    -L=<loc>   sets library install path. e.g. /Library/Perl/5.18
-    -B=<loc>   sets the binary install path. e.g. ~/bin
-    -SC=<loc>  sets the script install path. e.g. ~/scripts
-    -M1=<loc>  sets the man1 install path e.g. /usr/share/man/man1
-    -M3=<loc>  sets the man3 install path e.g. /usr/share/man/man3
+    -I <loc>   sets install base path. e.g. /usr/local
+    -L <loc>   sets library install path. e.g. /Library/Perl/5.18
+    -LL <loc>  sets library install path including the architecture dependent dirs.
+    -B <loc>   sets the binary install path. e.g. ~/bin
+    -SC <loc>  sets the script install path. e.g. ~/scripts
+    -M1 <loc>  sets the man1 install path e.g. /usr/share/man/man1
+    -M3 <loc>  sets the man3 install path e.g. /usr/share/man/man3
 
     <module>   name of the module you want to install
                e.g. DBD::mysql or DBD-mysql-4.046.tar.gz or ./
@@ -1354,7 +1591,7 @@ then you can look around.
 Use the -p option to open perldoc for the module.
 
 The -f option can be used to display what files will be installed.
-Use along with the -I, -L, -B, -SC, -M1, -M3 or the PERL_MM_OPT or
+Use along with the -I, -L, -LL, -B, -SC, -M1, -M3 or the PERL_MM_OPT or
 PERL_MB_OPT environment variables, to make sure you set the right
 settings before you install.
 

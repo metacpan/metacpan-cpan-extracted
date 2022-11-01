@@ -59,8 +59,8 @@
   date_format_long => "MMMM d, y",
   date_format_medium => "MMM d, y",
   date_format_short => "M/d/yy",
-  datetime_format_full => "{1} \N{U+13a4}\N{U+13be}\N{U+13a2} {0}",
-  datetime_format_long => "{1} \N{U+13a4}\N{U+13be}\N{U+13a2} {0}",
+  datetime_format_full => "{1}, {0}",
+  datetime_format_long => "{1}, {0}",
   datetime_format_medium => "{1}, {0}",
   datetime_format_short => "{1}, {0}",
   day_format_abbreviated => [
@@ -269,5 +269,5 @@
   time_format_medium => "h:mm:ss a",
   time_format_short => "h:mm a",
   variant => undef,
-  version => 41,
+  version => 42,
 }

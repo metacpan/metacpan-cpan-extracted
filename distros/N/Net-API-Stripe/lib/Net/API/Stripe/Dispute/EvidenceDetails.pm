@@ -2,7 +2,7 @@
 ## Stripe API - ~/lib/Net/API/Stripe/Dispute/EvidenceDetails.pm
 ## Version v0.100.0
 ## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2020/05/15
 ## 
@@ -11,9 +11,14 @@ package Net::API::Stripe::Dispute::EvidenceDetails;
 BEGIN
 {
     use strict;
+    use warnings;
     use parent qw( Net::API::Stripe::Generic );
+    use vars qw( $VERSION );
     our( $VERSION ) = 'v0.100.0';
 };
+
+use strict;
+use warnings;
 
 sub due_by { return( shift->_set_get_datetime( 'due_by', @_ ) ); }
 
@@ -52,67 +57,59 @@ This is instantiated by method B<evidence_details> from module L<Net::API::Strip
 
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>( %ARG )
+=head2 new( %ARG )
 
 Creates a new L<Net::API::Stripe::Dispute::EvidenceDetails> object.
 It may also take an hash like arguments, that also are method of the same name.
 
-=back
-
 =head1 METHODS
 
-=over 4
-
-=item B<due_by> timestamp
+=head2 due_by timestamp
 
 Date by which evidence must be submitted in order to successfully challenge dispute. Will be null if the customer’s bank or credit card company doesn’t allow a response for this particular dispute.
 
-=item B<has_evidence> boolean
+=head2 has_evidence boolean
 
 Whether evidence has been staged for this dispute.
 
-=item B<past_due> boolean
+=head2 past_due boolean
 
 Whether the last evidence submission was submitted past the due date. Defaults to false if no evidence submissions have occurred. If true, then delivery of the latest evidence is not guaranteed.
 
-=item B<submission_count> integer
+=head2 submission_count integer
 
 The number of times evidence has been submitted. Typically, you may only submit evidence once.
 
-=back
-
 =head1 API SAMPLE
 
-	{
-	  "object": "balance",
-	  "available": [
-		{
-		  "amount": 0,
-		  "currency": "jpy",
-		  "source_types": {
-			"card": 0
-		  }
-		}
-	  ],
-	  "connect_reserved": [
-		{
-		  "amount": 0,
-		  "currency": "jpy"
-		}
-	  ],
-	  "livemode": false,
-	  "pending": [
-		{
-		  "amount": 7712,
-		  "currency": "jpy",
-		  "source_types": {
-			"card": 7712
-		  }
-		}
-	  ]
-	}
+    {
+      "object": "balance",
+      "available": [
+        {
+          "amount": 0,
+          "currency": "jpy",
+          "source_types": {
+            "card": 0
+          }
+        }
+      ],
+      "connect_reserved": [
+        {
+          "amount": 0,
+          "currency": "jpy"
+        }
+      ],
+      "livemode": false,
+      "pending": [
+        {
+          "amount": 7712,
+          "currency": "jpy",
+          "source_types": {
+            "card": 7712
+          }
+        }
+      ]
+    }
 
 =head1 HISTORY
 

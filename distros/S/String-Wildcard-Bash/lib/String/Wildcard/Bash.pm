@@ -7,9 +7,9 @@ use warnings;
 use Exporter 'import';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-06'; # DATE
+our $DATE = '2022-08-12'; # DATE
 our $DIST = 'String-Wildcard-Bash'; # DIST
-our $VERSION = '0.044'; # VERSION
+our $VERSION = '0.045'; # VERSION
 
 our @EXPORT_OK = qw(
                        $RE_WILDCARD_BASH
@@ -267,20 +267,32 @@ String::Wildcard::Bash - Bash wildcard string routines
 
 =head1 VERSION
 
-This document describes version 0.044 of String::Wildcard::Bash (from Perl distribution String-Wildcard-Bash), released on 2022-08-06.
+This document describes version 0.045 of String::Wildcard::Bash (from Perl distribution String-Wildcard-Bash), released on 2022-08-12.
 
 =head1 SYNOPSIS
 
     use String::Wildcard::Bash qw(
         $RE_WILDCARD_BASH
+
         contains_wildcard
+        contains_brace_wildcard
+        contains_class_wildcard
+        contains_joker_wildcard
+        contains_qmark_wildcard
+        contains_glob_wildcard
+        contains_globstar_wildcard
+
         convert_wildcard_to_sql
         convert_wildcard_to_re
     );
 
-    say 1 if contains_wildcard(""));      # -> 0
+    say 1 if contains_wildcard(""));      # ->
     say 1 if contains_wildcard("ab*"));   # -> 1
-    say 1 if contains_wildcard("ab\\*")); # -> 0
+    say 1 if contains_wildcard("ab\\*")); # ->
+
+    say 1 if contains_glob_wildcard("ab*"));   # -> 1
+    say 1 if contains_glob_wildcard("ab?"));   # ->
+    say 1 if contains_qmark_wildcard("ab?"));  # -> 1
 
     say convert_wildcard_to_sql("foo*");  # -> "foo%"
 
@@ -319,7 +331,8 @@ Although this module has 'Bash' in its name, this set of wildcards should be
 applicable to other Unix shells. Haven't checked completely though.
 
 For more specific needs, e.g. you want to check if a string just contains joker
-and not other types of wildcard patterns, use L</"$RE_WILDCARD_BASH"> directly.
+and not other types of wildcard patterns, use L</"$RE_WILDCARD_BASH"> directly
+or one of the C<contains_*_wildcard> functions.
 
 =head2 contains_brace_wildcard
 
@@ -470,9 +483,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

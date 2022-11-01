@@ -1,4 +1,4 @@
-package Email::Sender::Failure::Multi 2.500;
+package Email::Sender::Failure::Multi 2.600;
 # ABSTRACT: an aggregate of multiple failures
 
 use Moo;
@@ -84,7 +84,7 @@ Email::Sender::Failure::Multi - an aggregate of multiple failures
 
 =head1 VERSION
 
-version 2.500
+version 2.600
 
 =head1 DESCRIPTION
 
@@ -117,11 +117,11 @@ its contained failures are failures of that type.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Ricardo Signes.
+This software is copyright (c) 2022 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

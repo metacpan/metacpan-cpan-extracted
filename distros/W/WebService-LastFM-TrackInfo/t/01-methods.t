@@ -5,7 +5,7 @@ use Test::Exception;
 use Mojo::Base -strict;
 use Mojolicious;
 
-subtest 'throws' => sub {
+subtest throws => sub {
     use_ok 'WebService::LastFM::TrackInfo';
 
     throws_ok { WebService::LastFM::TrackInfo->new }
@@ -28,7 +28,7 @@ subtest 'throws' => sub {
         qr/No album provided/, 'fetch with no album';
 };
 
-subtest 'mock' => sub {
+subtest mock => sub {
     my $ws = new_ok 'WebService::LastFM::TrackInfo' => [ api_key => 'abc123' ];
 
     my $mock = Mojolicious->new;

@@ -3,7 +3,7 @@ use warnings;
 
 use Test::More;
 use Kelp;
-use MIME::Base64;
+use Sereal qw(encode_sereal decode_sereal);
 
 my $app = Kelp->new(mode => 'test');
 
@@ -24,20 +24,22 @@ my @documents = (
 	},
 );
 
-my $res = '';
+my @res;
+my @sereal_res;
 
 for my $doc (@documents) {
-	$res .= $app->sereal->encode($doc);
+	push @res, $app->sereal->encode($doc);
+	push @sereal_res, encode_sereal($doc);
 }
 
-my $base64_result = <<'BASE64';
-PfNybAQAUmRrZXkxZHZhbDFka2V5MmR2YWwyPfNybAQAUmRrZXkzQmR2YWwzZHZhbDRka2V5NCU=
-BASE64
+while (@res) {
+	my $doc = shift @documents;
 
-is $res, decode_base64($base64_result), 'encode ok';
-
-while (length $res) {
-	is_deeply $app->sereal->decode($res), shift @documents, 'decode ok';
+	is_deeply $app->sereal->decode(shift @sereal_res), $doc, 'decode ok';
+	is_deeply decode_sereal(shift @res), $doc, 'decode against sereal ok';
 }
+
+is scalar @sereal_res, 0, 'fully decoded ok';
 
 done_testing;
+

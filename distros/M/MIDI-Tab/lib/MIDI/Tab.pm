@@ -1,14 +1,14 @@
 package MIDI::Tab;
-BEGIN {
-  $MIDI::Tab::AUTHORITY = 'cpan:GENE';
-}
+our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Generate MIDI from ASCII tablature
 
 use strict;
 use warnings;
 
-use MIDI::Simple;
+use MIDI::Simple qw(is_absolute_note_spec);
+
+our $VERSION = '0.0402';
 
 use base 'Exporter';
 our @ISA    = qw(Exporter);
@@ -17,8 +17,6 @@ our @EXPORT = qw(
     from_drum_tab
     from_piano_tab
 );
-
-our $VERSION = '0.0401';
 
 use constant CONTROL => 'CTL';
 
@@ -335,7 +333,7 @@ MIDI::Tab - Generate MIDI from ASCII tablature
 
 =head1 VERSION
 
-version 0.0401
+version 0.0402
 
 =head1 SYNOPSIS
 
@@ -462,11 +460,11 @@ from 1 to 9.
 
 =head1 AUTHOR
 
-Rob Symes <rob@robsymes.com> and Gene Boggs <gene@cpan.org>
+Rob Symes <rob@robsymes.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Rob Symes and Gene Boggs.
+This software is copyright (c) 2015 by Rob Symes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

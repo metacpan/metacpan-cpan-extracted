@@ -15,7 +15,7 @@ Readonly::Scalar my $EMPTY_STR => q{};
 Readonly::Scalar my $LAST_INDEX => -1;
 Readonly::Scalar my $SPACE => q{ };
 
-our $VERSION = 0.11;
+our $VERSION = 0.12;
 
 # Finalize Tags output.
 sub finalize {
@@ -101,6 +101,9 @@ sub _default_parameters {
 
 	# Data callback.
 	$self->{'data_callback'} = \&encode_char_entities;
+
+	# No data callback.
+	$self->{'no_data_callback'} = ['script', 'style'];
 
 	# No simple tags.
 	$self->{'no_simple'} = [];
@@ -277,7 +280,9 @@ sub _put_data {
 	}
 
 	# Process data callback.
-	$self->_process_callback(\@character_data, 'data_callback');
+	if (none { $_ eq $self->{'printed_tags'}->[0] } @{$self->{'no_data_callback'}}) {
+		$self->_process_callback(\@character_data, 'data_callback');
+	}
 
 	# To flush code.
 	$self->{'flush_code'} .= join $EMPTY_STR, @character_data;
@@ -467,6 +472,22 @@ __END__
  Callback is processing before main 'Tags' put().
  It's usefull for e.g. validation.
  Default value is undef.
+
+=item * C<no_data_callback>
+
+ Reference to array of tags, that can't use data callback.
+ Default is ['script', 'style'].
+
+ Example:
+ For elements defined in this field we don't use 'data_callback'. It's used for
+ doing of HTML escape sequences.
+ Prints <script>&</script> instead <script>&amp;</script> in default setting of 'data_callback'.
+
+ my $tags = Tags::Output::Raw->new(
+         'no_data_callback' => ['script'],
+ );
+ $tags->put(['b', 'script'], ['d', '&'], ['e', 'script']);
+ $tags->flush;
 
 =item * C<no_simple>
 
@@ -694,12 +715,12 @@ L<http://skim.cz/>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2005-2021 Michal Josef Špaček
+© 2005-2022 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.11
+0.12
 
 =cut

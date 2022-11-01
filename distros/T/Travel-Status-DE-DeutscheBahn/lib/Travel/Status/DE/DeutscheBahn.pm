@@ -6,7 +6,7 @@ use 5.014;
 
 use parent 'Travel::Status::DE::HAFAS';
 
-our $VERSION = '3.01';
+our $VERSION = '4.01';
 
 sub new {
 	my ( $class, %opt ) = @_;
@@ -40,7 +40,7 @@ monitor operated by Deutsche Bahn
 	for my $departure ($status->results) {
 		printf(
 			"At %s: %s to %s from platform %s\n",
-			$departure->time,
+			$departure->datetime->strftime('%H:%M'),
 			$departure->line,
 			$departure->destination,
 			$departure->platform,
@@ -49,13 +49,13 @@ monitor operated by Deutsche Bahn
 
 =head1 VERSION
 
-version 3.01
+version 4.01
 
 =head1 DESCRIPTION
 
 Travel::Status::DE::DeutscheBahn is an interface to the Deutsche Bahn
 departure monitor available at
-L<http://reiseauskunft.bahn.de/bin/bhftafel.exe/dn>.
+L<https://reiseauskunft.bahn.de/bin/mgate.exe>.
 
 It takes a station name and (optional) date and time and reports all arrivals
 or departures at that station starting at the specified point in time (now if
@@ -79,25 +79,19 @@ and other methdos.
 
 =head1 DIAGNOSTICS
 
-None.
+See Travel::Status::DE::HAFAS(3pm).
 
 =head1 DEPENDENCIES
 
 =over
 
-=item * Class::Accessor(3pm)
-
-=item * LWP::UserAgent(3pm)
-
 =item * Travel::Status::DE::HAFAS(3pm)
-
-=item * XML::LibXML(3pm)
 
 =back
 
 =head1 BUGS AND LIMITATIONS
 
-Unknown.
+See Travel::Status::DE::HAFAS(3pm).
 
 =head1 SEE ALSO
 
@@ -105,7 +99,7 @@ Travel::Status::DE::HAFAS(3pm).
 
 =head1 AUTHOR
 
-Copyright (C) 2015-2017 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
+Copyright (C) 2015-2022 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>
 
 =head1 LICENSE
 

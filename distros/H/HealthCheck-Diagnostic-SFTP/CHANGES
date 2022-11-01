@@ -1,6 +1,12 @@
 Changelog for HealthCheck-Diagnostic-SFTP
 
-v1.4.2 2022-03-03T23:08:05
+v1.5.0 2022-10-25T17:17:00
+ - Update README (Andrew Hewus Fresh)
+ - Update Makefile (Andrew Hewus Fresh)
+ - Pull request #6: SM-3859 (Mitch McCracken)
+ - Increase default timeout from 3 to 10 seconds (Mitch McCracken)
+
+v1.4.2 2022-03-03T23:07:32
  - Update README (Andrew Hewus Fresh)
  - Pull request #5: SM-3529 (Mitch McCracken)
  - Call alarm(0) after connection failure exceptions (Mitch McCracken)
@@ -33,8 +39,8 @@ v1.2.1 2019-11-05T22:35:51
 
 v1.2.0.1 2019-10-18T19:55:55
  - Create distribution files (Andrew Hewus Fresh)
- - Remove gitc metadata (Andrew Hewus Fresh)
  - Convert to Bitbucket workflow (Andrew Hewus Fresh)
+ - Remove gitc metadata (Andrew Hewus Fresh)
 
 v1.2.0.0 2018-12-04T17:02:02
  - Add a SYNOPSIS (Brandon Messineo)

@@ -11,11 +11,11 @@ use strict;
 use warnings;
 
 package Parse::ANSIColor::Tiny;
-# git description: v0.600-2-gba6391f
+# git description: v0.601-1-g8166474
 
 our $AUTHORITY = 'cpan:RWSTAUNER';
 # ABSTRACT: Determine attributes of ANSI-Colored string
-$Parse::ANSIColor::Tiny::VERSION = '0.601';
+$Parse::ANSIColor::Tiny::VERSION = '0.700';
 our @COLORS = qw( black red green yellow blue magenta cyan white );
 our %FOREGROUND = (
   (map { (               $COLORS[$_] =>  30 + $_ ) } 0 .. $#COLORS),
@@ -25,6 +25,45 @@ our %BACKGROUND = (
   (map { (       'on_' . $COLORS[$_] =>  40 + $_ ) } 0 .. $#COLORS),
   (map { ('on_bright_' . $COLORS[$_] => 100 + $_ ) } 0 .. $#COLORS),
 );
+
+# Generating the 256-color codes involves a lot of codes and offsets that are
+# not helped by turning them into constants.
+## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
+
+our @COLORS256;
+
+# The first 16 256-color codes are duplicates of the 16 ANSI colors,
+# included for completeness.
+for my $code (0 .. 15) {
+  my $name = "ansi$code";
+  $FOREGROUND{$name}      = "38;5;$code";
+  $BACKGROUND{"on_$name"} = "48;5;$code";
+  push @COLORS256, $name;
+}
+
+# 256-color RGB colors.  Red, green, and blue can each be values 0 through 5,
+# and the resulting 216 colors start with color 16.
+for my $r (0 .. 5) {
+  for my $g (0 .. 5) {
+    for my $b (0 .. 5) {
+      my $code = 16 + (6 * 6 * $r) + (6 * $g) + $b;
+      my $name = "rgb$r$g$b";
+      $FOREGROUND{$name}    = "38;5;$code";
+      $BACKGROUND{"on_$name"} = "48;5;$code";
+      push @COLORS256, $name;
+    }
+  }
+}
+
+# The last 256-color codes are 24 shades of grey.
+for my $n (0 .. 23) {
+  my $code = $n + 232;
+  my $name = "grey$n";
+  $FOREGROUND{$name}      = "38;5;$code";
+  $BACKGROUND{"on_$name"} = "48;5;$code";
+  push @COLORS256, $name;
+}
+
 our %ATTRIBUTES = (
   clear          => 0,
   reset          => 0,
@@ -42,44 +81,6 @@ our %ATTRIBUTES = (
   %FOREGROUND,
   %BACKGROUND,
 );
-
-# Generating the 256-color codes involves a lot of codes and offsets that are
-# not helped by turning them into constants.
-## no critic (ValuesAndExpressions::ProhibitMagicNumbers)
-
-our @COLORS256;
-
-# The first 16 256-color codes are duplicates of the 16 ANSI colors,
-# included for completeness.
-for my $code (0 .. 15) {
-  my $name = "ansi$code";
-  $ATTRIBUTES{$name}      = "38;5;$code";
-  $ATTRIBUTES{"on_$name"} = "48;5;$code";
-  push @COLORS256, $name;
-}
-
-# 256-color RGB colors.  Red, green, and blue can each be values 0 through 5,
-# and the resulting 216 colors start with color 16.
-for my $r (0 .. 5) {
-  for my $g (0 .. 5) {
-    for my $b (0 .. 5) {
-      my $code = 16 + (6 * 6 * $r) + (6 * $g) + $b;
-      my $name = "rgb$r$g$b";
-      $ATTRIBUTES{$name}    = "38;5;$code";
-      $ATTRIBUTES{"on_$name"} = "48;5;$code";
-      push @COLORS256, $name;
-    }
-  }
-}
-
-# The last 256-color codes are 24 shades of grey.
-for my $n (0 .. 23) {
-  my $code = $n + 232;
-  my $name = "grey$n";
-  $ATTRIBUTES{$name}      = "38;5;$code";
-  $ATTRIBUTES{"on_$name"} = "48;5;$code";
-  push @COLORS256, $name;
-}
 
 # copied from Term::ANSIColor
   our %ATTRIBUTES_R;
@@ -322,8 +323,8 @@ __END__
 
 =encoding UTF-8
 
-=for :stopwords Randy Stauner ACKNOWLEDGEMENTS cpan testmatrix url annocpan anno bugtracker
-rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords Randy Stauner ACKNOWLEDGEMENTS cpan testmatrix url bugtracker rt cpants
+kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 NAME
 
@@ -331,7 +332,7 @@ Parse::ANSIColor::Tiny - Determine attributes of ANSI-Colored string
 
 =head1 VERSION
 
-version 0.601
+version 0.700
 
 =for test_synopsis sub h { shift };
 
@@ -610,7 +611,7 @@ MetaCPAN
 
 A modern, open-source CPAN search engine, useful to view POD in HTML format.
 
-L<http://metacpan.org/release/Parse-ANSIColor-Tiny>
+L<https://metacpan.org/release/Parse-ANSIColor-Tiny>
 
 =back
 
@@ -631,11 +632,21 @@ L<https://github.com/rwstauner/Parse-ANSIColor-Tiny>
 
 Randy Stauner <rwstauner@cpan.org>
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Dmitry Fedin
+=for stopwords Dmitry Fedin Randy Stauner
+
+=over 4
+
+=item *
 
 Dmitry Fedin <dmitry.fedin@gmail.com>
+
+=item *
+
+Randy Stauner <randy@r4s6.net>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

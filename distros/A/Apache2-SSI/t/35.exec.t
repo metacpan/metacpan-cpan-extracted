@@ -1,14 +1,20 @@
 #!/usr/local/bin/perl
 BEGIN
 {
-    ## use Test::More qw( no_plan );
+    use strict;
+    use warnings;
+    # use Test::More qw( no_plan );
     use Test::More;
-    ## use_ok( 'Apache2::SSI' ) || BAIL_OUT( "Unable to load Apache2::SSI" );
+    # use_ok( 'Apache2::SSI' ) || BAIL_OUT( "Unable to load Apache2::SSI" );
     use lib './lib';
+    use vars qw( $BASE_URI $DEBUG );
     require( "./t/functions.pl" ) || BAIL_OUT( "Unable to find library \"functions.pl\"." );
     our $BASE_URI;
-    our $DEBUG = 0;
+    our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
 };
+
+use strict;
+use warnings;
 
 $ENV{PATH_INFO}    = '/path';
 # $ENV{QUERY_STRING} = 'query';

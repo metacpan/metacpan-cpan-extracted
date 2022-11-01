@@ -1,7 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/BPOMUtils/bpom_show_nutrition_facts
-# and generated automatically using Perinci::CmdLine::Gen version 0.501
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
 use strict;
@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-12'; # DATE
+our $DATE = '2022-11-01'; # DATE
 our $DIST = 'App-BPOMUtils'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/BPOMUtils/bpom_show_nutrition_facts",
@@ -38,9 +38,13 @@ bpom-show-nutrition-facts - Round values and format them as nutrition fact table
 
 =head1 VERSION
 
-This document describes version 0.007 of bpom-show-nutrition-facts (from Perl distribution App-BPOMUtils), released on 2022-10-12.
+This document describes version 0.012 of bpom-show-nutrition-facts (from Perl distribution App-BPOMUtils), released on 2022-11-01.
 
 =head1 SYNOPSIS
+
+B<bpom-show-nutrition-facts> L<--help|/"--help, -h, -v"> (or L<-h|/"--help, -h, -v">, L<-?|/"--help, -h, -v">)
+
+B<bpom-show-nutrition-facts> L<--version|/"--version, -v"> (or L<-v|/"--version, -v">)
 
 B<bpom-show-nutrition-facts> [L<--browser|/"--browser">] [L<--carbohydrate|/"--carbohydrate=s*">=L<ufloat|Sah::Schema::ufloat>] [L<--color|/"--color=s">=I<str>] [L<--config-path|/"--config-path=s, -c">=I<path>|L<-c|/"--config-path=s, -c">|L<--no-config|/"--no-config, -C">|L<-C|/"--no-config, -C">] [L<--config-profile|/"--config-profile=s, -P">=I<profile>|L<-P|/"--config-profile=s, -P">] [L<--debug|/"--debug">|L<--log-level|/"--log-level=s">=I<level>|L<--quiet|/"--quiet">|L<--trace|/"--trace">|L<--verbose|/"--verbose">] [L<--fat|/"--fat=s*">=L<ufloat|Sah::Schema::ufloat>] [L<--format|/"--format=s">=I<name>|L<--json|/"--json">] [L<--(no)naked-res|/"--naked-res">] [L<--name|/"--name=s">=I<str>] [L<--no-env|/"--no-env">] [L<--output-format|/"--output-format=s, -f">=I<str>|L<-f|/"--output-format=s, -f">=I<str>] [L<--package-size|/"--package-size=s*">=L<ufloat|Sah::Schema::ufloat>] [L<--page-result|/"--page-result">[=I<program>]|L<--view-result|/"--view-result">[=I<program>]] [L<--protein|/"--protein=s*">=L<ufloat|Sah::Schema::ufloat>] [L<--saturated-fat|/"--saturated-fat=s*">=L<ufloat|Sah::Schema::ufloat>] [L<--serving-size|/"--serving-size=s*">=L<ufloat|Sah::Schema::ufloat>] [L<--sodium|/"--sodium=s*, --salt">=L<ufloat|Sah::Schema::ufloat>|L<--salt|/"--sodium=s*, --salt">=L<ufloat|Sah::Schema::ufloat>] [L<--sugar|/"--sugar=s*">=L<ufloat|Sah::Schema::ufloat>]
 
@@ -65,6 +69,9 @@ Total carbohydrate, in g/100g.
 Total fat, in g/100g.
 
 =item B<--name>=I<s>
+
+(No description)
+
 
 =item B<--package-size>=I<s>*
 

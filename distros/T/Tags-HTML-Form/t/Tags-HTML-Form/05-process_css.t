@@ -24,22 +24,7 @@ is_deeply(
 		['d', 'padding', '20px'],
 		['e'],
 
-		['s', '.form input[type=submit]:hover'],
-		['d', 'background-color', '#45a049'],
-		['e'],
-
-		['s', '.form input[type=submit]'],
-		['d', 'width', '100%'],
-		['d', 'background-color', '#4CAF50'],
-		['d', 'color', 'white'],
-		['d', 'padding', '14px 20px'],
-		['d', 'margin', '8px 0'],
-		['d', 'border', 'none'],
-		['d', 'border-radius', '4px'],
-		['d', 'cursor', 'pointer'],
-		['e'],
-
-		['s', '.form input, select, textarea'],
+		['s', '.form textarea'],
 		['d', 'width', '100%'],
 		['d', 'padding', '12px 20px'],
 		['d', 'margin', '8px 0'],

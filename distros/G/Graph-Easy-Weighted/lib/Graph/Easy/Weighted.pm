@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: A weighted graph implementation
 
-our $VERSION = '0.07';
+our $VERSION = '0.0701';
 
 use warnings;
 use strict;
@@ -11,15 +11,15 @@ use strict;
 use parent qw(Graph::Easy);
 
 use Carp qw( croak );
-use Readonly;
-Readonly my $WEIGHT => 'weight';
+
+use constant WEIGHT => 'weight';
 
 
 sub populate {
     my ($self, $data, $attr, $format) = @_;
 
     # Set the default attribute.
-    $attr ||= $WEIGHT;
+    $attr ||= WEIGHT;
 
     # What type of data are we given?
     my $data_ref = ref $data;
@@ -108,7 +108,7 @@ sub get_cost {
     my ($self, $v, $attr) = @_;
     croak 'ERROR: No vertex given to get_cost()' unless defined $v;
 
-    $attr ||= $WEIGHT;
+    $attr ||= WEIGHT;
 
     if ( ref $v eq 'Graph::Easy::Edge' ) {
         return $v->get_custom_attributes->{"x-$attr"} || 0;
@@ -228,7 +228,7 @@ Graph::Easy::Weighted - A weighted graph implementation
 
 =head1 VERSION
 
-version 0.07
+version 0.0701
 
 =head1 SYNOPSIS
 
@@ -368,7 +368,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Gene Boggs.
+This software is copyright (c) 2022 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,3 +1,9 @@
+0.05 2022-10-26T02:36:47+02:00
+ - Add Select and Option objects.
+ - Fix data_type parameter for Button.
+ - Fix doc in Input object.
+ - Rewrite Form to use Input and Select objects.
+
 0.04 2022-10-18T11:01:35+02:00
  - Fix minimal version of Tags::HTML.
 

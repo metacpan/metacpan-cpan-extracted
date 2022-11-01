@@ -10,7 +10,7 @@ use Path::Tiny qw( path );
 use Scalar::Util qw( refaddr );
 
 # ABSTRACT: Automatically load WebAssembly modules without a Perl wrapper
-our $VERSION = '0.21'; # VERSION
+our $VERSION = '0.22'; # VERSION
 
 
 sub _hook
@@ -67,7 +67,7 @@ Wasm::Hook - Automatically load WebAssembly modules without a Perl wrapper
 
 =head1 VERSION
 
-version 0.21
+version 0.22
 
 =head1 SYNOPSIS
 
@@ -117,7 +117,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Graham Ollis.
+This software is copyright (c) 2020-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

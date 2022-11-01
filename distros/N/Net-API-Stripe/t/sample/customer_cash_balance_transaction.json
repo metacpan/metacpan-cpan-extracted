@@ -1,0 +1,22 @@
+{
+   "created" : "1662261083",
+   "currency" : "eur",
+   "customer" : "cus_AJ78ZaALpqgiuZ",
+   "ending_balance" : "10000",
+   "funded" : {
+      "bank_transfer" : {
+         "eu_bank_transfer" : {
+            "bic" : "BANKDEAAXXX",
+            "iban_last4" : "7089",
+            "sender_name" : "Sample Business GmbH"
+         },
+         "reference" : "Payment for Invoice AB94287-155",
+         "type" : "eu_bank_transfer"
+      }
+   },
+   "id" : "ccsbtxn_1Le9F12eZvKYlo2CVyp3u69f",
+   "livemode" : 0,
+   "net_amount" : "5000",
+   "object" : "customer_cash_balance_transaction",
+   "type" : "funded"
+}

@@ -8,7 +8,7 @@ use Error::Pure qw(err);
 use Getopt::Std;
 use Unicode::UTF8 qw(decode_utf8 encode_utf8);
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Constructor.
 sub new {
@@ -109,7 +109,10 @@ sub run {
 	print "Schema data ${print_version}from '$self->{'_schema_data_module'}' was ".
 		"inserted to '$self->{'_dsn'}'.\n";
 
-	my @plugins = split m/:/ms, $self->{'_opts'}->{'l'};
+	my @plugins;
+	if (defined $self->{'_opts'}->{'l'}) {
+		@plugins = split m/:/ms, $self->{'_opts'}->{'l'};
+	}
 	foreach my $plugin (@plugins) {
 
 		# Load plugin object.
@@ -244,6 +247,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

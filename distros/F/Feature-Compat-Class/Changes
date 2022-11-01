@@ -1,4 +1,13 @@
 Revision history for Feature-Compat-Class
 
+0.03    2022-10-29
+        [CHANGES]
+         * Forbid `ADJUST :params` from Object::Pad v0.70
+
+0.02    2022-10-25
+        [CHANGES]
+         * Support the :isa class attribute, now that perl's `featuer-class`
+           branch does
+
 0.01    2022-08-27
         First version, released on an unsuspecting world.

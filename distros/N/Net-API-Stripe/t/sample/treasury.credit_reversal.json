@@ -1,0 +1,17 @@
+{
+   "amount" : "1000",
+   "currency" : "usd",
+   "financial_account" : "fa_1Le9F32eZvKYlo2CjbQcDQUE",
+   "hosted_regulatory_receipt_url" : "https://payments.stripe.com/regulatory-receipt/CBQaFwoVYWNjdF8xMDMyRDgyZVp2S1lsbzJDKN6u0JgGMgZ5OcNPutk6NpPqyGNMSnPeYuICbWV_67gyzu-WhKrtnutbIUkZW186FSWoCzhS4mHPYChKMkLzDubrcfUuiQ",
+   "id" : "credrev_1Le9F42eZvKYlo2CHPmAdXSp",
+   "livemode" : 0,
+   "metadata" : {},
+   "network" : "ach",
+   "object" : "treasury.credit_reversal",
+   "received_credit" : "rc_1Le9F42eZvKYlo2CM2wIU5bz",
+   "status" : "processing",
+   "status_transitions" : {
+      "posted_at" : null
+   },
+   "transaction" : "trxn_1Le9F32eZvKYlo2C2dtkse82"
+}

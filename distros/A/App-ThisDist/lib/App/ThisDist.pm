@@ -8,9 +8,9 @@ use Exporter qw(import);
 use File::chdir;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-06-05'; # DATE
+our $DATE = '2022-08-21'; # DATE
 our $DIST = 'App-ThisDist'; # DIST
-our $VERSION = '0.016'; # VERSION
+our $VERSION = '0.017'; # VERSION
 
 our @EXPORT_OK = qw(this_dist this_mod);
 
@@ -211,7 +211,7 @@ App::ThisDist - Print Perl {distribution,module,author,...} associated with curr
 
 =head1 VERSION
 
-This document describes version 0.016 of App::ThisDist (from Perl distribution App-ThisDist), released on 2022-06-05.
+This document describes version 0.017 of App::ThisDist (from Perl distribution App-ThisDist), released on 2022-08-21.
 
 =head1 DESCRIPTION
 
@@ -239,10 +239,14 @@ If C<$dir> is not specified, will default to current directory. If
 C<$extract_version> is set to true, will also try to extract distribution
 version and will return "?" for version when version cannot be found.
 
+Debugging statement are logged using L<Log::ger>.
+
 =head2 this_mod
 
 A thin wrapper for L</this_dist>. It just converts "-" in the result to "::", so
 "Foo-Bar" becomes "Foo::Bar".
+
+Debugging statement are logged using L<Log::ger>.
 
 =head1 HOMEPAGE
 
@@ -273,9 +277,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

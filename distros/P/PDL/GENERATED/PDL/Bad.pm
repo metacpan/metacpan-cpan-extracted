@@ -21,7 +21,7 @@ use DynaLoader;
 
 
 
-#line 20 "bad.pd"
+#line 19 "bad.pd"
 
 
 =head1 NAME
@@ -76,7 +76,7 @@ Set to 1 as of PDL 2.035 as always available.
 
 
 
-#line 63 "bad.pd"
+#line 62 "bad.pd"
 
 
 # really should be constants
@@ -95,7 +95,7 @@ use PDL::Primitive;
 
 
 
-#line 99 "bad.pd"
+#line 98 "bad.pd"
 
 ############################################################
 ############################################################
@@ -173,7 +173,7 @@ C<[0 1 2 3 BAD 5 6 7 8 9]>.
 =for bad
 
 This method does not care if you call it on an input ndarray
-that has bad values. It always returns a Perl scalar
+that has bad values. It always returns an ndarray
 with the current or new bad value.
 
 =head2 orig_badvalue
@@ -198,7 +198,7 @@ It also has an I<awful> name.
 =for bad
 
 This method does not care if you call it on an input ndarray
-that has bad values. It always returns a Perl scalar
+that has bad values. It always returns an ndarray
 with the original bad value for the associated type.
 
 =head2 check_badflag
@@ -234,7 +234,7 @@ sub PDL::check_badflag {
 
 
 
-#line 310 "bad.pd"
+#line 309 "bad.pd"
 
 
 # note:
@@ -287,7 +287,7 @@ sub PDL::orig_badvalue {
 
 
 
-#line 1058 "../../blib/lib/PDL/PP.pm"
+#line 949 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -327,14 +327,14 @@ same as the input ndarray's flag.
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 951 "../../blib/lib/PDL/PP.pm"
 
 *isbad = \&PDL::isbad;
 #line 334 "Bad.pm"
 
 
 
-#line 1058 "../../blib/lib/PDL/PP.pm"
+#line 949 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -373,14 +373,14 @@ same as the input ndarray's flag.
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 951 "../../blib/lib/PDL/PP.pm"
 
 *isgood = \&PDL::isgood;
 #line 380 "Bad.pm"
 
 
 
-#line 1058 "../../blib/lib/PDL/PP.pm"
+#line 949 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -421,14 +421,14 @@ flag set.
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 951 "../../blib/lib/PDL/PP.pm"
 
 *nbadover = \&PDL::nbadover;
 #line 428 "Bad.pm"
 
 
 
-#line 1058 "../../blib/lib/PDL/PP.pm"
+#line 949 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -470,14 +470,14 @@ flag set.
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 951 "../../blib/lib/PDL/PP.pm"
 
 *ngoodover = \&PDL::ngoodover;
 #line 477 "Bad.pm"
 
 
 
-#line 534 "bad.pd"
+#line 533 "bad.pd"
 
 
 *nbad = \&PDL::nbad;
@@ -490,7 +490,7 @@ sub PDL::nbad {
 
 
 
-#line 534 "bad.pd"
+#line 533 "bad.pd"
 
 
 *ngood = \&PDL::ngood;
@@ -503,7 +503,7 @@ sub PDL::ngood {
 
 
 
-#line 546 "bad.pd"
+#line 545 "bad.pd"
 
 
 =head2 nbad
@@ -518,8 +518,8 @@ Returns the number of bad values in an ndarray
 
 =for bad
 
-Accepts good and bad input ndarrays; output is a Perl scalar
-and therefore is always good.
+Accepts good and bad input ndarrays; output is an ndarray
+and is always good.
 
 =head2 ngood
 
@@ -533,8 +533,8 @@ Returns the number of good values in an ndarray
 
 =for bad
 
-Accepts good and bad input ndarrays; output is a Perl scalar
-and therefore is always good.
+Accepts good and bad input ndarrays; output is an ndarray
+and is always good.
 
 =head2 setbadat
 
@@ -584,7 +584,7 @@ sub PDL::setbadat {
 
 
 
-#line 1058 "../../blib/lib/PDL/PP.pm"
+#line 949 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -636,14 +636,14 @@ Also see L</setvaltobad> and L</setnantobad>.
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 951 "../../blib/lib/PDL/PP.pm"
 
 *setbadif = \&PDL::setbadif;
 #line 643 "Bad.pm"
 
 
 
-#line 1058 "../../blib/lib/PDL/PP.pm"
+#line 949 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -682,14 +682,14 @@ Any bad values in the input ndarrays are copied across to the output ndarray.
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 951 "../../blib/lib/PDL/PP.pm"
 
 *setvaltobad = \&PDL::setvaltobad;
 #line 689 "Bad.pm"
 
 
 
-#line 1058 "../../blib/lib/PDL/PP.pm"
+#line 949 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -726,14 +726,14 @@ bad flag set.
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 951 "../../blib/lib/PDL/PP.pm"
 
 *setnantobad = \&PDL::setnantobad;
 #line 733 "Bad.pm"
 
 
 
-#line 1058 "../../blib/lib/PDL/PP.pm"
+#line 949 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -769,14 +769,14 @@ bad flag set.
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 951 "../../blib/lib/PDL/PP.pm"
 
 *setinftobad = \&PDL::setinftobad;
 #line 776 "Bad.pm"
 
 
 
-#line 1058 "../../blib/lib/PDL/PP.pm"
+#line 949 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -812,14 +812,14 @@ bad flag set.
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 951 "../../blib/lib/PDL/PP.pm"
 
 *setnonfinitetobad = \&PDL::setnonfinitetobad;
 #line 819 "Bad.pm"
 
 
 
-#line 1058 "../../blib/lib/PDL/PP.pm"
+#line 949 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -855,14 +855,14 @@ operation, it clears the bad flag.
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 951 "../../blib/lib/PDL/PP.pm"
 
 *setbadtonan = \&PDL::setbadtonan;
 #line 862 "Bad.pm"
 
 
 
-#line 1058 "../../blib/lib/PDL/PP.pm"
+#line 949 "../../blib/lib/PDL/PP.pm"
 
 
 =head2 setbadtoval
@@ -897,14 +897,14 @@ values are copied with no replacement.
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 951 "../../blib/lib/PDL/PP.pm"
 
 *setbadtoval = \&PDL::setbadtoval;
 #line 904 "Bad.pm"
 
 
 
-#line 1058 "../../blib/lib/PDL/PP.pm"
+#line 949 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -933,14 +933,14 @@ If bad values are present, these are also cleared.
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 951 "../../blib/lib/PDL/PP.pm"
 
 *badmask = \&PDL::badmask;
 #line 940 "Bad.pm"
 
 
 
-#line 1058 "../../blib/lib/PDL/PP.pm"
+#line 949 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -985,14 +985,14 @@ its bad value flag set to true.
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 951 "../../blib/lib/PDL/PP.pm"
 
 *copybad = \&PDL::copybad;
 #line 992 "Bad.pm"
 
 
 
-#line 1058 "../../blib/lib/PDL/PP.pm"
+#line 949 "../../blib/lib/PDL/PP.pm"
 
 
 
@@ -1020,7 +1020,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1060 "../../blib/lib/PDL/PP.pm"
+#line 951 "../../blib/lib/PDL/PP.pm"
 
 *locf = \&PDL::locf;
 #line 1027 "Bad.pm"
@@ -1029,7 +1029,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 1092 "bad.pd"
+#line 1091 "bad.pd"
 
 
 =head1 AUTHOR

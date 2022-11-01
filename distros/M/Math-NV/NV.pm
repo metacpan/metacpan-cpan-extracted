@@ -8,27 +8,38 @@ use 5.010;
 # With mpfr-3.1.5 and earlier, the ternary value returned
 # by mpfr_strtofr is unreliable - thereby making that function
 # unusable with mpfr_subnormalize.
-use constant MPFR_STRTOFR_BUG => MPFR_VERSION() <= 196869        ? 1 : 0;
+use constant MPFR_STRTOFR_BUG => MPFR_VERSION() <= 196869             ? 1 : 0;
 
 # check for presence of mpfr bug in handling of long doubles.
-use constant LD_SUBNORMAL_BUG => Math::MPFR::_ld_subnormal_bug() ? 1 : 0;
+use constant LD_SUBNORMAL_BUG => Math::MPFR::_ld_subnormal_bug()      ? 1 : 0;
 
 # Math::MPFR::bytes semantics changed in Math-MPFR-4.13
-use constant OLD_MATH_MPFR    => $Math::MPFR::VERSION < 4.13     ? 1 : 0;
+use constant OLD_MATH_MPFR    => $Math::MPFR::VERSION < 4.13          ? 1 : 0;
+
+# Check for unpack/pack bug in older Win32 perls. With these perls
+#  this is reliable:
+#    scalar reverse unpack "h*", pack "d<", $nv;
+#  but these (which should be equivalent to the above), are not:
+#    unpack "H*", pack "d>", $nv;
+#    unpack "H*", pack "F>", $nv;
+
+use constant PACK_BUG => $Config::Config{archname} =~ /MSWin32\-x86/
+                         && $] < 5.02                                 ? 1 : 0;
 
 require Exporter;
 *import = \&Exporter::import;
 require DynaLoader;
 
-$Math::NV::VERSION = '2.03';
+$Math::NV::VERSION = '2.04';
 
-DynaLoader::bootstrap Math::NV $Math::NV::VERSION;
+Math::NV->DynaLoader::bootstrap($Math::NV::VERSION);
 
 @Math::NV::EXPORT = ();
 @Math::NV::EXPORT_OK = qw(
     nv nv_type mant_dig ld2binary ld_str2binary is_eq
     bin2val Cprintf Csprintf nv_mpfr is_eq_mpfr
     set_C set_mpfr is_inexact
+    cmp_2
     MPFR_STRTOFR_BUG LD_SUBNORMAL_BUG
     );
 
@@ -36,6 +47,7 @@ DynaLoader::bootstrap Math::NV $Math::NV::VERSION;
     nv nv_type mant_dig ld2binary ld_str2binary is_eq
     bin2val Cprintf Csprintf nv_mpfr is_eq_mpfr
     set_C set_mpfr is_inexact
+    cmp_2
     MPFR_STRTOFR_BUG LD_SUBNORMAL_BUG
     )]);
 
@@ -103,6 +115,11 @@ my %_itsa = (
   2 => 'IV',
   3 => 'NV',
   4 => 'string',
+  5 => 'Math::MPFR object',
+  6 => 'Math::GMPf object',
+  7 => 'Math::GMPq object',
+  8 => 'Math::GMPz object',
+  9 => 'Math::GMP object',
   0 => 'unknown',
 );
 
@@ -150,7 +167,7 @@ sub bin2val {
 sub is_eq {
   unless($Math::NV::no_warn & 1) {
     my $itsa = $_[0];
-    $itsa = _itsa($itsa); # make sure that $_[0] has POK flag set && all numeric flags unset
+    $itsa = Math::MPFR::_itsa($itsa); # make sure that $_[0] has POK flag set && IOK flag unset
     warn "Argument given to is_eq() is $_itsa{$itsa}, not a string - probably not what you want"
     if $itsa != 4;
   }
@@ -161,9 +178,9 @@ sub is_eq {
     if(mant_dig() == 64) {
       # pack/unpack like to deliver irrelevant (ie ignored) leading bytes
       # if NV is 80-bit long double
-      my $first = scalar(reverse(unpack("h*", pack("F<", $nv))));
+      my $first = unpack("H*", pack("F>", $nv));
       $first = substr($first, length($first) - 20, 20);
-      my $second = scalar(reverse(unpack("h*", pack("F<", $check))));
+      my $second = unpack("H*", pack("F>", $check));
       $second = substr($second, length($second) - 20, 20);
       warn "\nIn is_eq:\nperl: $first vs C: $second\n";
       if($] > 5.02) {
@@ -172,8 +189,8 @@ sub is_eq {
     }
     else {
       warn "\nIn is_eq:\nperl: ",
-        scalar(reverse(unpack("h*", pack("F<", $nv)))), " vs C: ",
-        scalar(reverse(unpack("h*", pack("F<", $check)))), "\n";
+        unpack("H*", pack("F>", $nv)), " vs C: ",
+        unpack("H*", pack("F>", $check)), "\n";
       if($] > 5.02) {
         warn "perl: ", sprintf("%a", $nv), " vs mpfr: ", sprintf("%a", $check), "\n";
       }
@@ -186,7 +203,7 @@ sub is_eq_mpfr {
 
   unless($Math::NV::no_warn & 1) {
     my $itsa = $_[0];
-    $itsa = _itsa($itsa); # make sure that $_[0] has POK flag set && all numeric flags unset
+    $itsa = Math::MPFR::_itsa($itsa); # make sure that $_[0] has POK flag set && IOK flag unset
     warn "Argument given to is_eq() is $_itsa{$itsa}, not a string - probably not what you want"
     if $itsa != 4;
   }
@@ -225,9 +242,9 @@ sub is_eq_mpfr {
     if($bits == 64) {
       # pack/unpack like to deliver irrelevant (ie ignored) leading bytes
       # if NV is 80-bit long double
-      my $first = scalar(reverse(unpack("h*", pack("F<", $nv))));
+      my $first = unpack("H*", pack("F>", $nv));
       $first = substr($first, length($first) - 20, 20);
-      my $second = scalar(reverse(unpack("h*", pack("F<", Rmpfr_get_NV($fr, 0)))));
+      my $second = unpack("H*", pack("F>", Rmpfr_get_NV($fr, 0)));
       $second = substr($second, length($second) - 20, 20);
       warn "\nIn is_eq_mpfr: $_[0]\nperl: $first vs mpfr: $second\n";
       if($] > 5.02) {
@@ -235,11 +252,20 @@ sub is_eq_mpfr {
       }
     }
     else {
-      warn "\nIn is_eq_mpfr: $_[0]\nperl: ",
-        scalar(reverse(unpack("h*", pack("F<", $nv)))), " vs mpfr: ",
-        scalar(reverse(unpack("h*", pack("F<", Rmpfr_get_NV($fr, 0))))), "\n";
-      if($] > 5.02) {
-        warn "perl: ", sprintf("%a", $nv), " vs mpfr: ", sprintf("%a", Rmpfr_get_NV($fr, 0)), "\n";
+
+
+      if(PACK_BUG) {
+        warn "\nIn is_eq_mpfr: $_[0]\nperl: ",
+          scalar(reverse(unpack("h*", pack("d<", $nv)))), " vs mpfr: ",
+          scalar(reverse(unpack("h*", pack("d<", Rmpfr_get_NV($fr, 0))))), "\n";
+      }
+      else {
+        warn "\nIn is_eq_mpfr: $_[0]\nperl: ",
+          unpack("H*", pack("F>", $nv)), " vs mpfr: ",
+          unpack("H*", pack("F>", Rmpfr_get_NV($fr, 0))), "\n";
+        if($] > 5.02) {
+          warn "perl: ", sprintf("%a", $nv), " vs mpfr: ", sprintf("%a", Rmpfr_get_NV($fr, 0)), "\n";
+        }
       }
     }
   }
@@ -251,9 +277,13 @@ sub nv_mpfr {
 
   unless($Math::NV::no_warn & 1) {
     my $itsa = $_[0];
-    $itsa = _itsa($itsa);  # make sure that $_[0] has POK flag set && all numeric flags unset
-    warn "Argument given to is_eq() is $_itsa{$itsa}, not a string - probably not what you want"
-    if $itsa != 4;
+    $itsa = Math::MPFR::_itsa($itsa);
+
+    # $itsa == 4 implies that $val's POK flag is set && IOK flag is unset.
+    # $itsa == 5 implies that $val is a Math::MPFR::object.
+    warn "Argument given to nv_mpfr is $_itsa{$itsa}, neither a string nor a Math::MPFR object",
+    " and probably not what you want"
+    if ($itsa != 4 && $itsa != 5);
   }
 
   my($val, $bits);
@@ -278,9 +308,13 @@ sub nv_mpfr {
     } # ELSE1
 
     my $nv = Rmpfr_get_NV($val, 0);
-    my $ret = scalar(reverse(unpack("h*", pack("F<", $nv))));
 
-    return $ret;
+    if(PACK_BUG) {     # nvtype is inevitably 'double'
+      return scalar reverse unpack("h*", pack("d<", $nv));
+    }
+    else {
+      return unpack("H*", pack("F>", $nv));
+    }
   }
 
   if($bits == 53) {
@@ -298,7 +332,12 @@ sub nv_mpfr {
     } # ELSE1
 
     my $nv = Rmpfr_get_d($val, 0);
-    return scalar(reverse(unpack("h*", pack("d<", $nv))));
+    if(PACK_BUG) {
+      return scalar reverse unpack("h*", pack("d<", $nv));
+    }
+    else {
+      return unpack("H*", pack("d>", $nv));
+    }
   }
 
   if($bits == 64) {
@@ -328,7 +367,7 @@ sub set_mpfr {
 
   unless($Math::NV::no_warn & 1) {
     my $itsa = $_[0];
-    $itsa = _itsa($itsa);  # make sure that $_[0] has POK flag set && all numeric flags unset
+    $itsa = Math::MPFR::_itsa($itsa);  # make sure that $_[0] has POK flag set && all numeric flags unset
     warn "Argument given to is_eq() is $_itsa{$itsa}, not a string - probably not what you want"
     if $itsa != 4;
   }
@@ -372,7 +411,7 @@ sub is_inexact {
 
   unless($Math::NV::no_warn & 1) {
     my $itsa = $_[0];
-    $itsa = _itsa($itsa);  # make sure that $_[0] has POK flag set && all numeric flags unset
+    $itsa = Math::MPFR::_itsa($itsa);  # make sure that $_[0] has POK flag set && all numeric flags unset
     warn "Argument given to is_inexact() is $_itsa{$itsa}, not a string - possibly not what you want"
     if $itsa != 4;
   }
@@ -394,7 +433,7 @@ sub is_inexact {
 sub set_C {
   unless($Math::NV::no_warn & 1) {
     my $itsa = $_[0];
-    $itsa = _itsa($itsa);  # make sure that $_[0] has POK flag set && all numeric flags unset
+    $itsa = Math::MPFR::_itsa($itsa);  # make sure that $_[0] has POK flag set && all numeric flags unset
     warn "Argument given to is_eq() is $_itsa{$itsa}, not a string - probably not what you want"
     if $itsa != 4;
   }
@@ -406,8 +445,8 @@ sub _double_double {
   my $val = Rmpfr_init2(2098);
   Rmpfr_set_str($val, shift, 0, 0);
   my @val = _dd_obj($val);
-  return [scalar(reverse(unpack("h*", pack("d<", $val[0])))),
-          scalar(reverse(unpack("h*", pack("d<", $val[1]))))];
+  return [unpack("H*", pack("d>", $val[0])),
+          unpack("H*", pack("d>", $val[1]))];
 }
 
 sub _dd_obj {
@@ -431,7 +470,7 @@ sub get_subnormal {
     return $Math::NV::DENORM_MIN{'0'} * $signbit;
   }
 
-  # If prec == 0, then the value is less than the
+  # If $prec == 0, then the value is less than the
   # minimum subnormal number.
   if($prec == 0) {
     return $Math::NV::DENORM_MIN{$bits} * $signbit if abs($_[0]) > $Math::NV::DENORM_MIN{"${bits}MIN"};
@@ -499,6 +538,50 @@ sub _subnormalize {
 # Rmpfr_set_default_prec($original_prec);
 
   return $val;
+}
+
+sub cmp_2 {
+  my($s1, $s2) = (shift, shift);
+  my($prec1, $prec2);
+
+  if($s1 =~ /^(\-|\+)?0b/i) {
+    $prec1 = length($s1);
+  }
+  elsif($s1 =~ /^(\-|\+)?0x/i) {
+    $prec1 = length($s1) * 4;
+  }
+  elsif($s1 =~ /^(\-|\+)?inf|^(\-|\+)?nan/i) {
+    $prec1 = 2;
+  }
+  else {
+    die "Invalid 1st arg to cmp_2";
+  }
+
+  if($s2 =~ /^(\-|\+)?0b/i) {
+    $prec2 = length($s2);
+  }
+  elsif($s2 =~ /^(\-|\+)?0x/i) {
+    $prec2 = length($s2) * 4;
+  }
+  elsif($s2 =~ /^(\-|\+)?inf|^(\-|\+)?nan/i) {
+    $prec2 = 2;
+  }
+  else {
+    die "Invalid 2nd arg to cmp_2";
+  }
+
+  my $f1 = Math::MPFR::Rmpfr_init2($prec1);
+  my $f2 = Math::MPFR::Rmpfr_init2($prec2);
+
+  my $inex = Math::MPFR::Rmpfr_strtofr($f1, $s1, 0, 0);
+  die "Inexact assignment of first arg in cmp_2 function"
+    if $inex;
+
+  $inex = Math::MPFR::Rmpfr_strtofr($f2, $s2, 0, 0);
+  die "Inexact assignment of second arg in cmp_2 function"
+    if $inex;
+
+  return $f1 <=> $f2;
 }
 
 1;

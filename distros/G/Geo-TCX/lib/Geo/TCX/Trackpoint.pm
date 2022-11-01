@@ -2,7 +2,7 @@ package Geo::TCX::Trackpoint;
 use strict;
 use warnings;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 =encoding utf-8
 
@@ -107,7 +107,7 @@ Methods with respect to certain fields can be autoloaded and return the current 
 
 For Basic trackpoints, LatitudeDegrees and LongitudeDegrees are the supported fields.
 
-For Full trackpoints, supported fields are: LatitudeDegrees, LongitudeDegrees, AltitudeMeters, DistanceMeters, HeartRateBpm, Cadence, and SensorState.
+For Full trackpoints, supported fields are: LatitudeDegrees, LongitudeDegrees, AltitudeMeters, HeartRateBpm, Cadence, and SensorState.
 
 Some fields may contain a value of 0. It is safer to check if a field is defined with C<< if (defined $trackpoint->Cadence) >> rather than C<< if ($trackpoint->Cadence) >>.
 
@@ -256,7 +256,7 @@ use warnings;
 use DateTime::Format::ISO8601;
 use Carp qw(confess croak cluck);
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 our @ISA=qw(Geo::TCX::Trackpoint);
 
 
@@ -340,6 +340,18 @@ sub AUTOLOAD {
 }
 
 =head2 Object Methods for class Geo::TXC::Trackpoint::Full
+
+=over 4
+
+=item DistanceMeters()
+
+Returns the C<DistanceMeters> field of a trackpoint.
+
+=back
+
+=cut
+
+sub DistanceMeters { return shift->{DistanceMeters} }
 
 =over 4
 
@@ -661,7 +673,7 @@ Patrick Joly
 
 =head1 VERSION
 
-1.01
+1.02
 
 =head1 SEE ALSO
 

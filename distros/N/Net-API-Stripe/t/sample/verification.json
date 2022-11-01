@@ -1,0 +1,17 @@
+{
+   "additional_document" : {
+      "back" : null,
+      "details" : null,
+      "details_code" : null,
+      "front" : null
+   },
+   "details" : null,
+   "details_code" : null,
+   "document" : {
+      "back" : null,
+      "details" : null,
+      "details_code" : null,
+      "front" : null
+   },
+   "status" : "unverified"
+}

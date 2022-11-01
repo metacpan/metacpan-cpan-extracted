@@ -69,20 +69,21 @@ DESCRIPTION
       An unlabelled counter tracking the number of times a received packet
       is discarded due to failing CRC check.
 
-    packets_received
+    packets
 
-      A counter, labelled by packet type, tracking the number of packets
-      received of each type.
-
-    packets_sent
-
-      A counter, labelled by packet type, tracking the number of packets
-      sent of each type.
+      A counter, labelled by direction and packet type, tracking the number
+      of packets sent and received of each type.
 
     retransmits
 
       An unlabelled counter tracking the number of times a (REQUEST) packet
       had to be retransmitted after the initial one timed out.
+
+    serial_bytes
+
+      A counter, labelled by direction, tracking the number of bytes sent
+      and received directly over the serial port. The rate of this can be
+      used to calculate overall serial link utilisation.
 
     timeouts
 

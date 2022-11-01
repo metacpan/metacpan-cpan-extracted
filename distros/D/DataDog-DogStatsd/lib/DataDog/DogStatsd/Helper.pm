@@ -2,7 +2,7 @@ package DataDog::DogStatsd::Helper;
 
 use strict;
 use warnings;
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use base qw( Exporter );
 our @EXPORT_OK = qw/stats_inc stats_dec stats_timing stats_gauge stats_count stats_histogram stats_event stats_timed/;
@@ -21,7 +21,7 @@ sub stats_inc {
     }
     get_dogstatsd()->increment(@args);
 }
-sub stats_dec    { get_dogstatsd()->decrement(@_); }
+sub stats_dec { get_dogstatsd()->decrement(@_); }
 
 sub stats_timing {
     my @args = @_;
@@ -34,7 +34,7 @@ sub stats_timing {
     get_dogstatsd()->timing(@args);
 }
 
-sub stats_timed (&@) {    ## no critic (ProhibitSubroutinePrototypes)
+sub stats_timed (&@) {    ## no critic (ProhibitSubroutinePrototypes, Subroutines::RequireArgUnpacking)
     my ($sub, $what, $opts) = splice @_, 0, 3;
 
     my $start = [gettimeofday];
@@ -52,24 +52,24 @@ sub stats_timed (&@) {    ## no critic (ProhibitSubroutinePrototypes)
         get_dogstatsd()->timing($what, 1000 * tv_interval($start), $opts);
     } else {
         get_dogstatsd()->increment("$what.failure", $opts);
-        die $@;
+        die $@;    ## no critic (Variables::ProhibitEvilVariables)
     }
 
     return wantarray ? @res : $res[0];
 }
 
-sub stats_gauge      { get_dogstatsd()->gauge(@_); }
-sub stats_count      { get_dogstatsd()->count(@_); }
-sub stats_histogram  { get_dogstatsd()->histogram(@_); }
-sub stats_event      { get_dogstatsd()->event(@_); }
+sub stats_gauge     { get_dogstatsd()->gauge(@_); }
+sub stats_count     { get_dogstatsd()->count(@_); }
+sub stats_histogram { get_dogstatsd()->histogram(@_); }
+sub stats_event     { get_dogstatsd()->event(@_); }
 
 my $DOGSTATSD;
+
 sub get_dogstatsd {
     $DOGSTATSD ||= DataDog::DogStatsd->new(
-        host        => $ENV{DATADOG_AGENT_HOST},
-        port        => $ENV{DATADOG_AGENT_PORT},
-        namespace   => $ENV{DATADOG_AGENT_NAMESPACE}
-        );
+        host      => $ENV{DATADOG_AGENT_HOST},
+        port      => $ENV{DATADOG_AGENT_PORT},
+        namespace => $ENV{DATADOG_AGENT_NAMESPACE});
     return $DOGSTATSD;
 }
 

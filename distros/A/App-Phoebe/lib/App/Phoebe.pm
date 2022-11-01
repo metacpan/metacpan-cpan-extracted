@@ -151,7 +151,7 @@ use Mojo::IOLoop;
 use Mojo::Log;
 use utf8;
 
-our $VERSION = 4.05;
+our $VERSION = 4.06;
 
 require Exporter;
 our @ISA = qw(Exporter);

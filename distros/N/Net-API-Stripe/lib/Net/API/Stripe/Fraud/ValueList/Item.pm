@@ -2,7 +2,7 @@
 ## Stripe API - ~/lib/Net/API/Stripe/Fraud/ValueList/Item.pm
 ## Version v0.100.0
 ## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2020/05/15
 ## 
@@ -10,10 +10,15 @@
 package Net::API::Stripe::Fraud::ValueList::Item;
 BEGIN
 {
-	use strict;
-	use parent qw( Net::API::Stripe::Generic );
-	our( $VERSION ) = 'v0.100.0';
+    use strict;
+    use warnings;
+    use parent qw( Net::API::Stripe::Generic );
+    use vars qw( $VERSION );
+    our( $VERSION ) = 'v0.100.0';
 };
+
+use strict;
+use warnings;
 
 sub id { return( shift->_set_get_scalar( 'id', @_ ) ); }
 
@@ -59,62 +64,54 @@ Value list items allow you to add specific values to a given Radar value list, w
 
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>( %ARG )
+=head2 new( %ARG )
 
 Creates a new L<Net::API::Stripe::Fraud::ValueList::Item> object.
 It may also take an hash like arguments, that also are method of the same name.
 
-=back
-
 =head1 METHODS
 
-=over 4
-
-=item B<id> string
+=head2 id string
 
 Unique identifier for the object.
 
-=item B<object> string, value is "radar.value_list_item"
+=head2 object string, value is "radar.value_list_item"
 
 String representing the object’s type. Objects of the same type share the same value.
 
-=item B<created> timestamp
+=head2 created timestamp
 
 Time at which the object was created. Measured in seconds since the Unix epoch.
 
 This is a C<DateTime> object.
 
-=item B<created_by> string
+=head2 created_by string
 
 The name or email address of the user who added this item to the value list.
 
-=item B<livemode> boolean
+=head2 livemode boolean
 
 Has the value true if the object exists in live mode or the value false if the object exists in test mode.
 
-=item B<value> string
+=head2 value string
 
 The value of the item.
 
-=item B<value_list> string
+=head2 value_list string
 
 The identifier of the value list this item belongs to.
 
-=back
-
 =head1 API SAMPLE
 
-	{
-	  "id": "rsli_fake123456789",
-	  "object": "radar.value_list_item",
-	  "created": 1571480456,
-	  "created_by": "jenny@example.com",
-	  "livemode": false,
-	  "value": "1.2.3.4",
-	  "value_list": "rsl_1FVF3MCeyNCl6fY2Wg2IWniP"
-	}
+    {
+      "id": "rsli_fake123456789",
+      "object": "radar.value_list_item",
+      "created": 1571480456,
+      "created_by": "jenny@example.com",
+      "livemode": false,
+      "value": "1.2.3.4",
+      "value_list": "rsl_1FVF3MCeyNCl6fY2Wg2IWniP"
+    }
 
 =head1 HISTORY
 

@@ -1,19 +1,27 @@
 ##----------------------------------------------------------------------------
-## Stripe API - ~/lib/Net/API/Stripe/Reporting/ReportRun.pm
-## Version v0.100.0
+## Stripe API - ~/usr/local/src/perl/Net-API-Stripe/lib/Net/API/Stripe/Reporting/ReportRun.pm
+## Version v0.101.0
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/01/19
-## Modified 2020/05/15
+## Modified 2020/11/28
+## All rights reserved
 ## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 package Net::API::Stripe::Reporting::ReportRun;
 BEGIN
 {
     use strict;
+    use warnings;
     use parent qw( Net::API::Stripe::Generic );
-    our( $VERSION ) = 'v0.100.0';
+    use vars qw( $VERSION );
+    our( $VERSION ) = 'v0.101.0';
 };
+
+use strict;
+use warnings;
 
 sub id { return( shift->_set_get_scalar( 'id', @_ ) ); }
 
@@ -27,16 +35,17 @@ sub livemode { return( shift->_set_get_boolean( 'livemode', @_ ) ); }
 
 sub parameters
 {
-	return( shift->_set_get_class( 'parameters',
-	{
-	columns => { type => 'array_as_object' },
-	connected_account => { type => 'scalar_as_object' },
-	currency => { type => 'scalar_as_object' },
-	interval_end => { type => 'datetime' },
-	interval_start => { type => 'datetime' },
-	payout => { type => 'scalar_as_object' },
-	reporting_category => { type => 'scalar_as_object' },
-	}, @_ ) );
+    return( shift->_set_get_class( 'parameters',
+    {
+    columns => { type => 'array_as_object' },
+    connected_account => { type => 'scalar_as_object' },
+    currency => { type => 'scalar_as_object' },
+    interval_end => { type => 'datetime' },
+    interval_start => { type => 'datetime' },
+    payout => { type => 'scalar_as_object' },
+    reporting_category => { type => 'scalar_as_object' },
+    timezone => { type => 'scalar' },
+    }, @_ ) );
 }
 
 sub report_type { return( shift->_set_get_scalar( 'report_type', @_ ) ); }
@@ -69,7 +78,7 @@ See documentation in L<Net::API::Stripe> for example to make api calls to Stripe
 
 =head1 VERSION
 
-    v0.100.0
+    v0.101.0
 
 =head1 DESCRIPTION
 
@@ -79,44 +88,38 @@ Note that reports can only be run based on your live-mode data (not test-mode da
 
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>( %arg )
+=head2 new( %arg )
 
 Creates a new L<Net::API::Stripe::Reporting::ReportRun> object.
 It may also take an hash like arguments, that also are method of the same name.
 
-=back
-
 =head1 METHODS
 
-=over 4
-
-=item B<id> string
+=head2 id string
 
 Unique identifier for the object.
 
-=item B<object> string, value is "reporting.report_run"
+=head2 object string, value is "reporting.report_run"
 
 String representing the object’s type. Objects of the same type share the same value.
 
-=item B<created> timestamp
+=head2 created timestamp
 
 Time at which the object was created. Measured in seconds since the Unix epoch.
 
-=item B<error>string
+=head2 errorstring
 
 If something should go wrong during the run, a message about the failure (populated when status=failed).
 
-=item B<livemode> boolean
+=head2 livemode boolean
 
 Always true: reports can only be run on live-mode data.
 
-=item B<parameters> hash
+=head2 parameters hash
 
 Parameters of this report run.
 
-=over 8
+=over 4
 
 =item I<columns> array containing strings
 
@@ -146,59 +149,61 @@ Payout ID by which to filter the report run.
 
 Category of balance transactions to be included in the report run.
 
+=item I<timezone> string
+
+Defaults to C<Etc/UTC>. The output timezone for all timestamps in the report. A list of possible time zone values is maintained at the L<IANA Time Zone Database|http://www.iana.org/time-zones>. Has no effect on C<interval_start> or C<interval_end>.
+
 =back
 
-=item B<report_type> string
+=head2 report_type string
 
 The ID of the report type to run, such as "balance.summary.1".
 
-=item B<result> hash
+=head2 result hash
 
 The file object (L<Net::APi::Stripe::File>) representing the result of the report run (populated when status=succeeded).
 
-=item B<status> string
+=head2 status string
 
 Status of this report run. This will be pending when the run is initially created. When the run finishes, this will be set to succeeded and the result field will be populated. Rarely, Stripe may encounter an error, at which point this will be set to failed and the error field will be populated.
 
-=item B<succeeded_at> timestamp
+=head2 succeeded_at timestamp
 
 Timestamp at which this run successfully finished (populated when status=succeeded). Measured in seconds since the Unix epoch.
 
-=back
-
 =head1 API SAMPLE
 
-	{
-	  "id": "frr_fake123456789",
-	  "object": "reporting.report_run",
-	  "created": 1579440566,
-	  "error": null,
-	  "livemode": true,
-	  "parameters": {
-		"interval_end": 1525132800,
-		"interval_start": 1522540800
-	  },
-	  "report_type": "balance.summary.1",
-	  "result": {
-		"id": "file_fake123456789",
-		"object": "file",
-		"created": 1535589144,
-		"filename": "file_fake123456789",
-		"links": {
-		  "object": "list",
-		  "data": [],
-		  "has_more": false,
-		  "url": "/v1/file_links?file=file_fake123456789"
-		},
-		"purpose": "finance_report_run",
-		"size": 9863,
-		"title": null,
-		"type": "csv",
-		"url": "https://files.stripe.com/v1/files/file_fake123456789/contents"
-	  },
-	  "status": "succeeded",
-	  "succeeded_at": 1525192811
-	}
+    {
+      "id": "frr_fake123456789",
+      "object": "reporting.report_run",
+      "created": 1579440566,
+      "error": null,
+      "livemode": true,
+      "parameters": {
+        "interval_end": 1525132800,
+        "interval_start": 1522540800
+      },
+      "report_type": "balance.summary.1",
+      "result": {
+        "id": "file_fake123456789",
+        "object": "file",
+        "created": 1535589144,
+        "filename": "file_fake123456789",
+        "links": {
+          "object": "list",
+          "data": [],
+          "has_more": false,
+          "url": "/v1/file_links?file=file_fake123456789"
+        },
+        "purpose": "finance_report_run",
+        "size": 9863,
+        "title": null,
+        "type": "csv",
+        "url": "https://files.stripe.com/v1/files/file_fake123456789/contents"
+      },
+      "status": "succeeded",
+      "succeeded_at": 1525192811
+    }
 
 =head1 HISTORY
 
@@ -223,5 +228,3 @@ All rights reserved
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 
 =cut
-
-

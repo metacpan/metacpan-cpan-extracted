@@ -1,0 +1,242 @@
+char *								T_PV_OR_NULL
+const char *						T_PV_OR_NULL
+
+EflTime *							T_EVAS_OBJECT
+const EflTime * 					T_EVAS_OBJECT
+
+Eina_Bool							T_IV
+Eina_Bool * 						T_PTR
+Elm_Text_Format 					T_IV
+Elm_Ctxpopup_Direction				T_IV
+Elm_Scroller_Policy 				T_IV
+Evas_BiDi_Direction 				T_IV
+Evas_Aspect_Control 				T_IV
+
+ElmActionslider *					T_EVAS_OBJECT
+const ElmActionslider * 			T_EVAS_OBJECT
+ElmWin *							T_EVAS_OBJECT
+const ElmWin *						T_EVAS_OBJECT
+ElmBg * 							T_EVAS_OBJECT
+const ElmBg *						T_EVAS_OBJECT
+ElmBubble * 						T_EVAS_OBJECT
+const ElmBubble *					T_EVAS_OBJECT
+ElmCalendar *						T_EVAS_OBJECT
+const ElmCalendar * 				T_EVAS_OBJECT
+# TODO: Make a T_EVAS_OBJECT of Efl_Time
+Efl_Time *							T_PTR
+const Efl_Time *					T_PTR
+Elm_Calendar_Mark * 				T_PTR
+ElmColorselector *					T_EVAS_OBJECT
+const ElmColorselector *			T_EVAS_OBJECT
+ElmColorselectorPaletteItem *		T_EVAS_OBJECT
+ElmCombobox *						T_EVAS_OBJECT
+const ElmCombobox * 				T_EVAS_OBJECT
+ElmCtxpopup *						T_EVAS_OBJECT
+ElmCtxpopupItem *					T_EVAS_OBJECT
+ElmLabel *							T_EVAS_OBJECT
+ElmButton * 						T_EVAS_OBJECT
+ElmCheck *							T_EVAS_OBJECT
+ElmEntry *							T_EVAS_OBJECT
+const ElmEntry *					T_EVAS_OBJECT
+ElmEntryAnchorInfo *				T_PTROBJ
+ElmEntryChangeInfo *				T_PTROBJ
+ElmFileselector *					T_EVAS_OBJECT
+ElmFrame *							T_EVAS_OBJECT
+ElmFlip *							T_EVAS_OBJECT
+ElmGenlist *						T_EVAS_OBJECT
+const ElmGenlist *					T_EVAS_OBJECT
+ElmGenlistItem *					T_EVAS_OBJECT
+const ElmGenlistItem *				T_EVAS_OBJECT
+ElmGenlistItemClass *				T_EVAS_OBJECT
+const ElmGenlistItemClass * 		T_EVAS_OBJECT
+ElmGlview * 						T_EVAS_OBJECT
+ElmHover *							T_EVAS_OBJECT
+ElmHoversel *						T_EVAS_OBJECT
+ElmRadio *							T_EVAS_OBJECT
+ElmIcon *							T_EVAS_OBJECT
+ElmImage *							T_EVAS_OBJECT
+ElmImageProgress *					T_PTROBJ
+ElmIndex *							T_EVAS_OBJECT
+ElmIndexItem *						T_EVAS_OBJECT
+ElmInwin *							T_EVAS_OBJECT
+ElmLayout * 						T_EVAS_OBJECT
+ElmList *							T_EVAS_OBJECT
+ElmListItem *						T_EVAS_OBJECT
+ElmMapbuf * 						T_EVAS_OBJECT
+ElmMenu *							T_EVAS_OBJECT
+ElmMenuItem *						T_EVAS_OBJECT
+ElmNotify * 						T_EVAS_OBJECT
+ElmObjectItem * 					T_EVAS_OBJECT
+const ElmObjectItem *				T_EVAS_OBJECT
+ElmPanes *							T_EVAS_OBJECT
+ElmPanel *							T_EVAS_OBJECT
+const ElmPanel *					T_EVAS_OBJECT
+ElmPanelScrollInfo *				T_PTROBJ
+ElmPhoto *							T_EVAS_OBJECT
+const ElmPhoto *					T_EVAS_OBJECT
+ElmPhotocam *						T_EVAS_OBJECT
+const ElmPhotocam * 				T_EVAS_OBJECT
+ElmPopup *							T_EVAS_OBJECT
+const ElmPopup *					T_EVAS_OBJECT
+ElmProgressbar *					T_EVAS_OBJECT
+const ElmProgressbar *				T_EVAS_OBJECT
+ElmSegmentControl * 				T_EVAS_OBJECT
+const ElmSegmentControl *			T_EVAS_OBJECT
+ElmSegmentItem *					T_EVAS_OBJECT
+const ElmSegmentItem *				T_EVAS_OBJECT
+ElmSeparator *						T_EVAS_OBJECT
+const ElmSeparator *				T_EVAS_OBJECT
+ElmSlider * 						T_EVAS_OBJECT
+const ElmSlider *					T_EVAS_OBJECT
+ElmSpinner *						T_EVAS_OBJECT
+const ElmSpinner *					T_EVAS_OBJECT
+ElmToolbar *						T_EVAS_OBJECT
+const ElmToolbar *					T_EVAS_OBJECT
+ElmToolbarItem *					T_EVAS_OBJECT
+const ElmToolbarItem *				T_EVAS_OBJECT
+ElmToolbarTip * 					T_EVAS_OBJECT
+const ElmToolbarTip *				T_EVAS_OBJECT
+ElmToolbarItemState *				T_EVAS_OBJECT
+const ElmToolbarItemState * 		T_EVAS_OBJECT
+ElmWidgetItem * 					T_EVAS_OBJECT
+Eina_List							T_PTR
+Eina_List * 						T_PTR
+EinaList							T_EVAS_OBJECT
+EinaList *							T_EVAS_OBJECT
+const EinaList *					T_EVAS_OBJECT
+ElmPlayer * 						T_EVAS_OBJECT
+const ElmPlayer *					T_EVAS_OBJECT
+ElmVideo *							T_EVAS_OBJECT
+const ElmVideo *					T_EVAS_OBJECT
+
+# ElmConfig
+ElmTextClass *						T_PTROBJ
+ElmFontOverlay *					T_PTROBJ
+ElmColorClass * 					T_PTROBJ
+
+# Containers
+ElmGrid *							T_EVAS_OBJECT
+const ElmGrid * 					T_EVAS_OBJECT
+ElmBox *							T_EVAS_OBJECT
+const ElmBox *						T_EVAS_OBJECT
+ElmConformant * 					T_EVAS_OBJECT
+ElmTable *							T_EVAS_OBJECT
+const ElmTable *					T_EVAS_OBJECT
+ElmScroller *						T_EVAS_OBJECT
+const ElmScroller * 				T_EVAS_OBJECT
+ElmNaviframe *						T_EVAS_OBJECT
+const ElmNaviframe *				T_EVAS_OBJECT
+ElmNaviframeItem *					T_EVAS_OBJECT
+const ElmNaviframeItem *			T_EVAS_OBJECT
+
+#####################
+# EMOTION
+#####################
+EmotionObject * 					T_EVAS_OBJECT
+const EmotionObject *				T_EVAS_OBJECT
+EmotionWebcam * 					T_EVAS_OBJECT
+const EmotionWebcam *				T_EVAS_OBJECT
+
+#####################
+# EVAS
+#####################
+EvasCanvas *						T_EVAS_OBJECT
+const EvasCanvas *					T_EVAS_OBJECT
+EvasImage * 						T_EVAS_OBJECT
+const EvasImage *					T_EVAS_OBJECT
+EvasLine *							T_EVAS_OBJECT
+const EvasLine *					T_EVAS_OBJECT
+EvasPolygon *						T_EVAS_OBJECT
+const EvasPolygon * 				T_EVAS_OBJECT
+EvasRectangle * 					T_EVAS_OBJECT
+const EvasRectangle *				T_EVAS_OBJECT
+EvasText *							T_EVAS_OBJECT
+const EvasText *					T_EVAS_OBJECT
+EvasTextblock * 					T_EVAS_OBJECT
+const EvasTextblock *				T_EVAS_OBJECT
+EvasTextblockCursor *				T_EVAS_OBJECT
+const EvasTextblockCursor * 		T_EVAS_OBJECT
+EvasTextblockNodeFormat *			T_EVAS_OBJECT
+const EvasTextblockNodeFormat * 	T_EVAS_OBJECT
+EvasTextblockStyle *				T_EVAS_OBJECT
+const EvasTextblockStyle *			T_EVAS_OBJECT
+EvasTextblockRectangle *			T_PTROBJ
+EvasObject *						T_EVAS_OBJECT
+const EvasObject *					T_EVAS_OBJECT
+EvasCoordRectangle *				T_PTROBJ
+Evas_Coord							T_IV
+EvasModifier *						T_EVAS_OBJECT
+const EvasModifier *				T_EVAS_OBJECT
+EvasLock *							T_EVAS_OBJECT
+const EvasLock *					T_EVAS_OBJECT
+EvasEventMouseDown *				T_PTROBJ
+EvasEventMouseUp *					T_PTROBJ
+EvasEventMouseIn *					T_PTROBJ
+EvasEventMouseOut * 				T_PTROBJ
+EvasEventMouseMove *				T_PTROBJ
+EvasEventMouseWheel *				T_PTROBJ
+EvasEventKeyDown *					T_PTROBJ
+EvasEventKeyUp *					T_PTROBJ
+EvasEventHold * 					T_PTROBJ
+
+####################
+# ECORE
+###################
+EcoreEventHandler * 				T_EVAS_OBJECT
+const EcoreEventHandler *			T_EVAS_OBJECT
+EcoreEvent *						T_EVAS_OBJECT
+const EcoreEvent *					T_EVAS_OBJECT
+EcoreEventFilter *					T_EVAS_OBJECT
+const EcoreEventFilter *			T_EVAS_OBJECT
+EcoreEventKey * 					T_EVAS_OBJECT
+EcoreEventMouseButton * 			T_EVAS_OBJECT
+EcoreEventMouseWheel *				T_EVAS_OBJECT
+EcoreEventMouseMove *				T_EVAS_OBJECT
+EcoreEventSignalExit *				T_EVAS_OBJECT
+EcoreEventSignalRealtime *			T_EVAS_OBJECT
+EcoreEventSignalUser *				T_EVAS_OBJECT
+EcoreEvas * 						T_EVAS_OBJECT
+const EcoreEvas *					T_EVAS_OBJECT
+EcoreTimer *						T_EVAS_OBJECT
+const EcoreTimer *					T_EVAS_OBJECT
+EcoreIdler *						T_EVAS_OBJECT
+EcoreIdleEnterer *					T_EVAS_OBJECT
+EcoreIdleExiter *					T_EVAS_OBJECT
+EcorePoller *						T_EVAS_OBJECT
+const EcorePoller * 				T_EVAS_OBJECT
+
+################################################################################
+INPUT
+# the difference to T_PTROBJ is
+# 1) if undef is passed instead of an Evas_Object and the derived structs,
+# then on the C Side we must have NULL instead of PL_Sv_undef!!!
+# otherwise we get the error "$var is not of type EvasObjectPtr"
+# 2) const is cut
+T_EVAS_OBJECT
+		if (!SvROK($arg)) {
+			$var = NULL;
+		}
+		else {
+			if (sv_derived_from($arg, \"${(my $ntt=$ntype)=~s/^const //g;\$ntt}\")) {
+				IV tmp = SvIV((SV*)SvRV($arg));
+				$var = INT2PTR($type,tmp);
+			}
+			else {
+				Perl_croak(aTHX_ \"%s: %s is not of type %s\",
+							${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+							\"$var\", \"$ntype\");
+			}
+		}
+T_PV_OR_NULL
+	if (SvTYPE($arg) == SVt_NULL) {
+		$var = NULL;
+	}
+	else {
+		$var = ($type)SvPV_nolen($arg);
+	}
+################################################################################
+OUTPUT
+T_EVAS_OBJECT
+	sv_setref_pv($arg, \"${(my $ntt=$ntype)=~s/^const //g;\$ntt}\", (void*)$var);
+T_PV_OR_NULL
+	sv_setpv((SV*)$arg, $var);

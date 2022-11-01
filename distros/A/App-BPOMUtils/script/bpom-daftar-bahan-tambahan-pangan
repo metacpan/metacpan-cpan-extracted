@@ -1,0 +1,499 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /App/BPOMUtils/bpom_list_food_additives
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+
+use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-11-01'; # DATE
+our $DIST = 'App-BPOMUtils'; # DIST
+our $VERSION = '0.012'; # VERSION
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/App/BPOMUtils/bpom_list_food_additives",
+    program_name => "bpom-daftar-bahan-tambahan-pangan",
+    log => 1,
+    read_config => 0,
+    read_env => 0,
+);
+
+$cmdline->run;
+
+# ABSTRACT: List additives in BPOM processed food division
+# PODNAME: bpom-daftar-bahan-tambahan-pangan
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+bpom-daftar-bahan-tambahan-pangan - List additives in BPOM processed food division
+
+=head1 VERSION
+
+This document describes version 0.012 of bpom-daftar-bahan-tambahan-pangan (from Perl distribution App-BPOMUtils), released on 2022-11-01.
+
+=head1 SYNOPSIS
+
+B<bpom-daftar-bahan-tambahan-pangan> L<--help|/"--help, -h, -v"> (or L<-h|/"--help, -h, -v">, L<-?|/"--help, -h, -v">)
+
+B<bpom-daftar-bahan-tambahan-pangan> L<--version|/"--version, -v"> (or L<-v|/"--version, -v">)
+
+B<bpom-daftar-bahan-tambahan-pangan> [L<--debug|/"--debug">|L<--log-level|/"--log-level=s">=I<level>|L<--quiet|/"--quiet">|L<--trace|/"--trace">|L<--verbose|/"--verbose">] [L<--detail|/"--detail, -l">|L<-l|/"--detail, -l">|L<--no-detail|/"--detail, -l">|L<--nodetail|/"--detail, -l">] [(L<--exclude-field|/"--exclude-fields-json=s">=I<str>)+|L<--exclude-fields-json|/"--exclude-fields-json=s">=I<json>] [(L<--field|/"--fields-json=s">=I<str>)+|L<--fields-json|/"--fields-json=s">=I<json>] [L<--format|/"--format=s">=I<name>|L<--json|/"--json">] [L<--id-contains|/"--id-contains=s">=I<str>] [(L<--id-in|/"--id-in=s@">=I<str>)+|L<--id-in-json|/"--id-in=s@">=I<json>] [L<--id-is|/"--id-is=s">=I<str>] [L<--id-isnt|/"--id-isnt=s">=I<str>] [L<--id-matches|/"--id-matches=s">=I<str>] [L<--id-max|/"--id-max=s">=I<str>] [L<--id-min|/"--id-min=s">=I<str>] [L<--id-not-contains|/"--id-not-contains=s">=I<str>] [(L<--id-not-in|/"--id-not-in=s@">=I<str>)+|L<--id-not-in-json|/"--id-not-in=s@">=I<json>] [L<--id-not-matches|/"--id-not-matches=s">=I<str>] [L<--id-xmax|/"--id-xmax=s">=I<str>] [L<--id-xmin|/"--id-xmin=s">=I<str>] [L<--id|/"--id=s">=I<str>] [L<--(no)naked-res|/"--naked-res">] [L<--name-contains|/"--name-contains=s">=I<str>] [(L<--name-in|/"--name-in=s@">=I<str>)+|L<--name-in-json|/"--name-in=s@">=I<json>] [L<--name-is|/"--name-is=s">=I<str>] [L<--name-isnt|/"--name-isnt=s">=I<str>] [L<--name-matches|/"--name-matches=s">=I<str>] [L<--name-max|/"--name-max=s">=I<str>] [L<--name-min|/"--name-min=s">=I<str>] [L<--name-not-contains|/"--name-not-contains=s">=I<str>] [(L<--name-not-in|/"--name-not-in=s@">=I<str>)+|L<--name-not-in-json|/"--name-not-in=s@">=I<json>] [L<--name-not-matches|/"--name-not-matches=s">=I<str>] [L<--name-xmax|/"--name-xmax=s">=I<str>] [L<--name-xmin|/"--name-xmin=s">=I<str>] [L<--name|/"--name=s">=I<str>] [L<--page-result|/"--page-result">[=I<program>]|L<--view-result|/"--view-result">[=I<program>]] [L<--random|/"--random">|L<--no-random|/"--random">|L<--norandom|/"--random">] [L<--result-limit|/"--result-limit=s">=I<int>] [L<--result-start|/"--result-start=s">=I<int>] [(L<--sort|/"--sort=s@">=I<str>)+|L<--sort-json|/"--sort=s@">=I<json>] [L<--with-field-names|/"--with-field-names">|L<--without-field-names|/"--with-field-names">] -- [L<query|/"--query=s, -q">]
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Field selection options
+
+=over
+
+=item B<--detail>, B<-l>
+
+Return array of full records instead of just ID fields.
+
+By default, only the key (ID) field is returned per result entry.
+
+
+=item B<--exclude-field>=I<s@>
+
+Select fields to return.
+
+Can be specified multiple times.
+
+=item B<--exclude-fields-json>=I<s>
+
+Select fields to return (JSON-encoded).
+
+See C<--exclude-field>.
+
+=item B<--field>=I<s@>
+
+Select fields to return.
+
+Can be specified multiple times.
+
+=item B<--fields-json>=I<s>
+
+Select fields to return (JSON-encoded).
+
+See C<--field>.
+
+=item B<--with-field-names>
+
+Return field names in each record (as hash/associative array).
+
+When enabled, function will return each record as hash/associative array
+(field name => value pairs). Otherwise, function will return each record
+as list/array (field value, field value, ...).
+
+
+=back
+
+=head2 Filtering for id options
+
+=over
+
+=item B<--id-contains>=I<s>
+
+Only return records where the 'id' field contains specified text.
+
+=item B<--id-in-json>=I<s>
+
+Only return records where the 'id' field is in the specified values (JSON-encoded).
+
+See C<--id-in>.
+
+=item B<--id-in>=I<s@>
+
+Only return records where the 'id' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--id-is>=I<s>
+
+Only return records where the 'id' field equals specified value.
+
+=item B<--id-isnt>=I<s>
+
+Only return records where the 'id' field does not equal specified value.
+
+=item B<--id-matches>=I<s>
+
+Only return records where the 'id' field matches specified regular expression pattern.
+
+=item B<--id-max>=I<s>
+
+Only return records where the 'id' field is less than or equal to specified value.
+
+=item B<--id-min>=I<s>
+
+Only return records where the 'id' field is greater than or equal to specified value.
+
+=item B<--id-not-contains>=I<s>
+
+Only return records where the 'id' field does not contain specified text.
+
+=item B<--id-not-in-json>=I<s>
+
+Only return records where the 'id' field is not in the specified values (JSON-encoded).
+
+See C<--id-not-in>.
+
+=item B<--id-not-in>=I<s@>
+
+Only return records where the 'id' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--id-not-matches>=I<s>
+
+Only return records where the 'id' field does not match specified regular expression.
+
+=item B<--id-xmax>=I<s>
+
+Only return records where the 'id' field is less than specified value.
+
+=item B<--id-xmin>=I<s>
+
+Only return records where the 'id' field is greater than specified value.
+
+=item B<--id>=I<s>
+
+Only return records where the 'id' field equals specified value.
+
+=back
+
+=head2 Filtering for name options
+
+=over
+
+=item B<--name-contains>=I<s>
+
+Only return records where the 'name' field contains specified text.
+
+=item B<--name-in-json>=I<s>
+
+Only return records where the 'name' field is in the specified values (JSON-encoded).
+
+See C<--name-in>.
+
+=item B<--name-in>=I<s@>
+
+Only return records where the 'name' field is in the specified values.
+
+Can be specified multiple times.
+
+=item B<--name-is>=I<s>
+
+Only return records where the 'name' field equals specified value.
+
+=item B<--name-isnt>=I<s>
+
+Only return records where the 'name' field does not equal specified value.
+
+=item B<--name-matches>=I<s>
+
+Only return records where the 'name' field matches specified regular expression pattern.
+
+=item B<--name-max>=I<s>
+
+Only return records where the 'name' field is less than or equal to specified value.
+
+=item B<--name-min>=I<s>
+
+Only return records where the 'name' field is greater than or equal to specified value.
+
+=item B<--name-not-contains>=I<s>
+
+Only return records where the 'name' field does not contain specified text.
+
+=item B<--name-not-in-json>=I<s>
+
+Only return records where the 'name' field is not in the specified values (JSON-encoded).
+
+See C<--name-not-in>.
+
+=item B<--name-not-in>=I<s@>
+
+Only return records where the 'name' field is not in the specified values.
+
+Can be specified multiple times.
+
+=item B<--name-not-matches>=I<s>
+
+Only return records where the 'name' field does not match specified regular expression.
+
+=item B<--name-xmax>=I<s>
+
+Only return records where the 'name' field is less than specified value.
+
+=item B<--name-xmin>=I<s>
+
+Only return records where the 'name' field is greater than specified value.
+
+=item B<--name>=I<s>
+
+Only return records where the 'name' field equals specified value.
+
+=back
+
+=head2 Filtering options
+
+=over
+
+=item B<--query>=I<s>, B<-q>
+
+Search.
+
+Can also be specified as the 1st command-line argument.
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+By default, these log levels are available (in order of increasing level of
+importance, from least important to most): C<trace>, C<debug>, C<info>,
+C<warn>/C<warning>, C<error>, C<fatal>. By default, the level is usually set to
+C<warn>, which means that log statements with level C<info> and less important
+levels will not be shown. To increase verbosity, choose C<info>, C<debug>, or
+C<trace>.
+
+For more details on log level and logging, as well as how new logging levels can
+be defined or existing ones modified, see L<Log::ger>.
+
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
+
+=back
+
+=head2 Ordering options
+
+=over
+
+=item B<--random>
+
+Return records in random order.
+
+=item B<--sort-json>=I<s>
+
+Order records according to certain field(s) (JSON-encoded).
+
+See C<--sort>.
+
+=item B<--sort>=I<s@>
+
+Order records according to certain field(s).
+
+A list of field names separated by comma. Each field can be prefixed with '-' to
+specify descending order instead of the default ascending.
+
+
+Can be specified multiple times.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+C<--naked-res> so you just get:
+
+ [1,2,3]
+
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
+=item B<--view-result>
+
+View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
+
+=back
+
+=head2 Paging options
+
+=over
+
+=item B<--result-limit>=I<s>
+
+Only return a certain number of records.
+
+=item B<--result-start>=I<s>
+
+Only return starting from the n'th record.
+
+Default value:
+
+ 1
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C bpom-daftar-bahan-tambahan-pangan bpom-daftar-bahan-tambahan-pangan
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete bpom-daftar-bahan-tambahan-pangan 'p/*/`bpom-daftar-bahan-tambahan-pangan`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-BPOMUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-BPOMUtils>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2021 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-BPOMUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

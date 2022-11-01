@@ -1,0 +1,117 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Sub::HandlesVia::Manual::WithObjectPad - using Sub::HandlesVia with Object::Pad
+
+=head1 SYNOPSIS
+
+ use Object::Pad;
+ 
+ class Kitchen {
+   has @foods;
+   use Sub::HandlesVia::Declare '@foods', Array => (
+     all_foods => 'all',
+     add_food  => 'push',
+   );
+ }
+
+=head1 MANUAL
+
+Sub::HandlesVia allows you to delegate methods from your class to the
+values of your objects' attributes.
+
+Conceptually, it allows you to define C<< $object->push_number($n) >>
+to be a shortcut for C<< $object->numbers->push($n) >> except that
+C<< $object->numbers >> is an arrayref, so doesn't have methods you
+can call on it like C<push>.
+
+Experimental L<Object::Pad> support is provided by Sub::HandlesVia,
+including for array and hash fields.
+
+Object::Pad classes are "sealed" after compile time, preventing new
+methods from being installed at run-time. (It's actually trivially
+easy to add them at runtime, but not using the API provided by the
+Object::Pad MOP, so we don't do that.) This is why L<Sub::Handles::Declare>
+is used, as it creates delegated methods at compile-time.
+
+The first argument is the field name, including its sigil.
+
+The second argument is the handler library. If the field name
+begins with a '@' or '%', this is implied to be "Array"/"Hash".
+
+ use Object::Pad;
+ 
+ class Kitchen {
+   has @foods;
+   use Sub::HandlesVia::Declare '@foods', (
+     all_foods => 'all',
+     add_food  => 'push',
+   );
+ }
+
+The third argument is a hash of methods to delegate.
+
+=head2 Which Methods Can Be Delegated To?
+
+The second parameter ("Array" in the synopsis) indicates which library
+of methods should be available. Valid values include
+L<Array|Sub::HandlesVia::HandlerLibrary::Array>,
+L<Blessed|Sub::HandlesVia::HandlerLibrary::Blessed>,
+L<Bool|Sub::HandlesVia::HandlerLibrary::Bool>,
+L<Code|Sub::HandlesVia::HandlerLibrary::Code>,
+L<Counter|Sub::HandlesVia::HandlerLibrary::Counter>,
+L<Hash|Sub::HandlesVia::HandlerLibrary::Hash>,
+L<Number|Sub::HandlesVia::HandlerLibrary::Number>,
+L<Scalar|Sub::HandlesVia::HandlerLibrary::Scalar>, and
+L<String|Sub::HandlesVia::HandlerLibrary::String>.
+
+An arrayref can be provided, though many of the options are conceptually
+contradictory.
+
+ use Sub::HandlesVia::Declare 'num', [ 'Number', 'Scalar' ] => (
+   ...,
+ );
+
+=head1 BUGS
+
+Please report any bugs to
+L<https://github.com/tobyink/p5-sub-handlesvia/issues>.
+
+=head1 SEE ALSO
+
+Misc advanced documentation:
+L<Sub::HandlesVia::Manual::Advanced>.
+
+L<Sub::HandlesVia>, L<Sub::HandlesVia::Declare>.
+
+Documentation for delegatable methods:
+L<Sub::HandlesVia::HandlerLibrary::Array>,
+L<Sub::HandlesVia::HandlerLibrary::Blessed>,
+L<Sub::HandlesVia::HandlerLibrary::Bool>,
+L<Sub::HandlesVia::HandlerLibrary::Code>,
+L<Sub::HandlesVia::HandlerLibrary::Counter>,
+L<Sub::HandlesVia::HandlerLibrary::Hash>,
+L<Sub::HandlesVia::HandlerLibrary::Number>,
+L<Sub::HandlesVia::HandlerLibrary::Scalar>, and
+L<Sub::HandlesVia::HandlerLibrary::String>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2022 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

@@ -37,7 +37,7 @@ print $css->flush;
 # Output:
 # HTML:
 # <input class="form-input" type="text" />
-# 
+#
 # CSS:
 # input.form-input[type=submit]:hover {
 #         background-color: #45a049;

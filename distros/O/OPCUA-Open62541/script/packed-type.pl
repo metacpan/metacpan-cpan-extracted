@@ -6,7 +6,7 @@ use warnings;
 
 open(my $in, '<', "Open62541-packed.xsh")
     or die "Open 'Open62541-packed.xsh' for reading failed: $!";
-my @types = map { m{^static UA_(\w+) XS_unpack_UA_\w+} } <$in>
+my @types = map { m{^static void pack_UA_(\w+)\(} } <$in>
     or die "No types found";
 
 local $\ = "\n";
@@ -18,38 +18,51 @@ foreach my $type (sort @types) {
     my $index = uc($type);
     print $out <<"EOF";
 #ifdef UA_TYPES_$index
+static void XS_pack_UA_$type(SV *out, UA_$type in) __attribute__((unused));
+static UA_$type XS_unpack_UA_$type(SV *in) __attribute__((unused));
 static void
-pack_UA_$type(SV *sv, void *p)
+XS_pack_UA_$type(SV *out, UA_$type in)
 {
-	UA_$type *data = p;
-	XS_pack_UA_$type(sv, *data);
+	pack_UA_$type(out, &in);
+}
+static UA_$type
+XS_unpack_UA_$type(SV *in)
+{
+	UA_$type out;
+	unpack_UA_$type(&out, in);
+	return out;
 }
 static void
-unpack_UA_$type(SV *sv, void *p)
+table_pack_UA_$type(SV *out, const void *in)
 {
-	UA_$type *data = p;
-	*data = XS_unpack_UA_$type(sv);
+	pack_UA_$type(out, in);
+}
+static void
+table_unpack_UA_$type(void *out, SV *in)
+{
+	unpack_UA_$type(out, in);
 }
 #endif
 EOF
 }
 
-print $out "typedef void (*packed_UA)(SV *, void *);\n";
+print $out "typedef void (*pack_UA)(SV *, const void *);\n";
+print $out "typedef void (*unpack_UA)(void *, SV *);\n";
 
-print $out "static packed_UA pack_UA_table[UA_TYPES_COUNT] = {";
+print $out "static pack_UA pack_UA_table[UA_TYPES_COUNT] = {";
 foreach my $type (@types) {
     my $index = "UA_TYPES_". uc($type);
     print $out "#ifdef $index";
-    print $out "	[$index] = pack_UA_$type,";
+    print $out "	[$index] = table_pack_UA_$type,";
     print $out "#endif";
 }
 print $out "};\n";
 
-print $out "static packed_UA unpack_UA_table[UA_TYPES_COUNT] = {";
+print $out "static unpack_UA unpack_UA_table[UA_TYPES_COUNT] = {";
 foreach my $type (@types) {
     my $index = "UA_TYPES_". uc($type);
     print $out "#ifdef $index";
-    print $out "	[$index] = unpack_UA_$type,";
+    print $out "	[$index] = table_unpack_UA_$type,";
     print $out "#endif";
 }
 print $out "};\n";

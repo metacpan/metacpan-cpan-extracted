@@ -22,7 +22,3 @@ for my $module ( @modules ) {
 
     $t->create_test;
 }
-
-__END__
-For example:
-perl -Ilib eg/stub Test::NaiveStubs

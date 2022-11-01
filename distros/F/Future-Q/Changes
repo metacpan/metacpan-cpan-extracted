@@ -1,5 +1,11 @@
 Revision history for Future-Q
 
+0.120    2022-10-24
+         [BUG FIX]
+         - Add some module names to @Future::Q::CARP_NOT.
+           This is because Future-0.49 now has additional modules.
+           This change fixes the test 50-failure-position.t
+
 0.110    2015-08-02
          [DOCUMENTATION UPDATE]
          - Fix a little typo.

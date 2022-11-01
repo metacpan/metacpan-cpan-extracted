@@ -3,33 +3,40 @@ abstract: 'Parse CIGAR strings and translate coordinates to/from reference/query
 author:
   - 'Thomas Sibley <trsibley@uw.edu>'
 build_requires:
-  Test::More: 0.96
+  Test::More: '0.96'
 configure_requires:
-  ExtUtils::MakeMaker: 0
+  ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Milla version v1.0.8, Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690'
+generated_by: 'Dist::Milla version v1.0.21, Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Bio-Cigar
 no_index:
   directory:
-    - t
-    - xt
-    - inc
-    - share
     - eg
     - examples
+    - inc
+    - share
+    - t
+    - xt
 requires:
-  Carp: 0
-  List::Util: 0
-  Moo: 0
-  Types::Standard: 1.000005
-  namespace::clean: 0
-  perl: 5.014
+  Carp: '0'
+  List::Util: '0'
+  Moo: '0'
+  Types::Standard: '1.000005'
+  namespace::clean: '0'
+  perl: '5.014'
 resources:
-  bugtracker: https://github.com/MullinsLab/Bio-Cigar/issues
-  homepage: https://github.com/MullinsLab/Bio-Cigar
-  repository: https://github.com/MullinsLab/Bio-Cigar.git
-version: 1.01
+  bugtracker: https://github.com/tsibley/Bio-Cigar/issues
+  homepage: https://github.com/tsibley/Bio-Cigar
+  repository: https://github.com/tsibley/Bio-Cigar.git
+version: '1.02'
+x_contributors:
+  - 'Felix Kuehnl <felix@bioinf.uni-leipzig.de>'
+  - 'Thomas Sibley <tsibley@fredhutch.org>'
+x_generated_by_perl: v5.26.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: GPL-2.0-only
+x_static_install: 1

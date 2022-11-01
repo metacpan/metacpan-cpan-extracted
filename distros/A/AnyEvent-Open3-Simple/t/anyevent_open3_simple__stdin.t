@@ -23,15 +23,15 @@ foreach my $stdin ([ qw( message1 message2 ) ], join("\n", qw( message1 message2
 {
   subtest 'run ' . ((ref $stdin) ? 'list ref' : 'string') => sub {
     plan tests => 4;
-    
+
     my $done = AnyEvent->condvar;
-    
+
     my $ipc = AnyEvent::Open3::Simple->new(
       on_exit => sub {
         $done->send(1);
       },
     );
-    
+
     my $timeout = AnyEvent->timer(
       after => 5,
       cb    => sub { diag 'timeout!'; $done->send(0) },
@@ -50,14 +50,14 @@ foreach my $stdin ([ qw( message1 message2 ) ], join("\n", qw( message1 message2
 
       is $list[0], 'message1', 'list[0] = message1';
       is $list[1], 'message2', 'list[1] = message2';
-    
+
   };
-  
+
 }
 
 subtest constructor => sub {
   plan tests => 2;
-  
+
   my $in='';
   eval { AnyEvent::Open3::Simple->new( stdin => \$in ) };
   isnt $@, '', 'throws exception';

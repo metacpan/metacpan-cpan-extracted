@@ -7,8 +7,6 @@ use v5.010;
 # SMARTROW_PASSWORD=yyyy \
 # carton exec perl -Ilib examples/total_distance.pl
 
-
-
 use WebService::SmartRow;
 
 use Data::Dumper;
@@ -23,5 +21,4 @@ for my $workout (@$workouts) {
 }
 
 say "Total distace across all workouts: $total_distance meters";
-
 

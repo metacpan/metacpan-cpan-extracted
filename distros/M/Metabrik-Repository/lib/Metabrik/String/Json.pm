@@ -68,7 +68,7 @@ sub decode {
    };
    if ($@) {
       chomp($@);
-      return $self->log->error("decode: unable to decode JSON: $@");
+      return $self->log->error("decode: unable to decode JSON: $@, data[$data]");
    }
 
    return $decoded;

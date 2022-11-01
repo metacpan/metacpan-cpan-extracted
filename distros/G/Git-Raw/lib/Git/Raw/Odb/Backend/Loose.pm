@@ -1,5 +1,5 @@
 package Git::Raw::Odb::Backend::Loose;
-$Git::Raw::Odb::Backend::Loose::VERSION = '0.88';
+$Git::Raw::Odb::Backend::Loose::VERSION = '0.90';
 use strict;
 use warnings;
 
@@ -11,7 +11,7 @@ Git::Raw::Odb::Backend::Loose - Git loose object database backend class
 
 =head1 VERSION
 
-version 0.88
+version 0.90
 
 =head1 DESCRIPTION
 
@@ -28,7 +28,7 @@ Create a backend for loose objects.
 
 =head1 AUTHOR
 
-Jacques Germishuys <jacquesg@striata.com>
+Jacques Germishuys <jacquesg@cpan.org>
 
 =head1 LICENSE AND COPYRIGHT
 

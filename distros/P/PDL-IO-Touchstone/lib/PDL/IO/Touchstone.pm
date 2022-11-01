@@ -20,13 +20,15 @@
 #  respective owners and no grant or license is provided thereof.
 
 package PDL::IO::Touchstone;
-$VERSION = 1.008;
+our $VERSION = '1.010';
 
 use 5.010;
 use strict;
 use warnings;
 
 use Carp;
+
+use IO::Handle;
 
 use PDL;
 use PDL::LinearAlgebra;
@@ -40,6 +42,11 @@ BEGIN {
 	our @ISA = ( @ISA, qw(Exporter) );
 	our @EXPORT = qw/rsnp wsnp/;
 	our @EXPORT_OK = qw/
+		rsnp_fh
+		wsnp_fh
+
+		rsnp_hash
+
 		n_ports
 		m_interpolate
 		f_uniformity
@@ -89,15 +96,41 @@ sub rsnp
 {
 	my ($fn, $args) = @_;
 
+	$args = { ($args ? %$args : () ), filename => $fn };
+
+	open(my $in, $fn) or croak "$fn: $!";
+
+	my @ret = rsnp_fh($in, $args);
+
+	close($in) or carp "$fn: $!";
+
+	return @ret;
+}
+
+sub rsnp_hash
+{
+	my @data = @_;
+	my %data;
+	@data{qw/freqs m param_type z0_ref comments output_fmt funit orig_f_unit/} = @data;
+
+	return %data;
+}
+
+sub rsnp_fh
+{
+	my ($in, $args) = @_;
+
 	my $class;
 	my $comments = '';
 	my ($orig_funit, $param_type, $fmt, $R, $z0);
 	my $n_ports;
 
+	my $fn = $args->{filename} // '(unknown file)';
+
+	my $EOF_REGEX = $args->{EOF_REGEX};
+
 	# Try to enforce the number of ports based on the filename extension.
 	$n_ports = $1 if ($fn =~ /s(\d+)p/i);
-
-	open(my $in, $fn) or croak "$fn: $!";
 
 	my $n = 0;
 	my $line;
@@ -108,14 +141,26 @@ sub rsnp
 	my @comments;
 	my @cols;
 	my @f;
+
+	# input_line_number is a surprisingly slow call, so get it out of the loop:
+	$n = $in->input_line_number - 1;
+
 	while (defined($line = <$in>))
 	{
-		chomp($line);
 		$n++;
+
+		last if (defined($EOF_REGEX) && $line =~ /$EOF_REGEX/);
+
+		last if $line =~ /^\s*!\s*Noise Parameters/i;
+
+		chomp($line);
 
 		$line =~ s/^\s+|\s+$//g;
 
 		next if !length($line);
+
+		# Skip % lines as found in MDIF files:
+		next if $line =~ /^\s*%/;
 
 		# Strip leading space so split() will work properly.
 		$line =~ s/^\s+//;
@@ -329,11 +374,14 @@ sub wsnp_fh
 	# $out is in touchstone-formated order for each frequency with frequency as the first element:
 	# ie: [freq s11 21 s12 s11] < transposed for only for 2-port models.
 	
+	$f = $f->reshape($n_freqs);
+	my @freqs = $f->dog;
+
 	for (my $i = 0; $i < $n_freqs; $i++)
 	{
 		# matrix at frequency $i:
 		my $fm = $out->slice(":,$i");
-		my $freq = $f->slice("$i")->sclr;
+		my $freq = $freqs[$i];
 
 		# More than 2 ports are printed on multiple lines,
 		# at least one line for each port.
@@ -342,9 +390,14 @@ sub wsnp_fh
 			$fm = $fm->reshape($n_ports*2,$n_ports);
 		}
 
+		# First, print the frequency:
 		print $fd $freq;
 
 		# foreach matrix row:
+		# TODO: This loop is a hotspot, maybe someone can optimize it!
+		#       Using PDL::IO::Misc's `wcols` is probably a good idea
+		#       but formating it for Touchstone's weird column format
+		#       for n_ports >2 could be challenging.
 		foreach my $row ($fm->dog)
 		{
 			# No more than four data samples are allowed per line,
@@ -996,14 +1049,27 @@ sub m_interpolate
 	croak "caller must expect an array!" if !wantarray;
 
 	# Interpolate frequency range and input data:
-	if (defined $args->{freq_min_hz} && defined $args->{freq_max_hz} && defined $args->{freq_count})
+	if ((defined $args->{freq_min_hz} && defined $args->{freq_max_hz} && defined $args->{freq_count}) ||
+		defined $args->{freq_min_hz} && defined $args->{freq_count} && $args->{freq_count} == 1)
 	{
-		if ($args->{freq_min_hz} >= $args->{freq_max_hz})
+		my $freq_step;
+
+		if ($args->{freq_count} == 1)
+		{
+			$freq_step = 0;
+			$args->{freq_max_hz} = $args->{freq_min_hz};
+		}
+		else
+		{
+			$freq_step = ($args->{freq_max_hz} - $args->{freq_min_hz}) / ($args->{freq_count} - 1);
+		}
+
+		if ($freq_step && $args->{freq_min_hz} >= $args->{freq_max_hz})
 		{
 			croak "freq_min_hz=$args->{freq_min_hz} !< freq_max_hz=$args->{freq_max_hz}"
 		}
 
-		my $freq_step = ($args->{freq_max_hz} - $args->{freq_min_hz}) / ($args->{freq_count} - 1);
+
 		my $f_new = sequence($args->{freq_count}) * $freq_step + $args->{freq_min_hz};
 
 		# Scale the frequency unit to those requested by the caller:
@@ -1342,6 +1408,21 @@ re-create the original touchstone file.
 
 =back
 
+=head2 C<rsnp_fh($fh, $options)> - Read touchstone file
+
+This is the same as C<rsnp> except that it takes a file handle instead of a
+filename.  Additionally, C<$options> accepts the following additional values:
+
+=over 4
+
+=item C<filename> - the original filename to facilitate more verbose error output.
+
+=item C<EOF_REGEX> - a regular expression that, when matched, will cause C<rsnp_fh> to stop reading data.
+
+This is used by L<PDL::IO::MDIF> when loading multiple touchstone files from a single MDIF file.
+
+=back
+
 =head2 C<wsnp($filename, $f, $m, $param_type, $z0, $comments, $fmt, $from_hz, $to_hz)>
 
 =head3 Arguments
@@ -1614,7 +1695,7 @@ MHz (inclusive):
 	  quiet => 1 # optional
 	} )
 
-This function returns C<$f> and C<$m> verbatim if no C<$args> are passed.
+This function returns C<$f> and C<$m> without interpolation if no C<$args> are passed.
 
 =over 4
 
@@ -1622,7 +1703,9 @@ This function returns C<$f> and C<$m> verbatim if no C<$args> are passed.
 
 =item * freq_max_hz: the maximum frequency at which to interpolate
 
-=item * freq_count: the total number of frequencies sampled
+=item * freq_count: the total number of frequencies sampled.
+
+If C<freq_count> is C<1> then only C<freq_min_hz> is returned.
 
 =item * quiet: suppress warnings when interpolating beyond the available frequency range
 
@@ -1676,10 +1759,42 @@ For example, re-compose $T from the C<m_to_pos_vecs> example.
 	$T = pos_vecs_to_m($T11, $T12, $T21, $T22)
 
 
+=head2 C<%h = rsnp_hash(rsnp(...))> - Create a named hash from the return values of rsnp
+
+It is sometimes more familiar and readable to work with a hash of names instead
+of an index of arrays.  This function converts the return value of C<rsnp> into
+a hash with the following fields.  The C<[n]> values are the array index order
+into the list that C<rsnp> returns.
+
+    %h = rsnp_hash(rsnp($filename, ...));
+
+    %h = rsnp_hash(rsnp_fh($filehandle, ...));
+
+=over 4
+
+=item * [0] freqs
+
+=item * [1] m
+
+=item * [2] param_type
+
+=item * [3] z0_ref
+
+=item * [4] comments
+
+=item * [5] output_fmt
+
+=item * [6] funit
+
+=item * [7] orig_f_unit
+
+=back
 
 =head1 SEE ALSO
 
 =over 4
+
+=item L<PDL::IO::MDIF> - A L<PDL> IO module to load Measurement Data Interchange Format (*.mdf) files.
 
 =item L<RF::Component> - An object-oriented encapsulation of C<PDL::IO::Touchstone>.
 
@@ -1687,11 +1802,11 @@ For example, re-compose $T from the C<m_to_pos_vecs> example.
 
 =item S-parameter matrix transform equations: L<http://qucs.sourceforge.net/tech/node98.html>
 
-=item Building MDF files from multiple S2P files: L<https://youtu.be/q1ixcb_mgeM>, L<https://github.com/KJ7NLL/mdf/>
+=item Building MDIF/MDF files from multiple S2P files: L<https://youtu.be/q1ixcb_mgeM>, L<https://github.com/KJ7NLL/mdf/>
 
 =item Optimizing amplifer impedance match circuits with MDF files: L<https://youtu.be/nx2jy7EHzxw>
 
-=item MDF file format: L<https://awrcorp.com/download/faq/english/docs/users_guide/data_file_formats.html#i489154>
+=item MDIF file format: L<https://awrcorp.com/download/faq/english/docs/users_guide/data_file_formats.html#i489154>
 
 =item "Conversions Between S, Z, Y, h, ABCD, and T Parameters which are Valid
 for Complex Source and Load Impedances" March 1994 IEEE Transactions on

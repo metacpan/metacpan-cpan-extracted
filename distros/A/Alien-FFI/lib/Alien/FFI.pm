@@ -6,7 +6,7 @@ use Config;
 use base qw( Alien::Base );
 
 # ABSTRACT: Build and make available libffi
-our $VERSION = '0.25'; # VERSION
+our $VERSION = '0.27'; # VERSION
 
 
 
@@ -25,42 +25,39 @@ Alien::FFI - Build and make available libffi
 
 =head1 VERSION
 
-version 0.25
+version 0.27
 
 =head1 SYNOPSIS
+
+In your Makefile.PL:
+
+ use ExtUtils::MakeMaker;
+ use Alien::Base::Wrapper ();
+
+ WriteMakefile(
+   Alien::Base::Wrapper->new('Alien::FFI')->mm_args2(
+     # MakeMaker args
+     NAME => 'My::XS',
+     ...
+   ),
+ );
 
 In your Build.PL:
 
  use Module::Build;
- use Alien::FFI;
+ use Alien::Base::Wrapper qw( Alien::FFI !export );
+
  my $builder = Module::Build->new(
    ...
    configure_requires => {
      'Alien::FFI' => '0',
      ...
    },
-   extra_compiler_flags => Alien::FFI->cflags,
-   extra_linker_flags   => Alien::FFI->libs,
+   Alien::Base::Wrapper->mb_args,
    ...
  );
- 
+
  $build->create_build_script;
-
-In your Makefile.PL:
-
- use ExtUtils::MakeMaker;
- use Config;
- use Alien::FFI;
- 
- WriteMakefile(
-   ...
-   CONFIGURE_REQUIRES => {
-     'Alien::FFI' => '0',
-   },
-   CCFLAGS => Alien::FFI->cflags . " $Config{ccflags}",
-   LIBS    => [ Alien::FFI->libs ],
-   ...
- );
 
 =head1 DESCRIPTION
 
@@ -89,11 +86,11 @@ Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
 
 Contributors:
 
-Petr Pisar (ppisar)
+Petr Písař (ppisar)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Graham Ollis.
+This software is copyright (c) 2014-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

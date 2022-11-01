@@ -1,3 +1,5 @@
+October 2022.
+
 Sendmail::PMilter
 =================
 
@@ -10,9 +12,9 @@ which are needed to support milters which make use of of the Milter
 Protocol - especially Version 6 of the Protocol.  Sendmail itself has
 supported the Milter Protocol by default since 2004.  It provides the
 optional 'libmilter' which is written in C.  For Perl milters this can
-be replaced by Sendmail::PMilter.  Perl milters using Sendmail::PMilter
-do not need the 'libmilter' library, and the 'libmilter' provided by
-Sendmail need not be built unless it is needed by other milters.
+be replaced by Sendmail::PMilter.  A milter written in Perl does not
+need the 'libmilter' library, and the 'libmilter' provided by Sendmail
+need not be built (unless it is needed by other milters).
 
 Sendmail::PMilter supports Milter Protocol Version 6 'negotiation'.
 
@@ -22,29 +24,24 @@ For installation instructions see the file named INSTALL.  If during
 installation the standard procedures are followed, then the tests in
 t/ will be run automatically before the final installation step.
 
-Alternatively you can just copy these two files somewhere where your
-Perl will be able to find them:
-
-lib/Sendmail/PMilter.pm
-lib/Sendmail/PMilter/Context.pm
-
 As of 2022 this author has been using Sendmail::PMilter routinely to
-handle modest volumes of mail for about five years.  Nevertheless it
-might be best to consider this as a test release.  You should be very
-familiar with milters and mail processing systems so that you can cope
-easily if things go horribly wrogn.
+handle modest volumes of mail for about six years.  In 2022 several
+users have also admitted to using it with Postfix.  So far it seems
+to be working for them.
 
 Enjoy!
 
-Ged Haywood, July 2022.
+Ged Haywood, October 2022.
 
 ----------------------------------------------------------------------
 For copyright/license terms see the file named LICENCE.
+
+The Changelog is, er, in the file named Changelog.
 
 Comments via the CPAN bug tracking system will be most welcome.
 
 Ged Haywood, BSc (1st hons 1975), CEng, MIET, MRIN, 1st dan (BJA);
 RNLI Life Governor; RSPB Life Fellow; Woodland Trust Life Member;
-PPL(H); RYA Yachmaster; NVQ level 4 (motorcycle); unicyclist; Perl
-coder and mail administrator since 1995.
+PPL(H); RYA Yachmaster; NVQ level 4 (motorcycle); unicyclist; and
+Perl coder since 1995.
 ----------------------------------------------------------------------

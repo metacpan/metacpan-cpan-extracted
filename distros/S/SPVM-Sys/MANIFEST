@@ -188,6 +188,9 @@ Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 README.md
+t/00_socket_pre_00.t
+t/00_socket_pre_01.t
+t/00_socket_pre_02.t
 t/execv_success.pl
 t/exit_failure.pl
 t/exit_success.pl

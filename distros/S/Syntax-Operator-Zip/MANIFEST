@@ -2,14 +2,14 @@ Build.PL
 Changes
 lib/Syntax/Operator/Zip.pm
 lib/Syntax/Operator/Zip.xs
+LICENSE
 MANIFEST			This list of files
+META.json
+META.yml
+README
 t/00use.t
 t/01zip.t
 t/02mesh.t
 t/11func.t
 t/95benchmark.t
 t/99pod.t
-README
-LICENSE
-META.yml
-META.json

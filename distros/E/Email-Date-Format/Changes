@@ -1,5 +1,9 @@
 Revision history for Email-Date-Format
 
+1.006     2022-10-22 16:01:01-04:00 America/New_York
+        - update packaging
+        - avoid using ambiguous 2 digit years (thanks, bitcardbmw@lsmod.de)
+
 1.005     2014-10-13 08:32:03-04:00 America/New_York
           fix documentation of export names (thanks, Thomas Klausner!)
 

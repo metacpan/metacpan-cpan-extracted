@@ -14,7 +14,7 @@ do {
   open($fh, '>', File::Spec->catfile($dir, 'child_sig9.pl'));
   print $fh "#!$^X\nkill 9, \$\$\n";
   close $fh;
-  
+
   open($fh, '>', File::Spec->catfile($dir, 'child_normal.pl'));
   print $fh "#!$^X\n";
   close $fh;
@@ -45,7 +45,7 @@ do {
   my $ret = $ipc->run($^X, File::Spec->catfile($dir, 'child_normal.pl'));
   diag $@ if $@;
   isa_ok $ret, 'AnyEvent::Open3::Simple';
-  
+
   $done->recv;
 
   is $signal1, undef, 'signal1 = undef';

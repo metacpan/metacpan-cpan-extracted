@@ -7,36 +7,36 @@ use Test::More;
 
 use Net::DNS::Resolver::Unbound;
 
+plan tests => 14;
+
+
 my $resolver = Net::DNS::Resolver::Unbound->new();
-
-plan skip_all => 'no local nameserver' unless $resolver->nameservers;
-plan tests => 15;
-
 
 for ( my $handle = undef ) {
 	ok( !$resolver->bgbusy($handle), 'not bgbusy' );
 	is( $resolver->bgread($handle), undef, 'undefined bgread' );
 }
 
+my $id	= 123;
+my $err = -99;
 
-for ( my $handle = Net::DNS::Resolver::libunbound::emulate_wait(123) ) {
+for ( my $handle = Net::DNS::Resolver::libunbound::emulate_wait($id) ) {
 	ok( $handle->waiting(),		'handle->waiting' );
 	ok( $resolver->bgbusy($handle), 'bgbusy' );
-	is( $resolver->bgread($handle), undef, 'undefined bgread' );
-	is( $handle->async_id(),	123,   'handle->async_id' );
-	is( $handle->result(),		undef, 'no handle->result' );
-	ok( !$handle->err(), 'no handle->err' );
+	ok( !$handle->err(),		'no handle->err' );
+	is( $handle->query_id(), $id,	'handle->query_id' );
+	is( $handle->result(),	 undef, 'no handle->result' );
 }
 
 
-for ( my $handle = Net::DNS::Resolver::libunbound::emulate_callback( 123, -99 ) ) {
+for ( my $handle = Net::DNS::Resolver::libunbound::emulate_callback( $id, $err ) ) {
 	ok( !$handle->waiting(),	 'not handle->waiting' );
 	ok( !$resolver->bgbusy($handle), 'not bgbusy' );
-	is( $resolver->bgread($handle), undef, 'undefined bgread' );
-	is( $handle->async_id(),	123,   'handle->async_id' );
+	ok( $handle->err(),		 'handle->err' );
+	is( $handle->query_id(),	$id,   'handle->query_id' );
 	is( $handle->result(),		undef, 'no handle->result' );
-	ok( $handle->err(), 'handle->err' );
-	like( $resolver->errorstring(), '/-99/', 'unknown error' );
+	is( $resolver->bgread($handle), undef, 'undefined bgread' );
+	like( $resolver->errorstring(), "/$err/", 'unknown error' );
 }
 
 

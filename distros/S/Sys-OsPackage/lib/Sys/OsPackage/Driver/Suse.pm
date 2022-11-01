@@ -14,7 +14,7 @@ use utf8;
 ## use critic (Modules::RequireExplicitPackage)
 
 package Sys::OsPackage::Driver::Suse;
-$Sys::OsPackage::Driver::Suse::VERSION = '0.1.6';
+$Sys::OsPackage::Driver::Suse::VERSION = '0.3.0';
 use base "Sys::OsPackage::Driver";
 
 # check if packager command found (zypper)
@@ -33,7 +33,7 @@ sub modpkg
 
     #return join("-", "perl", @{$args_ref->{mod_parts}}); # zypper/rpm format for Perl module packages
     my @querycmd = $ospkg->sysenv("zypper");
-    my @pkglist = sort $ospkg->capture_cmd({list=>1}, @querycmd,
+    my @pkglist = sort $ospkg->capture_cmd({list=>1}, $ospkg->sudo_cmd(), @querycmd,
         qw(--non-interactive --quiet --terse search --provides --type=package --match-exact),
         "'perl(".$args_ref->{module}.")'");
     $ospkg->debug()
@@ -53,7 +53,7 @@ sub find
     return if not $class->pkgcmd($ospkg);
 
     my @querycmd = $ospkg->sysenv("zypper");
-    my @pkglist = sort $ospkg->capture_cmd({list=>1}, @querycmd,
+    my @pkglist = sort $ospkg->capture_cmd({list=>1}, $ospkg->sudo_cmd(), @querycmd,
         qw(--non-interactive --quiet --terse search --provides --type=package --match-exact),
         $args_ref->{pkg});
     return if not scalar @pkglist; # empty list means nothing found
@@ -82,7 +82,7 @@ sub install
 
     # install the packages
     my $pkgcmd = $ospkg->sysenv("zypper");
-    return $ospkg->run_cmd($pkgcmd, qw(--non-interactive --quiet --terse install), @packages);
+    return $ospkg->run_cmd($ospkg->sudo_cmd(), $pkgcmd, qw(--non-interactive --quiet --terse install), @packages);
 }
 
 # check if an OS package is installed locally
@@ -93,7 +93,7 @@ sub is_installed
 
     # check if package is installed
     my $querycmd = $ospkg->sysenv("rpm");
-    my @pkglist = $ospkg->capture_cmd({list=>1}, $querycmd, qw(--query), $args_ref->{pkg});
+    my @pkglist = $ospkg->capture_cmd({list=>1}, $ospkg->sudo_cmd(), $querycmd, qw(--query), $args_ref->{pkg});
     return (scalar @pkglist > 0) ? 1 : 0;
 }
 
@@ -109,7 +109,7 @@ Sys::OsPackage::Driver::Suse - SUSE/OpenSUSE Zypper packaging handler for Sys::O
 
 =head1 VERSION
 
-version 0.1.6
+version 0.3.0
 
 =head1 SYNOPSIS
 

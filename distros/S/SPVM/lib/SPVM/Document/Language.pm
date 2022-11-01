@@ -308,6 +308,7 @@ The list of keywords:
   required
   rw
   ro
+  say
   set_error_code
   static
   switch
@@ -1168,7 +1169,7 @@ The definition of syntax parsing of SPVM language. This is written by yacc/bison
   %token <opval> SYMBOL_NAME VAR_NAME CONSTANT EXCEPTION_VAR
   %token <opval> UNDEF VOID BYTE SHORT INT LONG FLOAT DOUBLE STRING OBJECT TRUE FALSE END_OF_FILE
   %token <opval> DOT3 FATCAMMA RW RO WO INIT NEW OF CLASS_ID EXTENDS SUPER
-  %token <opval> RETURN WEAKEN DIE WARN PRINT CURRENT_CLASS_NAME UNWEAKEN '[' '{' '('
+  %token <opval> RETURN WEAKEN DIE WARN PRINT SAY CURRENT_CLASS_NAME UNWEAKEN '[' '{' '('
   %type <opval> grammar
   %type <opval> opt_classes classes class class_block
   %type <opval> opt_declarations declarations declaration
@@ -1357,6 +1358,7 @@ The definition of syntax parsing of SPVM language. This is written by yacc/bison
     : die
     | WARN operator
     | PRINT operator
+    | SAY operator
     | weaken_field
     | unweaken_field
     | MAKE_READ_ONLY operator
@@ -1937,6 +1939,9 @@ The list of syntax parsing tokens:
   </tr>
   <tr>
     <td>RW</td><td>rw</td>
+  </tr>
+  <tr>
+    <td>SAY</td><td>say</td>
   </tr>
   <tr>
     <td>SCALAR</td><td>scalar</td>
@@ -6036,7 +6041,7 @@ The unboxing conversion is a L<type coversion|/"Type Conversion"> to convert the
 
 The bool conversion is a L<type conversion|/"Type Conversion"> that is performed on the L<conditional operand|/"Conditional Operand">.
 
-The type of the operand of the bool conversion must be one of a L<numeric type|/"Numeric Type">, an L<object type|/"Object Type"> or the L<undef type|/"Undefined Type">. Otherwise a compilation error will occur.
+The type of the operand of the bool conversion must be a L<numeric type|/"Numeric Type">, an L<object type|/"Object Type"> or an L<reference type|/"Reference Type"> or the L<undef type|/"Undefined Type">. Otherwise a compilation error will occur.
 
 The bool conversion returns the following value corresponding to the type of the condional operand.
 
@@ -6097,6 +6102,13 @@ B<Examples:>
   $object = undef;
   if ($object) {
     # not ok
+  }
+  
+  my $value = 1;
+  my $ref = \$value;
+  
+  if ($ref) {
+    # ok
   }
   
   if (undef) {
@@ -7297,7 +7309,6 @@ Comparison operators are the L<numeric comparison operators|/"Numeric Comparison
 =head2 Numeric Comparison Operator
 
 The numeric comparison operator is a L<comparison operator|/"Comparison Operator"> that is placed between The left operand and the right operand to compare the size of number or check the equqlity of objects.
-
   LEFT_OPERAND NUMERIC_COMPARISON_OPERATOR RIGHT_OPERAND
 
 The list of numeric comparison operators.
@@ -7315,7 +7326,7 @@ The list of numeric comparison operators.
       LEFT_OPERAND == RIGHT_OPERAND
     </td>
     <td>
-      The left operand and the right operand are numeric types, The left operand and the right operand are Object Type (including Undefined Value)
+      The left operand and the right operand are numeric types or object types or reference types. If the one side is an object type or an reference type, L<undef|/"Undefined Value"> is allowed at the other side.
     </td>
     <td>
       The left operand and the right operand are equal
@@ -7326,7 +7337,7 @@ The list of numeric comparison operators.
       LEFT_OPERAND != RIGHT_OPERAND
     </td>
     <td>
-      The left operand and the right operand are numeric types, The left operand and the right operand are Object Type (including Undefined Value)
+      The left operand and the right operand are numeric types or object types or reference types. If the one side is an object type or an reference type, L<undef|/"Undefined Value"> is allowed at the other side.
     </td>
     <td>
       The left operand and the right operand are not equal
@@ -8737,6 +8748,16 @@ The oeprand must be a L<string type|/"string Type">.
 
 If the value of the operand is an L<undef|/"Undefined Value">, print nothing.
 
+=head2 say Operator
+
+The C<say> operator is a L<void retruning operator|/"void Returning Operator"> to print a L<string|/"String"> with a line break C<\n> to the standard output.
+
+  say OPERAND;
+
+The oeprand must be a L<string type|/"string Type">.
+
+If the value of the operand is an L<undef|/"Undefined Value">, print C<\n>.
+
 =head2 make_read_only Operator
 
 The C<make_read_only> operator is a L<void retruning operator|/"void Returning Operator"> to make the L<string|/"Strings"> read-only.
@@ -8951,6 +8972,14 @@ Even if there are 3 circular references, you can release them correctly by setti
   }
 
 As a syntax related to Weak Reference, Weak Reference can be destroyed the L<weaken operator/"weaken Operator">, and it can be confirmed whether Field is Weak Reference the L<isweak operator|/"isweak Operator">.
+
+=head1 Standard IO
+
+C<stdin>, C<stdout>, C<stderr> in C<C language> is set to the binary mode on all systems.
+
+This means the escape character of the string literal C<"\n"> is not coverted to C<"\r\n"> when it is got from C<stdin> and it is printed to C<stdout> and C<stderr>.
+
+C<stdin>, C<stdout>, C<stderr> can be changed to the text mode using the L<native module|SPVM::Document::NativeModule>, but don't do that.
 
 =head1 See Also
 

@@ -19,10 +19,10 @@ name: App-ThisDist
 provides:
   App::ThisDist:
     file: lib/App/ThisDist.pm
-    version: '0.016'
+    version: '0.017'
   App::ThisMod:
     file: lib/App/ThisMod.pm
-    version: '0.016'
+    version: '0.017'
 requires:
   CPAN::Dist::FromRepoName: '0'
   CPAN::Dist::FromURL: '0'
@@ -42,7 +42,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-ThisDist
   homepage: https://metacpan.org/release/App-ThisDist
   repository: git://github.com/perlancar/perl-App-ThisDist.git
-version: '0.016'
+version: '0.017'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -320,7 +320,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::PERLANCAR::Contributing
               name: '@Author::PERLANCAR/PERLANCAR/Contributing'
-              version: '0.292'
+              version: '0.293'
             -
               class: Pod::Weaver::Section::Legal
               name: '@Author::PERLANCAR/Legal'
@@ -328,7 +328,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.780'
+              version: '0.784'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'

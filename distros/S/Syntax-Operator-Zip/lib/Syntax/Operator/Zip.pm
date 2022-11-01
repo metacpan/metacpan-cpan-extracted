@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package Syntax::Operator::Zip 0.04;
+package Syntax::Operator::Zip 0.05;
 
 use v5.14;
 use warnings;

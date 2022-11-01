@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.57;
 
-package Tangence::Type 0.29;
+package Tangence::Type 0.30;
 class Tangence::Type :isa(Tangence::Meta::Type);
 
 =head1 NAME

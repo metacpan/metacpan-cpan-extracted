@@ -1,7 +1,7 @@
 do { my $x = {
        'configure' => {
                         'requires' => {
-                                        'ExtUtils::MakeMaker' => '0'
+                                        'ExtUtils::MakeMaker' => '6.78'
                                       }
                       },
        'develop' => {
@@ -15,7 +15,7 @@ do { my $x = {
                                       'Carp' => '0',
                                       'Data::GUID' => '0',
                                       'Digest::MD5' => '0',
-                                      'Email::Address' => '0',
+                                      'Email::Address::XS' => '0',
                                       'Email::MIME::Creator' => '0',
                                       'Email::MessageID' => '0',
                                       'Email::Sender::Simple' => '0',
@@ -29,6 +29,7 @@ do { my $x = {
                                       'Try::Tiny' => '0',
                                       'YAML::XS' => '0',
                                       'parent' => '0',
+                                      'perl' => '5.012',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }

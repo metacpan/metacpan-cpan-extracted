@@ -17926,8 +17926,9 @@ sub ftpcmd
       "\n" if $Net::FullAuto::FA_Core::log &&
       -1<index $Net::FullAuto::FA_Core::LOG,'*';
    my $self = shift @_;
+   my $cmd  = shift @_;
    if (exists $self->{_ftp_handle}) {
-      return $self->{_ftp_handle}->cmd(@_);
+      return $self->{_ftp_handle}->cmd($cmd);
    } else {
       my $error="Not logged in via (s)ftp\n";
       &Net::FullAuto::FA_Core::handle_error($error);

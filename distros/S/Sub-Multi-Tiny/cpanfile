@@ -14,7 +14,11 @@ requires 'Import::Into', '1.002005';
 requires 'parent';
 requires 'Scalar::Util', '1.50';
 requires 'Text::Balanced', '2.01';
-requires 'Type::Params', '1.004004';    # for Dispatcher::TypeParams
+
+requires 'Type::Params', '1.999010';
+    # for Dispatcher::TypeParams,
+    # ${^_TYPE_PARAMS_MULTISIG} with leading underscore
+
 requires 'strict';
 requires 'subs';
 requires 'vars';

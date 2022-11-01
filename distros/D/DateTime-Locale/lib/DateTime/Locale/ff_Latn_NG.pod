@@ -19,12 +19,12 @@
 
 =head1 NAME
 
-DateTime::Locale::ff_Latn_NG - Locale data examples for the Fulah Nigeria Latin (ff-Latn-NG) locale
+DateTime::Locale::ff_Latn_NG - Locale data examples for the Fula Nigeria Latin (ff-Latn-NG) locale
 
 =head1 DESCRIPTION
 
 This pod file contains examples of the locale data available for the
-Fulah Nigeria Latin locale.
+Fula Nigeria Latin locale.
 
 =head2 Days
 

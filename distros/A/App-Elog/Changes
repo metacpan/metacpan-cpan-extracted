@@ -1,5 +1,54 @@
 Revision history for App::Elog
 
+0.08  Sat Oct 22 18:41:59 CDT 2022
+    - Make sure there's no warnings or errors under normal cases.
+
+    - Removed the -v for vim option.
+
+    - Changed from using the PWD env var to Cwd::cwd() because sudo
+      wasn't setting the PWD env var.
+
+    - Changed options to be -i for info and -s for statistics.
+
+    - Changed -a to -m for max records. And to have it show records you
+      use -v along with it.
+
+    - Options that take arguments like -a and -g now require a space
+      before the argument so instead of -a5 it's -m 5.
+
+    - Removed -? option, now its only --help, -help, or -h for that.
+
+    - Changed -f option from doing a tail -f to filtering results based
+      on a given regexp. If you want to tail -f just tail -f `elog -p`.
+
+    - The -l option shows the full path of the log file, not just the
+      basename of the file.
+
+    - The relative date string always shows "x units ago" before if
+      it was over a certain number of days it would show like "Jun 2022"
+      now it would show "4 months ago".
+
+    - Make sure there's space between the number and it's unit and
+      between the time and the AM/PM.
+
+    - Show slowest locations in alog -s.
+
+    - Do not show rotation count and combined size in -l or -L output.
+
+    - Originally log files were looped backwards, with the tac program,
+      so it can limit to the most recent x errors, but it couldnt show
+      the errors till the script was done. Now, it loops in order but gets
+      the last x errors by using the tail program.
+
+    - Added an offset option -o, so you can limit to the most recent x
+      errors but at an offset line number into the file.
+
+    - Added elog -s option to show info and statistics about the log.
+
+    - When you don't have a format string for a log, either use key value pairs in the
+      log line itself, or a default format string depending on the content of the
+      first line.
+
 0.07  Tue Nov  7 18:00:47 CST 2017
     - Documentation update
     - Remove -d option

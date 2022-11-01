@@ -1,0 +1,38 @@
+NAME
+    Graphics::ColorNames::Pantone - RGB values of Pantone colors
+
+SYNOPSIS
+      require Graphics::ColorNames::Pantone;
+
+      $NameTable = Graphics::ColorNames::Pantone->NamesRgbTable();
+      $RgbBlack  = $NameTable->{'151'};
+
+DESCRIPTION
+    See the documentation of Graphics::ColorNames for information how to use
+    this module.
+
+    This module defines 1091 names and associated RGB values of colors which
+    are part of a palette created by the *Pantone Institute* for Designers.
+    Please not mistake them for the colors of the annual *Pantone Report*.
+    To access them use Graphics::ColorNames::PantoneReport.
+
+    Pantone names are numbers with three or four digits. Colors from the
+    extended palette are marked by an appended *'2x'* (without space) (e.g.
+    "8082x" ).
+
+SEE ALSO
+    Pantone Institute <https://www.pantone.com>
+
+    Pantone Colors <https://www.pantone-colours.com/>
+
+AUTHOR
+    Herbert Breunung <lichtkind@cpan.org>
+
+    Based on Graphics::ColorNames::X by Robert Rothenberg.
+
+LICENSE
+    Copyright 2022 Herbert Breunung
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

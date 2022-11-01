@@ -35,8 +35,9 @@ recommends:
   IO::Uncompress::Brotli: '0.004001'
 requires:
   Carp: '0'
+  Clone: '0.46'
   Compress::Raw::Bzip2: '0'
-  Compress::Raw::Zlib: '0'
+  Compress::Raw::Zlib: '2.062'
   Encode: '3.01'
   Encode::Locale: '1'
   Exporter: '5.57'
@@ -46,8 +47,6 @@ requires:
   IO::Compress::Deflate: '0'
   IO::Compress::Gzip: '0'
   IO::HTML: '0'
-  IO::Uncompress::Bunzip2: '2.021'
-  IO::Uncompress::Gunzip: '0'
   IO::Uncompress::Inflate: '0'
   IO::Uncompress::RawInflate: '0'
   LWP::MediaTypes: '6'
@@ -64,7 +63,7 @@ resources:
   bugtracker: https://github.com/libwww-perl/HTTP-Message/issues
   homepage: https://github.com/libwww-perl/HTTP-Message
   repository: https://github.com/libwww-perl/HTTP-Message.git
-version: '6.42'
+version: '6.44'
 x_Dist_Zilla:
   perl:
     version: '5.036000'
@@ -348,7 +347,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.38.0
+          git_version: 2.38.1
           repo_root: .
       name: '@Author::OALDERS/Git::Check'
       version: '2.048'
@@ -356,7 +355,7 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.38.0
+          git_version: 2.38.1
           include_authors: 0
           include_releaser: 1
           order_by: name
@@ -440,7 +439,7 @@ x_Dist_Zilla:
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.38.0
+          git_version: 2.38.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -453,11 +452,11 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v6.42
+          tag: v6.44
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.38.0
+          git_version: 2.38.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -495,7 +494,7 @@ x_Dist_Zilla:
             - (?^:^lib/.*\.pm$)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.38.0
+          git_version: 2.38.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
@@ -509,22 +508,10 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.38.0
+          git_version: 2.38.1
           repo_root: .
       name: '@Author::OALDERS/Git::Push'
       version: '2.048'
-    -
-      class: Dist::Zilla::Plugin::Prereqs::Soften
-      config:
-        Dist::Zilla::Plugin::Prereqs::Soften:
-          copy_to:
-            - develop.requires
-          modules:
-            - Clone
-          modules_from_features: ~
-          to_relationship: suggests
-      name: Prereqs::Soften
-      version: '0.006003'
     -
       class: Dist::Zilla::Plugin::Prereqs::Soften
       config:
@@ -643,6 +630,7 @@ x_contributors:
   - 'Hans-H. Froehlich <hfroehlich@co-de-co.de>'
   - 'Ian Kilgore <iank@cpan.org>'
   - 'Jacob J <waif@chaos2.org>'
+  - 'Jakub Skory <jakub.skory@atos.net>'
   - 'Jakub Wilk <jwilk@jwilk.net>'
   - 'James Raspass <jraspass@gmail.com>'
   - 'jefflee <shaohua@gmail.com>'

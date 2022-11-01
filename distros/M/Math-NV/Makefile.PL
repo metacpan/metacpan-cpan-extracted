@@ -1,4 +1,7 @@
+use strict;
+use warnings;
 use ExtUtils::MakeMaker;
+
 use 5.010;
 
 my $defines = $Config::Config{nvtype} eq 'long double'
@@ -12,6 +15,9 @@ print "Defining $defines\n";
 my $nv = 1.0;
 my $x = $nv + (2 ** -1000);
 
+my $libopts = '-lm';
+$libopts    = '-lquadmath -lm'
+  if ($^O eq 'cygwin' && $Config::Config{nvtype} eq '__float128');
 
 my %options = %{
 {
@@ -22,7 +28,7 @@ my %options = %{
 
                },
   'LIBS' => [
-    '-lm'
+    "$libopts"
   ],
   'INC' => '',
   'DEFINE' => $defines,

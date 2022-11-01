@@ -2,7 +2,7 @@
 ## Stripe API - ~/lib/Net/API/Stripe/Customer/BalanceTransaction.pm
 ## Version v0.100.0
 ## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2020/05/15
 ## 
@@ -11,10 +11,15 @@
 package Net::API::Stripe::Customer::BalanceTransaction;
 BEGIN
 {
-	use strict;
-	use parent qw( Net::API::Stripe::Generic );
-	our( $VERSION ) = 'v0.100.0';
+    use strict;
+    use warnings;
+    use parent qw( Net::API::Stripe::Generic );
+    use vars qw( $VERSION );
+    our( $VERSION ) = 'v0.100.0';
 };
+
+use strict;
+use warnings;
 
 sub id { return( shift->_set_get_scalar( 'id', @_ ) ); }
 
@@ -89,103 +94,95 @@ Each customer has a I<balance> value, which denotes a debit or credit that's aut
 
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>( %ARG )
+=head2 new( %ARG )
 
 Creates a new L<Net::API::Stripe::Customer::BalanceTransaction> object.
 It may also take an hash like arguments, that also are method of the same name.
 
-=back
-
 =head1 METHODS
 
-=over 4
-
-=item B<id> string
+=head2 id string
 
 Unique identifier for the object.
 
-=item B<object> string, value is "customer_balance_transaction"
+=head2 object string, value is "customer_balance_transaction"
 
 String representing the object’s type. Objects of the same type share the same value.
 
-=item B<amount> integer
+=head2 amount integer
 
 The amount of the transaction. A negative value is a credit for the customer’s balance, and a positive value is a debit to the customer’s balance.
 
-=item B<created> timestamp
+=head2 created timestamp
 
 Time at which the object was created. Measured in seconds since the Unix epoch.
 
-=item B<credit_note> string (expandable)
+=head2 credit_note string (expandable)
 
 The ID of the credit note (if any) related to the transaction. When expanded this is a L<Net::API::Stripe::Billing::CreditNote> object.
 
-=item B<currency> currency
+=head2 currency currency
 
 Three-letter ISO currency code, in lowercase. Must be a supported currency.
 
-=item B<customer> string (expandable)
+=head2 customer string (expandable)
 
 The ID of the customer the transaction belongs to. When expanded, this is a L<Net::API::Stripe::Customer> object.
 
-=item B<description> string
+=head2 description string
 
 An arbitrary string attached to the object. Often useful for displaying to users.
 
-=item B<ending_balance> integer
+=head2 ending_balance integer
 
 The customer’s balance after the transaction was applied. A negative value decreases the amount due on the customer’s next invoice. A positive value increases the amount due on the customer’s next invoice.
 
-=item B<invoice> string (expandable)
+=head2 invoice string (expandable)
 
 The ID of the invoice (if any) related to the transaction. When expanded, this is a L<Net::API::Stripe::Billing::Invoice> object.
 
-=item B<livemode> boolean
+=head2 livemode boolean
 
 Has the value true if the object exists in live mode or the value false if the object exists in test mode.
 
-=item B<metadata> hash
+=head2 metadata hash
 
 Set of key-value pairs that you can attach to an object. This can be useful for storing additional information about the object in a structured format.
 
-=item B<type> string
+=head2 type string
 
 Transaction type: adjustment, applied_to_invoice, credit_note, initial, invoice_too_large, invoice_too_small, unapplied_from_invoice, or unspent_receiver_credit. See the Customer Balance page to learn more about transaction types.
 
-=back
-
 =head1 API SAMPLE
 
-	{
-	  "object": "balance",
-	  "available": [
-		{
-		  "amount": 0,
-		  "currency": "jpy",
-		  "source_types": {
-			"card": 0
-		  }
-		}
-	  ],
-	  "connect_reserved": [
-		{
-		  "amount": 0,
-		  "currency": "jpy"
-		}
-	  ],
-	  "livemode": false,
-	  "pending": [
-		{
-		  "amount": 7712,
-		  "currency": "jpy",
-		  "source_types": {
-			"card": 7712
-		  }
-		}
-	  ]
-	}
+    {
+      "object": "balance",
+      "available": [
+        {
+          "amount": 0,
+          "currency": "jpy",
+          "source_types": {
+            "card": 0
+          }
+        }
+      ],
+      "connect_reserved": [
+        {
+          "amount": 0,
+          "currency": "jpy"
+        }
+      ],
+      "livemode": false,
+      "pending": [
+        {
+          "amount": 7712,
+          "currency": "jpy",
+          "source_types": {
+            "card": 7712
+          }
+        }
+      ]
+    }
 
 =head1 HISTORY
 

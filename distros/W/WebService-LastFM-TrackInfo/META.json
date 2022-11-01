@@ -70,7 +70,7 @@
          "web" : "https://github.com/ology/WebService-LastFM-TrackInfo"
       }
    },
-   "version" : "0.0205",
+   "version" : "0.0206",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.032001"

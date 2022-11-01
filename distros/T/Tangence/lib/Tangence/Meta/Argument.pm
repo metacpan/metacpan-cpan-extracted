@@ -1,12 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.43;
+use Object::Pad 0.66 ':experimental(init_expr)';
 
-package Tangence::Meta::Argument 0.29;
+package Tangence::Meta::Argument 0.30;
 class Tangence::Meta::Argument :strict(params);
 
 =head1 NAME
@@ -46,8 +46,8 @@ Type of the arugment as a L<Tangence::Meta::Type> reference
 
 =cut
 
-has $name :reader :param = undef;
-has $type :reader :param;
+field $name :reader :param { undef };
+field $type :reader :param;
 
 =head1 ACCESSORS
 

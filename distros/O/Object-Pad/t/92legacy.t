@@ -61,6 +61,42 @@ role DRole { requires mmethod; }
 BEGIN {
    like( $warnings, qr/^'requires' is now discouraged; use an empty 'method NAME;' declaration instead at /m,
       'requires keyword provokes discouraged warning' );
+
+   undef $warnings;
+}
+
+{
+   my @called;
+   my $paramsref;
+
+   class EClass {
+      ADJUST {
+         push @called, "ADJUST";
+      }
+
+      ADJUSTPARAMS {
+         my ( $href ) = @_;
+         push @called, "ADJUSTPARAMS";
+         $paramsref = $href;
+      }
+
+      ADJUST {
+         push @called, "ADJUST";
+      }
+   }
+
+   EClass->new( key => "val" );
+   is_deeply( \@called, [qw( ADJUST ADJUSTPARAMS ADJUST )], 'ADJUST and ADJUSTPARAMS invoked together' );
+   is_deeply( $paramsref, { key => "val" }, 'ADJUSTPARAMS received HASHref' );
+}
+
+BEGIN {
+   local $TODO = "ADJUSTPARAMS";
+
+   like( $warnings, qr/^ADJUSTPARAMS is now the same as ADJUST; you should use ADJUST instead at /,
+      'ADJUSTPARAMS provokes warning' );
+
+   undef $warnings;
 }
 
 BEGIN {

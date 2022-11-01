@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::UseUnsafeInc; # git description: f69f5d2
-# vim: set ts=8 sts=4 sw=4 tw=115 et :
-# ABSTRACT: Indicates the value of PERL_USE_UNSAFE_INC to use during installation
-# KEYWORDS: metadata PERL_USE_UNSAFE_inc distribution testing compatibility environment
+package Dist::Zilla::Plugin::UseUnsafeInc; # git description: v0.001-13-g5e39279
+# vim: set ts=8 sts=2 sw=2 tw=115 et :
+# ABSTRACT: Indicates in metadata the value of PERL_USE_UNSAFE_INC to use during installation
+# KEYWORDS: metadata PERL_USE_UNSAFE_INC INC distribution testing compatibility environment security
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 use Moose;
 with 'Dist::Zilla::Role::MetaProvider',
@@ -68,11 +68,11 @@ __END__
 
 =head1 NAME
 
-Dist::Zilla::Plugin::UseUnsafeInc - Indicates the value of PERL_USE_UNSAFE_INC to use during installation
+Dist::Zilla::Plugin::UseUnsafeInc - Indicates in metadata the value of PERL_USE_UNSAFE_INC to use during installation
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 SYNOPSIS
 
@@ -94,13 +94,15 @@ or:
 
 This is a L<Dist::Zilla> plugin that populates the C<x_use_unsafe_inc> key in your distribution metadata. This
 indicates to components of the toolchain that C<PERL_USE_UNSAFE_INC> should be set to a certain value during
-installation and testing, overriding any previous setting e.g. from the environment or from other tools.
+installation and testing.  If C<PERL_USE_UNSAFE_INC> has already been set in the environment, it is unchanged, but
+the metadata is respected at a higher precedence than any setting that other tools e.g. L<Test::Harness> might have
+done.
 
 The environment variable is also set in L<Dist::Zilla> while building and testing the distribution, to ensure
 that local testing behaves in an expected fashion.
 
-Additionally, the release must be performed using a Perl version that supports C<PERL_USE_UNSAFE_INC>, to further
-guarantee test integrity.
+Additionally, the release must be performed using a Perl version that supports C<PERL_USE_UNSAFE_INC> (that is,
+5.26), to further guarantee test integrity. To bypass this check, set C<DZIL_ANY_PERL=1> in the environment.
 
 =head1 CONFIGURATION OPTIONS
 
@@ -121,7 +123,11 @@ When this environment variable is true, the Perl version check at release time (
 
 =item *
 
-L<perldelta/'.' and @INC>
+L<perl5260delta/'.' and @INC>
+
+=item *
+
+L<Dist::Zilla::Plugin::EnsureLatestPerl>
 
 =back
 
@@ -136,7 +142,7 @@ L<http://dzil.org/#mailing-list>.
 There is also an irc channel available for users of this distribution, at
 L<C<#distzilla> on C<irc.perl.org>|irc://irc.perl.org/#distzilla>.
 
-I am also usually active on irc, as 'ether' at C<irc.perl.org>.
+I am also usually active on irc, as 'ether' at C<irc.perl.org> and C<irc.libera.chat>.
 
 =head1 AUTHOR
 

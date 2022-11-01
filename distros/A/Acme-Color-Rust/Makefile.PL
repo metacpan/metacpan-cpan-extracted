@@ -57,10 +57,11 @@ my %WriteMakefileArgs = (
     "FFI::Platypus::Lang::Rust" => 0
   },
   "TEST_REQUIRES" => {
-    "Test2::V0" => "0.000121",
-    "YAML"      => 0
+    "Test2::Tools::Rustfmt" => 0,
+    "Test2::V0"             => "0.000121",
+    "YAML"                  => 0
   },
-  "VERSION" => "0.03",
+  "VERSION" => "0.04",
   "test"    => {
     "TESTS" => "t/*.t"
   }
@@ -69,6 +70,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "FFI::Platypus"             => "2.00",
   "FFI::Platypus::Lang::Rust" => 0,
+  "Test2::Tools::Rustfmt"     => 0,
   "Test2::V0"                 => "0.000121",
   "YAML"                      => 0
 );

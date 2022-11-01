@@ -1,5 +1,13 @@
 Revision history for Perl extension Alien-CSFML
 
+v0.0.7 2022-10-22T03:01:52Z
+
+  - Don't require sh on Win32 now that we're using prebuilt libs
+
+v0.0.6 2022-10-21T18:00:37Z
+
+  - More tweaking to get failure data from smokers
+
 v0.0.5 2022-10-21T12:34:19Z
 
   - Bump required version of perl to 5.32 because 5 years is enough

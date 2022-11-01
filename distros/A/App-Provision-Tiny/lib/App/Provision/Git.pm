@@ -1,5 +1,5 @@
 package App::Provision::Git;
-$App::Provision::Git::VERSION = '0.0404';
+$App::Provision::Git::VERSION = '0.0405';
 our $AUTHORITY = 'cpan:GENE';
 use strict;
 use warnings;
@@ -43,7 +43,7 @@ App::Provision::Git
 
 =head1 VERSION
 
-version 0.0404
+version 0.0405
 
 =head1 FUNCTIONS
 

@@ -1,8 +1,11 @@
 #!/usr/local/bin/perl
 BEGIN
 {
+    use strict;
+    use warnings;
     use Test::More qw( no_plan );
     use lib './lib';
+    use vars qw( $DEBUG $IS_WINDOWS_OS );
     use_ok( 'Apache2::SSI::Finfo', ':all' ) || BAIL_OUT( "Unable to load Apache2::SSI::Finfo" );
     use constant FINFO_DEV => 0;
     use constant FINFO_INODE => 1;
@@ -17,9 +20,12 @@ BEGIN
     use constant FINFO_CTIME => 10;
 #     use constant FINFO_BLOCK_SIZE => 11;
 #     use constant FINFO_BLOCKS => 12;
-    our $DEBUG = 0;
+    our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
     our $IS_WINDOWS_OS = ( $^O =~ /^(dos|mswin32|NetWare|symbian|win32)$/i );
 };
+
+use strict;
+use warnings;
 
 my $file;
 if( $IS_WINDOWS_OS )

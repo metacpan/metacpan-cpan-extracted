@@ -12,11 +12,14 @@ plugin 'Probe::CommandLine' => (
 );
 
 share {
-   start_url 'https://github.com/stedolan/jq/releases/';
+   # github release download page changed, stick with jq-1.6 for now
+   # start_url 'https://github.com/stedolan/jq/releases/';
+   start_url 'https://github.com/stedolan/jq/releases/expanded_assets/jq-1.6';
    # china mirror
    #start_url 'https://hub.fastgit.org/stedolan/jq/releases/';
    plugin Download => (
-      version => qr/^jq-([0-9\.]+)\.tar\.gz$/o,
+      filter  => qr/^jq-.+?\.tar\.gz$/,
+      version => qr/[0-9\.]+/,
    );
    plugin Extract => 'tar.gz';
    plugin 'Build::CMake';

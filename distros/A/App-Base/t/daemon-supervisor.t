@@ -52,7 +52,7 @@ is(
             tmp_dir              => $tmp_dir,
             delay_before_respawn => 0.1,
         }
-        )->run,
+    )->run,
     0,
     "Test daemon deamonized"
 );

@@ -28,7 +28,7 @@
 
 	our @EXPORT = qw(new Open Select SelectCursor Delete Insert Update Call $VERSION);
 
-	our $VERSION = "2022.266.1";
+	our $VERSION = "2022.301.1";
 
 	our @EXPORT_OK = @EXPORT;
 

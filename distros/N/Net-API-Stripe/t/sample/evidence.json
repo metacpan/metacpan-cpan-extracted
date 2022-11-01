@@ -1,0 +1,7 @@
+{
+   "fraudulent" : {
+      "additional_documentation" : null,
+      "explanation" : "Fraud; card reported lost on 09/04/2022"
+   },
+   "reason" : "fraudulent"
+}

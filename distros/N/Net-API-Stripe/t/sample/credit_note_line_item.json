@@ -1,0 +1,18 @@
+{
+   "amount" : "10005",
+   "amount_excluding_tax" : "10005",
+   "description" : "My First Invoice Item (created for API docs)",
+   "discount_amount" : "0",
+   "discount_amounts" : [],
+   "id" : "cnli_1Le9F22eZvKYlo2CmlcjZkQv",
+   "invoice_line_item" : "il_1Le9F22eZvKYlo2CibwNbhoU",
+   "livemode" : 0,
+   "object" : "credit_note_line_item",
+   "quantity" : "1",
+   "tax_amounts" : [],
+   "tax_rates" : [],
+   "type" : "invoice_line_item",
+   "unit_amount" : null,
+   "unit_amount_decimal" : null,
+   "unit_amount_excluding_tax" : "10005"
+}

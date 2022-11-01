@@ -3,34 +3,72 @@ abstract: 'RedisDB based cache system'
 author:
   - 'binary.com <BINARY@cpan.org>'
 build_requires:
-  DateTime: '0'
+  Date::Utility: '0'
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
+  File::Temp: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
-  JSON: '0'
+  JSON::MaybeXS: '0'
+  POSIX: '0'
   Test::CheckDeps: '0.010'
   Test::Differences: '0.61'
+  Test::Exception: '0'
   Test::FailWarnings: '0'
   Test::More: '0.96'
   Test::Most: '0.22'
   Test::TCP: '1.17'
-  perl: '5.014000'
+  lib: '0'
+  utf8: '0'
+  version: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '6.48'
+  ExtUtils::MakeMaker: '7.64'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Cache-RedisDB
+no_index:
+  directory:
+    - eg
+    - share
+    - shares
+    - t
+    - xt
+provides:
+  Cache::RedisDB:
+    file: lib/Cache/RedisDB.pm
+    version: '0.13'
 requires:
+  Carp: '0'
   RedisDB: '2.14'
   Sereal: '0'
-  perl: '5.014000'
+  perl: '5.012'
+  strict: '0'
+  warnings: '0'
 resources:
   bugtracker: https://github.com/binary-com/perl-Cache-RedisDB/issues
-  repository: git://github.com/binary-com/perl-Cache-RedisDB.git
-version: '0.12'
-x_serialization_backend: 'YAML::Tiny version 1.66'
+  homepage: https://github.com/binary-com/perl-Cache-RedisDB
+  repository: https://github.com/binary-com/perl-Cache-RedisDB.git
+version: '0.13'
+x_authority: cpan:DERIV
+x_contributors:
+  - 'Chylli <chylli@binary.com>'
+  - 'Chris Travers <christravers@binary.com>'
+  - 'Rakesh Kumar Shardiwal <rakesh.shardiwal@gmail.com>'
+  - 'Tom Molesworth <tom@binary.com>'
+  - 'Jean-Yves Sireau <jy@binary.com>'
+  - 'Matt Miller <matt@binary.com>'
+  - 'Matt Miller <mwm@fastmail.com>'
+  - 'Rakesh Kumar Shardiwal <shardiwal@users.noreply.github.com>'
+  - 'Chris Travers <chris.travers@gmail.com>'
+  - 'Chylli <chylli.email@gmail.com>'
+  - 'Kaveh Mousavi Zamani <kaveh@binary.com>'
+  - 'Kaveh Mousavi Zamani <kavehmz@gmail.com>'
+  - 'Matt Miller <mwmiller@outlook.com>'
+  - 'Torsten Förtsch <torsten@binary.com>'
+x_generated_by_perl: v5.26.2
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

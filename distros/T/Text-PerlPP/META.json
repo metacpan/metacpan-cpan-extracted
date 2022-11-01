@@ -4,13 +4,13 @@
       "Christopher White <cxwembedded@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Text-PerlPP",
    "no_index" : {
@@ -67,6 +67,6 @@
          "web" : "https://github.com/interpreters/perlpp"
       }
    },
-   "version" : "0.600001",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "0.600002",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

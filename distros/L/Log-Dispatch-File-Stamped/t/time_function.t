@@ -18,6 +18,7 @@ my %args = (
     close_after_write => 1, # prevents file creation until first use
     filename => 'foo.log',
     stamp_fmt => '%Y%m%d%H',
+    stamp_sep => '_',
 );
 
 {
@@ -25,7 +26,7 @@ my %args = (
     my ($basename, $path) = fileparse($logger->{filename});
     is(
         $basename,
-        strftime('foo-' . $args{stamp_fmt} . '.log', @localtime),
+        strftime('foo_' . $args{stamp_fmt} . '.log', @localtime),
         'localtime is used by default',
     );
 }
@@ -35,7 +36,7 @@ my %args = (
     my ($basename, $path) = fileparse($logger->{filename});
     is(
         $basename,
-        strftime('foo-' . $args{stamp_fmt} . '.log', @localtime),
+        strftime('foo_' . $args{stamp_fmt} . '.log', @localtime),
         'localtime is used by request',
     );
 }
@@ -45,7 +46,7 @@ my %args = (
     my ($basename, $path) = fileparse($logger->{filename});
     is(
         $basename,
-        strftime('foo-' . $args{stamp_fmt} . '.log', @gmtime),
+        strftime('foo_' . $args{stamp_fmt} . '.log', @gmtime),
         'gmtime is used by request',
     );
 }

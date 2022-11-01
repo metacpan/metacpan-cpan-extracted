@@ -4,9 +4,9 @@
 #  (C) Paul Evans, 2010-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.57;
+use Object::Pad 0.70 ':experimental(init_expr adjust_params)';
 
-package Tangence::Registry 0.29;
+package Tangence::Registry 0.30;
 class Tangence::Registry :isa(Tangence::Object);
 
 use Carp;
@@ -85,23 +85,21 @@ sub BUILDARGS ( $class, %args )
    );
 }
 
-has $_nextid = 1;
-has @_freeids;
-has %_objects;
+field $_nextid { 1 };
+field @_freeids;
+field %_objects;
 
-ADJUST
-{
+ADJUST :params (
+   :$tanfile
+) {
    my $id = 0;
    weaken( $self->{registry} = $self );
 
    %_objects = ( $id => $self );
    weaken( $_objects{$id} );
    $self->add_prop_objects( $id => $self->describe );
-}
 
-ADJUSTPARAMS ( $params )
-{
-   $self->load_tanfile( delete $params->{tanfile} );
+   $self->load_tanfile( $tanfile );
 }
 
 =head1 METHODS

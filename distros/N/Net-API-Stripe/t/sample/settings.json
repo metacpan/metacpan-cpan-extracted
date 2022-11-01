@@ -1,0 +1,42 @@
+{
+   "bacs_debit_payments" : {},
+   "branding" : {
+      "icon" : null,
+      "logo" : null,
+      "primary_color" : null,
+      "secondary_color" : null
+   },
+   "card_issuing" : {
+      "tos_acceptance" : {
+         "date" : null,
+         "ip" : null
+      }
+   },
+   "card_payments" : {
+      "decline_on" : {
+         "avs_failure" : 1,
+         "cvc_failure" : 0
+      },
+      "statement_descriptor_prefix" : null,
+      "statement_descriptor_prefix_kana" : null,
+      "statement_descriptor_prefix_kanji" : null
+   },
+   "dashboard" : {
+      "display_name" : "Stripe.com",
+      "timezone" : "US/Pacific"
+   },
+   "payments" : {
+      "statement_descriptor" : null,
+      "statement_descriptor_kana" : null,
+      "statement_descriptor_kanji" : null
+   },
+   "payouts" : {
+      "debit_negative_balances" : 1,
+      "schedule" : {
+         "delay_days" : "7",
+         "interval" : "daily"
+      },
+      "statement_descriptor" : null
+   },
+   "sepa_debit_payments" : {}
+}

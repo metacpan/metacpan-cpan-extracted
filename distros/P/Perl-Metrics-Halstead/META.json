@@ -67,7 +67,7 @@
          "web" : "https://github.com/ology/Perl-Metrics-Halstead"
       }
    },
-   "version" : "0.0616",
+   "version" : "0.0617",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.032001"

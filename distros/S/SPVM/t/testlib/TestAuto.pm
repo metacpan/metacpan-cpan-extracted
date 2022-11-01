@@ -9,46 +9,67 @@ use File::Find;
 use File::Basename 'basename', 'dirname';
 
 sub import {
-  if ($FindBin::Bin =~ /\/precompile$/) {
-    # Set build directory
-    my $test_precompile_dir = 't/precompile/lib';
-    my $test_precompile_dir_re = quotemeta($test_precompile_dir);
-    
-    find(
-      {
-        wanted => sub {
-          my $class_name = $File::Find::name;
-          if ($class_name =~ /\.spvm$/) {
-            $class_name =~ s|$test_precompile_dir_re||;
-            $class_name =~ s|^/SPVM/||;
-            $class_name =~ s|/|::|g;
-            $class_name =~ s|\.spvm$||;
-            
-            SPVM::Precompile->import($class_name);
-          }
-        },
-        no_chdir => 1,
-      },
-      $test_precompile_dir
-    );
+  my $test_dir;
 
+  my $test_dir_builder_base = '00_builder';
+  my $test_dir_syntax_base = '01_syntax';
+  my $test_dir_vm_base = '02_vm';
+  my $test_dir_precompile_base = '03_precompile';
+  my $test_dir_spvmcc_base = '04_spvmcc';
+  my $test_dir_spvmdist_base = '05_spvmdist';
+
+  $ENV{SPVM_TEST_DIR_BUILDER_BASE} = $test_dir_builder_base;
+  $ENV{SPVM_TEST_DIR_SYNTAX_BASE} = $test_dir_syntax_base;
+  $ENV{SPVM_TEST_DIR_VM_BASE} = $test_dir_vm_base;
+  $ENV{SPVM_TEST_DIR_PRECOMPILE_BASE} = $test_dir_precompile_base;
+  $ENV{SPVM_TEST_DIR_SPVMCC_BASE} = $test_dir_spvmcc_base;
+  $ENV{SPVM_TEST_DIR_SPVMDIST_BASE} = $test_dir_spvmdist_base;
+
+  my $test_dir_builder = "t/$test_dir_builder_base";
+  my $test_dir_syntax = "t/$test_dir_syntax_base";
+  my $test_dir_vm = "t/$test_dir_vm_base";
+  my $test_dir_precompile = "t/$test_dir_precompile_base";
+  my $test_dir_spvmcc = "t/$test_dir_spvmcc_base";
+  my $test_dir_spvmdist = "t/$test_dir_spvmdist_base";
+
+  $ENV{SPVM_TEST_DIR_BUILDER} = $test_dir_builder;
+  $ENV{SPVM_TEST_DIR_SYNTAX} = $test_dir_syntax;
+  $ENV{SPVM_TEST_DIR_VM} = $test_dir_vm;
+  $ENV{SPVM_TEST_DIR_PRECOMPILE} = $test_dir_precompile;
+  $ENV{SPVM_TEST_DIR_SPVMCC} = $test_dir_spvmcc;
+  $ENV{SPVM_TEST_DIR_SPVMDIST} = $test_dir_spvmdist;
+  
+  if ($FindBin::Bin =~ /t\/$test_dir_builder_base\b/) {
+    $test_dir = $test_dir_builder;
+  }
+  elsif ($FindBin::Bin =~ /t\/$test_dir_syntax_base\b/) {
+    $test_dir = $test_dir_syntax;
+  }
+  elsif ($FindBin::Bin =~ /t\/$test_dir_vm_base\b/) {
+    $test_dir = $test_dir_vm;
+  }
+  elsif ($FindBin::Bin =~ /t\/$test_dir_precompile_base\b/) {
+    $test_dir = $test_dir_precompile;
     $ENV{SPVM_TEST_PRECOMPILE} = 1;
-    $ENV{SPVM_TEST_LIB_DIR} = "$test_precompile_dir";
-    $ENV{SPVM_BUILD_DIR} = 't/precompile/.spvm_build';
+  }
+  elsif ($FindBin::Bin =~ /t\/$test_dir_spvmcc_base\b/) {
+    $test_dir = $test_dir_spvmcc;
+  }
+  elsif ($FindBin::Bin =~ /t\/$test_dir_spvmdist_base\b/) {
+    $test_dir = $test_dir_spvmdist;
+  }
+  elsif ($FindBin::Bin =~ /t\/utils\b/) {
+    $test_dir = 't/utils';
   }
   else {
-    # Set build directory
-    $ENV{SPVM_TEST_LIB_DIR} = "t/default/lib";
-    $ENV{SPVM_BUILD_DIR} = 't/default/.spvm_build';
+    die "\"$FindBin::Bin\" is an invalid test directory";
   }
   
-  unshift @INC, $ENV{SPVM_TEST_LIB_DIR};
+  my $test_lib_dir = "$test_dir/lib";
+  unshift @INC, $test_lib_dir;
+  
+  $ENV{SPVM_TEST_DIR} = $test_dir;
+  $ENV{SPVM_BUILD_DIR} = "$test_dir/.spvm_build";
 }
 
 1;
-
-=pod
-
-=DESCRITPION
-
-if test scritp file is in precompile directory, precompile test is automatically on.

@@ -1,5 +1,12 @@
 Revision history for Email-MIME-Kit-Assembler-Markdown
 
+0.100008  2022-10-22 16:18:22-04:00 America/New_York
+        - prep next release
+
+0.100007  2018-06-18 17:58:45-04:00 America/New_York (TRIAL RELEASE)
+        - render things twice, once with part_type set to "text" and one set to
+          "html" (thanks, Chris Morgan!)
+
 0.100006  2017-08-29 15:59:19-04:00 America/New_York
         - added encode_entities to HTML entity encode variables in the HTML
           part (thanks, Michael McClimon!)

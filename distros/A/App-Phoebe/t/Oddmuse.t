@@ -18,7 +18,7 @@ use Test::More;
 use Mojo::IOLoop;
 use Mojo::UserAgent;
 use URI::Escape;
-use Encode;
+use Encode qw(encode_utf8);
 use Encode::Locale;
 use File::Slurper qw(write_text);
 use Test::More;
@@ -99,10 +99,13 @@ for (qw(1 1 1 1 2 2 3 4 5)) {
 die "$!: giving up after ${total}s\n" unless $ok;
 
 # Test Oddmuse, and create the Test page in the main namespace (with the text
-# "Alex") and in the "Travels" namespace (with the text "Berta").
+# "Alex"), in the "Travels" namespace (with the text "Berta"), and in a Mëtal
+# namespace (with the text "Chloë"), and the page "Link" that links to it.
 $res = $ua->get("http://localhost:$oddmuse_port/wiki?title=Test&text=Fnord")->result;
 is($res->code, 302, "Oddmuse save page");
 $res = $ua->get("http://localhost:$oddmuse_port/wiki?title=Test&text=Alex")->result;
+is($res->code, 302, "Oddmuse updated page");
+$res = $ua->get("http://localhost:$oddmuse_port/wiki?title=Link&text=[M%C3%ABtal:Test Mëtal Link]")->result;
 is($res->code, 302, "Oddmuse updated page");
 $res = $ua->get("http://localhost:$oddmuse_port/wiki?title=Test&text=Check%20out%20[[Bet]].&ns=Travels")->result;
 is($res->code, 302, "Oddmuse save page in namespace");
@@ -110,12 +113,17 @@ $res = $ua->get("http://localhost:$oddmuse_port/wiki?title=Test&text=Bert&ns=Tra
 is($res->code, 302, "Oddmuse save page in namespace");
 $res = $ua->get("http://localhost:$oddmuse_port/wiki?title=Test&text=Berta&ns=Travels")->result;
 is($res->code, 302, "Oddmuse updated page in namespace");
+$res = $ua->get("http://localhost:$oddmuse_port/wiki?title=Test&text=Chlo%C3%AB&ns=M%C3%ABtal")->result;
+is($res->code, 302, "Oddmuse updated page in namespace with umlauts");
 $res = $ua->get("http://localhost:$oddmuse_port/wiki/raw/Test")->result;
 is($res->code, 200, "Oddmuse read page");
 is($res->body, "Alex\n", "Oddmuse page content");
 $res = $ua->get("http://localhost:$oddmuse_port/wiki/Travels/raw/Test")->result;
 is($res->code, 200, "Oddmuse read page from namespace");
 is($res->body, "Berta\n", "Oddmuse page content from namespace");
+$res = $ua->get("http://localhost:$oddmuse_port/wiki/M%C3%ABtal/raw/Test")->result;
+is($res->code, 200, "Oddmuse read page from umlaut namespace");
+is($res->body, encode_utf8("Chloë\n"), "Oddmuse umlaut page content from umlaut namespace");
 
 # Start Phoebe
 
@@ -205,6 +213,12 @@ like($page, qr(^to:\n> ｢Berta｣$)m, "To");
 $page = query_gemini("$base/Travels/page/Test/1");
 like($page, qr(^Check out Bet\.$)m, "Revision 1");
 like($page, qr(^=> $base/Travels/page/Bet Bet$)m, "Link");
+
+$page = query_gemini("$base/page/Link");
+like($page, qr(^=> $base/M%C3%ABtal/page/Test Mëtal Link)m, "Page Link (namespace)");
+
+$page = query_gemini("$base/M%C3%ABtal/page/Test");
+like($page, qr(Chloë), "Page (namespace)");
 
 like(query_gemini("$base/do/rss"), qr(Test.*Alex)s, "RSS");
 like(query_gemini("$base/Travels/do/rss"), qr(Test.*Berta)s, "RSS (namespace)");

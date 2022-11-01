@@ -1,5 +1,5 @@
 package Git::Raw::Worktree;
-$Git::Raw::Worktree::VERSION = '0.88';
+$Git::Raw::Worktree::VERSION = '0.90';
 use strict;
 use warnings;
 
@@ -11,7 +11,7 @@ Git::Raw::Worktree - Git worktree class
 
 =head1 VERSION
 
-version 0.88
+version 0.90
 
 =head1 DESCRIPTION
 
@@ -100,7 +100,7 @@ on disk. See C<is_prunable> for valid values of C<%prune_opts>.
 
 =head1 AUTHOR
 
-Jacques Germishuys <jacquesg@striata.com>
+Jacques Germishuys <jacquesg@cpan.org>
 
 =head1 LICENSE AND COPYRIGHT
 

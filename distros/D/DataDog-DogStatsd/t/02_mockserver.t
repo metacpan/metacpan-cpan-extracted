@@ -21,11 +21,11 @@ my $PORT = MockServer::start();
 
 my $statsd = DataDog::DogStatsd->new(port => $PORT);
 
-$statsd->increment( 'test.stats' );
+$statsd->increment('test.stats');
 my ($msg) = MockServer::get_and_reset_messages();
 is $msg, 'test.stats:1|c';
 
-$statsd->decrement( 'test.stats' );
+$statsd->decrement('test.stats');
 ($msg) = MockServer::get_and_reset_messages();
 is $msg, 'test.stats:-1|c';
 
@@ -38,19 +38,19 @@ $statsd->gauge('test.gauge', 10);
 is $msg, 'test.gauge:10|g';
 
 ## test tags
-$statsd->increment( 'test.stats', { tags => ['tag1', 'tag2'] } );
+$statsd->increment('test.stats', {tags => ['tag1', 'tag2']});
 ($msg) = MockServer::get_and_reset_messages();
 is $msg, 'test.stats:1|c|#tag1,tag2';
 
-$statsd->decrement( 'test.stats', { tags => ['tag1', 'tag2'] } );
+$statsd->decrement('test.stats', {tags => ['tag1', 'tag2']});
 ($msg) = MockServer::get_and_reset_messages();
 is $msg, 'test.stats:-1|c|#tag1,tag2';
 
-$statsd->timing( 'test.timing', 1, { tags => ['tag1', 'tag2'] } );
+$statsd->timing('test.timing', 1, {tags => ['tag1', 'tag2']});
 ($msg) = MockServer::get_and_reset_messages();
 is $msg, 'test.timing:1|ms|#tag1,tag2';
 
-$statsd->gauge('test.gauge', 10, { tags => ['tag1', 'tag2'] } );
+$statsd->gauge('test.gauge', 10, {tags => ['tag1', 'tag2']});
 ($msg) = MockServer::get_and_reset_messages();
 is $msg, 'test.gauge:10|g|#tag1,tag2';
 
@@ -58,17 +58,25 @@ $statsd->event('test event', 'test description');
 ($msg) = MockServer::get_and_reset_messages();
 is $msg, '_e{10,16}:test event|test description';
 
-$statsd->event('test event', 'test description', { tags => [ 'tag1', 'tag2' ] } );
+$statsd->event('test event', 'test description', {tags => ['tag1', 'tag2']});
 ($msg) = MockServer::get_and_reset_messages();
 is $msg, '_e{10,16}:test event|test description|#tag1,tag2';
 
-$statsd->event('test event', 'test description',
-    { hostname => "host", tags => [ 'tag1', 'tag2' ] } );
+$statsd->event(
+    'test event',
+    'test description',
+    {
+        hostname => "host",
+        tags     => ['tag1', 'tag2']});
 ($msg) = MockServer::get_and_reset_messages();
 is $msg, '_e{10,16}:test event|test description|h:host|#tag1,tag2';
 
-$statsd->event('test event', 'test description',
-    { alert_type => "error", tags => [ 'tag1', 'tag2' ] } );
+$statsd->event(
+    'test event',
+    'test description',
+    {
+        alert_type => "error",
+        tags       => ['tag1', 'tag2']});
 ($msg) = MockServer::get_and_reset_messages();
 is $msg, '_e{10,16}:test event|test description|t:error|#tag1,tag2';
 
@@ -78,11 +86,11 @@ is $msg, 'test.count:1|c';
 
 ## test namespace
 $statsd->namespace('test2.');
-$statsd->increment( 'stats' );
+$statsd->increment('stats');
 ($msg) = MockServer::get_and_reset_messages();
 is $msg, 'test2.stats:1|c';
 
-$statsd->decrement( 'stats' );
+$statsd->decrement('stats');
 ($msg) = MockServer::get_and_reset_messages();
 is $msg, 'test2.stats:-1|c';
 

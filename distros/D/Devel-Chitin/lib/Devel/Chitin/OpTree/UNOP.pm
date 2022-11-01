@@ -1,7 +1,7 @@
 package Devel::Chitin::OpTree::UNOP;
 use base 'Devel::Chitin::OpTree';
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 use strict;
 use warnings;
@@ -60,14 +60,7 @@ sub pp_refgen {
     }
 
     if ($anoncode) {
-        my $subref = $self->_padval_sv($anoncode->op->targ);
-        my $deparser = Devel::Chitin::OpTree->build_from_location($subref->object_2svref);
-        my $deparsed = $deparser->deparse;
-        if ($deparsed =~ m/\n/) {
-            return join('', 'sub {', $self->_indent_block_text($deparsed), '}');
-        } else {
-            return join('', 'sub { ', $deparsed, ' }');
-        }
+        return $anoncode->pp_anoncode()
 
     } elsif ($first->is_null
              and $first->_ex_name eq 'pp_list'

@@ -3,22 +3,22 @@ abstract: 'Perl bindings for GNU Libidn2'
 author:
   - 'Thomas Jacob <gnuthor@gmail.com>'
 build_requires:
-  ExtUtils::CBuilder: 0
-  ExtUtils::ParseXS: 0
-  Test::More: 0.10
+  ExtUtils::CBuilder: '0'
+  ExtUtils::ParseXS: '0'
+  Test::More: '0.10'
 configure_requires:
-  Module::Build: 0.40
+  Module::Build: '0.42'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4005, CPAN::Meta::Converter version 2.120921'
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Net-LibIDN2
 provides:
   Net::LibIDN2:
     file: lib/Net/LibIDN2.pm
-    version: 1.01
+    version: '1.02'
 requires:
   perl: v5.6.1
 resources:
@@ -26,4 +26,5 @@ resources:
   homepage: https://metacpan.org/release/Net-LibIDN2
   license: http://dev.perl.org/licenses/
   repository: https://github.com/gnuthor/Net--LibIDN2
-version: 1.01
+version: '1.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

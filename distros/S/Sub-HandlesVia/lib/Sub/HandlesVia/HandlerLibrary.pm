@@ -5,7 +5,7 @@ use warnings;
 package Sub::HandlesVia::HandlerLibrary;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.038';
+our $VERSION   = '0.044';
 
 use Types::Standard qw( Any Item );
 
@@ -18,6 +18,36 @@ sub _type_inspector {
 	}
 	
 	return { trust_mutated => 'never' };
+}
+
+{
+	my %cache;
+	
+	sub get_handler {
+		my ($me, $handler_name) = @_;
+		$cache{$me} ||= $me->_populate_cache;
+		$cache{$me}{$handler_name} ? $me->$handler_name : undef;
+	}
+	
+	sub has_handler {
+		my ($me, $handler_name) = @_;
+		$cache{$me} ||= $me->_populate_cache;
+		exists $cache{$me}{$handler_name};
+	}
+}
+
+# This is not necessarily an exhaustive list, however if it is non-exhaustive
+# then subclasses must override get_handler and has_handler.
+#
+sub handler_names {
+	no strict 'refs';
+	@{ $_[0] . '::METHODS' }
+}
+
+sub _populate_cache {
+	my %hash;
+	$hash{$_} = 1 for $_[0]->handler_names;
+	\%hash;
 }
 
 1;

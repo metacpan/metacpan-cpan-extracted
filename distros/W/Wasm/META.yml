@@ -4,7 +4,7 @@ author:
   - 'Graham Ollis <plicease@cpan.org>'
 build_requires:
   Capture::Tiny: '0'
-  Test2::V0: '0.000060'
+  Test2::V0: '0.000121'
   YAML: '0'
   perl: '5.008004'
 configure_requires:
@@ -12,7 +12,7 @@ configure_requires:
   FFI::CheckLib: '0.26'
   perl: '5.008004'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.015, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,13 +30,14 @@ requires:
   FFI::CheckLib: '0.26'
   FFI::Platypus: '1.26'
   FFI::Platypus::Buffer: '0'
+  FFI::Platypus::Memory: '0'
   FFI::Platypus::Record: '0'
   FFI::Platypus::Type::PtrObject: '0.02'
   Path::Tiny: '0'
   Ref::Util: '0'
   Sub::Install: '0'
   Test2::API: '1.302015'
-  Test2::Mock: '0.000060'
+  Test2::Mock: '0.000121'
   autodie: '0'
   perl: '5.008004'
 resources:
@@ -44,8 +45,8 @@ resources:
   bugtracker: https://github.com/perlwasm/Wasm/issues
   homepage: https://metacpan.org/pod/Wasm
   repository: git://github.com/perlwasm/Wasm.git
-version: '0.21'
-x_generated_by_perl: v5.33.3
+version: '0.22'
+x_generated_by_perl: v5.37.4
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_use_unsafe_inc: 0

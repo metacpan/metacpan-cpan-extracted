@@ -1,5 +1,5 @@
 package Form::Tiny::Meta;
-$Form::Tiny::Meta::VERSION = '2.14';
+$Form::Tiny::Meta::VERSION = '2.15';
 use v5.10;
 use strict;
 use warnings;
@@ -364,7 +364,6 @@ sub _build_blueprint
 	};
 
 	my $transform = $params{transform} // $transform_base;
-
 
 	# croak, since we don't know anything about dynamic fields in static context
 	croak "Can't create a blueprint of a dynamic form"

@@ -15,7 +15,7 @@ use Ref::Util qw( is_blessed_ref );
 use Carp ();
 
 # ABSTRACT: Wasmtime module class
-our $VERSION = '0.21'; # VERSION
+our $VERSION = '0.22'; # VERSION
 
 
 $ffi_prefix = 'wasm_module_';
@@ -115,7 +115,7 @@ $ffi->attach( [ wasmtime_module_validate => 'validate' ] => ['wasm_store_t', 'wa
   my $store = defined $_[0] && ref($_[0]) eq 'Wasm::Wasmtime::Store' ? shift : Wasm::Wasmtime::Store->new;
   my($wasm, $data) = _args(@_);
   my $error = $xsub->($store, $$wasm);
-  wantarray  ## no critic (Freenode::Wantarray)
+  wantarray  ## no critic (Community::Wantarray)
     ? $error ? (0, $error->message) : (1, '')
     : $error ? 0 : 1;
 });
@@ -195,7 +195,7 @@ Wasm::Wasmtime::Module - Wasmtime module class
 
 =head1 VERSION
 
-version 0.21
+version 0.22
 
 =head1 SYNOPSIS
 
@@ -348,7 +348,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Graham Ollis.
+This software is copyright (c) 2020-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

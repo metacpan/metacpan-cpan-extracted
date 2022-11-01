@@ -4,9 +4,9 @@
 #  (C) Paul Evans, 2010-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.57;
+use Object::Pad 0.66;
 
-package Tangence::Class 0.29;
+package Tangence::Class 0.30;
 class Tangence::Class :isa(Tangence::Meta::Class);
 
 use Tangence::Constants;
@@ -155,7 +155,7 @@ method property ( $name )
    return $self->properties->{$name};
 }
 
-has $smashkeys;
+field $smashkeys;
 
 method smashkeys
 {

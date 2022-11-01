@@ -11,7 +11,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.55';
+our $VERSION = '2.56';
 
 our @ALL =
 qw(
@@ -118,7 +118,6 @@ qw(
   America/Monterrey
   America/Montevideo
   America/New_York
-  America/Nipigon
   America/Nome
   America/Noronha
   America/North_Dakota/Beulah
@@ -134,7 +133,6 @@ qw(
   America/Porto_Velho
   America/Puerto_Rico
   America/Punta_Arenas
-  America/Rainy_River
   America/Rankin_Inlet
   America/Recife
   America/Regina
@@ -150,7 +148,6 @@ qw(
   America/Swift_Current
   America/Tegucigalpa
   America/Thule
-  America/Thunder_Bay
   America/Tijuana
   America/Toronto
   America/Vancouver
@@ -465,7 +462,6 @@ Moncton
 Monterrey
 Montevideo
 New_York
-Nipigon
 Nome
 Noronha
 North_Dakota/Beulah
@@ -481,7 +477,6 @@ Port-au-Prince
 Porto_Velho
 Puerto_Rico
 Punta_Arenas
-Rainy_River
 Rankin_Inlet
 Recife
 Regina
@@ -497,7 +492,6 @@ St_Johns
 Swift_Current
 Tegucigalpa
 Thule
-Thunder_Bay
 Tijuana
 Toronto
 Vancouver
@@ -859,13 +853,10 @@ America/Moncton
 America/Goose_Bay
 America/Blanc-Sablon
 America/Toronto
-America/Nipigon
-America/Thunder_Bay
 America/Iqaluit
 America/Pangnirtung
 America/Atikokan
 America/Winnipeg
-America/Rainy_River
 America/Resolute
 America/Rankin_Inlet
 America/Regina
@@ -1688,8 +1679,10 @@ our %LINKS =
   'America/Montreal' => 'America/Toronto',
   'America/Montserrat' => 'America/Puerto_Rico',
   'America/Nassau' => 'America/Toronto',
+  'America/Nipigon' => 'America/Toronto',
   'America/Port_of_Spain' => 'America/Puerto_Rico',
   'America/Porto_Acre' => 'America/Rio_Branco',
+  'America/Rainy_River' => 'America/Winnipeg',
   'America/Rosario' => 'America/Argentina/Cordoba',
   'America/Santa_Isabel' => 'America/Tijuana',
   'America/Shiprock' => 'America/Denver',
@@ -1698,6 +1691,7 @@ our %LINKS =
   'America/St_Lucia' => 'America/Puerto_Rico',
   'America/St_Thomas' => 'America/Puerto_Rico',
   'America/St_Vincent' => 'America/Puerto_Rico',
+  'America/Thunder_Bay' => 'America/Toronto',
   'America/Tortola' => 'America/Puerto_Rico',
   'America/Virgin' => 'America/Puerto_Rico',
   'Antarctica/DumontDUrville' => 'Pacific/Port_Moresby',
@@ -1765,6 +1759,9 @@ our %LINKS =
   'Eire' => 'Europe/Dublin',
   'Etc/GMT' => 'UTC',
   'Etc/GMT+0' => 'UTC',
+  'Etc/GMT-0' => 'UTC',
+  'Etc/GMT0' => 'UTC',
+  'Etc/Greenwich' => 'UTC',
   'Etc/UCT' => 'UTC',
   'Etc/UTC' => 'UTC',
   'Etc/Universal' => 'UTC',
@@ -1866,7 +1863,7 @@ our %LINKS =
 
 ;
 
-sub OlsonVersion { '2022e' }
+sub OlsonVersion { '2022f' }
 
 
 1;
@@ -2008,7 +2005,6 @@ so that applications can easily present a list of timezones.
   America/Moncton
   America/Monterrey
   America/New_York
-  America/Nipigon
   America/Nome
   America/North_Dakota/Beulah
   America/North_Dakota/Center
@@ -2019,7 +2015,6 @@ so that applications can easily present a list of timezones.
   America/Phoenix
   America/Port-au-Prince
   America/Puerto_Rico
-  America/Rainy_River
   America/Rankin_Inlet
   America/Regina
   America/Resolute
@@ -2028,7 +2023,6 @@ so that applications can easily present a list of timezones.
   America/St_Johns
   America/Swift_Current
   America/Tegucigalpa
-  America/Thunder_Bay
   America/Tijuana
   America/Toronto
   America/Vancouver
@@ -2443,13 +2437,10 @@ so that applications can easily present a list of timezones.
   America/Goose_Bay - Atlantic - Labrador (most areas)
   America/Blanc-Sablon - AST - QC (Lower North Shore)
   America/Toronto - Eastern - ON, QC (most areas)
-  America/Nipigon - Eastern - ON, QC (no DST 1967-73)
-  America/Thunder_Bay - Eastern - ON (Thunder Bay)
   America/Iqaluit - Eastern - NU (most east areas)
   America/Pangnirtung - Eastern - NU (Pangnirtung)
   America/Atikokan - EST - ON (Atikokan); NU (Coral H)
   America/Winnipeg - Central - ON (west); Manitoba
-  America/Rainy_River - Central - ON (Rainy R, Ft Frances)
   America/Resolute - Central - NU (Resolute)
   America/Rankin_Inlet - Central - NU (central)
   America/Regina - CST - SK (most areas)
@@ -3466,8 +3457,10 @@ A linked zone is an alias from one name to another.
   America/Montreal => America/Toronto
   America/Montserrat => America/Puerto_Rico
   America/Nassau => America/Toronto
+  America/Nipigon => America/Toronto
   America/Port_of_Spain => America/Puerto_Rico
   America/Porto_Acre => America/Rio_Branco
+  America/Rainy_River => America/Winnipeg
   America/Rosario => America/Argentina/Cordoba
   America/Santa_Isabel => America/Tijuana
   America/Shiprock => America/Denver
@@ -3476,6 +3469,7 @@ A linked zone is an alias from one name to another.
   America/St_Lucia => America/Puerto_Rico
   America/St_Thomas => America/Puerto_Rico
   America/St_Vincent => America/Puerto_Rico
+  America/Thunder_Bay => America/Toronto
   America/Tortola => America/Puerto_Rico
   America/Virgin => America/Puerto_Rico
   Antarctica/DumontDUrville => Pacific/Port_Moresby
@@ -3543,6 +3537,9 @@ A linked zone is an alias from one name to another.
   Eire => Europe/Dublin
   Etc/GMT => UTC
   Etc/GMT+0 => UTC
+  Etc/GMT-0 => UTC
+  Etc/GMT0 => UTC
+  Etc/Greenwich => UTC
   Etc/UCT => UTC
   Etc/UTC => UTC
   Etc/Universal => UTC

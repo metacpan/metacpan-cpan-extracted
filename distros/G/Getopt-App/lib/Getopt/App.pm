@@ -8,12 +8,13 @@ use Carp         qw(croak);
 use Getopt::Long ();
 use List::Util   qw(first);
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 our ($OPT_COMMENT_RE, $OPTIONS, $SUBCOMMAND, $SUBCOMMANDS, %APPS) = (qr{\s+\#\s+});
 
 our $call_maybe = sub {
   my ($app, $m) = (shift, shift);
+  local $Getopt::App::APP_CLASS;
   $m = $app->can($m) || __PACKAGE__->can("_$m");
   return $m ? $app->$m(@_) : undef;
 };
@@ -186,6 +187,8 @@ sub _getopt_configure {qw(bundling no_auto_abbrev no_ignore_case pass_through re
 
 sub _getopt_load_subcommand {
   my ($app, $subcommand, $argv) = @_;
+  return $subcommand->[1] if ref $subcommand->[1] eq 'CODE';
+
   ($@, $!) = ('', 0);
   croak "Unable to load subcommand $subcommand->[0]: $@ ($!)" unless my $code = do $subcommand->[1];
   return $code;
@@ -206,7 +209,6 @@ sub _getopt_unknown_subcommand {
 
 sub _subcommand_run {
   my ($app, $subcommand, $argv) = @_;
-  local $Getopt::App::APP_CLASS;
   local $Getopt::App::SUBCOMMAND = $subcommand;
   unless ($APPS{$subcommand->[1]}) {
     $APPS{$subcommand->[1]} = $app->$call_maybe(getopt_load_subcommand => $subcommand, $argv);

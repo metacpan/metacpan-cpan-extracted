@@ -25,6 +25,17 @@ Media::Convert::Asset - Media::Convert representation of a media asset
   $output->audio_codec("libvorbis");
   Media::Convert::Pipe->new(inputs => [$input], output => $output)->run();
 
+  # Merge the video stream from one file with the audio stream from another,
+  # and convert to VP9
+  use Media::Convert::Map;
+  my $input_v = Media::Convert::Asset->new(url => $input_video_filename);
+  my $input_a = Media::Convert::Asset->new(url => $input_audio_filename);
+  $profile = Media::Convert::ProfileFactory->new("vp9", $input);
+  $output = Media::Convert::Asset->new(url => $merged_filename, reference => $profile);
+  my $map_v = Media::Convert::Map->new(input => $input_v, type => "stream", choice => "video");
+  my $map_a = Media::Convert::Map->new(input => $input_a, type => "stream", choice => "audio");
+  Media::Convert::Pipe->new(inputs => [$input_a, $input_v], map => [$map_a, $map_v], output => $output)->run();
+
 =head1 DESCRIPTION
 
 The C<Media::Convert::Asset> package is used to represent media assets

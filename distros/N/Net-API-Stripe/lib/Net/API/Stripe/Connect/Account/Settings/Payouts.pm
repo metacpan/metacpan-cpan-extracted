@@ -2,7 +2,7 @@
 ## Stripe API - ~/lib/Net/API/Stripe/Connect/Account/Settings/Payouts.pm
 ## Version v0.100.0
 ## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2020/05/15
 ## 
@@ -10,10 +10,15 @@
 package Net::API::Stripe::Connect::Account::Settings::Payouts;
 BEGIN
 {
-	use strict;
-	use parent qw( Net::API::Stripe::Generic );
-	our( $VERSION ) = 'v0.100.0';
+    use strict;
+    use warnings;
+    use parent qw( Net::API::Stripe::Generic );
+    use vars qw( $VERSION );
+    our( $VERSION ) = 'v0.100.0';
 };
+
+use strict;
+use warnings;
 
 sub debit_negative_balances { return( shift->_set_get_boolean( 'debit_negative_balances', @_ ) ); }
 
@@ -29,7 +34,6 @@ sub schedule
 }
 
 sub statement_descriptor { return( shift->_set_get_scalar( 'statement_descriptor', @_ ) ); }
-
 
 1;
 
@@ -66,30 +70,24 @@ This is instantiated by method B<payouts> from module L<Net::API::Stripe::Connec
 
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>( %ARG )
+=head2 new( %ARG )
 
 Creates a new L<Net::API::Stripe::Connect::Account::Settings::Payouts> object.
 It may also take an hash like arguments, that also are method of the same name.
 
-=back
-
 =head1 METHODS
 
-=over 4
-
-=item B<debit_negative_balances> boolean
+=head2 debit_negative_balances boolean
 
 A Boolean indicating if Stripe should try to reclaim negative balances from an attached bank account. See L<Stripe Understanding Connect Account Balances documentation|https://stripe.com/docs/connect/account-balances> for details. Default value is true for Express accounts and false for Custom accounts.
 
-=item B<schedule> hash
+=head2 schedule hash
 
 Details on when funds from charges are available, and when they are paid out to an external account. See L<Stripe Setting Bank and Debit Card Payouts documentation|https://stripe.com/docs/connect/bank-transfers#payout-information> for details.
 
 This is a dynamic class with name L<Net::API::Stripe::Connect::Account::Settings::Payouts::Schedule>. It is created using method B<_set_get_class> from module L<Module::Generic>
 
-=over 8
+=over 4
 
 =item I<delay_days> positive integer or zero
 
@@ -109,79 +107,77 @@ The day of the week funds will be paid out, of the style ‘monday’, ‘tuesda
 
 =back
 
-=item B<statement_descriptor> string
+=head2 statement_descriptor string
 
 The text that appears on the bank account statement for payouts. If not set, this defaults to the platform’s bank descriptor as set in the Dashboard.
 
-=back
-
 =head1 API SAMPLE
 
-	{
-	  "id": "acct_fake123456789",
-	  "object": "account",
-	  "business_profile": {
-		"mcc": null,
-		"name": "My Shop, Inc",
-		"product_description": "Great products shipping all over the world",
-		"support_address": {
-		  "city": "Tokyo",
-		  "country": "JP",
-		  "line1": "1-2-3 Kudan-minami, Chiyoda-ku",
-		  "line2": "",
-		  "postal_code": "100-0012",
-		  "state": ""
-		},
-		"support_email": "billing@example.com",
-		"support_phone": "+81312345678",
-		"support_url": "",
-		"url": "https://www.example.com"
-	  },
-	  "business_type": "company",
-	  "capabilities": {
-		"card_payments": "active"
-	  },
-	  "charges_enabled": true,
-	  "country": "JP",
-	  "default_currency": "jpy",
-	  "details_submitted": true,
-	  "email": "tech@example.com",
-	  "metadata": {},
-	  "payouts_enabled": true,
-	  "settings": {
-		"branding": {
-		  "icon": "file_fake123456789",
-		  "logo": null,
-		  "primary_color": "#0e77ca"
-		},
-		"card_payments": {
-		  "decline_on": {
-			"avs_failure": false,
-			"cvc_failure": false
-		  },
-		  "statement_descriptor_prefix": null
-		},
-		"dashboard": {
-		  "display_name": "myshop-inc",
-		  "timezone": "Asia/Tokyo"
-		},
-		"payments": {
-		  "statement_descriptor": "MYSHOP, INC",
-		  "statement_descriptor_kana": "ﾏｲｼｮｯﾌﾟｲﾝｸ",
-		  "statement_descriptor_kanji": "マイショップインク"
-		},
-		"payouts": {
-		  "debit_negative_balances": true,
-		  "schedule": {
-			"delay_days": 4,
-			"interval": "weekly",
-			"weekly_anchor": "thursday"
-		  },
-		  "statement_descriptor": null
-		}
-	  },
-	  "type": "standard"
-	}
+    {
+      "id": "acct_fake123456789",
+      "object": "account",
+      "business_profile": {
+        "mcc": null,
+        "name": "My Shop, Inc",
+        "product_description": "Great products shipping all over the world",
+        "support_address": {
+          "city": "Tokyo",
+          "country": "JP",
+          "line1": "1-2-3 Kudan-minami, Chiyoda-ku",
+          "line2": "",
+          "postal_code": "100-0012",
+          "state": ""
+        },
+        "support_email": "billing@example.com",
+        "support_phone": "+81312345678",
+        "support_url": "",
+        "url": "https://www.example.com"
+      },
+      "business_type": "company",
+      "capabilities": {
+        "card_payments": "active"
+      },
+      "charges_enabled": true,
+      "country": "JP",
+      "default_currency": "jpy",
+      "details_submitted": true,
+      "email": "tech@example.com",
+      "metadata": {},
+      "payouts_enabled": true,
+      "settings": {
+        "branding": {
+          "icon": "file_fake123456789",
+          "logo": null,
+          "primary_color": "#0e77ca"
+        },
+        "card_payments": {
+          "decline_on": {
+            "avs_failure": false,
+            "cvc_failure": false
+          },
+          "statement_descriptor_prefix": null
+        },
+        "dashboard": {
+          "display_name": "myshop-inc",
+          "timezone": "Asia/Tokyo"
+        },
+        "payments": {
+          "statement_descriptor": "MYSHOP, INC",
+          "statement_descriptor_kana": "ﾏｲｼｮｯﾌﾟｲﾝｸ",
+          "statement_descriptor_kanji": "マイショップインク"
+        },
+        "payouts": {
+          "debit_negative_balances": true,
+          "schedule": {
+            "delay_days": 4,
+            "interval": "weekly",
+            "weekly_anchor": "thursday"
+          },
+          "statement_descriptor": null
+        }
+      },
+      "type": "standard"
+    }
 
 =head1 HISTORY
 

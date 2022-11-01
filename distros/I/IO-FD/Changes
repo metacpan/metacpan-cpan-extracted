@@ -1,5 +1,12 @@
 Revision history for Perl extension IO::FD.
 
+0.1.2	Sun 23 Oct 2022 18:38:07 AEST
+	- Fixed failing peername test due to 'Temporary failure in name resolution'
+	- Added shutdown to IO::FD and IO::FD::DWIM
+	- Fixed up XS returns
+	- Removed kqueue/kevent test as it is experimental and broken
+	
+
 0.1.1	Sun  9 Oct 2022 18:42:13 AEST
 	- Added thread context macros to fix failing build on threaded perl
 	- Fixed IO::FD::recv bug, not updating current length of PV

@@ -1,5 +1,5 @@
 # Sys::OsPackage::Driver::Debian
-# ABSTRACT: Debian.Ubuntu DEB packaging handler for Sys::OsPackage
+# ABSTRACT: Debian/Ubuntu DEB packaging handler for Sys::OsPackage
 # Copyright (c) 2022 by Ian Kluft
 # Open Source license Perl's Artistic License 2.0: <http://www.perlfoundation.org/artistic_license_2_0>
 # SPDX-License-Identifier: Artistic-2.0
@@ -14,7 +14,7 @@ use utf8;
 ## use critic (Modules::RequireExplicitPackage)
 
 package Sys::OsPackage::Driver::Debian;
-$Sys::OsPackage::Driver::Debian::VERSION = '0.1.6';
+$Sys::OsPackage::Driver::Debian::VERSION = '0.3.0';
 use base "Sys::OsPackage::Driver";
 
 # check if packager command found (deb)
@@ -51,7 +51,8 @@ sub find
     return if not $class->pkgcmd($ospkg);
 
     my $querycmd = $ospkg->sysenv("apt-cache");
-    my @pkglist = sort $ospkg->capture_cmd({list=>1}, $querycmd, qw(search --quiet=2), '^'.$args_ref->{pkg}.'$');
+    my @pkglist = sort $ospkg->capture_cmd({list=>1}, $ospkg->sudo_cmd(), $querycmd, qw(search --quiet=2),
+        '^'.$args_ref->{pkg}.'$');
     return if not scalar @pkglist; # empty list means nothing found
     return $pkglist[-1]; # last of sorted list should be most recent version
 }
@@ -74,7 +75,7 @@ sub install
 
     # install the packages
     my $pkgcmd = $ospkg->sysenv("apt");
-    return $ospkg->run_cmd($pkgcmd, "install", "--yes", @packages);
+    return $ospkg->run_cmd($ospkg->sudo_cmd(), $pkgcmd, "install", "--yes", @packages);
 }
 
 # check if an OS package is installed locally
@@ -85,7 +86,8 @@ sub is_installed
 
     # check if package is installed
     my $querycmd = $ospkg->sysenv("dpkg-query");
-    my @pkglist = $ospkg->capture_cmd({list=>1}, $querycmd, '--show', '--showformat=\${package}\n', $args_ref->{pkg});
+    my @pkglist = $ospkg->capture_cmd({list=>1}, $ospkg->sudo_cmd(), $querycmd, '--show',
+        '--showformat=\${package}\n', $args_ref->{pkg});
     return (scalar @pkglist > 0) ? 1 : 0;
 }
 
@@ -98,11 +100,11 @@ sub is_installed
 
 =head1 NAME
 
-Sys::OsPackage::Driver::Debian - Debian.Ubuntu DEB packaging handler for Sys::OsPackage
+Sys::OsPackage::Driver::Debian - Debian/Ubuntu DEB packaging handler for Sys::OsPackage
 
 =head1 VERSION
 
-version 0.1.6
+version 0.3.0
 
 =head1 SYNOPSIS
 

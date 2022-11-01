@@ -1,0 +1,25 @@
+{
+   "amount" : "400",
+   "available_on" : "1386374400",
+   "created" : "1385814763",
+   "currency" : "usd",
+   "description" : "Charge for test@example.com",
+   "exchange_rate" : null,
+   "fee" : "42",
+   "fee_details" : [
+      {
+         "amount" : "42",
+         "application" : null,
+         "currency" : "usd",
+         "description" : "Stripe processing fees",
+         "type" : "stripe_fee"
+      }
+   ],
+   "id" : "txn_1032HU2eZvKYlo2CEPtcnUvl",
+   "net" : "358",
+   "object" : "balance_transaction",
+   "reporting_category" : "charge",
+   "source" : "ch_1032HU2eZvKYlo2C0FuZb3X7",
+   "status" : "available",
+   "type" : "charge"
+}

@@ -81,8 +81,15 @@ In general, this means anything that matches C</[_a-z]\w*/i>.
 
 I would like to reserve the namespace C<Devel::AssertOS::OSFeatures::*>.
 If you want to release a module that tells the user whether a particular
-feature is available (eg, whether POSIX shell redirection can be expected
-to work) then please discuss it with me first.
+OS feature is available (eg, whether POSIX shell redirection can be
+expected to work) then please discuss it with me first.
+
+=head1 HARDWARE CAPABILITIES
+
+I would like to reserve the namespace C<Devel::AssertOS::HWCapabilities::*>.
+If you want to release a module that tells the user whether a particular
+hardware feature is available (eg, whether you have 64 bit integers) then
+please discuss it with me first.
 
 =head1 ALIASES
 

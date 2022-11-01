@@ -33,6 +33,7 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
+            "Cwd" : "0",
             "List::Util" : "1.45",
             "Symbol" : "0",
             "mro" : "0"
@@ -40,6 +41,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v1.0.0",
-   "x_serialization_backend" : "JSON::PP version 4.08"
+   "version" : "v1.0.1",
+   "x_serialization_backend" : "JSON::PP version 4.12"
 }

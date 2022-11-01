@@ -59,4 +59,11 @@ like(query_gemini("$base/do/static/other"),
 like(query_gemini("$base/do/static/other/a.txt"),
      qr/^40/m, "Just files for known routes");
 
+# gemini://gemi.dev/gemlog/2022-02-10-robust-dir-defence.gmi
+like(query_gemini("$base/do/static/.."), qr/^40/m, "Directory traversal 1");
+like(query_gemini("$base/do/static//etc/hosts"), qr/^51/m, "Directory traversal 2");
+like(query_gemini("$base/do/static/%2Fetc%2Fhosts"), qr/^40/m, "Directory traversal 3");
+like(query_gemini("$base/do/static/%252Fetc%252Fhosts"), qr/^40/m, "Directory traversal 4");
+like(query_gemini("$base/do/static/~/.bashrc"), qr/^51/m, "Directory traversal 5");
+
 done_testing;

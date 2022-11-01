@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2022 -- leonerd@leonerd.org.uk
 
-package Feature::Compat::Class 0.01;
+package Feature::Compat::Class 0.03;
 
 use v5.14;
 use warnings;
@@ -78,9 +78,9 @@ sub import
    }
    else {
       require Object::Pad;
-      Object::Pad->VERSION( '0.66' );
+      Object::Pad->VERSION( '0.70' );
       Object::Pad->import(qw( class method field ADJUST ),
-         ':config(always_strict no_class_attrs no_field_attrs)',
+         ':config(always_strict only_class_attrs=isa no_field_attrs no_adjust_attrs)',
       );
    }
 }
@@ -103,8 +103,7 @@ the following notes may be of interest:
 
 See also L<Object::Pad/class>.
 
-Attributes are not supported. In particular, there is no ability to declare
-a superclass with C<:isa> nor any roles with C<:does>. The legacy subkeywords
+There is no ability to declare any roles with C<:does>. The legacy subkeywords
 for these are equally not supported.
 
 The C<:repr> attribute is also not supported; the default representation type
@@ -114,6 +113,31 @@ The C<:strict(params)> attribute is not available, but all constructed classes
 will behave as if the attribute had been declared. Every generated constructor
 will check its parameters for key names left unhandled by C<ADJUST> blocks,
 and throw an exception if any remain.
+
+The following class attributes are supported:
+
+=head3 :isa
+
+   :isa(CLASS)
+
+   :isa(CLASS CLASSVER)
+
+I<Since version 0.02.>
+
+Declares a superclass that this class extends. At most one superclass is
+supported.
+
+If the package providing the superclass does not exist, an attempt is made to
+load it by code equivalent to
+
+   require CLASS ();
+
+and thus it must either already exist, or be locatable via the usual C<@INC>
+mechanisms.
+
+An optional version check can also be supplied; it performs the equivalent of
+
+   BaseClass->VERSION( $ver )
 
 =head2 method
 
@@ -154,6 +178,9 @@ an C<ADJUST> block to initialise a field:
    ADJUST { ... }
 
 See also L<Object::Pad/ADJUST>.
+
+Attributes are not supported; in particular the C<:params> attribute of
+C<Object::Pad> v0.70.
 
 =head2 Other Keywords
 

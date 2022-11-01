@@ -2,7 +2,7 @@ package App::sslmaker;
 use strict;
 use warnings;
 
-use Carp qw(confess);
+use Carp         qw(confess);
 use Data::Dumper ();
 use Path::Tiny;
 use File::umask;
@@ -11,7 +11,7 @@ use constant DEBUG        => $ENV{SSLMAKER_DEBUG} || 0;
 use constant DEFAULT_BITS => $ENV{SSLMAKER_BITS}  || 4096;
 use constant DEFAULT_DAYS => $ENV{SSLMAKER_DAYS}  || 365;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 our $OPENSSL = $ENV{SSLMAKER_OPENSSL} || 'openssl';
 
 my @CONFIG_TEMPLATE_KEYS = qw(bits cert crl_days days home key);
@@ -29,13 +29,13 @@ my %DATA = do {
 
 # need to be defined up front
 sub openssl {
-  my $cb   = ref $_[-1] eq 'CODE' ? pop : sub { print STDERR $_[1] if DEBUG == 2 and length $_[1] };
+  my $cb   = ref $_[-1] eq 'CODE' ? pop   : sub { print STDERR $_[1] if DEBUG == 2 and length $_[1] };
   my $self = ref $_[0]            ? shift : __PACKAGE__;
   my $buf  = '';
 
   use IPC::Open3;
   use Symbol;
-  warn "\$ $OPENSSL @_\n" if DEBUG;
+  $self->_d("\$ $OPENSSL @_") if DEBUG;
   my $OUT = gensym;
   my $pid = open3(undef, $OUT, $OUT, $OPENSSL => @_);
 
@@ -56,8 +56,7 @@ sub make_cert {
   my $asset = $args->{cert} ? Path::Tiny->new($args->{cert}) : Path::Tiny->tempfile;
 
   local $UMASK = 0222;    # make files with mode 444
-  confess '"subject" is required'
-    unless my $subject = $self->_render_subject($self->subject, $args->{subject});
+  confess '"subject" is required' unless my $subject = $self->_render_subject($self->subject, $args->{subject});
   openssl qw(req -new -sha256 -x509 -extensions v3_ca),
     -passin => $self->_passphrase($args->{passphrase}),
     -days   => $args->{days} || DEFAULT_DAYS,
@@ -77,8 +76,7 @@ sub make_crl {
   openssl qw(ca -gencrl),
     -keyfile => $args->{key},
     -cert    => $args->{cert},
-    $args->{passphrase} ? (-passin => $self->_passphrase($args->{passphrase})) : (),
-    -out => $asset->path;
+    $args->{passphrase} ? (-passin => $self->_passphrase($args->{passphrase})) : (), -out => $asset->path;
 
   return $asset;
 }
@@ -89,10 +87,8 @@ sub make_csr {
 
   local $UMASK = 0277;    # make files with mode 400
 
-  confess '"subject" is required'
-    unless my $subject = $self->_render_subject($self->subject, $args->{subject});
-  openssl qw(req -new -sha256),
-    $args->{passphrase} ? (-passin => $self->_passphrase($args->{passphrase})) : (),
+  confess '"subject" is required' unless my $subject = $self->_render_subject($self->subject, $args->{subject});
+  openssl qw(req -new -sha256), $args->{passphrase} ? (-passin => $self->_passphrase($args->{passphrase})) : (),
     -key  => $args->{key},
     -days => $args->{days} || DEFAULT_DAYS,
     -out  => $asset->path,
@@ -113,11 +109,10 @@ sub make_directories {
 
   if ($args->{templates}) {
     local $UMASK = 0122;    # make files with mode 644
-    $self->render_to_file('crlnumber', $file, {}) unless -e ($file = $home->child('crlnumber'));
-    $self->render_to_file('index.txt', $file, {}) unless -e ($file = $home->child('index.txt'));
-    $self->render_to_file('index.txt.attr', $file, {})
-      unless -e ($file = $home->child('index.txt.attr'));
-    $self->render_to_file('serial', $file, {}) unless -e ($file = $home->child('serial'));
+    $self->render_to_file('crlnumber',      $file, {}) unless -e ($file = $home->child('crlnumber'));
+    $self->render_to_file('index.txt',      $file, {}) unless -e ($file = $home->child('index.txt'));
+    $self->render_to_file('index.txt.attr', $file, {}) unless -e ($file = $home->child('index.txt.attr'));
+    $self->render_to_file('serial',         $file, {}) unless -e ($file = $home->child('serial'));
   }
 
   return $args->{home};    # TBD, but will be true
@@ -222,6 +217,13 @@ sub _cat {
   return $dest;
 }
 
+sub _d {
+  return 0 unless DEBUG;
+  my ($self, $msg) = @_;
+  print STDERR "$msg\n";
+  return 0;
+}
+
 sub _home {
   my ($self, $args) = @_;
   return Path::Tiny->new($args->{home})              if exists $args->{home};
@@ -275,15 +277,13 @@ sub _render_subject {
   my %subject;
   for my $i (@_) {
     next unless $i;
-    warn qq(# [sslmaker] subject from @{[-r $i ? 'file' : 'data']} "$i"\n) if DEBUG == 2;
+    $self->_d(qq(# Subject from @{[-r $i ? 'file' : 'data']} "$i")) if DEBUG == 2;
     my $s = -r $i ? $self->_read_subject_from_cert($i) : $self->_parse_subject($i);
-    warn Data::Dumper->new([$s])->Indent(0)->Sortkeys(1)->Terse(1)->Useqq(1)->Dump, "\n"
-      if DEBUG == 2;
+    map { $self->_d(sprintf '- %-12s %s', "$_:", "$s->{$_}") } sort keys %$s if DEBUG == 2;
     $subject{$_} = $s->{$_} for keys %$s;
   }
 
-  return join '/', '',
-    map {"$_=$subject{$_}"} grep { defined $subject{$_} } qw(C ST L O OU CN emailAddress);
+  return join '/', '', map {"$_=$subject{$_}"} grep { defined $subject{$_} } qw(C ST L O OU CN emailAddress);
 }
 
 # used in script/sslmaker
@@ -362,15 +362,11 @@ library.
   $ sslmaker revoke /etc/ssl/sslmaker/newcerts/1000.pem
 
   # 4. Utility commands
-  # 4a. Show certificate details
-  $ sslmaker show <infile>
-  $ sslmaker show /etc/ssl/sslmaker/newcerts/1000.pem
-
-  # 4b. Create dhparam file
+  # 4a. Create dhparam file
   $ sslmaker dhparam
   $ sslmaker dhparam /etc/ssl/sslmaker/dhparam.pem 2048
 
-  # 4c. Show the manual for App::sslmaker
+  # 4b. Show the manual for App::sslmaker
   $ sslmaker man
 
 =head1 ENVIRONMENT VARIABLES

@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
     "Protocol::WebSocket::Client" => 0,
     "File::Slurp" => 0,
   },
-  "VERSION" => "0.05",
+  "VERSION" => "0.6",
   "test" => {
     "TESTS" => "t/*.t"
   }

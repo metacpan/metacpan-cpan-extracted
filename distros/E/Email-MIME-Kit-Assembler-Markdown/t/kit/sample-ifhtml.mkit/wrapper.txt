@@ -1,0 +1,6 @@
+THE FOLLOWING IS NOT A PAID ENDORSEMENT
+
+<!-- type: [% part_type %] -->
+[% wrapped_content %]
+
+THANK YOU FOR READING OUR PAID ENDORSEMENT

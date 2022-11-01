@@ -1,0 +1,42 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.83.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA256 4fe37fb5970a6bc83df6135e7e6b395cada863b406b10fdce6cc24a7ca1db476 CONTRIBUTING
+SHA256 34916434ae2c625df71975552ba23b196bc6fd4c74238fd616f8749edd4416f1 Changes
+SHA256 6d5a67d82e1fe419bb5243f4cd11f2ca4ad8039eb400cbd60f6e17c6b1dc737c KEY.asc
+SHA256 da96bfd19722abdc44493c5ead0258528bf110aecb199cbe2e08f41643265794 MANIFEST
+SHA256 fb792d41f986b456c85b16f0ba3c616862b326e28289d8ea8ccb58839c080270 META.json
+SHA256 4962285d19944e4895eb2f576e5d3a7fb99123e4ffbbf33797144856ca7b6d01 META.yml
+SHA256 ea9ee539b8cf777fe6bb57c18ef484e419a58129ffb0c6526fbe15294ebd64be Makefile.PL
+SHA256 277852179dafebd05dd35a847c87a90b5d5921f13bc6646efb4c81beb57984ae README
+SHA256 ecc6296be861d36ce7481de604b817a1ee82713c1a8c1a2d158f6daf1543029b lib/Parse/H.pm
+SHA256 e752a87090122c75836b3921db5ff0e64249bee5922af2bd9cfbabcdef9859d8 t/00-load.t
+SHA256 5ef1816c6425ffd8cecbf983c23ab76787be9beff9ad300926ac2dd377366aa5 t/boilerplate.t
+SHA256 4bd4f0f77fc3a6672ff6540bb1f9aec720546c421a1e800799e889c850825dd6 t/pod-coverage.t
+SHA256 505f0d5c68824b3d02df44fa02031c9a379939327af4ef3565166d713cd24f70 t/pod.t
+SHA256 ddb1da722e142c7562eee2a0ac9834ee2094a5439055c020e9bdd8742728978a t/test.h
+SHA256 6a3c68ad1fd084b0d574364d56ede5b6fa63eba1c7b4651a4e1d3f5362cbaf63 t/z_parse_file.t
+-----BEGIN PGP SIGNATURE-----
+
+iQFEBAEBCgAuFiEEoX6/UZuNVfQ0cpl7/NuiNmeGVuoFAmNgJ5cQHGJvZ2Ryb0Bj
+cGFuLm9yZwAKCRD826I2Z4ZW6gOuB/9f5hxTfjAY8/3fmtfMmt+i/fItYTjLsC9Q
+MQA0CutUR5JMn4c6kfYyBuXv/NRDDHAlhS4oHPC+RAfn4KacY/AvyhQ+RW9tNezm
+dqmQoo9gOiPQ7nXhCsQw4YdjXRIBwPAXp6rIE5MjdX6PjG15D+2OpVlLpr0YNeyQ
+guRBXmNQ3QZwvpnQOyFElnDmomxQe7tNLSNYlGGj/qBYwxPHh5nfJs3ou9WCptJk
+Opp7M5IH/zxgNImaydK64UZRi7whuPYvIM4ksEL2djtTzh7aLhx9mjJxNHgRWXy4
+8wugMN0y1N4GK2Z4PSco2B3rpW7XQeYxgVE+RF0SR2SqtfZw2VRW
+=woKn
+-----END PGP SIGNATURE-----

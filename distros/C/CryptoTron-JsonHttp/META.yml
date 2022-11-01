@@ -1,0 +1,28 @@
+---
+abstract: 'Perl extension for use of with the Tron blockchain'
+author:
+  - 'Dr. Peter Netz <ztenretep@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: CryptoTron-JsonHttp
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::Basename: '2.85'
+  JSON::PP: '4.11'
+  LWP::UserAgent: '6.43'
+  POSIX: '1.88'
+  Try::Catch: v1.1.0
+  URI: '1.76'
+version: '0.07'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

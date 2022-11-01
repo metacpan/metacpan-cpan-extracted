@@ -1,0 +1,51 @@
+---
+abstract: 'Handles interpolation on yield curves for interest rates and dividends'
+author:
+  - 'DERIV <DERIV@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::CheckDeps: '0.010'
+  Test::More: '0.94'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '7.64'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Finance-YieldCurve
+no_index:
+  directory:
+    - eg
+    - share
+    - shares
+    - t
+    - xt
+provides:
+  Finance::YieldCurve:
+    file: lib/Finance/YieldCurve.pm
+    version: '0.001'
+requires:
+  Math::Function::Interpolator: '0'
+  Moo: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/binary-com/perl-Finance-YieldCurve/issues
+  homepage: https://github.com/binary-com/perl-Finance-YieldCurve
+  repository: https://github.com/binary-com/perl-Finance-YieldCurve.git
+version: '0.001'
+x_authority: cpan:DERIV
+x_contributors:
+  - 'Tom Molesworth <tom@binary.com>'
+  - 'chylli-binary <chylli@binary.com>'
+  - 'Jean-Yves Sireau <jy@binary.com>'
+  - 'Zak B. Elep <zakame@zakame.net>'
+x_generated_by_perl: v5.26.2
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -1,0 +1,15 @@
+Revision history for Perl extension CryptoTron.
+
+0.09   2022-11-01
+        - Module CreateAccount.pm added.
+
+0.08   2022-11-01
+        - Typo fixing. Bug fixing.
+
+0.02 - 0.07 2022-10-31
+        - Changes in code. Changes in documentation.
+
+0.01  Sat Oct 29 09:38:42 2022
+	- original version; created by h2xs 1.23 with options
+		-AX --skip-exporter --use-new-tests -n CryptoTron -b 5.8.9
+

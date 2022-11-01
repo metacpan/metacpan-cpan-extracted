@@ -82,19 +82,19 @@
    "provides" : {
       "App::Docmake" : {
          "file" : "lib/App/Docmake.pm",
-         "version" : "0.1004"
+         "version" : "0.1100"
       },
       "App::XML::DocBook::Builder" : {
          "file" : "lib/App/XML/DocBook/Builder.pm",
-         "version" : "0.1004"
+         "version" : "0.1100"
       },
       "App::XML::DocBook::Docmake" : {
          "file" : "lib/App/XML/DocBook/Docmake.pm",
-         "version" : "0.1004"
+         "version" : "0.1100"
       },
       "App::XML::DocBook::Docmake::CmdComponent" : {
          "file" : "lib/App/XML/DocBook/Docmake/CmdComponent.pm",
-         "version" : "0.1004"
+         "version" : "0.1100"
       }
    },
    "release_status" : "stable",
@@ -109,7 +109,7 @@
          "web" : "https://github.com/shlomif/docmake"
       }
    },
-   "version" : "0.1004",
+   "version" : "0.1100",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034001"

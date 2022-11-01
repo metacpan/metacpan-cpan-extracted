@@ -1,4 +1,4 @@
-# $Id: TestConfig.pm 71 2019-01-15 01:46:34Z stro $
+# $Id: TestConfig.pm 85 2022-10-29 05:44:36Z stro $
 
 use Cwd;
 my $cwd   = cwd;
@@ -51,6 +51,7 @@ $CPAN::Config = {
   #'pager' => q[less],
   'prefer_installer'     => q[MB],
   'prerequisites_policy' => q[follow],
+  'pushy_https'          => q[0],
   'scan_cache'           => q[atstart],
 
   #'shell' => q[/usr/bin/zsh],

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Price.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/05/15
-## Modified 2020/05/15
+## Modified 2022/10/29
 ## 
 ##----------------------------------------------------------------------------
 ## "A list of up to 5 attributes that each SKU can provide values for (e.g., ["color", "size"]). Only applicable to products of type=good."
@@ -12,9 +12,14 @@ package Net::API::Stripe::Price;
 BEGIN
 {
     use strict;
+    use warnings;
     use parent qw( Net::API::Stripe::Generic );
-    our( $VERSION ) = 'v0.1.0';
+    use vars qw( $VERSION );
+    our( $VERSION ) = 'v0.2.0';
 };
+
+use strict;
+use warnings;
 
 sub id { return( shift->_set_get_scalar( 'id', @_ ) ); }
 
@@ -24,9 +29,18 @@ sub active { return( shift->_set_get_boolean( 'active', @_ ) ); }
 
 sub billing_scheme { return( shift->_set_get_scalar( 'billing_scheme', @_ ) ); }
 
-sub created { shift->_set_get_datetime( 'created', @_ ); }
+sub created { return( shift->_set_get_datetime( 'created', @_ ) ); }
 
 sub currency { return( shift->_set_get_scalar( 'currency', @_ ) ); }
+
+sub currency_options { return( shift->_set_get_object( 'currency_options', 'Net::API::Stripe::Price', @_ ) ); }
+
+sub custom_unit_amount { return( shift->_set_get_class( 'custom_unit_amount',
+{
+  maximum => { type => "number" },
+  minimum => { type => "number" },
+  preset  => { type => "number" },
+}, @_ ) ); }
 
 sub deleted { return( shift->_set_get_boolean( 'deleted', @_ ) ); }
 
@@ -50,6 +64,8 @@ sub recurring { return( shift->_set_get_class( 'recurring',
     trial_period_days   => { type => 'number' },
     usage_type          => { type => 'string' },
 }) ); }
+
+sub tax_behavior { return( shift->_set_get_scalar( 'tax_behavior', @_ ) ); }
 
 sub tiers { return( shift->_set_get_class_array( 'tiers', 
 {
@@ -107,7 +123,7 @@ See documentation in L<Net::API::Stripe> for example to make api calls to Stripe
 
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 
@@ -121,79 +137,101 @@ Documentation on Products for use with Subscriptions can be found at L<Subscript
 
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>( %ARG )
+=head2 new( %ARG )
 
 Creates a new L<Net::API::Stripe::Price> object.
 
-=back
-
 =head1 METHODS
 
-=over 4
-
-=item B<id> string
+=head2 id string
 
 Unique identifier for the object.
 
-=item B<object> string, value is "price"
+=head2 object string, value is "price"
 
 String representing the object’s type. Objects of the same type share the same value.
 
-=item B<active> boolean
+=head2 active boolean
 
 Whether the price can be used for new purchases.
 
-=item B<billing_scheme> string
+=head2 billing_scheme string
 
 Describes how to compute the price per period. Either I<per_unit> or I<tiered>. I≤per_unit> indicates that the fixed amount (specified in I<unit_amount> or I<unit_amount_decimal>) will be charged per unit in C<quantity> (for prices with C<usage_type=licensed>), or per unit of total usage (for prices with C<usage_type=metered>). I<tiered> indicates that the unit pricing will be computed using a tiering strategy as defined using the I<tiers> and I<tiers_mode> attributes.
 
-=item B<created> timestamp
+=head2 created timestamp
 
 Time at which the object was created. Measured in seconds since the Unix epoch.
 
-=item B<currency> string
+=head2 currency string
 
 Three-letter L<ISO currency code|https://www.iso.org/iso-4217-currency-codes.html>, in lowercase. Must be a supported L<currency|https://stripe.com/docs/currencies>.
 
-=item B<deleted> boolean
+=head2 currency_options object
+
+Prices defined in each available currency option. Each key must be a three-letter L<ISO currency code|https://www.iso.org/iso-4217-currency-codes.html> and a L<supported currency|https://stripe.com/docs/currencies>. For example, to get your price in C<eur>, fetch the value of the C<eur> key in C<currency_options>.
+
+This is a L<Net::API::Stripe::Price> object.
+
+=head2 custom_unit_amount hash
+
+When set, provides configuration for the amount to be adjusted by the customer during Checkout Sessions and Payment Links.
+
+It has the following properties:
+
+=over 4
+
+=item C<maximum> nonnegative_integer
+
+The maximum unit amount the customer can specify for this item.
+
+=item C<minimum> nonnegative_integer
+
+The minimum unit amount the customer can specify for this item. Must be at least the minimum charge amount.
+
+=item C<preset> nonnegative_integer
+
+The starting unit amount which can be updated by the customer.
+
+=back
+
+=head2 deleted boolean
 
 Set to true when the price has been deleted.
 
-=item B<livemode> boolean
+=head2 livemode boolean
 
 Has the value true if the object exists in live mode or the value false if the object exists in test mode.
 
-=item B<lookup_key> string
+=head2 lookup_key string
 
 A lookup key used to retrieve prices dynamically from a static string.
 
-=item B<metadata> hash
+=head2 metadata hash
 
 Set of key-value pairs that you can attach to an object. This can be useful for storing additional information about the object in a structured format.
 
-=item B<nickname> string
+=head2 nickname string
 
 A brief description of the plan, hidden from customers.
 
-=item B<product> string (expandable)
+=head2 product string (expandable)
 
 The ID of the product this price is associated with. When expanded, this is a L<Net::API::Stripe::Product> object.
 
-=item B<product_data> hash
+=head2 product_data hash
 
 These fields can be used to create a new product that this price will belong to. This is a L<Net::API::Stripe::Product> object
 
 This is used when creating a Stripe price object, and to create a product in the process as well.
 
-=item B<recurring> hash
+=head2 recurring hash
 
 The recurring components of a price such as interval and usage_type.
 
 This has the following properties, that look very much like a L<Net::API::Stripe::Billing::Plan>:
 
-=over 8
+=over 4
 
 =item I<interval>
 
@@ -217,13 +255,17 @@ Configures how the quantity per period should be determined. Can be either C<met
 
 =back
 
-=item B<tiers> hash
+=head2 tax_behavior string
+
+Specifies whether the price is considered inclusive of taxes or exclusive of taxes. One of C<inclusive>, C<exclusive>, or C<unspecified>. Once specified as either C<inclusive> or C<exclusive>, it cannot be changed.
+
+=head2 tiers hash
 
 Each element represents a pricing tier. This parameter requires C<billing_scheme> to be set to C<tiered>. See also the documentation for C<billing_scheme>.
 
 The possible properties are:
 
-=over 8
+=over 4
 
 =item I<up_to> number
 
@@ -247,17 +289,17 @@ Same as C≤unit_amount>, but accepts a decimal value with at most 12 decimal pl
 
 =back
 
-=item B<tiers_mode> string
+=head2 tiers_mode string
 
 Defines if the tiering price should be C<graduated> or C<volume> based. In C≤volume>-based tiering, the maximum quantity within a period determines the per unit price, in C<graduated> tiering pricing can successively change as the quantity grows.
 
-=item B<transform_quantity> hash
+=head2 transform_quantity hash
 
 Apply a transformation to the reported usage or set quantity before computing the billed price. Cannot be combined with C<tiers>.
 
 Possible properties are:
 
-=over 8
+=over 4
 
 =item I<divide_by> number
 
@@ -269,19 +311,17 @@ After division, either round the result C<up> or C<down>.
 
 =back
 
-=item B<type> string
+=head2 type string
 
 One of C<one_time> or C<recurring> depending on whether the price is for a one-time purchase or a recurring (subscription) purchase.
 
-=item B<unit_amount> number
+=head2 unit_amount number
 
 The unit amount in JPY to be charged, represented as a whole integer if possible.
 
-=item B<unit_amount_decimal> number
+=head2 unit_amount_decimal number
 
 The unit amount in JPY to be charged, represented as a decimal string with at most 12 decimal places.
-
-=back
 
 =head1 API SAMPLE
 

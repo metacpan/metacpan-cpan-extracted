@@ -1,5 +1,21 @@
 #!perl
 
+# vim: ts=4 sts=4 sw=4 et: syntax=perl
+#
+# Copyright (c) 2017-2022 Sven Kirmess
+#
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
 use 5.006;
 use strict;
 use warnings;
@@ -101,7 +117,20 @@ sub _configure_root {
 
     my $sub_src = _create_submodule();
     push @files, path($root_dir)->child('s');
-    $git->run( 'submodule', 'add', $sub_src, 's' )->get;
+    if ( $git->run( 'submodule', 'add', $sub_src, 's' )->await->is_failed ) {
+
+        # "protocol.file.allow=always" lets the submodule command clone from
+        # a local directory. It's necessary as of Git 2.38.1, where the
+        # default was changed to "user" in response to CVE-2022-39253.
+        # It isn't a concern here where all repositories involved are
+        # trusted. For more information, see:
+        # https://vielmetti.typepad.com/logbook/2022/10/git-security-fixes-lead-to-fatal-transport-file-not-allowed-error-in-ci-systems-cve-2022-39253.html
+        # https://github.com/microsoft/go-infra/pull/71/files
+        # https://github.blog/2022-10-18-git-security-vulnerabilities-announced/#cve-2022-39253
+        # https://bugs.launchpad.net/ubuntu/+source/git/+bug/1993586
+        # https://git-scm.com/docs/git-config#Documentation/git-config.txt-protocolallow
+        $git->run( '-c', 'protocol.file.allow=always', 'submodule', 'add', $sub_src, 's' )->get;
+    }
     $dir_perm = ( stat $files[-1] )[2] & 07777;
 
     is( ( stat $files[0] )[2] & 07777, _p(0755),  sprintf q{File '%s' created correctly},      $files[0]->relative($root_dir) );
@@ -328,5 +357,3 @@ sub _test_with_config_scripts_unchanged {
 
     return;
 }
-
-# vim: ts=4 sts=4 sw=4 et: syntax=perl

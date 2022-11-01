@@ -3,17 +3,16 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Access to the AcousticBrainz API
 
-our $VERSION = '0.0601';
+our $VERSION = '0.0602';
 
-use Moo;
 use strictures 2;
-use namespace::clean;
-
-use Carp;
-use Mojo::UserAgent;
-use Mojo::JSON qw( decode_json );
-use Mojo::URL;
+use Carp qw(croak);
+use Mojo::UserAgent ();
+use Mojo::JSON qw(decode_json);
+use Mojo::URL ();
+use Moo;
 use Try::Tiny;
+use namespace::clean;
 
 
 has base => (
@@ -82,7 +81,7 @@ WebService::AcousticBrainz - Access to the AcousticBrainz API
 
 =head1 VERSION
 
-version 0.0601
+version 0.0602
 
 =head1 SYNOPSIS
 

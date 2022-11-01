@@ -6,14 +6,14 @@ our $AUTHORITY = 'cpan:GENE';
 use strict;
 use warnings;
 
-our $VERSION = '0.0806';
+our $VERSION = '0.0807';
 
-use Bit::Vector;
-use DBI;
-use List::PowerSet qw( powerset_lazy );
-use IO::File;
+use Bit::Vector ();
+use DBI ();
+use List::PowerSet qw(powerset_lazy);
+use IO::File ();
 
-use Memoize;
+use Memoize qw(memoize);
 memoize('_does_not_overlap');
 memoize('power');
 memoize('_reconstruct');
@@ -420,7 +420,7 @@ Lingua::Word::Parser - Parse a word into scored known and unknown parts
 
 =head1 VERSION
 
-version 0.0806
+version 0.0807
 
 =head1 SYNOPSIS
 
@@ -545,7 +545,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Gene Boggs.
+This software is copyright (c) 2022 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

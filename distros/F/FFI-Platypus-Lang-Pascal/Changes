@@ -1,5 +1,13 @@
 Revision history for Perl module FFI::Platypus::Lang::Pascal
 
+0.11 2022-10-31 09:27:36 -0600
+  - Removed unused symbols from test unit (gh#18, gh#19 bbrtj++)
+
+0.10 2022-10-26 05:58:37 -0600
+  - Fix bug where FFI::Build::File::Pascal would sometimes
+    exit on failure instead of die, which would throw away
+    any diagnostics when running in dev / prove mode (gh#21)
+
 0.09 2020-07-12 09:29:33 -0600
   - Added File::chdir as a configure prereq
     (this was used, but undeclared in the previous two releases)

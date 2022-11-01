@@ -250,6 +250,53 @@ you can prepend their names with a hyphen:
 		-writer => 1,
 	);
 
+=head1 CUSTOM SHORTCUTS
+
+It is possible to introduce custom shortcuts by calling C<add_shortcut>:
+
+	use Mooish::AttributeBuilder;
+	use Data::Dumper;
+
+	Mooish::AttributeBuilder::add_shortcut(sub {
+		my ($name, %args) = @_;
+
+		print Dumper(\%args);
+
+		return %args;
+	});
+
+Each new option filter must be an anonymous subroutine that accepts
+C<($name, %args)> and returns new value for C<%args>. C<$name> will contain
+full name of the attribute (which can be an array reference), while C<%args>
+are attribute options plus a C<"_type"> key, which is the name of the helper,
+e.g. C<"param">.
+
+Custom shortcuts are called before built in shortcuts described in
+L</SHORTCUTS>, in order of declaration. Make sure not to call C<add_shortcut>
+repeatedly with the same sub, as the module will not run any checks to prevent
+duplication.
+
+Example, making fields C<rw> by default:
+
+	Mooish::AttributeBuilder::add_shortcut(sub {
+		my ($name, %args) = @_;
+
+		if ($args{_type} eq 'field') {
+			$args{is} = 'rw';
+		}
+
+		return %args;
+	});
+
+=head2 For module authors
+
+If you want to use Mooish::AttributeBuilder in your module, these custom
+filters are undesirable. You want to be sure your module works regardless of
+environment. In CPAN modules the module should be imported with the C<-standard>
+flag, which will disable all custom behavior.
+
+	use Mooish::AttributeBuilder -standard;
+
 =head1 CAVEATS
 
 =over

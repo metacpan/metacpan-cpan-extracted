@@ -1,0 +1,36 @@
+pEFL Perl bindings for the Enlightenment Foundation Libraries
+================
+
+Perl bindings for the Enlightenment Foundation Libraries (EFL). 
+The module gives a nice object-oriented interface. Apart from that 
+the API is deliberatly kept close to the Elementary API. The perl 
+method names generally remove the prefix at the beginning of the c 
+functions. Therefore applying the C documentation should be no problem. 
+
+For the documentation in detail please study the single modules and the 
+documentation at https://www.enlightenment.org/docs/start
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+efl-dev
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2021 by Maximilian Lika
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.28.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -212,7 +212,10 @@ int32_t SPVM__Sys__Time__times(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__Time__clock_nanosleep(SPVM_ENV* env, SPVM_VALUE* stack) {
 #ifdef __APPLE__
-  env->die(env, stack, "clock_nanosleep is not supported on this system", FILE_NAME, __LINE__);
+  env->die(env, stack, "clock_nanosleep is not supported on this system(__APPLE__)", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#elif __FreeBSD__ && !(__FreeBSD__ >= 13)
+  env->die(env, stack, "clock_nanosleep is not supported on this system(__FreeBSD__ && !(__FreeBSD__ >= 13))", FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
   (void)env;

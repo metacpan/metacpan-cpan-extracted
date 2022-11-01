@@ -1,3 +1,7 @@
+0.08 2022-10-29T17:07:43+02:00
+ - Add script_js() and script_js_src() methods.
+ - Set preserved for style element in Tags default.
+
 0.07 2022-09-12T18:53:17+02:00
  - Add better checks for css() and tags() accessors.
  - Rename examples to better names.

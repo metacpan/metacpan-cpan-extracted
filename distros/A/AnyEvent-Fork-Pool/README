@@ -46,10 +46,10 @@ DESCRIPTION
     AnyEvent::Fork::RPC to create a load-balanced pool of processes that
     handles jobs.
 
-    Understanding of AnyEvent::Fork is helpful but not critical to be able
-    to use this module, but a thorough understanding of AnyEvent::Fork::RPC
-    is, as it defines the actual API that needs to be implemented in the
-    worker processes.
+    Understanding AnyEvent::Fork is helpful but not required to use this
+    module, but a thorough understanding of AnyEvent::Fork::RPC is, as it
+    defines the actual API that needs to be implemented in the worker
+    processes.
 
 PARENT USAGE
     To create a pool, you first have to create a AnyEvent::Fork object -

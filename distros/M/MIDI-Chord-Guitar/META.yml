@@ -38,7 +38,7 @@ requires:
 resources:
   homepage: https://github.com/ology/MIDI-Chord-Guitar
   repository: https://github.com/ology/MIDI-Chord-Guitar.git
-version: '0.0704'
+version: '0.0705'
 x_Dist_Zilla:
   perl:
     version: '5.032001'

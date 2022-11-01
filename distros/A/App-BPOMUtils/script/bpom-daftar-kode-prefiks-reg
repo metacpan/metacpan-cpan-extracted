@@ -1,7 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/BPOMUtils/bpom_list_reg_code_prefixes
-# and generated automatically using Perinci::CmdLine::Gen version 0.501
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
 use strict;
@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-12'; # DATE
+our $DATE = '2022-11-01'; # DATE
 our $DIST = 'App-BPOMUtils'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/BPOMUtils/bpom_list_reg_code_prefixes",
@@ -40,9 +40,13 @@ bpom-daftar-kode-prefiks-reg - List known alphabetical prefixes in BPOM register
 
 =head1 VERSION
 
-This document describes version 0.007 of bpom-daftar-kode-prefiks-reg (from Perl distribution App-BPOMUtils), released on 2022-10-12.
+This document describes version 0.012 of bpom-daftar-kode-prefiks-reg (from Perl distribution App-BPOMUtils), released on 2022-11-01.
 
 =head1 SYNOPSIS
+
+B<bpom-daftar-kode-prefiks-reg> L<--help|/"--help, -h, -v"> (or L<-h|/"--help, -h, -v">, L<-?|/"--help, -h, -v">)
+
+B<bpom-daftar-kode-prefiks-reg> L<--version|/"--version, -v"> (or L<-v|/"--version, -v">)
 
 B<bpom-daftar-kode-prefiks-reg> [L<--code-contains|/"--code-contains=s">=I<str>] [(L<--code-in|/"--code-in=s@">=I<str>)+|L<--code-in-json|/"--code-in=s@">=I<json>] [L<--code-is|/"--code-is=s">=I<str>] [L<--code-isnt|/"--code-isnt=s">=I<str>] [L<--code-max|/"--code-max=s">=I<str>] [L<--code-min|/"--code-min=s">=I<str>] [L<--code-not-contains|/"--code-not-contains=s">=I<str>] [(L<--code-not-in|/"--code-not-in=s@">=I<str>)+|L<--code-not-in-json|/"--code-not-in=s@">=I<json>] [L<--code-xmax|/"--code-xmax=s">=I<str>] [L<--code-xmin|/"--code-xmin=s">=I<str>] [L<--code|/"--code=s">=I<str>] [L<--debug|/"--debug">|L<--log-level|/"--log-level=s">=I<level>|L<--quiet|/"--quiet">|L<--trace|/"--trace">|L<--verbose|/"--verbose">] [L<--detail|/"--detail, -l">|L<-l|/"--detail, -l">|L<--no-detail|/"--detail, -l">|L<--nodetail|/"--detail, -l">] [L<--division-contains|/"--division-contains=s">=I<str>] [(L<--division-in|/"--division-in=s@">=I<str>)+|L<--division-in-json|/"--division-in=s@">=I<json>] [L<--division-is|/"--division-is=s">=I<str>] [L<--division-isnt|/"--division-isnt=s">=I<str>] [L<--division-max|/"--division-max=s">=I<str>] [L<--division-min|/"--division-min=s">=I<str>] [L<--division-not-contains|/"--division-not-contains=s">=I<str>] [(L<--division-not-in|/"--division-not-in=s@">=I<str>)+|L<--division-not-in-json|/"--division-not-in=s@">=I<json>] [L<--division-xmax|/"--division-xmax=s">=I<str>] [L<--division-xmin|/"--division-xmin=s">=I<str>] [L<--division|/"--division=s">=I<str>] [(L<--exclude-field|/"--exclude-fields-json=s">=I<str>)+|L<--exclude-fields-json|/"--exclude-fields-json=s">=I<json>] [(L<--field|/"--fields-json=s">=I<str>)+|L<--fields-json|/"--fields-json=s">=I<json>] [L<--format|/"--format=s">=I<name>|L<--json|/"--json">] [L<--(no)naked-res|/"--naked-res">] [L<--page-result|/"--page-result">[=I<program>]|L<--view-result|/"--view-result">[=I<program>]] [L<--random|/"--random">|L<--no-random|/"--random">|L<--norandom|/"--random">] [L<--result-limit|/"--result-limit=s">=I<int>] [L<--result-start|/"--result-start=s">=I<int>] [(L<--sort|/"--sort=s@">=I<str>)+|L<--sort-json|/"--sort=s@">=I<json>] [L<--summary-eng-contains|/"--summary-eng-contains=s">=I<str>] [(L<--summary-eng-in|/"--summary-eng-in=s@">=I<str>)+|L<--summary-eng-in-json|/"--summary-eng-in=s@">=I<json>] [L<--summary-eng-is|/"--summary-eng-is=s">=I<str>] [L<--summary-eng-isnt|/"--summary-eng-isnt=s">=I<str>] [L<--summary-eng-max|/"--summary-eng-max=s">=I<str>] [L<--summary-eng-min|/"--summary-eng-min=s">=I<str>] [L<--summary-eng-not-contains|/"--summary-eng-not-contains=s">=I<str>] [(L<--summary-eng-not-in|/"--summary-eng-not-in=s@">=I<str>)+|L<--summary-eng-not-in-json|/"--summary-eng-not-in=s@">=I<json>] [L<--summary-eng-xmax|/"--summary-eng-xmax=s">=I<str>] [L<--summary-eng-xmin|/"--summary-eng-xmin=s">=I<str>] [L<--summary-eng|/"--summary-eng=s">=I<str>] [L<--summary-ind-contains|/"--summary-ind-contains=s">=I<str>] [(L<--summary-ind-in|/"--summary-ind-in=s@">=I<str>)+|L<--summary-ind-in-json|/"--summary-ind-in=s@">=I<json>] [L<--summary-ind-is|/"--summary-ind-is=s">=I<str>] [L<--summary-ind-isnt|/"--summary-ind-isnt=s">=I<str>] [L<--summary-ind-max|/"--summary-ind-max=s">=I<str>] [L<--summary-ind-min|/"--summary-ind-min=s">=I<str>] [L<--summary-ind-not-contains|/"--summary-ind-not-contains=s">=I<str>] [(L<--summary-ind-not-in|/"--summary-ind-not-in=s@">=I<str>)+|L<--summary-ind-not-in-json|/"--summary-ind-not-in=s@">=I<json>] [L<--summary-ind-xmax|/"--summary-ind-xmax=s">=I<str>] [L<--summary-ind-xmin|/"--summary-ind-xmin=s">=I<str>] [L<--summary-ind|/"--summary-ind=s">=I<str>] [L<--with-field-names|/"--with-field-names">|L<--without-field-names|/"--with-field-names">] -- [L<query|/"--query=s, -q">]
 

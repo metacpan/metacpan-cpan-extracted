@@ -10,6 +10,7 @@ CLASS HIERARCHY
 
 SYNOPSIS
      use Curses::UI;
+
      my $win = $cui->add('window_id', 'Window');
      my $number = $win->add(
              'mynum', 'Curses::UI::Number',
@@ -60,11 +61,9 @@ WIDGET-SPECIFIC METHODS
              Returns number (0 - 9).
 
 EXAMPLE1
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Curses::UI;
 
      # Object.
@@ -93,11 +92,9 @@ EXAMPLE1
      # ██████
 
 EXAMPLE2
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Curses::UI;
 
      # Object.
@@ -146,27 +143,29 @@ EXAMPLE2
      # └──────┘
 
 DEPENDENCIES
-    Curses::UI::Common, Curses::UI::Label, Curses::UI::Widget, Encode.
+    Curses::UI::Common, Curses::UI::Label, Curses::UI::Widget,
+    Unicode::UTF8.
 
 SEE ALSO
     Task::Curses::UI
         Install the Curses::UI modules.
 
 REPOSITORY
-    <https://github.com/tupinek/Curses-UI-Number>
+    <https://github.com/michal-josef-spacek/Curses-UI-Number>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2014-2015 Michal Špaček
-     BSD 2-Clause License
+    © 2014-2015 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 DEDICATION
     To Czech Perl Workshop 2014 and their organizers.
 
 VERSION
-    0.06
+    0.07
 

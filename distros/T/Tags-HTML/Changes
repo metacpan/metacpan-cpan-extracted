@@ -1,3 +1,7 @@
+0.06 2022-10-25T22:07:12+02:00
+ - Add _cleanup() and _init() methods to handle initialization and cleanup
+   for data used by object.
+
 0.05 2022-09-10T12:30:41+02:00
  - Add example to doc (without css).
  - Rename example to better name.

@@ -13,6 +13,7 @@ CLASS HIERARCHY
 
 SYNOPSIS
      use Curses::UI;
+
      my $win = $cui->add('window_id', 'Window');
      my $time = $win->add(
              'mynum', 'Curses::UI::Time',
@@ -81,11 +82,9 @@ WIDGET-SPECIFIC METHODS
              Returns time in seconds.
 
 EXAMPLE1
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Curses::UI;
 
      # Object.
@@ -114,11 +113,9 @@ EXAMPLE1
      # ██████ ██████      ██████     ██
 
 EXAMPLE2
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Curses::UI;
 
      # Object.
@@ -164,11 +161,9 @@ EXAMPLE2
      # └────────────────────────────────────────────────────┘
 
 EXAMPLE3
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Curses::UI;
 
      # Object.
@@ -218,23 +213,24 @@ EXAMPLE3
 
 DEPENDENCIES
     Curses, Curses::UI::Common, Curses::UI::Label, Curses::UI::Number,
-    Curses::UI::Widget, Encode, Readonly.
+    Curses::UI::Widget, Readonly, Unicode::UTF8.
 
 SEE ALSO
     Task::Curses::UI
         Install the Curses::UI modules.
 
 REPOSITORY
-    <https://github.com/tupinek/Curses-UI-Time>
+    <https://github.com/michal-josef-spacek/Curses-UI-Time>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2014-2015 Michal Špaček
-     BSD 2-Clause License
+    © 2014-2020 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 DEDICATION
     To Czech Perl Workshop 2014 and their organizers.
@@ -242,5 +238,5 @@ DEDICATION
     tty-clock program.
 
 VERSION
-    0.05
+    0.06
 

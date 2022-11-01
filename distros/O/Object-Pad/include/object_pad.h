@@ -101,7 +101,7 @@ enum {
   PADIX_EMBEDDING = 3,
 
   /* during initfields */
-  PADIX_INITFIELDS_PARAMS = 4,
+  PADIX_PARAMS = 4,
 };
 
 /* Function prototypes */

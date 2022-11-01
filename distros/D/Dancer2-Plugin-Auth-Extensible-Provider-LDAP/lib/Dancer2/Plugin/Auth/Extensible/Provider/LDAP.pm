@@ -8,7 +8,7 @@ use Moo;
 with "Dancer2::Plugin::Auth::Extensible::Role::Provider";
 use namespace::clean;
 
-our $VERSION = '0.705';
+our $VERSION = '0.706';
 
 =head1 NAME 
 
@@ -91,6 +91,25 @@ has bindpw => (
     isa      => Str,
     required => 0,
 );
+
+=head2 ldap
+
+Returns a connected L<Net::LDAP> object.
+
+=cut
+
+has ldap => (
+    is        => 'lazy',
+    clearer   => '_clear_ldap',
+    predicate => '_has_ldap',
+);
+
+sub _build_ldap {
+    my $self = shift;
+    my $ldap = Net::LDAP->new( $self->host, %{ $self->options } )
+      or croak "LDAP connect failed for: " . $self->host;
+    return $ldap;
+}
 
 =head2 username_attribute
 
@@ -195,6 +214,19 @@ has role_member_attribute => (
     default => 'member',
 );
 
+sub _unbind_ldap {
+    my ($self) = @_;
+
+    return
+      unless $self->_has_ldap;
+
+    my $ldap = $self->ldap;
+
+    $ldap->unbind;
+    $ldap->disconnect;
+    $self->_clear_ldap;
+}
+
 sub _bind_ldap {
     my ( $self, $username, $dummy, $password ) = @_;
 
@@ -221,18 +253,6 @@ sub _bind_ldap {
 
 =head1 METHODS
 
-=head2 ldap
-
-Returns a connected L<Net::LDAP> object.
-
-=cut
-
-sub ldap {
-    my $self = shift;
-    Net::LDAP->new( $self->host, %{ $self->options } )
-      or croak "LDAP connect failed for: " . $self->host;
-}
-
 =head2 authenticate_user $username, $password
 
 =cut
@@ -249,8 +269,7 @@ sub authenticate_user {
 
     my $mesg = $self->_bind_ldap( $user->{dn}, password => $password );
 
-    $ldap->unbind;
-    $ldap->disconnect;
+    $self->_unbind_ldap;
 
     return not $mesg->is_error;
 }
@@ -330,8 +349,7 @@ sub get_user_details {
             debug => "User not found via LDAP: $username" );
     }
 
-    $ldap->unbind;
-    $ldap->disconnect;
+    $self->_unbind_ldap;
 
     return $user;
 }

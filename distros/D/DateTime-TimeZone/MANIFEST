@@ -120,7 +120,6 @@ lib/DateTime/TimeZone/America/Moncton.pm
 lib/DateTime/TimeZone/America/Monterrey.pm
 lib/DateTime/TimeZone/America/Montevideo.pm
 lib/DateTime/TimeZone/America/New_York.pm
-lib/DateTime/TimeZone/America/Nipigon.pm
 lib/DateTime/TimeZone/America/Nome.pm
 lib/DateTime/TimeZone/America/Noronha.pm
 lib/DateTime/TimeZone/America/North_Dakota/Beulah.pm
@@ -136,7 +135,6 @@ lib/DateTime/TimeZone/America/Port_au_Prince.pm
 lib/DateTime/TimeZone/America/Porto_Velho.pm
 lib/DateTime/TimeZone/America/Puerto_Rico.pm
 lib/DateTime/TimeZone/America/Punta_Arenas.pm
-lib/DateTime/TimeZone/America/Rainy_River.pm
 lib/DateTime/TimeZone/America/Rankin_Inlet.pm
 lib/DateTime/TimeZone/America/Recife.pm
 lib/DateTime/TimeZone/America/Regina.pm
@@ -152,7 +150,6 @@ lib/DateTime/TimeZone/America/St_Johns.pm
 lib/DateTime/TimeZone/America/Swift_Current.pm
 lib/DateTime/TimeZone/America/Tegucigalpa.pm
 lib/DateTime/TimeZone/America/Thule.pm
-lib/DateTime/TimeZone/America/Thunder_Bay.pm
 lib/DateTime/TimeZone/America/Tijuana.pm
 lib/DateTime/TimeZone/America/Toronto.pm
 lib/DateTime/TimeZone/America/Vancouver.pm

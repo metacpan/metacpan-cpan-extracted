@@ -1,4 +1,4 @@
-package Email::Sender::Transport 2.500;
+package Email::Sender::Transport 2.600;
 # ABSTRACT: a role for email transports
 
 use Moo::Role;
@@ -52,7 +52,7 @@ Email::Sender::Transport - a role for email transports
 
 =head1 VERSION
 
-version 2.500
+version 2.600
 
 =head1 DESCRIPTION
 
@@ -88,11 +88,11 @@ all times.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Ricardo Signes.
+This software is copyright (c) 2022 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -32,7 +32,7 @@ resources:
   homepage: https://github.com/jhthorsen/openapi-client
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/jhthorsen/openapi-client.git
-version: '1.06'
+version: '1.07'
 x_contributors:
   - 'Clive Holloway <clhollow@estee.com>'
   - 'Ed J <mohawk2@users.noreply.github.com>'

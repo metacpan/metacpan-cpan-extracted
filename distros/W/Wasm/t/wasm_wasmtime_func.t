@@ -184,7 +184,7 @@ is(
     object {
       call [ isa => 'Wasm::Wasmtime::Func' ] => T();
     },
-    'create functon with arguments',
+    'create functon without arguments',
   );
 
   try_ok { $it_worked = $f->call } 'call function';

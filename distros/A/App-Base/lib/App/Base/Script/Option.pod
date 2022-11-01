@@ -1,0 +1,112 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with App::Base::Script::Option
+at lib/App/Base/Script/Option.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+App::Base::Script::Option - OO interface for command-line options
+
+=head1 SYNOPSIS
+
+    my $option = App::Base::Script::Option->new(
+        {
+            name          => 'foo',
+            display       => '--foo=<f>',
+            documentation => 'Controls the foo behavior of my script.',
+            default       => 4,
+            option_type   => 'integer',
+        }
+    );
+
+=head1 DESCRIPTION
+
+App::Base::Script::Option is used by App::Base::Script::Common and its
+descendents to implement the standard definition of command-
+line options. Typically an object of this class will be
+constructed anonymously as part of the anonymous arrayref
+return value of the options() method:
+
+    sub options {
+        return [
+            App::Base::Script::Option->new(
+                name          => 'foo',
+                documentation => 'The foo option',
+                option_type   => 'integer',
+            ),
+            App::Base::Script::Option->new(
+                name          => 'bar',
+                documentation => 'The bar option',
+            ),
+        ];
+    }
+
+=head1 ATTRIBUTES
+
+=head2 name
+
+The name of the attribute that must be specified on the command line.
+This name follows Getopt::Long rules, so its usage can be reduced to
+the shortest unambiguous specification. In other words, if the options
+'fibonacci' and 'fortune' are options to the same script, then --fi
+and --fo are valid options but -f (or --f) are not because of the
+ambiguity between the two options.
+
+=head2 display
+
+The name as it is displayed in a usage (--help) option (switch) table.
+By default, it is the same as the name; this method is provided for
+cases in which it may be helpful to have a usage statement that shows
+a sample value such as '--max-timeout=<timeout>' rather than simply
+saying '--max-timeout', because the meaning of --max-timeout is then
+explained in terms of <timeout> in the documentation for the option.
+
+=head2 documentation
+
+A scalar (string) which documents the behavior of the option. REQUIRED.
+
+=head2 default
+
+The default value of the option, if any.
+
+=head2 option_type
+
+One of: 'integer', 'float', 'string', or 'switch'.
+
+The content of an option field is verified against the provided value
+during option parsing. For example, --foo=Fred will cause a failure
+if the 'foo' option was declared to have option_type 'integer'.
+
+=head1 METHODS
+
+=head2 display_name
+
+Returns the display name of the option, which is either $self->display or
+(if $self->display is not defined) $self->name. This value is used to
+generate the switch table documentation.
+
+=head2 show_documentation
+
+Returns documentation string for the option
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<MooseX::Types::Base>
+
+L<add_type|MooseX::Types::Base/add_type>, L<get_registered_class_type|MooseX::Types::Base/get_registered_class_type>, L<get_registered_role_type|MooseX::Types::Base/get_registered_role_type>, L<get_type|MooseX::Types::Base/get_type>, L<has_type|MooseX::Types::Base/has_type>, L<import|MooseX::Types::Base/import>, L<register_class_type|MooseX::Types::Base/register_class_type>, L<register_role_type|MooseX::Types::Base/register_role_type>, L<registered_class_types|MooseX::Types::Base/registered_class_types>, L<registered_role_types|MooseX::Types::Base/registered_role_types>, L<type_names|MooseX::Types::Base/type_names>, L<type_storage|MooseX::Types::Base/type_storage>
+
+=item L<Moose::Object>
+
+L<BUILDALL|Moose::Object/BUILDALL>, L<BUILDARGS|Moose::Object/BUILDARGS>, L<DEMOLISHALL|Moose::Object/DEMOLISHALL>, L<DOES|Moose::Object/DOES>, L<does|Moose::Object/does>, L<dump|Moose::Object/dump>
+
+=back
+

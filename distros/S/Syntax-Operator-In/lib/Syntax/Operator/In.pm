@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021,2022 -- leonerd@leonerd.org.uk
 
-package Syntax::Operator::In 0.01;
+package Syntax::Operator::In 0.03;
 
 use v5.14;
 use warnings;
@@ -15,13 +15,11 @@ XSLoader::load( __PACKAGE__, our $VERSION );
 
 =head1 NAME
 
-C<Syntax::Operator::In> - placeholder module for infix element-of-list meta-operator
+C<Syntax::Operator::In> - infix element-of-list meta-operator
 
-=head1 DESCRIPTION
+=head1 SYNOPSIS
 
-This empty module is a placeholder for eventually implementing syntax for a
-generic element-of-list meta-operator, perhaps using syntax such as the
-following:
+On a suitably-patched perl:
 
    use Syntax::Operator::In;
 
@@ -29,12 +27,59 @@ following:
       say "x is one of the given strings";
    }
 
-It is currently empty, because the underlying syntax parsing module,
-L<XS::Parse::Infix>, does not yet support the additional syntax required to
-parameterize this meta-operator.
+=head1 DESCRIPTION
 
-Instead, for operators that already specialize on string or numerical
-equality, see instead L<Syntax::Operator::Elem>.
+This module provides an infix meta-operator that implements a element-of-list
+test on either strings or numbers.
+
+Current versions of perl do not directly support custom infix operators. The
+documentation of L<XS::Parse::Infix> describes the situation, with reference
+to a branch experimenting with this new feature. This module is therefore
+I<almost> entirely useless on standard perl builds. While the regular parser
+does not support custom infix operators, they are supported via
+C<XS::Parse::Infix> and hence L<XS::Parse::Keyword>, and so custom keywords
+which attempt to parse operator syntax may be able to use it.
+
+For operators that already specialize on string or numerical equality, see
+instead L<Syntax::Operator::Elem>.
+
+=cut
+
+sub import
+{
+   my $class = shift;
+   my $caller = caller;
+
+   $class->import_into( $caller, @_ );
+}
+
+sub import_into
+{
+   my $class = shift;
+   my ( $caller, @syms ) = @_;
+
+   @syms or @syms = qw( in );
+
+   my %syms = map { $_ => 1 } @syms;
+   $^H{"Syntax::Operator::In/in"}++ if delete $syms{in};
+
+   croak "Unrecognised import symbols @{[ keys %syms ]}" if keys %syms;
+}
+
+=head1 OPERATORS
+
+=head2 in
+
+   my $present = $lhs in<OP> @rhs;
+
+Yields true if the value on the lefhand side is equal to any of the values in
+the list on the right, according to some equality test operator C<OP>.
+
+This test operator must be either C<eq> for string match, or C<==> for number
+match, or any other custom infix operator that is registered in the
+C<XPI_CLS_EQUALITY> classification.
+
+=cut
 
 =head1 TODO
 
@@ -48,8 +93,15 @@ lookup.
 
 =item *
 
-The real C<in> meta-operator. This first requires more extensive parsing
-support from L<XS::Parse::Infix>.
+Consider further on the syntax for this operator. Maybe instead of the
+circumfix anglebrackets, a single colon might look nicer?
+
+   $lhs in:OP @rhs
+
+   $x in:== @numbers
+   $x in:eq @strings
+
+Does the lacking of end marker make parsing harder though?
 
 =item *
 

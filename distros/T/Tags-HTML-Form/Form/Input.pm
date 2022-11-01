@@ -8,7 +8,7 @@ use Class::Utils qw(set_params split_params);
 use Error::Pure qw(err);
 use Scalar::Util qw(blessed);
 
-our $VERSION = 0.04;
+our $VERSION = 0.05;
 
 # Process 'Tags'.
 sub _process {
@@ -126,7 +126,7 @@ Tags::HTML::Form::Input - Tags helper for form input element.
 
  my $obj = Tags::HTML::Form::Input->new(%params);
  $obj->process($input);
- $obj->process_css;
+ $obj->process_css($input);
 
 =head1 METHODS
 
@@ -164,7 +164,7 @@ Returns undef.
 
 =head2 C<process_css>
 
- $obj->process_css;
+ $obj->process_css($input);
 
 Process CSS::Struct structure for output.
 
@@ -228,7 +228,7 @@ Returns undef.
  # Output:
  # HTML:
  # <input class="form-input" type="text" />
- # 
+ #
  # CSS:
  # input.form-input[type=submit]:hover {
  #         background-color: #45a049;
@@ -278,6 +278,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.04
+0.05
 
 =cut

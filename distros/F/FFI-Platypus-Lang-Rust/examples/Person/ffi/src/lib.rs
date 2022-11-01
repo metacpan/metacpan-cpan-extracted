@@ -1,7 +1,7 @@
-use std::ffi::CString;
+use std::cell::RefCell;
 use std::ffi::c_void;
 use std::ffi::CStr;
-use std::cell::RefCell;
+use std::ffi::CString;
 
 struct Person {
     name: String,
@@ -20,6 +20,10 @@ impl Person {
         String::from(&self.name)
     }
 
+    fn set_name(&mut self, new: &str) {
+        self.name = new.to_string();
+    }
+
     fn get_lucky_number(&self) -> i32 {
         self.lucky_number
     }
@@ -28,7 +32,11 @@ impl Person {
 type CPerson = c_void;
 
 #[no_mangle]
-pub extern "C" fn person_new(_class: *const i8, name: *const i8, lucky_number: i32) -> *mut CPerson {
+pub extern "C" fn person_new(
+    _class: *const i8,
+    name: *const i8,
+    lucky_number: i32,
+) -> *mut CPerson {
     let name = unsafe { CStr::from_ptr(name) };
     let name = name.to_string_lossy().into_owned();
     Box::into_raw(Box::new(Person::new(&name, lucky_number))) as *mut CPerson
@@ -36,17 +44,26 @@ pub extern "C" fn person_new(_class: *const i8, name: *const i8, lucky_number: i
 
 #[no_mangle]
 pub extern "C" fn person_name(p: *mut CPerson) -> *const i8 {
-    thread_local! (
+    thread_local!(
         static KEEP: RefCell<Option<CString>> = RefCell::new(None);
     );
 
-    let p = unsafe { &*(p as *mut Person)};
+    let p = unsafe { &*(p as *mut Person) };
     let name = CString::new(p.get_name()).unwrap();
     let ptr = name.as_ptr();
     KEEP.with(|k| {
         *k.borrow_mut() = Some(name);
     });
     ptr
+}
+
+#[no_mangle]
+pub extern "C" fn person_rename(p: *mut CPerson, new: *const i8) {
+    let new = unsafe { CStr::from_ptr(new) };
+    let p = unsafe { &mut *(p as *mut Person) };
+    if let Ok(new) = new.to_str() {
+        p.set_name(new);
+    }
 }
 
 #[no_mangle]
@@ -58,30 +75,8 @@ pub extern "C" fn person_lucky_number(p: *mut CPerson) -> i32 {
 #[allow(non_snake_case)]
 #[no_mangle]
 pub extern "C" fn person_DESTROY(p: *mut CPerson) {
-    unsafe { drop(Box::from_raw(p as *mut Person)) };
+    unsafe { Box::from_raw(p as *mut Person) };
 }
-
 
 #[cfg(test)]
-mod tests {
-
-    use std::ffi::CString;
-    use std::ffi::CStr;
-
-    #[test]
-    fn rust_lib_works() {
-        let name = "Graham Ollis";
-        let plicease = crate::Person::new(name, 42);
-        assert_eq!(plicease.get_name(), "Graham Ollis");
-        assert_eq!(plicease.get_lucky_number(), 42);
-    }
-
-    #[test]
-    fn c_lib_works() {
-        let class = CString::new("Person");
-        let name = CString::new("Graham Ollis");
-        let plicease = crate::person_new(class.unwrap().as_ptr(), name.unwrap().as_ptr(), 42);
-        assert_eq!(unsafe { CStr::from_ptr(crate::person_name(plicease)).to_string_lossy().into_owned() },  "Graham Ollis");
-        assert_eq!(crate::person_lucky_number(plicease), 42);
-    }
-}
+mod test;

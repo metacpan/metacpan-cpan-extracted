@@ -1,0 +1,62 @@
+{
+   "abstract" : "a small gemini client",
+   "author" : [
+      "Jeremy Mates <jeremy.mates@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-Gemini",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Encode" : "0",
+            "IO::Socket::SSL" : "1.985",
+            "perl" : "v5.10.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V0" : "0.000060",
+            "perl" : "v5.10.0"
+         }
+      }
+   },
+   "provides" : {
+      "Net::Gemini" : {
+         "file" : "lib/Net/Gemini.pm",
+         "version" : "0.03"
+      },
+      "Net::Gemini::Server" : {
+         "file" : "lib/Net/Gemini/Server.pm",
+         "version" : "0.03"
+      },
+      "Net::Gemini::URI" : {
+         "file" : "lib/Net/Gemini/URI.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/BSD-3-Clause"
+      ],
+      "repository" : {
+         "url" : "https://thrig.me/src/Net-Gemini.git"
+      }
+   },
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 4.12"
+}

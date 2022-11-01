@@ -3,7 +3,7 @@ badges = ["github-actions/linux.yaml", "github-actions/windows.yaml", "github-ac
 module_maker="ModuleBuildTiny"
 license="artistic_2"
 authority="cpan:SANKO"
-requires_external_bin=["sh');\nuse lib 'inc';\nuse MBCSFML;\n('1"]
+requires_external_bin=["perl')if 0;\nuse lib 'inc';\nuse MBCSFML;\n('1"]
 
 [release]
 hook=[

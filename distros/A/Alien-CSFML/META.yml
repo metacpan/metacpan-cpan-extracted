@@ -61,7 +61,7 @@ no_index:
 provides:
   Alien::CSFML:
     file: lib/Alien/CSFML.pm
-    version: v0.0.5
+    version: v0.0.7
 requires:
   File::ShareDir: '0'
   File::Slurp: '0'
@@ -72,7 +72,7 @@ resources:
   bugtracker: https://github.com/sanko/alien-csfml/issues
   homepage: https://github.com/sanko/alien-csfml
   repository: https://github.com/sanko/alien-csfml.git
-version: v0.0.5
+version: v0.0.7
 x_authority: cpan:SANKO
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 0

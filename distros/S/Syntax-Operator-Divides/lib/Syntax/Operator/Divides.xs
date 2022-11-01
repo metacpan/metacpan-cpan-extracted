@@ -32,7 +32,7 @@ static OP *pp_divides(pTHX)
   return NORMAL;
 }
 
-static OP *new_op_divides(pTHX_ U32 flags, OP *lhs, OP *rhs, void *hookdata)
+static OP *new_op_divides(pTHX_ U32 flags, OP *lhs, OP *rhs, ANY *parsedata, void *hookdata)
 {
   OP *ret = newBINOP_CUSTOM(&pp_divides, flags, lhs, rhs);
   ret->op_targ = pad_alloc(OP_CUSTOM, SVs_PADTMP);
@@ -40,15 +40,16 @@ static OP *new_op_divides(pTHX_ U32 flags, OP *lhs, OP *rhs, void *hookdata)
 }
 
 static const struct XSParseInfixHooks hooks_divides = {
-  .permit_hintkey = "Syntax::Operator::Divides/divides",
-  .cls            = XPI_CLS_MATCH_MISC,
-  .new_op         = &new_op_divides,
-  .ppaddr         = &pp_divides,
+  .cls               = XPI_CLS_MATCH_MISC,
+  .wrapper_func_name = "Syntax::Operator::Divides::is_divisor",
+  .permit_hintkey    = "Syntax::Operator::Divides/divides",
+  .new_op            = &new_op_divides,
+  .ppaddr            = &pp_divides,
 };
 
 MODULE = Syntax::Operator::Divides    PACKAGE = Syntax::Operator::Divides
 
 BOOT:
-  boot_xs_parse_infix(0);
+  boot_xs_parse_infix(0.26);
 
   register_xs_parse_infix("%%", &hooks_divides, NULL);

@@ -1,0 +1,18 @@
+{
+   "balance_impact" : {
+      "cash" : "0",
+      "inbound_pending" : "0",
+      "outbound_pending" : "-1000"
+   },
+   "created" : "1662261086",
+   "currency" : "usd",
+   "effective_at" : "1662261086",
+   "financial_account" : "fa_1Le9F32eZvKYlo2CjbQcDQUE",
+   "flow" : "obt_1Le9F32eZvKYlo2CPQD5jo2F",
+   "flow_type" : "outbound_transfer",
+   "id" : "trxne_1Le9F42eZvKYlo2CjTLEfFll",
+   "livemode" : 0,
+   "object" : "treasury.transaction_entry",
+   "transaction" : "trxn_1Le9F32eZvKYlo2C2dtkse82",
+   "type" : "outbound_transfer"
+}

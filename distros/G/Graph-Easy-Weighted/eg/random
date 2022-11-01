@@ -1,0 +1,39 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Graph::Easy::Weighted;
+use Math::Partition::Rand;
+
+my $attr = 'probability';
+
+my $gw = Graph::Easy::Weighted->new();
+
+$gw->populate( random_graph([qw( W X Y Z )]), $attr, '%0.2f' );
+
+$gw->dump($attr);
+
+print $gw->as_ascii();
+
+sub random_graph {
+    my $labels = shift;
+
+    my $graph = {};
+
+    for my $label ( @$labels ) {
+        $graph->{$label} = { attributes => { title => lc($label) }, choose_n( $labels ) };
+    }
+
+    return $graph;
+}
+
+sub choose_n {
+    my $labels = shift;
+
+    my %distribution;
+    my $partition = Math::Partition::Rand->new( top => 1, n => scalar(@$labels) );
+    @distribution{@$labels} = @{ $partition->choose() };
+
+    return %distribution;
+}

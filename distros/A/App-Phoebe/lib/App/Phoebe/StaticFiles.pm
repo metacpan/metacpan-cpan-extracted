@@ -43,9 +43,9 @@ require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(%routes mime_type);
 use App::Phoebe qw(@extensions $log host_regex port success result);
-use File::Slurper qw(read_text read_binary read_dir);
 use Encode qw(encode_utf8 decode_utf8);
 use URI::Escape;
+use Mojo::File;
 
 # add a code reference to the list of extensions
 push(@extensions, \&static_routes);
@@ -70,7 +70,8 @@ sub static_routes {
     $log->debug("Serving list of files at $route, reading $dir");
     if ($dir) {
       success($stream);
-      for my $file (sort map { decode_utf8($_) } grep !/^\./, read_dir($dir)) {
+      my @files = map { $_->basename } Mojo::File->new($dir)->list->each;
+      for my $file (sort map { decode_utf8($_) } @files) {
 	$stream->write("=> /do/static/" . uri_escape_utf8($route) . "/" . uri_escape_utf8($file)
 		       . " " . encode_utf8($file) . "\n");
       }
@@ -83,16 +84,22 @@ sub static_routes {
     my $file = decode_utf8(uri_unescape($3));
     $log->debug("Serving $route/$file");
     my $dir = $routes{$route};
-    # no slashes in the file name!
-    if ($file !~ /\// and -f "$dir/$file") {
-      success($stream, mime_type($file));
-      $stream->write(read_binary("$dir/$file"));
-    } else {
-      result($stream, "40", "Unknown file: " . encode_utf8($file));
-    }
+    return result($stream, "40", "Unknown route: " . encode_utf8($route))
+	unless $dir;
+    my $path = Mojo::File->new($dir, $file);
+    return result($stream, "40", "Unknown file: " . encode_utf8($file))
+	unless -f $path and is_in(Mojo::File->new($dir), $path);
+    success($stream, mime_type($$path));
+    $stream->write($path->slurp);
     return 1;
   }
   return;
+}
+
+# being paranoid about directory traversal
+sub is_in {
+  my ($parent, $child) = map { $_->to_abs } @_;
+  return substr($child, 0, length($parent)) eq $parent;
 }
 
 # cheap MIME type guessing; alternatively, use File::MimeInfo

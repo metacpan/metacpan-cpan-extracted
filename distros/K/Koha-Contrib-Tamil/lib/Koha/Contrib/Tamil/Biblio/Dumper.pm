@@ -1,6 +1,6 @@
 package Koha::Contrib::Tamil::Biblio::Dumper;
 # ABSTRACT: Class dumping a Koha Catalog
-$Koha::Contrib::Tamil::Biblio::Dumper::VERSION = '0.068';
+$Koha::Contrib::Tamil::Biblio::Dumper::VERSION = '0.069';
 use Moose;
 
 extends 'AnyEvent::Processor';
@@ -12,7 +12,7 @@ use MARC::Moose::Record;
 use MARC::Moose::Writer;
 use MARC::Moose::Formater::Iso2709;
 use C4::Biblio;
-use C4::Items;
+use C4::Items qw/ Item2Marc /;
 use Locale::TextDomain 'Koha-Contrib-Tamil';
 
 
@@ -172,7 +172,7 @@ Koha::Contrib::Tamil::Biblio::Dumper - Class dumping a Koha Catalog
 
 =head1 VERSION
 
-version 0.068
+version 0.069
 
 =head1 SYNOPSIS
 

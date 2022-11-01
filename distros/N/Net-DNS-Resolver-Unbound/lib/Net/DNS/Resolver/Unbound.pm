@@ -2,16 +2,17 @@ package Net::DNS::Resolver::Unbound;
 
 use strict;
 use warnings;
+use Net::DNS;
+use base qw(Net::DNS::Resolver DynaLoader);
 
 our $VERSION;
-$VERSION = '1.19';
 
-use Carp;
-use Net::DNS;
+BEGIN {
+	$VERSION = '1.20';
+	eval { __PACKAGE__->bootstrap($VERSION) };
+}
 
-use base qw(Net::DNS::Resolver DynaLoader);
-eval { __PACKAGE__->bootstrap($VERSION) };
-warn "\n\n$@\n" if $@;
+use constant UB_SEND => Net::DNS::Resolver::Unbound::Context->can('ub_send');
 
 
 =head1 NAME
@@ -28,7 +29,8 @@ Net::DNS::Resolver::Unbound - Net::DNS resolver based on libunbound
 =head1 DESCRIPTION
 
 Net::DNS::Resolver::Unbound is designed as an extension to an existing
-Net::DNS installation which facilitates DNS(SEC) name resolution.
+Net::DNS installation which facilitates DNS(SEC) name resolution using
+the libunbound library developed by NLnet Labs.
 
 Net::DNS::Resolver::Unbound replaces the resolver send() and bgsend()
 functionality in the Net::DNS::Resolver::Base implementation.
@@ -93,11 +95,26 @@ sub new {
 	);
 
     my $fully_recursive = Net::DNS::Resolver::Unbound->new(
-	nameservers => [],		# override /etc/resolv.conf
+	nameservers => []		# override /etc/resolv.conf
 	);
+
+    my $dnssec_resolver = Net::DNS::Resolver::Unbound->new(
+	nameservers => [],
+	add_ta_file => '/var/lib/unbound/root.key'
+	);
+
+    my @nameservers = $stub_resolver->nameservers;
 
 By default, DNS queries are sent to the IP addresses listed in
 /etc/resolv.conf or similar platform-specific sources.
+
+=cut
+
+sub nameservers {
+	my $self = shift;
+	local $self->{debug};		## "no nameservers" ok in this context
+	return $self->SUPER::nameservers(@_);
+}
 
 
 =head2 search, query, send, bgsend, bgbusy, bgread
@@ -112,9 +129,9 @@ sub send {
 	$self->_reset_errorstring;
 
 	my $query = $self->_make_query_packet(@_);
-	my ($q)	  = $query->question;
+	my ($q) = $query->question;
 	my $reply = $self->{ub_ctx}->ub_resolve( $q->name, $q->{qtype}, $q->{qclass} );
-	return $self->_decode_result( $reply, $query->header->id );
+	return $self->_decode_result($reply);
 }
 
 sub bgsend {
@@ -124,7 +141,7 @@ sub bgsend {
 
 	my $query = $self->_make_query_packet(@_);
 	my ($q) = $query->question;
-	return $self->{ub_ctx}->ub_resolve_async( $q->name, $q->{qtype}, $q->{qclass}, $query->header->id );
+	return $self->{ub_ctx}->ub_resolve_async( $q->name, $q->{qtype}, $q->{qclass} );
 }
 
 sub bgbusy {
@@ -142,10 +159,9 @@ sub bgread {
 
 	$self->{ub_ctx}->ub_wait if &bgbusy;
 
-	my $async_id = $handle->async_id;
+	my $query_id = $handle->query_id;
 	$self->errorstring( $handle->err );
-	my $result = $handle->result;
-	return $self->_decode_result( $result, $async_id );
+	return $self->_decode_result( $handle->result );
 }
 
 
@@ -358,9 +374,10 @@ sub debug_level {
 
     $resolver->async_thread(1);
 
+Set the context behaviour for asynchronous actions.
 Enable a call to resolve_async() to create a thread to handle work in
-the background. If false (by default), a process is forked to perform
-the work.
+the background.
+If false (by default), a process is forked to perform the work.
 
 =cut
 
@@ -370,17 +387,21 @@ sub async_thread {
 }
 
 
-########################################
+=head2 print, string
 
-sub nameservers {
-	my $self = shift;
-	local $self->{debug};		## "no nameservers" ok in this context
-	return $self->SUPER::nameservers(@_);
+    $resolver->print;
+    print $resolver->string;
+
+Prints the resolver state on the standard output.
+
+=cut
+
+sub print {
+	return print shift->string;
 }
 
 sub string {
 	my $self = shift;
-
 	$self = $self->_defaults unless ref($self);
 
 	my @nslist   = $self->nameservers();
@@ -396,24 +417,21 @@ sub string {
 END
 }
 
-sub print {
-	return print shift->string;
-}
 
+########################################
 
 sub _decode_result {
-	my ( $self, $result, $query_id ) = @_;
+	my ( $self, $result ) = @_;
 
-	my $packet;
-	if ($result) {
-		$self->errorstring('INSECURE') unless $result->secure;
-		$self->errorstring( $result->why_bogus ) if $result->bogus;
+	return unless $result;
 
-		my $buffer = $result->answer_packet || return;
-		substr( $buffer, 0, 2 ) = pack 'n', $query_id;	# emulate Net::DNS resolver->send(packet)
-		$packet = Net::DNS::Packet->decode( \$buffer, $self->debug );
-		$self->errorstring($@);
-	}
+	$self->errorstring('INSECURE') unless $result->secure;
+	$self->errorstring( $result->why_bogus ) if $result->bogus;
+
+	my $buffer = $result->answer_packet || return;
+	my $packet = Net::DNS::Packet->decode(\$buffer);
+	$self->errorstring($@);
+	$packet->print if $self->debug;
 
 	return $packet;
 }

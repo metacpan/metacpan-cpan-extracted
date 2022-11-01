@@ -1,0 +1,6 @@
+{
+   "address_line1_check" : "not_provided",
+   "address_postal_code_check" : "not_provided",
+   "cvc_check" : "mismatch",
+   "expiry_check" : "match"
+}

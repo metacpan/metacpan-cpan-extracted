@@ -15,7 +15,7 @@ use Music::Chord::Note;
 use Music::Scales qw(get_scale_notes);
 
 my $reps  = shift || 2;
-my $sects = shift || 'Amv-DMc-Emv-DMc'; # <note><major|minor><verse|chorus> v=verse, c=chorus, M=major, m=minor
+my $sects = shift || 'Amv-DMc-Emv-DMc'; # <note><major|minor><verse|chorus>
 
 my @sections = split /-/, $sects;
 

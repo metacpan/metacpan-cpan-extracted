@@ -1,0 +1,132 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Sub::HandlesVia::Manual::WithGeneric - using Sub::HandlesVia with generic Perl classes
+
+=head1 MANUAL
+
+Sub::HandlesVia allows you to delegate methods from your class to the
+values of your objects' attributes.
+
+Conceptually, it allows you to define C<< $object->push_number($n) >>
+to be a shortcut for C<< $object->numbers->push($n) >> except that
+C<< $object->numbers >> is an arrayref, so doesn't have methods you
+can call on it like C<push>.
+
+For Moose and Mouse, Sub::HandlesVia can use their metaobject protocols
+to grab an attribute's definition and install the methods it needs to.
+For Moo, it can wrap C<has> and do its stuff that way. For other classes,
+you need to be more explicit and tell it what methods to delegate to
+what attributes.
+
+ package Kitchen {
+   
+   # constructor
+   sub new {
+     my ( $class, %arg ) = @_;
+     $arg{food} ||= [];
+     return bless( \%arg, $class );
+   }
+   
+   # getter/setter for `food`
+   sub food {
+     (@_ == 1) ? $_[0]{food} : ( $_[0]{food} = $_[1] );
+   }
+   
+   use Sub::HandlesVia qw( delegations );
+   
+   delegations(
+     attribute   => 'food'
+     handles_via => 'Array',
+     handles     => {
+       'add_food'    => 'push',
+       'find_food'   => 'grep',
+     },
+   );
+ }
+
+Setting C<attribute> to "food" means that when Sub::HandlesVia needs
+to get the food list, it will call C<< $kitchen->food >> and when
+it needs to set the food list, it will call C<< $kitchen->food($value) >>.
+If you have separate getter and setter methods, just do:
+
+     attribute   => [ 'get_food', 'set_food' ],
+
+Or if you don't have any accessors and want Sub::HandlesVia to
+directly access the underlying hashref:
+
+     attribute   => '{food}',
+
+Or maybe you have a setter, but want to use hashref access for the
+getter:
+
+     attribute   => [ '{food}', 'set_food' ],
+
+Or maybe you still want direct access for the getter, but your
+object is a blessed arrayref instead of a blessed hashref:
+
+     attribute   => [ '[7]', 'set_food' ],
+
+Or maybe your needs are crazy unique:
+
+     attribute   => [ \&getter, \&setter ],
+
+The coderefs are passed the instance as their first argument, and
+the setter is also passed a value to set.
+
+Really, I don't think there's any object system that this won't work
+for!
+
+If you supply an arrayref with a getter and setter, it's also
+possible to supply a third argument which is a coderef or string
+which will be called as a method if needing to "reset" the value.
+This can be thought of like a default or builder.
+
+(The C<delegations> function can be imported into Moo/Mouse/Moose classes
+too, in which case the C<attribute> needs to be the same attribute name
+you passed to C<has>. You cannot use a arrayref, coderef, hash key, or
+array index.)
+
+=head1 BUGS
+
+Please report any bugs to
+L<https://github.com/tobyink/p5-sub-handlesvia/issues>.
+
+=head1 SEE ALSO
+
+Misc advanced documentation:
+L<Sub::HandlesVia::Manual::Advanced>.
+
+L<Sub::HandlesVia>.
+
+Documentation for delegatable methods:
+L<Sub::HandlesVia::HandlerLibrary::Array>,
+L<Sub::HandlesVia::HandlerLibrary::Blessed>,
+L<Sub::HandlesVia::HandlerLibrary::Bool>,
+L<Sub::HandlesVia::HandlerLibrary::Code>,
+L<Sub::HandlesVia::HandlerLibrary::Counter>,
+L<Sub::HandlesVia::HandlerLibrary::Hash>,
+L<Sub::HandlesVia::HandlerLibrary::Number>,
+L<Sub::HandlesVia::HandlerLibrary::Scalar>, and
+L<Sub::HandlesVia::HandlerLibrary::String>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2022 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

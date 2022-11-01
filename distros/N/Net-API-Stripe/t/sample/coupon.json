@@ -1,0 +1,17 @@
+{
+   "amount_off" : null,
+   "created" : "1662261083",
+   "currency" : "usd",
+   "duration" : "repeating",
+   "duration_in_months" : "3",
+   "id" : "Z4OV52SU",
+   "livemode" : 0,
+   "max_redemptions" : null,
+   "metadata" : {},
+   "name" : "25.5% off",
+   "object" : "coupon",
+   "percent_off" : "25.5",
+   "redeem_by" : null,
+   "times_redeemed" : "0",
+   "valid" : 1
+}

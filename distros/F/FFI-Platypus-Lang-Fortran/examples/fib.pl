@@ -1,10 +1,12 @@
 use strict;
 use warnings;
-use FFI::Platypus 1.00;
+use FFI::Platypus 2.00;
 
-my $ffi = FFI::Platypus->new( api => 1 );
-$ffi->lang('Fortran');
-$ffi->lib('./libfib.so');
+my $ffi = FFI::Platypus->new(
+  api  => 2,
+  lang =>'Fortran',
+  lib  => './fib.so',
+);
 
 $ffi->attach( fib => ['integer*'] => 'integer' );
 

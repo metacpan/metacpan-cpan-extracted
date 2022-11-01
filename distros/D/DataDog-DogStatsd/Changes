@@ -1,6 +1,9 @@
 Revision history for DataDog-DogStatsd
 
-0.06  2019-12-09 08:16:23 UTC
+0.07      2022-10-25 06:45:09+00:00 UTC
+      - Apply perlcritic
+
+0.06  2019-12-04 00:00:00
         - Allow setting the DataDog host, port and namespace via DATADOG_AGENT_HOST,
           DATADOG_AGENT_PORT, and DATADOG_AGENT_NAMESPACE environment variables
         - Add stats_event

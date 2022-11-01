@@ -5,6 +5,8 @@ SYNOPSIS
      use Tags::HTML;
 
      my $obj = Tags::HTML->new(%params);
+     $obj->cleanup(@params);
+     $obj->init(@params);
      $obj->process;
      $obj->process_css;
 
@@ -35,6 +37,20 @@ METHODS
 
             Default value is undef.
 
+  "cleanup"
+     $obj->cleanup(@params);
+
+    Process cleanup after page run.
+
+    Returns undef.
+
+  "init"
+     $obj->init(@params);
+
+    Process initialization before page run.
+
+    Returns undef.
+
   "process"
      $obj->process;
 
@@ -64,7 +80,97 @@ ERRORS
              Need to be implemented in inherited class in _process_css() method.
              Parameter 'css' isn't defined.
 
-EXAMPLE
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     package Foo;
+
+     use base qw(Tags::HTML);
+
+     sub new {
+             my ($class, @params) = @_;
+ 
+             # No CSS support.
+             push @params, 'no_css', 1;
+ 
+             my $self = $class->SUPER::new(@params);
+ 
+             # Object.
+             return $self;
+     }
+
+     sub _cleanup {
+             my $self = shift;
+
+             delete $self->{'_data'};
+
+             return;
+     }
+
+     sub _init {
+             my ($self, @variables) = @_;
+
+             $self->{'_data'} = \@variables;
+
+             return;
+     }
+
+     sub _process {
+             my $self = shift;
+
+             $self->{'tags'}->put(
+                     ['b', 'div'],
+             );
+             foreach my $variable (@{$self->{'_data'}}) {
+                     $self->{'tags'}->put(
+                             ['b', 'div'],
+                             ['d', $variable],
+                             ['e', 'div'],
+                     );
+             }
+             $self->{'tags'}->put(
+                     ['e', 'div'],
+             );
+
+             return;
+     }
+
+     package main;
+
+     use Tags::Output::Indent;
+
+     # Object.
+     my $tags = Tags::Output::Indent->new;
+     my $obj = Foo->new(
+             'tags' => $tags,
+     );
+
+     # Init data.
+     $obj->init('foo', 'bar', 'baz');
+
+     # Process.
+     $obj->process;
+
+     # Print out.
+     print "HTML\n";
+     print $tags->flush."\n";
+
+     # Output:
+     # HTML
+     # <div>
+     #   <div>
+     #     foo
+     #   </div>
+     #   <div>
+     #     bar
+     #   </div>
+     #   <div>
+     #     baz
+     #   </div>
+     # </div>
+
+EXAMPLE2
      use strict;
      use warnings;
 
@@ -154,5 +260,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.05
+    0.06
 

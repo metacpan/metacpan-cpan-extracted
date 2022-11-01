@@ -21,8 +21,8 @@ if ( grep /\P{ASCII}/ => @ARGV ) {
 
 # Useful common code
 use autodie;
-use Carp qw( carp croak confess cluck );
-use English qw( -no_match_vars );
+use Carp         qw( carp croak confess cluck );
+use English      qw( -no_match_vars );
 use Data::Dumper qw( Dumper );
 
 # give a full stack dump on any untrapped exceptions
@@ -41,7 +41,7 @@ local $SIG{ __WARN__ } = sub {
 # Useful common code
 
 use Module::Runtime qw( use_module );
-use Clone qw( clone );
+use Clone           qw( clone );
 
 sub new {
     my ( $class, $the_rest ) = @_;
@@ -128,8 +128,28 @@ sub pretty_print {
 sub quote_literal {
     my $self = shift;
     my $val  = shift;
+
+    # Set of characters that, if found, should be converted to \escaped, and they change how string is printed (E'' vs. '')
+    my $rep = {};
+    $rep->{ "\r" } = "\\r";
+    $rep->{ "\t" } = "\\t";
+    $rep->{ "\n" } = "\\n";
+    my $look_for = join( '|', keys %{ $rep } );
+
+    if ( $val =~ /${look_for}/ ) {
+
+        # If we are representing string using E'' notation, ' character has to be escaped too
+        $rep->{ "'" } = "\\'";
+        $look_for = join( '|', keys %{ $rep } );
+
+        # Replace all characters that need it
+        $val =~ s/(${look_for})/$rep->{$1}/ge;
+        return "E'${val}'";
+    }
+
+    # For '' strings, we just need to change each ' into ''.
     $val =~ s/'/''/g;
-    return "'" . $val . "'";
+    return "'${val}'";
 }
 
 sub quote_ident {

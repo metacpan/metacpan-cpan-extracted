@@ -37,6 +37,25 @@ pass 'interruptable';
 $config->max_wasm_stack(1024);
 pass 'max_wasm_stack';
 
+if(Wasm::Wasmtime::FFI::_v0_23_0())
+{
+  $config->consume_fuel(1);
+  pass 'consume_fuel';
+
+  $config->max_instances(100);
+  pass 'max_instances';
+}
+else
+{
+  local $@='';
+  eval { $config->consume_fuel(1); };
+  like "$@", qr/^unimplemented, upgrade wasmtime to 0\.23\.0/;
+
+  $@='';
+  eval { $config->max_instances(100) };
+  like "$@", qr/^unimplemented, upgrade wasmtime to 0\.23\.0/;
+}
+
 foreach my $strategy (qw( auto cranelift lightbeam ))
 {
   if(my $e = dies { $config->strategy($strategy) })

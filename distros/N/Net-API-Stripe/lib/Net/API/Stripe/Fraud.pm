@@ -1,19 +1,24 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Fraud.pm
-## Version v0.100.0
+## Version v0.101.0
 ## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
-## Modified 2020/05/15
+## Modified 2022/10/29
 ## 
 ##----------------------------------------------------------------------------
 package Net::API::Stripe::Fraud;
 BEGIN
 {
-	use strict;
+    use strict;
+    use warnings;
     use parent qw( Net::API::Stripe::Generic );
-	our( $VERSION ) = 'v0.100.0';
+    use vars qw( $VERSION );
+    our( $VERSION ) = 'v0.101.0';
 };
+
+use strict;
+use warnings;
 
 sub id { return( shift->_set_get_scalar( 'id', @_ ) ); }
 
@@ -28,6 +33,8 @@ sub created { return( shift->_set_get_datetime( 'created', @_ ) ); }
 sub fraud_type { return( shift->_set_get_scalar( 'fraud_type', @_ ) ); }
 
 sub livemode { return( shift->_set_get_boolean( 'livemode', @_ ) ); }
+
+sub payment_intent { return( shift->_set_get_scalar_or_object( 'payment_intent', 'Net::API::Stripe::Payment::Intent', @_ ) ); }
 
 1;
 
@@ -53,7 +60,7 @@ See documentation in L<Net::API::Stripe> for example to make api calls to Stripe
 
 =head1 VERSION
 
-    v0.100.0
+    v0.101.0
 
 =head1 DESCRIPTION
 
@@ -61,62 +68,60 @@ An early fraud warning indicates that the card issuer has notified us that a cha
 
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>( %ARG )
+=head2 new( %ARG )
 
 Creates a new L<Net::API::Stripe::Fraud> object.
 It may also take an hash like arguments, that also are method of the same name.
 
-=back
-
 =head1 METHODS
 
-=over 4
-
-=item B<id> string
+=head2 id string
 
 Unique identifier for the object.
 
-=item B<object> string, value is "radar.early_fraud_warning"
+=head2 object string, value is "radar.early_fraud_warning"
 
 String representing the object’s type. Objects of the same type share the same value.
 
-=item B<actionable> boolean
+=head2 actionable boolean
 
 An EFW is actionable if it has not received a dispute and has not been fully refunded. You may wish to proactively refund a charge that receives an EFW, in order to avoid receiving a dispute later.
 
-=item B<charge> string (expandable)
+=head2 charge string (expandable)
 
 ID of the charge this early fraud warning is for, optionally expanded.
 
 When expanded, this is a L<Net::API::Stripe::Charge> object.
 
-=item B<created> timestamp
+=head2 created timestamp
 
 Time at which the object was created. Measured in seconds since the Unix epoch.
 
-=item B<fraud_type> string
+=head2 fraud_type string
 
 The type of fraud labelled by the issuer. One of card_never_received, fraudulent_card_application, made_with_counterfeit_card, made_with_lost_card, made_with_stolen_card, misc, unauthorized_use_of_card.
 
-=item B<livemode> boolean
+=head2 livemode boolean
 
 Has the value true if the object exists in live mode or the value false if the object exists in test mode.
 
-=back
+=head2 payment_intent expandable
+
+ID of the Payment Intent this early fraud warning is for, optionally expanded.
+
+When expanded this is an L<Net::API::Stripe::Payment::Intent> object.
 
 =head1 API SAMPLE
 
-	{
-	  "id": "issfr_123456789",
-	  "object": "radar.early_fraud_warning",
-	  "actionable": true,
-	  "charge": "ch_1234",
-	  "created": 123456789,
-	  "fraud_type": "misc",
-	  "livemode": false
-	}
+    {
+      "id": "issfr_123456789",
+      "object": "radar.early_fraud_warning",
+      "actionable": true,
+      "charge": "ch_1234",
+      "created": 123456789,
+      "fraud_type": "misc",
+      "livemode": false
+    }
 
 =head1 HISTORY
 

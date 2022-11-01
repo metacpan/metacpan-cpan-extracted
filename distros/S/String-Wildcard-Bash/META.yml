@@ -20,7 +20,7 @@ name: String-Wildcard-Bash
 provides:
   String::Wildcard::Bash:
     file: lib/String/Wildcard/Bash.pm
-    version: '0.044'
+    version: '0.045'
 requires:
   Exporter: '5.57'
   perl: '5.010001'
@@ -30,7 +30,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=String-Wildcard-Bash
   homepage: https://metacpan.org/release/String-Wildcard-Bash
   repository: git://github.com/perlancar/perl-String-Wildcard-Bash.git
-version: '0.044'
+version: '0.045'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -308,7 +308,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::PERLANCAR::Contributing
               name: '@Author::PERLANCAR/PERLANCAR/Contributing'
-              version: '0.292'
+              version: '0.293'
             -
               class: Pod::Weaver::Section::Legal
               name: '@Author::PERLANCAR/Legal'

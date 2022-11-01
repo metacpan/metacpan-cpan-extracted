@@ -6,7 +6,12 @@ use Rose::HTML::Object::Errors qw(:number);
 
 use base 'Rose::HTML::Form::Field::Numeric';
 
-our $VERSION = '0.606';
+our $VERSION = '0.624';
+
+__PACKAGE__->add_required_html_attrs({
+  step => 1,
+});
+
 
 sub validate
 {
@@ -158,6 +163,10 @@ If BOOL is true or omitted, sets L<max|/max> to C<0>.  If BOOL is false, sets L<
 =item B<positive [BOOL]>
 
 If BOOL is true or omitted, sets L<min|/min> to C<0>.  If BOOL is false, sets L<min|/min> to undef.
+
+=item B<step [ NUM | any ]>
+
+Get or set the granularity that is expected (and required). The value may be a number or the keyword C<any>. The default value is C<1>.
 
 =back
 

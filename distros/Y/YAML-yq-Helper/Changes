@@ -1,0 +1,9 @@
+Revision history for YAML-yq-Helper
+
+0.1.0	 2022-10-26/00:30
+		 -Fix #! bits.
+		 -Add set_in_array, push_array, and dedup_array.
+
+0.0.1	 2022-10-25/01:15
+		 -First version, released on an unsuspecting world.
+

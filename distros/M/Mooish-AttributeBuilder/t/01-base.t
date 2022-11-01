@@ -48,5 +48,15 @@ subtest 'testing extended()' => sub {
 		'return value ok';
 };
 
+subtest 'testing whether is => rw will get overridden' => sub {
+	my ($name, %params) = field 'field', is => 'rw';
+
+	is $name, 'field', 'name ok';
+	is_deeply
+		\%params,
+		{is => 'rw', init_arg => undef},
+		'return value ok';
+};
+
 done_testing;
 

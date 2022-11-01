@@ -1,5 +1,6 @@
 Changes
 JOESUF.pub
+lib/ModPerl/RegistryCookerSealed.pm
 lib/sealed.pm
 LICENSE
 Makefile.PL

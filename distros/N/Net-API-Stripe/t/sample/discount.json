@@ -1,0 +1,29 @@
+{
+   "checkout_session" : null,
+   "coupon" : {
+      "amount_off" : "99",
+      "created" : "1449638350",
+      "currency" : "usd",
+      "duration" : "once",
+      "duration_in_months" : null,
+      "id" : "MmtYHtx6",
+      "livemode" : 0,
+      "max_redemptions" : "1",
+      "metadata" : {},
+      "name" : null,
+      "object" : "coupon",
+      "percent_off" : null,
+      "redeem_by" : "1452230350",
+      "times_redeemed" : "1",
+      "valid" : 0
+   },
+   "customer" : "cus_AJ78ZaALpqgiuZ",
+   "end" : null,
+   "id" : "di_17G0M72eZvKYlo2ClYl5y9Fl",
+   "invoice" : null,
+   "invoice_item" : null,
+   "object" : "discount",
+   "promotion_code" : null,
+   "start" : "1449638351",
+   "subscription" : null
+}

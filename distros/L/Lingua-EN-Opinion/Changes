@@ -1,5 +1,9 @@
 Revision history for Lingua-EN-Opinion
 
+0.1702 2022-10-21 22:45:53
+    - Update SEE ALSO link.
+    - Avoid implicit imports.
+
 0.1701 2021-03-12 06:45:20
     - Improve documentation.
 

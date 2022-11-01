@@ -7,13 +7,12 @@ build_requires:
   IO::Handle: '0'
   IPC::Open3: '0'
   Test::More: '0'
-  blib: '1.01'
   perl: '5.006'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.006'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -22,18 +21,18 @@ name: Graph-Easy-Weighted
 requires:
   Carp: '0'
   Graph::Easy: '0'
-  Readonly: '0'
+  constant: '0'
   parent: '0'
   perl: '5.006'
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Graph-Easy-Weighted
-  repository: https://github.com/ology/Graph-Easy-Weighted
-version: '0.07'
+  homepage: https://github.com/ology/Graph-Easy-Weighted
+  repository: https://github.com/ology/Graph-Easy-Weighted.git
+version: '0.0701'
 x_Dist_Zilla:
   perl:
-    version: '5.020003'
+    version: '5.032001'
   plugins:
     -
       class: Dist::Zilla::Plugin::VersionFromModule
@@ -46,15 +45,15 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: AutoPrereqs
-      version: '6.008'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::CheckChangesHasContent
       name: CheckChangesHasContent
-      version: '0.008'
+      version: '0.011'
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: NextRelease
-      version: '6.008'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::Authority
       name: Authority
@@ -62,7 +61,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PkgVersion
       name: PkgVersion
-      version: '6.008'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::PodWeaver
       config:
@@ -74,77 +73,77 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::EnsurePod5
               name: '@CorePrep/EnsurePod5'
-              version: '4.012'
+              version: '4.017'
             -
               class: Pod::Weaver::Plugin::H1Nester
               name: '@CorePrep/H1Nester'
-              version: '4.012'
+              version: '4.017'
             -
               class: Pod::Weaver::Plugin::SingleEncoding
               name: '@Default/SingleEncoding'
-              version: '4.012'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Name
               name: '@Default/Name'
-              version: '4.012'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Version
               name: '@Default/Version'
-              version: '4.012'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Region
               name: '@Default/prelude'
-              version: '4.012'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Generic
               name: SYNOPSIS
-              version: '4.012'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Generic
               name: DESCRIPTION
-              version: '4.012'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Generic
               name: OVERVIEW
-              version: '4.012'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Collect
               name: ATTRIBUTES
-              version: '4.012'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Collect
               name: METHODS
-              version: '4.012'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Collect
               name: FUNCTIONS
-              version: '4.012'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Leftovers
               name: '@Default/Leftovers'
-              version: '4.012'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Region
               name: '@Default/postlude'
-              version: '4.012'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Authors
               name: '@Default/Authors'
-              version: '4.012'
+              version: '4.017'
             -
               class: Pod::Weaver::Section::Legal
               name: '@Default/Legal'
-              version: '4.012'
+              version: '4.017'
       name: PodWeaver
-      version: '4.006'
+      version: '4.008'
     -
       class: Dist::Zilla::Plugin::PodCoverageTests
       name: PodCoverageTests
-      version: '6.008'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: PodSyntaxTests
-      version: '6.008'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::Test::NoTabs
       config:
@@ -162,12 +161,12 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Test::EOL:
           filename: xt/author/eol.t
           finder:
-            - ':InstallModules'
             - ':ExecFiles'
+            - ':InstallModules'
             - ':TestFiles'
-          trailing_whitespace: '1'
+          trailing_whitespace: 1
       name: Test::EOL
-      version: '0.18'
+      version: '0.19'
     -
       class: Dist::Zilla::Plugin::Test::Compile
       config:
@@ -183,30 +182,41 @@ x_Dist_Zilla:
           script_finder:
             - ':PerlExecFiles'
           skips: []
+          switch: []
       name: Test::Compile
-      version: '2.054'
+      version: '2.058'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: MetaConfig
-      version: '6.008'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: MetaJSON
-      version: '6.008'
+      version: '6.025'
     -
-      class: Dist::Zilla::Plugin::MetaResources
-      name: MetaResources
-      version: '6.008'
+      class: Dist::Zilla::Plugin::GithubMeta
+      name: GithubMeta
+      version: '0.58'
     -
       class: Dist::Zilla::Plugin::Test::PodSpelling
+      config:
+        Dist::Zilla::Plugin::Test::PodSpelling:
+          directories:
+            - bin
+            - lib
+          spell_cmd: ''
+          stopwords:
+            - LoLs
+            - hashrefs
+            - vertices
+          wordlist: Pod::Wordlist
       name: Test::PodSpelling
-      version: '2.006009'
+      version: '2.007005'
     -
       class: Dist::Zilla::Plugin::GatherDir
       config:
         Dist::Zilla::Plugin::GatherDir:
-          exclude_filename:
-            - LICENSE
+          exclude_filename: []
           exclude_match: []
           follow_symlinks: 0
           include_dotfiles: 0
@@ -214,110 +224,108 @@ x_Dist_Zilla:
           prune_directory: []
           root: .
       name: GatherDir
-      version: '6.008'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: PruneCruft
-      version: '6.008'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: ManifestSkip
-      version: '6.008'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: MetaYAML
-      version: '6.008'
-    -
-      class: Dist::Zilla::Plugin::License
-      name: License
-      version: '6.008'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::Readme
       name: Readme
-      version: '6.008'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: ExtraTests
-      version: '6.008'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: ExecDir
-      version: '6.008'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: ShareDir
-      version: '6.008'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: MakeMaker
-      version: '6.008'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: Manifest
-      version: '6.008'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: TestRelease
-      version: '6.008'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: ConfirmRelease
-      version: '6.008'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: UploadToCPAN
-      version: '6.008'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::CopyFilesFromBuild
       name: CopyFilesFromBuild
-      version: '0.151680'
+      version: '0.170880'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.008'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.008'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.008'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.008'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.008'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.008'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.008'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.008'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.008'
+      version: '6.025'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.008'
+      version: '6.025'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '6.008'
+    version: '6.025'
 x_authority: cpan:GENE
-x_serialization_backend: 'YAML::Tiny version 1.69'
+x_generated_by_perl: v5.32.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

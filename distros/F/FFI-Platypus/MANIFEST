@@ -343,7 +343,6 @@ xt/author/pod.t
 xt/author/pod_coverage.t
 xt/author/pod_link.t
 xt/author/pod_spelling_system.t
-xt/author/strict.t
 xt/author/version.t
 xt/release/changes.t
 xt/release/fixme.t

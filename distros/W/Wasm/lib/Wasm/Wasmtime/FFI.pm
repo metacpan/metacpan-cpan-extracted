@@ -4,21 +4,24 @@ use strict;
 use warnings;
 use 5.008004;
 use FFI::C 0.05;
+use FFI::C::Util ();
 use FFI::Platypus 1.26;
 use FFI::Platypus::Buffer ();
 use FFI::CheckLib 0.26 qw( find_lib );
 use Sub::Install;
 use Devel::GlobalDestruction ();
+use constant ();
 use base qw( Exporter );
 
 # ABSTRACT: Private class for Wasm::Wasmtime
-our $VERSION = '0.21'; # VERSION
+our $VERSION = '0.22'; # VERSION
 
 
-our @EXPORT = qw( $ffi $ffi_prefix _generate_vec_class _generate_destroy );
+our @EXPORT = qw( $ffi $ffi_prefix _generate_vec_class _generate_destroy _v0_23_0 );
 
 sub _lib
 {
+  return $ENV{WASM_WASMTIME_FFI} if defined $ENV{WASM_WASMTIME_FFI};
   my @symbols = (
     # 0.19.0
     'wasmtime_func_as_funcref',
@@ -26,6 +29,9 @@ sub _lib
     'wasmtime_module_serialize',
     'wasmtime_module_deserialize',
     'wasmtime_store_gc',
+    ## 0.23.0
+    #'wasmtime_config_consume_fuel_set',
+    #'wasmtime_config_max_instances_set
   );
   my $lib = find_lib lib => 'wasmtime', symbol => \@symbols;
   return $lib if $lib;
@@ -43,6 +49,8 @@ $ffi->mangler(sub {
   return $name if $name =~ /^(wasm|wasmtime|wasi)_/;
   return $ffi_prefix . $name;
 });
+
+constant->import( _v0_23_0 => $ffi->find_symbol('wasmtime_config_consume_fuel_set') ? 1 : 0);
 
 { package Wasm::Wasmtime::Vec;
   use FFI::Platypus::Record;
@@ -245,10 +253,32 @@ my %kind = (
     map { $_->to_perl } @$self
   }
 
-  $ffi->attach_cast('from_c', 'opaque', 'wasm_val_vec_t', sub {
-    my($xsub, undef, $ptr) = @_;
-    $xsub->($ptr);
-  });
+  if(Wasm::Wasmtime::FFI::_v0_23_0())
+  {
+    {
+      package Wasm::Wasmtime::ValVecWrapper;
+      FFI::C->struct(wasm_val_vec_wrapper_t => [
+        size => 'size_t',
+        data => 'opaque',
+      ]);
+
+    }
+
+    $ffi->attach_cast('from_c', 'opaque', 'wasm_val_vec_wrapper_t', sub {
+      my($xsub, undef, $ptr) = @_;
+      my $wrapper = $xsub->($ptr);
+      my $inner = $ffi->cast('opaque', 'wasm_val_vec_t', $wrapper->data);
+      FFI::C::Util::set_array_count($inner, $wrapper->size);
+      return $inner;
+    });
+  }
+  else
+  {
+    $ffi->attach_cast('from_c', 'opaque', 'wasm_val_vec_t', sub {
+      my($xsub, undef, $ptr) = @_;
+      $xsub->($ptr);
+    });
+  }
 
   sub from_perl
   {
@@ -271,7 +301,7 @@ Wasm::Wasmtime::FFI - Private class for Wasm::Wasmtime
 
 =head1 VERSION
 
-version 0.21
+version 0.22
 
 =head1 SYNOPSIS
 
@@ -310,7 +340,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Graham Ollis.
+This software is copyright (c) 2020-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

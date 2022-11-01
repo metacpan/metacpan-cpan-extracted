@@ -1,5 +1,14 @@
 Revision history for PDL-IO-Touchstone
 
+1.010   Mon, 31 Oct 2022 19:15:01 -0700
+	Added support for single-frequency interpolation
+	Added rsnp_hash.
+
+1.009   Sun, 30 Oct 2022 18:24:52 -0700
+	Added PDL::IO::MDIF: Read and write Measurement Data Interchange Format
+	Fixed 5.26.3 CI test
+	Updated documentation.
+
 1.008   Wed, 19 Oct 2022 18:13:59 -0700
 	Add support for wsnp() to take n-port z0 vectors
 	Updated documentation to reference RF::Component

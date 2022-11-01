@@ -15,7 +15,7 @@ use utf8;
 ## use critic (Modules::RequireExplicitPackage)
 
 package WebFetch::Output::Capture;
-$WebFetch::Output::Capture::VERSION = '0.15.4';
+$WebFetch::Output::Capture::VERSION = '0.15.5';
 use base "WebFetch";
 use Data::Dumper;
 
@@ -76,13 +76,13 @@ WebFetch::Output::Capture - capture WebFetch data without generating an output f
 
 =head1 VERSION
 
-version 0.15.4
+version 0.15.5
 
 =head1 SYNOPSIS
 
 In perl scripts:
 
-    use WebFetch::Input::RSS; # or another WebFetch input - this example shows RSS
+    use WebFetch::RSS; # or another WebFetch input - this example shows RSS
     use WebFetch::Output::Capture;
     # ... fill in $params hashref
     my %Options = (
@@ -92,7 +92,7 @@ In perl scripts:
         dest_format => "capture",
         dest => "", # unused
     );
-    WebFetch::Input::RSS->run(\%Options);
+    WebFetch::RSS->run(\%Options);
     my @data_records = WebFetch::Output::Capture::data_records();
 
 =head1 DESCRIPTION

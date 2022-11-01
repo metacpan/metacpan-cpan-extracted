@@ -19,7 +19,7 @@ Readonly::Scalar my $LAST_INDEX => -1;
 Readonly::Scalar my $LINE_SIZE => 79;
 Readonly::Scalar my $SPACE => q{ };
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 # Finalize Tags output.
 sub finalize {
@@ -144,6 +144,9 @@ sub _default_parameters {
 
 	# Next indent string.
 	$self->{'next_indent'} = $SPACE x 2;
+
+	# No data callback.
+	$self->{'no_data_callback'} = ['script', 'style'];
 
 	# No simple tags.
 	$self->{'no_simple'} = [];
@@ -414,7 +417,9 @@ sub _put_data {
 	}
 
 	# Process data callback.
-	$self->_process_callback(\@data, 'data_callback');
+	if (none { $_ eq $self->{'printed_tags'}->[0] } @{$self->{'no_data_callback'}}) {
+		$self->_process_callback(\@data, 'data_callback');
+	}
 
 	$self->_newline;
 	$self->{'preserve_obj'}->save_previous;
@@ -640,6 +645,22 @@ Returns instance of class.
  Value of indent, which are added to begin of line.
  Default value is "  ".
 
+=item * C<no_data_callback>
+
+ Reference to array of tags, that can't use data callback.
+ Default is ['script', 'style'].
+
+ Example:
+ For elements defined in this field we don't use 'data_callback'. It's used for
+ doing of HTML escape sequences.
+ Prints <script>&</script> instead <script>&amp;</script> in default setting of 'data_callback'.
+
+ my $tags = Tags::Output::Indent->new(
+         'no_data_callback' => ['script'],
+ );
+ $tags->put(['b', 'script'], ['d', '&'], ['e', 'script']);
+ $tags->flush;
+
 =item * C<no_simple>
 
  Reference to array of tags, that can't by simple.
@@ -811,12 +832,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2011-2020 Michal Josef Špaček
+© 2011-2022 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut

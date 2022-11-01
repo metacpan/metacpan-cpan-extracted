@@ -22,7 +22,7 @@ the same terms as the Perl 5 programming language system itself.
 use strict;
 use warnings;
 use Test::More;
-use Test::Requires '5.010001';
+use Test::Requires '5.008001';
 
 use FindBin qw($Bin);
 use lib "$Bin/lib";

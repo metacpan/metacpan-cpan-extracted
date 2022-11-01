@@ -1,5 +1,8 @@
 Revision history for Mock::Populate
 
+0.1702 2022-10-23 11:44:02
+    - Avoid implicit imports.
+
 0.1701 2019-04-07 14:40:57
     - Removed unused or abused variables.
     - Fixed regular expression used to split a localtime.

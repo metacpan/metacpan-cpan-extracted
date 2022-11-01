@@ -13,7 +13,7 @@ use File::Copy::Recursive qw(rcopy_glob pathempty);
 # test configuration
 my $workspace = "t/container-workspace";
 my %distro_subst = (
-    "opensuse" => "opensuse/leap",
+    "opensuse" => "opensuse/tumbleweed",
     "kalilinux" => "kalilinux/kali-last-release"
 );
 my @distros = qw(fedora rockylinux almalinux debian ubuntu alpine archlinux opensuse kalilinux);
@@ -71,10 +71,11 @@ my $orig_cwd = getcwd();
 chdir $workspace;
 system "cpan -g Sys::OsRelease >/dev/null 2>&1";
 
-# find container command: Podman or Docker - check Podman first to prefer local containers over Docker's root daemon
+# find container command: Podman is Open Source and uses local containers
+# Docker can possibly be added as a search option below, untested/unsupported but CLI options should be compatible
 my $container_cmd;
 DIR_LOOP: foreach my $pathdir (split /:/, $ENV{PATH}) {
-    foreach my $cmdname (qw(podman docker)) {
+    foreach my $cmdname (qw(podman)) {
         if (-x "$pathdir/$cmdname") {
             $container_cmd = "$pathdir/$cmdname";
             last DIR_LOOP;
@@ -82,7 +83,7 @@ DIR_LOOP: foreach my $pathdir (split /:/, $ENV{PATH}) {
     }
 }
 if (not defined $container_cmd) {
-    print qq{1..0 # SKIP container tests - neither podman nor docker found in PATH\n};
+    print qq{1..0 # SKIP container tests - podman not found in PATH\n};
     exit 0;
 }
 

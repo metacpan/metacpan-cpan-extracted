@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <gmp.h>
 
-#if defined(USE_QUADMATH)
+#if defined(USE_QUADMATH) || defined(LD_PRINTF_BROKEN)
 #include <quadmath.h>
 #endif
 

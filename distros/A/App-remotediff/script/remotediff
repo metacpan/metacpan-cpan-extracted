@@ -1,0 +1,178 @@
+#!/usr/bin/env perl
+#
+# remotediff - remote diff over rsync
+#
+# 2022.10.21 v1.10 jul : fixed caching
+# 2022.06.24 v1.00 jul : first release
+
+use 5.006;
+use strict;
+use warnings;
+use utf8;
+use Getopt::Std;
+use File::Basename;
+use File::Temp qw(tempdir);
+use File::Path qw(make_path);
+use Cwd qw(abs_path);
+
+our $VERSION = '1.10';
+my $program  = basename($0);
+my $usage    = <<EOF;
+
+Usage: $program [OPTION]... FILES
+
+Like 'diff' :
+FILES are 'FILE1 FILE2' or 'DIR1 DIR2' or 'DIR FILE...' or 'FILE... DIR'.
+
+Like 'rsync' :
+FILES can be [[USER@]HOST:]SRC
+
+But '..' is forbidden in local and remote sources.
+
+All [OPTION] pass through to 'diff'.
+
+See `perldoc $program` for full documentation.
+EOF
+
+# options and args
+die $usage if @ARGV < 2;
+my $opts = @ARGV > 2 ? join(' ', splice(@ARGV,0,@ARGV-2)) : "";
+die $usage if $ARGV[0] =~ /\.\./ or $ARGV[1] =~ /\.\./;
+
+########
+# MAIN #
+########
+
+# flush output
+select(STDERR);
+$| = 1;
+select(STDOUT);
+$| = 1;
+     
+my $tmp = File::Spec->tmpdir() . "/remotediff"; # cache remote sources
+#my $tmp = tempdir( CLEANUP => 1 );             # no cache
+
+# process file 1
+if ( $ARGV[0] =~ /^([^\/:]*:)(\/?)(.+)/ )
+{
+	# remote src
+	my $host = $1;
+	my $root = $2;
+	my $path = dirname($3);
+	my $base = basename($3);
+
+	make_path("$tmp/$host");
+	system ("rsync -az --relative --copy-dirlinks $ARGV[0] $tmp/$host") == 0 or die "system failed: $?";
+	
+	if ( $root ne '/' )
+	{
+		# relative src	
+		my @dirs = File::Spec->splitdir($path);
+
+		my $old = $path eq '.' ? "$tmp/$host/$base" : "$tmp/$host/$dirs[0]" ;
+		my $new = $path eq '.' ? "$tmp/$host$base"  : "$tmp/$host$dirs[0]"  ;
+
+		# recreate symlink
+		unlink($new);
+		symlink($old,$new) or die "symlink failed : $!";
+	}
+}
+else
+{
+	# local src
+	my $path = dirname($ARGV[0]);
+	my $base = basename($ARGV[0]);
+
+	# recreate symlink
+	make_path("$tmp/$path");
+	unlink "$tmp/$path/$base";
+	symlink(abs_path($ARGV[0]),"$tmp/$path/$base") or die "symlink failed : $!";
+}
+
+# process file 2
+if ( $ARGV[1] =~ /^([^\/:]*:)(\/?)(.+)/ )
+{
+	# remote src
+	my $host = $1;
+	my $root = $2;
+	my $path = dirname($3);
+	my $base = basename($3);
+
+	make_path("$tmp/$host");
+	system ("rsync -az --relative --copy-dirlinks $ARGV[1] $tmp/$host") == 0 or die "system failed: $?";
+	
+	if ( $root ne '/' )
+	{
+		# relative src
+		my @dirs = File::Spec->splitdir($path);
+
+		my $old = $path eq '.' ? "$tmp/$host/$base" : "$tmp/$host/$dirs[0]" ;
+		my $new = $path eq '.' ? "$tmp/$host$base"  : "$tmp/$host$dirs[0]"  ;
+
+		# recreate symlink
+		unlink($new);
+		symlink($old,$new) or die "symlink failed : $!";
+	}	
+}
+else
+{
+	# local src
+	my $path = dirname($ARGV[1]);
+	my $base = basename($ARGV[1]);
+
+	# recreate symlink
+	make_path("$tmp/$path");
+	unlink "$tmp/$path/$base";
+	symlink(abs_path($ARGV[1]),"$tmp/$path/$base") or die "symlink failed : $!";
+}
+
+my $diff = 'diff';
+$diff = 'colordiff' if -t STDOUT and `which colordiff`; # use colordiff if tty
+
+chdir $tmp;
+
+exec ("$diff $opts $ARGV[0] $ARGV[1]");
+
+__END__
+
+=head1 NAME
+
+remotediff - remote diff over rsync
+
+=head1 SYNOPSIS
+
+    $ remotediff [OPTION]... FILES
+
+    Like 'diff' :
+    FILES are 'FILE1 FILE2' or 'DIR1 DIR2' or 'DIR FILE...' or 'FILE... DIR'.
+
+    Like 'rsync' :
+    FILES can be [[USER@]HOST:]SRC
+
+    But '..' is forbidden in local and remote sources.
+
+    All [OPTION] pass through to 'diff'.
+
+=head1 DESCRIPTION
+
+`remotediff` uses `rsync` to copy remote files to a tmp directory, before
+executing `diff` on them locally.
+
+`colordiff` is used if installed and STDOUT is a TTY.
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<kaldor@cpan.org>, or through
+the web interface at L<https://github.com/kal247/App-remotediff/issues>.
+
+=head1 AUTHOR
+
+jul, C<kaldor@cpan.org>
+
+=head1 LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2022 by jul.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)

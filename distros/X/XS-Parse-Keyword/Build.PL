@@ -54,7 +54,12 @@ EOF
 #include "perl.h"
 #include "XSUB.h"
 
-int main(void) { struct Perl_custom_infix def; return 0; }
+int main(void) {
+   struct Perl_custom_infix def;
+   def.prec = INFIX_PREC_LOW;
+   def.build_op = NULL;
+   return 0;
+}
 EOF
    ) if $] >= 5.037000; # maybe I'll start this in 5.37...
 

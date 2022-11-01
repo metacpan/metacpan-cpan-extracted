@@ -1,7 +1,13 @@
+0.49
+ - Fix some bugs in t/NOK_and_POK.t that did not cater for the possibility
+   that nvtype is __float128
+ - Enable building on Cygwin -Dusequadmath perls. (Add '-lquadmath' link to LIBS.)
+
 0.48
  - Correction to NaN handling test - the need for which is demonstrated at:
    http://www.cpantesters.org/cpan/report/d284d78e-99ce-11ec-816f-efdcdd96d0b2
- - Work around perl bug in https://github.com/Perl/perl5/issues/19550
+ - Work around perl bug in https://github.com/Perl/perl5/issues/19550.
+   (Affected only perl-5.35.10.)
 
 0.47
  - Fix bug re inconsistent settings of POK and NOK flag, which manifests itself as (eg):

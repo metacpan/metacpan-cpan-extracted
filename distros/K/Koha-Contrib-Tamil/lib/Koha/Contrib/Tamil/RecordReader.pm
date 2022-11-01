@@ -1,6 +1,6 @@
 package Koha::Contrib::Tamil::RecordReader;
 #ABSTRACT: Koha biblio/authority records reader
-$Koha::Contrib::Tamil::RecordReader::VERSION = '0.068';
+$Koha::Contrib::Tamil::RecordReader::VERSION = '0.069';
 use Moose;
 
 with 'MooseX::RW::Reader';
@@ -294,7 +294,7 @@ Koha::Contrib::Tamil::RecordReader - Koha biblio/authority records reader
 
 =head1 VERSION
 
-version 0.068
+version 0.069
 
 =head1 SYNOPSYS
 

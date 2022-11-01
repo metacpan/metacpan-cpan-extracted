@@ -2,7 +2,7 @@
 ## Stripe API - ~/lib/Net/API/Stripe/Customer/TaxId.pm
 ## Version v0.100.0
 ## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2020/05/15
 ## 
@@ -11,30 +11,35 @@ package Net::API::Stripe::Customer::TaxId;
 BEGIN
 {
     use strict;
+    use warnings;
     use parent qw( Net::API::Stripe::Generic );
+    use vars qw( $VERSION );
     our( $VERSION ) = 'v0.100.0';
 };
 
-sub id { shift->_set_get_scalar( 'id', @_ ); }
+use strict;
+use warnings;
+
+sub id { return( shift->_set_get_scalar( 'id', @_ ) ); }
 
 sub object { return( shift->_set_get_scalar( 'object', @_ ) ); }
 
-sub country { shift->_set_get_scalar( 'country', @_ ); }
+sub country { return( shift->_set_get_scalar( 'country', @_ ) ); }
 
-sub created { shift->_set_get_datetime( 'created', @_ ); }
+sub created { return( shift->_set_get_datetime( 'created', @_ ) ); }
 
 ## Customer id
-sub customer { shift->_set_get_scalar_or_object( 'customer', 'Net::API::Stripe::Customer', @_ ); }
+sub customer { return( shift->_set_get_scalar_or_object( 'customer', 'Net::API::Stripe::Customer', @_ ) ); }
 
-sub livemode { shift->_set_get_boolean( 'livemode', @_ ); }
+sub livemode { return( shift->_set_get_boolean( 'livemode', @_ ) ); }
 
 ## au_abn, ch_vat, eu_vat, in_gst, no_vat, nz_gst, unknown, or za_vat
-sub type { shift->_set_get_scalar( 'type', @_ ); }
+sub type { return( shift->_set_get_scalar( 'type', @_ ) ); }
 
-sub value { shift->_set_get_scalar( 'value', @_ ); }
+sub value { return( shift->_set_get_scalar( 'value', @_ ) ); }
 
-# sub verification { shift->_set_get_object( 'verification', 'Net::API::Stripe::Customer::TaxInfoVerification', @_ ); }
-sub verification { shift->_set_get_object( 'verification', 'Net::API::Stripe::Connect::Account::Verification', @_ ); }
+# sub verification { return( shift->_set_get_object( 'verification', 'Net::API::Stripe::Customer::TaxInfoVerification', @_ ) ); }
+sub verification { return( shift->_set_get_object( 'verification', 'Net::API::Stripe::Connect::Account::Verification', @_ ) ); }
 
 1;
 
@@ -67,74 +72,66 @@ You can add one or multiple tax IDs to a customer (L<Net::API::Stripe::Customer>
 
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>( %ARG )
+=head2 new( %ARG )
 
 Creates a new L<Net::API::Stripe::Customer::TaxId> object.
 It may also take an hash like arguments, that also are method of the same name.
 
-=back
-
 =head1 METHODS
 
-=over 4
-
-=item B<id> string
+=head2 id string
 
 Unique identifier for the object.
 
-=item B<object> string, value is "tax_id"
+=head2 object string, value is "tax_id"
 
 String representing the object’s type. Objects of the same type share the same value.
 
-=item B<country> string
+=head2 country string
 
 Two-letter ISO code representing the country of the tax ID.
 
-=item B<created> timestamp
+=head2 created timestamp
 
 Time at which the object was created. Measured in seconds since the Unix epoch.
 
-=item B<customer> string (expandable)
+=head2 customer string (expandable)
 
 ID of the customer. When expanded, this is a L<Net::API::Stripe::Customer> object.
 
-=item B<livemode> boolean
+=head2 livemode boolean
 
 Has the value true if the object exists in live mode or the value false if the object exists in test mode.
 
-=item B<type> string
+=head2 type string
 
 Type of the tax ID, one of au_abn, ch_vat, eu_vat, in_gst, no_vat, nz_gst, unknown, or za_vat
 
-=item B<value> string
+=head2 value string
 
 Value of the tax ID.
 
-=item B<verification> object
+=head2 verification object
 
 Tax ID verification information. This is a L<Net::API::Stripe::Customer::TaxInfoVerification> object.
 
-=back
-
 =head1 API SAMPLE
 
-	{
-	  "id": "txi_fake123456789",
-	  "object": "tax_id",
-	  "country": "DE",
-	  "created": 123456789,
-	  "customer": "cus_fake123456789",
-	  "livemode": false,
-	  "type": "eu_vat",
-	  "value": "DE123456789",
-	  "verification": {
-		"status": "pending",
-		"verified_address": null,
-		"verified_name": null
-	  }
-	}
+    {
+      "id": "txi_fake123456789",
+      "object": "tax_id",
+      "country": "DE",
+      "created": 123456789,
+      "customer": "cus_fake123456789",
+      "livemode": false,
+      "type": "eu_vat",
+      "value": "DE123456789",
+      "verification": {
+        "status": "pending",
+        "verified_address": null,
+        "verified_name": null
+      }
+    }
 
 =head1 HISTORY
 

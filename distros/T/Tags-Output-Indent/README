@@ -96,6 +96,22 @@ METHODS
              Value of indent, which are added to begin of line.
              Default value is "  ".
 
+    *       "no_data_callback"
+
+             Reference to array of tags, that can't use data callback.
+             Default is ['script', 'style'].
+
+             Example:
+             For elements defined in this field we don't use 'data_callback'. It's used for
+             doing of HTML escape sequences.
+             Prints <script>&</script> instead <script>&amp;</script> in default setting of 'data_callback'.
+
+             my $tags = Tags::Output::Indent->new(
+                     'no_data_callback' => ['script'],
+             );
+             $tags->put(['b', 'script'], ['d', '&'], ['e', 'script']);
+             $tags->flush;
+
     *       "no_simple"
 
              Reference to array of tags, that can't by simple.
@@ -239,10 +255,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © 2011-2020 Michal Josef Špaček
+    © 2011-2022 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.07
+    0.08
 

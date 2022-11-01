@@ -1,5 +1,9 @@
 Revision history for Text-TFIDF-Ngram
 
+0.0509 2022-10-26 17:49:06
+    - Improve eg/analyze.
+    - Avoid implicit imports.
+
 0.0508 2021-02-15 11:39:02
     - Add a test for the single quote.
 

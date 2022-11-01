@@ -3,6 +3,7 @@
 
 #include "spvm_native.h"
 
+#include <unistd.h>
 #include <stdio.h>
 #include <sys/fcntl.h>
 #include <sys/stat.h>

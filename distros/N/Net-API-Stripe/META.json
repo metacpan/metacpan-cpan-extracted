@@ -4,7 +4,7 @@
       "Jacques Deguest (jack@deguest.jp)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -32,9 +32,6 @@
       },
       "runtime" : {
          "requires" : {
-            "Crypt::OpenSSL::RSA" : "0.31",
-            "Cwd" : "3.75",
-            "Data::Dumper" : "2.173",
             "Data::Random" : "0.13",
             "Data::UUID" : "1.224",
             "DateTime" : "1.51",
@@ -44,29 +41,23 @@
             "Digest::MD5" : "2.55",
             "Digest::SHA" : "6.02",
             "Encode" : "3.01",
-            "File::Basename" : "2.85",
-            "File::Spec" : "3.75",
-            "HTTP::Cookies" : "6.04",
-            "HTTP::Request" : "6.18",
-            "IO::File" : "1.41",
+            "HTTP::Promise" : "v0.2.1",
             "JSON" : "4.02",
-            "LWP::MediaTypes" : "6.04",
-            "LWP::UserAgent" : "6.39",
             "MIME::Base64" : "3.15",
             "MIME::QuotedPrint" : "3.13",
-            "Module::Generic" : "v0.12.13",
+            "Module::Generic" : "v0.28.4",
             "Net::IP" : "1.26",
-            "Net::OAuth" : "0.28",
-            "Nice::Try" : "v0.1.4",
+            "Nice::Try" : "v1.3.1",
+            "Regexp::Common" : "2017060201",
             "Scalar::Util" : "1.54",
             "URI::Escape" : "3.31",
-            "URI::Query" : "0.16",
             "Want" : "0.29",
             "common::sense" : "0",
             "constant" : "0",
             "overload" : "1.26",
             "parent" : "0",
-            "perl" : "5.006000"
+            "perl" : "5.006000",
+            "vars" : "0"
          }
       },
       "test" : {
@@ -77,6 +68,16 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v1.0.8",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "cpan-bug@deguest.jp",
+         "web" : "https://gitlab.com/jackdeguest/Net-API-Stripe/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "web" : "https://gitlab.com/jackdeguest/Net-API-Stripe"
+      }
+   },
+   "version" : "v2.0.1",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

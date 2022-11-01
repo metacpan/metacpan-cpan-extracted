@@ -1,24 +1,62 @@
 Revision history for Perl extension Terminal::Identify.
 
-0.08  2022-10-21
+0.29  2022-10-28
+        - Required Perl version changed to 5.010000.
+        - Minor changes in code. Minor changes in documentation.
+        - Terminal emulators added to the dictionary.
+        - Some variables checked, if they are defined or initialised. 
+        - Tests added.
+        - Typos correction.
+
+0.28  2022-10-27
+        - Required Perl version changed to 5.020000.
+        - Major changes in code. Major changes in documentation. 
+        - Terminal emulators added to the dictionary.
+        - Inline C code removed. 
+        - Typos correction.
+
+0.27  2022-10-26
+        - Changing CONTRIBUTING.md.
+        - Inline C code disabled. 
+        - Suppress error messages from Linux commands.
+        - Terminal emulators added to the dictionary.
+        - Major changes in code. Major changes in documentation. 
+        - Terminal dictionary moved to __Data__ section.
+        - Typos correction.
+
+0.26  2022-10-24
+        - As response on ticket from RT: Set $term to "?" in case of pts and
+          tty not recognised. Changed (! -x "/bin/which" || ! -x "/usr/bin/which")
+          ("! -x "/bin/which" && ! -x "/usr/bin/which"). Added Putty to list of 
+          known but not tested terminals.
+        - Some minor changes in code. Bug fixing in general. 
+
+0.25  2022-10-24
+        - Added Windows recognition. Error fixing. 
+        - Minor changes in code. Minor changes in documentation. 
+
+0.19 - 0.24  2022-10-24
+        - Changing CONTRIBUTING.md. Bug fixing. 
+
+0.16 - 0.18  2022-10-24
+        - Bug fixing. 
+
+0.15  2022-10-24
+        - Major changes in code. Major changes in documentation. 
+
+0.12 - 0.14  2022-10-23
+        - Minor changes in code. Minor changes in documentation. Bug fixing.
+
+0.10 - 0.11  2022-10-22
+        - Major changes in code. Minor changes in documentation.
+
+0.07 - 0.09  2022-10-21
         - Minor changes in code. Minor changes in documentation.
 
-0.07  2022-10-21
-        - Minor changes in code. Major changes in documentation.
-
-0.06  2022-10-20
+0.05 - 0.06  2022-10-20
         - Major changes in code. Major changes in documentation.
 
-0.05  2022-10-20
-        - Major changes in code. Major changes in documentation.
-
-0.04  2022-10-20
-        - Bug fixing.
-
-0.03  2022-09-17
-        - Bug fixing.
-
-0.02  2022-09-16
+0.02 - 0.04  2022-10-20
         - Bug fixing.
 
 0.01  2022-09-15

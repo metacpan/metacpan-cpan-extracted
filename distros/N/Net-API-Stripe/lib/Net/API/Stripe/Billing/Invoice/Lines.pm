@@ -2,7 +2,7 @@
 ## Stripe API - ~/lib/Net/API/Stripe/Billing/Invoice/Lines.pm
 ## Version v0.100.0
 ## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2020/05/15
 ## 
@@ -11,21 +11,26 @@ package Net::API::Stripe::Billing::Invoice::Lines;
 BEGIN
 {
     use strict;
+    use warnings;
     use parent qw( Net::API::Stripe::List );
+    use vars qw( $VERSION );
     our( $VERSION ) = 'v0.100.0';
 };
 
+use strict;
+use warnings;
+
 # Inherited
-# sub object { shift->_set_get_scalar( 'object', @_ ); }
+# sub object { return( shift->_set_get_scalar( 'object', @_ ) ); }
 
 ## Array of Net::API::Stripe::Billing::Invoice::LineItem
-# sub data { shift->_set_get_object_array( 'data', 'Net::API::Stripe::Billing::Invoice::LineItem', @_ ); }
+# sub data { return( shift->_set_get_object_array( 'data', 'Net::API::Stripe::Billing::Invoice::LineItem', @_ ) ); }
 
 # Inherited
-# sub has_more { shift->_set_get_scalar( 'has_more', @_ ); }
+# sub has_more { return( shift->_set_get_scalar( 'has_more', @_ ) ); }
 
 # Inherited
-# sub url { shift->_set_get_uri( 'url', @_ ); }
+# sub url { return( shift->_set_get_uri( 'url', @_ ) ); }
 
 1;
 

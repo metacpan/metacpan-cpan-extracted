@@ -1,3 +1,13 @@
+0.15 2022-10-27
+    * Add Archive::Zip::Member prerequisite
+      ... for _unixToDosTime()
+
+0.14 2022-10-26
+    * Archive::SevenZip::API::ArchiveZip->addFile now takes a third
+      optional parameter $compressionLevel before the hash options. This
+      mirrors the Archive::Zip API.
+      Reported by LanX
+
 0.13 2022-04-21
     * ->find_7z_executable now also returns the 7z version when a path to
       the executable is set via $ENV{PERL_ARCHIVE_SEVENZIP_BIN}

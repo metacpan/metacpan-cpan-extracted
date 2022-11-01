@@ -1,5 +1,14 @@
 Revision history for Perl module Math::GMPz
 
+0.55
+ - Simplify overloading of NVs by utilizing Rmpz_set_NV(). This also seems to fix the
+   off-by-one errors that might afflict NV overloading when NV type is doubledouble.
+ - Limit test in Makefile.PL for GMPQ_PV_NV_BUG to perl-5.35.9 and earlier.
+ - In Makefile.PL, insert '-lquadmath' link in LIBS entry in %WriteMakefile - but only
+   for Cygwin -Dusequadmath perls.
+ - Workaround Cygwin -Duselongdouble printf "%.0Lf" formatting bug. For example of bug
+   see: http://www.cpantesters.org/cpan/report/981d0446-6f3a-1014-84d5-f4f801469742
+
 0.54
  - Fix bug re inconsistent settings of POK and NOK flag, which manifests itself as (eg):
    http://www.cpantesters.org/cpan/report/dc4f8aec-900b-11ec-bfc9-d1f1448276d4

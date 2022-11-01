@@ -8,7 +8,7 @@ use Webservice::Judobase;
 my $event_id   = $ARGV[0] || 1457;    # Ekaterinburg Grand Slam 2017
 my $athlete_id = $ARGV[1] || 2130;    # Papanishvili Amiran
 
-my $srv = Webservice::Judobase->new;
+my $srv      = Webservice::Judobase->new;
 my $contests = $srv->contests->competition( id => $event_id );
 
 for ( @{$contests} ) {

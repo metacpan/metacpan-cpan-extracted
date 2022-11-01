@@ -128,7 +128,7 @@
     "\N{U+0f66}\N{U+0fa4}\N{U+0fb1}\N{U+0f72}\N{U+0f0b}\N{U+0f63}\N{U+0f7c}\N{U+0f0b}\N{U+0f66}\N{U+0f94}\N{U+0f7c}\N{U+0f53}\N{U+0f0b}",
     "\N{U+0f66}\N{U+0fa4}\N{U+0fb1}\N{U+0f72}\N{U+0f0b}\N{U+0f63}\N{U+0f7c}\N{U+0f0b}",
   ],
-  first_day_of_week => 7,
+  first_day_of_week => 1,
   glibc_date_1_format => "\N{U+0f54}\N{U+0f66}\N{U+0fb1}\N{U+0f72}\N{U+0f0b}\N{U+0f63}\N{U+0f7c}%y\N{U+0f5f}\N{U+0f63}%m\N{U+0f5a}\N{U+0f7a}\N{U+0f66}%d\N{U+0f46}\N{U+0f74}\N{U+0f0b}\N{U+0f5a}\N{U+0f7c}\N{U+0f51}%H\N{U+0f40}\N{U+0f66}\N{U+0f62}\N{U+0f0b}\N{U+0f58}%M\N{U+0f40}\N{U+0f66}\N{U+0f62}\N{U+0f0b}\N{U+0f46}%S",
   glibc_date_format => "\N{U+0f54}\N{U+0f66}\N{U+0fb1}\N{U+0f72}\N{U+0f0b}\N{U+0f63}\N{U+0f7c}%y\N{U+0f5f}\N{U+0f63}%m\N{U+0f5a}\N{U+0f7a}\N{U+0f66}%d",
   glibc_datetime_format => "\N{U+0f54}\N{U+0f66}\N{U+0fb1}\N{U+0f72}\N{U+0f0b}\N{U+0f63}\N{U+0f7c}%y\N{U+0f5f}\N{U+0f63}%m\N{U+0f5a}\N{U+0f7a}\N{U+0f66}%d\N{U+0f46}\N{U+0f74}\N{U+0f0b}\N{U+0f5a}\N{U+0f7c}\N{U+0f51}%H\N{U+0f40}\N{U+0f66}\N{U+0f62}\N{U+0f0b}\N{U+0f58}%M\N{U+0f40}\N{U+0f66}\N{U+0f62}\N{U+0f0b}\N{U+0f46}%S",
@@ -268,5 +268,5 @@
   time_format_medium => "HH:mm:ss",
   time_format_short => "HH:mm",
   variant => undef,
-  version => 41,
+  version => 42,
 }

@@ -20,7 +20,6 @@ my $opt = Getopt::Class->new({
 # $opt->message( $opt->dumper( $dict ) ); exit;
 # my $params = $opt->parameters;
 # my $options = $opt->options;
-# $opt->message( $opt->dumper( $options ) );
 # $opt->message( $opt->dumper( $params ) ); exit;
 isa_ok( $opt, 'Getopt::Class' );
 

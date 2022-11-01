@@ -2,7 +2,7 @@
 ## Stripe API - ~/lib/Net/API/Stripe/Issuing/Card/Holder.pm
 ## Version v0.200.0
 ## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2020/05/15
 ## 
@@ -12,45 +12,50 @@ package Net::API::Stripe::Issuing::Card::Holder;
 BEGIN
 {
     use strict;
+    use warnings;
     use parent qw( Net::API::Stripe::Generic );
+    use vars qw( $VERSION );
     our( $VERSION ) = 'v0.200.0';
 };
 
-sub id { shift->_set_get_scalar( 'id', @_ ); }
+use strict;
+use warnings;
 
-sub object { shift->_set_get_scalar( 'object', @_ ); }
+sub id { return( shift->_set_get_scalar( 'id', @_ ) ); }
+
+sub object { return( shift->_set_get_scalar( 'object', @_ ) ); }
 
 sub authorization_controls { return( shift->_set_get_object( 'authorization_controls', 'Net::API::Stripe::Issuing::Card::AuthorizationsControl', @_ ) ); }
 
-sub billing { shift->_set_get_object( 'billing', 'Net::API::Stripe::Billing::Details', @_ ); }
+sub billing { return( shift->_set_get_object( 'billing', 'Net::API::Stripe::Billing::Details', @_ ) ); }
 
 sub company { return( shift->_set_get_object( 'company', 'Net::API::Stripe::Connect::Account::Company', @_ ) ); }
 
-sub created { shift->_set_get_datetime( 'created', @_ ); }
+sub created { return( shift->_set_get_datetime( 'created', @_ ) ); }
 
-sub email { shift->_set_get_scalar( 'email', @_ ); }
+sub email { return( shift->_set_get_scalar( 'email', @_ ) ); }
 
 sub individual { return( shift->_set_get_object( 'individual', 'Net::API::Stripe::Connect::Person', @_ ) ); }
 
 sub is_default { return( shift->_set_get_boolean( 'is_default', @_ ) ); }
 
-sub livemode { shift->_set_get_boolean( 'livemode', @_ ); }
+sub livemode { return( shift->_set_get_boolean( 'livemode', @_ ) ); }
 
-sub metadata { shift->_set_get_hash( 'metadata', @_ ); }
+sub metadata { return( shift->_set_get_hash( 'metadata', @_ ) ); }
 
-sub name { shift->_set_get_scalar( 'name', @_ ); }
+sub name { return( shift->_set_get_scalar( 'name', @_ ) ); }
 
-sub phone_number { shift->_set_get_scalar( 'phone_number', @_ ); }
+sub phone_number { return( shift->_set_get_scalar( 'phone_number', @_ ) ); }
 
 sub requirements { return( shift->_set_get_object( 'requirements', 'Net::API::Stripe::Connect::Account::Requirements', @_ ) ); }
 
 sub spending_controls
 {
-	return( shift->_set_get_class( 'spending_controls',
-	{
-	allowed_categories => { type => 'array' },
-	blocked_categories => { type => 'array' },
-	spending_limits => 
+    return( shift->_set_get_class( 'spending_controls',
+    {
+    allowed_categories => { type => 'array' },
+    blocked_categories => { type => 'array' },
+    spending_limits => 
         {
         type => 'class', definition =>
             {
@@ -58,14 +63,14 @@ sub spending_controls
             categories => { type => 'array' },
             interval => { type => 'scalar' },
             }
-	    },
-	spending_limits_currency => { type => 'scalar' },
-	}, @_ ) );
+        },
+    spending_limits_currency => { type => 'scalar' },
+    }, @_ ) );
 }
 
-sub status { shift->_set_get_scalar( 'status', @_ ); }
+sub status { return( shift->_set_get_scalar( 'status', @_ ) ); }
 
-sub type { shift->_set_get_scalar( 'type', @_ ); }
+sub type { return( shift->_set_get_scalar( 'type', @_ ) ); }
 
 1;
 
@@ -125,90 +130,84 @@ An Issuing Cardholder object represents an individual or business entity who is 
 
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>( %ARG )
+=head2 new( %ARG )
 
 Creates a new L<Net::API::Stripe::Issuing::Card::Holder> object.
 It may also take an hash like arguments, that also are method of the same name.
 
-=back
-
 =head1 METHODS
 
-=over 4
-
-=item B<id> string
+=head2 id string
 
 Unique identifier for the object.
 
-=item B<object> string, value is "issuing.cardholder"
+=head2 object string, value is "issuing.cardholder"
 
 String representing the object’s type. Objects of the same type share the same value.
 
-=item B<authorization_controls> hash
+=head2 authorization_controls hash
 
 This is a L<Net::API::Stripe::Issuing::Card::AuthorizationsControl> object.
 
-=item B<billing> hash
+=head2 billing hash
 
 The cardholder’s billing address.
 
 This is a L<Net::API::Stripe::Billing::Details> object.
 
-=item B<company> hash preview feature
+=head2 company hash preview feature
 
 Additional information about a business_entity cardholder.
 
 This is a L<Net::API::Stripe::Connect::Account::Company> object.
 
-=item B<created> timestamp
+=head2 created timestamp
 
 Time at which the object was created. Measured in seconds since the Unix epoch.
 
 This is a C<DateTime> object.
 
-=item B<email> string
+=head2 email string
 
 The cardholder’s email address.
 
-=item B<individual> hash preview feature
+=head2 individual hash preview feature
 
 Additional information about an individual cardholder.
 
 This is a L<Net::API::Stripe::Connect::Person> object.
 
-=item B<is_default> boolean
+=head2 is_default boolean
 
 Whether or not this cardholder is the default cardholder.
 
-=item B<livemode> boolean
+=head2 livemode boolean
 
 Has the value true if the object exists in live mode or the value false if the object exists in test mode.
 
-=item B<metadata> hash
+=head2 metadata hash
 
 Set of key-value pairs that you can attach to an object. This can be useful for storing additional information about the object in a structured format.
 
-=item B<name> string
+=head2 name string
 
 The cardholder’s name. This will be printed on cards issued to them.
 
-=item B<phone_number> string
+=head2 phone_number string
 
 The cardholder’s phone number.
 
-=item B<requirements> hash
+=head2 requirements hash
 
 Information about verification requirements for the cardholder, including what information needs to be collected.
 
 This is a L<Net::API::Stripe::Connect::Account::Requirements> object.
 
-=item B<spending_controls> hash
+=head2 spending_controls hash
 
 This is a hash whose properties are accessible as a dynamic class methods
 
-=over 8
+=over 4
 
 =item I<amount> positive integer
 
@@ -222,7 +221,7 @@ Array of strings containing categories on which to apply the spending limit. Lea
 
 The time interval or event with which to apply this spending limit towards.
 
-=over 12
+=over 8
 
 =item I<per_authorization>
 
@@ -256,15 +255,13 @@ Currency for the amounts within spending_limits. Locked to the currency of the c
 
 =back
 
-=item B<status> string
+=head2 status string
 
 One of active, inactive, or blocked.
 
-=item B<type> string
+=head2 type string
 
 One of individual or business_entity.
-
-=back
 
 =head1 API SAMPLE
 

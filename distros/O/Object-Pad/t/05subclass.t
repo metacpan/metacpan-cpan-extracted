@@ -60,11 +60,11 @@ EOPERL
    is( SubClass->new->one, 1, 'Inner derived subclass instances can be constructed' );
 }
 
-# Make sure that ADJUSTPARAMS still works via trivial subclasses
+# Make sure that ADJUST still works via trivial subclasses
 {
    my $param;
    class WithAdjustParams {
-      ADJUSTPARAMS {
+      ADJUST {
          my ( $href ) = @_;
          $param = delete $href->{param};
       }
@@ -74,7 +74,7 @@ EOPERL
    class TrivialSubclass :isa( WithAdjustParams ) {}
 
    TrivialSubclass->new( param => "value" );
-   is( $param, "value", 'ADJUSTPARAMS still invoked on superclass' );
+   is( $param, "value", 'ADJUST still invoked on superclass' );
 }
 
 done_testing;

@@ -1,0 +1,37 @@
+---
+abstract: 'Shared files and directories as Mojo::File objects'
+author:
+  - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.30'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Mojo-ShareDir
+no_index:
+  directory:
+    - t
+    - inc
+    - examples
+    - t
+requires:
+  File::ShareDir::Install: '0.14'
+  Mojolicious: '9.00'
+  perl: '5.016'
+resources:
+  IRC:
+    url: irc://irc.libera.chat/#convos
+    web: https://web.libera.chat/#convos
+  bugtracker: https://github.com/jhthorsen/mojo-file-share/issues
+  homepage: https://github.com/jhthorsen/mojo-file-share
+  license: http://www.opensource.org/licenses/artistic-license-2.0
+  repository: https://github.com/jhthorsen/mojo-file-share.git
+version: '0.01'
+x_contributors: []
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

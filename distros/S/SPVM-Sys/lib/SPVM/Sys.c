@@ -213,6 +213,14 @@ int32_t SPVM__Sys__defined(SPVM_ENV* env, SPVM_VALUE* stack) {
       dval = (double)__solaris;
 #   endif
   }
+  else if (strcmp(macro_name, "__sun") == 0) {
+#   ifdef __sun
+      defined = 1;
+      ival = (int32_t)__sun;
+      lval = (int64_t)__sun;
+      dval = (double)__sun;
+#   endif
+  }
   else {
     return env->die(env, stack, "The macro name \"%s\" is not supported yet", macro_name, FILE_NAME, __LINE__);
   }

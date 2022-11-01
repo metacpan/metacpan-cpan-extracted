@@ -1,10 +1,10 @@
 {
-   "abstract" : "Documentation and tools for using Platypus with Fortran",
+   "abstract" : "FFI::Platypus::Lang::Fortran",
    "author" : [
       "Graham Ollis <plicease@cpan.org>"
    ],
-   "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -13,39 +13,125 @@
       "version" : 2
    },
    "name" : "FFI-Platypus-Lang-Fortran",
-   "no_index" : {
-      "directory" : [
-         "t",
-         "inc",
-         "examples"
-      ]
-   },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "FFI::Build::MM" : "0",
-            "File::ShareDir::Dist" : "0"
-         }
-      },
       "configure" : {
          "requires" : {
             "ExtUtils::F77" : "1.24",
             "ExtUtils::MakeMaker" : "6.64",
-            "FFI::Platypus" : "1.00",
+            "FFI::Platypus" : "2.00",
             "File::ShareDir::Dist::Install" : "0.07",
-            "File::Which" : "0"
+            "File::Which" : "0",
+            "File::chdir" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Dist::Zilla::Plugin::Author::Plicease::Thanks" : "0",
+            "Dist::Zilla::Plugin::Author::Plicease::Upload" : "0",
+            "Dist::Zilla::Plugin::InsertExample" : "0",
+            "Dist::Zilla::Plugin::Prereqs" : "0",
+            "Dist::Zilla::Plugin::PruneFiles" : "0",
+            "Dist::Zilla::Plugin::RemovePrereqs" : "0",
+            "Dist::Zilla::PluginBundle::Author::Plicease" : "2.72",
+            "Perl::Critic::Policy::BuiltinFunctions::ProhibitBooleanGrep" : "0",
+            "Perl::Critic::Policy::BuiltinFunctions::ProhibitStringySplit" : "0",
+            "Perl::Critic::Policy::BuiltinFunctions::ProhibitVoidGrep" : "0",
+            "Perl::Critic::Policy::BuiltinFunctions::ProhibitVoidMap" : "0",
+            "Perl::Critic::Policy::ClassHierarchies::ProhibitExplicitISA" : "0",
+            "Perl::Critic::Policy::ClassHierarchies::ProhibitOneArgBless" : "0",
+            "Perl::Critic::Policy::CodeLayout::ProhibitHardTabs" : "0",
+            "Perl::Critic::Policy::CodeLayout::ProhibitTrailingWhitespace" : "0",
+            "Perl::Critic::Policy::CodeLayout::RequireConsistentNewlines" : "0",
+            "Perl::Critic::Policy::Community::ArrayAssignAref" : "0",
+            "Perl::Critic::Policy::Community::BarewordFilehandles" : "0",
+            "Perl::Critic::Policy::Community::ConditionalDeclarations" : "0",
+            "Perl::Critic::Policy::Community::ConditionalImplicitReturn" : "0",
+            "Perl::Critic::Policy::Community::DeprecatedFeatures" : "0",
+            "Perl::Critic::Policy::Community::DiscouragedModules" : "0",
+            "Perl::Critic::Policy::Community::DollarAB" : "0",
+            "Perl::Critic::Policy::Community::Each" : "0",
+            "Perl::Critic::Policy::Community::IndirectObjectNotation" : "0",
+            "Perl::Critic::Policy::Community::LexicalForeachIterator" : "0",
+            "Perl::Critic::Policy::Community::LoopOnHash" : "0",
+            "Perl::Critic::Policy::Community::ModPerl" : "0",
+            "Perl::Critic::Policy::Community::OpenArgs" : "0",
+            "Perl::Critic::Policy::Community::OverloadOptions" : "0",
+            "Perl::Critic::Policy::Community::POSIXImports" : "0",
+            "Perl::Critic::Policy::Community::PackageMatchesFilename" : "0",
+            "Perl::Critic::Policy::Community::PreferredAlternatives" : "0",
+            "Perl::Critic::Policy::Community::StrictWarnings" : "0",
+            "Perl::Critic::Policy::Community::Threads" : "0",
+            "Perl::Critic::Policy::Community::Wantarray" : "0",
+            "Perl::Critic::Policy::Community::WarningsSwitch" : "0",
+            "Perl::Critic::Policy::Community::WhileDiamondDefaultAssignment" : "0",
+            "Perl::Critic::Policy::ControlStructures::ProhibitLabelsWithSpecialBlockNames" : "0",
+            "Perl::Critic::Policy::ControlStructures::ProhibitMutatingListFunctions" : "0",
+            "Perl::Critic::Policy::ControlStructures::ProhibitUnreachableCode" : "0",
+            "Perl::Critic::Policy::InputOutput::ProhibitBarewordFileHandles" : "0",
+            "Perl::Critic::Policy::InputOutput::ProhibitJoinedReadline" : "0",
+            "Perl::Critic::Policy::InputOutput::ProhibitTwoArgOpen" : "0",
+            "Perl::Critic::Policy::Miscellanea::ProhibitFormats" : "0",
+            "Perl::Critic::Policy::Miscellanea::ProhibitUselessNoCritic" : "0",
+            "Perl::Critic::Policy::Modules::ProhibitConditionalUseStatements" : "0",
+            "Perl::Critic::Policy::Modules::RequireNoMatchVarsWithUseEnglish" : "0",
+            "Perl::Critic::Policy::Objects::ProhibitIndirectSyntax" : "0",
+            "Perl::Critic::Policy::RegularExpressions::ProhibitUselessTopic" : "0",
+            "Perl::Critic::Policy::Subroutines::ProhibitNestedSubs" : "0",
+            "Perl::Critic::Policy::ValuesAndExpressions::ProhibitLeadingZeros" : "0",
+            "Perl::Critic::Policy::ValuesAndExpressions::ProhibitMixedBooleanOperators" : "0",
+            "Perl::Critic::Policy::ValuesAndExpressions::ProhibitSpecialLiteralHeredocTerminator" : "0",
+            "Perl::Critic::Policy::ValuesAndExpressions::RequireUpperCaseHeredocTerminator" : "0",
+            "Perl::Critic::Policy::Variables::ProhibitPerl4PackageNames" : "0",
+            "Perl::Critic::Policy::Variables::ProhibitUnusedVariables" : "0",
+            "Software::License::Perl_5" : "0"
+         },
+         "requires" : {
+            "CHI" : "0",
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "HTTP::Tiny::Mech" : "0",
+            "Path::Tiny" : "0",
+            "Perl::Critic" : "0",
+            "Test2::Require::EnvVar" : "0.000121",
+            "Test2::Require::Module" : "0.000121",
+            "Test2::Tools::PerlCritic" : "0",
+            "Test2::V0" : "0.000121",
+            "Test::EOL" : "0",
+            "Test::Fixme" : "0.07",
+            "Test::More" : "0.98",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Pod::LinkCheck::Lite" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0",
+            "Test::Spelling" : "0",
+            "Test::Strict" : "0",
+            "WWW::Mechanize::Cached" : "0",
+            "YAML" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "FFI::Build" : "1.00",
-            "FFI::Platypus" : "1.00",
-            "File::Which" : "0",
-            "perl" : "5.008004"
+            "FFI::Build::File::C" : "0",
+            "File::Path" : "2.04",
+            "File::ShareDir::Dist" : "0",
+            "base" : "0",
+            "perl" : "5.008001"
          }
       },
       "test" : {
-         "requires" : {}
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "FFI::Build" : "0",
+            "FFI::Build::Platform" : "0",
+            "FFI::Platypus" : "0",
+            "File::Path" : "2.04",
+            "File::Which" : "0",
+            "File::chdir" : "0",
+            "Test2::V0" : "0.000121",
+            "perl" : "5.008001"
+         }
       }
    },
    "release_status" : "stable",
@@ -53,13 +139,21 @@
       "bugtracker" : {
          "web" : "https://github.com/PerlFFI/FFI-Platypus-Lang-Fortran/issues"
       },
+      "homepage" : "https://metacpan.org/pod/FFI::Platypus::Lang::Fortran",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/PerlFFI/FFI-Platypus-Lang-Fortran.git",
+         "url" : "git://github.com/PerlFFI/FFI-Platypus-Lang-Fortran.git",
          "web" : "https://github.com/PerlFFI/FFI-Platypus-Lang-Fortran"
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.12",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.14",
+   "x_contributors" : [
+      "Graham Ollis <plicease@cpan.org>"
+   ],
+   "x_generated_by_perl" : "v5.37.5",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
+   "x_use_unsafe_inc" : 0
 }
+

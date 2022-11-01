@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Content;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Content vocabulary
 
-our $VERSION = '0.556';
+our $VERSION = '0.557';
 
 use 5.020;
 use Moo;
@@ -43,23 +43,32 @@ sub _traverse_keyword_contentEncoding ($self, $schema, $state) {
 sub _eval_keyword_contentEncoding ($self, $data, $schema, $state) {
   return 1 if not is_type('string', $data);
 
+  A($state, $schema->{$state->{keyword}});
+
   if ($state->{validate_content_schemas}) {
     my $decoder = $state->{evaluator}->get_encoding($schema->{contentEncoding});
     abort($state, 'cannot find decoder for contentEncoding "%s"', $schema->{contentEncoding})
       if not $decoder;
 
     # decode the data now, so we can report errors for the right keyword
-    try { $state->{_content_ref} = $decoder->(\$data) }
-    catch ($e) { return E($state, $e) }
+    try {
+      $state->{_content_ref} = $decoder->(\$data);
+    }
+    catch ($e) {
+      chomp $e;
+      return E($state, 'could not decode %s string: %s', $schema->{contentEncoding}, $e);
+    };
   }
 
-  return A($state, $schema->{$state->{keyword}})
+  return 1;
 }
 
 sub _traverse_keyword_contentMediaType { shift->_traverse_keyword_contentEncoding(@_) }
 
 sub _eval_keyword_contentMediaType ($self, $data, $schema, $state) {
   return 1 if not is_type('string', $data);
+
+  A($state, $schema->{$state->{keyword}});
 
   if ($state->{validate_content_schemas}) {
     my $decoder = $state->{evaluator}->get_media_type($schema->{contentMediaType});
@@ -70,11 +79,17 @@ sub _eval_keyword_contentMediaType ($self, $data, $schema, $state) {
     return 1 if exists $schema->{contentEncoding} and not exists $state->{_content_ref};
 
     # decode the data now, so we can report errors for the right keyword
-    try { $state->{_content_ref} = $decoder->($state->{_content_ref} // \$data) }
-    catch ($e) { return E($state, $e) }
+    try {
+      $state->{_content_ref} = $decoder->($state->{_content_ref} // \$data);
+    }
+    catch ($e) {
+      chomp $e;
+      delete $state->{_content_ref};
+      return E($state, 'could not decode %s string: %s', $schema->{contentMediaType}, $e);
+    }
   }
 
-  return A($state, $schema->{$state->{keyword}})
+  return 1;
 }
 
 sub _traverse_keyword_contentSchema ($self, $schema, $state) {
@@ -88,7 +103,8 @@ sub _eval_keyword_contentSchema ($self, $data, $schema, $state) {
   return 1 if not exists $schema->{contentMediaType};
   return 1 if not is_type('string', $data);
 
-  return A($state, dclone($schema->{contentSchema})) if not $state->{validate_content_schemas};
+  A($state, dclone($schema->{contentSchema}));
+  return 1 if not $state->{validate_content_schemas};
 
   return 1 if not exists $state->{_content_ref};  # contentMediaType failed to decode the content
 
@@ -111,7 +127,7 @@ JSON::Schema::Modern::Vocabulary::Content - Implementation of the JSON Schema Co
 
 =head1 VERSION
 
-version 0.556
+version 0.557
 
 =head1 DESCRIPTION
 

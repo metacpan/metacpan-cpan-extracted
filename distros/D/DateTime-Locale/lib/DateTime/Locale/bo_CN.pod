@@ -624,7 +624,7 @@ Yes
 
 =head3 Local first day of the week
 
-7 (གཟའ་ཉི་མ་)
+1 (གཟའ་ཟླ་བ་)
 
 =head2 Strftime Patterns
 

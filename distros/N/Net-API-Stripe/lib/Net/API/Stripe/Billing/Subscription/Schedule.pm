@@ -1,23 +1,33 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Billing/Subscription/Schedule.pm
-## Version v0.100.0
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Version v0.101.0
+## Copyright(c) 2020 DEGUEST Pte. Ltd.
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/12/25
-## Modified 2020/05/15
+## Modified 2022/10/29
+## All rights reserved
 ## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 package Net::API::Stripe::Billing::Subscription::Schedule;
 BEGIN
 {
-	use strict;
-	use parent qw( Net::API::Stripe::Generic );
-	our( $VERSION ) = 'v0.100.0';
+    use strict;
+    use warnings;
+    use parent qw( Net::API::Stripe::Generic );
+    use vars qw( $VERSION );
+    our( $VERSION ) = 'v0.101.0';
 };
+
+use strict;
+use warnings;
 
 sub id { return( shift->_set_get_scalar( 'id', @_ ) ); }
 
 sub object { return( shift->_set_get_scalar( 'object', @_ ) ); }
+
+sub application { return( shift->_set_get_scalar_or_object( 'application', 'Net::API::Stripe::Connect::Account', @_ ) ); }
 
 sub canceled_at { return( shift->_set_get_datetime( 'canceled_at', @_ ) ); }
 
@@ -27,30 +37,17 @@ sub created { return( shift->_set_get_datetime( 'created', @_ ) ); }
 
 sub current_phase
 {
-	return( shift->_set_get_class( 'current_phase',
-		{
-		end_date	=> { type => 'datetime' },
-		start_date	=> { type => 'datetime' },
-		}, @_ )
-	);
+    return( shift->_set_get_class( 'current_phase',
+        {
+        end_date    => { type => 'datetime' },
+        start_date    => { type => 'datetime' },
+        }, @_ )
+    );
 }
 
 sub customer { return( shift->_set_get_scalar_or_object( 'customer', 'Net::API::Stripe::Customer', @_ ) ); }
 
-sub default_settings
-{
-	return( shift->_set_get_class( 'default_settings',
-		{
-		billing_thresholds => { type => 'object', class => 'Net::API::Stripe::Billing::Thresholds' },
-		collection_method => { type => 'scalar' },
-		default_payment_method => { type => 'scalar_or_object', class => 'Net::API::Stripe::Payment::Method' },
-		invoice_settings => { type => 'class', definition =>
-			{
-			days_until_due => { type => 'scalar' }
-			}}
-		}, @_ )
-	);
-}
+sub default_settings { return( shift->_set_get_object( 'default_settings', 'Net::API::Stripe::Billing::Subscription', @_ ) ); }
 
 sub end_behavior { return( shift->_set_get_scalar( 'end_behavior', @_ ) ); }
 
@@ -62,48 +59,46 @@ sub livemode { return( shift->_set_get_boolean( 'livemode', @_ ) ); }
 
 sub metadata { return( shift->_set_get_hash( 'metadata', @_ ) ); }
 
-sub phases
-{
-	return( shift->_set_get_class_array( 'phases',
-		{
-		application_fee_percent => { type => 'number' },
-		billing_thresholds => { type => 'object', class => 'Net::API::Stripe::Billing::Thresholds' },
-		collection_method => { type => 'scalar' },
-		coupon => { type => 'scalar_or_object', class => 'Net::API::Stripe::Billing::Coupon' },
-		default_payment_method => { type => 'scalar_or_object', class => 'Net::API::Stripe::Payment::Method' },
-		default_tax_rates => { type => 'object_array', class => 'Net::API::Stripe::Tax::Rate' },
-		end_date => { type => 'datetime' },
-		invoice_settings => { type => 'class', definition =>
-			{
-			days_until_due => { type => 'number' }
-			}},
-		iterations => { type => 'number' },
-		plans => { type => 'class_array', definition =>
-			{
-			billing_thresholds => { type => 'object', class => 'Net::API::Stripe::Billing::Thresholds' },
-			plan => { type => 'scalar_or_object', class => 'Net::API::Stripe::Billing::Plan' },
-			quantity => { type => 'number' },
-			tax_rates => { type => 'object_array', class => 'Net::APi::Stripe::Tax::Rate' },
-			}},
-		start_date => { type => 'datetime' },
-		trial_end => { type => 'datetime' },
-		}, @_ )
-	);
-}
+sub phases { return( shift->_set_get_object_array( 'phases', 'Net::API::Stripe::Billing::Subscription', @_ ) ); }
 
 sub preserve_cancel_date { return( shift->_set_get_boolean( 'preserve_cancel_date', @_ ) ); }
 
 sub prorate { return( shift->_set_get_boolean( 'prorate', @_ ) ); }
 
+sub proration_behavior { return( shift->_set_get_scalar( 'proration_behavior', @_ ) ); }
+
 sub released_at { return( shift->_set_get_datetime( 'released_at', @_ ) ); }
 
 sub released_subscription { return( shift->_set_get_scalar( 'released_subscription', @_ ) ); }
+
+sub renewal_interval { return( shift->_set_get_scalar( 'renewal_interval', @_ ) ); }
 
 sub start_date { return( shift->_set_get_datetime( 'start_date', @_ ) ); }
 
 sub status { return( shift->_set_get_scalar( 'status', @_ ) ); }
 
 sub subscription { return( shift->_set_get_scalar_or_object( 'subscription', 'Net::API::Stripe::Billing::Subscription', @_ ) ); }
+
+## Undocumented but appears in data returned
+
+sub tax_percent { return( shift->_set_get_number( 'tax_percent', @_ ) ); }
+
+## Undocumented but appears in data returned
+
+sub test_clock { return( shift->_set_get_scalar_or_object( 'test_clock', 'Net::API::Stripe::Billing::TestHelpersTestClock', @_ ) ); }
+
+sub transfer_data
+{
+    return( shift->_set_get_class( 'transfer_data',
+    {
+    amount_percent  => { type => 'number' },
+    destination     => { type => 'object', class => 'Net::API::Stripe::Connect::Account' },
+    }, @_ ) );
+}
+
+## Undocumented but appears in data returned
+
+sub trial_end { return( shift->_set_get_datetime( 'trial_end', @_ ) ); }
 
 1;
 
@@ -125,7 +120,7 @@ Net::API::Stripe::Billing::Subscription::Schedule - A Stripe Subscription Schedu
 
 =head1 VERSION
 
-    v0.100.0
+    v0.101.0
 
 =head1 DESCRIPTION
 
@@ -133,44 +128,44 @@ A subscription schedule allows you to create and manage the lifecycle of a subsc
 
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>( %ARG )
+=head2 new( %ARG )
 
 Creates a new L<Net::API::Stripe::Billing::Subscription::Schedule> object.
 It may also take an hash like arguments, that also are method of the same name.
 
-=back
-
 =head1 METHODS
 
-=over 4
-
-=item B<id> string
+=head2 id string
 
 Unique identifier for the object.
 
-=item B<object> string, value is C<subscription_schedule>
+=head2 object string, value is C<subscription_schedule>
 
 String representing the object’s type. Objects of the same type share the same value.
 
-=item B<canceled_at> timestamp
+=head2 application expandable
+
+ID of the Connect Application that created the schedule.
+
+When expanded this is an L<Net::API::Stripe::Connect::Account> object.
+
+=head2 canceled_at timestamp
 
 Time at which the subscription schedule was canceled. Measured in seconds since the Unix epoch.
 
-=item B<completed_at> timestamp
+=head2 completed_at timestamp
 
 Time at which the subscription schedule was completed. Measured in seconds since the Unix epoch.
 
-=item B<created> timestamp
+=head2 created timestamp
 
 Time at which the object was created. Measured in seconds since the Unix epoch.
 
-=item B<current_phase> hash
+=head2 current_phase hash
 
 Object representing the start and end dates for the current phase of the subscription schedule, if it is active.
 
-=over 8
+=over 4
 
 =item I<end_date> timestamp
 
@@ -178,201 +173,53 @@ Object representing the start and end dates for the current phase of the subscri
 
 =back
 
-=item B<customer> string expandable
+=head2 customer string expandable
 
 ID of the customer who owns the subscription schedule. When expanded, this is a L<Net::API::Stripe::Customer> object.
 
-=item B<default_settings> hash
+=head2 default_settings object
 
-Object representing the subscription schedule’s default settings.
+Object representing the subscription schedule's default settings.
 
-=over 12
+This is a L<Net::API::Stripe::Billing::Subscription> object.
 
-=item I<billing_thresholds> hash
-
-Define thresholds at which an invoice will be sent, and the subscription advanced to a new billing period
-
-This is a L<Net::API::Stripe::Billing::Thresholds> object.
-
-=over 16
-
-=item I<amount_gte> integer
-
-Monetary threshold that triggers the subscription to create an invoice
-
-=item I<reset_billing_cycle_anchor> boolean
-
-Indicates if the billing_cycle_anchor should be reset when a threshold is reached. If true, billing_cycle_anchor will be updated to the date/time the threshold was last reached; otherwise, the value will remain unchanged. This value may not be true if the subscription contains items with plans that have aggregate_usage=last_ever.
-
-=back
-
-=item I<collection_method> string
-
-Either charge_automatically, or send_invoice. When charging automatically, Stripe will attempt to pay the underlying subscription at the end of each billing cycle using the default source attached to the customer. When sending an invoice, Stripe will email your customer an invoice with payment instructions.
-
-=item I<default_payment_method> string expandable
-
-ID of the default payment method for the subscription schedule. If not set, invoices will use the default payment method in the customer’s invoice settings. When expanded, this is a L<Net::API::Stripe::Payment::Method> object.
-
-=item I<invoice_settings> hash
-
-The subscription schedule’s default invoice settings.
-
-=over 16
-
-=item I<days_until_due> integer
-
-Number of days within which a customer must pay invoices generated by this subscription schedule. This value will be null for subscription schedules where billing=charge_automatically.
-
-=back
-
-=back
-
-=item B<end_behavior> string
+=head2 end_behavior string
 
 Configures how the subscription schedule behaves when it ends. Possible values are I<release> or I<cancel> with the default being release. release will end the subscription schedule and keep the underlying subscription running.cancel will end the subscription schedule and cancel the underlying subscription. 
 
-=item B<from_subscription> string
+=head2 from_subscription string
 
 Migrate an existing subscription to be managed by a subscription schedule. If this parameter is set, a subscription schedule will be created using the subscription’s plan(s), set to auto-renew using the subscription’s interval. When using this parameter, other parameters (such as phase values) cannot be set. To create a subscription schedule with other modifications, Stripe recommends making two separate API calls.
 
 This is used only when creating a subscription schedule.
 
-=item B<invoice_now> boolean
+=head2 invoice_now boolean
 
 If the subscription schedule is active, indicates whether or not to generate a final invoice that contains any un-invoiced metered usage and new/pending proration invoice items. Defaults to true.
 
 This is used only when cancelling a subscription schedule.
 
-=item B<livemode> boolean
+=head2 livemode boolean
 
 Has the value true if the object exists in live mode or the value false if the object exists in test mode.
 
-=item B<metadata> hash
+=head2 metadata hash
 
 Set of key-value pairs that you can attach to an object. This can be useful for storing additional information about the object in a structured format.
 
-=item B<phases> array of hashes
+=head2 phases array of objects
 
-Configuration for the subscription schedule’s phases.
+Configuration for the subscription schedule's phases.
 
-=over 12
+This is a L<Net::API::Stripe::Billing::Subscription> object.
 
-=item I<application_fee_percent> decimal
-
-A non-negative decimal between 0 and 100, with at most two decimal places. This represents the percentage of the subscription invoice subtotal that will be transferred to the application owner’s Stripe account during this phase of the schedule.
-
-=item I<billing_thresholds> hash
-
-Define thresholds at which an invoice will be sent, and the subscription advanced to a new billing period.
-
-This is a L<Net::API::Stripe::Billing::Thresholds> object.
-
-=over 16
-
-=item I<amount_gte> integer
-
-Monetary threshold that triggers the subscription to create an invoice
-
-=item I<reset_billing_cycle_anchor> boolean
-
-Indicates if the billing_cycle_anchor should be reset when a threshold is reached. If true, billing_cycle_anchor will be updated to the date/time the threshold was last reached; otherwise, the value will remain unchanged. This value may not be true if the subscription contains items with plans that have aggregate_usage=last_ever.
-
-=back
-
-=item I<collection_method> string
-
-Either charge_automatically, or send_invoice. When charging automatically, Stripe will attempt to pay the underlying subscription at the end of each billing cycle using the default source attached to the customer. When sending an invoice, Stripe will email your customer an invoice with payment instructions.
-
-=item I<coupon> string expandable
-
-ID of the coupon to use during this phase of the subscription schedule. When expanded, this is a L<Net::API::Stripe::Billing::Coupon> object.
-
-=item I<default_payment_method> string expandable
-
-ID of the default payment method for the subscription schedule. It must belong to the customer associated with the subscription schedule. If not set, invoices will use the default payment method in the customer’s invoice settings.
-
-When expanded, this is a L<Net::API::Stripe::Payment::Method> object.
-
-=item I<default_tax_rates> array of L<Net::API::Stripe::Tax::Rate> objects.
-
-=item I<end_date> timestamp
-
-The end of this phase of the subscription schedule.
-
-=item I<invoice_settings> hash
-
-The subscription schedule’s default invoice settings.
-
-=over 16
-
-=item I<days_until_due> integer
-
-Number of days within which a customer must pay invoices generated by this subscription schedule. This value will be null for subscription schedules where billing=charge_automatically.
-
-=back
-
-=item I<iterations> integer
-
-Integer representing the multiplier applied to the plan interval. For example, iterations=2 applied to a plan with interval=month and interval_count=3 results in a phase of duration 2 * 3 months = 6 months. If set, end_date must not be set.
-
-This option is only used in making calls to create or update a subscription schedule.
-
-=item I<plans> array of hashes
-
-Plans to subscribe during this phase of the subscription schedule.
-
-=over 16
-
-=item I<billing_thresholds> hash
-
-Define thresholds at which an invoice will be sent, and the related subscription advanced to a new billing period
-
-=over 20
-
-=item I<usage_gte> integer
-
-Usage threshold that triggers the subscription to create an invoice
-
-=back
-
-=item I<plan> string expandable
-
-ID of the plan to which the customer should be subscribed. When expanded, this is a L<Net::API::Stripe::Billing::Plan> object.
-
-=item I<quantity> positive integer or zero
-
-Quantity of the plan to which the customer should be subscribed.
-
-=item I<tax_rates> array of L<Net::APi::Stripe::Tax::Rate> objects.
-
-The tax rates which apply to this phase_item. When set, the default_tax_rates on the phase do not apply to this phase_item.
-
-=back
-
-=item I<start_date> timestamp
-
-The start of this phase of the subscription schedule.
-
-=item I<trial_end> timestamp
-
-When the trial ends within the phase.
-
-=back
-
-=item B<preserve_cancel_date> boolean
-
-Keep any cancellation on the subscription that the schedule has set.
-
-This is used only when cancelling subscription schedule.
-
-=item B<preserve_cancel_date> boolean
+=head2 preserve_cancel_date boolean
 
 Keep any cancellation on the subscription that the schedule has set.
 
 This is used only when making a Stripe api call to release a subscription schedule.
 
-=item B<prorate> boolean
+=head2 prorate boolean
 
 This is only used when making B<update> or B<cancel>.
 
@@ -380,77 +227,125 @@ When doing an update and if the update changes the current phase, indicates if t
 
 When cancelling the subscription schedule, if the subscription schedule is active, this indicates if the cancellation should be prorated. Defaults to true.
 
-=item B<released_at> timestamp
+=head2 proration_behavior string
+
+Determines how to handle prorations resulting from the billing_cycle_anchor. Valid values are I<create_prorations> or I<none>.
+
+Passing I<create_prorations> will cause proration invoice items to be created when applicable. Prorations can be disabled by passing I<none>. If no value is passed, the default is create_prorations.
+
+This property is not documented on Stripe api documentation, but appears in data returned as of 2020-12-02.
+
+=head2 released_at timestamp
 
 Time at which the subscription schedule was released. Measured in seconds since the Unix epoch.
 
-=item B<released_subscription> string
+=head2 released_subscription string
 
 ID of the subscription once managed by the subscription schedule (if it is released).
 
-=item B<start_date> unix timestamp
+=head2 renewal_interval
+
+This property was found in the data returned from Stripe, but is not documented yet as of 2020-12-03.
+
+=head2 start_date unix timestamp
 
 When the subscription schedule starts. Stripe recommends using now so that it starts the subscription immediately. You can also use a Unix timestamp to backdate the subscription so that it starts on a past date, or set a future date for the subscription to start on. When you backdate, the billing_cycle_anchor of the subscription is equivalent to the start_date.
 
 This is used only when creating a subscription schedule.
 
-=item B<status> string
+=head2 status string
 
 The present status of the subscription schedule. Possible values are not_started, active, completed, released, and canceled. You can read more about the different states in Stripe behavior guide.
 
-=item B<subscription> string expandable
+=head2 subscription string expandable
 
 ID of the subscription managed by the subscription schedule. When expanded, this is a L<Net::API::Stripe::Billing::Subscription> object.
 
+=head2 tax_percent decimal (deprecated)
+
+A non-negative decimal (with at most four decimal places) between 0 and 100. This represents the percentage of the subscription invoice subtotal that will be calculated and added as tax to the final amount in each billing period. For example, a plan which charges $10/month with a tax_percent of 20.0 will charge $12 per invoice. To unset a previously-set value, pass an empty string. This field has been deprecated and will be removed in a future API version, for further information view the migration docs for tax_rates.
+
+This is an undocumented property for Subscription Schedule that usually belonging to L<Subscription|Net::API::Stripe::Billing::Subscription>, but that appears in data returned by Stripe.
+
+=head2 test_clock expandable
+
+ID of the test clock this subscription schedule belongs to.
+
+When expanded this is an L<Net::API::Stripe::Billing::TestHelpersTestClock> object.
+
+=head2 transfer_data hash
+
+This is for Connect only.
+
+The account (if any) the subscription’s payments will be attributed to for tax reporting, and where funds from each payment will be transferred to for each of the subscription’s invoices.
+
+This is an undocumented property for Subscription Schedule that usually belonging to L<Subscription|Net::API::Stripe::Billing::Subscription>, but that appears in data returned by Stripe.
+
+=over 4
+
+=item I<amount_percent> decimal
+
+A non-negative decimal between 0 and 100, with at most two decimal places. This represents the percentage of the subscription invoice subtotal that will be transferred to the destination account. By default, the entire amount is transferred to the destination.
+
+=item I<destination> string expandable
+
+The account where funds from the payment will be transferred to upon payment success.
+
 =back
+
+=head2 trial_end timestamp
+
+If the subscription has a trial, the end of that trial.
+
+This is an undocumented property for Subscription Schedule that usually belonging to L<Subscription|Net::API::Stripe::Billing::Subscription>, but that appears in data returned by Stripe.
 
 =head1 API SAMPLE
 
-	{
-	  "id": "sub_sched_fake123456789",
-	  "object": "subscription_schedule",
-	  "canceled_at": null,
-	  "completed_at": null,
-	  "created": 1577193148,
-	  "current_phase": null,
-	  "customer": "cus_fake123456789",
-	  "default_settings": {
-		"billing_thresholds": null,
-		"collection_method": "charge_automatically",
-		"default_payment_method": null,
-		"invoice_settings": null
-	  },
-	  "end_behavior": "cancel",
-	  "livemode": false,
-	  "metadata": {},
-	  "phases": [
-		{
-		  "application_fee_percent": null,
-		  "billing_thresholds": null,
-		  "collection_method": null,
-		  "coupon": null,
-		  "default_payment_method": null,
-		  "default_tax_rates": [],
-		  "end_date": 1572481590,
-		  "invoice_settings": null,
-		  "plans": [
-			{
-			  "billing_thresholds": null,
-			  "plan": "gold",
-			  "quantity": 1,
-			  "tax_rates": []
-			}
-		  ],
-		  "start_date": 1541031990,
-		  "tax_percent": null,
-		  "trial_end": null
-		}
-	  ],
-	  "released_at": null,
-	  "released_subscription": null,
-	  "status": "not_started",
-	  "subscription": null
-	}
+    {
+      "id": "sub_sched_fake123456789",
+      "object": "subscription_schedule",
+      "canceled_at": null,
+      "completed_at": null,
+      "created": 1577193148,
+      "current_phase": null,
+      "customer": "cus_fake123456789",
+      "default_settings": {
+        "billing_thresholds": null,
+        "collection_method": "charge_automatically",
+        "default_payment_method": null,
+        "invoice_settings": null
+      },
+      "end_behavior": "cancel",
+      "livemode": false,
+      "metadata": {},
+      "phases": [
+        {
+          "application_fee_percent": null,
+          "billing_thresholds": null,
+          "collection_method": null,
+          "coupon": null,
+          "default_payment_method": null,
+          "default_tax_rates": [],
+          "end_date": 1572481590,
+          "invoice_settings": null,
+          "plans": [
+            {
+              "billing_thresholds": null,
+              "plan": "gold",
+              "quantity": 1,
+              "tax_rates": []
+            }
+          ],
+          "start_date": 1541031990,
+          "tax_percent": null,
+          "trial_end": null
+        }
+      ],
+      "released_at": null,
+      "released_subscription": null,
+      "status": "not_started",
+      "subscription": null
+    }
 
 =head1 HISTORY
 
@@ -468,6 +363,8 @@ Stripe API documentation:
 
 L<https://stripe.com/docs/api>, L<https://stripe.com/docs/api/subscription_schedules/object>, L<https://stripe.com/docs/billing/subscriptions/subscription-schedules#managing>
 
+See also L<use cases|https://stripe.com/docs/billing/subscriptions/subscription-schedules/use-cases>
+
 =head1 COPYRIGHT & LICENSE
 
 Copyright (c) 2019-2020 DEGUEST Pte. Ltd.
@@ -476,4 +373,3 @@ You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.
 
 =cut
-

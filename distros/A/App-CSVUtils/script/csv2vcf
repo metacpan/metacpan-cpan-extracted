@@ -1,0 +1,288 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /App/CSVUtils/csv2vcf
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-10-25'; # DATE
+our $DIST = 'App-CSVUtils'; # DIST
+our $VERSION = '0.046'; # VERSION
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/App/CSVUtils/csv2vcf",
+    program_name => "csv2vcf",
+    read_config => 0,
+    read_env => 0,
+    use_utf8 => 1,
+);
+
+$cmdline->run;
+
+# ABSTRACT: Create a VCF from selected fields of the CSV
+# PODNAME: csv2vcf
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+csv2vcf - Create a VCF from selected fields of the CSV
+
+=head1 VERSION
+
+This document describes version 0.046 of csv2vcf (from Perl distribution App-CSVUtils), released on 2022-10-25.
+
+=head1 SYNOPSIS
+
+B<csv2vcf> L<--help|/"--help, -h, -v"> (or L<-h|/"--help, -h, -v">, L<-?|/"--help, -h, -v">)
+
+B<csv2vcf> L<--version|/"--version, -v"> (or L<-v|/"--version, -v">)
+
+B<csv2vcf> [L<--cell-vcf-field|/"--cell-vcf-field=s">=I<str>] [L<--email-vcf-field|/"--email-vcf-field=s">=I<str>] [L<--escape-char|/"--escape-char=s">=I<str>] [L<--format|/"--format=s">=I<name>|L<--json|/"--json">] [L<--header|/"--no-header, --input-header">|L<--input-header|/"--no-header, --input-header">|L<--no-header|/"--no-header, --input-header">|L<--noheader|/"--no-header, --input-header">] [L<--(no)naked-res|/"--naked-res">] [L<--name-vcf-field|/"--name-vcf-field=s">=I<str>] [L<--page-result|/"--page-result">[=I<program>]|L<--view-result|/"--view-result">[=I<program>]] [L<--quote-char|/"--quote-char=s">=I<str>] [L<--sep-char|/"--sep-char=s">=I<str>] [L<--tsv|/"--tsv, --input-tsv">|L<--input-tsv|/"--tsv, --input-tsv">|L<--no-tsv|/"--tsv, --input-tsv">|L<--notsv|/"--tsv, --input-tsv">] -- E<lt>L<filename|/"--filename=s*">E<gt>
+
+=head1 DESCRIPTION
+
+I<Common notes for the utilities>
+
+Encoding: The utilities in this module/distribution accept and emit UTF8 text.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--cell-vcf-field>=I<s>
+
+Select field to use as VCF CELL field.
+
+=item B<--email-vcf-field>=I<s>
+
+Select field to use as VCF EMAIL field.
+
+=item B<--name-vcf-field>=I<s>
+
+Select field to use as VCF N (name) field.
+
+=back
+
+=head2 Input options
+
+=over
+
+=item B<--escape-char>=I<s>
+
+Specify character to escape value in field in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to C<\\> (backslash). Overrides C<--tsv> option.
+
+
+=item B<--filename>=I<s>*
+
+Input CSV file or URL.
+
+Use C<-> to read from stdin, use C<clipboard:> to read from clipboard.
+
+
+Can also be specified as the 1st command-line argument.
+
+=item B<--no-header>, B<--input-header>
+
+By default (C<--header>), the first row of the CSV will be assumed to contain
+field names (and the second row contains the first data row). When you declare
+that CSV does not have header row (C<--no-header>), the first row of the CSV is
+assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
+and so on.
+
+
+=item B<--quote-char>=I<s>
+
+Specify field quote character in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to C<"> (double quote). Overrides C<--tsv> option.
+
+
+=item B<--sep-char>=I<s>
+
+Specify field separator character in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to C<,> (comma). Overrides C<--tsv> option.
+
+
+=item B<--tsv>, B<--input-tsv>
+
+Inform that input file is in TSV (tab-separated) format instead of CSV.
+
+Overriden by C<--sep-char>, C<--quote-char>, C<--escape-char> options. If one of
+those options is specified, then C<--tsv> will be ignored.
+
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+C<--naked-res> so you just get:
+
+ [1,2,3]
+
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
+=item B<--view-result>
+
+View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C csv2vcf csv2vcf
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete csv2vcf 'p/*/`csv2vcf`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-CSVUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-CSVUtils>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-CSVUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

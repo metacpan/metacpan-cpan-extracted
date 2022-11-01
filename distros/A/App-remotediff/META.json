@@ -1,0 +1,63 @@
+{
+   "abstract" : "remote diff over rsync",
+   "author" : [
+      "jul <kaldor@cpan.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "App-remotediff",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cwd" : "0",
+            "File::Basename" : "0",
+            "File::Path" : "0",
+            "File::Temp" : "0",
+            "Getopt::Std" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kal247/App-remotediff/issues"
+      },
+      "homepage" : "https://github.com/kal247/App-remotediff",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/kal247/App-remotediff.git",
+         "web" : "https://github.com/kal247/App-remotediff"
+      }
+   },
+   "version" : "1.10",
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

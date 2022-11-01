@@ -1,0 +1,43 @@
+{
+   "billing" : {
+      "address" : {
+         "city" : "\"San Francisco\"",
+         "country" : "US",
+         "line1" : "\"1234 Main Street\"",
+         "line2" : null,
+         "postal_code" : "94111",
+         "state" : "CA"
+      }
+   },
+   "company" : null,
+   "created" : "1651948931",
+   "email" : "adnansami1992sami@gmail.com",
+   "id" : "ich_1KwsZz2eZvKYlo2Cz5eys5Kb",
+   "individual" : null,
+   "livemode" : 0,
+   "metadata" : {
+      "order_id" : "6735"
+   },
+   "name" : "\"Jenny Rosen\"",
+   "object" : "issuing.cardholder",
+   "phone_number" : "+18888675309",
+   "redaction" : null,
+   "requirements" : {
+      "disabled_reason" : null,
+      "past_due" : []
+   },
+   "spending_controls" : {
+      "allowed_categories" : [],
+      "blocked_categories" : [],
+      "spending_limits" : [
+         {
+            "amount" : "300000",
+            "categories" : [],
+            "interval" : "monthly"
+         }
+      ],
+      "spending_limits_currency" : "usd"
+   },
+   "status" : "active",
+   "type" : "individual"
+}

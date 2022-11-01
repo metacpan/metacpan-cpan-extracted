@@ -4,111 +4,18 @@ use strict;
 use warnings;
 use 5.008001;
 use File::chdir;
-use FFI::CheckLib 0.11 qw( find_lib_or_exit );
+use FFI::CheckLib 0.11 qw( find_lib_or_die );
 use File::Copy qw( copy );
 use Path::Tiny ();
 use FFI::Build::File::Base 1.00 ();
+use Env::ShellWords qw( @PERL_FFI_CARGO_FLAGS );
 use base qw( FFI::Build::File::Base );
 use constant default_suffix => '.toml';
 use constant default_encoding => ':utf8';
 
-our $VERSION = '0.09';
+# ABSTRACT
+our $VERSION = '0.12'; # VERSION
 
-=head1 NAME
-
-FFI::Build::File::Cargo - Write Perl extensions in Rust!
-
-=head1 SYNOPSIS
-
-Crete a rust project in the C<ffi> directory that produces a dynamic library:
-
- $ cargo new --lib --name my_lib ffi
-       Created library `my_lib` package
-
-Add this to your C<ffi/Cargo.toml> file to get dynamic libraries:
-
- [lib]
- crate-type = ["dylib"]
-
-Your library goes in C<lib/MyLib.pm>:
-
- package MyLib;
- 
- use FFI::Platypus 1.00;
- 
- my $ffi = FFI::Platypus->new( api => 1, lang => 'Rust' );
- # configure platypus to use the bundled Rust code
- $ffi->bundle;
- 
- ...
-
-Your C<Makefile.PL>:
-
- use ExtUtils::MakeMaker;
- use FFI::Build::MM;
- 
- my $fbmm = FFI::Build::MM->new;
- 
- WriteMakefile($fbmm->mm_args(
-     ABSTRACT       => 'My Lib',
-     DISTNAME       => 'MyLib',
-     NAME           => 'MyLib',
-     VERSION_FROM   => 'lib/MyLib.pm',
-     BUILD_REQUIRES => {
-         'FFI::Build::MM'          => '1.00',
-         'FFI::Build::File::Cargo' => '0.07',
-     },
-     PREREQ_PM => {
-         'FFI::Platypus'             => '1.00',
-         'FFI::Platypus::Lang::Rust' => '0.07',
-     },
- ));
- 
- sub MY::postamble {
-     $fbmm->mm_postamble;
- }
-
-or alternatively, your C<dist.ini>:
-
- [FFI::Build]
-
-=head1 DESCRIPTION
-
-This module provides the necessary machinery to bundle rust code with your
-Perl extension.  It uses L<FFI::Build> and C<cargo> to do the heavy lifting.
-
-A complete example comes with this distribution in the C<examples/Person>
-directory, incouding tests.  You can browse this example on the web here:
-
-L<https://github.com/Perl5-FFI/FFI-Platypus-Lang-Rust/tree/master/examples/Person>
-
-The distribution that follows the pattern above works just like a regular
-Pure-Perl or XS distribution, except:
-
-=over 4
-
-=item make
-
-Running the C<make> step builds the Rust library as a dynamic library using
-cargo, and runs the crate's tests if any are available.  It then moves the
-resulting dynamic library in to the appropriate location in C<blib> so that
-it can be found at test and runtime.
-
-=item prove
-
-If you run the tests using C<prove -l> (that is, without building the
-distribution), Platypus will find the rust crate in the C<ffi> directory,
-build that and use it on the fly.  This makes it easier to test your
-distribution with less explicit building.
-
-=back
-
-This module is smart enough to check the timestamps on the appropriate files
-so the library won't need to be rebuilt if the source files haven't changed.
-
-For more details using Perl + Rust with FFI, see L<FFI::Platypus::Lang::Rust>.
-
-=cut
 
 sub accept_suffix
 {
@@ -149,17 +56,21 @@ sub build_item
     local $CWD = $cargo_toml->parent->stringify;
     print "+cd $CWD\n";
 
-    my @cmd = ('cargo', 'test');
+    my @cargo_flags = defined $ENV{PERL_FFI_CARGO_FLAGS}
+      ? @PERL_FFI_CARGO_FLAGS
+      : ('--release');
+
+    my @cmd = ('cargo', 'test', @cargo_flags);
     print "+@cmd\n";
     system @cmd;
-    exit 2 if $?;
+    die "error running cargo test" if $?;
 
-    @cmd = ('cargo', 'build', '--release');
+    @cmd = ('cargo', 'build', @cargo_flags);
     print "+@cmd\n";
     system @cmd;
-    exit 2 if $?;
+    die "error running cargo build" if $?;
 
-    my($dl) = find_lib_or_exit
+    my($dl) = find_lib_or_die
       lib        => '*',
       libpath    => "$CWD/target/release",
       systempath => [],
@@ -205,6 +116,150 @@ sub _deps
 
 1;
 
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+FFI::Build::File::Cargo
+
+=head1 VERSION
+
+version 0.12
+
+=head1 SYNOPSIS
+
+Crete a rust project in the C<ffi> directory that produces a dynamic library:
+
+ $ cargo new --lib --name my_lib ffi
+       Created library `my_lib` package
+
+Add this to your C<ffi/Cargo.toml> file to get dynamic libraries:
+
+ [lib]
+ crate-type = ["cdylib"]
+
+Add Rust code to C<ffi/src/lib.rs> that you want to call from Perl:
+
+ #![crate_type = "cdylib"]
+ 
+ #[no_mangle]
+ pub extern "C" fn add(a: i32, b: i32) -> i32 {
+     a + b
+ }
+
+Your Perl bindings go in a C<.pm> file like C<lib/MyLib.pm>:
+
+ package MyLib;
+ 
+ use FFI::Platypus 2.00;
+ 
+ my $ffi = FFI::Platypus->new( api => 2, lang => 'Rust' );
+ # configure platypus to use the bundled Rust code
+ $ffi->bundle;
+ 
+ $ffi->attach( 'add' => ['i32','i32'] => 'i32' );
+
+Your C<Makefile.PL>:
+
+ use ExtUtils::MakeMaker;
+ use FFI::Build::MM;
+ 
+ my $fbmm = FFI::Build::MM->new;
+ 
+ WriteMakefile($fbmm->mm_args(
+     ABSTRACT       => 'My Lib',
+     DISTNAME       => 'MyLib',
+     NAME           => 'MyLib',
+     VERSION_FROM   => 'lib/MyLib.pm',
+     BUILD_REQUIRES => {
+         'FFI::Build::MM'          => '1.00',
+         'FFI::Build::File::Cargo' => '0.07',
+     },
+     PREREQ_PM => {
+         'FFI::Platypus'             => '1.00',
+         'FFI::Platypus::Lang::Rust' => '0.07',
+     },
+ ));
+ 
+ sub MY::postamble {
+     $fbmm->mm_postamble;
+ }
+
+or alternatively, your C<dist.ini>:
+
+ [FFI::Build]
+ lang = Rust
+ build = Cargo
+
+Write a test:
+
+ use Test2::V0;
+ use MyLib;
+ 
+ is MyLib::add(1,2), 3;
+ 
+ done_testing;
+
+=head1 DESCRIPTION
+
+This module provides the necessary machinery to bundle rust code with your
+Perl extension.  It uses L<FFI::Build> and C<cargo> to do the heavy lifting.
+
+A complete example comes with this distribution in the C<examples/Person>
+directory, including tests.  You can browse this example on the web here:
+
+L<https://github.com/PerlFFI/FFI-Platypus-Lang-Rust/tree/main/examples/Person>
+
+The distribution that follows the pattern above works just like a regular
+Pure-Perl or XS distribution, except:
+
+=over 4
+
+=item make
+
+Running the C<make> step builds the Rust library as a dynamic library using
+cargo, and runs the crate's tests if any are available.  It then moves the
+resulting dynamic library in to the appropriate location in C<blib> so that
+it can be found at test and runtime.
+
+=item prove
+
+If you run the tests using C<prove -l> (that is, without building the
+distribution), Platypus will find the rust crate in the C<ffi> directory,
+build that and use it on the fly.  This makes it easier to test your
+distribution with less explicit building.
+
+=back
+
+This module is smart enough to check the timestamps on the appropriate files
+so the library won't need to be rebuilt if the source files haven't changed.
+
+For more details using Perl + Rust with FFI, see L<FFI::Platypus::Lang::Rust>.
+
+=head1 ENVIRONMENT
+
+=over 4
+
+=item C<PERL_FFI_CARGO_FLAGS>
+
+This environment variable changes the flags that are passed into
+C<cargo test> and C<cargo build>.
+
+By default this module passes C<--release> into both C<cargo test> and
+C<cargo build>.  It does this so that you will get optimized libraries
+when your Perl extension is installed.  You may require a different
+profile when testing so you can, for example, set this environment
+variable to something else:
+
+ $ export PERL_FFI_CARGO_FLAGS='--profile test'
+ $ ...
+
+=back
+
 =head1 SEE ALSO
 
 =over 4
@@ -221,14 +276,17 @@ Rust language plugin for Platypus.
 
 =head1 AUTHOR
 
-Graham Ollis E<lt>plicease@cpan.orgE<gt>
+Author: Graham Ollis E<lt>plicease@cpan.orgE<gt>
+
+Contributors:
+
+Andrew Grangaard (SPAZM)
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015 by Graham Ollis.
+This software is copyright (c) 2015-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

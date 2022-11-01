@@ -1,0 +1,6 @@
+{
+   "description" : "Any tangible or physical good. For jurisdictions that impose a tax, the standard rate is applied.",
+   "id" : "txcd_99999999",
+   "name" : "General - Tangible Goods",
+   "object" : "tax_code"
+}

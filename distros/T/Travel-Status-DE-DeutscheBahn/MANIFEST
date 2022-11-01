@@ -6,7 +6,9 @@ cpanfile
 Dockerfile
 lib/Travel/Status/DE/DeutscheBahn.pm
 lib/Travel/Status/DE/HAFAS.pm
-lib/Travel/Status/DE/HAFAS/Result.pm
+lib/Travel/Status/DE/HAFAS/Journey.pm
+lib/Travel/Status/DE/HAFAS/Message.pm
+lib/Travel/Status/DE/HAFAS/Polyline.pm
 lib/Travel/Status/DE/HAFAS/StopFinder.pm
 MANIFEST			This list of files
 README.md
@@ -14,6 +16,8 @@ scripts/check-hafas-urls
 scripts/makedeb-docker
 scripts/makedeb-docker-helper
 scripts/update-readme
+t/20-db.t
+'t/in/DB.Berlin Jannowitzbrücke.json'
 xt/00-compile-pm.t
 xt/01-compile-pl.t
 xt/10-pod-coverage.t

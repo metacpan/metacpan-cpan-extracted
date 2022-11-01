@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.57;
 
-package Device::Chip::MAX7219 0.06;
+package Device::Chip::MAX7219 0.07;
 class Device::Chip::MAX7219
    :isa(Device::Chip);
 

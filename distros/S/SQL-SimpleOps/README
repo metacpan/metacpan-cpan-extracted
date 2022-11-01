@@ -1,4 +1,4 @@
-SQL-SimpleOps version 2022.266.1
+SQL-SimpleOps version 2022.301.1
 ================================
 
   The README is used to introduce the module and provide instructions on
@@ -319,7 +319,7 @@ DEPENDENCIES
 
   Dependencies for Databases (not checked in the installation)
 
-    DBD::MySQL
+    DBD::mysql
     DBD::SQLite
     DBD::Pg
 

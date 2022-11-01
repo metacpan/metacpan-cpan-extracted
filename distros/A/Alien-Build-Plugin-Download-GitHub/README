@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.09
+    version 0.10
 
 SYNOPSIS
 
@@ -112,6 +112,11 @@ PROPERTIES
     The format of the asset. This is passed to
     Alien::Build::Plugin::Extract::Negotiate so any format supported by
     that is valid.
+
+    [version 0.10]
+
+    If this is set to none then no extractor will be added. This allows for
+    you to write your own extractor code, or use a non-standard one.
 
  asset_convert_version
 

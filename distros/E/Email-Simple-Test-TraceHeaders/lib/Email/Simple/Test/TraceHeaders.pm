@@ -1,9 +1,6 @@
 use strict;
 use warnings;
-package Email::Simple::Test::TraceHeaders;
-{
-  $Email::Simple::Test::TraceHeaders::VERSION = '0.091702';
-}
+package Email::Simple::Test::TraceHeaders 0.091703;
 # ABSTRACT: generate sample trace headers for testing
 
 use Carp ();
@@ -25,6 +22,31 @@ my %POSTFIX_FMT = (
   nofor => q{from %s (%s [%s]) by %s (Postfix) with ESMTP id %s%s; %s},
 );
 
+#pod =head1 METHODS
+#pod
+#pod =head2 trace_headers
+#pod
+#pod   my $header_strings = Email::Simple::Test::TraceHeaders->trace_headers(\%arg);
+#pod
+#pod This returns an arrayref of "Received" header strings.
+#pod
+#pod At present, all headers are produced in Postfix style.
+#pod
+#pod At present the only valid argument is C<hops>, which is an arrayref of hashrefs
+#pod describing hops.  Each hashref should have the following entries:
+#pod
+#pod   from_helo - the hostname given in the sending host's HELO
+#pod   from_rdns - the hostname found by looking up the PTR for the sender's ip
+#pod   from_ip   - the IP addr of the sending host
+#pod   by_name   - the hostname of the receiving host
+#pod   queue_id  - the id of the mail queue entry created upon receipt
+#pod   env_to    - the recipient of the message (an email addr)
+#pod   time      - the timestamp on the header
+#pod
+#pod At present, these are all required.  In the future they may have more flexible
+#pod semantics, and more formats for output of hops may be supported.
+#pod
+#pod =cut
 
 sub trace_headers {
   my ($self, $arg) = @_;
@@ -63,6 +85,16 @@ sub trace_headers {
   return [ reverse @received ];
 }
 
+#pod =head2 create_email
+#pod
+#pod   my $email_simple = Email::Simple::Test::TraceHeaders->create_email(
+#pod     \%trace_arg
+#pod   );
+#pod
+#pod This creates and returns an Email::Simple message with trace headers created by
+#pod C<L</trace_headers>>.
+#pod
+#pod =cut
 
 sub create_email {
   my ($self, $arg) = @_;
@@ -80,6 +112,24 @@ sub create_email {
   return $email;
 }
 
+#pod =head1 HELPERS
+#pod
+#pod Some routines can be exported to make it easier to set up trace headers.
+#pod
+#pod You can get them all with:
+#pod
+#pod   use Email::Simple::Test::TraceHeaders -helpers;
+#pod
+#pod =head2 prev
+#pod
+#pod This helper gets a value from the previous hop.  So, given these hops:
+#pod
+#pod   { ..., by_name => 'mx.example.com', ... },
+#pod   { ..., from_rdns => prev('by_name'), ... },
+#pod
+#pod ...the second hop will have F<mx.example.com> as its C<from_rdns> parameter.
+#pod
+#pod =cut
 
 sub _build_prev {
   my ($self) = @_;
@@ -100,13 +150,27 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Email::Simple::Test::TraceHeaders - generate sample trace headers for testing
 
 =head1 VERSION
 
-version 0.091702
+version 0.091703
+
+=head1 PERL VERSION
+
+This module should work on any version of perl still receiving updates from
+the Perl 5 Porters.  This means it should work on any version of perl released
+in the last two to three years.  (That is, if the most recently released
+version is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 METHODS
 
@@ -160,11 +224,17 @@ This helper gets a value from the previous hop.  So, given these hops:
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <cpan@semiotic.systems>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Ricardo Signes
+
+Ricardo Signes <rjbs@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Ricardo Signes.
+This software is copyright (c) 2022 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

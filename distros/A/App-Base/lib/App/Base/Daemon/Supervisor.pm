@@ -3,7 +3,7 @@ use 5.010;
 use Moose::Role;
 with 'App::Base::Daemon';
 
-our $VERSION = '0.07';    ## VERSION
+our $VERSION = '0.08';    ## VERSION
 
 =head1 NAME
 
@@ -62,10 +62,9 @@ supervisor and resumes normal work.
 
 use namespace::autoclean;
 use Socket qw();
-use POSIX qw(:errno_h);
+use POSIX  qw(:errno_h);
 use Time::HiRes;
 use IO::Handle;
-use Try::Tiny;
 
 =head1 REQUIRED METHODS
 
@@ -196,7 +195,7 @@ sub daemon_run {
             $chld->close;
             $par->autoflush(1);
             $self->_supervisor_pipe($par);
-            while (<$par>) {
+            while (local $_ = <$par>) {
                 chomp;
                 if ($_ eq 'ping') {
                     say $par 'pong';
@@ -302,7 +301,7 @@ sub _control_takeover {
             # We may fail because two reasons:
             # a) previous process didn't exit and still holds the lock
             # b) new process was started and locked pid
-            $pid = try { File::Flock::Tiny->lock($self->pid_file) };
+            $pid = eval { File::Flock::Tiny->lock($self->pid_file) };
             unless ($pid) {
 
                 # So let's try killing old process, if after that locking still will fail

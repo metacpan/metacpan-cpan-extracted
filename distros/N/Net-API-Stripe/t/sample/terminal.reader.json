@@ -1,0 +1,14 @@
+{
+   "action" : null,
+   "device_sw_version" : null,
+   "device_type" : "bbpos_wisepos_e",
+   "id" : "tmr_aFYGjO74HXE8aG5c5o0ymQ5X",
+   "ip_address" : "192.168.2.2",
+   "label" : "Blue Rabbit",
+   "livemode" : 0,
+   "location" : null,
+   "metadata" : {},
+   "object" : "terminal.reader",
+   "serial_number" : "123-456-789",
+   "status" : "online"
+}

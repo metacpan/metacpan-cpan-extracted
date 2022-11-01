@@ -17,7 +17,6 @@ use Test::NoTabs;
 my @files = (
     'lib/Graph/Easy/Weighted.pm',
     't/00-compile.t',
-    't/00-load.t',
     't/01-methods.t'
 );
 

@@ -1,0 +1,14 @@
+Revision history for Net-Gemini
+
+0.03    2022-10-27
+        Set a minimum bar on IO::Socket:SSL for can_ipv6. Disable
+        automatic build on Windows due to test failures.
+
+0.02    2022-10-25
+        Various network tests as expected are not portable, require
+        AUTHOR_TEST_JMATES for these and note that they're rigged up
+        only for OpenBSD. Fix missing IO::Socket::SSL require.
+
+0.01    2022-10-24
+        First version, released on an unsuspecting world.
+

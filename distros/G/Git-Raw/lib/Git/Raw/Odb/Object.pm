@@ -1,5 +1,5 @@
 package Git::Raw::Odb::Object;
-$Git::Raw::Odb::Object::VERSION = '0.88';
+$Git::Raw::Odb::Object::VERSION = '0.90';
 use strict;
 use warnings;
 
@@ -11,7 +11,7 @@ Git::Raw::Odb::Object - Git object database backend class
 
 =head1 VERSION
 
-version 0.88
+version 0.90
 
 =head1 DESCRIPTION
 
@@ -22,7 +22,7 @@ B<WARNING>: The API of this module is unstable and may change without warning
 
 =head1 AUTHOR
 
-Jacques Germishuys <jacquesg@striata.com>
+Jacques Germishuys <jacquesg@cpan.org>
 
 =head1 METHODS
 

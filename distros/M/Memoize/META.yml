@@ -16,12 +16,13 @@ no_index:
     - t
     - inc
 requires:
+  Scalar::Util: '1.11'
   perl: '5.006'
 resources:
   bugtracker: https://rt.cpan.org/Dist/Display.html?Name=Memoize
   license: http://dev.perl.org/licenses/
   repository: https://github.com/ap/Memoize.git
-version: '1.14'
+version: '1.15'
 x_copyright:
   holder: 'Mark Jason Dominus'
   year: 2012

@@ -72,6 +72,12 @@ ACCESSOR METHODS
     PSGI application to run instead of normal process. Intent of this is
     change application in "_process_actions" method. Default value is undef.
 
+  "script_js"
+    Reference to array with Javascript code strings. Default value is [].
+
+  "script_js_src"
+    Reference to array with Javascript URLs. Default value is [].
+
   "status_code"
     HTTP status code. Default value is 200.
 
@@ -241,5 +247,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.07
+    0.08
 

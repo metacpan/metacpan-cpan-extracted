@@ -1,8 +1,7 @@
 # even the old version is guaranteed not to work
 # with anything earlier than 5.008.
 
-use 5.024;
-
+use v5.24;
 use ExtUtils::MakeMaker;
 
 WriteMakefile
@@ -24,6 +23,7 @@ WriteMakefile
         (
 
 			mro			0
+			Cwd			0
             Carp        0
             List::Util  1.45
             Symbol      0

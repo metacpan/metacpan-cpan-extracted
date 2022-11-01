@@ -6,9 +6,9 @@
 use v5.26;
 use utf8;
 
-use Object::Pad 0.43;  # :strict(params)
+use Object::Pad 0.66;
 
-package App::sdview::Parser::Man 0.07;
+package App::sdview::Parser::Man 0.08;
 class App::sdview::Parser::Man
    does App::sdview::Parser
    :strict(params);
@@ -31,7 +31,7 @@ sub can_parse_file ( $class, $file )
    return $file =~ m/\.[0-9](pm)?(\.gz)?/n;
 }
 
-has @_paragraphs;
+field @_paragraphs;
 
 method parse_file ( $fh )
 {

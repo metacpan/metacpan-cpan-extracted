@@ -8,7 +8,7 @@ package Jacode;
 # Copyright (c) 2018, 2019, 2020, 2022 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
-$VERSION = '2.13.4.28';
+$VERSION = '2.13.4.29';
 $VERSION = $VERSION;
 
 use 5.00503;
@@ -67,9 +67,36 @@ Jacode - Perl program for Japanese character code conversion
                             $encoding = Jacode::getcode(\$line)
                                         Jacode::init()
 
-=head1 INSTALLATION
+=head1 INSTALL of "Jacode.pm"
 
-To install this software, copy 'Jacode.pm' to any directory of @INC.
+=over 2
+
+=item 1. Open URL of "Jacode.pm"
+
+L<https://metacpan.org/pod/Jacode>
+
+=item 2. Click This
+
+  ----------------------------------
+  Source (raw) <--- Click this (raw)
+  Browse (raw)
+  Changes
+  How to Contribute
+  Repository
+  Issues
+  Testers (NNN / NNN / NNN)
+  Kwalitee
+  Bus factor: NN
+  NN.NN% Coverage
+  License: perl_5
+  Perl: v5.5.30
+  ----------------------------------
+
+=item 3. Select All Text of Page
+
+=item 4. Save Text as "Jacode.pm"
+
+=back
 
 =head1 DEPENDENCIES
 

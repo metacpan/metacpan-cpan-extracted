@@ -4,7 +4,7 @@ use strict;
 
 package Devel::Chitin;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 use Scalar::Util;
 use IO::File;

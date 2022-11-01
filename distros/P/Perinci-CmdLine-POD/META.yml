@@ -19,9 +19,9 @@ name: Perinci-CmdLine-POD
 provides:
   Perinci::CmdLine::POD:
     file: lib/Perinci/CmdLine/POD.pm
-    version: '0.033'
+    version: '0.037'
 requires:
-  Data::Dmp: '0.241'
+  Data::Dmp: '0.242'
   Data::Sah::Terse: '0'
   Exporter: '5.57'
   IPC::System::Options: '0.339'
@@ -32,8 +32,9 @@ requires:
   Perinci::CmdLine::Dump: '0.120'
   Perinci::CmdLine::Lite: '1.915'
   Perinci::Result::Format::Lite: '0.286'
-  Perinci::Sub::To::CLIDocData: '0.298'
+  Perinci::Sub::To::CLIDocData: '0.303'
   Proc::ChildError: '0'
+  String::PodQuote: '0'
   String::ShellQuote: '0'
   Text::Wrap: '0'
   experimental: '0'
@@ -44,7 +45,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-POD
   homepage: https://metacpan.org/release/Perinci-CmdLine-POD
   repository: git://github.com/perlancar/perl-Perinci-CmdLine-POD.git
-version: '0.033'
+version: '0.037'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -322,7 +323,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::PERLANCAR::Contributing
               name: '@Author::PERLANCAR/PERLANCAR/Contributing'
-              version: '0.292'
+              version: '0.293'
             -
               class: Pod::Weaver::Section::Legal
               name: '@Author::PERLANCAR/Legal'

@@ -1,5 +1,5 @@
 package Form::Tiny::Error;
-$Form::Tiny::Error::VERSION = '2.14';
+$Form::Tiny::Error::VERSION = '2.15';
 use v5.10;
 use strict;
 use warnings;
@@ -14,9 +14,9 @@ use overload
 
 has 'field' => (
 	is => 'ro',
-	isa => Maybe [Str],
+	isa => Str,
 	writer => 'set_field',
-	default => sub { undef },
+	predicate => 'has_field',
 );
 
 has 'error' => (
@@ -46,16 +46,16 @@ sub as_string
 
 	# Internal use only
 	package Form::Tiny::Error::NestedFormError;
-$Form::Tiny::Error::NestedFormError::VERSION = '2.14';
-	use parent -norequire, 'Form::Tiny::Error';
+$Form::Tiny::Error::NestedFormError::VERSION = '2.15';
+use parent -norequire, 'Form::Tiny::Error';
 
 }
 
 {
 
 	package Form::Tiny::Error::InvalidFormat;
-$Form::Tiny::Error::InvalidFormat::VERSION = '2.14';
-	use parent -norequire, 'Form::Tiny::Error';
+$Form::Tiny::Error::InvalidFormat::VERSION = '2.15';
+use parent -norequire, 'Form::Tiny::Error';
 
 	sub default_error
 	{
@@ -66,8 +66,8 @@ $Form::Tiny::Error::InvalidFormat::VERSION = '2.14';
 {
 
 	package Form::Tiny::Error::Required;
-$Form::Tiny::Error::Required::VERSION = '2.14';
-	use parent -norequire, 'Form::Tiny::Error';
+$Form::Tiny::Error::Required::VERSION = '2.15';
+use parent -norequire, 'Form::Tiny::Error';
 
 	sub default_error
 	{
@@ -78,8 +78,8 @@ $Form::Tiny::Error::Required::VERSION = '2.14';
 {
 
 	package Form::Tiny::Error::IsntStrict;
-$Form::Tiny::Error::IsntStrict::VERSION = '2.14';
-	use parent -norequire, 'Form::Tiny::Error';
+$Form::Tiny::Error::IsntStrict::VERSION = '2.15';
+use parent -norequire, 'Form::Tiny::Error';
 
 	sub default_error
 	{
@@ -90,8 +90,8 @@ $Form::Tiny::Error::IsntStrict::VERSION = '2.14';
 {
 
 	package Form::Tiny::Error::DoesNotValidate;
-$Form::Tiny::Error::DoesNotValidate::VERSION = '2.14';
-	use parent -norequire, 'Form::Tiny::Error';
+$Form::Tiny::Error::DoesNotValidate::VERSION = '2.15';
+use parent -norequire, 'Form::Tiny::Error';
 
 	sub default_error
 	{

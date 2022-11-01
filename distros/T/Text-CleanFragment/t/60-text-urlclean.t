@@ -17,13 +17,14 @@ push @tests, ["\x{5317}\x{4EB0}\n",  # those are the Chinese characters for Beij
 push @tests, ["Do p\x{00FC}t <this> into URL's?","Do_put_this_into_URLs",'Synopsis'];
 push @tests, ["Do\x{A0}nonbreaking\x{A0}spaces\x{A0}work?","Do_nonbreaking_spaces_work",'nbsp'];
 
-plan tests => 1+@tests*3;
+plan tests => 1+@tests*4;
 
 for (@tests) {
     my $name= $_->[2] || $_->[1];
     my $res = clean_fragment($_->[0]);
     is $res, $_->[1], $name;
     like $res, qr/^([-.A-Za-z0-9]([-._A-Za-z0-9]*[-.A-Za-z0-9])?)?$/ , "Result matches qr/^([-.A-Za-z0-9]([-._A-Za-z0-9]*[-.A-Za-z0-9])?)?\$/";
+    unlike $res, qr/--/ , "No doubled dashes in result";
     is clean_fragment($_->[1]), $_->[1], "'$_->[1]' is idempotent";
 };
 
@@ -54,3 +55,8 @@ Do püt <this> into URL's?|Do_put_this_into_URLs|Synopsis
 This is plenking ...|This_is_plenking...|No underscore before \W
 Also    this   should be ___ squashed|Also_this_should_be_squashed|Squash underscores
 Also _ _ _ this _ _ should be _ _ squashed|Also_this_should_be_squashed|Squash underscores
+Bang!|Bang|Exclamation points also get eliminated
+Die Arzte - Drei Mann – Zwei Songs (EP)|Die_Arzte-Drei_Mann-Zwei_Songs_EP|long dash
+C++|C|Trailing underscores get eliminated (even if this mangles C++)
+C++ and C|C_and_C|Underscores get merged
+C++ - _ - C|C-C|Underscore-Dashes get converted to dashes

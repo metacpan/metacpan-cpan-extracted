@@ -20,9 +20,15 @@
 #######################################################################
 
 
-2022-08-22  Brian M. Kelly <Brian.Kelly@fullauto.com>
+2022-10-24  Brian M. Kelly <Brian.Kelly@fullauto.com>
 
         * Version 1.0000631 released
+	
+	* Updated ftpcmd()
+
+2022-08-22  Brian M. Kelly <Brian.Kelly@fullauto.com>
+
+        * Version 1.0000630 released
 
         * Updated Instruction Set WordPress_is.pm.
 

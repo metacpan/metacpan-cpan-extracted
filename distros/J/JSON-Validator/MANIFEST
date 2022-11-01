@@ -34,7 +34,7 @@ lib/JSON/Validator/URI.pm
 lib/JSON/Validator/Util.pm
 Makefile.PL
 MANIFEST			This list of files
-t/00-basic.t
+t/00-project.t
 t/benchmark.t
 t/bundle.t
 t/coerce-default.t
@@ -138,12 +138,15 @@ t/spec/v3-default-response-extra.yaml
 t/spec/v3-petstore.json
 t/spec/with-deep-mixed-ref.json
 t/spec/with-relative-ref.json
+t/spec/with-unicode-multibyte.json
+t/spec/with-unicode-multibyte.yml
 t/stack/Some.pm
 t/stack/Some/Module.pm
 t/test/array.pm
 t/test/number.pm
 t/test/object.pm
 t/to-json.t
+t/unicode-multibyte.t
 t/uri.t
 t/util-checksum-yaml-xs.t
 t/util.t

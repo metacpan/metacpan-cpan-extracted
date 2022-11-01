@@ -1,5 +1,9 @@
 Revision history for Device-Chip
 
+0.25    2022-10-30
+         * Updates for Object::Pad v0.70:
+            + `ADJUST :params`
+
 0.24    2022-10-04
         [CHANGES]
          * Update to Test::ExpectAndCheck::Future v0.04

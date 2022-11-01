@@ -11,7 +11,7 @@ require DynaLoader;
 
 our @ISA = qw(Exporter DynaLoader);
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 bootstrap Net::LibIDN2 $VERSION;
 
 our %EXPORT_TAGS = ( 'all' => [ qw(
@@ -22,6 +22,13 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	idn2_lookup_ul
 	idn2_register_u8
 	idn2_register_ul
+	idn2_to_ascii_8
+	idn2_to_ascii_l
+	idn2_to_unicode_88
+	idn2_to_unicode_8l
+	idn2_to_unicode_ll
+	idn2_to_unicode_u8
+	idn2_to_unicode_ul
 	IDN2_OK
 	IDN2_MALLOC
 	IDN2_NO_CODESET
@@ -110,6 +117,7 @@ Net::LibIDN2 - Perl bindings for GNU Libidn2
 =head1 SYNOPSIS
 
   use Net::LibIDN2 ':all';
+  use Encode;
 
   idn2_lookup_u8(Encode::encode_utf8("m\N{U+00FC}\N{U+00DF}li.de"))
     eq 'xn--mli-5ka8l.de';
@@ -120,7 +128,7 @@ Net::LibIDN2 - Perl bindings for GNU Libidn2
   ) eq 'xn--mli-5ka8l';
 
   Encode::decode_utf8(idn2_to_unicode_88("xn--mli-5ka8l.de"))
-    eq "m\N{U+00FC}\N{U+00DF}li"
+    eq "m\N{U+00FC}\N{U+00DF}li.de"
 
 =head1 DESCRIPTION
 
@@ -131,7 +139,7 @@ domain names based on IDNA 2008, Punycode and TR46.
 
 =over 4
 
-=item B<Net::LibIDN2::idn2_lookup_u8>(I<$src> [, I<$flags> [, I<$rc>]]);
+=item B<Net::LibIDN2::idn2_lookup_u8>(I<$src>, [I<$flags>, [I<$rc>]]);
 
 Alternative name idn2_to_ascii_8.
 
@@ -143,8 +151,8 @@ Pass B<IDN2_NFC_INPUT> in I<$flags> to convert input to NFC form before further
 processing. IDN2_TRANSITIONAL and IDN2_NONTRANSITIONAL do already imply IDN2_NFC_INPUT.
 
 Pass B<IDN2_ALABEL_ROUNDTRIP> in flags to convert any input A-labels
-to U-labels and perform additional testing. This is default if used with a libidn 
-version >= 2.2. To switch this behavior off, pass IDN2_NO_ALABEL_ROUNDTRIP
+to U-labels and perform additional testing. This is default if used with a libidn2
+version >= 2.2. To switch this behavior off, pass IDN2_NO_ALABEL_ROUNDTRIP.
 
 Pass IDN2_TRANSITIONAL to enable Unicode TR46 transitional processing, and
 IDN2_NONTRANSITIONAL to enable Unicode TR46 non-transitional processing. 
@@ -152,17 +160,17 @@ IDN2_NONTRANSITIONAL to enable Unicode TR46 non-transitional processing.
 Multiple flags may be specified by binary or:ing them together, for example
 B<IDN2_NFC_INPUT> | B<IDN2_ALABEL_ROUNDTRIP>.
 
-If linked to library GNU Libidn version > 2.0.3: IDN2_USE_STD3_ASCII_RULES disabled by default.
+If linked to library GNU Libidn2 version > 2.0.3: IDN2_USE_STD3_ASCII_RULES disabled by default.
 Previously we were eliminating non-STD3 characters from domain strings such as
 _443._tcp.example.com, or IPs 1.2.3.4/24 provided to libidn2 functions.
-That was an unexpected regression for applications switching from libidn 
+That was an unexpected regression for applications switching from libidn2
 and thus it is no longer applied by default. Use IDN2_USE_STD3_ASCII_RULES
 to enable that behavior again.
 
 On error, returns undef. If a scalar variable is provided in I<$rc>, 
 returns the internal libidn2 C library result code as well.
 
-=item B<Net::LibIDN2::idn2_lookup_ul>(I<$src> [, I<$flags> [, I<$rc>]]);
+=item B<Net::LibIDN2::idn2_lookup_ul>(I<$src>, [I<$flags>, [I<$rc>]]);
 
 Alternative name idn2_to_ascii_l.
 
@@ -170,7 +178,7 @@ Similar to function C<idn2_lookup_u8> but I<$src> is assumed to be encoded in
 the locale's default coding system, and will be transcoded to UTF-8 and NFC 
 normalized before returning the result.
 
-=item B<Net::LibIDN2::idn2_register_u8>(I<$ulabel> [, I<$alabel>, [I<$flags>, [I<$rc>]]]);
+=item B<Net::LibIDN2::idn2_register_u8>(I<$ulabel>, [I<$alabel>, [I<$flags>, [I<$rc>]]]);
 
 Perform IDNA2008 register string conversion on domain label I<$ulabel> and I<$alabel>,
 as described in section 4 of RFC 5891. Note that the input ulabel must be encoded 
@@ -186,9 +194,9 @@ only I<$ulabel>. See RFC 5891 section 4 for more information.
 On error, returns undef. If a scalar variable is provided in I<$rc>, 
 returns the internal libidn2 C library result code as well.
 
-=item B<Net::LibIDN2::idn2_register_u8>(I<$ulabel> [, I<$alabel>, [I<$flags>, [I<$rc>]]]);
+=item B<Net::LibIDN2::idn2_register_ul>(I<$ulabel>, [I<$alabel>, [I<$flags>, [I<$rc>]]]);
 
-Similar to function C<idn2_register_ul> but I<$ulabel> is assumed to be encoded in 
+Similar to function C<idn2_register_u8> but I<$ulabel> is assumed to be encoded in 
 the locale's default coding system, and will be transcoded to UTF-8 and NFC 
 normalized before returning the result.
 
@@ -212,14 +220,14 @@ the locale's default coding system.
 
 =item B<Net::LibIDN2::idn2_strerror>(I<$rc>);
 
-Convert internal libidn2 error code I<$rc> to a humanly readable string.
+Convert internal libidn2 error code I<$rc> to a human-readable string.
 
 =item B<Net::LibIDN2::idn2_strerror_name>(I<$rc>);
 
 Convert internal libidn2 error code I<$rc> to a string corresponding to
 internal header file symbols names like IDN2_MALLOC.
 
-=item B<Net::LibIDN2::id2n_check_version>([I<$req_version>])
+=item B<Net::LibIDN2::idn2_check_version>([I<$req_version>])
 
 Checks that the version of the underlying IDN2 C library is at minimum
 the one given as a string in I<$req_version> and if that is the case
@@ -231,7 +239,7 @@ See B<IDN2_VERSION> for a suitable I<$req_version> string, it corresponds
 to  the idn2.h C header file version at compile time of this Perl module.
 Normally these two version numbers match, but if you compiled this Perl
 module against an older libidn2  and then run it with a newer libidn2
-shared library they will be different.
+shared library, they will be different.
 
 =back
 
@@ -241,7 +249,7 @@ shared library they will be different.
 
 =item B<IDN2_VERSION>
 
-Pre-processor symbol with a string that describe the C header file version
+Pre-processor symbol with a string that describes the C header file version
 number at compile time of this Perl module. Used together with idn2_check_version()
 to verify header file and run-time library consistency.
 
@@ -344,13 +352,13 @@ String has disallowed character.
 String has forbidden context-j character.
 
 =item B<"Net::LibIDN2::IDN2_CONTEXTJ_NO_RULE">
-String has context-j character with no rull.
+String has context-j character with no rule.
 
 =item B<"Net::LibIDN2::IDN2_CONTEXTO">
 String has forbidden context-o character.
 
 =item B<"Net::LibIDN2::IDN2_CONTEXTO_NO_RULE">
-String has context-o character with no rull.
+String has context-o character with no rule.
 
 =item B<"Net::LibIDN2::IDN2_UNASSIGNED">
 String has forbidden unassigned character.

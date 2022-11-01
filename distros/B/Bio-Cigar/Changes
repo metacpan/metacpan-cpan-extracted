@@ -1,5 +1,10 @@
 Revision history for Bio-Cigar
 
+1.02  2022-10-28 16:39:31 PDT
+        - Added a ->reversed method
+        - Added an ->aligned method (thanks to Felix Kühnl!)
+        - Switched maintenance to my fork, <https://github.com/tsibley/Bio-Cigar>, since I no longer have access to the original.
+
 1.01  2015-01-05 10:12:47 PST
         - Bump dependency on Types::Standard to 1.000005 to ensure everything
           expected is available

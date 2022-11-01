@@ -2,7 +2,7 @@
 ## Stripe API - ~/lib/Net/API/Stripe/Connect/CountrySpec.pm
 ## Version v0.100.0
 ## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2020/05/15
 ## 
@@ -12,25 +12,30 @@ package Net::API::Stripe::Connect::CountrySpec;
 BEGIN
 {
     use strict;
+    use warnings;
     use parent qw( Net::API::Stripe::Generic );
+    use vars qw( $VERSION );
     our( $VERSION ) = 'v0.100.0';
 };
 
-sub id { shift->_set_get_scalar( 'id', @_ ); }
+use strict;
+use warnings;
 
-sub object { shift->_set_get_scalar( 'object', @_ ); }
+sub id { return( shift->_set_get_scalar( 'id', @_ ) ); }
 
-sub default_currency { shift->_set_get_scalar( 'default_currency', @_ ); }
+sub object { return( shift->_set_get_scalar( 'object', @_ ) ); }
 
-sub supported_bank_account_currencies { shift->_set_get_hash( 'supported_bank_account_currencies', @_ ); }
+sub default_currency { return( shift->_set_get_scalar( 'default_currency', @_ ) ); }
 
-sub supported_payment_currencies { shift->_set_get_array( 'supported_payment_currencies', @_ ); }
+sub supported_bank_account_currencies { return( shift->_set_get_hash( 'supported_bank_account_currencies', @_ ) ); }
 
-sub supported_payment_methods { shift->_set_get_array( 'supported_payment_methods', @_ ); }
+sub supported_payment_currencies { return( shift->_set_get_array( 'supported_payment_currencies', @_ ) ); }
 
-sub supported_transfer_countries { shift->_set_get_array( 'supported_transfer_countries', @_ ); }
+sub supported_payment_methods { return( shift->_set_get_array( 'supported_payment_methods', @_ ) ); }
 
-sub verification_fields { shift->_set_get_object( 'verification_fields', 'Net::API::Stripe::Connect::CountrySpec::VerificationFields', @_ ); }
+sub supported_transfer_countries { return( shift->_set_get_array( 'supported_transfer_countries', @_ ) ); }
+
+sub verification_fields { return( shift->_set_get_object( 'verification_fields', 'Net::API::Stripe::Connect::CountrySpec::VerificationFields', @_ ) ); }
 
 1;
 
@@ -66,130 +71,122 @@ Stripe needs to collect certain pieces of information about each account created
 
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>( %ARG )
+=head2 new( %ARG )
 
 Creates a new L<Net::API::Stripe::Connect::CountrySpec> object.
 It may also take an hash like arguments, that also are method of the same name.
 
-=back
-
 =head1 METHODS
 
-=over 4
-
-=item B<id> string
+=head2 id string
 
 Unique identifier for the object. Represented as the ISO country code for this country.
 
-=item B<object> string, value is "country_spec"
+=head2 object string, value is "country_spec"
 
 String representing the object’s type. Objects of the same type share the same value.
 
-=item B<default_currency> string
+=head2 default_currency string
 
 The default currency for this country. This applies to both payment methods and bank accounts.
 
-=item B<supported_bank_account_currencies> hash
+=head2 supported_bank_account_currencies hash
 
 Currencies that can be accepted in the specific country (for transfers).
 
-=item B<supported_payment_currencies> array containing strings
+=head2 supported_payment_currencies array containing strings
 
 Currencies that can be accepted in the specified country (for payments).
 
-=item B<supported_payment_methods> array containing strings
+=head2 supported_payment_methods array containing strings
 
 Payment methods available in the specified country. You may need to enable some payment methods (e.g., ACH) on your account before they appear in this list. The stripe payment method refers to charging through your platform.
 
-=item B<supported_transfer_countries> array containing strings
+=head2 supported_transfer_countries array containing strings
 
 Countries that can accept transfers from the specified country.
 
-=item B<verification_fields> hash
+=head2 verification_fields hash
 
 Lists the types of verification data needed to keep an account open.
 
 This is a L<Net::API::Stripe::Connect::CountrySpec::VerificationFields> object.
 
-=back
-
 =head1 API SAMPLE
 
-	{
-	  "id": "US",
-	  "object": "country_spec",
-	  "default_currency": "usd",
-	  "supported_bank_account_currencies": {
-		"usd": [
-		  "US"
-		]
-	  },
-	  "supported_payment_currencies": [
-		"usd",
-		"aed",
-		"afn",
-		"..."
-	  ],
-	  "supported_payment_methods": [
-		"ach",
-		"card",
-		"stripe"
-	  ],
-	  "supported_transfer_countries": [
-		"US"
-	  ],
-	  "verification_fields": {
-		"company": {
-		  "additional": [
-			"relationship.representative"
-		  ],
-		  "minimum": [
-			"business_profile.mcc",
-			"business_profile.url",
-			"business_type",
-			"company.address.city",
-			"company.address.line1",
-			"company.address.postal_code",
-			"company.address.state",
-			"company.name",
-			"company.phone",
-			"company.tax_id",
-			"external_account",
-			"relationship.owner",
-			"relationship.representative",
-			"tos_acceptance.date",
-			"tos_acceptance.ip"
-		  ]
-		},
-		"individual": {
-		  "additional": [
-			"individual.id_number"
-		  ],
-		  "minimum": [
-			"business_profile.mcc",
-			"business_profile.url",
-			"business_type",
-			"external_account",
-			"individual.address.city",
-			"individual.address.line1",
-			"individual.address.postal_code",
-			"individual.address.state",
-			"individual.dob.day",
-			"individual.dob.month",
-			"individual.dob.year",
-			"individual.email",
-			"individual.first_name",
-			"individual.last_name",
-			"individual.phone",
-			"individual.ssn_last_4",
-			"tos_acceptance.date",
-			"tos_acceptance.ip"
-		  ]
-		}
-	  }
-	}
+    {
+      "id": "US",
+      "object": "country_spec",
+      "default_currency": "usd",
+      "supported_bank_account_currencies": {
+        "usd": [
+          "US"
+        ]
+      },
+      "supported_payment_currencies": [
+        "usd",
+        "aed",
+        "afn",
+        "..."
+      ],
+      "supported_payment_methods": [
+        "ach",
+        "card",
+        "stripe"
+      ],
+      "supported_transfer_countries": [
+        "US"
+      ],
+      "verification_fields": {
+        "company": {
+          "additional": [
+            "relationship.representative"
+          ],
+          "minimum": [
+            "business_profile.mcc",
+            "business_profile.url",
+            "business_type",
+            "company.address.city",
+            "company.address.line1",
+            "company.address.postal_code",
+            "company.address.state",
+            "company.name",
+            "company.phone",
+            "company.tax_id",
+            "external_account",
+            "relationship.owner",
+            "relationship.representative",
+            "tos_acceptance.date",
+            "tos_acceptance.ip"
+          ]
+        },
+        "individual": {
+          "additional": [
+            "individual.id_number"
+          ],
+          "minimum": [
+            "business_profile.mcc",
+            "business_profile.url",
+            "business_type",
+            "external_account",
+            "individual.address.city",
+            "individual.address.line1",
+            "individual.address.postal_code",
+            "individual.address.state",
+            "individual.dob.day",
+            "individual.dob.month",
+            "individual.dob.year",
+            "individual.email",
+            "individual.first_name",
+            "individual.last_name",
+            "individual.phone",
+            "individual.ssn_last_4",
+            "tos_acceptance.date",
+            "tos_acceptance.ip"
+          ]
+        }
+      }
+    }
 
 =head1 HISTORY
 

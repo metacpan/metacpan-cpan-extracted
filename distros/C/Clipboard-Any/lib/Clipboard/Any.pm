@@ -10,9 +10,9 @@ use File::Which qw(which);
 use IPC::System::Options 'system', 'readpipe', -log=>1;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-09'; # DATE
+our $DATE = '2022-10-25'; # DATE
 our $DIST = 'Clipboard-Any'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 my $known_clipboard_managers = [qw/klipper/];
 my $sch_clipboard_manager = ['str', in=>$known_clipboard_managers];
@@ -259,7 +259,7 @@ $SPEC{'add_clipboard_content'} = {
 _
     args => {
         %argspecopt_clipboard_manager,
-        content => {schema => 'str*', req=>1, pos=>0},
+        content => {schema => 'str*', pos=>0, cmdline_src=>'stdin_or_args'},
     },
     result => {
         schema => $sch_clipboard_manager,
@@ -271,6 +271,9 @@ sub add_clipboard_content {
     my $clipboard_manager = $args{clipboard_manager} // detect_clipboard_manager();
     return [412, "Can't detect any known clipboard manager"]
         unless $clipboard_manager;
+
+    defined $args{content} or
+        return [400, "Please specify content"];
 
     if ($clipboard_manager eq 'klipper') {
         my ($stdout, $stderr);
@@ -300,7 +303,7 @@ Clipboard::Any - Common interface to clipboard manager functions
 
 =head1 VERSION
 
-This document describes version 0.003 of Clipboard::Any (from Perl distribution Clipboard-Any), released on 2022-10-09.
+This document describes version 0.004 of Clipboard::Any (from Perl distribution Clipboard-Any), released on 2022-10-25.
 
 =head1 DESCRIPTION
 
@@ -358,7 +361,9 @@ Explicitly set clipboard manager to use.
 
 The default, when left undef, is to detect what clipboard manager is running.
 
-=item * B<content>* => I<str>
+=item * B<content> => I<str>
+
+(No description)
 
 
 =back

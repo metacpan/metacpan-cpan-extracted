@@ -4,7 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 
-our $VERSION = "0.07";
+our $VERSION = "0.08";
 
 1;
 
@@ -12,7 +12,7 @@ __END__
 
 =head1 NAME
 
-App::Elog - An Apache error log viewer
+elog - An Apache error log viewer
 
 =head1 SYNOPSIS
 
@@ -20,22 +20,21 @@ App::Elog - An Apache error log viewer
 
 =head1 OPTIONS
 
-    -a[<n>]    show last n errors on own line, info preceeding
-    -d=<file>  default log when one isn't found for cwd
-    -f         tail -f the log
-    -g         graph errors at hourly intervals
-    -gd        graph errors at daily intervals
-    -h         displays this help text
-    -i         info and statistics
-    -l         list available logs
-    -ll        list available logs verbosely
-    -p         print log path
-    -r<n>      rotation number
-    -v         vim the log
+    -f <regex>        filter based on regex
+    -g [<interval>]   graph errors
+    -h                show this help text
+    -i                show info spread vertically
+    -l                list available logs
+    -L                list available logs with details
+    -m <n>            process a maximum of n errors, starting from the end
+    -o <n>            process errors starting at an offset from the end
+    -p                print log path
+    -r <n>            rotation number
+    -s                show statistics
 
-    <name>     name of the log you are trying to access (regexp),
-               if name contains a "/", name is treated as a file name,
-               default is the error log for the cwd.
+    <name>            name of the log you are trying to access (regex),
+                      if name contains a "/", name is treated as a file name,
+                      default is the error log for the cwd.
 
 =head1 DESCRIPTION
 
@@ -56,11 +55,12 @@ after the `elog` command. For example, `elog foo`.
 
 To see a list of all the error logs on the server use `elog -l`.
 More detailed information, such as what rotations exist for each
-log, use `elog -ll`.
+log, use `elog -L`.
 
 To specify an older rotation of an error log, use the -r option.
-For example `elog -r2`, might show the /var/log/httpd/foo.error_log.2.gz
-file.
+For example `elog -r 2`, might show the /var/log/httpd/foo.error_log.2.gz
+file. If that rotation doesn't exist, it will choose the 2nd in the list
+shown when you use the -L option.
 
 The way it determines which error log to show is by parsing Apache
 config files in either /etc/httpd or /etc/apache2. An ErrorLog line
@@ -69,23 +69,22 @@ that error log is for.
 
 The -p option will show the path the selected error log file.
 
-The -f option will open the log in `tail -f`.
+The -f option will filter based on a given regex for the -i, -s, or -g option.
 
-The -v option will open the log in `vim`.
+The -s option will show statistics about the error log file such
+as how many errors there were, and their time frame.
 
-The -i option will show statistics about the error log file such
-as how many errors there were and what time frame.
+The -i option will show each error on a line by itself with extra info (time, ip,
+etc) on the line before.
 
-The -a option will show the message of the error on it's own line,
-with extra info such as date and ip address on a line beforehand.
-When multiple lines of the error log relate to the same error, they
-are grouped.
+The -m option limits the maximum number of errors shown with the -i, -s, or
+the -g option, starting from the end of the log (most recent).
 
-The -g option will show a graph of the number of errors in an hourly
-interval.
+The -o option sets an offset to the errors shown with the -i option, so
+"elog -i -m 1" shows the last error, "elog -i -m 1 -o 1" shows the second
+to last error.
 
-The -gd option will show a graph of the number of errors in a daily
-interval.
+The -g option will show a graph of the number of errors in hourly intervals. If provided an argument, it can be h for hourly, d for daily, or a number of seconds.
 
 =head1 METACPAN
 

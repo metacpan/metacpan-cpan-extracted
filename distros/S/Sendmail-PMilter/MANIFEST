@@ -1,24 +1,24 @@
 ABOUT
 ACKNOWLEDGEMENTS
+Changes
 CONTRIBUTING
 COPYRIGHT
-Changes
-INSTALL
-LICENSE
-Makefile.PL
-MANIFEST
-README
-README.1.21
-TODO
 examples/protocol-dump.pl
 examples/symbol-dump.pl
+INSTALL
 lib/Sendmail/PMilter.pm
 lib/Sendmail/PMilter/Context.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+README.1.23
 t/00_pmilter.t
 t/files/sendmail0.cf
 t/files/sendmail1.cf
 t/files/sendmail2.cf
 t/files/sendmail3.cf
 t/files/sendmail4.cf
+TODO
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

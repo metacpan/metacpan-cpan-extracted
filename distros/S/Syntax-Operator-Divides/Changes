@@ -1,4 +1,9 @@
 Revision history for Syntax-Operator-Divides
 
+0.02    2022-10-24
+        [CHANGES]
+         * Add a wrapper function
+         * Updates for XS::Parse::Infix v0.26
+
 0.01    2021-08-31
         First version, released on an unsuspecting world.

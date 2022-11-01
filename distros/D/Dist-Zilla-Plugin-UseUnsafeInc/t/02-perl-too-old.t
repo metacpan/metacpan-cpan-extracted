@@ -5,7 +5,7 @@ use Path::Tiny;
 my $code = path('t', '01-basic.t')->slurp_utf8;
 
 # fake the current perl version to be something old.
-$code =~ s/^plan skip_all.*$/local \$\] = '5.010000';/m;
+$code =~ s/^plan skip_all.*$/local \$\] = '5.024000';/m;
 
 my $new_test = <<'NEW_TEST';
     like(

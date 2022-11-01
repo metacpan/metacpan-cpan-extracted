@@ -42,7 +42,7 @@ requires:
   JSON::XS: '4.03'
   Module::Generic: v0.27.2
   Nice::Try: v1.3.1
-  Promise::Me: v0.4.2
+  Promise::Me: v0.4.4
   Regexp::Common: '2017060201'
   Scalar::Util: '1.54'
   Socket: '2.031'
@@ -61,5 +61,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jackdeguest/HTTP-Promise/issues
   repository: https://gitlab.com/jackdeguest/HTTP-Promise
-version: v0.2.0
+version: v0.2.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -3,12 +3,11 @@
 export PERL5LIB=lib
 
 checks="DB Berlin Jannowitzbrücke
-NAHSH Flensburg Solitüde
+NAHSH Flensburg
 NASA Wernigerode Hbf
-NVV Kassel Hbf
-ÖBB Wien Praterstern
-RSAG Rostock Hbf
-VBB Berlin Jannowitzbrücke
+NVV Kassel Hauptbahnhof
+ÖBB Wien Meidling
+VBB S+U Jannowitzbrücke (Berlin)
 VBN Diepholz"
 
 echo $checks | while read service stop; do

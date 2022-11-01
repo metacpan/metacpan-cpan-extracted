@@ -1,0 +1,8 @@
+{
+   "address" : "121042882-38381234567890123",
+   "amount_charged" : "0",
+   "amount_received" : "0",
+   "amount_returned" : "0",
+   "refund_attributes_method" : "email",
+   "refund_attributes_status" : "missing"
+}

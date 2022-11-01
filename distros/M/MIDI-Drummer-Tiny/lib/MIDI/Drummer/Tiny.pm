@@ -3,13 +3,13 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Glorified metronome
 
-our $VERSION = '0.4001';
+our $VERSION = '0.4002';
 
 use Data::Dumper::Compact qw(ddc);
 use List::Util qw(sum0);
 use Math::Bezier ();
 use MIDI::Util qw(dura_size reverse_dump set_chan_patch set_time_signature);
-use Music::Duration;
+use Music::Duration ();
 use Music::RhythmSet::Util qw(upsize);
 
 use Moo;
@@ -430,12 +430,15 @@ sub pattern {
 sub sync_patterns {
     my ($self, %patterns) = @_;
 
+    my $master_duration = delete $patterns{duration};
+
     my @subs;
     for my $instrument (keys %patterns) {
         push @subs, sub {
             $self->pattern(
                 instrument => $instrument,
                 patterns   => $patterns{$instrument},
+                $master_duration ? (duration => $master_duration) : (),
             );
         },
     }
@@ -467,6 +470,10 @@ sub add_fill {
 
     my $lcm = _multilcm($fill_duration, values %lengths);
     print "LCM: $lcm\n" if $self->verbose;
+
+    my $size = 4 / $lcm;
+    my $dump = reverse_dump('length');
+    my $master_duration = $dump->{$size} || $self->eighth;
 
     my $fill_chop = $fill_duration == $lcm
         ? $fill_length
@@ -509,7 +516,12 @@ sub add_fill {
         $replaced{$instrument} = [ $string ];
     }
 
-    $self->sync_patterns(%replaced);
+    $self->sync_patterns(
+        %replaced,
+        duration => $master_duration,
+    );
+
+    return \%replaced;
 }
 
 
@@ -566,7 +578,7 @@ MIDI::Drummer::Tiny - Glorified metronome
 
 =head1 VERSION
 
-version 0.4001
+version 0.4002
 
 =head1 SYNOPSIS
 
@@ -950,10 +962,13 @@ Defaults:
       $d->open_hh => [ ('11111111') x $d->bars ],
       $d->snare   => [ ('0101') x $d->bars ],
       $d->kick    => [ ('1010') x $d->bars ],
-      ...
+      duration    => $d->eighth, # render all notes at this level of granularity
   );
 
 Execute the C<pattern> method for multiple voices.
+
+If a C<duration> is provided, this will be used for each pattern
+(primarily for the B<add_fill> method).
 
 =head2 add_fill
 
@@ -977,6 +992,8 @@ Add a fill to the beat pattern.  That is, replace the end of the given
 beat-string phrase with a fill.  The fill is given as the first
 argument and should be a coderef that returns a hashref.  The default
 is a three-note, eighth-note snare fill.
+
+* This method is not right at all and is still in development.
 
 =head2 set_time_sig
 

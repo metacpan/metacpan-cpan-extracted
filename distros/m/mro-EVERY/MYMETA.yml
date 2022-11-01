@@ -19,8 +19,9 @@ no_index:
     - inc
 requires:
   Carp: '0'
+  Cwd: '0'
   List::Util: '1.45'
   Symbol: '0'
   mro: '0'
-version: v1.0.0
+version: v1.0.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -377,7 +377,7 @@ sub invert {
 
 
 
-#line 948 "../../blib/lib/PDL/PP.pm"
+#line 949 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 
@@ -731,7 +731,7 @@ It will set the bad-value flag of all output ndarrays if the flag is set for any
 
 
 
-#line 949 "../../blib/lib/PDL/PP.pm"
+#line 950 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 
 #line 1573 "transform.pd"
@@ -740,9 +740,9 @@ sub PDL::match {
   # Set default for rectification to 0 for simple matching...
   push @_, {} if ref($_[-1]) ne 'HASH';
   my @k = grep(m/^r(e(c(t)?)?)?/,sort keys %{$_[-1]});
-#line 957 "../../blib/lib/PDL/PP.pm"
-#line 957 "../../blib/lib/PDL/PP.pm"
-#line 959 "../../blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 958 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 960 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 #line 1578 "transform.pd"
   unless(@k) {
       $_[-1]->{rectify} = 0;
@@ -774,9 +774,9 @@ sub map {
     my($x);
     if(defined ($x = $tmp->gethdr)) {
       my(%b) = %{$x};
-#line 991 "../../blib/lib/PDL/PP.pm"
-#line 989 "../../blib/lib/PDL/PP.pm"
-#line 993 "../../blib/lib/PDL/PP.pm"
+#line 992 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 990 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 994 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 #line 1608 "transform.pd"
       $ohdr = \%b;
     }
@@ -787,9 +787,9 @@ sub map {
     }
     # deep-copy fits header into output
     my %foo = %{$tmp};
-#line 1004 "../../blib/lib/PDL/PP.pm"
-#line 1000 "../../blib/lib/PDL/PP.pm"
-#line 1006 "../../blib/lib/PDL/PP.pm"
+#line 1005 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 1001 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 1007 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 #line 1617 "transform.pd"
     $ohdr = \%foo;
   } elsif(ref $tmp eq 'ARRAY') {
@@ -988,9 +988,9 @@ sub map {
           ### These are the CROTA<n>, PCi_j, and CDi_j.
           delete @{$out->hdr}{
               grep /(^CROTA\d*$)|(^(CD|PC)\d+_\d+[A-Z]?$)/, keys %{$out->hdr}
-#line 1205 "../../blib/lib/PDL/PP.pm"
-#line 1199 "../../blib/lib/PDL/PP.pm"
-#line 1207 "../../blib/lib/PDL/PP.pm"
+#line 1206 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 1200 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 1208 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 #line 1814 "transform.pd"
           };
       } else {
@@ -1036,9 +1036,9 @@ sub map {
           ## Eliminate competing header pointing tags if they exist
           delete @{$out->hdr}{
               grep /(^CROTA\d*$)|(^(PC)\d+_\d+[A-Z]?$)|(CDELT\d*$)/, keys %{$out->hdr}
-#line 1253 "../../blib/lib/PDL/PP.pm"
-#line 1245 "../../blib/lib/PDL/PP.pm"
-#line 1255 "../../blib/lib/PDL/PP.pm"
+#line 1254 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 1246 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
+#line 1256 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 #line 1858 "transform.pd"
           };
       }
@@ -1150,12 +1150,12 @@ sub map {
   }
   return $out;
 }
-#line 1367 "../../blib/lib/PDL/PP.pm"
+#line 1368 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 #line 1155 "Transform.pm"
 
 
 
-#line 950 "../../blib/lib/PDL/PP.pm"
+#line 951 "/home/osboxes/pdl-code/blib/lib/PDL/PP.pm"
 
 *map = \&PDL::map;
 #line 1162 "Transform.pm"
@@ -1832,6 +1832,7 @@ the type/unit fields are currently ignored by t_linear.
 { package PDL::Transform::Linear;
 our @ISA = ('PDL::Transform');
 *_opt = \&PDL::Transform::_opt;
+*identity = \&PDL::MatrixOps::identity;
 
 sub PDL::Transform::t_linear { PDL::Transform::Linear->new(@_); }
 
@@ -1876,6 +1877,7 @@ sub new {
   # Figure out the number of dimensions to transform, and,
   # if necessary, generate a new matrix.
 
+  my $rot = $me->{params}{rot};
   if(defined($me->{params}{matrix})) {
     my $mat = $me->{params}{matrix} = $me->{params}{matrix}->slice(":,:");
     $me->{idim} = $mat->dim(0);
@@ -1905,6 +1907,8 @@ sub new {
       $me->{idim} = $me->{odim} = $me->{params}{post}->dim(0);
     } elsif(defined($o_dims)) {
       $me->{idim} = $me->{odim} = $o_dims;
+    } elsif (UNIVERSAL::isa($rot,'PDL') && (my $nrots = $rot->nelem) > 1) {
+      $me->{idim} = $me->{odim} = $nrots;
     } else {
       print "PDL::Transform::Linear: assuming 2-D transform (set dims option to change)\n" if($PDL::Transform::debug);
       $me->{idim} = $me->{odim} = 2;
@@ -1916,7 +1920,6 @@ sub new {
   }
 
   ### Handle rotation option
-  my $rot = $me->{params}{rot};
   if(defined($rot)) {
     # Subrotation closure -- rotates from axis $d->(0) --> $d->(1).
     my $subrot = sub {
@@ -2034,11 +2037,11 @@ sub stringify {
   $out;
 }
 }
-#line 2038 "Transform.pm"
+#line 2041 "Transform.pm"
 
 
 
-#line 2846 "transform.pd"
+#line 2849 "transform.pd"
 
 
 =head2 t_scale
@@ -2060,16 +2063,16 @@ sub t_scale {
     my($scale) = shift;
     my($y) = shift;
     return t_linear(scale=>$scale,%{$y})
-#line 2064 "Transform.pm"
-#line 2867 "transform.pd"
+#line 2067 "Transform.pm"
+#line 2870 "transform.pd"
         if(ref $y eq 'HASH');
     t_linear(Scale=>$scale,$y,@_);
 }
-#line 2069 "Transform.pm"
+#line 2072 "Transform.pm"
 
 
 
-#line 2874 "transform.pd"
+#line 2877 "transform.pd"
 
 
 =head2 t_offset
@@ -2091,31 +2094,31 @@ sub t_offset {
     my($pre) = shift;
     my($y) = shift;
     return t_linear(pre=>$pre,%{$y})
-#line 2095 "Transform.pm"
-#line 2895 "transform.pd"
+#line 2098 "Transform.pm"
+#line 2898 "transform.pd"
         if(ref $y eq 'HASH');
 
     t_linear(pre=>$pre,$y,@_);
 }
-#line 2101 "Transform.pm"
+#line 2104 "Transform.pm"
 
 
 
-#line 2903 "transform.pd"
+#line 2906 "transform.pd"
 
 
 =head2 t_rot
 
 =for usage
 
-  $f = t_rot(<rotation-in-degrees>)
+  $f = t_rot(\@rotation_in_degrees)
 
 =for ref
 
 Convenience interface to L</t_linear>.
 
 t_rot produces a rotation transform in 2-D (scalar), 3-D (3-vector), or
-N-D (matrix).  It acts exactly the same as C<t_linear(Rot=>\<shift\>)>.
+N-D (matrix).  It acts exactly the same as C<t_linear(rot=>shift)>.
 
 =cut
 
@@ -2124,17 +2127,17 @@ sub t_rotate    {
     my $rot = shift;
     my($y) = shift;
     return t_linear(rot=>$rot,%{$y})
-#line 2128 "Transform.pm"
-#line 2925 "transform.pd"
+#line 2131 "Transform.pm"
+#line 2928 "transform.pd"
         if(ref $y eq 'HASH');
 
     t_linear(rot=>$rot,$y,@_);
 }
-#line 2134 "Transform.pm"
+#line 2137 "Transform.pm"
 
 
 
-#line 2935 "transform.pd"
+#line 2938 "transform.pd"
 
 
 =head2 t_fits
@@ -2299,11 +2302,11 @@ sub t_fits {
 
   return $me;
 }
-#line 2303 "Transform.pm"
+#line 2306 "Transform.pm"
 
 
 
-#line 3107 "transform.pd"
+#line 3110 "transform.pd"
 
 
 =head2 t_code
@@ -2396,11 +2399,11 @@ sub t_code {
 
   $me;
 }
-#line 2400 "Transform.pm"
+#line 2403 "Transform.pm"
 
 
 
-#line 3206 "transform.pd"
+#line 3209 "transform.pd"
 
 
 =head2 t_cylindrical
@@ -2575,11 +2578,11 @@ sub t_radial {
 
   $me;
 }
-#line 2579 "Transform.pm"
+#line 2582 "Transform.pm"
 
 
 
-#line 3384 "transform.pd"
+#line 3387 "transform.pd"
 
 
 =head2 t_quadratic
@@ -2695,11 +2698,11 @@ sub t_quadratic {
     };
     $me;
 }
-#line 2699 "Transform.pm"
+#line 2702 "Transform.pm"
 
 
 
-#line 3503 "transform.pd"
+#line 3506 "transform.pd"
 
 
 =head2 t_cubic
@@ -2841,11 +2844,11 @@ sub t_cubic {
 
     $me;
 }
-#line 2845 "Transform.pm"
+#line 2848 "Transform.pm"
 
 
 
-#line 3649 "transform.pd"
+#line 3652 "transform.pd"
 
 
 =head2 t_quartic
@@ -2965,11 +2968,11 @@ sub t_quartic {
     };
     $me;
 }
-#line 2969 "Transform.pm"
+#line 2972 "Transform.pm"
 
 
 
-#line 3772 "transform.pd"
+#line 3775 "transform.pd"
 
 
 =head2 t_spherical
@@ -3104,11 +3107,11 @@ sub t_spherical {
 
     $me;
   }
-#line 3108 "Transform.pm"
+#line 3111 "Transform.pm"
 
 
 
-#line 3910 "transform.pd"
+#line 3913 "transform.pd"
 
 
 =head2 t_projective
@@ -3262,7 +3265,7 @@ sub t_projective {
 
   $me;
 }
-#line 3266 "Transform.pm"
+#line 3269 "Transform.pm"
 
 
 
@@ -3335,7 +3338,7 @@ sub stringify {
   $out .= "fwd ". ((defined ($me->{func})) ? ( (ref($me->{func}) eq 'CODE') ? "ok" : "non-CODE(!!)" ): "missing")."; ";
   $out .= "inv ". ((defined ($me->{inv})) ?  ( (ref($me->{inv}) eq 'CODE') ? "ok" : "non-CODE(!!)" ):"missing").".\n";
 }
-#line 3339 "Transform.pm"
+#line 3342 "Transform.pm"
 
 
 

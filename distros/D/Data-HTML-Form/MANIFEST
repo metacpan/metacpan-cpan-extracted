@@ -4,6 +4,8 @@ examples/form.pl
 examples/form_default.pl
 Form.pm
 Form/Input.pm
+Form/Select.pm
+Form/Select/Option.pm
 inc/Module/Install.pm
 inc/Module/Install/AuthorRequires.pm
 inc/Module/Install/AuthorTests.pm
@@ -24,6 +26,10 @@ SIGNATURE
 t/Data-HTML-Form-Input/01-use.t
 t/Data-HTML-Form-Input/02-version.t
 t/Data-HTML-Form-Input/03-new.t
+t/Data-HTML-Form-Select-Option/01-use.t
+t/Data-HTML-Form-Select-Option/02-version.t
+t/Data-HTML-Form-Select/01-use.t
+t/Data-HTML-Form-Select/02-version.t
 t/Data-HTML-Form/01-use.t
 t/Data-HTML-Form/02-version.t
 t/Data-HTML-Form/03-new.t
@@ -35,5 +41,9 @@ t/Data-HTML-Form/07-label.t
 t/Data-HTML-Form/08-method.t
 xt/Data-HTML-Form-Input/01-pod_coverage.t
 xt/Data-HTML-Form-Input/02-pod.t
+xt/Data-HTML-Form-Select-Option/01-pod_coverage.t
+xt/Data-HTML-Form-Select-Option/02-pod.t
+xt/Data-HTML-Form-Select/01-pod_coverage.t
+xt/Data-HTML-Form-Select/02-pod.t
 xt/Data-HTML-Form/01-pod_coverage.t
 xt/Data-HTML-Form/02-pod.t

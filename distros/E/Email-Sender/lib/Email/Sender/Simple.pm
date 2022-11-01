@@ -1,4 +1,4 @@
-package Email::Sender::Simple 2.500;
+package Email::Sender::Simple 2.600;
 # ABSTRACT: the simple interface for sending mail with Sender
 
 use Moo;
@@ -19,7 +19,7 @@ use Sub::Exporter -setup => {
   },
 };
 
-use Email::Address;
+use Email::Address::XS;
 use Email::Sender::Transport;
 use Email::Sender::Util;
 use Try::Tiny;
@@ -143,10 +143,9 @@ sub _get_to_from {
   my $to = $arg->{to};
   unless (@$to) {
     my @to_addrs =
-      map  { $_->address               }
-      grep { defined                   }
-      map  { Email::Address->parse($_) }
-      map  { $email->get_header($_)    }
+      map  { $_->address                   }
+      map  { Email::Address::XS->parse($_) }
+      map  { $email->get_header($_)        }
       qw(to cc);
     $to = \@to_addrs;
   }
@@ -154,10 +153,9 @@ sub _get_to_from {
   my $from = $arg->{from};
   unless (defined $from) {
     ($from) =
-      map  { $_->address               }
-      grep { defined                   }
-      map  { Email::Address->parse($_) }
-      map  { $email->get_header($_)    }
+      map  { $_->address                   }
+      map  { Email::Address::XS->parse($_) }
+      map  { $email->get_header($_)        }
       qw(from);
   }
 
@@ -179,7 +177,7 @@ Email::Sender::Simple - the simple interface for sending mail with Sender
 
 =head1 VERSION
 
-version 2.500
+version 2.600
 
 =head1 PERL VERSION
 
@@ -198,11 +196,11 @@ L<Email::Sender::Manual::QuickStart>.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@semiotic.systems>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Ricardo Signes.
+This software is copyright (c) 2022 by Ricardo Signes.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

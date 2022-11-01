@@ -2,7 +2,7 @@
 ## Stripe API - ~/lib/Net/API/Stripe/Order/Return.pm
 ## Version v0.100.0
 ## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
 ## Modified 2020/05/15
 ## 
@@ -12,28 +12,33 @@ package Net::API::Stripe::Order::Return;
 BEGIN
 {
     use strict;
+    use warnings;
     use parent qw( Net::API::Stripe::Generic );
+    use vars qw( $VERSION );
     our( $VERSION ) = 'v0.100.0';
 };
 
-sub id { shift->_set_get_scalar( 'id', @_ ); }
+use strict;
+use warnings;
 
-sub object { shift->_set_get_scalar( 'object', @_ ); }
+sub id { return( shift->_set_get_scalar( 'id', @_ ) ); }
 
-sub amount { shift->_set_get_number( 'amount', @_ ); }
+sub object { return( shift->_set_get_scalar( 'object', @_ ) ); }
 
-sub created { shift->_set_get_datetime( 'created', @_ ); }
+sub amount { return( shift->_set_get_number( 'amount', @_ ) ); }
 
-sub currency { shift->_set_get_scalar( 'currency', @_ ); }
+sub created { return( shift->_set_get_datetime( 'created', @_ ) ); }
 
-## Array of Net::API::Stripe::Order::Item
-sub items { shift->_set_get_object_array( 'items', 'Net::API::Stripe::Order::Item', @_ ); }
+sub currency { return( shift->_set_get_scalar( 'currency', @_ ) ); }
 
-sub livemode { shift->_set_get_boolean( 'livemode', @_ ); }
+# Array of Net::API::Stripe::Order::Item
+sub items { return( shift->_set_get_object_array( 'items', 'Net::API::Stripe::Order::Item', @_ ) ); }
 
-sub order { shift->_set_get_scalar_or_object( 'order', 'Net::API::Stripe::Order', @_ ); }
+sub livemode { return( shift->_set_get_boolean( 'livemode', @_ ) ); }
 
-sub refund { shift->_set_get_scalar_or_object( 'refund', 'Net::API::Stripe::Refund', @_ ); }
+sub order { return( shift->_set_get_scalar_or_object( 'order', 'Net::API::Stripe::Order', @_ ) ); }
+
+sub refund { return( shift->_set_get_scalar_or_object( 'refund', 'Net::API::Stripe::Refund', @_ ) ); }
 
 1;
 
@@ -67,85 +72,77 @@ A return represents the full or partial return of a number of order items (L<htt
 
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>( %ARG )
+=head2 new( %ARG )
 
 Creates a new L<Net::API::Stripe::Order::Return> object.
 
-=back
-
 =head1 METHODS
 
-=over 4
-
-=item B<id> string
+=head2 id string
 
 Unique identifier for the object.
 
-=item B<object> string, value is "order_return"
+=head2 object string, value is "order_return"
 
 String representing the object’s type. Objects of the same type share the same value.
 
-=item B<amount> integer
+=head2 amount integer
 
 A positive integer in the smallest currency unit (that is, 100 cents for $1.00, or 1 for ¥1, Japanese Yen being a zero-decimal currency) representing the total amount for the returned line item.
 
-=item B<created> timestamp
+=head2 created timestamp
 
 Time at which the object was created. Measured in seconds since the Unix epoch.
 
-=item B<currency> currency
+=head2 currency currency
 
 Three-letter ISO currency code, in lowercase. Must be a supported currency.
 
-=item B<items> array of hashes
+=head2 items array of hashes
 
 The items included in this order return.
 
 This is an array of L<Net::API::Stripe::Order::Item> objects.
 
-=item B<livemode> boolean
+=head2 livemode boolean
 
 Has the value true if the object exists in live mode or the value false if the object exists in test mode.
 
-=item B<order> string (expandable)
+=head2 order string (expandable)
 
 The order that this return includes items from.
 
 When expanded, this is a L<Net::API::Stripe::Order> object.
 
-=item B<refund> string (expandable)
+=head2 refund string (expandable)
 
 The ID of the refund issued for this return.
 
 When expanded, this is a L<Net::API::Stripe::Refund> object.
 
-=back
-
 =head1 API SAMPLE
 
-	{
-	  "id": "orret_fake123456789",
-	  "object": "order_return",
-	  "amount": 1500,
-	  "created": 1571480456,
-	  "currency": "jpy",
-	  "items": [
-		{
-		  "object": "order_item",
-		  "amount": 1500,
-		  "currency": "jpy",
-		  "description": "Provider, Inc investor yearly membership",
-		  "parent": "sk_fake123456789",
-		  "quantity": null,
-		  "type": "sku"
-		}
-	  ],
-	  "livemode": false,
-	  "order": "or_fake123456789",
-	  "refund": "re_fake123456789"
-	}
+    {
+      "id": "orret_fake123456789",
+      "object": "order_return",
+      "amount": 1500,
+      "created": 1571480456,
+      "currency": "jpy",
+      "items": [
+        {
+          "object": "order_item",
+          "amount": 1500,
+          "currency": "jpy",
+          "description": "Provider, Inc investor yearly membership",
+          "parent": "sk_fake123456789",
+          "quantity": null,
+          "type": "sku"
+        }
+      ],
+      "livemode": false,
+      "order": "or_fake123456789",
+      "refund": "re_fake123456789"
+    }
 
 =head1 HISTORY
 

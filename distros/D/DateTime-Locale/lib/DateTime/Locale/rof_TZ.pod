@@ -519,11 +519,11 @@ Rombo Tanzania locale.
    1995-12-22T09:05:02 = 9 kang’ama
   -0010-09-15T04:44:23 = 4 kang’ama
 
-=head3 hm (h:mm a)
+=head3 hm (h:mm a)
 
-   2008-02-05T18:30:30 = 6:30 kingoto
-   1995-12-22T09:05:02 = 9:05 kang’ama
-  -0010-09-15T04:44:23 = 4:44 kang’ama
+   2008-02-05T18:30:30 = 6:30 kingoto
+   1995-12-22T09:05:02 = 9:05 kang’ama
+  -0010-09-15T04:44:23 = 4:44 kang’ama
 
 =head3 hms (h:mm:ss a)
 

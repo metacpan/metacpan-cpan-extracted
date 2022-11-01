@@ -24,7 +24,7 @@ use v5.12;
 
 package Chart::Mountain;
 our @ISA     = qw(Chart::Base);
-our $VERSION = 'v2.403.7';
+our $VERSION = 'v2.403.8';
 
 use Chart::Base;
 use GD;

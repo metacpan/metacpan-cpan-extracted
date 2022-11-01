@@ -1,0 +1,15 @@
+{
+   "address" : {
+      "city" : "Rawalpidni",
+      "country" : "UY",
+      "line1" : "ABsnio,nsnisdc",
+      "line2" : "sdfsf",
+      "postal_code" : "46000",
+      "state" : "UY-CA"
+   },
+   "display_name" : "My First Store",
+   "id" : "tml_tNoUkSMckrqIbIiO6oRCPowh",
+   "livemode" : 0,
+   "metadata" : {},
+   "object" : "terminal.location"
+}

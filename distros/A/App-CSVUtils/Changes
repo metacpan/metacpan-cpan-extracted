@@ -1,3 +1,8 @@
+0.046   2022-10-25  Released-By: PERLANCAR; Urgency: medium
+
+        - Add utility: csv2vcf.
+
+
 0.045   2022-10-09  Released-By: PERLANCAR; Urgency: medium
 
         - Add option --output-filename (-o) and --overwrite (-O); allow

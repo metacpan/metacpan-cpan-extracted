@@ -43,6 +43,8 @@
       "test" : {
          "recommends" : {
             "AnyEvent" : "0",
+            "HTTP::Request" : "0",
+            "HTTP::Response" : "0",
             "IO::Async" : "0",
             "IPC::Run" : "0",
             "Net::Curl::Promiser" : "0"
@@ -71,6 +73,6 @@
          "web" : "https://github.com/cpanel/p5-cPanel-APIClient"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

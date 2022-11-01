@@ -7,11 +7,13 @@ use lib 't/lib';
 use Test::More;
 
 our @plugins;
+
 BEGIN {
 	@plugins = ('MyPlugin');
 }
 
 {
+
 	package Test;
 	use Form::Tiny plugins => \@plugins;
 }

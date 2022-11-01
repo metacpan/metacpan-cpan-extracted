@@ -50,9 +50,11 @@ use Carp;
 use Socket;
 use UNIVERSAL;
 
-use Sendmail::PMilter 1.21 qw(:all);
+use Sendmail::PMilter 1.23 qw(:all);
 
-our $VERSION = '1.21';
+# use Data::Dumper;
+
+our $VERSION = '1.23';
 $VERSION = eval $VERSION;
 
 =pod
@@ -185,8 +187,15 @@ sub main ($) {
 
 	$this->{lastsymbol} = '';
 
+#my $time_now = localtime;
+
 	eval {
+
+#$time_now = localtime;
+#printf( "%s PID=%d Context.pm(%3d): main(eval): entered eval, about to enter main loop.\n", $time_now, $$, __LINE__ );
 		while (1) {
+#$time_now = localtime;
+#printf( "%s PID=%d Context.pm(%3d): main(eval): top of main loop\n", $time_now, $$, __LINE__ );
 			# Loop, reading packets 'from the wire' into $buf and then extracting the commands and any data from them.
 			# Note that commands are known by the symbolic constants 'SMFIC_something'.  There are 14 of these commands;
 			# all are listed in the 'Commands' section under 'Protocol constants' above.  Correspondigly the responses
@@ -202,17 +211,20 @@ sub main ($) {
 			$this->read_block(\$buf, 1) || last;
 			my $cmd = $buf;
 
+#$time_now = localtime;
+#printf( "%s PID=%d Context.pm(%3d): main(eval): got command=[%s]\n", $time_now, $$, __LINE__, $cmd );
+
 			# get actual data
 			$this->read_block(\$buf, $len - 1) || die "EOF in stream\n";
 
 			if ($cmd eq SMFIC_ABORT) {
-				delete $this->{symbols}{&SMFIC_CONNECT};
-				delete $this->{symbols}{&SMFIC_HELO};
+#				delete $this->{symbols}{&SMFIC_CONNECT};
+#				delete $this->{symbols}{&SMFIC_HELO};
 				delete $this->{symbols}{&SMFIC_MAIL};
-				delete $this->{symbols}{&SMFIC_RCPT};
-				delete $this->{symbols}{&SMFIC_DATA};
-				delete $this->{symbols}{&SMFIC_EOH};
-				delete $this->{symbols}{&SMFIC_BODYEOB};
+#				delete $this->{symbols}{&SMFIC_RCPT};
+#				delete $this->{symbols}{&SMFIC_DATA};
+#				delete $this->{symbols}{&SMFIC_EOH};
+#				delete $this->{symbols}{&SMFIC_BODYEOB};
 				$this->call_hooks('abort');
 			} elsif ($cmd eq SMFIC_BODY) {
 				$this->call_hooks('body', $buf, length($buf));
@@ -261,10 +273,10 @@ sub main ($) {
 				}
 			} elsif ($cmd eq SMFIC_BODYEOB) {
 				$this->call_hooks('eom');
-				delete $this->{symbols}{&SMFIC_MAIL};
-				delete $this->{symbols}{&SMFIC_DATA};
-				delete $this->{symbols}{&SMFIC_EOH};
-				delete $this->{symbols}{&SMFIC_BODYEOB};
+#				delete $this->{symbols}{&SMFIC_MAIL};
+#				delete $this->{symbols}{&SMFIC_DATA};
+#				delete $this->{symbols}{&SMFIC_EOH};
+#				delete $this->{symbols}{&SMFIC_BODYEOB};
 			} elsif ($cmd eq SMFIC_HELO) {
 				my $helo = &$split_buf;
 				die "SMFIC_HELO: bad packet\n" unless (@$helo == 1);
@@ -379,11 +391,14 @@ sub main ($) {
 
 				if( ${$this->{'milter_protocol_version_ref'}} != 2 && ${$this->{'milter_protocol_version_ref'}} != 6) { die "SMFIC_OPTNEG: unsupported milter protocol version " . ${$this->{'milter_protocol_version_ref'}} . "\n"; }
 
-				# Next we will actually call the milter's 'negotiate' callback, via the 'call_hooks' sub (the sub is defined about 108 lines below in this file).
-				# The sub which is called by the 'call_hooks' sub returns a packet which contains whatever we got back from the milter callback.  If you follow me.
+				# Next we call the milter's 'negotiate' callback, if there is one, via the 'call_hooks' sub.  The 'call_hooks' sub is defined about 78 lines below in this file.
+				# The 'call_hooks' sub returns to the MTA a packet which contains (subject to translation of some symbolic constants) whatever the milter callback returned.
 				# The 'call_hooks' sub will unpack that packet into the three class variables $this->{'something_ref'} (where 'something' is one of 'milter_protocol_version', 'actions_available' and 'protocol_steps_available').
-				# Then, I guess, we'll have to find out what happened.
 				my @negotiate_refs = ();
+				if( ! defined $this->{callbacks}{'negotiate'} )
+				{   # Default protocol steps if no negotiate callback registered.
+				    ${$this->{'protocol_steps_available_ref'}} &= SMFIP_DEFAULTS;
+				}
 				push( @negotiate_refs, $this->{'milter_protocol_version_ref'}, $this->{'actions_available_ref'}, $this->{'protocol_steps_available_ref'} );
 				$this->call_hooks('negotiate', @negotiate_refs);
 
@@ -397,6 +412,7 @@ sub main ($) {
 				$this->call_hooks('data');
 #				delete $this->{symbols}{&SMFIC_DATA};
 			} elsif ($cmd eq SMFIC_QUIT) {
+				$this->call_hooks('quit');		# A long-felt want, but I'm not sure it will really do what I want.  Is it called if the client does *not* send the 'QUIT' command?
 				last;
 				# that's all, folks!
 			} elsif ($cmd eq SMFIC_UNKNOWN) {
@@ -408,19 +424,31 @@ sub main ($) {
 				die "unknown milter packet type $cmd\n";
 			}
 		}
+
+#$time_now = localtime;
+#printf( "%s PID=%d Context.pm(%3d): main:       exited main loop.\n", $time_now, $$, __LINE__ );
+
 	};
 
 	my $err = $@;
+
+#$time_now = localtime;
+#printf( "%s PID=%d Context.pm(%3d): main:       exited eval, err=[%s], about to call 'close' callback.\n", $time_now, $$, __LINE__, $err );
+
 	$this->call_hooks('close');
 
 	# XXX better error handling?  die here to let an eval further up get it?
 	if ($err) {
 		$this->write_packet(SMFIR_TEMPFAIL) if defined($socket);
+#$time_now = localtime;
+#printf( "%s PID=%d Context.pm(%3d): main:       error found at loop exit: [%s]\n", $time_now, $$, __LINE__, $err );
 		warn $err;
 	} else {
 		$this->write_packet(SMFIR_CONTINUE) if defined($socket);
 	}
 
+#$time_now = localtime;
+#printf( "%s PID=%d Context.pm(%3d): main:       exit.\n", $time_now, $$, __LINE__ );
 	undef;
 }
 
@@ -452,16 +480,30 @@ sub write_packet {
 	$socket->syswrite($len);
 	$socket->syswrite($code);
 	$socket->syswrite($out);
+return length($code) + length($out);	# XXXX
 }
 
 sub call_hooks ($$;@) {
 	my $this = shift;
 	my $what = $this->{cb} = shift;
 
-	my $sub = $this->{callbacks}{$what};
-	my $rc = SMFIS_CONTINUE;
+#my $time_now = localtime;
+#printf( "%s PID=%d Context.pm(%3d): call_hooks: callback=[%s]\n", $time_now, $$, __LINE__, $what );
 
-	$rc = &$sub($this, @_) if defined($sub);
+	my $rc = SMFIS_CONTINUE;
+	my $sub = $this->{callbacks}{$what};
+#$time_now = localtime;
+	if( defined($sub) )
+	{
+#printf( "%s PID=%d Context.pm(%3d): call_hooks: about to call callback=[%s], rc=[%s]\n", $time_now, $$, __LINE__, $what, $rc );
+	    $rc = &$sub($this, @_);
+#$time_now = localtime;
+#printf( "%s PID=%d Context.pm(%3d): call_hooks: after calling callback=[%s], rc=[%s]\n", $time_now, $$, __LINE__, $what, $rc );
+	}
+	else
+	{
+#printf( "%s PID=%d Context.pm(%3d): call_hooks: (non-existent callback=[%s])\n", $time_now, $$, __LINE__, $what );
+	}
 
 	# translate to response codes
 	if ($rc eq SMFIS_CONTINUE) {
@@ -486,11 +528,15 @@ sub call_hooks ($$;@) {
 		die "invalid callback return $rc";			# XXXX Need to handle SMFIF_ALL_OPTS
 	}
 
+my $len = 0;
+#$time_now = localtime;
+
 	if( $what eq 'negotiate' )
 	{
-	    $rc = SMFIC_OPTNEG;
 	    $this->{protocol} = ${$this->{'protocol_steps_available_ref'}};
-	    $this->write_packet
+#printf( "%s PID=%d Context.pm(%3d): call_hooks: calling write_packet at [%s] callback, rc=[%s]\n", $time_now, $$, __LINE__, $what, $rc );
+#print Dumper($this->{symbols})."\n";
+	    $len = $this->write_packet
 	    (
 		SMFIC_OPTNEG,
 		pack(
@@ -501,18 +547,21 @@ sub call_hooks ($$;@) {
 		)
 	    );
 	}
-	elsif ($what ne 'abort' && $what ne 'close')			# XXXX No write_packet() call for abort?
+	elsif( $rc ne SMFIR_REPLYCODE || $what eq 'close' || $what eq 'abort' )	# According to the Sendmail docs the abort callback reply is ignored.  Do we still need to send it?
 	{
-		if ($rc eq SMFIR_REPLYCODE)
-		{
-			$this->write_packet($rc, $this->{reply}."\0");
-		}
-		else
-		{
-			$this->write_packet($rc);
-		}
+#printf( "%s PID=%d Context.pm(%3d): call_hooks: calling write_packet at [%s] callback, rc=[%s]\n", $time_now, $$, __LINE__, $what, $rc );
+##printf( "%s Context.pm(%3d): call_hooks: calling write_packet at [%s] callback, rc=[%s] (symval{'_'}=[%s])\n", $time_now, __LINE__, $what, $rc, $this->{symbols}{SMFIC_CONNECT}{'_'}//'null' );
+#print Dumper($this->{symbols})."\n";
+	    $len = $this->write_packet($rc);
 	}
-
+	else
+	{
+#printf( "%s PID=%d Context.pm(%3d): call_hooks: calling write_packet at [%s] callback, rc=[%s]\n", $time_now, $$, __LINE__, $what, $rc );
+#print Dumper($this->{symbols})."\n";
+	    $len = $this->write_packet($rc, $this->{reply}."\0");
+	}
+#$time_now = localtime;
+#printf( "%s PID=%d Context.pm(%3d): call_hooks: packet length written=[%2d]\n", $time_now, $$, __LINE__, $len );
 	undef $this->{reply};
 }
 

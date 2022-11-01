@@ -18,6 +18,27 @@ use warnings;
 use Math::NV qw(:all);
 use Config;
 
+# We skip all if we're running a 32-bit windows perl that is pre-5.20.0
+# - because of the bugginess of pack/unpack (and bugginess of subnormals).
+
+my $skip = 0;
+$skip = 1 if( $] < 5.02 && $Config{archname} =~ /^MSWin32\-x86/ );
+
+if($skip) {
+  print "1..1\n";
+  warn "\n Skipping exhaustive tests - hard to test this buggy old perl wrt to subnormals\n";
+
+  my $s1 = nv_mpfr('2.007e-308', 53);
+  my $s2 = Math::MPFR::bytes('2.007e-308', 53);
+
+  if($s1 eq $s2) {   print "ok 1\n" }
+  else {
+    warn "$s1 ne $s2\n";
+    print "not ok 1\n";
+  }
+  exit 0;
+}
+
 my ($have_atonv);
 
 $have_atonv = Math::MPFR::MPFR_VERSION() <= 196869 ? 0 : 1;
@@ -126,7 +147,7 @@ unless(LD_SUBNORMAL_BUG && $Config{nvtype} eq 'long double') {
       }
     }
 
-    my $out1 = scalar(reverse(unpack("h*", pack("F<", $nv))));
+    my $out1 = unpack("H*", pack("F>", $nv));
 
     my $out2;
     my $out = nv_mpfr($str);
@@ -140,7 +161,7 @@ unless(LD_SUBNORMAL_BUG && $Config{nvtype} eq 'long double') {
       warn "For $str:\n $out1 ne $out2\n";
       if($] >= '5.022') {
         warn "The former is: ", sprintf("%a\n", $nv), sprintf("%.16e\n", $nv);
-        warn "The latter is: ", sprintf "%a\n", unpack("F<", pack "h*", scalar reverse $out2);
+        warn "The latter is: ", sprintf "%a\n", unpack("F>", pack "H*", $out2);
       }
       $ok = 0;
      last;
@@ -189,9 +210,9 @@ unless(LD_SUBNORMAL_BUG && $Config{nvtype} eq 'long double') {
       my $ret = nv_mpfr($str);
       my @t = @$ret;
       my $s = $t[0] . $t[1];
-      $out = unpack("F<", pack "h*", scalar reverse $s);
+      $out = unpack("F>", pack "H*", $s);
     }
-    else { $out = unpack("F<", pack "h*", scalar reverse nv_mpfr($str));}
+    else { $out = unpack("F>", pack "H*", nv_mpfr($str));}
 
     if($out == $perl_nv && !is_eq_mpfr($str)) {
       warn "For $str:\nperl and nv_mpfr() agree, but is_eq_mpfr($str) returns false\n";
@@ -237,6 +258,7 @@ $ok = 1;
 # Otherwise Math::MPFR::_d_bytes() is called
 # upon.
 
+
 for my $count(1 .. 10000, 150000 .. 222507) {
 
   my $exp =  308 + int(rand(16));
@@ -256,7 +278,7 @@ for my $count(1 .. 10000, 150000 .. 222507) {
     last;
   }
 
-  my $lsd = unpack("d<", pack "h*", scalar reverse $out[1]);
+  my $lsd = unpack("d>", pack "H*", $out[1]);
 
   unless($lsd == 0) {
     warn "\n$str: lsd ($out[1]) is not 0\n";

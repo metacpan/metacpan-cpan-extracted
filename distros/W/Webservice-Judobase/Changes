@@ -1,4 +1,9 @@
 Revision history for perl module Webservice::Judobase
+0.08 2022-10-30
+  - Remove cpanfile
+  - Update dependencies in dist.ini
+  - Updates to xt tests to match IJF API
+  - "dzil perltidy"
 
 0.07 2022-03-22
   - Add a contributing guide

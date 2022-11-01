@@ -3,14 +3,13 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: SQLite setup/teardown for tests
 
-our $VERSION = '0.0409';
+our $VERSION = '0.0410';
 
-use DBI;
-use File::Copy;
-use File::Temp ();
-
-use Moo;
 use strictures 2;
+use DBI ();
+use File::Copy qw(copy);
+use File::Temp ();
+use Moo;
 use namespace::clean;
 
 
@@ -130,7 +129,7 @@ Test::SQLite - SQLite setup/teardown for tests
 
 =head1 VERSION
 
-version 0.0409
+version 0.0410
 
 =head1 SYNOPSIS
 
@@ -252,7 +251,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Gene Boggs.
+This software is copyright (c) 2022 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

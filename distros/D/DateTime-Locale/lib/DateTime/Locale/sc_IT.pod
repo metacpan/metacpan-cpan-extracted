@@ -248,9 +248,9 @@ Sardinian Italy locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = 5 de freàrgiu de su 2008, de martis
-   1995-12-22T09:05:02 = 22 de nadale de su 1995, de chenàbura
-  -0010-09-15T04:44:23 = 15 de cabudanni de su -10, de sàbadu
+   2008-02-05T18:30:30 = martis 5 de freàrgiu de su 2008
+   1995-12-22T09:05:02 = chenàbura 22 de nadale de su 1995
+  -0010-09-15T04:44:23 = sàbadu 15 de cabudanni de su -10
 
 =head3 Long
 
@@ -302,15 +302,15 @@ Sardinian Italy locale.
 
 =head3 Full
 
-   2008-02-05T18:30:30 = 5 de freàrgiu de su 2008, de martis a sas 18:30:30 UTC
-   1995-12-22T09:05:02 = 22 de nadale de su 1995, de chenàbura a sas 09:05:02 UTC
-  -0010-09-15T04:44:23 = 15 de cabudanni de su -10, de sàbadu a sas 04:44:23 UTC
+   2008-02-05T18:30:30 = martis 5 de freàrgiu de su 2008, 18:30:30 UTC
+   1995-12-22T09:05:02 = chenàbura 22 de nadale de su 1995, 09:05:02 UTC
+  -0010-09-15T04:44:23 = sàbadu 15 de cabudanni de su -10, 04:44:23 UTC
 
 =head3 Long
 
-   2008-02-05T18:30:30 = 5 de freàrgiu de su 2008 a sas 18:30:30 UTC
-   1995-12-22T09:05:02 = 22 de nadale de su 1995 a sas 09:05:02 UTC
-  -0010-09-15T04:44:23 = 15 de cabudanni de su -10 a sas 04:44:23 UTC
+   2008-02-05T18:30:30 = 5 de freàrgiu de su 2008, 18:30:30 UTC
+   1995-12-22T09:05:02 = 22 de nadale de su 1995, 09:05:02 UTC
+  -0010-09-15T04:44:23 = 15 de cabudanni de su -10, 04:44:23 UTC
 
 =head3 Medium
 
@@ -459,11 +459,11 @@ Sardinian Italy locale.
    1995-12-22T09:05:02 = 12
   -0010-09-15T04:44:23 = 9
 
-=head3 MEd (E d/M)
+=head3 MEd (E dd/MM)
 
-   2008-02-05T18:30:30 = mar 5/2
+   2008-02-05T18:30:30 = mar 05/02
    1995-12-22T09:05:02 = che 22/12
-  -0010-09-15T04:44:23 = sàb 15/9
+  -0010-09-15T04:44:23 = sàb 15/09
 
 =head3 MMM (LLL)
 
@@ -501,11 +501,11 @@ Sardinian Italy locale.
    1995-12-22T09:05:02 = 22 de nad
   -0010-09-15T04:44:23 = 15 de cab
 
-=head3 Md (d/M)
+=head3 Md (dd/MM)
 
-   2008-02-05T18:30:30 = 5/2
+   2008-02-05T18:30:30 = 05/02
    1995-12-22T09:05:02 = 22/12
-  -0010-09-15T04:44:23 = 15/9
+  -0010-09-15T04:44:23 = 15/09
 
 =head3 d (d)
 
@@ -555,17 +555,17 @@ Sardinian Italy locale.
    1995-12-22T09:05:02 = 1995
   -0010-09-15T04:44:23 = -10
 
-=head3 yM (M/y)
+=head3 yM (MM/Y)
 
-   2008-02-05T18:30:30 = 2/2008
+   2008-02-05T18:30:30 = 02/2008
    1995-12-22T09:05:02 = 12/1995
-  -0010-09-15T04:44:23 = 9/-10
+  -0010-09-15T04:44:23 = 09/-10
 
-=head3 yMEd (E d/M/y)
+=head3 yMEd (E dd/MM/y)
 
-   2008-02-05T18:30:30 = mar 5/2/2008
+   2008-02-05T18:30:30 = mar 05/02/2008
    1995-12-22T09:05:02 = che 22/12/1995
-  -0010-09-15T04:44:23 = sàb 15/9/-10
+  -0010-09-15T04:44:23 = sàb 15/09/-10
 
 =head3 yMMM (MMM y)
 
@@ -591,11 +591,11 @@ Sardinian Italy locale.
    1995-12-22T09:05:02 = 22 de nad 1995
   -0010-09-15T04:44:23 = 15 de cab -10
 
-=head3 yMd (d/M/y)
+=head3 yMd (dd/MM/y)
 
-   2008-02-05T18:30:30 = 5/2/2008
+   2008-02-05T18:30:30 = 05/02/2008
    1995-12-22T09:05:02 = 22/12/1995
-  -0010-09-15T04:44:23 = 15/9/-10
+  -0010-09-15T04:44:23 = 15/09/-10
 
 =head3 yQQQ (QQQ y)
 

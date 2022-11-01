@@ -1,0 +1,74 @@
+{
+   "brand" : "Visa",
+   "cancellation_reason" : null,
+   "cardholder" : {
+      "billing" : {
+         "address" : {
+            "city" : "Beverly Hills",
+            "country" : "US",
+            "line1" : "123 Fake St",
+            "line2" : "Apt 3",
+            "postal_code" : "90210",
+            "state" : "CA"
+         }
+      },
+      "company" : null,
+      "created" : "1528992903",
+      "email" : "jenny@example.com",
+      "id" : "ich_1Ccy6F2eZvKYlo2ClnIm9bs4",
+      "individual" : null,
+      "livemode" : 0,
+      "metadata" : {},
+      "name" : "Jenny Rosen",
+      "object" : "issuing.cardholder",
+      "phone_number" : "+18008675309",
+      "redaction" : null,
+      "requirements" : {
+         "disabled_reason" : null,
+         "past_due" : []
+      },
+      "spending_controls" : {
+         "allowed_categories" : [],
+         "blocked_categories" : [],
+         "spending_limits" : [],
+         "spending_limits_currency" : null
+      },
+      "status" : "active",
+      "type" : "individual"
+   },
+   "created" : "1567541772",
+   "currency" : "usd",
+   "exp_month" : "12",
+   "exp_year" : "2020",
+   "id" : "ic_1FEiQC2eZvKYlo2CtahKepKy",
+   "last4" : "4242",
+   "livemode" : 0,
+   "metadata" : {
+      "order_id" : "6735"
+   },
+   "object" : "issuing.card",
+   "redaction" : null,
+   "replaced_by" : null,
+   "replacement_for" : null,
+   "replacement_reason" : null,
+   "shipping" : null,
+   "spending_controls" : {
+      "allowed_categories" : null,
+      "blocked_categories" : null,
+      "spending_limits" : [],
+      "spending_limits_currency" : null
+   },
+   "status" : "canceled",
+   "type" : "physical",
+   "wallets" : {
+      "apple_pay" : {
+         "eligible" : 1,
+         "ineligible_reason" : null
+      },
+      "google_pay" : {
+         "eligible" : 1,
+         "ineligible_reason" : null
+      },
+      "primary_account_identifier" : null
+   }
+}

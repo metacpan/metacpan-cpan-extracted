@@ -1,7 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /Clipboard/Any/add_clipboard_content
-# and generated automatically using Perinci::CmdLine::Gen version 0.501
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
 use strict;
@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-09'; # DATE
+our $DATE = '2022-10-25'; # DATE
 our $DIST = 'App-ClipboardUtils'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.005'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/Clipboard/Any/add_clipboard_content",
@@ -40,11 +40,19 @@ add-clipboard-content - Add a new content to the clipboard
 
 =head1 VERSION
 
-This document describes version 0.003 of add-clipboard-content (from Perl distribution App-ClipboardUtils), released on 2022-10-09.
+This document describes version 0.005 of add-clipboard-content (from Perl distribution App-ClipboardUtils), released on 2022-10-25.
 
 =head1 SYNOPSIS
 
-B<add-clipboard-content> [B<--clipboard-manager>=I<str>] [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] -- E<lt>I<content>E<gt>
+B<add-clipboard-content> L<--help|/"--help, -h, -v"> (or L<-h|/"--help, -h, -v">, L<-?|/"--help, -h, -v">)
+
+B<add-clipboard-content> L<--version|/"--version, -v"> (or L<-v|/"--version, -v">)
+
+B<add-clipboard-content> [L<--clipboard-manager|/"--clipboard-manager=s">=I<str>] [L<--debug|/"--debug">|L<--log-level|/"--log-level=s">=I<level>|L<--quiet|/"--quiet">|L<--trace|/"--trace">|L<--verbose|/"--verbose">] [L<--format|/"--format=s">=I<name>|L<--json|/"--json">] [L<--(no)naked-res|/"--naked-res">] [L<--page-result|/"--page-result">[=I<program>]|L<--view-result|/"--view-result">[=I<program>]] -- [L<content|/"--content=s">]
+
+
+
+See examples in the L</EXAMPLES> section.
 
 =head1 DESCRIPTION
 
@@ -67,7 +75,10 @@ Valid values:
 The default, when left undef, is to detect what clipboard manager is running.
 
 
-=item B<--content>=I<s>*
+=item B<--content>=I<s>
+
+(No description)
+
 
 Can also be specified as the 1st command-line argument.
 
@@ -219,6 +230,12 @@ It is also recommended to install L<shcompgen> (see above).
 =head2 other shells
 
 For fish and zsh, install L<shcompgen> as described above.
+
+=head1 EXAMPLES
+
+=head2 Munge text (remove duplicate spaces) in clipboard
+
+ % clipget | perl -lpe's/ {2,}/ /g' | add-clipboard-content
 
 =head1 HOMEPAGE
 

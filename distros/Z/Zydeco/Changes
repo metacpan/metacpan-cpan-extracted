@@ -7,6 +7,11 @@ Home page:    <https://metacpan.org/release/Zydeco>
 Bug tracker:  <https://github.com/tobyink/p5-zydeco/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.617	2022-10-23
+
+ [ Test Suite ]
+ - Don't require Devel::TypeTiny::Perl56Compat in test suite.
+
 0.616	2022-07-19
 
  [ Packaging ]

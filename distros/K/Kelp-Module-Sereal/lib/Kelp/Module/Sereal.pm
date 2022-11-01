@@ -1,5 +1,5 @@
 package Kelp::Module::Sereal;
-$Kelp::Module::Sereal::VERSION = '1.01';
+$Kelp::Module::Sereal::VERSION = '1.02';
 use Kelp::Base qw(Kelp::Module);
 use Sereal qw(get_sereal_encoder get_sereal_decoder);
 

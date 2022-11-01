@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2022 -- leonerd@leonerd.org.uk
 
-package Object::Pad 0.68;
+package Object::Pad 0.71;
 
 use v5.14;
 use warnings;
@@ -112,6 +112,8 @@ module to only silence the module's warnings selectively:
    use Object::Pad ':experimental(mop)';
 
    use Object::Pad ':experimental(custom_field_attr)';
+
+   use Object::Pad ':experimental(adjust_params)';
 
    use Object::Pad ':experimental';  # all of the above
 
@@ -811,8 +813,80 @@ to consume. Once all the C<ADJUST> blocks have run, any remaining keys in the
 hash will be considered errors, subject to the L</:strict(params)> check.
 
 An adjust block is not a subroutine and thus is not permitted to use
-subroutine attributes. Note that an C<ADJUST> block is a named phaser block
-and not a method; it does not use the C<sub> or C<method> keyword.
+subroutine attributes (except see below). Note that an C<ADJUST> block is a
+named phaser block and not a method; it does not use the C<sub> or C<method>
+keyword.
+
+=head2 ADJUST :params
+
+   ADJUST :params ( :$var1, :$var2, ... ) {
+      ...
+   }
+
+   ADJUST :params ( :$var1, :$var2, ..., %varN ) {
+      ...
+   }
+
+I<Since version 0.70.>
+
+An C<ADJUST> block can marked with a C<:params> attribute, meaning that it
+consumes additional constructor parameters by assigning them into lexical
+variables.
+
+This feature should be considered B<experimental>, and will emit warnings to
+that effect. They can be silenced with
+
+   use Object::Pad qw( :experimental(adjust_params) );
+
+Before the block itself, a list of lexical variables are introduced, inside
+parentheses. The name of each one is preceeded by a colon, and consumes a
+constructor parameter of the same name. These parameters are considered
+"consumed" for the purposes of a C<:strict(params)> check.
+
+A named parameter may be provided with default expression, which is evaluated
+if no matching named argument is provided to the constructor. As with fields,
+if a named parameter has no defaulting expression it becomes a required
+argument to the constructor; an exception is thrown by the constructor if it
+absent.
+
+For example,
+
+   ADJUST :params ( :$x, :$y = "default", :$z ) { ... }
+
+Note here that C<x> and C<z> are required parameters for the constructor of a
+class containing this block, but C<y> is an optional parameter whose value
+will be filled in by the expression if not provided. Because these parameters
+are named and not positional, there is no ordering constraint; required and
+optional parameters can be freely mixed.
+
+Like with subroutine signature parameters, every declared named parameter is
+visible to the defaulting expression of all the later ones. This permits
+values to be calculated based on other ones. For example,
+
+   ADJUST :params ( :$thing = undef, :$things = [ $thing ] ) {
+      # Here, @$things is a list of values
+   }
+
+This permits the caller to pass a list of values via an array reference in
+the C<things> parameter, or a single value in C<thing>.
+
+The final element may be a regular hash variable. This requests that all
+remaining named parameters are made available inside it. The code in the block
+should C<delete> from this hash any parameters it wishes to consume, as with
+the earlier case above.
+
+It is I<unspecified> whether named fields or parameters for subclasses yet to
+be processed are visible to hashes of earlier superclasses. In the current
+implementation they are, but code should not rely on this fact.
+
+Note also that there must be a space between the C<:params> attribute and the
+parentheses holding the named parameters. If this space is not present, perl
+will parse the parentheses as if they are the value to the C<:params()>
+attribute, and this will fail to parse as intended. As with other attributes
+and subroutine signatures, this whitespace B<is> significant.
+
+(This notation is borrowed from a plan to add named parameter support to
+perl's subroutine signature syntax).
 
 =head2 ADJUSTPARAMS
 
@@ -1054,8 +1128,18 @@ sub _import_configuration
       my $sym = $syms->[$i];
 
       if( $sym =~ m/^:config\((.*)\)$/ ) {
-         my $opts = $1 =~ s/^\s+|\s+$//gr; # trim
-         $^H{"Object::Pad/configure($_)"}++ for split m/\s+/, $opts;
+         foreach my $opt ( split m/\s+/, $1 =~ s/^\s+|\s+$//gr ) {
+            if( $opt =~ m/^only_class_attrs=(.*)$/ ) {
+               # Store an entire sub-hash inside the hints hash. This won't
+               # survive squashing into a COP for runtime but we only need it
+               # during compile so that's OK
+               my $attrs = $1;
+               $^H{"Object::Pad/configure(only_class_attrs)"} = { map { $_ => 1 } split m/,/, $attrs };
+            }
+            else {
+               $^H{"Object::Pad/configure($opt)"}++
+            }
+         }
       }
       else {
          $i++;
@@ -1071,7 +1155,7 @@ sub import_into
    my $class = shift;
    my $caller = shift;
 
-   $class->_import_experimental( \@_, qw( init_expr mop custom_field_attr ) );
+   $class->_import_experimental( \@_, qw( init_expr mop custom_field_attr adjust_params ) );
 
    $class->_import_configuration( \@_ );
 

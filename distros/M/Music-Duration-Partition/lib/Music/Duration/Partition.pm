@@ -3,14 +3,15 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Partition a musical duration into rhythmic phrases
 
-our $VERSION = '0.0707';
-
-use Math::Random::Discrete;
-use MIDI::Simple ();
-use List::Util qw(min);
+our $VERSION = '0.0708';
 
 use Moo;
 use strictures 2;
+
+use Math::Random::Discrete ();
+use MIDI::Simple ();
+use List::Util qw(min);
+
 use namespace::clean;
 
 use constant TICKS => 96;
@@ -216,7 +217,7 @@ Music::Duration::Partition - Partition a musical duration into rhythmic phrases
 
 =head1 VERSION
 
-version 0.0707
+version 0.0708
 
 =head1 SYNOPSIS
 

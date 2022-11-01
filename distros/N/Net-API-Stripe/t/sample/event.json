@@ -1,0 +1,55 @@
+{
+   "api_version" : "2018-05-21",
+   "created" : "1530291411",
+   "data" : {
+      "object" : {
+         "amount" : "1000",
+         "client_secret" : "src_client_secret_D8hHhtdrGWQyK8bLM4M3uFQ6",
+         "created" : "1530291339",
+         "currency" : "eur",
+         "flow" : "redirect",
+         "id" : "src_1CiPsl2eZvKYlo2CVVyt3LKy",
+         "livemode" : 0,
+         "metadata" : {},
+         "object" : "source",
+         "owner" : {
+            "address" : null,
+            "email" : null,
+            "name" : null,
+            "phone" : null,
+            "verified_address" : null,
+            "verified_email" : null,
+            "verified_name" : "Jenny Rosen",
+            "verified_phone" : null
+         },
+         "redirect" : {
+            "failure_reason" : null,
+            "return_url" : "https://minkpolice.com",
+            "status" : "succeeded",
+            "url" : "https://hooks.stripe.com/redirect/authenticate/src_1CiPsl2eZvKYlo2CVVyt3LKy?client_secret=src_client_secret_D8hHhtdrGWQyK8bLM4M3uFQ6"
+         },
+         "sofort" : {
+            "bank_code" : "DEUT",
+            "bank_name" : "Deutsche Bank",
+            "bic" : "DEUTDE2H",
+            "country" : "DE",
+            "iban_last4" : "3000",
+            "preferred_language" : null,
+            "statement_descriptor" : null
+         },
+         "statement_descriptor" : null,
+         "status" : "chargeable",
+         "type" : "sofort",
+         "usage" : "single_use"
+      }
+   },
+   "id" : "evt_1CiPtv2eZvKYlo2CcUZsDcO6",
+   "livemode" : 0,
+   "object" : "event",
+   "pending_webhooks" : "0",
+   "request" : {
+      "id" : null,
+      "idempotency_key" : null
+   },
+   "type" : "source.chargeable"
+}

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Terminal/Location.pm
-## Version v0.100.0
+## Version v0.101.0
 ## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
-## Modified 2020/05/15
+## Modified 2022/10/29
 ## 
 ##----------------------------------------------------------------------------
 ## https://stripe.com/docs/api/terminal/locations
@@ -12,20 +12,31 @@ package Net::API::Stripe::Terminal::Location;
 BEGIN
 {
     use strict;
+    use warnings;
     use parent qw( Net::API::Stripe::Generic );
-    our( $VERSION ) = 'v0.100.0';
+    use vars qw( $VERSION );
+    our( $VERSION ) = 'v0.101.0';
 };
 
-sub id { shift->_set_get_scalar( 'id', @_ ); }
+use strict;
+use warnings;
 
-sub object { shift->_set_get_scalar( 'object', @_ ); }
+sub id { return( shift->_set_get_scalar( 'id', @_ ) ); }
 
-sub address { shift->_set_get_object( 'address', 'Net::API::Stripe::Address', @_ ); }
+sub object { return( shift->_set_get_scalar( 'object', @_ ) ); }
 
-sub display_name { shift->_set_get_scalar( 'display_name', @_ ); }
+sub address { return( shift->_set_get_object( 'address', 'Net::API::Stripe::Address', @_ ) ); }
+
+sub configuration_overrides { return( shift->_set_get_scalar( 'configuration_overrides', @_ ) ); }
+
+sub display_name { return( shift->_set_get_scalar( 'display_name', @_ ) ); }
+
+sub livemode { return( shift->_set_get_boolean( 'livemode', @_ ) ); }
+
+sub metadata { return( shift->_set_get_hash( 'metadata', @_ ) ); }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf8
@@ -45,7 +56,7 @@ See documentation in L<Net::API::Stripe> for example to make api calls to Stripe
 
 =head1 VERSION
 
-    v0.100.0
+    v0.101.0
 
 =head1 DESCRIPTION
 
@@ -53,54 +64,58 @@ A Location represents a grouping of readers.
 
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>( %ARG )
+=head2 new( %ARG )
 
 Creates a new L<Net::API::Stripe::Terminal::Location> object.
 It may also take an hash like arguments, that also are method of the same name.
 
-=back
-
 =head1 METHODS
 
-=over 4
-
-=item B<id> string
+=head2 id string
 
 Unique identifier for the object.
 
-=item B<object> string, value is "terminal.location"
+=head2 object string, value is "terminal.location"
 
 String representing the object’s type. Objects of the same type share the same value.
 
-=item B<address> hash
+=head2 address hash
 
 The full address of the location.
 
 This is a L<Net::API::Stripe::Address> object.
 
-=item B<display_name> string
+=head2 configuration_overrides string
+
+The ID of a configuration that will be used to customize all readers in this location.
+
+=head2 display_name string
 
 The display name of the location.
 
-=back
+=head2 livemode boolean
+
+Has the value `true` if the object exists in live mode or the value `false` if the object exists in test mode.
+
+=head2 metadata hash
+
+Set of [key-value pairs](/docs/api/metadata) that you can attach to an object. This can be useful for storing additional information about the object in a structured format.
 
 =head1 API SAMPLE
 
-	{
-	  "id": "tml_fake123456789",
-	  "object": "terminal.location",
-	  "address": {
-		"city": "Anytown",
-		"country": "US",
-		"line1": "1234 Main street",
-		"line2": null,
-		"postal_code": "123456",
-		"state": null
-	  },
-	  "display_name": "My First Store"
-	}
+    {
+      "id": "tml_fake123456789",
+      "object": "terminal.location",
+      "address": {
+        "city": "Anytown",
+        "country": "US",
+        "line1": "1234 Main street",
+        "line2": null,
+        "postal_code": "123456",
+        "state": null
+      },
+      "display_name": "My First Store"
+    }
 
 =head1 HISTORY
 

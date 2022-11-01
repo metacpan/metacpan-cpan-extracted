@@ -1,14 +1,19 @@
-Revision history for App-Config
+Revision history for App-Config-Chronicle
 
-0.05      2017-02-14 00:19:43+00:00 UTC
+0.07      2022-11-01 12:54:04+00:00 UTC
+    Implemented new storage system based on key-values pairs instead of monolithic tree structure
+    Implemented new API
+    Implemented support for setting up Redis subscriptions
+
+0.06      2017-02-14 00:19:43+00:00 UTC
     Manage version with dzil
 0.05      2017-01-21 12:34:26+00:00 UTC
     * No functional changes
     * Drop POD and coverage tests, switch to Dist::Zilla
 
-0.03    Mon 31 Oct 07:19:09 GMT 2016
+0.03    2016-10-31 07:19:09 GMT
     * Return the db revision from check_for_update
 
-0.01    Date/time
+0.01    2016-05-01 00:00:00
         First version, released on an unsuspecting world.
 

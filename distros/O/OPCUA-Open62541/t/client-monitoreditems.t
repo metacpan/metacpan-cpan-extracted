@@ -81,7 +81,7 @@ cmp_deeply($request,
 throws_ok { $client->{client}->MonitoredItems_createDataChange(
     -1, TIMESTAMPSTORETURN_BOTH, $request, undef, undef, undef
 )}
-    (qr/XS_unpack_UA_UInt32: Unsigned value \d+ greater than UA_UINT32_MAX/,
+    (qr/unpack_UA_UInt32: Unsigned value \d+ greater than UA_UINT32_MAX/,
     "monitored items create negative subscription ID");
 
 my ($deleted, %moncontext, @values);

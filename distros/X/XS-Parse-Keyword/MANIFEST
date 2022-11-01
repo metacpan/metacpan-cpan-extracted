@@ -6,6 +6,7 @@ hax/make_argcheck_aux.c.inc
 hax/make_argcheck_ops.c.inc
 hax/newOP_CUSTOM.c.inc
 hax/op_sibling_splice.c.inc
+hax/optree-additions.c.inc
 hax/perl-backcompat.c.inc
 hax/wrap_keyword_plugin.c.inc
 inc/Module/Build/with/XSTests.pm

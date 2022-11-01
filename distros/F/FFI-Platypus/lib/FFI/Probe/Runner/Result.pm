@@ -5,7 +5,7 @@ use warnings;
 use 5.008004;
 
 # ABSTRACT: The results from a probe run.
-our $VERSION = '2.01'; # VERSION
+our $VERSION = '2.03'; # VERSION
 
 
 sub new
@@ -42,7 +42,7 @@ FFI::Probe::Runner::Result - The results from a probe run.
 
 =head1 VERSION
 
-version 2.01
+version 2.03
 
 =head1 SYNOPSIS
 

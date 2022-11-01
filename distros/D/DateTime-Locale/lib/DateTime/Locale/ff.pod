@@ -19,12 +19,12 @@
 
 =head1 NAME
 
-DateTime::Locale::ff - Locale data examples for the Fulah (ff) locale
+DateTime::Locale::ff - Locale data examples for the Fula (ff) locale
 
 =head1 DESCRIPTION
 
 This pod file contains examples of the locale data available for the
-Fulah locale.
+Fula locale.
 
 =head2 Days
 

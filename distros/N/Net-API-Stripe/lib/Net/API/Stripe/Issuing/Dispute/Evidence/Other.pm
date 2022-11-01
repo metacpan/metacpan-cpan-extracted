@@ -1,21 +1,37 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Issuing/Dispute/Evidence/Other.pm
-## Version v0.100.0
-## Copyright(c) 2019 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Version v0.101.0
+## Copyright(c) 2020 DEGUEST Pte. Ltd.
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
-## Modified 2020/05/15
+## Modified 2020/11/30
+## All rights reserved
 ## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 package Net::API::Stripe::Issuing::Dispute::Evidence::Other;
 BEGIN
 {
     use strict;
+    use warnings;
     use parent qw( Net::API::Stripe::Generic );
-    our( $VERSION ) = 'v0.100.0';
+    use vars qw( $VERSION );
+    our( $VERSION ) = 'v0.101.0';
 };
 
+use strict;
+use warnings;
+
+sub additional_documentation { return( shift->_set_get_scalar_or_object( 'additional_documentation', 'Net::API::Stripe::File', @_ ) ); }
+
 sub dispute_explanation { return( shift->_set_get_scalar( 'dispute_explanation', @_ ) ); }
+
+sub explanation { return( shift->_set_get_scalar( 'explanation', @_ ) ); }
+
+sub product_description { return( shift->_set_get_scalar( 'product_description', @_ ) ); }
+
+sub product_type { return( shift->_set_get_scalar( 'product_type', @_ ) ); }
 
 sub uncategorized_file { return( shift->_set_get_scalar_or_object( 'uncategorized_file', 'Net::API::Stripe::File', @_ ) ); }
 
@@ -38,7 +54,7 @@ Net::API::Stripe::Issuing::Dispute::Evidence::Other - A Stripe Issued Card Evide
 
 =head1 VERSION
 
-    v0.100.0
+    v0.101.0
 
 =head1 DESCRIPTION
 
@@ -48,52 +64,62 @@ This is instantiated by method B<other> in module L<Net::API::Stripe::Issuing::D
 
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>( %ARG )
+=head2 new( %ARG )
 
 Creates a new L<Net::API::Stripe::Issuing::Dispute::Evidence::Other> object.
 It may also take an hash like arguments, that also are method of the same name.
 
-=back
-
 =head1 METHODS
 
-=over 4
+=head2 additional_documentation expandable
 
-=item B<dispute_explanation> string
+(ID of a L<file upload|https://stripe.com/docs/guides/file-upload>) Additional documentation supporting the dispute.
+
+When expanded this is an L<Net::API::Stripe::File> object.
+
+=head2 dispute_explanation string
 
 Brief freeform text explaining why you are disputing this transaction.
 
-=item B<uncategorized_file> string (expandable)
+=head2 explanation string
+
+Explanation of why the cardholder is disputing this transaction.
+
+=head2 product_description string
+
+Description of the merchandise or service that was purchased.
+
+=head2 product_type string
+
+Whether the product was a merchandise or service.
+
+=head2 uncategorized_file string (expandable)
 
 (ID of a file upload) Additional file evidence supporting your dispute.
 
 When expanded, this is a L<Net::API::Stripe::File> object.
 
-=back
-
 =head1 API SAMPLE
 
-	{
-	  "id": "idp_fake123456789",
-	  "object": "issuing.dispute",
-	  "amount": 100,
-	  "created": 1571480456,
-	  "currency": "usd",
-	  "disputed_transaction": "ipi_fake123456789",
-	  "evidence": {
-		"fraudulent": {
-		  "dispute_explanation": "Fraud; card reported lost on 10/19/2019",
-		  "uncategorized_file": null
-		},
-		"other": null
-	  },
-	  "livemode": false,
-	  "metadata": {},
-	  "reason": "fraudulent",
-	  "status": "under_review"
-	}
+    {
+      "id": "idp_fake123456789",
+      "object": "issuing.dispute",
+      "amount": 100,
+      "created": 1571480456,
+      "currency": "usd",
+      "disputed_transaction": "ipi_fake123456789",
+      "evidence": {
+        "fraudulent": {
+          "dispute_explanation": "Fraud; card reported lost on 10/19/2019",
+          "uncategorized_file": null
+        },
+        "other": null
+      },
+      "livemode": false,
+      "metadata": {},
+      "reason": "fraudulent",
+      "status": "under_review"
+    }
 
 =head1 HISTORY
 

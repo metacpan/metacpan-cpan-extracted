@@ -1,4 +1,17 @@
 Revision history for Perl module Math::NV
+
+ 2.04
+    - Add cmp_2 (new function).
+    - Remove all occurrences of "scalar reverse" from NV.pm, NV.pod,
+      t/08subnormal_mpfr.t and t/09subnormal_mpfr_alt.t
+    - Having removed all of those instances of "scalar reverse", I subsequently
+      discovered a need to (conditionally) reinstate a couple of them in NV.pm,
+      because of bugginess in pre-5.20.0 32-bit builds of Windows perl. Because
+      of that same bugginess, these perls are now also excluded from running
+      t/08subnormal_mpfr.t and t/09subnormal_mpfr_alt.t. (Some bugs call for
+      more fucking about than even I am prepared to tolerate.)
+    - Enable building on Cygwin -Dusequadmath perls. (Add '-lquadmath' link to LIBS.)
+
  2.03
     - "use constant" to replace $Math::NV::mpfr_strtofr_bug with MPFR_STRTOFR_BUG
        and to replace $Math::NV::_ld_subnormal_bug with LD_SUBNORMAL_BUG

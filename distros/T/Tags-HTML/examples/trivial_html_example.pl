@@ -19,12 +19,36 @@ sub new {
         return $self;
 }
 
+sub _cleanup {
+        my $self = shift;
+
+        delete $self->{'_data'};
+
+        return;
+}
+
+sub _init {
+        my ($self, @variables) = @_;
+
+        $self->{'_data'} = \@variables;
+
+        return;
+}
+
 sub _process {
-        my ($self, $value) = @_;
+        my $self = shift;
 
         $self->{'tags'}->put(
                 ['b', 'div'],
-                ['d', $value],
+        );
+        foreach my $variable (@{$self->{'_data'}}) {
+                $self->{'tags'}->put(
+                        ['b', 'div'],
+                        ['d', $variable],
+                        ['e', 'div'],
+                );
+        }
+        $self->{'tags'}->put(
                 ['e', 'div'],
         );
 
@@ -41,8 +65,11 @@ my $obj = Foo->new(
         'tags' => $tags,
 );
 
-# Process indicator.
-$obj->process('value');
+# Init data.
+$obj->init('foo', 'bar', 'baz');
+
+# Process.
+$obj->process;
 
 # Print out.
 print "HTML\n";
@@ -51,5 +78,13 @@ print $tags->flush."\n";
 # Output:
 # HTML
 # <div>
-#   value
+#   <div>
+#     foo
+#   </div>
+#   <div>
+#     bar
+#   </div>
+#   <div>
+#     baz
+#   </div>
 # </div>

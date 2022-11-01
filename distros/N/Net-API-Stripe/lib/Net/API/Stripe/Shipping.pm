@@ -1,29 +1,39 @@
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe/Shipping.pm
-## Version v0.100.1
+## Version v0.101.0
 ## Copyright(c) 2020 DEGUEST Pte. Ltd.
-## Author: Jacques Deguest <@sitael.tokyo.deguest.jp>
+## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/11/02
-## Modified 2020/05/15
+## Modified 2022/10/29
 ## 
 ##----------------------------------------------------------------------------
 package Net::API::Stripe::Shipping;
 BEGIN
 {
     use strict;
+    use warnings;
     use parent qw( Net::API::Stripe::Generic );
-    our( $VERSION ) = 'v0.100.1';
+    use vars qw( $VERSION );
+    our( $VERSION ) = 'v0.101.0';
 };
+
+use strict;
+use warnings;
 
 sub address { return( shift->_set_get_object( 'address', 'Net::API::Stripe::Address', @_ ) ); }
 
 sub carrier { return( shift->_set_get_scalar( 'carrier', @_ ) ); }
+
+sub customs { return( shift->_set_get_class( 'customs',
+{ eori_number => { type => "scalar" } }, @_ ) ); }
 
 sub eta { return( shift->_set_get_datetime( 'eta', @_ ) ); }
 
 sub name { return( shift->_set_get_scalar( 'name', @_ ) ); }
 
 sub phone { return( shift->_set_get_scalar( 'phone', @_ ) ); }
+
+sub phone_number { return( shift->_set_get_scalar( 'phone_number', @_ ) ); }
 
 sub service { return( shift->_set_get_scalar( 'service', @_ ) ); }
 
@@ -36,7 +46,7 @@ sub tracking_url { return( shift->_set_get_uri( 'tracking_url', @_ ) ); }
 sub type { return( shift->_set_get_scalar( 'type', @_ ) ); }
 
 1;
-
+# NOTE: POD
 __END__
 
 =encoding utf8
@@ -62,7 +72,7 @@ Net::API::Stripe::Shipping - A Stripe Shipping Object
 
 =head1 VERSION
 
-    v0.100.1
+    v0.101.0
 
 =head1 DESCRIPTION
 
@@ -72,46 +82,58 @@ This is inherited by: L<Net::API::Stripe::Charge::Shipping>, L<Net::API::Stripe:
 
 =head1 CONSTRUCTOR
 
-=over 4
-
-=item B<new>( %ARG )
+=head2 new( %ARG )
 
 Creates a new L<Net::API::Stripe::Shipping> object.
 It may also take an hash like arguments, that also are method of the same name.
 
-=back
-
 =head1 METHODS
 
-=over 4
-
-=item B<address> hash
+=head2 address hash
 
 Shipping address.
 
 This is a L<Net::API::Stripe::Address> object, if any.
 
-=item B<carrier> string
+=head2 carrier string
 
 The delivery service that shipped a physical product, such as Fedex, UPS, USPS, etc.
 
-=item B<eta> timestamp
+=head2 customs hash
+
+Additional information that may be required for clearing customs.
+
+It has the following properties:
+
+=over 4
+
+=item C<eori_number> string
+
+A registration number used for customs in Europe. See https://www.gov.uk/eori and https://ec.europa.eu/taxationI<customs/business/customs-procedures-import-and-export/customs-procedures/economic-operators-registration-and-identification-number-eori>en.
+
+=back
+
+=head2 eta timestamp
 
 A unix timestamp representing a best estimate of when the card will be delivered.
 
-=item B<name> string
+=head2 name string
 
 Recipient name.
 
-=item B<phone> string
+=head2 phone string
 
 Recipient phone (including extension).
 
-=item B<service> string
+=head2 phone_number string
+
+The phone number of the receiver of the bulk shipment. This phone number will be provided to the shipping company, who might use it to contact the receiver in case of delivery issues.
+
+=head2 service string
 
 Shipment service, such as standard or express. Possible enum values
 
-=over 8
+=over 4
 
 =item I<standard>
 
@@ -127,92 +149,90 @@ Cards arrive in 1 business day.
 
 =back
 
-=item B<status> string
+=head2 status string
 
 The delivery status of the card. One of pending, shipped, delivered, returned, failure, or canceled.
 
-=item B<tracking_number> string
+=head2 tracking_number string
 
 A tracking number for a card shipment. This is a C<URI> object.
 
-=item B<tracking_url> string
+=head2 tracking_url string
 
 A link to the shipping carrier’s site where you can view detailed information about a card shipment.
 
 This returns a L<URI> object.
 
-=item B<type> string
+=head2 type string
 
 One of bulk or individual. Bulk shipments will be grouped and mailed together, while individual ones will not.
 
-=back
-
 =head1 API SAMPLE
 
-	{
-	  "id": "ic_fake123456789",
-	  "object": "issuing.card",
-	  "authorization_controls": {
-		"allowed_categories": null,
-		"blocked_categories": null,
-		"currency": "usd",
-		"max_amount": 10000,
-		"max_approvals": 1,
-		"spending_limits": [],
-		"spending_limits_currency": null
-	  },
-	  "brand": "Visa",
-	  "cardholder": {
-		"id": "ich_fake123456789",
-		"object": "issuing.cardholder",
-		"authorization_controls": {
-		  "allowed_categories": [],
-		  "blocked_categories": [],
-		  "spending_limits": [],
-		  "spending_limits_currency": null
-		},
-		"billing": {
-		  "address": {
-			"city": "Beverly Hills",
-			"country": "US",
-			"line1": "123 Fake St",
-			"line2": "Apt 3",
-			"postal_code": "90210",
-			"state": "CA"
-		  },
-		  "name": "Jenny Rosen"
-		},
-		"company": null,
-		"created": 1540111055,
-		"email": "jenny@example.com",
-		"individual": null,
-		"is_default": false,
-		"livemode": false,
-		"metadata": {},
-		"name": "Jenny Rosen",
-		"phone_number": "+18008675309",
-		"requirements": {
-		  "disabled_reason": null,
-		  "past_due": []
-		},
-		"status": "active",
-		"type": "individual"
-	  },
-	  "created": 1571652525,
-	  "currency": "usd",
-	  "exp_month": 8,
-	  "exp_year": 2020,
-	  "last4": "4242",
-	  "livemode": false,
-	  "metadata": {},
-	  "name": "Jenny Rosen",
-	  "pin": null,
-	  "replacement_for": null,
-	  "replacement_reason": null,
-	  "shipping": null,
-	  "status": "active",
-	  "type": "physical"
-	}
+    {
+      "id": "ic_fake123456789",
+      "object": "issuing.card",
+      "authorization_controls": {
+        "allowed_categories": null,
+        "blocked_categories": null,
+        "currency": "usd",
+        "max_amount": 10000,
+        "max_approvals": 1,
+        "spending_limits": [],
+        "spending_limits_currency": null
+      },
+      "brand": "Visa",
+      "cardholder": {
+        "id": "ich_fake123456789",
+        "object": "issuing.cardholder",
+        "authorization_controls": {
+          "allowed_categories": [],
+          "blocked_categories": [],
+          "spending_limits": [],
+          "spending_limits_currency": null
+        },
+        "billing": {
+          "address": {
+            "city": "Beverly Hills",
+            "country": "US",
+            "line1": "123 Fake St",
+            "line2": "Apt 3",
+            "postal_code": "90210",
+            "state": "CA"
+          },
+          "name": "Jenny Rosen"
+        },
+        "company": null,
+        "created": 1540111055,
+        "email": "jenny@example.com",
+        "individual": null,
+        "is_default": false,
+        "livemode": false,
+        "metadata": {},
+        "name": "Jenny Rosen",
+        "phone_number": "+18008675309",
+        "requirements": {
+          "disabled_reason": null,
+          "past_due": []
+        },
+        "status": "active",
+        "type": "individual"
+      },
+      "created": 1571652525,
+      "currency": "usd",
+      "exp_month": 8,
+      "exp_year": 2020,
+      "last4": "4242",
+      "livemode": false,
+      "metadata": {},
+      "name": "Jenny Rosen",
+      "pin": null,
+      "replacement_for": null,
+      "replacement_reason": null,
+      "shipping": null,
+      "status": "active",
+      "type": "physical"
+    }
 
 =head1 HISTORY
 

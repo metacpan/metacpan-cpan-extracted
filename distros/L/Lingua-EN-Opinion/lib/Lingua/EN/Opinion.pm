@@ -3,21 +3,22 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Measure the emotional sentiment of text
 
-our $VERSION = '0.1701';
+our $VERSION = '0.1702';
 
 use Moo;
-use strictures 2;
-use namespace::clean;
 
 use Lingua::EN::Opinion::Positive;
 use Lingua::EN::Opinion::Negative;
 use Lingua::EN::Opinion::Emotion;
 
-use Carp;
+use Carp qw( croak );
 use File::Slurper qw( read_text );
 use Lingua::EN::Sentence qw( get_sentences );
 use Statistics::Lite qw( mean );
-use Try::Tiny;
+use Try::Tiny qw( try catch );
+
+use strictures 2;
+use namespace::clean;
 
 
 has file => (
@@ -343,7 +344,7 @@ Lingua::EN::Opinion - Measure the emotional sentiment of text
 
 =head1 VERSION
 
-version 0.1701
+version 0.1702
 
 =head1 SYNOPSIS
 
@@ -629,7 +630,7 @@ L<https://www.cs.uic.edu/~liub/FBS/sentiment-analysis.html#lexicon>
 
 L<http://saifmohammad.com/WebPages/NRC-Emotion-Lexicon.htm>
 
-L<http://techn.ology.net/book-of-revelation-sentiment-analysis/> is a write-up using this technique.
+L<https://ology.github.io/2018/03/04/book-of-revelation-sentiment-analysis/> is a write-up using this technique.
 
 L<https://ai.stanford.edu/~amaas/data/sentiment/> is the "Large Movie Review Dataset"
 
@@ -639,7 +640,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Gene Boggs.
+This software is copyright (c) 2022 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

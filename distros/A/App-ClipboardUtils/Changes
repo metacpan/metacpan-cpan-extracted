@@ -1,3 +1,15 @@
+0.005   2022-10-25  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Add shorter alias clipadd (for add-clipboard-content) and
+          clipget (for get-clipboard-content).
+
+
+0.004   2022-10-25  Released-By: PERLANCAR; Urgency: medium
+
+        - Bump prereq Clipboard::Any=0.004 ([ux] add-clipboard-content gets
+          content from stdin if argument not specified).
+
+
 0.003   2022-10-09  Released-By: PERLANCAR; Urgency: medium
 
         - Add CLIs: add-clipboard-content, clear-clipboard-content.

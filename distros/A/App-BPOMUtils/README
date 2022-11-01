@@ -2,8 +2,8 @@ NAME
     App::BPOMUtils - Utilities related to BPOM
 
 VERSION
-    This document describes version 0.007 of App::BPOMUtils (from Perl
-    distribution App-BPOMUtils), released on 2022-10-12.
+    This document describes version 0.012 of App::BPOMUtils (from Perl
+    distribution App-BPOMUtils), released on 2022-11-01.
 
 SYNOPSIS
      # Use via the included scripts
@@ -13,9 +13,29 @@ DESCRIPTION
     Obat dan Makanan, Indonesian equivalent of Food & Drug Administration
     authority).
 
+    *   bpom-daftar-bahan-baku-pangan
+
+    *   bpom-daftar-bahan-tambahan-pangan
+
+    *   bpom-daftar-cemaran-logam-pangan
+
+    *   bpom-daftar-cemaran-mikroba-pangan
+
     *   bpom-daftar-jenis-pangan
 
+    *   bpom-daftar-kategori-pangan
+
     *   bpom-daftar-kode-prefiks-reg
+
+    *   bpom-list-food-additives
+
+    *   bpom-list-food-categories
+
+    *   bpom-list-food-ingredients
+
+    *   bpom-list-food-inputs
+
+    *   bpom-list-food-microbe-inputs
 
     *   bpom-list-food-types
 
@@ -26,6 +46,1763 @@ DESCRIPTION
     *   bpom-tampilkan-ing
 
 FUNCTIONS
+  bpom_list_food_additives
+    Usage:
+
+     bpom_list_food_additives(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    List additives in BPOM processed food division.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   detail => *bool* (default: 0)
+
+        Return array of full records instead of just ID fields.
+
+        By default, only the key (ID) field is returned per result entry.
+
+    *   exclude_fields => *array[str]*
+
+        Select fields to return.
+
+    *   fields => *array[str]*
+
+        Select fields to return.
+
+    *   id => *str*
+
+        Only return records where the 'id' field equals specified value.
+
+    *   id.contains => *str*
+
+        Only return records where the 'id' field contains specified text.
+
+    *   id.in => *array[str]*
+
+        Only return records where the 'id' field is in the specified values.
+
+    *   id.is => *str*
+
+        Only return records where the 'id' field equals specified value.
+
+    *   id.isnt => *str*
+
+        Only return records where the 'id' field does not equal specified
+        value.
+
+    *   id.matches => *str*
+
+        Only return records where the 'id' field matches specified regular
+        expression pattern.
+
+    *   id.max => *str*
+
+        Only return records where the 'id' field is less than or equal to
+        specified value.
+
+    *   id.min => *str*
+
+        Only return records where the 'id' field is greater than or equal to
+        specified value.
+
+    *   id.not_contains => *str*
+
+        Only return records where the 'id' field does not contain specified
+        text.
+
+    *   id.not_in => *array[str]*
+
+        Only return records where the 'id' field is not in the specified
+        values.
+
+    *   id.not_matches => *str*
+
+        Only return records where the 'id' field does not match specified
+        regular expression.
+
+    *   id.xmax => *str*
+
+        Only return records where the 'id' field is less than specified
+        value.
+
+    *   id.xmin => *str*
+
+        Only return records where the 'id' field is greater than specified
+        value.
+
+    *   name => *str*
+
+        Only return records where the 'name' field equals specified value.
+
+    *   name.contains => *str*
+
+        Only return records where the 'name' field contains specified text.
+
+    *   name.in => *array[str]*
+
+        Only return records where the 'name' field is in the specified
+        values.
+
+    *   name.is => *str*
+
+        Only return records where the 'name' field equals specified value.
+
+    *   name.isnt => *str*
+
+        Only return records where the 'name' field does not equal specified
+        value.
+
+    *   name.matches => *str*
+
+        Only return records where the 'name' field matches specified regular
+        expression pattern.
+
+    *   name.max => *str*
+
+        Only return records where the 'name' field is less than or equal to
+        specified value.
+
+    *   name.min => *str*
+
+        Only return records where the 'name' field is greater than or equal
+        to specified value.
+
+    *   name.not_contains => *str*
+
+        Only return records where the 'name' field does not contain
+        specified text.
+
+    *   name.not_in => *array[str]*
+
+        Only return records where the 'name' field is not in the specified
+        values.
+
+    *   name.not_matches => *str*
+
+        Only return records where the 'name' field does not match specified
+        regular expression.
+
+    *   name.xmax => *str*
+
+        Only return records where the 'name' field is less than specified
+        value.
+
+    *   name.xmin => *str*
+
+        Only return records where the 'name' field is greater than specified
+        value.
+
+    *   query => *str*
+
+        Search.
+
+    *   random => *bool* (default: 0)
+
+        Return records in random order.
+
+    *   result_limit => *int*
+
+        Only return a certain number of records.
+
+    *   result_start => *int* (default: 1)
+
+        Only return starting from the n'th record.
+
+    *   sort => *array[str]*
+
+        Order records according to certain field(s).
+
+        A list of field names separated by comma. Each field can be prefixed
+        with '-' to specify descending order instead of the default
+        ascending.
+
+    *   with_field_names => *bool*
+
+        Return field names in each record (as hash/associative array).
+
+        When enabled, function will return each record as hash/associative
+        array (field name => value pairs). Otherwise, function will return
+        each record as list/array (field value, field value, ...).
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  bpom_list_food_categories
+    Usage:
+
+     bpom_list_food_categories(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    List food categories in BPOM processed food division.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   code => *str*
+
+        Only return records where the 'code' field equals specified value.
+
+    *   code.contains => *str*
+
+        Only return records where the 'code' field contains specified text.
+
+    *   code.in => *array[str]*
+
+        Only return records where the 'code' field is in the specified
+        values.
+
+    *   code.is => *str*
+
+        Only return records where the 'code' field equals specified value.
+
+    *   code.isnt => *str*
+
+        Only return records where the 'code' field does not equal specified
+        value.
+
+    *   code.matches => *str*
+
+        Only return records where the 'code' field matches specified regular
+        expression pattern.
+
+    *   code.max => *str*
+
+        Only return records where the 'code' field is less than or equal to
+        specified value.
+
+    *   code.min => *str*
+
+        Only return records where the 'code' field is greater than or equal
+        to specified value.
+
+    *   code.not_contains => *str*
+
+        Only return records where the 'code' field does not contain
+        specified text.
+
+    *   code.not_in => *array[str]*
+
+        Only return records where the 'code' field is not in the specified
+        values.
+
+    *   code.not_matches => *str*
+
+        Only return records where the 'code' field does not match specified
+        regular expression.
+
+    *   code.xmax => *str*
+
+        Only return records where the 'code' field is less than specified
+        value.
+
+    *   code.xmin => *str*
+
+        Only return records where the 'code' field is greater than specified
+        value.
+
+    *   detail => *bool* (default: 0)
+
+        Return array of full records instead of just ID fields.
+
+        By default, only the key (ID) field is returned per result entry.
+
+    *   exclude_fields => *array[str]*
+
+        Select fields to return.
+
+    *   fields => *array[str]*
+
+        Select fields to return.
+
+    *   name => *str*
+
+        Only return records where the 'name' field equals specified value.
+
+    *   name.contains => *str*
+
+        Only return records where the 'name' field contains specified text.
+
+    *   name.in => *array[str]*
+
+        Only return records where the 'name' field is in the specified
+        values.
+
+    *   name.is => *str*
+
+        Only return records where the 'name' field equals specified value.
+
+    *   name.isnt => *str*
+
+        Only return records where the 'name' field does not equal specified
+        value.
+
+    *   name.matches => *str*
+
+        Only return records where the 'name' field matches specified regular
+        expression pattern.
+
+    *   name.max => *str*
+
+        Only return records where the 'name' field is less than or equal to
+        specified value.
+
+    *   name.min => *str*
+
+        Only return records where the 'name' field is greater than or equal
+        to specified value.
+
+    *   name.not_contains => *str*
+
+        Only return records where the 'name' field does not contain
+        specified text.
+
+    *   name.not_in => *array[str]*
+
+        Only return records where the 'name' field is not in the specified
+        values.
+
+    *   name.not_matches => *str*
+
+        Only return records where the 'name' field does not match specified
+        regular expression.
+
+    *   name.xmax => *str*
+
+        Only return records where the 'name' field is less than specified
+        value.
+
+    *   name.xmin => *str*
+
+        Only return records where the 'name' field is greater than specified
+        value.
+
+    *   query => *str*
+
+        Search.
+
+    *   random => *bool* (default: 0)
+
+        Return records in random order.
+
+    *   result_limit => *int*
+
+        Only return a certain number of records.
+
+    *   result_start => *int* (default: 1)
+
+        Only return starting from the n'th record.
+
+    *   sort => *array[str]*
+
+        Order records according to certain field(s).
+
+        A list of field names separated by comma. Each field can be prefixed
+        with '-' to specify descending order instead of the default
+        ascending.
+
+    *   status => *str*
+
+        Only return records where the 'status' field equals specified value.
+
+    *   status.contains => *str*
+
+        Only return records where the 'status' field contains specified
+        text.
+
+    *   status.in => *array[str]*
+
+        Only return records where the 'status' field is in the specified
+        values.
+
+    *   status.is => *str*
+
+        Only return records where the 'status' field equals specified value.
+
+    *   status.isnt => *str*
+
+        Only return records where the 'status' field does not equal
+        specified value.
+
+    *   status.matches => *str*
+
+        Only return records where the 'status' field matches specified
+        regular expression pattern.
+
+    *   status.max => *str*
+
+        Only return records where the 'status' field is less than or equal
+        to specified value.
+
+    *   status.min => *str*
+
+        Only return records where the 'status' field is greater than or
+        equal to specified value.
+
+    *   status.not_contains => *str*
+
+        Only return records where the 'status' field does not contain
+        specified text.
+
+    *   status.not_in => *array[str]*
+
+        Only return records where the 'status' field is not in the specified
+        values.
+
+    *   status.not_matches => *str*
+
+        Only return records where the 'status' field does not match
+        specified regular expression.
+
+    *   status.xmax => *str*
+
+        Only return records where the 'status' field is less than specified
+        value.
+
+    *   status.xmin => *str*
+
+        Only return records where the 'status' field is greater than
+        specified value.
+
+    *   summary => *str*
+
+        Only return records where the 'summary' field equals specified
+        value.
+
+    *   summary.contains => *str*
+
+        Only return records where the 'summary' field contains specified
+        text.
+
+    *   summary.in => *array[str]*
+
+        Only return records where the 'summary' field is in the specified
+        values.
+
+    *   summary.is => *str*
+
+        Only return records where the 'summary' field equals specified
+        value.
+
+    *   summary.isnt => *str*
+
+        Only return records where the 'summary' field does not equal
+        specified value.
+
+    *   summary.matches => *str*
+
+        Only return records where the 'summary' field matches specified
+        regular expression pattern.
+
+    *   summary.max => *str*
+
+        Only return records where the 'summary' field is less than or equal
+        to specified value.
+
+    *   summary.min => *str*
+
+        Only return records where the 'summary' field is greater than or
+        equal to specified value.
+
+    *   summary.not_contains => *str*
+
+        Only return records where the 'summary' field does not contain
+        specified text.
+
+    *   summary.not_in => *array[str]*
+
+        Only return records where the 'summary' field is not in the
+        specified values.
+
+    *   summary.not_matches => *str*
+
+        Only return records where the 'summary' field does not match
+        specified regular expression.
+
+    *   summary.xmax => *str*
+
+        Only return records where the 'summary' field is less than specified
+        value.
+
+    *   summary.xmin => *str*
+
+        Only return records where the 'summary' field is greater than
+        specified value.
+
+    *   with_field_names => *bool*
+
+        Return field names in each record (as hash/associative array).
+
+        When enabled, function will return each record as hash/associative
+        array (field name => value pairs). Otherwise, function will return
+        each record as list/array (field value, field value, ...).
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  bpom_list_food_ingredients
+    Usage:
+
+     bpom_list_food_ingredients(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    List ingredients in BPOM processed food division.
+
+    This function is not exported by default, but exportable.
+
+    Arguments ('*' denotes required arguments):
+
+    *   country_of_origin => *str*
+
+        Only return records where the 'country_of_origin' field equals
+        specified value.
+
+    *   country_of_origin.contains => *str*
+
+        Only return records where the 'country_of_origin' field contains
+        specified text.
+
+    *   country_of_origin.in => *array[str]*
+
+        Only return records where the 'country_of_origin' field is in the
+        specified values.
+
+    *   country_of_origin.is => *str*
+
+        Only return records where the 'country_of_origin' field equals
+        specified value.
+
+    *   country_of_origin.isnt => *str*
+
+        Only return records where the 'country_of_origin' field does not
+        equal specified value.
+
+    *   country_of_origin.matches => *str*
+
+        Only return records where the 'country_of_origin' field matches
+        specified regular expression pattern.
+
+    *   country_of_origin.max => *str*
+
+        Only return records where the 'country_of_origin' field is less than
+        or equal to specified value.
+
+    *   country_of_origin.min => *str*
+
+        Only return records where the 'country_of_origin' field is greater
+        than or equal to specified value.
+
+    *   country_of_origin.not_contains => *str*
+
+        Only return records where the 'country_of_origin' field does not
+        contain specified text.
+
+    *   country_of_origin.not_in => *array[str]*
+
+        Only return records where the 'country_of_origin' field is not in
+        the specified values.
+
+    *   country_of_origin.not_matches => *str*
+
+        Only return records where the 'country_of_origin' field does not
+        match specified regular expression.
+
+    *   country_of_origin.xmax => *str*
+
+        Only return records where the 'country_of_origin' field is less than
+        specified value.
+
+    *   country_of_origin.xmin => *str*
+
+        Only return records where the 'country_of_origin' field is greater
+        than specified value.
+
+    *   detail => *bool* (default: 0)
+
+        Return array of full records instead of just ID fields.
+
+        By default, only the key (ID) field is returned per result entry.
+
+    *   exclude_fields => *array[str]*
+
+        Select fields to return.
+
+    *   fields => *array[str]*
+
+        Select fields to return.
+
+    *   id => *int*
+
+        Only return records where the 'id' field equals specified value.
+
+    *   id.in => *array[int]*
+
+        Only return records where the 'id' field is in the specified values.
+
+    *   id.is => *int*
+
+        Only return records where the 'id' field equals specified value.
+
+    *   id.isnt => *int*
+
+        Only return records where the 'id' field does not equal specified
+        value.
+
+    *   id.max => *int*
+
+        Only return records where the 'id' field is less than or equal to
+        specified value.
+
+    *   id.min => *int*
+
+        Only return records where the 'id' field is greater than or equal to
+        specified value.
+
+    *   id.not_in => *array[int]*
+
+        Only return records where the 'id' field is not in the specified
+        values.
+
+    *   id.xmax => *int*
+
+        Only return records where the 'id' field is less than specified
+        value.
+
+    *   id.xmin => *int*
+
+        Only return records where the 'id' field is greater than specified
+        value.
+
+    *   is_herbal => *str*
+
+        Only return records where the 'is_herbal' field equals specified
+        value.
+
+    *   is_herbal.contains => *str*
+
+        Only return records where the 'is_herbal' field contains specified
+        text.
+
+    *   is_herbal.in => *array[str]*
+
+        Only return records where the 'is_herbal' field is in the specified
+        values.
+
+    *   is_herbal.is => *str*
+
+        Only return records where the 'is_herbal' field equals specified
+        value.
+
+    *   is_herbal.isnt => *str*
+
+        Only return records where the 'is_herbal' field does not equal
+        specified value.
+
+    *   is_herbal.matches => *str*
+
+        Only return records where the 'is_herbal' field matches specified
+        regular expression pattern.
+
+    *   is_herbal.max => *str*
+
+        Only return records where the 'is_herbal' field is less than or
+        equal to specified value.
+
+    *   is_herbal.min => *str*
+
+        Only return records where the 'is_herbal' field is greater than or
+        equal to specified value.
+
+    *   is_herbal.not_contains => *str*
+
+        Only return records where the 'is_herbal' field does not contain
+        specified text.
+
+    *   is_herbal.not_in => *array[str]*
+
+        Only return records where the 'is_herbal' field is not in the
+        specified values.
+
+    *   is_herbal.not_matches => *str*
+
+        Only return records where the 'is_herbal' field does not match
+        specified regular expression.
+
+    *   is_herbal.xmax => *str*
+
+        Only return records where the 'is_herbal' field is less than
+        specified value.
+
+    *   is_herbal.xmin => *str*
+
+        Only return records where the 'is_herbal' field is greater than
+        specified value.
+
+    *   name => *str*
+
+        Only return records where the 'name' field equals specified value.
+
+    *   name.contains => *str*
+
+        Only return records where the 'name' field contains specified text.
+
+    *   name.in => *array[str]*
+
+        Only return records where the 'name' field is in the specified
+        values.
+
+    *   name.is => *str*
+
+        Only return records where the 'name' field equals specified value.
+
+    *   name.isnt => *str*
+
+        Only return records where the 'name' field does not equal specified
+        value.
+
+    *   name.matches => *str*
+
+        Only return records where the 'name' field matches specified regular
+        expression pattern.
+
+    *   name.max => *str*
+
+        Only return records where the 'name' field is less than or equal to
+        specified value.
+
+    *   name.min => *str*
+
+        Only return records where the 'name' field is greater than or equal
+        to specified value.
+
+    *   name.not_contains => *str*
+
+        Only return records where the 'name' field does not contain
+        specified text.
+
+    *   name.not_in => *array[str]*
+
+        Only return records where the 'name' field is not in the specified
+        values.
+
+    *   name.not_matches => *str*
+
+        Only return records where the 'name' field does not match specified
+        regular expression.
+
+    *   name.xmax => *str*
+
+        Only return records where the 'name' field is less than specified
+        value.
+
+    *   name.xmin => *str*
+
+        Only return records where the 'name' field is greater than specified
+        value.
+
+    *   origin => *str*
+
+        Only return records where the 'origin' field equals specified value.
+
+    *   origin.contains => *str*
+
+        Only return records where the 'origin' field contains specified
+        text.
+
+    *   origin.in => *array[str]*
+
+        Only return records where the 'origin' field is in the specified
+        values.
+
+    *   origin.is => *str*
+
+        Only return records where the 'origin' field equals specified value.
+
+    *   origin.isnt => *str*
+
+        Only return records where the 'origin' field does not equal
+        specified value.
+
+    *   origin.matches => *str*
+
+        Only return records where the 'origin' field matches specified
+        regular expression pattern.
+
+    *   origin.max => *str*
+
+        Only return records where the 'origin' field is less than or equal
+        to specified value.
+
+    *   origin.min => *str*
+
+        Only return records where the 'origin' field is greater than or
+        equal to specified value.
+
+    *   origin.not_contains => *str*
+
+        Only return records where the 'origin' field does not contain
+        specified text.
+
+    *   origin.not_in => *array[str]*
+
+        Only return records where the 'origin' field is not in the specified
+        values.
+
+    *   origin.not_matches => *str*
+
+        Only return records where the 'origin' field does not match
+        specified regular expression.
+
+    *   origin.xmax => *str*
+
+        Only return records where the 'origin' field is less than specified
+        value.
+
+    *   origin.xmin => *str*
+
+        Only return records where the 'origin' field is greater than
+        specified value.
+
+    *   query => *str*
+
+        Search.
+
+    *   random => *bool* (default: 0)
+
+        Return records in random order.
+
+    *   result_limit => *int*
+
+        Only return a certain number of records.
+
+    *   result_start => *int* (default: 1)
+
+        Only return starting from the n'th record.
+
+    *   sort => *array[str]*
+
+        Order records according to certain field(s).
+
+        A list of field names separated by comma. Each field can be prefixed
+        with '-' to specify descending order instead of the default
+        ascending.
+
+    *   status => *str*
+
+        Only return records where the 'status' field equals specified value.
+
+    *   status.contains => *str*
+
+        Only return records where the 'status' field contains specified
+        text.
+
+    *   status.in => *array[str]*
+
+        Only return records where the 'status' field is in the specified
+        values.
+
+    *   status.is => *str*
+
+        Only return records where the 'status' field equals specified value.
+
+    *   status.isnt => *str*
+
+        Only return records where the 'status' field does not equal
+        specified value.
+
+    *   status.matches => *str*
+
+        Only return records where the 'status' field matches specified
+        regular expression pattern.
+
+    *   status.max => *str*
+
+        Only return records where the 'status' field is less than or equal
+        to specified value.
+
+    *   status.min => *str*
+
+        Only return records where the 'status' field is greater than or
+        equal to specified value.
+
+    *   status.not_contains => *str*
+
+        Only return records where the 'status' field does not contain
+        specified text.
+
+    *   status.not_in => *array[str]*
+
+        Only return records where the 'status' field is not in the specified
+        values.
+
+    *   status.not_matches => *str*
+
+        Only return records where the 'status' field does not match
+        specified regular expression.
+
+    *   status.xmax => *str*
+
+        Only return records where the 'status' field is less than specified
+        value.
+
+    *   status.xmin => *str*
+
+        Only return records where the 'status' field is greater than
+        specified value.
+
+    *   type => *str*
+
+        Only return records where the 'type' field equals specified value.
+
+    *   type.contains => *str*
+
+        Only return records where the 'type' field contains specified text.
+
+    *   type.in => *array[str]*
+
+        Only return records where the 'type' field is in the specified
+        values.
+
+    *   type.is => *str*
+
+        Only return records where the 'type' field equals specified value.
+
+    *   type.isnt => *str*
+
+        Only return records where the 'type' field does not equal specified
+        value.
+
+    *   type.matches => *str*
+
+        Only return records where the 'type' field matches specified regular
+        expression pattern.
+
+    *   type.max => *str*
+
+        Only return records where the 'type' field is less than or equal to
+        specified value.
+
+    *   type.min => *str*
+
+        Only return records where the 'type' field is greater than or equal
+        to specified value.
+
+    *   type.not_contains => *str*
+
+        Only return records where the 'type' field does not contain
+        specified text.
+
+    *   type.not_in => *array[str]*
+
+        Only return records where the 'type' field is not in the specified
+        values.
+
+    *   type.not_matches => *str*
+
+        Only return records where the 'type' field does not match specified
+        regular expression.
+
+    *   type.xmax => *str*
+
+        Only return records where the 'type' field is less than specified
+        value.
+
+    *   type.xmin => *str*
+
+        Only return records where the 'type' field is greater than specified
+        value.
+
+    *   with_field_names => *bool*
+
+        Return field names in each record (as hash/associative array).
+
+        When enabled, function will return each record as hash/associative
+        array (field name => value pairs). Otherwise, function will return
+        each record as list/array (field value, field value, ...).
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  bpom_list_food_inputs
+    Usage:
+
+     bpom_list_food_inputs(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    List of basic characteristic and heavy metal pollutant references in
+    BPOM processed food division.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   category => *str*
+
+        Only return records where the 'category' field equals specified
+        value.
+
+    *   category.contains => *str*
+
+        Only return records where the 'category' field contains specified
+        text.
+
+    *   category.in => *array[str]*
+
+        Only return records where the 'category' field is in the specified
+        values.
+
+    *   category.is => *str*
+
+        Only return records where the 'category' field equals specified
+        value.
+
+    *   category.isnt => *str*
+
+        Only return records where the 'category' field does not equal
+        specified value.
+
+    *   category.matches => *str*
+
+        Only return records where the 'category' field matches specified
+        regular expression pattern.
+
+    *   category.max => *str*
+
+        Only return records where the 'category' field is less than or equal
+        to specified value.
+
+    *   category.min => *str*
+
+        Only return records where the 'category' field is greater than or
+        equal to specified value.
+
+    *   category.not_contains => *str*
+
+        Only return records where the 'category' field does not contain
+        specified text.
+
+    *   category.not_in => *array[str]*
+
+        Only return records where the 'category' field is not in the
+        specified values.
+
+    *   category.not_matches => *str*
+
+        Only return records where the 'category' field does not match
+        specified regular expression.
+
+    *   category.xmax => *str*
+
+        Only return records where the 'category' field is less than
+        specified value.
+
+    *   category.xmin => *str*
+
+        Only return records where the 'category' field is greater than
+        specified value.
+
+    *   characteristic => *str*
+
+        Only return records where the 'characteristic' field equals
+        specified value.
+
+    *   characteristic.contains => *str*
+
+        Only return records where the 'characteristic' field contains
+        specified text.
+
+    *   characteristic.in => *array[str]*
+
+        Only return records where the 'characteristic' field is in the
+        specified values.
+
+    *   characteristic.is => *str*
+
+        Only return records where the 'characteristic' field equals
+        specified value.
+
+    *   characteristic.isnt => *str*
+
+        Only return records where the 'characteristic' field does not equal
+        specified value.
+
+    *   characteristic.matches => *str*
+
+        Only return records where the 'characteristic' field matches
+        specified regular expression pattern.
+
+    *   characteristic.max => *str*
+
+        Only return records where the 'characteristic' field is less than or
+        equal to specified value.
+
+    *   characteristic.min => *str*
+
+        Only return records where the 'characteristic' field is greater than
+        or equal to specified value.
+
+    *   characteristic.not_contains => *str*
+
+        Only return records where the 'characteristic' field does not
+        contain specified text.
+
+    *   characteristic.not_in => *array[str]*
+
+        Only return records where the 'characteristic' field is not in the
+        specified values.
+
+    *   characteristic.not_matches => *str*
+
+        Only return records where the 'characteristic' field does not match
+        specified regular expression.
+
+    *   characteristic.xmax => *str*
+
+        Only return records where the 'characteristic' field is less than
+        specified value.
+
+    *   characteristic.xmin => *str*
+
+        Only return records where the 'characteristic' field is greater than
+        specified value.
+
+    *   detail => *bool* (default: 0)
+
+        Return array of full records instead of just ID fields.
+
+        By default, only the key (ID) field is returned per result entry.
+
+    *   exclude_fields => *array[str]*
+
+        Select fields to return.
+
+    *   fields => *array[str]*
+
+        Select fields to return.
+
+    *   id => *int*
+
+        Only return records where the 'id' field equals specified value.
+
+    *   id.in => *array[int]*
+
+        Only return records where the 'id' field is in the specified values.
+
+    *   id.is => *int*
+
+        Only return records where the 'id' field equals specified value.
+
+    *   id.isnt => *int*
+
+        Only return records where the 'id' field does not equal specified
+        value.
+
+    *   id.max => *int*
+
+        Only return records where the 'id' field is less than or equal to
+        specified value.
+
+    *   id.min => *int*
+
+        Only return records where the 'id' field is greater than or equal to
+        specified value.
+
+    *   id.not_in => *array[int]*
+
+        Only return records where the 'id' field is not in the specified
+        values.
+
+    *   id.xmax => *int*
+
+        Only return records where the 'id' field is less than specified
+        value.
+
+    *   id.xmin => *int*
+
+        Only return records where the 'id' field is greater than specified
+        value.
+
+    *   lower_limit => *str*
+
+        Only return records where the 'lower_limit' field equals specified
+        value.
+
+    *   lower_limit.contains => *str*
+
+        Only return records where the 'lower_limit' field contains specified
+        text.
+
+    *   lower_limit.in => *array[str]*
+
+        Only return records where the 'lower_limit' field is in the
+        specified values.
+
+    *   lower_limit.is => *str*
+
+        Only return records where the 'lower_limit' field equals specified
+        value.
+
+    *   lower_limit.isnt => *str*
+
+        Only return records where the 'lower_limit' field does not equal
+        specified value.
+
+    *   lower_limit.matches => *str*
+
+        Only return records where the 'lower_limit' field matches specified
+        regular expression pattern.
+
+    *   lower_limit.max => *str*
+
+        Only return records where the 'lower_limit' field is less than or
+        equal to specified value.
+
+    *   lower_limit.min => *str*
+
+        Only return records where the 'lower_limit' field is greater than or
+        equal to specified value.
+
+    *   lower_limit.not_contains => *str*
+
+        Only return records where the 'lower_limit' field does not contain
+        specified text.
+
+    *   lower_limit.not_in => *array[str]*
+
+        Only return records where the 'lower_limit' field is not in the
+        specified values.
+
+    *   lower_limit.not_matches => *str*
+
+        Only return records where the 'lower_limit' field does not match
+        specified regular expression.
+
+    *   lower_limit.xmax => *str*
+
+        Only return records where the 'lower_limit' field is less than
+        specified value.
+
+    *   lower_limit.xmin => *str*
+
+        Only return records where the 'lower_limit' field is greater than
+        specified value.
+
+    *   query => *str*
+
+        Search.
+
+    *   random => *bool* (default: 0)
+
+        Return records in random order.
+
+    *   result_limit => *int*
+
+        Only return a certain number of records.
+
+    *   result_start => *int* (default: 1)
+
+        Only return starting from the n'th record.
+
+    *   sort => *array[str]*
+
+        Order records according to certain field(s).
+
+        A list of field names separated by comma. Each field can be prefixed
+        with '-' to specify descending order instead of the default
+        ascending.
+
+    *   upper_limit => *str*
+
+        Only return records where the 'upper_limit' field equals specified
+        value.
+
+    *   upper_limit.contains => *str*
+
+        Only return records where the 'upper_limit' field contains specified
+        text.
+
+    *   upper_limit.in => *array[str]*
+
+        Only return records where the 'upper_limit' field is in the
+        specified values.
+
+    *   upper_limit.is => *str*
+
+        Only return records where the 'upper_limit' field equals specified
+        value.
+
+    *   upper_limit.isnt => *str*
+
+        Only return records where the 'upper_limit' field does not equal
+        specified value.
+
+    *   upper_limit.matches => *str*
+
+        Only return records where the 'upper_limit' field matches specified
+        regular expression pattern.
+
+    *   upper_limit.max => *str*
+
+        Only return records where the 'upper_limit' field is less than or
+        equal to specified value.
+
+    *   upper_limit.min => *str*
+
+        Only return records where the 'upper_limit' field is greater than or
+        equal to specified value.
+
+    *   upper_limit.not_contains => *str*
+
+        Only return records where the 'upper_limit' field does not contain
+        specified text.
+
+    *   upper_limit.not_in => *array[str]*
+
+        Only return records where the 'upper_limit' field is not in the
+        specified values.
+
+    *   upper_limit.not_matches => *str*
+
+        Only return records where the 'upper_limit' field does not match
+        specified regular expression.
+
+    *   upper_limit.xmax => *str*
+
+        Only return records where the 'upper_limit' field is less than
+        specified value.
+
+    *   upper_limit.xmin => *str*
+
+        Only return records where the 'upper_limit' field is greater than
+        specified value.
+
+    *   with_field_names => *bool*
+
+        Return field names in each record (as hash/associative array).
+
+        When enabled, function will return each record as hash/associative
+        array (field name => value pairs). Otherwise, function will return
+        each record as list/array (field value, field value, ...).
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
+  bpom_list_food_microbe_inputs
+    Usage:
+
+     bpom_list_food_microbe_inputs(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+    List of microbe specification in BPOM processed food division.
+
+    This function is not exported.
+
+    Arguments ('*' denotes required arguments):
+
+    *   category => *str*
+
+        Only return records where the 'category' field equals specified
+        value.
+
+    *   category.contains => *str*
+
+        Only return records where the 'category' field contains specified
+        text.
+
+    *   category.in => *array[str]*
+
+        Only return records where the 'category' field is in the specified
+        values.
+
+    *   category.is => *str*
+
+        Only return records where the 'category' field equals specified
+        value.
+
+    *   category.isnt => *str*
+
+        Only return records where the 'category' field does not equal
+        specified value.
+
+    *   category.matches => *str*
+
+        Only return records where the 'category' field matches specified
+        regular expression pattern.
+
+    *   category.max => *str*
+
+        Only return records where the 'category' field is less than or equal
+        to specified value.
+
+    *   category.min => *str*
+
+        Only return records where the 'category' field is greater than or
+        equal to specified value.
+
+    *   category.not_contains => *str*
+
+        Only return records where the 'category' field does not contain
+        specified text.
+
+    *   category.not_in => *array[str]*
+
+        Only return records where the 'category' field is not in the
+        specified values.
+
+    *   category.not_matches => *str*
+
+        Only return records where the 'category' field does not match
+        specified regular expression.
+
+    *   category.xmax => *str*
+
+        Only return records where the 'category' field is less than
+        specified value.
+
+    *   category.xmin => *str*
+
+        Only return records where the 'category' field is greater than
+        specified value.
+
+    *   characteristic => *str*
+
+        Only return records where the 'characteristic' field equals
+        specified value.
+
+    *   characteristic.contains => *str*
+
+        Only return records where the 'characteristic' field contains
+        specified text.
+
+    *   characteristic.in => *array[str]*
+
+        Only return records where the 'characteristic' field is in the
+        specified values.
+
+    *   characteristic.is => *str*
+
+        Only return records where the 'characteristic' field equals
+        specified value.
+
+    *   characteristic.isnt => *str*
+
+        Only return records where the 'characteristic' field does not equal
+        specified value.
+
+    *   characteristic.matches => *str*
+
+        Only return records where the 'characteristic' field matches
+        specified regular expression pattern.
+
+    *   characteristic.max => *str*
+
+        Only return records where the 'characteristic' field is less than or
+        equal to specified value.
+
+    *   characteristic.min => *str*
+
+        Only return records where the 'characteristic' field is greater than
+        or equal to specified value.
+
+    *   characteristic.not_contains => *str*
+
+        Only return records where the 'characteristic' field does not
+        contain specified text.
+
+    *   characteristic.not_in => *array[str]*
+
+        Only return records where the 'characteristic' field is not in the
+        specified values.
+
+    *   characteristic.not_matches => *str*
+
+        Only return records where the 'characteristic' field does not match
+        specified regular expression.
+
+    *   characteristic.xmax => *str*
+
+        Only return records where the 'characteristic' field is less than
+        specified value.
+
+    *   characteristic.xmin => *str*
+
+        Only return records where the 'characteristic' field is greater than
+        specified value.
+
+    *   detail => *bool* (default: 0)
+
+        Return array of full records instead of just ID fields.
+
+        By default, only the key (ID) field is returned per result entry.
+
+    *   exclude_fields => *array[str]*
+
+        Select fields to return.
+
+    *   fields => *array[str]*
+
+        Select fields to return.
+
+    *   id => *int*
+
+        Only return records where the 'id' field equals specified value.
+
+    *   id.in => *array[int]*
+
+        Only return records where the 'id' field is in the specified values.
+
+    *   id.is => *int*
+
+        Only return records where the 'id' field equals specified value.
+
+    *   id.isnt => *int*
+
+        Only return records where the 'id' field does not equal specified
+        value.
+
+    *   id.max => *int*
+
+        Only return records where the 'id' field is less than or equal to
+        specified value.
+
+    *   id.min => *int*
+
+        Only return records where the 'id' field is greater than or equal to
+        specified value.
+
+    *   id.not_in => *array[int]*
+
+        Only return records where the 'id' field is not in the specified
+        values.
+
+    *   id.xmax => *int*
+
+        Only return records where the 'id' field is less than specified
+        value.
+
+    *   id.xmin => *int*
+
+        Only return records where the 'id' field is greater than specified
+        value.
+
+    *   lower_limit => *str*
+
+        Only return records where the 'lower_limit' field equals specified
+        value.
+
+    *   lower_limit.contains => *str*
+
+        Only return records where the 'lower_limit' field contains specified
+        text.
+
+    *   lower_limit.in => *array[str]*
+
+        Only return records where the 'lower_limit' field is in the
+        specified values.
+
+    *   lower_limit.is => *str*
+
+        Only return records where the 'lower_limit' field equals specified
+        value.
+
+    *   lower_limit.isnt => *str*
+
+        Only return records where the 'lower_limit' field does not equal
+        specified value.
+
+    *   lower_limit.matches => *str*
+
+        Only return records where the 'lower_limit' field matches specified
+        regular expression pattern.
+
+    *   lower_limit.max => *str*
+
+        Only return records where the 'lower_limit' field is less than or
+        equal to specified value.
+
+    *   lower_limit.min => *str*
+
+        Only return records where the 'lower_limit' field is greater than or
+        equal to specified value.
+
+    *   lower_limit.not_contains => *str*
+
+        Only return records where the 'lower_limit' field does not contain
+        specified text.
+
+    *   lower_limit.not_in => *array[str]*
+
+        Only return records where the 'lower_limit' field is not in the
+        specified values.
+
+    *   lower_limit.not_matches => *str*
+
+        Only return records where the 'lower_limit' field does not match
+        specified regular expression.
+
+    *   lower_limit.xmax => *str*
+
+        Only return records where the 'lower_limit' field is less than
+        specified value.
+
+    *   lower_limit.xmin => *str*
+
+        Only return records where the 'lower_limit' field is greater than
+        specified value.
+
+    *   query => *str*
+
+        Search.
+
+    *   random => *bool* (default: 0)
+
+        Return records in random order.
+
+    *   result_limit => *int*
+
+        Only return a certain number of records.
+
+    *   result_start => *int* (default: 1)
+
+        Only return starting from the n'th record.
+
+    *   sort => *array[str]*
+
+        Order records according to certain field(s).
+
+        A list of field names separated by comma. Each field can be prefixed
+        with '-' to specify descending order instead of the default
+        ascending.
+
+    *   upper_limit => *str*
+
+        Only return records where the 'upper_limit' field equals specified
+        value.
+
+    *   upper_limit.contains => *str*
+
+        Only return records where the 'upper_limit' field contains specified
+        text.
+
+    *   upper_limit.in => *array[str]*
+
+        Only return records where the 'upper_limit' field is in the
+        specified values.
+
+    *   upper_limit.is => *str*
+
+        Only return records where the 'upper_limit' field equals specified
+        value.
+
+    *   upper_limit.isnt => *str*
+
+        Only return records where the 'upper_limit' field does not equal
+        specified value.
+
+    *   upper_limit.matches => *str*
+
+        Only return records where the 'upper_limit' field matches specified
+        regular expression pattern.
+
+    *   upper_limit.max => *str*
+
+        Only return records where the 'upper_limit' field is less than or
+        equal to specified value.
+
+    *   upper_limit.min => *str*
+
+        Only return records where the 'upper_limit' field is greater than or
+        equal to specified value.
+
+    *   upper_limit.not_contains => *str*
+
+        Only return records where the 'upper_limit' field does not contain
+        specified text.
+
+    *   upper_limit.not_in => *array[str]*
+
+        Only return records where the 'upper_limit' field is not in the
+        specified values.
+
+    *   upper_limit.not_matches => *str*
+
+        Only return records where the 'upper_limit' field does not match
+        specified regular expression.
+
+    *   upper_limit.xmax => *str*
+
+        Only return records where the 'upper_limit' field is less than
+        specified value.
+
+    *   upper_limit.xmin => *str*
+
+        Only return records where the 'upper_limit' field is greater than
+        specified value.
+
+    *   with_field_names => *bool*
+
+        Return field names in each record (as hash/associative array).
+
+        When enabled, function will return each record as hash/associative
+        array (field name => value pairs). Otherwise, function will return
+        each record as list/array (field value, field value, ...).
+
+    Returns an enveloped result (an array).
+
+    First element ($status_code) is an integer containing HTTP-like status
+    code (200 means OK, 4xx caller error, 5xx function error). Second
+    element ($reason) is a string containing error message, or something
+    like "OK" if status is 200. Third element ($payload) is the actual
+    result, but usually not present when enveloped result is an error
+    response ($status_code is not 2xx). Fourth element (%result_meta) is
+    called result metadata and is optional, a hash that contains extra
+    information, much like how HTTP response headers provide additional
+    metadata.
+
+    Return value: (any)
+
   bpom_list_food_types
     Usage:
 
@@ -59,6 +1836,11 @@ FUNCTIONS
         Only return records where the 'code' field does not equal specified
         value.
 
+    *   code.matches => *str*
+
+        Only return records where the 'code' field matches specified regular
+        expression pattern.
+
     *   code.max => *str*
 
         Only return records where the 'code' field is less than or equal to
@@ -78,6 +1860,11 @@ FUNCTIONS
 
         Only return records where the 'code' field is not in the specified
         values.
+
+    *   code.not_matches => *str*
+
+        Only return records where the 'code' field does not match specified
+        regular expression.
 
     *   code.xmax => *str*
 
@@ -152,6 +1939,11 @@ FUNCTIONS
         Only return records where the 'summary' field does not equal
         specified value.
 
+    *   summary.matches => *str*
+
+        Only return records where the 'summary' field matches specified
+        regular expression pattern.
+
     *   summary.max => *str*
 
         Only return records where the 'summary' field is less than or equal
@@ -171,6 +1963,11 @@ FUNCTIONS
 
         Only return records where the 'summary' field is not in the
         specified values.
+
+    *   summary.not_matches => *str*
+
+        Only return records where the 'summary' field does not match
+        specified regular expression.
 
     *   summary.xmax => *str*
 
@@ -589,13 +2386,19 @@ FUNCTIONS
 
     *   color => *str* (default: "auto")
 
+        (No description)
+
     *   fat* => *ufloat*
 
         Total fat, in g/100g.
 
     *   name => *str*
 
+        (No description)
+
     *   output_format => *str* (default: "vertical_text_table")
+
+        (No description)
 
     *   package_size* => *ufloat*
 

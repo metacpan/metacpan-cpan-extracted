@@ -1,12 +1,16 @@
-# $Id: TokenParse.pm,v 1.20 2004/08/08 01:20:36 gene Exp $
-
 package Lingua::TokenParse;
-$VERSION = '0.1601';
+$Lingua::TokenParse::VERSION = '0.1602';
+our $AUTHORITY = 'cpan:GENE';
+
+# ABSTRACT: DEPRECATED in favor of Lingua::Word::Parser
+
+$VERSION = '0.1602';
+
 use strict;
 use warnings;
-use Carp;
-use Storable;
-use Math::BaseCalc;
+use Carp qw(croak);
+use Storable qw(retrieve store);
+use Math::BaseCalc ();
 
 sub new {
     my $proto = shift;
@@ -290,11 +294,11 @@ sub build_knowns {
 # Reduce the number of known combinations by concatinating adjacent
 # unknowns (and then removing any duplicates produced).
 
-sub learn {
-    my ($self, %args) = @_;
+#sub learn {
+#    my ($self, %args) = @_;
     # Get the list of (partially) unknown stem combinations.
     # Loop through each looking in %args or prompting for a definition.
-}
+#}
 
 # Update the given string with its actual lexicon value and increment
 # the seen flag.
@@ -387,9 +391,17 @@ sub lexicon_cache {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
-Lingua::TokenParse - Parse a word into scored, fragment combinations
+Lingua::TokenParse - DEPRECATED in favor of Lingua::Word::Parser
+
+=head1 VERSION
+
+version 0.1602
 
 =head1 SYNOPSIS
 
@@ -409,12 +421,14 @@ Lingua::TokenParse - Parse a word into scored, fragment combinations
 
 =head1 DESCRIPTION
 
+This module has been DEPRECATED in favor of L<Lingua::Word::Parser>.
+
 This class represents a Lingua::TokenParse object and contains
 methods to parse a given word into familiar combinations based
 on a lexicon of known word parts.  This lexicon is a simple
 I<fragment =E<gt> definition> list.
 
-Words like "automobile" and "deoyribonucleic" are composed of
+Words like "automobile" and "deoxyribonucleic" are composed of
 different roots, prefixes, suffixes, etc.  With a lexicon of known
 fragments, a word can be partitioned into a list of its (possibly
 overlapping) known and unknown fragment combinations.
@@ -591,6 +605,10 @@ apply when constructing the list of parts and combinations.  This
 acts as a negative pruning device, meaning that if a match is
 successful, the entry is excluded from the list.
 
+=head2 verbose
+
+Boolean
+
 =head1 EXAMPLES
 
 Example code can be found in the distribution C<eg/> directory.
@@ -617,25 +635,20 @@ L<Storable>
 
 L<Math::BaseCalc>
 
-=head1 DEDICATION
-
-For my Grandmother and English teacher Frances Jones.
-
 =head1 THANK YOU
 
 Thank you to Luc St-Louis for helping me increase the speed while
-eliminating the exponential memory footprint.  I wish I knew your
-email address so I could tell you.  B<lucs++>
+eliminating the exponential memory footprint. lucs++
 
 =head1 AUTHOR
 
-Gene Boggs E<lt>gene@cpan.orgE<gt>
+Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2003-2004 by Gene Boggs
+This software is copyright (c) 2022 by Gene Boggs.
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

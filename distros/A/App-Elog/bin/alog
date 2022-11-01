@@ -8,150 +8,91 @@ use POSIX ();
 my %opts;
 my @logs;
 my $selected_log;
+my $host = {};
 my %months = (
     Jan => 1, Feb => 2, Mar => 3, Apr => 4, May => 5, Jun => 6,
     Jul => 7, Aug => 8, Sep => 9, Oct => 10, Nov => 11, Dec => 12,
 );
-my $now;
+my $now = time();
 my $columns;
+my $line_count = 0;
 
 get_opts();
 get_logs();
 select_log();
 
 if ($opts{action} eq "list") {
-    list();
+    show_list();
+}
+elsif ($opts{action} eq "detailed_list") {
+    show_detailed_list();
 }
 elsif ($opts{action} eq "info") {
     show_info();
 }
-elsif ($opts{action} eq "print") {
-    print_log_file();
-}
-elsif ($opts{action} eq "tailf") {
-    show_tailf();
-}
-elsif ($opts{action} eq "vim") {
-    vim_log();
+elsif ($opts{action} eq "stats") {
+    show_stats();
 }
 elsif ($opts{action} eq "graph") {
     show_graph();
 }
-elsif (exists $opts{last}) {
-    show_last();
+elsif ($opts{action} eq "print") {
+    print "$selected_log->{pfile}\n";
 }
 else {
-    show_log();
+    if (!-t STDOUT) {
+        system "cat", $selected_log->{pfile};
+    }
+    elsif ($ENV{PAGER}) {
+        system "$ENV{PAGER} $selected_log->{pfile}";
+    }
+    else {
+        system "less", "-RIMS", $selected_log->{pfile};
+    }
 }
 
-sub myglob {
+sub get_rotations {
     my ($file) = @_;
     my $dir = dirname($file);
     opendir my $dh, $dir or return ();
-    my @array;
-    for my $dfile (readdir $dh) {
-        next if $dfile =~ /^\.\.?$/;
-        if ("$dir/$dfile" =~ /^\Q$file\E./) {
-            push @array, "$dir/$dfile";
+    my $array = [];
+    for my $name (readdir $dh) {
+        next if $name =~ /^\.\.?$/;
+        my $dfile = "$dir/$name";
+        if ($dfile =~ /^\Q$file\E.(.*?)(\.gz)?$/) {
+            my $r = {};
+            $r->{file} = $dfile;
+            $r->{name} = $1;
+            push @$array, $r;
         }
     }
     closedir $dh;
-    @array = natural_sort(@array);
-    return @array;
+    $array = natural_sort($array, "file");
+    return $array;
 }
 
+# Sorts files in a way that treats numbers as numbers, so if you have
+# files file1, file2, file10 it wouldn't sort it like file1, file10, file2.
 sub natural_sort {
-    my @array;
-    for my $entry (@_) {
-        my $entry2 = $entry;
-        $entry2 =~ s/(\d+)/sprintf("%05d", $1)/ge;
-        push @array, [$entry, $entry2];
+    my ($array, $key) = @_;
+    my @array2;
+    for my $entry (@$array) {
+        my $value = $entry->{$key};
+        $value =~ s/(\d+)/sprintf("%05d", $1)/ge;
+        push @array2, [$value, $entry];
     }
-    @array = sort {$a->[1] cmp $b->[1]} @array;
-    return map {$_->[0]} @array;
-}
-
-sub vim_log {
-    log_file();
-    system "vim", $selected_log->{file2};
-}
-
-sub print_log_file {
-    log_file();
-    print "$selected_log->{file2}\n";
-}
-
-sub show_tailf {
-    log_file();
-    system "tail", "-f", $selected_log->{file2};
-}
-
-sub show_log {
-    log_file();
-    if (!-t STDOUT) {
-        system "cat", $selected_log->{file2};
+    @array2 = sort {$a->[0] cmp $b->[0]} @array2;
+    my @array3;
+    for my $entry (@array2) {
+        push @array3, $entry->[1];
     }
-    elsif ($ENV{PAGER}) {
-        system "$ENV{PAGER} $selected_log->{file2}";
-    }
-    else {
-        system "less", "-RIMS", $selected_log->{file2};
-    }
+    return \@array3;
 }
 
 sub show_graph {
-    log_file();
-    my @cmd = ("cat", $selected_log->{file2});
-    if ($selected_log->{file2} =~ /\.gz$/) {
-        @cmd = ("gzip -dc $selected_log->{file2}");
-    }
-    if ($opts{last}) {
-        @cmd = ("tail -$opts{last} $selected_log->{file2}");
-        if ($selected_log->{file2} =~ /\.gz$/) {
-            @cmd = ("gzip -dc $selected_log->{file2} | tail -$opts{last}");
-        }
-    }
-    open my $fh, "-|", @cmd
-        or die "Can't open $selected_log->{file2}: $!\n";
-    $columns = `tput cols`;
-    my $count = 0;
-    my $entry;
     my @entries;
-    while (my $line = <$fh>) {
-        chomp $line;
-        my $a = parse_request_line($line, $selected_log);
-        if (!$a) {
-            die "Couldn't parse: $line\n";
-        }
-        $count++;
-        $a->{date} = parse_date($a->{datestr});
-        if (!$entry) {
-            $entry = {};
-            $entry->{count} = 1;
-            $entry->{start} = $a->{date};
-        }
-        if ($a->{date} > $entry->{start} + $opts{interval}) {
-            push @entries, $entry;
-            while (1) {
-                my $entry2 = {};
-                $entry2->{count} = $entry->{count} + 1;
-                $entry2->{start} = $entry->{start} + $opts{interval};
-                $entry = $entry2;
-                if ($a->{date} > $entry->{start} + $opts{interval}) {
-                    push @entries, $entry;
-                    next;
-                }
-                last;
-            }
-        }
-        if ($a->{status} =~ /^(\d)/) {
-            $entry->{$1}++;
-        }
-        $entry->{total}++;
-    }
-    if ($entry) {
-        push @entries, $entry;
-    }
+    loop_accesses(\&add_access_to_graph, \@entries);
+
     my $max = 0;
     for my $entry (@entries) {
         $entry->{total} ||= 0;
@@ -159,16 +100,43 @@ sub show_graph {
             $max = $entry->{total};
         }
     }
-    my $entryp;
+    $columns = `tput cols`;
+    my $prev;
     for my $entry (@entries) {
-        show_graph_entry($entry, $entryp, $max);
-        $entryp = $entry;
+        show_graph_entry($entry, $prev, $max);
+        $prev = $entry;
     }
-    close $fh;
+}
+
+sub add_access_to_graph {
+    my ($a, $entries) = @_;
+    my $entry = $entries->[-1];
+    if (!$entry) {
+        $entry = {};
+        $entry->{start} = $a->{date};
+        $entry->{count} = 1;
+        push @$entries, $entry;
+    }
+    elsif ($a->{date} >= $entry->{start} + $opts{interval}) {
+        while (1) {
+            my $entry2 = {};
+            $entry2->{count} = $entry->{count} + 1;
+            $entry2->{start} = $entry->{start} + $opts{interval};
+            $entry = $entry2;
+            push @$entries, $entry;
+            if ($a->{date} < $entry->{start} + $opts{interval}) {
+                last;
+            }
+        }
+    }
+    if ($a->{status} =~ /^(\d)/) {
+        $entry->{$1}++;
+    }
+    $entry->{total}++;
 }
 
 sub show_graph_entry {
-    my ($entry, $entryp, $max) = @_;
+    my ($entry, $prev, $max) = @_;
     my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) = localtime($entry->{start});
     $mon += 1;
     my $hour2;
@@ -187,7 +155,7 @@ sub show_graph_entry {
         printf "%-5s: ", "$mon/$mday";
     }
     elsif ($opts{interval} >= 60 * 60) {
-        if (!$entryp || $entryp->{monday} ne $entry->{monday}) {
+        if (!$prev || $prev->{monday} ne $entry->{monday}) {
             printf "%-5s %2d: ", "$mon/$mday", $hour2;
         }
         else {
@@ -196,7 +164,7 @@ sub show_graph_entry {
     }
     else {
         $offset += 3;
-        if (!$entryp || $entryp->{monday} ne $entry->{monday}) {
+        if (!$prev || $prev->{monday} ne $entry->{monday}) {
             printf "%-5s %2d:%02d: ", "$mon/$mday", $hour2, $min;
         }
         else {
@@ -235,51 +203,28 @@ sub show_graph_entry {
     print "$bar2\n";
 }
 
-sub show_info {
-    log_file();
-    my $size = -s $selected_log->{file2};
-    $size = human_readable($size);
-    print "$selected_log->{file2} $size\n";
-
-    my @cmd = ("tac", $selected_log->{file2});
-    if ($selected_log->{file2} =~ /\.gz$/) {
-        @cmd = ("gzip -dc $selected_log->{file2} | tac");
-    }
-    open my $fh, "-|", @cmd
-        or die "Can't open $selected_log->{file2}: $!\n";
-    my $stats = {};
-    my $count = 0;
-    while (my $line = <$fh>) {
-        $count++;
-        chomp $line;
-        my $a = parse_request_line($line, $selected_log);
-        if (!$a || !$a->{ip}) {
-            die "Couldn't parse: $line\n";
-        }
-        if ($count == 1) {
-            $stats->{mintime} = $a->{reqtime};
-            $stats->{maxtime} = $a->{reqtime};
-        }
-        update_stats($stats, $a);
-        if ($opts{last} && $count == $opts{last}) {
-            last;
-        }
-    }
-    $stats->{count} = $count;
-    close $fh;
-    show_stats($stats);
-}
-
 sub show_stats {
-    my ($stats) = @_;
-    my $from = parse_date($stats->{fromstr});
-    my $fromstr = datestr($from);
-    my $to = parse_date($stats->{tostr});
-    my $tostr = datestr($to);
-    my $time_diff = time_diff($from, $to);
-    my $count = $stats->{count} || 0;
+    my $stats = {};
+    loop_accesses(\&process_access_for_stats, $stats);
 
-    print "$count requests$time_diff between [$fromstr] and [$tostr]\n";
+    my $file = $selected_log->{pfile};
+    my $size = -s $file;
+    $size = human_readable($size);
+    print "$file\n";
+    print "size $size\n";
+    my $count = $stats->{count} || 0;
+    print "$count requests\n";
+
+    my $from = $stats->{from};
+    my $fromstr = datestr($from);
+    my $to = $stats->{to};
+    my $tostr = datestr($to);
+    my $time_diff = time_diff_str2($from, $to);
+    if ($time_diff) {
+        print "spanning $time_diff\n";
+    }
+
+    print "from [$fromstr] to [$tostr]\n";
     if (defined $stats->{bytes}) {
         my $bytes = human_readable($stats->{bytes});
         print "total response size $bytes\n";
@@ -321,8 +266,24 @@ sub show_stats {
     } keys %{$stats->{locations}};
     @locations = splice @locations, 0, 5;
     print "most requested locations (of $locations):\n";
-    print join " ", map "$stats->{locations}{$_} $_", @locations;
-    print "\n\n";
+    for my $loc (@locations) {
+        my $count = $stats->{locations}{$loc};
+        print "$count $loc\n";
+    }
+    print "\n";
+
+    @locations = sort {
+        $stats->{lreqtimes}{$b} <=> $stats->{lreqtimes}{$a}
+    } keys %{$stats->{lreqtimes}};
+    @locations = splice @locations, 0, 5;
+    print "slowest request locations (in seconds):\n";
+    for my $loc (@locations) {
+        my $time = $stats->{lreqtimes}{$loc};
+        $time = $time / (1000 * 1000);
+        $time = sprintf "%.1f", $time;
+        print "$time $loc\n";
+    }
+    print "\n";
 
     my @types = sort {
         $stats->{types}{$b} <=> $stats->{types}{$a}
@@ -339,6 +300,55 @@ sub show_stats {
     print "most active ips (of $ips):\n";
     print join " ", map "$stats->{ips}{$_} $_", @ips;
     print "\n";
+}
+
+sub process_access_for_stats {
+    my ($a, $stats) = @_;
+    $stats->{count}++;
+    if (!$stats->{from}) {
+        $stats->{from} = $a->{date};
+    }
+    my $loc = process_location($a->{loc});
+    $stats->{to} = $a->{date};
+    $stats->{locations}{$loc}++;
+    $stats->{methods}{$a->{method}}++;
+    $stats->{status}{$a->{status}}++;
+    if (defined $a->{bytes}) {
+        $stats->{bytes} += $a->{bytes};
+    }
+    $stats->{ips}{$a->{ip}}++;
+    $stats->{types}{$a->{type}}++;
+    if ($a->{reqtime}) {
+        if (!$stats->{initmintime}) {
+            $stats->{mintime} = $a->{reqtime};
+            $stats->{maxtime} = $a->{reqtime};
+            $stats->{initmintime} = 1;
+        }
+        if ($a->{reqtime} < $stats->{mintime}) {
+            $stats->{mintime} = $a->{reqtime};
+        }
+        if ($a->{reqtime} > $stats->{maxtime}) {
+            $stats->{maxtime} = $a->{reqtime};
+        }
+        $stats->{sumtime} += $a->{reqtime};
+        $stats->{sumtime2} += $a->{reqtime} ** 2;
+        my $lreqtime = $stats->{lreqtimes}{$loc};
+        if (!$lreqtime || $lreqtime < $a->{reqtime}) {
+            $stats->{lreqtimes}{$loc} = $a->{reqtime};
+        }
+    }
+}
+
+# Make locations that look like /json-api/order/123456789/purchase/card/ become
+# /json-api/order/*/purchase/card/ so they can be combined for stats like
+# "most requested locations" or "slowest request locations"
+sub process_location {
+    my ($loc) = @_;
+    # this is special case for the access logs im looking at
+    $loc =~ s{/(idev_magic_revision)/[^/]+/+}{/$1/*/};
+    # this might be more generally applicable
+    $loc =~ s/\d{4,}/*/g;
+    return $loc;
 }
 
 # for dates that look like 09/Sep/2015:11:01:24 -0500
@@ -361,244 +371,267 @@ sub parse_date {
     return $time;
 }
 
-sub update_stats {
-    my ($stats, $a) = @_;
-    if (!$stats->{tostr}) {
-        $stats->{tostr} = $a->{datestr};
-    }
-    $stats->{fromstr} = $a->{datestr};
-    $stats->{locations}{$a->{loc}}++;
-    $stats->{methods}{$a->{method}}++;
-    $stats->{status}{$a->{status}}++;
-    if (defined $a->{bytes}) {
-        $stats->{bytes} += $a->{bytes};
-    }
-    $stats->{ips}{$a->{ip}}++;
-    $stats->{types}{$a->{type}}++;
-    if ($a->{reqtime}) {
-        if ($a->{reqtime} < $stats->{mintime}) {
-            $stats->{mintime} = $a->{reqtime};
-        }
-        if ($a->{reqtime} > $stats->{maxtime}) {
-            $stats->{maxtime} = $a->{reqtime};
-        }
-        $stats->{sumtime} += $a->{reqtime};
-        $stats->{sumtime2} += $a->{reqtime} ** 2;
-    }
-}
-
-sub parse_request_line {
+sub parse_access_line {
     my ($line, $log) = @_;
-    if ($log->{format}) {
-        return parse_request_line_format($line, $log);
+
+    # If its the first line being parsed, we use the log's format if there is one,
+    # if not, based on the content of the line, we could use a default format string,
+    # or parse the line a different way.
+    if ($line_count == 1) {
+        if ($selected_log->{format} && !$selected_log->{captures}) {
+            $selected_log->{captures} = parse_log_format($selected_log->{format});
+        }
+        elsif ($line =~ m{^(\S+) \s+ (\S+) \s+ (\S+) \s+ \[([^\]]+)\] \s+}x) {
+            # For lines like:
+            # 51.222.253.12 - - [20/Oct/2022:23:37:06 -0400] "GET /post/5345/thumb/blah.jpg HTTP/1.1" 200 108940 "-" "Mozilla/5.0 (compatible; AhrefsBot/7.0; +http://ahrefs.com/robot/)"
+            my $default_format = '%a %l %u %t "%r" %s %B "%{Referer}i" "%{User-Agent}i"';
+            $selected_log->{captures} = parse_log_format($default_format);
+        }
+    }
+    if ($log->{captures}) {
+        return parse_access_line_format($line, $log);
     }
     else {
-        return parse_request_line_default($line);
+        return parse_access_line_different($line);
     }
 }
 
-sub parse_request_line_format {
+sub parse_access_line_format {
     my ($line, $log) = @_;
-    if (!$log->{regexp}) {
-        parse_log_format($log);
+    if ($line =~ /^\s*$/) {
+        return undef;
     }
     my $a = {};
-    my @captures = $line =~ $log->{regexp};
-    if (!@captures) {
-        return $a;
-    }
-    for my $i (0 .. $#captures) {
-        my $c = $captures[$i];
-        my $f = $log->{cformats}[$i];
-        if ($f->{letter} eq "a") {
-            $a->{ip} = $c;
+    my $captures = $log->{captures};
+    for my $c (@$captures) {
+        my $regex = $c->{regex};
+        my $letter = $c->{letter};
+        if ($line !~ /\G$regex/gc) {
+            # The log entry doesnt match the format, however some of it might have
+            # matched, so we can use that. If it didn't get at least a datestr,
+            # then report the error.
+            if (!$a->{datestr}) {
+                warn "Unable to parse: $line\n";
+            }
+            last;
         }
-        elsif ($f->{letter} eq "A") {
-            $a->{local_ip} = $c;
+        my $value = $1;
+        if (!$letter) {
+            # we only matched text, nothing to capture
         }
-        elsif ($f->{letter} eq "B") {
-            $a->{bytes} = $c;
+        elsif ($letter eq "a") {
+            $a->{ip} = $value;
         }
-        elsif ($f->{letter} eq "D") {
-            $a->{reqtime} = $c;
+        elsif ($letter eq "A") {
+            $a->{local_ip} = $value;
         }
-        elsif ($f->{letter} eq "e") {
-            my $name = lc $f->{curly};
+        elsif ($letter eq "B") {
+            $a->{bytes} = $value;
+        }
+        elsif ($letter eq "D") {
+            $a->{reqtime} = $value;
+        }
+        elsif ($letter eq "e") {
+            my $name = lc $c->{curly};
             $name =~ s/-/_/g;
-            $a->{$name} = $c;
+            $a->{$name} = $value;
         }
-        elsif ($f->{letter} eq "f") {
-            $a->{file} = $c;
+        elsif ($letter eq "f") {
+            $a->{file} = $value;
         }
-        elsif ($f->{letter} eq "h") {
-            $a->{host} = $c;
+        elsif ($letter eq "h") {
+            $a->{host} = $value;
             if (!$a->{ip}) {
                 $a->{ip} = $a->{host};
             }
         }
-        elsif ($f->{letter} eq "i") {
-            my $name = lc $f->{curly};
+        elsif ($letter eq "i") {
+            my $name = lc $c->{curly};
             $name =~ s/-/_/g;
-            $a->{$name} = $c;
+            $a->{$name} = $value;
         }
-        elsif ($f->{letter} eq "I") {
-            $a->{req_bytes} = $c;
+        elsif ($letter eq "I") {
+            $a->{req_bytes} = $value;
         }
-        elsif ($f->{letter} eq "k") {
-            $a->{keepalives} = $c;
+        elsif ($letter eq "k") {
+            $a->{keepalives} = $value;
         }
-        elsif ($f->{letter} eq "l") {
-            $a->{ident} = $c;
+        elsif ($letter eq "l") {
+            $a->{ident} = $value;
         }
-        elsif ($f->{letter} eq "L") {
-            $a->{errid} = $c;
+        elsif ($letter eq "L") {
+            $a->{errid} = $value;
         }
-        elsif ($f->{letter} eq "m") {
-            $a->{method} = $c;
+        elsif ($letter eq "m") {
+            $a->{method} = $value;
         }
-        elsif ($f->{letter} eq "O") {
-            $a->{bytes2} = $c;
+        elsif ($letter eq "O") {
+            # bytes with headers
+            $a->{byteswh} = $value;
         }
-        elsif ($f->{letter} eq "p") {
-            if ($f->{curly} && $f->{curly} eq "local") {
-                $a->{local_port} = $c;
+        elsif ($letter eq "p") {
+            if ($c->{curly} && $c->{curly} eq "local") {
+                $a->{local_port} = $value;
             }
-            elsif ($f->{curly} && $f->{curly} eq "remote") {
-                $a->{remote_port} = $c;
+            elsif ($c->{curly} && $c->{curly} eq "remote") {
+                $a->{remote_port} = $value;
             }
         }
-        elsif ($f->{letter} eq "P") {
-            if ($f->{curly} && $f->{curly} eq "tid") {
-                $a->{tid} = $c;
+        elsif ($letter eq "P") {
+            if ($c->{curly} && $c->{curly} eq "tid") {
+                $a->{tid} = $value;
             }
             else {
-                $a->{pid} = $c;
+                $a->{pid} = $value;
             }
         }
-        elsif ($f->{letter} eq "q") {
-            $a->{query} = $c;
+        elsif ($letter eq "q") {
+            $a->{query} = $value;
         }
-        elsif ($f->{letter} eq "r") {
-            $a->{request} = $c;
+        elsif ($letter eq "r") {
+            $a->{request} = $value;
         }
-        elsif ($f->{letter} eq "R") {
-            $a->{handler} = $c;
+        elsif ($letter eq "R") {
+            $a->{handler} = $value;
         }
-        elsif ($f->{letter} eq "s") {
-            if ($f->{angle} && $f->{angle} eq ">") {
-                $a->{final_status} = $c;
+        elsif ($letter eq "s") {
+            if ($c->{angle} && $c->{angle} eq ">") {
+                $a->{final_status} = $value;
                 if (!$a->{status}) {
-                    $a->{status} = $c;
+                    $a->{status} = $value;
                 }
             }
             else {
-                $a->{status} = $c;
+                $a->{status} = $value;
             }
         }
-        elsif ($f->{letter} eq "t") {
-            if ($c =~ /^\[([^]]*)\]/) {
+        elsif ($letter eq "t") {
+            if ($value =~ /^\[([^]]*)\]/) {
                 $a->{datestr} = $1;
             }
             else {
-                $a->{datestr} = $c;
+                $a->{datestr} = $value;
             }
         }
-        elsif ($f->{letter} eq "u") {
-            $a->{user} = $c;
+        elsif ($letter eq "u") {
+            $a->{user} = $value;
         }
-        elsif ($f->{letter} eq "U") {
-            if ($f->{angle} && $f->{angle} eq ">") {
-                $a->{url_final} = $c;
+        elsif ($letter eq "U") {
+            if ($c->{angle} && $c->{angle} eq ">") {
+                $a->{url_final} = $value;
             }
             else {
-                $a->{url} = $c;
+                $a->{url} = $value;
             }
         }
-        elsif ($f->{letter} eq "v") {
-            $a->{vhost} = $c;
+        elsif ($letter eq "v") {
+            $a->{vhost} = $value;
         }
-        elsif ($f->{letter} eq "V") {
-            $a->{server_name} = $c;
+        elsif ($letter eq "V") {
+            $a->{server_name} = $value;
         }
     }
-    process_request($a);
+    process_access($a);
     return $a;
 }
 
 sub parse_log_format {
-    my ($log) = @_;
-    $log->{regexp} = "^";
+    my ($format) = @_;
+    my @captures;
+    my $prev;
     while (1) {
-        if ($log->{format} =~ /\G([^%\\]+)/gc) {
-            $log->{regexp} .= quotemeta($1);
+        my $c = {};
+        if ($format =~ /\G\s+/gc) {
+            $c->{regex} = qr{\s+};
+            $c->{whitespace} = 1;
         }
-        elsif ($log->{format} =~ /\G\\t/gc) {
-            $log->{regexp} .= "\t";
+        elsif ($format =~ /\G([^%\\\s]+)/gc) {
+            $c->{regex} = quotemeta($1);
         }
-        elsif ($log->{format} =~ /\G%t/gc) {
-            my $c = {};
+        elsif ($format =~ /\G\\t/gc) {
+            $c->{regex} = qr{\s+};
+            $c->{whitespace} = 1;
+        }
+        elsif ($format =~ /\G%t/gc) {
             $c->{letter} = "t";
-            $log->{regexp} .= "\\[([^\\]]*)\\]";
-            push @{$log->{cformats}}, $c;
+            $c->{regex} = qr{\[([^\]]*)\]};
         }
-        elsif ($log->{format} =~ /\G%r/gc) {
-            my $c = {};
+        elsif ($format =~ /\G%r/gc) {
             $c->{letter} ="r";
-            if ($log->{regexp} && $log->{regexp} =~ /"$/) {
-                $log->{regexp} .= "((?:\\\\?.)*?)";
+            if ($prev && $prev->{regex} =~ /"$/) {
+                $c->{regex} = qr{((?:[^"]*|\\")*)};
             }
             else {
-                $log->{regexp} .= "(\\S*)";
+                $c->{regex} = qr{(\S*)};
             }
-            push @{$log->{cformats}}, $c;
         }
-        elsif ($log->{format} =~ /\G%(\{([^\}]*)\}|([<>]))?(\w)/gc) {
-            my $c = {};
+        elsif ($format =~ /\G%(\{([^\}]*)\}|([<>]))?(\w)/gc) {
             $c->{curly} = $2;
             $c->{angle} = $3;
             $c->{letter} = $4;
-            if ($log->{regexp} && $log->{regexp} =~ /"$/) {
-                $log->{regexp} .= "([^\"]*)";
+            if ($prev && $prev->{regex} =~ /"$/) {
+                $c->{regex} = qr{((?:[^"]*|\\")*)};
             }
             else {
-                $log->{regexp} .= "(\\S*)";
+                $c->{regex} = qr{(\S*)};
             }
-            push @{$log->{cformats}}, $c;
         }
         else {
             last;
         }
+        if ($prev && $prev->{whitespace} && $c->{whitespace}) {
+            next;
+        }
+        push @captures, $c;
+        $prev = $c;
     }
+    if (!@captures) {
+        die "Unable to parse format: $format\n";
+    }
+    return \@captures;
 }
 
-sub parse_request_line_default {
+sub parse_access_line_different {
     my ($line) = @_;
+    # For lines like:
+    # unique_id:"Y0gPiJCuUIKvl11H6djHxgAAAUM" remote_host:"184.94.203.3"      client_IP:"184.94.203.3"        X-Real-IP:"92.205.104.221"      ident:"-"       user:"-"        time:"[13/Oct/2022:08:15:52 -0500]"     req:"GET /foo.cgi?asdf=436 HTTP/1.1" initial_status:200      final_status:200        resp_size:35    referer:"-"     ua:"Foo-Client/1.0"     reqtime_usec:158951     method:"GET"    url_orig:"/foo.cgi"       url_final:"/foo.cgi"      query_string:"?asdf=436"   local_ip:"10.255.1.3"   local_port:443  handler:"cgi-script"    file:"/var/www/foo/foo.cgi"    errid:- pid:4243        tid:139832986691328     req_size:1250   resp_with_headers:588   keep_alives:0   server_name:foo.bar.baz  vhost:qwe.foo.bar.baz
     my $a = {};
-    if ($line !~ m{
-            ^(\S+) \s+ (\S+) \s+ (\S+) \s+ \[([^\]]+)\] \s+
-            "(.+?)" \s+ (\S+) \s+ (\S+) \s+ "([^"]*)" \s+ "([^"]*)"
-        }x) {
-        return $a;
+    my %key_trans = (
+        "time" => "datestr",
+        "client_ip" => "ip",
+        "ua" => "user_agent",
+        "req" => "request",
+        "initial_status" => "status",
+        "final_status" => "status",
+        "reqtime_usec" => "reqtime",
+    );
+    while ($line =~ m{\G\s*([\w-]+):("([^"]|\\")*"|\S*)}gc) {
+        my $key = $1;
+        my $value = $2;
+        $value =~ s/^"|"$//g;
+        $value =~ s/^\[|\]$//g;
+        $key = lc $key;
+        $key =~ s/-/_/g;
+        if ($key_trans{$key}) {
+            $key = $key_trans{$key};
+        }
+        $a->{$key} = $value;
     }
-    $a->{ip} = $1;
-    $a->{ident} = $2;
-    $a->{user} = $3;
-    $a->{datestr} = $4;
-    $a->{request} = $5;
-    $a->{status} = $6;
-    $a->{bytes} = $7;
-    $a->{referer} = $8;
-    $a->{user_agent} = $9;
-    process_request($a);
+    if (!$a->{datestr}) {
+        warn "Unable to parse: $line\n";
+    }
+    process_access($a);
     return $a;
 }
 
-sub process_request {
+sub process_access {
     my ($a) = @_;
-    delete $a->{ident} if $a->{ident} && $a->{ident} eq "-";
-    delete $a->{user} if $a->{user} && $a->{user} eq "-";
+    delete $a->{ident} if !$a->{ident} || $a->{ident} eq "-";
+    delete $a->{user} if !$a->{user} || $a->{user} eq "-";
+    delete $a->{user_agent} if !$a->{user_agent} || $a->{user_agent} eq "-";
     $a->{bytes} = 0 if $a->{bytes} && $a->{bytes} eq "-";
-    delete $a->{referer} if $a->{referer} eq "-";
+    delete $a->{referer} if $a->{referer} && $a->{referer} eq "-";
+    $a->{request} ||= "";
     if ($a->{request} =~ /^ (\S+) \s+ (\S+) \s+ (\S+) $/x) {
         $a->{method} = $1;
         $a->{uri} = $2;
@@ -628,318 +661,380 @@ sub process_request {
     elsif ($a->{loc} =~ /\.(css)$/i) {
         $a->{type} = "css";
     }
+    elsif ($a->{loc} =~ m{/[^/\.]*$}i) {
+        $a->{type} = "script";
+    }
     else {
         $a->{type} = "other";
     }
+    $a->{date} = parse_date($a->{datestr});
+    $a->{datestr} = datestr($a->{date});
 }
 
 sub datestr {
     my ($date) = @_;
     return "" if !$date;
-    my $datestr = POSIX::strftime("%a %b %d, %Y %I:%M:%S%P", localtime($date));
+    my $datestr = POSIX::strftime("%a %b %d, %Y %I:%M:%S %p", localtime($date));
     return $datestr;
 }
 
-sub time_diff {
-    my ($from, $to) = @_;
-    return "" if !$from || !$to;
-    my $diff = $to - $from;
-    if ($diff < 60) {
-        return " in the $diff seconds";
+# returns a string like "17 hours 5 minutes 2 seconds"
+sub time_diff_str2 {
+    my ($date1, $date2) = @_;
+    return "" if !$date1 || !$date2;
+    my $obj = time_diff_obj($date1, $date2);
+
+    my $str = "";
+    for my $key ("year", "month", "day", "hour", "minute", "second") {
+        if ($obj->{$key}) {
+            if ($str) {
+                $str .= " ";
+            }
+            $str .= "$obj->{$key} $key";
+            if ($obj->{$key} != 1) {
+                $str .= "s";
+            }
+        }
     }
-    elsif ($diff < 60 * 60) {
-        return " in the " . int($diff / 60) . " minutes";
+
+    if ($date1 == $date2) {
+        $str = "0 seconds";
     }
-    elsif ($diff < 24 * 60 * 60) {
-        return " in the " . int($diff / (60 * 60)) . " hours";
-    }
-    else {
-        return " in the " . int($diff / (24 * 60 * 60)) . " days";
-    }
+    return $str;
 }
 
-sub natural_time {
-    my ($date) = @_;
-    $now = time if !$now;
-    my $delta = $now - $date;
-    if ($delta < -32 * 24 * 60 * 60) {
-        return POSIX::strftime("%b %Y", localtime($date));
+# returns a string like "17 hours ago" or "in 5 seconds"
+sub time_diff_str {
+    my ($date1, $date2) = @_;
+    return "" if !$date1 || !$date2;
+    my $obj = time_diff_obj($date1, $date2);
+
+    my $str = "";
+    for my $key ("year", "month", "day", "hour", "minute", "second") {
+        if ($obj->{$key}) {
+            $str .= "$obj->{$key} $key";
+            if ($obj->{$key} != 1) {
+                $str .= "s";
+            }
+            last;
+        }
     }
-    elsif ($delta < -2 * 24 * 60 * 60) {
-        return "in " . int(-$delta / (24 * 60 * 60)) . " days";
+
+    if ($date1 == $date2) {
+        $str = "0 seconds";
     }
-    elsif ($delta < -24 * 60 * 60) {
-        return "in 1 day";
-    }
-    elsif ($delta < -2 * 60 * 60) {
-        return "in " . int(-$delta / (60 * 60)) . " hours";
-    }
-    elsif ($delta < -60 * 60) {
-        return "in 1 hour";
-    }
-    elsif ($delta < -2 * 60) {
-        return "in " . int(-$delta / 60) . " minutes";
-    }
-    elsif ($delta < -60) {
-        return "in 1 minute";
-    }
-    elsif ($delta < -1) {
-        return "in $delta seconds";
-    }
-    elsif ($delta < 0) {
-        return "in 1 second";
-    }
-    elsif ($delta < 1) {
-        return "right now";
-    }
-    elsif ($delta < 2) {
-        return "1 second ago";
-    }
-    if ($delta < 60) {
-        return "$delta seconds ago";
-    }
-    elsif ($delta < 2 * 60) {
-        return "1 minute ago";
-    }
-    elsif ($delta < 60 * 60) {
-        return int($delta / 60) . " minutes ago";
-    }
-    elsif ($delta < 2 * 60 * 60) {
-        return "1 hour ago";
-    }
-    elsif ($delta < 24 * 60 * 60) {
-        return int($delta / (60 * 60)) . " hours ago";
-    }
-    elsif ($delta < 2 * 24 * 60 * 60) {
-        return "1 day ago";
-    }
-    elsif ($delta < 32 * 24 * 60 * 60) {
-        return int($delta / (24 * 60 * 60)) . " days ago";
+    if ($date1 <= $date2) {
+        $str .= " ago";
     }
     else {
-        return POSIX::strftime("%b %Y", localtime($date));
+        $str = "in $str";
     }
+    return $str;
 }
 
-sub show_last {
-    log_file();
-    my @cmd = ("cat", $selected_log->{file2});
-    if ($selected_log->{file2} =~ /\.gz$/) {
-        @cmd = ("gzip -dc $selected_log->{file2}");
+sub time_diff_obj {
+    my ($date1, $date2) = @_;
+    my $from = $date1 < $date2 ? $date1 : $date2;
+    my $to = $date1 < $date2 ? $date2 : $date1;
+    my ($fsec, $fmin, $fhour, $fmday, $fmon, $fyear, $fwday, $fyday, $fisdst) = localtime($from);
+    my ($tsec, $tmin, $thour, $tmday, $tmon, $tyear, $twday, $tyday, $tisdst) = localtime($to);
+
+    my $year_diff = 0;
+    my $mon_diff;
+    if ($tyear > $fyear) {
+        $mon_diff = 12 - $fmon + $tmon + 12 * ($tyear - $fyear - 1);
+        $year_diff = int($mon_diff / 12);
+        $mon_diff = $mon_diff % 12;
     }
-    if ($opts{last}) {
-        @cmd = ("tail -$opts{last} $selected_log->{file2}");
-        if ($selected_log->{file2} =~ /\.gz$/) {
-            @cmd = ("gzip -dc $selected_log->{file2} | tail -$opts{last}");
+    else {
+        $mon_diff = $tmon - $fmon;
+    }
+
+    my %obj;
+    if ($year_diff) {
+        $obj{year} = $year_diff;
+    }
+
+    my $inner = $from;
+    if ($mon_diff) {
+        if ($tmday < $fmday) {
+            if ($mon_diff > 1) {
+                $obj{month} = $mon_diff - 1;
+                $inner = POSIX::mktime($fsec, $fmin, $fhour, $fmday, $fmon + $mon_diff - 1, $fyear + $year_diff, 0, 0, -1);
+            }
+        }
+        else {
+            $obj{month} = $mon_diff;
+            $inner = POSIX::mktime($fsec, $fmin, $fhour, $fmday, $fmon + $mon_diff, $fyear + $year_diff, 0, 0, -1);
         }
     }
-    open my $fh, "-|", @cmd
-        or die "Can't open $selected_log->{file2}: $!\n";
-    while (my $line = <$fh>) {
-        chomp $line;
-        my $a = parse_request_line($line, $selected_log);
-        if (!$a) {
-            die "Couldn't parse: $line\n";
+
+    # $inner is less than a month away from the $to date at this point, so you can focus on only days, hours, etc at this point
+    my $remaining_time = $to - $inner;
+    my $day_diff = int($remaining_time / (24 * 60 * 60));
+    if ($day_diff) {
+        $obj{day} = $day_diff;
+    }
+    $remaining_time -= $day_diff * 24 * 60 * 60;
+
+    my $hour_diff = int($remaining_time / (60 * 60));
+    if ($hour_diff) {
+        $obj{hour} = $hour_diff;
+    }
+    $remaining_time -= $hour_diff * 60 * 60;
+
+    my $minute_diff = int($remaining_time / 60);
+    if ($minute_diff) {
+        $obj{minute} = $minute_diff;
+    }
+    $remaining_time -= $minute_diff * 60;
+
+    if ($remaining_time) {
+        $obj{second} = $remaining_time;
+    }
+
+    return \%obj;
+}
+
+sub show_info {
+    loop_accesses(\&show_access_info);
+}
+
+sub show_access_info {
+    my ($a) = @_;
+    print "[$a->{datestr}] from IP $a->{ip}:\n";
+    if ($opts{verbose}) {
+        delete $a->{datestr};
+        delete $a->{date};
+        delete $a->{ip};
+        for my $key (sort keys %$a) {
+            printf "    %12s %s\n", $key, $a->{$key};
         }
-        $a->{date} = parse_date($a->{datestr});
-        $a->{datestr} = datestr($a->{date});
-        print "[$a->{datestr}] from IP $a->{ip}:\n";
-        print "agent $a->{user_agent}\n";
-        if ($a->{referer}) {
-            print "referer $a->{referer}\n";
-        }
-        print "status $a->{status}\n";
-        if (defined $a->{bytes}) {
-            print "bytes " . human_readable($a->{bytes}) . "\n";
-        }
-        if ($a->{reqtime}) {
-            my $reqtime = int($a->{reqtime} / 1000);
-            print "time ${reqtime}ms\n";
-        }
-        print "$a->{method} $a->{uri}\n";
         print "\n";
+        return;
+    }
+    if ($a->{user_agent}) {
+        print "agent $a->{user_agent}\n";
+    }
+    if ($a->{referer}) {
+        print "referer $a->{referer}\n";
+    }
+    print "status $a->{status}\n";
+    if (defined $a->{bytes}) {
+        print "bytes " . human_readable($a->{bytes}) . "\n";
+    }
+    if ($a->{reqtime}) {
+        my $reqtime = int($a->{reqtime} / 1000);
+        print "time $reqtime ms\n";
+    }
+    print "$a->{method} $a->{uri}\n";
+    print "\n";
+}
+
+sub loop_accesses {
+    my ($func, $arg) = @_;
+    my $cmd = "";
+    my $file = $selected_log->{pfile};
+    if ($file =~ /\.gz$/) {
+        $cmd = "gzip -dc $file";
+    }
+    if ($opts{max}) {
+        if ($opts{offset}) {
+            my $amount = $opts{offset} + $opts{max};
+            if ($cmd) {
+                $cmd .= "| tail -n $amount | head -n $opts{max}";
+            }
+            else {
+                $cmd = "tail -n $amount $file | head -n $opts{max}";
+            }
+        }
+        else {
+            if ($cmd) {
+                $cmd .= "| tail -n $opts{max}";
+            }
+            else {
+                $cmd = "tail -n $opts{max} $file";
+            }
+        }
+    }
+    my $fh;
+    if ($cmd) {
+        open $fh, "-|", $cmd or die "Can't open $file: $!\n";
+    }
+    else {
+        open $fh, "<", $file or die "Can't open $file: $!\n";
+    }
+    my $filter = $opts{filter};
+    if ($filter) {
+        $filter = qr{$filter}i;
+    }
+    $line_count = 0;
+
+    while (my $line = <$fh>) {
+        if ($filter && $line !~ $filter) {
+            next;
+        }
+        $line_count++;
+        chomp $line;
+        my $a = parse_access_line($line, $selected_log);
+        if (!$a || !$a->{date}) {
+            # couldn't parse the line
+            next;
+        }
+        $func->($a, $arg);
     }
     close $fh;
 }
 
-sub log_file {
-    if (!$selected_log) {
-        die "No log selected\n";
-    }
-    if ($selected_log->{file2}) {
-        return;
-    }
-    elsif (!$opts{rotation}) {
-        $selected_log->{file2} = $selected_log->{file};
-    }
-    elsif (-e "$selected_log->{file}.$opts{rotation}.gz") {
-        $selected_log->{file2} = "$selected_log->{file}.$opts{rotation}.gz";
-    }
-    elsif (-e "$selected_log->{file}.$opts{rotation}") {
-        $selected_log->{file2} = "$selected_log->{file}.$opts{rotation}";
-    }
-    elsif (-e "$selected_log->{file}-$opts{rotation}.gz") {
-        $selected_log->{file2} = "$selected_log->{file}-$opts{rotation}.gz";
-    }
-    elsif (-e "$selected_log->{file}-$opts{rotation}") {
-        $selected_log->{file2} = "$selected_log->{file}-$opts{rotation}";
-    }
-    else {
-        die "Unable to find log file.\n";
-    }
-}
-
-sub list {
+sub show_list {
     for my $log (@logs) {
-        if ($opts{verbose}) {
-            show_log_info_verbose($log);
+        my $selected = $log->{selected} ? "*" : " ";
+        my $size = "-";
+        my $updated = "";
+        if (-e $log->{file}) {
+            $size = human_readable(-s $log->{file});
+            my $mtime = (stat($log->{file}))[9];
+            $updated = time_diff_str($mtime, $now);
         }
-        else {
-            show_log_info($log);
-        }
+        my $file = $log->{file};
+        my $line = sprintf "%s %-60s %-10s %s", $selected, $file, $size, $updated;
+        print "$line\n";
     }
 }
 
-sub show_log_info {
-    my ($log) = @_;
-    my $selected = $log->{selected} ? "*" : " ";
-    my $size = "-";
-    my $updated = "";
-    my $rinfo = "";
-    if (-e $log->{file}) {
-        $size = human_readable(-s $log->{file});
-        my $mtime = (stat($log->{file}))[9];
-        $updated = " " . natural_time($mtime);
-        my @rotations = myglob($log->{file});
-        my $rcount = @rotations;
-        if ($rcount) {
-            my $rsize = 0;
-            for my $rotation (@rotations) {
-                $rsize += -s $rotation || 0;
-            }
-            $rsize = human_readable($rsize);
-            $rinfo = " +$rcount $rsize";
+sub show_detailed_list {
+    for my $log (@logs) {
+        my $size = "-";
+        my $updated = "";
+        if (-e $log->{file}) {
+            $size = human_readable(-s $log->{file});
+            my $mtime = (stat($log->{file}))[9];
+            $updated = datestr($mtime) . " (" . time_diff_str($mtime, $now) . ")";
         }
-    }
-    my $name = $log->{name};
-    my $line = sprintf "%s %-33s %-16s %s", $selected, $name, "$size$rinfo", $updated;
-    print "$line\n";
-    return if !$opts{verbose};
-
-}
-
-sub show_log_info_verbose {
-    my ($log) = @_;
-    my $selected = $log->{selected} ? "* " : "";
-    my $size = "-";
-    my $updated = "";
-    my $rinfo = "";
-    my @rotations2;
-    if (-e $log->{file}) {
-        $size = human_readable(-s $log->{file});
-        my $mtime = (stat($log->{file}))[9];
-        $updated = natural_time($mtime);
-        my @rotations = myglob($log->{file});
-        my $rcount = @rotations;
-        if ($rcount) {
-            my $rsize = 0;
-            for my $rotation (@rotations) {
-                $rsize += -s $rotation || 0;
-                if ($rotation =~ /^\Q$log->{file}\E.(.*?)(\.gz)?$/) {
-                    my $r = {};
-                    $r->{name} = $1;
-                    $r->{size} = human_readable(-s $rotation);
-                    my $mtime = (stat($rotation))[9];
-                    $r->{updated} = natural_time($mtime);
-                    push @rotations2, $r;
-                }
-            }
-            $rsize = human_readable($rsize);
-            $rinfo = " +$rcount $rsize";
+        my $vhost = $log->{vhost};
+        print "$log->{file}\n";
+        if ($log->{selected}) {
+            print "    selected\n";
         }
-    }
-    my $docroot = "";
-    my $docroot2 = "";
-    if ($log->{vhost} && $log->{vhost}{docroot}) {
-        $docroot = $log->{vhost}{docroot};
-        $docroot2 = $log->{vhost}{docroot2};
-    }
-    print "$selected$log->{name}\n";
-    print "    file $log->{file}\n";
-    print "    size $size$rinfo\n";
-    if ($updated) {
-        print "    updated $updated\n";
-    }
-    if ($log->{fname}) {
-        print "    fname $log->{fname}\n";
-    }
-    if ($log->{format}) {
-        print "    format $log->{format}\n";
-    }
-    if ($docroot) {
-        print "    docroot $docroot\n";
-    }
-    if ($docroot2 && $docroot2 ne $docroot) {
-        print "    docroot2 $docroot2\n";
-    }
-    for my $r (@rotations2) {
-        print "    rotation $r->{name} ($r->{size} $r->{updated})\n";
+        print "    size $size\n";
+
+        if ($updated) {
+            print "    updated $updated\n";
+        }
+        if ($vhost) {
+            if ($vhost->{file}) {
+                print "    config $vhost->{file}\n";
+            }
+            if ($vhost->{docroot}) {
+                print "    docroot $vhost->{docroot}\n";
+            }
+            if ($vhost->{absdocroot}) {
+                print "    absdocroot $vhost->{absdocroot}\n";
+            }
+        }
+        if ($log->{fname}) {
+            print "    fname $log->{fname}\n";
+        }
+        if ($log->{format}) {
+            print "    format $log->{format}\n";
+        }
+        my $rotations = get_rotations($log->{file});
+        for my $r (@$rotations) {
+            my $size = human_readable(-s $r->{file});
+            my $mtime = (stat($r->{file}))[9];
+            my $updated = datestr($mtime) . " (" . time_diff_str($mtime, $now) . ")";
+            print "    rotation $r->{name} $size $updated\n";
+        }
     }
 }
 
 sub human_readable {
     my ($size) = @_;
     $size ||= 0;
-    my @power = ("B", "K", "M", "G", "T", "P", "E", "Z", "Y");
+    my @power = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB");
     my $i = 0;
     my $abs_size = abs $size;
     for ($i = 0; $i < @power; $i++) {
         last if $abs_size < 1024;
         $abs_size /= 1024;
     }
-    my $str = sprintf("%.1f", $abs_size) . $power[$i];
+    my $str = sprintf("%.1f %s", $abs_size, $power[$i]);
     $str =~ s/\.0//;
     $str = "-$str" if $size < 0;
     return $str;
 }
 
 sub select_log {
-    if ($opts{name}) {
-        select_log_by_name($opts{name});
+    my $name = $opts{name};
+    if ($name) {
+        my $regex = qr/^$name/;
+        for my $log (@logs) {
+            if ($log->{name} eq $name || $log->{file} eq $name || $log->{name} =~ $regex) {
+                select_log_rotation($log);
+                last;
+            }
+        }
+        # If the name doesn't match one of the discovered log files,
+        # treat it as a filename.
+        if (!$selected_log) {
+            my $log = add_log($name);
+            select_log_rotation($log);
+        }
         return;
     }
-    select_log_by_cwd();
-    if (!$selected_log && @logs) {
-        my @logs2 = sort bybegcmp @logs;
-        $selected_log = $logs2[0];
-        $selected_log->{selected} = 1;
-        return;
+
+    if (@logs) {
+        my $cwd = Cwd::cwd();
+        $cwd .= "/" if $cwd !~ m{/$};
+        for my $log (@logs) {
+            my $docroot = "";
+            if ($log->{vhost} && $log->{vhost}{absdocroot}) {
+                $docroot = $log->{vhost}{absdocroot} . "/";
+            }
+            $log->{begcmp} = begcmp($cwd, $docroot);
+        }
+        my @logs_sorted = sort {
+            return $b->{begcmp} <=> $a->{begcmp} || $a->{name} cmp $b->{name};
+        } @logs;
+
+        select_log_rotation($logs_sorted[0]);
     }
 }
 
-sub select_log_by_name {
-    my ($name) = @_;
-    if ($name =~ /\//) {
-        for my $log (@logs) {
-            if ($log->{file} eq $name) {
-                $log->{selected} = 1;
-                $selected_log = $log;
-                return;
-            }
-        }
-        $selected_log = add_log($name);
-        $selected_log->{selected} = 1;
+sub select_log_rotation {
+    my ($log) = @_;
+    $selected_log = $log;
+    $log->{selected} = 1;
+    my $file = $log->{file};
+    my $rot = $opts{rotation};
+
+    my $pfile; # pfile for processed file (includes rotation part)
+    if (!$rot) {
+        $pfile = $file;
     }
-    else {
-        my $regexp = qr/^$name/;
-        for my $log (@logs) {
-            if ($log->{name} =~ $regexp) {
-                $log->{selected} = 1;
-                $selected_log = $log;
-                return;
-            }
+    elsif (-e "$file.$rot.gz") {
+        $pfile = "$file.$rot.gz";
+    }
+    elsif (-e "$file.$rot") {
+        $pfile = "$file.$rot";
+    }
+    elsif (-e "$file-$rot.gz") {
+        $pfile = "$file-$rot.gz";
+    }
+    elsif (-e "$file-$rot") {
+        $pfile = "$file-$rot";
+    }
+    elsif ($rot =~ /^\d+$/) {
+        my $rotations = get_rotations($file);
+        my $r = $rotations->[- $rot];
+        if ($r) {
+            $pfile = $r->{file};
         }
     }
+    if (!$pfile) {
+        die "Unable to find log file.\n";
+    }
+    $log->{pfile} = $pfile;
 }
 
 sub add_log {
@@ -952,11 +1047,11 @@ sub add_log {
 }
 
 sub select_log_by_cwd {
-    my $cwd = $ENV{PWD};
+    my $cwd = Cwd::cwd();
     $cwd =~ s{/+$}{};
     for my $log (@logs) {
-        next if !$log || !$log->{vhost} || !$log->{vhost}{docroot2};
-        my $docroot = $log->{vhost}{docroot2};
+        next if !$log || !$log->{vhost} || !$log->{vhost}{absdocroot};
+        my $docroot = $log->{vhost}{absdocroot};
         next if !$docroot;
         $docroot =~ s/\/+$//;
         $docroot =~ s/\/public_html$//;
@@ -970,19 +1065,20 @@ sub select_log_by_cwd {
 
 sub get_logs {
     get_logs_from_apache_conf();
-    if (-e "$ENV{HOME}/access-logs") {
-        get_logs_from_dir("$ENV{HOME}/access-logs");
+    my $dir = "$ENV{HOME}/access-logs";
+    if (-e $dir) {
+        get_logs_from_dir($dir);
     }
-    for my $log (@logs) {
-        my $docroot = "";
-        if ($log->{vhost} && $log->{vhost}{docroot2}) {
-            $docroot = $log->{vhost}{docroot2};
-        }
-        $log->{begcmp} = begcmp($ENV{PWD}, $docroot);
-    }
-    @logs = sort byname @logs;
+    process_log_list();
+    @logs = sort {
+        return $a->{file} cmp $b->{file};
+    } @logs;
 }
 
+# Returns the number of characters that are the same from the beginning
+# between two strings.
+#     abc and def is 0
+#     abc and abcdef is 3
 sub begcmp {
     my ($a, $b) = @_;
     my $count = 0;
@@ -1009,8 +1105,6 @@ sub get_logs_from_dir {
 
 sub get_logs_from_apache_conf {
     my @files = `find /etc/apache2 /etc/httpd 2>/dev/null`;
-    my @logs_all;
-    my $host = {};
     my $vhost = $host;
     my %vhosts;
     for my $file (sort @files) {
@@ -1046,19 +1140,18 @@ sub get_logs_from_apache_conf {
             }
             elsif ($line =~ /^\s*DocumentRoot\s+(.+)/ims) {
                 $vhost->{docroot} = unquote($1);
-                $vhost->{docroot2} = Cwd::abs_path($vhost->{docroot});
+                $vhost->{absdocroot} = Cwd::abs_path($vhost->{docroot});
             }
             elsif ($line =~ /^\s*ServerRoot\s+(\S+)/ims) {
                 $vhost->{servroot} = unquote($1);
             }
             elsif ($line =~ /^\s*CustomLog\s+("[^"]*"|\S+)(\s+("(\\"|[^"])*"|\S+))?/ims) {
-                my $log = {};
+                my $log_file = unquote($1);
+                my $arg2 = unquote($3);
+                $log_file = env_replace($log_file);
+                my $log = add_log($log_file);
                 $log->{vhost} = $vhost;
-                my $file = $1;
-                my $arg2 = $3;
-                $file = unquote($file);
-                $arg2 = unquote($arg2);
-                $log->{file} = $file;
+                $vhost->{file} = $file;
                 if ($arg2) {
                     if ($arg2 =~ /%/) {
                         $log->{format} = $arg2;
@@ -1067,15 +1160,10 @@ sub get_logs_from_apache_conf {
                         $log->{fname} = $arg2;
                     }
                 }
-                env_replace($log);
-                $log->{name} = basename($log->{file});
-                push @logs_all, $log;
             }
             elsif ($line =~ /^\s*LogFormat\s+("(\\"|[^"])*"|\S+)(\s+(\S+))?/ims) {
-                my $format = $1;
-                my $fname = $4;
-                $format = unquote($format);
-                $fname = unquote($fname);
+                my $format = unquote($1);
+                my $fname = unquote($4);
                 if ($fname) {
                     $host->{fnames}{$fname} = $format;
                 }
@@ -1086,42 +1174,38 @@ sub get_logs_from_apache_conf {
         }
         close $fh;
     }
+}
+
+# The list is processed to remove duplicates and remove logs for
+# overridden virtualhosts.
+sub process_log_list {
     my %logs;
-    for my $log (@logs_all) {
-        if ($log && $log->{vhost}) {
-            if ($log->{vhost}{invalid}) {
-                next;
-            }
-            if ($host->{servroot} && $log->{file} !~ /^\//) {
-                $log->{file} = "$host->{servroot}/$log->{file}";
-            }
-            if ($log->{fname} && $host->{fnames}{$log->{fname}}) {
-                $log->{format} = $host->{fnames}{$log->{fname}};
-            }
-            if (!$log->{format}) {
-                $log->{format} = $log->{vhost}{format};
-            }
-            if ($logs{$log->{file}}) {
-                next;
-            }
-            $logs{$log->{file}} = $log;
+    my @logs_new;
+    for my $log (@logs) {
+        my $vhost = $log->{vhost};
+        if ($vhost && $vhost->{invalid}) {
+            next;
         }
-        push @logs, $log;
+        if ($host->{servroot} && $log->{file} !~ /^\//) {
+            $log->{file} = "$host->{servroot}/$log->{file}";
+        }
+        if ($log->{fname} && $host->{fnames}{$log->{fname}}) {
+            $log->{format} = $host->{fnames}{$log->{fname}};
+        }
+        if ($logs{$log->{file}}) {
+            next;
+        }
+        $logs{$log->{file}} = $log;
+        push @logs_new, $log;
     }
+    @logs = @logs_new;
 }
 
 sub env_replace {
-    my ($log) = @_;
+    my ($file) = @_;
     $ENV{APACHE_LOG_DIR} ||= "/var/log/apache2";
-    $log->{file} =~ s/\$\{(\w+)\}/$ENV{$1}/ge;
-}
-
-sub bybegcmp {
-    return $b->{begcmp} <=> $a->{begcmp} || $a->{name} cmp $b->{name};
-}
-
-sub byname {
-    return $a->{name} cmp $b->{name};
+    $file =~ s/\$\{(\w+)\}/$ENV{$1}/ge;
+    return $file;
 }
 
 sub basename {
@@ -1166,49 +1250,76 @@ sub vhost_name {
 
 sub get_opts {
     my @args;
-    $opts{action} = "less";
     while (my $arg = shift @ARGV) {
         if ($arg =~ /^--?$/) {
             push @args, @ARGV;
             last;
         }
-        elsif ($arg =~ /^-a(\d*)$/) {
-            $opts{last} = $1;
-        }
-        elsif ($arg =~ /^-f$/) {
-            $opts{action} = "tailf";
-        }
-        elsif ($arg =~ /^-g(\d+|[dh]|)$/) {
-            $opts{action} = "graph";
-            my $interval = $1 || "";
-            if ($interval eq "d") {
-                $opts{interval} = 24 * 60 * 60;
+        elsif ($arg eq "-m") {
+            my $max = shift @ARGV;
+            if (!defined $max || $max !~ /^\d+$/) {
+                die "-m option requires a numerical argument.\n";
             }
-            elsif ($interval eq "h" || !$interval) {
-                $opts{interval} = 60 * 60;
+            $opts{max} = $max;
+        }
+        elsif ($arg eq "-o") {
+            my $offset = shift @ARGV;
+            if (!defined $offset || $offset !~ /^\d+$/) {
+                die "-o option requires a numerical argument.\n";
+            }
+            $opts{offset} = $offset;
+        }
+        elsif ($arg eq "-f") {
+            my $filter = shift @ARGV;
+            $opts{filter} = $filter;
+            $opts{action} ||= "info";
+        }
+        elsif ($arg eq "-g") {
+            $opts{action} = "graph";
+            my $interval = $ARGV[0];
+            if (defined $interval && $interval !~ /^-/) {
+                shift @ARGV;
             }
             else {
+                $interval = undef;
+            }
+            if (!$interval || $interval eq "h") {
+                $opts{interval} = 60 * 60;
+            }
+            elsif ($interval eq "d") {
+                $opts{interval} = 24 * 60 * 60;
+            }
+            elsif ($interval =~ /^\d+$/) {
                 $opts{interval} = $interval;
             }
+            else {
+                die "-g argument must be h, d, or a number.\n";
+            }
         }
-        elsif ($arg =~ /^(--?help|-h|-\?)$/) {
+        elsif ($arg =~ /^(--?help|-h)$/) {
             usage();
         }
-        elsif ($arg =~ /^-i$/) {
+        elsif ($arg eq "-s") {
+            $opts{action} = "stats";
+        }
+        elsif ($arg eq "-i") {
             $opts{action} = "info";
         }
-        elsif ($arg =~ /^-l(l)?$/) {
-            $opts{action} = "list";
-            $opts{verbose} = $1;
+        elsif ($arg eq "-I") {
+            $opts{action} = "info";
+            $opts{verbose} = 1;
         }
-        elsif ($arg =~ /^-p$/) {
+        elsif ($arg eq "-l") {
+            $opts{action} = "list";
+        }
+        elsif ($arg eq "-L") {
+            $opts{action} = "detailed_list";
+        }
+        elsif ($arg eq "-p") {
             $opts{action} = "print";
         }
-        elsif ($arg =~ /^-r(\w+)$/) {
-            $opts{rotation} = $1;
-        }
-        elsif ($arg =~ /^-v$/) {
-            $opts{action} = "vim";
+        elsif ($arg eq "-r") {
+            $opts{rotation} = shift @ARGV;
         }
         elsif ($arg =~ /^-/) {
             die "Invalid argument '$arg'\n";
@@ -1221,29 +1332,31 @@ sub get_opts {
         die "Too many arguments\n";
     }
     $opts{name} = shift @args;
+    $opts{action} ||= "less";
 }
 
 sub usage {
     print <<EOUSAGE;
 Usage: alog [<options>] [<name>]
 
--a[<n>]    show last n accesses with info spread vertically
--f         tail -f the log
--g         graph requests at hourly intervals
--gd        graph requests at daily intervals
--h         displays this help text
--i         info and statistics
--l         list available logs
--ll        list available logs verbosely
--p         print log path
--r<n>      rotation number
--v         vim the log
+-f <regex>        filter based on regex
+-g [<interval>]   graph errors
+-h                show this help text
+-i                show info spread vertically
+-I                show info verbosely
+-l                list available logs
+-L                list available logs with details
+-m <n>            process a maximum of n accesses, starting from the end
+-o <n>            process accesses starting at an offset from the end
+-p                print log path
+-r <n>            rotation number
+-s                show statistics
 
-<name>     name of the log you are trying to access (regexp),
-           if name contains a "/", name is treated as a file name,
-           default is the error log for the cwd.
+<name>            name of the log you are trying to access (regex),
+                  if name contains a "/", name is treated as a file name,
+                  default is the access log for the cwd.
 
-by default, this command will open the log in \$PAGER or less(1)
+By default, this command will open the log in \$PAGER or less(1)
 EOUSAGE
     exit;
 }
@@ -1260,21 +1373,24 @@ alog - An Apache access log viewer
 
 =head1 OPTIONS
 
-    -a[<n>]    show last n accesses with info spread vertically
-    -f         tail -f the log
-    -g         graph requests at hourly intervals
-    -gd        graph requests at daily intervals
-    -h         displays this help text
-    -i         info and statistics
-    -l         list available logs
-    -ll        list available logs verbosely
-    -p         print log path
-    -r<n>      rotation number
-    -v         vim the log
+    -f <regex>        filter based on regex
+    -g [<interval>]   graph errors
+    -h                show this help text
+    -i                show info spread vertically
+    -I                show info verbosely
+    -l                list available logs
+    -L                list available logs with details
+    -m <n>            process a maximum of n accesses, starting from the end
+    -o <n>            process accesses starting at an offset from the end
+    -p                print log path
+    -r <n>            rotation number
+    -s                show statistics
 
-    <name>     name of the log you are trying to access (regexp),
-               if name contains a "/", name is treated as a file name,
-               default is the error log for the cwd.
+    <name>            name of the log you are trying to access (regex),
+                      if name contains a "/", name is treated as a file name,
+                      default is the access log for the cwd.
+
+By default, this command will open the log in \$PAGER or less(1)
 
 =head1 DESCRIPTION
 
@@ -1295,11 +1411,12 @@ after the `alog` command. For example, `alog foo`.
 
 To see a list of all the access logs on the server use `alog -l`.
 More detailed information, such as what rotations exist for each
-log, use `alog -ll`.
+log, use `alog -L`.
 
 To specify an older rotation of an access log, use the -r option.
-For example `alog -r2`, might show the /var/log/httpd/foo.access_log.2.gz
-file.
+For example `alog -r 2`, might show the /var/log/httpd/foo.access_log.2.gz
+file. If that rotation doesn't exist, it will choose the 2nd in the list
+shown when you use the -L option.
 
 The way it determines which access log to show is by parsing Apache
 config files in either /etc/httpd or /etc/apache2. A CustomLog line
@@ -1309,21 +1426,29 @@ access log uses.
 
 The -p option will show the path the selected access log file.
 
-The -f option will open the log in `tail -f`.
+The -f option will filter based on a given regex for the -i, -s, or -g option.
 
-The -v option will open the log in `vim`.
-
-The -i option will show statistics about the access log file such
+The -s option will show statistics about the access log file such
 as how many requests there were, their time frame, and most active
-uris.
+URIs.
 
-The -a option will show the data fields of the access log entry on
+The -i option will show the data fields of the access log entry on
 their own line, so you don't have to scroll right to see the part
 you are interested in.
 
-The -g option will show a graph of the number of requests in hourly intervals.
+The -I option will show all the fields we have for the entry on it's
+own line.
 
-The -gd option will show a graph of the number of requests in daily intervals.
+The -m option limits the maximum number of accesses shown with the -i, -s, or the
+-g option, starting from the end of the log (most recent).
+
+The -o option sets an offset to the accesses shown with the -i option, so
+"elog -i -m 1" shows the last access, "elog -i -m 1 -o 1" shows the second
+to last access.
+
+The -g option will show a graph of the number of accesses in hourly
+intervals. If provided an argument, it can be h for hourly, d for daily,
+or a number of seconds.
 
 =head1 METACPAN
 

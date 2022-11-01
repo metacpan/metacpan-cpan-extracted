@@ -1,0 +1,16 @@
+{
+   "api_version" : null,
+   "application" : null,
+   "created" : "1662261086",
+   "description" : "This is my webhook, I like it a lot",
+   "enabled_events" : [
+      "charge.failed",
+      "charge.succeeded"
+   ],
+   "id" : "we_1Le9F42eZvKYlo2CMJDLWV0x",
+   "livemode" : 0,
+   "metadata" : {},
+   "object" : "webhook_endpoint",
+   "status" : "enabled",
+   "url" : "https://example.com/my/webhook/endpoint"
+}

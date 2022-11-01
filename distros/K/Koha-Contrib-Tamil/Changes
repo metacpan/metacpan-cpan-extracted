@@ -1,5 +1,9 @@
 Revision history for Perl module Koha::Contrib::Tamil
 
+0.069 2022-10-24
+
+  - Fix for Koha 22.05
+
 0.067 2022-03-10
 
   - Fix for Koha 21.11

@@ -4,13 +4,13 @@
       "unknown"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142060",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "AnyEvent-Fork-Pool",
    "no_index" : {
@@ -22,7 +22,6 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "AnyEvent::Fork" : "0.6",
             "ExtUtils::MakeMaker" : "0"
          }
       },
@@ -40,8 +39,14 @@
             "Task::Weaken" : "1",
             "common::sense" : "3.6"
          }
+      },
+      "test" : {
+         "requires" : {
+            "AnyEvent::Fork" : "0.6"
+         }
       }
    },
    "release_status" : "stable",
-   "version" : 1.2
+   "version" : 1.3,
+   "x_serialization_backend" : "JSON::PP version 4.11"
 }
