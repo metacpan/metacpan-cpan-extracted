@@ -6,9 +6,9 @@ use warnings;
 use Exporter 'import';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-09'; # DATE
+our $DATE = '2022-11-03'; # DATE
 our $DIST = 'Regexp-From-String'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 our @EXPORT_OK = qw(str_maybe_to_re str_to_re);
 
@@ -25,15 +25,17 @@ sub str_maybe_to_re {
 sub str_to_re {
     my $opts = ref $_[0] eq 'HASH' ? shift : {};
     my $str = shift;
-    if ($str =~ m!\A(?:/.*/|qr\(.*\))(?:[ims]*)\z!s) {
+    if (!$opts->{always_quote} && $str =~ m!\A(?:/.*/|qr\(.*\))(?:[ims]*)\z!s) {
         my $re = eval(substr($str, 0, 2) eq 'qr' ? $str : "qr$str"); ## no critic: BuiltinFunctions::ProhibitStringyEval
         die if $@;
         return $re;
     } else {
         $str = quotemeta($str);
-        return $opts->{anchored} ?
-            ($opts->{case_insensitive} ? qr/\A$str\z/i : qr/\A$str\z/) :
-            ($opts->{case_insensitive} ? qr/$str/i     : qr/$str/);
+        if ($opts->{anchored}) {
+            if ($opts->{case_insensitive}) { return qr/\A$str\z/i } else { return qr/\A$str\z/ }
+        } else {
+            if ($opts->{case_insensitive}) { return qr/$str/i     } else { return qr/$str/     }
+        }
     }
     $str;
 }
@@ -53,24 +55,25 @@ Regexp::From::String - Convert '/.../' or 'qr(...)' into Regexp object
 
 =head1 VERSION
 
-This document describes version 0.002 of Regexp::From::String (from Perl distribution Regexp-From-String), released on 2022-07-09.
+This document describes version 0.004 of Regexp::From::String (from Perl distribution Regexp-From-String), released on 2022-11-03.
 
 =head1 SYNOPSIS
 
  use Regexp::From::String qw(str_maybe_to_re str_to_re);
 
- my $re1 = str_maybe_to_re('foo');        # stays as string 'foo'
- my $re2 = str_maybe_to_re('/foo');       # stays as string '/foo'
- my $re3 = str_maybe_to_re('/foo/');      # compiled to Regexp object qr(foo)
- my $re4 = str_maybe_to_re('qr(foo)i');   # compiled to Regexp object qr(foo)i
+ my $re1 = str_maybe_to_re('foo.');       # stays as string 'foo.'
+ my $re2 = str_maybe_to_re('/foo.');      # stays as string '/foo.'
+ my $re3 = str_maybe_to_re('/foo./');     # compiled to Regexp object qr(foo.) (metacharacters are allowed)
+ my $re4 = str_maybe_to_re('qr(foo.)i');  # compiled to Regexp object qr(foo.)i
  my $re5 = str_maybe_to_re('qr(foo[)i');  # dies, invalid regex syntax
 
- my $re1 = str_to_re('foo');        # compiled to Regexp object qr(foo)
- my $re2 = str_to_re('/foo');       # compiled to Regexp object qr(/foo)
- my $re2 = str_to_re({case_insensitive=>1}, 'foo[]');  # compiled to Regexp object qr(foo\[\])i
- my $re2 = str_to_re({anchored=>1}, 'foo[]');          # compiled to Regexp object qr(\Afoo\[\]\z)
- my $re3 = str_to_re('/foo/');      # compiled to Regexp object qr(foo)
- my $re4 = str_to_re('qr(foo)i');   # compiled to Regexp object qr(foo)i
+ my $re1 = str_to_re('foo.');       # compiled to Regexp object qr(foo\.) (metacharacters are quoted)
+ my $re2 = str_to_re('/foo.');      # compiled to Regexp object qr(/foo\.)
+ my $re2 = str_to_re({case_insensitive=>1}, 'foo.');    # compiled to Regexp object qr(foo\.)i
+ my $re2 = str_to_re({anchored=>1}, 'foo.');            # compiled to Regexp object qr(\Afoo\.\z)
+ my $re3 = str_to_re('/foo./');     # compiled to Regexp object qr(foo) (metacharacters are allowed)
+ my $re4 = str_to_re('qr(foo.)i');  # compiled to Regexp object qr(foo.)i
+ my $re4 = str_to_re({always_quote=>1}, 'qr(foo.)');  # compiled to Regexp object qr(qr\(foo\.\)) (metacharacters are quoted)
  my $re5 = str_to_re('qr(foo[)i');  # dies, invalid regex syntax
 
 =head1 FUNCTIONS
@@ -109,11 +112,22 @@ in first argument hashref C<\%opts>:
 
 =over
 
-=item case_insensitive
+=item * always_quote
+
+Bool. Default false. If set to true, will always C<quotemeta()> regardless of
+whether the string is in the form of C</.../> or C<qr(...)> or not. This means
+user will not be able to use metacharacters and the Regexp will only match the
+literal string (with some option like anchoring and case-sensitivity, see other
+options).
+
+Defaults to false because the point of this function is to allow specifying
+regex.
+
+=item * case_insensitive
 
 Bool. If set to true will compile to Regexp object with C<i> regexp modifier.
 
-=item anchored
+=item * anchored
 
 Bool. If set to true will anchor the pattern with C<\A> and C<\z>.
 
@@ -148,9 +162,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

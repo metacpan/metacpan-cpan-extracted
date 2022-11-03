@@ -471,3 +471,9 @@ Revision history for StreamFinder
         - StreamFinder::Tunein - Use https://opml.radiotime.com/Tune.ashx 
         JSON API instead of youtube-dl/yt-dlp to extract radio streams.
         (Removes dependency on youtube-dl)
+2.00    2022/11/03
+        - Add StreamFinder::InternetRadio (www.internet-radio.com stations)
+        - Add StreamFinder::OnlineRadiobox (onlineradiobox.com stations)
+        - StreamFinder::AnyStream - Add .acc streams to search.
+        - StreamFinder::Tunein - Cpl. minor cleanups.
+        - StreamFinder::Youtube - Accept urls containing "/c/" as channel urls.

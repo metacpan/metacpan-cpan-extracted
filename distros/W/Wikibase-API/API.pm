@@ -12,7 +12,7 @@ use Wikibase::Datatype::Struct::Item;
 use Wikibase::Datatype::Struct::Lexeme;
 use Wikibase::Datatype::Struct::Mediainfo;
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 # Constructor.
 sub new {
@@ -46,28 +46,15 @@ sub new {
 	$self->{'mediawiki_api'}->{'config'}->{'api_url'}
 		= $self->{'_mediawiki_base_uri'}.'/w/api.php';
 
-	# Login.
-	if (defined $self->{'login_name'} && defined $self->{'login_password'}) {
-		my $login_ret = $self->{'mediawiki_api'}->login({
-			'lgname' => $self->{'login_name'},
-			'lgpassword' => $self->{'login_password'},
-		});
-		$self->_mediawiki_api_error($login_ret, 'Cannot login.');
-	}
-
-	# Token.
-	my $token_hr = $self->{'mediawiki_api'}->api({
-		'action' => 'query',
-		'meta' => 'tokens',
-	});
-	$self->_mediawiki_api_error($token_hr, 'Cannot get token.');
-	$self->{'_csrftoken'} = $token_hr->{'query'}->{'tokens'}->{'csrftoken'};
+	$self->{'_init'} = 0;
 
 	return $self;
 }
 
 sub create_item {
 	my ($self, $item_obj) = @_;
+
+	$self->_init;
 
 	my $res = $self->{'mediawiki_api'}->api({
 		'action' => 'wbeditentity',
@@ -82,6 +69,8 @@ sub create_item {
 
 sub get_item {
 	my ($self, $id, $opts_hr) = @_;
+
+	$self->_init;
 
 	my $struct_hr = $self->get_item_raw($id, $opts_hr);
 	if (! exists $struct_hr->{'type'}) {
@@ -107,6 +96,8 @@ sub get_item {
 sub get_item_raw {
 	my ($self, $id, $opts_hr) = @_;
 
+	$self->_init;
+
 	# TODO $opts_hr - Muzu vyfiltrovat jenom claims napr.
 
 	my $res = $self->{'mediawiki_api'}->api({
@@ -119,6 +110,36 @@ sub get_item_raw {
 	my $struct_hr = $res->{'entities'}->{$id};
 
 	return $struct_hr;
+}
+
+sub _init {
+	my $self = shift;
+
+	if ($self->{'_init'}) {
+		return;
+	}
+
+	# Login.
+	if (defined $self->{'login_name'} && defined $self->{'login_password'}) {
+		my $login_ret = $self->{'mediawiki_api'}->login({
+			'lgname' => $self->{'login_name'},
+			'lgpassword' => $self->{'login_password'},
+		});
+		$self->_mediawiki_api_error($login_ret, 'Cannot login.');
+	}
+
+	# Token.
+	my $token_hr = $self->{'mediawiki_api'}->api({
+		'action' => 'query',
+		'meta' => 'tokens',
+	});
+	$self->_mediawiki_api_error($token_hr, 'Cannot get token.');
+	$self->{'_csrftoken'} = $token_hr->{'query'}->{'tokens'}->{'csrftoken'};
+
+	# Initialized.
+	$self->{'_init'} = 1;
+
+	return;
 }
 
 sub _obj2json {
@@ -163,7 +184,7 @@ __END__
 
 =head1 NAME
 
-Wikibase::API - Class for API to Wikibase (Wikibase) system.
+Wikibase::API - Wikibase API class.
 
 =head1 SYNOPSIS
 
@@ -374,6 +395,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

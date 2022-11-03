@@ -2,8 +2,8 @@ NAME
     String::Query::To::Regexp - Convert query to regular expression
 
 VERSION
-    This document describes version 0.001 of String::Query::To::Regexp (from
-    Perl distribution String-Query-To-Regexp), released on 2022-11-01.
+    This document describes version 0.002 of String::Query::To::Regexp (from
+    Perl distribution String-Query-To-Regexp), released on 2022-11-02.
 
 SYNOPSIS
      use String::Query::To::Regexp qw(query2re);
@@ -45,6 +45,12 @@ FUNCTIONS
 
         Bool. Default false. If set to true, will do case-insensitive
         matching
+
+    *   re
+
+        Bool. Default false. If set to true, will allow regexes in @query as
+        well as converting string queries of the form "/foo/" to regex using
+        Regexp::From::String.
 
 HOMEPAGE
     Please visit the project's homepage at

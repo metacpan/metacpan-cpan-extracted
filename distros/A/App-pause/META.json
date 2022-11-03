@@ -41,14 +41,14 @@
             "Log::ger::Output::Screen" : "0.018",
             "Log::ger::Output::SimpleFile" : "0",
             "Log::ger::Util" : "0.037",
-            "Perinci::CmdLine::Util::Config" : "1.724",
-            "Perinci::Result::Format::Lite" : "0.282",
+            "Perinci::CmdLine::Util::Config" : "1.725",
+            "Perinci::Result::Format::Lite" : "0.286",
             "Scalar::Util" : "0",
             "Scalar::Util::Numeric" : "0",
             "Scalar::Util::Numeric::PP" : "0",
             "Time::Duration::Parse::AsHash" : "0",
             "Time::Local" : "1.27",
-            "WWW::PAUSE::Simple" : "0.452",
+            "WWW::PAUSE::Simple" : "0.453",
             "perl" : "5.010001",
             "strict" : "0",
             "warnings" : "0"
@@ -66,7 +66,7 @@
    "provides" : {
       "App::pause" : {
          "file" : "lib/App/pause.pm",
-         "version" : "0.657"
+         "version" : "0.659"
       }
    },
    "release_status" : "stable",
@@ -81,7 +81,7 @@
          "web" : "https://github.com/perlancar/perl-App-pause"
       }
    },
-   "version" : "0.657",
+   "version" : "0.659",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
@@ -195,8 +195,14 @@
          },
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec",
+            "config" : {
+               "Dist::Zilla::Role::ModuleMetadata" : {
+                  "Module::Metadata" : "1.000037",
+                  "version" : "0.006"
+               }
+            },
             "name" : "@Author::PERLANCAR/PERLANCAR::EnsurePrereqToSpec",
-            "version" : "0.062"
+            "version" : "0.064"
          },
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::MetaResources",
@@ -427,7 +433,7 @@
                      {
                         "class" : "Pod::Weaver::Section::PERLANCAR::Contributing",
                         "name" : "@Author::PERLANCAR/PERLANCAR/Contributing",
-                        "version" : "0.292"
+                        "version" : "0.293"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Legal",
@@ -437,7 +443,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::Rinci",
                         "name" : "@Author::PERLANCAR/Rinci",
-                        "version" : "0.780"
+                        "version" : "0.784"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::AppendPrepend",

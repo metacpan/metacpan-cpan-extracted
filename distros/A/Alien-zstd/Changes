@@ -1,5 +1,9 @@
 Revision history for Alien-zstd
 
+0.03      2022-11-01 20:38:04-04:00 America/New_York
+  - Ensure that zstd program exists.
+    See <https://github.com/PerlAlien/Alien-zstd/pull/4>.
+
 0.02      2022-10-28 13:22:04-04:00 America/New_York
   - Switch to using Download::GitHub plugin.
     See <https://github.com/PerlAlien/Alien-zstd/pull/3>.

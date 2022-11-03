@@ -13,9 +13,9 @@ use String::ShellQuote;
 use Exporter 'import';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-15'; # DATE
+our $DATE = '2022-10-27'; # DATE
 our $DIST = 'Perinci-CmdLine-POD'; # DIST
-our $VERSION = '0.037'; # VERSION
+our $VERSION = '0.038'; # VERSION
 
 our @EXPORT_OK = qw(gen_pod_for_pericmd_script);
 
@@ -460,7 +460,7 @@ sub gen_pod_for_pericmd_script {
                 my $title = $eg->{summary} ? $eg->{summary} : "Example #$num";
                 push @sectpod, "=head2 $title\n\n";
                 my $cmdline = $eg->{cmdline};
-                $cmdline =~ s/\[\[prog\]\]/$cli->{subcommands} ? "$program_name $eg->{_sc_name}" : $program_name/e;
+                $cmdline =~ s/\[\[prog\]\]/$cli->{subcommands} ? "$program_name $eg->{_sc_name}" : $program_name/eg;
                 push @sectpod, " % $cmdline\n";
 
                 my $show_result;
@@ -474,7 +474,7 @@ sub gen_pod_for_pericmd_script {
                             # execute script and get its output
                             if (defined $args{script}) {
                                 my $cmdline = $eg->{cmdline};
-                                $cmdline =~ s/\[\[prog\]\]/shell_quote($^X, (map {"-I$_"} @{ $args{libs} || [] }), $args{script}, ($cli->{subcommands} ? ($eg->{_sc_name}) : ()))/e;
+                                $cmdline =~ s/\[\[prog\]\]/shell_quote($^X, (map {"-I$_"} @{ $args{libs} || [] }), $args{script}, ($cli->{subcommands} ? ($eg->{_sc_name}) : ()))/eg;
                                 system(
                                     {log=>1, shell => 0, capture_stdout => \$fres},
                                     "bash", "-c", $cmdline);
@@ -566,7 +566,7 @@ sub gen_pod_for_pericmd_script {
                     next unless length $sc_name;
                     if (defined $gen_sc) { next unless $sc_name eq $gen_sc }
                     my $usage = $clidocdata{$sc_name}->{'usage_line.alt.fmt.pod'};
-                    $usage =~ s/\[\[prog\]\]/$program_name $sc_name/;
+                    $usage =~ s/\[\[prog\]\]/$program_name $sc_name/g;
                     push @sectpod, "$usage\n\n";
                 }
             } else {
@@ -576,7 +576,7 @@ sub gen_pod_for_pericmd_script {
         } else {
             # 2b. show main usage line
             my $usage = $clidocdata{''}->{'usage_line.alt.fmt.pod'};
-            $usage =~ s/\[\[prog\]\]/$program_name/;
+            $usage =~ s/\[\[prog\]\]/$program_name/g;
             push @sectpod, "$usage\n\n";
         }
 
@@ -1115,7 +1115,7 @@ Perinci::CmdLine::POD - Generate POD for Perinci::CmdLine-based CLI script
 
 =head1 VERSION
 
-This document describes version 0.037 of Perinci::CmdLine::POD (from Perl distribution Perinci-CmdLine-POD), released on 2022-10-15.
+This document describes version 0.038 of Perinci::CmdLine::POD (from Perl distribution Perinci-CmdLine-POD), released on 2022-10-27.
 
 =head1 SYNOPSIS
 

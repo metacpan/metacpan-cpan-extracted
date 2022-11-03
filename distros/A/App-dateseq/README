@@ -2,8 +2,8 @@ NAME
     App::dateseq - Generate a sequence of dates
 
 VERSION
-    This document describes version 0.111 of App::dateseq (from Perl
-    distribution App-dateseq), released on 2022-09-09.
+    This document describes version 0.112 of App::dateseq (from Perl
+    distribution App-dateseq), released on 2022-10-12.
 
 FUNCTIONS
   dateseq

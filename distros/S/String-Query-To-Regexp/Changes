@@ -1,3 +1,10 @@
+0.002   2022-11-02  Released-By: PERLANCAR; Urgency: medium
+
+        - Add option: re.
+
+        - [safety] Die on unknown options.
+
+
 0.001   2022-11-01  Released-By: PERLANCAR
 
         - First release.

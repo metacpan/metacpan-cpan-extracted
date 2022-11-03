@@ -35,7 +35,7 @@ no_index:
 provides:
   Alien::zstd:
     file: lib/Alien/zstd.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   Alien::Base: '0.038'
   base: '0'
@@ -46,7 +46,7 @@ resources:
   IRC: irc://irc.perl.org/#native
   homepage: https://github.com/PerlAlien/Alien-zstd
   repository: https://github.com/PerlAlien/Alien-zstd.git
-version: '0.02'
+version: '0.03'
 x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
   requires:

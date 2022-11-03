@@ -13,7 +13,7 @@ use Perinci::CmdLine::Any;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-10-09'; # DATE
 our $DIST = 'App-FirefoxUtils'; # DIST
-our $VERSION = '0.020'; # VERSION
+our $VERSION = '0.021'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/FirefoxUtils/firefox_is_paused",
@@ -40,11 +40,11 @@ firefox-is-paused - Check whether Firefox is paused
 
 =head1 VERSION
 
-This document describes version 0.020 of firefox-is-paused (from Perl distribution App-FirefoxUtils), released on 2022-10-09.
+This document describes version 0.021 of firefox-is-paused (from Perl distribution App-FirefoxUtils), released on 2022-10-09.
 
 =head1 SYNOPSIS
 
-B<firefox-is-paused> [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--quiet-arg>|B<-q>] [(B<--user>=I<unix::uid::exists>)+|B<--users-json>=I<json>]
+B<firefox-is-paused> [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--quiet-arg>|B<-q>] [(B<--user>=L<unix::uid::exists|Sah::Schema::unix::uid::exists>)+|B<--users-json>=I<json>]
 
 =head1 DESCRIPTION
 

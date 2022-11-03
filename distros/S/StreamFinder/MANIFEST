@@ -10,7 +10,9 @@ lib/StreamFinder/Brighteon.pm
 lib/StreamFinder/Castbox.pm
 lib/StreamFinder/Google.pm
 lib/StreamFinder/IHeartRadio.pm
+lib/StreamFinder/InternetRadio.pm
 lib/StreamFinder/Odysee.pm
+lib/StreamFinder/OnlineRadiobox.pm
 lib/StreamFinder/Podbean.pm
 lib/StreamFinder/PodcastAddict.pm
 lib/StreamFinder/RadioNet.pm

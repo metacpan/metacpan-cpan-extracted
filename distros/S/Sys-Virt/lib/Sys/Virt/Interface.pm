@@ -102,8 +102,6 @@ completes and should not be used again.
 
 =head1 CONSTANTS
 
-=head1 CONSTANTS
-
 This section documents constants that are used with various
 APIs described above
 

@@ -3,7 +3,7 @@ NAME
     with current directory
 
 VERSION
-    This document describes version 0.017 of App::ThisDist (from Perl
+    This document describes version 0.018 of App::ThisDist (from Perl
     distribution App-ThisDist), released on 2022-08-21.
 
 DESCRIPTION
@@ -41,6 +41,10 @@ SOURCE
 
 SEE ALSO
     App::DistUtils
+
+    "my_dist()" from Dist::Util::Current tries to guess distribution name
+    associated with source code file. It uses us when guessing via $DIST or
+    .packlist files fail.
 
 AUTHOR
     perlancar <perlancar@cpan.org>

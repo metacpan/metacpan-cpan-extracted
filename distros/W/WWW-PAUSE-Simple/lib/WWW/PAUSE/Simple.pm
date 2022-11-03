@@ -21,9 +21,9 @@ our @EXPORT_OK = qw(
                );
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-26'; # DATE
+our $DATE = '2022-11-03'; # DATE
 our $DIST = 'WWW-PAUSE-Simple'; # DIST
-our $VERSION = '0.452'; # VERSION
+our $VERSION = '0.455'; # VERSION
 
 our %SPEC;
 my $access_log = Log::ger->get_logger(category => "_access");
@@ -146,6 +146,34 @@ our %protect_files_arg = (
     },
 );
 
+our %argspecsopt_filter_dev = (
+    include_nondev => {
+        summary => 'Whether to include cleaning up non-dev releases',
+        schema => 'bool*',
+        default => 1,
+    },
+    include_dev => {
+        summary => 'Whether to include cleaning up non-dev releases',
+        schema => 'bool*',
+        default => 0,
+    },
+);
+
+our %argspecsopt_filter_dists = (
+    include_dists => {
+        summary => 'Only include specified distributions',
+        "x.name.is_plural" => 1,
+        "x.name.singular" => "include_dist",
+        schema => ['array*', of=>'str*'], # XXX perl::distname
+    },
+    exclude_dists => {
+        summary => 'Exclude specified distributions',
+        "x.name.is_plural" => 1,
+        "x.name.singular" => "exclude_dist",
+        schema => ['array*', of=>'str*'], # XXX perl::distname
+    },
+);
+
 $SPEC{':package'} = {
     v => 1.1,
     summary => 'An API for PAUSE',
@@ -157,7 +185,7 @@ sub _parse_release_filename {
     return undef unless
         $filename =~ /\A
                       (\w+(?:-\w+)*)
-                      -v?(\d+(?:\.\d+){0,2}(_\d+|-TRIAL)?)
+                      -v?(\d+(?:\.\d+){0,}(_\d+|-TRIAL)?)
                       \.$re_archive_ext
                       \z/ix;
     return ($1, $2, $3); # (dist, version, is_dev)
@@ -500,13 +528,8 @@ Dev versions will be skipped.
 
 _
         },
-        include_nondev => {
-            schema => 'bool*',
-            default => 1,
-        },
-        include_dev => {
-            schema => 'bool*',
-        },
+        %argspecsopt_filter_dists,
+        %argspecsopt_filter_dev,
     },
 };
 sub list_dists {
@@ -527,55 +550,68 @@ sub list_dists {
     my $include_dev = $args{include_dev};
     my $include_nondev = $args{include_nondev} // 1;
 
-    my @dists;
+    my @distrecs;
     for my $file (@{$res->[2]}) {
         if ($file =~ m!/!) {
             log_debug("Skipping %s: under a subdirectory", $file);
             next;
         }
-        my ($dist, $version0, $dev) = _parse_release_filename($file);
-        unless (defined $dist) {
+        my ($distname, $version0, $dev) = _parse_release_filename($file);
+        unless (defined $distname) {
             log_debug("Skipping %s: doesn't match release regex", $file);
             next;
         }
+        if ($args{include_dists} && @{$args{include_dists}} && !(grep {$distname eq $_} @{$args{include_dists}})) {
+            log_trace("Skipping %s: Distribution %s not in include_dists", $file, $distname);
+            next;
+        }
+        if ($args{exclude_dists} && @{$args{exclude_dists}} &&  (grep {$distname eq $_} @{$args{exclude_dists}})) {
+            log_trace("Skipping %s: Distribution %s in exclude_dists", $file, $distname);
+            next;
+        }
+
         next if $newest_n && (($dev && !$include_dev) || (!$dev && !$include_nondev));
         (my $version = $version0) =~ s/-TRIAL$/_001/;
-        push @dists, {
-            name => $dist,
+        push @distrecs, {
+            name => $distname,
             file => $file,
             version0 => $version0,
             version => $version,
         };
-    }
+    } # for my $file
 
     my @old_files;
     if ($newest_n) {
         my %dist_versions;
-        for my $dist (@dists) {
-            push @{ $dist_versions{$dist->{name}} }, $dist->{version};
+        for my $distrec (@distrecs) {
+            push @{ $dist_versions{$distrec->{name}} }, $distrec->{version};
         }
-        for my $dist (keys %dist_versions) {
-            $dist_versions{$dist} = [
+        for my $distname (keys %dist_versions) {
+            $dist_versions{$distname} = [
                 sort { version->parse($b) <=> version->parse($a) }
-                    @{ $dist_versions{$dist} }];
-            if (@{ $dist_versions{$dist} } > $newest_n) {
-                $dist_versions{$dist} = [splice(
-                    @{ $dist_versions{$dist} }, 0, $newest_n)];
+                    @{ $dist_versions{$distname} }];
+            if (@{ $dist_versions{$distname} } > $newest_n) {
+                $dist_versions{$distname} = [splice(
+                    @{ $dist_versions{$distname} }, 0, $newest_n)];
             }
         }
-        my @old_dists = @dists;
-        @dists = ();
-        for my $dist (@old_dists) {
-            if ($dist->{version} ~~ @{ $dist_versions{$dist->{name}} }) {
-                push @dists, $dist;
+        my @old_distrecs = @distrecs;
+        @distrecs = ();
+        my %dist_seen;
+        for my $distrec (@old_distrecs) {
+            log_trace "Distribution %s: Keeping these newest versions: %s", $distrec->{name}, $dist_versions{$distrec->{name}}
+                unless $dist_seen{$distrec->{name}};
+            if ($distrec->{version} ~~ @{ $dist_versions{$distrec->{name}} }) {
+                push @distrecs, $distrec;
             } else {
-                push @old_files, $dist->{file};
+                push @old_files, $distrec->{file};
             }
         }
     }
 
+    my @distnames;
     unless ($args{detail}) {
-        @dists = List::MoreUtils::uniq(map { $_->{name} } @dists);
+        @distnames = List::MoreUtils::uniq(map { $_->{name} } @distrecs);
     }
 
     my %resmeta;
@@ -585,7 +621,7 @@ sub list_dists {
     if ($args{detail}) {
         $resmeta{'table.fields'} = [qw/name version is_dev_version file/];
     }
-    [200, "OK", \@dists, \%resmeta];
+    [200, "OK", ($args{detail} ? \@distrecs : \@distnames), \%resmeta];
 }
 
 $SPEC{delete_old_releases} = {
@@ -606,16 +642,8 @@ _
         %common_args,
         %detail_l_arg,
         %protect_files_arg,
-        include_nondev => {
-            summary => 'Whether to include cleaning up non-dev releases',
-            schema => 'bool*',
-            default => 1,
-        },
-        include_dev => {
-            summary => 'Whether to include cleaning up non-dev releases',
-            schema => 'bool*',
-            default => 0,
-        },
+        %argspecsopt_filter_dists,
+        %argspecsopt_filter_dev,
         num_keep => {
             schema => ['int*', min=>1],
             default => 1,
@@ -634,7 +662,14 @@ _
 sub delete_old_releases {
     my %args = @_;
 
-    my $res = list_dists(_common_args(\%args), newest_n=>$args{num_keep}//1, include_dev=>$args{include_dev}, include_nondev=>$args{include_nondev});
+    my $res = list_dists(
+        _common_args(\%args),
+        newest_n=>$args{num_keep}//1,
+        include_dev=>$args{include_dev},
+        include_nondev=>$args{include_nondev},
+        include_dists=>$args{include_dists},
+        exclude_dists=>$args{exclude_dists},
+    );
     return [500, "Can't list dists: $res->[0] - $res->[1]"] if $res->[0] != 200;
     my $old_files = $res->[3]{'func.old_files'};
 
@@ -670,6 +705,18 @@ sub _delete_or_undelete_or_reindex_files {
     my $which = shift;
     my %args = @_;
 
+    # to supply to pause server
+    my $action;
+    if ($which eq 'delete') {
+        $action = 'delete_files';
+    } elsif ($which eq 'undelete') {
+        $action = 'delete_files'; # sic
+    } elsif ($which eq 'reindex') {
+        $action = 'reindex';
+    } else {
+        die "BUG: undefined action";
+    }
+
     my $files0 = $args{files} // [];
     return [400, "Please specify at least one file"] unless @$files0;
 
@@ -679,7 +726,22 @@ sub _delete_or_undelete_or_reindex_files {
     {
         my $listres;
         if (grep {String::Wildcard::Bash::contains_wildcard($_)}
-                (@$files0, @$protect_files)) {
+            (@$files0, @$protect_files)) {
+
+            if ($which eq 'delete' && (grep {$_ =~ /\A\*\.?/} @$files0)) {
+                log_warn "Please make sure that you really want to delete ALL/many files using the '*' wildcard! ".
+                    "Delaying 10s to give you chance to cancel (Ctrl-C on the terminal) ...";
+                sleep 10;
+                log_warn "Continuing ...";
+            } elsif ($which eq 'reindex' && (grep {$_ =~ /\A\*(z|\.?gz|\.?tar\.gz)?\z/} @$files0)) {
+                log_warn "Please make sure that you really want to reindex ALL files or ALL tarballs! ".
+                    "If you want to fix certain distributions that are missing from the index, ".
+                    "you should reindex just those distribution files. ".
+                    "Delaying 10s to give you chance to cancel (Ctrl-C on the terminal) ...";
+                sleep 10;
+                log_warn "Continuing ...";
+            }
+
             $listres = list_files(_common_args(\%args));
             return [500, "Can't list files: $listres->[0] - $listres->[1]"]
                 unless $listres->[0] == 200;
@@ -733,17 +795,6 @@ sub _delete_or_undelete_or_reindex_files {
         return [200, "OK (dry-run)"];
     } else {
         log_info("%s %s ...", $which, \@files);
-    }
-
-    my $action;
-    if ($which eq 'delete') {
-        $action = 'delete_files';
-    } elsif ($which eq 'undelete') {
-        $action = 'delete_files';
-    } elsif ($which eq 'reindex') {
-        $action = 'reindex';
-    } else {
-        die "BUG: undefined action";
     }
 
     my $httpres = _request(
@@ -958,7 +1009,7 @@ WWW::PAUSE::Simple - An API for PAUSE
 
 =head1 VERSION
 
-This document describes version 0.452 of WWW::PAUSE::Simple (from Perl distribution WWW-PAUSE-Simple), released on 2021-08-26.
+This document describes version 0.455 of WWW::PAUSE::Simple (from Perl distribution WWW-PAUSE-Simple), released on 2022-11-03.
 
 =head1 SYNOPSIS
 
@@ -1075,9 +1126,17 @@ Arguments ('*' denotes required arguments):
 
 Whether to return detailed records.
 
+=item * B<exclude_dists> => I<array[str]>
+
+Exclude specified distributions.
+
 =item * B<include_dev> => I<bool> (default: 0)
 
 Whether to include cleaning up non-dev releases.
+
+=item * B<include_dists> => I<array[str]>
+
+Only include specified distributions.
 
 =item * B<include_nondev> => I<bool> (default: 1)
 
@@ -1163,9 +1222,21 @@ Arguments ('*' denotes required arguments):
 
 Whether to return detailed records.
 
-=item * B<include_dev> => I<bool>
+=item * B<exclude_dists> => I<array[str]>
+
+Exclude specified distributions.
+
+=item * B<include_dev> => I<bool> (default: 0)
+
+Whether to include cleaning up non-dev releases.
+
+=item * B<include_dists> => I<array[str]>
+
+Only include specified distributions.
 
 =item * B<include_nondev> => I<bool> (default: 1)
+
+Whether to include cleaning up non-dev releases.
 
 =item * B<newest> => I<bool>
 
@@ -1244,7 +1315,11 @@ File namesE<sol>wildcard patterns.
 
 =item * B<mtime_max> => I<date>
 
+(No description)
+
 =item * B<mtime_min> => I<date>
+
+(No description)
 
 =item * B<password> => I<str>
 
@@ -1262,7 +1337,11 @@ The retry uses an exponential backoff strategy of delaying 3, 6, 12, 24, ...,
 
 =item * B<size_max> => I<uint>
 
+(No description)
+
 =item * B<size_min> => I<uint>
+
+(No description)
 
 =item * B<username> => I<str>
 
@@ -1608,13 +1687,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

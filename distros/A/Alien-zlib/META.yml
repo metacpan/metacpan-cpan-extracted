@@ -16,7 +16,7 @@ configure_requires:
   Alien::Build::MM: '0.32'
   ExtUtils::MakeMaker: '6.52'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -33,7 +33,7 @@ no_index:
 provides:
   Alien::zlib:
     file: lib/Alien/zlib.pm
-    version: '0.01'
+    version: '0.02'
 requires:
   Alien::Base: '0.038'
   base: '0'
@@ -44,7 +44,7 @@ resources:
   IRC: irc://irc.perl.org/#native
   homepage: https://github.com/PerlAlien/Alien-zlib
   repository: https://github.com/PerlAlien/Alien-zlib.git
-version: '0.01'
+version: '0.02'
 x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
   requires:
@@ -57,6 +57,7 @@ x_alienfile:
       IO::Zlib: '0'
       Mojo::DOM: '0'
       Mojolicious: '7.00'
+      Mozilla::CA: '0'
       Net::SSLeay: '1.49'
       Sort::Versions: '0'
       URI: '0'

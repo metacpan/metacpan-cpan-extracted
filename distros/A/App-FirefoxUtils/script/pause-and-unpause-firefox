@@ -13,7 +13,7 @@ use Perinci::CmdLine::Any;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-10-09'; # DATE
 our $DIST = 'App-FirefoxUtils'; # DIST
-our $VERSION = '0.020'; # VERSION
+our $VERSION = '0.021'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/FirefoxUtils/pause_and_unpause_firefox",
@@ -40,11 +40,11 @@ pause-and-unpause-firefox - Pause and unpause Firefox alternately
 
 =head1 VERSION
 
-This document describes version 0.020 of pause-and-unpause-firefox (from Perl distribution App-FirefoxUtils), released on 2022-10-09.
+This document describes version 0.021 of pause-and-unpause-firefox (from Perl distribution App-FirefoxUtils), released on 2022-10-09.
 
 =head1 SYNOPSIS
 
-B<pause-and-unpause-firefox> [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [(B<--period>=I<duration>)+|B<--periods-json>=I<json>] [(B<--user>=I<unix::uid::exists>)+|B<--users-json>=I<json>]
+B<pause-and-unpause-firefox> [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [(B<--period>=I<duration>)+|B<--periods-json>=I<json>] [(B<--user>=L<unix::uid::exists|Sah::Schema::unix::uid::exists>)+|B<--users-json>=I<json>]
 
 =head1 DESCRIPTION
 

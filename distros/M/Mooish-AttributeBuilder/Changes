@@ -1,3 +1,7 @@
+1.002 Nov 2 2022
+	- set proper subnames to exported functions if Sub::Util is available
+	- cache exported functions, so that they can be identified by other systems
+
 1.001 Oct 31 2022
 	- add an ability to add custom shortcuts
 	- no longer uses Exporter

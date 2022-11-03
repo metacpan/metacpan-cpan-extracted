@@ -16,12 +16,12 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Module::Build" : "0.28"
+            "Module::Build" : "0.3601"
          }
       },
       "configure" : {
          "requires" : {
-            "Module::Build" : "0.28"
+            "Module::Build" : "0.3601"
          }
       },
       "develop" : {
@@ -74,7 +74,7 @@
          "web" : "https://github.com/ikluft/Sys-OsPackage"
       }
    },
-   "version" : "0.3.0",
+   "version" : "0.3.1",
    "x_generated_by_perl" : "v5.34.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
    "x_spdx_expression" : "Artistic-2.0"

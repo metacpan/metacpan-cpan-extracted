@@ -10,9 +10,9 @@ use Exporter 'import';
 use Perinci::Sub::Gen::AccessTable qw(gen_read_table_func);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-01'; # DATE
+our $DATE = '2022-11-02'; # DATE
 our $DIST = 'App-BPOMUtils'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 our @EXPORT_OK = qw(
                        bpom_list_food_categories
@@ -124,6 +124,24 @@ $res = gen_read_table_func(
 _
     extra_props => {
         examples => [
+            {
+                summary => 'Check for additives that contain "dextrin" but do not contain "gamma"',
+                src_plang => 'bash',
+                src => '[[prog]] -l --format text-pretty -- dextrin -gamma',
+                test => 0,
+            },
+            {
+                summary => 'Check for additives that contain "magnesium" or "titanium"',
+                src_plang => 'bash',
+                src => '[[prog]] -l --format text-pretty --or -- magnesium titanium',
+                test => 0,
+            },
+            {
+                summary => 'Check for additives that match some regular expressions',
+                src_plang => 'bash',
+                src => '[[prog]] -l --format text-pretty -- /potassium/ /citrate|phosphate/',
+                test => 0,
+            },
         ],
     },
 );
@@ -657,7 +675,7 @@ App::BPOMUtils - Utilities related to BPOM
 
 =head1 VERSION
 
-This document describes version 0.012 of App::BPOMUtils (from Perl distribution App-BPOMUtils), released on 2022-11-01.
+This document describes version 0.013 of App::BPOMUtils (from Perl distribution App-BPOMUtils), released on 2022-11-02.
 
 =head1 SYNOPSIS
 
@@ -839,9 +857,22 @@ Only return records where the 'name' field is less than specified value.
 
 Only return records where the 'name' field is greater than specified value.
 
-=item * B<query> => I<str>
+=item * B<queries> => I<array[str]>
 
 Search.
+
+This will search all searchable fields with one or more specified queries. Each
+query can be in the form of C<-FOO> (dash prefix notation) to require that the
+fields do not contain specified string, or C</FOO/> to use regular expression.
+All queries must match if the C<query_boolean> option is set to C<and>; only one
+query should match if the C<query_boolean> option is set to C<or>.
+
+=item * B<query_boolean> => I<str> (default: "and")
+
+Whether records must match all search queries ('and') or just one ('or').
+
+If set to C<and>, all queries must match; if set to C<or>, only one query should
+match. See the C<queries> option for more details on searching.
 
 =item * B<random> => I<bool> (default: 0)
 
@@ -1018,9 +1049,22 @@ Only return records where the 'name' field is less than specified value.
 
 Only return records where the 'name' field is greater than specified value.
 
-=item * B<query> => I<str>
+=item * B<queries> => I<array[str]>
 
 Search.
+
+This will search all searchable fields with one or more specified queries. Each
+query can be in the form of C<-FOO> (dash prefix notation) to require that the
+fields do not contain specified string, or C</FOO/> to use regular expression.
+All queries must match if the C<query_boolean> option is set to C<and>; only one
+query should match if the C<query_boolean> option is set to C<or>.
+
+=item * B<query_boolean> => I<str> (default: "and")
+
+Whether records must match all search queries ('and') or just one ('or').
+
+If set to C<and>, all queries must match; if set to C<or>, only one query should
+match. See the C<queries> option for more details on searching.
 
 =item * B<random> => I<bool> (default: 0)
 
@@ -1441,9 +1485,22 @@ Only return records where the 'origin' field is less than specified value.
 
 Only return records where the 'origin' field is greater than specified value.
 
-=item * B<query> => I<str>
+=item * B<queries> => I<array[str]>
 
 Search.
+
+This will search all searchable fields with one or more specified queries. Each
+query can be in the form of C<-FOO> (dash prefix notation) to require that the
+fields do not contain specified string, or C</FOO/> to use regular expression.
+All queries must match if the C<query_boolean> option is set to C<and>; only one
+query should match if the C<query_boolean> option is set to C<or>.
+
+=item * B<query_boolean> => I<str> (default: "and")
+
+Whether records must match all search queries ('and') or just one ('or').
+
+If set to C<and>, all queries must match; if set to C<or>, only one query should
+match. See the C<queries> option for more details on searching.
 
 =item * B<random> => I<bool> (default: 0)
 
@@ -1812,9 +1869,22 @@ Only return records where the 'lower_limit' field is less than specified value.
 
 Only return records where the 'lower_limit' field is greater than specified value.
 
-=item * B<query> => I<str>
+=item * B<queries> => I<array[str]>
 
 Search.
+
+This will search all searchable fields with one or more specified queries. Each
+query can be in the form of C<-FOO> (dash prefix notation) to require that the
+fields do not contain specified string, or C</FOO/> to use regular expression.
+All queries must match if the C<query_boolean> option is set to C<and>; only one
+query should match if the C<query_boolean> option is set to C<or>.
+
+=item * B<query_boolean> => I<str> (default: "and")
+
+Whether records must match all search queries ('and') or just one ('or').
+
+If set to C<and>, all queries must match; if set to C<or>, only one query should
+match. See the C<queries> option for more details on searching.
 
 =item * B<random> => I<bool> (default: 0)
 
@@ -2131,9 +2201,22 @@ Only return records where the 'lower_limit' field is less than specified value.
 
 Only return records where the 'lower_limit' field is greater than specified value.
 
-=item * B<query> => I<str>
+=item * B<queries> => I<array[str]>
 
 Search.
+
+This will search all searchable fields with one or more specified queries. Each
+query can be in the form of C<-FOO> (dash prefix notation) to require that the
+fields do not contain specified string, or C</FOO/> to use regular expression.
+All queries must match if the C<query_boolean> option is set to C<and>; only one
+query should match if the C<query_boolean> option is set to C<or>.
+
+=item * B<query_boolean> => I<str> (default: "and")
+
+Whether records must match all search queries ('and') or just one ('or').
+
+If set to C<and>, all queries must match; if set to C<or>, only one query should
+match. See the C<queries> option for more details on searching.
 
 =item * B<random> => I<bool> (default: 0)
 
@@ -2310,9 +2393,22 @@ Select fields to return.
 
 Select fields to return.
 
-=item * B<query> => I<str>
+=item * B<queries> => I<array[str]>
 
 Search.
+
+This will search all searchable fields with one or more specified queries. Each
+query can be in the form of C<-FOO> (dash prefix notation) to require that the
+fields do not contain specified string, or C</FOO/> to use regular expression.
+All queries must match if the C<query_boolean> option is set to C<and>; only one
+query should match if the C<query_boolean> option is set to C<or>.
+
+=item * B<query_boolean> => I<str> (default: "and")
+
+Whether records must match all search queries ('and') or just one ('or').
+
+If set to C<and>, all queries must match; if set to C<or>, only one query should
+match. See the C<queries> option for more details on searching.
 
 =item * B<random> => I<bool> (default: 0)
 
@@ -2525,9 +2621,22 @@ Select fields to return.
 
 Select fields to return.
 
-=item * B<query> => I<str>
+=item * B<queries> => I<array[str]>
 
 Search.
+
+This will search all searchable fields with one or more specified queries. Each
+query can be in the form of C<-FOO> (dash prefix notation) to require that the
+fields do not contain specified string, or C</FOO/> to use regular expression.
+All queries must match if the C<query_boolean> option is set to C<and>; only one
+query should match if the C<query_boolean> option is set to C<or>.
+
+=item * B<query_boolean> => I<str> (default: "and")
+
+Whether records must match all search queries ('and') or just one ('or').
+
+If set to C<and>, all queries must match; if set to C<or>, only one query should
+match. See the C<queries> option for more details on searching.
 
 =item * B<random> => I<bool> (default: 0)
 

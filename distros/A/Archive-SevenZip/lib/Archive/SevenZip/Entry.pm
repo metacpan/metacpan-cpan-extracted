@@ -6,7 +6,7 @@ use Time::Piece; # for strptime
 use File::Basename ();
 use Path::Class ();
 
-our $VERSION= '0.15';
+our $VERSION= '0.16';
 
 sub new {
     my( $class, %options) = @_;
@@ -45,7 +45,8 @@ sub components {
 }
 
 sub lastModTime {
-    Time::Piece->strptime($_[0]->{Modified}, '%Y-%m-%d %H:%M:%S')->epoch;
+    (my $dt = $_[0]->{Modified}) =~ s/\.\d+$//;
+    Time::Piece->strptime($dt, '%Y-%m-%d %H:%M:%S')->epoch;
 }
 
 sub lastModFileDateTime {

@@ -1,3 +1,9 @@
+0.125   2022-08-28  Released-By: PERLANCAR; Urgency: medium
+
+        - Pass 'common_opts' and 'meta' in 'r' in 'extras' argument so they
+          get passed to Complete::Getopt::Long to extract summaries.
+
+
 0.124   2022-08-28  Released-By: PERLANCAR; Urgency: medium
 
         - Add summaries to subcommands completion.

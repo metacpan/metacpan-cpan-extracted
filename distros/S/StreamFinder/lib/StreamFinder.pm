@@ -127,18 +127,27 @@ B<SYNOPSIS> section above, save it to an executable text file, ie.
 I<StreamFinder.pl> and run it from the command line with a supported streaming 
 site URL as the argument.  You can then edit it to tailor it to your needs.
 
-The currently-supported websites are:  podcasts.apple.com (L<StreamFinder::Apple>), 
-bitchute.com (L<StreamFinder::Bitchute>), blogger.com (L<StreamFinder::Blogger>), 
-brandnewtube.com and ugetube.com (L<StreamFinder::BrandNewTube>), brighteon.com 
-(L<StreamFinder::Brighteon>), castbox.fm (L<StreamFinder::Castbox>), 
-podcasts.google.com (L<StreamFinder::Google>), 
-iheartradio.com (L<StreamFinder::IHeartRadio>), 
-odysee.com (L<StreamFinder::Odysee>), podbean.com (L<StreamFinder::Podbean>), 
-podcastaddict.com (L<StreamFinder::PodcastAddict>), 
-radio.net (L<StreamFinder::RadioNet>), rumble.com (L<StreamFinder::Rumble>),
-sermonaudio.com (L<StreamFinder::SermonAudio>), soundcloud.com 
-(L<StreamFinder::SoundCloud>), spreaker.com podcasts (L<StreamFinder::Spreaker>), 
-tunein.com (L<StreamFinder::Tunein>), vimeo.com (L<StreamFinder::Vimeo>), 
+The currently-supported websites are:  
+podcasts.apple.com podcasts (L<StreamFinder::Apple>), 
+bitchute.com videos (L<StreamFinder::Bitchute>), 
+blogger.com videos (L<StreamFinder::Blogger>), 
+brandnewtube.com and ugetube.com videos (L<StreamFinder::BrandNewTube>), 
+brighteon.com videos (L<StreamFinder::Brighteon>), 
+castbox.fm podcases (L<StreamFinder::Castbox>), 
+podcasts.google.com podcasts (L<StreamFinder::Google>), 
+iheartradio.com radio stations and podcasts (L<StreamFinder::IHeartRadio>), 
+www.internetradio.com radio stations (L<StreamFinder::InternetRadio>), 
+onlineradiobox.com radio stations (L<StreamFinder::OnlineRadiobox>), 
+odysee.com videos (L<StreamFinder::Odysee>), 
+podbean.com podcasts (L<StreamFinder::Podbean>), 
+podcastaddict.com podcasts (L<StreamFinder::PodcastAddict>), 
+radio.net radio stations (L<StreamFinder::RadioNet>), 
+rumble.com videos (L<StreamFinder::Rumble>),
+sermonaudio.com sermon audio and video (L<StreamFinder::SermonAudio>), soundcloud.com 
+soundcloud.com songs (L<StreamFinder::SoundCloud>), 
+spreaker.com podcasts (L<StreamFinder::Spreaker>), 
+tunein.com radio stations and podcasts(L<StreamFinder::Tunein>), 
+vimeo.com videos (L<StreamFinder::Vimeo>), 
 (youtube.com, et. al and other sites that youtube-dl supports) 
 (L<StreamFinder::Youtube>), and L<StreamFinder::Anystream> - search any (other) 
 webpage URL (not supported by any of the other submodules) for streams.  
@@ -487,7 +496,7 @@ use strict;
 use warnings;
 use vars qw(@ISA @EXPORT $VERSION);
 
-our $VERSION = '1.93';
+our $VERSION = '2.00';
 our $DEBUG = 0;
 
 require Exporter;
@@ -495,8 +504,8 @@ require Exporter;
 @ISA = qw(Exporter);
 @EXPORT = qw();
 my @supported_mods = (qw(Anystream Apple Bitchute Blogger BrandNewTube Brighteon Castbox Google
-		IHeartRadio Odysee Podbean PodcastAddict RadioNet Rumble SermonAudio SoundCloud Spreaker
-		Tunein Vimeo Youtube));
+		IHeartRadio InternetRadio Odysee OnlineRadiobox Podbean PodcastAddict RadioNet Rumble SermonAudio
+		SoundCloud	Spreaker	Subsplash Tunein Vimeo Youtube));
 
 my %useit;
 
@@ -581,6 +590,12 @@ sub new
 	} elsif ($url =~ m#\bpodbean\.com\/# && $useit{'Podbean'}) {
 		eval { require 'StreamFinder/Podbean.pm'; $haveit = 1; };
 		return new StreamFinder::Podbean($url, @args)  if ($haveit);
+	} elsif ($url =~ m#\bonlineradiobox\.# && $useit{'OnlineRadiobox'}) {
+		eval { require 'StreamFinder/OnlineRadiobox.pm'; $haveit = 1; };
+		return new StreamFinder::OnlineRadiobox($url, @args)  if ($haveit);
+	} elsif ($url =~ m#\binternet\-radio\.# && $useit{'InternetRadio'}) {
+		eval { require 'StreamFinder/InternetRadio.pm'; $haveit = 1; };
+		return new StreamFinder::InternetRadio($url, @args)  if ($haveit);
 	} elsif ($url =~ m#\bsoundcloud\.# && $useit{'SoundCloud'}) {
 		eval { require 'StreamFinder/SoundCloud.pm'; $haveit = 1; };
 		return new StreamFinder::SoundCloud($url, @args)  if ($haveit);

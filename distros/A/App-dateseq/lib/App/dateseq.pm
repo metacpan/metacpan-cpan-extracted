@@ -7,9 +7,9 @@ use warnings;
 use Scalar::Util qw(blessed);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-09'; # DATE
+our $DATE = '2022-10-12'; # DATE
 our $DIST = 'App-dateseq'; # DIST
-our $VERSION = '0.111'; # VERSION
+our $VERSION = '0.112'; # VERSION
 
 our %SPEC;
 
@@ -524,7 +524,7 @@ App::dateseq - Generate a sequence of dates
 
 =head1 VERSION
 
-This document describes version 0.111 of App::dateseq (from Perl distribution App-dateseq), released on 2022-09-09.
+This document describes version 0.112 of App::dateseq (from Perl distribution App-dateseq), released on 2022-10-12.
 
 =head1 FUNCTIONS
 

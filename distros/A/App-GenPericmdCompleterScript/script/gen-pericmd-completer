@@ -12,7 +12,7 @@ use Perinci::CmdLine::Any;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-08-28'; # DATE
 our $DIST = 'App-GenPericmdCompleterScript'; # DIST
-our $VERSION = '0.124'; # VERSION
+our $VERSION = '0.125'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/GenPericmdCompleterScript/gen_pericmd_completer_script",
@@ -36,7 +36,7 @@ gen-pericmd-completer - Generate Perinci::CmdLine completer script
 
 =head1 VERSION
 
-This document describes version 0.124 of gen-pericmd-completer (from Perl distribution App-GenPericmdCompleterScript), released on 2022-08-28.
+This document describes version 0.125 of gen-pericmd-completer (from Perl distribution App-GenPericmdCompleterScript), released on 2022-08-28.
 
 =head1 SYNOPSIS
 

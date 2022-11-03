@@ -12,7 +12,7 @@ use Getopt::Long;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-08-21'; # DATE
 our $DIST = 'App-ThisDist'; # DIST
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.018'; # VERSION
 
 my ($quiet, $extract_version);
 Getopt::Long::Configure("bundling", "no_ignore_case");
@@ -49,7 +49,7 @@ this-dist - Return name of Perl distribution associated with the current directo
 
 =head1 VERSION
 
-This document describes version 0.017 of this-dist (from Perl distribution App-ThisDist), released on 2022-08-21.
+This document describes version 0.018 of this-dist (from Perl distribution App-ThisDist), released on 2022-08-21.
 
 =head1 SYNOPSIS
 

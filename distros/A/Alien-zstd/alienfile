@@ -1,6 +1,12 @@
 use alienfile;
 
 plugin PkgConfig => 'libzstd';
+plugin 'Probe::CommandLine' => (
+  command   => 'zstd',
+  args      => [ '--version' ],
+  match     => qr/zstd command line interface/,
+  secondary => 1,
+);
 
 share {
   plugin 'Download::GitHub' => (

@@ -31,7 +31,7 @@ Archive::SevenZip - Read/write 7z , zip , ISO9960 and other archives
 
 =cut
 
-our $VERSION= '0.15';
+our $VERSION= '0.16';
 
 # Archive::Zip API
 # Error codes
@@ -460,10 +460,6 @@ sub get_command {
         $_ = encode $options{ fs_encoding }, $_;
     };
 
-    # Now quote what needs to be quoted
-    for( @{ $options{ options }}, @{ $options{ members }}, $options{ archivename }, "$self->{ '7zip' }") {
-    };
-
     my $add_quote = $self->{system_needs_quotes};
     return [grep {defined $_}
         add_quotes($add_quote, $self->{ '7zip' }),
@@ -471,7 +467,7 @@ sub get_command {
         $options{ command },
         @charset,
         add_quotes($add_quote, @{ $options{ options }} ),
-        "--",
+        # "--",
         add_quotes($add_quote, $options{ archivename } ),
         add_quotes($add_quote, @{ $options{ members }} ),
     ];
@@ -487,7 +483,7 @@ sub run {
 
     my $fh;
     warn "Opening [@$cmd]"
-        if $options{ verbose };
+        if $options{ verbose } || $self->{verbose};
 
     if( $self->{verbose} ) {
         CORE::open( $fh, $mode, @$cmd)
@@ -724,7 +720,6 @@ sub add {
         if( $options{ recursive }) {
             push @options, '-r';
         };
-
         my $cmd = $self->get_command(
             command => 'a',
             archivename => $self->archive_or_temp,

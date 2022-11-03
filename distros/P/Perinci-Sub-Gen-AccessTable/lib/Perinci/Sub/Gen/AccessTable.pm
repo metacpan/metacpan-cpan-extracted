@@ -1,14 +1,12 @@
 package Perinci::Sub::Gen::AccessTable;
 
-our $DATE = '2021-07-29'; # DATE
-our $VERSION = '0.587'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 use experimental 'smartmatch';
 use Log::ger;
 
+use Exporter 'import';
 use Function::Fallback::CoreOrPP qw(clone);
 use List::Util qw(shuffle);
 use Locale::Set qw(:locale_h setlocale);
@@ -18,8 +16,11 @@ use Perinci::Sub::Gen;
 use Perinci::Sub::Util qw(err);
 #use String::Trim::More qw(trim_blank_lines);
 
-require Exporter;
-our @ISA       = qw(Exporter);
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-11-02'; # DATE
+our $DIST = 'Perinci-Sub-Gen-AccessTable'; # DIST
+our $VERSION = '0.590'; # VERSION
+
 our @EXPORT_OK = qw(gen_read_table_func);
 
 our %SPEC;
@@ -78,6 +79,10 @@ sub _add_arg {
 
     if (defined $args{pos}) {
         $arg_spec->{pos} = $args{pos};
+    }
+
+    if (defined $args{slurpy}) {
+        $arg_spec->{slurpy} = $args{slurpy};
     }
 
     if ($args{extra_props}) {
@@ -180,7 +185,7 @@ _
         func_meta   => $func_meta,
         langs       => $langs,
         name        => 'fields',
-        type        => ['array*' => {of=>['str*', in=>[keys %{$table_spec->{fields}}]]}],
+        type        => ['array*' => {of=>['str*', {in=>[keys %{$table_spec->{fields}}]}]}],
         default     => $opts->{default_fields},
         aliases     => $opts->{fields_aliases},
         cat_name    => 'field-selection',
@@ -194,7 +199,7 @@ _
         func_meta   => $func_meta,
         langs       => $langs,
         name        => 'exclude_fields',
-        type        => ['array*' => {of=>['str*', in=>[keys %{$table_spec->{fields}}]]}],
+        type        => ['array*' => {of=>['str*', {in=>[keys %{$table_spec->{fields}}]}]}],
         default     => $opts->{default_exclude_fields},
         aliases     => $opts->{exclude_fields_aliases},
         cat_name    => 'field-selection',
@@ -260,13 +265,46 @@ _
     _add_arg(
         func_meta   => $func_meta,
         langs       => $langs,
-        name        => 'query',
-        aliases     => $opts->{query_aliases},
-        type        => 'str',
+        name        => 'queries',
+        aliases     => $opts->{queries_aliases},
+        type        => ['array*', of=>'str*'],
         cat_name    => 'filtering',
         cat_text    => N__('filtering'),
         summary     => N__("Search"),
         pos         => 0,
+        slurpy      => 1,
+        extra_props => {
+            'x.name.is_plural' => 1,
+            'x.name.singular' => 'query',
+        },
+        description => N__(<<'_',
+
+This will search all searchable fields with one or more specified queries. Each
+query can be in the form of `-FOO` (dash prefix notation) to require that the
+fields do not contain specified string, or `/FOO/` to use regular expression.
+All queries must match if the `query_boolean` option is set to `and`; only one
+query should match if the `query_boolean` option is set to `or`.
+
+_
+                       )
+    ) if $opts->{enable_filtering} && $opts->{enable_search};
+    _add_arg(
+        func_meta   => $func_meta,
+        langs       => $langs,
+        name        => 'query_boolean',
+        aliases     => $opts->{query_boolean_aliases},
+        type        => ['str*', {in=>['and','or']}],
+        default     => $opts->{default_query_boolean} // 'and',
+        cat_name    => 'filtering',
+        cat_text    => N__('filtering'),
+        summary     => N__("Whether records must match all search queries ('and') or just one ('or')"),
+        description => N__(<<'_',
+
+If set to `and`, all queries must match; if set to `or`, only one query should
+match. See the `queries` option for more details on searching.
+
+_
+                       )
     ) if $opts->{enable_filtering} && $opts->{enable_search};
 
     # add filter arguments for each table field
@@ -658,21 +696,26 @@ sub __parse_query {
         }
     }
 
+    my $search_re;
+    my $search_opts = {ci => $opts->{case_insensitive_search}};
     my @searchable_fields = grep {
         !defined($fspecs->{$_}{searchable}) || $fspecs->{$_}{searchable}
         } @fields;
-    my $cis = $opts->{case_insensitive_search};
-    my $search_opts = {ci => $cis};
-    my $search_re;
-    my $q = $args->{query};
-    if (defined $q) {
-        if ($opts->{word_search}) {
-            $search_re = $cis ? qr/\b$q\b/i : qr/\b$q\b/;
-        } else {
-            $search_re = $cis ? qr/$q/i : qr/$q/;
-        }
+    my $q  = $args->{query}; # old, still supported
+    my $qq = $args->{queries};
+    my @qq = defined $qq && @$qq ? @$qq : defined $q ? ($q) : ();
+    if (@qq) {
+        require String::Query::To::Regexp;
+        $search_re = String::Query::To::Regexp::query2re(
+            {
+                word => $opts->{word_search},
+                bool => $args->{query_boolean} // $opts->{default_query_boolean} // 'and',
+                ci   => $opts->{case_insensitive_search},
+                re   => 1,
+            },
+            @qq);
     }
-    $query->{query} = $args->{query};
+    $query->{queries} = @qq ? \@qq : undef;
     $query->{search_opts} = $args->{search_opts};
     unless ($opts->{custom_search}) {
         $query->{search_fields} = \@searchable_fields;
@@ -805,7 +848,7 @@ sub _gen_func {
         no warnings; # silence undef warnings when comparing record values
 
         log_trace("(read_table_func) Filtering ...");
-        my $q = $query->{query};
+        my $qq = $query->{queries};
         my $search_re = $query->{search_re};
 
         if (grep { $_->[1] eq 'date' } @{ $query->{filters} }) {
@@ -976,10 +1019,10 @@ sub _gen_func {
                 }
             }
 
-            if (defined $q) {
+            if (defined $qq) {
                 if ($opts->{custom_search}) {
                     next REC unless $opts->{custom_search}->(
-                        $r_h, $q, $query->{search_opts});
+                        $r_h, $qq, $query->{search_opts});
                 } else {
                     my $match;
                     for my $f (@{$query->{search_str_fields}}) {
@@ -1134,12 +1177,19 @@ arguments.
   prefix before the field name signifies descending instead of ascending order.
   Multiple fields are allowed for secondary sort fields.
 
-* *q* => STR
+* *q* => ARRAY[STR]
 
   A filtering option. By default, all fields except those specified with
   searchable=0 will be searched using simple case-insensitive string search.
   There are a few options to customize this, using these gen arguments:
-  *word_search*, *case_insensitive_search*, and *custom_search*.
+  *word_search*, *case_insensitive_search*, *custom_search*,
+  *default_query_boolean*.
+
+* *query_boolean* => STR
+
+  Either `and` or `or`. Default can be set with gen argument
+  *default_query_boolean*. With `and`, all the words in *q* argument must match.
+  With `or`, only one of the words in *q* argument must match.
 
 * Filter arguments
 
@@ -1326,6 +1376,11 @@ Can be used to supply default filters, e.g.
 
 _
         },
+        default_query_boolean => {
+            schema => ['str', {in=>['and', 'or']}],
+            default => 'and',
+            summary => "Specify default for --query-boolean option",
+        },
         case_insensitive_search => {
             schema => ['bool' => {
                 default => 1,
@@ -1457,7 +1512,7 @@ _
         random_aliases => {
             schema => 'hash*',
         },
-        query_aliases => {
+        queries_aliases => {
             schema => 'hash*',
         },
 
@@ -1542,7 +1597,12 @@ sub gen_read_table_func {
         result_limit_aliases       => $args{result_limit_aliases},
 
         result_start_aliases       => $args{result_start_aliases},
-        query_aliases              => $args{query_aliases} // {q=>{}},
+
+        query_aliases              => $args{query_aliases} // {q=>{}}, # old, still supported
+        queries_aliases            => $args{queries_aliases} // {q=>{}},
+
+        default_query_boolean      => $args{default_query_boolean} // 'and',
+        query_boolean_aliases      => $args{query_boolean_aliases} // {and=>{is_flag=>1, summary=>"Shortcut for --query-boolean=and", code=>sub{$_[0]{query_boolean}='and'}}, or=>{is_flag=>1, summary=>"Shortcut for --query-boolean=or", code=>sub{$_[0]{query_boolean}='or'}}},
 
         enable_filtering           => $args{enable_filtering} // 1,
         enable_search              => $args{enable_search} // 1,
@@ -1572,7 +1632,7 @@ sub gen_read_table_func {
     my $func = $res->[2];
 
     if ($args{install} // 1) {
-        no strict 'refs';
+        no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
         no warnings;
         log_trace("Installing function as %s ...", $fqname);
         *{ $fqname } = $func;
@@ -1597,7 +1657,7 @@ Perinci::Sub::Gen::AccessTable - Generate function (and its metadata) to read ta
 
 =head1 VERSION
 
-This document describes version 0.587 of Perinci::Sub::Gen::AccessTable (from Perl distribution Perinci-Sub-Gen-AccessTable), released on 2021-07-29.
+This document describes version 0.590 of Perinci::Sub::Gen::AccessTable (from Perl distribution Perinci-Sub-Gen-AccessTable), released on 2022-11-02.
 
 =head1 SYNOPSIS
 
@@ -1701,12 +1761,6 @@ paging. The resulting function can then be run via command-line using
 L<Perinci::CmdLine> (as demonstrated in Synopsis), or served via HTTP using
 L<Perinci::Access::HTTP::Server>, or consumed normally by Perl programs.
 
-=head1 CONTRIBUTOR
-
-=for stopwords Steven Haryanto
-
-Steven Haryanto <sharyanto@cpan.org>
-
 =head1 FUNCTIONS
 
 
@@ -1767,12 +1821,19 @@ The sort argument is an ordering option, containing names of field. A C<->
 prefix before the field name signifies descending instead of ascending order.
 Multiple fields are allowed for secondary sort fields.
 
-=item * I<q> => STR
+=item * I<q> => ARRAY[STR]
 
 A filtering option. By default, all fields except those specified with
 searchable=0 will be searched using simple case-insensitive string search.
 There are a few options to customize this, using these gen arguments:
-I<word_search>, I<case_insensitive_search>, and I<custom_search>.
+I<word_search>, I<case_insensitive_search>, I<custom_search>,
+I<default_query_boolean>.
+
+=item * I<query_boolean> => STR
+
+Either C<and> or C<or>. Default can be set with gen argument
+I<default_query_boolean>. With C<and>, all the words in I<q> argument must match.
+With C<or>, only one of the words in I<q> argument must match.
 
 =item * Filter arguments
 
@@ -1866,6 +1927,10 @@ Supply default 'exclude_fields' value for function arg spec.
 
 Supply default 'fields' value for function arg spec.
 
+=item * B<default_query_boolean> => I<str> (default: "and")
+
+Specify default for --query-boolean option.
+
 =item * B<default_random> => I<bool>
 
 Supply default 'random' value in generated function's metadata.
@@ -1887,6 +1952,8 @@ Supply default 'with_field_names' value in generated function's metadata.
 Generated function's description.
 
 =item * B<detail_aliases> => I<hash>
+
+(No description)
 
 =item * B<enable_field_selection> => I<bool> (default: 1)
 
@@ -1918,6 +1985,8 @@ Filtering must also be enabled (C<enable_filtering>).
 
 =item * B<exclude_fields_aliases> => I<hash>
 
+(No description)
+
 =item * B<extra_args> => I<hash>
 
 Extra arguments for the generated function.
@@ -1927,6 +1996,8 @@ Extra arguments for the generated function.
 Extra metadata properties for the generated function metadata.
 
 =item * B<fields_aliases> => I<hash>
+
+(No description)
 
 =item * B<hooks> => I<hash>
 
@@ -1989,15 +2060,25 @@ supply this if you set C<install> to false.
 
 If not specified, caller's package will be used by default.
 
-=item * B<query_aliases> => I<hash>
+=item * B<queries_aliases> => I<hash>
+
+(No description)
 
 =item * B<random_aliases> => I<hash>
 
+(No description)
+
 =item * B<result_limit_aliases> => I<hash>
+
+(No description)
 
 =item * B<result_start_aliases> => I<hash>
 
+(No description)
+
 =item * B<sort_aliases> => I<hash>
+
+(No description)
 
 =item * B<summary> => I<str>
 
@@ -2048,6 +2129,8 @@ true).
 
 =item * B<with_field_names_aliases> => I<hash>
 
+(No description)
+
 =item * B<word_search> => I<bool> (default: 0)
 
 Decide whether generated function will perform word searching instead of string searching.
@@ -2096,18 +2179,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Su
 
 Source repository is at L<https://github.com/perlancar/perl-Perinci-Sub-Gen-AccessTable>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Sub-Gen-AccessTable>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
-=head1 CAVEATS
-
-It is often not a good idea to expose your database schema directly as API.
-
 =head1 SEE ALSO
 
 L<Perinci::Sub::Gen::AccessTable::Simple> for a simpler variant.
@@ -2120,11 +2191,47 @@ L<Perinci::CmdLine>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2020, 2019, 2018, 2017, 2016, 2015, 2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Sub-Gen-AccessTable>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 CAVEATS
+
+It is often not a good idea to expose your database schema directly as API.
 
 =cut

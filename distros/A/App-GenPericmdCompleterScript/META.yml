@@ -19,7 +19,7 @@ name: App-GenPericmdCompleterScript
 provides:
   App::GenPericmdCompleterScript:
     file: lib/App/GenPericmdCompleterScript.pm
-    version: '0.124'
+    version: '0.125'
 requires:
   App::depak: '0.584'
   Complete::Bash: '0.333'
@@ -53,7 +53,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-GenPericmdCompleterScript
   homepage: https://metacpan.org/release/App-GenPericmdCompleterScript
   repository: git://github.com/perlancar/perl-App-GenPericmdCompleterScript.git
-version: '0.124'
+version: '0.125'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

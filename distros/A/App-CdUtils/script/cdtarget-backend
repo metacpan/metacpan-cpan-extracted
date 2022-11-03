@@ -1,0 +1,126 @@
+#!perl
+
+use strict;
+use warnings;
+
+use Path::Tiny;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-09-30'; # DATE
+our $DIST = 'App-CdUtils'; # DIST
+our $VERSION = '0.006'; # VERSION
+
+our $DEBUG = $ENV{DEBUG};
+
+if (@ARGV != 1) { warn "Usage: cdtarget <symlink>\n"; print ".\n"; exit }
+
+my $target = readlink($ARGV[0]);
+unless (defined $target) { warn "cdtarget: $ARGV[0] not a symlink\n"; print ".\n"; exit }
+
+my $targetp = path($target);
+unless ($targetp->is_absolute) {
+    $targetp = $targetp->absolute( path($ARGV[0])->parent );
+}
+
+if ($targetp->is_dir) {
+    print "$targetp\n"; exit;
+} else {
+    print $targetp->parent, "\n"; exit;
+}
+
+# ABSTRACT: Change directory to symlink target's directory
+# PODNAME: cdtarget-backend
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+cdtarget-backend - Change directory to symlink target's directory
+
+=head1 VERSION
+
+This document describes version 0.006 of cdtarget-backend (from Perl distribution App-CdUtils), released on 2022-09-30.
+
+=head1 SYNOPSIS
+
+To use in shell:
+
+ % cdtarget() { cd `cdtarget-backend "$1"`; }
+
+ % pwd
+ /tmp
+
+ % file p1todo p2
+ p1todo: symbolic link to /home/u1/Documents/project1/todo.txt
+ p2: symbolic link to /home/u1/Documents/project2
+
+ % cdtarget p1todo
+
+ % pwd
+ /home/u1/Documents/project1
+
+ % cdtarget p2
+
+ % pwd
+ /home/u1/Documents/project2
+
+=head1 DESCRIPTION
+
+B<cdtarget> is a command to change directory to a symlink target's directory. If
+the target is already a directory then it will be used directly, otherwise it's
+the target's directory that is used.
+
+=head1 ENVIRONMENT
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-CdUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-CdUtils>.
+
+=head1 SEE ALSO
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2016 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-CdUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

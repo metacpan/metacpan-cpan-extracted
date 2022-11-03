@@ -2,7 +2,7 @@ NAME
     App::FirefoxUtils - Utilities related to Firefox
 
 VERSION
-    This document describes version 0.020 of App::FirefoxUtils (from Perl
+    This document describes version 0.021 of App::FirefoxUtils (from Perl
     distribution App-FirefoxUtils), released on 2022-10-09.
 
 SYNOPSIS

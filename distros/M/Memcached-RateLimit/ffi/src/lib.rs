@@ -111,6 +111,10 @@ thread_local!(
 
 #[no_mangle]
 pub extern "C" fn rl_new(url: *const i8) -> u64 {
+    if url.is_null() {
+        return 0;
+    }
+
     let url = unsafe { CStr::from_ptr(url) };
     let rl = match Rl::new(url) {
         Ok(rl) => rl,
@@ -139,7 +143,11 @@ pub extern "C" fn rl__rate_limit(
     rate_max: u32,
     rate_seconds: u32,
 ) -> i32 {
-    let prefix = unsafe { CStr::from_ptr(prefix) };
+    let prefix = if prefix.is_null() {
+        unsafe { CStr::from_ptr(b"\0".as_ptr() as *const i8) }
+    } else {
+        unsafe { CStr::from_ptr(prefix) }
+    };
 
     STORE.with(|it| {
         return match it.borrow_mut().get_mut(&index) {

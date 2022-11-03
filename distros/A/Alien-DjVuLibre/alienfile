@@ -1,5 +1,41 @@
 use alienfile;
 
+requires 'File::Which';
+
+# Probe for these tools by default in addition to the library. This can be
+# overridden by setting `ALIEN_DJVULIBRE_PROBE_TOOLS`:
+#
+#   - Set ALIEN_DJVULIBRE_PROBE_TOOLS=0 to disable probe for tools.
+#   - Set ALIEN_DJVULIBRE_PROBE_TOOLS to space-delimited list of alternative
+#     tools to probe.
+my @DEFAULT_PROBE_TOOLS = qw{ddjvu c44 djvm};
+
+my @should_probe_tools = exists $ENV{ALIEN_DJVULIBRE_PROBE_TOOLS}
+	? ( $ENV{ALIEN_DJVULIBRE_PROBE_TOOLS} ne '0'
+		? split(' ', $ENV{ALIEN_DJVULIBRE_PROBE_TOOLS})
+		: ()
+	)
+	: @DEFAULT_PROBE_TOOLS;
+
+meta->around_hook( probe => sub {
+	my $orig = shift;
+	my ($build) = @_;
+	my $install_type = $orig->(@_);
+
+	return $install_type unless @should_probe_tools;
+
+	if( $install_type eq 'system' ) {
+		my @missing_tools = grep { ! File::Which::which($_) } @should_probe_tools;
+		if( ! @missing_tools ) {
+			return 'system';
+		} else {
+			$build->log("Missing tools [ @missing_tools ] requires share install");
+			return 'share';
+		}
+	}
+
+	return $install_type;
+});
 plugin 'PkgConfig' => 'ddjvuapi';
 
 share {

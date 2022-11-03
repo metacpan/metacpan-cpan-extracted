@@ -21,6 +21,8 @@ t/20-methods.t
 t/30-custom-shortcuts.t
 t/31-standard.t
 t/50-Moo.t
+t/51-Moo-Role.t
+t/52-subname.t
 t/90-extensions.t
 t/author-pod-syntax.t
 t/lib/CustomBuilder.pm

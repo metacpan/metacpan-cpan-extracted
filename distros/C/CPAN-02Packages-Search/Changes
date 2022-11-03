@@ -1,4 +1,7 @@
 Revision history for CPAN-02Packages-Search
 
+0.002  2022-11-03 09:12:57 JST
+    - No functional changes, update dist.ini
+
 0.001  2021-02-21 12:01:38 JST
     - Initial release

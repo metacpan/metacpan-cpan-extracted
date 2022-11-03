@@ -2930,6 +2930,14 @@ domain.
 Also remove any checkpoint metadata when undefining the virtual
 domain.
 
+=item Sys::Virt::Domain::UNDEFINE_TPM
+
+Also remove any TPM state when undefining the virtual domain.
+
+=item Sys::Virt::Domain::UNDEFINE_KEEP_TPM
+
+Keep TPM state when undefining the virtual domain.
+
 =back
 
 =head2 JOB TYPES
@@ -4698,6 +4706,11 @@ Memory bandwidth statistics values
 =item Sys::Virt::Domain::STATS_DIRTYRATE
 
 Memory dirty rate statistics
+
+=item Sys::Virt::Domain::STATS_VM
+
+Hypervisor-specific stats fields for given VM
+
 
 =back
 

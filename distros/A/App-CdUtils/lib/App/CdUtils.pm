@@ -1,13 +1,13 @@
 package App::CdUtils;
 
-our $DATE = '2016-10-28'; # DATE
-our $VERSION = '0.005'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 
-#our %SPEC;
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-09-30'; # DATE
+our $DIST = 'App-CdUtils'; # DIST
+our $VERSION = '0.006'; # VERSION
 
 1;
 
@@ -25,7 +25,7 @@ App::CdUtils - CLI utilities related to changing directories
 
 =head1 VERSION
 
-This document describes version 0.005 of App::CdUtils (from Perl distribution App-CdUtils), released on 2016-10-28.
+This document describes version 0.006 of App::CdUtils (from Perl distribution App-CdUtils), released on 2022-09-30.
 
 =head1 DESCRIPTION
 
@@ -34,6 +34,8 @@ This distribution contains the following utilities:
 =over
 
 =item * L<cdpart-backend>
+
+=item * L<cdtarget-backend>
 
 =item * L<cdtree-backend>
 
@@ -47,6 +49,35 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-CdUtil
 
 Source repository is at L<https://github.com/perlancar/perl-App-CdUtils>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2016 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-CdUtils>
@@ -54,16 +85,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2016 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

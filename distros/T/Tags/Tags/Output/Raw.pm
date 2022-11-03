@@ -15,7 +15,7 @@ Readonly::Scalar my $EMPTY_STR => q{};
 Readonly::Scalar my $LAST_INDEX => -1;
 Readonly::Scalar my $SPACE => q{ };
 
-our $VERSION = 0.12;
+our $VERSION = 0.13;
 
 # Finalize Tags output.
 sub finalize {
@@ -280,7 +280,9 @@ sub _put_data {
 	}
 
 	# Process data callback.
-	if (none { $_ eq $self->{'printed_tags'}->[0] } @{$self->{'no_data_callback'}}) {
+	if (none { defined $self->{'printed_tags'}->[0] && $_ eq $self->{'printed_tags'}->[0] }
+		@{$self->{'no_data_callback'}}) {
+
 		$self->_process_callback(\@character_data, 'data_callback');
 	}
 
@@ -721,6 +723,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.12
+0.13
 
 =cut

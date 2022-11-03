@@ -1,5 +1,12 @@
 Change log for Sys::OsPackage
 
+0.3.1 2022-11-02T22:29:47-07:00 America/Los_Angeles
+ [BUG FIXES]
+ - Back off 010_fetch_reqs.t until it works from both desktop CLI and
+   container environment. (GH-1)
+ - new share/sys-ospkg-test directory with container test tool used to
+   investigate CPAN Testers' breakage report
+
 0.3.0 2022-10-30T20:08:27-07:00 America/Los_Angeles
  [DOCS]
  - add docs for CLI options: --debug --quiet --notest --sudo

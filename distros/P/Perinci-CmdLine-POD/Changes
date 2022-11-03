@@ -1,3 +1,9 @@
+0.038   2022-10-27  Released-By: PERLANCAR; Urgency: medium
+
+        - In showing examples, Replace *all* occurrences of '[[prog]]'
+          instead of only one.
+
+
 0.037   2022-10-15  Released-By: PERLANCAR; Urgency: medium
 
         - Tweaks.

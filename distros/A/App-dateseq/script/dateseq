@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-09'; # DATE
+our $DATE = '2022-10-12'; # DATE
 our $DIST = 'App-dateseq'; # DIST
-our $VERSION = '0.111'; # VERSION
+our $VERSION = '0.112'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/dateseq/dateseq",
@@ -38,11 +38,11 @@ dateseq - Generate a sequence of dates
 
 =head1 VERSION
 
-This document describes version 0.111 of dateseq (from Perl distribution App-dateseq), released on 2022-09-09.
+This document describes version 0.112 of dateseq (from Perl distribution App-dateseq), released on 2022-10-12.
 
 =head1 SYNOPSIS
 
-B<dateseq> [B<--business>|B<--no-business>|B<--nobusiness>] [B<--business6>|B<--no-business6>|B<--nobusiness6>] [B<--eval>=I<str>|B<-e>=I<str>] [(B<--exclude-dow>=I<date::dow_nums>)+|B<--exclude-dow-json>=I<json>] [(B<--exclude-month>=I<date::month_nums>)+|B<--exclude-month-json>=I<json>] [B<--format-class-attrs>=I<s>|B<--format-class-attrs-json>=I<json>] [B<--format-class>=I<perl::modname>] [B<--format>=I<name>|B<--json>] [B<--header>=I<str>] [(B<--include-dow>=I<date::dow_nums>)+|B<--include-dow-json>=I<json>] [(B<--include-month>=I<date::month_nums>)+|B<--include-month-json>=I<json>] [B<--limit-monthly>=I<posint>] [B<--limit-yearly>=I<posint>] [B<--limit>=I<posint>|B<-n>=I<posint>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--random>] [B<--reverse>|B<-r>] [B<--strftime>=I<str>|B<-f>=I<str>] -- [I<from>] [I<to>] [I<increment>]
+B<dateseq> [L<--business|/"--business">|L<--no-business|/"--business">|L<--nobusiness|/"--business">] [L<--business6|/"--business6">|L<--no-business6|/"--business6">|L<--nobusiness6|/"--business6">] [L<--eval|/"--eval=s, -e">=I<str>|L<-e|/"--eval=s, -e">=I<str>] [(L<--exclude-dow|/"--exclude-dow=s@">=L<date::dow_nums|Sah::Schema::date::dow_nums>)+|L<--exclude-dow-json|/"--exclude-dow=s@">=I<json>] [(L<--exclude-month|/"--exclude-month=s@">=L<date::month_nums|Sah::Schema::date::month_nums>)+|L<--exclude-month-json|/"--exclude-month=s@">=I<json>] [L<--format-class-attrs|/"--format-class-attrs=s">=I<s>|L<--format-class-attrs-json|/"--format-class-attrs=s">=I<json>] [L<--format-class|/"--format-class=s">=L<perl::modname|Sah::Schema::perl::modname>] [L<--format|/"--format=s">=I<name>|L<--json|/"--json">] [L<--header|/"--header=s">=I<str>] [(L<--include-dow|/"--include-dow=s@">=L<date::dow_nums|Sah::Schema::date::dow_nums>)+|L<--include-dow-json|/"--include-dow=s@">=I<json>] [(L<--include-month|/"--include-month=s@">=L<date::month_nums|Sah::Schema::date::month_nums>)+|L<--include-month-json|/"--include-month=s@">=I<json>] [L<--limit-monthly|/"--limit-monthly=s">=L<posint|Sah::Schema::posint>] [L<--limit-yearly|/"--limit-yearly=s">=L<posint|Sah::Schema::posint>] [L<--limit|/"--limit=s, -n">=L<posint|Sah::Schema::posint>|L<-n|/"--limit=s, -n">=L<posint|Sah::Schema::posint>] [L<--(no)naked-res|/"--naked-res">] [L<--page-result|/"--page-result">[=I<program>]|L<--view-result|/"--view-result">[=I<program>]] [L<--random|/"--random">] [L<--reverse|/"--reverse, -r">|L<-r|/"--reverse, -r">] [L<--strftime|/"--strftime=s, -f">=I<str>|L<-f|/"--strftime=s, -f">=I<str>] -- [L<from|/"--from=s">] [L<to|/"--to=s">] [L<increment|/"--increment=s, -i">]
 
 
 
@@ -355,11 +355,11 @@ For fish and zsh, install L<shcompgen> as described above.
 =head2 Generate dates from yesterday to 2 weeks from now
 
  % dateseq yesterday "2 weeks from now"
- 2022-09-08T00:00:00
- 2022-09-09T00:00:00
+ 2022-10-11T00:00:00
+ 2022-10-12T00:00:00
  ... 12 more lines ...
- 2022-09-22T00:00:00
- 2022-09-23T00:00:00
+ 2022-10-25T00:00:00
+ 2022-10-26T00:00:00
 
 =head2 Generate dates from 2015-01-31 to 2015-01-01 (reverse)
 
@@ -542,11 +542,11 @@ See also L<dateseq-idn> as alternative.
 =head2 Generate 100 random dates between a certain range
 
  % dateseq --random --from "1 year ago" --to "1 year from now" --limit 100
- 2022-05-06T20:46:43
- 2022-11-03T01:13:45
+ 2022-09-08T14:55:06
+ 2022-03-20T12:07:01
  ... 96 more lines ...
- 2023-01-30T06:56:27
- 2023-07-31T17:33:44
+ 2022-01-02T07:23:33
+ 2022-12-31T03:43:00
 
 =head1 HOMEPAGE
 

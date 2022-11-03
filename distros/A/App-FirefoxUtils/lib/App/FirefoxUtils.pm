@@ -8,7 +8,7 @@ use Log::ger;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-10-09'; # DATE
 our $DIST = 'App-FirefoxUtils'; # DIST
-our $VERSION = '0.020'; # VERSION
+our $VERSION = '0.021'; # VERSION
 
 our %SPEC;
 
@@ -172,7 +172,7 @@ App::FirefoxUtils - Utilities related to Firefox
 
 =head1 VERSION
 
-This document describes version 0.020 of App::FirefoxUtils (from Perl distribution App-FirefoxUtils), released on 2022-10-09.
+This document describes version 0.021 of App::FirefoxUtils (from Perl distribution App-FirefoxUtils), released on 2022-10-09.
 
 =head1 SYNOPSIS
 

@@ -2,11 +2,14 @@ Changes
 Makefile.PL
 MANIFEST
 README
+LICENSE
+CONTRIBUTING.md
 t/CryptoTron-JsonHttp.t
+lib/CryptoTron/Modules.pm
 lib/CryptoTron/JsonHttp.pm
 lib/CryptoTron/GetAccount.pm
-lib/CryptoTron/GetAccountResource.pm
 lib/CryptoTron/GetAccountNet.pm
+lib/CryptoTron/GetAccountResource.pm
 lib/CryptoTron/GetReward.pm
 lib/CryptoTron/ParseAccount.pm
 lib/CryptoTron/WithdrawBalance.pm

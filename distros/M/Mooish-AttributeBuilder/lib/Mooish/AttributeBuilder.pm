@@ -1,11 +1,18 @@
 package Mooish::AttributeBuilder;
-$Mooish::AttributeBuilder::VERSION = '1.001';
+$Mooish::AttributeBuilder::VERSION = '1.002';
 use v5.10;
 use strict;
 use warnings;
 
 use Carp qw(croak);
 use Scalar::Util qw(blessed);
+
+my $set_subname;
+BEGIN {
+	if (eval { require Sub::Util } && Sub::Util->VERSION >= 1.40) {
+		$set_subname = \&Sub::Util::set_subname;
+	}
+}
 
 ### These subs can be extended in subclasses
 
@@ -67,14 +74,19 @@ sub method_prefixes
 sub import
 {
 	my ($self, $caller) = (shift, scalar caller);
+	state $export_cache = {};
 
-	my %flags = map { $_ => 1 } @_;
+	my %flags = map { $_ => $_ } @_;
 
+	my $cache_key = $self . ($flags{-standard} || '');
 	foreach my $type (keys %{$self->attribute_types}) {
-		my $function = sub {
+		my $function = $export_cache->{$cache_key . $type} //= sub {
 			my ($name, %args) = @_;
 			return $self->expand_shortcuts($flags{-standard}, $type => $name, %args);
 		};
+
+		$set_subname->("${self}::${type}", $function)
+			if $set_subname;
 
 		NO_STRICT: {
 			no strict 'refs';

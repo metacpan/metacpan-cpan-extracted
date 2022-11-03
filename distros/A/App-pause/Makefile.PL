@@ -32,14 +32,14 @@ my %WriteMakefileArgs = (
     "Log::ger::Output::Screen" => "0.018",
     "Log::ger::Output::SimpleFile" => 0,
     "Log::ger::Util" => "0.037",
-    "Perinci::CmdLine::Util::Config" => "1.724",
-    "Perinci::Result::Format::Lite" => "0.282",
+    "Perinci::CmdLine::Util::Config" => "1.725",
+    "Perinci::Result::Format::Lite" => "0.286",
     "Scalar::Util" => 0,
     "Scalar::Util::Numeric" => 0,
     "Scalar::Util::Numeric::PP" => 0,
     "Time::Duration::Parse::AsHash" => 0,
     "Time::Local" => "1.27",
-    "WWW::PAUSE::Simple" => "0.452",
+    "WWW::PAUSE::Simple" => "0.453",
     "strict" => 0,
     "warnings" => 0
   },
@@ -49,7 +49,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.657",
+  "VERSION" => "0.659",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -72,15 +72,15 @@ my %FallbackPrereqs = (
   "Log::ger::Output::Screen" => "0.018",
   "Log::ger::Output::SimpleFile" => 0,
   "Log::ger::Util" => "0.037",
-  "Perinci::CmdLine::Util::Config" => "1.724",
-  "Perinci::Result::Format::Lite" => "0.282",
+  "Perinci::CmdLine::Util::Config" => "1.725",
+  "Perinci::Result::Format::Lite" => "0.286",
   "Scalar::Util" => 0,
   "Scalar::Util::Numeric" => 0,
   "Scalar::Util::Numeric::PP" => 0,
   "Test::More" => 0,
   "Time::Duration::Parse::AsHash" => 0,
   "Time::Local" => "1.27",
-  "WWW::PAUSE::Simple" => "0.452",
+  "WWW::PAUSE::Simple" => "0.453",
   "strict" => 0,
   "warnings" => 0
 );

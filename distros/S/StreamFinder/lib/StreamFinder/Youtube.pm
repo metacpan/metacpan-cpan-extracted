@@ -542,7 +542,7 @@ sub new
 
 	#FIRST, CHECK IF WE'RE A CHANNEL OR USER PAGE, IF SO, FETCH & RETURN LATEST UPLOADED VIDEO (EXCLUDE MARQUEE VIDEO AT TOP):
 
-	if ($self->{'_isaYtPage'} && !$self->{'noiframes'} && $url2fetch =~ m#\/(?:channel|user)\/#) {  #WE'RE A CHANNEL PAGE, GRAB 1ST VIDEO!:
+	if ($self->{'_isaYtPage'} && !$self->{'noiframes'} && $url2fetch =~ m#\/(?:channel|user|c)\/#) {  #WE'RE A CHANNEL PAGE, GRAB 1ST VIDEO!:
 		print STDERR "..1a:We're a channel or user page!...\n"  if ($DEBUG);
 		my $embedded_video;
 		my $html = '';

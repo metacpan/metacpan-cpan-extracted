@@ -27,6 +27,8 @@ subtest str_to_re => sub {
     is_deeply(str_to_re({anchored=>1}, '/foo'), qr(\A\/foo\z));
 
     is_deeply(str_to_re('/foo/'), qr(foo));
+    is_deeply(str_to_re({always_quote=>1}, '/foo/'), qr(\/foo\/));
+    is_deeply(str_to_re({always_quote=>1}, 'qr(foo.)'), qr(qr\(foo\.\)));
     is_deeply(str_to_re('qr(foo)i'), qr(foo)i);
 
     dies_ok { str_to_re('/foo(/') };

@@ -8,14 +8,15 @@ my %WriteMakefileArgs = (
 	'ABSTRACT' => 'Find or download and install DjVuLibre',
 	'AUTHOR' => "Michal Josef \x{160}pa\x{10d}ek <skim\@cpan.org>",
 	'BUILD_REQUIRES' => {
-		'Alien::Build' => '0.32',
 		'Alien::Build::MM' => '0.32',
 		'ExtUtils::MakeMaker' => '6.76',
+		'ExtUtils::CppGuess' => 0,
 	},
 	'CONFIGURE_REQUIRES' => {
-		'Alien::Build' => '1.19',
 		'Alien::Build::MM' => '0.32',
+		'Alien::Build::Plugin::PkgConfig::Negotiate' => 0,
 		'ExtUtils::MakeMaker' => '6.76',
+		'File::Which' => '0',
 	},
 	'DISTNAME' => 'Alien-DjVuLibre',
 	'LICENSE' => 'bsd',
@@ -39,7 +40,7 @@ my %WriteMakefileArgs = (
 		'Test::More' => 0,
 		'Test::NoWarnings' => 0,
 	},
-	'VERSION' => '0.04',
+	'VERSION' => '0.05',
 	'test' => {
 		'RECURSIVE_TEST_FILES' => 1,
 	}

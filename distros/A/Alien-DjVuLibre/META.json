@@ -22,17 +22,18 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Alien::Build" : "0.32",
             "Alien::Build::MM" : "0.32",
             "Alien::Build::Plugin::Gather::IsolateDynamic" : "0.48",
             "Archive::Tar" : "0",
             "Config" : "0",
             "ExtUtils::CppGuess" : "0.13",
             "ExtUtils::MakeMaker" : "6.76",
+            "File::Which" : "0",
             "HTTP::Tiny" : "0.044",
             "IO::Socket::SSL" : "1.56",
             "IO::Zlib" : "0",
             "Mojo::DOM58" : "1.00",
+            "Mozilla::CA" : "0",
             "Net::SSLeay" : "1.49",
             "Sort::Versions" : "0",
             "URI" : "0",
@@ -44,7 +45,9 @@
             "Alien::Build" : "1.40",
             "Alien::Build::MM" : "0.32",
             "Alien::Build::Plugin::Decode::SourceForge" : "0",
-            "ExtUtils::MakeMaker" : "6.76"
+            "Alien::Build::Plugin::PkgConfig::Negotiate" : "0",
+            "ExtUtils::MakeMaker" : "6.76",
+            "File::Which" : "0"
          }
       },
       "runtime" : {
@@ -74,25 +77,29 @@
          "url" : "https://github.com/michal-josef-spacek/Alien-DjVuLibre"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_alienfile" : {
-      "generated_by" : "Alien::Build::MM version 2.48",
+      "generated_by" : "Alien::Build::MM version 2.68",
       "requires" : {
          "share" : {
             "Alien::Build::Plugin::Gather::IsolateDynamic" : "0.48",
             "Archive::Tar" : "0",
             "Config" : "0",
             "ExtUtils::CppGuess" : "0.13",
+            "File::Which" : "0",
             "HTTP::Tiny" : "0.044",
             "IO::Socket::SSL" : "1.56",
             "IO::Zlib" : "0",
             "Mojo::DOM58" : "1.00",
+            "Mozilla::CA" : "0",
             "Net::SSLeay" : "1.49",
             "Sort::Versions" : "0",
             "URI" : "0",
             "URI::Escape" : "0"
          },
-         "system" : {}
+         "system" : {
+            "File::Which" : "0"
+         }
       }
    },
    "x_serialization_backend" : "JSON::PP version 4.04"

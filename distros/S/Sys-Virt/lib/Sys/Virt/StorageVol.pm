@@ -304,7 +304,7 @@ Cryptography" (1996)
 
 =back
 
-VOLUME RESIZE CONSTANTS
+=head2 VOLUME RESIZE CONSTANTS
 
 The following constants control how storage volumes can
 be resized

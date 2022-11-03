@@ -16,7 +16,7 @@ our @EXPORT = qw(GetReward);
 our @ISA = qw(Exporter);
 
 # Set the package version. 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 # Load the required Perl module.
 use File::Basename;
@@ -65,13 +65,7 @@ sub GetReward {
         # Get the content from the service url.
         ($content, undef, undef, undef) = HTTP_Request($SERVICE_URL, $METHOD, $payload);
         # Format the content for the output.
-        if ($outflag eq "RAW") {
-            # Use the content as it is. 
-            $json_data = $content;    
-        } else {
-            # Encode the content.
-            $json_data = encode($content);
-        };
+        $json_data = format_output($content, $outflag);
     };
     # Return the json data.
     return $json_data;
@@ -87,7 +81,7 @@ CryptoTron::GetAccount - Perl extension for use with the blockchain of the crypt
 
 =head1 SYNOPSIS
 
-  use CryptoTron::GetAccount;
+  use CryptoTron::GetReward;
 
   # Set the public key as Base58 address.
   my $PublicKeyBase58 = "TY2fJ7AcsnQhfW3UJ1cjEUak5vkM87KC6R";
@@ -99,7 +93,7 @@ CryptoTron::GetAccount - Perl extension for use with the blockchain of the crypt
   my $VisibleSwitch = ["True"|"False"|""];
 
   # Get the account info from the blockchain.
-  my $account_info = GetAccount({
+  my $account_info = GetReward({
       PublicAddr => $PublicKeyBase58
       [, OutputFlag => $OutputFlag]
       [, VisibleSwitch => $VisibleSwitch]
@@ -121,7 +115,7 @@ as unformated raw JSON data.
 
 =head1 MODULE METHOD
 
-  GetAccount()
+  GetReward()
 
 =head1 SEE ALSO
 
@@ -139,8 +133,31 @@ Dr. Peter Netz, E<lt>ztenretep@cpan.orgE<gt>
 
 Copyright (C) 2022 by Dr. Peter Netz
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.30.0 or,
-at your option, any later version of Perl 5 you may have available.
+The MIT License
+ 
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the Software
+without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to
+whom the Software is furnished to do so, subject to the
+following conditions:
+ 
+The above copyright notice and this permission notice shall
+be included in all copies or substantial portions of the
+Software.
+ 
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT
+WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE AND NONINFRINGEMENT. IN NO EVENT
+SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
 
 =cut

@@ -3,22 +3,22 @@
 use strict;
 use warnings;
 
-use Module::Build 0.28;
+use Module::Build 0.3601;
 
 
 my %module_build_args = (
   "build_requires" => {
-    "Module::Build" => "0.28"
+    "Module::Build" => "0.3601"
   },
   "configure_requires" => {
-    "Module::Build" => "0.28"
+    "Module::Build" => "0.3601"
   },
   "dist_abstract" => "install OS packages and determine if CPAN modules are packaged for the OS ",
   "dist_author" => [
     "Ian Kluft <cpan-dev\@iankluft.com>"
   ],
   "dist_name" => "Sys-OsPackage",
-  "dist_version" => "0.3.0",
+  "dist_version" => "0.3.1",
   "license" => "artistic_2",
   "module_name" => "Sys::OsPackage",
   "recursive_test_files" => 1,
@@ -40,6 +40,9 @@ my %module_build_args = (
   "script_files" => [
     "bin/fetch-reqs.pl"
   ],
+  "share_dir" => {
+    "dist" => "share"
+  },
   "test_requires" => {
     "Cwd" => 0,
     "File::Basename" => 0,
@@ -62,7 +65,7 @@ my %fallback_build_requires = (
   "File::Path" => 0,
   "File::Slurp" => 0,
   "File::Temp" => 0,
-  "Module::Build" => "0.28",
+  "Module::Build" => "0.3601",
   "Readonly" => 0,
   "Test::More" => 0,
   "local::lib" => 0,

@@ -51,7 +51,7 @@
             "Org::To::Text" : "0.050",
             "Perinci::CmdLine::Any" : "0.154",
             "Perinci::CmdLine::Lite" : "1.924",
-            "Perinci::Sub::Gen::AccessTable" : "0.586",
+            "Perinci::Sub::Gen::AccessTable" : "0.590",
             "Perinci::Sub::Property::result::table" : "0",
             "Sah::Schema::true" : "0",
             "Sah::Schema::ufloat" : "0",
@@ -75,11 +75,11 @@
    "provides" : {
       "App::BPOMUtils" : {
          "file" : "lib/App/BPOMUtils.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       },
       "App::BPOMUtils::Table" : {
          "file" : "lib/App/BPOMUtils/Table.pm",
-         "version" : "0.012"
+         "version" : "0.013"
       }
    },
    "release_status" : "stable",
@@ -94,7 +94,7 @@
          "web" : "https://github.com/perlancar/perl-App-BPOMUtils"
       }
    },
-   "version" : "0.012",
+   "version" : "0.013",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

@@ -1,5 +1,9 @@
 Revision history for TimTools
 
+0.08
+        11-02-2022 Can set default in the spec function.
+0.07
+        11-02-2022 Added argument key to parsed output.
 0.02
         Added new git flow.
 0.01    Date/time

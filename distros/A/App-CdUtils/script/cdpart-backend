@@ -1,0 +1,213 @@
+#!perl
+
+use strict;
+use warnings;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-09-30'; # DATE
+our $DIST = 'App-CdUtils'; # DIST
+our $VERSION = '0.006'; # VERSION
+
+our $DEBUG = $ENV{DEBUG};
+
+if (@ARGV != 1) { print ".\n"; exit }
+
+my $cwd = $ENV{PWD} || do { require Cwd; Cwd::cwd() };
+my @elems = split m!/+!, $cwd;
+
+while (@elems >= 1) {
+    for my $i (reverse 0..$#elems) {
+        my @newelems = @elems; $newelems[$i] = $ARGV[0];
+        my $newpath = join "/", @newelems;
+        warn "cdpart: Trying $newpath\n" if $DEBUG;
+        if (-d $newpath) {
+            warn "cdpart: Found\n" if $DEBUG;
+            print "$newpath\n";
+            exit;
+        }
+    }
+    pop @elems;
+}
+
+# no match
+warn "cdpart: Can't find any match, giving up\n" if $DEBUG;
+print ".\n";
+
+# ABSTRACT: Change directory part
+# PODNAME: cdpart-backend
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+cdpart-backend - Change directory part
+
+=head1 VERSION
+
+This document describes version 0.006 of cdpart-backend (from Perl distribution App-CdUtils), released on 2022-09-30.
+
+=head1 SYNOPSIS
+
+To use in shell:
+
+ % cdpart() { cd `cdpart-backend "$1"`; }
+
+ % cd /media/mv/en/c/celine-dion
+ % cdpart fr; # /media/mv/fr/c/celine-dion
+
+=head1 DESCRIPTION
+
+B<cdpart> is a command to change directory which can be convenient in some
+cases. It takes your argument and tries to substitute your argument into the
+directory path element starting from the deepest to the topmost, stopping after
+it finds an existing directory, then change to the directory.
+
+The best way to explain it is by an example. Consider this directory structure:
+
+ media/
+   mv/
+     en/
+       a/
+       b/
+       c/
+         carly-rae-japsen/
+         celine-dion/
+         charlie-puth/
+         ...
+       ...
+     fr/
+       a/
+       b/
+       c/
+         celine-dion/
+         christophe-willem/
+         ...
+     de/
+     ...
+   music/
+     en/
+       a/
+       b/
+       c/
+         celine-dion/
+         ...
+     fr/
+       a/
+       b/
+       c/
+         celine-dion/
+         ...
+       ...
+     ...
+  ...
+
+You can see that the directories C<mv> and C<music> have the same structure: the
+first subdirectory level is language code (C<en>, C<fr>, ...), the second level
+is the first letter of artist's name (C<a>, C<b>, C<c>, ...) and the third level
+is the name of the artist.
+
+Suppose you are now in directory:
+
+ /media/mv/en/c/celine-dion
+
+and you want to see Céline's French music videos (in
+C</media/mv/fr/c/celine-dion>). If you use B<cd>, the command will be:
+
+ % cd ../../fr/c/celine-dion
+
+which is too much to type because you are retyping the substructure. With
+B<cdpart> you just have to type:
+
+ % cdpart fr
+
+What B<cdpart> will do is try the following directories in order:
+
+ /media/mv/en/c/fr
+ /media/mv/en/fr/celine-dion
+ /media/mv/fr/c/celine-dion
+
+The third succeeds so it goes there. If no match is found until the topmost
+directory, B<cdpart> will try these in order:
+
+ /media/mv/en/fr
+ /media/mv/fr/c
+ /media/fr/en/c
+ /fr/mv/en/c
+
+ /media/mv/fr
+ /media/fr/en
+ /fr/mv/en
+
+ /media/fr
+ /fr/mv
+
+ /fr
+
+If the last doesn't succeed too, B<cdpart> won't change directory.
+
+Another example:
+
+ % cdpart music
+
+will eventually change the directory to C</media/music/fr/c/celine-dion>.
+
+=head1 ENVIRONMENT
+
+=head2 DEBUG => bool
+
+If set to true, will print the directories as they are tried.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-CdUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-CdUtils>.
+
+=head1 SEE ALSO
+
+L<cdpart-backend>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2016 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-CdUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

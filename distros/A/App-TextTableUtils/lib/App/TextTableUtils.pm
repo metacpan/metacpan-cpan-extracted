@@ -5,7 +5,7 @@ use strict;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-02-18'; # DATE
 our $DIST = 'App-TextTableUtils'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 1;
 # ABSTRACT: CLI utilities related to text tables
@@ -22,7 +22,7 @@ App::TextTableUtils - CLI utilities related to text tables
 
 =head1 VERSION
 
-This document describes version 0.007 of App::TextTableUtils (from Perl distribution App-TextTableUtils), released on 2022-02-18.
+This document describes version 0.008 of App::TextTableUtils (from Perl distribution App-TextTableUtils), released on 2022-02-18.
 
 =head1 DESCRIPTION
 

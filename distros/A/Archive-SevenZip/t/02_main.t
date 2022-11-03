@@ -130,7 +130,6 @@ my $member = $zip->addDirectory($memberName);
 ok(defined($member));
 is($member->fileName(), $memberName);
 
-note "Here";
 # On some (Windows systems) the modification time is
 # corrupted. Save this to check late.
 my $dir_time = $member->lastModFileDateTime();

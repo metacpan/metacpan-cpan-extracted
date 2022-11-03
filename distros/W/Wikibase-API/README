@@ -1,5 +1,5 @@
 NAME
-    Wikibase::API - Class for API to Wikibase (Wikibase) system.
+    Wikibase::API - Wikibase API class.
 
 SYNOPSIS
      use Wikibase::API;
@@ -177,5 +177,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.02
+    0.03
 

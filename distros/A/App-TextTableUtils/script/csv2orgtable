@@ -7,16 +7,12 @@ use warnings;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-02-18'; # DATE
 our $DIST = 'App-TextTableUtils'; # DIST
-our $VERSION = '0.007'; # VERSION
+our $VERSION = '0.008'; # VERSION
 
 my ($ifmt, $ofmt) = $0 =~ /(\w+)2(\w+)\z/ or die "Please call me as <foo>2<bar> (not $0)";
 
 # parse options
-my %Opts = (
-    csv_sep => ",",
-    csv_quote => '"',
-    csv_escape => "\\",
-);
+my %Opts;
 {
     require Getopt::Long;
     Getopt::Long::Configure("bundling", "no_ignore_case", "permute", "no_getopt_compat");
@@ -48,8 +44,17 @@ my $rows;
 {
     if ($ifmt eq 'csv') {
         require Text::CSV;
-        my $csv = Text::CSV->new({ binary => 1, sep_char=>$Opts{csv_sep}, quote_char=>$Opts{csv_quote}, escape_char=>$Opts{csv_escape} })
+        my $csv = Text::CSV->new({ binary => 1 })
             or die "Cannot use CSV: ".Text::CSV->error_diag;
+        if ($Opts{csv_sep}) {
+            $csv->sep_char($Opts{csv_sep});
+        }
+        if ($Opts{csv_quote}) {
+            $csv->quote_char($Opts{csv_quote});
+        }
+        if ($Opts{csv_escape}) {
+            $csv->escape_char($Opts{csv_escape});
+        }
         if ($Opts{csv_loose}) {
             $csv->allow_loose_quotes(1);
             $csv->allow_loose_escapes(1);
@@ -191,7 +196,7 @@ csv2orgtable - Convert/render {CSV,TSV,INI,IOD,JSON/Perl array-of-arrays} into {
 
 =head1 VERSION
 
-This document describes version 0.007 of csv2orgtable (from Perl distribution App-TextTableUtils), released on 2022-02-18.
+This document describes version 0.008 of csv2orgtable (from Perl distribution App-TextTableUtils), released on 2022-02-18.
 
 =head1 SYNOPSIS
 

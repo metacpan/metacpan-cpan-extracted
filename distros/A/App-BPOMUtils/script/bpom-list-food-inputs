@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-01'; # DATE
+our $DATE = '2022-11-02'; # DATE
 our $DIST = 'App-BPOMUtils'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/BPOMUtils/bpom_list_food_inputs",
@@ -40,7 +40,7 @@ bpom-list-food-inputs - List of basic characteristic and heavy metal pollutant r
 
 =head1 VERSION
 
-This document describes version 0.012 of bpom-list-food-inputs (from Perl distribution App-BPOMUtils), released on 2022-11-01.
+This document describes version 0.013 of bpom-list-food-inputs (from Perl distribution App-BPOMUtils), released on 2022-11-02.
 
 =head1 SYNOPSIS
 
@@ -48,7 +48,7 @@ B<bpom-list-food-inputs> L<--help|/"--help, -h, -v"> (or L<-h|/"--help, -h, -v">
 
 B<bpom-list-food-inputs> L<--version|/"--version, -v"> (or L<-v|/"--version, -v">)
 
-B<bpom-list-food-inputs> [L<--category-contains|/"--category-contains=s">=I<str>] [(L<--category-in|/"--category-in=s@">=I<str>)+|L<--category-in-json|/"--category-in=s@">=I<json>] [L<--category-is|/"--category-is=s">=I<str>] [L<--category-isnt|/"--category-isnt=s">=I<str>] [L<--category-matches|/"--category-matches=s">=I<str>] [L<--category-max|/"--category-max=s">=I<str>] [L<--category-min|/"--category-min=s">=I<str>] [L<--category-not-contains|/"--category-not-contains=s">=I<str>] [(L<--category-not-in|/"--category-not-in=s@">=I<str>)+|L<--category-not-in-json|/"--category-not-in=s@">=I<json>] [L<--category-not-matches|/"--category-not-matches=s">=I<str>] [L<--category-xmax|/"--category-xmax=s">=I<str>] [L<--category-xmin|/"--category-xmin=s">=I<str>] [L<--category|/"--category=s">=I<str>] [L<--characteristic-contains|/"--characteristic-contains=s">=I<str>] [(L<--characteristic-in|/"--characteristic-in=s@">=I<str>)+|L<--characteristic-in-json|/"--characteristic-in=s@">=I<json>] [L<--characteristic-is|/"--characteristic-is=s">=I<str>] [L<--characteristic-isnt|/"--characteristic-isnt=s">=I<str>] [L<--characteristic-matches|/"--characteristic-matches=s">=I<str>] [L<--characteristic-max|/"--characteristic-max=s">=I<str>] [L<--characteristic-min|/"--characteristic-min=s">=I<str>] [L<--characteristic-not-contains|/"--characteristic-not-contains=s">=I<str>] [(L<--characteristic-not-in|/"--characteristic-not-in=s@">=I<str>)+|L<--characteristic-not-in-json|/"--characteristic-not-in=s@">=I<json>] [L<--characteristic-not-matches|/"--characteristic-not-matches=s">=I<str>] [L<--characteristic-xmax|/"--characteristic-xmax=s">=I<str>] [L<--characteristic-xmin|/"--characteristic-xmin=s">=I<str>] [L<--characteristic|/"--characteristic=s">=I<str>] [L<--debug|/"--debug">|L<--log-level|/"--log-level=s">=I<level>|L<--quiet|/"--quiet">|L<--trace|/"--trace">|L<--verbose|/"--verbose">] [L<--detail|/"--detail, -l">|L<-l|/"--detail, -l">|L<--no-detail|/"--detail, -l">|L<--nodetail|/"--detail, -l">] [(L<--exclude-field|/"--exclude-fields-json=s">=I<str>)+|L<--exclude-fields-json|/"--exclude-fields-json=s">=I<json>] [(L<--field|/"--fields-json=s">=I<str>)+|L<--fields-json|/"--fields-json=s">=I<json>] [L<--format|/"--format=s">=I<name>|L<--json|/"--json">] [(L<--id-in|/"--id-in=s@">=I<int>)+|L<--id-in-json|/"--id-in=s@">=I<json>] [L<--id-is|/"--id-is=s">=I<int>] [L<--id-isnt|/"--id-isnt=s">=I<int>] [L<--id-max|/"--id-max=s">=I<int>] [L<--id-min|/"--id-min=s">=I<int>] [(L<--id-not-in|/"--id-not-in=s@">=I<int>)+|L<--id-not-in-json|/"--id-not-in=s@">=I<json>] [L<--id-xmax|/"--id-xmax=s">=I<int>] [L<--id-xmin|/"--id-xmin=s">=I<int>] [L<--id|/"--id=s">=I<int>] [L<--lower-limit-contains|/"--lower-limit-contains=s">=I<str>] [(L<--lower-limit-in|/"--lower-limit-in=s@">=I<str>)+|L<--lower-limit-in-json|/"--lower-limit-in=s@">=I<json>] [L<--lower-limit-is|/"--lower-limit-is=s">=I<str>] [L<--lower-limit-isnt|/"--lower-limit-isnt=s">=I<str>] [L<--lower-limit-matches|/"--lower-limit-matches=s">=I<str>] [L<--lower-limit-max|/"--lower-limit-max=s">=I<str>] [L<--lower-limit-min|/"--lower-limit-min=s">=I<str>] [L<--lower-limit-not-contains|/"--lower-limit-not-contains=s">=I<str>] [(L<--lower-limit-not-in|/"--lower-limit-not-in=s@">=I<str>)+|L<--lower-limit-not-in-json|/"--lower-limit-not-in=s@">=I<json>] [L<--lower-limit-not-matches|/"--lower-limit-not-matches=s">=I<str>] [L<--lower-limit-xmax|/"--lower-limit-xmax=s">=I<str>] [L<--lower-limit-xmin|/"--lower-limit-xmin=s">=I<str>] [L<--lower-limit|/"--lower-limit=s">=I<str>] [L<--(no)naked-res|/"--naked-res">] [L<--page-result|/"--page-result">[=I<program>]|L<--view-result|/"--view-result">[=I<program>]] [L<--random|/"--random">|L<--no-random|/"--random">|L<--norandom|/"--random">] [L<--result-limit|/"--result-limit=s">=I<int>] [L<--result-start|/"--result-start=s">=I<int>] [(L<--sort|/"--sort=s@">=I<str>)+|L<--sort-json|/"--sort=s@">=I<json>] [L<--upper-limit-contains|/"--upper-limit-contains=s">=I<str>] [(L<--upper-limit-in|/"--upper-limit-in=s@">=I<str>)+|L<--upper-limit-in-json|/"--upper-limit-in=s@">=I<json>] [L<--upper-limit-is|/"--upper-limit-is=s">=I<str>] [L<--upper-limit-isnt|/"--upper-limit-isnt=s">=I<str>] [L<--upper-limit-matches|/"--upper-limit-matches=s">=I<str>] [L<--upper-limit-max|/"--upper-limit-max=s">=I<str>] [L<--upper-limit-min|/"--upper-limit-min=s">=I<str>] [L<--upper-limit-not-contains|/"--upper-limit-not-contains=s">=I<str>] [(L<--upper-limit-not-in|/"--upper-limit-not-in=s@">=I<str>)+|L<--upper-limit-not-in-json|/"--upper-limit-not-in=s@">=I<json>] [L<--upper-limit-not-matches|/"--upper-limit-not-matches=s">=I<str>] [L<--upper-limit-xmax|/"--upper-limit-xmax=s">=I<str>] [L<--upper-limit-xmin|/"--upper-limit-xmin=s">=I<str>] [L<--upper-limit|/"--upper-limit=s">=I<str>] [L<--with-field-names|/"--with-field-names">|L<--without-field-names|/"--with-field-names">] -- [L<query|/"--query=s, -q">]
+B<bpom-list-food-inputs> [L<--category-contains|/"--category-contains=s">=I<str>] [(L<--category-in|/"--category-in=s@">=I<str>)+|L<--category-in-json|/"--category-in=s@">=I<json>] [L<--category-is|/"--category-is=s">=I<str>] [L<--category-isnt|/"--category-isnt=s">=I<str>] [L<--category-matches|/"--category-matches=s">=I<str>] [L<--category-max|/"--category-max=s">=I<str>] [L<--category-min|/"--category-min=s">=I<str>] [L<--category-not-contains|/"--category-not-contains=s">=I<str>] [(L<--category-not-in|/"--category-not-in=s@">=I<str>)+|L<--category-not-in-json|/"--category-not-in=s@">=I<json>] [L<--category-not-matches|/"--category-not-matches=s">=I<str>] [L<--category-xmax|/"--category-xmax=s">=I<str>] [L<--category-xmin|/"--category-xmin=s">=I<str>] [L<--category|/"--category=s">=I<str>] [L<--characteristic-contains|/"--characteristic-contains=s">=I<str>] [(L<--characteristic-in|/"--characteristic-in=s@">=I<str>)+|L<--characteristic-in-json|/"--characteristic-in=s@">=I<json>] [L<--characteristic-is|/"--characteristic-is=s">=I<str>] [L<--characteristic-isnt|/"--characteristic-isnt=s">=I<str>] [L<--characteristic-matches|/"--characteristic-matches=s">=I<str>] [L<--characteristic-max|/"--characteristic-max=s">=I<str>] [L<--characteristic-min|/"--characteristic-min=s">=I<str>] [L<--characteristic-not-contains|/"--characteristic-not-contains=s">=I<str>] [(L<--characteristic-not-in|/"--characteristic-not-in=s@">=I<str>)+|L<--characteristic-not-in-json|/"--characteristic-not-in=s@">=I<json>] [L<--characteristic-not-matches|/"--characteristic-not-matches=s">=I<str>] [L<--characteristic-xmax|/"--characteristic-xmax=s">=I<str>] [L<--characteristic-xmin|/"--characteristic-xmin=s">=I<str>] [L<--characteristic|/"--characteristic=s">=I<str>] [L<--debug|/"--debug">|L<--log-level|/"--log-level=s">=I<level>|L<--quiet|/"--quiet">|L<--trace|/"--trace">|L<--verbose|/"--verbose">] [L<--detail|/"--detail, -l">|L<-l|/"--detail, -l">|L<--no-detail|/"--detail, -l">|L<--nodetail|/"--detail, -l">] [(L<--exclude-field|/"--exclude-fields-json=s">=I<str>)+|L<--exclude-fields-json|/"--exclude-fields-json=s">=I<json>] [(L<--field|/"--fields-json=s">=I<str>)+|L<--fields-json|/"--fields-json=s">=I<json>] [L<--format|/"--format=s">=I<name>|L<--json|/"--json">] [(L<--id-in|/"--id-in=s@">=I<int>)+|L<--id-in-json|/"--id-in=s@">=I<json>] [L<--id-is|/"--id-is=s">=I<int>] [L<--id-isnt|/"--id-isnt=s">=I<int>] [L<--id-max|/"--id-max=s">=I<int>] [L<--id-min|/"--id-min=s">=I<int>] [(L<--id-not-in|/"--id-not-in=s@">=I<int>)+|L<--id-not-in-json|/"--id-not-in=s@">=I<json>] [L<--id-xmax|/"--id-xmax=s">=I<int>] [L<--id-xmin|/"--id-xmin=s">=I<int>] [L<--id|/"--id=s">=I<int>] [L<--lower-limit-contains|/"--lower-limit-contains=s">=I<str>] [(L<--lower-limit-in|/"--lower-limit-in=s@">=I<str>)+|L<--lower-limit-in-json|/"--lower-limit-in=s@">=I<json>] [L<--lower-limit-is|/"--lower-limit-is=s">=I<str>] [L<--lower-limit-isnt|/"--lower-limit-isnt=s">=I<str>] [L<--lower-limit-matches|/"--lower-limit-matches=s">=I<str>] [L<--lower-limit-max|/"--lower-limit-max=s">=I<str>] [L<--lower-limit-min|/"--lower-limit-min=s">=I<str>] [L<--lower-limit-not-contains|/"--lower-limit-not-contains=s">=I<str>] [(L<--lower-limit-not-in|/"--lower-limit-not-in=s@">=I<str>)+|L<--lower-limit-not-in-json|/"--lower-limit-not-in=s@">=I<json>] [L<--lower-limit-not-matches|/"--lower-limit-not-matches=s">=I<str>] [L<--lower-limit-xmax|/"--lower-limit-xmax=s">=I<str>] [L<--lower-limit-xmin|/"--lower-limit-xmin=s">=I<str>] [L<--lower-limit|/"--lower-limit=s">=I<str>] [L<--(no)naked-res|/"--naked-res">] [L<--page-result|/"--page-result">[=I<program>]|L<--view-result|/"--view-result">[=I<program>]] [L<--query-boolean|/"--query-boolean=s">=I<str>|L<--and|/"--query-boolean=s">|L<--or|/"--query-boolean=s">] [(L<--query|/"--query=s@">=I<str>)+|L<--queries-json|/"--query=s@">=I<json>|(L<-q|/"--query=s@">=I<str>)+] [L<--random|/"--random">|L<--no-random|/"--random">|L<--norandom|/"--random">] [L<--result-limit|/"--result-limit=s">=I<int>] [L<--result-start|/"--result-start=s">=I<int>] [(L<--sort|/"--sort=s@">=I<str>)+|L<--sort-json|/"--sort=s@">=I<json>] [L<--upper-limit-contains|/"--upper-limit-contains=s">=I<str>] [(L<--upper-limit-in|/"--upper-limit-in=s@">=I<str>)+|L<--upper-limit-in-json|/"--upper-limit-in=s@">=I<json>] [L<--upper-limit-is|/"--upper-limit-is=s">=I<str>] [L<--upper-limit-isnt|/"--upper-limit-isnt=s">=I<str>] [L<--upper-limit-matches|/"--upper-limit-matches=s">=I<str>] [L<--upper-limit-max|/"--upper-limit-max=s">=I<str>] [L<--upper-limit-min|/"--upper-limit-min=s">=I<str>] [L<--upper-limit-not-contains|/"--upper-limit-not-contains=s">=I<str>] [(L<--upper-limit-not-in|/"--upper-limit-not-in=s@">=I<str>)+|L<--upper-limit-not-in-json|/"--upper-limit-not-in=s@">=I<json>] [L<--upper-limit-not-matches|/"--upper-limit-not-matches=s">=I<str>] [L<--upper-limit-xmax|/"--upper-limit-xmax=s">=I<str>] [L<--upper-limit-xmin|/"--upper-limit-xmin=s">=I<str>] [L<--upper-limit|/"--upper-limit=s">=I<str>] [L<--with-field-names|/"--with-field-names">|L<--without-field-names|/"--with-field-names">] -- [L<query|/"--query=s@">] ...
 
 =head1 OPTIONS
 
@@ -458,11 +458,56 @@ Only return records where the 'upper_limit' field equals specified value.
 
 =over
 
-=item B<--query>=I<s>, B<-q>
+=item B<--and>
+
+Shortcut for --query-boolean=and.
+
+See C<--query-boolean>.
+
+=item B<--or>
+
+Shortcut for --query-boolean=or.
+
+See C<--query-boolean>.
+
+=item B<--queries-json>=I<s>, B<-q>
+
+Search (JSON-encoded).
+
+See C<--query>.
+
+Can also be specified as the 1st command-line argument and onwards.
+
+=item B<--query-boolean>=I<s>
+
+Whether records must match all search queries ('and') or just one ('or').
+
+Default value:
+
+ "and"
+
+Valid values:
+
+ ["and","or"]
+
+If set to C<and>, all queries must match; if set to C<or>, only one query should
+match. See the C<queries> option for more details on searching.
+
+
+=item B<--query>=I<s@>
 
 Search.
 
-Can also be specified as the 1st command-line argument.
+This will search all searchable fields with one or more specified queries. Each
+query can be in the form of C<-FOO> (dash prefix notation) to require that the
+fields do not contain specified string, or C</FOO/> to use regular expression.
+All queries must match if the C<query_boolean> option is set to C<and>; only one
+query should match if the C<query_boolean> option is set to C<or>.
+
+
+Can also be specified as the 1st command-line argument and onwards.
+
+Can be specified multiple times.
 
 =back
 

@@ -81,7 +81,7 @@ use Sys::Virt::DomainSnapshot;
 use Sys::Virt::DomainCheckpoint;
 use Sys::Virt::Stream;
 
-our $VERSION = '8.8.0';
+our $VERSION = '8.9.0';
 require XSLoader;
 XSLoader::load('Sys::Virt', $VERSION);
 
@@ -233,7 +233,7 @@ sub new_stream {
 }
 
 
-=item my $dom = $conn->create_domain($xml, $flags);
+=item my $dom = $conn->create_domain($xml, $flags=0);
 
 Create a new domain based on the XML description passed into the C<$xml>
 parameter. The returned object is an instance of the L<Sys::Virt::Domain>
@@ -251,7 +251,7 @@ sub create_domain {
     return Sys::Virt::Domain->_new(connection => $self, xml => $xml, flags => $flags);
 }
 
-=item my $dom = $conn->create_domain_with_files($xml, $fds, $flags);
+=item my $dom = $conn->create_domain_with_files($xml, $fds, $flags=0);
 
 Create a new domain based on the XML description passed into the C<$xml>
 parameter. The returned object is an instance of the L<Sys::Virt::Domain>
@@ -281,7 +281,8 @@ passed into the C<$xml> parameter. The returned object is an instance
 of the L<Sys::Virt::Domain> class. This method is not available with
 unprivileged connections to the hypervisor. The defined domain can be later started
 by calling the C<create> method on the returned C<Sys::Virt::Domain>
-object.
+object. The C<$flags> parameter accepts one of the DOMAIN DEFINE constants
+documented in L<Sys::Virt::Domain>, and defaults to 0 if omitted.
 
 =cut
 
@@ -298,7 +299,8 @@ sub define_domain {
 Create a new network based on the XML description passed into the C<$xml>
 parameter. The returned object is an instance of the L<Sys::Virt::Network>
 class. This method is not available with unprivileged connections to
-the hypervisor.
+the hypervisor. The C<$flags> parameter accepts one of the NETWORK CREATION
+constants documented in L<Sys::Virt::Network>, and defaults to 0 if omitted.
 
 =cut
 
@@ -310,14 +312,15 @@ sub create_network {
     return Sys::Virt::Network->_new(connection => $self, xml => $xml, flags => $flags);
 }
 
-=item my $net = $conn->define_network($xml, $flags = 0);
+=item my $net = $conn->define_network($xml, $flags=0);
 
 Defines, but does not start, a new network based on the XML description
 passed into the C<$xml> parameter. The returned object is an instance
 of the L<Sys::Virt::Network> class. This method is not available with
 unprivileged connections to the hypervisor. The defined network can be later started
 by calling the C<create> method on the returned C<Sys::Virt::Network>
-object.
+object. The C<$flags> parameter accepts one of the NETWORK DEFINE constants
+documented in L<Sys::Virt::Network>, and defaults to 0 if omitted.
 
 =cut
 
@@ -334,7 +337,9 @@ sub define_network {
 Defines a new network filter based on the XML description
 passed into the C<$xml> parameter. The returned object is an instance
 of the L<Sys::Virt::NWFilter> class. This method is not available with
-unprivileged connections to the hypervisor.
+unprivileged connections to the hypervisor. The C<$flags> parameter accepts
+one of the NWFILTER DEFINE constants documented in L<Sys::Virt::NWFilter>,
+and defaults to 0 if omitted.
 
 =cut
 
@@ -346,12 +351,32 @@ sub define_nwfilter {
     return Sys::Virt::NWFilter->_new(connection => $self, xml => $xml, nocreate => 1, flags => $flags);
 }
 
+=item my $binding = $conn->create_nwfilter_binding($xml, $flags=0);
+
+Create a new network filter binding based on the XML description passed into the C<$xml>
+parameter. The returned object is an instance of the L<Sys::Virt::NWFilterBinding>
+class. The C<$flags> parameter accepts one of the NETWORK FILTER BINDING
+CREATION constants documented in L<Sys::Virt::NWFilterBinding>, and defaults to
+0 if omitted.
+
+=cut
+
+sub create_nwfilter_binding {
+    my $self = shift;
+    my $xml = shift;
+    my $flags = shift || 0;
+
+    return Sys::Virt::NWFilterBinding->_new(connection => $self, xml => $xml, flags => $flags);
+}
+
 =item my $secret = $conn->define_secret($xml, $flags=0);
 
 Defines a new secret based on the XML description
 passed into the C<$xml> parameter. The returned object is an instance
 of the L<Sys::Virt::Secret> class. This method is not available with
-unprivileged connections to the hypervisor.
+unprivileged connections to the hypervisor. The C<$flags> parameter
+accepts one of the SECRET DEFINE constants documented in
+L<Sys::Virt::Secret>, and defaults to 0 if omitted.
 
 =cut
 
@@ -386,7 +411,8 @@ passed into the C<$xml> parameter. The returned object is an instance
 of the L<Sys::Virt::StoragePool> class. This method is not available with
 unprivileged connections to the hypervisor. The defined pool can be later started
 by calling the C<create> method on the returned C<Sys::Virt::StoragePool>
-object.
+object. The C<$flags> parameter accepts one of the STORAGE POOL DEFINE
+constants documented in L<Sys::Virt::StoragePool>, and defaults to 0 if omitted.
 
 =cut
 
@@ -414,25 +440,6 @@ sub create_interface {
     return Sys::Virt::Interface->_new(connection => $self, xml => $xml);
 }
 
-
-=item my $binding = $conn->create_nwfilter_binding($xml, $flags=0);
-
-Create a new network filter binding based on the XML description passed into the C<$xml>
-parameter. The returned object is an instance of the L<Sys::Virt::NWFilterBinding>
-class.
-
-=cut
-
-sub create_nwfilter_binding {
-    my $self = shift;
-    my $xml = shift;
-    my $flags = shift || 0;
-
-    return Sys::Virt::NWFilterBinding->_new(connection => $self, xml => $xml, flags => $flags);
-}
-
-
-
 =item my $iface = $conn->define_interface($xml, $flags=0);
 
 Defines, but does not start, a new interface based on the XML description
@@ -440,7 +447,9 @@ passed into the C<$xml> parameter. The returned object is an instance
 of the L<Sys::Virt::Interface> class. This method is not available with
 unprivileged connections to the hypervisor. The defined interface can be later started
 by calling the C<create> method on the returned C<Sys::Virt::Interface>
-object.
+object. The C<$flags> parameter accepts one of the INTERFACE DEFINE constants
+documented in L<Sys::Virt::Interface>, and defaults to 0 if omitted.
+
 
 =cut
 

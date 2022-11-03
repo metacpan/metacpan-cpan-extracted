@@ -14,7 +14,7 @@ use utf8;
 ## use critic (Modules::RequireExplicitPackage)
 
 package Sys::OsPackage::Driver::Alpine;
-$Sys::OsPackage::Driver::Alpine::VERSION = '0.3.0';
+$Sys::OsPackage::Driver::Alpine::VERSION = '0.3.1';
 use base "Sys::OsPackage::Driver";
 
 # check if packager command found (alpine)
@@ -101,7 +101,7 @@ Sys::OsPackage::Driver::Alpine - Alpine APK packaging handler for Sys::OsPackage
 
 =head1 VERSION
 
-version 0.3.0
+version 0.3.1
 
 =head1 SYNOPSIS
 

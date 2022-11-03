@@ -124,17 +124,23 @@ DESCRIPTION
     streaming site URL as the argument. You can then edit it to tailor it to
     your needs.
 
-    The currently-supported websites are: podcasts.apple.com
-    (StreamFinder::Apple), bitchute.com (StreamFinder::Bitchute),
-    blogger.com (StreamFinder::Blogger), brandnewtube.com and ugetube.com
-    (StreamFinder::BrandNewTube), brighteon.com (StreamFinder::Brighteon),
-    castbox.fm (StreamFinder::Castbox), podcasts.google.com
-    (StreamFinder::Google), iheartradio.com (StreamFinder::IHeartRadio),
-    odysee.com (StreamFinder::Odysee), podbean.com (StreamFinder::Podbean),
-    podcastaddict.com (StreamFinder::PodcastAddict), radio.net
-    (StreamFinder::RadioNet), rumble.com (StreamFinder::Rumble),
-    sermonaudio.com (StreamFinder::SermonAudio), spreaker.com podcasts
-    (StreamFinder::Spreaker), tunein.com (StreamFinder::Tunein), vimeo.com
+    The currently-supported websites are: podcasts.apple.com podcasts
+    (StreamFinder::Apple), bitchute.com videos (StreamFinder::Bitchute),
+    blogger.com videos (StreamFinder::Blogger), brandnewtube.com and
+    ugetube.com videos (StreamFinder::BrandNewTube), brighteon.com videos
+    (StreamFinder::Brighteon), castbox.fm podcases (StreamFinder::Castbox),
+    podcasts.google.com podcasts (StreamFinder::Google), iheartradio.com
+    radio stations and podcasts (StreamFinder::IHeartRadio),
+    www.internetradio.com radio stations (StreamFinder::InternetRadio),
+    onlineradiobox.com radio stations (StreamFinder::OnlineRadiobox),
+    odysee.com videos (StreamFinder::Odysee), podbean.com podcasts
+    (StreamFinder::Podbean), podcastaddict.com podcasts
+    (StreamFinder::PodcastAddict), radio.net radio stations
+    (StreamFinder::RadioNet), rumble.com videos (StreamFinder::Rumble),
+    sermonaudio.com sermon audio and video (StreamFinder::SermonAudio),
+    soundcloud.com soundcloud.com songs (StreamFinder::SoundCloud),
+    spreaker.com podcasts (StreamFinder::Spreaker), tunein.com radio
+    stations and podcasts(StreamFinder::Tunein), vimeo.com videos
     (StreamFinder::Vimeo), (youtube.com, et. al and other sites that
     youtube-dl supports) (StreamFinder::Youtube), and
     StreamFinder::Anystream - search any (other) webpage URL (not supported

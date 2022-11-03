@@ -8,21 +8,36 @@ use Exporter 'import';
 our @EXPORT_OK = qw(query2re);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-01'; # DATE
+our $DATE = '2022-11-02'; # DATE
 our $DIST = 'String-Query-To-Regexp'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 sub query2re {
-    my $opts = ref($_[0]) eq 'HASH' ? shift : {};
-    my $bool = $opts->{bool} // 'and';
-    my $ci   = $opts->{ci};
-    my $word = $opts->{word};
+    my $opts = ref($_[0]) eq 'HASH' ? {%{shift()}} : {};
+    my $bool   = delete $opts->{bool} // 'and';
+    my $ci     = delete $opts->{ci};
+    my $word   = delete $opts->{word};
+    my $opt_re = delete $opts->{re};
+    die "query2re(): Unknown option(s): ".
+        join(", ", sort keys %$opts) if keys %$opts;
 
     return qr// unless @_;
     my @re_parts;
     for my $query0 (@_) {
         my ($neg, $query) = $query0 =~ /\A(-?)(.*)/;
-        $query = quotemeta $query;
+
+        if ($opt_re) {
+            if (ref $query0 eq 'Regexp') {
+                $query = $query0;
+            } else {
+                require Regexp::From::String;
+                $query = Regexp::From::String::str_maybe_to_re($query);
+                $query = quotemeta($query) unless ref $query eq 'Regexp';
+            }
+        } else {
+            $query = quotemeta $query;
+        }
+
         if ($word) {
             push @re_parts, $neg ? "(?!.*\\b$query\\b)" : "(?=.*\\b$query\\b)";
         } else {
@@ -48,7 +63,7 @@ String::Query::To::Regexp - Convert query to regular expression
 
 =head1 VERSION
 
-This document describes version 0.001 of String::Query::To::Regexp (from Perl distribution String-Query-To-Regexp), released on 2022-11-01.
+This document describes version 0.002 of String::Query::To::Regexp (from Perl distribution String-Query-To-Regexp), released on 2022-11-02.
 
 =head1 SYNOPSIS
 
@@ -99,6 +114,12 @@ Bool. Default false. If set to true, queries must be separate words.
 =item * ci
 
 Bool. Default false. If set to true, will do case-insensitive matching
+
+=item * re
+
+Bool. Default false. If set to true, will allow regexes in C<@query> as well as
+converting string queries of the form C</foo/> to regex using
+L<Regexp::From::String>.
 
 =back
 

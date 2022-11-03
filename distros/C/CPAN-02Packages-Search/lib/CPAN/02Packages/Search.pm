@@ -6,7 +6,7 @@ use IO::Handle;
 use Search::Dict ();
 use Tie::Handle::SkipHeader;
 
-our $VERSION = '0.001';
+our $VERSION = '0.002';
 
 sub new {
     my ($class, %argv) = @_;

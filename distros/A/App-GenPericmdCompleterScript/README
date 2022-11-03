@@ -3,7 +3,7 @@ NAME
     script
 
 VERSION
-    This document describes version 0.124 of App::GenPericmdCompleterScript
+    This document describes version 0.125 of App::GenPericmdCompleterScript
     (from Perl distribution App-GenPericmdCompleterScript), released on
     2022-08-28.
 

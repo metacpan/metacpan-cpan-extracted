@@ -1,3 +1,7 @@
+0.03 2022-11-03T02:04:46+01:00
+ - Fix abstract in doc.
+ - Rewrite to better initialization. Constructor not connect to network.
+
 0.02 2022-10-18T10:56:15+02:00
  - Add check for existing type.
  - Fix dependencies.

@@ -30,6 +30,7 @@
       "runtime" : {
          "requires" : {
             "Exporter" : "5.57",
+            "Regexp::From::String" : "0.003",
             "perl" : "5.010001",
             "strict" : "0",
             "warnings" : "0"
@@ -40,6 +41,7 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
+            "Test::Exception" : "0",
             "Test::More" : "0.98"
          }
       }
@@ -47,7 +49,7 @@
    "provides" : {
       "String::Query::To::Regexp" : {
          "file" : "lib/String/Query/To/Regexp.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -62,7 +64,7 @@
          "web" : "https://github.com/perlancar/perl-String-Query-To-Regexp"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

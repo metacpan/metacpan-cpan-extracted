@@ -35,6 +35,8 @@ Graham
 Herzog
 Heuristic
 Honma
+Håkon
+Hægland
 IDNA
 IRI
 ISBNs
@@ -50,6 +52,7 @@ Karen
 Karr
 Kenichi
 Kent
+Kereliuk
 Knop
 Koster
 Lawrence
@@ -78,6 +81,7 @@ Rabbitson
 Raspass
 Rezic
 Roszatycki
+Ryan
 Salvatore
 Schmidt
 Schwern
@@ -129,6 +133,7 @@ gerard
 gisle
 gopher
 haarg
+hakon
 happy
 hiratara
 http
@@ -164,6 +169,7 @@ rlogin
 rsync
 rtsp
 rtspu
+ryker
 schwern
 sftp
 simbabque

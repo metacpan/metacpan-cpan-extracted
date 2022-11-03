@@ -18,6 +18,9 @@ lib/Sys/OsPackage/Driver/Arch.pm
 lib/Sys/OsPackage/Driver/Debian.pm
 lib/Sys/OsPackage/Driver/RPM.pm
 lib/Sys/OsPackage/Driver/Suse.pm
+share/sys-ospkg-test/container-startup.sh
+share/sys-ospkg-test/sys-ospkg-test.sh
+share/sys-ospkg-test/ubuntu.containerfile
 t/001_module_load.t
 t/002_basic.t
 t/003_driver.t

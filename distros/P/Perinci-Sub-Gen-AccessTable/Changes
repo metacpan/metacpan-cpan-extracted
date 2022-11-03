@@ -1,3 +1,22 @@
+0.590   2022-11-02  Released-By: PERLANCAR; Urgency: medium
+
+        - Enable regex searching.
+
+        - [ux] Describe the generated --queries and --query-boolean option.
+
+
+0.589   2022-11-02  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Forgot to generate 'query_boolean' argument.
+
+
+0.588   2022-11-02  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
+
+        - [incompatible change] Change generated 'query' (str) argument to
+          'queries' (array of str) argument to allow for multiple queries
+          as well as negative searching.
+
+
 0.587   2021-07-29  Released-By: PERLANCAR; Urgency: medium
 
 	- Update to Data::Sah::Resolve 0.010.

@@ -5,7 +5,7 @@ use strict;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-08-21'; # DATE
 our $DIST = 'App-ThisDist'; # DIST
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.018'; # VERSION
 
 1;
 # ABSTRACT: Synonym for App::ThisDist
@@ -22,7 +22,7 @@ App::ThisMod - Synonym for App::ThisDist
 
 =head1 VERSION
 
-This document describes version 0.017 of App::ThisMod (from Perl distribution App-ThisDist), released on 2022-08-21.
+This document describes version 0.018 of App::ThisMod (from Perl distribution App-ThisDist), released on 2022-08-21.
 
 =head1 DESCRIPTION
 

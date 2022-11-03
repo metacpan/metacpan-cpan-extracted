@@ -19,7 +19,7 @@ name: App-FirefoxUtils
 provides:
   App::FirefoxUtils:
     file: lib/App/FirefoxUtils.pm
-    version: '0.020'
+    version: '0.021'
 requires:
   App::BrowserUtils: '0.018'
   Data::Sah::Coerce::perl::To_array::From_str::comma_sep: '0'
@@ -51,7 +51,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-FirefoxUtils
   homepage: https://metacpan.org/release/App-FirefoxUtils
   repository: git://github.com/perlancar/perl-App-FirefoxUtils.git
-version: '0.020'
+version: '0.021'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

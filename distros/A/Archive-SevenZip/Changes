@@ -1,3 +1,7 @@
+0.16 2022-11-02
+    * Change how we construct the command line to accomodate for modified
+      handling with 7z version 21.x
+
 0.15 2022-10-27
     * Add Archive::Zip::Member prerequisite
       ... for _unixToDosTime()

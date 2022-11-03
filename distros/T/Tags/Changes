@@ -1,3 +1,7 @@
+0.13 2022-11-02T23:12:31+01:00
+ [Tags::Output::Raw]
+ - Fix warning for 'no_data_callback' if isn't in element.
+
 0.12 2022-10-25T16:12:31+02:00
  [Common]
  - Update copyright years.

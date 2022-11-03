@@ -3,17 +3,18 @@ abstract: 'Find or download and install DjVuLibre'
 author:
   - 'Michal Josef Špaček <skim@cpan.org>'
 build_requires:
-  Alien::Build: '0.32'
   Alien::Build::MM: '0.32'
   Alien::Build::Plugin::Gather::IsolateDynamic: '0.48'
   Archive::Tar: '0'
   Config: '0'
   ExtUtils::CppGuess: '0.13'
   ExtUtils::MakeMaker: '6.76'
+  File::Which: '0'
   HTTP::Tiny: '0.044'
   IO::Socket::SSL: '1.56'
   IO::Zlib: '0'
   Mojo::DOM58: '1.00'
+  Mozilla::CA: '0'
   Net::SSLeay: '1.49'
   Sort::Versions: '0'
   Test::Alien: '0'
@@ -26,7 +27,9 @@ configure_requires:
   Alien::Build: '1.40'
   Alien::Build::MM: '0.32'
   Alien::Build::Plugin::Decode::SourceForge: '0'
+  Alien::Build::Plugin::PkgConfig::Negotiate: '0'
   ExtUtils::MakeMaker: '6.76'
+  File::Which: '0'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: bsd
@@ -47,22 +50,25 @@ requires:
 resources:
   bugtracker: https://github.com/michal-josef-spacek/Alien-DjVuLibre/issues
   repository: https://github.com/michal-josef-spacek/Alien-DjVuLibre
-version: '0.04'
+version: '0.05'
 x_alienfile:
-  generated_by: 'Alien::Build::MM version 2.48'
+  generated_by: 'Alien::Build::MM version 2.68'
   requires:
     share:
       Alien::Build::Plugin::Gather::IsolateDynamic: '0.48'
       Archive::Tar: '0'
       Config: '0'
       ExtUtils::CppGuess: '0.13'
+      File::Which: '0'
       HTTP::Tiny: '0.044'
       IO::Socket::SSL: '1.56'
       IO::Zlib: '0'
       Mojo::DOM58: '1.00'
+      Mozilla::CA: '0'
       Net::SSLeay: '1.49'
       Sort::Versions: '0'
       URI: '0'
       URI::Escape: '0'
-    system: {}
+    system:
+      File::Which: '0'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

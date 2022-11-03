@@ -73,7 +73,7 @@
    "provides" : {
       "App::FirefoxUtils" : {
          "file" : "lib/App/FirefoxUtils.pm",
-         "version" : "0.020"
+         "version" : "0.021"
       }
    },
    "release_status" : "stable",
@@ -88,7 +88,7 @@
          "web" : "https://github.com/perlancar/perl-App-FirefoxUtils"
       }
    },
-   "version" : "0.020",
+   "version" : "0.021",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

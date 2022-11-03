@@ -1,3 +1,13 @@
+0.013   2022-11-02  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Rebuild with Perinci::Sub::Gen::AccessTable 0.590 to show
+          --queries and --query-boolean.
+
+        - [ux] Add some examples.
+
+
 0.012   2022-11-01  Released-By: PERLANCAR; Urgency: medium
 
         - Tweak Abstract and rename alias CLI

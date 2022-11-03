@@ -3,6 +3,7 @@
 use 5.010001;
 use strict;
 use warnings;
+use Test::Exception;
 use Test::More 0.98;
 
 use String::Query::To::Regexp qw(
@@ -18,13 +19,20 @@ my @data1 = (
     "barfoo",
 );
 
+my @data2 = (
+    "aa",
+    "a+",
+);
+
 my $re;
 
 subtest "basics" => sub {
+    dies_ok { query2re({foo=>1}) } 'unknown option -> dies';
+
     $re = query2re("foo");                                        is_deeply([grep {$_ =~ $re} @data1], [qw/foo foobar fooBAR barfoo/]);
     $re = query2re("foo", "bar");                                 is_deeply([grep {$_ =~ $re} @data1], [qw/foobar barfoo/]);
     $re = query2re("foo", "-bar");                                is_deeply([grep {$_ =~ $re} @data1], [qw/foo fooBAR/]);
-    note explain [grep {$_ =~ $re} @data1];
+    $re = query2re("a+");                                         is_deeply([grep {$_ =~ $re} @data2], [qw/a+/]); # test metachars
 };
 
 
@@ -38,6 +46,12 @@ subtest "opt: word" => sub {
 
 subtest "opt: bool" => sub {
     $re = query2re({bool=>'or'},"foo", "bar");                    is_deeply([grep {$_ =~ $re} @data1], [qw/foo bar foobar fooBAR barfoo/]);
+};
+
+subtest "opt: re" => sub {
+    $re = query2re({bool=>'or'}, "a", '/b/');                     is_deeply([grep {$_ =~ $re} "a", "b", "/b/"], [qw(a /b/)]);
+    $re = query2re({bool=>'or', re=>1}, "a", '/b/');              is_deeply([grep {$_ =~ $re} "a", "b", "/b/"], [qw(a b /b/)]);
+    $re = query2re({bool=>'or', re=>1}, "a", qr/b/);              is_deeply([grep {$_ =~ $re} "a", "b", "/b/"], [qw(a b /b/)]);
 };
 
 

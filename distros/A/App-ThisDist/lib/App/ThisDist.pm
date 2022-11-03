@@ -10,7 +10,7 @@ use File::chdir;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-08-21'; # DATE
 our $DIST = 'App-ThisDist'; # DIST
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.018'; # VERSION
 
 our @EXPORT_OK = qw(this_dist this_mod);
 
@@ -211,7 +211,7 @@ App::ThisDist - Print Perl {distribution,module,author,...} associated with curr
 
 =head1 VERSION
 
-This document describes version 0.017 of App::ThisDist (from Perl distribution App-ThisDist), released on 2022-08-21.
+This document describes version 0.018 of App::ThisDist (from Perl distribution App-ThisDist), released on 2022-08-21.
 
 =head1 DESCRIPTION
 
@@ -259,6 +259,10 @@ Source repository is at L<https://github.com/perlancar/perl-App-ThisDist>.
 =head1 SEE ALSO
 
 L<App::DistUtils>
+
+C<my_dist()> from L<Dist::Util::Current> tries to guess distribution name
+associated with source code file. It uses us when guessing via C<$DIST> or
+F<.packlist> files fail.
 
 =head1 AUTHOR
 

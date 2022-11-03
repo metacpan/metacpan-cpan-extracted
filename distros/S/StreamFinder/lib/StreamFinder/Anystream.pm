@@ -365,7 +365,7 @@ sub new
 	if (!defined($okStreams[0]) && defined($self->{'keep'})) {
 		@okStreams = (ref($self->{'keep'}) =~ /ARRAY/) ? @{$self->{'keep'}} : split(/\,\s*/, $self->{'keep'});
 	}
-	@okStreams = (qw(mp3 ogg flac mp4 m4a mpd m3u8 m3u pls))  unless (defined $okStreams[0]);
+	@okStreams = (qw(mp3 ogg flac mp4 m4a mpd m3u8 m3u pls aac))  unless (defined $okStreams[0]);
 
 	my $url2fetch = $url;
 	my $urlPrefix = '';

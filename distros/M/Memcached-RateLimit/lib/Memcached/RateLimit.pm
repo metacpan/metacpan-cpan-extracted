@@ -2,7 +2,7 @@ use warnings;
 use 5.020;
 use experimental qw( postderef signatures );
 
-package Memcached::RateLimit 0.06 {
+package Memcached::RateLimit 0.07 {
 
   # ABSTRACT: Sliding window rate limiting with Memcached
 
@@ -13,7 +13,7 @@ package Memcached::RateLimit 0.06 {
   my $ffi = FFI::Platypus->new( api => 2, lang => 'Rust' );
   $ffi->bundle;
   $ffi->mangler(sub ($name) { "rl_$name" });
-  $ffi->type("object(@{[ __PACKAGE__ ]})" => 'rl');
+  $ffi->type("object(@{[ __PACKAGE__ ]},u64)" => 'rl');
   our %retry;
   our %error_handler;
   our %final_error_handler;
@@ -129,7 +129,7 @@ Memcached::RateLimit - Sliding window rate limiting with Memcached
 
 =head1 VERSION
 
-version 0.06
+version 0.07
 
 =head1 SYNOPSIS
 

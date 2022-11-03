@@ -14,6 +14,8 @@ meta-spec:
   version: '1.4'
 name: TimTools
 provides:
+  My:
+    file: lib/My/Opts.pm
   My::Array:
     file: lib/My/Array.pm
   My::Color:
@@ -24,12 +26,12 @@ provides:
     file: lib/My/Role/ColoredHelp.pm
   TimTools:
     file: lib/TimTools.pm
-    version: '0.06'
+    version: '0.08'
 requires:
   Mojolicious: '9.27'
 resources:
   bugtracker: https://github.com/poti1/timtools/issues
   license: http://opensource.org/licenses/artistic-license-2.0.php
   repository: https://github.com/poti1/timtools
-version: '0.06'
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

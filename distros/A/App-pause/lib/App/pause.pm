@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-01-16'; # DATE
+our $DATE = '2022-11-02'; # DATE
 our $DIST = 'App-pause'; # DIST
-our $VERSION = '0.657'; # VERSION
+our $VERSION = '0.659'; # VERSION
 
 our %cli_attrs = do {
     my $p = '/WWW/PAUSE/Simple/';
@@ -48,7 +48,7 @@ App::pause - A CLI for PAUSE
 
 =head1 VERSION
 
-This document describes version 0.657 of App::pause (from Perl distribution App-pause), released on 2022-01-16.
+This document describes version 0.659 of App::pause (from Perl distribution App-pause), released on 2022-11-02.
 
 =head1 DESCRIPTION
 
@@ -85,9 +85,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

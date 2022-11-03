@@ -3,9 +3,9 @@ NAME
     read table data
 
 VERSION
-    This document describes version 0.587 of Perinci::Sub::Gen::AccessTable
+    This document describes version 0.590 of Perinci::Sub::Gen::AccessTable
     (from Perl distribution Perinci-Sub-Gen-AccessTable), released on
-    2021-07-29.
+    2022-11-02.
 
 SYNOPSIS
     In list_countries.pl:
@@ -108,9 +108,6 @@ DESCRIPTION
     served via HTTP using Perinci::Access::HTTP::Server, or consumed
     normally by Perl programs.
 
-CONTRIBUTOR
-    Steven Haryanto <sharyanto@cpan.org>
-
 FUNCTIONS
   gen_read_table_func
     Usage:
@@ -170,13 +167,20 @@ FUNCTIONS
         ascending order. Multiple fields are allowed for secondary sort
         fields.
 
-    *   *q* => STR
+    *   *q* => ARRAY[STR]
 
         A filtering option. By default, all fields except those specified
         with searchable=0 will be searched using simple case-insensitive
         string search. There are a few options to customize this, using
-        these gen arguments: *word_search*, *case_insensitive_search*, and
-        *custom_search*.
+        these gen arguments: *word_search*, *case_insensitive_search*,
+        *custom_search*, *default_query_boolean*.
+
+    *   *query_boolean* => STR
+
+        Either "and" or "or". Default can be set with gen argument
+        *default_query_boolean*. With "and", all the words in *q* argument
+        must match. With "or", only one of the words in *q* argument must
+        match.
 
     *   Filter arguments
 
@@ -269,6 +273,10 @@ FUNCTIONS
 
         Supply default 'fields' value for function arg spec.
 
+    *   default_query_boolean => *str* (default: "and")
+
+        Specify default for --query-boolean option.
+
     *   default_random => *bool*
 
         Supply default 'random' value in generated function's metadata.
@@ -292,6 +300,8 @@ FUNCTIONS
         Generated function's description.
 
     *   detail_aliases => *hash*
+
+        (No description)
 
     *   enable_field_selection => *bool* (default: 1)
 
@@ -329,6 +339,8 @@ FUNCTIONS
 
     *   exclude_fields_aliases => *hash*
 
+        (No description)
+
     *   extra_args => *hash*
 
         Extra arguments for the generated function.
@@ -338,6 +350,8 @@ FUNCTIONS
         Extra metadata properties for the generated function metadata.
 
     *   fields_aliases => *hash*
+
+        (No description)
 
     *   hooks => *hash*
 
@@ -403,15 +417,25 @@ FUNCTIONS
 
         If not specified, caller's package will be used by default.
 
-    *   query_aliases => *hash*
+    *   queries_aliases => *hash*
+
+        (No description)
 
     *   random_aliases => *hash*
 
+        (No description)
+
     *   result_limit_aliases => *hash*
+
+        (No description)
 
     *   result_start_aliases => *hash*
 
+        (No description)
+
     *   sort_aliases => *hash*
+
+        (No description)
 
     *   summary => *str*
 
@@ -466,6 +490,8 @@ FUNCTIONS
 
     *   with_field_names_aliases => *hash*
 
+        (No description)
+
     *   word_search => *bool* (default: 0)
 
         Decide whether generated function will perform word searching
@@ -514,6 +540,42 @@ SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-Perinci-Sub-Gen-AccessTable>.
 
+SEE ALSO
+    Perinci::Sub::Gen::AccessTable::Simple for a simpler variant.
+
+    Rinci
+
+    Perinci::CmdLine
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2022, 2020, 2019, 2018, 2017, 2016, 2015,
+    2014, 2013, 2012, 2011 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
 BUGS
     Please report any bugs or feature requests on the bugtracker website
     <https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Sub-Gen-Acces
@@ -525,21 +587,4 @@ BUGS
 CAVEATS
     It is often not a good idea to expose your database schema directly as
     API.
-
-SEE ALSO
-    Perinci::Sub::Gen::AccessTable::Simple for a simpler variant.
-
-    Rinci
-
-    Perinci::CmdLine
-
-AUTHOR
-    perlancar <perlancar@cpan.org>
-
-COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016, 2015,
-    2014, 2013, 2012, 2011 by perlancar@cpan.org.
-
-    This is free software; you can redistribute it and/or modify it under
-    the same terms as the Perl 5 programming language system itself.
 

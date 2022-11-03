@@ -2,6 +2,14 @@ use alienfile;
 
 use Config;
 
+meta->around_hook( gather_system => sub {
+  my $orig = shift;
+  my ($build) = @_;
+  $orig->(@_);
+  if( ! exists $build->runtime_prop->{ffi_name} ) {
+    $build->runtime_prop->{ffi_name} = 'z';
+  }
+});
 plugin PkgConfig => 'zlib';
 
 share {

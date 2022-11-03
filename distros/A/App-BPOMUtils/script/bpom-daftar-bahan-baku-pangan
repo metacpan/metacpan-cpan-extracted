@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-01'; # DATE
+our $DATE = '2022-11-02'; # DATE
 our $DIST = 'App-BPOMUtils'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.013'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/BPOMUtils/bpom_list_food_ingredients",
@@ -40,7 +40,7 @@ bpom-daftar-bahan-baku-pangan - List ingredients in BPOM processed food division
 
 =head1 VERSION
 
-This document describes version 0.012 of bpom-daftar-bahan-baku-pangan (from Perl distribution App-BPOMUtils), released on 2022-11-01.
+This document describes version 0.013 of bpom-daftar-bahan-baku-pangan (from Perl distribution App-BPOMUtils), released on 2022-11-02.
 
 =head1 SYNOPSIS
 
@@ -48,7 +48,7 @@ B<bpom-daftar-bahan-baku-pangan> L<--help|/"--help, -h, -v"> (or L<-h|/"--help, 
 
 B<bpom-daftar-bahan-baku-pangan> L<--version|/"--version, -v"> (or L<-v|/"--version, -v">)
 
-B<bpom-daftar-bahan-baku-pangan> [L<--country-of-origin-contains|/"--country-of-origin-contains=s">=I<str>] [(L<--country-of-origin-in|/"--country-of-origin-in=s@">=I<str>)+|L<--country-of-origin-in-json|/"--country-of-origin-in=s@">=I<json>] [L<--country-of-origin-is|/"--country-of-origin-is=s">=I<str>] [L<--country-of-origin-isnt|/"--country-of-origin-isnt=s">=I<str>] [L<--country-of-origin-matches|/"--country-of-origin-matches=s">=I<str>] [L<--country-of-origin-max|/"--country-of-origin-max=s">=I<str>] [L<--country-of-origin-min|/"--country-of-origin-min=s">=I<str>] [L<--country-of-origin-not-contains|/"--country-of-origin-not-contains=s">=I<str>] [(L<--country-of-origin-not-in|/"--country-of-origin-not-in=s@">=I<str>)+|L<--country-of-origin-not-in-json|/"--country-of-origin-not-in=s@">=I<json>] [L<--country-of-origin-not-matches|/"--country-of-origin-not-matches=s">=I<str>] [L<--country-of-origin-xmax|/"--country-of-origin-xmax=s">=I<str>] [L<--country-of-origin-xmin|/"--country-of-origin-xmin=s">=I<str>] [L<--country-of-origin|/"--country-of-origin=s">=I<str>] [L<--debug|/"--debug">|L<--log-level|/"--log-level=s">=I<level>|L<--quiet|/"--quiet">|L<--trace|/"--trace">|L<--verbose|/"--verbose">] [L<--detail|/"--detail, -l">|L<-l|/"--detail, -l">|L<--no-detail|/"--detail, -l">|L<--nodetail|/"--detail, -l">] [(L<--exclude-field|/"--exclude-fields-json=s">=I<str>)+|L<--exclude-fields-json|/"--exclude-fields-json=s">=I<json>] [(L<--field|/"--fields-json=s">=I<str>)+|L<--fields-json|/"--fields-json=s">=I<json>] [L<--format|/"--format=s">=I<name>|L<--json|/"--json">] [(L<--id-in|/"--id-in=s@">=I<int>)+|L<--id-in-json|/"--id-in=s@">=I<json>] [L<--id-is|/"--id-is=s">=I<int>] [L<--id-isnt|/"--id-isnt=s">=I<int>] [L<--id-max|/"--id-max=s">=I<int>] [L<--id-min|/"--id-min=s">=I<int>] [(L<--id-not-in|/"--id-not-in=s@">=I<int>)+|L<--id-not-in-json|/"--id-not-in=s@">=I<json>] [L<--id-xmax|/"--id-xmax=s">=I<int>] [L<--id-xmin|/"--id-xmin=s">=I<int>] [L<--id|/"--id=s">=I<int>] [L<--is-herbal-contains|/"--is-herbal-contains=s">=I<str>] [(L<--is-herbal-in|/"--is-herbal-in=s@">=I<str>)+|L<--is-herbal-in-json|/"--is-herbal-in=s@">=I<json>] [L<--is-herbal-is|/"--is-herbal-is=s">=I<str>] [L<--is-herbal-isnt|/"--is-herbal-isnt=s">=I<str>] [L<--is-herbal-matches|/"--is-herbal-matches=s">=I<str>] [L<--is-herbal-max|/"--is-herbal-max=s">=I<str>] [L<--is-herbal-min|/"--is-herbal-min=s">=I<str>] [L<--is-herbal-not-contains|/"--is-herbal-not-contains=s">=I<str>] [(L<--is-herbal-not-in|/"--is-herbal-not-in=s@">=I<str>)+|L<--is-herbal-not-in-json|/"--is-herbal-not-in=s@">=I<json>] [L<--is-herbal-not-matches|/"--is-herbal-not-matches=s">=I<str>] [L<--is-herbal-xmax|/"--is-herbal-xmax=s">=I<str>] [L<--is-herbal-xmin|/"--is-herbal-xmin=s">=I<str>] [L<--is-herbal|/"--is-herbal=s">=I<str>] [L<--(no)naked-res|/"--naked-res">] [L<--name-contains|/"--name-contains=s">=I<str>] [(L<--name-in|/"--name-in=s@">=I<str>)+|L<--name-in-json|/"--name-in=s@">=I<json>] [L<--name-is|/"--name-is=s">=I<str>] [L<--name-isnt|/"--name-isnt=s">=I<str>] [L<--name-matches|/"--name-matches=s">=I<str>] [L<--name-max|/"--name-max=s">=I<str>] [L<--name-min|/"--name-min=s">=I<str>] [L<--name-not-contains|/"--name-not-contains=s">=I<str>] [(L<--name-not-in|/"--name-not-in=s@">=I<str>)+|L<--name-not-in-json|/"--name-not-in=s@">=I<json>] [L<--name-not-matches|/"--name-not-matches=s">=I<str>] [L<--name-xmax|/"--name-xmax=s">=I<str>] [L<--name-xmin|/"--name-xmin=s">=I<str>] [L<--name|/"--name=s">=I<str>] [L<--origin-contains|/"--origin-contains=s">=I<str>] [(L<--origin-in|/"--origin-in=s@">=I<str>)+|L<--origin-in-json|/"--origin-in=s@">=I<json>] [L<--origin-is|/"--origin-is=s">=I<str>] [L<--origin-isnt|/"--origin-isnt=s">=I<str>] [L<--origin-matches|/"--origin-matches=s">=I<str>] [L<--origin-max|/"--origin-max=s">=I<str>] [L<--origin-min|/"--origin-min=s">=I<str>] [L<--origin-not-contains|/"--origin-not-contains=s">=I<str>] [(L<--origin-not-in|/"--origin-not-in=s@">=I<str>)+|L<--origin-not-in-json|/"--origin-not-in=s@">=I<json>] [L<--origin-not-matches|/"--origin-not-matches=s">=I<str>] [L<--origin-xmax|/"--origin-xmax=s">=I<str>] [L<--origin-xmin|/"--origin-xmin=s">=I<str>] [L<--origin|/"--origin=s">=I<str>] [L<--page-result|/"--page-result">[=I<program>]|L<--view-result|/"--view-result">[=I<program>]] [L<--random|/"--random">|L<--no-random|/"--random">|L<--norandom|/"--random">] [L<--result-limit|/"--result-limit=s">=I<int>] [L<--result-start|/"--result-start=s">=I<int>] [(L<--sort|/"--sort=s@">=I<str>)+|L<--sort-json|/"--sort=s@">=I<json>] [L<--status-contains|/"--status-contains=s">=I<str>] [(L<--status-in|/"--status-in=s@">=I<str>)+|L<--status-in-json|/"--status-in=s@">=I<json>] [L<--status-is|/"--status-is=s">=I<str>] [L<--status-isnt|/"--status-isnt=s">=I<str>] [L<--status-matches|/"--status-matches=s">=I<str>] [L<--status-max|/"--status-max=s">=I<str>] [L<--status-min|/"--status-min=s">=I<str>] [L<--status-not-contains|/"--status-not-contains=s">=I<str>] [(L<--status-not-in|/"--status-not-in=s@">=I<str>)+|L<--status-not-in-json|/"--status-not-in=s@">=I<json>] [L<--status-not-matches|/"--status-not-matches=s">=I<str>] [L<--status-xmax|/"--status-xmax=s">=I<str>] [L<--status-xmin|/"--status-xmin=s">=I<str>] [L<--status|/"--status=s">=I<str>] [L<--type-contains|/"--type-contains=s">=I<str>] [(L<--type-in|/"--type-in=s@">=I<str>)+|L<--type-in-json|/"--type-in=s@">=I<json>] [L<--type-is|/"--type-is=s">=I<str>] [L<--type-isnt|/"--type-isnt=s">=I<str>] [L<--type-matches|/"--type-matches=s">=I<str>] [L<--type-max|/"--type-max=s">=I<str>] [L<--type-min|/"--type-min=s">=I<str>] [L<--type-not-contains|/"--type-not-contains=s">=I<str>] [(L<--type-not-in|/"--type-not-in=s@">=I<str>)+|L<--type-not-in-json|/"--type-not-in=s@">=I<json>] [L<--type-not-matches|/"--type-not-matches=s">=I<str>] [L<--type-xmax|/"--type-xmax=s">=I<str>] [L<--type-xmin|/"--type-xmin=s">=I<str>] [L<--type|/"--type=s">=I<str>] [L<--with-field-names|/"--with-field-names">|L<--without-field-names|/"--with-field-names">] -- [L<query|/"--query=s, -q">]
+B<bpom-daftar-bahan-baku-pangan> [L<--country-of-origin-contains|/"--country-of-origin-contains=s">=I<str>] [(L<--country-of-origin-in|/"--country-of-origin-in=s@">=I<str>)+|L<--country-of-origin-in-json|/"--country-of-origin-in=s@">=I<json>] [L<--country-of-origin-is|/"--country-of-origin-is=s">=I<str>] [L<--country-of-origin-isnt|/"--country-of-origin-isnt=s">=I<str>] [L<--country-of-origin-matches|/"--country-of-origin-matches=s">=I<str>] [L<--country-of-origin-max|/"--country-of-origin-max=s">=I<str>] [L<--country-of-origin-min|/"--country-of-origin-min=s">=I<str>] [L<--country-of-origin-not-contains|/"--country-of-origin-not-contains=s">=I<str>] [(L<--country-of-origin-not-in|/"--country-of-origin-not-in=s@">=I<str>)+|L<--country-of-origin-not-in-json|/"--country-of-origin-not-in=s@">=I<json>] [L<--country-of-origin-not-matches|/"--country-of-origin-not-matches=s">=I<str>] [L<--country-of-origin-xmax|/"--country-of-origin-xmax=s">=I<str>] [L<--country-of-origin-xmin|/"--country-of-origin-xmin=s">=I<str>] [L<--country-of-origin|/"--country-of-origin=s">=I<str>] [L<--debug|/"--debug">|L<--log-level|/"--log-level=s">=I<level>|L<--quiet|/"--quiet">|L<--trace|/"--trace">|L<--verbose|/"--verbose">] [L<--detail|/"--detail, -l">|L<-l|/"--detail, -l">|L<--no-detail|/"--detail, -l">|L<--nodetail|/"--detail, -l">] [(L<--exclude-field|/"--exclude-fields-json=s">=I<str>)+|L<--exclude-fields-json|/"--exclude-fields-json=s">=I<json>] [(L<--field|/"--fields-json=s">=I<str>)+|L<--fields-json|/"--fields-json=s">=I<json>] [L<--format|/"--format=s">=I<name>|L<--json|/"--json">] [(L<--id-in|/"--id-in=s@">=I<int>)+|L<--id-in-json|/"--id-in=s@">=I<json>] [L<--id-is|/"--id-is=s">=I<int>] [L<--id-isnt|/"--id-isnt=s">=I<int>] [L<--id-max|/"--id-max=s">=I<int>] [L<--id-min|/"--id-min=s">=I<int>] [(L<--id-not-in|/"--id-not-in=s@">=I<int>)+|L<--id-not-in-json|/"--id-not-in=s@">=I<json>] [L<--id-xmax|/"--id-xmax=s">=I<int>] [L<--id-xmin|/"--id-xmin=s">=I<int>] [L<--id|/"--id=s">=I<int>] [L<--is-herbal-contains|/"--is-herbal-contains=s">=I<str>] [(L<--is-herbal-in|/"--is-herbal-in=s@">=I<str>)+|L<--is-herbal-in-json|/"--is-herbal-in=s@">=I<json>] [L<--is-herbal-is|/"--is-herbal-is=s">=I<str>] [L<--is-herbal-isnt|/"--is-herbal-isnt=s">=I<str>] [L<--is-herbal-matches|/"--is-herbal-matches=s">=I<str>] [L<--is-herbal-max|/"--is-herbal-max=s">=I<str>] [L<--is-herbal-min|/"--is-herbal-min=s">=I<str>] [L<--is-herbal-not-contains|/"--is-herbal-not-contains=s">=I<str>] [(L<--is-herbal-not-in|/"--is-herbal-not-in=s@">=I<str>)+|L<--is-herbal-not-in-json|/"--is-herbal-not-in=s@">=I<json>] [L<--is-herbal-not-matches|/"--is-herbal-not-matches=s">=I<str>] [L<--is-herbal-xmax|/"--is-herbal-xmax=s">=I<str>] [L<--is-herbal-xmin|/"--is-herbal-xmin=s">=I<str>] [L<--is-herbal|/"--is-herbal=s">=I<str>] [L<--(no)naked-res|/"--naked-res">] [L<--name-contains|/"--name-contains=s">=I<str>] [(L<--name-in|/"--name-in=s@">=I<str>)+|L<--name-in-json|/"--name-in=s@">=I<json>] [L<--name-is|/"--name-is=s">=I<str>] [L<--name-isnt|/"--name-isnt=s">=I<str>] [L<--name-matches|/"--name-matches=s">=I<str>] [L<--name-max|/"--name-max=s">=I<str>] [L<--name-min|/"--name-min=s">=I<str>] [L<--name-not-contains|/"--name-not-contains=s">=I<str>] [(L<--name-not-in|/"--name-not-in=s@">=I<str>)+|L<--name-not-in-json|/"--name-not-in=s@">=I<json>] [L<--name-not-matches|/"--name-not-matches=s">=I<str>] [L<--name-xmax|/"--name-xmax=s">=I<str>] [L<--name-xmin|/"--name-xmin=s">=I<str>] [L<--name|/"--name=s">=I<str>] [L<--origin-contains|/"--origin-contains=s">=I<str>] [(L<--origin-in|/"--origin-in=s@">=I<str>)+|L<--origin-in-json|/"--origin-in=s@">=I<json>] [L<--origin-is|/"--origin-is=s">=I<str>] [L<--origin-isnt|/"--origin-isnt=s">=I<str>] [L<--origin-matches|/"--origin-matches=s">=I<str>] [L<--origin-max|/"--origin-max=s">=I<str>] [L<--origin-min|/"--origin-min=s">=I<str>] [L<--origin-not-contains|/"--origin-not-contains=s">=I<str>] [(L<--origin-not-in|/"--origin-not-in=s@">=I<str>)+|L<--origin-not-in-json|/"--origin-not-in=s@">=I<json>] [L<--origin-not-matches|/"--origin-not-matches=s">=I<str>] [L<--origin-xmax|/"--origin-xmax=s">=I<str>] [L<--origin-xmin|/"--origin-xmin=s">=I<str>] [L<--origin|/"--origin=s">=I<str>] [L<--page-result|/"--page-result">[=I<program>]|L<--view-result|/"--view-result">[=I<program>]] [L<--query-boolean|/"--query-boolean=s">=I<str>|L<--and|/"--query-boolean=s">|L<--or|/"--query-boolean=s">] [(L<--query|/"--query=s@">=I<str>)+|L<--queries-json|/"--query=s@">=I<json>|(L<-q|/"--query=s@">=I<str>)+] [L<--random|/"--random">|L<--no-random|/"--random">|L<--norandom|/"--random">] [L<--result-limit|/"--result-limit=s">=I<int>] [L<--result-start|/"--result-start=s">=I<int>] [(L<--sort|/"--sort=s@">=I<str>)+|L<--sort-json|/"--sort=s@">=I<json>] [L<--status-contains|/"--status-contains=s">=I<str>] [(L<--status-in|/"--status-in=s@">=I<str>)+|L<--status-in-json|/"--status-in=s@">=I<json>] [L<--status-is|/"--status-is=s">=I<str>] [L<--status-isnt|/"--status-isnt=s">=I<str>] [L<--status-matches|/"--status-matches=s">=I<str>] [L<--status-max|/"--status-max=s">=I<str>] [L<--status-min|/"--status-min=s">=I<str>] [L<--status-not-contains|/"--status-not-contains=s">=I<str>] [(L<--status-not-in|/"--status-not-in=s@">=I<str>)+|L<--status-not-in-json|/"--status-not-in=s@">=I<json>] [L<--status-not-matches|/"--status-not-matches=s">=I<str>] [L<--status-xmax|/"--status-xmax=s">=I<str>] [L<--status-xmin|/"--status-xmin=s">=I<str>] [L<--status|/"--status=s">=I<str>] [L<--type-contains|/"--type-contains=s">=I<str>] [(L<--type-in|/"--type-in=s@">=I<str>)+|L<--type-in-json|/"--type-in=s@">=I<json>] [L<--type-is|/"--type-is=s">=I<str>] [L<--type-isnt|/"--type-isnt=s">=I<str>] [L<--type-matches|/"--type-matches=s">=I<str>] [L<--type-max|/"--type-max=s">=I<str>] [L<--type-min|/"--type-min=s">=I<str>] [L<--type-not-contains|/"--type-not-contains=s">=I<str>] [(L<--type-not-in|/"--type-not-in=s@">=I<str>)+|L<--type-not-in-json|/"--type-not-in=s@">=I<json>] [L<--type-not-matches|/"--type-not-matches=s">=I<str>] [L<--type-xmax|/"--type-xmax=s">=I<str>] [L<--type-xmin|/"--type-xmin=s">=I<str>] [L<--type|/"--type=s">=I<str>] [L<--with-field-names|/"--with-field-names">|L<--without-field-names|/"--with-field-names">] -- [L<query|/"--query=s@">] ...
 
 =head1 OPTIONS
 
@@ -606,11 +606,56 @@ Only return records where the 'type' field equals specified value.
 
 =over
 
-=item B<--query>=I<s>, B<-q>
+=item B<--and>
+
+Shortcut for --query-boolean=and.
+
+See C<--query-boolean>.
+
+=item B<--or>
+
+Shortcut for --query-boolean=or.
+
+See C<--query-boolean>.
+
+=item B<--queries-json>=I<s>, B<-q>
+
+Search (JSON-encoded).
+
+See C<--query>.
+
+Can also be specified as the 1st command-line argument and onwards.
+
+=item B<--query-boolean>=I<s>
+
+Whether records must match all search queries ('and') or just one ('or').
+
+Default value:
+
+ "and"
+
+Valid values:
+
+ ["and","or"]
+
+If set to C<and>, all queries must match; if set to C<or>, only one query should
+match. See the C<queries> option for more details on searching.
+
+
+=item B<--query>=I<s@>
 
 Search.
 
-Can also be specified as the 1st command-line argument.
+This will search all searchable fields with one or more specified queries. Each
+query can be in the form of C<-FOO> (dash prefix notation) to require that the
+fields do not contain specified string, or C</FOO/> to use regular expression.
+All queries must match if the C<query_boolean> option is set to C<and>; only one
+query should match if the C<query_boolean> option is set to C<or>.
+
+
+Can also be specified as the 1st command-line argument and onwards.
+
+Can be specified multiple times.
 
 =back
 

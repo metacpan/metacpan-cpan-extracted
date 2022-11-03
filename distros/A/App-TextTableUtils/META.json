@@ -60,7 +60,7 @@
    "provides" : {
       "App::TextTableUtils" : {
          "file" : "lib/App/TextTableUtils.pm",
-         "version" : "0.007"
+         "version" : "0.008"
       }
    },
    "release_status" : "stable",
@@ -75,7 +75,7 @@
          "web" : "https://github.com/perlancar/perl-App-TextTableUtils"
       }
    },
-   "version" : "0.007",
+   "version" : "0.008",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

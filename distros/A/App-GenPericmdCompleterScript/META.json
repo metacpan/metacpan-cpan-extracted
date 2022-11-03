@@ -75,7 +75,7 @@
    "provides" : {
       "App::GenPericmdCompleterScript" : {
          "file" : "lib/App/GenPericmdCompleterScript.pm",
-         "version" : "0.124"
+         "version" : "0.125"
       }
    },
    "release_status" : "stable",
@@ -90,7 +90,7 @@
          "web" : "https://github.com/perlancar/perl-App-GenPericmdCompleterScript"
       }
    },
-   "version" : "0.124",
+   "version" : "0.125",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

@@ -294,7 +294,7 @@ test_gen(
         my ($res) = @_;
         my $func = $res->[2]{code};
 
-        test_query($func, {query=>"b"}, 1, 'search b');
+        test_query($func, {queries=>["b"]}, 1, 'search b');
         test_query($func, {query=>"B"}, 1, 'search B');
     },
 );

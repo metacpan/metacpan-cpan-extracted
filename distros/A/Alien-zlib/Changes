@@ -1,4 +1,10 @@
 Revision history for Alien-zlib
 
+0.02      2022-11-02 14:56:31-04:00 America/New_York
+  - Fix `dynamic_libs` / FFI tests by setting `ffi_name` property. Thanks
+    to Michal Josef Špaček for the report.
+    See <https://github.com/PerlAlien/Alien-zlib/issues/1>,
+    <https://github.com/PerlAlien/Alien-zlib/pull/2>.
+
 0.01      2022-05-14 21:19:13-04:00 America/New_York
   - initial version

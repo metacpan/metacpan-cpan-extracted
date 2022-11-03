@@ -1,5 +1,10 @@
 Revision history for perl module Sys::Virt
 
+8.9.0 2022-11-01
+
+ - Add VIR_DOMAIN_UNDEFINE_TPM and VIR_DOMAIN_UNDEFINE_KEEP_TPM constants
+ - Add VIR_DOMAIN_STATS_VM constant
+
 8.8.0 2022-10-04
 
  - Fix some spelling errors in various manpages

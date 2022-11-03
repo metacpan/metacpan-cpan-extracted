@@ -33,11 +33,16 @@ sub _probe_exten {
 }
 
 sub _probe_videocodec {
-	if(Media::Convert::FfmpegInfo->instance->codecs->{av1}{description} =~ /libsvtav1/) {
+	my $codecs = Media::Convert::FfmpegInfo->instance->codecs;
+	die "av1 not supported by ffmpeg" unless exists($codecs->{av1});
+	if($codecs->{av1}{description} =~ /libsvtav1/) {
 		return "libsvtav1";
-	} else {
+	} elsif ($codecs->{av1}{description} =~ /libaom/) {
 		print STDERR "Warning: libsvtav1 not supported by ffmpeg. Trying libaom-av1 instead, which will probably be too slow...\n";
 		return "libaom-av1";
+	} else {
+		print STDERR "Warning: ffmpeg supports av1, but it is neither libsvtav1 nor libaom-av1. Trying, but not sure what's going to happen...\n";
+		return "av1";
 	}
 }
 
@@ -49,11 +54,11 @@ sub _probe_quality {
 	return 25;
 }
 
-#sub _probe_video_preset {
-#	if(shift->video_height > 1080) {
-#		return 5;
-#	}
-#	return 1;
-#}
+sub _probe_video_preset {
+	if(shift->video_height > 1080) {
+		return 5;
+	}
+	return 1;
+}
 
 1;

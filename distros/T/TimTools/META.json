@@ -31,6 +31,9 @@
       }
    },
    "provides" : {
+      "My" : {
+         "file" : "lib/My/Opts.pm"
+      },
       "My::Array" : {
          "file" : "lib/My/Array.pm"
       },
@@ -45,7 +48,7 @@
       },
       "TimTools" : {
          "file" : "lib/TimTools.pm",
-         "version" : "0.06"
+         "version" : "0.08"
       }
    },
    "release_status" : "stable",
@@ -60,6 +63,6 @@
          "url" : "https://github.com/poti1/timtools"
       }
    },
-   "version" : "0.06",
+   "version" : "0.08",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

@@ -1,3 +1,22 @@
+0.455   2022-11-03  Released-By: PERLANCAR; Urgency: medium
+
+        - Tweak regex for warning.
+
+
+0.454   2022-11-03  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Give warning and delay when we want to 'delete *' and
+          'reindex *'.
+
+
+0.453   2022-11-02  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Fix regex to parse a release filename: we didn't allow
+          dotted version that has more than 3 parts.
+
+        - Add arguments: include_dists, exclude_dists.
+
+
 0.452   2021-08-26  Released-By: PERLANCAR; Urgency: medium
 
 	- Change access log category: access -> _access (new convention).

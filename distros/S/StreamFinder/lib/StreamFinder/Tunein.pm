@@ -4,7 +4,7 @@ StreamFinder::Tunein - Fetch actual raw streamable URLs from radio-station websi
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2021 by
+This module is Copyright (C) 2021-2022 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -260,11 +260,7 @@ I<-debug> => [0|1|2] and most of the L<LWP::UserAgent> options.
 Options specified here override any specified in I<~/.config/StreamFinder/config>.
 
 Among options valid for Tunein streams is the I<-notrim> described in the 
-B<new()> function.  Also, various youtube-dl (L<StreamFinder::Youtube>) 
-configuration options, namely I<format>, I<formatonly>, I<youtube-dl-args>, 
-and I<youtube-dl-add-args> can be overridden here by specifying 
-I<youtube-format>, I<youtube-formatonly>, I<youtube-dl-args>, and 
-I<youtube-dl-add-args> arguments respectively.  
+B<new()> function.  
 
 =item ~/.config/StreamFinder/config
 
@@ -289,8 +285,6 @@ tunein
 =head1 DEPENDENCIES
 
 L<URI::Escape>, L<HTML::Entities>, L<LWP::UserAgent>
-
-youtube-dl (or yt-dlp, or other compatable program)
 
 =head1 RECCOMENDS
 
@@ -410,14 +404,6 @@ sub new
 		}
 	}
 	$okStreams = 'all'  unless ($okStreams);
-	while (@_) {
-		if ($_[0] =~ /^\-?notrim$/o) {
-			shift;
-			$self->{'notrim'} = (defined $_[0]) ? shift : 1;
-		} else {
-			shift;
-		}
-	}
 
 	my $html = '';
 	print STDERR "-0(Tunein): URL=$url=\n"  if ($DEBUG);
@@ -518,7 +504,7 @@ TRYIT:
 		print STDERR "--RETRY (PODCAST PAGE) 1ST EPISODE URL=$url2fetch=\n"  if ($DEBUG);
 		++$tried;
 		goto TRYIT;
-	} elsif (!$tried) {  #(USUALLY) NO STREAMS / PODCASTS EPISODES FOUND, TRY youtube-dl! (PBLY. A STATION):
+	} elsif (!$tried) {  #(USUALLY) NO STREAMS / PODCASTS EPISODES FOUND (PBLY. A STATION):
 		#SEE:  https://stackoverflow.com/questions/52754263/playing-a-live-tunein-radio-url-ios-swift
 		#ALSO: https://github.com/core-hacked/tunein-api/commit/a1bebe327f46cdaab0f1306741546438020584b9
 		my $tryStream = "https://opml.radiotime.com/Tune.ashx?id=$stationID&render=json";

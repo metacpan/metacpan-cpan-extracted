@@ -2,8 +2,8 @@ NAME
     App::BPOMUtils - Utilities related to BPOM
 
 VERSION
-    This document describes version 0.012 of App::BPOMUtils (from Perl
-    distribution App-BPOMUtils), released on 2022-11-01.
+    This document describes version 0.013 of App::BPOMUtils (from Perl
+    distribution App-BPOMUtils), released on 2022-11-02.
 
 SYNOPSIS
      # Use via the included scripts
@@ -194,9 +194,25 @@ FUNCTIONS
         Only return records where the 'name' field is greater than specified
         value.
 
-    *   query => *str*
+    *   queries => *array[str]*
 
         Search.
+
+        This will search all searchable fields with one or more specified
+        queries. Each query can be in the form of "-FOO" (dash prefix
+        notation) to require that the fields do not contain specified
+        string, or "/FOO/" to use regular expression. All queries must match
+        if the "query_boolean" option is set to "and"; only one query should
+        match if the "query_boolean" option is set to "or".
+
+    *   query_boolean => *str* (default: "and")
+
+        Whether records must match all search queries ('and') or just one
+        ('or').
+
+        If set to "and", all queries must match; if set to "or", only one
+        query should match. See the "queries" option for more details on
+        searching.
 
     *   random => *bool* (default: 0)
 
@@ -389,9 +405,25 @@ FUNCTIONS
         Only return records where the 'name' field is greater than specified
         value.
 
-    *   query => *str*
+    *   queries => *array[str]*
 
         Search.
+
+        This will search all searchable fields with one or more specified
+        queries. Each query can be in the form of "-FOO" (dash prefix
+        notation) to require that the fields do not contain specified
+        string, or "/FOO/" to use regular expression. All queries must match
+        if the "query_boolean" option is set to "and"; only one query should
+        match if the "query_boolean" option is set to "or".
+
+    *   query_boolean => *str* (default: "and")
+
+        Whether records must match all search queries ('and') or just one
+        ('or').
+
+        If set to "and", all queries must match; if set to "or", only one
+        query should match. See the "queries" option for more details on
+        searching.
 
     *   random => *bool* (default: 0)
 
@@ -885,9 +917,25 @@ FUNCTIONS
         Only return records where the 'origin' field is greater than
         specified value.
 
-    *   query => *str*
+    *   queries => *array[str]*
 
         Search.
+
+        This will search all searchable fields with one or more specified
+        queries. Each query can be in the form of "-FOO" (dash prefix
+        notation) to require that the fields do not contain specified
+        string, or "/FOO/" to use regular expression. All queries must match
+        if the "query_boolean" option is set to "and"; only one query should
+        match if the "query_boolean" option is set to "or".
+
+    *   query_boolean => *str* (default: "and")
+
+        Whether records must match all search queries ('and') or just one
+        ('or').
+
+        If set to "and", all queries must match; if set to "or", only one
+        query should match. See the "queries" option for more details on
+        searching.
 
     *   random => *bool* (default: 0)
 
@@ -1319,9 +1367,25 @@ FUNCTIONS
         Only return records where the 'lower_limit' field is greater than
         specified value.
 
-    *   query => *str*
+    *   queries => *array[str]*
 
         Search.
+
+        This will search all searchable fields with one or more specified
+        queries. Each query can be in the form of "-FOO" (dash prefix
+        notation) to require that the fields do not contain specified
+        string, or "/FOO/" to use regular expression. All queries must match
+        if the "query_boolean" option is set to "and"; only one query should
+        match if the "query_boolean" option is set to "or".
+
+    *   query_boolean => *str* (default: "and")
+
+        Whether records must match all search queries ('and') or just one
+        ('or').
+
+        If set to "and", all queries must match; if set to "or", only one
+        query should match. See the "queries" option for more details on
+        searching.
 
     *   random => *bool* (default: 0)
 
@@ -1692,9 +1756,25 @@ FUNCTIONS
         Only return records where the 'lower_limit' field is greater than
         specified value.
 
-    *   query => *str*
+    *   queries => *array[str]*
 
         Search.
+
+        This will search all searchable fields with one or more specified
+        queries. Each query can be in the form of "-FOO" (dash prefix
+        notation) to require that the fields do not contain specified
+        string, or "/FOO/" to use regular expression. All queries must match
+        if the "query_boolean" option is set to "and"; only one query should
+        match if the "query_boolean" option is set to "or".
+
+    *   query_boolean => *str* (default: "and")
+
+        Whether records must match all search queries ('and') or just one
+        ('or').
+
+        If set to "and", all queries must match; if set to "or", only one
+        query should match. See the "queries" option for more details on
+        searching.
 
     *   random => *bool* (default: 0)
 
@@ -1890,9 +1970,25 @@ FUNCTIONS
 
         Select fields to return.
 
-    *   query => *str*
+    *   queries => *array[str]*
 
         Search.
+
+        This will search all searchable fields with one or more specified
+        queries. Each query can be in the form of "-FOO" (dash prefix
+        notation) to require that the fields do not contain specified
+        string, or "/FOO/" to use regular expression. All queries must match
+        if the "query_boolean" option is set to "and"; only one query should
+        match if the "query_boolean" option is set to "or".
+
+    *   query_boolean => *str* (default: "and")
+
+        Whether records must match all search queries ('and') or just one
+        ('or').
+
+        If set to "and", all queries must match; if set to "or", only one
+        query should match. See the "queries" option for more details on
+        searching.
 
     *   random => *bool* (default: 0)
 
@@ -2133,9 +2229,25 @@ FUNCTIONS
 
         Select fields to return.
 
-    *   query => *str*
+    *   queries => *array[str]*
 
         Search.
+
+        This will search all searchable fields with one or more specified
+        queries. Each query can be in the form of "-FOO" (dash prefix
+        notation) to require that the fields do not contain specified
+        string, or "/FOO/" to use regular expression. All queries must match
+        if the "query_boolean" option is set to "and"; only one query should
+        match if the "query_boolean" option is set to "or".
+
+    *   query_boolean => *str* (default: "and")
+
+        Whether records must match all search queries ('and') or just one
+        ('or').
+
+        If set to "and", all queries must match; if set to "or", only one
+        query should match. See the "queries" option for more details on
+        searching.
 
     *   random => *bool* (default: 0)
 

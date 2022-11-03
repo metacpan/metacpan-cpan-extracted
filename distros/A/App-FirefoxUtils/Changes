@@ -1,3 +1,12 @@
+0.021   2022-10-09  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Rebuild again with updated Perinci::Sub::To::CLIDocData
+          (0.302) to improve usage line (link to apppropriate Sah::Schema::*
+          module).
+
+
 0.020   2022-10-09  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.
