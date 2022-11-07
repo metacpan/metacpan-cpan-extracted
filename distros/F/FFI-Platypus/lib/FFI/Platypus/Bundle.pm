@@ -6,7 +6,7 @@ use 5.008004;
 use Carp ();
 
 # ABSTRACT: Bundle foreign code with your Perl module
-our $VERSION = '2.03'; # VERSION
+our $VERSION = '2.04'; # VERSION
 
 
 package FFI::Platypus;
@@ -150,7 +150,7 @@ FFI::Platypus::Bundle - Bundle foreign code with your Perl module
 
 =head1 VERSION
 
-version 2.03
+version 2.04
 
 =head1 SYNOPSIS
 
@@ -165,8 +165,7 @@ C<ffi/foo.c>:
  } foo_t;
  
  foo_t*
- foo__new(const char *class_name, const char *name, int value)
- {
+ foo__new(const char *class_name, const char *name, int value) {
    (void)class_name;
    foo_t *self = malloc( sizeof( foo_t ) );
    self->name = strdup(name);
@@ -175,20 +174,17 @@ C<ffi/foo.c>:
  }
  
  const char *
- foo__name(foo_t *self)
- {
+ foo__name(foo_t *self) {
    return self->name;
  }
  
  int
- foo__value(foo_t *self)
- {
+ foo__value(foo_t *self) {
    return self->value;
  }
  
  void
- foo__DESTROY(foo_t *self)
- {
+ foo__DESTROY(foo_t *self) {
    free(self->name);
    free(self);
  }
@@ -201,23 +197,21 @@ C<lib/Foo.pm>:
  use warnings;
  use FFI::Platypus 2.00;
  
- {
-   my $ffi = FFI::Platypus->new( api => 2 );
+ my $ffi = FFI::Platypus->new( api => 2 );
  
-   $ffi->type('object(Foo)' => 'foo_t');
-   $ffi->mangler(sub {
-     my $name = shift;
-     $name =~ s/^/foo__/;
-     $name;
-   });
+ $ffi->type('object(Foo)' => 'foo_t');
+ $ffi->mangler(sub {
+   my $name = shift;
+   $name =~ s/^/foo__/;
+   $name;
+ });
  
-   $ffi->bundle;
+ $ffi->bundle;
  
-   $ffi->attach( new =>     [ 'string', 'string', 'int' ] => 'foo_t'  );
-   $ffi->attach( name =>    [ 'foo_t' ]                   => 'string' );
-   $ffi->attach( value =>   [ 'foo_t' ]                   => 'int'    );
-   $ffi->attach( DESTROY => [ 'foo_t' ]                   => 'void'   );
- }
+ $ffi->attach( new =>     [ 'string', 'string', 'int' ] => 'foo_t'  );
+ $ffi->attach( name =>    [ 'foo_t' ]                   => 'string' );
+ $ffi->attach( value =>   [ 'foo_t' ]                   => 'int'    );
+ $ffi->attach( DESTROY => [ 'foo_t' ]                   => 'void'   );
  
  1;
 
@@ -602,8 +596,6 @@ C<include/answer.h>:
 
 C<ffi/answer.c>:
 
- #include <answer.h>
- 
  int
  answer(void)
  {

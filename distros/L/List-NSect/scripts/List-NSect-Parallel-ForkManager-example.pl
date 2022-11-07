@@ -1,7 +1,6 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
-#use Sys::RunAlone;
 use Parallel::ForkManager;
 use Time::HiRes qw{sleep};
 use List::NSect;
@@ -43,5 +42,3 @@ foreach my $section (@sections) {
 $pm->wait_all_children;
 
 printf "%s: Finished\n", DateTime->now;
-
-__END__

@@ -5,6 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   JSON::PP: '2.27203'
+  PDF::API2: '2.043'
   Storable: '3.08'
   String::Interpolate::Named: '1.01'
   Test::More: '0'
@@ -31,26 +32,26 @@ no_index:
 provides:
   App::Music::ChordPro:
     file: lib/App/Music/ChordPro.pm
-    version: '5.989'
+    version: '5.990'
   chordpro:
     file: script/chordpro
-    version: '5.989'
+    version: '5.990'
 requires:
   App::Packager: '1.43'
   File::HomeDir: '1.004'
-  File::LoadLines: '1.02'
+  File::LoadLines: '1.021'
   Image::Info: '1.41'
   JSON::PP: '2.27203'
   List::Util: '1.33'
-  PDF::API2: '2.036'
+  PDF::API2: '2.043'
   Storable: '3.08'
-  String::Interpolate::Named: '1.01'
-  Text::Layout: '0.028'
-  perl: '5.010'
+  String::Interpolate::Named: '1.03'
+  Text::Layout: '0.03'
+  perl: '5.010001'
 resources:
   bugtracker: https://github.com/sciurius/chordpro/issues
   homepage: http://www.chordpro.org
   license: http://dev.perl.org/licenses/
   repository: https://github.com/sciurius/chordpro
-version: '5.989'
+version: '5.990'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -38,6 +38,9 @@ FUNCTIONS
 
     Default: 1
 
+  get_score
+    Return the MIDI::Simple score object.
+
   n
       n(@note_spec)
 

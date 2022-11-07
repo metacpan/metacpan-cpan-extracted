@@ -1,3 +1,8 @@
+0.009   2022-11-05  Released-By: PERLANCAR; Urgency: medium
+
+        - Add support for AAAA and PTR records (thanks keteague).
+
+
 0.008   2019-09-17  Released-By: PERLANCAR; Urgency: medium
 
 	- Add workaround: convert_underscore_in_host.

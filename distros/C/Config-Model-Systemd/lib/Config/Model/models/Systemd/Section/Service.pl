@@ -295,7 +295,7 @@ C<Before>/C<After> ordering constraints.',
           'type' => 'leaf',
           'value_type' => 'uniline'
         },
-        'description' => 'Optional commands that are executed before the command(s) in C<ExecStartPre>.
+        'description' => 'Optional commands that are executed before the commands in C<ExecStartPre>.
 Syntax is the same as for C<ExecStart>, except that multiple command lines are allowed and the
 commands are executed one after the other, serially.
 
@@ -304,7 +304,7 @@ C<ExecCondition> command exits with exit code 1 through 254 (inclusive), the rem
 commands are skipped and the unit is not marked as failed. However, if an
 C<ExecCondition> command exits with 255 or abnormally (e.g. timeout, killed by a
 signal, etc.), the unit will be considered failed (and remaining commands will be skipped). Exit code of 0 or
-those matching C<SuccessExitStatus> will continue execution to the next command(s).
+those matching C<SuccessExitStatus> will continue execution to the next commands.
 
 The same recommendations about not running long-running processes in C<ExecStartPre>
 also applies to C<ExecCondition>. C<ExecCondition> will also run the commands
@@ -904,7 +904,7 @@ C<main>.',
       {
         'description' => 'Configure the location of a file containing
 L<USB
-FunctionFS|https://www.kernel.org/doc/Documentation/usb/functionfs.txt> descriptors, for implementation of USB
+FunctionFS|https://docs.kernel.org/usb/functionfs.html> descriptors, for implementation of USB
 gadget functions. This is used only in conjunction with a
 socket unit with C<ListenUSBFunction>
 configured. The contents of this file are written to the
@@ -938,7 +938,7 @@ killed by the kernel\'s OOM killer this is logged but the service continues runn
 C<stop> the event is logged but the service is terminated cleanly by the service
 manager. If set to C<kill> and one of the service\'s processes is killed by the OOM
 killer the kernel is instructed to kill all remaining processes of the service too, by setting the
-C<memory.oom.group> attribute to C<1>; also see L<kernel documentation|https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html>.
+C<memory.oom.group> attribute to C<1>; also see L<kernel documentation|https://docs.kernel.org/admin-guide/cgroup-v2.html>.
 
 Defaults to the setting C<DefaultOOMPolicy> in
 L<systemd-system.conf(5)>
@@ -951,9 +951,9 @@ killer logic. See
 L<systemd.exec(5)> for
 details.
 
-This setting also applies to systemd-oomd, similar to the kernel OOM kills
-this setting determines the state of the service after systemd-oomd kills a cgroup
-associated with the service.',
+This setting also applies to systemd-oomd. Similarly to the kernel OOM
+kills, this setting determines the state of the service after systemd-oomd kills a
+cgroup associated with the service.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },

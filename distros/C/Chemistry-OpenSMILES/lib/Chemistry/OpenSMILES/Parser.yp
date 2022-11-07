@@ -8,25 +8,11 @@ use 5.0100;
 use Chemistry::OpenSMILES qw(
     is_aromatic
     is_chiral
+    %normal_valence
     toggle_cistrans
 );
 use Graph::Undirected;
 use List::Util qw(any sum);
-
-my %normal_valence = (
-    B  => [ 3 ],
-    C  => [ 4 ],
-    N  => [ 3, 5 ],
-    O  => [ 2 ],
-    P  => [ 3, 5 ],
-    S  => [ 2, 4, 6 ],
-    F  => [ 1 ],
-    Cl => [ 1 ],
-    Br => [ 1 ],
-    I  => [ 1 ],
-
-    c  => [ 3 ],
-);
 
 my %bond_order = (
     '-' => 1,

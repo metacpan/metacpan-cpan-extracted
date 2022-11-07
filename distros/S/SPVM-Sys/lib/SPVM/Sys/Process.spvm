@@ -6,7 +6,6 @@ class Sys::Process {
   native static method getpriority : int ($which : int, $who : int);
   native static method setpriority : int ($which : int, $who : int, $prio : int);
   native static method sleep : int ($seconds : int);
-  native static method kill : int ($pid : int, $sig : int);
   native static method wait : int ($wstatus_ref : int*);
   native static method waitpid : int ($pid : int, $wstatus_ref : int*, $options : int);
   native static method system : int ($command : string);
@@ -17,6 +16,7 @@ class Sys::Process {
   native static method getpid : int ();
   native static method getppid : int ();
   native static method execv : int ($path : string, $args : string[]);
+  native static method usleep : int ($usec : long);
 
   native static method WIFEXITED : int ($wstatus : int);
   native static method WEXITSTATUS : int ($wstatus : int);
@@ -26,6 +26,4 @@ class Sys::Process {
   native static method WIFSTOPPED : int ($wstatus : int);
   native static method WSTOPSIG : int ($wstatus : int);
   native static method WIFCONTINUED : int ($wstatus : int);
-
-  native static method usleep : int ($usec : long);
 }

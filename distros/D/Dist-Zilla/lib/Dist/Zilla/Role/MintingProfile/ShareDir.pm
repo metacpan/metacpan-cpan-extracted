@@ -1,16 +1,10 @@
-package Dist::Zilla::Role::MintingProfile::ShareDir 6.025;
+package Dist::Zilla::Role::MintingProfile::ShareDir 6.027;
 # ABSTRACT: something that keeps its minting profile in a sharedir
 
 use Moose::Role;
 with 'Dist::Zilla::Role::MintingProfile';
 
-# BEGIN BOILERPLATE
-use v5.20.0;
-use warnings;
-use utf8;
-no feature 'switch';
-use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
-# END BOILERPLATE
+use Dist::Zilla::Pragmas;
 
 use namespace::autoclean;
 
@@ -49,7 +43,7 @@ Dist::Zilla::Role::MintingProfile::ShareDir - something that keeps its minting p
 
 =head1 VERSION
 
-version 6.025
+version 6.027
 
 =head1 DESCRIPTION
 
@@ -70,7 +64,7 @@ the minimum required perl.
 
 =head1 AUTHOR
 
-Ricardo SIGNES 😏 <rjbs@semiotic.systems>
+Ricardo SIGNES 😏 <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

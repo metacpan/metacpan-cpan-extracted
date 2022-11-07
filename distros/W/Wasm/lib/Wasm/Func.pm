@@ -5,7 +5,7 @@ use warnings;
 use 5.008004;
 
 # ABSTRACT: Interface to WebAssembly functions
-our $VERSION = '0.22'; # VERSION
+our $VERSION = '0.23'; # VERSION
 
 
 1;
@@ -22,7 +22,7 @@ Wasm::Func - Interface to WebAssembly functions
 
 =head1 VERSION
 
-version 0.22
+version 0.23
 
 =head1 SYNOPSIS
 

@@ -96,7 +96,6 @@ do { my $x = {
                                       'YAML::Tiny' => '0',
                                       'autodie' => '0',
                                       'experimental' => '0',
-                                      'feature' => '0',
                                       'namespace::autoclean' => '0',
                                       'parent' => '0',
                                       'perl' => 'v5.20.0',

@@ -1,15 +1,28 @@
---- #YAML:1.0
-name:                Compass-Bearing
-version:             0.07
-abstract:            Convert angle to text bearing (aka heading)
-license:             ~
-author:              ~
-generated_by:        ExtUtils::MakeMaker version 6.42
-distribution_type:   module
-requires:     
-    GD::Graph::Polar:              0.09
-    Geo::Functions:                0.03
-    Package::New:                  0
+---
+abstract: 'Convert angle to text bearing (aka heading)'
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.52, CPAN::Meta::Converter version 2.150001'
+license: mit
 meta-spec:
-    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
-    version: 1.3
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Compass-Bearing
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  GD::Graph::Polar: '0.09'
+  Geo::Functions: '0.03'
+  Package::New: '0'
+resources:
+  bugtracker: https://github.com/mrdvt92/perl-Compass-Bearing/issues
+  homepage: https://github.com/mrdvt92/perl-Compass-Bearing
+  repository: https://github.com/mrdvt92/perl-Compass-Bearing.git
+version: '0.08'

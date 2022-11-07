@@ -1,4 +1,7 @@
-Revision history for Alien-wasmtime},
+Revision history for Alien-wasmtime
+
+0.17      2022-11-03 20:30:10 -0600
+  - Bump to version 0.27.0 (gh#28, gh#29)
 
 0.16      2021-01-21 09:28:29 -0700
   - Bump to version 0.22.1 (gh#21)

@@ -1,3 +1,113 @@
+0.25 2022-11-07
+  [OS Support Changes]
+    * SPVM::Sys doesn't supports OpenBSD because the following tests are hard to fix for us.
+      http://www.cpantesters.org/cpan/report/fa34e08c-5cf9-11ed-aba6-9a79f339625c
+  [Bug Fix]
+    * Fixed the bug that OpenBSD doesn't have clock_nanosleep.
+      undefined symbol 'clock_nanosleep'
+      http://www.cpantesters.org/cpan/report/fadaebbe-5cc0-11ed-b394-4404171ec35d
+0.24 2022-11-04
+  [New Features]
+    * Added the Sys::Signal class
+    * Added the Sys::Signal::Constant class.
+    * Added the Sys::Signal::Handler class.
+    * Added the following methods in the Sys::Signal::Constant class.
+      BUS_ADRALN
+      BUS_ADRERR
+      BUS_MCEERR_AO
+      BUS_MCEERR_AR
+      BUS_MCERR_
+      BUS_OBJERR
+      CLD_CONTINUED
+      CLD_DUMPED
+      CLD_EXITED
+      CLD_KILLED
+      CLD_STOPPED
+      CLD_TRAPPED
+      FPE_FLTDIV
+      FPE_FLTINV
+      FPE_FLTOVF
+      FPE_FLTRES
+      FPE_FLTSUB
+      FPE_FLTUND
+      FPE_INTDIV
+      FPE_INTOVF
+      FUTEX_WAIT
+      ILL_BADSTK
+      ILL_COPROC
+      ILL_ILLADR
+      ILL_ILLOPC
+      ILL_ILLOPN
+      ILL_ILLTRP
+      ILL_PRVOPC
+      ILL_PRVREG
+      POLL_ERR
+      POLL_HUP
+      POLL_IN
+      POLL_MSG
+      POLL_OUT
+      POLL_PRI
+      SI_ASYNCIO
+      SI_KERNEL
+      SI_MESGQ
+      SI_QUEUE
+      SI_SIGIO
+      SI_TIMER
+      SI_TKILL
+      SI_USER
+      TRAP_BRANCH
+      TRAP_BRKPT
+      TRAP_HWBKPT
+      TRAP_TRACE
+      SIGABRT
+      SIGALRM
+      SIGBUS
+      SIGCHLD
+      SIGCONT
+      SIGFPE
+      SIGHUP
+      SIGILL
+      SIGINT
+      SIGIO
+      SIGKILL
+      SIGPIPE
+      SIGPROF
+      SIGPWR
+      SIGQUIT
+      SIGRTMAX
+      SIGRTMIN
+      SIGSEGV
+      SIGSTKFLT
+      SIGSTOP
+      SIGSYS
+      SIGTERM
+      SIGTRAP
+      SIGTSTP
+      SIGTTIN
+      SIGTTOU
+      SIGURG
+      SIGUSR1
+      SIGUSR2
+      SIGVTALRM
+      SIGWINCH
+      SIGXCPU
+      SIGXFSZ
+      SIG_DFL
+      SIG_ERR
+      SIG_IGN
+    * Added the Sys::Signal::Handler::SIG_DFL class.
+    * Added the Sys::Signal::Handler::SIG_IGN class.
+    * Added the Sys::Signal::Handler::SIG_ERR class.
+    * Added the Sys::Signal::Handler::SIG_MONITOR class.
+  [Bug Fix]
+    * Fixed the bug that "solaris" is detected as "sunos" in the get_osname method in the Sys class. SunOS is detected as "solaris".
+      http://www.cpantesters.org/cpan/report/7b1f20d8-5a00-11ed-aba6-9a79f339625c
+  [Incompatible Changes]
+    * The kill method in the Sys::Process class is moved to the Sys::Signal.
+    * The alarm and ualarm method is added to the Sys::Signal class. This was removed from the Sys::Process class at 0.23(2022-11-01)
+      native static method alarm : int ($seconds : int);
+      native static method ualarm : int ($usecs : int, $interval : int);
+    * Added the raise method to the Sys::Signal class.
 0.23 2022-11-01
   [Bug Fix]
     * Fixed the bug that the get_osname method in the Sys class returned "sunos", not "solaris" in Soralis.

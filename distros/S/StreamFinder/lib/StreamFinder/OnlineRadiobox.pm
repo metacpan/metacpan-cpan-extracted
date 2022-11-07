@@ -102,12 +102,22 @@ One or more streams can be returned for each station.
 
 =over 4
 
-=item B<new>(I<ID>|I<url> [, I<-secure> [ => 0|1 ]] [, I<-debug> [ => 0|1|2 ]])
+=item B<new>(I<ID>|I<url> [, I<-notrim> [ => 0|1 ]] [, I<-secure> [ => 0|1 ]]
+[, I<-debug> [ => 0|1|2 ]])
 
 Accepts an Onlineradiobox.com station ID or URL and creates and returns a new 
 station object, or I<undef> if the URL is not a valid Onlineradiobox.com 
 station or no streams are found.  The URL can be the full URL, 
 ie. https://Onlineradiobox.com/B<country-code>/B<station-id>, or just I<station-id>.
+
+The optional I<-notrim> argument can be either 0 or 1 (I<false> or I<true>).  
+If 0 (I<false>) then stream URLs are trimmed of excess "ad" parameters 
+(everything after the first "?" character, ie. "?ads.cust_params=premium" is 
+removed, including the "?".  Otherwise, the stream URLs are returned as-is.  
+
+DEFAULT I<-notrim> (if not given) is 0 (I<false>) and URLs are trimmed.  If 
+I<-notrim> is specified without argument, the default is 1 (I<true>).  Try 
+using I<-notrim> if stream will not play without the extra arguments.
 
 The optional I<-secure> argument can be either 0 or 1 (I<false> or I<true>).  If 1 
 then only secure ("https://") streams will be returned.
@@ -223,6 +233,9 @@ I<-debug> => [0|1|2] and most of the L<LWP::UserAgent> options.
 
 Options specified here override any specified in I<~/.config/StreamFinder/config>.
 
+Among options valid for OnlineRadioBox streams is the I<-notrim> described 
+in the B<new()> function.  
+
 =item ~/.config/StreamFinder/config
 
 Optional text file for specifying various configuration options.  
@@ -287,7 +300,7 @@ L<http://search.cpan.org/dist/StreamFinder-OnlineRadiobox/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2021 Jim Turner.
+Copyright 2022 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -348,7 +361,17 @@ sub new
 	my $self = $class->SUPER::new('OnlineRadiobox', @_);
 	$DEBUG = $self->{'debug'}  if (defined $self->{'debug'});
 
-	(my $url2fetch = $url);
+	$self->{'notrim'} = 0;
+	while (@_) {
+		if ($_[0] =~ /^\-?notrim$/o) {
+			shift;
+			$self->{'notrim'} = (defined $_[0]) ? shift : 1;
+		} else {
+			shift;
+		}
+	}
+
+	my $url2fetch = $url;
 	if ($url =~ /^https?\:/) {
 		$self->{'id'} = $1  if ($url2fetch =~ m#\/([^\/]+)\/?$#);
 	} else {
@@ -378,9 +401,13 @@ sub new
 			$self->{'iconurl'} = $1;
 			$self->{'iconurl'} = 'https:' . $self->{'iconurl'}  if ($self->{'iconurl'} =~ m#^\/\/#);
 		}
+		$self->{'fccid'} = $1  if ($goodpart =~ m#\bradioId\=\"([^\"]+)#s);
+
+		#TRY TO FETCH THE STREAMS:
 		if ($goodpart =~ m#\bstream\=\"([^\"]+)#si) {
 			my $one = $1;
 			unless ($self->{'secure'} && $one !~ /^https/o) {
+				$one =~ s/\.(\w+)\?.*$/\.$1/  unless ($self->{'notrim'});   #STRIP OFF EXTRA GARBAGE PARMS, COMMENT OUT IF STARTS FAILING!
 				push @{$self->{'streams'}}, $one;
 				$self->{'cnt'}++;
 			}
@@ -390,7 +417,7 @@ sub new
 	if ($html =~ m#\<ul\s+class\=\"station\_\_tags\"(.+?)\<\/ul\>#si) {
 		my $goodpart = $1;
 		$self->{'genre'} = '';
-		while ($goodpart =~ s#\bclass\=\"ajax\"\>([^\<]+)\<##s) {
+		while ($goodpart =~ s#\bclass\=\"ajax\"\>([^\<]+)\<##so) {
 			$self->{'genre'} .= $1 . ', ';
 		}
 		$self->{'genre'} =~ s/, $//  if ($self->{'genre'});

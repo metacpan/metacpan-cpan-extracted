@@ -41,4 +41,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Plack-Component-Tags-HTML
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Plack-Component-Tags-HTML
-version: '0.08'
+version: '0.09'

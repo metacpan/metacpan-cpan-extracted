@@ -9,7 +9,7 @@ use Wasm::Wasmtime::Trap;
 use Wasm::Wasmtime::WasiConfig;
 
 # ABSTRACT: WASI instance class
-our $VERSION = '0.22'; # VERSION
+our $VERSION = '0.23'; # VERSION
 
 
 $ffi_prefix = 'wasi_instance_';
@@ -54,7 +54,7 @@ Wasm::Wasmtime::WasiInstance - WASI instance class
 
 =head1 VERSION
 
-version 0.22
+version 0.23
 
 =head1 SYNOPSIS
 

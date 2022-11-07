@@ -18,33 +18,14 @@ our @ISA = qw(Exporter);
 # Set the package version. 
 our $VERSION = '0.03';
 
-# Load the required Perl modules or packages.
-use URI;
-use LWP::UserAgent;
-use JSON::PP;
-
 # Load the required package module.
 use CryptoTron::JsonHttp;
 
-# Set the variable $JSON.
-our $JSON = 'JSON::PP'->new->pretty;
+# Load the required Perl module.
+use File::Basename;
 
-# Define the global variables.
-our($HEADER, $SERVICE_URL);
-
-# Set api url and api path.
-our $API_URL = 'https://api.trongrid.io';
-our $API_PATH = '/wallet/withdrawbalance';
-
-# Set the request header.
-$HEADER = [Accept => 'application/json',
-           Content_Type => 'application/json'];
-
-# Assemble the service url.
-$SERVICE_URL = $API_URL.$API_PATH;
-
-# Set the HTTP request method.
-our $METHOD = "POST";
+# Get the package name.
+our ($MODULE_NAME, undef, undef) = fileparse(__FILE__, '\..*');
 
 # ---------------------------------------------------------------------------- #
 # Subroutine WithdrawBalance()                                                 #
@@ -54,40 +35,25 @@ our $METHOD = "POST";
 # the Tron blockchain. This balance is the reward which is available every 24  #  
 # hours.                                                                       #
 #                                                                              #
-# @argument $privKey    Private Key         (scalar)                           #
-#           $flag       Output format flag  (scalar)                           # 
-# @return   $json_data  Response content    (scalar)                           #
+# @argument {PublicKey     => $PublicKey,                                      #
+#            VisibleFlag => ["True"|"False"|""],                               #
+#            ControlFlag => ["True"|"False"|""],                               #
+#            OutputFormat => ["RAW"|"STR"|""]}    (hash)                       #
+# @return   $output_data  Response content        (scalar)                     #
 # ---------------------------------------------------------------------------- #
 sub WithdrawBalance {
-    # Assign the argument(s) to the local variable.
-    my ($args) = @_;
-    # Set the local variables.
-    my $address = $args->{address};
-    my $outflag = $args->{outflag};
-    # Check the first argument.
-    $address = (defined $address ? $address : "");
-    # Check the second argument.
-    $outflag = (defined $outflag ? $outflag : "");
-    # Initialise the return variable.
-    my $json_data = ""; 
-    # Initialise the other variables. 
-    my $payload = "";
-    my $content = "";
-    # Check address.
-    if ($address ne "") {
-        my $payload = "\{\"owner_address\":\"$address\",\"visible\":\"True\"\}";
-        # Get the content from the service url.
-        ($content, undef, undef, undef) = HTTP_Request($SERVICE_URL, $METHOD, $payload);
-        # Format the content for the output.
-        if ($outflag eq "RAW") {
-            $json_data = $content;    
-        } else {
-            # Encode the content.
-            $json_data = encoded($content);
-        };
-    };
-    # Return JSON data.
-    return $json_data;
+    # Assign the subroutine arguments to the local array.
+    my ($param) = @_;
+    # Create the payload.
+    my $payload = payload_standard($param);
+    # Add the payload to the given hash.
+    $param->{'PayloadString'} = $payload;
+    # Add the module name to the given hash.
+    $param->{'ModuleName'} = $MODULE_NAME;
+    # Get the ouput data.
+    my $output_data = json_data($param);
+    # Return the ouput data.
+    return $output_data;
 };
 
 1;

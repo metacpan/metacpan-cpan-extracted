@@ -8,7 +8,7 @@ use pEFL::Elm;
 pEFL::Elm::init($#ARGV, \@ARGV);
 
 pEFL::Elm::policy_set(ELM_POLICY_QUIT, ELM_POLICY_QUIT_LAST_WINDOW_CLOSED);
-my $win = pEFL::Elm::Win->util_standard_add("hello", "Hello, World!");
+my $win = pEFL::Elm::Win->util_standard_add("colorselector", "Color Selector");
 $win->autodel_set(1);
 
 # win 400x400
@@ -47,6 +47,7 @@ $cs->show();
 # TODO: Callbacks
 $fr2->part_content_set("default",$cs);
 
+$cs->smart_callback_add("changed",\&_change_color,$rect);
 $cs->smart_callback_add("color,item,longpressed" => \&longpressed_cb);
 
 $win->show();
@@ -54,9 +55,16 @@ $win->show();
 pEFL::Elm::run();
 pEFL::Elm::shutdown();
 
+sub _change_color {
+	my ($rect, $obj, $evinfo) = @_;
+	
+	my ($r,$g,$b,$a) = $obj->color_get();
+	$rect->color_set($r,$g,$b,$a);
+}
+
 sub longpressed_cb {
-    my ($data,$obj,$ev_info) = @_;
-    my $it = pEFL::ev_info2obj( $ev_info, "pEFL::Elm::ColorselectorPaletteItem");
-    my ($r,$g,$b,$a) = $it->color_get();
-    print "color: $r $g $b $a\n";
+	my ($data,$obj,$ev_info) = @_;
+	my $it = pEFL::ev_info2obj( $ev_info, "pEFL::Elm::ColorselectorPaletteItem");
+	my ($r,$g,$b,$a) = $it->color_get();
+	print "color: $r $g $b $a\n";
 }

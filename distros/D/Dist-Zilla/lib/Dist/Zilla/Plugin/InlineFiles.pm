@@ -1,16 +1,10 @@
-package Dist::Zilla::Plugin::InlineFiles 6.025;
+package Dist::Zilla::Plugin::InlineFiles 6.027;
 # ABSTRACT: files in a data section
 
 use Moose;
 with 'Dist::Zilla::Role::FileGatherer';
 
-# BEGIN BOILERPLATE
-use v5.20.0;
-use warnings;
-use utf8;
-no feature 'switch';
-use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
-# END BOILERPLATE
+use Dist::Zilla::Pragmas;
 
 use namespace::autoclean;
 
@@ -70,7 +64,7 @@ Dist::Zilla::Plugin::InlineFiles - files in a data section
 
 =head1 VERSION
 
-version 6.025
+version 6.027
 
 =head1 DESCRIPTION
 
@@ -99,7 +93,7 @@ L<PodSyntaxTests|Dist::Zilla::Plugin::PodSyntaxTests>.
 
 =head1 AUTHOR
 
-Ricardo SIGNES 😏 <rjbs@semiotic.systems>
+Ricardo SIGNES 😏 <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

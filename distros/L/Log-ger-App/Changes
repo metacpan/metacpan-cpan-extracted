@@ -1,3 +1,9 @@
+0.024   2022-11-04  Released-By: PERLANCAR; Urgency: medium
+
+        - Bump prereq Log::ger::Output::Composite=0.016 to comply with
+          Log::ger 0.037+ (RT#136716).
+
+
 0.023   2022-02-18  Released-By: PERLANCAR; Urgency: medium
 
         - Observe $main::Default_Log_Level.

@@ -10,8 +10,6 @@ extends 'Vote::Count::Charge::Cascade';
 no warnings 'experimental';
 use feature qw /postderef signatures/;
 
-use Vote::Count::Charge::Utility 'FullCascadeCharge', 'NthApproval',
-  'WeightedTable', 'ChargeTable';
 use Vote::Count::TextTableTiny qw/generate_table/;
 use Vote::Count::Method::CondorcetIRV;
     # import Vote::Count::Method::CondorcetIRV;
@@ -23,13 +21,13 @@ use Try::Tiny;
 use Path::Tiny;
 use Carp;
 
-our $VERSION='2.01';
+our $VERSION='2.02';
 
 =head1 NAME
 
 Vote::Count::Method::Cascade
 
-=head1 VERSION 2.01
+=head1 VERSION 2.02
 
 =cut
 

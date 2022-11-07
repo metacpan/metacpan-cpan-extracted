@@ -1,0 +1,53 @@
+{
+   "abstract" : "Convert angle to text bearing (aka heading)",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.52, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Compass-Bearing",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "GD::Graph::Polar" : "0.09",
+            "Geo::Functions" : "0.03",
+            "Package::New" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mrdvt92/perl-Compass-Bearing/issues"
+      },
+      "homepage" : "https://github.com/mrdvt92/perl-Compass-Bearing",
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/mrdvt92/perl-Compass-Bearing.git"
+      }
+   },
+   "version" : "0.08"
+}

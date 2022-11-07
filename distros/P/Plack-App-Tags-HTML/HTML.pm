@@ -6,10 +6,10 @@ use warnings;
 
 use English;
 use Error::Pure qw(err);
-use Plack::Util::Accessor qw(component constructor_args data data_css);
+use Plack::Util::Accessor qw(component constructor_args data data_css data_init);
 use Symbol::Get;
 
-our $VERSION = 0.08;
+our $VERSION = 0.09;
 
 sub _css {
 	my $self = shift;
@@ -63,6 +63,16 @@ sub _prepare_app {
 	);
 	if (! $self->{'_component'}->isa('Tags::HTML')) {
 		err "Component must be a instance of 'Tags::HTML' class.";
+	}
+
+	return;
+}
+
+sub _process_actions {
+	my $self = shift;
+
+	if (defined $self->data_init && $self->{'_component'}->can('init')) {
+		$self->{'_component'}->init(@{$self->data_init});
 	}
 
 	return;
@@ -134,6 +144,12 @@ Default value is undef.
 =item * C<data_css>
 
 Reference to array with structure for input argument of C<Tags::HTML::process_css()>.
+
+Default value is undef.
+
+=item * C<data_init>
+
+Reference to array with structure for input argument of C<Tags::HTML::init()>.
 
 Default value is undef.
 
@@ -284,6 +300,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.08
+0.09
 
 =cut

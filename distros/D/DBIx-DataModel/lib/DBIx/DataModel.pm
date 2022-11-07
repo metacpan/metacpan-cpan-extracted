@@ -11,7 +11,7 @@ use MRO::Compat;
 use DBIx::DataModel::Meta::Utils qw/does/;
 use Carp::Clan qw[^(DBIx::DataModel::|SQL::Abstract)];
 
-our $VERSION = '3.03';
+our $VERSION = '3.04';
 
 # compatibility setting : see import()
 our $COMPATIBILITY = $VERSION; # from 2.20, no longer automatic compatibility
@@ -72,18 +72,13 @@ after the synopsis.
 
 =head1 VERSION
 
-This is the 3rd generation of C<DBIx::DataModel>. The external
-application programming interface (API) remains fully compatible with
-version 2.0; however the inheritance API has slightly changed and may
-therefore bring some incompatibilities in client classes that inherit
-from C<DBIx::DataModel::Source::Table>.
-
-Recent changes are documented in L<DBIx::DataModel::Doc::Delta_v3>.
-Older changes are in L<DBIx::DataModel::Doc::Delta_v2>
-and L<DBIx::DataModel::Doc::Delta_v1>.
-
+This is the 3rd generation of C<DBIx::DataModel>.
 Compatibility layers with older versions may be
 L<loaded on demand|DBIx::DataModel::Compatibility::V1>.
+Changes are documented in L<DBIx::DataModel::Doc::Delta_v3>,
+L<DBIx::DataModel::Doc::Delta_v2>
+and L<DBIx::DataModel::Doc::Delta_v1>.
+
 
 =head1 SYNOPSIS
 

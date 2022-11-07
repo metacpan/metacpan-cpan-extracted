@@ -2,20 +2,18 @@ NAME
     Data::Sah::FilterBundle::Phone - Sah filters related to phone numbers
 
 VERSION
-    This document describes version 0.003 of Data::Sah::FilterBundle::Phone
+    This document describes version 0.004 of Data::Sah::FilterBundle::Phone
     (from Perl distribution Data-Sah-FilterBundle-Phone), released on
-    2022-09-09.
+    2022-10-18.
 
 DESCRIPTION
     This distribution contains the following Sah filter rule modules:
 
-    *   Data::Sah::Filter::perl::Phone::format_idn
-
-    *   Data::Sah::Filter::perl::Phone::format_idnlocal_nospace
+    *   Data::Sah::Filter::perl::Phone::format_idn_local
 
     *   Data::Sah::Filter::perl::Phone::format
 
-    *   Data::Sah::Filter::perl::Phone::format_idn_nospace
+    *   Data::Sah::Filter::perl::Phone::format_idn
 
 HOMEPAGE
     Please visit the project's homepage at

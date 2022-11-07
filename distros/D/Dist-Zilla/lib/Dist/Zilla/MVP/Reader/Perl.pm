@@ -1,17 +1,11 @@
-package Dist::Zilla::MVP::Reader::Perl 6.025;
+package Dist::Zilla::MVP::Reader::Perl 6.027;
 # ABSTRACT: the reader for dist.pl files
 
 use Moose;
 extends 'Config::MVP::Reader';
 with qw(Config::MVP::Reader::Findable::ByExtension);
 
-# BEGIN BOILERPLATE
-use v5.20.0;
-use warnings;
-use utf8;
-no feature 'switch';
-use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
-# END BOILERPLATE
+use Dist::Zilla::Pragmas;
 
 use namespace::autoclean;
 
@@ -71,7 +65,7 @@ Dist::Zilla::MVP::Reader::Perl - the reader for dist.pl files
 
 =head1 VERSION
 
-version 6.025
+version 6.027
 
 =head1 DESCRIPTION
 
@@ -91,7 +85,7 @@ the minimum required perl.
 
 =head1 AUTHOR
 
-Ricardo SIGNES 😏 <rjbs@semiotic.systems>
+Ricardo SIGNES 😏 <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

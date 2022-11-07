@@ -8,7 +8,7 @@ use Class::Utils qw(set_params split_params);
 use Error::Pure qw(err);
 use Scalar::Util qw(blessed);
 
-our $VERSION = 0.05;
+our $VERSION = 0.07;
 
 # Process 'Tags'.
 sub _process {
@@ -24,6 +24,9 @@ sub _process {
 
 	$self->{'tags'}->put(
 		['b', 'input'],
+		$input->autofocus ? (
+			['a', 'autofocus', 'autofocus'],
+		) : (),
 		defined $input->css_class ? (
 			['a', 'class', $input->css_class],
 		) : (),
@@ -94,7 +97,13 @@ sub _process_css {
 		['d', 'cursor', 'pointer'],
 		['e'],
 
-		['s', 'input'.$css_class],
+		['s', 'input'.$css_class.'[type=submit][disabled=disabled]'],
+		['d', 'background-color', '#888888'],
+		['e'],
+
+		['s', 'input'.$css_class.'[type=text]'],
+		['s', 'input'.$css_class.'[type=date]'],
+		['s', 'input'.$css_class.'[type=number]'],
 		['d', 'width', '100%'],
 		['d', 'padding', '12px 20px'],
 		['d', 'margin', '8px 0'],
@@ -278,6 +287,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.05
+0.07
 
 =cut

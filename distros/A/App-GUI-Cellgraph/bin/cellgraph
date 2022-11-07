@@ -1,0 +1,10 @@
+#!/usr/bin/perl -w
+use v5.12;
+use lib 'lib', '../lib';
+use App::GUI::Cellgraph;
+
+App::GUI::Cellgraph->new->MainLoop( );
+
+exit 0;
+__END__
+

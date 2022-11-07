@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use URI();
 
-our $VERSION = '1.28';
+our $VERSION = '1.31';
 
 sub _NUMBER_OF_MILLISECONDS_IN_A_SECOND { return 1000 }
 
@@ -38,7 +38,7 @@ sub _resolve_to_boolean {
 sub successful {
     my ($self) = @_;
     return ( ( defined $self->{update_status_code} )
-          && ( $self->{update_status_code} eq 'SUCCESSFUL_UPDATE' ) );
+          && ( $self->{update_status_code} eq 'PENDING_UPDATE' ) );
 }
 
 sub update_status_code {
@@ -155,7 +155,7 @@ Firefox::Marionette::UpdateStatus - Represents the resulting status of an Firefo
 
 =head1 VERSION
 
-Version 1.28
+Version 1.31
 
 =head1 SYNOPSIS
 

@@ -10,7 +10,7 @@ use List::MoreUtils qw(none);
 use Scalar::Util qw(blessed);
 use Unicode::UTF8 qw(decode_utf8);
 
-our $VERSION = 0.01;
+our $VERSION = 0.02;
 
 # Constructor.
 sub new {
@@ -121,7 +121,7 @@ sub _process {
 
 		if (defined $self->{'img_select_cb'}) {
 			my $select_hr = $self->{'img_select_cb'}->($self, $image);
-			if (ref $select_hr eq 'HASH' && $select_hr->{'value'}) {
+			if (ref $select_hr eq 'HASH' && exists $select_hr->{'value'}) {
 				$select_hr->{'css_background_color'} ||= 'lightgreen';
 				$self->{'tags'}->put(
 					['b', 'i'],
@@ -506,6 +506,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.01
+0.02
 
 =cut

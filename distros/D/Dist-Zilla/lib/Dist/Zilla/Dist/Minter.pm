@@ -1,16 +1,10 @@
-package Dist::Zilla::Dist::Minter 6.025;
+package Dist::Zilla::Dist::Minter 6.027;
 # ABSTRACT: distribution builder; installer not included!
 
 use Moose 0.92; # role composition fixes
 extends 'Dist::Zilla';
 
-# BEGIN BOILERPLATE
-use v5.20.0;
-use warnings;
-use utf8;
-no feature 'switch';
-use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
-# END BOILERPLATE
+use Dist::Zilla::Pragmas;
 
 use File::pushd ();
 use Dist::Zilla::Path;
@@ -160,7 +154,7 @@ Dist::Zilla::Dist::Minter - distribution builder; installer not included!
 
 =head1 VERSION
 
-version 6.025
+version 6.027
 
 =head1 PERL VERSION
 
@@ -176,7 +170,7 @@ the minimum required perl.
 
 =head1 AUTHOR
 
-Ricardo SIGNES 😏 <rjbs@semiotic.systems>
+Ricardo SIGNES 😏 <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

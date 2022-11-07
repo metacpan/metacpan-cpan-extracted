@@ -1,16 +1,16 @@
 package Perinci::CmdLine::Help;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-10'; # DATE
-our $DIST = 'Perinci-CmdLine-Help'; # DIST
-our $VERSION = '0.174'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 
-require Exporter;
-our @ISA = qw(Exporter);
+use Exporter 'import';
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-10-19'; # DATE
+our $DIST = 'Perinci-CmdLine-Help'; # DIST
+our $VERSION = '0.175'; # VERSION
+
 our @EXPORT_OK = qw(gen_help);
 
 our %SPEC;
@@ -57,6 +57,14 @@ If you already call <pm:Perinci::Sub::GetArgs::Argv>'s
 here, to avoid calculating twice.
 
 _
+        },
+        lang => {
+            summary => "Will be passed to Perinci::Sub::To::CLIDocData's gen_cli_doc_data_from_meta()",
+            schema => 'str*',
+        },
+        mark_different_lang => {
+            summary => "Will be passed to Perinci::Sub::To::CLIDocData's gen_cli_doc_data_from_meta()",
+            schema => 'bool*',
         },
     },
 };
@@ -107,6 +115,8 @@ sub gen_help {
             per_arg_json => $args{per_arg_json},
             per_arg_yaml => $args{per_arg_yaml},
             (ggls_res => $args{ggls_res}) x defined($args{ggls_res}),
+            (lang => $args{lang}) x defined($args{lang}),
+            (mark_different_lang => $args{mark_different_lang}) x defined($args{mark_different_lang}),
         );
         die [500, "gen_cli_doc_data_from_meta failed: ".
                  "$res->[0] - $res->[1]"] unless $res->[0] == 200;
@@ -266,7 +276,7 @@ Perinci::CmdLine::Help - Generate help message for Perinci::CmdLine-based app
 
 =head1 VERSION
 
-This document describes version 0.174 of Perinci::CmdLine::Help (from Perl distribution Perinci-CmdLine-Help), released on 2021-07-10.
+This document describes version 0.175 of Perinci::CmdLine::Help (from Perl distribution Perinci-CmdLine-Help), released on 2022-10-19.
 
 =head1 DESCRIPTION
 
@@ -293,6 +303,8 @@ Arguments ('*' denotes required arguments):
 
 =item * B<common_opts> => I<hash> (default: {})
 
+(No description)
+
 =item * B<ggls_res> => I<array>
 
 Full result from gen_getopt_long_spec_from_meta().
@@ -301,21 +313,41 @@ If you already call L<Perinci::Sub::GetArgs::Argv>'s
 C<gen_getopt_long_spec_from_meta()>, you can pass the I<full> enveloped result
 here, to avoid calculating twice.
 
+=item * B<lang> => I<str>
+
+Will be passed to Perinci::Sub::To::CLIDocData's gen_cli_doc_data_from_meta().
+
+=item * B<mark_different_lang> => I<bool>
+
+Will be passed to Perinci::Sub::To::CLIDocData's gen_cli_doc_data_from_meta().
+
 =item * B<meta>* => I<hash>
 
 Function metadata.
 
 =item * B<meta_is_normalized> => I<bool>
 
+(No description)
+
 =item * B<per_arg_json> => I<bool>
+
+(No description)
 
 =item * B<per_arg_yaml> => I<bool>
 
+(No description)
+
 =item * B<program_name>* => I<str>
+
+(No description)
 
 =item * B<program_summary> => I<str>
 
+(No description)
+
 =item * B<subcommands> => I<hash>
+
+(No description)
 
 
 =back
@@ -341,6 +373,37 @@ Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Cm
 
 Source repository is at L<https://github.com/perlancar/perl-Perinci-CmdLine-Help>.
 
+=head1 SEE ALSO
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2021, 2020, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine-Help>
@@ -348,18 +411,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 SEE ALSO
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021, 2020, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

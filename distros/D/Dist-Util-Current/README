@@ -1,0 +1,111 @@
+NAME
+    Dist::Util::Current - Guess the current Perl distribution name
+
+VERSION
+    This document describes version 0.003 of Dist::Util::Current (from Perl
+    distribution Dist-Util-Current), released on 2022-11-07.
+
+SYNOPSIS
+     use Dist::Util::Current qw(my_dist);
+
+     my $dist = my_dist();
+
+DESCRIPTION
+FUNCTIONS
+  my_dist
+    Usage:
+
+     my_dist(%opts) => STR|HASH
+
+    Guess the current distribution (the Perl distribution associated with
+    the source code) using one of several ways.
+
+    Options:
+
+    *   filename
+
+        String. The path to source code file. If unspecified, will use file
+        name retrieved from caller(0).
+
+    *   package
+
+        String. The caller's package. If unspecified, will use package name
+        retrieved from caller(0).
+
+    How the function works:
+
+    1. $DIST
+        If the caller's package defines a package variable $DIST, will
+        return this.
+
+    2. .packlist for module or supermodules
+        Will check .packlist for module or supermodules. For example, if
+        module is Algorithm::Backoff::Constant then will try to check for
+        .packlist for "Algorithm::Backoff::Constant", "Algorithm::Backoff",
+        and "Algorithm".
+
+        For each found .packlist will read its contents and check whether
+        the filename is listed. If yes, then we've found the distribution
+        name and return it.
+
+    3. .packlist in @INC
+        Will check .packlist in directories listed in @INC. Will use
+        Dist::Util's "list_dists()" for this.
+
+        For each found .packlist will read its contents and check whether
+        the filename is listed. If yes, then we've found the distribution
+        name and return it.
+
+    4. Try "this_dist()" against current directory and several levels up
+        Will guess using App::ThisDist's "this_dist()" against the current
+        directory and several levels up.
+
+    If all of the above fails, we return undef.
+
+    TODO: Query the OS's package manager.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Dist-Util-Current>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Dist-Util-Current>.
+
+SEE ALSO
+    App::ThisDist
+
+    Dist::Util
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Util-Current>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

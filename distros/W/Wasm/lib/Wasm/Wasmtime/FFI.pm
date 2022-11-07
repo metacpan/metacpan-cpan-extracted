@@ -14,10 +14,10 @@ use constant ();
 use base qw( Exporter );
 
 # ABSTRACT: Private class for Wasm::Wasmtime
-our $VERSION = '0.22'; # VERSION
+our $VERSION = '0.23'; # VERSION
 
 
-our @EXPORT = qw( $ffi $ffi_prefix _generate_vec_class _generate_destroy _v0_23_0 );
+our @EXPORT = qw( $ffi $ffi_prefix _generate_vec_class _generate_destroy );
 
 sub _lib
 {
@@ -30,8 +30,8 @@ sub _lib
     'wasmtime_module_deserialize',
     'wasmtime_store_gc',
     ## 0.23.0
-    #'wasmtime_config_consume_fuel_set',
-    #'wasmtime_config_max_instances_set
+    'wasmtime_config_consume_fuel_set',
+    #'wasmtime_config_max_instances_set',  # removed in 0.27.0
   );
   my $lib = find_lib lib => 'wasmtime', symbol => \@symbols;
   return $lib if $lib;
@@ -49,8 +49,6 @@ $ffi->mangler(sub {
   return $name if $name =~ /^(wasm|wasmtime|wasi)_/;
   return $ffi_prefix . $name;
 });
-
-constant->import( _v0_23_0 => $ffi->find_symbol('wasmtime_config_consume_fuel_set') ? 1 : 0);
 
 { package Wasm::Wasmtime::Vec;
   use FFI::Platypus::Record;
@@ -253,32 +251,22 @@ my %kind = (
     map { $_->to_perl } @$self
   }
 
-  if(Wasm::Wasmtime::FFI::_v0_23_0())
   {
-    {
-      package Wasm::Wasmtime::ValVecWrapper;
-      FFI::C->struct(wasm_val_vec_wrapper_t => [
-        size => 'size_t',
-        data => 'opaque',
-      ]);
+    package Wasm::Wasmtime::ValVecWrapper;
+    FFI::C->struct(wasm_val_vec_wrapper_t => [
+      size => 'size_t',
+      data => 'opaque',
+    ]);
 
-    }
+  }
 
-    $ffi->attach_cast('from_c', 'opaque', 'wasm_val_vec_wrapper_t', sub {
-      my($xsub, undef, $ptr) = @_;
-      my $wrapper = $xsub->($ptr);
-      my $inner = $ffi->cast('opaque', 'wasm_val_vec_t', $wrapper->data);
-      FFI::C::Util::set_array_count($inner, $wrapper->size);
-      return $inner;
-    });
-  }
-  else
-  {
-    $ffi->attach_cast('from_c', 'opaque', 'wasm_val_vec_t', sub {
-      my($xsub, undef, $ptr) = @_;
-      $xsub->($ptr);
-    });
-  }
+  $ffi->attach_cast('from_c', 'opaque', 'wasm_val_vec_wrapper_t', sub {
+    my($xsub, undef, $ptr) = @_;
+    my $wrapper = $xsub->($ptr);
+    my $inner = $ffi->cast('opaque', 'wasm_val_vec_t', $wrapper->data);
+    FFI::C::Util::set_array_count($inner, $wrapper->size);
+    return $inner;
+  });
 
   sub from_perl
   {
@@ -301,7 +289,7 @@ Wasm::Wasmtime::FFI - Private class for Wasm::Wasmtime
 
 =head1 VERSION
 
-version 0.22
+version 0.23
 
 =head1 SYNOPSIS
 

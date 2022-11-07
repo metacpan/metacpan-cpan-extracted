@@ -1,5 +1,21 @@
 #!perl
 
+# vim: ts=4 sts=4 sw=4 et: syntax=perl
+#
+# Copyright (c) 2021-2022 Sven Kirmess
+#
+# Permission to use, copy, modify, and distribute this software for any
+# purpose with or without fee is hereby granted, provided that the above
+# copyright notice and this permission notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+# WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+# ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+# WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+# ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+# OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
 use 5.006;
 use strict;
 use warnings;
@@ -15,6 +31,17 @@ use Local::Test::TempDir qw(tempdir);
 
 use Git::Background 0.003;
 
+package Git::Background::Future;
+
+# is_ready reaps the Git process if it is done. We don't want to for the
+# tests.
+sub _test_is_ready {
+    my ($self) = @_;
+    return $self->SUPER::is_ready;
+}
+
+package main;
+
 my $bindir = File::Spec->catdir( File::Basename::dirname( File::Basename::dirname( Cwd::abs_path __FILE__ ) ), 'corpus', 'bin' );
 
 my $obj = Git::Background->new( { git => [ $^X, File::Spec->catdir( $bindir, 'my-git.pl' ) ] } );
@@ -25,14 +52,14 @@ my $f = $obj->run('--version');
 isa_ok( $f, 'Git::Background::Future', 'run() returns a Git::Background::Future' );
 isa_ok( $f, 'Future',                  '... which is a Future' );
 
-ok( exists $f->{_run},         'contains a _run structure' );
-ok( $f->{_run}{_fatal},        '_run has correct _fatal' );
-ok( !defined $f->{_run}{_dir}, '... _dir' );
-isa_ok( $f->{_run}{_stderr}, 'File::Temp',       '... stderr' );
-isa_ok( $f->{_run}{_stdout}, 'File::Temp',       '... stdout' );
-isa_ok( $f->{_run}{_proc},   'Proc::Background', '... and _proc' );
+ok( defined $f->udata('_run'),          'contains a _run structure' );
+ok( $f->udata('_run')->{_fatal},        '_run has correct _fatal' );
+ok( !defined $f->udata('_run')->{_dir}, '... _dir' );
+isa_ok( $f->udata('_run')->{_stderr}, 'File::Temp',       '... stderr' );
+isa_ok( $f->udata('_run')->{_stdout}, 'File::Temp',       '... stdout' );
+isa_ok( $f->udata('_run')->{_proc},   'Proc::Background', '... and _proc' );
 
-ok( !$f->{ready}, 'future is not yet ready' );
+ok( !$f->_test_is_ready, 'future is not yet ready' );
 
 # await can be called multiple times
 is( $f->await, $f, 'await returns itself' );
@@ -40,14 +67,14 @@ is( $f->await, $f, '... and can be called multiple times' );
 is( $f->await, $f, '... really' );
 my ( $stdout, $stderr, $rc ) = $f->get;
 
-ok( $f->{ready},    'future is ready' );
-ok( $f->is_ready,   'is_ready' );
-ok( $f->is_done,    'is_done' );
-ok( !$f->is_failed, '!is_failed' );
+ok( $f->_test_is_ready, 'future is ready' );
+ok( $f->is_ready,       'is_ready' );
+ok( $f->is_done,        'is_done' );
+ok( !$f->is_failed,     '!is_failed' );
 is_deeply( $stdout, ['git version 2.33.1'], 'get() returns correct stdout' );
 is_deeply( $stderr, [],                     '... stderr' );
 is( $rc, 0, '... and exit code' );
-ok( !exists $f->{_run}, '_run no longer exists' );
+ok( !defined $f->udata('_run'), '_run no longer defined' );
 
 #
 note('stdout and stderr');
@@ -87,11 +114,11 @@ note('non fatal');
 $f = $obj->run( '-x77', '-eerror 1', { fatal => 0 } );
 isa_ok( $f, 'Git::Background::Future', 'run() returns a Git::Background::Future' );
 
-ok( exists $f->{_run},   'contains a _run structure' );
-ok( !$f->{_run}{_fatal}, '_run has correct _fatal' );
-isa_ok( $f->{_run}{_stderr}, 'File::Temp',       '... stderr' );
-isa_ok( $f->{_run}{_stdout}, 'File::Temp',       '... stdout' );
-isa_ok( $f->{_run}{_proc},   'Proc::Background', '... and _proc' );
+ok( defined $f->udata('_run'),    'contains a _run structure' );
+ok( !$f->udata('_run')->{_fatal}, '_run has correct _fatal' );
+isa_ok( $f->udata('_run')->{_stderr}, 'File::Temp',       '... stderr' );
+isa_ok( $f->udata('_run')->{_stdout}, 'File::Temp',       '... stdout' );
+isa_ok( $f->udata('_run')->{_proc},   'Proc::Background', '... and _proc' );
 
 ( $stdout, $stderr, $rc ) = $f->get;
 
@@ -172,5 +199,3 @@ is( $rc, 7, 'error contains correct exit code' );
 done_testing();
 
 exit 0;
-
-# vim: ts=4 sts=4 sw=4 et: syntax=perl

@@ -59,6 +59,7 @@ t/lib/DBIC_example/MyApp/Schema/Result/Track.pm
 t/lib/DBIDM_Test.pm
 t/lib/HR/ResultAs/Buggy.pm
 t/lib/HR/ResultAs/Stupid.pm
+t/metadm.t
 t/v1_DBIx-DataModel.t
 t/v1_Limit.t
 t/v1_LocalizeState.t

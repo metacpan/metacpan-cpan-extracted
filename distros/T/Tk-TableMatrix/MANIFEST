@@ -18,12 +18,13 @@ demos/TableMatrixTest
 demos/tagBorderWidth
 demos/tagMerge
 demos/tagMerge2
+Makefile
 Makefile.PL
 MANIFEST			This list of files
+MANIFEST.SKIP
 myConfig
+pod/Makefile
 pod/Makefile.PL
-pod/MYMETA.json
-pod/MYMETA.yml
 pod/TableMatrix.pod
 pTk/chext
 pTk/counts
@@ -37,6 +38,7 @@ pTk/genexc
 pTk/license.html_lib
 pTk/license.terms
 pTk/makeenglish
+pTk/Makefile
 pTk/Makefile.PL
 pTk/mkmethods
 pTk/mkneed
@@ -97,8 +99,6 @@ pTk/mTk/Tktable800/tkTableUtil.c
 pTk/mTk/Tktable800/tkTableversion.h
 pTk/mTk/Tktable800/tkTableWin.c
 pTk/mTk/Tktable800/version.h
-pTk/MYMETA.json
-pTk/MYMETA.yml
 pTk/p4e
 pTk/process_object
 pTk/refs

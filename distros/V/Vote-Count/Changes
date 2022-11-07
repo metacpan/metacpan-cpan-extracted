@@ -1,4 +1,5 @@
 Revision history for Vote::Count
+2.02  Nov  01, 2022 remove ghost dependencies
 2.01  June 30, 2021 lc tiebreakmethod in tiebreaker, improvements to untielist.
                     added strict moose attribute checking.
                     tiebreakerprecedencefallback with 

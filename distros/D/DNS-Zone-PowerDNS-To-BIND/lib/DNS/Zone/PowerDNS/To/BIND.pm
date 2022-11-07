@@ -1,8 +1,5 @@
 package DNS::Zone::PowerDNS::To::BIND;
 
-our $DATE = '2019-09-17'; # DATE
-our $VERSION = '0.008'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
@@ -15,6 +12,11 @@ use Exporter 'import';
 our @EXPORT_OK = qw(
                        gen_bind_zone_from_powerdns_db
                );
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-11-05'; # DATE
+our $DIST = 'DNS-Zone-PowerDNS-To-BIND'; # DIST
+our $VERSION = '0.009'; # VERSION
 
 our %SPEC;
 
@@ -151,12 +153,16 @@ sub gen_bind_zone_from_powerdns_db {
         push @res, "$name ", ($rec->{ttl} ? "$rec->{ttl} ":""), "IN ";
         if ($type eq 'A') {
             push @res, "A $rec->{content}\n";
+	} elsif ($type eq 'AAAA') {
+            push @res, "AAAA $rec->{content}\n";
         } elsif ($type eq 'CNAME') {
             push @res, "CNAME $rec->{content}.\n";
         } elsif ($type eq 'MX') {
             push @res, "MX $rec->{prio} $rec->{content}.\n";
         } elsif ($type eq 'NS') {
             push @res, "NS $rec->{content}.\n";
+	} elsif ($type eq 'PTR') {
+            push @res, "PTR $rec->{content}.\n";
         } elsif ($type eq 'SSHFP') {
             push @res, "SSHFP $rec->{content}\n";
         } elsif ($type eq 'SRV') {
@@ -186,7 +192,7 @@ DNS::Zone::PowerDNS::To::BIND - Generate BIND zone configuration from informatio
 
 =head1 VERSION
 
-This document describes version 0.008 of DNS::Zone::PowerDNS::To::BIND (from Perl distribution DNS-Zone-PowerDNS-To-BIND), released on 2019-09-17.
+This document describes version 0.009 of DNS::Zone::PowerDNS::To::BIND (from Perl distribution DNS-Zone-PowerDNS-To-BIND), released on 2022-11-05.
 
 =head1 SYNOPSIS
 
@@ -231,17 +237,31 @@ Arguments ('*' denotes required arguments):
 
 =item * B<db_dsn> => I<str> (default: "DBI:mysql:database=pdns")
 
+(No description)
+
 =item * B<db_password> => I<str>
+
+(No description)
 
 =item * B<db_user> => I<str>
 
+(No description)
+
 =item * B<dbh> => I<obj>
+
+(No description)
 
 =item * B<default_ns> => I<array[net::hostname]>
 
+(No description)
+
 =item * B<domain> => I<net::hostname>
 
+(No description)
+
 =item * B<domain_id> => I<uint>
+
+(No description)
 
 =item * B<workaround_cname_and_other_data> => I<bool> (default: 1)
 
@@ -268,6 +288,7 @@ by automatically converting underscores to dashes. Note that it does not ensure
 hostnames like C<foo_.example.com> to become valid as C<foo-.example.com> is also
 not a valid hostname.
 
+
 =back
 
 Return value:  (any)
@@ -280,14 +301,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/DNS-Zone-P
 
 Source repository is at L<https://github.com/perlancar/perl-DNS-Zone-PowerDNS-To-BIND>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=DNS-Zone-PowerDNS-To-BIND>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Sah::Schemas::DNS>
@@ -298,11 +311,43 @@ L<DNS::Zone::Struct::To::BIND>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Ken Teague
+
+Ken Teague <kteague@pobox.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2019 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=DNS-Zone-PowerDNS-To-BIND>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

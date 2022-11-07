@@ -1,16 +1,10 @@
-package Dist::Zilla::Role::ArchiveBuilder 6.025;
+package Dist::Zilla::Role::ArchiveBuilder 6.027;
 # ABSTRACT: something that builds archives
 
 use Moose::Role;
 with 'Dist::Zilla::Role::Plugin';
 
-# BEGIN BOILERPLATE
-use v5.20.0;
-use warnings;
-use utf8;
-no feature 'switch';
-use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
-# END BOILERPLATE
+use Dist::Zilla::Pragmas;
 
 requires 'build_archive';
 
@@ -63,7 +57,7 @@ Dist::Zilla::Role::ArchiveBuilder - something that builds archives
 
 =head1 VERSION
 
-version 6.025
+version 6.027
 
 =head1 DESCRIPTION
 
@@ -113,7 +107,7 @@ tarball.  It does not include C<-TRIAL>, even if building a trial dist.
 
 =head1 AUTHOR
 
-Ricardo SIGNES 😏 <rjbs@semiotic.systems>
+Ricardo SIGNES 😏 <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

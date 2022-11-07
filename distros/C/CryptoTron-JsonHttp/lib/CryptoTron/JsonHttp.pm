@@ -1,7 +1,7 @@
 package CryptoTron::JsonHttp;
 
 # Load the Perl pragmas.
-use 5.010000;
+use 5.008008;
 use strict;
 use warnings;
 
@@ -15,19 +15,16 @@ our @ISA = qw(Exporter);
 # Exporting the implemented subroutine.
 our @EXPORT = qw(
     HTTP_Request
-    encode
     encode_data
     json_data
     format_output
+    payload_standard
     %SERVICES
     $API_URL
 );
 
-# Set alias.
-*encode = \&encode_data;
-
 # Set the package version. 
-our $VERSION = '0.09';
+our $VERSION = '0.13';
 
 # Load the required Perl modules or packages.
 use JSON::PP;
@@ -46,6 +43,7 @@ our %SERVICES = (
     'BroadcastTransaction'   => ['/wallet/broadcasttransaction',   'POST'],
     'FreezeBalance'          => ['/wallet/freezebalance',          'POST'],
     'GetAccount'             => ['/walletsolidity/getaccount',     'POST'],
+    'GetBrokerage'           => ['/wallet/getBrokerage',           'POST'],
     'GetAccountBalance'      => ['/wallet/getaccountbalance',      'POST'],
     'GetAccountNet'          => ['/wallet/getaccountnet',          'POST'],
     'GetAccountResource'     => ['/wallet/getaccountresource',     'POST'],
@@ -66,44 +64,65 @@ $JSON = $JSON->allow_blessed("true");
 $JSON = $JSON->allow_singlequote("true");
 
 # ---------------------------------------------------------------------------- #
-# Function json_data()                                                         #
+# Subroutine payload_standard()                                                #
+# ---------------------------------------------------------------------------- #
+sub payload_standard {
+    # Assign the subroutine arguments to the local array.
+    my ($args) = @_;
+    # Set the local variables.
+    my $addr = $args->{PublicKey};
+    my $flag = $args->{VisibleFlag};
+    my $chk = $args->{ControlFlag};
+    # Check if the the local variables are defined.
+    $addr = (defined $addr ? $addr : "");
+    $chk = (defined $chk ? $chk : "True");
+    $flag = (defined $flag ? $flag : "True");
+    # Initialise the local variable $payload. 
+    my $payload = "";
+    # Check if the $address is not empty.
+    if ($addr ne "") {
+        if ($chk eq "True") { 
+            # Check variable $visible.
+            my $isBase58Addr = ($flag eq "True" && chk_base58_addr($addr) != 1); 
+            my $isHexAddr = ($flag eq "False" && chk_hex_addr($addr) != 1);
+            $flag = ($isBase58Addr ? "False" : "True"); 
+            $flag = ($isHexAddr ? "True" : "False"); 
+        };
+        # Create the payload from the address.
+        $payload = "\{\"address\":\"${addr}\",\"visible\":\"${flag}\"\}";
+    };
+    # Return the payload string.
+    return $payload;    
+};
+
+# ---------------------------------------------------------------------------- #
+# Subroutine json_data()                                                       #
 # ---------------------------------------------------------------------------- #
 sub json_data {
     # Assign the arguments to the local array.
     my ($args) = @_;
     # Set the local variables.
-    my $address = (defined $args->{PublicAddr} ? $args->{PublicAddr} : "");
-    my $outflag = (defined $args->{OutputFlag} ? $args->{OutputFlag} : "RAW");
-    my $visible = (defined $args->{VisibleSwitch} ? $args->{VisibleSwitch} : "True");
-    my $addrchk = (defined $args->{AddrCheck} ? $args->{AddrCheck} : "True");
+    my $outfmt = (defined $args->{OutputFormat} ? $args->{OutputFormat} : "RAW");
     # Get the name of the calling module.   
     my $module_name = $args->{ModuleName};
+    # Get the payload string.
+    my $payload = $args->{PayloadString};
     # Get service url and related method.
     my $service_url = $API_URL.$SERVICES{$module_name}[0];
     my $method = $SERVICES{$module_name}[1];
-    # Initialise the local variables. 
-    my $payload = "";
     my $content = "";
     # Initialise the return variable.
     my $output_data = "{}";
-    # Check if address is not empty.
-    if ($address ne "") {
-        # Check if address check is set to True.
-        $visible = (($visible eq "True" && chk_base58_addr($address) != 1) ? "False" : "True"); 
-        $visible = (($visible eq "False" && chk_hex_addr($address) != 1) ? "True" : "False"); 
-        # Create the payload from the address.
-        $payload = "\{\"address\":\"$address\",\"visible\":\"$visible\"\}";
-        # Get the content from the service url.
-        ($content, undef, undef, undef) = HTTP_Request($service_url, $method, $payload);
-        # Format the content for the output.
-        $output_data = format_output($content, $outflag);
-    };
+    # Get the content from the service url.
+    ($content, undef, undef, undef) = HTTP_Request($service_url, $method, $payload);
+    # Format the content for the output.
+    $output_data = format_output($content, $outfmt);
     # Return the JSON data raw or formatted.
     return $output_data;
 };
 
 # ---------------------------------------------------------------------------- #
-# Function format_output()                                                     #
+# Subroutine format_output()                                                   #
 # ---------------------------------------------------------------------------- #
 sub format_output {
     # Assign the subroutine arguments to the local variables.
@@ -122,7 +141,7 @@ sub format_output {
     return $output;
 };
 # ---------------------------------------------------------------------------- #
-# Function encode_data()                                                       #
+# Subroutine encode_data()                                                     #
 #                                                                              #
 # Description:                                                                 # 
 # At first glance, it is not obvious why the response should be decoded and    #
@@ -146,7 +165,7 @@ sub encode_data {
 };
 
 # ---------------------------------------------------------------------------- #
-# Function HTTP_Request()                                                      # 
+# Subroutine HTTP_Request()                                                    # 
 #                                                                              #
 # Description:                                                                 #
 # The subroutine is using the HTTP methods GET or POST to send a request to a  #

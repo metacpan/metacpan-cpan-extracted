@@ -1,0 +1,58 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.56, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown",
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Devel-Deprecations-Environmental",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime" : "0",
+            "DateTime::Format::ISO8601" : "0",
+            "Devel::CheckOS" : "1.95",
+            "Module::Load" : "0",
+            "Scalar::Util" : "0",
+            "Test::Exception" : "0.43",
+            "Test::More" : "0.96",
+            "Test::Time" : "0.092"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/DrHyde/perl-modules-Devel-Deprecations/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/DrHyde/perl-modules-Devel-Deprecations"
+      }
+   },
+   "version" : "1.000",
+   "x_serialization_backend" : "JSON::PP version 4.02"
+}

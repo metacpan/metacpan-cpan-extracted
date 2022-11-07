@@ -1,16 +1,10 @@
-package Dist::Zilla 6.025;
+package Dist::Zilla 6.027;
 # ABSTRACT: distribution builder; installer not included!
 
 use Moose 0.92; # role composition fixes
 with 'Dist::Zilla::Role::ConfigDumper';
 
-# BEGIN BOILERPLATE
-use v5.20.0;
-use warnings;
-use utf8;
-no feature 'switch';
-use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
-# END BOILERPLATE
+use Dist::Zilla::Pragmas;
 
 # This comment has fün̈n̈ÿ characters.
 
@@ -93,9 +87,7 @@ has version => (
   builder   => '_build_version',
 );
 
-sub _build_name {
-  my ($self) = @_;
-
+sub _build_name ($self) {
   my $name;
   for my $plugin (@{ $self->plugins_with(-NameProvider) }) {
     next unless defined(my $this_name = $plugin->provide_name);
@@ -110,9 +102,7 @@ sub _build_name {
   $name;
 }
 
-sub _build_version {
-  my ($self) = @_;
-
+sub _build_version ($self) {
   my $version = $self->_version_override;
 
   for my $plugin (@{ $self->plugins_with(-VersionProvider) }) {
@@ -163,9 +153,7 @@ has release_status => (
   builder => '_build_release_status',
 );
 
-sub _build_release_status {
-  my ($self) = @_;
-
+sub _build_release_status ($self) {
   # environment variables override completely
   return $self->_release_status_from_env if $self->_release_status_from_env;
 
@@ -196,8 +184,7 @@ has _release_status_from_env => (
   builder => '_build_release_status_from_env',
 );
 
-sub _build_release_status_from_env {
-  my ($self) = @_;
+sub _build_release_status_from_env ($self) {
   return $ENV{RELEASE_STATUS} if $ENV{RELEASE_STATUS};
   return $ENV{TRIAL} ? 'testing' : '';
 }
@@ -334,9 +321,7 @@ has license => (
   },
 );
 
-sub _build_license {
-  my ($self) = @_;
-
+sub _build_license ($self) {
   my $license_class    = $self->_license_class;
   my $copyright_holder = $self->_copyright_holder;
   my $copyright_year   = $self->_copyright_year;
@@ -504,8 +489,7 @@ has files => (
   default  => sub { [] },
 );
 
-sub prune_file {
-  my ($self, $file) = @_;
+sub prune_file ($self, $file) {
   my @files = @{ $self->files };
 
   for my $i (0 .. $#files) {
@@ -555,9 +539,8 @@ has _override_is_trial => (
   default => 0,
 );
 
-sub _build_is_trial {
-    my ($self) = @_;
-    return $self->release_status =~ /\A(?:testing|unstable)\z/ ? 1 : 0;
+sub _build_is_trial ($self) {
+  return $self->release_status =~ /\A(?:testing|unstable)\z/ ? 1 : 0;
 }
 
 #pod =attr plugins
@@ -593,9 +576,7 @@ has distmeta => (
   builder   => '_build_distmeta',
 );
 
-sub _build_distmeta {
-  my ($self) = @_;
-
+sub _build_distmeta ($self) {
   require CPAN::Meta::Merge;
   my $meta_merge = CPAN::Meta::Merge->new(default_version => 2);
   my $meta = {};
@@ -661,8 +642,7 @@ has prereqs => (
 #pod
 #pod =cut
 
-sub plugin_named {
-  my ($self, $name) = @_;
+sub plugin_named ($self, $name) {
   my $plugin = first { $_->plugin_name eq $name } @{ $self->plugins };
 
   return $plugin if $plugin;
@@ -679,9 +659,7 @@ sub plugin_named {
 #pod
 #pod =cut
 
-sub plugins_with {
-  my ($self, $role) = @_;
-
+sub plugins_with ($self, $role) {
   $role =~ s/^-/Dist::Zilla::Role::/;
   my $plugins = [ grep { $_->does($role) } @{ $self->plugins } ];
 
@@ -699,9 +677,7 @@ sub plugins_with {
 #pod
 #pod =cut
 
-sub find_files {
-  my ($self, $finder_name) = @_;
-
+sub find_files ($self, $finder_name) {
   $self->log_fatal("no plugin named $finder_name found")
     unless my $plugin = $self->plugin_named($finder_name);
 
@@ -711,9 +687,7 @@ sub find_files {
   $plugin->find_files;
 }
 
-sub _check_dupe_files {
-  my ($self) = @_;
-
+sub _check_dupe_files ($self) {
   my %files_named;
   my @dupes;
   for my $file (@{ $self->files }) {
@@ -737,9 +711,7 @@ sub _check_dupe_files {
   Carp::croak("aborting; duplicate files would be produced");
 }
 
-sub _write_out_file {
-  my ($self, $file, $build_root) = @_;
-
+sub _write_out_file ($self, $file, $build_root) {
   # Okay, this is a bit much, until we have ->debug. -- rjbs, 2008-06-13
   # $self->log("writing out " . $file->name);
 
@@ -812,9 +784,7 @@ has _global_stashes => (
 #pod
 #pod =cut
 
-sub stash_named {
-  my ($self, $name) = @_;
-
+sub stash_named ($self, $name) {
   return $self->_local_stashes->{ $name } if $self->_local_stashes->{$name};
   return $self->_global_stashes->{ $name };
 }
@@ -906,7 +876,7 @@ Dist::Zilla - distribution builder; installer not included!
 
 =head1 VERSION
 
-version 6.025
+version 6.027
 
 =head1 DESCRIPTION
 
@@ -1186,7 +1156,7 @@ Search for plugin bundles: L<https://metacpan.org/search?q=Dist::Zilla::PluginBu
 
 =head1 AUTHOR
 
-Ricardo SIGNES 😏 <rjbs@semiotic.systems>
+Ricardo SIGNES 😏 <cpan@semiotic.systems>
 
 =head1 CONTRIBUTORS
 
@@ -1588,7 +1558,7 @@ Randy Stauner <rwstauner@cpan.org>
 
 =item *
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <rjbs@semiotic.systems>
 
 =item *
 

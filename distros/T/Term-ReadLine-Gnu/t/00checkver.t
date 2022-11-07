@@ -27,8 +27,8 @@ $loaded = 1;
 
 # The GNU Readline library requires $TERM to be set properly.
 # https://github.com/hirooih/perl-trg/issues/11
-if (!exists($ENV{TERM}) || !defined($ENV{TERM}) || $ENV{TERM} =~ /^(dumb|emacs|unknown|)$/) {
-    warn "wrong \$TERM value: $ENV{TERM}\n";
+if ($ENV{TERM} eq "emacs" || defined($ENV{EMACS}) || defined($ENV{INSIDE_EMACS})) {
+    warn "Wrong env setting: \$TERM is set to 'emacs', or \$EMACS or \$INSIDE_EMACS is defined.\n";
     exit 1;
 }
 ok(1, '$TERM value');

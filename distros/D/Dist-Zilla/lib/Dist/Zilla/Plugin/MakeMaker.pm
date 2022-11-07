@@ -1,15 +1,9 @@
-package Dist::Zilla::Plugin::MakeMaker 6.025;
+package Dist::Zilla::Plugin::MakeMaker 6.027;
 # ABSTRACT: build a Makefile.PL that uses ExtUtils::MakeMaker
 
 use Moose;
 
-# BEGIN BOILERPLATE
-use v5.20.0;
-use warnings;
-use utf8;
-no feature 'switch';
-use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
-# END BOILERPLATE
+use Dist::Zilla::Pragmas;
 
 use namespace::autoclean;
 
@@ -375,7 +369,7 @@ Dist::Zilla::Plugin::MakeMaker - build a Makefile.PL that uses ExtUtils::MakeMak
 
 =head1 VERSION
 
-version 6.025
+version 6.027
 
 =head1 DESCRIPTION
 
@@ -433,7 +427,7 @@ L<TestRunner|Dist::Zilla::Role::TestRunner>.
 
 =head1 AUTHOR
 
-Ricardo SIGNES 😏 <rjbs@semiotic.systems>
+Ricardo SIGNES 😏 <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,17 +1,11 @@
-package Dist::Zilla::Plugin::GatherFile 6.025;
+package Dist::Zilla::Plugin::GatherFile 6.027;
 # ABSTRACT: gather individual file(s)
 
 use Moose;
 use Dist::Zilla::Types qw(Path ArrayRefOfPaths);
 with 'Dist::Zilla::Role::FileGatherer';
 
-# BEGIN BOILERPLATE
-use v5.20.0;
-use warnings;
-use utf8;
-no feature 'switch';
-use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
-# END BOILERPLATE
+use Dist::Zilla::Pragmas;
 
 use MooseX::Types::Moose 'ArrayRef';
 use Path::Tiny;
@@ -153,7 +147,7 @@ Dist::Zilla::Plugin::GatherFile - gather individual file(s)
 
 =head1 VERSION
 
-version 6.025
+version 6.027
 
 =head1 SYNOPSIS
 
@@ -203,7 +197,7 @@ Can be used more than once.
 
 =head1 AUTHOR
 
-Ricardo SIGNES 😏 <rjbs@semiotic.systems>
+Ricardo SIGNES 😏 <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

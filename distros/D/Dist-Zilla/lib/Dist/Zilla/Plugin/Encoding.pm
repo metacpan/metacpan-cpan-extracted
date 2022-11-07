@@ -1,16 +1,10 @@
-package Dist::Zilla::Plugin::Encoding 6.025;
+package Dist::Zilla::Plugin::Encoding 6.027;
 # ABSTRACT: set the encoding of arbitrary files
 
 use Moose;
 with 'Dist::Zilla::Role::EncodingProvider';
 
-# BEGIN BOILERPLATE
-use v5.20.0;
-use warnings;
-use utf8;
-no feature 'switch';
-use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
-# END BOILERPLATE
+use Dist::Zilla::Pragmas;
 
 use namespace::autoclean;
 
@@ -131,7 +125,7 @@ Dist::Zilla::Plugin::Encoding - set the encoding of arbitrary files
 
 =head1 VERSION
 
-version 6.025
+version 6.027
 
 =head1 SYNOPSIS
 
@@ -184,7 +178,7 @@ that would otherwise be selected by C<matches>.
 
 =head1 AUTHOR
 
-Ricardo SIGNES 😏 <rjbs@semiotic.systems>
+Ricardo SIGNES 😏 <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

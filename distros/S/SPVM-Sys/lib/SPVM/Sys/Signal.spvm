@@ -1,0 +1,31 @@
+class Sys::Signal {
+  use Sys::Signal::Constant;
+  use Sys::Signal::Handler;
+  use Sys::Signal::Handler::Default;
+  use Sys::Signal::Handler::Ignore;
+  use Sys::Signal::Handler::Monitor;
+  use Sys::Signal::Handler::Unknown;
+  
+  our $SIG_DFL : ro Sys::Signal::Handler::Default;
+  our $SIG_IGN : ro Sys::Signal::Handler::Ignore;
+  our $SIG_MONITOR : ro Sys::Signal::Handler::Monitor;
+  
+  INIT {
+    $SIG_DFL = &new_signal_handler_sig_dfl();
+    $SIG_IGN = &new_signal_handler_sig_ign();
+    $SIG_MONITOR = &new_signal_handler_sig_monitor();
+  }
+
+  private native static method new_signal_handler_sig_dfl : Sys::Signal::Handler::Default ();
+  private native static method new_signal_handler_sig_ign : Sys::Signal::Handler::Ignore ();
+  private native static method new_signal_handler_sig_monitor : Sys::Signal::Handler::Monitor ();
+
+  native static method raise : int ($sig : int);
+  native static method kill : int ($pid : int, $sig : int);
+  native static method alarm : int ($seconds : int);
+  native static method ualarm : int ($usecs : int, $interval : int);
+  
+  native static method signal : Sys::Signal::Handler ($signum : int, $handler : Sys::Signal::Handler);
+  native static method reset_monitored_signal : void ($signum : int);
+  native static method check_monitored_signal : int ($signum : int);
+}

@@ -1,0 +1,6 @@
+.travis.yml
+^\.git
+.appveyor.yml
+.cirrus.yml
+t/coverage.sh
+cover_db/

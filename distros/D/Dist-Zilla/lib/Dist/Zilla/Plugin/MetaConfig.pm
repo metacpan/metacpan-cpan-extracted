@@ -1,16 +1,10 @@
-package Dist::Zilla::Plugin::MetaConfig 6.025;
+package Dist::Zilla::Plugin::MetaConfig 6.027;
 # ABSTRACT: summarize Dist::Zilla configuration into distmeta
 
 use Moose;
 with 'Dist::Zilla::Role::MetaProvider';
 
-# BEGIN BOILERPLATE
-use v5.20.0;
-use warnings;
-use utf8;
-no feature 'switch';
-use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
-# END BOILERPLATE
+use Dist::Zilla::Pragmas;
 
 use namespace::autoclean;
 
@@ -82,7 +76,7 @@ Dist::Zilla::Plugin::MetaConfig - summarize Dist::Zilla configuration into distm
 
 =head1 VERSION
 
-version 6.025
+version 6.027
 
 =head1 DESCRIPTION
 
@@ -114,7 +108,7 @@ Dist::Zilla roles: L<MetaProvider|Dist::Zilla::Role::MetaProvider>.
 
 =head1 AUTHOR
 
-Ricardo SIGNES 😏 <rjbs@semiotic.systems>
+Ricardo SIGNES 😏 <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,0 +1,4 @@
+(^|/)MYMETA\.
+^MANIFEST\.bak$
+^\.git/
+^\.gitignore$

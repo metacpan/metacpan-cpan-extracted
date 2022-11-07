@@ -1,5 +1,11 @@
 Revision history for Git-Background
 
+0.006  2022-11-05 13:16:26 UTC
+
+  - Switch license to the ISC license
+  - Bumped dependency to Future 0.49 and use the new set_udata/udata methods
+  - Remove test dependency on Test::Fatal
+
 0.005  2022-04-03 16:05:30 UTC
 
   - Use Git::Background::Future->fail instead of Future->fail when

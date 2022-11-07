@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
 	},
 	'CONFIGURE_REQUIRES' => {
 		'Alien::Build::MM' => '0.32',
+		'Alien::Build::Plugin::Build::Make' => 0,
 		'Alien::Build::Plugin::PkgConfig::Negotiate' => 0,
 		'ExtUtils::MakeMaker' => '6.76',
 		'File::Which' => '0',
@@ -40,7 +41,7 @@ my %WriteMakefileArgs = (
 		'Test::More' => 0,
 		'Test::NoWarnings' => 0,
 	},
-	'VERSION' => '0.05',
+	'VERSION' => '0.06',
 	'test' => {
 		'RECURSIVE_TEST_FILES' => 1,
 	}

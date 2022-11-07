@@ -11,7 +11,7 @@ use constant is_tabletype => 1;
 use constant kind => 'tabletype';
 
 # ABSTRACT: Wasmtime table type class
-our $VERSION = '0.22'; # VERSION
+our $VERSION = '0.23'; # VERSION
 
 
 $ffi_prefix = 'wasm_tabletype_';
@@ -90,7 +90,7 @@ Wasm::Wasmtime::TableType - Wasmtime table type class
 
 =head1 VERSION
 
-version 0.22
+version 0.23
 
 =head1 SYNOPSIS
 

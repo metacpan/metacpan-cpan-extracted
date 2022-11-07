@@ -55,6 +55,6 @@
       },
       "x_MailingList" : "http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/dbd-sqlite"
    },
-   "version" : "1.70",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "1.72",
+   "x_serialization_backend" : "JSON::PP version 4.12"
 }

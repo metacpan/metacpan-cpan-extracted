@@ -279,7 +279,7 @@ condition settings (of any kind) will have no effect.
 
 The C<AssertArchitecture>, C<AssertVirtualization>, \x{2026} options
 are similar to conditions but cause the start job to fail (instead of being skipped). The failed check
-is logged. Units with failed conditions are considered to be in a clean state and will be garbage
+is logged. Units with unmet conditions are considered to be in a clean state and will be garbage
 collected if they are not referenced. This means that when queried, the condition failure may or may
 not show up in the state of the unit.
 
@@ -435,7 +435,7 @@ a mount unit might be unmounted without involvement of the system and service ma
 When used in conjunction with C<After> on the same unit the behaviour of
 C<BindsTo> is even stronger. In this case, the unit bound to strictly has to be in active
 state for this unit to also be in active state. This not only means a unit bound to another unit that suddenly
-enters inactive state, but also one that is bound to another unit that gets skipped due to a failed condition
+enters inactive state, but also one that is bound to another unit that gets skipped due to an unmet condition
 check (such as C<ConditionPathExists>, C<ConditionPathIsSymbolicLink>, \x{2026} \x{2014}
 see below) will be stopped, should it be running. Hence, in many cases it is best to combine
 C<BindsTo> with C<After>.
@@ -1045,10 +1045,8 @@ mark.',
           'type' => 'leaf',
           'value_type' => 'uniline'
         },
-        'description' => 'Check whether the system\'s firmware is of a certain type. Possible values are:
-C<uefi> (for systems with EFI),
-C<device-tree> (for systems with a device tree) and
-C<device-tree-compatible(xyz)> (for systems with a device tree that is compatible to C<xyz>).',
+        'description' => 'Check whether the system\'s firmware is of a certain type. The following values are
+possible:',
         'type' => 'list'
       },
       'ConditionVirtualization',
@@ -1075,6 +1073,7 @@ C<bochs>,
 C<uml>,
 C<bhyve>,
 C<qnx>,
+C<apple>,
 C<openvz>,
 C<lxc>,
 C<lxc-libvirt>,
@@ -1133,18 +1132,34 @@ is invoked as payload of a container manager, in which case the command line of 
           'value_type' => 'uniline'
         },
         'description' => 'C<ConditionKernelVersion> may be used to check whether the kernel
-version (as reported by uname -r) matches a certain expression (or if prefixed
-with the exclamation mark does not match it). The argument must be a list of (potentially quoted)
-expressions.  For each of the expressions, if it starts with one of C<<>,
-C<<=>, C<=>, C<!=>, C<>=>,
-C<>> a relative version comparison is done, otherwise the specified string is
-matched with shell-style globs.
+version (as reported by uname -r) matches a certain expression, or if prefixed
+with the exclamation mark, does not match. The argument must be a list of (potentially quoted)
+expressions. Each expression starts with one of C<=> or C<!=> for
+string comparisons, C<< < >>, C<< <= >>, C<==>,
+C<< <> >>, C<< >= >>, C<< > >> for version
+comparisons, or C<$=>, C<!$=> for a shell-style glob match. If no
+operator is specified, C<$=> is implied.
 
 Note that using the kernel version string is an unreliable way to determine which features
 are supported by a kernel, because of the widespread practice of backporting drivers, features, and
 fixes from newer upstream kernels into older versions provided by distributions. Hence, this check
 is inherently unportable and should not be used for units which may be used on different
 distributions.',
+        'type' => 'list'
+      },
+      'ConditionCredential',
+      {
+        'cargo' => {
+          'type' => 'leaf',
+          'value_type' => 'uniline'
+        },
+        'description' => 'C<ConditionCredential> may be used to check whether a credential
+by the specified name was passed into the service manager. See L<System and Service Credentials|https://systemd.io/CREDENTIALS> for details about
+credentials. If used in services for the system service manager this may be used to conditionalize
+services based on system credentials passed in. If used in services for the per-user service
+manager this may be used to conditionalize services based on credentials passed into the
+C<unit@.service> service instance belonging to the user. The argument must be a
+valid credential name.',
         'type' => 'list'
       },
       'ConditionEnvironment',
@@ -1264,15 +1279,18 @@ happen.',
           ]
         },
         'description' => 'Takes a boolean argument. This condition may be used to conditionalize units on
-whether the system is booting up for the first time.  This roughly means that C</etc/>
-is unpopulated (for details, see "First Boot Semantics" in
+whether the system is booting up for the first time. This roughly means that C</etc/>
+was unpopulated when the system started booting (for details, see "First Boot Semantics" in
 L<machine-id(5)>).
-This may be used to populate C</etc/> on the first boot after factory reset, or
-when a new system instance boots up for the first time.
+First boot is considered finished (this condition will evaluate as false) after the manager
+has finished the startup phase.
+
+This condition may be used to populate C</etc/> on the first boot after
+factory reset, or when a new system instance boots up for the first time.
 
 For robustness, units with C<ConditionFirstBoot=yes> should order themselves
 before C<first-boot-complete.target> and pull in this passive target with
-C<Wants>.  This ensures that in a case of an aborted first boot, these units will
+C<Wants>. This ensures that in a case of an aborted first boot, these units will
 be re-run during the next system startup.
 
 If the C<systemd.condition-first-boot=> option is specified on the kernel
@@ -1428,23 +1446,14 @@ C<@system>.',
           'value_type' => 'uniline'
         },
         'description' => 'Check whether given cgroup controllers (e.g. C<cpu>) are available
-for use on the system or whether the legacy v1 cgroup or the modern v2 cgroup hierarchy is used.
+for use on the system.
 
 Multiple controllers may be passed with a space separating them; in this case the condition
 will only pass if all listed controllers are available for use. Controllers unknown to systemd are
-ignored. Valid controllers are C<cpu>, C<cpuacct>,
-C<io>, C<blkio>, C<memory>,
-C<devices>, and C<pids>. Even if available in the kernel, a
-particular controller may not be available if it was disabled on the kernel command line with
-C<cgroup_disable=controller>.
-
-Alternatively, two special strings C<v1> and C<v2> may be
-specified (without any controller names). C<v2> will pass if the unified v2 cgroup
-hierarchy is used, and C<v1> will pass if the legacy v1 hierarchy or the hybrid
-hierarchy are used (see the discussion of C<systemd.unified_cgroup_hierarchy> and
-C<systemd.legacy_systemd_cgroup_controller> in
-L<systemd.service(5)>
-for more information).',
+ignored. Valid controllers are C<cpu>, C<cpuset>,
+C<io>, C<memory>, and C<pids>. Even if available in
+the kernel, a particular controller may not be available if it was disabled on the kernel command
+line with C<cgroup_disable=controller>.',
         'type' => 'list'
       },
       'ConditionMemory',
@@ -1455,10 +1464,11 @@ for more information).',
         },
         'description' => 'Verify that the specified amount of system memory is available to the current
 system. Takes a memory size in bytes as argument, optionally prefixed with a comparison operator
-C<<>, C<<=>, C<=>, C<!=>,
-C<>=>, C<>>. On bare-metal systems compares the amount of
-physical memory in the system with the specified size, adhering to the specified comparison
-operator. In containers compares the amount of memory assigned to the container instead.',
+C<< < >>, C<< <= >>, C<=> (or C<==>),
+C<!=> (or C<< <> >>), C<< >= >>,
+C<< > >>. On bare-metal systems compares the amount of physical memory in the system
+with the specified size, adhering to the specified comparison operator. In containers compares the
+amount of memory assigned to the container instead.',
         'type' => 'list'
       },
       'ConditionCPUs',
@@ -1469,13 +1479,14 @@ operator. In containers compares the amount of memory assigned to the container 
         },
         'description' => 'Verify that the specified number of CPUs is available to the current system. Takes
 a number of CPUs as argument, optionally prefixed with a comparison operator
-C<<>, C<<=>, C<=>, C<!=>,
-C<>=>, C<>>. Compares the number of CPUs in the CPU affinity
-mask configured of the service manager itself with the specified number, adhering to the specified
-comparison operator. On physical systems the number of CPUs in the affinity mask of the service
-manager usually matches the number of physical CPUs, but in special and virtual environments might
-differ. In particular, in containers the affinity mask usually matches the number of CPUs assigned
-to the container and not the physically available ones.',
+C<< < >>, C<< <= >>, C<=> (or C<==>),
+C<!=> (or C<< <> >>), C<< >= >>,
+C<< > >>. Compares the number of CPUs in the CPU affinity mask configured of the
+service manager itself with the specified number, adhering to the specified comparison operator. On
+physical systems the number of CPUs in the affinity mask of the service manager usually matches the
+number of physical CPUs, but in special and virtual environments might differ. In particular, in
+containers the affinity mask usually matches the number of CPUs assigned to the container and not
+the physically available ones.',
         'type' => 'list'
       },
       'ConditionCPUFeature',
@@ -1551,10 +1562,12 @@ C<constant_tsc>.',
         'description' => 'Verify that a specific C<key=value> pair is set in the host\'s
 L<os-release(5)>.
 
-Other than exact matching with C<=>, and C<!=>, relative
-comparisons are supported for versioned parameters (e.g. C<VERSION_ID>). The
-comparator can be one of C<<>, C<<=>, C<=>,
-C<!=>, C<>=> and C<>>.',
+Other than exact string matching (with C<=> and C<!=>),
+relative comparisons are supported for versioned parameters (e.g. C<VERSION_ID>;
+with C<< < >>, C<< <= >>, C<==>,
+C<< <> >>, C<< >= >>, C<< > >>), and shell-style
+wildcard comparisons (C<*>, C<?>, C<[]>) are
+supported with the C<$=> (match) and C<!$=> (non-match).',
         'type' => 'list'
       },
       'ConditionMemoryPressure',
@@ -1572,7 +1585,7 @@ example: C<10%/1min>. The supported timespans match what the kernel provides, an
 limited to C<10sec>, C<1min> and C<5min>. The
 C<full> PSI will be checked first, and if not found C<some> will be
 checked. For more details, see the documentation on L<PSI (Pressure Stall Information)
-|https://www.kernel.org/doc/html/latest/accounting/psi.html>.
+|https://docs.kernel.org/accounting/psi.html>.
 
 Optionally, the threshold value can be prefixed with the slice unit under which the pressure will be checked,
 followed by a C<:>. If the slice unit is not specified, the overall system pressure will be measured,
@@ -1594,7 +1607,7 @@ example: C<10%/1min>. The supported timespans match what the kernel provides, an
 limited to C<10sec>, C<1min> and C<5min>. The
 C<full> PSI will be checked first, and if not found C<some> will be
 checked. For more details, see the documentation on L<PSI (Pressure Stall Information)
-|https://www.kernel.org/doc/html/latest/accounting/psi.html>.
+|https://docs.kernel.org/accounting/psi.html>.
 
 Optionally, the threshold value can be prefixed with the slice unit under which the pressure will be checked,
 followed by a C<:>. If the slice unit is not specified, the overall system pressure will be measured,
@@ -1616,7 +1629,7 @@ example: C<10%/1min>. The supported timespans match what the kernel provides, an
 limited to C<10sec>, C<1min> and C<5min>. The
 C<full> PSI will be checked first, and if not found C<some> will be
 checked. For more details, see the documentation on L<PSI (Pressure Stall Information)
-|https://www.kernel.org/doc/html/latest/accounting/psi.html>.
+|https://docs.kernel.org/accounting/psi.html>.
 
 Optionally, the threshold value can be prefixed with the slice unit under which the pressure will be checked,
 followed by a C<:>. If the slice unit is not specified, the overall system pressure will be measured,
@@ -1680,6 +1693,20 @@ into.",
         'value_type' => 'uniline'
       },
       'AssertKernelVersion',
+      {
+        'description' => "Similar to the C<ConditionArchitecture>,
+C<ConditionVirtualization>, \x{2026}, condition settings described above, these settings
+add assertion checks to the start-up of the unit. However, unlike the conditions settings, any
+assertion setting that is not met results in failure of the start job (which means this is logged
+loudly). Note that hitting a configured assertion does not cause the unit to enter the
+C<failed> state (or in fact result in any state change of the unit), it affects
+only the job queued for it. Use assertion expressions for units that cannot operate when specific
+requirements are not met, and when this is something the administrator or user should look
+into.",
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
+      'AssertCredential',
       {
         'description' => "Similar to the C<ConditionArchitecture>,
 C<ConditionVirtualization>, \x{2026}, condition settings described above, these settings
@@ -1987,6 +2014,20 @@ into.",
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
+      'AssertCPUFeature',
+      {
+        'description' => "Similar to the C<ConditionArchitecture>,
+C<ConditionVirtualization>, \x{2026}, condition settings described above, these settings
+add assertion checks to the start-up of the unit. However, unlike the conditions settings, any
+assertion setting that is not met results in failure of the start job (which means this is logged
+loudly). Note that hitting a configured assertion does not cause the unit to enter the
+C<failed> state (or in fact result in any state change of the unit), it affects
+only the job queued for it. Use assertion expressions for units that cannot operate when specific
+requirements are not met, and when this is something the administrator or user should look
+into.",
+        'type' => 'leaf',
+        'value_type' => 'uniline'
+      },
       'AssertOSRelease',
       {
         'description' => "Similar to the C<ConditionArchitecture>,
@@ -2058,7 +2099,7 @@ into.",
         'warn' => 'OnFailureIsolate is now OnFailureJobMode.'
       }
     ],
-    'generated_by' => 'parse-man.pl from systemd 250 doc',
+    'generated_by' => 'parse-man.pl from systemd 252 doc',
     'license' => 'LGPLv2.1+',
     'name' => 'Systemd::Section::Unit'
   }

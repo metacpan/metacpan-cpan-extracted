@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+LICENSE
+CONTRIBUTING.md
+t/Simple-Filter-Macro.t
+lib/Simple/Filter/Macro.pm
+lib/Simple/Filter/MacroLite.pm
+lib/Simple/Filter/SanitiseCompiled.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

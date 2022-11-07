@@ -3,17 +3,16 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Glorified metronome
 
-our $VERSION = '0.4002';
+our $VERSION = '0.4004';
 
+use strictures 2;
 use Data::Dumper::Compact qw(ddc);
 use List::Util qw(sum0);
 use Math::Bezier ();
 use MIDI::Util qw(dura_size reverse_dump set_chan_patch set_time_signature);
+use Moo;
 use Music::Duration ();
 use Music::RhythmSet::Util qw(upsize);
-
-use Moo;
-use strictures 2;
 use namespace::clean;
 
 use constant TICKS => 96; # Per quarter note
@@ -43,7 +42,7 @@ has kit       => ( is => 'ro', default => sub { 0 } );
 has reverb    => ( is => 'ro', default => sub { 15 } );
 has channel   => ( is => 'ro', default => sub { 9 } );
 has volume    => ( is => 'ro', default => sub { 100 } );
-has bpm       => ( is => 'ro', default => sub { 120 } );
+has bpm       => ( is => 'rw', default => sub { 120 } );
 has file      => ( is => 'ro', default => sub { 'MIDI-Drummer.mid' } );
 has bars      => ( is => 'ro', default => sub { 4 } );
 has score     => ( is => 'ro', default => sub { MIDI::Simple->new_score } );
@@ -473,12 +472,13 @@ sub add_fill {
 
     my $size = 4 / $lcm;
     my $dump = reverse_dump('length');
-    my $master_duration = $dump->{$size} || $self->eighth;
+    my $master_duration = $dump->{$size} || $self->eighth; # XXX this || is not right
+    print "Size: $size, Duration: $master_duration\n" if $self->verbose;
 
     my $fill_chop = $fill_duration == $lcm
         ? $fill_length
-        : int $lcm / $fill_length + 1;
-    print "FC: $fill_chop\n" if $self->verbose;
+        : int($lcm / $fill_length) + 1;
+    print "Chop: $fill_chop\n" if $self->verbose;
 
     my %fresh_patterns;
     for my $instrument (keys %patterns) {
@@ -538,6 +538,13 @@ sub set_time_sig {
 }
 
 
+sub set_bpm {
+    my ($self, $bpm) = @_;
+    $self->bpm($bpm);
+    $self->score->set_tempo( int( 60_000_000 / $self->bpm ) );
+}
+
+
 sub sync {
     my $self = shift;
     $self->score->synch(@_);
@@ -578,7 +585,7 @@ MIDI::Drummer::Tiny - Glorified metronome
 
 =head1 VERSION
 
-version 0.4002
+version 0.4004
 
 =head1 SYNOPSIS
 
@@ -1007,6 +1014,10 @@ B<divisions> object attributes.
 If a ratio argument is given, set the B<signature> object attribute to
 it.  If the 2nd argument flag is C<0>, the B<beats> and B<divisions>
 are B<not> reset.
+
+=head2 set_bpm
+
+Reset the beats per minute.
 
 =head2 sync
 

@@ -8,7 +8,7 @@ use feature qw /postderef signatures/;
 use Sort::Hash;
 use Vote::Count::TextTableTiny qw/generate_table/;
 
-our $VERSION='2.01';
+our $VERSION='2.02';
 
 # ABSTRACT: Non OO Components for the Vote::Charge implementation of STV FullCascadeCharge.
 
@@ -16,7 +16,7 @@ our $VERSION='2.01';
 
 Vote::Count::Helper::FullCascadeCharge
 
-=head1 VERSION 2.01
+=head1 VERSION 2.02
 
 =head1 SYNOPSIS
 

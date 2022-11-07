@@ -1,5 +1,8 @@
 Revision history for Perl extension Date::Holidays::EnglandWales.
 
+0:11  Sun Nov 6 11:36:00 2022
+    - Bank holiday for coronation of King Charles III on 8th May 2023
+
 0.10  Mon Sep 12 10:52:00 2022
     - Update changes file after adding State Funeral of Queen Elizabeth II
 

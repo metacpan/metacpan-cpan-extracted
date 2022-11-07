@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-02-18'; # DATE
+our $DATE = '2022-11-04'; # DATE
 our $DIST = 'Log-ger-App'; # DIST
-our $VERSION = '0.023'; # VERSION
+our $VERSION = '0.024'; # VERSION
 
 our $DEBUG = defined($ENV{LOG_GER_APP_DEBUG}) ? $ENV{LOG_GER_APP_DEBUG} : 0;
 
@@ -243,7 +243,7 @@ Log::ger::App - An easy way to use Log::ger in applications
 
 =head1 VERSION
 
-version 0.023
+version 0.024
 
 =head1 SYNOPSIS
 

@@ -32,7 +32,7 @@
             "Log::ger" : "0.038",
             "Log::ger::Layout::Pattern" : "0.008",
             "Log::ger::Output" : "0.005",
-            "Log::ger::Output::Composite" : "0.009",
+            "Log::ger::Output::Composite" : "0.016",
             "Log::ger::Output::File" : "0.002",
             "Log::ger::Output::Screen" : "0.018",
             "Log::ger::Output::Syslog" : "0",
@@ -55,7 +55,7 @@
    "provides" : {
       "Log::ger::App" : {
          "file" : "lib/Log/ger/App.pm",
-         "version" : "0.023"
+         "version" : "0.024"
       }
    },
    "release_status" : "stable",
@@ -70,7 +70,7 @@
          "web" : "https://github.com/perlancar/perl-Log-ger-App"
       }
    },
-   "version" : "0.023",
+   "version" : "0.024",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

@@ -1,17 +1,11 @@
-package Dist::Zilla::Role::PluginBundle::Easy 6.025;
+package Dist::Zilla::Role::PluginBundle::Easy 6.027;
 # ABSTRACT: something that bundles a bunch of plugins easily
 # This plugin was originally contributed by Christopher J. Madsen
 
 use Moose::Role;
 with 'Dist::Zilla::Role::PluginBundle';
 
-# BEGIN BOILERPLATE
-use v5.20.0;
-use warnings;
-use utf8;
-no feature 'switch';
-use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
-# END BOILERPLATE
+use Dist::Zilla::Pragmas;
 
 use Module::Runtime 'use_module';
 use namespace::autoclean;
@@ -236,7 +230,7 @@ Dist::Zilla::Role::PluginBundle::Easy - something that bundles a bunch of plugin
 
 =head1 VERSION
 
-version 6.025
+version 6.027
 
 =head1 SYNOPSIS
 
@@ -338,7 +332,7 @@ key does not exist in C<payload>, then it is omitted from the result.
 
 =head1 AUTHOR
 
-Ricardo SIGNES 😏 <rjbs@semiotic.systems>
+Ricardo SIGNES 😏 <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

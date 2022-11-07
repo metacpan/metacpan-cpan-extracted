@@ -1,16 +1,10 @@
-package Dist::Zilla::MVP::Section 6.025;
+package Dist::Zilla::MVP::Section 6.027;
 # ABSTRACT: a standard section in Dist::Zilla's configuration sequence
 
 use Moose;
 extends 'Config::MVP::Section';
 
-# BEGIN BOILERPLATE
-use v5.20.0;
-use warnings;
-use utf8;
-no feature 'switch';
-use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
-# END BOILERPLATE
+use Dist::Zilla::Pragmas;
 
 use namespace::autoclean;
 
@@ -64,7 +58,7 @@ Dist::Zilla::MVP::Section - a standard section in Dist::Zilla's configuration se
 
 =head1 VERSION
 
-version 6.025
+version 6.027
 
 =head1 PERL VERSION
 
@@ -80,7 +74,7 @@ the minimum required perl.
 
 =head1 AUTHOR
 
-Ricardo SIGNES 😏 <rjbs@semiotic.systems>
+Ricardo SIGNES 😏 <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -4,23 +4,22 @@ use constant ZMQ_IO_THREADS  => 1;
 use constant ZMQ_MAX_SOCKETS => 2;
 use constant ZMQ_REQ => 3;
 use constant ZMQ_REP => 4;
-use FFI::CheckLib qw( find_lib_or_exit );
+use FFI::CheckLib qw( find_lib_or_die );
 use FFI::Platypus 2.00;
 use FFI::Platypus::Memory qw( malloc );
-use FFI::Platypus::Buffer qw( scalar_to_buffer buffer_to_scalar );
+use FFI::Platypus::Buffer qw( scalar_to_buffer window );
 
 my $endpoint = "ipc://zmq-ffi-$$";
-my $ffi = FFI::Platypus->new( api => 2 );
+my $ffi = FFI::Platypus->new(
+  api => 2,
+  lib => find_lib_or_die lib => 'zmq',
+);
 
-$ffi->lib(undef); # for puts
-$ffi->attach(puts => ['string'] => 'int');
-
-$ffi->lib(find_lib_or_exit lib => 'zmq');
 $ffi->attach(zmq_version => ['int*', 'int*', 'int*'] => 'void');
 
 my($major,$minor,$patch);
 zmq_version(\$major, \$minor, \$patch);
-puts("libzmq version $major.$minor.$patch");
+print "libzmq version $major.$minor.$patch\n";
 die "this script only works with libzmq 3 or better" unless $major >= 3;
 
 $ffi->type('opaque'       => 'zmq_context');
@@ -47,19 +46,19 @@ zmq_connect($socket1, $endpoint);
 my $socket2 = zmq_socket($context, ZMQ_REP);
 zmq_bind($socket2, $endpoint);
 
-do { # send
+{ # send
   our $sent_message = "hello there";
   my($pointer, $size) = scalar_to_buffer $sent_message;
   my $r = zmq_send($socket1, $pointer, $size, 0);
   die zmq_strerror(zmq_errno()) if $r == -1;
-};
+}
 
-do { # recv
+{ # recv
   my $msg_ptr  = malloc 100;
   zmq_msg_init($msg_ptr);
   my $size     = zmq_msg_recv($msg_ptr, $socket2, 0);
   die zmq_strerror(zmq_errno()) if $size == -1;
   my $data_ptr = zmq_msg_data($msg_ptr);
-  my $recv_message = buffer_to_scalar $data_ptr, $size;
+  window(my $recv_message, $data_ptr, $size);
   print "recv_message = $recv_message\n";
-};
+}

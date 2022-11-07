@@ -25,7 +25,7 @@ use Wasm::Wasmtime::WasiConfig;
 use Wasm::Wasmtime::WasiInstance;
 
 # ABSTRACT: Perl interface to Wasmtime
-our $VERSION = '0.22'; # VERSION
+our $VERSION = '0.23'; # VERSION
 
 
 1;
@@ -42,7 +42,7 @@ Wasm::Wasmtime - Perl interface to Wasmtime
 
 =head1 VERSION
 
-version 0.22
+version 0.23
 
 =head1 SYNOPSIS
 

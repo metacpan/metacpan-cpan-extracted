@@ -1,12 +1,12 @@
 package SPVM::Sys;
 
-our $VERSION = '0.23';
+our $VERSION = '0.25';
 
 1;
 
 =head1 Name
 
-SPVM::Sys - System Calls such as File IO, User, Process, Socket,
+SPVM::Sys - System Calls for File IO, User, Process, Signal, Socket
 
 =head1 Caution
 
@@ -18,23 +18,49 @@ L<SPVM> itself is yet experimental release.
 
 C<Sys> is the class for system calls such as file IO, user manipulation, process, socket, time,
 
-=head1 System Modules
+=head1 Modules
 
-=over 2
+The list of the modules that provide system calls.
 
-=item * L<Sys::IO|SPVM::Sys::IO>
+=head2 Sys::IO
 
-=item * L<Sys::Socket|SPVM::Sys::Socket>
+L<Sys::IO|SPVM::Sys::IO> - File I/O
 
-=item * L<Sys::Process|SPVM::Sys::Process>
+=head2 Sys::Ioctl
 
-=item * L<Sys::Time|SPVM::Sys::Time>
+L<Sys::Ioctl|SPVM::Sys::Ioctl> - The C<ioctl> function
 
-=item * L<Sys::User|SPVM::Sys::User>
+=head2 Sys::Socket
 
-=item * L<Sys::FiteTest|SPVM::Sys::FiteTest>
+L<Sys::Socket|SPVM::Sys::Socket> - Socket
 
-=back
+=head2 Sys::Select
+
+L<Sys::Select|SPVM::Sys::Select> - The C<select> function
+
+=head2 Sys::Poll
+
+L<Sys::Poll|SPVM::Sys::Poll> - The C<poll> function.
+
+=head2 Sys::Process
+
+L<Sys::Process|SPVM::Sys::Process> - Process Manipulation
+
+=head2 Sys::Signal
+
+L<Sys::Signal|SPVM::Sys::Signal> - Signal
+
+=head2 Sys::Time
+
+L<Sys::Time|SPVM::Sys::Time> - Time Manipulation
+
+=head2 Sys::User
+
+L<Sys::User|SPVM::Sys::User> - User Manipulation
+
+=head2 Sys::FiteTest
+
+L<Sys::FiteTest|SPVM::Sys::FiteTest> - File Tests
 
 =head1 Class Methods
 
@@ -132,7 +158,7 @@ Supports the following macro names.
 
 =back
 
-=head1 get_osname
+=head2 get_osname
 
   static method get_osname : string ()
 
@@ -151,8 +177,6 @@ The C<get_osname> in the C<Sys> class supports the following os names.
 =item * freebsd
 
 =item * openbsd
-
-=item * sunos
 
 =item * solaris
 

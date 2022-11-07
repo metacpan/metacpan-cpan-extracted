@@ -1,4 +1,3 @@
-[![Build Status](https://travis-ci.org/avkhozov/Test-Mojo-Session.svg?branch=master)](https://travis-ci.org/avkhozov/Test-Mojo-Session)
 # NAME
 
 Test::Mojo::Session - Testing session in Mojolicious applications
@@ -23,7 +22,9 @@ Test::Mojo::Session - Testing session in Mojolicious applications
       ->session_has('/s1')
       ->session_is('/s1' => 'session data')
       ->session_hasnt('/s2')
-      ->session_is('/s3' => [1, 3]);
+      ->session_is('/s3' => [1, 3])
+      ->session_like('/s1' => qr/data/, 's1 contains "data"')
+      ->session_unlike('/s1' => qr/foo/, 's1 does not contain "foo"');
 
     done_testing();
 
@@ -47,7 +48,9 @@ Use [Test::Mojo::Sesssion](https://metacpan.org/pod/Test%3A%3AMojo%3A%3ASesssion
       ->session_has('/s1')
       ->session_is('/s1' => 'session data')
       ->session_hasnt('/s2')
-      ->session_is('/s3' => [1, 3]);
+      ->session_is('/s3' => [1, 3])
+      ->session_like('/s1' => qr/data/, 's1 contains "data"')
+      ->session_unlike('/s1' => qr/foo/, 's1 does not contain "foo"');
 
     done_testing();
 
@@ -72,17 +75,31 @@ JSON Pointer with [Mojo::JSON::Pointer](https://metacpan.org/pod/Mojo%3A%3AJSON%
 ## session\_hasnt
 
     $t = $t->session_hasnt('/bar');
-    $t = $t->session_hasnt('/bar', 'session does not has "bar"');
+    $t = $t->session_hasnt('/bar', 'session does not have "bar"');
 
-Check if current session no contains a value that can be identified using the given
+Check if current session does not contain a value that can be identified using the given
 JSON Pointer with [Mojo::JSON::Pointer](https://metacpan.org/pod/Mojo%3A%3AJSON%3A%3APointer).
 
 ## session\_is
 
     $t = $t->session_is('/pointer', 'value');
-    $t = $t->session_is('/pointer', 'value', 'right halue');
+    $t = $t->session_is('/pointer', 'value', 'right value');
 
 Check the session using the given JSON Pointer with [Mojo::JSON::Pointer](https://metacpan.org/pod/Mojo%3A%3AJSON%3A%3APointer).
+
+## session\_like
+
+    $t = $t->session_like('/pointer', qr/value/);
+    $t = $t->session_like('/pointer', qr/value/, 'matched value');
+
+Check if current session matches a regular expression.
+
+## session\_unlike
+
+    $t = $t->session_unlike('/pointer', qr/value/);
+    $t = $t->session_unlike('/pointer', qr/value/, 'did not match value');
+
+Check if current session does not match a regular expression.
 
 ## session\_ok
 
@@ -100,11 +117,13 @@ Andrey Khozov, `avkhozov@googlemail.com`.
 
 # CREDITS
 
-Renee, `reb@perl-services.de`.
+Renee, `reb@perl-services.de`
+
+Gene Boggs, `gene.boggs@gmail.com`
 
 # COPYRIGHT AND LICENSE
 
-Copyright (C) 2013-2015, Andrey Khozov.
+Copyright (C) 2013-2022, Andrey Khozov.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Artistic License version 2.0.

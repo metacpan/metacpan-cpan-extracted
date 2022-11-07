@@ -1,5 +1,20 @@
 Revision history for Perl extension CryptoTron-JsonHttp.
 
+0.12  2022-11-03
+        - Module GetBrokerage added.
+        - Changes in named variables for more consistency.
+        - Filter macro added for easier handling of packages.
+        - Prepared the package, that payload can be of each kind.
+        - Major changes in code. Major changes in documentation.
+
+0.11  2022-11-03
+        - Bug fixing.
+        - Changes in code. Changes in documentation.
+
+0.10  2022-11-03
+        - Bug fixing.
+        - Changes in code. Changes in documentation.
+
 0.09  2022-11-03
         - Bug fixing.
         - Restructuring package.

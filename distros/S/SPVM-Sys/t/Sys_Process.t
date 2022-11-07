@@ -40,14 +40,6 @@ else {
 }
 
 if ($^O eq 'MSWin32') {
-  eval { SPVM::Sys::Process->kill(0, 0) };
-  like($@, qr/not supported/);
-}
-else {
-  ok(SPVM::TestCase::Sys::Process->kill);
-}
-
-if ($^O eq 'MSWin32') {
   eval { my $status = -1; SPVM::Sys::Process->wait(\$status) };
   like($@, qr/not supported/);
 }

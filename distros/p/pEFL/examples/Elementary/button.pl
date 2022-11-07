@@ -88,23 +88,23 @@ pEFL::Elm::run();
 pEFL::Elm::shutdown();
 
 sub _button_click_cb {
-    my ($data, $button, $event_info) = @_;
-    print "Clicked\n";
-    $button->text_set("Clicked!");
+	my ($data, $button, $event_info) = @_;
+	print "Clicked\n";
+	$button->text_set("Clicked!");
 }
 
 sub _button_press_cb {
-    my ($data, $button, $event_info) = @_;
-     $button->text_set("Pressed!");
+	my ($data, $button, $event_info) = @_;
+	 $button->text_set("Pressed!");
 }
 
 sub _button_unpress_cb {
-    my ($data,$button, $event_info) = @_;
-    $button->text_set("Unpressed!");
+	my ($data,$button, $event_info) = @_;
+	$button->text_set("Unpressed!");
 }
 
 sub _button_repeat_cb {
-    my ($data, $button, $event_info) = @_;
-    $count++;
-    $button->text_set("Repeat $count!");
+	my ($data, $button, $event_info) = @_;
+	$count++;
+	$button->text_set("Repeat $count!");
 }

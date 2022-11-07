@@ -48,7 +48,7 @@
             "Complete::Zsh" : "0",
             "Data::Clean::ForJSON" : "0.390",
             "Data::Dump" : "0",
-            "Data::Sah" : "0.911",
+            "Data::Sah" : "0.914",
             "Data::Sah::Util::Type" : "0.45",
             "Encode" : "0",
             "Fcntl" : "0",
@@ -60,7 +60,7 @@
             "JSON::MaybeXS" : "0",
             "List::Util" : "1.54",
             "Log::ger" : "0.038",
-            "Log::ger::App" : "0.018",
+            "Log::ger::App" : "0.024",
             "MIME::Base64" : "0",
             "Moo" : "0",
             "Perinci::Access::Lite" : "0.09",
@@ -98,51 +98,51 @@
    "provides" : {
       "Perinci::CmdLine::Base" : {
          "file" : "lib/Perinci/CmdLine/Base.pm",
-         "version" : "1.925"
+         "version" : "1.926"
       },
       "Perinci::CmdLine::Lite" : {
          "file" : "lib/Perinci/CmdLine/Lite.pm",
-         "version" : "1.925"
+         "version" : "1.926"
       },
       "Perinci::CmdLine::Plugin::Debug::DumpArgs" : {
          "file" : "lib/Perinci/CmdLine/Plugin/Debug/DumpArgs.pm",
-         "version" : "1.925"
+         "version" : "1.926"
       },
       "Perinci::CmdLine::Plugin::Debug::DumpR" : {
          "file" : "lib/Perinci/CmdLine/Plugin/Debug/DumpR.pm",
-         "version" : "1.925"
+         "version" : "1.926"
       },
       "Perinci::CmdLine::Plugin::Debug::DumpRes" : {
          "file" : "lib/Perinci/CmdLine/Plugin/Debug/DumpRes.pm",
-         "version" : "1.925"
+         "version" : "1.926"
       },
       "Perinci::CmdLine::Plugin::Flow::Exit" : {
          "file" : "lib/Perinci/CmdLine/Plugin/Flow/Exit.pm",
-         "version" : "1.925"
+         "version" : "1.926"
       },
       "Perinci::CmdLine::Plugin::Plugin::Disable" : {
          "file" : "lib/Perinci/CmdLine/Plugin/Plugin/Disable.pm",
-         "version" : "1.925"
+         "version" : "1.926"
       },
       "Perinci::CmdLine::Plugin::Run::Completion" : {
          "file" : "lib/Perinci/CmdLine/Plugin/Run/Completion.pm",
-         "version" : "1.925"
+         "version" : "1.926"
       },
       "Perinci::CmdLine::Plugin::Run::DebugCompletion" : {
          "file" : "lib/Perinci/CmdLine/Plugin/Run/DebugCompletion.pm",
-         "version" : "1.925"
+         "version" : "1.926"
       },
       "Perinci::CmdLine::Plugin::Run::DumpObject" : {
          "file" : "lib/Perinci/CmdLine/Plugin/Run/DumpObject.pm",
-         "version" : "1.925"
+         "version" : "1.926"
       },
       "Perinci::CmdLine::Plugin::Run::Normal" : {
          "file" : "lib/Perinci/CmdLine/Plugin/Run/Normal.pm",
-         "version" : "1.925"
+         "version" : "1.926"
       },
       "Perinci::CmdLine::PluginBase" : {
          "file" : "lib/Perinci/CmdLine/PluginBase.pm",
-         "version" : "1.925"
+         "version" : "1.926"
       }
    },
    "release_status" : "stable",
@@ -157,7 +157,7 @@
          "web" : "https://github.com/perlancar/perl-Perinci-CmdLine-Lite"
       }
    },
-   "version" : "1.925",
+   "version" : "1.926",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

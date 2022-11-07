@@ -6,4 +6,4 @@ use Test::NoWarnings;
 use Wikibase::Datatype::Property;
 
 # Test.
-is($Wikibase::Datatype::Property::VERSION, 0.22, 'Version.');
+is($Wikibase::Datatype::Property::VERSION, 0.23, 'Version.');

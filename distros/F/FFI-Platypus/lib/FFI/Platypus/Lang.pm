@@ -5,7 +5,7 @@ use warnings;
 use 5.008004;
 
 # ABSTRACT: Language specific customizations
-our $VERSION = '2.03'; # VERSION
+our $VERSION = '2.04'; # VERSION
 
 
 
@@ -23,7 +23,7 @@ FFI::Platypus::Lang - Language specific customizations
 
 =head1 VERSION
 
-version 2.03
+version 2.04
 
 =head1 SYNOPSIS
 
@@ -78,6 +78,10 @@ Non-core language plugin for the Rust programming language.
 =item L<FFI::Platypus::Lang::Win32>
 
 Language plugin for use with the Win32 API.
+
+=item L<FFI::Platypus::Lang::Zig>
+
+Non-core language plugin for the Zig programming language.
 
 =back
 

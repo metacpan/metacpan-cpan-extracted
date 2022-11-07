@@ -1,0 +1,2 @@
+-- (lucas)
+SELECT * FROM foo;

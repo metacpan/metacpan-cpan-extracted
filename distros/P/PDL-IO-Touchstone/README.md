@@ -374,16 +374,18 @@ For example, re-compose $T from the `m_to_pos_vecs` example.
 
         $T = pos_vecs_to_m($T11, $T12, $T21, $T22)
 
-## `%h = rsnp_hash(rsnp(...))` - Create a named hash from the return values of rsnp
+## `%h = rsnp_list_to_hash(rsnp(...))` - Create a named hash from the return values of rsnp
 
 It is sometimes more familiar and readable to work with a hash of names instead
 of an index of arrays.  This function converts the return value of `rsnp` into
 a hash with the following fields.  The `[n]` values are the array index order
 into the list that `rsnp` returns.
 
-    %h = rsnp_hash(rsnp($filename, ...));
+    %h = rsnp_list_to_hash(rsnp($filename, ...));
 
-    %h = rsnp_hash(rsnp_fh($filehandle, ...));
+    %h = rsnp_list_to_hash(rsnp_fh($filehandle, ...));
+
+    print "$h{z0_ref}\n";
 
 - \[0\] freqs
 - \[1\] m
@@ -393,6 +395,14 @@ into the list that `rsnp` returns.
 - \[5\] output\_fmt
 - \[6\] funit
 - \[7\] orig\_f\_unit
+
+## `%h = rsnp_hash(...)` - Same as `rsnp` but returns a hash.
+
+See hash elements in `rsnp_list_to_hash`
+
+## `%h = rsnp_fh_hash(...)` - Same as `rsnp_fh` but returns a hash.
+
+See hash elements in `rsnp_list_to_hash`
 
 # SEE ALSO
 

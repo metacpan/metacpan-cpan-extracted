@@ -59,6 +59,30 @@ I<writer:> C<set_base>
 
 I<predicate:> C<has_base>
 
+=head3 imitates
+
+Accepts package name or array reference of package names.
+
+Causes C<isa>, C<DOES> and C<does> methods return true value if they are used
+to check the resulting object with the same package name. Similar to L</base>,
+but only affects object identity and will not call any methods or construct an
+object from class names. Useful if you want to make sure it passes some type
+checks, but will not actually call any unforeseen methods present in the base
+class.
+
+	$spy->set_imitates('Some::Package');
+
+	$spy->object->isa('Some::Package'); # true
+	$spy->object->does('Some::Package'); # true
+	$spy->object->DOES('Some::Package'); # true
+	$spy->object->isa('Other::Package'); # false
+
+I<optional on the constructor with name:> C<imitates>
+
+I<writer:> C<set_imitates>
+
+I<predicate:> C<has_imitates>
+
 =head3 interface
 
 Strictness of the object interface. Can be any of:

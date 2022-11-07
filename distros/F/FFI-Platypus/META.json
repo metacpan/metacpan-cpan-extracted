@@ -103,10 +103,15 @@
             "Software::License::Perl_5" : "0"
          },
          "requires" : {
+            "CHI" : "0",
             "Convert::Binary::C" : "0",
             "Devel::Hide" : "0",
             "Devel::PPPort" : "3.28",
+            "FFI::C" : "0",
+            "File::chdir" : "0",
             "FindBin" : "0",
+            "HTTP::Tiny::Mech" : "0",
+            "Path::Tiny" : "0",
             "Perl::Critic" : "0",
             "Test2::Require::EnvVar" : "0.000121",
             "Test2::Require::Module" : "0.000121",
@@ -122,6 +127,7 @@
             "Test::Pod::LinkCheck::Lite" : "0",
             "Test::Script" : "0",
             "Test::Spelling" : "0",
+            "WWW::Mechanize::Cached" : "0",
             "YAML" : "0"
          }
       },
@@ -162,7 +168,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "2.03",
+   "version" : "2.04",
    "x_contributors" : [
       "Graham Ollis <plicease@cpan.org>",
       "Bakkiaraj Murugesan (bakkiaraj)",

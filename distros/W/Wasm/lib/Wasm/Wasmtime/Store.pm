@@ -10,7 +10,7 @@ use Wasm::Wasmtime::Engine;
 # TODO: wasmtime_store_fuel_consumed
 
 # ABSTRACT: Wasmtime store class
-our $VERSION = '0.22'; # VERSION
+our $VERSION = '0.23'; # VERSION
 
 
 $ffi_prefix = 'wasm_store_';
@@ -47,7 +47,7 @@ Wasm::Wasmtime::Store - Wasmtime store class
 
 =head1 VERSION
 
-version 0.22
+version 0.23
 
 =head1 SYNOPSIS
 

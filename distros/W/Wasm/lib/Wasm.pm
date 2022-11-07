@@ -8,7 +8,7 @@ use Carp ();
 use Wasm::Trap;
 
 # ABSTRACT: Write Perl extensions using Wasm
-our $VERSION = '0.22'; # VERSION
+our $VERSION = '0.23'; # VERSION
 
 
 our %WASM;
@@ -329,7 +329,7 @@ Wasm - Write Perl extensions using Wasm
 
 =head1 VERSION
 
-version 0.22
+version 0.23
 
 =head1 SYNOPSIS
 

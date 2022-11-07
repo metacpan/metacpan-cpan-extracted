@@ -3,6 +3,7 @@ abstract: 'Interface to the online arrival/departure'
 author:
   - 'Copyright (C) 2015-2022 by Daniel Friesel E<lt>derf@finalrewind.orgE<gt>'
 build_requires:
+  File::Slurp: '0'
   Test::Compile: '0'
   Test::More: '0'
   Test::Pod: '0'
@@ -18,22 +19,22 @@ name: Travel-Status-DE-DeutscheBahn
 provides:
   Travel::Status::DE::DeutscheBahn:
     file: lib/Travel/Status/DE/DeutscheBahn.pm
-    version: '4.01'
+    version: '4.02'
   Travel::Status::DE::HAFAS:
     file: lib/Travel/Status/DE/HAFAS.pm
-    version: '4.01'
+    version: '4.02'
   Travel::Status::DE::HAFAS::Journey:
     file: lib/Travel/Status/DE/HAFAS/Journey.pm
-    version: '4.01'
+    version: '4.02'
   Travel::Status::DE::HAFAS::Message:
     file: lib/Travel/Status/DE/HAFAS/Message.pm
-    version: '4.01'
+    version: '4.02'
   Travel::Status::DE::HAFAS::Polyline:
     file: lib/Travel/Status/DE/HAFAS/Polyline.pm
-    version: '4.00'
+    version: '4.02'
   Travel::Status::DE::HAFAS::StopFinder:
     file: lib/Travel/Status/DE/HAFAS/StopFinder.pm
-    version: '4.01'
+    version: '4.02'
 requires:
   Carp: '0'
   Class::Accessor: '0.16'
@@ -50,5 +51,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: https://github.com/derf/Travel-Status-DE-DeutscheBahn
-version: '4.01'
+version: '4.02'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

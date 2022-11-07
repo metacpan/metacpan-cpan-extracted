@@ -23,7 +23,7 @@ use overload
   fallback => 1;
 
 # ABSTRACT: Wasmtime instance exports class
-our $VERSION = '0.22'; # VERSION
+our $VERSION = '0.23'; # VERSION
 
 
 sub new
@@ -87,7 +87,7 @@ Wasm::Wasmtime::Instance::Exports - Wasmtime instance exports class
 
 =head1 VERSION
 
-version 0.22
+version 0.23
 
 =head1 SYNOPSIS
 

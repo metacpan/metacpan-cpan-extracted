@@ -75,17 +75,6 @@ class TestCase::Sys::Process {
     return 1;
   }
 
-  static method kill : int () {
-    
-    my $status = Sys::Process->kill(0, 0);
-    
-    unless ($status == 0) {
-      return 0;
-    }
-    
-    return 1;
-  }
-
   static method wait : int () {
     
     my $child_process_id = Sys::Process->fork;

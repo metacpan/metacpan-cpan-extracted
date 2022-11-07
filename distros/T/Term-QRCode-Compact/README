@@ -1,0 +1,36 @@
+Term::QRCode::Compact - create QR codes for display in the terminal
+
+
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult https://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+
+
+
+
+
+
+
+SEE ALSO
+
+L<Text::QRCode> - needs an update to support C<.> in C<@INC>
+
+L<Term::QRCode> - needs L<Text::QRCode>
+
+
+

@@ -6,7 +6,7 @@
    "dynamic_config" : 1,
    "generated_by" : "Dist::Zilla, CPAN::Meta::Converter",
    "license" : [
-      "freebsd"
+      "open_source"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -31,7 +31,7 @@
          "requires" : {
             "Carp" : "0",
             "File::Temp" : "0",
-            "Future" : "0.40",
+            "Future" : "0.49",
             "Proc::Background" : "1.30",
             "Scalar::Util" : "0",
             "parent" : "0",
@@ -67,7 +67,6 @@
          "web" : "https://github.com/skirmess/Git-Background"
       }
    },
-   "version" : "0.005",
-   "x_spdx_expression" : "BSD-2-Clause-FreeBSD"
+   "version" : "0.006"
 }
 

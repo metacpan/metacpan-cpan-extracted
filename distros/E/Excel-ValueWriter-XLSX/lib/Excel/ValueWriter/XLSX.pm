@@ -3,16 +3,16 @@ package Excel::ValueWriter::XLSX;
 use strict;
 use warnings;
 use utf8;
-use Archive::Zip          qw/AZ_OK/;
+use Archive::Zip          qw/AZ_OK COMPRESSION_LEVEL_DEFAULT/;
 use Scalar::Util          qw/looks_like_number/;
 use List::Util            qw/none/;
-use Params::Validate      qw/validate_with SCALARREF UNDEF/;
+use Params::Validate      qw/validate_with SCALAR SCALARREF UNDEF/;
 use POSIX                 qw/strftime/;
 use Date::Calc            qw/Delta_Days/;
 use Carp                  qw/croak/;
 use Encode                qw/encode_utf8/;
 
-our $VERSION = '0.6';
+our $VERSION = '0.7';
 
 #======================================================================
 # GLOBALS
@@ -29,11 +29,13 @@ my $TABLE_NAME = qr(^\w{3,}$);             # valid table names: >= 3 chars, no s
 my %params_spec = (
 
   # date_regex : for identifying dates in data cells. Should capture into $+{d}, $+{m} and $+{y}.
-  date_regex => {type => SCALARREF|UNDEF, optional => 1, default =>
-                  qr[^(?: (?<d>\d\d?)    \. (?<m>\d\d?) \. (?<y>\d\d\d\d)  # dd.mm.yyyy
-                        | (?<y>\d\d\d\d) -  (?<m>\d\d?) -  (?<d>\d\d?)     # yyyy-mm-dd
-                        | (?<m>\d\d?)    /  (?<d>\d\d?) /  (?<y>\d\d\d\d)) # mm/dd/yyyy
-                      $]x},
+  date_regex        => {type => SCALARREF|UNDEF, optional => 1, default =>
+                         qr[^(?: (?<d>\d\d?)    \. (?<m>\d\d?) \. (?<y>\d\d\d\d)  # dd.mm.yyyy
+                               | (?<y>\d\d\d\d) -  (?<m>\d\d?) -  (?<d>\d\d?)     # yyyy-mm-dd
+                               | (?<m>\d\d?)    /  (?<d>\d\d?) /  (?<y>\d\d\d\d)) # mm/dd/yyyy
+                             $]x},
+  compression_level => {type => SCALAR, regex => qr/^\d$/, optional => 1, default => COMPRESSION_LEVEL_DEFAULT},
+
  );
 
 
@@ -166,8 +168,12 @@ sub add_sheet {
   # insert the sheet and its rels into the zip archive
   my $sheet_id   = $self->n_sheets;
   my $sheet_file = "sheet$sheet_id.xml";
-  $self->{zip}->addString(join("", @xml),                     "xl/worksheets/$sheet_file");
-  $self->{zip}->addString($self->worksheet_rels(@table_rels), "xl/worksheets/_rels/$sheet_file.rels");
+  $self->{zip}->addString(join("", @xml),
+                          "xl/worksheets/$sheet_file",
+                          $self->{compression_level});
+  $self->{zip}->addString($self->worksheet_rels(@table_rels),
+                          "xl/worksheets/_rels/$sheet_file.rels",
+                          $self->{compression_level});
 
   return $sheet_id;
 }
@@ -222,7 +228,9 @@ sub add_table {
    );
 
   # insert into the zip archive
-  $self->{zip}->addString(encode_utf8(join "", @xml), "xl/tables/table$table_id.xml");
+  $self->{zip}->addString(encode_utf8(join "", @xml),
+                          "xl/tables/table$table_id.xml",
+                          $self->{compression_level});
 
   return $table_id;
 }
@@ -246,14 +254,14 @@ sub save_as {
 
   # assemble all parts within the zip, except sheets and tables that were already added previously
   my $zip = $self->{zip};
-  $zip->addString($self->content_types,      "[Content_Types].xml");
-  $zip->addString($self->core,               "docProps/core.xml");
-  $zip->addString($self->app,                "docProps/app.xml");
-  $zip->addString($self->workbook,           "xl/workbook.xml");
-  $zip->addString($self->_rels,              "_rels/.rels");
-  $zip->addString($self->workbook_rels,      "xl/_rels/workbook.xml.rels");
-  $zip->addString($self->shared_strings,     "xl/sharedStrings.xml");
-  $zip->addString($self->styles,             "xl/styles.xml");
+  $zip->addString($self->content_types,  "[Content_Types].xml"        , $self->{compression_level});
+  $zip->addString($self->core,           "docProps/core.xml"          , $self->{compression_level});
+  $zip->addString($self->app,            "docProps/app.xml"           , $self->{compression_level});
+  $zip->addString($self->workbook,       "xl/workbook.xml"            , $self->{compression_level});
+  $zip->addString($self->_rels,          "_rels/.rels"                , $self->{compression_level});
+  $zip->addString($self->workbook_rels,  "xl/_rels/workbook.xml.rels" , $self->{compression_level});
+  $zip->addString($self->shared_strings, "xl/sharedStrings.xml"       , $self->{compression_level});
+  $zip->addString($self->styles,         "xl/styles.xml"              , $self->{compression_level});
 
   # write the Zip archive
   my $write_result = ref $target ? $zip->writeToFileHandle($target) : $zip->writeToFileNamed($target);
@@ -521,7 +529,9 @@ L<Excel::ValueWriter::XLSX> is aimed at fast and cost-effective
 production of data-only workbooks, containing nothing but plain values
 and formulas, without any formatting. Such workbooks are useful in
 architectures where Excel is used merely as a local database, for
-example in connection with a Power Pivot architecture.
+example in connection with a Power Pivot architecture. This module
+also lets you choose the ZIP compression level to be applied
+to the generated C<.xlsx> file.
 
 
 =head1 METHODS
@@ -530,7 +540,7 @@ example in connection with a Power Pivot architecture.
 
   my $writer = Excel::ValueWriter::XLSX->new(%options);
 
-Constructor for a new writer object. Currently the only option is :
+Constructor for a new writer object. Options are :
 
 =over
 
@@ -541,6 +551,13 @@ The default implementation recognizes dates in C<dd.mm.yyyy>, C<yyyy-mm-dd>
 and C<mm/dd/yyyy> formats. User-supplied regular expressions should use
 named captures so that the day, month and year values can be found respectively
 in C<< $+{d} >>, C<< $+{m} >> and C<< $+{y} >>.
+
+=item compression_level
+
+A number from 0 (no compression) to 9 (maximum compression) specifying
+the desired ZIP compression level. High values produce smaller files but
+consume more CPU. The default is taken from COMPRESSION_LEVEL_DEFAULT in
+L<Archive::Zip>, which amounts to 6.
 
 =back
 

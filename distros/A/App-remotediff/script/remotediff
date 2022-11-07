@@ -2,6 +2,7 @@
 #
 # remotediff - remote diff over rsync
 #
+# 2022.11.02 v1.11 jul : fixed rsync --delete
 # 2022.10.21 v1.10 jul : fixed caching
 # 2022.06.24 v1.00 jul : first release
 
@@ -12,10 +13,10 @@ use utf8;
 use Getopt::Std;
 use File::Basename;
 use File::Temp qw(tempdir);
-use File::Path qw(make_path);
+use File::Path qw(make_path remove_tree);
 use Cwd qw(abs_path);
 
-our $VERSION = '1.10';
+our $VERSION = '1.11';
 my $program  = basename($0);
 my $usage    = <<EOF;
 
@@ -52,6 +53,14 @@ $| = 1;
 my $tmp = File::Spec->tmpdir() . "/remotediff"; # cache remote sources
 #my $tmp = tempdir( CLEANUP => 1 );             # no cache
 
+# cleanup old symlinks, to avoid creating a mess
+opendir(DIR, $tmp) or die $!;
+while(readdir DIR)
+{
+	remove_tree("$tmp/$_") if ! /^([^\/:]*:)(\/?)(.+)|\.|\.\./;
+}
+closedir(DIR);
+
 # process file 1
 if ( $ARGV[0] =~ /^([^\/:]*:)(\/?)(.+)/ )
 {
@@ -62,7 +71,7 @@ if ( $ARGV[0] =~ /^([^\/:]*:)(\/?)(.+)/ )
 	my $base = basename($3);
 
 	make_path("$tmp/$host");
-	system ("rsync -az --relative --copy-dirlinks $ARGV[0] $tmp/$host") == 0 or die "system failed: $?";
+	system ("rsync -az --relative --copy-dirlinks --delete $ARGV[0] $tmp/$host") == 0 or die "system failed: $?";
 	
 	if ( $root ne '/' )
 	{
@@ -85,7 +94,6 @@ else
 
 	# recreate symlink
 	make_path("$tmp/$path");
-	unlink "$tmp/$path/$base";
 	symlink(abs_path($ARGV[0]),"$tmp/$path/$base") or die "symlink failed : $!";
 }
 
@@ -99,7 +107,7 @@ if ( $ARGV[1] =~ /^([^\/:]*:)(\/?)(.+)/ )
 	my $base = basename($3);
 
 	make_path("$tmp/$host");
-	system ("rsync -az --relative --copy-dirlinks $ARGV[1] $tmp/$host") == 0 or die "system failed: $?";
+	system ("rsync -az --relative --copy-dirlinks --delete $ARGV[1] $tmp/$host") == 0 or die "system failed: $?";
 	
 	if ( $root ne '/' )
 	{
@@ -122,7 +130,6 @@ else
 
 	# recreate symlink
 	make_path("$tmp/$path");
-	unlink "$tmp/$path/$base";
 	symlink(abs_path($ARGV[1]),"$tmp/$path/$base") or die "symlink failed : $!";
 }
 

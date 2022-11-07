@@ -1,15 +1,9 @@
-package Dist::Zilla::Role::File 6.025;
+package Dist::Zilla::Role::File 6.027;
 # ABSTRACT: something that can act like a file
 
 use Moose::Role;
 
-# BEGIN BOILERPLATE
-use v5.20.0;
-use warnings;
-use utf8;
-no feature 'switch';
-use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
-# END BOILERPLATE
+use Dist::Zilla::Pragmas;
 
 use Dist::Zilla::Types qw(_Filename);
 use Moose::Util::TypeConstraints;
@@ -193,7 +187,7 @@ Dist::Zilla::Role::File - something that can act like a file
 
 =head1 VERSION
 
-version 6.025
+version 6.027
 
 =head1 DESCRIPTION
 
@@ -239,7 +233,7 @@ C<content> will be an error.
 
 =head1 AUTHOR
 
-Ricardo SIGNES 😏 <rjbs@semiotic.systems>
+Ricardo SIGNES 😏 <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

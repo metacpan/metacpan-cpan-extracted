@@ -1,16 +1,10 @@
-package Dist::Zilla::Role::LicenseProvider 6.025;
+package Dist::Zilla::Role::LicenseProvider 6.027;
 # ABSTRACT: something that provides a license for the dist
 
 use Moose::Role;
 with 'Dist::Zilla::Role::Plugin';
 
-# BEGIN BOILERPLATE
-use v5.20.0;
-use warnings;
-use utf8;
-no feature 'switch';
-use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
-# END BOILERPLATE
+use Dist::Zilla::Pragmas;
 
 #pod =head1 DESCRIPTION
 #pod
@@ -50,7 +44,7 @@ Dist::Zilla::Role::LicenseProvider - something that provides a license for the d
 
 =head1 VERSION
 
-version 6.025
+version 6.027
 
 =head1 DESCRIPTION
 
@@ -85,7 +79,7 @@ C<$copyright_year> arguments into the license if these arguments are defined.
 
 =head1 AUTHOR
 
-Ricardo SIGNES 😏 <rjbs@semiotic.systems>
+Ricardo SIGNES 😏 <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

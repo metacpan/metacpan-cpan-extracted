@@ -1,0 +1,56 @@
+{
+   "abstract" : "Create ODF documents from Markdown",
+   "author" : [
+      "Andy Beverley <andy@andybev.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Markdown-ODF",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Markdown::Parser" : "0",
+            "Markdown::Parser::Document" : "0",
+            "Moo" : "0",
+            "ODF::lpOD" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Amtivo-Group/Markdown-ODF/issues"
+      },
+      "homepage" : "https://github.com/Amtivo-Group/Markdown-ODF/",
+      "repository" : {
+         "url" : "https://github.com/Amtivo-Group/Markdown-ODF"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

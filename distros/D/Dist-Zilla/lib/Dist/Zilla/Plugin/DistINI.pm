@@ -1,16 +1,10 @@
-package Dist::Zilla::Plugin::DistINI 6.025;
+package Dist::Zilla::Plugin::DistINI 6.027;
 # ABSTRACT: a plugin to add a dist.ini to newly-minted dists
 
 use Moose;
 with qw(Dist::Zilla::Role::FileGatherer);
 
-# BEGIN BOILERPLATE
-use v5.20.0;
-use warnings;
-use utf8;
-no feature 'switch';
-use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
-# END BOILERPLATE
+use Dist::Zilla::Pragmas;
 
 use Dist::Zilla::File::FromCode;
 
@@ -124,7 +118,7 @@ Dist::Zilla::Plugin::DistINI - a plugin to add a dist.ini to newly-minted dists
 
 =head1 VERSION
 
-version 6.025
+version 6.027
 
 =head1 DESCRIPTION
 
@@ -180,7 +174,7 @@ like this:
 
 =head1 AUTHOR
 
-Ricardo SIGNES 😏 <rjbs@semiotic.systems>
+Ricardo SIGNES 😏 <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

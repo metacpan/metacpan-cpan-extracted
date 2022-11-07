@@ -80,7 +80,7 @@ C<User> is used. If not set, defaults to the root directory when systemd is runn
 system instance and the respective user\'s home directory if run as user. If the setting is prefixed with the
 C<-> character, a missing working directory is not considered fatal. If
 C<RootDirectory>/C<RootImage> is not set, then
-C<WorkingDirectory> is relative to the root of the system running the service manager.  Note
+C<WorkingDirectory> is relative to the root of the system running the service manager. Note
 that setting this parameter might result in additional dependencies to be added to the unit (see
 above).',
         'type' => 'leaf',
@@ -248,7 +248,7 @@ C</proc/>. If C<ptraceable> all processes that cannot be
 ptrace()\'ed by a process are hidden to it. If C<default> no
 restrictions on C</proc/> access or visibility are made. For further details see
 L<The /proc
-Filesystem|https://www.kernel.org/doc/html/latest/filesystems/proc.html#mount-options>. It is generally recommended to run most system services with this option set to
+Filesystem|https://docs.kernel.org/filesystems/proc.html#mount-options>. It is generally recommended to run most system services with this option set to
 C<invisible>. This option is implemented via file system namespacing, and thus cannot
 be used with services that shall be able to install mount points in the host file system
 hierarchy. Note that the root user is unaffected by this option, so to be effective it has to be used
@@ -274,7 +274,7 @@ C<pid>, all files and directories not directly associated with process managemen
 introspection are made invisible in the C</proc/> file system configured for the
 unit\'s processes. This controls the C<subset=> mount option of the
 C<procfs> instance for the unit. For further details see L<The /proc
-Filesystem|https://www.kernel.org/doc/html/latest/filesystems/proc.html#mount-options>. Note that Linux exposes various kernel APIs via C</proc/>,
+Filesystem|https://docs.kernel.org/filesystems/proc.html#mount-options>. Note that Linux exposes various kernel APIs via C</proc/>,
 which are made unavailable with this setting. Since these APIs are used frequently this option is
 useful only in a few, specific cases, and is not suitable for most non-trivial programs.
 
@@ -315,7 +315,7 @@ This option is particularly useful when C<RootDirectory>/C<RootImage>
 is used. In this case the source path refers to a path on the host file system, while the destination path
 refers to a path below the root directory of the unit.
 
-Note that the destination directory must exist or systemd must be able to create it.  Thus, it
+Note that the destination directory must exist or systemd must be able to create it. Thus, it
 is not possible to use those options for mount points nested underneath paths specified in
 C<InaccessiblePaths>, or under C</home/> and other protected
 directories if C<ProtectHome=yes> is
@@ -351,7 +351,7 @@ This option is particularly useful when C<RootDirectory>/C<RootImage>
 is used. In this case the source path refers to a path on the host file system, while the destination path
 refers to a path below the root directory of the unit.
 
-Note that the destination directory must exist or systemd must be able to create it.  Thus, it
+Note that the destination directory must exist or systemd must be able to create it. Thus, it
 is not possible to use those options for mount points nested underneath paths specified in
 C<InaccessiblePaths>, or under C</home/> and other protected
 directories if C<ProtectHome=yes> is
@@ -387,7 +387,7 @@ These settings may be used more than once, each usage appends to the unit\'s lis
 paths. If the empty string is assigned, the entire list of mount paths defined prior to this is
 reset.
 
-Note that the destination directory must exist or systemd must be able to create it.  Thus, it
+Note that the destination directory must exist or systemd must be able to create it. Thus, it
 is not possible to use those options for mount points nested underneath paths specified in
 C<InaccessiblePaths>, or under C</home/> and other protected
 directories if C<ProtectHome=yes> is specified.
@@ -440,6 +440,8 @@ Each image must carry a C</usr/lib/extension-release.d/extension-release.IMAGE>
 file, with the appropriate metadata which matches C<RootImage>/C<RootDirectory>
 or the host. See:
 L<os-release(5)>.
+To disable the safety check that the extension-release file name matches the image file name, the
+C<x-systemd.relax-extension-release-check> mount option may be appended.
 
 When C<DevicePolicy> is set to C<closed> or
 C<strict>, or set to C<auto> and C<DeviceAllow> is
@@ -574,7 +576,7 @@ C<User> is specified and the static group with the name exists, then it is requi
 that the static user with the name already exists. Similarly, if C<Group> is
 specified and the static user with the name exists, then it is required that the static group with
 the name already exists. Dynamic users/groups are allocated from the UID/GID range 61184\x{2026}65519. It is
-recommended to avoid this range for regular system or login users.  At any point in time each UID/GID
+recommended to avoid this range for regular system or login users. At any point in time each UID/GID
 from this range is only assigned to zero or one dynamically allocated users/groups in use. However,
 UID/GIDs are recycled after a unit is terminated. Care should be taken that any processes running as
 part of a unit for which dynamic users/groups are enabled do not leave files or directories owned by
@@ -665,7 +667,7 @@ hence no limits on the capabilities of the process are enforced. This option may
 once, in which case the bounding sets are merged by C<OR>, or by
 C<AND> if the lines are prefixed with C<~> (see below). If the
 empty string is assigned to this option, the bounding set is reset to the empty capability set, and
-all prior settings have no effect.  If set to C<~> (without any further argument),
+all prior settings have no effect. If set to C<~> (without any further argument),
 the bounding set is reset to the full set of available capabilities, also undoing any previous
 settings. This does not affect commands prefixed with C<+>.
 
@@ -680,7 +682,7 @@ Example: if a unit has the following,
     CapabilityBoundingSet=CAP_B CAP_C
 
 then C<CAP_A>, C<CAP_B>, and
-C<CAP_C> are set.  If the second line is prefixed with
+C<CAP_C> are set. If the second line is prefixed with
 C<~>, e.g.,
 
     CapabilityBoundingSet=CAP_A CAP_B
@@ -695,16 +697,16 @@ then, only C<CAP_A> is set.',
         'description' => 'Controls which capabilities to include in the ambient capability set for the executed
 process. Takes a whitespace-separated list of capability names, e.g. C<CAP_SYS_ADMIN>,
 C<CAP_DAC_OVERRIDE>, C<CAP_SYS_PTRACE>. This option may appear more than
-once in which case the ambient capability sets are merged (see the above examples in
+once, in which case the ambient capability sets are merged (see the above examples in
 C<CapabilityBoundingSet>). If the list of capabilities is prefixed with C<~>,
 all but the listed capabilities will be included, the effect of the assignment inverted. If the empty string is
 assigned to this option, the ambient capability set is reset to the empty capability set, and all prior
-settings have no effect.  If set to C<~> (without any further argument), the ambient capability
+settings have no effect. If set to C<~> (without any further argument), the ambient capability
 set is reset to the full set of available capabilities, also undoing any previous settings. Note that adding
-capabilities to ambient capability set adds them to the process\'s inherited capability set.
+capabilities to the ambient capability set adds them to the process\'s inherited capability set.
 
 Ambient capability sets are useful if you want to execute a process as a non-privileged user but still want to
-give it some capabilities.  Note that in this case option C<keep-caps> is automatically added
+give it some capabilities. Note that in this case option C<keep-caps> is automatically added
 to C<SecureBits> to retain the capabilities over the user
 change. C<AmbientCapabilities> does not affect commands prefixed with
 C<+>.',
@@ -717,28 +719,26 @@ C<+>.',
 children can never gain new privileges through execve() (e.g. via setuid or
 setgid bits, or filesystem capabilities). This is the simplest and most effective way to ensure that
 a process and its children can never elevate privileges again. Defaults to false, but certain
-settings override this and ignore the value of this setting.  This is the case when
-C<DynamicUser>,
-C<LockPersonality>,
-C<MemoryDenyWriteExecute>,
-C<PrivateDevices>,
-C<ProtectClock>,
-C<ProtectHostname>,
-C<ProtectKernelLogs>,
-C<ProtectKernelModules>,
-C<ProtectKernelTunables>,
-C<RestrictAddressFamilies>,
-C<RestrictNamespaces>,
-C<RestrictRealtime>,
-C<RestrictSUIDSGID>,
-C<SystemCallArchitectures>,
-C<SystemCallFilter>, or
-C<SystemCallLog> are specified. Note that even if this setting is overridden
-by them, systemctl show shows the original value of this setting. In case the
-service will be run in a new mount namespace anyway and SELinux is disabled, all file systems
-are mounted with C<MS_NOSUID> flag. Also see
-L<No New
-Privileges Flag|https://www.kernel.org/doc/html/latest/userspace-api/no_new_privs.html>.',
+settings override this and ignore the value of this setting. This is the case when
+C<DynamicUser>, C<LockPersonality>,
+C<MemoryDenyWriteExecute>, C<PrivateDevices>,
+C<ProtectClock>, C<ProtectHostname>,
+C<ProtectKernelLogs>, C<ProtectKernelModules>,
+C<ProtectKernelTunables>, C<RestrictAddressFamilies>,
+C<RestrictNamespaces>, C<RestrictRealtime>,
+C<RestrictSUIDSGID>, C<SystemCallArchitectures>,
+C<SystemCallFilter>, or C<SystemCallLog> are specified. Note that
+even if this setting is overridden by them, systemctl show shows the original
+value of this setting. In case the service will be run in a new mount namespace anyway and SELinux is
+disabled, all file systems are mounted with C<MS_NOSUID> flag. Also see L<No New Privileges
+Flag|https://docs.kernel.org/userspace-api/no_new_privs.html>.
+
+Note that this setting only has an effect on the unit\'s processes themselves (or any processes
+directly or indirectly forked off them). It has no effect on processes potentially invoked on request
+of them through tools such as L<at(1p)>,
+L<crontab(1p)>,
+L<systemd-run(1)>, or
+arbitrary IPC services.',
         'type' => 'leaf',
         'value_type' => 'boolean',
         'write_as' => [
@@ -751,9 +751,9 @@ Privileges Flag|https://www.kernel.org/doc/html/latest/userspace-api/no_new_priv
         'description' => 'Controls the secure bits set for the executed process. Takes a space-separated combination of
 options from the following list: C<keep-caps>, C<keep-caps-locked>,
 C<no-setuid-fixup>, C<no-setuid-fixup-locked>, C<noroot>, and
-C<noroot-locked>.  This option may appear more than once, in which case the secure bits are
+C<noroot-locked>. This option may appear more than once, in which case the secure bits are
 ORed. If the empty string is assigned to this option, the bits are reset to 0. This does not affect commands
-prefixed with C<+>.  See L<capabilities(7)> for
+prefixed with C<+>. See L<capabilities(7)> for
 details.',
         'type' => 'leaf',
         'value_type' => 'uniline'
@@ -765,7 +765,7 @@ automated domain transition. However, the policy still needs to authorize the tr
 ignored if SELinux is disabled. If prefixed by C<->, failing to set the SELinux
 security context will be ignored, but it\'s still possible that the subsequent
 execve() may fail if the policy doesn\'t allow the transition for the
-non-overridden context. This does not affect commands prefixed with C<+>.  See
+non-overridden context. This does not affect commands prefixed with C<+>. See
 L<setexeccon(3)>
 for details.',
         'type' => 'leaf',
@@ -799,13 +799,13 @@ C<+>.',
       {
         'description' => "Set soft and hard limits on various resources for executed processes. See
 L<setrlimit(2)> for
-details on the resource limit concept. Resource limits may be specified in two formats: either as
-single value to set a specific soft and hard limit to the same value, or as colon-separated pair
-C<soft:hard> to set both limits individually (e.g. C<LimitAS=4G:16G>).
-Use the string C<infinity> to configure no limit on a specific resource. The
-multiplicative suffixes K, M, G, T, P and E (to the base 1024) may be used for resource limits
-measured in bytes (e.g. C<LimitAS=16G>). For the limits referring to time values, the
-usual time units ms, s, min, h and so on may be used (see
+details on the process resource limit concept. Process resource limits may be specified in two formats:
+either as single value to set a specific soft and hard limit to the same value, or as colon-separated
+pair C<soft:hard> to set both limits individually
+(e.g. C<LimitAS=4G:16G>).  Use the string C<infinity> to configure no
+limit on a specific resource. The multiplicative suffixes K, M, G, T, P and E (to the base 1024) may
+be used for resource limits measured in bytes (e.g. C<LimitAS=16G>). For the limits
+referring to time values, the usual time units ms, s, min, h and so on may be used (see
 L<systemd.time(7)> for
 details). Note that if no time unit is specified for C<LimitCPU> the default unit of
 seconds is implied, while for C<LimitRTTIME> the default unit of microseconds is
@@ -856,13 +856,13 @@ user's service manager.",
       {
         'description' => "Set soft and hard limits on various resources for executed processes. See
 L<setrlimit(2)> for
-details on the resource limit concept. Resource limits may be specified in two formats: either as
-single value to set a specific soft and hard limit to the same value, or as colon-separated pair
-C<soft:hard> to set both limits individually (e.g. C<LimitAS=4G:16G>).
-Use the string C<infinity> to configure no limit on a specific resource. The
-multiplicative suffixes K, M, G, T, P and E (to the base 1024) may be used for resource limits
-measured in bytes (e.g. C<LimitAS=16G>). For the limits referring to time values, the
-usual time units ms, s, min, h and so on may be used (see
+details on the process resource limit concept. Process resource limits may be specified in two formats:
+either as single value to set a specific soft and hard limit to the same value, or as colon-separated
+pair C<soft:hard> to set both limits individually
+(e.g. C<LimitAS=4G:16G>).  Use the string C<infinity> to configure no
+limit on a specific resource. The multiplicative suffixes K, M, G, T, P and E (to the base 1024) may
+be used for resource limits measured in bytes (e.g. C<LimitAS=16G>). For the limits
+referring to time values, the usual time units ms, s, min, h and so on may be used (see
 L<systemd.time(7)> for
 details). Note that if no time unit is specified for C<LimitCPU> the default unit of
 seconds is implied, while for C<LimitRTTIME> the default unit of microseconds is
@@ -913,13 +913,13 @@ user's service manager.",
       {
         'description' => "Set soft and hard limits on various resources for executed processes. See
 L<setrlimit(2)> for
-details on the resource limit concept. Resource limits may be specified in two formats: either as
-single value to set a specific soft and hard limit to the same value, or as colon-separated pair
-C<soft:hard> to set both limits individually (e.g. C<LimitAS=4G:16G>).
-Use the string C<infinity> to configure no limit on a specific resource. The
-multiplicative suffixes K, M, G, T, P and E (to the base 1024) may be used for resource limits
-measured in bytes (e.g. C<LimitAS=16G>). For the limits referring to time values, the
-usual time units ms, s, min, h and so on may be used (see
+details on the process resource limit concept. Process resource limits may be specified in two formats:
+either as single value to set a specific soft and hard limit to the same value, or as colon-separated
+pair C<soft:hard> to set both limits individually
+(e.g. C<LimitAS=4G:16G>).  Use the string C<infinity> to configure no
+limit on a specific resource. The multiplicative suffixes K, M, G, T, P and E (to the base 1024) may
+be used for resource limits measured in bytes (e.g. C<LimitAS=16G>). For the limits
+referring to time values, the usual time units ms, s, min, h and so on may be used (see
 L<systemd.time(7)> for
 details). Note that if no time unit is specified for C<LimitCPU> the default unit of
 seconds is implied, while for C<LimitRTTIME> the default unit of microseconds is
@@ -970,13 +970,13 @@ user's service manager.",
       {
         'description' => "Set soft and hard limits on various resources for executed processes. See
 L<setrlimit(2)> for
-details on the resource limit concept. Resource limits may be specified in two formats: either as
-single value to set a specific soft and hard limit to the same value, or as colon-separated pair
-C<soft:hard> to set both limits individually (e.g. C<LimitAS=4G:16G>).
-Use the string C<infinity> to configure no limit on a specific resource. The
-multiplicative suffixes K, M, G, T, P and E (to the base 1024) may be used for resource limits
-measured in bytes (e.g. C<LimitAS=16G>). For the limits referring to time values, the
-usual time units ms, s, min, h and so on may be used (see
+details on the process resource limit concept. Process resource limits may be specified in two formats:
+either as single value to set a specific soft and hard limit to the same value, or as colon-separated
+pair C<soft:hard> to set both limits individually
+(e.g. C<LimitAS=4G:16G>).  Use the string C<infinity> to configure no
+limit on a specific resource. The multiplicative suffixes K, M, G, T, P and E (to the base 1024) may
+be used for resource limits measured in bytes (e.g. C<LimitAS=16G>). For the limits
+referring to time values, the usual time units ms, s, min, h and so on may be used (see
 L<systemd.time(7)> for
 details). Note that if no time unit is specified for C<LimitCPU> the default unit of
 seconds is implied, while for C<LimitRTTIME> the default unit of microseconds is
@@ -1027,13 +1027,13 @@ user's service manager.",
       {
         'description' => "Set soft and hard limits on various resources for executed processes. See
 L<setrlimit(2)> for
-details on the resource limit concept. Resource limits may be specified in two formats: either as
-single value to set a specific soft and hard limit to the same value, or as colon-separated pair
-C<soft:hard> to set both limits individually (e.g. C<LimitAS=4G:16G>).
-Use the string C<infinity> to configure no limit on a specific resource. The
-multiplicative suffixes K, M, G, T, P and E (to the base 1024) may be used for resource limits
-measured in bytes (e.g. C<LimitAS=16G>). For the limits referring to time values, the
-usual time units ms, s, min, h and so on may be used (see
+details on the process resource limit concept. Process resource limits may be specified in two formats:
+either as single value to set a specific soft and hard limit to the same value, or as colon-separated
+pair C<soft:hard> to set both limits individually
+(e.g. C<LimitAS=4G:16G>).  Use the string C<infinity> to configure no
+limit on a specific resource. The multiplicative suffixes K, M, G, T, P and E (to the base 1024) may
+be used for resource limits measured in bytes (e.g. C<LimitAS=16G>). For the limits
+referring to time values, the usual time units ms, s, min, h and so on may be used (see
 L<systemd.time(7)> for
 details). Note that if no time unit is specified for C<LimitCPU> the default unit of
 seconds is implied, while for C<LimitRTTIME> the default unit of microseconds is
@@ -1084,13 +1084,13 @@ user's service manager.",
       {
         'description' => "Set soft and hard limits on various resources for executed processes. See
 L<setrlimit(2)> for
-details on the resource limit concept. Resource limits may be specified in two formats: either as
-single value to set a specific soft and hard limit to the same value, or as colon-separated pair
-C<soft:hard> to set both limits individually (e.g. C<LimitAS=4G:16G>).
-Use the string C<infinity> to configure no limit on a specific resource. The
-multiplicative suffixes K, M, G, T, P and E (to the base 1024) may be used for resource limits
-measured in bytes (e.g. C<LimitAS=16G>). For the limits referring to time values, the
-usual time units ms, s, min, h and so on may be used (see
+details on the process resource limit concept. Process resource limits may be specified in two formats:
+either as single value to set a specific soft and hard limit to the same value, or as colon-separated
+pair C<soft:hard> to set both limits individually
+(e.g. C<LimitAS=4G:16G>).  Use the string C<infinity> to configure no
+limit on a specific resource. The multiplicative suffixes K, M, G, T, P and E (to the base 1024) may
+be used for resource limits measured in bytes (e.g. C<LimitAS=16G>). For the limits
+referring to time values, the usual time units ms, s, min, h and so on may be used (see
 L<systemd.time(7)> for
 details). Note that if no time unit is specified for C<LimitCPU> the default unit of
 seconds is implied, while for C<LimitRTTIME> the default unit of microseconds is
@@ -1141,13 +1141,13 @@ user's service manager.",
       {
         'description' => "Set soft and hard limits on various resources for executed processes. See
 L<setrlimit(2)> for
-details on the resource limit concept. Resource limits may be specified in two formats: either as
-single value to set a specific soft and hard limit to the same value, or as colon-separated pair
-C<soft:hard> to set both limits individually (e.g. C<LimitAS=4G:16G>).
-Use the string C<infinity> to configure no limit on a specific resource. The
-multiplicative suffixes K, M, G, T, P and E (to the base 1024) may be used for resource limits
-measured in bytes (e.g. C<LimitAS=16G>). For the limits referring to time values, the
-usual time units ms, s, min, h and so on may be used (see
+details on the process resource limit concept. Process resource limits may be specified in two formats:
+either as single value to set a specific soft and hard limit to the same value, or as colon-separated
+pair C<soft:hard> to set both limits individually
+(e.g. C<LimitAS=4G:16G>).  Use the string C<infinity> to configure no
+limit on a specific resource. The multiplicative suffixes K, M, G, T, P and E (to the base 1024) may
+be used for resource limits measured in bytes (e.g. C<LimitAS=16G>). For the limits
+referring to time values, the usual time units ms, s, min, h and so on may be used (see
 L<systemd.time(7)> for
 details). Note that if no time unit is specified for C<LimitCPU> the default unit of
 seconds is implied, while for C<LimitRTTIME> the default unit of microseconds is
@@ -1198,13 +1198,13 @@ user's service manager.",
       {
         'description' => "Set soft and hard limits on various resources for executed processes. See
 L<setrlimit(2)> for
-details on the resource limit concept. Resource limits may be specified in two formats: either as
-single value to set a specific soft and hard limit to the same value, or as colon-separated pair
-C<soft:hard> to set both limits individually (e.g. C<LimitAS=4G:16G>).
-Use the string C<infinity> to configure no limit on a specific resource. The
-multiplicative suffixes K, M, G, T, P and E (to the base 1024) may be used for resource limits
-measured in bytes (e.g. C<LimitAS=16G>). For the limits referring to time values, the
-usual time units ms, s, min, h and so on may be used (see
+details on the process resource limit concept. Process resource limits may be specified in two formats:
+either as single value to set a specific soft and hard limit to the same value, or as colon-separated
+pair C<soft:hard> to set both limits individually
+(e.g. C<LimitAS=4G:16G>).  Use the string C<infinity> to configure no
+limit on a specific resource. The multiplicative suffixes K, M, G, T, P and E (to the base 1024) may
+be used for resource limits measured in bytes (e.g. C<LimitAS=16G>). For the limits
+referring to time values, the usual time units ms, s, min, h and so on may be used (see
 L<systemd.time(7)> for
 details). Note that if no time unit is specified for C<LimitCPU> the default unit of
 seconds is implied, while for C<LimitRTTIME> the default unit of microseconds is
@@ -1255,13 +1255,13 @@ user's service manager.",
       {
         'description' => "Set soft and hard limits on various resources for executed processes. See
 L<setrlimit(2)> for
-details on the resource limit concept. Resource limits may be specified in two formats: either as
-single value to set a specific soft and hard limit to the same value, or as colon-separated pair
-C<soft:hard> to set both limits individually (e.g. C<LimitAS=4G:16G>).
-Use the string C<infinity> to configure no limit on a specific resource. The
-multiplicative suffixes K, M, G, T, P and E (to the base 1024) may be used for resource limits
-measured in bytes (e.g. C<LimitAS=16G>). For the limits referring to time values, the
-usual time units ms, s, min, h and so on may be used (see
+details on the process resource limit concept. Process resource limits may be specified in two formats:
+either as single value to set a specific soft and hard limit to the same value, or as colon-separated
+pair C<soft:hard> to set both limits individually
+(e.g. C<LimitAS=4G:16G>).  Use the string C<infinity> to configure no
+limit on a specific resource. The multiplicative suffixes K, M, G, T, P and E (to the base 1024) may
+be used for resource limits measured in bytes (e.g. C<LimitAS=16G>). For the limits
+referring to time values, the usual time units ms, s, min, h and so on may be used (see
 L<systemd.time(7)> for
 details). Note that if no time unit is specified for C<LimitCPU> the default unit of
 seconds is implied, while for C<LimitRTTIME> the default unit of microseconds is
@@ -1312,13 +1312,13 @@ user's service manager.",
       {
         'description' => "Set soft and hard limits on various resources for executed processes. See
 L<setrlimit(2)> for
-details on the resource limit concept. Resource limits may be specified in two formats: either as
-single value to set a specific soft and hard limit to the same value, or as colon-separated pair
-C<soft:hard> to set both limits individually (e.g. C<LimitAS=4G:16G>).
-Use the string C<infinity> to configure no limit on a specific resource. The
-multiplicative suffixes K, M, G, T, P and E (to the base 1024) may be used for resource limits
-measured in bytes (e.g. C<LimitAS=16G>). For the limits referring to time values, the
-usual time units ms, s, min, h and so on may be used (see
+details on the process resource limit concept. Process resource limits may be specified in two formats:
+either as single value to set a specific soft and hard limit to the same value, or as colon-separated
+pair C<soft:hard> to set both limits individually
+(e.g. C<LimitAS=4G:16G>).  Use the string C<infinity> to configure no
+limit on a specific resource. The multiplicative suffixes K, M, G, T, P and E (to the base 1024) may
+be used for resource limits measured in bytes (e.g. C<LimitAS=16G>). For the limits
+referring to time values, the usual time units ms, s, min, h and so on may be used (see
 L<systemd.time(7)> for
 details). Note that if no time unit is specified for C<LimitCPU> the default unit of
 seconds is implied, while for C<LimitRTTIME> the default unit of microseconds is
@@ -1369,13 +1369,13 @@ user's service manager.",
       {
         'description' => "Set soft and hard limits on various resources for executed processes. See
 L<setrlimit(2)> for
-details on the resource limit concept. Resource limits may be specified in two formats: either as
-single value to set a specific soft and hard limit to the same value, or as colon-separated pair
-C<soft:hard> to set both limits individually (e.g. C<LimitAS=4G:16G>).
-Use the string C<infinity> to configure no limit on a specific resource. The
-multiplicative suffixes K, M, G, T, P and E (to the base 1024) may be used for resource limits
-measured in bytes (e.g. C<LimitAS=16G>). For the limits referring to time values, the
-usual time units ms, s, min, h and so on may be used (see
+details on the process resource limit concept. Process resource limits may be specified in two formats:
+either as single value to set a specific soft and hard limit to the same value, or as colon-separated
+pair C<soft:hard> to set both limits individually
+(e.g. C<LimitAS=4G:16G>).  Use the string C<infinity> to configure no
+limit on a specific resource. The multiplicative suffixes K, M, G, T, P and E (to the base 1024) may
+be used for resource limits measured in bytes (e.g. C<LimitAS=16G>). For the limits
+referring to time values, the usual time units ms, s, min, h and so on may be used (see
 L<systemd.time(7)> for
 details). Note that if no time unit is specified for C<LimitCPU> the default unit of
 seconds is implied, while for C<LimitRTTIME> the default unit of microseconds is
@@ -1426,13 +1426,13 @@ user's service manager.",
       {
         'description' => "Set soft and hard limits on various resources for executed processes. See
 L<setrlimit(2)> for
-details on the resource limit concept. Resource limits may be specified in two formats: either as
-single value to set a specific soft and hard limit to the same value, or as colon-separated pair
-C<soft:hard> to set both limits individually (e.g. C<LimitAS=4G:16G>).
-Use the string C<infinity> to configure no limit on a specific resource. The
-multiplicative suffixes K, M, G, T, P and E (to the base 1024) may be used for resource limits
-measured in bytes (e.g. C<LimitAS=16G>). For the limits referring to time values, the
-usual time units ms, s, min, h and so on may be used (see
+details on the process resource limit concept. Process resource limits may be specified in two formats:
+either as single value to set a specific soft and hard limit to the same value, or as colon-separated
+pair C<soft:hard> to set both limits individually
+(e.g. C<LimitAS=4G:16G>).  Use the string C<infinity> to configure no
+limit on a specific resource. The multiplicative suffixes K, M, G, T, P and E (to the base 1024) may
+be used for resource limits measured in bytes (e.g. C<LimitAS=16G>). For the limits
+referring to time values, the usual time units ms, s, min, h and so on may be used (see
 L<systemd.time(7)> for
 details). Note that if no time unit is specified for C<LimitCPU> the default unit of
 seconds is implied, while for C<LimitRTTIME> the default unit of microseconds is
@@ -1483,13 +1483,13 @@ user's service manager.",
       {
         'description' => "Set soft and hard limits on various resources for executed processes. See
 L<setrlimit(2)> for
-details on the resource limit concept. Resource limits may be specified in two formats: either as
-single value to set a specific soft and hard limit to the same value, or as colon-separated pair
-C<soft:hard> to set both limits individually (e.g. C<LimitAS=4G:16G>).
-Use the string C<infinity> to configure no limit on a specific resource. The
-multiplicative suffixes K, M, G, T, P and E (to the base 1024) may be used for resource limits
-measured in bytes (e.g. C<LimitAS=16G>). For the limits referring to time values, the
-usual time units ms, s, min, h and so on may be used (see
+details on the process resource limit concept. Process resource limits may be specified in two formats:
+either as single value to set a specific soft and hard limit to the same value, or as colon-separated
+pair C<soft:hard> to set both limits individually
+(e.g. C<LimitAS=4G:16G>).  Use the string C<infinity> to configure no
+limit on a specific resource. The multiplicative suffixes K, M, G, T, P and E (to the base 1024) may
+be used for resource limits measured in bytes (e.g. C<LimitAS=16G>). For the limits
+referring to time values, the usual time units ms, s, min, h and so on may be used (see
 L<systemd.time(7)> for
 details). Note that if no time unit is specified for C<LimitCPU> the default unit of
 seconds is implied, while for C<LimitRTTIME> the default unit of microseconds is
@@ -1540,13 +1540,13 @@ user's service manager.",
       {
         'description' => "Set soft and hard limits on various resources for executed processes. See
 L<setrlimit(2)> for
-details on the resource limit concept. Resource limits may be specified in two formats: either as
-single value to set a specific soft and hard limit to the same value, or as colon-separated pair
-C<soft:hard> to set both limits individually (e.g. C<LimitAS=4G:16G>).
-Use the string C<infinity> to configure no limit on a specific resource. The
-multiplicative suffixes K, M, G, T, P and E (to the base 1024) may be used for resource limits
-measured in bytes (e.g. C<LimitAS=16G>). For the limits referring to time values, the
-usual time units ms, s, min, h and so on may be used (see
+details on the process resource limit concept. Process resource limits may be specified in two formats:
+either as single value to set a specific soft and hard limit to the same value, or as colon-separated
+pair C<soft:hard> to set both limits individually
+(e.g. C<LimitAS=4G:16G>).  Use the string C<infinity> to configure no
+limit on a specific resource. The multiplicative suffixes K, M, G, T, P and E (to the base 1024) may
+be used for resource limits measured in bytes (e.g. C<LimitAS=16G>). For the limits
+referring to time values, the usual time units ms, s, min, h and so on may be used (see
 L<systemd.time(7)> for
 details). Note that if no time unit is specified for C<LimitCPU> the default unit of
 seconds is implied, while for C<LimitRTTIME> the default unit of microseconds is
@@ -1597,13 +1597,13 @@ user's service manager.",
       {
         'description' => "Set soft and hard limits on various resources for executed processes. See
 L<setrlimit(2)> for
-details on the resource limit concept. Resource limits may be specified in two formats: either as
-single value to set a specific soft and hard limit to the same value, or as colon-separated pair
-C<soft:hard> to set both limits individually (e.g. C<LimitAS=4G:16G>).
-Use the string C<infinity> to configure no limit on a specific resource. The
-multiplicative suffixes K, M, G, T, P and E (to the base 1024) may be used for resource limits
-measured in bytes (e.g. C<LimitAS=16G>). For the limits referring to time values, the
-usual time units ms, s, min, h and so on may be used (see
+details on the process resource limit concept. Process resource limits may be specified in two formats:
+either as single value to set a specific soft and hard limit to the same value, or as colon-separated
+pair C<soft:hard> to set both limits individually
+(e.g. C<LimitAS=4G:16G>).  Use the string C<infinity> to configure no
+limit on a specific resource. The multiplicative suffixes K, M, G, T, P and E (to the base 1024) may
+be used for resource limits measured in bytes (e.g. C<LimitAS=16G>). For the limits
+referring to time values, the usual time units ms, s, min, h and so on may be used (see
 L<systemd.time(7)> for
 details). Note that if no time unit is specified for C<LimitCPU> the default unit of
 seconds is implied, while for C<LimitRTTIME> the default unit of microseconds is
@@ -1654,13 +1654,13 @@ user's service manager.",
       {
         'description' => "Set soft and hard limits on various resources for executed processes. See
 L<setrlimit(2)> for
-details on the resource limit concept. Resource limits may be specified in two formats: either as
-single value to set a specific soft and hard limit to the same value, or as colon-separated pair
-C<soft:hard> to set both limits individually (e.g. C<LimitAS=4G:16G>).
-Use the string C<infinity> to configure no limit on a specific resource. The
-multiplicative suffixes K, M, G, T, P and E (to the base 1024) may be used for resource limits
-measured in bytes (e.g. C<LimitAS=16G>). For the limits referring to time values, the
-usual time units ms, s, min, h and so on may be used (see
+details on the process resource limit concept. Process resource limits may be specified in two formats:
+either as single value to set a specific soft and hard limit to the same value, or as colon-separated
+pair C<soft:hard> to set both limits individually
+(e.g. C<LimitAS=4G:16G>).  Use the string C<infinity> to configure no
+limit on a specific resource. The multiplicative suffixes K, M, G, T, P and E (to the base 1024) may
+be used for resource limits measured in bytes (e.g. C<LimitAS=16G>). For the limits
+referring to time values, the usual time units ms, s, min, h and so on may be used (see
 L<systemd.time(7)> for
 details). Note that if no time unit is specified for C<LimitCPU> the default unit of
 seconds is implied, while for C<LimitRTTIME> the default unit of microseconds is
@@ -1734,7 +1734,7 @@ C<private-file-backed>, C<shared-file-backed>,
 C<elf-headers>, C<private-huge>,
 C<shared-huge>, C<private-dax>, C<shared-dax>,
 and the special values C<all> (all types) and C<default> (the
-kernel default of C<C<private-anonymous>C<shared-anonymous> C<elf-headers>C<private-huge>>). See
+kernel default of C<private-anonymous>C<shared-anonymous> C<elf-headers>C<private-huge>). See
 L<core(5)>
 for the meaning of the mapping types. When specified multiple times, all specified masks are
 ORed. When not set, or if the empty value is assigned, the inherited value is not changed.',
@@ -1769,12 +1769,12 @@ non-service units and for services of the user service manager.',
       {
         'description' => 'Sets the adjustment value for the Linux kernel\'s Out-Of-Memory (OOM) killer score for
 executed processes. Takes an integer between -1000 (to disable OOM killing of processes of this unit)
-and 1000 (to make killing of processes of this unit under memory pressure very likely). See L<proc.txt|https://www.kernel.org/doc/Documentation/filesystems/proc.txt> for details. If
-not specified defaults to the OOM score adjustment level of the service manager itself, which is
-normally at 0.
+and 1000 (to make killing of processes of this unit under memory pressure very likely). See L<The /proc Filesystem|https://docs.kernel.org/filesystems/proc.html> for
+details. If not specified defaults to the OOM score adjustment level of the service manager itself,
+which is normally at 0.
 
 Use the C<OOMPolicy> setting of service units to configure how the service
-manager shall react to the kernel OOM killer or systemd-oomd terminating a process of the service.  See
+manager shall react to the kernel OOM killer or systemd-oomd terminating a process of the service. See
 L<systemd.service(5)>
 for details.',
         'max' => '1000',
@@ -1979,7 +1979,7 @@ mounted read-only, except for the API file system subtrees C</dev/>,
 C</proc/> and C</sys/> (protect these directories using
 C<PrivateDevices>, C<ProtectKernelTunables>,
 C<ProtectControlGroups>). This setting ensures that any modification of the vendor-supplied
-operating system (and optionally its configuration, and local mounts) is prohibited for the service.  It is
+operating system (and optionally its configuration, and local mounts) is prohibited for the service. It is
 recommended to enable this setting for all long-running services, unless they are involved with system updates
 or need to modify the operating system in other ways. If this option is used,
 C<ReadWritePaths> may be used to exclude specific directories from being made read-only. This
@@ -2013,7 +2013,7 @@ directories not relevant to the processes invoked by the unit, while still allow
 directories to be made visible when listed in C<BindPaths> or
 C<BindReadOnlyPaths>.
 
-Setting this to C<yes> is mostly equivalent to set the three directories in
+Setting this to C<yes> is mostly equivalent to setting the three directories in
 C<InaccessiblePaths>. Similarly, C<read-only> is mostly equivalent to
 C<ReadOnlyPaths>, and C<tmpfs> is mostly equivalent to
 C<TemporaryFileSystem> with C<:ro>.
@@ -2321,7 +2321,7 @@ using the same first parameter, but a different second parameter.',
       {
         'description' => 'Specifies the access mode of the directories specified in C<RuntimeDirectory>,
 C<StateDirectory>, C<CacheDirectory>, C<LogsDirectory>, or
-C<ConfigurationDirectory>, respectively, as an octal number.  Defaults to
+C<ConfigurationDirectory>, respectively, as an octal number. Defaults to
 C<0755>. See "Permissions" in L<path_resolution(7)> for a
 discussion of the meaning of permission bits.',
         'type' => 'leaf',
@@ -2331,7 +2331,7 @@ discussion of the meaning of permission bits.',
       {
         'description' => 'Specifies the access mode of the directories specified in C<RuntimeDirectory>,
 C<StateDirectory>, C<CacheDirectory>, C<LogsDirectory>, or
-C<ConfigurationDirectory>, respectively, as an octal number.  Defaults to
+C<ConfigurationDirectory>, respectively, as an octal number. Defaults to
 C<0755>. See "Permissions" in L<path_resolution(7)> for a
 discussion of the meaning of permission bits.',
         'type' => 'leaf',
@@ -2341,7 +2341,7 @@ discussion of the meaning of permission bits.',
       {
         'description' => 'Specifies the access mode of the directories specified in C<RuntimeDirectory>,
 C<StateDirectory>, C<CacheDirectory>, C<LogsDirectory>, or
-C<ConfigurationDirectory>, respectively, as an octal number.  Defaults to
+C<ConfigurationDirectory>, respectively, as an octal number. Defaults to
 C<0755>. See "Permissions" in L<path_resolution(7)> for a
 discussion of the meaning of permission bits.',
         'type' => 'leaf',
@@ -2351,7 +2351,7 @@ discussion of the meaning of permission bits.',
       {
         'description' => 'Specifies the access mode of the directories specified in C<RuntimeDirectory>,
 C<StateDirectory>, C<CacheDirectory>, C<LogsDirectory>, or
-C<ConfigurationDirectory>, respectively, as an octal number.  Defaults to
+C<ConfigurationDirectory>, respectively, as an octal number. Defaults to
 C<0755>. See "Permissions" in L<path_resolution(7)> for a
 discussion of the meaning of permission bits.',
         'type' => 'leaf',
@@ -2361,7 +2361,7 @@ discussion of the meaning of permission bits.',
       {
         'description' => 'Specifies the access mode of the directories specified in C<RuntimeDirectory>,
 C<StateDirectory>, C<CacheDirectory>, C<LogsDirectory>, or
-C<ConfigurationDirectory>, respectively, as an octal number.  Defaults to
+C<ConfigurationDirectory>, respectively, as an octal number. Defaults to
 C<0755>. See "Permissions" in L<path_resolution(7)> for a
 discussion of the meaning of permission bits.',
         'type' => 'leaf',
@@ -2374,7 +2374,7 @@ discussion of the meaning of permission bits.',
           'yes',
           'restart'
         ],
-        'description' => 'Takes a boolean argument or C<restart>.  If set to C<no> (the
+        'description' => 'Takes a boolean argument or C<restart>. If set to C<no> (the
 default), the directories specified in C<RuntimeDirectory> are always removed when the service
 stops. If set to C<restart> the directories are preserved when the service is both automatically
 and manually restarted. Here, the automatic restart means the operation specified in
@@ -2449,7 +2449,7 @@ second.
 
 Note that these settings will disconnect propagation of mounts from the unit\'s processes to the
 host. This means that this setting may not be used for services which shall be able to install mount points in
-the main mount namespace. For C<ReadWritePaths> and C<ReadOnlyPaths>
+the main mount namespace. For C<ReadWritePaths> and C<ReadOnlyPaths>,
 propagation in the other direction is not affected, i.e. mounts created on the host generally appear in the
 unit processes\' namespace, and mounts removed on the host also disappear there too. In particular, note that
 mount propagation from host to unit will result in unmodified mounts to be created in the unit\'s namespace,
@@ -2521,7 +2521,7 @@ second.
 
 Note that these settings will disconnect propagation of mounts from the unit\'s processes to the
 host. This means that this setting may not be used for services which shall be able to install mount points in
-the main mount namespace. For C<ReadWritePaths> and C<ReadOnlyPaths>
+the main mount namespace. For C<ReadWritePaths> and C<ReadOnlyPaths>,
 propagation in the other direction is not affected, i.e. mounts created on the host generally appear in the
 unit processes\' namespace, and mounts removed on the host also disappear there too. In particular, note that
 mount propagation from host to unit will result in unmodified mounts to be created in the unit\'s namespace,
@@ -2593,7 +2593,7 @@ second.
 
 Note that these settings will disconnect propagation of mounts from the unit\'s processes to the
 host. This means that this setting may not be used for services which shall be able to install mount points in
-the main mount namespace. For C<ReadWritePaths> and C<ReadOnlyPaths>
+the main mount namespace. For C<ReadWritePaths> and C<ReadOnlyPaths>,
 propagation in the other direction is not affected, i.e. mounts created on the host generally appear in the
 unit processes\' namespace, and mounts removed on the host also disappear there too. In particular, note that
 mount propagation from host to unit will result in unmodified mounts to be created in the unit\'s namespace,
@@ -2665,7 +2665,7 @@ second.
 
 Note that these settings will disconnect propagation of mounts from the unit\'s processes to the
 host. This means that this setting may not be used for services which shall be able to install mount points in
-the main mount namespace. For C<ReadWritePaths> and C<ReadOnlyPaths>
+the main mount namespace. For C<ReadWritePaths> and C<ReadOnlyPaths>,
 propagation in the other direction is not affected, i.e. mounts created on the host generally appear in the
 unit processes\' namespace, and mounts removed on the host also disappear there too. In particular, note that
 mount propagation from host to unit will result in unmodified mounts to be created in the unit\'s namespace,
@@ -2737,7 +2737,7 @@ second.
 
 Note that these settings will disconnect propagation of mounts from the unit\'s processes to the
 host. This means that this setting may not be used for services which shall be able to install mount points in
-the main mount namespace. For C<ReadWritePaths> and C<ReadOnlyPaths>
+the main mount namespace. For C<ReadWritePaths> and C<ReadOnlyPaths>,
 propagation in the other direction is not affected, i.e. mounts created on the host generally appear in the
 unit processes\' namespace, and mounts removed on the host also disappear there too. In particular, note that
 mount propagation from host to unit will result in unmodified mounts to be created in the unit\'s namespace,
@@ -2802,7 +2802,7 @@ created by a service in these directories will be removed after the service is s
 false. It is possible to run two or more units within the same private C</tmp/> and
 C</var/tmp/> namespace by using the C<JoinsNamespaceOf> directive,
 see L<systemd.unit(5)>
-for details. This setting is implied if C<DynamicUser> is set. For this setting the
+for details. This setting is implied if C<DynamicUser> is set. For this setting, the
 same restrictions regarding mount propagation and privileges apply as for
 C<ReadOnlyPaths> and related calls, see above. Enabling this setting has the side
 effect of adding C<Requires> and C<After> dependencies on all mount
@@ -3070,7 +3070,7 @@ that do not need special file systems or extra kernel modules to work. Defaults 
 removes C<CAP_SYS_MODULE> from the capability bounding set for the unit, and installs a
 system call filter to block module system calls, also C</usr/lib/modules> is made
 inaccessible. For this setting the same restrictions regarding mount propagation and privileges apply as for
-C<ReadOnlyPaths> and related calls, see above.  Note that limited automatic module loading due
+C<ReadOnlyPaths> and related calls, see above. Note that limited automatic module loading due
 to user configuration or kernel mapping tables might still happen as side effect of requested user operations,
 both privileged and unprivileged. To disable module auto-load feature please see
 L<sysctl.d(5)>C<kernel.modules_disabled> mechanism and
@@ -3191,7 +3191,7 @@ Example: if a unit has the following,
 
 then only access to C<tmpfs> is denied.
 
-As the number of possible filesystems is large, predefined sets of filesystems are provided.  A set
+As the number of possible filesystems is large, predefined sets of filesystems are provided. A set
 starts with C<@> character, followed by name of the set.
 
 Use
@@ -3226,7 +3226,7 @@ L<clone(2)> and
 L<setns(2)> system calls, taking
 the specified flags parameters into account. Note that \x{2014} if this option is used \x{2014} in addition to restricting
 creation and switching of the specified types of namespaces (or all of them, if true) access to the
-setns() system call with a zero flags parameter is prohibited.  This setting is only
+setns() system call with a zero flags parameter is prohibited. This setting is only
 supported on x86, x86-64, mips, mips-le, mips64, mips64-le, mips64-n32, mips64-le-n32, ppc64, ppc64-le, s390
 and s390x, and enforces no restrictions on other architectures. If running in user mode, or in system mode, but
 without the C<CAP_SYS_ADMIN> capability (e.g. setting C<User>),
@@ -3266,7 +3266,7 @@ C<NoNewPrivileges=yes> is implied.',
       {
         'description' => 'Takes a boolean argument. If set, attempts to create memory mappings that are writable and
 executable at the same time, or to change existing memory mappings to become executable, or mapping shared
-memory segments as executable are prohibited.  Specifically, a system call filter is added that rejects
+memory segments as executable, are prohibited. Specifically, a system call filter is added that rejects
 L<mmap(2)> system calls with both
 C<PROT_EXEC> and C<PROT_WRITE> set,
 L<mprotect(2)> or
@@ -3278,7 +3278,7 @@ generate program code dynamically at runtime, including JIT execution engines, e
 "trampoline" feature of various C compilers. This option improves service security, as it makes harder for
 software exploits to change running code dynamically. However, the protection can be circumvented, if
 the service can write to a filesystem, which is not mounted with C<noexec> (such as
-C</dev/shm>), or it can use memfd_create().  This can be
+C</dev/shm>), or it can use memfd_create(). This can be
 prevented by making such file systems inaccessible to the service
 (e.g. C<InaccessiblePaths=/dev/shm>) and installing further system call filters
 (C<SystemCallFilter=~memfd_create>). Note that this feature is fully available on
@@ -3322,7 +3322,7 @@ set-group-ID (SGID) bits on files or directories will be denied (for details on 
 L<inode(7)>). If
 running in user mode, or in system mode, but without the C<CAP_SYS_ADMIN>
 capability (e.g. setting C<User>), C<NoNewPrivileges=yes> is
-implied. As the SUID/SGID bits are mechanisms to elevate privileges, and allows users to acquire the
+implied. As the SUID/SGID bits are mechanisms to elevate privileges, and allow users to acquire the
 identity of other users, it is recommended to restrict creation of SUID/SGID files to the few
 programs that actually require them. Note that this restricts marking of any type of file system
 object with these bits, including both regular files and directories (where the SGID is a different
@@ -3433,7 +3433,7 @@ C<EACCES> or C<EUCLEAN> (see L<errno(3)> for a
 full list). This value will be returned when a deny-listed system call is triggered, instead of
 terminating the processes immediately. Special setting C<kill> can be used to
 explicitly specify killing. This value takes precedence over the one given in
-C<SystemCallErrorNumber>, see below.  If running in user mode, or in system mode,
+C<SystemCallErrorNumber>, see below. If running in user mode, or in system mode,
 but without the C<CAP_SYS_ADMIN> capability (e.g. setting
 C<User>), C<NoNewPrivileges=yes> is implied. This feature
 makes use of the Secure Computing Mode 2 interfaces of the kernel ('seccomp filtering') and is useful
@@ -3458,7 +3458,7 @@ require access to an additional set of system calls in order to process and log 
 might be necessary to temporarily disable system call filters in order to simplify debugging of such
 failures.
 
-If you specify both types of this option (i.e.  allow-listing and deny-listing), the first
+If you specify both types of this option (i.e. allow-listing and deny-listing), the first
 encountered will take precedence and will dictate the default action (termination or approval of a
 system call). Then the next occurrences of this option will add or delete the listed system calls
 from the set of the filtered system calls, depending of its type and the default action. (For
@@ -3466,7 +3466,7 @@ example, if you have started with an allow list rule for read() and
 write(), and right after it add a deny list rule for write(),
 then write() will be removed from the set.)
 
-As the number of possible system calls is large, predefined sets of system calls are provided.  A set
+As the number of possible system calls is large, predefined sets of system calls are provided. A set
 starts with C<\@> character, followed by name of the set.
 Currently predefined system call setsSetDescription\@aioAsynchronous I/O (L<io_setup(2)>, L<io_submit(2)>, and related calls)\@basic-ioSystem calls for basic I/O: reading, writing, seeking, file descriptor duplication and closing (L<read(2)>, L<write(2)>, and related calls)\@chownChanging file ownership (L<chown(2)>, L<fchownat(2)>, and related calls)\@clockSystem calls for changing the system clock (L<adjtimex(2)>, L<settimeofday(2)>, and related calls)\@cpu-emulationSystem calls for CPU emulation functionality (L<vm86(2)> and related calls)\@debugDebugging, performance monitoring and tracing functionality (L<ptrace(2)>, L<perf_event_open(2)> and related calls)\@file-systemFile system operations: opening, creating files and directories for read and write, renaming and removing them, reading file properties, or creating hard and symbolic links\@io-eventEvent loop system calls (L<poll(2)>, L<select(2)>, L<epoll(7)>, L<eventfd(2)> and related calls)\@ipcPipes, SysV IPC, POSIX Message Queues and other IPC (L<mq_overview(7)>, L<svipc(7)>)\@keyringKernel keyring access (L<keyctl(2)> and related calls)\@memlockLocking of memory in RAM (L<mlock(2)>, L<mlockall(2)> and related calls)\@moduleLoading and unloading of kernel modules (L<init_module(2)>, L<delete_module(2)> and related calls)\@mountMounting and unmounting of file systems (L<mount(2)>, L<chroot(2)>, and related calls)\@network-ioSocket I/O (including local AF_UNIX): L<socket(7)>, L<unix(7)>\@obsoleteUnusual, obsolete or unimplemented (L<create_module(2)>, L<gtty(2)>, \x{2026})\@privilegedAll system calls which need super-user capabilities (L<capabilities(7)>)\@processProcess control, execution, namespacing operations (L<clone(2)>, L<kill(2)>, L<namespaces(7)>, \x{2026})\@raw-ioRaw I/O port access (L<ioperm(2)>, L<iopl(2)>, pciconfig_read(), \x{2026})\@rebootSystem calls for rebooting and reboot preparation (L<reboot(2)>, kexec(), \x{2026})\@resourcesSystem calls for changing resource limits, memory and scheduling parameters (L<setrlimit(2)>, L<setpriority(2)>, \x{2026})\@setuidSystem calls for changing user ID and group ID credentials, (L<setuid(2)>, L<setgid(2)>, L<setresuid(2)>, \x{2026})\@signalSystem calls for manipulating and handling process signals (L<signal(2)>, L<sigprocmask(2)>, \x{2026})\@swapSystem calls for enabling/disabling swap devices (L<swapon(2)>, L<swapoff(2)>)\@syncSynchronizing files and memory to disk (L<fsync(2)>, L<msync(2)>, and related calls)\@system-serviceA reasonable set of system calls used by common system services, excluding any special purpose calls. This is the recommended starting point for allow-listing system calls for system services, as it contains what is typically needed by system services, but excludes overly specific interfaces. For example, the following APIs are excluded: C<\@clock>, C<\@mount>, C<\@swap>, C<\@reboot>.\@timerSystem calls for scheduling operations by time (L<alarm(2)>, L<timer_create(2)>, \x{2026})\@knownAll system calls defined by the kernel. This list is defined statically in systemd based on a kernel version that was available when this systemd version was released. It will become progressively more out-of-date as the kernel is updated.
 Note, that as new system calls are added to the kernel, additional system calls might be added to the groups
@@ -3523,7 +3523,7 @@ filter is triggered.',
 filter. The known architecture identifiers are the same as for C<ConditionArchitecture>
 described in L<systemd.unit(5)>,
 as well as C<x32>, C<mips64-n32>, C<mips64-le-n32>, and
-the special identifier C<native>.  The special identifier C<native>
+the special identifier C<native>. The special identifier C<native>
 implicitly maps to the native architecture of the system (or more precisely: to the architecture the system
 manager is compiled for). If running in user mode, or in system mode, but without the
 C<CAP_SYS_ADMIN> capability (e.g. setting C<User>),
@@ -3619,11 +3619,14 @@ securely.",
           'type' => 'leaf',
           'value_type' => 'uniline'
         },
-        'description' => 'Similar to C<Environment> but reads the environment variables from a text file.
-The text file should contain newline-separated variable assignments.  Empty lines, lines without an
-C<=> separator, or lines starting with C<;> or C<#> will be
-ignored, which may be used for commenting. The file must be UTF-8 encoded. Valid characters are L<unicode scalar values|https://www.unicode.org/glossary/#unicode_scalar_value> other than L<noncharacters|https://www.unicode.org/glossary/#noncharacter>, U+0000 NUL, and U+FEFF L<byte order mark|https://www.unicode.org/glossary/#byte_order_mark>. Control codes other than NUL
-are allowed.
+        'description' => 'Similar to C<Environment>, but reads the environment variables from
+a text file. The text file should contain newline-separated variable assignments. Empty lines, lines
+without an C<=> separator, or lines starting with C<;> or
+C<#> will be ignored, which may be used for commenting. The file must be UTF-8
+encoded. Valid characters are L<unicode scalar values|https://www.unicode.org/glossary/#unicode_scalar_value> other than
+L<noncharacters|https://www.unicode.org/glossary/#noncharacter>, U+0000 NUL, and
+U+FEFF L<byte order mark|https://www.unicode.org/glossary/#byte_order_mark>.
+Control codes other than NUL are allowed.
 
 In the file, an unquoted value after the C<=> is parsed with the same backslash-escape
 rules as L<unquoted
@@ -3654,8 +3657,8 @@ read. If the empty string is assigned to this option, the list of file to read i
 have no effect.
 
 The files listed with this directive will be read shortly before the process is executed (more
-specifically, after all processes from a previous unit state terminated.  This means you can generate these
-files in one unit state, and read it with this option in the next.  The files are read from the file
+specifically, after all processes from a previous unit state terminated. This means you can generate these
+files in one unit state, and read it with this option in the next. The files are read from the file
 system of the service manager, before any file system changes like bind mounts take place).
 
 Settings from these files override settings made with C<Environment>. If the same
@@ -3771,12 +3774,12 @@ compatibility with daemons designed for use with the traditional L<inetd(8)> soc
 daemon.
 
 The C<fd:name> option connects standard input to a specific,
-named file descriptor provided by a socket unit.  The name may be specified as part of this option, following a
-C<:> character (e.g. C<fd:foobar>).  If no name is specified, the name
+named file descriptor provided by a socket unit. The name may be specified as part of this option, following a
+C<:> character (e.g. C<fd:foobar>). If no name is specified, the name
 C<stdin> is implied (i.e. C<fd> is equivalent to C<fd:stdin>).
 At least one socket unit defining the specified name must be provided via the C<Sockets>
-option, and the file descriptor name may differ from the name of its containing socket unit.  If multiple
-matches are found, the first one will be used.  See C<FileDescriptorName> in
+option, and the file descriptor name may differ from the name of its containing socket unit. If multiple
+matches are found, the first one will be used. See C<FileDescriptorName> in
 L<systemd.socket(5)> for more
 details about named file descriptors and their ordering.
 
@@ -3861,7 +3864,7 @@ C<socket> connects standard output to a socket acquired via socket activation. T
 semantics are similar to the same option of C<StandardInput>, see above.
 
 The C<fd:name> option connects standard output to a
-specific, named file descriptor provided by a socket unit.  A name may be specified as part of this
+specific, named file descriptor provided by a socket unit. A name may be specified as part of this
 option, following a C<:> character
 (e.g. C<fd:foobar>). If no name is specified, the name
 C<stdout> is implied (i.e. C<fd> is equivalent to
@@ -3881,7 +3884,11 @@ when executing shell scripts the construct echo \"hello\" > /dev/stderr for
 writing text to stderr will not work. To mitigate this use the construct echo \"hello\"
 >&2 instead, which is mostly equivalent and avoids this pitfall.
 
-This setting defaults to the value set with C<DefaultStandardOutput> in
+If C<StandardInput> is set to one of C<tty>, C<tty-force>,
+C<tty-fail>, C<socket>, or C<fd:name>, this
+setting defaults to C<inherit>.
+
+In other cases, this setting defaults to the value set with C<DefaultStandardOutput> in
 L<systemd-system.conf(5)>, which
 defaults to C<journal>. Note that setting this parameter might result in additional dependencies
 to be added to the unit (see above).",
@@ -4048,8 +4055,8 @@ for details about journal namespaces.
 Internally, journal namespaces are implemented through Linux mount namespacing and
 over-mounting the directory that contains the relevant C<AF_UNIX> sockets used for
 logging in the unit\'s mount namespace. Since mount namespaces are used this setting disconnects
-propagation of mounts from the unit\'s processes to the host, similar to how
-C<ReadOnlyPaths> and similar settings (see above) work. Journal namespaces may hence
+propagation of mounts from the unit\'s processes to the host, similarly to how
+C<ReadOnlyPaths> and similar settings describe above work. Journal namespaces may hence
 not be used for services that need to establish mount points on the host.
 
 When this option is used the unit will automatically gain ordering and requirement dependencies
@@ -4065,7 +4072,7 @@ output, unless the C<--namespace=> option is used.',
       {
         'description' => 'Sets the process name ("syslog tag") to prefix log lines sent to
 the logging system or the kernel log buffer with. If not set, defaults to the process name of the
-executed process.  This option is only useful when C<StandardOutput> or
+executed process. This option is only useful when C<StandardOutput> or
 C<StandardError> are set to C<journal> or C<kmsg> (or to
 the same settings in combination with C<+console>) and only applies to log messages
 written to stdout or stderr.',
@@ -4133,7 +4140,7 @@ Defaults to true.',
       'TTYReset',
       {
         'description' => 'Reset the terminal device specified with C<TTYPath> before and after
-execution.  Defaults to C<no>.',
+execution. Defaults to C<no>.',
         'type' => 'leaf',
         'value_type' => 'uniline'
       },
@@ -4241,12 +4248,19 @@ Currently, an accumulated credential size limit of 1 MB per unit is enforced.
 
 The service manager itself may receive system credentials that can be propagated to services
 from a hosting container manager or VM hypervisor. See the L<Container Interface|https://systemd.io/CONTAINER_INTERFACE> documentation for details
-about the former. For the latter, use the qemu C<fw_cfg> node
+about the former. For the latter, pass L<DMI/SMBIOS|https://www.dmtf.org/standards/smbios> OEM string table entries (field type
+11) with a prefix of C<io.systemd.credential:> or
+C<io.systemd.credential.binary:>. In both cases a key/value pair separated by
+C<=> is expected, in the latter case the right-hand side is Base64 decoded when
+parsed (thus permitting binary data to be passed in). Example qemu switch: C<-smbios
+type=11,value=io.systemd.credential:xx=yy>, or C<-smbios
+type=11,value=io.systemd.credential.binary:rick=TmV2ZXIgR29ubmEgR2l2ZSBZb3UgVXA=>. Alternatively,
+use the qemu C<fw_cfg> node
 C<opt/io.systemd.credentials/>. Example qemu switch: C<-fw_cfg
 name=opt/io.systemd.credentials/mycred,string=supersecret>. They may also be specified on
 the kernel command line using the C<systemd.set_credential=> switch (see
-L<systemd(1)>)
-and from the UEFI firmware environment via
+L<systemd(1)>) and from
+the UEFI firmware environment via
 L<systemd-stub(7)>.
 
 If referencing an C<AF_UNIX> stream socket to connect to, the connection will
@@ -4341,12 +4355,19 @@ Currently, an accumulated credential size limit of 1 MB per unit is enforced.
 
 The service manager itself may receive system credentials that can be propagated to services
 from a hosting container manager or VM hypervisor. See the L<Container Interface|https://systemd.io/CONTAINER_INTERFACE> documentation for details
-about the former. For the latter, use the qemu C<fw_cfg> node
+about the former. For the latter, pass L<DMI/SMBIOS|https://www.dmtf.org/standards/smbios> OEM string table entries (field type
+11) with a prefix of C<io.systemd.credential:> or
+C<io.systemd.credential.binary:>. In both cases a key/value pair separated by
+C<=> is expected, in the latter case the right-hand side is Base64 decoded when
+parsed (thus permitting binary data to be passed in). Example qemu switch: C<-smbios
+type=11,value=io.systemd.credential:xx=yy>, or C<-smbios
+type=11,value=io.systemd.credential.binary:rick=TmV2ZXIgR29ubmEgR2l2ZSBZb3UgVXA=>. Alternatively,
+use the qemu C<fw_cfg> node
 C<opt/io.systemd.credentials/>. Example qemu switch: C<-fw_cfg
 name=opt/io.systemd.credentials/mycred,string=supersecret>. They may also be specified on
 the kernel command line using the C<systemd.set_credential=> switch (see
-L<systemd(1)>)
-and from the UEFI firmware environment via
+L<systemd(1)>) and from
+the UEFI firmware environment via
 L<systemd-stub(7)>.
 
 If referencing an C<AF_UNIX> stream socket to connect to, the connection will
@@ -4454,7 +4475,7 @@ leader. Defaults to C<init>.',
         'value_type' => 'enum'
       }
     ],
-    'generated_by' => 'parse-man.pl from systemd 250 doc',
+    'generated_by' => 'parse-man.pl from systemd 252 doc',
     'license' => 'LGPLv2.1+',
     'name' => 'Systemd::Common::Exec'
   }

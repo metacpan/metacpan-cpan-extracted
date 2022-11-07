@@ -1,3 +1,11 @@
+0.07 2022-11-05T16:18:08+01:00
+ - Add autofocus to input element.
+
+0.06 2022-11-03T22:29:14+01:00
+ - Add CSS for disabled submit.
+ - Change CSS for type=text|date|number only.
+ - Fix checks for defined value = 0.
+
 0.05 2022-10-26T02:36:47+02:00
  - Add Select and Option objects.
  - Fix data_type parameter for Button.

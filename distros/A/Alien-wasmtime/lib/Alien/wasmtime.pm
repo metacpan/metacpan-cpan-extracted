@@ -6,7 +6,7 @@ use 5.008001;
 use base qw( Alien::Base );
 
 # ABSTRACT: Find or download wasmtime for use by other Perl modules
-our $VERSION = '0.16'; # VERSION
+our $VERSION = '0.17'; # VERSION
 
 
 1;
@@ -23,7 +23,7 @@ Alien::wasmtime - Find or download wasmtime for use by other Perl modules
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 SYNOPSIS
 
@@ -81,11 +81,21 @@ This L<Alien> is geared for use with FFI only.
 
 =over 4
 
+=item L<Wasm>
+
+High level interface to WebAssembly which uses wasmtime under the covers.
+
 =item L<Wasm::Wasmtime>
+
+Lower-level direct interface to Wasmtime itself from Perl.
 
 =item L<Alien>
 
+Documentation for the Perl / Alien concept.
+
 =item L<FFI::Platypus>
+
+Foreign function interface to dynamic libraries in perl via C<libffi>.
 
 =back
 
@@ -95,7 +105,7 @@ Graham Ollis <plicease@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Graham Ollis.
+This software is copyright (c) 2020-2022 by Graham Ollis.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

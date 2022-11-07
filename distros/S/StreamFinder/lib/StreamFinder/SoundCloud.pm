@@ -4,7 +4,7 @@ StreamFinder::SoundCloud - Fetch actual raw streamable URLs from song-entry webs
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2021 by
+This module is Copyright (C) 2022 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -105,11 +105,11 @@ cookies, trackers, web-bugs, and other crapware that can come with that method
 of play.  The author uses his own custom all-purpose media player called 
 "fauxdacious" (his custom hacked version of the open-source "audacious" 
 audio player).  "fauxdacious" can incorporate this module to decode and play 
-SoundCloud.com streams.  One or more streams can be returned for each song.  
+songs from SoundCloud.com.  One or more streams can be returned for each song.  
 
 WARNING:  SoundCloud streams usually EXPIRE VERY QUICKLY, ie. A FEW MINUTES, 
 and become unplayable (403 ERRORS), requiring recording during first play, or 
-repeatedly readding to your playlist!
+repeatedly re-adding to your playlist!
 
 NOTE:  SoundCloud REQUIRES youtube-dl / yt-dlp (StreamFinder::Youtube) to 
 extract the actual stream and only returns a SINGLE valid stream URL for a 
@@ -315,7 +315,7 @@ L<http://search.cpan.org/dist/StreamFinder-SoundCloud/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2021 Jim Turner.
+Copyright 2022 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

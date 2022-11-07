@@ -1,13 +1,7 @@
-package Dist::Zilla::App 6.025;
+package Dist::Zilla::App 6.027;
 # ABSTRACT: Dist::Zilla's App::Cmd
 
-# BEGIN BOILERPLATE
-use v5.20.0;
-use warnings;
-use utf8;
-no feature 'switch';
-use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
-# END BOILERPLATE
+use Dist::Zilla::Pragmas;
 
 use App::Cmd::Setup 0.330 -app; # better compilation error detection
 
@@ -183,7 +177,7 @@ Dist::Zilla::App - Dist::Zilla's App::Cmd
 
 =head1 VERSION
 
-version 6.025
+version 6.027
 
 =head1 PERL VERSION
 
@@ -206,7 +200,7 @@ been constructed, one will be by calling C<< Dist::Zilla->from_config >>.
 
 =head1 AUTHOR
 
-Ricardo SIGNES 😏 <rjbs@semiotic.systems>
+Ricardo SIGNES 😏 <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,16 +1,10 @@
-package Dist::Zilla::Dist::Builder 6.025;
+package Dist::Zilla::Dist::Builder 6.027;
 # ABSTRACT: dist zilla subclass for building dists
 
 use Moose 0.92; # role composition fixes
 extends 'Dist::Zilla';
 
-# BEGIN BOILERPLATE
-use v5.20.0;
-use warnings;
-use utf8;
-no feature 'switch';
-use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
-# END BOILERPLATE
+use Dist::Zilla::Pragmas;
 
 use MooseX::Types::Moose qw(HashRef);
 use Dist::Zilla::Types qw(Path);
@@ -900,7 +894,7 @@ Dist::Zilla::Dist::Builder - dist zilla subclass for building dists
 
 =head1 VERSION
 
-version 6.025
+version 6.027
 
 =head1 PERL VERSION
 
@@ -1069,7 +1063,7 @@ non-zero, the directory will be left in place.
 
 =head1 AUTHOR
 
-Ricardo SIGNES 😏 <rjbs@semiotic.systems>
+Ricardo SIGNES 😏 <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

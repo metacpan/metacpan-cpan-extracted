@@ -1,7 +1,6 @@
 use Config;
 use ExtUtils::MakeMaker;
 
-use Tk::MMtry qw(try_compile);
 use Tk::MMutil;
 
 
@@ -23,17 +22,17 @@ if( $tkversion < 804.000 ){
 
 # Find path to existing pTk include files
 my $ptkPath = Tk::MMutil::findINC('Tk/pTk/Lang.h');
-$ptkPath =~ s/\/Lang.h$//g;
+$ptkPath =~ s/\/Lang\.h$//g;
 
 Tk::MMutil::TkExtMakefile(
     'NAME'	=> 'Tk::pTk',
-    'VERSION'	=> '1.26',
+    'VERSION'	=> '1.29',
     'XS_VERSION'=> '0.9',
     'LINKTYPE'	=> 'static',
     'OBJECT'	=> '$(O_FILES)', 
     macro	=> { WINARCH     => $win_arch },
     'DEFINE'	=> $define,
-    'INC'	=> "$inc -I$ptkPath -I. -Ibitmaps",
+    'INC'	=> "-I$ptkPath -I. -Ibitmaps",
     'SKIP'	=> [qw( distclean dist makeaperl xs_o)],
     'clean'	=> {'FILES' => 'libpTk$(LIB_EXT)'}
 );
@@ -41,7 +40,7 @@ Tk::MMutil::TkExtMakefile(
 sub MY::top_targets {
  my ($self) = @_;
  local $_ = $self->MM::top_targets;
- s/^(\$\(O_FILES\)\s*:.*)$/# Explicit dependancies provided\n# $1/m;
+ s/^(\$\(O_FILES\)\s*:.*)$/# Explicit dependencies provided\n# $1/m;
  return $_;
 }
 
@@ -110,18 +109,6 @@ sub MY::post_initialize
     }
   }
  my @loose = ();
- if (defined($Config{'i_stdlib'}) && try_compile("config/Hstrtoul.c"))
-  {
-   push(@loose,'strtoul.c');
-  }
- if (defined($Config{'i_string'}) && try_compile("config/Hstrdup.c"))
-  {
-   push(@loose,'strdup.c');
-  }
- if (try_compile("config/Hstrcasecmp.c"))
-  {
-   push(@loose,'strcasecmp.c');
-  }
  $self->Tk::MMutil::mTk_CHO(\%mTk,@loose);
  my %files = ();
  $files{'windows.h'} = 1 if $win_arch eq 'open32';

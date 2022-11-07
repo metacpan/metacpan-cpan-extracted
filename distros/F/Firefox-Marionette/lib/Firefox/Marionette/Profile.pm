@@ -13,7 +13,7 @@ BEGIN {
         require Win32;
     }
 }
-our $VERSION = '1.28';
+our $VERSION = '1.31';
 
 sub ANY_PORT            { return 0 }
 sub _GETPWUID_DIR_INDEX { return 7 }
@@ -51,13 +51,19 @@ sub profile_ini_directory {
 }
 
 sub _read_ini_file {
-    my ( $class, $profile_ini_directory ) = @_;
-    if ( -d $profile_ini_directory ) {
-        my $profile_ini_path =
-          File::Spec->catfile( $profile_ini_directory, 'profiles.ini' );
-        if ( -f $profile_ini_path ) {
-            my $config = Config::INI::Reader->read_file($profile_ini_path);
-            return $config;
+    my ( $class, $profile_ini_directory, $handle ) = @_;
+    if ( defined $handle ) {
+        my $config = Config::INI::Reader->read_handle($handle);
+        return $config;
+    }
+    else {
+        if ( -d $profile_ini_directory ) {
+            my $profile_ini_path =
+              File::Spec->catfile( $profile_ini_directory, 'profiles.ini' );
+            if ( -f $profile_ini_path ) {
+                my $config = Config::INI::Reader->read_file($profile_ini_path);
+                return $config;
+            }
         }
     }
     return {};
@@ -104,11 +110,9 @@ sub path {
     return;
 }
 
-sub directory {
-    my ( $class, $name ) = @_;
-    my $profile_ini_directory = $class->profile_ini_directory();
-    my $config                = $class->_read_ini_file($profile_ini_directory);
-    my $path;
+sub _parse_config_for_path {
+    my ( $class, $name, $config, $profile_ini_directory ) = @_;
+    my @path;
     my $first_key;
     foreach my $key ( sort { $a cmp $b } keys %{$config} ) {
         if ( ( !defined $first_key ) && ( defined $config->{$key}->{Name} ) ) {
@@ -126,31 +130,54 @@ sub directory {
         }
         if ($selected) {
             if ( $config->{$key}->{IsRelative} ) {
-                $path = File::Spec->catfile( $profile_ini_directory,
-                    $config->{$key}->{Path} );
+                @path = ( $profile_ini_directory, $config->{$key}->{Path} );
             }
             elsif ( $config->{$key}->{Path} ) {
-                $path =
-                  File::Spec->catfile( $config->{$key}->{Path} );
+                @path = ( $config->{$key}->{Path} );
             }
             else {
-                $path =
-                  File::Spec->catfile( $profile_ini_directory,
-                    $config->{$key}->{Default} );
+                @path = ( $profile_ini_directory, $config->{$key}->{Default} );
             }
         }
     }
-    if ( ( !$path ) && ( !defined $name ) && ( defined $first_key ) ) {
+    if ( ( !@path ) && ( !defined $name ) && ( defined $first_key ) ) {
         if ( $config->{$first_key}->{IsRelative} ) {
-            $path = File::Spec->catfile( $profile_ini_directory,
-                $config->{$first_key}->{Path} );
+            @path = ( $profile_ini_directory, $config->{$first_key}->{Path} );
         }
         else {
-            $path =
-              File::Spec->catfile( $config->{$first_key}->{Path} );
+            @path = ( $config->{$first_key}->{Path} );
         }
     }
-    return $path;
+    return @path;
+}
+
+sub directory {
+    my ( $class, $name, $config, $profile_ini_directory, $remote_address ) = @_;
+    if ( !$name ) {
+        Firefox::Marionette::Exception->throw(
+            'No profile name has been supplied');
+    }
+    $remote_address = $remote_address ? "$remote_address:" : q[];
+    $profile_ini_directory =
+        $profile_ini_directory
+      ? $profile_ini_directory
+      : $class->profile_ini_directory();
+    $config =
+      $config ? $config : $class->_read_ini_file($profile_ini_directory);
+    my @path =
+      $class->_parse_config_for_path( $name, $config, $profile_ini_directory );
+    if ( !@path ) {
+        Firefox::Marionette::Exception->throw(
+"Failed to find Firefox profile for '$name' in $remote_address$profile_ini_directory"
+        );
+    }
+    if (wantarray) {
+        return @path;
+    }
+    else {
+        my $path = File::Spec->catfile(@path);
+        return $path;
+    }
 }
 
 sub existing {
@@ -183,24 +210,25 @@ sub new {
     $profile->set_value( 'browser.startup.homepage', 'about:blank',      1 );
     $profile->set_value( 'browser.startup.homepage_override.mstone',
         'ignore', 1 );
-    $profile->set_value( 'browser.startup.page',                 '0',      0 );
-    $profile->set_value( 'browser.tabs.warnOnClose',             'false',  0 );
-    $profile->set_value( 'browser.topsites.contile.enabled',     'false',  0 );
-    $profile->set_value( 'browser.warnOnQuit',                   'false',  0 );
-    $profile->set_value( 'datareporting.policy.firstRunURL',     q[],      1 );
-    $profile->set_value( 'devtools.jsonview.enabled',            'false',  0 );
-    $profile->set_value( 'devtools.netmonitor.persistlog',       'true',   0 );
-    $profile->set_value( 'devtools.toolbox.host',                'window', 1 );
-    $profile->set_value( 'dom.disable_open_click_delay',         0,        0 );
-    $profile->set_value( 'extensions.installDistroAddons',       'false',  0 );
-    $profile->set_value( 'focusmanager.testmode',                'true',   0 );
-    $profile->set_value( 'marionette.port',                      ANY_PORT() );
-    $profile->set_value( 'network.http.prompt-temp-redirect',    'false', 0 );
-    $profile->set_value( 'network.http.request.max-start-delay', '0',     0 );
-    $profile->set_value( 'security.osclientcerts.autoload',      'true',  0 );
-    $profile->set_value( 'signon.autofillForms',                 'false', 0 );
-    $profile->set_value( 'signon.rememberSignons',               'false', 0 );
-    $profile->set_value( 'startup.homepage_welcome_url', 'about:blank',   1 );
+    $profile->set_value( 'browser.startup.page',                  '0',      0 );
+    $profile->set_value( 'browser.tabs.warnOnClose',              'false',  0 );
+    $profile->set_value( 'browser.toolbars.bookmarks.visibility', 'never',  1 );
+    $profile->set_value( 'browser.topsites.contile.enabled',      'false',  0 );
+    $profile->set_value( 'browser.warnOnQuit',                    'false',  0 );
+    $profile->set_value( 'datareporting.policy.firstRunURL',      q[],      1 );
+    $profile->set_value( 'devtools.jsonview.enabled',             'false',  0 );
+    $profile->set_value( 'devtools.netmonitor.persistlog',        'true',   0 );
+    $profile->set_value( 'devtools.toolbox.host',                 'window', 1 );
+    $profile->set_value( 'dom.disable_open_click_delay',          0,        0 );
+    $profile->set_value( 'extensions.installDistroAddons',        'false',  0 );
+    $profile->set_value( 'focusmanager.testmode',                 'true',   0 );
+    $profile->set_value( 'marionette.port',                       ANY_PORT() );
+    $profile->set_value( 'network.http.prompt-temp-redirect',     'false', 0 );
+    $profile->set_value( 'network.http.request.max-start-delay',  '0',     0 );
+    $profile->set_value( 'security.osclientcerts.autoload',       'true',  0 );
+    $profile->set_value( 'signon.autofillForms',                  'false', 0 );
+    $profile->set_value( 'signon.rememberSignons',                'false', 0 );
+    $profile->set_value( 'startup.homepage_welcome_url', 'about:blank',    1 );
     $profile->set_value( 'startup.homepage_welcome_url.additional',
         'about:blank', 1 );
 
@@ -226,6 +254,7 @@ sub new {
         $profile->set_value( 'app.update.staging.enabled', 'false',      0 );
         $profile->set_value( 'app.update.timer',           '131400000',  0 );
         $profile->set_value( 'beacon.enabled',             'false',      0 );
+        $profile->set_value( 'browser.aboutConfig.showWarning', 'false', 0 );
         $profile->set_value( 'browser.aboutHomeSnippets.updateUrl', q[], 1 );
         $profile->set_value( 'browser.beacon.enabled',          'false', 0 );
         $profile->set_value( 'browser.casting.enabled',         'false', 0 );
@@ -289,8 +318,12 @@ sub new {
         $profile->set_value( 'browser.uitour.enabled',            'false', 0 );
         $profile->set_value( 'datareporting.healthreport.uploadEnabled',
             'false', 0 );
-        $profile->set_value( 'dom.battery.enabled',                'false', 0 );
-        $profile->set_value( 'extensions.blocklist.enabled',       'false', 0 );
+        $profile->set_value( 'dom.battery.enabled',          'false', 0 );
+        $profile->set_value( 'extensions.blocklist.enabled', 'false', 0 );
+        $profile->set_value( 'extensions.formautofill.addresses.enabled',
+            'false', 0 );
+        $profile->set_value( 'extensions.formautofill.creditCards.enabled',
+            'false', 0 );
         $profile->set_value( 'extensions.pocket.enabled',          'false', 0 );
         $profile->set_value( 'extensions.pocket.site',             q[],     1 );
         $profile->set_value( 'extensions.getAddons.cache.enabled', 'false', 0 );
@@ -312,10 +345,20 @@ sub new {
         $profile->set_value( 'media.navigator.enabled',    'false', 0 );
         $profile->set_value( 'network.captive-portal-service.enabled',
             'false', 0 );
-        $profile->set_value( 'network.cookie.lifetimePolicy', '2', 0 );
+        $profile->set_value( 'network.cookie.lifetimePolicy',       '2',    0 );
+        $profile->set_value( 'privacy.clearOnShutdown.downloads',   'true', 0 );
+        $profile->set_value( 'privacy.clearOnShutdown.formdata',    'true', 0 );
+        $profile->set_value( 'privacy.clearOnShutdown.history',     'true', 0 );
+        $profile->set_value( 'privacy.clearOnShutdown.offlineApps', 'true', 0 );
+        $profile->set_value( 'privacy.clearOnShutdown.openWindows', 'true', 0 );
+        $profile->set_value( 'privacy.clearOnShutdown.sessions',    'true', 0 );
+        $profile->set_value( 'privacy.clearOnShutdown.siteSettings', 'true',
+            0 );
+        $profile->set_value( 'privacy.donottrackheader.enabled',   'true', 0 );
+        $profile->set_value( 'privacy.trackingprotection.enabled', 'true', 0 );
         $profile->set_value(
             'privacy.trackingprotection.fingerprinting.enabled',
-            'false', 0 );
+            'true', 0 );
         $profile->set_value( 'privacy.trackingprotection.pbmode.enabled',
             'false', 0 );
         $profile->set_value( 'profile.enable_profile_migration', 'false', 0 );
@@ -336,7 +379,9 @@ sub new {
 'services.sync.prefs.sync.privacy.trackingprotection.pbmode.enabled',
             'false', 0
         );
-        $profile->set_value( 'signon.rememberSignons',            'false', 0 );
+        $profile->set_value( 'signon.rememberSignons', 'false', 0 );
+        $profile->set_value( 'signon.management.page.breach-alerts.enabled',
+            'false', 0 );
         $profile->set_value( 'toolkit.telemetry.archive.enabled', 'false', 0 );
         $profile->set_value( 'toolkit.telemetry.enabled',         'false', 0 );
         $profile->set_value( 'toolkit.telemetry.rejected',        'true',  0 );
@@ -476,7 +521,7 @@ Firefox::Marionette::Profile - Represents a prefs.js Firefox Profile
 
 =head1 VERSION
 
-Version 1.28
+Version 1.31
 
 =head1 SYNOPSIS
 

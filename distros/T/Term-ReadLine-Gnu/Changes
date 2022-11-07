@@ -1,5 +1,11 @@
 -*- Indented-text -*-
 
+1.44  2022-11-06
+	- change the TERM check as bash does (#11)
+	    - Use `Term::ReadLine::Stub` if the environment variable `TERM` is
+	      set to `"emacs"` or the environment variable `INSIDE_EMACS` or
+	      `EMACS` is defined.
+
 1.43  2022-09-27
 	- readline-8.2 support
 	    new functions

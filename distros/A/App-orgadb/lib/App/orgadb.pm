@@ -8,9 +8,9 @@ use Log::ger;
 use App::orgadb::Common;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-17'; # DATE
+our $DATE = '2022-11-04'; # DATE
 our $DIST = 'App-orgadb'; # DIST
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 our %SPEC;
 
@@ -478,7 +478,7 @@ App::orgadb - An opinionated Org addressbook toolset
 
 =head1 VERSION
 
-This document describes version 0.014 of App::orgadb (from Perl distribution App-orgadb), released on 2022-10-17.
+This document describes version 0.015 of App::orgadb (from Perl distribution App-orgadb), released on 2022-11-04.
 
 =head1 SYNOPSIS
 

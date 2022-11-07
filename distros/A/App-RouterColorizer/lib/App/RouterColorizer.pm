@@ -12,7 +12,7 @@ use strict;
 use warnings;
 
 package App::RouterColorizer;
-$App::RouterColorizer::VERSION = '1.222970';
+$App::RouterColorizer::VERSION = '1.223080';
 use Moose;
 
 use feature 'signatures';
@@ -56,6 +56,13 @@ our $LOWLIGHT = qr/ (?: -[3-9][0-9]\. [0-9]{1,2} )
                   | (?: -2 [5-9] \. [0-9]{1,2} )/xx;
 our $VERYLL = qr/ (?: -[4-9][0-9]\. [0-9]{1,2} )/xx;
 our $LIGHT  = qr/ (?: $NUM ) | (?: N\/A ) /xx;
+
+our $GOODRETURNLOSS = qr/ (?: 29\.[0-9]+ )
+                        | (?: [3-9][0-9]+\.[0-9]+ )/xx;
+our $WARNRETURNLOSS = qr/ (?: 2[0-8]\.[0-9]+ )
+                        | (?: 1[6-9]\.[0-9]+ )/xx;
+our $BADRETURNLOSS = qr/ (?: 1[0-5]\.[0-9]+ )
+                       | (?:  [0-9]\.[0-9]+ )/xx;
 
 our $IPV4CIDR = qr/ $RE{net}{IPv4}
                    (?: \/
@@ -475,6 +482,16 @@ s/ ^ ( \| \s+ [0-9]* \s* \| ) ( \Q Actual Aggregate Power (dBm)\E \s* ) ( \| ) (
 s/ ^ ( \| \s+ [0-9]* \s* \| ) ( \Q Span Loss (dB)\E \s* ) ( \| ) ( \s+ $NUM \s+ ) ( \| ) ( \s+ $NUM \s+ ) ( \| )$/
         $1.$self->_colorize($2, $INFO).$3.$self->_colorize($4, $INFO).$5.$self->_colorize($6, $INFO).$7/exx;
 
+    $line =~
+s/^ ( \| \s+ \| ) ( \Q Optical Return Loss \E \( \QdB\E \) ) ( \s+ \| \s+ ) ( $GOODRETURNLOSS ) (\s+ \| ) $/
+        $1.$self->_colorize($2, $GREEN).$3.$self->_colorize($4, $GREEN).$5/exx;
+    $line =~
+s/^ ( \| \s+ \| ) ( \Q Optical Return Loss \E \( \QdB\E \) ) ( \s+ \| \s+ ) ( $WARNRETURNLOSS ) (\s+ \| ) $/
+        $1.$self->_colorize($2, $ORANGE).$3.$self->_colorize($4, $ORANGE).$5/exx;
+    $line =~
+s/^ ( \| \s+ \| ) ( \Q Optical Return Loss \E \( \QdB\E \) ) ( \s+ \| \s+ ) ( $BADRETURNLOSS  ) (\s+ \| ) $/
+        $1.$self->_colorize($2, $RED).$3.$self->_colorize($4, $RED).$5/exx;
+
     # alarm show
     $line =~ s/ ^ ( \| ) ( \s+ [0-9]* ) ( \| ) ( \s+ ) ( \| ) ( [^|]+ ) ( \| ) ( \s+ [0-9]+ )
                   ( \| ) ( \s* $BIGALARMS|$LITTLEALARMS \s* ) ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ ) ( \| ) $/
@@ -516,7 +533,8 @@ s/ ^ ( \| \s+ [0-9]* \s* \| ) ( \Q Span Loss (dB)\E \s* ) ( \| ) ( \s+ $NUM \s+ 
     $line =~ s/ ^ ( \QSHELL \E \S+ \Q FAILURE\E \N+ ) $/$self->_colorize($1, $RED)/exx;
 
     # ptp show
-    $line =~ s/ ^ ( \| ) ( [^|]+ ) ( \| ) ( \Q Ena \E  ) ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ )
+    $line =~
+      s/ ^ ( \| ) ( [^|]+ ) ( \| ) ( \Q Ena \E  ) ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ )
                   ( \| ) ( [^|]+ ) ( \| ) ( \QUp\E \s+ ) ( \| ) ( [^|]+ )
                   ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ ) ( \| ) /
         $1.$self->_colorize($2, $GREEN).
@@ -531,7 +549,8 @@ s/ ^ ( \| \s+ [0-9]* \s* \| ) ( \Q Span Loss (dB)\E \s* ) ( \| ) ( \s+ $NUM \s+ 
         $19.$self->_colorize($20, $GREEN).
         $21.$self->_colorize($22, $GREEN).
         $23/exx;
-    $line =~ s/ ^ ( \| ) ( [^|]+ ) ( \| ) ( \Q Ena \E  ) ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ )
+    $line =~
+      s/ ^ ( \| ) ( [^|]+ ) ( \| ) ( \Q Ena \E  ) ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ )
                   ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ )
                   ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ ) ( \| ) /
         $1.$self->_colorize($2, $RED).
@@ -546,7 +565,8 @@ s/ ^ ( \| \s+ [0-9]* \s* \| ) ( \Q Span Loss (dB)\E \s* ) ( \| ) ( \s+ $NUM \s+ 
         $19.$self->_colorize($20, $RED).
         $21.$self->_colorize($22, $RED).
         $23/exx;
-    $line =~ s/ ^ ( \| ) ( [^|]+ ) ( \| ) ( \Q Dis \E  ) ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ )
+    $line =~
+      s/ ^ ( \| ) ( [^|]+ ) ( \| ) ( \Q Dis \E  ) ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ )
                   ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ )
                   ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ ) ( \| ) /
         $1.$self->_colorize($2, $INFO).
@@ -653,7 +673,7 @@ App::RouterColorizer - Colorize router CLI output
 
 =head1 VERSION
 
-version 1.222970
+version 1.223080
 
 =head1 DESCRIPTION
 

@@ -1,15 +1,9 @@
-package Dist::Zilla::Role::MutableFile 6.025;
+package Dist::Zilla::Role::MutableFile 6.027;
 # ABSTRACT: something that can act like a file with changeable contents
 
 use Moose::Role;
 
-# BEGIN BOILERPLATE
-use v5.20.0;
-use warnings;
-use utf8;
-no feature 'switch';
-use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
-# END BOILERPLATE
+use Dist::Zilla::Pragmas;
 
 use Moose::Util::TypeConstraints;
 use MooseX::SetOnce;
@@ -144,7 +138,7 @@ Dist::Zilla::Role::MutableFile - something that can act like a file with changea
 
 =head1 VERSION
 
-version 6.025
+version 6.027
 
 =head1 DESCRIPTION
 
@@ -174,7 +168,7 @@ Default is 'UTF-8'. Can only be set once.
 
 =head1 AUTHOR
 
-Ricardo SIGNES 😏 <rjbs@semiotic.systems>
+Ricardo SIGNES 😏 <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

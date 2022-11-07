@@ -11,7 +11,7 @@ Elm_Ctxpopup_Direction				T_IV
 Elm_Scroller_Policy 				T_IV
 Evas_BiDi_Direction 				T_IV
 Evas_Aspect_Control 				T_IV
-
+sssas
 ElmActionslider *					T_EVAS_OBJECT
 const ElmActionslider * 			T_EVAS_OBJECT
 ElmWin *							T_EVAS_OBJECT
@@ -228,7 +228,7 @@ T_EVAS_OBJECT
 			}
 		}
 T_PV_OR_NULL
-	if (SvTYPE($arg) == SVt_NULL) {
+	if (!SvPOK($arg)) {
 		$var = NULL;
 	}
 	else {

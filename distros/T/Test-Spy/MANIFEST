@@ -21,4 +21,5 @@ t/03-call-data.t
 t/04-context.t
 t/05-interface.t
 t/10-base.t
+t/11-imitates.t
 t/author-pod-syntax.t

@@ -1,0 +1,16 @@
+Macro-Simple
+============
+
+Created:      2022-11-05
+Home page:    <https://metacpan.org/release/Macro-Simple>
+Bug tracker:  <https://github.com/tobyink/p5-macro-simple/issues>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.002	2022-11-06
+
+ - Implement some of this in XS for about a 30% runtime speedup.
+ - Internal tidy-ups.
+ - Use namespace::clean to avoid leaving subs with the same names as macros
+   in your package.
+
+0.001	2022-11-05	Initial release

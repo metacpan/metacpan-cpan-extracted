@@ -1,16 +1,10 @@
-package Dist::Zilla::PluginBundle::Classic 6.025;
+package Dist::Zilla::PluginBundle::Classic 6.027;
 # ABSTRACT: the classic (old) default configuration for Dist::Zilla
 
 use Moose;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
 
-# BEGIN BOILERPLATE
-use v5.20.0;
-use warnings;
-use utf8;
-no feature 'switch';
-use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
-# END BOILERPLATE
+use Dist::Zilla::Pragmas;
 
 use namespace::autoclean;
 
@@ -91,7 +85,7 @@ Dist::Zilla::PluginBundle::Classic - the classic (old) default configuration for
 
 =head1 VERSION
 
-version 6.025
+version 6.027
 
 =head1 DESCRIPTION
 
@@ -194,7 +188,7 @@ L<@Basic|Dist::Zilla::PluginBundle::Basic>
 
 =head1 AUTHOR
 
-Ricardo SIGNES 😏 <rjbs@semiotic.systems>
+Ricardo SIGNES 😏 <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

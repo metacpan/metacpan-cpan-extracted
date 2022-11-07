@@ -1,3 +1,9 @@
+0.175   2022-10-19  Released-By: PERLANCAR; Urgency: medium
+
+        - Add options lang & mark_different_lang to pass to
+          Perinci::Sub::To::CLIDocData.
+
+
 0.174   2021-07-10  Released-By: PERLANCAR; Urgency: medium
 
 	- Better wrapping of usage line to adjust for the newer

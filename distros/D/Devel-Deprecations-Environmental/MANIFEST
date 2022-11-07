@@ -1,0 +1,24 @@
+Makefile.PL
+MANIFEST
+CHANGELOG
+ARTISTIC.txt
+GPL2.txt
+MANIFEST.SKIP
+lib/Devel/Deprecations/Environmental.pm
+lib/Devel/Deprecations/Environmental/Plugin/OldPerl.pm
+lib/Devel/Deprecations/Environmental/Plugin/Int32.pm
+t/lib/Devel/Deprecations/Environmental/Plugin/Internal/Int64.pm
+t/lib/Devel/Deprecations/Environmental/Plugin/Internal/Never.pm
+t/lib/Devel/Deprecations/Environmental/Plugin/Internal/Always.pm
+t/32-bit.t
+t/64-bit.t
+t/basic-warning-file-and-line-number.t
+t/time.t
+t/pod-coverage.t
+t/pod.t
+t/broken-plugin.t
+t/lib/Devel/Deprecations/Environmental/Plugin/Internal/Broken.pm
+t/oldperl.t
+t/multi.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

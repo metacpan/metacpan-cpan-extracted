@@ -1,3 +1,7 @@
+0.8.3 2022-11-03
+
+    - Exporting %Chemistry::OpenSMILES::normal_valence.
+
 0.8.2 2022-09-20
 
     - Adding Chemistry::OpenSMILES::Aromaticity and

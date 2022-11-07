@@ -34,7 +34,6 @@
          "requires" : {
             "CryptoTron" : "0.10",
             "File::Basename" : "2.85",
-            "Filter::Macro" : "0.11",
             "JSON::PP" : "4.11",
             "LWP::UserAgent" : "6.43",
             "POSIX" : "1.88",
@@ -44,6 +43,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.09",
+   "version" : "0.13",
    "x_serialization_backend" : "JSON::PP version 4.11"
 }

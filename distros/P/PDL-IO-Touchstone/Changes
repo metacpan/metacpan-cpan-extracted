@@ -1,48 +1,54 @@
 Revision history for PDL-IO-Touchstone
 
-1.010   Mon, 31 Oct 2022 19:15:01 -0700
-	Added support for single-frequency interpolation
-	Added rsnp_hash.
+1.011	2022-11-04T17:08:35-07:00
+	- Renamed rsnp_hash to rsnp_list_to_hash
+	- Added rsnp_hash
+	- Added rsnp_fh_hash
+	- Note: This breaks compat with v1.010.
 
-1.009   Sun, 30 Oct 2022 18:24:52 -0700
-	Added PDL::IO::MDIF: Read and write Measurement Data Interchange Format
-	Fixed 5.26.3 CI test
-	Updated documentation.
+1.010	2022-10-31T19:15:01-07:00
+	- Added support for single-frequency interpolation
+	- Added rsnp_hash.
 
-1.008   Wed, 19 Oct 2022 18:13:59 -0700
-	Add support for wsnp() to take n-port z0 vectors
-	Updated documentation to reference RF::Component
-	Fixed 1.007 changelog
+1.009	2022-10-30T18:24:52-07:00
+	- Added PDL::IO::MDIF: Read and write Measurement Data Interchange Format
+	- Fixed 5.26.3 CI test
+	- Updated documentation.
 
-1.007   Wed, 19 Oct 2022 17:41:41 -0700
-	Fixed abcd_is* functions that were calling Re($pdl) instead of $pdl->re()
-	rsnp: Return a $z0 n-port vector from rsnp instead of a single-value scalar.
-	Added :ALL export tag
-	Added y_esr to EXPORT_OK
-	Added exports for m_to_pos_vecs and pos_vecs_to_m
+1.008	2022-10-19T18:13:59-07:00
+	- Add support for wsnp() to take n-port z0 vectors
+	- Updated documentation to reference RF::Component
+	- Fixed 1.007 changelog
 
-1.006   Fri, 07 Oct 2022 21:41:30 -0700
-	Added Y-parameter calculation functions for cap/inductance, etc
-	Added version dependency for PDL::LinearAlgebra 0.35
-	Add S-parameter interpolation support
-	Fixed ESR and Q calculations
-	Fixed self-resonant frequency calculation and added tests
-	Work-around for missing complex interpolation support in PDL <= 2.080
+1.007	2022-10-19T17:41:41-07:00
+	- Fixed abcd_is* functions that were calling Re($pdl) instead of $pdl->re()
+	- rsnp: Return a $z0 n-port vector from rsnp instead of a single-value scalar.
+	- Added :ALL export tag
+	- Added y_esr to EXPORT_OK
+	- Added exports for m_to_pos_vecs and pos_vecs_to_m
 
-1.005	Fri, 05 Aug 2022 19:50:07 -0700
-	Fixed missing Makefile.PL
+1.006	2022-10-07T21:41:30-07:00
+	- Added Y-parameter calculation functions for cap/inductance, etc
+	- Added version dependency for PDL::LinearAlgebra 0.35
+	- Add S-parameter interpolation support
+	- Fixed ESR and Q calculations
+	- Fixed self-resonant frequency calculation and added tests
+	- Work-around for missing complex interpolation support in PDL <= 2.080
 
-1.004	Fri, 05 Aug 2022 19:38:32 -0700
-	Added s_port_z to find per-port impedances
-	Lots of cleanup help from @mohawk on IRC including github CI integration!
+1.005	2022-08-05T19:50:07-07:00
+	- Fixed missing Makefile.PL
 
-1.003   Fri Aug  5 11:56:04 2022 -0700
-	Fixed PDL::LinearAlgebra Dependency
-	Fixed documentation typo
+1.004	2022-08-05T19:38:32-07:00
+	- Added s_port_z to find per-port impedances
+	- Lots of cleanup help from @mohawk on IRC including github CI integration!
 
-1.002   Thu Jul 28 18:09:15 2022 -0700
-	Added transforms to/from S and these matrices: Z, Y, ABCD
+1.003	2022-08-05T11:56:04-07:00
+	- Fixed PDL::LinearAlgebra Dependency
+	- Fixed documentation typo
 
-1.001   Fri Jul 15 17:37:23 2022 -0700
-        First version, released on an unsuspecting world.
+1.002	2022-07-28T18:09:15-07:00
+	- Added transforms to/from S and these matrices: Z, Y, ABCD
+
+1.001	2022-07-15T17:37:23-07:00
+	- First version, released on an unsuspecting world.
 

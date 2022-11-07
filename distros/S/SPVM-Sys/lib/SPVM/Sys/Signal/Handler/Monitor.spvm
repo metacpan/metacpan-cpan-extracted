@@ -1,0 +1,1 @@
+class Sys::Signal::Handler::Monitor extends Sys::Signal::Handler;

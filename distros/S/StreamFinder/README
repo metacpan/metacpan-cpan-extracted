@@ -137,17 +137,17 @@ DESCRIPTION
     (StreamFinder::Podbean), podcastaddict.com podcasts
     (StreamFinder::PodcastAddict), radio.net radio stations
     (StreamFinder::RadioNet), rumble.com videos (StreamFinder::Rumble),
-    sermonaudio.com sermon audio and video (StreamFinder::SermonAudio),
-    soundcloud.com soundcloud.com songs (StreamFinder::SoundCloud),
-    spreaker.com podcasts (StreamFinder::Spreaker), tunein.com radio
-    stations and podcasts(StreamFinder::Tunein), vimeo.com videos
-    (StreamFinder::Vimeo), (youtube.com, et. al and other sites that
-    youtube-dl supports) (StreamFinder::Youtube), and
+    sermonaudio.com sermons: audio and video (StreamFinder::SermonAudio),
+    soundcloud.com (non-paywalled) songs (StreamFinder::SoundCloud),
+    spreaker.com podcasts (StreamFinder::Spreaker), tunein.com
+    (non-paywalled) radio stations and podcasts (StreamFinder::Tunein),
+    vimeo.com videos (StreamFinder::Vimeo), (youtube.com, et. al and other
+    sites that youtube-dl supports) (StreamFinder::Youtube), and
     StreamFinder::Anystream - search any (other) webpage URL (not supported
     by any of the other submodules) for streams.
 
-    NOTE: StreamFinder::Reciva has been removed, as that site has now closed
-    down.
+    NOTE: StreamFinder::Reciva and StreamFinder::Radionomy have been
+    removed, as those sites have now closed down.
 
     NOTE: For many sites, ie. Youtube, Vimeo, Apple, Spreaker, Castbox,
     Google, etc. the "station" object actually refers to a specific video or
@@ -333,11 +333,8 @@ SUBROUTINES/METHODS
 
     $station->getType()
         Returns the station / podcast / video's type (*submodule-name*).
-        (one of: "Anystream", "Apple", "BitChute", "Blogger",
-        "BrandNewTube", "Brighteon", "Castbox", "Google", "IHeartRadio",
-        "Odysee", "Podbean", "PodcastAddict", "RadioNet", "Rumble",
-        "SermonAudio", "Spreaker", "Tunein", "Youtube" or "Vimeo" -
-        depending on the sight that matched the URL).
+        (one of: "Anystream", "Apple", "BitChute", "Blogger", "Youtube",
+        etc. - depending on the sight that matched the URL).
 
 CONFIGURATION FILES
     The default root location directory for StreamFinder configuration files

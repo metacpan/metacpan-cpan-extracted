@@ -24,7 +24,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '0.71';
+our $VERSION = '0.72';
 
 require XSLoader;
 XSLoader::load('pEFL', $VERSION);
@@ -94,13 +94,13 @@ For the documentation in detail please study the single modules and the document
 
 =head2 Perl specific variants of methods (_pv, "perl value"-methods)
 
-If a method returns an Eina_List there usually is a version with the suffix _pv (for perl value) that returns a perl array (for example in pEFL::Elm::List the method items_get_pv()). It is recommended to use these perl adjusted methods. If you find a method, where the adaption is missing, please open an issue.
+If a method returns an Eina_List there usually is a version with the suffix _pv (for perl value) that returns a perl array (for example in pEFL::Elm::List the method C<< items_get_pv() >>). It is recommended to use these perl adjusted methods. If you find a method, where the adaption is missing, please open an issue on github.
 
-Sometimes a method returns an EvasObject which can be any Elm Widget Type (e.g. $nav->item_pop(), $object->content_get, $object_item->content_get). In this case there will be a "perl value" version that tries to bless the return variant to the appropriate perl class, too (e.g. $naviframe->item_pop_pv(), $object->[part_]content_get_pv, $object_item->[part_]content_get_pv).
+Sometimes a method returns an EvasObject which can be any Elm Widget Type (e.g. C<< $nav->item_pop() >>, C<< $object->content_get >>, C<< $object_item->content_get() >>). In this case there will be a "perl value" version that tries to bless the returned variable to the appropriate perl class, too (e.g. C<< $naviframe->item_pop_pv() >>, C<< $object->[part_]content_get_pv() >>, C<< $object_item->[part_]content_get_pv() >>).
 
 =head2 Output Parameters
 
-pEFL sometimes uses output parameters. See for example C<void elm_calendar_min_max_year_get(Evas_Object *obj,int *min,int *max)>, where you have to pass in C a pointer to max and min. In perl this is translated to my C<($min, $max) = $calendar->min_max_year_get();>. Sometimes the C function returns a status or similar as in C<Eina_Bool> elm_entry_cursor_geometry_get(Evas_Object *obj,int *x,int *y,int *w,int *h)>. In Perl this status variable is given, too. So the function elm_entry_cursor_geometry_get for example is translated into C<my ($status,$x,$y,$w,$h) = $entry->cursor_geometry_get;>.
+pEFL sometimes uses output parameters. See for example C<< void elm_calendar_min_max_year_get(Evas_Object *obj,int *min,int *max) >>, where you have to pass in C a pointer to max and min. In perl this is translated to C<< my ($min, $max) = $calendar->min_max_year_get(); >>. Sometimes the C function returns a status or similar as in C<< Eina_Bool elm_entry_cursor_geometry_get(Evas_Object *obj,int *x,int *y,int *w,int *h) >>. In Perl this status variable is given, too. So the function C<< elm_entry_cursor_geometry_get >> for example is translated into C<< my ($status,$x,$y,$w,$h) = $entry->cursor_geometry_get; >>.
 
 =head1 FUNCTIONS IN EFL
 
@@ -160,7 +160,7 @@ if event info is a c stuct, this function converts the void pointer to a perl sc
 
 =back
 
-Some events pass an Elementary Widget or an Evas Object as event info. Of course you can use ev_info2obj to convert these pointers to a appropiate blessed perl scalar, too. See for instance examples/colorselector.pl, where the Elm Widget Itemq Elm_Colorselector_Palette_Item is passed as event_info. This must converted by pEFL::ev_info2obj($ev_info, "pEFL::Elm::ColorselectorPaletteItem"); 
+Some events pass an Elementary Widget or an Evas Object as event info. Of course you can use C<< ev_info2obj() >> to convert these pointers to a appropiate blessed perl scalar, too. See for instance examples/colorselector.pl, where the Elm Widget Itemq Elm_Colorselector_Palette_Item is passed as event_info. This must converted by C<< pEFL::ev_info2obj($ev_info, "pEFL::Elm::ColorselectorPaletteItem"); >> 
 
 The provision of perl classes for event_info c structs is work in progress. If you need a specific binding for a c struct that is not supported at the moment, please send an issue report.
 

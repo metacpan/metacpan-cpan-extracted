@@ -17,7 +17,7 @@ my %WriteMakefileArgs = (
     PREREQ_PM        => {
         Carp               => 0,
         'File::Temp'       => 0,
-        Future             => '0.40',
+        Future             => '0.49',
         'Proc::Background' => '1.30',
         'Scalar::Util'     => 0,
         parent             => 0,
@@ -35,7 +35,7 @@ my %WriteMakefileArgs = (
         lib                     => 0,
         overload                => 0,
     },
-    VERSION => '0.005',
+    VERSION => '0.006',
     test    => {
         TESTS => 't/*.t',
     },
@@ -50,7 +50,7 @@ my %FallbackPrereqs = (
     'File::Spec'            => 0,
     'File::Spec::Functions' => 0,
     'File::Temp'            => 0,
-    Future                  => '0.40',
+    Future                  => '0.49',
     'Proc::Background'      => '1.30',
     'Scalar::Util'          => 0,
     'Test::More'            => '0.88',
@@ -85,7 +85,6 @@ sub test_requires {
 }
 
 sub _add_extended_test_requirements {
-    test_requires( 'Test::Fatal',      0 );
     test_requires( 'Test::MockModule', '0.14' );
     return;
 }

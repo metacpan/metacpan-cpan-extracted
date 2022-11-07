@@ -2,8 +2,8 @@ NAME
     Test::Sah::Schema - Test Sah::Schema::* modules in distribution
 
 VERSION
-    This document describes version 0.012 of Test::Sah::Schema (from Perl
-    distribution Test-Sah-Schema), released on 2022-07-17.
+    This document describes version 0.015 of Test::Sah::Schema (from Perl
+    distribution Test-Sah-Schema), released on 2022-11-04.
 
 SYNOPSIS
     To check a single Sah::Schema::* module:
@@ -79,10 +79,10 @@ CONTRIBUTING
 
     If you want to build the distribution (e.g. to try to install it locally
     on your system), you can install Dist::Zilla,
-    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
-    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
-    steps required beyond that are considered a bug and can be reported to
-    me.
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
     This software is copyright (c) 2022, 2020 by perlancar

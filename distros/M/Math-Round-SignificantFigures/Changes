@@ -1,4 +1,9 @@
 Revision history for Perl extension Math::Round::SignificantFigures.
 
+0.02 2022-11-05
+  - Updated lib/Math/Round/SignificantFigures.pm to use log10 from POSIX
+  - Updated MANIFEST to add LICENSE and CONTRIBUTING.md for meta cpan
+  - Updated Makefile.PL to add GitHub repo and license for meta cpan
+
 0.01 2022-05-17
   - original version; created by h2xs 1.23 with options

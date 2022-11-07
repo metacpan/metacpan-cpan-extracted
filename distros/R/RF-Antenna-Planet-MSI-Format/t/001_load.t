@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 17;
+use Test::More tests => 20;
 BEGIN { use_ok('RF::Antenna::Planet::MSI::Format') };
 
 my $antenna = RF::Antenna::Planet::MSI::Format->new;
@@ -21,5 +21,9 @@ can_ok($antenna, 'gain_dbi');
 can_ok($antenna, 'frequency');
 can_ok($antenna, 'frequency_ghz');
 can_ok($antenna, 'frequency_mhz');
+can_ok($antenna, 'frequency_mhz_lower');
+can_ok($antenna, 'frequency_mhz_upper');
 can_ok($antenna, 'electrical_tilt');
 can_ok($antenna, 'comment');
+
+can_ok($antenna, 'blob');

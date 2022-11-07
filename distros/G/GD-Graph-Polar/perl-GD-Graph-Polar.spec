@@ -1,5 +1,5 @@
 Name:           perl-GD-Graph-Polar
-Version:        0.20
+Version:        0.22
 Release:        1%{?dist}
 Summary:        Make polar graph using GD package
 License:        perl

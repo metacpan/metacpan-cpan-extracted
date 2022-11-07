@@ -1,13 +1,13 @@
 package AppBase::Grep;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-01'; # DATE
-our $DIST = 'AppBase-Grep'; # DIST
-our $VERSION = '0.009'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-11-04'; # DATE
+our $DIST = 'AppBase-Grep'; # DIST
+our $VERSION = '0.010'; # VERSION
 
 our %SPEC;
 
@@ -38,10 +38,12 @@ Compared to the standard grep, AppBase::Grep also has these unique features:
 _
     args => {
         pattern => {
+            summary => 'Specify *string* to search for',
             schema => 'str*',
             pos => 0,
         },
         regexps => {
+            summary => 'Specify additional *regexp pattern* to search for',
             'x.name.is_plural' => 1,
             'x.name.singular' => 'regexp',
             schema => ['array*', of=>'str*'],
@@ -49,6 +51,7 @@ _
         },
 
         ignore_case => {
+            summary => 'If set to true, will search case-insensitively',
             schema => 'bool*',
             cmdline_aliases => {i=>{}},
             tags => ['category:matching-control'],
@@ -84,17 +87,20 @@ _
             tags => ['category:general-output-control'],
         },
         color => {
+            summary => 'Specify when to show color (never, always, or auto/when interactive)',
             schema => ['str*', in=>[qw/never always auto/]],
             default => 'auto',
             tags => ['category:general-output-control'],
         },
         quiet => {
+            summary => 'Do not print matches, only return appropriate exit code',
             schema => ['true*'],
             cmdline_aliases => {silent=>{}, q=>{}},
             tags => ['category:general-output-control'],
         },
 
         line_number => {
+            summary => 'Show line number along with matches',
             schema => ['true*'],
             cmdline_aliases => {n=>{}},
             tags => ['category:output-line-prefix-control'],
@@ -109,14 +115,52 @@ _
         _source => {
             schema => 'code*',
             tags => ['hidden'],
+            description => <<'_',
+
+Code to produce lines of text to grep form. Required.
+
+Will be called with these arguments:
+
+    ()
+
+Should return the following:
+
+    ($line, $label, $chomp)
+
+Where `$line` is the line (with newline ending, unless `$chomp` is true),
+`$label` is source label (e.g. filename without line number if text source is
+from files), and `$chomp` is boolean that can be set to true to indicate that
+line is already chomped and should not be chomped again.
+
+_
         },
         _highlight_regexp => {
             schema => 're*',
             tags => ['hidden'],
+            description => <<'_',
+
+Regexp pattern to capture each pattern for highlighting. Optional.
+
+_
         },
         _filter_code => {
             schema => 'code*',
             tags => ['hidden'],
+            description => <<'_',
+
+Custom filtering. If set, then `pattern` and `regexps` arguments are not
+required and lines of text will be filtered by this code. Used e.g. for grepping
+custom stuffs, e.g. email address or URL from lines of text instead of plain
+string or regexp patterns.
+
+Will be called for each line of text with these arguments:
+
+    ($line, \%args)
+
+where `$line` is the line of text and `%args` are the arguments given to the
+`grep()` function.
+
+_
         },
 
     },
@@ -157,7 +201,7 @@ sub grep {
         ($color eq 'always' ? 1 : $color eq 'never' ? 0 : undef) //
         (defined $ENV{NO_COLOR} ? 0 : undef) //
         ($ENV{COLOR} ? 1 : defined($ENV{COLOR}) ? 0 : undef) //
-        (-t STDOUT);
+        (-t STDOUT); ## no critic: InputOutput::ProhibitInteractiveTest
 
     my $source = $args{_source};
 
@@ -278,7 +322,7 @@ AppBase::Grep - A base for grep-like CLI utilities
 
 =head1 VERSION
 
-This document describes version 0.009 of AppBase::Grep (from Perl distribution AppBase-Grep), released on 2021-07-01.
+This document describes version 0.010 of AppBase::Grep (from Perl distribution AppBase-Grep), released on 2022-11-04.
 
 =head1 FUNCTIONS
 
@@ -327,6 +371,8 @@ Require all patterns to match, instead of just one.
 
 =item * B<color> => I<str> (default: "auto")
 
+Specify when to show color (never, always, or autoE<sol>when interactive).
+
 =item * B<count> => I<true>
 
 Supress normal output, return a count of matching lines.
@@ -342,17 +388,27 @@ Google search and a few other search engines.
 
 =item * B<ignore_case> => I<bool>
 
+If set to true, will search case-insensitively.
+
 =item * B<invert_match> => I<bool>
 
 Invert the sense of matching.
 
 =item * B<line_number> => I<true>
 
+Show line number along with matches.
+
 =item * B<pattern> => I<str>
+
+Specify *string* to search for.
 
 =item * B<quiet> => I<true>
 
+Do not print matches, only return appropriate exit code.
+
 =item * B<regexps> => I<array[str]>
+
+Specify additional *regexp pattern* to search for.
 
 
 =back
@@ -393,6 +449,43 @@ Please visit the project's homepage at L<https://metacpan.org/release/AppBase-Gr
 
 Source repository is at L<https://github.com/perlancar/perl-AppBase-Grep>.
 
+=head1 SEE ALSO
+
+Some scripts that use us as a base: L<abgrep> (from L<App::abgrep>),
+L<grep-email> (from L<App::grep::email>), L<grep-url> (from L<App::grep::url>),
+L<pdfgrep> (a.k.a. L<grep-from-pdf>, from L<App::PDFUtils>).
+
+L<Regexp::From::String> is related to C<--dash-prefix-inverts> option.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2021, 2020, 2018 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=AppBase-Grep>
@@ -400,16 +493,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021, 2020, 2018 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

@@ -1,0 +1,1 @@
+class Sys::Signal::Handler::Default extends Sys::Signal::Handler;

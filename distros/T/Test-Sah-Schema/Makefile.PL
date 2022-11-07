@@ -20,13 +20,14 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Test::Sah::Schema",
   "PREREQ_PM" => {
+    "Data::Dmp" => "0.242",
     "Data::Dump" => 0,
-    "Data::Sah" => "0.911",
+    "Data::Sah" => "0.914",
     "Data::Sah::Normalize" => "0.051",
     "File::Spec" => 0,
     "Getopt::Long" => "2.50",
     "Log::ger" => "0.038",
-    "Log::ger::App" => "0.018",
+    "Log::ger::App" => "0.024",
     "Test::Builder" => 0,
     "Test::More" => "0.98",
     "Text::Diff" => 0,
@@ -39,7 +40,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.012",
+  "VERSION" => "0.015",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -47,15 +48,16 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Data::Dmp" => "0.242",
   "Data::Dump" => 0,
-  "Data::Sah" => "0.911",
+  "Data::Sah" => "0.914",
   "Data::Sah::Normalize" => "0.051",
   "File::Spec" => 0,
   "Getopt::Long" => "2.50",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Log::ger" => "0.038",
-  "Log::ger::App" => "0.018",
+  "Log::ger::App" => "0.024",
   "Test::Builder" => 0,
   "Test::More" => "0.98",
   "Text::Diff" => 0,

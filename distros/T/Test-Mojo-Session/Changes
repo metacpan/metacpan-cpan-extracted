@@ -1,5 +1,8 @@
 Revision history for Perl extension Test::Mojo::Session.
 
+1.07 2022-11-04T04:26:30Z
+    - Added session_like and session_unlike methods.
+
 1.06 2020-05-17T14:35:18Z
     - Added compatibility with Mojo >= 8.36.
 

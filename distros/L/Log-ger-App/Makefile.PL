@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
     "Log::ger" => "0.038",
     "Log::ger::Layout::Pattern" => "0.008",
     "Log::ger::Output" => "0.005",
-    "Log::ger::Output::Composite" => "0.009",
+    "Log::ger::Output::Composite" => "0.016",
     "Log::ger::Output::File" => "0.002",
     "Log::ger::Output::Screen" => "0.018",
     "Log::ger::Output::Syslog" => 0,
@@ -35,7 +35,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.023",
+  "VERSION" => "0.024",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -49,7 +49,7 @@ my %FallbackPrereqs = (
   "Log::ger" => "0.038",
   "Log::ger::Layout::Pattern" => "0.008",
   "Log::ger::Output" => "0.005",
-  "Log::ger::Output::Composite" => "0.009",
+  "Log::ger::Output::Composite" => "0.016",
   "Log::ger::Output::File" => "0.002",
   "Log::ger::Output::Screen" => "0.018",
   "Log::ger::Output::Syslog" => 0,

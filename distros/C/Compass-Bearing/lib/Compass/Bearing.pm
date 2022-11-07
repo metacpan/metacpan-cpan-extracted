@@ -4,7 +4,7 @@ use warnings;
 use base qw{Package::New};
 use Geo::Functions qw{deg_rad round};
 
-our $VERSION='0.07';
+our $VERSION = '0.08';
 
 =head1 NAME
 
@@ -50,7 +50,7 @@ Method returns a text string based on bearing
 sub bearing {
   my $self  = shift;
   my $angle = shift || 0; #degrees
-  $angle+=360 while ($angle < 0);
+  $angle   += 360 while ($angle < 0);
   my @data  = $self->data;
   return $data[round($angle/360 * @data) % @data];
 }
@@ -64,8 +64,8 @@ Method returns a text string based on bearing
 =cut
 
 sub bearing_rad {
-  my $self=shift;
-  my $angle=deg_rad(shift()||0); #degrees
+  my $self  = shift;
+  my $angle = deg_rad(shift()||0); #degrees
   return $self->bearing($angle);
 }
 
@@ -73,21 +73,21 @@ sub bearing_rad {
 
 Method sets and returns key for the bearing text data structure.
 
-  my $key=$self->set;
-  my $key=$self->set(1);
-  my $key=$self->set(2);
-  my $key=$self->set(3); #default value
+  my $key = $self->set;
+  my $key = $self->set(1);
+  my $key = $self->set(2);
+  my $key = $self->set(3); #default value
 
 =cut
 
 sub set {
-  my $self=shift;
-  my $param=shift;
+  my $self  = shift;
+  my $param = shift;
   if (defined $param) {
-    my %data=$self->_dataraw;
-    my @keys=sort keys %data;
+    my %data = $self->_dataraw;
+    my @keys = sort keys %data;
     if (exists $data{$param}) {
-      $self->{'set'}=$param;
+      $self->{'set'} = $param;
     } else {
       die(qq{Error: "$param" is not a valid parameter to the set method.  Try }. join(", ", map {qq{"$_"}} @keys). ".\n")
     }
@@ -104,32 +104,38 @@ Method returns an array of text values.
 =cut
 
 sub data {
-  my $self=shift;
-  my $data=$self->_dataraw;
-  my $return=$data->{$self->set};
+  my $self   = shift;
+  my $data   = $self->_dataraw;
+  my $return = $data->{$self->set};
   return wantarray ? @{$return} : $return;
 }
 
 sub _dataraw {
-  my %data=(1=>[qw{N E S W}],
-            2=>[qw{N NE E SE S SW W NW}],
-            3=>[qw{N NNE NE ENE E ESE SE SSE S SSW SW WSW W WNW NW NNW}]);
+  my %data=(
+            1 => [qw{N E S W}],
+            2 => [qw{N NE E SE S SW W NW}],
+            3 => [qw{N NNE NE ENE E ESE SE SSE S SSW SW WSW W WNW NW NNW}]
+           );
   return wantarray ? %data : \%data;
 }
 
 =head1 BUGS
 
-Please send to the geo-perl email list.
+Please log on GitHub
 
 =head1 AUTHOR
 
-Michael R. Davis qw/perl michaelrdavis com/
+Michael R. Davis
 
 =head1 LICENSE
 
-Copyright (c) 2012 Michael R. Davis (mrdvt92)
+MIT License
 
-This library is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+Copyright (c) 2022 Michael R. Davis
+
+=head1 SEE ALSO
+
+L<Ham::Resources::Utils> compass method
 
 =cut
 

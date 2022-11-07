@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 0.16
+    version 0.17
 
 SYNOPSIS
 
@@ -57,11 +57,22 @@ CAVEATS
 
 SEE ALSO
 
+    Wasm
+
+      High level interface to WebAssembly which uses wasmtime under the
+      covers.
+
     Wasm::Wasmtime
+
+      Lower-level direct interface to Wasmtime itself from Perl.
 
     Alien
 
+      Documentation for the Perl / Alien concept.
+
     FFI::Platypus
+
+      Foreign function interface to dynamic libraries in perl via libffi.
 
 AUTHOR
 
@@ -69,7 +80,7 @@ AUTHOR
 
 COPYRIGHT AND LICENSE
 
-    This software is copyright (c) 2020 by Graham Ollis.
+    This software is copyright (c) 2020-2022 by Graham Ollis.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

@@ -490,7 +490,9 @@ xxxxx.xxxxxx$ ptp show ptp 1/13 status
 |      |    Minimum (dBm)                   | -15.80                    | 3.60                      |
 |      |    Time Recorded                   | Thu Sep 15 17:12:28 [4m2[24m022  | Thu Sep 15 17:12:28 [4m2[24m022  |
 |      |------------------------------------+---------------------------+---------------------------|
-|      | Optical Return Loss (dB)           | 34.20                                                 |
+|      |[32m Optical Return Loss (dB)[0m           | [32m34.20[0m                                                 |
+|      |[33m Optical Return Loss (dB)[0m           | [33m24.20[0m                                                 |
+|      |[1;31m Optical Return Loss (dB)[0m           | [1;31m14.20[0m                                                 |
 |      |    Maximum (dB)                    | 39.50                                                 |
 |      |    Time Recorded                   | Thu Sep 22 20:26:26 [4m2[24m022                              |
 |      |    Minimum (dB)                    | 33.90                                                 |

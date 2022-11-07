@@ -6,7 +6,7 @@
 
 Vote::Count::Range
 
-=head1 VERSION 2.01
+=head1 VERSION 2.02
 
 =cut
 
@@ -26,11 +26,11 @@ There are a fixed number of Rankings available, usually 5, 10 or 100.
 
 =item *
 
-Voters (Typically) May Rank Choices Equally.
+Voters (typically) may rate choices equally.
 
 =item *
 
-Voters Rank their best choice highest, the inverse of Ranked Choice.
+Voters rate their best choice highest, the inverse of Ranked Choice.
 
 =back
 
@@ -60,13 +60,7 @@ L<Vote::Count::IRV|https://metacpan.org/pod/Vote::Count::IRV> supports Range Bal
 
 =head2 Tie Breakers
 
-Only Approval, all and none currently support Range Ballots.
-
-=head1 Ordinal Ranged
-
-Limiting voters to one choice per Rank has the advantage of creating a ballot which translates perfectly to Ranked Choice ballots. From an analysis standpoint having such versatile ballots is valuable. While IRV and Condorcet work with Range Ballots, they work better with Ordinal Ballots, Scoring Methods works much better with Range ballots. As alternate ballots gain popularity the ability to compare the results across methods with the same live data would be valuable.
-
-Unfortunately limiting the number of choices is also limiting the voter's expression. The larger the Range the less this issue matters. On a Range 100 ballot it is unlikely that in a real world situation a voter is going to be able to or want to rank nearly that many. Because the Range needs space to express strong and weak preference 10 is the minimum reasonable range for this variant.
+Precedence, Approval, all and none currently support Range Ballots.
 
 =cut
 

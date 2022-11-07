@@ -1,3 +1,15 @@
+0.010   2022-11-04  Released-By: PERLANCAR; Urgency: medium
+
+        - [refactor] Extract file-related code to AppBase::Grep::File.
+
+        - Support option --recursive (-r) and --dereference-recursive (-R)
+          for file source.
+
+        - [doc] Document the hidden (dev) arguments.
+
+        - [doc] Mention some related modules.
+
+
 0.009   2021-07-01  Released-By: PERLANCAR; Urgency: medium
 
 	- Observe _filter_code and _highlight_regexp arguments, to accommodate

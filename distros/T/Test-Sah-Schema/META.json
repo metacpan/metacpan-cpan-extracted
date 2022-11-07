@@ -35,13 +35,14 @@
             "Perinci::Sub::Wrapper" : "0.83"
          },
          "requires" : {
+            "Data::Dmp" : "0.242",
             "Data::Dump" : "0",
-            "Data::Sah" : "0.911",
+            "Data::Sah" : "0.914",
             "Data::Sah::Normalize" : "0.051",
             "File::Spec" : "0",
             "Getopt::Long" : "2.50",
             "Log::ger" : "0.038",
-            "Log::ger::App" : "0.018",
+            "Log::ger::App" : "0.024",
             "Test::Builder" : "0",
             "Test::More" : "0.98",
             "Text::Diff" : "0",
@@ -62,7 +63,7 @@
    "provides" : {
       "Test::Sah::Schema" : {
          "file" : "lib/Test/Sah/Schema.pm",
-         "version" : "0.012"
+         "version" : "0.015"
       }
    },
    "release_status" : "stable",
@@ -77,7 +78,7 @@
          "web" : "https://github.com/perlancar/perl-Test-Sah-Schema"
       }
    },
-   "version" : "0.012",
+   "version" : "0.015",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
@@ -429,7 +430,7 @@
                      {
                         "class" : "Pod::Weaver::Section::PERLANCAR::Contributing",
                         "name" : "@Author::PERLANCAR/PERLANCAR/Contributing",
-                        "version" : "0.292"
+                        "version" : "0.293"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Legal",
@@ -439,7 +440,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::Rinci",
                         "name" : "@Author::PERLANCAR/Rinci",
-                        "version" : "0.783"
+                        "version" : "0.784"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::AppendPrepend",

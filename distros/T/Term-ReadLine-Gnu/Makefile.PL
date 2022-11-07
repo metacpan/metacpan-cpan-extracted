@@ -30,12 +30,6 @@ if ($ENV{AUTOMATED_TESTING} && !open(SESAMI, '/dev/tty')) {
     warn "cannot open /dev/tty\n";
     exit 0;
 }
-# https://rt.cpan.org/Ticket/Display.html?id=128806
-# https://github.com/hirooih/perl-trg/issues/11
-if (!exists($ENV{TERM}) || !defined($ENV{TERM}) || $ENV{TERM} =~ /^(dumb|emacs|unknown|)$/) {
-    warn "Warning: wrong \$TERM value, '$ENV{TERM}'. The GNU Readline Library does not work properly.\n";
-    exit 0 if $ENV{AUTOMATED_TESTING};  # exit on CPAN testers
-}
 
 push(@defs, '-DHAVE_STRING_H') if ($Config{strings} =~ m|/string.h$|);
 

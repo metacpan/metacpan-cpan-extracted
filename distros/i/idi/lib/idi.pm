@@ -5,15 +5,15 @@ package idi;
 use strict;
 use warnings;
 
+use strictures 2;
 use File::Slurper qw(read_binary);
 use File::Temp qw(tempfile);
 use MIDI::Simple ();
 use Music::Tempo qw(bpm_to_ms);
 use Moo;
-use strictures 2;
 use namespace::clean;
 
-use Exporter 'import';
+use Exporter qw(import);
 our @EXPORT = qw(
     get_score
     b
@@ -30,7 +30,7 @@ our @EXPORT = qw(
     x
 );
 
-our $VERSION = '0.0302';
+our $VERSION = '0.0304';
 
 my $self;
 
@@ -192,6 +192,10 @@ Default: C<96>
 Play at end
 
 Default: C<1>
+
+=head2 get_score
+
+Return the L<MIDI::Simple> score object.
 
 =head2 n
 

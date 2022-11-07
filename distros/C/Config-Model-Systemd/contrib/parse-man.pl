@@ -126,7 +126,10 @@ sub parse_xml ($list, $map) {
         $desc =~ s/\n{3,}/\n\n/g;
 
         foreach my $term_elt ($elt->children('term')) {
-            my $varname = $term_elt->first_child('varname')->text;
+            my $var_elt = $term_elt->first_child('varname');
+            next unless $var_elt;
+
+            my $varname = $var_elt->text;
             my ($name, $extra_info) = $varname =~ /C<([\w-]+)=([^>]*)>/ ;
 
             next unless defined $name;
@@ -148,7 +151,13 @@ sub parse_xml ($list, $map) {
             $set_config_class->($1) ;
         }
     };
-    my $turn_to_pod_c = sub { my $t = $_->text(); $_->set_text("C<$t>");};
+    my $turn_to_pod_c = sub {
+        my $t = $_->text();
+        # takes care of constant embedded in literal blocks
+        return if $t =~ /^C</;
+        $_->set_text($t =~ /[<>]/ ? "C<< $t >>" : "C<$t>");
+    };
+
     my $twig = XML::Twig->new (
         twig_handlers => {
             'refsect1/title' => $parse_sub_title,

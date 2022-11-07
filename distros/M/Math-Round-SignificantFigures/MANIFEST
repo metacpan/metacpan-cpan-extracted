@@ -2,12 +2,14 @@ Changes
 Makefile.PL
 MANIFEST
 README.md
+LICENSE
+CONTRIBUTING.md
 lib/Math/Round/SignificantFigures.pm
-t/003_export_digs.t
+t/001_export_all.t
 t/002_export_figs.t
+t/003_export_digs.t
 t/004_math_sigdig.t
 t/004_wikipedia.t
-t/001_export_all.t
 perl-Math-Round-SignificantFigures.spec
 
 META.yml                                 Module YAML meta-data (added by MakeMaker)

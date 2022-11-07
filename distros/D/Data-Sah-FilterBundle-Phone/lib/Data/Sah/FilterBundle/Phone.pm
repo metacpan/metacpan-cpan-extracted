@@ -3,9 +3,9 @@ package Data::Sah::FilterBundle::Phone;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-09'; # DATE
+our $DATE = '2022-10-18'; # DATE
 our $DIST = 'Data-Sah-FilterBundle-Phone'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 1;
 # ABSTRACT: Sah filters related to phone numbers
@@ -22,7 +22,7 @@ Data::Sah::FilterBundle::Phone - Sah filters related to phone numbers
 
 =head1 VERSION
 
-This document describes version 0.003 of Data::Sah::FilterBundle::Phone (from Perl distribution Data-Sah-FilterBundle-Phone), released on 2022-09-09.
+This document describes version 0.004 of Data::Sah::FilterBundle::Phone (from Perl distribution Data-Sah-FilterBundle-Phone), released on 2022-10-18.
 
 =head1 DESCRIPTION
 
@@ -30,13 +30,11 @@ This distribution contains the following L<Sah> filter rule modules:
 
 =over
 
-=item * L<Data::Sah::Filter::perl::Phone::format_idn>
-
-=item * L<Data::Sah::Filter::perl::Phone::format_idnlocal_nospace>
+=item * L<Data::Sah::Filter::perl::Phone::format_idn_local>
 
 =item * L<Data::Sah::Filter::perl::Phone::format>
 
-=item * L<Data::Sah::Filter::perl::Phone::format_idn_nospace>
+=item * L<Data::Sah::Filter::perl::Phone::format_idn>
 
 =back
 

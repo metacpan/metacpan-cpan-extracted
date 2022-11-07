@@ -1,0 +1,28 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(MIDI-Drummer-Tiny);
+use MIDI::Drummer::Tiny ();
+use MIDI::Util qw(midi_dump);
+
+my $bpm = shift || 80;
+
+my $lengths = midi_dump('Length');
+
+my $d = MIDI::Drummer::Tiny->new(
+    file => "$0.mid",
+    bpm  => $bpm,
+    bars => 4,
+);
+
+$d->count_in(1);
+
+for my $i (1 .. 4) {
+    $d->set_bpm($bpm);
+    $d->metronome44swing;
+    $d->set_bpm($bpm * $lengths->{thn});
+    $d->metronome44swing;
+}
+
+$d->write;

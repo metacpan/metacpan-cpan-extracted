@@ -14,7 +14,7 @@ Tk::TableMatrix::Spreadsheet - Table Display with Spreadsheet-like bindings.
     -titlerows => 1, -titlecols => 1,
     -variable => $arrayVar,
     -selectmode => 'extended',
-	-bg => 'white',
+    -bg => 'white',
   );
 
 =head1 DESCRIPTION
@@ -94,7 +94,7 @@ use Tk::Derived;
 
 use base qw/ Tk::Derived Tk::TableMatrix/;
 
-$VERSION = '1.26';
+$VERSION = '1.29';
 
 
 Tk::Widget->Construct("Spreadsheet");

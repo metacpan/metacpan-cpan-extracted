@@ -1,0 +1,80 @@
+{
+   "X_No_Archive" : "Yes",
+   "abstract" : "Build and Install libui: A portable GUI library",
+   "author" : [
+      "Sanko Robinson <sanko@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.1.19",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Alien-libui",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Alien::Build::MB" : "0",
+            "Alien::Meson" : "0",
+            "Alien::Ninja" : "0",
+            "Module::Build" : "0.4005"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Alien::libui" : {
+         "file" : "lib/Alien/libui.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/sanko/alien-libui/issues"
+      },
+      "homepage" : "https://github.com/sanko/alien-libui",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/sanko/alien-libui.git",
+         "web" : "https://github.com/sanko/alien-libui"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:SANKO",
+   "x_serialization_backend" : "JSON::PP version 4.11",
+   "x_static_install" : 0
+}

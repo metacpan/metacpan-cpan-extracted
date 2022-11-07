@@ -1,7 +1,7 @@
 #
 #       Gnu.pm --- The GNU Readline/History Library wrapper module
 #
-#       Copyright (c) 1996-2021 Hiroo Hayashi.  All rights reserved.
+#       Copyright (c) 1996-2022 Hiroo Hayashi.  All rights reserved.
 #
 #       This program is free software; you can redistribute it and/or
 #       modify it under the same terms as Perl itself.
@@ -78,12 +78,17 @@ the Term::ReadLine documentation for more information.
 END
     }
 }
-# use Term::ReadLine::Stub on a dumb terminal.
-# https://rt.cpan.org/Ticket/Display.html?id=123398
-# Debian Bug Report #99843
+
 BEGIN {
-    if (!exists($ENV{TERM}) || !defined($ENV{TERM}) || $ENV{TERM} =~ /^(dumb|emacs|unknown|)$/) {
-        croak "dumb terminal.";
+    # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=99843
+    $ENV{TERM} = 'dumb' unless defined($ENV{TERM});
+
+    # Use Term::ReadLine::Stub in Emacs
+    # as bash does not do line-editing in the case. (cf. bash-5.2/shell.c)
+    # https://rt.cpan.org/Ticket/Display.html?id=123398
+    # https://github.com/hirooih/perl-trg/issues/11
+    if ($ENV{TERM} eq "emacs" || defined($ENV{EMACS}) || defined($ENV{INSIDE_EMACS})) {
+        croak "Use Term::ReadLine::Stub.";
     }
 }
 
@@ -91,7 +96,7 @@ BEGIN {
     use Exporter ();
     use DynaLoader;
 
-    our $VERSION = '1.43';              # update Gnu::XS::VERSION also.
+    our $VERSION = '1.44';              # update Gnu::XS::VERSION also.
 
     # Term::ReadLine::Gnu::AU makes a function in
     # `Term::ReadLine::Gnu::XS' as a method.
@@ -2176,6 +2181,10 @@ The environment variable C<PERL_RL> governs which ReadLine clone is
 loaded.  See the ENVIRONMENT section on
 L<Term::ReadLine|http://search.cpan.org/dist/Term-ReadLine/> for
 further details.
+
+If the environment variable C<TERM> is set to C<"emacs">
+or the environment variable C<INSIDE_EMACS> or C<EMACS> is defined,
+C<Term::ReadLine::Stub> is used instead of <Term::ReadLine:Gnu>.
 
 =head1 SEE ALSO
 

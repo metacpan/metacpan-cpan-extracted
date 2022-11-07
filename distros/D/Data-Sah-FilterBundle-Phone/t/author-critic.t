@@ -15,7 +15,7 @@ use warnings;
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/Data/Sah/Filter/perl/Phone/format.pm','lib/Data/Sah/Filter/perl/Phone/format_idn.pm','lib/Data/Sah/Filter/perl/Phone/format_idn_nospace.pm','lib/Data/Sah/Filter/perl/Phone/format_idnlocal_nospace.pm','lib/Data/Sah/FilterBundle/Phone.pm'];
+my $filenames = ['lib/Data/Sah/Filter/perl/Phone/format.pm','lib/Data/Sah/Filter/perl/Phone/format_idn.pm','lib/Data/Sah/Filter/perl/Phone/format_idn_local.pm','lib/Data/Sah/FilterBundle/Phone.pm'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

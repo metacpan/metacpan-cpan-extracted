@@ -1,0 +1,70 @@
+{
+   "abstract" : "DEPRECATED Running code on scope exit",
+   "author" : [
+      "Leon Timmermans <fawaka@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Scope-OnExit",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "5.57",
+            "XSLoader" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Scope::OnExit" : {
+         "file" : "lib/Scope/OnExit.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Leont/scope-onexit/issues"
+      },
+      "homepage" : "http://search.cpan.org/~leont/Scope-OnExit/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/Leont/scope-onexit.git",
+         "web" : "https://github.com/Leont/scope-onexit"
+      }
+   },
+   "version" : "0.03",
+   "x_generated_by_perl" : "v5.36.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.29",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

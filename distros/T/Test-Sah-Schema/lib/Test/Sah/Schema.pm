@@ -13,9 +13,9 @@ use Test::Builder;
 use Test::More ();
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-17'; # DATE
+our $DATE = '2022-11-04'; # DATE
 our $DIST = 'Test-Sah-Schema'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 my $Test = Test::Builder->new;
 
@@ -67,6 +67,7 @@ sub sah_schema_module_ok {
                 if ($sch_dmp eq $nsch_dmp) {
                     $Test->ok(1, "Schema is normalized");
                 } elsif ($sch_dmp eq $nsch_with_extras_dmp) {
+                    $Test->note($sch_dmp);
                     $Test->carp("\e[31mSchema still contains extras part, please remove it to avoid this warning\e[0m");
                     $Test->ok(1, "Schema is normalized but still contains extras part");
                 } else {
@@ -80,8 +81,10 @@ sub sah_schema_module_ok {
           TEST_EXAMPLES: {
                 last unless $opts{test_schema_examples};
                 last unless $sch->[1]{examples};
+                require Data::Dmp;
                 require Data::Sah;
 
+                $Test->note("Generating validator for schema ".Data::Dmp::dmp($sch));
                 my $vdr = Data::Sah::gen_validator($sch, {return_type=>'str_errmsg+val'});
 
                 my $wsub;
@@ -94,7 +97,7 @@ sub sah_schema_module_ok {
                     # turn is used in applications like Perinci::CmdLine.
                     my $wres = Perinci::Sub::Wrapper::wrap_sub(
                         sub => sub { my %args = @_; [200, "OK", $args{'arg'}] },
-                        meta => { v=>1.1, args=>{arg=>{schema=>[$sch_name,req=>1]}} },
+                        meta => { v=>1.1, args=>{arg=>{schema=>[$sch_name]}} },
                         validate_args => 1,
                     );
                     die "Can't wrap subroutine with Perinci::Sub::Wrapper: $wres->[0] - $wres->[1]"
@@ -305,7 +308,7 @@ Test::Sah::Schema - Test Sah::Schema::* modules in distribution
 
 =head1 VERSION
 
-This document describes version 0.012 of Test::Sah::Schema (from Perl distribution Test-Sah-Schema), released on 2022-07-17.
+This document describes version 0.015 of Test::Sah::Schema (from Perl distribution Test-Sah-Schema), released on 2022-11-04.
 
 =head1 SYNOPSIS
 
@@ -401,9 +404,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

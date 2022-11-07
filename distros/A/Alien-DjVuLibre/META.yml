@@ -6,7 +6,6 @@ build_requires:
   Alien::Build::MM: '0.32'
   Alien::Build::Plugin::Gather::IsolateDynamic: '0.48'
   Archive::Tar: '0'
-  Config: '0'
   ExtUtils::CppGuess: '0.13'
   ExtUtils::MakeMaker: '6.76'
   File::Which: '0'
@@ -26,6 +25,7 @@ build_requires:
 configure_requires:
   Alien::Build: '1.40'
   Alien::Build::MM: '0.32'
+  Alien::Build::Plugin::Build::Make: '0.99'
   Alien::Build::Plugin::Decode::SourceForge: '0'
   Alien::Build::Plugin::PkgConfig::Negotiate: '0'
   ExtUtils::MakeMaker: '6.76'
@@ -50,14 +50,13 @@ requires:
 resources:
   bugtracker: https://github.com/michal-josef-spacek/Alien-DjVuLibre/issues
   repository: https://github.com/michal-josef-spacek/Alien-DjVuLibre
-version: '0.05'
+version: '0.06'
 x_alienfile:
   generated_by: 'Alien::Build::MM version 2.68'
   requires:
     share:
       Alien::Build::Plugin::Gather::IsolateDynamic: '0.48'
       Archive::Tar: '0'
-      Config: '0'
       ExtUtils::CppGuess: '0.13'
       File::Which: '0'
       HTTP::Tiny: '0.044'

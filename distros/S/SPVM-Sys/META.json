@@ -1,5 +1,5 @@
 {
-   "abstract" : "System Calls such as File IO, User, Process, Socket,",
+   "abstract" : "System Calls for File IO, User, Process, Signal, Socket",
    "author" : [
       "USER_NAME<USER_MAIL>"
    ],
@@ -47,6 +47,6 @@
          "web" : "https://github.com/yuki-kimoto/SPVM-Sys"
       }
    },
-   "version" : "0.23",
+   "version" : "0.25",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

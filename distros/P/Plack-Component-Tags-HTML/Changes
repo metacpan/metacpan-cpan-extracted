@@ -1,3 +1,6 @@
+0.09 2022-11-04T01:54:46+01:00
+ - Add _cleanup() method to overwrite.
+
 0.08 2022-10-29T17:07:43+02:00
  - Add script_js() and script_js_src() methods.
  - Set preserved for style element in Tags default.

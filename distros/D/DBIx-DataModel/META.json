@@ -63,7 +63,7 @@
    "provides" : {
       "DBIx::DataModel" : {
          "file" : "lib/DBIx/DataModel.pm",
-         "version" : "3.03"
+         "version" : "3.04"
       },
       "DBIx::DataModel::Compatibility::V0" : {
          "file" : "lib/DBIx/DataModel/Compatibility/V0.pm"
@@ -192,6 +192,6 @@
          "url" : "https://github.com/damil/DBIx-DataModel"
       }
    },
-   "version" : "3.03",
+   "version" : "3.04",
    "x_serialization_backend" : "JSON::PP version 4.05"
 }

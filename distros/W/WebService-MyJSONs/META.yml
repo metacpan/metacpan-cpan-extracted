@@ -1,0 +1,36 @@
+---
+abstract: 'Perl SDK to consume the MyJSONs web service'
+author:
+  - 'Flavio Poletti (flavio@polettix.it)'
+build_requires:
+  Path::Tiny: '0.084'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.21, Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-MyJSONs
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  WebService::MyJSONs:
+    file: lib/WebService/MyJSONs.pm
+    version: '0.002'
+requires:
+  perl: '5.024000'
+version: '0.002'
+x_contributors:
+  - 'Flavio Poletti <flavio@polettix.it>'
+x_generated_by_perl: v5.36.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: Apache-2.0
+x_static_install: 1

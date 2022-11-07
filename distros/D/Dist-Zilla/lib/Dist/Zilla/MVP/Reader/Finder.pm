@@ -1,17 +1,11 @@
-package Dist::Zilla::MVP::Reader::Finder 6.025;
+package Dist::Zilla::MVP::Reader::Finder 6.027;
 # ABSTRACT: the reader for dist.ini files
 
 use Moose;
 use Config::MVP::Reader 2.101540; # if_none
 extends 'Config::MVP::Reader::Finder';
 
-# BEGIN BOILERPLATE
-use v5.20.0;
-use warnings;
-use utf8;
-no feature 'switch';
-use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
-# END BOILERPLATE
+use Dist::Zilla::Pragmas;
 
 use namespace::autoclean;
 
@@ -36,7 +30,7 @@ Dist::Zilla::MVP::Reader::Finder - the reader for dist.ini files
 
 =head1 VERSION
 
-version 6.025
+version 6.027
 
 =head1 PERL VERSION
 
@@ -52,7 +46,7 @@ the minimum required perl.
 
 =head1 AUTHOR
 
-Ricardo SIGNES 😏 <rjbs@semiotic.systems>
+Ricardo SIGNES 😏 <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

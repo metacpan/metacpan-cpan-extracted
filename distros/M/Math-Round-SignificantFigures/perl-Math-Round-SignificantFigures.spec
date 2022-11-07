@@ -1,8 +1,8 @@
 Name:           perl-Math-Round-SignificantFigures
-Version:        0.01
+Version:        0.02
 Release:        1%{?dist}
 Summary:        Perl package for rounding numbers to a specified number of Significant Figures
-License:        CHECK(Distributable)
+License:        MIT
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/Math-Round-SignificantFigures/
 Source0:        http://www.cpan.org/modules/by-module/Math/Math-Round-SignificantFigures-%{version}.tar.gz
@@ -13,9 +13,7 @@ Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $versi
 
 %description
 Math::Round::SignificantFigures supplies functions that will round numbers
-in based on significant figures. No functions are exported by default;
-others are available as described below. "use
-Math::Round::SignificantFigures qw(:all)" exports all functions.
+in based on significant figures.
 
 %prep
 %setup -q -n Math-Round-SignificantFigures-%{version}
@@ -42,7 +40,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root,-)
-%doc Changes META.json README.md
+%doc Changes README.md LICENSE 
 %{perl_vendorlib}/*
 %{_mandir}/man3/*
 

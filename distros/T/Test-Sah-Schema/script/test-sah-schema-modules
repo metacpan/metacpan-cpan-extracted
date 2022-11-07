@@ -8,9 +8,9 @@ use Getopt::Long qw(:config bundling no_ignore_case auto_help auto_version);
 use Test::Sah::Schema;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-17'; # DATE
+our $DATE = '2022-11-04'; # DATE
 our $DIST = 'Test-Sah-Schema'; # DIST
-our $VERSION = '0.012'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 my %opts = (
     exclude_modules => [],
@@ -46,7 +46,7 @@ test-sah-schema-modules - Test all Schema modules in distribution
 
 =head1 VERSION
 
-This document describes version 0.012 of test-sah-schema-modules (from Perl distribution Test-Sah-Schema), released on 2022-07-17.
+This document describes version 0.015 of test-sah-schema-modules (from Perl distribution Test-Sah-Schema), released on 2022-11-04.
 
 =head1 SYNOPSIS
 
@@ -118,9 +118,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

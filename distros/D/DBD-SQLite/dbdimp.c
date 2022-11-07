@@ -1859,16 +1859,20 @@ sqlite_db_create_function(pTHX_ SV *dbh, const char *name, int argc, SV *func, i
     }
 
     /* Copy the function reference */
-    func_sv = newSVsv(func);
-    av_push( imp_dbh->functions, func_sv );
+    if (SvOK(func)) {
+        func_sv = newSVsv(func);
+        av_push( imp_dbh->functions, func_sv );
+    }
 
     croak_if_db_is_null();
 
     /* warn("create_function %s with %d args\n", name, argc); */
-    rc = sqlite3_create_function( imp_dbh->db, name, argc, SQLITE_UTF8|flags,
-                                  func_sv,
-                                  _FUNC_DISPATCHER[imp_dbh->string_mode],
-                                  NULL, NULL );
+    if (SvOK(func)) {
+        rc = sqlite3_create_function( imp_dbh->db, name, argc, SQLITE_UTF8|flags,
+                                      func_sv, _FUNC_DISPATCHER[imp_dbh->string_mode], NULL, NULL );
+    } else {
+        rc = sqlite3_create_function( imp_dbh->db, name, argc, SQLITE_UTF8|flags, NULL, NULL, NULL, NULL );
+    }
     if ( rc != SQLITE_OK ) {
         sqlite_error(dbh, rc, form("sqlite_create_function failed with error %s", sqlite3_errmsg(imp_dbh->db)));
         return FALSE;
@@ -1924,6 +1928,21 @@ sqlite_db_load_extension(pTHX_ SV *dbh, const char *file, const char *proc)
 
 #endif
 
+SV* _lc(pTHX_ SV* sv) {
+    int i, l;
+    char* pv;
+    if (SvPOK(sv)) {
+        pv = SvPV_nolen(sv);
+        l = strlen(pv);
+        for(i = 0; i < l; i++) {
+            if (pv[i] >= 'A' && pv[i] <= 'Z') {
+                pv[i] = pv[i] - 'A' + 'a';
+            }
+        }
+    }
+    return sv;
+}
+
 HV*
 sqlite_db_table_column_metadata(pTHX_ SV *dbh, SV *dbname, SV *tablename, SV *columnname)
 {
@@ -1960,7 +1979,7 @@ sqlite_db_table_column_metadata(pTHX_ SV *dbh, SV *dbname, SV *tablename, SV *co
 #endif
 
     if (rc == SQLITE_OK) {
-        hv_stores(metadata, "data_type", datatype ? newSVpv(datatype, 0) : newSV(0));
+        hv_stores(metadata, "data_type", datatype ? _lc(aTHX_ newSVpv(datatype, 0)) : newSV(0));
         hv_stores(metadata, "collation_name", collseq ? newSVpv(collseq, 0) : newSV(0));
         hv_stores(metadata, "not_null", newSViv(notnull));
         hv_stores(metadata, "primary", newSViv(primary));

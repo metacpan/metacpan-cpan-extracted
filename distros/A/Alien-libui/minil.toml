@@ -1,0 +1,12 @@
+name = "Alien-libui"
+badges = ["github-actions/linux.yaml", "github-actions/windows.yaml", "github-actions/osx.yaml", "github-actions/freebsd.yaml", "metacpan"]
+authority="cpan:SANKO"
+module_maker="ModuleBuild"
+static_install = "auto"
+license = "artistic_2"
+
+[build]
+build_class = "inc::libui"
+
+[Metadata]
+X_No_Archive = 'Yes'

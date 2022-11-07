@@ -43,7 +43,7 @@ resources:
   bugtracker: https://github.com/PerlFFI/FFI-Platypus/issues
   homepage: https://metacpan.org/pod/FFI::Platypus
   repository: git://github.com/PerlFFI/FFI-Platypus.git
-version: '2.03'
+version: '2.04'
 x_contributors:
   - 'Graham Ollis <plicease@cpan.org>'
   - 'Bakkiaraj Murugesan (bakkiaraj)'

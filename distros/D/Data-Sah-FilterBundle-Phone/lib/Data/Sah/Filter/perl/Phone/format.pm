@@ -7,9 +7,9 @@ use warnings;
 #use Data::Dmp;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-09'; # DATE
+our $DATE = '2022-10-18'; # DATE
 our $DIST = 'Data-Sah-FilterBundle-Phone'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 sub meta {
     +{
@@ -18,10 +18,18 @@ sub meta {
         might_fail => 1,
         args => {
         },
+        before_test_examples => sub { undef $ENV{SAH_FILTER_PHONE_FORMAT_COUNTRY} },
         examples => [
             {value=>'+62812000000', filtered_value=>'+62 812 000 000'},
             {value=>'+62 555 1234567', valid=>0},
             {value=>'0812000000', valid=>0},
+            {
+                value=>'0812000000',
+                before_test=>sub { $ENV{SAH_FILTER_PHONE_FORMAT_COUNTRY} = 'ID' },
+                summary=>'Valid if SAH_FILTER_PHONE_FORMAT_COUNTRY is set e.g. to ID',
+                filtered_value=>'+62 812 000 000',
+                after_test=>sub { undef $ENV{SAH_FILTER_PHONE_FORMAT_COUNTRY} },
+            },
         ],
     };
 }
@@ -36,10 +44,22 @@ sub filter {
     $res->{modules}{'Number::Phone'} //= 0;
     $res->{expr_filter} = join(
         "",
-        "do { ", (
-            "my \$tmp = $dt; my \$ph = Number::Phone->new(\$tmp); ",
-            "\$ph ? [undef, \$ph->format] : ['Invalid phone number '.\$tmp, \$tmp] ",
-        ), "}",
+        "do {\n",
+        "    my \$res;\n",
+        "    my \$module = 'Number::Phone';\n",
+        "    my \$c = \$ENV{SAH_FILTER_PHONE_FORMAT_COUNTRY};\n",
+        "    if (defined \$c) {\n",
+        "        if (\$c =~ /\\A[A-Z]{2}\\z/) {\n",
+        "            \$module = 'Number::Phone::'.\$c; (my \$modulepm = \$module.'.pm') =~ s!::!/!g;\n",
+        "            eval { require \$modulepm; 1 }; if (\$@) { \$module = 'Number::Phone::StubCountry::'.\$c }\n",
+        "        } else { \$res = ['Configuration error: invalid syntax in environment variable SAH_FILTER_PHONE_FORMAT_COUNTRY']; goto L1 }\n",
+        "    }\n",
+        "    (my \$modulepm = \$module.'.pm') =~ s!::!/!g;\n",
+        "    require \$modulepm;\n",
+        "    my \$tmp = $dt; my \$ph = \$module->new(\$tmp); ",
+        "    \$res = \$ph ? [undef, \$ph->format] : ['Invalid phone number '.\$tmp, \$tmp];\n",
+        "    \$res;\n",
+        "}",
     );
 
     $res;
@@ -60,7 +80,7 @@ Data::Sah::Filter::perl::Phone::format - Format international phone number with 
 
 =head1 VERSION
 
-This document describes version 0.003 of Data::Sah::Filter::perl::Phone::format (from Perl distribution Data-Sah-FilterBundle-Phone), released on 2022-09-09.
+This document describes version 0.004 of Data::Sah::Filter::perl::Phone::format (from Perl distribution Data-Sah-FilterBundle-Phone), released on 2022-10-18.
 
 =head1 SYNOPSIS
 
@@ -88,9 +108,16 @@ This document describes version 0.003 of Data::Sah::Filter::perl::Phone::format 
 
  "+62812000000" # valid, becomes "+62 812 000 000"
  "+62 555 1234567" # INVALID (Invalid phone number +62 555 1234567), unchanged
- "0812000000" # INVALID (Invalid phone number 0812000000), unchanged
+ "0812000000" # valid, becomes "+62 812 000 000"
+ "0812000000" # valid, becomes "+62 812 000 000" (Valid if SAH_FILTER_PHONE_FORMAT_COUNTRY is set e.g. to ID)
 
 =for Pod::Coverage ^(meta|filter)$
+
+=head1 ENVIRONMENT
+
+=head2 SAH_FILTER_PHONE_FORMAT_COUNTRY
+
+String, 2-letter ISO code. Set country to use.
 
 =head1 HOMEPAGE
 

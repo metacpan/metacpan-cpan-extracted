@@ -22,7 +22,7 @@
 package PDL::IO::MDIF;
 
 # Use PDL::IO::Touchstone's version.  See https://stackoverflow.com/a/74264406/14055985 .
-our $VERSION = do { use PDL::IO::Touchstone; $PDL::IO::Touchstone::VERSION };
+use PDL::IO::Touchstone; our $VERSION = $PDL::IO::Touchstone::VERSION;
 
 use 5.010;
 use strict;

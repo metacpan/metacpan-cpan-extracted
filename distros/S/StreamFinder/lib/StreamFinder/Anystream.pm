@@ -4,7 +4,7 @@ StreamFinder::Anystream - Fetch any raw streamable URLs from an HTML page.
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2017-2021 by
+This module is Copyright (C) 2017-2022 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -92,7 +92,7 @@ NOTE:  Since these are actual extensions used to identify streams, there is NO
 (more specific) StreamFinder-supported sites!  Streams will be returned sorted by 
 extension in the order specified in this list.
 
-DEFAULT I<-keep> list is:  "mp3,ogg,flac,mp4,m4a,mpd,m3u8,m3u,pls", meaning that 
+DEFAULT I<-keep> list is:  "mp3,ogg,flac,mp4,m4a,mpd,aac,m3u8,m3u,pls", meaning that 
 all mp3 streams found (if any), followed by all "ogg" streams, etc.
 
 The optional I<-secure> argument can be either 0 or 1 (I<false> or I<true>).  If 1 
@@ -290,7 +290,7 @@ L<http://search.cpan.org/dist/StreamFinder-Anystream/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2021 Jim Turner.
+Copyright 2017-2022 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -365,7 +365,7 @@ sub new
 	if (!defined($okStreams[0]) && defined($self->{'keep'})) {
 		@okStreams = (ref($self->{'keep'}) =~ /ARRAY/) ? @{$self->{'keep'}} : split(/\,\s*/, $self->{'keep'});
 	}
-	@okStreams = (qw(mp3 ogg flac mp4 m4a mpd m3u8 m3u pls aac))  unless (defined $okStreams[0]);
+	@okStreams = (qw(mp3 ogg flac mp4 m4a mpd aac m3u8 m3u pls))  unless (defined $okStreams[0]);
 
 	my $url2fetch = $url;
 	my $urlPrefix = '';

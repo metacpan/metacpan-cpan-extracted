@@ -1,16 +1,10 @@
-package Dist::Zilla::PluginBundle::Basic 6.025;
+package Dist::Zilla::PluginBundle::Basic 6.027;
 # ABSTRACT: the basic plugins to maintain and release CPAN dists
 
 use Moose;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
 
-# BEGIN BOILERPLATE
-use v5.20.0;
-use warnings;
-use utf8;
-no feature 'switch';
-use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
-# END BOILERPLATE
+use Dist::Zilla::Pragmas;
 
 use namespace::autoclean;
 
@@ -86,7 +80,7 @@ Dist::Zilla::PluginBundle::Basic - the basic plugins to maintain and release CPA
 
 =head1 VERSION
 
-version 6.025
+version 6.027
 
 =head1 DESCRIPTION
 
@@ -178,7 +172,7 @@ L<PluginBundle::Easy|Dist::Zilla::Role::PluginBundle::Easy>.
 
 =head1 AUTHOR
 
-Ricardo SIGNES 😏 <rjbs@semiotic.systems>
+Ricardo SIGNES 😏 <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

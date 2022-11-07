@@ -27,7 +27,7 @@ BEGIN
 
   };
 
-use constant HAVE_DISPLAY => $^O =~ /Win/ || defined $ENV{DISPLAY};
+use constant HAVE_DISPLAY => ($^O eq 'MSWin32') || defined $ENV{DISPLAY};
 use constant SKIP => HAVE_DISPLAY ? 0 : 'Skip if no display';
 
 eval { require Tk; };

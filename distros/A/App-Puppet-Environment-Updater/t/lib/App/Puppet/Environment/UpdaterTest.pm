@@ -22,7 +22,15 @@ sub setup : Test(setup) {
 	my $env = $repos_dir->subdir('environment');
 	$env->mkpath();
 	$self->{env_git} = Git::Wrapper->new($env);
-	$self->{env_git}->init();
+	# Newer versions of Git might have a different default branch, either through
+	# configuration or as new Git default, so ensure we create a branch which
+	# matches what the tests expect.
+	eval { $self->{env_git}->init('--initial-branch' => 'master') };
+	if ($@) {
+		# Likely an older version of Git which doesn't support --initial-branch,
+		# so it's most likely going to be 'master'.
+		$self->{env_git}->init();
+	}
 	$self->{env_git}->config('user.email' => 'test@example.com');
 	$self->{env_git}->config('user.name'  => 'test@example.com');
 	$self->{tmp}->create_tree({

@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.19, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,20 +28,21 @@ provides:
     file: lib/Test/Mojo/Role/Session.pm
   Test::Mojo::Session:
     file: lib/Test/Mojo/Session.pm
-    version: '1.06'
+    version: '1.07'
 requires:
   Mojolicious: '4.82'
   Role::Tiny: '0'
 resources:
   bugtracker: https://github.com/avkhozov/Test-Mojo-Session/issues
   homepage: https://github.com/avkhozov/Test-Mojo-Session
-  repository: git://github.com/avkhozov/Test-Mojo-Session.git
-version: '1.06'
+  repository: https://github.com/avkhozov/Test-Mojo-Session.git
+version: '1.07'
 x_authority: cpan:AVKHOZOV
 x_contributors:
   - 'Akron <nils@diewald-online.de>'
   - 'Andrey Khozov <andrey@rydlab.ru>'
   - 'Andrey Khozov <avkhozov@gmail.com>'
+  - 'Gene Boggs <gene@ology.net>'
   - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
   - 'Renee <reb@perl-services.de>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

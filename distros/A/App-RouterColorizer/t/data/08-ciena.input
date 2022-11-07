@@ -491,6 +491,8 @@ xxxxx.xxxxxx$ ptp show ptp 1/13 status
 |      |    Time Recorded                   | Thu Sep 15 17:12:28 2022  | Thu Sep 15 17:12:28 2022  |
 |      |------------------------------------+---------------------------+---------------------------|
 |      | Optical Return Loss (dB)           | 34.20                                                 |
+|      | Optical Return Loss (dB)           | 24.20                                                 |
+|      | Optical Return Loss (dB)           | 14.20                                                 |
 |      |    Maximum (dB)                    | 39.50                                                 |
 |      |    Time Recorded                   | Thu Sep 22 20:26:26 2022                              |
 |      |    Minimum (dB)                    | 33.90                                                 |

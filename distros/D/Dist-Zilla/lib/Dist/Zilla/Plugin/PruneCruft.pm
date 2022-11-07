@@ -1,17 +1,11 @@
-package Dist::Zilla::Plugin::PruneCruft 6.025;
+package Dist::Zilla::Plugin::PruneCruft 6.027;
 # ABSTRACT: prune stuff that you probably don't mean to include
 
 use Moose;
 use Moose::Util::TypeConstraints;
 with 'Dist::Zilla::Role::FilePruner';
 
-# BEGIN BOILERPLATE
-use v5.20.0;
-use warnings;
-use utf8;
-no feature 'switch';
-use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
-# END BOILERPLATE
+use Dist::Zilla::Pragmas;
 
 use namespace::autoclean;
 
@@ -123,7 +117,7 @@ Dist::Zilla::Plugin::PruneCruft - prune stuff that you probably don't mean to in
 
 =head1 VERSION
 
-version 6.025
+version 6.027
 
 =head1 SYNOPSIS
 
@@ -166,7 +160,7 @@ L<ManifestSkip|Dist::Zilla::Plugin::ManifestSkip>.
 
 =head1 AUTHOR
 
-Ricardo SIGNES 😏 <rjbs@semiotic.systems>
+Ricardo SIGNES 😏 <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

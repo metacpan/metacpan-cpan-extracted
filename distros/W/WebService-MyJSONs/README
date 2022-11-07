@@ -1,0 +1,332 @@
+NAME
+
+    WebService::MyJSONs - Perl SDK to consume the MyJSONs web service
+
+VERSION
+
+    This document describes WebService::MyJSONs version 0.002.
+
+SYNOPSIS
+
+    Functional interface:
+
+       use WebService::MyJSONs qw< myjsons_put myjsons_get >;
+    
+       # create a new item, get item's code back
+       my $code = myjsons_put({ foo => 'bar' });
+    
+       # retrieve data for $code
+       my $retrieved_data = myjsons_get($code);
+    
+       # update data for $code
+       myjsons_put($code, { foo => 'bar', baz => 42 });
+
+    Function myjsons_put doubles down on creation of a new slot or update
+    of the slot, depending on the number of parameters (one or two,
+    respectively). The interface above takes care to convert it to/from
+    JSON as needed.
+
+    JSON-specific API:
+
+       use WebService::MyJSONs qw< myjsons_put_json myjsons_get_json >;
+    
+       my $code = myjsons_put_json('{"foo":"bar"}');
+       my $json = myjsons_get_json($code);
+       myjsons_put_json($code, '{"foo":"bar", "baz": "yay!"}');
+
+    Again, myjsons_put_json doubles down on creation and update.
+
+    Object-oriented interface (remote JSON item code is cached when
+    available):
+
+       use WebService::MyJSONs;
+    
+       my $mj1 = WebService::MyJSONs->new;
+    
+       # initialize with a $code
+       $code = '5ef6366';
+       my $mj2 = WebService::MyJSONs->new(code => $code);
+    
+       # set endpoint explicitly (e.g. a different one)
+       my $url = 'https://www.myjsons.com';
+       my $mj3 = WebService::MyJSONs->new(endpoint => $url);
+
+    Objects that do not have a cached code inside will invoke the creation
+    of a new remote item and then cache the code returned by the web
+    service.
+
+    In the next example, $mj starts without a code inside, so the first put
+    takes care to create a new remote item and cache its code inside the
+    object, while the second put is an update to that remote item.
+
+       my $mj = WebService::MyJSONs->new;
+       $mj->put({ foo => 'bar', hex => [ 0 .. 9, 'a' .. 'f' ] });
+       say $mj->code;
+       my $retrieved_data = $mj->get;
+       $mj->put({ foo => 'bar', hex => [ 0 .. 9, 'A' .. 'F' ] });
+
+    There’s of course the counterpart when playing directly with JSON
+    strings:
+
+       my $mj = WebService::MyJSONs->new;
+       $mj->put_json('{"foo":"bar"}');
+       my $json = $mj->get_json;
+       $mj->put_json('{"foo":"barbaz"}');
+
+    Using a different remote JSON item code (does not update the cached
+    one):
+
+       my $mj = WebService::MyJSONs->new($somecode);
+       my $data = $mj->get($code);
+       my $json = $mj->get($json);
+       $mj->put($code, $data);
+       $mj->put_json($code, $json);
+
+    put/put_json can also act as constructors when called as class methods:
+
+       my $mj_a = WebService::MyJSONs->put($data);
+       my $mj_b = WebService::MyJSONs->put($code, $data);
+       my $mj_c = WebService::MyJSONs->put_json($json);
+       my $mj_d = WebService::MyJSONs->put_json($code, $json);
+
+    get/get_json can be called as class methods as well:
+
+       my $data = WebService::MyJSONs->get($code);
+       my $json = WebService::MyJSONs->get_json($code);
+
+DESCRIPTION
+
+    https://www.myjsons.com is a handy service that can host some JSON data
+    for us, e.g. for test/mock purposes.
+
+    As long as it keeps its interface as of the end of October 2022, this
+    module can help interacting with the web service.
+
+    See the "SYNOPSIS" for an overview of the different ways of using it.
+
+INTERFACE
+
+    There are a functional and an object-oriented interfaces provided by
+    the module. It can also act as a modulino.
+
+ Modulino
+
+    The module can be invoked as a Perl program, like this:
+
+       # print a help message
+       perl /path/to/MyJSONs.pm
+    
+       # create a new remote item, new code is printed on STDOUT
+       code=$(perl /path/to/MyJSONs.pm put </path/to/stuff.json)
+    
+       # update a remote item
+       perl /path/to/MyJSONs.pm put $somecode </path/to/stuff.json
+    
+       # retrieve JSON stuff, printed on STDOUT
+       perl /path/to/MyJSONs.pm get $somecode | jq .
+
+    The actual implementation is provided by "myjsons_cmdline".
+
+    As there is no dependency that is not in CORE, it's possible to copy
+    the Perl module file somewhere in PATH (e.g. with file name myjsons)
+    and invoke it as a program.
+
+ Functional Interface
+
+    All of the functions below can be imported at once using import string
+    :all, like this:
+
+       use WebService::MyJSONs ':all';
+
+  myjsons_cmdline
+
+       myjsons_cmdline();               # 1
+       myjsons_cmdline('help');         # 2
+       myjsons_cmdline('get', $code);   # 3
+       myjsons_cmdline('put');          # 4
+       myjsons_cmdline('put', $code);   # 5
+
+    Implement a simple program to use the functionalities from the command
+    line, like this:
+
+       use WebService::MyJSONs 'myjsons_cmdline';
+       myjsons_cmdline(@ARGV);
+
+    All JSON input/output is performed through STDIN/STDOUT respectively.
+
+    Calls 1 and 2 print a help message and exit with status code 1.
+
+    Call 3 retrieves the JSON string at $code and prints it on STDOUT.
+
+    Calls 4 and 5 read the JSON string from STDIN and send it to the remote
+    server. 4 creates a new item, 5 updates the object at $code. Both print
+    out the item's code.
+
+  myjsons_get
+
+       my $data = myjsons_get($code);
+
+    Get data from the web service, pointed by $code. The JSON object
+    retrieved is turned into a Perl data structure by means of JSON::PP.
+
+  myjsons_get_json
+
+       my $data = myjsons_get_json($code);
+
+    Get a JSON string from the web service, pointed by $code.
+
+  myjsons_put
+
+       my $code = myjsons_put($data);
+       myjsons_put($code, $data);
+
+    Put some data in the web service. $data is turned into a JSON string by
+    means of JSON::PP.
+
+    The first call only provides $data and triggers the addition of a new
+    item in the web service, returning the code of the newly created item.
+
+    The second call example provides both $code and $data, leading to an
+    update operation (unless $code is undef). It also returns the code.
+
+  myjsons_put_json
+
+       my $code = myjsons_put_json($json);
+       myjsons_put_json($code, $json);
+
+    Put a JSON string in the web service.
+
+    The first call only provides $json and triggers the addition of a new
+    item in the web service, returning the code of the newly created item.
+
+    The second call example provides both $code and $json, leading to an
+    update operation (unless $code is undef). It also returns the code.
+
+ Object-oriented Interface
+
+    The object-oriented interface provides a finer granularity control.
+
+ code
+
+       my $code = $mj->code;
+       $mj->code($new_code);
+
+    Accessor for the code, i.e. the unique identifier of the JSON string in
+    the web service.
+
+ get
+
+       my $data = $mj->get;                # instance method, cached code
+       $data = $mj->get($code);            # instance method, explicit code
+       $data = WebService::MyJSONs->get($code); # class method
+
+    Retrieve data, taking care to transform the retrieved JSON string into
+    a Perl data structure with JSON::PP.
+
+    The instance call with the $code uses the provided value, leaving the
+    cached code (if any) unchanged.
+
+ get_json
+
+       my $json = $mj->get_json;            # instance method, cached code
+       $json = $mj->get_json($code);        # instance method, explicit code
+       $json = WebService::MyJSONs->get_json($code); # class method
+
+    Retrieve a JSON string.
+
+    The instance call with the $code uses the provided value, leaving the
+    cached code (if any) unchanged.
+
+ new
+
+       my $mj = WebService::MyJSONs->new(%args);
+
+    Constructor. Allowed keys are:
+
+    code
+
+      a unique code for a remote JSON item. See also "code".
+
+    endpoint
+
+      the endpoint to use instead of the default one. See also "Package
+      Variables".
+
+    response_callback
+
+      A callback function with the following signature:
+
+         sub ($response) { ... }
+
+      After each call to HTTP::Tiny, a $response object is retrieved and
+      then passed to this callback function. It can be e.g. useful for
+      troubleshooting purposes.
+
+ put
+
+       $mj->put($data);                                   # 1
+       $mj->put($code, $data);                            # 2
+       my $obj = WebService::MyJSONs->put($data);         # 3
+       my $obj = WebService::MyJSONs->put($code, $data);  # 4
+
+    Transform $data into a JSON string with JSON::PP and store it remotely.
+
+    Alternative 1 generates a new item in the web service, unless a "code"
+    is cached (either because of a previous invocation, or because passed
+    explicitly upon construction). If the code is available, it acts as an
+    updater.
+
+    Alternative 2 updates the remote item corresponding to $code if this is
+    defined. If $code is undef, it acts just like 1.
+
+    Alternative 3 acts as a constructor that also creates a remote item and
+    sets the object's "code" accordingly.
+
+    Alternative 4 with a defined $code acts as a constructor with the $code
+    and then updates the corresponding remote object. If $code is undef, it
+    acts just like 3.
+
+ put_json
+
+       $mj->put_json($json);                                   # 1
+       $mj->put_json($code, $json);                            # 2
+       my $obj = WebService::MyJSONs->put_json($json);         # 3
+       my $obj = WebService::MyJSONs->put_json($code, $json);  # 4
+
+    See "put", the only difference is that JSON strings are used instead of
+    data structures, so no automatic encoding happens.
+
+ Package Variables
+
+    The package variable $DEFAULT_ENDPOINT can be manipulated to point the
+    module to a different web service instance, providing the same API. Its
+    value is used by the functions in the "Functional Interface", as well
+    as the default endpoint value in the "Object-oriented Interface".
+
+BUGS AND LIMITATIONS
+
+    Minimum perl version 5.24.
+
+    Report bugs through GitHub (patches welcome) at
+    https://github.com/polettix/WebService-MyJSONs.
+
+AUTHOR
+
+    Flavio Poletti <flavio@polettix.it>
+
+COPYRIGHT AND LICENSE
+
+    Copyright 2022 by Flavio Poletti <flavio@polettix.it>
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may
+    not use this file except in compliance with the License. You may obtain
+    a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+    implied. See the License for the specific language governing
+    permissions and limitations under the License.
+

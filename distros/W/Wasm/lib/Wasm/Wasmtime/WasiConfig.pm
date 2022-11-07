@@ -6,7 +6,7 @@ use 5.008004;
 use Wasm::Wasmtime::FFI;
 
 # ABSTRACT: WASI Configuration
-our $VERSION = '0.22'; # VERSION
+our $VERSION = '0.23'; # VERSION
 
 
 $ffi_prefix = 'wasi_config_';
@@ -67,7 +67,7 @@ Wasm::Wasmtime::WasiConfig - WASI Configuration
 
 =head1 VERSION
 
-version 0.22
+version 0.23
 
 =head1 SYNOPSIS
 

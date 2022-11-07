@@ -29,6 +29,10 @@ executing `diff` on them locally.
 INSTALLATION
 ------------
 
+To install this module automatically from CPAN :
+
+    cpan App::remotediff
+
 To install this module automatically from Git repository :
 
     cpanm https://github.com/kal247/App-remotediff.git

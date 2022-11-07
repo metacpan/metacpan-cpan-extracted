@@ -7,9 +7,9 @@ use warnings;
 #use Data::Dmp;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-09'; # DATE
+our $DATE = '2022-10-18'; # DATE
 our $DIST = 'Data-Sah-FilterBundle-Phone'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 sub meta {
     +{
@@ -63,7 +63,7 @@ Data::Sah::Filter::perl::Phone::format_idn - Format Indonesian phone number with
 
 =head1 VERSION
 
-This document describes version 0.003 of Data::Sah::Filter::perl::Phone::format_idn (from Perl distribution Data-Sah-FilterBundle-Phone), released on 2022-09-09.
+This document describes version 0.004 of Data::Sah::Filter::perl::Phone::format_idn (from Perl distribution Data-Sah-FilterBundle-Phone), released on 2022-10-18.
 
 =head1 SYNOPSIS
 

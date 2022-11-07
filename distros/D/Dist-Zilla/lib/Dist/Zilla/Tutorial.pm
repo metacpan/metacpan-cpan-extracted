@@ -1,13 +1,7 @@
-package Dist::Zilla::Tutorial 6.025;
+package Dist::Zilla::Tutorial 6.027;
 # ABSTRACT: how to use this "Dist::Zilla" thing
 
-# BEGIN BOILERPLATE
-use v5.20.0;
-use warnings;
-use utf8;
-no feature 'switch';
-use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
-# END BOILERPLATE
+use Dist::Zilla::Pragmas;
 
 use Carp ();
 Carp::confess "you're not meant to use the tutorial, just read it!";
@@ -154,7 +148,7 @@ Dist::Zilla::Tutorial - how to use this "Dist::Zilla" thing
 
 =head1 VERSION
 
-version 6.025
+version 6.027
 
 =head1 SYNOPSIS
 
@@ -297,7 +291,7 @@ L<dzil>
 
 =head1 AUTHOR
 
-Ricardo SIGNES 😏 <rjbs@semiotic.systems>
+Ricardo SIGNES 😏 <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -6,4 +6,4 @@ use Test::NoWarnings;
 use Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::Image::Dog;
 
 # Test.
-is($Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::Image::Dog::VERSION, 0.22, 'Version.');
+is($Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::Image::Dog::VERSION, 0.23, 'Version.');

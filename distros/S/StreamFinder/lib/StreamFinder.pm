@@ -25,8 +25,7 @@ Email: turnerjw784@yahoo.com
 All rights reserved.
 
 You may distribute this module under the terms of either the GNU General 
-Public License or the Artistic License, as specified in the Perl README 
-file.
+Public License or the Artistic License, as specified in the Perl README file.
 
 =head1 SYNOPSIS
 
@@ -143,24 +142,25 @@ podbean.com podcasts (L<StreamFinder::Podbean>),
 podcastaddict.com podcasts (L<StreamFinder::PodcastAddict>), 
 radio.net radio stations (L<StreamFinder::RadioNet>), 
 rumble.com videos (L<StreamFinder::Rumble>),
-sermonaudio.com sermon audio and video (L<StreamFinder::SermonAudio>), soundcloud.com 
-soundcloud.com songs (L<StreamFinder::SoundCloud>), 
+sermonaudio.com sermons: audio and video (L<StreamFinder::SermonAudio>), 
+soundcloud.com (non-paywalled) songs (L<StreamFinder::SoundCloud>), 
 spreaker.com podcasts (L<StreamFinder::Spreaker>), 
-tunein.com radio stations and podcasts(L<StreamFinder::Tunein>), 
-vimeo.com videos (L<StreamFinder::Vimeo>), 
+tunein.com (non-paywalled) radio stations and podcasts 
+(L<StreamFinder::Tunein>), vimeo.com videos (L<StreamFinder::Vimeo>), 
 (youtube.com, et. al and other sites that youtube-dl supports) 
 (L<StreamFinder::Youtube>), and L<StreamFinder::Anystream> - search any (other) 
 webpage URL (not supported by any of the other submodules) for streams.  
 
-NOTE:  StreamFinder::Reciva has been removed, as that site has now closed down.
+NOTE:  StreamFinder::Reciva and StreamFinder::Radionomy have been removed, as 
+those sites have now closed down.
 
 NOTE:  For many sites, ie. Youtube, Vimeo, Apple, Spreaker, Castbox, Google, 
 etc. the "station" object actually refers to a specific video or podcast, but 
 functions the same way.
 
 Each site is supported by a separate subpackage (StreamFinder::I<Package>), 
-which is determined and selected based on the URL argument passed to it when the 
-StreamFinder object is created.  The methods are overloaded by the selected 
+which is determined and selected based on the URL argument passed to it when 
+the StreamFinder object is created.  The methods are overloaded by the selected 
 subpackage's methods.  An example would be B<StreamFinder::Youtube>.  
 
 Please see the POD. documentation for each subpackage for important additional 
@@ -341,10 +341,8 @@ the "icon image" data, if any, will be returned.
 =item $station->B<getType>()
 
 Returns the station / podcast / video's type (I<submodule-name>).  
-(one of:  "Anystream", "Apple", "BitChute", "Blogger", "BrandNewTube", 
-"Brighteon", "Castbox", "Google", "IHeartRadio", "Odysee", "Podbean", 
-"PodcastAddict", "RadioNet", "Rumble", "SermonAudio", "Spreaker", "Tunein", 
-"Youtube" or "Vimeo" - depending on the sight that matched the URL).
+(one of:  "Anystream", "Apple", "BitChute", "Blogger", "Youtube", etc. - 
+depending on the sight that matched the URL).
 
 =back
 
@@ -496,7 +494,7 @@ use strict;
 use warnings;
 use vars qw(@ISA @EXPORT $VERSION);
 
-our $VERSION = '2.00';
+our $VERSION = '2.01';
 our $DEBUG = 0;
 
 require Exporter;

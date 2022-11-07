@@ -477,3 +477,7 @@ Revision history for StreamFinder
         - StreamFinder::AnyStream - Add .acc streams to search.
         - StreamFinder::Tunein - Cpl. minor cleanups.
         - StreamFinder::Youtube - Accept urls containing "/c/" as channel urls.
+2.01    2022/11/05
+        - StreamFinder::OnlineRadiobox - Add -notrim option and fetch the 
+        station's callsign, ie. the "fccid".
+        - Misc. minor code & doc. cleanups and update some copyright years.

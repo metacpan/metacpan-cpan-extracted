@@ -20,7 +20,7 @@
 #  respective owners and no grant or license is provided thereof.
 
 package PDL::IO::Touchstone;
-our $VERSION = '1.010';
+our $VERSION = '1.011';
 
 use 5.010;
 use strict;
@@ -45,7 +45,9 @@ BEGIN {
 		rsnp_fh
 		wsnp_fh
 
+		rsnp_list_to_hash
 		rsnp_hash
+		rsnp_fh_hash
 
 		n_ports
 		m_interpolate
@@ -107,7 +109,7 @@ sub rsnp
 	return @ret;
 }
 
-sub rsnp_hash
+sub rsnp_list_to_hash
 {
 	my @data = @_;
 	my %data;
@@ -272,6 +274,9 @@ sub rsnp_fh
 
 	return ($f, $m, $param_type, $z0, $comments, $fmt, $funit, $orig_funit);
 }
+
+sub  rsnp_hash     {  return  rsnp_list_to_hash(rsnp(@_));     }
+sub  rsnp_fh_hash  {  return  rsnp_list_to_hash(rsnp_fh(@_));  }
 
 sub wsnp
 {
@@ -1759,16 +1764,18 @@ For example, re-compose $T from the C<m_to_pos_vecs> example.
 	$T = pos_vecs_to_m($T11, $T12, $T21, $T22)
 
 
-=head2 C<%h = rsnp_hash(rsnp(...))> - Create a named hash from the return values of rsnp
+=head2 C<%h = rsnp_list_to_hash(rsnp(...))> - Create a named hash from the return values of rsnp
 
 It is sometimes more familiar and readable to work with a hash of names instead
 of an index of arrays.  This function converts the return value of C<rsnp> into
 a hash with the following fields.  The C<[n]> values are the array index order
 into the list that C<rsnp> returns.
 
-    %h = rsnp_hash(rsnp($filename, ...));
+    %h = rsnp_list_to_hash(rsnp($filename, ...));
 
-    %h = rsnp_hash(rsnp_fh($filehandle, ...));
+    %h = rsnp_list_to_hash(rsnp_fh($filehandle, ...));
+
+    print "$h{z0_ref}\n";
 
 =over 4
 
@@ -1789,6 +1796,14 @@ into the list that C<rsnp> returns.
 =item * [7] orig_f_unit
 
 =back
+
+=head2 C<%h = rsnp_hash(...)> - Same as C<rsnp> but returns a hash.
+
+See hash elements in C<rsnp_list_to_hash>
+
+=head2 C<%h = rsnp_fh_hash(...)> - Same as C<rsnp_fh> but returns a hash.
+
+See hash elements in C<rsnp_list_to_hash>
 
 =head1 SEE ALSO
 

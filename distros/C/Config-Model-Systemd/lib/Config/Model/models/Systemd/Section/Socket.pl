@@ -409,7 +409,7 @@ inherited between processes.',
           'value_type' => 'uniline'
         },
         'description' => 'Specifies a L<USB
-FunctionFS|https://www.kernel.org/doc/Documentation/usb/functionfs.txt> endpoints location to listen on, for
+FunctionFS|https://docs.kernel.org/usb/functionfs.html> endpoints location to listen on, for
 implementation of USB gadget functions. This expects an
 absolute file system path of a FunctionFS mount point as the argument.
 Behavior otherwise is very similar to the C<ListenFIFO>
@@ -778,7 +778,7 @@ C<security.SMACK64IPIN> and
 C<security.SMACK64IPOUT>, respectively, i.e.
 the security label of the FIFO, or the security label for the
 incoming or outgoing connections of the socket, respectively.
-See L<Smack.txt|https://www.kernel.org/doc/Documentation/security/Smack.txt>
+See L<Smack|https://docs.kernel.org/admin-guide/LSM/Smack.html>
 for details.',
         'type' => 'leaf',
         'value_type' => 'uniline'
@@ -791,7 +791,7 @@ C<security.SMACK64IPIN> and
 C<security.SMACK64IPOUT>, respectively, i.e.
 the security label of the FIFO, or the security label for the
 incoming or outgoing connections of the socket, respectively.
-See L<Smack.txt|https://www.kernel.org/doc/Documentation/security/Smack.txt>
+See L<Smack|https://docs.kernel.org/admin-guide/LSM/Smack.html>
 for details.',
         'type' => 'leaf',
         'value_type' => 'uniline'
@@ -804,7 +804,7 @@ C<security.SMACK64IPIN> and
 C<security.SMACK64IPOUT>, respectively, i.e.
 the security label of the FIFO, or the security label for the
 incoming or outgoing connections of the socket, respectively.
-See L<Smack.txt|https://www.kernel.org/doc/Documentation/security/Smack.txt>
+See L<Smack|https://docs.kernel.org/admin-guide/LSM/Smack.html>
 for details.',
         'type' => 'leaf',
         'value_type' => 'uniline'
@@ -1134,7 +1134,7 @@ limit is enforced before the service activation is enqueued.",
         'value_type' => 'uniline'
       }
     ],
-    'generated_by' => 'parse-man.pl from systemd 250 doc',
+    'generated_by' => 'parse-man.pl from systemd 252 doc',
     'license' => 'LGPLv2.1+',
     'name' => 'Systemd::Section::Socket'
   }

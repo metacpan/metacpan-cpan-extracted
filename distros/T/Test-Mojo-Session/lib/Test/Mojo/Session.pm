@@ -4,7 +4,7 @@ use Mojo::Base 'Test::Mojo';
 use Mojo::Util qw(b64_decode hmac_sha1_sum);
 use Mojo::JSON 'decode_json';
 
-our $VERSION = '1.06';
+our $VERSION = '1.07';
 
 sub new {
   my $self = shift->SUPER::new(@_);
@@ -38,6 +38,20 @@ sub session_is {
   $desc //= qq{session exact match for JSON Pointer "$p"};
   my $session = $self->_extract_session;
   return $self->test('is_deeply', Mojo::JSON::Pointer->new($session)->get($p), $data, $desc);
+}
+
+sub session_like {
+  my ($self, $p, $regex, $desc) = @_;
+  $desc //= qq{session regular expression match for JSON Pointer "$p"};
+  my $session = $self->_extract_session;
+  return $self->test('like', Mojo::JSON::Pointer->new($session)->get($p), qr/$regex/, $desc);
+}
+
+sub session_unlike {
+  my ($self, $p, $regex, $desc) = @_;
+  $desc //= qq{session negated regular expression match for JSON Pointer "$p"};
+  my $session = $self->_extract_session;
+  return $self->test('unlike', Mojo::JSON::Pointer->new($session)->get($p), qr/$regex/, $desc);
 }
 
 sub session_ok {
@@ -88,7 +102,9 @@ Test::Mojo::Session - Testing session in Mojolicious applications
     ->session_has('/s1')
     ->session_is('/s1' => 'session data')
     ->session_hasnt('/s2')
-    ->session_is('/s3' => [1, 3]);
+    ->session_is('/s3' => [1, 3])
+    ->session_like('/s1' => qr/data/, 's1 contains "data"')
+    ->session_unlike('/s1' => qr/foo/, 's1 does not contain "foo"');
 
   done_testing();
 
@@ -112,7 +128,9 @@ Use L<Test::Mojo::Sesssion> via L<Test::Mojo::WithRoles>.
     ->session_has('/s1')
     ->session_is('/s1' => 'session data')
     ->session_hasnt('/s2')
-    ->session_is('/s3' => [1, 3]);
+    ->session_is('/s3' => [1, 3])
+    ->session_like('/s1' => qr/data/, 's1 contains "data"')
+    ->session_unlike('/s1' => qr/foo/, 's1 does not contain "foo"');
 
   done_testing();
 
@@ -137,17 +155,32 @@ JSON Pointer with L<Mojo::JSON::Pointer>.
 =head2 session_hasnt
 
   $t = $t->session_hasnt('/bar');
-  $t = $t->session_hasnt('/bar', 'session does not has "bar"');
+  $t = $t->session_hasnt('/bar', 'session does not have "bar"');
 
-Check if current session no contains a value that can be identified using the given
+Check if current session does not contain a value that can be identified using the given
 JSON Pointer with L<Mojo::JSON::Pointer>.
 
 =head2 session_is
 
   $t = $t->session_is('/pointer', 'value');
-  $t = $t->session_is('/pointer', 'value', 'right halue');
+  $t = $t->session_is('/pointer', 'value', 'right value');
 
 Check the session using the given JSON Pointer with L<Mojo::JSON::Pointer>.
+
+=head2 session_like
+
+  $t = $t->session_like('/pointer', qr/value/);
+  $t = $t->session_like('/pointer', qr/value/, 'matched value');
+
+Check if current session matches a regular expression.
+
+
+=head2 session_unlike
+
+  $t = $t->session_unlike('/pointer', qr/value/);
+  $t = $t->session_unlike('/pointer', qr/value/, 'did not match value');
+
+Check if current session does not match a regular expression.
 
 =head2 session_ok
 
@@ -165,11 +198,13 @@ Andrey Khozov, C<avkhozov@googlemail.com>.
 
 =head1 CREDITS
 
-Renee, C<reb@perl-services.de>.
+Renee, C<reb@perl-services.de>
+
+Gene Boggs, C<gene.boggs@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2013-2015, Andrey Khozov.
+Copyright (C) 2013-2022, Andrey Khozov.
 
 This program is free software, you can redistribute it and/or modify it under
 the terms of the Artistic License version 2.0.

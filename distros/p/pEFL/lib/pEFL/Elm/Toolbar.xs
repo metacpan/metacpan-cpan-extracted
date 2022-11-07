@@ -14,13 +14,13 @@ typedef Elm_Toolbar ElmToolbar;
 typedef Elm_Toolbar_Item ElmToolbarItem;
 typedef Evas_Object EvasObject;
 
-MODULE = pEFL::Elm::Toolbar		PACKAGE = pEFL::Elm::Toolbar
+MODULE = pEFL::Elm::Toolbar 	PACKAGE = pEFL::Elm::Toolbar
 
 ElmToolbar * 
 elm_toolbar_add(parent)
-    EvasObject *parent
+	EvasObject *parent
 
-MODULE = pEFL::Elm::Toolbar		PACKAGE = ElmToolbarPtr     PREFIX = elm_toolbar_
+MODULE = pEFL::Elm::Toolbar 	PACKAGE = ElmToolbarPtr 	PREFIX = elm_toolbar_
 
 
 void
@@ -177,20 +177,20 @@ _elm_toolbar_item_insert_before(obj,before,icon,label,id)
 	const char *label
 	int id
 PREINIT:
-    _perl_gendata *data;
-    UV objaddr;
-    ElmToolbarItem *item;
+	_perl_gendata *data;
+	UV objaddr;
+	ElmToolbarItem *item;
 CODE:
-    // Get the adress of the object
-    objaddr = PTR2IV(obj);
-    
-    // Save C struct with necessary infos to link to perl side
-    data = perl_save_gen_cb(aTHX_ objaddr, 0, id);
-    item = elm_toolbar_item_insert_before(obj,before,icon,label,call_perl_gen_item_selected, data);
-    elm_object_item_del_cb_set(item,call_perl_gen_del);
-    RETVAL = item;
+	// Get the adress of the object
+	objaddr = PTR2IV(obj);
+	
+	// Save C struct with necessary infos to link to perl side
+	data = perl_save_gen_cb(aTHX_ objaddr, 0, id);
+	item = elm_toolbar_item_insert_before(obj,before,icon,label,call_perl_gen_item_selected, data);
+	elm_object_item_del_cb_set(item,call_perl_gen_del);
+	RETVAL = item;
 OUTPUT:
-    RETVAL
+	RETVAL
 
 
 ElmToolbarItem *
@@ -201,20 +201,20 @@ _elm_toolbar_item_insert_after(obj,after,icon,label,id)
 	const char *label
 	int id
 PREINIT:
-    _perl_gendata *data;
-    UV objaddr;
-    ElmToolbarItem *item;
+	_perl_gendata *data;
+	UV objaddr;
+	ElmToolbarItem *item;
 CODE:
-    // Get the adress of the object
-    objaddr = PTR2IV(obj);
-    
-    // Save C struct with necessary infos to link to perl side
-    data = perl_save_gen_cb(aTHX_ objaddr, 0, id);
-    item = elm_toolbar_item_insert_after(obj,after,icon,label,call_perl_gen_item_selected, data);
-    elm_object_item_del_cb_set(item,call_perl_gen_del);
-    RETVAL = item;
+	// Get the adress of the object
+	objaddr = PTR2IV(obj);
+	
+	// Save C struct with necessary infos to link to perl side
+	data = perl_save_gen_cb(aTHX_ objaddr, 0, id);
+	item = elm_toolbar_item_insert_after(obj,after,icon,label,call_perl_gen_item_selected, data);
+	elm_object_item_del_cb_set(item,call_perl_gen_del);
+	RETVAL = item;
 OUTPUT:
-    RETVAL
+	RETVAL
 
 
 ElmToolbarItem *
@@ -224,20 +224,20 @@ _elm_toolbar_item_append(obj,icon,label,id)
 	const char *label
 	int id
 PREINIT:
-    _perl_gendata *data;
-    UV objaddr;
-    ElmToolbarItem *item;
+	_perl_gendata *data;
+	UV objaddr;
+	ElmToolbarItem *item;
 CODE:
-    // Get the adress of the object
-    objaddr = PTR2IV(obj);
-    
-    // Save C struct with necessary infos to link to perl side
-    data = perl_save_gen_cb(aTHX_ objaddr, 0, id);
-    item = elm_toolbar_item_append(obj,icon,label,call_perl_gen_item_selected, data);
-    elm_object_item_del_cb_set(item,call_perl_gen_del);
-    RETVAL = item;
+	// Get the adress of the object
+	objaddr = PTR2IV(obj);
+	
+	// Save C struct with necessary infos to link to perl side
+	data = perl_save_gen_cb(aTHX_ objaddr, 0, id);
+	item = elm_toolbar_item_append(obj,icon,label,call_perl_gen_item_selected, data);
+	elm_object_item_del_cb_set(item,call_perl_gen_del);
+	RETVAL = item;
 OUTPUT:
-    RETVAL
+	RETVAL
 
 int
 elm_toolbar_items_count(obj)
@@ -251,20 +251,20 @@ _elm_toolbar_item_prepend(obj,icon,label,id)
 	const char *label
 	int id
 PREINIT:
-    _perl_gendata *data;
-    UV objaddr;
-    ElmToolbarItem *item;
+	_perl_gendata *data;
+	UV objaddr;
+	ElmToolbarItem *item;
 CODE:
-    // Get the adress of the object
-    objaddr = PTR2IV(obj);
-    
-    // Save C struct with necessary infos to link to perl side
-    data = perl_save_gen_cb(aTHX_ objaddr, 0, id);
-    item = elm_toolbar_item_prepend(obj,icon,label,call_perl_gen_item_selected, data);
-    elm_object_item_del_cb_set(item,call_perl_gen_del);
-    RETVAL = item;
+	// Get the adress of the object
+	objaddr = PTR2IV(obj);
+	
+	// Save C struct with necessary infos to link to perl side
+	data = perl_save_gen_cb(aTHX_ objaddr, 0, id);
+	item = elm_toolbar_item_prepend(obj,icon,label,call_perl_gen_item_selected, data);
+	elm_object_item_del_cb_set(item,call_perl_gen_del);
+	RETVAL = item;
 OUTPUT:
-    RETVAL
+	RETVAL
 
 ElmToolbarItem *
 elm_toolbar_item_find_by_label(obj,label)

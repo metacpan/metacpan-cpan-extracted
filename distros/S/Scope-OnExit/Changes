@@ -1,5 +1,9 @@
 Revision history for Scope-OnExit
 
+0.03      2022-11-05 22:10:40+01:00 Europe/Amsterdam
+        - Upgrade to Dist::Zilla
+        - Modernize Exporter and loader code
+
 0.02    2010-03-24
         Documentation updates
 

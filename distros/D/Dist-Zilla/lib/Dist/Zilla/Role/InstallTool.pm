@@ -1,4 +1,4 @@
-package Dist::Zilla::Role::InstallTool 6.025;
+package Dist::Zilla::Role::InstallTool 6.027;
 # ABSTRACT: something that creates an install program for a dist
 
 use Moose::Role;
@@ -7,13 +7,7 @@ with qw(
   Dist::Zilla::Role::FileInjector
 );
 
-# BEGIN BOILERPLATE
-use v5.20.0;
-use warnings;
-use utf8;
-no feature 'switch';
-use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
-# END BOILERPLATE
+use Dist::Zilla::Pragmas;
 
 use namespace::autoclean;
 
@@ -44,7 +38,7 @@ Dist::Zilla::Role::InstallTool - something that creates an install program for a
 
 =head1 VERSION
 
-version 6.025
+version 6.027
 
 =head1 DESCRIPTION
 
@@ -69,7 +63,7 @@ the minimum required perl.
 
 =head1 AUTHOR
 
-Ricardo SIGNES 😏 <rjbs@semiotic.systems>
+Ricardo SIGNES 😏 <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

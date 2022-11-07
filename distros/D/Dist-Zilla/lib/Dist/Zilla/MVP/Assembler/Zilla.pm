@@ -1,16 +1,10 @@
-package Dist::Zilla::MVP::Assembler::Zilla 6.025;
+package Dist::Zilla::MVP::Assembler::Zilla 6.027;
 # ABSTRACT: Dist::Zilla::MVP::Assembler for the Dist::Zilla object
 
 use Moose;
 extends 'Dist::Zilla::MVP::Assembler';
 
-# BEGIN BOILERPLATE
-use v5.20.0;
-use warnings;
-use utf8;
-no feature 'switch';
-use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
-# END BOILERPLATE
+use Dist::Zilla::Pragmas;
 
 use namespace::autoclean;
 
@@ -90,7 +84,7 @@ Dist::Zilla::MVP::Assembler::Zilla - Dist::Zilla::MVP::Assembler for the Dist::Z
 
 =head1 VERSION
 
-version 6.025
+version 6.027
 
 =head1 OVERVIEW
 
@@ -133,7 +127,7 @@ is already taken, in which case an exception is raised.
 
 =head1 AUTHOR
 
-Ricardo SIGNES 😏 <rjbs@semiotic.systems>
+Ricardo SIGNES 😏 <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

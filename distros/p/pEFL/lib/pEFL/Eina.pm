@@ -33,26 +33,26 @@ EINA_FALSE
 
 
 sub AUTOLOAD {
-    # This AUTOLOAD is used to 'autoload' constants from the constant()
-    # XS function.
+	# This AUTOLOAD is used to 'autoload' constants from the constant()
+	# XS function.
 
-    my $constname;
-    our $AUTOLOAD;
-    ($constname = $AUTOLOAD) =~ s/.*:://;
-    croak "&Callback::constant not defined" if $constname eq 'constant';
-    my ($error, $val) = constant($constname);
-    if ($error) { croak $error; }
-    {
+	my $constname;
+	our $AUTOLOAD;
+	($constname = $AUTOLOAD) =~ s/.*:://;
+	croak "&Callback::constant not defined" if $constname eq 'constant';
+	my ($error, $val) = constant($constname);
+	if ($error) { croak $error; }
+	{
 	no strict 'refs';
 	# Fixed between 5.005_53 and 5.005_61
 #XXX	if ($] >= 5.00561) {
-#XXX	    *$AUTOLOAD = sub () { $val };
+#XXX		*$AUTOLOAD = sub () { $val };
 #XXX	}
 #XXX	else {
-	    *$AUTOLOAD = sub { $val };
+		*$AUTOLOAD = sub { $val };
 #XXX	}
-    }
-    goto &$AUTOLOAD;
+	}
+	goto &$AUTOLOAD;
 }
 
 require XSLoader;
@@ -61,17 +61,17 @@ XSLoader::load('pEFL::Eina');
 # Preloaded methods go here.
 
 sub list2array {
-    my ($list,$class) = @_;
-    my @array = ();
-    return @array if (!defined($list));
-    my $count = $list->count;
-    my $i;
-    for ($i = 0; $i < $count; $i++) {
-        my $item = $list->nth($i);
-        $item = pEFL::PLSide::int2blessedref($item,$class);
-        push @array,$item;
-    }
-    return @array;
+	my ($list,$class) = @_;
+	my @array = ();
+	return @array if (!defined($list));
+	my $count = $list->count;
+	my $i;
+	for ($i = 0; $i < $count; $i++) {
+		my $item = $list->nth($i);
+		$item = pEFL::PLSide::int2blessedref($item,$class);
+		push @array,$item;
+	}
+	return @array;
 }
 
 1;

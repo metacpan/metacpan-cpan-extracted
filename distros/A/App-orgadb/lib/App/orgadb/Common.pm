@@ -6,9 +6,9 @@ use warnings;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-17'; # DATE
+our $DATE = '2022-11-04'; # DATE
 our $DIST = 'App-orgadb'; # DIST
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 sub _heading_from_line {
     my $heading = shift;
@@ -454,6 +454,10 @@ _
     num_fields => {
         summary => 'Specify maximum number of fields (per entry) to return (0 means unlimited)',
         schema => 'uint*',
+        cmdline_aliases => {
+            n=>{},
+            1 => {is_flag=>1, summary=>'Shortcut for --num-fields=1', code=>sub { $_[0]{num_fields} = 1 }},
+        },
         tags => ['category:output'],
     },
 
@@ -495,7 +499,7 @@ App::orgadb::Common
 
 =head1 VERSION
 
-This document describes version 0.014 of App::orgadb::Common (from Perl distribution App-orgadb), released on 2022-10-17.
+This document describes version 0.015 of App::orgadb::Common (from Perl distribution App-orgadb), released on 2022-11-04.
 
 =head1 HOMEPAGE
 

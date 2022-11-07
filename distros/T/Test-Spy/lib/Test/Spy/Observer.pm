@@ -1,5 +1,5 @@
 package Test::Spy::Observer;
-$Test::Spy::Observer::VERSION = '0.004';
+$Test::Spy::Observer::VERSION = '0.005';
 use v5.10;
 use strict;
 use warnings;

@@ -1,16 +1,10 @@
-package Dist::Zilla::Role::MetaProvider 6.025;
+package Dist::Zilla::Role::MetaProvider 6.027;
 # ABSTRACT: something that provides metadata (for META.yml/json)
 
 use Moose::Role;
 with 'Dist::Zilla::Role::Plugin';
 
-# BEGIN BOILERPLATE
-use v5.20.0;
-use warnings;
-use utf8;
-no feature 'switch';
-use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
-# END BOILERPLATE
+use Dist::Zilla::Pragmas;
 
 use namespace::autoclean;
 
@@ -40,7 +34,7 @@ Dist::Zilla::Role::MetaProvider - something that provides metadata (for META.yml
 
 =head1 VERSION
 
-version 6.025
+version 6.027
 
 =head1 DESCRIPTION
 
@@ -77,7 +71,7 @@ L<GithubMeta|Dist::Zilla::Plugin::GithubMeta>...
 
 =head1 AUTHOR
 
-Ricardo SIGNES 😏 <rjbs@semiotic.systems>
+Ricardo SIGNES 😏 <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

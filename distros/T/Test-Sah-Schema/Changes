@@ -1,3 +1,21 @@
+0.015   2022-11-04  Released-By: PERLANCAR; Urgency: medium
+
+        - Chain bumping prereq Log::ger::App=0.024 to bump prereq
+          Log::ger::Output::Composite=0.016 to comply with Log::ger 0.037+
+          (RT#136716).
+
+
+0.014   2022-09-25  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Note schema that has extras for debugging.
+
+
+0.013   2022-08-25  Released-By: PERLANCAR; Urgency: medium
+
+        - Do not require arguments in wrapped sub, to allow testing for
+          undef.
+
+
 0.012   2022-07-17  Released-By: PERLANCAR; Urgency: low
 
         - sort files.

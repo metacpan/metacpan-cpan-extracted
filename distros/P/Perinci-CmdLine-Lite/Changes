@@ -1,3 +1,8 @@
+1.926   2022-11-04  Released-By: PERLANCAR; Urgency: medium
+
+        - Fix typo in POD usage of --help.
+
+
 1.925   2022-10-19  Released-By: PERLANCAR; Urgency: medium
 
         - Warn multiple cmdline instances in a single process.

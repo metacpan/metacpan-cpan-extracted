@@ -19,21 +19,21 @@ ok ($found, "found $found routes for AS5650");
 can_ok($i, "get_ipv6_routes_by_origin");
 
 can_ok($i, "get_as_set");
-if (my @ases = $i->get_as_set("AS-ELI", 1)) {
+if (my @ases = $i->get_as_set("AS-FRONTIER", 1)) {
     my $found = scalar @ases;
-    ok ($found, "found $found ASNs in the AS-ELI AS set. (1)");
+    ok ($found, "found $found ASNs in the AS-FRONTIER AS set. (1)");
 }
 else {
-    fail('no ASNs found in the AS-ELI AS set (1)');
+    fail('no ASNs found in the AS-FRONTIER AS set (1)');
 }
 
 can_ok($i, "get_route_set");
-if (my @ases = $i->get_route_set("AS-ELI", 1)) {
+if (my @ases = $i->get_route_set("AS-FRONTIER", 1)) {
     my $found = scalar @ases;
-    ok ($found, "found $found ASNs in the AS-ELI AS set (2).");
+    ok ($found, "found $found ASNs in the AS-FRONTIER AS set (2).");
 }
 else {
-    fail('no ASNs found in the AS-ELI AS set (2)');
+    fail('no ASNs found in the AS-FRONTIER AS set (2)');
 }
 
 can_ok($i, "match");

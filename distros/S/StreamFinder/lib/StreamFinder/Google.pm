@@ -4,7 +4,7 @@ StreamFinder::Google - Fetch actual raw streamable podcast URLs on google.com
 
 =head1 AUTHOR
 
-This module is Copyright (C) 2021 by
+This module is Copyright (C) 2021-2022 by
 
 Jim Turner, C<< <turnerjw784 at yahoo.com> >>
 		
@@ -180,6 +180,10 @@ on Google usually have separate long-descriptions.
 
 Returns the URL for the podcast's "cover art" icon image, if any.
 
+NOTE:  For Google podcasts, the podcast episode's icon will always be the 
+podcast's icon (the "channel icon"), as Google does not provide for icons 
+for individual episodes.
+
 =item $podcast->B<getIconData>()
 
 Returns a two-element array consisting of the extension (ie. "png", 
@@ -295,7 +299,7 @@ L<http://search.cpan.org/dist/StreamFinder-Google/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2021 Jim Turner.
+Copyright 2021-2022 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

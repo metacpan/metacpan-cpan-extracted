@@ -1,29 +1,33 @@
 ---
-name: Scope-OnExit
-version: 0.02
+abstract: 'DEPRECATED Running code on scope exit'
 author:
-  - 'Leon Timmermans <leont@cpan.org>'
-abstract: Running code on scope exit
-license: perl
-resources:
-  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Scope-OnExit
-  license: http://dev.perl.org/licenses/
-configure_requires:
-  Module::Build: 0
-requires:
-  perl: 5.006
+  - 'Leon Timmermans <fawaka@gmail.com>'
 build_requires:
-  ExtUtils::CBuilder: 0
-  Module::Build: 0
-  Test::More: 0
+  Module::Build: '0.28'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Scope-OnExit
 provides:
   Scope::OnExit:
     file: lib/Scope/OnExit.pm
-    version: 0.02
-generated_by: Module::Build version 0.280801
-meta-spec:
-  url: http://module-build.sourceforge.net/META-spec-v1.2.html
-  version: 1.2
-keywords:
-  - scope
-  - end
+    version: '0.03'
+requires:
+  Exporter: '5.57'
+  XSLoader: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/Leont/scope-onexit/issues
+  homepage: http://search.cpan.org/~leont/Scope-OnExit/
+  repository: git://github.com/Leont/scope-onexit.git
+version: '0.03'
+x_generated_by_perl: v5.36.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

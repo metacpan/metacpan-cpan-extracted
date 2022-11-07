@@ -74,9 +74,12 @@ service is considered stopped and is assumed to not consume any resources.
 Processes will first be terminated via C<SIGTERM> (unless the signal to send
 is changed via C<KillSignal> or C<RestartKillSignal>). Optionally,
 this is immediately followed by a C<SIGHUP> (if enabled with
-C<SendSIGHUP>). If processes still remain after the main process of a unit has
-exited or the delay configured via the C<TimeoutStopSec> has passed, the termination
-request is repeated with the C<SIGKILL> signal or the signal specified via
+C<SendSIGHUP>). If processes still remain after:
+the main process of a unit has exited (applies to C<KillMode>:
+C<mixed>)the delay configured via the C<TimeoutStopSec> has passed
+(applies to C<KillMode>: C<control-group>, C<mixed>,
+C<process>)
+the termination request is repeated with the C<SIGKILL> signal or the signal specified via
 C<FinalKillSignal> (unless this is disabled via the C<SendSIGKILL>
 option). See L<kill(2)>
 for more information.
@@ -168,7 +171,7 @@ C<WatchdogSec>). Defaults to C<SIGABRT>.
         'value_type' => 'uniline'
       }
     ],
-    'generated_by' => 'parse-man.pl from systemd 250 doc',
+    'generated_by' => 'parse-man.pl from systemd 252 doc',
     'license' => 'LGPLv2.1+',
     'name' => 'Systemd::Common::Kill'
   }

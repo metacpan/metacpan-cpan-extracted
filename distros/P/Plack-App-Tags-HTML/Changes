@@ -1,3 +1,6 @@
+0.09 2022-11-03T21:36:40+01:00
+ - API change: Add 'data_init' accessor.
+
 0.08 2022-10-20T11:15:43+02:00
  - API change: Add 'data_css' accessor.
  - Regen README file.

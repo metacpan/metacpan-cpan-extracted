@@ -1,5 +1,17 @@
 Revision history for Firefox-Marionette
 
+1.31  Mon Nov 07 20:43 2022
+       Fixing taint test suite failures in github actions 
+
+1.30  Mon Nov 07 16:26 2022
+       Fixing test suite for FreeBSD by adding /usr/local/bin to PATH
+
+1.29  Sun Nov 06 15:55 2022
+       Adding wheel, scroll, is_trusted, uname method
+       Adding support for remotely opening profiles by name
+       Adding --issuer-organization, --trusted-only and --profile-name options to ./ca-bundle-for-firefox
+       Hiding bookmarks toolbar
+
 1.28  Mon Jun 13 11:54 2022
        Adding ./setup-for-firefox-marionette-build.sh to remove the snap firefox for Ubuntu 22.04 TLS.
 

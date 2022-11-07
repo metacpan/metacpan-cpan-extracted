@@ -1,0 +1,144 @@
+class TestCase::Sys::Signal {
+  use Sys::Signal;
+  use Sys::Signal::Constant as SIGNAL;
+  use Sys::Process;
+  use Sys;
+  
+  static method kill : int () {
+    
+    my $status = Sys::Signal->kill(0, 0);
+    
+    unless ($status == 0) {
+      return 0;
+    }
+    
+    return 1;
+  }
+
+  static method raise : int () {
+    
+    my $status = Sys::Signal->raise(0);
+    
+    unless ($status == 0) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  
+  
+  static method alarm : int () {
+    
+    Sys::Signal->reset_monitored_signal(SIGNAL->SIGALRM);
+    
+    Sys::Signal->signal(SIGNAL->SIGALRM, Sys::Signal->SIG_MONITOR);
+    
+    my $rest = Sys::Signal->alarm(1);
+    
+    unless ($rest == 0) {
+      return 0;
+    }
+    
+    while (1) {
+      if (Sys::Signal->check_monitored_signal(SIGNAL->SIGALRM)) {
+        last;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method ualarm : int () {
+
+    Sys::Signal->reset_monitored_signal(SIGNAL->SIGALRM);
+
+    Sys::Signal->signal(SIGNAL->SIGALRM, Sys::Signal->SIG_MONITOR);
+    
+    my $rest = Sys::Signal->ualarm(999_999, 0);
+    
+    unless ($rest == 0) {
+      return 0;
+    }
+    
+    my $try_count = 0;
+    while (1) {
+      if (Sys::Signal->check_monitored_signal(SIGNAL->SIGALRM)) {
+        last;
+      }
+      $try_count++;
+    }
+    
+    return 1;
+  }
+
+  static method signal_handler : int () {
+    unless (Sys::Signal->SIG_DFL == Sys::Signal->SIG_DFL) {
+      return 0;
+    }
+    
+    unless (Sys::Signal->SIG_IGN == Sys::Signal->SIG_IGN) {
+      return 0;
+    }
+    
+    unless (Sys::Signal->SIG_MONITOR == Sys::Signal->SIG_MONITOR) {
+      return 0;
+    }
+    
+    return 1;
+  }
+
+  static method signal_return : int () {
+    # Return value
+    {
+      {
+        Sys::Signal->signal(SIGNAL->SIGINT, Sys::Signal->SIG_DFL);
+      }
+      
+      {
+        my $old_handler = Sys::Signal->signal(SIGNAL->SIGINT, Sys::Signal->SIG_IGN);
+        
+        unless ($old_handler == Sys::Signal->SIG_DFL) {
+          return 0;
+        }
+      }
+      {
+        my $old_handler = Sys::Signal->signal(SIGNAL->SIGINT, Sys::Signal->SIG_MONITOR);
+        
+        unless ($old_handler == Sys::Signal->SIG_IGN) {
+          return 0;
+        }
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method signal : int () {
+    # signal
+    {
+      {
+        unless (Sys::Signal->check_monitored_signal(SIGNAL->SIGTERM) == 0) {
+          return 0;
+        }
+        
+        Sys::Signal->signal(SIGNAL->SIGTERM, Sys::Signal->SIG_MONITOR);
+        
+        Sys::Signal->raise(SIGNAL->SIGTERM);
+        
+        while (1) {
+          if (Sys::Signal->check_monitored_signal(SIGNAL->SIGTERM)) {
+            last;
+          }
+        }
+        
+        Sys::Signal->reset_monitored_signal(SIGNAL->SIGTERM);
+        
+        unless (Sys::Signal->check_monitored_signal(SIGNAL->SIGTERM) == 0) {
+          return 0;
+        }
+      }
+    }
+    
+    return 1;
+  }
+}

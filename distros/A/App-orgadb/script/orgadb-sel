@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-17'; # DATE
+our $DATE = '2022-11-04'; # DATE
 our $DIST = 'App-orgadb'; # DIST
-our $VERSION = '0.014'; # VERSION
+our $VERSION = '0.015'; # VERSION
 
 use Perinci::CmdLine::Any;
 
@@ -35,11 +35,11 @@ orgadb-sel - Select entries and fields from Org addressbook
 
 =head1 VERSION
 
-This document describes version 0.014 of orgadb-sel (from Perl distribution App-orgadb), released on 2022-10-17.
+This document describes version 0.015 of orgadb-sel (from Perl distribution App-orgadb), released on 2022-11-04.
 
 =head1 SYNOPSIS
 
-B<B<orgadb-sel>> [L<--category|/"--category=s, -c">=L<str_or_re|Sah::Schema::str_or_re>|L<-c|/"--category=s, -c">=L<str_or_re|Sah::Schema::str_or_re>] [L<--clipboard|/"-y">=I<str>|L<-Y|/"-y">|L<--clipboard-only|/"-y">|L<-y|/"-y">] [L<--color-theme|/"--color-theme=s">=L<perl::colortheme::modname_with_optional_args|Sah::Schema::perl::colortheme::modname_with_optional_args>] [L<--color|/"--color=s">=I<str>] [(L<--config-path|/"--config-path=s">=I<path>)+|L<--no-config|/"--no-config">] [L<--config-profile|/"--config-profile=s, -P">=I<profile>|L<-P|/"--config-profile=s, -P">] [L<--count|/"--count">] [L<--debug|/"--debug">|L<--log-level|/"--log-level=s">=I<level>|L<--quiet|/"--quiet">|L<--trace|/"--trace">|L<--verbose|/"--verbose">] [L<--detail|/"--detail, -l">|L<-l|/"--detail, -l">|L<--no-detail|/"--detail, -l">|L<--nodetail|/"--detail, -l">] [L<--field-value-formatter-rules|/"--field-value-formatter-rules=s">=I<hash>] [(L<--field-value-formatter|/"--remove-whitespaces">=I<str>)+|(L<-f|/"--remove-whitespaces">=I<str>)+|L<--format-phone|/"--remove-whitespaces">|(L<--fvfmt|/"--remove-whitespaces">=I<str>)+|L<--remove-comments|/"--remove-whitespaces">|L<--remove-nondigits|/"--remove-whitespaces">|L<--remove-whitespaces|/"--remove-whitespaces">] [(L<--field|/"--field=s@">=L<str_or_re|Sah::Schema::str_or_re>)+] [(L<--file|/"--file=s@">=L<filename|Sah::Schema::filename>)+] [(L<--filter-entries-by-field|/"--filter-entries-by-field=s@">=I<str>)+] [L<--format|/"--format=s">=I<name>|L<--json|/"--json">] [L<--hide-category|/"--hide-category, -C">|L<-C|/"--hide-category, -C">] [L<--hide-entry|/"--hide-entry, -E">|L<-E|/"--hide-entry, -E">] [L<--hide-field-name|/"--hide-field-name, -N">|L<-N|/"--hide-field-name, -N">] [L<--(no)naked-res|/"--naked-res">] [L<--no-env|/"--no-env">] [L<--no-field-value-formatters|/"--no-field-value-formatters, --raw-field-values, -F">|L<-F|/"--no-field-value-formatters, --raw-field-values, -F">|L<--raw-field-values|/"--no-field-value-formatters, --raw-field-values, -F">] [L<--num-entries|/"--num-entries=s">=L<uint|Sah::Schema::uint>] [L<--num-fields|/"--num-fields=s">=L<uint|Sah::Schema::uint>] [L<--page-result|/"--page-result">[=I<program>]|L<--view-result|/"--view-result">[=I<program>]] [L<--reload-files-on-change|/"--no-reload-files-on-change">|L<--no-reload-files-on-change|/"--no-reload-files-on-change">|L<--noreload-files-on-change|/"--no-reload-files-on-change">] [L<--shell|/"--shell, -s">|L<-s|/"--shell, -s">] -- [L<entry|/"--entry=s">] [L<field|/"--field=s@">] ...
+B<B<orgadb-sel>> [L<--category|/"--category=s, -c">=L<str_or_re|Sah::Schema::str_or_re>|L<-c|/"--category=s, -c">=L<str_or_re|Sah::Schema::str_or_re>] [L<--clipboard|/"-y">=I<str>|L<-Y|/"-y">|L<--clipboard-only|/"-y">|L<-y|/"-y">] [L<--color-theme|/"--color-theme=s">=L<perl::colortheme::modname_with_optional_args|Sah::Schema::perl::colortheme::modname_with_optional_args>] [L<--color|/"--color=s">=I<str>] [(L<--config-path|/"--config-path=s">=I<path>)+|L<--no-config|/"--no-config">] [L<--config-profile|/"--config-profile=s, -P">=I<profile>|L<-P|/"--config-profile=s, -P">] [L<--count|/"--count">] [L<--debug|/"--debug">|L<--log-level|/"--log-level=s">=I<level>|L<--quiet|/"--quiet">|L<--trace|/"--trace">|L<--verbose|/"--verbose">] [L<--detail|/"--detail, -l">|L<-l|/"--detail, -l">|L<--no-detail|/"--detail, -l">|L<--nodetail|/"--detail, -l">] [L<--field-value-formatter-rules|/"--field-value-formatter-rules=s">=I<hash>] [(L<--field-value-formatter|/"--remove-whitespaces">=I<str>)+|(L<-f|/"--remove-whitespaces">=I<str>)+|L<--format-phone|/"--remove-whitespaces">|(L<--fvfmt|/"--remove-whitespaces">=I<str>)+|L<--remove-comments|/"--remove-whitespaces">|L<--remove-nondigits|/"--remove-whitespaces">|L<--remove-whitespaces|/"--remove-whitespaces">] [(L<--field|/"--field=s@">=L<str_or_re|Sah::Schema::str_or_re>)+] [(L<--file|/"--file=s@">=L<filename|Sah::Schema::filename>)+] [(L<--filter-entries-by-field|/"--filter-entries-by-field=s@">=I<str>)+] [L<--format|/"--format=s">=I<name>|L<--json|/"--json">] [L<--hide-category|/"--hide-category, -C">|L<-C|/"--hide-category, -C">] [L<--hide-entry|/"--hide-entry, -E">|L<-E|/"--hide-entry, -E">] [L<--hide-field-name|/"--hide-field-name, -N">|L<-N|/"--hide-field-name, -N">] [L<--(no)naked-res|/"--naked-res">] [L<--no-env|/"--no-env">] [L<--no-field-value-formatters|/"--no-field-value-formatters, --raw-field-values, -F">|L<-F|/"--no-field-value-formatters, --raw-field-values, -F">|L<--raw-field-values|/"--no-field-value-formatters, --raw-field-values, -F">] [L<--num-entries|/"--num-entries=s">=L<uint|Sah::Schema::uint>] [L<--num-fields|/"--num-fields=s, -n">=L<uint|Sah::Schema::uint>|L<-1|/"--num-fields=s, -n">|L<-n|/"--num-fields=s, -n">=L<uint|Sah::Schema::uint>] [L<--page-result|/"--page-result">[=I<program>]|L<--view-result|/"--view-result">[=I<program>]] [L<--reload-files-on-change|/"--no-reload-files-on-change">|L<--no-reload-files-on-change|/"--no-reload-files-on-change">|L<--noreload-files-on-change|/"--no-reload-files-on-change">] [L<--shell|/"--shell, -s">|L<-s|/"--shell, -s">] -- [L<entry|/"--entry=s">] [L<field|/"--field=s@">] ...
 
 First, create a configuration file F<~/.config/orgadb.conf> containing something
 like the following (use INI syntax, or L<IOD> to be more exact):
@@ -321,7 +321,7 @@ level is where you put all your entries. Fields are written in description list.
 
 =head2 Aliasing orgadb-sel to a shorter command name
 
-If you are like me and you select from addressbook a lot, you might want to
+If you are like me and you select from addressbooks a lot, you might want to
 alias C<orgadb-sel> to a shorter name, e.g. C<sel>. To do this, create this
 script somewhere in your PATH:
 
@@ -343,7 +343,7 @@ type:
 
  % orgadb-sel --category <tab>        ;# see what categories are available
  % orgadb-sel lis<tab>                ;# complete with entries matching 'lis'
- % orgadb-sel lisa <tab>              ;# complete with available fields or /lisa/ entries
+ % orgadb-sel lisa <tab>              ;# complete with available fields of /lisa/ entries
 
 =head2 Using field formatters
 
@@ -366,6 +366,15 @@ selecting matching fields:
  % orgadb-sel lisa phone
 
 To disable formatters, use C<--no-formatters> (C<-F>).
+
+=head2 Copying to clipboard
+
+Instead of manually copy-pasting the result of C<orgadb-sel> using your mouse in
+the terminal and pasting to other GUI application (like LibreOffice Writer/Calc,
+WhatsApp Web in Firefox, or whatever), you can instruct C<orgadb-sel> to copy to
+clipboard for you:
+
+ % orgadb-sel -c lisa phone
 
 =head1 OPTIONS
 
@@ -636,7 +645,10 @@ Mnemonic for short option C<-y> and C<-Y>: I<y>ank as in Emacs (C<C-y>).
 
 =item B<--detail>, B<-l>
 
-(No description)
+Instead of showing matching field values, display the whole entry.
+
+Mnemonic for shortcut option C<-l>: the option C<-l> is usually used for the short
+version of C<--detail>, as in I<ls> Unix command.
 
 
 =item B<--field-value-formatter-rules-json>=I<s>
@@ -659,19 +671,22 @@ The rules are best specified in the configuration as opposed to on the
 command-line option. An example (the lines below are writen in configuration
 file in IOD syntax, as rows of JSON hashes):
 
- ; by default remove all comments in field values when 'hide_field_name'
- ; option is set (which usually means we want to copy paste things)
+ ; remove all comments in field values when 'hide_field_name' option is set
+ ; (which usually means we want to copy paste things)
+ 
  field_value_formatter_rules={"hide_field_name":true, "formatters":[ ["Str::remove_comment"] ]}
  
- ; by default normalize phone numbers using Phone::format_phone_idn_nospace
- ; when 'hide_field_name' option is set (which usually means we want to copy
- ; paste things). e.g. '0812-1234-5678' becomes '+6281212345678'.
- field_value_formatter_rules={"field_name_matches":"/phone|wa|whatsapp/i", "hide_field_name":true, "formatters":[ ["Phone::format_phone_idn_nospace"] ]}
+ ; normalize phone numbers using Phone::format + Str::remove_whitespace when
+ ; 'hide_field_name' option is set (which usually means we want to copy paste
+ ; things). e.g. '0812-1234-5678' becomes '+6281212345678'.
+ 
+ field_value_formatter_rules={"field_name_matches":"/phone|wa|whatsapp/i", "hide_field_name":true, "formatters":[ ["Phone::format", "Str::remove_whitespace"] ]}
  
  ; but if 'hide_field_name' field is not set, normalize phone numbers using
- ; Phone::format_phone_idn which is more easier to see (e.g. '+62 812 1234
- ; 5678').
- field_value_formatter_rules={"field_name_matches":"/phone|wa|whatsapp/i", "hide_field_name":false, "formatters":[ ["Phone::format_phone_idn"] ]}
+ ; Phone::format without removing whitespaces, which is easier to see (e.g.
+ ; '+62 812 1234 5678').
+ 
+ field_value_formatter_rules={"field_name_matches":"/phone|wa|whatsapp/i", "hide_field_name":false, "formatters":[ ["Phone::format"] ]}
 
 Condition keys:
 
@@ -727,6 +742,12 @@ Add one or more formatters to display field value (JSON-encoded).
 
 See C<--field-value-formatter>.
 
+=item B<--format-phone>
+
+Shortcut for --field-value-formatter Phone::format.
+
+See C<--field-value-formatter>.
+
 =item B<--format>=I<s>
 
 Choose output format, e.g. json, text.
@@ -752,6 +773,10 @@ Do not show entry headline.
 =item B<--hide-field-name>, B<-N>
 
 Do not show field names, just show field values.
+
+Mnemonic for short option C<-N>: field I<N>ame (uppercase letter usually means
+/no/).
+
 
 =item B<--json>
 
@@ -802,6 +827,24 @@ Filter output through a pager.
 This option will pipe the output to a specified pager program. If pager program
 is not specified, a suitable default e.g. C<less> is chosen.
 
+
+=item B<--remove-comments>
+
+Shortcut for --field-value-formatter Str::remove_comment.
+
+See C<--field-value-formatter>.
+
+=item B<--remove-nondigits>
+
+Shortcut for --field-value-formatter Str::remove_nondigit.
+
+See C<--field-value-formatter>.
+
+=item B<--remove-whitespaces>
+
+Shortcut for --field-value-formatter Str::remove_whitespaces.
+
+See C<--field-value-formatter>.
 
 =item B<--view-result>
 

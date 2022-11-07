@@ -1,0 +1,167 @@
+class Sys::Signal::Constant {
+  native static method BUS_ADRALN : int ();
+
+  native static method BUS_ADRERR : int ();
+
+  native static method BUS_MCEERR_AO : int ();
+
+  native static method BUS_MCEERR_AR : int ();
+
+  native static method BUS_MCERR_ : int ();
+
+  native static method BUS_OBJERR : int ();
+
+  native static method CLD_CONTINUED : int ();
+
+  native static method CLD_DUMPED : int ();
+
+  native static method CLD_EXITED : int ();
+
+  native static method CLD_KILLED : int ();
+
+  native static method CLD_STOPPED : int ();
+
+  native static method CLD_TRAPPED : int ();
+
+  native static method FPE_FLTDIV : int ();
+
+  native static method FPE_FLTINV : int ();
+
+  native static method FPE_FLTOVF : int ();
+
+  native static method FPE_FLTRES : int ();
+
+  native static method FPE_FLTSUB : int ();
+
+  native static method FPE_FLTUND : int ();
+
+  native static method FPE_INTDIV : int ();
+
+  native static method FPE_INTOVF : int ();
+
+  native static method FUTEX_WAIT : int ();
+
+  native static method ILL_BADSTK : int ();
+
+  native static method ILL_COPROC : int ();
+
+  native static method ILL_ILLADR : int ();
+
+  native static method ILL_ILLOPC : int ();
+
+  native static method ILL_ILLOPN : int ();
+
+  native static method ILL_ILLTRP : int ();
+
+  native static method ILL_PRVOPC : int ();
+
+  native static method ILL_PRVREG : int ();
+
+  native static method POLL_ERR : int ();
+
+  native static method POLL_HUP : int ();
+
+  native static method POLL_IN : int ();
+
+  native static method POLL_MSG : int ();
+
+  native static method POLL_OUT : int ();
+
+  native static method POLL_PRI : int ();
+
+  native static method SI_ASYNCIO : int ();
+
+  native static method SI_KERNEL : int ();
+
+  native static method SI_MESGQ : int ();
+
+  native static method SI_QUEUE : int ();
+
+  native static method SI_SIGIO : int ();
+
+  native static method SI_TIMER : int ();
+
+  native static method SI_TKILL : int ();
+
+  native static method SI_USER : int ();
+
+  native static method TRAP_BRANCH : int ();
+
+  native static method TRAP_BRKPT : int ();
+
+  native static method TRAP_HWBKPT : int ();
+
+  native static method TRAP_TRACE : int ();
+
+  native static method SIGABRT : int ();
+
+  native static method SIGALRM : int ();
+
+  native static method SIGBUS : int ();
+
+  native static method SIGCHLD : int ();
+
+  native static method SIGCONT : int ();
+
+  native static method SIGFPE : int ();
+
+  native static method SIGHUP : int ();
+
+  native static method SIGILL : int ();
+
+  native static method SIGINT : int ();
+
+  native static method SIGIO : int ();
+
+  native static method SIGKILL : int ();
+
+  native static method SIGPIPE : int ();
+
+  native static method SIGPROF : int ();
+
+  native static method SIGPWR : int ();
+
+  native static method SIGQUIT : int ();
+
+  native static method SIGRTMAX : int ();
+
+  native static method SIGRTMIN : int ();
+
+  native static method SIGSEGV : int ();
+
+  native static method SIGSTKFLT : int ();
+
+  native static method SIGSTOP : int ();
+
+  native static method SIGSYS : int ();
+
+  native static method SIGTERM : int ();
+
+  native static method SIGTRAP : int ();
+
+  native static method SIGTSTP : int ();
+
+  native static method SIGTTIN : int ();
+
+  native static method SIGTTOU : int ();
+
+  native static method SIGURG : int ();
+
+  native static method SIGUSR1 : int ();
+
+  native static method SIGUSR2 : int ();
+
+  native static method SIGVTALRM : int ();
+
+  native static method SIGWINCH : int ();
+
+  native static method SIGXCPU : int ();
+
+  native static method SIGXFSZ : int ();
+
+  native static method SIG_DFL : int ();
+
+  native static method SIG_ERR : int ();
+
+  native static method SIG_IGN : int ();
+}

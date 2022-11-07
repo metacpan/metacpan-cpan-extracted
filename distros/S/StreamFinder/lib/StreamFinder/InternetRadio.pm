@@ -293,7 +293,7 @@ L<http://search.cpan.org/dist/StreamFinder-InternetRadio/>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2017-2021 Jim Turner.
+Copyright 2022 Jim Turner.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a
@@ -363,7 +363,7 @@ sub new
 		}
 	}
 
-	(my $url2fetch = $url);
+	my $url2fetch = $url;
 	if ($url =~ /^https?\:/) {
 		$self->{'id'} = $1  if ($url2fetch =~ m#\/([^\/]+)\/?$#);
 	} else {
@@ -380,14 +380,11 @@ sub new
 	my $response = $ua->get($url2fetch);
 	if ($response->is_success) {
 		$html = $response->decoded_content;
-print STDERR "--SUCCESS!\n"  if ($DEBUG);
 	} else {
 		my $server_error = $response->status_line;
 		print STDERR "f:${server_error}\n"  if ($DEBUG);
-		my $no_wget = system('wget','-V');
 	}
 	print STDERR "-1: html=$html=\n"  if ($DEBUG > 1);
-print STDERR "--NO HTML, PUNT!\n"  unless ($html);
 	return undef  unless ($html);  #STEP 1 FAILED, INVALID STATION URL, PUNT!
 
 	$self->{'title'} = $1  if ($html =~ m#\<(?:h1|title)\>([^\<]+)#si);
@@ -398,13 +395,11 @@ print STDERR "--NO HTML, PUNT!\n"  unless ($html);
 			$self->{'genre'} =~ s/ $//;
 			$self->{'genre'} .= ', ';
 		}
-		while ($goodpart =~ s#\'startpage\'\,\s*\'([^\']+)\'\)\;##s) {
+		while ($goodpart =~ s#\'startpage\'\,\s*\'([^\']+)\'\)\;##so) {
 			my $one = $1;
-print STDERR "----ONE=$one=\n"  if ($DEBUG);
 			$self->{'genre'} .= $one . ', '  unless ($one =~ m#[\:\/\;]#o);
 		}
 		$self->{'genre'} =~ s/\, $//  if ($self->{'genre'});
-print STDERR "-GENRE=".$self->{'genre'}."=\n-goodpart left=$goodpart=\n";
 	}
 	if ($html =~ m#\<br\>Website\s*\:\s*(.+?)\<\/div\>#s) {
 		my $goodpart = $1;
@@ -414,8 +409,9 @@ print STDERR "-GENRE=".$self->{'genre'}."=\n-goodpart left=$goodpart=\n";
 	$self->{'description'} = $self->{'title'};  #Internet-radio.com DOES NOT PROVIDE ICONS OR DESCRIPTIONS!
 	$self->{'title'} =~ s#\s*\-\s*Internet Radio##;
 
+	#TRY TO FETCH THE STREAMS:
 	my %streamHash = ();  #PREVENT DUPLICATES.
-	while ($html =~ s#\,\s*\'play\w+\'\,\s*\'(http[^\']+)##s) {
+	while ($html =~ s#\,\s*\'play\w+\'\,\s*\'(http[^\']+)##so) {
 		my $stream = $1;
 		$stream =~ s/\.(pls|m3u)[\?\&].+$/\.$1/  unless ($self->{'notrim'});   #STRIP OFF EXTRA GARBAGE PARMS, COMMENT OUT IF STARTS FAILING!
 		unless ($self->{'secure'} && $stream !~ /^https/o) {

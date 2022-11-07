@@ -2,7 +2,7 @@
 #
 use v5.12;
 use warnings;
-use Test::More tests => 310;
+use Test::More tests => 313;
 use Test::Warn;
 
 BEGIN { unshift @INC, 'lib', '../lib'}
@@ -367,6 +367,12 @@ is( $g[1]->saturation-4,                    $g[0]->saturation,   "saturation mov
 is( $g[1]->saturation+4,                    $g[2]->saturation,   "saturation moves on odd and skewed circle as predicted back");
 is( $g[1]->lightness -8,                     $g[0]->lightness,   "lightness moves on odd and skewed circle as predicted fore");
 is( $g[1]->lightness +8,                     $g[2]->lightness,   "lightness moves on odd and skewed circle as predicted back");
+
+my $recursive = Graphics::Toolkit::Color->new( $red );
+is(  ref $recursive,                                  $module,   "recursive constructor option works");
+ok(  $recursive != $red,                                         "recursive constructor produced object is new");
+is(  $recursive->name,                                  'red',   "recursive constructor produced correct onject");
+
 
 eval "color('blue')";
 is( substr($@, 0, 20),  'Undefined subroutine', 'sub not there when not imported');

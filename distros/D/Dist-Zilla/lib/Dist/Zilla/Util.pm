@@ -1,13 +1,7 @@
-package Dist::Zilla::Util 6.025;
+package Dist::Zilla::Util 6.027;
 # ABSTRACT: random snippets of code that Dist::Zilla wants
 
-# BEGIN BOILERPLATE
-use v5.20.0;
-use warnings;
-use utf8;
-no feature 'switch';
-use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
-# END BOILERPLATE
+use Dist::Zilla::Pragmas;
 
 use Carp ();
 use Encode ();
@@ -179,7 +173,7 @@ Dist::Zilla::Util - random snippets of code that Dist::Zilla wants
 
 =head1 VERSION
 
-version 6.025
+version 6.027
 
 =head1 PERL VERSION
 
@@ -232,7 +226,7 @@ otherwise, C<Dist::Zilla::Plugin::> is prepended
 
 =head1 AUTHOR
 
-Ricardo SIGNES 😏 <rjbs@semiotic.systems>
+Ricardo SIGNES 😏 <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

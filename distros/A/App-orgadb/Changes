@@ -1,6 +1,15 @@
+0.015   2022-11-04  Released-By: PERLANCAR; Urgency: low
+
+        - [ux] Add shorter alias option -n for --num-fields.
+
+        - [ux] Add -1 as shortcut for --num-fields=1.
+
+        - [doc] Add a tip/trick item.
+
+
 0.014   2022-10-17  Released-By: PERLANCAR; Urgency: medium
 
-        - Tweak doc, add shortcut options: --remove-nondigits,
+        - Add shortcut options: --remove-nondigits,
           --remove-comments, --remove-whitespaces, --format-phone.
 
         - [bugfix] Non-simple headings (e.g. containing timestamp) were not
@@ -13,8 +22,6 @@
 
 
 0.013   2022-10-16  Released-By: PERLANCAR; Backward-Incompatible: yes
-
-        [cli orgadb-sel]
 
         - [incompatible change] Rename --formatter to --field-value-formatter
           (alias --fvfmt) to avoid ambiguity with --format. Also,
@@ -36,8 +43,6 @@
 
 
 0.011   2022-10-15  Released-By: PERLANCAR; Urgency: medium
-
-        [cli orgadb-sel]
 
         - Add --clipboard option.
 

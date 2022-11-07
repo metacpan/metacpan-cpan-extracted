@@ -1,15 +1,9 @@
-package Dist::Zilla::Chrome::Term 6.025;
+package Dist::Zilla::Chrome::Term 6.027;
 # ABSTRACT: chrome used for terminal-based interaction
 
 use Moose;
 
-# BEGIN BOILERPLATE
-use v5.20.0;
-use warnings;
-use utf8;
-no feature 'switch';
-use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
-# END BOILERPLATE
+use Dist::Zilla::Pragmas;
 
 use Digest::MD5 qw(md5);
 use Dist::Zilla::Types qw(OneZero);
@@ -80,7 +74,9 @@ sub _build_logger {
     quiet_fatal => 'stdout',
   });
 
-  if (-t *STDOUT || $ENV{DZIL_COLOR}) {
+  my $use_color = $ENV{DZIL_COLOR} // -t *STDOUT;
+
+  if ($use_color) {
     my $stdout = $logger->{dispatcher}->output('stdout');
 
     $stdout->add_callback(sub {
@@ -221,7 +217,7 @@ Dist::Zilla::Chrome::Term - chrome used for terminal-based interaction
 
 =head1 VERSION
 
-version 6.025
+version 6.027
 
 =head1 OVERVIEW
 
@@ -242,7 +238,7 @@ the minimum required perl.
 
 =head1 AUTHOR
 
-Ricardo SIGNES 😏 <rjbs@semiotic.systems>
+Ricardo SIGNES 😏 <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

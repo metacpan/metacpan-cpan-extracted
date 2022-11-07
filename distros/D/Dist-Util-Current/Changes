@@ -1,0 +1,16 @@
+0.003   2022-11-07  Released-By: PERLANCAR; Urgency: high
+
+        - [bugfix] Use this_dist() against current dirs + several levels
+          up, not against @INC.
+
+
+0.002   2022-08-21  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Mention App::ThisDist.
+
+
+0.001   2022-08-21  Released-By: PERLANCAR
+
+        - First release.

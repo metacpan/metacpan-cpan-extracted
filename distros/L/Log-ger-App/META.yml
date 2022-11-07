@@ -20,12 +20,12 @@ name: Log-ger-App
 provides:
   Log::ger::App:
     file: lib/Log/ger/App.pm
-    version: '0.023'
+    version: '0.024'
 requires:
   Log::ger: '0.038'
   Log::ger::Layout::Pattern: '0.008'
   Log::ger::Output: '0.005'
-  Log::ger::Output::Composite: '0.009'
+  Log::ger::Output::Composite: '0.016'
   Log::ger::Output::File: '0.002'
   Log::ger::Output::Screen: '0.018'
   Log::ger::Output::Syslog: '0'
@@ -37,7 +37,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Log-ger-App
   homepage: https://metacpan.org/release/Log-ger-App
   repository: git://github.com/perlancar/perl-Log-ger-App.git
-version: '0.023'
+version: '0.024'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

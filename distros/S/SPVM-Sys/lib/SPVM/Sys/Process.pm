@@ -9,14 +9,14 @@ SPVM::Sys::Process - Process System Call
 =head1 Usage
   
   use Sys::Process;
-  use Sys::Process::Constant as Process;
+  use Sys::Process::Constant as PROCESS;
   
   # exit
-  Sys::Process->exit(Process->EXIT_FAILURE);
+  Sys::Process->exit(PROCESS->EXIT_FAILURE);
   
   # waitpid
   my $wstatus;
-  my $changed_process_id = Sys::Process->waitpid($process_id, \$wstatus, Process->WNOHANG);
+  my $changed_process_id = Sys::Process->waitpid($process_id, \$wstatus, PROCESS->WNOHANG);
   
   # getpid
   my $process_id = Sys::Process->getpid;
@@ -29,14 +29,6 @@ SPVM::Sys::Process - Process System Call
 C<Sys::Process> provides the methods to call the system call for the process manipulation.
 
 =head1 Class Methods
-
-=head2 alarm
-
-  static method alarm : int ($seconds : int);
-
-alarm() arranges for a SIGALRM signal to be delivered to the calling process in seconds seconds.
-
-See the detail of the L<alerm|https://linux.die.net/man/2/alarm> function in the case of Linux.
 
 =head2 fork
 
@@ -69,14 +61,6 @@ See the detail of the L<setpriority|https://linux.die.net/man/2/setpriority> fun
 sleep() makes the calling thread sleep until seconds seconds have elapsed or a signal arrives which is not ignored.
 
 See the detail of the L<sleep|https://linux.die.net/man/3/sleep> function in the case of Linux.
-
-=head2 kill
-
-  static method kill : int ($pid : int, $sig : int);
-
-The kill() system call can be used to send any signal to any process group or process.
-
-See the detail of the L<kill|https://linux.die.net/man/2/kill> function in the case of Linux.
 
 =head2 wait
 
@@ -209,12 +193,3 @@ See the detail of the L<https://linux.die.net/man/3/execv> function in the case 
 The usleep() function suspends execution of the calling thread for (at least) usec microseconds. The sleep may be lengthened slightly by any system activity or by the time spent processing the call or by the granularity of system timers.
 
 See the detail of the L<usleep|https://linux.die.net/man/3/usleep> function in the case of Linux.
-
-=head2 ualarm
-
-  static method ualarm : long ($usecs : long, $interval : long);
-
-The ualarm() function causes the signal SIGALRM to be sent to the invoking process after (not less than) usecs microseconds. The delay may be lengthened slightly by any system activity or by the time spent processing the call or by the granularity of system timers.
-
-See the detail of the L<https://linux.die.net/man/3/ualarm> function in the case of Linux.
-

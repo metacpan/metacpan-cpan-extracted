@@ -4,7 +4,7 @@
       "jcerney@home.com (John Cerney)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -28,7 +28,6 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "6.52",
-            "Tk::MMtry" : "0",
             "Tk::MMutil" : "0"
          }
       },
@@ -40,12 +39,15 @@
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/asb-capfan/Tk-TableMatrix/issues"
+      },
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/asb-capfan/Tk-TableMatrix.git",
          "web" : "https://github.com/asb-capfan/Tk-TableMatrix"
       }
    },
-   "version" : "1.26",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "1.29",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

@@ -8,7 +8,7 @@ use Archive::Zip;
 
 # build an XLSX file
 my $filename = 'foo.xlsx';
-my $writer = Excel::ValueWriter::XLSX->new;
+my $writer = Excel::ValueWriter::XLSX->new(compression_level => 7);
 
 # 1st sheet, plain values and dates
 $writer->add_sheet(s1 => à_table => [[qw/foo bar barbar gig/],

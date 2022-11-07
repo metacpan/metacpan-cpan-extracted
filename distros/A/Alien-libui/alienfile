@@ -1,0 +1,37 @@
+use alienfile;
+use Config;
+use strict;
+use warnings;
+probe sub {'share'};    # Always build because we're using a fork of libui
+my $osx   = $Config{osname} eq 'darwin';
+my $win32 = $Config{osname} eq 'MSWin32';
+share {
+    requires 'Alien::Meson';
+    requires 'Alien::Ninja';
+    start_url 'https://github.com/sanko/libui-ng/archive/refs/heads/master.tar.gz';
+
+    #   'https://github.com/libui-ng/libui-ng/archive/refs/heads/master.tar.gz';
+    plugin 'Download';
+    plugin Extract => 'tar.gz';
+
+    # download ['https://github.com/libui-ng/libui-ng/archive/refs/heads/master.zip'];
+    plugin Extract => 'tar.gz';
+    build [
+        [   '%{meson}', 'setup', '-Dtests=false', '-Dexamples=false', '--buildtype=release',
+            '--default-library=shared',
+
+            #'--default-library=' . ( $win32 ? 'static' : 'shared' ),
+            #'--backend=ninja',
+            '--prefix=%{.install.prefix}', 'build'
+        ],
+        [ '%{meson}', 'install', '-C', 'build' ],
+    ];
+
+    #gather [
+    #   [   'echo "-L%{.install.prefix}/lib"' . ( $osx ? ' --stdlib=libc++' : '' ),
+    #       \'%{.runtime.libs}'
+    #  ],
+    #  [ 'echo "-I%{.install.prefix}/include"', \'%{.runtime.cflags}' ],
+    #];
+    plugin 'Gather::IsolateDynamic';
+};

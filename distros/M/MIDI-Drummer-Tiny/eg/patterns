@@ -13,18 +13,18 @@ my $d = MIDI::Drummer::Tiny->new(
 
 $d->count_in(1);
 
-#$d->sync_patterns(
-#    $d->closed_hh => [ ('11111111') x $d->bars ],
-#    $d->snare     => [ ('0101') x $d->bars ],
-#    $d->kick      => [ ('1010') x $d->bars ],
-#);
+$d->sync_patterns(
+    $d->closed_hh => [ ('11111111') x $d->bars ],
+    $d->snare     => [ ('0101') x $d->bars ],
+    $d->kick      => [ ('1010') x $d->bars ],
+);
 
 # For finer-grain control:
-#$d->sync(
-#   sub { $d->pattern( instrument => $d->closed_hh, patterns => [ ('11111111') x $d->bars ] ) },
-#   sub { $d->pattern( instrument => $d->snare,     patterns => [ ('0101') x $d->bars ] ) },
-#   sub { $d->pattern( instrument => $d->kick,      patterns => [ ('1010') x $d->bars ] ) },
-#);
+$d->sync(
+   sub { $d->pattern( instrument => $d->closed_hh, patterns => [ ('11111111') x $d->bars ] ) },
+   sub { $d->pattern( instrument => $d->snare,     patterns => [ ('0101') x $d->bars ] ) },
+   sub { $d->pattern( instrument => $d->kick,      patterns => [ ('1010') x $d->bars ] ) },
+);
 
 $d->add_fill(
     sub {
@@ -36,7 +36,7 @@ $d->add_fill(
           $self->kick      => '00000000',
         };
     },
-    $d->closed_hh => [ '11111111' ],  # example phrase
+    $d->closed_hh => [ '1111' ],  # example phrase
     $d->snare     => [ '0101' ],      # "
     $d->kick      => [ '1010' ],      # "
 );

@@ -4,11 +4,9 @@ use warnings;
 use base qw{Exporter};
 use List::MoreUtils qw{part};
 
-our $VERSION = '0.06';
-our @EXPORT  = qw(nsect);
+our $VERSION    = '0.07';
+our @EXPORT     = qw(nsect);
 our @EXPORT_OK  = qw(spart deal);
-
-=for stopwords natatime nsect
 
 =head1 NAME
 
@@ -131,31 +129,21 @@ The nsect function will ALWAYS return an array (array reference in scalar contex
 
 =head1 BUGS
 
-Please log on RT and send an email to the author.
-
-=head1 SUPPORT
-
-DavisNetworks.com supports all Perl applications including this package.
+Please open an issue on GitHub
 
 =head1 AUTHOR
 
   Michael R. Davis
-  CPAN ID: MRDVT
-  Satellite Tracking of People, LLC
-  mdavis@stopllc.com
-  http://www.stopllc.com/
 
 =head1 COPYRIGHT
 
-This program is free software licensed under the...
+MIT License
 
-  The General Public License (GPL) Version 2, June 1991
-
-The full text of the license can be found in the LICENSE file included with this module.
+Copyright (c) 2022 Michael R. Davis
 
 =head1 SEE ALSO
 
-L<List::MoreUtils> part and natatime, L<Array::Group>, L<http://www.perlmonks.org/?node_id=516499>, L<http://www.perlmonks.org/?node_id=861938>, L<Parallel::ForkManager>
+L<List::MoreUtils> part and natatime, L<Array::Group>, L<List::UtilsBy> bundle_by, L<http://www.perlmonks.org/?no^de_id=516499>, L<http://www.perlmonks.org/?node_id=861938>, L<Parallel::ForkManager>
 
 =cut
 

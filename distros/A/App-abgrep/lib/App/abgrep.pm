@@ -8,12 +8,13 @@ use warnings;
 use Log::ger;
 
 use AppBase::Grep;
+use AppBase::Grep::File ();
 use Perinci::Sub::Util qw(gen_modified_sub);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-11-14'; # DATE
+our $DATE = '2022-11-04'; # DATE
 our $DIST = 'App-abgrep'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.009'; # VERSION
 
 our %SPEC;
 
@@ -29,14 +30,7 @@ and `--dash-prefix-inverts`.
 
 _
     add_args    => {
-        files => {
-            'x.name.is_plural' => 1,
-            'x.name.singular' => 'file',
-            schema => ['array*', of=>'filename*'],
-            pos => 1,
-            slurpy => 1,
-        },
-        # XXX recursive (-r)
+        %AppBase::Grep::File::argspecs_files,
     },
     modify_meta => sub {
         my $meta = shift;
@@ -55,50 +49,8 @@ _
     },
     output_code => sub {
         my %args = @_;
-        my ($fh, $file);
 
-        my @files = @{ $args{files} // [] };
-        # pattern (arg0) can actually be a file or regexp
-        if (defined $args{pattern}) {
-            if ($args{regexps} && @{ $args{regexps} }) {
-                unshift @files, delete $args{pattern};
-            } else {
-                unshift @{ $args{regexps} }, delete $args{pattern};
-            }
-        }
-
-        my $show_label = 0;
-        if (!@files) {
-            $file = "(stdin)";
-            $fh = \*STDIN;
-        } elsif (@files > 1) {
-            $show_label = 1;
-        }
-
-        $args{_source} = sub {
-          READ_LINE:
-            {
-                if (!defined $fh) {
-                    return unless @files;
-                    $file = shift @files;
-                    log_trace "Opening $file ...";
-                    open $fh, "<", $file or do {
-                        warn "abgrep: Can't open '$file': $!, skipped\n";
-                        undef $fh;
-                    };
-                    redo READ_LINE;
-                }
-
-                my $line = <$fh>;
-                if (defined $line) {
-                    return ($line, $show_label ? $file : undef);
-                } else {
-                    undef $fh;
-                    redo READ_LINE;
-                }
-            }
-        };
-
+        AppBase::Grep::File::set_source_arg(\%args);
         AppBase::Grep::grep(%args);
     },
 );
@@ -118,7 +70,7 @@ App::abgrep - Print lines matching a pattern
 
 =head1 VERSION
 
-This document describes version 0.008 of App::abgrep (from Perl distribution App-abgrep), released on 2021-11-14.
+This document describes version 0.009 of App::abgrep (from Perl distribution App-abgrep), released on 2022-11-04.
 
 =head1 FUNCTIONS
 
@@ -147,6 +99,8 @@ Require all patterns to match, instead of just one.
 
 =item * B<color> => I<str> (default: "auto")
 
+Specify when to show color (never, always, or autoE<sol>when interactive).
+
 =item * B<count> => I<true>
 
 Supress normal output, return a count of matching lines.
@@ -160,9 +114,17 @@ Instead of using C<-v> to invert the meaning of all patterns, this option allows
 you to invert individual pattern using the dash prefix, which is also used by
 Google search and a few other search engines.
 
+=item * B<dereference_recursive> => I<true>
+
+Read all files under each directory, recursively, following all symbolic links, unlike -r.
+
 =item * B<files> => I<array[filename]>
 
+(No description)
+
 =item * B<ignore_case> => I<bool>
+
+If set to true, will search case-insensitively.
 
 =item * B<invert_match> => I<bool>
 
@@ -170,11 +132,23 @@ Invert the sense of matching.
 
 =item * B<line_number> => I<true>
 
+Show line number along with matches.
+
 =item * B<pattern> => I<str>
+
+Specify *string* to search for.
 
 =item * B<quiet> => I<true>
 
+Do not print matches, only return appropriate exit code.
+
+=item * B<recursive> => I<true>
+
+Read all files under each directory, recursively, following symbolic links only if they are on the command line.
+
 =item * B<regexps> => I<array[str]>
+
+Specify additional *regexp pattern* to search for.
 
 
 =back
@@ -215,13 +189,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2018 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021, 2020, 2018 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

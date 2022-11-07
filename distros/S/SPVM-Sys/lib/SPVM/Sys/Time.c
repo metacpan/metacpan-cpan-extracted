@@ -217,6 +217,9 @@ int32_t SPVM__Sys__Time__clock_nanosleep(SPVM_ENV* env, SPVM_VALUE* stack) {
 #elif __FreeBSD__ && !(__FreeBSD__ >= 13)
   env->die(env, stack, "clock_nanosleep is not supported on this system(__FreeBSD__ && !(__FreeBSD__ >= 13))", FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#elif __OpenBSD__
+  env->die(env, stack, "clock_nanosleep is not supported on this system(__OpenBSD__)", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
   (void)env;
   (void)stack;

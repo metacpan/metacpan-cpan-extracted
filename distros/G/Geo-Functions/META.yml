@@ -1,14 +1,27 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         Geo-Functions
-version:      0.07
-version_from: lib/Geo/Functions.pm
-installdirs:  site
+---
+abstract: 'Package for standard Geo:: functions.'
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.52, CPAN::Meta::Converter version 2.150001'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Geo-Functions
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-    Exporter:                      0
-    Geo::Constants:                0.06
-    strict:                        0
-    vars:                          0
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.30
+  Exporter: '0'
+  Geo::Constants: '0.06'
+resources:
+  bugtracker: https://github.com/mrdvt92/perl-Geo-Functions/issues
+  homepage: https://github.com/mrdvt92/perl-Geo-Functions
+  repository: https://github.com/mrdvt92/perl-Geo-Functions.git
+version: '0.08'

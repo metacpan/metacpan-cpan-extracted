@@ -12,9 +12,9 @@ use IO::Interactive qw(is_interactive);
 
 # put global variables alphabetically here
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-19'; # DATE
+our $DATE = '2022-11-04'; # DATE
 our $DIST = 'Perinci-CmdLine-Lite'; # DIST
-our $VERSION = '1.925'; # VERSION
+our $VERSION = '1.926'; # VERSION
 
 # TODO: this class can actually be a role instead of base class for pericmd &
 # pericmd-lite.
@@ -169,7 +169,7 @@ our %copts = (
         # XXX when option is changed, we need to update this. we should generate
         # usage automatically instead.
         usage   => "--help (or -h, -?)",
-        'usage.alt.fmt.pod' => qq{L<--help|/"--help, -h, -v"> (or L<-h|/"--help, -h, -v">, L<-?|/"--help, -h, -v">)},
+        'usage.alt.fmt.pod' => qq{L<--help|/"--help, -h, -?"> (or L<-h|/"--help, -h, -?">, L<-?|/"--help, -h, -?">)},
         handler => sub {
             my ($go, $val, $r) = @_;
             $r->{action} = 'help';
@@ -1987,7 +1987,7 @@ Perinci::CmdLine::Base - Base class for Perinci::CmdLine{::Classic,::Lite}
 
 =head1 VERSION
 
-This document describes version 1.925 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2022-10-19.
+This document describes version 1.926 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2022-11-04.
 
 =head1 DESCRIPTION
 

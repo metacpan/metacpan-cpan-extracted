@@ -5,3 +5,4 @@ MANIFEST
 MANIFEST.SKIP
 t/01_methods.t
 META.yml                                Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

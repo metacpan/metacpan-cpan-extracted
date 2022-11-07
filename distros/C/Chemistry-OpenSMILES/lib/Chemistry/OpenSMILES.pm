@@ -5,7 +5,7 @@ use warnings;
 use 5.0100;
 
 # ABSTRACT: OpenSMILES format reader and writer
-our $VERSION = '0.8.2'; # VERSION
+our $VERSION = '0.8.3'; # VERSION
 
 require Exporter;
 our @ISA = qw( Exporter );
@@ -18,6 +18,7 @@ our @EXPORT_OK = qw(
     is_ring_bond
     is_single_bond
     mirror
+    %normal_valence
     toggle_cistrans
 );
 
@@ -28,6 +29,20 @@ sub is_chiral($);
 sub is_chiral_tetrahedral($);
 sub mirror($);
 sub toggle_cistrans($);
+
+our %normal_valence = (
+    B  => [ 3 ],
+    C  => [ 4 ],
+    N  => [ 3, 5 ],
+    O  => [ 2 ],
+    P  => [ 3, 5 ],
+    S  => [ 2, 4, 6 ],
+    F  => [ 1 ],
+    Cl => [ 1 ],
+    Br => [ 1 ],
+    I  => [ 1 ],
+    c  => [ 3 ], # Not from OpenSMILES specification
+);
 
 # Removes chiral setting from tetrahedral chiral centers with less than
 # four distinct neighbours. Only tetrahedral chiral centers with four atoms

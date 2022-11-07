@@ -1,17 +1,11 @@
-package Dist::Zilla::Plugin::UploadToCPAN 6.025;
+package Dist::Zilla::Plugin::UploadToCPAN 6.027;
 # ABSTRACT: upload the dist to CPAN
 
 use Moose;
 with 'Dist::Zilla::Role::BeforeRelease',
      'Dist::Zilla::Role::Releaser';
 
-# BEGIN BOILERPLATE
-use v5.20.0;
-use warnings;
-use utf8;
-no feature 'switch';
-use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
-# END BOILERPLATE
+use Dist::Zilla::Pragmas;
 
 use File::Spec;
 use Moose::Util::TypeConstraints;
@@ -324,7 +318,7 @@ Dist::Zilla::Plugin::UploadToCPAN - upload the dist to CPAN
 
 =head1 VERSION
 
-version 6.025
+version 6.027
 
 =head1 SYNOPSIS
 
@@ -423,7 +417,7 @@ by this plugin. This option will be passed to L<CPAN::Uploader>.
 
 =head1 AUTHOR
 
-Ricardo SIGNES 😏 <rjbs@semiotic.systems>
+Ricardo SIGNES 😏 <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

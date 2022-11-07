@@ -2,7 +2,19 @@ Summary of Changes to Tk::TableMatrix
 
 See ChangeLog for detailed changes.
 
-Release 1.26   10/26/2020
+1.29  2022-11-07
+* Removed blib/ directory unintentionally present in 1.28 distribution
+
+1.28  2022-11-07
+
+* Specify GitHub issues as bugtracker
+* Incorporate change from Perl/Tk's myConfig:
+  exit gracefully if libX11 not found
+  (should prevent UNKNOWN reports from CPAN testers)
+* Fix build failures caused by an include path (possibly containing Tcl/Tk
+  headers) which was specified with higher precedence than Perl/Tk headers
+
+1.26  2020-10-26
 
 * Fix RT #133587: improper handling of line endings differing from `$/`
   in pTk.exc files causes build failure (tries compiling
@@ -10,32 +22,32 @@ Release 1.26   10/26/2020
 * Add GitHub repository to module metadata
 * Apply POD fixes (originally by Debian package maintainer Bart Martens)
 
-Release 1.25   10/19/2020
+1.25  2020-10-19
 
 * add dependencies / RT #133557
 * improve POD (incl. RT #75690)
 
-Release 1.24   10/17/2020
+1.24  2020-10-17
 
 * pTk/Makefile.PL: fix RT #133547
 * improve indentation of myConfig
 
-Release 1.23   1/9/2007
+1.23  2007-01-09
 
 * Changed TableMatrix::Spreadsheet row/col resize behavior to be more
 spreadsheet-like.
  
-Release 1.22   3/23/06
+1.22  2006-03-23
 
 * Misc Bugs fixed in Tk::TableMatrix::SpreadsheetHideRows
  
-Release 1.21   3/2/06
+1.21  2006-03-02
 
 * Updated to make the row/size resize operation (that happens when you
   drag the row/col borders) apply to every row or column that is currently
   selected, instead of just the	row/col border that was dragged.
   
-Release 1.2   1/26/05
+1.2  2005-01-26
 
 * Fixed bug which was causing crashes on perl 5.8.4 on win32 when 
   anything was copied into the clipboard (i.e. when control-c pressed).
@@ -43,18 +55,18 @@ Release 1.2   1/26/05
 * Fixed row/col insert/deletes to work more reliably in TableMatrix::Spreadsheet
 
 
-Release 1.1:   2/12/04
+1.1  2004-02-12
 
 * Updated to be compatible with the new Tk804 series.
 
 
-Release 1.01:  12/6/02
+1.01  2002-12-06
 
 * Fixed Error where the rowHeight method
   was getting executed like a colWidth. This was introduced in the
   update of TkTable 2.5 to 2.6
 
-Release 1.0:  12/2/02
+1.0  2002-12-02
 
 * Updated core C-code for the changes made from TkTable 2.6 to 2.8.
   (Tk::TableMatrix is derived from the TkTable Tcl/Tk Widget.
@@ -76,7 +88,7 @@ Release 1.0:  12/2/02
       
 * Numerous minor bugs fixed.
 
-Release 0.9:  5/22/02
+0.9  2002-05-22
 
 * Added an experimental widget: SpreadsheetHideRows. This enables
   display of tabular info, with selectable hide/unhide of detail
@@ -84,7 +96,7 @@ Release 0.9:  5/22/02
   
 * Numerous minor bugs fixed.
   
-Release 0.8:  10/5/01
+0.8  2001-10-05
 
 * Removed un-needed dependencies on Data::Parse and Date::Format
   for TableMatrix::Spreadsheet
@@ -92,11 +104,11 @@ Release 0.8:  10/5/01
 * Fixed problem with the selection going nuts when dragging the 
   selection out of the window.
 
-Release 0.71:  6/15/01
+0.71  2001-6-15
 
 * Fixed to compile with the new Tk800.023 release.
 
-Release 0.7:  6/7/01
+0.7  2001-06-07
 
 * Added TableMatrix::Spreadsheet widget. This is a TableMatrix Derived
         widget with Excel-like bindings.
@@ -110,12 +122,12 @@ Release 0.7:  6/7/01
 * Fixed control +/- key bindings for modifying the column with. 
         (Patch from Slaven)
 	
-Release 0.5:  12/20/00
+0.5  2000-12-20
 
 * Updated to be consistent with tkTable 2.6
 
 
-Release 0.3  9/16/00
+0.3  2000-09-16
 
 * Initial Release (based on tkTable 2.5)
 

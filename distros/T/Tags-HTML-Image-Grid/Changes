@@ -1,2 +1,5 @@
+0.02 2022-11-05T17:33:05+01:00
+ - Fix existing of value in select callback.
+
 0.01 2022-10-14T12:58:51+02:00
  - First version.

@@ -6,7 +6,7 @@ use 5.008004;
 use Wasm::Wasmtime::FFI;
 
 # ABSTRACT: Global configuration for Wasm::Wasmtime::Engine
-our $VERSION = '0.22'; # VERSION
+our $VERSION = '0.23'; # VERSION
 
 
 $ffi_prefix = 'wasm_config_';
@@ -139,28 +139,11 @@ $ffi->attach( [ 'wasmtime_config_cache_config_load' => 'cache_config_default' ] 
 });
 
 
-if(_v0_23_0())
-{
-  $ffi->attach( ['wasmtime_config_consume_fuel_set' => 'consume_fuel' ] => [ 'wasm_config_t', 'bool' ] => sub {
-    my($xsub, $self, $value) = @_;
-    $xsub->($self, $value);
-    $self;
-  });
-  $ffi->attach( ['wasmtime_config_max_instances_set' => 'max_instances' ] => [ 'wasm_config_t', 'size_t' ] => sub {
-    my($xsub, $self, $value) = @_;
-    $xsub->($self, $value);
-    $self;
-  });
-}
-else
-{
-  *consume_fuel = sub {
-    Carp::croak("unimplemented, upgrade wasmtime to 0.23.0");
-  };
-  *max_instances = sub {
-    Carp::croak("unimplemented, upgrade wasmtime to 0.23.0");
-  };
-}
+$ffi->attach( ['wasmtime_config_consume_fuel_set' => 'consume_fuel' ] => [ 'wasm_config_t', 'bool' ] => sub {
+  my($xsub, $self, $value) = @_;
+  $xsub->($self, $value);
+  $self;
+});
 
 1;
 
@@ -176,7 +159,7 @@ Wasm::Wasmtime::Config - Global configuration for Wasm::Wasmtime::Engine
 
 =head1 VERSION
 
-version 0.22
+version 0.23
 
 =head1 SYNOPSIS
 

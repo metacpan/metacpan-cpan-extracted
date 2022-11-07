@@ -10,13 +10,13 @@ use List::Util qw( min max sum);
 use Vote::Count::TextTableTiny qw/generate_table/;
 use Sort::Hash;
 
-our $VERSION='2.01';
+our $VERSION='2.02';
 
 =head1 NAME
 
 Vote::Count::RankCount
 
-=head1 VERSION 2.01
+=head1 VERSION 2.02
 
 =cut
 

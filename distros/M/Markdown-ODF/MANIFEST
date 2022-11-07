@@ -1,0 +1,11 @@
+Changes
+ignore.txt
+lib/Markdown/ODF.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/001_base.t
+t/002_basic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

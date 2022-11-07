@@ -1,5 +1,9 @@
 Revision history for Perl module Compass::Bearing
 
+0.08 2022-11-06
+  - Moved to GitHub
+  - Changed licensed fron Perl to MIT
+
 0.07 2012-08-14
   - Tweaked example scripts
 

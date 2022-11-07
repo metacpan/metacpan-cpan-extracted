@@ -1,0 +1,52 @@
+{
+   "abstract" : "Mojolicious Plugin for htmx",
+   "author" : [
+      "Giuseppe Di Terlizzi <gdt@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Mojolicious-Plugin-HTMX",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "9.0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/giterlizzi/perl-Mojolicious-Plugin-HTMX/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/giterlizzi/perl-Mojolicious-Plugin-HTMX",
+         "web" : "https://github.com/giterlizzi/perl-Mojolicious-Plugin-HTMX"
+      }
+   },
+   "version" : "1.00",
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

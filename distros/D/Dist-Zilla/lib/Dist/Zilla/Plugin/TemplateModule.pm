@@ -1,17 +1,11 @@
-package Dist::Zilla::Plugin::TemplateModule 6.025;
+package Dist::Zilla::Plugin::TemplateModule 6.027;
 # ABSTRACT: a simple module-from-template plugin
 
 use Moose;
 with 'Dist::Zilla::Role::ModuleMaker',
      'Dist::Zilla::Role::TextTemplate';
 
-# BEGIN BOILERPLATE
-use v5.20.0;
-use warnings;
-use utf8;
-no feature 'switch';
-use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
-# END BOILERPLATE
+use Dist::Zilla::Pragmas;
 
 use Dist::Zilla::Path;
 
@@ -116,7 +110,7 @@ Dist::Zilla::Plugin::TemplateModule - a simple module-from-template plugin
 
 =head1 VERSION
 
-version 6.025
+version 6.027
 
 =head1 DESCRIPTION
 
@@ -175,7 +169,7 @@ presently required:
 
 =head1 AUTHOR
 
-Ricardo SIGNES 😏 <rjbs@semiotic.systems>
+Ricardo SIGNES 😏 <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

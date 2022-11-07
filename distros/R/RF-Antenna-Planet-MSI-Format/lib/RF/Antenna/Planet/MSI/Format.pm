@@ -5,7 +5,7 @@ use Scalar::Util qw();
 use Tie::IxHash qw{};
 use Path::Class qw{};
 
-our $VERSION = '0.05';
+our $VERSION = '0.08';
 
 =head1 NAME
 
@@ -108,40 +108,52 @@ Assumptions:
 =cut
 
 sub read {
-  my $self  = shift;
-  my $file  = shift;
-  my $blob  = ref($file) eq 'SCALAR' ? ${$file} : Path::Class::file($file)->slurp;
-  my @lines = split(/[\n\r]+/, $blob);
-  my $loop  = 0;
+  my $self        = shift;
+  my $file        = shift;
+  my $blob        = ref($file) eq 'SCALAR' ? ${$file} : Path::Class::file($file)->slurp;
+  $self->{'blob'} = $blob; #store for blob method
+  my @lines       = split(/[\n\r]+/, $blob);
+  my $loop        = 0;
   while (1) {
     my $line = shift @lines;
     $line =~ s/\A\s*//; #ltrim
     $line =~ s/\s*\Z//; #rtrim
-    next unless $line;
-    $loop++;
-    my ($key, $value) = split /\s+/, $line, 2; #split with limit returns undef value if empty string
-    $value = '' unless defined $value;
-
-    if ($loop == 1 and $key ne 'NAME') { #First line of file is NAME even if NAME token is surpessed
-      $self->header(NAME => $line);
-    } else {
-      #printf "Key: $key, Value: $value\n";
-      if ($key =~ m/\AHORIZONTAL\Z/i) {
-        my @data = map {s/\s+\Z//; s/\A\s+//; [split /\s+/, $_, 2]} splice @lines, 0, $value;
-        die(sprintf('Error: HORIZONTAL records with %s records returned %s records', $value, scalar(@data))) unless scalar(@data) == $value;
-        $self->horizontal(\@data);
-      } elsif ($key =~ m/\AVERTICAL\Z/i) {
-        my @data = map {s/\s+\Z//; s/\A\s+//; [split /\s+/, $_, 2]} splice @lines, 0, $value;
-        die unless @data == $value;
-        die(sprintf('Error: VERTICAL records with %s records returned %s records', $value, scalar(@data))) unless scalar(@data) == $value;
-        $self->vertical(\@data);
+    if ($line) {
+      $loop++;
+      my ($key, $value) = split /\s+/, $line, 2; #split with limit returns undef value if empty string
+      $value = '' unless defined $value;
+  
+      if ($loop == 1 and $key ne 'NAME') { #First line of file is NAME even if NAME token is surpessed
+        $self->header(NAME => $line);
       } else {
-        $self->header($key => $value);
+        #printf "Key: $key, Value: $value\n";
+        if (uc($key) eq 'HORIZONTAL') {
+          $self->_parse_polarization(\@lines, horizontal => $value);
+        } elsif (uc($key) eq 'VERTICAL') {
+          $self->_parse_polarization(\@lines, vertical => $value);
+        } else {
+          $self->header($key => $value);
+        }
       }
     }
     last unless @lines;
   }
   return $self;
+
+  sub _parse_polarization {
+    my $self   = shift;
+    my $lines  = shift;
+    my $method = shift;
+    my $value  = shift; #string
+    if ($value =~ m/([0-9]+)/) { #support bad data like missing 360 or "360 0"
+      $value = $1 + 0; #convert string to number
+    } else {
+      $value = 360;    #default
+    }
+    my @data = map {s/\s+\Z//; s/\A\s+//; [split /\s+/, $_, 2]} splice @$lines, 0, $value;
+    die(sprintf('Error: %s records with %s records returned %s records', uc($method), $value, scalar(@data))) unless scalar(@data) == $value;
+    $self->$method(\@data);
+  }
 }
 
 =head2 read_fromZipMember
@@ -169,6 +181,17 @@ sub read_fromZipMember {
   $fh->close;
 
   return $self->read(\$blob);
+}
+
+=head2 blob
+
+Returns the data blob that was read by the read($file), read($scalar_ref), or read_fromZipMember($,$) methods.
+
+=cut
+
+sub blob {
+  my $self = shift;
+  return $self->{'blob'};
 }
 
 =head2 write
@@ -355,9 +378,11 @@ sub make {
 Sets and returns the frequency string as displayed in header structure
 
   my $frequency = $antenna->frequency;
-  $antenna->frequency("2450");     #correct format in MHz
-  $antenna->frequency("2450 MHz"); #acceptable format
-  $antenna->frequency("2.45 GHz"); #common format but technically not to spec
+  $antenna->frequency("2450");          #correct format in MHz
+  $antenna->frequency("2450 MHz");      #acceptable format
+  $antenna->frequency("2.45 GHz");      #common format but technically not to spec
+  $antenna->frequency("2450-2550");     #common range format but technically not to spec
+  $antenna->frequency("2.45-2.55 GHz"); #common range format but technically not to spec
 
 =cut
 
@@ -390,34 +415,40 @@ Attempts to read and parse the string header value and return the frequency as a
 sub frequency_mhz {
   my $self   = shift;
   my $string = $self->frequency;
-  my $scale  = 1; #MHz
   my $number = undef; #return undef if cannot parse
-  my $upper  = undef;
-  my $lower  = undef;
-  if ($string =~ m/GHz/i) {
-    $scale = 1e3;
-  } elsif ($string =~ m/kHz/i) {
-    $scale = 1e-3;
-  } elsif ($string =~ m/MHz/i) {
-    $scale = 1;
-  }
 
-  if (Scalar::Util::looks_like_number($string)) {
-    $number = $scale * $string; #convert from string to number
-    $lower  = $number;
-    $upper  = $number;
-  } elsif ($string =~ m/([0-9]*\.?[0-9]+)[^0-9.]+([0-9]*\.?[0-9]+)/) { #two decimals or floats with any separator
-    $lower  = $scale * $1;
-    $upper  = $scale * $2;
-    $number = ($lower + $upper) / 2;
-  } elsif ($string =~ m/([0-9\.]+)/) { #single float
-    $number = $scale * $1;
-    $lower  = $number;
-    $upper  = $number;
+  if (defined($string)) {
+
+    my $upper  = undef;
+    my $lower  = undef;
+
+    my $scale  = 1; #Default: MHz
+    if ($string =~ m/GHz/i) {
+      $scale = 1e3;
+    } elsif ($string =~ m/kHz/i) {
+      $scale = 1e-3;
+    } elsif ($string =~ m/MHz/i) {
+      $scale = 1;
+    }
+
+    if (Scalar::Util::looks_like_number($string)) { #entire string looks like a number
+      $number = $scale * $string;
+      $lower  = $number;
+      $upper  = $number;
+    } elsif ($string =~  m/([0-9]*\.?[0-9]+)[^0-9.]+([0-9]*\.?[0-9]+)/) { #two non-negative numbers with any separator
+      $lower  = $scale * $1;
+      $upper  = $scale * $2;
+      $number = ($lower + $upper) / 2;
+    } elsif ($string =~ m/([0-9]*\.?[0-9]+)/) { #one non-negative number
+      $number = $scale * $1;
+      $lower  = $number;
+      $upper  = $number;
+    }
+    $self->{'frequency_mhz'}       = $number;
+    $self->{'frequency_mhz_lower'} = $lower;
+    $self->{'frequency_mhz_upper'} = $upper;
+
   }
-  $self->{'frequency_mhz'}       = $number;
-  $self->{'frequency_mhz_lower'} = $lower;
-  $self->{'frequency_mhz_upper'} = $upper;
   return $number;
 }
 
@@ -453,7 +484,13 @@ sub frequency_ghz_upper {
 
 =head2 gain
 
-Antenna gain string as displayed in file (dBd is the default unit of measure)
+Sets and returns the antenna gain string as displayed in file (dBd is the default unit of measure)
+
+  my $gain = $antenna->gain;
+  $antenna->gain("9.1");          #correct format in dBd
+  $antenna->gain("9.1 dBd");      #correct format in dBd
+  $antenna->gain("9.1 dBi");      #correct format in dBi
+  $antenna->gain("(dBi) 9.1");    #supported format
 
 =cut
 
@@ -472,19 +509,24 @@ Attempts to read and parse the string header value and return the gain as a numb
 sub gain_dbd {
   my $self   = shift;
   my $string = $self->gain;
-  if (Scalar::Util::looks_like_number($string)) {
-    return $string + 0; #dBd is the default UOM
-  } elsif ($string =~ m/dBd/i) {
-    if ($string =~ m/([0-9]*\.?[0-9]+)/) { #0.123 | .123 | 123
-      return $1 + 0;
+  my $number = undef;
+  if (defined($string)) {
+
+    my $scale  = 0; #default dBd
+    if ($string =~ m/dBi/i) {
+      $scale = -2.14;
+    } elsif ($string =~ m/dBd/i) {
+      $scale = 0;
     }
-  } elsif ($string =~ m/dBi/i) {
-    if ($string =~ m/([0-9]*\.?[0-9]+)/) {
-      return ($1 + 0) - 2.14;
+
+    if (Scalar::Util::looks_like_number($string)) { #entire string looks like a number
+      $number = $string + $scale; #default: dBd
+    } elsif ($string =~ m/([+-]?[0-9]*\.?[0-9]+)/) { #one real number
+      $number = $1 + $scale;
     }
-  } else {
-    return undef;
+
   }
+  return $number;
 }
 
 sub gain_dbi {

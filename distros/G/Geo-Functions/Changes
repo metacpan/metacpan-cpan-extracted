@@ -1,0 +1,25 @@
+0.08 2022-11-06
+  - Moved to GitHub
+  - Changed license from Perl to MIT
+
+0.07 2007-10-07
+  - Absolutely nothing.  It's a perl testing thing.
+
+0.06 2007-01-15
+  - Added mps_knots and knots_mps functions
+
+0.05 2007-01-12
+  - Added methods dms_deg and dm_deg 
+
+0.04 2006-12-09
+  - Documentation
+
+0.03 2006-12-08
+  - Added () for imported Geo::Constants as some systems don't like barewords
+  - Added rad_dms method
+
+0.02 2006-12-05
+  - Documentation
+
+0.01 2006-12-02
+  - Original version

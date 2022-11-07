@@ -1,5 +1,5 @@
 This file contains message digests of all files listed in MANIFEST,
-signed via the Module::Signature module, version 0.70.
+signed via the Module::Signature module, version 0.87.
 
 To verify the content in this distribution, first make sure you have
 Module::Signature installed, then type:
@@ -12,29 +12,28 @@ the distribution may already have been compromised, and you should
 not run its Makefile.PL or Build.PL.
 
 -----BEGIN PGP SIGNED MESSAGE-----
-Hash: SHA1
+Hash: RIPEMD160
 
-SHA1 294505f858f11dd062e9916e3f50d88210a9ef54 CONTRIBUTING
-SHA1 e2e24878d31b169774a1b99d30b638850c456e8e COPYRIGHT
-SHA1 6bd7b17d81be63d08d4efa6cb80106e72887842c CREDITS
-SHA1 167e54a06e8fba11ab18f5e608e1809fa1677f71 Changes
-SHA1 ec5a7b4f3023f03ebf821b57690758f7e6f3ae2a LICENSE
-SHA1 9ef492c956af12e9ea3225c0966d871851686cb6 MANIFEST
-SHA1 36def083547fbb90a7564c8592827061d3d9ccdb META.json
-SHA1 2d41104781f255dd5f0e6aa944a50f5e28f66c94 META.ttl
-SHA1 f7d303197c9556d72f0534bc9b900101f1ce67b5 META.yml
-SHA1 09dccd643e1d5c1d2b57c09e38cf6e3605bf951f Makefile.PL
-SHA1 052631c39d2a4628a4bffc7dfcdb79a7777596c5 README
-SHA1 56897f027d1270362d5a0eca8ad99b3f11c442dd bin/distinkt-mint
-SHA1 bbbf6d76575318bdb89b4306e388be88e3c17718 dist.ini
-SHA1 d1483c74068d4eafd0deeddabaaae2c0e9be0ca8 lib/Dist/Inktly/Bovine.pm
-SHA1 3108961e6ee75c991f998ca985b63c5163f19264 lib/Dist/Inktly/Cervine.pm
-SHA1 3f0d7c5abd53c6ddc3a4dbb7d3e57a9e8c7817a5 lib/Dist/Inktly/Minty.pm
-SHA1 c4583dac562fd8d9dd3878a756363a091a8389d9 t/01basic.t
+SHA256 5806dc7a0a6eee3bed431a778763166669f9e7894c10305fa867d65e51856284 COPYRIGHT
+SHA256 7977c02e031153dc91d6db9d2e803671d586e59bca2c5c3dc6211f29c04d92d6 CREDITS
+SHA256 42d79ca5bf527af3901914df041c662be75f976f87f5178cd2ecd4846fd9deff Changes
+SHA256 bdcbdff8a8a52345b07f5f987ae232b0410a505cc638f12405df6f374f6aaa95 INSTALL
+SHA256 a4f85c6f4d6e8bdd37b7ab08013e3e3bee1fe8e910e20f8f54d5025ffe40f384 LICENSE
+SHA256 79f6fb5d4a7a97bbef1fa16cacd76f0e772b4553cedda6ec9c210e56717446cc MANIFEST
+SHA256 df32d35bc2c2f7fa43a362eb513a2d5ae41d76ed9321d5cd45939dcfaaced88f META.json
+SHA256 0ef01bf286640d9fd9ffb2fba4b8cb63362c8439971e1bf0c313dec6d039fb5a META.yml
+SHA256 910049044afffef232d8eb3c0b9cc2e13d32f49bcde96a620e87480bc846c2c1 Makefile.PL
+SHA256 8c2bb74e5eec2a090549e9a017c03c76bcbd404bd9a36fdfe9d7f94edf3cdaa4 README
+SHA256 7bb316b139a03ee8b258d2b19bbdae29b61a7a7484e9928f7f55b8d7cf263494 bin/distinkt-mint
+SHA256 b78aba1fa85be3f0a89099a39a64799987a714f03d014272a4b318efdbce748d dist.ini
+SHA256 4739941a504dbaeb53d5ed67f9cfde23961367cf20cc929010b358b6c3f25c39 doap.ttl
+SHA256 67abd61aa711abe95b25be8861baf40733d515e7457fd6b96b5120f70000835d lib/Dist/Inktly/Bovine.pm
+SHA256 f57efcafcfc409792b61f4635c3fb1403fd3df6ed1f84b673f0a4770e30d241e lib/Dist/Inktly/Cervine.pm
+SHA256 f874e0156103031bc39f329236a779aea48fa208865cebe32d8dda50bb65f12e lib/Dist/Inktly/Minty.pm
+SHA256 b7ae7f46e91c1ab81fb5e0b5b01e171617601ef81c639ae834cac319a8ded04a t/01basic.t
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1.4.12 (GNU/Linux)
 
-iEYEARECAAYFAlIKL/cACgkQzr+BKGoqfTm4NwCcCsWnXiz4mSZvSxZJvVBkqCk9
-QMEAn29k0cDgDipSpxFcDUXUxrWpesIJ
-=H2M1
+iF0EAREDAB0WIQRVJKj/4+s6z4WzNujOv4Eoaip9OQUCY2hBSAAKCRDOv4Eoaip9
+OQAJAJ9mcxmcpxYzvbKqXIjQLZF09XlvmgCfXabG5QvzajCfSZA3FGobcf5KNJI=
+=Z4sH
 -----END PGP SIGNATURE-----

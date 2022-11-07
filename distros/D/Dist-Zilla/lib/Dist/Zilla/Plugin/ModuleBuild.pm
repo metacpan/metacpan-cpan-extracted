@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::ModuleBuild 6.025;
+package Dist::Zilla::Plugin::ModuleBuild 6.027;
 # ABSTRACT: build a Build.PL that uses Module::Build
 
 use Moose;
@@ -9,13 +9,7 @@ with (
   'Dist::Zilla::Role::TextTemplate',
 );
 
-# BEGIN BOILERPLATE
-use v5.20.0;
-use warnings;
-use utf8;
-no feature 'switch';
-use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
-# END BOILERPLATE
+use Dist::Zilla::Pragmas;
 
 use namespace::autoclean;
 
@@ -276,7 +270,7 @@ Dist::Zilla::Plugin::ModuleBuild - build a Build.PL that uses Module::Build
 
 =head1 VERSION
 
-version 6.025
+version 6.027
 
 =head1 DESCRIPTION
 
@@ -333,7 +327,7 @@ L<BuildPL|Dist::Zilla::Role::BuildPL>.
 
 =head1 AUTHOR
 
-Ricardo SIGNES 😏 <rjbs@semiotic.systems>
+Ricardo SIGNES 😏 <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

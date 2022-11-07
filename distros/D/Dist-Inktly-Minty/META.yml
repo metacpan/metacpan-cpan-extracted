@@ -4,14 +4,14 @@ author:
   - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
 build_requires: {}
 configure_requires:
-  ExtUtils::MakeMaker: 6.17
+  ExtUtils::MakeMaker: '6.17'
 dynamic_config: 0
-generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.005, CPAN::Meta::Converter version 2.120921'
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010'
 keywords: []
-license: unknown
+license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: Dist-Inktly-Minty
 no_index:
   directory:
@@ -20,30 +20,33 @@ no_index:
     - inc
     - t
     - xt
+optional_features: {}
 provides:
   Dist::Inktly::Bovine:
     file: lib/Dist/Inktly/Bovine.pm
-    version: 0.002
+    version: '0.004'
   Dist::Inktly::Cervine:
     file: lib/Dist/Inktly/Cervine.pm
-    version: 0.002
+    version: '0.004'
   Dist::Inktly::Minty:
     file: lib/Dist/Inktly/Minty.pm
-    version: 0.002
+    version: '0.004'
 requires:
-  Getopt::ArgvFile: 0
-  Path::Tiny: 0
-  Software::License: 0
-  Text::Template: 0
-  URI::Escape: 0
-  perl: 5.010001
+  File::chdir: '0'
+  Getopt::ArgvFile: '0'
+  Path::Tiny: '0'
+  Software::License: '0'
+  Text::Template: '0'
+  URI::Escape: '0'
+  perl: '5.010001'
 resources:
-  X_identifier: http://purl.org/NET/cpan-uri/dist/Dist-Inktly-Minty/project
-  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=Dist-Inktly-Minty
+  Identifier: http://purl.org/NET/cpan-uri/dist/Dist-Inktly-Minty/project
+  bugtracker: https://github.com/tobyink/p5-dist-inktly-minty/issues
   homepage: https://metacpan.org/release/Dist-Inktly-Minty
   license: http://dev.perl.org/licenses/
-  repository: https://github.com/tobyink/p5-dist-inktly-minty
-version: 0.002
+  repository: git://github.com/tobyink/p5-dist-inktly-minty.git
+version: '0.004'
 x_provides_scripts:
   distinkt-mint:
     file: bin/distinkt-mint
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

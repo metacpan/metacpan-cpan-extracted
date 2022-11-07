@@ -9,7 +9,7 @@ BEGIN
 
   $IsWin32 = ($^O eq 'MSWin32' || $Config{'ccflags'} =~ /-D_?WIN32_?/);
 
-  $VERSION = '1.26';
+  $VERSION = '1.29';
   $win_arch = shift @ARGV if @ARGV and $ARGV[0] =~ /^(open32|pm|x|MSWin32)$/;
   require('fix_4_os2.pl'), OS2_massage() if $^O eq 'os2';
 
@@ -48,7 +48,7 @@ else
   my $plibs = $Config{'libs'};
   my $libs  = "$xlib -lX11";   # Used to have -lpt in here as well.
   my @try   = qw(-lsocket -lnsl -lm);
-  push(@try,'-lc') if $^O =~ /svr4/i;
+  push(@try,'-lc') if $^O eq 'svr4';
   my $lib;
   # perl needs sockets and math library too
   # so only include these if they made it through perl's Configure
@@ -64,7 +64,7 @@ delete $dir->{'pTk'};
 
 # Find path to existing pTk include files
 my $ptkPath = Tk::MMutil::findINC('Tk/pTk/Lang.h');
-$ptkPath =~ s/\/Lang.h$//g;
+$ptkPath =~ s/\/Lang\.h$//g;
 
 
 
@@ -88,7 +88,6 @@ Tk::MMutil::TkExtMakefile(
     },
 	'CONFIGURE_REQUIRES' => {
 		"ExtUtils::MakeMaker" => 6.52,
-		"Tk::MMtry" => 0,
 		"Tk::MMutil" => 0,
 	},
 	'META_MERGE' => {
@@ -98,6 +97,9 @@ Tk::MMutil::TkExtMakefile(
 				type => 'git',
 				url => 'https://github.com/asb-capfan/Tk-TableMatrix.git',
 				web => 'https://github.com/asb-capfan/Tk-TableMatrix',
+			},
+			bugtracker => {
+				web => 'https://github.com/asb-capfan/Tk-TableMatrix/issues',
 			},
 		},
 	},

@@ -5,9 +5,10 @@ use warnings;
 package Dist::Inktly::Minty;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.002';
+our $VERSION   = '0.004';
 
 use Carp;
+use File::chdir;
 use Path::Tiny 'path';
 use Software::License;
 use Text::Template;
@@ -96,6 +97,7 @@ sub create
 	$self->create_metadata;
 	$self->create_tests;
 	$self->create_author_tests;
+	$self->run_then;
 	return $self;
 }
 
@@ -128,6 +130,13 @@ sub set_defaults
 		$self->{module_filename} .= '.pm';
 	}
 	
+	unless ($self->{unit_test_filename})
+	{
+		$self->{unit_test_filename} = $self->{module_filename};
+		$self->{unit_test_filename} =~ s/\.pm$/\.t/;
+		$self->{unit_test_filename} =~ s/lib/t\/unit/;
+	}
+	
 	$self->{copyright}{holder} ||= $self->{author}{name};
 	$self->{copyright}{year}   ||= 1900 + [localtime]->[5];
 	
@@ -142,21 +151,21 @@ sub set_defaults
 sub create_module
 {
 	my $self = shift;
-	$self->_file( $self->{module_filename} )->spew_utf8( $self->_fill_in_template('module') );
+	$self->_file( $self->{module_filename} )->spew( $self->_fill_in_template('module') );
 	return;
 }
 
 sub create_dist_ini
 {
 	my $self = shift;
-	$self->_file('dist.ini')->spew_utf8($self->_fill_in_template('dist.ini'));
+	$self->_file('dist.ini')->spew($self->_fill_in_template('dist.ini'));
 	return;
 }
 
 sub create_metadata
 {
 	my $self = shift;
-	$self->_file($_)->spew_utf8($self->_fill_in_template($_))
+	$self->_file($_)->spew($self->_fill_in_template($_))
 		for grep { m#^meta/# } $self->_get_template_names;
 	return;
 }
@@ -164,8 +173,11 @@ sub create_metadata
 sub create_tests
 {
 	my $self = shift;
-	$self->_file($_)->spew_utf8($self->_fill_in_template($_))
+	$self->_file($_)->spew($self->_fill_in_template($_))
 		for grep { m#^t/# } $self->_get_template_names;
+	mkdir( $self->_file('t/unit') );
+	mkdir( $self->_file('t/integration') );
+	$self->_file( $self->{unit_test_filename} )->spew( $self->_fill_in_template('unit-test') );
 	return;
 }
 
@@ -173,14 +185,27 @@ sub create_author_tests
 {
 	my $self = shift;
 	
-	$self->_file($_)->spew_utf8($self->_fill_in_template($_))
+	$self->_file($_)->spew($self->_fill_in_template($_))
 		for grep { m#^xt/# } $self->_get_template_names;
 	
 	my $xtdir = path("~/perl5/xt");
-	$self->_file("xt/" . $_->relative($xtdir))->spew_utf8(scalar $_->slurp)
-		for grep { $_ =~ /\.t$/ } $xtdir->children;
+	if ( $xtdir->exists ) {
+		$self->_file("xt/" . $_->relative($xtdir))->spew(scalar $_->slurp)
+			for grep { $_ =~ /\.t$/ } $xtdir->children;
+	}
 	
 	return;
+}
+
+sub run_then {
+	my $self = shift;
+	ref $self->{then} or return;
+	my $dir = path(
+		$self->{destination},
+		sprintf('p5-%s', lc($self->{dist_name})),
+	);
+	local $CWD = "$dir";
+	system($_) for @{ $self->{then} };
 }
 
 1;
@@ -198,6 +223,8 @@ Dist::Inktly::Minty - create distributions that will use Dist::Inkt
 Experimental.
 
 =head1 DESCRIPTION
+
+Sets up a new distribution in the style TOBYINK likes.
 
 This package provides just one (class) method:
 
@@ -238,7 +265,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013 by Toby Inkster.
+This software is copyright (c) 2013-2022 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
@@ -282,7 +309,7 @@ our $VERSION   = '{$version}';
 {}=head1 BUGS
 
 Please report any bugs to
-L<http://rt.cpan.org/Dist/Display.html?Queue={URI::Escape::uri_escape($dist_name)}>.
+<https://github.com/{lc $author->{cpanid}}/p5-{lc URI::Escape::uri_escape($dist_name)}/issues>.
 
 {}=head1 SEE ALSO
 
@@ -301,7 +328,7 @@ WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
 MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
 COMMENCE dist.ini
-;;class='Dist::Inkt::Profile::{uc $author->{cpanid}}'
+;;class='Dist::Inkt::Profile::TOBYINK'
 ;;name='{$dist_name}'
 
 COMMENCE meta/changes.pret
@@ -321,8 +348,8 @@ COMMENCE meta/doap.pret
 	:shortdesc            "{$abstract}";
 	:homepage             <https://metacpan.org/release/{URI::Escape::uri_escape($dist_name)}>;
 	:download-page        <https://metacpan.org/release/{URI::Escape::uri_escape($dist_name)}>;
-	:bug-database         <http://rt.cpan.org/Dist/Display.html?Queue={URI::Escape::uri_escape($dist_name)}>;
-#	:repository           [ a :GitRepository; :browse <https://github.com/{lc $author->{cpanid}}/p5-{lc URI::Escape::uri_escape($dist_name)}> ];
+	:bug-database         <https://github.com/{lc $author->{cpanid}}/p5-{lc URI::Escape::uri_escape($dist_name)}/issues>;
+	:repository           [ a :GitRepository; :browse <https://github.com/{lc $author->{cpanid}}/p5-{lc URI::Escape::uri_escape($dist_name)}> ];
 	:created              {sprintf('%04d-%02d-%02d', 1900+(localtime)[5], 1+(localtime)[4], (localtime)[3])};
 	:license              <{$licence->url}>;
 	:maintainer           cpan:{uc $author->{cpanid}};
@@ -347,7 +374,11 @@ COMMENCE meta/makefile.pret
 @prefix : <http://ontologi.es/doap-deps#>.
 
 `{$dist_name}`
-	:test-requirement       [ :on "Test::More 0.96"^^:CpanId ];
+	:runtime-requirement    [ :on "perl 5.010001"^^:CpanId ];
+	:test-requirement       [ :on "Test2::V0"^^:CpanId ];
+	:test-requirement       [ :on "Test2::Tools::Spec"^^:CpanId ];
+	:test-requirement       [ :on "Test2::Require::AuthorTesting"^^:CpanId ];
+	:test-requirement       [ :on "Test2::Require::Module"^^:CpanId ];
 	:develop-recommendation [ :on "Dist::Inkt 0.001"^^:CpanId ];
 	.
 
@@ -372,12 +403,79 @@ Test that {$module_name} compiles.
 
 use strict;
 use warnings;
-use Test::More;
+use Test2::V0;
 
-use_ok('{$module_name}');
+use {$module_name} ();
+
+pass 'compiles ok';
 
 done_testing;
 
-COMMENCE xt/03meta_uptodate.config
-\{"package":"{$dist_name}"\}
+COMMENCE t/00start.t
+{}=pod
 
+{}=encoding utf-8
+
+{}=head1 PURPOSE
+
+Print version numbers, etc.
+
+{}=head1 AUTHOR
+
+{$author->{name}} E<lt>{$author->{mbox}}E<gt>.
+
+{}=head1 COPYRIGHT AND LICENCE
+
+{$licence->notice}
+
+{}=cut
+
+use Test2::V0;
+
+my @modules = qw(
+	Carp
+);
+
+diag "\n####";
+for my $mod ( sort @modules ) \{
+	eval "require $mod;";
+	diag sprintf( '%-20s %s', $mod, $mod->VERSION );
+\}
+diag "####";
+
+pass;
+
+done_testing;
+
+COMMENCE unit-test
+{}=pod
+
+{}=encoding utf-8
+
+{}=head1 PURPOSE
+
+Unit tests for L<{$module_name}>.
+
+{}=head1 AUTHOR
+
+{$author->{name}} E<lt>{$author->{mbox}}E<gt>.
+
+{}=head1 COPYRIGHT AND LICENCE
+
+{$licence->notice}
+
+{}=cut
+
+use Test2::V0 -target => '{$module_name}';
+use Test2::Tools::Spec;
+use Data::Dumper;
+
+describe "class `$CLASS`" => sub \{
+
+	tests 'blah blah blah' => sub \{
+	
+		pass;
+	\};
+\};
+
+done_testing;

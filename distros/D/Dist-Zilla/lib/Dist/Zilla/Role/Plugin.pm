@@ -1,16 +1,10 @@
-package Dist::Zilla::Role::Plugin 6.025;
+package Dist::Zilla::Role::Plugin 6.027;
 # ABSTRACT: something that gets plugged in to Dist::Zilla
 
 use Moose::Role;
 with 'Dist::Zilla::Role::ConfigDumper';
 
-# BEGIN BOILERPLATE
-use v5.20.0;
-use warnings;
-use utf8;
-no feature 'switch';
-use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
-# END BOILERPLATE
+use Dist::Zilla::Pragmas;
 
 use Params::Util qw(_HASHLIKE);
 use Moose::Util::TypeConstraints 'class_type';
@@ -109,7 +103,7 @@ Dist::Zilla::Role::Plugin - something that gets plugged in to Dist::Zilla
 
 =head1 VERSION
 
-version 6.025
+version 6.027
 
 =head1 DESCRIPTION
 
@@ -148,7 +142,7 @@ L<Dist::Zilla/log> method after including a bit of argument-munging.
 
 =head1 AUTHOR
 
-Ricardo SIGNES 😏 <rjbs@semiotic.systems>
+Ricardo SIGNES 😏 <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

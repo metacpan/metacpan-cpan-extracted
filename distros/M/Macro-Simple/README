@@ -1,0 +1,99 @@
+NAME
+    Macro::Simple - preprocessor-like macros in Perl
+
+SYNOPSIS
+      use Macros::Simple {
+        'CAN($$)' => 'blessed(%1$s) && %1$s->can(%2$s)',
+      };
+  
+      ...;
+  
+      if ( CAN($obj, 'get') ) {
+        ...;
+      }
+
+DESCRIPTION
+    This module implements something like C preprocessor macros for Perl
+    5.14+. It has fallbacks for Perl 5.8.3+.
+
+    I initially wrote this code back in 2014, but never put it on CPAN until
+    now.
+
+  Methods
+   `import( \%macros )`
+    The primary interface for this module is the `use` statement as
+    (obviously) it needs to work its magic at compile time.
+
+    Macros are defined as key-value pairs.
+
+    The keys are the names of the macros, optionally including a sub
+    prototype. (The full feature set of Perl prototypes is not supported.) It
+    is recommended that you use ALL_CAPS for macro names, but this is not
+    enforced.
+
+    The values are code generators. A code generator is responsible for
+    generating a string of Perl code that the macro will expand to.
+
+    Code generators can be coderefs which will be passed the macro's arguments
+    as strings of Perl code, and should return the expanded Perl code as a
+    string.
+
+      use Macro::Simple {
+        'ISA($;$)' => sub {
+          my ( $obj, $class ) = @_;
+          $class ||= '__PACKAGE__';
+          require Scalar::Util;
+          return sprintf(
+            'Scalar::Util::blessed(%s) and %s->isa(%s)',
+            $obj, $obj, $class,
+          );
+        },
+      };
+
+    In many simple cases though, an sprintf-compatible string is sufficient:
+
+      use Macro::Simple {
+        'CAN($$)' => 'blessed(%1$s) && %1$s->can(%2$s)',
+      };
+
+    Macro::Simple has some built-in support for using Type::Tiny types as
+    generators too:
+
+      use Types::Standard qw( Str );
+      use Macro::Simple {
+        'IS_STR($)'     => { is     => Str },
+        'ASSERT_STR($)' => { assert => Str },
+      };
+
+   `setup_for( $package, \%macros )`
+    The `import` method sets up macros for its caller. If you need to install
+    the macros into a different package (which should currently be in the
+    process of compiling!), then you can use `Macro::Simple->setup_for( $pkg,
+    \%macros )`.
+
+   `handle_generator( $generator )`
+    Method used internally to transform a non-coderef generator into a
+    coderef. (Is also called for coderefs, but the value is simply passed
+    through.) Overriding this method may be useful in subclasses.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Macro-Simple>.
+
+SEE ALSO
+    I dunno.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2022 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

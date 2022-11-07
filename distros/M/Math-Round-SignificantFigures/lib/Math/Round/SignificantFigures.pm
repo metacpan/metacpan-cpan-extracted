@@ -1,13 +1,13 @@
 package Math::Round::SignificantFigures;
 use strict;
 use warnings;
-use POSIX qw{ceil floor};
+use POSIX qw{ceil floor log10};
 require Exporter;
 
-our $VERSION      = '0.01';
-our @ISA          = qw(Exporter);
-my @figs          = qw{roundsigfigs ceilsigfigs floorsigfigs};
-my @digs          = qw{roundsigdigs ceilsigdigs floorsigdigs};
+our $VERSION     = '0.02';
+our @ISA         = qw(Exporter);
+my @figs         = qw{roundsigfigs ceilsigfigs floorsigfigs};
+my @digs         = qw{roundsigdigs ceilsigdigs floorsigdigs};
 our %EXPORT_TAGS = (
                      figs => \@figs,
                      digs => \@digs,
@@ -50,7 +50,7 @@ sub _floor_or_ceil_by_significant_figures {
   my $ceiling   = shift || 0; #-1 floor, 0 round, 1 ceil
   return $num if $num == 0;
   my $half      = $num < 0 ? -0.5 : 0.5;
-  my $d         = ceil(log(abs($num))/log(10));
+  my $d         = ceil(log10(abs($num)));
   my $power     = $sigfigs - $d;
   my $magnitude = 10 ** $power;
   my $shifted   = $ceiling > 0 ? ceil($num * $magnitude)
@@ -66,8 +66,8 @@ Rounds a number given the number and a number of significant figures.
 =cut
 
 sub roundsigfigs {
-  my $num = shift;
-  my $sigfigs   = shift;
+  my $num     = shift;
+  my $sigfigs = shift;
   return _floor_or_ceil_by_significant_figures($num, $sigfigs, 0);
 }
 
@@ -80,8 +80,8 @@ Rounds a number toward -inf given the number and a number of significant figures
 =cut
 
 sub floorsigfigs {
-  my $num = shift;
-  my $sigfigs   = shift;
+  my $num     = shift;
+  my $sigfigs = shift;
   return _floor_or_ceil_by_significant_figures($num, $sigfigs, -1);
 }
 
@@ -94,8 +94,8 @@ Rounds a number toward +inf given the number and a number of significant figures
 =cut
 
 sub ceilsigfigs {
-  my $num = shift;
-  my $sigfigs   = shift;
+  my $num     = shift;
+  my $sigfigs = shift;
   return _floor_or_ceil_by_significant_figures($num, $sigfigs, 1);
 }
 

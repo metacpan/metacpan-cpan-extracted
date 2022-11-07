@@ -7,7 +7,7 @@ use warnings;
 use Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::ReferenceURL::Fixture1;
 use Test::Shared::Fixture::Wikibase::Datatype::Snak::Wikidata::Retrieved::Fixture1;
 
-our $VERSION = 0.22;
+our $VERSION = 0.23;
 
 sub new {
 	my $class = shift;

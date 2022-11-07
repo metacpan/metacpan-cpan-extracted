@@ -5,7 +5,7 @@ use strict;
 use DBI   1.57 ();
 use XSLoader ();
 
-our $VERSION = '1.70';
+our $VERSION = '1.72';
 
 # sqlite_version cache (set in the XS bootstrap)
 our ($sqlite_version, $sqlite_version_number);
@@ -62,6 +62,7 @@ sub driver {
         DBD::SQLite::db->install_method('sqlite_db_config');
         DBD::SQLite::db->install_method('sqlite_get_autocommit');
         DBD::SQLite::db->install_method('sqlite_txn_state');
+        DBD::SQLite::db->install_method('sqlite_error_offset');
 
         $methods_are_installed++;
     }
@@ -1073,7 +1074,7 @@ are limited by the typeless nature of the SQLite database.
 =head1 SQLITE VERSION
 
 DBD::SQLite is usually compiled with a bundled SQLite library
-(SQLite version S<3.36.0> as of this release) for consistency.
+(SQLite version S<3.39.4> as of this release) for consistency.
 However, a different version of SQLite may sometimes be used for
 some reasons like security, or some new experimental features.
 
@@ -2297,12 +2298,16 @@ Calling this method with a true value enables loading (external)
 SQLite3 extensions. After the call, you can load extensions like this:
 
   $dbh->sqlite_enable_load_extension(1);
-  $sth = $dbh->prepare("select load_extension('libsqlitefunctions.so')")
+  $sth = $dbh->prepare("select load_extension('libmemvfs.so')")
   or die "Cannot prepare: " . $dbh->errstr();
 
 =head2 $dbh->sqlite_load_extension( $file, $proc )
 
-Loading an extension by a select statement (with the "load_extension" SQLite3 function like above) has some limitations. If you need to, say, create other functions from an extension, use this method. $file (a path to the extension) is mandatory, and $proc (an entry point name) is optional. You need to call C<sqlite_enable_load_extension> before calling C<sqlite_load_extension>.
+Loading an extension by a select statement (with the "load_extension" SQLite3 function like above) has some limitations. If the extension you want to use creates other functions that are not native to SQLite, use this method instead. $file (a path to the extension) is mandatory, and $proc (an entry point name) is optional. You need to call C<sqlite_enable_load_extension> before calling C<sqlite_load_extension>:
+
+  $dbh->sqlite_enable_load_extension(1);
+  $dbh->sqlite_load_extension('libsqlitefunctions.so')
+  or die "Cannot load extension: " . $dbh->errstr();
 
 If the extension uses SQLite mutex functions like C<sqlite3_mutex_enter>, then
 the extension should be compiled with the same C<SQLITE_THREADSAFE> compile-time
@@ -2426,6 +2431,12 @@ Return values (SQLITE_TXN_NONE, SQLITE_TXN_READ, SQLITE_TXN_WRITE)
 can be imported from DBD::SQLite::Constants. You may pass an optional
 schema name (usually "main"). If SQLite does not support this function,
 or if you pass a wrong schema name, -1 is returned.
+
+=head2 $dbh->sqlite_error_offset()
+
+Returns the byte offset of the start of a problematic input SQL token
+or -1 if the most recent error does not reference a specific token in
+the input SQL (or DBD::SQLite is built with an older version of SQLite).
 
 =head1 DRIVER FUNCTIONS
 
@@ -2589,18 +2600,17 @@ or
 
 =head2 Unicode handling
 
-If the attribute C<< $dbh->{sqlite_unicode} >> is set, strings coming from
-the database and passed to the collation function will be properly
-tagged with the utf8 flag; but this only works if the
-C<sqlite_unicode> attribute is set B<before> the first call to
-a perl collation sequence . The recommended way to activate unicode
-is to set the parameter at connection time :
+Depending on the C<< $dbh->{sqlite_string_mode} >> value, strings coming
+from the database and passed to the collation function may be decoded as
+UTF-8. This only works, though, if the C<sqlite_string_mode> attribute is
+set B<before> the first call to a perl collation sequence. The recommended
+way to activate unicode is to set C<sqlite_string_mode> at connection time:
 
   my $dbh = DBI->connect(
       "dbi:SQLite:dbname=foo", "", "",
       {
-          RaiseError     => 1,
-          sqlite_unicode => 1,
+          RaiseError         => 1,
+          sqlite_string_mode => DBD_SQLITE_STRING_MODE_UNICODE_STRICT,
       }
   );
 
@@ -2622,7 +2632,7 @@ characters :
   use DBD::SQLite;
   $DBD::SQLite::COLLATION{no_accents} = sub {
     my ( $a, $b ) = map lc, @_;
-    tr[àâáäåãçðèêéëìîíïñòôóöõøùûúüý]
+    tr[Ã Ã¢Ã¡Ã¤Ã¥Ã£Ã§Ã°Ã¨ÃªÃ©Ã«Ã¬Ã®Ã­Ã¯Ã±Ã²Ã´Ã³Ã¶ÃµÃ¸Ã¹Ã»ÃºÃ¼Ã½]
       [aaaaaacdeeeeiiiinoooooouuuuy] for $a, $b;
     $a cmp $b;
   };

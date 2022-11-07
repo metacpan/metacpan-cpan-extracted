@@ -7,7 +7,7 @@ use Error::Pure qw(err);
 use Mo qw(build is);
 use Wikibase::Datatype::Utils qw(check_entity);
 
-our $VERSION = 0.22;
+our $VERSION = 0.23;
 
 extends 'Wikibase::Datatype::Value';
 
@@ -286,6 +286,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.22
+0.23
 
 =cut

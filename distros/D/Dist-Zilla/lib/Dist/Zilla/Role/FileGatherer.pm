@@ -1,17 +1,11 @@
-package Dist::Zilla::Role::FileGatherer 6.025;
+package Dist::Zilla::Role::FileGatherer 6.027;
 # ABSTRACT: something that gathers files into the distribution
 
 use Moose::Role;
 with 'Dist::Zilla::Role::Plugin',
      'Dist::Zilla::Role::FileInjector';
 
-# BEGIN BOILERPLATE
-use v5.20.0;
-use warnings;
-use utf8;
-no feature 'switch';
-use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
-# END BOILERPLATE
+use Dist::Zilla::Pragmas;
 
 use namespace::autoclean;
 
@@ -43,7 +37,7 @@ Dist::Zilla::Role::FileGatherer - something that gathers files into the distribu
 
 =head1 VERSION
 
-version 6.025
+version 6.027
 
 =head1 DESCRIPTION
 
@@ -69,7 +63,7 @@ the minimum required perl.
 
 =head1 AUTHOR
 
-Ricardo SIGNES 😏 <rjbs@semiotic.systems>
+Ricardo SIGNES 😏 <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

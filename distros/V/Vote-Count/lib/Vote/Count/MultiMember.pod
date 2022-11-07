@@ -4,7 +4,7 @@
 
 =encoding utf8
 
-=head1 VERSION 2.01
+=head1 VERSION 2.02
 
 =head1 NAME
 

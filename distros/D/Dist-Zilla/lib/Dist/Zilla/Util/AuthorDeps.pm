@@ -1,13 +1,7 @@
-package Dist::Zilla::Util::AuthorDeps 6.025;
+package Dist::Zilla::Util::AuthorDeps 6.027;
 # ABSTRACT: Utils for listing your distribution's author dependencies
 
-# BEGIN BOILERPLATE
-use v5.20.0;
-use warnings;
-use utf8;
-no feature 'switch';
-use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
-# END BOILERPLATE
+use Dist::Zilla::Pragmas;
 
 use Dist::Zilla::Util;
 use Path::Tiny;
@@ -152,7 +146,7 @@ Dist::Zilla::Util::AuthorDeps - Utils for listing your distribution's author dep
 
 =head1 VERSION
 
-version 6.025
+version 6.027
 
 =head1 PERL VERSION
 
@@ -168,7 +162,7 @@ the minimum required perl.
 
 =head1 AUTHOR
 
-Ricardo SIGNES 😏 <rjbs@semiotic.systems>
+Ricardo SIGNES 😏 <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

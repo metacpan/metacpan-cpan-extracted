@@ -1,5 +1,9 @@
 Revision history for Perl module List::NSect
 
+0.07 2022-11-05
+  - Moved to GitHub
+  - Moved LICENSE to MIT from GPL2
+
 0.06 2014-06-20
   - Refactored functions to return only at end.
 

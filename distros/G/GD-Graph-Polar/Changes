@@ -1,5 +1,15 @@
 Changes for package GD-Graph-Polar
 
+0.22 2022-10-18
+  - Added axes property
+  - Removed use of $_ in favor of named loop varabes
+
+0.21 2022-10-13
+  - Added radius_origin method to support display of antenna paterns with dB scale (negatives)
+  - Updated _scale to support radius_origin
+  - Updated all methods to use $radius => $theta instead of $r=>$t
+  - Added t/002_radius_origin.t as author test
+
 0.20 2022-09-22
   - Updated rbgfile method to fixed issue calling Graphics::ColorNames which requires files to be true according to File::Spec::Functions::file_name_is_absolute - GitHub #1 - Slaven Rezić
 

@@ -18,9 +18,9 @@ my %WriteMakefileArgs = (
   "NAME" => "Test::Spy",
   "PREREQ_PM" => {
     "Moo" => "2.003004",
-    "Mooish::AttributeBuilder" => "1.001"
+    "Mooish::AttributeBuilder" => "1.002"
   },
-  "VERSION" => "0.004",
+  "VERSION" => "0.005",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Moo" => "2.003004",
-  "Mooish::AttributeBuilder" => "1.001"
+  "Mooish::AttributeBuilder" => "1.002"
 );
 
 

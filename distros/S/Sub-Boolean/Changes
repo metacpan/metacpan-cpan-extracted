@@ -1,0 +1,21 @@
+Sub-Boolean
+===========
+
+Created:      2022-11-06
+Home page:    <https://metacpan.org/release/Sub-Boolean>
+Bug tracker:  <https://github.com/tobyink/p5-sub-boolean/issues>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+1.000000	2022-11-07
+
+ [ Documentation ]
+ - Fix link to issue tracker.
+
+ [ Packaging ]
+ - Bump version number to the shiny 1.000000 number.
+
+ [ Other ]
+ - Allow the make_foo functions to be called with no parameter and return a
+   coderef.
+
+0.001	2022-11-06	Initial release

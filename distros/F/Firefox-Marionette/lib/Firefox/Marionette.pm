@@ -62,7 +62,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '1.28';
+our $VERSION = '1.31';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
@@ -79,7 +79,6 @@ sub _MIN_VERSION_FOR_NEW_SENDKEYS   { return 55 }
 sub _MIN_VERSION_FOR_HEADLESS       { return 55 }
 sub _MIN_VERSION_FOR_WD_HEADLESS    { return 56 }
 sub _MIN_VERSION_FOR_SAFE_MODE      { return 55 }
-sub _MIN_VERSION_FOR_MODERN_EXIT    { return 40 }
 sub _MIN_VERSION_FOR_AUTO_LISTEN    { return 55 }
 sub _MIN_VERSION_FOR_HOSTPORT_PROXY { return 57 }
 sub _MIN_VERSION_FOR_XVFB           { return 12 }
@@ -673,10 +672,12 @@ sub _init {
     my ( $class, %parameters ) = @_;
     my $self = bless {}, $class;
     $self->_store_restart_parameters(%parameters);
-    $self->{last_message_id}  = 0;
-    $self->{creation_pid}     = $PROCESS_ID;
-    $self->{sleep_time_in_ms} = $parameters{sleep_time_in_ms};
-    $self->{visible}          = $parameters{visible};
+    $self->{last_message_id}    = 0;
+    $self->{creation_pid}       = $PROCESS_ID;
+    $self->{sleep_time_in_ms}   = $parameters{sleep_time_in_ms};
+    $self->{force_scp_protocol} = $parameters{scp};
+    $self->{visible}            = $parameters{visible};
+
     foreach my $type (qw(nightly developer waterfox)) {
         if ( defined $parameters{$type} ) {
             $self->{requested_version}->{$type} = $parameters{$type};
@@ -1633,6 +1634,19 @@ _JS_
     return $self->_translate_firefox_logins( @{$result} );
 }
 
+sub _untaint_binary {
+    my ( $self, $binary, $remote_path_to_binary ) = @_;
+    if ( defined $remote_path_to_binary ) {
+        my $quoted_binary = quotemeta $binary;
+        if ( $remote_path_to_binary =~
+            /^([[:alnum:]\-\/\\:()~]*$quoted_binary)$/smx )
+        {
+            return $1;
+        }
+    }
+    return;
+}
+
 sub _binary_directory {
     my ($self) = @_;
     if ( exists $self->{_binary_directory} ) {
@@ -1658,9 +1672,13 @@ sub _binary_directory {
                   File::Spec::Unix->catdir( $volume, $directories );
             }
             else {
-                my $remote_path_to_binary =
-                  $self->_execute_via_ssh( { ignore_exit_status => 1 },
-                    'which', $binary );
+                my $remote_path_to_binary = $self->_untaint_binary(
+                    $binary,
+                    $self->_execute_via_ssh(
+                        { ignore_exit_status => 1 },
+                        'which', $binary
+                    )
+                );
                 if ( defined $remote_path_to_binary ) {
                     chomp $remote_path_to_binary;
                     if (
@@ -1747,55 +1765,17 @@ sub _most_recent_updates_status_path {
     return;
 }
 
-sub _wait_for_updating_to_finish {
-    my ($self) = @_;
-    my $count = 1;
-    my $updating;
-    while ($count) {
-        $count = 0;
-        if (
-            defined(
-                my $most_recent_updates_index =
-                  $self->_most_recent_updates_index()
-            )
-          )
-        {
-            my $update_directory =
-              $self->_updates_directory_exists( $self->_binary_directory() );
-            my $most_recent_update_directory =
-              File::Spec->catfile( $update_directory,
-                $most_recent_updates_index );
-            foreach my $entry (
-                $self->_directory_listing(
-                    { ignore_missing_directory => 1 },
-                    $most_recent_update_directory,
-                    1
-                )
-              )
-            {
-                $count += 1;
-            }
-        }
-        if ($count) {
-            $updating = 1;
-            sleep 1;
-        }
-    }
-    if ($updating) {
-        sleep 1;
-    }
-    return;
-}
-
 sub _get_update_status {
     my ($self) = @_;
     my $updates_status_path = $self->_most_recent_updates_status_path();
     if ($updates_status_path) {
         my $updates_status_handle;
         if ( $self->_ssh() ) {
-            $updates_status_handle =
-              $self->_get_file_via_scp( {}, $updates_status_path,
-                'update.status file' );
+            $updates_status_handle = $self->_get_file_via_scp(
+                { ignore_exit_status => 1 },
+                $updates_status_path,
+                'update.status file'
+            );
         }
         else {
             $updates_status_handle =
@@ -1807,7 +1787,7 @@ sub _get_update_status {
             chomp $status;
             return $status;
         }
-        elsif ( $OS_ERROR == POSIX::ENOENT() ) {
+        elsif ( ( $self->_ssh() ) || ( $OS_ERROR == POSIX::ENOENT() ) ) {
         }
         else {
             Firefox::Marionette::Exception->throw(
@@ -1982,7 +1962,7 @@ let updateManager = new Promise((resolve, reject) => {
             updateStatus["state"] = latestUpdate.state;
             updateStatus["statusText"] = latestUpdate.statusText;
             if ((latestUpdate.state == 'pending') || (latestUpdate.state == 'pending-service')) {
-              updateStatus["updateStatusCode"] = 'SUCCESSFUL_UPDATE';
+              updateStatus["updateStatusCode"] = 'PENDING_UPDATE';
               resolve(updateStatus);
             } else {
               setTimeout(function() { nowPending() }, 500);
@@ -2152,6 +2132,27 @@ return certificateDatabase.deleteCertificate(certificate);
 _JS_
     $self->_context($old);
     return $self;
+}
+
+sub is_trusted {
+    my ( $self, $certificate ) = @_;
+    my $db_key = $certificate->db_key();
+    chomp $db_key;
+    my $encoded_db_key = URI::Escape::uri_escape($db_key);
+    my $old            = $self->_context('chrome');
+    my $trusted        = $self->script(
+        $self->_compress_script(
+            $self->_certificate_interface_preamble()
+              . <<'_JS_'), args => [$encoded_db_key] );
+let certificate = certificateDatabase.findCertByDBKey(decodeURIComponent(arguments[0]), {});
+if (certificateDatabase.isCertTrusted(certificate, Components.interfaces.nsIX509Cert.CA_CERT, Components.interfaces.nsIX509CertDB.TRUSTED_SSL)) {
+    return true;
+} else {
+    return false;
+}
+_JS_
+    $self->_context($old);
+    return $trusted ? 1 : 0;
 }
 
 sub certificates {
@@ -2507,6 +2508,63 @@ sub _restart_profile_directory {
     return $profile_directory;
 }
 
+sub _get_remote_profile_directory {
+    my ( $self, $profile_name ) = @_;
+    my $profile_directory;
+    if (   ( $self->_remote_uname() eq 'cygwin' )
+        || ( $self->_remote_uname() eq 'MSWin32' ) )
+    {
+        my $appdata_directory =
+          $self->_get_remote_environment_variable_via_ssh('APPDATA');
+        if ( $self->_remote_uname() eq 'cygwin' ) {
+            $appdata_directory =~ s/\\/\//smxg;
+            $appdata_directory =
+              $self->_execute_via_ssh( {}, 'cygpath', '-u',
+                $appdata_directory );
+            chomp $appdata_directory;
+        }
+        my $profile_ini_directory =
+          $self->_remote_catfile( $appdata_directory, 'Mozilla', 'Firefox' );
+        my $profile_ini_path =
+          $self->_remote_catfile( $profile_ini_directory, 'profiles.ini' );
+        my $handle = $self->_get_file_via_scp( {}, $profile_ini_path,
+            'profiles.ini file' );
+        my $config = Config::INI::Reader->read_handle($handle);
+        $profile_directory = $self->_remote_catfile(
+            Firefox::Marionette::Profile->directory(
+                $profile_name, $config, $profile_ini_directory
+            )
+        );
+    }
+    else {
+        my $profile_ini_directory;
+        if ( $self->_remote_uname() eq 'darwin' ) {
+            $profile_ini_directory = $self->_remote_catfile( 'Library',
+                'Application Support', 'Firefox' );
+        }
+        else {
+            $profile_ini_directory =
+              $self->_remote_catfile( '.mozilla', 'firefox' );
+        }
+        my $profile_ini_path =
+          $self->_remote_catfile( $profile_ini_directory, 'profiles.ini' );
+        my $handle = $self->_get_file_via_scp( { ignore_exit_status => 1 },
+            $profile_ini_path, 'profiles.ini file' )
+          or Firefox::Marionette::Exception->throw( 'Failed to find the file '
+              . $self->_ssh_address()
+              . ":$profile_ini_path which would indicate where the prefs.js file for the '$profile_name' is stored"
+          );
+        my $config = Config::INI::Reader->read_handle($handle);
+        $profile_directory = $self->_remote_catfile(
+            Firefox::Marionette::Profile->directory(
+                $profile_name,          $config,
+                $profile_ini_directory, $self->_ssh_address()
+            )
+        );
+    }
+    return $profile_directory;
+}
+
 sub _setup_arguments {
     my ( $self, %parameters ) = @_;
     my @arguments = qw(-marionette);
@@ -2520,8 +2578,24 @@ sub _setup_arguments {
     if ( defined $self->{console} ) {
         push @arguments, '--jsconsole';
     }
+    if ( ( defined $self->{debug} ) && ( $self->{debug} !~ /^[01]$/smx ) ) {
+        push @arguments, '-MOZ_LOG=' . $self->{debug};
+    }
     push @arguments, $self->_check_addons(%parameters);
     push @arguments, $self->_check_visible(%parameters);
+    push @arguments, $self->_profile_arguments(%parameters);
+    if ( ( $self->{_har} ) || ( $parameters{devtools} ) ) {
+        push @arguments, '--devtools';
+    }
+    if ( $parameters{kiosk} ) {
+        push @arguments, '--kiosk';
+    }
+    return @arguments;
+}
+
+sub _profile_arguments {
+    my ( $self, %parameters ) = @_;
+    my @arguments;
     if ( $parameters{restart} ) {
         push @arguments,
           (
@@ -2531,10 +2605,19 @@ sub _setup_arguments {
     }
     elsif ( $parameters{profile_name} ) {
         $self->{profile_name} = $parameters{profile_name};
-        $self->{_profile_directory} =
-          Firefox::Marionette::Profile->directory( $parameters{profile_name} );
-        $self->{profile_path} =
-          File::Spec->catfile( $self->{_profile_directory}, 'prefs.js' );
+        if ( $self->_ssh() ) {
+            $self->{_profile_directory} =
+              $self->_get_remote_profile_directory( $parameters{profile_name} );
+            $self->{profile_path} =
+              $self->_remote_catfile( $self->{_profile_directory}, 'prefs.js' );
+        }
+        else {
+            $self->{_profile_directory} =
+              Firefox::Marionette::Profile->directory(
+                $parameters{profile_name} );
+            $self->{profile_path} =
+              File::Spec->catfile( $self->{_profile_directory}, 'prefs.js' );
+        }
         push @arguments, ( '-P', $self->{profile_name} );
     }
     else {
@@ -2575,12 +2658,6 @@ sub _setup_arguments {
         }
         push @arguments,
           ( '-profile', $profile_directory, '--no-remote', '--new-instance' );
-    }
-    if ( ( $self->{_har} ) || ( $parameters{devtools} ) ) {
-        push @arguments, '--devtools';
-    }
-    if ( $parameters{kiosk} ) {
-        push @arguments, '--kiosk';
     }
     return @arguments;
 }
@@ -3016,21 +3093,14 @@ sub _updates_directory_exists {
         if (   ($common_appdata_directory)
             && ( !$self->{_cached_per_instance}->{_mozilla_update_directory} ) )
         {
-            foreach my $entry (
-                $self->_directory_listing(
-                    { ignore_missing_directory => 1 },
-                    $common_appdata_directory,
-                    1
-                )
+            if (
+                my $sub_directory = $self->_get_microsoft_updates_sub_directory(
+                    $common_appdata_directory)
               )
             {
-                if ( $entry eq 'Mozilla' ) {
-                    $base_directory =
-                      $self->_remote_catfile( $common_appdata_directory,
-                        'Mozilla' );
-                    $self->{_cached_per_instance}->{_mozilla_update_directory}
-                      = $base_directory;
-                }
+                $base_directory = $sub_directory;
+                $self->{_cached_per_instance}->{_mozilla_update_directory} =
+                  $base_directory;
             }
         }
         if ($base_directory) {
@@ -3049,6 +3119,70 @@ sub _updates_directory_exists {
         }
     }
     return $self->{_cached_per_instance}->{_update_directory};
+}
+
+sub _get_microsoft_updates_sub_directory {
+    my ( $self, $common_appdata_directory ) = @_;
+    my $sub_directory;
+  ENTRY:
+    foreach my $entry (
+        $self->_directory_listing(
+            { ignore_missing_directory => 1 },
+            $common_appdata_directory, 1
+        )
+      )
+    {
+        if ( $entry =~ /^Mozilla/smx ) {
+            my $first_updates_directory =
+              $self->_catfile( $common_appdata_directory, $entry, 'updates' );
+            foreach my $entry (
+                $self->_directory_listing(
+                    { ignore_missing_directory => 1 },
+                    $first_updates_directory,
+                    1
+                )
+              )
+            {
+                if ( $entry =~ /^[[:xdigit:]]{16}$/smx ) {
+                    if (
+                        my $handle = $self->_open_handle_for_reading(
+                            $first_updates_directory, $entry,
+                            'updates',                '0',
+                            'update.status'
+                        )
+                      )
+                    {
+                        $sub_directory =
+                          $self->_catfile( $first_updates_directory, $entry );
+                        last ENTRY;
+                    }
+                }
+            }
+        }
+    }
+    return $sub_directory;
+}
+
+sub _open_handle_for_reading {
+    my ( $self, @path ) = @_;
+    my $path = $self->_catfile(@path);
+    if ( $self->_ssh() ) {
+        if (
+            my $handle = $self->_get_file_via_scp(
+                { ignore_exit_status => 1 },
+                $path, $path[-1], ' file'
+            )
+          )
+        {
+            return $handle;
+        }
+    }
+    else {
+        if ( my $handle = FileHandle->new( $path, Fcntl::O_RDONLY() ) ) {
+            return $handle;
+        }
+    }
+    return;
 }
 
 sub _active_update_xml_path {
@@ -3369,7 +3503,12 @@ sub _visible {
 
 sub _firefox_pid {
     my ($self) = @_;
-    return $self->{_firefox_pid};
+    if (   ( defined $self->{_firefox_pid} )
+        && ( $self->{_firefox_pid} =~ /^(\d+)/smx ) )
+    {
+        return $1;
+    }
+    return;
 }
 
 sub _local_ssh_pid {
@@ -3618,7 +3757,7 @@ sub _launch {
     }
     if ( $self->_ssh() ) {
         $self->{_local_ssh_pid} = $self->_launch_via_ssh(@arguments);
-        $self->_wait_for_updating_to_finish();
+        $self->_wait_for_any_background_update_status();
         return;
     }
     if ( $OSNAME eq 'MSWin32' ) {
@@ -3648,7 +3787,7 @@ sub _launch {
         local $ENV{TMPDIR} = $self->_local_firefox_tmp_directory();
         $self->{_firefox_pid} = $self->_launch_unix(@arguments);
     }
-    $self->_wait_for_updating_to_finish();
+    $self->_wait_for_any_background_update_status();
     return;
 }
 
@@ -4049,8 +4188,7 @@ sub macos_binary_paths {
         }
         if ( $self->{requested_version}->{waterfox} ) {
             return (
-                '/Applications/Waterfox Current.app/Contents/MacOS/waterfox',
-            );
+                '/Applications/Waterfox Current.app/Contents/MacOS/waterfox', );
         }
     }
     return (
@@ -4067,7 +4205,7 @@ my %_known_win32_organisations = (
     'Mozilla Firefox ESR'       => 'Mozilla',
     'Firefox Developer Edition' => 'Mozilla',
     Nightly                     => 'Mozilla',
-    'Waterfox'                  => 'Waterfox',
+    'Waterfox'                  => 'WaterfoxLimited',
     'Waterfox Current'          => 'Waterfox',
     'Waterfox Classic'          => 'Waterfox',
     Basilisk                    => 'Mozilla',
@@ -4688,8 +4826,16 @@ sub _win32_remote_process_running {
 
 sub _generic_remote_process_running {
     my ( $self, $remote_pid ) = @_;
-    my $result = $self->_execute_via_ssh( { return_exit_status => 1 },
-        'kill', '-0', $remote_pid );
+    my $result = $self->_execute_via_ssh(
+        { return_exit_status => 1 },
+        (
+            $self->_remote_uname() eq 'cygwin'
+            ? ( '/bin/kill', '-W' )
+            : ('kill')
+        ),
+        '-0',
+        $remote_pid
+    );
     if ( $result == 0 ) {
         $self->{last_remote_alive_status} = 1;
     }
@@ -4995,6 +5141,36 @@ sub _using_unix_sockets_for_ssh_connection {
     return 0;
 }
 
+sub _network_connection_and_initial_read_from_marionette {
+    my ( $self, $socket, $sock_addr ) = @_;
+    my ( $port, $host ) = Socket::unpack_sockaddr_in($sock_addr);
+    $host = Socket::inet_ntoa($host);
+    my $connected;
+    if ( connect $socket, $sock_addr ) {
+        my $number_of_bytes = sysread $socket,
+          $self->{_initial_octet_read_from_marionette_socket}, 1;
+        if ($number_of_bytes) {
+            $connected = 1;
+        }
+        else {
+            sleep 1;
+        }
+    }
+    elsif ( $EXTENDED_OS_ERROR == POSIX::ECONNREFUSED() ) {
+        sleep 1;
+    }
+    elsif (( $OSNAME eq 'MSWin32' )
+        && ( $EXTENDED_OS_ERROR == _WIN32_CONNECTION_REFUSED() ) )
+    {
+        sleep 1;
+    }
+    else {
+        Firefox::Marionette::Exception->throw(
+            "Failed to connect to $host on port $port:$EXTENDED_OS_ERROR");
+    }
+    return $connected;
+}
+
 sub _setup_local_connection_to_firefox {
     my ( $self, @arguments ) = @_;
     my $host = _DEFAULT_HOST();
@@ -5020,21 +5196,9 @@ sub _setup_local_connection_to_firefox {
         $sock_addr ||= $self->_get_sock_addr( $host, $port );
         next if ( !defined $sock_addr );
 
-        if ( connect $socket, $sock_addr ) {
-            $connected = 1;
-        }
-        elsif ( $EXTENDED_OS_ERROR == POSIX::ECONNREFUSED() ) {
-            sleep 1;
-        }
-        elsif (( $OSNAME eq 'MSWin32' )
-            && ( $EXTENDED_OS_ERROR == _WIN32_CONNECTION_REFUSED() ) )
-        {
-            sleep 1;
-        }
-        else {
-            Firefox::Marionette::Exception->throw(
-                "Failed to connect to $host on port $port:$EXTENDED_OS_ERROR");
-        }
+        $connected =
+          $self->_network_connection_and_initial_read_from_marionette( $socket,
+            $sock_addr );
     }
     $self->_reap();
     if ( ( $self->alive() ) && ($socket) ) {
@@ -5697,6 +5861,9 @@ sub _scp_t_ok {
 sub _scp_arguments {
     my ( $self, %parameters ) = @_;
     my @arguments = qw(-p);
+    if ( $self->{force_scp_protocol} ) {
+        push @arguments, qw(-O);
+    }
     if ( $self->_scp_t_ok() ) {
         push @arguments, qw(-T);
     }
@@ -5758,10 +5925,10 @@ sub _system {
     if ( $OSNAME eq 'MSWin32' ) {
         $command_line = $self->_quoting_for_cmd_exe( $binary, @arguments );
         if ( $self->_execute_win32_process( $binary, @arguments ) ) {
-            $result = 0;
+            $result = 1;
         }
         else {
-            $result = 1;
+            $result = 0;
         }
     }
     else {
@@ -5774,8 +5941,10 @@ sub _system {
         if ( my $pid = fork ) {
             waitpid $pid, 0;
             if ( $CHILD_ERROR == 0 ) {
+                $result = 1;
             }
             elsif ( $parameters->{ignore_exit_status} ) {
+                $result = 0;
             }
             else {
                 Firefox::Marionette::Exception->throw(
@@ -5811,7 +5980,7 @@ sub _system {
                 "Failed to fork:$EXTENDED_OS_ERROR");
         }
     }
-    return;
+    return $result;
 }
 
 sub _get_file_via_scp {
@@ -5820,35 +5989,49 @@ sub _get_file_via_scp {
     my $local_name = 'file_' . $self->{_scp_get_file_index} . '.dat';
     my $local_path =
       File::Spec->catfile( $self->{_local_scp_get_directory}, $local_name );
+    if (   ( $self->_remote_uname() eq 'MSWin32' )
+        && ( $remote_path !~ /^[[:alnum:]:\-+\\\/.]+$/smx ) )
+    {
+        $remote_path = $self->_execute_via_ssh( {},
+            q[for %A in ("] . $remote_path . q[") do ] . q[@] . q[echo %~sA] );
+        chomp $remote_path;
+        $remote_path =~ s/\r$//smx;
+    }
     if ( $OSNAME eq 'MSWin32' ) {
         $remote_path = $self->_quoting_for_cmd_exe($remote_path);
     }
     else {
-        $remote_path = "\"$remote_path\"";
+        if (   ( $self->_remote_uname() eq 'MSWin32' )
+            || ( $self->_remote_uname() eq 'cygwin' ) )
+        {
+            $remote_path =~ s/\\/\//smxg;
+        }
     }
+    $remote_path =~ s/[ ]/\\ /smxg;
     my @arguments = (
         $self->_scp_arguments(),
         $self->_ssh_address() . ":$remote_path", $local_path,
     );
-    $self->_system( $parameters, 'scp', @arguments );
-    my $handle = FileHandle->new( $local_path, Fcntl::O_RDONLY() );
-    if ($handle) {
-        binmode $handle;
+    if ( $self->_system( $parameters, 'scp', @arguments ) ) {
+        my $handle = FileHandle->new( $local_path, Fcntl::O_RDONLY() );
+        if ($handle) {
+            binmode $handle;
 
-        if (   ( $OSNAME eq 'MSWin32' )
-            || ( $OSNAME eq 'cygwin' ) )
-        {
+            if (   ( $OSNAME eq 'MSWin32' )
+                || ( $OSNAME eq 'cygwin' ) )
+            {
+            }
+            else {
+                unlink $local_path
+                  or Firefox::Marionette::Exception->throw(
+                    "Failed to unlink '$local_path':$EXTENDED_OS_ERROR");
+            }
+            return $handle;
         }
         else {
-            unlink $local_path
-              or Firefox::Marionette::Exception->throw(
-                "Failed to unlink '$local_path':$EXTENDED_OS_ERROR");
+            Firefox::Marionette::Exception->throw(
+                "Failed to open '$local_path' for reading:$EXTENDED_OS_ERROR");
         }
-        return $handle;
-    }
-    else {
-        Firefox::Marionette::Exception->throw(
-            "Failed to open '$local_path' for reading:$EXTENDED_OS_ERROR");
     }
     return;
 }
@@ -5884,9 +6067,7 @@ sub _put_file_via_scp {
     if ( $OSNAME eq 'MSWin32' ) {
         $remote_path = $self->_quoting_for_cmd_exe($remote_path);
     }
-    else {
-        $remote_path = "\"$remote_path\"";
-    }
+    $remote_path =~ s/[ ]/\\ /smxg;
     my @arguments = (
         $self->_scp_arguments(),
         $local_path, $self->_ssh_address() . ":$remote_path",
@@ -5940,27 +6121,25 @@ sub _get_marionette_port_via_ssh {
             $self->{profile_path}, 'profile path' );
     }
     else {
-        $handle = $self->_search_file_via_ssh(
-            $self->{profile_path},
-            'profile path',
-            [
-                'marionette\\.port',
-                'security\\.sandbox\\.content\\.tempDirSuffix',
-                'security\\.sandbox\\.plugin\\.tempDirSuffix'
-            ]
-        );
+        $handle =
+          $self->_search_file_via_ssh( $self->{profile_path}, 'profile path',
+            [ 'marionette', 'security', ] );
     }
     my $port;
-    while ( my $line = <$handle> ) {
-        if ( $line =~ /^user_pref[(]"marionette[.]port",[ ]*(\d+)[)];\s*$/smx )
-        {
-            $port = $1;
-        }
-        elsif ( $line =~
-            /^user_pref[(]"$sandbox_regex",[ ]*"[{]?([^"}]+)[}]?"[)];\s*$/smx )
-        {
-            my ( $sandbox, $uuid ) = ( $1, $2 );
-            $self->{_ssh}->{sandbox}->{$sandbox} = $uuid;
+    if ( defined $handle ) {
+        while ( my $line = <$handle> ) {
+            if ( $line =~
+                /^user_pref[(]"marionette[.]port",[ ]*(\d+)[)];\s*$/smx )
+            {
+                $port = $1;
+            }
+            elsif ( $line =~
+/^user_pref[(]"$sandbox_regex",[ ]*"[{]?([^"}]+)[}]?"[)];\s*$/smx
+              )
+            {
+                my ( $sandbox, $uuid ) = ( $1, $2 );
+                $self->{_ssh}->{sandbox}->{$sandbox} = $uuid;
+            }
         }
     }
     return $port;
@@ -5968,6 +6147,7 @@ sub _get_marionette_port_via_ssh {
 
 sub _search_file_via_ssh {
     my ( $self, $path, $description, $patterns ) = @_;
+    $path =~ s/[ ]/\\ /smxg;
     my $output = $self->_execute_via_ssh( {}, 'grep',
         ( map { ( q[-e], $_ ) } @{$patterns} ), $path );
     my $handle = File::Temp::tempfile(
@@ -6328,8 +6508,9 @@ sub _create_capabilities {
         ? $parameters->{platformName}
         : $parameters->{platform},
         rotatable        => $parameters->{rotatable} ? 1 : 0,
-        platform_version => $parameters->{platformVersion},
-        moz_profile      => $parameters->{'moz:profile'}
+        platform_version =>
+          $self->_platform_version_from_capabilities($parameters),
+        moz_profile => $parameters->{'moz:profile'}
           || $self->{_profile_directory},
         moz_process_id => $pid,
         moz_build_id   => $parameters->{'moz:buildID'}
@@ -6338,6 +6519,15 @@ sub _create_capabilities {
         moz_headless => $headless,
         %optional,
     );
+}
+
+sub _platform_version_from_capabilities {
+    my ( $self, $parameters ) = @_;
+    return
+      defined $parameters->{'moz:platformVersion'}
+      ? $parameters->{'moz:platformVersion'}
+      : $parameters->{platformVersion}
+      , # https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Releases/103#marionette
 }
 
 sub _get_optional_capabilities {
@@ -7589,6 +7779,32 @@ sub pdf {
     }
 }
 
+sub scroll {
+    my ( $self, $element, $arguments ) = @_;
+    if (
+        !$self->_is_marionette_object(
+            $element, 'Firefox::Marionette::Element'
+        )
+      )
+    {
+        Firefox::Marionette::Exception->throw(
+            'scroll method requires a Firefox::Marionette::Element parameter');
+    }
+    if ( defined $arguments ) {
+        if ( ref $arguments ) {
+        }
+        else {
+            $arguments = $arguments ? JSON::true() : JSON::false();
+        }
+        $self->script( 'arguments[0].scrollIntoView(arguments[1]);',
+            args => [ $element, $arguments ] );
+    }
+    else {
+        $self->script( 'arguments[0].scrollIntoView();', args => [$element] );
+    }
+    return $self;
+}
+
 sub selfie {
     my ( $self, $element, @remaining ) = @_;
     my $message_id = $self->_new_message_id();
@@ -7734,6 +7950,28 @@ sub pause {
     return { type => 'pause', duration => $duration };
 }
 
+sub wheel {
+    my ( $self, @parameters ) = @_;
+    my %arguments;
+    if (
+        $self->_is_marionette_object(
+            $parameters[0], 'Firefox::Marionette::Element'
+        )
+      )
+    {
+        my $origin = shift @parameters;
+        %arguments = $self->_calculate_xy_from_element( $origin, %arguments );
+    }
+    while (@parameters) {
+        my $key = shift @parameters;
+        $arguments{$key} = shift @parameters;
+    }
+    foreach my $key (qw(x y duration deltaX deltaY)) {
+        $arguments{$key} ||= 0;
+    }
+    return { type => 'scroll', %arguments };
+}
+
 sub mouse_move {
     my ( $self, @parameters ) = @_;
     my %arguments;
@@ -7744,21 +7982,27 @@ sub mouse_move {
       )
     {
         my $origin = shift @parameters;
-        my $rect   = $origin->rect();
-        $arguments{x} = $rect->pos_x() + ( $rect->width() / 2 );
-        if ( $arguments{x} != int $arguments{x} ) {
-            $arguments{x} = int $arguments{x} + 1;
-        }
-        $arguments{y} = $rect->pos_y() + ( $rect->height() / 2 );
-        if ( $arguments{y} != int $arguments{y} ) {
-            $arguments{y} = int $arguments{y} + 1;
-        }
+        %arguments = $self->_calculate_xy_from_element( $origin, %arguments );
     }
     while (@parameters) {
         my $key = shift @parameters;
         $arguments{$key} = shift @parameters;
     }
     return { type => 'pointerMove', pointerType => 'mouse', %arguments };
+}
+
+sub _calculate_xy_from_element {
+    my ( $self, $origin, %arguments ) = @_;
+    my $rect = $origin->rect();
+    $arguments{x} = $rect->pos_x() + ( $rect->width() / 2 );
+    if ( $arguments{x} != int $arguments{x} ) {
+        $arguments{x} = int $arguments{x} + 1;
+    }
+    $arguments{y} = $rect->pos_y() + ( $rect->height() / 2 );
+    if ( $arguments{y} != int $arguments{y} ) {
+        $arguments{y} = int $arguments{y} + 1;
+    }
+    return %arguments;
 }
 
 sub mouse_down {
@@ -7790,11 +8034,17 @@ sub perform {
             $marionette_action->{$key} = $parameter_action->{$key};
         }
         my $type;
+        my %type_map = (
+            keyUp   => 'key',
+            keyDown => 'key',
+            scroll  => 'wheel',
+        );
         my %arguments;
         if (   ( $marionette_action->{type} eq 'keyUp' )
-            || ( $marionette_action->{type} eq 'keyDown' ) )
+            || ( $marionette_action->{type} eq 'keyDown' )
+            || ( $marionette_action->{type} eq 'scroll' ) )
         {
-            $type = 'key';
+            $type = $type_map{ $marionette_action->{type} };
         }
         elsif (( $marionette_action->{type} eq 'pointerMove' )
             || ( $marionette_action->{type} eq 'pointerDown' )
@@ -7815,7 +8065,7 @@ sub perform {
         }
         else {
             Firefox::Marionette::Exception->throw(
-'Unknown action type in sequence.  keyUp, keyDown, pointerMove, pointerDown, pointerUp or pause are the only known types'
+'Unknown action type in sequence.  keyUp, keyDown, pointerMove, pointerDown, pointerUp, pause and wheel are the only known types'
             );
         }
         $self->{next_action_sequence_id}++;
@@ -8333,23 +8583,10 @@ sub _quit_over_marionette {
         $self->_wait_for_firefox_to_exit();
     }
     else {
-        if (
-            !$self->_is_firefox_major_version_at_least(
-                _MIN_VERSION_FOR_MODERN_EXIT()
-            )
-          )
-        {
-            close $socket
-              or Firefox::Marionette::Exception->throw(
-                "Failed to close socket to firefox:$EXTENDED_OS_ERROR");
-            $socket = undef;
-        }
-        elsif ( $self->_ssh() ) {
-            close $socket
-              or Firefox::Marionette::Exception->throw(
-                "Failed to close socket to firefox:$EXTENDED_OS_ERROR");
-            $socket = undef;
-        }
+        close $socket
+          or Firefox::Marionette::Exception->throw(
+            "Failed to close socket to firefox:$EXTENDED_OS_ERROR");
+        $socket = undef;
         $self->_wait_for_firefox_to_exit();
     }
     if ( defined $socket ) {
@@ -8434,6 +8671,16 @@ sub _get_remote_root_directory {
             $self->_remote_catfile( $original_tmp_directory, $name ) );
     }
     return $remote_root_directory;
+}
+
+sub uname {
+    my ($self) = @_;
+    if ( my $ssh = $self->_ssh() ) {
+        return $self->_remote_uname();
+    }
+    else {
+        return $OSNAME;
+    }
 }
 
 sub _get_remote_environment_command {
@@ -9217,13 +9464,17 @@ sub _get_xpi_path {
               File::Spec->splitpath( $path, 1 );
             $base_directory = $path;
         }
-        else {
+        elsif ( FileHandle->new( $path, Fcntl::O_RDONLY() ) ) {
             ( $volume, $directories, $name ) = File::Spec->splitpath($path);
             $base_directory = File::Spec->catdir( $volume, $directories );
             if ( $OSNAME eq 'cygwin' ) {
                 $base_directory =~
                   s/^\/\//\//smx;   # seems to be a bug in File::Spec for cygwin
             }
+        }
+        else {
+            Firefox::Marionette::Exception->throw(
+                "Failed to find extension $path:$EXTENDED_OS_ERROR");
         }
         my @directories = File::Spec->splitdir($directories);
         if ( $directories[-1] eq q[] ) {
@@ -9418,27 +9669,41 @@ sub _send_request {
     return;
 }
 
+sub _handle_socket_read_failure {
+    my ($self) = @_;
+    my $socket_error = $EXTENDED_OS_ERROR;
+    if ( $self->alive() ) {
+        Firefox::Marionette::Exception->throw(
+"Failed to read size of response from socket to firefox:$socket_error"
+        );
+    }
+    else {
+        my $error_message =
+          $self->error_message() ? $self->error_message() : q[];
+        Firefox::Marionette::Exception->throw($error_message);
+    }
+    return;
+}
+
 sub _read_from_socket {
     my ($self) = @_;
     my $number_of_bytes_in_response;
     my $initial_buffer;
     while ( ( !defined $number_of_bytes_in_response ) && ( $self->alive() ) ) {
-        my $number_of_bytes = sysread $self->_socket(), my $octet, 1;
+        my $number_of_bytes;
+        my $octet;
+        if ( $self->{_initial_octet_read_from_marionette_socket} ) {
+            $octet = delete $self->{_initial_octet_read_from_marionette_socket};
+            $number_of_bytes = length $octet;
+        }
+        else {
+            $number_of_bytes = sysread $self->_socket(), $octet, 1;
+        }
         if ( defined $number_of_bytes ) {
             $initial_buffer .= $octet;
         }
         else {
-            my $socket_error = $EXTENDED_OS_ERROR;
-            if ( $self->alive() ) {
-                Firefox::Marionette::Exception->throw(
-"Failed to read size of response from socket to firefox:$socket_error"
-                );
-            }
-            else {
-                my $error_message =
-                  $self->error_message() ? $self->error_message() : q[];
-                Firefox::Marionette::Exception->throw($error_message);
-            }
+            $self->_handle_socket_read_failure();
         }
         if ( $initial_buffer =~ s/^(\d+)://smx ) {
             ($number_of_bytes_in_response) = ($1);
@@ -9579,7 +9844,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 1.28
+Version 1.31
 
 =head1 SYNOPSIS
 
@@ -9592,15 +9857,15 @@ Version 1.28
 
     say $firefox->html();
 
-    $firefox->find_class('container-fluid')->find_id('metacpan_search-input')->type('Test::More');
+    $firefox->find_class('page-content')->find_id('metacpan_search-input')->type('Test::More');
 
-    say "Height of search box is " . $firefox->find_class('container-fluid')->css('height');
+    say "Height of page-content div is " . $firefox->find_class('page-content')->css('height');
 
     my $file_handle = $firefox->selfie();
 
-    $firefox->find('//button[@name="lucky"]')->click();
+    $firefox->await(sub { $firefox->find_class('autocomplete-suggestion'); })->click();
 
-    $firefox->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click();
+    $firefox->find_partial('Download')->click();
 
 =head1 DESCRIPTION
 
@@ -9783,9 +10048,7 @@ accepts a subroutine reference as a parameter and then executes the subroutine. 
 
     $firefox->find_id('metacpan_search-input')->type('Test::More');
 
-    $firefox->find_name('lucky')->click();
-
-    $firefox->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click();
+    $firefox->await(sub { $firefox->find_class('autocomplete-suggestion'); })->click();
 
 =head2 back
 
@@ -9813,9 +10076,9 @@ accepts a subroutine reference as a parameter and then executes the subroutine. 
 
     $firefox->find_id('metacpan_search-input')->type('Test::More');
 
-    $firefox->find_name('lucky')->click();
+    $firefox->await(sub { $firefox->find_class('autocomplete-suggestion'); })->click();
 
-    $firefox->bye(sub { $firefox->find_name('lucky') })->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click();
+    $firefox->bye(sub { $firefox->find_name('metacpan_search-input') })->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click();
 
 =head2 capabilities
 
@@ -10089,11 +10352,11 @@ accepts a filesystem path and returns a matching filehandle.  This is trivial fo
 
     my $firefox = Firefox::Marionette->new( host => '10.1.2.3' )->go('https://metacpan.org/');
 
-    $firefox->find_class('container-fluid')->find_id('metacpan_search-input')->type('Test::More');
+    $firefox->find_class('page-content')->find_id('metacpan_search-input')->type('Test::More');
 
-    $firefox->find('//button[@name="lucky"]')->click();
+    $firefox->await(sub { $firefox->find_class('autocomplete-suggestion'); })->click();
 
-    $firefox->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click();
+    $firefox->find_partial('Download')->click();
 
     while(!$firefox->downloads()) { sleep 1 }
 
@@ -10114,11 +10377,11 @@ returns true if any files in L<downloads|Firefox::Marionette#downloads> end in C
 
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
 
-    $firefox->find_class('container-fluid')->find_id('metacpan_search-input')->type('Test::More');
+    $firefox->find_class('page-content')->find_id('metacpan_search-input')->type('Test::More');
 
-    $firefox->find('//button[@name="lucky"]')->click();
+    $firefox->await(sub { $firefox->find_class('autocomplete-suggestion'); })->click();
 
-    $firefox->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click();
+    $firefox->find_partial('Download')->click();
 
     while(!$firefox->downloads()) { sleep 1 }
 
@@ -10137,11 +10400,11 @@ returns a list of file paths (including partial downloads) of downloads during t
 
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
 
-    $firefox->find_class('container-fluid')->find_id('metacpan_search-input')->type('Test::More');
+    $firefox->find_class('page-content')->find_id('metacpan_search-input')->type('Test::More');
 
-    $firefox->find('//button[@name="lucky"]')->click();
+    $firefox->await(sub { $firefox->find_class('autocomplete-suggestion'); })->click();
 
-    $firefox->await(sub { $firefox->interactive() && $firefox->find_partial('Download') })->click();
+    $firefox->find_partial('Download')->click();
 
     while(!$firefox->downloads()) { sleep 1 }
 
@@ -10384,7 +10647,7 @@ returns a hashref representing the L<http archive|https://en.wikipedia.org/wiki/
     $firefox->go("http://metacpan.org/");
 
     $firefox->find('//input[@id="metacpan_search-input"]')->type('Test::More');
-    $firefox->find_name('lucky')->click();
+    $firefox->await(sub { $firefox->find_class('autocomplete-suggestion'); })->click();
 
     my $har = Archive::Har->new();
     $har->hashref($firefox->har());
@@ -10593,7 +10856,7 @@ returns true if C<document.readyState === "interactive"> or if L<loaded|Firefox:
 
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
     $firefox->find_id('metacpan_search-input')->type('Type::More');
-    $firefox->find('//button[@name="lucky"]')->click();
+    $firefox->await(sub { $firefox->find_class('autocomplete-suggestion'); })->click();
     while(!$firefox->interactive()) {
         # redirecting to Test::More page
     }
@@ -10609,6 +10872,20 @@ accepts an L<element|Firefox::Marionette::Element> as the first parameter.  This
 =head2 is_selected
 
 accepts an L<element|Firefox::Marionette::Element> as the first parameter.  This method returns true or false depending on if the element L<is selected|https://w3c.github.io/webdriver/#dfn-is-element-selected>.  Note that this method only makes sense for L<checkbox|https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/checkbox> or L<radio|https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/radio> inputs or L<option|https://developer.mozilla.org/en-US/docs/Web/HTML/Element/option> elements in a L<select|https://developer.mozilla.org/en-US/docs/Web/HTML/Element/select> dropdown.
+
+=head2 is_trusted
+
+accepts an L<certificate|Firefox::Marionette::Certificate> as the first parameter.  This method returns true or false depending on if the certificate is a trusted CA certificate in the current profile.
+
+    use Firefox::Marionette();
+    use v5.10;
+
+    my $firefox = Firefox::Marionette->new( profile_name => 'default' );
+    foreach my $certificate ($firefox->certificates()) {
+        if (($certificate->is_ca_cert()) && ($firefox->is_trusted($certificate))) {
+            say $certificate->display_name() . " is a trusted CA cert in the current profile";
+        } 
+    } 
 
 =head2 json
 
@@ -10658,7 +10935,7 @@ returns true if C<document.readyState === "complete">
 
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
     $firefox->find_id('metacpan_search-input')->type('Type::More');
-    $firefox->find('//button[@name="lucky"]')->click();
+    $firefox->await(sub { $firefox->find_class('autocomplete-suggestion'); })->click();
     while(!$firefox->loaded()) {
         # redirecting to Test::More page
     }
@@ -10830,7 +11107,7 @@ accepts an optional hash as a parameter.  Allowed keys are below;
 
 =item * console - show the L<browser console|https://developer.mozilla.org/en-US/docs/Tools/Browser_Console/> when the browser is launched.  This defaults to "0" (off).
 
-=item * debug - should firefox's debug to be available via STDERR. This defaults to "0". Any ssh connections will also be printed to STDERR.  This defaults to "0" (off).  This setting may be updated by the L<debug|Firefox::Marionette#debug> method.
+=item * debug - should firefox's debug to be available via STDERR. This defaults to "0". Any ssh connections will also be printed to STDERR.  This defaults to "0" (off).  This setting may be updated by the L<debug|Firefox::Marionette#debug> method.  If this option is not a boolean (0|1), the value will be passed to the L<MOZ_LOG|https://firefox-source-docs.mozilla.org/networking/http/logging.html> option on the command line of the firefox binary to allow extra levels of debug.
 
 =item * developer - only allow a L<developer edition|https://www.mozilla.org/en-US/firefox/developer/> to be launched. This defaults to "0" (off).
 
@@ -10840,7 +11117,7 @@ accepts an optional hash as a parameter.  Allowed keys are below;
 
 =item * har - begin the session with the L<devtools|https://developer.mozilla.org/en-US/docs/Tools> window opened in a separate window.  The L<HAR Export Trigger|https://addons.mozilla.org/en-US/firefox/addon/har-export-trigger/> addon will be loaded into the new session automatically, which means that L<-safe-mode|http://kb.mozillazine.org/Command_line_arguments#List_of_command_line_arguments_.28incomplete.29> will not be activated for this session AND this functionality will only be available for Firefox 61+.
 
-=item * host - use L<ssh|https://man.openbsd.org/ssh.1> to create and automate firefox on the specified host.  See L<REMOTE AUTOMATION OF FIREFOX VIA SSH|Firefox::Marionette#REMOTE-AUTOMATION-OF-FIREFOX-VIA-SSH>.
+=item * host - use L<ssh|https://man.openbsd.org/ssh.1> to create and automate firefox on the specified host.  See L<REMOTE AUTOMATION OF FIREFOX VIA SSH|Firefox::Marionette#REMOTE-AUTOMATION-OF-FIREFOX-VIA-SSH>.  The user will default to the current user name (see the user parameter to change this).  Authentication should be via public keys loaded into the local L<ssh-agent|https://man.openbsd.org/ssh-agent>.
 
 =item * implicit - a shortcut to allow directly providing the L<implicit|Firefox::Marionette::Timeout#implicit> timeout, instead of needing to use timeouts from the capabilities parameter.  Overrides all longer ways.
 
@@ -10862,6 +11139,8 @@ accepts an optional hash as a parameter.  Allowed keys are below;
 
 =item * reconnect - an experimental parameter to allow a reconnection to firefox that a connection has been discontinued.  See the survive parameter.
 
+=item * scp - force the scp protocol when transferring files to remote hosts via ssh. See L<REMOTE AUTOMATION OF FIREFOX VIA SSH|Firefox::Marionette#REMOTE-AUTOMATION-OF-FIREFOX-VIA-SSH> and the --scp-only option in the L<ssh-auth-cmd-marionette|ssh-auth-cmd-marionette> script in this distribution.
+
 =item * script - a shortcut to allow directly providing the L<script|Firefox::Marionette::Timeout#script> timeout, instead of needing to use timeouts from the capabilities parameter.  Overrides all longer ways.
 
 =item * seer - this option is switched off "0" by default.  When it is switched on "1", it will activate the various speculative and pre-fetch options for firefox.  NOTE: that this option only works when profile_name/profile is not specified.
@@ -10874,7 +11153,7 @@ accepts an optional hash as a parameter.  Allowed keys are below;
 
 =item * timeouts - a shortcut to allow directly providing a L<timeout|Firefox::Marionette::Timeout> object, instead of needing to use timeouts from the capabilities parameter.  Overrides the timeouts provided (if any) in the capabilities parameter.
 
-=item * user - if the "host" parameter is also set, use L<ssh|https://man.openbsd.org/ssh.1> to create and automate firefox with the specified user.  See L<REMOTE AUTOMATION OF FIREFOX VIA SSH|Firefox::Marionette#REMOTE-AUTOMATION-OF-FIREFOX-VIA-SSH>.  The user will default to the current user name.
+=item * user - if the "host" parameter is also set, use L<ssh|https://man.openbsd.org/ssh.1> to create and automate firefox with the specified user.  See L<REMOTE AUTOMATION OF FIREFOX VIA SSH|Firefox::Marionette#REMOTE-AUTOMATION-OF-FIREFOX-VIA-SSH>.  The user will default to the current user name.  Authentication should be via public keys loaded into the local L<ssh-agent|https://man.openbsd.org/ssh-agent>.
 
 =item * via - specifies a L<proxy jump box|https://man.openbsd.org/ssh_config#ProxyJump> to be used to connect to a remote host.  See the host parameter.
 
@@ -10891,7 +11170,7 @@ This method returns a new C<Firefox::Marionette> object, connected to an instanc
     use Firefox::Marionette();
 
     my $remote_darwin_firefox = Firefox::Marionette->new(
-                     debug => 1,
+                     debug => 'timestamp,nsHttp:1',
                      host => '10.1.2.3',
                      trust => '/path/to/root_ca.pem',
                      binary => '/Applications/Firefox.app/Contents/MacOS/firefox'
@@ -11178,7 +11457,7 @@ Returns the result of the javascript function.  When a parameter is an L<element
 
     my $firefox = Firefox::Marionette->new()->go('https://metacpan.org/');
 
-    if (my $element = $firefox->script('return document.getElementsByName("lucky")[0];')) {
+    if (my $element = $firefox->script('return document.getElementsByName("metacpan_search-input")[0];')) {
         say "Lucky find is a " . $element->tag_name() . " element";
     }
 
@@ -11211,6 +11490,19 @@ The parameters after the L<element|Firefox::Marionette::Element> parameter are t
 =item * highlights - a reference to a list containing L<elements|Firefox::Marionette::Element> to draw a highlight around.  Not available in L<Firefox 70|https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Releases/70#WebDriver_conformance_Marionette> onwards.
 
 =back
+
+=head2 scroll
+
+accepts a L<element|Firefox::Marionette::Element> as the first parameter and L<scrolls|https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollIntoView> to it.  The optional second parameter is the same as for the L<scrollInfoView|https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollIntoView> method.
+
+    use Firefox::Marionette();
+
+    my $firefox = Firefox::Marionette->new(visible => 1)->go('https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollIntoView');
+    my $link = $firefox->find_id('content')->find_link('Examples');
+    $firefox->scroll($link);
+    $firefox->scroll($link, 1);
+    $firefox->scroll($link, { behavior => 'smooth', block => 'center' });
+    $firefox->scroll($link, { block => 'end', inline => 'nearest' });
 
 =head2 send_alert_text
 
@@ -11328,6 +11620,10 @@ returns the current L<title|https://developer.mozilla.org/en-US/docs/Web/HTML/El
 
 accepts an L<element|Firefox::Marionette::Element> as the first parameter and a string as the second parameter.  It sends the string to the specified L<element|Firefox::Marionette::Element> in the current page, such as filling out a text box. This method returns L<itself|Firefox::Marionette> to aid in chaining methods.
 
+=head2 uname
+
+returns the $^O ($OSNAME) compatible string to describe the plaform where firefox is running.
+
 =head2 update
 
 queries the Update Services and applies any available updates.  L<Restarts|Firefox::Marionette#restart> the browser if necessary to complete the update.  This function is experimental and currently has not been successfully tested on Win32 or MacOS.
@@ -11366,6 +11662,22 @@ accepts the GUID for the addon to uninstall.  The GUID is returned when from the
 =head2 uri
 
 returns the current L<URI|URI> of current top level browsing context for Desktop.  It is equivalent to the javascript C<document.location.href>
+
+=head2 wheel
+
+accepts a L<element|Firefox::Marionette::Element> parameter, or a C<( x =E<gt> 0, y =E<gt> 0 )> type hash manually describing exactly where to move the mouse from and returns an action for use in the L<perform|Firefox::Marionette#perform> method that corresponding with such a wheel action, either to the specified co-ordinates or to the middle of the supplied L<element|Firefox::Marionette::Element> parameter.  Other parameters that may be passed are listed below;
+
+=over 4
+
+=item * origin - the origin of the C(<x =E<gt> 0, y =E<gt> 0)> co-ordinates.  Should be either C<viewport>, C<pointer> or an L<element|Firefox::Marionette::Element>.
+
+=item * duration - Number of milliseconds over which to distribute the move. If not defined, the duration defaults to 0.
+
+=item * deltaX - the change in X co-ordinates during the wheel.  If not defined, deltaX defaults to 0.
+
+=item * deltaY - the change in Y co-ordinates during the wheel.  If not defined, deltaY defaults to 0.
+
+=back
 
 =head2 win32_organisation
 
@@ -11490,6 +11802,8 @@ This module has support for creating and automating an instance of Firefox on a 
     no-agent-forwarding,no-pty,no-X11-forwarding,permitopen="127.0.0.1:*",command="/usr/local/bin/ssh-auth-cmd-marionette" ssh-rsa AAAA ... == user@server
 
 As an example, the L<ssh-auth-cmd-marionette|ssh-auth-cmd-marionette> command is provided as part of this distribution.
+
+The module will expect to access private keys via the local L<ssh-agent|https://man.openbsd.org/ssh-agent> when authenticating.
 
 When using ssh, Firefox::Marionette will attempt to pass the L<TMPDIR|https://en.wikipedia.org/wiki/TMPDIR> environment variable across the ssh connection to make cleanups easier.  In order to allow this, the L<AcceptEnv|https://man.openbsd.org/sshd_config#AcceptEnv> setting in the remote L<sshd configuration|https://man.openbsd.org/sshd_config> should be set to allow TMPDIR, which will look like;
 

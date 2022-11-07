@@ -43,6 +43,13 @@ METHODS
 
             Default value is undef.
 
+    *       "data_init"
+
+            Reference to array with structure for input argument of
+            "Tags::HTML::init()".
+
+            Default value is undef.
+
   "to_app"
      my $app = $obj->to_app;
 
@@ -158,5 +165,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.08
+    0.09
 

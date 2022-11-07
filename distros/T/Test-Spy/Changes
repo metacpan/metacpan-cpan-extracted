@@ -1,3 +1,8 @@
+0.005 Nov 4 2022
+	- test object now also handles 'does'
+	- add 'imitates' option, which affects identity checks
+	- use Mooish::AttributeBuilder >=1.002 (fixes CPAN testers)
+
 0.004 Nov 1 2022
 	- use Mooish::AttributeBuilder >=1.001
 

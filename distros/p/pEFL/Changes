@@ -118,5 +118,11 @@ Revision history for Perl extension pEFL.
 	- Add pEFL::Evas::Canvas::font_path_list_pv and pEFL::Evas::Canvas::font_available_list_pv
 0.71 Tue Nov 01 13:35:00 2022
 	- POD corrections
-	- Fix pEfl::Evas::Textblock->range_geometry_get_pv and add pEFL::Evas::Textblock::Rectangle
+	- Fix pEFL::Evas::Textblock->range_geometry_get_pv and add pEFL::Evas::Textblock::Rectangle
 	- Improve Makefile.PL (add ExtUtils::PkgConf as prereq and add META_MERGE)
+0.72 Mo Nov 07 21:32:00 2022
+	- Fix blessing to "ElmEntryPtr" in callback of pEFL::Elm::Entry::markup_filter_append|prepend
+	- Fix Typemap of T_PV_OR_NULL to solve problems with pEFL::Elm::Toolbar->item_append etc.
+		(SvTYPE($arg) == SVt_NULL seems to be unreliable)
+	- POD corrections
+	- complete colorselector example

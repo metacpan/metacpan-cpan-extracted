@@ -13,7 +13,11 @@ Readonly::Array our @TYPES => qw(button checkbox color date datetime-local
 	email file hidden image month number password radio range reset search
 	submit tel text time url week);
 
-our $VERSION = 0.05;
+our $VERSION = 0.06;
+
+has autofocus => (
+	ro => 1,
+);
 
 has checked => (
 	is => 'ro',
@@ -69,6 +73,12 @@ has type => (
 
 sub BUILD {
 	my $self = shift;
+
+	# Check autofocus.
+	if (! defined $self->{'autofocus'}) {
+		$self->{'autofocus'} = 0;
+	}
+	check_bool($self, 'autofocus');
 
 	# Check checked.
 	check_bool($self, 'checked');

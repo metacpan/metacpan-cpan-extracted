@@ -1,3 +1,9 @@
+0.004   2022-10-17  Released-By: PERLANCAR; Urgency: medium
+
+        - [perl filter Phone::format] observe environment variable
+          SAH_FILTER_PHONE_FORMAT_COUNTRY.
+
+
 0.003   2022-09-09  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

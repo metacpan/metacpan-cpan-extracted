@@ -8,7 +8,7 @@ use IO::Socket::INET;
 
 use vars qw/ @ISA %EXPORT_TAGS @EXPORT_OK $VERSION /;
 
-$VERSION = '0.08';
+$VERSION = '0.09';
 
 #  used for route searches
 use constant EXACT_MATCH   => 'o';

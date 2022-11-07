@@ -147,10 +147,11 @@ subtest 'sql'=> sub {
   like $result, qr/^select\s+\*\s+from/i, 'SQL in scalar context';
 
   $dbh->{mock_add_resultset} = \@fake_data;
-  my @result = HR->table('Employee')->select(-where => {foo => 123},
+  my @result = HR->table('Employee')->select(-where => {foo => {-in => [123, 456]}},
                                              -result_as => 'sql');
   like $result[0], qr/^select\s+\*\s+from/i, 'SQL in list context';
-  is   $result[1], 123,                      'bind values';
+  is   $result[1], 123,                      'bind value 1';
+  is   $result[2], 456,                      'bind value 2';
 };
 
 subtest 'statement'=> sub {

@@ -11,7 +11,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '1.28';
+our $VERSION = '1.31';
 
 sub default_binary_name {
     return 'waterfox';
@@ -26,7 +26,7 @@ sub macos_binary_paths {
 }
 
 my %_known_win32_organisations = (
-    'Waterfox'         => 'Waterfox',
+    'Waterfox'         => 'WaterfoxLimited',
     'Waterfox Current' => 'Waterfox',
     'Waterfox Classic' => 'Waterfox',
 );
@@ -54,7 +54,7 @@ Waterfox::Marionette - Automate the Waterfox browser with the Marionette protoco
 
 =head1 VERSION
 
-Version 1.28
+Version 1.31
 
 =head1 SYNOPSIS
 
@@ -67,15 +67,16 @@ Version 1.28
 
     say $waterfox->html();
 
-    $waterfox->find_class('container-fluid')->find_id('search-input')->type('Test::More');
+    $waterfox->find_class('page-content')->find_id('metacpan_search-input')->type('Test::More');
 
-    say "Height of search box is " . $waterfox->find_class('container-fluid')->css('height');
+    say "Height of page-content div is " . $waterfox->find_class('page-content')->css('height');
 
     my $file_handle = $waterfox->selfie();
 
-    $waterfox->find('//button[@name="lucky"]')->click();
+    $waterfox->await(sub { $firefox->find_class('autocomplete-suggestion'); })->click();
 
-    $waterfox->await(sub { $waterfox->interactive() && $waterfox->find_partial('Download') })->click();
+    $waterfox->find_partial('Download')->click();
+
 
 =head1 DESCRIPTION
 

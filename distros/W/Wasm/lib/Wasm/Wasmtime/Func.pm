@@ -20,7 +20,7 @@ use overload
   ;
 
 # ABSTRACT: Wasmtime function class
-our $VERSION = '0.22'; # VERSION
+our $VERSION = '0.23'; # VERSION
 
 
 $ffi_prefix = 'wasm_func_';
@@ -48,7 +48,6 @@ $ffi->attach( [ wasmtime_func_new => 'new' ] => ['wasm_store_t', 'wasm_functype_
 
       my @args = $param_arity ? do {
         my $args = Wasm::Wasmtime::ValVec->from_c($params);
-        set_array_count($args, $param_arity) unless _v0_23_0();
         $args->to_perl;
       } : ();
 
@@ -100,49 +99,30 @@ $ffi->attach( [ wasmtime_func_new => 'new' ] => ['wasm_store_t', 'wasm_functype_
 });
 
 
-if(_v0_23_0())
-{
-  $ffi->attach( call => ['wasm_func_t', 'record(Wasm::Wasmtime::Vec)*', 'record(Wasm::Wasmtime::Vec)*'] => 'wasm_trap_t' => sub {
-    my $xsub = shift;
-    my $self = shift;
-    my @params = $self->type->params;
-    my $args = Wasm::Wasmtime::ValVec->from_perl(\@_, \@params);
-    my $results = $self->result_arity ? Wasm::Wasmtime::ValVec->new($self->result_arity) : undef;
+$ffi->attach( call => ['wasm_func_t', 'record(Wasm::Wasmtime::Vec)*', 'record(Wasm::Wasmtime::Vec)*'] => 'wasm_trap_t' => sub {
+  my $xsub = shift;
+  my $self = shift;
+  my @params = $self->type->params;
+  my $args = Wasm::Wasmtime::ValVec->from_perl(\@_, \@params);
+  my $results = $self->result_arity ? Wasm::Wasmtime::ValVec->new($self->result_arity) : undef;
 
-    my $args_vec = Wasm::Wasmtime::Vec->new(
-      size => scalar @params,
-      data => defined $args ? addressof($args) : undef,
-    );
+  my $args_vec = Wasm::Wasmtime::Vec->new(
+    size => scalar @params,
+    data => defined $args ? addressof($args) : undef,
+  );
 
-    my $results_vec = Wasm::Wasmtime::Vec->new(
-      size => $self->result_arity,
-      data => defined $results ? addressof($results) : undef,
-    );
+  my $results_vec = Wasm::Wasmtime::Vec->new(
+    size => $self->result_arity,
+    data => defined $results ? addressof($results) : undef,
+  );
 
-    my $trap = $xsub->($self, $args_vec, $results_vec);
+  my $trap = $xsub->($self, $args_vec, $results_vec);
 
-    die $trap if $trap;
-    return unless defined $results;
-    my @results = $results->to_perl;
-    wantarray ? @results : $results[0]; ## no critic (Community::Wantarray)
-  });
-}
-else
-{
-  $ffi->attach( call => ['wasm_func_t', 'wasm_val_vec_t', 'wasm_val_vec_t'] => 'wasm_trap_t' => sub {
-    my $xsub = shift;
-    my $self = shift;
-    my $args = Wasm::Wasmtime::ValVec->from_perl(\@_, [$self->type->params]);
-    my $results = $self->result_arity ? Wasm::Wasmtime::ValVec->new($self->result_arity) : undef;
-
-    my $trap = $xsub->($self, $args, $results);
-
-    die $trap if $trap;
-    return unless defined $results;
-    my @results = $results->to_perl;
-    wantarray ? @results : $results[0]; ## no critic (Community::Wantarray)
-  });
-}
+  die $trap if $trap;
+  return unless defined $results;
+  my @results = $results->to_perl;
+  wantarray ? @results : $results[0]; ## no critic (Community::Wantarray)
+});
 
 
 sub attach
@@ -198,7 +178,7 @@ Wasm::Wasmtime::Func - Wasmtime function class
 
 =head1 VERSION
 
-version 0.22
+version 0.23
 
 =head1 SYNOPSIS
 

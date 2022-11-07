@@ -110,7 +110,7 @@ my %WriteMakefileArgs = (
     "Test2::V0"     => "0.000121",
     "YAML"          => 0
   },
-  "VERSION" => "0.22",
+  "VERSION" => "0.23",
   "test"    => {
     "TESTS" => "t/*.t"
   }
@@ -140,7 +140,7 @@ my %FallbackPrereqs = (
 
 # inserted by Dist::Zilla::Plugin::DynamicPrereqs 0.040
 if ( do { use FFI::CheckLib 0.26; !find_lib lib => 'wasmtime', symbol => ['wasmtime_func_as_funcref'] } ) {
-  requires( 'Alien::wasmtime', '0.16' );
+  requires( 'Alien::wasmtime', '0.17' );
 }
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {

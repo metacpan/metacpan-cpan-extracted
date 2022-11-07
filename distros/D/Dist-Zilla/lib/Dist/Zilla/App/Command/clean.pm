@@ -1,13 +1,7 @@
-package Dist::Zilla::App::Command::clean 6.025;
+package Dist::Zilla::App::Command::clean 6.027;
 # ABSTRACT: clean up after build, test, or install
 
-# BEGIN BOILERPLATE
-use v5.20.0;
-use warnings;
-use utf8;
-no feature 'switch';
-use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
-# END BOILERPLATE
+use Dist::Zilla::Pragmas;
 
 use Dist::Zilla::App -command;
 
@@ -56,7 +50,7 @@ Dist::Zilla::App::Command::clean - clean up after build, test, or install
 
 =head1 VERSION
 
-version 6.025
+version 6.027
 
 =head1 SYNOPSIS
 
@@ -87,7 +81,7 @@ Nothing is removed; instead, everything that would be removed will be listed.
 
 =head1 AUTHOR
 
-Ricardo SIGNES 😏 <rjbs@semiotic.systems>
+Ricardo SIGNES 😏 <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

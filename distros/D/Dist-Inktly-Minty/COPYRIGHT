@@ -3,42 +3,50 @@ Upstream-Name: Dist-Inktly-Minty
 Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
 Source: https://metacpan.org/release/Dist-Inktly-Minty
 
-Files: CONTRIBUTING
- CREDITS
- Changes
- LICENSE
+Files: Changes
  META.json
- META.ttl
  META.yml
- Makefile.PL
- README
- SIGNATURE
  bin/distinkt-mint
- dist.ini
-Copyright: Unknown
-License: Unknown
+ doap.ttl
+Copyright: Copyright 2022 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
 
-Files: lib/Dist/Inktly/Bovine.pm
+Files: README
+ lib/Dist/Inktly/Bovine.pm
  lib/Dist/Inktly/Cervine.pm
  lib/Dist/Inktly/Minty.pm
  t/01basic.t
-Copyright: This software is copyright (c) 2013 by Toby Inkster.
+Copyright: This software is copyright (c) 2013-2022 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
 Copyright: None
 License: public-domain
-Comment: This file! Automatically generated.
+
+Files: INSTALL
+ LICENSE
+Copyright: Unknown
+License: Unknown
+
+Files: Makefile.PL
+Copyright: Copyright 2020 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: dist.ini
+Copyright: Copyright 2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0
- This software is Copyright (c) 2013 by the copyright holder(s).
+ This software is Copyright (c) 2022 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2013 by the copyright holder(s).
+ This software is Copyright (c) 2022 by the copyright holder(s).
  
  This is free software, licensed under:
  

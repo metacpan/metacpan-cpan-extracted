@@ -1,0 +1,101 @@
+NAME
+    Sub::Boolean - make XS true/false subs
+
+SYNOPSIS
+      use Test::More;
+      use Sub::Boolean qw( make_true );
+  
+      make_true( __PACKAGE__ . "::foobar" );
+  
+      ok( foobar(),    'returns true' );
+      ok( foobar(123), 'returns true' );
+
+DESCRIPTION
+    A good way to create fast true/false constants is:
+
+      use constant { true => !!1, false => !!0 };
+
+    Or on newer Perls:
+
+      use builtin qw( true false );
+
+    However these constants will throw a compile-time error if you call them
+    as a sub:
+
+      if ( true(123) ) {
+        ...;
+      }
+
+    Sub::Boolean allows you to create subs which return true or false fast as
+    they're implemented in XS.
+
+    As a bonus, it can also generate subs which return undef or the empty
+    list.
+
+    Each function created by this module will have a different refaddr, which
+    means that using things like `set_prototype` or `set_subname` on one will
+    not affect others.
+
+    Boolean functions are really unlikely to be a bottleneck in most
+    applications, so the use cases for this module are very limited.
+
+FUNCTIONS
+    Nothing is exported unless requested.
+
+  `make_true( $qualified_name )`
+    Given a fully qualified sub name, installs a sub something like:
+
+      sub $qualified_name {
+        return !!1;
+      }
+
+    If called as `make_true()` with no name, returns an anonymous coderef.
+
+  `make_false( $qualified_name )`
+    Given a fully qualified sub name, installs a sub something like:
+
+      sub $qualified_name {
+        return !!0;
+      }
+
+    If called as `make_false()` with no name, returns an anonymous coderef.
+
+  `make_undef( $qualified_name )`
+    Given a fully qualified sub name, installs a sub something like:
+
+      sub $qualified_name {
+        return undef;
+      }
+
+    If called as `make_undef()` with no name, returns an anonymous coderef.
+
+  `make_empty( $qualified_name )`
+    Given a fully qualified sub name, installs a sub something like:
+
+      sub $qualified_name {
+        return ();
+      }
+
+    If called as `make_empty()` with no name, returns an anonymous coderef.
+
+BUGS
+    Please report any bugs to
+    <https://github.com/tobyink/p5-sub-boolean/issues>.
+
+SEE ALSO
+    builtin, constant.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2022 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

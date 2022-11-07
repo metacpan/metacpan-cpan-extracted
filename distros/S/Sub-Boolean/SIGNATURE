@@ -1,0 +1,38 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.87.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 41d171f7afd107b8402f0b1e0cb101c32e394bd1e22fc6ea4b82e9ae2dba6321 Boolean.xs
+SHA256 88ee01a0c42077022b4e394040a292487f25746da870bdf18a01dfff6e216050 COPYRIGHT
+SHA256 7977c02e031153dc91d6db9d2e803671d586e59bca2c5c3dc6211f29c04d92d6 CREDITS
+SHA256 72da3feead57789a52af7ea9549e9c85c7ec5b3d008354f6a4e453639febdea9 Changes
+SHA256 64c719c3b69d4aa719fabe2c3606db14d69f112dbfe7b1f602f55ab67ce949c8 INSTALL
+SHA256 a4f85c6f4d6e8bdd37b7ab08013e3e3bee1fe8e910e20f8f54d5025ffe40f384 LICENSE
+SHA256 a1a6afa8035910e8ef2e86367481c7fb864a557379620e963192163236f41c5b MANIFEST
+SHA256 8c5d151d1dba3a26df1a73a825237dfb017a5e28e37e3b2120569730839df406 META.json
+SHA256 a86ab648a580f0a03a40e81d001df385eadbb6f1cf209a8b9ec63412d8a03648 META.yml
+SHA256 7c109a5cdbeb5f42287747e2572f16710351b560a3210cf06a2a1dc1ce4b498f Makefile.PL
+SHA256 205b7660fdf19ff9776ab6ba6a50dfc79376f544c51cafe5f6af162fc8b636e5 README
+SHA256 3e72793e6573ef96dca007dd2bde8f9f4f0886be2bbd60e46e3cf22f3d31bed9 dist.ini
+SHA256 624cfbcc39dbcb02f0b2f1be0a473d940352f7274e4b81b02be4dfff0e45d1ad doap.ttl
+SHA256 15be40acf8ded87fb029c0aa93df965b0e6eabaa61f47cbaae0177be81c66c06 examples/benchmark.pl
+SHA256 9c6c5680b2b4a59010b559c55c75413527b5403a1576f29f3d9ebe40a316d4d2 lib/Sub/Boolean.pm
+SHA256 64fa3658e6d1331edadd963374fd70c84d390f33dfb95f717a4a70fe64b37a85 t/01basic.t
+-----BEGIN PGP SIGNATURE-----
+
+iF0EAREDAB0WIQRVJKj/4+s6z4WzNujOv4Eoaip9OQUCY2hrHwAKCRDOv4Eoaip9
+OeM+AKCQ3mWGYci/A/fBBKwiV1y1pf+tSgCfS8h4RghEv2/e9pY1xWQk7JfBv1Y=
+=N8oy
+-----END PGP SIGNATURE-----

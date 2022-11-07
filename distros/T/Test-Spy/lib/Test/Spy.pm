@@ -1,5 +1,5 @@
 package Test::Spy;
-$Test::Spy::VERSION = '0.004';
+$Test::Spy::VERSION = '0.005';
 use v5.10;
 use strict;
 use warnings;
@@ -40,6 +40,11 @@ has option 'base' => (
 	trigger => '_clear_object',
 );
 
+has option 'imitates' => (
+	writer => 1,
+	trigger => '_clear_object',
+);
+
 with qw(Test::Spy::Interface);
 
 sub _no_method
@@ -60,7 +65,7 @@ sub _build_object
 		? ref $self->base ? $self->base : $self->base->new
 		: undef;
 
-	return Test::Spy::Object->_new(
+	return Test::Spy::Object->__new(
 		%{$base // {}},
 		__base => $base,
 		__spy => $self,

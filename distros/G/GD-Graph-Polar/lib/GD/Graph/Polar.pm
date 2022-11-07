@@ -7,7 +7,7 @@ use Geo::Constants qw{PI};
 use Geo::Functions qw{rad_deg};
 use GD qw{gdSmallFont};
 
-our $VERSION = '0.20';
+our $VERSION = '0.22';
 
 =head1 NAME
 
@@ -17,26 +17,26 @@ GD::Graph::Polar - Perl package to create polar graphs using GD package
 
   use GD::Graph::Polar;
   my $obj = GD::Graph::Polar->new(size=>480, radius=>100);
-  $obj->addPoint        (50=>25);
-  $obj->addPoint_rad    (50=>3.1415);
-  $obj->addGeoPoint     (75=>25);
-  $obj->addGeoPoint_rad (75=>3.1415);
-  $obj->addLine($r0=>$t0, $r1=>$t1);
-  $obj->addLine_rad($r0=>$t0, $r1=>$t1);
-  $obj->addGeoLine($r0=>$t0, $r1=>$t1);
-  $obj->addGeoLine_rad($r0=>$t0, $r1=>$t1);
-  $obj->addArc($r0=>$t0, $r1=>$t1);
-  $obj->addArc_rad($r0=>$t0, $r1=>$t1);
-  $obj->addGeoArc($r0=>$t0, $r1=>$t1);
-  $obj->addGeoArc_rad($r0=>$t0, $r1=>$t1);
-  $obj->addString($r=>$t, "Hello World!");
-  $obj->addString_rad($r=>$t, "Hello World!");
-  $obj->addGeoString($r=>$t, "Hello World!");
-  $obj->addGeoString_rad($r=>$t, "Hello World!");
+  $obj->addPoint(50=>25);                                  #radius => angle (e.g. polar form of complex number notation)
+  $obj->addPoint_rad(50=>3.1415);
+  $obj->addGeoPoint(75=>25);
+  $obj->addGeoPoint_rad(75=>3.1415);
+  $obj->addLine($radius0=>$theta0, $radius1=>$theta1);
+  $obj->addLine_rad($radius0=>$theta0, $radius1=>$theta1);
+  $obj->addGeoLine($radius0=>$theta0, $radius1=>$theta1);
+  $obj->addGeoLine_rad($radius0=>$theta0, $radius1=>$theta1);
+  $obj->addArc($radius0=>$theta0, $radius1=>$theta1);
+  $obj->addArc_rad($radius0=>$theta0, $radius1=>$theta1);
+  $obj->addGeoArc($radius0=>$theta0, $radius1=>$theta1);
+  $obj->addGeoArc_rad($radius0=>$theta0, $radius1=>$theta1);
+  $obj->addString($radius=>$theta, "Hello World!");
+  $obj->addString_rad($radius=>$theta, "Hello World!");
+  $obj->addGeoString($radius=>$theta, "Hello World!");
+  $obj->addGeoString_rad($radius=>$theta, "Hello World!");
   $obj->font(gdSmallFont);  #sets the current font from GD exports
   $obj->color("blue");      #sets the current color from Graphics::ColorNames
   $obj->color([0,0,0]);     #sets the current color [red,green,blue]
-  print $obj->draw;
+  print $obj->draw; #PNG image
 
 =head1 DESCRIPTION
 
@@ -49,11 +49,12 @@ This package is a wrapper around GD to produce polar graphs with an easy interfa
 The new constructor. 
 
   my $obj = GD::Graph::Polar->new(           #default values
-                                  size    => 480,    #width and height in pixels
-                                  radius  => 1,      #scale of the radius
-                                  ticks   => 10,     #number of major ticks
-                                  border  => 2,      #pixel border around graph
-                                  rgbfile => "/usr/X11R6/lib/X11/rgb.txt"
+                                  size          => 480,    #width and height in pixels
+                                  radius        => 1,      #max value of the radius
+                                  radius_origin => 0,      #value at the origin
+                                  ticks         => 10,     #number of major ticks
+                                  border        => 2,      #pixel border around graph
+                                  rgbfile       => "/usr/X11R6/lib/X11/rgb.txt"
                                  );
 
 =head1 METHODS
@@ -67,10 +68,10 @@ Method to add a point to the graph.
 =cut
 
 sub addPoint {
-  my $self = shift;
-  my $r    = shift;
-  my $t    = rad_deg(shift());
-  return $self->addPoint_rad($r,$t);
+  my $self   = shift;
+  my $radius = shift;
+  my $theta  = rad_deg(shift());
+  return $self->addPoint_rad($radius,$theta);
 }
 
 =head2 addPoint_rad
@@ -83,9 +84,9 @@ Method to add a point to the graph.
 
 sub addPoint_rad {
   my $self    = shift;
-  my $r       = shift;
-  my $t       = shift;
-  my ($x, $y) = $self->_imgxy_rt_rad($r,$t);
+  my $radius  = shift;
+  my $theta   = shift;
+  my ($x, $y) = $self->_imgxy_rt_rad($radius,$theta);
   my $icon    = 7;
   return $self->gdimage->arc($x,$y,$icon,$icon,0,360,$self->color);
 }
@@ -99,10 +100,10 @@ Method to add a point to the graph.
 =cut
 
 sub addGeoPoint {
-  my $self = shift;
-  my $r    = shift;
-  my $t    = rad_deg(shift());
-  return $self->addGeoPoint_rad($r,$t);
+  my $self   = shift;
+  my $radius = shift;
+  my $theta  = rad_deg(shift());
+  return $self->addGeoPoint_rad($radius,$theta);
 }
 
 =head2 addGeoPoint_rad
@@ -114,10 +115,10 @@ Method to add a point to the graph.
 =cut
 
 sub addGeoPoint_rad {
-  my $self = shift;
-  my $r    = shift;
-  my $t    = PI()/2-shift();
-  return $self->addPoint_rad($r,$t);
+  my $self   = shift;
+  my $radius = shift;
+  my $theta  = PI()/2-shift();
+  return $self->addPoint_rad($radius,$theta);
 }
 
 =head2 addLine
@@ -129,12 +130,12 @@ Method to add a line to the graph.
 =cut
 
 sub addLine {
-  my $self = shift;
-  my $r0   = shift;
-  my $t0   = rad_deg(shift());
-  my $r1   = shift;
-  my $t1   = rad_deg(shift());
-  return $self->addLine_rad($r0=>$t0, $r1=>$t1);
+  my $self    = shift;
+  my $radius0 = shift;
+  my $theta0  = rad_deg(shift());
+  my $radius1 = shift;
+  my $theta1  = rad_deg(shift());
+  return $self->addLine_rad($radius0=>$theta0, $radius1=>$theta1);
 }
 
 =head2 addLine_rad
@@ -147,12 +148,12 @@ Method to add a line to the graph.
 
 sub addLine_rad {
   my $self      = shift;
-  my $r0        = shift;
-  my $t0        = shift;
-  my $r1        = shift;
-  my $t1        = shift;
-  my ($x0=>$y0) = $self->_imgxy_rt_rad($r0=>$t0);
-  my ($x1=>$y1) = $self->_imgxy_rt_rad($r1=>$t1);
+  my $radius0   = shift;
+  my $theta0    = shift;
+  my $radius1   = shift;
+  my $theta1    = shift;
+  my ($x0=>$y0) = $self->_imgxy_rt_rad($radius0=>$theta0);
+  my ($x1=>$y1) = $self->_imgxy_rt_rad($radius1=>$theta1);
   return $self->gdimage->line($x0, $y0, $x1, $y1, $self->color);
 }
 
@@ -165,12 +166,12 @@ Method to add a line to the graph.
 =cut
 
 sub addGeoLine {
-  my $self = shift;
-  my $r0   = shift;
-  my $t0   = rad_deg(shift());
-  my $r1   = shift;
-  my $t1   = rad_deg(shift());
-  return $self->addGeoLine_rad($r0=>$t0, $r1=>$t1);
+  my $self    = shift;
+  my $radius0 = shift;
+  my $theta0  = rad_deg(shift());
+  my $radius1 = shift;
+  my $theta1  = rad_deg(shift());
+  return $self->addGeoLine_rad($radius0=>$theta0, $radius1=>$theta1);
 }
 
 =head2 addGeoLine_rad
@@ -182,12 +183,12 @@ Method to add a line to the graph.
 =cut
 
 sub addGeoLine_rad {
-  my $self = shift;
-  my $r0   = shift;
-  my $t0   = PI()/2-shift();
-  my $r1   = shift;
-  my $t1   = PI()/2-shift();
-  return $self->addLine_rad($r0=>$t0, $r1=>$t1);
+  my $self    = shift;
+  my $radius0 = shift;
+  my $theta0  = PI()/2-shift();
+  my $radius1 = shift;
+  my $theta1  = PI()/2-shift();
+  return $self->addLine_rad($radius0=>$theta0, $radius1=>$theta1);
 }
 
 =head2 addArc
@@ -199,12 +200,12 @@ Method to add an arc to the graph.
 =cut
 
 sub addArc {
-  my $self = shift;
-  my $r0   = shift;
-  my $t0   = rad_deg(shift());
-  my $r1   = shift;
-  my $t1   = rad_deg(shift());
-  return $self->addArc_rad($r0=>$t0, $r1=>$t1);
+  my $self    = shift;
+  my $radius0 = shift;
+  my $theta0  = rad_deg(shift());
+  my $radius1 = shift;
+  my $theta1  = rad_deg(shift());
+  return $self->addArc_rad($radius0=>$theta0, $radius1=>$theta1);
 }
 
 =head2 addArc_rad
@@ -216,23 +217,23 @@ Method to add an arc to the graph.
 =cut
 
 sub addArc_rad {
-  my $self  = shift;
-  my $r0    = shift;
-  my $t0    = shift;
-  my $r1    = shift;
-  my $t1    = shift;
-  my $m     = ($r1-$r0) / ($t1-$t0);
-  my $inc   = 0.02; #is this good?
-  my $steps = int(($t1-$t0) / $inc);
-  my @array = ();
-  foreach (0 .. $steps) {
-    my $t = $_ / $steps * ($t1-$t0) + $t0;
-    my $r = $r0 + $m * ($t-$t0);
-    push @array, [$r=>$t];
+  my $self    = shift;
+  my $radius0 = shift;
+  my $theta0  = shift;
+  my $radius1 = shift;
+  my $theta1  = shift;
+  my $m       = ($radius1-$radius0) / ($theta1-$theta0);
+  my $inc     = 0.02; #is this good?
+  my $steps   = int(($theta1-$theta0) / $inc);
+  my @array   = ();
+  foreach my $step (0 .. $steps) {
+    my $theta  = $step / $steps * ($theta1-$theta0) + $theta0;
+    my $radius = $radius0 + $m * ($theta-$theta0);
+    push @array, [$radius=>$theta];
   } 
   my @return = ();
-  foreach (1 .. $steps) {
-    push @return, $self->addLine_rad(@{$array[$_-1]}, @{$array[$_]});
+  foreach my $step (1 .. $steps) {
+    push @return, $self->addLine_rad(@{$array[$step-1]}, @{$array[$step]});
   }
   return \@return;
 }
@@ -246,12 +247,12 @@ Method to add an arc to the graph.
 =cut
 
 sub addGeoArc {
-  my $self = shift;
-  my $r0   = shift;
-  my $t0   = rad_deg(shift());
-  my $r1   = shift;
-  my $t1   = rad_deg(shift());
-  return $self->addGeoArc_rad($r0=>$t0, $r1=>$t1);
+  my $self    = shift;
+  my $radius0 = shift;
+  my $theta0  = rad_deg(shift());
+  my $radius1 = shift;
+  my $theta1  = rad_deg(shift());
+  return $self->addGeoArc_rad($radius0=>$theta0, $radius1=>$theta1);
 }
 
 =head2 addGeoArc_rad
@@ -263,12 +264,12 @@ Method to add an arc to the graph.
 =cut
 
 sub addGeoArc_rad {
-  my $self = shift;
-  my $r0   = shift;
-  my $t0   = PI()/2-shift();
-  my $r1   = shift;
-  my $t1   = PI()/2-shift();
-  return $self->addArc_rad($r0=>$t0, $r1=>$t1);
+  my $self    = shift;
+  my $radius0 = shift;
+  my $theta0  = PI()/2-shift();
+  my $radius1 = shift;
+  my $theta1  = PI()/2-shift();
+  return $self->addArc_rad($radius0=>$theta0, $radius1=>$theta1);
 }
 
 =head2 addString
@@ -279,10 +280,10 @@ Method to add a string to the graph.
 
 sub addString {
   my $self   = shift;
-  my $r      = shift;
-  my $t      = rad_deg(shift());
+  my $radius = shift;
+  my $theta  = rad_deg(shift());
   my $string = shift;
-  return $self->addString_rad($r=>$t, $string);
+  return $self->addString_rad($radius=>$theta, $string);
 }
 
 =head2 addString_rad
@@ -293,10 +294,10 @@ Method to add a string to the graph.
 
 sub addString_rad {
   my $self    = shift;
-  my $r       = shift;
-  my $t       = shift;
+  my $radius  = shift;
+  my $theta   = shift;
   my $string  = shift;
-  my ($x=>$y) = $self->_imgxy_rt_rad($r=>$t);
+  my ($x=>$y) = $self->_imgxy_rt_rad($radius=>$theta);
   return $self->gdimage->string($self->font, $x, $y, $string, $self->color);
 }
 
@@ -308,10 +309,10 @@ Method to add a string to the graph.
 
 sub addGeoString {
   my $self   = shift;
-  my $r      = shift;
-  my $t      = rad_deg(shift());
+  my $radius = shift;
+  my $theta  = rad_deg(shift());
   my $string = shift;
-  return $self->addGeoString_rad($r=>$t, $string);
+  return $self->addGeoString_rad($radius=>$theta, $string);
 }
 
 =head2 addGeoString_rad
@@ -322,10 +323,10 @@ Method to add a string to the graph.
 
 sub addGeoString_rad {
   my $self   = shift;
-  my $r      = shift;
-  my $t      = PI()/2-shift();
+  my $radius = shift;
+  my $theta  = PI()/2-shift();
   my $string = shift;
-  return $self->addString_rad($r=>$t, $string);
+  return $self->addString_rad($radius=>$theta, $string);
 }
 
 =head1 Objects
@@ -349,26 +350,26 @@ sub gdimage {
     # Put a frame around the picture
     $self->gdimage->rectangle(0, 0, $self->size - 1, $self->size - 1, $self->color([0,0,0]));
   
+    #Add concentric circles around origin ticks is number of circles
     if ($self->ticks > 0) {
       $self->color([192,192,192]);
-      foreach (0 .. $self->ticks) {
+      foreach my $tick (1 .. $self->ticks) {
         my $c = $self->size / 2;
-        my $r = $self->_width * $_ / $self->ticks;
+        my $r = $self->_width * $tick / $self->ticks;
         $self->gdimage->arc($c,$c,$r,$r,0,360,$self->color);
       }
     }
   
-    $self->color([192,192,192]);
-    $self->gdimage->line($self->size/2,
-                            $self->border,
-                            $self->size/2,
-                            $self->size-$self->border,
-                            $self->color);
-    $self->gdimage->line($self->border,
-                            $self->size/2,
-                            $self->size-$self->border,
-                            $self->size/2,
-                            $self->color);
+    #Add radiating lines around origin axes is number of lines
+    if ($self->axes > 0) {
+      $self->color([192,192,192]);
+      my $delta = 360 / $self->axes;
+      my $angle = 0;
+      while ($angle < 360) {
+        $self->addLine($self->radius_origin, $angle, $self->radius, $angle);
+        $angle += $delta;
+      }
+    }
 
     #default to black pen color
     $self->color([0,0,0]);
@@ -475,8 +476,23 @@ Default: 1
 sub radius {
   my $self          = shift;
   $self->{'radius'} = shift if @_;
-  $self->{'radius'} = 1 unless $self->{'radius'};
+  $self->{'radius'} = 1 unless defined $self->{'radius'};
   return $self->{'radius'};
+}
+
+=head2 radius_origin
+
+Sets or returns the radius origin of the graph which sets the value scale at the origin of the graph.
+
+Default: 0
+
+=cut
+
+sub radius_origin {
+  my $self                 = shift;
+  $self->{'radius_origin'} = shift if @_;
+  $self->{'radius_origin'} = 0 unless defined $self->{'radius_origin'};
+  return $self->{'radius_origin'};
 }
 
 =head2 border
@@ -510,6 +526,22 @@ sub ticks {
   return $self->{'ticks'};
 }
 
+=head2 axes
+
+Sets and returns the number of axes (plural of axis) on the graph.
+
+Default: 4
+
+=cut
+
+sub axes {
+  my $self        = shift;
+  $self->{'axes'} = shift if @_;
+  $self->{'axes'} = 4 unless defined $self->{'axes'};
+  return $self->{'axes'};
+}
+
+
 =head2 rgbfile
 
 Sets or returns an RGB file.
@@ -523,9 +555,9 @@ sub rgbfile {
   $self->{'rgbfile'} = shift if @_;
   unless (defined $self->{'rgbfile'}) {
     my $cwd = Cwd::getcwd();
-    foreach ('/etc/X11/rgb.txt', '/usr/share/X11/rgb.txt', '/usr/X11R6/lib/X11/rgb.txt', "$cwd/rgb.txt", "$cwd/../rgb.txt") {
-      next unless -r;
-      $self->{'rgbfile'} = $_;
+    foreach my $dir ('/etc/X11/rgb.txt', '/usr/share/X11/rgb.txt', '/usr/X11R6/lib/X11/rgb.txt', "$cwd/rgb.txt", "$cwd/../rgb.txt") {
+      next unless -r $dir; 
+      $self->{'rgbfile'} = $dir;
       last;
     }
   }
@@ -552,9 +584,10 @@ sub draw {
 #=cut
 
 sub _scale {
-  my $self = shift;
-  my $r    = shift;
-  return $self->_width / 2 / $self->radius * $r;
+  my $self   = shift;
+  my $radius = shift;
+  $radius    = $self->radius_origin if $radius < $self->radius_origin; #polar graphs do not support negative values
+  return $self->_width / 2 * ($radius - $self->radius_origin)/($self->radius - $self->radius_origin);
 }
 
 #=head2 _width
@@ -593,11 +626,11 @@ sub _imgxy_xy {
 #=cut
 
 sub _xy_rt_rad {
-  my $self = shift;
-  my $r    = shift;
-  my $t    = shift;
-  my $x    = $r*cos($t);
-  my $y    = $r*sin($t);
+  my $self   = shift;
+  my $radius = shift;
+  my $theta  = shift;
+  my $x      = $radius*cos($theta);
+  my $y      = $radius*sin($theta);
   return ($x, $y);
 }
 
@@ -609,9 +642,9 @@ sub _xy_rt_rad {
 
 sub _imgxy_rt_rad {
   my $self   = shift;
-  my $r      = shift;
-  my $t      = shift;
-  my ($x,$y) = $self->_xy_rt_rad($self->_scale($r), $t);
+  my $radius = shift;
+  my $theta  = shift;
+  my ($x,$y) = $self->_xy_rt_rad($self->_scale($radius), $theta);
   return $self->_imgxy_xy($x, $y);
 }
 

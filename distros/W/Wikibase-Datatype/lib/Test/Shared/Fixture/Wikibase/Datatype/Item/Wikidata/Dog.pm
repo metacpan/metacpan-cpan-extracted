@@ -11,7 +11,7 @@ use Wikibase::Datatype::Statement;
 use Wikibase::Datatype::Value::Item;
 use Wikibase::Datatype::Value::Monolingual;
 
-our $VERSION = 0.22;
+our $VERSION = 0.23;
 
 sub new {
 	my $class = shift;
@@ -57,6 +57,10 @@ sub new {
 			Wikibase::Datatype::Value::Monolingual->new(
 				'language' => 'en',
 				'value' => 'dog',
+			),
+			Wikibase::Datatype::Value::Monolingual->new(
+				'language' => 'cs',
+				'value' => 'pes',
 			),
 		],
 		'id' => 'Q144',

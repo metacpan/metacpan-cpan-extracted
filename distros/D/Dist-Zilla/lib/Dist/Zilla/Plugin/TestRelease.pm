@@ -1,16 +1,10 @@
-package Dist::Zilla::Plugin::TestRelease 6.025;
+package Dist::Zilla::Plugin::TestRelease 6.027;
 # ABSTRACT: extract archive and run tests before releasing the dist
 
 use Moose;
 with 'Dist::Zilla::Role::BeforeRelease';
 
-# BEGIN BOILERPLATE
-use v5.20.0;
-use warnings;
-use utf8;
-no feature 'switch';
-use experimental qw(postderef postderef_qq); # This experiment gets mainlined.
-# END BOILERPLATE
+use Dist::Zilla::Pragmas;
 
 use namespace::autoclean;
 
@@ -81,7 +75,7 @@ Dist::Zilla::Plugin::TestRelease - extract archive and run tests before releasin
 
 =head1 VERSION
 
-version 6.025
+version 6.027
 
 =head1 DESCRIPTION
 
@@ -112,7 +106,7 @@ This plugin was originally contributed by Christopher J. Madsen.
 
 =head1 AUTHOR
 
-Ricardo SIGNES 😏 <rjbs@semiotic.systems>
+Ricardo SIGNES 😏 <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

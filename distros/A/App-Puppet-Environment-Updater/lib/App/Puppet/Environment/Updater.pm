@@ -1,8 +1,5 @@
 package App::Puppet::Environment::Updater;
-{
-  $App::Puppet::Environment::Updater::VERSION = '0.001001';
-}
-
+$App::Puppet::Environment::Updater::VERSION = '0.001002';
 # ABSTRACT: Update a Puppet environment in a Git branch
 
 use Moose;
@@ -227,9 +224,11 @@ __PACKAGE__->meta()->make_immutable();
 
 1;
 
-
 __END__
+
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -237,7 +236,7 @@ App::Puppet::Environment::Updater - Update a Puppet environment in a Git branch
 
 =head1 VERSION
 
-version 0.001001
+version 0.001002
 
 =head1 SYNOPSIS
 
@@ -508,10 +507,9 @@ Manfred Stock <mstock@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Manfred Stock.
+This software is copyright (c) 2022 by Manfred Stock.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

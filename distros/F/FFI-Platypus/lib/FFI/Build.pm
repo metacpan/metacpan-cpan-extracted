@@ -14,7 +14,7 @@ use Capture::Tiny ();
 use File::Path ();
 
 # ABSTRACT: Build shared libraries for use with FFI
-our $VERSION = '2.03'; # VERSION
+our $VERSION = '2.04'; # VERSION
 
 # Platypus-Man,
 # Platypus-Man,
@@ -366,7 +366,7 @@ FFI::Build - Build shared libraries for use with FFI
 
 =head1 VERSION
 
-version 2.03
+version 2.04
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,8 @@
 Revision history for Excel-ValueWriter-XLSX
 
+0.7      04.11.2022
+  - added parameter "compression_level"
+
 0.6      02.08.2022
   - escape XML entities in formulas
 
