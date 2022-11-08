@@ -4,14 +4,14 @@ use warnings;
 use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
-	NAME             => 'HV::Monitor',
-	AUTHOR           => q{Zane C. Bowers-Hadley <vvelox@vvelox.net>},
-	VERSION_FROM     => 'lib/HV/Monitor.pm',
-	ABSTRACT_FROM    => 'lib/HV/Monitor.pm',
-	LICENSE          => 'artistic_2',
-	MIN_PERL_VERSION => '5.006',
-	INST_SCRIPT      => 'bin',
-
+	NAME               => 'HV::Monitor',
+	AUTHOR             => q{Zane C. Bowers-Hadley <vvelox@vvelox.net>},
+	VERSION_FROM       => 'lib/HV/Monitor.pm',
+	ABSTRACT_FROM      => 'lib/HV/Monitor.pm',
+	LICENSE            => 'artistic_2',
+	MIN_PERL_VERSION   => '5.006',
+	INST_SCRIPT        => 'bin',
+	EXE_FILES          => ['src_bin/hv_monitor'],
 	CONFIGURE_REQUIRES => {
 		'ExtUtils::MakeMaker' => '0',
 		'JSON'                => '0',

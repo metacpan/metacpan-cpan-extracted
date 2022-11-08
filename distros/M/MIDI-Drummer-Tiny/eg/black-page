@@ -1,0 +1,168 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+# use local author libraries
+use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(MIDI-Drummer-Tiny MIDI-Util Music-Duration Music-MelodicDevice-Ornamentation);
+use MIDI::Drummer::Tiny ();
+use Music::Duration ();
+
+Music::Duration::tuplet('hn', 'H', 5);
+Music::Duration::tuplet('en', 'E', 5);
+Music::Duration::tuplet('qn', 'Q', 7);
+
+my $d = MIDI::Drummer::Tiny->new(
+    file   => "$0.mid",
+    bpm    => 60,
+    bars   => 7,
+    reverb => 15,
+);
+
+$d->sync(
+    \&pulse,
+    \&beat,
+);
+
+$d->write;
+
+sub pulse {
+    for my $i (1 .. $d->beats * $d->bars) {
+        if ($i == 1) {
+            $d->rest('d6');
+            $d->note('d90', $d->pedal_hh);
+        }
+        else {
+            $d->note($d->quarter, $d->pedal_hh);
+        }
+    }
+}
+
+sub beat {
+    # 1
+    $d->flam($d->quarter, $d->kick, $d->snare);
+
+    $d->note($d->thirtysecond, $d->snare);
+    $d->note($d->thirtysecond, $d->snare);
+    $d->note($d->thirtysecond, $d->kick);
+    $d->note($d->thirtysecond, $d->kick);
+    $d->note($d->eighth, $d->snare);
+
+    $d->note($d->thirtysecond);
+    $d->note($d->thirtysecond, $d->snare);
+    $d->note($d->sixteenth, $d->snare);
+    $d->note($d->eighth, $d->kick);
+
+    $d->rest($d->sixteenth);
+    $d->roll($d->eighth, $d->thirtysecond);
+    $d->note($d->sixteenth, $d->kick);
+
+    # 2
+    $d->note($d->triplet_sixteenth, $d->kick);
+    $d->note($d->triplet_sixteenth, $d->kick);
+    $d->note($d->triplet_sixteenth, $d->snare);
+    $d->note($d->eighth, $d->kick);
+
+    $d->note($d->triplet_eighth, $d->kick);
+    $d->note($d->triplet_sixteenth, $d->kick);
+    $d->roll($d->eighth, $d->thirtysecond);
+
+    $d->rest('Hhn');
+    $d->flam('Hhn', $d->hi_tom, $d->hi_tom, 80);
+    $d->flam('Hhn', $d->snare, $d->snare, 80);
+    $d->flam('Hhn', $d->low_tom, $d->low_tom, 80);
+    $d->flam('Hhn', $d->hi_floor_tom, $d->hi_floor_tom, 80);
+
+    # 3
+    $d->note($d->dotted_eighth, $d->kick, $d->crash1);
+    $d->note($d->thirtysecond, $d->snare);
+    $d->note($d->thirtysecond, $d->snare);
+
+    $d->crescendo_roll([100, 50, 1], $d->quarter, $d->thirtysecond);
+
+    $d->crescendo_roll([100, 50, 1], $d->quarter, $d->thirtysecond);
+
+    $d->roll($d->quarter, $d->thirtysecond);
+
+    # 4
+    $d->note($d->thirtysecond, $d->snare);
+    $d->note($d->thirtysecond, $d->snare);
+    $d->note($d->thirtysecond, $d->kick);
+    $d->note($d->thirtysecond, $d->kick);
+    $d->note($d->thirtysecond, $d->kick);
+    $d->note($d->thirtysecond, $d->snare);
+    $d->note($d->thirtysecond, $d->kick);
+    $d->note($d->thirtysecond, $d->kick);
+
+    $d->note($d->triplet_sixteenth, $d->snare, $d->crash1);
+    $d->note($d->triplet_sixteenth, $d->kick);
+    $d->note($d->triplet_sixteenth, $d->kick);
+    $d->note('Een', $d->kick);
+    $d->note('Een', $d->hi_tom);
+    $d->note('Een', $d->hi_tom);
+    $d->note('Een', $d->hi_tom);
+    $d->note('Een', $d->hi_tom);
+
+    $d->note('Qqn', $d->snare, $d->crash1);
+    $d->note('Qqn', $d->kick);
+    $d->note('Qqn', $d->kick);
+    $d->note('Qqn', $d->snare, $d->closed_hh);
+    $d->note('Qqn', $d->kick);
+    $d->note('Qqn', $d->snare, $d->closed_hh);
+    $d->note('Qqn', $d->snare, $d->closed_hh);
+
+    $d->note('Qqn', $d->kick);
+    $d->note('Qqn', $d->snare, $d->closed_hh);
+    $d->note('Qqn', $d->kick);
+    $d->note('Qqn', $d->snare, $d->closed_hh);
+    $d->note('Qqn', $d->snare, $d->closed_hh);
+    $d->note('Qqn', $d->snare, $d->closed_hh);
+    $d->note('Qqn', $d->kick);
+
+    # 5
+    $d->rest($d->half);
+
+    $d->note('Qqn', $d->hi_tom);
+    $d->note('Qqn', $d->snare);
+    $d->note('Qqn', $d->snare);
+    $d->note('Qqn', $d->hi_tom);
+    $d->note('Qqn', $d->snare);
+    $d->note('Qqn', $d->hi_tom);
+    $d->note('Qqn', $d->kick);
+
+    $d->note($d->thirtysecond, $d->kick);
+    $d->note($d->thirtysecond, $d->snare);
+    $d->note($d->thirtysecond, $d->snare);
+    $d->note($d->thirtysecond, $d->kick);
+
+    $d->note('Een', $d->hi_tom);
+    $d->note('Een', $d->hi_tom);
+    $d->note('Een', $d->snare);
+    $d->note('Een', $d->snare);
+    $d->note('Een', $d->low_tom);
+
+    # 6
+    $d->note($d->quarter, $d->kick, $d->crash1);
+
+    $d->rest($d->sixteenth);
+    $d->note($d->dotted_eighth, $d->snare);
+
+    $d->rest($d->eighth);
+    $d->note($d->eighth, $d->snare);
+
+    $d->rest($d->eighth);
+    $d->note($d->sixteenth, $d->snare);
+
+    # 7
+    $d->rest($d->quarter);
+
+    $d->note($d->quarter, $d->low_tom);
+
+    $d->rest($d->sixteenth);
+    $d->note($d->dotted_eighth, $d->hi_floor_tom);
+
+    $d->rest($d->eighth);
+    $d->note($d->eighth, $d->low_tom);
+
+    # 8 - D.S. for 18 bars
+    # ... TODO ...
+}

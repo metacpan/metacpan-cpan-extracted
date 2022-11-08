@@ -12,11 +12,11 @@ HV::Monitor::Backends::Libvirt - Libvirt support for HV::Monitor
 
 =head1 VERSION
 
-Version 0.0.2
+Version 0.0.4
 
 =cut
 
-our $VERSION = '0.0.2';
+our $VERSION = '0.0.4';
 
 =head1 SYNOPSIS
 
@@ -230,6 +230,7 @@ sub run {
 			|| $domstats->{'state.state'} eq 4 )
 		{
 			my $pid = `ps ax o pid,args | grep qemu | grep ' -name '| grep 'guest='$vm','`;
+			$pid =~ s/^[\ \t]*//;
 			chomp($pid);
 			$pid =~ s/^[\ \t]*//;
 			my $command = $pid;
@@ -239,6 +240,7 @@ sub run {
 			@hv_args = split( /\n/, `cat /proc/$pid/cmdline | strings` );
 
 			my $ps_info = `ps -q $pid --no-headers -o pcpu,pmem,etimes,vsz,pri,nice`;
+			$ps_info =~ s/^[\ \t]*//;
 			chomp($ps_info);
 			$ps_info =~ s/^[\ \t]*//;
 			$ps_info =~ s/[\ \t]*$//;
@@ -335,6 +337,33 @@ sub run {
 					if ( defined( $net_list[ $json->{netdev} ] ) ) {
 						if ( defined( $net_cache->{ $net_list[ $json->{netdev} ] } ) ) {
 							$nic_info->{parent} = $net_cache->{ $net_list[ $json->{netdev} ] };
+						}
+					}
+				}
+			}
+			else {
+				# looks like we did not find one that appears to be a JSON style one, so now try for the CSV style
+				@net_line
+					= grep( /virtio-net-pci/, grep( /mac/, grep( /\=$netdev\,/, @hv_args ) ) );
+
+				# if we failed, now check for it with $netdev at the end of the arg
+				if ( !defined( $net_line[0] ) ) {
+					@net_line
+						= grep( /virtio-net-pci/, grep( /mac/, grep( /\=$netdev$/, @hv_args ) ) );
+				}
+
+				if ( defined( $net_line[0] ) ) {
+					my @net_line_split = split( /\,/, $net_line[0] );
+					foreach my $net_line_arg (@net_line_split) {
+						my ( $net_line_key, $net_line_value ) = split( /\=/, $net_line_arg, 2 );
+						if (   defined($net_line_key)
+							&& defined($net_line_value)
+							&& $net_line_value ne ''
+							&& $net_line_key ne '' )
+						{
+							if ( $net_line_key eq 'mac' ) {
+								$nic_info->{mac} = $net_line_value;
+							}
 						}
 					}
 				}

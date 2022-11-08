@@ -20,5 +20,5 @@ no_index:
 requires:
   File::Basename: '2.85'
   Filter::Simple::Compile: v0.0.2
-version: '0.07'
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

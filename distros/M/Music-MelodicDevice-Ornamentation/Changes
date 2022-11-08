@@ -1,5 +1,9 @@
 Revision history for Music-MelodicDevice-Ornamentation
 
+0.0703 2022-11-08 00:29:34
+    - Change the grace_note() to a 64th.
+    - Improve tests.
+
 0.0702 2022-10-23 12:58:23
     - Avoid implicit imports.
 

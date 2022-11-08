@@ -533,6 +533,8 @@ xxxxx.xxxxxx$ e[1D [1Dalarm show
 |[33m    8[0m|[33m Y [0m|[33m   [0m|[33m   51[0m|[33mcritical[0m|[33m Thu Sep 15 17:12:30 [4m2[24m022 [0m|[33m               PTP-1/9[0m|[33m Rx Loss of Signal                          [0m|
 |[33m    9[0m|[33m Y [0m|[33m   [0m|[33m   51[0m|[33mcritical[0m|[33m Thu Sep 15 17:12:30 [4m2[24m022 [0m|[33m              PTP-1/10[0m|[33m Rx Loss of Signal                          [0m|
 |[36m    9[0m|[36m Y [0m|[36m   [0m|[36m   51[0m|[36m   info [0m|[36m Thu Sep 15 17:12:30 [4m2[24m022 [0m|[36m              PTP-1/10[0m|[36m Rx Loss of Signal                          [0m|
+|[33m    9[0m|[33m   [0m|[33m   [0m|[33m   51[0m|[33mcritical[0m|[33m Thu Sep 15 17:12:30 [4m2[24m022 [0m|[33m              Port-2/4[0m|[33m Rx Remote Fault                            [0m|
+|[33m    9[0m|[33m   [0m|[33m   [0m|[33m   51[0m|[33mcritical[0m|[33m Thu Sep 15 17:12:30 [4m2[24m022 [0m|[33m         Channel-2/1.2[0m|[33m Far End Client Signal Fail                 [0m|
 +-----+---+---+-----+--------+--------------------------+----------------------+--------------------------------------------+
 | |              \---------> ATID : Alarm Table ID                                                                          |
 | \------------------------> IID  : Alarm Instance ID                                                                       |

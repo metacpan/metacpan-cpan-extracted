@@ -1,6 +1,6 @@
 package Lab::Instrument::DummySource;
 #ABSTRACT: Dummy voltage source
-$Lab::Instrument::DummySource::VERSION = '3.823';
+$Lab::Instrument::DummySource::VERSION = '3.830';
 use v5.20;
 
 use warnings;
@@ -138,7 +138,7 @@ Lab::Instrument::DummySource - Dummy voltage source
 
 =head1 VERSION
 
-version 3.823
+version 3.830
 
 =head1 DESCRIPTION
 

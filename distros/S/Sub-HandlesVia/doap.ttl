@@ -32,7 +32,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Sub-HandlesVia";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-008_000>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-008_001>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-008_002>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-008_003>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-009>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-010>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-011>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-012>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-013>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-014>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-015>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-016>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-017>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-018>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-019>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-020>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-021>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-022>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-023>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-024>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-025>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-026>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-027>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-028>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-029>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-030>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-031>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-032>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-033>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-034>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-035>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-036>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-037>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-038>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-039>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-040>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-041>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-042>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-043>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-044>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-008_000>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-008_001>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-008_002>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-008_003>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-009>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-010>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-011>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-012>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-013>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-014>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-015>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-016>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-017>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-018>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-019>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-020>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-021>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-022>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-023>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-024>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-025>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-026>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-027>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-028>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-029>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-030>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-031>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-032>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-033>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-034>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-035>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-036>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-037>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-038>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-039>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-040>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-041>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-042>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-043>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-044>, <http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-045>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-sub-handlesvia>;
@@ -726,6 +726,7 @@
 			rdfs:label "Fix test case broken by Type::Tiny v2.";
 			doap-changeset:fixes <tdb:2013,https://github.com/tobyink/p5-sub-handlesvia/issues/2>;
 			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/syspete>;
+			rdfs:seeAlso <https://github.com/tobyink/p5-sub-handlesvia/issues/2>;
 		];
 	];
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
@@ -759,6 +760,7 @@
 			rdfs:label "Fix application of Sub::HandlesVia Moose/Mouse traits to metaobjects that have other traits applied to them.";
 			doap-changeset:fixes <tdb:2013,https://github.com/tobyink/p5-sub-handlesvia/issues/3>;
 			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/brtastic>;
+			rdfs:seeAlso <https://github.com/tobyink/p5-sub-handlesvia/issues/3>;
 		];
 	];
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
@@ -775,11 +777,13 @@
 			rdfs:label "Stricter detection of Moo::Role roles to prevent some false positives when given Mouse::Role and Moose::Role roles.";
 			doap-changeset:fixes <tdb:2013,https://github.com/tobyink/p5-sub-handlesvia/issues/4>;
 			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/brtastic>;
+			rdfs:seeAlso <https://github.com/tobyink/p5-sub-handlesvia/issues/4>;
 		], [
 			a doap-changeset:Tests;
 			rdfs:label "Add a test using Sub::HandlesVia when Beam::Wire is loaded.";
 			doap-changeset:fixes <tdb:2013,https://github.com/tobyink/p5-sub-handlesvia/issues/5>;
 			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/brtastic>;
+			rdfs:seeAlso <https://github.com/tobyink/p5-sub-handlesvia/issues/5>;
 		];
 	];
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
@@ -847,6 +851,41 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Sub-HandlesVia-0.044.tar.gz>;
 	doap:revision        "0.044"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Sub-HandlesVia/v_0-045>
+	a                    doap:Version;
+	dc:identifier        "Sub-HandlesVia-0.045"^^xsd:string;
+	dc:issued            "2022-11-08"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix for `with qw(Role1 Role2)` in Moose where at least one role uses Sub::HandlesVia.";
+			doap-changeset:fixes <tdb:2013,https://github.com/tobyink/p5-sub-handlesvia/issues/6>;
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/brtastic>;
+			rdfs:seeAlso <https://github.com/tobyink/p5-sub-handlesvia/issues/6>;
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Support attributes declared with `has '+name'`.";
+			doap-changeset:fixes <tdb:2013,https://github.com/tobyink/p5-sub-handlesvia/issues/7>;
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/brtastic>;
+			rdfs:seeAlso <https://github.com/tobyink/p5-sub-handlesvia/issues/7>;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Add a `generator_for_prelude` attribute to Sub::HandlesVia::CodeGenerator.";
+			doap-changeset:fixes <tdb:2013,https://github.com/tobyink/p5-sub-handlesvia/issues/8>;
+			rdfs:seeAlso <https://github.com/tobyink/p5-sub-handlesvia/issues/8>;
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Document that `with qw(Role1 Role2)` in Mouse is currently broken if either role uses Sub::HandlesVia.";
+			rdfs:seeAlso <https://github.com/tobyink/p5-sub-handlesvia/issues/9>;
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "Test that `with qw(Role1 Role2)` in Moo works if either role uses Sub::HandlesVia.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Sub-HandlesVia-0.045.tar.gz>;
+	doap:revision        "0.045"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/brtastic>
 	a                    foaf:Person;

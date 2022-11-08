@@ -245,22 +245,20 @@ sub frame_clause {
 sub as_text {
     my $self = shift;
 
-    my $over_clause = $self->over_clause_as_text // '';
+    my $suffix = $self->over_clause_as_text // '';
+    if ( exists $self->{ 'agg_filter' } ) {
+        $suffix .= ' FILTER ( WHERE ' . $self->{ 'agg_filter' }->as_text . ' )';
+    }
 
-    return $self->func_name . '(*)' . $over_clause if $self->{ 'agg_star' };
-    return $self->func_name . '()' . $over_clause unless exists $self->{ 'args' };
+    return $self->func_name . '(*)' . $suffix if $self->{ 'agg_star' };
+    return $self->func_name . '()' . $suffix unless exists $self->{ 'args' };
 
     my @args_as_text = map { $_->as_text } @{ $self->{ 'args' } };
     if ( $self->{ 'func_variadic' } ) {
         $args_as_text[ -1 ] = 'VARIADIC ' . $args_as_text[ -1 ];
     }
     my $args_str = join( ', ', @args_as_text );
-    if ( exists $self->{ 'agg_filter' } ) {
-        return $self->func_name . '( ' . $args_str . ' )' . $over_clause . ' FILTER ( WHERE ' . $self->{ 'agg_filter' }->as_text . ' )';
-    }
-    else {
-        return $self->func_name . '( ' . $args_str . ' )' . $over_clause;
-    }
+    return $self->func_name . '( ' . $args_str . ' )' . $suffix;
 }
 
 sub pretty_print {

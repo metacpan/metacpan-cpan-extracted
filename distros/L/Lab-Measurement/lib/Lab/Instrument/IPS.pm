@@ -5,7 +5,7 @@
 
 package Lab::Instrument::IPS;
 #ABSTRACT: Oxford Instruments IPS Magnet Power Supply
-$Lab::Instrument::IPS::VERSION = '3.823';
+$Lab::Instrument::IPS::VERSION = '3.830';
 use v5.20;
 
 use strict;
@@ -972,7 +972,7 @@ Lab::Instrument::IPS - Oxford Instruments IPS Magnet Power Supply
 
 =head1 VERSION
 
-version 3.823
+version 3.830
 
 =head1 SYNOPSIS
 

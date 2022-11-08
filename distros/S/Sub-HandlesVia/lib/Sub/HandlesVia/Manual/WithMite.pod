@@ -56,6 +56,37 @@ are conceptually contradictory.
 
  handles_via => [ 'Number', 'Scalar' ]
 
+=head2 C<< use Sub::HandlesVia >>
+
+Mite goes to a lot of effort to avoid you needing to C<< use Sub::HandlesVia >>
+directly in your classes and roles, and thus avoid you needing to add it as
+a dependency.
+
+However, there are edge cases that it might not handle. In these cases, you
+should be able to C<< use SubHandlesVia >> in your code I<< after >> your
+C<< use MyApp::Mite >> and Sub::HandlesVia will intervene and make things
+work. This adds a dependency on Sub::HandlesVia though.
+
+ package MyApp::Kitchen {
+   use MyApp::Mite;
+   use Sub::HandlesVia;
+   
+   has food => (
+     is          => 'ro',
+     isa         => 'ArrayRef[Str]',
+     handles_via => 'Array',
+     default     => sub { [] },
+     handles     => {
+       'add_food'    => 'push',
+       'find_food'   => 'grep',
+     },
+   );
+ }
+
+Now Mite will no longer generate C<add_food> and C<find_food> methods in your
+F<Kitchen.pm.mite.pm> file when you run C<< mite compile >>. Instead,
+Sub::HandlesVia will generate them at run-time when your application runs.
+
 =head1 BUGS
 
 Please report any bugs to

@@ -11,13 +11,6 @@ Files: Changes
 Copyright: Copyright 2022 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: INSTALL
- LICENSE
- Makefile.PL
- Simple.xs
-Copyright: Unknown
-License: Unknown
-
 Files: COPYRIGHT
  CREDITS
  SIGNATURE
@@ -29,6 +22,12 @@ Files: README
  t/01basic.t
 Copyright: This software is copyright (c) 2022 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
+
+Files: INSTALL
+ LICENSE
+ Makefile.PL
+Copyright: Unknown
+License: Unknown
 
 License: Artistic-1.0
  This software is Copyright (c) 2022 by the copyright holder(s).

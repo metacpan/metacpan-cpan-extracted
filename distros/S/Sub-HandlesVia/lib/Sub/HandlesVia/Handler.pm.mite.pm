@@ -1412,7 +1412,7 @@
         }
 
         # Attribute name (type: Str)
-        # has declaration, file lib/Sub/HandlesVia/Handler.pm, line 281
+        # has declaration, file lib/Sub/HandlesVia/Handler.pm, line 282
         croak "Missing key in constructor: name" unless exists $args->{"name"};
         do {
 
@@ -1444,7 +1444,7 @@
       && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };
 
     # Accessors for name
-    # has declaration, file lib/Sub/HandlesVia/Handler.pm, line 281
+    # has declaration, file lib/Sub/HandlesVia/Handler.pm, line 282
     if ($__XS) {
         Class::XSAccessor->import(
             chained   => 1,
@@ -1978,7 +1978,7 @@
         }
 
         # Attribute delegated_coderef (type: CodeRef)
-        # has declaration, file lib/Sub/HandlesVia/Handler.pm, line 302
+        # has declaration, file lib/Sub/HandlesVia/Handler.pm, line 303
         croak "Missing key in constructor: delegated_coderef"
           unless exists $args->{"delegated_coderef"};
         do {
@@ -2008,7 +2008,7 @@
       && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };
 
     # Accessors for delegated_coderef
-    # has declaration, file lib/Sub/HandlesVia/Handler.pm, line 302
+    # has declaration, file lib/Sub/HandlesVia/Handler.pm, line 303
     if ($__XS) {
         Class::XSAccessor->import(
             chained   => 1,

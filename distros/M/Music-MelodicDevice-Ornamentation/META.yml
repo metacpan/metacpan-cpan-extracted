@@ -38,10 +38,10 @@ requires:
 resources:
   homepage: https://github.com/ology/Music-MelodicDevice-Ornamentation
   repository: https://github.com/ology/Music-MelodicDevice-Ornamentation.git
-version: '0.0702'
+version: '0.0703'
 x_Dist_Zilla:
   perl:
-    version: '5.032001'
+    version: '5.030002'
   plugins:
     -
       class: Dist::Zilla::Plugin::VersionFromModule
@@ -82,67 +82,67 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::EnsurePod5
               name: '@CorePrep/EnsurePod5'
-              version: '4.017'
+              version: '4.015'
             -
               class: Pod::Weaver::Plugin::H1Nester
               name: '@CorePrep/H1Nester'
-              version: '4.017'
+              version: '4.015'
             -
               class: Pod::Weaver::Plugin::SingleEncoding
               name: '@Default/SingleEncoding'
-              version: '4.017'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Name
               name: '@Default/Name'
-              version: '4.017'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Version
               name: '@Default/Version'
-              version: '4.017'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Region
               name: '@Default/prelude'
-              version: '4.017'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Generic
               name: SYNOPSIS
-              version: '4.017'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Generic
               name: DESCRIPTION
-              version: '4.017'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Generic
               name: OVERVIEW
-              version: '4.017'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Collect
               name: ATTRIBUTES
-              version: '4.017'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Collect
               name: METHODS
-              version: '4.017'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Collect
               name: FUNCTIONS
-              version: '4.017'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Leftovers
               name: '@Default/Leftovers'
-              version: '4.017'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Region
               name: '@Default/postlude'
-              version: '4.017'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Authors
               name: '@Default/Authors'
-              version: '4.017'
+              version: '4.015'
             -
               class: Pod::Weaver::Section::Legal
               name: '@Default/Legal'
-              version: '4.017'
+              version: '4.015'
       name: PodWeaver
       version: '4.008'
     -
@@ -351,6 +351,6 @@ x_Dist_Zilla:
       is_trial: '0'
     version: '6.025'
 x_authority: cpan:GENE
-x_generated_by_perl: v5.32.1
+x_generated_by_perl: v5.30.2
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -5,9 +5,11 @@ use warnings;
 
 use App::Kramerius::V4;
 use Class::Utils qw(set_params);
+use Cwd qw(cwd);
 use Data::Kramerius;
 use English;
 use Error::Pure qw(err);
+use File::Spec::Functions qw(catfile);
 use Getopt::Std;
 use HTTP::Request;
 use IO::Barf qw(barf);
@@ -16,7 +18,7 @@ use LWP::UserAgent;
 use METS::Files;
 use Perl6::Slurp qw(slurp);
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Constructor.
 sub new {
@@ -24,6 +26,9 @@ sub new {
 
 	# Create object.
 	my $self = bless {}, $class;
+
+	# Directory to store files.
+	$self->{'dir_to_store_files'} = undef;
 
 	# LWP::UserAgent object.
 	$self->{'lwp_user_agent'} = undef;
@@ -80,11 +85,19 @@ sub run {
 		err 'Cannot read library id and work id.';
 	}
 
+	# Directory to store files.
+	my $dir_to_store_files;
+	if ($self->{'dir_to_store_files'}) {
+		$dir_to_store_files = $self->{'dir_to_store_files'};
+	} else {
+		$dir_to_store_files = cwd();
+	}
+
 	$self->{'_kramerius_obj'} = $self->{'_kramerius'}->get($kramerius_id);
 	if (! defined $self->{'_kramerius_obj'}) {
 		err "Library with ID '$kramerius_id' is unknown.";
 	}
-	barf('ROOT', <<"END");
+	barf(catfile($dir_to_store_files, 'ROOT'), <<"END");
 $kramerius_id
 $object_id
 END
@@ -131,7 +144,7 @@ END
 					if (! $self->{'_opts'}->{'q'}) {
 						print "$page\n";
 					}
-					$self->_download($page, $path_segments[-1]);
+					$self->_download($page, catfile($dir_to_store_files, $path_segments[-1]));
 				}
 
 				# Strip URI part.
@@ -159,7 +172,7 @@ END
 		my $json;
 		if ($res->is_success) {
 			$json = $res->content;
-			barf($object_id.'.json', $json);
+			barf(catfile($dir_to_store_files, $object_id.'.json'), $json);
 		} else {
 			err "Cannot get '$json_uri' URI.",
 				'HTTP code', $res->code,
@@ -196,7 +209,8 @@ END
 			}
 			# XXX Support of jpg only
 			if (! -r $pid.'.jpg') {
-				$self->_do_command("kramerius4 $quiet $kramerius_id $pid");
+				my $out_file = '-o '.catfile($dir_to_store_files, $pid.'.jpg');
+				$self->_do_command("kramerius4 $out_file $quiet $kramerius_id $pid");
 			}
 			push @pages, $pid.'.jpg';
 			$images++;
@@ -211,7 +225,8 @@ END
 			# XXX Support of jpg only
 			my $output_file = $pid.'.jpg';
 			if (! -r $output_file) {
-				$self->_do_command("kramerius4 $quiet $kramerius_id $pid");
+				my $out_file = '-o '.catfile($dir_to_store_files, $output_file);
+				$self->_do_command("kramerius4 $out_file $quiet $kramerius_id $pid");
 			}
 			push @pages, $output_file;
 		}
@@ -219,7 +234,7 @@ END
 		err 'Bad version of Kramerius.',
 			'Kramerius version', $self->{'_kramerius_obj'}->version;
 	}
-	barf('LIST', join "\n", @pages);
+	barf(catfile($dir_to_store_files, 'LIST'), join "\n", @pages);
 
 	return 0;
 }
@@ -288,6 +303,22 @@ Constructor.
 
 Returns instance of object.
 
+=over 8
+
+=item * C<dir_to_store_files>
+
+Directory to store files.
+
+Default value is undef, which means actual directory.
+
+=item * C<lwp_user_agent>
+
+LWP::UserAgent object.
+
+Default value is instance of LWP::UserAgent with set user agent to 'kramerius2images/__PACKAGE_VERSION__'.
+
+=back
+
 =head2 C<run>
 
  my $exit_code = $app->run;
@@ -319,6 +350,8 @@ Returns 1 for error, 0 for success.
          No images to download.
 
 =head1 EXAMPLE
+
+=for comment filename=print_help.pl
 
  use strict;
  use warnings;
@@ -357,6 +390,20 @@ L<LWP::UserAgent>,
 L<METS::Files>,
 L<Perl6::Slurp>.
 
+=head1 SEE ALSO
+
+=over
+
+=item L<Task::Kramerius>
+
+Install modules for Kramerius system.
+
+=item L<App::Images::To::DjVu>
+
+Base class for images2djvu script.
+
+=back
+
 =head1 REPOSITORY
 
 L<https://github.com/michal-josef-spacek/App-Kramerius-To-Images>
@@ -375,6 +422,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

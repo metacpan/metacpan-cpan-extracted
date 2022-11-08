@@ -1,0 +1,42 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 00fcd8f3491dfa63cb851788c4eaae72ea8a259a3211c504cc8713046597f90d Build.PL
+SHA256 e2bf18b91c5f71d7cad607aa5fc8d13e36cd771628340afca1e5d58a3a346ce6 Changes
+SHA256 db739608563af2d9f1763883315451cc38032cb67bdd42a443bfcc7eef1a49b2 LICENSE
+SHA256 1a7cee4861a6f95696866d70753723325a850bb7067dfec1921a23bb21707b15 MANIFEST
+SHA256 f6d7b44f0b1d048cce313c9e3571a5864ab00591603fc493056e3b2983768f9e META.json
+SHA256 e39912e294422ba65e63a30dd40357fbce38ae08b90ceb895761d81f77595d6c META.yml
+SHA256 39e5ecc0eb1f702c2bc441fb2b3cbb83afd4ac0b9403820a18576fa6ee23a385 README
+SHA256 1c4806b7144477f2412de5717e1f0ae42812e6798cc75a388515339eca6cc4ee bin/pmarad
+SHA256 52ac41d7540fcb441455ded98157d9dae5247757c4a3d48841fcc1245f451596 lib/Game/Marad.pm
+SHA256 ce0a894a7da84b02ee2ced31b4c5bc2869cc36a56f3ace61a57610db9f2426eb t/00-load.t
+SHA256 7b13beda7f57093a3c2ba13d5a36b8f0faa249394c79512342a0032173243489 t/10-game.t
+SHA256 26e8eef165b3efeb88516cf0e98ea5ac2455f53e57eabc1259f9cfa6937a51a8 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEElPO2YAAs9b/plKLEs1lvXE/ryKcFAmNp4EwACgkQs1lvXE/r
+yKcJ3wwAwl1NTvZDa26OAgHWSf19Pq2eDI4vnJhM08X/0oRd1N7TvFXK0Bslb5jZ
+e6wWCB27x65tBd2pn/tXxD7fRSIF4blYTccGRrqm9hJ0enIDy37obtg/hl10HN21
+AHezvJPq/yf3ULsLu3u7Kj2sy+rNu9+9fTYQxJ7QraL0y0QbdXuVUSKHEzfl+4Al
+9oJA8zOOeEQHk3lkxSWyarZUuzY13dDlChLG8XFRllzEIISv8bd0KMeS3iaTEyOV
+trqt3EMGuEDpL6w8NZN81DwetE+e7PTi7c5bFtps0qENVXsiXr2b3exxhAis2arZ
+8SMafUazGe7zTKW44B2hbGo5XkdT7DxsDKPRUW7cHNk3tFVy2evwmmt95bdM7sBh
+xjiY00WsNyGaiWhh7avbhbGWgvogwp05iflUBNhE2traT03mfZ3G4SpJFQRFaImN
+mEY9weJHFlKCHER55wSAWML+lHQYsJC1RG9LaBJgWybGLImHNpinZQ00VnpKb9pD
+KOHLl57M
+=i2hi
+-----END PGP SIGNATURE-----

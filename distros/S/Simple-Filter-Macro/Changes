@@ -1,5 +1,9 @@
 Revision history for Perl extension Simple::Filter::Macro.
 
+0.08  2022-11-08
+        - Bug fixing.
+        - Changes in code. Changes in documentation.
+
 0.07  2022-11-07
         - Bug fixing.
         - Changes in code. Changes in documentation.

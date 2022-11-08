@@ -5,7 +5,8 @@ use_ok('SQL::Load');
 can_ok(
     'SQL::Load',
     'new',
-    'load'
+    'load',
+    'reload'
 );
 
 use_ok('SQL::Load::Method');

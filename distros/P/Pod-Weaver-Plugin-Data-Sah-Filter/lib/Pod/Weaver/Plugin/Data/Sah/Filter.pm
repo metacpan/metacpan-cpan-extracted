@@ -9,9 +9,9 @@ use Data::Dmp;
 use File::Temp;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-16'; # DATE
+our $DATE = '2022-08-25'; # DATE
 our $DIST = 'Pod-Weaver-Plugin-Data-Sah-Filter'; # DIST
-our $VERSION = '0.006'; # VERSION
+our $VERSION = '0.007'; # VERSION
 
 sub _process_filter_module {
     no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
@@ -92,7 +92,9 @@ sub _process_filter_module {
                 push @pod, " ", dmp($eg->{value}), " #",
                     ($eg->{filter_args} ? " filtered with args ".dmp($eg->{filter_args}).", " : " "),
                     ($actual_errmsg ? "INVALID ($actual_errmsg)" : "valid"), ", ",
-                    (Data::Cmp::cmp_data($eg->{value}, $actual_filtered_value) == 0 ? "unchanged" : "becomes ".dmp($actual_filtered_value)), "\n";
+                    (Data::Cmp::cmp_data($eg->{value}, $actual_filtered_value) == 0 ? "unchanged" : "becomes ".dmp($actual_filtered_value)),
+                    (defined $eg->{summary} ? " ($eg->{summary})" : ""),
+                    "\n";
             }
             push @pod, "\n";
         }
@@ -218,7 +220,7 @@ Pod::Weaver::Plugin::Data::Sah::Filter - Plugin to use when building Data::Sah::
 
 =head1 VERSION
 
-This document describes version 0.006 of Pod::Weaver::Plugin::Data::Sah::Filter (from Perl distribution Pod-Weaver-Plugin-Data-Sah-Filter), released on 2022-07-16.
+This document describes version 0.007 of Pod::Weaver::Plugin::Data::Sah::Filter (from Perl distribution Pod-Weaver-Plugin-Data-Sah-Filter), released on 2022-08-25.
 
 =head1 SYNOPSIS
 
@@ -284,9 +286,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

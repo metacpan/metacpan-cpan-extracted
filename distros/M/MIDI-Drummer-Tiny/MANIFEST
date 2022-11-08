@@ -8,6 +8,7 @@ Makefile.PL
 README
 README.md
 dist.ini
+eg/black-page
 eg/cold-sweat
 eg/crescendo
 eg/disco

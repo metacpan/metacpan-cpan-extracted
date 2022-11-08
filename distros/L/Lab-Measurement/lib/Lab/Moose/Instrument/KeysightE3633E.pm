@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::KeysightE3633E;
-$Lab::Moose::Instrument::KeysightE3633E::VERSION = '3.823';
+$Lab::Moose::Instrument::KeysightE3633E::VERSION = '3.830';
 #ABSTRACT: Keysight E3633E voltage/current source.
 
 use v5.20;
@@ -155,7 +155,7 @@ Lab::Moose::Instrument::KeysightE3633E - Keysight E3633E voltage/current source.
 
 =head1 VERSION
 
-version 3.823
+version 3.830
 
 =head1 SYNOPSIS
 

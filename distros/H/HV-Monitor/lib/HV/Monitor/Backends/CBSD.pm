@@ -10,11 +10,11 @@ HV::Monitor::Backends::CBSD - CBSD support for HV::Monitor
 
 =head1 VERSION
 
-Version 0.0.1
+Version 0.0.2
 
 =cut
 
-our $VERSION = '0.0.1';
+our $VERSION = '0.0.2';
 
 =head1 SYNOPSIS
 
@@ -226,6 +226,7 @@ sub run {
 				= `ps S -o pid,etimes,%mem,cow,majflt,minflt,nice,nivcsw,nswap,nvcsw,inblk,oublk,pri,rss,systime,usertime,vsz | grep '^ *'$pid'[\ \t]'`;
 
 			chomp($additional);
+			$additional =~ s/^[\ \t]*//;
 			(
 				$pid,               $vm_info->{etimes}, $vm_info->{pmem},    $vm_info->{cow},
 				$vm_info->{majflt}, $vm_info->{minflt}, $vm_info->{nice},    $vm_info->{nivcsw},

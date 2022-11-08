@@ -1,6 +1,6 @@
-#!/usr/bin/env perl
+#!perl
 
-my $version = '0.0.1';
+my $version = '0.1.0';
 
 use strict;
 use warnings;
@@ -10,11 +10,12 @@ use JSON qw(to_json);
 use YAML;
 use Getopt::Long qw(:config pass_through);
 use Data::Dumper;
+use String::ShellQuote;
 
 my $to_read;
 my $format = 'json';
-my $pretty=0;
-my $sort=0;
+my $pretty = 0;
+my $sort   = 0;
 my $version_flag;
 my $help;
 GetOptions(
@@ -40,7 +41,7 @@ if ($help) {
 -r <file>     File to read/run
 -o <format>   Output formats
               Default: json
-              Formats: json,yaml,toml,dumper(Data::Dumper)
+              Formats: json,yaml,toml,dumper(Data::Dumper),shell
 -p            Pretty print
 -s            Sort
 
@@ -50,34 +51,43 @@ if ($help) {
 	exit 255;
 }
 
-if (!defined($to_read)) {
+if ( !defined($to_read) ) {
 	die('No file specified to read via -r');
 }
 
-if ($format ne 'json' && $format ne 'yaml' && $format ne 'toml' && $format ne 'dumper') {
-	die("'".$format."' is not a recognized format");
+if ( $format ne 'json' && $format ne 'yaml' && $format ne 'toml' && $format ne 'dumper' && $format ne 'shell') {
+	die( "'" . $format . "' is not a recognized format" );
 }
 
-my $found_vars=Shell::Var::Reader->read_in($to_read);
+my $found_vars = Shell::Var::Reader->read_in($to_read);
 
 # print in the requested format
-if ($format eq 'toml') {
+if ( $format eq 'toml' ) {
 	print to_toml($found_vars);
-}elsif ($format eq 'yaml') {
-	if (!$sort) {
-		$YAML::SortKeys=0;
+}
+elsif ( $format eq 'yaml' ) {
+	if ( !$sort ) {
+		$YAML::SortKeys = 0;
 	}
 	print Dump($found_vars);
-}elsif ($format eq 'json') {
-	my $json=JSON->new;
+}
+elsif ( $format eq 'json' ) {
+	my $json = JSON->new;
 	$json->canonical($sort);
 	$json->pretty($pretty);
 	print $json->encode($found_vars);
-	if (!$pretty) {
+	if ( !$pretty ) {
 		print "\n";
 	}
-}elsif ($format eq 'dumper') {
+}
+elsif ( $format eq 'dumper' ) {
 	print Dumper($found_vars);
+}
+elsif ( $format eq 'shell' ) {
+	my @keys = keys( %{$found_vars} );
+	foreach my $key (@keys) {
+		print $key. '=' . shell_quote( $found_vars->{$key} ) . "\n";
+	}
 }
 
 exit 0;
@@ -102,7 +112,7 @@ The output format.
 
 Default: json
 
-Formats: json,yaml,toml,dumper(Data::Dumper)
+Formats: json,yaml,toml,dumper(Data::Dumper),shell
 
 =head2 -p
 

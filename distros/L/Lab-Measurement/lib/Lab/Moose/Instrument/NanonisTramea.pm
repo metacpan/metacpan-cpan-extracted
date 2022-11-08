@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::NanonisTramea;
-$Lab::Moose::Instrument::NanonisTramea::VERSION = '3.823';
+$Lab::Moose::Instrument::NanonisTramea::VERSION = '3.830';
 #ABSTRACT: Nanonis Tramea
 
 use v5.20;
@@ -15,6 +15,8 @@ use Lab::Moose::Instrument qw/
 extends 'Lab::Moose::Instrument';
 
 use namespace::autoclean;
+
+
 
 sub nt_string {
   my $s = shift;
@@ -36,7 +38,6 @@ sub nt_uint32 {
   return pack "N", $i;
 }
 
-
 sub nt_float32 {
   my $f = shift;
   return pack "f>", $f;
@@ -46,6 +47,7 @@ sub nt_float64 {
   my $f = shift;
   return pack "d>", $f;
 }
+
 
 sub  nt_header {
     my ($self,$command,$b_size,$response) =@_;
@@ -62,6 +64,7 @@ sub  nt_header {
     return $cmd.$bodysize.$rsp.nt_uint16(0);
 }
 
+
 sub _end_of_com
 {
   my $self = shift;
@@ -72,6 +75,7 @@ sub _end_of_com
     print(substr($response,40,$response_bodysize)."\n");
   }
 }
+
 
 sub strArrayUnpacker {
     my ($self, $elementNum, $strArray) = @_;
@@ -112,10 +116,6 @@ sub float32ArrayUnpacker {
 
   return @floatArray;
 }
-
-
-
-
 
 
 
@@ -334,22 +334,23 @@ sub oneDSwp_Open {
 
 
 sub threeDSwp_AcqChsSet {
-  #Some issues with this function, calling Start too soon after it breakes software
-  #not sure whats happening, I am waiting for response :/
   my $self = shift;
-  my $Number_of_Channels= shift;
+  my $channels_ref = shift;
+  my @channels = @{$channels_ref};
+  my $Number_of_Channels= scalar @channels;
   my $command_name = "3dswp.acqchsset";
   my $bodysize = 4*($Number_of_Channels+1);
   my $header = $self->nt_header($command_name,$bodysize,1);
   my $body = nt_int($Number_of_Channels);
-  while(scalar(@_)!=0){
-    $body =$body.nt_int(shift);
+  for(my $i = 0;$i<$Number_of_Channels;$i++)
+  {
+    $body=$body.nt_int($channels[$i]);
   }
   $self->write(command=>$header.$body);
   $self->_end_of_com();
   #This sleep here solves "some issue" with threeDSwp_AcqChsSet, 
   #even if it sends a response baclo, software bhaves wierdly if another command is sent too soon
-  sleep(0.1);
+  #sleep(0.1);
 
 }
 
@@ -380,15 +381,20 @@ sub threeDSwp_SaveOptionsSet {
   my $Series_Name= shift;
   my $Create_Date_Time =shift;
   my $Comment = shift;
-  my @Modules_Names = @_;
+  my @Modules_Names= ();
+  if(scalar(@_) >0)
+  {
+    my $Modules_Names_ref = shift;
+    @Modules_Names = @{$Modules_Names_ref};
+  }
   my $command_name = "3dswp.saveoptionsset";
-  my $bodysize = 8;
+  my $bodysize = 20;
   my $body = nt_int(0);
   if(length($Series_Name)!=0)
   {
     $body=nt_int(length($Series_Name));
     $body=$body.$Series_Name;
-    $bodysize= 4*(1+length($Series_Name));
+    $bodysize+=length($Series_Name);
   }
   if($Create_Date_Time >0)
   {
@@ -402,7 +408,7 @@ sub threeDSwp_SaveOptionsSet {
   if(length($Comment)!=0)
   {
     $body = $body.nt_int(length($Comment)).$Comment;
-    $bodysize+= 4*(1+length($Comment));
+    $bodysize+= length($Comment);
   }
   else
   {
@@ -415,15 +421,16 @@ sub threeDSwp_SaveOptionsSet {
     foreach(@Modules_Names)
     {
       $buffer_body = $buffer_body.nt_int(length($_)).$_;
-      $buffer_size+= 4*(1+length($_));
+      $buffer_size+= 4+length($_);
     }
-    $body = $body.nt_int($buffer_size).nt_int(scalar(@Modules_Names)).$buffer_body;
+    $body = $body.nt_int($buffer_size);
+    $body = $body.nt_int(scalar(@Modules_Names));
+    $body = $body.$buffer_body;
     $bodysize += 8 + $buffer_size;
   }
   else
   {
     $body= $body.nt_int(0).nt_int(0);
-    $bodysize+=8;
   }
   
   $self->write(command=>$self->nt_header($command_name,$bodysize,1).$body);
@@ -719,7 +726,7 @@ sub threeDSwp_StpCh2SignalSet {
   my $self = shift;
   my $Channel_name = shift;
   my $name_len = length($Channel_name);
-  my $bodysize = 4*($name_len+1);
+  my $bodysize = 4+($name_len);
   my $command_name = "3dswp.stpch2signalset";
   my $head= $self->nt_header($command_name,$bodysize,1);
   $self->write(command=>$head.nt_int($name_len).$Channel_name);
@@ -1084,7 +1091,7 @@ sub Signals_MeasNamesGet {
 }
 
 sub Signals_AddRTGet() {
-  # Incomplete, not getting a response
+  
   my $self = shift;
   my $command_name="signals.addrtget";
   my $head = $self->nt_header($command_name,0,1);
@@ -1569,8 +1576,8 @@ has sweep_prop_configuration => (
 sub _build_sweep_prop_configuration {
   my $self = shift;
   my %hash;
-  $hash{point_number}=0;
-  $hash{number_of_sweeps}=0;
+  $hash{point_number}=2;
+  $hash{number_of_sweeps}=1;
   $hash{backwards}=-1;
   $hash{at_end}=-1;
   $hash{at_end_val}=0;
@@ -1884,45 +1891,6 @@ sub step2_prop_configure {
                                   $params{at_end_val});  
 }
 
-# Deprecate after expanding to 3D
-sub sweep1D {
-  my ($self, %params) = validated_hash(
-    \@_,
-    sweep_channel => {isa => "Int"},
-    aquisition_channels => {isa=>"ArrayRef[Int]"},
-    lower_limit =>{isa=>"Num"},
-    upper_limit =>{isa=>"Num"},
-    point_number =>{isa=>"Int", optional=>1},
-    series_name => {isa=> "Str", optional=>1},
-    comment => {isa=>"Str", optional =>1}
-  );
-
-  if(exists($params{point_number}) && $params{point_number}!= $self->sweep_prop_configuration()->{point_number}){
-    $self->sweep_prop_configure(point_number=>$params{point_number});
-  }
-  if(exists($params{series_name})&& $params{series_name} ne $self->sweep_save_configuration()->{series_name}){
-    $self->sweep_save_configure(series_name=>$params{series_name});
-  }
-  if(exists($params{comment})&& ($params{comment} ne $self->sweep_save_configuration()->{comment})){
-    $self->sweep_save_configure(comment=>$params{comment});
-  }
-
-  $self->threeDSwp_SwpChSignalSet($params{sweep_channel});
-  $self->threeDSwp_StpCh1SignalSet(-1);
-  $self->threeDSwp_StpCh2SignalSet(-1);
-
-  $self->threeDSwp_SwpChLimitsSet($params{lower_limit},$params{upper_limit});
-  $self->threeDSwp_AcqChsSet(scalar(@{$params{aquisition_channels}}),@{$params{aquisition_channels}});
-  $self->threeDSwp_Start();
-
-  #Not sure whats the best approach here.
-  while($self->threeDSwp_StatusGet()!=0 && $self->threeDSwp_StatusGet()!=2)
-  {
-    sleep(0.5);
-  }
-  #Note: Delay Between response and successfull file creation,may be due to VM setup
-}
-
 sub sweep {
   my ($self, %params) = validated_hash(
     \@_,
@@ -1942,15 +1910,17 @@ sub sweep {
     series_name => {isa=> "Str", optional=>1},
     comment => {isa=>"Str", optional =>1}
   );
+  
 
   # PARAMETER CONTROLL FOR Sweep Channel, Need to check for maximum channel?
 
   if(exists($params{point_number_sweep}) && $params{point_number_sweep}!= $self->sweep_prop_configuration()->{point_number}){
-    #$self->sweep_prop_configure(point_number=>$params{point_number_sweep});
+    $self->sweep_prop_configure(point_number=>$params{point_number_sweep});
   }
   
-  #$self->threeDSwp_SwpChSignalSet($params{sweep_channel});
+  $self->threeDSwp_SwpChSignalSet($params{sweep_channel});
   
+  $self->threeDSwp_SwpChLimitsSet($params{lower_limit_sweep},$params{upper_limit_sweep});
   # PARAMETER CONTROLL FOR Step channel 1
   if(exists($params{step1_channel}))
   {
@@ -1996,7 +1966,7 @@ sub sweep {
      { 
        if(exists($params{point_number_step2}) && $params{point_number_step2}!= $self->step2_prop_configuration()->{point_number})
        {
-          #$self->step2_prop_configure(point_number=>$params{point_number_step2});
+          $self->step2_prop_configure(point_number=>$params{point_number_step2});
        }
 
        if(exists($params{lower_limit_step2}))
@@ -2029,8 +1999,6 @@ sub sweep {
     $self->threeDSwp_StpCh2SignalSet("");
   }
 
-
-  # Needs a better solution here to not call Sweep Save configure twice
   if(exists($params{series_name})&& $params{series_name} ne $self->sweep_save_configuration()->{series_name}){
     $self->sweep_save_configure(series_name=>$params{series_name});
   }
@@ -2038,18 +2006,14 @@ sub sweep {
   if(exists($params{comment})&& ($params{comment} ne $self->sweep_save_configuration()->{comment})){
     $self->sweep_save_configure(comment=>$params{comment});
   }
-  $self->threeDSwp_AcqChsSet(scalar(@{$params{aquisition_channels}}),@{$params{aquisition_channels}});
-  $self->threeDSwp_SwpChLimitsSet($params{lower_limit_sweep},$params{upper_limit_sweep});
+  $self->threeDSwp_AcqChsSet($params{aquisition_channels});
   $self->threeDSwp_Start();
 
-  #Not sure whats the best approach here.
   while($self->threeDSwp_StatusGet()!=0 && $self->threeDSwp_StatusGet()!=2)
   {
     sleep(0.1);
   }
-  #Note: Delay Between response and successfull file creation,may be due to VM setup
 }
-#Prototype: Function to parse into pdl from .dat Nanonis file
 
 sub to_pdl_1D{
     my ($self,%params) =  validated_hash(
@@ -2133,13 +2097,63 @@ Lab::Moose::Instrument::NanonisTramea - Nanonis Tramea
 
 =head1 VERSION
 
-version 3.823
+version 3.830
 
 =head1 SYNOPSIS
 
  my $tramea = instrument(
      type => 'NanonisTramea',
  );
+
+=head1 FORMATTERS
+Collections of functions to pack or unpack numbers and srings for TCP comunication
+
+=head2 nt_string
+
+=head2 nt_int
+
+=head2 nt_uint16
+
+=head2 nt_uint32
+
+=head2 nt_float32
+
+=head2 nt_float64
+
+=head2 nt_header
+
+    my $header =  $tramea->nt_header($command,$body_size,$response);
+
+  Function to format Header of tcp message.
+  C<command> refers to command name as reported in the Nanonis Tramea documentation
+  C<body_size> refers to the size of the message body, not including the header itself.
+  C<response> Must have value of either 0 or 1. If value is the nanonis Software will send a response according to documentation.
+
+=head2 _end_of_com
+
+=head2 strArrayUnpacker
+
+  my %strArray = $tramea->strArrayUnpacker($element_number, $string_array);
+
+Returns an hash that has as keys the indexes of the strings in the array and as items the strings themselves.
+C<element_number> refers to the ammount of strings about to be in the array.
+C<string_array> refers to the binary of the strings array.
+
+=head2 intArrayUnpacker
+
+  my @int_array = $tramea->intArrayUnpacker($element_number, $int_array);
+
+Unpacks binary array of int and returns into perl Array type.
+C<element_number> refers to the expected number of elements in the array.
+C<int_array> refers to the int array binary.
+
+=head2 float32ArrayUnpacker
+
+  my $floeat32_array = $tramea->float32ArrayUnpacker($element_number, $float32_array);
+
+Unpacks binary array of float32 and returns into perl Array type.
+C<element_number> refers to the expected number of elements in the array.
+C<float32_array> refers to float32 array binary.
 
 =head1 1DSweep
 

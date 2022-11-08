@@ -1,3 +1,5 @@
+0.025 2022-11-08 20:08:00+0000
+  -Filename is available in context
 0.024 2020-08-17 20:40:00+0000
   -Add support for glob expansion on IF EXIST condition
 0.023 2020-07-06 20:40:00+0000

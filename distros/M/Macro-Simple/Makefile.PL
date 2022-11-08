@@ -26,7 +26,7 @@ my $meta = {
                         test      => { requires => { "Test::More" => 0.96 } },
                       },
   "provides"       => {
-                        "Macro::Simple" => { file => "lib/Macro/Simple.pm", version => 0.002 },
+                        "Macro::Simple" => { file => "lib/Macro/Simple.pm", version => 0.003 },
                       },
   "release_status" => "stable",
   "resources"      => {
@@ -40,7 +40,7 @@ my $meta = {
                                         },
                         x_identifier => "http://purl.org/NET/cpan-uri/dist/Macro-Simple/project",
                       },
-  "version"        => 0.002,
+  "version"        => 0.003,
 };
 
 my %dynamic_config;
@@ -48,6 +48,7 @@ do {
 	if ( $] ge 5.014000 ) {
 		$meta->{prereqs}{runtime}{requires}{'Parse::Keyword'} = '0.09';
 		$meta->{prereqs}{runtime}{requires}{'PPI'} = '1.270';
+		$meta->{prereqs}{runtime}{requires}{'Sub::Boolean'} = '1.000000';
 	}
 
 };

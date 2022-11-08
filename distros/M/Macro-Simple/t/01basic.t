@@ -45,6 +45,10 @@ my $obj = bless [];
 ok( ISA($obj, 'main') );
 ok( CAN($obj, 'wxyz') );
 
+if ( not Macro::Simple::DO_CLEAN ) {
+	ok( !main->can('ISA') );
+}
+
 diag Macro::Simple::DO_MACRO
 	? 'macro: real'
 	: 'macro: fallback';

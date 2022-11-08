@@ -533,6 +533,8 @@ xxxxx.xxxxxx$ e[1D [1Dalarm show
 |    8| Y |   |   51|critical| Thu Sep 15 17:12:30 2022 |               PTP-1/9| Rx Loss of Signal                          |
 |    9| Y |   |   51|critical| Thu Sep 15 17:12:30 2022 |              PTP-1/10| Rx Loss of Signal                          |
 |    9| Y |   |   51|   info | Thu Sep 15 17:12:30 2022 |              PTP-1/10| Rx Loss of Signal                          |
+|    9|   |   |   51|critical| Thu Sep 15 17:12:30 2022 |              Port-2/4| Rx Remote Fault                            |
+|    9|   |   |   51|critical| Thu Sep 15 17:12:30 2022 |         Channel-2/1.2| Far End Client Signal Fail                 |
 +-----+---+---+-----+--------+--------------------------+----------------------+--------------------------------------------+
 | |              \---------> ATID : Alarm Table ID                                                                          |
 | \------------------------> IID  : Alarm Instance ID                                                                       |

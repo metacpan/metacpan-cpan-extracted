@@ -41,6 +41,38 @@ You should be able to use Sub::HandlesVia as a drop-in replacement for
 L<MouseX::NativeTraits>, just replacing C<< traits => ['Array'] >> in an
 attribute definition with C<< handles_via => 'Array' >>.
 
+=head2 Usage in Mouse Roles
+
+Mouse roles are only partially supported.
+
+ package R1 {
+   use Mouse:Role;
+ }
+ 
+ package R2 {
+   use Mouse:Role;
+   use Sub::HandlesVia;
+   
+   # define some attributes with delegation
+ }
+ 
+ # This class is broken.
+ package C1 {
+   use Mouse;
+   with 'R1', 'R2';
+ }
+ 
+ # This class should work.
+ package C2 {
+   use Mouse;
+   with 'R1';
+   with 'R2';
+ }
+
+For details, see L<https://github.com/tobyink/p5-sub-handlesvia/issues/9>.
+
+Patches to fix the issue are very welcome!
+
 =head2 Which Methods Can Be Delegated To?
 
 The C<handles_via> option indicates which library of methods should be

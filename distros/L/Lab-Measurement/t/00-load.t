@@ -77,7 +77,7 @@ my %depencencies = (
             Lab/Moose/Instrument/HPE4400B.pm
             }
     ],
-
+    'PDL::IO::CSV'        => ['Lab/Moose/Instrument/NanonisTramea.pm'],
     'Statistics::LineFit' => ['Lab/XPRESS/Data/XPRESS_dataset.pm'],
 
     'Device::SerialPort' => $rs232_stuff,

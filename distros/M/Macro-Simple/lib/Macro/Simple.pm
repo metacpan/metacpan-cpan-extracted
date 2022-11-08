@@ -5,17 +5,18 @@ use warnings;
 package Macro::Simple;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.002';
+our $VERSION   = '0.003';
 
 use Carp;
 
-use constant DO_MACRO =>
-	( $] ge 5.014000 and require Parse::Keyword and require PPI );
-use constant DO_CLEAN =>
-	( require namespace::clean );
+use constant DO_MACRO => (
+	$] ge 5.014000 and
+	require Parse::Keyword and
+	require PPI and
+	require Sub::Boolean
+);
 
-require XSLoader;
-XSLoader::load(__PACKAGE__, $VERSION);
+use constant DO_CLEAN => eval { require namespace::clean };
 
 sub import {
 	my ( $class, $macros ) = ( shift, @_ );
@@ -63,7 +64,7 @@ sub handle_generator {
 sub _setup_using_parse_keyword {
 	my ( $class, $opt ) = ( shift, @_ );
 	my ( $caller, $subname ) = @{$opt}{qw/ caller subname /};
-	make_truthy("$caller\::$subname");
+	Sub::Boolean::make_true("$caller\::$subname");
 	no strict qw( refs );
 	Parse::Keyword::install_keyword_handler(
 		\&{ "$caller\::$subname" },
@@ -171,7 +172,7 @@ sub _parse {
 	
 	Parse::Keyword::lex_read( $length );
 	Parse::Keyword::lex_stuff( sprintf ' && do { %s }', $generator->(@args) );
-	return \&truthy; # will never be called. sigh.
+	return \&Sub::Boolean::truthy; # will never be called. sigh.
 }
 
 1;
@@ -266,7 +267,7 @@ Overriding this method may be useful in subclasses.
 =head1 BUGS
 
 Please report any bugs to
-L<http://rt.cpan.org/Dist/Display.html?Queue=Macro-Simple>.
+L<https://github.com/tobyink/p5-macro-simple/issues>.
 
 =head1 SEE ALSO
 

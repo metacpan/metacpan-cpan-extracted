@@ -1,0 +1,379 @@
+#!perl
+#
+# pmarad - a command line interface to Game::Marad
+
+use 5.26.0;
+use warnings;
+use Curses;
+use Game::Marad;
+
+use constant {
+    COLOFF => 2,    # two screen columns per one game column
+
+    CURS_START_Y => 4,    # where cursor starts in a new game
+    CURS_START_X => 5,
+
+    CURS_OFF_Y => 0,      # where board 0,0 is relative to display cursor
+    CURS_OFF_X => -3,
+
+    MINCOL => 3,          # cursor constraints - see also boardw in newgame
+    MAXCOL => 19,
+    MINROW => 0,
+    MAXROW => 8,
+
+    NEED_COLS => 24,      # minimum terminal dimensions
+    NEED_ROWS => 12,
+
+    NEXT_EVENT => 0,
+    NEXT_KEY   => 1,
+
+    STATE_NORMAL => 0,
+    STATE_SELECT => 1,
+
+    VICTORY => 15,        # points required to win
+};
+
+our $app;
+
+our %piecemap = (
+    0  => '.',
+    1  => 'R',            # White, player 1
+    2  => 'B',
+    3  => 'K',
+    65 => 'r',            # Black, player 2
+    66 => 'b',
+    67 => 'k',
+);
+
+# so with curses support rogue (and keypad) keys and it's move
+# cursor to a piece, select (enter or space?), make a motion to
+# indicate the direction. escape unlocks a selected piece
+
+our %ch_inputs = (    # regular keys (see Curses getchar docs)
+    Q       => \&move_quit,
+    ' '     => \&move_select,    # pick or complete a move
+    "\r"    => \&move_select,
+    "\n"    => \&move_select,
+    "\e"    => \&move_cancel,    # unpick a move
+    chr(12) => \&move_winch,     # control+l to refresh things
+
+    # these are from vi(1)
+    h => \&move_west,
+    j => \&move_south,
+    k => \&move_north,
+    l => \&move_east,
+    # and these are from rogue(6)
+    y => \&move_northwest,
+    u => \&move_northeast,
+    b => \&move_southwest,
+    n => \&move_southeast,
+);
+
+our %key_inputs = (    # extended keys (mostly untested)
+    410 => \&move_winch,
+    331 => \&move_select,    # "0" maybe?
+
+    260 => \&move_west,
+    258 => \&move_south,
+    259 => \&move_north,
+    261 => \&move_east,
+
+    262 => \&move_northwest,
+    339 => \&move_northeast,
+    360 => \&move_southwest,
+    338 => \&move_southeast,
+);
+
+run();
+
+sub init {
+    # NOTE do not add "nodelay" without reviewing the getchar loop
+    initscr;
+    $SIG{WINCH} = 'IGNORE';    # KLUGE lock curses window size
+    if ( $COLS < NEED_COLS or $LINES < NEED_ROWS ) {
+        endwin;
+        printf STDERR "pmarad: screen is too small (need %d,%d)\n", NEED_COLS,
+          NEED_ROWS;
+        exit 1;
+    }
+    raw;
+    keypad(1);
+    noecho;
+    $app = newgame();
+}
+
+sub newgame {
+    state $app;
+    $app->{dirty} = 1;
+    $app->{game}  = Game::Marad->new;
+    $app->{state} = STATE_NORMAL;
+    $app->{boardw} //= subwin( 9, 18, 0, 3 );
+    $app->@{qw(cursy cursx)} = ( CURS_START_Y, CURS_START_X );
+    return $app;
+}
+
+sub run {
+    init() unless defined $app;
+    while (1) {
+        update($app);
+      KEY:
+        my ( $ch, $key ) = getchar;
+        my $action;
+        if ( defined $key ) {
+            $action = $key_inputs{$key};
+            unless ( defined $action ) {
+                #printf STDERR "DBG INPUT KEY %vx %d\n", $key, $key;
+                goto KEY;
+            }
+        } elsif ( defined $ch ) {
+            $action = $ch_inputs{$ch};
+            unless ( defined $action ) {
+                #printf STDERR "DBG INPUT CH  %vx $ch\n", $ch;
+                goto KEY;
+            }
+        } else {
+            # nodelay if set will probably need a napms here to avoid busy
+            # looping through a getchar that then too quickly returns
+            goto KEY;
+        }
+        goto KEY if $action->($app) == NEXT_KEY;
+    }
+}
+
+sub move_west {
+    my ($app) = @_;
+    $app->{cursx} -= COLOFF;
+    return NEXT_EVENT;
+}
+
+sub move_south {
+    my ($app) = @_;
+    $app->{cursy} += 1;
+    return NEXT_EVENT;
+}
+
+sub move_north {
+    my ($app) = @_;
+    $app->{cursy} -= 1;
+    return NEXT_EVENT;
+}
+
+sub move_east {
+    my ($app) = @_;
+    $app->{cursx} += COLOFF;
+    return NEXT_EVENT;
+}
+
+# the checks on the diagonals are to prevent the cursor from "sliding"
+# along a border; diagonals are only allowed where a proper diagonal
+# can happen
+sub move_northwest {
+    my ($app) = @_;
+    if ( $app->{cursy} > MINROW and $app->{cursx} > MINCOL ) {
+        $app->{cursy} -= 1;
+        $app->{cursx} -= COLOFF;
+    }
+    return NEXT_EVENT;
+}
+
+sub move_northeast {
+    my ($app) = @_;
+    if ( $app->{cursy} > MINROW and $app->{cursx} < MAXCOL ) {
+        $app->{cursy} -= 1;
+        $app->{cursx} += COLOFF;
+    }
+    return NEXT_EVENT;
+}
+
+sub move_southwest {
+    my ($app) = @_;
+    if ( $app->{cursy} < MAXROW and $app->{cursx} > MINCOL ) {
+        $app->{cursy} += 1;
+        $app->{cursx} -= COLOFF;
+    }
+    return NEXT_EVENT;
+}
+
+sub move_southeast {
+    my ($app) = @_;
+    if ( $app->{cursy} < MAXROW and $app->{cursx} < MAXCOL ) {
+        $app->{cursy} += 1;
+        $app->{cursx} += COLOFF;
+    }
+    return NEXT_EVENT;
+}
+
+sub move_cancel {
+    my ($app) = @_;
+    $app->{state} = STATE_NORMAL;
+    return NEXT_KEY;
+}
+
+sub move_quit {
+    endwin;
+    exit;
+}
+
+# pick a source square, or try a move with a destination square
+sub move_select {
+    my ($app) = @_;
+    if ( $app->{state} == STATE_NORMAL ) {
+        # oh X needs a modify by uh
+        $app->@{qw(state srcy srcx)} = (
+            STATE_SELECT,
+            $app->{cursy} + CURS_OFF_Y,
+            int( ( $app->{cursx} + CURS_OFF_X ) / COLOFF )
+        );
+        return NEXT_KEY;
+    } elsif ( $app->{state} == STATE_SELECT ) {
+        my ( $dsty, $dstx ) = (
+            $app->{cursy} + CURS_OFF_Y,
+            int( ( $app->{cursx} + CURS_OFF_X ) / COLOFF )
+        );
+        my ( $r, $msg ) = $app->{game}->move( $app->@{qw(srcx srcy)}, $dstx, $dsty );
+        if ( $r == 1 ) {
+            $app->@{qw(dirty state)} = ( 1, STATE_NORMAL );
+            return NEXT_EVENT;
+        } else {
+            # not a valid move. better luck next time?
+            return NEXT_KEY;
+        }
+    }
+}
+
+sub move_winch {
+    my ($app) = @_;
+    move 0, 0;
+    clrtobot;
+    $app->{dirty} = 1;
+    return NEXT_EVENT;
+}
+
+sub update {
+    my ($app) = @_;
+    if ( $app->{dirty} ) {
+        touchwin;
+
+        my $score = $app->{game}->score;
+        if ( $score->[0] >= VICTORY ) {
+            victory(1);
+        } elsif ( $score->[1] >= VICTORY ) {
+            victory(2);
+        }
+
+        my $game = $app->{game};
+        my ( $board, $grid ) = ( $game->board, $app->{boardw} );
+        $score = $game->score;
+
+        addstring 7, 1,  sprintf "%X", $score->[0];
+        addstring 7, 21, sprintf "%X", $score->[1];
+
+        if ( $game->player == 0 ) {
+            addstring 1, 1, sprintf "%d", $game->move_count;
+            addstring 1, 21, ' ';
+        } else {
+            addstring 1, 1, ' ';
+            addstring 1, 21, sprintf "%d", $game->move_count;
+        }
+
+        my $maxidx = $board->$#*;
+        for my $row ( 0 .. $maxidx ) {
+            for my $col ( 0 .. $maxidx ) {
+                addch $grid, $row, $col * COLOFF, $piecemap{ $board->[$row][$col] } // '?';
+            }
+        }
+
+        noutrefresh $grid;
+        doupdate;
+        $app->{dirty} = 0;
+    }
+
+    # maintain the cursor position, which things like window resizes
+    # may like to fiddle with
+    if ( $app->{cursx} < MINCOL ) {
+        $app->{cursx} = MINCOL;
+    } elsif ( $app->{cursx} > MAXCOL ) {
+        $app->{cursx} = MAXCOL;
+    }
+    if ( $app->{cursy} < MINROW ) {
+        $app->{cursy} = MINROW;
+    } elsif ( $app->{cursy} > MAXROW ) {
+        $app->{cursy} = MAXROW;
+    }
+    move $app->@{qw(cursy cursx)};
+}
+
+sub victory {
+    my ($player) = @_;
+    move 0, 0;
+    clrtobot;
+    addstring("Player $player wins!");
+    getchar;
+    move 0, 0;
+    clrtobot;
+    newgame();
+    touchwin;
+}
+
+__END__
+
+=head1 NAME
+
+B<pmarad> - Perl implementation of the Marad board game
+
+=head1 SYNOPSIS
+
+  pmarad
+
+=head1 DESCRIPTION
+
+Marad is a game for two players that takes place on a nine by
+nine board.
+
+The cursor may be moved using L<rogue(6)> keys:
+
+   y  k  u
+    \ | /
+  h - . - l
+    / | \
+   b  j  n
+
+Navigate the cursor to a piece you own and select it with space or
+enter. To cancel a selection, hit escape. To move a selected piece, move
+the cursor to some other square then hit space or enter again. If the
+move is valid, the piece will move, and the second player can now make
+their move.
+
+Hit Q to quit the game.
+
+=head2 Gameplay
+
+A move count (between 1 and 4) is displayed on the side of the player
+whose turn it is. A piece will move by this amount, pushing anything in
+the way, unless something is stopped by the edge of the board.
+
+The pieces move somewhat like in chess, except for the move count being
+determined at random. The King (C<K> or C<k>) can move in any direction;
+the Bishop (C<B> or C<b>) only diagonal and the Rook (C<R> or C<r>) only
+in straight lines.
+
+To score points, any piece must be moved and end the turn in the
+center square.
+
+The usual gameplay alternates setting your pieces up to score points,
+moving them to score points, and the perhaps less important task of
+preventing the opposing player from scoring points or pushing your
+pieces out of the way.
+
+=head1 AUTHOR
+
+Jeremy Mates
+
+=head1 BUGS
+
+L<Curses> must be installed for C<pmarad>, but is not required by the
+installation of L<Game::Marad>.
+
+The interface is pretty minimal.
+
+=cut

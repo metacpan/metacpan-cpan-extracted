@@ -1,6 +1,6 @@
 package Lab::XPRESS::Sweep::LogBlock;
 #ABSTRACT: Sweep add-on for matrix logging
-$Lab::XPRESS::Sweep::LogBlock::VERSION = '3.823';
+$Lab::XPRESS::Sweep::LogBlock::VERSION = '3.830';
 use v5.20;
 
 use Role::Tiny;
@@ -88,7 +88,7 @@ Lab::XPRESS::Sweep::LogBlock - Sweep add-on for matrix logging
 
 =head1 VERSION
 
-version 3.823
+version 3.830
 
 =head1 SYNOPSIS
 

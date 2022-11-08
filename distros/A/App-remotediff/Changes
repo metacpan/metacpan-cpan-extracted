@@ -1,5 +1,8 @@
 Revision history for App-remotediff
 
+1.12    2022-11-08
+        - fixed cleanup crash bug
+
 1.11    2022-11-02
         - fixed rsync --delete
 

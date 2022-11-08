@@ -1,3 +1,9 @@
+0.04 2022-11-08T21:23:18+01:00
+ - Add 'dir_to_store_files' constructor parameter.
+ - Add SEE ALSO section to doc.
+ - Add doc for 'lwp_user_agent' constructor parameter.
+ - Rename example file to better name.
+
 0.03 2021-11-20T12:29:01+01:00
  - Add test for constructor.
  - Better error message (object -> instance).

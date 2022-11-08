@@ -35,9 +35,13 @@ Files: Changes
  lib/Sub/HandlesVia/Toolkit/Plain.pm.mite.pm
  t/00begin.t
  t/02moo.t
+ t/02moo/ext_attr.t
+ t/02moo/roles-multiple.t
  t/03moo_mxtt.t
  t/04moose.t
+ t/04moose/ext_attr.t
  t/04moose/role.t
+ t/04moose/roles-multiple.t
  t/04moose/trait_array.t
  t/04moose/trait_bool.t
  t/04moose/trait_code.t
@@ -47,9 +51,12 @@ Files: Changes
  t/04moose/trait_string.t
  t/05moose_nativetypes/trait_array.t
  t/06mouse.t
+ t/06mouse/ext_attr.t
+ t/06mouse/roles-multiple.t
  t/06mouse/trait_hash.t
  t/10barebones_eagerbuilder.t
  t/11delegation.t
+ t/15preludes.t
  t/30egpod/array.t
  t/30egpod/bool.t
  t/30egpod/code.t

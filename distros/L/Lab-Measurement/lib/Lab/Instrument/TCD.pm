@@ -1,6 +1,6 @@
 package Lab::Instrument::TCD;
 #ABSTRACT: Temperature control for our Oxford Instruments TLM dilution fridge
-$Lab::Instrument::TCD::VERSION = '3.823';
+$Lab::Instrument::TCD::VERSION = '3.830';
 use v5.20;
 
 use strict;
@@ -215,7 +215,7 @@ Lab::Instrument::TCD - Temperature control for our Oxford Instruments TLM diluti
 
 =head1 VERSION
 
-version 3.823
+version 3.830
 
 =head1 SYNOPSIS
 

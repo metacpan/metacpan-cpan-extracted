@@ -5,7 +5,7 @@ use warnings;
 package Sub::HandlesVia::Toolkit::Mouse;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.044';
+our $VERSION   = '0.045';
 
 use Sub::HandlesVia::Mite;
 extends 'Sub::HandlesVia::Toolkit';
@@ -175,7 +175,7 @@ sub code_generator_for_attribute {
 package Sub::HandlesVia::Toolkit::Mouse::PackageTrait;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.044';
+our $VERSION   = '0.045';
 
 use Mouse::Role;
 
@@ -198,7 +198,8 @@ around add_attribute => sub {
 		($attrname, %spec) = @args;
 		$spec = \%spec;
 	}
-	$spec->{provides}{shv} = $self->_shv_toolkit->clean_spec($self->name, $attrname, $spec)
+	( my $real_attrname = $attrname ) =~ s/^[+]//;
+	$spec->{provides}{shv} = $self->_shv_toolkit->clean_spec($self->name, $real_attrname, $spec)
 		unless $spec->{provides}{shv};
 	my $attr = $self->$next($attrobj ? $attrobj : ($attrname, %$spec));
 	if ($spec->{provides}{shv} and $self->isa('Mouse::Meta::Class')) {
@@ -213,7 +214,7 @@ around add_attribute => sub {
 package Sub::HandlesVia::Toolkit::Mouse::RoleTrait;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.044';
+our $VERSION   = '0.045';
 
 use Mouse::Role;
 requires '_shv_toolkit';
@@ -222,6 +223,27 @@ around apply => sub {
 	my ($next, $self, $other, %args) = (shift, shift, @_);
 	$other = $self->_shv_toolkit->meta_hack( $other );
 	$self->$next( $other, %args );
+};
+
+# This is a horrible hack.
+do {
+	no warnings 'redefine';
+	require Mouse::Meta::Role;
+	require Scalar::Util;
+	my $next = \&Mouse::Meta::Role::combine;
+	*Mouse::Meta::Role::combine = sub {
+		my ( $class, @roles ) = ( shift, @_ );
+		my $combined = $class->$next( @roles );
+		my ($hack) = map {
+			( ref $_ and blessed $_->[0] and $_->[0]->can( '_shv_toolkit' ) )
+				? $_->[0]->_shv_toolkit
+				: ();
+		} @roles;
+		if ($hack) {
+			$combined = $hack->meta_hack( $combined );
+		}
+		return $combined;
+	};
 };
 
 1;

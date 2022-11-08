@@ -9,7 +9,6 @@ META.yml
 Makefile.PL
 README
 SIGNATURE
-Simple.xs
 dist.ini
 doap.ttl
 lib/Macro/Simple.pm

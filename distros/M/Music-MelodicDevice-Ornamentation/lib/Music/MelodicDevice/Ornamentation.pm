@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Chromatic and diatonic melodic ornamentation
 
-our $VERSION = '0.0702';
+our $VERSION = '0.0703';
 
 use strictures 2;
 use Carp qw(croak);
@@ -74,7 +74,7 @@ sub grace_note {
 
     # Compute the ornament durations
     my $x = $MIDI::Simple::Length{$duration} * TICKS;
-    my $y = $MIDI::Simple::Length{xn} * TICKS; # Thirty-second note
+    my $y = $MIDI::Simple::Length{yn} * TICKS; # 64th note
     my $z = sprintf '%0.f', $x - $y;
     print "Durations: $x, $y, $z\n" if $self->verbose;
     $y = 'd' . $y;
@@ -250,7 +250,7 @@ Music::MelodicDevice::Ornamentation - Chromatic and diatonic melodic ornamentati
 
 =head1 VERSION
 
-version 0.0702
+version 0.0703
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
 package Lab::XPRESS::Data::XPRESS_DataFile;
-$Lab::XPRESS::Data::XPRESS_DataFile::VERSION = '3.823';
+$Lab::XPRESS::Data::XPRESS_DataFile::VERSION = '3.830';
 #ABSTRACT: XPRESS data file module
 
 use v5.20;
@@ -612,7 +612,7 @@ Lab::XPRESS::Data::XPRESS_DataFile - XPRESS data file module
 
 =head1 VERSION
 
-version 3.823
+version 3.830
 
 =head1 COPYRIGHT AND LICENSE
 

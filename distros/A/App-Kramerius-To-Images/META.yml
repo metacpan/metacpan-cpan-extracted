@@ -6,8 +6,14 @@ build_requires:
   English: 0
   Error::Pure::Utils: 0
   ExtUtils::MakeMaker: 6.59
+  File::Spec::Functions: 0
+  File::Temp: 0
+  HTTP::Response: 0
+  Test::File::Contents: 0
+  Test::LWP::UserAgent: 0
   Test::More: 0
   Test::NoWarnings: 0
+  Test::Output: 0
 configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
@@ -27,9 +33,11 @@ no_index:
 requires:
   App::Kramerius::V4: 0
   Class::Utils: 0
+  Cwd: 0
   Data::Kramerius: 0
   English: 0
   Error::Pure: 0
+  File::Spec::Functions: 0
   Getopt::Std: 0
   HTTP::Request: 0
   IO::Barf: 0
@@ -43,4 +51,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/App-Kramerius-To-Images
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/App-Kramerius-To-Images
-version: '0.03'
+version: '0.04'

@@ -14,7 +14,7 @@ use Bat::Interpreter::Delegate::LineLogger::Silent;
 use File::Glob;
 use namespace::autoclean;
 
-our $VERSION = '0.024';    # VERSION
+our $VERSION = '0.025';    # VERSION
 
 # ABSTRACT: Pure perl interpreter for a small subset of bat/cmd files
 
@@ -78,7 +78,8 @@ sub run {
                         'IP'           => 0,
                         'LABEL_INDEX'  => \%line_from_label,
                         'current_line' => '',
-                        'STACK'        => []
+                        'STACK'        => [],
+                        'filename'     => $filename
         };
 
         # Execute lines in a nonlinear fashion
@@ -484,7 +485,7 @@ Bat::Interpreter - Pure perl interpreter for a small subset of bat/cmd files
 
 =head1 VERSION
 
-version 0.024
+version 0.025
 
 =head1 SYNOPSIS
 
@@ -521,7 +522,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Pablo Rodríguez González.
+This software is Copyright (c) 2022 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 
@@ -529,9 +530,13 @@ This is free software, licensed under:
 
 =head1 CONTRIBUTORS
 
-=for stopwords eva.dominguez Eva juanradiego Nicolas De los Santos pablo.rodriguez ricardo.gomez Toby Inkster
+=for stopwords andres.mari eva.dominguez Eva juanradiego Nicolas De los Santos pablo.rodriguez ricardo.gomez Toby Inkster
 
 =over 4
+
+=item *
+
+andres.mari <andres.mari@meteologica.com>
 
 =item *
 

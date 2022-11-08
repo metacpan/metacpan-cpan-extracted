@@ -410,8 +410,28 @@
             $self->{"generator_for_error"} = $value;
         };
 
+        # Attribute generator_for_prelude (type: CodeRef)
+        # has declaration, file lib/Sub/HandlesVia/CodeGenerator.pm, line 176
+        do {
+            my $value = exists( $args->{"generator_for_prelude"} )
+              ? (
+                (
+                    do {
+
+                        package Sub::HandlesVia::Mite;
+                        ref( $args->{"generator_for_prelude"} ) eq 'CODE';
+                    }
+                ) ? $args->{"generator_for_prelude"} : croak(
+                    "Type check failed in constructor: %s should be %s",
+                    "generator_for_prelude", "CodeRef"
+                )
+              )
+              : $self->_build_generator_for_prelude;
+            $self->{"generator_for_prelude"} = $value;
+        };
+
         # Attribute method_installer (type: CodeRef)
-        # has declaration, file lib/Sub/HandlesVia/CodeGenerator.pm, line 170
+        # has declaration, file lib/Sub/HandlesVia/CodeGenerator.pm, line 179
         if ( exists $args->{"method_installer"} ) {
             do {
 
@@ -424,26 +444,26 @@
         }
 
         # Attribute is_method
-        # has declaration, file lib/Sub/HandlesVia/CodeGenerator.pm, line 180
+        # has declaration, file lib/Sub/HandlesVia/CodeGenerator.pm, line 189
         $self->{"is_method"} =
           ( exists( $args->{"is_method"} ) ? $args->{"is_method"} : "1" );
 
         # Attribute get_is_lvalue
-        # has declaration, file lib/Sub/HandlesVia/CodeGenerator.pm, line 185
+        # has declaration, file lib/Sub/HandlesVia/CodeGenerator.pm, line 194
         $self->{"get_is_lvalue"} = (
             exists( $args->{"get_is_lvalue"} )
             ? $args->{"get_is_lvalue"}
             : "" );
 
         # Attribute set_checks_isa
-        # has declaration, file lib/Sub/HandlesVia/CodeGenerator.pm, line 190
+        # has declaration, file lib/Sub/HandlesVia/CodeGenerator.pm, line 199
         $self->{"set_checks_isa"} = (
             exists( $args->{"set_checks_isa"} )
             ? $args->{"set_checks_isa"}
             : "" );
 
         # Attribute set_strictly
-        # has declaration, file lib/Sub/HandlesVia/CodeGenerator.pm, line 195
+        # has declaration, file lib/Sub/HandlesVia/CodeGenerator.pm, line 204
         $self->{"set_strictly"} =
           ( exists( $args->{"set_strictly"} ) ? $args->{"set_strictly"} : "1" );
 
@@ -452,7 +472,7 @@
 
         # Unrecognized parameters
         my @unknown = grep not(
-/\A(?:attribute(?:_spec)?|coerce|env|ge(?:nerator_for_(?:arg[cs]?|currying|default|error|get|s(?:e(?:lf|t)|lot)|type_assertion|usage_string)|t_is_lvalue)|is(?:_method|a)|method_installer|s(?:andboxing_package|et_(?:checks_isa|strictly))|t(?:arget|oolkit))\z/
+/\A(?:attribute(?:_spec)?|coerce|env|ge(?:nerator_for_(?:arg[cs]?|currying|default|error|get|prelude|s(?:e(?:lf|t)|lot)|type_assertion|usage_string)|t_is_lvalue)|is(?:_method|a)|method_installer|s(?:andboxing_package|et_(?:checks_isa|strictly))|t(?:arget|oolkit))\z/
         ), keys %{$args};
         @unknown
           and croak(
@@ -493,7 +513,7 @@
       && eval { require Class::XSAccessor; Class::XSAccessor->VERSION("1.19") };
 
     # Accessors for _override
-    # has declaration, file lib/Sub/HandlesVia/CodeGenerator.pm, line 175
+    # has declaration, file lib/Sub/HandlesVia/CodeGenerator.pm, line 184
     if ($__XS) {
         Class::XSAccessor->import(
             chained     => 1,
@@ -695,6 +715,24 @@
         };
     }
 
+    # Accessors for generator_for_prelude
+    # has declaration, file lib/Sub/HandlesVia/CodeGenerator.pm, line 176
+    if ($__XS) {
+        Class::XSAccessor->import(
+            chained   => 1,
+            "getters" => { "generator_for_prelude" => "generator_for_prelude" },
+        );
+    }
+    else {
+        *generator_for_prelude = sub {
+            @_ == 1
+              or croak(
+'Reader "generator_for_prelude" usage: $self->generator_for_prelude()'
+              );
+            $_[0]{"generator_for_prelude"};
+        };
+    }
+
     # Accessors for generator_for_self
     # has declaration, file lib/Sub/HandlesVia/CodeGenerator.pm, line 128
     if ($__XS) {
@@ -788,7 +826,7 @@
     }
 
     # Accessors for get_is_lvalue
-    # has declaration, file lib/Sub/HandlesVia/CodeGenerator.pm, line 185
+    # has declaration, file lib/Sub/HandlesVia/CodeGenerator.pm, line 194
     if ($__XS) {
         Class::XSAccessor->import(
             chained   => 1,
@@ -804,7 +842,7 @@
     }
 
     # Accessors for is_method
-    # has declaration, file lib/Sub/HandlesVia/CodeGenerator.pm, line 180
+    # has declaration, file lib/Sub/HandlesVia/CodeGenerator.pm, line 189
     if ($__XS) {
         Class::XSAccessor->import(
             chained   => 1,
@@ -834,7 +872,7 @@
     }
 
     # Accessors for method_installer
-    # has declaration, file lib/Sub/HandlesVia/CodeGenerator.pm, line 170
+    # has declaration, file lib/Sub/HandlesVia/CodeGenerator.pm, line 179
     sub method_installer {
         @_ > 1
           ? do {
@@ -866,7 +904,7 @@
     }
 
     # Accessors for set_checks_isa
-    # has declaration, file lib/Sub/HandlesVia/CodeGenerator.pm, line 190
+    # has declaration, file lib/Sub/HandlesVia/CodeGenerator.pm, line 199
     if ($__XS) {
         Class::XSAccessor->import(
             chained   => 1,
@@ -883,7 +921,7 @@
     }
 
     # Accessors for set_strictly
-    # has declaration, file lib/Sub/HandlesVia/CodeGenerator.pm, line 195
+    # has declaration, file lib/Sub/HandlesVia/CodeGenerator.pm, line 204
     if ($__XS) {
         Class::XSAccessor->import(
             chained   => 1,

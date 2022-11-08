@@ -1,5 +1,11 @@
 Revision history for Pg-SQL-PrettyPrinter
 
+0.6     2022-11-08
+        - Fix bug with display of filtered aggregates that are part of CASE
+          statement
+          per bug https://gitlab.com/depesz/pg-sql-prettyprinter/-/issues/2
+          reported by Aleš Zelený
+
 0.5     2022-11-01
         - Fix display of E'\n' literals
         - Fix generation of typecasts of expressions

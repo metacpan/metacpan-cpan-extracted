@@ -1,5 +1,12 @@
 Revision history for HV-Monitor
 
+0.0.4   2022-11-08/07:30
+		-Fix a off by 1 issue that occasionally happens with ps.
+		-Update it so make sets the path for perl in the script.
+
+0.0.3   2022-08-03/11:30
+        -Add support for CSV style netdev args for Libvirt+QEMU.
+
 0.0.2   2022-08-02/14:00
         -Fix for when a Libvirt block device has no path.
 

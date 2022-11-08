@@ -53,6 +53,6 @@
          "web" : "https://github.com/VVelox/HV-Monitor"
       }
    },
-   "version" : "v0.0.2",
+   "version" : "v0.0.4",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

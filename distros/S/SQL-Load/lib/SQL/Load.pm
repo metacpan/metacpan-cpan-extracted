@@ -9,7 +9,7 @@ use SQL::Load::Util qw/
 /;
 use SQL::Load::Method;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub new {
     my ($class, $path) = @_;
@@ -28,16 +28,19 @@ sub new {
 }
 
 sub load {
-    my ($self, $name) = @_;
+    my ($self, $name, $reload) = @_;
     
     $name = remove_extension($name);
     
     if ($name && $name =~ /^[\w-]+$/) {
-        # check if exist the key to get tmp
-        my $key = $self->_key($name);
-        
-        # check if tmp exists, if true return
-        return $self->_get_tmp($key) if $key;
+        # if true not get tmp
+        unless ($reload) {
+            # check if exist the key to get tmp
+            my $key = $self->_key($name);
+            
+            # check if tmp exists, if true return
+            return $self->_get_tmp($key) if $key;
+        }
         
         # get name list
         my $name_list = name_list($name);
@@ -55,6 +58,12 @@ sub load {
     }
     
     croak "the name '$name' is invalid!";
+}
+
+sub reload {
+    my ($self, $name) = @_;
+    
+    return $self->load($name, 1);
 }
 
 sub _find_file {
@@ -114,7 +123,7 @@ sub _generate_key {
 sub _get_tmp {
     my ($self, $key) = @_;
     
-    return $self->{_data}->{$key}->{content} 
+    return SQL::Load::Method->new($self->{_data}->{$key}->{content}) 
         if exists $self->{_data}->{$key}->{content};
     
     return;
@@ -185,8 +194,17 @@ Construct a new L<SQL::Load>, passing the folder path is required.
 
     my $method = $sql_load->load('file_name'); 
     my $method = $sql_load->load('file_name.sql');
+    my $method = $sql_load->load('file_name', 1); # reload to get content directly from the file
     
 Load the content in the reference and return an instance of L<SQL::Load::Method>.
+
+=head2 reload
+
+    my $method = $sql_load->reload('file_name'); 
+    my $method = $sql_load->reload('file_name.sql');
+    my $method = $sql_load->reload('file_name');
+    
+Reload to get content directly from the file without getting from the tmp from reference.
 
 =head1 FILES SQL
     

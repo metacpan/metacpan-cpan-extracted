@@ -1,5 +1,5 @@
 package Lab::Moose::Sweep::Continuous;
-$Lab::Moose::Sweep::Continuous::VERSION = '3.823';
+$Lab::Moose::Sweep::Continuous::VERSION = '3.830';
 #ABSTRACT: Base class for continuous sweeps (time, temperature, magnetic field)
 
 use v5.20;
@@ -327,7 +327,7 @@ Lab::Moose::Sweep::Continuous - Base class for continuous sweeps (time, temperat
 
 =head1 VERSION
 
-version 3.823
+version 3.830
 
 =head1 SYNOPSIS
 

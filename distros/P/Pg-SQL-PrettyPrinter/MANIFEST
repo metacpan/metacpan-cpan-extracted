@@ -422,6 +422,9 @@ t/16-bugs.d/04-cast-of-expression.psql
 t/16-bugs.d/04-cast-of-expression.sql
 t/16-bugs.d/05-literal-new-line.psql
 t/16-bugs.d/05-literal-new-line.sql
+t/16-bugs.d/06-aggregate-filter-inside-case.json
+t/16-bugs.d/06-aggregate-filter-inside-case.psql
+t/16-bugs.d/06-aggregate-filter-inside-case.sql
 t/16-bugs.t
 t/17-locking-selects.d/01-for-update.json
 t/17-locking-selects.d/01-for-update.psql

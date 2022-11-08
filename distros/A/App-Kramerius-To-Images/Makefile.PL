@@ -21,9 +21,11 @@ readme_from 'bin/kramerius2images';
 recursive_author_tests('xt');
 requires 'App::Kramerius::V4';
 requires 'Class::Utils' => 0;
+requires 'Cwd' => 0;
 requires 'Data::Kramerius' => 0;
 requires 'English' => 0;
 requires 'Error::Pure' => 0;
+requires 'File::Spec::Functions' => 0;
 requires 'Getopt::Std' => 0;
 requires 'HTTP::Request' => 0;
 requires 'IO::Barf' => 0;
@@ -36,10 +38,16 @@ resources 'homepage' => 'https://github.com/michal-josef-spacek/App-Kramerius-To
 resources 'repository' => 'git://github.com/michal-josef-spacek/App-Kramerius-To-Images';
 test_requires 'English' => 0;
 test_requires 'Error::Pure::Utils' => 0;
+test_requires 'File::Temp' => 0;
+test_requires 'File::Spec::Functions' => 0;
+test_requires 'HTTP::Response' => 0;
+test_requires 'Test::File::Contents' => 0;
+test_requires 'Test::LWP::UserAgent' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
+test_requires 'Test::Output' => 0;
 tests_recursive;
-version '0.03';
+version '0.04';
 
 # Run.
 WriteAll();

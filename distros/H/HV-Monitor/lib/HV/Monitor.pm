@@ -11,11 +11,11 @@ HV::Monitor - A generalized module for gathering stats for a hypervisor.
 
 =head1 VERSION
 
-Version 0.0.2
+Version 0.0.4
 
 =cut
 
-our $VERSION = '0.0.2';
+our $VERSION = '0.0.4';
 
 =head1 SYNOPSIS
 
@@ -40,16 +40,16 @@ The keys are list as below.
 =cut
 
 sub new {
-	my $module=shift;
-	my $config=shift;
+	my $module = shift;
+	my $config = shift;
 
-	if (!defined($config->{backend})) {
-		$config->{backend}='CBSD';
+	if ( !defined( $config->{backend} ) ) {
+		$config->{backend} = 'CBSD';
 	}
 
 	my $self = {
-				version=>1,
-				backend=>$config->{backend},
+		version => 1,
+		backend => $config->{backend},
 	};
 	bless $self;
 
@@ -83,8 +83,9 @@ $usable=$backend_test->usable;
 	if ($usable) {
 		$self->{backend_mod} = $backend_test;
 		$loaded = 1;
-	}else {
-		die('Failed to load backend... '.$@);
+	}
+	else {
+		die( 'Failed to load backend... ' . $@ );
 	}
 
 	return $loaded;
@@ -103,24 +104,24 @@ If nothing is nothing is loaded, load will be called.
 sub run {
 	my $self = $_[0];
 
-	if (!defined($self->{backend_mod})) {
+	if ( !defined( $self->{backend_mod} ) ) {
 		return {
-				version=>$self->{version},
-				data=>{},
-				error=>1,
-				errorString=>'No module loaded',
-				};
+			version     => $self->{version},
+			data        => {},
+			error       => 1,
+			errorString => 'No module loaded',
+		};
 	}
 
 	my $to_return;
-	eval{ $to_return=$self->{backend_mod}->run };
+	eval { $to_return = $self->{backend_mod}->run };
 	if ($@) {
 		return {
-				version=>$self->{version},
-				data=>{},
-				error=>1,
-				errorString=>'Failed to run backend... '.$@,
-				};
+			version     => $self->{version},
+			data        => {},
+			error       => 1,
+			errorString => 'Failed to run backend... ' . $@,
+		};
 	}
 
 	return $to_return;

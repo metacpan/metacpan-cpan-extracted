@@ -35,9 +35,27 @@ outputing it in a desired format.
 -v/--version  Version
 ```
 
-## building
+## Install
 
+### FreeBSD
+
+```shell
+pkg install p5-YAML p5-JSON p5-TOML p5-Data-Dumper \
+    p5-String-ShellQuote p5-File-Slurp p5-App-cpanm
+cpanm Shell::Var::Reader
 ```
+
+### Debian
+
+```shell
+apt-get install libfile-slurp-perl libjson-perl libyaml-perl \
+        libtoml-perl libstring-shellquote-perl cpanminus
+cpanm Shell::Var::Reader
+```
+
+### Source
+
+```shell
 perl Makefile.PL
 make
 make test

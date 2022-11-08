@@ -5,7 +5,7 @@ use utf8;
 use Moo::Role;
 use namespace::autoclean;
 
-our $VERSION = '0.024';    # VERSION
+our $VERSION = '0.025';    # VERSION
 
 requires 'get_contents';
 
@@ -23,7 +23,7 @@ Bat::Interpreter::Role::FileStore
 
 =head1 VERSION
 
-version 0.024
+version 0.025
 
 =head1 SYNOPSIS
 
@@ -48,7 +48,7 @@ Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2020 by Pablo Rodríguez González.
+This software is Copyright (c) 2022 by Pablo Rodríguez González.
 
 This is free software, licensed under:
 

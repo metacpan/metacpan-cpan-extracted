@@ -1,5 +1,9 @@
 Revision history for Shell-Var-Reader
 
+0.1.0	 2022-11-08/09:15
+		 -Add shell output.
+		 -Now set the perl path for the script.
+
 0.0.1	 2022-10-03/16:00
 		 -Initial release.
 

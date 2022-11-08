@@ -6,6 +6,16 @@ Home page:    <https://metacpan.org/release/Macro-Simple>
 Bug tracker:  <https://github.com/tobyink/p5-macro-simple/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.003	2022-11-08
+
+ [ Documentation ]
+ - Link to correct issue tracker in pod.
+
+ [ Other ]
+ - Ensure Macro::Simple handles namespace::clean being missing.
+ - Remove the XS added in the previous version as that has been split out
+   into Sub::Boolean.
+
 0.002	2022-11-06
 
  - Implement some of this in XS for about a 30% runtime speedup.

@@ -165,6 +165,7 @@ lib/Lab/Moose/Instrument/HPE4400B.pm
 lib/Lab/Moose/Instrument/Keithley2000.pm
 lib/Lab/Moose/Instrument/Keithley2400.pm
 lib/Lab/Moose/Instrument/Keithley2450.pm
+lib/Lab/Moose/Instrument/Keysight33600.pm
 lib/Lab/Moose/Instrument/Keysight34470A.pm
 lib/Lab/Moose/Instrument/KeysightB2901A.pm
 lib/Lab/Moose/Instrument/KeysightDSOS604A.pm
@@ -184,6 +185,7 @@ lib/Lab/Moose/Instrument/OI_ITC503.pm
 lib/Lab/Moose/Instrument/OI_Mercury/Magnet.pm
 lib/Lab/Moose/Instrument/OI_Triton.pm
 lib/Lab/Moose/Instrument/RS_FSV.pm
+lib/Lab/Moose/Instrument/RS_RTB2000.pm
 lib/Lab/Moose/Instrument/RS_SMB.pm
 lib/Lab/Moose/Instrument/RS_ZNL.pm
 lib/Lab/Moose/Instrument/RS_ZVA.pm

@@ -2,6 +2,7 @@
 #
 # remotediff - remote diff over rsync
 #
+# 2022.11.08 v1.12 jul : fixed cleanup crash bug
 # 2022.11.02 v1.11 jul : fixed rsync --delete
 # 2022.10.21 v1.10 jul : fixed caching
 # 2022.06.24 v1.00 jul : first release
@@ -16,7 +17,7 @@ use File::Temp qw(tempdir);
 use File::Path qw(make_path remove_tree);
 use Cwd qw(abs_path);
 
-our $VERSION = '1.11';
+our $VERSION = '1.12';
 my $program  = basename($0);
 my $usage    = <<EOF;
 
@@ -54,12 +55,15 @@ my $tmp = File::Spec->tmpdir() . "/remotediff"; # cache remote sources
 #my $tmp = tempdir( CLEANUP => 1 );             # no cache
 
 # cleanup old symlinks, to avoid creating a mess
-opendir(DIR, $tmp) or die $!;
-while(readdir DIR)
+if (-d $tmp)
 {
-	remove_tree("$tmp/$_") if ! /^([^\/:]*:)(\/?)(.+)|\.|\.\./;
+	opendir(DIR, $tmp) or die "cleanup failed : $!";
+	while(readdir DIR)
+	{
+		remove_tree("$tmp/$_") if ! /^([^\/:]*:)(\/?)(.+)|\.|\.\./;
+	}
+	closedir(DIR);
 }
-closedir(DIR);
 
 # process file 1
 if ( $ARGV[0] =~ /^([^\/:]*:)(\/?)(.+)/ )

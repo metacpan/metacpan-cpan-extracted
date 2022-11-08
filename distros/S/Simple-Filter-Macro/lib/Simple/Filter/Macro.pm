@@ -1,25 +1,30 @@
 package Simple::Filter::Macro;
 
 # Set the VERSION.
-$VERSION = "0.07";
+$VERSION = "0.08";
 
 # Load the Perl pragmas.
 use strict;
 use warnings;
 
-=pod
-
-=item Subroutine FILTER()
-
-The outer value of $_ is the content from the module. The inner value of 
-$_ is the content from the script. The Perl function caller is used as   
-follows. E.g. one can write my ($package, $filename, $line) = caller($i) 
-where $i is the level of interest. The elements of the array can be reached 
-as it is known by caller(0)[0] which results the package name of level 0.   
-caller(5) returns the data from the module and caller(6) returns the data   
-from the script.                                                            
-
-=cut
+# ---------------------------------------------------------------------------- #
+# Simple::Filter::Macro                                                        #
+#                                                                              #
+# In the following code the predefined default input string variable $_ is     #
+# used twice. The outer value of $_ is the content from the module. The inner  #
+# value of $_ is the content from the script. The Perl function caller() is    #
+# used as follows. For example one can write my ($package, $filename, $line)   #
+# = caller($i) where $i is the level in calling of interest. The elements of   #
+# the array can be reached as it is known by e.g. caller(0)[0] which results   #
+# the package name of calling level 0. C<caller(5)> returns the data from the  #
+# module and caller(6) returns the data from the script. Data are filename and #
+# line of appearance in source code. To work as expected the module terminator #
+# 1; has to be stripped from the module content. In the Perl function join()   #
+# the newline string "\n" is used as separator between module content and      #
+# script content. The Perl function q() simply interprets the merged content   #
+# as a single-quoted string. The Perl function sprintf() creates the new       #
+# content of the compiled file as a multi-line string.                         #
+# ---------------------------------------------------------------------------- #
 
 # Outer filter starts here.
 use Filter::Simple::Compile sub {
@@ -33,14 +38,14 @@ use Filter::Simple::Compile sub {
             use Filter::Simple::Compile sub {
                 # Concatenate content from module and script. 
                 $_ = join("\n",
-                    '# Line %s %s', "%s", '# Line %s %s',
-                    $_,
+                    "#line %s %s", "%s", "#line %s %s",
+                    $_, # Script content.
                 );
             };
             # Inner filter ends here.
             1;
         ), (caller(5))[2], (caller(5))[1],
-           $_,
+           $_, # Module content.
            (caller(6))[2], (caller(6))[1]
     );
 };
@@ -202,14 +207,15 @@ beginning after the C<use> statement.
 
 Then a inner filter is applied. In the inner filter section the module content
 is concatenated to the content of the given script. Both are attached and 
-ritten to the file with the head created applying the filtering procedure.
+written to the file with the head created applying the filtering procedure.
 
-To get line numbers for the marker and get module and file names the Perl 
-function caller is used. The Perl function caller is used as follows. E.g. one
-can write my ($package, $filename, $line) = caller($i) where $i is the level of
-interest. The elements of the array can be reached  as it is known from arrays 
-by e.g. caller(0)[0] which results the package name of level 0. caller(5)
-returns the data from the module and caller(6) returns the data from the script.                        
+To get line numbers for the marker and get module and file names the Perl
+function C<caller()> is used. For example one can write C<my ($package,
+$filename, $line) = caller($i)> where C<$i> is the level of interest. The
+elements of the array can be reached  as it is known from arrays by e.g. 
+C<caller(0)[0]> which results the package name of level 0. C<caller(5)>
+returns the data from the module and C<caller(6)> returns the data from the
+script.                        
 
 =head1 MODULE METHOD
 

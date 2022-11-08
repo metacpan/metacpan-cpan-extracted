@@ -44,7 +44,7 @@ use HTTP::Tiny;
 use JSON::MaybeXS;
 use Pg::SQL::PrettyPrinter::Node;
 
-our $VERSION = 0.5;
+our $VERSION = 0.6;
 
 sub new {
     my ( $class, %args ) = @_;

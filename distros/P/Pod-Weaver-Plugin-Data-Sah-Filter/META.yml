@@ -19,7 +19,7 @@ name: Pod-Weaver-Plugin-Data-Sah-Filter
 provides:
   Pod::Weaver::Plugin::Data::Sah::Filter:
     file: lib/Pod/Weaver/Plugin/Data/Sah/Filter.pm
-    version: '0.006'
+    version: '0.007'
 requires:
   Data::Cmp: '0.002'
   Data::Dmp: '0.241'
@@ -38,7 +38,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Weaver-Plugin-Data-Sah-Filter
   homepage: https://metacpan.org/release/Pod-Weaver-Plugin-Data-Sah-Filter
   repository: git://github.com/perlancar/perl-Pod-Weaver-Plugin-Data-Sah-Filter.git
-version: '0.006'
+version: '0.007'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -316,7 +316,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::PERLANCAR::Contributing
               name: '@Author::PERLANCAR/PERLANCAR/Contributing'
-              version: '0.292'
+              version: '0.293'
             -
               class: Pod::Weaver::Section::Legal
               name: '@Author::PERLANCAR/Legal'
@@ -324,7 +324,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.783'
+              version: '0.784'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'

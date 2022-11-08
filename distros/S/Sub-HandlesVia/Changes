@@ -6,6 +6,31 @@ Home page:    <https://metacpan.org/release/Sub-HandlesVia>
 Bug tracker:  <https://github.com/tobyink/p5-sub-handlesvia/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.045	2022-11-08
+
+ [ Bug Fixes ]
+ - Fix for `with qw(Role1 Role2)` in Moose where at least one role uses
+   Sub::HandlesVia.
+   Bartosz Jarzyna++
+   <https://github.com/tobyink/p5-sub-handlesvia/issues/6>
+ - Support attributes declared with `has '+name'`.
+   Bartosz Jarzyna++
+   <https://github.com/tobyink/p5-sub-handlesvia/issues/7>
+
+ [ Documentation ]
+ - Document that `with qw(Role1 Role2)` in Mouse is currently broken if
+   either role uses Sub::HandlesVia.
+   <https://github.com/tobyink/p5-sub-handlesvia/issues/9>
+
+ [ Test Suite ]
+ - Test that `with qw(Role1 Role2)` in Moo works if either role uses
+   Sub::HandlesVia.
+
+ [ Other ]
+ - Added: Add a `generator_for_prelude` attribute to
+   Sub::HandlesVia::CodeGenerator.
+   <https://github.com/tobyink/p5-sub-handlesvia/issues/8>
+
 0.044	2022-10-31
 
  [ Documentation ]
@@ -35,10 +60,12 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
  - Stricter detection of Moo::Role roles to prevent some false positives
    when given Mouse::Role and Moose::Role roles.
    Bartosz Jarzyna++
+   <https://github.com/tobyink/p5-sub-handlesvia/issues/4>
 
  [ Test Suite ]
  - Add a test using Sub::HandlesVia when Beam::Wire is loaded.
    Bartosz Jarzyna++
+   <https://github.com/tobyink/p5-sub-handlesvia/issues/5>
 
 0.039	2022-10-26
 
@@ -46,6 +73,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
  - Fix application of Sub::HandlesVia Moose/Mouse traits to metaobjects
    that have other traits applied to them.
    Bartosz Jarzyna++
+   <https://github.com/tobyink/p5-sub-handlesvia/issues/3>
 
  [ Test Suite ]
  - Mite has supported Perl 5.8.x for a while now, so Mite-related tests
@@ -61,6 +89,7 @@ Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
  [ Bug Fixes ]
  - Fix test case broken by Type::Tiny v2.
    Peter Mottram++
+   <https://github.com/tobyink/p5-sub-handlesvia/issues/2>
  - Hash:set shouldn't hardcode use of Carp::croak. Instead a CodeGenerator
    should decide how to deal with error messages.
 

@@ -12,7 +12,7 @@ use strict;
 use warnings;
 
 package App::RouterColorizer;
-$App::RouterColorizer::VERSION = '1.223080';
+$App::RouterColorizer::VERSION = '1.223120';
 use Moose;
 
 use feature 'signatures';
@@ -87,6 +87,9 @@ our $IPV6CIDR = qr/ $RE{net}{IPv6}
 
 our $BIGALARMS    = qr/critical|major|minor|warning/;
 our $LITTLEALARMS = qr/info/;
+our $BIGOVERRIDES = qr/   (?:\QRx Remote Fault\E)
+                        | (?:\QFar End Client Signal Fail\E)
+                    /xx;
 
 our @INTERFACE_IGNORES = ( "bytes", "packets input", "packets output", "multicast" );
 our @INTERFACE_INFOS   = ( "PAUSE input", "PAUSE output", "pause input" );
@@ -494,6 +497,18 @@ s/^ ( \| \s+ \| ) ( \Q Optical Return Loss \E \( \QdB\E \) ) ( \s+ \| \s+ ) ( $B
 
     # alarm show
     $line =~ s/ ^ ( \| ) ( \s+ [0-9]* ) ( \| ) ( \s+ ) ( \| ) ( [^|]+ ) ( \| ) ( \s+ [0-9]+ )
+                  ( \| ) ( \s* $BIGALARMS|$LITTLEALARMS \s* ) ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ )
+                  ( \| ) ( \s+ $BIGOVERRIDES \s+ ) ( \| ) $/
+        $1.$self->_colorize($2, $ORANGE).
+        $3.$self->_colorize($4, $ORANGE).
+        $5.$self->_colorize($6, $ORANGE).
+        $7.$self->_colorize($8, $ORANGE).
+        $9.$self->_colorize($10, $ORANGE).
+        $11.$self->_colorize($12, $ORANGE).
+        $13.$self->_colorize($14, $ORANGE).
+        $15.$self->_colorize($16, $ORANGE).
+        $17/exx;
+    $line =~ s/ ^ ( \| ) ( \s+ [0-9]* ) ( \| ) ( \s+ ) ( \| ) ( [^|]+ ) ( \| ) ( \s+ [0-9]+ )
                   ( \| ) ( \s* $BIGALARMS|$LITTLEALARMS \s* ) ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ ) ( \| ) ( [^|]+ ) ( \| ) $/
         $1.$self->_colorize($2, $RED).
         $3.$self->_colorize($4, $RED).
@@ -673,7 +688,7 @@ App::RouterColorizer - Colorize router CLI output
 
 =head1 VERSION
 
-version 1.223080
+version 1.223120
 
 =head1 DESCRIPTION
 

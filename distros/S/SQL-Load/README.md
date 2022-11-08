@@ -44,8 +44,17 @@ Construct a new L<SQL::Load>, passing the folder path is required.
 
     my $method = $sql_load->load('file_name'); 
     my $method = $sql_load->load('file_name.sql');
+    my $method = $sql_load->load('file_name', 1); # reload to get content directly from the file
     
 Load the content in the reference and return an instance of L<SQL::Load::Method>.
+
+## reload
+
+    my $method = $sql_load->reload('file_name'); 
+    my $method = $sql_load->reload('file_name.sql');
+    my $method = $sql_load->reload('file_name');
+    
+Reload to get content directly from the file without getting from the tmp from reference.
 
 # FILES SQL
     

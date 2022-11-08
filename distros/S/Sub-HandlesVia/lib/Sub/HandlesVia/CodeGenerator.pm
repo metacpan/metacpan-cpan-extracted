@@ -5,7 +5,7 @@ use warnings;
 package Sub::HandlesVia::CodeGenerator;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.044';
+our $VERSION   = '0.045';
 
 use Sub::HandlesVia::Mite -all;
 
@@ -167,6 +167,15 @@ has generator_for_error => (
 	default_is_trusted => true,
 );
 
+has generator_for_prelude => (
+	is => ro,
+	isa => 'CodeRef',
+	builder => sub {
+		return sub { '' };
+	},
+	default_is_trusted => true,
+);
+
 has method_installer => (
 	is => rw,
 	isa => 'CodeRef',
@@ -212,7 +221,7 @@ my $REASONABLE_SCALAR = qr/^
 
 my @generatable_things = qw(
 	slot get set default arg args argc currying usage_string self
-	type_assertion error
+	type_assertion error prelude
 );
 
 for my $thing ( @generatable_things ) {
@@ -372,6 +381,7 @@ sub _generate_ec_args_for_handler {
 	);
 	$self
 		->_handle_sigcheck( @args )               # check method sigs
+		->_handle_prelude( @args )                # insert any prelude
 		->_handle_shiftself( @args )              # $self = shift
 		->_handle_currying( @args )               # push curried values to @_
 		->_handle_additional_validation( @args )  # additional type checks
@@ -399,56 +409,6 @@ sub _generate_ec_args_for_handler {
 			$handler->name,
 		),
 	};
-}
-
-sub _handle_shiftself {
-	my ( $self, $method_name, $handler, $env, $code, $state ) = @_;
-
-	# Handlers which use @ARG will benefit from shifting $self
-	# off @_, but for other handlers, this will just slow compilation
-	# down (but not much).
-	#
-	return $self
-		unless $handler->curried || $handler->prefer_shift_self;
-
-	# Shift off the invocant.
-	#
-	push @$code, 'my $shv_self=shift;';
-	
-	$self->_add_generator_override(
-	
-		# Override $ARG[$n] because the array has been reindexed.
-		#
-		arg  => sub { my ($gen, $n) = @_; $gen->generate_arg( $n - 1 ) },
-		
-		# Overrride @ARG to point to the whole array. This is the
-		# real speed-up!
-		#
-		args => sub { '@_' },
-		
-		# Override #ARG to no longer subtract 1.
-		#
-		argc => sub { 'scalar(@_)' },
-		
-		# $SELF is now '$shv_self'.
-		#
-		self => sub { '$shv_self' },
-		
-		# The default currying callback will splice the list into
-		# @_ at index 1. Instead unshift the list at the start of @_.
-		#
-		currying => sub {
-			my ($gen, $list) = @_;
-			"CORE::unshift(\@_, $list);";
-		},
-	);
-	
-	# Getter was cached in $state and needs update.
-	#
-	$state->{getter} = $self->generate_get;
-	$state->{shifted_self} = true;
-	
-	return $self;
 }
 
 sub _handle_sigcheck {
@@ -515,6 +475,64 @@ sub _handle_sigcheck {
 		#
 		$state->{signature_check_needed} = true;
 	}
+	
+	return $self;
+}
+
+sub _handle_prelude {
+	my ( $self, $method_name, $handler, $env, $code, $state ) = @_;
+	
+	push @$code, $self->generate_prelude();
+	
+	return $self;
+}
+
+sub _handle_shiftself {
+	my ( $self, $method_name, $handler, $env, $code, $state ) = @_;
+
+	# Handlers which use @ARG will benefit from shifting $self
+	# off @_, but for other handlers, this will just slow compilation
+	# down (but not much).
+	#
+	return $self
+		unless $handler->curried || $handler->prefer_shift_self;
+
+	# Shift off the invocant.
+	#
+	push @$code, 'my $shv_self=shift;';
+	
+	$self->_add_generator_override(
+	
+		# Override $ARG[$n] because the array has been reindexed.
+		#
+		arg  => sub { my ($gen, $n) = @_; $gen->generate_arg( $n - 1 ) },
+		
+		# Overrride @ARG to point to the whole array. This is the
+		# real speed-up!
+		#
+		args => sub { '@_' },
+		
+		# Override #ARG to no longer subtract 1.
+		#
+		argc => sub { 'scalar(@_)' },
+		
+		# $SELF is now '$shv_self'.
+		#
+		self => sub { '$shv_self' },
+		
+		# The default currying callback will splice the list into
+		# @_ at index 1. Instead unshift the list at the start of @_.
+		#
+		currying => sub {
+			my ($gen, $list) = @_;
+			"CORE::unshift(\@_, $list);";
+		},
+	);
+	
+	# Getter was cached in $state and needs update.
+	#
+	$state->{getter} = $self->generate_get;
+	$state->{shifted_self} = true;
 	
 	return $self;
 }
@@ -904,6 +922,14 @@ value meets the type constraint, with coercion if appropriate.
 
 Called as a method and passed a Perl string which is an expression evaluating
 to an error message. Generates code to throw the error.
+
+=head2 C<generator_for_prelude> B<< CodeRef >>
+
+By default is a coderef returning the empty string. Can be used to generate
+some additional statements which will be inserted near the top of the
+method being generated. (Typically after parameter checks but before
+doing anything serious.) This can be used to unlock a read-only attribute,
+for example.
 
 =head2 C<get_is_lvalue> B<Bool>
 

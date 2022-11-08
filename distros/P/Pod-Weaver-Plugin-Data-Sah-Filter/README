@@ -3,9 +3,9 @@ NAME
     Data::Sah::Filter::* or Data::Sah::FilterBundle::* distribution
 
 VERSION
-    This document describes version 0.006 of
+    This document describes version 0.007 of
     Pod::Weaver::Plugin::Data::Sah::Filter (from Perl distribution
-    Pod-Weaver-Plugin-Data-Sah-Filter), released on 2022-07-16.
+    Pod-Weaver-Plugin-Data-Sah-Filter), released on 2022-08-25.
 
 SYNOPSIS
     In your weaver.ini:
@@ -57,10 +57,10 @@ CONTRIBUTING
 
     If you want to build the distribution (e.g. to try to install it locally
     on your system), you can install Dist::Zilla,
-    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
-    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
-    steps required beyond that are considered a bug and can be reported to
-    me.
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
     This software is copyright (c) 2022, 2020 by perlancar

@@ -14,7 +14,7 @@ Lab::Measurement::Manual - API documentation manual for Lab::Measurement
 
 =head1 VERSION
 
-version 3.823
+version 3.830
 
 =head1 OVERVIEW
 
@@ -280,6 +280,8 @@ contains support for temperature sensor and He/N2 level meters.
 
 =item * L<Lab::Moose::Instrument::KeysightDSOS604A>
 
+=item * L<Lab::Moose::Instrument::RS_RTB2000>
+
 =back
 
 =head3 Function/Waveform Generators
@@ -287,6 +289,8 @@ contains support for temperature sensor and He/N2 level meters.
 =over
 
 =item * L<Lab::Moose::Instrument::Rigol_DG5000>
+
+=item * L<Lab::Moose::Instrument::Keysight33600>
 
 =back
 

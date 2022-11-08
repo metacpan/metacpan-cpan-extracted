@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Glorified metronome
 
-our $VERSION = '0.4004';
+our $VERSION = '0.4005';
 
 use strictures 2;
 use Data::Dumper::Compact qw(ddc);
@@ -319,13 +319,14 @@ sub metronome78 {
 
 
 sub flam {
-    my ($self, $spec, $patch) = @_;
+    my ($self, $spec, $grace, $patch, $accent) = @_;
+    $grace ||= $self->snare;
     $patch ||= $self->snare;
     my $x = $MIDI::Simple::Length{$spec};
     my $y = $MIDI::Simple::Length{ $self->sixtyfourth };
     my $z = sprintf '%0.f', ($x - $y) * TICKS;
-    my $accent = sprintf '%0.f', $self->score->Volume / 2;
-    $self->accent_note($accent, $self->sixtyfourth, $patch);
+    $accent ||= sprintf '%0.f', $self->score->Volume / 2;
+    $self->accent_note($accent, $self->sixtyfourth, $grace);
     $self->note('d' . $z, $patch);
 }
 
@@ -585,7 +586,7 @@ MIDI::Drummer::Tiny - Glorified metronome
 
 =head1 VERSION
 
-version 0.4004
+version 0.4005
 
 =head1 SYNOPSIS
 
@@ -887,12 +888,16 @@ Add a 7/8 beat to the score.
 =head2 flam
 
   $d->flam($spec);
-  $d->flam( $spec, $patch );
+  $d->flam( $spec, $grace_note );
+  $d->flam( $spec, $grace_note, $patch );
+  $d->flam( $spec, $grace_note, $patch, $accent );
 
 Add a "flam" to the score, where a ghosted 64th gracenote is played
 before the primary note.
 
-If not provided the B<snare> is used for the B<patch>.
+If not provided the B<snare> is used for the B<grace> and B<patch>
+patches.  Also, 1/2 of the score volume is used for the B<accent>
+if that is not given.
 
 =head2 roll
 

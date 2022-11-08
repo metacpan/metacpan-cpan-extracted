@@ -1,6 +1,6 @@
 package Lab::Instrument::TemperatureControl;
 #ABSTRACT: Generic temperature control instrument base class
-$Lab::Instrument::TemperatureControl::VERSION = '3.823';
+$Lab::Instrument::TemperatureControl::VERSION = '3.830';
 use v5.20;
 
 use strict;
@@ -73,7 +73,7 @@ Lab::Instrument::TemperatureControl - Generic temperature control instrument bas
 
 =head1 VERSION
 
-version 3.823
+version 3.830
 
 =head1 COPYRIGHT AND LICENSE
 

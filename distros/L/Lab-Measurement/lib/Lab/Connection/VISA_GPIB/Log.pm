@@ -1,6 +1,6 @@
 package Lab::Connection::VISA_GPIB::Log;
 #ABSTRACT: Add logging capability to a VISA_GPIB connection
-$Lab::Connection::VISA_GPIB::Log::VERSION = '3.823';
+$Lab::Connection::VISA_GPIB::Log::VERSION = '3.830';
 use v5.20;
 
 use warnings;
@@ -33,7 +33,7 @@ Lab::Connection::VISA_GPIB::Log - Add logging capability to a VISA_GPIB connecti
 
 =head1 VERSION
 
-version 3.823
+version 3.830
 
 =head1 COPYRIGHT AND LICENSE
 

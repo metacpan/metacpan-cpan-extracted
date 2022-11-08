@@ -5,7 +5,7 @@ use warnings;
 package Sub::HandlesVia::Toolkit::Moose;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.044';
+our $VERSION   = '0.045';
 
 use Sub::HandlesVia::Mite;
 extends 'Sub::HandlesVia::Toolkit';
@@ -176,7 +176,7 @@ sub code_generator_for_attribute {
 package Sub::HandlesVia::Toolkit::Moose::PackageTrait;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.044';
+our $VERSION   = '0.045';
 
 use Moose::Role;
 
@@ -199,7 +199,8 @@ around add_attribute => sub {
 		($attrname, %spec) = @args;
 		$spec = \%spec;
 	}
-	$spec->{definition_context}{shv} = $self->_shv_toolkit->clean_spec($self->name, $attrname, $spec)
+	( my $real_attrname = $attrname ) =~ s/^[+]//;
+	$spec->{definition_context}{shv} = $self->_shv_toolkit->clean_spec($self->name, $real_attrname, $spec)
 		unless $spec->{definition_context}{shv};
 	my $attr = $self->$next($attrobj ? $attrobj : ($attrname, %$spec));
 	if ($spec->{definition_context}{shv} and $self->isa('Moose::Meta::Class')) {
@@ -214,7 +215,7 @@ around add_attribute => sub {
 package Sub::HandlesVia::Toolkit::Moose::RoleTrait;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.044';
+our $VERSION   = '0.045';
 
 use Moose::Role;
 requires '_shv_toolkit';
@@ -223,6 +224,16 @@ around apply => sub {
 	my ($next, $self, $other, %args) = (shift, shift, @_);
 	$other = $self->_shv_toolkit->meta_hack( $other );
 	$self->$next( $other, %args );
+};
+
+around composition_class_roles => sub {
+	my ( $next, $self ) = ( shift, shift );
+	my @return = $self->$next( @_ );
+	return (
+		@return,
+		$self->_shv_toolkit->package_trait,
+		$self->_shv_toolkit->role_trait,
+	);
 };
 
 1;

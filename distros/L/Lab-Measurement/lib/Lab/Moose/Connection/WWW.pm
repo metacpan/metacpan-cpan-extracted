@@ -1,5 +1,5 @@
 package Lab::Moose::Connection::WWW;
-$Lab::Moose::Connection::WWW::VERSION = '3.823';
+$Lab::Moose::Connection::WWW::VERSION = '3.830';
 #ABSTRACT: Connection with URL requests
 
 use v5.20;
@@ -63,7 +63,7 @@ Lab::Moose::Connection::WWW - Connection with URL requests
 
 =head1 VERSION
 
-version 3.823
+version 3.830
 
 =head1 SYNOPSIS
 

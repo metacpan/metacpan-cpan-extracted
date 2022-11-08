@@ -5,7 +5,7 @@ use warnings;
 package Sub::HandlesVia::Toolkit::Mite;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.044';
+our $VERSION   = '0.045';
 
 use Sub::HandlesVia::Mite -all;
 extends 'Sub::HandlesVia::Toolkit';
@@ -35,10 +35,10 @@ sub install_has_wrapper {
 		return $orig->($names, %spec) unless $spec{handles}; # shortcut
 		
 		my @shv;
-		$names = [ $names ] unless ref($names);
-		for my $name ( @$names ) {
-			my $shv = $me->clean_spec( $target, $name, \%spec );
-			$SPECS{$target}{$name} = \%spec;
+		for my $name ( ref($names) ? @$names : $names) {
+			( my $real_name = $name ) =~ s/^[+]//;
+			my $shv = $me->clean_spec( $target, $real_name, \%spec );
+			$SPECS{$target}{$real_name} = \%spec;
 			$orig->( $name, %spec );
 			push @shv, $shv if $shv;
 		}

@@ -38,7 +38,8 @@ WriteMakefile(
     },
     
     TEST_REQUIRES => {
-        'Test::More' => 0
+        'Test::More' => 0,
+        'File::Temp' => 0
     },   
 
     test => {
