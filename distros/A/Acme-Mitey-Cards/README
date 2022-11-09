@@ -11,6 +11,8 @@ SYNOPSIS
 DESCRIPTION
     This is a small distribution to test/demonstrate Mite.
 
+    It's an object-oriented library for modelling playing cards.
+
 BUGS
     Please report any bugs to <https://github.com/tobyink/p5-mite/issues>.
 

@@ -1,0 +1,25 @@
+severity        = 4
+criticism-fatal = 1
+color           = 1
+include = TestingAndDebugging::RequireUseWarnings Subroutines::RequireArgUnpacking TestingAndDebugging::ProhibitNoStrict ErrorHandling::RequireCheckingReturnValueOfEval TestingAndDebugging::RequireUseStrict Freenode::Each Freenode::IndirectObjectNotation Freenode::DollarAB Freenode::DeprecatedFeatures BuiltinFunctions::ProhibitReturnOr Dynamic::NoIndirect ProhibitSmartmatch Subroutines::ProhibitAmbiguousFunctionCalls Modules::ProhibitPOSIXimport
+exclude = ValuesAndExpressions::ProhibitConstantPragma Subroutines::ProhibitExplicitReturnUndef Subroutines::RequireFinalReturn Community::PackageMatchesFilename Freenode::PackageMatchesFilename Community::DiscouragedModules Freenode::DiscouragedModules Modules::RequireEndWithOn CodeLayout::RequireTidyCode
+
+[TestingAndDebugging::RequireUseWarnings]
+equivalent_modules=MooseX::Singleton Mojo::Base
+
+[Subroutines::RequireArgUnpacking]
+short_subroutine_statements=3
+
+[TestingAndDebugging::ProhibitNoStrict]
+allow=refs
+
+[ErrorHandling::RequireCheckingReturnValueOfEval]
+severity=4
+
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules=MooseX::Singleton Mojo::Base
+
+[-Perl::Critic::Policy::Subroutines::ProhibitBuiltinHomonyms]
+
+[Variables::ProhibitEvilVariables]
+variables = $@

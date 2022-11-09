@@ -205,6 +205,8 @@ subtest 'serialisation with cbor' => sub
             mode => 0666,
         ) || die( Module::Generic::File::Mmap->error );
         my $s = $cache->open({ mode => 'w' });
+        diag( "Error opening mmap cache file: ", $cache->error ) if( $DEBUG && !defined( $s ) );
+        ok( $s, 'mmap cache opened' );
         ok( $s->write({ name => 'John Doe', location => 'Tokyo' }), 'write to cache mmap' );
         try
         {

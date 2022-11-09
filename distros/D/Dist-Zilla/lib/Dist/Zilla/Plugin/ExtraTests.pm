@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::ExtraTests 6.027;
+package Dist::Zilla::Plugin::ExtraTests 6.028;
 # ABSTRACT: rewrite ./xt tests to ./t tests with skips
 
 use Moose;
@@ -84,7 +84,7 @@ Dist::Zilla::Plugin::ExtraTests - rewrite ./xt tests to ./t tests with skips
 
 =head1 VERSION
 
-version 6.027
+version 6.028
 
 =head1 DESCRIPTION
 

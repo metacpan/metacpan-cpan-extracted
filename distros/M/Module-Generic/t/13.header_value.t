@@ -52,6 +52,7 @@ subtest 'parse' => sub
                 my $elem = $res->[$i];
                 diag( "Value as string is '", $elem->value_as_string, "' vs test '$val'" ) if( $DEBUG );
                 $elem->value_as_string eq $val or ++$fail, last;
+                no warnings 'uninitialized';
                 foreach my $att ( sort( keys( %$def ) ) )
                 {
                     diag( "Does param '$att' exists? ", $elem->params->exists( $att ) ? 'yes' : 'no' ) if( $DEBUG );

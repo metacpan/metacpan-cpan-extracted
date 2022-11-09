@@ -1,0 +1,95 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with HTML::FormBuilder::Field
+at lib/HTML/FormBuilder/Field.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+HTML::FormBuilder::Field - Field container used by HTML::FormBuilder
+
+=head1 SYNOPSIS
+
+    my $form = HTML::FormBuilder->new(data => {id => 'testform});
+
+    my $fieldset = $form->add_fieldset({id => 'fieldset1'});
+
+    $fieldset->add_field({input => {type => 'text', value => 'Join'}});
+
+    # Text only, without input fields
+    $fieldset->add_field({
+        comment => {
+            text        => 'Please check on checkbox below:',
+            class       => 'grd-grid-12',
+            # no extra <br/> before <span> for comment
+            no_new_line => 1,
+        },
+    });
+
+    # checkbox & explanation text
+    $fieldset->add_field({
+        input => {
+            id                  => 'tnc',
+            name                => 'tnc',
+            type                => 'checkbox',
+            trailing            => 'I have read & agree to all terms & condition.',
+            # wrap <input> & trailing <span> respectively in <div>, with class:
+            wrap_in_div_class   => {
+                input    => 'grd-grid-1',
+                trailing => 'grd-grid-11'
+            },
+        },
+        error => {
+            id    => 'error_tnc',
+            class => 'errorfield',
+         },
+        validation => [{
+            type    => 'checkbox_checked',
+            err_msg => localize('Please agree in order to proceed.'),
+        }],
+        # override div container class for input
+        override_input_class => 'grd-grid-12',
+    });
+
+    $form->add_field($fieldset_index, {input => {type => 'text', value => 'Join'}});
+
+=head1 METHODS
+
+=head2 BUILDARGS
+
+=head2 build
+
+=head2 data
+
+=head1 AUTHOR
+
+Chylli L<mailto:chylli@binary.com>
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<HTML::FormBuilder::Base>
+
+L<classes|HTML::FormBuilder::Base/classes>, L<localize|HTML::FormBuilder::Base/localize>
+
+=item L<Moo::Object>
+
+L<BUILDALL|Moo::Object/BUILDALL>, L<DEMOLISHALL|Moo::Object/DEMOLISHALL>, L<does|Moo::Object/does>, L<meta|Moo::Object/meta>
+
+=back
+
+=head1 CONTRIBUTOR
+
+Fayland Lam L<mailto:fayland@binary.com>
+
+Tee Shuwn Yuan L<mailto:shuwnyuan@binary.com>
+
+=head1 COPYRIGHT AND LICENSE
+

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Scalar.pm
-## Version v1.3.1
+## Version v1.3.2
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2022/08/05
+## Modified 2022/11/05
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -78,7 +78,7 @@ BEGIN
     );
     $DEBUG = 0;
     $ERRORS = {};
-    our $VERSION = 'v1.3.1';
+    our $VERSION = 'v1.3.2';
 };
 
 use strict;
@@ -117,7 +117,7 @@ sub new
     return( bless( \$init => ( ref( $this ) || $this ) ) );
 }
 
-sub append { ${$_[0]} .= ( Scalar::Util::reftype( $_[1] ) eq 'SCALAR' ? ${$_[1]} : $_[1] ); return( $_[0] ); }
+sub append { ${$_[0]} .= ( ( Scalar::Util::reftype( $_[1] ) // '' ) eq 'SCALAR' ? ${$_[1]} : $_[1] ); return( $_[0] ); }
 
 sub as_array { return( Module::Generic::Array->new( [ ${$_[0]} ] ) ); }
 
@@ -159,7 +159,11 @@ sub callback
             my $tie = tied( $$self );
             return(1) if( !$tie );
             my $rv = $tie->unset_callback( $what );
-            untie( $$self ) if( !$tie->has_callback );
+            if( !$tie->has_callback )
+            {
+                undef( $tie );
+                untie( $$self );
+            }
             return( $rv );
         }
         # Only 1 argument: get mode only
@@ -201,8 +205,10 @@ sub capitalise
     my $apos = qr/ (?: ['’] [[:lower:]]* )? /x;
     
     my $copy = $$self;
-    $copy =~ s{\A\s+}{}, s{\s+\z}{};
-    $copy = CORE::lc( $copy ) if( not /[[:lower:]]/ );
+    return( $self->_new( $copy ) ) if( !CORE::defined( $copy ) );
+    $copy =~ s{\A\s+}{};
+    $copy =~ s{\s+\z}{};
+    $copy = CORE::lc( $copy ) if( $copy !~ /[[:lower:]]/ );
     $copy =~ s{
         \b (_*) (?:
             ( (?<=[ ][/\\]) [[:alpha:]]+ [-_[:alpha:]/\\]+ |   # file path or
@@ -239,7 +245,7 @@ sub capitalise
     }{\u\L$1}xig;
 
     # Exceptions for small words in hyphenated compound words
-    ## e.g. "in-flight" -> In-Flight
+    # e.g. "in-flight" -> In-Flight
     $copy =~ s{
         \b
         (?<! -)                 # Negative lookbehind for a hyphen; we don't want to match man-in-the-middle but do want (in-flight)
@@ -247,7 +253,7 @@ sub capitalise
         (?= -[[:alpha:]]+)      # lookahead for "-someword"
     }{\u\L$1}xig;
 
-    ## # e.g. "Stand-in" -> "Stand-In" (Stand is already capped at this point)
+    # e.g. "Stand-in" -> "Stand-In" (Stand is already capped at this point)
     $copy =~ s{
         \b
         (?<!…)                  # Negative lookbehind for a hyphen; we don't want to match man-in-the-middle but do want (stand-in)
@@ -259,9 +265,9 @@ sub capitalise
     return( $self->_new( $copy ) );
 }
 
-sub chomp { return( CORE::chomp( ${$_[0]} ) ); }
+sub chomp { no warnings 'uninitialized'; return( CORE::chomp( ${$_[0]} ) ); }
 
-sub chop { return( CORE::chop( ${$_[0]} ) ); }
+sub chop { no warnings 'uninitialized'; return( CORE::chop( ${$_[0]} ) ); }
 
 sub clone
 {
@@ -359,27 +365,27 @@ sub index
     return( $self->_number( CORE::index( ${$self}, $substr ) ) );
 }
 
-sub is_alpha { return( ${$_[0]} =~ /^[[:alpha:]]+$/ ); }
+sub is_alpha { return( CORE::defined( ${$_[0]} ) && ${$_[0]} =~ /^[[:alpha:]]+$/ ); }
 
-sub is_alpha_numeric { return( ${$_[0]} =~ /^[[:alnum:]]+$/ ); }
+sub is_alpha_numeric { return( CORE::defined( ${$_[0]} ) && ${$_[0]} =~ /^[[:alnum:]]+$/ ); }
 
-sub is_empty { return( CORE::length( ${$_[0]} ) == 0 ); }
+sub is_empty { return( CORE::length( ${$_[0]} // '' ) == 0 ); }
 
-sub is_lower { return( ${$_[0]} =~ /^[[:lower:]]+$/ ); }
+sub is_lower { return( CORE::defined( ${$_[0]} ) && ${$_[0]} =~ /^[[:lower:]]+$/ ); }
 
 sub is_numeric { return( Scalar::Util::looks_like_number( ${$_[0]} ) ); }
 
-sub is_upper { return( ${$_[0]} =~ /^[[:upper:]]+$/ ); }
+sub is_upper { return( CORE::defined( ${$_[0]} ) && ${$_[0]} =~ /^[[:upper:]]+$/ ); }
 
 sub join { return( __PACKAGE__->new( CORE::join( CORE::splice( @_, 1, 1 ), ${ shift( @_ ) }, @_ ) ) ); }
 
-sub lc { return( __PACKAGE__->_new( CORE::lc( ${$_[0]} ) ) ); }
+sub lc { no warnings 'uninitialized'; return( __PACKAGE__->_new( CORE::lc( ${$_[0]} ) ) ); }
 
-sub lcfirst { return( __PACKAGE__->_new( CORE::lcfirst( ${$_[0]} ) ) ); }
+sub lcfirst { no warnings 'uninitialized'; return( __PACKAGE__->_new( CORE::lcfirst( ${$_[0]} ) ) ); }
 
-sub left { return( $_[0]->_new( CORE::substr( ${$_[0]}, 0, CORE::int( $_[1] ) ) ) ); }
+sub left { no warnings 'uninitialized'; return( $_[0]->_new( CORE::substr( ${$_[0]}, 0, CORE::int( $_[1] ) ) ) ); }
 
-sub length { return( $_[0]->_number( CORE::length( ${$_[0]} ) ) ); }
+sub length { no warnings 'uninitialized'; return( $_[0]->_number( CORE::length( ${$_[0]} ) ) ); }
 
 sub like
 {
@@ -387,6 +393,7 @@ sub like
     my $str = shift( @_ );
     my @matches = ();
     my @rv = ();
+    no warnings 'uninitialized';
     $str = CORE::defined( $str ) 
         ? ref( $str ) eq 'Regexp'
             ? $str
@@ -415,6 +422,7 @@ sub ltrim
 {
     my $self = shift( @_ );
     my $str = shift( @_ );
+    no warnings 'uninitialized';
     $str = CORE::defined( $str ) 
         ? ref( $str ) eq 'Regexp'
             ? $str
@@ -429,6 +437,7 @@ sub match
     my( $self, $re ) = @_;
     my @matches = ();
     my @rv = ();
+    no warnings 'uninitialized';
     $re = CORE::defined( $re ) 
         ? ref( $re ) eq 'Regexp'
             ? $re
@@ -559,7 +568,7 @@ sub pass_error
 
 sub pos { return( $_[0]->_number( @_ > 1 ? ( CORE::pos( ${$_[0]} ) = $_[1] ) : CORE::pos( ${$_[0]} ) ) ); }
 
-sub prepend { return( shift->substr( 0, 0, ( Scalar::Util::reftype( $_[0] ) eq 'SCALAR' ? ${$_[0]} : $_[0] ) ) ); }
+sub prepend { return( shift->substr( 0, 0, ( ( Scalar::Util::reftype( $_[0] ) // '' ) eq 'SCALAR' ? ${$_[0]} : $_[0] ) ) ); }
 
 sub quotemeta { return( __PACKAGE__->_new( CORE::quotemeta( ${$_[0]} ) ) ); }
 
@@ -655,7 +664,12 @@ sub split
 {
     my $self = CORE::shift( @_ );
     my( $expr, $limit ) = @_;
-    CORE::warn( "No argument was provided to split string in Module::Generic::Scalar::split\n" ) if( !scalar( @_ ) );
+    if( !scalar( @_ ) )
+    {
+        CORE::warn( "No argument was provided to split string in Module::Generic::Scalar::split\n" ) if( $self->_warnings_is_enabled );
+        # NOTE: As per perlfunc: "If omitted, PATTERN defaults to a single space, " ", triggering the previously described *awk* emulation."
+        $expr = ' ';
+    }
     unless( ref( $expr ) eq 'Regexp' )
     {
         if( ref( $expr ) )
@@ -666,7 +680,7 @@ sub split
         $expr = qr/\Q$expr\E/;
     }
     my $ref;
-    $limit = "$limit";
+    $limit = "$limit" if( CORE::defined( $limit ) );
     if( CORE::defined( $limit ) && $limit =~ /^\d+$/ )
     {
         $ref = [ CORE::split( $expr, $$self, $limit ) ];
@@ -703,6 +717,7 @@ sub tr ###
 {
     my $self = CORE::shift( @_ );
     my( $search, $replace, $opts ) = @_;
+    $opts //= '';
     eval( "\$\$self =~ CORE::tr/$search/$replace/$opts" );
     return( $self );
 }

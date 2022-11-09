@@ -8,11 +8,17 @@ use Test::EOL;
 
 my @files = (
     'lib/HTML/FormBuilder.pm',
+    'lib/HTML/FormBuilder.pod',
     'lib/HTML/FormBuilder/Base.pm',
+    'lib/HTML/FormBuilder/Base.pod',
     'lib/HTML/FormBuilder/Field.pm',
+    'lib/HTML/FormBuilder/Field.pod',
     'lib/HTML/FormBuilder/FieldSet.pm',
+    'lib/HTML/FormBuilder/FieldSet.pod',
     'lib/HTML/FormBuilder/Select.pm',
+    'lib/HTML/FormBuilder/Select.pod',
     'lib/HTML/FormBuilder/Validation.pm',
+    'lib/HTML/FormBuilder/Validation.pod',
     't/00-check-deps.t',
     't/00-compile.t',
     't/00-report-prereqs.dd',
@@ -28,8 +34,19 @@ my @files = (
     't/formbuilder_output.t',
     't/lib/BaseTest.pm',
     't/lib/TestHelper.pm',
-    't/rc/.perlcriticrc',
-    't/rc/.perltidyrc'
+    't/rc/perlcriticrc',
+    't/rc/perltidyrc',
+    'xt/author/critic.t',
+    'xt/author/distmeta.t',
+    'xt/author/eol.t',
+    'xt/author/minimum-version.t',
+    'xt/author/mojibake.t',
+    'xt/author/no-tabs.t',
+    'xt/author/pod-syntax.t',
+    'xt/author/portability.t',
+    'xt/author/test-version.t',
+    'xt/release/common_spelling.t',
+    'xt/release/cpan-changes.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

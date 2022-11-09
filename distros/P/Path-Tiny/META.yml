@@ -18,7 +18,7 @@ configure_requires:
   ExtUtils::MakeMaker: '6.17'
   perl: '5.008001'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.027, CPAN::Meta::Converter version 2.150010'
 license: apache
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -36,10 +36,10 @@ no_index:
 provides:
   Path::Tiny:
     file: lib/Path/Tiny.pm
-    version: '0.130'
+    version: '0.142'
   Path::Tiny::Error:
     file: lib/Path/Tiny.pm
-    version: '0.130'
+    version: '0.142'
 recommends:
   Unicode::UTF8: '0.58'
 requires:
@@ -67,7 +67,7 @@ resources:
   bugtracker: https://github.com/dagolden/Path-Tiny/issues
   homepage: https://github.com/dagolden/Path-Tiny
   repository: https://github.com/dagolden/Path-Tiny.git
-version: '0.130'
+version: '0.142'
 x_authority: cpan:DAGOLDEN
 x_contributors:
   - 'Alex Efros <powerman@powerman.name>'
@@ -93,7 +93,10 @@ x_contributors:
   - 'Mark Ellis <mark.ellis@cartridgesave.co.uk>'
   - 'Martin H. Sluka <fany@cpan.org>'
   - 'Martin Kjeldsen <mk@bluepipe.dk>'
+  - 'Mary Ehlers <regina.verb.ae@gmail.com>'
   - 'Michael G. Schwern <mschwern@cpan.org>'
+  - 'Nicolas R <nicolas@atoomic.org>'
+  - 'Nicolas Rochelemagne <rochelemagne@cpanel.net>'
   - 'Nigel Gregoire <nigelgregoire@gmail.com>'
   - 'Philippe Bruhat (BooK) <book@cpan.org>'
   - 'regina-verbae <regina-verbae@users.noreply.github.com>'

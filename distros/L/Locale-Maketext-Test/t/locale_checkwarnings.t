@@ -15,5 +15,5 @@ my $handler = Locale::Maketext::Test->new(
 my $result = $handler->testlocales();
 
 is scalar @{$result->{warnings}->{pt}}, 2, 'Got warnings as parameters are not properly used';
-is $result->{status}, 0, 'Status is 0 as debug flag is set and it has warnings';
+is $result->{status},                   0, 'Status is 0 as debug flag is set and it has warnings';
 

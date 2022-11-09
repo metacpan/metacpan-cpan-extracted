@@ -28,6 +28,9 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Regexp::Util" : "0"
+         },
          "requires" : {
             "Exporter" : "5.57",
             "strict" : "0",
@@ -36,18 +39,20 @@
       },
       "test" : {
          "requires" : {
+            "Capture::Tiny" : "0",
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Test::Exception" : "0",
-            "Test::More" : "0.98"
+            "Test::More" : "0.98",
+            "Test::Needs" : "0"
          }
       }
    },
    "provides" : {
       "Regexp::From::String" : {
          "file" : "lib/Regexp/From/String.pm",
-         "version" : "0.004"
+         "version" : "0.007"
       }
    },
    "release_status" : "stable",
@@ -62,7 +67,7 @@
          "web" : "https://github.com/perlancar/perl-Regexp-From-String"
       }
    },
-   "version" : "0.004",
+   "version" : "0.007",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
@@ -580,6 +585,17 @@
                }
             },
             "name" : "Prereqs",
+            "version" : "6.024"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "runtime",
+                  "type" : "recommends"
+               }
+            },
+            "name" : "RuntimeRecommends",
             "version" : "6.024"
          },
          {

@@ -42,7 +42,7 @@ my $input_field_amount = {
         'maxlength' => 40,
         'value'     => '',
     },
-    'comment' => {text  => 'commenttext'},
+    'comment' => {text => 'commenttext'},
     'error'   => [{text => 'errortext'}],
 };
 
@@ -153,7 +153,7 @@ lives_ok(sub { $result = $form_obj->build }, 'build field with heading');
 $expect_result = <<EOF;
 <form id="testid" method="get"><div class="rbox form">
     <div class="rbox-wrap">
-        <fieldset><div class="grd-grid-12"></div></fieldset>
+        <fieldset stacked="0"><div class="grd-grid-12"></div></fieldset>
         <span class="tl">&nbsp;</span><span class="tr">&nbsp;</span><span class="bl">&nbsp;</span><span class="br">&nbsp;</span>
     </div>
 </div>

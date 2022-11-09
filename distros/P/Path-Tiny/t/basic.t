@@ -3,10 +3,12 @@ use strict;
 use warnings;
 use Test::More 0.96;
 use File::Spec;
+use File::Glob;
 use Path::Tiny;
 use Cwd;
 
 my $IS_WIN32 = $^O eq 'MSWin32';
+my $IS_CYGWIN = $^O eq 'cygwin';
 
 use lib 't/lib';
 use TestUtils qw/exception/;
@@ -126,11 +128,15 @@ is $file->parent,  '/foo/baz';
 
 # tilde processing
 {
-    my ($homedir) = glob('~');
-    $homedir =~ tr[\\][/] if $IS_WIN32;
+    # Construct expected paths manually with glob, but normalize with Path::Tiny
+    # to work around windows slashes and drive case issues.  Extract the interior
+    # paths with ->[0] rather than relying on stringification, which will escape
+    # leading tildes.
+
+    my $homedir = path(glob('~'))->[0];
     my $username = path($homedir)->basename;
-    my ($root_homedir) = glob('~root');
-    my ($missing_homedir) = glob('~idontthinkso');
+    my $root_homedir = path(glob('~root'))->[0];
+    my $missing_homedir = path(glob('~idontthinkso'))->[0];
 
     my @tests = (
       # [arg for path(), expected string (undef if eq arg for path()), test string]
@@ -152,18 +158,69 @@ is $file->parent,  '/foo/baz';
         ["~fun\ttimes",           undef,                    'Test tab' ],
         ["~new\nline",            undef,                    'Test newline' ],
         ['~'.$username.' file',   undef,                    'Test \'~$username file\'' ],
+        ['./~',                   "~",                      'Test literal tilde under current directory' ],
+        ['~idontthinkso[123]',    undef,                    'Test File::Glob metacharacter ['],
+        ['~idontthinkso*',        undef,                    'Test File::Glob metacharacter *'],
+        ['~idontthinkso?',        undef,                    'Test File::Glob metacharacter ?'],
+        ['~idontthinkso{a}',      undef,                    'Test File::Glob metacharacter {'],
     );
 
+    if (! $IS_WIN32 && ! $IS_CYGWIN ) {
+        push @tests, ['~idontthinkso\\x',      undef,                    'Test File::Glob metacharacter \\'];
+    }
+
     for my $test (@tests) {
-        is(path($test->[0]), defined $test->[1] ? $test->[1] : $test->[0], $test->[2]);
+        my $path = path($test->[0]);
+        my $internal_path = $path->[0]; # Avoid stringification adding a "./" prefix
+        my $expected = defined $test->[1] ? $test->[1] : $test->[0];
+        is($internal_path, $expected, $test->[2]);
+        is($path, $expected =~ /^~/ ? "./$expected" : $expected, '... and its stringification');
+    }
+
+    is(path('.')->child('~')->[0], '~', 'Test indirect form of literal tilde under current directory');
+    is(path('.')->child('~'), './~', '... and its stringification');
+
+    $file = path('/tmp/foo/~root');
+    is $file->relative('/tmp/foo')->[0], '~root', 'relative path begins with tilde';
+    is $file->relative('/tmp/foo'), "./~root", '... and its stringification is escaped';
+
+    # successful tilde expansion of account names with glob metacharacters is
+    # actually untested so far because it would require such accounts to exist
+    # so instead we wrap File::Glob::bsd_glob to mock up certain responses:
+    my %mock = (
+        '~i[dont]{think}so' => '/home/i[dont]{think}so',
+        '~idont{think}so'   => '/home/idont{think}so',
+        '~i{dont,think}so'  => '/home/i{dont,think}so',
+    );
+    if ( ! $IS_WIN32 && ! $IS_CYGWIN ) {
+        $mock{'~i?dont*think*so?'} = '/home/i?dont*think*so?';
+    }
+    my $orig_bsd_glob = \&File::Glob::bsd_glob;
+    my $do_brace_expansion_only = do { package File::Glob; GLOB_NOCHECK() | GLOB_BRACE() | GLOB_QUOTE() };
+    sub mock_bsd_glob {
+        my $dequoted = $orig_bsd_glob->( $_[0], $do_brace_expansion_only );
+        $mock{ $dequoted } || goto &$orig_bsd_glob;
+    }
+    no warnings 'redefine'; local *File::Glob::bsd_glob = \&mock_bsd_glob;
+    is(File::Glob::bsd_glob('{root}'), 'root', 'double-check of mock_bsd_glob dequoting');
+    is(File::Glob::bsd_glob('~root'), $root_homedir, 'double-check of mock_bsd_glob fallback');
+    for my $test (sort keys %mock) {
+        is(path($test), $mock{ $test }, "tilde expansion with glob metacharacters in account name: $test");
     }
 }
 
 # freeze/thaw
 {
-    my $path = path("/foo/bar/baz");
-    is( Path::Tiny->THAW( "fake", $path->FREEZE("fake") ),
-        $path, "FREEZE-THAW roundtrip" );
+    my @cases = qw(
+        /foo/bar/baz"
+        ./~root
+    );
+
+    for my $c ( @cases ) {
+        my $path = path($c);
+        is( Path::Tiny->THAW( "fake", $path->FREEZE("fake") ),
+            $path, "FREEZE-THAW roundtrip: $c" );
+    }
 }
 
 # assertions

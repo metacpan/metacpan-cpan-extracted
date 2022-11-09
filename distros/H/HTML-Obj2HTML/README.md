@@ -10,7 +10,11 @@ HTML::Obj2HTML - Create HTML from a arrays and hashes
 
     This is the relative path from the current working directory to components.
     Obj2HTML will find all \*.po files and automatically register elements that when
-    called within your object executes the file. (See `fetch()`)
+    called within your object executes the file. (See `fetch()`);
+
+    Note, you can change the extension searched for with an import argument:
+
+        use HTML::Obj2HTML file_extension => ".po"
 
 - `default_currency`
 
@@ -155,6 +159,8 @@ Without HTML::FromArrayref format eanbled, it looks like this:
         [
            div => include("path/to/file")
         ]
+
+    You should exclude the file extension. It will be added automatically. By default this is "\*.po" but can be changed.
 
 - Add some javascript
 

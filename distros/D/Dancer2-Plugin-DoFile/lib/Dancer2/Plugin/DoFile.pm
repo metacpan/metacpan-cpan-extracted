@@ -1,5 +1,5 @@
 package Dancer2::Plugin::DoFile;
-$Dancer2::Plugin::DoFile::VERSION = '0.12';
+$Dancer2::Plugin::DoFile::VERSION = '0.13';
 # ABSTRACT: File-based MVC plugin for Dancer2
 
 use strict;
@@ -9,10 +9,29 @@ use Dancer2::Plugin;
 
 use JSON;
 use Hash::Merge;
+use HTTP::Accept;
 
-has page_loc => (
+# Not sure if this is necessary at this point, as the model
+# Should in general not be dynamically loaded...
+#has model_loc => (
+#    is      => 'rw',
+#    default => sub {'dofiles/models'},
+#);
+has controller_loc => (
     is      => 'rw',
-    default => sub {'dofiles/pages'},
+    default => sub {'dofiles/controllers'},
+);
+has controller_extension_list => (
+    is      => 'rw',
+    default => sub { ['.ctl','.do'] }
+);
+has view_loc => (
+    is      => 'rw',
+    default => sub {'dofiles/views'},
+);
+has view_extension_list => (
+    is      => 'rw',
+    default => sub { ['.view','.po'] }
 );
 
 has default_file => (
@@ -20,23 +39,273 @@ has default_file => (
     default => sub {'index'},
 );
 
+# This is old config syntax and should not be used
+# Only preserved as temporary backwards compatibility
+has page_loc => (
+    is      => 'rw',
+    default => sub {'dofiles/pages'},
+);
+# This list will change over time to remove "do" and "po" in favour of "ctl" (controllers) and "view" (views)
 has extension_list => (
     is      => 'rw',
-    default => sub { ['.do', '.view']}
+    default => sub { ['.ctl', '.do', '.po', '.view']}
 );
 
+# Old method
 plugin_keywords 'dofile';
 
+# New methods
+plugin_keywords 'controller';
+plugin_keywords 'view';
+
 my %dofiles;
+my $acceptext = {
+  "" => "",
+  "text/html" => ".html",
+  "application/json" => ".json"
+};
 
 sub BUILD {
     my $self     = shift;
     my $settings = $self->config;
 
     $settings->{$_} and $self->$_( $settings->{$_} )
-      for qw/ page_loc default_file extension_list /;
+      for qw/ page_loc default_file extension_list controller_loc controller_extension_list view_loc view_extension_list /;
 }
 
+sub controller {
+  my $plugin = shift;
+  my $arg = shift;
+  my %opts = @_;
+
+  my $app = $plugin->app;
+  my $settings = $app->settings;
+  my $method = $app->request->method;
+  my $pageroot = $settings->{appdir};
+  if ($pageroot !~ /\/$/) {
+    $pageroot .= "/";
+  }
+  $pageroot .= $plugin->controller_loc;
+
+  my $path = $arg || $app->request->path;
+
+  # If any one of these returns content then we stop processing any more of them
+  # Content is defined as an array ref (it's an Obj2HTML array), a hashref with a "content" element, or a scalar (assumed HTML string - it's not checked!)
+  # This can lead to some interesting results if someone doesn't explicitly return undef when they want to fall through to the next file
+  # as perl will return the last evaluated value, which would be intepretted as content according to the above rules
+
+  my $merger = Hash::Merge->new('RIGHT_PRECEDENT');
+
+  my $stash = $opts{stash} || {};
+
+  # Safety first...
+  $path =~ s|/$|"/".$plugin->default_file|e;
+  $path =~ s|^/+||;
+  $path =~ s|\.\./||g;
+  $path =~ s|~||g;
+
+  if (!$path) { $path = $plugin->default_file; }
+  if (-d $pageroot."/$path") {
+    if ($path !~ /\/$/) {
+      $path .= "/".$plugin->default_file;
+    } else {
+      return {
+        url => "/$path/",
+        redirect => 1,
+        done => 1
+      };
+    }
+  }
+
+  if (!defined $stash->{dofiles_executed}) { $stash->{dofiles_executed} = 0; }
+OUTER:
+  foreach my $ext (@{$plugin->controller_extension_list}) {
+    foreach my $m ("", "-$method", "-ANY") {
+      my $cururl = $path;
+      my @path = ();
+
+      # This iterates back through the path to find the closest FILE downstream, using the rest of the url as a "path" argument
+      while (!-f $pageroot."/".$cururl.$m.$ext && $cururl =~ s/\/([^\/]*)$//) {
+        if ($1) { unshift(@path, $1); }
+      }
+
+      # "Do" the file
+      if ($cururl) {
+        my $result;
+        if (defined $dofiles{$pageroot."/".$cururl.$m.$ext}) {
+          $stash->{dofiles}->{$cururl.$m.$ext} = { origin => "cache", order => $stash->{dofiles_executed}++ };
+          $result = $dofiles{$pageroot."/".$cururl.$m.$ext}->({path => \@path, this_url => $cururl, dofile_plugin => $plugin, stash => $stash, env => $app->request->env});
+
+        } elsif (-f $pageroot."/".$cururl.$m.$ext) {
+          $stash->{dofiles}->{$cururl.$m.$ext} = { origin => "file", order => $stash->{dofiles_executed}++ };
+
+          our $args = { path => \@path, this_url => $cururl, dofile_plugin => $plugin, stash => $stash, env => $app->request->env };
+
+          $result = do($pageroot."/".$cururl.$m.$ext);
+          if ($@ || $!) { $plugin->app->log( error => "Error processing $pageroot / $cururl.$m.$ext: $@ $!\n"); }
+          if (ref $result eq "CODE") {
+            $stash->{dofiles}->{$cururl.$m.$ext}->{cached} = 1;
+            $dofiles{$pageroot."/".$cururl.$m.$ext} = $result;
+            $result = $result->($args);
+          }
+        }
+
+        # We need to reassign the stash to the opts hash as the merge will have destroyed the old stash
+        $opts{stash} = $stash;
+
+        if (defined $result && ref $result eq "HASH") {
+          $stash = $merger->merge($stash, $result);
+          if (defined $result->{url} && !defined $result->{done}) {
+            $path = $result->{url};
+            next OUTER;
+          }
+          if (defined $result->{view} && $result->{done}) {
+            $stash->{dofiles}->{$cururl.$m.$ext}->{last} = 1;
+            $stash->{'controller_result'} = $result;
+            return $plugin->view($result->{view}, path => \@path, this_url => $cururl, dofile_plugin => $plugin, stash => $stash, env => $app->request->env );
+
+          } elsif (defined $result->{content} || $result->{url} || $result->{done}) {
+            $stash->{dofiles}->{$cururl.$m.$ext}->{last} = 1;
+            return $result;
+          }
+          # Move on to the next file
+
+        } elsif (ref $result eq "ARRAY") {
+          $stash->{dofiles}->{$cururl.$m.$ext}->{last} = 1;
+          return { content => $result };
+
+        } elsif (!ref $result && $result) {
+          # do we assume this is HTML? Or a file to use in templating? Who knows!
+          $stash->{dofiles}->{$cururl.$m.$ext}->{last} = 1;
+          return { content => $result };
+
+        }
+      }
+    }
+  }
+
+  # If we got here we didn't find a controller. We should fail over to see if it's just a view on its own (effectively this module or the route acts as the controller)
+  $opts{stash} = $stash;
+  if ($stash->{view}) {
+    $opts{'controller_arg'} = $arg;
+    return $plugin->view($stash->{view}, %opts);
+  } else {
+    return $plugin->view($arg, %opts);
+  }
+
+}
+
+sub view {
+  my $plugin = shift;
+  my $arg = shift;
+  my %opts = @_;
+
+  my $app = $plugin->app;
+  my $settings = $app->settings;
+  my $method = $app->request->method;
+
+  my $accept  = HTTP::Accept->new( $app->request->accept )->values();
+  push(@{$accept}, "");
+
+  my $pageroot = $settings->{appdir};
+  if ($pageroot !~ /\/$/) {
+    $pageroot .= "/";
+  }
+  $pageroot .= $plugin->view_loc;
+
+  my $path = $arg || $app->request->path;
+
+  # If any one of these returns content then we stop processing any more of them
+  # Content is defined as an array ref (it's an Obj2HTML array), a hashref with a "content" element, or a scalar (assumed HTML string - it's not checked!)
+  # This can lead to some interesting results if someone doesn't explicitly return undef when they want to fall through to the next file
+  # as perl will return the last evaluated value, which would be intepretted as content according to the above rules
+
+  my $merger = Hash::Merge->new('RIGHT_PRECEDENT');
+
+  my $stash = $opts{stash} || {};
+
+  # Safety first...
+  $path =~ s|/$|"/".$plugin->default_file|e;
+  $path =~ s|^/+||;
+  $path =~ s|\.\./||g;
+  $path =~ s|~||g;
+
+  if (!$path) { $path = $plugin->default_file; }
+  if (-d $pageroot."/$path") {
+    if ($path !~ /\/$/) {
+      $path .= "/".$plugin->default_file;
+    } else {
+      return {
+        url => "/$path/",
+        redirect => 1,
+        done => 1
+      };
+    }
+  }
+OUTER:
+  foreach my $ext (@{$plugin->view_extension_list}) {
+    foreach my $fmt (@{$accept}) {
+      if (defined $acceptext->{$fmt}) {
+        foreach my $m ("", "-$method", "-ANY") {
+          my $cururl = $path;
+          my @path = ();
+          # This iterates back through the path to find the closest FILE downstream, using the rest of the url as a "path" argument
+          while (!-f $pageroot."/".$cururl.$m.$acceptext->{$fmt}.$ext && $cururl =~ s/\/([^\/]*)$//) {
+            if ($1) { unshift(@path, $1); }
+          }
+
+          # "Do" the file
+          if ($cururl) {
+            my $result;
+            if (defined $dofiles{$pageroot."/".$cururl.$m.$acceptext->{$fmt}.$ext}) {
+              $stash->{dofiles}->{$cururl.$m.$acceptext->{$fmt}.$ext} = { origin => "cache", order => $stash->{dofiles_executed}++ };
+              $result = $dofiles{$pageroot."/".$cururl.$m.$acceptext->{$fmt}.$ext}->({path => \@path, this_url => $cururl, dofile_plugin => $plugin, stash => $stash, env => $app->request->env});
+
+            } elsif (-f $pageroot."/".$cururl.$m.$acceptext->{$fmt}.$ext) {
+              $stash->{dofiles}->{$cururl.$m.$acceptext->{$fmt}.$ext} = { origin => "file", order => $stash->{dofiles_executed}++ };
+
+              our $args = { path => \@path, this_url => $cururl, dofile_plugin => $plugin, stash => $stash, env => $app->request->env };
+
+              $result = do($pageroot."/".$cururl.$m.$acceptext->{$fmt}.$ext);
+              if ($@ || $!) { $plugin->app->log( error => "Error processing $pageroot / $cururl.$m.$acceptext->{$fmt}.$ext: $@ $!\n"); }
+              if (ref $result eq "CODE") {
+                $stash->{dofiles}->{$cururl.$m.$acceptext->{$fmt}.$ext}->{cached} = 1;
+                $dofiles{$pageroot."/".$cururl.$m.$acceptext->{$fmt}.$ext} = $result;
+                $result = $result->($args);
+              }
+            }
+
+            # We need to reassign the stash to the opts hash as the merge will have destroyed the old stash
+            $opts{stash} = $stash;
+
+            if (defined $result && ref $result eq "HASH") {
+              $result->{'content-type'} = $acceptext->{$fmt};
+              $stash->{dofiles}->{$cururl.$m.$acceptext->{$fmt}.$ext}->{last} = 1;
+              return $result;
+
+            } elsif (ref $result eq "ARRAY") {
+              $stash->{dofiles}->{$cururl.$m.$acceptext->{$fmt}.$ext}->{last} = 1;
+              return { 'content-type' => $acceptext->{$fmt}, content => $result };
+
+            } elsif (!ref $result && $result) {
+              # do we assume this is HTML? Or a file to use in templating? Who knows!
+              $stash->{dofiles}->{$cururl.$m.$acceptext->{$fmt}.$ext}->{last} = 1;
+              return { 'content-type' => $acceptext->{$fmt}, content => $result };
+
+            }
+          }
+        }
+      }
+    }
+  }
+
+  # If we got here we didn't find a do file that returned some content
+  return { status => 404 };
+
+}
+
+
+# Backward compatibility
 sub dofile {
   my $plugin = shift;
   my $arg = shift;
@@ -81,6 +350,7 @@ sub dofile {
     }
   }
 
+  if (!defined $stash->{dofiles_executed}) { $stash->{dofiles_executed} = 0; }
 OUTER:
   foreach my $ext (@{$plugin->extension_list}) {
     foreach my $m ("", "-$method") {
@@ -96,14 +366,18 @@ OUTER:
       if ($cururl) {
         my $result;
         if (defined $dofiles{$pageroot."/".$cururl.$m.$ext}) {
+          $stash->{dofiles}->{$cururl.$m.$ext} = { origin => "cache", order => $stash->{dofiles_executed}++ };
           $result = $dofiles{$pageroot."/".$cururl.$m.$ext}->({path => \@path, this_url => $cururl, dofile_plugin => $plugin, stash => $stash, env => $app->request->env});
 
         } elsif (-f $pageroot."/".$cururl.$m.$ext) {
+          $stash->{dofiles}->{$cururl.$m.$ext} = { origin => "file", order => $stash->{dofiles_executed}++ };
+
           our $args = { path => \@path, this_url => $cururl, dofile_plugin => $plugin, stash => $stash, env => $app->request->env };
 
           $result = do($pageroot."/".$cururl.$m.$ext);
           if ($@ || $!) { $plugin->app->log( error => "Error processing $pageroot / $cururl.$m.$ext: $@ $!\n"); }
           if (ref $result eq "CODE") {
+            $stash->{dofiles}->{$cururl.$m.$ext}->{cached} = 1;
             $dofiles{$pageroot."/".$cururl.$m.$ext} = $result;
             $result = $result->($args);
           }
@@ -115,6 +389,7 @@ OUTER:
             next OUTER;
           }
           if (defined $result->{content} || $result->{url} || $result->{done}) {
+            $stash->{dofiles}->{$cururl.$m.$ext}->{last} = 1;
             return $result;
           } else {
             $stash = $merger->merge($stash, $result);
@@ -122,10 +397,12 @@ OUTER:
           # Move on to the next file
 
         } elsif (ref $result eq "ARRAY") {
+          $stash->{dofiles}->{$cururl.$m.$ext}->{last} = 1;
           return { content => $result };
 
         } elsif (!ref $result && $result) {
           # do we assume this is HTML? Or a file to use in templating? Who knows!
+          $stash->{dofiles}->{$cururl.$m.$ext}->{last} = 1;
           return { content => $result };
 
         }
@@ -162,57 +439,81 @@ In your config.yml
 
     plugins:
       DoFile:
-        page_loc: "dofiles/pages"
+        controller_loc: 'dofiles/controllers'
+        controller_extension_list: ['.ctl','.do']
+        view_loc: 'dofiles/views'
+        view_extension_list: ['.view','.po']
         default_file: "index"
-        extension_list: ['.do','.view']
 
-Make sure you have created the directory used for page_loc
+Make sure you have created the directory used for the locations in your dancer application root.
 
 Within a route in dancer2:
 
-    my $result = dofile 'path/to/file'
+    my $result = controller 'path/to/file'
 
 You must not include the extension of the file as part of the path, as this will
 be added per the settings.
 
-Or a default route, with example handling of some return values:
+An example route in Dancer2, not using HTML::Obj2HTML (the controller returns the
+layout and tokens directly):
+
+    get 'dashboard' => sub {
+      my $self = shift;
+      my $result = controller 'dashboards/user-dashboard';
+      return template $result->{layout} => $result->{tokens};
+    }
+
+An example default route that will search for controllers (or views) based on the
+URI requested, and some handling of other controller return keys:
 
     prefix '/';
     any qr{.*} => sub {
       my $self = shift;
-      my $result = dofile undef;
+
+      my $result = controller undef;  # Not specifying the controller to use will use the URI to guess
+
+      # My controller might return all manner of different things; this is an example:
       if ($result && ref $result eq "HASH") {
-        if (defined $result->{status}) {
-          status $result->{status};
-        }
         if (defined $result->{url}) {
           if (defined $result->{redirect} && $result->{redirect} eq "forward") {
             return forward $result->{url};
           } else {
             return redirect $result->{url};
           }
-        } elsif (defined $result->{content}) {
-          return $result->{content};
         }
-      }
+        if (defined $result->{status}) {
+          status $result->{status};
+        }
+        if (defined $result->{template}) {
+          set layout => $result->{template};
+        }
+        if (defined $result->{headers}) {
+          headers %{$result->{headers}};
+        }
+        if (defined $result->{content}) {
+          return template $result->{content}, $result->{tokens};
+        }
+      };
     };
 
-When the 1st parameter to 'dofile' is undef it'll use the request URI to work
+
+When the 1st parameter to 'controller' is undef it'll use the request URI to work
 out what the file(s) to execute are.
 
 =head1 DESCRIPTION
 
 DoFile is a way of automatically pulling multiple perl files to execute as a way
 to simplify routing complexity in Dancer2 for very large applications. In
-particular it was designed to offload "as many as possible" URIs that related to
-some standard functionality through a default route, just by having files
-existing for the specific URI.
+particular it was designed to split out larger controllers into logical partitions
+based on heirarchy of files compared to what's being requested.
 
 The magic will look through your filesystem for files to 'do' (execute), and
-there may be several. The intent is to split out controller files and
-view files, and these may individually be rolled out or split out. In the
-default configuration the controller files are suffixed .do, and the view files
-.view
+there may be several.
+
+An added benefit of using DoFile is it's ability to execute multiple files per
+request, effectively allowing you to split controllers into sub-parts. For example,
+you might have a "DoFile" that is always executed for /some/uri, and another
+for POST or GET, and even another for the fact you hade /some too.
 
 =head2 File Search Ordering
 
@@ -226,10 +527,11 @@ Files are searched:
 
 =item * By extension
 
-The default extensions .do and .view are checked, unless defined in your
-config.yml. The intention here is that .do files contain controller code and
-don't typically return content, but may return redirects. After .do files have
-been executed, .view files are executed. These are expected to return content.
+The default extensions .ctl and .view are checked (.do and .po are legacy extensions),
+unless defined in your config.yml. The intention here is that .do files contain
+controller code and don't typically return content, but may return redirects. After
+.do files have been executed, .view files are executed. These are expected to return
+content.
 
 You can define as many extensions as you like. You could, for example have:
 C<['.init','.do','.view','.final']>
@@ -238,16 +540,17 @@ C<['.init','.do','.view','.final']>
 
 For each extension, first the "root" file C<file.ext> is tested, then a file
 that matches C<file-METHOD.ext> is tested (where METHOD is the HTTP request
-method for this request, .ext is the extension).
+method for this request, .ext is the extension). Finally C<file-ANY.ext> is
+checked.
 
 =item * Iterating up the directory tree
 
-If your call to C<path/to/file> results in a miss for C<path/to/file.do>, DoFile
-will then test for C<path/to.do> and finally C<path.do> before moving on to
-C<path/to/file-METHOD.do>
+If your call to C<path/to/file> results in a miss for C<path/to/file.ctl>, DoFile
+will then test for C<path/to.ctl> and finally C<path.ctl> before moving on to
+C<path/to/file-METHOD.ctl>
 
 Once DoFile has found one it will not transcend the directory tree any further.
-Therefore defining C<path/to/file.do> and C<path/to.do> will not result in
+Therefore defining C<path/to/file.ctl> and C<path/to.ctl> will not result in
 both being executed for the URI C<path/to/file> - only the first will be
 executed.
 

@@ -3,13 +3,17 @@ package Email::Stuffer::TestLinks;
 use strict;
 use warnings;
 
-our $VERSION = 0.020;
+our $VERSION = '0.03';
 
-use Test::Most;
-use Mojolicious 6.00;
-use Mojo::UserAgent;
+use Test::More;
+use Mojo::DOM;
 use Email::Stuffer;
 use Class::Method::Modifiers qw/ install_modifier /;
+use IO::Async::Loop;
+use Net::Async::HTTP;
+use IO::Async::SSL;
+use URI;
+use Future::Utils qw( fmap_void );
 
 =head1 SYNOPSIS
 
@@ -22,17 +26,17 @@ Email::Stuffer>send_or_die()
 
 =head1 DESCRIPTION
 
-When this module is included in a test, it parses HTML links (<a href="xyz"...)
-in every email sent through Email::Stuffer->send_or_die(). Each URI must get a
-successful response code (200 range) and the returned pagetitle must not contain
-'error' or 'not found'.
+When this module is included in a test, it parses http links (<a href="xyz">...</a>)
+and image links (<img src="xyz">) in every email sent through Email::Stuffer->send_or_die().
+Each URI must be  get a successful response code (200 range).
+Page title must not contain 'error' or 'not found' for text/html content.
+Image links must return an image content type.
 
 =cut
 
 install_modifier 'Email::Stuffer', after => send_or_die => sub {
 
     my $self = shift;
-    my $ua = Mojo::UserAgent->new(max_redirects => 10, connect_timeout => 5);
 
     my %urls;
     $self->email->walk_parts(
@@ -40,37 +44,60 @@ install_modifier 'Email::Stuffer', after => send_or_die => sub {
             my ($part) = @_;
             return unless ($part->content_type && $part->content_type =~ /text\/html/i);
             my $dom = Mojo::DOM->new($part->body);
-            my $links = $dom->find('a')->map(attr => 'href')->compact;
-
-            # Exclude anchors, mailto
-            $urls{$_} = 1 for (grep { !/^mailto:/ } @$links);
+            push @{$urls{http}},  $dom->find('a')->map(attr => 'href')->compact->grep(sub { $_ !~ /^mailto:/ })->uniq->to_array->@*;
+            push @{$urls{image}}, $dom->find('img')->map(attr => 'src')->compact->uniq->to_array->@*;
         });
 
-    for my $url (sort keys %urls) {
+    my @data = map {
+        my $type = $_;
+        map { [$type, $_] } $urls{$type}->@*
+    } keys %urls;
 
-        my $err = '';
+    my $loop = IO::Async::Loop->new();
+    $loop->add(my $http = Net::Async::HTTP->new(max_connections_per_host => 3));
 
-        if ($url =~ /^[#\/]/) {
-            $err = "$url is not a valid URL for an email";
-        } else {
-            my $tx = $ua->get($url);
+    (
+        fmap_void {
+            my ($type, $url) = @$_;
 
-            if ($tx->success) {
-                my $res = $tx->result;
-
-                if ($res->code !~ /^2\d\d/) {
-                    $err = "HTTP code was " . $res->code;
-                } else {
-                    my $title = $res->dom->at('title')->text;
-                    $err = "Page title contains text '$1'"
-                        if $title =~ /(error|not found)/i;
-                }
-            } else {
-                $err = "Could not retrieve URL: " . $tx->error->{message};
+            my $uri = URI->new($url);
+            unless ($uri->scheme) {
+                fail "$type link $url is an invalid uri";
+                return Future->done;
             }
+
+            $http->GET(URI->new($uri))->then(
+                sub {
+                    my $response = shift;
+
+                    return Future->fail("Response code was " . $response->code) if ($response->code !~ /^2\d\d/);
+
+                    if ($response->content_type eq 'text/html') {
+                        my $dom = Mojo::DOM->new($response->decoded_content);
+                        if (my $title = $dom->at('title')) {
+                            return Future->fail("Page title contains text '$1'") if $title->text =~ /(error|not found)/i;
+                        }
+                    }
+
+                    if ($type eq 'image') {
+                        return Future->fail("Unexpected content type: " . $response->content_type) unless $response->content_type =~ /^image\//;
+                    }
+
+                    return Future->done;
+                }
+            )->transform(
+                done => sub {
+                    pass "$type link works ($url)";
+                },
+                fail => sub {
+                    my $failure = shift;
+                    fail "$type link $url does not work - $failure";
+                }
+            )->else(sub { Future->done })
         }
-        ok(!$err, "Link in email works ($url)") or diag($err);
-    }
+        foreach    => \@data,
+        concurrent => 10
+    )->get;
 
 };
 

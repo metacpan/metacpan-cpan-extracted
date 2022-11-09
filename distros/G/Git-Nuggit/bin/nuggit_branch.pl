@@ -465,14 +465,21 @@ sub is_branch_selected_throughout($)
   my $branch = $_[0];
   my $branch_consistent_throughout = 1;
   my $cnt = 0;
-  print "Checking submodule status . . . ";
+  print "Checking submodule status . . . \n";
 
   submodule_foreach(sub {
       my $subname = File::Spec->catdir(shift, shift);
       
       my $active_branch = get_selected_branch_here();
-         
-      if ($active_branch ne $branch) {
+      if(!defined($active_branch))
+      {
+          say colored("$subname is not on selected branch", 'bold red');
+          say "\t Current branch unknown.";
+          $cnt++;
+                    
+          $branch_consistent_throughout = 0;
+      }  
+      elsif ($active_branch ne $branch) {
           say colored("$subname is not on selected branch", 'bold red');
           say "\t Currently on branch $active_branch";
           $cnt++;
@@ -567,34 +574,46 @@ sub check_branch_merged_all
 
     # TODO: Replace remotes with origin for local detection?
     my $check_cmd = "git branch -a --merged";
+    my $check_branch_known_cmd = "git branch | grep $branch";
     
     $ngt->foreach( {'depth_first' => sub {
-                           my $state = `$check_cmd`;
-                           if (!$state) {
-                               $status = 0;
-                               say "Branch ($branch) not merged/found at ".getcwd() if $verbose;
-                           } else {
-                               my @lines = split('\n', $state);
-                               my $linefound = 0;
-                               foreach my $line (@lines) {
-                                   $line =~ /(remotes\/(?<remote>\w+)\/)?(?<branch>[\w\d\-\_\/]+)/;
-                                   if ($remote && $+{remote} && $+{remote} eq $remote && $+{branch} eq $branch) {
-                                       $linefound = 1; # Match for remote branch
-                                       last;
-                                   } elsif (!$remote && !$+{remote} && $branch eq $+{branch}) {
-                                       $linefound = 1; # Match for local branch
-                                       last;
-                                   }
-                               }
-                               if (!$linefound) {
-                                   $status = 0;
-                                   say "Branch (line not found) not merged/found at ".getcwd() if $verbose;
-                               }
-                           }
-                       },
-                    'run_root' => 1
-                   }
-                  );
+              # is the branch unknown
+              my $branch_known = `$check_branch_known_cmd`;
+              if( $branch_known eq "")
+              {
+                #branch is not found in this repository... consider this merged and deleted... not an error.
+              }
+              else  
+              {
+                # branch does exist in this repo, check if it is merged
+                my $state = `$check_cmd`;
+                if (!$state) {
+                    $status = 0;
+                    say "Branch ($branch) not merged/found at ".getcwd() if $verbose;
+                } else {
+                    #print $state . "\n";
+                    my @lines = split('\n', $state);
+                    my $linefound = 0;
+                    foreach my $line (@lines) {
+                        $line =~ /(remotes\/(?<remote>\w+)\/)?(?<branch>[\w\d\-\_\/]+)/;
+                        if ($remote && $+{remote} && $+{remote} eq $remote && $+{branch} eq $branch) {
+                            $linefound = 1; # Match for remote branch
+                            last;
+                        } elsif (!$remote && !$+{remote} && $branch eq $+{branch}) {
+                            $linefound = 1; # Match for local branch
+                            last;
+                        }
+                    }
+                    if (!$linefound) {
+                        $status = 0;
+                        say "Branch (line not found) not merged/found at ".getcwd() if $verbose;
+                    }
+                }
+             }
+          },
+       'run_root' => 1
+      }
+     );
     return $status;
 }
 

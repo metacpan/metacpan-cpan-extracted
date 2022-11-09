@@ -118,10 +118,9 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-Catalyst-Runtime@rt.cpan.org",
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-Runtime"
+         "web" : "https://github.com/perl-catalyst/catalyst-runtime/issues"
       },
-      "homepage" : "http://dev.catalyst.perl.org/",
+      "homepage" : "https://github.com/perl-catalyst/catalyst-runtime",
       "license" : [
          "http://dev.perl.org/licenses/"
       ],
@@ -133,7 +132,7 @@
       "x_IRC" : "irc://irc.perl.org/#catalyst",
       "x_MailingList" : "http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst"
    },
-   "version" : "5.90129",
+   "version" : "5.90130",
    "x_authority" : "cpan:MSTROUT",
    "x_breaks" : {
       "Catalyst::Action::REST" : "<= 0.67",
@@ -163,5 +162,5 @@
       "Reaction" : "<= 0.001999",
       "Test::WWW::Mechanize::Catalyst" : "<= 0.53"
    },
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

@@ -23,7 +23,10 @@ bin/nuggit_reset.pl
 bin/nuggit_rm.pl
 bin/nuggit_stash.pl
 bin/nuggit_status.pl
+bin/nuggit_tools.pl
 bin/nuggit_tree.pl
+bin/squash-rebase.pl
+bin/squash.pl
 CHANGELOG.md
 docs/alias.pod
 docs/checkout.pod
@@ -33,6 +36,7 @@ docs/merge-tree.pod
 docs/merge.pod
 docs/pull.pod
 docs/rebase.pod
+Git-Nuggit-1.tar.gz
 lib/Git/Nuggit.pm
 lib/Git/Nuggit/Log.pm
 lib/Git/Nuggit/Status.pm

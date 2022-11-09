@@ -12,6 +12,6 @@ my $handler = Locale::Maketext::Test->new(
 
 my $result = $handler->testlocales();
 
-is scalar @{$result->{errors}->{pt}}, 2, 'One error is for missing translation, other for fuzzy';
-is $result->{status}, 0, 'Status is 0 as translations is missing';
+is scalar @{$result->{errors}->{pt}},  2, 'One error is for missing translation, other for fuzzy';
+is $result->{status},                  0, 'Status is 0 as translations is missing';
 is scalar keys %{$result->{warnings}}, 0, 'No warnings as no debug flag is set';

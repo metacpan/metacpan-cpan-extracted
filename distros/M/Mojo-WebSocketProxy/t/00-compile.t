@@ -6,13 +6,12 @@ use warnings;
 
 use Test::More;
 
-plan tests => 8 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 7 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Mojo/WebSocketProxy.pm',
     'Mojo/WebSocketProxy/Backend.pm',
     'Mojo/WebSocketProxy/Backend/JSONRPC.pm',
-    'Mojo/WebSocketProxy/Backend/JobAsync.pm',
     'Mojo/WebSocketProxy/Config.pm',
     'Mojo/WebSocketProxy/Dispatcher.pm',
     'Mojo/WebSocketProxy/Parser.pm',

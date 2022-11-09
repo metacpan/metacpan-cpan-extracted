@@ -33,4 +33,6 @@ requires:
   IPC::Run3: '0'
   JSON: '0'
   Term::ANSIColor: '4'
-version: 1
+resources:
+  repository: git://github.com/monacca1/nuggit.git
+version: 1.01

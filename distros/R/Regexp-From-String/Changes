@@ -1,3 +1,28 @@
+0.007   2022-11-08  Released-By: PERLANCAR; Urgency: medium
+
+        - [security] Add 'safety' option (GH#1) and defaults to safety=1.
+
+
+0.006   2022-11-04  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Deprecate the case_insensitive option in favor of ci, the former
+          is now no longer documented (but still supported).
+
+
+0.005   2022-11-03  Released-By: PERLANCAR; Urgency: medium
+
+        - Also allow options for str_maybe_to_re().
+
+        - Add alias ci for option case_insensitive.
+
+        - [safety] Die on unknown option.
+
+        - Also apply ci and anchored options to string of the form /.../ and
+          qr(...).
+
+
 0.004   2022-11-03  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

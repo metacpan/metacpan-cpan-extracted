@@ -1,4 +1,4 @@
-package Dist::Zilla::MVP::Assembler::Zilla 6.027;
+package Dist::Zilla::MVP::Assembler::Zilla 6.028;
 # ABSTRACT: Dist::Zilla::MVP::Assembler for the Dist::Zilla object
 
 use Moose;
@@ -84,7 +84,7 @@ Dist::Zilla::MVP::Assembler::Zilla - Dist::Zilla::MVP::Assembler for the Dist::Z
 
 =head1 VERSION
 
-version 6.027
+version 6.028
 
 =head1 OVERVIEW
 

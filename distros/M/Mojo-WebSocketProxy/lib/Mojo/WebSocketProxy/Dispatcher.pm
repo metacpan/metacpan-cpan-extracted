@@ -9,17 +9,17 @@ use Mojo::WebSocketProxy::Config;
 
 use Class::Method::Modifiers;
 
-use JSON::MaybeUTF8 qw(:v1);
+use JSON::MaybeUTF8    qw(:v1);
 use Unicode::Normalize ();
 use Future::Mojo 0.004;    # ->new_timeout
 use Future::Utils qw(fmap);
-use Scalar::Util qw(blessed);
+use Scalar::Util  qw(blessed);
 use Encode;
 use DataDog::DogStatsd::Helper qw(stats_inc);
 
 use constant TIMEOUT => $ENV{MOJO_WEBSOCKETPROXY_TIMEOUT} || 15;
 
-our $VERSION = '0.13';     ## VERSION
+our $VERSION = '0.14';     ## VERSION
 around 'send' => sub {
     my ($orig, $c, $api_response, $req_storage) = @_;
 
@@ -58,7 +58,7 @@ sub open_connection {
     my $config = $c->wsp_config->{config};
 
     Mojo::IOLoop->singleton->stream($c->tx->connection)->timeout($config->{stream_timeout}) if $config->{stream_timeout};
-    Mojo::IOLoop->singleton->max_connections($config->{max_connections}) if $config->{max_connections};
+    Mojo::IOLoop->singleton->max_connections($config->{max_connections})                    if $config->{max_connections};
 
     $config->{opened_connection}->($c) if $config->{opened_connection};
 
@@ -145,7 +145,7 @@ sub on_message {
             return $req_storage->{instead_of_forward}->($c, $req_storage) if $req_storage->{instead_of_forward};
             return $c->forward($req_storage);
         }
-        )->then(
+    )->then(
         sub {
             my $result = shift;
             return $c->after_forward($result, $req_storage)->transform(done => sub { $result });
@@ -162,13 +162,13 @@ sub on_message {
             }
         ),
         $f
-        )->then(
+    )->then(
         sub {
             my ($result) = @_;
             $c->send({json => $result}, $req_storage) if $result;
             return $c->_run_hooks($config->{after_dispatch} || []);
         }
-        )->on_fail(
+    )->on_fail(
         sub {
             $c->app->log->error("An error occurred handling on_message. Error @_");
         })->retain;
@@ -205,7 +205,7 @@ sub _run_hooks {
     my $hooks       = shift @hook_params;
 
     my $result_f = fmap {
-        my $hook = shift;
+        my $hook   = shift;
         my $result = $hook->($c, @hook_params) or return Future->done;
         return $result if blessed($result) && $result->isa('Future');
         return Future->fail($result);
@@ -241,8 +241,11 @@ sub forward {
         ];
     }
 
+    # default to config (generic) only if call specific is not defined
+    $req_storage->{rpc_failure_cb} //= $config->{rpc_failure_cb};
+
     my $backend_name = $req_storage->{backend} // "default";
-    my $backend = $c->wsp_config->{backends}{$backend_name}
+    my $backend      = $c->wsp_config->{backends}{$backend_name}
         or die "Cannot dispatch request - no backend named '$backend_name'";
 
     $backend->call_rpc($c, $req_storage);
@@ -290,8 +293,6 @@ Handle message - parse and dispatch request messages.
 Dispatching action and forward to RPC server. Note that all
 incoming JSON messages are first normalised using
 L<NFC|https://www.w3.org/International/articles/unicode-migration/#normalization>.
- 
-
 
 =head2 before_forward
 

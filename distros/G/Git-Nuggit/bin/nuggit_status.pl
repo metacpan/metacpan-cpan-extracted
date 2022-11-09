@@ -53,6 +53,10 @@ Show ignored files
 
 Show raw status structure in JSON format.
 
+=item --conflicts | -c
+
+Filter status output to show submodule summaries and conflicted files only.
+
 =back
 
 =head2 Output Details
@@ -107,6 +111,7 @@ my $rtv = Getopt::Long::GetOptions(
     'json' => \$do_json,
     'all|a!' => \$flags->{all},
     'details|d!' => \$flags->{details},
+    'conflicts|c' => \$flags->{conflicts_only},
    );
 if (!$rtv) { pod2usage(1); die("Unrecognized options specified"); }
 

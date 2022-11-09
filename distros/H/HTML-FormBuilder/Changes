@@ -1,4 +1,6 @@
 Revision history for HTML-FormBuilder
+0.13      2022-11-09 06:10:36+00:00 UTC
+       - fix several bugs
 
 0.11  2015-12-10
         - encode / decode HTML entities in get / set field

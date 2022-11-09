@@ -14,7 +14,7 @@ use Moo;
 use namespace::clean;
 extends qw(HTML::FormBuilder);
 
-our $VERSION = '0.12';    ## VERSION
+our $VERSION = '0.13';    ## VERSION
 
 has has_error_of => (
     is      => 'rw',
@@ -304,7 +304,7 @@ sub _build_single_javascript_validation {
     }
 
     my $error_if_true = $validation->{error_if_true} ? '' : '!';
-    my $test = '';
+    my $test          = '';
     if ($validation->{'type'} eq 'regexp') {
         my $regexp = $validation->{'regexp'};
         $regexp =~ s/(\\|')/\\$1/g;
@@ -409,9 +409,8 @@ sub _validate_field {
             {
                 $self->set_field_error_message($input_element_id, $validation->{'err_msg'});
                 return 0;
-            }
 
-            elsif ($validation->{'type'} eq 'checkbox_checked' && !$field_value) {
+            } elsif ($validation->{'type'} eq 'checkbox_checked' && !$field_value) {
                 $self->set_field_error_message($input_element_id, $validation->{'err_msg'});
                 return 0;
             }

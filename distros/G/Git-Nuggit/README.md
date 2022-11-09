@@ -16,11 +16,12 @@ scripts.  Tab auto-completion is optionally available for the 'ngt'
 form when using the Bash shell.
 
 
-The nuggit.sh or nuggit.csh shell should be sourced to add nuggit to
-your path for bash or csh respectively (required for auto-completion).
-These files can be used as an example if needed to adopt for other
-shell environments.  If installed via cpan, this step is optional,
-however may be required to enable shell-specific features.
+For full functionality the nuggit.sh or nuggit.csh shell should be
+sourced to add nuggit to your path for bash or csh respectively
+(required for auto-completion).  These files can be used as an example
+if needed to adopt for other shell environments.  If installed via
+cpan, this step is optional, however may be required to enable
+shell-specific features.
 
 Full usage information is available via man pages for most scripts, or
 from the command-line by specifying '--man' (for detailed usage) or
@@ -45,13 +46,18 @@ if you have not defined your git user.name and user.email.  These can
 be set with "git config --global user.email my@email.com" and "git
 config --global user.name 'J Doe'"
 
-### CPAN (local, recommended)
+### CPAN (recommended)
+Nuggit is now listed in CPAN and can be installed directly with:
+
+   "cpan Git::Nuggit"
+   
+### CPAN (local, for developers)
 
 Clone this repository and run "cpan ." from within the current folder
 to automatically install all dependencies.
 
-It is intended for this module to eventually be available from CPAN as
-"cpan Git::Nuggit"
+This is the recommended installation method for developers, or users
+requiring a specific version of Nuggit.
 
 ### Makefile.PL
 

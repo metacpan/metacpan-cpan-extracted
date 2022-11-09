@@ -1417,6 +1417,10 @@ A shared memory segment object must be first created with the L</open> method, b
 
 When called, this will set L<CBOR::XS> as the data serialisation mechanism when storing data to memory or reading data from memory.
 
+=head2 close
+
+This is an alias for L</remove>
+
 =head2 create
 
 Set or get the boolean value to true to indicate you want to create the shared memory block if it does not exist already. Default to false.

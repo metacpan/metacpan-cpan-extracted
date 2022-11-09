@@ -1,7 +1,14 @@
 Revision history for Perl module Mojo::WebSocketProxy
+0.14      2022-11-09 07:45:53+00:00 UTC
+    - Move Mojo::WebSocketProxy::Backend::JobAsync and Mojo::WebSocketProxy::Backend::ConsumerGroups out
+    - Add support for separating messages to different channels with
+      different timeout values for each channel.
+    - Increase minimum Perl version from 5.014 to 5.024 for the module.
+    - Remove warning line for RPC communication failure.
+    - Add documentation about RPC failure callback.
 
 0.13      2019-09-20 01:44:27+00:00 UTC
-
+    - Change sanity error type
     - Add callback for use on RPC communication failure
 
 0.12      2019-08-15 09:57:43+00:00 UTC
@@ -43,11 +50,11 @@ Revision history for Perl module Mojo::WebSocketProxy
 0.04      2017-02-21 02:16:06+00:00 UTC
     - Switch to dzil
 
-0.03 Thu Jun  9 15:50:00 2016
+0.03 2016-06-09 15:50:00
     - Use before send hook to check response size
 
-0.02 Thu Jun  9 09:28:00 2016
+0.02 2016-06-09 09:28:00
     - Minor fixes
 
-0.01 Thu Jun  2 06:02:18 2016
+0.01 2016-0602 06:02:18
     - First version, released on an unsuspecting world.

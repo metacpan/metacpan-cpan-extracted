@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Finfo.pm
-## Version v0.3.1
+## Version v0.3.2
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2022/08/05
+## Modified 2022/11/06
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -17,11 +17,9 @@ BEGIN
     use warnings;
     use warnings::register;
     use parent qw( Module::Generic );
-    use DateTime;
-    use DateTime::Format::Strptime;
+    use vars qw( $VERSION $HAS_LOCAL_TZ );
     use File::Basename ();
     use File::MMagic::XS ();
-    use Module::Generic::DateTime;
     use Module::Generic::Null;
     use Nice::Try;
     use Want;
@@ -65,7 +63,7 @@ BEGIN
     };
     our %EXPORT_TAGS = ( all => [qw( FILETYPE_NOFILE FILETYPE_REG FILETYPE_DIR FILETYPE_CHR FILETYPE_BLK FILETYPE_PIPE FILETYPE_LNK FILETYPE_SOCK FILETYPE_UNKFILE )] );
     our @EXPORT_OK = qw( FILETYPE_NOFILE FILETYPE_REG FILETYPE_DIR FILETYPE_CHR FILETYPE_BLK FILETYPE_PIPE FILETYPE_LNK FILETYPE_SOCK FILETYPE_UNKFILE );
-    our $VERSION = 'v0.3.1';
+    our $VERSION = 'v0.3.2';
 };
 
 use strict;
@@ -391,15 +389,35 @@ sub _datetime
     my $class = ref( $self ) || $self;
     try
     {
+        require DateTime;
+        require DateTime::Format::Strptime;
+        require Module::Generic::DateTime;
         my $dt;
-        try
+        if( !defined( $HAS_LOCAL_TZ ) )
         {
-            $dt = DateTime->from_epoch( epoch => $t, time_zone => 'local' );
+            try
+            {
+                $dt = DateTime->from_epoch( epoch => $t, time_zone => 'local' );
+                $HAS_LOCAL_TZ = 1;
+            }
+            catch( $e )
+            {
+                $HAS_LOCAL_TZ = 0;
+                warn( "Your system is missing key timezone components. ${class}::_datetime is reverting to UTC instead of local time zone.\n" );
+                $dt = DateTime->from_epoch( epoch => $t, time_zone => 'UTC' );
+            }
         }
-        catch( $e )
+        else
         {
-            warn( "Your system is missing key timezone components. ${class}::_datetime is reverting to UTC instead of local time zone.\n" );
-            $dt = DateTime->from_epoch( epoch => $t, time_zone => 'UTC' );
+            try
+            {
+                $dt = DateTime->from_epoch( epoch => $t, time_zone => ( $HAS_LOCAL_TZ ? 'local' : 'UTC' ) );
+            }
+            catch( $e )
+            {
+                warn( "Error trying to set a DateTime object using ", ( $HAS_LOCAL_TZ ? 'local' : 'UTC' ), " time zone\n" );
+                $dt = DateTime->from_epoch( epoch => $t, time_zone => 'UTC' );
+            }
         }
         
         my $fmt = DateTime::Format::Strptime->new(
@@ -550,7 +568,7 @@ Module::Generic::Finfo - File Info Object Class
 
 =head1 VERSION
 
-    v0.3.1
+    v0.3.2
 
 =head1 DESCRIPTION
 

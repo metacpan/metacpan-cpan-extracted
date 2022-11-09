@@ -27,7 +27,7 @@ foreach my $fn (@files)
 		$newopts{model} = $fn;
 	}
 
-	my $c = RF::Component->load("$datadir/$fn", undef, %newopts);
+	my $c = RF::Component->load("$datadir/$fn", %newopts);
 
 	my $n_freqs = $c->{freqs}->nelem;
 	my $n_ports = n_ports($c->S); 

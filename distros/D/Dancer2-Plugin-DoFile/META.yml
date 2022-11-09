@@ -30,6 +30,7 @@ no_index:
     - inc
 requires:
   Dancer2: '0'
+  HTTP::Accept: '0'
   Hash::Merge: '0'
   JSON: '0'
   perl: '5.008004'
@@ -37,5 +38,5 @@ requires:
   warnings: '0'
 resources:
   repository: https://github.com/Pero-Moretti/Perl-Dancer2-Plugin-DoFile.git
-version: '0.12'
+version: '0.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

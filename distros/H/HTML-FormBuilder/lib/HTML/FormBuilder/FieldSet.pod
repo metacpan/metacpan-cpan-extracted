@@ -1,0 +1,78 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with HTML::FormBuilder::FieldSet
+at lib/HTML/FormBuilder/FieldSet.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+HTML::FormBuilder::FieldSet - FieldSet container used by HTML::FormBuilder
+
+=head1 SYNOPSIS
+
+    my $form = HTML::FormBuilder->new(data => {id => 'testform});
+
+    my $fieldset = $form->add_fieldset({id => 'fieldset1'});
+
+    $fieldset->add_field({input => {type => 'text', value => 'Join'}});
+
+    $form->add_field($fieldset_index, {input => {type => 'text', value => 'Join'}});
+
+=head1 Attributes
+
+=head2 fields
+
+The fields included by this fieldset.
+
+=head1 Methods
+
+=head2 build
+
+    my ($fieldset_group, $fieldset_html) = $fieldset->build();
+
+=head2 add_field
+
+    $fieldset->add_field({input => {type => 'text', value => 'name'}});
+
+append the field into fieldset and return that field
+
+=head2 add_fields
+
+    $fieldset->add_fields({input => {type => 'text', value => 'name'}},{input => {type => 'text', value => 'address'}});
+
+append fields into fieldset and return the number of fields added.
+
+=head2 data
+
+=head1 AUTHOR
+
+Chylli L<mailto:chylli@binary.com>
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<HTML::FormBuilder::Base>
+
+L<classes|HTML::FormBuilder::Base/classes>, L<localize|HTML::FormBuilder::Base/localize>
+
+=item L<Moo::Object>
+
+L<BUILDALL|Moo::Object/BUILDALL>, L<BUILDARGS|Moo::Object/BUILDARGS>, L<DEMOLISHALL|Moo::Object/DEMOLISHALL>, L<does|Moo::Object/does>, L<meta|Moo::Object/meta>
+
+=back
+
+=head1 CONTRIBUTOR
+
+Fayland Lam L<mailto:fayland@binary.com>
+
+Tee Shuwn Yuan L<mailto:shuwnyuan@binary.com>
+
+=head1 COPYRIGHT AND LICENSE
+

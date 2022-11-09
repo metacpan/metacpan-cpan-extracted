@@ -12,7 +12,7 @@ use Moo;
 use namespace::clean;
 extends qw(HTML::FormBuilder::Base);
 
-our $VERSION = '0.12';    ## VERSION
+our $VERSION = '0.13';    ## VERSION
 
 has data => (
     is  => 'ro',
@@ -75,7 +75,7 @@ sub build {
 
     #FIXME this attribute should be deleted, or it will emit to the html code
     my $fieldset_group = $data->{'group'};
-    my $stacked = defined $data->{'stacked'} ? $data->{'stacked'} : 1;
+    my $stacked        = defined $data->{'stacked'} ? $data->{'stacked'} : 1;
 
     if (not $fieldset_group) {
         $fieldset_group = 'no-group';

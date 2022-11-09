@@ -1,4 +1,4 @@
-package Dist::Zilla::Path 6.027;
+package Dist::Zilla::Path 6.028;
 # ABSTRACT: a helper to get Path::Tiny objects
 
 use Dist::Zilla::Pragmas;
@@ -64,7 +64,7 @@ Dist::Zilla::Path - a helper to get Path::Tiny objects
 
 =head1 VERSION
 
-version 6.027
+version 6.028
 
 =head1 PERL VERSION
 

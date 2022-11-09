@@ -62,8 +62,36 @@ sub confess { unshift @_, 'confess'; goto \&_error_handler }
     *guard = sub (&) { bless [ 0, @_ ] => $GUARD_PACKAGE };
 }
 
+# Exportable lock and unlock
+sub _lul {
+    my ( $lul, $ref ) = @_;
+    if ( ref $ref eq 'ARRAY' ) {
+        &Internals::SvREADONLY( $ref, $lul );
+        &Internals::SvREADONLY( \$_, $lul ) for @$ref;
+        return;
+    }
+    if ( ref $ref eq 'HASH' ) {
+        &Internals::hv_clear_placeholders( $ref );
+        &Internals::SvREADONLY( $ref, $lul );
+        &Internals::SvREADONLY( \$_, $lul ) for values %$ref;
+        return;
+    }
+    return;
+}
+
+sub lock {
+    unshift @_, true;
+    goto \&_lul;
+}
+
+sub unlock {
+    my $ref = shift;
+    _lul( 0 , $ref );
+    &guard( sub { _lul( 1, $ref ) } );
+}
+
 sub _is_compiling {
-    return !! $ENV{MITE_COMPILE};
+    defined $Mite::COMPILING and $Mite::COMPILING eq __PACKAGE__;
 }
 
 sub import {

@@ -209,6 +209,7 @@ t/encoding_set_in_app.t
 t/encoding_set_in_plugin.t
 t/evil_stash.t
 t/execute_exception.t
+t/forward_instances.t
 t/head_middleware.t
 t/http_exceptions.t
 t/http_exceptions_backcompat.t

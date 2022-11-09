@@ -2,7 +2,7 @@ requires 'File::Spec';
 requires 'Locale::Maketext::ManyPluralForms';
 requires 'Moose';
 requires 'Test::MockModule';
-requires 'Try::Tiny';
+requires 'Syntax::Keyword::Try';
 requires 'namespace::autoclean';
 requires 'perl', '5.014';
 

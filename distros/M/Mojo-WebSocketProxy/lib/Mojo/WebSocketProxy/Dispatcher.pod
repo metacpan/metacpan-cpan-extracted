@@ -1,0 +1,83 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Mojo::WebSocketProxy::Dispatcher
+at lib/Mojo/WebSocketProxy/Dispatcher.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Mojo::WebSocketProxy::Dispatcher
+
+=head1 DESCRIPTION
+
+Using this module you can forward websocket JSON-RPC 2.0 requests to RPC server.
+See L<Mojo::WebSocketProxy> for details on how to use hooks and parameters.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Mojolicious::Controller>
+
+L<app|Mojolicious::Controller/app>, L<continue|Mojolicious::Controller/continue>, L<cookie|Mojolicious::Controller/cookie>, L<every_cookie|Mojolicious::Controller/every_cookie>, L<every_param|Mojolicious::Controller/every_param>, L<every_signed_cookie|Mojolicious::Controller/every_signed_cookie>, L<finish|Mojolicious::Controller/finish>, L<flash|Mojolicious::Controller/flash>, L<helpers|Mojolicious::Controller/helpers>, L<match|Mojolicious::Controller/match>, L<on|Mojolicious::Controller/on>, L<param|Mojolicious::Controller/param>, L<redirect_to|Mojolicious::Controller/redirect_to>, L<render|Mojolicious::Controller/render>, L<render_later|Mojolicious::Controller/render_later>, L<render_maybe|Mojolicious::Controller/render_maybe>, L<render_to_string|Mojolicious::Controller/render_to_string>, L<rendered|Mojolicious::Controller/rendered>, L<req|Mojolicious::Controller/req>, L<res|Mojolicious::Controller/res>, L<respond_to|Mojolicious::Controller/respond_to>, L<session|Mojolicious::Controller/session>, L<signed_cookie|Mojolicious::Controller/signed_cookie>, L<stash|Mojolicious::Controller/stash>, L<tx|Mojolicious::Controller/tx>, L<url_for|Mojolicious::Controller/url_for>, L<validation|Mojolicious::Controller/validation>, L<write|Mojolicious::Controller/write>, L<write_chunk|Mojolicious::Controller/write_chunk>
+
+=item L<Mojo::Base>
+
+L<attr|Mojo::Base/attr>, L<import|Mojo::Base/import>, L<new|Mojo::Base/new>, L<tap|Mojo::Base/tap>
+
+=back
+
+=head1 METHODS
+
+=head2 open_connection
+
+Run while opening new wss connection.
+Run hook when connection is opened.
+Set finish connection callback.
+
+=head2 on_message
+
+Handle message - parse and dispatch request messages.
+Dispatching action and forward to RPC server. Note that all
+incoming JSON messages are first normalised using
+L<NFC|https://www.w3.org/International/articles/unicode-migration/#normalization>.
+
+=head2 before_forward
+
+Run hooks.
+
+=head2 after_forward
+
+Run hooks.
+
+=head2 dispatch
+
+Dispatch request using message json key.
+
+=head2 forward
+
+Forward call to RPC server using global and action hooks.
+Don't forward call to RPC if any before_forward hook returns response.
+Or if there is instead_of_forward action.
+
+=head2 _get_error_details
+
+Generates and returns a hash for error reporting
+
+=head2 ok
+
+=head1 SEE ALSO
+
+L<Mojolicious::Plugin::WebSocketProxy>,
+L<Mojo::WebSocketProxy>,
+L<Mojo::WebSocketProxy::Backend>,
+L<Mojo::WebSocketProxy::Dispatcher>,
+L<Mojo::WebSocketProxy::Config>
+L<Mojo::WebSocketProxy::Parser>
+

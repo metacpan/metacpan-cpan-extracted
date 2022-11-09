@@ -1,4 +1,4 @@
-package Dist::Zilla::Types 6.027;
+package Dist::Zilla::Types 6.028;
 # ABSTRACT: dzil-specific type library
 
 use Dist::Zilla::Pragmas;
@@ -63,7 +63,7 @@ Dist::Zilla::Types - dzil-specific type library
 
 =head1 VERSION
 
-version 6.027
+version 6.028
 
 =head1 OVERVIEW
 

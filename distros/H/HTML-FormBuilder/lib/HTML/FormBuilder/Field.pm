@@ -11,7 +11,7 @@ use Moo;
 use namespace::clean;
 extends qw(HTML::FormBuilder::Base);
 
-our $VERSION = '0.12';    ## VERSION
+our $VERSION = '0.13';    ## VERSION
 
 has data => (
     is  => 'ro',
@@ -77,7 +77,7 @@ sub build {
         my $label_text = $data->{'label'}->{'text'} || '';
         undef $data->{'label'}->{'text'};
         my $required_mark = delete $data->{label}{required_mark} || 0;
-        my $label_html = $self->_build_element_and_attributes('label', $data->{'label'}, $label_text, {required_mark => $required_mark},);
+        my $label_html    = $self->_build_element_and_attributes('label', $data->{'label'}, $label_text, {required_mark => $required_mark},);
 
         # add a tooltip explanation if given
         if ($data->{'label'}{'tooltip'}) {

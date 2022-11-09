@@ -1,6 +1,6 @@
 # -*- Perl -*-
 
-package Game::Marad 0.02;
+package Game::Marad 0.04;
 use 5.26.0;
 use Object::Pad 0.52;
 class Game::Marad :strict(params);
@@ -35,7 +35,6 @@ has $board      :reader;
 has $move_count :reader;
 has $player     :reader;
 has $score      :reader;
-has $turn       :reader;
 
 ADJUST {
     $board = [
@@ -52,12 +51,19 @@ ADJUST {
     $move_count = _move_count();
     $player     = 0;
     $score      = [ 0, 0 ];
-    $turn       = 0;
 }
 
 ########################################################################
 #
 # METHODS
+
+method is_owner( $x, $y ) {
+    return 0 if $x < 0 or $x >= BOARD_SIZE or $y < 0 or $y >= BOARD_SIZE;
+    my $piece = $board->[$y][$x];
+    return 0 if $piece == PIECE_EMPTY;
+    return 0 unless ( $piece >> PLAYER_BIT & 1 ) == $player;
+    return 1;
+}
 
 # try to carry out a game move involving two points, generally from a
 # player selecting a piece to move and a direction (via the destination
@@ -100,12 +106,14 @@ method move( $srcx, $srcy, $dstx, $dsty ) {
     }
 
     $player ^= 1;
-    if ( ( ++$turn & 1 ) == 0 ) {
-        $move_count = _move_count();
-    }
+    $move_count = _move_count() if $player == 0;
 
     return 1, "ok";
 }
+
+# boards of different sizes might be supported in which case clients may
+# need something like the following to obtain that information
+method size() { return BOARD_SIZE }
 
 ########################################################################
 #
@@ -194,6 +202,11 @@ study the module and C<bin/pmarad> to work out these details.
 Returns a reference to the game board. Callers should not modify this,
 only read from it.
 
+=item B<is_owner> I<x> I<y>
+
+Returns true if the current player owns the piece on the given point,
+false otherwise.
+
 =item B<move_count>
 
 Returns the current move count (how far a piece moved will move). This
@@ -215,14 +228,14 @@ Constructor. Returns a new game in the initial game state.
 
 Returns the player C<0> or C<1> whose turn it is to move.
 
+=item B<size>
+
+Returns the size of the game board, C<9>.
+
 =item B<score>
 
 Returns an array reference containing the current score. Clients again
 should not modify this, only read from it.
-
-=item B<turn>
-
-Returns the current turn count, starting from 0 as the first turn.
 
 =back
 

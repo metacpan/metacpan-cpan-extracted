@@ -2,12 +2,12 @@ Build.PL
 Changes
 LICENSE
 MANIFEST
+META.json
+META.yml
 README
 bin/pmarad
 lib/Game/Marad.pm
 t/00-load.t
 t/10-game.t
 t/pod.t
-META.yml
-META.json
 SIGNATURE    Added here by Module::Build

@@ -93,9 +93,9 @@ the site with a moderate load.  An alternate ExifTool homepage is available at
 </div>
 
 <blockquote><table class='dl lg'><tr><td><b>
-<a href="Image-ExifTool-12.42.tar.gz">
-Download        Version 12.42</a> (4.8 MB) -
-<a href="history.html">June 1, 2022</a></b></td></tr></table></blockquote>
+<a href="Image-ExifTool-12.50.tar.gz">
+Download        Version 12.50</a> (4.9 MB) -
+<a href="history.html">Nov. 8, 2022</a></b></td></tr></table></blockquote>
 
 <p><b>ExifTool is a platform-independent <a href="ExifTool.html">Perl
 library</a> plus a <a href="exiftool_pod.html">command-line application</a> for
@@ -148,8 +148,8 @@ distribution above.)</i></p>
 
 <blockquote><table class='dl lg'><tr><td><b>
 <a name="alone">Windows Executable:</a>
-<a href="exiftool-12.42.zip">
-         exiftool-12.42.zip</a> (6.4 MB)</b></td></tr></table></blockquote>
+<a href="exiftool-12.50.zip">
+         exiftool-12.50.zip</a> (6.5 MB)</b></td></tr></table></blockquote>
 
 <p><b>The stand-alone Windows executable</b> does not require Perl. Just
 download and un-zip the archive then double-click on
@@ -166,8 +166,8 @@ if you have any problems/comments with this version.)</i></p>
 
 <blockquote><table class='dl lg'><tr><td><b>
 MacOS Package:
-<a href="ExifTool-12.42.dmg">
-         ExifTool-12.42.dmg</a> (3.1 MB)</b></td></tr></table></blockquote>
+<a href="ExifTool-12.50.dmg">
+         ExifTool-12.50.dmg</a> (3.1 MB)</b></td></tr></table></blockquote>
 
 <p><b>The MacOS package</b> installs the ExifTool command-line application and
 libraries in /usr/local/bin. After installing, type "<code>exiftool</code>" in a
@@ -290,7 +290,7 @@ suck the last bit of metadata out of whatever image file you throw at it!"</i> -
 
 <h2><a name="supported">Supported File Types</a></h2>
 <p>ExifTool can <b>R</b>ead, <b>W</b>rite and/or <b>C</b>reate files in the following formats. 
-Also listed are the support levels for EXIF, IPTC, XMP, ICC_Profile and other metadata types
+Also listed are the support levels for EXIF, IPTC (IIM), XMP, ICC_Profile and other metadata types
 for each file format.</p>
 <blockquote class=s><table class='sticky tight sm bm'>
 <tr><th>File Type</th><th>Support</th><th>Description</th><th><a href="TagNames/EXIF.html">EXIF</a></th><th><a href="TagNames/IPTC.html">IPTC</a></th><th><a href="TagNames/XMP.html">XMP</a></th><th><a href="TagNames/ICC_Profile.html">ICC</a><span class=sup>1</span></th><th>Other</th></tr>
@@ -367,6 +367,7 @@ for each file format.</p>
 <tr><td>HEIC, HEIF, HIF</td><td>R/W</td><td>High Efficiency Image Format (<a href="TagNames/QuickTime.html">QuickTime</a>-based)</td><td>R/W/C</td><td>-</td><td>R/W/C</td><td>R/W</td><td>R/W <a href="TagNames/QuickTime.html">QuickTime</a></td></tr>
 <tr><td><a href="TagNames/HTML.html">HTML, HTM, XHTML</a></td><td>R</td><td>[Extensible] HyperText Markup Language</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/HTML.html">HTML</a></td></tr>
 <tr><td><a href="TagNames/ICC_Profile.html">ICC, ICM</a></td><td>R/W/C<span class=sup>1</span></td><td>International Color Consortium color profile</td><td>-</td><td>-</td><td>-</td><td>R/W/C</td><td>-</td></tr>
+<tr><td><a href="TagNames/ICO.html">ICO, CUR</a></td><td>R</td><td>Windows Icon / Cursor</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/ICO.html">ICO</a></td></tr>
 <tr><td><a href="TagNames/VCard.html#VCalendar">ICS, ICAL</a></td><td>R</td><td>iCalendar Schedule</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/VCard.html#VCalendar">VCalendar</a></td></tr>
 <tr><td>IDML</td><td>R</td><td>Adobe InDesign Markup Language (ZIP/XML-based)</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R XML <a href="TagNames/ZIP.html">ZIP</a></td></tr>
 <tr><td><a href="TagNames/PhaseOne.html">IIQ</a></td><td>R/W</td><td>Phase One Intelligent Image Quality RAW (<a href="TagNames/EXIF.html">TIFF</a>-based)</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C</td><td>R/W/C</td><td>R/W <a href="TagNames/PhaseOne.html">PhaseOne</a></td></tr>
@@ -389,7 +390,7 @@ for each file format.</p>
 <tr><td><a href="TagNames/LIF.html">LIF</a></td><td>R</td><td>Leica Image File</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/LIF.html">LIF</a></td></tr>
 <tr><td><a href="TagNames/LNK.html">LNK</a></td><td>R</td><td>Microsoft Shell Link (Windows shortcut)</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/LNK.html">LNK</a></td></tr>
 <tr><td>LRV</td><td>R/W</td><td>Low-Resolution Video (<a href="TagNames/QuickTime.html">QuickTime</a>-based)</td><td>R/W<span class=sup>3</span></td><td>R/W<span class=sup>3</span></td><td>R/W/C</td><td>-</td><td>R/W/C <a href="TagNames/QuickTime.html">QuickTime</a></td></tr>
-<tr><td><a href="TagNames/M2TS.html">M2TS, MTS, M2T, TS</a></td><td>R</td><td>MPEG-2 Transport Stream (used for AVCHD video)</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/M2TS.html">M2TS</a> <a href="TagNames/H264.html">H264</a></td></tr>
+<tr><td><a href="TagNames/M2TS.html">M2TS, MTS, M2T, TS</a></td><td>R</td><td>MPEG-2 Transport Stream (used for AVCHD video)</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/M2TS.html">M2TS</a> <a href="TagNames/H264.html">H264</a> <a href="TagNames/MISB.html">MISB</a></td></tr>
 <tr><td>M4A, M4B, M4P, M4V</td><td>R/W</td><td>MPEG-4 Audio/Video (<a href="TagNames/QuickTime.html">QuickTime</a>-based)</td><td>R/W<span class=sup>3</span></td><td>R/W<span class=sup>3</span></td><td>R/W/C</td><td>-</td><td>R/W/C <a href="TagNames/QuickTime.html">QuickTime</a></td></tr>
 <tr><td>MACOS</td><td>R</td><td>MacOS "._" sidecar file (may have any extension)</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/MacOS.html#XAttr">XAttr</a> <a href="TagNames/RSRC.html">RSRC</a></td></tr>
 <tr><td>MAX</td><td>R</td><td>3D Studio MAX (<a href="TagNames/FlashPix.html">FPX</a>-like)</td><td>-</td><td>-</td><td>R</td><td>R</td><td>R <a href="TagNames/FlashPix.html">FlashPix</a></td></tr>
@@ -482,7 +483,7 @@ for each file format.</p>
 <tr><td>VSD</td><td>R</td><td>Microsoft Visio Drawing (<a href="TagNames/FlashPix.html">FPX</a>-like)</td><td>-</td><td>-</td><td>R</td><td>R</td><td>R <a href="TagNames/FlashPix.html">FlashPix</a></td></tr>
 <tr><td>WAV</td><td>R</td><td>Windows digital audio WAVeform (<a href="TagNames/RIFF.html">RIFF</a>-based)</td><td>R<span class=sup>3</span></td><td>-</td><td>R</td><td>-</td><td>R <a href="TagNames/RIFF.html">RIFF</a></td></tr>
 <tr><td>WEBM</td><td>R</td><td>Google Web Movie (<a href="TagNames/Matroska.html">Matroska</a>-based)</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/Matroska.html">Matroska</a></td></tr>
-<tr><td>WEBP</td><td>R</td><td>Google Web Picture (<a href="TagNames/RIFF.html">RIFF</a>-based)</td><td>R<span class=sup>3</span></td><td>-</td><td>R</td><td>-</td><td>R <a href="TagNames/RIFF.html">RIFF</a></td></tr>
+<tr><td>WEBP</td><td>R/W</td><td>Google Web Picture (<a href="TagNames/RIFF.html">RIFF</a>-based)</td><td>R/W/C</td><td>-</td><td>R/W/C</td><td>R/W/C</td><td>R <a href="TagNames/RIFF.html">RIFF</a></td></tr>
 <tr><td>WMA, WMV</td><td>R</td><td>Windows Media Audio/Video (<a href="TagNames/ASF.html">ASF</a>-based)</td><td>-</td><td>-</td><td>R</td><td>-</td><td>R <a href="TagNames/ASF.html">ASF</a></td></tr>
 <tr><td><a href="TagNames/WTV.html">WTV</a></td><td>R</td><td>Windows recorded TV show</td><td>-</td><td>-</td><td>-</td><td>-</td><td>R <a href="TagNames/WTV.html">WTV</a></td></tr>
 <tr><td>WV</td><td>R</td><td>WavePack lossless audio (<a href="TagNames/RIFF.html">RIFF</a>-based)</td><td>R<span class=sup>3</span></td><td>-</td><td>R</td><td>-</td><td>R <a href="TagNames/RIFF.html">RIFF</a></td></tr>
@@ -610,7 +611,7 @@ examples</a>.</p>
 <p>The Perl application ("<code>exiftool</code>") is run by typing "<code>perl
 exiftool</code>". Alternately, you may be able to rename it to
 "<code>exiftool.pl</code>" and type "<code>exiftool.pl</code>", but this
-requires that the proper Windows associations have been made for the the
+requires that the proper Windows associations have been made for the
 "<code>.pl</code>" extension.</p>
 
 <p>The stand-alone version ("<code>exiftool(-k).exe</code>") should be
@@ -821,7 +822,7 @@ APP5, APP6, APP8, ASF, Audible, CanonVRD, Composite, DICOM, DNG, DV, DjVu,
 Ducky, EXE, EXIF, ExifTool, FITS, FLAC, FLIR, File, Flash, FlashPix, Font,
 FotoStation, GIF, GIMP, GeoTiff, GoPro, H264, HTML, ICC_Profile, ID3, IPTC,
 ISO, ITC, JFIF, JPEG, JSON, JUMBF, Jpeg2000, LNK, Leaf, Lytro, M2TS, MIE,
-MIFF, MNG, MOI, MPC, MPEG, MPF, MXF, MakerNotes, Matroska, Meta, Ogg,
+MIFF, MISB, MNG, MOI, MPC, MPEG, MPF, MXF, MakerNotes, Matroska, Meta, Ogg,
 OpenEXR, Opus, PDF, PICT, PLIST, PNG, PSP, Palm, Parrot, PanasonicRaw,
 PhotoCD, PhotoMechanic, Photoshop, PostScript, PrintIM, QuickTime, RAF,
 RIFF, RSRC, RTF, Radiance, Rawzor, Real, Red, SVG, SigmaRaw, Stim, Theora,
@@ -843,7 +844,7 @@ KyoceraRaw, LNK, Leaf, LeafSubIFD, Leica, Lyrics3, Lytro, M2TS, MAC,
 MIE-Audio, MIE-Camera, MIE-Canon, MIE-Doc, MIE-Extender, MIE-Flash, MIE-GPS,
 MIE-Geo, MIE-Image, MIE-Lens, MIE-Main, MIE-MakerNotes, MIE-Meta,
 MIE-Orient, MIE-Preview, MIE-Thumbnail, MIE-UTM, MIE-Unknown, MIE-Video,
-MIFF, MNG, MOBI, MOI, MPC, MPEG, MPF0, MPImage, MS-DOC, MXF, MacOS,
+MIFF, MISB, MNG, MOBI, MOI, MPC, MPEG, MPF0, MPImage, MS-DOC, MXF, MacOS,
 MakerNotes, MakerUnknown, Matroska, MediaJukebox, Meta, MetaIFD, Microsoft,
 Minolta, MinoltaRaw, Motorola, NITF, Nikon, NikonCapture, NikonCustom,
 NikonScan, NikonSettings, NineEdits, Nintendo, Ocad, Ogg, Olympus, OpenEXR,
@@ -1013,6 +1014,9 @@ for proper rendering of the image.</li>
 
 <h2><font color='#cc6600'><a name="problems">Known Problems</a></font></h2>
 <ul>
+<li><span class=red>[2022-08-23]</span>
+<b>Sony Imaging Edge Desktop</b> has problems displaying some ExifTool-edited ARW
+images, although other software (such as Adobe utilites) have no problems with these.</li>
 <li><span class=red>[2020-02-18]</span>
 <b>Hasselblad Phocus</b> software will no longer update the small preview or
 thumbnail images of <b>FFF files</b> edited by ExifTool.  This is perhaps due to
@@ -1096,7 +1100,7 @@ calling application must either place file names after the "<code>--</code>"
 option, or ensure that input file names do not start with a dash (U+002D) or a
 Unicode minus sign (U+2212).  One way to accomplish this is to prefix input file
 names with a known directory name, eg.) <code>"./FILENAME"</code>.</p>
-<p>As well, untrusted window title strings should not be using with the
+<p>As well, untrusted window title strings should not be used with the
 <code>-progress:TITLE</code> option.</p>
 
 <h2><a name="shift">Date/Time Shift Feature</a></h2>

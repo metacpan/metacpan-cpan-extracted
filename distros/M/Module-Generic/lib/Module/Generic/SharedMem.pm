@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/SharedMem.pm
-## Version v0.3.4
+## Version v0.3.5
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/01/18
-## Modified 2022/08/28
+## Modified 2022/11/09
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -112,7 +112,7 @@ EOT
             lock    => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
             'flock' => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
     );
-    our $VERSION = 'v0.3.4';
+    our $VERSION = 'v0.3.5';
 };
 
 # use strict;
@@ -252,8 +252,19 @@ sub exists
     }
     catch( $e )
     {
+        # warn( "Trying to access shared memory triggered error: $e" ) if( $self->_warnings_is_enabled );
         my $arg = 0;
-        semctl( $semid, 0, &IPC::SysV::IPC_RMID, $arg ) if( $semid );
+        if( $semid )
+        {
+            try
+            {
+                semctl( $semid, 0, &IPC::SysV::IPC_RMID, $arg );
+            }
+            catch( $e2 )
+            {
+                warn( "Error trying to remove semaphore id ${semid} after checking if shared memory existed: $e2" ) if( $self->_warnings_is_enabled );
+            }
+        }
         return(0);
     }
 }
@@ -481,8 +492,15 @@ sub pid
         return( $self->error( "No semaphore set yet. You must open the shared memory first to remove semaphore." ) );
     no strict 'subs';
     my $arg = 0;
-    my $v = semctl( $semid, $sem, &IPC::SysV::GETPID, $arg );
-    return( $v ? 0 + $v : undef() );
+    try
+    {
+        my $v = semctl( $semid, $sem, &IPC::SysV::GETPID, $arg );
+        return( $v ? 0 + $v : undef() );
+    }
+    catch( $e )
+    {
+        return( $self->error( "Error trying to get semaphore pid using semaphore id ${semid}: $e" ) );
+    }
 }
 
 sub rand

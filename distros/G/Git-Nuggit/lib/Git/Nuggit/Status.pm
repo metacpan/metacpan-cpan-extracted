@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 package Git::Nuggit::Status;
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 use v5.10;
 use strict;
@@ -123,6 +123,7 @@ sub get_status
                # number of >MODIFIED objects that are not submodules
                'staged_files_cnt' => 0, # Number of modified (not submodule) files staged (recursive)
                'unstaged_files_cnt' => 0, # Number of modified (not submodule) files unstaged (recursive)
+               'conflict_cnt'       => 0, # total count of (unstaged) files/submodules in a conflicted state
                'branch_status_flag' => 0, # True if any scanned submodules are not on the same branch as parent
                'detached_heads_flag' => 0, # True if any scanned submodules or root are detached
               };
@@ -178,6 +179,7 @@ sub _get_status
                    'staged_files_cnt' => 0, # Number of modified (not submodule) files staged (recursive)
                    'unstaged_files_cnt' => 0, # Number of modified (not submodule) files unstaged (recursive)
                    'branch_status_flag' => 0, # True if any scanned submodules are not on the same branch as parent
+                   'conflict_cnt'       => 0, # total count of (unstaged) files/submodules in a conflicted state
         };
         my ($xy, $sub, $mh, $mi, $mw, $hh, $h1, $h2, $h3, $path, $xscore, $oldPath, $m1, $m2, $m3);
         # $mh = octal file mode in HEAD
@@ -197,7 +199,8 @@ sub _get_status
             #  2 <XY> <sub> <mH> <mI> <mW> <hH> <hI> <X><score> <path><sep><origPath>
             ($xy, $sub, $mh, $mi, $mw, $hh, $h1, $xscore, $path, $oldPath) = @parts;
             $obj->{'staged_status'} = $STATE{'RENAMED'};
-            $obj->{'status'} = $STATE{'RENAMED'};
+            # Note: A rename can only be detected when staged, so unstaged status wil never be 'RENAMED'.
+            
             $obj->{'old_path'} = $oldPath;
         } elsif ($type eq "u") {
             # Unmerged:
@@ -244,9 +247,11 @@ sub _get_status
         }
 
         $obj->{path} = $path;
-        
+        $rtv->{conflict_cnt}++ if $obj->{status} == STATE('CONFLICT');
+
+        # Is this a submodule?
         if ($sub && substr($sub, 0, 1) eq "S") {
-            # This is a submodule
+            
             $obj->{is_submodule} = 1;
             my @substate = split("",$sub);
 
@@ -278,6 +283,7 @@ sub _get_status
             # Increment modification counts
             $rtv->{unstaged_files_cnt} += $obj->{unstaged_files_cnt};
             $rtv->{staged_files_cnt} += $obj->{staged_files_cnt};
+            $rtv->{conflict_cnt} += $obj->{conflict_cnt};
 
             # Branch Check (only valid if we've recursed)
             if (!$opts->{no_recurse}) {
@@ -435,6 +441,12 @@ sub pretty_print_status
     
     say "";
     do_pretty_print_status($status, $relative_path, $root_branch, $flags);
+
+    if ($status->{status} == $STATE{'CONFLICT'}) {
+        say "\n".colored("$status->{conflict_cnt} ", "warn").colored("conflict(s) detected.", "error");
+        say colored("Tip:",'info')." For complex merges, run 'ngt status -c' to see conflicts and submodule summaries only." unless $flags->{conflicts_only};
+        say "Resolve all conflicts before completing the merge, ie:  with 'ngt merge --continue' or aborting with 'ngt merge --abort'";
+    }
 }
 
 =head2 do_pretty_print_status($status, $relative_path, $root_path, $flags)
@@ -443,7 +455,7 @@ Output details on all objects in this $status object and it's children (submodul
 
 Parameters:
 - status - Status object from get_status(), or a nested object state
-- relative_path - Relative path to repository root level. This will be concatenated with an object's path for display.  If omitted, path will be relative to the top directory of the repository that the provided status object represents.
+- relativ_path - Relative path to repository root level. This will be concatenated with an object's path for display.  If omitted, path will be relative to the top directory of the repository that the provided status object represents.
 - root_branch - If defined for applicable objects, output a warning if current branch does not match.
 - verbose - If set, always output additional information when known, for example commit hash.
 
@@ -461,11 +473,15 @@ sub do_pretty_print_status {
     # Paths may not be equal when recursing
     my $abs_rel_path = abs_path(File::Spec->catdir($flags->{user_dir},$relative_path));
 
+    say colored("Showing conflicts & submodules only", 'warn') if $flags->{conflicts_only};
+
     foreach my $key (sort keys(%{$status->{'objects'}})) {
         my $obj = $status->{objects}->{$key};
         # Note: We deliberately do not use File::Spec here because we want to colorize submodule path
         #  This is for display-only, so OS compatibility is not an issue
 
+        next if ($flags->{conflicts_only} && !$obj->{is_submodule} && $obj->{status}!=$STATE{'CONFLICT'});
+        
         print " ".$obj->{'status_flag'};
         print colored($obj->{'staged_status_flag'},'info').' ';
         if ($relative_path && $relative_path !~ /^\.\/?$/ && $abs_rel_path ne $flags->{usr_abs_path}) {
@@ -484,6 +500,10 @@ sub do_pretty_print_status {
             print colored(" Delta-Commits",'warn') if $obj->{sub_commit_delta};
             print colored(" Modified",'warn') if $obj->{sub_modified};
             print " Untracked-Content" if $obj->{sub_untracked};
+
+            if ($obj->{'status'} == STATE('CONFLICT')) {
+                print colored( ' Conflict ', 'warn'); # TODO: Extra handling may be needed in this case
+            }
 
             if ($obj->{'status'} == STATE('UNINITIALIZED')) {
                 print colored(' Uninitialized', 'error');

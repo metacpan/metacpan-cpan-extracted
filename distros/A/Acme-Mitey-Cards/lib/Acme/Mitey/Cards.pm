@@ -1,6 +1,6 @@
 package Acme::Mitey::Cards;
 
-our $VERSION   = '0.014';
+our $VERSION   = '0.015';
 our $AUTHORITY = 'cpan:TOBYINK';
 
 use Acme::Mitey::Cards::Suit;
@@ -35,6 +35,8 @@ Acme::Mitey::Cards - demo of Mite
 =head1 DESCRIPTION
 
 This is a small distribution to test/demonstrate L<Mite>.
+
+It's an object-oriented library for modelling playing cards.
 
 =head1 BUGS
 

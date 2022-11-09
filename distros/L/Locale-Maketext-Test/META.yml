@@ -13,26 +13,50 @@ build_requires:
   Test::MockModule: '0'
   Test::More: '0.94'
   Test::NoWarnings: '0'
-  perl: '5.014000'
 configure_requires:
-  ExtUtils::MakeMaker: '6.48'
+  ExtUtils::MakeMaker: '7.64'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Locale-Maketext-Test
+no_index:
+  directory:
+    - eg
+    - share
+    - shares
+    - t
+    - xt
+provides:
+  Locale::Maketext::Test:
+    file: lib/Locale/Maketext/Test.pm
+    version: '0.06'
 requires:
   File::Spec: '0'
   Locale::Maketext::ManyPluralForms: '0'
   Moose: '0'
+  Syntax::Keyword::Try: '0'
   Test::MockModule: '0'
-  Try::Tiny: '0'
   namespace::autoclean: '0'
-  perl: '5.014000'
+  perl: '5.014'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
 resources:
   bugtracker: https://github.com/binary-com/perl-Locale-Maketext-Test/issues
-  repository: git://github.com/binary-com/perl-Locale-Maketext-Test.git
-version: '0.05'
-x_serialization_backend: 'YAML::Tiny version 1.66'
+  homepage: https://github.com/binary-com/perl-Locale-Maketext-Test
+  repository: https://github.com/binary-com/perl-Locale-Maketext-Test.git
+version: '0.06'
+x_authority: cpan:DERIV
+x_contributors:
+  - 'Raunak Kathuria <raunakkathuria@gmail.com>'
+  - 'Chylli <chylli@binary.com>'
+  - 'Jean-Yves Sireau <jy@binary.com>'
+  - 'chylli-binary <52912308+chylli-binary@users.noreply.github.com>'
+  - 'Chylli <chylli.email@gmail.com>'
+  - 'Tom Molesworth <tom@binary.com>'
+x_generated_by_perl: v5.26.2
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

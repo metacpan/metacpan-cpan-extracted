@@ -45,7 +45,7 @@ subtest "simple before-forward (allows forward)" => sub {
                     before_forward => [sub { return }],
                     actions        => [['success'],],
                     base_path      => '/api',
-                    url => $ENV{T_TestWSP_RPC_URL} // die("T_TestWSP_RPC_URL is not defined"),
+                    url            => $ENV{T_TestWSP_RPC_URL} // die("T_TestWSP_RPC_URL is not defined"),
                 });
         }
     };
@@ -71,7 +71,7 @@ subtest "simple before-forward (prohibits forward)" => sub {
                     before_forward => [sub { return {"non-authorized" => 'by-some-reason'} }],
                     actions        => [['success'],],
                     base_path      => '/api',
-                    url => $ENV{T_TestWSP_RPC_URL} // die("T_TestWSP_RPC_URL is not defined"),
+                    url            => $ENV{T_TestWSP_RPC_URL} // die("T_TestWSP_RPC_URL is not defined"),
                 });
         }
     };
@@ -97,7 +97,7 @@ subtest "future-based before-forward (immediate success)" => sub {
                     before_forward => [sub { return Future->done }],
                     actions        => [['success'],],
                     base_path      => '/api',
-                    url => $ENV{T_TestWSP_RPC_URL} // die("T_TestWSP_RPC_URL is not defined"),
+                    url            => $ENV{T_TestWSP_RPC_URL} // die("T_TestWSP_RPC_URL is not defined"),
                 });
         }
     };
@@ -123,7 +123,7 @@ subtest "future-based before-forward (immediate error)" => sub {
                     before_forward => [sub { return Future->fail({"non-authorized" => 'by-some-reason'}) }],
                     actions        => [['success'],],
                     base_path      => '/api',
-                    url => $ENV{T_TestWSP_RPC_URL} // die("T_TestWSP_RPC_URL is not defined"),
+                    url            => $ENV{T_TestWSP_RPC_URL} // die("T_TestWSP_RPC_URL is not defined"),
                 });
         }
     };

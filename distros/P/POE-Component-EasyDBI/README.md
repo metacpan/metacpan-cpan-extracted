@@ -106,7 +106,7 @@ This one is for mysql:
 
 This method will die on error or return success.
 
-Note the difference between dbname and database, that is dependant on the 
+Note the difference between dbname and database, that is dependant on the
 driver used, NOT EasyDBI
 
 NOTE: If the SubProcess could not connect to the DB, it will return an error,
@@ -145,7 +145,7 @@ This constructor accepts 6 different options.
 
 - `options`
 
-    Pass a hash ref that normally would be after the $password param on a 
+    Pass a hash ref that normally would be after the $password param on a
     DBI->connect call.
 
 - `max_retries`
@@ -361,7 +361,7 @@ or
             }
             $primary_key = $sth->{NAME}->[($primary_key-1)];
         }
-        
+
         for $i (0..$sth->{NUM_OF_FIELDS}-1) {
             $col{$sth->{NAME}->[$i]} = $i;
             push(@cols, $sth->{NAME}->[$i]);
@@ -398,7 +398,7 @@ or
 
 - `hasharray`
 
-        This query is for those queries where you will get more than one row 
+        This query is for those queries where you will get more than one row
         and column back.
 
         Internally, it does something like this:
@@ -410,12 +410,12 @@ or
             }
             $primary_key = $sth->{NAME}->[($primary_key-1)];
         }
-        
+
         for $i (0..$sth->{NUM_OF_FIELDS}-1) {
             $col{$sth->{NAME}->[$i]} = $i;
             push(@cols, $sth->{NAME}->[$i]);
         }
-        
+
         $sth = $dbh->prepare_cached($SQL);
         $sth->execute($PLACEHOLDERS);
         while (@row = $sth->fetch_array()) {
@@ -679,8 +679,8 @@ or
 
 - `func`
 
-        This is for calling $dbh->func(), when using a driver that supports it.  
-        
+        This is for calling $dbh->func(), when using a driver that supports it.
+
         Internally, it does this:
 
         return $dbh->func(@{$args});
@@ -732,7 +732,7 @@ or
 - `commit`
 
         This is for calling $dbh->commit(), if the driver supports it.
-        
+
         Internally, it does this:
 
         return $dbh->commit();
@@ -757,7 +757,7 @@ or
 - `rollback`
 
         This is for calling $dbh->rollback(), if the driver supports it.
-        
+
         Internally, it does this:
 
         return $dbh->rollback();
@@ -782,7 +782,7 @@ or
 - `begin_work`
 
         This is for calling $dbh->begin_work(), if the driver supports it.
-        
+
         Internally, it does this:
 
         return $dbh->begin_work();
@@ -828,7 +828,7 @@ or
 
         $kernel->call('EasyDBI', 'shutdown' => 'NOW');
 
-        ALL shutdown NOW's send kill 9 to thier children, beware of any 
+        ALL shutdown NOW's send kill 9 to thier children, beware of any
         transactions that you may be in. Your queries will revert if you are in
         transaction mode
 
@@ -916,7 +916,7 @@ ie ARRAYHASH or arrayhash but not ArrayHash
             }
         );
 
-    If I were to add an option 'filehandle' (for importing data from a file for 
+    If I were to add an option 'filehandle' (for importing data from a file for
     instance) you don't want an upgrade to produce BAD results.
 
 ## OBJECT METHODS
@@ -961,7 +961,7 @@ suggestions to the author.
         username    => 'user',
         password    => 'pass',
     );
-    
+
     # Create our own session to communicate with EasyDBI
     POE::Session->create(
         inline_states => {
@@ -976,7 +976,7 @@ suggestions to the author.
 
                 # 'single' is very different from the single query in SimpleDBI
                 # look at 'hash' to get those results
-                
+
                 # If you select more than one field, you will only get the last one
                 # unless you pass in a separator with what you want the fields seperated by
                 # to get null sperated values, pass in separator => "\0"
@@ -995,7 +995,7 @@ suggestions to the author.
                         event => 'quote_handler',
                     }
                 );
-                
+
                 $_[KERNEL]->post('EasyDBI',
                     arrayhash => {
                         sql => 'SELECT user_id,user_login from users where logins = ?',
@@ -1003,16 +1003,16 @@ suggestions to the author.
                         placeholders => [qw(53)],
                     }
                 );
-                
+
                 my $postback = $_[SESSION]->postback("arrayhash_handler",3,2,1);
-                
+
                 $_[KERNEL]->post('EasyDBI',
                     arrayhash => {
                         sql => 'SELECT user_id,user_login from users',
                         event => $postback,
                     }
                 );
-                
+
                 $_[KERNEL]->post('EasyDBI',
                     arrayarray => {
                         sql => 'SELECT * from locations',
@@ -1028,7 +1028,7 @@ suggestions to the author.
                         primary_key => '1', # you can specify a primary key, or a number based on what column to use
                     }
                 );
-                
+
                 $_[KERNEL]->post('EasyDBI',
                     hasharray => {
                         sql => 'SELECT * from locations',
@@ -1036,7 +1036,7 @@ suggestions to the author.
                         primary_key => "1",
                     }
                 );
-                
+
                 # you should use limit 1, it is NOT automaticly added
                 $_[KERNEL]->post('EasyDBI',
                     hash => {
@@ -1044,14 +1044,14 @@ suggestions to the author.
                         event => 'hash_handler',
                     }
                 );
-                
+
                 $_[KERNEL]->post('EasyDBI',
                     array => {
                         sql => 'SELECT location_id from locations',
                         event => 'array_handler',
                     }
                 );
-                
+
                 $_[KERNEL]->post('EasyDBI',
                     keyvalhash => {
                         sql => 'SELECT location_id,location_name from locations',
@@ -1082,7 +1082,7 @@ suggestions to the author.
                         # query that will return a value
                     },
                 );
-                
+
                 # 3 ways to shutdown
 
                 # This will let the existing queries finish, then shutdown
@@ -1174,7 +1174,7 @@ suggestions to the author.
         #   error => Error occurred, check this first
         # }
     }
-    
+
     sub array_handler {
         # For array calls, we receive an array
         # $_[ARG0] = {
@@ -1187,7 +1187,7 @@ suggestions to the author.
         #   error => Error occurred, check this first
         # }
     }
-    
+
     sub arrayarray_handler {
         # For array calls, we receive an array ref of array refs
         # $_[ARG0] = {
@@ -1198,7 +1198,7 @@ suggestions to the author.
         #   error => Error occurred, check this first
         # }
     }
-    
+
     sub hash_handler {
         # For hash calls, we receive a hash
         # $_[ARG0] = {
@@ -1221,7 +1221,7 @@ suggestions to the author.
         #   primary_key => primary key used
         # }
     }
-    
+
     sub insert_handle {
         # $_[ARG0] = {
         #   sql => The SQL you sent

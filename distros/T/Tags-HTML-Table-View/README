@@ -1,0 +1,243 @@
+NAME
+    Tags::HTML::Table::View - Tags helper for table view.
+
+SYNOPSIS
+     use Tags::HTML::Table::View;
+
+     my $obj = Tags::HTML::Table::View->new(%params);
+     $obj->cleanup;
+     $obj->init($data_ar, $no_data_value);
+     $obj->process;
+     $obj->process_css;
+
+METHODS
+  "new"
+     my $obj = Tags::HTML::Table::View->new(%params);
+
+    Constructor.
+
+    Returns instance of object.
+
+    *       "css"
+
+            'CSS::Struct::Output' object for process_css processing.
+
+            Default value is undef.
+
+    *       "css_table"
+
+            CSS class for table.
+
+            Default value is 'table'.
+
+    *       "header"
+
+            Boolean flag, that means that header is in first line.
+
+            Default value is 1.
+
+    *       "tags"
+
+            'Tags::Output' object.
+
+            Default value is undef.
+
+  "cleanup"
+     $obj->cleanup;
+
+    Process cleanup after page run.
+
+    Returns undef.
+
+  "init"
+     $obj->init($data_ar, $no_data_value);
+
+    Process initialization before page run. Variable $data_ar are data for
+    table. Variable $no_data_value contain information for situation when
+    data in table not exists.
+
+    Returns undef.
+
+  "process"
+     $obj->process;
+
+    Process Tags structure for table view.
+
+    Returns undef.
+
+  "process_css"
+     $obj->process_css;
+
+    Process CSS::Struct structure for output.
+
+    Returns undef.
+
+ERRORS
+     new():
+             From Class::Utils::set_params():
+                     Unknown parameter '%s'.
+             From Tags::HTML::new():
+                     Parameter 'css' must be a 'CSS::Struct::Output::*' class.
+                     Parameter 'tags' must be a 'Tags::Output::*' class.
+
+     process():
+             From Tags::HTML::process():
+                     Parameter 'tags' isn't defined.
+             Bad value object.
+
+     process_css():
+             From Tags::HTML::process_css():
+                     Parameter 'css' isn't defined.
+
+EXAMPLE1
+     use strict;
+     use warnings;
+
+     use CSS::Struct::Output::Indent;
+     use Tags::HTML::Table::View;
+     use Tags::Output::Indent;
+
+     # Object.
+     my $css = CSS::Struct::Output::Indent->new;
+     my $tags = Tags::Output::Indent->new;
+     my $obj = Tags::HTML::Table::View->new(
+             'css' => $css,
+             'tags' => $tags,
+     );
+
+     # Table data.
+     my $table_data_ar = [
+             ['Country', 'Capital'],
+             ['Czech Republic', 'Prague'],
+             ['Russia', 'Moscow'],
+     ];
+
+     # Process login button.
+     $obj->init($table_data_ar, 'No data.');
+     $obj->process_css;
+     $tags->put(['b', 'body']);
+     $obj->process;
+     $tags->put(['e', 'body']);
+     $obj->cleanup;
+
+     # Print out.
+     print "CSS\n";
+     print $css->flush."\n\n";
+     print "HTML\n";
+     print $tags->flush."\n";
+
+     # Output:
+     # CSS
+     # .table table, .table th, .table td {
+     #         border: 1px solid black;
+     # }
+     #
+     # HTML
+     # <body>
+     #   <table class="table">
+     #     <tr>
+     #       <th>
+     #         Country
+     #       </th>
+     #       <th>
+     #         Capital
+     #       </th>
+     #     </tr>
+     #     <tr>
+     #       <td>
+     #         Czech Republic
+     #       </td>
+     #       <td>
+     #         Prague
+     #       </td>
+     #     </tr>
+     #     <tr>
+     #       <td>
+     #         Russia
+     #       </td>
+     #       <td>
+     #         Moscow
+     #       </td>
+     #     </tr>
+     #   </table>
+     # </body>
+
+EXAMPLE2
+     use strict;
+     use warnings;
+
+     use CSS::Struct::Output::Indent;
+     use Tags::HTML::Table::View;
+     use Tags::Output::Indent;
+
+     # Object.
+     my $css = CSS::Struct::Output::Indent->new;
+     my $tags = Tags::Output::Indent->new;
+     my $obj = Tags::HTML::Table::View->new(
+             'css' => $css,
+             'tags' => $tags,
+     );
+
+     # Table data.
+     my $table_data_ar = [];
+
+     # Process login button.
+     $obj->init($table_data_ar, 'No data.');
+     $obj->process_css;
+     $tags->put(['b', 'body']);
+     $obj->process;
+     $tags->put(['e', 'body']);
+     $obj->cleanup;
+
+     # Print out.
+     print "CSS\n";
+     print $css->flush."\n\n";
+     print "HTML\n";
+     print $tags->flush."\n";
+
+     # Output:
+     # CSS
+     # table, td, th {
+     #         border: 1px solid #ddd;
+     #         text-align: left;
+     # }
+     # table {
+     #         border-collapse: collapse;
+     #         width: 100%;
+     # }
+     # th, td {
+     #         padding: 15px;
+     # }
+     #
+     # HTML
+     # <body>
+     #   <table class="table">
+     #     <tr>
+     #     </tr>
+     #     <tr>
+     #       <td colspan="0">
+     #         No data.
+     #       </td>
+     #     </tr>
+     #   </table>
+     # </body>
+
+DEPENDENCIES
+    Class::Utils, Error::Pure, List::MoreUtils, Scalar::Util, Tags::HTML.
+
+REPOSITORY
+    <https://github.com/michal-josef-spacek/Tags-HTML-Table-View>
+
+AUTHOR
+    Michal Josef Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+    © 2021-2022 Michal Josef Špaček
+
+    BSD 2-Clause License
+
+VERSION
+    0.01
+

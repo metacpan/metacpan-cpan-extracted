@@ -28,8 +28,11 @@ BEGIN
 {
     use strict;
     use warnings;
-    diag( "Checking module $_" ) if( $DEBUG );
-    use_ok( $_ ) for( sort( @modules ) );
+    for( sort( @modules ) )
+    {
+        diag( "Checking module $_" ) if( $DEBUG );
+        use_ok( $_ );
+    }
 };
 
 done_testing();

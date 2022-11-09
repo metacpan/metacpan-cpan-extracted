@@ -7,7 +7,7 @@
       "Gaspar Nagy"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.027, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
@@ -44,99 +44,99 @@
    "provides" : {
       "App::gherkin" : {
          "file" : "lib/App/gherkin.pm",
-         "version" : "v24.1.0"
+         "version" : "v25.0.2"
       },
       "Gherkin" : {
          "file" : "lib/Gherkin.pm",
-         "version" : "v24.1.0"
+         "version" : "v25.0.2"
       },
       "Gherkin::AstBuilder" : {
          "file" : "lib/Gherkin/AstBuilder.pm",
-         "version" : "v24.1.0"
+         "version" : "v25.0.2"
       },
       "Gherkin::AstNode" : {
          "file" : "lib/Gherkin/AstNode.pm",
-         "version" : "v24.1.0"
+         "version" : "v25.0.2"
       },
       "Gherkin::Dialect" : {
          "file" : "lib/Gherkin/Dialect.pm",
-         "version" : "v24.1.0"
+         "version" : "v25.0.2"
       },
       "Gherkin::Exceptions" : {
          "file" : "lib/Gherkin/Exceptions.pm",
-         "version" : "v24.1.0"
+         "version" : "v25.0.2"
       },
       "Gherkin::Exceptions::AstBuilder" : {
          "file" : "lib/Gherkin/Exceptions.pm",
-         "version" : "v24.1.0"
+         "version" : "v25.0.2"
       },
       "Gherkin::Exceptions::CompositeParser" : {
          "file" : "lib/Gherkin/Exceptions.pm",
-         "version" : "v24.1.0"
+         "version" : "v25.0.2"
       },
       "Gherkin::Exceptions::NoSuchLanguage" : {
          "file" : "lib/Gherkin/Exceptions.pm",
-         "version" : "v24.1.0"
+         "version" : "v25.0.2"
       },
       "Gherkin::Exceptions::Parser" : {
          "file" : "lib/Gherkin/Exceptions.pm",
-         "version" : "v24.1.0"
+         "version" : "v25.0.2"
       },
       "Gherkin::Exceptions::SingleParser" : {
          "file" : "lib/Gherkin/Exceptions.pm",
-         "version" : "v24.1.0"
+         "version" : "v25.0.2"
       },
       "Gherkin::Exceptions::UnexpectedEOF" : {
          "file" : "lib/Gherkin/Exceptions.pm",
-         "version" : "v24.1.0"
+         "version" : "v25.0.2"
       },
       "Gherkin::Exceptions::UnexpectedToken" : {
          "file" : "lib/Gherkin/Exceptions.pm",
-         "version" : "v24.1.0"
+         "version" : "v25.0.2"
       },
       "Gherkin::Generated::Languages" : {
          "file" : "lib/Gherkin/Generated/Languages.pm",
-         "version" : "v24.1.0"
+         "version" : "v25.0.2"
       },
       "Gherkin::Generated::Parser" : {
          "file" : "lib/Gherkin/Generated/Parser.pm",
-         "version" : "v24.1.0"
+         "version" : "v25.0.2"
       },
       "Gherkin::Line" : {
          "file" : "lib/Gherkin/Line.pm",
-         "version" : "v24.1.0"
+         "version" : "v25.0.2"
       },
       "Gherkin::Parser" : {
          "file" : "lib/Gherkin/Parser.pm",
-         "version" : "v24.1.0"
+         "version" : "v25.0.2"
       },
       "Gherkin::ParserBase" : {
          "file" : "lib/Gherkin/ParserBase.pm",
-         "version" : "v24.1.0"
+         "version" : "v25.0.2"
       },
       "Gherkin::ParserContext" : {
          "file" : "lib/Gherkin/ParserContext.pm",
-         "version" : "v24.1.0"
+         "version" : "v25.0.2"
       },
       "Gherkin::Pickles::Compiler" : {
          "file" : "lib/Gherkin/Pickles/Compiler.pm",
-         "version" : "v24.1.0"
+         "version" : "v25.0.2"
       },
       "Gherkin::Token" : {
          "file" : "lib/Gherkin/Token.pm",
-         "version" : "v24.1.0"
+         "version" : "v25.0.2"
       },
       "Gherkin::TokenFormatterBuilder" : {
          "file" : "lib/Gherkin/TokenFormatterBuilder.pm",
-         "version" : "v24.1.0"
+         "version" : "v25.0.2"
       },
       "Gherkin::TokenMatcher" : {
          "file" : "lib/Gherkin/TokenMatcher.pm",
-         "version" : "v24.1.0"
+         "version" : "v25.0.2"
       },
       "Gherkin::TokenScanner" : {
          "file" : "lib/Gherkin/TokenScanner.pm",
-         "version" : "v24.1.0"
+         "version" : "v25.0.2"
       }
    },
    "release_status" : "stable",
@@ -150,9 +150,9 @@
          "web" : "https://github.com/cucumber/gherkin-perl"
       }
    },
-   "version" : "24.1.0",
+   "version" : "25.0.2",
    "x_generated_by_perl" : "v5.30.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.29",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
    "x_spdx_expression" : "MIT"
 }
 

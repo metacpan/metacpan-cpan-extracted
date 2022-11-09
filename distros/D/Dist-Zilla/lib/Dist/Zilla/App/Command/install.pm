@@ -1,4 +1,4 @@
-package Dist::Zilla::App::Command::install 6.027;
+package Dist::Zilla::App::Command::install 6.028;
 # ABSTRACT: install your dist
 
 use Dist::Zilla::Pragmas;
@@ -70,7 +70,7 @@ Dist::Zilla::App::Command::install - install your dist
 
 =head1 VERSION
 
-version 6.027
+version 6.028
 
 =head1 SYNOPSIS
 

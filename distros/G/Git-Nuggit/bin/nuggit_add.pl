@@ -43,9 +43,6 @@ use Term::ANSIColor;
 #
 # NOTE: Branch consistency check is not required for add, but should run as a pre-commit hook.
 
-sub ParseArgs();
-sub add_file($);
-
 my $cwd = getcwd();
 my $add_all_bool = 0;
 my $patch_bool = 0;
@@ -87,7 +84,7 @@ if ($argc == 0) {
 }
 
 
-sub ParseArgs()
+sub ParseArgs
 {
     my ($help, $man);
     Getopt::Long::GetOptions(
@@ -116,7 +113,7 @@ sub add_all
 }
 
 
-sub add_file($)
+sub add_file
 {
   my $relative_path_and_file = $_[0];
   

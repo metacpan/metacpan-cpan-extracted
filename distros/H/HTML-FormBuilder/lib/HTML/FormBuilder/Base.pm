@@ -8,7 +8,7 @@ use Carp;
 use Moo;
 use namespace::clean;
 
-our $VERSION = '0.12';    ## VERSION
+our $VERSION = '0.13';    ## VERSION
 
 our $CLASSES = {
     fieldset_group          => 'fieldset_group',
@@ -73,9 +73,10 @@ sub _build_element_and_attributes {
 
         # skip attributes that are not intended for HTML
         next if ($key =~ /^(?:option|text|hide_required_text|localize|wrap_in_div_class)/i);
-        if ($attributes->{$key}) {
-            $html .= ' ' . $key . '="' . $attributes->{$key} . '"';
-        }
+        next if not defined $attributes->{$key};
+        next if $attributes->{$key} eq '';
+
+        $html .= qq[ $key="$attributes->{$key}"];
     }
     if ($element_tag eq 'button') {
         $html .= '>' . $attributes->{'value'} . '</' . $element_tag . '>';

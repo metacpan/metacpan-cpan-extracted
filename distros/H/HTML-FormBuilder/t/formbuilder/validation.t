@@ -36,18 +36,18 @@ is($form_obj->get_field_error_message('amount'), 'Too much', 'error message=Too 
 
 set_valid_input(\$form_obj);
 $form_obj->set_field_value('amount', 'abc');
-is($form_obj->validate(), 0, 'validate=0');
+is($form_obj->validate(),                        0,               'validate=0');
 is($form_obj->get_field_error_message('amount'), 'Must be digit', 'error message=Must be digit');
 
 set_valid_input(\$form_obj);
 $form_obj->set_field_value('select_text_curr', '');
-is($form_obj->validate(), 0, 'validate=0');
+is($form_obj->validate(),                                  0,                'validate=0');
 is($form_obj->get_field_error_message('select_text_curr'), 'Must be select', 'error message=Must be select');
 
 set_valid_input(\$form_obj);
 $form_obj->set_field_value('select_text_curr',   'USD');
 $form_obj->set_field_value('select_text_amount', 'abc');
-is($form_obj->validate(), 0, 'validate=0');
+is($form_obj->validate(),                                    0,                'validate=0');
 is($form_obj->get_field_error_message('select_text_amount'), 'Must be digits', 'error message=Must be digits');
 
 set_valid_input(\$form_obj);

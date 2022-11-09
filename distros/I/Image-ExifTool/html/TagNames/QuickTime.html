@@ -193,9 +193,11 @@ roll, yaw, speed, altitude)</span></span></td></tr>
 <td>'skip'</td>
 <td>CanonSkip
   <br>PreviewImage
+  <br>SkipInfo
   <br>Skip?</td>
-<td class=c>-<br>no<br>no</td>
-<td>--&gt; <a href='Canon.html#Skip'>Canon Skip Tags</a></td></tr>
+<td class=c>-<br>no<br>-<br>no</td>
+<td>--&gt; <a href='Canon.html#Skip'>Canon Skip Tags</a>
+  <br>--&gt; <a href='QuickTime.html#SkipInfo'>QuickTime SkipInfo Tags</a></td></tr>
 <tr class=b>
 <td>'thm '</td>
 <td>ThumbnailImage</td>
@@ -240,69 +242,11 @@ roll, yaw, speed, altitude)</span></span></td></tr>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
-<h2><a name='HTCInfo'>QuickTime HTCInfo Tags</a></h2>
-<p>Tags written by some HTC camera phones.</p>
-<blockquote>
-<table class=frame><tr><td>
-<table class=inner cellspacing=1>
-<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
-<tr>
-<td>'slmt'</td>
-<td>Unknown_slmt?</td>
-<td class=c>no</td>
-<td>&nbsp;</td></tr>
-</table></td></tr></table></blockquote>
-
-<h2><a name='Pittasoft'>QuickTime Pittasoft Tags</a></h2>
-<p>Tags found in Pittasoft Blackvue dashcam &quot;free&quot; data.</p>
-<blockquote>
-<table class=frame><tr><td>
-<table class=inner cellspacing=1>
-<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
-<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
-<tr>
-<td>'3gf '</td>
-<td>AccelData</td>
-<td class=c>-</td>
-<td>--&gt; <a href='QuickTime.html#Stream'>QuickTime Stream Tags</a></td></tr>
-<tr class=b>
-<td>'cprt'</td>
-<td>Copyright</td>
-<td class=c>no</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>'gps '</td>
-<td>GPSLog</td>
-<td class=c>no</td>
-<td><span class=s><span class=n>(parsed to extract GPS separately when ExtractEmbedded is used)</span></span></td></tr>
-<tr class=b>
-<td>'ptnm'</td>
-<td>OriginalFileName</td>
-<td class=c>no</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>'ptrh'</td>
-<td>Ptrh</td>
-<td class=c>-</td>
-<td>--&gt; <a href='QuickTime.html#Pittasoft'>QuickTime Pittasoft Tags</a></td></tr>
-<tr class=b>
-<td>'sttm'</td>
-<td>StartTime</td>
-<td class=c>no</td>
-<td>&nbsp;</td></tr>
-<tr>
-<td>'thum'</td>
-<td>PreviewImage</td>
-<td class=c>no</td>
-<td>&nbsp;</td></tr>
-</table></td></tr></table></blockquote>
-
 <h2><a name='Stream'>QuickTime Stream Tags</a></h2>
 <p>The tags below are extracted from timed metadata in QuickTime and other
 formats of video files when the ExtractEmbedded option is used.  Although
 most of these tags are combined into the single table below, ExifTool
-currently reads 59 different formats of timed GPS metadata from video files.</p>
+currently reads 62 different formats of timed GPS metadata from video files.</p>
 <blockquote>
 <table class=frame><tr><td>
 <table class=inner cellspacing=1>
@@ -1227,6 +1171,64 @@ subtitle text in some other videos.</p>
 <tr>
 <td>'Yaw'</td>
 <td>Yaw</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='HTCInfo'>QuickTime HTCInfo Tags</a></h2>
+<p>Tags written by some HTC camera phones.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>'slmt'</td>
+<td>Unknown_slmt?</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Pittasoft'>QuickTime Pittasoft Tags</a></h2>
+<p>Tags found in Pittasoft Blackvue dashcam &quot;free&quot; data.</p>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>'3gf '</td>
+<td>AccelData</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#Stream'>QuickTime Stream Tags</a></td></tr>
+<tr class=b>
+<td>'cprt'</td>
+<td>Copyright</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'gps '</td>
+<td>GPSLog</td>
+<td class=c>no</td>
+<td><span class=s><span class=n>(parsed to extract GPS separately when ExtractEmbedded is used)</span></span></td></tr>
+<tr class=b>
+<td>'ptnm'</td>
+<td>OriginalFileName</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'ptrh'</td>
+<td>Ptrh</td>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#Pittasoft'>QuickTime Pittasoft Tags</a></td></tr>
+<tr class=b>
+<td>'sttm'</td>
+<td>StartTime</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>'thum'</td>
+<td>PreviewImage</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
@@ -5291,8 +5293,9 @@ and are not currently writable.</p>
 <td>'colr'</td>
 <td>ICC_Profile
   <br>ColorRepresentation</td>
-<td class=c>-<br>no</td>
-<td>--&gt; <a href='ICC_Profile.html'>ICC_Profile Tags</a></td></tr>
+<td class=c>-<br>-</td>
+<td>--&gt; <a href='ICC_Profile.html'>ICC_Profile Tags</a>
+  <br>--&gt; <a href='QuickTime.html#ColorRep'>QuickTime ColorRep Tags</a></td></tr>
 <tr>
 <td>'hvcC'</td>
 <td>HEVCConfiguration</td>
@@ -5385,6 +5388,79 @@ and are not currently writable.</p>
 <td>InitialDelaySamples?</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='ColorRep'>QuickTime ColorRep Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Index1</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td class=r title='0 = 0x0'>0</td>
+<td>ColorProfiles</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td class=r title='4 = 0x4'>4</td>
+<td>ColorPrimaries</td>
+<td class=c>no</td>
+<td><span class=s>1 = BT.709
+  <br>2 = Unspecified
+  <br>4 = BT.470 System M (historical)
+  <br>5 = BT.470 System B, G (historical)
+  <br>6 = BT.601
+  <br>7 = SMPTE 240
+  <br>8 = Generic film (color filters using illuminant C)
+  <br>9 = BT.2020, BT.2100
+  <br>10 = SMPTE 428 (CIE 1921 XYZ)
+  <br>11 = SMPTE RP 431-2
+  <br>12 = SMPTE EG 432-1
+  <br>22 = EBU Tech. 3213-E</span></td></tr>
+<tr>
+<td class=r title='6 = 0x6'>6</td>
+<td>TransferCharacteristics</td>
+<td class=c>no</td>
+<td><table class=cols><tr>
+  <td>0 = For future use (0)
+  <br>1 = BT.709
+  <br>2 = Unspecified
+  <br>3 = For future use (3)
+  <br>4 = BT.470 System M (historical)
+  <br>5 = BT.470 System B, G (historical)
+  <br>6 = BT.601
+  <br>7 = SMPTE 240 M
+  <br>8 = Linear
+  <br>9 = Logarithmic (100 : 1 range)
+  <br>10 = Logarithmic (100 * Sqrt(10) : 1 range)
+  <br>11 = IEC 61966-2-4
+  <br>12 = BT.1361
+  <br>13 = sRGB or sYCC
+  <br>14 = BT.2020 10-bit systems
+  <br>15 = BT.2020 12-bit systems
+  <br>16 = SMPTE ST 2084, ITU BT.2100 PQ
+  <br>17 = SMPTE ST 428
+  <br>18 = BT.2100 HLG, ARIB STD-B67</td></tr></table>
+</td></tr>
+<tr class=b>
+<td class=r title='8 = 0x8'>8</td>
+<td>MatrixCoefficients</td>
+<td class=c>no</td>
+<td><span class=s>0 = Identity matrix
+  <br>1 = BT.709
+  <br>2 = Unspecified
+  <br>3 = For future use (3)
+  <br>4 = US FCC 73.628
+  <br>5 = BT.470 System B, G (historical)
+  <br>6 = BT.601
+  <br>7 = SMPTE 240 M
+  <br>8 = YCgCo
+  <br>9 = BT.2020 non-constant luminance, BT.2100 YCbCr
+  <br>10 = BT.2020 constant luminance
+  <br>11 = SMPTE ST 2085 YDzDx
+  <br>12 = Chromaticity-derived non-constant luminance
+  <br>13 = Chromaticity-derived constant luminance
+  <br>14 = BT.2100 ICtCp</span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='HEVCConfig'>QuickTime HEVCConfig Tags</a></h2>
@@ -5645,10 +5721,14 @@ ExifTool, but these entries are not extracted as tags.</p>
 <td>'uuid'</td>
 <td>UUID-USMT
   <br>UUID-Canon
+  <br>GarminGPS
+  <br>GarminGPS
   <br>UUID-Unknown?</td>
-<td class=c>-<br>-<br>no</td>
+<td class=c>-<br>-<br>-<br>no<br>no</td>
 <td>--&gt; <a href='QuickTime.html#UserMedia'>QuickTime UserMedia Tags</a>
-  <br>--&gt; <a href='Canon.html#uuid'>Canon uuid Tags</a></td></tr>
+  <br>--&gt; <a href='Canon.html#uuid'>Canon uuid Tags</a>
+  <br>--&gt; <a href='QuickTime.html#Stream'>QuickTime Stream Tags</a>
+  <br><span class=n>(Garmin GPS sensor data)</span></td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='CMovie'>QuickTime CMovie Tags</a></h2>
@@ -6794,8 +6874,8 @@ spherical coordinates left/right degrees, down/up degrees, distance)</span></spa
 <tr>
 <td>'colr'</td>
 <td>ColorRepresentation</td>
-<td class=c>no</td>
-<td>&nbsp;</td></tr>
+<td class=c>-</td>
+<td>--&gt; <a href='QuickTime.html#ColorRep'>QuickTime ColorRep Tags</a></td></tr>
 <tr class=b>
 <td>'fiel'</td>
 <td>VideoFieldOrder</td>
@@ -7044,11 +7124,16 @@ for the specification.</p>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td title='0x0008 = 8'>0x0008</td>
+<td>MetaType</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>'btrt'</td>
 <td>BitrateInfo</td>
 <td class=c>-</td>
 <td>--&gt; <a href='QuickTime.html#Bitrate'>QuickTime Bitrate Tags</a></td></tr>
-<tr>
+<tr class=b>
 <td>'keys'</td>
 <td>Keys</td>
 <td class=c>-</td>
@@ -7067,11 +7152,16 @@ for the specification.</p>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td title='0x0018 = 24'>0x0018</td>
+<td>PlaybackFrameRate</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>'ftab'</td>
 <td>FontTable</td>
 <td class=c>no</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>'name'</td>
 <td>OtherName</td>
 <td class=c>no</td>
@@ -8442,6 +8532,24 @@ yaw, pitch and roll angles in degrees)</span></span></td></tr>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
+<h2><a name='SkipInfo'>QuickTime SkipInfo Tags</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Tag&nbsp;ID</th><th>Tag Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>'thma'</td>
+<td>ThumbnailImage</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>'ver '</td>
+<td>Version</td>
+<td class=c>no</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
 <h2><a name='Profile'>QuickTime Profile Tags</a></h2>
 <blockquote>
 <table class=frame><tr><td>
@@ -8873,7 +8981,7 @@ yaw, pitch and roll angles in degrees)</span></span></td></tr>
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Dec 8, 2021</i>
+<br><i>Last revised Nov 8, 2022</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

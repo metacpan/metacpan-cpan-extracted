@@ -25,6 +25,7 @@ lib/Acme/Mitey/Cards/Deck.pm
 lib/Acme/Mitey/Cards/Deck.pm.mite.pm
 lib/Acme/Mitey/Cards/Hand.pm
 lib/Acme/Mitey/Cards/Hand.pm.mite.pm
+lib/Acme/Mitey/Cards/MOP.pm
 lib/Acme/Mitey/Cards/Mite.pm
 lib/Acme/Mitey/Cards/Set.pm
 lib/Acme/Mitey/Cards/Set.pm.mite.pm
@@ -33,6 +34,7 @@ lib/Acme/Mitey/Cards/Suit.pm.mite.pm
 lib/Acme/Mitey/Cards/Types.pm
 lib/Acme/Mitey/Cards/Types/Source.pm
 t/00-cards.t
+t/01-moose-compat.t
 t/card-face.t
 t/card-joker.t
 t/card-numeric.t

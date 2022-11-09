@@ -87,7 +87,7 @@ for( 1..3 )
     $mydir = $mydir->child( $_ );
 }
 diag( "New path is '$mydir'" ) if( $DEBUG );
-is( "$mydir", File::Spec->catpath( $mydir->volume, File::Spec->catdir( $dircopy, 1, 2, 3 ) ), "combined path" );
+is( "$mydir", File::Spec->catpath( $mydir->volume, File::Spec->catdir( $dircopy, 1, 2, 3 ), '' ), "combined path" );
 my $frags = $mydir->mkpath;
 diag( "mkpath error: ", $mydir->error ) if( $DEBUG && !defined( $frags ) );
 isa_ok( $frags, 'Module::Generic::Array', 'mkpath returned object' );
@@ -263,8 +263,10 @@ is( $f4->code, 410, 'code: file is gone' );
 
 my $here = cwd();
 is( $here, Cwd::cwd(), 'cwd' );
-ok( !$f4->chdir, 'file cannot chdir' );
-
+{
+    no warnings 'Module::Generic::File';
+    ok( !$f4->chdir, 'file cannot chdir' );
+}
 use utf8;
 my $data = <<EOT;
 Mignonne, allons voir si la rose

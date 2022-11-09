@@ -1,5 +1,5 @@
 package Gherkin;
-$Gherkin::VERSION = '24.1.0';
+$Gherkin::VERSION = '25.0.2';
 use strict;
 use warnings;
 use Encode qw(encode_utf8 find_encoding);
@@ -149,7 +149,7 @@ the C<$sink>, whereas the current version sends L<Cucumber::Messages>.
 
 The Cucumber toolkit consists of a set of tools which form a pipe line:
 each consumes and produces protobuf messages
-(See L<https://github.com/cucumber/common/tree/main/messages>). Messages
+(See L<https://github.com/cucumber/messages>). Messages
 use ndjson formatting.
 
 The start of the pipeline is the Gherkin language parser. C<Gherkin>

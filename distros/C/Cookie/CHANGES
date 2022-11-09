@@ -1,51 +1,58 @@
 Revision history for Perl module Cookie
 
+v0.2.1 2022-09-24T17:34:13+0900
+    - Minor modification of method 'save' in Cookie::Jar
+    - Minor improvement to cron_fetch in Cookie::Domain
+    - Added methods load_as_mozilla() and save_as_mozilla() in Cookie::Jar
+    - Corrected a minor issue when removing cookies while performing a do() or scan(), since they were accessing and modifying the same array reference at the same time.
+    - Corrected a format error in save_as_netscape in Cookie::Jar when exporting cookies as netscape whereby the expiration was not in a unix timestamp format
+
 v0.2.0 2022-07-16T15:50:52+0900
     - Added methods algo, autosave, file, secret, type to Cookie::Jar
     - Corrected some typos in Cookie::Jar
 
-v0.1.13 2022-06-27T13:59:30Z +0900
+v0.1.13 2022-06-27T13:59:30+0900
     - Minor correction in Cookie::Jar for cases where the host is an IP address
 
-v0.1.12 2022-06-23T15:47:58Z +0900
+v0.1.12 2022-06-23T15:47:58+0900
     - Improved correction for a race condition when no local time has been set
 
-v0.1.11 2022-06-22T15:20:03Z +0900
+v0.1.11 2022-06-22T15:20:03+0900
     - Corrected for a race condition when no local time has been set
 
-v0.1.10 2022-06-21T00:00:24Z +0900
+v0.1.10 2022-06-21T00:00:24+0900
     - Corrected a small error in Makefile.PL
 
-v0.1.9 2022-06-19T08:38:19Z +0900
+v0.1.9 2022-06-19T08:38:19+0900
     - Improvement of the Makefile.PL
 
-v0.1.8 2021-12-15T07:01:04Z +0900
+v0.1.8 2021-12-15T07:01:04+0900
     - Re-submision for Cookies
 
-v0.1.7 2021-12-14T10:50:36Z +0900
+v0.1.7 2021-12-14T10:50:36+0900
     - Added the Cookies class to serve as a cookies jar. See also Cookie::Jar
 
-v0.1.6 2021-12-07T17:49:09Z +0900
+v0.1.6 2021-12-07T17:49:09+0900
     - Corrected bug in handling and resetting cache in Cookie
 
-v0.1.5 2021-11-25T07:27:14Z +0900
+v0.1.5 2021-11-25T07:27:14+0900
     - Corrected test units version requirement for testing with CryptX
 
-v0.1.4 2021-11-22T11:10:49Z +0900
+v0.1.4 2021-11-22T11:10:49+0900
     - Minor correction in expires() in Cookie and related test units
 
-v0.1.3 2021-11-18T12:24:20Z +0900
+v0.1.3 2021-11-18T12:24:20+0900
     - Improvement on is_expired in Cookie
 
-v0.1.2 2021-11-18T11:34:17Z +0900
+v0.1.2 2021-11-18T11:34:17+0900
     - Documentation corrections
 
-v0.1.1 2021-11-17T17:00:54Z +0900
+v0.1.1 2021-11-17T17:00:54+0900
     - Change of distribution name from Cookies to Cookie
     - Improvements on handling of same cookie name for a given domain and path
     - Better compliance with rfc6265
 
-v0.1.0 2021-11-14T14:40:13Z +0900
+v0.1.0 2021-11-14T14:40:13+0900
     - Initial release
     - Added classes Cookies and Cookie
     - Added class Cookies::Domain

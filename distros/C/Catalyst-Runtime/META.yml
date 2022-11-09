@@ -82,11 +82,11 @@ requires:
 resources:
   IRC: irc://irc.perl.org/#catalyst
   MailingList: http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/catalyst
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Catalyst-Runtime
-  homepage: http://dev.catalyst.perl.org/
+  bugtracker: https://github.com/perl-catalyst/catalyst-runtime/issues
+  homepage: https://github.com/perl-catalyst/catalyst-runtime
   license: http://dev.perl.org/licenses/
   repository: https://github.com/perl-catalyst/catalyst-runtime.git
-version: '5.90129'
+version: '5.90130'
 x_authority: cpan:MSTROUT
 x_breaks:
   Catalyst::Action::REST: '<= 0.67'

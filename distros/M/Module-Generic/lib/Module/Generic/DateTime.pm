@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/DateTime.pm
-## Version v0.4.2
+## Version v0.4.3
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2022/08/05
+## Modified 2022/11/06
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -17,7 +17,7 @@ BEGIN
     use warnings;
     use warnings::register;
     use parent qw( Module::Generic );
-    use vars qw( $ERROR $TS_RE $VERSION );
+    use vars qw( $ERROR $TS_RE $VERSION $HAS_LOCAL_TZ );
     use DateTime 1.57;
     use DateTime::Format::Strptime 1.79;
     use DateTime::TimeZone 2.51;
@@ -58,7 +58,7 @@ BEGIN
         )?
     )?
     /x;
-    our $VERSION = 'v0.4.2';
+    our $VERSION = 'v0.4.3';
 };
 
 BEGIN
@@ -326,14 +326,31 @@ sub op
     # Unix time
     elsif( $other =~ /^\d{10}$/ )
     {
-        try
+        if( !defined( $HAS_LOCAL_TZ ) )
         {
-            $dt2 = DateTime->from_epoch( epoch => $other, time_zone => 'local' );
+            try
+            {
+                $dt2 = DateTime->from_epoch( epoch => $other, time_zone => 'local' );
+                $HAS_LOCAL_TZ = 1;
+            }
+            catch( $e )
+            {
+                warn( "Your system is missing key timezone components. ${class} is reverting to UTC instead of local time zone.\n" );
+                $dt2 = DateTime->from_epoch( epoch => $other, time_zone => 'UTC' );
+                $HAS_LOCAL_TZ = 0;
+            }
         }
-        catch( $e )
+        else
         {
-            warn( "Your system is missing key timezone components. ${class} is reverting to UTC instead of local time zone.\n" );
-            $dt2 = DateTime->from_epoch( epoch => $other, time_zone => 'UTC' );
+            try
+            {
+                $dt2 = DateTime->from_epoch( epoch => $other, time_zone => ( $HAS_LOCAL_TZ ? 'local' : 'UTC' ) );
+            }
+            catch( $e )
+            {
+                warn( "Error trying to set a DateTime object using ", ( $HAS_LOCAL_TZ ? 'local' : 'UTC' ), " time zone\n" );
+                $dt2 = DateTime->from_epoch( epoch => $other, time_zone => 'UTC' );
+            }
         }
         $dt2->set_formatter( $self->formatter );
     }
@@ -436,15 +453,33 @@ sub op_minus_plus
             {
                 my $clone = $dt1->clone;
                 my $ts = $clone->epoch;
-                try
+                if( !defined( $HAS_LOCAL_TZ ) )
                 {
-                    $clone->set_time_zone( 'local' );
+                    try
+                    {
+                        $clone->set_time_zone( 'local' );
+                        $HAS_LOCAL_TZ = 1;
+                    }
+                    catch( $e )
+                    {
+                        $clone->set_time_zone( 'UTC' );
+                        $HAS_LOCAL_TZ = 0;
+                        warn( "Your system is missing key timezone components. ${class} is reverting to UTC instead of local time zone.\n" ) if( warnings::enabled() );
+                    }
                 }
-                catch( $e )
+                else
                 {
-                    $clone->set_time_zone( 'UTC' );
-                    warn( "Your system is missing key timezone components. ${class} is reverting to UTC instead of local time zone.\n" ) if( warnings::enabled() );
+                    try
+                    {
+                        $clone->set_time_zone( $HAS_LOCAL_TZ ? 'local' : 'UTC' );
+                    }
+                    catch( $e )
+                    {
+                        warn( "Error trying to set the DateTime object time zone using ", ( $HAS_LOCAL_TZ ? 'local' : 'UTC' ), "\n" );
+                        $clone->set_time_zone( 'UTC' );
+                    }
                 }
+                
                 my $new_ts = $v - $ts;
                 $new_dt = DateTime->from_epoch( epoch => $new_ts, time_zone => $dt1->time_zone );
                 my $strp = DateTime::Format::Strptime->new(
@@ -1061,7 +1096,7 @@ Module::Generic::DateTime - A DateTime wrapper for enhanced features
 
 =head1 VERSION
 
-    v0.4.2
+    v0.4.3
 
 =head1 DESCRIPTION
 
@@ -1081,7 +1116,31 @@ If no L<DateTime> object was provided, this will instantiate one implicitly and 
 
     $dt->set_time_zone( 'Asia/Tokyo' );
 
+=head2 from_epoch
+
+    my $d = Module::Generic::DateTime->from_epoch( epoch => $unix_timestamp );
+
+Instantiate a new L<Module::Generic::DateTime> using the L<DateTime> method C<from_epoch>. Any parameters are passed through to L<DateTime/from_epoch>
+
+If a L<DateTime> error occurs, it will be caught and an L<error|Module::Generic/error> will be set and C<undef> will be returned.
+
+=head2 now
+
+    my $d = Module::Generic::DateTime->now;
+
+Instantiate a new L<Module::Generic::DateTime> using the L<DateTime> method C<now>. Any parameters are passed through to L<DateTime/now>
+
+If a L<DateTime> error occurs, it will be caught and an L<error|Module::Generic/error> will be set and C<undef> will be returned.
+
 =head1 METHODS
+
+=head2 as_string
+
+This is an alias to L</stringify>
+
+=head2 datetime
+
+Sets or gets the underlying L<DateTime> object.
 
 =head2 op
 

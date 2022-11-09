@@ -18,7 +18,7 @@ package t::FrontEnd {
                 before_forward => [sub { return {"non-authorized" => 'by-some-reason'} }],
                 actions        => [['success'],],
                 base_path      => '/api',
-                url => $ENV{T_TestWSP_RPC_URL} // die("T_TestWSP_RPC_URL is not defined"),
+                url            => $ENV{T_TestWSP_RPC_URL} // die("T_TestWSP_RPC_URL is not defined"),
             });
     }
 };

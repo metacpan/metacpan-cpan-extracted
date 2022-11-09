@@ -1,5 +1,8 @@
 Revision history for POE::Component::EasyDBI.
 
+1.29
+	- Fix crashes when starting up without a DBI connection
+
 1.28
     - Update documentation
     - Revert DBD::AnyData tests and skip them

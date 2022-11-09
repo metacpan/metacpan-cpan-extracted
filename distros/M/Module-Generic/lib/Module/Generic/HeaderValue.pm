@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/HeaderValue.pm
-## Version v0.4.1
+## Version v0.4.2
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/11/03
-## Modified 2022/08/05
+## Modified 2022/11/09
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -66,7 +66,7 @@ BEGIN
     # our $TYPE_REGEXP  = qr/(?:[!#$%&'*+.^_`|~0-9A-Za-z-]+\/[!#$%&'*+.^_`|~0-9A-Za-z-]+)|$TOKEN_REGEXP/;
     # our $TOKEN_REGEXP = qr/[!#$%&'*+.^_`|~0-9A-Za-z-]+/;
     # our $TEXT_REGEXP  = qr/[\u000b\u0020-\u007e\u0080-\u00ff]+|$COOKIE_DATA_RE/;
-    our $VERSION = 'v0.4.1';
+    our $VERSION = 'v0.4.2';
 };
 
 use strict;
@@ -175,7 +175,7 @@ sub new_from_header
     #     {
     #         my $trace = $self->_get_stack_trace;
     #     }
-        $v =~ s/^\"|(?<!\\)\"$//g;
+        $v =~ s/^\"|(?<!\\)\"$//g if( CORE::defined( $v ) );
         if( $opts->{decode} )
         {
             $n = URI::Escape::uri_unescape( $n );
@@ -392,7 +392,7 @@ sub value_as_string
         {
             $v = URI::Escape::uri_escape( $v ) if( $v !~ /^$TEXT_REGEXP$/ || $v =~ /=/ );
         }
-        $v = qq{"${v}"} if( $v =~ /$DELIMITERS/ );
+        $v = qq{"${v}"} if( CORE::defined( $v ) && $v =~ /$DELIMITERS/ );
         $string = defined( $v ) ? join( '=', $n, $v ) : $n;
     }
     return( $string );
@@ -496,7 +496,7 @@ Module::Generic::HeaderValue - Generic Header Value Parser
 
 =head1 VERSION
 
-    v0.4.1
+    v0.4.2
 
 =head1 DESCRIPTION
 
@@ -656,6 +656,10 @@ Provided with a string and this returns a quoted version, if necessary.
 =head2 reset
 
 Remove the cached version of the stringification, i.e. set the object property C<original> to an empty string.
+
+=head2 token_escape
+
+This will escape token value using hexadecimal equivalent if it contains delimiters as defined by L<rfc2616|https://datatracker.ietf.org/doc/html/rfc2616#section-2.2>
 
 =head2 token_max
 

@@ -5,7 +5,7 @@ use warnings;
 package Path::Tiny;
 # ABSTRACT: File path utility
 
-our $VERSION = '0.130';
+our $VERSION = '0.142';
 
 # Dependencies
 use Config;
@@ -27,15 +27,14 @@ use constant {
 };
 
 use overload (
-    q{""}    => sub    { $_[0]->[PATH] },
+    q{""}    => 'stringify',
     bool     => sub () { 1 },
     fallback => 1,
 );
 
 # FREEZE/THAW per Sereal/CBOR/Types::Serialiser protocol
-sub FREEZE { return $_[0]->[PATH] }
 sub THAW   { return path( $_[2] ) }
-{ no warnings 'once'; *TO_JSON = *FREEZE };
+{ no warnings 'once'; *TO_JSON = *FREEZE = \&stringify };
 
 my $HAS_UU; # has Unicode::UTF8; lazily populated
 
@@ -182,7 +181,6 @@ sub _get_args {
 #pod     $path = path("foo/bar");
 #pod     $path = path("/tmp", "file.txt"); # list
 #pod     $path = path(".");                # cwd
-#pod     $path = path("~user/file.txt");   # tilde processing
 #pod
 #pod Constructs a C<Path::Tiny> object.  It doesn't matter if you give a file or
 #pod directory path.  It's still up to you to call directory-like methods only on
@@ -193,11 +191,12 @@ sub _get_args {
 #pod will be thrown.  This prevents subtle, dangerous errors with code like
 #pod C<< path( maybe_undef() )->remove_tree >>.
 #pod
-#pod If the first component of the path is a tilde ('~') then the component will be
-#pod replaced with the output of C<glob('~')>.  If the first component of the path
-#pod is a tilde followed by a user name then the component will be replaced with
-#pod output of C<glob('~username')>.  Behaviour for non-existent users depends on
-#pod the output of C<glob> on the system.
+#pod B<DEPRECATED>: If and only if the B<first> character of the B<first> argument
+#pod to C<path> is a tilde ('~'), then tilde replacement will be applied to the
+#pod first path segment. A single tilde will be replaced with C<glob('~')> and a
+#pod tilde followed by a username will be replaced with output of
+#pod C<glob('~username')>. B<No other method does tilde expansion on its arguments>.
+#pod See L</Tilde expansion (deprecated)> for more.
 #pod
 #pod On Windows, if the path consists of a drive identifier without a path component
 #pod (C<C:> or C<D:>), it will be expanded to the absolute path of the current
@@ -233,6 +232,46 @@ sub path {
     # stringify objects
     $path = "$path";
 
+    # do any tilde expansions
+    my ($tilde) = $path =~ m{^(~[^/]*)};
+    if ( defined $tilde ) {
+        # Escape File::Glob metacharacters
+        (my $escaped = $tilde) =~ s/([\[\{\*\?\\])/\\$1/g;
+        require File::Glob;
+        my ($homedir) = File::Glob::bsd_glob($escaped);
+        if (defined $homedir && ! $File::Glob::ERROR) {
+            $homedir =~ tr[\\][/] if IS_WIN32();
+            $path =~ s{^\Q$tilde\E}{$homedir};
+        }
+    }
+
+    unshift @_, $path;
+    goto &_pathify;
+}
+
+# _path is like path but without tilde expansion
+sub _path {
+    my $path = shift;
+    Carp::croak("Path::Tiny paths require defined, positive-length parts")
+      unless 1 + @_ == grep { defined && length } $path, @_;
+
+    # non-temp Path::Tiny objects are effectively immutable and can be reused
+    if ( !@_ && ref($path) eq __PACKAGE__ && !$path->[TEMP] ) {
+        return $path;
+    }
+
+    # stringify objects
+    $path = "$path";
+
+    unshift @_, $path;
+    goto &_pathify;
+}
+
+# _pathify expects one or more string arguments, then joins and canonicalizes
+# them into an object.
+sub _pathify {
+    my $path = shift;
+
     # expand relative volume paths on windows; put trailing slash on UNC root
     if ( IS_WIN32() ) {
         $path = _win32_vol( $path, $1 ) if $path =~ m{^($DRV_VOL)(?:$NOTSLASH|\z)};
@@ -243,6 +282,7 @@ sub path {
     if (@_) {
         $path .= ( _is_root($path) ? "" : "/" ) . join( "/", @_ );
     }
+
 
     # canonicalize, but with unix slashes and put back trailing volume slash
     my $cpath = $path = File::Spec->canonpath($path);
@@ -256,14 +296,6 @@ sub path {
     }
     else {
         $path =~ s{/\z}{};
-    }
-
-    # do any tilde expansions
-    if ( $path =~ m{^(~[^/]*).*} ) {
-        require File::Glob;
-        my ($homedir) = File::Glob::bsd_glob($1);
-        $homedir =~ tr[\\][/] if IS_WIN32();
-        $path =~ s{^(~[^/]*)}{$homedir};
     }
 
     bless [ $path, $cpath ], __PACKAGE__;
@@ -299,7 +331,7 @@ sub new { shift; path(@_) }
 
 sub cwd {
     require Cwd;
-    return path( Cwd::getcwd() );
+    return _path( Cwd::getcwd() );
 }
 
 #pod =construct rootdir
@@ -317,7 +349,7 @@ sub cwd {
 #pod
 #pod =cut
 
-sub rootdir { path( File::Spec->rootdir ) }
+sub rootdir { _path( File::Spec->rootdir ) }
 
 #pod =construct tempfile, tempdir
 #pod
@@ -328,8 +360,11 @@ sub rootdir { path( File::Spec->rootdir ) }
 #pod     $temp = tempfile( @options ); # optional export
 #pod     $temp = tempdir( @options );  # optional export
 #pod
-#pod C<tempfile> passes the options to C<< File::Temp->new >> and returns a C<Path::Tiny>
-#pod object with the file name.  The C<TMPDIR> option is enabled by default.
+#pod C<tempfile> passes the options to C<< File::Temp->new >> and returns a
+#pod C<Path::Tiny> object with the file name.  The C<TMPDIR> option will be enabled
+#pod by default, but you can override that by passing C<< TMPDIR => 0 >> along with
+#pod the options.  (If you use an absolute C<TEMPLATE> option, you will want to
+#pod disable C<TMPDIR>.)
 #pod
 #pod The resulting C<File::Temp> object is cached. When the C<Path::Tiny> object is
 #pod destroyed, the C<File::Temp> object will be as well.
@@ -399,7 +434,7 @@ sub tempfile {
     require File::Temp;
     my $temp = File::Temp->new( TMPDIR => 1, %$args );
     close $temp;
-    my $self = $opts->{realpath} ? path($temp)->realpath : path($temp)->absolute;
+    my $self = $opts->{realpath} ? _path($temp)->realpath : _path($temp)->absolute;
     $self->[TEMP] = $temp;                # keep object alive while we are
     return $self;
 }
@@ -410,7 +445,7 @@ sub tempdir {
 
     require File::Temp;
     my $temp = File::Temp->newdir( @$maybe_template, TMPDIR => 1, %$args );
-    my $self = $opts->{realpath} ? path($temp)->realpath : path($temp)->absolute;
+    my $self = $opts->{realpath} ? _path($temp)->realpath : _path($temp)->absolute;
     $self->[TEMP] = $temp;                # keep object alive while we are
     # Some ActiveState Perls for Windows break Cwd in ways that lead
     # File::Temp to get confused about what path to remove; this
@@ -465,11 +500,27 @@ sub _resolve_symlinks {
         if ( ++$count > 100 ) {
             $self->_throw( 'readlink', $self->[PATH], "maximum symlink depth exceeded" );
         }
-        my $resolved = readlink $new->[PATH] or $new->_throw( 'readlink', $new->[PATH] );
-        $resolved = path($resolved);
+        my $resolved = readlink $new->[PATH];
+        $new->_throw( 'readlink', $new->[PATH] ) unless defined $resolved;
+        $resolved = _path($resolved);
         $new = $resolved->is_absolute ? $resolved : $new->sibling($resolved);
     }
     return $new;
+}
+
+sub _replacment_path {
+    my ($self) = @_;
+
+    my $unique_suffix = $$ . int( rand( 2**31 ) );
+    my $temp          = _path( $self . $unique_suffix );
+
+    # If filename with process+random suffix is too long, use a shorter
+    # version that doesn't preserve the basename.
+    if ( length $temp->basename > 255 ) {
+        $temp = $self->sibling( "temp" . $unique_suffix );
+    }
+
+    return $temp;
 }
 
 #--------------------------------------------------------------------------#
@@ -509,7 +560,7 @@ sub absolute {
             # use Win32::GetCwd not Cwd::getdcwd because we're sure
             # to have the former but not necessarily the latter
             my ($drv) = Win32::GetCwd() =~ /^($DRV_VOL | $UNC_VOL)/x;
-            return path( $drv . $self->[PATH] );
+            return _path( $drv . $self->[PATH] );
         }
     }
     else {
@@ -518,13 +569,13 @@ sub absolute {
 
     # no base means use current directory as base
     require Cwd;
-    return path( Cwd::getcwd(), $_[0]->[PATH] ) unless defined $base;
+    return _path( Cwd::getcwd(), $_[0]->[PATH] ) unless defined $base;
 
     # relative base should be made absolute; we check is_absolute rather
     # than unconditionally make base absolute so that "/foo" doesn't become
     # "C:/foo" on Windows.
-    $base = path($base);
-    return path( ( $base->is_absolute ? $base : $base->absolute ), $_[0]->[PATH] );
+    $base = _path($base);
+    return _path( ( $base->is_absolute ? $base : $base->absolute ), $_[0]->[PATH] );
 }
 
 #pod =method append, append_raw, append_utf8
@@ -547,13 +598,14 @@ sub absolute {
 #pod B<in place>, unlike L</spew> which writes to a temporary file and then
 #pod replaces the original (if it exists).
 #pod
-#pod C<append_raw> is like C<append> with a C<binmode> of C<:unix> for fast,
+#pod C<append_raw> is like C<append> with a C<binmode> of C<:unix> for a fast,
 #pod unbuffered, raw write.
 #pod
-#pod C<append_utf8> is like C<append> with a C<binmode> of
-#pod C<:unix:encoding(UTF-8)> (or L<PerlIO::utf8_strict>).  If L<Unicode::UTF8>
-#pod 0.58+ is installed, a raw append will be done instead on the data encoded
-#pod with C<Unicode::UTF8>.
+#pod C<append_utf8> is like C<append> with an unbuffered C<binmode>
+#pod C<:unix:encoding(UTF-8)> (or C<:unix:utf8_strict> with
+#pod L<PerlIO::utf8_strict>).  If L<Unicode::UTF8> 0.58+ is installed, an
+#pod unbuffered, raw append will be done instead on the data encoded with
+#pod C<Unicode::UTF8>.
 #pod
 #pod Current API available since 0.060.
 #pod
@@ -567,7 +619,7 @@ sub append {
     $binmode = ( ( caller(0) )[10] || {} )->{'open>'} unless defined $binmode;
     my $mode = $args->{truncate} ? ">" : ">>";
     my $fh = $self->filehandle( { locked => 1 }, $mode, $binmode );
-    print {$fh} map { ref eq 'ARRAY' ? @$_ : $_ } @data;
+    print( {$fh} map { ref eq 'ARRAY' ? @$_ : $_ } @data ) or self->_throw('print');
     close $fh or $self->_throw('close');
 }
 
@@ -709,7 +761,7 @@ sub cached_temp {
 
 sub child {
     my ( $self, @parts ) = @_;
-    return path( $self->[PATH], @parts );
+    return _path( $self->[PATH], @parts );
 }
 
 #pod =method children
@@ -748,7 +800,7 @@ sub children {
         Carp::croak("Invalid argument '$filter' for children()");
     }
 
-    return map { path( $self->[PATH], $_ ) } @children;
+    return map { _path( $self->[PATH], $_ ) } @children;
 }
 
 #pod =method chmod
@@ -810,7 +862,7 @@ sub copy {
     File::Copy::copy( $self->[PATH], $dest )
       or Carp::croak("copy failed for $self to $dest: $!");
 
-    return -d $dest ? path( $dest, $self->basename ) : path($dest);
+    return -d $dest ? _path( $dest, $self->basename ) : _path($dest);
 }
 
 #pod =method digest
@@ -841,7 +893,11 @@ sub digest {
     if ( $args->{chunk_size} ) {
         my $fh = $self->filehandle( { locked => 1 }, "<", ":unix" );
         my $buf;
-        $digest->add($buf) while read $fh, $buf, $args->{chunk_size};
+        while (!eof($fh)) {
+            my $rc = read $fh, $buf, $args->{chunk_size};
+            $self->_throw('read') unless defined $rc;
+            $digest->add($buf);
+        }
     }
     else {
         $digest->add( $self->slurp_raw );
@@ -941,8 +997,12 @@ sub edit_raw { $_[2] = { binmode => ":unix" }; goto &edit }
 #pod C<binmode>, which is passed to the method that open handles for reading and
 #pod writing.
 #pod
-#pod C<edit_lines_utf8> and C<edit_lines_raw> act like their respective
-#pod C<slurp_*> and C<spew_*> methods.
+#pod C<edit_lines_raw> is like C<edit_lines> with a buffered C<binmode> of
+#pod C<:raw>.
+#pod
+#pod C<edit_lines_utf8> is like C<edit_lines> with a buffered C<binmode>
+#pod C<:raw:encoding(UTF-8)> (or C<:raw:utf8_strict> with
+#pod L<PerlIO::utf8_strict>).
 #pod
 #pod Current API available since 0.077.
 #pod
@@ -959,18 +1019,19 @@ sub edit_lines {
     # get default binmode from caller's lexical scope (see "perldoc open")
     $binmode = ( ( caller(0) )[10] || {} )->{'open>'} unless defined $binmode;
 
-    # writing need to follow the link and create the tempfile in the same
+    # writing needs to follow the link and create the tempfile in the same
     # dir for later atomic rename
     my $resolved_path = $self->_resolve_symlinks;
-    my $temp          = path( $resolved_path . $$ . int( rand( 2**31 ) ) );
+    my $temp          = $resolved_path->_replacment_path;
 
     my $temp_fh = $temp->filehandle( { exclusive => 1, locked => 1 }, ">", $binmode );
     my $in_fh = $self->filehandle( { locked => 1 }, '<', $binmode );
 
     local $_;
-    while (<$in_fh>) {
+    while (! eof($in_fh) ) {
+        defined( $_ = readline($in_fh) ) or $self->_throw('readline');
         $cb->();
-        $temp_fh->print($_);
+        $temp_fh->print($_) or self->_throw('print', $temp);
     }
 
     close $temp_fh or $self->_throw( 'close', $temp );
@@ -979,10 +1040,15 @@ sub edit_lines {
     return $temp->move($resolved_path);
 }
 
-sub edit_lines_raw { $_[2] = { binmode => ":unix" }; goto &edit_lines }
+sub edit_lines_raw { $_[2] = { binmode => ":raw" }; goto &edit_lines }
 
 sub edit_lines_utf8 {
-    $_[2] = { binmode => ":raw:encoding(UTF-8)" };
+    if ( defined($HAS_PU) ? $HAS_PU : ( $HAS_PU = _check_PU() ) ) {
+        $_[2] = { binmode => ":raw:utf8_strict" };
+    }
+    else {
+        $_[2] = { binmode => ":raw:encoding(UTF-8)" };
+    }
     goto &edit_lines;
 }
 
@@ -1132,7 +1198,7 @@ sub filehandle {
 
 sub has_same_bytes {
     my ($self, $other_path) = @_;
-    my $other = path($other_path);
+    my $other = _path($other_path);
 
     my $fh1 = $self->openr_raw({ locked => 1 });
     my $fh2 = $other->openr_raw({ locked => 1 });
@@ -1313,11 +1379,11 @@ sub iterator {
 #pod instead of C<:unix> so PerlIO buffering can manage reading by line.
 #pod
 #pod C<lines_utf8> is like C<lines> with a C<binmode> of C<:raw:encoding(UTF-8)>
-#pod (or L<PerlIO::utf8_strict>).  If L<Unicode::UTF8> 0.58+ is installed, a raw
-#pod UTF-8 slurp will be done and then the lines will be split.  This is
-#pod actually faster than relying on C<:encoding(UTF-8)>, though a bit memory
-#pod intensive.  If memory use is a concern, consider C<openr_utf8> and
-#pod iterating directly on the handle.
+#pod (or C<:raw:utf8_strict> with L<PerlIO::utf8_strict>).  If L<Unicode::UTF8>
+#pod 0.58+ is installed, a raw, unbuffered UTF-8 slurp will be done and then the
+#pod lines will be split.  This is actually faster than relying on
+#pod IO layers, though a bit memory intensive.  If memory use is a
+#pod concern, consider C<openr_utf8> and iterating directly on the handle.
 #pod
 #pod Current API available since 0.065.
 #pod
@@ -1333,7 +1399,10 @@ sub lines {
     # XXX more efficient to read @lines then chomp(@lines) vs map?
     if ( $args->{count} ) {
         my ( $counter, $mod, @result ) = ( 0, abs( $args->{count} ) );
-        while ( my $line = <$fh> ) {
+        my $line;
+        while ( !eof($fh) ) {
+            defined( $line = readline($fh) ) or $self->_throw('readline');
+
             $line =~ s/(?:\x{0d}?\x{0a}|\x{0d})\z// if $chomp;
             $result[ $counter++ ] = $line;
             # for positive count, terminate after right number of lines
@@ -1347,10 +1416,23 @@ sub lines {
         return @result;
     }
     elsif ($chomp) {
-        return map { s/(?:\x{0d}?\x{0a}|\x{0d})\z//; $_ } <$fh>; ## no critic
+        local $!;
+        my @lines = map { s/(?:\x{0d}?\x{0a}|\x{0d})\z//; $_ } <$fh>; ## no critic
+        $self->_throw('readline') if $!;
+        return @lines;
     }
     else {
-        return wantarray ? <$fh> : ( my $count =()= <$fh> );
+        if ( wantarray ) {
+            local $!;
+            my @lines = <$fh>;
+            $self->_throw('readline') if $!;
+            return @lines;
+        } else {
+            local $!;
+            my $count =()= <$fh>;
+            $self->_throw('readline') if $!;
+            return $count;
+        }
     }
 }
 
@@ -1380,7 +1462,7 @@ sub lines_utf8 {
         return split $CRLF, $slurp, -1; ## no critic
     }
     elsif ( defined($HAS_PU) ? $HAS_PU : ( $HAS_PU = _check_PU() ) ) {
-        $args->{binmode} = ":unix:utf8_strict";
+        $args->{binmode} = ":raw:utf8_strict";
         return lines( $self, $args );
     }
     else {
@@ -1454,19 +1536,33 @@ sub mkpath {
 #pod
 #pod     path("foo.txt")->move("bar.txt");
 #pod
-#pod Move the current path to the given destination path using Perl's
-#pod built-in L<rename|perlfunc/rename> function. Returns the result
-#pod of the C<rename> function (except it throws an exception if it fails).
+#pod Moves the current path to the given destination using L<File::Copy>'s
+#pod C<move> function. Upon success, returns the C<Path::Tiny> object for the
+#pod newly moved file.
 #pod
-#pod Current API available since 0.001.
+#pod If the destination already exists and is a directory, and the source is not a
+#pod directory, then the source file will be renamed into the directory
+#pod specified by the destination.
+#pod
+#pod If possible, move() will simply rename the file. Otherwise, it
+#pod copies the file to the new location and deletes the original. If an
+#pod error occurs during this copy-and-delete process, you may be left
+#pod with a (possibly partial) copy of the file under the destination
+#pod name.
+#pod
+#pod Current API available since 0.124. Prior versions used Perl's
+#pod -built-in (and less robust) L<rename|perlfunc/rename> function
+#pod and did not return an object.
 #pod
 #pod =cut
 
 sub move {
-    my ( $self, $dst ) = @_;
+    my ( $self, $dest ) = @_;
+    require File::Copy;
+    File::Copy::move( $self->[PATH], $dest )
+      or $self->_throw( 'move', $self->[PATH] . "' -> '$dest" );
 
-    return rename( $self->[PATH], $dst )
-      || $self->_throw( 'rename', $self->[PATH] . "' -> '$dst" );
+    return -d $dest ? _path( $dest, $self->basename ) : _path($dest);
 }
 
 #pod =method openr, openw, openrw, opena
@@ -1489,8 +1585,9 @@ sub move {
 #pod
 #pod Returns a file handle opened in the specified mode.  The C<openr> style methods
 #pod take a single C<binmode> argument.  All of the C<open*> methods have
-#pod C<open*_raw> and C<open*_utf8> equivalents that use C<:raw> and
-#pod C<:raw:encoding(UTF-8)>, respectively.
+#pod C<open*_raw> and C<open*_utf8> equivalents that use buffered I/O layers C<:raw>
+#pod and C<:raw:encoding(UTF-8)> (or C<:raw:utf8_strict> with
+#pod L<PerlIO::utf8_strict>).
 #pod
 #pod An optional hash reference may be used to pass options.  The only option is
 #pod C<locked>.  If true, handles opened for writing, appending or read-write are
@@ -1534,7 +1631,14 @@ while ( my ( $k, $v ) = each %opens ) {
         my ( $self, @args ) = @_;
         my $args = ( @args && ref $args[0] eq 'HASH' ) ? shift @args : {};
         $args = _get_args( $args, qw/locked/ );
-        $self->filehandle( $args, $v, ":raw:encoding(UTF-8)" );
+        my $layer;
+        if ( defined($HAS_PU) ? $HAS_PU : ( $HAS_PU = _check_PU() ) ) {
+            $layer = ":raw:utf8_strict";
+        }
+        else {
+            $layer = ":raw:encoding(UTF-8)";
+        }
+        $self->filehandle( $args, $v, $layer );
     };
 }
 
@@ -1563,25 +1667,25 @@ sub parent {
     my $parent;
     if ( length $self->[FILE] ) {
         if ( $self->[FILE] eq '.' || $self->[FILE] eq ".." ) {
-            $parent = path( $self->[PATH] . "/.." );
+            $parent = _path( $self->[PATH] . "/.." );
         }
         else {
-            $parent = path( _non_empty( $self->[VOL] . $self->[DIR] ) );
+            $parent = _path( _non_empty( $self->[VOL] . $self->[DIR] ) );
         }
     }
     elsif ( length $self->[DIR] ) {
         # because of symlinks, any internal updir requires us to
         # just add more updirs at the end
         if ( $self->[DIR] =~ m{(?:^\.\./|/\.\./|/\.\.\z)} ) {
-            $parent = path( $self->[VOL] . $self->[DIR] . "/.." );
+            $parent = _path( $self->[VOL] . $self->[DIR] . "/.." );
         }
         else {
             ( my $dir = $self->[DIR] ) =~ s{/[^\/]+/\z}{/};
-            $parent = path( $self->[VOL] . $dir );
+            $parent = _path( $self->[VOL] . $dir );
         }
     }
     else {
-        $parent = path( _non_empty( $self->[VOL] ) );
+        $parent = _path( _non_empty( $self->[VOL] ) );
     }
     return $level == 1 ? $parent : $parent->parent( $level - 1 );
 }
@@ -1636,7 +1740,7 @@ sub realpath {
     # parent realpath must exist; not all Cwd::realpath will error if it doesn't
     $self->_throw("resolving realpath")
       unless defined $realpath && length $realpath && -e $realpath;
-    return ( $check_parent ? path( $realpath, $self->[FILE] ) : path($realpath) );
+    return ( $check_parent ? _path( $realpath, $self->[FILE] ) : _path($realpath) );
 }
 
 #pod =method relative
@@ -1684,7 +1788,7 @@ sub realpath {
 
 sub relative {
     my ( $self, $base ) = @_;
-    $base = path( defined $base && length $base ? $base : '.' );
+    $base = _path( defined $base && length $base ? $base : '.' );
 
     # relative paths must be converted to absolute first
     $self = $self->absolute if $self->is_relative;
@@ -1700,14 +1804,14 @@ sub relative {
     }
 
     # if same absolute path, relative is current directory
-    return path(".") if _same( $self->[PATH], $base->[PATH] );
+    return _path(".") if _same( $self->[PATH], $base->[PATH] );
 
     # if base is a prefix of self, chop prefix off self
     if ( $base->subsumes($self) ) {
         $base = "" if $base->is_rootdir;
         my $relative = "$self";
         $relative =~ s{\A\Q$base/}{};
-        return path($relative);
+        return _path(".", $relative);
     }
 
     # base is not a prefix, so must find a common prefix (even if root)
@@ -1741,7 +1845,7 @@ sub relative {
     # otherwise, symlinks in common or from common to A don't matter as
     # those don't involve updirs
     my @new_path = ( ("..") x ( 0+ @base_parts ), @self_parts );
-    return path(@new_path);
+    return _path(@new_path);
 }
 
 sub _just_filepath {
@@ -1763,7 +1867,7 @@ sub _resolve_between {
         if ( $p eq '..' ) {
             $changed = 1;
             if ( -e $path ) {
-                $path = path($path)->realpath->[PATH];
+                $path = _path($path)->realpath->[PATH];
             }
             else {
                 $path =~ s{/[^/]+/..\z}{/};
@@ -1771,10 +1875,10 @@ sub _resolve_between {
         }
         if ( -l $path ) {
             $changed = 1;
-            $path    = path($path)->realpath->[PATH];
+            $path    = _path($path)->realpath->[PATH];
         }
     }
-    return $changed ? path($path) : undef;
+    return $changed ? _path($path) : undef;
 }
 
 #pod =method remove
@@ -1850,7 +1954,7 @@ sub remove_tree {
 
 sub sibling {
     my $self = shift;
-    return path( $self->parent->[PATH], @_ );
+    return _path( $self->parent->[PATH], @_ );
 }
 
 #pod =method size, size_human
@@ -1937,9 +2041,10 @@ sub _human_size {
 #pod a fast, unbuffered, raw read.
 #pod
 #pod C<slurp_utf8> is like C<slurp> with a C<binmode> of
-#pod C<:unix:encoding(UTF-8)> (or L<PerlIO::utf8_strict>).  If L<Unicode::UTF8>
-#pod 0.58+ is installed, a raw slurp will be done instead and the result decoded
-#pod with C<Unicode::UTF8>.  This is just as strict and is roughly an order of
+#pod C<:unix:encoding(UTF-8)> (or C<:unix:utf8_strict> with
+#pod L<PerlIO::utf8_strict>).  If L<Unicode::UTF8> 0.58+ is installed, a
+#pod unbuffered, raw slurp will be done instead and the result decoded with
+#pod C<Unicode::UTF8>. This is just as strict and is roughly an order of
 #pod magnitude faster than using C<:encoding(UTF-8)>.
 #pod
 #pod B<Note>: C<slurp> and friends lock the filehandle before slurping.  If
@@ -1963,12 +2068,15 @@ sub slurp {
         and my $size = -s $fh )
     {
         my $buf;
-        read $fh, $buf, $size; # File::Slurp in a nutshell
+        my $rc = read $fh, $buf, $size; # File::Slurp in a nutshell
+        $self->_throw('read') unless defined $rc;
         return $buf;
     }
     else {
         local $/;
-        return scalar <$fh>;
+        my $buf = scalar <$fh>;
+        $self->_throw('read') unless defined $buf;
+        return $buf;
     }
 }
 
@@ -1983,7 +2091,7 @@ sub slurp_utf8 {
         goto &slurp;
     }
     else {
-        $_[1] = { binmode => ":raw:encoding(UTF-8)" };
+        $_[1] = { binmode => ":unix:encoding(UTF-8)" };
         goto &slurp;
     }
 }
@@ -2005,8 +2113,9 @@ sub slurp_utf8 {
 #pod unbuffered, raw write.
 #pod
 #pod C<spew_utf8> is like C<spew> with a C<binmode> of C<:unix:encoding(UTF-8)>
-#pod (or L<PerlIO::utf8_strict>).  If L<Unicode::UTF8> 0.58+ is installed, a raw
-#pod spew will be done instead on the data encoded with C<Unicode::UTF8>.
+#pod (or C<:unix:utf8_strict> with L<PerlIO::utf8_strict>).  If L<Unicode::UTF8>
+#pod 0.58+ is installed, a raw, unbuffered spew will be done instead on the data
+#pod encoded with C<Unicode::UTF8>.
 #pod
 #pod B<NOTE>: because the file is written to a temporary file and then renamed, the
 #pod new file will wind up with permissions based on your current umask.  This is a
@@ -2018,7 +2127,6 @@ sub slurp_utf8 {
 #pod
 #pod =cut
 
-# XXX add "unsafe" option to disable flocking and atomic?  Check benchmarks on append() first.
 sub spew {
     my ( $self, @data ) = @_;
     my $args = ( @data && ref $data[0] eq 'HASH' ) ? shift @data : {};
@@ -2027,13 +2135,13 @@ sub spew {
     # get default binmode from caller's lexical scope (see "perldoc open")
     $binmode = ( ( caller(0) )[10] || {} )->{'open>'} unless defined $binmode;
 
-    # spewing need to follow the link
-    # and create the tempfile in the same dir
+    # writing needs to follow the link and create the tempfile in the same
+    # dir for later atomic rename
     my $resolved_path = $self->_resolve_symlinks;
+    my $temp          = $resolved_path->_replacment_path;
 
-    my $temp = path( $resolved_path . $$ . int( rand( 2**31 ) ) );
-    my $fh = $temp->filehandle( { exclusive => 1, locked => 1 }, ">", $binmode );
-    print {$fh} map { ref eq 'ARRAY' ? @$_ : $_ } @data;
+    my $fh   = $temp->filehandle( { exclusive => 1, locked => 1 }, ">", $binmode );
+    print( {$fh} map { ref eq 'ARRAY' ? @$_ : $_ } @data) or self->_throw('print', $temp->[PATH]);
     close $fh or $self->_throw( 'close', $temp->[PATH] );
 
     return $temp->move($resolved_path);
@@ -2096,7 +2204,7 @@ sub lstat {
 #pod
 #pod =cut
 
-sub stringify { $_[0]->[PATH] }
+sub stringify { $_[0]->[PATH] =~ /^~/ ? './' . $_[0]->[PATH] : $_[0]->[PATH] }
 
 #pod =method subsumes
 #pod
@@ -2125,7 +2233,7 @@ sub subsumes {
     my $self = shift;
     Carp::croak("subsumes() requires a defined, positive-length argument")
       unless defined $_[0];
-    my $other = path(shift);
+    my $other = _path(shift);
 
     # normalize absolute vs relative
     if ( $self->is_absolute && !$other->is_absolute ) {
@@ -2330,7 +2438,7 @@ Path::Tiny - File path utility
 
 =head1 VERSION
 
-version 0.130
+version 0.142
 
 =head1 SYNOPSIS
 
@@ -2352,18 +2460,18 @@ version 0.130
   # Reading files
 
   my $guts = $file->slurp;
-  my $guts = $file->slurp_utf8;
+     $guts = $file->slurp_utf8;
 
   my @lines = $file->lines;
-  my @lines = $file->lines_utf8;
+     @lines = $file->lines_utf8;
 
   my ($head) = $file->lines( {count => 1} );
   my ($tail) = $file->lines( {count => -1} );
 
   # Writing files
 
-  my $bar->spew( @data );
-  my $bar->spew_utf8( @data );
+  $bar->spew( @data );
+  $bar->spew_utf8( @data );
 
   # Reading directories
 
@@ -2408,7 +2516,6 @@ requires Perl 5.008001 or later.
     $path = path("foo/bar");
     $path = path("/tmp", "file.txt"); # list
     $path = path(".");                # cwd
-    $path = path("~user/file.txt");   # tilde processing
 
 Constructs a C<Path::Tiny> object.  It doesn't matter if you give a file or
 directory path.  It's still up to you to call directory-like methods only on
@@ -2419,11 +2526,12 @@ The first argument must be defined and have non-zero length or an exception
 will be thrown.  This prevents subtle, dangerous errors with code like
 C<< path( maybe_undef() )->remove_tree >>.
 
-If the first component of the path is a tilde ('~') then the component will be
-replaced with the output of C<glob('~')>.  If the first component of the path
-is a tilde followed by a user name then the component will be replaced with
-output of C<glob('~username')>.  Behaviour for non-existent users depends on
-the output of C<glob> on the system.
+B<DEPRECATED>: If and only if the B<first> character of the B<first> argument
+to C<path> is a tilde ('~'), then tilde replacement will be applied to the
+first path segment. A single tilde will be replaced with C<glob('~')> and a
+tilde followed by a username will be replaced with output of
+C<glob('~username')>. B<No other method does tilde expansion on its arguments>.
+See L</Tilde expansion (deprecated)> for more.
 
 On Windows, if the path consists of a drive identifier without a path component
 (C<C:> or C<D:>), it will be expanded to the absolute path of the current
@@ -2488,8 +2596,11 @@ Current API available since 0.018.
     $temp = tempfile( @options ); # optional export
     $temp = tempdir( @options );  # optional export
 
-C<tempfile> passes the options to C<< File::Temp->new >> and returns a C<Path::Tiny>
-object with the file name.  The C<TMPDIR> option is enabled by default.
+C<tempfile> passes the options to C<< File::Temp->new >> and returns a
+C<Path::Tiny> object with the file name.  The C<TMPDIR> option will be enabled
+by default, but you can override that by passing C<< TMPDIR => 0 >> along with
+the options.  (If you use an absolute C<TEMPLATE> option, you will want to
+disable C<TMPDIR>.)
 
 The resulting C<File::Temp> object is cached. When the C<Path::Tiny> object is
 destroyed, the C<File::Temp> object will be as well.
@@ -2596,13 +2707,14 @@ The C<truncate> option is a way to replace the contents of a file
 B<in place>, unlike L</spew> which writes to a temporary file and then
 replaces the original (if it exists).
 
-C<append_raw> is like C<append> with a C<binmode> of C<:unix> for fast,
+C<append_raw> is like C<append> with a C<binmode> of C<:unix> for a fast,
 unbuffered, raw write.
 
-C<append_utf8> is like C<append> with a C<binmode> of
-C<:unix:encoding(UTF-8)> (or L<PerlIO::utf8_strict>).  If L<Unicode::UTF8>
-0.58+ is installed, a raw append will be done instead on the data encoded
-with C<Unicode::UTF8>.
+C<append_utf8> is like C<append> with an unbuffered C<binmode>
+C<:unix:encoding(UTF-8)> (or C<:unix:utf8_strict> with
+L<PerlIO::utf8_strict>).  If L<Unicode::UTF8> 0.58+ is installed, an
+unbuffered, raw append will be done instead on the data encoded with
+C<Unicode::UTF8>.
 
 Current API available since 0.060.
 
@@ -2786,8 +2898,12 @@ An optional hash reference may be used to pass options.  The only option is
 C<binmode>, which is passed to the method that open handles for reading and
 writing.
 
-C<edit_lines_utf8> and C<edit_lines_raw> act like their respective
-C<slurp_*> and C<spew_*> methods.
+C<edit_lines_raw> is like C<edit_lines> with a buffered C<binmode> of
+C<:raw>.
+
+C<edit_lines_utf8> is like C<edit_lines> with a buffered C<binmode>
+C<:raw:encoding(UTF-8)> (or C<:raw:utf8_strict> with
+L<PerlIO::utf8_strict>).
 
 Current API available since 0.077.
 
@@ -2940,11 +3056,11 @@ C<lines_raw> is like C<lines> with a C<binmode> of C<:raw>.  We use C<:raw>
 instead of C<:unix> so PerlIO buffering can manage reading by line.
 
 C<lines_utf8> is like C<lines> with a C<binmode> of C<:raw:encoding(UTF-8)>
-(or L<PerlIO::utf8_strict>).  If L<Unicode::UTF8> 0.58+ is installed, a raw
-UTF-8 slurp will be done and then the lines will be split.  This is
-actually faster than relying on C<:encoding(UTF-8)>, though a bit memory
-intensive.  If memory use is a concern, consider C<openr_utf8> and
-iterating directly on the handle.
+(or C<:raw:utf8_strict> with L<PerlIO::utf8_strict>).  If L<Unicode::UTF8>
+0.58+ is installed, a raw, unbuffered UTF-8 slurp will be done and then the
+lines will be split.  This is actually faster than relying on
+IO layers, though a bit memory intensive.  If memory use is a
+concern, consider C<openr_utf8> and iterating directly on the handle.
 
 Current API available since 0.065.
 
@@ -2974,11 +3090,23 @@ Deprecated in 0.125.
 
     path("foo.txt")->move("bar.txt");
 
-Move the current path to the given destination path using Perl's
-built-in L<rename|perlfunc/rename> function. Returns the result
-of the C<rename> function (except it throws an exception if it fails).
+Moves the current path to the given destination using L<File::Copy>'s
+C<move> function. Upon success, returns the C<Path::Tiny> object for the
+newly moved file.
 
-Current API available since 0.001.
+If the destination already exists and is a directory, and the source is not a
+directory, then the source file will be renamed into the directory
+specified by the destination.
+
+If possible, move() will simply rename the file. Otherwise, it
+copies the file to the new location and deletes the original. If an
+error occurs during this copy-and-delete process, you may be left
+with a (possibly partial) copy of the file under the destination
+name.
+
+Current API available since 0.124. Prior versions used Perl's
+-built-in (and less robust) L<rename|perlfunc/rename> function
+and did not return an object.
 
 =head2 openr, openw, openrw, opena
 
@@ -3000,8 +3128,9 @@ Current API available since 0.001.
 
 Returns a file handle opened in the specified mode.  The C<openr> style methods
 take a single C<binmode> argument.  All of the C<open*> methods have
-C<open*_raw> and C<open*_utf8> equivalents that use C<:raw> and
-C<:raw:encoding(UTF-8)>, respectively.
+C<open*_raw> and C<open*_utf8> equivalents that use buffered I/O layers C<:raw>
+and C<:raw:encoding(UTF-8)> (or C<:raw:utf8_strict> with
+L<PerlIO::utf8_strict>).
 
 An optional hash reference may be used to pass options.  The only option is
 C<locked>.  If true, handles opened for writing, appending or read-write are
@@ -3200,9 +3329,10 @@ C<slurp_raw> is like C<slurp> with a C<binmode> of C<:unix> for
 a fast, unbuffered, raw read.
 
 C<slurp_utf8> is like C<slurp> with a C<binmode> of
-C<:unix:encoding(UTF-8)> (or L<PerlIO::utf8_strict>).  If L<Unicode::UTF8>
-0.58+ is installed, a raw slurp will be done instead and the result decoded
-with C<Unicode::UTF8>.  This is just as strict and is roughly an order of
+C<:unix:encoding(UTF-8)> (or C<:unix:utf8_strict> with
+L<PerlIO::utf8_strict>).  If L<Unicode::UTF8> 0.58+ is installed, a
+unbuffered, raw slurp will be done instead and the result decoded with
+C<Unicode::UTF8>. This is just as strict and is roughly an order of
 magnitude faster than using C<:encoding(UTF-8)>.
 
 B<Note>: C<slurp> and friends lock the filehandle before slurping.  If
@@ -3231,8 +3361,9 @@ C<spew_raw> is like C<spew> with a C<binmode> of C<:unix> for a fast,
 unbuffered, raw write.
 
 C<spew_utf8> is like C<spew> with a C<binmode> of C<:unix:encoding(UTF-8)>
-(or L<PerlIO::utf8_strict>).  If L<Unicode::UTF8> 0.58+ is installed, a raw
-spew will be done instead on the data encoded with C<Unicode::UTF8>.
+(or C<:unix:utf8_strict> with L<PerlIO::utf8_strict>).  If L<Unicode::UTF8>
+0.58+ is installed, a raw, unbuffered spew will be done instead on the data
+encoded with C<Unicode::UTF8>.
 
 B<NOTE>: because the file is written to a temporary file and then renamed, the
 new file will wind up with permissions based on your current umask.  This is a
@@ -3420,6 +3551,27 @@ For speed, this class is implemented as an array based object and uses many
 direct function calls internally.  You must not subclass it and expect
 things to work properly.
 
+=head2 Tilde expansion (deprecated)
+
+Tilde expansion was a nice idea, but it can't easily be applied consistently
+across the entire API.  This was a source of bugs and confusion for users.
+Therefore, it is B<deprecated> and its use is discouraged.  Limitations to the
+existing, legacy behavior follow.
+
+Tilde expansion will only occur if the B<first> argument to C<path> begins with
+a tilde. B<No other method does tilde expansion on its arguments>.  If you want
+tilde expansion on arguments, you must explicitly wrap them in a call to
+C<path>.
+
+    path( "~/foo.txt" )->copy( path( "~/bar.txt" ) );
+
+If you need a literal leading tilde, use C<path("./~whatever")> so that the
+argument to C<path> doesn't start with a tilde, but the path still resolves to
+the current directory.
+
+Behaviour of tilde expansion with a username for non-existent users depends on
+the output of C<glob> on the system.
+
 =head2 File locking
 
 If flock is not supported on a platform, it will not be used, even if
@@ -3456,9 +3608,10 @@ permission, no lock will be used.
 =head2 utf8 vs UTF-8
 
 All the C<*_utf8> methods by default use C<:encoding(UTF-8)> -- either as
-C<:unix:encoding(UTF-8)> (unbuffered) or C<:raw:encoding(UTF-8)> (buffered) --
-which is strict against the Unicode spec and disallows illegal Unicode
-codepoints or UTF-8 sequences.
+C<:unix:encoding(UTF-8)> (unbuffered, for whole file operations) or
+C<:raw:encoding(UTF-8)> (buffered, for line-by-line operations). These are
+strict against the Unicode spec and disallows illegal Unicode codepoints or
+UTF-8 sequences.
 
 Unfortunately, C<:encoding(UTF-8)> is very, very slow.  If you install
 L<Unicode::UTF8> 0.58 or later, that module will be used by some C<*_utf8>
@@ -3483,7 +3636,8 @@ If you have Perl 5.10 or later, file input/output methods (C<slurp>, C<spew>,
 etc.) and high-level handle opening methods ( C<filehandle>, C<openr>,
 C<openw>, etc. ) respect default encodings set by the C<-C> switch or lexical
 L<open> settings of the caller.  For UTF-8, this is almost certainly slower
-than using the dedicated C<_utf8> methods if you have L<Unicode::UTF8>.
+than using the dedicated C<_utf8> methods if you have L<Unicode::UTF8> or
+L<PerlIP::utf8_strict>.
 
 =head1 TYPE CONSTRAINTS AND COERCION
 
@@ -3561,7 +3715,7 @@ David Golden <dagolden@cpan.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Alex Efros Aristotle Pagaltzis Chris Williams Dan Book Dave Rolsky David Steinbrunner Doug Bell Elvin Aslanov Flavio Poletti Gabor Szabo Gabriel Andrade George Hartzell Geraud Continsouzas Goro Fuji Graham Knop Ollis Ian Sillitoe James Hunt John Karr Karen Etheridge Mark Ellis Martin H. Sluka Kjeldsen Michael G. Schwern Nigel Gregoire Philippe Bruhat (BooK) regina-verbae Roy Ivy III Shlomi Fish Smylers Tatsuhiko Miyagawa Toby Inkster Yanick Champoux 김도형 - Keedi Kim
+=for stopwords Alex Efros Aristotle Pagaltzis Chris Williams Dan Book Dave Rolsky David Steinbrunner Doug Bell Elvin Aslanov Flavio Poletti Gabor Szabo Gabriel Andrade George Hartzell Geraud Continsouzas Goro Fuji Graham Knop Ollis Ian Sillitoe James Hunt John Karr Karen Etheridge Mark Ellis Martin H. Sluka Kjeldsen Mary Ehlers Michael G. Schwern Nicolas R Rochelemagne Nigel Gregoire Philippe Bruhat (BooK) regina-verbae Roy Ivy III Shlomi Fish Smylers Tatsuhiko Miyagawa Toby Inkster Yanick Champoux 김도형 - Keedi Kim
 
 =over 4
 
@@ -3659,7 +3813,19 @@ Martin Kjeldsen <mk@bluepipe.dk>
 
 =item *
 
+Mary Ehlers <regina.verb.ae@gmail.com>
+
+=item *
+
 Michael G. Schwern <mschwern@cpan.org>
+
+=item *
+
+Nicolas R <nicolas@atoomic.org>
+
+=item *
+
+Nicolas Rochelemagne <rochelemagne@cpanel.net>
 
 =item *
 

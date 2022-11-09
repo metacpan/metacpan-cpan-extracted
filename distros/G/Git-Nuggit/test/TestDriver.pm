@@ -121,6 +121,9 @@ sub cmd {
     # Git will also output nominal status to stderr
     eval { run3($cmd, undef, \$rtv, \$err); };
 
+    say $rtv if $self->{verbose};
+    say colored($err,'red') if $self->{verbose}; # Note: Git routinely writes to stderr
+
     if ($@) {
         my ($package, $filename, $line) = caller;
         die "Error: Cmd ($cmd) at $filename:$line from ".getcwd()." failed with: \n\t$@\n";
@@ -138,8 +141,6 @@ sub cmd {
 #    elsif ( $? & 0x7F ) { die "Killed by signal \n".( $? & 0x7F ); }
 #    elsif ( $? >> 8   ) { die "$cmd Exited with error \n".( $? >> 8 )."\n $rtv \n $err";  }
 
-    say $rtv if $self->{verbose} > 3;
-    say colored($err,'red') if $self->{verbose} > 3; # Note: Git routinely writes to stderr
 
     return 1; #($?, $rtv, $err);
 

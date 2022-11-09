@@ -7,8 +7,8 @@ RF::Component - Compose RF component circuits and calculate values from objects 
 This module builds on [PDL::IO::Touchstone](https://metacpan.org/pod/PDL::IO::Touchstone) by encapsulating data returned by its
 methods into an object for easy use:
 
-        my $cap = $self->load('/path/to/capacitor.s2p', $options);
-        my $wilky = $self->load('/path/to/wilkinson.s3p', $options);
+        my $cap = RF::Component->load('/path/to/capacitor.s2p', $options);
+        my $wilky = RF::Component->load('/path/to/wilkinson.s3p', $options);
 
         # port 1 input impedances
         my $z_in = $cap->port_z(1);
@@ -20,6 +20,9 @@ methods into an object for easy use:
         my $Y21 = $cap->Y(2,1);
         my $Z33 = $wilky->Z(3,3);
 
+        # Write a Y-parameter .s2p in mag/angle format::
+        $cap->save("cap-y.s2p", param_type => 'Y', output_fmt => 'MA');
+
 In most cases, the return value from the [RF::Component](https://metacpan.org/pod/RF::Component) methods are [PDL](https://metacpan.org/pod/PDL)
 vectors, typically one value per frequency.  For example, `$pF` as shown above
 will be a N-vector of values in picofarads, with one pF value for each
@@ -27,19 +30,19 @@ frequency.
 
 # Constructor
 
-The `$self->load` function (below) is typically used to load RF data, but
+The `RF::Component->load` function (below) is typically used to load RF data, but
 you may pass it directly to the constructor as follows.  Most of these options 
-are valid for `$self->load` as well:
+are valid for `RF::Component->load` as well:
 
         my $c = RF::Component->new(%opts);
 
 ## Required:
 
-- freqs: a PDL vector, one for each frequency in Hz.
-- z0\_ref: A value representing the charectaristic impedance at each port.
+- `freqs`: a PDL vector, one for each frequency in Hz.
+- `z0_ref`: A value representing the charectaristic impedance at each port.
 If port impedances differ, then this may be a vector
-- n\_ports: the number of ports represented by the port parameter matrix(es):
-- At least one (N,N,M) [PDL](https://metacpan.org/pod/PDL) object where N is the number of ports and M
+- `n_ports`: the number of ports represented by the port parameter matrix(es):
+- At least one (N,N,M) [PDL](https://metacpan.org/pod/PDL) element where N is the number of ports and M
 is the number of frequencies to represent complex port-parameter data:
     - S => pdl(...) - S-Paramters
     - Y => pdl(...) - Y-Paramters
@@ -51,10 +54,24 @@ is the number of frequencies to represent complex port-parameter data:
 
 ## Optional:
 
-- comments - An arrayref of comments read from `load`
-- filename - The filename read by `load`
-- model - Component model number
-- value\_code\_regex - Regular expression to parse the exponent-value code
+- `comments`: An arrayref of comments read from `load`
+- `filename`: The filename read by `load`
+- `output_fmt`: The .sNp output format: one of DB, MA, or RI
+
+    This is the format originally read in by `$self->load`.
+
+    - DB: dB,phase formatted
+    - MA: magnitude,phase formatted
+    - RI: real,imag formatted
+
+- `orig_f_unit`: The original frequency unit from the .sNp file
+
+    This is the frequency format originally read in by `$self->load`:
+    kHz, MHz, GHz, THz, ...
+
+- `filename`: The filename read by `load`
+- `model`: Component model number
+- `value_code_regex`: Regular expression to parse the exponent-value code
 
     Specifies the variable to be assigned and a regular expression to match the
     capacitance code (or other unit): NNX or NRN. X is the exponent, N is a numeric
@@ -69,7 +86,7 @@ is the number of frequencies to represent complex port-parameter data:
     The above (...) must match the code (or literal) to be placed in the MDF
     variable. 
 
-- value\_literal\_regex - Regular expression to parse the literal value
+- `value_literal_regex`: Regular expression to parse the literal value
 
     The "literal" version is the same as `value_code_regex` but does not calcualte
     the code, it takes the value verbatim.  For example, some inductors specify the
@@ -77,33 +94,35 @@ is the number of frequencies to represent complex port-parameter data:
 
             MODEL-([0-9]+)T\.s2p
 
-- value - Component value
+- `value`: Component value
 
     The component value is parsed based on `value_code_regex` or
     `value_literal_regex`
 
-- value\_unit - Unit of the value (pF, nH, etc).
+- `value_unit`: Unit of the value (pF, nH, etc).
 
     This is the unit expected in `value` afer parsing `value_code_regex`.
     Supported units: pF|nF|uF|uH|nH|R|Ohm|Ohms
 
 You may also pass the above `new` options to the load call:
 
-        my $cap = $self->load('/path/to/capacitor.s2p', $load_options, %new_options);
+        my $cap = RF::Component->load('/path/to/capacitor.s2p', %options);
 
 # IO Functions
 
 ## `RF::Component->load` - Load an RF data file as a component
 
-    $cap = $self->load($filename, $load_options, %new_options);
+    $cap = RF::Component->load($filename, %new_options);
 
 Arguments:
 
 - $filename: the path to the data file you wish to load
-- $load\_options: a hashref of options that get passed to the
-[PDL::IO::Touchstone](https://metacpan.org/pod/PDL::IO::Touchstone) `rsnp()` function options.
 - %new\_options: a hash of options passed to `RF::Component->new` as
-listed above.
+listed above, except the option `load_options`:
+
+    `load()` supports the special option `load_options`.  If `load_options` is
+    specified then it is passed to the loading function such as
+    `PDL::IO::Touchstone::rsnp()`.
 
 This function loads the data based on the file extension, however,
 only .sNp touchstone files are supported at this time. See the
@@ -112,10 +131,34 @@ only .sNp touchstone files are supported at this time. See the
 
 ## `RF::Component->load_snp` - Load a Touchstone data file as a component
 
-This is the lower-level function called by `RF::Component->load`.  This function is 
-functionally equivalent but does not evaluate the file extension being passed.
+This is the lower-level function called by `RF::Component->load`.  This
+function is functionally equivalent but does not evaluate the file extension
+being passed before calling `PDL::IO::Touchstone::rsnp()`:
 
-    $cap = $self->load_snp($filename, $load_options, %new_options);
+    $cap = RF::Component->load_snp($filename, %new_options);
+
+## `RF::Component->save` - Write the component to a data file
+
+    $cap->save('cap.s2p', %options);
+
+This function will match based on the output file extension and call the
+appropriate save\_\* function below.  The `%options` hash will depend on the
+desired file output type.
+
+## `RF::Component->save_snp` - Write the component to a Touchstone data file
+
+    $cap->save_snp('cap.s2p', %options);
+
+- `param_type`: Supported paramter type: S, Y, Z, A
+
+    Notice: While A can be specified to write ABCD-formatted parameters, the ABCD
+    matrix is not officially supported by the Touchstone spec.
+
+- `output_f_unit`: The .sNp file's frequency unit.
+
+    This defaults to Hz, but supports SI units such as: KHZ, MHz, GHz, ...
+
+- `output_fmt`: See above, same as in `new()`.
 
 # Calculation Functions
 
@@ -207,6 +250,38 @@ the insertion (S21) phase changes from negative through zero to positive."
 
 Internally this function uses the [IO::PDL::Touchstone](https://metacpan.org/pod/IO::PDL::Touchstone) `y_srf_ideal` function.
 
+# Helper Functions
+
 ## `$n = $self->num_ports` - return the number of ports in this component.
 
 ## `$n = $self->num_freqs` - return the number of frequencies in this component.
+
+# SEE ALSO
+
+- [PDL::IO::Touchstone](https://metacpan.org/pod/PDL::IO::Touchstone) - The lower-level framework used by [RF::Component](https://metacpan.org/pod/RF::Component)
+- [RF::Component::Multi](https://metacpan.org/pod/RF::Component::Multi) - A list-encapsulation of [RF::Component](https://metacpan.org/pod/RF::Component) to provide vectorized operations
+on multiple components.
+- Touchstone specification: [https://ibis.org/connector/touchstone\_spec11.pdf](https://ibis.org/connector/touchstone_spec11.pdf)
+
+# AUTHOR
+
+Originally written at eWheeler, Inc. dba Linux Global Eric Wheeler to
+transform .s2p files and build MDF files to optimize with Microwave Office
+for amplifer impedance matches.
+
+# COPYRIGHT
+
+Copyright (C) 2022 eWheeler, Inc. [https://www.linuxglobal.com/](https://www.linuxglobal.com/)
+
+This module is free software: you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+This module is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License along
+with this module. If not, see &lt;http://www.gnu.org/licenses/>.

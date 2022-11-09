@@ -9,81 +9,9 @@ HTML::Obj2HTML::register_extension("form", {
 });HTML::Obj2HTML::register_extension("select", {
   attr => { class => "ui dropdown" }
 });
-HTML::Obj2HTML::register_extension("checkbox", {
-  tag => "",
-  before => sub {
-    my $obj = shift;
-    if (ref $obj ne "HASH") { return ""; }
-    my $readonly = HTML::Obj2HTML::get_opt("readonly") || $obj->{readonly};
-    delete($obj->{readonly});
-    if ($readonly) {
-      return HTML::Obj2HTML::gen([ div => [
-        if => { cond => $obj->{checked}, true => [ icon => 'green check' ], false => [ icon => 'red close' ]},
-        _ => " ".$obj->{label}
-      ]]);
-    } else {
-      my $label = $obj->{label}; delete($obj->{label});
-      if (!$label && $obj->{checkboxlabel}) { $label = $obj->{checkboxlabel}; delete($obj->{checkboxlabel}); }
-      if (!$obj->{value}) { $obj->{value} = 1; }
-      $obj->{if} = { cond => $obj->{checked}, true => { checked => 1 } }; delete($obj->{checked});
-      $obj->{type} = "checkbox";
-      return HTML::Obj2HTML::gen([
-        div => { class => 'ui checkbox', _ => [
-          input => $obj, label => $label
-        ] }
-      ]);
-    }
-  }
-});
-HTML::Obj2HTML::register_extension("radio", {
-  tag => "",
-  before => sub {
-    my $obj = shift;
-    if (ref $obj ne "HASH") { return ""; }
-    my $readonly = HTML::Obj2HTML::get_opt("readonly") || $obj->{readonly};
-    delete($obj->{readonly});
-    if ($readonly) {
-      return HTML::Obj2HTML::gen([ div => [
-        if => { cond => $obj->{checked}, true => [ icon => 'check' ] },
-        _ => " ".$obj->{label}
-      ]]);
-    } else {
-      my $label = $obj->{label}; delete($obj->{label});
-      if (!$label && $obj->{radiolabel}) { $label = $obj->{radiolabel}; delete($obj->{radiolabel}); }
-      if (!$obj->{value}) { $obj->{value} = 1; }
-      $obj->{if} = { cond => $obj->{checked}, true => { checked => 1 } }; delete($obj->{checked});
-      $obj->{type} = "radio";
-      return HTML::Obj2HTML::gen([
-        div => { class => 'ui radio checkbox', _ => [
-          input => $obj, label => $label
-        ] }
-      ]);
-    }
-  }
-});
-HTML::Obj2HTML::register_extension("labeledinput", {
-  tag => "",
-  before => sub {
-    my $obj = shift;
-    if (ref $obj ne "HASH") { return ""; }
-    my $readonly = HTML::Obj2HTML::get_opt("readonly") || $obj->{readonly};
-    delete($obj->{readonly});
-    if ($readonly) {
-      return [ div => $obj->{value}." ".$obj->{label} ];
-    } else {
-      my $label = $obj->{label}; delete($obj->{label});
 
-      # The has we were passed actually belongs to a child element, we need to copy and clear.
-      my $inputobj = {};
-      for (keys %$obj) { $inputobj->{$_} = $obj->{$_}; delete $obj->{$_}; }
 
-      return [ div => { class => "ui right labeled input", _ => [
-        input => $inputobj,
-        div => { class => "ui basic label", _ => $label }
-      ]}];
-    }
-  }
-});
+# Top level field objects (don't contain the actual inputs)
 HTML::Obj2HTML::register_extension("field", {
   tag => 'div',
   before => sub {
@@ -110,6 +38,13 @@ HTML::Obj2HTML::register_extension("fields", {
     return "";
   }
 });
+
+
+
+
+
+
+# Semantic-UI full field objects. These include the 'field' div and the input.
 HTML::Obj2HTML::register_extension("checkboxfield", {
   tag => "",
   before => sub {
@@ -131,9 +66,12 @@ HTML::Obj2HTML::register_extension("inputfield", {
   tag => "",
   before => sub {
     my $obj = shift;
+
     if (ref $obj ne "HASH") { return ""; }
+
     my $readonly = HTML::Obj2HTML::get_opt("readonly") || $obj->{readonly};
     delete($obj->{readonly});
+
     if ($readonly) {
       return HTML::Obj2HTML::gen(commonfield($obj, [ span => $obj->{value} ]));
     } else {
@@ -202,7 +140,7 @@ HTML::Obj2HTML::register_extension("selectfield", {
 
     if ($obj->{options} && ref $obj->{options} eq "ARRAY") {
       my @contents = ();
-      if ($obj->{inclblank}) { push(@contents, option => { value => "", _ => "" }); }
+      if (defined $obj->{inclblank}) { push(@contents, option => { value => "", _ => $obj->{inclblank} }); }
       for (my $i = 0; $i <= $#{$obj->{hiddenoptions}}; $i+=2) {
         my $v = $obj->{hiddenoptions}->[$i];
         my $t = $obj->{hiddenoptions}->[$i+1];
@@ -243,7 +181,7 @@ HTML::Obj2HTML::register_extension("selectfield", {
     }
     if ($obj->{optionsql} && ref $obj->{optionsql} eq "ARRAY") {
       my @contents = ();
-      if ($obj->{inclblank}) { push(@contents, option => { value => "", _ => "" }); }
+      if (defined $obj->{inclblank}) { push(@contents, option => { value => "", _ => $obj->{inclblank} }); }
       if (!$obj->{valuefield}) { $obj->{valuefield} = "id"; }
       if (!$obj->{textfield}) { $obj->{textfield} = "name"; }
       for (my $r = $db->for(@{$obj->{optionsql}}); $r->more; $r->next) {
@@ -286,20 +224,6 @@ HTML::Obj2HTML::register_extension("selectfield", {
 
   }
 });
-HTML::Obj2HTML::register_extension("dateinput", {
-  tag => "",
-  before => sub {
-    my $o = shift;
-    return HTML::Obj2HTML::gen([
-      div => { class => "ui calendar dateonly", _ => [
-        div => { class => "ui input left icon", _ => [
-          i => { class => "calendar icon", _ => [] },
-          input => $o
-        ]}
-      ]}
-    ]);
-  }
-});
 HTML::Obj2HTML::register_extension("datefield", {
   tag => "",
   before => sub {
@@ -322,10 +246,147 @@ HTML::Obj2HTML::register_extension("datefield", {
     }
   }
 });
+
+
+
+
+# Low level inputs - no "field" div
+HTML::Obj2HTML::register_extension("checkbox", {
+  tag => "",
+  before => sub {
+    my $obj = shift;
+
+    if (ref $obj ne "HASH") { return ""; }
+
+    my $readonly = HTML::Obj2HTML::get_opt("readonly") || $obj->{readonly};
+    delete($obj->{readonly});
+
+    # TO-FIX: This should be multi param as multiple checkboxes might have the same name resulting in multiple values
+    if (!defined $obj->{value}) { $obj->{value} = 1; }
+    if (defined $obj->{name}) {
+      my $cgi = HTML::Obj2HTML::get_opt("CGI-params");
+      if (defined $cgi) {
+        my $val = $cgi->param($obj->{name});
+        if (defined $val && "$val" eq $obj->{value}) { $obj->{checked} = 1; } else { delete($obj->{checked}); }
+      }
+    }
+
+    if ($readonly) {
+      return HTML::Obj2HTML::gen([ div => [
+        if => { cond => $obj->{checked}, true => [ icon => 'green check' ], false => [ icon => 'red close' ]},
+        _ => " ".$obj->{label}
+      ]]);
+    } else {
+      my $label = $obj->{label}; delete($obj->{label});
+      if (!$label && $obj->{checkboxlabel}) { $label = $obj->{checkboxlabel}; delete($obj->{checkboxlabel}); }
+      $obj->{if} = { cond => $obj->{checked}, true => { checked => 1 } }; delete($obj->{checked});
+      $obj->{type} = "checkbox";
+      return HTML::Obj2HTML::gen([
+        div => { class => 'ui checkbox', _ => [
+          input => $obj, label => $label
+        ] }
+      ]);
+    }
+  }
+});
+HTML::Obj2HTML::register_extension("radio", {
+  tag => "",
+  before => sub {
+    my $obj = shift;
+
+    if (ref $obj ne "HASH") { return ""; }
+
+    my $readonly = HTML::Obj2HTML::get_opt("readonly") || $obj->{readonly};
+    delete($obj->{readonly});
+
+    if (!defined $obj->{value}) { $obj->{value} = 1; }
+    if (defined $obj->{name}) {
+      my $cgi = HTML::Obj2HTML::get_opt("CGI-params");
+      if (defined $cgi) {
+        my $val = $cgi->param($obj->{name});
+        if (defined $val && "$val" eq $obj->{value}) { $obj->{checked} = 1; } else { delete($obj->{checked}); }
+      }
+    }
+
+    if ($readonly) {
+      return HTML::Obj2HTML::gen([ div => [
+        if => { cond => $obj->{checked}, true => [ icon => 'check' ] },
+        _ => " ".$obj->{label}
+      ]]);
+    } else {
+      my $label = $obj->{label}; delete($obj->{label});
+      if (!$label && $obj->{radiolabel}) { $label = $obj->{radiolabel}; delete($obj->{radiolabel}); }
+      $obj->{if} = { cond => $obj->{checked}, true => { checked => 1 } }; delete($obj->{checked});
+      $obj->{type} = "radio";
+      return HTML::Obj2HTML::gen([
+        div => { class => 'ui radio checkbox', _ => [
+          input => $obj, label => $label
+        ] }
+      ]);
+    }
+  }
+});
+HTML::Obj2HTML::register_extension("labeledinput", {
+  tag => "",
+  before => sub {
+    my $obj = shift;
+
+    if (ref $obj ne "HASH") { return ""; }
+
+    my $readonly = HTML::Obj2HTML::get_opt("readonly") || $obj->{readonly};
+    delete($obj->{readonly});
+
+    if (defined $obj->{name}) {
+      my $cgi = HTML::Obj2HTML::get_opt("CGI-params");
+      if (defined $cgi) {
+        my $val = $cgi->param($obj->{name});
+        if (defined $val) { $obj->{value} = $val; }
+      }
+    }
+
+    if ($readonly) {
+      return [ div => $obj->{value}." ".$obj->{label} ];
+    } else {
+      my $label = $obj->{label}; delete($obj->{label});
+
+      # The has we were passed actually belongs to a child element, we need to copy and clear.
+      my $inputobj = {};
+      for (keys %$obj) { $inputobj->{$_} = $obj->{$_}; delete $obj->{$_}; }
+
+      return [ div => { class => "ui right labeled input", _ => [
+        input => $inputobj,
+        div => { class => "ui basic label", _ => $label }
+      ]}];
+    }
+  }
+});
+HTML::Obj2HTML::register_extension("dateinput", {
+  tag => "",
+  before => sub {
+    my $obj = shift;
+
+    if (ref $obj ne "HASH") { return ""; }
+
+    return HTML::Obj2HTML::gen([
+      div => { class => "ui calendar dateonly", _ => [
+        div => { class => "ui input left icon", _ => [
+          i => { class => "calendar icon", _ => [] },
+          labeledinput => $obj
+        ]}
+      ]}
+    ]);
+  }
+});
+
 HTML::Obj2HTML::register_extension("hiddeninput", {
   tag => "input",
   attr => { type => "hidden" }
 });
+
+
+
+
+
 HTML::Obj2HTML::register_extension("submit", {
   tag => "",
   before => sub {
@@ -360,6 +421,10 @@ HTML::Obj2HTML::register_extension("cancel", {
   },
 });
 
+
+
+
+
 HTML::Obj2HTML::register_extension("helplabel", {
   tag => "label",
   before => sub {
@@ -384,13 +449,18 @@ sub genhelplabel {
   if (ref $obj ne "HASH") { $obj = { _ => $obj }; }
   if ($obj->{label}) {
     my $label = $obj->{label};
-    if ($obj->{helptext}) {
-      $label = [ _ => $label, i => { style => 'margin-left: 5px;', class => 'blue circular icon help', 'data-content' => $obj->{helptext}, _ => [] } ];
-      delete($obj->{helptext});
+    my @errorlabel = ();
+    if ($obj->{error}) {
+      @errorlabel = (i => { style => 'margin-left: 5px;', class => 'red circular icon exclamation', 'data-content' => $obj->{error} });
     }
-    if ($obj->{helphtml}) {
-      $label = [ _ => $label, i => { style => 'margin-left: 5px;', class => 'blue circular icon help', 'data-html' => $obj->{helphtml}, _ => [] } ];
+    if ($obj->{helptext}) {
+      $label = [ _ => $label, \@errorlabel, i => { style => 'margin-left: 5px;', class => 'blue circular icon help', 'data-content' => $obj->{helptext}, _ => [] } ];
+      delete($obj->{helptext});
+    } elsif ($obj->{helphtml}) {
+      $label = [ _ => $label, \@errorlabel, i => { style => 'margin-left: 5px;', class => 'blue circular icon help', 'data-html' => $obj->{helphtml}, _ => [] } ];
       delete($obj->{helphtml});
+    } elsif (@errorlabel) {
+      $label = [ _ => $label, \@errorlabel ];    
     }
     delete($obj->{label});
     return $label;
@@ -402,16 +472,26 @@ sub commonfield {
   my $field = shift;
 
   if (ref $obj ne "HASH") { return ""; }
-  my $class = "field";
-  if ($obj->{required}) {
-    $class .= " required";
-    delete($obj->{required});
+  my $val = HTML::Obj2HTML::get_opt("data-formvalidator-results");
+  if (defined $val) {
+    if (!defined $obj->{error} || !$obj->{error}) {
+      if ($val->missing($obj->{name})) { $obj->{error} = "This field is required"; }
+      elsif ($val->invalid($obj->{name})) { $obj->{error} = "This field is invalid"; }
+    }
   }
-
+  my $class = "field";
   my $label = genhelplabel($obj);
   if ($label) {
     unshift(@{$field}, "label", $label);
   };
+  if ($obj->{required}) {
+    $class .= " required";
+    delete($obj->{required});
+  }
+  if ($obj->{error}) {
+    $class .= " error";
+    delete($obj->{error});
+  }
   if ($obj->{uiwidth}) {
     $class .= " $semanticnumbers[$obj->{uiwidth}] wide";
     delete($obj->{uiwidth});

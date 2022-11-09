@@ -10,7 +10,7 @@ BEGIN {
     use_ok('HTML::FormBuilder::Field');
 }
 
-my $form = HTML::FormBuilder->new(data => {id => 'testid'});
+my $form     = HTML::FormBuilder->new(data => {id => 'testid'});
 my $fieldset = $form->add_fieldset({});
 my $field;
 lives_ok(

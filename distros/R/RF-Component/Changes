@@ -1,5 +1,15 @@
-Revision history for RF-Component
+Revision history for RF::Component
 
-1.001	Fri, 05 Aug 2022 17:36:28 -0700
-        First version, released on an unsuspecting world.
+1.003	2022-11-08T14:33:04-08:00
+	- Added RF::Component::Multi Documentation
+	- Updated PDL::IO::Touchstone version dependency
+	- Fixed changelog format
+
+1.002	2022-10-30T18:31:27-07:00
+	- Added support to save Touchstone files (.s2p, .sNp, etc.)
+	- Moved load_options into %opts (not backwards-compatible)
+	- Fixed documentation related to calling conventions
+
+1.001	2022-08-05T17:36:28-07:00
+	- First version, released on an unsuspecting world.
 

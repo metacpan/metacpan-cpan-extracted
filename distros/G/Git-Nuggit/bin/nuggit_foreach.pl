@@ -27,7 +27,7 @@
 
 =head1 SYNOPSIS
 
-If executed without arguments, this script will simplly list the known submodules.
+If executed without arguments, this script will simply list the known submodules.
 
 This script provides a generic wrapper for commands (got or otherwise) to be executed as-is on each submodule, with all arguments passed along.  This is effectively a wrapper for "git submodule foreach" that invokes the command depth-first, ending with the root level.
 
@@ -91,9 +91,9 @@ GetOptions(
            "break-on-error!" => \$break_on_error,
            "recursive!"      => \$recursive,
            "log_level=i"     => \$log_level,
-           "breadth!"  => \$breadth_first,
-           "depth!"    => \$depth_first,
-           "root!"       => \$run_root,
+           "breadth!"        => \$breadth_first,
+           "depth!"          => \$depth_first,
+           "root!"           => \$run_root,
           );
 pod2usage(1) if $help;
 pod2usage(-exitval => 0, -verbose => 2) if $man;

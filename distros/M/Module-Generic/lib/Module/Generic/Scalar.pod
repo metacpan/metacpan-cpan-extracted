@@ -144,7 +144,7 @@ Module::Generic::Scalar - String Manipulation Object Class
 
 =head1 VERSION
 
-    v1.3.1
+    v1.3.2
 
 =head1 DESCRIPTION
 
@@ -314,6 +314,12 @@ Returns true or false whether the string object contains a defined string, i.e. 
 =head2 empty
 
 Alias for L</reset>. This empties the scalar object, making it zero-byte in length.
+
+=head2 error
+
+Provided with an error message string, or an hash of parameters, and this will instantiate a new L<exception object|Module::Generic::Exception> and return C<undef>, or return an L<Module::Generic::Null> object in object context, such as when it is chained.
+
+See L<Module::Generic/error> for more information.
 
 =head2 fc
 
@@ -532,6 +538,14 @@ Provided with a number n and a string and this will create n instance of the str
 
     $s->padd( -3, 'X' );
     # Hello worldXXX
+
+=head2 pass_error
+
+If provided with an error object, this will set it in this package and pass it along to the caller.
+
+If no error object is provided, this will merely return C<undef>, or an L<Module::Generic::Null> object in object context, such as when it is chained.
+
+See L<Module::Generic/pass_error> for more information.
 
 =head2 pos
 

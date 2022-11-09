@@ -1,0 +1,184 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Locale::Maketext::Test
+at lib/Locale/Maketext/Test.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Locale::Maketext::Test
+
+=head1 SYNOPSIS
+
+    use Locale::Maketext::Test;
+
+    my $foo = Locale::Maketext::Test->new(directory => '/tmp/locales'); # it will look for files like id.po, ru.po
+
+    ### optional parameters
+    # languages => ['en', 'de'] - to test specific languages in directory, else it will pick all po files in directory
+    # ideally these languages should be as per https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes format
+    # debug     => 1 - if you want to check warnings add debug flag else it will output errors only
+    # auto      => 1 set only when you want to fallback in case a key is missing from lexicons
+
+    # start test
+    my $response = $foo->testlocales();
+
+    # no errors or warnings if
+    $response->{status} eq 1;
+
+    # something is wrong when
+    $response->{status} eq 0;
+
+    # check for errors and warnings in case status is 0
+    $response->{errors} = {id => [qw(error1 error2)], ru => [qw(error1 error2)]};
+    # warnings are only present when debug is set to 1
+    $response->{warnings} = {id => [qw(warn1 warn2)], ru => [qw(warn1 warn2)]};
+
+=head1 DESCRIPTION
+
+This reads all message ids from the specified PO files and tries to
+translate them into the destination language. PO files can be specified either
+as file name (extension .po) or by providing the language. In the latter case
+the PO file is found in the directory given by the directory option.
+
+=head2 TYPES OF ERRORS FOUND
+
+=head3 unknown %func() calls
+
+Translations can contain function calls in the form of %func(parameters).
+These functions must be defined in our code. Sometimes translators try
+to translate the function name which then calls an undefined function.
+
+=head3 incorrect number of %plural() parameters
+
+Different languages have different numbers of plural forms.
+Some, like Malay, don't have any plural forms. Some, like English or French,
+have just 2 forms, singular and one plural. Others like Arabic or Russian have
+more forms. Whenever a translator uses the %plural() function, he must specify
+the correct number of plural forms as parameters.
+
+=head3 incorrect usage of %d in %plural() parameters
+
+In some languages, like English or German, singular is applicable only to the
+quantity of 1. That means the German translator could come up for instance
+with the following valid %plural call:
+
+    %plural(%5,ein Stein,%d Steine)
+
+In other languages, like French or Russian, this would be an error. French uses
+singular also for 0 quantities. So, if the French translator calls:
+
+    %plural(%5,une porte,%d portes)
+
+and in the actual call the quantity of 0 is passed the output is still "une porte".
+In Russian the problem is even more critical because singular is used for instance
+also for the quantity of 121.
+
+Thus, this test checks if a) the target language is similar to English in having only
+2 plural forms, singular and one plural, and in applying singular only to the quantity
+of 1. If both of these conditions are met %plural calls like the above are allowed.
+Otherwise, if at least one of the parameters passed to %plural contains a %d,
+all of the parameters must contain the %d as well.
+
+That means the following 2 %plural calls are allowed in Russian:
+
+    %plural(%3,%d книга,%d книги,%d книг)
+    %3 %plural(%3,книга,книги,книг)
+
+while this is forbidden:
+
+    %plural(%3,одна книга,%d книги,%d книг)
+
+=head1 SUBROUTINES/METHODS
+
+=head2 debug
+
+set this if you need to check warnings along with errors
+
+=head2 directory
+
+directory where locales files are located
+
+=head2 languages
+
+language array, set this if you want to test specific language only in specified directory
+
+=head2 auto
+
+flag to fallback when a key is missing from lexicons
+
+    # if this is not set then maketext will output errors if
+    # translations is marked as fuzzy or is missing
+    # read more about it here https://metacpan.org/pod/Locale::Maketext::Lexicon
+    Locale::Maketext::Lexicon->import({ _auto => 1 })
+
+=head2 BUILD
+
+=head2 testlocales
+
+test po files in directory specified
+
+This returns hash with status, errors and warnings
+
+    {
+        status   => 1/0, # 1 is success, 0 failure
+        errors   => { id => [error1, error2], ru => [error1, error2] },
+        warnings => { id => [warn1, warn2] }
+    }
+
+=head1 AUTHOR
+
+Binary.com, C<< <binary at cpan.org> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-locale-maketext-test at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Locale-Maketext-Test>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Locale::Maketext::Test
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker (report bugs here)
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Locale-Maketext-Test>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Locale-Maketext-Test>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Locale-Maketext-Test>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Locale-Maketext-Test/>
+
+=back
+
+=head1 ACKNOWLEDGEMENTS
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Moose::Object>
+
+L<BUILDALL|Moose::Object/BUILDALL>, L<BUILDARGS|Moose::Object/BUILDARGS>, L<DEMOLISHALL|Moose::Object/DEMOLISHALL>, L<DOES|Moose::Object/DOES>, L<does|Moose::Object/does>, L<dump|Moose::Object/dump>
+
+=back
+

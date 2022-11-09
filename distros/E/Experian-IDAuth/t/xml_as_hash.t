@@ -3,14 +3,17 @@ use strict;
 use warnings;
 
 use Test::Most;
-require Test::NoWarnings;
+use Test::Warnings;
+use Path::Tiny;
 
-use lib 'lib';
 use Experian::IDAuth;
+
+my $tmp_dir = Path::Tiny->tempdir(CLEANUP => 1);
 
 my $proveid = Experian::IDAuth->new(
     client        => {},
-    search_option => 'ProveID_KYC'
+    search_option => 'ProveID_KYC',
+    folder        => $tmp_dir,
 );
 
 my $xml = <<EOD;
@@ -273,6 +276,5 @@ ok(scalar keys %$h == $num_keys, 'num keys of hashref');
 my $person_age = 52;
 ok($h->{Person}{Age} eq '52', 'person age');
 
-Test::NoWarnings::had_no_warnings();
 done_testing;
 

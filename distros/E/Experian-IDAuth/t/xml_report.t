@@ -4,20 +4,15 @@ use warnings;
 
 use Test::Most;
 use Test::MockModule;
+use Test::Warnings;
+use Path::Tiny;
 use SOAP::Lite;
-require Test::NoWarnings;
-use Data::Dumper;
 
-use lib 'lib';
-use_ok('Experian::IDAuth');
-
-my $tmp = $ENV{TEMP} || '/tmp';    # portability between windows and linux
-
-unlink $_ for <"$tmp/proveid/*">;
-rmdir "$tmp/proveid/*";
+use Experian::IDAuth;
 
 my $module = Test::MockModule->new('SOAP::Lite');
 my $xml;
+my $tmp_dir = Path::Tiny->tempdir(CLEANUP => 1);
 
 # create a return object
 {
@@ -297,6 +292,9 @@ EOD
 my $som = SOM->new;
 $module->mock(search => $som);
 
+my $exp = Test::MockModule->new('Experian::IDAuth');
+$exp->mock(save_pdf_result => sub { return });
+
 my $prove_id = Experian::IDAuth->new(
     client_id     => '45',
     search_option => 'CheckID',
@@ -310,18 +308,13 @@ my $prove_id = Experian::IDAuth->new(
     phone         => '34878123',
     email         => 'john.galt@gmail.com',
     premise       => 'premise',
+    folder        => $tmp_dir,
 );
 
-warning_like(
-    sub {
-        my $prove_id_result = $prove_id->get_result();
-        my $xml_report      = $prove_id->get_192_xml_report();
+my $prove_id_result = $prove_id->get_result();
+my $xml_report      = $prove_id->get_192_xml_report();
 
-        ok($xml_report eq $xml, 'get_192_xml_report');
-    },
-    qr/not a pdf/,
-    'bad pdf warning'
-);
-Test::NoWarnings::had_no_warnings();
+ok($xml_report eq $xml, 'get_192_xml_report');
+
 done_testing;
 

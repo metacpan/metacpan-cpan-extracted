@@ -55,5 +55,12 @@
       }
    },
    "release_status" : "stable",
-   "version" : 1
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/monacca1/nuggit.git",
+         "web" : "https://github.com/monacca1/nuggit"
+      }
+   },
+   "version" : 1.01
 }

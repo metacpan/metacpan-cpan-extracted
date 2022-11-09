@@ -8,57 +8,80 @@ In your config.yml
 
     plugins:
       DoFile:
-        page_loc: "dofiles/pages"
+        controller_loc: 'dofiles/controllers'
+        controller_extension_list: ['.ctl','.do']
+        view_loc: 'dofiles/views'
+        view_extension_list: ['.view','.po']
         default_file: "index"
-        extension_list: ['.do','.view']
 
-Make sure you have created the directory used for page\_loc
+Make sure you have created the directory used for the locations in your dancer application root.
 
 Within a route in dancer2:
 
-    my $result = dofile 'path/to/file'
+    my $result = controller 'path/to/file'
 
 You must not include the extension of the file as part of the path, as this will
 be added per the settings.
 
-Or a default route, with example handling of some return values:
+An example route in Dancer2, not using HTML::Obj2HTML (the controller returns the
+layout and tokens directly):
+
+    get 'dashboard' => sub {
+      my $self = shift;
+      my $result = controller 'dashboards/user-dashboard';
+      return template $result->{layout} => $result->{tokens};
+    }
+
+An example default route that will search for controllers (or views) based on the
+URI requested, and some handling of other controller return keys:
 
     prefix '/';
     any qr{.*} => sub {
       my $self = shift;
-      my $result = dofile undef;
+
+      my $result = controller undef;  # Not specifying the controller to use will use the URI to guess
+
+      # My controller might return all manner of different things; this is an example:
       if ($result && ref $result eq "HASH") {
-        if (defined $result->{status}) {
-          status $result->{status};
-        }
         if (defined $result->{url}) {
           if (defined $result->{redirect} && $result->{redirect} eq "forward") {
             return forward $result->{url};
           } else {
             return redirect $result->{url};
           }
-        } elsif (defined $result->{content}) {
-          return $result->{content};
         }
-      }
+        if (defined $result->{status}) {
+          status $result->{status};
+        }
+        if (defined $result->{template}) {
+          set layout => $result->{template};
+        }
+        if (defined $result->{headers}) {
+          headers %{$result->{headers}};
+        }
+        if (defined $result->{content}) {
+          return template $result->{content}, $result->{tokens};
+        }
+      };
     };
 
-When the 1st parameter to 'dofile' is undef it'll use the request URI to work
+When the 1st parameter to 'controller' is undef it'll use the request URI to work
 out what the file(s) to execute are.
 
 # DESCRIPTION
 
 DoFile is a way of automatically pulling multiple perl files to execute as a way
 to simplify routing complexity in Dancer2 for very large applications. In
-particular it was designed to offload "as many as possible" URIs that related to
-some standard functionality through a default route, just by having files
-existing for the specific URI.
+particular it was designed to split out larger controllers into logical partitions
+based on heirarchy of files compared to what's being requested.
 
 The magic will look through your filesystem for files to 'do' (execute), and
-there may be several. The intent is to split out controller files and
-view files, and these may individually be rolled out or split out. In the
-default configuration the controller files are suffixed .do, and the view files
-.view
+there may be several.
+
+An added benefit of using DoFile is it's ability to execute multiple files per
+request, effectively allowing you to split controllers into sub-parts. For example,
+you might have a "DoFile" that is always executed for /some/uri, and another
+for POST or GET, and even another for the fact you hade /some too.
 
 ## File Search Ordering
 
@@ -70,10 +93,11 @@ Files are searched:
 
 - By extension
 
-    The default extensions .do and .view are checked, unless defined in your
-    config.yml. The intention here is that .do files contain controller code and
-    don't typically return content, but may return redirects. After .do files have
-    been executed, .view files are executed. These are expected to return content.
+    The default extensions .ctl and .view are checked (.do and .po are legacy extensions),
+    unless defined in your config.yml. The intention here is that .do files contain
+    controller code and don't typically return content, but may return redirects. After
+    .do files have been executed, .view files are executed. These are expected to return
+    content.
 
     You can define as many extensions as you like. You could, for example have:
     `['.init','.do','.view','.final']`
@@ -82,16 +106,17 @@ Files are searched:
 
     For each extension, first the "root" file `file.ext` is tested, then a file
     that matches `file-METHOD.ext` is tested (where METHOD is the HTTP request
-    method for this request, .ext is the extension).
+    method for this request, .ext is the extension). Finally `file-ANY.ext` is
+    checked.
 
 - Iterating up the directory tree
 
-    If your call to `path/to/file` results in a miss for `path/to/file.do`, DoFile
-    will then test for `path/to.do` and finally `path.do` before moving on to
-    `path/to/file-METHOD.do`
+    If your call to `path/to/file` results in a miss for `path/to/file.ctl`, DoFile
+    will then test for `path/to.ctl` and finally `path.ctl` before moving on to
+    `path/to/file-METHOD.ctl`
 
     Once DoFile has found one it will not transcend the directory tree any further.
-    Therefore defining `path/to/file.do` and `path/to.do` will not result in
+    Therefore defining `path/to/file.ctl` and `path/to.ctl` will not result in
     both being executed for the URI `path/to/file` - only the first will be
     executed.
 

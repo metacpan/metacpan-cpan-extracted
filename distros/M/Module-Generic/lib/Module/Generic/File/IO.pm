@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File/IO.pm
-## Version v0.1.1
+## Version v0.1.2
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/04/26
-## Modified 2022/08/05
+## Modified 2022/10/31
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -25,9 +25,13 @@ BEGIN
     use Want;
     our @EXPORT = grep( /^(?:O_|F_GETFL|F_SETFL)/, @Fcntl::EXPORT );
     push( @EXPORT, @{$Fcntl::EXPORT_TAGS{flock}}, @{$Fcntl::EXPORT_TAGS{seek}} );
+    our @EXPORT_OK = qw( wraphandle );
     our $THAW_REOPENS_FILE = 1;
-    our $VERSION = 'v0.1.1';
+    our $VERSION = 'v0.1.2';
 };
+
+use strict;
+use warnings;
 
 sub new
 {
@@ -41,6 +45,17 @@ sub new
     {
         $self = $class->IO::File::new( @_ ) ||
             return( $this->error( "Unable to open file \"", $_[0], "\" with arguments: '", join( "', '", @_[1..$#_] ), "': $!" ) );
+        if( exists( $opts->{fileno} ) &&
+            defined( $opts->{fileno} ) &&
+            length( $opts->{fileno} ) )
+        {
+            my $fileno = CORE::delete( $opts->{fileno} );
+            # > +<, etc and r, w, r+
+            my $mode = 'r';
+            $mode = CORE::delete( $opts->{mode} ) if( exists( $opts->{mode} ) && defined( $opts->{mode} ) && length( $opts->{mode} ) );
+            $self->fdopen( $fileno, $mode ) || 
+                return( $this->error( "Unable to fdopen using file descriptor ${fileno} and mode ${mode}: $!" ) );
+        }
     }
     catch( $e )
     {
@@ -222,6 +237,33 @@ sub ungetc { return( shift->_filehandle_method( 'ungetc', @_ ) ); }
 
 sub untaint { return( shift->_filehandle_method( 'untaint', @_ ) ); }
 
+sub wraphandle
+{
+    my( $this, $mode ) = @_;
+    my $fileno;
+    if( Scalar::Util::blessed( $this ) &&
+        $this->can( 'fileno' ) )
+    {
+        $fileno = $this->fileno;
+    }
+    else
+    {
+        $fileno = CORE::fileno( $this );
+    }
+    
+    if( !defined( $fileno ) )
+    {
+        warn( "Cannot get a file descriptor from the filehandle (${this}) provided.\n" );
+        return;
+    }
+    my $io = Module::Generic::File::IO->new( { 'fileno' => $fileno } ) || do
+    {
+        warn( Module::Generic::File::IO->error );
+        return;
+    };
+    return( $io );
+}
+
 sub write { return( shift->_filehandle_method( 'write', @_ ) ); }
 
 sub _filehandle_method
@@ -234,6 +276,7 @@ sub _filehandle_method
         my @rv = ();
         my $ref = IO::File->can( $what ) ||
             return( $self->error( "Method '$what' is unsupported." ) );
+        no warnings 'uninitialized';
         if( wantarray() )
         {
             @rv = $self->$ref( @_ );
@@ -332,12 +375,18 @@ Module::Generic::File::IO - File IO Object Wrapper
 =head1 SYNOPSIS
 
     use Module::Generic::File::IO;
-    my $io = Module::Generic::File::IO->new( '/some/file.txt' ) || 
+    my $io = Module::Generic::File::IO->new || 
         die( Module::Generic::File::IO->error, "\n" );
+    my $io = Module::Generic::File::IO->new( fileno => $fileno ) || 
+        die( Module::Generic::File::IO->error, "\n" );
+
+    use Module::Generic::File::IO qw( wraphandle );
+    my $io = wraphandle( $fh );
+    my $io = wraphandle( $fh, '>' );
 
 =head1 VERSION
 
-    v0.1.1
+    v0.1.2
 
 =head1 DESCRIPTION
 
@@ -346,6 +395,39 @@ This is a thin wrapper that inherits from L<IO::File> with the purpose of provid
 Supported methods are rigorously the same as L<IO::File> and L<IO::Handle> on top of all the standard ones from L<Module::Generic>
 
 The IO methods are listed below for convenience, but make sure to check the L<IO::File> documentation for more information.
+
+=head1 CONSTRUCTOR
+
+=head2 new
+
+This instantiates a new L<Module::Generic::File::IO> object and returns it.
+
+It optionally takes the following parameters:
+
+=over 4
+
+=item C<fileno>
+
+A file descriptor. When this is provided, the newly created object will perform a L</fdopen> on the file descriptor provided.
+
+=item C<mode>
+
+A mode which will be used along with C<fileno> to fdopen the file descriptor. Possible values can be C<< < >>, C<< >+ >>, etc and C<r>, C<w>, C<r+>
+
+=back
+
+=head1 FUNCTIONS
+
+=head2 wraphandle
+
+    my $io = Module::Generic::File::IO::wraphandle( $fh, '>' );
+    # or
+    use Module::Generic::File::IO qw( wraphandle );
+    my $io = wraphandle( $fh, '>' );
+
+Provided with a filehandle and an optional mode and this will return a newly created L<Module::Generic::File::IO>
+
+By default, the mode will be '<'
 
 =head1 METHODS
 
@@ -364,6 +446,14 @@ See L<IO::File/binmode> for details
 =head2 blocking
 
 See L<IO::Handle/blocking> for details
+
+=head2 can_read
+
+Returns true if one can read from this filehandle, or false otherwise.
+
+=head2 can_write
+
+Returns true if one can write from this filehandle, or false otherwise.
 
 =head2 close
 
@@ -384,6 +474,10 @@ See L<IO::Handle/fdopen> for details
 =head2 fileno
 
 See L<IO::Handle/fileno> for details
+
+=head2 flags
+
+Returns the filehandle flags value using L<perlfunc/fcntl>
 
 =head2 flush
 
@@ -571,6 +665,10 @@ See also the manual page for C<fcntl> for more detail about those constants.
 
 =for Pod::Coverage STORABLE_freeze
 
+=for Pod::Coverage STORABLE_freeze_pre_processing
+
+=for Pod::Coverage STORABLE_thaw_post_processing
+
 =for Pod::Coverage STORABLE_thaw
 
 =for Pod::Coverage THAW
@@ -599,7 +697,8 @@ L<IO::Handle>, L<IO::File>, L<IO::Seekable>
 
 Copyright(c) 2022 DEGUEST Pte. Ltd.
 
-All rights reserved
+All rights reserved.
+
 This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
 
 =cut

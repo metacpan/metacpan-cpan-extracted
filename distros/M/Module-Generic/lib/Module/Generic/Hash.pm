@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Hash.pm
-## Version v1.2.1
+## Version v1.2.2
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2022/08/05
+## Modified 2022/11/09
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -39,7 +39,7 @@ BEGIN
         'ge'     => sub { _obj_comp( @_, 'ge') },
         fallback => 1,
     );
-    our( $VERSION ) = 'v1.2.1';
+    our( $VERSION ) = 'v1.2.2';
 };
 
 use strict;
@@ -238,7 +238,7 @@ sub merge
                 }
                 else
                 {
-                    $to->{ $k } = {} unless( Scalar::Util::reftype( $to->{ $k } ) eq 'HASH' );
+                    $to->{ $k } = {} unless( CORE::defined( $to->{ $k } ) && Scalar::Util::reftype( $to->{ $k } ) eq 'HASH' );
                     $copy->( $this->{ $k }, $to->{ $k } );
                 }
                 $seen->{ $addr } = $this->{ $k };

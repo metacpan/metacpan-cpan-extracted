@@ -655,62 +655,82 @@ at this time.  For this reason, tags below with equivalents in the
 <td class=c>boolean</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td>Firmware</td>
-<td class=c>string</td>
+<td>EnhanceDetailsAlreadyApplied</td>
+<td class=c>boolean</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
-<td>FlashCompensation</td>
+<td>EnhanceDetailsVersion</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>EnhanceSuperResolutionAlreadyApplied</td>
+<td class=c>boolean</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>EnhanceSuperResolutionScale</td>
 <td class=c>rational</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td>EnhanceSuperResolutionVersion</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>Firmware</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>FlashCompensation</td>
+<td class=c>rational</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>ImageNumber</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>IsMergedHDR</td>
 <td class=c>boolean</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>IsMergedPanorama</td>
 <td class=c>boolean</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>LateralChromaticAberrationCorrectionAlreadyApplied</td>
 <td class=c>boolean</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>Lens</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>LensDistortInfo</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>LensID</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>LensInfo</td>
 <td class=c title=' / = Avoid'>string/</td>
 <td><span class=s><span class=n>(4 rational values giving focal and aperture ranges)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td>LensSerialNumber</td>
 <td class=c title=' / = Avoid'>string/</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>NeutralDensityFactor</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>OwnerName</td>
 <td class=c title=' / = Avoid'>string/</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>SerialNumber</td>
 <td class=c title=' / = Avoid'>string/</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>VignetteCorrectionAlreadyApplied</td>
 <td class=c>boolean</td>
 <td>&nbsp;</td></tr>
@@ -4543,7 +4563,14 @@ specific properties in XMP (see <a href="http://creativecommons.org/ns">http://c
 <tr>
 <td>PerspectiveUpright</td>
 <td class=c title=' / = Avoid'>integer/</td>
-<td>&nbsp;</td></tr>
+<td><table class=cols><tr>
+  <td>0 = Off
+  <br>1 = Auto
+  <br>2 = Full</td><td>&nbsp;&nbsp;</td>
+  <td>3 = Level
+  <br>4 = Vertical
+  <br>5 = Guided</td></tr></table>
+</td></tr>
 <tr class=b>
 <td>PerspectiveVertical</td>
 <td class=c title=' / = Avoid'>integer/</td>
@@ -4579,7 +4606,9 @@ specific properties in XMP (see <a href="http://creativecommons.org/ns">http://c
 <tr class=b>
 <td>PostCropVignetteStyle</td>
 <td class=c title=' / = Avoid'>integer/</td>
-<td>&nbsp;</td></tr>
+<td><span class=s>1 = Highlight Priority
+  <br>2 = Color Priority
+  <br>3 = Paint Overlay</span></td></tr>
 <tr>
 <td>PresetType</td>
 <td class=c title=' / = Avoid'>string/</td>
@@ -5423,70 +5452,90 @@ specific properties in XMP (see <a href="http://creativecommons.org/ns">http://c
 <td class=c title=' / = Avoid'>integer/</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td>UprightFourSegments_0</td>
+<td class=c title=' / = Avoid'>string/</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>UprightFourSegments_1</td>
+<td class=c title=' / = Avoid'>string/</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>UprightFourSegments_2</td>
+<td class=c title=' / = Avoid'>string/</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>UprightFourSegments_3</td>
+<td class=c title=' / = Avoid'>string/</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>UprightFourSegmentsCount</td>
 <td class=c title=' / = Avoid'>integer/</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td>UprightGuidedDependentDigest</td>
+<td class=c title=' / = Avoid'>string/</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>UprightPreview</td>
 <td class=c title=' / = Avoid'>boolean/</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>UprightTransform_0</td>
 <td class=c title=' / = Avoid'>string/</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>UprightTransform_1</td>
 <td class=c title=' / = Avoid'>string/</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>UprightTransform_2</td>
 <td class=c title=' / = Avoid'>string/</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>UprightTransform_3</td>
 <td class=c title=' / = Avoid'>string/</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>UprightTransform_4</td>
 <td class=c title=' / = Avoid'>string/</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>UprightTransform_5</td>
 <td class=c title=' / = Avoid'>string/</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>UprightTransformCount</td>
 <td class=c title=' / = Avoid'>integer/</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>UprightVersion</td>
 <td class=c title=' / = Avoid'>integer/</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>UUID</td>
 <td class=c title=' / = Avoid'>string/</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>Version</td>
 <td class=c title=' / = Avoid'>string/</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>Vibrance</td>
 <td class=c title=' / = Avoid'>integer/</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>VignetteAmount</td>
 <td class=c title=' / = Avoid'>integer/</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>VignetteMidpoint</td>
 <td class=c title=' / = Avoid'>integer/</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>What</td>
 <td class=c title=' / = Avoid'>string/</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>WhiteBalance</td>
 <td class=c title=' / = Avoid'>string/</td>
 <td><table class=cols><tr>
@@ -5500,7 +5549,7 @@ specific properties in XMP (see <a href="http://creativecommons.org/ns">http://c
   <br>&#39;Shade&#39; = Shade
   <br>&#39;Tungsten&#39; = Tungsten</td></tr></table>
 </td></tr>
-<tr class=b>
+<tr>
 <td>Whites2012</td>
 <td class=c title=' / = Avoid'>integer/</td>
 <td>&nbsp;</td></tr>
@@ -9373,7 +9422,14 @@ metadata space with these incredibly bulky image editing parameters.</p>
 <tr>
 <td>PerspectiveUpright</td>
 <td class=c>integer</td>
-<td>&nbsp;</td></tr>
+<td><table class=cols><tr>
+  <td>0 = Off
+  <br>1 = Auto
+  <br>2 = Full</td><td>&nbsp;&nbsp;</td>
+  <td>3 = Level
+  <br>4 = Vertical
+  <br>5 = Guided</td></tr></table>
+</td></tr>
 <tr class=b>
 <td>PerspectiveVertical</td>
 <td class=c>integer</td>
@@ -9409,7 +9465,9 @@ metadata space with these incredibly bulky image editing parameters.</p>
 <tr class=b>
 <td>PostCropVignetteStyle</td>
 <td class=c>integer</td>
-<td>&nbsp;</td></tr>
+<td><span class=s>1 = Highlight Priority
+  <br>2 = Color Priority
+  <br>3 = Paint Overlay</span></td></tr>
 <tr>
 <td>PresetType</td>
 <td class=c>string</td>
@@ -10137,70 +10195,90 @@ metadata space with these incredibly bulky image editing parameters.</p>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td>UprightFourSegments_0</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>UprightFourSegments_1</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>UprightFourSegments_2</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>UprightFourSegments_3</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>UprightFourSegmentsCount</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td>UprightGuidedDependentDigest</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>UprightPreview</td>
 <td class=c>boolean</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>UprightTransform_0</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>UprightTransform_1</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>UprightTransform_2</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>UprightTransform_3</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>UprightTransform_4</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>UprightTransform_5</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>UprightTransformCount</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>UprightVersion</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>UUID</td>
 <td class=c title=' / = Avoid'>string/</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>Version</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>Vibrance</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>VignetteAmount</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>VignetteMidpoint</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>What</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>WhiteBalance</td>
 <td class=c title=' / = Avoid'>string/</td>
 <td><table class=cols><tr>
@@ -10214,7 +10292,7 @@ metadata space with these incredibly bulky image editing parameters.</p>
   <br>&#39;Shade&#39; = Shade
   <br>&#39;Tungsten&#39; = Tungsten</td></tr></table>
 </td></tr>
-<tr class=b>
+<tr>
 <td>Whites2012</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
@@ -11431,10 +11509,14 @@ of tags available in DICOM-format files.</p>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
 <tr>
-<td>PickLabel</td>
+<td>PicasawebGPhotoId</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td>PickLabel</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>TagsList</td>
 <td class=c title=' + = List'>string+</td>
 <td>&nbsp;</td></tr>
@@ -12417,6 +12499,10 @@ writing due to name conflicts with tags in other schemas.</p>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td>ShotLogData</td>
+<td class=c>string</td>
+<td><span class=s><span class=n>(called shot_log_data by the spec)</span></span></td></tr>
+<tr>
 <td>SpecialTypeID</td>
 <td class=c title=' + = List'>string+</td>
 <td>&nbsp;</td></tr>
@@ -12434,6 +12520,10 @@ writing due to name conflicts with tags in other schemas.</p>
 <tr>
 <td>CameraBurstID</td>
 <td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>Type</td>
+<td class=c title=' / = Avoid'>string/</td>
 <td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
@@ -13164,10 +13254,11 @@ shortens this for the family 1 group name. (see
 </table></td></tr></table></blockquote>
 
 <h2><a name='iptcExt'>XMP iptcExt Tags</a></h2>
-<p>This table contains tags defined by the IPTC Extension schema version 1.6.
-The actual namespace prefix is &quot;Iptc4xmpExt&quot;, but ExifTool shortens this for
-the family 1 group name. (see
-<a href="http://www.iptc.org/standards/photo-metadata/iptc-standard/">http://www.iptc.org/standards/photo-metadata/iptc-standard/</a>)</p>
+<p>This table contains tags defined by the IPTC Extension schema version 1.7
+and IPTC Video Metadata version 1.3. The actual namespace prefix is
+&quot;Iptc4xmpExt&quot;, but ExifTool shortens this for the family 1 group name. (See
+<a href="http://www.iptc.org/standards/photo-metadata/iptc-standard/">http://www.iptc.org/standards/photo-metadata/iptc-standard/</a> and
+<a href="https://iptc.org/standards/video-metadata-hub/">https://iptc.org/standards/video-metadata-hub/</a>.)</p>
 
 <p>These tags belong to the ExifTool XMP-iptcExt family 1 group.</p>
 <blockquote>
@@ -13809,16 +13900,50 @@ the family 1 group name. (see
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td>MetadataAuthority</td>
+<td class=c>struct</td>
+<td>--&gt; <a href='XMP.html#Entity'>Entity Struct</a></td></tr>
+<tr class=b>
+<td>MetadataAuthorityIdentifier</td>
+<td class=c title=' _ = Flattened
+ + = List'>string_+</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>MetadataAuthorityName</td>
+<td class=c title=' _ = Flattened'>lang-alt_</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>MetadataLastEdited</td>
+<td class=c>date</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>MetadataLastEditor</td>
+<td class=c>struct</td>
+<td>--&gt; <a href='XMP.html#Entity'>Entity Struct</a></td></tr>
+<tr class=b>
+<td>MetadataLastEditorIdentifier</td>
+<td class=c title=' _ = Flattened
+ + = List'>string_+</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>MetadataLastEditorName</td>
+<td class=c title=' _ = Flattened'>lang-alt_</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>ModelAge</td>
 <td class=c title=' + = List'>integer+</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>OrganisationInImageCode</td>
 <td class=c title=' + = List'>string+</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>OrganisationInImageName</td>
 <td class=c title=' + = List'>string+</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>ParentID</td>
+<td class=c>string</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
 <td>PersonHeard</td>
@@ -13917,236 +14042,241 @@ the family 1 group name. (see
  + = List'>string_+</td>
 <td><span class=s><span class=n>(ProductInImageProductGTIN)</span></span></td></tr>
 <tr class=b>
+<td>ProductInImageProductId</td>
+<td class=c title=' _ = Flattened
+ + = List'>string_+</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>ProductInImageName</td>
 <td class=c title=' _ = Flattened
  + = List'>lang-alt_+</td>
 <td><span class=s><span class=n>(ProductInImageProductName)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td>PublicationEvent</td>
 <td class=c title=' + = List'>struct+</td>
 <td>--&gt; <a href='XMP.html#PublicationEvent'>PublicationEvent Struct</a></td></tr>
-<tr class=b>
+<tr>
 <td>PublicationEventDate</td>
 <td class=c title=' _ = Flattened
  + = List'>date_+</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>PublicationEventIdentifier</td>
 <td class=c title=' _ = Flattened
  + = List'>string_+</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>PublicationEventName</td>
 <td class=c title=' _ = Flattened
  + = List'>string_+</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>Rating</td>
 <td class=c title=' + = List'>struct+</td>
 <td>--&gt; <a href='XMP.html#Rating'>Rating Struct</a></td></tr>
-<tr class=b>
+<tr>
 <td>RatingRegion</td>
 <td class=c title=' _ = Flattened
  + = List'>struct_+</td>
 <td>--&gt; <a href='XMP.html#LocationDetails'>LocationDetails Struct</a>
   <br><span class='n s'>(RatingRatingRegion)</span></td></tr>
-<tr>
+<tr class=b>
 <td>RatingRegionCity</td>
 <td class=c title=' _ = Flattened
  + = List'>string_+</td>
 <td><span class=s><span class=n>(RatingRatingRegionCity)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td>RatingRegionCountryCode</td>
 <td class=c title=' _ = Flattened
  + = List'>string_+</td>
 <td><span class=s><span class=n>(RatingRatingRegionCountryCode)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td>RatingRegionCountryName</td>
 <td class=c title=' _ = Flattened
  + = List'>string_+</td>
 <td><span class=s><span class=n>(RatingRatingRegionCountryName)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td>RatingRegionGPSAltitude</td>
 <td class=c title=' _ = Flattened
  + = List'>rational_+</td>
 <td><span class=s><span class=n>(RatingRatingRegionGPSAltitude)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td>RatingRegionGPSLatitude</td>
 <td class=c title=' _ = Flattened
  + = List'>string_+</td>
 <td><span class=s><span class=n>(RatingRatingRegionGPSLatitude)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td>RatingRegionGPSLongitude</td>
 <td class=c title=' _ = Flattened
  + = List'>string_+</td>
 <td><span class=s><span class=n>(RatingRatingRegionGPSLongitude)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td>RatingRegionIdentifier</td>
 <td class=c title=' _ = Flattened
  + = List'>string_+</td>
 <td><span class=s><span class=n>(RatingRatingRegionIdentifier)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td>RatingRegionLocationId</td>
 <td class=c title=' _ = Flattened
  + = List'>string_+</td>
 <td><span class=s><span class=n>(RatingRatingRegionLocationId)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td>RatingRegionLocationName</td>
 <td class=c title=' _ = Flattened
  + = List'>lang-alt_+</td>
 <td><span class=s><span class=n>(RatingRatingRegionLocationName)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td>RatingRegionProvinceState</td>
 <td class=c title=' _ = Flattened
  + = List'>string_+</td>
 <td><span class=s><span class=n>(RatingRatingRegionProvinceState)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td>RatingRegionSublocation</td>
 <td class=c title=' _ = Flattened
  + = List'>string_+</td>
 <td><span class=s><span class=n>(RatingRatingRegionSublocation)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td>RatingRegionWorldRegion</td>
 <td class=c title=' _ = Flattened
  + = List'>string_+</td>
 <td><span class=s><span class=n>(RatingRatingRegionWorldRegion)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td>RatingScaleMaxValue</td>
 <td class=c title=' _ = Flattened
  + = List'>string_+</td>
 <td><span class=s><span class=n>(RatingRatingScaleMaxValue)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td>RatingScaleMinValue</td>
 <td class=c title=' _ = Flattened
  + = List'>string_+</td>
 <td><span class=s><span class=n>(RatingRatingScaleMinValue)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td>RatingSourceLink</td>
 <td class=c title=' _ = Flattened
  + = List'>string_+</td>
 <td><span class=s><span class=n>(RatingRatingSourceLink)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td>RatingValue</td>
 <td class=c title=' _ = Flattened
  + = List'>string_+</td>
 <td><span class=s><span class=n>(RatingRatingValue)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td>RatingValueLogoLink</td>
 <td class=c title=' _ = Flattened
  + = List'>string_+</td>
 <td><span class=s><span class=n>(RatingRatingValueLogoLink)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td>RecDevice</td>
 <td class=c>struct</td>
 <td>--&gt; <a href='XMP.html#Device'>Device Struct</a></td></tr>
-<tr>
+<tr class=b>
 <td>RecDeviceAttLensDescription</td>
 <td class=c title=' _ = Flattened'>string_</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>RecDeviceManufacturer</td>
 <td class=c title=' _ = Flattened'>string_</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>RecDeviceModelName</td>
 <td class=c title=' _ = Flattened'>string_</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>RecDeviceOwnersDeviceId</td>
 <td class=c title=' _ = Flattened'>string_</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>RecDeviceSerialNumber</td>
 <td class=c title=' _ = Flattened'>string_</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>RegistryID</td>
 <td class=c title=' + = List'>struct+</td>
 <td>--&gt; <a href='XMP.html#RegistryEntryDetails'>RegistryEntryDetails Struct</a></td></tr>
-<tr>
+<tr class=b>
 <td>RegistryEntryRole</td>
 <td class=c title=' _ = Flattened
  + = List'>string_+</td>
 <td><span class=s><span class=n>(RegistryIdRegEntryRole)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td>RegistryItemID</td>
 <td class=c title=' _ = Flattened
  + = List'>string_+</td>
 <td><span class=s><span class=n>(RegistryIdRegItemId)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td>RegistryOrganisationID</td>
 <td class=c title=' _ = Flattened
  + = List'>string_+</td>
 <td><span class=s><span class=n>(RegistryIdRegOrgId)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td>ReleaseReady</td>
 <td class=c>boolean</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>Season</td>
 <td class=c>struct</td>
 <td>--&gt; <a href='XMP.html#EpisodeOrSeason'>EpisodeOrSeason Struct</a></td></tr>
-<tr class=b>
+<tr>
 <td>SeasonIdentifier</td>
 <td class=c title=' _ = Flattened'>string_</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>SeasonName</td>
 <td class=c title=' _ = Flattened'>string_</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>SeasonNumber</td>
 <td class=c title=' _ = Flattened'>string_</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>Series</td>
 <td class=c>struct</td>
 <td>--&gt; <a href='XMP.html#Series'>Series Struct</a></td></tr>
-<tr class=b>
+<tr>
 <td>SeriesIdentifier</td>
 <td class=c title=' _ = Flattened'>string_</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>SeriesName</td>
 <td class=c title=' _ = Flattened'>string_</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>Snapshot</td>
 <td class=c title=' + = List'>struct+</td>
 <td>--&gt; <a href='XMP.html#LinkedImage'>LinkedImage Struct</a>
   <br><span class='n s'>(called SnapshotLink by the spec)</span></td></tr>
-<tr>
+<tr class=b>
 <td>SnapshotFormat</td>
 <td class=c title=' _ = Flattened
  + = List'>string_+</td>
 <td><span class=s><span class=n>(SnapshotLinkFormat)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td>SnapshotHeightPixels</td>
 <td class=c title=' _ = Flattened
  + = List'>integer_+</td>
 <td><span class=s><span class=n>(SnapshotLinkHeightPixels)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td>SnapshotImageRole</td>
 <td class=c title=' _ = Flattened
  + = List'>string_+</td>
 <td><span class=s><span class=n>(SnapshotLinkImageRole)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td>SnapshotLink</td>
 <td class=c title=' _ = Flattened
  + = List'>string_+</td>
 <td><span class=s><span class=n>(SnapshotLinkLink)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td>SnapshotLinkQualifier</td>
 <td class=c title=' _ = Flattened
  + = List'>string_+</td>
 <td><span class=s><span class=n>(SnapshotLinkLinkQualifier)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td>SnapshotUsedVideoFrame</td>
 <td class=c title=' _ = Flattened
  + = List'>struct_+</td>
 <td>--&gt; <a href='XMP.html#Timecode'>Timecode Struct</a>
   <br><span class='n s'>(SnapshotLinkUsedVideoFrame)</span></td></tr>
-<tr>
+<tr class=b>
 <td>SnapshotUsedVideoFrameTimeFormat</td>
 <td class=c title=' _ = Flattened
  + = List'>string_+</td>
@@ -14162,137 +14292,137 @@ the family 1 group name. (see
   <br>&#39;5994NonDropTimecode&#39; = 59.94 fps (non-drop)
   <br>&#39;60Timecode&#39; = 60 fps</td></tr></table>
 </td></tr>
-<tr class=b>
+<tr>
 <td>SnapshotUsedVideoFrameTimeValue</td>
 <td class=c title=' _ = Flattened
  + = List'>string_+</td>
 <td><span class=s><span class=n>(SnapshotLinkUsedVideoFrameTimeValue)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td>SnapshotUsedVideoFrameValue</td>
 <td class=c title=' _ = Flattened
  + = List'>integer_+</td>
 <td><span class=s><span class=n>(SnapshotLinkUsedVideoFrameValue; only in XMP 2008 spec; an error?)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td>SnapshotWidthPixels</td>
 <td class=c title=' _ = Flattened
  + = List'>integer_+</td>
 <td><span class=s><span class=n>(SnapshotLinkWidthPixels)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td>StorylineIdentifier</td>
 <td class=c title=' + = List'>string+</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>StreamReady</td>
 <td class=c>string</td>
 <td><span class=s>&#39;false&#39; = False
   <br>&#39;true&#39; = True
   <br>&#39;unknown&#39; = Unknown</span></td></tr>
-<tr>
+<tr class=b>
 <td>StylePeriod</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>SupplyChainSource</td>
 <td class=c title=' + = List'>struct+</td>
 <td>--&gt; <a href='XMP.html#Entity'>Entity Struct</a></td></tr>
-<tr>
+<tr class=b>
 <td>SupplyChainSourceIdentifier</td>
 <td class=c title=' _ = Flattened
  + = List'>string_+</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>SupplyChainSourceName</td>
 <td class=c title=' _ = Flattened
  + = List'>lang-alt_+</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>TemporalCoverage</td>
 <td class=c>struct</td>
 <td>--&gt; <a href='XMP.html#TemporalCoverage'>TemporalCoverage Struct</a></td></tr>
-<tr class=b>
+<tr>
 <td>TemporalCoverageFrom</td>
 <td class=c title=' _ = Flattened'>date_</td>
 <td><span class=s><span class=n>(TemporalCoverageTempCoverageFrom)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td>TemporalCoverageTo</td>
 <td class=c title=' _ = Flattened'>date_</td>
 <td><span class=s><span class=n>(TemporalCoverageTempCoverageTo)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td>Transcript</td>
 <td class=c>lang-alt</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>TranscriptLink</td>
 <td class=c title=' + = List'>struct+</td>
 <td>--&gt; <a href='XMP.html#QualifiedLink'>QualifiedLink Struct</a></td></tr>
-<tr class=b>
+<tr>
 <td>TranscriptLinkLink</td>
 <td class=c title=' _ = Flattened
  + = List'>string_+</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>TranscriptLinkLinkQualifier</td>
 <td class=c title=' _ = Flattened
  + = List'>string_+</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>VideoBitrate</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>VideoBitrateMode</td>
 <td class=c>string</td>
 <td><span class=s>&#39;fixed&#39; = Fixed
   <br>&#39;variable&#39; = Variable</span></td></tr>
-<tr class=b>
+<tr>
 <td>VideoDisplayAspectRatio</td>
 <td class=c>rational</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>VideoEncodingProfile</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>VideoShotType</td>
 <td class=c title=' + = List'>struct+</td>
 <td>--&gt; <a href='XMP.html#Entity'>Entity Struct</a></td></tr>
-<tr>
+<tr class=b>
 <td>VideoShotTypeIdentifier</td>
 <td class=c title=' _ = Flattened
  + = List'>string_+</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>VideoShotTypeName</td>
 <td class=c title=' _ = Flattened
  + = List'>lang-alt_+</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>VideoStreamsCount</td>
 <td class=c>integer</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>VisualColor</td>
 <td class=c>string</td>
 <td><span class=s><span class=n>(called VisualColour by the spec)</span>
   <br>&#39;bw-monochrome&#39; = Monochrome
   <br>&#39;colour&#39; = Color</span></td></tr>
-<tr>
+<tr class=b>
 <td>WorkflowTag</td>
 <td class=c>struct</td>
 <td>--&gt; <a href='XMP.html#CVTermDetails'>CVTermDetails Struct</a></td></tr>
-<tr class=b>
+<tr>
 <td>WorkflowTagCvId</td>
 <td class=c title=' _ = Flattened'>string_</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>WorkflowTagCvTermId</td>
 <td class=c title=' _ = Flattened'>string_</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>WorkflowTagCvTermName</td>
 <td class=c title=' _ = Flattened'>lang-alt_</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>WorkflowTagCvTermRefinedAbout</td>
 <td class=c title=' _ = Flattened'>string_</td>
 <td>&nbsp;</td></tr>
@@ -14744,6 +14874,10 @@ is to write ImageRegion as a structure with these tags as new fields.</p>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
 <tr>
+<td>ProductId</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
 <td>ProductName</td>
 <td class=c>lang-alt</td>
 <td>&nbsp;</td></tr>
@@ -15119,18 +15253,132 @@ created to enable writing of XMP-pdfx information.</p>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
 <tr class=b>
+<td>CameraProfiles</td>
+<td class=c title=' + = List'>struct+</td>
+<td>--&gt; <a href='XMP.html#Camera'>Camera Struct</a></td></tr>
+<tr>
+<td>CameraProfilesApertureValue</td>
+<td class=c title=' _ = Flattened
+ + = List'>real_+</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>CameraProfilesAuthor</td>
+<td class=c title=' _ = Flattened
+ + = List'>string_+</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>CameraProfilesAutoScale</td>
+<td class=c title=' _ = Flattened
+ + = List'>boolean_+</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>CameraProfilesCameraPrettyName</td>
+<td class=c title=' _ = Flattened
+ + = List'>string_+</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>CameraProfilesCameraRawProfile</td>
+<td class=c title=' _ = Flattened
+ + = List'>boolean_+</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>CameraProfilesFocalLength</td>
+<td class=c title=' _ = Flattened
+ + = List'>real_+</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>CameraProfilesFocusDistance</td>
+<td class=c title=' _ = Flattened
+ + = List'>real_+</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>CameraProfilesLens</td>
+<td class=c title=' _ = Flattened
+ + = List'>string_+</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>CameraProfilesLensPrettyName</td>
+<td class=c title=' _ = Flattened
+ + = List'>string_+</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>CameraProfilesMake</td>
+<td class=c title=' _ = Flattened
+ + = List'>string_+</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>CameraProfilesModel</td>
+<td class=c title=' _ = Flattened
+ + = List'>string_+</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>CameraProfilesPerspectiveModel</td>
+<td class=c title=' _ = Flattened
+ + = List'>struct_+</td>
+<td>--&gt; <a href='XMP.html#PerspectiveModel'>PerspectiveModel Struct</a></td></tr>
+<tr>
+<td>CameraProfilesPerspectiveModelImageXCenter</td>
+<td class=c title=' _ = Flattened
+ + = List'>real_+</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>CameraProfilesPerspectiveModelImageYCenter</td>
+<td class=c title=' _ = Flattened
+ + = List'>real_+</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>CameraProfilesPerspectiveModelRadialDistortParam1</td>
+<td class=c title=' _ = Flattened
+ + = List'>real_+</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>CameraProfilesPerspectiveModelRadialDistortParam2</td>
+<td class=c title=' _ = Flattened
+ + = List'>real_+</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>CameraProfilesPerspectiveModelRadialDistortParam3</td>
+<td class=c title=' _ = Flattened
+ + = List'>real_+</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>CameraProfilesPerspectiveModelScaleFactor</td>
+<td class=c title=' _ = Flattened
+ + = List'>real_+</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>CameraProfilesPerspectiveModelVersion</td>
+<td class=c title=' _ = Flattened
+ + = List'>string_+</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>CameraProfilesProfileName</td>
+<td class=c title=' _ = Flattened
+ + = List'>string_+</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>CameraProfilesSensorFormatFactor</td>
+<td class=c title=' _ = Flattened
+ + = List'>real_+</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>CameraProfilesUniqueCameraModel</td>
+<td class=c title=' _ = Flattened
+ + = List'>string_+</td>
+<td>&nbsp;</td></tr>
+<tr>
 <td>CaptionWriter</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>Category</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>City</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>ColorMode</td>
 <td class=c>integer</td>
 <td><table class=cols><tr>
@@ -15143,81 +15391,81 @@ created to enable writing of XMP-pdfx information.</p>
   <br>8 = Duotone
   <br>9 = Lab</td></tr></table>
 </td></tr>
-<tr class=b>
+<tr>
 <td>Country</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>Credit</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>DateCreated</td>
 <td class=c>date</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>DocumentAncestors</td>
 <td class=c title=' + = List'>string+</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>EmbeddedXMPDigest</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>Headline</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>History</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>ICCProfileName</td>
 <td class=c>string</td>
 <td><span class=s><span class=n>(called ICCProfile by the spec)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td>Instructions</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>LegacyIPTCDigest</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>SidecarForExtension</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>Source</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>State</td>
 <td class=c>string</td>
 <td>&nbsp;</td></tr>
-<tr>
+<tr class=b>
 <td>SupplementalCategories</td>
 <td class=c title=' + = List'>string+</td>
 <td>&nbsp;</td></tr>
-<tr class=b>
+<tr>
 <td>TextLayers</td>
 <td class=c title=' + = List'>struct+</td>
 <td>--&gt; <a href='XMP.html#Layer'>Layer Struct</a></td></tr>
-<tr>
+<tr class=b>
 <td>TextLayerName</td>
 <td class=c title=' _ = Flattened
  + = List'>string_+</td>
 <td><span class=s><span class=n>(TextLayersLayerName)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td>TextLayerText</td>
 <td class=c title=' _ = Flattened
  + = List'>string_+</td>
 <td><span class=s><span class=n>(TextLayersLayerText)</span></span></td></tr>
-<tr>
+<tr class=b>
 <td>TransmissionReference</td>
 <td class=c>string</td>
 <td><span class=s><span class=n>(Now used as a job identifier)</span></span></td></tr>
-<tr class=b>
+<tr>
 <td>Urgency</td>
 <td class=c>integer</td>
 <td><span class=s><span class=n>(should be in the range 1-8 to conform with the XMP spec)</span></span><table class=cols><tr>
@@ -15232,6 +15480,110 @@ created to enable writing of XMP-pdfx information.</p>
   <br>8 = 8 (least urgent)
   <br>9 = 9 (user-defined priority)</td></tr></table>
 </td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='Camera'>XMP Camera Struct</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Field Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>ApertureValue</td>
+<td class=c>real</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>Author</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>AutoScale</td>
+<td class=c>boolean</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>CameraPrettyName</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>CameraRawProfile</td>
+<td class=c>boolean</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>FocalLength</td>
+<td class=c>real</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>FocusDistance</td>
+<td class=c>real</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>Lens</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>LensPrettyName</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>Make</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>Model</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>PerspectiveModel</td>
+<td class=c>PerspectiveModel</td>
+<td>--&gt; <a href='XMP.html#PerspectiveModel'>PerspectiveModel Struct</a></td></tr>
+<tr>
+<td>ProfileName</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>SensorFormatFactor</td>
+<td class=c>real</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>UniqueCameraModel</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
+</table></td></tr></table></blockquote>
+
+<h2><a name='PerspectiveModel'>XMP PerspectiveModel Struct</a></h2>
+<blockquote>
+<table class=frame><tr><td>
+<table class=inner cellspacing=1>
+<tr class=h><th>Field Name</th>
+<th>Writable</th><th>Values / <span class=n>Notes</span></th></tr>
+<tr>
+<td>ImageXCenter</td>
+<td class=c>real</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>ImageYCenter</td>
+<td class=c>real</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>RadialDistortParam1</td>
+<td class=c>real</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>RadialDistortParam2</td>
+<td class=c>real</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>RadialDistortParam3</td>
+<td class=c>real</td>
+<td>&nbsp;</td></tr>
+<tr class=b>
+<td>ScaleFactor</td>
+<td class=c>real</td>
+<td>&nbsp;</td></tr>
+<tr>
+<td>Version</td>
+<td class=c>string</td>
+<td>&nbsp;</td></tr>
 </table></td></tr></table></blockquote>
 
 <h2><a name='Layer'>XMP Layer Struct</a></h2>
@@ -19431,7 +19783,7 @@ XMP module for convenience.  (see <a href="http://www.w3.org/TR/SVG11/">http://w
 
 <hr>
 (This document generated automatically by Image::ExifTool::BuildTagLookup)
-<br><i>Last revised Jan 12, 2022</i>
+<br><i>Last revised Nov 8, 2022</i>
 <p class=lf><a href='index.html'>&lt;-- ExifTool Tag Names</a></p>
 </body>
 </html>

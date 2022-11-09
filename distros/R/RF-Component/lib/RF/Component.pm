@@ -1,5 +1,5 @@
 package RF::Component;
-$VERSION = 1.001;
+our $VERSION = '1.003';
 
 
 use strict;
@@ -16,6 +16,8 @@ our %valid_opts = map { $_ => 1 } (
 				z0_ref
 				n_ports
 				comments
+				output_fmt
+				orig_f_unit
 				filename
 				model
 				value
@@ -28,6 +30,16 @@ our %valid_opts = map { $_ => 1 } (
 sub new
 {
 	my ($class, %args) = @_;
+
+	#############################################
+	# Compatibility cleanup from rsnp_hash values
+	#
+
+	# Name the matrix S, Z, Y, etc. based on its type:
+	$args{delete $args{param_type}} = delete $args{m};
+
+	# We don't need this, always Hz
+	delete $args{funit};
 
 	#########################
 	# Required arg validation
@@ -44,6 +56,14 @@ sub new
 	{
 		croak "Cannot define both value and value_(code|literal)_regex";
 	}
+
+	my @available_params = $self->_available_params;
+	if (!@available_params)
+	{
+		croak "At least one port-parameter matrix must be provided: " . join(' ', @PARAM_TYPES);
+	}
+
+	$args{n_ports} = PDL::IO::Touchstone::n_ports($self->{$available_params[0]});
 
 	croak "n_ports: Port count is required." if (!defined($self->{n_ports}));
 
@@ -67,11 +87,6 @@ sub new
 	elsif ($self->{z0_ref} <= 0)
 	{
 		croak "Invalid value for z0_ref: $self->{z0_ref}";
-	}
-
-	if (!$self->_available_params)
-	{
-		croak "At least one port-parameter matrix must be provided: " . join(' ', @PARAM_TYPES);
 	}
 
 	#########################
@@ -132,12 +147,14 @@ sub new
 
 sub load
 {
-	my ($class, $filename, $opts, %newopts) = @_;
+	my ($class, $filename, %newopts) = @_;
+
+	croak "usage: ".__PACKAGE__."->load(...)" if ref $class;
 
 	my $self;
-	if ($filename =~ /\.s\d+p/)
+	if ($filename =~ /\.s\d+p/i)
 	{
-		$self = $class->load_snp($filename, $opts, %newopts)
+		$self = $class->load_snp($filename, %newopts)
 	}
 	else
 	{
@@ -151,59 +168,57 @@ sub load
 
 sub load_snp
 {
-	my ($class, $filename, $opts, %newopts) = @_;
+	my ($class, $filename, %newopts) = @_;
 
-	my %args;
+	my $opts = delete $newopts{load_options};
 
-	@args{qw/f m param_type z0/} = rsnp($filename, $opts);
+	croak "units: RF::Component requires an internal representation of Hz" if ($opts->{units} && lc($opts->{units}) ne 'hz');
+
+	my %args = rsnp_hash($filename, $opts);
 
 	return $class->new(
 		%newopts,
-		freqs => $args{f},
-		uc($args{param_type}) => $args{m},
-		n_ports => PDL::IO::Touchstone::n_ports($args{m}),
-		z0_ref => $args{z0});
+		%args
+		);
 }
 
-sub S
+sub save
 {
-	my ($self, $i, $j) = @_;
+	my ($self, $filename, %args) = @_;
 
-	my $S = $self->_sparam;
-
-	return pos_vec($S, $i, $j) if ($i && $j);
-	return $S;
+	if ($filename =~ /\.s\d+p/i)
+	{
+		$self->save_snp($filename, %args)
+	}
+	else
+	{
+		croak("$filename: unknown file extension");
+	}
 }
 
-sub Y
+sub save_snp
 {
-	my ($self, $i, $j) = @_;
+	my ($self, $filename, %args) = @_;
 
-	my $Y = $self->_yparam;
+	my ($f, $param_type, $z0, $comments, $fmt, $output_f_unit)
+		= @{$self}{qw/freqs param_type z0_ref comments output_fmt orig_f_unit/};
 
-	return pos_vec($Y, $i, $j) if ($i && $j);
-	return $Y;
+	$param_type = $args{param_type} if $args{param_type};
+	$param_type //= 'S';
+	my $m = $self->_X_param($param_type);
+
+	$output_f_unit = $args{output_f_unit} if $args{output_f_unit};
+	$fmt = $args{output_fmt} if $args{output_fmt};
+
+	return wsnp($filename, $f, $m, $param_type, $z0, $comments, $fmt, 'Hz', $output_f_unit);
 }
 
-sub Z
-{
-	my ($self, $i, $j) = @_;
+sub freqs { return shift->{freqs} }
 
-	my $Z = $self->_zparam;
-
-	return pos_vec($Z, $i, $j) if ($i && $j);
-	return $Z;
-}
-
-sub ABCD
-{
-	my ($self, $i, $j) = @_;
-
-	my $ABCD = $self->_aparam;
-
-	return pos_vec($ABCD, $i, $j) if ($i && $j);
-	return $ABCD;
-}
+sub S { return shift->_X_param('S', @_) }
+sub Y { return shift->_X_param('Y', @_) }
+sub Z { return shift->_X_param('Z', @_) }
+sub ABCD { return shift->_X_param('A', @_) }
 
 sub A { return shift->ABCD(1,1) }
 sub B { return shift->ABCD(1,2) }
@@ -240,25 +255,25 @@ sub value_unit { return shift->{value_unit}; }
 sub comments { return @{ shift->{comments} // [] }; }
 
 # Passthrough calls from PDL::IO::Touchstone:
-sub  port_z            {  my $self = shift;   s_port_z(               $self->_sparam, $self->{z0_ref}, @_)  }
-sub  inductance        {  my $self = shift;   y_inductance(           $self->_yparam, $self->{freqs},  @_)  }
-sub  ind_nH            {  my $self = shift;   y_ind_nH(               $self->_yparam, $self->{freqs},  @_)  }
-sub  resistance        {  my $self = shift;   y_resistance(           $self->_yparam,  @_)  }
-sub  esr               {  my $self = shift;   y_esr(                  $self->_yparam,  @_)  }
-sub  capacitance       {  my $self = shift;   y_capacitance(          $self->_yparam, $self->{freqs},  @_)  }
-sub  cap_pF            {  my $self = shift;   y_cap_pF(               $self->_yparam, $self->{freqs},  @_)  }
-sub  qfactor_l         {  my $self = shift;   y_qfactor_l(            $self->_yparam, $self->{freqs},  @_)  }
-sub  qfactor_c         {  my $self = shift;   y_qfactor_c(            $self->_yparam, $self->{freqs},  @_)  }
-sub  reactance_l       {  my $self = shift;   y_reactance_l(          $self->_yparam, $self->{freqs},  @_)  }
-sub  reactance_c       {  my $self = shift;   y_reactance_c(          $self->_yparam, $self->{freqs},  @_)  }
-sub  reactance         {  my $self = shift;   y_reactance(            $self->_yparam, $self->{freqs},  @_)  }
-sub  srf               {  my $self = shift;   y_srf(                  $self->_yparam, $self->{freqs},  @_)  }
-sub  srf_ideal         {  my $self = shift;   y_srf_ideal(            $self->_yparam, $self->{freqs},  @_)  }
-sub  is_lossless       {  my $self = shift;   abcd_is_lossless(       $self->_aparam,  @_)  }
-sub  is_symmetrical    {  my $self = shift;   abcd_is_symmetrical(    $self->_aparam,  @_)  }
-sub  is_reciprocal     {  my $self = shift;   abcd_is_reciprocal(     $self->_aparam,  @_)  }
-sub  is_open_circuit   {  my $self = shift;   abcd_is_open_circuit(   $self->_aparam,  @_)  }
-sub  is_short_circuit  {  my $self = shift;   abcd_is_short_circuit(  $self->_aparam,  @_)  }
+sub  port_z            {  my $self = shift;   s_port_z(               $self->S, $self->{z0_ref}, @_)  }
+sub  inductance        {  my $self = shift;   y_inductance(           $self->Y, $self->{freqs},  @_)  }
+sub  ind_nH            {  my $self = shift;   y_ind_nH(               $self->Y, $self->{freqs},  @_)  }
+sub  resistance        {  my $self = shift;   y_resistance(           $self->Y,  @_)  }
+sub  esr               {  my $self = shift;   y_esr(                  $self->Y,  @_)  }
+sub  capacitance       {  my $self = shift;   y_capacitance(          $self->Y, $self->{freqs},  @_)  }
+sub  cap_pF            {  my $self = shift;   y_cap_pF(               $self->Y, $self->{freqs},  @_)  }
+sub  qfactor_l         {  my $self = shift;   y_qfactor_l(            $self->Y, $self->{freqs},  @_)  }
+sub  qfactor_c         {  my $self = shift;   y_qfactor_c(            $self->Y, $self->{freqs},  @_)  }
+sub  reactance_l       {  my $self = shift;   y_reactance_l(          $self->Y, $self->{freqs},  @_)  }
+sub  reactance_c       {  my $self = shift;   y_reactance_c(          $self->Y, $self->{freqs},  @_)  }
+sub  reactance         {  my $self = shift;   y_reactance(            $self->Y, $self->{freqs},  @_)  }
+sub  srf               {  my $self = shift;   y_srf(                  $self->Y, $self->{freqs},  @_)  }
+sub  srf_ideal         {  my $self = shift;   y_srf_ideal(            $self->Y, $self->{freqs},  @_)  }
+sub  is_lossless       {  my $self = shift;   abcd_is_lossless(       $self->ABCD,  @_)  }
+sub  is_symmetrical    {  my $self = shift;   abcd_is_symmetrical(    $self->ABCD,  @_)  }
+sub  is_reciprocal     {  my $self = shift;   abcd_is_reciprocal(     $self->ABCD,  @_)  }
+sub  is_open_circuit   {  my $self = shift;   abcd_is_open_circuit(   $self->ABCD,  @_)  }
+sub  is_short_circuit  {  my $self = shift;   abcd_is_short_circuit(  $self->ABCD,  @_)  }
 
 sub interpolate
 {
@@ -274,66 +289,12 @@ sub interpolate
 	return __PACKAGE__->new(%clone);
 }
 
-sub _sparam
-{
-	my $self = shift;
-
-	my $S = $self->{S};
-
-	$S //= abcd_to_s($self->{A}, $self->z0_ref) if defined($self->{A});
-	$S //= y_to_s($self->{Y}, $self->z0_ref) if defined($self->{Y});
-	$S //= z_to_s($self->{Z}, $self->z0_ref) if defined($self->{Z});
-
-	$self->{S} //= $S;
-
-	return $S if (defined $S);
-
-	my $params = $self->_available_params || '(none)';
-	croak("S-parameter from available matrix is not implemented.  Available matrix types: $params");
-}
-
-sub _yparam
-{
-	my $self = shift;
-
-	$self->{Y} //= s_to_y($self->_sparam, $self->z0_ref);
-
-	return $self->{Y} if (defined($self->{Y}));
-
-	my $params = $self->_available_params || '(none)';
-	croak("Y-parameter from available matrix is not implemented.  Available matrix types: $params");
-}
-
-sub _zparam
-{
-	my $self = shift;
-
-	$self->{Z} //= s_to_z($self->_sparam, $self->z0_ref);
-
-	return $self->{Z} if (defined($self->{Z}));
-
-	my $params = $self->_available_params || '(none)';
-	croak("Z-parameter from available matrix is not implemented.  Available matrix types: $params");
-}
-
-sub _aparam
-{
-	my $self = shift;
-
-	$self->{A} //= s_to_abcd($self->_sparam, $self->z0_ref);
-
-	return $self->{A} if (defined($self->{A}));
-
-	my $params = $self->_available_params || '(none)';
-	croak("ABCD-parameter from available matrix is not implemented.  Available matrix types: $params");
-}
-
 # return S, A, etc... based on which are defined.
 sub _available_params
 {
 	my $self = shift;
 
-	my @params = map { defined $_ } @$self{@PARAM_TYPES};
+	my @params = grep { defined $self->{$_} } @PARAM_TYPES;
 
 	return @params if (wantarray);
 
@@ -432,6 +393,59 @@ sub _parse_model_value_literal
 	return $val;
 }
 
+sub _X_param
+{
+	my ($self, $X, $i, $j) = @_;
+
+	my $m;
+
+	# Try to find an S-matrix:
+	my $S = $self->{S};
+	if (!defined($S))
+	{
+		$S //= abcd_to_s($self->{A}, $self->z0_ref) if defined($self->{A});
+		$S //= y_to_s($self->{Y}, $self->z0_ref) if defined($self->{Y});
+		$S //= z_to_s($self->{Z}, $self->z0_ref) if defined($self->{Z});
+
+		$self->{S} = $S;
+	}
+
+	# Set $m from the object if we have it, otherwise try to create $m from
+	# $S.  This will fail if S is undefined.
+	#
+	# There is room for optimization here if you often convert directly
+	# from, for example, Y to ABCD.  If this is the case then write a new
+	# y_to_abcd function in PDL::IO::Touchstone and add a special for when
+	# $X eq 'Y'.  However, the most common conversion is probably from S:
+	$m = $self->{$X};
+	if (!defined($m) && defined($S))
+	{
+		my $f;
+
+		# Note that at this point here: $X ne 'S':
+
+		$f = \&s_to_abcd if ($X eq 'A' || $X eq 'ABCD');
+		$f = \&s_to_y if ($X eq 'Y');
+		$f = \&s_to_z if ($X eq 'Z');
+
+		croak "unknown (or unimplemented) RF parameter type: $X" if (!$f);
+
+		# Convert based on the function above:
+		$m = $f->($S, $self->z0_ref);
+
+		$self->{$X} = $m;
+	}
+
+	if (!defined($m))
+	{
+		my $params = $self->_available_params || '(none)';
+		croak("$X-parameter from available matrix is not implemented.  Available matrix types: $params");
+	}
+
+	return pos_vec($m, $i, $j) if ($i && $j);
+	return $m;
+}
+
 
 1;
 
@@ -446,8 +460,8 @@ RF::Component - Compose RF component circuits and calculate values from objects 
 This module builds on L<PDL::IO::Touchstone> by encapsulating data returned by its
 methods into an object for easy use:
 
-	my $cap = $self->load('/path/to/capacitor.s2p', $options);
-	my $wilky = $self->load('/path/to/wilkinson.s3p', $options);
+	my $cap = RF::Component->load('/path/to/capacitor.s2p', $options);
+	my $wilky = RF::Component->load('/path/to/wilkinson.s3p', $options);
 
 	# port 1 input impedances
 	my $z_in = $cap->port_z(1);
@@ -459,6 +473,9 @@ methods into an object for easy use:
 	my $Y21 = $cap->Y(2,1);
 	my $Z33 = $wilky->Z(3,3);
 
+	# Write a Y-parameter .s2p in mag/angle format::
+	$cap->save("cap-y.s2p", param_type => 'Y', output_fmt => 'MA');
+
 In most cases, the return value from the L<RF::Component> methods are L<PDL>
 vectors, typically one value per frequency.  For example, C<$pF> as shown above
 will be a N-vector of values in picofarads, with one pF value for each
@@ -466,9 +483,9 @@ frequency.
 
 =head1 Constructor
 
-The C<$self-E<gt>load> function (below) is typically used to load RF data, but
+The C<RF::Component-E<gt>load> function (below) is typically used to load RF data, but
 you may pass it directly to the constructor as follows.  Most of these options 
-are valid for C<$self-E<gt>load> as well:
+are valid for C<RF::Component-E<gt>load> as well:
 
 	my $c = RF::Component->new(%opts);
 
@@ -476,14 +493,14 @@ are valid for C<$self-E<gt>load> as well:
 
 =over 4
 
-=item * freqs: a PDL vector, one for each frequency in Hz.
+=item * C<freqs>: a PDL vector, one for each frequency in Hz.
 
-=item * z0_ref: A value representing the charectaristic impedance at each port.
+=item * C<z0_ref>: A value representing the charectaristic impedance at each port.
 If port impedances differ, then this may be a vector
 
-=item * n_ports: the number of ports represented by the port parameter matrix(es):
+=item * C<n_ports>: the number of ports represented by the port parameter matrix(es):
 
-=item * At least one (N,N,M) L<PDL> object where N is the number of ports and M
+=item * At least one (N,N,M) L<PDL> element where N is the number of ports and M
 is the number of frequencies to represent complex port-parameter data:
 
 =over 4
@@ -510,13 +527,34 @@ is the number of frequencies to represent complex port-parameter data:
 
 =over 4
 
-=item * comments - An arrayref of comments read from C<load>
+=item * C<comments>: An arrayref of comments read from C<load>
 
-=item * filename - The filename read by C<load>
+=item * C<filename>: The filename read by C<load>
 
-=item * model - Component model number
+=item * C<output_fmt>: The .sNp output format: one of DB, MA, or RI
 
-=item * value_code_regex - Regular expression to parse the exponent-value code
+This is the format originally read in by C<$self-E<gt>load>.
+
+=over 4
+
+=item DB: dB,phase formatted
+
+=item MA: magnitude,phase formatted
+
+=item RI: real,imag formatted
+
+=back
+
+=item * C<orig_f_unit>: The original frequency unit from the .sNp file
+
+This is the frequency format originally read in by C<$self-E<gt>load>:
+kHz, MHz, GHz, THz, ...
+
+=item * C<filename>: The filename read by C<load>
+
+=item * C<model>: Component model number
+
+=item * C<value_code_regex>: Regular expression to parse the exponent-value code
 
 Specifies the variable to be assigned and a regular expression to match the
 capacitance code (or other unit): NNX or NRN. X is the exponent, N is a numeric
@@ -531,7 +569,7 @@ excluded from the code.  Example:
 The above (...) must match the code (or literal) to be placed in the MDF
 variable. 
 
-=item * value_literal_regex - Regular expression to parse the literal value
+=item * C<value_literal_regex>: Regular expression to parse the literal value
 
 The "literal" version is the same as C<value_code_regex> but does not calcualte
 the code, it takes the value verbatim.  For example, some inductors specify the
@@ -539,12 +577,12 @@ number of turns in their s2p filename:
 
         MODEL-([0-9]+)T\.s2p
 
-=item * value - Component value
+=item * C<value>: Component value
 
 The component value is parsed based on C<value_code_regex> or
 C<value_literal_regex>
 
-=item * value_unit - Unit of the value (pF, nH, etc).
+=item * C<value_unit>: Unit of the value (pF, nH, etc).
 
 This is the unit expected in C<value> afer parsing C<value_code_regex>.
 Supported units: pF|nF|uF|uH|nH|R|Ohm|Ohms
@@ -553,14 +591,14 @@ Supported units: pF|nF|uF|uH|nH|R|Ohm|Ohms
 
 You may also pass the above C<new> options to the load call:
 
-	my $cap = $self->load('/path/to/capacitor.s2p', $load_options, %new_options);
+	my $cap = RF::Component->load('/path/to/capacitor.s2p', %options);
 
 
 =head1 IO Functions
 
 =head2 C<RF::Component-E<gt>load> - Load an RF data file as a component
 
-    $cap = $self->load($filename, $load_options, %new_options);
+    $cap = RF::Component->load($filename, %new_options);
 
 Arguments:
 
@@ -568,11 +606,12 @@ Arguments:
 
 =item * $filename: the path to the data file you wish to load
 
-=item * $load_options: a hashref of options that get passed to the
-L<PDL::IO::Touchstone> C<rsnp()> function options.
-
 =item * %new_options: a hash of options passed to C<RF::Component-E<gt>new> as
-listed above.
+listed above, except the option C<load_options>:
+
+C<load()> supports the special option C<load_options>.  If C<load_options> is
+specified then it is passed to the loading function such as
+C<PDL::IO::Touchstone::rsnp()>.
 
 =back
 
@@ -584,11 +623,38 @@ L<PDL::IO::Touchstone> for specific details about C<$options>.
 
 =head2 C<RF::Component-E<gt>load_snp> - Load a Touchstone data file as a component
 
-This is the lower-level function called by C<RF::Component-E<gt>load>.  This function is 
-functionally equivalent but does not evaluate the file extension being passed.
+This is the lower-level function called by C<RF::Component-E<gt>load>.  This
+function is functionally equivalent but does not evaluate the file extension
+being passed before calling C<PDL::IO::Touchstone::rsnp()>:
 
-    $cap = $self->load_snp($filename, $load_options, %new_options);
+    $cap = RF::Component->load_snp($filename, %new_options);
 
+=head2 C<RF::Component-E<gt>save> - Write the component to a data file
+
+    $cap->save('cap.s2p', %options);
+
+This function will match based on the output file extension and call the
+appropriate save_* function below.  The C<%options> hash will depend on the
+desired file output type.
+
+=head2 C<RF::Component-E<gt>save_snp> - Write the component to a Touchstone data file
+
+    $cap->save_snp('cap.s2p', %options);
+
+=over 4
+
+=item * C<param_type>: Supported paramter type: S, Y, Z, A
+
+Notice: While A can be specified to write ABCD-formatted parameters, the ABCD
+matrix is not officially supported by the Touchstone spec.
+
+=item * C<output_f_unit>: The .sNp file's frequency unit.
+
+This defaults to Hz, but supports SI units such as: KHZ, MHz, GHz, ...
+
+=item * C<output_fmt>: See above, same as in C<new()>.
+
+=back
 
 =head1 Calculation Functions
 
@@ -697,7 +763,45 @@ the insertion (S21) phase changes from negative through zero to positive."
 
 Internally this function uses the L<IO::PDL::Touchstone> C<y_srf_ideal> function.
 
+=head1 Helper Functions
 
 =head2 C<$n = $self-E<gt>num_ports> - return the number of ports in this component.
 
 =head2 C<$n = $self-E<gt>num_freqs> - return the number of frequencies in this component.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<PDL::IO::Touchstone> - The lower-level framework used by L<RF::Component>
+
+=item L<RF::Component::Multi> - A list-encapsulation of L<RF::Component> to provide vectorized operations
+on multiple components.
+
+=item Touchstone specification: L<https://ibis.org/connector/touchstone_spec11.pdf>
+
+=back
+
+=head1 AUTHOR
+
+Originally written at eWheeler, Inc. dba Linux Global Eric Wheeler to
+transform .s2p files and build MDF files to optimize with Microwave Office
+for amplifer impedance matches.
+
+
+=head1 COPYRIGHT
+
+Copyright (C) 2022 eWheeler, Inc. L<https://www.linuxglobal.com/>
+
+This module is free software: you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation, either version 3 of the License, or (at your
+option) any later version.
+
+This module is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License along
+with this module. If not, see <http://www.gnu.org/licenses/>.

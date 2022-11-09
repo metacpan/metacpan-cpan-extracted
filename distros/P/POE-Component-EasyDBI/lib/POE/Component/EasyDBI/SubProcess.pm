@@ -4,7 +4,7 @@ use strict;
 use warnings FATAL => 'all';
 
 # Initialize our version
-our $VERSION = '1.28';
+our $VERSION = '1.29';
 
 use Try::Tiny qw( try catch );
 
@@ -206,6 +206,7 @@ sub process {
 	
 	# Process each data structure
 	foreach my $input (shift(@{$self->{queue}})) {
+		next unless $input->{'action'};
 		$input->{action} = lc($input->{action});
 		
 		# Now, we do the actual work depending on what kind of query it was

@@ -2,7 +2,7 @@ NAME
     Path::Tiny - File path utility
 
 VERSION
-    version 0.130
+    version 0.142
 
 SYNOPSIS
       use Path::Tiny;
@@ -23,18 +23,18 @@ SYNOPSIS
       # Reading files
 
       my $guts = $file->slurp;
-      my $guts = $file->slurp_utf8;
+         $guts = $file->slurp_utf8;
 
       my @lines = $file->lines;
-      my @lines = $file->lines_utf8;
+         @lines = $file->lines_utf8;
 
       my ($head) = $file->lines( {count => 1} );
       my ($tail) = $file->lines( {count => -1} );
 
       # Writing files
 
-      my $bar->spew( @data );
-      my $bar->spew_utf8( @data );
+      $bar->spew( @data );
+      $bar->spew_utf8( @data );
 
       # Reading directories
 
@@ -76,7 +76,6 @@ CONSTRUCTORS
         $path = path("foo/bar");
         $path = path("/tmp", "file.txt"); # list
         $path = path(".");                # cwd
-        $path = path("~user/file.txt");   # tilde processing
 
     Constructs a "Path::Tiny" object. It doesn't matter if you give a file
     or directory path. It's still up to you to call directory-like methods
@@ -87,11 +86,12 @@ CONSTRUCTORS
     exception will be thrown. This prevents subtle, dangerous errors with
     code like "path( maybe_undef() )->remove_tree".
 
-    If the first component of the path is a tilde ('~') then the component
-    will be replaced with the output of "glob('~')". If the first component
-    of the path is a tilde followed by a user name then the component will
-    be replaced with output of "glob('~username')". Behaviour for
-    non-existent users depends on the output of "glob" on the system.
+    DEPRECATED: If and only if the first character of the first argument to
+    "path" is a tilde ('~'), then tilde replacement will be applied to the
+    first path segment. A single tilde will be replaced with "glob('~')" and
+    a tilde followed by a username will be replaced with output of
+    "glob('~username')". No other method does tilde expansion on its
+    arguments. See "Tilde expansion (deprecated)" for more.
 
     On Windows, if the path consists of a drive identifier without a path
     component ("C:" or "D:"), it will be expanded to the absolute path of
@@ -153,8 +153,10 @@ CONSTRUCTORS
         $temp = tempdir( @options );  # optional export
 
     "tempfile" passes the options to "File::Temp->new" and returns a
-    "Path::Tiny" object with the file name. The "TMPDIR" option is enabled
-    by default.
+    "Path::Tiny" object with the file name. The "TMPDIR" option will be
+    enabled by default, but you can override that by passing "TMPDIR => 0"
+    along with the options. (If you use an absolute "TEMPLATE" option, you
+    will want to disable "TMPDIR".)
 
     The resulting "File::Temp" object is cached. When the "Path::Tiny"
     object is destroyed, the "File::Temp" object will be as well.
@@ -251,12 +253,13 @@ METHODS
     place, unlike "spew" which writes to a temporary file and then replaces
     the original (if it exists).
 
-    "append_raw" is like "append" with a "binmode" of ":unix" for fast,
+    "append_raw" is like "append" with a "binmode" of ":unix" for a fast,
     unbuffered, raw write.
 
-    "append_utf8" is like "append" with a "binmode" of
-    ":unix:encoding(UTF-8)" (or PerlIO::utf8_strict). If Unicode::UTF8 0.58+
-    is installed, a raw append will be done instead on the data encoded with
+    "append_utf8" is like "append" with an unbuffered "binmode"
+    ":unix:encoding(UTF-8)" (or ":unix:utf8_strict" with
+    PerlIO::utf8_strict). If Unicode::UTF8 0.58+ is installed, an
+    unbuffered, raw append will be done instead on the data encoded with
     "Unicode::UTF8".
 
     Current API available since 0.060.
@@ -432,8 +435,11 @@ METHODS
     is "binmode", which is passed to the method that open handles for
     reading and writing.
 
-    "edit_lines_utf8" and "edit_lines_raw" act like their respective
-    "slurp_*" and "spew_*" methods.
+    "edit_lines_raw" is like "edit_lines" with a buffered "binmode" of
+    ":raw".
+
+    "edit_lines_utf8" is like "edit_lines" with a buffered "binmode"
+    ":raw:encoding(UTF-8)" (or ":raw:utf8_strict" with PerlIO::utf8_strict).
 
     Current API available since 0.077.
 
@@ -581,11 +587,11 @@ METHODS
     instead of ":unix" so PerlIO buffering can manage reading by line.
 
     "lines_utf8" is like "lines" with a "binmode" of ":raw:encoding(UTF-8)"
-    (or PerlIO::utf8_strict). If Unicode::UTF8 0.58+ is installed, a raw
-    UTF-8 slurp will be done and then the lines will be split. This is
-    actually faster than relying on ":encoding(UTF-8)", though a bit memory
-    intensive. If memory use is a concern, consider "openr_utf8" and
-    iterating directly on the handle.
+    (or ":raw:utf8_strict" with PerlIO::utf8_strict). If Unicode::UTF8 0.58+
+    is installed, a raw, unbuffered UTF-8 slurp will be done and then the
+    lines will be split. This is actually faster than relying on IO layers,
+    though a bit memory intensive. If memory use is a concern, consider
+    "openr_utf8" and iterating directly on the handle.
 
     Current API available since 0.065.
 
@@ -612,11 +618,21 @@ METHODS
   move
         path("foo.txt")->move("bar.txt");
 
-    Move the current path to the given destination path using Perl's
-    built-in rename function. Returns the result of the "rename" function
-    (except it throws an exception if it fails).
+    Moves the current path to the given destination using File::Copy's
+    "move" function. Upon success, returns the "Path::Tiny" object for the
+    newly moved file.
 
-    Current API available since 0.001.
+    If the destination already exists and is a directory, and the source is
+    not a directory, then the source file will be renamed into the directory
+    specified by the destination.
+
+    If possible, move() will simply rename the file. Otherwise, it copies
+    the file to the new location and deletes the original. If an error
+    occurs during this copy-and-delete process, you may be left with a
+    (possibly partial) copy of the file under the destination name.
+
+    Current API available since 0.124. Prior versions used Perl's -built-in
+    (and less robust) rename function and did not return an object.
 
   openr, openw, openrw, opena
         $fh = path("foo.txt")->openr($binmode);  # read
@@ -637,8 +653,9 @@ METHODS
 
     Returns a file handle opened in the specified mode. The "openr" style
     methods take a single "binmode" argument. All of the "open*" methods
-    have "open*_raw" and "open*_utf8" equivalents that use ":raw" and
-    ":raw:encoding(UTF-8)", respectively.
+    have "open*_raw" and "open*_utf8" equivalents that use buffered I/O
+    layers ":raw" and ":raw:encoding(UTF-8)" (or ":raw:utf8_strict" with
+    PerlIO::utf8_strict).
 
     An optional hash reference may be used to pass options. The only option
     is "locked". If true, handles opened for writing, appending or
@@ -812,10 +829,10 @@ METHODS
     unbuffered, raw read.
 
     "slurp_utf8" is like "slurp" with a "binmode" of ":unix:encoding(UTF-8)"
-    (or PerlIO::utf8_strict). If Unicode::UTF8 0.58+ is installed, a raw
-    slurp will be done instead and the result decoded with "Unicode::UTF8".
-    This is just as strict and is roughly an order of magnitude faster than
-    using ":encoding(UTF-8)".
+    (or ":unix:utf8_strict" with PerlIO::utf8_strict). If Unicode::UTF8
+    0.58+ is installed, a unbuffered, raw slurp will be done instead and the
+    result decoded with "Unicode::UTF8". This is just as strict and is
+    roughly an order of magnitude faster than using ":encoding(UTF-8)".
 
     Note: "slurp" and friends lock the filehandle before slurping. If you
     plan to slurp from a file created with File::Temp, be sure to close
@@ -843,8 +860,9 @@ METHODS
     unbuffered, raw write.
 
     "spew_utf8" is like "spew" with a "binmode" of ":unix:encoding(UTF-8)"
-    (or PerlIO::utf8_strict). If Unicode::UTF8 0.58+ is installed, a raw
-    spew will be done instead on the data encoded with "Unicode::UTF8".
+    (or ":unix:utf8_strict" with PerlIO::utf8_strict). If Unicode::UTF8
+    0.58+ is installed, a raw, unbuffered spew will be done instead on the
+    data encoded with "Unicode::UTF8".
 
     NOTE: because the file is written to a temporary file and then renamed,
     the new file will wind up with permissions based on your current umask.
@@ -1011,6 +1029,26 @@ CAVEATS
     many direct function calls internally. You must not subclass it and
     expect things to work properly.
 
+  Tilde expansion (deprecated)
+    Tilde expansion was a nice idea, but it can't easily be applied
+    consistently across the entire API. This was a source of bugs and
+    confusion for users. Therefore, it is deprecated and its use is
+    discouraged. Limitations to the existing, legacy behavior follow.
+
+    Tilde expansion will only occur if the first argument to "path" begins
+    with a tilde. No other method does tilde expansion on its arguments. If
+    you want tilde expansion on arguments, you must explicitly wrap them in
+    a call to "path".
+
+        path( "~/foo.txt" )->copy( path( "~/bar.txt" ) );
+
+    If you need a literal leading tilde, use "path("./~whatever")" so that
+    the argument to "path" doesn't start with a tilde, but the path still
+    resolves to the current directory.
+
+    Behaviour of tilde expansion with a username for non-existent users
+    depends on the output of "glob" on the system.
+
   File locking
     If flock is not supported on a platform, it will not be used, even if
     locking is requested.
@@ -1042,9 +1080,10 @@ CAVEATS
 
   utf8 vs UTF-8
     All the *_utf8 methods by default use ":encoding(UTF-8)" -- either as
-    ":unix:encoding(UTF-8)" (unbuffered) or ":raw:encoding(UTF-8)"
-    (buffered) -- which is strict against the Unicode spec and disallows
-    illegal Unicode codepoints or UTF-8 sequences.
+    ":unix:encoding(UTF-8)" (unbuffered, for whole file operations) or
+    ":raw:encoding(UTF-8)" (buffered, for line-by-line operations). These
+    are strict against the Unicode spec and disallows illegal Unicode
+    codepoints or UTF-8 sequences.
 
     Unfortunately, ":encoding(UTF-8)" is very, very slow. If you install
     Unicode::UTF8 0.58 or later, that module will be used by some *_utf8
@@ -1070,7 +1109,7 @@ CAVEATS
     "openr", "openw", etc. ) respect default encodings set by the "-C"
     switch or lexical open settings of the caller. For UTF-8, this is almost
     certainly slower than using the dedicated "_utf8" methods if you have
-    Unicode::UTF8.
+    Unicode::UTF8 or PerlIP::utf8_strict.
 
 TYPE CONSTRAINTS AND COERCION
     A standard MooseX::Types library is available at
@@ -1166,7 +1205,13 @@ CONTRIBUTORS
 
     *   Martin Kjeldsen <mk@bluepipe.dk>
 
+    *   Mary Ehlers <regina.verb.ae@gmail.com>
+
     *   Michael G. Schwern <mschwern@cpan.org>
+
+    *   Nicolas R <nicolas@atoomic.org>
+
+    *   Nicolas Rochelemagne <rochelemagne@cpanel.net>
 
     *   Nigel Gregoire <nigelgregoire@gmail.com>
 

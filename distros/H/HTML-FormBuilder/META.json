@@ -4,7 +4,7 @@
       "binary.com <BINARY@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -13,26 +13,38 @@
       "version" : 2
    },
    "name" : "HTML-FormBuilder",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "share",
+         "shares",
+         "t",
+         "xt"
+      ]
+   },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "perl" : "5.014000"
-         }
-      },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.48"
+            "ExtUtils::MakeMaker" : "7.64"
          }
       },
       "develop" : {
          "requires" : {
-            "Pod::Coverage::TrustPod" : "0",
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::Plugin::PerlTidy" : "0",
+            "Dist::Zilla::Plugin::Test::Perl::Critic" : "0",
+            "Dist::Zilla::PluginBundle::Author::DERIV" : "0",
+            "Software::License::Perl_5" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
             "Test::EOL" : "0",
+            "Test::MinimumVersion" : "0",
             "Test::Mojibake" : "0",
-            "Test::More" : "0.88",
+            "Test::More" : "0.96",
+            "Test::NoTabs" : "0",
+            "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
-            "Test::Pod::Coverage" : "1.08",
-            "Test::Pod::LinkCheck" : "0",
+            "Test::Portability::Files" : "0",
             "Test::Version" : "1"
          }
       },
@@ -47,7 +59,9 @@
             "String::Random" : "0",
             "URI::Escape" : "0",
             "namespace::clean" : "0",
-            "perl" : "5.014000"
+            "perl" : "5.014",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "test" : {
@@ -55,16 +69,45 @@
             "CPAN::Meta" : "2.120900"
          },
          "requires" : {
+            "Exporter" : "0",
             "ExtUtils::MakeMaker" : "0",
             "File::Spec" : "0",
+            "FindBin" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
             "Test::CheckDeps" : "0.010",
             "Test::Exception" : "0",
             "Test::FailWarnings" : "0",
             "Test::More" : "0.96",
-            "Test::Perl::Critic" : "0"
+            "Test::Perl::Critic" : "0",
+            "lib" : "0"
          }
+      }
+   },
+   "provides" : {
+      "HTML::FormBuilder" : {
+         "file" : "lib/HTML/FormBuilder.pm",
+         "version" : "0.13"
+      },
+      "HTML::FormBuilder::Base" : {
+         "file" : "lib/HTML/FormBuilder/Base.pm",
+         "version" : "0.13"
+      },
+      "HTML::FormBuilder::Field" : {
+         "file" : "lib/HTML/FormBuilder/Field.pm",
+         "version" : "0.13"
+      },
+      "HTML::FormBuilder::FieldSet" : {
+         "file" : "lib/HTML/FormBuilder/FieldSet.pm",
+         "version" : "0.13"
+      },
+      "HTML::FormBuilder::Select" : {
+         "file" : "lib/HTML/FormBuilder/Select.pm",
+         "version" : "0.13"
+      },
+      "HTML::FormBuilder::Validation" : {
+         "file" : "lib/HTML/FormBuilder/Validation.pm",
+         "version" : "0.13"
       }
    },
    "release_status" : "stable",
@@ -72,13 +115,28 @@
       "bugtracker" : {
          "web" : "https://github.com/binary-com/perl-HTML-FormBuilder/issues"
       },
+      "homepage" : "https://github.com/binary-com/perl-HTML-FormBuilder",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/binary-com/perl-HTML-FormBuilder.git",
+         "url" : "https://github.com/binary-com/perl-HTML-FormBuilder.git",
          "web" : "https://github.com/binary-com/perl-HTML-FormBuilder"
       }
    },
-   "version" : "0.12",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0222"
+   "version" : "0.13",
+   "x_authority" : "cpan:DERIV",
+   "x_contributors" : [
+      "Chylli <chylli.email@gmail.com>",
+      "Tee Shuwn Yuan <shuwnyuan@binary.com>",
+      "Fayland Lam <fayland@gmail.com>",
+      "Chylli <chylli@binary.com>",
+      "Jean-Yves Sireau <jy@binary.com>",
+      "Kaveh Mousavi Zamani <kavehmz@gmail.com>",
+      "felipe-binary <64797927+felipe-binary@users.noreply.github.com>",
+      "Tom Molesworth <tom@binary.com>",
+      "Torsten F\u00f6rtsch <torsten@binary.com>"
+   ],
+   "x_generated_by_perl" : "v5.26.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

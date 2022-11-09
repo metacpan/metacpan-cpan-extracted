@@ -117,21 +117,22 @@ is [ Game::Marad::_move_type( 0, 0, 9, -9 ) ],
 # OBJECTIVE TESTS
 
 # not very random but easier to make the players score points with
-my @moves = (2,4,3,3);
+my @moves = ( 2, 4, 3, 3 );
 {
     no warnings 'redefine';
     *Game::Marad::_move_count = sub {
         state $i = 0;
         my $c = $moves[$i];
-        $i = ($i + 1) % @moves;
+        $i = ( $i + 1 ) % @moves;
         return $c;
     };
 }
 
-my $m = Game::Marad->new;
-is $m->score, [ 0, 0 ];
-is $m->turn,      0;
-is $m->player,    0;
+my $m    = Game::Marad->new;
+my $size = $m->size;
+is $size,      9;
+is $m->score,  [ 0, 0 ];
+is $m->player, 0;
 my $count = $m->move_count;
 number $count;
 
@@ -146,29 +147,37 @@ is [ $m->move( 1,  1,  2, 1 ) ], [ 0, "invalid move type" ];
 
 # diagonal move into the corner has the same result regardless the
 # move count
-is [ $m->move( 1,  1,  0, 0 ) ], [ 1, "ok" ];
-is $m->turn,      1;
-is $m->player,    1;
+is [ $m->move( 1, 1, 0, 0 ) ], [ 1, "ok" ];
+is $m->player,                 1;
 # do we have the same move count as prior for the 2nd player?
 is $m->move_count, $count;
 
 $board = $m->board;
 
-is [ $m->move( 7,  1,  8, 0 ) ], [ 1, "ok" ];
-is $m->turn,      2;
-is $m->player,    0;
-is $m->score, [ 0, 0 ];
+is [ $m->move( 7, 1, 8, 0 ) ], [ 1, "ok" ];
+is $m->player,                 0;
+is $m->score,                  [ 0, 0 ];
 
 # diagonal moves into the center scoring square
-is [ $m->move( 0,  0,  1, 1 ) ], [ 1, "ok" ];
-is $m->score, [ 1, 0 ];
-is [ $m->move( 8,  0,  7, 1 ) ], [ 1, "ok" ];
-is $m->score, [ 1, 1 ];
+is [ $m->move( 0, 0, 1, 1 ) ], [ 1, "ok" ];
+is $m->score,                  [ 1, 0 ];
+is [ $m->move( 8, 0, 7, 1 ) ], [ 1, "ok" ];
+is $m->score,                  [ 1, 1 ];
 
 # some other move to confirm that the score does not increase due to the
 # player 2 piece sitting unmoved in the scoring square
-is [ $m->move( 1,  2,  0, 2 ) ], [ 1, "ok" ];
-is $m->score, [ 1, 1 ];
+is [ $m->move( 1, 2, 0, 2 ) ], [ 1, "ok" ];
+is $m->score,                  [ 1, 1 ];
+
+is $m->is_owner( -1,        0 ),         0;
+is $m->is_owner( $size + 1, 0 ),         0;
+is $m->is_owner( 0,         -1 ),        0;
+is $m->is_owner( 0,         $size + 1 ), 0;
+# empty
+is $m->is_owner( 0, 0 ), 0;
+# 'tis now player 2's turn, who still has that piece in the middle
+is $m->is_owner( 0, 2 ), 0;
+is $m->is_owner( 4, 4 ), 1;
 
 #showboard($board);
 

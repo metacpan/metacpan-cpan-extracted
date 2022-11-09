@@ -6,9 +6,10 @@ build_requires:
   Test::More: '0'
   Test::Requires: '0.08'
 configure_requires:
-  Module::Build: '0.38'
+  Module::Build: '0'
+  Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Minilla/v3.1.19, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,10 +28,10 @@ no_index:
 provides:
   POE::Component::EasyDBI:
     file: lib/POE/Component/EasyDBI.pm
-    version: '1.28'
+    version: '1.29'
   POE::Component::EasyDBI::SubProcess:
     file: lib/POE/Component/EasyDBI/SubProcess.pm
-    version: '1.28'
+    version: '1.29'
 requires:
   Carp: '0'
   DBI: '1.38'
@@ -43,9 +44,12 @@ requires:
   warnings: '0'
 resources:
   homepage: https://github.com/gps4net/POE-Component-EasyDBI
-  repository: git://github.com/gps4net/POE-Component-EasyDBI.git
-version: '1.28'
+  repository: https://github.com/gps4net/POE-Component-EasyDBI.git
+version: '1.29'
 x_authority: cpan:XANTUS
 x_contributors:
-  - 'Olivier Mengué <dolmen@cpan.org>'
+  - 'Gelu Lupas <ggl@users.noreply.github.com>'
   - 'Gelu Lupaș <gvl@cpan.org>'
+  - 'Olivier Mengué <dolmen@cpan.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

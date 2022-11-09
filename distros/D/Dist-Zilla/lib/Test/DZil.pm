@@ -1,4 +1,4 @@
-package Test::DZil 6.027;
+package Test::DZil 6.028;
 # ABSTRACT: tools for testing Dist::Zilla plugins
 
 use Dist::Zilla::Pragmas;
@@ -253,7 +253,7 @@ Test::DZil - tools for testing Dist::Zilla plugins
 
 =head1 VERSION
 
-version 6.027
+version 6.028
 
 =head1 DESCRIPTION
 

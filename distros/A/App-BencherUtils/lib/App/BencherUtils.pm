@@ -1,10 +1,5 @@
 package App::BencherUtils;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-23'; # DATE
-our $DIST = 'App-BencherUtils'; # DIST
-our $VERSION = '0.244'; # VERSION
-
 use 5.010001;
 use strict 'subs', 'vars';
 use warnings;
@@ -16,6 +11,11 @@ use Perinci::Object;
 use Perinci::Sub::Util qw(err);
 use PerlX::Maybe;
 use POSIX qw(strftime);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-08-24'; # DATE
+our $DIST = 'App-BencherUtils'; # DIST
+our $VERSION = '0.245'; # VERSION
 
 our %SPEC;
 
@@ -61,7 +61,7 @@ sub _json {
 }
 
 sub _encode_json {
-    no strict 'refs';
+    no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
     no warnings 'once';
     local *version::TO_JSON = sub { "$_[0]" };
     _json->encode($_[0]);
@@ -89,12 +89,12 @@ sub _complete_scenario_in_result_dir {
     my $cmdline = $args{cmdline};
     my $r = $args{r};
 
-    return undef unless $cmdline;
+    return unless $cmdline;
 
     $r->{read_config} = 1;
 
     my $res = $cmdline->parse_argv($r);
-    return undef unless $res->[0] == 200;
+    return unless $res->[0] == 200;
 
     # combine from command-line and from config/env
     my $final_args = { %{$res->[2]}, %{$args{args}} };
@@ -104,7 +104,7 @@ sub _complete_scenario_in_result_dir {
 
     my %scenarios;
 
-    opendir my($dh), $final_args->{result_dir} or return undef;
+    opendir my($dh), $final_args->{result_dir} or return;
     for my $filename (readdir $dh) {
         $filename =~ $re_filename or next;
         my $sc = $1; $sc =~ s/-/::/g;
@@ -407,13 +407,13 @@ $SPEC{list_bencher_scenario_modules} = {
     },
 };
 sub list_bencher_scenario_modules {
-    require PERLANCAR::Module::List;
+    require Module::List::Tiny;
 
     my %args = @_;
     my $q = lc($args{query} // '');
     my $detail = $args{detail};
 
-    my $res = PERLANCAR::Module::List::list_modules(
+    my $res = Module::List::Tiny::list_modules(
         "Bencher::Scenario::", {list_modules=>1, recurse=>1});
     my @res0 = sort keys %$res;
 
@@ -738,7 +738,7 @@ App::BencherUtils - Utilities related to bencher
 
 =head1 VERSION
 
-This document describes version 0.244 of App::BencherUtils (from Perl distribution App-BencherUtils), released on 2021-07-23.
+This document describes version 0.245 of App::BencherUtils (from Perl distribution App-BencherUtils), released on 2022-08-24.
 
 =head1 SYNOPSIS
 
@@ -1144,6 +1144,35 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-Benche
 
 Source repository is at L<https://github.com/perlancar/perl-App-BencherUtils>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2021, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-BencherUtils>
@@ -1151,16 +1180,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021, 2019, 2018, 2017, 2016 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

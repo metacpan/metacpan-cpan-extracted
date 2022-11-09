@@ -7,32 +7,75 @@ build_requires:
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
+  Path::Tiny: '0'
   Test::CheckDeps: '0.010'
+  Test::Exception: '0'
   Test::MockModule: '0'
   Test::More: '0.94'
   Test::Most: '0'
-  Test::NoWarnings: '0'
-  perl: '5.014000'
+  Test::Warnings: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '6.48'
+  ExtUtils::MakeMaker: '7.64'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Experian-IDAuth
+no_index:
+  directory:
+    - eg
+    - share
+    - shares
+    - t
+    - xt
+provides:
+  Experian::IDAuth:
+    file: lib/Experian/IDAuth.pm
+    version: '2.53'
 requires:
+  Carp: '0'
+  Digest::SHA: '0'
+  File::MimeInfo::Magic: '0'
   IO::Socket: '0'
-  Locale::Country: '0'
+  IO::Socket::SSL: '0'
+  Locale::Country: '3.66'
   Path::Tiny: '0'
   SOAP::Lite: '0'
+  Syntax::Keyword::Try: '0'
   WWW::Mechanize: '0'
   XML::Simple: '0'
   XML::Twig: '0'
-  perl: '5.014000'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
 resources:
-  bugtracker: https://github.com/binary-com/perl-experian-idauth/issues
-  repository: git://github.com/binary-com/perl-experian-idauth.git
-version: '2.52'
-x_serialization_backend: 'YAML::Tiny version 1.66'
+  bugtracker: https://github.com/binary-com/perl-Experian-IDAuth/issues
+  homepage: https://github.com/binary-com/perl-Experian-IDAuth
+  repository: https://github.com/binary-com/perl-Experian-IDAuth.git
+version: '2.53'
+x_authority: cpan:DERIV
+x_contributors:
+  - 'Rohan Almeida <almeida@aarohan.biz>'
+  - 'Chris Travers <chris@efficito.com>'
+  - 'Amin Marashi <marashi.s.amin@gmail.com>'
+  - 'Chylli <chylli@binary.com>'
+  - 'Boris Blinov <boris.blinov@binary.com>'
+  - 'Jean-Yves Sireau <jy@binary.com>'
+  - 'DEV <anthony@binary.com>'
+  - 'Chylli <chylli.email@gmail.com>'
+  - 'Tom Molesworth <tom@binary.com>'
+  - 'Anthony-Wong <34021543+Anthony-Wong@users.noreply.github.com>'
+  - 'Fayland Lam <fayland@gmail.com>'
+  - 'chylli-binary <52912308+chylli-binary@users.noreply.github.com>'
+  - 'Raunak Kathuria <raunakkathuria@gmail.com>'
+  - 'Rohan Almeida <rohan@binary.com>'
+  - 'Arun Venkataraman <arun@regentmarkets.com>'
+  - 'Chris Travers <chris.travers@gmail.com>'
+  - 'Gabor Szabo <szabgab@gmail.com>'
+  - 'Kaveh Mousavi Zamani <kavehmz@gmail.com>'
+  - 'Torsten Förtsch <torsten@binary.com>'
+x_generated_by_perl: v5.26.2
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

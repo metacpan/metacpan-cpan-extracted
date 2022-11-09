@@ -18,7 +18,7 @@ package t::FrontEnd {
 
         $self->plugin(
             'web_socket_proxy' => {
-                actions => [['success'], ['faraway', {backend => "rpc2"}],],
+                actions  => [['success'], ['faraway', {backend => "rpc2"}],],
                 backends => {
                     rpc2 => {url => $url2},
                 },

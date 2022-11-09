@@ -16,6 +16,7 @@ t/002_domain.t
 t/003_cookie.t
 t/004_cookies.t
 t/005_modperl.t
+t/006_cookies_sqlite.t
 t/090_coverage.t
 t/091_pod.t
 t/092_manifest.t

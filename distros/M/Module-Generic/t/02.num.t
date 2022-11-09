@@ -61,7 +61,7 @@ $lconv = $Module::Generic::Number::DEFAULT if( !$curr_locale );
 my( $sep_space, $tho_sep, $dec_sep, $n );
 if( scalar( keys( %$lconv ) ) )
 {
-    $sep_space = $lconv->{p_sep_by_space} > 0 ? qr/[[:blank:]\h]+/ : '';
+    $sep_space = int( $lconv->{p_sep_by_space} // '' ) > 0 ? qr/[[:blank:]\h]+/ : '';
     $tho_sep = CORE::length( $lconv->{thousands_sep} )
         ? $lconv->{thousands_sep} 
         : $lconv->{mon_thousands_sep};

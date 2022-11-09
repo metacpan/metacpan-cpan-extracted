@@ -6,7 +6,7 @@ use Carp;
 use Moo;
 use namespace::clean;
 
-our $VERSION = '0.12';    ## VERSION
+our $VERSION = '0.13';    ## VERSION
 
 =head1 NAME
 
@@ -72,8 +72,8 @@ has options => (
 =cut
 
 has values => (
-    is  => 'rw',
-    isa => sub { die "$_[0] is not a Arrayref" unless (ref($_[0]) eq 'ARRAY') },
+    is      => 'rw',
+    isa     => sub { die "$_[0] is not a Arrayref" unless (ref($_[0]) eq 'ARRAY') },
     default => sub { [] },
 );
 
@@ -87,7 +87,7 @@ sub value {
     my $self   = shift;
     my $val    = shift;
     my $values = $self->values;
-    return $values->[0] if defined $values and not defined $val;
+    return $values->[0]          if defined $values and not defined $val;
     return $self->values([$val]) if defined $val;
     return;
 }

@@ -3,8 +3,10 @@ abstract: 'A Multi-part HTML form'
 author:
   - 'binary.com <BINARY@cpan.org>'
 build_requires:
+  Exporter: '0'
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
+  FindBin: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
   Test::CheckDeps: '0.010'
@@ -12,16 +14,42 @@ build_requires:
   Test::FailWarnings: '0'
   Test::More: '0.96'
   Test::Perl::Critic: '0'
-  perl: '5.014000'
+  lib: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '6.48'
+  ExtUtils::MakeMaker: '7.64'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: HTML-FormBuilder
+no_index:
+  directory:
+    - eg
+    - share
+    - shares
+    - t
+    - xt
+provides:
+  HTML::FormBuilder:
+    file: lib/HTML/FormBuilder.pm
+    version: '0.13'
+  HTML::FormBuilder::Base:
+    file: lib/HTML/FormBuilder/Base.pm
+    version: '0.13'
+  HTML::FormBuilder::Field:
+    file: lib/HTML/FormBuilder/Field.pm
+    version: '0.13'
+  HTML::FormBuilder::FieldSet:
+    file: lib/HTML/FormBuilder/FieldSet.pm
+    version: '0.13'
+  HTML::FormBuilder::Select:
+    file: lib/HTML/FormBuilder/Select.pm
+    version: '0.13'
+  HTML::FormBuilder::Validation:
+    file: lib/HTML/FormBuilder/Validation.pm
+    version: '0.13'
 requires:
   Carp: '0'
   Class::Std::Utils: '0'
@@ -32,9 +60,25 @@ requires:
   String::Random: '0'
   URI::Escape: '0'
   namespace::clean: '0'
-  perl: '5.014000'
+  perl: '5.014'
+  strict: '0'
+  warnings: '0'
 resources:
   bugtracker: https://github.com/binary-com/perl-HTML-FormBuilder/issues
-  repository: git://github.com/binary-com/perl-HTML-FormBuilder.git
-version: '0.12'
-x_serialization_backend: 'YAML::Tiny version 1.66'
+  homepage: https://github.com/binary-com/perl-HTML-FormBuilder
+  repository: https://github.com/binary-com/perl-HTML-FormBuilder.git
+version: '0.13'
+x_authority: cpan:DERIV
+x_contributors:
+  - 'Chylli <chylli.email@gmail.com>'
+  - 'Tee Shuwn Yuan <shuwnyuan@binary.com>'
+  - 'Fayland Lam <fayland@gmail.com>'
+  - 'Chylli <chylli@binary.com>'
+  - 'Jean-Yves Sireau <jy@binary.com>'
+  - 'Kaveh Mousavi Zamani <kavehmz@gmail.com>'
+  - 'felipe-binary <64797927+felipe-binary@users.noreply.github.com>'
+  - 'Tom Molesworth <tom@binary.com>'
+  - 'Torsten Förtsch <torsten@binary.com>'
+x_generated_by_perl: v5.26.2
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

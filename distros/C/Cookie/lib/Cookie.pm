@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Cookies API for Server & Client - ~/lib/Cookie.pm
-## Version v0.2.0
+## Version v0.2.1
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/10/08
-## Modified 2022/07/16
+## Modified 2022/09/24
 ## You can use, copy, modify and  redistribute  this  package  and  associated
 ## files under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
@@ -29,7 +29,7 @@ BEGIN
         '=='     => \&same_as,
         fallback => 1,
     );
-    our $VERSION = 'v0.2.0';
+    our $VERSION = 'v0.2.1';
     our $SUBS;
     our $COOKIE_DEBUG = 0;
     use constant CRYPTX_VERSION => '0.074';
@@ -77,6 +77,9 @@ sub init
     $self->{encrypt}    = 0;
     $self->{initialisation_vector} = undef;
     $self->{key}        = undef;
+    # Should this API be strict about the cookie names?
+    # When true, this will reject cookie names with invalid characters.
+    $self->{strict}     = 0;
     # Needs to be an empty string or it would be overriden by Module::Generic who would put here the package version instead
     $self->{version}    = '';
     $self->{_init_strict_use_sub} = 1;
@@ -316,7 +319,7 @@ sub expires
         $self->reset(1);
         my $exp = shift( @_ );
         my $tz;
-        # DateTime::TimeZone::Local will die ungracefully if the local timezeon is not set with the error:
+        # DateTime::TimeZone::Local will die ungracefully if the local timezone is not set with the error:
         # "Cannot determine local time zone"
         try
         {
@@ -568,7 +571,7 @@ sub name
         $self->reset( @_ );
         my $name = shift( @_ );
         # https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie
-        if( $name =~ /[\(\)\<\>\@\,\;\:\\\"\/\[\]\?\=\{\}]/ )
+        if( $name =~ /[\(\)\<\>\@\,\;\:\\\"\/\[\]\?\=\{\}]/ && $self->strict )
         {
             return( $self->error( "A cookie name can only contain US ascii characters. Cookie name provided was '$name'." ) );
         }
@@ -627,6 +630,8 @@ sub samesite { return( shift->same_site( @_ ) ); }
 sub secure { return( shift->reset(@_)->_set_get_boolean( 'secure', @_ ) ); }
 
 sub sign { return( shift->reset(@_)->_set_get_boolean( 'sign', @_ ) ); }
+
+sub strict { return( shift->reset(@_)->_set_get_boolean( 'strict', @_ ) ); }
 
 sub uri
 {
@@ -732,7 +737,6 @@ sub TO_JSON
 }
 
 1;
-
 # NOTE: POD
 __END__
 
@@ -833,7 +837,7 @@ Cookie - Cookie Object with Encryption or Signature
 
 =head1 VERSION
 
-    v0.2.0
+    v0.2.1
 
 =head1 DESCRIPTION
 
@@ -1331,6 +1335,13 @@ Signature are used to ensure data integrity protection for content that are not 
 For more secret content, use L</encrypt>.
 
 You can read more about the difference between L<sign and encryption at Stackoverflow|https://stackoverflow.com/questions/41467012/what-is-the-difference-between-signed-and-encrypted-cookies-in-rails>
+
+=head2 strict
+
+Boolean. Should this API be strict about the cookie names?
+When true, this will reject cookie names with invalid characters.
+
+Cookie name can contain only US ASCII characters and exclude any separators such as C<< ( ) < > @ , ; : \ " / [ ] ? = { } >>
 
 =head2 uri
 

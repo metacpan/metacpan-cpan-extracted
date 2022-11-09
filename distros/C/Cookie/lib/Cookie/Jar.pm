@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Cookies API for Server & Client - ~/lib/Cookie/Jar.pm
-## Version v0.2.0
+## Version v0.2.1
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/10/08
-## Modified 2022/07/16
+## Modified 2022/09/24
 ## You can use, copy, modify and  redistribute  this  package  and  associated
 ## files under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
@@ -22,7 +22,7 @@ BEGIN
         ( $MOD_PERL = $ENV{MOD_PERL} =~ /^mod_perl\/(\d+\.[\d\.]+)/ ) )
     {
         $MOD_PERL_VERSION = $1;
-        select( ( select( STDOUT ), $| = 1 )[ 0 ] );
+        select( ( select( STDOUT ), $| = 1 )[0] );
         require Apache2::Const;
         Apache2::Const->import( compile => qw( :common :http OK DECLINED ) );
         require APR::Pool;
@@ -39,7 +39,7 @@ BEGIN
     use Nice::Try;
     use Scalar::Util;
     use URI::Escape ();
-    our $VERSION = 'v0.2.0';
+    our $VERSION = 'v0.2.1';
     # This flag to allow extensive debug message to be enabled
     our $COOKIES_DEBUG = 0;
     use constant CRYPTX_VERSION => '0.074';
@@ -197,8 +197,8 @@ sub add_request_header
         # URI::_generic method
         $path = $uri->path;
     }
-    $path = '/' unless( length( $path ) );
-    $port = $uri->port if( !defined( $port ) || !length( $port ) );
+    $path = '/' unless( CORE::length( $path ) );
+    $port = $uri->port if( !defined( $port ) || !CORE::length( $port ) );
     # my $now = time();
     my $now = DateTime->now;
     $path = $self->_normalize_path( $path ) if( CORE::index( $path, '%' ) != -1 );
@@ -342,6 +342,7 @@ sub autosave { return( shift->_set_get_boolean( 'autosave', @_ ) ); }
 sub delete
 {
     my $self = shift( @_ );
+    no overloading;
     my $ref = $self->_cookies;
     my $idx = $self->_index;
     if( scalar( @_ ) == 1 && $self->_is_a( $_[0], 'Cookie' ) )
@@ -374,6 +375,7 @@ sub delete
                     CORE::delete( $idx->{ $key } ) if( scalar( @{$idx->{ $key }} ) == 0 );
                 }
                 CORE::splice( @$ref, $i, 1 );
+                $i--;
                 $removed->push( $c );
             }
         }
@@ -414,7 +416,7 @@ sub do
     my $self = shift( @_ );
     my $code = shift( @_ ) || return( $self->error( "No callback code was provided." ) );
     return( $self->error( "Callback code provided is not a code." ) ) if( ref( $code ) ne 'CODE' );
-    my $ref = $self->_cookies;
+    my $ref = $self->_cookies->clone;
     my $all = $self->new_array;
     foreach my $c ( @$ref )
     {
@@ -502,8 +504,8 @@ sub extract
         # URI::_generic method
         $path = $uri->path;
     }
-    $path = '/' unless( length( $path ) );
-    $port = $uri->port if( !defined( $port ) || !length( $port ) );
+    $path = '/' unless( CORE::length( $path ) );
+    $port = $uri->port if( !defined( $port ) || !CORE::length( $port ) );
     my $root;
     if( $self->_is_ip( $host ) )
     {
@@ -798,7 +800,7 @@ sub get_by_domain
     $opts->{with_subdomain} = 0;
     $opts->{sort} = 1 if( !CORE::exists( $opts->{sort} ) );
     my $all  = $self->new_array;
-    return( $all ) if( !defined( $host ) || !length( $host ) );
+    return( $all ) if( !defined( $host ) || !CORE::length( $host ) );
     $host = lc( $host );
     my $ref = $self->_cookies;
     foreach my $c ( @$ref )
@@ -842,6 +844,8 @@ sub key
     return( join( ';', $host, $path, $name ) ) if( defined( $host ) && CORE::length( $host ) );
     return( $name );
 }
+
+sub length { return( shift->repo->length ); }
 
 # Load cookie data from json cookie file
 sub load
@@ -979,11 +983,178 @@ sub load_as_lwp
     return( $self );
 }
 
+sub load_as_mozilla
+{
+    my $self = shift( @_ );
+    my $file = shift( @_ ) || return( $self->error( "No filename was provided." ) );
+    my $f = $self->new_file( $file ) || return( $self->pass_error );
+    my $opts = $self->_get_args_as_hash( @_ );
+    $opts->{use_dbi} //= 0;
+    $opts->{sqlite} //= '';
+    # First, we copy the file, because Firefox locks it
+    my $tmpfile = $self->new_tempfile( extension => 'sqlite' );
+    my $sqldb = $f->copy( $tmpfile ) || return( $self->pass_error );
+    # Now, try to load DBI and DBD::SQLite
+    my $dbi_error;
+    my $sqlite_bin;
+    my $cookies = [];
+    my $requires_dbi = ( CORE::exists( $opts->{use_dbi} ) && defined( $opts->{use_dbi} ) && $opts->{use_dbi} ) ? 1 : 0;
+    require version;
+    my $sql = <<EOT;
+SELECT
+   name
+  ,value
+  ,host AS "domain"
+  ,path
+  ,expiry AS "expires"
+  ,isSecure AS "secure"
+  ,sameSite AS "same_site"
+  ,isHttpOnly AS "http_only"
+  ,CAST( ( lastAccessed / 1000000 ) AS "INTEGER" ) AS "accessed"
+  ,CAST( ( creationTime / 1000000 ) AS "INTEGER" ) AS "created"
+FROM moz_cookies
+EOT
+
+    # If the user explicitly required the use of DBI/DBD::SQLite; or
+    # the user has not explicitly required the use of DBI/DBD::SQLite nor of sqlite3 binary
+    if( $requires_dbi ||
+        ( !$opts->{use_dbi} && !$opts->{sqlite} ) )
+    {
+        eval
+        {
+            require DBI;
+            require DBD::SQLite;
+        };
+        $dbi_error = $@ if( $@ );
+        # User explicitly required the use of DBI/DBD::SQLite, but it failed, so we return an error
+        if( defined( $dbi_error ) && exists( $opts->{use_dbi} ) && defined( $opts->{use_dbi} ) && $opts->{use_dbi} )
+        {
+            return( $self->error( "Unable to load either DBI or DBD::SQLite: $@" ) );
+        }
+        elsif( !defined( $dbi_error ) )
+        {
+            # As of Firefox 106.0.5 (2022-11-06), the cookie table structure is:
+            # CREATE TABLE moz_cookies(
+            #   id INTEGER PRIMARY KEY,
+            #   originAttributes TEXT NOT NULL DEFAULT '',
+            #   name TEXT,
+            #   value TEXT,
+            #   host TEXT,
+            #   path TEXT,
+            #   expiry INTEGER,
+            #   lastAccessed INTEGER,
+            #   creationTime INTEGER,
+            #   isSecure INTEGER,
+            #   isHttpOnly INTEGER,
+            #   inBrowserElement INTEGER DEFAULT 0,
+            #   sameSite INTEGER DEFAULT 0,
+            #   rawSameSite INTEGER DEFAULT 0,
+            #   schemeMap INTEGER DEFAULT 0,
+            #   CONSTRAINT moz_uniqueid UNIQUE(name, host, path, originAttributes)
+            # );
+            # 'expiry' is a unix timestamp
+            # 'lastAccessed' and 'creationTime' are in microseconds
+            try
+            {
+                my $dbh = DBI->connect( "dbi:SQLite:dbname=${sqldb}", '', '', { RaiseError => 1 } ) ||
+                    die( "Unable to connect to SQLite database file ${sqldb}: ", $DBI::errstr );
+                my $tbl_check = $dbh->table_info( undef, undef, 'moz_cookies', 'TABLE' ) ||
+                    die( "Error checking for existence of table 'moz_cookies' in SQLite database file ${sqldb}: ", $dbh->errstr );
+                $tbl_check->execute || die( "Error executing query to check existence of table 'moz_cookies': ", $tbl_check->errstr );
+                my $found = $tbl_check->fetchrow;
+                $tbl_check->finish;
+                if( !$found )
+                {
+                    die( "No table 'moz_cookies' found in SQLite database ${sqldb}" );
+                }
+                my $sth = $dbh->prepare( $sql ) ||
+                    die( "Error preparing the sql query to get all mozilla cookies from database ${sqldb}: ", $dbh->errstr, "\nSQL query was: ${sql}" );
+                $sth->execute() ||
+                    die( "Error executing sql query to get all mozilla cookies from database ${sqldb}: ", $sth->errstr, "\nSQL query was: ${sql}" );
+                $cookies = $sth->fetchall_arrayref;
+                $sth->finish;
+                $dbh->disconnect;
+                $sqldb->remove;
+            }
+            catch( $e )
+            {
+                if( $requires_dbi )
+                {
+                    return( $self->error( "Error trying to get mozilla cookies from SQLite database ${sqldb} using DBI: $e" ) );
+                }
+                else
+                {
+                    warn( "Non fatal error occurred while trying to get mozilla cookies from SQLite database ${sqldb} using DBI: $e\n" ) if( $self->_warnings_is_enabled );
+                }
+            }
+        }
+    }
+    
+    # If there is no cookies found yet; and
+    # the user did not require exclusively the use of DBI, but required the use of sqlite3 binary
+    # the user did not require the use of DBI nor the use of sqlite3 binary
+    if( !scalar( @$cookies ) && !$requires_dbi )
+    {
+        # If the user required specific sqlite3 binary
+        if( exists( $opts->{sqlite} ) && defined( $opts->{sqlite} ) && CORE::length( $opts->{sqlite} ) )
+        {
+            if( !-e( $opts->{sqlite} ) )
+            {
+                return( $self->error( "sqlite3 binary path provided \"$opts->{sqlite}\" does not exist." ) );
+            }
+            elsif( !-x( $opts->{sqlite} ) )
+            {
+                return( $self->error( "sqlite3 binary path provided \"$opts->{sqlite}\" is not executable by user id $>" ) );
+            }
+            $sqlite_bin = $opts->{sqlite};
+        }
+        else
+        {
+            require File::Which;
+            my $bin = File::Which::which( 'sqlite3' );
+            if( !defined( $bin ) )
+            {
+                return( $self->error( "DBI and/or DBD::SQLite modules are not installed and I could not find thr sqlite3 binary anywhere." ) );
+            }
+            $sqlite_bin = $bin;
+        }
+        
+        $sql =~ s/\n/ /gs;
+        open( my $fh, '-|', $sqlite_bin, "${sqldb}", $sql ) ||
+            return( $self->error( "Failed to execute sqlite3 binary with sql query to get all mozilla cookies from database ${sqldb}: $!" ) );
+        # $cookies = [map{ [split( /\|/, $_ )] } <$fh>];
+        while( defined( $_ = <$fh> ) )
+        {
+            chomp;
+            push( @$cookies, [split( /\|/, $_ )] );
+        }
+        close( $fh );
+    }
+    
+    foreach my $ref ( @$cookies )
+    {
+        my( $name, $value, $domain, $path, $expires, $secure, $same_site, $http_only, $accessed, $created ) = @$ref;
+        $self->add({
+            name    => $name,
+            value   => $value,
+            domain  => $domain,
+            path    => $path,
+            expires => $expires,
+            secure  => $secure,
+            http_only => $http_only,
+            same_site => $same_site,
+            accessed_on => $accessed,
+            created_on => $created,
+        }) || return( $self->pass_error );
+    }
+    return( $self );
+}
+
 sub load_as_netscape
 {
     my $self = shift( @_ );
     my $file = shift( @_ ) || return( $self->error( "No filename was provided." ) );
-    my $f = $self->new_file( $file );
+    my $f = $self->new_file( $file ) || return( $self->pass_error );
     my $opts = $self->_get_args_as_hash( @_ );
     my $host = $opts->{host} || $self->host || '';
     $f->open || return( $self->pass_error( $f->error ) );
@@ -1109,7 +1280,7 @@ sub parse
     my $self = shift( @_ );
     my $raw  = shift( @_ );
     my $ref = $self->new_array;
-    return( $ref ) unless( defined( $raw ) && length( $raw ) );
+    return( $ref ) unless( defined( $raw ) && CORE::length( $raw ) );
     my @pairs = grep( /=/, split( /; ?/, $raw ) );
     foreach my $pair ( @pairs )
     {
@@ -1241,7 +1412,8 @@ sub save
     my $today = DateTime->now( time_zone => $tz );
     my $dt_fmt = DateTime::Format::Strptime->new(
         pattern => '%FT%T%z',
-        locale => 'en_GB',
+        # Unnecessary
+        # locale => 'en_GB',
         time_zone => $tz->name,
     );
     $today->set_formatter( $dt_fmt );
@@ -1319,23 +1491,23 @@ sub save_as_lwp
         return(1) if( $c->discard && $opts->{skip_discard} );
         return(1) if( $c->expires && $c->expires < $now && $opts->{skip_expired} );
         my $vals = $c->as_hash;
-        $vals->{path_spec} = 1 if( length( $vals->{path} ) );
+        $vals->{path_spec} = 1 if( CORE::length( $vals->{path} ) );
         # In HTTP::Cookies logic, version 1 is rfc2109, version 2 is rfc6265
         $vals->{version} = 2;
         my $hv = Module::Generic::HeaderValue->new( [CORE::delete( @$vals{qw( name value )} )] );
         $hv->param( path => sprintf( '"%s"', $vals->{path} ) );
         $hv->param( domain => $vals->{domain} );
-        $hv->param( port => $vals->{port} ) if( defined( $vals->{port} ) && length( $vals->{port} ) );
+        $hv->param( port => $vals->{port} ) if( defined( $vals->{port} ) && CORE::length( $vals->{port} ) );
         $hv->param( path_spec => undef() ) if( defined( $vals->{path_spec} ) && $vals->{path_spec} );
         $hv->param( secure => undef() ) if( defined( $vals->{secure} ) && $vals->{secure} );
         $hv->param( expires => sprintf( '"%s"', "$vals->{expires}" ) ) if( defined( $vals->{secure} ) && $vals->{expires} );
         $hv->param( discard => undef() ) if( defined( $vals->{discard} ) && $vals->{discard} );
-        if( defined( $vals->{comment} ) && length( $vals->{comment} ) )
+        if( defined( $vals->{comment} ) && CORE::length( $vals->{comment} ) )
         {
             $vals->{comment} =~ s/(?<!\\)\"/\\\"/g;
             $hv->param( comment => sprintf( '"%s"', $vals->{comment} ) );
         }
-        $hv->param( commentURL => $vals->{commentURL} ) if( defined( $vals->{commentURL} ) && length( $vals->{commentURL} ) );
+        $hv->param( commentURL => $vals->{commentURL} ) if( defined( $vals->{commentURL} ) && CORE::length( $vals->{commentURL} ) );
         $hv->param( version => $vals->{version} );
         if( $opts->{encrypt} )
         {
@@ -1354,6 +1526,451 @@ sub save_as_lwp
         $io->print( $b64 );
     }
     $io->close;
+    return( $self );
+}
+
+sub save_as_mozilla
+{
+    my $self = shift( @_ );
+    my $file = shift( @_ ) || return( $self->error( "No database file to write cookies was specified." ) );
+    my $opts = $self->_get_args_as_hash( @_ );
+    $opts->{log_sql} //= '';
+    $opts->{overwrite} //= 0;
+    $opts->{rollback} //= 0;
+    $opts->{skip_discard} //= 0;
+    $opts->{skip_expired} //= 0;
+    $opts->{sqlite} //= '';
+    $opts->{use_dbi} //= 0;
+    my $sqldb = $self->new_file( $file ) || return( $self->pass_error );
+    my $dbi_error;
+    my $sqlite_bin;
+    my $requires_dbi = ( CORE::exists( $opts->{use_dbi} ) && defined( $opts->{use_dbi} ) && $opts->{use_dbi} ) ? 1 : 0;
+    require version;
+    my $db_file_exists = $sqldb->exists;
+    my $table_moz_cookies_exists = 0;
+    # As of Firefox 106.0.5 (2022-11-06), the cookie table structure is:
+    # 'expiry' is a unix timestamp
+    # 'lastAccessed' and 'creationTime' are in microseconds
+    my $create_table_sql = <<EOT;
+CREATE TABLE moz_cookies(
+  id INTEGER PRIMARY KEY,
+  originAttributes TEXT NOT NULL DEFAULT '',
+  name TEXT,
+  value TEXT,
+  host TEXT,
+  path TEXT,
+  expiry INTEGER,
+  lastAccessed INTEGER,
+  creationTime INTEGER,
+  isSecure INTEGER,
+  isHttpOnly INTEGER,
+  inBrowserElement INTEGER DEFAULT 0,
+  sameSite INTEGER DEFAULT 0,
+  rawSameSite INTEGER DEFAULT 0,
+  schemeMap INTEGER DEFAULT 0,
+  CONSTRAINT moz_uniqueid UNIQUE(name, host, path, originAttributes)
+)
+EOT
+    my $core_fields = 
+    {
+        name            => { type => 'TEXT', constant => 'SQL_VARCHAR' },
+        value           => { type => 'TEXT', constant => 'SQL_VARCHAR' },
+        host            => { type => 'TEXT', constant => 'SQL_VARCHAR' },
+        path            => { type => 'TEXT', constant => 'SQL_VARCHAR' },
+        expiry          => { type => 'INTEGER', constant => 'SQL_INTEGER' },
+        isSecure        => { type => 'INTEGER', constant => 'SQL_INTEGER' },
+        sameSite        => { type => 'INTEGER', constant => 'SQL_INTEGER' },
+        isHttpOnly      => { type => 'INTEGER', constant => 'SQL_INTEGER' },
+        lastAccessed    => { type => 'INTEGER', constant => 'SQL_INTEGER' },
+        creationTime    => { type => 'INTEGER', constant => 'SQL_INTEGER' },
+    };
+    # To hold the cookies data to be saved
+    my $cookies = [];
+    my $now = DateTime->now;
+    my $can_do_upsert = 0;
+    my $get_cookies = sub
+    {
+        my $c = shift( @_ );
+        return(1) if( $c->discard && $opts->{skip_discard} );
+        return(1) if( $c->expires && $c->expires < $now && $opts->{skip_expired} );
+        # Offset 0 is the value, offset 1 is the data type for DBI and offset 2 is the field name used for the sqlite3 binary method
+        my $row = 
+        [
+            [$c->name->scalar, $core_fields->{name}->{constant}, 'name'],
+            [$c->value->scalar, $core_fields->{value}->{constant}, 'value'],
+            [$c->domain->scalar, $core_fields->{host}->{constant}, 'host'],
+            [$c->path->scalar, $core_fields->{path}->{constant}, 'path'],
+            [( $c->expires ? $c->expires->epoch : undef ), $core_fields->{expiry}->{constant}, 'expiry'],
+            [( $c->secure ? 1 : 0 ), $core_fields->{isSecure}->{constant}, 'isSecure'],
+            [( $c->same_site->lc eq 'strict' ? 1 : 0 ), $core_fields->{sameSite}->{constant}, 'sameSite'],
+            [( $c->http_only ? 1 : 0 ), $core_fields->{isHttpOnly}->{constant}, 'isHttpOnly'],
+            [( $c->accessed_on ? ( $c->accessed_on->epoch * 1000000 ) : undef ), $core_fields->{lastAccessed}->{constant}, 'lastAccessed'],
+            [( $c->created_on ? ( $c->created_on->epoch * 1000000 ) : undef ), $core_fields->{creationTime}->{constant}, 'creationTime'],
+        ];
+        if( $can_do_upsert )
+        {
+            push( @$row, [$c->value->scalar, $core_fields->{value}->{constant}, 'value'] );
+            push( @$row, [( $c->expires ? $c->expires->epoch : undef ), $core_fields->{expiry}->{constant}, 'expiry'] );
+            push( @$row, [( $c->secure ? 1 : 0 ), $core_fields->{isSecure}->{constant}, 'isSecure'] );
+            push( @$row, [( $c->same_site->lc eq 'strict' ? 1 : 0 ), $core_fields->{sameSite}->{constant}, 'sameSite'] );
+            push( @$row, [( $c->http_only ? 1 : 0 ), $core_fields->{isHttpOnly}->{constant}, 'isHttpOnly'] );
+            push( @$row, [( $c->accessed_on ? ( $c->accessed_on->epoch * 1000000 ) : undef ), $core_fields->{lastAccessed}->{constant}, 'lastAccessed'] );
+            push( @$row, [( $c->created_on ? ( $c->created_on->epoch * 1000000 ) : undef ), $core_fields->{creationTime}->{constant}, 'creationTime'] );
+        }
+        push( @$cookies, $row );
+    };
+
+    # From SQLite version 3.24.0
+    # update if there is a constraint violation on 'moz_uniqueid', i.e. name, host, path, originAttributes
+    my $upsert_sql = <<EOT;
+INSERT INTO moz_cookies (name, value, host, path, expiry, isSecure, sameSite, isHttpOnly, lastAccessed, creationTime)
+VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+ON CONFLICT(name, host, path, originAttributes)
+DO UPDATE SET value = ?, expiry = ?, isSecure = ?, sameSite = ?, isHttpOnly = ?, lastAccessed = ?, creationTime = ?
+EOT
+    my $insert_ignore_sql = <<EOT;
+INSERT OR IGNORE INTO moz_cookies (name, value, host, path, expiry, isSecure, sameSite, isHttpOnly, lastAccessed, creationTime)
+VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+EOT
+    my $insert_replace_sql = <<EOT;
+INSERT OR REPLACE INTO moz_cookies (name, value, host, path, expiry, isSecure, sameSite, isHttpOnly, lastAccessed, creationTime)
+VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+EOT
+    
+    # Required version for upsert
+    my $req_v = version->parse( '3.24.0' );
+    my $log_file;
+    if( $opts->{log_sql} )
+    {
+        $log_file = $self->new_file( $opts->{log_sql} ) ||
+            return( $self->pass_error );
+    }
+
+    # If the user explicitly required the use of DBI/DBD::SQLite; or
+    # the user has not explicitly required the use of DBI/DBD::SQLite nor of sqlite3 binary
+    if( $requires_dbi ||
+        ( !$opts->{use_dbi} && !$opts->{sqlite} ) )
+    {
+        eval
+        {
+            require DBI;
+            require DBD::SQLite;
+        };
+        $dbi_error = $@ if( $@ );
+        # User explicitly required the use of DBI/DBD::SQLite, but it failed, so we return an error
+        if( defined( $dbi_error ) && exists( $opts->{use_dbi} ) && defined( $opts->{use_dbi} ) && $opts->{use_dbi} )
+        {
+            return( $self->error( "Unable to load either DBI or DBD::SQLite: $@" ) );
+        }
+        elsif( !defined( $dbi_error ) )
+        {
+            foreach my $f ( keys( %$core_fields ) )
+            {
+                my $code = DBI->can( $core_fields->{ $f }->{constant} ) ||
+                    die( "Invalid data type '", $core_fields->{ $f }->{constant}, "' for DBI." );
+                $core_fields->{ $f }->{constant} = $code->();
+            }
+            
+            try
+            {
+                my $dbh = DBI->connect( "dbi:SQLite:dbname=${sqldb}", '', '', { RaiseError => 1, AutoCommit => 1 } ) ||
+                    die( "Unable to connect to SQLite database file ${sqldb}: ", $DBI::errstr );
+                if( $opts->{log_sql} )
+                {
+                    $log_file->open( '>>', { binmode => 'utf-8', autoflush => 1 } ) ||
+                        return( $self->pass_error( $log_file->error ) );
+                    $dbh->sqlite_trace(sub
+                    {
+                        my $sql = shift( @_ );
+                        $log_file->print( $sql, "\n" );
+                    });
+                }
+                my $rv;
+                my $version_sql = q{SELECT sqlite_version()};
+                my $version_sth = $dbh->prepare( $version_sql ) ||
+                    die( "Errror preparing sql query to get the SQLite driver version: ", $dbh->errstr, "\nSQL query was ${version_sql}" );
+                $rv = $version_sth->execute() ||
+                    die( "Errror executing sql query to get the SQLite driver version: ", $version_sth->errstr, "\nSQL query was ${version_sql}" );
+                my $sqlite_version = $version_sth->fetchrow;
+                $version_sth->finish;
+                my $sql_v = version->parse( $sqlite_version );
+                
+                if( $db_file_exists )
+                {
+                    # my $tbl_check = $dbh->table_info( undef, undef, 'moz_cookies', 'TABLE' ) ||
+                    my $tbl_check = $dbh->prepare( q{SELECT name FROM sqlite_master WHERE type IN ('table') AND name IS 'moz_cookies'} ) ||
+                        die( "Error preparing sql query to check for existence of table 'moz_cookies' in SQLite database file ${sqldb}: ", $dbh->errstr );
+                    $rv = $tbl_check->execute || die( "Error executing query to check existence of table 'moz_cookies': ", $tbl_check->errstr );
+                    $table_moz_cookies_exists = $tbl_check->fetchrow;
+                    $tbl_check->finish;
+                    if( $table_moz_cookies_exists )
+                    {
+                        # Drop the table altogether
+                        if( $opts->{overwrite} )
+                        {
+                            my $drop_sql = q{DROP TABLE moz_cookies};
+                            my $drop_sth = $dbh->prepare( $drop_sql ) ||
+                                die( "Error preparing query to drop existing table moz_cookies in SQLIte database file ${sqldb}: ", $dbh->errstr, "\nSQL query was ${$drop_sql}" );
+                            $rv = $drop_sth->execute() ||
+                                die( "Error executing query to drop existing table moz_cookies in SQLIte database file ${sqldb}: ", $drop_sth->errstr, "\nSQL query was ${$drop_sql}" );
+                            $drop_sth->finish;
+                            $table_moz_cookies_exists = 0;
+                        }
+                        else
+                        {
+                            # PRAGMA table_info() returns cid, name, type, notnull, dflt_value, pk
+                            my $tbl_info_sql = q{PRAGMA TABLE_INFO(moz_cookies)};
+                            my $tbl_info_sth = $dbh->prepare( $tbl_info_sql ) ||
+                                die( "Error while trying to prepare query to get the existing table 'moz_cookies' information: ", $dbh->errstr, "\nSQL query is: ${tbl_info_sql}" );
+                            $rv = $tbl_info_sth->execute ||
+                                die( "Error while trying to execute query to get the existing table 'moz_cookies' information: ", $tbl_info_sth->errstr, "\nSQL query is: ${tbl_info_sql}" );
+                            my $all = $tbl_info_sth->fetchall_arrayref( {} );
+                            $tbl_info_sth->finish;
+                            # Check existing table field for missing fields
+                            my $fields = {};
+                            foreach my $this ( @$all )
+                            {
+                                $fields->{ $this->{name} } = $this;
+                            }
+                            my $missing = [];
+                            my $bad_datatype = [];
+                            foreach my $f ( keys( %$core_fields ) )
+                            {
+                                if( !CORE::exists( $fields->{ $f } ) )
+                                {
+                                    push( @$missing, $f );
+                                }
+                                elsif( $core_fields->{ $f }->{type} ne uc( $fields->{ $f }->{type} ) )
+                                {
+                                    push( @$bad_datatype, $f );
+                                }
+                            }
+                            if( scalar( @$missing ) || scalar( @$bad_datatype ) )
+                            {
+                                return( $self->error( sprintf( "Found an existing SQLite database file ${sqldb} with a table 'moz_cookies', but found %d missing fields (%s) and %d fields with inappropriate data type (%s)", scalar( @$missing ), join( ', ', @$missing ), scalar( @$bad_datatype ), join( ', ', @$bad_datatype ) ) ) );
+                            }
+                        }
+                    }
+                }
+                
+                my $errors = [];
+                my $insert_sth;
+                # Create the table if it does not exist
+                if( !$table_moz_cookies_exists )
+                {
+                    my $create_table_sth = $dbh->prepare( $create_table_sql ) ||
+                        die( "Error preparing query to create table moz_cookies in SQLite database file ${sqldb}: ", $dbh->errstr, "\nSQL query was: ${create_table_sql}" );
+                    my $rv = $create_table_sth->execute() ||
+                        die( "Error executing query to create table moz_cookies in SQLite database file ${sqldb}: ", $create_table_sth->errstr, "\nSQL query was: ${create_table_sql}" );
+                    $create_table_sth->finish;
+                    $insert_sth = $dbh->prepare( $insert_ignore_sql ) ||
+                        die( "Error preparing the sql query to add/ignore cookies to 'moz_cookies' in SQLite database file ${sqldb}: ", $dbh->errstr, "\nSQL query was: ${insert_ignore_sql}" );
+                }
+                # or update the data
+                else
+                {
+                    $can_do_upsert = ( $sql_v >= $req_v ) ? 1 : 0;
+                    # if version is greater or equal to 3.24.0 we can do upsert, otherwise we do insert replace
+                    if( $can_do_upsert )
+                    {
+                        $insert_sth = $dbh->prepare( $upsert_sql ) ||
+                            die( "Error preparing the sql query to add cookies to 'moz_cookies' in SQLite database file ${sqldb}: ", $dbh->errstr, "\nSQL query was: ${upsert_sql}" );
+                    }
+                    else
+                    {
+                        $insert_sth = $dbh->prepare( $insert_replace_sql ) ||
+                            die( "Error preparing the sql query to add/replace cookies to 'moz_cookies' in SQLite database file ${sqldb}: ", $dbh->errstr, "\nSQL query was: ${insert_replace_sql}" );
+                    }
+                }
+                
+                # NOTE: call to scan() must be after setting $can_do_upsert
+                $self->scan( $get_cookies );
+                
+                if( $opts->{rollback} )
+                {
+                    $dbh->begin_work;
+                }
+                
+                foreach my $c ( @$cookies )
+                {
+                    eval
+                    {
+                        for( my $i = 0; $i < scalar( @$c ); $i++ )
+                        {
+                            $insert_sth->bind_param( $i + 1, $c->[$i]->[0], $c->[$i]->[1] ) ||
+                                die( "Error binding parameter No. ", ( $i + 1 ), " with value '", $c->[$i]->[0], "': ", $insert_sth->errstr );
+                        }
+                        $rv = $insert_sth->execute() || 
+                            die( "Failed to execute query to insert cookie '", $c->name->scalar, "' -> ", $insert_sth->errstr, "\nQuery was ${insert_ignore_sql}" );
+                    };
+                    if( $@ )
+                    {
+                        # offset 0 -> name, offset 2 -> domain
+                        push( @$errors, [$c->[0], $c->[2], $@] );
+                        if( $opts->{rollback} )
+                        {
+                            $dbh->rollback;
+                            last;
+                        }
+                    }
+                }
+                $insert_sth->finish;
+                $dbh->disconnect;
+            }
+            catch( $e )
+            {
+                if( $requires_dbi )
+                {
+                    return( $self->error( "Error trying to save mozilla cookies to SQLite database ${sqldb} using DBI: $e" ) );
+                }
+                else
+                {
+                    $dbi_error = $e;
+                    warn( "Non fatal error occurred while trying to save mozilla cookies to SQLite database ${sqldb} using DBI: $e\n" ) if( $self->_warnings_is_enabled );
+                }
+            }
+        }
+    }
+    
+    # If the user did not require exclusively the use of DBI, but required the use of sqlite3 binary
+    # the user did not require the use of DBI nor the use of sqlite3 binary
+    if( ( defined( $dbi_error ) && !$requires_dbi ) ||
+        ( exists( $opts->{sqlite} ) && defined( $opts->{sqlite} ) && CORE::length( $opts->{sqlite} ) ) )
+    {
+        # If the user required specific sqlite3 binary
+        if( exists( $opts->{sqlite} ) && defined( $opts->{sqlite} ) && CORE::length( $opts->{sqlite} ) )
+        {
+            if( !-e( $opts->{sqlite} ) )
+            {
+                return( $self->error( "sqlite3 binary path provided \"$opts->{sqlite}\" does not exist." ) );
+            }
+            elsif( !-x( $opts->{sqlite} ) )
+            {
+                return( $self->error( "sqlite3 binary path provided \"$opts->{sqlite}\" is not executable by user id $>" ) );
+            }
+            $sqlite_bin = $opts->{sqlite};
+        }
+        else
+        {
+            require File::Which;
+            my $bin = File::Which::which( 'sqlite3' );
+            if( !defined( $bin ) )
+            {
+                return( $self->error( "DBI and/or DBD::SQLite modules are not installed and I could not find thr sqlite3 binary anywhere." ) );
+            }
+            $sqlite_bin = $bin;
+        }
+        
+        my $fh;
+        # Get SQLite version
+        # open( $fh, '-|', $sqlite_bin, "SELECT sqlite_version()" ) ||
+        open( $fh, '-|', $sqlite_bin, "--version" ) ||
+            return( $self->error( "Failed to execute sqlite3 binary ${sqlite_bin} to get its version number: $!" ) );
+        chomp( my $sqlite_version = <$fh> );
+        $sqlite_version = [split( /[[:blank:]\h]+/, $sqlite_version )]->[0];
+        my $sql_v = version->parse( $sqlite_version );
+        close( $fh );
+        
+        # Check if table moz_cookies exists
+        # open( $fh, '-|', $sqlite_bin, ' --bail --batch', "${sqldb}", "SELECT name FROM sqlite_master WHERE type IN ('table') AND name IS 'moz_cookies'" ) ||
+        # open( $fh, '-|', $sqlite_bin, " --bail", "${sqldb}", "SELECT name FROM sqlite_master WHERE type IN ('table') AND name IS 'moz_cookies'" ) ||
+        open( $fh, '-|', $sqlite_bin, "${sqldb}", "SELECT name FROM sqlite_master WHERE type IN ('table') AND name IS 'moz_cookies'" ) ||
+            return( $self->error( "Failed to execute sqlite3 binary ${sqlite_bin} to check if table moz_cookies exists: $!" ) );
+        # chomp( $table_moz_cookies_exists = <$fh> );
+        $table_moz_cookies_exists = <$fh>;
+        $table_moz_cookies_exists //= '';
+        chomp( $table_moz_cookies_exists );
+        close( $fh );
+        
+        # Now, get the data to save
+        # open( $fh, '|-', $sqlite_bin, '--bail', '--echo', "${sqldb}" ) ||
+        open( $fh, '|-', $sqlite_bin, '--bail', "${sqldb}" ) ||
+        # open( $fh, '|-', $sqlite_bin, " --bail --echo ${sqldb}" ) ||
+            return( $self->error( "Failed to execute sqlite3 binary ${sqlite_bin} to save all mozilla cookies to database ${sqldb}: $!" ) );
+        $fh->autoflush;
+        if( $opts->{log_sql} )
+        {
+            print( $fh ".trace ${log_file}\n" ) ||
+                return( $self->error( "Failed to print sqlite command to enable logging to file ${log_file}: $!" ) );
+        }
+        if( $table_moz_cookies_exists && $opts->{overwrite} )
+        {
+            print( $fh "DROP TABLE IF EXISTS moz_cookies;\n" ) ||
+                return( $self->error( "Failed to print sql commands to sqlite3 binary ${sqlite_bin} to save all mozilla cookies to database ${sqldb}: $!" ) );
+            $table_moz_cookies_exists = 0;
+        }
+        
+        if( $opts->{rollback} )
+        {
+            print( $fh "BEGIN TRANSACTION;\n" ) ||
+                return( $self->error( "Failed to print sql commands to sqlite3 binary ${sqlite_bin} to save all mozilla cookies to database ${sqldb}: $!" ) );
+        }
+        my $template;
+        if( !$table_moz_cookies_exists )
+        {
+            chomp( $create_table_sql );
+            print( $fh "${create_table_sql};\n" ) ||
+                return( $self->error( "Failed to print sql commands to sqlite3 binary ${sqlite_bin} to save all mozilla cookies to database ${sqldb}: $!" ) );
+            $template = $insert_ignore_sql;
+        }
+        else
+        {
+            $can_do_upsert = ( $sql_v >= $req_v ) ? 1 : 0;
+            # if version is greater or equal to 3.24.0 we can do upsert, otherwise we do insert replace
+            if( $can_do_upsert )
+            {
+                $template = $upsert_sql;
+            }
+            else
+            {
+                $template = $insert_replace_sql;
+            }
+        }
+        chomp( $template );
+        # This stores the data in $cookies array reference
+        # NOTE: call to scan() must be after setting $can_do_upsert
+        $self->scan( $get_cookies );
+        my $row = $cookies->[0];
+        foreach my $ref ( @$row )
+        {
+            if( $core_fields->{ $ref->[2] }->{constant} eq 'SQL_INTEGER' )
+            {
+                $template =~ s/\?/%s/;
+            }
+            else
+            {
+                $template =~ s/\?/'%s'/;
+            }
+        }
+        
+        foreach my $row ( @$cookies )
+        {
+            my $sql = sprintf( $template, map( $_->[0], @$row ) );
+            print( $fh "${sql};\n" ) || do
+            {
+                my $err = $!;
+                if( $opts->{rollback} )
+                {
+                    print( $fh "ROLLBACK TRANSACTION;\n" );
+                }
+                return( $self->error( "Failed to print sql commands to sqlite3 binary ${sqlite_bin} to save all mozilla cookies to database ${sqldb}: ${err}" ) );
+            };
+        }
+        
+        if( $opts->{rollback} )
+        {
+            print( $fh "END TRANSACTION;\n" ) ||
+                return( $self->error( "Failed to print sql commands to sqlite3 binary ${sqlite_bin} to save all mozilla cookies to database ${sqldb}: $!" ) );
+        }
+        close( $fh );
+    }
+
+    if( $opts->{log_sql} && 
+        defined( $log_file ) &&
+        $log_file->opened )
+    {
+        $log_file->close;
+    }
     return( $self );
 }
 
@@ -1379,7 +1996,7 @@ sub save_as_netscape
         push( @temp, $c->domain->substr( 1, 1 ) eq '.' ? 'TRUE' : 'FALSE' );
         push( @temp, $c->path );
         push( @temp, $c->secure ? 'TRUE' : 'FALSE' );
-        push( @temp, $c->expires );
+        push( @temp, $c->expires->epoch );
         push( @temp, $c->name );
         push( @temp, $c->value );
         $io->print( join( "\t", @temp ), "\n" );
@@ -1642,9 +2259,11 @@ Cookie::Jar - Cookie Jar Class for Server & Client
         algo => 'AES',
     ) || die( Cookie::Jar->error );
 
+    say "There are ", $jar->length, " cookies in the repository.";
+
 =head1 VERSION
 
-    v0.2.0
+    v0.2.1
 
 =head1 DESCRIPTION
 
@@ -1664,6 +2283,11 @@ This module is also compatible with L<LWP::UserAgent>, so you can use like this:
     my $ua = LWP::UserAgent->new(
         cookie_jar => Cookie::Jar->new
     );
+
+It is also compatible with L<HTTP::Promise>, such as:
+
+    use HTTP::Promise;
+    my $ua = HTTP::Promise->new( cookie_jar => Cookie::Jar->new );
 
 This module does not die upon error, but instead returns C<undef> and sets an L<error|Module::Generic/error>, so you should always check the return value of a method.
 
@@ -1822,7 +2446,7 @@ See L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/HTTP/He
 
 Provided with an anonymous code or reference to a subroutine, and this will call that code for every cookie in the repository, passing it the cookie object as the sole argument. Also, that cookie object is accessible using C<$_>.
 
-If the code return C<undef>, it will end the loop, and it the code returns true, this will have the current cookie object added to an L<array object|Module::Generic::Array> returned upon completion of the loop.
+If the code return C<undef>, it will end the loop, and if the code returns true, this will have the current cookie object added to an L<array object|Module::Generic::Array> returned upon completion of the loop.
 
     my $found = $jar->do(sub
     {
@@ -2006,6 +2630,37 @@ LWP-style cookie files are ancient, and barely used anymore, but no matter; if y
     Set-Cookie3: cookie3=value3; domain=img.example.com; path=; path_spec; secure; version=2
 
 It returns the current object upon success, or C<undef> and sets an L<error|Module::Generic/error> upon error.
+
+=head2 load_as_mozilla
+
+    $jar->load_as_mozilla( '/home/joe/cookies.sqlite' ) ||
+        die( "Unable to load cookies from mozilla cookies.sqlite file: ", $jar->error );
+
+Given a file path to a mozilla SQLite database file, and an hash or hash reference of options, and this method will attempt to read the cookies from the SQLite database file and add them to our repository, possibly overwriting previous cookies with the same name and domain name.
+
+To read the SQLite database file, this will try first to load L<DBI> and L<DBD::SQLite> and use them if they are available, otherwise it will resort to using the C<sqlite3> binary if it can find it, using L<File::Which/which>
+
+If none of those 2 methods succeeded, it will return C<undef> with an L<error|Module::Generic/error>
+
+Note that contrary to other loading method, this method does not support encryption.
+
+It returns the current object upon success, or C<undef> and sets an L<error|Module::Generic/error> upon error.
+
+Supported options are:
+
+=over 4
+
+=item * C<use_dbi>
+
+Boolean. If true, this will require the use of L<DBI> and L<DBD::SQLite> and if it cannot load them, it will return an error without trying to alternatively use the C<sqlite3> binary. Default to false.
+
+=item * C<sqlite>
+
+String. The file path to a C<sqlite3> binary. If the file path does not exist, or is lacking sufficient permission, this will return an error.
+
+If it is not provided, and using L<DBI> and L<DBD::SQLite> failed, it will try to find the C<sqlite3> using L<File::Which/which>
+
+=back
 
 =head2 load_as_netscape
 
@@ -2221,9 +2876,100 @@ The supported options are the same as for L</save>
 
 It returns the current object. If an error occurred, it will return C<undef> and set an L<error|Module::Generic/error>
 
+=head2 save_as_mozilla
+
+    $jar->save_as_mozilla( '/home/joe/cookies.sqlite' ) ||
+        die( "Unable to save cookies as mozilla SQLite database: ", $jar->error );
+
+    # or
+    $jar->save_as_mozilla( '/home/joe/cookies.sqlite',
+    {
+        # force use of DBI/DBD::SQLite
+        use_dbi => 1,
+        # or specify the path of the sqlite3 binary
+        # sqlite => '/some/where/sqlite3',
+        # Enable logging of SQL queries maybe?
+        # log_sql => '/some/where/sql.log',
+        # Overwrite previous data
+        overwrite => 1,
+        # abort if an error occurred
+        rollback => 1,
+    }) || die( "Unable to save cookies as mozilla SQLite database: ", $jar->error );
+
+Provided with a file path to a SQLite database and this saves the cookies repository as a mozilla SQLite database.
+
+The structure of the L<mozilla SQLite database|http://kb.mozillazine.org/Cookies> is:
+
+    CREATE TABLE moz_cookies(
+      id INTEGER PRIMARY KEY,
+      originAttributes TEXT NOT NULL DEFAULT '',
+      name TEXT,
+      value TEXT,
+      host TEXT,
+      path TEXT,
+      expiry INTEGER,
+      lastAccessed INTEGER,
+      creationTime INTEGER,
+      isSecure INTEGER,
+      isHttpOnly INTEGER,
+      inBrowserElement INTEGER DEFAULT 0,
+      sameSite INTEGER DEFAULT 0,
+      rawSameSite INTEGER DEFAULT 0,
+      schemeMap INTEGER DEFAULT 0,
+      CONSTRAINT moz_uniqueid UNIQUE(name, host, path, originAttributes)
+    );
+
+This method will attempt loading L<DBI> and L<DBD::SQLite>, and if it fails, it will alternatively try to use the C<sqlite3> binary.
+
+Note that, contrary to other save methods, this method does not allow encrypting the SQLite database.
+
+It returns the current object. If an error occurred, it will return C<undef> and set an L<error|Module::Generic/error>
+
+Supported options are:
+
+=over 4
+
+=item * C<log_sql>
+
+String. This specifies a file name that will be opened in append mode and to which the SQL statements issued will be logged.
+
+=item * C<overwrite>
+
+Boolean. If true, this will overwrite any existing data if the specified SQLite database file already exists.
+
+And if false, this will issue sql queries to perform L<upsert|https://www.sqlite.org/lang_UPSERT.html> if the SQLite version is greater or equal to C<3.24.0> (2018-06-04), or otherwise it will issue L<INSERT OR REPLACE|https://www.sqlite.org/lang_insert.html> queries.
+
+Default false.
+
+=item * C<rollback>
+
+Boolean. If true, this will cancel, i.e. rollback, any change mad to the SQLite database upon error, otherwise, any change made will be kept up to the point of when the error occurred. Default to false.
+
+=item * C<skip_discard>
+
+Boolean. If true, this will not save cookies that have been marked as being discarded, such as session cookies. Default false.
+
+=item * C<skip_expired>
+
+Boolean. If true, this will not save the cookies that have already expired. Default false.
+
+=item * C<sqlite>
+
+String. The file path to a C<sqlite3> binary. If the file path does not exist, or is lacking sufficient permission, this will return an error.
+
+If it is not provided, and using L<DBI> and L<DBD::SQLite> failed, it will try to find the C<sqlite3> using L<File::Which/which>
+
+=item * C<use_dbi>
+
+Boolean. Requires the use of L<DBI> and L<DBD::SQLite> and it will return an error if those are not installed.
+
+If you want to let this method try also to use C<sqlite3> binary if necessary, then do not set this option.
+
+=back
+
 =head2 save_as_netscape
 
-Provided with a file and this save the cookies repository as a Netscape-style data.
+Provided with a file and this saves the cookies repository as a Netscape-style data.
 
 It returns the current object. If an error occurred, it will return C<undef> and set an L<error|Module::Generic/error>
 

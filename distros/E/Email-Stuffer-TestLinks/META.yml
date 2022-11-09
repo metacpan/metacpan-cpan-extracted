@@ -3,28 +3,64 @@ abstract: 'validates links in HTML emails sent by Email::Stuffer>send_or_die()'
 author:
   - 'binary.com <BINARY@cpan.org>'
 build_requires:
+  Dist::Zilla::App::Command::xtest: '0'
   Email::Sender::Transport::Test: '0'
   ExtUtils::MakeMaker: '0'
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
+  Test::Builder: '0'
   Test::Builder::Tester: '0'
   Test::CheckDeps: '0.010'
+  Test::Exception: '0'
   Test::More: '0.94'
+  perl: '5.006'
 configure_requires:
-  ExtUtils::MakeMaker: '0'
+  ExtUtils::MakeMaker: '7.64'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Email-Stuffer-TestLinks
+no_index:
+  directory:
+    - eg
+    - share
+    - shares
+    - t
+    - xt
+provides:
+  Email::Stuffer::TestLinks:
+    file: lib/Email/Stuffer/TestLinks.pm
+    version: '0.03'
 requires:
   Class::Method::Modifiers: '0'
   Email::Stuffer: '0'
-  Mojo::UserAgent: '0'
+  Future::Utils: '0'
+  IO::Async::Loop: '0'
+  IO::Async::SSL: '0'
+  Mojo::DOM: '0'
   Mojolicious: '6.00'
-  Test::Most: '0'
-version: '0.02'
-x_serialization_backend: 'YAML::Tiny version 1.66'
+  Net::Async::HTTP: '0'
+  Test::More: '0.94'
+  URI: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/binary-com/perl-Email-Stuffer-TestLinks/issues
+  homepage: https://github.com/binary-com/perl-Email-Stuffer-TestLinks
+  repository: https://github.com/binary-com/perl-Email-Stuffer-TestLinks.git
+version: '0.03'
+x_authority: cpan:DERIV
+x_contributors:
+  - 'Bill Marriott <billmarriott@binary.com>'
+  - 'Jean-Yves Sireau <jy@binary.com>'
+  - 'chylli-binary <chylli@binary.com>'
+  - 'Zak B. Elep <zakame@zakame.net>'
+  - 'billmarriott <38449124+billmarriott@users.noreply.github.com>'
+  - 'billmarriott-binary <38449124+billmarriott-binary@users.noreply.github.com>'
+x_generated_by_perl: v5.26.2
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

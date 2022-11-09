@@ -1,6 +1,6 @@
 package HTML::Obj2HTML;
 
-$HTML::Obj2HTML::VERSION = '0.12';
+$HTML::Obj2HTML::VERSION = '0.13';
 
 use strict;
 use warnings;
@@ -811,7 +811,7 @@ sub format_attr {
 sub substitute_dictionary {
   my $val = shift;
   if ($val) {
-    $val =~ s/%([A-Za-z0-9]+)%/$dictionary{$1}/g;
+    $val =~ s/%([A-Za-z][A-Za-z0-9]+)%/if (defined $dictionary{$1}) { $dictionary{$1}; } else { $1; }/ge;
   }
   return $val;
 }

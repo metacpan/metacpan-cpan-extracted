@@ -836,7 +836,6 @@ sub root_operation {
         exit_save_merge_state("One or more conflicts detected.");
     }
 
-    
 }
 
 sub show_conflicts_state
@@ -979,7 +978,10 @@ sub exit_save_merge_state
     say(colored("Currently in ".getcwd(), 'warn')) if $opts->{verbose};
 
     # TODO: Do we need to tweak this message for rebase?
-    say(colored($opts->{mode}." failed. See above for details. Please resolve and continue with 'ngt $opts->{mode} --continue' or abort with 'ngt $opts->{mode} --abort' to cancel.", 'error'));
+    say(colored($opts->{mode}." failed. See above for details. ", "error"));
+    say(colored("Please resolve and continue with 'ngt $opts->{mode} --continue' or abort with 'ngt $opts->{mode} --abort' to cancel.", 'info'));
+    say "To invoke a GUI tool to aide in large merge conflicts you can use 'ngt mergetool' (--help for usage details).";
+    say "To view an abbreviated status of unresolved conflicts only run 'ngt status --conflicts'";
     exit(1);
 }
 

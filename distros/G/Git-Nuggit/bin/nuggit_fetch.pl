@@ -61,7 +61,7 @@ if ($err) {
     die colored("Fetch failed. See above for details",'error')."\n";
 } else {
     say colored("Note: Fetch executed on-demand only, which is optimal for most cases and is the default behavior. Use 'ngt fetch --branch-first' to force a fetch for all submodules if, for example, fetch/pull commands have been performed outside of ngt, or if paired with other branch-first commands.", 'info') if $opts->{'recurse-submodules'} eq "on-demand";
-    say colored("Fetch completed without error", "green");
+    say colored("Fetch completed without error", "success");
 }
 
 

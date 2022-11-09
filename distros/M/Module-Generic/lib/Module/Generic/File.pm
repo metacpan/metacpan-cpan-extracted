@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File.pm
-## Version v0.5.3
+## Version v0.5.4
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2022/09/27
+## Modified 2022/10/31
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -36,7 +36,7 @@ BEGIN
     use URI ();
     use URI::file ();
     use Want;
-    our @EXPORT_OK = qw( cwd file rootdir stdin stderr stdout sys_tmpdir tempfile tempdir );
+    our @EXPORT_OK = qw( cwd file rmtree rootdir stdin stderr stdout sys_tmpdir tempfile tempdir );
     our %EXPORT_TAGS = %Fcntl::EXPORT_TAGS;
     # Export Fcntl O_* constants for convenience
     our @EXPORT = grep( /^O_/, keys( %Fcntl:: ) );
@@ -127,7 +127,7 @@ BEGIN
     # Catching non-ascii characters: [^\x00-\x7F]
     # Credits to: File::Util
     $ILLEGAL_CHARACTERS = qr/[\x5C\/\|\015\012\t\013\*\"\?\<\:\>]/;
-    our $VERSION = 'v0.5.3';
+    our $VERSION = 'v0.5.4';
 };
 
 use strict;
@@ -146,6 +146,10 @@ sub init
         # stringify it if it were overloaded
         $file = "$file";
     }
+    my $opts = $self->_get_args_as_hash( @_ );
+    # autoremove relies on the complete filepath being set, but this happens at the end of the init, so we delay setting this property until later
+    my $autoremove;
+    $autoremove = CORE::delete( $opts->{auto_remove} ) if( CORE::exists( $opts->{auto_remove} ) );
     $self->{autoflush}      = 1;
     # Activated when this is a file or directory created by us, such as a temporary file
     $self->{auto_remove}    = 0;
@@ -170,13 +174,14 @@ sub init
     $self->{type}           = '';
     $self->{use_file_map}   = $MMAP_USE_FILE_MAP unless( CORE::exists( $self->{use_file_map} ) );
     $self->{_init_strict_use_sub} = 1;
-    $self->SUPER::init( @_ );
+    $self->SUPER::init( %$opts );
     $self->{_handle}        = '';
     # Pervious location prior to chdir, so we can revert to it when necessary
     $self->{_prev_cwd}      = '';
     $self->{_spec_class}    = $self->_spec_class( $self->{os} || $^O );
     $self->{_uri_file_class}= $self->_uri_file_class( $self->{os} || $^O );
     $self->{changed}        = '';
+    $self->{locked}         = 0;
     $self->{opened}         = '';
     $file = $self->{file} || return( $self->error( "No file was provided." ) );
     unless( CORE::length( $self->{base_dir} ) )
@@ -211,7 +216,7 @@ sub init
     }
     $file = $self->filename( $file ) || return( $self->pass_error );
     # Idea borrowed from File::Temp
-    $FILES_TO_REMOVE->{ $$ }->{ $file } = 1 if( $self->{auto_remove} );
+    $FILES_TO_REMOVE->{ $$ }->{ $file } = $self->{auto_remove} = 1 if( defined( $autoremove ) && $autoremove );
     $self->{_orig} = [CORE::caller(1)];
     return( $self );
 }
@@ -530,8 +535,15 @@ sub changed
     }
     my $time = $self->_set_get_scalar( 'changed' );
     my $file = $self->filename;
-    return(0) if( !$time && !-e( $file ) );
-    return( $time != [CORE::stat( $file)]->[9] );
+    if( !$time && !-e( $file ) )
+    {
+        return(0);
+    }
+    elsif( !$time && -e( $file ) )
+    {
+        return(1);
+    }
+    return( $time != [CORE::stat( $file )]->[9] );
 }
 
 sub checksum_md5
@@ -1235,6 +1247,8 @@ sub find
     my $opts = $self->_get_args_as_hash( @_ );
     return( $self->error( "Can only call find on a directory." ) ) if( !$self->is_dir );
     return( $self->error( "No callback code reference was provided." ) ) if( !defined( $cb ) && ( !CORE::exists( $opts->{callback} ) || ( CORE::exists( $opts->{callback} ) && ref( $opts->{callback} ) ne 'CODE' ) ) );
+    $opts->{method} //= 'find';
+    return( $self->error( "Unsupported method '$opts->{method}'. Use either 'find' or 'finddepth'." ) ) if( $opts->{method} ne 'find' && $opts->{method} ne 'finddepth' );
     $cb //= delete( $opts->{callback} );
     if( !$self->_is_class_loadable( 'File::Find' ) )
     {
@@ -1280,13 +1294,30 @@ sub find
     
     try
     {
-        File::Find::find( $p, $dir );
+        if( $opts->{method} eq 'finddepth' )
+        {
+            File::Find::finddepth( $p, $dir );
+        }
+        else
+        {
+            File::Find::find( $p, $dir );
+        }
     }
     catch( $e )
     {
-        return( $self->error( "An unexpected error has occurred in File::Find::find(): $e" ) );
+        return( $self->error( "An unexpected error has occurred in File::Find::$opts->{method}(): $e" ) );
     }
     return( $self );
+}
+
+sub finddepth
+{
+    my $self = shift( @_ );
+    my $cb;
+    $cb = pop( @_ ) if( ref( $_[-1] ) eq 'CODE' );
+    my $opts = $self->_get_args_as_hash( @_ );
+    $opts->{method} = 'finddepth';
+    return( $self->find( $opts, $cb ) );
 }
 
 sub finfo
@@ -1340,6 +1371,8 @@ sub flatten
     my $dir_sep = $self->_os2sep;
     return( $self->new( $self->collapse_dots( "$path", { separator => $dir_sep } )->file( $self->{os} || $^O ), { os => $self->{os} } ) );
 }
+
+sub flock { return( shift->_filehandle_method( 'flock', 'file', @_ ) ); }
 
 sub flush { return( shift->_filehandle_method( 'flush', 'file', @_ ) ); }
 
@@ -1869,11 +1902,11 @@ sub lock
     unless( defined( $flags ) )
     {
         $flags = 0;
-        if( $opts->{exclusive} || $opts->{mode} eq 'exclusive' )
+        if( ( CORE::exists( $opts->{exclusive} ) && CORE::defined( $opts->{exclusive} ) && $opts->{exclusive} ) || ( CORE::exists( $opts->{mode} ) && CORE::defined( $opts->{mode} ) && $opts->{mode} eq 'exclusive' ) )
         {
             $flags |= LOCK_EX;
         }
-        elsif( $opts->{shared} || $opts->{mode} eq 'shared' )
+        elsif( ( CORE::exists( $opts->{shared} ) && CORE::defined( $opts->{shared} ) && $opts->{shared} ) || ( CORE::exists( $opts->{mode} ) && CORE::defined( $opts->{mode} ) && $opts->{mode} eq 'shared' ) )
         {
             $flags |= LOCK_SH;
         }
@@ -2418,18 +2451,30 @@ sub read
         if( $self->is_dir )
         {
             my $opts = $self->_get_args_as_hash( @_[1..$#_] );
-            my $f = $io->read;
-            return( $f ) if( !defined( $f ) );
-            if( substr( $f, 0, 1 ) eq '.' && $opts->{exclude_invisible} )
+            $opts->{as_object} //= 0;
+            $opts->{exclude_invisible} //= 0;
+            if( want( 'LIST' ) )
             {
-                return( $self->read( $opts ) );
+                my @all = $io->read;
+                return if( !scalar( @all ) );
+                return( grep( !/^\./, @all ) ) if( $opts->{exclude_invisible} );
+                return( @all );
             }
+            else
+            {
+                my $f = $io->read;
+                return( $f ) if( !defined( $f ) );
+                if( substr( $f, 0, 1 ) eq '.' && $opts->{exclude_invisible} )
+                {
+                    return( $self->read( $opts ) );
+                }
             
-            if( $opts->{as_object} )
-            {
-                $f = $self->new( $f, base_dir => $self->filename ) || return( $self->pass_error );
+                if( $opts->{as_object} )
+                {
+                    $f = $self->new( $f, base_dir => $self->filename ) || return( $self->pass_error );
+                }
+                return( $f );
             }
-            return( $f );
         }
         else
         {
@@ -2445,6 +2490,13 @@ sub read
     {
         return( $self->error( "An unexpected error has occurred while trying to read from ", ( $self->is_dir ? 'directory' : 'file' ), " \"${file}\": $e" ) );
     }
+}
+
+sub readdir
+{
+    my $self = shift( @_ );
+    return( $self->error( "readdir() can only be called on a directory." ) ) if( !$self->is_dir );
+    return( $self->read( @_ ) );
 }
 
 # perlport: "(Win32, VMS, RISC OS) Not implemented."
@@ -2719,7 +2771,7 @@ sub rmtree
         # Return true
         return(1);
     });
-    unless( $opts->{keep_root} )
+    unless( $opts->{keep_root} || !-e( $dir ) )
     {
         CORE::rmdir( $dir ) || do
         {
@@ -3074,6 +3126,7 @@ sub unload
     return( $self ) if( $self->is_dir );
     my $opts = $self->_get_args_as_hash( @_ );
     $opts->{append} //= 0;
+    $opts->{lock} //= 0;
     my $file = $self->filepath;
     my $io;
     my $opened = $io = $self->opened;
@@ -3092,7 +3145,9 @@ sub unload
     {
         return( $self->error( "File \"$file\" is opened, but not in write mode. Cannot unload data into it." ) );
     }
+    $self->lock if( $opts->{lock} );
     $io->print( ref( $data ) ? $$data : $data ) || return( $self->error( "Unable to print ", CORE::length( ref( $data ) ? $$data : $data ), " bytes of data to file \"${file}\": $!" ) );
+    $self->unlock if( $opts->{lock} );
     # close it if it were close before we opened it
     $io->close if( !$opened );
     return( $self );
@@ -3178,7 +3233,7 @@ sub unlock
         my $rc = $io->flock( $flags ) || return( $self->error( "Unable to remove the lock from file \"${file}\" using flags '$flags': $!" ) );
         if( $rc )
         {
-            $self->locked( 0 );
+            $self->locked(0);
         }
         else
         {
@@ -3314,7 +3369,8 @@ sub _function2method
         # if we were called from 'file' method, our directory to remove is already set in 
         # our object, so we take only one or two arguments:
         # file( $dir_to_remove )->rmtree
-        if( substr( $caller[3], rindex( $caller[3], '::' ) + 2 ) eq 'file' && 
+        if( CORE::defined( $caller[3] ) &&
+            substr( $caller[3], rindex( $caller[3], '::' ) + 2 ) eq 'file' && 
             $caller[0] eq ref( $ref->[0] ) )
         {
             return( shift( @$ref ) );
@@ -3582,7 +3638,7 @@ sub _spec_catpath
     my $self = shift( @_ );
     my( $volume, $directory, $file, $os ) = @_;
     my $class = $self->_spec_class( $os );
-    return( $class->catpath( $volume, $directory, $file ) );
+    return( $class->catpath( $volume, $directory, ( $file // '' ) ) );
 }
 
 sub _spec_class
@@ -3811,6 +3867,7 @@ sub DESTROY
 {
     my $self = shift( @_ );
     my $file = $self->filepath;
+    no warnings 'uninitialized';
     # Revert back to the directory we were before there was a chdir, if any
     # This way, we avoid making change of directory permanent throughout our entire
     # program, even after our object has died
@@ -3828,6 +3885,7 @@ sub DESTROY
         CORE::delete( $FILES_TO_REMOVE->{ $$ }->{ $file } );
         my @info = caller();
         my $sub = [caller(1)]->[3];
+        return unless( -e( $file ) );
         if( $self->is_dir )
         {
             $self->rmtree;
@@ -4162,14 +4220,18 @@ Module::Generic::File - File Object Abstraction Class
         no_magic => 1,
         sort => 1,
     });
+    $d->open || die( $d->error );
+    my @files = $d->read;
 
     my $data = $file->load_perl || die( $file->error );
     $file->unload_perl( $data, { indent => 4, max_binary_size => 1024, max_width => 60 } ) ||
         die( $file->error );
 
+    $file->flock(1) || die( $file->error );
+
 =head1 VERSION
 
-    v0.5.3
+    v0.5.4
 
 =head1 DESCRIPTION
 
@@ -4638,6 +4700,12 @@ A code reference representing the callback called for each element found while c
 
 The variable C<$_> representing the current file or directory found, will be made available as a L<Module::Generic::File> object, and will also be passed as the first argument to the callback.
 
+=item * C<method>
+
+The L<File::Find> method to use to perform the search. By default this is C<find>.
+
+Possible values are: C<find> and C<finddepth>
+
 =item * C<skip>
 
 An array reference of files or directories path to skip.
@@ -4674,6 +4742,10 @@ Additional L<File::Find> options supported. See L<File::Find> documentation for 
 
 =back
 
+=head2 finddepth
+
+Same as L</find>, but using C<finddepth> as the L<File::Find> method instead.
+
 =head2 finfo
 
 Returns the current L<Module::Generic::Finfo> object for the current element.
@@ -4695,6 +4767,10 @@ It returns undef and sets an exception object if an error occurred.
 This will resolve the file/directory path and remove the possible dots in its path.
 
 It will return a new object, or undef and set an exception object if an error occurred.
+
+=head2 flock
+
+This is a thin wrapper around L<perlfunc/flock> method of the same name.
 
 =head2 flush
 
@@ -4865,6 +4941,10 @@ Returns true if the element is an absolute path or false otherwise.
 =head2 is_dir
 
 Returns true if the element is a directory or false otherwise.
+
+=head2 is_directory
+
+This is an alias for L</is_dir>
 
 =head2 is_empty
 
@@ -5358,6 +5438,12 @@ This is a shortcut to L<Module::Generic::Finfo/rdev>
 
 If the element is a directory, this will call L<IO::Dir/read> and return the value received.
 
+If it is called in list context, then this will return an array of all the directory elements, otherwise, this will return one directory element.
+
+If the option C<as_object> is provided and set to a true value, that element will be returned as an L<Module::Generic::File> object.
+
+If this is called in list context and the option C<exclude_invisible> is provided and set to a true value, the array of directory elements returned will exclude any element that starts with a dot.
+
 If the element is a regular file, then it takes the same arguments as L<perlfunc/read>, meaning:
 
     $io->read( $buff, $size, $offset );
@@ -5367,6 +5453,10 @@ If the element is a regular file, then it takes the same arguments as L<perlfunc
     $io->read( $buff );
 
 If an error occurred, this returns undef and set an exception object.
+
+=head2 readdir
+
+This is an alias to L</read>, but can only be called on a directory, or it will return an error.
 
 =head2 readlink
 
@@ -5723,9 +5813,13 @@ The available options are:
 
 =over 4
 
-=item I<append>
+=item C<append>
 
 If true and assuming the file is not already opened, the file will be opened using >> otherwise > will be used.
+
+=item C<lock>
+
+If true, L</unload> will perform a lock after opening the file and unlock it before closing it.
 
 =back
 

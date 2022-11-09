@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Array.pm
-## Version v1.5.3
+## Version v1.5.4
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2022/10/17
+## Modified 2022/10/30
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -33,7 +33,7 @@ BEGIN
     );
     $DEBUG  = 0;
     $RETURN = {};
-    our $VERSION = 'v1.5.3';
+    our $VERSION = 'v1.5.4';
 };
 
 use strict;
@@ -324,13 +324,13 @@ sub for
         
         if( CORE::ref( $rv ) eq 'SCALAR' )
         {
-            if( $$rv =~ /^[\-\+]?\d+$/ )
-            {
-                $i += int( $$rv );
-            }
-            elsif( !defined( $$rv ) )
+            if( !defined( $$rv ) )
             {
                 CORE::last;
+            }
+            elsif( $$rv =~ /^[\-\+]?\d+$/ )
+            {
+                $i += int( $$rv );
             }
         }
     }
@@ -932,7 +932,7 @@ sub _warnings_is_enabled { CORE::return( warnings::enabled( ref( $_[0] ) || $_[0
 
 sub DESTROY
 {
-    my $self = shift( @_ );
+    my $self = CORE::shift( @_ );
     my $id = Scalar::Util::refaddr( $self );
     CORE:delete( $RETURN->{ $id } );
     return( $self );

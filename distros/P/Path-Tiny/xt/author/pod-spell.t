@@ -29,6 +29,7 @@ Dave
 David
 Doug
 Efros
+Ehlers
 Ellis
 Elvin
 Etheridge
@@ -62,16 +63,19 @@ Knop
 Lustre
 Mark
 Martin
+Mary
 MiB
 Michael
 Miyagawa
 NFS
+Nicolas
 Nigel
 Ollis
 Pagaltzis
 Path
 Philippe
 Poletti
+Rochelemagne
 Rolsky
 Roy
 SHA
@@ -123,6 +127,7 @@ mk
 mkdir
 mkpath
 mschwern
+nicolas
 nigelgregoire
 opena
 openr
@@ -135,6 +140,7 @@ powerman
 realpath
 regina
 rivy
+rochelemagne
 rwp
 shlomif
 si

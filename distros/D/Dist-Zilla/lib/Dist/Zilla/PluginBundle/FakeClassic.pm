@@ -1,4 +1,4 @@
-package Dist::Zilla::PluginBundle::FakeClassic 6.027;
+package Dist::Zilla::PluginBundle::FakeClassic 6.028;
 # ABSTRACT: build something more or less like a "classic" CPAN dist
 
 use Moose;
@@ -42,7 +42,7 @@ Dist::Zilla::PluginBundle::FakeClassic - build something more or less like a "cl
 
 =head1 VERSION
 
-version 6.027
+version 6.028
 
 =head1 PERL VERSION
 

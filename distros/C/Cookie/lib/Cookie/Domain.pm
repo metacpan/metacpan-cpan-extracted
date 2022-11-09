@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Cookies API for Server & Client - ~/lib/Cookie/Domain.pm
-## Version v0.1.2
+## Version v0.1.3
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/06
-## Modified 2022/06/23
+## Modified 2022/11/06
 ## You can use, copy, modify and  redistribute  this  package  and  associated
 ## files under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
@@ -16,9 +16,9 @@ BEGIN
     use warnings::register;
     use parent qw( Module::Generic );
     use vars qw( $DOMAIN_RE $PUBLIC_SUFFIX_DATA $VERSION );
-	use DateTime;
-	use DateTime::Format::Strptime;
-	use Module::Generic::File qw( tempfile );
+    use DateTime;
+    use DateTime::Format::Strptime;
+    use Module::Generic::File qw( tempfile );
     use JSON;
     use Net::IDN::Encode ();
     use Nice::Try;
@@ -41,7 +41,7 @@ BEGIN
             )*
         )
     $/x;
-    our $VERSION = 'v0.1.2';
+    our $VERSION = 'v0.1.3';
 };
 
 use strict;
@@ -169,7 +169,7 @@ sub cron_fetch
         my $epoch = $last_mod->epoch;
         if( $resp->header( 'etag' ) )
         {
-            $dont_have_etag = $resp->header( 'etag' ) eq $meta->{etag} ? 0 : 1;
+            $dont_have_etag = $resp->header( 'etag' ) eq ( $meta->{etag} // '' ) ? 0 : 1;
             $meta->{etag} = $resp->header( 'etag' );
             $meta->{etag} =~ s/^\"([^"]+)\"$/$1/;
         }
@@ -196,8 +196,7 @@ sub cron_fetch
         {
             return( $self->error( "Remote server returned no data." ) );
         }
-        $file->lock;
-        $file->unload_utf8( $data ) || return( $self->error( "Unable to open public suffix data file \"$file\" in write mode: ", $file->error ) );
+        $file->unload_utf8( $data, { lock => 1 } ) || return( $self->error( "Unable to open public suffix data file \"$file\" in write mode: ", $file->error ) );
         $file->unlock;
         $file->utime( $epoch, $epoch );
         $self->load_public_suffix || return( $self->pass_error );
@@ -602,7 +601,6 @@ sub suffixes { return( shift->_set_get_hash_as_mix_object( 'suffixes', @_ ) ); }
 }
 
 1;
-
 # NOTE: POD
 __END__
 
@@ -614,30 +612,30 @@ Cookie::Domain - Domain Name Public Suffix Query Interface
 
 =head1 SYNOPSIS
 
-	use Cookie::Domain;
-	my $dom = Cookie::Domain->new( min_suffix => 1, debug => 3 ) ||
-	    die( Cookie::Domain->error, "\n" );
-	my $res = $dom->stat( 'www.example.or.uk' ) || die( $dom->error, "\n" );
-	# Check for potential errors;
-	die( $dom->error ) if( !defined( $res ) );
-	# stat(9 returns an empty string if nothing was found
-	print( "Nothing found\n" ), exit(0) if( !$res );
-	print( $res->domain, "\n" ); # example.co.uk
-	print( $res->name, "\n" ); # example
-	print( $res->sub, "\n" ); # www
-	print( $res->suffix, "\n" ); # co.uk
+    use Cookie::Domain;
+    my $dom = Cookie::Domain->new( min_suffix => 1, debug => 3 ) ||
+        die( Cookie::Domain->error, "\n" );
+    my $res = $dom->stat( 'www.example.or.uk' ) || die( $dom->error, "\n" );
+    # Check for potential errors;
+    die( $dom->error ) if( !defined( $res ) );
+    # stat() returns an empty string if nothing was found and undef upon error
+    print( "Nothing found\n" ), exit(0) if( !$res );
+    print( $res->domain, "\n" ); # example.co.uk
+    print( $res->name, "\n" ); # example
+    print( $res->sub, "\n" ); # www
+    print( $res->suffix, "\n" ); # co.uk
 
     # Load the public suffix. This is done automatically, so no need to do it
-	$dom->load_public_suffix( '/some/path/on/the/filesystem/data.txt' ) || 
-	    die( $dom->error );
-	# Then, save it as json data for next time
-	$dom->save_as_json( '/var/domain/public_suffix.json' ) || 
-	    die( $dom->error, "\n" );
-	say $dom->suffixes->length, " suffixes data loaded.";
+    $dom->load_public_suffix( '/some/path/on/the/filesystem/data.txt' ) || 
+        die( $dom->error );
+    # Then, save it as json data for next time
+    $dom->save_as_json( '/var/domain/public_suffix.json' ) || 
+        die( $dom->error, "\n" );
+    say $dom->suffixes->length, " suffixes data loaded.";
 
 =head1 VERSION
 
-    v0.1.2
+    v0.1.3
 
 =head1 DESCRIPTION
 

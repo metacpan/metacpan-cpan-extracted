@@ -49,6 +49,7 @@ subtest 'methods' => sub
     can_ok( $jar, "key" );
     can_ok( $jar, "load" );
     can_ok( $jar, "load_as_lwp" );
+    can_ok( $jar, "load_as_mozilla" );
     can_ok( $jar, "load_as_netscape" );
     can_ok( $jar, "make" );
     can_ok( $jar, "merge" );
@@ -58,6 +59,7 @@ subtest 'methods' => sub
     can_ok( $jar, "request" );
     can_ok( $jar, "save" );
     can_ok( $jar, "save_as_lwp" );
+    can_ok( $jar, "save_as_mozilla" );
     can_ok( $jar, "save_as_netscape" );
     can_ok( $jar, "scan" );
     can_ok( $jar, "set" );

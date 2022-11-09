@@ -2,8 +2,8 @@ NAME
     Regexp::From::String - Convert '/.../' or 'qr(...)' into Regexp object
 
 VERSION
-    This document describes version 0.004 of Regexp::From::String (from Perl
-    distribution Regexp-From-String), released on 2022-11-03.
+    This document describes version 0.007 of Regexp::From::String (from Perl
+    distribution Regexp-From-String), released on 2022-11-08.
 
 SYNOPSIS
      use Regexp::From::String qw(str_maybe_to_re str_to_re);
@@ -16,11 +16,11 @@ SYNOPSIS
 
      my $re1 = str_to_re('foo.');       # compiled to Regexp object qr(foo\.) (metacharacters are quoted)
      my $re2 = str_to_re('/foo.');      # compiled to Regexp object qr(/foo\.)
-     my $re2 = str_to_re({case_insensitive=>1}, 'foo.');    # compiled to Regexp object qr(foo\.)i
-     my $re2 = str_to_re({anchored=>1}, 'foo.');            # compiled to Regexp object qr(\Afoo\.\z)
+     my $re2 = str_to_re({ci=>1}, 'foo.');        # compiled to Regexp object qr(foo\.)i
+     my $re2 = str_to_re({anchored=>1}, 'foo.');  # compiled to Regexp object qr(\Afoo\.\z)
      my $re3 = str_to_re('/foo./');     # compiled to Regexp object qr(foo) (metacharacters are allowed)
      my $re4 = str_to_re('qr(foo.)i');  # compiled to Regexp object qr(foo.)i
-     my $re4 = str_to_re({always_quote=>1}, 'qr(foo.)');  # compiled to Regexp object qr(qr\(foo\.\)) (metacharacters are quoted)
+     my $re4 = str_to_re({always_quote=>1}, 'qr(foo.)');  # compiled to Regexp object qr(qr\(foo\.\)s) (the whole string is quotemeta'ed)
      my $re5 = str_to_re('qr(foo[)i');  # dies, invalid regex syntax
 
 FUNCTIONS
@@ -29,12 +29,12 @@ FUNCTIONS
 
     Usage:
 
-     $str_or_re = str_maybe_to_re($str);
+     $str_or_re = str_maybe_to_re([ \%opts , ] $str);
 
     Check if string $str is in the form of "/.../" or "qr(...)'" and if so,
-    compile the inside regex (currently simply using stringy "eval") and
-    return the resulting Regexp object. Otherwise, will simply return the
-    argument unmodified.
+    compile the inside regex (currently using stringy "eval" or Safe's
+    "reval") and return the resulting Regexp object. Otherwise, will simply
+    return the argument unmodified.
 
     Will die if compilation fails, e.g. when the regexp syntax is invalid.
 
@@ -42,6 +42,8 @@ FUNCTIONS
     delimiter characters are recognized and not others.
 
     Optional modifiers "i", "m", and "s" are currently allowed at the end.
+
+    Recognize some options, see "str_to_re" for more details.
 
   str_to_re
     Convert string to Regexp object.
@@ -57,24 +59,57 @@ FUNCTIONS
 
     *   always_quote
 
-        Bool. Default false. If set to true, will always "quotemeta()"
-        regardless of whether the string is in the form of "/.../" or
-        "qr(...)" or not. This means user will not be able to use
+        Bool. Default is false. If set to true then will always quote the
+        whole string regardless of whether the string is in the form of
+        "/.../" or "qr(...)". This means user will not be able to use
         metacharacters and the Regexp will only match the literal string
         (with some option like anchoring and case-sensitivity, see other
         options).
 
-        Defaults to false because the point of this function is to allow
-        specifying regex.
+        Defaults to false because the main point of this function is to
+        allow specifying regex.
 
-    *   case_insensitive
+    *   ci
 
-        Bool. If set to true will compile to Regexp object with "i" regexp
-        modifier.
+        Bool, default is false.
+
+        If set to true will compile to regexp with the /i modifier, so
+        matching is done case-insensitively. This includes when the string
+        is in the form of "/.../" or "qr(...)" (the /i is also added).
 
     *   anchored
 
         Bool. If set to true will anchor the pattern with "\A" and "\z".
+        This includes when the string is in the form of "/.../" or "qr(...)"
+        (the regexp will be enclosed with anchor).
+
+    *   safety
+
+        Int, default 1. Valid values include 0, 1, 2.
+
+        If set to 0, the compilation of string into regex will use stringy
+        "eval". Note that this is insecure as it can be tricked to execute
+        arbitrary Perl code by strings like:
+
+         qr() and unlink q(hello.txt) and qr()
+
+        If set to 1 (the default), compilation will use stringy "eval" but
+        these extra restrictions are added: 1) pattern inside string of the
+        form "/.../" is not allowed to have literal "/" (to prevent one from
+        getting out of the pattern); 2) pattern inside string of the form
+        "qr(...)" is not allowed to have literal ")" (to prevent one from
+        getting out of the pattern); 3) pattern inside string cannot contain
+        literal "(?{" or "(??{" (to prevent specifying embedded code inside
+        regex pattern). These restrictions might be annoying in some cases.
+
+        If set to 2, compilation will use Regexp::Util's
+        "deserialize_regexp()", which in turn uses Safe's "reval" to add
+        some security. In addition to that, a check using "Regexp::Util"'s
+        "regexp_seen_evals()" to reject regex that contains embedded Perl
+        code. Note that "Regexp::Util" is specified as a Recommends
+        prerequisite (optional dependency) so you will need to install it
+        manually or use cpanm's "--with-recommends" option when installing
+        this distribution.
 
 HOMEPAGE
     Please visit the project's homepage at

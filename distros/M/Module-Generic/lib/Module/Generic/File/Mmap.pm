@@ -844,6 +844,10 @@ An object will be returned if it successfully initiated, or C<undef()> upon erro
         storable => 1,
     ) || die( Module::Generic::SharedMem->error );
 
+=head2 cache_file
+
+Sets or gets the underlying cache file to use.
+
 =head2 cbor
 
 When called, this will set L<CBOR::XS> as the data serialisation mechanism when storing data to mmap cache or reading data from mmap cache.

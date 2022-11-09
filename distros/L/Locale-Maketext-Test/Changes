@@ -1,16 +1,20 @@
 Revision history for Locale-Maketext-Test
 
-0.04      2017-02-27 08:15:07+00:00 UTC
+0.06      2022-11-09 06:25:48+00:00 UTC
+    - replace Try::Tiny with Syntax::Keyword::Try
+
+0.05      2017-02-27 08:15:07+00:00 UTC
     Switch to dzil
 
-0.04    18 August 2016
+0.04    2016-08-18 08:15:07+00:00 UTC
         minor enhancement as per review comments
-0.03    15 August 2016
+
+0.03    2016-08-15 08:15:07+00:00 UTC
         Proper documentation
 
-0.02    15 August 2016
+0.02    2016-08-15 08:15:07+00:00 UTC
         Fix failing test
 
-0.01    12 August 2016
+0.01    2016-08-12 08:15:07+00:00 UTC
         First version, released on an unsuspecting world.
 

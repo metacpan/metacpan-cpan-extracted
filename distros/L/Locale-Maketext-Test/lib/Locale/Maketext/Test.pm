@@ -5,7 +5,7 @@ use warnings;
 use 5.014;
 use utf8;
 
-use Try::Tiny;
+use Syntax::Keyword::Try;
 use File::Spec;
 use Test::MockModule;
 use Locale::Maketext::ManyPluralForms;
@@ -20,7 +20,7 @@ Locale::Maketext::Test
 
 =cut
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 SYNOPSIS
 
@@ -182,8 +182,8 @@ sub BUILD {
     unless (scalar @{$self->languages}) {
         my @lang = ();
         if (opendir my $dh, $self->directory) {
-            while (readdir $dh) {
-                if (my ($x) = ($_ =~ /^(\w+)\.po$/)) {
+            while (my $dir = readdir($dh)) {
+                if (my ($x) = ($dir =~ /^(\w+)\.po$/)) {
                     push @lang, $x;
                 }
             }
@@ -304,14 +304,13 @@ sub testlocales {
             try {
                 local $SIG{__WARN__} = sub { die $_[0] };
                 $hnd->maketext($test->[0], @param);
-            }
-            catch {
-                if (/Can't locate object method "([^"]+)" via package/) {
+            } catch ($e) {
+                if ($e =~ /Can't locate object method "([^"]+)" via package/) {
                     push @{$self->_status->{errors}->{$lg}}, $self->_format_message($ln, "Unknown directive \%$1()");
                 } else {
-                    push @{$self->_status->{errors}->{$lg}}, $self->_format_message($ln, "Unexpected error:\n$_");
+                    push @{$self->_status->{errors}->{$lg}}, $self->_format_message($ln, "Unexpected error:\n$e");
                 }
-            };
+            }
         }
     }
 

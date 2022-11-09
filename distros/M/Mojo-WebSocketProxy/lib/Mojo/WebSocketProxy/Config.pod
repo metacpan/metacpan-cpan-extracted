@@ -1,0 +1,71 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Mojo::WebSocketProxy::Config
+at lib/Mojo/WebSocketProxy/Config.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 METHODS
+
+=head2 init
+
+Applies configuration. Supports the following config vars:
+
+=over 4
+
+=item * opened_connection - coderef which will be called when a new connection is opened
+
+=item * finish_connection - coderef called on connection close
+
+=item * skip_check_sanity - actions for which sanity checks will not be applied
+
+=back
+
+Returns an empty list.
+
+=head2 add_action
+
+Adds an action to the list of handlers.
+
+Expects C<$action> as an arrayref, and an C<$order> in which the action should be applied.
+
+=head1 NAME
+
+Mojo::WebSocketProxy::Parser
+
+=head1 DESCRIPTION
+
+This module using for store server configuration in memory.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Mojo::Base>
+
+L<attr|Mojo::Base/attr>, L<import|Mojo::Base/import>, L<new|Mojo::Base/new>, L<tap|Mojo::Base/tap>
+
+=back
+
+=head1 METHODS
+
+=head2 init
+
+=head2 add_action
+
+=head2 add_backend
+
+=head1 SEE ALSO
+
+L<Mojolicious::Plugin::WebSocketProxy>,
+L<Mojo::WebSocketProxy>,
+L<Mojo::WebSocketProxy::Backend>,
+L<Mojo::WebSocketProxy::Dispatcher>,
+L<Mojo::WebSocketProxy::Config>
+L<Mojo::WebSocketProxy::Parser>
+

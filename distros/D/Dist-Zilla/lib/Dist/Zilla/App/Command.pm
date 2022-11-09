@@ -1,4 +1,4 @@
-package Dist::Zilla::App::Command 6.027;
+package Dist::Zilla::App::Command 6.028;
 # ABSTRACT: base class for dzil commands
 
 use Dist::Zilla::Pragmas;
@@ -42,7 +42,7 @@ Dist::Zilla::App::Command - base class for dzil commands
 
 =head1 VERSION
 
-version 6.027
+version 6.028
 
 =head1 PERL VERSION
 

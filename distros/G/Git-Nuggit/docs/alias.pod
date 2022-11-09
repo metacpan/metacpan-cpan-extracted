@@ -8,9 +8,11 @@ FUTURE: 'nuggit alias' command will enable listing and editing of defined nuggit
 
 Nuggit now supports user-defined aliases.  These alises will always be executed by nuggit from the project's root directory, or a user-specified folder relative to it.
 
-Aliases are defined in .nuggit/config.json as the "aliases" object.  At present, this file must be edited by hand.
+Aliases are defined in .nuggit/config.json as the "aliases" object, or via the NGT_ALIASES environment variable.  At present, this file must be edited by hand.
 
 The key in the aliases array is the command given to nuggit, such as 'ngt foo'.  The value is either a string defining the command to be executed, or an object defining 'cmd' and any of the additional options listed below.
+
+Aliases defined via environment variable are limited to basic functionality.  Entries in the .nuggit/config will take precedence over any NGT_ALIASES environment variable definitions.  The environment variable is interpreted as a space-delimited string of key=value pairs, where value may be optionally quoted.  For example, export NGT_ALIASES='ls="ls -lvh" n=ngt s="ngt status"'.
 
 =over 4
 

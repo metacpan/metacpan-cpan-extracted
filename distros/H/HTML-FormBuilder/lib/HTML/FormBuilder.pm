@@ -3,7 +3,7 @@ package HTML::FormBuilder;
 use strict;
 use warnings;
 use 5.008_005;
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use Carp;
 use HTML::FormBuilder::FieldSet;
@@ -213,7 +213,7 @@ sub build_confirmation_button_with_all_inputs_hidden {
 
     foreach my $input (@inputs) {
         next if ($input->{'type'} and $input->{'type'} eq 'submit');
-        my $n = $input->{'name'} || '';
+        my $n   = $input->{'name'}                       || '';
         my $val = $self->get_field_value($input->{'id'}) || '';
         $html .= qq{<input type="hidden" name="$n" value="$val"/>};
     }

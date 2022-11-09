@@ -3,14 +3,17 @@ use strict;
 use warnings;
 
 use Test::Most;
-require Test::NoWarnings;
+use Test::Warnings;
+use Path::Tiny;
 
-use lib 'lib';
 use Experian::IDAuth;
+
+my $tmp_dir = Path::Tiny->tempdir(CLEANUP => 1);
 
 my $proveid = Experian::IDAuth->new(
     client        => {},
-    search_option => 'ProveID_KYC'
+    search_option => 'ProveID_KYC',
+    folder        => $tmp_dir,
 );
 
 sub examine {
@@ -1487,42 +1490,43 @@ my $fraud = <<EOD;
 EOD
 
 my $result = examine($fully1);
-is($result->{age_verified},        1, "Fully 1, age verified");
 is($result->{fully_authenticated}, 1, 'Fully 1, Fully authenticated');
 ok(not(exists $result->{deny}), 'Fully 1, not denied');
+is($result->{kyc_summary_score}, 5, 'Fully 1, kyc summary score is 5');
 
 $result = examine($fully2);
-is($result->{age_verified},        1, "Fully 2, age verified");
 is($result->{fully_authenticated}, 1, 'Fully 2, Fully authenticated');
 ok(not(exists $result->{deny}), 'Fully 2, not denied');
+is($result->{kyc_summary_score}, 2, 'Fully 2, kyc summary score is 2');
 
 $result = examine($not_authenticated);
 ok(not(exists $result->{deny}),                'not authenticated, not denied');
-ok(not(exists $result->{age_verified}),        'not authenticated, not age verified');
 ok(not(exists $result->{fully_authenticated}), 'not authenticated');
+is($result->{kyc_summary_score}, 0, 'not authenticated, kyc summary score is 0');
 
-$result = examine($not_deceased), is($result->{age_verified}, 1, "Not deceased, age verified");
+$result = examine($not_deceased);
 is($result->{fully_authenticated}, 1, 'Not deceased, Fully authenticated');
 ok(not(exists $result->{deceased}), 'Not deceased, not deceased');
 ok(not(exists $result->{deny}),     'Not deceased, not denied');
+is($result->{kyc_summary_score}, 7, 'Not deceased, kyc summary score is 7');
 
 $result = examine($deceased);
-is($result->{age_verified},        1, "deceased, age verified");
 is($result->{fully_authenticated}, 1, 'deceased, Fully authenticated');
 is($result->{deceased},            1, 'deceased, deceased');
 ok(not(exists $result->{deny}), 'deceased, not denied');
+is($result->{kyc_summary_score}, 7, 'deceased, kyc summary score is 7');
 
 $result = examine($cr_deceased);
-is($result->{age_verified},        1, "cr deceased, age verified");
 is($result->{fully_authenticated}, 1, 'cr deceased, Fully authenticated');
 is($result->{deceased},            1, 'cr deceased, deceased');
 ok(not(exists $result->{deny}), 'cr deceased, not denied');
+is($result->{kyc_summary_score}, 7, 'cr deceased, kyc summary score is 7');
 
 $result = examine($fraud);
-is($result->{age_verified},        1, "fraud, age verified");
 is($result->{fully_authenticated}, 1, 'fraud, Fully authenticated');
 is($result->{fraud},               1, 'fraud, fraud');
 ok(not(exists $result->{deny}), 'fraud, not denied');
+is($result->{kyc_summary_score}, 7, 'fraud, kyc summary score is 7');
 
 # this one has 2 in KYCSummary, so should be fully authenticated
 my $age_only_1 = <<EOD;
@@ -2374,63 +2378,66 @@ my $age_only_10 = <<EOD;
 </Search>
 EOD
 
-$result = examine($age_only_1), is($result->{age_verified}, 1, "Age only 1, age verified");
+$result = examine($age_only_1);
 is($result->{fully_authenticated}, 1, 'Age only 1, Fully authenticated');
 ok(not(exists $result->{deceased}), 'Age only 1, not deceased');
 ok(not(exists $result->{deny}),     'Age only 1, not denied');
+is($result->{kyc_summary_score}, 3, 'Age only 1, kyc summary score is 3');
 
-$result = examine($age_only_2), is($result->{age_verified}, 1, "Age only 2, age verified");
+$result = examine($age_only_2);
 is($result->{fully_authenticated}, 1, 'Age only 2, Fully authenticated');
 ok(not(exists $result->{deceased}), 'Age only 2, not deceased');
-is($result->{deny}, 1, 'Age only 2, denied');
-is($result->{PEP},  1, 'Age only 2, PEP flagged');
+is($result->{deny},              1, 'Age only 2, denied');
+is($result->{PEP},               1, 'Age only 2, PEP flagged');
+is($result->{kyc_summary_score}, 3, 'Age only 2, kyc summary score is 3');
 
-$result = examine($age_only_3), is($result->{age_verified}, 1, "Age only 3, age verified");
+$result = examine($age_only_3);
 is($result->{fully_authenticated}, 1, 'Age only 3, Fully authenticated');
 ok(not(exists $result->{deceased}), 'Age only 3, not deceased');
 is($result->{deny}, 1, 'Age only 3, denied');
 is($result->{BOE},  1, 'Age only 3, BOE flagged');
 
-$result = examine($age_only_4), is($result->{age_verified}, 1, "Age only 4, age verified");
+$result = examine($age_only_4);
 is($result->{fully_authenticated}, 1, 'Age only 4, Fully authenticated');
 ok(not(exists $result->{deceased}), 'Age only 4, not deceased');
 is($result->{deny}, 1, 'Age only 4, denied');
 is($result->{OFAC}, 1, 'Age only 4, OFAC flagged');
 
 #Change of address handling
-$result = examine($age_only_5), is($result->{age_verified}, 1, "Age only 5, age verified");
+$result = examine($age_only_5);
 is($result->{fully_authenticated}, 1, 'Age only 5, Fully authenticated');
 ok(not(exists $result->{deceased}), 'Age only 5, not deceased');
 ok(not(exists $result->{deny}),     'Age only 5, not denied');
 
-$result = examine($age_only_6), is($result->{age_verified}, 1, "Age only 6, age verified");
+$result = examine($age_only_6);
 is($result->{fully_authenticated}, 1, 'Age only 6, Fully authenticated');
 ok(not(exists $result->{deceased}), 'Age only 6, not deceased');
 is($result->{deny},  1, 'Age only 6, denied');
 is($result->{CIFAS}, 1, 'Age only 6, CIFAS flagged');
 
-$result = examine($age_only_7), is($result->{age_verified}, 1, "Age only 7, age verified");
+$result = examine($age_only_7);
 is($result->{fully_authenticated}, 1, 'Age only 7, Fully authenticated');
 is($result->{CCJ},                 1, 'Age only 7, Has court judgements');
 ok(not(exists $result->{deceased}), 'Age only 7, not deceased');
 ok(not(exists $result->{deny}),     'Age only 7, not denied');
 
-$result = examine($age_only_8), is($result->{age_verified}, 1, "Age only 8, age verified");
+$result = examine($age_only_8);
 is($result->{fully_authenticated}, 1, 'Age only 8, Fully authenticated');
 is($result->{director},            1, 'Age only 8, Is Director');
 ok(not(exists $result->{deceased}), 'Age only 8, not deceased');
 ok(not(exists $result->{deny}),     'Age only 8, not denied');
 
-$result = examine($age_only_9), is($result->{age_verified}, 1, "Age only 9, age verified");
+$result = examine($age_only_9);
 ok(not(exists $result->{fully_authenticated}), 'Age only 9, not authenticated');
 ok(not(exists $result->{deceased}),            'Age only 9, not deceased');
 ok(not(exists $result->{deny}),                'Age only 9, not denied');
+is($result->{kyc_summary_score}, 2, 'Age only 9, kyc summary score is 2');
 
-$result = examine($age_only_10), is($result->{age_verified}, 1, "Age only 10, age verified");
+$result = examine($age_only_10);
 is($result->{fully_authenticated}, 1, 'Age only 10, Fully authenticated');
 ok(not(exists $result->{deceased}), 'Age only 10, not deceased');
 ok(not(exists $result->{deny}),     'Age only 10, not denied');
+is($result->{kyc_summary_score}, 0, 'Age only 10, kyc summary score is 0');
 
-Test::NoWarnings::had_no_warnings();
 done_testing;
 

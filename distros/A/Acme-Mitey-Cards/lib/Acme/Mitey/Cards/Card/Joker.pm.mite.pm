@@ -7,7 +7,7 @@
 
     our $USES_MITE    = "Mite::Class";
     our $MITE_SHIM    = "Acme::Mitey::Cards::Mite";
-    our $MITE_VERSION = "0.010002";
+    our $MITE_VERSION = "0.011000";
 
     # Mite keywords
     BEGIN {
@@ -47,10 +47,12 @@
         *false   = \&Acme::Mitey::Cards::Mite::false;
         *guard   = \&Acme::Mitey::Cards::Mite::guard;
         *lazy    = \&Acme::Mitey::Cards::Mite::lazy;
+        *lock    = \&Acme::Mitey::Cards::Mite::lock;
         *ro      = \&Acme::Mitey::Cards::Mite::ro;
         *rw      = \&Acme::Mitey::Cards::Mite::rw;
         *rwp     = \&Acme::Mitey::Cards::Mite::rwp;
         *true    = \&Acme::Mitey::Cards::Mite::true;
+        *unlock  = \&Acme::Mitey::Cards::Mite::unlock;
     }
 
     BEGIN {
@@ -67,6 +69,11 @@
         our %DOES;
         return $DOES{$role} if exists $DOES{$role};
         return 1            if $role eq __PACKAGE__;
+        if ( $INC{'Moose/Util.pm'}
+            and my $meta = Moose::Util::find_meta( ref $self or $self ) )
+        {
+            $meta->can('does_role') and $meta->does_role($role) and return 1;
+        }
         return $self->SUPER::DOES($role);
     }
 

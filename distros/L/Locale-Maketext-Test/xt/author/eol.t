@@ -8,6 +8,7 @@ use Test::EOL;
 
 my @files = (
     'lib/Locale/Maketext/Test.pm',
+    'lib/Locale/Maketext/Test.pod',
     't/00-check-deps.t',
     't/00-compile.t',
     't/00-report-prereqs.dd',
@@ -21,8 +22,20 @@ my @files = (
     't/locales/id.po',
     't/locales/pt.po',
     't/locales/ru.po',
-    't/rc/.perlcriticrc',
-    't/rc/.perltidyrc'
+    't/rc/perlcriticrc',
+    't/rc/perltidyrc',
+    'xt/author/critic.t',
+    'xt/author/distmeta.t',
+    'xt/author/eol.t',
+    'xt/author/minimum-version.t',
+    'xt/author/mojibake.t',
+    'xt/author/no-tabs.t',
+    'xt/author/pod-syntax.t',
+    'xt/author/portability.t',
+    'xt/author/test-version.t',
+    'xt/boilerplate.t',
+    'xt/release/common_spelling.t',
+    'xt/release/cpan-changes.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.28.4
+## Version v0.28.5
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2022/09/27
+## Modified 2022/10/30
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -21,7 +21,7 @@ BEGIN
     use vars qw( $MOD_PERL $AUTOLOAD $ERROR $PARAM_CHECKER_LOAD_ERROR $VERBOSE $DEBUG 
                  $SILENT_AUTOLOAD $PARAM_CHECKER_LOADED $CALLER_LEVEL $COLOUR_NAME_TO_RGB 
                  $true $false $DEBUG_LOG_IO %RE $stderr $stderr_raw $SERIALISER 
-                 $AUTOLOAD_SUBS $SUB_ATTR_LIST $DATA_POS );
+                 $AUTOLOAD_SUBS $SUB_ATTR_LIST $DATA_POS $HAS_LOCAL_TZ );
     use Config;
     use Class::Load ();
     use Clone ();
@@ -43,7 +43,7 @@ BEGIN
     our @EXPORT      = qw( );
     our @EXPORT_OK   = qw( subclasses );
     our %EXPORT_TAGS = ();
-    our $VERSION     = 'v0.28.4';
+    our $VERSION     = 'v0.28.5';
     # local $^W;
     # mod_perl/2.0.10
     if( exists( $ENV{MOD_PERL} )
@@ -391,7 +391,9 @@ sub deserialise
     # when retrieved from memory, and in such case, there is no point passing it to 
     # deserialiser. Even worse, CBOR::XS does not deal with extra null padded data in the first 
     # place, and Sereal would not like a string made only of null bytes
-    elsif( $opts->{data} =~ /\x{00}$/ )
+    elsif( CORE::exists( $opts->{data} ) && 
+           CORE::defined( $opts->{data} ) && 
+           $opts->{data} =~ /\x{00}$/ )
     {
         ( my $temp = $opts->{data} ) =~ s/\x{00}+$//gs;
         # There is nothing to do
@@ -5604,15 +5606,32 @@ sub _parse_timestamp
     my $tz;
     # DateTime::TimeZone::Local will die ungracefully if the local timezeon is not set with the error:
     # "Cannot determine local time zone"
-    try
+    if( !defined( $HAS_LOCAL_TZ ) )
     {
-        require DateTime::TimeZone;
-        $tz = DateTime::TimeZone->new( name => 'local' );
+        try
+        {
+            require DateTime::TimeZone;
+            $tz = DateTime::TimeZone->new( name => 'local' );
+            $HAS_LOCAL_TZ = 1;
+        }
+        catch( $e )
+        {
+            $tz = DateTime::TimeZone->new( name => 'UTC' );
+            $HAS_LOCAL_TZ = 0;
+            warn( "Your system is missing key timezone components. ${class}::_parse_timestamp is reverting to UTC instead of local time zone.\n" );
+        }
     }
-    catch( $e )
+    else
     {
-        $tz = DateTime::TimeZone->new( name => 'UTC' );
-        warn( "Your system is missing key timezone components. ${class}::_parse_timestamp is reverting to UTC instead of local time zone.\n" );
+        try
+        {
+            $tz = DateTime::TimeZone->new( name => ( $HAS_LOCAL_TZ ? 'local' : 'UTC' ) );
+        }
+        catch( $e )
+        {
+            warn( "Error trying to set a DateTime object using ", ( $HAS_LOCAL_TZ ? 'local' : 'UTC' ), " time zone\n" );
+            $tz = DateTime::TimeZone->new( name => 'UTC' );
+        }
     }
     
     # my $tz = DateTime::TimeZone->new( name => 'Europe/Berlin' );
@@ -5858,7 +5877,7 @@ sub _parse_timestamp
     {
         my $re = { %+ };
         # $opt->{pattern} = $fmt->{pattern} = join( $re->{sep}, qw( %d %m %Y ) );
-        $opt->{pattern} = $fmt->{pattern} = "%d$re->{sep}$re->{blank1}%m$re->{sep}$re->{blank2}%Y$re->{trailing_dot}";
+        $opt->{pattern} = $fmt->{pattern} = "%d$re->{sep}" . ( $re->{blank1} // '' ) . "%m$re->{sep}" . ( $re->{blank2} // '' ) . "%Y" . ( $re->{trailing_dot} // '' );
         $fmt->{leading_zero} = 1 if( substr( $re->{day}, 0, 1 ) == 0 || substr( $re->{month}, 0, 1 ) == 0 );
         {
             package
@@ -5900,7 +5919,7 @@ sub _parse_timestamp
         $re->{month} = $roman2regular->{ $re->{month} };
         $str = join( '-', @$re{qw( year month day )} );
         $opt->{pattern} = '%F';
-        $fmt->{pattern} = "%d.$re->{blank1}%m.$re->{blank2}%Y$re->{trailing_dot}";
+        $fmt->{pattern} = "%d." . ( $re->{blank1} // '' ) . "%m." . ( $re->{blank2} // '' ) . "%Y" . ( $re->{trailing_dot} // '' );
         {
             package
                 DateTime::Format::RomanDDXXXYYYY;
@@ -6117,20 +6136,37 @@ sub _set_get_datetime : lvalue
             unless( Scalar::Util::blessed( $now ) && ( $now->isa( 'DateTime' ) || $now->isa( 'Module::Generic::DateTime' ) ) )
             {
                 require DateTime;
-                try
+                if( !defined( $HAS_LOCAL_TZ ) )
                 {
-                    $now = DateTime->from_epoch(
-                        epoch => $time,
-                        time_zone => 'local',
-                    );
+                    try
+                    {
+                        $now = DateTime->from_epoch(
+                            epoch => $time,
+                            time_zone => 'local',
+                        );
+                        $HAS_LOCAL_TZ = 1;
+                    }
+                    catch( $e )
+                    {
+                        warn( "Your system is missing key timezone components. ${class}::_set_get_datetime is reverting to UTC instead of local time zone -> $e\n" );
+                        $now = DateTime->from_epoch(
+                            epoch => $time,
+                            time_zone => 'UTC',
+                        );
+                        $HAS_LOCAL_TZ = 0;
+                    }
                 }
-                catch( $e )
+                else
                 {
-                    warn( "Your system is missing key timezone components. ${class}::_set_get_datetime is reverting to UTC instead of local time zone.\n" );
-                    $now = DateTime->from_epoch(
-                        epoch => $time,
-                        time_zone => 'UTC',
-                    );
+                    try
+                    {
+                        $now = DateTime->from_epoch( epoch => $time, time_zone => ( $HAS_LOCAL_TZ ? 'local' : 'UTC' ) );
+                    }
+                    catch( $e )
+                    {
+                        warn( "Error trying to set a DateTime object using ", ( $HAS_LOCAL_TZ ? 'local' : 'UTC' ), " time zone -> $e\n" );
+                        $now = DateTime->from_epoch( epoch => $time, time_zone => 'UTC' );
+                   }
                 }
             }
             
@@ -6148,6 +6184,7 @@ sub _set_get_datetime : lvalue
         }
         catch( $e )
         {
+            warn( "Error creating DateTime object: $e\n" );
         }
     };
     
@@ -6361,7 +6398,7 @@ AUTOLOAD
     my $sub = ( caller(1) )[3];
     no overloading;
     no strict 'refs';
-    if( $sub eq 'Module::Generic::AUTOLOAD' )
+    if( CORE::defined( $sub ) && $sub eq 'Module::Generic::AUTOLOAD' )
     {
         my $trace = $self->_get_stack_trace;
         my $mesg = "Module::Generic::AUTOLOAD (called at line '$line') is looping for autoloadable method '$AUTOLOAD' and args '" . join( "', '", @_ ) . "'. Trace is: " . $trace->as_string;
@@ -6395,7 +6432,7 @@ AUTOLOAD
     {
         if( my $code = $self->autoload( $meth ) )
         {
-            return( $code->( $self ) ) if( $code );
+            return( $code->( $self, @_ ) ) if( $code );
         }
     }
     
@@ -6678,7 +6715,7 @@ Module::Generic - Generic Module to inherit from
 
 =head1 VERSION
 
-    v0.28.4
+    v0.28.5
 
 =head1 DESCRIPTION
 
@@ -6732,13 +6769,13 @@ This is a handy method to use at the beginning of other methods of calling packa
     $obj->some_method( 'some arguments' );
     die( $obj->error() ) if( $obj->error() );
 
-    ## some_method() would then contain something like:
+    # some_method() would then contain something like:
     sub some_method
     {
         my $self = shift( @_ );
         ## Clear all previous error, so we may set our own later one eventually
         $self->clear_error();
-        ## ...
+        # ...
     }
 
 This way the end user may be sure that if C<$obj->error()> returns true something wrong has occured.
@@ -6839,59 +6876,6 @@ rgb can also be rgba with the last decimal, normally an opacity used here to set
 
     print( $o->coloured( 'underline rgba(255, 0, 0, 0.5)', "Hello everyone!" ), "\n" );
 
-=head2 deserialise
-
-    my $ref = $self->deserialise( %hash_of_options );
-    my $ref = $self->deserialise( $hash_reference_of_options );
-    my $ref = $self->deserialise( $serialised_data, %hash_of_options );
-    my $ref = $self->deserialise( $serialised_data, $hash_reference_of_options );
-
-This method deserialise data previously serialised by either L<CBOR|CBOR::XS>, L<Sereal> or L<Storable|Storable::Improved>.
-
-It takes an hash or hash reference of options. You can also provide the data to deserialise as the first argument followed by an hash or hash reference of options.
-
-The supported options are:
-
-=over 4
-
-=item C<base64>
-
-Thise can be set to a true value like C<1>, or to your preferred base64 encoder/decoder, or to an array reference containing 2 code references, the first one for encoding and the second one for decoding.
-
-If this is set simply to a true value, C<deserialise> will call L</_has_base64> to find out any installed base64 modules. Currently the ones supported are: L<Crypt::Misc> and L<MIME::Base64>. Of course, you need to have one of those modules installed first before it can be used.
-
-If this option is set and no appropriate module could be found, C<deserialise> will return an error.
-
-=item C<data>
-
-Data to be deserialised.
-
-=item C<file>
-
-Provides a file path from which to read the serialised data.
-
-=item C<io>
-
-A filehandle to read the data to deserialise from. This option only works with L<Storable|Storable::Improved>
-
-=item C<serialiser>
-
-Specify the class name of the serialiser to use. Supported serialiser can either be C<CBOR> or L<CBOR::XS>, L<Sereal> and L<Storable|Storable::Improved>
-
-If the serialiser is L<CBOR::XS> the following additional options are supported: C<max_depth>, C<max_size>, C<allow_unknown>, C<allow_sharing>, C<allow_cycles>, C<forbid_objects>, C<pack_strings>, C<text_keys>, C<text_strings>, C<validate_utf8>, C<filter>
-
-See L<CBOR::XS> for detail on those options.
-
-If the serialiser is L<Sereal>, the following additional options are supported: C<refuse_snappy>, C<refuse_objects>, C<no_bless_objects>, C<validate_utf8>, C<max_recursion_depth>, C<max_num_hash_entries>, C<max_num_array_entries>, C<max_string_length>, C<max_uncompressed_size>, C<incremental>, C<alias_smallint>, C<alias_varint_under>, C<use_undef>, C<set_readonly>, C<set_readonly_scalars>
-
-See L<Sereal> for detail on those options.
-
-=back
-
-=head2 deserialize
-
-Alias for L</deserialise>
-
 =head2 debug
 
 Set or get the debug level. This takes and return an integer.
@@ -6899,6 +6883,7 @@ Set or get the debug level. This takes and return an integer.
 Based on the value, L</"message"> will or will not print out messages. For example :
 
     $self->debug( 2 );
+    $self->message( 2, "Debugging message here." );
 
 Since C<2> used in L</"message"> is equal to the debug value, the debugging message is printed.
 
@@ -6906,11 +6891,18 @@ If the debug value is switched to 1, the message will be silenced.
 
 =head2 deserialise
 
+    my $ref = $self->deserialise( %hash_of_options );
+    my $ref = $self->deserialise( $hash_reference_of_options );
+    my $ref = $self->deserialise( $serialised_data, %hash_of_options );
+    my $ref = $self->deserialise( $serialised_data, $hash_reference_of_options );
+
 This method use a specified serialiser class and deserialise the given data either directly from a specified file or being provided, and returns the perl data.
 
 The serialisers currently supported are: L<CBOR::Free>, L<CBOR::XS>, L<JSON>, L<Sereal> and L<Storable::Improved> (or the legacy L<Storable>). They are not required by L<Module::Generic>, so you must install them yourself. If the serialiser chosen is not installed, this will set an L<errr|Module::Generic/error> and return C<undef>.
 
-This method takes some parameters as an hash or hash reference. It can then:
+It takes an hash or hash reference of options. You can also provide the data to deserialise as the first argument followed by an hash or hash reference of options.
+
+It can then:
 
 =over 4
 
@@ -6922,19 +6914,27 @@ This method takes some parameters as an hash or hash reference. It can then:
 
 =back
 
-The supported parameters are:
+The supported options are:
 
 =over 4
 
-=item * I<data>
+=item * C<base64>
 
-String of data to deserialise.
+Thise can be set to a true value like C<1>, or to your preferred base64 encoder/decoder, or to an array reference containing 2 code references, the first one for encoding and the second one for decoding.
 
-=item * I<file>
+If this is set simply to a true value, C<deserialise> will call L</_has_base64> to find out any installed base64 modules. Currently the ones supported are: L<Crypt::Misc> and L<MIME::Base64>. Of course, you need to have one of those modules installed first before it can be used.
 
-String. A file path where to store the serialised data.
+If this option is set and no appropriate module could be found, C<deserialise> will return an error.
 
-=item * I<io>
+=item * C<data>
+
+Data to be deserialised.
+
+=item * C<file>
+
+Provides a file path from which to read the serialised data.
+
+=item * C<io>
 
 A file handle. This is used when the serialiser is L<Storable> to call its function L<Storable::Improved/store_fd> and L<Storable::Improved/fd_retrieve>
 
@@ -6942,25 +6942,17 @@ A file handle. This is used when the serialiser is L<Storable> to call its funct
 
 Boolean. If true, this will lock the file before reading from it. This works only in conjonction with I<file> and the serialiser L<Storable::Improved>
 
-=item * I<serialiser> or I<serializer>
+=item * C<serialiser>
 
-A string being the class of the serialiser to use. This can be only either L<Sereal> or L<Storable> or L<Storable::Improved>
+Specify the class name of the serialiser to use. Supported serialiser can either be C<CBOR> or L<CBOR::XS>, L<Sereal> and L<Storable|Storable::Improved>
 
-=back
+If the serialiser is L<CBOR::XS> the following additional options are supported: C<max_depth>, C<max_size>, C<allow_unknown>, C<allow_sharing>, C<allow_cycles>, C<forbid_objects>, C<pack_strings>, C<text_keys>, C<text_strings>, C<validate_utf8>, C<filter>
 
-Additionally the following options are supported and passed through directly to each serialiser:
+See L<CBOR::XS> for detail on those options.
 
-=over 4
+If the serialiser is L<Sereal>, the following additional options are supported: C<refuse_snappy>, C<refuse_objects>, C<no_bless_objects>, C<validate_utf8>, C<max_recursion_depth>, C<max_num_hash_entries>, C<max_num_array_entries>, C<max_string_length>, C<max_uncompressed_size>, C<incremental>, C<alias_smallint>, C<alias_varint_under>, C<use_undef>, C<set_readonly>, C<set_readonly_scalars>
 
-=item * L<CBOR::Free>: no option for deserialisation.
-
-=item * L<CBOR|CBOR::XS>: C<max_depth>, C<max_size>, C<allow_unknown>, C<allow_sharing>, C<allow_cycles>, C<forbid_objects>, C<pack_strings>, C<text_keys>, C<text_strings>, C<validate_utf8>, C<filter>
-
-=item * L<JSON>: C<allow_blessed> C<allow_nonref> C<allow_unknown> C<allow_tags> C<ascii> C<boolean_values> C<canonical> C<convert_blessed> C<filter_json_object> C<filter_json_single_key_object> C<indent> C<latin1> C<max_depth> C<max_size> C<pretty> C<relaxed> C<space_after> C<space_before> C<utf8>
-
-=item * L<Sereal::Decoder/decode> if the serialiser is L<Sereal>: C<alias_smallint>, C<alias_varint_under>, C<incremental>, C<max_num_array_entries>, C<max_num_hash_entries>, C<max_recursion_depth>, C<max_string_length>, C<max_uncompressed_size>, C<no_bless_objects>, C<refuse_objects>, C<refuse_snappy>, C<set_readonly>, C<set_readonly_scalars>, C<use_undef>, C<validate_utf8>
-
-=item * L<Storable::Improved> / L<Storable>: no option available
+See L<Sereal> for detail on those options.
 
 =back
 
@@ -7247,15 +7239,18 @@ Addionally, if a number is provided as first argument to B<message>(), it will b
 
 For example:
 
-    ## Set debugness to 3
+    # Set debugness to 3
     $obj->debug( 3 );
-    ## This message will not be printed
-    ## This will be displayed
+    # This message will not be printed
+    $obj->message( 4, "Some detailed debugging stuff that we might not want." );
+    # This will be displayed
+    $obj->message( 2, "Some more common message we want the user to see." );
 
 Now, why debug is used and not verbose level? Well, because mostly, the verbose level needs only to be true, that is equal to 1 to be efficient. You do not really need to have a verbose level greater than 1. However, the debug level usually may have various level.
 
 Also, the text provided can be separated by comma, and even be a code reference, such as:
 
+    $self->message( 2, "I have found", "something weird here:", sub{ $self->dumper( $data ) } );
 
 If the object has a property I<_msg_no_exec_sub> set to true, then a code reference will not be called and instead be added to the string as is. This can be done simply like this:
 
@@ -7279,9 +7274,11 @@ An integer. Debugging level.
 
 The text of the debugging message. This is optional since this can be provided as first or consecutive arguments like in a list as demonstrated in the example above. This allows you to do something like this:
 
+    $self->message( 2, { message => "Some debug message here", prefix => ">>" });
 
 or
 
+    $self->message( { message => "Some debug message here", prefix => ">>", level => 2 });
 
 =item I<no_encoding>
 
@@ -7326,6 +7323,7 @@ Return the optional hash reference of parameters, if any, that can be provided a
 
 This works like L<perlfunc/"sprintf">, so provided with a format and a list of arguments, this print out the message. For example :
 
+    $self->messagef( 1, "Customer name is %s", $cust->name );
 
 Where 1 is the debug level set with L</"debug">
 
@@ -7372,6 +7370,12 @@ Example:
 =head2 new_file
 
 Instantiate a new L<Module::Generic::File> object. If any arguments are provided, it will pass it to L<Module::Generic::File/new> and return the object.
+
+=head2 new_glob
+
+This method is called instead of L</new> in your package for GLOB type module.
+
+It will set an hash of options provided and call L</init> and return the newly instantiated object upon success, or C<undef> upon error.
 
 =head2 new_hash
 
@@ -7494,6 +7498,7 @@ Sets the module property I<_msg_no_exec_sub> to true, so that any call to L</"me
 
 And in your code, you write:
 
+    $self->message( 2, "Someone said: ", \&hello );
 
 If I<_msg_no_exec_sub> is set to false (by default), then the above would print out the following message:
 
