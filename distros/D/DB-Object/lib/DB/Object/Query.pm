@@ -126,7 +126,7 @@ sub delete
     return( $self->error( "No table to delete entries from was set." ) );
     my $where = '';
     $self->where( @_ ) if( @_ );
-    ## if( !$where && $self->{ 'query_reset' } )
+    # if( !$where && $self->{ 'query_reset' } )
     if( !$where )
     {
         $where = $self->where();
@@ -137,18 +137,18 @@ sub delete
     }
     my $clauses = $self->_query_components( 'delete' );
     my @query = ( "DELETE FROM $table" );
-    ## 'query_reset' condition to avoid catching parameters from pervious queries.
+    # 'query_reset' condition to avoid catching parameters from pervious queries.
     push( @query, @$clauses ) if( scalar( @$clauses ) );
     my $query = $self->{query} = CORE::join( ' ', @query );
     return( $self->error( "Refusing to do a bulk delete. Enable the allow_bulk_delete database object property if you want to do so. Original query was: $query" ) ) if( !$self->where && !$self->database_object->allow_bulk_delete );
     $self->_save_bind();
     my $sth = $tbl_o->_cache_this( $self ) ||
     return( $self->error( "Error while preparing query to delete from table '$table':\n$query" ) );
-    ## Routines such as as_string() expect an array on pupose so we do not have to commit the action
-    ## but rather get the statement string. At the end, we write:
-    ## $obj->delete() to really delete
-    ## $obj->delete->as_string() to ONLY get the formatted statement
-    ## wantarray returns undef in void context, i.e. $obj->delete()
+    # Routines such as as_string() expect an array on pupose so we do not have to commit the action
+    # but rather get the statement string. At the end, we write:
+    # $obj->delete() to really delete
+    # $obj->delete->as_string() to ONLY get the formatted statement
+    # wantarray returns undef in void context, i.e. $obj->delete()
     if( !defined( wantarray() ) )
     {
         $sth->execute() ||
@@ -156,16 +156,16 @@ sub delete
         ## Will be destroyed anyway and permits the end user to manipulate the object if needed
         ## $sth->finish();
     }
-    ## wantarray returns false but not undef() otherwise, i.e.
-    ## $obj->delete->as_string();
+    # wantarray returns false but not undef() otherwise, i.e.
+    # $obj->delete->as_string();
     return( $sth );
 }
 
 sub enhance { return( shift->_set_get_boolean( 'enhance', @_ ) ); }
 
-## Used in conjonction with constant(), allows internally to know if the query has reached the end of the chain
-## Such as $tbl->select->join( $tbl_object, $conditions )->join( $other_tbl_object, $other_conditions );
-## final() enables to know the query reached the end, so that when constant is used, all the processing can be skipped
+# Used in conjonction with constant(), allows internally to know if the query has reached the end of the chain
+# Such as $tbl->select->join( $tbl_object, $conditions )->join( $other_tbl_object, $other_conditions );
+# final() enables to know the query reached the end, so that when constant is used, all the processing can be skipped
 sub final { return( shift->_set_get_scalar( 'final', @_ ) ); }
 
 sub format_from_epoch
@@ -381,7 +381,7 @@ sub format_update($;%)
     return( $self->error( "Must provide key => value pairs. I received an odd number of arguments" ) ) if( @arg && ( scalar( @arg ) % 2 ) );
     my %arg  = ( @arg );
     my $tbl_o = $self->table_object || return( $self->error( "No table object is set." ) );
-    $arg{ 'default' } ||= $self->{ '_default' };
+    $arg{default} ||= $self->{_default};
     if( $arg{data} && !$data )
     {
         my $hash = $arg{data};
@@ -394,13 +394,13 @@ sub format_update($;%)
         $data    = \@vals;
     }
     my $info = $data || \@arg;
-    ## if( !%$info || !scalar( keys( %$info ) ) )
+    # if( !%$info || !scalar( keys( %$info ) ) )
     if( !$info || !scalar( @$info ) )
     {
         return( $self->error( "No data to update was provided to format update." ) );
     }
     my $bind   = $tbl_o->database_object->use_bind;
-    my $def    = $arg{default} || $self->{ '_default' };
+    my $def    = $arg{default} || $self->{_default};
     my $fields_ref = $tbl_o->fields();
     my $fields_list = CORE::join( '|', keys( %$fields_ref ) );
     my $struct = $tbl_o->structure();
@@ -410,12 +410,14 @@ sub format_update($;%)
     my @fields = ();
     my @binded = ();
     my @types  = ();
-    ## Before we used to call getdefault supplying it our new values and the
-    ## format_statement() that would take the default supplied values
-    ## Now, this works differently since we use update() method and supply 
-    ## directly our value to update to it
-    ## In this context, getting the default values is dangerous, since resetting
-    ## the values to their default ones is not was we want, is it?
+    # Get the constant has definition for each table fields
+    my $types_const = $tbl_o->types_const;
+    # Before we used to call getdefault supplying it our new values and the
+    # format_statement() that would take the default supplied values
+    # Now, this works differently since we use update() method and supply 
+    # directly our value to update to it
+    # In this context, getting the default values is dangerous, since resetting
+    # the values to their default ones is not was we want, is it?
     #foreach my $field ( keys( %$def ) )
     #{
     #    if( exists( $info->{ $field } ) )
@@ -427,15 +429,15 @@ sub format_update($;%)
     while( @$info )
     {
         my( $field, $value ) = ( shift( @$info ), shift( @$info ) );
-        ## Do not update a field that does not belong in this table
+        # Do not update a field that does not belong in this table
         next if( !exists( $fields_ref->{ $field } ) );
-        ## Make it a FROM_UNIXTIME field if this is what we need.
-        ## $value = "FROM_UNIXTIME($value)" if( exists( $from_unixtime->{ $field } ) );
+        # Make it a FROM_UNIXTIME field if this is what we need.
+        # $value = "FROM_UNIXTIME($value)" if( exists( $from_unixtime->{ $field } ) );
         # $value = \"TO_TIMESTAMP($value)" if( exists( $from_unixtime->{ $field } ) );
-        ## This is for insert or update statement types
+        # This is for insert or update statement types
         if( exists( $from_unixtime->{ $field } ) )
         {
-            ## push( @format_values, sprintf( "FROM_UNIXTIME('%s') AS $_", $data->{ $_ } ) );
+            # push( @format_values, sprintf( "FROM_UNIXTIME('%s') AS $_", $data->{ $_ } ) );
             if( $bind )
             {
                 push( @binded, $value );
@@ -444,7 +446,7 @@ sub format_update($;%)
             }
             else
             {
-                ## push( @format_values, "FROM_UNIXTIME($value)" );
+                # push( @format_values, "FROM_UNIXTIME($value)" );
                 push( @fields, "$field=" . $self->format_from_epoch({ value => $value, bind => 0 }) );
             }
         }
@@ -452,10 +454,10 @@ sub format_update($;%)
         {
             push( @fields, "$field=$$value" );
         }
-        ## Maybe $bind is not enabled, but the user may have manually provided a placeholder, i.e. '?'
+        # Maybe $bind is not enabled, but the user may have manually provided a placeholder, i.e. '?'
         elsif( !$bind )
         {
-            ## push( @fields, sprintf( "$field='%s'", quotemeta( $value ) ) );
+            # push( @fields, sprintf( "$field='%s'", quotemeta( $value ) ) );
             my $const;
             if( $value eq '?' )
             {
@@ -463,6 +465,10 @@ sub format_update($;%)
                 if( lc( $types->{ $field } ) eq 'bytea' && ( $const = $self->database_object->get_sql_type( 'bytea' ) ) )
                 {
                     CORE::push( @types, $const );
+                }
+                elsif( CORE::exists( $types_const->{ $field } ) )
+                {
+                    CORE::push( @types, $types_const->{ $field }->{constant} );
                 }
                 else
                 {
@@ -486,8 +492,8 @@ sub format_update($;%)
                 push( @fields, sprintf( "$field=%s", $tbl_o->database_object->quote( $value ) ) );
             }
         }
-        ## if this is a SET field type and value is a number, treat it as a number and not as a string
-        ## We do this before testing for param binding because DBI puts quotes around SET number :-(
+        # if this is a SET field type and value is a number, treat it as a number and not as a string
+        # We do this before testing for param binding because DBI puts quotes around SET number :-(
         elsif( $value =~ /^\d+$/ && $struct->{ $field } =~ /\bSET\(/i )
         {
             push( @fields, "$field=$value" );
@@ -501,6 +507,10 @@ sub format_update($;%)
             {
                 # CORE::push( @types, DBD::Pg::PG_BYTEA );
                 CORE::push( @types, $const );
+            }
+            elsif( CORE::exists( $types_const->{ $field } ) )
+            {
+                CORE::push( @types, $types_const->{ $field }->{constant} );
             }
             else
             {

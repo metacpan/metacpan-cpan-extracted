@@ -2,9 +2,10 @@
 use strict;
 use warnings;
 
-use Data::Dumper::Compact 'ddc';
+use Data::Dumper::Compact qw/ddc/;
 use GraphViz2;
 use List::Util qw/max/;
+#use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(Music-BachChoralHarmony); # local author libs
 use Music::BachChoralHarmony;
 use Music::Tension::Cope;
 
@@ -12,7 +13,12 @@ my $thresh = shift || 20;
 
 my $tension = Music::Tension::Cope->new;
 
-my $bach = Music::BachChoralHarmony->new;
+#my $data_file = 'share/jsbach_chorals_harmony.data'; # local author files
+#my $key_title = 'share/jsbach_BWV_keys_titles.txt';  # "
+my $bach = Music::BachChoralHarmony->new(
+#    data_file => $data_file,
+#    key_title => $key_title,
+);
 my $songs = $bach->parse();
 
 my @scale = 0 .. 11;

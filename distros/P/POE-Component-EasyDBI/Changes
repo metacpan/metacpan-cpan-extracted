@@ -1,7 +1,10 @@
 Revision history for POE::Component::EasyDBI.
 
+1.30
+    - Shut down the subpocess if the parent dies
+
 1.29
-	- Fix crashes when starting up without a DBI connection
+    - Fix crashes when starting up without a DBI connection
 
 1.28
     - Update documentation
@@ -35,8 +38,8 @@ Revision history for POE::Component::EasyDBI.
     - Fixed RT #32448, setup_wheel should be called with call (Andy Grundman)
     - Fixed RT #32447, combo query does not pass-through args (Andy Grundman)
     - Fixed RT #30248, cpan install fails due to missing prereq
-    - Fixed RT #38456, typo in manpage 
-    - Added print_queue sub 
+    - Fixed RT #38456, typo in manpage
+    - Added print_queue sub
 
 1.23 Tue Sep 25 2007
     - alt_fork can be the path to your perl binary
@@ -99,104 +102,104 @@ Revision history for POE::Component::EasyDBI.
     - added a test for code refs in events
     - stopwatch is now set when a query is sent to the subprocess, not when it enters the que
     - changed query binding, so you can bind using ints without the quoting  ie, LIMIT ?,?
-    
+
 1.06 Fri Jan 20 2006
-	- added CHLD handling
+    - added CHLD handling
 
 1.05 Sat Oct 29 2005
-	- removed SELECT checking so queries like SHOW TABLES will work
+    - removed SELECT checking so queries like SHOW TABLES will work
 
 1.04 Sat Aug 13 2005
-	- fixed misuse of wantarray, I had it backwards. Duh!
+    - fixed misuse of wantarray, I had it backwards. Duh!
 
 1.03 Tue Aug 02 2005
-	- fixed minor bug with 'connected' option, thanks Jason Lavold
+    - fixed minor bug with 'connected' option, thanks Jason Lavold
 
 1.02 Thu Jun 30 2005
-	- added stopwatch option
-	- added contrib to MANIFEST so make dist picks it up
+    - added stopwatch option
+    - added contrib to MANIFEST so make dist picks it up
 
 1.01 Thu Jun 30 2005
-	- fixed alias_remove stupidness
+    - fixed alias_remove stupidness
 
 1.00 Thu May 26 2005
-	- fixed t/2.t, test skipped 12 intead of 13 if SQLite wasn't installed
-	- added prereq for POE .3101 if MSWin3
+    - fixed t/2.t, test skipped 12 intead of 13 if SQLite wasn't installed
+    - added prereq for POE .3101 if MSWin3
 
 0.15 Fri May 20 2005
-	- added commit/begin_work/rollback actions
-	- added tests for commit and begin_work (needs improved tests)
-	- added commit/begin_work post and pre events to actions
+    - added commit/begin_work/rollback actions
+    - added tests for commit and begin_work (needs improved tests)
+    - added commit/begin_work post and pre events to actions
 
 0.14 Fri May 20 2005
-	- Chris Williams submitted a patch to get EasyDBI to work on MSWin32
-	- Added test using SQLite
+    - Chris Williams submitted a patch to get EasyDBI to work on MSWin32
+    - Added test using SQLite
 
 0.13 Tue Apr 26 2005
-	- added arrayarray, and a test for it, but tests are still disabled
-	
+    - added arrayarray, and a test for it, but tests are still disabled
+
 0.12 Sun Apr 24 2005
-	- fixed alt_fork param, v.11 was unreleased anyway
+    - fixed alt_fork param, v.11 was unreleased anyway
 
 0.11 Sun Apr 24 2005
-	- added option alt_fork that runs the database connection in a 
-		seperate process but not forked. Thanks Apocalypse
-	- fixed version in Subprocess.pm
+    - added option alt_fork that runs the database connection in a
+    seperate process but not forked. Thanks Apocalypse
+    - fixed version in Subprocess.pm
 
 0.10 Wed Mar 16 2005
-	- moved select(STDERR) stuff to main() in subprocess.pm, oops :)
-	- added object methods, new() returns an object
-	- disabled DBD::AnyData tests because DBD::File is broken
-	- fixed docs
-	- documented arbitrary data passing
-	
+    - moved select(STDERR) stuff to main() in subprocess.pm, oops :)
+    - added object methods, new() returns an object
+    - disabled DBD::AnyData tests because DBD::File is broken
+    - fixed docs
+    - documented arbitrary data passing
+
 
 0.09 Wed Dec 22 2004
-	- fixed bug in error checking on inserts
-	- documeted max_retries => -1
+    - fixed bug in error checking on inserts
+    - documeted max_retries => -1
 
 0.08 Mon Nov 15 2004
-	- added func and method to subprocess
-	- fixed the variables that were suppose to be passed to the subprocess
-	- added documentation for func
-	- fixed a shutdown bug
-	- fixed insert not working correctly
-	- added anon subs and postback ablitiy to event param
-	- fixed bug where a statement handle would hang around in db_insert
-	- added insert key to insert function, it can be an array ref of hashes
-		or a hash
-	- added no_cache option
-	- moved docs around and improved them
-	- added extra tests if DBD::AnyData is installed
+    - added func and method to subprocess
+    - fixed the variables that were suppose to be passed to the subprocess
+    - added documentation for func
+    - fixed a shutdown bug
+    - fixed insert not working correctly
+    - added anon subs and postback ablitiy to event param
+    - fixed bug where a statement handle would hang around in db_insert
+    - added insert key to insert function, it can be an array ref of hashes
+    or a hash
+    - added no_cache option
+    - moved docs around and improved them
+    - added extra tests if DBD::AnyData is installed
 
 0.07 Tue Oct 19 2004
-	- added signal ignores for INT HUP TERM into subprocess
-		now a ctrl-c (int) can be handled correctly by a script
-		using easydbi
+    - added signal ignores for INT HUP TERM into subprocess
+    now a ctrl-c (int) can be handled correctly by a script
+    using easydbi
 
 0.06 Tue Oct 19 2004
-	- fixed typo of connect_error event
-	- added connected parameter
-	- added an oracle error check to subprocess
+    - fixed typo of connect_error event
+    - added connected parameter
+    - added an oracle error check to subprocess
 
 0.05 Tue Oct 19 2004
-	- added create method, it just calls new
-	- added insert query type
-	- bumped up the DBI required version to 1.38
-		because of the last_insert_id use for inserts
-	- added better reconnect handling
-	- added several options for reconnecting
-	- objectized the subprocess, it's more efficient
+    - added create method, it just calls new
+    - added insert query type
+    - bumped up the DBI required version to 1.38
+    because of the last_insert_id use for inserts
+    - added better reconnect handling
+    - added several options for reconnecting
+    - objectized the subprocess, it's more efficient
 
 0.04 Thu Sep 23 2004
-	- added ability to specify session id
+    - added ability to specify session id
 
 0.03 Mon Jan 02 2004
-	- 'bout time I fixed that bug that came from using SimpleDBI as my base :)
+    - 'bout time I fixed that bug that came from using SimpleDBI as my base :)
 
 0.02 Mon Nov 24 2003
-	- Fixed docs, README and Changes
+    - Fixed docs, README and Changes
 
 0.01 Mon Nov 24 2003
-	- First work based off SimpleDBI, but with easier to more data structures
-	and query chunks, and documented each query type
+    - First work based off SimpleDBI, but with easier to more data structures
+    and query chunks, and documented each query type

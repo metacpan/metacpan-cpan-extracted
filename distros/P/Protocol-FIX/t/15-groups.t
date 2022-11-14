@@ -53,8 +53,8 @@ subtest "simple case :: NoRoutingIDs" => sub {
         ),
         '215=2 | 216=1 | 217=binary.com | 216=3 | 217=champion-fx.com';
 
-    like exception { $g->serialize() }, qr/repetitions must be ARRAY/;
-    like exception { $g->serialize([]) }, qr/repetitions must be non-empty/;
+    like exception { $g->serialize() },                                 qr/repetitions must be ARRAY/;
+    like exception { $g->serialize([]) },                               qr/repetitions must be non-empty/;
     like exception { $g->serialize([[RoutingType => 'WRONG_VALUE']]) }, qr/The value 'WRONG_VALUE' is not acceptable for field RoutingType/;
 };
 

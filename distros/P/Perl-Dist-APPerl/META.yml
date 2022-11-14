@@ -1,0 +1,28 @@
+---
+abstract: 'Actually Portable Perl'
+author:
+  - 'Gavin Hayes <gahayes@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Perl-Dist-APPerl
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/G4Vi/Perl-Dist-APPerl/issues
+  homepage: https://computoid.com/APPerl
+  repository: https://github.com/G4Vi/Perl-Dist-APPerl.git
+version: v0.1.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

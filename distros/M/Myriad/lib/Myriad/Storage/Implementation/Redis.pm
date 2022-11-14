@@ -4,7 +4,7 @@ use Myriad::Class does => [
     'Myriad::Role::Storage'
 ];
 
-our $VERSION = '1.000'; # VERSION
+our $VERSION = '1.001'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 =encoding utf8

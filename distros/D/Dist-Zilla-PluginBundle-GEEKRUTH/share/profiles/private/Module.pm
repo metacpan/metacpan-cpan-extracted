@@ -1,0 +1,37 @@
+package {
+   {$name}
+};
+use Modern::Perl;
+use Carp;
+
+1;
+
+__END__
+
+# ABSTRACT:
+
+=pod
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=head1 SUBROUTINES/METHODS
+
+=head1 ATTRIBUTES
+
+=head1 DIAGNOSTICS
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+=head1 DEPENDENCIES
+
+=head1 INCOMPATIBILITIES
+
+=head1 BUGS AND LIMITATIONS
+
+=head1 ACKNOWLEDGEMENTS
+
+=head1 SEE ALSO
+
+=cut

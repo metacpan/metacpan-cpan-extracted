@@ -55,7 +55,7 @@ SYNOPSIS
         $result = $cust_sth_ins->as_string;
         # INSERT INTO customers (first_name, last_name, email, active) VALUES('Paul', 'Goldman', 'paul\@example.org', '0')
         $dbh->commit;
-        ## Get the last used insert id
+        # Get the last used insert id
         my $id = $dbh->last_insert_id();
 
         $cust->where( email => 'john@example.org' );
@@ -72,11 +72,11 @@ SYNOPSIS
         # Would become:
         # UPDATE ONLY customers SET active='0' WHERE email='john\@example.org'
 
-        ## Lets' dump the result of our query
-        ## First to STDERR
+        # Lets' dump the result of our query
+        # First to STDERR
         $login->where( "login='jack'" );
         $login->select->dump();
-        ## Now dump the result to a file
+        # Now dump the result to a file
         $login->select->dump( "my_file.txt" );
 
 Using fields objects
@@ -131,7 +131,7 @@ so you can use placeholder objects to make it work:
 VERSION
 =======
 
-        v0.10.2
+        v0.10.4
 
 DESCRIPTION
 ===========
@@ -1003,6 +1003,13 @@ order
 See [\"order\" in
 DB::Object::Tables](https://metacpan.org/pod/DB::Object::Tables#order){.perl-module}
 
+P
+-
+
+Returns a
+[DB::Object::Placeholder](https://metacpan.org/pod/DB::Object::Placeholder){.perl-module}
+object, passing it whatever arguments was provided.
+
 param
 -----
 
@@ -1094,6 +1101,13 @@ ping\_select
 Will prepare and execute a simple `SELECT 1` and return 0 upon failure
 or return the value returned from calling [\"execute\" in
 DBI](https://metacpan.org/pod/DBI#execute){.perl-module}.
+
+placeholder
+-----------
+
+Same as [\"P\"](#p){.perl-module}. Returns a
+[DB::Object::Placeholder](https://metacpan.org/pod/DB::Object::Placeholder){.perl-module}
+object, passing it whatever arguments was provided.
 
 port
 ----
@@ -1274,6 +1288,12 @@ tie
 
 See [\"tie\" in
 DB::Object::Tables](https://metacpan.org/pod/DB::Object::Tables#tie){.perl-module}
+
+transaction
+-----------
+
+True when a transaction has been started with
+[\"begin\_work\"](#begin_work){.perl-module}, false otherwise.
 
 TRUE
 ----
@@ -1613,7 +1633,7 @@ SEE ALSO
 AUTHOR
 ======
 
-Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x557467ec43f8)"}\>
+Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x55bf74e28d40)"}\>
 
 COPYRIGHT & LICENSE
 ===================

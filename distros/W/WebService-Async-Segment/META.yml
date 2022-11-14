@@ -1,0 +1,81 @@
+---
+abstract: 'Unofficial support for the Segment service'
+author:
+  - 'DERIV <DERIV@cpan.org>'
+build_requires:
+  Clone: '0'
+  Data::UUID: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Path::Tiny: '0'
+  Test::CheckDeps: '0.010'
+  Test::Fatal: '0'
+  Test::MockModule: '0'
+  Test::MockObject: '0'
+  Test::More: '0.98'
+  Test::NoWarnings: '0'
+  Test::Warnings: '0'
+  Time::Moment: '0'
+  URI: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '7.64'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-Async-Segment
+no_index:
+  directory:
+    - eg
+    - share
+    - shares
+    - t
+    - xt
+provides:
+  WebService::Async::Segment:
+    file: lib/WebService/Async/Segment.pm
+    version: '0.001'
+  WebService::Async::Segment::Customer:
+    file: lib/WebService/Async/Segment/Customer.pm
+    version: '0.001'
+requires:
+  IO::Async::Loop: '0'
+  IO::Async::Notifier: '0'
+  IO::Async::SSL: '0'
+  JSON::MaybeUTF8: '0'
+  Log::Any: '0'
+  Log::Any::Adapter: '0'
+  Net::Async::HTTP: '0'
+  Path::Tiny: '0'
+  Scalar::Util: '0'
+  Syntax::Keyword::Try: '0'
+  Time::Moment: '0'
+  URI: '0'
+  URI::Escape: '0'
+  URI::QueryParam: '0'
+  URI::Template: '0'
+  constant: '0'
+  indirect: '0'
+  parent: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/binary-com/perl-WebService-Async-Segment/issues
+  homepage: https://github.com/binary-com/perl-WebService-Async-Segment
+  repository: https://github.com/binary-com/perl-WebService-Async-Segment.git
+version: '0.001'
+x_authority: cpan:DERIV
+x_contributors:
+  - 'chylli-binary <chylli@binary.com>'
+  - 'felipe-binary <64797927+felipe-binary@users.noreply.github.com>'
+  - 'Kirill Sysoev <55120154+kirill-binary@users.noreply.github.com>'
+  - 'mat-fs <53427463+mat-fs@users.noreply.github.com>'
+  - 'Tom Molesworth <tom@binary.com>'
+x_generated_by_perl: v5.26.2
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

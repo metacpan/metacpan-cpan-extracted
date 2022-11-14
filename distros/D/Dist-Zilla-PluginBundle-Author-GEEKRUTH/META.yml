@@ -13,18 +13,22 @@ build_requires:
   warnings: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
   perl: '5.010'
-dynamic_config: '0'
-generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.028, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Dist-Zilla-PluginBundle-Author-GEEKRUTH
 provides:
+  Dist::Zilla::MintingProfile::GEEKRUTH:
+    file: lib/Dist/Zilla/MintingProfile/GEEKRUTH.pm
+    version: '2.0000'
   Dist::Zilla::PluginBundle::Author::GEEKRUTH:
     file: lib/Dist/Zilla/PluginBundle/Author/GEEKRUTH.pm
-    version: '1.0202'
+    version: '2.0000'
 requires:
   Code::TidyAll::Plugin::Test::Vars: '0'
   Dist::Zilla: '0'
@@ -50,14 +54,12 @@ requires:
   Dist::Zilla::Plugin::Git::Tag: '0'
   Dist::Zilla::Plugin::GitLab::Meta: '0'
   Dist::Zilla::Plugin::GitLab::Update: '0'
-  Dist::Zilla::Plugin::INI::Baked: '0'
   Dist::Zilla::Plugin::InstallGuide: '0'
   Dist::Zilla::Plugin::InstallRelease: '0'
   Dist::Zilla::Plugin::License: '0'
   Dist::Zilla::Plugin::MakeMaker: '0'
   Dist::Zilla::Plugin::Manifest: '0'
   Dist::Zilla::Plugin::ManifestSkip: '0'
-  Dist::Zilla::Plugin::MetaData::BuiltWith: '0'
   Dist::Zilla::Plugin::MetaJSON: '0'
   Dist::Zilla::Plugin::MetaProvides::Package: '0'
   Dist::Zilla::Plugin::MetaYAML: '0'
@@ -72,12 +74,14 @@ requires:
   Dist::Zilla::Plugin::ReadmeMarkdownFromPod: '0'
   Dist::Zilla::Plugin::RunExtraTests: '0'
   Dist::Zilla::Plugin::SchwartzRatio: '0'
+  Dist::Zilla::Plugin::ShareDir: '0'
   Dist::Zilla::Plugin::Test::Compile: '0'
   Dist::Zilla::Plugin::Test::ReportPrereqs: '0'
   Dist::Zilla::Plugin::Test::UnusedVars: '0'
   Dist::Zilla::Plugin::TestRelease: '0'
   Dist::Zilla::Plugin::TidyAll: '0'
   Dist::Zilla::Plugin::UploadToCPAN: '0'
+  Dist::Zilla::Role::MintingProfile::ShareDir: '0'
   Dist::Zilla::Role::PluginBundle::Config::Slicer: '0'
   Dist::Zilla::Role::PluginBundle::Easy: '0'
   Dist::Zilla::Role::PluginBundle::PluginRemover: '0'
@@ -90,91 +94,12 @@ resources:
   bugtracker: https://gitlab.com/GeekRuthie/Dist-Zilla-PluginBundle-Author-GEEKRUTH/-/issues
   homepage: https://p3rl.org/Dist::Zilla::PluginBundle::Author::GEEKRUTH
   repository: https://gitlab.com/GeekRuthie/Dist-Zilla-PluginBundle-Author-GEEKRUTH.git
-version: '1.0202'
-x_BuiltWith:
-  modules:
-    CPAN::Meta: '2.150010'
-    Code::TidyAll: '0.82'
-    Code::TidyAll::Plugin::Test::Vars: '0.04'
-    Dist::Zilla: '6.025'
-    Dist::Zilla::Plugin::Authority: '1.009'
-    Dist::Zilla::Plugin::AutoPrereqs: '6.025'
-    Dist::Zilla::Plugin::CPANFile: '6.025'
-    Dist::Zilla::Plugin::ChangeStats::Git: 0.6.0
-    Dist::Zilla::Plugin::CheckChangesHasContent: '0.011'
-    Dist::Zilla::Plugin::CoalescePod: 0.3.0
-    Dist::Zilla::Plugin::ConfirmRelease: '6.025'
-    Dist::Zilla::Plugin::ContributorCovenant: '2.000000'
-    Dist::Zilla::Plugin::ContributorsFile: 0.3.0
-    Dist::Zilla::Plugin::CopyFilesFromBuild: '0.170880'
-    Dist::Zilla::Plugin::CopyrightYearFromGit: '0.009'
-    Dist::Zilla::Plugin::Covenant: 0.1.2
-    Dist::Zilla::Plugin::ExecDir: '6.025'
-    Dist::Zilla::Plugin::Git::Check: '2.048'
-    Dist::Zilla::Plugin::Git::Commit: '2.048'
-    Dist::Zilla::Plugin::Git::CommitBuild: '2.048'
-    Dist::Zilla::Plugin::Git::Contributors: '0.036'
-    Dist::Zilla::Plugin::Git::GatherDir: '2.048'
-    Dist::Zilla::Plugin::Git::Push: '2.048'
-    Dist::Zilla::Plugin::Git::Tag: '2.048'
-    Dist::Zilla::Plugin::GitLab::Meta: '1.0002'
-    Dist::Zilla::Plugin::GitLab::Update: '1.0002'
-    Dist::Zilla::Plugin::INI::Baked: '0.002002'
-    Dist::Zilla::Plugin::InstallGuide: '1.200014'
-    Dist::Zilla::Plugin::InstallRelease: '0.008'
-    Dist::Zilla::Plugin::License: '6.025'
-    Dist::Zilla::Plugin::MakeMaker: '6.025'
-    Dist::Zilla::Plugin::Manifest: '6.025'
-    Dist::Zilla::Plugin::ManifestSkip: '6.025'
-    Dist::Zilla::Plugin::MetaData::BuiltWith: '1.004005'
-    Dist::Zilla::Plugin::MetaJSON: '6.025'
-    Dist::Zilla::Plugin::MetaProvides::Package: '2.004003'
-    Dist::Zilla::Plugin::MetaYAML: '6.025'
-    Dist::Zilla::Plugin::MinimumPerl: '1.006'
-    Dist::Zilla::Plugin::NextRelease: '6.025'
-    Dist::Zilla::Plugin::NextVersion::Semantic: 0.2.6
-    Dist::Zilla::Plugin::OurPkgVersion: '0.21'
-    Dist::Zilla::Plugin::PodWeaver: '4.009'
-    Dist::Zilla::Plugin::Prereqs: '6.025'
-    Dist::Zilla::Plugin::Prereqs::Plugins: '1.003003'
-    Dist::Zilla::Plugin::PreviousVersion::Changelog: 0.2.6
-    Dist::Zilla::Plugin::ReadmeMarkdownFromPod: '0.141140'
-    Dist::Zilla::Plugin::RunExtraTests: '0.029'
-    Dist::Zilla::Plugin::SchwartzRatio: 0.3.4
-    Dist::Zilla::Plugin::Test::Compile: '2.058'
-    Dist::Zilla::Plugin::Test::ReportPrereqs: '0.028'
-    Dist::Zilla::Plugin::Test::UnusedVars: '2.000007'
-    Dist::Zilla::Plugin::TestRelease: '6.025'
-    Dist::Zilla::Plugin::TidyAll: '0.04'
-    Dist::Zilla::Plugin::UploadToCPAN: '6.025'
-    Dist::Zilla::Role::PluginBundle::Config::Slicer: '0.202'
-    Dist::Zilla::Role::PluginBundle::Easy: '6.025'
-    Dist::Zilla::Role::PluginBundle::PluginRemover: '0.105'
-    ExtUtils::MakeMaker: '7.62'
-    File::Spec: '3.80'
-    IO::Handle: '1.46'
-    IPC::Open3: '1.21'
-    Modern::Perl: '1.20220515'
-    Moose: '2.2201'
-    Test::More: '1.302183'
-    Test::Vars: '0.015'
-    Type::Tiny: '1.012005'
-    Types::Standard: '1.012005'
-    strict: '1.12'
-    warnings: '1.51'
-  perl:
-    original: v5.34.1
-    qv: 1
-    version:
-      - 5
-      - 34
-      - 1
-  platform: linux
+version: '2.0000'
 x_author_pledge:
-  version: '1'
+  version: 1
 x_authority: cpan:GEEKRUTH
 x_contributor_covenant:
-  version: '0.02'
-x_generated_by_perl: v5.34.1
+  version: 0.02
+x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

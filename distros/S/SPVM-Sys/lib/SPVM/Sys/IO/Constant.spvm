@@ -241,4 +241,18 @@ class Sys::IO::Constant {
   native static method LOCK_UN : int ();
 
   native static method AT_EACCESS : int ();
+
+  native static method STDIN_FILENO : int ();
+
+  native static method STDOUT_FILENO : int ();
+
+  native static method STDERR_FILENO : int ();
+
+  native static method BUFSIZ : int ();
+
+  native static method _IONBF : int ();
+
+  native static method _IOLBF : int ();
+
+  native static method _IOFBF : int ();
 }

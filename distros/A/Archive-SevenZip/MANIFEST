@@ -24,6 +24,7 @@ t/03-archive-from-stdin.t
 t/05_tree.t
 t/20_bug_github11.t
 t/21_zip64.t
+t/22_deflated_dir.t
 t/badjpeg/expected.jpg
 t/badjpeg/source.zip
 t/common.pm
@@ -38,6 +39,7 @@ t/data/emptydefstr.zip
 t/data/emptystore.zip
 t/data/emptystorestr.zip
 t/data/fred
+t/data/fred.7z
 t/data/good_github11.zip
 t/data/jar.zip
 t/data/linux.zip
@@ -59,4 +61,5 @@ xt/99-test-prerequisites.t
 xt/99-todo.t
 xt/99-unix-text.t
 xt/99-versions.t
+xt/copyright.t
 xt/meta-lint.t

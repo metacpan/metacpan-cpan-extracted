@@ -2,8 +2,8 @@ NAME
     App::BPOMUtils - Utilities related to BPOM
 
 VERSION
-    This document describes version 0.013 of App::BPOMUtils (from Perl
-    distribution App-BPOMUtils), released on 2022-11-02.
+    This document describes version 0.014 of App::BPOMUtils (from Perl
+    distribution App-BPOMUtils), released on 2022-11-10.
 
 SYNOPSIS
      # Use via the included scripts

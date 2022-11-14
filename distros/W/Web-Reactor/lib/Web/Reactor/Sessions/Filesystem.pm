@@ -1,10 +1,12 @@
 ##############################################################################
 ##
 ##  Web::Reactor application machinery
-##  2013-2016 (c) Vladi Belperchinov-Shabanski "Cade"
-##  <cade@bis.bg> <cade@biscom.net> <cade@cpan.org>
-##
+##  Copyright (c) 2013-2022 Vladi Belperchinov-Shabanski "Cade"
+##        <cade@noxrun.com> <cade@bis.bg> <cade@cpan.org>
+##  http://cade.noxrun.com
+##  
 ##  LICENSE: GPLv2
+##  https://github.com/cade-vs/perl-web-reactor
 ##
 ##############################################################################
 package Web::Reactor::Sessions::Filesystem;
@@ -150,10 +152,12 @@ sub _key_to_fn
   my $r = shift @key; # this should be type
   boom "invalid key component 0, needs ALPHANUMERIC type, got [$r]" unless $r =~ /^[A-Z]+$/;
   
-  my $vd = $self->{ 'ENV' }{ 'SESS_VAR_DIR' };
+  my $cfg = $self->get_cfg();
+  
+  my $vd = $cfg->{ 'SESS_VAR_DIR' };
   if( ! $vd )
     {
-    my $app_root = $self->{ 'ENV' }{ 'APP_ROOT' };
+    my $app_root = $cfg->{ 'APP_ROOT' };
     boom "missing APP_ROOT" unless -d $app_root; # FIXME: function? get_app_root()
     $vd = "$app_root/var";
     }

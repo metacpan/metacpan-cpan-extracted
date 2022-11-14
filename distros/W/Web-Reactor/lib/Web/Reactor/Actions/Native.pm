@@ -1,10 +1,12 @@
 ##############################################################################
 ##
 ##  Web::Reactor application machinery
-##  2013-2016 (c) Vladi Belperchinov-Shabanski "Cade"
-##  <cade@bis.bg> <cade@biscom.net> <cade@cpan.org>
-##
+##  Copyright (c) 2013-2022 Vladi Belperchinov-Shabanski "Cade"
+##        <cade@noxrun.com> <cade@bis.bg> <cade@cpan.org>
+##  http://cade.noxrun.com
+##  
 ##  LICENSE: GPLv2
+##  https://github.com/cade-vs/perl-web-reactor
 ##
 ##############################################################################
 package Web::Reactor::Actions::Native;
@@ -66,17 +68,19 @@ sub __find_act_pkg
   
   return $act_cache->{ $name } if exists $act_cache->{ $name };
 
-  my $app_name = lc $self->{ 'ENV' }{ 'APP_NAME' };
-  my $dirs = $self->{ 'ENV' }{ 'LIB_DIRS' } || [];
+  my $cfg = $self->get_cfg();
+
+  my $app_name = lc $cfg->{ 'APP_NAME' };
+  my $dirs     =    $cfg->{ 'LIB_DIRS' } || [];
   if( @$dirs == 0 )
     {
-    my $app_root = $self->{ 'ENV' }{ 'APP_ROOT' };
+    my $app_root = $cfg->{ 'APP_ROOT' };
     boom "missing APP_ROOT" unless -d $app_root; # FIXME: function? get_app_root()
     $dirs = [ "$app_root/lib" ]; # FIXME: 'act' actions ?
     }
 
   # actions sets list
-  my @asl = @{ $self->{ 'ENV' }{ 'ACTIONS_SETS' } || [] };
+  my @asl = @{ $cfg->{ 'ACTIONS_SETS' } || [] };
   @asl = ( $app_name, "Base", "Core" ) unless @asl > 0;
 
   # action package
@@ -106,29 +110,6 @@ sub __find_act_pkg
       {
       print STDERR "ERROR LOADING: action: $ap: $@\n";
       }  
-    
-
-    next;
-=pod
-    my $fn = $ap;
-    $fn =~ s/::/\//g;
-    # paths
-    for my $p ( @$dirs )
-      {
-      my $ffn = "$p/$fn.pm";
-  
-      print STDERR "looking for file, action: $ap --> $fn --> $ffn\n";
-  
-      next unless -e $ffn;
-      # FIXME: check require status!
-      print STDERR "FOUND! action: $ap --> $fn --> $ffn\n";
-      require $ffn;
-      print STDERR "LOADED! action: $ap --> $fn --> $ffn\n";
-      # print "FOUND ", %INC;
-      $act_cache->{ $name } = $ap;
-      return $ap;
-      }
-=cut  
   }
 
   return undef;

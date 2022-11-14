@@ -1,5 +1,12 @@
 Revision history for Acme::Glue
 
+2022.11
+    - a perl quine
+
+2022.05
+    - snippet from "How Perl Saved the Human Genome Project"
+	- complete with syntax error :)
+
 2022.04
     - vec/pack examples from perldoc vec
 

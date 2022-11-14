@@ -1,3 +1,12 @@
+0.004   2022-08-25  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Tweak/add examples.
+
+        - Fix typos in description.
+
+
 0.003   2022-07-17  Released-By: PERLANCAR; Urgency: low
 
         - Remove manual test script because we are now using

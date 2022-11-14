@@ -1,16 +1,28 @@
 class Sys::IO::Stat : pointer_t {
   # Class methods
   native static method new : Sys::IO::Stat ();
+
+  native static method stat_raw : int ($path : string, $stat : Sys::IO::Stat);
   
+  native static method stat : int ($path : string, $stat : Sys::IO::Stat);
+  
+  native static method lstat_raw : int ($path : string, $stat : Sys::IO::Stat);
+  
+  native static method lstat : int ($path : string, $stat : Sys::IO::Stat);
+  
+  native static method fstat_raw : int ($fd : int, $stat : Sys::IO::Stat);
+
+  native static method fstat : int ($fd : int, $stat : Sys::IO::Stat);
+
   # Instance methods
   native method DESTROY : void ();
-  native method st_dev : int ();
-  native method st_ino : int ();
+  native method st_dev : long ();
+  native method st_ino : long ();
   native method st_mode : int ();
-  native method st_nlink : int ();
+  native method st_nlink : long ();
   native method st_uid : int ();
   native method st_gid : int ();
-  native method st_rdev : int ();
+  native method st_rdev : long ();
   native method st_size : long ();
   native method st_blksize : long ();
   native method st_blocks : long ();

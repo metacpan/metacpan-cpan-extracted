@@ -246,7 +246,7 @@ sub structure
     };
     my $sth1 = $self->prepare_cached( "SELECT * FROM sqlite_master WHERE name = ?" ) ||
     return( $self->error( "An error occured while preparing the sql query to get the details of table \"$table\": ", $self->errstr() ) );
-    $sth1->execute( $table ) || return( $self->error( "An erro occured while executing the sql query to get the details of table \"$table\": ", $sth1->errstr() ) );
+    $sth1->execute( $table ) || return( $self->error( "An error occured while executing the sql query to get the details of table \"$table\": ", $sth1->errstr() ) );
     my $def = $sth1->fetchrow_hashref;
     $sth1->finish;
     # table or view

@@ -10,6 +10,7 @@ my @files = (
     'lib/Protocol/FIX.pm',
     'lib/Protocol/FIX/BaseComposite.pm',
     'lib/Protocol/FIX/Component.pm',
+    'lib/Protocol/FIX/Component.pod',
     'lib/Protocol/FIX/Field.pm',
     'lib/Protocol/FIX/Group.pm',
     'lib/Protocol/FIX/Message.pm',
@@ -32,8 +33,19 @@ my @files = (
     't/21-parse.t',
     't/50-synopsis.t',
     't/data/extension-sample.xml',
-    't/rc/.perlcriticrc',
-    't/rc/.perltidyrc'
+    't/rc/perlcriticrc',
+    't/rc/perltidyrc',
+    'xt/author/critic.t',
+    'xt/author/distmeta.t',
+    'xt/author/eol.t',
+    'xt/author/minimum-version.t',
+    'xt/author/mojibake.t',
+    'xt/author/no-tabs.t',
+    'xt/author/pod-syntax.t',
+    'xt/author/portability.t',
+    'xt/author/test-version.t',
+    'xt/release/common_spelling.t',
+    'xt/release/cpan-changes.t'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

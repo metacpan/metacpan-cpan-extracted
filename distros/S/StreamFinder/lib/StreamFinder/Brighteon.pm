@@ -573,6 +573,10 @@ sub new
 		$self->{'articonurl'} = $1  if ($authorstuff =~ m# src\=\"([^\"]+)#s);
 		print STDERR "---CHANNEL ICON URL=".$self->{'articonurl'}."=\n"  if ($DEBUG);
 	}
+	if ($html =~ m#©(.+?)All\s+Rights#s) {
+		my $copyright = $1;
+		$self->{'year'} = $1  if ($copyright =~ /(\d\d\d\d)/);
+	}
 	print STDERR "\n--ID=".$self->{'id'}."=\n--ARTIST=".$self->{'artist'}."=\n--TITLE=".$self->{'title'}."=\n--CNT=".$self->{'cnt'}."=\n--ICON=".$self->{'iconurl'}."=\n--DESC=".$self->{'description'}."=\n--streams=".join('|',@{$self->{'streams'}})."=\n"  if ($DEBUG);
 
 	#IF WE DIDN'T FIND ANY STREAMS IN THE PAGE, TRY youtube-dl:
@@ -623,7 +627,7 @@ sub new
 	$self->{'Url'} = ($self->{'cnt'} > 0) ? $self->{'streams'}->[0] : '';
 	print STDERR "--SUCCESS: 1st stream=".$self->{'Url'}."= total=".$self->{'total'}."=\n"
 			if ($DEBUG && $self->{'cnt'} > 0);
-	print STDERR "\n--ID=".$self->{'id'}."=\n--TITLE=".$self->{'title'}."=\n--CNT=".$self->{'cnt'}."=\n--ICON=".$self->{'iconurl'}."=\n--1ST=".$self->{'Url'}."=\n--streams=".join('|',@{$self->{'streams'}})."=\n"  if ($DEBUG);
+	print STDERR "\n--ID=".$self->{'id'}."=\n--TITLE=".$self->{'title'}."=\n--YEAR=".$self->{'year'}."=\n--CNT=".$self->{'cnt'}."=\n--ICON=".$self->{'iconurl'}."=\n--1ST=".$self->{'Url'}."=\n--streams=".join('|',@{$self->{'streams'}})."=\n"  if ($DEBUG);
 	$self->_log($url);
 
 	bless $self, $class;   #BLESS IT!

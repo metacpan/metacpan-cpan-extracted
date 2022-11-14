@@ -1,5 +1,8 @@
 Revision history for Music-Duration
 
+0.0901 2022-11-12 08:35:55
+    - Disambiguate tuple name from 128th note in the SYNOPSIS.
+
 0.0900 2021-04-09 22:45:32
     - Update the eg/ programs.
     - Use x, y & z instead of y, x & o for 32nd, 64th & 128th notes.

@@ -1,40 +1,224 @@
-class IO::File extends IO::Handle : precompile {
-  use IO::FileHandle;
+class IO::File extends IO::Handle {
+  use Sys::IO;
   use Fn;
   use Array;
+  use Sys::IO::FileStream;
+  use Sys::Ioctl;
+  use StringBuffer;
   
   # Fields
   has auto_flush : rw byte;
-  has fh : private IO::FileHandle;
+  has stream : private Sys::IO::FileStream;
   
   # Class methods
-  native static method STDERR : int ();
-  native static method STDIN : int ();
-  native static method STDOUT : int ();
-  native static method open : IO::File ($file_name : string, $open_mode : string);
+
+  static method new : IO::File ($file_name = undef : string, $open_mode = undef : string) {
+    my $self = new IO::File;
+    
+    $self->init;
+    
+    if ($file_name) {
+      $self->open($file_name, $open_mode);
+    }
+    
+    return $self;
+  }
+
+  static method new_from_fd : IO::Handle ($fd : int, $open_mode = undef : string) {
+    my $self = new IO::File;
+    
+    $self->init;
+    
+    $self->fdopen($fd, $open_mode);
+    
+    return $self;
+  }
+
+  method open : void ($file_name : string, $open_mode : string) {
+    
+    my $valid_mode = 0;
+    my $real_mode : string;
+    if ($open_mode eq "<") {
+      $valid_mode = 1;
+      $real_mode = "rb";
+    }
+    elsif ($open_mode eq ">") {
+      $valid_mode = 1;
+      $real_mode = "wb";
+    }
+    elsif ($open_mode eq ">>") {
+      $valid_mode = 1;
+      $real_mode = "wa";
+    }
+    elsif ($open_mode eq "+<") {
+      $valid_mode = 1;
+      $real_mode = "r+b";
+    }
+    elsif ($open_mode eq "+>") {
+      $valid_mode = 1;
+      $real_mode = "w+b";
+    }
+    elsif ($open_mode eq "+>>") {
+      $valid_mode = 1;
+      $real_mode = "a+b";
+    }
+    else {
+      $valid_mode = 0;
+    }
+    unless ($valid_mode) {
+      die "Invalid open mode $open_mode";
+    }
+    
+    my $stream = Sys::IO->fopen($file_name, $real_mode);
+    
+    $self->{stream} = $stream;
+  }
+
+  method fdopen : void ($fd : int, $open_mode : string) {
+    
+    my $valid_mode = 0;
+    my $real_mode : string;
+    if ($open_mode eq "<") {
+      $valid_mode = 1;
+      $real_mode = "rb";
+    }
+    elsif ($open_mode eq ">") {
+      $valid_mode = 1;
+      $real_mode = "wb";
+    }
+    elsif ($open_mode eq ">>") {
+      $valid_mode = 1;
+      $real_mode = "wa";
+    }
+    elsif ($open_mode eq "+<") {
+      $valid_mode = 1;
+      $real_mode = "r+b";
+    }
+    elsif ($open_mode eq "+>") {
+      $valid_mode = 1;
+      $real_mode = "w+b";
+    }
+    elsif ($open_mode eq "+>>") {
+      $valid_mode = 1;
+      $real_mode = "a+b";
+    }
+    else {
+      $valid_mode = 0;
+    }
+    unless ($valid_mode) {
+      die "Invalid open mode $open_mode";
+    }
+    
+    my $stream = Sys::IO->fdopen($fd, $real_mode);
+    
+    $self->{stream} = $stream;
+  }
+
+  method init : void () {
+    $self->SUPER::init;
+  }
+  
+  method DESTROY : void () {
+    if ($self->{stream}) {
+      $self->flush;
+    }
+  }
   
   # Instance methods
-  native method flush : void ();
-  native method print : void ($string : string);
-  native method read : int ($bufer : mutable string);
-  native method readline : string ();
+  method getline : string () {
+    my $stream = $self->{stream};
+    my $line = Sys::IO->readline($stream);
+    return $line;
+  }
   
-  method slurp : string ($file : string) {
+  method getlines : string () {
     
     my $buffer_length = 4096;
     my $buffer = (mutable string)new_string_len $buffer_length;
-    my $string = "";
+    my $string_buffer = StringBuffer->new;
     while (1) {
-      my $read_length = $self->read($buffer);
+      my $read_length = $self->read($buffer, length $buffer);
       
       if ($read_length < $buffer_length) {
-        $string .= Fn->substr($buffer, 0, $read_length);
+        $string_buffer->push(Fn->substr($buffer, 0, $read_length));
         last;
       }
       else {
-        $string .= (string)$buffer;
+        $string_buffer->push($buffer);
       }
     }
+    
+    my $string = $string_buffer->to_string;
+    
     return $string;
+  }
+  
+  method close : int () {
+    my $stream = $self->{stream};
+    
+    my $status = Sys::IO->fclose($stream);
+    
+    return $status;
+  }
+  
+  method eof : int () {
+    my $stream = $self->{stream};
+    return Sys::IO->feof($stream);
+  }
+  
+  method fileno : int () {
+    my $stream = $self->{stream};
+    return Sys::IO->fileno($stream);
+  }
+  
+  method getc : int () {
+    my $stream = $self->{stream};
+    return Sys::IO->getc($stream);
+  }
+  
+  method print : int ($string : string) {
+    
+    my $stream = $self->{stream};
+    
+    my $length = length $string;
+    
+    return Sys::IO->fwrite($string, 1, $length, $stream);
+  }
+  
+  method clearerr : void () {
+    
+    my $stream = $self->{stream};
+    
+    Sys::IO->clearerr($stream);
+  }
+  
+  method error : int () {
+    my $stream = $self->{stream};
+    
+    return Sys::IO->ferror($stream);
+  }
+  
+  method flush : int () {
+    my $stream = $self->{stream};
+    
+    return Sys::IO->fflush($stream);
+  }
+  
+  method ungetc : int ($c : int) {
+    my $stream = $self->{stream};
+    
+    return Sys::IO->ungetc($c, $stream);
+  }
+
+  method syswrite : int ($buffer : string, $length : int, $offset = 0 : int) {
+    my $stream = $self->{stream};
+    
+    return Sys::IO->fwrite($buffer, 1, $length, $stream);
+  }
+  
+  method sysread : int ($buffer : mutable string, $length : int, $offset = 0 : int) {
+    my $stream = $self->{stream};
+    
+    return Sys::IO->fread($buffer, 1, $length, $stream);
   }
 }

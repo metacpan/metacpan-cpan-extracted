@@ -34,3 +34,5 @@ $outpath //= $outdir . '/' . $save->{'filename'};
 
 open(my $fh, '>', $outpath) or die("Unable to create file: $outpath");
 print $fh $save->{'data'};
+
+1;

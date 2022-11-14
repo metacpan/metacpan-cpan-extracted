@@ -4,13 +4,13 @@
       "Masayoshi Sekimura <sekimura@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380",
+   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Text-Markdown-Discount",
    "no_index" : {
@@ -18,6 +18,21 @@
          "t",
          "inc"
       ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {}
+      }
    },
    "release_status" : "stable",
    "resources" : {
@@ -27,5 +42,6 @@
          "web" : "https://github.com/sekimura/text-markdown-discount"
       }
    },
-   "version" : "0.13"
+   "version" : "0.14",
+   "x_serialization_backend" : "JSON::PP version 4.02"
 }

@@ -11,7 +11,7 @@ package UTF8::R2;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.24';
+$VERSION = '0.25';
 $VERSION = $VERSION;
 
 use strict;
@@ -98,7 +98,7 @@ my $bare_v = '\x0A\x0B\x0C\x0D';
 my $bare_w = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_';
 
 #---------------------------------------------------------------------
-# exports %mb
+# exports mb package
 sub import {
     my $self = shift @_;
 
@@ -113,9 +113,39 @@ sub import {
 
     for (@_) {
 
-        # export %mb
-        if ($_ eq '%mb') {
+        # export *mb
+        if ($_ eq '*mb') {
             no strict qw(refs);
+
+            # tie my %mb, __PACKAGE__; # makes: Parentheses missing around "my" list
+            tie my %mb, 'UTF8::R2';
+            *{caller().'::mb'} = \%mb;
+
+            # supports mb package
+            *{caller().'::mb::ORIG_PROGRAM_NAME'} = \$UTF8::R2::ORIG_PROGRAM_NAME;
+            *{caller().'::mb::PERL'}              = \$UTF8::R2::PERL;
+            *{caller().'::mb::chop'}              = \&UTF8::R2::chop;
+            *{caller().'::mb::chr'}               = \&UTF8::R2::chr;
+            *{caller().'::mb::do'}                = \&UTF8::R2::do;
+            *{caller().'::mb::eval'}              = \&UTF8::R2::eval;
+            *{caller().'::mb::getc'}              = \&UTF8::R2::getc;
+            *{caller().'::mb::index'}             = \&UTF8::R2::index;
+            *{caller().'::mb::index_byte'}        = \&UTF8::R2::index_byte;
+            *{caller().'::mb::length'}            = \&UTF8::R2::length;
+            *{caller().'::mb::ord'}               = \&UTF8::R2::ord;
+            *{caller().'::mb::require'}           = \&UTF8::R2::require;
+            *{caller().'::mb::reverse'}           = \&UTF8::R2::reverse;
+            *{caller().'::mb::rindex'}            = \&UTF8::R2::rindex;
+            *{caller().'::mb::rindex_byte'}       = \&UTF8::R2::rindex_byte;
+            *{caller().'::mb::split'}             = \&UTF8::R2::split;
+            *{caller().'::mb::substr'}            = \&UTF8::R2::substr;
+            *{caller().'::mb::tr'}                = \&UTF8::R2::tr;
+        }
+
+        # export %mb
+        elsif ($_ eq '%mb') {
+            no strict qw(refs);
+
             # tie my %mb, __PACKAGE__; # makes: Parentheses missing around "my" list
             tie my %mb, 'UTF8::R2';
             *{caller().'::mb'} = \%mb;
@@ -190,16 +220,6 @@ package %s;
 #line %s "%s"
 CORE::do "$_[0]";
 END
-}
-
-#---------------------------------------------------------------------
-# mb::dosglob() like glob(), mb.pm compatible
-sub UTF8::R2::dosglob (;$) {
-    my $expr = @_ ? $_[0] : $_;
-
-    # returns globbing result
-    my %glob = map { $_ => 1 } CORE::glob($expr);
-    return sort { (UTF8::R2::uc($a) cmp UTF8::R2::uc($b)) || ($a cmp $b) } keys %glob;
 }
 
 #---------------------------------------------------------------------
@@ -815,11 +835,11 @@ sub list_all_ASCII_by_hyphen {
             $hyphened[$i+0] = ($hyphened[$i+0] eq '\\-') ? '-' : $hyphened[$i+0];
             $hyphened[$i+2] = ($hyphened[$i+2] eq '\\-') ? '-' : $hyphened[$i+2];
             if (0) { }
-            elsif ($hyphened[$i+0] !~ m/\A [\x00-\x7F] \z/oxms) {
-                confess sprintf(qq{@{[__FILE__]}: "$hyphened[$i+0]-$hyphened[$i+2]" in tr/// is not ASCII});
+            elsif ($hyphened[$i+0] !~ m/\A [\x00-\x7F] \z/xms) {
+                confess sprintf(qq{@{[__FILE__]}: "$hyphened[$i+0]-$hyphened[$i+2]" in tr/// is not US-ASCII});
             }
-            elsif ($hyphened[$i+2] !~ m/\A [\x00-\x7F] \z/oxms) {
-                confess sprintf(qq{@{[__FILE__]}: "$hyphened[$i+0]-$hyphened[$i+2]" in tr/// is not ASCII});
+            elsif ($hyphened[$i+2] !~ m/\A [\x00-\x7F] \z/xms) {
+                confess sprintf(qq{@{[__FILE__]}: "$hyphened[$i+0]-$hyphened[$i+2]" in tr/// is not US-ASCII});
             }
             elsif ($hyphened[$i+0] gt $hyphened[$i+2]) {
                 confess sprintf(qq{@{[__FILE__]}: "$hyphened[$i+0]-$hyphened[$i+2]" in tr/// is not "$hyphened[$i+0]" le "$hyphened[$i+2]"});
@@ -857,7 +877,7 @@ sub UTF8::R2::tr ($$$;$) {
         if (not exists $tr{$search[$i]}) {
 
             # tr/ABC/123/ makes %tr = ('A'=>'1','B'=>'2','C'=>'3',);
-            if (defined $replacement[$i] and ($replacement[$i] ne '')) {
+            if (defined($replacement[$i]) and ($replacement[$i] ne '')) {
                 $tr{$search[$i]} = $replacement[$i];
             }
 
@@ -867,7 +887,7 @@ sub UTF8::R2::tr ($$$;$) {
             }
 
             # tr/ABC/12/ makes %tr = ('A'=>'1','B'=>'2','C'=>'2',);
-            elsif (defined $replacement[-1] and ($replacement[-1] ne '')) {
+            elsif (defined($replacement[-1]) and ($replacement[-1] ne '')) {
                 $tr{$search[$i]} = $replacement[-1];
             }
 
@@ -1056,6 +1076,7 @@ UTF8::R2 - makes UTF-8 scripting easy for enterprise use
   use UTF8::R2 qw( RFC3629.ja_JP ); # optimized RFC3629 for ja_JP
   use UTF8::R2 qw( WTF8.ja_JP );    # optimized WTF-8 for ja_JP
   use UTF8::R2 qw( %mb );           # multibyte regex by %mb
+  use UTF8::R2 qw( *mb );           # multibyte regex by %mb, and mb::* subroutines
 
   UTF8::R2::length($_)
   UTF8::R2::qr(qr/ utf8_regex_here . \D \H \N \R \S \V \W \b \d \h \s \v \w \x{UTF8hex} [ \D \H \S \V \W \b \d \h \s \v \w \x{UTF8hex} \x{UTF8hex}-\x{UTF8hex} [:POSIX:] [:^POSIX:] ] ? + * {n} {n,} {n,m} /imsxo) # no /gc
@@ -1277,59 +1298,59 @@ If you like utf8 pragma, UTF8::R2::* subroutines will help you.
 On other hand, If you love JPerl, those subroutines will not help you very much.
 Traditional functions of Perl are useful still now in octet-oriented semantics.
 
-  elder <<<---                                   age                                   --->>> younger
-  ---------------------------------------------------------------------------------------------------
-  bare Perl4       JPerl4           use utf8;        UTF8::R2                mb.pm
-  bare Perl5       JPerl5           pragma           module                  modulino
-  ---------------------------------------------------------------------------------------------------
-  chop             ---              ---              chop                    chop
-  chr              chr              bytes::chr       chr                     chr
-  getc             getc             ---              getc                    getc
-  index            ---              bytes::index     index                   index
-  lc               ---              ---              lc                      CORE::lc (acts as tr/\x41-\x5A/\x61-\x7A/)
-  lcfirst          ---              ---              lcfirst                 CORE::lcfirst (acts as tr/\x41-\x5A/\x61-\x7A/)
-  length           length           bytes::length    length                  length
-  ord              ord              bytes::ord       ord                     ord
-  reverse          reverse          ---              reverse                 reverse
-  rindex           ---              bytes::rindex    rindex                  rindex
-  substr           substr           bytes::substr    substr                  substr
-  uc               ---              ---              uc                      CORE::uc (acts as tr/\x61-\x7A/\x41-\x5A/)
-  ucfirst          ---              ---              ucfirst                 CORE::ucfirst (acts as tr/\x61-\x7A/\x41-\x5A/)
-  ---              chop             chop             UTF8::R2::chop          mb::chop
-  ---              ---              chr              UTF8::R2::chr           mb::chr
-  ---              ---              getc             UTF8::R2::getc          mb::getc
-  ---              index            ---              UTF8::R2::index_byte    mb::index_byte
-  ---              ---              index            UTF8::R2::index         mb::index
-  ---              lc               ---              lc                      lc (also mb::lc)
-  ---              lcfirst          ---              lcfirst                 lcfirst (also mb::lcfirst)
-  ---              ---              length           UTF8::R2::length        mb::length
-  ---              ---              ord              UTF8::R2::ord           mb::ord
-  ---              ---              reverse          UTF8::R2::reverse       mb::reverse
-  ---              rindex           ---              UTF8::R2::rindex_byte   mb::rindex_byte
-  ---              ---              rindex           UTF8::R2::rindex        mb::rindex
-  ---              ---              substr           UTF8::R2::substr        mb::substr
-  ---              uc               ---              uc                      uc (also mb::uc)
-  ---              ucfirst          ---              ucfirst                 ucfirst (also mb::ucfirst)
-  ---              ---              lc               (mb::Casing::lc)        (mb::Casing::lc)
-  ---              ---              lcfirst          (mb::Casing::lcfirst)   (mb::Casing::lcfirst)
-  ---              ---              uc               (mb::Casing::uc)        (mb::Casing::uc)
-  ---              ---              ucfirst          (mb::Casing::ucfirst)   (mb::Casing::ucfirst)
-  ---------------------------------------------------------------------------------------------------
-  do 'file'        ---              do 'file'        do 'file'               do 'file'
-  eval 'string'    ---              eval 'string'    eval 'string'           eval 'string'
-  require 'file'   ---              require 'file'   require 'file'          require 'file'
-  use Module       ---              use Module       use Module              use Module
-  no Module        ---              no Module        no Module               no Module
-  ---              do 'file'        do 'file'        do 'file'               mb::do 'file'
-  ---              eval 'string'    eval 'string'    eval 'string'           mb::eval 'string'
-  ---              require 'file'   require 'file'   require 'file'          mb::require 'file'
-  ---              use Module       use Module       use Module              mb::use Module
-  ---              no Module        no Module        no Module               mb::no Module
-  $^X              ---              $^X              $^X                     $^X
-  ---              $^X              $^X              $^X                     $mb::PERL
-  $0               $0               $0               $0                      $mb::ORIG_PROGRAM_NAME
-  ---              ---              ---              ---                     $0
-  ---------------------------------------------------------------------------------------------------
+  elder <<<---                                               age                                               --->>> younger
+  ---------------------------------------------------------------------------------------------------------------------------
+  bare Perl4       JPerl4           use utf8;        use UTF8::R2;           use UTF8::R2 qw(*mb);   mb.pm
+  bare Perl5       JPerl5           pragma           module                  module                  modulino
+  ---------------------------------------------------------------------------------------------------------------------------
+  chop             ---              ---              chop                    chop                    chop
+  chr              chr              bytes::chr       chr                     chr                     chr
+  getc             getc             ---              getc                    getc                    getc
+  index            ---              bytes::index     index                   index                   index
+  lc               ---              ---              CORE::lc                CORE::lc                CORE::lc (= tr/A-Z/a-z/)
+  lcfirst          ---              ---              CORE::lcfirst           CORE::lcfirst           CORE::lcfirst (= tr/A-Z/a-z/)
+  length           length           bytes::length    length                  length                  length
+  ord              ord              bytes::ord       ord                     ord                     ord
+  reverse          reverse          ---              reverse                 reverse                 reverse
+  rindex           ---              bytes::rindex    rindex                  rindex                  rindex
+  substr           substr           bytes::substr    substr                  substr                  substr
+  uc               ---              ---              CORE::uc                CORE::uc                CORE::uc (= tr/a-z/A-Z/)
+  ucfirst          ---              ---              CORE::ucfirst           CORE::ucfirst           CORE::ucfirst (= tr/a-z/A-Z/)
+  ---              chop             chop             UTF8::R2::chop          mb::chop                mb::chop
+  ---              ---              chr              UTF8::R2::chr           mb::chr                 mb::chr
+  ---              ---              getc             UTF8::R2::getc          mb::getc                mb::getc
+  ---              index            ---              UTF8::R2::index_byte    mb::index_byte          mb::index_byte
+  ---              ---              index            UTF8::R2::index         mb::index               mb::index
+  ---              lc               ---              lc                      lc                      lc (= mb::lc)
+  ---              lcfirst          ---              lcfirst                 lcfirst                 lcfirst (= mb::lcfirst)
+  ---              ---              length           UTF8::R2::length        mb::length              mb::length
+  ---              ---              ord              UTF8::R2::ord           mb::ord                 mb::ord
+  ---              ---              reverse          UTF8::R2::reverse       mb::reverse             mb::reverse
+  ---              rindex           ---              UTF8::R2::rindex_byte   mb::rindex_byte         mb::rindex_byte
+  ---              ---              rindex           UTF8::R2::rindex        mb::rindex              mb::rindex
+  ---              ---              substr           UTF8::R2::substr        mb::substr              mb::substr
+  ---              uc               ---              uc                      uc                      uc (= mb::uc)
+  ---              ucfirst          ---              ucfirst                 ucfirst                 ucfirst (= mb::ucfirst)
+  ---              ---              lc               (mb::Casing::lc)        (mb::Casing::lc)        (mb::Casing::lc)
+  ---              ---              lcfirst          (mb::Casing::lcfirst)   (mb::Casing::lcfirst)   (mb::Casing::lcfirst)
+  ---              ---              uc               (mb::Casing::uc)        (mb::Casing::uc)        (mb::Casing::uc)
+  ---              ---              ucfirst          (mb::Casing::ucfirst)   (mb::Casing::ucfirst)   (mb::Casing::ucfirst)
+  ---------------------------------------------------------------------------------------------------------------------------
+  do 'file'        ---              do 'file'        do 'file'               do 'file'               do 'file'
+  eval 'string'    ---              eval 'string'    eval 'string'           eval 'string'           eval 'string'
+  require 'file'   ---              require 'file'   require 'file'          require 'file'          require 'file'
+  use Module       ---              use Module       use Module              use Module              use Module
+  no Module        ---              no Module        no Module               no Module               no Module
+  ---              do 'file'        do 'file'        do 'file'               mb::do 'file'           mb::do 'file'
+  ---              eval 'string'    eval 'string'    eval 'string'           mb::eval 'string'       mb::eval 'string'
+  ---              require 'file'   require 'file'   require 'file'          mb::require 'file'      mb::require 'file'
+  ---              use Module       use Module       use Module              use Module              mb::use Module
+  ---              no Module        no Module        no Module               no Module               mb::no Module
+  $^X              ---              $^X              $^X                     $^X                     $^X
+  ---              $^X              $^X              $^X                     $mb::PERL               $mb::PERL
+  $0               $0               $0               $0                      $mb::ORIG_PROGRAM_NAME  $mb::ORIG_PROGRAM_NAME
+  ---              ---              ---              ---                     ---                     $0
+  ---------------------------------------------------------------------------------------------------------------------------
 
 index brothers
 
@@ -1346,23 +1367,6 @@ index brothers
 
 The most useful of the above are UTF8::R2::index_byte() and UTF8::R2::rindex_byte(), but it's more convenient to use regular expressions than those.
 So you can forget about these subroutines.
-
-=head1 mb.pm Modulino Compatible Routines, and Variables
-
-The following subroutines and variables exist for compatibility with the mb.pm module.
-
-  -------------------------------------------------------------------
-  mb.pm Modulino            Compatible Routines, and Variables
-  -------------------------------------------------------------------
-  mb::do                    UTF8::R2::do($_)
-  mb::dosglob($_)           UTF8::R2::dosglob($_)
-  mb::eval                  UTF8::R2::eval($_)
-  mb::index_byte            UTF8::R2::index_byte($_, 'ABC', 5)
-  mb::require               UTF8::R2::require($_)
-  mb::rindex_byte           UTF8::R2::rindex_byte($_, 'ABC', 5)
-  $mb::PERL                 $UTF8::R2::PERL
-  $mb::ORIG_PROGRAM_NAME    $UTF8::R2::ORIG_PROGRAM_NAME
-  -------------------------------------------------------------------
 
 =head1 Codepoint-Semantics Regular Expression
 
@@ -1471,6 +1475,52 @@ When you need multibyte functionally, you need to use subroutines in the "UTF8::
   uc                        ---
   ucfirst                   ---
   -----------------------------------------------------------------
+
+=head1 Porting from script with mb.pm modulino
+
+=head2 mb.pm Compatible Routines, and Variables of UTF8::R2 module
+
+You can call subroutines by mb.pm-like names using "use UTF8::R2 qw(*mb);".
+
+  subroutines to scripts born in mb.pm modulino
+  --------------------------------------------------
+  mb.pm                     use UTF8::R2 qw(*mb);   
+  modulino                  module                  
+  --------------------------------------------------
+  mb::chop                  mb::chop                
+  mb::chr                   mb::chr                 
+  mb::do 'file'             mb::do 'file'           
+  mb::eval 'string'         mb::eval 'string'       
+  mb::getc                  mb::getc                
+  mb::index                 mb::index               
+  mb::index_byte            mb::index_byte          
+  mb::length                mb::length              
+  mb::ord                   mb::ord                 
+  mb::require 'file'        mb::require 'file'      
+  mb::reverse               mb::reverse             
+  mb::rindex                mb::rindex              
+  mb::rindex_byte           mb::rindex_byte         
+  mb::split                 mb::split               
+  mb::substr                mb::substr              
+  mb::tr                    mb::tr                  
+  --------------------------------------------------
+  However...
+  --------------------------------------------------
+  mb::use Module            use Module              
+  mb::no Module             no Module               
+  mb::dosglob               glob                    
+  --------------------------------------------------
+
+You can use variables by mb.pm-like names using "use UTF8::R2 qw(*mb);".
+
+  variables to scripts born in mb.pm modulino
+  --------------------------------------------------
+  mb.pm                     use UTF8::R2 qw(*mb);   
+  modulino                  module                  
+  --------------------------------------------------
+  $mb::PERL                 $mb::PERL               
+  $mb::ORIG_PROGRAM_NAME    $mb::ORIG_PROGRAM_NAME  
+  --------------------------------------------------
 
 =head1 DEPENDENCIES
 

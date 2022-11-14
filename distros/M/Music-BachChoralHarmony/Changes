@@ -1,5 +1,8 @@
 Revision history for Music-BachChoralHarmony
 
+0.0412 2022-11-12 10:44:15
+    - Improve eg/* programs.
+
 0.0411 2022-10-23 12:00:09
     - Avoid implicit imports.
 

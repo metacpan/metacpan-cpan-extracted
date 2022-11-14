@@ -9,6 +9,17 @@
 #6 git93.def
 #7 git93.git93
 #8 c139.def
+#9 drc.def
+#10 drc.drc
+#11 git105.def
+#12 git106.def
+#13 git106.git106
+#14 c154.def
+#15 code_skipping.code_skipping
+#16 c158.def
+#17 git108.def
+#18 git108.git108
+#19 wtc.def
 
 # To locate test #13 you can search for its name or the string '#13'
 
@@ -26,10 +37,19 @@ BEGIN {
     # BEGIN SECTION 1: Parameter combinations #
     ###########################################
     $rparams = {
-        'bal2'  => "-bal=2",
-        'c133'  => "-boc",
-        'def'   => "",
-        'git93' => <<'----------',
+        'bal2'          => "-bal=2",
+        'c133'          => "-boc",
+        'code_skipping' => <<'----------',
+# same as the default but tests -cs -csb and -cse
+--code-skipping
+--code-skipping-begin='#<<V'
+--code-skipping-end='#>>V'
+----------
+        'def'    => "",
+        'drc'    => "-drc",
+        'git106' => "-xlp -gnu -xci",
+        'git108' => "-wn -wfc",
+        'git93'  => <<'----------',
 -vxl='q'
 ----------
         'lpxl6' => <<'----------',
@@ -95,6 +115,158 @@ _
 $r = $c->         
 
 sql_set_env_attr( $evh, $SQL_ATTR_ODBC_VERSION, $SQL_OV_ODBC2, 0 );
+----------
+
+        'c154' => <<'----------',
+{{{{
+for (
+    $order =
+    $start_order * $nbSubOrderByOrder + $start_suborder ;
+    !exists $level_hash{$level}->{$order}
+    and $order <=
+    $stop_order * $nbSubOrderByOrder + $stop_suborder ;
+    $order++
+  )
+{
+}
+
+# has comma
+for (
+    $q = 201 ;
+    print '-' x 79,
+    "\n" ;
+    $g = (
+	$f ^ ( $w = ( $z = $m . $e ) ^ substr $e, $q )
+	  ^ ( $n = $b ^ $d | $a ^ $l )
+    ) & ( $w | $z ^ $f ^ $n ) & ( $l | $g )
+  )
+{
+    ...;
+}
+
+for (
+    $j = 0, $match_j = -1 ;
+    $j < $sub_len
+      &&
+
+      # changed from naive_string_matcher
+      $sub->[$j] eq $big->[ $i + $j ] ; $j++
+  )
+{
+    ...;
+}
+}}}}
+----------
+
+        'c158' => <<'----------',
+my $meta = try { $package->meta }
+or die "$package does not have a ->meta method\n";
+
+my ($curr) = current();
+err(@_);
+----------
+
+        'code_skipping' => <<'----------',
+%Hdr=%U2E=%E2U=%Fallback=();
+$in_charmap=$nerror=$nwarning=0;
+$.=0;
+#<<V  code skipping: perltidy will pass this verbatim without error checking
+
+    }}} {{{
+
+#>>V
+my $self=shift;
+my $cloning=shift;
+----------
+
+        'drc' => <<'----------',
+ignoreSpec( $file, "file",, \%spec,,, \%Rspec );
+----------
+
+        'git105' => <<'----------',
+use v5.36;
+
+use experimental 'for_list';
+
+for my ( $k, $v ) ( 1, 2, 3, 4 ) {
+    say "$k:$v";
+}
+say 'end';
+
+----------
+
+        'git106' => <<'----------',
+is( $module->VERSION, $expected,
+    "$main_module->VERSION matches $module->VERSION ($expected)" );
+
+ok( ( $@ eq "" && "@b" eq "1 4 5 9" ),
+    'redefinition should not take effect during the sort' );
+
+&$f(
+    ( map { $points->slice($_) } @sls1 ),
+    ( map { $n->slice($_) } @sls1 ),
+    ( map { $this->{Colors}->slice($_) } @sls1 )
+);
+
+AA(
+    "0123456789012345678901234567890123456789",
+    "0123456789012345678901234567890123456789"
+);
+
+AAAAAA(
+    "0123456789012345678901234567890123456789",
+    "0123456789012345678901234567890123456789"
+);
+
+# padded
+return !( $elem->isa('PPI::Statement::End')
+    || $elem->isa('PPI::Statement::Data') );
+
+for (
+    $s = $dbobj->seq( $k, $v, R_LAST ) ;
+    $s == 0 ;
+    $s = $dbobj->seq( $k, $v, R_PREV )
+  )
+{
+    print "$k: $v\n";
+}
+
+# excess without -xci
+fresh_perl_is( '-C-',
+    <<'abcdefghijklmnopq', {}, "ambiguous unary operator check doesn't crash" );
+Warning: Use of "-C-" without parentheses is ambiguous at - line 1.
+abcdefghijklmnopq
+
+# excess with -xci
+{
+    {
+        {
+            $self->privmsg( $to,
+                "One moment please, I shall display the groups with agendas:" );
+        }
+    }
+}
+----------
+
+        'git108' => <<'----------',
+elf->call_method(
+    method_name_foo => {
+        some_arg1       => $foo,
+        some_other_arg3 => $bar->{'baz'},
+    }
+);
+
+# leading dash
+my $species = new Bio::Species(
+    -classification => [
+        qw(
+          sapiens Homo Hominidae
+          Catarrhini Primates Eutheria
+          Mammalia Vertebrata
+          Chordata Metazoa Eukaryota
+        )
+    ]
+);
 ----------
 
         'git93' => <<'----------',
@@ -182,6 +354,56 @@ $behaviour = {
               dog   => {prowl  => "growl", pool => "drool"},
               mouse => {nibble => "kibble"},
              };
+----------
+
+        'wtc' => <<'----------',
+# both single and multiple line lists:
+@LoL = (
+    [ "fred",   "barney", ],
+    [ "george", "jane",  "elroy" ],
+    [ "homer",  "marge", "bart", ],
+);
+
+# single line
+( $name, $body ) = ( $2, $3, );
+
+# multiline, but not bare
+$text = $main->Scrolled( TextUndo, $yyy, $zzz, $wwwww,
+    selectbackgroundxxxxx => 'yellow', );
+
+# this will pass for 'h'
+my $new = {
+      %$item,
+      text => $leaf,
+      color => 'green',
+};
+
+# matches 'i'
+my @list = (
+
+    $xx,
+    $yy
+);
+
+# does not match 'h'
+$c1->create(
+    'rectangle', 40, 60, 80, 80,
+    -fill => 'red',
+    -tags => 'rectangle'
+);
+
+$dasm_frame->Button(
+    -text    => 'Locate',
+    -command => sub {
+        $target_binary = $fs->Show( -popover => 'cursor', -create  => 1, );
+    },
+)->pack( -side => 'left', );
+
+my $no_index_1_1 =
+  { 'map' =>
+      { ':key' => { name => \&string, list => { value => \&string }, }, }, };
+
+
 ----------
     };
 
@@ -404,6 +626,322 @@ $r = $c->
 
   sql_set_env_attr( $evh, $SQL_ATTR_ODBC_VERSION, $SQL_OV_ODBC2, 0 );
 #8...........
+        },
+
+        'drc.def' => {
+            source => "drc",
+            params => "def",
+            expect => <<'#9...........',
+ignoreSpec( $file, "file",, \%spec,,, \%Rspec );
+#9...........
+        },
+
+        'drc.drc' => {
+            source => "drc",
+            params => "drc",
+            expect => <<'#10...........',
+ignoreSpec( $file, "file", \%spec, \%Rspec );
+#10...........
+        },
+
+        'git105.def' => {
+            source => "git105",
+            params => "def",
+            expect => <<'#11...........',
+use v5.36;
+
+use experimental 'for_list';
+
+for my ( $k, $v ) ( 1, 2, 3, 4 ) {
+    say "$k:$v";
+}
+say 'end';
+
+#11...........
+        },
+
+        'git106.def' => {
+            source => "git106",
+            params => "def",
+            expect => <<'#12...........',
+is( $module->VERSION, $expected,
+    "$main_module->VERSION matches $module->VERSION ($expected)" );
+
+ok( ( $@ eq "" && "@b" eq "1 4 5 9" ),
+    'redefinition should not take effect during the sort' );
+
+&$f(
+    ( map { $points->slice($_) } @sls1 ),
+    ( map { $n->slice($_) } @sls1 ),
+    ( map { $this->{Colors}->slice($_) } @sls1 )
+);
+
+AA(
+    "0123456789012345678901234567890123456789",
+    "0123456789012345678901234567890123456789"
+);
+
+AAAAAA(
+    "0123456789012345678901234567890123456789",
+    "0123456789012345678901234567890123456789"
+);
+
+# padded
+return !( $elem->isa('PPI::Statement::End')
+    || $elem->isa('PPI::Statement::Data') );
+
+for (
+    $s = $dbobj->seq( $k, $v, R_LAST ) ;
+    $s == 0 ;
+    $s = $dbobj->seq( $k, $v, R_PREV )
+  )
+{
+    print "$k: $v\n";
+}
+
+# excess without -xci
+fresh_perl_is( '-C-',
+    <<'abcdefghijklmnopq', {}, "ambiguous unary operator check doesn't crash" );
+Warning: Use of "-C-" without parentheses is ambiguous at - line 1.
+abcdefghijklmnopq
+
+# excess with -xci
+{
+    {
+        {
+            $self->privmsg( $to,
+                "One moment please, I shall display the groups with agendas:" );
+        }
+    }
+}
+#12...........
+        },
+
+        'git106.git106' => {
+            source => "git106",
+            params => "git106",
+            expect => <<'#13...........',
+is($module->VERSION, $expected,
+   "$main_module->VERSION matches $module->VERSION ($expected)");
+
+ok(($@ eq "" && "@b" eq "1 4 5 9"),
+   'redefinition should not take effect during the sort');
+
+&$f((map { $points->slice($_) } @sls1),
+    (map { $n->slice($_) } @sls1),
+    (map { $this->{Colors}->slice($_) } @sls1));
+
+AA("0123456789012345678901234567890123456789",
+   "0123456789012345678901234567890123456789");
+
+AAAAAA("0123456789012345678901234567890123456789",
+       "0123456789012345678901234567890123456789");
+
+# padded
+return !(   $elem->isa('PPI::Statement::End')
+         || $elem->isa('PPI::Statement::Data'));
+
+for ($s = $dbobj->seq($k, $v, R_LAST) ;
+     $s == 0 ;
+     $s = $dbobj->seq($k, $v, R_PREV))
+{
+    print "$k: $v\n";
+}
+
+# excess without -xci
+fresh_perl_is('-C-',
+     <<'abcdefghijklmnopq', {}, "ambiguous unary operator check doesn't crash");
+Warning: Use of "-C-" without parentheses is ambiguous at - line 1.
+abcdefghijklmnopq
+
+# excess with -xci
+{
+    {
+        {
+            $self->privmsg($to,
+                   "One moment please, I shall display the groups with agendas:"
+            );
+        }
+    }
+}
+#13...........
+        },
+
+        'c154.def' => {
+            source => "c154",
+            params => "def",
+            expect => <<'#14...........',
+{
+    {
+        {
+            {
+                for (
+                    $order =
+                      $start_order * $nbSubOrderByOrder + $start_suborder ;
+                    !exists $level_hash{$level}->{$order}
+                      and $order <=
+                      $stop_order * $nbSubOrderByOrder + $stop_suborder ;
+                    $order++
+                  )
+                {
+                }
+
+                # has comma
+                for (
+                    $q = 201 ;
+                    print '-' x 79, "\n" ;
+                    $g = (
+                          $f ^ ( $w = ( $z = $m . $e ) ^ substr $e, $q )
+                          ^ ( $n = $b ^ $d | $a ^ $l )
+                    ) & ( $w | $z ^ $f ^ $n ) & ( $l | $g )
+                  )
+                {
+                    ...;
+                }
+
+                for (
+                    $j = 0, $match_j = -1 ;
+                    $j < $sub_len
+                      &&
+
+                      # changed from naive_string_matcher
+                      $sub->[$j] eq $big->[ $i + $j ] ;
+                    $j++
+                  )
+                {
+                    ...;
+                }
+            }
+        }
+    }
+}
+#14...........
+        },
+
+        'code_skipping.code_skipping' => {
+            source => "code_skipping",
+            params => "code_skipping",
+            expect => <<'#15...........',
+%Hdr        = %U2E    = %E2U      = %Fallback = ();
+$in_charmap = $nerror = $nwarning = 0;
+$.          = 0;
+#<<V  code skipping: perltidy will pass this verbatim without error checking
+
+    }}} {{{
+
+#>>V
+my $self    = shift;
+my $cloning = shift;
+#15...........
+        },
+
+        'c158.def' => {
+            source => "c158",
+            params => "def",
+            expect => <<'#16...........',
+my $meta = try { $package->meta }
+  or die "$package does not have a ->meta method\n";
+
+my ($curr) = current();
+err(@_);
+#16...........
+        },
+
+        'git108.def' => {
+            source => "git108",
+            params => "def",
+            expect => <<'#17...........',
+elf->call_method(
+    method_name_foo => {
+        some_arg1       => $foo,
+        some_other_arg3 => $bar->{'baz'},
+    }
+);
+
+# leading dash
+my $species = new Bio::Species(
+    -classification => [
+        qw(
+          sapiens Homo Hominidae
+          Catarrhini Primates Eutheria
+          Mammalia Vertebrata
+          Chordata Metazoa Eukaryota
+        )
+    ]
+);
+#17...........
+        },
+
+        'git108.git108' => {
+            source => "git108",
+            params => "git108",
+            expect => <<'#18...........',
+elf->call_method( method_name_foo => {
+    some_arg1       => $foo,
+    some_other_arg3 => $bar->{'baz'},
+} );
+
+# leading dash
+my $species = new Bio::Species( -classification => [ qw(
+    sapiens Homo Hominidae
+    Catarrhini Primates Eutheria
+    Mammalia Vertebrata
+    Chordata Metazoa Eukaryota
+) ] );
+#18...........
+        },
+
+        'wtc.def' => {
+            source => "wtc",
+            params => "def",
+            expect => <<'#19...........',
+# both single and multiple line lists:
+@LoL = (
+    [ "fred",   "barney", ],
+    [ "george", "jane",  "elroy" ],
+    [ "homer",  "marge", "bart", ],
+);
+
+# single line
+( $name, $body ) = ( $2, $3, );
+
+# multiline, but not bare
+$text = $main->Scrolled( TextUndo, $yyy, $zzz, $wwwww,
+    selectbackgroundxxxxx => 'yellow', );
+
+# this will pass for 'h'
+my $new = {
+    %$item,
+    text  => $leaf,
+    color => 'green',
+};
+
+# matches 'i'
+my @list = (
+
+    $xx,
+    $yy
+);
+
+# does not match 'h'
+$c1->create(
+    'rectangle', 40, 60, 80, 80,
+    -fill => 'red',
+    -tags => 'rectangle'
+);
+
+$dasm_frame->Button(
+    -text    => 'Locate',
+    -command => sub {
+        $target_binary = $fs->Show( -popover => 'cursor', -create => 1, );
+    },
+)->pack( -side => 'left', );
+
+my $no_index_1_1 =
+  { 'map' =>
+      { ':key' => { name => \&string, list => { value => \&string }, }, }, };
+
+#19...........
         },
     };
 

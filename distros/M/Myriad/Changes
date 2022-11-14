@@ -1,6 +1,12 @@
 
 Revision history for Myriad
 
+1.001     2022-11-11 09:42:07+08:00 Asia/Singapore
+    [Bugs fixed]
+    - Latest Future (and Future::XS) were failing tests due to `Future->needs_all`
+    being a class method, the test was incorrectly trying to use it as a plain function
+    (only affects the memory transport, not Redis)
+
 1.000     2022-09-05 10:25:25+08:00 Asia/Singapore
     [API changes]
     - The --service_name parameter has been dropped, since it makes no sense when

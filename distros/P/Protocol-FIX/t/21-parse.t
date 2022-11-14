@@ -155,8 +155,8 @@ subtest "simple message (Logon)" => sub {
     ok $mi;
     is $err, undef;
 
-    is $mi->name,     'Logon';
-    is $mi->category, 'admin';
+    is $mi->name,                   'Logon';
+    is $mi->category,               'admin';
     is $mi->value('SenderCompID'),  'me';
     is $mi->value('TargetCompID'),  'you';
     is $mi->value('MsgSeqNum'),     '1';
@@ -174,8 +174,8 @@ subtest "message with component (MarketDataRequestReject)" => sub {
         ok $mi;
         is $err, undef;
 
-        is $mi->name,     'MarketDataRequestReject';
-        is $mi->category, 'app';
+        is $mi->name,                  'MarketDataRequestReject';
+        is $mi->category,              'app';
         is $mi->value('SenderCompID'), 'me';
         is $mi->value('TargetCompID'), 'you';
         is $mi->value('MsgSeqNum'),    '1';
@@ -184,7 +184,7 @@ subtest "message with component (MarketDataRequestReject)" => sub {
 
         my $group = $mi->value('MDRjctGrp')->value('NoAltMDSource');
         ok $group;
-        is scalar(@$group), 1;
+        is scalar(@$group),                     1;
         is $group->[0]->value('AltMDSourceID'), 'def';
     };
 
@@ -274,7 +274,7 @@ subtest "message with group (Logon)" => sub {
 
     my $group = $mi->value('NoMsgTypes');
     ok $group;
-    is scalar(@$group), 1;
+    is scalar(@$group),                    1;
     is $group->[0]->value('RefMsgType'),   'abc';
     is $group->[0]->value('MsgDirection'), 'SEND';
 };
@@ -287,10 +287,10 @@ subtest "Complex message: component, with group of components" => sub {
     ok $mi;
     is $err, undef;
 
-    is $mi->value('IOIID'),        'abc';
-    is $mi->value('IOITransType'), 'CANCEL';
-    is $mi->value('IOIQty'),       'LARGE';
-    is $mi->value('Side'),         'BORROW';
+    is $mi->value('IOIID'),                           'abc';
+    is $mi->value('IOITransType'),                    'CANCEL';
+    is $mi->value('IOIQty'),                          'LARGE';
+    is $mi->value('Side'),                            'BORROW';
     is $mi->value('OrderQtyData')->value('OrderQty'), '499';
     is $mi->value('Instrument')->value('Symbol'),     'EURUSD';
 
@@ -316,6 +316,11 @@ subtest "MarketDataRequest with 2 instruments" => sub {
     );
     my ($mi, $err) = $proto->parse_message(\$buff);
     ok $mi;
+
+    my $syms = $mi->value('InstrmtMDReqGrp')->value('NoRelatedSym');
+    is $syms->[0]->value('Instrument')->value('Symbol'), '1HZ100V';
+    is $syms->[1]->value('Instrument')->value('Symbol'), 'R_100';
+
     is $err, undef;
 };
 

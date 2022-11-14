@@ -8,7 +8,7 @@
 #   The GNU General Public License, Version 3, June 2007
 #
 package Software::Copyright::Statement;
-$Software::Copyright::Statement::VERSION = '0.004';
+$Software::Copyright::Statement::VERSION = '0.005';
 use 5.20.0;
 use warnings;
 
@@ -22,6 +22,8 @@ no warnings qw/experimental::postderef experimental::signatures/;
 
 use overload '""' => \&stringify;
 use overload 'cmp' => \&compare;
+use overload '==' => \&_equal;
+use overload 'eq' => \&_equal;
 
 has span => (
     is => 'ro',
@@ -50,7 +52,7 @@ sub __clean_copyright ($c) {
     $c =~ s/\b(\d{4}),?\s+([\S^\d])/$1, $2/g;
     $c =~ s/\s+by\s+//g;
     $c =~ s/(\\n)*all\s+rights?\s+reserved\.?(\\n)*\s*//gi; # yes there are literal \n
-    $c = 'no-info-found' if $c =~ /^\*No/;
+    $c = '' if $c =~ /^\*No copyright/i;
     $c =~ s/\(r\)//g;
     $c =~ s!^[\s,/*]|[\s,#/*-]+$!!g;
     $c =~ s/--/-/g;
@@ -70,7 +72,7 @@ sub __split_copyright ($c) {
         ($owner,$years) = $c =~ m/(.*?)(\d\d[\s,\d-]+)?$/;
     }
 
-    return $c unless $owner;
+    $owner //='';
 
     my @data = defined $years ? split /(?<=\d)[,\s]+/, $years : ();
     $owner =~ s/^[\s.,-]+|[\s,*-]+$//g;
@@ -91,7 +93,8 @@ around BUILDARGS => sub ($orig, $class, @args) {
         # take care of ranges written like 2014-15
         $year =~ s/^(\d\d)(\d\d)-(\d\d)$/$1$2-$1$3/;
         eval {
-            $span->set_range_as_string($year, $owner->identifier);
+            # the value stored in range is not used.
+            $span->set_range_as_string($year, $owner->identifier // 'unknown');
         };
         if ($@) {
             warn "Invalid year span: '$year': $@";
@@ -108,12 +111,17 @@ around BUILDARGS => sub ($orig, $class, @args) {
 
 sub stringify ($self,$=1,$=1) {
     my $range = $self->span->get_range_list;
-    return $range ? $range . ', '. $self->owner : $self->owner;
+    return join (', ', grep { $_ } ($range, $self->owner));
 }
 
 sub compare ($self, $other, $swap) {
     # we must force stringify before calling cmp
     return "$self" cmp "$other";
+}
+
+sub _equal  ($self, $other, $swap) {
+    # we must force stringify before calling eq
+    return "$self" eq "$other";
 }
 
 sub merge ($self, $other) {
@@ -125,11 +133,18 @@ sub merge ($self, $other) {
     else {
         croak "Cannot merge statement with mismatching owners";
     }
+    return $self;
+}
+
+sub add_years ($self, $range) {
+    $self->span->set_range_as_string($range, $self->owner->identifier);
+    $self->span->consolidate;
+    return $self;
 }
 
 1;
 
-# ABSTRACT: single copyright statement class
+# ABSTRACT: a copyright statement for one owner
 
 __END__
 
@@ -139,11 +154,11 @@ __END__
 
 =head1 NAME
 
-Software::Copyright::Statement - single copyright statement class
+Software::Copyright::Statement - a copyright statement for one owner
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -159,13 +174,16 @@ version 0.004
  $statement->merge(Software::Copyright::Statement->new('2022, Joe <joe@example.com>'));
  $statement->range; # => is '2020-2022'
 
+ # update the year range
+ $statement->add_years('2015, 2016-2019')->stringify; # => is '2015-2022, Joe <joe@example.com>'
+
  # stringification
- "$statement"; # => is '2020-2022, Joe <joe@example.com>'
+ "$statement"; # => is '2015-2022, Joe <joe@example.com>'
 
 =head1 DESCRIPTION
 
 This class holds one copyright statement, i.e. year range, name
-and email of a copyright statement.
+and email of one copyright contributor.
 
 On construction, a cleanup is done to make the statement more
 standard. Here are some cleanup example:
@@ -222,6 +240,16 @@ Merge 2 statements. Note that the 2 statements must belong to the same
 owner (the name attributes must be identical).
 
 See the Synopsis for an example.
+
+This method returns C<$self>
+
+=head2 add_years
+
+Add a year range to the copyright owner. This method accepts year
+ranges like "2020", "2018, 2020", "2016-2020,2022". White spaces are
+ignored.
+
+This method returns C<$self>
 
 =head2 stringify
 

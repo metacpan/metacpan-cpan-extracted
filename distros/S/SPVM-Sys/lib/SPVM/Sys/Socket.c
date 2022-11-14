@@ -145,7 +145,7 @@ int32_t SPVM__Sys__Socket__inet_aton(SPVM_ENV* env, SPVM_VALUE* stack) {
   void* obj_cp = stack[0].oval;
   
   if (!obj_cp) {
-    return env->die(env, stack, "The input address(cp) must be defined", FILE_NAME, __LINE__);
+    return env->die(env, stack, "The $cp must be defined", FILE_NAME, __LINE__);
   }
   
   const char* cp = env->get_chars(env, stack, obj_cp);
@@ -153,7 +153,7 @@ int32_t SPVM__Sys__Socket__inet_aton(SPVM_ENV* env, SPVM_VALUE* stack) {
   void* obj_inp = stack[1].oval;
   
   if (!obj_inp) {
-    return env->die(env, stack, "The output address(inp) must be defined", FILE_NAME, __LINE__);
+    return env->die(env, stack, "The $inp must be defined", FILE_NAME, __LINE__);
   }
   
   struct in_addr* st_in_addr = env->get_pointer(env, stack, obj_inp);
@@ -165,7 +165,7 @@ int32_t SPVM__Sys__Socket__inet_aton(SPVM_ENV* env, SPVM_VALUE* stack) {
 #endif
 
   if (status == 0) {
-    env->die(env, stack, "The address is not a valid network address", FILE_NAME, __LINE__);
+    env->die(env, stack, "The got address is not a valid network address", FILE_NAME, __LINE__);
     return InvalidNetworkAddress;
   }
   else if (status == -1) {
@@ -183,7 +183,7 @@ int32_t SPVM__Sys__Socket__inet_ntoa(SPVM_ENV* env, SPVM_VALUE* stack) {
   void* obj_in = stack[0].oval;
   
   if (!obj_in) {
-    return env->die(env, stack, "The input address must be defined", FILE_NAME, __LINE__);
+    return env->die(env, stack, "The $in address must be defined", FILE_NAME, __LINE__);
   }
   
   struct in_addr* in = env->get_pointer(env, stack, obj_in);
@@ -224,13 +224,13 @@ int32_t SPVM__Sys__Socket__inet_pton(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t af = stack[0].ival;
   
   if (!(af == AF_INET || af == AF_INET6)) {
-    return env->die(env, stack, "The address family must be AF_INET or AF_INET6", FILE_NAME, __LINE__);
+    return env->die(env, stack, "The $af must be AF_INET or AF_INET6", FILE_NAME, __LINE__);
   }
   
   void* obj_src = stack[1].oval;
   
   if (!obj_src) {
-    return env->die(env, stack, "The input address(src) must be defined", FILE_NAME, __LINE__);
+    return env->die(env, stack, "The $src must be defined", FILE_NAME, __LINE__);
   }
   
   const char* src = env->get_chars(env, stack, obj_src);
@@ -238,21 +238,21 @@ int32_t SPVM__Sys__Socket__inet_pton(SPVM_ENV* env, SPVM_VALUE* stack) {
   void* obj_dst = stack[2].oval;
   
   if (!obj_dst) {
-    return env->die(env, stack, "The output address(dst) must be defined", FILE_NAME, __LINE__);
+    return env->die(env, stack, "The $dst must be defined", FILE_NAME, __LINE__);
   }
   
   if (af == AF_INET) {
     if (!env->is_type(env, stack, obj_dst, In_addr, 0)) {
-      return env->die(env, stack, "The output address(dst) must be the Sys::Socket::In_addr class", FILE_NAME, __LINE__);
+      return env->die(env, stack, "The $dst must be the Sys::Socket::In_addr class", FILE_NAME, __LINE__);
     }
   }
   else if (af == AF_INET6) {
     if (!env->is_type(env, stack, obj_dst, In6_addr, 0)) {
-      return env->die(env, stack, "The output address(dst) must be the Sys::Socket::In6_addr class", FILE_NAME, __LINE__);
+      return env->die(env, stack, "The $dst must be the Sys::Socket::In6_addr class", FILE_NAME, __LINE__);
     }
   }
   else {
-    return env->die(env, stack, "The type of the output address(dst) is invalid", FILE_NAME, __LINE__);
+    return env->die(env, stack, "The type of the $dst is invalid", FILE_NAME, __LINE__);
   }
   
   void* dst = env->get_pointer(env, stack, obj_dst);
@@ -260,7 +260,7 @@ int32_t SPVM__Sys__Socket__inet_pton(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t status = inet_pton(af, src, dst);
   
   if (status == 0) {
-    env->die(env, stack, "The address is not a valid network address", FILE_NAME, __LINE__);
+    env->die(env, stack, "The got address is not a valid network address", FILE_NAME, __LINE__);
     return InvalidNetworkAddress;
   }
   else if (status == -1) {
@@ -279,20 +279,20 @@ int32_t SPVM__Sys__Socket__inet_ntop(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t af = stack[0].ival;
 
   if (!(af == AF_INET || af == AF_INET6)) {
-    return env->die(env, stack, "The address family must be AF_INET or AF_INET6", FILE_NAME, __LINE__);
+    return env->die(env, stack, "The $af must be AF_INET or AF_INET6", FILE_NAME, __LINE__);
   }
   
   // The input address
   void* obj_src = stack[1].oval;
   if (!obj_src) {
-    return env->die(env, stack, "The input address(src) must be defined", FILE_NAME, __LINE__);
+    return env->die(env, stack, "The $src must be defined", FILE_NAME, __LINE__);
   }
   void* src = env->get_pointer(env, stack, obj_src);
   
   // The output address
   void* obj_dst = stack[2].oval;
   if (!obj_dst) {
-    return env->die(env, stack, "The output address(dst) must be defined", FILE_NAME, __LINE__);
+    return env->die(env, stack, "The $dst must be defined", FILE_NAME, __LINE__);
   }
   char* dst = (char*)env->get_chars(env, stack, obj_dst);
   
@@ -338,7 +338,7 @@ int32_t SPVM__Sys__Socket__connect(SPVM_ENV* env, SPVM_VALUE* stack) {
   void* obj_addr = stack[1].oval;
   
   if (!obj_addr) {
-    return env->die(env, stack, "The address must be defined", FILE_NAME, __LINE__);
+    return env->die(env, stack, "The $addr must be defined", FILE_NAME, __LINE__);
   }
   
   const struct sockaddr* addr = env->get_pointer(env, stack, obj_addr);
@@ -364,7 +364,7 @@ int32_t SPVM__Sys__Socket__bind(SPVM_ENV* env, SPVM_VALUE* stack) {
   void* obj_addr = stack[1].oval;
   
   if (!obj_addr) {
-    return env->die(env, stack, "The address must be defined", FILE_NAME, __LINE__);
+    return env->die(env, stack, "The $addr must be defined", FILE_NAME, __LINE__);
   }
   
   const struct sockaddr* addr = env->get_pointer(env, stack, obj_addr);
@@ -390,7 +390,7 @@ int32_t SPVM__Sys__Socket__accept(SPVM_ENV* env, SPVM_VALUE* stack) {
   void* obj_addr = stack[1].oval;
   
   if (!obj_addr) {
-    return env->die(env, stack, "The address must be defined", FILE_NAME, __LINE__);
+    return env->die(env, stack, "The $addr must be defined", FILE_NAME, __LINE__);
   }
   
   struct sockaddr* addr = env->get_pointer(env, stack, obj_addr);
@@ -438,7 +438,7 @@ int32_t SPVM__Sys__Socket__recv(SPVM_ENV* env, SPVM_VALUE* stack) {
   void* obj_buf = stack[1].oval;
   
   if (!obj_buf) {
-    return env->die(env, stack, "The buffer must be defined", FILE_NAME, __LINE__);
+    return env->die(env, stack, "The $buf must be defined", FILE_NAME, __LINE__);
   }
   
   char* buf = (char*)env->get_chars(env, stack, obj_buf);
@@ -466,7 +466,7 @@ int32_t SPVM__Sys__Socket__send(SPVM_ENV* env, SPVM_VALUE* stack) {
   void* obj_buf = stack[1].oval;
   
   if (!obj_buf) {
-    return env->die(env, stack, "The buffer must be defined", FILE_NAME, __LINE__);
+    return env->die(env, stack, "The $buf must be defined", FILE_NAME, __LINE__);
   }
   
   const char* buf = env->get_chars(env, stack, obj_buf);
@@ -494,7 +494,7 @@ int32_t SPVM__Sys__Socket__getpeername(SPVM_ENV* env, SPVM_VALUE* stack) {
   void* obj_addr = stack[1].oval;
   
   if (!obj_addr) {
-    return env->die(env, stack, "The address must be defined", FILE_NAME, __LINE__);
+    return env->die(env, stack, "The $addr must be defined", FILE_NAME, __LINE__);
   }
   
   struct sockaddr* addr = env->get_pointer(env, stack, obj_addr);
@@ -524,7 +524,7 @@ int32_t SPVM__Sys__Socket__getsockname(SPVM_ENV* env, SPVM_VALUE* stack) {
   void* obj_addr = stack[1].oval;
   
   if (!obj_addr) {
-    return env->die(env, stack, "The address must be defined", FILE_NAME, __LINE__);
+    return env->die(env, stack, "The $addr must be defined", FILE_NAME, __LINE__);
   }
   
   struct sockaddr* addr = env->get_pointer(env, stack, obj_addr);
@@ -549,7 +549,7 @@ int32_t SPVM__Sys__Socket__getsockname(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__Socket__socketpair(SPVM_ENV* env, SPVM_VALUE* stack) {
 #ifdef _WIN32
-  env->die(env, stack, "socketpair is not supported on this system", FILE_NAME, __LINE__);
+  env->die(env, stack, "socketpair is not supported on this system(_WIN32)", FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
   
@@ -562,14 +562,14 @@ int32_t SPVM__Sys__Socket__socketpair(SPVM_ENV* env, SPVM_VALUE* stack) {
   void* obj_sv = stack[3].oval;
   
   if (!obj_sv) {
-    return env->die(env, stack, "The output of the socket pair(sv) must be defined", FILE_NAME, __LINE__);
+    return env->die(env, stack, "The $sv must be defined", FILE_NAME, __LINE__);
   }
   
   int32_t* sv = env->get_elems_int(env, stack, obj_sv);
   int32_t sv_length = env->length(env, stack, obj_sv);
   
   if (!(sv_length >= 2)) {
-    return env->die(env, stack, "The length of the output of the socket pair(sv) must be greater than or equal to 2", FILE_NAME, __LINE__);
+    return env->die(env, stack, "The length of the $sv must be greater than or equal to 2", FILE_NAME, __LINE__);
   }
   
   int int_sv[2];
@@ -600,17 +600,17 @@ int32_t SPVM__Sys__Socket__setsockopt(SPVM_ENV* env, SPVM_VALUE* stack) {
   void* obj_optval = stack[3].oval;
   char* optval = NULL;
   if (!obj_optval) {
-    return env->die(env, stack, "The option value must be defined", FILE_NAME, __LINE__);
+    return env->die(env, stack, "The $optval must be defined", FILE_NAME, __LINE__);
   }
   optval = (char*)env->get_chars(env, stack, obj_optval);
   int32_t optval_length = env->length(env, stack, obj_optval);
 
   socklen_t optlen = stack[4].ival;
   if (!(optlen >= 0)) {
-    env->die(env, stack, "The option length must be greater than or equal to 0", FILE_NAME, __LINE__);
+    env->die(env, stack, "The $optlen must be greater than or equal to 0", FILE_NAME, __LINE__);
   }
   if (!(optlen <= optval_length)) {
-    env->die(env, stack, "The length of the option value must be less than or equal to the option length", FILE_NAME, __LINE__);
+    env->die(env, stack, "The $optlen must be less than or equal to the length of the $optval", FILE_NAME, __LINE__);
   }
   
   int32_t status = setsockopt(sockfd, level, optname, optval, optlen);
@@ -653,17 +653,17 @@ int32_t SPVM__Sys__Socket__getsockopt(SPVM_ENV* env, SPVM_VALUE* stack) {
   void* obj_optval = stack[3].oval;
   char* optval = NULL;
   if (!obj_optval) {
-    return env->die(env, stack, "The option value must be defined", FILE_NAME, __LINE__);
+    return env->die(env, stack, "The $optval must be defined", FILE_NAME, __LINE__);
   }
   optval = (char*)env->get_chars(env, stack, obj_optval);
   int32_t optval_length = env->length(env, stack, obj_optval);
 
   int32_t* optlen_ref = stack[4].iref;
   if (!(*optlen_ref >= 0)) {
-    env->die(env, stack, "The option length must be greater than or equal to 0", FILE_NAME, __LINE__);
+    env->die(env, stack, "The referred value of the $optlen_ref must be greater than or equal to 0", FILE_NAME, __LINE__);
   }
   if (!(*optlen_ref <= optval_length)) {
-    env->die(env, stack, "The length of the option value must be less than or equal to the option length", FILE_NAME, __LINE__);
+    env->die(env, stack, "The referred value of the $optlen_ref must be less than or equal to the length of the $optval", FILE_NAME, __LINE__);
   }
   
   socklen_t socklen_t_optlen = *optlen_ref;
@@ -789,11 +789,11 @@ int32_t SPVM__Sys__Socket__getaddrinfo_raw(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* obj_res_array = stack[3].oval;
   if (!obj_res_array) {
-    return env->die(env, stack, "The response must be defined", FILE_NAME, __LINE__);
+    return env->die(env, stack, "The $res_array must be defined", FILE_NAME, __LINE__);
   }
-  int32_t res_length = env->length(env, stack, obj_res_array);
-  if (!(res_length >= 1)) {
-    return env->die(env, stack, "The length of the array of the response must be greater than or equal to 1", FILE_NAME, __LINE__);
+  int32_t res_array_length = env->length(env, stack, obj_res_array);
+  if (!(res_array_length >= 1)) {
+    return env->die(env, stack, "The length of the $res_array must be greater than or equal to 1", FILE_NAME, __LINE__);
   }
   
   struct addrinfo *res = NULL;
@@ -837,7 +837,7 @@ int32_t SPVM__Sys__Socket__getnameinfo_raw(SPVM_ENV* env, SPVM_VALUE* stack) {
   void* obj_sa = stack[0].oval;
   
   if (!obj_sa) {
-    return env->die(env, stack, "The socket address must be defined", FILE_NAME, __LINE__);
+    return env->die(env, stack, "The $sa must be defined", FILE_NAME, __LINE__);
   }
   
   const struct sockaddr* sa = env->get_pointer(env, stack, obj_sa);

@@ -54,6 +54,6 @@
          "web" : "https://github.com/KJ7LNW/perl-RF-Component.git"
       }
    },
-   "version" : "1.003",
+   "version" : "1.005",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

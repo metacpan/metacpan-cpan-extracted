@@ -3,10 +3,16 @@ use strict;
 use warnings;
 
 use Data::Dumper;
+#use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(Music-BachChoralHarmony); # local author libs
 use Music::BachChoralHarmony;
 
-my $bach = Music::BachChoralHarmony->new;
-my $songs = $bach->parse();
+#my $data_file = 'share/jsbach_chorals_harmony.data'; # local author files
+#my $key_title = 'share/jsbach_BWV_keys_titles.txt';  # "
+my $bach = Music::BachChoralHarmony->new(
+#    data_file => $data_file,
+#    key_title => $key_title,
+);
+my $songs = $bach->parse;
 
 my %score = ();
 
@@ -15,17 +21,16 @@ for my $song ( keys %$songs ) {
         $score{ $event->{chord} }++;
     }
 }
-print Dumper [ map { "$_ => $score{$_}" } sort { $score{$a} <=> $score{$b} } keys %score ];
-__END__
+#print Dumper [ map { "$_ => $score{$_}" } sort { $score{$a} <=> $score{$b} } keys %score ];
 
 use Chart::Bars;
-my $chart = Chart::Bars->new( 800, 400 );
+my $chart = Chart::Bars->new( 2000, 400 );
 
 $chart->set(
     legend       => 'none',
     title        => 'Chords of All Chorales',
     x_label      => 'Chord',
-    y_label      => 'Songs',
+    y_label      => 'Appears',
     precision    => 0,
     include_zero => 'true',
 );

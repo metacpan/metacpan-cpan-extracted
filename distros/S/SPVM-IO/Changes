@@ -1,3 +1,10 @@
+0.11 2022-11-07
+  [Prerequirement Changes]
+    * SPVM::IO needs SPVM 0.9661+.
+    * SPVM::IO needs SPVM::Sys 0.26+.
+  [New Features]
+    * Added the IO::Handle::Interface class.
+    * Added many methods to IO::File and IO::Handle.
 0.10 2022-09-16
   [New Features]
     * Add the IO::Socket::Interface interface.

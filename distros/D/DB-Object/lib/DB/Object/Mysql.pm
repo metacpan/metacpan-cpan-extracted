@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Mysql.pm
-## Version v0.3.4
-## Copyright(c) 2020 DEGUEST Pte. Ltd.
+## Version v0.3.6
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2021/08/30
+## Modified 2022/11/11
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -22,31 +22,28 @@ BEGIN
         $VERSION $CACHE_QUERIES $CACHE_SIZE $CACHE_TABLE $CONNECT_VIA $DB_ERRSTR @DBH 
         $DEBUG $ERROR $MOD_PERL $USE_BIND $USE_CACHE 
     );
-    # use DBD::mysql;
     eval{ require DBD::mysql; };
     die( $@ ) if( $@ );
-    use Net::IP;
     use Nice::Try;
     # DBI->trace( 5 );
-    $VERSION = 'v0.3.4';
+    $VERSION = 'v0.3.6';
     use Devel::Confess;
 };
 
 use strict;
 use warnings;
-require DB::Object::Mysql::Statement;
-require DB::Object::Mysql::Tables;
-$DB_ERRSTR     = '';
-$DEBUG         = 0;
-$CACHE_QUERIES = [];
-$CACHE_SIZE    = 10;
-$CACHE_TABLE   = {};
-$USE_BIND      = 0;
-$USE_CACHE     = 0;
-$MOD_PERL      = 0;
-@DBH           = ();
+our $DB_ERRSTR     = '';
+our $DEBUG         = 0;
+our $CACHE_QUERIES = [];
+our $CACHE_SIZE    = 10;
+our $CACHE_TABLE   = {};
+our $USE_BIND      = 0;
+our $USE_CACHE     = 0;
+our $MOD_PERL      = 0;
+our @DBH           = ();
+our $CONNECT_VIA;
 if( $INC{ 'Apache/DBI.pm' } && 
-    substr( $ENV{ 'GATEWAY_INTERFACE' }|| '', 0, 8 ) eq 'CGI-Perl' )
+    substr( $ENV{GATEWAY_INTERFACE}|| '', 0, 8 ) eq 'CGI-Perl' )
 {
     $CONNECT_VIA = "Apache::DBI::connect";
     $MOD_PERL++;
@@ -59,9 +56,9 @@ sub init
     $self->{ 'driver' } = 'mysql';
     return( $self );
 }
-##----{ End of generic routines }----##
+# End of generic routines 
 
-##----{ ROUTINES PROPRIETAIRE }----##
+# ROUTINES PROPRIETAIRE 
 sub attribute($;$@)
 {
     my $self = shift( @_ );
@@ -444,6 +441,7 @@ sub _dsn
     my @params = ( sprintf( 'dbi:%s:database=%s', @$self{ qw( driver database ) } ) );
     if( $self->{host} )
     {
+        $self->_load_class( 'Net::IP' ) || return( $self->pass_error );
         my $ip = Net::IP->new( $self->{host} );
         if( $ip )
         {
@@ -507,7 +505,6 @@ END
 };
 
 1;
-
 # NOTE: POD
 __END__
 
@@ -598,7 +595,7 @@ DB::Object::Mysql - Mysql Database Object
     
 =head1 VERSION
 
-    v0.3.4
+    v0.3.6
 
 =head1 DESCRIPTION
 

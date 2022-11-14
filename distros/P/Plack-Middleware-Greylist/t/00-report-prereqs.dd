@@ -1,0 +1,66 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Pod::Coverage::TrustPod' => '0',
+                                      'Test::EOF' => '0',
+                                      'Test::EOL' => '0',
+                                      'Test::Kwalitee' => '1.21',
+                                      'Test::MinimumVersion' => '0',
+                                      'Test::More' => '0.88',
+                                      'Test::NoTabs' => '0',
+                                      'Test::Perl::Critic' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'Test::Pod::Coverage' => '1.08',
+                                      'Test::Pod::LinkCheck' => '0',
+                                      'Test::Portability::Files' => '0',
+                                      'Test::TrailingSpace' => '0.0203',
+                                      'Test::Vars' => '0.015'
+                                    }
+                    },
+       'runtime' => {
+                      'recommends' => {
+                                        'Cache::FastMmap' => '0',
+                                        'Ref::Util::XS' => '0'
+                                      },
+                      'requires' => {
+                                      'HTTP::Status' => '0',
+                                      'List::Util' => '0',
+                                      'Module::Load' => '0',
+                                      'Net::IP::Match::Trie' => '0',
+                                      'Plack::Middleware' => '0',
+                                      'Ref::Util' => '0',
+                                      'Time::Seconds' => '0',
+                                      'parent' => '0',
+                                      'perl' => 'v5.34.0',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'File::Spec' => '0',
+                                   'HTTP::Request::Common' => '0',
+                                   'Module::Metadata' => '0',
+                                   'Path::Tiny' => '0',
+                                   'Plack::Builder' => '0',
+                                   'Plack::Middleware::ContentLength' => '0',
+                                   'Plack::Middleware::Head' => '0',
+                                   'Plack::Response' => '0',
+                                   'Plack::Test' => '0',
+                                   'Test::Differences' => '0',
+                                   'Test::More' => '0',
+                                   'Test::Most' => '0',
+                                   'perl' => 'v5.34.0'
+                                 }
+                 }
+     };
+  $x;
+ }

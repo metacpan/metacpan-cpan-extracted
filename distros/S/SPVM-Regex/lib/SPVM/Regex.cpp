@@ -46,7 +46,7 @@ int32_t SPVM__Regex__compile(SPVM_ENV* env, SPVM_VALUE* stack) {
   void* obj_re2 = env->new_pointer_by_name(env, stack, "Regex::Re2", re2.release(), &e, FILE_NAME, __LINE__);
   if (e) { return e; }
   
-  env->set_field_object_by_name_v2(env, stack, obj_self, "Regex", "re2", obj_re2, &e, FILE_NAME, __LINE__);
+  env->set_field_object_by_name(env, stack, obj_self, "re2", obj_re2, &e, FILE_NAME, __LINE__);
   if (e) { return e; }
   
   return 0;
@@ -93,7 +93,7 @@ int32_t SPVM__Regex__match_forward(SPVM_ENV* env, SPVM_VALUE* stack) {
     return env->die(env, stack, "The offset + the length must be less than or equal to the length of the string", FILE_NAME, __LINE__);
   }
   
-  void* obj_re2 = env->get_field_object_by_name_v2(env, stack, obj_self, "Regex", "re2", &e, FILE_NAME, __LINE__);
+  void* obj_re2 = env->get_field_object_by_name(env, stack, obj_self, "re2", &e, FILE_NAME, __LINE__);
   if (e) { return e; }
   
   if (!obj_re2) {
@@ -122,10 +122,10 @@ int32_t SPVM__Regex__match_forward(SPVM_ENV* env, SPVM_VALUE* stack) {
           int32_t match_start = (submatch[0].data() - string);
           int32_t match_length = submatch[0].length();
           
-          env->set_field_int_by_name(env, stack, obj_self, "Regex", "match_start", match_start, &e, FILE_NAME, __LINE__);
+          env->set_field_int_by_name(env, stack, obj_self, "match_start", match_start, &e, FILE_NAME, __LINE__);
           if (e) { return e; }
           
-          env->set_field_int_by_name(env, stack, obj_self, "Regex", "match_length", match_length, &e, FILE_NAME, __LINE__);
+          env->set_field_int_by_name(env, stack, obj_self, "match_length", match_length, &e, FILE_NAME, __LINE__);
           if (e) { return e; }
         }
         else {
@@ -133,7 +133,7 @@ int32_t SPVM__Regex__match_forward(SPVM_ENV* env, SPVM_VALUE* stack) {
           env->set_elem_object(env, stack, obj_captures, i, obj_capture);
         }
       }
-      env->set_field_object_by_name_v2(env, stack, obj_self, "Regex", "captures", obj_captures, &e, FILE_NAME, __LINE__);
+      env->set_field_object_by_name(env, stack, obj_self, "captures", obj_captures, &e, FILE_NAME, __LINE__);
       if (e) { return e; }
     }
     
@@ -155,7 +155,7 @@ int32_t SPVM__Regex__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* obj_self = stack[0].oval;
 
-  void* obj_re2 = env->get_field_object_by_name_v2(env, stack, obj_self, "Regex", "re2", &e, FILE_NAME, __LINE__);
+  void* obj_re2 = env->get_field_object_by_name(env, stack, obj_self, "re2", &e, FILE_NAME, __LINE__);
   if (e) { return e; }
   
   if (obj_re2) {

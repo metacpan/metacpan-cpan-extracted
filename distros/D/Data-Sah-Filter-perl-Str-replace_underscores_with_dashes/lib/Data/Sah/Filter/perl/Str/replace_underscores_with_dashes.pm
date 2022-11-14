@@ -5,25 +5,27 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-17'; # DATE
+our $DATE = '2022-08-25'; # DATE
 our $DIST = 'Data-Sah-Filter-perl-Str-replace_underscores_with_dashes'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 sub meta {
     +{
         v => 1,
         summary => 'Replace underscores in string with dashes',
-        examples => [
-            {value=>'foo'},
-            {value=>'foo_bar', filtered_value=>'foo-bar'},
-        ],
         description => <<'_',
 
-This is mostly created as a counterpart for the replace_dashes_with_underscores
-filter (<pm:Data::Sah::Filter::perl::Str::replace_dashes_with_underscores>). So
-far I haven't got a practical use for this.
+This is mostly created as a counterpart for the
+`replace_dashes_with_underscores` filter
+(<pm:Data::Sah::Filter::perl::Str::replace_dashes_with_underscores>). So far I
+haven't got a practical use for this.
 
 _
+        examples => [
+            {value=>'foo'},
+            {value=>'foo_bar_baz', filtered_value=>'foo-bar-baz'},
+            {value=>'foo--bar', summary=>'Already dash'},
+        ],
     };
 }
 
@@ -56,7 +58,7 @@ Data::Sah::Filter::perl::Str::replace_underscores_with_dashes - Replace undersco
 
 =head1 VERSION
 
-This document describes version 0.003 of Data::Sah::Filter::perl::Str::replace_underscores_with_dashes (from Perl distribution Data-Sah-Filter-perl-Str-replace_underscores_with_dashes), released on 2022-07-17.
+This document describes version 0.004 of Data::Sah::Filter::perl::Str::replace_underscores_with_dashes (from Perl distribution Data-Sah-Filter-perl-Str-replace_underscores_with_dashes), released on 2022-08-25.
 
 =head1 SYNOPSIS
 
@@ -82,15 +84,17 @@ This document describes version 0.003 of Data::Sah::Filter::perl::Str::replace_u
 =head2 Sample data and filtering results
 
  "foo" # valid, unchanged
- "foo_bar" # valid, becomes "foo-bar"
+ "foo_bar_baz" # valid, becomes "foo-bar-baz"
+ "foo--bar" # valid, unchanged (Already dash)
 
 =for Pod::Coverage ^(meta|filter)$
 
 =head1 DESCRIPTION
 
-This is mostly created as a counterpart for the replace_dashes_with_underscores
-filter (L<Data::Sah::Filter::perl::Str::replace_dashes_with_underscores>). So
-far I haven't got a practical use for this.
+This is mostly created as a counterpart for the
+C<replace_dashes_with_underscores> filter
+(L<Data::Sah::Filter::perl::Str::replace_dashes_with_underscores>). So far I
+haven't got a practical use for this.
 
 =head1 HOMEPAGE
 
@@ -121,9 +125,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

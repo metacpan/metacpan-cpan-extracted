@@ -6,6 +6,7 @@ META.json
 META.yml
 Makefile.PL
 README.md
+cpanfile
 dist.ini
 lib/Types/ULID.pm
 t/01-type.t

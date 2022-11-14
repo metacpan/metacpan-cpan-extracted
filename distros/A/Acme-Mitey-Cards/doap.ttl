@@ -13,9 +13,9 @@
 	a                    doap:Project;
 	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
-	doap-deps:develop-requirement [ doap-deps:on "Mite 0.002004"^^doap-deps:CpanId ];
+	doap-deps:develop-requirement [ doap-deps:on "Mite 0.011000"^^doap-deps:CpanId ];
 	doap-deps:runtime-requirement [ doap-deps:on "perl 5.008001"^^doap-deps:CpanId ];
-	doap-deps:test-recommendation [ doap-deps:on "Moose 2"^^doap-deps:CpanId ];
+	doap-deps:test-recommendation [ doap-deps:on "Moose 2"^^doap-deps:CpanId ], [ doap-deps:on "Type::Tiny 2"^^doap-deps:CpanId ];
 	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [ doap-deps:on "Test::Requires"^^doap-deps:CpanId ];
 	doap:bug-database    <https://github.com/tobyink/p5-mite/issues>;
 	doap:created         "2022-06-22"^^xsd:date;
@@ -26,7 +26,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "Acme-Mitey-Cards";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/v_0-009>, <http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/v_0-010>, <http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/v_0-011>, <http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/v_0-012>, <http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/v_0-013>, <http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/v_0-014>, <http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/v_0-015>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/v_0-009>, <http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/v_0-010>, <http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/v_0-011>, <http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/v_0-012>, <http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/v_0-013>, <http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/v_0-014>, <http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/v_0-015>, <http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/v_0-016>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-mite>;
@@ -246,6 +246,20 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Acme-Mitey-Cards-0.015.tar.gz>;
 	doap:revision        "0.015"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Acme-Mitey-Cards/v_0-016>
+	a                    doap:Version;
+	dc:identifier        "Acme-Mitey-Cards-0.016"^^xsd:string;
+	dc:issued            "2022-11-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "Rebuild Acme::Mitey::Cards::Types with Type::Library::Compiler 0.007.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Acme-Mitey-Cards-0.016.tar.gz>;
+	doap:revision        "0.016"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

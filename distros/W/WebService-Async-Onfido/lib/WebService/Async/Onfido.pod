@@ -1,0 +1,326 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with WebService::Async::Onfido
+at lib/WebService/Async/Onfido.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+WebService::Async::Onfido - unofficial support for the Onfido identity verification service
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=head2 applicant_list
+
+Retrieves a list of all known applicants.
+
+Returns a L<Ryu::Source> which will emit one L<WebService::Async::Onfido::Applicant> for
+each applicant found.
+
+=head2 paging
+
+Supports paging through HTTP GET requests.
+
+=over 4
+
+=item * C<$starting_uri> - the initial L<URI> to request
+
+=item * C<$factory> - a C<sub> that we will call with a L<Ryu::Source> and expect to return
+a second response-processing C<sub>.
+
+=back
+
+Returns a L<Ryu::Source>.
+
+=head2 extract_links
+
+Given a set of strings representing the C<Link> headers in an HTTP response,
+extracts the URIs based on the C<rel> attribute as described in
+L<RFC5988|http://tools.ietf.org/html/rfc5988>.
+
+Returns a list of key, value pairs where the key contains the lowercase C<rel> value
+and the value is a L<URI> instance.
+
+ my %links = $self->extract_links($res->header('Link'))
+ print "Last page would be $links{last}"
+
+=head2 applicant_create
+
+Creates a new applicant record.
+
+See accessors in L<WebService::Async::Onfido::Applicant> for a full list of supported attributes.
+These can be passed as named parameters to this method.
+
+Returns a L<Future> which resolves to a L<WebService::Async::Onfido::Applicant>
+instance on successful completion.
+
+=head2 applicant_update
+
+Updates a single applicant.
+
+Returns a L<Future> which resolves to empty on success.
+
+=head2 applicant_delete
+
+Deletes a single applicant.
+
+Returns a L<Future> which resolves to empty on success.
+
+=head2 applicant_get
+
+Retrieve a single applicant.
+
+Returns a L<Future> which resolves to a L<WebService::Async::Onfido::Applicant>
+
+=head2 document_list
+
+List all documents for a given L<WebService::Async::Onfido::Applicant>.
+
+Takes the following named parameters:
+
+=over 4
+
+=item * C<applicant_id> - the L<WebService::Async::Onfido::Applicant/id> for the applicant to query
+
+=back
+
+Returns a L<Ryu::Source> which will emit one L<WebService::Async::Onfido::Document> for
+each document found.
+
+=head2 get_document_details
+
+Gets a document object for a given L<WebService::Async::Onfido::Applicant>.
+
+Takes the following named parameters:
+
+=over 4
+
+=item * C<applicant_id> - the L<WebService::Async::Onfido::Applicant/id> for the applicant to query
+
+=item * C<document_id> - the L<WebService::Async::Onfido::Document/id> for the document to query
+
+=back
+
+Returns a Future object which consists of a L<WebService::Async::Onfido::Document>
+
+=head2 photo_list
+
+List all photos for a given L<WebService::Async::Onfido::Applicant>.
+
+Takes the following named parameters:
+
+=over 4
+
+=item * C<applicant_id> - the L<WebService::Async::Onfido::Applicant/id> for the applicant to query
+
+=back
+
+Returns a L<Ryu::Source> which will emit one L<WebService::Async::Onfido::Photo> for
+each photo found.
+
+=head2 get_photo_details
+
+Gets a live_photo object for a given L<WebService::Async::Onfido::Applicant>.
+
+Takes the following named parameters:
+
+=over 4
+
+=item * C<live_photo_id> - the L<WebService::Async::Onfido::Photo/id> for the document to query
+
+=back
+
+Returns a Future object which consists of a L<WebService::Async::Onfido::Photo>
+
+=head2 document_upload
+
+Uploads a single document for a given applicant.
+
+Takes the following named parameters:
+
+=over 4
+
+=item * C<type> - can be C<passport>, C<photo>, C<poa>
+
+=item * C<side> - which side, either C<front> or C<back>
+
+=item * C<issuing_country> - which country this document is for
+
+=item * C<filename> - the file name to use for this item
+
+=item * C<data> - the bytes for this image file (must be in JPEG format)
+
+=back
+
+=head2 live_photo_upload
+
+Uploads a single "live photo" for a given applicant.
+
+Takes the following named parameters:
+
+=over 4
+
+=item * C<applicant_id> - ID for the person this photo relates to
+
+=item * C<advanced_validation> - perform additional validation (ensure we only have a single face)
+
+=item * C<filename> - the file name to use for this item
+
+=item * C<data> - the bytes for this image file (must be in JPEG format)
+
+=back
+
+=head2 applicant_check
+
+Perform an identity check on an applicant.
+
+This is the main method for dealing with verification - once you have created
+the applicant and uploaded some documents, call this to start the process of
+checking the documents and details, and generating the reports.
+
+L<https://documentation.onfido.com/#check-object>
+
+Takes the following named parameters:
+
+=over 4
+
+=item * C<applicant_id> - the applicant requesting the check
+
+=item * C<document_ids> - arrayref of documents ids to be analyzed on this check
+
+=item * C<report_names> - arrayref of the reports to be made (e.g: document, facial_similarity_photo)
+
+=item * C<tags> - custom tags to apply to these reports
+
+=item * C<suppress_form_emails> - if true, do B<not> send out the email to
+the applicant
+
+=item * C<asynchronous> - return immediately and perform check in the background (default true since v3)
+
+=item * C<charge_applicant_for_check> - the applicant must enter payment
+details for this check, and it will not count towards the quota for this
+service account
+
+=item * C<consider> - used for sandbox API testing only
+
+=back
+
+Returns a L<Future> which will resolve with the result.
+
+=head2 download_photo
+
+Gets a live_photo in a form of binary data for a given L<WebService::Async::Onfido::Photo>.
+
+Takes the following named parameters:
+
+=over 4
+
+=item * C<live_photo_id> - the L<WebService::Async::Onfido::Photo/id> for the document to query
+
+=back
+
+Returns a photo file blob
+
+=head2 download_document
+
+Gets a document in a form of binary data for a given L<WebService::Async::Onfido::Document>.
+
+Takes the following named parameters:
+
+=over 4
+
+=item * C<applicant_id> - the L<WebService::Async::Onfido::Applicant/id> for the applicant to query
+
+=item * C<document_id> - the L<WebService::Async::Onfido::Document/id> for the document to query
+
+=back
+
+Returns a document file blob
+
+=head2 countries_list
+
+Returns a hashref containing 3-letter country codes as keys and supporting status
+as their value.
+
+=head2 supported_documents_list
+
+Returns an array of hashes of supported_documents for each country
+
+=head2 supported_documents_for_country
+
+Returns the supported_documents_list for the country
+
+=head2 is_country_supported
+
+Returns 1 if country supported and 0 for unsupported
+
+=head2 sdk_token
+
+Returns the generated Onfido Web SDK token for the applicant.
+
+L<https://documentation.onfido.com/#web-sdk-tokens>
+
+Takes the following named parameters:
+
+=over 4
+
+=item * C<applicant_id> - ID of the applicant to request the token for
+
+=item * C<referrer> - the URL of the web page where the Web SDK will be used
+
+=back
+
+=head2 endpoints
+
+Returns an accessor for the endpoints data. This is a hashref containing URI
+templates, used by L</endpoint>.
+
+=head2 endpoint
+
+Expands the selected URI via L<URI::Template>. Each item is defined in our C<endpoints.json>
+file.
+
+Returns a L<URI> instance.
+
+=head2 is_rate_limited
+
+Returns true if we are currently rate limited, false otherwise.
+
+May eventually be updated to return number of seconds that you need to wait.
+
+=head2 rate_limiting
+
+Applies rate limiting check.
+
+Returns a L<Future> which will resolve once it's safe to send further requests.
+
+=head1 AUTHOR
+
+deriv.com
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<IO::Async::Notifier>
+
+L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/adopt_future>, L<adopted_futures|IO::Async::Notifier/adopted_futures>, L<can_event|IO::Async::Notifier/can_event>, L<children|IO::Async::Notifier/children>, L<configure_unknown|IO::Async::Notifier/configure_unknown>, L<debug_printf|IO::Async::Notifier/debug_printf>, L<get_loop|IO::Async::Notifier/get_loop>, L<invoke_error|IO::Async::Notifier/invoke_error>, L<invoke_event|IO::Async::Notifier/invoke_event>, L<loop|IO::Async::Notifier/loop>, L<make_event_cb|IO::Async::Notifier/make_event_cb>, L<maybe_invoke_event|IO::Async::Notifier/maybe_invoke_event>, L<maybe_make_event_cb|IO::Async::Notifier/maybe_make_event_cb>, L<new|IO::Async::Notifier/new>, L<notifier_name|IO::Async::Notifier/notifier_name>, L<parent|IO::Async::Notifier/parent>, L<remove_child|IO::Async::Notifier/remove_child>, L<remove_from_parent|IO::Async::Notifier/remove_from_parent>
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright Deriv.com 2019.
+
+=head1 LICENSE
+
+Licensed under the same terms as Perl5 itself.
+

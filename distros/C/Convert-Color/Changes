@@ -1,5 +1,10 @@
 Revision history for Convert-Color
 
+0.13    2022-11-12
+        [CHANGES]
+         * Add another path to find X11/rgb.txt to be found on OpenBSD
+           (thanks Alexander Bluhm) (RT145106)
+
 0.12    2022-04-28
         [CHANGES]
          * General module style refresh

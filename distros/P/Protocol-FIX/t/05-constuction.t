@@ -167,11 +167,11 @@ sub check_header_tail {
     my $m = shift;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
 
-    ok !$m->{composite_by_name}->{BeginString}, "no managed field from header";
+    ok !$m->{composite_by_name}->{BeginString},           "no managed field from header";
     ok $m->{composite_by_name}->{LastMsgSeqNumProcessed}, "field from header";
     ok $m->{composite_by_name}->{Hop},                    "component from header";
     ok $m->{composite_by_name}->{Signature},              "field from trailer";
-    ok !$m->{composite_by_name}->{CheckSum}, "not managed field from trailer";
+    ok !$m->{composite_by_name}->{CheckSum},              "not managed field from trailer";
 }
 
 subtest "message with single field(Heartbeat)" => sub {

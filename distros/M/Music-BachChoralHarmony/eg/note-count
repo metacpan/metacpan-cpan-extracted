@@ -4,9 +4,15 @@ use warnings;
 
 # Plot the number of notes for each song.
 
+#use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(Music-BachChoralHarmony); # local author libs
 use Music::BachChoralHarmony;
 
-my $bach = Music::BachChoralHarmony->new;
+#my $data_file = 'share/jsbach_chorals_harmony.data'; # local author files
+#my $key_title = 'share/jsbach_BWV_keys_titles.txt';  # "
+my $bach = Music::BachChoralHarmony->new(
+#    data_file => $data_file,
+#    key_title => $key_title,
+);
 my $songs = $bach->parse();
 
 my %score;

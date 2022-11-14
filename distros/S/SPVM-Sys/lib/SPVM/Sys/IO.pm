@@ -28,17 +28,17 @@ See L<Sys::IO::Constant|SPVM::Sys::IO::Constant> about the constant value for th
 
 =head2 read
 
-  static method read : int ($fd : int, $buf : mutable string, $count : int);
+  static method read : int ($fd : int, $buf : mutable string, $count : int, $buf_offset = 0 : int);
 
-read() attempts to read up to count bytes from file descriptor fd into the buffer starting at buf.
+read() attempts to read up to count bytes from file descriptor fd into the buf starting at buf + buf_offset.
 
 See the L<read|https://linux.die.net/man/2/read> function in Linux.
 
 =head2 write
 
-  static method write : int ($fd : int, $buffer : string, $count : int);
+  static method write : int ($fd : int, $buf : string, $count : int, $buf_offset = 0 : int);
 
-write() writes up to count bytes from the buffer pointed buf to the file referred to by the file descriptor fd.
+write() writes up to count bytes from the buf pointed buf + buf_offset to the file referred to by the file descriptor fd.
 
 See the L<write|https://linux.die.net/man/2/write> function in Linux.
 
@@ -92,9 +92,9 @@ The file stream is a L<Sys::IO::FileStream|SPVM::Sys::IO::FileStream> object.
 
 =head2 fread
 
-  static method fread : int ($ptr : mutable string, $size : int, $nmemb : int, $stream : Sys::IO::FileStream);
+  static method fread : int ($ptr : mutable string, $size : int, $nmemb : int, $stream : Sys::IO::FileStream, $ptr_offset = 0 : int);
 
-The function fread() reads nmemb elements of data, each size bytes long, from the stream pointed to by stream, storing them at the location given by ptr.
+The function fread() reads nmemb elements of data, each size bytes long, from the stream pointed to by stream, storing them at the location given by ptr + ptr_offset.
 
 See the L<fread|https://linux.die.net/man/3/fread> function in Linux.
 
@@ -140,17 +140,17 @@ The file stream is a L<Sys::IO::FileStream|SPVM::Sys::IO::FileStream> object.
 
 =head2 fgets
 
-  static method fgets : mutable string ($s : mutable string, $size : int, $stream : Sys::IO::FileStream);
+  static method fgets : mutable string ($s : mutable string, $size : int, $stream : Sys::IO::FileStream, $s_offset = 0 : int);
 
-fgets() reads in at most one less than size characters from stream and stores them into the buffer pointed to by s. Reading stops after an EOF or a newline. If a newline is read, it is stored into the buffer. A terminating null byte (aq\0aq) is stored after the last character in the buffer.
+fgets() reads in at most one less than size characters from stream and stores them into the buf pointed to by s + s_offset. Reading stops after an EOF or a newline. If a newline is read, it is stored into the buf. A terminating null byte (aq\0aq) is stored after the last character in the buf.
 
 See the L<fgets|https://linux.die.net/man/3/fgets> function in Linux.
 
 =head2 fwrite
 
-  static method fwrite : int ($ptr : string, $size : int, $nmemb : int, $stream : Sys::IO::FileStream);
+  static method fwrite : int ($ptr : string, $size : int, $nmemb : int, $stream : Sys::IO::FileStream, $ptr_offset = 0 : int);
 
-The function fwrite() writes nmemb elements of data, each size bytes long, to the stream pointed to by stream, obtaining them from the location given by ptr.
+The function fwrite() writes nmemb elements of data, each size bytes long, to the stream pointed to by stream, obtaining them from the location given by ptr + ptr_offset.
 
 See the L<fread|https://linux.die.net/man/3/fwrite> function in Linux.
 
@@ -182,7 +182,7 @@ The file stream is a L<Sys::IO::FileStream|SPVM::Sys::IO::FileStream> object.
 
   static method fclose : int ($stream : Sys::IO::FileStream);
 
-The fclose() function flushes the stream pointed to by fp (writing any buffered output data using fflush(3)) and closes the underlying file descriptor.
+The fclose() function flushes the stream pointed to by fp (writing any bufed output data using fflush(3)) and closes the underlying file descriptor.
 
 See the L<fclose|https://linux.die.net/man/3/fclose> function in Linux.
 
@@ -192,7 +192,7 @@ The file stream is a L<Sys::IO::FileStream|SPVM::Sys::IO::FileStream> object.
 
   static method fflush : int ($stream : Sys::IO::FileStream);
 
-For output streams, fflush() forces a write of all user-space buffered data for the given output or update stream via the stream's underlying write function. For input streams, fflush() discards any buffered data that has been fetched from the underlying file, but has not been consumed by the application. The open status of the stream is unaffected.
+For output streams, fflush() forces a write of all user-space bufed data for the given output or update stream via the stream's underlying write function. For input streams, fflush() discards any bufed data that has been fetched from the underlying file, but has not been consumed by the application. The open status of the stream is unaffected.
 
 See the L<fflush|https://linux.die.net/man/3/fflush> function in Linux.
 
@@ -268,7 +268,7 @@ See the L<_getdcwd|https://docs.microsoft.com/en-us/cpp/c-runtime-library/refere
 
   static method realpath : mutable string ($path : string, $resolved_path : mutable string);
 
-realpath() expands all symbolic links and resolves references to /./, /../ and extra '/' characters in the null-terminated string named by path to produce a canonicalized absolute pathname. The resulting pathname is stored as a null-terminated string, up to a maximum of PATH_MAX bytes, in the buffer pointed to by resolved_path. The resulting path will have no symbolic link, /./ or /../ components.
+realpath() expands all symbolic links and resolves references to /./, /../ and extra '/' characters in the null-terminated string named by path to produce a canonicalized absolute pathname. The resulting pathname is stored as a null-terminated string, up to a maximum of PATH_MAX bytes, in the buf pointed to by resolved_path. The resulting path will have no symbolic link, /./ or /../ components.
 
 See the L<realpath|https://linux.die.net/man/3/realpath> function in Linux.
 
@@ -326,7 +326,7 @@ See the L<symlink|https://linux.die.net/man/2/symlink> function in Linux.
 
   static method readlink : int ($path : string, $buf : mutable string, $bufsiz : int);
 
-readlink() places the contents of the symbolic link path in the buffer buf, which has size bufsiz. readlink() does not append a null byte to buf. It will truncate the contents (to a length of bufsiz characters), in case the buffer is too small to hold all of the contents.
+readlink() places the contents of the symbolic link path in the buf buf, which has size bufsiz. readlink() does not append a null byte to buf. It will truncate the contents (to a length of bufsiz characters), in case the buf is too small to hold all of the contents.
 
 See the L<readlink|https://linux.die.net/man/2/readlink> function in Linux.
 
@@ -342,7 +342,7 @@ The return value is a L<Sys::IO::DirStream|SPVM::Sys::IO::DirStream> object.
 
 =head2 closedir
 
-  static method closedir : int ($dir_stream : Sys::IO::DirStream);
+  static method closedir : int ($dirp : Sys::IO::DirStream);
 
 The closedir() function closes the directory stream associated with dirp. A successful call to closedir() also closes the underlying file descriptor associated with dirp. The directory stream descriptor dirp is not available after this call.
 
@@ -352,7 +352,7 @@ The directory stream is a L<Sys::IO::DirStream|SPVM::Sys::IO::DirStream> object.
 
 =head2 readdir
 
-  static method readdir : Sys::IO::Dirent ($dir_stream : Sys::IO::DirStream); # Non-thead safe
+  static method readdir : Sys::IO::Dirent ($dirp : Sys::IO::DirStream); # Non-thead safe
 
 The readdir() function returns a pointer to a dirent structure representing the next directory entry in the directory stream pointed to by dirp. It returns NULL on reaching the end of the directory stream or if an error occurred.
 
@@ -363,7 +363,7 @@ The directory stream is a L<Sys::IO::DirStream|SPVM::Sys::IO::DirStream> object.
 The return value is a L<Sys::IO::Dirent|SPVM::Sys::IO::Dirent> object.
 =head2 rewinddir
 
-  static method rewinddir : void ($dir_stream : Sys::IO::DirStream);
+  static method rewinddir : void ($dirp : Sys::IO::DirStream);
 
 The rewinddir() function resets the position of the directory stream dirp to the beginning of the directory.
 
@@ -373,7 +373,7 @@ The directory stream is a L<Sys::IO::DirStream|SPVM::Sys::IO::DirStream> object.
 
 =head2 telldir
 
-  static method telldir : long ($dir_stream : Sys::IO::DirStream);
+  static method telldir : long ($dirp : Sys::IO::DirStream);
 
 The telldir() function returns the current location associated with the directory stream dirp.
 
@@ -383,7 +383,7 @@ The directory stream is a L<Sys::IO::DirStream|SPVM::Sys::IO::DirStream> object.
 
 =head2 seekdir
 
-  static method seekdir : void ($dir_stream : Sys::IO::DirStream, $offset : long);
+  static method seekdir : void ($dirp : Sys::IO::DirStream, $offset : long);
 
 The seekdir() function sets the location in the directory stream from which the next readdir(2) call will start. seekdir() should be used with an offset returned by telldir(3).
 See the L<seekdir|https://linux.die.net/man/3/seekdir> function in Linux.
@@ -398,13 +398,13 @@ The utime() system call changes the access and modification times of the inode s
 
 See the L<utime|https://linux.die.net/man/2/utime> function in Linux.
 
-The buffer is a L<Sys::IO::Utimbuf|SPVM::Sys::IO::Utimbuf> object.
+The buf is a L<Sys::IO::Utimbuf|SPVM::Sys::IO::Utimbuf> object.
 
 =head2 access_raw
 
   static method access_raw : int ($pathname : string, $mode : int);
 
-The same as L</"access">, but even if the return value is C<-1>, an exception will be not thrown.
+The same as L</"access">, but even if the return value is C<-1>, an exception will not be thrown.
 
 =head2 access
 
@@ -420,7 +420,7 @@ See L<Sys::IO::Constant|SPVM::Sys::IO::Constant> about the constant value for th
 
   static method eaccess_raw : int ($pathname : string, $mode : int);
 
-The same as L</"eaccess">, but even if the return value is C<-1>, an exception will be not thrown.
+The same as L</"eaccess">, but even if the return value is C<-1>, an exception will not be thrown.
 
 =head2 eaccess
 
@@ -436,7 +436,7 @@ See L<Sys::IO::Constant|SPVM::Sys::IO::Constant> about the constant value for th
 
   static method eaccess_emulate : int ($pathname : string, $mode : int)
 
-The same as L</"eaccess_emulate">, but even if the return value is C<-1>, an exception will be not thrown.
+The same as L</"eaccess_emulate">, but even if the return value is C<-1>, an exception will not be thrown.
 
 =head2 eaccess_emulate
 
@@ -448,7 +448,7 @@ Emulates C<eaccess> using L</"faccessat">.
 
   static method stat_raw : int ($path : string, $stat : Sys::IO::Stat);
 
-The same as L</"stat">, but even if the return value is C<-1>, an exception will be not thrown.
+The same as L</"stat">, but even if the return value is C<-1>, an exception will not be thrown.
 
 =head2 stat
 
@@ -466,7 +466,7 @@ The stat is L<Sys::IO::Stat|SPVM::Sys::IO::Stat> object.
 
   static method lstat_raw : int ($path : string, $stat : Sys::IO::Stat);
 
-The same as L</"lstat">, but even if the return value is C<-1>, an exception will be not thrown.
+The same as L</"lstat">, but even if the return value is C<-1>, an exception will not be thrown.
 
 =head2 lstat
 
@@ -489,3 +489,134 @@ fcntl() performs one of the operations described below on the open file descript
 See the L<lstat|https://linux.die.net/man/2/fcntl> function in Linux.
 
 The command argument can receive a L<Sys::IO::Flock|SPVM::Sys::IO::Flock> object.
+
+=head2 readline
+
+  static method readline : string ($stream : Sys::IO::FileStream);
+
+Reads characters from C<$stream> until C<\n> or C<EOF> is found and return it.
+
+The C<$stream> must be defined. Otherwise an exception will thrown.
+
+=head2 ftruncate
+
+  static method ftruncate : int ($fd : int, $length : long);
+
+The ftruncate() functions cause the regular file named by referenced by fd to be truncated to a size of precisely length bytes.
+
+See L<ftruncate(2) - Linux man page|https://linux.die.net/man/2/ftruncate> in Linux.
+
+=head2 ungetc
+
+  static method ungetc : int ($c : int, $stream : Sys::IO::FileStream);
+
+ungetc() pushes c back to stream, cast to unsigned char, where it is available for subsequent read operations. Pushed-back characters will be returned in reverse order; only one pushback is guaranteed.
+
+See L<ungetc(3) - Linux man page|https://linux.die.net/man/3/ungetc> in Linux.
+
+=head2 fsync
+
+  static method fsync : int ($fd : int);
+
+fsync() transfers ("flushes") all modified in-core data of (i.e., modified buffer cache pages for) the file referred to by the file descriptor fd to the disk device (or other permanent storage device) so that all changed information can be retrieved even after the system crashed or was rebooted.
+
+See L<fsync(2) - Linux man page|https://linux.die.net/man/2/fsync> in Linux.
+
+=head2 fstat_raw
+
+  static method fstat_raw : int ($fd : int, $stat : Sys::IO::Stat);
+
+The same as L</"fstat">, but even if the return value is C<-1>, an exception will not be thrown.
+
+=head2 fstat
+
+  static method fstat : int ($fd : int, $stat : Sys::IO::Stat);
+
+fstat() is identical to stat(), except that the file to be stat-ed is specified by the file descriptor fd.
+
+See L<fstat(2) - Linux man page|https://linux.die.net/man/2/fsync> in Linux.
+
+The C<$stat> is a L<Sys::IO::Stat|SPVM::Sys::IO::Stat> object.
+
+=head2 freopen
+
+  static method freopen : Sys::IO::FileStream ($path : string, $mode : string, $stream : Sys::IO::FileStream);
+
+The freopen() function opens the file whose name is the string pointed to by path and associates the stream pointed to by stream with it.
+
+See L<freopen(3) - Linux man page|https://linux.die.net/man/3/freopen> in Linux.
+
+=head2 setvbuf
+
+  static method setvbuf : int ($stream : Sys::IO::FileStream, $buf : mutable string, $mode : int, $size : int);
+
+The setvbuf() function may be used on any open stream to change its buffer.
+
+See L<setvbuf(3) - Linux man page|https://linux.die.net/man/3/setvbuf> in Linux.
+
+See L<Sys::IO::Constant|SPVM::Sys::IO::Constant> about the constant value for the C<$mode>.
+
+=head2 setbuf
+
+  static method setbuf : void ($stream : Sys::IO::FileStream, $buf : mutable string);
+
+The same as the following code using L</"setvbuf">.
+
+    my $mode : int;
+    if ($buf) {
+      $mode = IO->_IOFBF;
+    }
+    else {
+      $mode = IO->_IONBF;
+    }
+    
+    &setvbuf($stream, $buf, $mode, IO->BUFSIZ);
+
+=head2 setbuffer
+
+  static method setbuffer : void ($stream : Sys::IO::FileStream, $buf : mutable string, $size : int);
+
+The same as the following code using L</"setvbuf">.
+
+  my $mode : int;
+  if ($buf) {
+    $mode = IO->_IOFBF;
+  }
+  else {
+    $mode = IO->_IONBF;
+  }
+  
+  &setvbuf($stream, $buf, $mode, $size);
+
+=head2 setlinebuf
+
+  static method setlinebuf : void ($stream : Sys::IO::FileStream);
+
+The same as the following code using L</"setvbuf">.
+
+  my $mode = IO->_IOLBF;
+  &setvbuf($stream, undef, $mode, IO->BUFSIZ);
+
+=head2 stdin
+
+  static method stdin : Sys::IO::FileStream ();
+
+Returns a L<Sys::IO::FileStream|SPVM::Sys::IO::FileStream> object that has the pointer to the stream that C<stdin> in C<C language> returns.
+
+See L<stdin(3) - Linux man page|https://linux.die.net/man/3/stdin> in Linux.
+
+=head2 stdout
+
+  static method stdout : Sys::IO::FileStream ();
+
+Returns a L<Sys::IO::FileStream|SPVM::Sys::IO::FileStream> object that has the pointer to the stream that C<stdout> in C<C language> returns.
+
+See L<stdout(3) - Linux man page|https://linux.die.net/man/3/stdout> in Linux.
+
+=head2 stderr
+
+  static method stderr : Sys::IO::FileStream ();
+
+Returns a L<Sys::IO::FileStream|SPVM::Sys::IO::FileStream> object that has the pointer to the stream that C<stderr> in C<C language> returns.
+
+See L<stderr(3) - Linux man page|https://linux.die.net/man/3/stderr> in Linux.

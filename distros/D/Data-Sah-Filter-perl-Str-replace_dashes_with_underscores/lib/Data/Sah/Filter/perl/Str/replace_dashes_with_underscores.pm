@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-17'; # DATE
+our $DATE = '2022-08-25'; # DATE
 our $DIST = 'Data-Sah-Filter-perl-Str-replace_dashes_with_underscores'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 sub meta {
     +{
@@ -15,14 +15,15 @@ sub meta {
         summary => 'Replace dashes in string with underscores',
         examples => [
             {value=>'foo'},
-            {value=>'foo-bar', filtered_value=>'foo_bar'},
+            {value=>'foo-bar-baz', filtered_value=>'foo_bar_baz'},
+            {value=>'foo__bar', summary=>'Already underscore'},
         ],
         description => <<'_',
 
 Can be useful in schemas like Perl module name (or any other identifier kind of
-schema which only allowes alphanumeric characters which include underscore but
-not dash) where you can type dasah (which does not require pressing the Shiff
-key in most keyboards) and later have the dash canonicalized to undersore.
+schema which only allows alphanumeric characters which include underscore but
+not dash) where you can type dash (which does not require pressing the Shift key
+in most keyboards) and later have the dash canonicalized to underscore.
 
 _
     };
@@ -57,7 +58,7 @@ Data::Sah::Filter::perl::Str::replace_dashes_with_underscores - Replace dashes i
 
 =head1 VERSION
 
-This document describes version 0.003 of Data::Sah::Filter::perl::Str::replace_dashes_with_underscores (from Perl distribution Data-Sah-Filter-perl-Str-replace_dashes_with_underscores), released on 2022-07-17.
+This document describes version 0.004 of Data::Sah::Filter::perl::Str::replace_dashes_with_underscores (from Perl distribution Data-Sah-Filter-perl-Str-replace_dashes_with_underscores), released on 2022-08-25.
 
 =head1 SYNOPSIS
 
@@ -83,16 +84,17 @@ This document describes version 0.003 of Data::Sah::Filter::perl::Str::replace_d
 =head2 Sample data and filtering results
 
  "foo" # valid, unchanged
- "foo-bar" # valid, becomes "foo_bar"
+ "foo-bar-baz" # valid, becomes "foo_bar_baz"
+ "foo__bar" # valid, unchanged (Already underscore)
 
 =for Pod::Coverage ^(meta|filter)$
 
 =head1 DESCRIPTION
 
 Can be useful in schemas like Perl module name (or any other identifier kind of
-schema which only allowes alphanumeric characters which include underscore but
-not dash) where you can type dasah (which does not require pressing the Shiff
-key in most keyboards) and later have the dash canonicalized to undersore.
+schema which only allows alphanumeric characters which include underscore but
+not dash) where you can type dash (which does not require pressing the Shift key
+in most keyboards) and later have the dash canonicalized to underscore.
 
 =head1 HOMEPAGE
 
@@ -123,9 +125,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

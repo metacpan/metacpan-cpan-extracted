@@ -1,5 +1,17 @@
 Revision history for perl distribution Mojo-Server-DaemonControl
 
+0.05 2022-11-10T20:13:53
+ - Fix listening to https://
+ - Add documentation for "cleanup" attribute
+ - Removed MOJODCTL_CONTROL_CLASS from documentation
+
+0.04 2022-11-10T18:59:25
+ - Fix not rejecting connections when issuing hot deploy
+ - Changed from using "reuse" to passing on "fd" to worker
+ - Heartbeat messages goes through a file descriptior instead of "worker_pipe"
+ - Removed worker_pipe() attribute
+ - Removed support for environment variables
+
 0.03 2022-03-28T13:35:55+0900
  - Add support for config from environment variables
  - Changed hot deployment to be done explicit

@@ -15,8 +15,8 @@ require DynaLoader;
 
 use vars qw(@ISA $VERSION $XS_VERSION $CONFIG $DEBUG);
 
-$VERSION    = '1.16';
-$XS_VERSION = "1.16";
+$VERSION    = '1.17';
+$XS_VERSION = "1.17";
 @ISA        = qw(IO::Handle);
 
 eval { local $^W = 0; undef local $SIG{__DIE__}; require IO::Stty };
@@ -57,7 +57,8 @@ sub clone_winsize_from {
     croak "Given filehandle is not a tty in clone_winsize_from, called"
       if not POSIX::isatty($fh);
     return 1 if not POSIX::isatty($self);    # ignored for master ptys
-    my $winsize = " " x 1024;                # preallocate memory
+    my $winsize = " " x 1024;                # preallocate memory for older perl versions
+    $winsize = '';                           # But leave the SV as empty
     ioctl( $fh, &IO::Tty::Constant::TIOCGWINSZ, $winsize )
       and ioctl( $self, &IO::Tty::Constant::TIOCSWINSZ, $winsize )
       and return 1;
@@ -71,7 +72,8 @@ my $SIZEOF_WINSIZE = length IO::Tty::pack_winsize( 0, 0, 0, 0 );
 
 sub get_winsize {
     my $self = shift;
-    ioctl( $self, IO::Tty::Constant::TIOCGWINSZ(), my $winsize = q<> )
+    my $winsize = " " x 1024;    # preallocate memory
+    ioctl( $self, IO::Tty::Constant::TIOCGWINSZ(), $winsize )
       or croak "Cannot TIOCGWINSZ - $!";
     substr( $winsize, $SIZEOF_WINSIZE ) = "";
     return IO::Tty::unpack_winsize($winsize);
@@ -120,7 +122,7 @@ IO::Tty - Low-level allocate a pseudo-Tty, import constants.
 
 =head1 VERSION
 
-1.16
+1.17
 
 =head1 SYNOPSIS
 

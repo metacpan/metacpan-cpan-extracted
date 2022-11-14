@@ -8,6 +8,7 @@ Makefile.PL
 README.md
 dist.ini
 ex/bench.pl
+ex/bench2.pl
 lib/Algorithm/QuadTree.pm
 lib/Algorithm/QuadTree/PP.pm
 t/01-use.t

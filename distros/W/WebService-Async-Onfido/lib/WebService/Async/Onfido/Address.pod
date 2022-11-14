@@ -1,0 +1,36 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with WebService::Async::Onfido::Address
+at lib/WebService/Async/Onfido/Address.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+WebService::Async::Onfido::Address - represents data for Onfido
+
+=head1 DESCRIPTION
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<WebService::Async::Onfido::Base::Address>
+
+L<building_name|WebService::Async::Onfido::Base::Address/building_name>, L<building_number|WebService::Async::Onfido::Base::Address/building_number>, L<country|WebService::Async::Onfido::Base::Address/country>, L<end_date|WebService::Async::Onfido::Base::Address/end_date>, L<flat_number|WebService::Async::Onfido::Base::Address/flat_number>, L<new|WebService::Async::Onfido::Base::Address/new>, L<postcode|WebService::Async::Onfido::Base::Address/postcode>, L<start_date|WebService::Async::Onfido::Base::Address/start_date>, L<state|WebService::Async::Onfido::Base::Address/state>, L<street|WebService::Async::Onfido::Base::Address/street>, L<sub_street|WebService::Async::Onfido::Base::Address/sub_street>, L<town|WebService::Async::Onfido::Base::Address/town>
+
+=back
+
+=head1 AUTHOR
+
+deriv.com C<DERIV@cpan.org>
+
+=head1 LICENSE
+
+Copyright deriv.com 2019. Licensed under the same terms as Perl itself.
+

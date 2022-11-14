@@ -11,11 +11,11 @@ BEGIN {
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.005
+# this test was generated with Dist::Zilla::Plugin::Test::Perl::Critic::Subset 3.001.006
 
 use Test::Perl::Critic (-profile => "") x!! -e "";
 
-my $filenames = ['lib/App/SubtitleUtils.pm','script/srtadjust','script/srtcalc','script/srtrenumber','script/srtscale','script/srtshift','script/srtsplit','script/subscale','script/subshift','script/vtt2srt'];
+my $filenames = ['lib/App/SubtitleUtils.pm','script/srtadjust','script/srtcalc','script/srtcheck','script/srtcombinetext','script/srtparse','script/srtrenumber','script/srtscale','script/srtshift','script/srtsplit','script/subscale','script/subshift','script/vtt2srt'];
 unless ($filenames && @$filenames) {
     $filenames = -d "blib" ? ["blib"] : ["lib"];
 }

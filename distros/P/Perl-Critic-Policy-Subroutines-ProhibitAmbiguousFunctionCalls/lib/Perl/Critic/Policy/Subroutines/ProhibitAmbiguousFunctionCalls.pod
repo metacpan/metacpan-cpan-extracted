@@ -1,0 +1,53 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Perl::Critic::Policy::Subroutines::ProhibitAmbiguousFunctionCalls
+at lib/Perl/Critic/Policy/Subroutines/ProhibitAmbiguousFunctionCalls.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Perl::Critic::Policy::Subroutines::ProhibitAmbiguousFunctionCalls - Don't call fully qualified function methods without parens
+
+=head1 DESCRIPTION
+
+When writing code like this...
+
+  Some::Class::Name::foo->mymethod
+
+..it is not clear if 'foo' is part of the class, or a function within Some::Class::Name.
+The better way to write it is:
+
+  Some::Class::Name::foo()->method
+
+=head1 CONFIGURATION
+
+=over 4
+
+=item C<method_always_ok> (string list, default is "new add")
+
+A list of method names which should always be considered "ok"
+
+=item C<uppercase_module_always_ok> (boolean, defaults to true)
+
+Indicates whether module names starting with an uppercase letter are considered "ok".
+
+For example, Foo::Bar->pop; is considered ok by default, but Foo::bar->pop is not.
+
+=back
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Perl::Critic::Policy>
+
+L<add_themes|Perl::Critic::Policy/add_themes>, L<default_maximum_violations_per_document|Perl::Critic::Policy/default_maximum_violations_per_document>, L<get_abstract|Perl::Critic::Policy/get_abstract>, L<get_format|Perl::Critic::Policy/get_format>, L<get_long_name|Perl::Critic::Policy/get_long_name>, L<get_maximum_violations_per_document|Perl::Critic::Policy/get_maximum_violations_per_document>, L<get_parameters|Perl::Critic::Policy/get_parameters>, L<get_raw_abstract|Perl::Critic::Policy/get_raw_abstract>, L<get_severity|Perl::Critic::Policy/get_severity>, L<get_short_name|Perl::Critic::Policy/get_short_name>, L<get_themes|Perl::Critic::Policy/get_themes>, L<initialize_if_enabled|Perl::Critic::Policy/initialize_if_enabled>, L<is_enabled|Perl::Critic::Policy/is_enabled>, L<is_safe|Perl::Critic::Policy/is_safe>, L<new|Perl::Critic::Policy/new>, L<new_parameter_value_exception|Perl::Critic::Policy/new_parameter_value_exception>, L<parameter_metadata_available|Perl::Critic::Policy/parameter_metadata_available>, L<prepare_to_scan_document|Perl::Critic::Policy/prepare_to_scan_document>, L<set_format|Perl::Critic::Policy/set_format>, L<set_maximum_violations_per_document|Perl::Critic::Policy/set_maximum_violations_per_document>, L<set_severity|Perl::Critic::Policy/set_severity>, L<set_themes|Perl::Critic::Policy/set_themes>, L<throw_parameter_value_exception|Perl::Critic::Policy/throw_parameter_value_exception>, L<to_string|Perl::Critic::Policy/to_string>, L<violation|Perl::Critic::Policy/violation>
+
+=back
+

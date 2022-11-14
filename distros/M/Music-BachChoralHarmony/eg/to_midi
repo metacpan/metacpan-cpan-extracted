@@ -4,22 +4,31 @@ use warnings;
 
 # Render a song to MIDI.
 
-use List::Util 'shuffle';
-use MIDI::Simple;
-use Music::BachChoralHarmony;
-use Music::Chord::Note;
-use lib '/Users/gene/sandbox/Music-Duration/lib';
-use Music::Duration;
-use Music::Tempo;
+use List::Util qw(shuffle);
+use Music::Chord::Note ();
+use Music::Scales qw(get_scale_notes);
+#use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(MIDI-Util Music-BachChoralHarmony Music-Duration); # local author libs
+use Music::BachChoralHarmony ();
+use MIDI::Util qw(setup_score set_chan_patch midi_format);
+use Music::Duration ();
 
-my $id  = shift || '000106b_';
+my $id  = shift || '000106b_'; # -1 selects a random song
 my $bpm = shift || 90;
 
-Music::Duration::tuple( 'wn', 'z', 5 ); # 5 notes in place of one whole note
+Music::Duration::tuple( 'wn', 'W', 5 ); # 5 notes in place of one whole note
 
-my $bach = Music::BachChoralHarmony->new;
-my $song = $bach->parse();
-#use Data::Dumper;warn(Dumper[sort keys%$song]);exit;
+#my $data_file = 'share/jsbach_chorals_harmony.data'; # local author files
+#my $key_title = 'share/jsbach_BWV_keys_titles.txt';  # "
+my $bach = Music::BachChoralHarmony->new(
+#    data_file => $data_file,
+#    key_title => $key_title,
+);
+my $song = $bach->parse;
+
+if ($id eq -1) {
+    my @ids = keys %$song;
+    $id = $ids[ int rand @ids ];
+}
 
 # Redefine the progression for the given id:
 $song = $song->{$id};
@@ -28,29 +37,28 @@ my $bassline;
 my $melodyline;
 my $chordline;
 
-my @scale = qw( C Cs D Ds E F Fs G Gs A As B );
+my @scale = get_scale_notes( C => 'chromatic' );
+my $channel = 0;
 
-my $cn = Music::Chord::Note->new();
+my $cn = Music::Chord::Note->new;
 
-my $score = MIDI::Simple->new_score();
-$score->set_tempo( bpm_to_ms($bpm) * 1000 );
+my $score = setup_score( bpm => $bpm );
 
-for my $event ( @{ $song->{events} } ) {
-    my $note = $event->{bass};
-    $note =~ s/b/f/;
-    $note =~ s/#/s/;
-    push @$bassline, $note;
+for my $event ( $song->{events}->@* ) {
+    my ($note) = midi_format( $event->{bass} );
+    push @$bassline, $note . 3;
 
     my $size = count_ones( $event->{notes} );
     my $duration =
         $size == 1 ? 'wn'  :
         $size == 2 ? 'hn'  :
         $size == 3 ? 'thn' :
-        $size == 4 ? 'qn'  : 'zwn';
+        $size == 4 ? 'qn'  : 'Wwn';
     my @notes;
     my $i = 0;
     for my $bit ( split //, $event->{notes} ) {
-        push @notes, [ $duration, $scale[$i] ]
+        my ($pitch) = midi_format( $scale[$i] );
+        push @notes, [ $duration, $pitch . 5 ]
             if $bit;
         $i++;
     }
@@ -62,12 +70,8 @@ for my $event ( @{ $song->{events} } ) {
     $chord =~ s/d/dim/;
     $chord =~ s/dim6/dim/; # What is a dim6 chord?
     $chord =~ s/4/add4/;
-    my @tone = $cn->chord($chord);
-    for ( @tone ) {
-        s/#/s/;
-        s/b/f/;
-    }
-    push @$chordline, \@tone;
+    my @tone = midi_format( $cn->chord($chord) );
+    push @$chordline, map { $_ } \@tone;
 }
 
 $score->synch(
@@ -75,6 +79,7 @@ $score->synch(
     \&melody,
     \&chords,
 );
+
 $score->write_score("$0.mid");
 
 sub count_ones {
@@ -84,26 +89,17 @@ sub count_ones {
 }
 
 sub bass {
-    $score->Volume(127);
-    $score->Channel(0);
-    $score->patch_change( 0, 34 );
-    $score->Octave(3);
+    set_chan_patch( $score, $channel++, 34 );
     $score->n( 'wn', $_ ) for @$bassline;
     $score->n( 'wn', $bassline->[-1] );
 }
 
 sub melody {
-    $score->Volume(90);
-    $score->Channel(1);
-    $score->patch_change( 1, 73 );
-    $score->Octave(5);
+    set_chan_patch( $score, $channel++, 73 );
     $score->n( @$_ ) for @$melodyline;
 }
 
 sub chords {
-    $score->Volume(90);
-    $score->Channel(2);
-    $score->patch_change( 2, 4 );
-    $score->Octave(4);
+    set_chan_patch( $score, $channel++, 4 );
     $score->n( 'wn', @$_ ) for @$chordline;
 }

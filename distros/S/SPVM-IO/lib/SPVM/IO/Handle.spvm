@@ -1,1 +1,211 @@
-class IO::Handle;
+class IO::Handle {
+  use Sys::IO;
+  use Fn;
+  use Format;
+  use Scope::Guard;
+  use Sys;
+ 
+  use IO::File;
+  use Sys::IO::Constant as IO;
+  use Sys::Ioctl::Constant as IOCTL;
+  use Sys::IO::Stat;
+  
+  has autoflush : wo byte;
+  has input_line_number : ro int;
+  
+  interface IO::Handle::Interface;
+  
+  # Class methods
+  static method new : IO::Handle () {
+    my $self = new IO::Handle;
+    
+    $self->init();
+    
+    return $self;
+  }
+  
+  method has_interfaces : int () { return 1; }
+  
+  method init : void () {
+    
+  }
+  
+  method get_autoflush : byte () {
+    return $self->{autoflush};
+  }
+  
+  method close : int () {
+    return $self->(IO::Handle::Interface)->close;
+  }
+
+  method eof : int () {
+    return $self->(IO::Handle::Interface)->eof;
+  }
+
+  method fileno : int () {
+    return $self->(IO::Handle::Interface)->fileno;
+  }
+
+  method getc : int () {
+    return $self->(IO::Handle::Interface)->getc;
+  }
+
+  method print : int ($string : string) {
+    return $self->(IO::Handle::Interface)->print($string);
+  }
+
+  method say : int ($string : string) {
+    my $status1 = $self->print($string);
+    my $status2 = $self->print("\n");
+    my $status = $status1 || $status2;
+    
+    return $status;
+  }
+
+  method printf : int ($format : string, $args : object[]...) {
+    my $formated_string = Format->sprintf($format, $args);
+    return $self->print($formated_string);
+  }
+
+  method clearerr : void () {
+    $self->(IO::Handle::Interface)->clearerr;
+  }
+  
+  method error : int () {
+    $self->(IO::Handle::Interface)->error;
+  }
+
+  method flush : int () {
+    $self->(IO::Handle::Interface)->flush;
+  }
+
+  method ungetc : int ($c : int) {
+    return $self->(IO::Handle::Interface)->ungetc($c);
+  }
+
+  method printflush : int ($string : string) {
+    my $old_autoflush = $self->get_autoflush;
+    
+    # Restores the autoflush field at the end of the scope.
+    my $handle = $self;
+    my $scope_guard = Scope::Guard->new([$handle : IO::Handle, $old_autoflush : byte] method : void () {
+      $handle->set_autoflush($old_autoflush);
+    });
+    
+    $self->set_autoflush(1);
+    $self->print($string);
+  }
+
+  method truncate : int ($legnth : long) {
+    my $fileno = $self->fileno;
+    
+    return Sys::IO->ftruncate($fileno, $legnth);
+  }
+  
+  method ioctl : int ($request : int, $request_arg = undef : object of Byte|Short|Int|Long|Float|Double|object) {
+    my $fileno = $self->fileno;
+    
+    return Sys::Ioctl->ioctl($fileno, $request, $request_arg);
+  }
+
+  method sync : int () {
+    my $fileno = $self->fileno;
+    
+    return Sys::IO->fsync($fileno);
+  }
+
+  method stat : int ($stat : Sys::IO::Stat) {
+    my $fileno = $self->fileno;
+    
+    return Sys::IO::Stat->fstat($fileno, $stat);
+  }
+
+  method getline : string () {
+    return $self->(IO::Handle::Interface)->getline;
+  }
+
+  method getlines : string () {
+    return $self->(IO::Handle::Interface)->getlines;
+  }
+
+  method fcntl : int ($command : int, $command_arg = undef : object of Int|Sys::IO::Flock|object) {
+    my $fileno = $self->fileno;
+    
+    return Sys::IO->fcntl($fileno, $command, $command_arg);
+  }
+  
+  method blocking : void ($blocking : int) {
+    unless ($blocking >= 0) {
+      die "The $blocking must be greater than or equal to 0";
+    }
+    
+    my $fileno = $self->fileno;
+    
+    if (Sys->defined("_WIN32")) {
+      my $flags = Int->new(!$blocking);
+      $self->ioctl(IOCTL->FIONBIO, $flags);
+    }
+    else {
+      my $newmode = 0;
+      if ($blocking == 0) {
+        $newmode &= ~IO->O_NDELAY;
+        $newmode |= IO->O_NONBLOCK;
+      }
+      else {
+        $newmode &= ~(IO->O_NDELAY|IO->O_NONBLOCK);
+      }
+      
+      $self->fcntl(IO->F_SETFL, $newmode);
+    }
+  }
+
+  method write : int ($buffer : string, $length : int, $offset = 0 : int) {
+    return $self->syswrite($buffer, $length, $offset);
+  }
+  
+  method read : int ($buffer : mutable string, $length : int, $offset = 0 : int) {
+    return $self->sysread($buffer, $length, $offset);
+  }
+  
+  method syswrite : int ($buffer : string, $length : int, $offset = 0 : int) {
+    return $self->(IO::Handle::Interface)->syswrite($buffer, $length, $offset);
+  }
+  
+  method sysread : int ($buffer : mutable string, $length : int, $offset = 0 : int) {
+    return $self->(IO::Handle::Interface)->sysread($buffer, $length, $offset);
+  }
+}
+
+=pod TODO
+
+*new
+*new_from_fd ( FD, MODE )
+*close
+*eof
+*fileno
+*print ( ARGS )
+*printf ( FMT, [ARGS] )
+*getc
+*clearerr
+*error
+*flush
+*truncate ( LEN )
+*ioctl( FUNCTION, SCALAR )
+*ungetc ( ORD )
+*autoflush ( [BOOL] )                         $|
+*input_line_number( [NUM])                    $.
+*sync
+*printflush ( ARGS )
+*say ( ARGS )
+*stat
+*fcntl( FUNCTION, SCALAR )
+*blocking ( [ BOOL ] )
+*write ( BUF, LEN [, OFFSET ] )
+*read ( BUF, LEN, [OFFSET] )
+*sysread ( BUF, LEN, [OFFSET] )
+*syswrite ( BUF, [LEN, [OFFSET]] )
+*getline
+*getlines
+*fdopen ( FD, MODE )
+
+=cut

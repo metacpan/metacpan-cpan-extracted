@@ -7,7 +7,7 @@ package Acme::Mitey::Cards::Types;
 use Exporter ();
 use Carp qw( croak );
 
-our $TLC_VERSION = "0.006";
+our $TLC_VERSION = "0.007";
 our @ISA = qw( Exporter );
 our @EXPORT;
 our @EXPORT_OK;
@@ -25,7 +25,7 @@ BEGIN {
 		fallback => !!1,
 		'|'      => 'union',
 		bool     => sub { !! 1 },
-		'""'     => sub { shift->[1] },
+		'""'     => sub { shift->{name} },
 		'&{}'    => sub {
 			my $self = shift;
 			return sub { $self->assert_return( @_ ) };
@@ -33,62 +33,63 @@ BEGIN {
 	);
 
 	sub union {
-		my @types = grep ref( $_ ), @_;
-		my @codes = map $_->[0], @types;
-		bless [
-			sub { for ( @codes ) { return 1 if $_->(@_) } return 0 },
-			join( '|', map $_->[1], @types ),
-			\@types,
-		], __PACKAGE__;
+		my @types  = grep ref( $_ ), @_;
+		my @checks = map $_->{check}, @types;
+		bless {
+			check => sub { for ( @checks ) { return 1 if $_->(@_) } return 0 },
+			name  => join( '|', map $_->{name}, @types ),
+			union => \@types,
+		}, __PACKAGE__;
 	}
 
 	sub check {
-		$_[0][0]->( $_[1] );
+		$_[0]{check}->( $_[1] );
 	}
 
 	sub get_message {
 		sprintf '%s did not pass type constraint "%s"',
 			defined( $_[1] ) ? $_[1] : 'Undef',
-			$_[0][1];
+			$_[0]{name};
 	}
 
 	sub validate {
-		$_[0][0]->( $_[1] )
+		$_[0]{check}->( $_[1] )
 			? undef
 			: $_[0]->get_message( $_[1] );
 	}
 
 	sub assert_valid {
-		$_[0][0]->( $_[1] )
+		$_[0]{check}->( $_[1] )
 			? 1
 			: Carp::croak( $_[0]->get_message( $_[1] ) );
 	}
 
 	sub assert_return {
-		$_[0][0]->( $_[1] )
+		$_[0]{check}->( $_[1] )
 			? $_[1]
 			: Carp::croak( $_[0]->get_message( $_[1] ) );
 	}
 
 	sub to_TypeTiny {
-		my ( $coderef, $name, $library, $origname ) = @{ +shift };
-		if ( ref $library eq 'ARRAY' ) {
+		if ( $_[0]{union} ) {
 			require Type::Tiny::Union;
 			return 'Type::Tiny::Union'->new(
-				display_name     => $name,
-				type_constraints => [ map $_->to_TypeTiny, @$library ],
+				display_name     => $_[0]{name},
+				type_constraints => [ map $_->to_TypeTiny, @{ $_[0]{union} } ],
 			);
 		}
-		if ( $library ) {
+		if ( my $library = $_[0]{library} ) {
 			local $@;
 			eval "require $library; 1" or die $@;
-			my $type = $library->get_type( $origname );
+			my $type = $library->get_type( $_[0]{library_name} );
 			return $type if $type;
 		}
 		require Type::Tiny;
+		my $check = $_[0]{check};
+		my $name  = $_[0]{name};
 		return 'Type::Tiny'->new(
 			name       => $name,
-			constraint => sub { $coderef->( $_ ) },
+			constraint => sub { $check->( $_ ) },
 			inlined    => sub { sprintf '%s::is_%s(%s)', $LIBRARY, $name, pop }
 		);
 	}
@@ -104,7 +105,7 @@ BEGIN {
 {
 	my $type;
 	sub Any () {
-		$type ||= bless( [ \&is_Any, "Any", "Types::Standard", "Any" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_Any, name => "Any", library => "Types::Standard", library_name => "Any" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_Any ($) {
@@ -127,7 +128,7 @@ BEGIN {
 {
 	my $type;
 	sub ArrayRef () {
-		$type ||= bless( [ \&is_ArrayRef, "ArrayRef", "Types::Standard", "ArrayRef" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_ArrayRef, name => "ArrayRef", library => "Types::Standard", library_name => "ArrayRef" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_ArrayRef ($) {
@@ -150,7 +151,7 @@ BEGIN {
 {
 	my $type;
 	sub Bool () {
-		$type ||= bless( [ \&is_Bool, "Bool", "Types::Standard", "Bool" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_Bool, name => "Bool", library => "Types::Standard", library_name => "Bool" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_Bool ($) {
@@ -173,7 +174,7 @@ BEGIN {
 {
 	my $type;
 	sub Card () {
-		$type ||= bless( [ \&is_Card, "Card", "Acme::Mitey::Cards::Types::Source", "Card" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_Card, name => "Card", library => "Acme::Mitey::Cards::Types::Source", library_name => "Card" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_Card ($) {
@@ -196,7 +197,7 @@ BEGIN {
 {
 	my $type;
 	sub CardArray () {
-		$type ||= bless( [ \&is_CardArray, "CardArray", "Acme::Mitey::Cards::Types::Source", "CardArray" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_CardArray, name => "CardArray", library => "Acme::Mitey::Cards::Types::Source", library_name => "CardArray" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_CardArray ($) {
@@ -219,7 +220,7 @@ BEGIN {
 {
 	my $type;
 	sub CardNumber () {
-		$type ||= bless( [ \&is_CardNumber, "CardNumber", "Acme::Mitey::Cards::Types::Source", "CardNumber" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_CardNumber, name => "CardNumber", library => "Acme::Mitey::Cards::Types::Source", library_name => "CardNumber" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_CardNumber ($) {
@@ -242,7 +243,7 @@ BEGIN {
 {
 	my $type;
 	sub Character () {
-		$type ||= bless( [ \&is_Character, "Character", "Acme::Mitey::Cards::Types::Source", "Character" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_Character, name => "Character", library => "Acme::Mitey::Cards::Types::Source", library_name => "Character" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_Character ($) {
@@ -265,7 +266,7 @@ BEGIN {
 {
 	my $type;
 	sub ClassName () {
-		$type ||= bless( [ \&is_ClassName, "ClassName", "Types::Standard", "ClassName" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_ClassName, name => "ClassName", library => "Types::Standard", library_name => "ClassName" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_ClassName ($) {
@@ -318,7 +319,7 @@ BEGIN {
 {
 	my $type;
 	sub CodeRef () {
-		$type ||= bless( [ \&is_CodeRef, "CodeRef", "Types::Standard", "CodeRef" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_CodeRef, name => "CodeRef", library => "Types::Standard", library_name => "CodeRef" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_CodeRef ($) {
@@ -341,7 +342,7 @@ BEGIN {
 {
 	my $type;
 	sub ConsumerOf () {
-		$type ||= bless( [ \&is_ConsumerOf, "ConsumerOf", "Types::Standard", "ConsumerOf" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_ConsumerOf, name => "ConsumerOf", library => "Types::Standard", library_name => "ConsumerOf" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_ConsumerOf ($) {
@@ -364,7 +365,7 @@ BEGIN {
 {
 	my $type;
 	sub CycleTuple () {
-		$type ||= bless( [ \&is_CycleTuple, "CycleTuple", "Types::Standard", "CycleTuple" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_CycleTuple, name => "CycleTuple", library => "Types::Standard", library_name => "CycleTuple" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_CycleTuple ($) {
@@ -387,7 +388,7 @@ BEGIN {
 {
 	my $type;
 	sub Deck () {
-		$type ||= bless( [ \&is_Deck, "Deck", "Acme::Mitey::Cards::Types::Source", "Deck" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_Deck, name => "Deck", library => "Acme::Mitey::Cards::Types::Source", library_name => "Deck" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_Deck ($) {
@@ -410,7 +411,7 @@ BEGIN {
 {
 	my $type;
 	sub Defined () {
-		$type ||= bless( [ \&is_Defined, "Defined", "Types::Standard", "Defined" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_Defined, name => "Defined", library => "Types::Standard", library_name => "Defined" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_Defined ($) {
@@ -429,11 +430,34 @@ BEGIN {
 
 }
 
+# DelimitedStr
+{
+	my $type;
+	sub DelimitedStr () {
+		$type ||= bless( { check => \&is_DelimitedStr, name => "DelimitedStr", library => "Types::Common::String", library_name => "DelimitedStr" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
+	}
+
+	sub is_DelimitedStr ($) {
+		do {  defined($_[0]) and do { ref(\$_[0]) eq 'SCALAR' or ref(\(my $val = $_[0])) eq 'SCALAR' } }
+	}
+
+	sub assert_DelimitedStr ($) {
+		do {  defined($_[0]) and do { ref(\$_[0]) eq 'SCALAR' or ref(\(my $val = $_[0])) eq 'SCALAR' } } ? $_[0] : DelimitedStr->get_message( $_[0] );
+	}
+
+	$EXPORT_TAGS{"DelimitedStr"} = [ qw( DelimitedStr is_DelimitedStr assert_DelimitedStr ) ];
+	push @EXPORT_OK, @{ $EXPORT_TAGS{"DelimitedStr"} };
+	push @{ $EXPORT_TAGS{"types"} },  "DelimitedStr";
+	push @{ $EXPORT_TAGS{"is"} },     "is_DelimitedStr";
+	push @{ $EXPORT_TAGS{"assert"} }, "assert_DelimitedStr";
+
+}
+
 # Dict
 {
 	my $type;
 	sub Dict () {
-		$type ||= bless( [ \&is_Dict, "Dict", "Types::Standard", "Dict" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_Dict, name => "Dict", library => "Types::Standard", library_name => "Dict" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_Dict ($) {
@@ -456,7 +480,7 @@ BEGIN {
 {
 	my $type;
 	sub Enum () {
-		$type ||= bless( [ \&is_Enum, "Enum", "Types::Standard", "Enum" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_Enum, name => "Enum", library => "Types::Standard", library_name => "Enum" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_Enum ($) {
@@ -479,7 +503,7 @@ BEGIN {
 {
 	my $type;
 	sub FaceCard () {
-		$type ||= bless( [ \&is_FaceCard, "FaceCard", "Acme::Mitey::Cards::Types::Source", "FaceCard" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_FaceCard, name => "FaceCard", library => "Acme::Mitey::Cards::Types::Source", library_name => "FaceCard" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_FaceCard ($) {
@@ -502,7 +526,7 @@ BEGIN {
 {
 	my $type;
 	sub FileHandle () {
-		$type ||= bless( [ \&is_FileHandle, "FileHandle", "Types::Standard", "FileHandle" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_FileHandle, name => "FileHandle", library => "Types::Standard", library_name => "FileHandle" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_FileHandle ($) {
@@ -525,7 +549,7 @@ BEGIN {
 {
 	my $type;
 	sub GlobRef () {
-		$type ||= bless( [ \&is_GlobRef, "GlobRef", "Types::Standard", "GlobRef" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_GlobRef, name => "GlobRef", library => "Types::Standard", library_name => "GlobRef" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_GlobRef ($) {
@@ -548,7 +572,7 @@ BEGIN {
 {
 	my $type;
 	sub Hand () {
-		$type ||= bless( [ \&is_Hand, "Hand", "Acme::Mitey::Cards::Types::Source", "Hand" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_Hand, name => "Hand", library => "Acme::Mitey::Cards::Types::Source", library_name => "Hand" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_Hand ($) {
@@ -571,7 +595,7 @@ BEGIN {
 {
 	my $type;
 	sub HasMethods () {
-		$type ||= bless( [ \&is_HasMethods, "HasMethods", "Types::Standard", "HasMethods" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_HasMethods, name => "HasMethods", library => "Types::Standard", library_name => "HasMethods" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_HasMethods ($) {
@@ -594,7 +618,7 @@ BEGIN {
 {
 	my $type;
 	sub HashRef () {
-		$type ||= bless( [ \&is_HashRef, "HashRef", "Types::Standard", "HashRef" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_HashRef, name => "HashRef", library => "Types::Standard", library_name => "HashRef" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_HashRef ($) {
@@ -617,7 +641,7 @@ BEGIN {
 {
 	my $type;
 	sub InstanceOf () {
-		$type ||= bless( [ \&is_InstanceOf, "InstanceOf", "Types::Standard", "InstanceOf" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_InstanceOf, name => "InstanceOf", library => "Types::Standard", library_name => "InstanceOf" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_InstanceOf ($) {
@@ -640,7 +664,7 @@ BEGIN {
 {
 	my $type;
 	sub Int () {
-		$type ||= bless( [ \&is_Int, "Int", "Types::Standard", "Int" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_Int, name => "Int", library => "Types::Standard", library_name => "Int" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_Int ($) {
@@ -663,7 +687,7 @@ BEGIN {
 {
 	my $type;
 	sub IntRange () {
-		$type ||= bless( [ \&is_IntRange, "IntRange", "Types::Common::Numeric", "IntRange" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_IntRange, name => "IntRange", library => "Types::Common::Numeric", library_name => "IntRange" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_IntRange ($) {
@@ -686,7 +710,7 @@ BEGIN {
 {
 	my $type;
 	sub Item () {
-		$type ||= bless( [ \&is_Item, "Item", "Types::Standard", "Item" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_Item, name => "Item", library => "Types::Standard", library_name => "Item" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_Item ($) {
@@ -709,7 +733,7 @@ BEGIN {
 {
 	my $type;
 	sub JokerCard () {
-		$type ||= bless( [ \&is_JokerCard, "JokerCard", "Acme::Mitey::Cards::Types::Source", "JokerCard" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_JokerCard, name => "JokerCard", library => "Acme::Mitey::Cards::Types::Source", library_name => "JokerCard" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_JokerCard ($) {
@@ -732,7 +756,7 @@ BEGIN {
 {
 	my $type;
 	sub LaxNum () {
-		$type ||= bless( [ \&is_LaxNum, "LaxNum", "Types::Standard", "LaxNum" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_LaxNum, name => "LaxNum", library => "Types::Standard", library_name => "LaxNum" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_LaxNum ($) {
@@ -755,7 +779,7 @@ BEGIN {
 {
 	my $type;
 	sub LowerCaseSimpleStr () {
-		$type ||= bless( [ \&is_LowerCaseSimpleStr, "LowerCaseSimpleStr", "Types::Common::String", "LowerCaseSimpleStr" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_LowerCaseSimpleStr, name => "LowerCaseSimpleStr", library => "Types::Common::String", library_name => "LowerCaseSimpleStr" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_LowerCaseSimpleStr ($) {
@@ -778,7 +802,7 @@ BEGIN {
 {
 	my $type;
 	sub LowerCaseStr () {
-		$type ||= bless( [ \&is_LowerCaseStr, "LowerCaseStr", "Types::Common::String", "LowerCaseStr" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_LowerCaseStr, name => "LowerCaseStr", library => "Types::Common::String", library_name => "LowerCaseStr" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_LowerCaseStr ($) {
@@ -801,7 +825,7 @@ BEGIN {
 {
 	my $type;
 	sub Map () {
-		$type ||= bless( [ \&is_Map, "Map", "Types::Standard", "Map" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_Map, name => "Map", library => "Types::Standard", library_name => "Map" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_Map ($) {
@@ -824,7 +848,7 @@ BEGIN {
 {
 	my $type;
 	sub Maybe () {
-		$type ||= bless( [ \&is_Maybe, "Maybe", "Types::Standard", "Maybe" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_Maybe, name => "Maybe", library => "Types::Standard", library_name => "Maybe" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_Maybe ($) {
@@ -847,7 +871,7 @@ BEGIN {
 {
 	my $type;
 	sub NegativeInt () {
-		$type ||= bless( [ \&is_NegativeInt, "NegativeInt", "Types::Common::Numeric", "NegativeInt" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_NegativeInt, name => "NegativeInt", library => "Types::Common::Numeric", library_name => "NegativeInt" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_NegativeInt ($) {
@@ -870,7 +894,7 @@ BEGIN {
 {
 	my $type;
 	sub NegativeNum () {
-		$type ||= bless( [ \&is_NegativeNum, "NegativeNum", "Types::Common::Numeric", "NegativeNum" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_NegativeNum, name => "NegativeNum", library => "Types::Common::Numeric", library_name => "NegativeNum" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_NegativeNum ($) {
@@ -893,7 +917,7 @@ BEGIN {
 {
 	my $type;
 	sub NegativeOrZeroInt () {
-		$type ||= bless( [ \&is_NegativeOrZeroInt, "NegativeOrZeroInt", "Types::Common::Numeric", "NegativeOrZeroInt" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_NegativeOrZeroInt, name => "NegativeOrZeroInt", library => "Types::Common::Numeric", library_name => "NegativeOrZeroInt" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_NegativeOrZeroInt ($) {
@@ -916,7 +940,7 @@ BEGIN {
 {
 	my $type;
 	sub NegativeOrZeroNum () {
-		$type ||= bless( [ \&is_NegativeOrZeroNum, "NegativeOrZeroNum", "Types::Common::Numeric", "NegativeOrZeroNum" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_NegativeOrZeroNum, name => "NegativeOrZeroNum", library => "Types::Common::Numeric", library_name => "NegativeOrZeroNum" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_NegativeOrZeroNum ($) {
@@ -939,7 +963,7 @@ BEGIN {
 {
 	my $type;
 	sub NonEmptySimpleStr () {
-		$type ||= bless( [ \&is_NonEmptySimpleStr, "NonEmptySimpleStr", "Types::Common::String", "NonEmptySimpleStr" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_NonEmptySimpleStr, name => "NonEmptySimpleStr", library => "Types::Common::String", library_name => "NonEmptySimpleStr" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_NonEmptySimpleStr ($) {
@@ -962,7 +986,7 @@ BEGIN {
 {
 	my $type;
 	sub NonEmptyStr () {
-		$type ||= bless( [ \&is_NonEmptyStr, "NonEmptyStr", "Types::Common::String", "NonEmptyStr" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_NonEmptyStr, name => "NonEmptyStr", library => "Types::Common::String", library_name => "NonEmptyStr" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_NonEmptyStr ($) {
@@ -985,7 +1009,7 @@ BEGIN {
 {
 	my $type;
 	sub Num () {
-		$type ||= bless( [ \&is_Num, "Num", "Types::Standard", "Num" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_Num, name => "Num", library => "Types::Standard", library_name => "Num" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_Num ($) {
@@ -1008,7 +1032,7 @@ BEGIN {
 {
 	my $type;
 	sub NumRange () {
-		$type ||= bless( [ \&is_NumRange, "NumRange", "Types::Common::Numeric", "NumRange" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_NumRange, name => "NumRange", library => "Types::Common::Numeric", library_name => "NumRange" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_NumRange ($) {
@@ -1031,7 +1055,7 @@ BEGIN {
 {
 	my $type;
 	sub NumericCard () {
-		$type ||= bless( [ \&is_NumericCard, "NumericCard", "Acme::Mitey::Cards::Types::Source", "NumericCard" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_NumericCard, name => "NumericCard", library => "Acme::Mitey::Cards::Types::Source", library_name => "NumericCard" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_NumericCard ($) {
@@ -1054,7 +1078,7 @@ BEGIN {
 {
 	my $type;
 	sub NumericCode () {
-		$type ||= bless( [ \&is_NumericCode, "NumericCode", "Types::Common::String", "NumericCode" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_NumericCode, name => "NumericCode", library => "Types::Common::String", library_name => "NumericCode" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_NumericCode ($) {
@@ -1077,7 +1101,7 @@ BEGIN {
 {
 	my $type;
 	sub Object () {
-		$type ||= bless( [ \&is_Object, "Object", "Types::Standard", "Object" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_Object, name => "Object", library => "Types::Standard", library_name => "Object" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_Object ($) {
@@ -1100,7 +1124,7 @@ BEGIN {
 {
 	my $type;
 	sub OptList () {
-		$type ||= bless( [ \&is_OptList, "OptList", "Types::Standard", "OptList" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_OptList, name => "OptList", library => "Types::Standard", library_name => "OptList" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_OptList ($) {
@@ -1123,7 +1147,7 @@ BEGIN {
 {
 	my $type;
 	sub Optional () {
-		$type ||= bless( [ \&is_Optional, "Optional", "Types::Standard", "Optional" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_Optional, name => "Optional", library => "Types::Standard", library_name => "Optional" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_Optional ($) {
@@ -1146,7 +1170,7 @@ BEGIN {
 {
 	my $type;
 	sub Overload () {
-		$type ||= bless( [ \&is_Overload, "Overload", "Types::Standard", "Overload" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_Overload, name => "Overload", library => "Types::Standard", library_name => "Overload" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_Overload ($) {
@@ -1169,7 +1193,7 @@ BEGIN {
 {
 	my $type;
 	sub Password () {
-		$type ||= bless( [ \&is_Password, "Password", "Types::Common::String", "Password" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_Password, name => "Password", library => "Types::Common::String", library_name => "Password" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_Password ($) {
@@ -1192,7 +1216,7 @@ BEGIN {
 {
 	my $type;
 	sub PositiveInt () {
-		$type ||= bless( [ \&is_PositiveInt, "PositiveInt", "Types::Common::Numeric", "PositiveInt" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_PositiveInt, name => "PositiveInt", library => "Types::Common::Numeric", library_name => "PositiveInt" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_PositiveInt ($) {
@@ -1215,7 +1239,7 @@ BEGIN {
 {
 	my $type;
 	sub PositiveNum () {
-		$type ||= bless( [ \&is_PositiveNum, "PositiveNum", "Types::Common::Numeric", "PositiveNum" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_PositiveNum, name => "PositiveNum", library => "Types::Common::Numeric", library_name => "PositiveNum" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_PositiveNum ($) {
@@ -1238,7 +1262,7 @@ BEGIN {
 {
 	my $type;
 	sub PositiveOrZeroInt () {
-		$type ||= bless( [ \&is_PositiveOrZeroInt, "PositiveOrZeroInt", "Types::Common::Numeric", "PositiveOrZeroInt" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_PositiveOrZeroInt, name => "PositiveOrZeroInt", library => "Types::Common::Numeric", library_name => "PositiveOrZeroInt" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_PositiveOrZeroInt ($) {
@@ -1261,7 +1285,7 @@ BEGIN {
 {
 	my $type;
 	sub PositiveOrZeroNum () {
-		$type ||= bless( [ \&is_PositiveOrZeroNum, "PositiveOrZeroNum", "Types::Common::Numeric", "PositiveOrZeroNum" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_PositiveOrZeroNum, name => "PositiveOrZeroNum", library => "Types::Common::Numeric", library_name => "PositiveOrZeroNum" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_PositiveOrZeroNum ($) {
@@ -1284,7 +1308,7 @@ BEGIN {
 {
 	my $type;
 	sub Ref () {
-		$type ||= bless( [ \&is_Ref, "Ref", "Types::Standard", "Ref" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_Ref, name => "Ref", library => "Types::Standard", library_name => "Ref" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_Ref ($) {
@@ -1307,7 +1331,7 @@ BEGIN {
 {
 	my $type;
 	sub RegexpRef () {
-		$type ||= bless( [ \&is_RegexpRef, "RegexpRef", "Types::Standard", "RegexpRef" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_RegexpRef, name => "RegexpRef", library => "Types::Standard", library_name => "RegexpRef" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_RegexpRef ($) {
@@ -1330,7 +1354,7 @@ BEGIN {
 {
 	my $type;
 	sub RoleName () {
-		$type ||= bless( [ \&is_RoleName, "RoleName", "Types::Standard", "RoleName" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_RoleName, name => "RoleName", library => "Types::Standard", library_name => "RoleName" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_RoleName ($) {
@@ -1383,7 +1407,7 @@ BEGIN {
 {
 	my $type;
 	sub ScalarRef () {
-		$type ||= bless( [ \&is_ScalarRef, "ScalarRef", "Types::Standard", "ScalarRef" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_ScalarRef, name => "ScalarRef", library => "Types::Standard", library_name => "ScalarRef" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_ScalarRef ($) {
@@ -1406,7 +1430,7 @@ BEGIN {
 {
 	my $type;
 	sub Set () {
-		$type ||= bless( [ \&is_Set, "Set", "Acme::Mitey::Cards::Types::Source", "Set" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_Set, name => "Set", library => "Acme::Mitey::Cards::Types::Source", library_name => "Set" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_Set ($) {
@@ -1429,7 +1453,7 @@ BEGIN {
 {
 	my $type;
 	sub SimpleStr () {
-		$type ||= bless( [ \&is_SimpleStr, "SimpleStr", "Types::Common::String", "SimpleStr" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_SimpleStr, name => "SimpleStr", library => "Types::Common::String", library_name => "SimpleStr" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_SimpleStr ($) {
@@ -1452,7 +1476,7 @@ BEGIN {
 {
 	my $type;
 	sub SingleDigit () {
-		$type ||= bless( [ \&is_SingleDigit, "SingleDigit", "Types::Common::Numeric", "SingleDigit" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_SingleDigit, name => "SingleDigit", library => "Types::Common::Numeric", library_name => "SingleDigit" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_SingleDigit ($) {
@@ -1475,7 +1499,7 @@ BEGIN {
 {
 	my $type;
 	sub Slurpy () {
-		$type ||= bless( [ \&is_Slurpy, "Slurpy", "Types::Standard", "Slurpy" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_Slurpy, name => "Slurpy", library => "Types::Standard", library_name => "Slurpy" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_Slurpy ($) {
@@ -1498,7 +1522,7 @@ BEGIN {
 {
 	my $type;
 	sub Str () {
-		$type ||= bless( [ \&is_Str, "Str", "Types::Standard", "Str" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_Str, name => "Str", library => "Types::Standard", library_name => "Str" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_Str ($) {
@@ -1521,7 +1545,7 @@ BEGIN {
 {
 	my $type;
 	sub StrLength () {
-		$type ||= bless( [ \&is_StrLength, "StrLength", "Types::Common::String", "StrLength" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_StrLength, name => "StrLength", library => "Types::Common::String", library_name => "StrLength" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_StrLength ($) {
@@ -1544,7 +1568,7 @@ BEGIN {
 {
 	my $type;
 	sub StrMatch () {
-		$type ||= bless( [ \&is_StrMatch, "StrMatch", "Types::Standard", "StrMatch" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_StrMatch, name => "StrMatch", library => "Types::Standard", library_name => "StrMatch" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_StrMatch ($) {
@@ -1567,7 +1591,7 @@ BEGIN {
 {
 	my $type;
 	sub StrictNum () {
-		$type ||= bless( [ \&is_StrictNum, "StrictNum", "Types::Standard", "StrictNum" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_StrictNum, name => "StrictNum", library => "Types::Standard", library_name => "StrictNum" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_StrictNum ($) {
@@ -1600,7 +1624,7 @@ BEGIN {
 {
 	my $type;
 	sub StrongPassword () {
-		$type ||= bless( [ \&is_StrongPassword, "StrongPassword", "Types::Common::String", "StrongPassword" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_StrongPassword, name => "StrongPassword", library => "Types::Common::String", library_name => "StrongPassword" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_StrongPassword ($) {
@@ -1623,7 +1647,7 @@ BEGIN {
 {
 	my $type;
 	sub Suit () {
-		$type ||= bless( [ \&is_Suit, "Suit", "Acme::Mitey::Cards::Types::Source", "Suit" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_Suit, name => "Suit", library => "Acme::Mitey::Cards::Types::Source", library_name => "Suit" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_Suit ($) {
@@ -1646,7 +1670,7 @@ BEGIN {
 {
 	my $type;
 	sub Tied () {
-		$type ||= bless( [ \&is_Tied, "Tied", "Types::Standard", "Tied" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_Tied, name => "Tied", library => "Types::Standard", library_name => "Tied" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_Tied ($) {
@@ -1669,7 +1693,7 @@ BEGIN {
 {
 	my $type;
 	sub Tuple () {
-		$type ||= bless( [ \&is_Tuple, "Tuple", "Types::Standard", "Tuple" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_Tuple, name => "Tuple", library => "Types::Standard", library_name => "Tuple" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_Tuple ($) {
@@ -1692,7 +1716,7 @@ BEGIN {
 {
 	my $type;
 	sub Undef () {
-		$type ||= bless( [ \&is_Undef, "Undef", "Types::Standard", "Undef" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_Undef, name => "Undef", library => "Types::Standard", library_name => "Undef" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_Undef ($) {
@@ -1715,7 +1739,7 @@ BEGIN {
 {
 	my $type;
 	sub UpperCaseSimpleStr () {
-		$type ||= bless( [ \&is_UpperCaseSimpleStr, "UpperCaseSimpleStr", "Types::Common::String", "UpperCaseSimpleStr" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_UpperCaseSimpleStr, name => "UpperCaseSimpleStr", library => "Types::Common::String", library_name => "UpperCaseSimpleStr" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_UpperCaseSimpleStr ($) {
@@ -1738,7 +1762,7 @@ BEGIN {
 {
 	my $type;
 	sub UpperCaseStr () {
-		$type ||= bless( [ \&is_UpperCaseStr, "UpperCaseStr", "Types::Common::String", "UpperCaseStr" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_UpperCaseStr, name => "UpperCaseStr", library => "Types::Common::String", library_name => "UpperCaseStr" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_UpperCaseStr ($) {
@@ -1761,7 +1785,7 @@ BEGIN {
 {
 	my $type;
 	sub Value () {
-		$type ||= bless( [ \&is_Value, "Value", "Types::Standard", "Value" ], "Acme::Mitey::Cards::Types::TypeConstraint" );
+		$type ||= bless( { check => \&is_Value, name => "Value", library => "Types::Standard", library_name => "Value" }, "Acme::Mitey::Cards::Types::TypeConstraint" );
 	}
 
 	sub is_Value ($) {
@@ -1783,4 +1807,897 @@ BEGIN {
 
 1;
 __END__
+
+=head1 NAME
+
+Acme::Mitey::Cards::Types - type constraint library
+
+=head1 TYPES
+
+This type constraint library is even more basic that L<Type::Tiny>. Exported
+types may be combined using C<< Foo | Bar >> but parameterized type constraints
+like C<< Foo[Bar] >> are not supported.
+
+=head2 B<Any>
+
+Based on B<Any> in L<Types::Standard>.
+
+The C<< Any >> constant returns a blessed type constraint object.
+C<< is_Any($value) >> checks a value against the type and returns a boolean.
+C<< assert_Any($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :Any );
+
+=head2 B<ArrayRef>
+
+Based on B<ArrayRef> in L<Types::Standard>.
+
+The C<< ArrayRef >> constant returns a blessed type constraint object.
+C<< is_ArrayRef($value) >> checks a value against the type and returns a boolean.
+C<< assert_ArrayRef($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :ArrayRef );
+
+=head2 B<Bool>
+
+Based on B<Bool> in L<Types::Standard>.
+
+The C<< Bool >> constant returns a blessed type constraint object.
+C<< is_Bool($value) >> checks a value against the type and returns a boolean.
+C<< assert_Bool($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :Bool );
+
+=head2 B<Card>
+
+Based on B<Card> in L<Acme::Mitey::Cards::Types::Source>.
+
+The C<< Card >> constant returns a blessed type constraint object.
+C<< is_Card($value) >> checks a value against the type and returns a boolean.
+C<< assert_Card($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :Card );
+
+=head2 B<CardArray>
+
+Based on B<CardArray> in L<Acme::Mitey::Cards::Types::Source>.
+
+The C<< CardArray >> constant returns a blessed type constraint object.
+C<< is_CardArray($value) >> checks a value against the type and returns a boolean.
+C<< assert_CardArray($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :CardArray );
+
+=head2 B<CardNumber>
+
+Based on B<CardNumber> in L<Acme::Mitey::Cards::Types::Source>.
+
+The C<< CardNumber >> constant returns a blessed type constraint object.
+C<< is_CardNumber($value) >> checks a value against the type and returns a boolean.
+C<< assert_CardNumber($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :CardNumber );
+
+=head2 B<Character>
+
+Based on B<Character> in L<Acme::Mitey::Cards::Types::Source>.
+
+The C<< Character >> constant returns a blessed type constraint object.
+C<< is_Character($value) >> checks a value against the type and returns a boolean.
+C<< assert_Character($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :Character );
+
+=head2 B<ClassName>
+
+Based on B<ClassName> in L<Types::Standard>.
+
+The C<< ClassName >> constant returns a blessed type constraint object.
+C<< is_ClassName($value) >> checks a value against the type and returns a boolean.
+C<< assert_ClassName($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :ClassName );
+
+=head2 B<CodeRef>
+
+Based on B<CodeRef> in L<Types::Standard>.
+
+The C<< CodeRef >> constant returns a blessed type constraint object.
+C<< is_CodeRef($value) >> checks a value against the type and returns a boolean.
+C<< assert_CodeRef($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :CodeRef );
+
+=head2 B<ConsumerOf>
+
+Based on B<ConsumerOf> in L<Types::Standard>.
+
+The C<< ConsumerOf >> constant returns a blessed type constraint object.
+C<< is_ConsumerOf($value) >> checks a value against the type and returns a boolean.
+C<< assert_ConsumerOf($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :ConsumerOf );
+
+=head2 B<CycleTuple>
+
+Based on B<CycleTuple> in L<Types::Standard>.
+
+The C<< CycleTuple >> constant returns a blessed type constraint object.
+C<< is_CycleTuple($value) >> checks a value against the type and returns a boolean.
+C<< assert_CycleTuple($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :CycleTuple );
+
+=head2 B<Deck>
+
+Based on B<Deck> in L<Acme::Mitey::Cards::Types::Source>.
+
+The C<< Deck >> constant returns a blessed type constraint object.
+C<< is_Deck($value) >> checks a value against the type and returns a boolean.
+C<< assert_Deck($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :Deck );
+
+=head2 B<Defined>
+
+Based on B<Defined> in L<Types::Standard>.
+
+The C<< Defined >> constant returns a blessed type constraint object.
+C<< is_Defined($value) >> checks a value against the type and returns a boolean.
+C<< assert_Defined($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :Defined );
+
+=head2 B<DelimitedStr>
+
+Based on B<DelimitedStr> in L<Types::Common::String>.
+
+The C<< DelimitedStr >> constant returns a blessed type constraint object.
+C<< is_DelimitedStr($value) >> checks a value against the type and returns a boolean.
+C<< assert_DelimitedStr($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :DelimitedStr );
+
+=head2 B<Dict>
+
+Based on B<Dict> in L<Types::Standard>.
+
+The C<< Dict >> constant returns a blessed type constraint object.
+C<< is_Dict($value) >> checks a value against the type and returns a boolean.
+C<< assert_Dict($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :Dict );
+
+=head2 B<Enum>
+
+Based on B<Enum> in L<Types::Standard>.
+
+The C<< Enum >> constant returns a blessed type constraint object.
+C<< is_Enum($value) >> checks a value against the type and returns a boolean.
+C<< assert_Enum($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :Enum );
+
+=head2 B<FaceCard>
+
+Based on B<FaceCard> in L<Acme::Mitey::Cards::Types::Source>.
+
+The C<< FaceCard >> constant returns a blessed type constraint object.
+C<< is_FaceCard($value) >> checks a value against the type and returns a boolean.
+C<< assert_FaceCard($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :FaceCard );
+
+=head2 B<FileHandle>
+
+Based on B<FileHandle> in L<Types::Standard>.
+
+The C<< FileHandle >> constant returns a blessed type constraint object.
+C<< is_FileHandle($value) >> checks a value against the type and returns a boolean.
+C<< assert_FileHandle($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :FileHandle );
+
+=head2 B<GlobRef>
+
+Based on B<GlobRef> in L<Types::Standard>.
+
+The C<< GlobRef >> constant returns a blessed type constraint object.
+C<< is_GlobRef($value) >> checks a value against the type and returns a boolean.
+C<< assert_GlobRef($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :GlobRef );
+
+=head2 B<Hand>
+
+Based on B<Hand> in L<Acme::Mitey::Cards::Types::Source>.
+
+The C<< Hand >> constant returns a blessed type constraint object.
+C<< is_Hand($value) >> checks a value against the type and returns a boolean.
+C<< assert_Hand($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :Hand );
+
+=head2 B<HasMethods>
+
+Based on B<HasMethods> in L<Types::Standard>.
+
+The C<< HasMethods >> constant returns a blessed type constraint object.
+C<< is_HasMethods($value) >> checks a value against the type and returns a boolean.
+C<< assert_HasMethods($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :HasMethods );
+
+=head2 B<HashRef>
+
+Based on B<HashRef> in L<Types::Standard>.
+
+The C<< HashRef >> constant returns a blessed type constraint object.
+C<< is_HashRef($value) >> checks a value against the type and returns a boolean.
+C<< assert_HashRef($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :HashRef );
+
+=head2 B<InstanceOf>
+
+Based on B<InstanceOf> in L<Types::Standard>.
+
+The C<< InstanceOf >> constant returns a blessed type constraint object.
+C<< is_InstanceOf($value) >> checks a value against the type and returns a boolean.
+C<< assert_InstanceOf($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :InstanceOf );
+
+=head2 B<Int>
+
+Based on B<Int> in L<Types::Standard>.
+
+The C<< Int >> constant returns a blessed type constraint object.
+C<< is_Int($value) >> checks a value against the type and returns a boolean.
+C<< assert_Int($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :Int );
+
+=head2 B<IntRange>
+
+Based on B<IntRange> in L<Types::Common::Numeric>.
+
+The C<< IntRange >> constant returns a blessed type constraint object.
+C<< is_IntRange($value) >> checks a value against the type and returns a boolean.
+C<< assert_IntRange($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :IntRange );
+
+=head2 B<Item>
+
+Based on B<Item> in L<Types::Standard>.
+
+The C<< Item >> constant returns a blessed type constraint object.
+C<< is_Item($value) >> checks a value against the type and returns a boolean.
+C<< assert_Item($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :Item );
+
+=head2 B<JokerCard>
+
+Based on B<JokerCard> in L<Acme::Mitey::Cards::Types::Source>.
+
+The C<< JokerCard >> constant returns a blessed type constraint object.
+C<< is_JokerCard($value) >> checks a value against the type and returns a boolean.
+C<< assert_JokerCard($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :JokerCard );
+
+=head2 B<LaxNum>
+
+Based on B<LaxNum> in L<Types::Standard>.
+
+The C<< LaxNum >> constant returns a blessed type constraint object.
+C<< is_LaxNum($value) >> checks a value against the type and returns a boolean.
+C<< assert_LaxNum($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :LaxNum );
+
+=head2 B<LowerCaseSimpleStr>
+
+Based on B<LowerCaseSimpleStr> in L<Types::Common::String>.
+
+The C<< LowerCaseSimpleStr >> constant returns a blessed type constraint object.
+C<< is_LowerCaseSimpleStr($value) >> checks a value against the type and returns a boolean.
+C<< assert_LowerCaseSimpleStr($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :LowerCaseSimpleStr );
+
+=head2 B<LowerCaseStr>
+
+Based on B<LowerCaseStr> in L<Types::Common::String>.
+
+The C<< LowerCaseStr >> constant returns a blessed type constraint object.
+C<< is_LowerCaseStr($value) >> checks a value against the type and returns a boolean.
+C<< assert_LowerCaseStr($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :LowerCaseStr );
+
+=head2 B<Map>
+
+Based on B<Map> in L<Types::Standard>.
+
+The C<< Map >> constant returns a blessed type constraint object.
+C<< is_Map($value) >> checks a value against the type and returns a boolean.
+C<< assert_Map($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :Map );
+
+=head2 B<Maybe>
+
+Based on B<Maybe> in L<Types::Standard>.
+
+The C<< Maybe >> constant returns a blessed type constraint object.
+C<< is_Maybe($value) >> checks a value against the type and returns a boolean.
+C<< assert_Maybe($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :Maybe );
+
+=head2 B<NegativeInt>
+
+Based on B<NegativeInt> in L<Types::Common::Numeric>.
+
+The C<< NegativeInt >> constant returns a blessed type constraint object.
+C<< is_NegativeInt($value) >> checks a value against the type and returns a boolean.
+C<< assert_NegativeInt($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :NegativeInt );
+
+=head2 B<NegativeNum>
+
+Based on B<NegativeNum> in L<Types::Common::Numeric>.
+
+The C<< NegativeNum >> constant returns a blessed type constraint object.
+C<< is_NegativeNum($value) >> checks a value against the type and returns a boolean.
+C<< assert_NegativeNum($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :NegativeNum );
+
+=head2 B<NegativeOrZeroInt>
+
+Based on B<NegativeOrZeroInt> in L<Types::Common::Numeric>.
+
+The C<< NegativeOrZeroInt >> constant returns a blessed type constraint object.
+C<< is_NegativeOrZeroInt($value) >> checks a value against the type and returns a boolean.
+C<< assert_NegativeOrZeroInt($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :NegativeOrZeroInt );
+
+=head2 B<NegativeOrZeroNum>
+
+Based on B<NegativeOrZeroNum> in L<Types::Common::Numeric>.
+
+The C<< NegativeOrZeroNum >> constant returns a blessed type constraint object.
+C<< is_NegativeOrZeroNum($value) >> checks a value against the type and returns a boolean.
+C<< assert_NegativeOrZeroNum($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :NegativeOrZeroNum );
+
+=head2 B<NonEmptySimpleStr>
+
+Based on B<NonEmptySimpleStr> in L<Types::Common::String>.
+
+The C<< NonEmptySimpleStr >> constant returns a blessed type constraint object.
+C<< is_NonEmptySimpleStr($value) >> checks a value against the type and returns a boolean.
+C<< assert_NonEmptySimpleStr($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :NonEmptySimpleStr );
+
+=head2 B<NonEmptyStr>
+
+Based on B<NonEmptyStr> in L<Types::Common::String>.
+
+The C<< NonEmptyStr >> constant returns a blessed type constraint object.
+C<< is_NonEmptyStr($value) >> checks a value against the type and returns a boolean.
+C<< assert_NonEmptyStr($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :NonEmptyStr );
+
+=head2 B<Num>
+
+Based on B<Num> in L<Types::Standard>.
+
+The C<< Num >> constant returns a blessed type constraint object.
+C<< is_Num($value) >> checks a value against the type and returns a boolean.
+C<< assert_Num($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :Num );
+
+=head2 B<NumRange>
+
+Based on B<NumRange> in L<Types::Common::Numeric>.
+
+The C<< NumRange >> constant returns a blessed type constraint object.
+C<< is_NumRange($value) >> checks a value against the type and returns a boolean.
+C<< assert_NumRange($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :NumRange );
+
+=head2 B<NumericCard>
+
+Based on B<NumericCard> in L<Acme::Mitey::Cards::Types::Source>.
+
+The C<< NumericCard >> constant returns a blessed type constraint object.
+C<< is_NumericCard($value) >> checks a value against the type and returns a boolean.
+C<< assert_NumericCard($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :NumericCard );
+
+=head2 B<NumericCode>
+
+Based on B<NumericCode> in L<Types::Common::String>.
+
+The C<< NumericCode >> constant returns a blessed type constraint object.
+C<< is_NumericCode($value) >> checks a value against the type and returns a boolean.
+C<< assert_NumericCode($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :NumericCode );
+
+=head2 B<Object>
+
+Based on B<Object> in L<Types::Standard>.
+
+The C<< Object >> constant returns a blessed type constraint object.
+C<< is_Object($value) >> checks a value against the type and returns a boolean.
+C<< assert_Object($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :Object );
+
+=head2 B<OptList>
+
+Based on B<OptList> in L<Types::Standard>.
+
+The C<< OptList >> constant returns a blessed type constraint object.
+C<< is_OptList($value) >> checks a value against the type and returns a boolean.
+C<< assert_OptList($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :OptList );
+
+=head2 B<Optional>
+
+Based on B<Optional> in L<Types::Standard>.
+
+The C<< Optional >> constant returns a blessed type constraint object.
+C<< is_Optional($value) >> checks a value against the type and returns a boolean.
+C<< assert_Optional($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :Optional );
+
+=head2 B<Overload>
+
+Based on B<Overload> in L<Types::Standard>.
+
+The C<< Overload >> constant returns a blessed type constraint object.
+C<< is_Overload($value) >> checks a value against the type and returns a boolean.
+C<< assert_Overload($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :Overload );
+
+=head2 B<Password>
+
+Based on B<Password> in L<Types::Common::String>.
+
+The C<< Password >> constant returns a blessed type constraint object.
+C<< is_Password($value) >> checks a value against the type and returns a boolean.
+C<< assert_Password($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :Password );
+
+=head2 B<PositiveInt>
+
+Based on B<PositiveInt> in L<Types::Common::Numeric>.
+
+The C<< PositiveInt >> constant returns a blessed type constraint object.
+C<< is_PositiveInt($value) >> checks a value against the type and returns a boolean.
+C<< assert_PositiveInt($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :PositiveInt );
+
+=head2 B<PositiveNum>
+
+Based on B<PositiveNum> in L<Types::Common::Numeric>.
+
+The C<< PositiveNum >> constant returns a blessed type constraint object.
+C<< is_PositiveNum($value) >> checks a value against the type and returns a boolean.
+C<< assert_PositiveNum($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :PositiveNum );
+
+=head2 B<PositiveOrZeroInt>
+
+Based on B<PositiveOrZeroInt> in L<Types::Common::Numeric>.
+
+The C<< PositiveOrZeroInt >> constant returns a blessed type constraint object.
+C<< is_PositiveOrZeroInt($value) >> checks a value against the type and returns a boolean.
+C<< assert_PositiveOrZeroInt($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :PositiveOrZeroInt );
+
+=head2 B<PositiveOrZeroNum>
+
+Based on B<PositiveOrZeroNum> in L<Types::Common::Numeric>.
+
+The C<< PositiveOrZeroNum >> constant returns a blessed type constraint object.
+C<< is_PositiveOrZeroNum($value) >> checks a value against the type and returns a boolean.
+C<< assert_PositiveOrZeroNum($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :PositiveOrZeroNum );
+
+=head2 B<Ref>
+
+Based on B<Ref> in L<Types::Standard>.
+
+The C<< Ref >> constant returns a blessed type constraint object.
+C<< is_Ref($value) >> checks a value against the type and returns a boolean.
+C<< assert_Ref($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :Ref );
+
+=head2 B<RegexpRef>
+
+Based on B<RegexpRef> in L<Types::Standard>.
+
+The C<< RegexpRef >> constant returns a blessed type constraint object.
+C<< is_RegexpRef($value) >> checks a value against the type and returns a boolean.
+C<< assert_RegexpRef($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :RegexpRef );
+
+=head2 B<RoleName>
+
+Based on B<RoleName> in L<Types::Standard>.
+
+The C<< RoleName >> constant returns a blessed type constraint object.
+C<< is_RoleName($value) >> checks a value against the type and returns a boolean.
+C<< assert_RoleName($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :RoleName );
+
+=head2 B<ScalarRef>
+
+Based on B<ScalarRef> in L<Types::Standard>.
+
+The C<< ScalarRef >> constant returns a blessed type constraint object.
+C<< is_ScalarRef($value) >> checks a value against the type and returns a boolean.
+C<< assert_ScalarRef($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :ScalarRef );
+
+=head2 B<Set>
+
+Based on B<Set> in L<Acme::Mitey::Cards::Types::Source>.
+
+The C<< Set >> constant returns a blessed type constraint object.
+C<< is_Set($value) >> checks a value against the type and returns a boolean.
+C<< assert_Set($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :Set );
+
+=head2 B<SimpleStr>
+
+Based on B<SimpleStr> in L<Types::Common::String>.
+
+The C<< SimpleStr >> constant returns a blessed type constraint object.
+C<< is_SimpleStr($value) >> checks a value against the type and returns a boolean.
+C<< assert_SimpleStr($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :SimpleStr );
+
+=head2 B<SingleDigit>
+
+Based on B<SingleDigit> in L<Types::Common::Numeric>.
+
+The C<< SingleDigit >> constant returns a blessed type constraint object.
+C<< is_SingleDigit($value) >> checks a value against the type and returns a boolean.
+C<< assert_SingleDigit($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :SingleDigit );
+
+=head2 B<Slurpy>
+
+Based on B<Slurpy> in L<Types::Standard>.
+
+The C<< Slurpy >> constant returns a blessed type constraint object.
+C<< is_Slurpy($value) >> checks a value against the type and returns a boolean.
+C<< assert_Slurpy($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :Slurpy );
+
+=head2 B<Str>
+
+Based on B<Str> in L<Types::Standard>.
+
+The C<< Str >> constant returns a blessed type constraint object.
+C<< is_Str($value) >> checks a value against the type and returns a boolean.
+C<< assert_Str($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :Str );
+
+=head2 B<StrLength>
+
+Based on B<StrLength> in L<Types::Common::String>.
+
+The C<< StrLength >> constant returns a blessed type constraint object.
+C<< is_StrLength($value) >> checks a value against the type and returns a boolean.
+C<< assert_StrLength($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :StrLength );
+
+=head2 B<StrMatch>
+
+Based on B<StrMatch> in L<Types::Standard>.
+
+The C<< StrMatch >> constant returns a blessed type constraint object.
+C<< is_StrMatch($value) >> checks a value against the type and returns a boolean.
+C<< assert_StrMatch($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :StrMatch );
+
+=head2 B<StrictNum>
+
+Based on B<StrictNum> in L<Types::Standard>.
+
+The C<< StrictNum >> constant returns a blessed type constraint object.
+C<< is_StrictNum($value) >> checks a value against the type and returns a boolean.
+C<< assert_StrictNum($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :StrictNum );
+
+=head2 B<StrongPassword>
+
+Based on B<StrongPassword> in L<Types::Common::String>.
+
+The C<< StrongPassword >> constant returns a blessed type constraint object.
+C<< is_StrongPassword($value) >> checks a value against the type and returns a boolean.
+C<< assert_StrongPassword($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :StrongPassword );
+
+=head2 B<Suit>
+
+Based on B<Suit> in L<Acme::Mitey::Cards::Types::Source>.
+
+The C<< Suit >> constant returns a blessed type constraint object.
+C<< is_Suit($value) >> checks a value against the type and returns a boolean.
+C<< assert_Suit($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :Suit );
+
+=head2 B<Tied>
+
+Based on B<Tied> in L<Types::Standard>.
+
+The C<< Tied >> constant returns a blessed type constraint object.
+C<< is_Tied($value) >> checks a value against the type and returns a boolean.
+C<< assert_Tied($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :Tied );
+
+=head2 B<Tuple>
+
+Based on B<Tuple> in L<Types::Standard>.
+
+The C<< Tuple >> constant returns a blessed type constraint object.
+C<< is_Tuple($value) >> checks a value against the type and returns a boolean.
+C<< assert_Tuple($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :Tuple );
+
+=head2 B<Undef>
+
+Based on B<Undef> in L<Types::Standard>.
+
+The C<< Undef >> constant returns a blessed type constraint object.
+C<< is_Undef($value) >> checks a value against the type and returns a boolean.
+C<< assert_Undef($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :Undef );
+
+=head2 B<UpperCaseSimpleStr>
+
+Based on B<UpperCaseSimpleStr> in L<Types::Common::String>.
+
+The C<< UpperCaseSimpleStr >> constant returns a blessed type constraint object.
+C<< is_UpperCaseSimpleStr($value) >> checks a value against the type and returns a boolean.
+C<< assert_UpperCaseSimpleStr($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :UpperCaseSimpleStr );
+
+=head2 B<UpperCaseStr>
+
+Based on B<UpperCaseStr> in L<Types::Common::String>.
+
+The C<< UpperCaseStr >> constant returns a blessed type constraint object.
+C<< is_UpperCaseStr($value) >> checks a value against the type and returns a boolean.
+C<< assert_UpperCaseStr($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :UpperCaseStr );
+
+=head2 B<Value>
+
+Based on B<Value> in L<Types::Standard>.
+
+The C<< Value >> constant returns a blessed type constraint object.
+C<< is_Value($value) >> checks a value against the type and returns a boolean.
+C<< assert_Value($value) >> checks a value against the type and throws an error.
+
+To import all of these functions:
+
+  use Acme::Mitey::Cards::Types qw( :Value );
+
+=head1 TYPE CONSTRAINT METHODS
+
+For any type constraint B<Foo> the following methods are available:
+
+ Foo->check( $value )         # boolean
+ Foo->get_message( $value )   # error message, even if $value is ok 
+ Foo->validate( $value )      # error message, or undef if ok
+ Foo->assert_valid( $value )  # returns true, dies if error
+ Foo->assert_return( $value ) # returns $value, or dies if error
+ Foo->to_TypeTiny             # promotes the object to Type::Tiny
+
+Objects overload stringification to return their name and overload
+coderefification to call C<assert_return>.
+
+The objects as-is can be used in L<Moo> or L<Mite> C<isa> options.
+
+ has myattr => (
+   is => 'rw',
+   isa => Foo,
+ );
+
+They cannot be used as-is in L<Moose> or L<Mouse>, but can be promoted
+to Type::Tiny and will then work:
+
+ has myattr => (
+   is => 'rw',
+   isa => Foo->to_TypeTiny,
+ );
+
+=cut
 

@@ -7,7 +7,7 @@
 package Perl::Tidy::FileWriter;
 use strict;
 use warnings;
-our $VERSION = '20220613';
+our $VERSION = '20221112';
 
 use constant DEVEL_MODE   => 0;
 use constant EMPTY_STRING => q{};
@@ -182,11 +182,6 @@ sub get_convergence_check {
     return $self->[_K_arrival_order_matches_] && !@{$rlist};
 }
 
-sub get_K_sequence_error_msg {
-    my ($self) = @_;
-    return $self->[_K_sequence_error_msg_];
-}
-
 sub get_output_line_number {
     return $_[0]->[_output_line_number_];
 }
@@ -305,9 +300,11 @@ $str
 This is probably due to a recent programming change and needs to be fixed.
 EOM
 
+                # Always die during development, this needs to be fixed
                 if (DEVEL_MODE) { Fault($msg) }
 
-                $self->warning($msg);
+                # Otherwise warn if string is not empty (added for b1378)
+                $self->warning($msg) if ( length($str) );
 
                 # Only issue this warning once
                 $self->[_K_sequence_error_msg_] = $msg;

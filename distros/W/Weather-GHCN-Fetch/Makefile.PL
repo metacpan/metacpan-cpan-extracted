@@ -64,7 +64,7 @@ my %WriteMakefileArgs = (
     "Time::Local" => 0,
     "lib" => 0
   },
-  "VERSION" => "v0.0.009",
+  "VERSION" => "v0.0.010",
   "test" => {
     "TESTS" => "t/*.t"
   }

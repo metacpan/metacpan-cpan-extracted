@@ -1,7 +1,5 @@
 class IO::Socket::INET extends IO::Socket {
 
-  has handle : int;
-  
   native static method new : IO::Socket::INET ($host : string, $port : int);
   native method read : int ($buffer : byte[]);
   native method write : int ($buffer : string, $length : int);

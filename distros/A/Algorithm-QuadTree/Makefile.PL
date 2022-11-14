@@ -15,15 +15,19 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "Algorithm-QuadTree",
   "LICENSE" => "perl",
   "NAME" => "Algorithm::QuadTree",
-  "PREREQ_PM" => {},
-  "VERSION" => "0.3",
+  "PREREQ_PM" => {
+    "Scalar::Util" => 0
+  },
+  "VERSION" => "0.5",
   "test" => {
     "TESTS" => "t/*.t"
   }
 );
 
 
-my %FallbackPrereqs = ();
+my %FallbackPrereqs = (
+  "Scalar::Util" => 0
+);
 
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.63_03) } ) {

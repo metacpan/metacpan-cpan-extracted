@@ -4,7 +4,7 @@ use strict;
 use warnings FATAL =>'all';
 
 # Initialize our version
-our $VERSION = '1.29';
+our $VERSION = '1.30';
 
 # Import what we need from the POE namespace
 use POE;
@@ -207,6 +207,7 @@ sub new {
     }
 
     my $keep = { map { $_ => delete $opt{$_} } @valid };
+    $keep->{'parent_pid'} = $$;
 
     # Anything left over is unrecognized
     if (keys %opt) {

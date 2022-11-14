@@ -1,0 +1,56 @@
+{
+   "abstract" : "Sign URLs for use with Google Maps API Enterprise Business Accounts",
+   "author" : [
+      "Michael R. Davis"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.52, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "URL-Signature-Google-Maps-API",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::IniFiles" : "0",
+            "Digest::HMAC" : "0",
+            "MIME::Base64" : "0",
+            "Package::New" : "0",
+            "Path::Class" : "0",
+            "Test::Simple" : "0.44"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mrdvt92/perl-URL-Signature-Google-Maps-API/issues"
+      },
+      "homepage" : "https://github.com/mrdvt92/perl-URL-Signature-Google-Maps-API",
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/mrdvt92/perl-URL-Signature-Google-Maps-API.git"
+      }
+   },
+   "version" : "0.02"
+}

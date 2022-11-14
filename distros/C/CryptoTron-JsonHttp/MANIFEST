@@ -6,7 +6,6 @@ LICENSE
 CONTRIBUTING.md
 t/CryptoTron-JsonHttp.t
 lib/CryptoTron/Modules.pm
-lib/CryptoTron/FilterMacro.pm
 lib/CryptoTron/JsonHttp.pm
 lib/CryptoTron/GetBrokerage.pm
 lib/CryptoTron/GetAccount.pm

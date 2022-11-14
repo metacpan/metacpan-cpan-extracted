@@ -54,6 +54,7 @@ my %module = (
         'Encode'      => 0,
         'File::Basename' => 0,
         'Time::Piece' => 0,
+        'Archive::Zip' => 0,
         'Archive::Zip::Member' => 0,
     },
     TEST_REQUIRES => {

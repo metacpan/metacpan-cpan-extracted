@@ -12,7 +12,7 @@ our @EXPORT = qw(
 	&validate_rm
 );
 
-our $VERSION = '2.5';
+our $VERSION = '2.52';
 
 sub check_rm {
      my $self = shift;
@@ -37,7 +37,6 @@ sub check_rm {
 
 	}
 
-     require Data::FormValidator;
      my $dfv = Data::FormValidator->new({}, $self->param('dfv_defaults') );
 	 my $r =$dfv->check($self->query,$profile);
      $self->{'__DFV_RESULT'} = $r;
@@ -91,7 +90,7 @@ sub dfv_error_page {
             ? $return_page : \$return_page;
 
         my $fif_class = $self->param('dfv_fif_class') || 'HTML::FillInForm';
-        eval "require $fif_class";
+        eval { require $fif_class };
         # Deliberately do _not_ check if the eval succeeded,
         # since $fif_class might be an inlined class not to be found in @INC.
         my $fif = $fif_class->new();
@@ -137,7 +136,7 @@ the results and possibly an a version of the form page with errors marked on the
 
 In scalar context, it returns simply the Data::FormValidator::Results object
 which conveniently evaluates to false in a boolean context if there were any missing
-or invalide fields. This is the recommended calling convention.
+or invalid fields. This is the recommended calling convention.
 
 In list context, it returns the results object followed by the error page, if any.
 This was the previous recommended syntax, and was used like this:
@@ -269,7 +268,7 @@ and you wanted this to work with the form run mode used with ::ValidateRM.
 If we detect that ::Forward is loaded, we will set the current run mode name to
 be accurate while the error page is being generated, and then set it back to
 the previous value afterwards. There is a caveat: This currently only works
-when the run name name is the same as the subroutine name for the form page.
+when the run mode name is the same as the subroutine name for the form page.
 If they differ, the current run mode name inside of the form page will be
 inaccurate. If this is a problem for you, get in touch to discuss a solution.
 

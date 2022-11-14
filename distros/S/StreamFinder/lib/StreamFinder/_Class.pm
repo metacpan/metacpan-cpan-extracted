@@ -70,6 +70,8 @@ sub new
 			unless (defined $self->{'agent'});
 	$self->{'timeout'} = 10  unless (defined $self->{'timeout'});
 	$self->{'secure'} = 0    unless (defined $self->{'secure'});
+	$self->{'hls_bandwidth'} = 0    unless (defined($self->{'hls_bandwidth'}) && $self->{'hls_bandwidth'} =~ /^\d+$/);
+	$self->{'hls_bandwidth'} ||= $self->{'bandwidth'}  if (defined($self->{'bandwidth'}) && $self->{'bandwidth'} =~ /^\d+$/);
 	$self->{'log'} = '';
 	$self->{'logfmt'} = '[time] [url] - [site]: [title] ([total])';
 
@@ -128,11 +130,13 @@ sub getURL   #LIKE GET, BUT ONLY RETURN THE SINGLE ONE W/BEST BANDWIDTH AND RELI
 	my $self = shift;
 	my $arglist = (defined $_[0]) ? join('|',@_) : '';
 	my $idx = ($arglist =~ /\b\-?random\b/) ? int rand scalar @{$self->{'streams'}} : 0;
+	my $firstStream = ${$self->{'streams'}}[$idx];
+
 	if (($arglist =~ /\b\-?nopls\b/ && ${$self->{'streams'}}[$idx] =~ /\.(pls)$/i)
+			|| ($self->{'hls_bandwidth'} && ${$self->{'streams'}}[$idx] =~ /\.(m3u8)$/i)
 			|| ($arglist =~ /\b\-?noplaylists\b/ && ${$self->{'streams'}}[$idx] =~ /\.(pls|m3u8?)$/i)) {
 		my $plType = $1;
-		my $firstStream = ${$self->{'streams'}}[$idx];
-		print STDERR "-getURL($idx): NOPLAYLISTS and (".${$self->{'streams'}}[$idx].")\n"  if ($DEBUG);
+		print STDERR "-getURL($idx): NOPLAYLISTS|BANDWIDTH and (".${$self->{'streams'}}[$idx].") TP=$plType=\n"  if ($DEBUG);
 		my $ua = LWP::UserAgent->new(@{$self->{'_userAgentOps'}});		
 		$ua->timeout($self->{'timeout'});
 		$ua->cookie_jar({});
@@ -165,31 +169,65 @@ sub getURL   #LIKE GET, BUT ONLY RETURN THE SINGLE ONE W/BEST BANDWIDTH AND RELI
 			$self->{'title'} = HTML::Entities::decode_entities($self->{'title'});
 			$self->{'title'} = uri_unescape($self->{'title'});
 			print STDERR "-getURL(PLS): title=$firstTitle= pl_idx=$plidx=\n"  if ($DEBUG);
-		} elsif ($arglist =~ /\b\-?noplaylists\b/) {  #m3u*:
+			if ($plidx && $#plentries >= 0) {
+				$plidx = int rand scalar @plentries;
+			} else {
+				$plidx = 0;
+			}
+			$firstStream = (defined($plentries[$plidx]) && $plentries[$plidx]) ? $plentries[$plidx]
+					: ${$self->{'streams'}}[$idx];
+		} elsif ($plType =~ /m3u8/i) {  #HLS?:
+			my $line = 1;
+			(my $urlpath = ${$self->{'streams'}}[$idx]) =~ s#[^\/]+$##;
+			my $highestBW = 0;
+			my $bestStream = '';
+			while ($line <= $#lines) {   #FIND HIGHEST BANDWIDTH STREAM (WITHIN ANY USER-SET BANDWIDTH):
+				if ($lines[$line] =~ /\s*\#EXT\-X\-STREAM\-INF\:(?:.*?)BANDWIDTH\=(\d+)/o) {
+					$line++;
+					if ($line <= $#lines) {
+						(my $bw = $1) =~ s/^\d*x//o;
+						if ($bw > $highestBW && $lines[$line] =~ m#\.m3u8#o
+								&& ($self->{'hls_bandwidth'} <= 0	|| $bw <= $self->{'hls_bandwidth'})) {
+							my $url = $lines[$line];
+							$highestBW = $bw;
+							if ($lines[$line] =~ m#^https?\:\/\/#o) {
+								$bestStream = $lines[$line];
+							} else {
+								$lines[$line] =~ s#^\/##o;
+								$bestStream = $urlpath . $lines[$line];
+							}
+							print STDERR "----($bw): found stream=$bestStream=...\n"  if ($DEBUG);
+						}
+					}
+				}
+				$line++;
+			}
+			$firstStream = $bestStream  if ($bestStream);
+			print STDERR "-getURL(m3u8/HLS) best=$bestStream=\n"  if ($DEBUG);
+		} else {  #m3u:
 			(my $urlpath = ${$self->{'streams'}}[$idx]) =~ s#[^\/]+$##;
 			foreach my $line (@lines) {
 				if ($line =~ m#^\s*([^\#].+)$#o) {
 					my $urlpart = $1;
 					$urlpart =~ s#^\s+##o;
 					$urlpart =~ s#^\/##o;
-					push (@plentries, ($urlpart =~ m#https?\:#) ? $urlpart : ($urlpath . '/' . $urlpart));
+					push (@plentries, ($urlpart =~ m#https?\:#) ? $urlpart : ($urlpath . $urlpart));
 					last  unless ($plidx);
 				}
 			}
-			print STDERR "-getURL(m3u?): pl_idx=$plidx=\n"  if ($DEBUG);
+			if ($plidx && $#plentries >= 0) {
+				$plidx = int rand scalar @plentries;
+			} else {
+				$plidx = 0;
+			}
+			$firstStream = $plentries[$plidx]
+					if (defined($plentries[$plidx]) && $plentries[$plidx]);
+			print STDERR "-getURL(m3u): pl_idx=$plidx=\n"  if ($DEBUG);
 		}
-		if ($plidx && $#plentries >= 0) {
-			$plidx = int rand scalar @plentries;
-		} else {
-			$plidx = 0;
-		}
-		$firstStream = (defined($plentries[$plidx]) && $plentries[$plidx]) ? $plentries[$plidx]
-				: ${$self->{'streams'}}[$idx];
-
-		return $firstStream;
 	}
 
-	return ${$self->{'streams'}}[$idx];
+	print STDERR "-getURL returning stream=$firstStream=\n";
+	return $firstStream;
 }
 
 sub count

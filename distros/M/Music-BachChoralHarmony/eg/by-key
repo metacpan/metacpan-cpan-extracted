@@ -5,11 +5,17 @@ use warnings;
 # Plot a network graph of the outgoing chords of all songs in the given key.
 
 use GraphViz2;
+#use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(Music-BachChoralHarmony); # local author libs
 use Music::BachChoralHarmony;
 
 my $key = shift || 'A_m';
 
-my $bach = Music::BachChoralHarmony->new;
+#my $data_file = 'share/jsbach_chorals_harmony.data'; # local author files
+#my $key_title = 'share/jsbach_BWV_keys_titles.txt';  # "
+my $bach = Music::BachChoralHarmony->new(
+#    data_file => $data_file,
+#    key_title => $key_title,
+);
 my $progression = $bach->parse();
 
 # Get a list of all song events for the given key
@@ -62,4 +68,4 @@ for my $bigram ( keys %score ) {
         unless $edges{$bigram}++;
 }
 
-$g->run( format => 'png', output_file => $0 . '.png' );
+$g->run( format => 'png', output_file => "$0-$key.png" );

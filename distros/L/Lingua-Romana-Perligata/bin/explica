@@ -1,0 +1,147 @@
+#! /usr/bin/env perl
+
+my $template = "$ARGV[0]_XXXX";
+
+use 5.010;
+use warnings;
+
+my $source = do { local $/; readline *ARGV };
+
+our @N = [0];
+
+$source =~ s{
+    ^ \h* ECCE \h+
+    (?: EXPLICO                \b   (?<pod>    (?&content) )
+    |   PROSUM                 \b   (?<for>    (?&content) )
+    |   INCIPIO                \b   (?<begin>  (?&content) )
+    |   FINIO                  \b   (?<end>    (?&content) )
+    |   INTITULO \h+ PRIMUM    \b   (?<head1>  (?&content) )
+    |   INTITULO \h+ SECUNDUM  \b   (?<head2>  (?&content) )
+    |   INTITULO \h+ TERTIUM   \b   (?<head3>  (?&content) )
+    |   INTITULO \h+ QUARTUM   \b   (?<head4>  (?&content) )
+    |   INTITULO \h+ QUINTUM   \b   (?<head5>  (?&content) )
+    |   INTITULO \h+ SEXTUM    \b   (?<head6>  (?&content) )
+    |   AD \h+ DEXTRAM         \b   (?<over>   (?&content) )
+    |   AD \h+ SINISTRAM       \b   (?<back>   (?&content) )
+    |   FACIO  \h+ PUNCTUM     \b   (?<bullet> (?&content) )
+    |   NUMERO \h+ PUNCTUM     \b   (?<number> (?&content) )
+    |   DEFINIO                \b   (?<defn>   (?&content) )
+    |   SECO                   \b   (?<cut>    (?&content) )
+    )
+
+    (?(DEFINE)
+        (?<content> .*? (?: ^ \h* (?:\n|\Z) | \Z | (?= ^ \h* ecce \h+)) )
+    )
+}{
+    my ($block) = keys %+;
+
+       if ($block eq 'over' ) { push @N, 0 }
+    elsif ($block eq 'back' ) { pop  @N    }
+
+       if ($block eq 'defn')   {           "\n=item            $+{$block}\n" }
+    elsif ($block eq 'bullet') {           "\n=item   *        $+{$block}\n" }
+    elsif ($block eq 'number') { $N[-1]++; "\n=item   $N[-1].  $+{$block}\n" }
+    else                       {           "\n=$block          $+{$block}\n" }
+}gexmsi;
+
+use File::Temp 'tempfile';
+
+my ($fh, $filename) = tempfile($template, UNLINK => 1);
+
+print {$fh} $source;
+
+system "perldoc $filename";
+
+
+__END__
+
+=head1 NAME
+
+explica - Translate Perligata's ERL documentation format to POD and then format it with Perldoc
+
+=head1 VERSION
+
+This documentation refers to explica version 0.0.1
+
+=head1 USAGE
+
+    explica <FILENAME>
+
+=head1 REQUIRED ARGUMENTS
+
+=over
+
+=item <FILENAME>
+
+The name or filepath of a Perligata file
+
+=back
+
+=head1 OPTIONS
+
+=over
+
+None
+
+=back
+
+=head1 DIAGNOSTICS
+
+None.
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+Requires no configuration files or environment variables.
+
+
+=head1 DEPENDENCIES
+
+None.
+
+
+=head1 BUGS
+
+None reported.
+Bug reports and other feedback are most welcome.
+
+
+=head1 AUTHOR
+
+Damian Conway C<< <DCONWAY@cpan.org> >>
+
+
+=head1 COPYRIGHT
+
+Copyright (c) 2022, Damian Conway. All rights reserved.
+
+This module is free software. It may be used, redistributed
+and/or modified under the terms of the Perl Artistic License
+(see http://www.perl.com/perl/misc/Artistic.html)
+
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ALL SUCH WARRANTIES ARE EXPLICITLY DISCLAIMED. THE ENTIRE RISK AS TO THE
+QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH YOU. SHOULD THE SOFTWARE
+PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR,
+OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+FOR DAMAGES, INCLUDING ANY DIRECT, INDIRECT, GENERAL, SPECIAL, INCIDENTAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES, HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING OUT OF THE USE OR INABILITY TO USE THE
+SOFTWARE (INCLUDING BUT NOT LIMITED TO PROCUREMENT OF SUBSTITUTE GOODS
+OR SERVICES, LOSS OF DATA OR DATA BEING RENDERED INACCURATE, OR LOSSES
+SUSTAINED BY YOU OR THIRD PARTIES, OR A FAILURE OF THE SOFTWARE TO
+OPERATE WITH ANY OTHER SOFTWARE) EVEN IF SUCH HOLDER OR OTHER PARTY HAS
+BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+

@@ -23,23 +23,24 @@ no_index:
 requires:
   Class::Struct: '0.65'
   DBI: '1.643'
-  DateTime: '1.51'
-  DateTime::Format::Strptime: '1.76'
-  DateTime::TimeZone: '2.36'
+  DateTime: '1.59'
+  DateTime::Format::Strptime: '1.79'
+  DateTime::TimeZone: '2.56'
   Devel::Confess: '0.009004'
   Fcntl: '0'
-  JSON: '4.02'
-  Module::Generic: v0.24.2
+  JSON: '4.10'
+  JSON::XS: '4.03'
+  Module::Generic: v0.24.4
   Net::IP: '1.26'
-  Nice::Try: v1.3.0
+  Nice::Try: v1.3.1
   Number::Format: '1.75'
   POSIX: 1.53_01
-  Promise::Me: v0.3.0
+  Promise::Me: v0.4.5
   Regexp::Common: '2017060201'
-  Scalar::Util: '1.54'
-  URI: '1.76'
+  Scalar::Util: '1.63'
+  URI: '5.16'
   Want: '0.29'
-  common::sense: '3.74'
+  common::sense: '3.75'
   parent: '0'
   perl: '5.016000'
   strict: '0'
@@ -47,5 +48,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jackdeguest/DB-Object/issues
   repository: https://gitlab.com/jackdeguest/DB-Object
-version: v0.10.3
+version: v0.10.5
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

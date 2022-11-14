@@ -15,5 +15,7 @@ t/author-pod-spell.t
 t/author-pod-syntax.t
 t/copyright.t
 t/owner.t
+t/perl-critic.t
+t/perlcriticrc
 t/split-copyright.t
 t/statement.t

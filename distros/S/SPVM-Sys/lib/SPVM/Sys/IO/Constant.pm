@@ -876,6 +876,48 @@ Get the constant value of C<X_OK>. If the system doesn't define this constant, a
 
 Get the constant value of C<AT_EACCESS>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
 
+=head2 STDIN_FILENO
+
+  static method STDIN_FILENO : int ();
+
+Get the constant value of C<STDIN_FILENO>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+=head2 STDOUT_FILENO
+
+  static method STDOUT_FILENO : int ();
+
+Get the constant value of C<STDOUT_FILENO>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+=head2 STDERR_FILENO
+
+  static method STDERR_FILENO : int ();
+
+Get the constant value of C<STDERR_FILENO>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+=head2 BUFSIZ
+
+  static method BUFSIZ : int ();
+
+Get the constant value of C<BUFSIZ>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+=head2 _IONBF
+
+  static method _IONBF : int ();
+
+Get the constant value of C<_IONBF>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+=head2 _IOLBF
+
+  static method _IOLBF : int ();
+
+Get the constant value of C<_IOLBF>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+=head2 _IOFBF
+
+  static method _IOFBF : int ();
+
+Get the constant value of C<_IOFBF>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
 =head1 Copyright & License
 
 Copyright 2022-2022 Yuki Kimoto, all rights reserved.

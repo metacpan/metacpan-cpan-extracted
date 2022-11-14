@@ -1,0 +1,36 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with WebService::Async::Onfido::Check
+at lib/WebService/Async/Onfido/Check.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+WebService::Async::Onfido::Check - represents data for Onfido
+
+=head1 DESCRIPTION
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<WebService::Async::Onfido::Base::Check>
+
+L<applicant_id|WebService::Async::Onfido::Base::Check/applicant_id>, L<created_at|WebService::Async::Onfido::Base::Check/created_at>, L<download_uri|WebService::Async::Onfido::Base::Check/download_uri>, L<form_uri|WebService::Async::Onfido::Base::Check/form_uri>, L<href|WebService::Async::Onfido::Base::Check/href>, L<id|WebService::Async::Onfido::Base::Check/id>, L<new|WebService::Async::Onfido::Base::Check/new>, L<redirect_uri|WebService::Async::Onfido::Base::Check/redirect_uri>, L<reports_ids|WebService::Async::Onfido::Base::Check/reports_ids>, L<result|WebService::Async::Onfido::Base::Check/result>, L<results_uri|WebService::Async::Onfido::Base::Check/results_uri>, L<status|WebService::Async::Onfido::Base::Check/status>, L<tags|WebService::Async::Onfido::Base::Check/tags>
+
+=back
+
+=head1 AUTHOR
+
+deriv.com C<DERIV@cpan.org>
+
+=head1 LICENSE
+
+Copyright deriv.com 2019. Licensed under the same terms as Perl itself.
+

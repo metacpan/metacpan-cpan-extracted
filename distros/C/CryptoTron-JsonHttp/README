@@ -1,4 +1,4 @@
-CryptoTron-JsonHttp Version 0.12
+CryptoTron-JsonHttp Version 0.14
 ================================
 
 INTRODUCTION
@@ -27,6 +27,7 @@ DEPENDENCIES
 
 This module requires these other modules and libraries:
 
+  Simple::Filter::Macro
   CryptoTron
   Try::Catch
   URI
@@ -34,7 +35,6 @@ This module requires these other modules and libraries:
   JSON::PP
   LWP::UserAgent
   File::Basename 
-  Filter::Macro
 
 COPYRIGHT AND LICENCE
 

@@ -1,5 +1,11 @@
 Revision history for MIDI-Drummer
 
+0.4007 2022-11-13 07:54:23
+    - Allow flam() to rest for the grace-note.
+
+0.4006 2022-11-13 06:47:25
+    - Finish the eg/black-page program transcription.
+
 0.4005 2022-11-08 11:31:21
     - Add the eg/black-page program.
     - Add an optional patch and accent value to the flam() method.

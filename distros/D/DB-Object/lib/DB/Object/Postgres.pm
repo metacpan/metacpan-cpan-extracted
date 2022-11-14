@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Postgres.pm
-## Version v0.4.13
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.4.14
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2022/06/29
+## Modified 2022/11/04
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -23,7 +23,6 @@ BEGIN
         $VERSION $CACHE_QUERIES $CACHE_SIZE $CACHE_TABLE $CONNECT_VIA $DB_ERRSTR 
         @DBH $DEBUG $ERROR $MOD_PERL $USE_BIND $USE_CACHE );
     use DBI;
-    # use DBD::Pg qw( :pg_types );
     eval
     {
         require DBD::Pg;
@@ -34,15 +33,15 @@ BEGIN
     use DateTime::Format::Strptime;
     use Module::Generic::DateTime;
     use Nice::Try;
-    $VERSION     = 'v0.4.13';
+    $VERSION     = 'v0.4.14';
     use Devel::Confess;
 };
 
 use strict;
 use warnings;
-require DB::Object::Postgres::Statement;
-require DB::Object::Postgres::Tables;
-require DB::Object::Postgres::Lo;
+# require DB::Object::Postgres::Statement;
+# require DB::Object::Postgres::Tables;
+# require DB::Object::Postgres::Lo;
 $DB_ERRSTR     = '';
 $DEBUG         = 0;
 $CACHE_QUERIES = [];
@@ -405,6 +404,7 @@ sub large_object
 {
     my $self = shift( @_ );
     return( $self->error( "large_object() cannot be called as a class function." ) ) if( !ref( $self ) );
+    $self->_load_class( 'DB::Object::Postgres::Lo' ) || return( $self->pass_error );
     # Parameter is a bitmask mode
     return( DB::Object::Postgres::Lo->new( $self->{dbh} ) );
 }
@@ -1345,7 +1345,7 @@ DB::Object::Postgres - SQL API
     
 =head1 VERSION
 
-    v0.4.13
+    v0.4.14
 
 =head1 DESCRIPTION
 

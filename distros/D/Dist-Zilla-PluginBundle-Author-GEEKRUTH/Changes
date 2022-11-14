@@ -1,5 +1,12 @@
 Revision history for Dist-Zilla-PluginBundle-GEEKRUTH
 
+2.0000 2022-11-12T18:55:50-05:00 America/New_York
+ [MAJOR]
+ - Adjusted a couple of things, added minting profiles
+
+ [STATISTICS]
+ - code churn: 21 files changed, 498 insertions(+), 129 deletions(-)
+
 1.0202 2022-07-02T13:16:40-04:00 America/New_York
  [BUG FIXES]
  - Ensure prereqs are in runtime group

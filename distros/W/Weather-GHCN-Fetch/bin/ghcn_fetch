@@ -26,7 +26,7 @@
 ########################################################################
 use v5.18;  # minimum for Object::Pad
 
-our $VERSION = 'v0.0.009';
+our $VERSION = 'v0.0.010';
 
 use Weather::GHCN::App::Fetch;
 
@@ -45,7 +45,7 @@ ghcn_fetch.pl - Fetch station and weather data from the NOAA GHCN repository
 
 =head1 VERSION
 
-version v0.0.009
+version v0.0.010
 
 =head1 SYNOPSIS
 
@@ -527,6 +527,51 @@ option); e.g.
     ghcn_fetch -country CA | ghcn_station_counts > stn_counts.tsv
 
 =back
+
+=head1 EXAMPLES
+
+Here are some examples of the kinds of reports that can be generated:
+
+List the weather stations in NY state with "New York" in the name:
+
+    ghcn_fetch -country US -state NY -location "New York"
+
+List the New York weather stations active between 1900 and 1920:
+
+    ghcn_fetch -cou US -st NY -location "New York" -active 1900-1920
+
+Report the yearly max, min and average temperatures at JFK airport:
+
+    ghcn_fetch yearly -cou US -st NY -location "New York JFK"
+
+Report the monthly max, min and average temperatures at JFK airport:
+
+    ghcn_fetch monthly -cou US -st NY -location "New York JFK"
+
+Report the daily max, min and average temperatures at JFK airport:
+
+    ghcn_fetch daily -cou US -st NY -location "New York JFK"
+
+Launch the GUI for an options dialog:
+
+    ghcn_fetch -gui  (requires Tk and Tk::Getopt to be installed)
+
+Get documentation on all the options:
+
+    ghcn_fetch -help
+
+Find the 5-day heatwaves at the JFK airport station:
+
+    ghcn_fetch detail -cou US -st NY -loc "New York JFK" | ghcn_extremes
+
+Find the 3-day coldwaves (<= 15C) at the JFK airport station:
+
+    ghcn_fetch detail -cou US -st NY -loc "New York JFK" | 
+      ghcn_extremes -cold -ndays 3 -limit -15
+
+For each year between 1900 and 1950, count the number of active weather stations in NY state:
+
+    ghcn_fetch detail -cou US -st NY -active 1900-1950 | ghcn_station_counts
 
 =head1 AUTHOR
 

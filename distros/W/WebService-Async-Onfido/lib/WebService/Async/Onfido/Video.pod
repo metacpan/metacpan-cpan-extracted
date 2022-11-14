@@ -1,0 +1,36 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with WebService::Async::Onfido::Video
+at lib/WebService/Async/Onfido/Video.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+WebService::Async::Onfido::Video - represents data for Onfido
+
+=head1 DESCRIPTION
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<WebService::Async::Onfido::Base::Video>
+
+L<challenge|WebService::Async::Onfido::Base::Video/challenge>, L<created_at|WebService::Async::Onfido::Base::Video/created_at>, L<download_href|WebService::Async::Onfido::Base::Video/download_href>, L<file_name|WebService::Async::Onfido::Base::Video/file_name>, L<file_size|WebService::Async::Onfido::Base::Video/file_size>, L<file_type|WebService::Async::Onfido::Base::Video/file_type>, L<href|WebService::Async::Onfido::Base::Video/href>, L<id|WebService::Async::Onfido::Base::Video/id>, L<new|WebService::Async::Onfido::Base::Video/new>
+
+=back
+
+=head1 AUTHOR
+
+deriv.com C<DERIV@cpan.org>
+
+=head1 LICENSE
+
+Copyright deriv.com 2019. Licensed under the same terms as Perl itself.
+

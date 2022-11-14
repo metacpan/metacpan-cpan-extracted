@@ -1,4 +1,4 @@
-Changes
+CHANGES
 CONTRIBUTING.md
 lib/DB/Object.pm
 lib/DB/Object/AND.pod
@@ -43,3 +43,4 @@ t/pgsql.sql
 t/sqlite.sql
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

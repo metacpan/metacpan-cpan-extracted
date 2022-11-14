@@ -1,5 +1,30 @@
 Changes Blio
 
+2.007     2022-11-11 21:14:31+01:00
+    - update dist to use my Dist::Zilla plugin Author::DOMM
+
+
+2.006  2022-11-10T17:23:24
+    - change node->feed to rw so we can set feed for tags during build (Thomas Klausner)
+      this allows me to have an RSS feed for selected tags, eg
+      https://domm.plix.at/tags/PostgreSQL.html
+
+
+2.005	2021-04-18T22:43:59
+    - add older_younger (easier to grok then prev/next) (Thomas Klausner)
+    - add list_only flag to node (Thomas Klausner)
+    - set stash.is_tag for tags (Thomas Klausner)
+    - add list flag (Thomas Klausner)
+    - prev_next_nav, is_list (Thomas Klausner)
+
+
+2.004   2020-11-30T18:31:50
+    - actually use the configured converter.. (Thomas Klausner)
+    - reverse_children option (Thomas Klausner)
+    - add blio->absolute_base64_url helper (Thomas Klausner)
+    - add time_zone support to schedule (Thomas Klausner)
+
+
 2.003   2015-01-04T23:11:11
     - feed encoding issues (Thomas Klausner)
     - allow dashes in urls (Thomas Klausner)

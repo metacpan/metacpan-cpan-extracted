@@ -1,20 +1,21 @@
 ##############################################################################
 ##
 ##  Web::Reactor application machinery
-##  2013-2021 (c) Vladi Belperchinov-Shabanski "Cade"
-##  <cade@bis.bg> <cade@biscom.net> <cade@cpan.org>
-##
+##  Copyright (c) 2013-2022 Vladi Belperchinov-Shabanski "Cade"
+##        <cade@noxrun.com> <cade@bis.bg> <cade@cpan.org>
+##  http://cade.noxrun.com
+##  
 ##  LICENSE: GPLv2
+##  https://github.com/cade-vs/perl-web-reactor
 ##
 ##############################################################################
 package Web::Reactor;
 use strict;
 use Storable qw( dclone freeze thaw ); # FIXME: move to Data::Tools (data_freeze/data_thaw)
-use CGI 4.08;
-# use CGI 4.51;
-use CGI::Cookie;
+use Plack::Request;
+use Cookie::Baker;
 use MIME::Base64;
-use Data::Tools;
+use Data::Tools 1.24;
 use Exception::Sink;
 use Data::Dumper;
 use Encode;
@@ -22,7 +23,7 @@ use Encode;
 use Web::Reactor::Utils;
 use Web::Reactor::HTML::Form;
 
-our $VERSION = '2.10';
+our $VERSION = '2.11';
 
 ##############################################################################
 
@@ -56,76 +57,57 @@ our %ENV_ALLOWED_KEYS = {
 sub new
 {
   my $class = shift;
-  my %env = @_;
+  my $env   = shift;
+  my $cfg   = shift;
+
+  $class = ref( $class ) || $class;
+  my $self = {};
+  bless $self, $class;
+
+  $self->{ 'CFG' }                    = $cfg;
+  $self->{ 'CFG' }{ 'APP_CHARSET' } ||= 'UTF-8';
+  $self->{ 'IN'  }{ 'ENV'         }   = $env; # including headers
+
+  $self->log_dumper( "debug: reactor[$self] setup (ENV & CFG): ", $env, $cfg );
+  
+  $self->{ 'PLACK' } = Plack::Request->new( $env );
 
   # FIXME: verify %env content! Data::Validate::Struct
   boom "fatal: configuration: request scheme [HTTP] does not match cookies security policy! either enable HTTPS scheme or set DISABLE_SECURE_COOKIES=1"
-      if uc $ENV{ 'REQUEST_SCHEME' } eq 'HTTP' and ! $env{ 'DISABLE_SECURE_COOKIES' };
-
-  $class = ref( $class ) || $class;
-  my $self = {
-             'ENV' => \%env,
-             };
-  bless $self, $class;
-
-#  my $root = $self->{ 'ENV' }{ 'ROOT' };
-#  # autosetup defaults
-#  if( ! $self->{ 'ENV' }{ 'HTML_DIRS' } )
-#    {
-#    $self->{ 'ENV' }{ 'HTML_DIRS' } = [ "$root/html" ];
-#    }
+      if $self->get_request_scheme() eq 'http' and ! $cfg->{ 'DISABLE_SECURE_COOKIES' };
+  
+  data_tools_set_text_io_encoding( $self->{ 'CFG' }{ 'APP_CHARSET' } );
 
   # FIXME: common directories setup code?
-  if( ! $env{ 'LIB_DIRS' } or @{ $env{ 'LIB_DIRS' } } < 1 )
+  if( ! $cfg->{ 'LIB_DIRS' } or @{ $cfg->{ 'LIB_DIRS' } } < 1 )
     {
-    my $root = $env{ 'APP_ROOT' };
-    $env{ 'LIB_DIRS' } = [ "$root/lib" ];
+    my $root = $cfg->{ 'APP_ROOT' };
+    $cfg->{ 'LIB_DIRS' } = [ "$root/lib" ];
     }
 
-  my $lib_dirs = $env{ 'LIB_DIRS' } || [];
-  my $lib_dirs_ok = 0;
-  for my $lib_dir ( @$lib_dirs )
+  for my $lib_dir ( @{ $cfg->{ 'LIB_DIRS' } || [] } )
     {
     next unless -d $lib_dir;
     push @INC, $lib_dir;
-    $lib_dirs_ok++;
-    }
-  # FIXME: this should not be a fatal error?
-  #boom "invalid or not accessible LIB_DIR's [@$lib_dirs]" unless $lib_dirs_ok;
-
-  # sanity, remove '.' from include list, TODO: optionally remove other entries by config (%env)
-  for my $z ( 0 .. scalar( @INC ) - 1 )
-    {
-    next unless $INC[ $z ] eq '.';
-    splice @INC, $z, 1;
-    last;
     }
 
-  my $reo_sess_class = $env{ 'REO_SESS_CLASS' } ||= 'Web::Reactor::Sessions::Filesystem';
-  my $reo_prep_class = $env{ 'REO_PREP_CLASS' } ||= 'Web::Reactor::Preprocessor::Native';
-  my $reo_acts_class = $env{ 'REO_ACTS_CLASS' } ||= 'Web::Reactor::Actions::Native';
+  @INC = grep { $_ ne '.' } @INC;
 
-  my $reo_sess_class_file = perl_package_to_file( $reo_sess_class );
-  my $reo_prep_class_file = perl_package_to_file( $reo_prep_class );
-  my $reo_acts_class_file = perl_package_to_file( $reo_acts_class );
+  my $reo_ses_class = $cfg->{ 'REO_SES_CLASS' } ||= 'Web::Reactor::Sessions::Filesystem';
+  my $reo_pre_class = $cfg->{ 'REO_PRE_CLASS' } ||= 'Web::Reactor::Preprocessor::Native';
+  my $reo_act_class = $cfg->{ 'REO_ACT_CLASS' } ||= 'Web::Reactor::Actions::Native';
 
-  require $reo_sess_class_file;
-  require $reo_prep_class_file;
-  require $reo_acts_class_file;
+  my $reo_ses_class_file = perl_package_to_file( $reo_ses_class );
+  my $reo_pre_class_file = perl_package_to_file( $reo_pre_class );
+  my $reo_act_class_file = perl_package_to_file( $reo_act_class );
 
-  # new objects for part slots
-  # FIXME: pass %env reference to use the same env hash
-  $self->{ 'REO_SESS' } = new $reo_sess_class %env;
-  $self->{ 'REO_PREP' } = new $reo_prep_class %env;
-  $self->{ 'REO_ACTS' } = new $reo_acts_class %env;
+  require $reo_ses_class_file;
+  require $reo_pre_class_file;
+  require $reo_act_class_file;
 
-  # set backlinks to reactor
-  $self->{ 'REO_SESS' }->__set_reo( $self );
-  $self->{ 'REO_PREP' }->__set_reo( $self );
-  $self->{ 'REO_ACTS' }->__set_reo( $self );
-
-  # debug setup
-  $self->log_debug( "debug: Reactor[$self] setup: " . Dumper( $self->{ 'ENV' } ) );
+  $self->{ 'REO_SES' } = new $reo_ses_class $self, $cfg;
+  $self->{ 'REO_PRE' } = new $reo_pre_class $self, $cfg;
+  $self->{ 'REO_ACT' } = new $reo_act_class $self, $cfg;
 
   return $self;
 }
@@ -143,18 +125,30 @@ sub run
 {
   my $self = shift;
 
+  my $res;
   eval
     {
-    $self->main_process();
+    $self->prepare_and_execute();
     };
-  if( surface( 'CONTENT' ) )
+  if( surface( 'RENDER' ) )
     {
-    # nothing, should be ok
+    my $status  = $self->res_get_status() || 200;
+    my $headers = $self->res_get_headers_ar();
+    my $body    = $self->res_get_body();
+    $body = [ $body ] unless ref $body;
+    $res = [ $status, $headers, $body ];
     }
   elsif( surface( '*' ) )
     {
-    $self->log( "error: main process failed: $@" );
+    $self->log( "error: prepare or execute code failed: $@" );
+    $res = [ 200, [ 'content-type' => 'text/plain' ], [ 'system is currently unavailable (*)' ] ];
     }
+  else
+    {
+    $self->log( "error: unknown or empty result or exception" );
+    $res = [ 200, [ 'content-type' => 'text/plain' ], [ 'system is currently unavailable' ] ];
+    }  
+
   $self->save();
 
   if( $self->is_debug() )
@@ -169,31 +163,29 @@ sub run
     $self->log_dumper( "FINAL USER SESSION [$usid]-----------------------------------", $self->get_user_session() );
     }
 
+  # $self->log_dumper( 'RUN RESULT:', $res );
+  return $res;
 }
 
-sub main_process
+sub prepare_and_execute
 {
   my $self = shift;
 
+  my $cfg = $self->get_cfg();
+
   # 0. load/setup env/config defaults
-  my $app_name = $self->{ 'ENV' }{ 'APP_NAME' } or $self->boom( "missing APP_NAME" );
+  my $app_name = $cfg->{ 'APP_NAME' } or boom( "missing APP_NAME" );
 
-  # 1. loading request header and environment
-  $self->{ 'HTTP_ENV' } = { %ENV };
-
-  # 2. loading cookie
-  my $cookie_name = lc( $self->{ 'ENV' }{ 'COOKIE_NAME' } || "$app_name\_cookie" );
+  # 1. loading cookie
+  my $cookie_name = lc( $cfg->{ 'COOKIE_NAME' } || "$app_name\_cookie" );
   my $user_sid = $self->get_cookie( $cookie_name );
   $self->log_debug( "debug: incoming USER_SID cookie name [$cookie_name] value [$user_sid]" );
 
-  # 3. loading user session, setup new session and cookie if needed
+  # 2. loading user session, setup new session and cookie if needed
   my $user_shr = {}; # user session hash ref
-  if( ! ( $user_sid =~ /^[a-zA-Z0-9]+$/ and $user_shr = $self->sess_load( 'USER', $user_sid ) ) )
+  if( ! ( $user_sid =~ /^[a-zA-Z0-9]+$/ and $user_shr = $self->ses->load( 'USER', $user_sid ) ) )
     {
-#    print STDERR Dumper( $user_sid, $user_shr );
-
     $self->log( "warning: invalid user session [$user_sid]" );
-
     ( $user_sid, $user_shr ) = $self->__create_new_user_session();
     }
   $self->{ 'SESSIONS' }{ 'SID'  }{ 'USER' } = $user_sid;
@@ -218,7 +210,7 @@ sub main_process
   for my $k ( keys %{ $user_shr->{ ":HTTP_CHECK_HR" } } )
     {
     # check if session parameters are changed, stealing session?
-    next if $user_shr->{ ":HTTP_CHECK_HR" }{ $k } eq $ENV{ $k };
+    next if $user_shr->{ ":HTTP_CHECK_HR" }{ $k } eq $self->{ 'IN' }{ 'ENV' }{ $k };
 
     $self->log( "status: user session parameter [$k] check failed, sid [$user_sid]" );
     # FIXME: move to function: close_session();
@@ -233,96 +225,54 @@ sub main_process
     }
 
   # read and save http environment data into user session, used for checks and info
-  $user_shr->{ ":HTTP_ENV_HR"   } = { map { $_ => $ENV{ $_ } } @HTTP_VARS_SAVE  };
+  $user_shr->{ ":HTTP_ENV_HR"   } = { map { $_ => $self->{ 'IN' }{ 'ENV' }{ $_ } } @HTTP_VARS_SAVE  };
 
   # FIXME: move to single place
-  my $user_session_expire = $self->{ 'ENV' }{ 'USER_SESSION_EXPIRE' } || 600; # 10 minutes
+  my $user_session_expire = $cfg->{ 'USER_SESSION_EXPIRE' } || 600; # 10 minutes
   $self->set_user_session_expire_time_in( $user_session_expire );
 
   $self->save();
 
-  # 4. get input data, CGI::params, postdata
+  # 3. get input data, CGI::params, postdata
   my $input_user_hr = $self->{ 'INPUT_USER_HR' } = {};
   my $input_safe_hr = $self->{ 'INPUT_SAFE_HR' } = {};
 
   # FIXME: TODO: handle and URL params here. only for EX?
   my $iconv;
-  my $app_charset = uc $self->{ 'ENV' }{ 'APP_CHARSET' } || 'UTF-8';
+  my $app_charset = uc $cfg->{ 'APP_CHARSET' } || 'UTF-8';
   my $incoming_charset = $app_charset;
 
-  if( uc( CGI::http( 'HTTP_X_REQUESTED_WITH' ) ) eq 'XMLHTTPREQUEST' )
+  if( uc( $self->get_http_env->{ 'HTTP_X_REQUESTED_WITH' } ) eq 'XMLHTTPREQUEST' )
     {
     # TODO: it can be different, but nobody seems to use it, should be fixed eventually
     $incoming_charset = 'UTF-8';
     }
 
+  my $plack = $self->{ 'PLACK' };
+
+  # input parameters, GET + POST
+  my $params = $plack->parameters();
+  hash_uc_ipl( $params );
+  my @params = keys %$params;
+
   # import plain parameters from GET/POST request
-  for my $n ( CGI::url_param(), CGI::param() )
+  for my $n ( @params )
     {
     if( $n !~ /^[A-Za-z0-9\-\_\.\:]+$/o )
       {
       $self->log( "error: invalid CGI/input parameter name: [$n]" );
       next;
       }
-    my @u = CGI::upload( $n );
-    my $u = CGI::upload( $n );
-    my $v = CGI::url_param( $n );
-       $v = CGI::param( $n ) if $v eq '';
-    my @v = CGI::multi_param( $n ); # TODO: handling of multi-values
 
-    #my $iiuu = Encode::is_utf8( $v );
-    #print STDERR "------------->>>>>>>>>>>>>>. INCOMING PARAM [$n] => [$v] (utf:$iiuu)\n";
-    
-    $n = uc $n;
-    if( $n eq 'PUTDATA' or $n eq 'POSTDATA' or $n eq 'PATCHDATA' )
-      {
-      # post data is raw, do not process
-      $input_user_hr->{ $n } = $v;
-      next;
-      }
-
-    # process multiple incoming file uploads
-    if( @u > 0 )
-      {
-      my $uc = 0;
-      for my $uh ( @u )
-        {
-        $input_user_hr->{ "$n:FN:$uc" } = "$uh"; # file name
-        $input_user_hr->{ "$n:FH:$uc" } = $uh;   # file handle
-        $input_user_hr->{ "$n:FI:$uc" } = CGI::uploadInfo( $uh ); # file info
-        $uc++;
-        }
-      $input_user_hr->{ "$n:FC" } = @u; # file count
-      }
-    
-    if( ref( $u ) )
-      {
-      $input_user_hr->{ "$n:FH" } = $u;
-      # this is file upload, get more info
-      $input_user_hr->{ "$n:UPLOAD_INFO" } = CGI::uploadInfo( $u );
-      $v = "$v";
-      }
-
-    #my $iiuu = Encode::is_utf8( $v );
-    #print STDERR "------------->>>>>>>>>>>>>>. PRE ICOV [$v] (utf:$iiuu)\n";
-    if( $incoming_charset ne $app_charset )
-      {
-      Encode::from_to( $v, $incoming_charset, $app_charset );
-      Encode::from_to( $_, $incoming_charset, $app_charset ) for @v;
-      }
-
-    #print STDERR "------------->>>>>>>>>>>>>>. INCOMING [$v]\n";
-        #$v = decode( $app_charset, $v );
-    #print STDERR "------------->>>>>>>>>>>>>>. DECODED  [$v] from $app_charset\n\n";
-        #$_ = decode( $app_charset, $_ ) for @v;
-
-    $self->log_debug( "debug: CGI input param [$n] value [$v] [@v]" );
+    my $v = decode( $incoming_charset, $params->{ $n } );
 
     if( $self->__input_cgi_skip_invalid_value( $n, $v ) )
       {
       $self->log( "error: invalid CGI/input value for parameter: [$n]" );
       next;
       }
+    $self->log_debug( "debug: CGI input param [$n] value [$v]" );
+
     $v = $self->__input_cgi_make_safe_value( $n, $v );
     if ( $n =~ /BUTTON:([a-z0-9_\-]+)(:(.+?))?(\.[XY])?$/oi )
       {
@@ -343,13 +293,28 @@ sub main_process
       }
     }
 
+  # import uploads
+  my $uploads = $plack->uploads();
+  for my $n ( keys %$uploads )
+    {
+    my @u = $uploads->get_all( $n );
+    $input_user_hr->{ "$n" } = @u; # count of the uploaded files
+    if( @u > 0 )
+      {
+      $input_user_hr->{ "$n:UPLOADS" } = \@u;   # holds all uploads, even if there is just 1
+      $input_user_hr->{ "$n:UPLOAD"  } = $u[0]; # holds first or single upload
+      next;
+      }
+    }  
+
   my $safe_input_link_sess = $input_user_hr->{ '_' };
+  
   # parse link session: link-sid.link-key
   if( $safe_input_link_sess =~ /^([a-zA-Z0-9]+)\.([a-zA-Z0-9]+)$/ )
     {
     my ( $link_sid, $link_key ) = ( $1, $2 );
 
-    my $link_session_hr = $self->sess_load( 'LINK', $link_sid );
+    my $link_session_hr = $self->ses->load( 'LINK', $link_sid );
 
     my $link_data = $link_session_hr->{ $link_key };
 
@@ -361,13 +326,13 @@ sub main_process
     $self->log( "warning: invalid safe input link session.key [$safe_input_link_sess]" );
     }
 
-  # 5. loading page session
+  # 4. loading page session
   my $page_sid = $input_safe_hr->{ '_P' };
   my $page_shr = {}; # user session hash ref
-  if( ! ( $page_sid =~ /^[a-zA-Z0-9]+$/ and $page_shr = $self->sess_load( 'PAGE', $page_sid ) ) )
+  if( ! ( $page_sid =~ /^[a-zA-Z0-9]+$/ and $page_shr = $self->ses->load( 'PAGE', $page_sid ) ) )
     {
     $self->log( "warning: invalid page session [$page_sid]" );
-    $page_sid = $self->sess_create( 'PAGE', 8 );
+    $page_sid = $self->ses->create( 'PAGE', 8 );
     $self->log( "warning: new page session created [$page_sid]" );
     $page_shr = { ':ID' => $page_sid };
     }
@@ -381,7 +346,7 @@ sub main_process
     $page_shr->{ ':REF_PAGE_SID' } = $ref_page_sid;
     }
 
-  # 6. remap form input data, post to safe input
+  # 5. remap form input data, post to safe input
   my $form_name = $input_safe_hr->{ 'FORM_NAME' }; # FIXME: replace with _FO
   if( $form_name and exists $page_shr->{ ':FORM_DEF' }{ $form_name } )
     {
@@ -408,7 +373,7 @@ sub main_process
       }
     }
 
-  # 7. get action from input (USER/CGI) or page session
+  # 6. get action from input (USER/CGI) or page session
   my $action_name = lc( $input_safe_hr->{ '_AN' } || $input_user_hr->{ '_AN' } || $page_shr->{ ':ACTION_NAME' } );
   if( $action_name =~ /^[a-z_0-9]+$/ )
     {
@@ -419,7 +384,7 @@ sub main_process
     # $self->log( "error: invalid action name [$action_name]" );
     }
 
-  # 8. get page from input (USER/CGI) or page session
+  # 7. get page from input (USER/CGI) or page session
   my $page_name = lc( $input_safe_hr->{ '_PN' } || $input_user_hr->{ '_PN' } || $page_shr->{ ':PAGE_NAME' } || 'main' );
   if( $page_name ne '' )
     {
@@ -433,7 +398,7 @@ sub main_process
       }
     }
 
-  # pre-9. print debug status...
+  # pre-8. print debug status...
   if( $self->is_debug() )
     {
     my $psid = $self->get_page_session_id( 0 ) || 'empty';
@@ -445,7 +410,7 @@ sub main_process
     # $self->log_dumper( "USER SESSION-----------------------------------", $self->get_user_session() );
     }
 
-  # 9. render output action/page
+  # 8. render output action/page
   if( $action_name )
     {
     $self->render( ACTION => $action_name );
@@ -454,7 +419,6 @@ sub main_process
     {
     $self->render( PAGE => $page_name );
     }
-
 }
 
 sub __create_new_user_session
@@ -464,40 +428,65 @@ sub __create_new_user_session
   my $user_sid;
   my $user_shr;
 
-  # FIXME: move to function
-  my $app_name = $self->{ 'ENV' }{ 'APP_NAME' } or $self->boom( "missing APP_NAME" );
-  my $cookie_name = lc( $self->{ 'ENV' }{ 'COOKIE_NAME' } || "$app_name\_cookie" );
+  my $cfg = $self->get_cfg();
 
-  $user_sid = $self->sess_create( 'USER' );
+  # FIXME: move to function
+  my $app_name = $cfg->{ 'APP_NAME' } or boom( "missing APP_NAME" );
+  my $cookie_name = lc( $cfg->{ 'COOKIE_NAME' } || "$app_name\_cookie" );
+
+  $user_sid = $self->ses->create( 'USER' );
   $user_shr = { ':ID' => $user_sid };
   $self->{ 'SESSIONS' }{ 'SID'  }{ 'USER' } = $user_sid;
   $self->{ 'SESSIONS' }{ 'DATA' }{ 'USER' }{ $user_sid } = $user_shr;
 
-  my $path = $self->{ 'ENV' }{ 'COOKIE_PATH' };
+  my $path = $cfg->{ 'COOKIE_PATH' };
   if( ! $path )
     {
-    $path = $self->{ 'HTTP_ENV' }{ 'REQUEST_URI' };
-    #print STDERR ">>>>>>>>>>>>>>>>>>>111>>>>>>>>>>>>>>> cookie path [$path]\n";
+    $path = $self->get_request_uri();
     $path =~ s/^([^\?]*\/)([^\?\/]*)(\?.*)?$/$1/; # remove args: ?...
-    #print STDERR ">>>>>>>>>>>>>>>>>>>222>>>>>>>>>>>>>>> cookie path [$path]\n";
     }
   $path ||= '/';  
 
-  my $secure_cookie = $self->{ 'ENV' }{ 'DISABLE_SECURE_COOKIES' } ? 0 : 1;
-  $self->set_cookie( $cookie_name, -value => $user_sid, -path => $path, -httponly => 1, -secure => $secure_cookie );
+  my $secure_cookie = $cfg->{ 'DISABLE_SECURE_COOKIES' } ? 0 : 1;
+  $self->res_set_cookie( $cookie_name, value => $user_sid, path => $path, httponly => 1, secure => $secure_cookie, samesite => 'strict' );
   $self->log( "debug: creating new user session [$user_sid]" );
 
-  my $user_session_expire = $self->{ 'ENV' }{ 'USER_SESSION_EXPIRE' } || 600; # 10 minutes
+  my $user_session_expire = $cfg->{ 'USER_SESSION_EXPIRE' } || 600; # 10 minutes
 
   $user_shr->{ ':CTIME'      } = time();
   $user_shr->{ ':CTIME_STR'  } = scalar localtime();
 
   $self->set_user_session_expire_time_in( $user_session_expire );
 
-  $user_shr->{ ":HTTP_CHECK_HR" } = { map { $_ => $ENV{ $_ } } @HTTP_VARS_CHECK };
-  $user_shr->{ ":HTTP_ENV_HR"   } = { map { $_ => $ENV{ $_ } } @HTTP_VARS_SAVE  };
+  $user_shr->{ ":HTTP_CHECK_HR" } = { map { $_ => $self->{ 'IN' }{ 'ENV' }{ $_ } } @HTTP_VARS_CHECK };
+  $user_shr->{ ":HTTP_ENV_HR"   } = { map { $_ => $self->{ 'IN' }{ 'ENV' }{ $_ } } @HTTP_VARS_SAVE  };
 
   return ( $user_sid, $user_shr );
+}
+
+
+sub get_postdata_fh
+{
+  my $self = shift;
+  
+  return $self->{ 'PLACK' }->body();
+}
+
+sub get_postdata_body
+{
+  my $self = shift;
+  
+  my $fh = $self->get_postdata_fh();
+  
+  local $/ = undef;
+  return <$fh>;
+}
+
+sub get_cfg
+{
+  my $self = shift;
+  
+  return $self->{ 'CFG' };
 }
 
 ##############################################################################
@@ -539,7 +528,7 @@ sub get_page_session
     $page_shr = $self->{ 'SESSIONS' }{ 'DATA' }{ 'PAGE' }{ $page_sid };
     if( ! $page_shr )
       {
-      $page_shr = $self->sess_load( 'PAGE', $page_sid );
+      $page_shr = $self->ses->load( 'PAGE', $page_sid );
       $self->{ 'SESSIONS' }{ 'DATA' }{ 'PAGE' }{ $page_sid } = $page_shr;
       }
     }
@@ -550,6 +539,8 @@ sub get_page_session
 sub get_http_env
 {
   my $self  = shift;
+
+  # FIXME: TODO: remove or replace with http env from $reo?
 
   my $user_shr = $self->get_user_session();
 
@@ -647,14 +638,21 @@ sub get_lang
 {
   my $self  = shift;
 
-  return $self->{ 'ENV' }{ 'LANG' };
+  return $self->get_cfg->{ 'LANG' };
+}
+
+sub get_app_name
+{
+  my $self  = shift;
+
+  return $self->get_cfg->{ 'APP_NAME' };
 }
 
 sub get_app_root
 {
   my $self  = shift;
 
-  return $self->{ 'ENV' }{ 'APP_ROOT' };
+  return $self->get_cfg->{ 'APP_ROOT' };
 }
 
 sub args
@@ -669,7 +667,7 @@ sub args
 
   if( ! $self->{ 'SESSIONS' }{ 'SID'  }{ 'LINK' } )
     {
-    $link_sid = $self->sess_create( 'LINK', 8 );
+    $link_sid = $self->ses->create( 'LINK', 8 );
     $link_shr = { ':ID' => $link_sid };
     $self->{ 'SESSIONS' }{ 'DATA' }{ 'LINK' }{ $link_sid } = $link_shr;
     $self->{ 'SESSIONS' }{ 'SID'  }{ 'LINK' } = $link_sid;
@@ -683,10 +681,10 @@ sub args
   my $link_key;
   while(4)
     {
-    $link_key = $self->{ 'REO_SESS' }->create_id( 8 ); # FIXME: length param env
+    $link_key = $self->ses->create_id( 8 ); # FIXME: length param env
     last if ! exists $link_shr->{ $link_key };
     }
-  $self->boom( "cannot create LINK key" ) unless $link_key;
+  boom( "cannot create LINK key" ) unless $link_key;
 
   $link_shr->{ $link_key } = \%args;
 
@@ -751,69 +749,103 @@ sub args_type
   return $self->args_here( @_ ) if $type eq 'here';
   return $self->args_back( @_ ) if $type eq 'back';
   return $self->args( @_ )      if $type eq 'none';
-  $self->boom( "unknown or not supported TYPE [$type]" );
+  boom( "unknown or not supported TYPE [$type]" );
 }
 
 ##############################################################################
+
+sub get_request_scheme
+{
+  my $self   = shift;
+  
+  return $self->{ 'IN' }{ 'ENV' }{ 'REQUEST_SCHEME' };
+}
+
+sub get_request_uri
+{
+  my $self   = shift;
+  
+  return $self->{ 'IN' }{ 'ENV' }{ 'REQUEST_URI' };
+}
+
+sub get_headers
+{
+  my $self  = shift;
+
+  return $self->{ 'IN' }{ 'HEADERS' } ||= { map { lc( $_ ) => $self->{ 'IN' }{ 'ENV' }{ $_ } } grep /^(HTTPS?_|SSL_)/, keys %{ $self->{ 'IN' }{ 'ENV' } } };
+}
+
+sub get_header
+{
+  my $self = shift;
+  my $name = shift;
+
+  return $self->get_headers->{ $name };
+}
+
+sub get_cookies
+{
+  my $self = shift;
+  return $self->{ 'IN' }{ 'COOKIES' } ||= crush_cookie( $self->get_header( 'http_cookie' ) );;
+}  
 
 sub get_cookie
 {
   my $self = shift;
   my $name = shift;
 
-  my $cookie = CGI::cookie( $name );
+  my $cookie = $self->get_cookies->{ $name };
   $self->log_debug( "get_cookie: name [$name] value [$cookie]" );
   return $cookie;
 }
 
-sub set_cookie
+### RESULT/OUTPUT API ########################################################
+
+sub res_set_status
+{
+  my $self   = shift;
+  my $status = shift;
+  
+  return $self->{ 'OUT' }{ 'STATUS' } = $status;
+}
+
+sub res_get_status
+{
+  my $self   = shift;
+  
+  return $self->{ 'OUT' }{ 'STATUS' };
+}
+
+#-----------------------------------------------------------------------------
+
+sub res_set_headers
 {
   my $self = shift;
-  my $name = shift;
-  my %opt  = @_;
-
-  $self->log( "debug: creating new cookie [$name]" );
-  # FIXME: validate %opt  Data::Validate::Struct
-
-  $opt{ -name } = $name;
-
-  $self->{ 'OUTPUT' }{ 'COOKIES' }{ $name } = new CGI::Cookie( %opt );
-}
-
-##############################################################################
-
-sub get_headers
-{
-  my $self  = shift;
-
-  my %h = map { $_ => CGI::http( $_ ) } CGI::http();
-
-  return \%h;
-}
-
-sub set_headers
-{
-  my $self  = shift;
-  my %h = @_;
+  my %h    = @_;
 
   hash_lc_ipl( \%h );
 
-  $self->{ 'OUTPUT' }{ 'HEADERS' } ||= {};
-  $self->{ 'OUTPUT' }{ 'HEADERS' } = { %{ $self->{ 'OUTPUT' }{ 'HEADERS' } }, %h };
+  if( exists $h{ 'status' } )
+    {
+    $self->res_set_status( $h{ 'status' } );
+    delete $h{ 'status' };
+    }
+
+  return $self->{ 'OUT' }{ 'HEADERS' } = { %{ $self->{ 'OUT' }{ 'HEADERS' } || {} }, %h };
 }
 
-sub __make_headers
+sub res_get_headers_ar
 {
   my $self = shift;
 
   my $headers;
 
-  $self->{ 'OUTPUT' }{ 'HEADERS' }{ 'content-type' } ||= 'text/html';
+  $self->{ 'OUT' }{ 'HEADERS' }{ 'content-type' } ||= 'text/html';
 
   # postprocess headers, custom logic, etc.
-  my %headers_out = %{ $self->{ 'OUTPUT' }{ 'HEADERS' } };
+  my %headers_out = %{ $self->{ 'OUT' }{ 'HEADERS' } };
 
-  if( $headers_out{ 'content-charset' } )
+  if( exists $headers_out{ 'content-charset' } )
     {
     if( $headers_out{ 'content-type' } !~ /;\s*charset=/i )
       {
@@ -822,22 +854,57 @@ sub __make_headers
     delete $headers_out{ 'content-charset' };
     };
 
+  if( exists $headers_out{ 'location' } )
+    {
+    delete $headers_out{ 'content-type' };
+    }
+
+  my @headers;
   while( my ( $k, $v ) = each %headers_out )
     {
-    $headers .= "$k: $v\n";
+    push @headers, $k, $v;
     }
 
-  while( my ( $k, $v ) = each %{ $self->{ 'OUTPUT' }{ 'COOKIES' } } )
+  while( my ( $k, $v ) = each %{ $self->{ 'OUT' }{ 'COOKIES' } } )
     {
-    $k = 'set-cookie';
-    $headers .= "$k: $v\n";
+    push @headers, 'set-cookie', $v;
     }
 
-  $headers .= "\n"; # just single newline separator
+  $self->log_dumper( 'RESULT HEADERS---------------------------------', \@headers );
 
-  $self->log_dumper( 'HEADERS----------------------------------------', $headers );
+  return \@headers;
+}
 
-  return $headers;
+#-----------------------------------------------------------------------------
+
+sub res_set_cookie
+{
+  my $self = shift;
+  my $name = shift;
+  my %opt  = @_;
+
+  $self->log( "debug: creating new cookie [$name]" );
+  # FIXME: validate %opt  Data::Validate::Struct
+
+  $self->{ 'OUT' }{ 'COOKIES' }{ $name } = bake_cookie( $name, \%opt );
+}
+
+#-----------------------------------------------------------------------------
+
+sub res_set_body
+{
+  my $self = shift;
+  my $body = shift;
+  
+  return $self->{ 'OUT' }{ 'BODY' } = $body;
+}
+
+sub res_get_body
+{
+  my $self = shift;
+  my $body = shift;
+  
+  return $self->{ 'OUT' }{ 'BODY' };
 }
 
 ##############################################################################
@@ -847,12 +914,11 @@ sub save
   my $self = shift;
 
   my $mod_cache = $self->{ 'CACHE' }{ 'SESSION_DATA_SHA1' } ||= {};
-
   for my $type ( qw( USER PAGE LINK ) )
     {
     while( my ( $sid, $shr ) = each %{ $self->{ 'SESSIONS' }{ 'DATA' }{ $type } } )
       {
-      $self->boom( "SESSION:DATA:$type:$sid is not hashref" ) unless ref( $shr ) eq 'HASH';
+      boom( "SESSION:DATA:$type:$sid is not hashref" ) unless ref( $shr ) eq 'HASH';
 
       my $sha1   = sha1_hex( freeze( $shr ) );
       my $cache1 = $mod_cache->{ $type }{ $sid };
@@ -863,7 +929,7 @@ sub save
 
       $mod_cache->{ $type }{ $sid } = $sha1;
 
-      $self->sess_save( $type, $sid, $shr );
+      $self->ses->save( $type, $sid, $shr );
       }
     }
 }
@@ -881,11 +947,13 @@ sub __new_crypto_object
 
   # NOTE: RTFM says encryptor and decryptor must be different
 
-  # FIXME: read key from config file only!
-  my $key = $self->{ 'ENV' }{ 'ENCRYPT_KEY' };
-  $self->boom( "missing ENV:ENCRYPT_KEY" ) unless $key =~ /\S/;
+  my $cfg = $self->get_cfg();
 
-  my $ci = $self->{ 'ENV' }{ 'ENCRYPT_CIPHER' } || 'Twofish2'; # :)
+  # FIXME: read key from config file only!
+  my $key = $cfg->{ 'ENCRYPT_KEY' };
+  boom( "missing ENV:ENCRYPT_KEY" ) unless $key =~ /\S/;
+
+  my $ci = $cfg->{ 'ENCRYPT_CIPHER' } || 'Twofish2'; # :)
 
   return Crypt::CBC->new( -key => $key, -cipher => $ci );
 }
@@ -973,20 +1041,16 @@ sub crypto_thaw_base64u
 sub set_debug
 {
   my $self  = shift;
-  my $level = int(shift);
+  my $level = abs(int(shift));
 
-  if( $level > 0 )
-    {
-    $self->{ 'ENV' }{ 'DEBUG' } = $level > 0 ? $level : 0;
-    }
-  return $self->{ 'ENV' }{ 'DEBUG' };
+  return $self->get_cfg->{ 'DEBUG' } = $level;
 }
 
 sub is_debug
 {
   my $self = shift;
 
-  return $self->{ 'ENV' }{ 'DEBUG' };
+  return $self->get_cfg->{ 'DEBUG' } || 0;
 }
 
 #-----------------------------------------------------------------------------
@@ -1022,6 +1086,9 @@ sub log_dumper
   my $self = shift;
 
   return unless $self->is_debug();
+
+  local $Data::Dumper::Sortkeys = 1;
+
   $self->log_debug( Dumper( @_ ) );
 }
 
@@ -1143,9 +1210,7 @@ sub render
   my $self = shift;
   my %opt  = @_;
 
-#print STDERR Dumper( 'RENDER --- ' x 11, \%opt );
-
-  boom "too many nesting levels in rendering, probable bug in actions or pages" if (caller(512))[0] ne ''; # FIXME: config option for max level
+  boom "too many nesting levels in rendering, probable bug in actions or pages" if (caller(128))[0] ne ''; # FIXME: config option for max level
 
   my $action = $opt{ 'ACTION' };
   my $page   = $opt{ 'PAGE'   };
@@ -1166,15 +1231,12 @@ sub render
   elsif( $action )
     {
     # FIXME: handle content type also!
-    $portray_data = $self->action_call( $action );
-    
-    #print STDERR Dumper( '--------------->>> RENDER >>>>>>>>>>>>>>>>>>>>>', $portray_data );
-    
+    $portray_data = $self->act->call( $action );
     $page = undef;
     }
   elsif( $page )
     {
-    $portray_data = $self->prep_load_page( $page );
+    $portray_data = $self->pre->load_page( $page );
     $action = undef;
     }
   else
@@ -1184,7 +1246,7 @@ sub render
 
   if( ref( $portray_data ) eq 'HASH' )
     {
-    # nothing, ok
+    # as expected but no handling required
     }
   elsif( ref( $portray_data ) )
     {
@@ -1196,95 +1258,58 @@ sub render
     $portray_data = $self->portray( $portray_data, 'text/html' );
     }
 
-#print STDERR Dumper( 'PORTRAY --- ' x 11, $page, $portray_data );
-
   my $page_data = $portray_data->{ 'DATA'      };
   my $page_fh   = $portray_data->{ 'FH'        }; # filehandle has priority
   my $page_type = $portray_data->{ 'TYPE'      };
   my $file_name = $portray_data->{ 'FILE_NAME' };
   my $disp_type = $portray_data->{ 'DISPOSITION_TYPE' } || 'inline'; # default, rest must be handled as 'attachment', ref: rfc6266#section-4.2
 
-  my $page_type_is_text = $page_type =~ /^text\//i;
-
-  if( lc $page_type =~ /^text\/html/ )
-    {
-    my $prep_opt1 = {};
-    $page_data = $self->prep_process( $page, $page_data, $prep_opt1 );
-
-#print STDERR Dumper( 'OPT1 PREP --- ' x 11, $prep_opt1);
-
-    my $prep_opt2 = {};
-    $page_data = $self->prep_process( $page, $page_data, $prep_opt2 ) if $prep_opt1->{ 'SECOND_PASS_REQUIRED' };
-
-#print STDERR Dumper( 'PAGE DATA --- ' x 11, $page, $page_data );
-
-    # FIXME: translation
-    $self->load_trans();
-    my $tr = $self->{ 'TRANS' }{ $self->{ 'ENV' }{ 'LANG' } } || {};
-    $page_data =~ s/\<~([^\<\>]*)\>/$tr->{ $1 } || $1/ge;
-    $page_data =~ s/\[~([^\[\]]*)\]/$tr->{ $1 } || $1/ge;
-    }
-
+  # preparing headers --------------------------------------------------------
   # FIXME: charset
-  $self->set_headers( 'content-type'        => $page_type );
-  $self->set_headers( 'content-disposition' => "$disp_type; filename=$file_name" ) if $file_name;
+  $self->res_set_headers( 'content-type'        => $page_type );
+  $self->res_set_headers( 'content-disposition' => "$disp_type; filename=$file_name" ) if $file_name;
 
-  my $http_csp = $self->{ 'ENV' }{ 'HTTP_CSP' }; # || " default-src 'self' ";
-  $self->set_headers( 'Content-Security-Policy' => $http_csp ) if $http_csp;
+  # handling Content Security Policy (CSP) -- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP
+  my $http_csp = $self->get_cfg->{ 'HTTP_CSP' }; # || " default-src 'self' ";
+  $self->res_set_headers( 'Content-Security-Policy' => $http_csp ) if $http_csp;
 
-  my $app_charset = uc $self->{ 'ENV' }{ 'APP_CHARSET' } || 'UTF-8';
+  my $app_charset = uc $self->get_cfg->{ 'APP_CHARSET' } || 'UTF-8';
+
+  my $page_type_is_text = $page_type =~ /^text\//i;
   if( $page_type_is_text )
     {
     # set charset for TEXT only
-    $self->set_headers( 'content-charset' => $app_charset );
+    $self->res_set_headers( 'content-charset' => $app_charset );
     }
 
-  my $page_headers = $self->__make_headers();
+  # preparing body -----------------------------------------------------------
 
-  print $page_headers;
   if( $page_fh )
     {
-    my $buf_size = 1024*1024;
-    my $print_data;
-    while(4)
-      {
-      my $read_size = read( $page_fh, $print_data, $buf_size );
-      print $print_data;
-      last if $read_size < $buf_size;
-      }
+    $self->res_set_body( $page_fh );
+    }
+  elsif( lc $page_type =~ /^text\/html/ )
+    {
+    my $prep_opt1 = {};
+    $page_data = $self->pre->process( $page, $page_data, $prep_opt1 );
+
+    my $prep_opt2 = {};
+    $page_data = $self->pre->process( $page, $page_data, $prep_opt2 ) if $prep_opt1->{ 'SECOND_PASS_REQUIRED' };
+
+    # FIXME: translation
+    $self->load_trans();
+    my $tr = $self->{ 'TRANS' }{ $self->get_cfg->{ 'LANG' } } || {};
+    $page_data =~ s/\<~([^\<\>]*)\>/$tr->{ $1 } || $1/ge;
+    $page_data =~ s/\[~([^\[\]]*)\]/$tr->{ $1 } || $1/ge;
+    
+    $self->res_set_body( encode( $app_charset, $page_data ) );
     }
   else
-    {  
-    # TODO: FIXME: check app-charset and convert only if needed
-    #print $page_type_is_text ? encode( $app_charset, $page_data ) : $page_data;
-    #print "[[$page_type_is_text|$app_charset]]";
-    print $page_data;
-    }
-
-  $self->log_debug( "debug: page response content: page, action, type, headers:\n" . Dumper( $page, $action, $page_type, $page_headers ) ) if $self->is_debug() > 2;
-
-  if( $self->is_debug() > 1 and lc $page_type =~ /^text\/html/ )
     {
-    my $psid = $self->get_page_session_id( 0 ) || 'empty';
-    my $rsid = $self->get_page_session_id( 1 ) || 'empty';
-    print "<hr><pre>[$rsid] << [$psid]</pre>";
-    }
-  if( $self->is_debug() > 2 and lc $page_type =~ /^text\/html/ )
-    {
-    local $Data::Dumper::Sortkeys = 1;
-    local $Data::Dumper::Terse = 1;
-    local $Data::Dumper::Indent = 3;
-    print "<hr><pre>";
-    print Dumper( 'USER INPUT:'.'_'x80, $self->{ 'INPUT_USER_HR' } );
-    print Dumper( 'SAFE INPUT:'.'_'x80, $self->{ 'INPUT_SAFE_HR' } );
-    print Dumper( 'PAGE SESSION:'.'_'x80, $self->{ 'SESSIONS' }{ 'DATA' }{ 'PAGE' }{ $self->{ 'SESSIONS' }{ 'SID' }{ 'PAGE' } } );
-    print Dumper( 'USER SESSION:'.'_'x80, $self->{ 'SESSIONS' }{ 'DATA' }{ 'USER' }{ $self->{ 'SESSIONS' }{ 'SID' }{ 'USER' } } );
-#    print "<hr>";
-#    print Dumper( $self );
-    print "</pre><hr>";
-    }
+    $self->res_set_body( $page_data );
+    }  
 
-  sink 'CONTENT';
+  sink 'RENDER';
 }
 
 my %SIMPLE_PORTRAY_TYPE_MAP = (
@@ -1305,7 +1330,7 @@ sub portray
 
   $type = $SIMPLE_PORTRAY_TYPE_MAP{ $type } || $type;
 
-  boom "portray needs mime type xxx/xxx as arg 2, got [$type]" unless $type =~ /^[a-z\-_0-9]+\/[a-z\-_0-9]+$/;
+  boom "portray needs mime type xxx/xxx as arg 2, got [$type]" unless $type =~ /^[a-z\-_0-9]+\/[a-z\-_0-9\.]+$/;
 
   return { DATA => $data, TYPE => $type, @_ };
 }
@@ -1318,12 +1343,10 @@ sub forward_url
   my $url  = shift;
 
   # FIXME: use render+portray
-  $self->set_headers( location => $url );
+  $self->res_set_headers( status => 302, location => $url );
+  $self->res_set_body();
 
-  my $page_headers = $self->__make_headers();
-  print $page_headers;
-
-  sink 'CONTENT';
+  sink 'RENDER';
 }
 
 sub forward
@@ -1610,13 +1633,11 @@ sub get_user_session_expire_time_in
   return $xi > 0 ? $xi : undef;
 }
 
-sub need_post_method
+sub require_post_method
 {
   my $self = shift;
 
-  my $he = $self->get_http_env();
-
-  return if $he->{ 'REQUEST_METHOD' } eq 'POST';
+  return if $self->get_request_method() eq 'POST';
 
   $self->logout();
   $self->render( PAGE => 'epostrequired' );
@@ -1638,7 +1659,9 @@ sub load_trans
 {
   my $self = shift;
 
-  my $lang = lc $self->{ 'ENV' }{ 'LANG' };
+  my $cfg = $self->get_cfg();
+
+  my $lang = lc $cfg->{ 'LANG' };
 
   return 0 if $lang !~ /^[a-z][a-z]$/; # FIXME: move to init check! verofy hash etc. data::tools
 
@@ -1648,14 +1671,23 @@ sub load_trans
 
   my $tr = $self->{ 'TRANS' }{ $lang } = {};
 
-  my $trans_dirs = $self->{ 'ENV' }{ 'TRANS_DIRS' };
+  my $trans_dirs = $cfg->{ 'TRANS_DIRS' };
+  my $trans_file = $cfg->{ 'TRANS_FILE' };
 
   my @tf;
-  for my $dir ( @$trans_dirs )
+  if( $trans_file )
     {
-    push @tf, glob( "$dir/$lang/*.tr" );
-    push @tf, glob( "$dir/$lang/text/*.tr" );
+    # quick select single translation file, if specified
+    @tf = ( $trans_file );
     }
+  else
+    {  
+    for my $dir ( @$trans_dirs )
+      {
+      push @tf, glob( "$dir/$lang/*.tr" );
+      push @tf, glob( "$dir/$lang/text/*.tr" );
+      }
+    }  
 
   for my $tf ( @tf )
     {
@@ -1687,19 +1719,9 @@ sub load_trans_file
 ## REO proxies
 ##
 
-# FIXME: should actions have access to low-level session handling?
-sub sess_create    { my $self = shift; $self->{ 'REO_SESS' }->create(  @_ ) };
-sub sess_delete    { my $self = shift; $self->{ 'REO_SESS' }->delete(  @_ ) };
-sub sess_load      { my $self = shift; $self->{ 'REO_SESS' }->load(    @_ ) };
-sub sess_save      { my $self = shift; $self->{ 'REO_SESS' }->save(    @_ ) };
-sub sess_exists    { my $self = shift; $self->{ 'REO_SESS' }->exists(  @_ ) };
-
-#sub prep_render    { my $self = shift; $self->{ 'REO_PREP' }->render(    @_ ) };
-sub prep_load_page { my $self = shift; $self->{ 'REO_PREP' }->load_page( @_ ) };
-sub prep_load_file { my $self = shift; $self->{ 'REO_PREP' }->load_file( @_ ) };
-sub prep_process   { my $self = shift; $self->{ 'REO_PREP' }->process(   @_ ) };
-
-sub action_call    { my $self = shift; $self->{ 'REO_ACTS' }->call(  @_ ) };
+sub ses { my $self = shift; return $self->{ 'REO_SES' } };
+sub pre { my $self = shift; return $self->{ 'REO_PRE' } };
+sub act { my $self = shift; return $self->{ 'REO_ACT' } };
 
 sub new_form
 {
@@ -1721,14 +1743,25 @@ sub set_browser_window_title
 
 ##############################################################################
 
-sub html_new_id
+sub create_uniq_id
 {
   my $self = shift;
+  my $case = shift;
 
-  my $psid = $self->get_page_session_id();
-  $self->{ 'HTML_ID_COUNTER' }++;
-  # FIXME: hash $psid once more to hide...
-  return "REO_EID_$psid\_" . $self->{ 'HTML_ID_COUNTER' };
+  my $nid;
+  my $limit = 128;
+  while( $limit-- )
+    {
+    my $nid = create_random_id( 8 );
+    $nid = uc $nid if $case == 1;
+    $nid = lc $nid if $case == 2;
+    next if $self->{ 'CREATE_UNIQ_ID' }{ $nid }++;
+    my $psid = $self->get_page_session_id();
+    $self->{ 'CREATE_UNIQ_ID' }{ ':COUNT' }++;
+    return $psid . $nid;
+    }
+  boom "cannot create new uniq html id";  
+  return undef;
 }
 
 ##############################################################################

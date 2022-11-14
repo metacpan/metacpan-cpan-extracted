@@ -7,7 +7,7 @@ use Config::IniFiles qw{};
 use MIME::Base64 qw{};
 use Digest::HMAC_SHA1 qw{};
 
-our $VERSION='0.01';
+our $VERSION='0.02';
 
 =head1 NAME
 
@@ -80,7 +80,7 @@ sub url {
 Returns the signature value if you want to use the mathematics without the url method.
 
   my $path_query = "/path/script" . "?" . $query;
-  my $url=$protocol_$server . $path_query . "&signature=" . $signer->signature($path_query);
+  my $url=$protocol_server . $path_query . "&signature=" . $signer->signature($path_query);
 
 =cut
 
@@ -273,28 +273,18 @@ sub _Digest {
 
 =head1 BUGS
 
-Please log on RT and send an email to the author.
-
-=head1 SUPPORT
-
-DavisNetworks.com supports all Perl applications including this package.
+Please log on GitHub.
 
 =head1 AUTHOR
 
   Michael R. Davis
   CPAN ID: MRDVT
-  Satellite Tracking of People, LLC
-  mdavis@stopllc.com
-  http://www.stopllc.com/
 
 =head1 COPYRIGHT
 
-This program is free software licensed under the...
+MIT License
 
-  The General Public License (GPL)
-  Version 2, June 1991
-
-The full text of the license can be found in the LICENSE file included with this module.
+Copyright (c) 2022 Michael R. Davis
 
 =head1 SEE ALSO
 

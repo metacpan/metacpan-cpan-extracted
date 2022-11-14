@@ -7,7 +7,7 @@
 package Perl::Tidy::HtmlWriter;
 use strict;
 use warnings;
-our $VERSION = '20220613';
+our $VERSION = '20221112';
 
 use English qw( -no_match_vars );
 use File::Basename;
@@ -385,7 +385,6 @@ BEGIN {
     );
 
     # These token types will all be called identifiers for now
-    # FIXME: could separate user defined modules as separate type
     my @identifier = qw< i t U C Y Z G :: CORE::>;
     @token_short_names{@identifier} = ('i') x scalar(@identifier);
 
@@ -754,7 +753,7 @@ sub pod_to_html {
         # this error shouldn't happen ... we just used this filename
         Perl::Tidy::Warn(
             "unable to open temporary file $tmpfile; cannot use pod2html\n");
-        goto RETURN;
+        return $success_flag;
     }
 
     my $html_fh = $self->{_html_fh};
@@ -950,7 +949,6 @@ sub pod_to_html {
         $success_flag = 0;
     }
 
-  RETURN:
     close_object($html_fh);
 
     # note that we have to unlink tmpfile before making frames

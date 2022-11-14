@@ -1,6 +1,6 @@
 package SPVM::Regex;
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 1;
 
@@ -349,4 +349,27 @@ The alias for C<$re-E<gt>captures-E<gt>[19]>.
   method cap20 : string ()
 
 The alias for C<$re-E<gt>captures-E<gt>[20]>.
+
+=head1 Repository
+
+L<SPVM::Regex - Github|https://github.com/yuki-kimoto/SPVM-Regex>
+
+=head1 Author
+
+L<Yuki Kimoto|https://github.com/yuki-kimoto>
+
+=head1 Contributors
+
+=over 2
+
+L<Ryunosuke Murakami|https://github.com/ryun0suke22>
+
+=back
+
+=head1 Copyright & License
+
+Copyright Yuki Kimoto 2022-2022, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
 

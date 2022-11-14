@@ -60,9 +60,9 @@
          "web" : "https://github.com/G4Vi/MHFS"
       }
    },
-   "version" : "v0.2.0",
+   "version" : "v0.2.1",
    "x_alienfile" : {
-      "generated_by" : "Alien::Build::MM version 2.50",
+      "generated_by" : "Alien::Build::MM version 2.72",
       "requires" : {
          "share" : {
             "Alien::Build::Plugin::Gather::IsolateDynamic" : "0.48"
@@ -70,5 +70,5 @@
          "system" : {}
       }
    },
-   "x_serialization_backend" : "JSON::PP version 4.10"
+   "x_serialization_backend" : "JSON::PP version 4.12"
 }

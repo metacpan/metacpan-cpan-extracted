@@ -4,7 +4,7 @@ Task::BeLike::GEEKRUTH - TIMTOWTDI, but this works for GeekRuthie
 
 # VERSION
 
-version 1.0200
+version 1.0301
 
 # NAME
 
@@ -12,7 +12,7 @@ Task::BeLike::GEEKRUTH - TIMTOWTDI, but this works for GeekRuthie
 
 # VERSION
 
-version 1.0200
+version 1.0301
 
 # TASK CONTENTS
 
@@ -38,9 +38,15 @@ version 1.0200
 
 ### [Dist::Zilla::App::Command::lsplugins](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3AApp%3A%3ACommand%3A%3Alsplugins)
 
+### [Dist::Zilla::Plugin::INI::Baked](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3APlugin%3A%3AINI%3A%3ABaked)
+
+### [Dist::Zilla::Plugin::MetaData::BuiltWith](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3APlugin%3A%3AMetaData%3A%3ABuiltWith)
+
 ### [Dist::Zilla::Plugin::TaskWeaver](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3APlugin%3A%3ATaskWeaver)
 
-### [Dist::Zilla::PluginBundle::Author::GEEKRUTH](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3APluginBundle%3A%3AAuthor%3A%3AGEEKRUTH)
+### [Dist::Zilla::Plugin::Git::PushInitial](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3APlugin%3A%3AGit%3A%3APushInitial)
+
+### [Dist::Zilla::PluginBundle::GEEKRUTH](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3APluginBundle%3A%3AGEEKRUTH)
 
 ### [Dist::Zilla::PluginBundle::GitLab](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3APluginBundle%3A%3AGitLab)
 
@@ -65,6 +71,8 @@ version 1.0200
 ### [DBD::Pg](https://metacpan.org/pod/DBD%3A%3APg)
 
 ### [DBIx::Class](https://metacpan.org/pod/DBIx%3A%3AClass)
+
+### [DBIx::Class::Schema::Loader](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3ASchema%3A%3ALoader)
 
 ### [DBIx::Class::Schema::ResultSetNames](https://metacpan.org/pod/DBIx%3A%3AClass%3A%3ASchema%3A%3AResultSetNames)
 
@@ -98,6 +106,8 @@ version 1.0200
 
 ### [Dancer2::Plugin::REST](https://metacpan.org/pod/Dancer2%3A%3APlugin%3A%3AREST)
 
+### [Dancer2::Session::DBIC](https://metacpan.org/pod/Dancer2%3A%3ASession%3A%3ADBIC)
+
 ### [Dancer2::Template::Handlebars](https://metacpan.org/pod/Dancer2%3A%3ATemplate%3A%3AHandlebars)
 
 ### [File::Path](https://metacpan.org/pod/File%3A%3APath)
@@ -119,6 +129,16 @@ version 1.0200
 I write Perl for a living, and fully expect to do so for the rest of my career, and well into
 what passes for "retirement" for a workaholic nerd like me. This
 [Dist::Zilla::Plugin::TaskWeaver](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3APlugin%3A%3ATaskWeaver) module gathers together the things I use frequently.
+
+# INITIAL INSTALLATION
+
+I use Debian-ish systems, mostly.  Here are the packages I install on a bare system, **before** 
+I [perlbrew](https://metacpan.org/pod/perlbrew)brew a perl and try to install this Task:
+
+    sudo apt install build-essential direnv     git \
+                     libexpat1-dev   libssl-dev postgresql\
+                     pq-dev          unzip      vim \
+                     zlib1g-dev
 
 # TASK CONTENTS
 
@@ -148,30 +168,46 @@ the same terms as the Perl 5 programming language system itself.
 
 Hey! **The above document had some coding errors, which are explained below:**
 
-- Around line 129:
+- Around line 149:
 
     Unknown directive: =pkggoup
 
-- Around line 131:
+- Around line 151:
 
     Unknown directive: =pkg
 
-- Around line 133:
+- Around line 153:
 
     Unknown directive: =pkg
 
-- Around line 135:
+- Around line 155:
 
     Unknown directive: =pkg
 
-- Around line 137:
+- Around line 157:
 
     Unknown directive: =pkg
 
-- Around line 139:
+- Around line 159:
 
     Unknown directive: =pkg
 
-- Around line 141:
+- Around line 161:
+
+    Unknown directive: =pkg
+
+- Around line 163:
+
+    Unknown directive: =pkg
+
+- Around line 165:
+
+    Unknown directive: =pkg
+
+- Around line 167:
+
+    Unknown directive: =pkg
+
+- Around line 169:
 
     Unknown directive: =pkg

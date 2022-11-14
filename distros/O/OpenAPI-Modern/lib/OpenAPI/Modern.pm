@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package OpenAPI::Modern; # git description: v0.033-3-gf2ff940
+package OpenAPI::Modern; # git description: v0.034-2-gafe8b36
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI Swagger HTTP request response
 
-our $VERSION = '0.034';
+our $VERSION = '0.035';
 
 use 5.020;
 use Moo;
@@ -23,7 +23,7 @@ use Scalar::Util 'looks_like_number';
 use Feature::Compat::Try;
 use Encode 2.89;
 use URI::Escape ();
-use JSON::Schema::Modern 0.551;
+use JSON::Schema::Modern 0.557;
 use JSON::Schema::Modern::Utilities 0.531 qw(jsonp unjsonp canonical_uri E abort is_equal is_elements_unique);
 use JSON::Schema::Modern::Document::OpenAPI;
 use MooX::HandlesVia;
@@ -474,7 +474,7 @@ sub _validate_parameter_content ($self, $state, $param_obj, $content_ref) {
 }
 
 sub _validate_body_content ($self, $state, $content_obj, $message) {
-  my $content_type = _content_type($message);
+  my $content_type = _content_type($message); # does not include charset
 
   return E({ %$state, data_path => $state->{data_path} =~ s{body}{header/Content-Type}r, keyword => 'content' },
       'missing header: Content-Type')
@@ -504,8 +504,8 @@ sub _validate_body_content ($self, $state, $content_obj, $message) {
   # TODO: handle Content-Encoding header; https://github.com/OAI/OpenAPI-Specification/issues/2868
   my $content_ref = _content_ref($message);
 
-  # decode the charset
-  if (my $charset = _content_charset($message)) {
+  # decode the charset, for text content
+  if ($content_type =~ m{^text/} and my $charset = _content_charset($message)) {
     try {
       $content_ref = \ Encode::decode($charset, $content_ref->$*, Encode::FB_CROAK | Encode::LEAVE_SRC);
     }
@@ -517,8 +517,9 @@ sub _validate_body_content ($self, $state, $content_obj, $message) {
 
   my $schema = $content_obj->{$media_type}{schema};
 
-  # use the original Content-Type, NOT the possibly wildcard media type from the document
-  my $media_type_decoder = $self->get_media_type($content_type);  # case-insensitive, wildcard lookup
+  # use the original Content-Type, NOT the possibly wildcard media type from the openapi document
+  # lookup is case-insensitive and falls back to wildcard definitions
+  my $media_type_decoder = $self->get_media_type($content_type);
   $media_type_decoder = sub ($content_ref) { $content_ref } if $media_type eq '*/*';
   if (not $media_type_decoder) {
     # don't fail if the schema would pass on any input
@@ -684,7 +685,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI docume
 
 =head1 VERSION
 
-version 0.034
+version 0.035
 
 =head1 SYNOPSIS
 

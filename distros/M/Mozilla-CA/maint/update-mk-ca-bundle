@@ -1,0 +1,26 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use File::Spec::Functions qw(updir catfile abs2rel canonpath);
+use File::Basename qw(dirname);
+use Cwd qw(abs_path);
+
+my $dir = dirname(__FILE__);
+my $root = abs2rel(abs_path(catfile($dir, updir)));
+
+my $mk_ca_bundle_url = 'https://raw.githubusercontent.com/curl/curl/master/scripts/mk-ca-bundle.pl';
+my $mk_ca_bundle = canonpath("$dir/mk-ca-bundle.pl");
+
+system( qw(curl -s -o), $mk_ca_bundle, $mk_ca_bundle_url ) == 0
+    or die "Failed to download $mk_ca_bundle!";
+
+chmod 0755, $mk_ca_bundle;
+
+if (system( qw( git diff --quiet ), $mk_ca_bundle ) == 0) {
+    print "No changes to $mk_ca_bundle\n";
+}
+else {
+    print "Updated $mk_ca_bundle\n";
+    system $^X, $mk_ca_bundle, '--version';
+}

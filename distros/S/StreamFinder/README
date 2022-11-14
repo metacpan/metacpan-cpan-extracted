@@ -114,13 +114,14 @@ DESCRIPTION
     player (his custom forked version of the open-source "Audacious" audio
     player). "Fauxdacious" (<https://wildstar84.wordpress.com/fauxdacious/>)
     incorporates this module to decode and play streams, along with their
-    titles / station names, and station / podcast / video icons!
+    titles / station names, and station / podcast / video icons, artists /
+    channel names, genres, and descriptions!
 
     Please NOTE: StreamFinder is a module, NOT a standalone application. It
     is designed to be used by other Perl applications. To create your own
     very simple application just to fetch streams manually, simply grab the
     code in the SYNOPSIS section above, save it to an executable text file,
-    ie. *StreamFinder.pl* and run it from the command line with a supported
+    ie. *StreamFinder.pl*, and run it from the command line with a supported
     streaming site URL as the argument. You can then edit it to tailor it to
     your needs.
 
@@ -185,10 +186,10 @@ DESCRIPTION
     service), provide a Perl patch module / program source that can extract
     some or all of the necessary information for streams on that site and
     I'll consider it! The easiest way to do this is to take one of the
-    existing submodules, copy it to "StreamFinder::*YOURSITE*.pm" and modify
-    it (and the POD docs) to your specific site's needs, test it on several
-    of their pages (see the "SYNOPSIS" code above), and send it to me
-    (That's what I do when I want to add a new site)!
+    existing submodules, copy it to "StreamFinder::*YOURSITE*.pm", modify it
+    (and the POD docs) to your specific site's needs, test it on several of
+    their pages (see the "SYNOPSIS" code above), and send it to me (That's
+    what I do when I want to add a new site)!
 
 SUBROUTINES/METHODS
     new(*url* [, *options* ])
@@ -221,8 +222,8 @@ SUBROUTINES/METHODS
         StreamFinder::Youtube to not be used for the stream search. Default
         is for all installed submodules to be considered. NOTE: Omitting a
         module from being considered when seeking to match the correct
-        module by site URL, this does NOT prevent that module from being
-        invoked by a selected module for an embedded link, OR in the case of
+        module by site URL does NOT prevent that module from being invoked
+        by a selected module for an embedded link, OR in the case of
         StreamFinder::Youtube being omitted, will still be invoked, if
         required or needed by a non-omitted module initially selected!
 
@@ -247,6 +248,15 @@ SUBROUTINES/METHODS
 
         Additional options:
 
+        *-hls_bandwidth* => "*number*"
+
+        Limit HLS (m3u8) streams that contain a list of other HLS streams of
+        varying BANDWIDTH values (in BITS per second) by selecting the
+        highest bitrate stream at or below the specified limit when
+        *$stream-*getURL()> is called.
+
+        DEFAULT *-none-* (no limiting by bitrate).
+
         *-log* => "*logfile*"
 
         Specify path to a log file. If a valid and writable file is
@@ -270,13 +280,12 @@ SUBROUTINES/METHODS
     $station->get(['playlist'])
         Returns an array of strings representing all stream URLs found. If
         *"playlist"* is specified, then an extended m3u playlist is returned
-        instead of stream url(s). NOTE: For Apple, Castbox, Google,
-        Spreaker, and SermonAudio podcasts, if an author / channel page url
-        is given, rather than an individual podcast episode's url, get()
-        returns the first (latest?) podcast episode found, and
-        get("playlist") returns an extended m3u playlist containing the
-        urls, titles, etc. for all the podcast episodes found on that page
-        url from latest to oldest.
+        instead of stream url(s). NOTE: For podcast sites, if an author /
+        channel page url is given, rather than an individual podcast
+        episode's url, get() returns the first (latest?) podcast episode
+        found, and get("playlist") returns an extended m3u playlist
+        containing the urls, titles, etc. for all the podcast episodes found
+        on that page url from latest to oldest.
 
     $station->getURL([*options*])
         Similar to get() except it only returns a single stream representing
@@ -388,8 +397,8 @@ DEPENDENCIES
 
 RECCOMENDS
     youtube-dl, or other compatable program such as yt-dlp, etc. (for
-    Youtube, Bitchute, Blogger, Brighteon, Odysee, Tunein, Vimeo) NOTE:
-    Required for Youtube, Odysee, and Tunein (except for podcasts).
+    Youtube, Bitchute, Blogger, Brighteon, Odysee, Vimeo) NOTE: Required for
+    Youtube, Odysee, and SoundCloud.
 
     wget
 
@@ -397,7 +406,7 @@ BUGS
     Please report any bugs or feature requests to "bug-streamFinder at
     rt.cpan.org", or through the web interface at
     <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=StreamFinder>. I will be
-    notified, and then you'll automatically be notified of progress on your
+    notified, and then you'llautomatically be notified of progress on your
     bug as I make changes.
 
 SUPPORT

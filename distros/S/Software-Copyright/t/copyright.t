@@ -117,6 +117,14 @@ subtest "two statement" => sub {
     ok($statement->is_valid, "check validity");
 };
 
+subtest "just a year" => sub {
+    my $statement = Software::Copyright->new('2022');
+
+    is("$statement", "2022", "check simplified statement");
+    ok(! $statement->is_valid, "check validity");
+};
+
+
 subtest "lots of test cases" => sub {
     foreach my $t (@tests) {
         my ($in,$expect) = @$t;

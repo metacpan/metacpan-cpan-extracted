@@ -1,8 +1,8 @@
 ##############################################################################
 ##
 ##  Web::Reactor application machinery
-##  2013-2017 (c) Vladi Belperchinov-Shabanski "Cade"
-##  <cade@bis.bg> <cade@biscom.net> <cade@cpan.org>
+##  2014-2021 (c) Vladi Belperchinov-Shabanski "Cade"
+##  <cade@noxrun.com> <cade@bis.bg> <cade@cpan.org>
 ##
 ##  LICENSE: GPLv2
 ##
@@ -10,7 +10,7 @@
 package Web::Reactor::HTML::Form;
 use strict;
 use Exporter;
-use Data::Tools;
+use Data::Tools 1.31;
 use Exception::Sink;
 
 use Web::Reactor::HTML::Utils;
@@ -43,24 +43,17 @@ sub new
 
 ##############################################################################
 
-sub html_new_id
+sub create_uniq_id
 {
   my $self = shift;
 
-  my $form_name = $self->{ 'FORM_NAME' };
-  $form_name or boom "empty form name, need begin() first";
-
-  my $reo = $self->get_reo();
-  my $psid = $reo->get_page_session_id();
-  $self->{ 'HTML_ID_COUNTER' }++;
-  # FIXME: hash $psid once more to hide...
-  return $form_name . "_EID_$psid\_" . $self->{ 'HTML_ID_COUNTER' } . '_' . int(rand()*10_000_000_000);
+  return $self->get_reo()->create_uniq_id();
 }
 
 sub __check_name
 {
   my $name = shift;
-  $name =~ /^[A-Z_0-9:.]+$/ or boom "invalid or empty NAME attribute [$name]";
+  $name =~ /^[A-Z_0-9_:.]+$/ or boom "invalid or empty NAME attribute [$name]";
   return 1;
 }
 
@@ -77,24 +70,26 @@ sub begin
   my $method         = uc $opt{ 'METHOD' } || 'POST';
   my $action         =    $opt{ 'ACTION' } || '?';
   my $default_button =    $opt{ 'DEFAULT_BUTTON' };
-  my $state_keeper   =    $opt{ 'STATE_KEEPER'   };
-  my $extra_args     =    $opt{ 'EXTRA_ARGS'     } || {};
 
   $self->{ 'CLASS_MAP' } = $opt{ 'CLASS_MAP' } || {};
 
-  __check_name( $form_name );
   $method    =~ /^(POST|GET)$/  or boom "METHOD can either POST or GET";
 
   my $reo = $self->get_reo();
   my $psid = $reo->get_page_session_id();
 
+
+  $form_name ||= 
+  __check_name( $form_name );
+
   $form_id ||= $form_name;
   $form_id .= "_$psid";
 
-  $self->{ 'FORM_NAME' } = $form_name;
-  $self->{ 'FORM_ID'   } = $form_id = $form_id || $self->html_new_id();
-  $self->{ 'RADIO'     } = {};
-  $self->{ 'RET_MAP'   } = {}; # return data mapping (combo, checkbox, etc.)
+  $self->{ 'FORM_NAME'  } = $form_name;
+  $self->{ 'FORM_ID'    } = $form_id = $form_id || $self->create_uniq_id();
+  $self->{ 'RADIO'      } = {};
+  $self->{ 'RET_MAP'    } = {}; # return data mapping (combo, checkbox, etc.)
+  $self->{ 'FORM_STATE' } = {};
   
   my $options;
   
@@ -103,22 +98,30 @@ sub begin
   my $text;
 
   # FIXME: TODO: debug info inside html text, begin formname end etc.
+  
+  $self->state( FORM_NAME => $form_name );
 
   my $reo = $self->get_reo();
 
   my $page_session = $reo->get_page_session();
   $page_session->{ ':FORM_DEF' }{ $form_name } = {};
 
-  $state_keeper ||= $reo->args_here( FORM_NAME => $form_name, %$extra_args ); # keep state and more args
-  $text .= "<form name='$form_name' id='$form_id' action='$action' method='$method' enctype='multipart/form-data' $options>";
-  $text .= "</form>";
-  $text .= "<input type=hidden name='_' value='$state_keeper' form='$form_id'>";
-  $text .= "<input style='display: none;' name='__avoidiebug__' form='$form_id'>"; # stupid IE bugs
+  $text .= "<form name='$form_name' id='$form_id' action='$action' method='$method' enctype='multipart/form-data' $options></form>";
+  ### $text .= "<input style='display: none;' name='__avoidiebug__' form='$form_id'>"; # stupid IE bugs
   if( $default_button )
     {
     $text .= "<input style='display: none;' type='image' name='BUTTON:$default_button' src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQI12NgYGBgAAAABQABXvMqOgAAAABJRU5ErkJggg==' border=0 height=0 width=0 onDblClick='return false;' form='$form_id'>"
     }
   return $text;
+}
+
+sub state
+{
+  my $self = shift;
+
+  $self->{ 'FORM_STATE'  } = { %{ $self->{ 'FORM_STATE'  } }, @_ };
+  
+  return undef;
 }
 
 sub end
@@ -136,7 +139,11 @@ sub end
   my $page_session = $reo->get_page_session();
 
   my $form_name = $self->{ 'FORM_NAME' };
+  my $form_id   = $self->{ 'FORM_ID'   };
   $page_session->{ ':FORM_DEF' }{ $form_name }{ 'RET_MAP' } = $self->{ 'RET_MAP' };
+
+  my $state_keeper = $reo->args_here( %{ $self->{ 'FORM_STATE'  } } );
+  $text .= "<input type=hidden name='_' value='$state_keeper' form='$form_id'>";
 
   $text .= "\n";
   return $text;
@@ -179,15 +186,17 @@ sub checkbox
 
   my $text;
 
-  my $ch_id = $self->html_new_id(); # checkbox data holder
+  my $ch_id = $self->create_uniq_id(); # checkbox data holder
 
   my $form_id = $self->{ 'FORM_ID' };
   #print STDERR "ccccccccccccccccccccc CHECKBOX [$name] [$value]\n";
   #$text .= "<input type='checkbox' name='$name' value='1' $options>";
   $text .= "\n";
   $text .= "<input type='hidden' name='$name' id='$ch_id' value='$value' form='$form_id' $args>";
+  # --> $text .= html_element( "input", undef, type => 'hidden', name => $name, id => $ch_id, value => $value, form => $form_id, extra => $args );
 #  $text .= qq[ <input type='checkbox' $options checkbox_data_input_id="$ch_id" onclick='document.getElementById( "$ch_id" ).value = this.checked ? 1 : 0'> ];
   $text .= qq[ <input type='checkbox' $options data-checkbox-input-id="$ch_id" form='$form_id' onclick='reactor_form_checkbox_toggle(this)' class='$class'> ];
+  # --> $text .= html_element( "input", undef, type => 'checkbox', 'data-checkbox-input-id' => $ch_id, form => $form_id, onclick='reactor_form_checkbox_toggle(this)', class => $class, extra => $options );
   $text .= "\n";
 
   return $text;
@@ -215,35 +224,30 @@ sub checkbox_multi
   $value = abs( int( $value ) );
   $value = 0 if $value >= $stages;
 
-  my $options;
-  my $current_class;
+  my $text;
 
+  my $labels_spans;
   for my $s ( 0 .. $stages - 1 )
     {
-    my $c = ref( $class ) eq 'ARRAY' ? $class->[ $s ] : "$class-$s cursor-pointer";
-    my $v = $labels->[ $s ];
-    $options .= "data-value-label-$s='$v' ";
-    $options .= "data-value-class-$s='$c' ";
-    $current_class = $c if $s == 0;
-    $current_class = $c if $s == $value;
+    $labels_spans .= html_element( 'span', $labels->[$s], style => "display: none" );
     }
-  my $label = $labels->[ $value ];
-
-  my $text;
 
   my $reo = $self->get_reo();
   my $hint_handler = $hint ? html_hover_layer( $reo, VALUE => $hint ) : undef;
 
-  my $cb_id = $self->html_new_id(); # checkbox id
-  my $el_id = $self->html_new_id(); # checkbox label element id
+  my $cb_id = $self->create_uniq_id(); # checkbox id
+  my $el_id = $self->create_uniq_id(); # checkbox label element id
 
   my $form_id = $self->{ 'FORM_ID' };
   #print STDERR "ccccccccccccccccccccc CHECKBOX [$name] [$value]\n";
   #$text .= "<input type='checkbox' name='$name' value='1' $options>";
   $text .= "\n";
-  $text .= "<input type='hidden' name='$name' id='$cb_id' value='$value' form='$form_id' $args>";
-  $text .= qq[ <span class='$current_class' id='$el_id' data-stages='$stages' data-checkbox-input-id="$cb_id" onclick='reactor_form_multi_checkbox_toggle(this)' $hint_handler $options>$label</span> ];
-  $text .= "<script>reactor_form_multi_checkbox_setup_id( '$el_id' )</script>";
+  ### $text .= qq[<         input type='hidden' name='$name' id='$cb_id' value='$value' form='$form_id' $args>];
+  $text .= html_element( "input", undef, type => 'hidden', name => $name, id => $cb_id, value => $value, form => $form_id, extra => $args );
+  #$text .= qq[<span class='$current_class' id='$el_id' data-stages='$stages' data-checkbox-input-id='$cb_id' onclick='reactor_form_multi_checkbox_toggle(this)' $hint_handler $options>$label</span>];
+  $text .= html_element( "span", $labels_spans, id => $el_id, 'data-stages' => $stages, 'data-checkbox-input-id' => $cb_id, onclick => 'reactor_form_multi_checkbox_toggle(this)', extra => $hint_handler );
+  ### $text .= qq[<script>reactor_form_multi_checkbox_setup_id( '$el_id' )</script>];
+  $text .= html_element( "script", "reactor_form_multi_checkbox_setup_id( '$el_id' )" );
   $text .= "\n";
 
   return $text;
@@ -267,20 +271,21 @@ sub radio
 
   my %opt = @_;
 
-  my $name  = uc $opt{ 'NAME'  };
+  my $name  = uc $opt{ 'NAME'  }; # FIXME:escape or check?
   my $class =    $opt{ 'CLASS' } || $self->{ 'CLASS_MAP' }{ 'RADIO' } || 'radio';
   my $on    =    $opt{ 'ON'    }; # active?
-  my $ret   =    $opt{ 'RET'   } || $opt{ 'RETURN' } || 1; # map return value!
+  my $ret   =    $opt{ 'RET'   }; # map return value!
+  my $extra =    $opt{ 'EXTRA' };
 
   __check_name( $name );
 
   my $text;
 
-  my $val = $self->html_new_id();
+  my $val = $self->create_uniq_id();
 
   my $form_id = $self->{ 'FORM_ID' };
   my $checked = $on ? 'checked' : undef;
-  $text .= "<input type='radio' $checked name='$name' value='$val' form='$form_id'>";
+  $text .= "<input type='radio' $checked name='$name' value='$val' form='$form_id' $extra>";
 
   $self->__ret_map_set( $name, $val => $ret ) if defined $ret;
 
@@ -334,12 +339,17 @@ sub select
   my $class =    $opt{ 'CLASS' } || $self->{ 'CLASS_MAP' }{ 'SELECT' } || 'select';
   my $rows  =    $opt{ 'SIZE'  } || $opt{ 'ROWS'  } || 1;
   my $args  =    $opt{ 'ARGS' };
+  my $disabled = $opt{ 'DISABLED' };
 
   __check_name( $name );
 
-  my $data   = $opt{ 'DATA'     }; # array reference or hash reference, inside hashesh are the same
-  my $sel_hr = $opt{ 'SELECTED' }; # hashref with selected keys (values are true's)
+  my $data     = $opt{ 'DATA'     }; # array reference or hash reference, inside hashesh are the same
+  my $selected = $opt{ 'SELECTED' }; # hashref with selected keys (values are true's)
   my $sel_data;
+
+  my $options;
+
+  $options .= "disabled='disabled' " if $disabled;
 
   if( ref($data) eq 'HASH' )
     {
@@ -375,6 +385,7 @@ sub select
   my $text;
   my $form_id = $self->{ 'FORM_ID' };
 
+  $extra .= qq[ onchange='this.form.submit()'] if $opt{ 'RESUBMIT_ON_CHANGE' };
   if( $opt{ 'RADIO' } )
     {
     for my $hr ( @$sel_data )
@@ -383,9 +394,9 @@ sub select
       my $key   = $hr->{ 'KEY'      };
       my $value = $hr->{ 'VALUE'    };
 
-      $sel = 'selected' if $sel_hr and $sel_hr->{ $key };
-#print STDERR "sssssssssssssssssssssssss RADIO [$name] [$value] [$key] $sel\n";
-      $text .= $self->radio( NAME => $name, RET => $key, ON => $sel, EXTRA => $extra ) . " $value";
+      $sel = 'selected' if ( ref( $selected ) and $selected->{ $key } ) or ( $selected eq $key );
+#print STDERR "sssssssssssssssssssssssss RADIO [$name] [$value] [$key] $sel -- {$extra}\n";
+      $text .= $self->radio( NAME => $name, RET => $key, ON => $sel, EXTRA => $extra, DISABLED => $disabled ) . " $value";
       $text .= "<br>" if $opt{ 'RADIO' } != 2;
       }
     # FIXME: kakvo stava ako nqma dadeno selected pri submit na formata?
@@ -393,7 +404,7 @@ sub select
   else
     {
     my $multiple = 'multiple' if $opt{ 'MULTIPLE' };
-    $text .= "<select class='$class' id='$id' name='$name' size='$rows' $multiple form='$form_id' $args $extra>";
+    $text .= "<select class='$class' id='$id' name='$name' size='$rows' $multiple form='$form_id' $args $extra $options>";
 
     my $pad = '&nbsp;' x 3;
     for my $hr ( @$sel_data )
@@ -401,10 +412,10 @@ sub select
       my $sel   = $hr->{ 'SELECTED' } ? 'selected' : ''; # is selected?
       my $key   = $hr->{ 'KEY'      };
       my $value = $hr->{ 'VALUE'    };
-      my $id = $self->html_new_id();
+      my $id = $self->create_uniq_id();
       $self->__ret_map_set( $name, $id => $key );
 
-      $sel = 'selected' if $sel_hr and $sel_hr->{ $key };
+      $sel = 'selected' if ( ref( $selected ) and $selected->{ $key } ) or ( $selected eq $key );
 #print STDERR "sssssssssssssssssssssssss COMBO [$name] [$value] [$key] $sel\n";
       $text .= "<option value='$id' $sel>$value$pad</option>\n";
       }
@@ -483,6 +494,7 @@ sub input
   my $name  = uc $opt{ 'NAME'    };
   my $class =    $opt{ 'CLASS'   } || $self->{ 'CLASS_MAP' }{ 'INPUT' } || 'line';
   my $value =    $opt{ 'VALUE'   };
+  my $key   =    $opt{ 'KEY'     };
   my $id    =    $opt{ 'ID'      };
   # FIXME: default data?
   my $size  =    $opt{ 'SIZE'    } || $opt{ 'LEN' } || $opt{ 'WIDTH' };
@@ -493,7 +505,9 @@ sub input
   my $hid   =    $opt{ 'HIDDEN'  };
   my $ret   =    $opt{ 'RET'     } || $opt{ 'RETURN'  }; # if return value should be mapped, works only with HIDDEN
 
-  my $clear =    $opt{ 'CLEAR'   };
+  my $clear =    $opt{ 'DISABLED' } ? undef : $opt{ 'CLEAR'   };
+  
+  my $datalist = $opt{ 'DATALIST' }; # array ref with 'key' & 'value' hash
 
   $size = $maxl = $len if $len > 0;
 
@@ -521,7 +535,7 @@ sub input
   if( $hid and defined $ret )
     {
     # if input is hidden and return value mapping requested, VALUE is not used!
-    $value = $self->html_new_id();
+    $value = $self->create_uniq_id();
     $self->__ret_map_set( $name, $value => $ret );
     }
 
@@ -533,19 +547,42 @@ sub input
 
     if( $clear =~ /^[a-z_\-0-9\/]+\.(png|jpg|jpeg|gif|svg)$/ )
       {
-      $clear_tag = qq[ <img class='icon icon-clear' src='$clear' border='0' onClick='return set_value("$id", "")' $clear_hint_handler > ];
+      $clear_tag = qq[ <img class='icon-clear' src='$clear' border='0' onClick='return set_value("$id", "")' $clear_hint_handler > ];
       }
     else
       {
       my $s = $clear eq 1 ? '&otimes;' : $clear;
-      $clear_tag = qq[ <span class='icon icon-clear' border='0' onClick='return set_value("$id", "")' $clear_hint_handler >$s</span> ];
+      $clear_tag = qq[ <span class='icon-clear' border='0' onClick='return set_value("$id", "")' $clear_hint_handler >$s</span> ];
       }
     }
 
   my $text;
 
   my $form_id = $self->{ 'FORM_ID' };
-  $text .= "<input class='$class' name='$name' value='$value' $options form='$form_id' $args>$clear_tag";
+  
+  if( $datalist )
+    {
+    my $resub = $opt{ 'RESUBMIT_ON_CHANGE' } ? 1 : 0;
+    
+    my $empty_key   = str_html_escape( $opt{ 'EMPTY_KEY' } );
+    my $input_id    = $self->create_uniq_id();
+    my $datalist_id = $self->create_uniq_id();
+    $class .= " search_list";
+    $text  .= "\n\n\n\n\n<input id=$input_id type=hidden    name='$name' value='$key'          form='$form_id'      >";
+    $text  .= "\n<input class='$class' value='$value' list=$datalist_id $options form='$form_id' $args data-input-id=$input_id data-empty-key='$empty_key' onchange='return reactor_datalist_change( this, $resub )'>$clear_tag";
+    $text  .= "\n<datalist id=$datalist_id>";
+    for my $e ( @$datalist )
+      {
+      my $k = $e->{ 'KEY'   };
+      my $v = $e->{ 'VALUE' };
+      $text .= html_element( 'option', undef, name => $v, value => $v, 'data-key' => $k );
+      }
+    $text .= "\n</datalist>\n\n\n\n";
+    }
+  else
+    {  
+    $text .= "<input class='$class' name='$name' value='$value' $options form='$form_id' $args>$clear_tag";
+    }
 
   $text .= "\n";
   return $text;
@@ -553,7 +590,41 @@ sub input
 
 ##############################################################################
 
-# TODO: include button support
+sub file_upload
+{
+  my $self = shift;
+
+  my %opt = @_;
+
+  my $name  = uc $opt{ 'NAME'    };
+  my $class =    $opt{ 'CLASS'   } || $self->{ 'CLASS_MAP' }{ 'FILE_UPLOAD' } || 'file_upload';
+  my $id    =    $opt{ 'ID'      };
+  my $args  =    $opt{ 'ARGS'    };
+
+  my $options;
+
+  $options .= "multiple " if $opt{ 'MULTI' };
+  $options .= "id='$id' " if $id ne '';
+
+  my $text;
+
+  my $form_id = $self->{ 'FORM_ID' };
+
+  $text .= "<input class='$class' name='$name' type=file $options form='$form_id' $args>";
+
+  $text .= "\n";
+  return $text;
+}
+
+sub file_upload_multi
+{
+  my $self = shift;
+  return $self->file_upload( @_, MULTI => 1 );
+}  
+
+
+##############################################################################
+
 sub button
 {
   my $self = shift;
@@ -565,9 +636,6 @@ sub button
   my $class =    $opt{ 'CLASS' } || 'button';
   my $value =    $opt{ 'VALUE' };
   my $args  =    $opt{ 'ARGS'  };
-
-  $value =~ s/'//g;
-  $value = str_html_escape( $value );
 
   __check_name( $name );
 
@@ -584,7 +652,10 @@ sub button
   $name =~ s/^button://i;
 
   my $form_id = $self->{ 'FORM_ID' };
-  $text .= "<input class='$class' id='$id' type='submit' name='button:$name' value='$value' onDblClick='return false;' form='$form_id' $options $args>";
+#  $text .= "<input class='$class' id='$id' type='submit' name='button:$name' value='$value' onDblClick='return false;' form='$form_id' $options $args>";
+  #$text .= "<button class='$class' id='$id' type='submit' name='button:$name' value='1' onDblClick='return false;' form='$form_id' $options $args>$value</button>";
+  
+  $text .= html_element( 'button', $value, form => $form_id, class => $class, id => $id, name => "button:$name", onDblClick => 'return false;', extra => "$options $args" );
 
   $text .= "\n";
   return $text;

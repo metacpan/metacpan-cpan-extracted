@@ -16,7 +16,7 @@ use Config qw(%Config);
 my %cfg;
 @cfg{qw(cc ccflags ldflags)} = @Config{qw(cc ccflags ldflags)};
 for my $arg (@ARGV) {
-  if ( /^(CC|CCFLAGS|LDFLAGS)=(.*)/i ) {
+  if ( $arg =~ /^(CC|CCFLAGS|LDFLAGS)=(.*)/i ) {
     $cfg{lc($1)} = $2;
   }
 }
@@ -37,7 +37,7 @@ $^W=1;
 
 my %define;
 my @libs;
-my $Package_Version = '1.16';  # keep this consistent with Tty.pm
+my $Package_Version = '1.17';  # keep this consistent with Tty.pm
 my $Is_Beta = ($Package_Version =~ m/_/);
 
 open(SUB, ">xssubs.c") or die "open: $!";

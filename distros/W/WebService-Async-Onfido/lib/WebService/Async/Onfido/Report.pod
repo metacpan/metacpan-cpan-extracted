@@ -1,0 +1,36 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with WebService::Async::Onfido::Report
+at lib/WebService/Async/Onfido/Report.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+WebService::Async::Onfido::Report - represents data for Onfido
+
+=head1 DESCRIPTION
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<WebService::Async::Onfido::Base::Report>
+
+L<breakdown|WebService::Async::Onfido::Base::Report/breakdown>, L<created_at|WebService::Async::Onfido::Base::Report/created_at>, L<documents|WebService::Async::Onfido::Base::Report/documents>, L<href|WebService::Async::Onfido::Base::Report/href>, L<id|WebService::Async::Onfido::Base::Report/id>, L<name|WebService::Async::Onfido::Base::Report/name>, L<new|WebService::Async::Onfido::Base::Report/new>, L<options|WebService::Async::Onfido::Base::Report/options>, L<properties|WebService::Async::Onfido::Base::Report/properties>, L<result|WebService::Async::Onfido::Base::Report/result>, L<status|WebService::Async::Onfido::Base::Report/status>, L<sub_result|WebService::Async::Onfido::Base::Report/sub_result>, L<variant|WebService::Async::Onfido::Base::Report/variant>
+
+=back
+
+=head1 AUTHOR
+
+deriv.com C<DERIV@cpan.org>
+
+=head1 LICENSE
+
+Copyright deriv.com 2019. Licensed under the same terms as Perl itself.
+

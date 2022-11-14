@@ -1552,6 +1552,43 @@ class TestCase::Regex {
         return 0;
       }
     }
+
+    # '\b'
+    {
+      {
+        my $re = Regex->new("\b");
+
+        my $string = "12 34 56";
+        my $match = $re->match($string);
+
+        unless ($match) {
+          return 0;
+        }
+      }
+
+      {
+        my $re = Regex->new("\b");
+        my $string = "ab cde";
+
+        my $replaced = $re->replace($string, "_");
+
+        unless ($replaced eq "_ab cde") {
+          return 0;
+        }
+      }
+
+      {
+        my $re = Regex->new("\b");
+        my $string = "  k";
+
+        my $replaced = $re->replace($string, "_");
+
+        unless ($replaced eq "  _k") {
+          return 0;
+        }
+      }
+
+    }
     
     return 1;
   }

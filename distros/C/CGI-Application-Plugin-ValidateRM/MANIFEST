@@ -2,6 +2,7 @@ Build.PL
 Changes
 MANIFEST			This list of files
 MANIFEST.SKIP
+META.json
 META.yml
 Makefile.PL
 README
@@ -13,4 +14,3 @@ t/TestApp1.pm
 t/forward.t
 t/fif_class.t
 t/fif_defaults.t
-META.json                                Module JSON meta-data (added by MakeMaker)

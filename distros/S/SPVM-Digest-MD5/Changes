@@ -1,3 +1,6 @@
+0.08 2022-11-14
+  [Prerequirement Changes]
+    * SPVM::Digest::MD5 needs SPVM 0.9661+.
 0.07 2022-08-01
   [Internal Ineffective Changes]
     * Use get_field_object_by_name_v2 in SPVM/Digest/MD5.c

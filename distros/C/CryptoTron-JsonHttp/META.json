@@ -37,12 +37,13 @@
             "JSON::PP" : "4.11",
             "LWP::UserAgent" : "6.43",
             "POSIX" : "1.88",
+            "Simple::Filter::Macro" : "0.08",
             "Try::Catch" : "v1.1.0",
             "URI" : "1.76"
          }
       }
    },
    "release_status" : "stable",
-   "version" : "0.13",
+   "version" : "0.14",
    "x_serialization_backend" : "JSON::PP version 4.11"
 }

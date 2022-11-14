@@ -1,7 +1,8 @@
 use strict;
 use warnings;
 use Test::More;
-use Test::Requires { Moose => 2 };
+use Test::Requires { 'Moose'      => 2 };
+use Test::Requires { 'Type::Tiny' => 2 };
 
 use Acme::Mitey::Cards;
 use Acme::Mitey::Cards::MOP;

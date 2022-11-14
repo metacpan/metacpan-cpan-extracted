@@ -124,10 +124,6 @@ similarly wrong. Such UUIDs should only be used in contexts where no checking
 of these fields will be performed and no attempt will be made to extract or
 validate non-random information (i.e. timestamp, MAC address or namespace).
 
-# DEPENDENCIES
-
-[Math::Random::Secure](https://metacpan.org/pod/Math::Random::Secure), [Encode::Base32::GMP](https://metacpan.org/pod/Encode::Base32::GMP).
-
 # AUTHOR
 
 Baldur Kristinsson, December 2016
@@ -137,17 +133,3 @@ Baldur Kristinsson, December 2016
 This is free software. It may be copied, distributed and modified under the
 same terms as Perl itself.
 
-# VERSION HISTORY
-
-    0.1   - Initial version.
-    0.2   - Bugfixes: (a) fix errors on Perl 5.18 and older, (b) address an issue
-            with GMPz wrt Math::BigInt objects.
-    0.3   - Bugfix: Try to prevent 'Inappropriate argument' error from pre-0.43
-            versions of Math::GMPz.
-    0.4   - Bugfix: 'Invalid argument supplied to Math::GMPz::overload_mod' for
-            older versions of Math::GMPz on Windows and FreeBSD. Podfix.
-    1.0.0 - UUID conversion support; semantic versioning.
-    1.1.0 - Speedups courtesy of Bartosz Jarzyna (brtastic on CPAN, bbrtj on
-            Github). Use Crypt::PRNG for random number generation.
-    1.1.1 - Fix module version number.
-    1.1.2 - Fix POD (version history).

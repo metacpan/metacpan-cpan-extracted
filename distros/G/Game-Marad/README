@@ -12,7 +12,7 @@ to author a new release:
 
     perl Build.PL
     RELEASE_TESTING=1 ./Build test
-    ./Build testcover
+    AUTHOR_TEST_JMATES=1 ./Build testcover
     ./Build disttest
     git tag -u ... -s v...
     ./Build dist

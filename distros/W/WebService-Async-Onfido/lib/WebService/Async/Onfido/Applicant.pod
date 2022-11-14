@@ -1,0 +1,36 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with WebService::Async::Onfido::Applicant
+at lib/WebService/Async/Onfido/Applicant.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+WebService::Async::Onfido::Applicant - represents data for Onfido
+
+=head1 DESCRIPTION
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<WebService::Async::Onfido::Base::Applicant>
+
+L<address|WebService::Async::Onfido::Base::Applicant/address>, L<country|WebService::Async::Onfido::Base::Applicant/country>, L<country_of_birth|WebService::Async::Onfido::Base::Applicant/country_of_birth>, L<created_at|WebService::Async::Onfido::Base::Applicant/created_at>, L<delete_at|WebService::Async::Onfido::Base::Applicant/delete_at>, L<dob|WebService::Async::Onfido::Base::Applicant/dob>, L<email|WebService::Async::Onfido::Base::Applicant/email>, L<first_name|WebService::Async::Onfido::Base::Applicant/first_name>, L<gender|WebService::Async::Onfido::Base::Applicant/gender>, L<href|WebService::Async::Onfido::Base::Applicant/href>, L<id|WebService::Async::Onfido::Base::Applicant/id>, L<id_numbers|WebService::Async::Onfido::Base::Applicant/id_numbers>, L<last_name|WebService::Async::Onfido::Base::Applicant/last_name>, L<middle_name|WebService::Async::Onfido::Base::Applicant/middle_name>, L<mobile|WebService::Async::Onfido::Base::Applicant/mobile>, L<mothers_maiden_name|WebService::Async::Onfido::Base::Applicant/mothers_maiden_name>, L<nationality|WebService::Async::Onfido::Base::Applicant/nationality>, L<new|WebService::Async::Onfido::Base::Applicant/new>, L<previous_last_name|WebService::Async::Onfido::Base::Applicant/previous_last_name>, L<telephone|WebService::Async::Onfido::Base::Applicant/telephone>, L<title|WebService::Async::Onfido::Base::Applicant/title>, L<town_of_birth|WebService::Async::Onfido::Base::Applicant/town_of_birth>
+
+=back
+
+=head1 AUTHOR
+
+deriv.com C<DERIV@cpan.org>
+
+=head1 LICENSE
+
+Copyright deriv.com 2019. Licensed under the same terms as Perl itself.
+

@@ -8,7 +8,6 @@ BEGIN
     use vars qw( $DEBUG $HAS_DBI $HAS_SQLITE_BIN $SQLITE_BIN );
     # 2021-11-01T08:12:10
     use Test::Time time => 1635754330;
-    use Devel::Confess;
     use File::Which ();
     use HTTP::Request ();
     use HTTP::Response ();
@@ -19,8 +18,6 @@ BEGIN
 
 BEGIN
 {
-    use_ok( 'Cookie' );
-    use_ok( 'Cookie::Jar' );
     require( "./t/env.pl" ) if( -e( "t/env.pl" ) );
     eval
     {
@@ -31,6 +28,12 @@ BEGIN
     $SQLITE_BIN = File::Which::which( 'sqlite3' );
     $HAS_SQLITE_BIN = ( defined( $SQLITE_BIN ) && length( $SQLITE_BIN ) ) ? 1 : 0;
     plan skip_all => "DBI and DBD::SQLite not installed and sqlite3 binary not found" if( !$HAS_DBI && !$HAS_SQLITE_BIN );
+};
+
+BEGIN
+{
+    use_ok( 'Cookie' );
+    use_ok( 'Cookie::Jar' );
 };
 
 use strict;

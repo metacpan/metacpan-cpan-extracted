@@ -32,3 +32,4 @@ if($mcfile->{'type'} ne 'rawsave') {
 }
 my $save = $mcfile->readSave();
 print PlayStation::MemoryCard::FormatSaveAsMCS($save);
+1;

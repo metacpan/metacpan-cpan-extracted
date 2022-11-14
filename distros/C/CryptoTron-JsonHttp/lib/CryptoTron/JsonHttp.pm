@@ -24,7 +24,7 @@ our @EXPORT = qw(
 );
 
 # Set the package version. 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 # Load the required Perl modules or packages.
 use JSON::PP;
@@ -83,10 +83,13 @@ sub payload_standard {
     if ($addr ne "") {
         if ($chk eq "True") { 
             # Check variable $visible.
-            my $isBase58Addr = ($flag eq "True" && chk_base58_addr($addr) != 1); 
-            my $isHexAddr = ($flag eq "False" && chk_hex_addr($addr) != 1);
-            $flag = ($isBase58Addr ? "False" : "True"); 
-            $flag = ($isHexAddr ? "True" : "False"); 
+            #my $isBase58Addr = ($flag eq "True" && chk_base58_addr($addr) != 1); 
+            #my $isHexAddr = ($flag eq "False" && chk_hex_addr($addr) != 1);
+            if ($flag eq "True" && chk_base58_addr($addr) != 1) {
+                $flag = "False"; 
+            } elsif ($flag eq "False" && chk_hex_addr($addr) != 1) {
+                $flag = "True"; 
+            };
         };
         # Create the payload from the address.
         $payload = "\{\"address\":\"${addr}\",\"visible\":\"${flag}\"\}";

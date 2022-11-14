@@ -1,7 +1,63 @@
 Revision history for Dist-Zilla-PluginBundle-GEEKRUTH
 
+2.0002 2022-11-12T22:10:15-05:00 America/New_York
+ [BUG FIXES]
+ - CopyFilesFromBuild is not needed here.
+ - Switched to FakeRelease
+
+ [STATISTICS]
+ - code churn: 2 files changed, 11 insertions(+), 6 deletions(-)
+
+2.0001 2022-11-12T21:31:19-05:00 America/New_York
+ [BUG FIXES]
+ - Switch to manual upload--for now.
+ - Fixed ShareDir issues.
+
+ [STATISTICS]
+ - code churn: 2 files changed, 18 insertions(+), 7 deletions(-)
+
+2.0000 2022-11-12T19:39:11-05:00 America/New_York
+ [MAJOR]
+ - Adjusted a couple of things, added minting profiles
+
+ [STATISTICS]
+ - code churn: 23 files changed, 688 insertions(+), 133 deletions(-)
+
+1.0202 2022-07-02T13:16:40-04:00 America/New_York
+ [BUG FIXES]
+ - Ensure prereqs are in runtime group
+ - Explicitly add a TidyAll plugin I use
+
+ [STATISTICS]
+ - code churn: 2 files changed, 12 insertions(+), 2 deletions(-)
+
+1.0201 2022-06-16T08:48:22-04:00 America/New_York
+ [STATISTICS]
+ - code churn: 1 file changed, 7 insertions(+), 1 deletion(-)
+
+1.0200 2022-01-23T20:58:14-05:00 America/New_York
+ [ENHANCEMENTS]
+ - Add Role PluginRemover.
+
+ [STATISTICS]
+ - code churn: 3 files changed, 20 insertions(+), 9 deletions(-)
+
+1.0100 2022-01-23T19:28:25-05:00 America/New_York
+ [ENHANCEMENTS]
+ - Renamed module to properly put it in Author namespace.
+ - Switched from MinimumPerlFast to MinimumPerl.
+ - Add INI::Baked.
+ - Add MetaData::BuiltWith.
+ - Add Prereqs::Plugins.
+
+ [REVISION]
+ - Remove Test::UnusedVars; it's in TidyAll now.
+
+ [STATISTICS]
+ - code churn: 4 files changed, 55 insertions(+), 27 deletions(-)
+
 1.0001 2022-01-09T11:14:12-05:00 America/New_York
- [BUGS]
+ [BUG FIXES]
  - Fix a typo
 
  [STATISTICS]

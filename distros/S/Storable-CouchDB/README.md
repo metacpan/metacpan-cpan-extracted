@@ -1,0 +1,147 @@
+# NAME
+
+Storable::CouchDB - Persistence for Perl data structures in Apache CouchDB
+
+# SYNOPSIS
+
+    use Storable::CouchDB;
+    my $s = Storable::CouchDB->new;
+    my $data = $s->retrieve('doc'); #undef if not exists
+    $s->store('doc1' => "data");    #overwrites or creates if not exists
+    $s->store('doc2' => {"my" => "data"});
+    $s->store('doc3' => ["my", "data"]);
+    $s->store('doc4' => undef);
+    $s->store('doc5' => $deepDataStructure);
+    $s->delete('doc');
+
+## Inheritance
+
+    package My::Storable::CouchDB;
+    use base qw{Storable::CouchDB};
+    sub db {"what-i-want"};
+    sub uri {"http://where.i.want:5984/"};
+    1;
+
+# DESCRIPTION
+
+The Storable::CouchDB package brings persistence to your Perl data structures containing SCALAR, ARRAY, HASH or anything that can be serialized into JSON.
+
+The concept for this package is to provide similar capabilities as Storable::store and Storable::retrieve which work seamlessly with CouchDB instead of a file system.
+
+## Storage Details
+
+The data is stored in the CouchDB under a key named "data", in the document named by the "doc" argument, in the database return by the "db" method, on the server returned by the "uri" method.
+
+In pseudo code:
+
+    $uri . $db . $doc -> "data" = $data
+
+Example:
+
+The perl script
+
+    perl -MStorable::CouchDB -e 'Storable::CouchDB->new->store(counter=>{key=>[1,2,3]})' 
+
+Creates or updates this document
+
+    http://127.0.0.1:5984/perl-storable-couchdb/counter
+
+Which returns this JSON structure
+
+    {
+      "_id":"counter",
+      "_rev":"39-31732f54c3ad4f2b61c217a9a8cf6171",
+      "data":{"key":[1,2,3]}
+    }
+
+# USAGE
+
+Write a Perl data structure to the database.
+
+    use Storable::CouchDB;
+    my $s = Storable::CouchDB->new;
+    $s->store('doc' => "Hello World!");
+
+Read a Perl data structure from the database.
+
+    use Storable::CouchDB;
+    my $s = Storable::CouchDB->new;
+    my $data = $s->retrieve('doc');
+    print "$data\n";
+
+prints "Hello World!"
+
+# CONSTRUCTOR
+
+## new
+
+    my $s = Storable::CouchDB->new; #use default server and database
+
+    my $s = Storable::CouchDB->new(
+                                   uri => 'http://127.0.0.1:5984/',  #default
+                                   db  => 'perl-storable-couchdb',   #default
+                                  );
+
+# METHODS
+
+## initialize
+
+## store
+
+    $s->store('doc' => "Value");
+    $s->store('doc' => {a => 1});
+    $s->store('doc' => [1, 2, 3]);
+    my $data=$s->store('doc' => {b => 2}); #returns data that was stored
+
+API Difference: The [Storable](https://metacpan.org/pod/Storable) API uses the \`store data > filename\` syntax which I think is counterintuitive for a document key=>value store like Apache CouchDB.
+
+## retrieve
+
+    my $data=$s->retrieve('doc'); #undef if not exists (but you can also store undef)
+
+## delete
+
+    $s->delete('doc');
+
+    my $data=$s->delete('doc'); #returns value from database just before delete
+
+# METHODS (Properties)
+
+## db
+
+Sets and retrieves the Apache CouchDB database name.
+
+Default: perl-storable-couchdb
+
+Limitation: Only lowercase characters (a-z), digits (0-9), and any of the characters \_, $, (, ), +, -, and / are allowed. Must begin with a letter.
+
+## uri
+
+URI of the Apache CouchDB server
+
+Default: http://127.0.0.1:5984/
+
+# LIMITATIONS
+
+All I need this package for storing ASCII values so currently this package meets my requirements.  But, I would like to add blessed object support.  I will gladly accept patches!
+
+This package relies heavily on [CouchDB::Client](https://metacpan.org/pod/CouchDB::Client) to do the right thing.  So far, I have not had any complaints other than a slightly awkward interface.
+
+# BUGS
+
+Please log on GitHub
+
+# AUTHOR
+
+    Michael R. Davis
+    CPAN ID: MRDVT
+
+# COPYRIGHT
+
+MIT License
+
+Copyright (c) 2022 Michael R. Davis
+
+# SEE ALSO
+
+[Storable](https://metacpan.org/pod/Storable), [CouchDB::Client](https://metacpan.org/pod/CouchDB::Client), Apache CouchDB http://couchdb.apache.org/

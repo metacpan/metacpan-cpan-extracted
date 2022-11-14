@@ -4,7 +4,7 @@ Dist::Zilla::PluginBundle::Author::GEEKRUTH - Be like GeekRuthie when you build 
 
 # VERSION
 
-version 1.0202
+version 2.0000
 
 # DESCRIPTION
 
@@ -36,7 +36,9 @@ her distributions. It's roughly equivalent to
     [Manifest]
     [ManifestSkip]
     [Git::GatherDir]
+    [PruneCruft]
     [CopyFilesFromBuild]
+    copy = cpanfile
     [ExecDir]
     [OurPkgVersion]
     [INI::Baked]

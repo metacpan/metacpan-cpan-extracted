@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2009-2022 -- leonerd@leonerd.org.uk
 
-package Convert::Color::X11 0.12;
+package Convert::Color::X11 0.13;
 
 use v5.14;
 use warnings;
@@ -20,6 +20,7 @@ our @RGB_TXT = (
    '/etc/X11/rgb.txt',
    '/usr/share/X11/rgb.txt',
    '/usr/X11R6/lib/X11/rgb.txt',
+   '/usr/X11R6/share/X11/rgb.txt',
 );
 
 =head1 NAME

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/DOM/List.pm
-## Version v0.2.0
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.2.1
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/28
-## Modified 2022/09/18
+## Modified 2022/11/11
 ## All rights reserved
 ## 
 ## 
@@ -20,7 +20,7 @@ BEGIN
     use vars qw( $VERSION );
     use HTML::Object::Event;
     use Want;
-    our $VERSION = 'v0.2.0';
+    our $VERSION = 'v0.2.1';
 };
 
 use strict;
@@ -85,13 +85,13 @@ sub addEventListener
             my $subref = $self->can( $this->{property} );
             if( !defined( $subref ) )
             {
-                warnings::warn( "This object class \"", ( ref( $self ) || $self ), "\" does not support method \"", $this->{property}, "\".\n" ) if( warnings::enabled( 'HTML::Object' ) );
+                warnings::warn( "This object class \"" . ( ref( $self ) || $self ) . "\" does not support method \"" . $this->{property} . "\".\n" ) if( warnings::enabled( 'HTML::Object' ) );
                 next;
             }
             my $data = $subref->( $self );
             if( !$self->_is_object( $data ) || !$data->can( 'callback' ) )
             {
-                warnings::warn( "Object from class \"", ( ref( $data ) || $data ), "\" does not have a \"callback\" method.\n" ) if( warnings::enabled( 'HTML::Object' ) );
+                warnings::warn( "Object from class \"" . ( ref( $data ) || $data ) . "\" does not have a \"callback\" method.\n" ) if( warnings::enabled( 'HTML::Object' ) );
                 next;
             }
             my $cb = $data->callback( $this->{type} );
@@ -162,7 +162,7 @@ HTML::Object::DOM::List - HTML Object DOM List Abstract Class
 
 =head1 VERSION
 
-    v0.2.0
+    v0.2.1
 
 =head1 DESCRIPTION
 

@@ -35,13 +35,13 @@ is $error, undef;
 is $message_instance->name,     'IOI', "message name";
 is $message_instance->category, 'app', "message category";
 
-is $message_instance->value('SenderCompID'), 'me',     "Access to tags from header";
-is $message_instance->value('IOITransType'), 'CANCEL', "Access to tags from message body";
-is $message_instance->value('OrderQtyData')->value('OrderQty'), '499', "Access to tags from components";
+is $message_instance->value('SenderCompID'),                    'me',     "Access to tags from header";
+is $message_instance->value('IOITransType'),                    'CANCEL', "Access to tags from message body";
+is $message_instance->value('OrderQtyData')->value('OrderQty'), '499',    "Access to tags from components";
 
 my $group = $message_instance->value('Instrument')->value('EvntGrp')->value('NoEvents');
 ok $group, "access to group of elements";
-is ref($group), 'ARRAY';
+is ref($group),     'ARRAY';
 is scalar(@$group), 3;
 is $group->[0]->value('EventType'), 'PUT', "Access to individual elements in groups";
 

@@ -13,17 +13,23 @@ use Game::Marad;
 # _move_count
 
 # NOTE PORTABILITY may fail if rand() rolls unlucky or rand() sucks
-my $TRIALS = 10000;
-my %moves;
-for my $i ( 1 .. $TRIALS ) {
-    $moves{Game::Marad::_move_count}++;
+if ( $ENV{AUTHOR_TEST_JMATES} ) {
+    my $TRIALS = 10000;
+    my %moves;
+    for my $i ( 1 .. $TRIALS ) {
+        $moves{Game::Marad::_move_count}++;
+    }
+    my $expect = $TRIALS / 4;
+    is scalar keys %moves, 4;
+    for my $v ( values %moves ) {
+        $v = abs( $v - $expect );
+        ok $v < 100;
+    }
 }
-$_ = sprintf "%.2f", $_ / $TRIALS for values %moves;
-is( \%moves, { 1 => 0.25, 2 => 0.25, 3 => 0.25, 4 => 0.25 } );
 
 ########################################################################
 #
-#_move_pushing ( $grid, $moves, $srcx, $srcy, $stepx, $stepy )
+#_move_stack ( $grid, $moves, $srcx, $srcy, $stepx, $stepy )
 
 sub showboard {
     diag "BOARD";
@@ -49,26 +55,26 @@ my $board = newboard();
 # on the wild assumption that only the squares expected to be modified
 # are (there will be a round-up board test at the end)
 $board->[0][0] = 1;
-Game::Marad::_move_pushing( $board, 1, 0, 0, 1, 0 );
+Game::Marad::_move_stack( $board, 1, 0, 0, 1, 0 );
 is [ $board->[0]->@[ 0, 1 ] ], [ 0, 0b10000001 ];
 
 # bump against North edge
-Game::Marad::_move_pushing( $board, 2, 1, 0, 0, -1 );
+Game::Marad::_move_stack( $board, 2, 1, 0, 0, -1 );
 
 # back to start and West edge bump
-Game::Marad::_move_pushing( $board, 3, 1, 0, -1, 0 );
+Game::Marad::_move_stack( $board, 3, 1, 0, -1, 0 );
 is [ $board->[0]->@[ 0, 1 ] ], [ 0b10000001, 0 ];
 
 # some things to push and a South edge bump
 $board->[2][0] = 2;
 $board->[4][0] = 3;
-Game::Marad::_move_pushing( $board, 10, 0, 0, 0, 1 );
+Game::Marad::_move_stack( $board, 10, 0, 0, 0, 1 );
 is [ map $_->[0], $board->@[ 0, 2, 4, 6, 7, 8 ] ],
   [ 0, 0, 0, 0b10000001, 0b10000010, 0b10000011 ];
 
 # clear two of the pieces and a East edge bump
 $board->[6][0] = $board->[7][0] = 0;
-Game::Marad::_move_pushing( $board, 11, 0, 8, 1, 0 );
+Game::Marad::_move_stack( $board, 11, 0, 8, 1, 0 );
 is [ $board->[8]->@[ 0, -1 ] ], [ 0, 0b10000011 ];
 
 # clear last piece and check that the board is clean

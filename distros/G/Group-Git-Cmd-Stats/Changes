@@ -1,5 +1,11 @@
 Revision history for Group-Git-Cmd-Stats
 
+0.0.4   2022-11-13
+        Updating for release of version 0.0.4
+        Updated (Ivan Wills)
+        Latest travis file (Ivan Wills)
+        Better output (Ivan Wills)
+
 0.0.3   2018-01-14
         Updating for release of version 0.0.3
         Added latest perl version (Ivan Wills)

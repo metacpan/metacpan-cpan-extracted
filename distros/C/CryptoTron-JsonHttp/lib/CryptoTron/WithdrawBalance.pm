@@ -43,15 +43,15 @@ our ($MODULE_NAME, undef, undef) = fileparse(__FILE__, '\..*');
 # ---------------------------------------------------------------------------- #
 sub WithdrawBalance {
     # Assign the subroutine arguments to the local array.
-    my ($param) = @_;
+    my (%param) = @_;
     # Create the payload.
-    my $payload = payload_standard($param);
+    my $payload = payload_standard(\%param);
     # Add the payload to the given hash.
-    $param->{'PayloadString'} = $payload;
+    $param{'PayloadString'} = $payload;
     # Add the module name to the given hash.
-    $param->{'ModuleName'} = $MODULE_NAME;
+    $param{'ModuleName'} = $MODULE_NAME;
     # Get the ouput data.
-    my $output_data = json_data($param);
+    my $output_data = json_data(\%param);
     # Return the ouput data.
     return $output_data;
 };

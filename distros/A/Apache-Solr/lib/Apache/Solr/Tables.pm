@@ -8,7 +8,7 @@
 
 package Apache::Solr::Tables;
 use vars '$VERSION';
-$VERSION = '1.07';
+$VERSION = '1.08';
 
 use base 'Exporter';
 

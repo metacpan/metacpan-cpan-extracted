@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object.pm
-## Version v0.2.1
+## Version v0.2.2
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/04/20
-## Modified 2022/09/20
+## Modified 2022/11/11
 ## All rights reserved
 ## 
 ## 
@@ -35,7 +35,7 @@ BEGIN
     use Module::Generic::File qw( file );
     use Nice::Try;
     use Scalar::Util ();
-    our $VERSION = 'v0.2.1';
+    our $VERSION = 'v0.2.2';
     our $DICT = {};
     our $LINK_ELEMENTS = {};
     our $FATAL_ERROR = 0;
@@ -301,7 +301,7 @@ sub add_end
     my $parent = $me->parent;
     if( $opts->{tag} ne $me->tag )
     {
-        warnings::warn( "Oops, something is wrong in the parsing. I was expecting a closing tag for \"", $me->tag, "\" that started at line \"", $me->line, "\" but instead found a closing tag for \"$opts->{tag}\" at line \"$opts->{line}\" and column \"$opts->{col}\": $opts->{raw}\n" ) if( warnings::enabled() );
+        warn( "Oops, something is wrong in the parsing. I was expecting a closing tag for \"", $me->tag, "\" that started at line \"", $me->line, "\" but instead found a closing tag for \"$opts->{tag}\" at line \"$opts->{line}\" and column \"$opts->{col}\": $opts->{raw}\n" ) if( $self->_warnings_is_enabled );
     }
     else
     {
@@ -862,7 +862,7 @@ To enable fatal error and also implement try-catch (using L<Nice::Try>) :
 
 =head1 VERSION
 
-    v0.2.1
+    v0.2.2
 
 =head1 DESCRIPTION
 

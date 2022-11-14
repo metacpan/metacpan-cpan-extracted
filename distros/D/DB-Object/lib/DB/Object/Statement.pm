@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Statement.pm
-## Version v0.4.0
+## Version v0.4.1
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2021/08/29
+## Modified 2022/11/01
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -23,10 +23,8 @@ BEGIN
     use parent qw( DB::Object );
     use vars qw( $VERSION $VERBOSE $DEBUG );
     use Class::Struct qw( struct );
-    use DateTime;
-    use Promise::Me;
     use Want;
-    $VERSION    = 'v0.4.0';
+    $VERSION    = 'v0.4.1';
     $VERBOSE    = 0;
     $DEBUG      = 0;
     use Devel::Confess;
@@ -38,16 +36,16 @@ use warnings;
 sub as_string
 {
     my $self = shift( @_ );
-    ## my $q = $self->_query_object_current;
-    ## used by select, insert, update, delete to flag that we need to reformat the query
+    # my $q = $self->_query_object_current;
+    # used by select, insert, update, delete to flag that we need to reformat the query
     $self->{as_string}++;
     if( my $qo = $self->query_object )
     {
         $qo->final(1);
     }
-    ## return( $self->{ 'sth' }->{ 'Statement' } );
-    ## Same:
-    ## return( $q->as_string );
+    # return( $self->{sth}->{Statement} );
+    # Same:
+    # return( $q->as_string );
     return( $self->{query} );
 }
 
@@ -105,20 +103,20 @@ sub distinct
         return( $self->error( "No query to set as to be ignored." ) );
     
     my $type = uc( ( $query =~ /^\s*(\S+)\s+/ )[0] );
-    ## ALTER for table alteration statements (DB::Object::Tables
+    # ALTER for table alteration statements (DB::Object::Tables
     my @allowed = qw( SELECT );
     my $allowed = CORE::join( '|', @allowed );
     if( !scalar( grep{ /^$type$/i } @allowed ) )
     {
         return( $self->error( "You may not flag statement of type \U$type\E to be distinct:\n$query" ) );
     }
-    ## Incompatible. Do not bother going further
+    # Incompatible. Do not bother going further
     return( $self ) if( $query =~ /^\s*(?:$allowed)\s+(?:DISTINCT|DISTINCTROW|ALL)\s+/i );
     
     $query =~ s/^(\s*)($allowed)(\s+)/$1$2 DISTINCT /;
-    ## my $sth = $self->prepare( $query ) ||
-    ## $self->{ 'query' } = $query;
-    ## saving parameters to bind later on must have been done previously
+    # my $sth = $self->prepare( $query ) ||
+    # $self->{ 'query' } = $query;
+    # saving parameters to bind later on must have been done previously
     my $sth = $self->_cache_this( $query ) ||
     return( $self->error( "Error while preparing new ignored query:\n$query" ) );
     if( !defined( wantarray() ) )
@@ -135,13 +133,14 @@ sub dump
     my $file = shift( @_ );
     if( $file )
     {
-        ## Used to be handled by SQL server
-        ## my $query = $self->as_string();
-        ## $query    =~ s/(\s+FROM\s+)/ INTO OUTFILE '$file'$1/;
-        ## my $sth   = $self->prepare( $query ) ||
-        ## return( $self->error( "Error while preparing query to dump result on select:\n$query" ) );
-        ## $sth->execute() ||
-        ## return( $self->error( "Error while executing query to dump result on select:\n$query" ) );
+        # Used to be handled by SQL server
+        # my $query = $self->as_string();
+        # $query    =~ s/(\s+FROM\s+)/ INTO OUTFILE '$file'$1/;
+        # my $sth   = $self->prepare( $query ) ||
+        # return( $self->error( "Error while preparing query to dump result on select:\n$query" ) );
+        # $sth->execute() ||
+        # return( $self->error( "Error while executing query to dump result on select:\n$query" ) );
+        $self->_load_class( 'DateTime' ) || return( $self->pass_error );
         my $fields = $self->{_fields};
         my @header = sort{ $fields->{ $a } <=> $fields->{ $b } } keys( %$fields );
         # new_file is inherited from Module::Generic
@@ -163,10 +162,10 @@ sub dump
     }
     elsif( exists( $self->{sth} ) )
     {
-        ## my $fields = $self->{ '_fields' };
+        # my $fields = $self->{ '_fields' };
         my @fields = @{ $self->{sth}->FETCH( 'NAME' ) };
         my $max    = 0;
-        ## foreach my $field ( keys( %$fields ) )
+        # foreach my $field ( keys( %$fields ) )
         foreach my $field ( @fields )
         {
             $max = length( $field ) if( length( $field ) > $max );
@@ -199,7 +198,7 @@ sub execute
     my $self = shift( @_ );
     my( $pack, $file, $line ) = caller();
     my $sub = ( caller(1) )[3];
-    ## What we want is to get the point from where we were originatly called
+    # What we want is to get the point from where we were originatly called
     if( $pack =~ /^DB::Object/ )
     {
         for( my $i = 1; $i < 5; $i++ )
@@ -209,7 +208,7 @@ sub execute
             last if( $pack !~ /^DB::Object/ );
         }
     }
-    ## my $sub = ( caller( 1 ) )[ 3 ];
+    # my $sub = ( caller( 1 ) )[ 3 ];
     $self->{pack} = $pack;
     $self->{file} = $file;
     $self->{line} = $line;
@@ -243,8 +242,8 @@ sub execute
             {
                 $vals = { @_ };
             }
-            ## This is the list of fields as they appear in the order in insert or update query
-            ## Knowing their order of appearance is key so we can bind follow-on values to them
+            # This is the list of fields as they appear in the order in insert or update query
+            # Knowing their order of appearance is key so we can bind follow-on values to them
             my $sorted = $q->sorted;
             foreach my $f ( @$sorted )
             {
@@ -252,7 +251,7 @@ sub execute
                 {
                     push( @binded, undef() );
                 }
-                ## The value may be defined or not, or may be zero length long
+                # The value may be defined or not, or may be zero length long
                 else
                 {
                     push( @binded, $vals->{ $f } );
@@ -281,28 +280,33 @@ sub execute
     }
     if( $q && scalar( @binded ) != scalar( @binded_types ) )
     {
-        warn( sprintf( "Warning: total %d bound values does not match the total %d bound types ('%s')! Check the code for query $self->{sth}->{Statement}...\n", scalar( @binded ), scalar( @binded_types ), join( "','", @binded_types ) ) );
-        ## Cancel it, because it will create problems
+        warn( sprintf( "Warning: total %d bound values does not match the total %d bound types ('%s')! Check the code for query $self->{sth}->{Statement}...\n", scalar( @binded ), scalar( @binded_types ), CORE::join( "','", @binded_types ) ) );
+        # Cancel it, because it will create problems
         @binded_types = ();
     }
     
     # If there are any array object of some sort provided, make sure they are transformed into a regular array so DBD::Ph can then transform it into a Postgres array.
-    for( @binded )
-    # for( my $i = 0; $i < scalar( @binded ); $i++ )
+    for( my $i = 0; $i < scalar( @binded ); $i++ )
     {
-        # local $_ = $binded[$i];
-        if( $self->_is_array( $_ ) && ref( $_ ) ne 'ARRAY' )
+        next if( !defined( $binded[$i] ) );
+        if( $self->_is_array( $binded[$i] ) && 
+            ref( $binded[$i] ) ne 'ARRAY' )
         {
-            $_ = [ @$_ ];
+            $binded[$i] = [@{$binded[$i]}];
         }
-        elsif( $self->_is_object( $_ ) && overload::Overloaded( $_ ) && overload::Method( $_, '""' ) )
+        elsif( $self->_is_object( $binded[$i] ) && 
+               overload::Overloaded( $binded[$i] ) && 
+               overload::Method( $binded[$i], '""' ) )
         {
-            $_ = "$_";
+            no warnings 'uninitialized';
+            my $v = "$binded[$i]";
+            $binded[$i] = defined( $v ) ? $v : undef;
         }
         # Will work well with Module::Generic::Hash
-        elsif( $self->_is_hash( $_ ) && $self->_can( $_, 'as_json' ) )
+        elsif( $self->_is_hash( $binded[$i] ) && 
+               $self->_can( $binded[$i], 'as_json' ) )
         {
-            $_ = $_->as_json;
+            $binded[$i] = $binded[$i]->as_json;
         }
     }
     
@@ -313,8 +317,8 @@ sub execute
         #local( $SIG{__DIE__} )  = sub{ };
         #local( $SIG{__WARN__} ) = sub{ };
         local( $SIG{ALRM} )     = sub{ die( "Timeout while processing query $self->{sth}->{Statement}\n" ) };
-        ## print( STDERR ref( $self ) . "::execute(): binding parameters '", join( ', ', @$binded ), "' to query:\n$self->{ 'query' }\n" );
-        ## $self->{ 'sth' }->execute( @binded );
+        # print( STDERR ref( $self ) . "::execute(): binding parameters '", join( ', ', @$binded ), "' to query:\n$self->{ 'query' }\n" );
+        # $self->{ 'sth' }->execute( @binded );
         for( my $i = 0; $i < scalar( @binded ); $i++ )
         {
             # Stringify the binded value if it is a stringifyable object.
@@ -339,6 +343,7 @@ sub execute
         $self->{sth}->execute();
     };
     my $error = $@;
+    $error ||= $self->{sth}->errstr if( !$rv );
     if( $q )
     {
         if( $q->join_tables->length > 0 )
@@ -352,7 +357,7 @@ sub execute
         $q->table_object->reset;
     }
     my $tie = $self->{tie} || {};
-    ## Maybe it is time to bind SQL result to possible provided perl variables?
+    # Maybe it is time to bind SQL result to possible provided perl variables?
     if( !$error && %$tie )
     {
         my $order = $self->{tie_order};
@@ -370,7 +375,7 @@ sub execute
     if( $error )
     {
         $error =~ s/ at (\S+\s)?line \d+.*$//s;
-        ## $err .= ":\n\"$self->{ 'query' }\"";
+        # $err .= ":\n\"$self->{ 'query' }\"";
         $error .= ":\n\"$self->{sth}->{Statement}\"";
         $error = "Error while trying to execute query $self->{sth}->{Statement}: $error";
         if( $self->fatal() )
@@ -379,7 +384,7 @@ sub execute
         }
         else
         {
-            ## return( $self->error( "$err in $self->{ 'file' } at line $self->{ 'line' } within sub $self->{ 'sub' }" ) );
+            # return( $self->error( "$err in $self->{ 'file' } at line $self->{ 'line' } within sub $self->{ 'sub' }" ) );
             return( $self->error( $error ) );
         }
     }
@@ -407,7 +412,7 @@ sub execute
 sub executed
 {
     my $self = shift( @_ );
-    ## For hand made query to avoid clash when executing generic routine such as fetchall_arrayref...
+    # For hand made query to avoid clash when executing generic routine such as fetchall_arrayref...
     return( 1 ) if( !exists( $self->{query} ) );
     return( exists( $self->{executed} ) && $self->{executed} );
 }
@@ -422,7 +427,7 @@ sub fetchall_arrayref($@)
     {
         $self->execute() || return;
     }
-    ## $self->_cleanup();
+    # $self->_cleanup();
     my $mode  = ref( $slice );
     my @rows;
     my $row;
@@ -471,16 +476,16 @@ sub fetchall_arrayref($@)
 sub fetchcol($;$)
 {
     my $self = shift( @_ );
-    ## @arr = $sth->fetchcol( $col_number );
+    # @arr = $sth->fetchcol( $col_number );
     my $col_num = shift( @_ );
     if( !$self->executed() )
     {
         $self->execute() || return( $self->pass_error );
     }
-    ## $self->_cleanup();
-    ## return( $h->fetchcol( $COL_NUM ) );
+    # $self->_cleanup();
+    # return( $h->fetchcol( $COL_NUM ) );
     my @col;
-    ## $self->dataseek( 0 );
+    # $self->dataseek( 0 );
     my $ref;
     while( $ref = $self->{sth}->fetchrow_arrayref() )
     {
@@ -496,9 +501,9 @@ sub fetchhash(@)
     {
         $self->execute() || return( $self->pass_error );
     }
-    ## $self->_cleanup();
-    ## %hash = $sth->fetchhash;
-    ## return( $h->fetchhash );
+    # $self->_cleanup();
+    # %hash = $sth->fetchhash;
+    # return( $h->fetchhash );
     my $ref = $self->{sth}->fetchrow_hashref();
     if( $ref ) 
     {
@@ -517,13 +522,13 @@ sub fetchrow(@)
     {
         $self->execute() || return( $self->pass_error );
     }
-    ## $self->_cleanup();
-    ## @arr = $sth->fetchrow;        # Array context
-    ## $firstcol = $sth->fetchrow;   # Scalar context
-    ## return( $h->fetchrow );
-    ## my $ref = $self->fetchrow_arrayref();
+    # $self->_cleanup();
+    # @arr = $sth->fetchrow;        # Array context
+    # $firstcol = $sth->fetchrow;   # Scalar context
+    # return( $h->fetchrow );
+    # my $ref = $self->fetchrow_arrayref();
     my $ref = $self->{sth}->fetchrow_arrayref();
-    ## my $ref = $self->{sth}->fetch();
+    # my $ref = $self->{sth}->fetch();
     if( $ref ) 
     {
         return( wantarray ? @$ref : $ref->[0] );
@@ -548,7 +553,7 @@ sub fetchrow_hashref
     }
     return( $sth->fetchrow_hashref ) if( !$dbo->auto_decode_json && !$dbo->auto_convert_datetime_to_object );
     my $ref = $sth->fetchrow_hashref;
-    ## Convert json to hash for the relevant fields
+    # Convert json to hash for the relevant fields
     # return( $self->_convert_json2hash( $ref ) );
     $ref = $self->_convert_json2hash({ statement => $sth, data => $ref }) if( $dbo->auto_decode_json );
     $ref = $self->_convert_datetime2object({ statement => $sth, data => $ref }) if( $dbo->auto_convert_datetime_to_object );
@@ -558,7 +563,7 @@ sub fetchrow_hashref
 sub fetchrow_object
 {
     my $self = shift( @_ );
-    ## This should give us something like Postgres or Mysql or SQLite
+    # This should give us something like Postgres or Mysql or SQLite
     my $basePack = ( ref( $self ) =~ /^DB::Object::([^\:]+)/ )[0];
     if( !$self->executed() )
     {
@@ -606,21 +611,21 @@ sub ignore
     return( $self->error( "No query to set as to be ignored." ) );
     
     my $type = uc( ( $query =~ /^\s*(\S+)\s+/ )[0] );
-    ## ALTER for table alteration statements (DB::Object::Tables
+    # ALTER for table alteration statements (DB::Object::Tables
     my @allowed = qw( INSERT UPDATE ALTER );
     my $allowed = CORE::join( '|', @allowed );
     if( !scalar( grep{ /^$type$/i } @allowed ) )
     {
         return( $self->error( "You may not flag statement of type \U$type\E to be ignored:\n$query" ) );
     }
-    ## Incompatible. Do not bother going further
+    # Incompatible. Do not bother going further
     return( $self ) if( $query =~ /^\s*(?:$allowed)\s+(?:DELAYED|LOW_PRIORITY|HIGH_PRIORITY)\s+/i );
     return( $self ) if( $type eq 'ALTER' && $query !~ /^\s*$type\s+TABLE\s+/i );
     
     $query =~ s/^(\s*)($allowed)(\s+)/$1$2 IGNORE /;
-    ## my $sth = $self->prepare( $query ) ||
-    ## $self->{ 'query' } = $query;
-    ## saving parameters to bind later on must have been done previously
+    # my $sth = $self->prepare( $query ) ||
+    # $self->{ 'query' } = $query;
+    # saving parameters to bind later on must have been done previously
     my $sth = $self->_cache_this( $query ) ||
     return( $self->error( "Error while preparing new ignored query:\n$query" ) );
     if( !defined( wantarray() ) )
@@ -649,7 +654,7 @@ sub join
         return( $self->error( "You may not perform a join on a query other than select." ) );
     }
     my $constant = $q->constant;
-    ## Constant is set and query object marked as final, which means this statement has already been processed as a join and so we skip all further processing.
+    # Constant is set and query object marked as final, which means this statement has already been processed as a join and so we skip all further processing.
     if( scalar( keys( %$constant ) ) && $q->final )
     {
         return( $self );
@@ -960,21 +965,21 @@ sub priority
     my $type = uc( ( $query =~ /^\s*(\S+)\s+/ )[ 0 ] );
     my @allowed = qw( DELETE INSERT REPLACE SELECT UPDATE );
     my $allowed = CORE::join( '|', @allowed );
-    ## Ignore if not allowed
+    # Ignore if not allowed
     if( !scalar( grep{ /^$type$/i } @allowed ) )
     {
         $self->error( "You may not set priority on statement of type \U$type\E:\n$query" );
         return( $self );
     }
-    ## Incompatible. Do not bother going further
+    # Incompatible. Do not bother going further
     return( $self ) if( $query =~ /^\s*(?:$allowed)\s+(?:DELAYED|LOW_PRIORITY|HIGH_PRIORITY)\s+/i );
-    ## SELECT with something else than HIGH_PRIORITY is incompatible, so do not bother to go further
+    # SELECT with something else than HIGH_PRIORITY is incompatible, so do not bother to go further
     return( $self ) if( $prio != 1 && $type =~ /^(?:SELECT)$/i );
     return( $self ) if( $prio != 0 && $type =~ /^(?:DELETE|INSERT|REPLACE|UPDATE)$/i );
     
     $query =~ s/^(\s*)($allowed)(\s+)/$1$2 $map->{ $prio } /i;
-    ## $self->{ 'query' } = $query;
-    ## my $sth = $self->prepare( $query ) ||
+    # $self->{ 'query' } = $query;
+    # my $sth = $self->prepare( $query ) ||
     my $sth = $self->_cache_this( $query ) ||
     return( $self->error( "Error while preparing new low priority query:\n$query" ) );
     if( !defined( wantarray() ) )
@@ -988,6 +993,7 @@ sub priority
 sub promise
 {
     my $self = shift( @_ );
+    $self->_load_class( 'Promise::Me' ) || return( $self->pass_error );
     return( Promise::Me->new(sub
     {
         return( $self->execute( @_ ) );
@@ -1019,8 +1025,8 @@ sub rows(@)
     {
         $self->execute() || return( $self->pass_error );
     }
-    ## $self->_cleanup();
-    ## $rv = $sth->rows;
+    # $self->_cleanup();
+    # $rv = $sth->rows;
     if( !ref( $self ) )
     {
         return( $DBI::rows );
@@ -1031,7 +1037,7 @@ sub rows(@)
     }
 }
 
-## A DBI::sth object. This should rather be a _set_get_object helper method, but I am not 100% sure if this is really a DBI::sth
+# A DBI::sth object. This should rather be a _set_get_object helper method, but I am not 100% sure if this is really a DBI::sth
 sub sth { return( shift->_set_get_scalar( 'sth', @_ ) ); }
 
 sub table { return( shift->{table} ); }
@@ -1056,7 +1062,6 @@ DESTROY
 };
 
 1;
-
 # NOTE: POD
 __END__
 
@@ -1070,7 +1075,7 @@ DB::Object::Statement - Statement Object
 
 =head1 VERSION
 
-v0.4.0
+v0.4.1
 
 =head1 DESCRIPTION
 

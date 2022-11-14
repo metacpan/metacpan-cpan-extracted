@@ -5,13 +5,13 @@ package mb::Encode;
 #
 # https://metacpan.org/dist/mb-Encode
 #
-# Copyright (c) 2021 INABA Hitoshi <ina@cpan.org> in a CPAN
+# Copyright (c) 2021, 2022 INABA Hitoshi <ina@cpan.org> in a CPAN
 ######################################################################
 
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.03';
+$VERSION = '0.04';
 $VERSION = $VERSION;
 
 require Exporter;
@@ -100,7 +100,6 @@ sub by_eucjp     ($) { Encode::from_to(my $oct=$_[0], 'euc-jp',     'utf8',); $o
 sub by_gbk       ($) { Encode::from_to(my $oct=$_[0], 'gbk',        'utf8',); $oct }
 sub by_sjis      ($) { Encode::from_to(my $oct=$_[0], 'sjis',       'utf8',); $oct }
 sub by_uhc       ($) { Encode::from_to(my $oct=$_[0], 'uhc',        'utf8',); $oct }
-sub by_cp932     ($) { Encode::from_to(my $oct=$_[0], 'cp932',      'utf8',); $oct }
 sub by_cp932     ($) {
     my $oct = $_[0];
     if ($] >= 5.008_001) {

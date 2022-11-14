@@ -1,3 +1,11 @@
+0.003   2022-08-25  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Rebuild with updated Pod::Weaver::Plugin::Data::Sah::Filter to
+          render examples' summaries.
+
+
 0.002   2022-07-17  Released-By: PERLANCAR; Urgency: low
 
         - Move test to examples since we are now using Test::Sah::Filter.

@@ -1,0 +1,36 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with WebService::Async::Onfido::Document
+at lib/WebService/Async/Onfido/Document.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+WebService::Async::Onfido::Document - represents data for Onfido
+
+=head1 DESCRIPTION
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<WebService::Async::Onfido::Base::Document>
+
+L<created_at|WebService::Async::Onfido::Base::Document/created_at>, L<download_href|WebService::Async::Onfido::Base::Document/download_href>, L<file_name|WebService::Async::Onfido::Base::Document/file_name>, L<file_size|WebService::Async::Onfido::Base::Document/file_size>, L<file_type|WebService::Async::Onfido::Base::Document/file_type>, L<href|WebService::Async::Onfido::Base::Document/href>, L<id|WebService::Async::Onfido::Base::Document/id>, L<issuing_country|WebService::Async::Onfido::Base::Document/issuing_country>, L<new|WebService::Async::Onfido::Base::Document/new>, L<side|WebService::Async::Onfido::Base::Document/side>, L<type|WebService::Async::Onfido::Base::Document/type>
+
+=back
+
+=head1 AUTHOR
+
+deriv.com C<DERIV@cpan.org>
+
+=head1 LICENSE
+
+Copyright deriv.com 2019. Licensed under the same terms as Perl itself.
+

@@ -1,4 +1,10 @@
 Revision history for App-MHFS, note the CHANGELOG.md of the repository is much more comprehensive
+v0.5.0  2022-11-14
+        use compile time eval for proper `use` error handling in Makefile.PL. Move MHFS::EventLoop::Poll::Linux
+        archname requirement to MHFS::EventLoop::Poll::Linux::Timer. Reduce redundancy of turning on
+        nonblocking socket operation. Change settings loading to support Windows environments
+        (no Windows support yet)
+
 v0.4.1  2022-07-15
         Attempt to fix cpantesters issues, require perl 5.14.0 or greater, test Time::HiRes::clock_gettime in
         Makefile.PL for OS check, make integer size, a MHFS::Plugin::GetVideo plugin loading error instead of a

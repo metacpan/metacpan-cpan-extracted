@@ -46,7 +46,7 @@
    "provides" : {
       "Data::Sah::Filter::perl::Str::try_decode_json" : {
          "file" : "lib/Data/Sah/Filter/perl/Str/try_decode_json.pm",
-         "version" : "0.002"
+         "version" : "0.003"
       }
    },
    "release_status" : "stable",
@@ -61,7 +61,7 @@
          "web" : "https://github.com/perlancar/perl-Data-Sah-Filter-perl-Str-try_decode_json"
       }
    },
-   "version" : "0.002",
+   "version" : "0.003",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
@@ -418,7 +418,7 @@
                      {
                         "class" : "Pod::Weaver::Section::PERLANCAR::Contributing",
                         "name" : "@Author::PERLANCAR/PERLANCAR/Contributing",
-                        "version" : "0.292"
+                        "version" : "0.293"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Legal",
@@ -428,7 +428,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::Rinci",
                         "name" : "@Author::PERLANCAR/Rinci",
-                        "version" : "0.783"
+                        "version" : "0.784"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::AppendPrepend",
@@ -453,7 +453,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::Data::Sah::Filter",
                         "name" : "-Data::Sah::Filter",
-                        "version" : "0.006"
+                        "version" : "0.007"
                      }
                   ]
                }

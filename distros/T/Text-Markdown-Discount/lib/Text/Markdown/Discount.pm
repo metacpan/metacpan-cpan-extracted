@@ -25,7 +25,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 require XSLoader;
 XSLoader::load('Text::Markdown::Discount', $VERSION);
@@ -78,6 +78,7 @@ It passes Gruber's Markdown testsuite.
 
 Given that the performance of Discount, Text::Markdown::Discount processes
 markdown formatted text quickly and passes the Markdown test suite at
+L<http://daringfireball.net/projects/downloads/MarkdownTest_1.0.zip>
 
 The interface of the C<markdown()> function in this module
 is not compatible with the C<markdown()> function in L<Text::Markdown>.

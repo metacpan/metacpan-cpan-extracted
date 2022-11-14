@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-02'; # DATE
+our $DATE = '2022-11-10'; # DATE
 our $DIST = 'App-BPOMUtils'; # DIST
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/BPOMUtils/bpom_list_food_additives",
@@ -40,15 +40,19 @@ bpom-daftar-bahan-tambahan-pangan - List additives in BPOM processed food divisi
 
 =head1 VERSION
 
-This document describes version 0.013 of bpom-daftar-bahan-tambahan-pangan (from Perl distribution App-BPOMUtils), released on 2022-11-02.
+This document describes version 0.014 of bpom-daftar-bahan-tambahan-pangan (from Perl distribution App-BPOMUtils), released on 2022-11-10.
 
 =head1 SYNOPSIS
 
-B<bpom-daftar-bahan-tambahan-pangan> L<--help|/"--help, -h, -v"> (or L<-h|/"--help, -h, -v">, L<-?|/"--help, -h, -v">)
+B<bpom-daftar-bahan-tambahan-pangan> L<--help|/"--help, -h, -?"> (or L<-h|/"--help, -h, -?">, L<-?|/"--help, -h, -?">)
 
 B<bpom-daftar-bahan-tambahan-pangan> L<--version|/"--version, -v"> (or L<-v|/"--version, -v">)
 
 B<bpom-daftar-bahan-tambahan-pangan> [L<--debug|/"--debug">|L<--log-level|/"--log-level=s">=I<level>|L<--quiet|/"--quiet">|L<--trace|/"--trace">|L<--verbose|/"--verbose">] [L<--detail|/"--detail, -l">|L<-l|/"--detail, -l">|L<--no-detail|/"--detail, -l">|L<--nodetail|/"--detail, -l">] [(L<--exclude-field|/"--exclude-fields-json=s">=I<str>)+|L<--exclude-fields-json|/"--exclude-fields-json=s">=I<json>] [(L<--field|/"--fields-json=s">=I<str>)+|L<--fields-json|/"--fields-json=s">=I<json>] [L<--format|/"--format=s">=I<name>|L<--json|/"--json">] [L<--id-contains|/"--id-contains=s">=I<str>] [(L<--id-in|/"--id-in=s@">=I<str>)+|L<--id-in-json|/"--id-in=s@">=I<json>] [L<--id-is|/"--id-is=s">=I<str>] [L<--id-isnt|/"--id-isnt=s">=I<str>] [L<--id-matches|/"--id-matches=s">=I<str>] [L<--id-max|/"--id-max=s">=I<str>] [L<--id-min|/"--id-min=s">=I<str>] [L<--id-not-contains|/"--id-not-contains=s">=I<str>] [(L<--id-not-in|/"--id-not-in=s@">=I<str>)+|L<--id-not-in-json|/"--id-not-in=s@">=I<json>] [L<--id-not-matches|/"--id-not-matches=s">=I<str>] [L<--id-xmax|/"--id-xmax=s">=I<str>] [L<--id-xmin|/"--id-xmin=s">=I<str>] [L<--id|/"--id=s">=I<str>] [L<--(no)naked-res|/"--naked-res">] [L<--name-contains|/"--name-contains=s">=I<str>] [(L<--name-in|/"--name-in=s@">=I<str>)+|L<--name-in-json|/"--name-in=s@">=I<json>] [L<--name-is|/"--name-is=s">=I<str>] [L<--name-isnt|/"--name-isnt=s">=I<str>] [L<--name-matches|/"--name-matches=s">=I<str>] [L<--name-max|/"--name-max=s">=I<str>] [L<--name-min|/"--name-min=s">=I<str>] [L<--name-not-contains|/"--name-not-contains=s">=I<str>] [(L<--name-not-in|/"--name-not-in=s@">=I<str>)+|L<--name-not-in-json|/"--name-not-in=s@">=I<json>] [L<--name-not-matches|/"--name-not-matches=s">=I<str>] [L<--name-xmax|/"--name-xmax=s">=I<str>] [L<--name-xmin|/"--name-xmin=s">=I<str>] [L<--name|/"--name=s">=I<str>] [L<--page-result|/"--page-result">[=I<program>]|L<--view-result|/"--view-result">[=I<program>]] [L<--query-boolean|/"--query-boolean=s">=I<str>|L<--and|/"--query-boolean=s">|L<--or|/"--query-boolean=s">] [(L<--query|/"--query=s@">=I<str>)+|L<--queries-json|/"--query=s@">=I<json>|(L<-q|/"--query=s@">=I<str>)+] [L<--random|/"--random">|L<--no-random|/"--random">|L<--norandom|/"--random">] [L<--result-limit|/"--result-limit=s">=I<int>] [L<--result-start|/"--result-start=s">=I<int>] [(L<--sort|/"--sort=s@">=I<str>)+|L<--sort-json|/"--sort=s@">=I<json>] [L<--with-field-names|/"--with-field-names">|L<--without-field-names|/"--with-field-names">] -- [L<query|/"--query=s@">] ...
+
+
+
+See examples in the L</EXAMPLES> section.
 
 =head1 OPTIONS
 
@@ -495,6 +499,62 @@ It is also recommended to install L<shcompgen> (see above).
 =head2 other shells
 
 For fish and zsh, install L<shcompgen> as described above.
+
+=head1 EXAMPLES
+
+=head2 Check for additives that contain "dextrin" but do not contain "gamma"
+
+ % bpom-daftar-bahan-tambahan-pangan -l --format text-pretty -- dextrin -gamma
+ +----+-----------------------------------------+
+ | id | name                                    |
+ +----+-----------------------------------------+
+ |  7 | Alfa-Siklodekstrin (alpha-Cyclodextrin) |
+ |  8 | Alfa-Siklodekstrin (alpha-Cyclodextrin) |
+ | 65 | Dekstrin (Dextrins)                     |
+ | 66 | Dekstrin (Dextrins)                     |
+ | 67 | Dekstrin (Dextrins)                     |
+ +----+-----------------------------------------+
+
+=head2 Check for additives that contain "magnesium" or "titanium"
+
+ % bpom-daftar-bahan-tambahan-pangan -l --format text-pretty --or -- magnesium titanium
+ +-----+----------------------------------------------------+
+ |  id | name                                               |
+ +-----+----------------------------------------------------+
+ | 332 | Magnesium hidroksida (Magnesium hydroxide)         |
+ | 333 | Magnesium hidroksida (Magnesium hydroxide)         |
+ | 334 | Magnesium hidroksida (Magnesium hydroxide)         |
+ | 335 | Magnesium karbonat (Magnesium carbonate)           |
+ | 336 | Magnesium karbonat (Magnesium carbonate)           |
+ | 337 | Magnesium karbonat (Magnesium carbonate)           |
+ | 338 | Magnesium oksida (Magnesium oxide)                 |
+ | 339 | Magnesium silikat (Magnesium silicate)             |
+ | 529 | Titanium dioksida CI. No. 77891 (Titanium dioxide) |
+ +-----+----------------------------------------------------+
+
+=head2 Check for additives that match some regular expressions
+
+ % bpom-daftar-bahan-tambahan-pangan -l --format text-pretty -- /potassium/ '/citrate|phosphate/'
+ +-----+---------------------------------------------------+
+ |  id | name                                              |
+ +-----+---------------------------------------------------+
+ |  70 | Dikalium fosfat (Dipotassium orthophosphate)      |
+ |  71 | Dikalium fosfat (Dipotassium orthophosphate)      |
+ |  72 | Dikalium fosfat (Dipotassium orthophosphate)      |
+ | 357 | Monokalium fosfat (Monopotassium orthophosphate)  |
+ | 358 | Monokalium fosfat (Monopotassium orthophosphate)  |
+ | 359 | Monokalium fosfat (Monopotassium orthophosphate)  |
+ | 523 | Tetrakalium difosfat (Tetrapotassium diphosphate) |
+ | 524 | Tetrakalium difosfat (Tetrapotassium diphosphate) |
+ | 525 | Tetrakalium difosfat (Tetrapotassium diphosphate) |
+ | 534 | Trikalium fosfat (Tripotassium orthophosphate)    |
+ | 535 | Trikalium fosfat (Tripotassium orthophosphate)    |
+ | 536 | Trikalium fosfat (Tripotassium orthophosphate)    |
+ | 537 | Trikalium sitrat (Tripotassium citrate)           |
+ | 538 | Trikalium sitrat (Tripotassium citrate)           |
+ | 539 | Trikalium sitrat (Tripotassium citrate)           |
+ | 540 | Trikalium sitrat (Tripotassium citrate)           |
+ +-----+---------------------------------------------------+
 
 =head1 HOMEPAGE
 

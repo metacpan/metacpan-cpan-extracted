@@ -19,3 +19,5 @@ Makefile$
 ^.releaserc
 ^Archive-SevenZip-.*/
 ^Archive-SevenZip-.*.tar.gz$
+^\.prove
+^[^/]+.zip

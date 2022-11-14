@@ -1,3 +1,11 @@
+0.005 2022-11-11
+
+    * Copyright: handle statements that contain only year information
+    * Copyright::Statement:
+      * add add_years method
+      * merge method now returns $self
+      * handle statements that contain only year information
+
 0.004 2022-08-11
 
     * dist.ini: removed unused plugin

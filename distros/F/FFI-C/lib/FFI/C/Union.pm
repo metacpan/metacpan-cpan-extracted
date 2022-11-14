@@ -5,7 +5,7 @@ use warnings;
 use base qw( FFI::C::Struct );
 
 # ABSTRACT: Union data instance for FFI
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.14'; # VERSION
 
 
 1;
@@ -22,7 +22,7 @@ FFI::C::Union - Union data instance for FFI
 
 =head1 VERSION
 
-version 0.12
+version 0.14
 
 =head1 SYNOPSIS
 

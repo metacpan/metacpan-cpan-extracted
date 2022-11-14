@@ -12,6 +12,7 @@ SYNOPSIS
   use UTF8::R2 qw( RFC3629.ja_JP ); # optimized RFC3629 for ja_JP
   use UTF8::R2 qw( WTF8.ja_JP );    # optimized WTF-8 for ja_JP
   use UTF8::R2 qw( %mb );           # multibyte regex by %mb
+  use UTF8::R2 qw( *mb );           # multibyte regex by %mb, and mb::* subroutines
 
 DESCRIPTION
 

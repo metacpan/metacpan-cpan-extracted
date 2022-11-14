@@ -10,6 +10,10 @@ package MHFS::EventLoop::Poll::Linux::Timer {
     use POSIX qw/floor/;
     use Devel::Peek;
     use feature 'say';
+    use Config;
+    if(index($Config{archname}, 'x86_64-linux') == -1) {
+        die("Unsupported arch: " . $Config{archname});
+    }
     use constant {
         _clock_REALTIME  => 0,
         _clock_MONOTONIC => 1,
@@ -342,25 +346,26 @@ package MHFS::EventLoop::Poll::Linux {
 package MHFS::EventLoop::Poll {
     use strict; use warnings;
     use feature 'say';
+
+    my $selbackend;
     BEGIN {
-    use Config;
-    my $isLoaded;
-    if(index($Config{archname}, 'x86_64-linux') != -1) {
-        if(! main::HAS_EventLoop_Poll_Linux_Timer) {
-            warn "MHFS::EventLoop::Poll: Failed to load MHFS::EventLoop::Poll::Linux::Timer NOT enabling timerfd support!";
+    my @backends;
+    if(main::HAS_EventLoop_Poll_Linux_Timer) {
+        push @backends, "-norequire, 'MHFS::EventLoop::Poll::Linux'";
+    }
+    push @backends, "-norequire, 'MHFS::EventLoop::Poll::Base'";
+
+    foreach my $backend (@backends) {
+        if(eval "use parent $backend; 1;") {
+            $selbackend = $backend;
+            last;
         }
-        else {
-            warn "MHFS::EventLoop::Poll: enabling timerfd support";
-            $isLoaded = 1;
-            eval "use parent -norequire, 'MHFS::EventLoop::Poll::Linux'";
-        }
     }
-    else {
-        warn "MHFS::EventLoop::Poll no timerfd support for ".$Config{archname};
+    $selbackend or die("Failed to load MHFS::EventLoop::Poll backend");
     }
-    if(! $isLoaded) {
-        eval "use parent -norequire, 'MHFS::EventLoop::Poll::Base'";
-    }
+
+    sub backend {
+        return $selbackend;
     }
 1;
 }
@@ -1953,10 +1958,11 @@ package MHFS::HTTP::Server::Client {
         my ($self) = @_;
         my $tempdata;
         if(!defined($self->{'sock'}->recv($tempdata, RECV_SIZE))) {
-            if(! $!{EAGAIN}) {
+            if(! ($!{EAGAIN} || $!{EWOULDBLOCK})) {
                 print ("CT_READ RECV errno: $!\n");
                 return CT_DONE;
             }
+            say "CT_YIELD: $!";
             return CT_YIELD;
         }
         if(length($tempdata) == 0) {
@@ -2200,7 +2206,7 @@ package MHFS::HTTP::Server::Client {
 
     sub TrySendItem {
         my ($csock, $dataref) = @_;
-        my $sret = send($csock, $$dataref, MSG_DONTWAIT);
+        my $sret = send($csock, $$dataref, 0);
         if(! defined($sret)) {
             if($!{EAGAIN}) {
                 #say "SEND EAGAIN\n";
@@ -2684,6 +2690,9 @@ package MHFS::Settings {
     use Storable qw(freeze);
     use Cwd qw(abs_path);
     use File::ShareDir qw(dist_dir);
+    use File::Path qw(make_path);
+    use File::Spec::Functions qw(rel2abs);
+
     MHFS::Util->import();
 
     sub write_settings_file {
@@ -2767,7 +2776,8 @@ package MHFS::Settings {
         chop $settingscontents;
         chop $settingscontents;
         $settingscontents .= ";\n\n\$SETTINGS;\n";
-        system('mkdir', '-p', dirname($filepath)) == 0 or die("failed to make settings folder");
+        say "making settings folder $filepath";
+        make_path(dirname($filepath));
         write_file($filepath,  $settingscontents);
     }
 
@@ -2784,18 +2794,36 @@ package MHFS::Settings {
         my ($launchsettings) = @_;
         my $scriptpath = abs_path(__FILE__);
 
-        # determine the settings dir
-        my $CFGDIR;
-        if($launchsettings->{CFGDIR}) {
-            -d $launchsettings->{CFGDIR} or die("Bad CFGDIR provided");
+        # settings are loaded with the following precedence
+        # $launchsettings (@ARGV) > settings.pl > General environment vars
+        # Directory preference goes from declared to defaults and specific to general:
+        # For example $CFGDIR > $XDG_CONFIG_HOME > $XDG_CONFIG_DIRS > $FALLBACK_DATA_ROOT
+
+        # load in the launchsettings
+        my ($CFGDIR, $APPDIR, $FALLBACK_DATA_ROOT);
+        if(exists $launchsettings->{CFGDIR}) {
+            make_path($launchsettings->{CFGDIR});
             $CFGDIR = $launchsettings->{CFGDIR};
-            delete $launchsettings->{CFGDIR};
         }
-        else {
+        if(exists $launchsettings->{APPDIR}) {
+            -d $launchsettings->{APPDIR} or die("Bad APPDIR provided");
+            $APPDIR = $launchsettings->{APPDIR};
+        }
+        if(exists $launchsettings->{FALLBACK_DATA_ROOT}) {
+            make_path($launchsettings->{FALLBACK_DATA_ROOT});
+            $FALLBACK_DATA_ROOT = $launchsettings->{FALLBACK_DATA_ROOT};
+        }
+
+        # determine the settings dir
+        if(! $CFGDIR){
+            my $cfg_fallback = $FALLBACK_DATA_ROOT // $ENV{'HOME'};
+            $cfg_fallback //= ($ENV{APPDATA}.'/mhfs') if($ENV{APPDATA}); # Windows
             # set the settings dir to the first that exists of $XDG_CONFIG_HOME and $XDG_CONFIG_DIRS
             # https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
-            my $XDG_CONFIG_HOME = $ENV{'XDG_CONFIG_HOME'} || ($ENV{'HOME'} . '/.config');
-            my @configdirs = ($XDG_CONFIG_HOME);
+            my $XDG_CONFIG_HOME = $ENV{'XDG_CONFIG_HOME'};
+            $XDG_CONFIG_HOME //= ($cfg_fallback . '/.config') if($cfg_fallback);
+            my @configdirs;
+            push @configdirs, $XDG_CONFIG_HOME if($XDG_CONFIG_HOME);
             my $XDG_CONFIG_DIRS = $ENV{'XDG_CONFIG_DIRS'} || '/etc/xdg';
             push @configdirs, split(':', $XDG_CONFIG_DIRS);
             foreach my $cfgdir (@configdirs) {
@@ -2804,22 +2832,19 @@ package MHFS::Settings {
                     last;
                 }
             }
-            $CFGDIR ||= ($XDG_CONFIG_HOME.'/mhfs');
+            $CFGDIR //= ($XDG_CONFIG_HOME.'/mhfs') if($XDG_CONFIG_HOME);
+            defined($CFGDIR) or die("Failed to find valid candidate for \$CFGDIR");
         }
+        $CFGDIR = rel2abs($CFGDIR);
 
         # load from the settings file
-        my $SETTINGS_FILE = $CFGDIR . '/settings.pl';
+        my $SETTINGS_FILE = rel2abs($CFGDIR . '/settings.pl');
         my $SETTINGS = do ($SETTINGS_FILE);
         if(! $SETTINGS) {
             die "Error parsing settingsfile: $@" if($@);
             die "Cannot read settingsfile: $!" if(-e $SETTINGS_FILE);
             warn("No settings file found, using default settings");
             $SETTINGS = {};
-        }
-
-        # launchsettings overrides
-        foreach my $key (keys %{$launchsettings}) {
-            $SETTINGS->{$key} = $launchsettings->{$key};
         }
 
         # load defaults for unset values
@@ -2834,7 +2859,21 @@ package MHFS::Settings {
         if(! -f $SETTINGS_FILE) {
             write_settings_file($SETTINGS, $SETTINGS_FILE);
         }
+        $SETTINGS->{'CFGDIR'} = $CFGDIR;
+        $SETTINGS->{flush} = $launchsettings->{flush} if(exists $launchsettings->{flush});
 
+        # locate files based on appdir
+        $APPDIR ||= $SETTINGS->{'APPDIR'} || dist_dir('App-MHFS');
+        $APPDIR = abs_path($APPDIR);
+        say __PACKAGE__.": using APPDIR " . $APPDIR;
+        $SETTINGS->{'APPDIR'} = $APPDIR;
+
+        # determine the fallback data root
+        $FALLBACK_DATA_ROOT ||= $SETTINGS->{'FALLBACK_DATA_ROOT'} || $ENV{'HOME'};
+        $FALLBACK_DATA_ROOT ||= ($ENV{APPDATA}.'/mhfs') if($ENV{APPDATA}); # Windows
+        if($FALLBACK_DATA_ROOT) {
+            $FALLBACK_DATA_ROOT = abs_path($FALLBACK_DATA_ROOT);
+        }
         # determine the allowed remoteip host combos. only ipv4 now sorry
         $SETTINGS->{'ARIPHOSTS_PARSED'} = [];
         foreach my $rule (@{$SETTINGS->{'ALLOWED_REMOTEIP_HOSTS'}}) {
@@ -2864,16 +2903,14 @@ package MHFS::Settings {
             push @{ $SETTINGS->{'ARIPHOSTS_PARSED'}}, \%ariphost;
         }
 
-        # locate files based on appdir
-        my $APPDIR = $SETTINGS->{'APPDIR'} || dist_dir('App-MHFS');
-        say __PACKAGE__.": using APPDIR " . $APPDIR;
-        $SETTINGS->{'APPDIR'} = $APPDIR;
-
         if( ! $SETTINGS->{'DOCUMENTROOT'}) {
             $SETTINGS->{'DOCUMENTROOT'} = "$APPDIR/public_html";
         }
         $SETTINGS->{'XSEND'} //= 0;
-        my $tmpdir = $SETTINGS->{'TMPDIR'} || ($ENV{'XDG_CACHE_HOME'} || ($ENV{'HOME'} . '/.cache')) . '/mhfs';
+        my $tmpdir = $SETTINGS->{'TMPDIR'};
+        $tmpdir ||= ($ENV{'XDG_CACHE_HOME'}.'/mhfs') if($ENV{'XDG_CACHE_HOME'});
+        $tmpdir ||= "$FALLBACK_DATA_ROOT/.cache/mhfs" if($FALLBACK_DATA_ROOT);
+        defined($tmpdir) or die("Failed to find valid candidate for \$tmpdir");
         delete $SETTINGS->{'TMPDIR'}; # Use specific temp dir instead
         if(!$SETTINGS->{'RUNTIME_DIR'} ) {
             my $RUNTIMEDIR = $ENV{'XDG_RUNTIME_DIR'};
@@ -2883,7 +2920,10 @@ package MHFS::Settings {
             }
             $SETTINGS->{'RUNTIME_DIR'} = $RUNTIMEDIR.'/mhfs';
         }
-        my $datadir = $SETTINGS->{'DATADIR'} || ($ENV{'XDG_DATA_HOME'} || ($ENV{'HOME'} . '/.local/share')) . '/mhfs';
+        my $datadir = $SETTINGS->{'DATADIR'};
+        $datadir ||= ($ENV{'XDG_DATA_HOME'}.'/mhfs') if($ENV{'XDG_DATA_HOME'});
+        $datadir ||= "$FALLBACK_DATA_ROOT/.local/share/mhfs" if($FALLBACK_DATA_ROOT);
+        defined($datadir) or die("Failed to find valid candidate for \$datadir");
         $SETTINGS->{'DATADIR'} = $datadir;
         $SETTINGS->{'MHFS_TRACKER_TORRENT_DIR'} ||= $SETTINGS->{'DATADIR'}.'/torrent';
         $SETTINGS->{'VIDEO_TMPDIR'} ||= $tmpdir.'/video';
@@ -2927,7 +2967,6 @@ package MHFS::Settings {
 
         $SETTINGS->{'BINDIR'} ||= $APPDIR . '/bin';
         $SETTINGS->{'DOCDIR'} ||= $APPDIR . '/doc';
-        $SETTINGS->{'CFGDIR'} = $CFGDIR;
 
         # specify timeouts in seconds
         $SETTINGS->{'TIMEOUT'} ||= 75;
@@ -2936,7 +2975,7 @@ package MHFS::Settings {
         # maximum time allowed between sends
         $SETTINGS->{'sendresponsetimeout'} ||= $SETTINGS->{'TIMEOUT'};
 
-        $SETTINGS->{'Torrent'}{'pyroscope'} ||= $ENV{'HOME'} .'/.local/pyroscope';
+        $SETTINGS->{'Torrent'}{'pyroscope'} ||= $FALLBACK_DATA_ROOT .'/.local/pyroscope' if($FALLBACK_DATA_ROOT);
 
         return $SETTINGS;
     }
@@ -6952,9 +6991,28 @@ package MHFS::Plugin::VideoLibrary {
 }
 
 package App::MHFS; #Media Http File Server
-use version; our $VERSION = version->declare("v0.4.1");
+use version; our $VERSION = version->declare("v0.5.0");
 use strict; use warnings;
 use feature 'say';
+use Getopt::Long qw(GetOptions);
+Getopt::Long::Configure qw(gnu_getopt);
+
+our $USAGE = "Usage: $0 ".<<'END_USAGE';
+[-h|--help] [-v|--version] [--flush] [--cfgdir <directory>] [--appdir <directory>]
+  [--fallback_data_root <directory>]
+Media Http File Server - Stream your own music and video library via your
+browser and standard media players.
+
+All options are optional, provided to override settings.pl and defaults
+--flush               turn on autoflush for STDOUT and STDERR
+--cfgdir              location of configuration directory, will be created if
+  it does not exist
+--appdir              location of application static files
+--fallback_data_root  location to fallback to if setting isn't found instead of
+  $HOME or $APPDIR\mhfs
+-h|--help             print this message
+-v|--version          print version
+END_USAGE
 
 sub run {
     binmode(STDOUT, ":utf8");
@@ -6962,23 +7020,34 @@ sub run {
 
     # parse command line args into launchsettings
     my %launchsettings;
-    say __PACKAGE__ .": parsing command line args";
-
-    for(my $i = 0; $i < scalar(@ARGV); $i++) {
-        if($ARGV[$i] eq 'flush') {
-            $launchsettings{'flush'} = 1;
-        }
-        else {
-            defined($ARGV[$i+1]) or die("Missing PARAM");
-            if($ARGV[$i] eq '--cfgdir') {
-                $launchsettings{'CFGDIR'} = $ARGV[$i+1];
-            }
-            else {
-                die("Unknown PARAM");
-            }
-            $i++;
-        }
+    my ($flush, $cfgdir, $fallback_data_root, $appdir, $help, $versionflag);
+    if(!GetOptions(
+        'flush' => \$flush,
+        'cfgdir=s' => \$cfgdir,
+        'fallback_data_root=s' => \$fallback_data_root,
+        'appdir=s' => \$appdir,
+        '--help|h' =>\$help,
+        '--version|v' => \$versionflag,
+    )) {
+        print STDERR "$0: Invalid param\n";
+        print STDERR $USAGE;
+        exit(1);
     }
+
+    if($help) {
+        print $USAGE;
+        exit 0;
+    }
+    elsif($versionflag) {
+        print __PACKAGE__." $VERSION";
+        exit 0;
+    }
+    say __PACKAGE__ .": parsed command line args";
+
+    $launchsettings{flush} = $flush if($flush);
+    $launchsettings{CFGDIR} = $cfgdir if($cfgdir);
+    $launchsettings{FALLBACK_DATA_ROOT} = $fallback_data_root if($fallback_data_root);
+    $launchsettings{APPDIR} = $appdir if($appdir);
 
     # start the server (blocks)
     say __PACKAGE__.": starting MHFS::HTTP::Server";

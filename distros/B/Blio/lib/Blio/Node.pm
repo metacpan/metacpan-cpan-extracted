@@ -2,6 +2,8 @@ package Blio::Node;
 
 # ABSTRACT: A Blio Node
 
+our $VERSION = '2.007'; # VERSION
+
 use 5.010;
 use Moose;
 use namespace::autoclean;
@@ -54,11 +56,12 @@ sub _build_date {
 
 has 'language' => (is=>'ro', isa=>'Maybe[Str]');
 has 'converter' => (is=>'ro', isa=>'Maybe[Str]');
-has 'feed' => (is=>'ro',isa=>'Bool',default=>0);
+has 'feed' => (is=>'rw',isa=>'Bool',default=>0);
+has 'list' => (is=>'ro',isa=>'Bool',default=>0);
 has 'author' => (is=>'ro',isa=>'Str');
 has 'paged_list' => (is=>'ro',isa=>'Int',default=>0);
-has 'prev_next_nav' => (is=>'ro',isa=>'Int',default=>0);
 has 'list_image' => (is=>'ro',isa=>'Str');
+has 'list_only' => (is=>'ro',isa=>'Bool',default=>0);
 
 has 'raw_content'      => ( is => 'rw', isa => 'Str' );
 has 'content' => ( is => 'rw', isa => 'Str', lazy_build=>1 );
@@ -81,7 +84,7 @@ sub _build_content {
         when ('html') { return $raw_content }
         when ([qw(textile markdown bbcode)]) {
             my $o = Markup::Unified->new();
-            return $o->format($raw_content, 'textile')->formatted;
+            return $o->format($raw_content, $converter)->formatted;
         }
         default {
             my $method = 'convert_'.$converter;
@@ -133,6 +136,11 @@ has 'feed_url' => (is=>'ro',isa=>'Str',lazy_build=>1);
 sub _build_feed_url {
     my $self = shift;
     return $self->id.'.xml';
+}
+
+sub is_list {
+    my $self = shift;
+    return $self->list || $self->feed;
 }
 
 sub new_from_file {
@@ -204,6 +212,7 @@ sub parse {
 
 sub write {
     my ($self, $blio) = @_;
+    return if $self->list_only;
 
     my $tt = $blio->tt;
     my $outfile = $blio->output_dir->file($self->url);
@@ -316,7 +325,12 @@ sub sorted_children {
     if ($limit && $limit < @sorted) {
         @sorted = splice(@sorted,0,$limit);
     }
-    return \@sorted;
+    if ($self->stash->{reverse_children}) {
+        return [reverse @sorted];
+    }
+    else {
+        return \@sorted;
+    }
 }
 
 sub sort_children_by {
@@ -431,11 +445,14 @@ sub register_tags {
             $tagnode = Blio::Node->new(
                 base_dir => $blio->source_dir,
                 source_file => $0,
-                id=>"tags/".$tagid.'.html',
+                id=>$tagid,
                 url=>"tags/$tagid.html",
                 title=>$tag,
                 date=>DateTime->new(year=>1980),
                 content=>'',
+                stash=>{
+                    is_tag=>1,
+                }
             );
             $blio->nodes_by_url->{$tagnode->url} = $tagnode;
             $tagnode->parent($tagindex);
@@ -491,7 +508,6 @@ sub primary_image {
 sub prev_next_post {
     my $self = shift;
     return unless my $p = $self->parent;
-    return unless $p->prev_next_nav;
     my $siblings = $p->sorted_children;
     my $hit;
     my $i;
@@ -508,6 +524,25 @@ sub prev_next_post {
     return \%sib;
 }
 
+sub older_younger {
+    my $self = shift;
+    return unless my $p = $self->parent;
+    my $siblings = $p->sorted_children;
+    my $hit;
+    my $i;
+    for ($i=0;$i<@$siblings;$i++) {
+        my $this = $siblings->[$i];
+        if ($this->id eq $self->id) {
+            $hit = $i;
+            last;
+        }
+    }
+    my %sib;
+    $sib{older} = $siblings->[$i+1] if $i < $#{$siblings} && $siblings->[$i+1];
+    $sib{younger} = $siblings->[$i-1] if ($i-1 >= 0 && $siblings->[$i-1]);
+    return \%sib;
+}
+
 __PACKAGE__->meta->make_immutable;
 1;
 
@@ -521,15 +556,15 @@ Blio::Node - A Blio Node
 
 =head1 VERSION
 
-version 2.003
+version 2.007
 
 =head1 AUTHOR
 
-Thomas Klausner <domm@cpan.org>
+Thomas Klausner <domm@plix.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Thomas Klausner.
+This software is copyright (c) 2013 - 2022 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

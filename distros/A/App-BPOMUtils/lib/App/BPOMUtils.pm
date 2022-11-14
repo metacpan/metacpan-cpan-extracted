@@ -10,9 +10,9 @@ use Exporter 'import';
 use Perinci::Sub::Gen::AccessTable qw(gen_read_table_func);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-02'; # DATE
+our $DATE = '2022-11-10'; # DATE
 our $DIST = 'App-BPOMUtils'; # DIST
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 our @EXPORT_OK = qw(
                        bpom_list_food_categories
@@ -139,7 +139,7 @@ _
             {
                 summary => 'Check for additives that match some regular expressions',
                 src_plang => 'bash',
-                src => '[[prog]] -l --format text-pretty -- /potassium/ /citrate|phosphate/',
+                src => q{[[prog]] -l --format text-pretty -- /potassium/ '/citrate|phosphate/'},
                 test => 0,
             },
         ],
@@ -639,7 +639,15 @@ sub bpom_show_nutrition_facts {
             $text = Text::Table::More::generate_table(rows => \@rows, color=>1, header_row=>0);
         }
     } elsif ($output_format =~ /linear/) {
-        $text = join("", @rows). "\n";
+        if ($output_format =~ /html/) {
+            $text = "
+<style>
+  p { border-style: solid; }
+</style>
+<p>" . join("", @rows). "</p>\n";
+        } else {
+            $text = join("", @rows). "\n";
+        }
     }
 
     if ($output_format =~ /html/ && $args{browser}) {
@@ -675,7 +683,7 @@ App::BPOMUtils - Utilities related to BPOM
 
 =head1 VERSION
 
-This document describes version 0.013 of App::BPOMUtils (from Perl distribution App-BPOMUtils), released on 2022-11-02.
+This document describes version 0.014 of App::BPOMUtils (from Perl distribution App-BPOMUtils), released on 2022-11-10.
 
 =head1 SYNOPSIS
 

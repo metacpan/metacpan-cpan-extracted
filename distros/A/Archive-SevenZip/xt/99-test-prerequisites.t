@@ -71,7 +71,7 @@ my $scanner = Perl::PrereqScanner::Lite->new;
 for my $test_file (@tests) {
     my $implicit_test_prereqs = $scanner->scan_file($test_file)->as_string_hash;
     my %missing = %{ $implicit_test_prereqs };
-    #warn Dumper \%missing;
+    delete $missing{'Archive::'}; # Perl::PrereqScanner::Lite doesn't like Archive::7zip
 
     for my $p ( keys %missing ) {
         # remove core modules
@@ -81,18 +81,18 @@ for my $test_file (@tests) {
         } else {
             #diag "$p is not in core for $minimum_perl";
         };
+    };
 
-        # remove explicit (test) prerequisites
-        for my $k (keys %$explicit_test_prereqs) {
-            delete $missing{ $k };
-        };
-        #warn Dumper $explicit_test_prereqs->as_string_hash;
+    # remove explicit (test) prerequisites
+    for my $k (keys %$explicit_test_prereqs) {
+        delete $missing{ $k };
+    };
+    #warn Dumper $explicit_test_prereqs->as_string_hash;
 
-        # Remove stuff from our distribution
-        for my $k (keys %distribution) {
-            delete $missing{ $k };
-        };
-    }
+    # Remove stuff from our distribution
+    for my $k (keys %distribution) {
+        delete $missing{ $k };
+    };
 
     # If we have no apparent missing prerequisites, we're good
     my @missing = sort keys %missing;

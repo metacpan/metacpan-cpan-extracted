@@ -1,0 +1,229 @@
+{
+   "abstract" : "Schema-based enumerations independent of database",
+   "author" : [
+      "D Ruth Holloway <ruth@hiruthie.me>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.028, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "DBIx-Class-PseudoEnum",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "0",
+            "Dist::Zilla::Plugin::Authority" : "0",
+            "Dist::Zilla::Plugin::AutoPrereqs" : "0",
+            "Dist::Zilla::Plugin::CPANFile" : "0",
+            "Dist::Zilla::Plugin::ChangeStats::Git" : "0",
+            "Dist::Zilla::Plugin::CheckChangesHasContent" : "0",
+            "Dist::Zilla::Plugin::CoalescePod" : "0",
+            "Dist::Zilla::Plugin::ConfirmRelease" : "0",
+            "Dist::Zilla::Plugin::ContributorCovenant" : "0",
+            "Dist::Zilla::Plugin::ContributorsFile" : "0",
+            "Dist::Zilla::Plugin::CopyrightYearFromGit" : "0",
+            "Dist::Zilla::Plugin::Covenant" : "0",
+            "Dist::Zilla::Plugin::ExecDir" : "0",
+            "Dist::Zilla::Plugin::FakeRelease" : "0",
+            "Dist::Zilla::Plugin::Git::Check" : "0",
+            "Dist::Zilla::Plugin::Git::Commit" : "0",
+            "Dist::Zilla::Plugin::Git::CommitBuild" : "0",
+            "Dist::Zilla::Plugin::Git::Contributors" : "0",
+            "Dist::Zilla::Plugin::Git::GatherDir" : "0",
+            "Dist::Zilla::Plugin::Git::Push" : "0",
+            "Dist::Zilla::Plugin::Git::Tag" : "0",
+            "Dist::Zilla::Plugin::GitLab::Meta" : "0",
+            "Dist::Zilla::Plugin::GitLab::Update" : "0",
+            "Dist::Zilla::Plugin::INI::Baked" : "0",
+            "Dist::Zilla::Plugin::InstallGuide" : "0",
+            "Dist::Zilla::Plugin::InstallRelease" : "0",
+            "Dist::Zilla::Plugin::License" : "0",
+            "Dist::Zilla::Plugin::MakeMaker" : "0",
+            "Dist::Zilla::Plugin::Manifest" : "0",
+            "Dist::Zilla::Plugin::ManifestSkip" : "0",
+            "Dist::Zilla::Plugin::MetaData::BuiltWith" : "0",
+            "Dist::Zilla::Plugin::MetaJSON" : "0",
+            "Dist::Zilla::Plugin::MetaProvides::Package" : "0",
+            "Dist::Zilla::Plugin::MetaYAML" : "0",
+            "Dist::Zilla::Plugin::MinimumPerl" : "0",
+            "Dist::Zilla::Plugin::NextRelease" : "0",
+            "Dist::Zilla::Plugin::NextVersion::Semantic" : "0",
+            "Dist::Zilla::Plugin::OurPkgVersion" : "0",
+            "Dist::Zilla::Plugin::PodWeaver" : "0",
+            "Dist::Zilla::Plugin::Prereqs::Plugins" : "0",
+            "Dist::Zilla::Plugin::PreviousVersion::Changelog" : "0",
+            "Dist::Zilla::Plugin::PruneCruft" : "0",
+            "Dist::Zilla::Plugin::ReadmeMarkdownFromPod" : "0",
+            "Dist::Zilla::Plugin::RunExtraTests" : "0",
+            "Dist::Zilla::Plugin::SchwartzRatio" : "0",
+            "Dist::Zilla::Plugin::Test::Compile" : "0",
+            "Dist::Zilla::Plugin::Test::ReportPrereqs" : "0",
+            "Dist::Zilla::Plugin::TestRelease" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "DBIx::Class::Candy::Exports" : "0",
+            "DBIx::Class::Row" : "0",
+            "Modern::Perl" : "0",
+            "Sub::Quote" : "0",
+            "parent" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "DBIx::Class::Core" : "0",
+            "DBIx::Class::Schema" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test2::Plugin::ExitSummary" : "0",
+            "Test2::Plugin::NoWarnings" : "0",
+            "Test2::Plugin::Times" : "0",
+            "Test2::V0" : "0",
+            "Test::DBIx::Class" : "0",
+            "Test::More" : "0",
+            "base" : "0",
+            "lib" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "DBIx::Class::PseudoEnum" : {
+         "file" : "lib/DBIx/Class/PseudoEnum.pm",
+         "version" : "1.0002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://gitlab.com/GeekRuthie/DBIx-Class-PseudoEnum/-/issues"
+      },
+      "homepage" : "https://p3rl.org/DBIx::Class::PseudoEnum",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://gitlab.com/GeekRuthie/DBIx-Class-PseudoEnum.git",
+         "web" : "https://gitlab.com/GeekRuthie/DBIx-Class-PseudoEnum"
+      }
+   },
+   "version" : "1.0002",
+   "x_BuiltWith" : {
+      "failures" : {
+         "DBIx::Class::Core" : "Module::MetaData could not parse a version from /home/geekruthie/perl5/perlbrew/perls/perl-5.36.0/lib/site_perl/5.36.0/DBIx/Class/Core.pm",
+         "DBIx::Class::Row" : "Module::MetaData could not parse a version from /home/geekruthie/perl5/perlbrew/perls/perl-5.36.0/lib/site_perl/5.36.0/DBIx/Class/Row.pm",
+         "DBIx::Class::Schema" : "Module::MetaData could not parse a version from /home/geekruthie/perl5/perlbrew/perls/perl-5.36.0/lib/site_perl/5.36.0/DBIx/Class/Schema.pm"
+      },
+      "modules" : {
+         "CPAN::Meta" : "2.150010",
+         "Carp" : "1.52",
+         "DBIx::Class::Candy::Exports" : "0.005003",
+         "Dist::Zilla" : "6.028",
+         "Dist::Zilla::Plugin::Authority" : "1.009",
+         "Dist::Zilla::Plugin::AutoPrereqs" : "6.028",
+         "Dist::Zilla::Plugin::CPANFile" : "6.028",
+         "Dist::Zilla::Plugin::ChangeStats::Git" : "0.6.0",
+         "Dist::Zilla::Plugin::CheckChangesHasContent" : "0.011",
+         "Dist::Zilla::Plugin::CoalescePod" : "0.3.0",
+         "Dist::Zilla::Plugin::ConfirmRelease" : "6.028",
+         "Dist::Zilla::Plugin::ContributorCovenant" : "2.000000",
+         "Dist::Zilla::Plugin::ContributorsFile" : "0.3.0",
+         "Dist::Zilla::Plugin::CopyrightYearFromGit" : "0.009",
+         "Dist::Zilla::Plugin::Covenant" : "0.1.2",
+         "Dist::Zilla::Plugin::ExecDir" : "6.028",
+         "Dist::Zilla::Plugin::FakeRelease" : "6.028",
+         "Dist::Zilla::Plugin::Git::Check" : "2.048",
+         "Dist::Zilla::Plugin::Git::Commit" : "2.048",
+         "Dist::Zilla::Plugin::Git::CommitBuild" : "2.048",
+         "Dist::Zilla::Plugin::Git::Contributors" : "0.036",
+         "Dist::Zilla::Plugin::Git::GatherDir" : "2.048",
+         "Dist::Zilla::Plugin::Git::Push" : "2.048",
+         "Dist::Zilla::Plugin::Git::Tag" : "2.048",
+         "Dist::Zilla::Plugin::GitLab::Meta" : "1.0002",
+         "Dist::Zilla::Plugin::GitLab::Update" : "1.0002",
+         "Dist::Zilla::Plugin::INI::Baked" : "0.002002",
+         "Dist::Zilla::Plugin::InstallGuide" : "1.200014",
+         "Dist::Zilla::Plugin::InstallRelease" : "0.008",
+         "Dist::Zilla::Plugin::License" : "6.028",
+         "Dist::Zilla::Plugin::MakeMaker" : "6.028",
+         "Dist::Zilla::Plugin::Manifest" : "6.028",
+         "Dist::Zilla::Plugin::ManifestSkip" : "6.028",
+         "Dist::Zilla::Plugin::MetaData::BuiltWith" : "1.004005",
+         "Dist::Zilla::Plugin::MetaJSON" : "6.028",
+         "Dist::Zilla::Plugin::MetaProvides::Package" : "2.004003",
+         "Dist::Zilla::Plugin::MetaYAML" : "6.028",
+         "Dist::Zilla::Plugin::MinimumPerl" : "1.006",
+         "Dist::Zilla::Plugin::NextRelease" : "6.028",
+         "Dist::Zilla::Plugin::NextVersion::Semantic" : "0.2.6",
+         "Dist::Zilla::Plugin::OurPkgVersion" : "0.21",
+         "Dist::Zilla::Plugin::PodWeaver" : "4.009",
+         "Dist::Zilla::Plugin::Prereqs::Plugins" : "1.003003",
+         "Dist::Zilla::Plugin::PreviousVersion::Changelog" : "0.2.6",
+         "Dist::Zilla::Plugin::PruneCruft" : "6.028",
+         "Dist::Zilla::Plugin::ReadmeMarkdownFromPod" : "0.141140",
+         "Dist::Zilla::Plugin::RunExtraTests" : "0.029",
+         "Dist::Zilla::Plugin::SchwartzRatio" : "0.3.4",
+         "Dist::Zilla::Plugin::Test::Compile" : "2.058",
+         "Dist::Zilla::Plugin::Test::ReportPrereqs" : "0.028",
+         "Dist::Zilla::Plugin::TestRelease" : "6.028",
+         "ExtUtils::MakeMaker" : "7.64",
+         "File::Spec" : "3.84",
+         "FindBin" : "1.53",
+         "IO::Handle" : "1.48",
+         "IPC::Open3" : "1.22",
+         "Modern::Perl" : "1.20220515",
+         "Sub::Quote" : "2.006006",
+         "Test2::Plugin::ExitSummary" : "0.000145",
+         "Test2::Plugin::NoWarnings" : "0.09",
+         "Test2::Plugin::Times" : "0.000145",
+         "Test2::V0" : "0.000145",
+         "Test::DBIx::Class" : "0.52",
+         "Test::More" : "1.302190",
+         "base" : "2.27",
+         "lib" : "0.65",
+         "parent" : "0.238",
+         "strict" : "1.12",
+         "warnings" : "1.58"
+      },
+      "perl" : {
+         "original" : "v5.36.0",
+         "qv" : 1,
+         "version" : [
+            5,
+            36,
+            0
+         ]
+      },
+      "platform" : "linux"
+   },
+   "x_author_pledge" : {
+      "version" : 1
+   },
+   "x_authority" : "cpan:GEEKRUTH",
+   "x_contributor_covenant" : {
+      "version" : 0.02
+   },
+   "x_generated_by_perl" : "v5.36.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}

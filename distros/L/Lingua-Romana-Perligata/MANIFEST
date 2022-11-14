@@ -4,6 +4,9 @@ Makefile.PL
 MANIFEST
 README
 t/load_and_run.t
+t/UPPER_CASE.t
+t/ARGV.t
+bin/explica
 demo/demo_JAPH.pl
 demo/demo_OO.pl
 demo/demo_bitwise.pl
@@ -19,6 +22,5 @@ demo/demo_monkey.pl
 demo/demo_number.pl
 demo/demo_reference.pl
 demo/demo_simple.pl
-t/UPPER_CASE.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

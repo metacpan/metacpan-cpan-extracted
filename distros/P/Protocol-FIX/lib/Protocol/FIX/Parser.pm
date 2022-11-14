@@ -3,12 +3,12 @@ package Protocol::FIX::Parser;
 use strict;
 use warnings;
 
-use List::Util qw/first/;
+use List::Util    qw/first/;
 use Protocol::FIX qw/humanize/;
 use Protocol::FIX::TagsAccessor;
 use Protocol::FIX::MessageInstance;
 
-our $VERSION = '0.06';    ## VERSION
+our $VERSION = '0.07';    ## VERSION
 
 =head1 NAME
 
@@ -219,7 +219,7 @@ sub _construct_tag_accessor_group {
     my ($sub_composite, undef) = @$composite_desc;
 
     my @tag_accessors;
-    for (my $idx = 1; $idx <= $value;) {
+    for my $idx (1 .. $value) {
         my ($ta) = _construct_tag_accessor($protocol, $sub_composite, $tag_pairs, 0);
         return (undef,
                   "Protocol error: cannot construct item #${idx} for "
@@ -229,7 +229,6 @@ sub _construct_tag_accessor_group {
                 . $sub_composite->{name} . "')")
             unless $ta;
         push @tag_accessors, $ta;
-        $idx += $ta->count;
     }
     return ([$sub_composite => \@tag_accessors]);
 }
@@ -244,10 +243,9 @@ sub _construct_tag_accessor {
         # non-destructive look ahead
         my $field = $tag_pairs->[0]->[0];
 
-        # do not look ahead too much, i.e. for group it is enough to construct just one item
-        last if $parsed_subcomposites{$field->{name}};
-
         my $owner = $composite->{field_to_component}->{$field->{name}};
+        # do not look ahead too much, i.e. for group it is enough to construct just one item
+        last if $parsed_subcomposites{$field->{name}} || ($owner && $parsed_subcomposites{$owner});
 
         # The logic is following:
         # 1. try to construct sub-components (if there are fields pointing to them)

@@ -8,7 +8,7 @@ BEGIN
     our @modules;
     File::Find::find(sub
     {
-        next unless( /\.pm$/ );
+        return(1) unless( /\.pm$/ );
         # print( "Checking file '$_' ($File::Find::name)\n" );
         $_ = $File::Find::name;
         s,^./lib/,,;
@@ -21,8 +21,11 @@ BEGIN
 
 BEGIN
 {
-    diag( "Checking module $_" ) if( $DEBUG );
-    use_ok( $_ ) for( sort( @modules ) );
+    for( sort( @modules ) )
+    {
+        diag( "Checking module $_" ) if( $DEBUG );
+        use_ok( $_ );
+    }
 };
 
 done_testing();

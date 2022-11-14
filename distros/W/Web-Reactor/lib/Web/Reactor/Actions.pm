@@ -1,10 +1,12 @@
 ##############################################################################
 ##
 ##  Web::Reactor application machinery
-##  2013-2016 (c) Vladi Belperchinov-Shabanski "Cade"
-##  <cade@bis.bg> <cade@biscom.net> <cade@cpan.org>
-##
+##  Copyright (c) 2013-2022 Vladi Belperchinov-Shabanski "Cade"
+##        <cade@noxrun.com> <cade@bis.bg> <cade@cpan.org>
+##  http://cade.noxrun.com
+##  
 ##  LICENSE: GPLv2
+##  https://github.com/cade-vs/perl-web-reactor
 ##
 ##############################################################################
 package Web::Reactor::Actions;
@@ -15,16 +17,11 @@ use parent 'Web::Reactor::Base';
 sub new
 {
   my $class = shift;
-  my %env = @_;
-  
   $class = ref( $class ) || $class;
-  my $self = {
-             'ENV'           => \%env,
-             'ACT_PKG_CACHE' => {},
-             };
-  bless $self, $class;
-  # rcd_log( "debug: $self created" );
-  
+
+  my $self = $class->SUPER::new( @_ );
+  $self->{ 'ACT_PKG_CACHE' } = {};
+
   return $self;
 }
 

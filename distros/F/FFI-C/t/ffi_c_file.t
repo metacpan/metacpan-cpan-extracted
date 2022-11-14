@@ -89,7 +89,7 @@ subtest 'freopen' => sub {
   $file->freopen("$path2", "a");
   $file->fwrite(\"bar", 3);
 
-  if($^O eq 'MSWin32' || $^O eq 'openbsd')
+  if($^O =~ /^(MSWin32|opebsd|netbsd)$/)
   {
     $file->fflush;
     is($path1->slurp_raw, "foo");

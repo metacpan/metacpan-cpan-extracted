@@ -31,7 +31,7 @@ subtest "just a number" => sub {
     my $statement = Software::Copyright::Statement->new('2021');
 
     is($statement->name, undef, "check statement without name");
-    is("$statement", '', "check statement string without name");
+    is("$statement", '2021', "check statement string without name");
 };
 
 subtest "combined owners" => sub {
@@ -85,6 +85,22 @@ subtest "merge record" => sub {
     $statement->merge(Software::Copyright::Statement->new('2022, Marcel <marcel@example.com>'));
     is("$statement", '2004-2008, 2014-2022, Marcel <marcel@example.com>', "fix email");
 
+};
+
+subtest "add years" => sub {
+    my $statement = Software::Copyright::Statement->new('2022, Marcel <marcel@example.com>');
+    $statement->add_years(2010);
+    is("$statement", '2010, 2022, Marcel <marcel@example.com>', "added year");
+};
+
+subtest "handle garbage" => sub {
+    my $statement = Software::Copyright::Statement->new('**b <= a and (c+1)**b > a');
+    is($statement.'',"","handle C code with (c)");
+};
+
+subtest "handle No Copyright given by licensecheck" => sub {
+    my $statement = Software::Copyright::Statement->new('*No copyright*');
+    is($statement.'',"","handle No Copyright given by licensecheck");
 };
 
 done_testing;

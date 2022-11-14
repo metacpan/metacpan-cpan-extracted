@@ -1,0 +1,143 @@
+---
+abstract: 'Webservice to connect to Onfido API'
+author:
+  - 'DERIV <DERIV@cpan.org>'
+build_requires:
+  Clone: '0'
+  Data::UUID: '0'
+  Date::Utility: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  FindBin: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Mojolicious::Lite: '0'
+  Mojolicious::Plugin::RenderFile: '0'
+  Path::Tiny: '0'
+  Test::CheckDeps: '0.010'
+  Test::Exception: '0'
+  Test::More: '0.98'
+  Test::NoWarnings: '0'
+  URI: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '7.64'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-Async-Onfido
+no_index:
+  directory:
+    - eg
+    - share
+    - shares
+    - t
+    - xt
+provides:
+  WebService::Async::Onfido:
+    file: lib/WebService/Async/Onfido.pm
+    version: '0.002'
+  WebService::Async::Onfido::Address:
+    file: lib/WebService/Async/Onfido/Address.pm
+    version: '0.002'
+  WebService::Async::Onfido::Applicant:
+    file: lib/WebService/Async/Onfido/Applicant.pm
+    version: '0.002'
+  WebService::Async::Onfido::Base::Address:
+    file: lib/WebService/Async/Onfido/Base/Address.pm
+    version: '0.002'
+  WebService::Async::Onfido::Base::Applicant:
+    file: lib/WebService/Async/Onfido/Base/Applicant.pm
+    version: '0.002'
+  WebService::Async::Onfido::Base::Check:
+    file: lib/WebService/Async/Onfido/Base/Check.pm
+    version: '0.002'
+  WebService::Async::Onfido::Base::Document:
+    file: lib/WebService/Async/Onfido/Base/Document.pm
+    version: '0.002'
+  WebService::Async::Onfido::Base::Photo:
+    file: lib/WebService/Async/Onfido/Base/Photo.pm
+    version: '0.002'
+  WebService::Async::Onfido::Base::Report:
+    file: lib/WebService/Async/Onfido/Base/Report.pm
+    version: '0.002'
+  WebService::Async::Onfido::Base::Video:
+    file: lib/WebService/Async/Onfido/Base/Video.pm
+    version: '0.002'
+  WebService::Async::Onfido::Check:
+    file: lib/WebService/Async/Onfido/Check.pm
+    version: '0.002'
+  WebService::Async::Onfido::Document:
+    file: lib/WebService/Async/Onfido/Document.pm
+    version: '0.002'
+  WebService::Async::Onfido::Photo:
+    file: lib/WebService/Async/Onfido/Photo.pm
+    version: '0.002'
+  WebService::Async::Onfido::Report:
+    file: lib/WebService/Async/Onfido/Report.pm
+    version: '0.002'
+  WebService::Async::Onfido::Video:
+    file: lib/WebService/Async/Onfido/Video.pm
+    version: '0.002'
+requires:
+  Clone: '0'
+  Data::UUID: '0'
+  Date::Utility: '0'
+  Dir::Self: '0'
+  File::Basename: '0'
+  File::ShareDir: '0'
+  Future: '0'
+  Future::Utils: '0'
+  Getopt::Long: '0'
+  HTML::TreeBuilder: '0'
+  HTTP::Request::Common: '0'
+  IO::Async::Loop: '0'
+  IO::Async::Notifier: '0'
+  JSON::MaybeUTF8: '0'
+  JSON::MaybeXS: '0'
+  List::UtilsBy: '0'
+  Log::Any: '0'
+  Log::Any::Adapter: '0'
+  Mojolicious::Lite: '0'
+  Net::Async::HTTP: '0'
+  Path::Tiny: '0'
+  Ryu::Async: '0'
+  Scalar::Util: '0'
+  Syntax::Keyword::Try: '0'
+  Template: '0'
+  URI: '0'
+  URI::Escape: '0'
+  URI::QueryParam: '0'
+  URI::Template: '0'
+  constant: '0'
+  indirect: '0'
+  mro: '0'
+  parent: '0'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/binary-com/perl-WebService-Async-Onfido/issues
+  homepage: https://github.com/binary-com/perl-WebService-Async-Onfido
+  repository: https://github.com/binary-com/perl-WebService-Async-Onfido.git
+version: '0.002'
+x_authority: cpan:DERIV
+x_contributors:
+  - 'Raunak Kathuria <raunakkathuria@gmail.com>'
+  - 'chylli-binary <chylli@binary.com>'
+  - 'Tom Molesworth <tom@binary.com>'
+  - 'Mohammad Reza Hamedanchi <mohammad@binary.com>'
+  - 'chengyang-binary <45479072+chengyang-binary@users.noreply.github.com>'
+  - 'chylli-binary <52912308+chylli-binary@users.noreply.github.com>'
+  - 'Arshad Munir <55420460+arshad-binary@users.noreply.github.com>'
+  - 'felipe-binary <64797927+felipe-binary@users.noreply.github.com>'
+  - 'Jean-Yves Sireau <jy@binary.com>'
+  - 'junbon-binary <junbon@binary.com>'
+  - 'Tazeek <tazeek@binary.com>'
+x_generated_by_perl: v5.26.2
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

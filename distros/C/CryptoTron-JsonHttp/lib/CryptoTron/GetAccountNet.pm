@@ -16,7 +16,7 @@ our @ISA = qw(Exporter);
 our @EXPORT = qw(GetAccountNet);
 
 # Set the package version. 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 # Load the required Perl module.
 use File::Basename;
@@ -42,15 +42,15 @@ our ($MODULE_NAME, undef, undef) = fileparse(__FILE__, '\..*');
 # ---------------------------------------------------------------------------- #
 sub GetAccountNet {
     # Assign the subroutine arguments to the local array.
-    my ($param) = @_;
+    my (%param) = @_;
     # Create the payload.
-    my $payload = payload_standard($param);
+    my $payload = payload_standard(\%param);
     # Add the payload to the given hash.
-    $param->{'PayloadString'} = $payload;
+    $param{'PayloadString'} = $payload;
     # Add the module name to the given hash.
-    $param->{'ModuleName'} = $MODULE_NAME;
+    $param{'ModuleName'} = $MODULE_NAME;
     # Get the ouput data.
-    my $output_data = json_data($param);
+    my $output_data = json_data(\%param);
     # Return the ouput data.
     return $output_data;
 };
@@ -80,12 +80,12 @@ CryptoTron::GetAccountNet - Perl extension for use with the blockchain of the cr
   my $OutputFormat = ["RAW"|"STR"|""];
 
   # Request the account info from the mainnet.
-  my $accountnet_info = GetAccountNet({
+  my $accountnet_info = GetAccountNet(
       PublicKey => $PublicKeyBase58
       [, VisibleFlag => $VisibleFlag]
       [, ControlFlag => $ControlFlag]
       [, OutputFormat => $OutputFormat]
-  });
+  );
 
   # Print the account info into the terminal window.
   print $accountnet_info;
@@ -131,6 +131,16 @@ is "False" it will not be corrected.
 
 The subroutine argument key C<OutputFormat> and his value controls wether the
 output is raw JSON or or formatted JSON.
+
+=head1 METHOD RETURN
+
+<table>
+<tr><td>PARAMETER</td><td>DESCRIPTION</td></tr>
+<tr><td>NetLimit</td><td>Total bandwidth obtained by staking</td></tr>
+<tr><td>freeNetLimit</td><td>Total free bandwidth</td></tr>
+<tr><td>TotalNetLimit</td><td>Total bandwidth can be obtained by staking</td></tr>
+<tr><td>TotalNetWeight</td><td>Total TRX staked for bandwidth</td></tr>
+</table>
 
 =head1 EXAMPLES
 

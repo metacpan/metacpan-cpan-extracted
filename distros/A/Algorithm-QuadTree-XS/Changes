@@ -1,5 +1,8 @@
 Revision history for Perl extension Algorithm::QuadTree::XS.
 
+0.04 Thu Nov 10 2022
+	- greatly improve search performance
+
 0.03 Sun Jun 5 2022
 	- fix mark underflow problem on debugging perls
 

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/DOM/Element.pm
-## Version v0.2.1
+## Version v0.2.2
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/13
-## Modified 2022/09/20
+## Modified 2022/11/11
 ## All rights reserved
 ## 
 ## 
@@ -29,7 +29,7 @@ BEGIN
         DOCUMENT_POSITION_PRECEDING DOCUMENT_POSITION_FOLLOWING DOCUMENT_POSITION_CONTAINS 
         DOCUMENT_POSITION_CONTAINED_BY DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC
     );
-    our $VERSION = 'v0.2.1';
+    our $VERSION = 'v0.2.2';
 };
 
 use strict;
@@ -214,7 +214,7 @@ sub cmp
     # the 2 elements are not in the same twig
     unless( $a_pile->last == $b_pile->last ) 
     {
-        warnings::warn( "2 nodes not in the same pile: ", ref( $a ), " - ", ref( $b ), "\n" ) if( warnings::enabled( 'HTML::Object' ) );
+        warnings::warn( "2 nodes not in the same pile: " . ref( $a ) . " - " . ref( $b ) . "\n" ) if( warnings::enabled( 'HTML::Object' ) );
         # print "a: ", $a->string_value, "\nb: ", $b->string_value, "\n";
         return;
     }
@@ -2063,7 +2063,7 @@ HTML::Object::DOM::Element - HTML Object
 
 =head1 VERSION
 
-    v0.2.1
+    v0.2.2
 
 =head1 DESCRIPTION
 

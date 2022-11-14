@@ -1,0 +1,88 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use File::Spec::Functions qw(updir catfile abs2rel canonpath);
+use File::Basename qw(dirname);
+use Cwd qw(abs_path);
+use POSIX qw(strftime);
+
+my $dir = dirname(__FILE__);
+my $root = abs2rel(abs_path(catfile($dir, updir)));
+
+my $CACERT_PEM_FILE = canonpath("$root/lib/Mozilla/CA/cacert.pem");
+
+system($^X, "$dir/mk-ca-bundle.pl", '-u', $CACERT_PEM_FILE) == 0
+    or exit $?;
+
+if (system(qw( git diff --exit-code --quiet ), $CACERT_PEM_FILE) == 0) {
+    print "No changes to certificate bundle.\n";
+    exit;
+}
+
+{
+    my $new_version = strftime '%Y%m%d', gmtime;
+
+    my $infile = canonpath("$root/lib/Mozilla/CA.pm");
+    my $outfile = "$infile.update.$$";
+
+    open my $in, '<', $infile
+        or die "can't read $infile: $!";
+    open my $out, '>', $outfile
+        or die "can't write $outfile: $!";
+    my $found_version;
+    while (my $line = <$in>) {
+        if (!$found_version) {
+            $line =~ s{(^our \$VERSION = )'\d+(.\d+)?'}{$1'$new_version'}
+                and $found_version++;
+        }
+        print { $out } $line;
+    }
+    close $in;
+    close $out or die $!;
+
+    print "Updating version in $infile to $new_version.\n";
+    rename $outfile, $infile
+        or die "can't replace $infile with $outfile: $!";
+}
+
+{
+    my $infile = canonpath("$root/Changes");
+    my $outfile = "$infile.update.$$";
+
+    open my $in, '<', $infile
+        or die "can't read $infile: $!";
+    open my $out, '>', $outfile
+        or die "can't write $outfile: $!";
+
+    my $found_version;
+    my $heading = '';
+    while (my $line = <$in>) {
+        if ($found_version) {
+            print { $out } $line;
+        }
+        elsif ($line =~ /^v?\d+\b/) {
+            $found_version++;
+
+            $heading =~ /\A(.*^\{\{\s*\$NEXT\s*\}\}.*?^)(.*)/ms
+              or $heading =~ /\A(.*?)((?:^\s+-.*)?)\z/ms;
+
+            my ($prelude, $changes) = ($1, $2);
+
+            my $date = strftime '%Y-%m-%d', gmtime;
+            if (not $changes =~ s/(Update from Mozilla repository to )[\d-]+/$1$date/) {
+                $changes ||= "\n";
+                $changes = "  - Update from Mozilla repository to $date\n" . $changes;
+            }
+
+            print { $out } $prelude . $changes . $line;
+        }
+        else {
+            $heading .= $line;
+        }
+    }
+
+    print "Updating Changes file.\n";
+    rename $outfile, $infile
+        or die "can't replace $infile with $outfile: $!";
+}

@@ -1,3 +1,5 @@
+package t::common;
+package main;
 use strict;
 
 # Shared defs for test programs
@@ -126,7 +128,7 @@ BEGIN {
     }
 }
 use constant HAVEZIP   => !!File::Which::which('zip');
-use constant HAVEUNZIP => undef; #!!File::Which::which('unzip');
+use constant HAVEUNZIP => !!File::Which::which('unzip');
 
 use constant ZIP     => 'zip ';
 use constant ZIPTEST => 'unzip -t ';
@@ -154,7 +156,9 @@ sub testZip {
     }
     my $cmd = ZIPTEST . $zipName . ($^O eq 'MSWin32' ? '' : ' 2>&1');
     my $zipout = `$cmd`;
-    return wantarray ? ($?, $zipout) : $?;
+
+    my $res = ($? != 0 && $? != -1) ? $? : 0;
+    return wantarray ? ($res, $zipout) : $res;
 }
 
 # Return the crc-32 of the given file (0 if empty or error)
@@ -231,13 +235,13 @@ sub passthrough
     my $toFile = shift ;
     my $action = shift ;
 
-    my $z = Archive::Zip->new; 
+    my $z = Archive::Zip->new;
     $z->read($fromFile);
     if ($action)
     {
         for my $member($z->members())
         {
-            &$action($member) ; 
+            &$action($member) ;
         }
     }
     $z->writeToFileNamed($toFile);

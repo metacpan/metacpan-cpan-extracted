@@ -781,6 +781,9 @@ paths:
           tEXt/HTml:
             schema:
               not: true
+          text/plain:
+            schema:
+              const: éclair
           unknown/encodingtype:
             schema:
               not: true
@@ -807,7 +810,7 @@ YAML
   );
 
 
-  $request = request('GET', 'http://example.com/foo', [ 'Content-Type' => 'text/plain' ], 'plain text');
+  $request = request('GET', 'http://example.com/foo', [ 'Content-Type' => 'text/bloop' ], 'plain text');
   cmp_deeply(
     ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
     {
@@ -817,11 +820,11 @@ YAML
           instanceLocation => '/request/body',
           keywordLocation => jsonp(qw(/paths /foo get requestBody content)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get requestBody content)))->to_string,
-          error => 'incorrect Content-Type "text/plain"',
+          error => 'incorrect Content-Type "text/bloop"',
         },
       ],
     },
-    'wrong Content-Type',
+    'Content-Type not allowed by the schema',
   );
 
 
@@ -905,6 +908,50 @@ YAML
   );
 
 
+  $request = request('GET', 'http://example.com/foo', [ 'Content-Type' => 'text/plain; charset=UTF-8' ],
+    chr(0xe9).'clair"}');
+  cmp_deeply(
+    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/request/body',
+          keywordLocation => jsonp(qw(/paths /foo get requestBody content text/plain)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get requestBody content text/plain)))->to_string,
+          error => re(qr/^could not decode content as UTF-8: UTF-8 "\\xE9" does not map to Unicode/),
+        },
+      ],
+    },
+    'errors during charset decoding are detected',
+  );
+
+  $request = request('GET', 'http://example.com/foo', [ 'Content-Type' => 'text/plain; charset=ISO-8859-1' ],
+    chr(0xe9).'clair');
+  cmp_deeply(
+    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    { valid => true },
+    'latin1 content can be successfully decoded',
+  );
+
+  $request = request('GET', 'http://example.com/foo', [ 'Content-Type' => 'text/plain; charset=UTF-8' ],
+    chr(0xe9).'clair');
+  cmp_deeply(
+    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/request/body',
+          keywordLocation => jsonp(qw(/paths /foo get requestBody content text/plain)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get requestBody content text/plain)))->to_string,
+          error => re(qr/^could not decode content as UTF-8: UTF-8 "\\xE9" does not map to Unicode/),
+        },
+      ],
+    },
+    'errors during charset decoding are detected',
+  );
+
   $request = request('GET', 'http://example.com/foo', [ 'Content-Type' => 'application/json; charset=UTF-8' ],
     '{"alpha": "123", "beta": "'.chr(0xe9).'clair"}');
   cmp_deeply(
@@ -916,13 +963,12 @@ YAML
           instanceLocation => '/request/body',
           keywordLocation => jsonp(qw(/paths /foo get requestBody content application/json)),
           absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get requestBody content application/json)))->to_string,
-          error => re(qr/^could not decode content as UTF-8: UTF-8 "\\xE9" does not map to Unicode/),
+          error => re(qr/^could not decode content as application\/json: malformed UTF-8 character in JSON string/),
         },
       ],
     },
-    'errors during charset decoding are detected',
+    'charset encoding errors in json are decoded in the main decoding step',
   );
-
 
   $request = request('GET', 'http://example.com/foo', [ 'Content-Type' => 'application/json; charset=UTF-8' ],
     '{corrupt json');
@@ -943,14 +989,21 @@ YAML
   );
 
 
-  $request = request('GET', 'http://example.com/foo', [ 'Content-Type' => 'application/json; charset=ISO-8859-1' ],
-    '{"alpha": "123", "beta": "'.chr(0xe9).'clair"}');
+  $request = request('GET', 'http://example.com/foo', [ 'Content-Type' => 'application/json' ],
+    '{"alpha": "123", "beta": "'."\x{c3}\x{a9}".'clair"}');
   cmp_deeply(
     ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
     { valid => true },
-    'content matches',
+    'application/json is utf-8 encoded',
   );
 
+  $request = request('GET', 'http://example.com/foo', [ 'Content-Type' => 'application/json; charset=UTF-8' ],
+    '{"alpha": "123", "beta": "'."\x{c3}\x{a9}".'clair"}');
+  cmp_deeply(
+    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    { valid => true },
+    'charset is ignored for application/json',
+  );
 
   $request = request('GET', 'http://example.com/foo', [ 'Content-Type' => 'application/json; charset=UTF-8' ],
     '{"alpha": "foo", "gamma": "o.o"}');

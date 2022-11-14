@@ -1,5 +1,7 @@
 class IO::Socket extends IO::Handle {
   interface IO::Socket::Interface;
+
+  has fd : int;
   
   method has_interfaces : int () { return 1; }
   

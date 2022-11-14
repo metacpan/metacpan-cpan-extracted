@@ -1,0 +1,76 @@
+---
+abstract: 'unofficial support for the Customer.io service'
+author:
+  - 'DERIV <DERIV@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Async::Loop: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::CheckDeps: '0.010'
+  Test::Fatal: '0'
+  Test::MockObject: '0'
+  Test::MockObject::Extends: '0'
+  Test::More: '0.94'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '7.64'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: WebService-Async-CustomerIO
+no_index:
+  directory:
+    - eg
+    - share
+    - shares
+    - t
+    - xt
+provides:
+  WebService::Async::CustomerIO:
+    file: lib/WebService/Async/CustomerIO.pm
+    version: '0.001'
+  WebService::Async::CustomerIO::Customer:
+    file: lib/WebService/Async/CustomerIO/Customer.pm
+    version: '0.001'
+  WebService::Async::CustomerIO::RateLimiter:
+    file: lib/WebService/Async/CustomerIO/RateLimiter.pm
+    version: '0.001'
+  WebService::Async::CustomerIO::Trigger:
+    file: lib/WebService/Async/CustomerIO/Trigger.pm
+    version: '0.001'
+requires:
+  Carp: '0'
+  Future: '0'
+  IO::Async::Loop: '0'
+  IO::Async::Notifier: '0'
+  JSON::MaybeUTF8: '0'
+  Net::Async::HTTP: '0'
+  Syntax::Keyword::Try: '0'
+  URI::Escape: '0'
+  constant: '0'
+  mro: '0'
+  parent: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/binary-com/perl-WebService-Async-CustomerIO/issues
+  homepage: https://github.com/binary-com/perl-WebService-Async-CustomerIO
+  repository: https://github.com/binary-com/perl-WebService-Async-CustomerIO.git
+version: '0.001'
+x_authority: cpan:DERIV
+x_contributors:
+  - 'Kirill Sysoev <kirill@binary.com>'
+  - 'Kirill Sysoev <55120154+kirill-binary@users.noreply.github.com>'
+  - 'chylli-binary <chylli@binary.com>'
+  - 'abdalla-deriv <83196346+abdalla-deriv@users.noreply.github.com>'
+  - 'Arun Venkataraman <arun@regentmarkets.com>'
+  - 'billmarriott-binary <38449124+billmarriott-binary@users.noreply.github.com>'
+  - 'Tom Molesworth <tom@binary.com>'
+x_generated_by_perl: v5.26.2
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

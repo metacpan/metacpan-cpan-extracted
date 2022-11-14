@@ -14,7 +14,7 @@ WriteMakefile(
     'warnings' => 0,
     'Dancer2' => 0,
     'JSON' => 0,
-    'Hash::Merge' => 0,
+    'Time::HiRes' => 0,
     'HTTP::Accept' => 0
   },
   TEST_REQUIRES => {

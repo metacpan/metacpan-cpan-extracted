@@ -17,8 +17,8 @@ subtest "simple message instance " => sub {
 
     my $mi = Protocol::FIX::MessageInstance->new($m, $ta);
     ok $mi;
-    is $mi->name,     'Heartbeat';
-    is $mi->category, 'admin';
+    is $mi->name,               'Heartbeat';
+    is $mi->category,           'admin';
     is $mi->value('TestReqID'), 'abc';
 };
 

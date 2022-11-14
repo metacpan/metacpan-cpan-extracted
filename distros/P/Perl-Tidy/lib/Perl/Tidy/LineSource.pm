@@ -8,7 +8,10 @@
 package Perl::Tidy::LineSource;
 use strict;
 use warnings;
-our $VERSION = '20220613';
+use English qw( -no_match_vars );
+our $VERSION = '20221112';
+
+use constant DEVEL_MODE => 0;
 
 sub AUTOLOAD {
 
@@ -41,16 +44,14 @@ sub new {
     my ( $class, @args ) = @_;
 
     my %defaults = (
-        input_file               => undef,
-        rOpts                    => undef,
-        rpending_logfile_message => undef,
+        input_file => undef,
+        rOpts      => undef,
     );
 
     my %args = ( %defaults, @args );
 
-    my $input_file               = $args{input_file};
-    my $rOpts                    = $args{rOpts};
-    my $rpending_logfile_message = $args{rpending_logfile_message};
+    my $input_file = $args{input_file};
+    my $rOpts      = $args{rOpts};
 
     my $input_line_ending;
     if ( $rOpts->{'preserve-line-endings'} ) {
@@ -59,22 +60,6 @@ sub new {
 
     ( my $fh, $input_file ) = Perl::Tidy::streamhandle( $input_file, 'r' );
     return unless $fh;
-
-    # in order to check output syntax when standard output is used,
-    # or when it is an object, we have to make a copy of the file
-    if ( ( $input_file eq '-' || ref $input_file ) && $rOpts->{'check-syntax'} )
-    {
-
-        # Turning off syntax check when input output is used.
-        # The reason is that temporary files cause problems on
-        # on many systems.
-        $rOpts->{'check-syntax'} = 0;
-
-        ${$rpending_logfile_message} .= <<EOM;
-Note: --syntax check will be skipped because standard input is used
-EOM
-
-    }
 
     return bless {
         _fh                => $fh,
@@ -91,7 +76,10 @@ sub close_input_file {
     # Only close physical files, not STDIN and other objects
     my $filename = $self->{_filename};
     if ( $filename ne '-' && !ref $filename ) {
-        eval { $self->{_fh}->close() };
+        my $ok = eval { $self->{_fh}->close(); 1 };
+        if ( !$ok && DEVEL_MODE ) {
+            Fault("Could not close file handle(): $EVAL_ERROR\n");
+        }
     }
     return;
 }
@@ -124,4 +112,3 @@ sub get_line {
     return $line;
 }
 1;
-

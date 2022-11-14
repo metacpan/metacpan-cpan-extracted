@@ -61,3 +61,23 @@ Mon Dec 11 13:37:12 EST 2000
 
     - Added string literals 'guttam' ('.') and 'comma' (',')
       (thanks, Chris!)
+
+
+0.603  Sat Nov 12 04:06:30 2022
+
+    - Added ERA (Perligata's equivalent of POD)
+      and bin/explica (Perligata's equivalent of perldoc)
+      (thanks, Paul!)
+
+    - Added 'parametra' (@ARGV) and 'parametro' (*ARGV)
+      (thanks, Paul)
+
+    - Added 'programma' ($0)
+
+    - Added 'semicolon' (';')
+
+
+0.604  Sat Nov 12 04:10:29 2022
+
+    - A couple of POD tweaks
+

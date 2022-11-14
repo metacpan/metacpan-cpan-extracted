@@ -117,13 +117,13 @@ The author created and uses his own custom all-purpose media player called
 "Audacious" audio player).  "Fauxdacious" 
 (L<https://wildstar84.wordpress.com/fauxdacious/>) incorporates this module to 
 decode and play streams, along with their titles / station names, and station 
-/ podcast / video icons! 
+/ podcast / video icons, artists / channel names, genres, and descriptions! 
 
 Please NOTE:  StreamFinder is a module, NOT a standalone application.  It is 
 designed to be used by other Perl applications.  To create your own very simple 
 application just to fetch streams manually, simply grab the code in the 
 B<SYNOPSIS> section above, save it to an executable text file, ie. 
-I<StreamFinder.pl> and run it from the command line with a supported streaming 
+I<StreamFinder.pl>, and run it from the command line with a supported streaming 
 site URL as the argument.  You can then edit it to tailor it to your needs.
 
 The currently-supported websites are:  
@@ -187,7 +187,7 @@ request via email or the CPAN bug system, or (for faster service), provide a
 Perl patch module / program source that can extract some or all of the 
 necessary information for streams on that site and I'll consider it!  The 
 easiest way to do this is to take one of the existing submodules, copy it to 
-"StreamFinder::I<YOURSITE>.pm" and modify it (and the POD docs) to your 
+"StreamFinder::I<YOURSITE>.pm", modify it (and the POD docs) to your 
 specific site's needs, test it on several of their pages (see the "SYNOPSIS" 
 code above), and send it to me (That's what I do when I want to add a 
 new site)!
@@ -226,7 +226,7 @@ For example, to NOT handle Youtube videos nor use the fallback
 will cause StreamFinder::Anystream and StreamFinder::Youtube to not be used 
 for the stream search.  Default is for all installed submodules to be 
 considered.  NOTE:  Omitting a module from being considered when seeking 
-to match the correct module by site URL, this does NOT prevent that 
+to match the correct module by site URL does NOT prevent that 
 module from being invoked by a selected module for an embedded link, OR 
 in the case of StreamFinder::Youtube being omitted, will still be invoked, 
 if required or needed by a non-omitted module initially selected!
@@ -250,10 +250,19 @@ submodule configuration files for the ones you wish to change.
 
 Additional options:
 
+I<-hls_bandwidth> => "I<number>"
+
+Limit HLS (m3u8) streams that contain a list of other HLS streams of varying 
+BANDWIDTH values (in BITS per second) by selecting the highest bitrate stream 
+at or below the specified limit when I<$stream->getURL()> is called.
+
+DEFAULT I<-none-> (no limiting by bitrate).
+
 I<-log> => "I<logfile>"
 
-Specify path to a log file.  If a valid and writable file is specified, A line will be 
-appended to this file every time one or more streams is successfully fetched for a url.
+Specify path to a log file.  If a valid and writable file is specified, A line 
+will be appended to this file every time one or more streams is successfully 
+fetched for a url.
 
 DEFAULT I<-none-> (no logging).
 
@@ -261,21 +270,21 @@ I<-logfmt> specifies a format string for lines written to the log file.
 
 DEFAULT "I<[time] [url] - [site]: [title] ([total])>".  
 
-The valid field I<[variables]> are:  [stream]: The url of the first/best stream found.  
-[site]:  The site (submodule) name matching the webpage url.  [url]:  The url 
-searched for streams.  [time]: Perl timestamp when the line was logged.  [title], 
-[artist], [album], [description], [year], [genre], [total], [albumartist]:  The 
-corresponding field data returned (or "I<-na->", if no value).
+The valid field I<[variables]> are:  [stream]: The url of the first/best stream 
+found.  [site]:  The site (submodule) name matching the webpage url.  
+[url]:  The url searched for streams.  [time]: Perl timestamp when the line was 
+logged.  [title], [artist], [album], [description], [year], [genre], [total], 
+[albumartist]:  The corresponding field data returned (or "I<-na->", 
+if no value).
 
 =item $station->B<get>(['playlist'])
 
 Returns an array of strings representing all stream URLs found.
 If I<"playlist"> is specified, then an extended m3u playlist is returned 
-instead of stream url(s).  NOTE:  For Apple, Castbox, Google, Spreaker, 
-and SermonAudio podcasts, if an author / channel page url is given, 
-rather than an individual podcast episode's url, get() returns the 
-first (latest?) podcast episode found, and get("playlist") returns an 
-extended m3u playlist containing the urls, titles, etc. for all the podcast 
+instead of stream url(s).  NOTE:  For podcast sites, if an author / channel 
+page url is given, rather than an individual podcast episode's url, get() 
+returns the first (latest?) podcast episode found, and get("playlist") returns 
+an extended m3u playlist containing the urls, titles, etc. for all the podcast 
 episodes found on that page url from latest to oldest.
 
 =item $station->B<getURL>([I<options>])
@@ -405,16 +414,17 @@ L<URI::Escape>, L<HTML::Entities>, L<LWP::UserAgent>
 =head1 RECCOMENDS
 
 youtube-dl, or other compatable program such as yt-dlp, etc. 
-(for Youtube, Bitchute, Blogger, Brighteon, Odysee, Tunein, Vimeo)
-NOTE:  Required for Youtube, Odysee, and Tunein (except for podcasts).
+(for Youtube, Bitchute, Blogger, Brighteon, Odysee, Vimeo)
+NOTE:  Required for Youtube, Odysee, and SoundCloud.
 
 wget
 
 =head1 BUGS
 
 Please report any bugs or feature requests to C<bug-streamFinder at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=StreamFinder>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=StreamFinder>.  
+I will be notified, and then you'llautomatically be notified of progress on 
+your bug as I make changes.
 
 =head1 SUPPORT
 
@@ -494,7 +504,7 @@ use strict;
 use warnings;
 use vars qw(@ISA @EXPORT $VERSION);
 
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 our $DEBUG = 0;
 
 require Exporter;

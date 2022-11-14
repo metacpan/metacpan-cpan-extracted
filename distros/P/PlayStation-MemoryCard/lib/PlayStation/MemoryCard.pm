@@ -1,6 +1,6 @@
 package PlayStation::MemoryCard;
 # Copyright (c) 2021 Gavin Hayes and others, see LICENSE in the root of the project
-use version; our $VERSION = version->declare("v0.2.0");
+use version; our $VERSION = version->declare("v0.2.1");
 use strict;
 use warnings;
 use Encode qw(decode encode);

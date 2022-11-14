@@ -21,7 +21,7 @@
 #endif
 
 // Module file name
-static const char* MFILE = "IO/Socket.c";
+static const char* MFILE = "IO/Socket/INET.c";
 
 int32_t SPVM__IO__Socket__INET__new(SPVM_ENV* env, SPVM_VALUE* stack) {
 
@@ -43,9 +43,9 @@ int32_t SPVM__IO__Socket__INET__new(SPVM_ENV* env, SPVM_VALUE* stack) {
   // Port
   int32_t port = stack[1].ival;
   
-  // Socket handle
-  int32_t handle = socket(AF_INET, SOCK_STREAM, 0);
-  if (handle < 0) {
+  // Socket fd
+  int32_t fd = socket(AF_INET, SOCK_STREAM, 0);
+  if (fd < 0) {
     return env->die(env, stack,  "Can't create socket", MFILE, __LINE__);
   }
   
@@ -73,7 +73,7 @@ int32_t SPVM__IO__Socket__INET__new(SPVM_ENV* env, SPVM_VALUE* stack) {
   }
   
   // Connect
-  int32_t ret = connect(handle, (struct sockaddr *)&server, sizeof(server));
+  int32_t ret = connect(fd, (struct sockaddr *)&server, sizeof(server));
   if (ret != 0) {
     return env->die(env, stack,  "Can't connect to HTTP server : %s:%d", deststr, port, MFILE, __LINE__);
   }
@@ -82,8 +82,8 @@ int32_t SPVM__IO__Socket__INET__new(SPVM_ENV* env, SPVM_VALUE* stack) {
   void* obj_socket = env->new_object_by_name(env, stack,  "IO::Socket::INET", &e, __FILE__, __LINE__);
   if (e) { return e; }
   
-  // Set handle
-  env->set_field_int_by_name(env, stack,  obj_socket, "IO::Socket::INET", "handle", handle, &e, MFILE, __LINE__);
+  // Set fd
+  env->set_field_int_by_name(env, stack, obj_socket, "fd", fd, &e, MFILE, __LINE__);
   if (e) { return e; }
   
   stack[0].oval = obj_socket;
@@ -99,15 +99,15 @@ int32_t SPVM__IO__Socket__INET__read(SPVM_ENV* env, SPVM_VALUE* stack) {
   const char* buffer = (const char*)env->get_elems_byte(env, stack,  obj_buffer);
   int32_t length = env->length(env, stack,  obj_buffer);
   
-  int32_t handle = env->get_field_int_by_name(env, stack,  obj_socket, "IO::Socket::INET", "handle", &e, MFILE, __LINE__);
+  int32_t fd = env->get_field_int_by_name(env, stack,  obj_socket, "fd", &e, MFILE, __LINE__);
   if (e) { return e; }
 
-  if (handle < 0) {
+  if (fd < 0) {
     return env->die(env, stack,  "Handle is closed", MFILE, __LINE__);
   }
   
   /* HTTPリクエスト送信 */
-  int32_t read_length = recv(handle, (char*)buffer, length, 0);
+  int32_t read_length = recv(fd, (char*)buffer, length, 0);
   if (read_length < 0) {
     return env->die(env, stack,  "Socket read error", MFILE, __LINE__);
   }
@@ -125,15 +125,15 @@ int32_t SPVM__IO__Socket__INET__write(SPVM_ENV* env, SPVM_VALUE* stack) {
   const char* buffer = (const char*)env->get_elems_byte(env, stack,  obj_buffer);
   int32_t length = stack[2].ival;
   
-  int32_t handle = env->get_field_int_by_name(env, stack,  obj_socket, "IO::Socket::INET", "handle", &e, MFILE, __LINE__);
+  int32_t fd = env->get_field_int_by_name(env, stack,  obj_socket, "fd", &e, MFILE, __LINE__);
   if (e) { return e; }
   
-  if (handle < 0) {
+  if (fd < 0) {
     return env->die(env, stack,  "Handle is closed", MFILE, __LINE__);
   }
   
   /* HTTPリクエスト送信 */
-  int32_t write_length = send(handle, buffer, length, 0);
+  int32_t write_length = send(fd, buffer, length, 0);
   
   if (write_length < 0) {
     return env->die(env, stack,  "Socket write error", MFILE, __LINE__);
@@ -150,13 +150,13 @@ int32_t SPVM__IO__Socket__INET__close(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   void* obj_socket = stack[0].oval;
   
-  int32_t handle = env->get_field_int_by_name(env, stack,  obj_socket, "IO::Socket::INET", "handle", &e, MFILE, __LINE__);
+  int32_t fd = env->get_field_int_by_name(env, stack,  obj_socket, "fd", &e, MFILE, __LINE__);
   if (e) { return e; }
   
-  if (handle >= 0) {
-    int32_t ret = closesocket(handle);
+  if (fd >= 0) {
+    int32_t ret = closesocket(fd);
     if (ret == 0) {
-      env->set_field_int_by_name(env, stack,  obj_socket, "IO::Socket::INET", "handle", -1, &e, MFILE, __LINE__);
+      env->set_field_int_by_name(env, stack,  obj_socket, "fd", -1, &e, MFILE, __LINE__);
       if (e) { return e; }
     }
     else {
@@ -175,10 +175,10 @@ int32_t SPVM__IO__Socket__INET__fileno(SPVM_ENV* env, SPVM_VALUE* stack) {
   if (!obj_self) { return env->die(env, stack,  "Self must be defined", MFILE, __LINE__); }
   
   // File fh
-  int32_t handle = env->get_field_int_by_name(env, stack,  obj_self, "IO::Socket::INET", "handle", &e, MFILE, __LINE__);
+  int32_t fd = env->get_field_int_by_name(env, stack,  obj_self, "fd", &e, MFILE, __LINE__);
   if (e) { return e; }
   
-  stack[0].ival = handle;
+  stack[0].ival = fd;
 
   return 0;
 }

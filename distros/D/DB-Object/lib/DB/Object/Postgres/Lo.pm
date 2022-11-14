@@ -1,14 +1,14 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
-## DB/Object/Postgres/Lo.pm
-## Version 0.3
-## Copyright(c) 2019 Jacques Deguest
+## Database Object Interface - ~/lib/DB/Object/Postgres/Lo.pm
+## Version v0.300.1
+## Copyright(c) 2019 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2019/09/11
-## All rights reserved.
+## Modified 2022/11/04
+## All rights reserved
 ## 
-## This program is free software; you can redistribute it and/or modify it 
+## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
 ## Package for PostgreSQL large objects
@@ -19,7 +19,7 @@ BEGIN
     use warnings;
     use parent qw( Module::Generic );
     use vars qw( $VERSION );
-    our $VERSION = 'v0.300.0';
+    our $VERSION = 'v0.300.1';
     use Devel::Confess;
 };
 
@@ -182,7 +182,6 @@ sub write
 1;
 
 # NOTE: POD
-
 __END__
 
 =encoding utf-8

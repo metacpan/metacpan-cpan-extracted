@@ -212,12 +212,18 @@ t/00_socket_pre_02.t
 t/execv_success.pl
 t/exit_failure.pl
 t/exit_success.pl
+t/ftest/bar.txt
 t/ftest/dir_empty/.gitkeep
 t/ftest/file_bytes8.txt
 t/ftest/file_empty.txt
 t/ftest/file_new_lines.txt
+t/ftest/foo.txt
+t/ftest/readline_basic.txt
+t/ftest/readline_eof.txt
+t/ftest/readline_long_lines.txt
 t/lib/SPVM/TestCase/Sys/FileTest.spvm
 t/lib/SPVM/TestCase/Sys/IO.spvm
+t/lib/SPVM/TestCase/Sys/IO/Stat.spvm
 t/lib/SPVM/TestCase/Sys/Ioctl.spvm
 t/lib/SPVM/TestCase/Sys/Poll.spvm
 t/lib/SPVM/TestCase/Sys/Process.spvm
@@ -234,6 +240,7 @@ t/print_hello.pl
 t/Sys.t
 t/Sys_FileTest.t
 t/Sys_IO.t
+t/Sys_IO_Stat.t
 t/Sys_Ioctl.t
 t/Sys_Poll.t
 t/Sys_Process.t

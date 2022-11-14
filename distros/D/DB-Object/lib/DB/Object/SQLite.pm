@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/SQLite.pm
-## Version v0.400.7
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.400.8
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2022/06/29
+## Modified 2022/11/04
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -22,7 +22,6 @@ BEGIN
         $USE_BIND $USE_CACHE $MOD_PERL @DBH
     );
     use DBI qw( :sql_types );
-    # use DBD::SQLite;
     eval { require DBD::SQLite; };
     die( $@ ) if( $@ );
     use parent qw( DB::Object );
@@ -31,16 +30,15 @@ BEGIN
     use DateTime::TimeZone;
     use DateTime::Format::Strptime;
     use Module::Generic::File qw( sys_tmpdir );
-    use Number::Format;
     use Nice::Try;
-    $VERSION     = 'v0.400.7';
+    $VERSION     = 'v0.400.8';
     use Devel::Confess;
 };
 
 use strict;
 use warnings;
-require DB::Object::SQLite::Statement;
-require DB::Object::SQLite::Tables;
+# require DB::Object::SQLite::Statement;
+# require DB::Object::SQLite::Tables;
 $DB_ERRSTR     = '';
 $DEBUG         = 0;
 $CACHE_QUERIES = [];
@@ -53,7 +51,7 @@ $USE_CACHE     = 0;
 $MOD_PERL      = 0;
 @DBH           = ();
 if( $INC{ 'Apache/DBI.pm' } && 
-    substr( $ENV{ 'GATEWAY_INTERFACE' }|| '', 0, 8 ) eq 'CGI-Perl' )
+    substr( $ENV{GATEWAY_INTERFACE}|| '', 0, 8 ) eq 'CGI-Perl' )
 {
     $CONNECT_VIA = "Apache::DBI::connect";
     $MOD_PERL++;
@@ -1027,6 +1025,7 @@ sub _number_format
     my $self = shift( @_ );
     my @args = @_;
     my( $num, $tho, $dec, $prec ) = @args;
+    $self->_load_class( 'Number::Format' ) || return( $self->pass_error );
     my $fmt = Number::Format->new(
         -thousands_sep    => $tho,
         -decimal_point    => $dec,
@@ -1034,34 +1033,6 @@ sub _number_format
     );
     # 1 means with trailing zeros
     return( $fmt->format_number( $num, $prec, 1 ) );
-}
-
-# 1000 produces 001,000
-sub _number_format_v1_not_working
-{
-    my $self = shift( @_ );
-    my @args = @_;
-    my( $num, $tho, $dec, $prec ) = @args;
-    my $sign = ( $num <=> 0 );
-    $num     = abs( $num ) if( $sign < 0 );
-    my $mul  = ( 10 ** $prec );
-    my $res  = abs( $num );
-    $res     = ( int( ( $res * $mul ) + .5000001 ) / $mul );
-    # $num     = -$res if( $sign < 0 );
-    $res     = -$res if( $sign < 0 );
-    $num     = $res;
-    my $int  = int( $num );
-    my $decimal;
-    $decimal  = substr( $num, length( $int ) + 1 ) if( length( $int ) < length( $num ) );
-    $decimal  = '' unless( defined( $decimal ) );
-    # $decimal .= ''0'' x ( $prec - length( $decimal ) ) if( $prec > length( $decimal ) );
-    $int      = '0' x ( 3 - ( length( $int ) % 3 ) ) . $int;
-    $int      = join( $tho, grep{ $_ ne '' } split( /(...)/, $int ) );
-    $int      =~ s/^0+\\Q$tho\\E?//;dd
-    $int      = '0' if( $int eq '' );
-    $res      = ( ( defined( $decimal ) && length( $decimal ) ) ? join( $dec, $int, $decimal ) : $int );
-    # $res      =~ s/^-//;
-    return( ( $sign < 0 ) ? "-$res" : $res );
 }
 
 sub _power
@@ -1346,7 +1317,7 @@ DB::Object::SQLite - DB Object SQLite Driver
     
 =head1 VERSION
 
-    v0.400.7
+    v0.400.8
 
 =head1 DESCRIPTION
 

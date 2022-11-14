@@ -6,7 +6,7 @@ use File::Basename qw(dirname basename);
 use File::Copy;
 use Archive::SevenZip 'AZ_OK';
 
-our $VERSION= '0.16';
+our $VERSION= '0.17';
 
 sub new {
     my( $class, %options )= @_;
@@ -45,9 +45,17 @@ sub _params {
     }
 }
 
+sub read {
+    my( $self, $filename ) = _params(\@_, qw(filename));
+    $self->sevenZip->{archivename} = $filename;
+    return AZ_OK;
+}
+
 sub writeToFileNamed {
     my( $self, $targetName ) = _params(\@_, qw(fileName));
-    copy( $self->sevenZip->{archivename}, $targetName );
+
+    my $source = $self->sevenZip->archive_or_temp;
+    copy( $source, $targetName );
     return AZ_OK;
 }
 
@@ -254,7 +262,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2015-2019 by Max Maischein C<corion@cpan.org>.
+Copyright 2015-2022 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

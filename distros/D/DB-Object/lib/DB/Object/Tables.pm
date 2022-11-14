@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Tables.pm
-## Version v0.5.0
+## Version v0.5.1
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2021/08/29
+## Modified 2022/11/04
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -23,7 +23,7 @@ BEGIN
     use parent qw( DB::Object );
     use vars qw( $VERSION $VERBOSE $DEBUG );
     use DB::Object::Fields;
-    $VERSION    = 'v0.5.0';
+    $VERSION    = 'v0.5.1';
     $VERBOSE    = 0;
     $DEBUG      = 0;
     use Devel::Confess;
@@ -82,7 +82,7 @@ sub init
     return( $self );
 }
 
-## Get/set alias
+# Get/set alias
 sub alias
 {
     my $self = shift( @_ );
@@ -733,7 +733,7 @@ DB::Object::Tables - Database Table Object
 
 =head1 VERSION
 
-    v0.5.0
+    v0.5.1
 
 =head1 DESCRIPTION
 

@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-02'; # DATE
+our $DATE = '2022-11-10'; # DATE
 our $DIST = 'App-BPOMUtils'; # DIST
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/BPOMUtils/bpom_list_food_types",
@@ -40,11 +40,11 @@ bpom-daftar-jenis-pangan - List food types in BPOM processed food division
 
 =head1 VERSION
 
-This document describes version 0.013 of bpom-daftar-jenis-pangan (from Perl distribution App-BPOMUtils), released on 2022-11-02.
+This document describes version 0.014 of bpom-daftar-jenis-pangan (from Perl distribution App-BPOMUtils), released on 2022-11-10.
 
 =head1 SYNOPSIS
 
-B<bpom-daftar-jenis-pangan> L<--help|/"--help, -h, -v"> (or L<-h|/"--help, -h, -v">, L<-?|/"--help, -h, -v">)
+B<bpom-daftar-jenis-pangan> L<--help|/"--help, -h, -?"> (or L<-h|/"--help, -h, -?">, L<-?|/"--help, -h, -?">)
 
 B<bpom-daftar-jenis-pangan> L<--version|/"--version, -v"> (or L<-v|/"--version, -v">)
 

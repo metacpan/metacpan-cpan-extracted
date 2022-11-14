@@ -1,0 +1,17 @@
+{
+    "applicants": "/v3.4/applicants",
+    "applicant": "/v3.4/applicants/{applicant_id}",
+    "documents": "/v3.4/documents",
+    "document": "/v3.4/documents/{document_id}",
+    "document_download": "/v3.4/documents/{document_id}/download",
+    "checks": "/v3.4/checks",
+    "check": "/v3.4/checks/{check_id}",
+    "photos": "/v3.4/live_photos{?applicant_id}",
+    "photo": "/v3.4/live_photos/{live_photo_id}",
+    "photo_upload": "/v3.4/live_photos",
+    "photo_download": "/v3.4/live_photos/{live_photo_id}/download",
+    "reports": "/v3.4/reports",
+    "report": "/v3.4/reports/{report_id}",
+    "sdk_token": "/v3.4/sdk_token",
+    "check_download": "/v3.4/checks/{check_id}/download"
+}

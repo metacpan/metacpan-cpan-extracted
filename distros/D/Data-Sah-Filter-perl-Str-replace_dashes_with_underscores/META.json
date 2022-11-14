@@ -46,7 +46,7 @@
    "provides" : {
       "Data::Sah::Filter::perl::Str::replace_dashes_with_underscores" : {
          "file" : "lib/Data/Sah/Filter/perl/Str/replace_dashes_with_underscores.pm",
-         "version" : "0.003"
+         "version" : "0.004"
       }
    },
    "release_status" : "stable",
@@ -61,7 +61,7 @@
          "web" : "https://github.com/perlancar/perl-Data-Sah-Filter-perl-Str-replace_dashes_with_underscores"
       }
    },
-   "version" : "0.003",
+   "version" : "0.004",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
@@ -418,7 +418,7 @@
                      {
                         "class" : "Pod::Weaver::Section::PERLANCAR::Contributing",
                         "name" : "@Author::PERLANCAR/PERLANCAR/Contributing",
-                        "version" : "0.292"
+                        "version" : "0.293"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Legal",
@@ -428,7 +428,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::Rinci",
                         "name" : "@Author::PERLANCAR/Rinci",
-                        "version" : "0.783"
+                        "version" : "0.784"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::AppendPrepend",

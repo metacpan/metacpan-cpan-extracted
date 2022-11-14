@@ -6,7 +6,7 @@ use Carp qw( croak );
 use base qw( FFI::C::File );
 
 # ABSTRACT: Perl interface to C File pointer with POSIX extensions
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.14'; # VERSION
 
 
 our $ffi = $FFI::C::File::ffi;
@@ -57,7 +57,7 @@ FFI::C::PosixFile - Perl interface to C File pointer with POSIX extensions
 
 =head1 VERSION
 
-version 0.12
+version 0.14
 
 =head1 SYNOPSIS
 

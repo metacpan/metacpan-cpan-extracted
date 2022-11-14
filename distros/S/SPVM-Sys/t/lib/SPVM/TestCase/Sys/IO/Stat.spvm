@@ -1,0 +1,148 @@
+class TestCase::Sys::IO::Stat {
+  use Fn;
+  use Sys::IO::Stat;
+  use Sys;
+  use Sys::IO;
+
+  static method stat : int ($test_dir : string) {
+    
+    {
+      my $file = "$test_dir/ftest/readline_long_lines.txt";
+      
+      my $stat = Sys::IO::Stat->new;
+      my $status = Sys::IO::Stat->stat($file, $stat);
+      unless ($status == 0) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+
+  static method stat_info : long[] ($test_dir : string) {
+    
+    my $file = "$test_dir/ftest/readline_long_lines.txt";
+    
+    my $stat = Sys::IO::Stat->new;
+    Sys::IO::Stat->stat($file, $stat);
+    
+    my $stat_info = [
+      (long)$stat->st_dev,
+      (long)$stat->st_ino,
+      (long)$stat->st_mode,
+      (long)$stat->st_nlink,
+      (long)$stat->st_uid,
+      (long)$stat->st_gid,
+      (long)$stat->st_rdev,
+      (long)$stat->st_size,
+      (long)$stat->st_atime,
+      (long)$stat->st_mtime,
+      (long)$stat->st_ctime,
+      0,
+      0,
+    ];
+    
+    warn("[Test Output]stat:" . $stat->st_atime . " " . $stat->st_mtime . " " . $stat->st_ctime);
+    
+    unless (Sys->defined("_WIN32")) {
+      $stat_info->[11] = (long)$stat->st_blksize;
+      $stat_info->[12] = (long)$stat->st_blocks;
+    }
+    
+    return $stat_info;
+  }
+
+  static method lstat : int ($test_dir : string) {
+    
+    {
+      my $file = "$test_dir/ftest/readline_long_lines.txt";
+      
+      my $stat = Sys::IO::Stat->new;
+      my $status = Sys::IO::Stat->lstat($file, $stat);
+      unless ($status == 0) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+
+  static method lstat_info : long[] ($test_dir : string) {
+    
+    my $file = "$test_dir/ftest/readline_long_lines.txt";
+    
+    my $stat = Sys::IO::Stat->new;
+    Sys::IO::Stat->lstat($file, $stat);
+    
+    my $stat_info = [
+      (long)$stat->st_dev,
+      (long)$stat->st_ino,
+      (long)$stat->st_mode,
+      (long)$stat->st_nlink,
+      (long)$stat->st_uid,
+      (long)$stat->st_gid,
+      (long)$stat->st_rdev,
+      (long)$stat->st_size,
+      (long)$stat->st_atime,
+      (long)$stat->st_mtime,
+      (long)$stat->st_ctime,
+      0,
+      0,
+    ];
+
+    unless (Sys->defined("_WIN32")) {
+      $stat_info->[11] = (long)$stat->st_blksize;
+      $stat_info->[12] = (long)$stat->st_blocks;
+    }
+    
+    return $stat_info;
+  }
+
+  static method fstat : int ($test_dir : string) {
+    
+    {
+      my $file = "$test_dir/ftest/readline_long_lines.txt";
+      my $stream = Sys::IO->fopen($file, "rb");
+      
+      my $stat = Sys::IO::Stat->new;
+      my $status = Sys::IO::Stat->fstat(Sys::IO->fileno($stream), $stat);
+      unless ($status == 0) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+
+  static method fstat_info : long[] ($test_dir : string) {
+    
+    my $file = "$test_dir/ftest/readline_long_lines.txt";
+    my $stream = Sys::IO->fopen($file, "rb");
+    
+    my $stat = Sys::IO::Stat->new;
+    Sys::IO::Stat->fstat(Sys::IO->fileno($stream), $stat);
+    
+    my $stat_info = [
+      (long)$stat->st_dev,
+      (long)$stat->st_ino,
+      (long)$stat->st_mode,
+      (long)$stat->st_nlink,
+      (long)$stat->st_uid,
+      (long)$stat->st_gid,
+      (long)$stat->st_rdev,
+      (long)$stat->st_size,
+      (long)$stat->st_atime,
+      (long)$stat->st_mtime,
+      (long)$stat->st_ctime,
+      0,
+      0,
+    ];
+
+    unless (Sys->defined("_WIN32")) {
+      $stat_info->[11] = (long)$stat->st_blksize;
+      $stat_info->[12] = (long)$stat->st_blocks;
+    }
+    
+    return $stat_info;
+  }
+}

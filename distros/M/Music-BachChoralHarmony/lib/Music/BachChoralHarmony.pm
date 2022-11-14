@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Parse the UCI Bach choral harmony data set
 
-our $VERSION = '0.0411';
+our $VERSION = '0.0412';
 
 use Moo;
 use strictures 2;
@@ -344,7 +344,7 @@ Music::BachChoralHarmony - Parse the UCI Bach choral harmony data set
 
 =head1 VERSION
 
-version 0.0411
+version 0.0412
 
 =head1 SYNOPSIS
 

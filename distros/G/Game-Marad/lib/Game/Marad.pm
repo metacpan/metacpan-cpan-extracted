@@ -1,6 +1,6 @@
 # -*- Perl -*-
 
-package Game::Marad 0.04;
+package Game::Marad 0.05;
 use 5.26.0;
 use Object::Pad 0.52;
 class Game::Marad :strict(params);
@@ -24,8 +24,8 @@ use constant {
     PIECE_BISHOP => 2,
     PIECE_KING   => 3,            # NOTE Rook and Bishop bits are set
 
-    PUSH_STOP => 0,
-    PUSH_OKAY => 1,
+    XX => 0,
+    YY => 1,
 };
 
 # NOTE the client is expected to be well behaved and to not modify the
@@ -91,14 +91,16 @@ method move( $srcx, $srcy, $dstx, $dsty ) {
     my $piece_type = $piece & TYPE_MASK;
     return 0, "invalid move type" unless ( $move_type & $piece_type ) > 0;
 
-    _move_pushing( $board, $move_count, $srcx, $srcy, $stepx, $stepy );
+    _move_stack( $board, $move_count, $srcx, $srcy, $stepx, $stepy );
 
     # score points for motion in the middle
     my $center = $board->[MIDDLE][MIDDLE];
     if ( $center > 0 and ( $center & MOVED_MASK ) == MOVED_MASK ) {
         $score->[ $center >> PLAYER_BIT & 1 ]++;
     }
-    # clear any moved bits
+    # clear any moved bits (keeps the map clean, only the middle moved
+    # bit really needs to be cleared, provided things that iterate over
+    # the $board extract the type and owner)
     for my $row ( $board->@* ) {
         for my $col ( $row->@* ) {
             $col &= ~MOVED_MASK;
@@ -122,34 +124,42 @@ method size() { return BOARD_SIZE }
 # this many moves happen in each turnpair
 sub _move_count () { 1 + int rand(MAX_MOVES) }
 
-# moves stuff around the board
-sub _move_pushing ( $grid, $moves, $srcx, $srcy, $stepx, $stepy ) {
-    state sub swap ( $grid, $x1, $y1, $x2, $y2 ) {
-        $grid->[$y1][$x1] |= MOVED_MASK;
-        ( $grid->[$y1][$x1], $grid->[$y2][$x2] ) =
-          ( $grid->[$y2][$x2], $grid->[$y1][$x1] );
-    }
-    state sub step ( $grid, $newx, $newy, $stepx, $stepy ) {
-        return PUSH_STOP
-          if $newx < 0
-          or $newx >= BOARD_SIZE
-          or $newy < 0
-          or $newy >= BOARD_SIZE;
-        return PUSH_OKAY if $grid->[$newy][$newx] == 0;    # empty
-        my ( $morex, $morey ) = ( $newx + $stepx, $newy + $stepy );
-        return PUSH_STOP
-          if __SUB__->( $grid, $morex, $morey, $stepx, $stepy ) != PUSH_OKAY;
-        swap( $grid, $newx, $newy, $morex, $morey );
-        return PUSH_OKAY;
-    }
-
-    my ( $morex, $morey ) = ( $srcx + $stepx, $srcy + $stepy );
-    for my $i ( 1 .. $moves ) {
-        last if step( $grid, $morex, $morey, $stepx, $stepy ) != PUSH_OKAY;
-        swap( $grid, $srcx, $srcy, $morex, $morey );
-        ( $srcx, $srcy ) = ( $morex, $morey );
-        $morex += $stepx;
-        $morey += $stepy;
+# moves stuff with less recursion than in prior versions (before 0.05)
+sub _move_stack ( $grid, $moves, $srcx, $srcy, $stepx, $stepy ) {
+    my $point = [];
+    $point->@[XX,YY] = ($srcx, $srcy);
+    my @stack = $point;
+    while ( $moves > 0 ) {
+        my $point = [];
+        $point->@[ XX, YY ] = ( $stack[-1][XX] + $stepx, $stack[-1][YY] + $stepy );
+        # edge: ran out of space for pushing
+        last
+          if $point->[XX] < 0
+          or $point->[XX] >= BOARD_SIZE
+          or $point->[YY] < 0
+          or $point->[YY] >= BOARD_SIZE;
+        push @stack, $point;
+        # empty cell: swap along the stack to advance the pieces
+        if ( $grid->[ $stack[-1][YY] ][ $stack[-1][XX] ] == PIECE_EMPTY ) {
+            for my $i ( reverse 0 .. ( $#stack - 1 ) ) {
+                # downside: this may happen more than it needs to
+                $grid->[ $stack[$i][YY] ][ $stack[$i][XX] ] |= MOVED_MASK;
+                my $j = $i + 1;
+                (   $grid->[ $stack[$i][YY] ][ $stack[$i][XX] ],
+                    $grid->[ $stack[$j][YY] ][ $stack[$j][XX] ]
+                  )
+                  = (
+                    $grid->[ $stack[$j][YY] ][ $stack[$j][XX] ],
+                    $grid->[ $stack[$i][YY] ][ $stack[$i][XX] ]
+                  );
+                # in theory one could collect a list of moves for use by
+                # an animation routine, or have a callback for that. but
+                # that would use more CPU and memory
+            }
+            shift @stack;
+            $moves--;
+        }
+        # non-empty cell: put it onto the stack next time around
     }
 }
 

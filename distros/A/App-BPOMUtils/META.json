@@ -75,11 +75,11 @@
    "provides" : {
       "App::BPOMUtils" : {
          "file" : "lib/App/BPOMUtils.pm",
-         "version" : "0.013"
+         "version" : "0.014"
       },
       "App::BPOMUtils::Table" : {
          "file" : "lib/App/BPOMUtils/Table.pm",
-         "version" : "0.013"
+         "version" : "0.014"
       }
    },
    "release_status" : "stable",
@@ -94,7 +94,7 @@
          "web" : "https://github.com/perlancar/perl-App-BPOMUtils"
       }
    },
-   "version" : "0.013",
+   "version" : "0.014",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

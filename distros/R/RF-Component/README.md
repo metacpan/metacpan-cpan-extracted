@@ -104,6 +104,11 @@ is the number of frequencies to represent complex port-parameter data:
     This is the unit expected in `value` afer parsing `value_code_regex`.
     Supported units: pF|nF|uF|uH|nH|R|Ohm|Ohms
 
+- `vars`: A hashref of variable=value.
+
+    This is an opaque variables structure.  Currently it is used for vars defined
+    in an MDIF file.
+
 You may also pass the above `new` options to the load call:
 
         my $cap = RF::Component->load('/path/to/capacitor.s2p', %options);
@@ -250,17 +255,81 @@ the insertion (S21) phase changes from negative through zero to positive."
 
 Internally this function uses the [IO::PDL::Touchstone](https://metacpan.org/pod/IO::PDL::Touchstone) `y_srf_ideal` function.
 
+# Parameter Matrix and Vector Functions
+
+## `$n = $self->freqs` - return a PDL vector of each frequency.
+
+## `$self->S($i, $j)` - Access the S-parameter matrix or index slices.
+
+If `$i` and `$j` are specified, then return a PDL vector `S_i,j` index slice
+at each frequency. The vector will contain one value for each frequency.  For
+example:
+
+        my $S11 = $self->S(1,1);
+
+If you omit `$i` and `$j` then this returns a (N,N,M) [piddle](https://metacpan.org/pod/PDL) where N is the
+number of ports and M is the number of frequencies.
+
+## `$self->Y($i, $j)` - Access the Y-parameter matrix or index slices.
+
+Same as `$self->S($i, $j)`, but for a Y-paramater matrix, see above.  Even
+if a Y-parameter data file was not loaded, Y-parameters will be calculated for
+you.
+
+## `$self->Z($i, $j)` - Access the Z-parameter matrix or index slices.
+
+Same as `$self->S($i, $j)`, but for a Z-paramater matrix, see above.  Even
+if a Z-parameter data file was not loaded, Z-parameters will be calculated for
+you.
+
+## `$self->ABCD($i, $j)` - Access the ABCD-parameter matrix or index slices.
+
+Same as `$self->S($i, $j)`, but for a ABCD-paramater matrix, see above.  Even
+if a ABCD-parameter data file was not loaded, ABCD-parameters will be calculated for
+you.
+
+## `$self->A()` - Return the A vector from the ABCD matrix.
+
+Same as `$self->ABCD(1,1)`, returns a vector for A values at each frequency.
+
+## `$self->B()` - Return the B vector from the ABCD matrix.
+
+Same as `$self->ABCD(1,2)`, returns a vector for B values at each frequency.
+
+## `$self->C()` - Return the C vector from the ABCD matrix.
+
+Same as `$self->ABCD(2,1)`, returns a vector for C values at each frequency.
+
+## `$self->D()` - Return the D vector from the ABCD matrix.
+
+Same as `$self->ABCD(2,2)`, returns a vector for D values at each frequency.
+
 # Helper Functions
 
 ## `$n = $self->num_ports` - return the number of ports in this component.
 
 ## `$n = $self->num_freqs` - return the number of frequencies in this component.
 
+## `@wsnp_list = $self->get_wsnp_list(%opts)` - return a list for passing to `wsnp()`
+
+Options:
+
+- `param_type` - One of S, Y, or Z.  The matrix returned in the list
+will be converted to the requested type (or an error will be thrown).
+- `output_f_unit` - Same as [wsnp](https://metacpan.org/pod/PDL::IO::Touchstone)'s `$to_hz` value
+- `output_fmt` - Same as [wsnp](https://metacpan.org/pod/PDL::IO::Touchstone)'s `$fmt` value
+
+The get\_wsnp\_list method returns a list compatible with
+[PDL::IO::Touchstone](https://metacpan.org/pod/PDL::IO::Touchstone)'s `wsnp($filename, @wsnp_list)` function, which writes
+a .sNp file.  It is also the list format used internally for MDIFs in
+[RF::Component::Multi](https://metacpan.org/pod/RF::Component::Multi).
+
 # SEE ALSO
 
 - [PDL::IO::Touchstone](https://metacpan.org/pod/PDL::IO::Touchstone) - The lower-level framework used by [RF::Component](https://metacpan.org/pod/RF::Component)
 - [RF::Component::Multi](https://metacpan.org/pod/RF::Component::Multi) - A list-encapsulation of [RF::Component](https://metacpan.org/pod/RF::Component) to provide vectorized operations
-on multiple components.
+on multiple components.  This allows you to open MDIF files in a classful-way.
+- [PDL::IO::MDIF](https://metacpan.org/pod/PDL::IO::MDIF) - Load MDIF files
 - Touchstone specification: [https://ibis.org/connector/touchstone\_spec11.pdf](https://ibis.org/connector/touchstone_spec11.pdf)
 
 # AUTHOR

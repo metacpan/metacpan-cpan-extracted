@@ -8,7 +8,7 @@ use v5.18;  # minimum for Object::Pad
 
 package Weather::GHCN::Fetch;
 
-our $VERSION = 'v0.0.009';
+our $VERSION = 'v0.0.010';
 
 =head1 NAME
 
@@ -16,7 +16,7 @@ Weather::GHCN::Fetch - Access the NOAA GHCN Global Historical Climatology Networ
 
 =head1 VERSION
 
-version v0.0.009
+version v0.0.010
 
 =head1 DESCRIPTION
 
@@ -121,49 +121,8 @@ provides documentation and a primary module name for the distribution.
 =head1 EXAMPLES
 
 The primary usefulness of this package comes from the application
-scripts.  Here are some examples:
-
-B<List the weather stations in NY state with "New York" in the name:>
-
-C<ghcn_fetch -country US -state NY -location "New York">
-
-B<List the New York weather stations active between 1900 and 1920:>
-
-C<ghcn_fetch -cou US -st NY -location "New York" -active 1900-1920>
-
-B<Report the yearly max, min and average temperatures at JFK airport:>
-
-C<ghcn_fetch yearly -cou US -st NY -location "New York JFK">
-
-B<Report the monthly max, min and average temperatures at JFK airport:>
-
-C<ghcn_fetch monthly -cou US -st NY -location "New York JFK">
-
-B<Report the daily max, min and average temperatures at JFK airport:>
-
-C<ghcn_fetch daily -cou US -st NY -location "New York JFK">
-
-B<Launch the GUI for an options dialog>
-
-C<ghcn_fetch -gui>
-
-(requires B<Tk> and B<Tk::Getopt> to be installed)
-
-B<Get documentation on all the options>
-
-C<ghcn_fetch -help>
-
-B<Find the 5-day heatwaves at the JFK airport station:>
-
-C<ghcn_fetch id -cou US -st NY -location "New York JFK" | ghcn_extremes>
-
-B<Find the 3-day coldwaves (<= 15C) at the JFK airport station:>
-
-C<ghcn_fetch id -cou US -st NY -location "New York JFK" | ghcn_extremes -cold -ndays 3 -limit -15>
-
-B<For each year between 1900 and 1950, count the number of active weather stations in NY state:>
-
-C<ghcn_fetch id -cou US -st NY -active 1900-1950 | ghcn_station_counts>
+scripts.  For example of the types of reports that can be generated,
+see the EXAMPLES section of the help documentation for B<ghcn_fetch>.
 
 =head1 AUTHOR
 

@@ -4,9 +4,10 @@
       "Gisle Aas <gisle@activestate.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "open_source"
+      "unknown",
+      "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -37,25 +38,24 @@
       },
       "test" : {
          "requires" : {
-            "Test" : "0"
+            "Test::More" : "0"
          }
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Mozilla-CA"
+         "web" : "https://github.com/libwww-perl/Mozilla-CA/issues"
       },
-      "homepage" : "https://github.com/gisle/mozilla-ca",
       "license" : [
          "https://www.mozilla.org/media/MPL/2.0/index.txt"
       ],
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/gisle/mozilla-ca.git",
-         "web" : "https://github.com/gisle/mozilla-ca"
+         "url" : "https://github.com/libwww-perl/Mozilla-CA.git",
+         "web" : "https://github.com/libwww-perl/Mozilla-CA"
       }
    },
-   "version" : "20211001",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "20221114",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

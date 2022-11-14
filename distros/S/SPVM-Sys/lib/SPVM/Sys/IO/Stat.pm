@@ -4,16 +4,15 @@ package SPVM::Sys::IO::Stat;
 
 =head1 Name
 
-SPVM::Sys::IO::Stat - struct stat in C language
+SPVM::Sys::IO::Stat - The stat Functions and The struct stat in C language
 
 =head1 Usage
   
-  use Sys::IO;
   use Sys::IO::Stat;
   
   my $file = "foo.txt";
   my $stat =  Sys::IO::Stat->new;
-  Sys::IO->stat($file, $stat);
+  Sys::IO::Stat->stat($file, $stat);
   
   my $st_mode = $stat->st_mode;
   my $st_size = $stat->st_size;
@@ -31,6 +30,58 @@ This is a L<pointer class|SPVM::Document::Language/"Pointer Class">.
   static method new : Sys::IO::Stat ();
 
 Create a new C<Sys::IO::Stat> object.
+
+=head2 stat_raw
+
+  static method stat_raw : int ($path : string, $stat : Sys::IO::Stat);
+
+The same as L</"stat">, but even if the return value is C<-1>, an exception will not be thrown.
+
+=head2 stat
+
+  static method stat : int ($path : string, $stat : Sys::IO::Stat);
+
+These functions return information about a file. No permissions are required on the file itself, but-in the case of stat() and lstat() - execute (search) permission is required on all of the directories in path that lead to the file.
+
+stat() stats the file pointed to by path and fills in buf.
+
+See the L<stat|https://linux.die.net/man/2/stat> function in Linux.
+
+The stat is L<Sys::IO::Stat|SPVM::Sys::IO::Stat> object.
+
+=head2 lstat_raw
+
+  static method lstat_raw : int ($path : string, $stat : Sys::IO::Stat);
+
+The same as L</"lstat">, but even if the return value is C<-1>, an exception will not be thrown.
+
+=head2 lstat
+
+  static method lstat : int ($path : string, $stat : Sys::IO::Stat);
+
+These functions return information about a file. No permissions are required on the file itself, but-in the case of stat() and lstat() - execute (search) permission is required on all of the directories in path that lead to the file.
+
+lstat() is identical to stat(), except that if path is a symbolic link, then the link itself is stat-ed, not the file that it refers to.
+
+See the L<lstat|https://linux.die.net/man/2/lstat> function in Linux.
+
+The stat is L<Sys::IO::Stat|SPVM::Sys::IO::Stat> object.
+
+=head2 fstat_raw
+
+  static method fstat_raw : int ($fd : int, $stat : Sys::IO::Stat);
+
+The same as L</"fstat">, but even if the return value is C<-1>, an exception will not be thrown.
+
+=head2 fstat
+
+  static method fstat : int ($fd : int, $stat : Sys::IO::Stat);
+
+fstat() is identical to stat(), except that the file to be stat-ed is specified by the file descriptor fd.
+
+See L<fstat(2) - Linux man page|https://linux.die.net/man/2/fsync> in Linux.
+
+The C<$stat> is a L<Sys::IO::Stat|SPVM::Sys::IO::Stat> object.
 
 =head1 Instance Methods
 

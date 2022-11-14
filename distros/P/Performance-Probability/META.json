@@ -4,7 +4,7 @@
       "binary.com <BINARY@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -13,36 +13,49 @@
       "version" : 2
    },
    "name" : "Performance-Probability",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "share",
+         "shares",
+         "t",
+         "xt"
+      ]
+   },
    "prereqs" : {
-      "build" : {
-         "requires" : {
-            "perl" : "5.014000"
-         }
-      },
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "6.48"
+            "ExtUtils::MakeMaker" : "7.64"
          }
       },
       "develop" : {
          "requires" : {
-            "Pod::Coverage::TrustPod" : "0",
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::Plugin::PerlTidy" : "0",
+            "Dist::Zilla::Plugin::Test::Perl::Critic" : "0",
+            "Dist::Zilla::PluginBundle::Author::DERIV" : "0",
+            "Software::License::Perl_5" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
             "Test::EOL" : "0",
+            "Test::MinimumVersion" : "0",
             "Test::Mojibake" : "0",
-            "Test::More" : "0.88",
+            "Test::More" : "0.96",
+            "Test::NoTabs" : "0",
+            "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
-            "Test::Pod::Coverage" : "1.08",
-            "Test::Pod::LinkCheck" : "0",
-            "Test::Synopsis" : "0",
             "Test::Version" : "1"
          }
       },
       "runtime" : {
          "requires" : {
+            "Exporter" : "0",
             "Machine::Epsilon" : "0",
             "Math::BivariateCDF" : "0",
             "Math::Gauss::XS" : "0",
-            "perl" : "5.014000"
+            "perl" : "5.010",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "test" : {
@@ -61,15 +74,39 @@
          }
       }
    },
-   "release_status" : "stable",
-   "resources" : {
-      "repository" : {
-         "type" : "git",
-         "url" : "git://github.com/binary-com/perl-Performace-Probability.git",
-         "web" : "https://github.com/binary-com/perl-Performace-Probability"
+   "provides" : {
+      "Performance::Probability" : {
+         "file" : "lib/Performance/Probability.pm",
+         "version" : "0.06"
       }
    },
-   "version" : "0.05",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0222"
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/binary-com/perl-Performance-Probability/issues"
+      },
+      "homepage" : "https://github.com/binary-com/perl-Performance-Probability",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/binary-com/perl-Performance-Probability.git",
+         "web" : "https://github.com/binary-com/perl-Performance-Probability"
+      }
+   },
+   "version" : "0.06",
+   "x_authority" : "cpan:DERIV",
+   "x_contributors" : [
+      "Shahrizal Shaari <shahrizal@binary.com>",
+      "Chylli <chylli@binary.com>",
+      "Jean-Yves Sireau <jy@binary.com>",
+      "Nobody User <nobody@ip-172-30-0-189>",
+      "root <root@ip-172-30-0-189>",
+      "Tom Molesworth <tom@binary.com>",
+      "Chylli <chylli.email@gmail.com>",
+      "Kaveh Mousavi Zamani <kavehmz@gmail.com>",
+      "yngshan <yngshan@binary.com>"
+   ],
+   "x_generated_by_perl" : "v5.26.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

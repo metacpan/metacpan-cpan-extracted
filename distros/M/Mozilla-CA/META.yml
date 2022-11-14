@@ -4,12 +4,12 @@ author:
   - 'Gisle Aas <gisle@activestate.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
-  Test: '0'
+  Test::More: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
-license: open_source
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -21,9 +21,8 @@ no_index:
 requires:
   perl: '5.006'
 resources:
-  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Mozilla-CA
-  homepage: https://github.com/gisle/mozilla-ca
+  bugtracker: https://github.com/libwww-perl/Mozilla-CA/issues
   license: https://www.mozilla.org/media/MPL/2.0/index.txt
-  repository: https://github.com/gisle/mozilla-ca.git
-version: '20211001'
+  repository: https://github.com/libwww-perl/Mozilla-CA.git
+version: '20221114'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,4 +1,30 @@
-Revision history for Task::BeLik::GEEKRUTH
+Revision history for Task::BeLike::GEEKRUTH
+
+1.0301 2022-11-13T04:12:40-05:00 America/New_York
+ [BUG FIXES]
+ - Add two Dzil plugins that aren't picked up by the PluginBundle
+
+ [STATISTICS]
+ - code churn: 2 files changed, 23 insertions(+), 8 deletions(-)
+
+1.0300 2022-11-12T22:10:53-05:00 America/New_York
+ [BUG FIXES]
+ - Updated Dist::Zilla::PluginBundle::GEEKRUTH to proper namespace
+
+ [DOCUMENTATION]
+ - Added more POD for setup tasks.
+
+ [ENHANCEMENTS]
+ - Added Dist::Zilla::Plugin::Git::PushInitial
+ - Added File::Temp
+ - Added Test::PostgreSQL
+ - Added Dancer2::Session::DBIC
+ - Added DBIx::Class::Schema::Loader
+ - Added Keyword::DEVELOPMENT
+ - Added Smart::Comments
+
+ [STATISTICS]
+ - code churn: 3 files changed, 44 insertions(+), 5 deletions(-)
 
 1.0200 2022-07-02T13:27:52-04:00 America/New_York
  [ENHANCEMENTS]

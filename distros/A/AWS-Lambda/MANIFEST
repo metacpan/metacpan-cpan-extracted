@@ -77,7 +77,15 @@ author/cfn-layer-runtime-x86_64.yml
 author/cfn-s3.yml
 author/deploy-ecr-stack.sh
 author/deploy-s3-stack.sh
+author/perl-stripper/Makefile
+author/perl-stripper/perl-stripper/Makefile
+author/perl-stripper/perl-stripper/cpanfile
+author/perl-stripper/perl-stripper/handler.pl
+author/perl-stripper/samconfig.toml
+author/perl-stripper/template.yaml
 author/perlstrip.sh
+author/pod-stripper/cpanfile
+author/pod-stripper/scripts/pod_stripper.pl
 author/publish-perl-runtimes.pl
 author/regions-arm64.txt
 author/regions-x86_64.txt

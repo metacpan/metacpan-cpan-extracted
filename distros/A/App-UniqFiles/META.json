@@ -33,18 +33,24 @@
       },
       "runtime" : {
          "requires" : {
+            "Cwd" : "0",
             "Data::Sah::Coerce::perl::To_array::From_str::comma_sep" : "0",
-            "Data::Sah::Compiler::perl::TH::array" : "0.911",
-            "Data::Sah::Compiler::perl::TH::bool" : "0.911",
-            "Data::Sah::Compiler::perl::TH::int" : "0.911",
-            "Data::Sah::Compiler::perl::TH::str" : "0.911",
+            "Data::Sah::Coerce::perl::To_float::From_str::percent" : "0",
+            "Data::Sah::Coerce::perl::To_float::From_str::suffix_datasize" : "0",
+            "Data::Sah::Compiler::perl::TH::array" : "0.914",
+            "Data::Sah::Compiler::perl::TH::bool" : "0.914",
+            "Data::Sah::Compiler::perl::TH::float" : "0.914",
+            "Data::Sah::Compiler::perl::TH::int" : "0.914",
+            "Data::Sah::Compiler::perl::TH::str" : "0.914",
             "Exporter" : "5.57",
             "File::Digest" : "0.009",
             "File::Find" : "0",
             "Log::ger" : "0.038",
-            "Perinci::CmdLine::Any" : "0.152",
-            "Perinci::CmdLine::Lite" : "1.915",
+            "Perinci::CmdLine::Any" : "0.154",
+            "Perinci::CmdLine::Lite" : "1.924",
             "Perinci::Sub::Util" : "0.470",
+            "Regexp::Util" : "0",
+            "Sah::Schema::filesize" : "0",
             "Sah::Schema::true" : "0",
             "perl" : "5.010001",
             "strict" : "0",
@@ -66,7 +72,7 @@
    "provides" : {
       "App::UniqFiles" : {
          "file" : "lib/App/UniqFiles.pm",
-         "version" : "0.134"
+         "version" : "0.138"
       }
    },
    "release_status" : "stable",
@@ -81,7 +87,7 @@
          "web" : "https://github.com/perlancar/perl-App-UniqFiles"
       }
    },
-   "version" : "0.134",
+   "version" : "0.138",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

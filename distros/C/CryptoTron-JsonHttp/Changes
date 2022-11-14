@@ -1,6 +1,14 @@
 Revision history for Perl extension CryptoTron-JsonHttp.
 
-0.12  2022-11-03
+0.14  2022-11-12
+        - Bug fixing.
+        - Hash reference changed in hash in subroutine call.
+        - Major changes in code. Major changes in documentation.
+
+0.13  2022-11-04
+        - Bug fixing.
+
+0.12  2022-11-04
         - Module GetBrokerage added.
         - Changes in named variables for more consistency.
         - Filter macro added for easier handling of packages.
@@ -29,7 +37,7 @@ Revision history for Perl extension CryptoTron-JsonHttp.
         - Module GetAccountResource added.
         - Module GetAccountNet added.
 
-0.03 - 0.06  2022-11-01
+0.04 - 0.06  2022-11-01
         - Bug fixing. Typo fixing.
 
 0.03  2022-10-31

@@ -33,11 +33,11 @@ Pg::Explain - Object approach at reading explain analyze output
 
 =head1 VERSION
 
-Version 2.3
+Version 2.4
 
 =cut
 
-our $VERSION = '2.3';
+our $VERSION = '2.4';
 
 =head1 SYNOPSIS
 
@@ -676,10 +676,10 @@ Output looks like this:
 
  {
      'top_node'               => {...}
-     'planning_time'          => '12.34',
+     'planning_time'          => '12.44',
      'planning_buffers'       => {...},
-     'execution_time'         => '12.34',
-     'total_runtime'          => '12.34',
+     'execution_time'         => '12.44',
+     'total_runtime'          => '12.44',
      'trigger_times'          => [
         { 'name' => ..., 'time' => ..., 'calls' => ... },
         ...
@@ -725,12 +725,18 @@ sub anonymize {
     my $self       = shift;
     my @extra_args = @_;
 
-    my $anonymizer = Pg::Explain::StringAnonymizer->new();
-    $self->top_node->anonymize_gathering( $anonymizer );
-    $anonymizer->finalize();
-    $self->top_node->anonymize_substitute( $anonymizer );
+    my $anonymizer = $self->{ 'anonymizer' };
+    if ( !$anonymizer ) {
+        $anonymizer = Pg::Explain::StringAnonymizer->new();
+        $self->top_node->anonymize_gathering( $anonymizer );
+        $anonymizer->finalize();
+        $self->top_node->anonymize_substitute( $anonymizer );
+        $self->{ 'anonymizer' } = $anonymizer;
+    }
 
     return if 0 == scalar @extra_args;
+
+    return $anonymizer->anonymize_text( $extra_args[ 0 ] ) if 1 == scalar @extra_args;
 
     return map { $anonymizer->anonymize_text( $_ ) } @extra_args;
 }

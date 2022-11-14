@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/EventTarget.pm
-## Version v0.2.1
+## Version v0.2.2
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/11
-## Modified 2022/09/20
+## Modified 2022/11/11
 ## All rights reserved
 ## 
 ## 
@@ -27,7 +27,7 @@ BEGIN
     our $PACK_SUB_RE = qr/^(((?<pack>[a-zA-Z\_]\w*(?:\:\:\w+)*)\:\:)?(?<sub>\w+))$/;
     # Hash reference of signal to array of object to remove their listeners
     our $SIGNALS = {};
-    our $VERSION = 'v0.2.1';
+    our $VERSION = 'v0.2.2';
 };
 
 use strict;
@@ -72,7 +72,7 @@ sub addEventListener
     $post_processing = CORE::delete( $opts->{post_processing} ) if( CORE::exists( $opts->{post_processing} ) && ref( $opts->{post_processing} ) eq 'CODE' );
     if( scalar( keys( %$opts ) ) )
     {
-        warnings::warn( "Unrecognised options: '", join( "', '", sort( keys( %$opts ) ) ), "'\n" ) if( warnings::enabled( 'HTML::Object' ) );
+        warnings::warn( "Unrecognised options: '" . join( "', '", sort( keys( %$opts ) ) ) . "'\n" ) if( warnings::enabled( 'HTML::Object' ) );
     }
     $params->{capture} //= 0;
     $params->{once}    //= 0;
@@ -412,7 +412,7 @@ sub removeEventListener
     @$params{ @ok_params } = CORE::delete( @$opts{ @ok_params } );
     if( scalar( keys( %$opts ) ) )
     {
-        warnings::warn( "Unrecognised options: '", join( "', '", sort( keys( %$opts ) ) ), "'\n" ) if( warnings::enabled( 'HTML::Object' ) );
+        warnings::warn( "Unrecognised options: '" . join( "', '", sort( keys( %$opts ) ) ) . "'\n" ) if( warnings::enabled( 'HTML::Object' ) );
     }
     $params->{capture} //= 0;
     my $key = join( ';', $type, Scalar::Util::refaddr( $callback ), $params->{capture} );
@@ -510,7 +510,7 @@ HTML::Object::EventTarget - HTML Object Event Target Class
 
 =head1 VERSION
 
-    v0.2.1
+    v0.2.2
 
 =head1 DESCRIPTION
 

@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-17'; # DATE
+our $DATE = '2022-08-25'; # DATE
 our $DIST = 'Data-Sah-Filter-perl-Str-try_decode_json'; # DIST
-our $VERSION = '0.002'; # VERSION
+our $VERSION = '0.003'; # VERSION
 
 sub meta {
     +{
@@ -55,7 +55,7 @@ Data::Sah::Filter::perl::Str::try_decode_json - JSON-decode if we can, otherwise
 
 =head1 VERSION
 
-This document describes version 0.002 of Data::Sah::Filter::perl::Str::try_decode_json (from Perl distribution Data-Sah-Filter-perl-Str-try_decode_json), released on 2022-07-17.
+This document describes version 0.003 of Data::Sah::Filter::perl::Str::try_decode_json (from Perl distribution Data-Sah-Filter-perl-Str-try_decode_json), released on 2022-08-25.
 
 =head1 SYNOPSIS
 
@@ -80,12 +80,12 @@ This document describes version 0.002 of Data::Sah::Filter::perl::Str::try_decod
 
 =head2 Sample data and filtering results
 
- undef # valid, unchanged
- "foo" # valid, unchanged
- "[1," # valid, unchanged
- "\"foo\"" # valid, becomes "foo"
- "[1,2]" # valid, becomes [1,2]
- "null" # valid, becomes undef
+ undef # valid, unchanged (Unfiltered)
+ "foo" # valid, unchanged (Unquoted becomes as-is)
+ "[1," # valid, unchanged (Misquoted becomes as-is)
+ "\"foo\"" # valid, becomes "foo" (Quoted string becomes string)
+ "[1,2]" # valid, becomes [1,2] (Quoted array becomes array)
+ "null" # valid, becomes undef (Bare null keyword becomes undef)
 
 =head1 DESCRIPTION
 
@@ -122,9 +122,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

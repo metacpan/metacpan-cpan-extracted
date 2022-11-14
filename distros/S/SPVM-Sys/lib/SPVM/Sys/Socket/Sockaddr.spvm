@@ -17,11 +17,8 @@ class Sys::Socket::Sockaddr : pointer_t {
   }
   
   method clone : Sys::Socket::Sockaddr () {
-    warn("OOO");
     
     my $clone = (Sys::Socket::Sockaddr)$self->(Cloneable)->clone;
-
-    warn("PPP");
     
     return $clone;
   }

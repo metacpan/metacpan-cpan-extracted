@@ -1,5 +1,5 @@
 package Algorithm::QuadTree;
-$Algorithm::QuadTree::VERSION = '0.3';
+$Algorithm::QuadTree::VERSION = '0.5';
 use strict;
 use warnings;
 use Carp;
@@ -31,6 +31,9 @@ BEGIN {
 
 	$backend->import;
 }
+
+# List::Util 1.45 added 'uniqstr'
+use constant HAS_LIST_UTIL => eval { require List::Util; List::Util->VERSION('1.45'); 1 };
 
 sub new
 {
@@ -98,16 +101,6 @@ sub add
 	@coords = $self->_adjustCoords(@coords)
 		unless $self->{SCALE} == 1;
 
-	# if the object is rectangular, make sure the lower coordinate is always
-	# the first one
-	if (@coords == 4) {
-		($coords[0], $coords[2]) = ($coords[2], $coords[0])
-			if $coords[2] < $coords[0];
-
-		($coords[1], $coords[3]) = ($coords[3], $coords[1])
-			if $coords[3] < $coords[1];
-	}
-
 	_AQT_addObject($self, $object, @coords);
 
 	return;
@@ -138,19 +131,12 @@ sub getEnclosedObjects
 	@coords = $self->_adjustCoords(@coords)
 		unless $self->{SCALE} == 1;
 
-	my @results = @{_AQT_findObjects($self, @coords)};
-
-	# uniq results
-	my %temp = map { $_ => $_ } @results;
+	return _uniq(_AQT_findObjects($self, @coords));
 
 	# PS. I don't check explicitly if those objects
 	# are enclosed in the given area. They are just
 	# part of the segments that are enclosed in the
 	# given area. TBD.
-
-	# get values of %temp, since keys are strings
-	# even if they were references originally
-	return [values %temp];
 }
 
 sub setWindow
@@ -168,6 +154,20 @@ sub resetWindow
 
 	$self->{ORIGIN}[$_] = 0 for 0 .. 1;
 	$self->{SCALE} = 1;
+}
+
+# HELPERS
+# not called in object context
+
+sub _uniq
+{
+	if (HAS_LIST_UTIL) {
+		return [ List::Util::uniqstr(@{$_[0]}) ];
+	}
+	else {
+		my %temp = map { $_ => $_ } @{$_[0]};
+		return [ values %temp ];
+	}
 }
 
 1;
@@ -380,13 +380,13 @@ By default, the module uses L<Algorithm::QuadTree::PP>, which is the pure perl b
 
 If you install L<Algorithm::QuadTree::XS>, the module will load and use that
 instead. This behavior can be controlled by setting
-L<ALGORITHM_QUADTREE_BACKEND> environmental variable to the package name, which
+I<ALGORITHM_QUADTREE_BACKEND> environmental variable to the package name, which
 should be used as the backend.
 
 I<Note: the environmental variable must be present before loading Algorithm::QuadTree for the first time>
 
 	# will load pure perl backend regardless of XS availability
-	$ENV{ALGORITHM_QUADTREE_BACKEND} = 'Algorithm::QuadTree::PP';
+	BEGIN { $ENV{ALGORITHM_QUADTREE_BACKEND} = 'Algorithm::QuadTree::PP' };
 
 	use Algorithm::QuadTree;
 

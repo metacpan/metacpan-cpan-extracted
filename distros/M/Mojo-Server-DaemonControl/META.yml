@@ -3,11 +3,12 @@ abstract: 'A Mojolicious daemon manager'
 author:
   - 'Jan Henning Thorsen <jhthorsen@cpan.org>'
 build_requires:
-  Test2::Suite: '0.000145'
+  ExtUtils::MakeMaker: '0'
+  Test2::V0: '0.000145'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -17,14 +18,19 @@ no_index:
   directory:
     - t
     - inc
+    - examples
+    - t
 requires:
-  Mojolicious: '8.25'
-  perl: v5.20.0
+  Mojolicious: '9.00'
+  perl: '5.026'
 resources:
+  IRC:
+    url: irc://irc.libera.chat/#convos
+    web: https://web.libera.chat/#convos
   bugtracker: https://github.com/jhthorsen/mojo-server-daemoncontrol/issues
   homepage: https://github.com/jhthorsen/mojo-server-daemoncontrol
+  license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/jhthorsen/mojo-server-daemoncontrol.git
-version: '0.03'
-x_contributors:
-  - 'Jan Henning Thorsen'
+version: '0.05'
+x_contributors: []
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

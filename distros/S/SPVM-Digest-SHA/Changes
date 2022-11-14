@@ -1,3 +1,6 @@
+0.03 2022-11-14
+  [Prerequirement Changes]
+    * SPVM::Digest::SHA needs SPVM 0.9661+.
 0.02 2022-08-01
   [Internal Ineffective Changes]
     * Use get_field_object_by_name_v2 in SPVM/Digest/SHA.c

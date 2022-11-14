@@ -33,6 +33,7 @@ share/public_html/static/music_worklet_inprogress/decoder/deps/dr_libs/dr_flac.h
 share/public_html/static/music_worklet_inprogress/decoder/deps/dr_libs/LICENSE
 share/public_html/static/music_worklet_inprogress/decoder/deps/miniaudio/LICENSE
 share/public_html/static/music_worklet_inprogress/decoder/deps/miniaudio/miniaudio.h
+share/public_html/static/music_worklet_inprogress/decoder/exported_runtime_methods.pl
 share/public_html/static/music_worklet_inprogress/decoder/Makefile
 share/public_html/static/music_worklet_inprogress/decoder/mhfscl.js
 share/public_html/static/music_worklet_inprogress/decoder/src/blockvf.h

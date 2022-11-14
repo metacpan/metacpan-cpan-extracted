@@ -9,7 +9,7 @@ use overload
   fallback => 1;
 
 # ABSTRACT: Array instance for FFI
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.14'; # VERSION
 
 
 sub get
@@ -88,7 +88,7 @@ FFI::C::Array - Array instance for FFI
 
 =head1 VERSION
 
-version 0.12
+version 0.14
 
 =head1 SYNOPSIS
 

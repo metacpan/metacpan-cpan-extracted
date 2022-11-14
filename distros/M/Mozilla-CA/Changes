@@ -1,3 +1,12 @@
+Revision history for Mozilla-CA
+
+20221114
+  - Update from Mozilla repository to 2022-11-07
+  - stop installing mk-ca-bundle.pl script
+  - moved repository and issues to https://github.com/libwww-perl/Mozilla-CA
+  - switched tests from Test to Test::More
+  - fix license specification in metadata
+
 20211001
   - Update mk-ca-bundle.pl and Mozilla data to 2021-10-01 (Aaron Rowe)
   - Improve metadata for license information (Shoichi Kaji)

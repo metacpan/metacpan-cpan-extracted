@@ -3,7 +3,7 @@ meta-spec:
   version: 1.4
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
 name: mb-Encode
-version: 0.03
+version: 0.04
 abstract: provides MBCS encoder and decoder
 author:
   - ina <ina@cpan.org>

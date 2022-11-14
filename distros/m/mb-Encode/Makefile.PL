@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     'NAME'      => q{mb::Encode},
-    'VERSION'   => q{0.03},
+    'VERSION'   => q{0.04},
     'ABSTRACT'  => q{provides MBCS encoder and decoder},
     'PREREQ_PM' => {
         'Encode' => '0',

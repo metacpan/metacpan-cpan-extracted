@@ -69,7 +69,7 @@ int32_t SPVM__Sys__Time__clock_gettime(SPVM_ENV* env, SPVM_VALUE* stack) {
     st_tp = env->get_pointer(env, stack, obj_tp);
   }
   else {
-    return env->die(env, stack, "The tp must be defined", FILE_NAME, __LINE__);
+    return env->die(env, stack, "The $tp must be defined", FILE_NAME, __LINE__);
   }
   
   int32_t status = clock_gettime(clk_id, st_tp);
@@ -97,7 +97,7 @@ int32_t SPVM__Sys__Time__clock_getres(SPVM_ENV* env, SPVM_VALUE* stack) {
     st_res = env->get_pointer(env, stack, obj_res);
   }
   else {
-    return env->die(env, stack, "The res must be defined", FILE_NAME, __LINE__);
+    return env->die(env, stack, "The $res must be defined", FILE_NAME, __LINE__);
   }
   
   int32_t status = clock_getres(clk_id, st_res);
@@ -114,7 +114,7 @@ int32_t SPVM__Sys__Time__clock_getres(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__Time__setitimer(SPVM_ENV* env, SPVM_VALUE* stack) {
 #ifdef _WIN32
-  env->die(env, stack, "getitimer is not supported on this system", FILE_NAME, __LINE__);
+  env->die(env, stack, "getitimer is not supported on this system(_WIN32)", FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
   (void)env;
@@ -128,7 +128,7 @@ int32_t SPVM__Sys__Time__setitimer(SPVM_ENV* env, SPVM_VALUE* stack) {
     st_new_value = env->get_pointer(env, stack, obj_new_value);
   }
   else {
-    return env->die(env, stack, "The new_value must be defined", FILE_NAME, __LINE__);
+    return env->die(env, stack, "The $new_value must be defined", FILE_NAME, __LINE__);
   }
 
   void* obj_old_value = stack[1].oval;
@@ -152,7 +152,7 @@ int32_t SPVM__Sys__Time__setitimer(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__Time__getitimer(SPVM_ENV* env, SPVM_VALUE* stack) {
 #ifdef _WIN32
-  env->die(env, stack, "getitimer is not supported on this system", FILE_NAME, __LINE__);
+  env->die(env, stack, "getitimer is not supported on this system(_WIN32)", FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
   (void)env;
@@ -167,7 +167,7 @@ int32_t SPVM__Sys__Time__getitimer(SPVM_ENV* env, SPVM_VALUE* stack) {
     st_curr_value = env->get_pointer(env, stack, obj_curr_value);
   }
   else {
-    return env->die(env, stack, "The curr_value must be defined", FILE_NAME, __LINE__);
+    return env->die(env, stack, "The $curr_value must be defined", FILE_NAME, __LINE__);
   }
   
   int32_t status = getitimer(which, st_curr_value);
@@ -185,13 +185,13 @@ int32_t SPVM__Sys__Time__getitimer(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__Time__times(SPVM_ENV* env, SPVM_VALUE* stack) {
 #ifdef _WIN32
-  env->die(env, stack, "times is not supported on this system", FILE_NAME, __LINE__);
+  env->die(env, stack, "times is not supported on this system(_WIN32)", FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
   void* obj_tms = stack[0].oval;
   
   if (!obj_tms) {
-    return env->die(env, stack, "The buffer must be defined", FILE_NAME, __LINE__);
+    return env->die(env, stack, "The $tms must be defined", FILE_NAME, __LINE__);
   }
   
   struct tms* st_tms = env->get_pointer(env, stack, obj_tms);
@@ -235,7 +235,7 @@ int32_t SPVM__Sys__Time__clock_nanosleep(SPVM_ENV* env, SPVM_VALUE* stack) {
     st_request = env->get_pointer(env, stack, obj_request);
   }
   else {
-    return env->die(env, stack, "The request must be defined", FILE_NAME, __LINE__);
+    return env->die(env, stack, "The $request must be defined", FILE_NAME, __LINE__);
   }
   
   void* obj_remain = stack[3].oval;
@@ -269,7 +269,7 @@ int32_t SPVM__Sys__Time__nanosleep(SPVM_ENV* env, SPVM_VALUE* stack) {
     st_rqtp = env->get_pointer(env, stack, obj_rqtp);
   }
   else {
-    return env->die(env, stack, "The rqtp must be defined", FILE_NAME, __LINE__);
+    return env->die(env, stack, "The $rqtp must be defined", FILE_NAME, __LINE__);
   }
   
   void* obj_rmtp = stack[1].oval;

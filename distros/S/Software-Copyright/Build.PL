@@ -27,7 +27,7 @@ my %module_build_args = (
     "Dominique Dumont"
   ],
   "dist_name" => "Software-Copyright",
-  "dist_version" => "0.004",
+  "dist_version" => "0.005",
   "license" => "gpl",
   "module_name" => "Software::Copyright",
   "recursive_test_files" => 1,
@@ -46,8 +46,11 @@ my %module_build_args = (
     "warnings" => 0
   },
   "test_requires" => {
+    "English" => 0,
+    "File::Spec" => 0,
     "Test::Differences" => 0,
     "Test::More" => 0,
+    "Test::Perl::Critic" => 0,
     "Test::Synopsis::Expectation" => 0,
     "open" => 0,
     "strict" => 0
@@ -56,9 +59,12 @@ my %module_build_args = (
 
 
 my %fallback_build_requires = (
+  "English" => 0,
+  "File::Spec" => 0,
   "Module::Build" => "0.34",
   "Test::Differences" => 0,
   "Test::More" => 0,
+  "Test::Perl::Critic" => 0,
   "Test::Synopsis::Expectation" => 0,
   "open" => 0,
   "strict" => 0

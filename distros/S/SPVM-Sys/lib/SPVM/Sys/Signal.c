@@ -11,7 +11,7 @@ static const char* FILE_NAME = "Sys/Signal.c";
 
 int32_t SPVM__Sys__Signal__kill(SPVM_ENV* env, SPVM_VALUE* stack) {
 #ifdef _WIN32
-  env->die(env, stack, "kill is not supported on this system", FILE_NAME, __LINE__);
+  env->die(env, stack, "kill is not supported on this system(_WIN32)", FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
   (void)env;
@@ -51,7 +51,7 @@ int32_t SPVM__Sys__Signal__raise(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__Signal__alarm(SPVM_ENV* env, SPVM_VALUE* stack) {
 #ifdef _WIN32
-  env->die(env, stack, "alarm is not supported on this system", FILE_NAME, __LINE__);
+  env->die(env, stack, "alarm is not supported on this system(_WIN32)", FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
   (void)env;
@@ -69,7 +69,7 @@ int32_t SPVM__Sys__Signal__alarm(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__Signal__ualarm(SPVM_ENV* env, SPVM_VALUE* stack) {
 #ifdef _WIN32
-  env->die(env, stack, "ualarm is not supported on this system", FILE_NAME, __LINE__);
+  env->die(env, stack, "ualarm is not supported on this system(_WIN32)", FILE_NAME, __LINE__);
   return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
 #else
   (void)env;

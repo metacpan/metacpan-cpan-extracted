@@ -20,7 +20,7 @@ name: Getopt-Long-Util
 provides:
   Getopt::Long::Util:
     file: lib/Getopt/Long/Util.pm
-    version: '0.898'
+    version: '0.899'
 requires:
   Exporter: '5.57'
   perl: '5.010001'
@@ -30,7 +30,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Getopt-Long-Util
   homepage: https://metacpan.org/release/Getopt-Long-Util
   repository: git://github.com/perlancar/perl-Getopt-Long-Util.git
-version: '0.898'
+version: '0.899'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

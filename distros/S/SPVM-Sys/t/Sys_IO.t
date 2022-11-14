@@ -119,12 +119,6 @@ else {
   ok(SPVM::TestCase::Sys::IO->chown("$tmp_dir"));
 }
 
-# TODO
-{
-  my $tmp_dir = File::Temp->newdir;
-  # ok(SPVM::TestCase::Sys::IO->truncate("$tmp_dir"));
-}
-
 if ($^O eq 'MSWin32') {
   eval { SPVM::Sys::IO->symlink(undef, undef) };
   like($@, qr|not supported|);
@@ -141,6 +135,34 @@ if ($^O eq 'MSWin32') {
 else {
   my $tmp_dir = File::Temp->newdir;
   ok(SPVM::TestCase::Sys::IO->readlink("$tmp_dir"));
+}
+
+ok(SPVM::TestCase::Sys::IO->readline("$test_dir"));
+
+ok(SPVM::TestCase::Sys::IO->ungetc("$test_dir"));
+
+unless ($^O eq 'MSWin32') {
+  ok(SPVM::TestCase::Sys::IO->fsync("$test_dir"));
+}
+
+ok(SPVM::TestCase::Sys::IO->setvbuf("$test_dir"));
+
+ok(SPVM::TestCase::Sys::IO->setbuf("$test_dir"));
+
+ok(SPVM::TestCase::Sys::IO->setbuffer("$test_dir"));
+
+ok(SPVM::TestCase::Sys::IO->setlinebuf("$test_dir"));
+
+ok(SPVM::TestCase::Sys::IO->freopen("$test_dir"));
+
+{
+  my $tmp_dir = File::Temp->newdir;
+  ok(SPVM::TestCase::Sys::IO->truncate("$tmp_dir"));
+}
+
+{
+  my $tmp_dir = File::Temp->newdir;
+  ok(SPVM::TestCase::Sys::IO->ftruncate("$tmp_dir"));
 }
 
 SPVM::set_exception(undef);

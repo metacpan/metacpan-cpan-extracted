@@ -1,5 +1,9 @@
 Revision history for Game-Marad
 
+0.05    2022-11-11
+        Make tricky test author-only. Use less recursion to figure out
+        the piece pushing.
+
 0.04    2022-11-08
         Set and document ESCDELAY so hitting escape is not so terribly
         slow. Make the select and cancel actions less bad. Better

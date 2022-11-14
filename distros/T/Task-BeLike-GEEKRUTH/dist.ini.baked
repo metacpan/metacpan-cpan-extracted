@@ -8,116 +8,116 @@ copyright_holder = D Ruth Holloway
 
 [TaskWeaver]
 
-[MakeMaker / Dist::Zilla::PluginBundle::Author::GEEKRUTH/MakeMaker]
+[MakeMaker / Dist::Zilla::PluginBundle::GEEKRUTH/MakeMaker]
 
-[Git::Contributors / Dist::Zilla::PluginBundle::Author::GEEKRUTH/Git::Contributors]
+[Git::Contributors / Dist::Zilla::PluginBundle::GEEKRUTH/Git::Contributors]
 
-[ContributorsFile / Dist::Zilla::PluginBundle::Author::GEEKRUTH/ContributorsFile]
+[ContributorsFile / Dist::Zilla::PluginBundle::GEEKRUTH/ContributorsFile]
 
-[Test::Compile / Dist::Zilla::PluginBundle::Author::GEEKRUTH/Test::Compile]
+[Test::Compile / Dist::Zilla::PluginBundle::GEEKRUTH/Test::Compile]
 
-[CoalescePod / Dist::Zilla::PluginBundle::Author::GEEKRUTH/CoalescePod]
+[CoalescePod / Dist::Zilla::PluginBundle::GEEKRUTH/CoalescePod]
 
-[InstallGuide / Dist::Zilla::PluginBundle::Author::GEEKRUTH/InstallGuide]
+[InstallGuide / Dist::Zilla::PluginBundle::GEEKRUTH/InstallGuide]
 
-[Covenant / Dist::Zilla::PluginBundle::Author::GEEKRUTH/Covenant]
+[Covenant / Dist::Zilla::PluginBundle::GEEKRUTH/Covenant]
 
-[ContributorCovenant / Dist::Zilla::PluginBundle::Author::GEEKRUTH/ContributorCovenant]
+[ContributorCovenant / Dist::Zilla::PluginBundle::GEEKRUTH/ContributorCovenant]
 
-[GitLab::Update / Dist::Zilla::PluginBundle::Author::GEEKRUTH/GitLab::Update]
+[GitLab::Update / Dist::Zilla::PluginBundle::GEEKRUTH/GitLab::Update]
 
-[GitLab::Meta / Dist::Zilla::PluginBundle::Author::GEEKRUTH/GitLab::Meta]
+[GitLab::Meta / Dist::Zilla::PluginBundle::GEEKRUTH/GitLab::Meta]
 metacpan = 0
 p3rl = 1
 remote = origin
 
-[MetaYAML / Dist::Zilla::PluginBundle::Author::GEEKRUTH/MetaYAML]
+[MetaYAML / Dist::Zilla::PluginBundle::GEEKRUTH/MetaYAML]
 
-[MetaJSON / Dist::Zilla::PluginBundle::Author::GEEKRUTH/MetaJSON]
+[MetaJSON / Dist::Zilla::PluginBundle::GEEKRUTH/MetaJSON]
 
-[PodWeaver / Dist::Zilla::PluginBundle::Author::GEEKRUTH/PodWeaver]
+[PodWeaver / Dist::Zilla::PluginBundle::GEEKRUTH/PodWeaver]
 
-[License / Dist::Zilla::PluginBundle::Author::GEEKRUTH/License]
+[License / Dist::Zilla::PluginBundle::GEEKRUTH/License]
 
-[NextRelease / Dist::Zilla::PluginBundle::Author::GEEKRUTH/NextRelease]
+[NextRelease / Dist::Zilla::PluginBundle::GEEKRUTH/NextRelease]
 time_zone = America/New_York
 
-[MetaProvides::Package / Dist::Zilla::PluginBundle::Author::GEEKRUTH/MetaProvides::Package]
+[MetaProvides::Package / Dist::Zilla::PluginBundle::GEEKRUTH/MetaProvides::Package]
 
-[MetaData::BuiltWith / Dist::Zilla::PluginBundle::Author::GEEKRUTH/MetaData::BuiltWith]
+[MetaData::BuiltWith / Dist::Zilla::PluginBundle::GEEKRUTH/MetaData::BuiltWith]
 
-[Manifest / Dist::Zilla::PluginBundle::Author::GEEKRUTH/Manifest]
+[Manifest / Dist::Zilla::PluginBundle::GEEKRUTH/Manifest]
 
-[ManifestSkip / Dist::Zilla::PluginBundle::Author::GEEKRUTH/ManifestSkip]
+[ManifestSkip / Dist::Zilla::PluginBundle::GEEKRUTH/ManifestSkip]
 
-[Git::GatherDir / Dist::Zilla::PluginBundle::Author::GEEKRUTH/Git::GatherDir]
+[Git::GatherDir / Dist::Zilla::PluginBundle::GEEKRUTH/Git::GatherDir]
 
-[CopyFilesFromBuild / Dist::Zilla::PluginBundle::Author::GEEKRUTH/CopyFilesFromBuild]
+[PruneCruft / Dist::Zilla::PluginBundle::GEEKRUTH/PruneCruft]
 
-[ExecDir / Dist::Zilla::PluginBundle::Author::GEEKRUTH/ExecDir]
+[ExecDir / Dist::Zilla::PluginBundle::GEEKRUTH/ExecDir]
 
-[OurPkgVersion / Dist::Zilla::PluginBundle::Author::GEEKRUTH/OurPkgVersion]
+[OurPkgVersion / Dist::Zilla::PluginBundle::GEEKRUTH/OurPkgVersion]
 
-[INI::Baked / Dist::Zilla::PluginBundle::Author::GEEKRUTH/INI::Baked]
+[INI::Baked / Dist::Zilla::PluginBundle::GEEKRUTH/INI::Baked]
 
-[Authority / Dist::Zilla::PluginBundle::Author::GEEKRUTH/Authority]
+[Authority / Dist::Zilla::PluginBundle::GEEKRUTH/Authority]
 authority = cpan:GEEKRUTH
 locate_comment = 1
 
-[Test::ReportPrereqs / Dist::Zilla::PluginBundle::Author::GEEKRUTH/Test::ReportPrereqs]
+[Test::ReportPrereqs / Dist::Zilla::PluginBundle::GEEKRUTH/Test::ReportPrereqs]
 
-[AutoPrereqs / Dist::Zilla::PluginBundle::Author::GEEKRUTH/AutoPrereqs]
+[AutoPrereqs / Dist::Zilla::PluginBundle::GEEKRUTH/AutoPrereqs]
 
-[Prereqs::Plugins / Dist::Zilla::PluginBundle::Author::GEEKRUTH/Prereqs::Plugins]
+[Prereqs::Plugins / Dist::Zilla::PluginBundle::GEEKRUTH/Prereqs::Plugins]
 
-[CheckChangesHasContent / Dist::Zilla::PluginBundle::Author::GEEKRUTH/CheckChangesHasContent]
+[CheckChangesHasContent / Dist::Zilla::PluginBundle::GEEKRUTH/CheckChangesHasContent]
 
-[ReadmeMarkdownFromPod / Dist::Zilla::PluginBundle::Author::GEEKRUTH/ReadmeMarkdownFromPod]
+[ReadmeMarkdownFromPod / Dist::Zilla::PluginBundle::GEEKRUTH/ReadmeMarkdownFromPod]
 
-[TestRelease / Dist::Zilla::PluginBundle::Author::GEEKRUTH/TestRelease]
+[TestRelease / Dist::Zilla::PluginBundle::GEEKRUTH/TestRelease]
 
-[ConfirmRelease / Dist::Zilla::PluginBundle::Author::GEEKRUTH/ConfirmRelease]
+[ConfirmRelease / Dist::Zilla::PluginBundle::GEEKRUTH/ConfirmRelease]
 
-[Git::Check / Dist::Zilla::PluginBundle::Author::GEEKRUTH/Git::Check]
+[Git::Check / Dist::Zilla::PluginBundle::GEEKRUTH/Git::Check]
 
-[CopyrightYearFromGit / Dist::Zilla::PluginBundle::Author::GEEKRUTH/CopyrightYearFromGit]
+[CopyrightYearFromGit / Dist::Zilla::PluginBundle::GEEKRUTH/CopyrightYearFromGit]
 
-[Git::CommitBuild / Dist::Zilla::PluginBundle::Author::GEEKRUTH/Git::CommitBuild]
+[Git::CommitBuild / Dist::Zilla::PluginBundle::GEEKRUTH/Git::CommitBuild]
 multiple_inheritance = 1
 release_branch = releases
 
-[Git::Tag / Dist::Zilla::PluginBundle::Author::GEEKRUTH/Git::Tag]
+[Git::Tag / Dist::Zilla::PluginBundle::GEEKRUTH/Git::Tag]
 branch = releases
 tag_format = v%v
 
-[PreviousVersion::Changelog / Dist::Zilla::PluginBundle::Author::GEEKRUTH/PreviousVersion::Changelog]
+[PreviousVersion::Changelog / Dist::Zilla::PluginBundle::GEEKRUTH/PreviousVersion::Changelog]
 
-[NextVersion::Semantic / Dist::Zilla::PluginBundle::Author::GEEKRUTH/NextVersion::Semantic]
+[NextVersion::Semantic / Dist::Zilla::PluginBundle::GEEKRUTH/NextVersion::Semantic]
 format = %d.%02d%02d
 major = MAJOR, API CHANGES
 minor = MINOR, NEW FEATURES, ENHANCEMENTS
 revision = REVISION, BUG FIXES, DOCUMENTATION, STATISTICS
 
-[ChangeStats::Git / Dist::Zilla::PluginBundle::Author::GEEKRUTH/ChangeStats::Git]
+[ChangeStats::Git / Dist::Zilla::PluginBundle::GEEKRUTH/ChangeStats::Git]
 develop_branch = main
 group = STATISTICS
 release_branch = releases
 
-[Git::Commit / Dist::Zilla::PluginBundle::Author::GEEKRUTH/Git::Commit]
+[Git::Commit / Dist::Zilla::PluginBundle::GEEKRUTH/Git::Commit]
 
-[Git::Push / Dist::Zilla::PluginBundle::Author::GEEKRUTH/Git::Push]
+[Git::Push / Dist::Zilla::PluginBundle::GEEKRUTH/Git::Push]
 push_to = origin main releases
 
-[UploadToCPAN / Dist::Zilla::PluginBundle::Author::GEEKRUTH/UploadToCPAN]
+[FakeRelease / Dist::Zilla::PluginBundle::GEEKRUTH/FakeRelease]
 
-[InstallRelease / Dist::Zilla::PluginBundle::Author::GEEKRUTH/InstallRelease]
+[InstallRelease / Dist::Zilla::PluginBundle::GEEKRUTH/InstallRelease]
 install_command = cpanm .
 
-[SchwartzRatio / Dist::Zilla::PluginBundle::Author::GEEKRUTH/SchwartzRatio]
+[SchwartzRatio / Dist::Zilla::PluginBundle::GEEKRUTH/SchwartzRatio]
 
-[RunExtraTests / Dist::Zilla::PluginBundle::Author::GEEKRUTH/RunExtraTests]
+[RunExtraTests / Dist::Zilla::PluginBundle::GEEKRUTH/RunExtraTests]
 
-[CPANFile / Dist::Zilla::PluginBundle::Author::GEEKRUTH/CPANFile]
+[CPANFile / Dist::Zilla::PluginBundle::GEEKRUTH/CPANFile]
 
-[MinimumPerl / Dist::Zilla::PluginBundle::Author::GEEKRUTH/MinimumPerl]
+[MinimumPerl / Dist::Zilla::PluginBundle::GEEKRUTH/MinimumPerl]
 default_version = 5.012

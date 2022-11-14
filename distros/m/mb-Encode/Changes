@@ -1,5 +1,9 @@
 Revision history for this software.
 
+0.04  2021-11-12 00:00:00
+  - remove extra definition by_cp932()
+  - created by INABA Hitoshi
+
 0.03  2021-08-26 00:00:00
   - requires: warnings module in META.yml and META.json
   - requires: Encode module in META.yml and META.json

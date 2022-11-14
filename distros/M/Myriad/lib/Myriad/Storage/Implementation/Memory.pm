@@ -2,7 +2,7 @@ package Myriad::Storage::Implementation::Memory;
 
 use Myriad::Class extends => 'IO::Async::Notifier', does => [ 'Myriad::Role::Storage', 'Myriad::Util::Defer'];
 
-our $VERSION = '1.000'; # VERSION
+our $VERSION = '1.001'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 =encoding utf8

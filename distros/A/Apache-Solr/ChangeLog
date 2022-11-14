@@ -4,6 +4,15 @@
 All modifications are made by Mark Overmeer, unless explicitly stated
 differently.
 
+version 1.08: Sun 13 Nov 17:10:36 CET 2022
+
+	Fixes:
+	- perl 5.12 syntax issue [cpantesters]
+
+	Improvements:
+	- do not break at communication errors: alert but continue
+	  Detected by [Any Beverley]
+
 version 1.07: Fri 26 Aug 09:41:03 CEST 2022
 
 	Fixes:

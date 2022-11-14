@@ -1,5 +1,5 @@
 package RF::Component;
-our $VERSION = '1.003';
+our $VERSION = '1.005';
 
 
 use strict;
@@ -24,6 +24,7 @@ our %valid_opts = map { $_ => 1 } (
 				value_unit
 				value_code_regex
 				value_literal_regex
+				vars
 			/
 		);
 
@@ -200,6 +201,13 @@ sub save_snp
 {
 	my ($self, $filename, %args) = @_;
 
+	return wsnp($filename, $self->get_wsnp_list(%args));
+}
+
+sub get_wsnp_list
+{
+	my ($self, %args) = @_;
+
 	my ($f, $param_type, $z0, $comments, $fmt, $output_f_unit)
 		= @{$self}{qw/freqs param_type z0_ref comments output_fmt orig_f_unit/};
 
@@ -210,7 +218,7 @@ sub save_snp
 	$output_f_unit = $args{output_f_unit} if $args{output_f_unit};
 	$fmt = $args{output_fmt} if $args{output_fmt};
 
-	return wsnp($filename, $f, $m, $param_type, $z0, $comments, $fmt, 'Hz', $output_f_unit);
+	return ($f, $m, $param_type, $z0, $comments, $fmt, 'Hz', $output_f_unit);
 }
 
 sub freqs { return shift->{freqs} }
@@ -587,6 +595,11 @@ C<value_literal_regex>
 This is the unit expected in C<value> afer parsing C<value_code_regex>.
 Supported units: pF|nF|uF|uH|nH|R|Ohm|Ohms
 
+=item * C<vars>: A hashref of variable=value.
+
+This is an opaque variables structure.  Currently it is used for vars defined
+in an MDIF file.
+
 =back
 
 You may also pass the above C<new> options to the load call:
@@ -763,11 +776,81 @@ the insertion (S21) phase changes from negative through zero to positive."
 
 Internally this function uses the L<IO::PDL::Touchstone> C<y_srf_ideal> function.
 
+=head1 Parameter Matrix and Vector Functions
+
+=head2 C<$n = $self-E<gt>freqs> - return a PDL vector of each frequency.
+
+=head2 C<$self-E<gt>S($i, $j)> - Access the S-parameter matrix or index slices.
+
+If C<$i> and C<$j> are specified, then return a PDL vector C<S_i,j> index slice
+at each frequency. The vector will contain one value for each frequency.  For
+example:
+
+	my $S11 = $self->S(1,1);
+
+If you omit C<$i> and C<$j> then this returns a (N,N,M) L<piddle|PDL> where N is the
+number of ports and M is the number of frequencies.
+
+=head2 C<$self-E<gt>Y($i, $j)> - Access the Y-parameter matrix or index slices.
+
+Same as C<$self-E<gt>S($i, $j)>, but for a Y-paramater matrix, see above.  Even
+if a Y-parameter data file was not loaded, Y-parameters will be calculated for
+you.
+
+=head2 C<$self-E<gt>Z($i, $j)> - Access the Z-parameter matrix or index slices.
+
+Same as C<$self-E<gt>S($i, $j)>, but for a Z-paramater matrix, see above.  Even
+if a Z-parameter data file was not loaded, Z-parameters will be calculated for
+you.
+
+=head2 C<$self-E<gt>ABCD($i, $j)> - Access the ABCD-parameter matrix or index slices.
+
+Same as C<$self-E<gt>S($i, $j)>, but for a ABCD-paramater matrix, see above.  Even
+if a ABCD-parameter data file was not loaded, ABCD-parameters will be calculated for
+you.
+
+
+=head2 C<$self-E<gt>A()> - Return the A vector from the ABCD matrix.
+
+Same as C<$self-E<gt>ABCD(1,1)>, returns a vector for A values at each frequency.
+
+=head2 C<$self-E<gt>B()> - Return the B vector from the ABCD matrix.
+
+Same as C<$self-E<gt>ABCD(1,2)>, returns a vector for B values at each frequency.
+
+=head2 C<$self-E<gt>C()> - Return the C vector from the ABCD matrix.
+
+Same as C<$self-E<gt>ABCD(2,1)>, returns a vector for C values at each frequency.
+
+=head2 C<$self-E<gt>D()> - Return the D vector from the ABCD matrix.
+
+Same as C<$self-E<gt>ABCD(2,2)>, returns a vector for D values at each frequency.
+
 =head1 Helper Functions
 
 =head2 C<$n = $self-E<gt>num_ports> - return the number of ports in this component.
 
 =head2 C<$n = $self-E<gt>num_freqs> - return the number of frequencies in this component.
+
+=head2 C<@wsnp_list = $self-E<gt>get_wsnp_list(%opts)> - return a list for passing to C<wsnp()>
+
+Options:
+
+=over 4
+
+=item * C<param_type> - One of S, Y, or Z.  The matrix returned in the list
+will be converted to the requested type (or an error will be thrown).
+
+=item * C<output_f_unit> - Same as L<wsnp|PDL::IO::Touchstone>'s C<$to_hz> value
+
+=item * C<output_fmt> - Same as L<wsnp|PDL::IO::Touchstone>'s C<$fmt> value
+
+=back
+
+The get_wsnp_list method returns a list compatible with
+L<PDL::IO::Touchstone>'s C<wsnp($filename, @wsnp_list)> function, which writes
+a .sNp file.  It is also the list format used internally for MDIFs in
+L<RF::Component::Multi>.
 
 =head1 SEE ALSO
 
@@ -776,7 +859,9 @@ Internally this function uses the L<IO::PDL::Touchstone> C<y_srf_ideal> function
 =item L<PDL::IO::Touchstone> - The lower-level framework used by L<RF::Component>
 
 =item L<RF::Component::Multi> - A list-encapsulation of L<RF::Component> to provide vectorized operations
-on multiple components.
+on multiple components.  This allows you to open MDIF files in a classful-way.
+
+=item L<PDL::IO::MDIF> - Load MDIF files
 
 =item Touchstone specification: L<https://ibis.org/connector/touchstone_spec11.pdf>
 

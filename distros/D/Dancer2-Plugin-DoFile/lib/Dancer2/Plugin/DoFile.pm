@@ -1,15 +1,16 @@
 package Dancer2::Plugin::DoFile;
-$Dancer2::Plugin::DoFile::VERSION = '0.13';
-# ABSTRACT: File-based MVC plugin for Dancer2
 
 use strict;
 use warnings;
 
+$Dancer2::Plugin::DoFile::VERSION = '0.14';
+# ABSTRACT: File-based MVC plugin for Dancer2
+
 use Dancer2::Plugin;
 
 use JSON;
-use Hash::Merge;
 use HTTP::Accept;
+use Time::HiRes qw(time);
 
 # Not sure if this is necessary at this point, as the model
 # Should in general not be dynamically loaded...
@@ -38,6 +39,10 @@ has default_file => (
     is      => 'rw',
     default => sub {'index'},
 );
+has timings => (
+    is      => 'rw',
+    default => sub { 0; }
+);
 
 # This is old config syntax and should not be used
 # Only preserved as temporary backwards compatibility
@@ -60,9 +65,9 @@ plugin_keywords 'view';
 
 my %dofiles;
 my $acceptext = {
-  "" => "",
-  "text/html" => ".html",
-  "application/json" => ".json"
+  '' => '',
+  'text/html' => '.html',
+  'application/json' => '.json'
 };
 
 sub BUILD {
@@ -70,7 +75,7 @@ sub BUILD {
     my $settings = $self->config;
 
     $settings->{$_} and $self->$_( $settings->{$_} )
-      for qw/ page_loc default_file extension_list controller_loc controller_extension_list view_loc view_extension_list /;
+      for qw/ page_loc default_file extension_list controller_loc controller_extension_list view_loc view_extension_list timings /;
 }
 
 sub controller {
@@ -83,7 +88,7 @@ sub controller {
   my $method = $app->request->method;
   my $pageroot = $settings->{appdir};
   if ($pageroot !~ /\/$/) {
-    $pageroot .= "/";
+    $pageroot .= '/';
   }
   $pageroot .= $plugin->controller_loc;
 
@@ -94,12 +99,10 @@ sub controller {
   # This can lead to some interesting results if someone doesn't explicitly return undef when they want to fall through to the next file
   # as perl will return the last evaluated value, which would be intepretted as content according to the above rules
 
-  my $merger = Hash::Merge->new('RIGHT_PRECEDENT');
-
   my $stash = $opts{stash} || {};
 
   # Safety first...
-  $path =~ s|/$|"/".$plugin->default_file|e;
+  $path =~ s|/$|'/'.$plugin->default_file|e;
   $path =~ s|^/+||;
   $path =~ s|\.\./||g;
   $path =~ s|~||g;
@@ -107,7 +110,7 @@ sub controller {
   if (!$path) { $path = $plugin->default_file; }
   if (-d $pageroot."/$path") {
     if ($path !~ /\/$/) {
-      $path .= "/".$plugin->default_file;
+      $path .= '/'.$plugin->default_file;
     } else {
       return {
         url => "/$path/",
@@ -120,41 +123,50 @@ sub controller {
   if (!defined $stash->{dofiles_executed}) { $stash->{dofiles_executed} = 0; }
 OUTER:
   foreach my $ext (@{$plugin->controller_extension_list}) {
-    foreach my $m ("", "-$method", "-ANY") {
+    foreach my $m ('', "-$method", '-ANY') {
       my $cururl = $path;
       my @path = ();
 
       # This iterates back through the path to find the closest FILE downstream, using the rest of the url as a "path" argument
-      while (!-f $pageroot."/".$cururl.$m.$ext && $cururl =~ s/\/([^\/]*)$//) {
+      while (!-f $pageroot.'/'.$cururl.$m.$ext && $cururl =~ s/\/([^\/]*)$//) {
         if ($1) { unshift(@path, $1); }
       }
 
       # "Do" the file
       if ($cururl) {
         my $result;
-        if (defined $dofiles{$pageroot."/".$cururl.$m.$ext}) {
-          $stash->{dofiles}->{$cururl.$m.$ext} = { origin => "cache", order => $stash->{dofiles_executed}++ };
-          $result = $dofiles{$pageroot."/".$cururl.$m.$ext}->({path => \@path, this_url => $cururl, dofile_plugin => $plugin, stash => $stash, env => $app->request->env});
+        if (defined $dofiles{$pageroot.'/'.$cururl.$m.$ext}) {
+          $stash->{dofiles}->{$cururl.$m.$ext} = { type => 'controller', origin => 'cache', order => $stash->{dofiles_executed}++ };
+          if ($plugin->timings) {
+            my $start = time();
+            $result = $dofiles{$pageroot.'/'.$cururl.$m.$ext}->({path => \@path, this_url => $cururl, dofile_plugin => $plugin, stash => $stash, env => $app->request->env});
+            $stash->{dofiles}->{$cururl.$m.$ext}->{time} = time() - $start;
+          } else {
+            $result = $dofiles{$pageroot.'/'.$cururl.$m.$ext}->({path => \@path, this_url => $cururl, dofile_plugin => $plugin, stash => $stash, env => $app->request->env});
+          }
 
-        } elsif (-f $pageroot."/".$cururl.$m.$ext) {
-          $stash->{dofiles}->{$cururl.$m.$ext} = { origin => "file", order => $stash->{dofiles_executed}++ };
+        } elsif (-f $pageroot.'/'.$cururl.$m.$ext) {
+          $stash->{dofiles}->{$cururl.$m.$ext} = { type => 'controller', origin => 'file', order => $stash->{dofiles_executed}++ };
 
           our $args = { path => \@path, this_url => $cururl, dofile_plugin => $plugin, stash => $stash, env => $app->request->env };
 
-          $result = do($pageroot."/".$cururl.$m.$ext);
+          $result = do($pageroot.'/'.$cururl.$m.$ext);
           if ($@ || $!) { $plugin->app->log( error => "Error processing $pageroot / $cururl.$m.$ext: $@ $!\n"); }
-          if (ref $result eq "CODE") {
+          if (ref $result eq 'CODE') {
             $stash->{dofiles}->{$cururl.$m.$ext}->{cached} = 1;
-            $dofiles{$pageroot."/".$cururl.$m.$ext} = $result;
-            $result = $result->($args);
+            $dofiles{$pageroot.'/'.$cururl.$m.$ext} = $result;
+            if ($plugin->timings) {
+              my $start = time();
+              $result = $result->($args);
+              $stash->{dofiles}->{$cururl.$m.$ext}->{time} = time() - $start;
+            } else {
+              $result = $result->($args);
+            }
           }
         }
 
-        # We need to reassign the stash to the opts hash as the merge will have destroyed the old stash
-        $opts{stash} = $stash;
-
-        if (defined $result && ref $result eq "HASH") {
-          $stash = $merger->merge($stash, $result);
+        if (defined $result && ref $result eq 'HASH') {
+          merge($stash, $result);
           if (defined $result->{url} && !defined $result->{done}) {
             $path = $result->{url};
             next OUTER;
@@ -170,7 +182,7 @@ OUTER:
           }
           # Move on to the next file
 
-        } elsif (ref $result eq "ARRAY") {
+        } elsif (ref $result eq 'ARRAY') {
           $stash->{dofiles}->{$cururl.$m.$ext}->{last} = 1;
           return { content => $result };
 
@@ -205,11 +217,11 @@ sub view {
   my $method = $app->request->method;
 
   my $accept  = HTTP::Accept->new( $app->request->accept )->values();
-  push(@{$accept}, "");
+  push @{$accept}, '';
 
   my $pageroot = $settings->{appdir};
   if ($pageroot !~ /\/$/) {
-    $pageroot .= "/";
+    $pageroot .= '/';
   }
   $pageroot .= $plugin->view_loc;
 
@@ -220,12 +232,10 @@ sub view {
   # This can lead to some interesting results if someone doesn't explicitly return undef when they want to fall through to the next file
   # as perl will return the last evaluated value, which would be intepretted as content according to the above rules
 
-  my $merger = Hash::Merge->new('RIGHT_PRECEDENT');
-
   my $stash = $opts{stash} || {};
 
   # Safety first...
-  $path =~ s|/$|"/".$plugin->default_file|e;
+  $path =~ s|/$|'/'.$plugin->default_file|e;
   $path =~ s|^/+||;
   $path =~ s|\.\./||g;
   $path =~ s|~||g;
@@ -233,7 +243,7 @@ sub view {
   if (!$path) { $path = $plugin->default_file; }
   if (-d $pageroot."/$path") {
     if ($path !~ /\/$/) {
-      $path .= "/".$plugin->default_file;
+      $path .= '/'.$plugin->default_file;
     } else {
       return {
         url => "/$path/",
@@ -246,44 +256,53 @@ OUTER:
   foreach my $ext (@{$plugin->view_extension_list}) {
     foreach my $fmt (@{$accept}) {
       if (defined $acceptext->{$fmt}) {
-        foreach my $m ("", "-$method", "-ANY") {
+        foreach my $m ('', "-$method", '-ANY') {
           my $cururl = $path;
           my @path = ();
           # This iterates back through the path to find the closest FILE downstream, using the rest of the url as a "path" argument
-          while (!-f $pageroot."/".$cururl.$m.$acceptext->{$fmt}.$ext && $cururl =~ s/\/([^\/]*)$//) {
+          while (!-f $pageroot.'/'.$cururl.$m.$acceptext->{$fmt}.$ext && $cururl =~ s/\/([^\/]*)$//) {
             if ($1) { unshift(@path, $1); }
           }
 
           # "Do" the file
           if ($cururl) {
             my $result;
-            if (defined $dofiles{$pageroot."/".$cururl.$m.$acceptext->{$fmt}.$ext}) {
-              $stash->{dofiles}->{$cururl.$m.$acceptext->{$fmt}.$ext} = { origin => "cache", order => $stash->{dofiles_executed}++ };
-              $result = $dofiles{$pageroot."/".$cururl.$m.$acceptext->{$fmt}.$ext}->({path => \@path, this_url => $cururl, dofile_plugin => $plugin, stash => $stash, env => $app->request->env});
+            if (defined $dofiles{$pageroot.'/'.$cururl.$m.$acceptext->{$fmt}.$ext}) {
+              $stash->{dofiles}->{$cururl.$m.$acceptext->{$fmt}.$ext} = { type => 'view', origin => 'cache', order => $stash->{dofiles_executed}++ };
+              if ($plugin->timings) {
+                my $start = time();
+                $result = $dofiles{$pageroot.'/'.$cururl.$m.$acceptext->{$fmt}.$ext}->({path => \@path, this_url => $cururl, dofile_plugin => $plugin, stash => $stash, env => $app->request->env});
+                $stash->{dofiles}->{$cururl.$m.$acceptext->{$fmt}.$ext}->{time} = time() - $start;
+              } else {
+                $result = $dofiles{$pageroot.'/'.$cururl.$m.$acceptext->{$fmt}.$ext}->({path => \@path, this_url => $cururl, dofile_plugin => $plugin, stash => $stash, env => $app->request->env});
+              }
 
-            } elsif (-f $pageroot."/".$cururl.$m.$acceptext->{$fmt}.$ext) {
-              $stash->{dofiles}->{$cururl.$m.$acceptext->{$fmt}.$ext} = { origin => "file", order => $stash->{dofiles_executed}++ };
+            } elsif (-f $pageroot.'/'.$cururl.$m.$acceptext->{$fmt}.$ext) {
+              $stash->{dofiles}->{$cururl.$m.$acceptext->{$fmt}.$ext} = { type => 'view', origin => 'file', order => $stash->{dofiles_executed}++ };
 
               our $args = { path => \@path, this_url => $cururl, dofile_plugin => $plugin, stash => $stash, env => $app->request->env };
 
-              $result = do($pageroot."/".$cururl.$m.$acceptext->{$fmt}.$ext);
+              $result = do($pageroot.'/'.$cururl.$m.$acceptext->{$fmt}.$ext);
               if ($@ || $!) { $plugin->app->log( error => "Error processing $pageroot / $cururl.$m.$acceptext->{$fmt}.$ext: $@ $!\n"); }
-              if (ref $result eq "CODE") {
+              if (ref $result eq 'CODE') {
                 $stash->{dofiles}->{$cururl.$m.$acceptext->{$fmt}.$ext}->{cached} = 1;
-                $dofiles{$pageroot."/".$cururl.$m.$acceptext->{$fmt}.$ext} = $result;
-                $result = $result->($args);
+                $dofiles{$pageroot.'/'.$cururl.$m.$acceptext->{$fmt}.$ext} = $result;
+                if ($plugin->timings) {
+                  my $start = time();
+                  $result = $result->($args);
+                  $stash->{dofiles}->{$cururl.$m.$acceptext->{$fmt}.$ext}->{time} = time() - $start;
+                } else {
+                  $result = $result->($args);
+                }
               }
             }
 
-            # We need to reassign the stash to the opts hash as the merge will have destroyed the old stash
-            $opts{stash} = $stash;
-
-            if (defined $result && ref $result eq "HASH") {
+            if (defined $result && ref $result eq 'HASH') {
               $result->{'content-type'} = $acceptext->{$fmt};
               $stash->{dofiles}->{$cururl.$m.$acceptext->{$fmt}.$ext}->{last} = 1;
               return $result;
 
-            } elsif (ref $result eq "ARRAY") {
+            } elsif (ref $result eq 'ARRAY') {
               $stash->{dofiles}->{$cururl.$m.$acceptext->{$fmt}.$ext}->{last} = 1;
               return { 'content-type' => $acceptext->{$fmt}, content => $result };
 
@@ -316,7 +335,7 @@ sub dofile {
   my $method = $app->request->method;
   my $pageroot = $settings->{appdir};
   if ($pageroot !~ /\/$/) {
-    $pageroot .= "/";
+    $pageroot .= '/';
   }
   $pageroot .= $plugin->page_loc;
 
@@ -327,12 +346,10 @@ sub dofile {
   # This can lead to some interesting results if someone doesn't explicitly return undef when they want to fall through to the next file
   # as perl will return the last evaluated value, which would be intepretted as content according to the above rules
 
-  my $merger = Hash::Merge->new('RIGHT_PRECEDENT');
-
   my $stash = $opts{stash} || {};
 
   # Safety first...
-  $path =~ s|/$|"/".$plugin->default_file|e;
+  $path =~ s|/$|'/'.$plugin->default_file|e;
   $path =~ s|^/+||;
   $path =~ s|\.\./||g;
   $path =~ s|~||g;
@@ -340,7 +357,7 @@ sub dofile {
   if (!$path) { $path = $plugin->default_file; }
   if (-d $pageroot."/$path") {
     if ($path =~ /\/$/) {
-      $path .= "/".$plugin->default_file;
+      $path .= '/'.$plugin->default_file;
     } else {
       return {
         url => "/$path/",
@@ -353,37 +370,37 @@ sub dofile {
   if (!defined $stash->{dofiles_executed}) { $stash->{dofiles_executed} = 0; }
 OUTER:
   foreach my $ext (@{$plugin->extension_list}) {
-    foreach my $m ("", "-$method") {
+    foreach my $m ('', "-$method") {
       my $cururl = $path;
       my @path = ();
 
       # This iterates back through the path to find the closest FILE downstream, using the rest of the url as a "path" argument
-      while (!-f $pageroot."/".$cururl.$m.$ext && $cururl =~ s/\/([^\/]*)$//) {
+      while (!-f $pageroot.'/'.$cururl.$m.$ext && $cururl =~ s/\/([^\/]*)$//) {
         if ($1) { unshift(@path, $1); }
       }
 
       # "Do" the file
       if ($cururl) {
         my $result;
-        if (defined $dofiles{$pageroot."/".$cururl.$m.$ext}) {
-          $stash->{dofiles}->{$cururl.$m.$ext} = { origin => "cache", order => $stash->{dofiles_executed}++ };
-          $result = $dofiles{$pageroot."/".$cururl.$m.$ext}->({path => \@path, this_url => $cururl, dofile_plugin => $plugin, stash => $stash, env => $app->request->env});
+        if (defined $dofiles{$pageroot.'/'.$cururl.$m.$ext}) {
+          $stash->{dofiles}->{$cururl.$m.$ext} = { origin => 'cache', order => $stash->{dofiles_executed}++ };
+          $result = $dofiles{$pageroot.'/'.$cururl.$m.$ext}->({path => \@path, this_url => $cururl, dofile_plugin => $plugin, stash => $stash, env => $app->request->env});
 
-        } elsif (-f $pageroot."/".$cururl.$m.$ext) {
-          $stash->{dofiles}->{$cururl.$m.$ext} = { origin => "file", order => $stash->{dofiles_executed}++ };
+        } elsif (-f $pageroot.'/'.$cururl.$m.$ext) {
+          $stash->{dofiles}->{$cururl.$m.$ext} = { origin => 'file', order => $stash->{dofiles_executed}++ };
 
           our $args = { path => \@path, this_url => $cururl, dofile_plugin => $plugin, stash => $stash, env => $app->request->env };
 
-          $result = do($pageroot."/".$cururl.$m.$ext);
+          $result = do($pageroot.'/'.$cururl.$m.$ext);
           if ($@ || $!) { $plugin->app->log( error => "Error processing $pageroot / $cururl.$m.$ext: $@ $!\n"); }
-          if (ref $result eq "CODE") {
+          if (ref $result eq 'CODE') {
             $stash->{dofiles}->{$cururl.$m.$ext}->{cached} = 1;
-            $dofiles{$pageroot."/".$cururl.$m.$ext} = $result;
+            $dofiles{$pageroot.'/'.$cururl.$m.$ext} = $result;
             $result = $result->($args);
           }
         }
 
-        if (defined $result && ref $result eq "HASH") {
+        if (defined $result && ref $result eq 'HASH') {
           if (defined $result->{url} && !defined $result->{done}) {
             $path = $result->{url};
             next OUTER;
@@ -392,11 +409,11 @@ OUTER:
             $stash->{dofiles}->{$cururl.$m.$ext}->{last} = 1;
             return $result;
           } else {
-            $stash = $merger->merge($stash, $result);
+            merge($stash, $result);
           }
           # Move on to the next file
 
-        } elsif (ref $result eq "ARRAY") {
+        } elsif (ref $result eq 'ARRAY') {
           $stash->{dofiles}->{$cururl.$m.$ext}->{last} = 1;
           return { content => $result };
 
@@ -421,6 +438,21 @@ sub view_pathname {
 sub layout_pathname {
   my ( $self, $layout ) = @_;
   return $layout;
+}
+
+# Why not use Hash::Merge? I need to merge the result into the stash hashref, not
+# clone or make a new hashref, so that the dofile stats can be accumulated (in
+# $stash->{dofiles})
+sub merge {
+  my $src = shift;
+  my $dup = shift;
+  foreach my $k (keys %{$dup}) {
+    if (ref $dup->{$k} eq 'HASH' && $src->{$k} && ref $src->{$k} eq 'HASH') {
+      merge($src->{$k}, $dup->{$k});
+    } else {
+      $src->{$k} = $dup->{$k};
+    }
+  }
 }
 
 1;
@@ -697,11 +729,51 @@ This could be used to set the status code for returning to the client
 DoFile may however return pretty much whatever you want to handle in your final
 router code.
 
+=head1 DEBUGGING DONE-FILES
+
+From 0.14 you can see exactly what DoFile is doing, including the
+option to see how long each done-file took to execute so that you may improve
+the performance of your web app.
+
+All you need to do is make sure that you pass an initial "stash" to the
+controller (or view), and DoFiles will store some analysis in a hashref under a
+key called "dofiles".
+
+The key for the hasref is the filename executed. The contents of the hash will
+contain one or more elements giving some information about what's gone on.
+
+    my $stash = {};
+    my $result = controller "some/controller", stash => $stash;
+
+    if (defined $stash->{dofiles}) {
+      my @files = ();
+      foreach my $f (sort { $stash->{dofiles}->{$a}->{order} <=> $stash->{dofiles}->{$b}->{order} } keys %{$stash->{dofiles}}) {
+        my $text = $stash->{dofiles}->{$f}->{order}.": $f [".$stash->{dofiles}->{$f}->{type}."]";
+        if ($stash->{dofiles}->{$f}->{origin} eq "cache") { $text .= " [FROM CACHE]"; }
+        if ($stash->{dofiles}->{$f}->{origin} eq "file") { $text .= " [FROM FILE]"; }
+        if ($stash->{dofiles}->{$f}->{cached}) { $text .= " [WAS CACHED]"; }
+        if ($stash->{dofiles}->{$f}->{last}) { $text .= " [LAST]"; }
+        if ($stash->{dofiles}->{$f}->{time}) { $text .= " ".int($stash->{dofiles}->{$f}->{time}*1000)."ms"; }
+        # NB: For {time} to be defined you need to add an extra line to your config - see below
+        push @files, $text;
+      }
+      # Do something with your @files.
+    }
+
+To switch on timing of your done-files, in your config.yml
+
+    plugins:
+      DoFile:
+        timings: 1
+
+It's possible in the future the {dofiles} hashref will become an arrayref, as it's
+possible to mess things up by redirecting a page to itself (if for example you need
+to restart processing of passed data).
+
 =head1 EXAMPLES
 
 As noted, what's returned from a DoFile can contain anything. That gives you
 the opportunity to do pretty much whatever you want with what's returned.
-
 
 =head1 AUTHOR
 

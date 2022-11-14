@@ -2,11 +2,13 @@
 use strict;
 use warnings;
 
-# Roman numeral analysis
+# Roman numeral analysis plot over all songs
+
+# WARNING: This will produce a GIANT png file.
 
 use GraphViz2;
+#use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(Music-BachChoralHarmony Music-ToRoman); # local author libs
 use Music::BachChoralHarmony;
-use lib $ENV{HOME} . '/sandbox/Music-ToRoman/lib';
 use Music::ToRoman;
 
 my $in_note = shift // ''; # Show all connections if not given
@@ -18,7 +20,12 @@ $in_key = 'major'
 $in_key = 'minor'
     if $in_key eq 'm' || $in_key eq 'min';
 
-my $bach = Music::BachChoralHarmony->new;
+#my $data_file = 'share/jsbach_chorals_harmony.data'; # local author files
+#my $key_title = 'share/jsbach_BWV_keys_titles.txt';  # "
+my $bach = Music::BachChoralHarmony->new(
+#    data_file => $data_file,
+#    key_title => $key_title,
+);
 my $songs = $bach->parse();
 # Show all keys:
 #use Data::Dumper;warn(Dumper[map{"$_: $songs->{$_}{key}"}sort keys%$songs]);exit;

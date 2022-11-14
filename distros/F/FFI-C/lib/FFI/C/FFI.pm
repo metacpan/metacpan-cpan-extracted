@@ -7,7 +7,7 @@ use constant ();
 use base qw( Exporter );
 
 # ABSTRACT: Private module for FFI::C
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.14'; # VERSION
 
 
 our @EXPORT_OK = qw( malloc free memset memcpy_addr );
@@ -53,7 +53,7 @@ FFI::C::FFI - Private module for FFI::C
 
 =head1 VERSION
 
-version 0.12
+version 0.14
 
 =head1 SYNOPSIS
 

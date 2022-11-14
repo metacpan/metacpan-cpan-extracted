@@ -5,6 +5,7 @@ use Blio;
 
 # ABSTRACT: Blio - domm's blogging "engine"
 # PODNAME: blio.pl
+our $VERSION = '2.007'; # VERSION
 
 Blio->new_with_options->run;
 
@@ -20,7 +21,7 @@ blio.pl - Blio - domm's blogging "engine"
 
 =head1 VERSION
 
-version 2.003
+version 2.007
 
 =head1 SYNOPSIS
 
@@ -288,11 +289,11 @@ L<Blio - my blogging "engine"|http://domm.plix.at/perl/2012_08_09_blio_my_bloggi
 
 =head1 AUTHOR
 
-Thomas Klausner <domm@cpan.org>
+Thomas Klausner <domm@plix.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Thomas Klausner.
+This software is copyright (c) 2013 - 2022 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

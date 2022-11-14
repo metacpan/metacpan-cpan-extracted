@@ -42,15 +42,20 @@ our ($MODULE_NAME, undef, undef) = fileparse(__FILE__, '\..*');
 # ---------------------------------------------------------------------------- #
 sub GetBrokerage {
     # Assign the subroutine arguments to the local array.
-    my ($param) = @_;
+    my (%param) = @_;
+
+    if (! exists $param{'PublicKey'}) {
+        exit 1;
+    };
+
     # Create the payload.
-    my $payload = payload_standard($param);
+    my $payload = payload_standard(\%param);
     # Add the payload to the given hash.
-    $param->{'PayloadString'} = $payload;
+    $param{'PayloadString'} = $payload;
     # Add the module name to the given hash.
-    $param->{'ModuleName'} = $MODULE_NAME;
+    $param{'ModuleName'} = $MODULE_NAME;
     # Get the ouput data.
-    my $output_data = json_data($param);
+    my $output_data = json_data(\%param);
     # Return the ouput data.
     return $output_data;
 };
@@ -80,12 +85,12 @@ CryptoTron::GetBrokerage - Perl extension for use with the blockchain of the cry
   my $OutputFormat = ["RAW"|"STR"|""];
 
   # Request the account info from the mainnet.
-  my $brokerage_info = GetBrokerage({
+  my $brokerage_info = GetBrokerage(
       PublicKey => $PublicKeyBase58
       [, VisibleFlag => $VisibleFlag]
       [, ControlFlag => $ControlFlag]
       [, OutputFormat => $OutputFormat]
-  });
+  );
 
   # Print the brokerage info into the terminal window.
   print $brokerage_info;

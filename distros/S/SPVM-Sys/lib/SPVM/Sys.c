@@ -232,15 +232,15 @@ int32_t SPVM__Sys__defined(SPVM_ENV* env, SPVM_VALUE* stack) {
     
     // Int
     if (env->is_type(env, stack, obj_value, SPVM_NATIVE_C_BASIC_TYPE_ID_INT_CLASS, 0)) {
-      env->set_field_int_by_name(env, stack, obj_value, "Int", "value", ival, &e, FILE_NAME, __LINE__);
+      env->set_field_int_by_name(env, stack, obj_value, "value", ival, &e, FILE_NAME, __LINE__);
       if (e) { return e; }
     }
     else if (env->is_type(env, stack, obj_value, SPVM_NATIVE_C_BASIC_TYPE_ID_LONG_CLASS, 0)) {
-      env->set_field_long_by_name(env, stack, obj_value, "Long", "value", lval, &e, FILE_NAME, __LINE__);
+      env->set_field_long_by_name(env, stack, obj_value, "value", lval, &e, FILE_NAME, __LINE__);
       if (e) { return e; }
     }
     else if (env->is_type(env, stack, obj_value, SPVM_NATIVE_C_BASIC_TYPE_ID_DOUBLE_CLASS, 0)) {
-      env->set_field_double_by_name(env, stack, obj_value, "Double", "value", dval, &e, FILE_NAME, __LINE__);
+      env->set_field_double_by_name(env, stack, obj_value, "value", dval, &e, FILE_NAME, __LINE__);
       if (e) { return e; }
     }
     else {

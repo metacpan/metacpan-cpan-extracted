@@ -3,11 +3,11 @@ use strict;
 use warnings;
 use CouchDB::Client;
 
-our $VERSION='0.04';
+our $VERSION='0.05';
 
 =head1 NAME
 
-Storable::CouchDB - Persistences for Perl data structures in Apache CouchDB
+Storable::CouchDB - Persistence for Perl data structures in Apache CouchDB
 
 =head1 SYNOPSIS
 
@@ -86,7 +86,7 @@ prints "Hello World!"
 
   my $s = Storable::CouchDB->new(
                                  uri => 'http://127.0.0.1:5984/',  #default
-                                 db  => 'perl-storable-couchDB',   #default
+                                 db  => 'perl-storable-couchdb',   #default
                                 );
 
 =cut
@@ -118,7 +118,7 @@ sub initialize {
   $s->store('doc' => [1, 2, 3]);
   my $data=$s->store('doc' => {b => 2}); #returns data that was stored
 
-API Difference: The L<Storable> API uses the 'store data > filename' syntax which I think is counterintuitive for a document key=>value store like Apache CouchDB.
+API Difference: The L<Storable> API uses the `store data > filename` syntax which I think is counterintuitive for a document key=>value store like Apache CouchDB.
 
 =cut
 
@@ -242,31 +242,22 @@ sub uri {
 
 All I need this package for storing ASCII values so currently this package meets my requirements.  But, I would like to add blessed object support.  I will gladly accept patches!
 
-This package relies heavily on L<CouchDB::Client> to do the right thing.  So far, I have not had any compliants other than a slightly awkard interface.
+This package relies heavily on L<CouchDB::Client> to do the right thing.  So far, I have not had any complaints other than a slightly awkward interface.
 
 =head1 BUGS
 
-Please log on RT and send an email to the author.
-
-=head1 SUPPORT
-
-DavisNetworks.com supports all Perl applications including this package.
+Please log on GitHub
 
 =head1 AUTHOR
 
   Michael R. Davis
   CPAN ID: MRDVT
-  Satellite Tracking of People, LLC
-  mrdvt92
-  http://www.davisnetworks.com/
 
 =head1 COPYRIGHT
 
-Copyright (c) 2011 Michael R. Davis - MRDVT
+MIT License
 
-This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
-
-The full text of the license can be found in the LICENSE file included with this module.
+Copyright (c) 2022 Michael R. Davis
 
 =head1 SEE ALSO
 

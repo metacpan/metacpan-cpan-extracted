@@ -1,4 +1,16 @@
 # -*- perl -*-
+##----------------------------------------------------------------------------
+## Database Object Interface - ~/lib/DB/Object/Mysql/Statement.pm
+## Version v0.300.1
+## Copyright(c) 2019 DEGUEST Pte. Ltd.
+## Author: Jacques Deguest <jack@deguest.jp>
+## Created 2017/07/19
+## Modified 2022/11/04
+## All rights reserved
+## 
+## This program is free software; you can redistribute  it  and/or  modify  it
+## under the same terms as Perl itself.
+##----------------------------------------------------------------------------
 #----------------------------------------------------------------------------
 # DB/Object/Mysql/Statement.pm
 # Version 0.3
@@ -22,10 +34,7 @@ BEGIN
     use warnings;
     use parent qw( DB::Object::Statement DB::Object::Mysql );
     use vars qw( $VERSION $VERBOSE $DEBUG );
-    use DB::Object::Mysql;
-    use DB::Object::Statement;
-    use DateTime;
-    $VERSION    = 'v0.300.0';
+    $VERSION    = 'v0.300.1';
     $VERBOSE    = 0;
     $DEBUG      = 0;
     use Devel::Confess;
@@ -76,13 +85,24 @@ sub dump
     my $vsep  = ",";
     my $hsep  = "\n";
     my $width = 35;
-    require IO::File;
-    my $fh    = IO::File->new;
-    $fh->fdopen( fileno( STDOUT ), 'w' );
+    $self->_load_class( 'DateTime' ) || return( $self->pass_error );
+    $self->_load_class( 'Module::Generic::File' ) || return( $self->pass_error );
+    my $fh = Module::Generic::File->stdout() ||
+        return( $self->pass_error( Module::Generic::File->error ) );
     $vsep  = $args->{vsep} if( exists( $args->{vsep} ) );
     $hsep  = $args->{hsep} if( exists( $args->{hsep} ) );
     $width = $args->{width} if( exists( $args->{width} ) );
-    my @fields = @{$self->{sth}->FETCH( 'NAME' )};
+    my @fields = ();
+    # my @fields = @{$self->{sth}->FETCH( 'NAME' )};
+    my $fields_ref = $self->{sth}->{NAME};
+    if( defined( $fields_ref ) && ref( $fields_ref ) eq 'ARRAY' )
+    {
+        @fields = @$fields_ref;
+    }
+    else
+    {
+        return( $self->error( "No array reference of fields could be retrieved from statement '$self->{sth}'." ) );
+    }
     return( $self->error( "No query to dump." ) ) if( !exists( $self->{sth} ) );
     if( exists( $args->{file} ) )
     {
@@ -292,7 +312,7 @@ DB::Object::Mysql::Query - Statement Object for MySQL
 
 =head1 VERSION
 
-   v0.300.0
+   v0.300.1
 
 =head1 DESCRIPTION
 
@@ -378,4 +398,3 @@ You can use, copy, modify and redistribute this package and associated
 files under the same terms as Perl itself.
 
 =cut
-

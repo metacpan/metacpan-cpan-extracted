@@ -18,7 +18,7 @@ use Path::Tiny;
 use Getopt::Alt;
 use YAML::Syck;
 
-our $VERSION = version->new('0.0.3');
+our $VERSION = version->new('0.0.4');
 
 my $opt = Getopt::Alt->new(
     {
@@ -108,6 +108,7 @@ sub stats {
 sub stats_end {
     if ( -d '.stats' ) {
         DumpFile('.stats/collated.yml', $collected);
+        my $out = '';
 
         my $type = $opt->opt->by eq 'email' ? 'email'
             : $opt->opt->by eq 'name'       ? 'name'
@@ -131,11 +132,13 @@ sub stats_end {
         my @items = sort { $stats{$a} <=> $stats{$b} } keys %stats;
         my $max   = max map {length $_} @items;
         for my $item (@items) {
-            printf "%-${max}s %d\n", $item, $stats{$item};
+            $out .= sprintf "%-${max}s %d\n", $item, $stats{$item};
         }
+
+        return $out;
     }
 
-    return;
+    return "No stats!\n";
 }
 
 1;
@@ -148,7 +151,7 @@ Group::Git::Cmd::Stats - Group-Git tools to show statistics across many reposito
 
 =head1 VERSION
 
-This documentation refers to Group::Git::Cmd::Stats version 0.0.3
+This documentation refers to Group::Git::Cmd::Stats version 0.0.4
 
 =head1 SYNOPSIS
 

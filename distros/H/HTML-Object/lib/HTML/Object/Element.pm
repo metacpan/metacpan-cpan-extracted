@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/Element.pm
-## Version v0.2.1
+## Version v0.2.2
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/04/25
-## Modified 2022/09/20
+## Modified 2022/11/11
 ## All rights reserved
 ## 
 ## 
@@ -35,7 +35,7 @@ BEGIN
     our $LOOK_LIKE_HTML = qr/^[[:blank:]\h]*\<\w+.*?\>/;
     our $LOOK_LIKE_IT_HAS_HTML = qr/\<\w+.*?\>/;
     our $ATTRIBUTE_NAME_RE = qr/\w[\w\-]*/;
-    our $VERSION = 'v0.2.1';
+    our $VERSION = 'v0.2.2';
 };
 
 use strict;
@@ -184,7 +184,7 @@ sub as_string
     {
         if( $self->is_empty )
         {
-            warnings::warn( "This tag \"$tag\" is supposed to be an empty / void one, but it has ", $self->children->length, " children.\n" ) if( warnings::enabled() );
+            warnings::warn( "This tag \"$tag\" is supposed to be an empty / void one, but it has " . $self->children->length . " children.\n" ) if( warnings::enabled() );
         }
         # The user is alway right, so let's add those children
         $res->push( $a->join( ' ' )->scalar );
@@ -428,7 +428,7 @@ sub close
     return( $self ) if( $self->is_empty );
 #     if( !$parent )
 #     {
-#         warnings::warn( "No parent set for this element \"", $self->tag, "\".\n" ) if( warnings::enabled( 'HTML::Object' ) );
+#         warnings::warn( "No parent set for this element \"" . $self->tag . "\".\n" ) if( warnings::enabled( 'HTML::Object' ) );
 #         return( $self );
 #     }
     my $e = $self->new_closing({
@@ -1333,6 +1333,8 @@ sub traverse
     my $self = shift( @_ );
     my $code = shift( @_ ) || return( $self->error( "No code provided to traverse the html tree." ) );
     return( $self->error( "The argument provided (", overload::StrVal( $code ), ") is not an anonymous subroutine." ) ) if( ref( $code ) ne 'CODE' );
+    my $opts = $self->_get_args_as_hash( @_ );
+    $opts->{bottom_up} //= 0;
     my $seen = {};
     my $crawl;
     $crawl = sub
@@ -1342,11 +1344,12 @@ sub traverse
         # Duplicate
         return if( ++$seen->{ $addr } > 1 );
         local $_ = $e;
-        $code->( $e );
+        $code->( $e ) unless( $opts->{bottom_up} );
         $e->children->foreach(sub
         {
             $crawl->( $_[0] );
         });
+        $code->( $e ) if( $opts->{bottom_up} );
     };
     $crawl->( $self );
     return( $self );
@@ -1411,7 +1414,7 @@ sub _get_elements_list
         my $addr = Scalar::Util::refaddr( $_ );
         if( ++$seen->{ $addr } > 1 )
         {
-            warnings::warn( "Warnings only: found duplicate element with tag '", $_->tag, "' provided in replace_with()\n" ) if( warnings::enabled( 'HTML::Object' ) );
+            warnings::warn( "Warnings only: found duplicate element with tag '" . $_->tag . "' provided in replace_with()\n" ) if( warnings::enabled( 'HTML::Object' ) );
             next;
         }
         return( $self->error( "Replacement list contains a copy of target!" ) ) if( $self_addr eq $addr );
@@ -1511,7 +1514,7 @@ sub _get_md5_hash
     }
     catch( $e )
     {
-        warnings::warn( "An error occurred while calculating the md5 hash for tag \"", $self->tag, "\": $e\n" ) if( warnings::enabled() );
+        warnings::warn( "An error occurred while calculating the md5 hash for tag \"" . $self->tag . "\": $e\n" ) if( warnings::enabled() );
         return( $self->error( "An error occurred while calculating the md5 hash for tag \"", $self->tag, "\": $e" ) );
     }
 }
@@ -1624,7 +1627,7 @@ HTML::Object::Element - HTML Element Object
 
 =head1 VERSION
 
-    v0.2.1
+    v0.2.2
 
 =head1 DESCRIPTION
 

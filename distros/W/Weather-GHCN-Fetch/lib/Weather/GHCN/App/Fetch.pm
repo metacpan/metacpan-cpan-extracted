@@ -8,7 +8,7 @@ Weather::GHCN::App::Fetch - Fetch station and weather data from the NOAA GHCN re
 
 =head1 VERSION
 
-version v0.0.009
+version v0.0.010
 
 =head1 SYNOPSIS
 
@@ -52,7 +52,7 @@ use v5.18;  # minimum for Object::Pad
 
 package Weather::GHCN::App::Fetch;
 
-our $VERSION = 'v0.0.009';
+our $VERSION = 'v0.0.010';
 
 use feature 'signatures';
 no warnings 'experimental::signatures';
@@ -129,7 +129,7 @@ my $Opt;    # options object, with property accessors for each user option
 my $Opt_savegui;    # file in which to save options from GUI dialog
 my $Opt_gui;        # launch the GUI dialog
 my $Opt_help;       # display POD documentation
-my $Opt_readme;     # launch a browser displaying the GHCN readme file
+my $Opt_readme;     # print the text of the GHCN readme file
 my $Opt_usage;      # display a synopsis of the command line syntax
 my $Opt_outclip;    # send report output to the Windows clipboard instead of STDOUT
 
@@ -309,7 +309,7 @@ sub run ($progname, $argv_aref, %args) {
     if ($ghcn->stn_filtered_count > $STN_THRESHOLD ) {
         if (-t *STDIN) {                
             print {*STDERR} ">>>> There are a lot of stations to process. Continue (y/n)?\n>>>> ";
-            my $reply = <*STDIN>;
+            my $reply = <STDIN>;
             chomp $reply;
             exit if $reply =~ m{ \A ( n | no ) }xmsi;
         } else {

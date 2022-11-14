@@ -4,7 +4,7 @@ Dist::Zilla::PluginBundle::GEEKRUTH - Be like GeekRuthie when you build your dis
 
 # VERSION
 
-version 1.0001
+version 2.0002
 
 # DESCRIPTION
 
@@ -32,20 +32,20 @@ her distributions. It's roughly equivalent to
     time_zone = America/New_York
     
     [MetaProvides::Package]
+    [MetaData::BuiltWith]
     [Manifest]
     [ManifestSkip]
     [Git::GatherDir]
-    [CopyFilesFromBuild]
+    [PruneCruft]
     [ExecDir]
-    [PkgVersion]
-    use_package = 1
-    
+    [OurPkgVersion]
+    [INI::Baked]
     [Authority]
-    do_munging = 0
-    
+    locate_comment =    
     [Test::ReportPrereqs]
     [TidyAll]
     [AutoPrereqs]
+    [Prereqs::Plugins]
     [CheckChangesHasContent]
     [ReadmeMarkdownFromPod]
     [TestRelease]
@@ -84,7 +84,7 @@ her distributions. It's roughly equivalent to
     [RunExtraTests]
     [Test::UnusedVars]
     [CPANFile]
-    [MinimumPerlFast]
+    [MinimumPerl]
 
 # ARGUMENTS
 
@@ -127,6 +127,10 @@ her distributions. It's roughly equivalent to
     Branch on which the CPAN images are commited.
 
     Defaults to `releases`.
+
+- `remove_plugin`
+
+    Lets you drop a plugin from the bundle for this distro; see [Dist::Zilla::Role::PluginBundle::PluginRemover](https://metacpan.org/pod/Dist%3A%3AZilla%3A%3ARole%3A%3APluginBundle%3A%3APluginRemover).
 
 - `upstream`
 

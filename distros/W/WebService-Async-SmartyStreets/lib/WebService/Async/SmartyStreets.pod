@@ -1,0 +1,128 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with WebService::Async::SmartyStreets
+at lib/WebService/Async/SmartyStreets.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+WebService::Async::SmartyStreets - calls the SmartyStreets API and checks for the validity of the address
+
+=head1 SYNOPSIS
+
+    my $ss = WebService::Async::SmartyStreets->new(
+        # Obtain these from your SmartyStreets account page.
+        # These will be used for US lookups
+        us_auth_id => '...',
+        us_token   => '...',
+        # For non-US address lookups, you would also need an international token
+        international_auth_id => '...',
+        international_token   => '...',
+    );
+    IO::Async::Loop->new->add($ss);
+
+    print $ss->verify(
+        city => 'Atlanta',
+        country => 'US',
+        geocode => 1
+    )->get->status;
+
+=head1 DESCRIPTION
+
+This module provides basic support for the L<SmartyStreets API|https://smartystreets.com/>.
+
+Note that this module uses L<Future::AsyncAwait>.
+
+=head2 verify
+
+Makes connection to SmartyStreets API and parses the response into WebService::Async::SmartyStreets::Address.
+
+    my $addr = $ss->verify(%address_to_check)->get;
+
+Takes the following named parameters:
+
+=over 4
+
+=item * C<country> - country (required)
+
+=item * C<address1> - address line 1
+
+=item * C<address2> - address line 2
+
+=item * C<organization> - name of organization (usually building names)
+
+=item * C<locality> - city
+
+=item * C<administrative_area> - state
+
+=item * C<postal_code> - post code
+
+=item * C<geocode> - true or false
+
+=back
+
+Returns a L<Future> which should resolve to a valid L<WebService::Async::SmartyStreets::Address> instance.
+
+=head2 METHODS - Accessors
+
+=head1 METHODS - Internal
+
+=head2 get_decoded_data
+
+Calls the SmartyStreets API then decode and parses the response give by SmartyStreets
+
+    my $decoded = await get_decoded_data($self, $uri)
+
+Takes the following parameters:
+
+=over 4
+
+=item * C<$uri> - URI for endpoint
+
+=back
+
+More information on the response can be seen in L<SmartyStreets Documentation | https://smartystreets.com/docs/cloud/international-street-api>.
+
+Returns a L<Future> which resolves to an arrayref of L<WebService::Async::SmartyStreets::Address> instances.
+
+=head2 configure
+
+Configures the instance.
+
+Takes the following named parameters:
+
+=over 4
+
+=item * C<international_auth_id> - auth_id obtained from SmartyStreet
+
+=item * C<international_token> - token obtained from SmartyStreet
+
+=item * C<us_auth_id> - auth_id obtained from SmartyStreet
+
+=item * C<us_token> - token obtained from SmartyStreet
+
+=back
+
+Note that you can provide US, international or both API tokens - if an API token
+is not available for a L</verify> call, then it will return a failed L<Future>.
+
+=head2 ua
+
+Accessor for the L<Net::Async::HTTP> instance which will be used for SmartyStreets API requests.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<IO::Async::Notifier>
+
+L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/adopt_future>, L<adopted_futures|IO::Async::Notifier/adopted_futures>, L<can_event|IO::Async::Notifier/can_event>, L<children|IO::Async::Notifier/children>, L<configure_unknown|IO::Async::Notifier/configure_unknown>, L<debug_printf|IO::Async::Notifier/debug_printf>, L<get_loop|IO::Async::Notifier/get_loop>, L<invoke_error|IO::Async::Notifier/invoke_error>, L<invoke_event|IO::Async::Notifier/invoke_event>, L<loop|IO::Async::Notifier/loop>, L<make_event_cb|IO::Async::Notifier/make_event_cb>, L<maybe_invoke_event|IO::Async::Notifier/maybe_invoke_event>, L<maybe_make_event_cb|IO::Async::Notifier/maybe_make_event_cb>, L<new|IO::Async::Notifier/new>, L<notifier_name|IO::Async::Notifier/notifier_name>, L<parent|IO::Async::Notifier/parent>, L<remove_child|IO::Async::Notifier/remove_child>, L<remove_from_parent|IO::Async::Notifier/remove_from_parent>
+
+=back
+

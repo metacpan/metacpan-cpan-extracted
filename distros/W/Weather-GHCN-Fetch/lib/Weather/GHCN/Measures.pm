@@ -8,7 +8,7 @@ Weather::GHCN::Measures - provide a list of meteorological metrics to be obtaine
 
 =head1 VERSION
 
-version v0.0.009
+version v0.0.010
 
 =head1 SYNOPSIS
 
@@ -56,7 +56,7 @@ use Object::Pad 0.66 qw( :experimental(init_expr) );
 package Weather::GHCN::Measures;
 class   Weather::GHCN::Measures;
 
-our $VERSION = 'v0.0.009';
+our $VERSION = 'v0.0.010';
 
 use Const::Fast;
 

@@ -31,6 +31,8 @@ BEGIN
     use_ok( 'DB::Object::Query' );
     use_ok( 'DB::Object::Cache::Tables' );
     use_ok( 'DB::Object::Statement' );
+    use_ok( 'DB::Object::Tables' );
+    use_ok( 'DB::Object::Fields::Field' );
     SKIP:
     {
         eval{ require DBD::SQLite; };
@@ -50,7 +52,6 @@ BEGIN
         use_ok( 'DB::Object::Postgres::Lo' );
         use_ok( 'DB::Object::Postgres::Tables' );
     };
-    use_ok( 'DB::Object::Tables' );
     SKIP:
     {
         eval{ require DBD::mysql; };
@@ -60,7 +61,6 @@ BEGIN
         use_ok( 'DB::Object::Mysql::Statement' );
         use_ok( 'DB::Object::Mysql::Tables' );
     }
-    use_ok( 'DB::Object::Fields::Field' );
 };
 
 done_testing();

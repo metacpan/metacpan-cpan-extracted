@@ -56,7 +56,7 @@ SYNOPSIS
         $result = $cust_sth_ins->as_string;
         # INSERT INTO customers (first_name, last_name, email, active) VALUES('Paul', 'Goldman', 'paul\@example.org', '0')
         $dbh->commit;
-        ## Get the last used insert id
+        # Get the last used insert id
         my $id = $dbh->last_insert_id();
 
         $cust->where( email => 'john@example.org' );
@@ -73,11 +73,11 @@ SYNOPSIS
         # Would become:
         # UPDATE ONLY customers SET active='0' WHERE email='john\@example.org'
 
-        ## Lets' dump the result of our query
-        ## First to STDERR
+        # Lets' dump the result of our query
+        # First to STDERR
         $login->where( "login='jack'" );
         $login->select->dump();
-        ## Now dump the result to a file
+        # Now dump the result to a file
         $login->select->dump( "my_file.txt" );
 
     Using fields objects
@@ -128,7 +128,7 @@ SYNOPSIS
         # SELECT id FROM orders WHERE ip_addr = inet ? OR inet ? << ip_addr
 
 VERSION
-        v0.10.2
+        v0.10.4
 
 DESCRIPTION
     DB::Object is a SQL API much alike "DBI", but with the added benefits
@@ -760,6 +760,10 @@ METHODS
   order
     See "order" in DB::Object::Tables
 
+  P
+    Returns a DB::Object::Placeholder object, passing it whatever arguments
+    was provided.
+
   param
     If only a single parameter is provided, its value is return. If a list
     of parameters is provided they are set accordingly using the "SET" sql
@@ -800,6 +804,10 @@ METHODS
   ping_select
     Will prepare and execute a simple "SELECT 1" and return 0 upon failure
     or return the value returned from calling "execute" in DBI.
+
+  placeholder
+    Same as "P". Returns a DB::Object::Placeholder object, passing it
+    whatever arguments was provided.
 
   port
     Sets or gets the "port" property for this database object.
@@ -912,6 +920,10 @@ METHODS
 
   tie
     See "tie" in DB::Object::Tables
+
+  transaction
+    True when a transaction has been started with "begin_work", false
+    otherwise.
 
   TRUE
     Returns "TRUE" to be used in queries.

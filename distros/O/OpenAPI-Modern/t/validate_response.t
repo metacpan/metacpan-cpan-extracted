@@ -261,6 +261,9 @@ components:
             additionalProperties: false
         text/html:
           schema: false
+        text/plain:
+          schema:
+            const: éclair
 paths:
   /foo:
     post:
@@ -297,7 +300,7 @@ YAML
   );
 
   cmp_deeply(
-    ($result = $openapi->validate_response(response(200, [ 'Content-Type' => 'text/plain' ], 'plain text'),
+    ($result = $openapi->validate_response(response(200, [ 'Content-Type' => 'text/bloop' ], 'plain text'),
       { path_template => '/foo', method => 'post' }))->TO_JSON,
     {
       valid => false,
@@ -306,11 +309,11 @@ YAML
           instanceLocation => '/response/body',
           keywordLocation => jsonp(qw(/paths /foo post responses default $ref content)),
           absoluteKeywordLocation => $doc_uri_rel->clone->fragment('/components/responses/default/content')->to_string,
-          error => 'incorrect Content-Type "text/plain"',
+          error => 'incorrect Content-Type "text/bloop"',
         },
       ],
     },
-    'wrong Content-Type',
+    'Content-Type not allowed by the schema',
   );
 
   cmp_deeply(
@@ -331,15 +334,15 @@ YAML
   );
 
   cmp_deeply(
-    ($result = $openapi->validate_response(response(200, [ 'Content-Type' => 'application/json; charset=ISO-8859-1' ],
-        '{"alpha": "123", "beta": "'.chr(0xe9).'clair"}'),
+    ($result = $openapi->validate_response(response(200, [ 'Content-Type' => 'text/plain; charset=ISO-8859-1' ],
+        chr(0xe9).'clair'),
       { path_template => '/foo', method => 'post' }))->TO_JSON,
     { valid => true },
-    'content matches',
+    'latin1 content can be successfully decoded',
   );
 
   cmp_deeply(
-    ($result = $openapi->validate_response(response(200, [ 'Content-Type' => 'application/json; charset=UTF-8' ],
+    ($result = $openapi->validate_response(response(200, [ 'Content-Type' => 'application/json' ],
         '{"alpha": "foo", "gamma": "o.o"}'),
       { path_template => '/foo', method => 'post' }))->TO_JSON,
     {
@@ -371,7 +374,7 @@ YAML
 
   my $disapprove = v224.178.160.95.224.178.160; # utf-8-encoded "ಠ_ಠ"
   cmp_deeply(
-    ($result = $openapi->validate_response(response(200, [ 'Content-Type' => 'application/json; charset=UTF-8' ],
+    ($result = $openapi->validate_response(response(200, [ 'Content-Type' => 'application/json' ],
         '{"alpha": "123", "gamma": "'.$disapprove.'"}'),
       { path_template => '/foo', method => 'post' }))->TO_JSON,
     { valid => true },

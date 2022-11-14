@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2009-2022 -- leonerd@leonerd.org.uk
 
-package Convert::Color 0.12;
+package Convert::Color 0.13;
 
 use v5.14;
 use warnings;

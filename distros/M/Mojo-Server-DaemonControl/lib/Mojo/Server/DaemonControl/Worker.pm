@@ -1,35 +1,31 @@
 package Mojo::Server::DaemonControl::Worker;
 use Mojo::Base 'Mojo::Server::Daemon', -signatures;
 
-use IO::Socket::UNIX;
 use Scalar::Util qw(weaken);
 
 has heartbeat_interval => sub ($self) { $ENV{MOJODCTL_HEARTBEAT_INTERVAL} || 5 };
-has manager_pid        => sub ($self) { $ENV{MOJODCTL_PID}                || getppid };
+has manager_pid        => sub ($self) {getppid};
 has silent             => 1;
-has worker_pipe        => sub ($self) { $self->_build_worker_pipe };
 
 sub run ($self, $app, @) {
   weaken $self;
   $0 = $app;
+
   my $loop         = $self->ioloop;
   my $heartbeat_cb = sub { $self->_heartbeat_tick };
   $loop->next_tick($heartbeat_cb);
-  $loop->recurring($self->heartbeat_interval, $heartbeat_cb);
+  $self->{heartbeat_tid} ||= $loop->recurring($self->heartbeat_interval, $heartbeat_cb);
+
   $loop->on(finish => sub { $self->max_requests(1) });
   local $SIG{QUIT} = sub { $self->_stop_gracefully };
-  return $self->tap(load_app => $app)->SUPER::run;
-}
-
-sub _build_worker_pipe ($self) {
-  my $path = $ENV{MOJODCTL_CONTROL_SOCK}
-    || die "Can't create a worker pipe: MOJODCTL_CONTROL_SOCK not set";
-  return IO::Socket::UNIX->new(Peer => $path, Type => SOCK_DGRAM)
-    || die "Can't create a worker pipe: $@";
+  return $self->tap('manager_pid')->tap(load_app => $app)->SUPER::run;
 }
 
 sub _heartbeat ($self, $state) {
-  $self->worker_pipe->syswrite("$$:$state\n") || die "Heartbeat FAIL $!";
+  state $fh = IO::Handle->new_from_fd($ENV{MOJODCTL_HEARTBEAT_FD} || 1, '>')
+    or die "open heartbeat fd: $!";
+  $fh->autoflush(1);
+  $fh->printf("mojodctl:%s:%s:%s\n", $self->manager_pid, $$, $state);
 }
 
 sub _heartbeat_tick ($self) {
@@ -37,12 +33,13 @@ sub _heartbeat_tick ($self) {
 
   # Force kill when parent pid changes
   $self->_heartbeat('k');
-  $self->worker_pipe->close;
   kill KILL => $$;
 }
 
 sub _stop_gracefully ($self) {
-  $self->ioloop->stop_gracefully;
+  my $loop = $self->ioloop;
+  $loop->remove(delete $self->{heartbeat_tid}) if $self->{heartbeat_tid};
+  $loop->stop_gracefully;
   $self->_heartbeat('g');
   $0 .= '-' . time;    # Rename process to indicate which is going to be replaced
 }
@@ -107,14 +104,6 @@ Holds the PID of the L<Mojo::Server::DaemonControl> process.
   $daemon = $daemon->silent(1);
 
 Changes the default in L<Mojo::Server::Daemon/silent> to 1.
-
-=head2 worker_pipe
-
-  $socket = $daemon->worker_pipe;
-
-Holds a L<IO::Socket::UNIX> object used to communicate with the manager. The
-default socket path is read from the C<MOJODCTL_CONTROL_SOCK> environment
-variable.
 
 =head1 METHODS
 

@@ -13,7 +13,11 @@ lib/Convert/Color/RGB16.pm
 lib/Convert/Color/RGB8.pm
 lib/Convert/Color/VGA.pm
 lib/Convert/Color/X11.pm
+LICENSE
 MANIFEST			This list of files
+META.json
+META.yml
+README
 t/00use.t
 t/01rgb.t
 t/02hsv.t
@@ -33,8 +37,3 @@ t/24hsl-dst.t
 t/30vga.t
 t/31x11.t
 t/99pod.t
-Makefile.PL
-README
-LICENSE
-META.yml
-META.json

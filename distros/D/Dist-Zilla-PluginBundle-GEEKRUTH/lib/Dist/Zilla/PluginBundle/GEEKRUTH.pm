@@ -1,16 +1,17 @@
-package Dist::Zilla::PluginBundle::GEEKRUTH 1.0001;
+package Dist::Zilla::PluginBundle::GEEKRUTH;
 use Modern::Perl;
+our $VERSION   = '2.0002';           # VERSION
+our $AUTHORITY = 'cpan:GEEKRUTH';    # AUTHORITY
 
 # ABSTRACT: Be like GeekRuthie when you build your dists
 
 use Moose;
 use Dist::Zilla;
-
 with qw/
    Dist::Zilla::Role::PluginBundle::Easy
    Dist::Zilla::Role::PluginBundle::Config::Slicer
+   Dist::Zilla::Role::PluginBundle::PluginRemover
    /;
-
 use Type::Tiny;
 use Types::Standard qw/ Str ArrayRef /;
 
@@ -71,17 +72,19 @@ sub configure {
       ],
       qw/
          MetaProvides::Package
+         MetaData::BuiltWith
          Manifest
          ManifestSkip
          Git::GatherDir
-         CopyFilesFromBuild
+         PruneCruft
          ExecDir
+         OurPkgVersion
+         INI::Baked
          /,
-      [ PkgVersion => { use_package => 1 } ],
       [
          Authority => {
-            authority  => $arg->{authority} // 'cpan:GEEKRUTH',
-            do_munging => 0,
+            authority      => $arg->{authority} // 'cpan:GEEKRUTH',
+            locate_comment => 1,
          }
       ],
       qw/ Test::ReportPrereqs /,
@@ -90,14 +93,14 @@ sub configure {
             ( skip => $arg->{autoprereqs_skip} ) x !!$arg->{autoprereqs_skip}
          }
       ],
-      qw/ CheckChangesHasContent
+      qw/ Prereqs::Plugins
+         CheckChangesHasContent
          ReadmeMarkdownFromPod
          TestRelease
          ConfirmRelease
          Git::Check
          CopyrightYearFromGit
          /,
-
       [
          'Git::CommitBuild' => {
             release_branch       => $release_branch,
@@ -119,6 +122,7 @@ sub configure {
             major    => 'MAJOR, API CHANGES',
             minor    => 'MINOR, NEW FEATURES, ENHANCEMENTS',
             revision => 'REVISION, BUG FIXES, DOCUMENTATION, STATISTICS',
+            format   => '%d.%02d%02d',
          }
       ],
       [
@@ -141,7 +145,7 @@ sub configure {
                push_to => join q{ }, $upstream, $dev_branch, $release_branch
             }
          ],
-         qw/UploadToCPAN/,
+         qw/FakeRelease/,
          [ 'InstallRelease' => { install_command => 'cpanm .' } ],
       );
    }
@@ -149,7 +153,6 @@ sub configure {
    $self->add_plugins(
       qw/
          SchwartzRatio
-         Test::UnusedVars
          RunExtraTests
          /,
    );
@@ -162,7 +165,10 @@ sub configure {
       );
    }
 
-   $self->add_plugins( [ 'CPANFile', 'MinimumPerlFast' ], );
+   $self->add_plugins(
+      qw/CPANFile/,
+      [ 'MinimumPerl' => { default_version => '5.012' } ],
+   );
 
    $self->config_slice('mb_class');
 
@@ -183,7 +189,7 @@ Dist::Zilla::PluginBundle::GEEKRUTH - Be like GeekRuthie when you build your dis
 
 =head1 VERSION
 
-version 1.0001
+version 2.0002
 
 =head1 DESCRIPTION
 
@@ -211,20 +217,20 @@ her distributions. It's roughly equivalent to
    time_zone = America/New_York
    
    [MetaProvides::Package]
+   [MetaData::BuiltWith]
    [Manifest]
    [ManifestSkip]
    [Git::GatherDir]
-   [CopyFilesFromBuild]
+   [PruneCruft]
    [ExecDir]
-   [PkgVersion]
-   use_package = 1
-   
+   [OurPkgVersion]
+   [INI::Baked]
    [Authority]
-   do_munging = 0
-   
+   locate_comment =    
    [Test::ReportPrereqs]
    [TidyAll]
    [AutoPrereqs]
+   [Prereqs::Plugins]
    [CheckChangesHasContent]
    [ReadmeMarkdownFromPod]
    [TestRelease]
@@ -263,7 +269,7 @@ her distributions. It's roughly equivalent to
    [RunExtraTests]
    [Test::UnusedVars]
    [CPANFile]
-   [MinimumPerlFast]
+   [MinimumPerl]
 
 =head1 ARGUMENTS
 
@@ -308,6 +314,10 @@ Defaults to C<main>.
 Branch on which the CPAN images are commited.
 
 Defaults to C<releases>.
+
+=item C<remove_plugin>
+
+Lets you drop a plugin from the bundle for this distro; see L<Dist::Zilla::Role::PluginBundle::PluginRemover>.
 
 =item C<upstream>
 

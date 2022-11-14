@@ -1,4 +1,0 @@
-class TestCase::IO::FileHandle {
-  use IO::FileHandle;
-}
-

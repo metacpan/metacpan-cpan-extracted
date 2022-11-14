@@ -11,7 +11,7 @@ lib/App/UniqFiles.pm
 script/dupe-files
 script/uniq-files
 t/00-compile.t
-t/01-basics.t
+t/01-basic.t
 t/author-critic.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t

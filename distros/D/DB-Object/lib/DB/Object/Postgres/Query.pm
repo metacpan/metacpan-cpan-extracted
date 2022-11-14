@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Postgres/Query.pm
-## Version v0.1.6
+## Version v0.1.7
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2021/08/24
+## Modified 2022/11/04
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -19,7 +19,7 @@ BEGIN
     use parent qw( DB::Object::Query );
     use vars qw( $VERSION $VERBOSE $DEBUG );
     use Devel::Confess;
-    $VERSION = 'v0.1.6';
+    $VERSION = 'v0.1.7';
 };
 
 use strict;
@@ -165,12 +165,12 @@ sub format_statement
     # But or that we need to know the order of the fields.
     $self->{sorted} = \@sorted;
     
-    foreach( @sorted )
+    foreach my $field ( @sorted )
     {
-        next if( defined( $struct->{ $_ } ) && $struct->{ $_ } =~ /\bSERIAL\b/i );
-        if( exists( $data->{ $_ } ) )
+        next if( defined( $struct->{ $field } ) && $struct->{ $field } =~ /\bSERIAL\b/i );
+        if( exists( $data->{ $field } ) )
         {
-            my $value = $data->{ $_ };
+            my $value = $data->{ $field };
             if( $self->_is_a( $value, "${base_class}::Statement" ) )
             {
                 push( @format_values, '(' . $value->as_string . ')' );
@@ -179,9 +179,9 @@ sub format_statement
                 push( @types, $value->query_object->binded_types->list ) if( $value->query_object->binded_types->length );
             }
             # This is for insert or update statement types
-            elsif( exists( $from_unix->{ $_ } ) )
+            elsif( exists( $from_unix->{ $field } ) )
             {
-                # push( @format_values, sprintf( "FROM_UNIXTIME('%s') AS $_", $data->{ $_ } ) );
+                # push( @format_values, sprintf( "FROM_UNIXTIME('%s') AS $field", $data->{ $field } ) );
                 if( $bind )
                 {
                     push( @$binded, $value );
@@ -194,9 +194,11 @@ sub format_statement
                     push( @format_values, $self->format_from_epoch({ value => $value, bind => 0 }) );
                     if( $value eq '?' )
                     {
-                        if( CORE::exists( $types_const->{ $_ } ) )
+                        if( CORE::exists( $types_const->{ $field } ) )
                         {
-                            CORE::push( @types, $types_const->{ $_ }->{constant} );
+                            # CORE::push( @types, $types_const->{ $field }->{constant} );
+                            # PG_INT4
+                            CORE::push( @types, $self->database_object->get_sql_type( 'int4' ) );
                         }
                         else
                         {
@@ -212,22 +214,22 @@ sub format_statement
             elsif( $value eq '?' )
             {
                 push( @format_values, '?' );
-                # CORE::push( @types, $types_const->{ $_ } ? $types_const->{ $_ }->{constant} : '' );
-                if( CORE::exists( $types_const->{ $_ } ) )
+                # CORE::push( @types, $types_const->{ $field } ? $types_const->{ $field }->{constant} : '' );
+                if( CORE::exists( $types_const->{ $field } ) )
                 {
-                    CORE::push( @types, $types_const->{ $_ }->{constant} );
+                    CORE::push( @types, $types_const->{ $field }->{constant} );
                 }
                 else
                 {
                     CORE::push( @types, '' );
                 }
             }
-            elsif( $struct->{ $_ } =~ /^\s*\bBLOB\b/i )
+            elsif( $struct->{ $field } =~ /^\s*\bBLOB\b/i )
             {
                 push( @format_values, '?' );
                 push( @$binded, $value );
                 my $const;
-                if( lc( $types->{ $_ } ) eq 'bytea' && ( $const = $self->database_object->get_sql_type( 'bytea' ) ) )
+                if( lc( $types->{ $field } ) eq 'bytea' && ( $const = $self->database_object->get_sql_type( 'bytea' ) ) )
                 {
                     # CORE::push( @types, DBD::Pg::PG_BYTEA );
                     CORE::push( @types, $const );
@@ -250,17 +252,17 @@ sub format_statement
             elsif( !$bind )
             {
                 my $const;
-                if( lc( $types->{ $_ } ) eq 'bytea' && ( $const = $self->database_object->get_sql_type( 'bytea' ) ) )
+                if( lc( $types->{ $field } ) eq 'bytea' && ( $const = $self->database_object->get_sql_type( 'bytea' ) ) )
                 {
                     # push( @format_values, $tbl_o->database_object->quote( $value, DBD::Pg::PG_BYTEA ) );
                     push( @format_values, $tbl_o->database_object->quote( $value, { pg_type => $const } ) );
                 }
                 # Value is a hash and the data type is json, so we transform this value into a json data
-                elsif( $self->_is_hash( $value ) && ( lc( $types->{ $_ } ) eq 'jsonb' || lc( $types->{ $_ } ) eq 'json' ) )
+                elsif( $self->_is_hash( $value ) && ( lc( $types->{ $field } ) eq 'jsonb' || lc( $types->{ $field } ) eq 'json' ) )
                 {
                     my $this_json = $self->_encode_json( $value );
-                    # push( @format_values, $tbl_o->database_object->quote( $this_json, ( lc( $types->{ $_ } ) eq 'jsonb' ? DBD::Pg::PG_JSONB : DBD::Pg::PG_JSON ) ) );
-                    push( @format_values, $tbl_o->database_object->quote( $this_json, { pg_type => $self->database_object->get_sql_type( $types->{ $_ } ) } ) );
+                    # push( @format_values, $tbl_o->database_object->quote( $this_json, ( lc( $types->{ $field } ) eq 'jsonb' ? DBD::Pg::PG_JSONB : DBD::Pg::PG_JSON ) ) );
+                    push( @format_values, $tbl_o->database_object->quote( $this_json, { pg_type => $self->database_object->get_sql_type( $types->{ $field } ) } ) );
                 }
                 else
                 {
@@ -269,12 +271,12 @@ sub format_statement
                 }
             }
             # We do this before testing for param binding because DBI puts quotes around SET number :-(
-            elsif( $value =~ /^\d+$/ && $struct->{ $_ } =~ /\bSET\(/i )
+            elsif( $value =~ /^\d+$/ && $struct->{ $field } =~ /\bSET\(/i )
             {
                 push( @format_values, $value );
             }
             elsif( $value =~ /^\d+$/ && 
-                   $struct->{ $_ } =~ /\bENUM\(/i && 
+                   $struct->{ $field } =~ /\bENUM\(/i && 
                       ( $query_type eq 'insert' || $query_type eq 'update' ) )
             {
                 push( @format_values, "'$value'" );
@@ -285,7 +287,7 @@ sub format_statement
                 push( @format_values, '?' );
                 push( @$binded, $value );
                 my $const;
-                if( lc( $types->{ $_ } ) eq 'bytea' && ( $const = $self->database_object->get_sql_type( 'bytea' ) ) )
+                if( lc( $types->{ $field } ) eq 'bytea' && ( $const = $self->database_object->get_sql_type( 'bytea' ) ) )
                 {
                     CORE::push( @types, $const );
                 }
@@ -299,7 +301,7 @@ sub format_statement
             {
                 # push( @format_values, "'" . quotemeta( $value ) . "'" );
                 my $const;
-                if( lc( $types->{ $_ } ) eq 'bytea' && ( $const = $self->database_object->get_sql_type( 'bytea' ) ) )
+                if( lc( $types->{ $field } ) eq 'bytea' && ( $const = $self->database_object->get_sql_type( 'bytea' ) ) )
                 {
                     # push( @format_values, $tbl_o->database_object->quote( $value, DBD::Pg::PG_BYTEA ) );
                     push( @format_values, $tbl_o->database_object->quote( $value, { pg_type => $const } ) );
@@ -314,7 +316,7 @@ sub format_statement
         if( $field_prefix ) 
         {
             # $self->message_colour( 3, "Prefix to be used is '<green>$field_prefix</>'." );
-            s{
+            $field =~ s{
                 (?<!\.)\b($ok_list)\b(\s*)?(?!\.)
             }
             {
@@ -332,12 +334,12 @@ sub format_statement
                     "${field}${spc}";
                 }
             }gex;
-            s/(?<!\.)($tables)(?:\.)/$db\.$1\./g if( $multi_db );
-            push( @format_fields, $_ );
+            $field =~ s/(?<!\.)($tables)(?:\.)/$db\.$1\./g if( $multi_db );
+            push( @format_fields, $field );
         }
         else
         {
-            push( @format_fields, $_ );
+            push( @format_fields, $field );
         }
     }
     $self->binded_types->push( @types ) if( scalar( @types ) );
@@ -647,7 +649,7 @@ DB::Object::Postgres::Query - Query Object for PostgreSQL
 
 =head1 VERSION
 
-    v0.1.6
+    v0.1.7
 
 =head1 DESCRIPTION
 

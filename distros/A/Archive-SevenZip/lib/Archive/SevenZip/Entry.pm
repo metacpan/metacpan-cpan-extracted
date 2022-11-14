@@ -1,12 +1,13 @@
 package Archive::SevenZip::Entry;
 use strict;
+use warnings;
 
 use Archive::Zip::Member;
 use Time::Piece; # for strptime
 use File::Basename ();
 use Path::Class ();
 
-our $VERSION= '0.16';
+our $VERSION= '0.17';
 
 sub new {
     my( $class, %options) = @_;
@@ -25,9 +26,8 @@ sub fileName {
 
     # Normalize to unixy path names
     $res =~ s!\\!/!g;
-
     # If we're a directory, append the slash:
-    if( $self->{Folder} eq '+') {
+    if( exists $self->{Folder} and $self->{Folder} eq '+') {
         $res .= '/';
     };
 
@@ -134,7 +134,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2015-2019 by Max Maischein C<corion@cpan.org>.
+Copyright 2015-2022 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

@@ -1,0 +1,25 @@
+COPYING
+lib/HTML/Blitz.pm
+lib/HTML/Blitz/ActionType.pm
+lib/HTML/Blitz/Atom.pm
+lib/HTML/Blitz/Builder.pm
+lib/HTML/Blitz/CodeGen.pm
+lib/HTML/Blitz/Matcher.pm
+lib/HTML/Blitz/ParseError.pm
+lib/HTML/Blitz/Parser.pm
+lib/HTML/Blitz/pragma.pm
+lib/HTML/Blitz/RuleSet.pm
+lib/HTML/Blitz/SelectorGroup.pm
+lib/HTML/Blitz/SelectorType.pm
+lib/HTML/Blitz/SSSelector.pm
+lib/HTML/Blitz/Template.pm
+lib/HTML/Blitz/TokenType.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+t/actions.t
+t/methods.t
+t/selectors.t
+t/template/doc.html
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -36,7 +36,7 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
 
 # Retrun value automatical numeric convertion
 {
-  ok(SPVM::TestCase::Method->return_value_automatical_numeric_convertion);
+  ok(SPVM::TestCase::Method->return_mulnum_automatical_numeric_convertion);
 }
 # variable length arguments
 {
@@ -54,49 +54,72 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
   ok(SPVM::TestCase::Method->cb_obj_call_cb_obj_from_callback);
 }
 
+# Argument multi-numeric type
+{
+  ok(SPVM::TestCase::Method->test_arg_byte);
+  ok(SPVM::TestCase::Method->test_arg_short);
+  ok(SPVM::TestCase::Method->test_arg_int);
+  ok(SPVM::TestCase::Method->test_arg_long);
+  ok(SPVM::TestCase::Method->test_arg_float);
+  ok(SPVM::TestCase::Method->test_arg_double);
+  ok(SPVM::TestCase::Method->test_arg_object);
+  ok(SPVM::TestCase::Method->test_arg_ref);
+}
+
+# Argument multi-numeric type
+{
+  ok(SPVM::TestCase::Method->test_arg_mulnum_byte);
+  ok(SPVM::TestCase::Method->test_arg_mulnum_short);
+  ok(SPVM::TestCase::Method->test_arg_mulnum_int);
+  ok(SPVM::TestCase::Method->test_arg_mulnum_long);
+  ok(SPVM::TestCase::Method->test_arg_mulnum_float);
+  ok(SPVM::TestCase::Method->test_arg_mulnum_double);
+  ok(SPVM::TestCase::Method->test_arg_mulnum_ref);
+}
+
 # Return value
 {
-  ok(SPVM::TestCase::Method->return_value_byte);
-  ok(SPVM::TestCase::Method->return_value_short);
-  ok(SPVM::TestCase::Method->return_value_int);
-  ok(SPVM::TestCase::Method->return_value_long);
-  ok(SPVM::TestCase::Method->return_value_float);
-  ok(SPVM::TestCase::Method->return_value_double);
+  ok(SPVM::TestCase::Method->return_mulnum_byte);
+  ok(SPVM::TestCase::Method->return_mulnum_short);
+  ok(SPVM::TestCase::Method->return_mulnum_int);
+  ok(SPVM::TestCase::Method->return_mulnum_long);
+  ok(SPVM::TestCase::Method->return_mulnum_float);
+  ok(SPVM::TestCase::Method->return_mulnum_double);
 }
 
 {
-  ok(SPVM::TestCase::Method->push_arg_undef());
+  ok(SPVM::TestCase::Method->push_arg_undef);
 }
 
 # Call method
 {
-  ok(SPVM::TestCase::Method->call_spvm_method_last_camma());
+  ok(SPVM::TestCase::Method->call_spvm_method_last_camma);
   ok(SPVM::TestCase::Method->call_spvm_method_undef(undef));
 }
 
 # Call void method
 {
-  ok(SPVM::TestCase::Method->call_void());
+  ok(SPVM::TestCase::Method->call_void);
 }
 
 # Default return value
 {
-  ok(SPVM::TestCase::Method->default_return_value_byte());
-  ok(SPVM::TestCase::Method->default_return_value_short());
-  ok(SPVM::TestCase::Method->default_return_value_int());
-  ok(SPVM::TestCase::Method->default_return_value_long());
-  ok(SPVM::TestCase::Method->default_return_value_float());
-  ok(SPVM::TestCase::Method->default_return_value_double());
-  ok(SPVM::TestCase::Method->default_return_value_object());
+  ok(SPVM::TestCase::Method->default_return_mulnum_byte);
+  ok(SPVM::TestCase::Method->default_return_mulnum_short);
+  ok(SPVM::TestCase::Method->default_return_mulnum_int);
+  ok(SPVM::TestCase::Method->default_return_mulnum_long);
+  ok(SPVM::TestCase::Method->default_return_mulnum_float);
+  ok(SPVM::TestCase::Method->default_return_mulnum_double);
+  ok(SPVM::TestCase::Method->default_return_mulnum_object);
 }
 
 {
-  ok(SPVM::TestCase::Method->call_spvm_method_nest());
+  ok(SPVM::TestCase::Method->call_spvm_method_nest);
 }
 
 # Argument convetion
 {
-  ok(SPVM::TestCase::Method->call_spvm_method_args_convertion());
+  ok(SPVM::TestCase::Method->call_spvm_method_args_convertion);
 }
 
 

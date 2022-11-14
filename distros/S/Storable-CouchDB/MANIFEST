@@ -1,5 +1,6 @@
 MANIFEST
-README
+README.md
+CONTRIBUTING.md
 LICENSE
 Todo
 Changes
@@ -17,4 +18,5 @@ t/030_delete.t
 t/040_retrieve.t
 perl-Storable-CouchDB.spec
 scripts/perl-Storable-CouchDB-counter.pl
-META.yml                                 Module meta-data (added by MakeMaker)
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

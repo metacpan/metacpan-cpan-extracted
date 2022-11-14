@@ -28,10 +28,10 @@ no_index:
 provides:
   POE::Component::EasyDBI:
     file: lib/POE/Component/EasyDBI.pm
-    version: '1.29'
+    version: '1.30'
   POE::Component::EasyDBI::SubProcess:
     file: lib/POE/Component/EasyDBI/SubProcess.pm
-    version: '1.29'
+    version: '1.30'
 requires:
   Carp: '0'
   DBI: '1.38'
@@ -45,7 +45,7 @@ requires:
 resources:
   homepage: https://github.com/gps4net/POE-Component-EasyDBI
   repository: https://github.com/gps4net/POE-Component-EasyDBI.git
-version: '1.29'
+version: '1.30'
 x_authority: cpan:XANTUS
 x_contributors:
   - 'Gelu Lupas <ggl@users.noreply.github.com>'

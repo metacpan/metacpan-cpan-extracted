@@ -5,14 +5,24 @@ use warnings;
 # Plot a network graph of the chords of a given song.
 
 use GraphViz2;
+#use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(Music-BachChoralHarmony); # local author libs
 use Music::BachChoralHarmony;
 
-my $id = shift || '000106b_';
+my $id = shift || '000106b_'; # -1 selects a random song
 my $thresh = shift || 1;
 
-#my $bach = Music::BachChoralHarmony->new( data_file => 'share/jsbach_chorals_harmony.data', key_title => 'share/jsbach_BWV_keys_titles.txt' );
-my $bach = Music::BachChoralHarmony->new;
-my $progression = $bach->parse();
+#my $data_file = 'share/jsbach_chorals_harmony.data'; # local author files
+#my $key_title = 'share/jsbach_BWV_keys_titles.txt';  # "
+my $bach = Music::BachChoralHarmony->new(
+#    data_file => $data_file,
+#    key_title => $key_title,
+);
+my $progression = $bach->parse;
+
+if ($id eq -1) {
+    my @ids = keys %$progression;
+    $id = $ids[ int rand @ids ];
+}
 
 # Redefine the progression for the given id:
 $progression = $progression->{$id};
@@ -59,4 +69,4 @@ for my $bigram ( keys %score ) {
         unless $edges{$bigram}++;
 }
 
-$g->run( format => 'png', output_file => $0 . '.png' );
+$g->run( format => 'png', output_file => "$0-$id.png" );

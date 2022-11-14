@@ -8,7 +8,7 @@ Weather::GHCN::StationTable - collect station objects and weather data
 
 =head1 VERSION
 
-version v0.0.009
+version v0.0.010
 
 =head1 SYNOPSIS
 
@@ -69,7 +69,7 @@ use Object::Pad 0.66 qw( :experimental(init_expr) );
 package Weather::GHCN::StationTable;
 class   Weather::GHCN::StationTable;
 
-our $VERSION = 'v0.0.009';
+our $VERSION = 'v0.0.010';
 
 # directly used by this module
 use Carp                qw( carp croak );
@@ -1176,7 +1176,7 @@ method report_kml ( %arg ) {
     my @output;
 
     push @output, '<?xml version="1.0" encoding="UTF-8"?>';
-    push @output, '<kml xmlns="http://www.opengps.net/kml/2.2">';
+    push @output, '<kml xmlns="http://www.opengis.net/kml/2.2">';
     push @output, '<Document>';
     push @output, '  <Style id="mypin">';
     push @output, '  <IconStyle>';

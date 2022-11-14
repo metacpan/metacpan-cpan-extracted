@@ -4,55 +4,54 @@ use warnings;
 use ExtUtils::MakeMaker;
 use File::Spec;
 
-my $extdir = 'discount';
+my $extdir = 'discount-2.2.7';
 my $myextlib = File::Spec->catfile($extdir, 'libmarkdown.a');
 my $clean_files = join (" ",
                   map{ File::Spec->catfile($extdir, $_) }
                   qw ( 
-Csio.o
-basename.o
-blocktags
-cols
+main.o
+mkd2html.o
 config.cmd
+cols
+theme.o
+html5.o
+setup.o
+version.o
+mkd2html
+echo
+Csio.o
+msvc
+mktags
 config.h
-config.log
-config.mak
+pgm_options.o
+libmarkdown
+dumptree.o
+Makefile
+libmarkdown.a
+markdown
+flags.o
+blocktags
+toc.o
+makepage
+emmatch.o
+generate.o
 config.md
 config.sub
-css.o
-docheader.o
-dumptree.o
-echo
-emmatch.o
-flags.o
-generate.o
-html5.o
-libmarkdown
-libmarkdown.a
-librarian.sh
-main.o
-makepage
-markdown
-markdown.o
-mkd2html
-mkd2html.o
-mkdio.h
-mkdio.o
-mktags
-pgm_options.o
-resource.o
-setup.o
-tags.o
-theme
-theme.o
-toc.o
-theme
-theme.o
-toc.o
-version.c
-version.o
+config.mak
 xml.o
+theme
+resource.o
+version.c
+tags.o
+config.log
 xmlpage.o
+css.o
+basename.o
+mkdio.o
+mkdio.h
+markdown.o
+librarian.sh
+docheader.o
                   ));
 
 

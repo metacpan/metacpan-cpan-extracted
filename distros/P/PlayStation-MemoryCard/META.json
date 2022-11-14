@@ -49,7 +49,7 @@
          "web" : "https://github.com/G4Vi/psx_mc_cli"
       }
    },
-   "version" : "v0.2.0",
-   "x_serialization_backend" : "JSON::PP version 4.10",
+   "version" : "v0.2.1",
+   "x_serialization_backend" : "JSON::PP version 4.12",
    "x_static_install" : 1
 }

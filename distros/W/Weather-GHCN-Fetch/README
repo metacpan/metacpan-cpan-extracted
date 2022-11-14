@@ -3,7 +3,7 @@ NAME
     Climatology Network repository
 
 VERSION
-    version v0.0.009
+    version v0.0.010
 
 DESCRIPTION
     The Weather::GHCN module library provides classes that can be used to
@@ -78,51 +78,8 @@ API MODULES
 
 EXAMPLES
     The primary usefulness of this package comes from the application
-    scripts. Here are some examples:
-
-    List the weather stations in NY state with "New York" in the name:
-
-    "ghcn_fetch -country US -state NY -location "New York""
-
-    List the New York weather stations active between 1900 and 1920:
-
-    "ghcn_fetch -cou US -st NY -location "New York" -active 1900-1920"
-
-    Report the yearly max, min and average temperatures at JFK airport:
-
-    "ghcn_fetch yearly -cou US -st NY -location "New York JFK""
-
-    Report the monthly max, min and average temperatures at JFK airport:
-
-    "ghcn_fetch monthly -cou US -st NY -location "New York JFK""
-
-    Report the daily max, min and average temperatures at JFK airport:
-
-    "ghcn_fetch daily -cou US -st NY -location "New York JFK""
-
-    Launch the GUI for an options dialog
-
-    "ghcn_fetch -gui"
-
-    (requires Tk and Tk::Getopt to be installed)
-
-    Get documentation on all the options
-
-    "ghcn_fetch -help"
-
-    Find the 5-day heatwaves at the JFK airport station:
-
-    "ghcn_fetch id -cou US -st NY -location "New York JFK" | ghcn_extremes"
-
-    Find the 3-day coldwaves (<= 15C) at the JFK airport station:
-
-    "ghcn_fetch id -cou US -st NY -location "New York JFK" | ghcn_extremes
-    -cold -ndays 3 -limit -15"
-
-    For each year between 1900 and 1950, count the number of active weather
-    stations in NY state:
-
-    "ghcn_fetch id -cou US -st NY -active 1900-1950 | ghcn_station_counts"
+    scripts. For example of the types of reports that can be generated, see
+    the EXAMPLES section of the help documentation for ghcn_fetch.
 
 AUTHOR
     Gary Puckering (jgpuckering@rogers.com)

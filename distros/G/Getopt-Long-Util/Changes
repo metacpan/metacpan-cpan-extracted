@@ -1,3 +1,8 @@
+0.899   2022-11-14  Released-By: PERLANCAR; Urgency: medium
+
+        - [func humanize_getopt_long_opt_spec] Tweak POD formatting.
+
+
 0.898   2022-10-12  Released-By: PERLANCAR; Urgency: medium
 
         - humanize_getopt_long_opt_spec(): Add option opt_link.

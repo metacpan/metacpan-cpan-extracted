@@ -115,7 +115,7 @@ SKIP: {
     skip("freebsd's unzip doesn't care about empty zips", 1)
         if $^O eq 'freebsd';
 
-    ok($status != 0);
+    ok($status == 0 || $status == -1, "unzip -t returns error code=1 for warning on empty");
 }
 
 # unzip -t returns error code=1 for warning on empty

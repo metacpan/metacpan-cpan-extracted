@@ -4,13 +4,13 @@
       "Ivan Wills <ivan.wills@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Group-Git-Cmd-Stats",
    "prereqs" : {
@@ -41,7 +41,7 @@
    "provides" : {
       "Group::Git::Cmd::Stats" : {
          "file" : "lib/Group/Git/Cmd/Stats.pm",
-         "version" : "v0.0.3"
+         "version" : "v0.0.4"
       }
    },
    "release_status" : "stable",
@@ -56,6 +56,6 @@
          "url" : "git://github.com/ivanwills/Group-Git-Cmd-Stats.git"
       }
    },
-   "version" : "v0.0.3",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "v0.0.4",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

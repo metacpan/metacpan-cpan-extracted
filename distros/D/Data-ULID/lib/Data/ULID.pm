@@ -3,19 +3,27 @@ package Data::ULID;
 use strict;
 use warnings;
 
-our $VERSION = '1.1.2';
+our $VERSION = '1.2.1';
 
 use base qw(Exporter);
 our @EXPORT_OK = qw/ulid binary_ulid ulid_date ulid_to_uuid uuid_to_ulid/;
 our %EXPORT_TAGS = ( 'all' => \@EXPORT_OK );
 
 use Time::HiRes qw/time/;
-use Math::BigInt 1.999808 try => 'GMP,LTM';
 use Crypt::PRNG qw/random_bytes/;
-use DateTime;
 
-use Config;
-our $CAN_SKIP_BIGINTS = $Config{ivsize} >= 8;
+use constant HAS_DATETIME => eval { require DateTime; 1 };
+
+BEGIN {
+    use Config;
+    use constant CAN_SKIP_BIGINTS => $Config{ivsize} >= 8;
+
+    if (!CAN_SKIP_BIGINTS) {
+        require Math::BigInt;
+        Math::BigInt->VERSION(1.999808);
+        Math::BigInt->import(try => 'GMP,LTM');
+    }
+}
 
 ### EXPORTED ULID FUNCTIONS
 
@@ -29,7 +37,10 @@ sub binary_ulid {
 
 sub ulid_date {
     my $ulid = shift;
+
+    die "ulid_date() requires DateTime module" unless HAS_DATETIME;
     die "ulid_date() needs a normal or binary ULID as parameter" unless $ulid;
+
     my ($ts, $rand) = _ulid($ulid);
 
     return DateTime->from_epoch(epoch => _unfix_ts($ts));
@@ -106,9 +117,9 @@ sub _unpack {
 sub _fix_ts {
     my $ts = shift;
 
-    if ($CAN_SKIP_BIGINTS) {
-        $ts *= 1000;
-        return pack 'Nn', int($ts / (2 << 15)), $ts % (2 << 15);
+    if (CAN_SKIP_BIGINTS) {
+        $ts = int($ts * 1000);
+        return pack 'Nn', $ts >> 16, $ts & 0xffff;
     } else {
         $ts .= '000';
         $ts =~ s/\.(\d{3}).*$/$1/;
@@ -119,9 +130,9 @@ sub _fix_ts {
 sub _unfix_ts {
     my $ts = shift;
 
-    if ($CAN_SKIP_BIGINTS) {
+    if (CAN_SKIP_BIGINTS) {
         my ($high, $low) = unpack 'Nn', $ts;
-        return ($high * (2 << 15) + $low) / 1000;
+        return (($high << 16) + $low) / 1000;
     } else {
         $ts = Math::BigInt->from_bytes($ts);
         $ts =~ s/(\d{3})$/.$1/;
@@ -140,13 +151,18 @@ sub _decode {
 }
 
 sub _zero_pad {
-    my ($value, $mul, $char) = @_;
-    $char ||= '0';
+    # this function is used a lot. Keep it as lean as possible
+    # my ($value, $character_multiplier, $padding_character) = @_;
+    my $value = shift;
 
-    while ($char eq substr $value, 0, 1) { substr $value, 0, 1, '' }
+    my $padded = length($value) % $_[0];
+    return $value if $padded == 0;
 
-    my $left = $mul - length($value) % $mul;
-    return $char x ($left % $mul) . $value;
+    $_[1] ||= 0;
+    my $padding = substr $value, 0, $padded, '';
+
+    return $value if $padding eq $_[1] x $padded;
+    return $_[1] x ($_[0] - $padded) . $padding . $value;
 }
 
 ### BASE32 ENCODER / DECODER
@@ -169,18 +185,18 @@ sub _normalize {
 }
 
 sub _encode_b32 {
-    my $bits = unpack 'B*', shift;
-    $bits = _zero_pad($bits, 5);
+    my $bits = _zero_pad(unpack('B*', shift), 5);
+    my $len = length $bits;
 
     my $result = '';
-    for (my $i = 0; $i < length $bits; $i += 5) {
+    for (my $i = 0; $i < $len; $i += 5) {
         $result .= $ALPHABET_MAP_REVERSE{substr $bits, $i, 5};
     }
     return $result;
 }
 
 sub _decode_b32 {
-    my $encoded = join '', map { $ALPHABET_MAP{uc $_} } split //, shift;
+    my $encoded = join '', map { $ALPHABET_MAP{$_} } split //, uc shift;
     return pack 'B*', _zero_pad($encoded, 8);
 }
 
@@ -258,15 +274,19 @@ timestamp part.
 
  $ulid = ulid();
 
-Given a DateTime object as parameter, the function will set the timestamp part
-based on that:
-
- $ulid = ulid($datetime_obj);
-
 Given a binary ULID as parameter, it returns the same ULID in canonical
 format:
 
  $ulid = ulid($binary_ulid);
+
+Given a DateTime object as parameter, the function will set the timestamp part
+of the returned ULID accordingly:
+
+ $ulid = ulid($datetime_obj);
+
+This functionality obviously requires the DateTime module to be installed.
+Basic usage of C<Data::ULID> does not require this module, but it is
+recommended.
 
 =head2 Binary representation
 
@@ -284,7 +304,8 @@ ULID in the canonical representation and convert it to binary:
 =head2 Datetime extraction
 
 The C<ulid_date()> function takes a ULID (canonical or binary) and returns
-a DateTime object corresponding to the timestamp it encodes.
+a DateTime object corresponding to the timestamp it encodes. As above, this
+requires the DateTime module to be installed.
 
  $datetime = ulid_date($ulid);
 
@@ -349,11 +370,6 @@ validate non-random information (i.e. timestamp, MAC address or namespace).
 =back
 
 
-=head1 DEPENDENCIES
-
-L<Math::Random::Secure>, L<Encode::Base32::GMP>.
-
-
 =head1 AUTHOR
 
 Baldur Kristinsson, December 2016
@@ -364,20 +380,5 @@ Baldur Kristinsson, December 2016
 This is free software. It may be copied, distributed and modified under the
 same terms as Perl itself.
 
-
-=head1 VERSION HISTORY
-
- 0.1   - Initial version.
- 0.2   - Bugfixes: (a) fix errors on Perl 5.18 and older, (b) address an issue
-         with GMPz wrt Math::BigInt objects.
- 0.3   - Bugfix: Try to prevent 'Inappropriate argument' error from pre-0.43
-         versions of Math::GMPz.
- 0.4   - Bugfix: 'Invalid argument supplied to Math::GMPz::overload_mod' for
-         older versions of Math::GMPz on Windows and FreeBSD. Podfix.
- 1.0.0 - UUID conversion support; semantic versioning.
- 1.1.0 - Speedups courtesy of Bartosz Jarzyna (brtastic on CPAN, bbrtj on
-         Github). Use Crypt::PRNG for random number generation.
- 1.1.1 - Fix module version number.
- 1.1.2 - Fix POD (version history).
-
 =cut
+

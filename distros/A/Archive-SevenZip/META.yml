@@ -19,6 +19,7 @@ no_index:
     - t
     - inc
 requires:
+  Archive::Zip: '0'
   Archive::Zip::Member: '0'
   Encode: '0'
   Exporter: '5'
@@ -32,6 +33,6 @@ requires:
   perl: '5.006'
 resources:
   repository: git://github.com/Corion/Archive-SevenZip.git
-version: '0.16'
+version: '0.17'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

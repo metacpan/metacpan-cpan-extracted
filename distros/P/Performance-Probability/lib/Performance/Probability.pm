@@ -14,7 +14,7 @@ our @ISA = qw(Exporter);
 
 our @EXPORT_OK = qw(get_performance_probability);
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 =head1 NAME
 
@@ -129,52 +129,141 @@ sub _variance_x_square {
 #Covariance(i, j) is the covariance between contract i and j with time overlap.
 sub _covariance {
 
-    my ($start_time, $sell_time, $underlying, $types, $pk, $lk, $wk) = @_;
-
+    my ($start_time, $sell_time, $underlying, $types, $pk, $lk, $wk, $exit_tick_epoch, $barriers) = @_;
     my ($i, $j);
     my $covariance = 0;
 
-    for ($i = 0; $i < @{$start_time}; ++$i) {
-        for ($j = 0; $j < @{$sell_time}; ++$j) {
-            if ($i != $j and $underlying->[$i] eq $underlying->[$j]) {
+    for ($i = 0; $i < @{$types}; ++$i) {
+        if ($types->[$i] =~ /^CALL/ or $types->[$i] =~ /^PUT/) {
 
-                #check for time overlap.
-                my $min_end_time   = $sell_time->[$i] < $sell_time->[$j]   ? $sell_time->[$i]  : $sell_time->[$j];
-                my $max_start_time = $start_time->[$i] > $start_time->[$j] ? $start_time->[$i] : $start_time->[$j];
-                my $b_interval     = $min_end_time - $max_start_time;
+            for ($j = 0; $j < @{$sell_time}; ++$j) {
+                if ($i != $j and $underlying->[$i] eq $underlying->[$j]) {
 
-                if ($b_interval > 0) {
+                    #check for time overlap.
+                    my $min_end_time   = $sell_time->[$i] < $sell_time->[$j]   ? $sell_time->[$i]  : $sell_time->[$j];
+                    my $max_start_time = $start_time->[$i] > $start_time->[$j] ? $start_time->[$i] : $start_time->[$j];
+                    my $b_interval     = $min_end_time - $max_start_time;
 
-                    #calculate first and second contracts durations. please see the documentation for details
+                    if ($b_interval > 0) {
 
-                    my $first_contract_duration  = ($sell_time->[$i] - $start_time->[$i]);
-                    my $second_contract_duration = ($sell_time->[$j] - $start_time->[$j]);
+                        #calculate first and second contracts durations. please see the documentation for details
 
-                    my $i_strike = 0.0 - Math::Gauss::XS::inv_cdf($pk->[$i]);
-                    my $j_strike = 0.0 - Math::Gauss::XS::inv_cdf($pk->[$j]);
+                        my $first_contract_duration  = ($sell_time->[$i] - $start_time->[$i]);
+                        my $second_contract_duration = ($sell_time->[$j] - $start_time->[$j]);
 
-                    my $corr_ij = $b_interval / (sqrt($first_contract_duration) * sqrt($second_contract_duration));
+                        my $i_strike = 0.0 - Math::Gauss::XS::inv_cdf($pk->[$i]);
+                        my $j_strike = 0.0 - Math::Gauss::XS::inv_cdf($pk->[$j]);
 
-                    if ($types->[$i] ne $types->[$j]) {
-                        $corr_ij = -1 * $corr_ij;
+                        my $corr_ij = $b_interval / (sqrt($first_contract_duration) * sqrt($second_contract_duration));
+
+                        if ($types->[$i] ne $types->[$j]) {
+                            $corr_ij = -1 * $corr_ij;
+                        }
+
+                        if ($corr_ij < -1 or $corr_ij > 1) {
+                            next;
+                        }
+
+                        my $p_ij = Math::BivariateCDF::bivnor($i_strike, $j_strike, $corr_ij);
+
+                        my $covariance_ij =
+                            ($p_ij - $pk->[$i] * $pk->[$j]) * ($wk->[$i] - $lk->[$i]) * ($wk->[$j] - $lk->[$j]);
+                        $covariance = $covariance + $covariance_ij;
                     }
-
-                    if ($corr_ij < -1 or $corr_ij > 1) {
-                        next;
-                    }
-
-                    my $p_ij = Math::BivariateCDF::bivnor($i_strike, $j_strike, $corr_ij);
-
-                    my $covariance_ij =
-                        ($p_ij - $pk->[$i] * $pk->[$j]) * ($wk->[$i] - $lk->[$i]) * ($wk->[$j] - $lk->[$j]);
-
-                    $covariance = $covariance + $covariance_ij;
                 }
             }
+        } elsif ($types->[$i] =~ /^DIGIT/) {
+            for ($j = 0; $j < @{$exit_tick_epoch}; ++$j) {
+                if ($i != $j and $underlying->[$i] eq $underlying->[$j] and $exit_tick_epoch->[$i] == $exit_tick_epoch->[$j]) {
+
+                    my $p_ij = get_shared_winning_probability({
+                            type_1    => $types->[$i],
+                            type_2    => $types->[$j],
+                            barrier_1 => $barriers->[$i],
+                            barrier_2 => $barriers->[$j]});
+
+                    my $covariance_ij = ($p_ij - $pk->[$i] * $pk->[$j]) * ($wk->[$i] - $lk->[$i]) * ($wk->[$j] - $lk->[$j]);
+                    $covariance = $covariance + $covariance_ij;
+
+                }
+            }
+        } else {
+
+            next;
         }
     }
-
     return $covariance;
+}
+
+=head2 get_shared_winning_probability
+
+Calculate probability that a pair of digit contracts winning together.
+
+The outcome of a digit contract pairs are correlated if they expire at same time( same digit).
+
+The probability of a digit contract pair expiring at same digit is equal to the number of shared winning digits of the pair divied by 10.
+
+Example:
+i. The shared winning digits for a DIGITEVEN and a DIGITOVER 2 are: 4,6, and 8. The probability would be equal to 3/10.
+
+ii. For a DIGITOVER 3 and a DIGITUNDER 9: 4,5,6,7, and 8. The probability would be equal to 5/10.
+
+=cut
+
+sub get_shared_winning_probability {
+
+    my $params           = shift;
+    my $c1_type          = $params->{type_1};
+    my $c2_type          = $params->{type_2};
+    my $c1_choosen_digit = $params->{barrier_1};
+    my $c2_choosen_digit = $params->{barrier_2};
+
+    my @c1_winning_digits = get_winning_digits($c1_type, $c1_choosen_digit);
+    my @c2_winning_digits = get_winning_digits($c2_type, $c2_choosen_digit);
+
+    my %c2_winning_digits = map { $_ => 1 } @c2_winning_digits;
+
+    my @shared_winning_digits = grep { $c2_winning_digits{$_} } @c1_winning_digits;
+
+    return scalar(@shared_winning_digits) / 10;
+
+}
+
+=head2 get_winning_digits
+
+Return the digits that contribute to a winning contract.
+
+Example:DIGITEVEN : 0, 2, 4, 6, 8.
+DIGITODD: 1, 3, 5,7,9
+
+=cut
+
+sub get_winning_digits {
+
+    my ($type, $digit) = @_;
+
+    my @winning_digits;
+    my @all_digit = (0 .. 9);
+
+    if ($type eq 'DIGITEVEN') {
+
+        @winning_digits = (0, 2, 4, 6, 8);
+
+    } elsif ($type eq 'DIGITODD') {
+
+        @winning_digits = (1, 3, 5, 7, 9);
+    } elsif ($type eq 'DIGITDIFF' or $type eq 'DIGITMATCH') {
+
+        @winning_digits = $type eq 'DIGITDIFF' ? grep { $all_digit[$_] != $digit } @all_digit : grep { $all_digit[$_] == $digit } @all_digit;
+
+    } elsif ($type eq 'DIGITOVER' or $type eq 'DIGITUNDER') {
+
+        @winning_digits = $type eq 'DIGITOVER' ? grep { $all_digit[$_] > $digit } @all_digit : grep { $all_digit[$_] < $digit } @all_digit;
+
+    }
+
+    return @winning_digits;
+
 }
 
 =head2 get_performance_probability
@@ -194,14 +283,20 @@ sub get_performance_probability {
     }
 
     #Below variables are all arrays.
-    my $start_time   = $params->{start_time};
-    my $sell_time    = $params->{sell_time};
-    my $types        = $params->{types};
-    my $underlying   = $params->{underlying};
-    my $bought_price = $params->{bought_price};
-    my $payout       = $params->{payout};
+    my $start_time      = $params->{start_time};
+    my $sell_time       = $params->{sell_time};
+    my $types           = $params->{types};
+    my $underlying      = $params->{underlying};
+    my $bought_price    = $params->{bought_price};
+    my $payout          = $params->{payout};
+    my $exit_tick_epoch = $params->{exit_tick_epoch};
+    my $barriers        = $params->{barriers};
 
-    if (grep { $_ != scalar(@$start_time) } (scalar(@$sell_time), scalar(@$types), scalar(@$underlying), scalar(@$bought_price), scalar(@$payout))) {
+    if (
+        grep { $_ != scalar(@$start_time) } (
+            scalar(@$sell_time), scalar(@$types),           scalar(@$underlying), scalar(@$bought_price),
+            scalar(@$payout),    scalar(@$exit_tick_epoch), scalar(@$barriers)))
+    {
         die "start_time, sell_time, types, underlying, bought_price and payout are required parameters and need to be arrays of same lengths.";
     }
 
@@ -220,7 +315,7 @@ sub get_performance_probability {
 
     my $variance = _variance_x_square($pk, $lk, $wk);
 
-    my $covariance = _covariance($start_time, $sell_time, $underlying, $types, $pk, $lk, $wk);
+    my $covariance = _covariance($start_time, $sell_time, $underlying, $types, $pk, $lk, $wk, $exit_tick_epoch, $barriers);
 
     #Calculate the performance probability here.
     my $prob = 0;
@@ -228,7 +323,7 @@ sub get_performance_probability {
     my $epsilon = machine_epsilon();
 
     $prob = $pnl - $mean;
-    $prob = $prob / (sqrt(($variance - ($mean**2.0)) + 2.0 * $covariance) + $epsilon);
+    $prob = $prob / (sqrt(($variance - ($mean**2.0)) + $covariance) + $epsilon);
 
     $prob = 1.0 - Math::Gauss::XS::cdf($prob, 0.0, 1.0);
 

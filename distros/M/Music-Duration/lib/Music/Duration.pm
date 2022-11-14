@@ -8,7 +8,7 @@ use warnings;
 
 use MIDI::Simple ();
 
-our $VERSION = '0.0900';
+our $VERSION = '0.0901';
 
 
 {
@@ -67,14 +67,14 @@ Music::Duration - Add 32nd, 64th, 128th and tuplet durations to MIDI-Perl
 
 =head1 VERSION
 
-version 0.0900
+version 0.0901
 
 =head1 SYNOPSIS
 
   use Music::Duration;
 
   # 5 divisions in place of an eighth note triplet:
-  Music::Duration::tuplet( 'ten', 'z', 5 );
+  Music::Duration::tuplet( 'ten', 'Z', 5 );
 
   # Add an arbitrary duration:
   Music::Duration::add_duration( phi => 1.618 );
@@ -87,8 +87,8 @@ version 0.0900
   my $black_page = MIDI::Simple->new_score();
   $black_page->Channel(9);
   # ...
-  $black_page->n( 'zten', 'n38' ) for 1 .. 5;
-  $black_page->n( 'phi', 'n38' ) for 1 .. 4;
+  $black_page->n( 'Zten', 38 ) for 1 .. 5;
+  $black_page->n( 'phi', 38 ) for 1 .. 4;
 
 =head1 DESCRIPTION
 
@@ -122,11 +122,11 @@ module will insert any named note duration to the length hash.
 
 =head2 tuple, tuplet
 
-  Music::Duration::tuplet( 'qn', 'z', 5 );
-  # $score->n( 'zqn', ... );
+  Music::Duration::tuplet( 'qn', 'Z', 5 );
+  # $score->n( 'Zqn', ... );
 
-  Music::Duration::tuplet( 'wn', 'z', 7 );
-  # $score->n( 'zwn', ... );
+  Music::Duration::tuplet( 'wn', 'Z', 7 );
+  # $score->n( 'Zwn', ... );
 
 Add a fractional division to the L<MIDI::Simple> C<Length> hash for a
 given B<name> and B<duration>.
@@ -164,7 +164,7 @@ Gene Boggs <gene@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Gene Boggs.
+This software is copyright (c) 2022 by Gene Boggs.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

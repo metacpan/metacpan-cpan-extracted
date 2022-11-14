@@ -14,6 +14,7 @@ Apache::Solr - Apache Solr (Lucene) extension
 
   # use Log::Report mode => "DEBUG";
   my $solr    = Apache::Solr->new(server => $url);
+  my $lwp     = $solr->agent;   # internal LWP::UserAgent
 
   my $doc     = Apache::Solr::Document->new(...);
   my $results = $solr->addDocument($doc);
@@ -613,8 +614,8 @@ differences is that C<Apache::Solr> has much more abstraction.
 
 =head1 SEE ALSO
 
-This module is part of Apache-Solr distribution version 1.07,
-built on August 26, 2022. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Apache-Solr distribution version 1.08,
+built on November 13, 2022. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

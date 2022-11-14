@@ -3,7 +3,7 @@ use 5.010;
 
 # ABSTRACT: domms blogging "engine"
 
-our $VERSION = 2.003;
+our $VERSION = '2.007'; # VERSION
 
 use Moose;
 use MooseX::Types::Path::Class;
@@ -12,6 +12,7 @@ use Path::Class::Iterator;
 use Template;
 use File::ShareDir qw(dist_dir);
 use DateTime;
+use MIME::Base64 qw(encode_base64url);
 
 use Blio::Node;
 
@@ -63,9 +64,11 @@ has 'converter' => (is=>'ro',isa=>'Maybe[Str]',default=>undef,required=>1);
 has 'thumbnail' => (is=>'ro',isa=>'Int',default=>300,required=>1);
 has 'tags' => (is=>'ro',isa=>'Bool',default=>0);
 has 'schedule' => (is=>'ro',isa=>'Bool',default=>0);
+has 'time_zone' => (is=>'ro',isa=>'Str', default=>'UTC');
 
 has 'force' => (is=>'ro',isa=>'Bool',default=>0);
 has 'quiet' => (is=>'ro',isa=>'Bool',default=>0);
+has 'recent' => (is=>'ro',isa=>'Bool',default=>0);
 
 has 'nodes_by_url' => ( is => 'ro', isa => 'HashRef', default => sub { {} } ,traits  => [ 'NoGetopt' ]);
 has 'tree' => (
@@ -120,6 +123,7 @@ sub _build_tagindex {
         title=>'Tags',
         date=>DateTime->now,
         content=>'',
+        list=>1,
     );
     $self->nodes_by_url->{'tags.html'}=$tagindex;
     return $tagindex;
@@ -140,7 +144,7 @@ sub collect {
     );
 
     my $schedule = $self->schedule;
-    my $now = DateTime->now;
+    my $now = DateTime->now(time_zone=>$self->time_zone);
 
     until ( $iterator->done ) {
         my $file = $iterator->next;
@@ -193,16 +197,56 @@ sub collect {
 sub write {
     my $self = shift;
 
-    while (my ($url, $node) = each %{$self->nodes_by_url}) {
-        say "writing $url" unless $self->quiet;
-        if ($node->paged_list) {
-            $node->write_paged_list($self);
-        }
-        else {
-            $node->write($self);
-        }
+    for my $node (values %{$self->nodes_by_url}) {
+        $self->_write($node);
+    }
+}
+
+sub write_tree_up {
+    my ($self, $node) = @_;
+
+    $self->_write($node);
+    my $siblings = $node->older_younger;
+    for my $sib (values %$siblings) {
+        $sib->date($node->date);
+        $self->_write($sib);
     }
 
+    if (my $p = $node->parent) {
+        $p->date($node->date);
+        $self->write_tree_up($p);
+    }
+}
+
+sub write_tree_down {
+    my ($self, $node) = @_;
+
+    $self->_write($node);
+    for my $child ($node->children->@*) {
+        $self->write_tree_down($child);
+    }
+}
+
+
+sub _write {
+    my ($self, $node) = @_;
+    say "writing ".$node->url unless $self->quiet;
+    if ($node->paged_list) {
+        $node->write_paged_list($self);
+    }
+    else {
+        $node->write($self);
+    }
+}
+
+sub absolute_url {
+    my ($self, $node) = @_;
+    return $self->site_url.'/'.$node->url;
+}
+
+sub absolute_base64_url {
+    my ($self, $node) = @_;
+    return encode_base64url($self->absolute_url($node));
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -220,7 +264,7 @@ Blio - domms blogging "engine"
 
 =head1 VERSION
 
-version 2.003
+version 2.007
 
 =head1 SYNOPSIS
 
@@ -313,11 +357,11 @@ TODO - there are more fields that need explanation.
 
 =head1 AUTHOR
 
-Thomas Klausner <domm@cpan.org>
+Thomas Klausner <domm@plix.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Thomas Klausner.
+This software is copyright (c) 2013 - 2022 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

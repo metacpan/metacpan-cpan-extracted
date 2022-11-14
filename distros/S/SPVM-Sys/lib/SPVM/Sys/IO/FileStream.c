@@ -19,13 +19,15 @@ int32_t SPVM__Sys__IO__FileStream__DESTROY(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   assert(fh);
   
-  if (!file_stream_is_closed) {
-    int32_t status = fclose(fh);
-    if (status == EOF) {
-      env->die(env, stack, "[System Error]fclose failed:%s.", env->strerror(env, stack, errno, 0), FILE_NAME, __LINE__);
-      return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
+  if (!env->get_pointer_no_need_free(env, stack, obj_self)) {
+    if (!file_stream_is_closed) {
+      int32_t status = fclose(fh);
+      if (status == EOF) {
+        env->die(env, stack, "[System Error]fclose failed:%s.", env->strerror(env, stack, errno, 0), FILE_NAME, __LINE__);
+        return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
+      }
+      env->set_pointer(env, stack, obj_self, NULL);
     }
-    env->set_pointer(env, stack, obj_self, NULL);
   }
   
   return 0;

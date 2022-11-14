@@ -5,20 +5,25 @@ use warnings;
 # Roman numeral analysis of the most common bass lines.
 
 use Data::Dumper;
+#use lib map { "$ENV{HOME}/sandbox/$_/lib" } qw(Music-BachChoralHarmony Music-ToRoman); # local author libs
 use Music::BachChoralHarmony;
-use lib '/Users/gene/sandbox/Music-ToRoman/lib';
 use Music::ToRoman;
 
-my $size   = shift || 3; # Number of notes to consider
+my $size   = shift || 3;     # Number of notes to consider
 my $in_key = shift || 'maj'; # maj, min, m
-my $min    = shift // 1;
+my $min    = shift // 1;     # minimum number of occurances to show
 
 $in_key = 'major'
     if $in_key eq 'maj';
 $in_key = 'minor'
     if $in_key eq 'm' || $in_key eq 'min';
 
-my $bach = Music::BachChoralHarmony->new;
+#my $data_file = 'share/jsbach_chorals_harmony.data'; # local author files
+#my $key_title = 'share/jsbach_BWV_keys_titles.txt';  # "
+my $bach = Music::BachChoralHarmony->new(
+#    data_file => $data_file,
+#    key_title => $key_title,
+);
 my $songs = $bach->parse();
 
 my %score;

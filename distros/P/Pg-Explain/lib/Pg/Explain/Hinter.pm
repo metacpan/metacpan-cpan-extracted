@@ -25,11 +25,11 @@ Pg::Explain::Hinter - Review Pg::Explain plans and return hints, if there are an
 
 =head1 VERSION
 
-Version 2.3
+Version 2.4
 
 =cut
 
-our $VERSION = '2.3';
+our $VERSION = '2.4';
 
 =head1 SYNOPSIS
 

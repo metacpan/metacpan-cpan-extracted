@@ -1,6 +1,11 @@
 Revision history for Perl module libary Windows-GHCN-Fetch
 
-v0.0.009       in progress
+v0.0.010       2022-11-10
+  - moved EXAMPLES POD from Fetch.pm to ghch_fetch
+  - fixed: user prompt when stations found > 100 
+  - fixed: broken URL in exported KML
+
+v0.0.009       2022-10-23
   - fix Options::get_getopt_list so it handles aliases properly
   - require version 1.32 of Time::Piece so truncate is supported
   - fix the logic in get_getopt_list that unwinds Tk_opt_table

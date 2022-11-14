@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Postgres/Tables.pm
-## Version v0.5.0
+## Version v0.5.1
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2021/08/29
+## Modified 2022/11/03
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -22,7 +22,7 @@ BEGIN
     use warnings;
     use parent qw( DB::Object::Tables DB::Object::Postgres );
     use vars qw( $VERSION $VERBOSE $DEBUG $TYPE_TO_CONSTANT );
-    $VERSION    = 'v0.5.0';
+    $VERSION    = 'v0.5.1';
     $VERBOSE    = 0;
     $DEBUG      = 0;
     use Devel::Confess;
@@ -37,7 +37,9 @@ BEGIN
     qr/^(boolean|bool)/                 => { constant => '', name => 'PG_BOOL', type => 'bool' },
     qr/^box/                            => { constant => '', name => 'PG_BOX', type => 'box' },
     qr/^bytea/                          => { constant => '', name => 'PG_BYTEA', type => 'bytea' },
-    qr/^(character|char)\b/             => { constant => '', name => 'PG_CHAR', type => 'char' },
+    # Even if the table field type is CHAR, we use PG_VARCHAR, because PG_CHAR is for a single character, and if we used it, it would truncate the data to one character.
+    # <https://github.com/bucardo/dbdpg/issues/103>
+    qr/^(character|char)\b(?![[:blank:]]+varying)/             => { constant => '', name => 'PG_VARCHAR', type => 'varchar' },
     qr/^(character varying|varchar)/    => { constant => '', name => 'PG_VARCHAR', type => 'varchar' },
     qr/^cidr\b/                         => { constant => '', name => 'PG_CIDR', type => 'cidr' },
     qr/^circle/                         => { constant => '', name => 'PG_CIRCLE', type => 'circle' },
@@ -399,9 +401,9 @@ sub structure
     my $self  = shift( @_ );
     my $table = shift( @_ ) || $self->{table} ||
         return( $self->error( "No table provided to get its structure." ) );
-    ## $self->_reset_query();
-    ## delete( $self->{ 'query_reset' } );
-    ## my $struct  = $self->{ '_structure_real' } || $self->{ 'struct' }->{ $table };
+    # $self->_reset_query();
+    # delete( $self->{ 'query_reset' } );
+    # my $struct  = $self->{ '_structure_real' } || $self->{ 'struct' }->{ $table };
     my $struct  = $self->{structure};
     my $fields  = $self->{fields};
     my $default = $self->{default};
@@ -412,7 +414,7 @@ sub structure
     # If we have a cache, use it instead of reprocessing it.
     if( !%$fields || !%$struct || !%$default )
     {
-        ## my $query = "SELECT * FROM information_schema.columns WHERE table_name = ?";
+        # my $query = "SELECT * FROM information_schema.columns WHERE table_name = ?";
 #         my $query = <<EOT;
 # SELECT 
 #      pg_tables.schemaname as "schema_name"
@@ -483,8 +485,8 @@ WHERE c.relname = ? AND a.attnum > 0 AND NOT a.attisdropped
 ORDER BY a.attnum
 EOT
         }
-        ## http://www.postgresql.org/docs/9.3/interactive/infoschema-columns.html
-        ## select * from information_schema.columns where table_name = 'address'
+        # http://www.postgresql.org/docs/9.3/interactive/infoschema-columns.html
+        # select * from information_schema.columns where table_name = 'address'
         my $sth = $self->database_object->prepare_cached( $query ) ||
         return( $self->error( "Error while preparing query to get table '$table' columns specification: ", $self->database_object->errstr() ) );
         $sth->execute( $table ) ||
@@ -495,7 +497,9 @@ EOT
         my $type_convert =
         {
         'character varying' => 'varchar',
-        'character'         => 'char',
+        # Even if the table field type is CHAR, we use PG_VARCHAR, because PG_CHAR is for a single character, and if we used it, it would truncate the data to one character.
+        # <https://github.com/bucardo/dbdpg/issues/103>
+        'character'         => 'varchar',
         };
         # Mysql: field, type, null, key, default, extra
         # Postgres: tablename, field, field_num, type, len, comment, is_nullable, key, foreign_key, default 
@@ -509,7 +513,7 @@ EOT
                 $data{type} = $type_convert->{ $data{type} };
             }
             $data{default} = '' if( !defined( $data{default} ) );
-            ## push( @order, $data{ 'field' } );
+            # push( @order, $data{ 'field' } );
             $fields->{ $data{field} }  = ++$c;
             $types->{ $data{field} } = $data{type};
             $default->{ $data{field} } = '';
@@ -524,7 +528,7 @@ EOT
                 if( $data{type} =~ /$re/i )
                 {
                     my $dict = \%{$TYPE_TO_CONSTANT->{ $re }};
-                    $dict->{constant} = $self->database_object->get_sql_type( $dict->{type} );
+                    $dict->{constant} = $self->database_object->get_sql_type( $dict->{type} ) unless( length( $dict->{constant} ) );
                     $const->{ $data{field} } = $dict;
                     last DATA_TYPE_RE;
                 }
@@ -589,7 +593,7 @@ DB::Object::Postgres::Tables - PostgreSQL Table Object
 
 =head1 VERSION
 
-    v0.5.0
+    v0.5.1
 
 =head1 DESCRIPTION
 

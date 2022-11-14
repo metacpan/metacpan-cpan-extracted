@@ -1,5 +1,7 @@
 #!perl
 
+## no critic: TestingAndDebugging::RequireUseStrict
+
 # bbrp scale factor yang umum:
 # - 1.042709376 (25/23.976): PAL -> NTSC/FILM
 # - 0.8341675008 (25/29.97): PAL -> NTSC
@@ -57,15 +59,11 @@ srtscale - Speed up or slow down times in .srt by a factor
 
 =head1 VERSION
 
-This document describes version 0.006 of srtscale (from Perl distribution App-SubtitleUtils), released on 2021-08-11.
+This document describes version 0.008 of srtscale (from Perl distribution App-SubtitleUtils), released on 2022-11-10.
 
 =head1 SYNOPSIS
 
  % srtscale <factor> [FILE] ...
-
-=head1 HISTORY
-
-2003-02-06 - first written
 
 =head1 HOMEPAGE
 
@@ -75,13 +73,9 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-Subtit
 
 Source repository is at L<https://github.com/perlancar/perl-App-SubtitleUtils>.
 
-=head1 BUGS
+=head1 HISTORY
 
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-SubtitleUtils>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
+2003-02-06 - first written
 
 =head1 AUTHOR
 
@@ -100,15 +94,24 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-SubtitleUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

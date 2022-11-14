@@ -7,6 +7,7 @@ WriteMakefile(
     VERSION_FROM     => 'lib/CryptoTron/JsonHttp.pm', # Finds $VERSION from file, requires EU::MM from perl >= 5.5
     PREREQ_PM        => {'CryptoTron' => '0.10',
                          'Try::Catch' => '1.1.0',
+                         'Simple::Filter::Macro' => '0.08',
                          'File::Basename' => '2.85',
                          'URI' => '1.76',
                          'POSIX' => '1.88',

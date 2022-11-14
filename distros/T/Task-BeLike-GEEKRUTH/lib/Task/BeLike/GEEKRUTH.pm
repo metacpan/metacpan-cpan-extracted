@@ -1,6 +1,6 @@
 package Task::BeLike::GEEKRUTH;
 use Modern::Perl;
-our $VERSION = '1.0200'; # VERSION
+our $VERSION = '1.0301'; # VERSION
 our $AUTHORITY = 'cpan:GEEKRUTH'; # AUTHORITY
 # ABSTRACT: TIMTOWTDI, but this works for GeekRuthie
 
@@ -18,7 +18,7 @@ Task::BeLike::GEEKRUTH - TIMTOWTDI, but this works for GeekRuthie
 
 =head1 VERSION
 
-version 1.0200
+version 1.0301
 
 =head1 NAME
 
@@ -26,7 +26,7 @@ Task::BeLike::GEEKRUTH - TIMTOWTDI, but this works for GeekRuthie
 
 =head1 VERSION
 
-version 1.0200
+version 1.0301
 
 =head1 TASK CONTENTS
 
@@ -52,9 +52,15 @@ version 1.0200
 
 =head3 L<Dist::Zilla::App::Command::lsplugins>
 
+=head3 L<Dist::Zilla::Plugin::INI::Baked>
+
+=head3 L<Dist::Zilla::Plugin::MetaData::BuiltWith>
+
 =head3 L<Dist::Zilla::Plugin::TaskWeaver>
 
-=head3 L<Dist::Zilla::PluginBundle::Author::GEEKRUTH>
+=head3 L<Dist::Zilla::Plugin::Git::PushInitial>
+
+=head3 L<Dist::Zilla::PluginBundle::GEEKRUTH>
 
 =head3 L<Dist::Zilla::PluginBundle::GitLab>
 
@@ -79,6 +85,8 @@ version 1.0200
 =head3 L<DBD::Pg>
 
 =head3 L<DBIx::Class>
+
+=head3 L<DBIx::Class::Schema::Loader>
 
 =head3 L<DBIx::Class::Schema::ResultSetNames>
 
@@ -112,6 +120,8 @@ version 1.0200
 
 =head3 L<Dancer2::Plugin::REST>
 
+=head3 L<Dancer2::Session::DBIC>
+
 =head3 L<Dancer2::Template::Handlebars>
 
 =head3 L<File::Path>
@@ -134,15 +144,33 @@ I write Perl for a living, and fully expect to do so for the rest of my career, 
 what passes for "retirement" for a workaholic nerd like me. This
 L<Dist::Zilla::Plugin::TaskWeaver> module gathers together the things I use frequently.
 
+=head1 INITIAL INSTALLATION
+
+I use Debian-ish systems, mostly.  Here are the packages I install on a bare system, B<before> 
+I L<perlbrew>brew a perl and try to install this Task:
+
+  sudo apt install build-essential direnv     git \
+                   libexpat1-dev   libssl-dev postgresql\
+                   pq-dev          unzip      vim \
+                   zlib1g-dev
+
 =head1 TASK CONTENTS
 
 =pkggoup Testing & Debugging
 
 =pkg Data::Dumper
 
+=pkg File::Temp
+
+=pkg Keyword::DEVELOPMENT
+
 =pkg Memory::Usage
 
+=pkg Smart::Comments
+
 =pkg Test::Dzil
+
+=pkg Test::PostgreSQL
 
 =pkg Test2::V0
 

@@ -1,4 +1,10 @@
 Revision history for PlayStation-MemoryCard
+v0.2.1  2022-11-13
+        Packaging changes, shouldn't affect cli operations.
+        - all scripts now return true for operation under do
+        - use Perl::Dist::APPerl instead of PAR::Packer to build a
+        cross-platform binary that is compatible with several
+        unix-like operating systems in addition to Windows.
+
 v0.2.0  2022-07-19
         First packaged version, released on an unsuspecting world.
-

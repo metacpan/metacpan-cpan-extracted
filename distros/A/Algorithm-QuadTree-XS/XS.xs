@@ -15,8 +15,10 @@ typedef enum ShapeType ShapeType;
 
 struct QuadTreeNode {
 	QuadTreeNode *children;
+	QuadTreeNode *parent;
 	DynArr *values;
 	double xmin, ymin, xmax, ymax;
+	bool has_objects;
 };
 
 struct QuadTreeRootNode {
@@ -93,7 +95,7 @@ void push_array_SV(DynArr *arr, SV *ptr)
 	SvREFCNT_inc(ptr);
 }
 
-QuadTreeNode* create_nodes(int count)
+QuadTreeNode* create_nodes(int count, QuadTreeNode *parent)
 {
 	QuadTreeNode *node = malloc(count * sizeof *node);
 
@@ -101,6 +103,8 @@ QuadTreeNode* create_nodes(int count)
 	for (i = 0; i < count; ++i) {
 		node[i].values = NULL;
 		node[i].children = NULL;
+		node[i].parent = parent;
+		node[i].has_objects = false;
 	}
 
 	return node;
@@ -122,10 +126,25 @@ void destroy_node(QuadTreeNode *node)
 	}
 }
 
+void clear_has_objects (QuadTreeNode *node)
+{
+	if (node->values == NULL) {
+		int i;
+		for (i = 0; i < CHILDREN_PER_NODE; ++i) {
+			if (node->children[i].has_objects) return;
+		}
+	}
+
+	node->has_objects = false;
+	if (node->parent != NULL) {
+		clear_has_objects(node->parent);
+	}
+}
+
 QuadTreeRootNode* create_root()
 {
 	QuadTreeRootNode *root = malloc(sizeof *root);
-	root->node = create_nodes(1);
+	root->node = create_nodes(1, NULL);
 	root->backref = newHV();
 
 	return root;
@@ -158,7 +177,7 @@ void node_add_level(QuadTreeNode* node, double xmin, double ymin, double xmax, d
 		node->values = create_array();
 	}
 	else {
-		node->children = create_nodes(CHILDREN_PER_NODE);
+		node->children = create_nodes(CHILDREN_PER_NODE, node);
 		double xmid = xmin + (xmax - xmin) / 2;
 		double ymid = ymin + (ymax - ymin) / 2;
 
@@ -209,7 +228,7 @@ bool is_within_node(QuadTreeNode *node, Shape *param)
 
 void find_nodes(QuadTreeNode *node, AV *ret, Shape *param)
 {
-	if (!is_within_node(node, param)) return;
+	if (!node->has_objects || !is_within_node(node, param)) return;
 
 	int i;
 
@@ -231,6 +250,7 @@ void fill_nodes(QuadTreeRootNode *root, QuadTreeNode *node, SV *value, Shape *pa
 {
 	if (!is_within_node(node, param)) return;
 
+	node->has_objects = true;
 	if (node->values != NULL) {
 		push_array_SV(node->values, value);
 		store_backref(root, node, value);
@@ -274,6 +294,7 @@ void clear_tree(QuadTreeRootNode *root)
 				QuadTreeNode *node = (QuadTreeNode*) list->ptr[i];
 				destroy_array_SV(node->values);
 				node->values = create_array();
+				clear_has_objects(node);
 			}
 
 			destroy_array(list);
@@ -397,6 +418,7 @@ _AQT_delete(self, object)
 
 				destroy_array_SV(node->values);
 				node->values = new_list;
+				if (new_list->count == 0) clear_has_objects(node);
 			}
 
 			destroy_array(list);

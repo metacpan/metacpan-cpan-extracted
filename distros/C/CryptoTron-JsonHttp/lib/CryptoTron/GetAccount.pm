@@ -16,7 +16,7 @@ our @ISA = qw(Exporter);
 our @EXPORT = qw(GetAccount);
 
 # Set the package version. 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 # Load the required Perl module.
 use File::Basename;
@@ -42,15 +42,15 @@ our ($MODULE_NAME, undef, undef) = fileparse(__FILE__, '\..*');
 # ---------------------------------------------------------------------------- #
 sub GetAccount {
     # Assign the subroutine arguments to the local array.
-    my ($param) = @_;
+    my (%param) = @_;
     # Create the payload.
-    my $payload = payload_standard($param);
+    my $payload = payload_standard(\%param);
     # Add the payload to the given hash.
-    $param->{'PayloadString'} = $payload;
+    $param{'PayloadString'} = $payload;
     # Add the module name to the given hash.
-    $param->{'ModuleName'} = $MODULE_NAME;
+    $param{'ModuleName'} = $MODULE_NAME;
     # Get the ouput data.
-    my $output_data = json_data($param);
+    my $output_data = json_data(\%param);
     # Return the ouput data.
     return $output_data;
 };
@@ -80,30 +80,30 @@ CryptoTron::GetAccount - Perl extension for use with the blockchain of the crypt
   my $OutputFormat = ["RAW"|"STR"|""];
 
   # Request the account info from the mainnet.
-  my $account_info = GetAccount({
+  my $account_info = GetAccount(
       PublicKey => $PublicKeyBase58
       [, VisibleFlag => $VisibleFlag]
       [, ControlFlag => $ControlFlag]
       [, OutputFormat => $OutputFormat]
-  });
+  );
 
   # Print the account info into the terminal window.
   print $account_info;
 
 =head1 DESCRIPTION
 
-The module requests the account information of an Tron account from the
-Tron blockchain using the so-called full-node HTTP API from the Tron
-developer network. The module is designed for use with Tron Mainnet. For
-HTTP requests the methods C<POST> or C<GET> can be used in general. For
-the method C<GetAccount> the needed method is C<POST>. The payload of the
-HTTP request consists of the key 'address' and the key 'visible' and the
-related values. The switch 'visible' can be set to "True" or "False". If
-the switch is set to "True" a Base58 address is used. If the switch is set
-to "False" a Hex address is used. A request of the service API results in
-a response in JSON format. The module returns formatted string JSON data as
-well as unformated raw JSON data based on the output format flag. The parsing
-of the account information is done by a separate module.
+The module requests the account information of an Tron account from the Tron
+blockchain using the so-called full-node HTTP API from the Tron developer
+network. The module is designed for use with Tron Mainnet. For HTTP requests
+the methods C<POST> or C<GET> can be used in general. For the method
+C<GetAccount> the needed method is C<POST>. The payload of the HTTP request
+consists of the key 'address' and the key 'visible' and the related values.
+The switch 'visible' can be set to C<"True"> or C<"False">. If the switch is
+set to C<"True"> a Base58 address is used. If the switch is set to C<"False">
+a Hex address is used. A request of the service API results in a response in
+JSON format. The module returns formatted string JSON data as well as
+unformated raw JSON data based on the output format flag. The parsing of the
+account information is done by a separate module.
 
 =head1 METHOD
 
@@ -118,19 +118,83 @@ argument key C<PublicKey> can be a Base58 address or a Hex address. The
 value of the subroutine argument key C<VisibleFlag> can be "True" or
 "False".
 
-  PublicKey: Base58 address => VisibleFlag: True
-  PublicKey: Hex address    => VisibleFlag: False
+Public key and visible flag are related to each other:
 
-If the given combination is not valid, an error will be returned from the
-request. 
+C<PublicKey>: Base58 address => C<VisibleFlag>: True
+
+C<PublicKey>: Hex address    => C<VisibleFlag>: False
+
+If the given combination in the subroutine arguments is not valid, an error
+will be returned from the request. 
 
 The subroutine argument key C<ControlFlag> and his value controls if the given
-combination address and visible should be checked. If visible is not set in a
-correct way, the value will be corrected if the flag is "True" and if the flag 
-is "False" it will not be corrected.  
+combination of public key and visible flag should be checked. If visible is not
+set in a correct way, the value will be corrected if the flag is "True" and if
+the flag is "False" it will not be corrected.  
 
 The subroutine argument key C<OutputFormat> and his value controls wether the
 output is raw JSON or or formatted JSON.  
+
+=head1 METHOD RETURN
+
+Next others, the method returns informations about the balance, the staked and
+voted balance, and timestamps. 
+
+=over 4
+
+=item * Free available balance
+
+=item * Frozen staked balance
+
+=back 
+
+=over 4
+
+=item * Voted balance
+
+=item * SR vote address and number of votes
+
+=back 
+
+=over 4
+
+=item * Frozen BANDWIDTH
+
+=item * Expiration date and time of frozen BANDWIDTH
+
+=item * Frozen ENERGY
+
+=item * Expiration date and time of frozen ENERGY
+
+=back 
+
+=over 4
+
+=item * Creation date and time of account
+
+=item * Date and time of last operation
+
+=item * Last date and time when BANDWIDTH was consumed
+
+=item * Last date and time when ENERGY was consumed
+
+=item * Lastest consume date and time
+
+=item * Lastest withdraw date and time
+
+=back 
+
+The format of returned data and time is a Epoch Unix timestamp given in
+milliseconds. 1 second equals to 1 milliseconds. The epoch Unix timestamp
+is a way to track time as a running total of seconds since the Epoch on
+January 1st, 1970 at UTC.  
+
+The values of the balances are returned in SUN. 1 TRX equals to 1,000,000
+SUN. SUN is named after the founder of Tron. A Tron balance in TRX given as
+a decimal value can never have more than six digits after the decimal point.
+
+With the above knowledge, both raw JSON data as well as string JSON data can
+be interpreted directly by the user without automated parsing.  
 
 =head1 EXAMPLES
 
@@ -179,30 +243,33 @@ output is raw JSON or or formatted JSON.
   # Print the account info into the terminal window.
   print $response;
 
+
 =head1 LIMITATIONS
 
 The module is working with the Tron Mainnet, but not with other existing
 Tron Testnets. 
 
-=head1 OPEN ISSUES
+=head1 NOTES
 
-None
+As long as there is no balance in a Tron account, information's about such an
+account cannot be retrieved. It is only possible to check if the Tron public
+address is valid or not.
 
 =head1 ERROR CODES
 
-None
+No error codes returned yet.
 
-=head1 NOTES
+=head1 OPEN ISSUES
 
-None
+No open issues yet.
 
 =head1 BUGS
 
-None
+No known bugs yet.
 
 =head1 TODO
 
-None
+Nothing to do yet. 
 
 =head1 SEE ALSO
 
@@ -214,9 +281,9 @@ CryptoTron:AddressCheck
 
 CryptoTron:AddressConvert
 
-File::Basename
+L<File::Basename|https://metacpan.org/pod/File::Basename/>
 
-TRON Developer Hub
+L<TRON Developer Hub|https://developers.tron.network/>
 
 =head1 AUTHOR
 

@@ -9,7 +9,7 @@ use base qw( Exporter );
 our @EXPORT_OK = qw( SEEK_SET SEEK_CUR SEEK_END );
 
 # ABSTRACT: Perl interface to C File pointer
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.14'; # VERSION
 
 
 our $ffi = FFI::Platypus->new( api => 1, lib => [undef] );
@@ -158,7 +158,7 @@ FFI::C::File - Perl interface to C File pointer
 
 =head1 VERSION
 
-version 0.12
+version 0.14
 
 =head1 SYNOPSIS
 

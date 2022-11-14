@@ -1,5 +1,8 @@
 Revision history for FFI-C
 
+0.14      2022-11-14 05:38:05 -0700
+  - Update test for NetBSD (gh#60)
+
 0.12      2022-06-24 10:08:47 -0500
   - Documentation improvements (gh#58)
 

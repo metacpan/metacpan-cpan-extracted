@@ -4,8 +4,8 @@ use strict;
 use warnings;
 use feature qw/ say /;
 
-my $column_order = [ @ARGV ];
-my $data = [
+my $required_order = [ @ARGV ];
+my $chaos = [
 	{
 		1 => 'Liz',
 		2 => 'Nat',
@@ -16,8 +16,8 @@ my $data = [
 # transform an array of hashes into an array of arrays where each array
 # contains the values from the hash sorted by the original hash keys or
 # the passed order of columns (hash slicing)
-my @field_data = @{ $column_order // [] }
-    ? map { [ @$_{ @{ $column_order } } ] } @{ $data }
-    : map { [ @$_{sort keys %$_} ] } @{ $data };
+my @ordered = @{ $required_order // [] }
+    ? map { [ @$_{ @{ $required_order } } ] } @{ $chaos }
+    : map { [ @$_{sort keys %$_} ] } @{ $chaos };
 
-say join( ",",map { @{ $_ } } @field_data );
+say join( ",",map { @{ $_ } } @ordered );

@@ -1,5 +1,9 @@
 Revision history for Perl extension Text::Markdown::XS.
 
+0.14 Sat Nov 12 23:00:16 UTC 2022
+	- e191fde Add missing URL in POD @anirvan
+	- 2544da8 update Discount source code to v2.2.7
+
 0.13 Mon Aug  2 00:40:26 UTC 2021
 	- 473efac discount/configure.inc: include stdlib.h to find WORD/DWORD @Hugmeir
 	- 89de73e discount/configure.sh: include strings.h to find bzero & memset @Hugmeir

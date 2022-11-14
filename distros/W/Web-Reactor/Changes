@@ -1,5 +1,29 @@
 Revision history for Perl extension Web::Reactor
 
+2.11  2022.11.14
+
+    1. added sort multi checkbox support
+    2. added uniq-id case option
+    3. added contructior function for html_element()s
+    4. changed multi-checkboxes method, js is fixed also
+    5. added checks for html tags and attributes
+    6. added samesite-cookie policy
+    7. added-file-upload-inputs-to-html-form-module
+    8. fixed-set-status-from-status-header
+    9. new uniq ids
+   10. foxed Preprocessor::Extended load dirs order and page name
+   11. fixed JS for proper scrolled positioning
+   12. utf8 and incoming charset logic cleanup
+   13. randomize html ids
+   14. added RESUBMIT_ON_CHANGE option to INPUTs with DATALIST, i.e. search completion fields
+   15. fixed bug with return map ignoring value '0'
+   16. added option RESUBMIT_ON_CHANGE for COMBOs (SELECTs) and RADIOs controls
+   17. added support for single translation file (TRANS_FILE config option)
+   18. added default empty key for FORM INPUTs when DATALIST given
+   19. added search option for INPUT field (Form.pm) which uses
+       native HTML5 <input> with <datalist> to offer client side
+       incremental search functionality
+
 2.10  2021.07.31
 
     1. update status of the project and docs

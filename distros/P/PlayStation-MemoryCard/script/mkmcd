@@ -57,3 +57,4 @@ foreach my $file (@ARGV) {
 
 # output the memory card
 print $memcard;
+1;

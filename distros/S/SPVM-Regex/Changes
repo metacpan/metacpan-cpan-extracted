@@ -1,3 +1,11 @@
+0.14 2022-10-01
+  [Prerequirement Changes]
+    * SPVM::Regex needs SPVM 0.9661+.
+  [Test Improvement]
+    * Added the test of \b.
+  [Document Improvement]
+    * Added the hedding "Contributors" and "Author".
+    * Added Ryunosuke Murakami to the contributors.
 0.13 2022-09-01
   [Bug Fix]
     * Fix the bug that replace_common don't work well in global replacement.

@@ -118,7 +118,7 @@ class Sys::FileTest {
     
     my $stat = Sys::IO::Stat->new;
     
-    Sys::IO->stat($file, $stat);
+    Sys::IO::Stat->stat($file, $stat);
     
     my $size = $stat->st_size;
     
@@ -133,7 +133,7 @@ class Sys::FileTest {
     
     my $stat = Sys::IO::Stat->new;
     
-    Sys::IO->stat($file, $stat);
+    Sys::IO::Stat->stat($file, $stat);
     
     my $mtime = $stat->st_mtime;
     
@@ -150,7 +150,7 @@ class Sys::FileTest {
     
     my $stat = Sys::IO::Stat->new;
     
-    Sys::IO->stat($file, $stat);
+    Sys::IO::Stat->stat($file, $stat);
     
     my $ctime = $stat->st_ctime;
     
@@ -167,7 +167,7 @@ class Sys::FileTest {
     
     my $stat = Sys::IO::Stat->new;
     
-    Sys::IO->stat($file, $stat);
+    Sys::IO::Stat->stat($file, $stat);
     
     my $atime = $stat->st_atime;
     
@@ -184,7 +184,7 @@ class Sys::FileTest {
     
     my $stat = Sys::IO::Stat->new;
     
-    Sys::IO->stat($file, $stat);
+    Sys::IO::Stat->stat($file, $stat);
     
     my $ok = 0;
     if ($stat->st_uid == Sys::User->getuid) {
@@ -202,7 +202,7 @@ class Sys::FileTest {
     
     my $stat = Sys::IO::Stat->new;
     
-    Sys::IO->stat($file, $stat);
+    Sys::IO::Stat->stat($file, $stat);
     
     my $ok = 0;
     if ($stat->st_uid == Sys::User->geteuid) {
@@ -220,7 +220,7 @@ class Sys::FileTest {
     
     my $stat = Sys::IO::Stat->new;
     
-    Sys::IO->stat($file, $stat);
+    Sys::IO::Stat->stat($file, $stat);
     
     my $size = $stat->st_size;
     
@@ -240,7 +240,7 @@ class Sys::FileTest {
     
     my $stat = Sys::IO::Stat->new;
     
-    Sys::IO->stat($file, $stat);
+    Sys::IO::Stat->stat($file, $stat);
     
     # Socket
     my $ok = 0;
@@ -259,7 +259,7 @@ class Sys::FileTest {
     
     my $stat = Sys::IO::Stat->new;
     
-    Sys::IO->stat($file, $stat);
+    Sys::IO::Stat->stat($file, $stat);
     
     # Character device
     my $ok = 0;
@@ -278,7 +278,7 @@ class Sys::FileTest {
     
     my $stat = Sys::IO::Stat->new;
     
-    Sys::IO->stat($file, $stat);
+    Sys::IO::Stat->stat($file, $stat);
     
     # Block device
     my $ok = 0;
@@ -297,7 +297,7 @@ class Sys::FileTest {
     
     my $stat = Sys::IO::Stat->new;
     
-    Sys::IO->stat($file, $stat);
+    Sys::IO::Stat->stat($file, $stat);
     
     my $ok = 0;
     if (($stat->st_mode & IO->S_IFMT) == IO->S_IFREG) {
@@ -315,7 +315,7 @@ class Sys::FileTest {
     
     my $stat = Sys::IO::Stat->new;
     
-    Sys::IO->stat($file, $stat);
+    Sys::IO::Stat->stat($file, $stat);
     
     my $ok = 0;
     if (($stat->st_mode & IO->S_IFMT) == IO->S_IFDIR) {
@@ -333,7 +333,7 @@ class Sys::FileTest {
     
     my $stat = Sys::IO::Stat->new;
     
-    Sys::IO->stat($file, $stat);
+    Sys::IO::Stat->stat($file, $stat);
     
     # FIFO/PIPE
     my $ok = 0;
@@ -352,7 +352,7 @@ class Sys::FileTest {
     
     my $stat = Sys::IO::Stat->new;
     
-    Sys::IO->stat($file, $stat);
+    Sys::IO::Stat->stat($file, $stat);
     
     # Character device
     my $ok = 0;
@@ -371,7 +371,7 @@ class Sys::FileTest {
     
     my $stat = Sys::IO::Stat->new;
     
-    Sys::IO->stat($file, $stat);
+    Sys::IO::Stat->stat($file, $stat);
     
     # Character device
     my $ok = 0;
@@ -390,7 +390,7 @@ class Sys::FileTest {
     
     my $stat = Sys::IO::Stat->new;
     
-    Sys::IO->stat($file, $stat);
+    Sys::IO::Stat->stat($file, $stat);
     
     # Character device
     my $ok = 0;
@@ -409,7 +409,7 @@ class Sys::FileTest {
     
     my $stat = Sys::IO::Stat->new;
     
-    Sys::IO->lstat($file, $stat);
+    Sys::IO::Stat->lstat($file, $stat);
     
     # Symbolic link
     my $ok = 0;

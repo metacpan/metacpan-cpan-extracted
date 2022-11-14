@@ -34,7 +34,7 @@
    "provides" : {
       "Game::Marad" : {
          "file" : "lib/Game/Marad.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -46,6 +46,6 @@
          "url" : "https://thrig.me/src/Game-Marad.git"
       }
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.12"
 }

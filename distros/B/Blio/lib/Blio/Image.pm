@@ -2,6 +2,8 @@ package Blio::Image;
 
 # ABSTRACT: An image node
 
+our $VERSION = '2.007'; # VERSION
+
 use 5.010;
 use Moose;
 use namespace::autoclean;
@@ -65,7 +67,7 @@ Blio::Image - An image node
 
 =head1 VERSION
 
-version 2.003
+version 2.007
 
 =head1 SYNOPSIS
 
@@ -115,11 +117,11 @@ Relative <Path::Class::File> object pointing to the thumbnailed image. This can 
 
 =head1 AUTHOR
 
-Thomas Klausner <domm@cpan.org>
+Thomas Klausner <domm@plix.at>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2013 by Thomas Klausner.
+This software is copyright (c) 2013 - 2022 by Thomas Klausner.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

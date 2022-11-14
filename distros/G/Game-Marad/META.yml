@@ -16,12 +16,12 @@ name: Game-Marad
 provides:
   Game::Marad:
     file: lib/Game/Marad.pm
-    version: '0.04'
+    version: '0.05'
 requires:
   Object::Pad: '0.52'
   perl: v5.26.0
 resources:
   license: http://opensource.org/licenses/BSD-3-Clause
   repository: https://thrig.me/src/Game-Marad.git
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

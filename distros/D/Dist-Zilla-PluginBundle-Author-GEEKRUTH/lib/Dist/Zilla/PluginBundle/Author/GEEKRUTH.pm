@@ -1,6 +1,6 @@
 package Dist::Zilla::PluginBundle::Author::GEEKRUTH;
 use Modern::Perl;
-our $VERSION   = '1.0202';           # VERSION
+our $VERSION   = '2.0000';           # VERSION
 our $AUTHORITY = 'cpan:GEEKRUTH';    # AUTHORITY
 
 # ABSTRACT: Be like GeekRuthie when you build your dists
@@ -76,7 +76,10 @@ sub configure {
          Manifest
          ManifestSkip
          Git::GatherDir
-         CopyFilesFromBuild
+         /,
+      [ CopyFilesFromBuild => { copy => 'cpanfile' } ],
+      qw/
+         PruneCruft
          ExecDir
          OurPkgVersion
          INI::Baked
@@ -189,7 +192,7 @@ Dist::Zilla::PluginBundle::Author::GEEKRUTH - Be like GeekRuthie when you build 
 
 =head1 VERSION
 
-version 1.0202
+version 2.0000
 
 =head1 DESCRIPTION
 
@@ -221,7 +224,9 @@ her distributions. It's roughly equivalent to
    [Manifest]
    [ManifestSkip]
    [Git::GatherDir]
+   [PruneCruft]
    [CopyFilesFromBuild]
+   copy = cpanfile
    [ExecDir]
    [OurPkgVersion]
    [INI::Baked]

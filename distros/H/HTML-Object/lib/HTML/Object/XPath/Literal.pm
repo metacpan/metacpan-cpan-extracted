@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## HTML Object - ~/lib/HTML/Object/XPath/Literal.pm
-## Version v0.2.0
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v0.2.1
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/05
-## Modified 2022/09/18
+## Modified 2022/11/11
 ## All rights reserved
 ## 
 ## 
@@ -27,7 +27,7 @@ BEGIN
         '""'  => \&value,
         'cmp' => \&cmp
     );
-    our $VERSION = 'v0.2.0';
+    our $VERSION = 'v0.2.1';
 };
 
 use strict;
@@ -97,7 +97,7 @@ sub value
 sub value_as_number
 {
     my $self = shift( @_ );
-    warnings::warn( "numifying '", $$self, "' to '", +$$self, "'\n" ) if( warnings::enabled( $BASE_CLASS ) );
+    warnings::warn( "numifying '" . $$self . "' to '" . +$$self . "'\n" ) if( warnings::enabled( $BASE_CLASS ) );
     return( +$$self );
 }
 
@@ -129,7 +129,7 @@ HTML::Object::XPath::Literal - HTML Object XPath Literal
 
 =head1 VERSION
 
-    v0.2.0
+    v0.2.1
 
 =head1 DESCRIPTION
 

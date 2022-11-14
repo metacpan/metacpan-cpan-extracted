@@ -25,11 +25,11 @@ Pg::Explain::JIT - Stores information about JIT from PostgreSQL's explain analyz
 
 =head1 VERSION
 
-Version 2.3
+Version 2.4
 
 =cut
 
-our $VERSION = '2.3';
+our $VERSION = '2.4';
 
 =head1 SYNOPSIS
 

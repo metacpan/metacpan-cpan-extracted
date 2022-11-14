@@ -1,7 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/UniqFiles/dupe_files
-# and generated automatically using Perinci::CmdLine::Gen version 0.501
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
 
 use 5.010001;
 use strict;
@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-19'; # DATE
+our $DATE = '2022-11-14'; # DATE
 our $DIST = 'App-UniqFiles'; # DIST
-our $VERSION = '0.134'; # VERSION
+our $VERSION = '0.138'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/UniqFiles/dupe_files",
@@ -40,11 +40,15 @@ dupe-files - Report or omit duplicate file contents
 
 =head1 VERSION
 
-This document describes version 0.134 of dupe-files (from Perl distribution App-UniqFiles), released on 2022-08-19.
+This document describes version 0.138 of dupe-files (from Perl distribution App-UniqFiles), released on 2022-11-14.
 
 =head1 SYNOPSIS
 
-B<dupe-files> [B<--algorithm>=I<str>] [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--detail>|B<-l>] [B<--digest-args>=I<s>|B<--digest-args-json>=I<json>|B<-A>=I<s>] [B<--format>=I<name>|B<--json>] [B<--group-by-digest>|B<--no-group-by-digest>|B<--nogroup-by-digest>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--recurse>|B<-R>|B<--no-recurse>|B<--norecurse>] [B<--report-duplicate>=I<int>] [B<--report-unique>|B<-D>|B<-a>|B<-d>|B<-u>|B<--no-report-unique>|B<--noreport-unique>] [B<--show-count>|B<-c>|B<--count>|B<--no-show-count>|B<--noshow-count>] [B<--show-digest>] [B<--show-size>] -- E<lt>I<files>E<gt> ...
+B<dupe-files> L<--help|/"--help, -h, -?"> (or L<-h|/"--help, -h, -?">, L<-?|/"--help, -h, -?">)
+
+B<dupe-files> L<--version|/"--version, -v"> (or L<-v|/"--version, -v">)
+
+B<dupe-files> [B<L<--algorithm|/"--algorithm=s">>=I<str>] [(B<L<--authoritative-dir|/"--authoritative-dirs-json=s">>=I<str>)+|B<L<--authoritative-dirs-json|/"--authoritative-dirs-json=s">>=I<json>|(B<L<-O|/"--authoritative-dirs-json=s">>=I<str>)+] [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--detail|/"--detail, -l">>|B<L<-l|/"--detail, -l">>] [B<L<--digest-args|/"--digest-args=s">>=I<s>|B<L<--digest-args-json|/"--digest-args=s">>=I<json>|B<L<-A|/"--digest-args=s">>=I<s>] [B<L<--exclude-empty-files|/"--exclude-empty-files, -Z">>|B<L<-Z|/"--exclude-empty-files, -Z">>|B<L<--include-empty-files|/"--exclude-empty-files, -Z">>] [(B<L<--exclude-file-pattern|/"--exclude-file-patterns-json=s">>=I<str>)+|B<L<--exclude-file-patterns-json|/"--exclude-file-patterns-json=s">>=I<json>|(B<L<-X|/"--exclude-file-patterns-json=s">>=I<str>)+] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--group-by-digest|/"--group-by-digest">>|B<L<--no-group-by-digest|/"--group-by-digest">>|B<L<--nogroup-by-digest|/"--group-by-digest">>] [(B<L<--include-file-pattern|/"--include-file-patterns-json=s">>=I<str>)+|B<L<--include-file-patterns-json|/"--include-file-patterns-json=s">>=I<json>|(B<L<-I|/"--include-file-patterns-json=s">>=I<str>)+] [B<L<--max-size|/"--max-size=s">>=I<L<filesize|Sah::Schema::filesize>>] [B<L<--min-size|/"--min-size=s">>=I<L<filesize|Sah::Schema::filesize>>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--recurse|/"--recurse, -R">>|B<L<-R|/"--recurse, -R">>|B<L<--no-recurse|/"--recurse, -R">>|B<L<--norecurse|/"--recurse, -R">>] [B<L<--report-duplicate|/"--report-duplicate=s">>=I<int>] [B<L<--report-unique|/"-u">>|B<L<-D|/"-u">>|B<L<-a|/"-u">>|B<L<-d|/"-u">>|B<L<-u|/"-u">>|B<L<--no-report-unique|/"-u">>|B<L<--noreport-unique|/"-u">>] [B<L<--show-count|/"--show-count, --count, -c">>|B<L<-c|/"--show-count, --count, -c">>|B<L<--count|/"--show-count, --count, -c">>|B<L<--no-show-count|/"--show-count, --count, -c">>|B<L<--noshow-count|/"--show-count, --count, -c">>] [B<L<--show-digest|/"--show-digest">>] [B<L<--show-size|/"--show-size">>] -- E<lt>L<files|/"--files=s@*">E<gt> ...
 
 
 
@@ -52,8 +56,8 @@ See examples in the L</EXAMPLES> section.
 
 =head1 DESCRIPTION
 
-Given a list of filenames, will check each file size and content for duplicate
-content. Interface is a bit like the C<uniq> Unix command-line program.
+This is a thin wrapper to L<uniq-files>. It defaults C<report_unique> to 0
+and C<report_duplicate> to 1.
 
 =head1 OPTIONS
 
@@ -77,6 +81,18 @@ but will generate a false positive when two files of the same size are deemed as
 duplicate even though their content may be different.
 
 
+=item B<--authoritative-dir>=I<s@>, B<-O>
+
+Denote director(y|ies) where authoritative/"Original" copies are found.
+
+Can be specified multiple times.
+
+=item B<--authoritative-dirs-json>=I<s>
+
+Denote director(y|ies) where authoritative/"Original" copies are found (JSON-encoded).
+
+See C<--authoritative-dir>.
+
 =item B<--detail>, B<-l>
 
 Show details (a.k.a. --show-digest, --show-size, --show-count).
@@ -90,6 +106,23 @@ See C<--digest-args>.
 Some Digest algorithms require arguments, you can pass them here.
 
 
+=item B<--exclude-empty-files>, B<-Z>
+
+(No description)
+
+
+=item B<--exclude-file-pattern>=I<s@>, B<-X>
+
+Filename (including path) regex patterns to include.
+
+Can be specified multiple times.
+
+=item B<--exclude-file-patterns-json>=I<s>
+
+Filename (including path) regex patterns to include (JSON-encoded).
+
+See C<--exclude-file-pattern>.
+
 =item B<--files-json>=I<s>
 
 See C<--files>.
@@ -98,6 +131,9 @@ Can also be specified as the 1st command-line argument and onwards.
 
 =item B<--files>=I<s@>*
 
+(No description)
+
+
 Can also be specified as the 1st command-line argument and onwards.
 
 Can be specified multiple times.
@@ -105,6 +141,26 @@ Can be specified multiple times.
 =item B<--group-by-digest>
 
 Sort files by its digest (or size, if not computing digest), separate each different digest.
+
+=item B<--include-file-pattern>=I<s@>, B<-I>
+
+Filename (including path) regex patterns to exclude.
+
+Can be specified multiple times.
+
+=item B<--include-file-patterns-json>=I<s>
+
+Filename (including path) regex patterns to exclude (JSON-encoded).
+
+See C<--include-file-pattern>.
+
+=item B<--max-size>=I<s>
+
+Maximum file size to consider.
+
+=item B<--min-size>=I<s>
+
+Minimum file size to consider.
 
 =item B<--recurse>, B<-R>
 
@@ -123,22 +179,26 @@ Valid values:
 
  [0,1,2,3]
 
-Can be set to either 0, 1, 2.
-
-If set to 2 (the default for C<uniq-files>), will only return the first of
-duplicate items. For example: C<file1> contains text 'a', C<file2> 'b', C<file3>
-'a'. Only C<file1> will be returned because C<file2> is unique and C<file3>
-contains 'a' (already represented by C<file1>).
-
-If set to 1 (the default for C<dupe-files>), will return all the the duplicate
-files. From the above example: C<file1> and C<file3> will be returned.
-
-If set to 3, will return all but the first of duplicate items. From the above
-example: C<file3> will be returned. This is useful if you want to keep only one
-copy of the duplicate content. You can use the output of this routine to C<mv> or
-C<rm>.
+Can be set to either 0, 1, 2, or 3.
 
 If set to 0, duplicate items will not be returned.
+
+If set to 1 (the default for C<dupe-files>), will return all the the duplicate
+files. For example: C<file1> contains text 'a', C<file2> 'b', C<file3> 'a'. Then
+C<file1> and C<file3> will be returned.
+
+If set to 2 (the default for C<uniq-files>), will only return the first of
+duplicate items. Continuing from previous example, only C<file1> will be returned
+because C<file2> is unique and C<file3> contains 'a' (already represented by
+C<file1>). If one or more C<--authoritative-dir> (C<-O>) options are specified,
+files under these directories will be preferred.
+
+If set to 3, will return all but the first of duplicate items. Continuing from
+previous example: C<file3> will be returned. This is useful if you want to keep
+only one copy of the duplicate content. You can use the output of this routine
+to C<mv> or C<rm>. Similar to the previous case, if one or more
+C<--authoritative-dir> (C<-O>) options are specified, then files under these
+directories will not be listed if possible.
 
 
 =item B<--report-unique>
@@ -208,7 +268,7 @@ importance, from least important to most): C<trace>, C<debug>, C<info>,
 C<warn>/C<warning>, C<error>, C<fatal>. By default, the level is usually set to
 C<warn>, which means that log statements with level C<info> and less important
 levels will not be shown. To increase verbosity, choose C<info>, C<debug>, or
-C<fatal>.
+C<trace>.
 
 For more details on log level and logging, as well as how new logging levels can
 be defined or existing ones modified, see L<Log::ger>.

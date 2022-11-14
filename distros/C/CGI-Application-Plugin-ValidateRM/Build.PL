@@ -21,5 +21,10 @@ $class->new(
 	},
     create_makefile_pl => 'traditional',
 	sign=>0,
+	meta_merge     => {
+	  resources => {
+	    repository  => 'https://github.com/fany/CGI-Application-Plugin-ValidateRM',
+	  }
+	},
 )->create_build_script;
 

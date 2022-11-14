@@ -1,3 +1,11 @@
+0.17 2022-11-12
+    * .7z files don't necessarily have the 'Folder' entry
+    * Implement ->read() method in archiveZipApi
+    * Allow writing to a fresh archive file with archiveZipApi
+    * Test .7z files as well in some cases
+    * Test unzipping (.zip) files again, if the unzip tool exists
+
+
 0.16 2022-11-02
     * Change how we construct the command line to accomodate for modified
       handling with 7z version 21.x

@@ -1,6 +1,6 @@
 package Acme::Mitey::Cards;
 
-our $VERSION   = '0.015';
+our $VERSION   = '0.016';
 our $AUTHORITY = 'cpan:TOBYINK';
 
 use Acme::Mitey::Cards::Suit;

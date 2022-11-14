@@ -474,10 +474,15 @@ Revision history for StreamFinder
 2.00    2022/11/03
         - Add StreamFinder::InternetRadio (www.internet-radio.com stations)
         - Add StreamFinder::OnlineRadiobox (onlineradiobox.com stations)
-        - StreamFinder::AnyStream - Add .acc streams to search.
+        - StreamFinder::AnyStream - Add .aac streams to search.
         - StreamFinder::Tunein - Cpl. minor cleanups.
         - StreamFinder::Youtube - Accept urls containing "/c/" as channel urls.
 2.01    2022/11/05
         - StreamFinder::OnlineRadiobox - Add -notrim option and fetch the 
         station's callsign, ie. the "fccid".
         - Misc. minor code & doc. cleanups and update some copyright years.
+2.02    2022/11/10
+        - Add -hls_bandwidth option to specify a numeric (BITS per second) 
+        limit on HLS streams returned by getURL() when possible - useful for 
+        users with limited bandwidth.
+        - StreamFinder::Brighteon - Add ability to obtain the video's "year".

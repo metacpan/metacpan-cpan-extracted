@@ -27,7 +27,7 @@ WriteMakefile(
   },
   # SPVM::Builder::Util::API is needed for Makefile.PL
   CONFIGURE_REQUIRES => {
-    'SPVM'              => '0.9632',
+    'SPVM'              => '0.9661',
   },
   NORECURS => 1,
   META_MERGE   => {

@@ -1,5 +1,5 @@
 package Types::ULID;
-$Types::ULID::VERSION = '0.001';
+$Types::ULID::VERSION = '0.002';
 use v5.10;
 use strict;
 use warnings;

@@ -1,4 +1,4 @@
-* Software::Copyrigh Perl module
+* Software::Copyright Perl module
 
 ** Description
 

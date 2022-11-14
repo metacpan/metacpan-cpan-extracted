@@ -119,3 +119,4 @@ foreach my $file (@files) {
 		onSave($save);
 	}
 }
+1;

@@ -8,7 +8,7 @@
 
 package Apache::Solr;
 use vars '$VERSION';
-$VERSION = '1.07';
+$VERSION = '1.08';
 
 
 use warnings;
@@ -59,8 +59,9 @@ sub init($)
     $self->{AS_commit}   = exists $args->{autocommit} ? $args->{autocommit} : 1;
     $self->{AS_sversion} = $args->{server_version} || LATEST_SOLR_VERSION;
 
-    $http_agent = $self->{AS_agent} = $args->{agent} ||
-       $http_agent || LWP::UserAgent->new(keep_alive=>1);
+    $http_agent = $self->{AS_agent}
+       = $args->{agent} || $http_agent || LWP::UserAgent->new(keep_alive=>1);
+
     weaken $http_agent;
 
     $self;
@@ -517,7 +518,15 @@ sub request($$;$$)
 
     $result->request($req);
 
-    my $resp = $self->agent->request($req);
+    my $resp;
+  RETRY:
+    {   $resp = $self->agent->request($req);
+        unless($resp->is_success)
+        {   alert "Solr request failed with ".$resp->code;
+            sleep 5;    # let remote settle a bit
+            goto RETRY;
+        }
+    }
 #use Data::Dumper;
 #warn Dumper $resp;
     $result->response($resp);

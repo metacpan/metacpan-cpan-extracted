@@ -1,0 +1,77 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 fb88fc152e635fa7ccbbd647d9f4e8adad836dd34d069825f4554433ab585cd6 CHANGES
+SHA256 4a8bca6f22a6797a0f3a8b864fc956aba8e70b6c3e5df19cdeed29bfa943e389 CONTRIBUTING.md
+SHA256 4bb36edd2bcafef11ca615f69607953a31ee05ae172b69990aee317e95653456 LICENSE
+SHA256 7468fdf4c83e69f0826a45e2663360fe9f33238a4a1fafa6908c7b60a8a21fee MANIFEST
+SHA256 5bed6d73f11d64d956628d1944076aacf98ff2498f0d2ebe2be758c61345cd60 META.json
+SHA256 78b749ced364ceb25340f2150614cbe479c88a4d605fb008a8fd50085defe510 META.yml
+SHA256 3707a81d2b573b865cc6a285b75aadd59b32a64e49e406d2f5b5ace483508085 Makefile.PL
+SHA256 774b541710cb6dd3db2516c9515ab2cca9a927b7c1a457aad0126ab9b251108c README
+SHA256 99eb180c63a9c85b2842de19ac778f5621b77c26e604496e81f1b0174962b5ed README.md
+SHA256 8ec65926ce1beacd4edcfca7124c4e5e9064c2b14eeb6281bb323521b19ef748 lib/DB/Object.pm
+SHA256 c6caccf351bd3a96f3f8803a4488c6e1e41648a7d842adbc572fb86357b7606f lib/DB/Object/AND.pod
+SHA256 fb828622dc28025b441bbe95d902fb9ce3053ef7cee1d430d5aec3092dfe3550 lib/DB/Object/Cache/Tables.pm
+SHA256 73ebc655ee885ccbe820ba5f81f8976ee334224ac6e5a8fb71d27c4862d6df3c lib/DB/Object/Fields.pm
+SHA256 6d0dd92825417460adf97fc6b0e709efe6637cfbb61c3d44a1bcacd0047b69c6 lib/DB/Object/Fields/Field.pm
+SHA256 57687084fe256436d845275cd1ac10aaba7bf473be30de8828e6ff9c3f1be000 lib/DB/Object/Mysql.pm
+SHA256 80664aeecc9609a9deac540f59a79a2da1283cb01292ba7bdbf9607d49ce7f2d lib/DB/Object/Mysql/Query.pm
+SHA256 c87731cf529bb2d56ae36847c39334f198c96f015ce3b675b7817db308168e0c lib/DB/Object/Mysql/Statement.pm
+SHA256 ed868286f92d74205a6ee8d9790054f3097e61cd75ac1f775a4b1d7c7748d1d9 lib/DB/Object/Mysql/Tables.pm
+SHA256 7501afe833c858e9bc2a6cb0d01dda01d70b3923f9d6c32fc9faaddee660a7c5 lib/DB/Object/NOT.pod
+SHA256 93fa536e4e2d19268eaeebc0f4c6e658c61a21ec32de547912b9d734dfaf9f16 lib/DB/Object/OR.pod
+SHA256 83b6edf2aac12b273d61104f521f6a9392faad194d495b249b04cfbce1b3a5eb lib/DB/Object/Operator.pod
+SHA256 9c90b6c4aa4194a057043ddaa1f989c15badd6b0b91813539158c09e1dcf301f lib/DB/Object/Postgres.pm
+SHA256 8400de4e8fffcbab59aff03c35e905e30f0470b7555ff757758ae2d6090155e5 lib/DB/Object/Postgres/Lo.pm
+SHA256 6a9e92684b344b81503db75845a6b4396691eb9221aa4131aec83bc92e931571 lib/DB/Object/Postgres/Query.pm
+SHA256 ded012985e9b957865142dbecee6f7e29053a88c92030a864b5fc7f5fd54b230 lib/DB/Object/Postgres/Statement.pm
+SHA256 c57374ef2c306eb3851a91c052f20154d6adebb0317c1e98abf138214dc21080 lib/DB/Object/Postgres/Tables.pm
+SHA256 ff28a2757c3f42d0574b4f9362f65cb42f8607655086bc6cd1097fb55cf1d011 lib/DB/Object/Query.pm
+SHA256 ee96039a468d401126f75ba03aa66165edad88d86438ccbe686815102e805789 lib/DB/Object/Query/Clause.pod
+SHA256 852f90b9de49792f2f7e8e251e7b183beb8e66cc6df9643e93817beac3c94f7c lib/DB/Object/SQLite.pm
+SHA256 94a5a02933bf44697373b17bf951a75799912e8a0c20d4647cb55ad8decf3d48 lib/DB/Object/SQLite/Query.pm
+SHA256 f4704315f64ff01488c830e8654ea9feb81f679e017b0a1676ddb7e9c2134722 lib/DB/Object/SQLite/Statement.pm
+SHA256 981085d528244b88cbbe2e5201cd6690fc4c3c91498d02adb966ab290ded7c61 lib/DB/Object/SQLite/Tables.pm
+SHA256 96c228e4f5419c2882e252648f0a79942fbf111499305f2a49a8b77c543cf396 lib/DB/Object/Statement.pm
+SHA256 efe56cac6083c441796a57352a64aa121ff4a1c423e67cf701cc43ae51b0fa0c lib/DB/Object/Tables.pm
+SHA256 e5c0943b94cfeffc4e26f1f8cc6e954ed1e4c573303fab5bb412d9b6fe730d13 t/001_load.t
+SHA256 9b1ff9c17840ce20fbf6c99bd1c31fb592dccd57654981c7e2056c5a34488df4 t/002_postgres.t
+SHA256 0808295cfff5834a0095b81fc7065d7ec29cac766acfc253a0c4e1f1cf3e85e4 t/003_sqlite.t
+SHA256 bbaaae758ce0edda54f8f8017f44e7a456bdc884ef8faad015938a6fdc1fc6d4 t/004_mysql.t
+SHA256 a935bae1d62b7433ea2d0c5557d6fea5994f0b36d322b48c6ddf65f89c1d7fd9 t/005.field.t
+SHA256 782ba6082394e4a417a721a39ab4d6be999251ef81ff3c226193d244eafa493e t/900_pod.t
+SHA256 9119a524a1a2cc13a18faf0fbd953dcd94f5e1f84701a5e01ea4e8de24bc1560 t/910.coverage.t
+SHA256 51b38d8352c711876b6db518dd847c8b24715960943ab47c0005f7766b21c1f6 t/999.kwalitee.t
+SHA256 23ba299c8973708223b536dacf403f5b5281c31caf2022835747143923768d11 t/mysql.sql
+SHA256 bad6563e66c3f01685436f5b7e31d9b6bdce5549fd4af2e44dc1c3a6b0a73aa2 t/pgsql.sql
+SHA256 1fc5d5e5419df6c3089390f8700cc0dd633198bd304b42815bc5de9879f57f43 t/sqlite.sql
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBAwAdFiEENa28Ovg1XoRROdiWXzwCYc2y51IFAmNuHxoACgkQXzwCYc2y
+51IqcxAAkrFXRNF3qQ5E+nvm3v57RZrlUH3U6A+rc4ouFbHthr4G1/EpcWyU+FEL
+yfJ2SDXFuzgmlKofpBn8Y1QcCI2h4YClJ9BnoemA0DW4qrTDjd67N7C+gtdjXpWA
+uAyrzYkc1xAyb2V6d7cua/1OxTDVGPcxsJM6N7c0nYRUsq309tF/JmWkZW4KvxvA
+hiYoSAyRnEN0AENtkcl2UxBw+H7y23TXvFsEJC1vegjzLma9kAgBJOHoyHC4C/H6
+72TeMAmdFDK1WIrYrXs6FFhaVIQuCcM6SKQI+Uioro+mhEfxuaOFnESB+DXYbefL
+sMNd/j/haU6nds3Ho8vw19urK77yyuZUY1QHTsoyUsIOFKP5wOot38mOEifxeWDm
+bp2YBkAH+CTcyJso0JHP5GsjmP1Co2iy+ok/SvNLCk227OjYo8y4l/l/ES2odlO9
+lIi7of3c4uxKEo5SoNiypGYzOzl4jJuEHSROXfuVQHQt+pKdPDVr9QxIfrW99AIU
+fi+GaoNL4+kPD58T95W1yrZts/+QrHbB5x5/DRp9gjaW+7BJ7QGlnX5PFXHmJJ/C
+IiDrOfR7bSPDBVd3bsiW7yRYvifn+Yn9hJGtzILZoMaanoSeVChLdYtGsvlxSz1T
+6YPF/RF0oHPepDBsOI7MDmX4Hl1DKpAaS6Ua8um5LnmUWDqs+h4=
+=dyPy
+-----END PGP SIGNATURE-----

@@ -1,34 +1,35 @@
-require 5.006;
+use 5.006;
+use strict;
+use warnings;
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
-   NAME => "Mozilla::CA",
-   VERSION_FROM => "lib/Mozilla/CA.pm",
-   ABSTRACT_FROM => "lib/Mozilla/CA.pm",
-   AUTHOR => 'Gisle Aas <gisle@activestate.com>',
-   LICENSE => 'open_source',
-   MIN_PERL_VERSION => 5.006,
-   META_MERGE => {
-      'meta-spec' => { version => 2 },
-      dynamic_config => 0,
-      resources => {
-         homepage => 'https://github.com/gisle/mozilla-ca',
-         license => [
-            'https://www.mozilla.org/media/MPL/2.0/index.txt'
-         ],
-         bugtracker => {
-            web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=Mozilla-CA'
-         },
-         repository => {
-            url => 'https://github.com/gisle/mozilla-ca.git',
-            web => 'https://github.com/gisle/mozilla-ca',
-            type => 'git',
-         },
-      },
-   },
-   TEST_REQUIRES => {
-       Test => 0,
-   },
+    NAME => "Mozilla::CA",
+    VERSION_FROM => "lib/Mozilla/CA.pm",
+    ABSTRACT_FROM => "lib/Mozilla/CA.pm",
+    AUTHOR => 'Gisle Aas <gisle@activestate.com>',
+    MIN_PERL_VERSION => 5.006,
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+        license => [ 'mozilla_2_0' ],
+        dynamic_config => 0,
+        resources => {
+            license => [
+                'https://www.mozilla.org/media/MPL/2.0/index.txt'
+            ],
+            bugtracker => {
+                web => 'https://github.com/libwww-perl/Mozilla-CA/issues',
+            },
+            repository => {
+                url => 'https://github.com/libwww-perl/Mozilla-CA.git',
+                web => 'https://github.com/libwww-perl/Mozilla-CA',
+                type => 'git',
+            },
+        },
+    },
+    TEST_REQUIRES => {
+        'Test::More' => 0,
+    },
 );
 
 BEGIN {

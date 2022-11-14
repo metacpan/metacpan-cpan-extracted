@@ -8,7 +8,7 @@
 
 package Apache::Solr::Document;
 use vars '$VERSION';
-$VERSION = '1.07';
+$VERSION = '1.08';
 
 
 use warnings;
@@ -89,7 +89,7 @@ sub content($)
 our $AUTOLOAD;
 sub AUTOLOAD
 {   my $self = shift;
-    my $fn = $AUTOLOAD =~ s/.*\:\://r;
+    (my $fn = $AUTOLOAD) =~ s/.*\:\://;
 
       $fn =~ /^_(.*)/    ? $self->content($1)
     : $fn eq 'DESTROY'   ? undef

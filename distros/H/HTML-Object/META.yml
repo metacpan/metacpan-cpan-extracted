@@ -38,10 +38,10 @@ requires:
   HTML::Selector::XPath: '0.26'
   JSON: '4.05'
   List::Util: '1.56'
-  Module::Generic: v0.28.2
+  Module::Generic: v0.28.5
   Nice::Try: v1.3.1
   POSIX: '0'
-  Promise::Me: v0.4.0
+  Promise::Me: v0.4.5
   Scalar::Util: '1.60'
   Time::HiRes: '1.9764'
   URI: '5.10'
@@ -58,5 +58,5 @@ requires:
 resources:
   bugtracker: https://gitlab.com/jackdeguest/HTML-Object/issues
   repository: https://gitlab.com/jackdeguest/HTML-Object
-version: v0.2.1
+version: v0.2.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,131 @@
+{
+   "abstract" : "Access SmartyStreet API",
+   "author" : [
+      "DERIV <DERIV@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "WebService-Async-SmartyStreets",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "share",
+         "shares",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "7.64"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::Plugin::PerlTidy" : "0",
+            "Dist::Zilla::Plugin::Test::Perl::Critic" : "0",
+            "Dist::Zilla::PluginBundle::Author::DERIV" : "0",
+            "Software::License::Perl_5" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
+            "Test::EOL" : "0",
+            "Test::MinimumVersion" : "0",
+            "Test::Mojibake" : "0",
+            "Test::More" : "0.96",
+            "Test::NoTabs" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Portability::Files" : "0",
+            "Test::Version" : "1"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Future::AsyncAwait" : "0.21",
+            "IO::Async::Notifier" : "0",
+            "IO::Async::SSL" : "0",
+            "JSON::MaybeUTF8" : "0",
+            "Log::Any" : "0",
+            "Net::Async::HTTP" : "0.44",
+            "Scalar::Util" : "0",
+            "Syntax::Keyword::Try" : "0",
+            "URI" : "0",
+            "URI::QueryParam" : "0",
+            "indirect" : "0",
+            "mro" : "0",
+            "parent" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "Future" : "0",
+            "Future::Exception" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Log::Any::Test" : "0",
+            "Test::CheckDeps" : "0.010",
+            "Test::Deep" : "0",
+            "Test::Fatal" : "0",
+            "Test::MockModule" : "0",
+            "Test::More" : "0.94",
+            "Test::Warnings" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "WebService::Async::SmartyStreets" : {
+         "file" : "lib/WebService/Async/SmartyStreets.pm",
+         "version" : "0.001"
+      },
+      "WebService::Async::SmartyStreets::Address" : {
+         "file" : "lib/WebService/Async/SmartyStreets/Address.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/binary-com/perl-WebService-Async-SmartyStreets/issues"
+      },
+      "homepage" : "https://github.com/binary-com/perl-WebService-Async-SmartyStreets",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/binary-com/perl-WebService-Async-SmartyStreets.git",
+         "web" : "https://github.com/binary-com/perl-WebService-Async-SmartyStreets"
+      }
+   },
+   "version" : "0.001",
+   "x_authority" : "cpan:DERIV",
+   "x_contributors" : [
+      "chylli-binary <chylli@binary.com>",
+      "Abdalla Mourad <abdullah.f98m@gmail.com>",
+      "Brandon <52795236+brandon-binary@users.noreply.github.com>",
+      "chylli-binary <52912308+chylli-binary@users.noreply.github.com>",
+      "felipe-binary <64797927+felipe-binary@users.noreply.github.com>",
+      "limchengyang <45479072+limchengyang@users.noreply.github.com>",
+      "Luis Bobadilla <108674246+luis-bobadilla-deriv@users.noreply.github.com>",
+      "Tom Molesworth <tom@binary.com>",
+      "Zak B. Elep <zakame@zakame.net>"
+   ],
+   "x_generated_by_perl" : "v5.26.2",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+}
+

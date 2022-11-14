@@ -10,6 +10,7 @@ redist.sh
 repod.sh
 t/00-load.t
 t/01-pdl-opt-simplex-test.t
+t/02-simplex-reduced.t
 t/02-simplex.t
 t/03-simplex-2-var.t
 t/04-simplex-2-var-pdl.t

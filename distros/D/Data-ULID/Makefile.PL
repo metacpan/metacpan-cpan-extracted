@@ -16,20 +16,10 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "Data::ULID",
   "PREREQ_PM" => {
-    "Crypt::PRNG" => 0,
-    "DateTime" => 0,
-    "Exporter" => 0,
-    "Math::BigInt" => "1.999808",
-    "Time::HiRes" => 0,
-    "base" => 0,
-    "strict" => 0,
-    "warnings" => 0
+    "CryptX" => 0,
+    "Time::HiRes" => 0
   },
-  "TEST_REQUIRES" => {
-    "Data::Dumper" => 0,
-    "Test::More" => 0
-  },
-  "VERSION" => "1.1.2",
+  "VERSION" => "1.2.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -37,16 +27,8 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Crypt::PRNG" => 0,
-  "Data::Dumper" => 0,
-  "DateTime" => 0,
-  "Exporter" => 0,
-  "Math::BigInt" => "1.999808",
-  "Test::More" => 0,
-  "Time::HiRes" => 0,
-  "base" => 0,
-  "strict" => 0,
-  "warnings" => 0
+  "CryptX" => 0,
+  "Time::HiRes" => 0
 );
 
 

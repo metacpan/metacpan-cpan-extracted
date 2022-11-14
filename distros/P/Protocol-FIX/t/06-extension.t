@@ -40,7 +40,7 @@ ok $data, "can serialize message with custom field";
 my ($message, $error) = $proto->parse_message(\$data);
 
 ok $message;
-is $error, undef, "can deserialize message with custom field";
+is $error,                          undef,           "can deserialize message with custom field";
 is $message->value('AwesomeField'), 'bla-bla-field', "custom field value is valid";
 
 done_testing;

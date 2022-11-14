@@ -18,9 +18,9 @@ my %WriteMakefileArgs = (
   "NAME" => "Types::ULID",
   "PREREQ_PM" => {
     "Data::ULID" => 0,
-    "Type::Tiny" => 0
+    "Type::Tiny" => "1.004000"
   },
-  "VERSION" => "0.001",
+  "VERSION" => "0.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Data::ULID" => 0,
-  "Type::Tiny" => 0
+  "Type::Tiny" => "1.004000"
 );
 
 

@@ -1,18 +1,16 @@
 package Mojo::Server::DaemonControl;
 use Mojo::Base 'Mojo::EventEmitter', -signatures;
 
-use File::Basename qw(basename);
-use File::Spec::Functions qw(tmpdir);
+use Fcntl qw(F_GETFD F_SETFD FD_CLOEXEC);
+use File::Spec;
 use IO::Select;
-use IO::Socket::UNIX;
 use Mojo::File qw(curfile path);
-use Mojo::Log;
-use Mojo::URL;
+use Mojo::Server::Daemon;
 use Mojo::Util qw(steady_time);
+use Mojolicious;
 use POSIX qw(WNOHANG);
-use Scalar::Util qw(weaken);
 
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 # This should be considered internal for now
 our $MOJODCTL = do {
@@ -21,14 +19,22 @@ our $MOJODCTL = do {
   -x $x ? $x : 'mojodctl';
 };
 
-has graceful_timeout   => sub ($self) { $ENV{MOJODCTL_GRACEFUL_TIMEOUT}   || 120 };
-has heartbeat_interval => sub ($self) { $ENV{MOJODCTL_HEARTBEAT_INTERVAL} || 5 };
-has heartbeat_timeout  => sub ($self) { $ENV{MOJODCTL_HEARTBEAT_TIMEOUT}  || 50 };
-has listen             => sub ($self) { $self->_build_listen };
+has cleanup            => 0;
+has graceful_timeout   => 120;
+has heartbeat_interval => 5;
+has heartbeat_timeout  => 50;
+has listen             => sub ($self) { [split /,/, $ENV{MOJO_LISTEN} || 'http://*:8080'] };
 has log                => sub ($self) { $self->_build_log };
-has pid_file           => sub ($self) { $self->_build_pid_file };
-has workers            => sub ($self) { $ENV{MOJODCTL_WORKERS} || 4 };
-has worker_pipe        => sub ($self) { $self->_build_worker_pipe };
+has pid_file           => sub ($self) { path(File::Spec->tmpdir, path($0)->basename . '.pid') };
+has workers            => 4;
+
+has _listen_handles => sub ($self) {
+  my $daemon = Mojo::Server::Daemon->new(listen => $self->listen, silent => 1);
+  my $loop   = $daemon->start->ioloop;
+  my @fh     = map { $loop->acceptor($_)->handle } @{$daemon->acceptors};
+  die "Did you forget to specify listen addresses?" unless @fh;
+  return \@fh;
+};
 
 sub check_pid ($self) {
   return 0 unless my $pid = -r $self->pid_file && $self->pid_file->slurp;
@@ -38,41 +44,45 @@ sub check_pid ($self) {
   return 0;
 }
 
-sub ensure_pid_file ($self) {
-  my $pid = $self->{pid} ||= $$;
+sub ensure_pid_file ($self, $pid) {
   return $self if -s (my $file = $self->pid_file);
-  $self->log->debug("Writing pid $pid to @{[$self->pid_file]}");
+  $self->log->info("Writing pid $pid to $file");
   return $file->spurt("$pid\n")->chmod(0644) && $self;
 }
 
 sub reload ($self, $app) {
   return _errno(3) unless my $pid = $self->check_pid;
-  $self->log->info("Starting hot deployment of $pid.");
+  $self->log->info("Starting hot deployment of $pid");
   return kill(USR2 => $pid) ? _errno(0) : _errno(1);
 }
 
 sub run ($self, $app) {
+
+  # Cannot run two daemons at the same time
   if (my $pid = $self->check_pid) {
-    $self->log->info("Manager for $app is already running ($pid).");
+    $self->log->info("Manager for $app is already running ($pid)");
     return _errno(16);
   }
 
-  weaken $self;
+  # Listen for signals and start the daemon
   local $SIG{CHLD} = sub { $self->_waitpid };
   local $SIG{INT}  = sub { $self->stop('INT') };
   local $SIG{QUIT} = sub { $self->stop('QUIT') };
   local $SIG{TERM} = sub { $self->stop('TERM') };
-  local $SIG{TTIN} = sub { $self->_inc_workers(1) };
-  local $SIG{TTOU} = sub { $self->_inc_workers(-1) };
-  local $SIG{USR2} = sub { $self->_hot_deploy };
+  local $SIG{TTIN} = sub { $self->workers($self->workers + 1) };
+  local $SIG{TTOU} = sub { $self->workers($self->workers - 1) if $self->workers > 0 };
+  local $SIG{USR2} = sub { $self->_start_hot_deployment };
 
-  $self->{pool} ||= {};
-  @$self{qw(pid running)} = ($$, 1);
-  $self->worker_pipe;    # Make sure we have a working pipe
+  $self->cleanup(1)->ensure_pid_file($self->{pid} = $$);
+  $self->_create_worker_read_write_pipe;
+  $self->_listen_handles;
+
+  @$self{qw(pid pool running)} = ($$, {}, 1);
   $self->emit('start');
   $self->log->info("Manager for $app started");
   $self->_manage($app) while $self->{running};
   $self->log->info("Manager for $app stopped");
+  $self->cleanup(0)->pid_file->remove;
   return _errno(0);
 }
 
@@ -82,103 +92,83 @@ sub stop ($self, $signal = 'TERM') {
   return $self->emit(stop => $signal);
 }
 
-sub _build_listen ($self) {
-  return [map { Mojo::URL->new($_) } split ',', $ENV{MOJODCTL_LISTEN} || 'http://*:8080'];
-}
-
 sub _build_log ($self) {
-  $ENV{MOJODCTL_LOG_LEVEL}
-    ||= $ENV{HARNESS_IS_VERBOSE} ? 'debug' : $ENV{HARNESS_ACTIVE} ? 'error' : 'info';
-  $ENV{MOJO_LOG_LEVEL} ||= $ENV{MOJODCTL_LOG_LEVEL};
-  my $log = Mojo::Log->new(level => $ENV{MOJODCTL_LOG_LEVEL});
-  $log->path($ENV{MOJODCTL_LOG_FILE}) if $ENV{MOJODCTL_LOG_FILE};
-  return $log;
+  my $level = $ENV{MOJO_LOG_LEVEL}
+    || ($ENV{HARNESS_IS_VERBOSE} ? 'debug' : $ENV{HARNESS_ACTIVE} ? 'error' : 'info');
+  return Mojo::Log->new(level => $level);
 }
 
-sub _build_pid_file ($self) {
-  return path($ENV{MOJODCTL_PID_FILE}) if $ENV{MOJODCTL_PID_FILE};
-  return path(tmpdir, basename($0) . '.pid');
-}
-
-sub _build_worker_pipe ($self) {
-  my $path = $self->pid_file->to_string =~ s!\.pid$!.sock!r;
-  die qq(PID file "@{[$self->pid_file]}" must end with ".pid") unless $path =~ m!\.sock$!;
-  path($path)->remove if -S $path;
-  return IO::Socket::UNIX->new(Listen => 1, Local => $path, Type => SOCK_DGRAM)
-    || die "Can't create a worker pipe: $@";
+sub _create_worker_read_write_pipe ($self) {
+  return if $self->{worker_read};
+  pipe $self->{worker_read}, $self->{worker_write} or die "pipe: $!";
 }
 
 sub _errno ($n) { $! = $n }
 
-sub _hot_deploy ($self) {
-  $self->log->info('Starting hot deployment.');
-  my $time = steady_time;
-  $_->{graceful} = $time for values %{$self->{pool}};
-}
-
-sub _inc_workers ($self, $by) {
-  my $workers = $self->workers + $by;
-  $workers = 1 if $workers < 1;
-  $self->workers($workers);
-
-  my $time = steady_time;
-  my @stop = grep { !$_->{graceful} } values %{$self->{pool}};
-  splice @stop, 0, $workers;
-  $_->{graceful} = $time for @stop;
-}
-
-sub _kill ($self, $signal, $w, $reason = "with $signal") {
+sub _kill ($self, $signal, $w, $level, $reason) {
   return if $w->{$signal};
-  $w->{$signal} = kill($signal => $w->{pid}) // 0;
-  $self->log->info("Stopping worker $w->{pid} $reason == $w->{$signal}");
+  $w->{$signal} = kill($signal, $w->{pid}) || 0;
+  $self->log->$level("$reason (signalled=$w->{$signal})");
 }
 
 sub _manage ($self, $app) {
+
+  # Make sure we have a PID file and get status from workers
+  $self->ensure_pid_file($self->{pid});
   $self->_read_heartbeat;
 
   # Stop workers and eventually manager
   my $pool = $self->{pool};
   if (my $signal = $self->{stop_signal}) {
     return delete @$self{qw(running stop_signal)} unless keys %$pool;    # Fully stopped
-    return map { $_->{$signal} || $self->_kill($signal => $_) } values %{$self->{pool}};
+    return map { $_->{$signal} ||= kill $signal, $_->{pid} } values %$pool;
   }
 
-  # Make sure we have enough workers and a pid file
-  my $need = $self->workers - int grep { !$_->{graceful} } values %$pool;
-  $self->log->debug("Manager starting $need workers") if $need > 0;
-  $self->_spawn($app) while !$self->{stop_signal} && $need-- > 0;
-  $self->ensure_pid_file;
+  # Decrease workers on SIGTTOU
+  my $time       = steady_time;
+  my @maybe_stop = grep { !$_->{graceful} } values %$pool;
+  $_->{graceful} = $time for splice @maybe_stop, $self->workers;
 
-  # Keep track of worker health
-  my $gt   = $self->graceful_timeout;
-  my $ht   = $self->heartbeat_timeout;
-  my $time = steady_time;
-  for my $pid (keys %$pool) {
-    next unless my $w = $pool->{$pid};
+  # Figure out worker health
+  my $ht = $self->heartbeat_timeout;
+  my (@graceful, @healthy, @starting);
+  for my $pid (sort keys %$pool) {
+    my $w = $pool->{$pid} or next;
+    if    ($w->{graceful})            { push @graceful, $pid }
+    elsif (!$w->{time})               { push @starting, $pid }
+    elsif ($w->{time} + $ht <= $time) { $w->{graceful} //= $time; push @graceful, $pid }
+    else                              { push @healthy, $pid }
+  }
 
-    if (!$w->{graceful} and $w->{time} + $ht <= $time) {
-      $w->{graceful} = $time;
-      $self->log->error("Worker $pid has no heartbeat");
-    }
-
-    if ($gt and $w->{graceful} and $w->{graceful} + $gt < $time) {
-      $self->_kill(KILL => $w, 'with no heartbeat');
-    }
-    elsif ($w->{graceful}) {
-      $self->_kill(QUIT => $w, 'gracefully');
+  # Start or stop workers based on worker health
+  my $n_missing = $self->workers - (@healthy + @starting);
+  if ($n_missing > 0) {
+    $self->log->info("Manager starting $n_missing workers");
+    $self->_spawn($app) while !$self->{stop_signal} && $n_missing-- > 0;
+  }
+  elsif (!@starting) {
+    my $gt = $self->graceful_timeout;
+    for my $pid (@graceful) {
+      next unless my $w = $pool->{$pid};
+      if ($gt && $w->{graceful} + $gt < $time) {
+        $self->_kill(KILL => $w, warn => "Stopping worker $pid immediately");
+      }
+      else {
+        $self->_kill(QUIT => $w, info => "Stopping worker $pid gracefully ($gt seconds)");
+      }
     }
   }
 }
 
 sub _read_heartbeat ($self) {
-  my $select = $self->{select} ||= IO::Select->new($self->worker_pipe);
+  my $select = $self->{select} ||= IO::Select->new($self->{worker_read});
   return unless $select->can_read(0.1);
-  return unless $self->worker_pipe->sysread(my $chunk, 4194304);
+  return unless $self->{worker_read}->sysread(my $chunk, 4194304);
 
   my $time = steady_time;
-  while ($chunk =~ /(\d+):(\w)\n/g) {
+  while ($chunk =~ s/mojodctl:\d+:(\d+):(\w)\n//mg) {
     next unless my $w = $self->{pool}{$1};
-    ($w->{killed} = $time), $self->log->fatal("Worker $w->{pid} forced killed") if $2 eq 'k';
+    ($w->{killed} = $time), $self->log->fatal("Worker $w->{pid} force killed") if $2 eq 'k';
     $w->{graceful} ||= $time if $2 eq 'g';
     $w->{time} = $time;
     $self->emit(heartbeat => $w);
@@ -186,43 +176,57 @@ sub _read_heartbeat ($self) {
 }
 
 sub _spawn ($self, $app) {
-  my @args;
-  push @args, map {
-    my $url = $_->clone;
-    $url->query->param(reuse => 1);
-    (-l => $url->to_string);
-  } @{$self->listen};
 
   # Parent
-  my $ppid = $$;
   die "Can't fork: $!" unless defined(my $pid = fork);
-  return $self->emit(spawn => $self->{pool}{$pid} = {pid => $pid, time => steady_time}) if $pid;
+  if ($pid) {
+    my $w = $self->{pool}{$pid} = {pid => $pid, time => steady_time};
+    $self->log->info("Worker $pid started");
+    return $self->emit(spawn => $w);
+  }
 
   # Child
-  $ENV{MOJODCTL_HEARTBEAT_INTERVAL} = $self->heartbeat_interval;
+  $ENV{MOJO_LOG_LEVEL} ||= $self->log->level;
   $ENV{MOJODCTL_CONTROL_CLASS}      = 'Mojo::Server::DaemonControl::Worker';
-  $ENV{MOJODCTL_CONTROL_SOCK}       = $self->worker_pipe->hostpath;
-  $ENV{MOJODCTL_PID}                = $ppid;
-  $self->log->debug("Exec $^X $MOJODCTL $app daemon @args");
+  $ENV{MOJODCTL_HEARTBEAT_FD}       = fileno $self->{worker_write};
+  $ENV{MOJODCTL_HEARTBEAT_INTERVAL} = $self->heartbeat_interval;
+
+  my (@urls, @args) = @{$self->listen};
+  for my $fh ($self->{worker_write}, @{$self->_listen_handles}) {
+
+    # Remove close-on-exec flag
+    # https://stackoverflow.com/questions/14351147/perl-passing-an-open-socket-across-fork-exec
+    my $flags = fcntl $fh, F_GETFD, 0 or die "fcntl F_GETFD: $!";
+    fcntl $fh, F_SETFD, $flags & ~FD_CLOEXEC or die "fcntl F_SETFD: $!";
+
+    next if $fh eq $self->{worker_write};
+    my $url = Mojo::URL->new(shift @urls);
+    $url->query->param(fd => fileno $fh);
+    push @args, -l => $url->to_string;
+  }
+
+  $self->log->debug("Starting $^X $MOJODCTL $app daemon @args");
   exec $^X, $MOJODCTL => $app => daemon => @args;
   die "Could not exec $app: $!";
+}
+
+sub _start_hot_deployment ($self) {
+  $self->log->info('Starting hot deployment.');
+  my $time = steady_time;
+  $_->{graceful} = $time for values %{$self->{pool}};
 }
 
 sub _waitpid ($self) {
   while ((my $pid = waitpid -1, WNOHANG) > 0) {
     next unless my $w = delete $self->{pool}{$pid};
-    $self->log->debug("Worker $pid stopped");
+    $self->log->info("Worker $pid stopped");
     $self->emit(reap => $w);
   }
 }
 
 sub DESTROY ($self) {
-  return if $self->{pid} and $self->{pid} != $$;    # Fork safety
-  my $path = $self->pid_file;
+  my $path = $self->cleanup && $self->pid_file;
   $path->remove if $path and -e $path;
-
-  my $worker_pipe = $self->{worker_pipe};
-  path($worker_pipe->hostpath)->remove if $worker_pipe and -S $worker_pipe->hostpath;
 }
 
 1;
@@ -249,9 +253,7 @@ Mojo::Server::DaemonControl - A Mojolicious daemon manager
 =head2 Perl API
 
   use Mojo::Server::DaemonControl;
-  my $listen = Mojo::URL->new('http://*:8080');
-  my $dctl   = Mojo::Server::DaemonControl->new(listen => [$listen], workers => 4);
-
+  my $dctl = Mojo::Server::DaemonControl->new(listen => ['http://*:8080'], workers => 4);
   $dctl->run('/path/to/my-mojo-app.pl');
 
 =head2 Mojolicious application
@@ -274,13 +276,7 @@ L<Mojo::Server::Daemon> for more information about what to tweak.
 =head1 DESCRIPTION
 
 L<Mojo::Server::DaemonControl> is not a web server. Instead it manages one or
-more L<Mojo::Server::Daemon> processes that can handle web requests. Each of
-these servers are started with L<SO_REUSEPORT|Mojo::Server::Daemon/reuse>
-enabled.
-
-This means it is only supported on systems that support
-L<SO_REUSEPORT|https://lwn.net/Articles/542629/>. It also does not support fork
-emulation. It should work on most modern Linux based systems though.
+more L<Mojo::Server::Daemon> processes that can handle web requests.
 
 This server is an alternative to L<Mojo::Server::Hypnotoad> where each of the
 workers handle long running (WebSocket) requests. The main difference is that a
@@ -293,51 +289,6 @@ code run, while new processes are deployed.
 
 Note that L<Mojo::Server::DaemonControl> is currently EXPERIMENTAL and it has
 not been tested in production yet. Feedback is more than welcome.
-
-=head1 ENVIRONMENT VARIABLES
-
-Some environment variables can be set in C<systemd> service files, while other
-can be useful to be read when initializing your web server.
-
-=head2 MOJODCTL_CONTROL_CLASS
-
-This environment variable will be set to L<Mojo::Server::DaemonControl::Worker>
-inside the worker process.
-
-=head2 MOJODCTL_GRACEFUL_TIMEOUT
-
-Can be used to set the default value for L</graceful_timeout>.
-
-=head2 MOJODCTL_HEARTBEAT_INTERVAL
-
-Can be used to set the default value for L</heartbeat_interval> and will be set
-to ensure a default value for L<Mojo::Server::DaemonControl::Worker/heartbeat_interval>.
-
-=head2 MOJODCTL_HEARTBEAT_TIMEOUT
-
-Can be used to set the default value for L</heartbeat_timeout>.
-
-=head2 MOJODCTL_LISTEN
-
-Can be used to set the default value for L</listen>. The environment variable
-will be split on comma for multiple listen addresses.
-
-=head2 MOJODCTL_LOG_FILE
-
-By default the log will be written to STDERR. It is possible to set this
-environment variable to log to a file instead.
-
-=head2 MOJODCTL_LOG_LEVEL
-
-Can be set to debug, info, warn, error, fatal. Default log level is "info".
-
-=head2 MOJODCTL_PID_FILE
-
-Can be used to set a default value for L</pid_file>.
-
-=head2 MOJODCTL_WORKERS
-
-Can be used to set a default value for L</workers>.
 
 =head1 SIGNALS
 
@@ -379,6 +330,14 @@ appended to C<$0> to illustrate which is new and which is old.
 L<Mojo::Server::DaemonControl> inherits all attributes from
 L<Mojo::EventEmitter> and implements the following ones.
 
+=head2 cleanup
+
+  $bool = $dctl->cleanup;
+  $dctl = $dctl->cleanup(1);
+
+Set this to true and L<Mojo::Server::DaemonControl> will remove L</pid_file>
+when this object goes out of scope.
+
 =head2 graceful_timeout
 
   $timeout = $dctl->graceful_timeout;
@@ -406,13 +365,10 @@ this amount of time.
 =head2 listen
 
   $array_ref = $dctl->listen;
-  $dctl      = $dctl->listen([Mojo::URL->new]);
+  $dctl      = $dctl->listen(['http://127.0.0.1:3000']);
 
-An array-ref of L<Mojo::URL> objects for what to listen to. See
-L<Mojo::Server::Daemon/listen> for supported values.
-
-The C<reuse=1> query parameter will be added automatically before starting the
-L<Mojo::Server::Daemon> sub process.
+Array reference with one or more locations to listen on.
+See L<Mojo::Server::Daemon/listen> for more details.
 
 =head2 log
 
@@ -439,12 +395,6 @@ L<File::Spec/tmpdir>.
 Number of worker processes, defaults to 4. See L<Mojo::Server::Prefork/workers>
 for more details.
 
-=head2 worker_pipe
-
-  $socket = $dctl->worker_pipe;
-
-Holds a L<IO::Socket::UNIX> object used to communicate with workers.
-
 =head1 METHODS
 
 L<Mojo::Server::DaemonControl> inherits all methods from
@@ -459,7 +409,7 @@ if it is not running.
 
 =head2 ensure_pid_file
 
-  $dctl->ensure_pid_file;
+  $dctl->ensure_pid_file($pid);
 
 Makes sure L</pid_file> exists and contains the current PID.
 

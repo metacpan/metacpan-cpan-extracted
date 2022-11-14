@@ -8,7 +8,7 @@
 #   The GNU General Public License, Version 3, June 2007
 #
 package Software::Copyright;
-$Software::Copyright::VERSION = '0.004';
+$Software::Copyright::VERSION = '0.005';
 use 5.20.0;
 use warnings;
 use utf8;
@@ -49,7 +49,7 @@ sub _create_or_merge ($result, $c) {
         $result->{$st->record} = $st;
     }
     else {
-        say "Dropping entry without name: '$c'";
+        $result->{unknown} = $st;
     }
 
     return;
@@ -59,9 +59,26 @@ subtype 'Copyright::Software::StatementHash' => as 'HashRef[Software::Copyright:
 coerce 'Copyright::Software::StatementHash' => from 'Str' => via {
     my $str = $_ ;
     my $result = {} ;
+    my @year_only_data;
+    my @data = split( m!(?:\s+/\s+)|(?:\s*\n\s*)!, $str);
     # split statement that can be licensecheck output or debfmt data
-    foreach my $c ( split( m!(?:\s+/\s+)|(?:\s*\n\s*)!, $str) ) {
-        _create_or_merge($result, $c);
+    foreach my $c ( @data ) {
+        if ($c =~ /^[\d\s,.-]+$/) {
+            push @year_only_data, $c;
+        }
+        else {
+            # copyright contain letters, so hopefully some name
+            _create_or_merge($result, $c);
+        }
+    }
+
+    # year only data is dropped when other more significant data is
+    # present (with names)
+    if (@data eq @year_only_data) {
+        # got only year data, save it.
+        foreach my $c ( @data ) {
+            _create_or_merge($result, $c);
+        }
     }
     return $result;
 };
@@ -139,7 +156,7 @@ Software::Copyright - Copyright class
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -174,7 +191,7 @@ Debian's L<licensecheck>, i.e. the statements can be separated by "C</>".
 
 =head1 Methods
 
-=head2 statement_by_name
+=head2 statement
 
 Get the L<Software::Copyright::Statement> object of a given user.
 

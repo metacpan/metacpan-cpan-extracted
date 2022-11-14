@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Glorified metronome
 
-our $VERSION = '0.4005';
+our $VERSION = '0.4007';
 
 use strictures 2;
 use Data::Dumper::Compact qw(ddc);
@@ -326,7 +326,12 @@ sub flam {
     my $y = $MIDI::Simple::Length{ $self->sixtyfourth };
     my $z = sprintf '%0.f', ($x - $y) * TICKS;
     $accent ||= sprintf '%0.f', $self->score->Volume / 2;
-    $self->accent_note($accent, $self->sixtyfourth, $grace);
+    if ($grace eq 'r') {
+        $self->rest($self->sixtyfourth);
+    }
+    else {
+        $self->accent_note($accent, $self->sixtyfourth, $grace);
+    }
     $self->note('d' . $z, $patch);
 }
 
@@ -586,7 +591,7 @@ MIDI::Drummer::Tiny - Glorified metronome
 
 =head1 VERSION
 
-version 0.4005
+version 0.4007
 
 =head1 SYNOPSIS
 
@@ -898,6 +903,9 @@ before the primary note.
 If not provided the B<snare> is used for the B<grace> and B<patch>
 patches.  Also, 1/2 of the score volume is used for the B<accent>
 if that is not given.
+
+If the B<grace> note is riven as a literal C<'r'>, rest instead adding
+a note to the score.
 
 =head2 roll
 

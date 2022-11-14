@@ -15,9 +15,9 @@ our @EXPORT_OK = qw(
                );
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-12'; # DATE
+our $DATE = '2022-11-14'; # DATE
 our $DIST = 'Getopt-Long-Util'; # DIST
-our $VERSION = '0.898'; # VERSION
+our $VERSION = '0.899'; # VERSION
 
 our %SPEC;
 
@@ -211,14 +211,14 @@ sub humanize_getopt_long_opt_spec {
         my $opt_pod_res   = '';
         if ($parse->{is_neg} && length($_) > 1) {
             $opt_plain_res .= "--(no)$_";
-            $opt_pod_res   .= defined($opts->{opt_link}) ? "L<--(no)$_|$opts->{opt_link}>" : "B<--(no)$_>";
+            $opt_pod_res   .= defined($opts->{opt_link}) ? "B<L<--(no)$_|$opts->{opt_link}>>" : "B<--(no)$_>";
         } else {
             if (length($_) > 1) {
                 $opt_plain_res .= "--$_";
-                $opt_pod_res   .= defined($opts->{opt_link}) ? "L<--$_|$opts->{opt_link}>" : "B<--$_>";
+                $opt_pod_res   .= defined($opts->{opt_link}) ? "B<L<--$_|$opts->{opt_link}>>" : "B<--$_>";
             } else {
                 $opt_plain_res .= "-$_";
-                $opt_pod_res   .= defined($opts->{opt_link}) ? "L<-$_|$opts->{opt_link}>" : "B<-$_>";
+                $opt_pod_res   .= defined($opts->{opt_link}) ? "B<L<-$_|$opts->{opt_link}>>" : "B<-$_>";
             }
             if ($i==1 && ($parse->{type} || $parse->{opttype})) {
                 # show value label
@@ -235,7 +235,7 @@ sub humanize_getopt_long_opt_spec {
                 $opt_pod_res   .= "[" if $parse->{opttype};
                 $opt_pod_res   .= ($parse->{type} && $parse->{desttype} eq '%' ? " " : "=");
                 $opt_pod_res   .= "I<$key_label>=" if $parse->{desttype} eq '%';
-                $opt_pod_res   .= defined $opts->{value_label_link} ? "L<$value_label|$opts->{value_label_link}>" : "I<$value_label>";
+                $opt_pod_res   .= defined $opts->{value_label_link} ? "I<L<$value_label|$opts->{value_label_link}>>" : "I<$value_label>";
                 $opt_pod_res   .= "]" if $parse->{opttype};
             }
             $opt_plain_res = "($opt_plain_res)+" if ($parse->{desttype} // '') =~ /@|%/;
@@ -498,7 +498,7 @@ Getopt::Long::Util - Utilities for Getopt::Long
 
 =head1 VERSION
 
-This document describes version 0.898 of Getopt::Long::Util (from Perl distribution Getopt-Long-Util), released on 2022-10-12.
+This document describes version 0.899 of Getopt::Long::Util (from Perl distribution Getopt-Long-Util), released on 2022-11-14.
 
 =head1 FUNCTIONS
 
@@ -674,15 +674,27 @@ If set to true, will return a hash of multiple formats instead of a single plain
 
 =item * B<key_label> => I<str> (default: "key")
 
+(No description)
+
 =item * B<opt_link> => I<str>
+
+(No description)
 
 =item * B<$optspec>* => I<str>
 
+(No description)
+
 =item * B<separator> => I<str> (default: ", ")
+
+(No description)
 
 =item * B<value_label> => I<str>
 
+(No description)
+
 =item * B<value_label_link> => I<str>
+
+(No description)
 
 
 =back
@@ -746,6 +758,8 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<$optspec>* => I<str>
+
+(No description)
 
 
 =back

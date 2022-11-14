@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-02'; # DATE
+our $DATE = '2022-11-10'; # DATE
 our $DIST = 'App-BPOMUtils'; # DIST
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/BPOMUtils/bpom_list_reg_code_prefixes",
@@ -40,11 +40,11 @@ bpom-daftar-kode-prefiks-reg - List known alphabetical prefixes in BPOM register
 
 =head1 VERSION
 
-This document describes version 0.013 of bpom-daftar-kode-prefiks-reg (from Perl distribution App-BPOMUtils), released on 2022-11-02.
+This document describes version 0.014 of bpom-daftar-kode-prefiks-reg (from Perl distribution App-BPOMUtils), released on 2022-11-10.
 
 =head1 SYNOPSIS
 
-B<bpom-daftar-kode-prefiks-reg> L<--help|/"--help, -h, -v"> (or L<-h|/"--help, -h, -v">, L<-?|/"--help, -h, -v">)
+B<bpom-daftar-kode-prefiks-reg> L<--help|/"--help, -h, -?"> (or L<-h|/"--help, -h, -?">, L<-?|/"--help, -h, -?">)
 
 B<bpom-daftar-kode-prefiks-reg> L<--version|/"--version, -v"> (or L<-v|/"--version, -v">)
 

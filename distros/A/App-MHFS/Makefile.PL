@@ -1,17 +1,6 @@
 use 5.014;
 use strict;
 use warnings;
-# Fails on non-unix like
-BEGIN {
-my $res = eval {
-    use Time::HiRes qw( clock_gettime );
-    1;
-};
-unless($res) {
-    die('OS unsupported');
-}
-};
-
 use ExtUtils::MakeMaker;
 use File::ShareDir::Install;
 
@@ -62,6 +51,11 @@ my %WriteMakefileArgs = (
         }
     },
 );
+
+# Perl CORE Time::HiRes is usually good enough, but Windows support was added recently
+if( ! (eval "use Time::HiRes qw( clock_gettime ); 1")) {
+    $WriteMakefileArgs{PREREQ_PM}{'Time::HiRes'} = '1.9764';
+}
 
 # Compatibility with old versions of ExtUtils::MakeMaker
 unless (eval { ExtUtils::MakeMaker->VERSION('6.64'); 1 }) {

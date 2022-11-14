@@ -1,10 +1,11 @@
 package Lingua::Romana::Perligata;
 
-our $VERSION = '0.602';
+our $VERSION = '0.604';
 
 use Filter::Util::Call;
 use IO::Handle;
 use Data::Dumper 'Dumper';
+no warnings 'once';
 
 my $offset = 0;
 my $translate = 0;
@@ -36,6 +37,7 @@ sub filter {
     $status = filter_read(100_000);
     return $status if $status<0;
     s/\A#!.*\n//;
+    s{^ \h* ecce \b .*? (?: ^ \h* ecce \h+ seco \h* $ | \Z )}{}gxmsi;
     $tokens = tokenize($_);
 
     my @commands;
@@ -165,29 +167,31 @@ sub add_genitives(\%$$$)
 
 my %literals =
 (
-    'novumversum'   => { perl => '"\n"' },
-    'biguttam'  => { perl => '":"' },
-    'guttam'    => { perl => '"."' },
-    'comma'     => { perl => '","' },
-    'lacunam'   => { perl => '" "' },
-    'stadium'   => { perl => '"\t"' },
-    'parprimum' => { perl => '$1' },
-    'pardecimum'    => { perl => '$10' },
-    'parsecundum'   => { perl => '$2' },
-    'partertium'    => { perl => '$3' },
-    'parquartum'    => { perl => '$4' },
-    'parquintum'    => { perl => '$5' },
-    'parsextum' => { perl => '$6' },
-    'parseptimum'   => { perl => '$7' },
-    'paroctavum'    => { perl => '$8' },
-    'parnonum'  => { perl => '$9' },
-    'nomen'         => { perl => '$<' },
+    'novumversum' => { perl => '"\n"'  },
+    'semicolon'   => { perl => '";"'   },
+    'biguttam'    => { perl => '":"'   },
+    'guttam'      => { perl => '"."'   },
+    'comma'       => { perl => '","'   },
+    'lacunam'     => { perl => '" "'   },
+    'stadium'     => { perl => '"\t"'  },
+    'parprimum'   => { perl => '$1'    },
+    'parsecundum' => { perl => '$2'    },
+    'partertium'  => { perl => '$3'    },
+    'parquartum'  => { perl => '$4'    },
+    'parquintum'  => { perl => '$5'    },
+    'parsextum'   => { perl => '$6'    },
+    'parseptimum' => { perl => '$7'    },
+    'paroctavum'  => { perl => '$8'    },
+    'parnonum'    => { perl => '$9'    },
+    'pardecimum'  => { perl => '$10'   },
+    'nomen'       => { perl => '$<'    },
 );
 
 multibless %literals, 'Literal', 'ACCUSATIVE';
-add_genitives %literals, 'Literal', 'um' => 'i';
-add_genitives %literals, 'Literal', 'am' => 'ae';
-add_genitives %literals, 'Literal', 'ma' => 'matis';
+add_genitives %literals, 'Literal', 'um'  => 'i';
+add_genitives %literals, 'Literal', 'am'  => 'ae';
+add_genitives %literals, 'Literal', 'ma'  => 'matis';
+add_genitives %literals, 'Literal', 'ula' => 'uli';
 
 
 my %numerals =
@@ -253,22 +257,28 @@ my %ordinals_d =
 
 multibless %ordinals_d, 'Ordinal', 'ORDINAL_DATIVE';
 
-my %underscores =
+my %special_vars =
 (
-    'hoc'       => { perl => '$_', lex => 'ACCUSATIVE'},
-    'huius'     => { perl => '$_', lex => 'GENITIVE'},
-    'huic'      => { perl => '$_', lex => 'DATIVE'},
-    'haec'      => { perl => '@_', lex => 'ACCUSATIVE'},
-    'horum'     => { perl => '@_', lex => 'GENITIVE'},
-    'his'       => { perl => '@_', lex => 'DATIVE'},
-    'ianitorem' => { perl => '$/', lex => 'ACCUSATIVE' },
-    'ianitoris' => { perl => '$/', lex => 'GENITIVE' },
-    'ianitori'  => { perl => '$/', lex => 'DATIVE' },
+    'hoc'          => { perl => '$_',    lex => 'ACCUSATIVE' },
+    'huius'        => { perl => '$_',    lex => 'GENITIVE'   },
+    'huic'         => { perl => '$_',    lex => 'DATIVE'     },
+    'haec'         => { perl => '@_',    lex => 'ACCUSATIVE' },
+    'horum'        => { perl => '@_',    lex => 'GENITIVE'   },
+    'his'          => { perl => '@_',    lex => 'DATIVE'     },
+    'ianitorem'    => { perl => '$/',    lex => 'ACCUSATIVE' },
+    'ianitoris'    => { perl => '$/',    lex => 'GENITIVE'   },
+    'ianitori'     => { perl => '$/',    lex => 'DATIVE'     },
+    'programma'    => { perl => '$0',    lex => 'ACCUSATIVE' },
+    'programmati'  => { perl => '$0',    lex => 'DATIVE'     },
+    'programmatis' => { perl => '$0',    lex => 'GENITIVE'   },
+    'parametra'    => { perl => '@ARGV', lex => 'ACCUSATIVE' },
+    'parametris'   => { perl => '@ARGV', lex => 'DATIVE'     },
+    'parametrorum' => { perl => '@ARGV', lex => 'GENITIVE'   },
 );
 
-for my $key ( keys %underscores )
+for my $key ( keys %special_vars )
 {
-    bless $underscores{$key}, 'Literal';
+    bless $special_vars{$key}, 'Literal';
 }
 
 my %varmods =
@@ -289,10 +299,11 @@ my %varmods =
 
 my %streams =
 (
-    'vestibulo' => { perl => '*STDIN' },
-    'egresso'   => { perl => 'STDOUT' },
-    'oraculo'   => { perl => 'STDERR' },
-    'nuntio'    => { perl => '*Lingua::Romana::Perligata::DATA' },
+    'parametro'  => { perl => '*ARGV'  },
+    'vestibulo'  => { perl => '*STDIN' },
+    'egresso'    => { perl => 'STDOUT' },
+    'oraculo'    => { perl => 'STDERR' },
+    'nuntio'     => { perl => '*Lingua::Romana::Perligata::DATA' },
 );
 multibless %streams, 'Literal', 'DATIVE';
 
@@ -335,20 +346,20 @@ addres %lops, 'Operator', 'SUBNAME_AD';
 
 my %invarops =
 (
-    'atque'         => { perl => '&&' },
-    'vel'           => { perl => '||' },
-    'praestantiam'      => { perl => '<' },
-    'non praestantiam'  => { perl => '>=' },
-    'praestantias'      => { perl => 'lt' },
-    'non praestantias'  => { perl => 'ge' },
-    'aequalitam'        => { perl => '==' },
-    'non aequalitam'    => { perl => '!=' },
-    'aequalitas'        => { perl => 'eq' },
-    'non aequalitas'    => { perl => 'ne' },
-    'comparitiam'       => { perl => '<=>' },
-    'comparitias'       => { perl => 'cmp' },
-    'non comparitiam'   => { perl => '!<=>' },
-    'non comparitias'   => { perl => '!cmp' },
+    'atque'            => { perl => '&&'   },
+    'vel'              => { perl => '||'   },
+    'praestantiam'     => { perl => '<'    },
+    'non praestantiam' => { perl => '>='   },
+    'praestantias'     => { perl => 'lt'   },
+    'non praestantias' => { perl => 'ge'   },
+    'aequalitam'       => { perl => '=='   },
+    'non aequalitam'   => { perl => '!='   },
+    'aequalitas'       => { perl => 'eq'   },
+    'non aequalitas'   => { perl => 'ne'   },
+    'comparitiam'      => { perl => '<=>'  },
+    'comparitias'      => { perl => 'cmp'  },
+    'non comparitiam'  => { perl => '!<=>' },
+    'non comparitias'  => { perl => '!cmp' },
 
     'non'           => { perl => '!', prefix => 1 },
     'nega'          => { perl => '-', prefix => 1 },
@@ -370,22 +381,22 @@ my %funcs_td =
 (
     'excerpe'   => { perl => 'substr' },    # SPECIAL: SEE BELOW
 
-    'cumula'    => { perl => 'push' },
-    'capita'    => { perl => 'unshift' },
-    'iunge'     => { perl => 'splice' },
-    'digere'    => { perl => 'sort' },
-    'retexe'    => { perl => 'reverse' },
-    'evolute'   => { perl => 'open' },
-    'lege'      => { perl => 'read' },
-    'scribe'    => { perl => 'print' },
-    'describe'  => { perl => 'printf' },
-    'subscribe' => { perl => 'write' },
-    'conquire'  => { perl => 'seek' },
-    'benedice'  => { perl => 'bless' },
-    'liga'      => { perl => 'tie' },
-    'modera'    => { perl => 'fcntl' },
-    'conflue'   => { perl => 'flock' },
-    'impera'    => { perl => 'ioctl' },
+    'cumula'    => { perl => 'push'     },
+    'capita'    => { perl => 'unshift'  },
+    'iunge'     => { perl => 'splice'   },
+    'digere'    => { perl => 'sort'     },
+    'retexe'    => { perl => 'reverse'  },
+    'evolute'   => { perl => 'open'     },
+    'lege'      => { perl => 'read'     },
+    'scribe'    => { perl => 'print'    },
+    'describe'  => { perl => 'printf'   },
+    'subscribe' => { perl => 'write'    },
+    'conquire'  => { perl => 'seek'     },
+    'benedice'  => { perl => 'bless'    },
+    'liga'      => { perl => 'tie'      },
+    'modera'    => { perl => 'fcntl'    },
+    'conflue'   => { perl => 'flock'    },
+    'impera'    => { perl => 'ioctl'    },
     'trunca'    => { perl => 'truncate' },
 );
 
@@ -407,7 +418,7 @@ for (qw( excerpe )) {
 my %funcs_bd =
 (
     'vanne'     => { perl => 'grep' },
-    'applica'   => { perl => 'map' },
+    'applica'   => { perl => 'map'  },
     'digere'    => { perl => 'sort' },
 );
 
@@ -426,25 +437,25 @@ $funcs_b{'factori'}{lex} = 'SUBNAME_B_DATIVE';
 
 my %funcs_t =
 (
-    'morde'     => { perl => 'chomp' },
-    'praecide'  => { perl => 'chop' },
-    'stude'     => { perl => 'study' },
-    'iani'      => { perl => 'undef' },
-    'lusta'     => { perl => 'reset' },
-    'decumula'  => { perl => 'pop' },
-    'decapita'  => { perl => 'shift' },
-    'claude'    => { perl => 'close' },
-    'perlege'   => { perl => 'Lingua::Romana::Perligata::getline' },
-    'sublege'   => { perl => 'getc' },
-    'enunta'    => { perl => 'tell' },
-    'dele'      => { perl => 'delete' },
-    'quisque'   => { perl => 'each' },
-    'adfirma'   => { perl => 'exists' },
-    'solvere'   => { perl => 'untie' },
-    'preincresce'   => { perl => '++', prefix => 1, operator => 1 },
-    'postincresce'  => { perl => '++', prefix => 0, operator => 1 },
-    'predecresce'   => { perl => '--', prefix => 1, operator => 1 },
-    'postdecresce'  => { perl => '--', prefix => 0, operator => 1 },
+    'morde'        => { perl => 'chomp'                              },
+    'praecide'     => { perl => 'chop'                               },
+    'stude'        => { perl => 'study'                              },
+    'iani'         => { perl => 'undef'                              },
+    'lusta'        => { perl => 'reset'                              },
+    'decumula'     => { perl => 'pop'                                },
+    'decapita'     => { perl => 'shift'                              },
+    'claude'       => { perl => 'close'                              },
+    'perlege'      => { perl => 'Lingua::Romana::Perligata::getline' },
+    'sublege'      => { perl => 'getc'                               },
+    'enunta'       => { perl => 'tell'                               },
+    'dele'         => { perl => 'delete'                             },
+    'quisque'      => { perl => 'each'                               },
+    'adfirma'      => { perl => 'exists'                             },
+    'solvere'      => { perl => 'untie'                              },
+    'preincresce'  => { perl => '++', prefix => 1, operator => 1     },
+    'postincresce' => { perl => '++', prefix => 0, operator => 1     },
+    'predecresce'  => { perl => '--', prefix => 1, operator => 1     },
+    'postdecresce' => { perl => '--', prefix => 0, operator => 1     },
 
     'reperi'    => { perl => 'pos' },   # SPECIAL: SEE BELOW
     'nomina'    => { perl => 'keys' },  # SPECIAL: SEE BELOW
@@ -586,27 +597,27 @@ multibless %funcs_dlo, 'Function_Lit', 'SUBNAME_OA';
 
 my %misc  =
 (
-    'fac'       => { lex => 'DO',       perl => 'do' },
-    'per'       => { lex => 'FOR',      perl => 'for' },
-    'per quisque'   => { lex => 'FOR',      perl => 'foreach' },
-    'si'        => { lex => 'CONTROL',      perl => 'if' },
-    'nisi'      => { lex => 'CONTROL',      perl => 'unless' },
-    'donec'     => { lex => 'CONTROL',      perl => 'until' },
-    'dum'       => { lex => 'CONTROL',      perl => 'while' },
-    'cum'       => { lex => 'WITH',     perl => '' },
-    'intra'     => { lex => 'WITHIN',       perl => '::' },
-    'apud'      => { lex => 'ARROW',        perl => '->' },
-    'tum'       => { lex => 'COMMA',        perl => ',' },
-    'in'        => { lex => 'IN',       perl => '' },
-    'sic'       => { lex => 'BEGIN',        perl => '{' },
-    'cis'       => { lex => 'END',      perl => '}' },
-    'princeps'  => { lex => 'NAME', raw=>'main',perl => 'main' },
-    'ad'        => { lex => 'ADDRESS',          perl => '\\' },
+    'fac'         => { lex => 'DO',                perl => 'do' },
+    'per'         => { lex => 'FOR',               perl => 'for' },
+    'per quisque' => { lex => 'FOR',               perl => 'foreach' },
+    'si'          => { lex => 'CONTROL',           perl => 'if' },
+    'nisi'        => { lex => 'CONTROL',           perl => 'unless' },
+    'donec'       => { lex => 'CONTROL',           perl => 'until' },
+    'dum'         => { lex => 'CONTROL',           perl => 'while' },
+    'cum'         => { lex => 'WITH',              perl => '' },
+    'intra'       => { lex => 'WITHIN',            perl => '::' },
+    'apud'        => { lex => 'ARROW',             perl => '->' },
+    'tum'         => { lex => 'COMMA',             perl => ',' },
+    'in'          => { lex => 'IN',                perl => '' },
+    'sic'         => { lex => 'BEGIN',             perl => '{' },
+    'cis'         => { lex => 'END',               perl => '}' },
+    'princeps'    => { lex => 'NAME', raw=>'main', perl => 'main' },
+    'ad'          => { lex => 'ADDRESS',           perl => '\\' },
 );
 
 my %tokens =
 (
-    %literals, %numerals, %underscores,
+    %literals, %numerals, %special_vars,
     %numerals, %ordinals_a, %ordinals_d,
     %varmods, %matchops, %ops, %lops, %invarops,
     %funcs_td, %funcs_bd, %funcs_b, %funcs_t,
@@ -756,7 +767,7 @@ sub tokenize
             if ($5)
             {
                 my $token = $4 ? $1.$4 : $1;
-                push @tokens, token($token,'NAME',"$perl",'Name');
+                push @tokens, token($token,'NAME',"$token",'Name');
             }
             else
             {
@@ -1636,7 +1647,7 @@ Lingua::Romana::Perligata -- Perl in Latin
 
 =head1 EDITIO
 
-This document describes version 0.602 of Lingua::Romana::Perligata
+This document describes version 0.604 of Lingua::Romana::Perligata
 released May  3, 2001.
 
 =head1 SUMMARIUM
@@ -1763,6 +1774,16 @@ I<parsecundum> ("the equal of the
 second"), etc. When used as interim indices, they take their genitive forms:
 I<parprimi>, I<parsecundi>, etc.
 Since they cannot be used as an lvalue, they have no dative forms.
+
+The one exception is C<$0> (the variable storing the name of the current program),
+which is I<programma> in the accusative and I<programmati> in the dative.
+It also have a genitive form (I<programmatis>), though it's hard to imagine
+ever needing that.
+
+The parameter variable (C<@ARGV>) is rendered as I<parametra> in the
+accusative, I<parametris> in the dative, and I<parametrorum> in the genetive.
+Its related filehandle (C<*ARGV>) is always dative singular: I<parametro>
+
 
 =head2 C<my>, C<our>, and C<local>
 
@@ -2536,6 +2557,51 @@ I<sicut> keywords, since there is no ambiguity as to whether they might
 represent subroutine calls in void context.)
 
 
+=head2 ERA (I<Expositio Rustica Antiqua>)
+
+Perligata supports almost the same set of documentation blocks as Perl.
+(See L<perlpod> for details).
+
+However, whereas POD blocks are introduced by an C<=> sign,
+ERA blocks are prefixed with the interjection: "Ecce" I<("Behold!")>
+
+Just as with POD, each ERA documentation block must be the first thing
+on a line, and opens a documentation section that continues until the
+next C<Ecce seco> I<("Behold! I cut")> command.
+
+ERA also recognizes two unheralded block types: I<verbatim blocks>,
+which are lines of text starting on the left margin; and I<code blocks>,
+which are lines of text that are indented. All the standard Perl
+formatting codes E<mdash> C<< BZ<><> >>, C<< IZ<><> >>, C<< CZ<><> >>,
+C<< EZ<><> >>, I<etc.> E<mdash> are also supported.
+
+The following table lists the available ERA documentation blocks:
+
+    Perligata                    Perl equivalent
+
+    ecce explico                 =pod
+    ecce prosum                  =for
+    ecce incipio                 =begin
+    ecce finio                   =end
+    ecce intitulo primum         =head1
+    ecce intitulo secundum       =head2
+    ecce intitulo tertium        =head3
+    ecce intitulo quartum        =head4
+    ecce intitulo quintum        =head5
+    ecce intitulo sextum         =head6
+    ecce ad dextram              =over
+    ecce ad sinistram            =back
+    ecce facio punctum           =item *
+    ecce numero punctum          =item 1.
+    ecce definio <TERM>          =item <TERM>
+    ecce seco                    =cut
+
+The module also ships with a script (F<bin/explica>) which can
+convert ERA to POD and pass it to C<perldoc> for display.
+
+
+
+
 =head1 THESAURUS PERLIGATUS
 
 This section lists the complete Perligata vocabulary, except for
@@ -2572,6 +2638,7 @@ and only the imperative for verbs.
         [8]          octavum          "eighth"
         [9]          nonum            "ninth"
         [10]         decimum          "tenth"
+        $0           programma        "the program"
         $1           parprimum        "equal of the first"
         $2           parsecundum      "equal of the first"
         $3           partertium       "equal of the third"
@@ -2587,9 +2654,11 @@ and only the imperative for verbs.
         $_           hoc/huic         "this thing"
         @_           his/horum        "these things"
         $<           nomen            "a name"
+        @ARGV        parametra        "parameters"
         ","          comma            "a comma"
         "."          guttam           "a spot"
         ":"          biguttam         "two spots"
+        ";"          semicolon        "semicolon"
         " "          lacunam          "a gap"
         "\t"         stadium          "a stride"
         "\n"         novumversum      "new line"
@@ -2712,10 +2781,11 @@ and only the imperative for verbs.
         pipe         inriga       "irrigate"
         tell         enunta       "tell"
         seek         conquire     "to seek out"
-        STDIN        vestibulo    "an entrance"
-        STDOUT       egresso      "an exit"
-        STDERR       oraculo      "a place where doom is pronounced"
-        DATA         nuntio       "information"
+        ARGV         parametro    "(from) a parameter"
+        DATA         nuntio       "(from) the information"
+        STDIN        vestibulo    "(from) the entrance"
+        STDOUT       egresso      "(to) the exit"
+        STDERR       oraculo      "(to) the place where doom is pronounced"
 
 
 =head2 Control structures
@@ -2788,6 +2858,25 @@ and only the imperative for verbs.
         umask        dissimula    "mask"
         wait         manta        "wait for"
 
+
+=head2 Documentation
+
+        =pod           ecce explico             "Behold! I explain"
+        =for           ecce prosum              "Behold! I am for"
+        =begin         ecce incipio             "Behold! I begin"
+        =end           ecce finio               "Behold! I end"
+        =head1         ecce intitulo primum     "Behold! I primarily entitle"
+        =head2         ecce intitulo secundum   "Behold! I secondarily entitle"
+        =head3         ecce intitulo tertium    "Behold! I tertiarily entitle"
+        =head4         ecce intitulo quartum    "Behold! I quaternarily entitle"
+        =head5         ecce intitulo quintum    "Behold! I quinarily entitle"
+        =head6         ecce intitulo sextum     "Behold! I senarily entitle"
+        =over          ecce ad dextram          "Behold! (I move) to the right"
+        =back          ecce ad sinistram        "Behold! (I move) to the left"
+        =item *        ecce facio punctum       "Behold! I make a point"
+        =item 1.       ecce numero punctum      "Behold! I enumerate a point"
+        =item <TERM>   ecce definio <TERM>      "Behold! I define <TERM>"
+        =cut           ecce seco                "Behold! I cut"
 
 =head2 Miscellaneous
 

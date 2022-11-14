@@ -3,82 +3,51 @@ use Test2::V0;
 use Mojo::File qw(curfile);
 use Mojo::Server::DaemonControl;
 
-my $app = curfile->dirname->child(qw(t no-such-app.pl))->to_abs->to_string;
+plan skip_all => 'TEST_LIVE=1' unless $ENV{TEST_LIVE};
 
-subtest 'stop' => sub {
-  my $dctl = dctl(workers => 0);
+my $listen = sprintf 'http://127.0.0.1:%s', Mojo::IOLoop::Server->generate_port;
+my $app    = curfile->sibling('myapp.pl')->to_abs->to_string;
+
+subtest 'Stop manager with signal' => sub {
+  my $dctl = dctl(workers => 1);
   my @stop;
   for my $sig (qw(INT QUIT TERM)) {
-    $dctl->once(stop  => sub { push @stop, $_[1] });
-    $dctl->once(start => sub { kill $sig => $$ });
+    $dctl->once(stop      => sub { push @stop, $_[1] });
+    $dctl->once(heartbeat => sub { kill $sig => $$ });
     $dctl->run($app);
   }
 
   is \@stop, [qw(INT QUIT TERM)], 'INT QUIT TERM';
 };
 
-subtest 'workers' => sub {
-  my $dctl = dctl();
+subtest 'Increase workers' => sub {
+  my $dctl = dctl(workers => 3);
 
-  note 'increase';
-  $dctl->once(
-    start => sub {
-      my $dctl = shift;
-      kill TTIN => $$ for 1 .. 2;
-      kill TERM => $$;
-    }
-  );
+  my $n_spawned = 0;
+  $dctl->on(spawn => sub { shift->stop if ++$n_spawned >= 5 });
+  $dctl->once(start => sub { kill TTIN => $$ for 1 .. 2 });
 
   $dctl->run($app);
-  is $dctl->workers, 6, 'inc workers';
-
-  note 'mock working processes';
-  $dctl->{pool}{$_} = {} for 1 .. $dctl->workers;
-  $dctl->once(
-    start => sub {
-      my $dctl = shift;
-      kill TTOU => $$ for 1 .. 2;
-      kill TERM => $$;
-    }
-  );
-
-  $dctl->run($app);
-  is int(grep { $_->{graceful} } values %{$dctl->{pool}}),  2, 'set graceful';
-  is int(grep { !$_->{graceful} } values %{$dctl->{pool}}), 4, 'rest is left alone';
-
-  note 'decrease';
-  $dctl->once(
-    start => sub {
-      my $dctl = shift;
-      kill TTOU => $$ for 1 .. 10;
-      kill TERM => $$;
-    }
-  );
-
-  $dctl->run($app);
-  is $dctl->workers, 1, 'min workers';
+  is $n_spawned,     5, 'spawned workers';
+  is $dctl->workers, 5, 'inc workers';
 };
 
-subtest 'reap' => sub {
-  my $dctl = dctl(workers => 0);
-  my ($running, @reap) = (1);
-  $dctl->once(reap => sub { push @reap, $_[1]; $running = 0 });
-  $dctl->once(
-    start => sub {
-      die "Can't fork: $!" unless defined(my $pid = fork);
-      exit                 unless $pid;
-      $dctl->{pool}{$pid} = {};
-      1 while $running;
-    }
-  );
+subtest 'Decrease workers' => sub {
+  my $dctl = dctl(workers => 3);
+
+  my $n_reaped = 0;
+  $dctl->on(reap      => sub { shift->stop if ++$n_reaped >= 3 });
+  $dctl->on(heartbeat => sub { kill TTOU => $$ });
   $dctl->run($app);
-  is int @reap, 1, 'reaped';
+  is $n_reaped,      3, 'reaped workers';
+  is $dctl->workers, 0, 'dec workers';
 };
 
 done_testing;
 
 sub dctl {
-  my $dctl = Mojo::Server::DaemonControl->new(@_);
-  $dctl->on(start => sub { delete shift->{running} });
+  my $dctl = Mojo::Server::DaemonControl->new(@_, heartbeat_interval => 0.1, listen => [$listen]);
+  my $n    = 0;
+  $dctl->on(heartbeat => sub { delete shift->{running} if ++$n > 10 });
   return $dctl;
 }

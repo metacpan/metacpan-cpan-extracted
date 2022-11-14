@@ -52,7 +52,7 @@
    "provides" : {
       "Getopt::Long::Util" : {
          "file" : "lib/Getopt/Long/Util.pm",
-         "version" : "0.898"
+         "version" : "0.899"
       }
    },
    "release_status" : "stable",
@@ -67,7 +67,7 @@
          "web" : "https://github.com/perlancar/perl-Getopt-Long-Util"
       }
    },
-   "version" : "0.898",
+   "version" : "0.899",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

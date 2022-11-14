@@ -256,6 +256,8 @@ values are available in the `$state` hashref:
         'optimization_pass' => 3,       # pass# if multiple ssizes are used
         'num_passes' => 6,              # total number of passes
         'best_pass' =>  3,              # the pass# that had the best goal result
+        'best_minima' => 0.2345         # The least value so far, returned by "f"
+        'best_vars' => { x=>1, ...}     # The vars associated with "best_minima"
         'log_count' => 22,              # number of times log has been called
         'prev_minima_count' => 10,      # number of same minima's in a row
         'cancel' =>     0,              # true if the simplex iteration is being cancelled
@@ -350,6 +352,18 @@ defined (see above).  Otherwise, we assume progress is being made and the
 stagnation count is reset.
 
 Default: same as `tolerance` (see above)
+
+## `reduce_search` - Reduce the search space
+
+Sometimes PDL provides multiple variable sets to calculate during an iteration.
+If `reduce_search => 1` is flagged then treat all variable sets as the
+same by only evaluating the first variable set and returning that result for
+all sets.  This speeds up the optimization but may provide sub-optimal results.
+
+This was the original behavior in back in Version 1.1, so newer versions are (probably) more
+accurate but will take longer to complete.  However, it is still useful if you have a slow
+computation (`f`) and want to converge sooner for an initial first pass.  It is still recommended
+to run a final pass without `reduce_search`.
 
 # BEST PRACTICES AND USE CASES
 
@@ -528,6 +542,7 @@ Patches welcome ;)
 ## Example links:
 
 - Antenna Geometry Optimization: [https://github.com/KJ7LNW/xnec2c-optimize](https://github.com/KJ7LNW/xnec2c-optimize)
+- PID Controller Optimization: [https://github.com/KJ7NLL/space-ham/blob/master/optimize-pid.pl](https://github.com/KJ7NLL/space-ham/blob/master/optimize-pid.pl)
 
 # AUTHOR
 

@@ -18,6 +18,8 @@ my @tests = (
     [ 'Dümônt 2004-2015', [ 'Dümônt', '2004-2015']],
     [ 'Dominique Dumont', [ 'Dominique Dumont']],
     [ '2015, Dominique Dumont <dod@debian.org>', [ 'Dominique Dumont <dod@debian.org>', '2015']],
+    [ '2021', [ '', '2021']],
+    [ '', ['']],
 );
 
 foreach my $t (@tests) {

@@ -1,0 +1,119 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with WebService::Async::CustomerIO
+at lib/WebService/Async/CustomerIO.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+WebService::Async::CustomerIO - unofficial support for the Customer.io service
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=head2 new
+
+Creates a new API client object
+
+Usage: C<< new(%params) -> obj >>
+
+Parameters:
+
+=over 4
+
+=item * C<site_id>
+
+=item * C<api_key>
+
+=item * C<api_token>
+
+=back
+
+=head2 site_id
+
+=head2 api_key
+
+=head2 api_token
+
+=head2 API endpoints:
+
+There is 2 stable API for Customer.io, if you need to add a new method check
+the L<documentation for API|https://customer.io/docs/api/> which endpoint
+you need to use:
+
+=over 4
+
+=item * C<Tracking API> - Behavioral Tracking API is used to identify and track
+customer data with Customer.io.
+
+=item * C<Regular API> - Currently, this endpoint is used to fetch list of customers
+given an email and for sending
+L<API triggered broadcasts|https://customer.io/docs/api-triggered-broadcast-setup>.
+
+=back
+
+=head2 tracking_request
+
+Sending request to Tracking API end point.
+
+Usage: C<< tracking_request($method, $uri, $data) -> future($data) >>
+
+=head2 api_request
+
+Sending request to Regular API end point with optional limit type.
+
+Usage: C<< api_request($method, $uri, $data, $limit_type) -> future($data) >>
+
+=head2 new_customer
+
+Creating new customer object
+
+Usage: C<< new_customer(%params) -> obj >>
+
+=head2 new_trigger
+
+Creating new trigger object
+
+Usage: C<< new_trigger(%params) -> obj >>
+
+=head2 new_customer
+
+Creating new customer object
+
+Usage: C<< new_customer(%params) -> obj >>
+
+=head2 add_to_segment
+
+Add people to a manual segment.
+
+Usage: C<< add_to_segment($segment_id, @$customer_ids) -> Future() >>
+
+=head2 remove_from_segment
+
+remove people from a manual segment.
+
+usage: c<< remove_from_segment($segment_id, @$customer_ids) -> future()>>
+
+=head2 get_customers_by_email
+
+Query Customer.io API for list of clients, who has requested email address.
+
+usage: c<< get_customers_by_email($email)->future([$customer_obj1, ...])>>
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<IO::Async::Notifier>
+
+L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/adopt_future>, L<adopted_futures|IO::Async::Notifier/adopted_futures>, L<can_event|IO::Async::Notifier/can_event>, L<children|IO::Async::Notifier/children>, L<configure_unknown|IO::Async::Notifier/configure_unknown>, L<debug_printf|IO::Async::Notifier/debug_printf>, L<get_loop|IO::Async::Notifier/get_loop>, L<invoke_error|IO::Async::Notifier/invoke_error>, L<invoke_event|IO::Async::Notifier/invoke_event>, L<loop|IO::Async::Notifier/loop>, L<make_event_cb|IO::Async::Notifier/make_event_cb>, L<maybe_invoke_event|IO::Async::Notifier/maybe_invoke_event>, L<maybe_make_event_cb|IO::Async::Notifier/maybe_make_event_cb>, L<new|IO::Async::Notifier/new>, L<notifier_name|IO::Async::Notifier/notifier_name>, L<parent|IO::Async::Notifier/parent>, L<remove_child|IO::Async::Notifier/remove_child>, L<remove_from_parent|IO::Async::Notifier/remove_from_parent>
+
+=back
+

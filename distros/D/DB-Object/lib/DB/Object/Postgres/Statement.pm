@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Database Object Interface - ~/lib/DB/Object/Postgres/Statement.pm
-## Version v0.301.1
+## Version v0.301.2
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2017/07/19
-## Modified 2021/08/29
+## Modified 2022/11/04
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -22,8 +22,7 @@ BEGIN
     use warnings;
     use parent qw( DB::Object::Statement DB::Object::Postgres );
     use vars qw( $VERSION $VERBOSE $DEBUG );
-    use DateTime;
-    $VERSION    = 'v0.301.1';
+    $VERSION    = 'v0.301.2';
     $VERBOSE    = 0;
     $DEBUG      = 0;
 };
@@ -127,10 +126,11 @@ sub dump
     $hsep  = $args->{hsep} if( exists( $args->{hsep} ) );
     $width = $args->{width} if( exists( $args->{width} ) );
     my @fields = ();
-    my $fields_ref = $self->{sth}->FETCH( 'NAME' );
+    # my $fields_ref = $self->{sth}->FETCH( 'NAME' );
+    my $fields_ref = $self->{sth}->{NAME};
     if( defined( $fields_ref ) && ref( $fields_ref ) eq 'ARRAY' )
     {
-        @fields = @{$self->{sth}->FETCH( 'NAME' )};
+        @fields = @$fields_ref;
     }
     else
     {
@@ -139,9 +139,11 @@ sub dump
     return( $self->error( "No query to dump." ) ) if( !exists( $self->{sth} ) );
     if( exists( $args->{file} ) )
     {
+        $self->_load_class( 'DateTime' ) || return( $self->pass_error );
         # new_file is inherited from Module::Generic and calls Module::Generic::File
         my $file = $self->new_file( $args->{file} );
-        $fh = $file->open( '>', { binmode => 'utf8' }) || return( $self->error( "Unable to open file $file in write mode: ", $file->error ) );
+        $fh = $file->open( '>', { binmode => 'utf8' }) ||
+            return( $self->error( "Unable to open file $file in write mode: ", $file->error ) );
         # my @header = sort{ $fields->{ $a } <=> $fields->{ $b } } keys( %$fields );
         my @header = sort{ $a <=> $b } @fields;
         my $date = DateTime->now;
@@ -325,7 +327,7 @@ DB::Object::Postgres::Statement - PostgreSQL Statement Object
 
 =head1 VERSION
 
-    v0.301.1
+    v0.301.2
 
 =head1 DESCRIPTION
 

@@ -1,3 +1,7 @@
+0.002 Nov 13 2022
+	- upgrade minimum version of Type::Tiny
+	- move dependencies to a cpanfile
+
 0.001 Nov 7 2022
 	- first version
 

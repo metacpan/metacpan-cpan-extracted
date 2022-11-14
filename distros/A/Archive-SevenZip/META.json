@@ -32,6 +32,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Archive::Zip" : "0",
             "Archive::Zip::Member" : "0",
             "Encode" : "0",
             "Exporter" : "5",
@@ -59,7 +60,7 @@
          "web" : "https://github.com/Corion/Archive-SevenZip"
       }
    },
-   "version" : "0.16",
+   "version" : "0.17",
    "x_serialization_backend" : "JSON::PP version 4.11",
    "x_static_install" : 1
 }

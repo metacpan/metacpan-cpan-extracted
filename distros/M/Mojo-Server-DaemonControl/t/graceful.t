@@ -10,11 +10,11 @@ use Time::HiRes qw(time);
 plan skip_all => 'TEST_LIVE=1' unless $ENV{TEST_LIVE};
 
 my $app    = curfile->dirname->child('myapp.pl');
-my $listen = Mojo::URL->new(sprintf 'http://127.0.0.1:%s', Mojo::IOLoop::Server->generate_port);
+my $listen = sprintf 'http://127.0.0.1:%s', Mojo::IOLoop::Server->generate_port;
 my $t0;
 
 subtest 'stop workers gracefully' => sub {
-  my $dctl = Mojo::Server::DaemonControl->new(heartbeat_interval => 0.5, listen => [$listen],
+  my $dctl = Mojo::Server::DaemonControl->new(heartbeat_interval => 0.1, listen => [$listen],
     workers => 2);
   my %pids;
 
@@ -32,8 +32,8 @@ subtest 'stop workers gracefully' => sub {
 
   delete $pids{$$};
   my @t = sort map { sprintf '%.3f', $_ - $t0 } values %pids;
-  is $t[0], within(0.5, 0.3), "one worker had nothing to do ($t[0])";
-  is $t[1], within(2.2, 0.5), "one worker had to finish the request ($t[1])";
+  is $t[0], within(0.3, 0.3), "one worker had nothing to do ($t[0])";
+  is $t[1], within(2,   0.3), "one worker had to finish the request ($t[1])";
 };
 
 done_testing;
@@ -41,6 +41,6 @@ done_testing;
 sub run_slow_request_in_fork {
   $t0 = time;
   return if fork;
-  Mojo::UserAgent->new->get($listen->clone->path('/slow'));
+  Mojo::UserAgent->new->get("$listen/slow");
   exit 0;
 }

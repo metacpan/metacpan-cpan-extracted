@@ -26,6 +26,9 @@ is(ref $token_info->{'TOKEN'}, 'ARRAY', 'Got data back about two tokens, so the 
 my $affiliate_id = $aff->get_affiliate_id_from_token('jGZUKO3JWgyVAv0U_Fv2nVOqZLGcUW5p');
 is($affiliate_id, 6, 'Token has affiliate id 6');
 
+my $affiliate_details = $aff->get_affiliate_details('jGZUKO3JWgyVAv0U_Fv2nVOqZLGcUW5p');
+is($affiliate_details->{TOKEN}->{USER}->{EMAIL}, 'dummy@regentmarkets.com', 'Token has affiliate email dummy@regentmarkets.com');
+
 done_testing();
 
 1;

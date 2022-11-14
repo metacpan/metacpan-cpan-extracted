@@ -2,7 +2,7 @@ package Myriad::Transport::HTTP;
 
 use Myriad::Class extends => 'IO::Async::Notifier';
 
-our $VERSION = '1.000'; # VERSION
+our $VERSION = '1.001'; # VERSION
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 use Net::Async::HTTP;
