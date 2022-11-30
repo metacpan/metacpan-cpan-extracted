@@ -3,6 +3,8 @@
 
 #include "perl.h"
 
+#define FUTURE_ASYNCAWAIT_ABI_VERSION 1
+
 /*
  * The API contained in this file is even more experimental than the rest of
  * Future::AsyncAwait. It is primarily designed to allow suspend-aware dynamic
@@ -13,6 +15,79 @@
  * it would require more XS code. It is tested as a side-effect of the
  * integration with Syntax::Keyword::Dynamically.
  */
+
+struct AsyncAwaitHookFuncs
+{
+  U32 flags;  /* currently unused but reserve the ABI space just in case */
+  void (*post_cv_copy)(pTHX_ CV *runcv, CV *cv, HV *modhookdata, void *hookdata);
+  void (*post_suspend)(pTHX_ CV *cv, HV *modhookdata, void *hookdata);
+  void (*pre_resume)  (pTHX_ CV *cv, HV *modhookdata, void *hookdata);
+  void (*free)        (pTHX_ CV *cv, HV *modhookdata, void *hookdata);
+};
+
+static void (*register_future_asyncawait_hook_func)(pTHX_ const struct AsyncAwaitHookFuncs *hookfuncs, void *hookdata);
+#define register_future_asyncawait_hook(hookfuncs, hookdata) S_register_future_asyncawait_hook(aTHX_ hookfuncs, hookdata)
+static void S_register_future_asyncawait_hook(pTHX_ const struct AsyncAwaitHookFuncs *hookfuncs, void *hookdata)
+{
+  if(!register_future_asyncawait_hook_func)
+    croak("Must call boot_future_asyncawait() first");
+
+  (*register_future_asyncawait_hook_func)(aTHX_ hookfuncs, hookdata);
+}
+
+#define future_asyncawait_on_activate(func, data) S_future_asyncawait_on_activate(aTHX_ func, data)
+static void S_future_asyncawait_on_activate(pTHX_ void (*func)(pTHX_ void *data), void *data)
+{
+  SV **svp;
+
+  if((svp = hv_fetchs(PL_modglobal, "Future::AsyncAwait/loaded", FALSE)) && SvOK(*svp)) {
+    (*func)(aTHX_ data);
+  }
+  else {
+    AV *av;
+
+    svp = hv_fetchs(PL_modglobal, "Future::AsyncAwait/on_loaded", FALSE);
+    if(svp)
+      av = (AV *)*svp;
+    else {
+      av = newAV();
+      hv_stores(PL_modglobal, "Future::AsyncAwait/on_loaded", (SV *)av);
+    }
+
+    av_push(av, newSVuv(PTR2UV(func)));
+    av_push(av, newSVuv(PTR2UV(data)));
+  }
+}
+
+#define boot_future_asyncawait(ver)  S_boot_future_asyncawait(aTHX_ ver)
+static void S_boot_future_asyncawait(pTHX_ double ver)
+{
+  SV **svp;
+  SV *versv = ver ? newSVnv(ver) : NULL;
+
+  load_module(PERL_LOADMOD_NOIMPORT, newSVpvs("Future::AsyncAwait"), versv, NULL);
+
+  svp = hv_fetchs(PL_modglobal, "Future::AsyncAwait/ABIVERSION_MIN", 0);
+  if(!svp)
+    croak("Future::AsyncAwait ABI minimum version missing");
+  int abi_ver = SvIV(*svp);
+  if(abi_ver > FUTURE_ASYNCAWAIT_ABI_VERSION)
+    croak("Future::AsyncAwait ABI version mismatch - library supports >= %d, compiled for %d",
+        abi_ver, FUTURE_ASYNCAWAIT_ABI_VERSION);
+
+  svp = hv_fetchs(PL_modglobal, "Future::AsyncAwait/ABIVERSION_MAX", 0);
+  abi_ver = SvIV(*svp);
+  if(abi_ver < FUTURE_ASYNCAWAIT_ABI_VERSION)
+    croak("Future::AsyncAwait ABI version mismatch - library supports <= %d, compiled for %d",
+        abi_ver, FUTURE_ASYNCAWAIT_ABI_VERSION);
+
+  register_future_asyncawait_hook_func = INT2PTR(void (*)(pTHX_ const struct AsyncAwaitHookFuncs *, void *),
+      SvUV(*hv_fetchs(PL_modglobal, "Future::AsyncAwait/register()@1", 0)));
+}
+
+/**************
+ * Legacy API *
+ **************/
 
 /*
  * This enum provides values for the `phase` hook parameter.
@@ -91,30 +166,6 @@ static void S_future_asyncawait_wrap_suspendhook(pTHX_ SuspendHookFunc *newfunc,
   }
 
   OP_CHECK_MUTEX_UNLOCK;
-}
-
-#define future_asyncawait_on_activate(func, data) S_future_asyncawait_on_activate(aTHX_ func, data)
-static void S_future_asyncawait_on_activate(pTHX_ void (*func)(pTHX_ void *data), void *data)
-{
-  SV **svp;
-
-  if((svp = hv_fetchs(PL_modglobal, "Future::AsyncAwait/loaded", FALSE)) && SvOK(*svp)) {
-    (*func)(aTHX_ data);
-  }
-  else {
-    AV *av;
-
-    svp = hv_fetchs(PL_modglobal, "Future::AsyncAwait/on_loaded", FALSE);
-    if(svp)
-      av = (AV *)*svp;
-    else {
-      av = newAV();
-      hv_stores(PL_modglobal, "Future::AsyncAwait/on_loaded", (SV *)av);
-    }
-
-    av_push(av, newSVuv(PTR2UV(func)));
-    av_push(av, newSVuv(PTR2UV(data)));
-  }
 }
 
 #endif

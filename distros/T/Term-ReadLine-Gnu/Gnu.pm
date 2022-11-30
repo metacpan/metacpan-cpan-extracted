@@ -96,7 +96,7 @@ BEGIN {
     use Exporter ();
     use DynaLoader;
 
-    our $VERSION = '1.44';              # update Gnu::XS::VERSION also.
+    our $VERSION = '1.45';              # update Gnu::XS::VERSION also.
 
     # Term::ReadLine::Gnu::AU makes a function in
     # `Term::ReadLine::Gnu::XS' as a method.
@@ -269,6 +269,11 @@ sub new {
 
     # set rl_readline_name before .inputrc is read in rl_initialize()
     $Attribs{readline_name} = $name;
+
+    # on MSWin32 setting $ENV{TERM} does not affect on getenv() in XS
+    if ($^O eq 'MSWin32') {
+        $Attribs{terminal_name} = $ENV{TERM};
+    }
 
     # some version of Perl cause segmentation fault, if XS module
     # calls setenv() before the 1st assignment to $ENV{}.

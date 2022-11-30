@@ -2,7 +2,7 @@
 
 package Parse::Syslog::Line;
 
-use warnings;
+use v5.14;
 use strict;
 
 use Carp;
@@ -10,12 +10,14 @@ use Const::Fast;
 use English qw(-no_match_vars);
 use Exporter;
 use HTTP::Date     qw( str2time );
+use JSON::MaybeXS  qw( decode_json );
+# RECOMMEND PREREQ: Cpanel::JSON::XS
 use Module::Load   qw( load );
 use Module::Loaded qw( is_loaded );
 use POSIX          qw( strftime tzset );
 use Ref::Util      qw( is_arrayref );
 
-our $VERSION = '4.7';
+our $VERSION = '5.0';
 
 # Default for Handling Parsing
 our $DateParsing     = 1;
@@ -33,6 +35,10 @@ our $PruneRaw            = 0;
 our $PruneEmpty          = 0;
 our @PruneFields         = ();
 our $FmtDate;
+
+# RFC-5424 Parsing
+our $RFC5424StructuredData       = 1;
+our $RFC5424StructuredDataStrict = 0;
 
 
 my %INT_PRIORITY = (
@@ -143,6 +149,57 @@ const my %RE => (
     program_sub     => qr/(?>\(([^\)]+)\))/,
     program_pid     => qr/(?>\[([^\]]+)\])/,
     program_netapp  => qr/(?>\[([^\]]+)\]:\s*)/,
+    kvdata          => qr/
+            (?:^|\b)                            # Start from beginning or a word boundary
+            \K                                  # Keep everything to the left, don't include in $&
+            (?>                                 # Start atomic match, ie, disable back tracking
+                ([a-zA-Z\.0-9\-_@]+)            # An "SDID", ie "\w" plus '.' and '-'
+            )                                   # RETURN: Key
+            =                                   # Literal '='
+            (
+                \S+                             # Any non-space string
+                (?:\s+\S+)                      # Clustering, non-grouping, space followed by one or more strings
+                    *?                          # Not greedy
+            )                                   # RETURN: Value, could be one word, or several
+            (?=                                 # Zero width positive look-ahead
+                (?:                             # Clustering, non-grouping group one of:
+                    \s*[,;]                     #   Space, comma, or semicolon
+                    |$                          #   End of string
+                    |\s+[a-zA-Z\.0-9\-_]+=      #   A word, followed by an equal sign
+                )
+            )
+    /x,
+    rfc_sdata_extract => qr/
+            (?>                             # Disable backtracking since it won't help us
+                (?:^|\s)
+                \[
+                        (?!                 # Zero width negative look ahead
+                            [^=]+           # A string that doesn't contain '='
+                            \]              # followed by a ]
+                        )
+                        ([^\]]+)            # RETURN: all non] characters
+                \]
+            )
+    /x,
+    rfc_sdata_strict => qr/
+        ^
+        (?>
+            \[
+                (
+                    (?:
+                        (?:timeQuality|origin|meta)
+                            |(?:[a-zA-Z0-9\.\-]+@[0-9]+)
+                    )
+                    (?:
+                        \s
+                        [a-zA-Z0-9\.\-]+="(?:[^"\\]++|\\.)*+"
+                    )+
+                )
+            \]
+        )
+    /x,
+    sysword      => qr/[a-zA-Z0-9\.\-]+/,
+    quotedstring => qr/"(?:[^"\\]++|\\.)*+"/,
 );
 
 
@@ -155,11 +212,14 @@ my %_empty_msg = map { $_ => undef } qw(
 
 
 my $SYSLOG_TIMEZONE = '';
-my $DateTimeTried = 0;
-my $JSONTried = 0;
 
 sub parse_syslog_line {
     my ($raw_string) = @_;
+
+    # State Variables
+    state $DateTimeTried = 0;
+    state $CpanelJSONXSWarning = 0;
+    state $DisableWarnings = $ENV{PARSE_SYSLOG_LINE_QUIET} || $ENV{TEST_ACTIVE} || $ENV{TEST2_ACTIVE};
 
     # Initialize everything to undef
     my %msg =  $PruneEmpty ? () : %_empty_msg;
@@ -233,18 +293,20 @@ sub parse_syslog_line {
                 printf("TZ=%s Parsed: %s to [%s] %s D:%s T:%s O:%s\n",
                     $SYSLOG_TIMEZONE,
                     @msg{qw(datetime_raw epoch datetime_str date time offset)},
-                ) if $ENV{DEBUG_PARSE_SYSLOG_LINE};
+                ) if $ENV{PARSE_SYSLOG_LINE_DEBUG};
             }
             # Use Module::Load to runtime load the DateTime libraries *if* necessary
             if( $DateTimeCreate ) {
                 unless( $DateTimeTried && is_loaded('DateTime') ) {
-                    warn "DateTime seriously degrades performance, please start using 'epoch' and/or 'datetime_str' instead.";
+                    warn "DateTime seriously degrades performance, please start using 'epoch' and/or 'datetime_str' instead."
+                        unless $DisableWarnings;
                     eval {
                         load DateTime;
                         1;
                     } or do {
                         my $err = $@;
-                        warn "DateTime unavailable, disabling it: $err";
+                        warn "DateTime unavailable, disabling it: $err"
+                            unless $DisableWarnings;
                         $DateTimeCreate = 0;
                     };
                     $DateTimeTried++;
@@ -333,30 +395,61 @@ sub parse_syslog_line {
     chomp $msg{content};
     $msg{message} = defined $msg{program_raw} ? "$msg{program_raw}: $msg{content}" : $msg{content};
 
+    # Extract RFC Structured Data
+    if( $RFC5424StructuredDataStrict ) {
+        while ( $msg{content} =~ s/$RE{rfc_sdata_strict}//o ) {
+            my $rfc_sdata = $1;
+            my ($sdid,$sdata) = split /\s+/, $rfc_sdata, 2;
+            foreach my $token ( $sdata =~ /($RE{sysword}=$RE{quotedstring})/og ) {
+                my ($k,$v) = split /=/, $token, 2;
+                next unless length $v;
+                # Trim off the quotes
+                $v = substr($v, 1, length($v) - 2);
+                $msg{SDATA}{$sdid}{$k} = $v;
+            }
+        }
+        $msg{content} =~ s/^\s+//;
+    }
+    elsif ( $RFC5424StructuredData ) {
+        while ( $msg{content} =~ s/$RE{rfc_sdata_extract}//o ) {
+            my $rfc_sdata = $1;
+            my ($group) = $rfc_sdata =~ s/^([^\s=]+)\s// ? $1 : undef;
+            foreach my $token ( $rfc_sdata =~ /($RE{sysword}=(?:$RE{quotedstring}|\S+))/og ) {
+                my ($k,$v) = split /=/, $token, 2;
+                next unless length $v;
+                # Trim off the quotes
+                $v =~ s/(?:^")|(?:"$)//g;
+                if( $group ) {
+                    $msg{SDATA}{$group}{$k} = $v;
+                } else {
+                    $msg{SDATA}{$k} = $v;
+                }
+            }
+            # When we parse without ExtractProgram, shit gets weird.
+            #   We need to restore the first space between the first semi-colon
+            #   and the rest of the string
+            $msg{content} =~ s/:\s*/: / if $msg{SDATA};
+        }
+        $msg{content} =~ s/^\s+// if $msg{SDATA};
+    }
+
     if( $AutoDetectJSON && (my $pos = index($msg{content},'{')) >= 0 ) {
-        unless( $JSONTried || is_loaded('JSON::MaybeXS') ) {
-            eval {
-                load JSON::MaybeXS;
-            } or do {
-                my $err = $@;
-                warn "JSON::MaybeXS unavailable, disabling it: $err";
-                $AutoDetectJSON = 0;
-            };
-            $JSONTried++;
+        if( !$CpanelJSONXSWarning && !is_loaded('Cpanel::JSON::XS') ) {
+            warn "When using AutoDetectJSON, we recommend Cpanel::JSON::XS for performance and compatibility"
+                unless $DisableWarnings;
+            $CpanelJSONXSWarning = 1;
         }
-        if( $AutoDetectJSON ) {
-            eval {
-                $msg{SDATA} = JSON::MaybeXS::decode_json(substr($msg{content},$pos));
-                1;
-            } or do {
-                my $err = $@;
-                $msg{_json_error} = sprintf "Failed to decode json: %s", $err;
-            };
-        }
+        eval {
+            $msg{SDATA} = decode_json(substr($msg{content},$pos));
+            1;
+        } or do {
+            my $err = $@;
+            $msg{_json_error} = sprintf "Failed to decode json: %s", $err;
+        };
     }
     elsif( $AutoDetectKeyValues && $msg{content} =~ /(?:^|\s)[a-zA-Z\.0-9\-_]+=\S+/ ) {
         my %sdata = ();
-        while( $msg{content} =~ /(?:^|\s)\K(?>([a-zA-Z\.0-9\-_]++))=(\S+(?:\s+\S+)*?)(?=(?:\s*[,;]|$|\s+[a-zA-Z\.0-9\-_]+=))/g ) {
+        while( $msg{content} =~ /$RE{kvdata}/og ) {
             my ($k,$v) = ($1,$2);
             # Remove Trailing Characters
             $v =~ s/[)\]>,;'"]+$//;
@@ -491,7 +584,7 @@ Parse::Syslog::Line - Simple syslog line parser
 
 =head1 VERSION
 
-version 4.7
+version 5.0
 
 =head1 SYNOPSIS
 
@@ -529,8 +622,8 @@ parsed out.
     #       content         => 'the rest of the message'
     #       message         => 'program[pid]: the rest of the message',
     #       message_raw     => 'The message as it was passed',
-    #       ntp             => 'ok',           # Only set for Cisco messages
-    #       SDATA           => { ... },  # Decoded JSON or K/V Pairs in the message
+    #       ntp             => 'ok',        # Only set for Cisco messages
+    #       SDATA           => { ... },     # RFC Structured data, decoded JSON, or K/V Pairs in the message
     # };
     ...
 
@@ -650,6 +743,47 @@ Resulting K/V pairs will be added to the C<SDATA> field.
 
     $Parse::Syslog::Line::AutoDetectKeyValues = 1;
 
+=head2 RFC5424StructuredData
+
+Default is true.  When enabled, this will extract the RFC standard structured data
+from the message content.  That content will be stripped from the message
+C<content> field.
+
+Some examples:
+
+    # Input
+    [foo x=1] some words [bar x=2]
+
+    # To (YAML for brevity)
+    ---
+    SDATA:
+      bar:
+        x: 2
+      foo:
+        x: 1
+    content: some words
+
+    # Input
+    [x=1] some words
+
+    # To (YAML for brevity)
+    ---
+    SDATA:
+      x: 1
+    content: some words
+
+To disable:
+
+    $Parse::Syslog::Line::RFC5424StructuredData = 0;
+
+=head2 RFC5424StructuredDataStrict
+
+Require the format:
+
+    [namespace@id property="value"][namespace@id property="value"]
+
+Defaults to 0, set to 1 to only parse the RFC5424 formatted structured data.
+
 =head2 PruneRaw
 
 This variable defaults to 0, set to 1 to delete all keys in the return hash
@@ -754,6 +888,23 @@ a hash reference as such:
         'as_int'    => 8,
     };
 
+=head1 ENVIRONMENT VARIABLES
+
+There are environment variables that affect how we operate. They are not
+options as they are not intended to be used by our users. Use at your own risk.
+
+=head2 PARSE_SYSLOG_LINE_DEBUG
+
+Outputs debugging information about the parser, not really intended for end-users.
+
+=head2 PARSE_SYSLOG_LINE_QUIET
+
+Disables warnings in the parse_syslog_line() function
+
+=head2 TEST_ACTIVE / TEST2_ACTIVE
+
+Disables warnings in the parse_syslog_line() function
+
 =head1 DEVELOPMENT
 
 This module is developed with Dist::Zilla.  To build from the repository, use Dist::Zilla:
@@ -811,7 +962,7 @@ Tomohiro Hosaka <bokutin@bokut.in>
 
 =back
 
-=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+=for :stopwords cpan testmatrix url bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
 
 =head1 SUPPORT
 

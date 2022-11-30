@@ -213,7 +213,7 @@ static void S_popdyn(pTHX_ void *_data)
   SvREFCNT_dec(sv);
 }
 
-static void hook_postsuspend(pTHX_ HV *modhookdata)
+static void hook_postsuspend(pTHX_ CV *cv, HV *modhookdata, void *hookdata)
 {
   IV i, max = av_top_index(dynamicstack);
   SV **avp = AvARRAY(dynamicstack);
@@ -289,7 +289,7 @@ static void hook_postsuspend(pTHX_ HV *modhookdata)
   }
 }
 
-static void hook_preresume(pTHX_ HV *modhookdata)
+static void hook_preresume(pTHX_ CV *cv, HV *modhookdata, void *hookdata)
 {
   AV *suspendedvars = (AV *)hv_deletes(modhookdata, "Syntax::Keyword::Dynamically/suspendedvars", 0);
   if(!suspendedvars)
@@ -325,28 +325,10 @@ static void hook_preresume(pTHX_ HV *modhookdata)
   }
 }
 
-static SuspendHookFunc *nexthook;
-
-static void S_suspendhook(pTHX_ U8 phase, CV *cv, HV *modhookdata)
-{
-  switch(phase) {
-    case FAA_PHASE_POSTSUSPEND:
-      (*nexthook)(aTHX_ phase, cv, modhookdata);
-
-      hook_postsuspend(aTHX_ modhookdata);
-      break;
-
-    case FAA_PHASE_PRERESUME:
-      hook_preresume(aTHX_ modhookdata);
-
-      (*nexthook)(aTHX_ phase, cv, modhookdata);
-      break;
-
-    default:
-      (*nexthook)(aTHX_ phase, cv, modhookdata);
-      break;
-  }
-}
+static const struct AsyncAwaitHookFuncs faa_hooks = {
+  .post_suspend = &hook_postsuspend,
+  .pre_resume   = &hook_preresume,
+};
 
 /* STARTDYN is the primary op that makes this work. It is used in two ways:
  *   With OPf_STACKED it takes an optree, which pushes an SV to the stack.
@@ -524,7 +506,8 @@ static void enable_async_mode(pTHX_ void *_unused)
   dynamicstack = newAV();
   av_extend(dynamicstack, 50);
 
-  future_asyncawait_wrap_suspendhook(&S_suspendhook, &nexthook);
+  boot_future_asyncawait(0.60);
+  register_future_asyncawait_hook(&faa_hooks, NULL);
 }
 
 MODULE = Syntax::Keyword::Dynamically    PACKAGE = Syntax::Keyword::Dynamically

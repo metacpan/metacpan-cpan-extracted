@@ -1,4 +1,4 @@
-package Dist::Zilla::Tutorial 6.028;
+package Dist::Zilla::Tutorial 6.029;
 # ABSTRACT: how to use this "Dist::Zilla" thing
 
 use Dist::Zilla::Pragmas;
@@ -10,7 +10,7 @@ Carp::confess "you're not meant to use the tutorial, just read it!";
 #pod =head1 SYNOPSIS
 #pod
 #pod B<BEFORE YOU GET STARTED>:  Maybe you should be looking at the web-based
-#pod tutorial instead.  It's more complete.  L<http://dzil.org/tutorial/start.html>
+#pod tutorial instead.  It's more complete.  L<https://dzil.org/tutorial/start.html>
 #pod
 #pod Dist::Zilla builds distributions to be uploaded to the CPAN.  That means that
 #pod the first thing you'll need is some code.
@@ -148,12 +148,12 @@ Dist::Zilla::Tutorial - how to use this "Dist::Zilla" thing
 
 =head1 VERSION
 
-version 6.028
+version 6.029
 
 =head1 SYNOPSIS
 
 B<BEFORE YOU GET STARTED>:  Maybe you should be looking at the web-based
-tutorial instead.  It's more complete.  L<http://dzil.org/tutorial/start.html>
+tutorial instead.  It's more complete.  L<https://dzil.org/tutorial/start.html>
 
 Dist::Zilla builds distributions to be uploaded to the CPAN.  That means that
 the first thing you'll need is some code.

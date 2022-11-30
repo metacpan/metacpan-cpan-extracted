@@ -1,66 +1,12 @@
-use strict;
-use warnings;
-use Prima;
-use Config;
-use Prima::Utils;
-use Prima::TextView;
-use Encode;
-
-package Prima::PodView::Link;
-use vars qw(@ISA);
-@ISA = qw( Prima::TextView::EventRectangles Prima::TextView::EventContent );
-
-sub on_mousedown
-{
-	my ( $self, $owner, $btn, $mod, $x, $y) = @_;
-	my $r = $self-> contains( $x, $y);
-	return 1 if $r < 0;
-	$r = $self-> {rectangles}-> [$r];
-	$r = $self-> {references}-> [$$r[4]];
-	$owner-> link_click( $r, $btn, $mod, $x, $y);
-	return 0;
-}
-
-sub on_mousemove
-{
-	my ( $self, $owner, $mod, $x, $y) = @_;
-	my $r = $self-> contains( $x, $y);
-	if ( $r != $owner-> {lastLinkPointer}) {
-		my $was_hand = ($owner->{lastLinkPointer} >= 0) ? 1 : 0;
-		my $is_hand  = ($r >= 0) ? 1 : 0;
-		if ( $is_hand != $was_hand) {
-			$owner-> pointer( $is_hand ? cr::Hand : cr::Text );
-		}
-		my $rr = $self->rectangles;
-		my ($dx, $dy) = $owner->point2screen(0,0);
-		my $or = $owner->{lastLinkPointer};
-		$owner-> {lastLinkPointer} = $r;
-		if ( $was_hand ) {
-			$or = $rr->[$or];
-			$owner-> invalidate_rect($or->[0] + $dx, $dy - $or->[1], $or->[2] + $dx, $dy - $or->[3]);
-		}
-		if ( $is_hand ) {
-			$or = $rr->[$r];
-			$owner-> invalidate_rect($or->[0] + $dx, $dy - $or->[1], $or->[2] + $dx, $dy - $or->[3]);
-		}
-	}
-}
-
-sub on_paint
-{
-	my ( $self, $owner, $canvas, $ci ) = @_;
-	my ($dx, $dy) = $owner->point2screen(0,0);
-	my $r  = $self->rectangles->[ $owner->{lastLinkPointer} ];
-	my $c  = $canvas-> color;
-	$canvas-> color( $owner-> {colorMap}->[ $ci ]);
-	$canvas-> translate(0,0);
-	$canvas-> line( $r->[0] + $dx, $dy - $r->[3], $r->[2] + $dx, $dy - $r->[3]);
-	$canvas-> color( $c);
-}
-
 package Prima::PodView;
 
-use vars qw(@ISA %HTML_Escapes $OP_LINK);
+use strict;
+use warnings;
+use Config;
+use Encode;
+use Prima qw(Utils TextView Widget::Link Image::base64);
+
+use vars qw(@ISA %HTML_Escapes);
 @ISA = qw(Prima::TextView);
 
 use constant DEF_INDENT       => 4;
@@ -112,10 +58,8 @@ use constant T_ITEM_DEPTH  => 4; # depth of =item recursion
 use constant T_LINK_OFFSET => 5; #
 
 # formatting constants
-use constant FORMAT_LINES    => 100;
+use constant FORMAT_LINES    => 300;
 use constant FORMAT_TIMEOUT  => 300;
-
-$OP_LINK = tb::opcode(1, 'link');
 
 sub model_create
 {
@@ -142,7 +86,7 @@ sub div_create
 {
 my %RNT = (
 	%{Prima::TextView-> notification_types()},
-	Link     => nt::Default,
+	%{Prima::Widget::Link-> notification_types()},
 	Bookmark => nt::Default,
 	NewPage  => nt::Default,
 );
@@ -203,10 +147,9 @@ sub init
 	$self-> {hasIndex}   = 0;
 	$self-> {topicView}  = 0;
 	$self-> {justify}  = 0;
-	$self-> {lastLinkPointer} = -1;
+	$self-> {link_handler} = Prima::Widget::Link-> new;
+	$self-> {contents} = [ $self->{link_handler} ];
 	my %profile = $self-> SUPER::init(@_);
-
-	$self-> {contents} = [ Prima::PodView::Link-> new ];
 
 	my %font = %{$self-> fontPalette-> [0]};
 	$font{pitch} = fp::Fixed;
@@ -218,31 +161,59 @@ sub init
 	return %profile;
 }
 
+sub colorMap
+{
+	return @{$_[0]->SUPER::colorMap} unless $#_;
+	my ( $self, $cm) = @_;
+	$self-> {link_handler}->color( $$cm[ COLOR_LINK_FOREGROUND & ~tb::COLOR_INDEX ] );
+	$self-> SUPER::colorMap($cm);
+}
+
 sub on_paint
 {
 	my ( $self, $canvas ) = @_;
 	$self-> SUPER::on_paint($canvas);
-	$self-> {contents}-> [0]-> on_paint( $self, $canvas, COLOR_LINK_FOREGROUND & ~tb::COLOR_INDEX )
-		if $self->{lastLinkPointer} >= 0
+	$self-> {link_handler}-> on_paint( $self, $canvas);
 }
 
 sub on_size
 {
 	my ( $self, $oldx, $oldy, $x, $y) = @_;
 	$self-> SUPER::on_size( $oldx, $oldy, $x, $y);
-	$self-> format(1) if $oldx != $x;
+	$self-> format(keep_offset => 1) if $oldx != $x;
 }
 
 sub on_fontchanged
 {
 	my $self = $_[0];
 	$self-> SUPER::on_fontchanged;
-	$self-> format(1);
+	$self-> format(keep_offset => 1);
 }
 
-# sub on_link {
-# 	my ( $self, $linkPointer, $mouseButtonOrKeyEventIfZero, $mod, $x, $y) = @_;
-# }
+sub on_link
+{
+	my ( $self, $link_handler, $url, $btn, $mod) = @_;
+	return if $btn != mb::Left;
+	$self-> load_link( $url );
+}
+
+sub on_linkpreview
+{
+	my ( $self, $link_handler, $url) = @_;
+	$$url = '';
+	$self->clear_event;
+}
+
+sub on_linkadjustrect
+{
+	my ( $self, $link_handler, $rc) = @_;
+	my ($dx, $dy) = $self->point2screen(0,0);
+	$$rc[$_] = $dx + $$rc[$_] for 0,2;
+	$$rc[$_] = $dy - $$rc[$_] for 1,3;
+	$self->clear_event;
+}
+
+sub link_handler { shift->{link_handler} }
 
 # returns a storable string, that identifies position.
 # can report current positions and links to the upper topic
@@ -310,7 +281,6 @@ sub load_bookmark
 	my ( $page, $topic, $ofs) = split( '\|', $mark, 3);
 	return 0 unless $ofs =~ /^\d+$/ && $topic =~ /^\d+$/;
 
-
 	if ( $page ne $self-> {pageName}) {
 		my $ret = $self-> load_file( $page);
 		return 2 if $ret != 1;
@@ -330,7 +300,7 @@ sub load_bookmark
 
 sub load_link
 {
-	my ( $self, $s) = @_;
+	my ( $self, $s, %opt) = @_;
 
 	my $mark = $self-> make_bookmark;
 	my $t;
@@ -345,9 +315,8 @@ sub load_link
 	unless ( defined $t) { # page / section / item
 		my ( $page, $section, $item, $lead_slash) = ( '', '', 1, '');
 		my $default_topic = 0;
-
-		if ( $s =~ /^file:\/\/(.*)$/) {
-			$page = $1;
+		if ( $s =~ /^file:\/\/(.*?)(?:\|([^\/]*))?$/) {
+			($page, $section) = ($1, $2 // '');
 		} elsif ( $s =~ m{^([:\w]+)/?$} ) {
 			$page = $1;
 		} elsif ( $s =~ /^([^\/]*)(\/)(.*)$/) {
@@ -383,7 +352,7 @@ sub load_link
 			}
 		}
 		if ( length $page and $page ne $self-> {pageName}) { # new page?
-			if ( $self-> load_file( $page) != 1) {
+			if ( $self-> load_file( $page, %opt) != 1) {
 				$self-> notify(q(Bookmark), $mark) if $mark;
 				return 0;
 			}
@@ -415,8 +384,9 @@ sub load_link
 	if ( defined $t) {
 		if ( $t = $self-> {topics}-> [$t]) {
 			if ( $self-> {topicView}) {
-				$self-> select_topic($t);
+				$self-> select_topic($t, %opt);
 			} else {
+					my $m = $self-> {model}-> [ $$t[ T_MODEL_START]];
 				$self-> select_text_offset(
 					$self-> {model}-> [ $$t[ T_MODEL_START]]-> [ M_TEXT_OFFSET]
 				);
@@ -432,32 +402,25 @@ sub load_link
 	return 0;
 }
 
-sub link_click
-{
-	my ( $self, $s, $btn, $mod, $x, $y) = @_;
-
-	return unless $self-> notify(q(Link), \$s, $btn, $mod, $x, $y);
-	return if $btn != mb::Left;
-	$self-> load_link( $s);
-}
-
 # selects a sub-page; does not check if topicView,
 # so must be called with care
 sub select_topic
 {
-	my ( $self, $t) = @_;
+	my ( $self, $t, %opt) = @_;
 	my @mr1 = @{$self-> {modelRange}};
 	if ( defined $t) {
 		$self-> {modelRange} = [
 			$$t[ T_MODEL_START],
 			$$t[ T_MODEL_END],
 			$$t[ T_LINK_OFFSET]
-		]
+		];
 	} else {
 		$self-> {modelRange} = [ 0, scalar @{$self-> {model}} - 1, 0 ]
 	}
-	my @mr2 = @{$self-> {modelRange}};
 
+	return unless $opt{format} // 1;
+
+	my @mr2 = @{$self-> {modelRange}};
 	if ( grep { $mr1[$_] != $mr2[$_] } 0 .. 2) {
 		$self-> lock;
 		$self-> topLine(0);
@@ -488,7 +451,7 @@ sub justify
 	$justify = ( $justify ? 1 : 0);
 	return if $self-> {justify} == $justify;
 	$self-> {justify} = $justify;
-	$self-> format(1);
+	$self-> format(keep_offset => 1);
 }
 
 sub pageName
@@ -571,42 +534,62 @@ sub message
 	$self-> {manpath} = '';
 }
 
-sub load_file
+sub podpath2file
 {
-	my ( $self, $manpage) = @_;
-	my $pageName = $manpage;
-	my $path = '';
+	my ($self, $manpage) = @_;
 
-	unless ( -f $manpage) {
-		my ( $fn, $mpath);
-		my @ext =  ( '.pod', '.pm', '.pl' );
-		push @ext, ( '.bat' ) if $^O =~ /win32/i;
-		push @ext, ( '.com' ) if $^O =~ /VMS/;
-		for ( map { $_, "$_/pod", "$_/pods" }
-				grep { defined && length && -d }
-					@INC,
-					split( $Config::Config{path_sep}, $ENV{PATH})) {
-			if ( -f "$_/$manpage") {
-				$manpage = "$_/$manpage";
-				$path = $_;
-				last;
-			}
-			$fn = "$_/$manpage";
-			$fn =~ s/::/\//g;
-			$mpath = $fn;
-			$mpath =~ s/\/[^\/]*$//;
-			for ( @ext ) {
-				if ( -f "$fn$_") {
-					$manpage = "$fn$_";
-					$path = $mpath;
-					goto FOUND;
-				}
+	my $path = '';
+	my ( $fn, $mpath);
+	my @ext =  ( '.pod', '.pm', '.pl' );
+	push @ext, ( '.bat' ) if $^O =~ /win32/i;
+	push @ext, ( '.com' ) if $^O =~ /VMS/;
+	for (
+		map  { $_, "$_/pod", "$_/pods" }
+		grep { defined && length && -d }
+			@INC,
+			split( $Config::Config{path_sep}, $ENV{PATH})
+	) {
+		if ( -f "$_/$manpage") {
+			$manpage = "$_/$manpage";
+			$path = $_;
+			goto FOUND;
+		}
+		$fn = "$_/$manpage";
+		$fn =~ s/::/\//g;
+		$mpath = $fn;
+		$mpath =~ s/\/[^\/]*$//;
+		for ( @ext ) {
+			if ( -f "$fn$_") {
+				$manpage = "$fn$_";
+				$path = $mpath;
+				goto FOUND;
 			}
 		}
 	}
-FOUND:
+	return undef;
 
-	unless ( open F, "< $manpage") {
+FOUND:
+	return $manpage, $path;
+}
+
+sub load_file
+{
+	my ( $self, $manpage, %opt) = @_;
+	my $pageName = $manpage;
+	my $path = '';
+	my $ok = 1;
+
+	unless (-f $manpage) {
+		my ($new_manpage, $new_path) = $self-> podpath2file($manpage);
+		if ( defined $new_manpage ) {
+			($manpage, $path) = ($new_manpage, $new_path);
+		} else {
+			$ok = 0;
+		}
+	}
+
+	my $f;
+	unless ( $ok && open $f, "<", $manpage) {
 		my $m = <<ERROR;
 \=head1 Error
 
@@ -622,9 +605,9 @@ ERROR
 	$self-> pointer( cr::Wait);
 	$self-> {manpath} = $path;
 	$self-> {source_file} = $manpage;
-	$self-> open_read;
-	$self-> read($_) while <F>;
-	close F;
+	$self-> open_read(%opt);
+	$self-> read($_) while <$f>;
+	close $f;
 
 	$self-> pageName( $pageName);
 	my $ret = $self-> close_read( $self-> {topicView});
@@ -656,7 +639,6 @@ sub load_content
 	return $self-> close_read( $self-> {topicView});
 }
 
-
 sub open_read
 {
 	my ($self, @opt) = @_;
@@ -676,8 +658,8 @@ sub open_read
 		wrapindent    => 0,
 
 		topicStack    => [[-1]],
-		ignoreFormat  => 0,
 
+		format        => 1,
 		createIndex   => 1,
 		encoding      => undef,
 		bom           => undef,
@@ -690,7 +672,10 @@ sub open_read
 
 sub load_image
 {
-	my ( $self, $src, $frame ) = @_;
+	my ( $self, $src, $frame, $rest ) = @_;
+	return Prima::Image::base64->load_icon($rest, index => $frame, iconUnmask => 1)
+		if $src eq 'data:base64';
+
 	return Prima::Icon-> load( $src, index => $frame, iconUnmask => 1)
 		if -f $src;
 
@@ -713,8 +698,8 @@ sub add_image
 	my $w = $opt{width} // $src-> width;
 	my $h = $opt{height} // $src-> height;
 	my @resolution = $self-> resolution;
-	$w *= 72 / $resolution[0];
-	$h *= 72 / $resolution[1];
+	my $W = $w * 72 / $resolution[0];
+	my $H = $h * 72 / $resolution[1];
 	$src-> {stretch} = [$w, $h];
 	my $r = $self-> {readState};
 	$r-> {pod_cutting} = $opt{cut} ? 0 : 1
@@ -723,9 +708,9 @@ sub add_image
 	my @imgop = (
 		tb::moveto( 2, 0, tb::X_DIMENSION_FONT_HEIGHT),
 		tb::wrap(tb::WRAP_MODE_OFF),
-		tb::extend( $w, $h, tb::X_DIMENSION_POINT),
+		tb::extend( $W, $H, tb::X_DIMENSION_POINT),
 		tb::code( \&_imgpaint, $src),
-		tb::moveto( $w, 0, tb::X_DIMENSION_POINT),
+		tb::moveto( $W, 0, tb::X_DIMENSION_POINT),
 		tb::wrap(tb::WRAP_MODE_ON)
 	);
 
@@ -776,8 +761,9 @@ sub add_formatted
 		$self-> add($text,STYLE_CODE,0);
 		$self-> add_new_line;
 	} elsif ( $format eq 'podview') {
-		while ( $text =~ m/<\s*([^<>]*)\s*>/gcs) {
+		while ( $text =~ m/<\s*([^<>]*)\s*>(.*)/gcs) {
 			my $cmd = $1;
+			my $rest = $2;
 			if ( lc($cmd) eq 'cut') {
 				$self-> {readState}-> {pod_cutting} = 0;
 			} elsif ( lc($cmd) eq '/cut') {
@@ -791,7 +777,7 @@ sub add_formatted
 					elsif ( $option =~ /^(src|cut|title)$/) { $opt{$option} = $value }
 				}
 				if ( defined $opt{src}) {
-					my $img = $self->load_image($opt{src}, $opt{frame} // 0);
+					my $img = $self->load_image($opt{src}, $opt{frame} // 0, $rest);
 					$self->add_image($img, %opt) if $img;
 				} elsif ( defined $opt{frame} && defined $self->{images}->[$opt{frame}]) {
 					$self->add_image($self->{images}->[$opt{frame}], %opt);
@@ -805,9 +791,7 @@ sub _imgpaint
 {
 	my ( $self, $canvas, $block, $state, $x, $y, $img) = @_;
 	my ( $dx, $dy) = @{$img->{stretch}};
-	my @res = $self-> resolution;
-	$dx *= $res[0] / 72;
-	$dy *= $res[1] / 72;
+
 	$canvas-> stretch_image( $x, $y, $dx, $dy, $img);
 	$canvas-> graphic_context(
 		color             => $canvas->backColor,
@@ -974,7 +958,10 @@ sub close_read
 	$self-> add_verbatim_mark(0);
 	$self-> {contents}-> [0]-> references( $self-> {links});
 
-	goto NO_INDEX unless $self-> {readState}-> {createIndex};
+	unless ($self-> {readState}-> {createIndex}) {
+		$self-> _close_topic( STYLE_HEAD_1);
+		goto NO_INDEX;
+	}
 
 	my $secid = 0;
 	my $msecid = scalar(@{$self-> {topics}});
@@ -985,6 +972,7 @@ sub close_read
 			0, scalar @{$self-> {model}} - 1,
 			"Document", STYLE_HEAD_1, 0, 0
 		] if scalar @{$self-> {model}} > 2; # no =head's, but some info
+		$self-> _close_topic( STYLE_HEAD_1);
 		goto NO_INDEX;
 	}
 
@@ -1089,11 +1077,10 @@ sub close_read
 NO_INDEX:
 	# finalize
 	undef $self-> {readState};
-	$self-> {lastLinkPointer} = -1;
 
 	my $topic;
-	$topic = $self-> {topics}-> [$msecid] if $topicView;
-	$self-> select_topic( $topic);
+	$topic = $self-> {topics}-> [$msecid] if $topicView and defined $msecid;
+	$self-> select_topic( $topic, format => $r->{format} );
 
 	$self-> notify(q(NewPage));
 
@@ -1313,7 +1300,8 @@ sub add
 						push @$g, $tb::{$_}-> ( $val{$_} = $z-> {$_});
 					}
 					unless ($link) {
-						push @$g, $OP_LINK, $link = 1;
+						push @$g, $self->link_handler->op_link_enter;
+						$link = 1;
 						$linkHREF = '';
 					}
 				} elsif ( $$_[1] eq 'S') {
@@ -1340,7 +1328,8 @@ sub add
 						push @$g, $tb::{$_}-> ( $val{$_} = pop @{$stack{$_}});
 					}
 					if ( $link) {
-						push @$g, $OP_LINK, $link = 0;
+						push @$g, $self->link_handler->op_link_leave;
+						$link = 0;
 						push @{$self-> {links}}, $linkHREF;
 						$self-> {postBlocks}-> { $itemid} = 1;
 					}
@@ -1350,7 +1339,8 @@ sub add
 			}
 		}
 		if ( $link) {
-			push @$g, $OP_LINK, $link = 0;
+			push @$g, $self->link_handler->op_link_leave;
+			$link = 0;
 			push @{$self-> {links}}, $linkHREF;
 			$self-> {postBlocks}-> { $itemid} = 1;
 		}
@@ -1425,11 +1415,11 @@ sub stop_format
 
 sub format
 {
-	my ( $self, $keepOffset) = @_;
+	my ( $self, %opt) = @_;
 	my ( $pw, $ph) = $self-> get_active_area(2);
 
 	my $autoOffset;
-	if ( $keepOffset) {
+	if ( $opt{keep_offset}) {
 		if ( $self-> {formatData} && $self-> {formatData}-> {position}) {
 			$autoOffset = $self-> {formatData}-> {position};
 		} else {
@@ -1448,13 +1438,13 @@ sub format
 	my ( $min, $max, $linkIdStart) = @{$self-> {modelRange}};
 	if ( $min >= $max) {
 		$self-> {blocks} = [];
-		$self-> {contents}-> [0]-> rectangles([]);
+		$self-> link_handler->clear_positions;
 		$self-> paneSize(0,0);
 		return;
 	}
 
 	$self-> {blocks} = [];
-	$self-> {contents}-> [0]-> rectangles( []);
+	$self-> link_handler->clear_positions;
 
 	$self-> begin_paint_info;
 
@@ -1481,22 +1471,24 @@ sub format
 		current       => $min,
 		paneWidth     => $paneWidth,
 		formatWidth   => $paneWidth,
-		linkRects     => $self-> {contents}-> [0]-> rectangles,
 		step          => FORMAT_LINES,
 		position      => undef,
 		positionSet   => 0,
 		verbatim      => undef,
 		last_ymap     => 0,
+		exportable    => $opt{exportable},
 	};
 
-	$self-> {formatTimer} = $self-> insert( Timer =>
-		name        => 'FormatTimer',
-		delegations => [ 'Tick' ],
-		timeout     => FORMAT_TIMEOUT,
-	) unless $self-> {formatTimer};
+	if ( !$opt{sync} ) {
+		$self-> {formatTimer} = $self-> insert( Timer =>
+			name        => 'FormatTimer',
+			delegations => [ 'Tick' ],
+			timeout     => FORMAT_TIMEOUT,
+		) unless $self-> {formatTimer};
+		$self-> {formatTimer}-> start;
+	}
 
 	$self-> paneSize(0,0);
-	$self-> {formatTimer}-> start;
 	$self-> select_text_offset( $autoOffset) if $autoOffset;
 
 	while ( 1) {
@@ -1506,6 +1498,8 @@ sub format
 			$self-> {blocks}-> [-1] &&
 			$self-> {blocks}-> [-1]-> [tb::BLK_Y] < $ph;
 	}
+
+	do {} while $opt{sync} && $self-> format_chunks;
 }
 
 sub FormatTimer_Tick
@@ -1517,13 +1511,12 @@ sub paint_code_div
 {
 	my ( $self, $canvas, $block, $state, $x, $y, $coord) = @_;
 	my $f  = $canvas->font;
-	my ($style, $w, $h) = @$coord;
+	my ($style, $w, $h, $corner) = @$coord;
 	my %save = map { $_ => $canvas-> $_() } qw(color);
-
 	my $path = $canvas->new_path->round_rect(
 		$x, $y,
 		$x + $w, $y + $h,
-		$self->{defaultFontSize} * 2 * $self->{resolution}->[0] / 96.0
+		$corner
 	);
 	if ( $style == TDIVSTYLE_SOLID ) {
 		$save{backColor} = $canvas->backColor;
@@ -1555,8 +1548,10 @@ sub add_code_div
 	$$b[tb::BLK_WIDTH]  = $w;
 	$$b[tb::BLK_HEIGHT] = $h;
 	$$b[tb::BLK_TEXT_OFFSET] = -1;
+	$style = TDIVSTYLE_OUTLINE if $self->{formatData}->{exportable};
+
 	push @$b,
-		tb::code( \&paint_code_div, [$style, $w, $h]),
+		tb::code( \&paint_code_div, [$style, $w, $h, $self->{defaultFontSize} * 2 * $self->{resolution}->[0] / 96.0]),
 		tb::extend($w, $h);
 	return $b;
 }
@@ -1565,7 +1560,7 @@ sub format_chunks
 {
 	my $self = $_[0];
 
-	my $f = $self-> {formatData};
+	my $f = $self-> {formatData} or return 0;
 
 	my $time = time;
 	$self-> begin_paint_info;
@@ -1576,7 +1571,6 @@ sub format_chunks
 	$max = $f-> {max} if $max > $f-> {max};
 	my $indents   = $f-> {indents};
 	my $state     = $f-> {state};
-	my $linkRects = $f-> {linkRects};
 	my $formatWidth = $f-> {formatWidth};
 	my $fw = $self->font->width;
 
@@ -1585,6 +1579,8 @@ sub format_chunks
 		my $m = $self-> {model}-> [$mid];
 
 		if (( $m->[M_TYPE] & T_TYPE_MASK) == T_DIV ) {
+			next if $self->{formatData}->{exportable};
+
 			if ( $m->[MDIV_TAG] == TDIVTAG_OPEN) {
 				$f->{verbatim} = scalar @{ $self->{blocks} };
 			} else {
@@ -1620,38 +1616,7 @@ sub format_chunks
 
 		# check links
 		if ( $postBlocks-> {$mid}) {
-			my $linkState = 0;
-			my $linkStart = 0;
-			my @rect;
-			for my $b ( @blocks) {
-				my @pos = ( $$b[tb::BLK_X], 0 );
-
-				if ( $linkState) {
-					$rect[0] = $$b[ tb::BLK_X];
-					$rect[1] = $$b[ tb::BLK_Y];
-				}
-
-				$self-> block_walk( $b,
-					position => \@pos,
-					trace => tb::TRACE_POSITION,
-					link  => sub {
-						if ( $linkState = shift ) {
-							$rect[0] = $pos[0];
-							$rect[1] = $$b[ tb::BLK_Y];
-						} else {
-							$rect[2] = $pos[0] + $fw;
-							$rect[3] = $$b[ tb::BLK_Y] + $$b[ tb::BLK_HEIGHT];
-							push @$linkRects, [ @rect, $f-> {linkId} ++ ];
-						}
-					},
-				);
-
-				if ( $linkState) {
-					$rect[2] = $pos[0];
-					$rect[3] = $$b[ tb::BLK_Y] + $$b[ tb::BLK_HEIGHT];
-					push @$linkRects, [ @rect, $f-> {linkId}];
-				}
-			}
+			$f->{linkId} = $self-> link_handler-> add_positions_from_blocks($f->{linkId}, \@blocks);
 		}
 
 		# push back
@@ -1707,8 +1672,11 @@ sub format_chunks
 		$self-> offset( $settopline[0]);
 	}
 
-	$self-> stop_format if $mid >= $f-> {max};
 	$f-> {step} *= 2 unless time - $time;
+
+	my $ret = 1;
+	$self-> stop_format, $ret = 0 if $mid >= $f-> {max};
+	return $ret;
 }
 
 sub print
@@ -1917,77 +1885,127 @@ sub text_range
 	return @range;
 }
 
+sub _is_block_prunable
+{
+	my ( $self, $b ) = @_;
+
+	my $semaphore;
+	tb::walk( $b,
+		trace     => tb::TRACE_TEXT,
+		textPtr   => $self->textRef,
+		semaphore => \ $semaphore,
+		code      => sub { $semaphore++ },
+		text      => sub { $semaphore++ if pop =~ /\S/ },
+	);
+	return !$semaphore;
+}
+
+sub export_blocks
+{
+	my ($self, %opt) = @_;
+	my %save;
+	$save{$_} = $self->{$_} for qw(blocks contents modelRange);
+
+	if ( $opt{trim_header}) {
+		# remove section header, display pure content
+		$self->{modelRange} = [ @{ $self->{modelRange} } ];
+		$self->{modelRange}->[T_MODEL_START]++;
+	}
+
+	$self->format(sync => 1, exportable => 1);
+	my @b = @{ $self->{blocks} };
+	$self->{$_} = $save{$_} for qw(blocks contents modelRange);
+
+	if ( $opt{trim_header}) {
+		# prune empty geads
+		shift @b while @b && $self->_is_block_prunable($b[0]);
+		return unless @b;
+	}
+	if ( $opt{trim_footer}) {
+		# prune empty tails
+		pop @b while @b && $self->_is_block_prunable($b[-1]);
+	}
+	return unless @b;
+
+	return Prima::Drawable::PolyTextBlock->new(
+		blocks   => \@b,
+		fontmap  => $self->{fontPalette},
+		colormap => $self->{colorMap},
+		textRef  => $self->textRef,
+	);
+}
+
 %HTML_Escapes = (
-	'amp'	=>	'&',	#   ampersand
-	'lt'	=>	'<',	#   left chevron, less-than
-	'gt'	=>	'>',	#   right chevron, greater-than
-	'quot'	=>	'"',	#   double quote
+	'amp'         =>        '&',           #   ampersand
+	'lt'          =>        '<',           #   left chevron, less-than
+	'gt'          =>        '>',           #   right chevron, greater-than
+	'quot'        =>        '"',           #   double quote
 
-	"Aacute"=>	"\xC1",	#   capital A, acute accent
-	"aacute"=>	"\xE1",	#   small a, acute accent
-	"Acirc"	=>	"\xC2",	#   capital A, circumflex accent
-	"acirc"	=>	"\xE2",	#   small a, circumflex accent
-	"AElig"	=>	"\xC6",	#   capital AE diphthong (ligature)
-	"aelig"	=>	"\xE6",	#   small ae diphthong (ligature)
-	"Agrave"=>	"\xC0",	#   capital A, grave accent
-	"agrave"=>	"\xE0",	#   small a, grave accent
-	"Aring"	=>	"\xC5",	#   capital A, ring
-	"aring"	=>	"\xE5",	#   small a, ring
-	"Atilde"=>	"\xC3",	#   capital A, tilde
-	"atilde"=>	"\xE3",	#   small a, tilde
-	"Auml"	=>	"\xC4",	#   capital A, dieresis or umlaut mark
-	"auml"	=>	"\xE4",	#   small a, dieresis or umlaut mark
-	"Ccedil"=>	"\xC7",	#   capital C, cedilla
-	"ccedil"=>	"\xE7",	#   small c, cedilla
-	"Eacute"=>	"\xC9",	#   capital E, acute accent
-	"eacute"=>	"\xE9",	#   small e, acute accent
-	"Ecirc"	=>	"\xCA",	#   capital E, circumflex accent
-	"ecirc"	=>	"\xEA",	#   small e, circumflex accent
-	"Egrave"=>	"\xC8",	#   capital E, grave accent
-	"egrave"=>	"\xE8",	#   small e, grave accent
-	"ETH"	=>	"\xD0",	#   capital Eth, Icelandic
-	"eth"	=>	"\xF0",	#   small eth, Icelandic
-	"Euml"	=>	"\xCB",	#   capital E, dieresis or umlaut mark
-	"euml"	=>	"\xEB",	#   small e, dieresis or umlaut mark
-	"Iacute"=>	"\xCD",	#   capital I, acute accent
-	"iacute"=>	"\xED",	#   small i, acute accent
-	"Icirc"	=>	"\xCE",	#   capital I, circumflex accent
-	"icirc"	=>	"\xEE",	#   small i, circumflex accent
-	"Igrave"=>	"\xCD",	#   capital I, grave accent
-	"igrave"=>	"\xED",	#   small i, grave accent
-	"Iuml"	=>	"\xCF",	#   capital I, dieresis or umlaut mark
-	"iuml"	=>	"\xEF",	#   small i, dieresis or umlaut mark
-	"Ntilde"=>	"\xD1",	#   capital N, tilde
-	"ntilde"=>	"\xF1",	#   small n, tilde
-	"Oacute"=>	"\xD3",	#   capital O, acute accent
-	"oacute"=>	"\xF3",	#   small o, acute accent
-	"Ocirc"	=>	"\xD4",	#   capital O, circumflex accent
-	"ocirc"	=>	"\xF4",	#   small o, circumflex accent
-	"Ograve"=>	"\xD2",	#   capital O, grave accent
-	"ograve"=>	"\xF2",	#   small o, grave accent
-	"Oslash"=>	"\xD8",	#   capital O, slash
-	"oslash"=>	"\xF8",	#   small o, slash
-	"Otilde"=>	"\xD5",	#   capital O, tilde
-	"otilde"=>	"\xF5",	#   small o, tilde
-	"Ouml"	=>	"\xD6",	#   capital O, dieresis or umlaut mark
-	"ouml"	=>	"\xF6",	#   small o, dieresis or umlaut mark
-	"szlig"	=>	"\xDF",		#   small sharp s, German (sz ligature)
-	"THORN"	=>	"\xDE",	#   capital THORN, Icelandic
-	"thorn"	=>	"\xFE",	#   small thorn, Icelandic
-	"Uacute"=>	"\xDA",	#   capital U, acute accent
-	"uacute"=>	"\xFA",	#   small u, acute accent
-	"Ucirc"	=>	"\xDB",	#   capital U, circumflex accent
-	"ucirc"	=>	"\xFB",	#   small u, circumflex accent
-	"Ugrave"=>	"\xD9",	#   capital U, grave accent
-	"ugrave"=>	"\xF9",	#   small u, grave accent
-	"Uuml"	=>	"\xDC",	#   capital U, dieresis or umlaut mark
-	"uuml"	=>	"\xFC",	#   small u, dieresis or umlaut mark
-	"Yacute"=>	"\xDD",	#   capital Y, acute accent
-	"yacute"=>	"\xFD",	#   small y, acute accent
-	"yuml"	=>	"\xFF",	#   small y, dieresis or umlaut mark
+	"Aacute"      =>        "\xC1",        #   capital A, acute accent
+	"aacute"      =>        "\xE1",        #   small a, acute accent
+	"Acirc"       =>        "\xC2",        #   capital A, circumflex accent
+	"acirc"       =>        "\xE2",        #   small a, circumflex accent
+	"AElig"       =>        "\xC6",        #   capital AE diphthong (ligature)
+	"aelig"       =>        "\xE6",        #   small ae diphthong (ligature)
+	"Agrave"      =>        "\xC0",        #   capital A, grave accent
+	"agrave"      =>        "\xE0",        #   small a, grave accent
+	"Aring"       =>        "\xC5",        #   capital A, ring
+	"aring"       =>        "\xE5",        #   small a, ring
+	"Atilde"      =>        "\xC3",        #   capital A, tilde
+	"atilde"      =>        "\xE3",        #   small a, tilde
+	"Auml"        =>        "\xC4",        #   capital A, dieresis or umlaut mark
+	"auml"        =>        "\xE4",        #   small a, dieresis or umlaut mark
+	"Ccedil"      =>        "\xC7",        #   capital C, cedilla
+	"ccedil"      =>        "\xE7",        #   small c, cedilla
+	"Eacute"      =>        "\xC9",        #   capital E, acute accent
+	"eacute"      =>        "\xE9",        #   small e, acute accent
+	"Ecirc"       =>        "\xCA",        #   capital E, circumflex accent
+	"ecirc"       =>        "\xEA",        #   small e, circumflex accent
+	"Egrave"      =>        "\xC8",        #   capital E, grave accent
+	"egrave"      =>        "\xE8",        #   small e, grave accent
+	"ETH"         =>        "\xD0",        #   capital Eth, Icelandic
+	"eth"         =>        "\xF0",        #   small eth, Icelandic
+	"Euml"        =>        "\xCB",        #   capital E, dieresis or umlaut mark
+	"euml"        =>        "\xEB",        #   small e, dieresis or umlaut mark
+	"Iacute"      =>        "\xCD",        #   capital I, acute accent
+	"iacute"      =>        "\xED",        #   small i, acute accent
+	"Icirc"       =>        "\xCE",        #   capital I, circumflex accent
+	"icirc"       =>        "\xEE",        #   small i, circumflex accent
+	"Igrave"      =>        "\xCD",        #   capital I, grave accent
+	"igrave"      =>        "\xED",        #   small i, grave accent
+	"Iuml"        =>        "\xCF",        #   capital I, dieresis or umlaut mark
+	"iuml"        =>        "\xEF",        #   small i, dieresis or umlaut mark
+	"Ntilde"      =>        "\xD1",        #   capital N, tilde
+	"ntilde"      =>        "\xF1",        #   small n, tilde
+	"Oacute"      =>        "\xD3",        #   capital O, acute accent
+	"oacute"      =>        "\xF3",        #   small o, acute accent
+	"Ocirc"       =>        "\xD4",        #   capital O, circumflex accent
+	"ocirc"       =>        "\xF4",        #   small o, circumflex accent
+	"Ograve"      =>        "\xD2",        #   capital O, grave accent
+	"ograve"      =>        "\xF2",        #   small o, grave accent
+	"Oslash"      =>        "\xD8",        #   capital O, slash
+	"oslash"      =>        "\xF8",        #   small o, slash
+	"Otilde"      =>        "\xD5",        #   capital O, tilde
+	"otilde"      =>        "\xF5",        #   small o, tilde
+	"Ouml"        =>        "\xD6",        #   capital O, dieresis or umlaut mark
+	"ouml"        =>        "\xF6",        #   small o, dieresis or umlaut mark
+	"szlig"       =>        "\xDF",        #   small sharp s, German (sz ligature)
+	"THORN"       =>        "\xDE",        #   capital THORN, Icelandic
+	"thorn"       =>        "\xFE",        #   small thorn, Icelandic
+	"Uacute"      =>        "\xDA",        #   capital U, acute accent
+	"uacute"      =>        "\xFA",        #   small u, acute accent
+	"Ucirc"       =>        "\xDB",        #   capital U, circumflex accent
+	"ucirc"       =>        "\xFB",        #   small u, circumflex accent
+	"Ugrave"      =>        "\xD9",        #   capital U, grave accent
+	"ugrave"      =>        "\xF9",        #   small u, grave accent
+	"Uuml"        =>        "\xDC",        #   capital U, dieresis or umlaut mark
+	"uuml"        =>        "\xFC",        #   small u, dieresis or umlaut mark
+	"Yacute"      =>        "\xDD",        #   capital Y, acute accent
+	"yacute"      =>        "\xFD",        #   small y, acute accent
+	"yuml"        =>        "\xFF",        #   small y, dieresis or umlaut mark
 
-	"lchevron"=>	"\xAB",	#   left chevron (double less than)
-	"rchevron"=>	"\xBB",	#   right chevron (double greater than)
+	"lchevron"    =>        "\xAB",        #   left chevron (double less than)
+	"rchevron"    =>        "\xBB",        #   right chevron (double greater than)
 );
 
 1;
@@ -2115,6 +2133,13 @@ otherwise the poor-man-drawings would be selected.
 
 If "src" is omitted, image is retrieved from C<images> array, from the index C<frame>.
 
+It is also possible to embed images in the pod, by using special C<src> tag and base64-encoded
+images. The format should preferrably be GIF, as this is Prima default format, or BMP for
+very small images, as it is supported without third party libraries:
+
+	=for podview <img src="data:base64">
+	R0lGODdhAQABAIAAAAAAAAAAACwAAAAAAQABAIAAAAAAAAACAkQBADs=
+
 =back
 
 
@@ -2197,12 +2222,11 @@ The default colors in the styles are mapped into these entries.
 
 Prima::PodView provides a hand-icon mouse pointer highlight for the link
 entries and as an interactive part, the link documents or topics are loaded
-when the user presses the mouse button on the link. The mechanics below that
-is as follows. C<{contents}> of event rectangles, ( see L<Prima::TextView> )
-is responsible for distinguishing whether a mouse is inside a link or not.
-When the link is activated, C<link_click> is called, which, in turn, calls
-C<load_link> method. If the page is loaded successfully, depending on C<::topicView>
-property value, either C<select_topic> or C<select_text_offset> method is called.
+when the user presses the mouse button on the link. L<Prima::Widget::Link> is
+used for the link mechanics implementation.
+
+If the page is loaded successfully, depending on C<::topicView> property value,
+either C<select_topic> or C<select_text_offset> method is called.
 
 The family of file and link access functions consists of the following methods:
 

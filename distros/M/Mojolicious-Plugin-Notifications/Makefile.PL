@@ -11,10 +11,10 @@ WriteMakefile(
   AUTHOR       => 'Nils Diewald',
   BUILD_REQUIRES => {
     'Test::More' => 0,
-    'Test::Mojo::Session' => 1.06
+    'Test::Mojo::Session' => 1.07
   },
   PREREQ_PM => {
-    'Mojolicious' => 7.24
+    'Mojolicious' => 9.17
   },
   LICENSE      => 'artistic_2',
   META_MERGE   => {

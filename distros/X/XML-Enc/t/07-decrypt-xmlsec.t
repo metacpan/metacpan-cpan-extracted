@@ -104,6 +104,7 @@ CONTENT
 
 SKIP: {
             skip "xmlsec1 not installed", 5 unless which('xmlsec1');
+            skip "xmlsec1 no support for MGF element", 5 if $km eq 'rsa-oaep';
             my $version;
             if (`xmlsec1 version` =~ m/(\d+\.\d+\.\d+)/) {
                 $version = $1;

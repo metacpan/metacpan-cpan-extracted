@@ -1,8 +1,17 @@
 Revision history for Perl extension DBIx::Class::Schema::Loader
 
+0.07051 - 2022-11-23
+        - Make defaulting primary key columns retrieve_on_insert for Pg (GH#28)
+
+0.07050 - 2022-11-20
+
+        - Revert inlining of String::CamelCase::wordsplit() (RT#125929)
+        - Do not require MooseX::MarkAsMethods with only_autoclean=1 (GH#21)
+        - Exclude tables in the Oracle Recycle Bin (RT#128149)
+
 0.07049 - 2018-03-21
         - Fix tests when the path to perl has spaces in it (GH#19)
-        - Inline String::CamelCase::wordsplit() due to RT#123030
+        - Inline String::CamelCase::wordsplit() due to RT#123030 (RT#124822)
         - Get enum values from DBD::Pg if it's new enough
         - Remove dependency on DBIx::Class::IntrospectableM2M
 

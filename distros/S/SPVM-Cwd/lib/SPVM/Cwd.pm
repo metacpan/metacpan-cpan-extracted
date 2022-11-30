@@ -1,31 +1,26 @@
 package SPVM::Cwd;
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 1;
 
 =head1 Name
 
-SPVM::Cwd - get pathname of current working directory
+SPVM::Cwd - Getting Pathname of Current Working Directory
 
 =head1 Usage
 
   use Cwd;
+  
   my $dir = Cwd->getcwd;
   
   my $abs_path = Cwd->abs_path($file);
 
 =head1 Description
 
-This module provides functions for determining the pathname of the current working directory.
+C<SPVM::Cwd> provides methods for determining the pathname of the current working directory.
 
-C<Cwd> is a Perl L<Cwd> porting to L<SPVM>.
-
-C<Cwd> is a L<SPVM> module.
-
-=head1 Caution
-
-L<SPVM> is yet experimental status.
+This module is the Perl's L<Cwd> porting to L<SPVM>.
 
 =head1 Class Methods
 
@@ -33,25 +28,47 @@ L<SPVM> is yet experimental status.
 
   static method getcwd : string ();
 
-Returns the current working directory. On error returns undef, with L<errno|SPVM::Errno/"errno"> set to indicate the error.
+Calls the L<getcwd|SPVM::Sys::IO/"getcwd"> method in the L<Sys::IO|SPVM::Sys::IO> class.
 
-Exposes the POSIX function getcwd(3).
+On Windows, the path separaters C<\> are replaced with C</>.
 
 =head2 abs_path
 
   static method abs_path : string ($file :string)
 
-Uses the same algorithm as getcwd(). Symbolic links and relative-path components ("." and "..") are resolved to return the canonical pathname, just like realpath(3). On error returns undef, with L<Errno->errno|SPVM::Errno/"errno"> set to indicate the error.
+The alias for the L</"realpath"> method.
 
 =head2 realpath
 
   static method realpath : string ($file : string)
 
-A synonym for abs_path().
+Calls the L<realpath|SPVM::Sys::IO/"realpath"> method in the L<Sys::IO|SPVM::Sys::IO> class except for Windows.
+
+On Windows, Calls the L<_fullpath|SPVM::Sys::IO/"_fullpath"> method in the L<Sys::IO|SPVM::Sys::IO> class.
+
+=head2 getdcwd
+
+  static method getdcwd : string ($drive = undef : string) {
+
+The C<$drive> is a drive letter such as C<C:>, C<D:>. It is converted to the drive id.
+
+And calls the L<_getdcwd|SPVM::Sys::IO/"_getdcwd"> method in the L<Sys::IO|SPVM::Sys::IO>.
+
+The OS must be Windows. Otherwise an exception will be thrown.
 
 =head1 Repository
 
 L<https://github.com/yuki-kimoto/SPVM-Cwd>
+
+=head1 See Also
+
+=head2 SPVM::Sys
+
+L<SPVM::Sys> provides system calls for changing working directory. C<SPVM::Cwd> calls the methods in the L<SPVM::Sys> class.
+
+=head2 Cwd
+
+C<SPVM::Cwd> is the Perl's L<Cwd> porting to L<SPVM>.
 
 =head1 Author
 

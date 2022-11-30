@@ -165,12 +165,60 @@ desired file output type.
 
 - `output_fmt`: See above, same as in `new()`.
 
+## `RF::Component->save_snp_fh` - Write the component to a file descriptor
+
+Same as `save_snp` but writes to a file handle:
+
+    $cap->save_snp_fh(*STDOUT, %options);
+
 # Calculation Functions
 
 Unless otherwise indicated, the return value from these methods are [PDL](https://metacpan.org/pod/PDL)
 vectors, typically one value per frequency.  For example, `$pF` as shown above
 will be a N-vector of values in picofarads, with one pF value for each
 frequency.
+
+## `$self->at($f_Hz)` - Frequency extrapolation (object cloning)
+
+It is importatant to easily choose which frequencies will be used for
+calculations because the functions below return vectors with values at each
+frequency for the calculation provided.  In many cases you will want to load a
+Touchstone data file at all frequencies and then use `$obj->at($f_Hz)` to
+reduce or extrapolate to a different frequency or set of freqencies.
+
+Each call to `$obj->at($f_Hz)` will return a new `RF::Component` object
+as follows:
+
+        $cap = RF::Component->load('my.s2p');
+
+        # Picofarads at 100 MHz (100e6 Hz).
+        $pF = $cap->at(100e6)->capacitance * 1e12;
+
+        # Reactance at 100 MHz and 200 MHz:
+        $X = $cap->at('100e6, 200e6')->reactance;
+
+        # ESR at 1-10 GHz with 20 samples (500 MHz each):
+        $esr = $cap->at('1e9 - 10e9  x20');
+
+        # ESR at 1-10 GHz stepping 500 MHz with 20 samples
+        # (same as the previous above, but different notation)
+        $esr = $cap->at('1e9 += 500e6  x20');
+
+Notes:
+
+- Each resulting value is a PDL vector containing one value per evaluated
+frequency.
+- Internally the `$obj->at($f_Hz)` function uses
+[PDL::IO::Touchstone](https://metacpan.org/pod/PDL::IO::Touchstone)'s `m_interpolate` function so you can use any syntax
+available to `m_interpolate`.
+- The `$obj->at($f_Hz)` call caches the resulting interpolated
+object to prevent repeated extrapolation at the same frequency set.  Because of this
+the `$obj->at($f_Hz)` call only supports scalar ranges either using a single
+frequency or the quoted range feature shown above and in
+[PDL::IO::Touchstone](https://metacpan.org/pod/PDL::IO::Touchstone)'s `m_interpolate` function.
+- If no range is specified then the original object is returned:
+
+            return $self if !length($range);
 
 ## `$z0n = $self->port_z($n)` - Return the complex port impedance vector for each frequency
 

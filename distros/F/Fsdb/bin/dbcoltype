@@ -1,0 +1,139 @@
+#!/usr/bin/perl -w
+
+#
+# dbcoltype.pm
+# Copyright (C) 2022 by John Heidemann <johnh@isi.edu>
+#
+# This program is distributed under terms of the GNU general
+# public license, version 2.  See the file COPYING
+# in $dblibdir for details.
+#
+
+
+=head1 NAME
+
+dbcoltype - define (or redefine) types for columns of an Fsdb file
+
+=head1 SYNOPSIS
+
+dbcol [-v] [column type...]
+
+=head1 DESCRIPTION
+
+Define the type of each column, where COLUMN and TYPE are pairs.
+Or, with the C<-v> option, redefine all types as string.
+
+The data does not change (just the header).
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-v> or B<--clear-types>
+
+Remove definitions from columns that are listed,
+or from all columns if none are listed.
+The effect is to restore types to their default type of "a" (string).
+
+=back
+
+=for comment
+begin_standard_fsdb_options
+
+and the standard fsdb options:
+
+=over 4
+
+=item B<-d>
+
+Enable debugging output.
+
+=item B<-i> or B<--input> InputSource
+
+Read from InputSource, typically a file, or - for standard input,
+or (if in Perl) a IO::Handle, Fsdb::IO or Fsdb::BoundedQueue objects.
+
+=item B<-o> or B<--output> OutputDestination
+
+Write to OutputDestination, typically a file, or - for standard output,
+or (if in Perl) a IO::Handle, Fsdb::IO or Fsdb::BoundedQueue objects.
+
+=item B<--autorun> or B<--noautorun>
+
+By default, programs process automatically,
+but Fsdb::Filter objects in Perl do not run until you invoke
+the run() method.
+The C<--(no)autorun> option controls that behavior within Perl.
+
+=item B<--header> H
+
+Use H as the full Fsdb header, rather than reading a header from
+then input.
+
+=item B<--help>
+
+Show help.
+
+=item B<--man>
+
+Show full manual.
+
+=back
+
+=for comment
+end_standard_fsdb_options
+
+
+=head1 SAMPLE USAGE
+
+=head2 Input:
+
+    #fsdb account passwd uid gid fullname homedir shell
+    johnh * 2274 134 John_Heidemann /home/johnh /bin/bash
+    greg * 2275 134 Greg_Johnson /home/greg /bin/bash
+    root * 0 0 Root /root /bin/bash
+    # this is a simple database
+
+=head2 Command:
+
+    cat DATA/passwd.fsdb account | dbcoltype uid l gid l
+
+=head2 Output:
+
+    #fsdb account passwd uid:l gid:l fullname homedir shell
+    johnh * 2274 134 John_Heidemann /home/johnh /bin/bash
+    greg * 2275 134 Greg_Johnson /home/greg /bin/bash
+    root * 0 0 Root /root /bin/bash
+    # this is a simple database
+
+
+=head1 SEE ALSO
+
+L<dbcoldefine(1)>,
+L<dbcolcreate(1)>,
+L<Fsdb(3)>.
+
+
+=cut
+
+
+# WARNING: This code is derived from dbcoltype.pm; that is the master copy.
+
+use Fsdb::Filter::dbcoltype;
+my $f = new Fsdb::Filter::dbcoltype(@ARGV);
+$f->setup_run_finish;  # or could just --autorun
+exit 0;
+
+
+=head1 AUTHOR and COPYRIGHT
+
+Copyright (C) 2022 by John Heidemann <johnh@isi.edu>
+
+This program is distributed under terms of the GNU general
+public license, version 2.  See the file COPYING
+with the distribution for details.
+
+=cut
+
+1;
+

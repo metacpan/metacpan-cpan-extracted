@@ -1,10 +1,10 @@
 # -*- perl -*-
-#	utf8_binary.t --- Term::ReadLine::Gnu UTF-8 binary string test script
+#       utf8_binary.t --- Term::ReadLine::Gnu UTF-8 binary string test script
 #
-#	Copyright (c) 2016-2019 Hiroo Hayashi.  All rights reserved.
+#       Copyright (c) 2016-2019 Hiroo Hayashi.  All rights reserved.
 #
-#	This program is free software; you can redistribute it and/or
-#	modify it under the same terms as Perl itself.
+#       This program is free software; you can redistribute it and/or
+#       modify it under the same terms as Perl itself.
 
 # The GNU Readline Library start supporting multibyte characters since
 # version 4.3, and is still improving the support.  You should use the
@@ -26,14 +26,14 @@ use Data::Dumper;
 {
     no warnings 'redefine';
     sub note {
-	my $msg = join('', @_);
-	$msg =~ s{\n(?!\z)}{\n# }sg;
-	print "# $msg" . ($msg =~ /\n$/ ? '' : "\n");
+        my $msg = join('', @_);
+        $msg =~ s{\n(?!\z)}{\n# }sg;
+        print "# $msg" . ($msg =~ /\n$/ ? '' : "\n");
     }
 }
 
 BEGIN {
-#    $ENV{PERL_RL} = 'Gnu';	# force to use Term::ReadLine::Gnu
+#    $ENV{PERL_RL} = 'Gnu';     # force to use Term::ReadLine::Gnu
 }
 
 use Term::ReadLine;
@@ -62,14 +62,14 @@ ok(1, 'PERL_UNICODE is not defined');
 my ($in, $line, @layers);
 open ($in, "<", "t/utf8.txt") or die "cannot open utf8.txt: $!";
 
-if (0) {	# This may cause a fail.
+if (0) {        # This may cause a fail.
     $line = <$in>; chomp($line);
     note $line;
     note Dumper($line, "🐪");
     ok($line eq "🐪", 'pre-read');
 }
 
-my $expected = $] >= 5.010 ? ['unix', 'perlio'] : ['stdio'];
+my $expected = $^O eq 'MSWin32' ? ['unix', 'crlf'] : $] >= 5.010 ? ['unix', 'perlio'] : ['stdio'];
 @layers = PerlIO::get_layers($in);
 note 'i: ', join(':', @layers);
 is_deeply(\@layers, $expected, "input layers before 'new'");
@@ -84,10 +84,10 @@ if ($verbose) {
 } else {
     $t = new Term::ReadLine 'ReadLineTest', $in, \*STDOUT;
 }
-print "\n";	# rl_initialize() outputs some escape characters in Term-ReadLine-Gnu less than 6.3, 
+print "\n";     # rl_initialize() outputs some escape characters in Term-ReadLine-Gnu less than 6.3,
 isa_ok($t, 'Term::ReadLine');
 
-$expected = $] >= 5.010 ? ['unix', 'perlio', 'stdio'] : ['stdio'];
+$expected = $^O eq 'MSWin32' ? ['unix', 'crlf', 'stdio'] : $] >= 5.010 ? ['unix', 'perlio', 'stdio'] : ['stdio'];
 @layers = PerlIO::get_layers($t->IN);
 note 'i: ', join(':', @layers);
 is_deeply(\@layers, $expected, "input layers after 'new'");
@@ -107,8 +107,8 @@ my $a = $t->Attribs;
 if ($verbose) {
     $a->{do_expand} = 1;
     while ($line = $t->readline("🐪🐪> ")) {
-	print {$t->OUT} $line, "\n";
-	print {$t->OUT} Dumper($line), "\n";
+        print {$t->OUT} $line, "\n";
+        print {$t->OUT} Dumper($line), "\n";
     }
     exit 0;
 }
@@ -134,7 +134,7 @@ ok(!utf8::is_utf8($line), 'not UTF-8 text string: variable');
 # UTF-8 binary string does not work.
 ok(reverse $line ne '🐪🐪🐪 🐪🐪 🐪', 'This does not work.');
 
-if (0) {	# This may cause a fail.
+if (0) {        # This may cause a fail.
     $line = <$in>; chomp($line);
     note $line;
     note Dumper($line, "🐪🐪");

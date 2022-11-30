@@ -1,0 +1,108 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Net::Async::Blockchain::Client::RPC::BTC
+at lib/Net/Async/Blockchain/Client/RPC/BTC.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Net::Async::Blockchain::Client::RPC::BTC - Async BTC RPC Client.
+
+=head1 SYNOPSIS
+
+    my $loop = IO::Async::Loop->new();
+
+    $loop->add(
+        my $http_client = Net::Async::Blockchain::Client::RPC::BTC->new(endpoint => 'http://127.0.0.1:8332', timeout => 100, rpc_user => 'test', rpc_password => 'test')
+    );
+
+    my $response = $http_client->get_transaction('txid...')->get;
+
+=head1 DESCRIPTION
+
+BTC based RPC calls
+
+=over 4
+
+=back
+
+=head2 get_transaction
+
+https://bitcoin-rpc.github.io/en/doc/0.17.99/rpc/wallet/gettransaction/
+
+=over 4
+
+=back
+
+L<Future>
+
+=head2 get_raw_transaction
+
+https://bitcoin-rpc.github.io/en/doc/0.17.99/rpc/rawtransactions/getrawtransaction/
+
+=over 4
+
+=back
+
+L<Future>
+
+=head2 get_block
+
+https://bitcoin-rpc.github.io/en/doc/0.17.99/rpc/wallet/getblock/
+
+=over 4
+
+=back
+
+L<Future>
+
+=head2 validate_address
+
+https://bitcoin-rpc.github.io/en/doc/0.17.99/rpc/util/validateaddress/
+
+=over 4
+
+=back
+
+L<Future>
+
+=head2 get_last_block
+
+https://bitcoin-rpc.github.io/en/doc/0.17.99/rpc/blockchain/getblockcount/
+
+=over 4
+
+=back
+
+L<Future>
+
+=head2 get_block_hash
+
+https://bitcoin-rpc.github.io/en/doc/0.17.99/rpc/blockchain/getblockhash/
+
+=over 4
+
+=back
+
+L<Future>
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Net::Async::Blockchain::Client::RPC>
+
+L<configure|Net::Async::Blockchain::Client::RPC/configure>, L<endpoint|Net::Async::Blockchain::Client::RPC/endpoint>, L<http_client|Net::Async::Blockchain::Client::RPC/http_client>, L<max_connections|Net::Async::Blockchain::Client::RPC/max_connections>, L<rpc_password|Net::Async::Blockchain::Client::RPC/rpc_password>, L<rpc_user|Net::Async::Blockchain::Client::RPC/rpc_user>, L<timeout|Net::Async::Blockchain::Client::RPC/timeout>
+
+=item L<IO::Async::Notifier>
+
+L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/adopt_future>, L<adopted_futures|IO::Async::Notifier/adopted_futures>, L<can_event|IO::Async::Notifier/can_event>, L<children|IO::Async::Notifier/children>, L<configure_unknown|IO::Async::Notifier/configure_unknown>, L<debug_printf|IO::Async::Notifier/debug_printf>, L<get_loop|IO::Async::Notifier/get_loop>, L<invoke_error|IO::Async::Notifier/invoke_error>, L<invoke_event|IO::Async::Notifier/invoke_event>, L<loop|IO::Async::Notifier/loop>, L<make_event_cb|IO::Async::Notifier/make_event_cb>, L<maybe_invoke_event|IO::Async::Notifier/maybe_invoke_event>, L<maybe_make_event_cb|IO::Async::Notifier/maybe_make_event_cb>, L<new|IO::Async::Notifier/new>, L<notifier_name|IO::Async::Notifier/notifier_name>, L<parent|IO::Async::Notifier/parent>, L<remove_child|IO::Async::Notifier/remove_child>, L<remove_from_parent|IO::Async::Notifier/remove_from_parent>
+
+=back
+

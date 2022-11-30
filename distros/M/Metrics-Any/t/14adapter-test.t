@@ -147,6 +147,28 @@ ok( $metrics, '$metrics is still true' );
    );
 }
 
+# batch mode is supported
+{
+   Metrics::Any::Adapter::Test->clear;
+
+   my $called;
+
+   my $batch_ok = $metrics->add_batch_mode_callback( sub {
+      $called++;
+      $metrics->inc_counter_by( abc => 100 );
+      $metrics->set_gauge_to( gauge => 25 );
+   } );
+   ok( $batch_ok, 'Test adapter supports batch mode' );
+
+   ok( !$called, 'Batch mode callback not yet invoked' );
+
+   is( Metrics::Any::Adapter::Test->metrics,
+      "the_ABC_counter = 100\n" .
+      "the_ABC_gauge = 25\n",
+      'Metrics::Any::Adapter::Test->metrics contains batch-reported values' );
+   ok( $called, 'Batch mode callback invoked by ->metrics' );
+}
+
 ok( $metrics, '$metrics is still true at EOF' );
 
 done_testing;

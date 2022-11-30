@@ -1,137 +1,82 @@
 NAME
-    kephra - crossplatform, GUI-Texteditor designed along Perl's Paradigms 
+    Kephra - compact, effective and beautiful coding editor
 
 SYNOPSIS
-        > kephra [<files>]   # start with certain files open
+        kephra [file_name]
+
+    Small single file editor for perl with max editing comfort.
 
 DESCRIPTION
-    This module install's a complete editor application with all its configs
-    and documentation for your programming, web and text authoring.
+    Kephra is an editor from and for programmers, currently at start of
+    rewrite. This page gives you a summary how to use it.
 
-  Philosophy
-  
-    Main Goals
+  File IO
+    Currently just the basics: ASCII and UTF-8 coding. Open, reload, save
+    and saving under different file name. See the menu for key kombos.
 
-    A visually harmonic and beautiful, sparing and elegantly programed Editor,
-    that helpes you with all your daily tasks. It should be also able to operate
-    in the way you prefer and be not afraid to try new things.
+  Editing
+    Basic editing as expected: undo redo, cut copy paste delete. When
+    nothing is selected Ctrl+C copies current line.
 
-    In Depth
-    I know, I know, there are plenty text editors out there, even some really
-    mighty IDE, but still no perfect solution for many programmers. So lets
-    learn from Perl 5 and 6 what it takes to build a tool thats powerful and fun
-    to play with for hours and months.
-    
-    * make a low entry barrier (usable like notepad)
-    * copy what people like and are used to and whats not inherently broken
-    * give choices (TimTowtdi) 
-      * (e.g. deliver vi and emacs input style)
-      * usable with menu, contextmenu, bars, mouse combo, key combos, commands ...
-      * configure via dialog and yaml/conf files ...
-    * highly configurable / adaptable to personal preferences
-    * beauty / good integration on GUI, code and config level
-    * solve things with minimal effort (no bloat / minimal dependencies)
-    * still everything extendable by easy to write plugins
-    
-    I believe strongly that there is much more possible with GUI editors
-    and text editors in general than we are used today. So I try to weave
-    fresh ideas wherever I can and design Kephra in a way, that every 
-    programmer can alter and extend it easily. That can speed up progress
-    or at least makes Kephra more comfortable for you.
+    Slightly more advanced is swapping selection and clipboard
+    (Ctrl+Shift+V) and duplicate current line or selection with Ctrl+D.
+    Ctrl+A grows selection from word to expression to line, block, sub until
+    all is selected and shrink selection is just the opposite
+    (Ctrl+Shift+A).
 
-    That is the plan, but we are currently not nearly that far.
+    Holding Ctrl allows you no navigate with left and right as expected word
+    wise, up and down block wise and page up and page down subroutine wise.
+    If the cursor is next to round a brace character you will navigate the
+    its partner.
 
-  Features
-    Beside all the basic stuff that would you expect from a notepad, we have
-    file sessions, simple templates, recent closed files, and file functions
-    applied to all files, where it makes sense.
-    
-    We have also a pile of advanced text navigation (on braces or blockwise),
-    goto last edit or 10 doc spanning Bookmarks as well as find in files. 
-    
-    Advanced undo, line editing (edit functions that take the current line as
-    input), move selected text by mouse or keyboard. Formating funtions like 
-    blockformat, align blocks, indenting, commenting ...
-    
-    Documents have several properties like syntax styling, auto indention, tab
-    width, tab use, write protection.
+    Holding Alt moves the selected or current line up or down. Left and
+    right indent and dedents char wise in this mode. Normal indent/dedent
+    listens to Tab and Shift+Tab.
 
-    View options contain switches for any GUI element and marker for: current
-    line, end of line bytes, right margin, indetion guides, bracehiglighting,
-    line wrap and font.
+    Ctrl+K toggles comment status of current or selected lines (commented
+    becomes uncommented and vice versa). Ctrl+Shift+K does the same, but
+    with one difference. Ladder are the normal perl comments you might know
+    (called line comments). The first option adds another letter after the
+    pound symbol so that such (block) comments stay commented, even after
+    come actions with Ctrl+Shift+K.
 
-    Every menu and toolbar is evaluated from a simple yaml file, so you can 
-    change it easily by opening this files from the config menu.
+    Bracing characters (including '' and "") are always created in pairs and
+    will embrace the selection.
 
+  Search and Replace
+    Kephra provides all the usual search and replace functions you expect.
+    We made sure all is accessable via menu, searchbar and keyboard. The
+    searchbar expands to replacebar via Strg+Shift+F or the *'='* button.
+    There you can only search for the replace term and refert the current.
+    Available options are: case sensitiv, words only, word starts, Regex,
+    Wrap.
 
-ROADMAP
+    F3 skips to next search term (selection by default) findings, F2 to next
+    marker. Adding shift searhes in reverse order (to previous finding).
+    Alt+F3 replaces selection with replace term and goes to next finding.
+    Adding Shift again reverses order. Ctrl+F takes selection as search term
+    and enters the search bar. Adding Shift takes the selection as replace
+    term and enters the input field for the replace term where you can
+    easily navigate the findings of search (up and down) and replace term
+    (Alt+up/down) and change it in both directions with (Alt+)Enter.
 
-  Overview
-  
-    Stable Release 0.4
+    Ctrl+E jumps to position of last edit.
 
-    This release was about getting the editor liquid or highly configurable.
-    Its also about improvements in the user interface and of course the little
-    things we missed. It also contains interpreter output panel and a notepad.
+PLAN
+    Development is done is stages which are focused on different feature
+    sets. Wer are in stage one called sed, where its all about basic editing
+    with comfort and effectiveness Next stage will be called med and will be
+    about having open several docs. Because *Kephra* is mainly released now
+    on CPAN we will go on with versioning and choose 0.401 instead of 0.01.
 
-    Stable Release 0.5
+    For more please check the TODO file.
 
-    This release is about getting Kephra into the world out there and adding
-    feature that are most needed and removing most hindering barriers.
-
-    Stable Release 0.6
-
-    This release will be about extending Kephra internal extentions and Plugins.
-
-  This Cycle
-
-    Testing 0.4.1 - code folding
-
-    Testing 0.4.2 - folding and GUI refined, movable tabs, 2 more tools, doc data
-
-    Testing 0.4.3 - utf, marker, folding finished, 3 more tools, help links
-
-    Testing 0.4.4 - new mouse control, 2 more tools, docs updated
-
-    Testing 0.4.5 - more encodings, config dialog
-
-    Stable 0.5 - about dialog
-
-  Future
-
-    command line vor vi like usage
-    tree lib extention: snippet lib and toolbox in one
-    file browser
-    Plugin API
-
-Coding support like L<Perl::Tidy>, outlining, help integration, debugger
-autocompletition and so on will be long time goals. Lets see where they fit in.
-
-
-SUPPORT
-    OS: Linux, Mac and Win32 (Basically same es the module named Wx.)
-    
-    Perl: >= 5.6             (we use our :) )
-
-
-AUTHORS
-    * Herbert Breunung <lichtkind@cpan.org> (main author)
-
-    * Jens Neuwerk (author of icons, GUI advisor)
-
-    * Andreas Kaschner (linux and mac ports)
-    
-    * Adam Kennedy <adamk@cpan.org> (cpanification)
- 
-    * Renee Bäcker E<lt>module@renee-baecker.deE<gt> (color picker)
-
-    * many more since we study other editors a lot and also the padre sources
+AUTHOR
+    Herbert Breunung (lichtkind@cpan.org)
 
 COPYRIGHT
-    This Copyright applies only to the "Kephra" Perl software distribution, not 
-    the icons bundled within.
-    
-    Copyright 2004 - 2010 Herbert Breunung. All rights reserved.
-    
-    This program is free software, licensed under the GNU GPL as you can see in
-    the LICENSE file in same directory or under http://www.gnu.org/licenses/.
+    Copyright(c) 2022 by Herbert Breunung
+
+    All rights reserved. This program is free software; you can redistribute
+    it and/or modify it under the GPL version 3.
+

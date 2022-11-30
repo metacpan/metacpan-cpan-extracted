@@ -17,11 +17,11 @@ use List::Util   qw/ pairs /;
 use Module::Load qw/ load /;
 use Net::IP::Match::Trie;
 use Plack::Util;
-use Plack::Util::Accessor qw/ default_rate rules cache file _match greylist /;
+use Plack::Util::Accessor qw/ default_rate rules cache file _match greylist retry_after /;
 use Ref::Util             qw/ is_plain_arrayref /;
 use Time::Seconds         qw/ ONE_MINUTE /;
 
-our $VERSION = 'v0.1.0';
+our $VERSION = 'v0.2.2';
 
 
 sub prepare_app {
@@ -31,10 +31,13 @@ sub prepare_app {
 
     die "default_rate must be a positive integer" unless $self->default_rate =~ /^[1-9][0-9]*$/;
 
+    $self->retry_after( ONE_MINUTE + 1 ) unless defined $self->retry_after;
+    die "retry_after must be a positive integer greater than ${ \ONE_MINUTE} seconds"
+      unless $self->retry_after =~ /^[1-9][0-9]*$/ && $self->retry_after > ONE_MINUTE;
+
     unless ( $self->cache ) {
 
-        my $file = $self->file // "/tmp/greylist";
-        $self->file($file) unless $self->file;
+        my $file = $self->file // die "No cache was set";
 
         load Cache::FastMmap;
 
@@ -68,7 +71,7 @@ sub prepare_app {
     my @blocks;
 
     if ( my $greylist = $self->greylist ) {
-        push @blocks, ( $greylist->%* );
+        push @blocks, ( %{ $greylist } );
     }
 
     $self->rules( my $rules = {} );
@@ -82,7 +85,7 @@ sub prepare_app {
         my $rule  = $line->value;
         $rule = [ split /\s+/, $rule ] unless is_plain_arrayref($rule);
 
-        my ( $rate, $type ) = $rule->@*;
+        my ( $rate, $type ) = @{ $rule };
 
         $rate //= $codes{blacklist};
         $rate = $codes{$rate} if exists $codes{$rate};
@@ -136,7 +139,7 @@ sub call {
                 return [
                     HTTP_TOO_MANY_REQUESTS,
                     [
-                        "Retry-After" => ONE_MINUTE + 1,
+                        "Retry-After" => $self->retry_after,
                     ],
                     ["Too Many Requests"]
                 ];
@@ -164,7 +167,7 @@ Plack::Middleware::Greylist - throttle requests with different rates based on ne
 
 =head1 VERSION
 
-version v0.1.0
+version v0.2.2
 
 =head1 SYNOPSIS
 
@@ -173,6 +176,7 @@ version v0.1.0
   builder {
 
     enable "Greylist",
+      file         => sprintf('/run/user/%u/greylist', $>), # cache file
       default_rate => 250,
       greylist     => {
           '192.168.0.0/24' => 'whitelist',
@@ -197,6 +201,13 @@ robots are like houseflies that repeatedly bump against closed windows.
 This is the default maximum number of hits per minute before requests are rejected, for any request not in the L</greylist>.
 
 Omitting it will disable the global rate.
+
+=head2 retry_after
+
+This sets the C<Retry-After> header value, in seconds. It defaults to 61 seconds, which is the minimum allowed value.
+
+Note that this does not enforce that a client has waited that amount of time before making a new request, as long as the
+number of hits per minute is within the allowed rate.
 
 =head2 greylist
 
@@ -238,9 +249,9 @@ The limit may be larger than L</default_rate>, to allow hosts to exceed the defa
 
 =head2 file
 
-This is the path of the throttle count file used by the L</cache>. If omitted, a default will be set.
+This is the path of the throttle count file used by the L</cache>.
 
-This does not need to be set except for running tests.
+It is required unless you are defining your own L</cache>.
 
 =head2 cache
 
@@ -251,6 +262,9 @@ block).
 
 This does not try and enforce any consistency or block overlapping netblocks.  It trusts L<Net::IP::Match::Trie> to
 handle any overlapping or conflicting network ranges, or to specify exceptions for larger blocks.
+
+Some search engine robots may not respect HTTP 429 responses, and will treat these as errors. You may want to make an
+exception for trusted networks that gives them a higher rate than the default.
 
 =head1 SOURCE
 

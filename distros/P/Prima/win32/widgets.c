@@ -214,7 +214,7 @@ create_group( Handle self, Handle owner, Bool syncPaint, Bool clipOwner,
 			sys last_size. x = r. right  - r. left;
 			sys y_override = sys last_size. y = r. bottom - r. top;
 			sys handle = frame;
-			SetWindowLongPtr( frame, GWLP_USERDATA, ( LONG) self);
+			SetWindowLongPtr( frame, GWLP_USERDATA, (LONG_PTR) self);
 		}
 		break;
 	case WC_CUSTOM:
@@ -249,8 +249,7 @@ create_group( Handle self, Handle owner, Bool syncPaint, Bool clipOwner,
 	sys owner   = ownerView;
 	if ( !reset)
 		sys pointer = LoadCursor( guts. instance, IDC_ARROW);
-	SetWindowLongPtr( ret, GWLP_USERDATA, ( LONG) self);
-
+	SetWindowLongPtr( ret, GWLP_USERDATA, (LONG_PTR) self);
 	if ( reset)
 	{
 		int i;
@@ -1044,6 +1043,8 @@ apc_widget_begin_paint( Handle self, Bool insideOnPaint)
 	apt_set( aptWinPS);
 	apt_set( aptCompatiblePS);
 	apt_assign( aptWM_PAINT, insideOnPaint);
+	sys effective_view. x = var w;
+	sys effective_view. y = var h;
 
 	if ( is_apt( aptLayeredPaint )) {
 		sys ps = sys layered_paint_surface;
@@ -1068,10 +1069,10 @@ apc_widget_begin_paint( Handle self, Bool insideOnPaint)
 		HDC dc;
 
 		GetClipBox( sys ps, &r);
-		var w = r. right  - r. left;
-		var h = r. bottom - r. top;
+		sys effective_view.x = r. right  - r. left;
+		sys effective_view.y = r. bottom - r. top;
 
-		if ( var w == 0 || var h == 0) {
+		if ( sys effective_view.x  == 0 || sys effective_view.y == 0) {
 			if ( !EndPaint(( HWND) var handle, &sys paint_struct)) apiErr;
 			apt_clear( aptWinPS);
 			apt_clear( aptWM_PAINT);
@@ -1092,14 +1093,13 @@ apc_widget_begin_paint( Handle self, Bool insideOnPaint)
 		if ( guts. display_bm_info. bmiHeader. biBitCount == 8)
 			apt_clear( aptCompatiblePS);
 
-		bm = CreateCompatibleBitmap( sys ps, var w, var h);
+		bm = CreateCompatibleBitmap( sys ps, sys effective_view.x, sys effective_view.y);
 
 		if ( bm) {
 			sys ps2 = sys ps;
 			sys ps  = dc;
 			sys stock_bitmap = SelectObject( dc, bm);
 			sys bm = bm;
-			apc_gp_set_transform( self, -r. left, -r. top);
 			sys transform2. x = r. left;
 			sys transform2. y = r. top;
 			apt_set( aptBitmap);
@@ -1129,7 +1129,6 @@ apc_widget_begin_paint( Handle self, Bool insideOnPaint)
 		dsys( owner) ps = sys ps;
 		dsys(owner) transform2. x += ed. x;
 		dsys(owner) transform2. y += so. y - sz. y - ed. y;
-		apc_gp_set_transform( owner, 0, 0);
 		apc_gp_set_text_out_baseline( owner, dsys(owner) options. aptTextOutBaseline);
 
 		saved_dc_state = SaveDC( sys ps );
@@ -1154,16 +1153,11 @@ apc_widget_begin_paint( Handle self, Bool insideOnPaint)
 		RestoreDC( sys ps, saved_dc_state);
 
 		dsys(owner)transform2 = tr;
-		apc_gp_set_transform( owner, 0, 0);
-		dsys( owner) ps = dc;
+		dsys(owner)ps = dc;
 		CWidget( owner)-> end_paint( owner);
 	}
 
 	hwnd_enter_paint( self);
-
-	if ( useRPDraw) {
-		apc_gp_set_transform( self, sys transform. x, sys transform. y);
-	}
 
 	if ( is_apt(aptLayeredPaint)) {
 		Rect r;
@@ -1348,7 +1342,11 @@ apc_widget_end_paint( Handle self)
 	} else if ( is_opt( optBuffered)) {
 		apt_clear( aptBitmap);
 		if ( sys bm != NULL) {
-			if ( !BitBlt( sys ps2, sys transform2. x, sys transform2. y, var w, var h, sys ps, 0, 0, SRCCOPY)) apiErr;
+			if ( !BitBlt( sys ps2,
+				sys transform2. x, sys transform2. y,
+				sys effective_view.x, sys effective_view.y,
+				sys ps, 0, 0, SRCCOPY
+				)) apiErr;
 			if ( sys stock_bitmap)
 				SelectObject( sys ps, sys stock_bitmap);
 			DeleteObject( sys bm);

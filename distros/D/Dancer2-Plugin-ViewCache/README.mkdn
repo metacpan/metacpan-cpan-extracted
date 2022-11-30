@@ -1,0 +1,123 @@
+# NAME
+
+Dancer2::Plugin::ViewCache - Create a code for a guest user to use to view a page
+
+# VERSION
+
+version 1.0001
+
+# SYNOPSIS
+
+In your [Dancer2](https://metacpan.org/pod/Dancer2) application configuration:
+
+    plugins:
+       ViewCache:
+         base_url: 'https://my.server.com'
+         template: 'project/order_acknowledgement'
+
+Then in your application:
+
+    package MyApp;
+    use Dancer2 appname => 'MyApp';
+    # This plugin has been tested with Provider::DBIC, but it should work for others.
+    use Dancer2::Plugin::DBIC;
+    use Dancer2::Plugin::ViewCache;
+
+# DESCRIPTION
+
+This [Dancer2](https://metacpan.org/pod/Dancer2) plugin lets you create a url with a unique code that can be given to a guest user to view 
+a web page without logging into the site.
+
+If delete\_after\_view is set, the generated link will be invalidated after being viewed.
+
+# CONFIGURATION
+
+Example configuration
+
+    plugins:
+       ViewCache:
+          base_url: 'https://my.server.com'         # No default
+          delete_after_view: '1'                    # Default '0'
+          randomize_code_length: '1'                # Default '0'
+          minimum_random_length: '5'                # Default '1'
+          maximum_random_length: '5'                # Default '128'
+          template: 'project/order_acknowledgement' # No default
+
+## base\_url
+
+The base URL that the code will be appended to. E.g.
+https://www.servername.com/
+
+## randomize\_code\_length
+
+Makes the code generated for the guest URL be of random length. Without a random value, the default code length is 128.
+
+## minimum\_random\_length
+
+Minimum length for randomize\_code\_length, default of 1
+
+## maximum\_random\_length
+
+Maximum length for randomize\_code\_length, default of 128
+
+# SUGGESTED SCHEMA
+
+You'll need a table to store the generated URL data named view\_cache. The following example is for Postgres:
+
+## view\_cache Table
+
+    CREATE TABLE view_cache (
+        cache_id  SERIAL NOT NULL PRIMARY KEY,
+        code TEXT NOT NULL UNIQUE,
+        html TEXT NOT NULL,
+        delete_after_view BOOLEAN NOT NULL DEFAULT FALSE,
+        created_dt TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now()
+    );
+
+# KEYWORDS
+
+## generate\_guest\_url(\[ \\%options \])
+
+Stores provided HTML and generates a URL for a guest user to view it with.
+
+The "html" argument is mandatory. This is the HTML that will be displayed by the generated URL.
+
+If the optional $code argument is provided, this will be used in the generated URL. If this is not provided, a random code will be generated and used.
+
+Note: You should not make any calls to this that store values to the database inside a transaction, if you plan to consume them before the transaction ends.
+
+Examples:
+
+    my $url = generate_guest_url({ html => $html});
+
+    my $url = generate_guest_url(
+          code => '123abc',
+          html => $html
+    );
+
+    my $url = generate_guest_url(
+          html => $html,
+          delete_after_view => '1',
+          randomize_code_length => '1'
+    );
+
+# REQUIRES
+
+- [Dancer2::Plugin](https://metacpan.org/pod/Dancer2%3A%3APlugin)
+- [Dancer2::Plugin::DBIC](https://metacpan.org/pod/Dancer2%3A%3APlugin%3A%3ADBIC)
+
+# ROADMAP
+
+- Generate a URL for a PDF or XML file stored on disk
+- Specify a number of days for the link to be active before invalidating
+
+# AUTHOR
+
+Tracey Clark <traceyc@clearbuilt.com>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022 by Clearbuilt.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

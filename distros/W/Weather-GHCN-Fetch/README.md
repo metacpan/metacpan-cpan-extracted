@@ -31,11 +31,12 @@ modules:
 - **ghcn_fetch**, fetches station and/or weather data for reporting
 - **ghcn_extremes**, reports temperature extremes
 - **ghcn_station_counts**, counts active stations by year
+- **ghcn_cacheutil**, lists and removes cache content
 
-The output from all scripts is tab-separated and designed for easy
-import into Excel (or similar) for analysis, reporting and charting.
-**ghcn_extremes** and **ghcn_station_counts** are designed to take the
-output from **ghcn_fetch** via pipeline.
+The output from the first three scripts is tab-separated and designed 
+for easy import into Excel (or similar) for analysis, reporting and 
+charting. **ghcn_extremes** and **ghcn_station_counts** are designed 
+to take the output from **ghcn_fetch** via pipeline.  
 
 ## Testing
 

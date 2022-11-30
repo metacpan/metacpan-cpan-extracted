@@ -75,11 +75,14 @@ my %WriteMakefileArgs = (
   "TEST_REQUIRES" => {
     "Config" => 0,
     "Email::Sender::Transport::Mbox" => 0,
+    "ExtUtils::MakeMaker" => 0,
+    "File::Spec" => 0,
     "Path::Tiny" => "0.060",
+    "Test::More" => 0,
     "Test::Requires::Git" => 0,
     "lib" => 0
   },
-  "VERSION" => "3.3.0",
+  "VERSION" => "3.3.1",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -93,6 +96,8 @@ my %FallbackPrereqs = (
   "Email::Simple" => 0,
   "Encode" => 0,
   "Exporter" => 0,
+  "ExtUtils::MakeMaker" => 0,
+  "File::Spec" => 0,
   "Git::Repository" => 0,
   "Git::Repository::Log" => 0,
   "Git::Repository::Plugin" => 0,

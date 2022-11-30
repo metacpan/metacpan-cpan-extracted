@@ -1,4 +1,7 @@
 Revision history for RF::Component
+1.006	2022-11-14T22:06:04-08:00
+	- Added frequency extrapolation tooling (smart object cloning).  See
+	  POD for details (the ->at method).
 
 1.005	2022-11-13T22:31:50-08:00
 	- Fixed regression in ->save

@@ -1,5 +1,5 @@
 ---
-abstract: 'Custom (x_*) keys in CPAN distribution metadata being used in the wild'
+abstract: 'Catalog of custom (x_*) keys in CPAN distribution metadata being used in the wild'
 author:
   - 'perlancar <perlancar@cpan.org>'
 build_requires:
@@ -19,15 +19,15 @@ name: CPAN-Meta-X
 provides:
   CPAN::Meta::X:
     file: lib/CPAN/Meta/X.pm
-    version: '0.007'
+    version: '0.009'
   CPAN::Meta::X::Old:
     file: lib/CPAN/Meta/X/Old.pm
-    version: '0.007'
+    version: '0.009'
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=CPAN-Meta-X
   homepage: https://metacpan.org/release/CPAN-Meta-X
   repository: git://github.com/perlancar/perl-CPAN-Meta-X.git
-version: '0.007'
+version: '0.009'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -305,7 +305,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::PERLANCAR::Contributing
               name: '@Author::PERLANCAR/PERLANCAR/Contributing'
-              version: '0.292'
+              version: '0.293'
             -
               class: Pod::Weaver::Section::Legal
               name: '@Author::PERLANCAR/Legal'
@@ -313,7 +313,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.780'
+              version: '0.784'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'

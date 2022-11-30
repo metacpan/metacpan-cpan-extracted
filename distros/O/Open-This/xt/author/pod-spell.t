@@ -15,6 +15,7 @@ Alders'
 Anwar
 Atria
 Boris
+Choroba
 Cyrill
 Däppen
 Heumann
@@ -27,6 +28,7 @@ Olaf
 Open
 This
 bdaeppen
+choroba
 cynovg
 github
 jjatria

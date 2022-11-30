@@ -1,5 +1,5 @@
 package Game::TileMap::_Utils;
-$Game::TileMap::_Utils::VERSION = '0.001';
+$Game::TileMap::_Utils::VERSION = '0.002';
 use v5.10;
 use strict;
 use warnings;

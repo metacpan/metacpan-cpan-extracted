@@ -1,0 +1,131 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Net::Async::Blockchain::Client::Websocket
+at lib/Net/Async/Blockchain/Client/Websocket.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Net::Async::Blockchain::Client::Websocket - Async websocket Client.
+
+=head1 SYNOPSIS
+
+    my $loop = IO::Async::Loop->new();
+
+    $loop->add(my $ws_source = Ryu::Async->new());
+
+    $loop->add(
+        my $client = Net::Async::Blockchain::Client::Websocket->new(
+            endpoint => "ws://127.0.0.1:8546",
+        )
+    );
+
+    $client->eth_subscribe('newHeads')->each(sub {print shift->{hash}})->get;
+
+=head1 DESCRIPTION
+
+Auto load the commands as the method parameters for the websocket calls returning them asynchronously.
+
+=over 4
+
+=back
+
+=head2 source
+
+Create an L<Ryu::Source> instance, if it is already defined just return
+the object
+
+=over 4
+
+=back
+
+L<Ryu::Source>
+
+=head2 endpoint
+
+Websocket endpoint
+
+=over 4
+
+=back
+
+URL containing the port if needed
+
+=head2 latest_subscription
+
+Latest subscription sent from this module
+
+=head2 websocket_client
+
+Create an L<Net::Async::WebSocket::Client> instance, if it is already defined just return
+the object
+
+=over 4
+
+=back
+
+L<Net::Async::WebSocket::Client>
+
+=head2 configure
+
+Any additional configuration that is not described on L<IO::Async::Notifier>
+must be included and removed here.
+
+=over 4
+
+=item * C<endpoint>
+
+=back
+
+=head2 _request
+
+Prepare the data to be sent to the websocket and call the request
+
+=over 4
+
+=item * C<method>
+
+=item * C<@_> - any parameter required by the RPC call
+
+=back
+
+L<Ryu::Source>
+
+=head2 shutdown
+
+run the configured shutdown action if any
+
+=over 4
+
+=item * C<error> error message
+
+=back
+
+=head2 eth_subscribe
+
+Subscribe to an event
+
+=over 4
+
+=item * C<method>
+
+=item * C<@_> - any parameter required by the RPC call
+
+=back
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<IO::Async::Notifier>
+
+L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/adopt_future>, L<adopted_futures|IO::Async::Notifier/adopted_futures>, L<can_event|IO::Async::Notifier/can_event>, L<children|IO::Async::Notifier/children>, L<configure_unknown|IO::Async::Notifier/configure_unknown>, L<debug_printf|IO::Async::Notifier/debug_printf>, L<get_loop|IO::Async::Notifier/get_loop>, L<invoke_error|IO::Async::Notifier/invoke_error>, L<invoke_event|IO::Async::Notifier/invoke_event>, L<loop|IO::Async::Notifier/loop>, L<make_event_cb|IO::Async::Notifier/make_event_cb>, L<maybe_invoke_event|IO::Async::Notifier/maybe_invoke_event>, L<maybe_make_event_cb|IO::Async::Notifier/maybe_make_event_cb>, L<new|IO::Async::Notifier/new>, L<notifier_name|IO::Async::Notifier/notifier_name>, L<parent|IO::Async::Notifier/parent>, L<remove_child|IO::Async::Notifier/remove_child>, L<remove_from_parent|IO::Async::Notifier/remove_from_parent>
+
+=back
+

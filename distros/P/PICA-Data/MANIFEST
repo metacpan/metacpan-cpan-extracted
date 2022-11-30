@@ -37,6 +37,7 @@ script/picadata
 t/00-load.t
 t/10-data.t
 t/12-clean.t
+t/13-sort-subfields.t
 t/14-sort.t
 t/15-path.t
 t/16-match.t
@@ -46,6 +47,7 @@ t/25-encoding.t
 t/30-writer.t
 t/40-holdings.t
 t/50-schema.t
+t/52-subfield-schedule.t
 t/60-schema-builder.t
 t/70-guess.t
 t/80-picadata.t
@@ -65,6 +67,5 @@ t/files/schema-tests.yaml
 t/files/slim_ppxml.xml
 t/files/sru_picaxml.xml
 t/files/sru_ppxml.xml
-xt/perltidy.t
 META.yml
 MANIFEST

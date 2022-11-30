@@ -33,7 +33,7 @@ share {
   # - schannel is the native SSL on windows
   if($^O eq 'MSWin32')
   {
-    unshift @acflags, '--with-schannel', '--without-ssl';
+    unshift @acflags, '--with-schannel';
     undef $alien_ssl;
   }
   # - libressl is the native SSL on openbsd and would be expected to be used there.
@@ -118,8 +118,29 @@ share {
 
   my $ffi_target = '%{.install.autoconf_prefix}/dynamic';
   ffi {
+
+    my $patch_makefile = sub {
+      my ($build) = @_;
+  
+      #  should also check curl version as change is not needed from 7.88
+      return if $^O ne 'MSWin32';
+  
+      my $target_file = "src/Makefile";
+      $build->log ("Patching $target_file for share build");
+      
+      my $target_text
+        = quotemeta '$(LIBTOOL) --tag=RC --mode=compile $(RC) -I$(top_srcdir)/include';
+      my $new_text
+        = '$(RC) -I$(top_srcdir)/include';
+  
+      Path::Tiny->new($target_file)->edit_raw(sub {s/^(\s+)$target_text/$1$new_text/ms});
+  
+      return;
+    };
+
     build [
       "%{configure} --enable-shared --disable-static --bindir=$ffi_target --libdir=$ffi_target @acflags",
+      $patch_makefile,
       '%{make}',
       '%{make} install',
       sub {

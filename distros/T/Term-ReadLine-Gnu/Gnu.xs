@@ -36,6 +36,23 @@ extern "C" {
 #define CONST const
 #endif /* (RL_READLINE_VERSION >= 0x0402) */
 
+/* from GNU Readline:xmalloc.h */
+#ifndef PTR_T
+#ifdef __STDC__
+#  define PTR_T void *
+#else
+#  define PTR_T char *
+#endif
+#endif /* !PTR_T */
+
+/* from GNU Readline:xmalloc.h */
+extern PTR_T xmalloc (size_t);
+extern PTR_T xrealloc (PTR_T, size_t);
+extern void xfree (PTR_T);
+
+extern char *tgetstr (const char *, char **);
+extern int tputs (const char *, int, int (*)(int));
+
 typedef char *  t_utf8;                 /* string which must not be xfreed */
 typedef char *  t_utf8_free;            /* string which must be xfreed */
 
@@ -302,7 +319,6 @@ static void rl_echo_signal_char(int sig){}
 static rl_dequote_func_t *rl_filename_rewrite_hook;
 
 /* Convenience function that discards, then frees, MAP. */
-static void xfree(void *);
 static void
 rl_free_keymap (map)
      Keymap map;
@@ -381,20 +397,8 @@ static rl_hook_func_t *rl_timeout_event_hook = NULL;
 /*
  * utility/dummy functions
  */
-/* from GNU Readline:xmalloc.h */
-#ifndef PTR_T
-#ifdef __STDC__
-#  define PTR_T void *
-#else
-#  define PTR_T char *
-#endif
-#endif /* !PTR_T */
-
-/* from GNU Readline:xmalloc.c */
-extern PTR_T xmalloc (int);
-extern char *tgetstr (const char *, char **);
-extern int tputs (const char *, int, int (*)(int));
-
+#if 0
+/* Added in 2000.  Removed in 2022. */
 /*
  * Using xfree() in GNU Readline Library causes problem with Solaris
  * 2.5.  It seems that the DLL mechanism of Solaris 2.5 links another
@@ -409,7 +413,7 @@ xfree (string)
   if (string)
     free (string);
 }
-
+#endif
 static char *
 dupstr(s)                       /* duplicate string */
      CONST char * s;
@@ -1372,7 +1376,7 @@ attempted_completion_function_wrapper(text, start, end)
   XPUSHs(sv_2mortal(newSViv(end)));
   PUTBACK;
 
-  count = call_sv(fn_tbl[ATMPT_COMP].callback, G_ARRAY);
+  count = call_sv(fn_tbl[ATMPT_COMP].callback, G_LIST);
 
   SPAGAIN;
 
@@ -1528,7 +1532,7 @@ ignore_some_completions_function_wrapper(matches)
   }
   PUTBACK;
 
-  count = call_sv(fn_tbl[IGNORE_COMP].callback, G_ARRAY);
+  count = call_sv(fn_tbl[IGNORE_COMP].callback, G_LIST);
 
   SPAGAIN;
 
@@ -1768,7 +1772,7 @@ static SV *callback_handler_callback = NULL;
 
 static void
 callback_handler_wrapper(line)
-     char *line;
+     CONST char *line;
 {
   dSP;
 
@@ -1999,7 +2003,7 @@ _rl_unbind_command(command, map = rl_get_keymap())
 
 int
 _rl_bind_keyseq(keyseq, function, map = rl_get_keymap())
-        const char *keyseq
+        CONST char *keyseq
         rl_command_func_t *     function
         Keymap map
     PROTOTYPE: $$;$
@@ -2027,7 +2031,7 @@ _rl_set_key(keyseq, function, map = rl_get_keymap())
 
 int
 _rl_bind_keyseq_if_unbound(keyseq, function, map = rl_get_keymap())
-        const char *keyseq
+        CONST char *keyseq
         rl_command_func_t *     function
         Keymap map
     PROTOTYPE: $$;$
@@ -2071,7 +2075,7 @@ _rl_generic_bind_macro(keyseq, macro, map = rl_get_keymap())
 
 void
 rl_parse_and_bind(line)
-        char *  line
+        CONST char *  line
     PROTOTYPE: $
     CODE:
         {
@@ -2328,7 +2332,7 @@ rl_show_char(i)
 
 int
 _rl_message(text)
-        const char *    text
+        CONST char *    text
     PROTOTYPE: $
     CODE:
         RETVAL = rl_message(text);
@@ -2353,12 +2357,12 @@ rl_restore_prompt()
 
 int
 rl_expand_prompt(prompt)
-        # should be defined as 'const char *'
+        # do not defined as 'CONST char *'
         char *          prompt
 
 int
 rl_set_prompt(prompt)
-        const char *    prompt
+        CONST char *    prompt
 
  #
  #      2.4.7 Modifying Text
@@ -2443,8 +2447,8 @@ rl_timeout_remaining()
     PPCODE:
         {
           int ret;
-          U8 gimme = GIMME_V; // https://perldoc.perl.org/perlcall#Using-GIMME_V
-          if (gimme == G_ARRAY) {
+          U8 gimme = GIMME_V; /* https://perldoc.perl.org/perlcall#Using-GIMME_V */
+          if (gimme == G_LIST) {
             unsigned int secs, usecs;
             ret = rl_timeout_remaining(&secs, &usecs);
             EXTEND(sp, 3);
@@ -2455,7 +2459,7 @@ rl_timeout_remaining()
             ret = rl_timeout_remaining(NULL, NULL);
             EXTEND(sp, 1);
             PUSHs(sv_2mortal(newSViv(ret)));
-          } else {  // G_VOID
+          } else {  /* G_VOID */
             XSRETURN(0);
           }
         }
@@ -2532,7 +2536,7 @@ MODULE = Term::ReadLine::Gnu    PACKAGE = Term::ReadLine::Gnu::XS
 
 void
 rl_replace_line(text, clear_undo = 0)
-        const char *text
+        CONST char *text
         int clear_undo
     PROTOTYPE: $;$
 
@@ -2717,7 +2721,7 @@ rl_get_termcap(cap)
 
 void
 rl_callback_handler_install(prompt, lhandler)
-        const char *    prompt
+        CONST char *    prompt
         SV *            lhandler
     PROTOTYPE: $$
     CODE:
@@ -2889,13 +2893,13 @@ rl_completion_matches(text, fn = NULL)
 
 t_utf8_free
 rl_filename_completion_function(text, state)
-        const char *    text
+        CONST char *    text
         int state
     PROTOTYPE: $$
 
 t_utf8_free
 rl_username_completion_function(text, state)
-        const char *    text
+        CONST char *    text
         int state
     PROTOTYPE: $$
 
@@ -3227,7 +3231,7 @@ MODULE = Term::ReadLine::Gnu            PACKAGE = Term::ReadLine::Gnu::Var
 
 void
 _rl_store_str(pstr, id)
-        const char *    pstr
+        CONST char *    pstr
         int id
     PROTOTYPE: $$
     CODE:
@@ -3272,7 +3276,7 @@ _rl_store_str(pstr, id)
 
 void
 _rl_store_rl_line_buffer(pstr)
-        const char *    pstr
+        CONST char *    pstr
     PROTOTYPE: $
     CODE:
         {

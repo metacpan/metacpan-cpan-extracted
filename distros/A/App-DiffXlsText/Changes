@@ -1,3 +1,21 @@
+0.011   2022-09-08  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Mention App::DiffPDFText.
+
+
+0.010   2022-09-08  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [pod] Fix heading level in POD.
+
+        - [doc] Mention App::DiffDocText.
+
+        - Tweak script's abstract.
+
+
 0.009   2022-09-07  Released-By: PERLANCAR; Urgency: medium
 
         - Spreadsheet-Read's CLI is now xlsx2csv.

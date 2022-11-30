@@ -14,7 +14,7 @@ $t->get_ok('/error')
   ->text_is('div.notify','Example')
   ;
 
-$t->get_ok('/error?_format=json&format=json')
+$t->get_ok('/error?_format=json')
   ->json_is('/notifications/0/1','Example')
   ;
 

@@ -1,5 +1,23 @@
 Revision history for Future-AsyncAwait
 
+0.61    2022-11-21
+        [BUGFIXES]
+         * Fix for some C compilers which get upset about variable
+           declarations having goto labels
+
+0.60    2022-11-21
+        [CHANGES]
+         * Added entirely new extension API based on structs of hook functions
+           registered with the module; similar to Object::Pad and XS::Parse::*
+         * Provide Future::AsyncAwait::ExtensionBuilder in a similar fashion
+           to above
+         * Added some more internal assert() and TRACEPRINT calls for
+           debugging
+
+        [BUGFIXES]
+         * Don't crash if an async sub's returning future is abandoned outside
+           of an await state
+
 0.59    2022-09-23
         [BUGFIXES]
          * Fix broken Future->get method resolution on recent

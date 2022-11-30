@@ -6,6 +6,12 @@
 #define Rect xxRect
 #define Color xxColor
 #define Point xxPoint
+#ifdef _MSC_VER
+#undef __inline__
+#define __inline__ inline
+#undef __extension__
+#define __extension__
+#endif
 #include <gdiplus/gdiplus.h>
 #undef Rect
 #undef Color
@@ -82,10 +88,6 @@ typedef HANDLE SOCKETHANDLE;
 #define WC_MENU         4
 #define WC_POPUP        5
 
-#define exsLinePattern  1
-#define exsLineEnd      2
-#define exsLineJoin     4
-
 #define stbPen          0x01
 #define stbBrush        0x02
 #define stbText         0x04
@@ -143,9 +145,10 @@ typedef HANDLE SOCKETHANDLE;
 #define objCheck          if ( var stage == csDead) return
 #define dobjCheck(handle) if ((( PObject)handle)-> stage == csDead) return
 
-#define SHIFT_X(X)    X + sys gp_transform.x
-#define SHIFT_Y(Y)    sys last_size.y - (Y) - 1 + sys gp_transform.y
-#define SHIFT_XY(X,Y) X += sys gp_transform.x,Y = sys last_size.y - (Y) - 1 + sys gp_transform.y
+#define SHIFT_X(X)     X -= sys transform2.x
+#define SHIFT_Y(Y)     Y = sys last_size.y - (Y) - 1 - sys transform2.y
+#define SHIFT_XY(X,Y)  if ( 1 ) { SHIFT_X(X); SHIFT_Y(Y); }
+#define SHIFT_POINT(P) SHIFT_XY(P.x,P.y)
 
 typedef struct _HandleOptions_ {
 	unsigned aptWM_PAINT             : 1;       // true if inside WM_PAINT
@@ -248,6 +251,7 @@ typedef struct _WinGuts
 	char           language_descr[32];
 	Bool           application_stop_signal;
 	long           apc_error;
+	Bool           wc2mb_is_fragile;     // cannot properly process current ACP
 } WinGuts, *PWinGuts;
 
 typedef struct _WindowData
@@ -338,15 +342,11 @@ typedef struct _PaintSaveData
 	Bool           antialias, fill_mode;
 	int            alpha;
 	Color          fg, bg;
-	float          line_width;
-	int            line_end, line_join;
 	unsigned char *line_pattern;
 	int            line_pattern_len;
-	float          miter_limit;
 	FillPattern    fill_pattern;
 	Point          fill_pattern_offset;
 	int            rop, rop2;
-	Point          transform;
 	Font           font;
 	Bool           text_opaque, text_out_baseline;
 } PaintSaveData, *PPaintSaveData;
@@ -393,15 +393,13 @@ typedef struct {
 	LOGPEN         logpen;
 	Bool           geometric;
 	DWORD          style;
-	DWORD          line_end;
-	DWORD          line_join;
 	LinePattern   *line_pattern;
 } RQPen, *PRQPen;
 
 typedef struct {
 	int            type;
 	LOGBRUSH       logbrush;
-	COLORREF       back_color;
+	COLORREF       color, back_color;
 	FillPattern    fill_pattern;
 } RQBrush, *PRQBrush;
 
@@ -427,7 +425,7 @@ typedef struct _PaintState
 		RQPen      rq_pen;
 		RQBrush    rq_brush;
 		PDCFont    dc_font;
-		float      font_sin, font_cos, line_width;
+		float      font_sin, font_cos;
 	} paint;
 	struct {
 		HPALETTE   palette;
@@ -482,18 +480,12 @@ typedef struct _DrawableData
 	/* HDC attributes storage outside paint mode */
 	Color          fg, bg;
 	int            fill_mode;
-	float          line_width;
-	int            line_end;
-	int            line_join;
 	unsigned char *line_pattern;
 	int            line_pattern_len;
 	FillPattern    fill_pattern;
 	Point          fill_pattern_offset;
 	int            rop;
 	int            rop2;
-	float          miter_limit;
-	Point          transform;
-	Point          gp_transform;
 
 	/* Basic widget fields */
 	HWND           handle;              // Windows handle of a widget
@@ -512,6 +504,7 @@ typedef struct _DrawableData
 	HDC            ps2;                 // original HDC
 	HPALETTE       pal2;                // original palette
 	Point          transform2;          // necessary additional transposition
+	Point          effective_view;      // area to be drawn, possibly with a backed bitmap
 
 	/* Positioning support fields */
 	Point          last_size;           // last actual size
@@ -678,7 +671,7 @@ extern Bool         aa_glyphs_out( Handle self, PGlyphsOutRec t, int x, int y, i
 extern void         aa_free_arena(Handle self, Bool for_reuse);
 extern WCHAR *      alloc_utf8_to_wchar( const char * utf8, int length, int * mb_len);
 extern WCHAR *      alloc_utf8_to_wchar_visual( const char * utf8, int length, int * mb_len);
-extern WCHAR *      alloc_ascii_to_wchar( const char * text, int length);
+extern WCHAR *      alloc_ascii_to_wchar( const char * text, int *length);
 extern char *       alloc_wchar_to_utf8( WCHAR * src, int * len );
 extern int          apcUpdateWindow( HWND wnd );
 extern int          arc_completion( double * angleStart, double * angleEnd, int * needFigure);
@@ -767,7 +760,6 @@ extern PDCObject    stylus_fetch( void * key );
 extern Bool         stylus_is_complex(Handle self);
 extern Bool         stylus_is_geometric( Handle self);
 extern void         stylus_release( Handle self );
-extern DWORD        stylus_get_extpen_style( Handle self );
 extern GpPen*       stylus_gp_get_pen(int line_width, uint32_t color);
 extern HPEN         stylus_get_pen( DWORD style, DWORD line_width, COLORREF color );
 extern HBRUSH       stylus_get_solid_brush( COLORREF color );

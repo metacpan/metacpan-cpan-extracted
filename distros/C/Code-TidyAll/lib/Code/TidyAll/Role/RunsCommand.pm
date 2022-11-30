@@ -3,7 +3,7 @@ package Code::TidyAll::Role::RunsCommand;
 use strict;
 use warnings;
 
-use IPC::Run3 qw(run3);
+use IPC::Run3       qw(run3);
 use List::SomeUtils qw(any);
 use Specio::Library::Builtins;
 use Specio::Library::Numeric;
@@ -12,7 +12,7 @@ use Try::Tiny;
 
 use Moo::Role;
 
-our $VERSION = '0.82';
+our $VERSION = '0.83';
 
 has ok_exit_codes => (
     is      => 'ro',
@@ -74,7 +74,7 @@ Code::TidyAll::Role::RunsCommand - A role for plugins which run external command
 
 =head1 VERSION
 
-version 0.82
+version 0.83
 
 =head1 SYNOPSIS
 

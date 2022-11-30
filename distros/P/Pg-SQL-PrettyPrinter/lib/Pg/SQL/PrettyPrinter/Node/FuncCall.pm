@@ -71,6 +71,7 @@ sub new {
         'funcname',
         'args',
         'agg_filter',
+        'agg_order',
         map { [ 'over', $_ ] } qw( orderClause partitionClause startOffset endOffset )
     );
 
@@ -249,16 +250,30 @@ sub as_text {
     if ( exists $self->{ 'agg_filter' } ) {
         $suffix .= ' FILTER ( WHERE ' . $self->{ 'agg_filter' }->as_text . ' )';
     }
+    my $agg_order = $self->get_agg_order();
 
-    return $self->func_name . '(*)' . $suffix if $self->{ 'agg_star' };
-    return $self->func_name . '()' . $suffix unless exists $self->{ 'args' };
+    if ( $self->{ 'agg_star' } ) {
+        my $internal = $agg_order ? " * ${agg_order} " : '*';
+        return sprintf( '%s(%s)%s', $self->func_name, $internal, $suffix );
+    }
+    unless ( exists $self->{ 'args' } ) {
+        return $self->func_name . '()' . $suffix unless $agg_order;
+        return $self->func_name . "( ${agg_order} )" . $suffix;
+    }
 
     my @args_as_text = map { $_->as_text } @{ $self->{ 'args' } };
     if ( $self->{ 'func_variadic' } ) {
         $args_as_text[ -1 ] = 'VARIADIC ' . $args_as_text[ -1 ];
     }
     my $args_str = join( ', ', @args_as_text );
+    $args_str .= ' ' . $agg_order if $agg_order;
     return $self->func_name . '( ' . $args_str . ' )' . $suffix;
+}
+
+sub get_agg_order {
+    my $self = shift;
+    return '' unless exists $self->{ 'agg_order' };
+    return sprintf( 'ORDER BY %s', join( ', ', map { $_->as_text } @{ $self->{ 'agg_order' } } ) );
 }
 
 sub pretty_print {
@@ -268,15 +283,23 @@ sub pretty_print {
     if ( exists $self->{ 'agg_filter' } ) {
         $suffix .= ' FILTER ( WHERE ' . $self->{ 'agg_filter' }->as_text . ' )';
     }
+    my $agg_order = $self->get_agg_order();
 
-    return $self->func_name . '(*)' . $suffix if $self->{ 'agg_star' };
-    return $self->func_name . '()' . $suffix unless exists $self->{ 'args' };
+    if ( $self->{ 'agg_star' } ) {
+        my $internal = $agg_order ? " * ${agg_order} " : '*';
+        return sprintf( '%s(%s)%s', $self->func_name, $internal, $suffix );
+    }
+    unless ( exists $self->{ 'args' } ) {
+        return $self->func_name . '()' . $suffix unless $agg_order;
+        return $self->func_name . "( ${agg_order} )" . $suffix;
+    }
 
     my @args_as_text = map { $_->as_text } @{ $self->{ 'args' } };
     if ( $self->{ 'func_variadic' } ) {
         $args_as_text[ -1 ] = 'VARIADIC ' . $args_as_text[ -1 ];
     }
     my $args_str = join( ', ', @args_as_text );
+    $args_str .= ' ' . $agg_order if $agg_order;
     if (   ( 1 == scalar @{ $self->{ 'args' } } )
         && ( 40 > length( $args_str ) ) )
     {
@@ -290,6 +313,7 @@ sub pretty_print {
     }
     push @lines, map { $self->increase_indent( $_ ) . ',' } @args_pp;
     $lines[ -1 ] =~ s/,\z//;
+    push @lines, $self->increase_indent( $agg_order ) if $agg_order;
     push @lines, ')' . $suffix;
     return join( "\n", @lines );
 }

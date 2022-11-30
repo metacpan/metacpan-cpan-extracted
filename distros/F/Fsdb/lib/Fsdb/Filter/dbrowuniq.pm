@@ -2,7 +2,7 @@
 
 #
 # dbrowuniq.pm
-# Copyright (C) 1997-2020 by John Heidemann <johnh@isi.edu>
+# Copyright (C) 1997-2022 by John Heidemann <johnh@isi.edu>
 #
 # This program is distributed under terms of the GNU general
 # public license, version 2.  See the file COPYING
@@ -62,7 +62,9 @@ The new column is named by the C<-N> argument, defaulting to C<count>.
 =item B<-N> on B<--new-name>
 
 Specify the name of the count column, if any.
-(Default is C<count>.)
+Please specify the type with the name, if desired
+(allowing one to pick sizes smaller than the default quad, if desired).
+(Default is C<count:q>.)
 
 =item B<-I> on B<--incremental>
 
@@ -283,7 +285,7 @@ sub set_defaults ($) {
     $self->{_which} = 'F';
     $self->{_incremental} = undef;
     $self->{_uniquifying_cols} = [];
-    $self->{_destination_column} = 'count';
+    $self->{_destination_column} = 'count:q';
     $self->{_header} = undef;
 }
 
@@ -336,20 +338,21 @@ sub setup ($) {
     $self->finish_io_option('input', @finish_args);
 
     if ($#{$self->{_uniquifying_cols}} == -1) {
-	foreach (@{$self->{_in}->cols}) {
+        my($destination_column_name) = $self->{_in}->colspec_to_name_type_spec($self->{_destination_column});
+	foreach (@{$self->{_in}->cols()}) {
 	    push (@{$self->{_uniquifying_cols}}, $_)
-		if ($_ ne $self->{_destination_column});
+		if ($_ ne $destination_column_name);
 	};
     } else {
 	foreach (@{$self->{_uniquifying_cols}}) {
 	    croak($self->{_prog} . ": unknown column ``$_''.\n")
-		if (!defined($self->{_in}->col_to_i($_)));
+		if (!defined($self->{_in}->colspec_to_i($_)));
 	};
     };
 
     $self->finish_io_option('output', -clone => $self->{_in}, -outputheader => 'delay');
     if ($self->{_count}) {
-	if ($self->{_out}->col_to_i($self->{_destination_column})) {
+	if ($self->{_out}->colspec_to_i($self->{_destination_column})) {
 	    if (!$self->{_incremental}) {
 		croak($self->{_prog} . ": cannot create column " . $self->{_destination_column} . " (it already exists)\n");
 	    };
@@ -373,8 +376,13 @@ sub run ($) {
 
     my $read_fastpath_sub = $self->{_in}->fastpath_sub();
     my $write_fastpath_sub = $self->{_out}->fastpath_sub();
-    my $count_coli = $self->{_out}->col_to_i($self->{_destination_column});
-
+    my $count_coli = undef;
+    if ($self->{_count}) {
+        $count_coli = $self->{_out}->colspec_to_i($self->{_destination_column});
+        die("internal error: cannot find count_coli for " . $self->{_destination_column} . "\n")
+            if (!defined($count_coli));
+    };
+    
     my $first_prev_fref = [];
     my $last_prev_fref = [];
     my $output_fref = [];
@@ -383,7 +391,7 @@ sub run ($) {
 
     my $check_code = '1';
     foreach (@{$self->{_uniquifying_cols}}) {
-	my $coli = $self->{_in}->col_to_i($_);
+	my $coli = $self->{_in}->colspec_to_i($_);
 	croak($self->{_prog} . ": internal error, cannot find column $_ even after checking already.\n")
 	    if (!defined($coli));
 	$check_code .= " && (\$first_prev_fref->[$coli] eq \$this_fref->[$coli])";
@@ -454,7 +462,7 @@ sub run ($) {
 
 =head1 AUTHOR and COPYRIGHT
 
-Copyright (C) 1997-2020 by John Heidemann <johnh@isi.edu>
+Copyright (C) 1997-2022 by John Heidemann <johnh@isi.edu>
 
 This program is distributed under terms of the GNU general
 public license, version 2.  See the file COPYING

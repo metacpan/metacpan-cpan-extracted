@@ -6,9 +6,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-10'; # DATE
+our $DATE = '2022-11-22'; # DATE
 our $DIST = 'App-SubtitleUtils'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 our %SPEC;
 
@@ -115,7 +115,7 @@ srtsplit - Split .srt by duration
 
 =head1 VERSION
 
-This document describes version 0.008 of srtsplit (from Perl distribution App-SubtitleUtils), released on 2022-11-10.
+This document describes version 0.011 of srtsplit (from Perl distribution App-SubtitleUtils), released on 2022-11-22.
 
 =head1 SYNOPSIS
 

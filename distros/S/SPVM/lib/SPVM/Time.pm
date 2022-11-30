@@ -27,9 +27,9 @@ C<Time> is a module to manipulate time.
 
 =head2 time
 
-  static method time : long ()
+  static method time : long ();
 
-Get the current epoch time. 
+Gets the current epoch time. 
 
 This method is the same as C<time> function of C<Linux>.
 
@@ -37,9 +37,9 @@ This method is the same as C<time> function of C<Linux>.
 
 =head2 localtime
 
-  static method localtime : Time::Info ($time : long)
+  static method localtime : Time::Info ($time : long);
 
-Convert an epoch time to the L<Time::Info|SPVM::Time::Info> object that is local time.
+Converts an epoch C<$time> to the L<Time::Info|SPVM::Time::Info> object that is local time.
 
 This method is the same as C<localtime> function of C<Linux>.
 
@@ -47,9 +47,9 @@ This method is the same as C<localtime> function of C<Linux>.
 
 =head2 gmtime
 
-  static method gmtime : Time::Info ($time : long)
+  static method gmtime : Time::Info ($time : long);
 
-Convert an epoch time to the L<Time::Info|SPVM::Time::Info> object that is C<UTC>.
+Converts an epoch C<$time> to the L<Time::Info|SPVM::Time::Info> object that is C<UTC>.
 
 This method is the same as C<gmtime> function of C<Linux>.
 

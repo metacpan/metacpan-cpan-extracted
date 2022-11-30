@@ -103,62 +103,6 @@ sub point2pixel
 	return @res;
 }
 
-our $PI = 3.14159265358979323846264338327950288419716939937510;
-our $RAD = 180.0 / $PI;
-
-# L.Maisonobe 2003
-# http://www.spaceroots.org/documents/ellipse/elliptical-arc.pdf
-sub arc2cubics
-{
-	my ( $self, $x, $y, $dx, $dy, $start, $end) = @_;
-
-	my ($reverse, @out);
-	($start, $end, $reverse) = ( $end, $start, 1 ) if $start > $end;
-
-	push @out, $start;
-	# see defects appearing after 45 degrees:
-	# https://pomax.github.io/bezierinfo/#circles_cubic
-	while (1) {
-		if ( $end - $start > 45 ) {
-			push @out, $start += 45;
-			$start += 45;
-		} else {
-			push @out, $end;
-			last;
-		}
-	}
-	@out = map { $_ / $RAD } @out;
-
-	my $rx = $dx / 2;
-	my $ry = $dy / 2;
-
-	my @cubics;
-	for ( my $i = 0; $i < $#out; $i++) {
-		my ( $a1, $a2 ) = @out[$i,$i+1];
-		my $b           = $a2 - $a1;
-		my ( $sin1, $cos1, $sin2, $cos2) = ( sin($a1), cos($a1), sin($a2), cos($a2) );
-		my @d1  = ( -$rx * $sin1, -$ry * $cos1 );
-		my @d2  = ( -$rx * $sin2, -$ry * $cos2 );
-		my $tan = sin( $b / 2 ) / cos( $b / 2 );
-		my $a   = sin( $b ) * (sqrt( 4 + 3 * $tan * $tan) - 1) / 3;
-		my @p1  = ( $rx * $cos1, $ry * $sin1 );
-		my @p2  = ( $rx * $cos2, $ry * $sin2 );
-		my @points = (
-			@p1,
-			$p1[0] + $a * $d1[0],
-			$p1[1] - $a * $d1[1],
-			$p2[0] - $a * $d2[0],
-			$p2[1] + $a * $d2[1],
-			@p2
-		);
-		$points[$_] += $x for 0,2,4,6;
-		$points[$_] += $y for 1,3,5,7;
-		@points[0,1,2,3,4,5,6,7] = @points[6,7,4,5,2,3,0,1] if $reverse;
-		push @cubics, \@points;
-	}
-	return \@cubics;
-}
-
 sub conic2curve
 {
 	my ($self, $x0, $y0, $x1, $y1, $x2, $y2) = @_;
@@ -193,6 +137,14 @@ sub spool
 	return 1;
 }
 
+sub is_custom_line
+{
+	my ($self, $for_closed_shapes) = shift;
+	return $self->{lineEnd_flags} ? (
+		$for_closed_shapes ? ( $self->{lineEnd_flags} & 2 ) : 1
+	) : 0;
+}
+
 # properties
 
 sub color
@@ -211,12 +163,41 @@ sub fillPatternOffset
 	$_[0]-> {changed}-> {fillPatternOffset} = 1;
 }
 
+sub lineTail  { shift->line_properties( lineTail  => @_ ); }
+sub lineHead  { shift->line_properties( lineHead  => @_ ); }
+sub arrowTail { shift->line_properties( arrowTail => @_ ); }
+sub arrowHead { shift->line_properties( arrewHead => @_ ); }
+
+sub update_custom_line
+{
+	my ( $self, $le ) = @_;
+	$le //= $self->SUPER::lineEnd;
+	my $lp = (length($self->linePattern) > 1) ? 1 : 0;
+	$self->{lineEnd_flags} = ref($le) ? 1 : $lp;
+	if ( $self->{lineEnd_flags} ) {
+		$self->{lineEnd_flags} |= 2 if $lp || defined($le->[2]) || defined($le->[3]);
+	} else {
+		$self-> {changed}-> {lineEnd} = 1;
+	}
+}
+
+sub line_properties
+{
+	my ( $self, $lp, @cmd ) = @_;
+	$lp = "SUPER::" . $lp;
+	return $self-> $lp unless @cmd;
+	$self->$lp(@cmd);
+	return unless $self-> {can_draw};
+	$self-> update_custom_line;
+}
+
 sub lineEnd
 {
 	return $_[0]-> SUPER::lineEnd unless $#_;
-	$_[0]-> SUPER::lineEnd($_[1]);
-	return unless $_[0]-> {can_draw};
-	$_[0]-> {changed}-> {lineEnd} = 1;
+	my ( $self, $le ) = @_;
+	$self-> SUPER::lineEnd($le);
+	return unless $self-> {can_draw};
+	$self-> update_custom_line( $le );
 }
 
 sub lineJoin
@@ -239,6 +220,7 @@ sub linePattern
 	$_[0]-> SUPER::linePattern($_[1]);
 	return unless $_[0]-> {can_draw};
 	$_[0]-> {changed}-> {linePattern} = 1;
+	$_[0]-> update_custom_line;
 }
 
 sub lineWidth
@@ -277,20 +259,20 @@ sub rop2
 	$self-> SUPER::rop2( $rop);
 }
 
-sub translate
-{
-	return $_[0]-> SUPER::translate unless $#_;
-	my $self = shift;
-	$self-> SUPER::translate(@_);
-	$self-> change_transform;
-}
-
 sub clipRect
 {
 	return @{$_[0]-> {clipRect}} unless $#_;
 	$_[0]-> {clipRect} = [@_[1..4]];
 	$_[0]-> {region} = undef;
 	$_[0]-> change_transform;
+}
+
+sub matrix
+{
+	return $_[0]->SUPER::matrix unless $#_;
+	my ( $self, @m ) = @_;
+	$self->SUPER::matrix(@m);
+	$self->change_transform;
 }
 
 sub region
@@ -300,10 +282,10 @@ sub region
 
 sub scale
 {
-	return @{$_[0]-> {scale}} unless $#_;
-	my $self = shift;
-	$self-> {scale} = [@_[0,1]];
-	$self-> change_transform;
+	my ( $self, @scale ) = @_;
+	my $m = $self-> matrix;
+	$m->scale(@scale);
+	$self->matrix($m);
 }
 
 sub reversed
@@ -316,10 +298,11 @@ sub reversed
 
 sub rotate
 {
-	return $_[0]-> {rotate} unless $#_;
-	my $self = $_[0];
-	$self-> {rotate} = $_[1];
-	$self-> change_transform;
+	my ( $self, $angle ) = @_;
+	return if $angle == 0.0;
+	my $m = $self-> matrix;
+	$m->rotate($angle);
+	$self->matrix($m);
 }
 
 sub resolution
@@ -341,11 +324,11 @@ sub grayscale
 sub graphic_context_push
 {
 	my $self = shift;
-	return 0 unless $self->graphic_context_push;
+	return 0 unless $self->SUPER::graphic_context_push;
 	my $stack = $self->{gc_stack} //= [];
 	push @$stack, {
-		(map { $_,  $self->$_()  } qw(rotate scale reversed grayscale)),
-		(map { $_, [$self->$_()] } qw(resolution clipRect))
+		(map { $_,  $self->$_()  } qw(rotate reversed grayscale)),
+		(map { $_, [$self->$_()] } qw(resolution scale clipRect))
 	};
 	return 1;
 }
@@ -353,11 +336,11 @@ sub graphic_context_push
 sub graphic_context_pop
 {
 	my $self = shift;
-	return unless $self->graphic_context_pop;
+	return unless $self->SUPER::graphic_context_pop;
 	my $stack = $self->{gc_stack} //= [];
 	my $item = pop @$stack or return 0;
-	@{$self->{$_}} = @{$item->{$_}} for qw(resolution clipRect);
-	$self->{$_} = $item->{$_} for qw(rotate scale reversed grayscale);
+	@{$self->{$_}} = @{$item->{$_}} for qw(resolution scale clipRect);
+	$self->{$_} = $item->{$_} for qw(rotate reversed grayscale);
 	$self->change_transform;
 	return 1;
 }
@@ -684,9 +667,127 @@ sub text_shape
 
 sub render_glyph {}
 
+# primitive emulation
+
+sub primitive
+{
+	my ( $self, $cmd, @param ) = @_;
+
+	my $dst  = $self->new_path;
+
+	my $src = Prima::Drawable::Path->new( undef, subpixel => 1 );
+	$src->$cmd(@param);
+
+	my @pp = map { @$_ } @{$src->points};
+	for my $p ( @pp ) {
+		next unless @$p;
+		my $cmds = $self->render_polyline( $p, path => 1, integer => 0);
+		for ( my $i = 0; $i < @$cmds;) {
+			my $cmd   = $cmds->[$i++];
+			my $param = $cmds->[$i++];
+			if ( $cmd eq 'line') {
+				$dst->line( $param );
+			} elsif ( $cmd eq 'arc') {
+				$dst->$cmd( @$param );
+			} elsif ( $cmd eq 'conic') {
+				$dst->spline( $param, degree => 2 );
+			} elsif ( $cmd eq 'cubic') {
+				$dst->spline( $param, degree => 3 );
+			} elsif ( $cmd eq 'open') {
+				$dst->close;
+				$dst->open;
+			} else {
+				warn "** panic: unknown render_polyline command '$cmd'";
+				last;
+			}
+		}
+		$dst->close;
+		$dst->open;
+	}
+
+	if ( $self->graphic_context_push ) {
+		if ( $self-> rop2 == rop::CopyPut ) {
+			my $color = $self->color;
+			$self->color($self->backColor);
+			$self->lineEnd(le::Flat);
+			$self->linePattern(lp::Solid);
+			$self->$cmd(@param);
+			$self->color($color);
+		}
+		$self->fillPattern(fp::Solid);
+		$dst->fill;
+		$self->graphic_context_pop;
+	}
+}
+
+sub prepare_image
+{
+	my ( $self, $image, $xFrom, $yFrom, $xLen, $yLen) = @_;
+
+	my @is = $image-> size;
+	$_ //= 0 for $xFrom, $yFrom;
+	$xLen //= $is[0];
+	$yLen //= $is[1];
+
+	my $touch;
+	$touch = 1, $image = $image-> image if $image-> isa('Prima::DeviceBitmap');
+
+	unless ( $xFrom == 0 && $yFrom == 0 && $xLen == $image-> width && $yLen == $image-> height) {
+		$image = $image-> extract( $xFrom, $yFrom, $xLen, $yLen);
+		$touch = 1;
+	}
+
+	my $ib = $image-> get_bpp;
+	if ( $ib != $self-> get_bpp) {
+		$image = $image-> dup unless $touch;
+		if ( $self-> {grayscale} || $image-> type & im::GrayScale) {
+			$image-> type( im::Byte);
+		} else {
+			$image-> type( im::RGB);
+		}
+		$touch = 1;
+	} elsif ( $self-> {grayscale} || $image-> type & im::GrayScale) {
+		$image = $image-> dup unless $touch;
+		$image-> type( im::Byte);
+		$touch = 1;
+	}
+
+	$ib = $image-> get_bpp;
+	if ($ib != 8 && $ib != 24) {
+		$image = $image-> dup unless $touch;
+		$image-> type( im::RGB);
+		$touch = 1;
+	}
+
+	if ( $image-> type == im::RGB ) {
+		# invert BGR -> RGB
+		$image = $image-> dup unless $touch;
+		$image-> set(data => $image->data, type => im::fmtBGR | im::RGB);
+		$touch = 1;
+	}
+
+	if ( $image-> isa('Prima::Icon')) {
+		if ( $image-> maskType != 1 && $image-> maskType != 8) {
+			$image = $image-> dup unless $touch;
+			$image-> set(maskType => 1);
+			$touch = 1;
+		}
+	}
+
+	return $image;
+}
+
 package
 	Prima::PS::Drawable::Path;
 use base qw(Prima::Drawable::Path);
+
+sub reset
+{
+	$_[0]->SUPER::reset();
+	delete $_[0]->{entries};
+	delete $_[0]->{last_matrix};
+	delete $_[0]->{last_point};
+}
 
 sub entries
 {
@@ -696,6 +797,7 @@ sub entries
 		local $self->{curr}  = { matrix => [ $self-> identity ] };
 		my $c = $self->{commands};
 		$self-> {entries} = [];
+		$self-> emit( $self->dict->{newpath});
 		for ( my $i = 0; $i < @$c; ) {
 			my ($cmd,$len) = @$c[$i,$i+1];
 			$self-> can("_$cmd")-> ( $self, @$c[$i+2..$i+$len+1] );
@@ -772,7 +874,7 @@ sub _spline
 sub _arc
 {
 	my ( $self, $from, $to, $rel ) = @_;
-	my $cubics = $self->canvas->arc2cubics(
+	my $cubics = Prima::Drawable::Path->arc2cubics(
 		0, 0, 2, 2,
 		$from, $to);
 
@@ -794,7 +896,18 @@ sub _arc
 sub stroke
 {
 	my $self = shift;
-	$self-> canvas-> stroke( join("\n", @{ $self->entries }, $self->dict->{stroke} ));
+	my $c = $self->canvas;
+	return $self-> canvas-> stroke( join("\n", @{ $self->entries }, $self->dict->{stroke} ))
+		if $c-> is_custom_line;
+
+	my $path = Prima::Drawable::Path-> new( undef,
+		subpixel => 1,
+		commands => $self->commands,
+	);
+	for ( map { @$_ } @{ $path->points }) {
+		next if 4 > @$_;
+		$c->primitive( polyline => $_ );
+	}
 }
 
 sub fill

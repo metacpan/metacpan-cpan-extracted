@@ -50,6 +50,7 @@ lib/AsposeSlidesCloud/Object/Connector.pm
 lib/AsposeSlidesCloud/Object/CubicBezierToPathSegment.pm
 lib/AsposeSlidesCloud/Object/CustomDashPattern.pm
 lib/AsposeSlidesCloud/Object/DataPoint.pm
+lib/AsposeSlidesCloud/Object/DataSource.pm
 lib/AsposeSlidesCloud/Object/DelimiterElement.pm
 lib/AsposeSlidesCloud/Object/DiscUsage.pm
 lib/AsposeSlidesCloud/Object/Document.pm
@@ -115,6 +116,7 @@ lib/AsposeSlidesCloud/Object/LightRig.pm
 lib/AsposeSlidesCloud/Object/LimitElement.pm
 lib/AsposeSlidesCloud/Object/LineFormat.pm
 lib/AsposeSlidesCloud/Object/LineToPathSegment.pm
+lib/AsposeSlidesCloud/Object/Literals.pm
 lib/AsposeSlidesCloud/Object/LuminanceEffect.pm
 lib/AsposeSlidesCloud/Object/MasterSlide.pm
 lib/AsposeSlidesCloud/Object/MasterSlides.pm
@@ -201,6 +203,7 @@ lib/AsposeSlidesCloud/Object/SlideModernComment.pm
 lib/AsposeSlidesCloud/Object/SlideProperties.pm
 lib/AsposeSlidesCloud/Object/SlideReplaceResult.pm
 lib/AsposeSlidesCloud/Object/Slides.pm
+lib/AsposeSlidesCloud/Object/SlideShowProperties.pm
 lib/AsposeSlidesCloud/Object/SmartArt.pm
 lib/AsposeSlidesCloud/Object/SmartArtNode.pm
 lib/AsposeSlidesCloud/Object/SmartArtShape.pm
@@ -235,6 +238,7 @@ lib/AsposeSlidesCloud/Object/UpdateShape.pm
 lib/AsposeSlidesCloud/Object/VideoExportOptions.pm
 lib/AsposeSlidesCloud/Object/VideoFrame.pm
 lib/AsposeSlidesCloud/Object/ViewProperties.pm
+lib/AsposeSlidesCloud/Object/Workbook.pm
 lib/AsposeSlidesCloud/Object/XamlExportOptions.pm
 lib/AsposeSlidesCloud/Object/XpsExportOptions.pm
 lib/AsposeSlidesCloud/Object/XYSeries.pm

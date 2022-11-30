@@ -62,10 +62,6 @@ Alien::Build->log ('$ENV{PROJ_LIB} IS ' . ($ENV{PROJ_LIB} // ''));
 
 use Cwd;
 my $base_dir = getcwd();
-my $patch_file_isnan
-  = "$base_dir/patch_isnan_gcc.patch";
-my $patch_file_configure
-  = "$base_dir/0001-Enable-shared-build-on-freebsd-10.patch";
 
 my $min_target_version = '3.1.0';
 
@@ -141,14 +137,15 @@ share {
     );
   
     start_url 'https://download.osgeo.org/gdal/CURRENT';
+    #start_url 'https://download.osgeo.org/gdal/3.6.0';
     #start_url "file://$base_dir";  #  debug
+    #  Handle release candidates in the regex.
+    #  These are checked occasionally for debug purposes.
+    my $RE_filter_version = qr/^gdal-([0-9\.]+)(?:rc\d\d)?\.tar\.gz$/;
     plugin Download => (
-      filter  => qr/^gdal-([0-9\.]+)\.tar\.gz$/,
-      version => qr/^gdal-([0-9\.]+)\.tar\.gz$/,
+      filter  => $RE_filter_version,
+      version => $RE_filter_version,
     );
-  
-    my $gdal_version = get_gdal_version() // 'not yet defined';
-    say "Downloaded gdal version is $gdal_version";
     
     plugin Extract => (format => 'tar.gz');
   
@@ -201,6 +198,17 @@ share {
       #  clean up the build dir on cpan testers etc
       plugin 'Cleanse::BuildDir';
     }
+    
+    my %runtime_props;
+    foreach my $alien (@alien_deps) {
+      my $libname = $alien;
+      $libname =~ s/^Alien:://;
+      $libname =~ s/::af$//;
+      my $key = "built_with_$libname";
+      $runtime_props{$key}
+        = sprintf "%s %s", $alien->version, $alien->install_type;
+      #Alien::Build->runtime_prop->{$key} = $runtime_props{$key};
+    };
     
     my @with_args = (
       #https://gdal.org/build_hints.html#cmdoption-arg-GDAL_USE_-Packagename_in_upper_case-BOOL
@@ -273,7 +281,7 @@ share {
       my $exe_extension = ($on_windows ? '.exe' : '');
       my $sqlite_exe = path ('Alien::sqlite'->dist_dir . "/bin/sqlite3$exe_extension");
       push @with_args, (
-        "-DEXE_SQLITE3=$sqlite_exe",
+        "-DEXE_SQLITE3=$sqlite_exe",  #  might not be needed now
         "-DSQLITE3_LIBRARY=$libfile",
         "-DSQLITE3_INCLUDE_DIR=$sqlite_include",
       );
@@ -357,6 +365,18 @@ share {
       $make_inst_cmd,
       \&patch_rpaths,
     ];
+
+    meta->after_hook( gather_share => sub {
+      my ($build) = @_;
+      $build->log ('+++++++ Setting props ++++++');
+      foreach my $alien_dep (sort keys %runtime_props) {
+        my $prop_name =  sprintf '%%{.runtime.%s}', $alien_dep;
+        #push @props, [$runtime_props{$alien_dep}, \$prop_name];
+        $build->log("Setting runtime prop $prop_name to $runtime_props{$alien_dep}");
+        $build->runtime_prop->{$alien_dep} = $runtime_props{$alien_dep};
+      }
+    });
+
   }
 };
 
@@ -395,8 +415,8 @@ sub patch_rpaths {
   for my $alien (@alien_deps) {
     next if not $alien->install_type('share');
     my $libdir;
-    for my $tgt (qw/lib lib64 lib32/) { 
-        $libdir = $alien->dist_dir . '/lib';
+    for my $tgt (qw/lib lib64 lib32/) {
+        $libdir = path ($alien->dist_dir, $tgt);
         last if -d $libdir;
     }
     $build->log ("Unable to locate lib dir for $alien, tried lib, lib64 and lib32.  Expect issues later on.")

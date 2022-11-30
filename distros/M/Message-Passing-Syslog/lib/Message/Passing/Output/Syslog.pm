@@ -1,6 +1,5 @@
 package Message::Passing::Output::Syslog;
-use Moose;
-use Moose::Util::TypeConstraints;
+use Moo;
 use AnyEvent;
 use Scalar::Util qw/ weaken /;
 use Try::Tiny qw/ try catch /;
@@ -22,15 +21,16 @@ has '+hostname' => (
 sub _default_port { 5140 }
 
 has protocol => (
-    isa => enum([qw/ tcp udp /]),
+    isa => sub {
+        die "$_[0] is not a valid value (tcp or udp)!"
+            unless $_[0] eq 'tcp' || $_[0] eq 'udp';
+    },
     is => 'ro',
-    default => 'udp',
+    default => sub { 'udp' },
 );
 
 has syslog => (
-    isa     => 'Net::Syslog',
-    is      => 'ro',
-    lazy    => 1,
+    is      => 'lazy',
     default => sub {
         Net::Syslog->new(
             SyslogHost => $_[0]->hostname,
@@ -78,7 +78,7 @@ my %syslog_facilities = do { my $i = 0; map { $i++ => $_ } (qw/
     local7
 /) };
 
-sub consume { shift->syslog->send(@_) } 
+sub consume { shift->syslog->send(@_) }
 
 1;
 

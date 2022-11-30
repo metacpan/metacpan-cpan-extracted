@@ -3,20 +3,20 @@ package Code::TidyAll::Git::Precommit;
 use strict;
 use warnings;
 
-use Capture::Tiny qw(capture_stdout capture_stderr);
+use Capture::Tiny            qw(capture_stdout capture_stderr);
 use Code::TidyAll::Git::Util qw(git_files_to_commit);
 use Code::TidyAll;
 use IPC::System::Simple qw(capturex run);
-use Log::Any qw($log);
-use Path::Tiny qw(path);
-use Scope::Guard qw(guard);
+use Log::Any            qw($log);
+use Path::Tiny          qw(path);
+use Scope::Guard        qw(guard);
 use Specio::Library::Builtins;
 use Specio::Library::String;
 use Try::Tiny;
 
 use Moo;
 
-our $VERSION = '0.82';
+our $VERSION = '0.83';
 
 has conf_name => (
     is  => 'ro',
@@ -142,7 +142,7 @@ Code::TidyAll::Git::Precommit - Git pre-commit hook that requires files to be ti
 
 =head1 VERSION
 
-version 0.82
+version 0.83
 
 =head1 SYNOPSIS
 

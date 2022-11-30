@@ -1,3 +1,15 @@
+0.011 2022-11-24 WENWU YAN <968826@gmail.com>
+   [FUNCTION]
+   - 优化批量端口开通处理逻辑
+
+0.010 2022-11-23 WENWU YAN <968826@gmail.com>
+   [FUNCTION]
+   - 新增快速开通H3C交换机端口功能
+
+0.009 2022-11-16 WENWU YAN <968826@gmail.com>
+   [FUNCTION]
+   - 新增快速开通CISCO交换机端口功能
+
 0.007 2022-10-18 WENWU YAN <968826@gmail.com>
    [FUNCTION]
    - 新增防火墙一键翻墙功能

@@ -2,7 +2,7 @@ package Code::TidyAll::Zglob;
 use strict;
 use warnings 'all', FATAL => 'recursion';
 use 5.008008;
-our $VERSION = '0.82';
+our $VERSION = '0.83';
 use base qw(Exporter);
 
 our @EXPORT = qw(zglob);
@@ -293,7 +293,7 @@ Code::TidyAll::Zglob - A borged copy of File::Zglob
 
 =head1 VERSION
 
-version 0.82
+version 0.83
 
 =head1 DESCRIPTION
 

@@ -1,0 +1,79 @@
+---
+abstract: 'Algorithm of Math::Business::BlackScholesMerton for binary and non-binary options'
+author:
+  - 'binary.com <BINARY@cpan.org>'
+build_requires:
+  Exporter: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Format::Util::Numbers: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::CheckDeps: '0.010'
+  Test::Exception: '0'
+  Test::More: '0.94'
+  Test::Most: '0'
+  Test::NoWarnings: '0'
+  Test::Warn: '0'
+  Test::Warnings: '0'
+  Text::CSV::Slurp: '0'
+  lib: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '7.64'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Math-Business-BlackScholesMerton
+no_index:
+  directory:
+    - eg
+    - share
+    - shares
+    - t
+    - xt
+provides:
+  Math::Business::BlackScholesMerton:
+    file: lib/Math/Business/BlackScholesMerton.pm
+    version: '1.25'
+  Math::Business::BlackScholesMerton::Binaries:
+    file: lib/Math/Business/BlackScholesMerton/Binaries.pm
+    version: '1.25'
+  Math::Business::BlackScholesMerton::NonBinaries:
+    file: lib/Math/Business/BlackScholesMerton/NonBinaries.pm
+    version: '1.25'
+requires:
+  List::Util: '0'
+  Machine::Epsilon: '0'
+  Math::CDF: '0'
+  Math::Trig: '0'
+  POSIX: '0'
+  Scalar::Util: '0'
+  constant: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/binary-com/perl-Math-Business-BlackScholesMerton/issues
+  homepage: https://github.com/binary-com/perl-Math-Business-BlackScholesMerton
+  repository: https://github.com/binary-com/perl-Math-Business-BlackScholesMerton.git
+version: '1.25'
+x_authority: cpan:DERIV
+x_contributors:
+  - 'Jun Bon <junbon@binary.com>'
+  - 'Rohan Almeida <almeida@aarohan.biz>'
+  - 'Jean-Yves Sireau <jy@binary.com>'
+  - 'Chylli <chylli@binary.com>'
+  - 'Matt Miller <matt@binary.com>'
+  - 'Matt Miller <mwmiller@outlook.com>'
+  - 'Apoorv Joshi <apoorv@binary.com>'
+  - 'chylli-binary <52912308+chylli-binary@users.noreply.github.com>'
+  - 'Raunak Kathuria <raunakkathuria@gmail.com>'
+  - 'Ravi Guglani <30819918+ravi-binary@users.noreply.github.com>'
+  - 'Zak B. Elep <zakame@zakame.net>'
+x_generated_by_perl: v5.26.2
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

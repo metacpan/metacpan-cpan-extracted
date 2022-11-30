@@ -54,6 +54,17 @@ int32_t SPVM_TOKE_is_white_space(SPVM_COMPILER* compiler, char ch) {
   }
 }
 
+int32_t SPVM_TOKE_is_octal_number(SPVM_COMPILER* compiler, char ch) {
+  (void)compiler;
+  // SP, CR, LF, HT, FF
+  if (ch >= '0' && ch <= '7') {
+    return 1;
+  }
+  else {
+    return 0;
+  }
+}
+
 int32_t SPVM_TOKE_is_hex_number(SPVM_COMPILER* compiler, char ch) {
   (void)compiler;
   // SP, CR, LF, HT, FF
@@ -63,6 +74,113 @@ int32_t SPVM_TOKE_is_hex_number(SPVM_COMPILER* compiler, char ch) {
   else {
     return 0;
   }
+}
+
+char SPVM_TOKE_parse_octal_escape(SPVM_COMPILER* compiler, char** char_ptr_ptr) {
+  char ch;
+  char* char_ptr = *char_ptr_ptr;
+  
+  int32_t is_o_escape_character = 0;
+  if (*char_ptr == 'o') {
+    is_o_escape_character = 1;
+  }
+  
+  char_ptr++;
+
+  // {
+  int32_t has_brace = 0;
+  if (is_o_escape_character) {
+    if (*char_ptr == '{') {
+      has_brace = 1;
+      char_ptr++;
+    }
+    else {
+      SPVM_COMPILER_error(compiler, "\"\\o\" of the octal escape character must have its brace at %s line %d", compiler->cur_file, compiler->cur_line);
+    }
+  }
+  
+  char hex_escape_char[3] = {0};
+  int32_t hex_escape_char_index = 0;
+  while (SPVM_TOKE_is_octal_number(compiler, *char_ptr)) {
+    if (hex_escape_char_index >= 2) {
+      break;
+    }
+    hex_escape_char[hex_escape_char_index] = *char_ptr;
+    char_ptr++;
+    hex_escape_char_index++;
+  }
+  
+  if (strlen(hex_escape_char) > 0) {
+    char* end;
+    ch = (char)strtol(hex_escape_char, &end, 8);
+  }
+  else {
+    if (is_o_escape_character) {
+      SPVM_COMPILER_error(compiler, "At least one octal number must be follow by \"\\o\" of the octal escape character at %s line %d", compiler->cur_file, compiler->cur_line);
+    }
+    else {
+      ch = 0;
+    }
+  }
+  
+  if (has_brace) {
+    if (*char_ptr == '}') {
+      char_ptr++;
+    }
+    else {
+      SPVM_COMPILER_error(compiler, "The octal escape character is not closed by \"}\" at %s line %d", compiler->cur_file, compiler->cur_line);
+    }
+  }
+  
+  *char_ptr_ptr = char_ptr;
+  
+  return ch;
+}
+
+char SPVM_TOKE_parse_hex_escape(SPVM_COMPILER* compiler, char** char_ptr_ptr) {
+  char ch;
+  char* char_ptr = *char_ptr_ptr;
+
+  char_ptr++;
+  
+  // {
+  int32_t has_brace = 0;
+  if (*char_ptr == '{') {
+    has_brace = 1;
+    char_ptr++;
+  }
+  
+  char hex_escape_char[3] = {0};
+  int32_t hex_escape_char_index = 0;
+  while (SPVM_TOKE_is_hex_number(compiler, *char_ptr)) {
+    if (hex_escape_char_index >= 2) {
+      break;
+    }
+    hex_escape_char[hex_escape_char_index] = *char_ptr;
+    char_ptr++;
+    hex_escape_char_index++;
+  }
+  
+  if (strlen(hex_escape_char) > 0) {
+    char* end;
+    ch = (char)strtol(hex_escape_char, &end, 16);
+  }
+  else {
+    SPVM_COMPILER_error(compiler, "One or tow hexadecimal numbers must be follow by \"\\x\" of the hexadecimal escape character at %s line %d", compiler->cur_file, compiler->cur_line);
+  }
+  
+  if (has_brace) {
+    if (*char_ptr == '}') {
+      char_ptr++;
+    }
+    else {
+      SPVM_COMPILER_error(compiler, "The hexadecimal escape character is not closed by \"}\" at %s line %d", compiler->cur_file, compiler->cur_line);
+    }
+  }
+  
+  *char_ptr_ptr = char_ptr;
+  
+  return ch;
 }
 
 int32_t SPVM_TOKE_is_unicode_scalar_value(int32_t code_point) {
@@ -212,7 +330,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
               if (i > 1) {
                 if (class_name[i - 2] == ':' && class_name[i - 1] == ':') {
                   if (islower(class_name[i])) {
-                    SPVM_COMPILER_error(compiler, "The part names of the class \"%s\" must begin with an upper case character at %s line %d", class_name, op_use->file, op_use->line);
+                    SPVM_COMPILER_error(compiler, "The part names of the \"%s\" class must begin with an upper case character at %s line %d", class_name, op_use->file, op_use->line);
                     return 0;
                   }
                 }
@@ -335,7 +453,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                     }
                   }
                   
-                  SPVM_COMPILER_error(compiler, "Failed to load the class \"%s\". The module file \"%s\" is not found in (%s) at %s line %d", class_name, cur_rel_file, moduler_dirs_str, op_use->file, op_use->line);
+                  SPVM_COMPILER_error(compiler, "Failed to load the \"%s\" class. The module file \"%s\" is not found in (%s) at %s line %d", class_name, cur_rel_file, moduler_dirs_str, op_use->file, op_use->line);
                   
                   return 0;
                 }
@@ -891,11 +1009,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
         else {
           if (*compiler->bufptr == '\\') {
             compiler->bufptr++;
-            if (*compiler->bufptr == '0') {
-              ch = 0x00; // NUL
-              compiler->bufptr++;
-            }
-            else if (*compiler->bufptr == 'a') {
+            if (*compiler->bufptr == 'a') {
               ch = 0x07; // BEL
               compiler->bufptr++;
             }
@@ -927,44 +1041,21 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
               ch = 0x5c; /* \ */
               compiler->bufptr++;
             }
-            // Hex ascii code
-            else if (*compiler->bufptr == 'x') {
-              compiler->bufptr++;
+            // Octal escape character
+            else if (*compiler->bufptr == '0' || *compiler->bufptr == 'o') {
+              char* char_ptr = compiler->bufptr;
 
-              // {
-              int32_t has_brace = 0;
-              if (*compiler->bufptr == '{') {
-                has_brace = 1;
-                compiler->bufptr++;
-              }
+              ch = SPVM_TOKE_parse_octal_escape(compiler, &char_ptr);
               
-              char hex_escape_char[3] = {0};
-              int32_t hex_escape_char_index = 0;
-              while (SPVM_TOKE_is_hex_number(compiler, *compiler->bufptr)) {
-                if (hex_escape_char_index >= 2) {
-                  break;
-                }
-                hex_escape_char[hex_escape_char_index] = *compiler->bufptr;
-                compiler->bufptr++;
-                hex_escape_char_index++;
-              }
+              compiler->bufptr = char_ptr;
+            }
+            // Hex escape character
+            else if (*compiler->bufptr == 'x') {
+              char* char_ptr = compiler->bufptr;
+
+              ch = SPVM_TOKE_parse_hex_escape(compiler, &char_ptr);
               
-              if (strlen(hex_escape_char) > 0) {
-                char* end;
-                ch = (char)strtol(hex_escape_char, &end, 16);
-              }
-              else {
-                SPVM_COMPILER_error(compiler, "One or tow hexadecimal numbers must be follow by \"\\x\" of the hexadecimal escape character at %s line %d", compiler->cur_file, compiler->cur_line);
-              }
-              
-              if (has_brace) {
-                if (*compiler->bufptr == '}') {
-                  compiler->bufptr++;
-                }
-                else {
-                  SPVM_COMPILER_error(compiler, "The hexadecimal escape character is not closed by \"}\" at %s line %d", compiler->cur_file, compiler->cur_line);
-                }
-              }
+              compiler->bufptr = char_ptr;
             }
             else {
               SPVM_COMPILER_error(compiler, "\"\\%c\" is the invalid charater literal escape character at %s line %d", *compiler->bufptr, compiler->cur_file, compiler->cur_line);
@@ -1188,12 +1279,7 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
             while (char_ptr != compiler->bufptr - 1) {
               if (*char_ptr == '\\') {
                 char_ptr++;
-                if (*char_ptr == '0') {
-                  string_literal_tmp[string_literal_length] = 0x00;
-                  string_literal_length++;
-                  char_ptr++;
-                }
-                else if (*char_ptr == 'a') {
+                if (*char_ptr == 'a') {
                   string_literal_tmp[string_literal_length] = 0x07;
                   string_literal_length++;
                   char_ptr++;
@@ -1238,46 +1324,19 @@ int SPVM_yylex(SPVM_YYSTYPE* yylvalp, SPVM_COMPILER* compiler) {
                   string_literal_length++;
                   char_ptr++;
                 }
+                // Octal escape character
+                else if (*char_ptr == '0' || *char_ptr == 'o') {
+                  ch = SPVM_TOKE_parse_octal_escape(compiler, &char_ptr);
+                  
+                  string_literal_tmp[string_literal_length] = ch;
+                  string_literal_length++;
+                }
                 // A hexadecimal escape character
                 else if (*char_ptr == 'x') {
-                  char_ptr++;
-
-                  // {
-                  int32_t has_brace = 0;
-                  if (*char_ptr == '{') {
-                    has_brace = 1;
-                    char_ptr++;
-                  }
+                  ch = SPVM_TOKE_parse_hex_escape(compiler, &char_ptr);
                   
-                  char hex_escape_char[3] = {0};
-                  int32_t hex_escape_char_index = 0;
-                  while (SPVM_TOKE_is_hex_number(compiler, *char_ptr)) {
-                    if (hex_escape_char_index >= 2) {
-                      break;
-                    }
-                    hex_escape_char[hex_escape_char_index] = *char_ptr;
-                    char_ptr++;
-                    hex_escape_char_index++;
-                  }
-                  
-                  if (strlen(hex_escape_char) > 0) {
-                    char* end;
-                    ch = (char)strtol(hex_escape_char, &end, 16);
-                    string_literal_tmp[string_literal_length] = ch;
-                    string_literal_length++;
-                  }
-                  else {
-                    SPVM_COMPILER_error(compiler, "One or tow hexadecimal numbers must be follow by \"\\x\" of the hexadecimal escape character at %s line %d", compiler->cur_file, compiler->cur_line);
-                  }
-                  
-                  if (has_brace) {
-                    if (*char_ptr == '}') {
-                      char_ptr++;
-                    }
-                    else {
-                      SPVM_COMPILER_error(compiler, "The hexadecimal escape character is not closed by \"}\" at %s line %d", compiler->cur_file, compiler->cur_line);
-                    }
-                  }
+                  string_literal_tmp[string_literal_length] = ch;
+                  string_literal_length++;
                 }
                 // Unicode escape character
                 // Note: "\N" is raw escape character, "\N{" is Unicode escape character

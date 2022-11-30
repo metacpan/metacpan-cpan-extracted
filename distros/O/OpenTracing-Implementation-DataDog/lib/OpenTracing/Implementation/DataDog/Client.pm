@@ -39,7 +39,7 @@ agent.
 
 
 
-our $VERSION = 'v0.43.1';
+our $VERSION = 'v0.43.2';
 
 use English;
 
@@ -109,13 +109,14 @@ has scheme => (
 =head2 C<host>
 
 The host-name where the DataDog agent is running, which defaults to
-C<localhost> or the value of the C<DD_AGENT_HOST> environment variable if set.
+C<localhost> or the value of either C<DD_HOST> or C<DD_AGENT_HOST> environment
+variable if set.
 
 =cut
 
 has host => (
-    is => 'ro',
-    env_key => 'DD_AGENT_HOST',
+    is      => 'ro',
+    env_key => [ 'DD_HOST', 'DD_AGENT_HOST' ],
     default => 'localhost',
 );
 
@@ -132,6 +133,18 @@ has port => (
     is => 'ro',
     env_key => 'DD_TRACE_AGENT_PORT',
     default => '8126',
+);
+
+=head2 C<env>
+
+The environment name to pass to the agent. By default, no environment is passed.
+
+=cut
+
+has env => (
+    is      => 'ro',
+    env_key => 'DD_ENV',
+    default => undef,
 );
 
 
@@ -218,7 +231,7 @@ sub send_span {
     my $self = shift;
     my $span = shift;
     
-    my $data = __PACKAGE__->to_struct( $span );
+    my $data = $self->to_struct( $span );
     
     my $resp = $self->http_post_struct_as_json( [[ $data ]] );
     
@@ -285,12 +298,15 @@ therefore can not be a intance method of the DataDog::Span object.
 =cut
 
 sub to_struct {
-    my $class = shift;
+    my $self = shift;
     my $span = shift;
     
     my $context = $span->get_context();
     
     my %meta_data = (
+        maybe
+        env => $self->env,
+
         $span->get_tags,
         $context->get_baggage_items,
     );

@@ -10,11 +10,11 @@ REFECO::Blockchain::Contract::Solidity::ABI - Contract ABI utilities
 
 =head1 VERSION
 
-Version 0.003
+Version 0.004
 
 =cut
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 =head1 SYNOPSIS
 
@@ -22,8 +22,13 @@ The Contract Application Binary Interface (ABI) is the standard way to interact
 with contracts (Ethereum), this module aims to be an utility to encode/decode the given
 data according ABI type specification.
 
+=over 4
+
 =item * B<Encoder>: L<REFECO::Blockchain::Contract::Solidity::ABI::Encoder>
+
 =item * B<Decoder>: L<REFECO::Blockchain::Contract::Solidity::ABI::Decoder>
+
+=back
 
 =head1 AUTHOR
 
@@ -57,9 +62,6 @@ L<https://cpanratings.perl.org/d/REFECO-Blockchain-Contract-Solidity-ABI>
 L<https://metacpan.org/release/REFECO-Blockchain-Contract-Solidity-ABI>
 
 =back
-
-=head1 ACKNOWLEDGEMENTS
-
 
 =head1 LICENSE AND COPYRIGHT
 

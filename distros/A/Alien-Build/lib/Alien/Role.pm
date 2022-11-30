@@ -5,7 +5,7 @@ use warnings;
 use 5.008004;
 
 # ABSTRACT: Extend Alien::Base with roles!
-our $VERSION = '2.72'; # VERSION
+our $VERSION = '2.74'; # VERSION
 
 
 1;
@@ -22,7 +22,7 @@ Alien::Role - Extend Alien::Base with roles!
 
 =head1 VERSION
 
-version 2.72
+version 2.74
 
 =head1 SYNOPSIS
 
@@ -126,6 +126,8 @@ Paul Evans (leonerd, PEVANS)
 Håkon Hægland (hakonhagland, HAKONH)
 
 nick nauwelaerts (INPHOBIA)
+
+Florian Weimer
 
 =head1 COPYRIGHT AND LICENSE
 

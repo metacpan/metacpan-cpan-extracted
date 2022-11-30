@@ -138,9 +138,9 @@ apc_application_get_gui_info( char * description, int len1, char * language, int
 	if ( language ) {
 		ULONG n_lang, n_words = 128;
 		WORD buffer[128];
-		if ( my_GetUserPreferredUILanguages(MUI_LANGUAGE_NAME, &n_lang, buffer, &n_words)) {
+		if ( my_GetUserPreferredUILanguages(MUI_LANGUAGE_NAME, &n_lang, (PZZWSTR) &buffer, &n_words)) {
 			if ( len2 < n_words ) n_words = len2;
-			wchar2char( language, buffer, n_words );
+			wchar2char( language, (WCHAR*) &buffer, n_words );
 		} else
 			*language = 0;
 	}
@@ -333,6 +333,7 @@ typedef struct {
 static BOOL
 _enum_monitors( HMONITOR monitor, HDC dc, LPRECT rect, LPARAM data)
 {
+	MONITORINFO mi;
 	EnumMonitorData * d;
 	Box * current;
 
@@ -347,6 +348,18 @@ _enum_monitors( HMONITOR monitor, HDC dc, LPRECT rect, LPARAM data)
 	if ( d-> max_height < rect-> bottom ) d-> max_height = rect-> bottom;
 	d->nrects++;
 
+	mi.cbSize = sizeof(mi);
+	if (
+		GetMonitorInfo( monitor, &mi) &&
+		( mi.dwFlags & MONITORINFOF_PRIMARY ) &&
+		(d->nrects > 1)
+	) {
+		/* primary comes first, if any */
+		Box first = *(d->rects);
+		*(d->rects) = *current;
+		*current = first;
+	}
+
 	return true;
 }
 
@@ -359,7 +372,7 @@ apc_application_get_monitor_rects( Handle self, int * nrects)
 
 	EnumDisplayMonitors( NULL, NULL, (MONITORENUMPROC) _enum_monitors, (LPARAM) &d);
 	if ( d. nrects == 0) return NULL;
-	if (!(ret = malloc( d.nrects * sizeof(Box) )))
+	if (!(ret = (Box*) malloc( d.nrects * sizeof(Box) )))
 		return NULL;
 
 	for ( i = 0; i < d.nrects; i++)
@@ -441,7 +454,7 @@ process_msg( MSG * msg)
 			( mouse_click. emsg         == msg-> message) &&
 			( mouse_click. msg. hwnd    == msg-> hwnd)    &&
 			( mouse_click. msg. wParam  == ( msg-> wParam & ( MK_CONTROL|MK_SHIFT))) &&
-			( abs( mouse_click. msg. time  - msg-> time) < 200)
+			( abs((int)( mouse_click. msg. time  - msg-> time)) < 200)
 			)
 			PostMessage( msg-> hwnd, mouse_click. msg. message, msg-> wParam, msg-> lParam);
 		mouse_click. pending = 0;
@@ -1188,7 +1201,7 @@ apc_system_action( const char * params)
 
 			if ( strcmp( params, " exists") == 0) {
 				char * p = ( char *) malloc(12);
-				if ( p) snprintf( p, 12, PR_HANDLE_FMT, ( Handle) guts. console);
+				if ( p) snprintf( p, 12, "%p", (void*)guts. console);
 				return p;
 			} else
 			if ( strcmp( params, " hide") == 0)     { ShowWindow( guts. console, SW_HIDE); } else

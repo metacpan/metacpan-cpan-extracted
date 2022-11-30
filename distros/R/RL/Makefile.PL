@@ -2,6 +2,7 @@ use 5.006;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker;
+use Config;
 
 my $mm_ver = $ExtUtils::MakeMaker::VERSION;
 if ($mm_ver =~ /_/) {
@@ -20,6 +21,26 @@ my %params = (
     AUTHOR => "Jacob Gelbman <gelbman\@gmail.com>",
     clean => {FILES => "RL-*.tar.gz *.bak"},
 );
+
+# MacOS needs to find EXTERN.h and other header files to compile the .xs file.
+# It used to just work, but now it doesn't. The closest thing in %Config would
+# be the archlib key which on my system is:
+#
+#     /System/Library/Perl/5.30/darwin-thread-multi-2level
+#
+# the include path needs to be:
+#
+#     /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/System/Library/Perl/5.30/darwin-thread-multi-2level/CORE
+#
+# I also found that for installing on MacOS, you need the most recent version of
+# ExtUtils::MakeMaker installed. otherwise the -lreadline part never gets
+# inserted into the Makefile.
+if ($Config{archlib}) {
+    my $file = "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/$Config{archlib}/CORE";
+    if (-e $file) {
+        $params{INC} .= " -I$file";
+    }
+}
 
 my @requires = (
     "strict" => 0,

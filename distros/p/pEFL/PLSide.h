@@ -22,6 +22,7 @@ struct __perl_callback {
 //
 // used by Smart_Cbs, Evas_Events, Tooltip::Content_Cbs
 // perl_save_callback is used by ElmSlider and ElmProgressbar, too (but they call call_perl_format_cb)
+// used also by edje_object_message_handler_set (but this calls call_perl_edje_message_handler)
 //
 _perl_callback *perl_save_callback(pTHX_ SV *func, UV objaddr, char *event, char *hashName);
 void call_perl_sub(void *data, Evas_Object *obj, void *event_info);
@@ -31,6 +32,8 @@ void call_perl_evas_event_cb(void *data, Evas *e, Evas_Object *obj, void *event_
 
 Evas_Object* call_perl_tooltip_content_cb(void *data, Evas_Object *obj, Evas_Object *tooltip);
 void del_tooltip(void *data, Evas_Object *obj, void *event_info);
+
+void call_perl_edje_message_handler(void *data, Evas_Object *obj, int type, int id, void *msg);
 
 //
 // used by ElmSlider and ElmProgressbar (and in the future hopefully ElmCalendar)

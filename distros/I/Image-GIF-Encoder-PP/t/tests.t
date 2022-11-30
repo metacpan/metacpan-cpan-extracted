@@ -4,7 +4,6 @@
 
 use strict;
 use warnings;
-use feature 'say';
 use FindBin;
 use Image::GIF::Encoder::PP;
 use Test::Simple tests => 2;
@@ -77,7 +76,7 @@ sub generate_flag_gif {
     
     my $gif = Image::GIF::Encoder::PP->new($outputfilename, $w, $h, $PALETTE, 4, 0, $ti);
     $gif or die("fail to open gif");
-    my $unscaled;
+    my $unscaled = '';
     vec($unscaled, 256-1, 8) = 0;
     for my $frame (@imdata) {
         if($scale != 1) {

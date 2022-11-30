@@ -23,7 +23,7 @@ Gurusamy Sarathy, for pointing out the need for a pod2text() compatibility
 interface for older applications, and for being willing to roll this code
 into the Perl core distribution.
 
-Larry Virden, for feedback on the section on writing a man page in
+Larry Virden, for feedback on the section on writing a manual page in
 pod2roff and lots of good suggestions for improving it.
 
 Michael Schwern, for pointing out that pod2text() needs to be exported for
@@ -58,7 +58,7 @@ Robin Barker, for finding problems with multiline =head* headings and
 input filenames containing spaces.
 
 Brendan O'Dea and Robin Barker (again!), for finding problems with
-Pod::Man guesswork and function and man page references that contained
+Pod::Man guesswork and function and manual page references that contained
 words in all caps and proposing fixes.
 
 Barrie Slaymaker, for the initial version of the heuristics in Pod::Man
@@ -67,8 +67,9 @@ C<>.
 
 Colin Watson, for finally pointing me in the right direction to find the
 problem with excessive double-quoting of text in =item's on some platforms
-and see how to fix it, and also for finding a problem with Pod::Man's
-output of section headings for troff.
+and see how to fix it, finding a problem with Pod::Man's output of section
+headings for troff, and the preamble change to define the IX macro to an
+empty macro when indexing is not requested.
 
 Jarkko Hietaniemi, for the original language for pod2man.PL explaining the
 COPYRIGHT AND LICENSE section, the modifications to the test suite needed
@@ -84,8 +85,8 @@ X<>, and diagnosing a problem with the pod2text() backward compatibility
 function..
 
 Kurt Hirchert, for pointing out that the path mangling used to derive the
-man page name should only be done for section three manual pages, and for
-suggesting a --name option for pod2man.
+manual page name should only be done for section three manual pages, and
+for suggesting a --name option for pod2man.
 
 Mike Fry, for pointing out that the intuiting of the manual page name from
 the directory path didn't deal with three-component version numbers,
@@ -94,8 +95,10 @@ another bug with the module name intuition on OS/2.
 
 Craig A. Berry, for reporting that POSIX::Termios doesn't work on VMS and
 providing the information necessary to add a workaround in
-Pod::Text::Termcap, and for lots of help with build system changes for the
-merge with Perl core.
+Pod::Text::Termcap, for lots of help with build system changes for the
+merge with Perl core, and for pointing out a bug in the Pod::Man
+devise_title logic that may cause it to look past the end of the path
+array and produce Perl warnings.
 
 Autrijus Tang, for finding a bug in error reporting in Pod::Text and
 providing a couple of test cases that became the beginning of the error
@@ -132,16 +135,9 @@ problems that crop up when that is done.
 Jerry D. Hedden, for finding a test suite problem on Windows with
 Pod::Simple 3.04.
 
-Craig A. Berry, for pointing out a bug in the Pod::Man devise_title logic
-that may cause it to look past the end of the path array and produce Perl
-warnings.
-
 Brendan O'Dea, for the initial patch to escape apostrophes in C<> and
 verbatim text so that they won't be converted to Unicode single quotes and
 the preamble magic to work with non-groff formatters.
-
-Colin Watson, for the preamble change to define the IX macro to an empty
-macro when indexing is not requested, thus suppressing groff warnings.
 
 Kevin Ryde, for diagnosing and providing a patch for the =head2 problem
 with some *roff implementations "looking through" the font escapes at the
@@ -196,12 +192,12 @@ Peter Rabbitson, for lots of assistance in getting the right build
 configuration for a dual-life module included in Perl core, including
 correct installation with old versions of Perl.
 
-Dave Mitchell, for a bug fix for warnings when determining the man page
+Dave Mitchell, for a bug fix for warnings when determining the manual page
 title of a simple module and for how best to suppress Encode warnings
 during Perl core builds.
 
-Guillem Jover, for the formatting change for man page references and
-function names to match the Linux man page standard, and reporting a
+Guillem Jover, for the formatting change for manual page references and
+function names to match the Linux manual page standard, and reporting a
 diagnostic bug when pod2man or pod2text gets empty input on standard
 input.
 
@@ -215,3 +211,27 @@ documentation.
 Olly Betts, for fixing errors=none behavior to fully suppress the POD
 errata section, even with unusual errors that still trigger with no
 whining set.
+
+Paul Evans, for finding a long-standing bug in the troff accent mark
+definition for an acute accent.  This error appears to have existed since
+the first version of Pod::Man.
+
+zynldyx, for a detailed analysis of the problems with line-breaking
+Japanese and Chinese text and a suggested fix, which led to the language
+option to Pod::Man.
+
+Yu, for an analysis of problems with inconsistent sentence spacing in
+Pod::Man output and a discussion of possible fixes.  I haven't adopted the
+suggested solution, but the discussion shed important light on a corner of
+nroff behavior that I had not previously understood and led to some
+guidance in the Pod::Man documentation.
+
+raforg, for reporting that --quotes=none did not correctly suppress quotes
+in the NAME section of a manual page.
+
+Richard Franks, for a bug report that surrounding an L<> tag with S<>
+failed to convert the internal spaces to non-breaking.
+
+Julien ÉLIE, for catching a long-standing bug where bold and italics
+continued farther than they should in Pod::Man output if they were
+combined with C<> and fixed-width fonts.

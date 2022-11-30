@@ -4,9 +4,15 @@ use Test::More;
 use Log::Any::Test;
 use Log::Any::Adapter 'Test';
 
-plan tests => 18;
+plan tests => 20;
 
 my ( $log, $out );
+
+$log = Log::Any->get_logger;
+is $log->category, __PACKAGE__, 'category is calling package';
+
+$log = Log::Any->get_logger( category => '' );
+is $log->category, '', 'empty string category refers to root logger';
 
 $log = Log::Any->get_logger( prefix => 'Foo: ' );
 $out = $log->info("test");

@@ -1,245 +1,203 @@
-package Kephra::App::SearchBar;
-our $VERSION = '0.15';
-
-use strict;
+use v5.12;
 use warnings;
+use Wx;
 
-sub _ID            { 'searchbar' }
-sub _ref           { Kephra::ToolBar::_ref( _ID(), $_[0]) }
-sub _config        { Kephra::API::settings()->{app}{ _ID() } }
-sub _search_config { Kephra::API::settings()->{search} }
-my $highlight_search; # set 1 if searchbar turns red
-#
-sub create {
-	# load searchbar definition
-	my $bar_def = Kephra::Config::File::load_from_node_data( _config() );
-	unless ($bar_def) {
-		$bar_def = Kephra::Config::Tree::get_subtree
-			( Kephra::Config::Default::toolbars(), _ID() );
-	}
+package Kephra::App::SearchBar;
+use base qw/Wx::Panel/;
 
-	# create searchbar with buttons
-	my $rest_widgets = Kephra::ToolBar::create_new( _ID(), $bar_def);
-	my $bar = _ref();
-	# apply special searchbar widgets
-	for my $item_data (@$rest_widgets){
-		my $ctrl;
-		if ($item_data->{type} eq 'combobox' and $item_data->{id} eq 'find'){
-			my $find_input = $bar->{find_input} = Wx::ComboBox->new (
-				$bar , -1, '', [-1,-1], [$item_data->{size},-1], [],
-				&Wx::wxTE_PROCESS_ENTER
-			);
-			$find_input->SetDropTarget
-				( Kephra::Edit::Search::InputTarget->new($find_input, 'find'));
-			$find_input->SetValue( Kephra::Edit::Search::get_find_item() );
-			$find_input->SetSize($item_data->{size},-1) if $item_data->{size};
-			if ( _search_config()->{history}{use} ){
-				$find_input->Append($_) for @{ Kephra::Edit::Search::get_find_history() }
-			}
+sub new {
+    my ( $class, $parent ) = @_;
+    my $self = $class->SUPER::new( $parent, -1 );
+    $self->{'data'} = { wrap => 1};
+    $self->{'lbl'} =  Wx::StaticText->new($self, -1, 'Find:' );
+    $self->{'text'} = Wx::TextCtrl->new( $self, -1, '', [-1, -1], [200, 25], &Wx::wxTE_PROCESS_ENTER);
+    $self->{'expand'} = Wx::Button->new( $self, -1, '=',     [-1, -1], [30, 20] );
+    $self->{'first'} = Wx::Button->new( $self, -1, 'First',  [-1, -1], [50, -1] );
+    $self->{'prev'}  = Wx::Button->new( $self, -1, '<',     [-1, -1], [30, -1] );
+    $self->{'next'}  = Wx::Button->new( $self, -1, '>',     [-1, -1], [30, -1] );
+    $self->{'case'}  = Wx::CheckBox->new( $self, -1, ' Case');
+    $self->{'word'}  = Wx::CheckBox->new( $self, -1, ' Word');
+    $self->{'start'} = Wx::CheckBox->new( $self, -1, ' Start');
+    $self->{'regex'} = Wx::CheckBox->new( $self, -1, ' Rx');
+    $self->{'wrap'}  = Wx::CheckBox->new( $self, -1, ' Wrap');
+    $self->{'close'} = Wx::Button->new( $self, -1, 'X',     [-1, -1], [30, 20] );
+    $self->{'text'}->SetToolTip('search term');
+    $self->{'first'}->SetToolTip('go to first match of search term');
+    $self->{'prev'}->SetToolTip('go to previous match of search term');
+    $self->{'next'}->SetToolTip('go to next match of search term');
+    $self->{'case'}->SetToolTip('apply case sensitive search if checked');
+    $self->{'word'}->SetToolTip('view search term as surrounded by none word characters');
+    $self->{'start'}->SetToolTip('search term has to be beginning of a word');
+    $self->{'regex'}->SetToolTip('view search term as regular expression');
+    $self->{'wrap'}->SetToolTip('after last match go to first again and vice versa');
+    $self->{'expand'}->SetToolTip('blend replace bar in or out');
+    $self->{'close'}->SetToolTip('close search bar');
+    $self->{'wrap'}->SetValue( $self->{'data'}{'wrap'} );
 
-			Wx::Event::EVT_TEXT( $bar, $find_input, sub {
-				my ($bar, $event) = @_;
-				my $old = Kephra::Edit::Search::get_find_item();
-				my $new = $find_input->GetValue;
-				if ($new ne $old){
-					Kephra::Edit::Search::set_find_item( $new );
-					Kephra::Edit::Search::first_increment()
-						if _search_config()->{attribute}{incremental}
-						and Wx::Window::FindFocus() eq $find_input;
-				}
-			} );
-			Wx::Event::EVT_KEY_DOWN( $find_input, sub {
-				my ( $fi, $event ) = @_;
-				my $key = $event->GetKeyCode;
-				my $found_something;
-				my $ep = Kephra::App::EditPanel::_ref();
-				if      ( $key == &Wx::WXK_RETURN ) {
-					if    ($event->ControlDown and $event->ShiftDown)   
-					                           {Kephra::Edit::Search::find_last() }
-					elsif ($event->ControlDown){Kephra::Edit::Search::find_first()}
-					elsif ($event->ShiftDown)  {Kephra::Edit::Search::find_prev() }
-					else                       {Kephra::Edit::Search::find_next() }
-				} elsif ($key == &Wx::WXK_F3){
-					$event->ShiftDown 
-						? Kephra::Edit::Search::find_prev()
-						: Kephra::Edit::Search::find_next();
-				} elsif ($key == &Wx::WXK_ESCAPE) {
-					give_editpanel_focus_back(); switch_visibility();
-				} elsif ($key == 65 and $event->ControlDown) {# A
-					$bar->{find_input}->SetSelection
-						(0, $bar->{find_input}->GetLastPosition);
-				} elsif ($key == 70 and $event->ControlDown) {# F
-					give_editpanel_focus_back()
-				} elsif ( $key == 71 ) { # G
-					if ($event->ControlDown and $event->ShiftDown){
-						give_editpanel_focus_back();
-						Kephra::Edit::Goto::last_edit();
-					}
-				} elsif ($key == 81) { # Q
-					switch_visibility() if $event->ControlDown;
-				#} elsif ( $key == &Wx::WXK_LEFT ){ &Wx::wxSTC_CMD_CHARLEFT return
-				#} elsif ($key == &Wx::WXK_RIGHT ){ &Wx::wxSTC_CMD_CHARRIGHT return;
-				} elsif ($key == &Wx::WXK_UP){
-					if ($event->ControlDown) {
-						$ep->CmdKeyExecute( &Wx::wxSTC_CMD_LINESCROLLUP ); return;
-					}
-				} elsif ($key == &Wx::WXK_DOWN) {
-					if ($event->ControlDown) {
-						$ep->CmdKeyExecute( &Wx::wxSTC_CMD_LINESCROLLDOWN ); return;
-					}
-				} elsif ($key == &Wx::WXK_PAGEUP) {
-					if ($event->ControlDown) {
-						my $pos = $bar->{find_input}->GetInsertionPoint;
-						Kephra::Document::Change::tab_left();
-						Wx::Window::SetFocus($bar->{find_input});
-						$bar->{find_input}->SetInsertionPoint($pos);
-					} else {
-						$ep->CmdKeyExecute( &Wx::wxSTC_CMD_PAGEUP );
-					}
-					return;
-				} elsif ($key == &Wx::WXK_PAGEDOWN){
-					if ($event->ControlDown) {
-						my $pos = $bar->{find_input}->GetInsertionPoint;
-						Kephra::Document::Change::tab_right();
-						Wx::Window::SetFocus($bar->{find_input});
-						$bar->{find_input}->SetInsertionPoint($pos);
-					} else {
-						$ep->CmdKeyExecute( &Wx::wxSTC_CMD_PAGEDOWN );
-					}
-					return;
-				} elsif ($key == &Wx::WXK_HOME and $event->ControlDown) {
-					$ep->CmdKeyExecute( &Wx::wxSTC_CMD_DOCUMENTSTART ); return;
-				} elsif ($key == &Wx::WXK_END and $event->ControlDown) {
-					$ep->CmdKeyExecute( &Wx::wxSTC_CMD_DOCUMENTEND ); return;
-				} elsif ($key == &Wx::WXK_BACK and $event->ControlDown and $event->ShiftDown) {
-					my $pos = $bar->{find_input}->GetInsertionPoint;
-					Kephra::Document::Change::switch_back();
-					Wx::Window::SetFocus($bar->{find_input});
-					$bar->{find_input}->SetInsertionPoint($pos);
-				} else  {
-					#print "$key\n"
-				}
-				$event->Skip;
-			} );
-			#Wx::Event::EVT_COMBOBOX( $find_input, -1, sub{ } );
-			Wx::Event::EVT_ENTER_WINDOW( $find_input, sub {
-				Wx::Window::SetFocus($find_input) if _config()->{autofocus};
-				disconnect_find_input();
-			});
-			Wx::Event::EVT_LEAVE_WINDOW( $find_input,sub{connect_find_input($find_input) });
-			connect_find_input($find_input);
-			$highlight_search = 1;
-			$ctrl = $find_input;
-		}
-		elsif ($item_data->{type} eq 'combobox' and $item_data->{id} eq 'replace'){
-			my $replace_input = $bar->{replace_input} = Wx::ComboBox->new (
-				$bar , -1, '', [-1,-1], [$item_data->{size},-1], [],
-				&Wx::wxTE_PROCESS_ENTER
-			);
-			$replace_input->SetDropTarget
-				( Kephra::Edit::Search::InputTarget->new($replace_input, 'replace'));
-			$replace_input->SetValue( Kephra::Edit::Search::get_replace_item() );
-			$replace_input->SetSize($item_data->{size},-1) if $item_data->{size};
-			if ( _search_config()->{history}{use} ){
-				$replace_input->Append($_) for @{ Kephra::Edit::Search::get_replace_history() }
-			}
-			$ctrl = $replace_input;
-		}
-		if (ref $ctrl) {
-			$bar->InsertControl( $item_data->{pos}, $ctrl );
-		}
-	}
+    Wx::Event::EVT_BUTTON( $self, $self->{'first'},  sub { $self->find_first });
+    Wx::Event::EVT_BUTTON( $self, $self->{'prev'},   sub { $self->find_prev  });
+    Wx::Event::EVT_BUTTON( $self, $self->{'next'},   sub { $self->find_next  });
+    Wx::Event::EVT_BUTTON( $self, $self->{'expand'}, sub { $self->replace_bar->show( not $self->replace_bar->IsShown() ) });
+    Wx::Event::EVT_BUTTON( $self, $self->{'close'},  sub { $self->close      });
 
-	Wx::Event::EVT_MIDDLE_DOWN( $bar,  sub {
-		my ($widget, $event) = @_;
-		my $ep = Kephra::App::EditPanel::_ref();
-		if ($ep->GetSelectedText){
-			Kephra::Edit::Search::set_selection_as_find_item();
-			Kephra::Edit::Search::find_next();
-		} else {
-			Kephra::Edit::Goto::last_edit();
-		}
-	} );
-	Wx::Event::EVT_RIGHT_DOWN ( $bar,  sub {
-		return unless get_contextmenu_visibility();
-		my ($widget, $event) = @_;
-		my ($x, $y) = ($event->GetX, $event->GetY);
-		my $menu = Kephra::App::ContextMenu::get(_config()->{contextmenu});
-		$bar->PopupMenu($menu, $x, $y) if Kephra::Menu::is($menu);
-	} );
-	Wx::Event::EVT_LEAVE_WINDOW($bar, \&leave_focus);
-	$bar->Realize;
-	$bar;
+    Wx::Event::EVT_TEXT( $self, $self->{'text'}, sub { $self->find_first( ); $_[1]->Skip; });
+    
+    Wx::Event::EVT_CHECKBOX( $self, $self->{'case'},  sub { $self->update_flags } );
+    Wx::Event::EVT_CHECKBOX( $self, $self->{'word'},  sub { $self->update_flags } );
+    Wx::Event::EVT_CHECKBOX( $self, $self->{'start'}, sub { $self->update_flags } );
+    Wx::Event::EVT_CHECKBOX( $self, $self->{'regex'}, sub { $self->update_flags } );
+    
+    Wx::Event::EVT_KEY_DOWN( $self->{'text'}, sub {
+        my ($ed, $event) = @_;
+        my $code = $event->GetKeyCode; # my $mod = $event->GetModifiers();
+        if   (                         $code == &Wx::WXK_UP )     { $self->_find_prev  }
+        elsif(                         $code == &Wx::WXK_DOWN )   { $self->_find_next  }
+        elsif( $event->ShiftDown   and $code == &Wx::WXK_RETURN)  { $self->_find_prev  }
+        elsif(                         $code == &Wx::WXK_RETURN ) { $self->_find_next  }
+        elsif(                         $code == &Wx::WXK_ESCAPE)  { $self->close  }
+        elsif( $event->ControlDown and $code == ord('R'))         { $self->replace_bar->enter  }
+        elsif( $event->ControlDown and $event->ShiftDown and $code == ord('F'))     { $self->replace_bar->enter  }
+        elsif( $event->ControlDown and $code == ord('F'))         { $self->editor->SetFocus  }
+        else { $event->Skip }
+    });
+    
+    my $attr = &Wx::wxGROW | &Wx::wxTOP|&Wx::wxDOWN;
+    my $sizer = Wx::BoxSizer->new( &Wx::wxHORIZONTAL );
+    $sizer->AddSpacer( 10);
+    $sizer->Add( $self->{'lbl'},  0, $attr|&Wx::wxALIGN_CENTER_VERTICAL, 20);
+    $sizer->AddSpacer( 36);
+    $sizer->Add( $self->{'text'},  0, $attr, 10);
+    $sizer->AddSpacer( 15);
+    $sizer->Add( $self->{'first'}, 0, $attr, 10);
+    $sizer->AddSpacer( 10);
+    $sizer->Add( $self->{'prev'},  0, $attr, 10);
+    $sizer->AddSpacer( 10);
+    $sizer->Add( $self->{'next'},  0, $attr, 10);
+    $sizer->Add( 0, 1, &Wx::wxEXPAND, 0);
+    #$sizer->AddSpacer( 140);
+    $sizer->Add( $self->{'case'},  0, $attr, 10);
+    $sizer->AddSpacer( 10);
+    $sizer->Add( $self->{'word'},  0, $attr, 10);
+    $sizer->AddSpacer( 10);
+    $sizer->Add( $self->{'start'},  0, $attr, 10);
+    $sizer->AddSpacer( 10);
+    $sizer->Add( $self->{'regex'},  0, $attr, 10);
+    $sizer->AddSpacer( 10);
+    $sizer->Add( $self->{'wrap'},  0, $attr, 10);
+    $sizer->Add( 0, 1, &Wx::wxEXPAND, 0);
+    $sizer->Add( $self->{'expand'},  0, $attr, 15);
+    $sizer->AddSpacer( 15);
+    $sizer->Add( $self->{'close'}, 0, $attr, 15);
+    $sizer->AddSpacer( 10);
+    $self->SetSizer($sizer);
+
+    $self->update_flags;
+    $self;
 }
 
+sub editor      { $_[0]->GetParent->{'ed'} }
+sub replace_bar { $_[0]->GetParent->{'rb'} }
 
-sub destroy{ Kephra::ToolBar::destroy ( _ID() ) }
-#
-sub connect_find_input {
-	my $find_input = shift;
-	my $ID = _ID();
-	my $add_call = \&Kephra::EventTable::add_call;
-	&$add_call( 'find.item.changed', $ID.'_input_refresh', sub {
-			my $value = Kephra::Edit::Search::get_find_item();
-			return if $value eq $find_input->GetValue;
-			$find_input->SetValue( $value );
-			my $pos = $find_input->GetLastPosition;
-			$find_input->SetSelection($pos,$pos);
-	}, $ID);
-	&$add_call( 'find.item.history.changed', $ID.'_popupmenu', sub {
-			$find_input->Clear();
-			$find_input->Append($_) for @{ Kephra::Edit::Search::get_find_history() };
-			$find_input->SetValue( Kephra::Edit::Search::get_find_item() );
-			$find_input->SetInsertionPointEnd;
-	}, $ID);
-	&$add_call( 'find', $ID.'_color_refresh', \&colour_find_input, $ID);
-}
-sub disconnect_find_input{ Kephra::EventTable::del_own_subscriptions(_ID()) }
-#
-sub colour_find_input {
-	my $find_input      = _ref()->{find_input};
-	my $found_something = Kephra::Edit::Search::_find_pos() > -1
-		? 1 : 0;
-	return if $highlight_search eq $found_something;
-	$highlight_search = $found_something;
-	if ($found_something){
-		$find_input->SetForegroundColour( Wx::Colour->new( 0x00, 0x00, 0x55 ) );
-		$find_input->SetBackgroundColour( Wx::Colour->new( 0xff, 0xff, 0xff ) );
-	} else {
-		$find_input->SetForegroundColour( Wx::Colour->new( 0xff, 0x33, 0x33 ) );
-		$find_input->SetBackgroundColour( Wx::Colour->new( 0xff, 0xff, 0xff ) );
-	}
-	$find_input->Refresh;
-}
-
-sub enter_focus {
-	my $bar = _ref();
-	switch_visibility() unless get_visibility();
-	Wx::Window::SetFocus($bar->{find_input}) if defined $bar->{find_input};
-}
-sub leave_focus { switch_visibility() if _config()->{autohide} }
-#
-sub give_editpanel_focus_back{
-	leave_focus();
-	Wx::Window::SetFocus( Kephra::App::EditPanel::_ref() );
-}
-
-sub position { _config()->{position} }
-#
-# set visibility
 sub show {
-	my $visible = shift || get_visibility();
-	my $bar = _ref();
-	return unless $bar;
-	my $sizer = $bar->GetParent->GetSizer;
-	$sizer->Show( $bar, $visible );
-	$sizer->Layout();
-	_config()->{visible} = $visible;
+    my ($self, $visible) = @_;
+    $self->Show( $visible );
+    $self->GetParent->Layout;
 }
-sub get_visibility    { _config()->{visible} }
-sub switch_visibility { _config()->{visible} ^= 1; show(); }
 
-sub get_contextmenu_visibility    { _config()->{contextmenu_visible} }
-sub switch_contextmenu_visibility { _config()->{contextmenu_visible} ^= 1 }
+sub enter {
+    my ($self) = @_;
+    $self->show(1);
+    my $sel = $self->editor->GetSelectedText;
+    $self->{'text'}->SetValue( $sel )  if $sel;
+    $self->{'text'}->SetFocus();
+}
+
+sub close {
+    my ($self) = @_;
+    $self->show(0);
+    $self->replace_bar->show(0);
+    $self->editor->SetFocus;
+}
+
+sub find_first {
+    my ($self) = @_;
+    my $ed = $self->editor;
+    my ($start, $end) = $ed->GetSelection;
+    $ed->SetSelection( 0, 0 );
+    $ed->SearchAnchor;
+    my $pos = $ed->SearchNext( $self->{'flags'}, $self->{'text'}->GetValue );
+    $ed->SetSelection( $start, $start ) if $pos == -1;
+    $ed->EnsureCaretVisible;
+    $pos > -1;
+}
+
+sub find_prev {                                                       # key command
+    my ($self) = @_;
+    $self->_find_prev( $self->editor->GetSelectedText  );
+}    
+sub _find_prev {                                                      # search bar command
+    my ($self, $term) = @_;
+    my $ed = $self->editor;
+    my $wrap = $self->{'wrap'}->GetValue;
+    my ($start_pos, $end_pos) = $ed->GetSelection;
+    
+    if (defined $term and $term){ $self->{'text'}->SetValue( $term ) }
+    else                        { $term = $self->{'text'}->GetValue  }
+
+    $ed->SetSelection( $start_pos, $start_pos );
+    $ed->SearchAnchor;
+    my $pos = $ed->SearchPrev( $self->{'flags'},  $term );
+    if ($pos == -1){
+        $ed->SetSelection( $ed->GetLength , $ed->GetLength );
+        $ed->SearchAnchor();
+        $pos = $ed->SearchPrev( $self->{'flags'},  $term ) if $wrap;
+        $ed->SetSelection( $start_pos, $end_pos ) if $pos == -1;
+    }
+    $ed->EnsureCaretVisible;
+    $pos > -1;
+}
+
+sub find_next {                                                       # key command
+    my ($self) = @_;
+    $self->_find_next( $self->editor->GetSelectedText  );
+}    
+sub _find_next {
+    my ($self, $term) = @_;
+    my $ed = $self->editor;
+    my $wrap = $self->{'wrap'}->GetValue;
+    my ($start_pos, $end_pos) = $ed->GetSelection;
+
+    if (defined $term and $term){ $self->{'text'}->SetValue( $term ) }
+    else                        { $term = $self->{'text'}->GetValue  }
+
+    $ed->SetSelection( $end_pos, $end_pos );
+    $ed->SearchAnchor;
+    my $pos = $ed->SearchNext( $self->{'flags'}, $term );
+    if ($pos == -1){
+        $ed->SetSelection( 0, 0 );
+        $ed->SearchAnchor;
+        $pos = $ed->SearchNext( $self->{'flags'}, $term ) if $wrap;
+        $ed->SetSelection( $start_pos, $end_pos ) if $pos == -1;
+    }
+    $ed->EnsureCaretVisible;
+    ($start_pos, $end_pos) = $ed->GetSelection;
+    $pos > -1;
+}
+
+
+sub line_nr_around {
+    my ($self) = @_;
+    my $line_nr = $self->GetCurrentLine
+}
+
+sub update_flags {
+    my ($self) = @_;
+    $self->{'flags'} = (&Wx::wxSTC_FIND_MATCHCASE * $self->{'case'}->GetValue )
+                     | (&Wx::wxSTC_FIND_WHOLEWORD * $self->{'word'}->GetValue )
+                     | (&Wx::wxSTC_FIND_WORDSTART * $self->{'start'}->GetValue)
+                     | (&Wx::wxSTC_FIND_REGEXP    * $self->{'regex'}->GetValue);
+}
+
+
 
 1;

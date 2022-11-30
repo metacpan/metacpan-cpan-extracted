@@ -2,13 +2,13 @@ use strict;
 use warnings;
 
 package XML::Enc;
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.08'; # VERSION
 
 # ABSTRACT: XML::Enc Encryption Support
 
 use Carp;
 use XML::LibXML;
-use Crypt::OpenSSL::RSA;
+use Crypt::PK::RSA;
 use Crypt::Mode::CBC;
 use Crypt::AuthEnc::GCM 0.062;
 use MIME::Base64 qw/decode_base64 encode_base64/;
@@ -82,6 +82,11 @@ sub new {
 
     my $key_method = exists($params->{'key_transport'}) ? $params->{'key_transport'} : 'rsa-oaep-mgf1p ';
     $self->{'key_transport'} = $self->_setKeyEncryptionMethod($key_method);
+
+    my $oaep_mgf_alg = exists($params->{'oaep_mgf_alg'}) ? $params->{'oaep_mgf_alg'} : 'http://www.w3.org/2009/xmlenc11#mgf1sha1';
+    $self->{'oaep_mgf_alg'} = $self->_setOAEPAlgorithm($oaep_mgf_alg);
+
+    $self->{'oaep_params'} = exists($params->{'oaep_params'}) ? $params->{'oaep_params'} : '';
 
     return $self;
 }
@@ -171,6 +176,11 @@ sub encrypt {
     my $base64_key  = encode_base64($key);
     my $base64_data = encode_base64($encrypteddata);
 
+    # Insert OAEPparams into the XML
+    if ($self->{oaep_params} ne '') {
+        $encrypted = $self->_setOAEPparams($encrypted, $xpc, encode_base64($self->{oaep_params}));
+    }
+
     # Insert Encrypted data into XML
     $encrypted = $self->_setEncryptedData($encrypted, $xpc, $base64_data);
 
@@ -213,11 +223,55 @@ sub _setEncryptionMethod {
     return exists($methods{$method}) ? $methods{$method} : $methods{'aes256-cbc'};
 }
 
+sub _setOAEPparams {
+    my $self         = shift;
+    my $context      = shift;
+    my $xpc          = shift;
+    my $oaep_params  = shift;
+
+    my $node = $xpc->findnodes('//xenc:EncryptedKey/xenc:EncryptionMethod/xenc:OAEPparams', $context);
+
+    $node->[0]->removeChildNodes();
+    $node->[0]->appendText($oaep_params);
+    return $context;
+}
+
+sub _setOAEPAlgorithm {
+    my $self    = shift;
+    my $method  = shift;
+
+    my %methods = (
+                    'mgf1sha1' => 'http://www.w3.org/2009/xmlenc11#mgf1sha1',
+                    'mgf1sha224' => 'http://www.w3.org/2009/xmlenc11#mgf1sha224',
+                    'mgf1sha256' => 'http://www.w3.org/2009/xmlenc11#mgf1sha256',
+                    'mgf1sha384' => 'http://www.w3.org/2009/xmlenc11#mgf1sha384',
+                    'mgf1sha512' => 'http://www.w3.org/2009/xmlenc11#mgf1sha512',
+                );
+
+    return exists($methods{$method}) ? $methods{$method} : $methods{'mgf1sha1'};
+}
+
+sub _getOAEPAlgorithm {
+    my $self    = shift;
+    my $method  = shift;
+
+    my %methods = (
+                    'http://www.w3.org/2009/xmlenc11#mgf1sha1'   => 'SHA1',
+                    'http://www.w3.org/2009/xmlenc11#mgf1sha224' => 'SHA224',
+                    'http://www.w3.org/2009/xmlenc11#mgf1sha256' => 'SHA256',
+                    'http://www.w3.org/2009/xmlenc11#mgf1sha384' => 'SHA384',
+                    'http://www.w3.org/2009/xmlenc11#mgf1sha512' => 'SHA512',
+                  );
+
+    return exists($methods{$method}) ? $methods{$method} : $methods{'http://www.w3.org/2009/xmlenc11#mgf1sha1'};
+}
+
 sub _getKeyEncryptionMethod {
     my $self    = shift;
     my $xpc     = shift;
     my $context = shift;
 
+    my %method;
     if ($xpc->findvalue('dsig:KeyInfo/dsig:RetrievalMethod/@Type', $context)
                 eq 'http://www.w3.org/2001/04/xmlenc#EncryptedKey')
     {
@@ -228,9 +282,17 @@ sub _getKeyEncryptionMethod {
         if (! $keyinfo ) {
             die "Unable to find EncryptedKey";
         }
-        return $keyinfo->[0]->findvalue('//xenc:EncryptedKey/xenc:EncryptionMethod/@Algorithm', $context);
+        $method{Algorithm} = $keyinfo->[0]->findvalue('//xenc:EncryptedKey/xenc:EncryptionMethod/@Algorithm', $context);
+        $method{KeySize}   = $keyinfo->[0]->findvalue('//xenc:EncryptedKey/xenc:EncryptionMethod/xenc:KeySize', $context);
+        $method{OAEPparams} = $keyinfo->[0]->findvalue('//xenc:EncryptedKey/xenc:EncryptionMethod/xenc:OAEPparams', $context);
+        $method{MGF} = $keyinfo->[0]->findvalue('//xenc:EncryptedKey/xenc:EncryptionMethod/xenc:MGF/@Algorithm', $context);
+        return \%method;
     }
-    return $xpc->findvalue('dsig:KeyInfo/xenc:EncryptedKey/xenc:EncryptionMethod/@Algorithm', $context)
+    $method{Algorithm} = $xpc->findvalue('dsig:KeyInfo/xenc:EncryptedKey/xenc:EncryptionMethod/@Algorithm', $context);
+    $method{KeySize}   = $xpc->findvalue('dsig:KeyInfo/xenc:EncryptedKey/xenc:EncryptionMethod/xenc:KeySize', $context);
+    $method{OAEPparams} = $xpc->findvalue('dsig:KeyInfo/xenc:EncryptedKey/xenc:EncryptionMethod/xenc:OAEPparams', $context);
+    $method{MGF} = $xpc->findvalue('dsig:KeyInfo/xenc:EncryptedKey/xenc:EncryptionMethod/xenc:MGF/@Algorithm', $context);
+    return \%method;
 }
 
 sub _setKeyEncryptionMethod {
@@ -240,6 +302,7 @@ sub _setKeyEncryptionMethod {
     my %methods = (
                     'rsa-1_5'           => 'http://www.w3.org/2001/04/xmlenc#rsa-1_5',
                     'rsa-oaep-mgf1p'    => 'http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p',
+                    'rsa-oaep'          => 'http://www.w3.org/2009/xmlenc11#rsa-oaep',
                 );
 
     return exists($methods{$method}) ? $methods{$method} : $methods{'rsa-oaep-mgf1p'};
@@ -324,11 +387,14 @@ sub _DecryptKey {
     my $keymethod       = shift;
     my $encryptedkey    = shift;
 
-    if ($keymethod eq 'http://www.w3.org/2001/04/xmlenc#rsa-1_5') {
-        $self->{key_obj}->use_pkcs1_padding;
+    if ($keymethod->{Algorithm} eq 'http://www.w3.org/2001/04/xmlenc#rsa-1_5') {
+        return $self->{key_obj}->decrypt($encryptedkey, 'v1.5');
     }
-    elsif ($keymethod eq 'http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p') {
-        $self->{key_obj}->use_pkcs1_oaep_padding;
+    elsif ($keymethod->{Algorithm} eq 'http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p') {
+        return $self->{key_obj}->decrypt($encryptedkey, 'oaep', 'SHA1', decode_base64($keymethod->{OAEPparams}));
+    }
+    elsif ($keymethod->{Algorithm} eq 'http://www.w3.org/2009/xmlenc11#rsa-oaep') {
+        return $self->{key_obj}->decrypt($encryptedkey, 'oaep', $self->_getOAEPAlgorithm($keymethod->{MGF}), decode_base64($keymethod->{OAEPparams}));
     } else {
         die "Unsupported Key Encryption Method";
     }
@@ -342,18 +408,21 @@ sub _EncryptKey {
     my $keymethod   = shift;
     my $key         = shift;
 
-    my $rsa_pub = Crypt::OpenSSL::RSA->new_public_key($self->{cert_obj}->pubkey);
+    my $rsa_pub = $self->{cert_obj};
+
     if ($keymethod eq 'http://www.w3.org/2001/04/xmlenc#rsa-1_5') {
-        $rsa_pub->use_pkcs1_padding;
+        ${$key} = $rsa_pub->encrypt(${$key}, 'v1.5');
     }
     elsif ($keymethod eq 'http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p') {
-        $rsa_pub->use_pkcs1_oaep_padding;
+        ${$key} = $rsa_pub->encrypt(${$key}, 'oaep', 'SHA1', $self->{oaep_params});
+    }
+    elsif ($keymethod eq 'http://www.w3.org/2009/xmlenc11#rsa-oaep') {
+        ${$key} = $rsa_pub->encrypt(${$key}, 'oaep', $self->_getOAEPAlgorithm($self->{oaep_mgf_alg}), $self->{oaep_params});
     } else {
         die "Unsupported Key Encryption Method";
     }
 
     print "Encrypted key: ", encode_base64(${$key}) if $DEBUG;
-    ${$key} = $rsa_pub->encrypt(${$key});
 }
 
 sub _getEncryptedData {
@@ -534,37 +603,31 @@ sub _load_rsa_key {
     my ($key_text)  = @_;
 
     eval {
-        require Crypt::OpenSSL::RSA;
+        require Crypt::PK::RSA;
     };
-    confess "Crypt::OpenSSL::RSA needs to be installed so that we can handle RSA keys." if $@;
+    confess "Crypt::PK::RSA needs to be installed so that we can handle RSA keys." if $@;
 
-    my $rsaKey = Crypt::OpenSSL::RSA->new_private_key( $key_text );
+    my $rsaKey = Crypt::PK::RSA->new(\$key_text );
 
     if ( $rsaKey ) {
-        $rsaKey->use_pkcs1_padding();
         $self->{ key_obj }  = $rsaKey;
         $self->{ key_type } = 'rsa';
 
         if (!$self->{ x509 }) {
-            my $bigNum = ( $rsaKey->get_key_parameters() )[1];
-            my $bin = $bigNum->to_bin();
-            my $exp = encode_base64( $bin, '' );
+            my $keyhash = $rsaKey->key2hash();
 
-            $bigNum = ( $rsaKey->get_key_parameters() )[0];
-            $bin = $bigNum->to_bin();
-            my $mod = encode_base64( $bin, '' );
             $self->{KeyInfo} = "<dsig:KeyInfo>
                                  <dsig:KeyValue>
                                   <dsig:RSAKeyValue>
-                                   <dsig:Modulus>$mod</dsig:Modulus>
-                                   <dsig:Exponent>$exp</dsig:Exponent>
+                                   <dsig:Modulus>$keyhash->{N}</dsig:Modulus>
+                                   <dsig:Exponent>$keyhash->{d}</dsig:Exponent>
                                   </dsig:RSAKeyValue>
                                  </dsig:KeyValue>
                                 </dsig:KeyInfo>";
         }
     }
     else {
-        confess "did not get a new Crypt::OpenSSL::RSA object";
+        confess "did not get a new Crypt::PK::RSA object";
     }
 }
 
@@ -630,10 +693,10 @@ sub _load_cert_file {
         $text = <$CERT>;
         close $CERT;
 
-        my $cert = Crypt::OpenSSL::X509->new_from_string($text);
+        my $cert = Crypt::PK::RSA->new(\$text);
         if ( $cert ) {
             $self->{ cert_obj } = $cert;
-            my $cert_text = $cert->as_string;
+            my $cert_text = $cert->export_key_pem('public_x509');
             $cert_text =~ s/-----[^-]*-----//gm;
             $self->{KeyInfo} = "<dsig:KeyInfo><dsig:X509Data><dsig:X509Certificate>\n"._trim($cert_text)."\n</dsig:X509Certificate></dsig:X509Data></dsig:KeyInfo>";
         }
@@ -698,6 +761,27 @@ sub _create_encrypted_data_xml {
                                 Algorithm => $self->{key_transport},
                             }
                         );
+
+    if ($self->{'oaep_params'} ne '') {
+        my $oaep_params = $self->_create_node(
+                            $doc,
+                            $xencns,
+                            $kencmethod,
+                            'xenc:OAEPparams',
+                        );
+    };
+
+    if ($self->{key_transport} eq 'http://www.w3.org/2009/xmlenc11#rsa-oaep') {
+        my $oaepmethod = $self->_create_node(
+                            $doc,
+                            $xencns,
+                            $kencmethod,
+                            'xenc:MGF',
+                            {
+                                Algorithm => $self->{oaep_mgf_alg},
+                            }
+                        );
+    };
 
     my $keyinfo2 = $self->_create_node(
                             $doc,
@@ -778,7 +862,7 @@ XML::Enc - XML::Enc Encryption Support
 
 =head1 VERSION
 
-version 0.06
+version 0.08
 
 =head1 SYNOPSIS
 
@@ -857,13 +941,35 @@ Used in encryption.  Optional.  Default method: aes256-cbc
 
 Specify the encryption method to be used for key transport.  Supported methods are:
 
-Used in encryption.  Optional.  Default method: rsa-1_5
+Used in encryption.  Optional.  Default method: rsa-oaep-mgf1p
 
 =over
 
 =item * L<rsa-1_5|https://www.w3.org/TR/2002/REC-xmlenc-core-20021210/Overview.html#rsa-1_5>
 
 =item * L<rsa-oaep-mgf1p|https://www.w3.org/TR/2002/REC-xmlenc-core-20021210/Overview.html#rsa-oaep-mgf1p>
+
+=item * L<rsa-oaep|http://www.w3.org/2009/xmlenc11#rsa-oaep>
+
+=back
+
+=item B<oaep_mgf_alg>
+
+Specify the Algorithm to be used for rsa-oaep.  Supported algorithms are:
+
+Used in encryption.  Optional.  Default method: mgf1sha1
+
+=over
+
+=item * L<mgf1sha1|http://www.w3.org/2009/xmlenc11#mgf1sha1>
+
+=item * L<mgf1sha224|http://www.w3.org/2009/xmlenc11#mgf1sha224>
+
+=item * L<mgf1sha265|http://www.w3.org/2009/xmlenc11#mgf1sha256>
+
+=item * L<mgf1sha384|http://www.w3.org/2009/xmlenc11#mgf1sha384>
+
+=item * L<mgf1sha512|http://www.w3.org/2009/xmlenc11#mgf1sha512>
 
 =back
 

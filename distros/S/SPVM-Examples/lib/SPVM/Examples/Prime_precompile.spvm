@@ -1,0 +1,11 @@
+class Examples::Prime_precompile : precompile {
+  static method is_prime : int ($num : int) {
+    my $limit = $num - 1; # a naive algorithm
+    for (my $i=2; $i<=$limit; $i++) {
+      if ($num % $i == 0) {
+        return 0;
+      }
+    }
+    return 1;
+  }
+}

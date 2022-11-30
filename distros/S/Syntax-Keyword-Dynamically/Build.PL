@@ -3,6 +3,7 @@ use strict;
 use warnings;
 
 use Module::Build;
+use Future::AsyncAwait::ExtensionBuilder;
 use XS::Parse::Keyword::Builder;
 
 my $build = Module::Build->new(
@@ -12,6 +13,7 @@ my $build = Module::Build->new(
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires
+      'Future::AsyncAwait::ExtensionBuilder' => '0.60',
       'XS::Parse::Keyword::Builder' => '0.13',
    },
    requires => {
@@ -33,6 +35,8 @@ if( eval { require Devel::MAT::Dumper::Helper and
             Devel::MAT::Dumper::Helper->VERSION( '0.44' ) } ) {
    Devel::MAT::Dumper::Helper->extend_module_build( $build );
 }
+
+Future::AsyncAwait::ExtensionBuilder->extend_module_build( $build );
 
 XS::Parse::Keyword::Builder->extend_module_build( $build );
 

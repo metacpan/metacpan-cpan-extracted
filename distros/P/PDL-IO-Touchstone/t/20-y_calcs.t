@@ -80,10 +80,7 @@ closedir($dir);
 
 foreach my $fn (@files, @ARGV)
 {
-	my ($f, $m, $param_type, $z0, $comments, $fmt, $funit, $orig_f_unit) = rsnp($fn,
-		#{ freq_min_hz => 1e6, freq_max_hz => 100e6, freq_count => 10 } 
-		#{ freq_min_hz => 1e6, freq_max_hz => 8e9, freq_count => 20 } 
-	);
+	my ($f, $m, $param_type, $z0, $comments, $fmt, $funit, $orig_f_unit) = rsnp($fn);
 
 	next unless $param_type eq 'S';
 

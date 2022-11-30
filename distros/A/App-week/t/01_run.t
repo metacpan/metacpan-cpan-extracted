@@ -41,6 +41,21 @@ END
                           $
 \z}m,
 
+'175209W_re' => qr{(?x:\A
+)                             $
+(?x: \s+ Sep(tember)? \s+ )   $
+(?x:
+(?-x:   Su Mo Tu We Th Fr Sa CW   ) |
+(?-x:    S  M Tu  W Th  F  S CW   ) )$
+          1  2 14 15 16 36   $
+   17 18 19 20 21 22 23 37   $
+   24 25 26 27 28 29 30 38   $
+                             $
+                             $
+                             $
+                             $
+\z}m,
+
 );
 
 sub compare {
@@ -87,6 +102,10 @@ SKIP: {
     my $sm =
     	Script->new([qw(--config shortmonth=1), @default])->run;
     compare $sm->result, $result{"175209_re"}, "solaris short month emulation";
+
+    my $sm =
+    	Script->new([qw(--weeknumber), @default])->run;
+    compare $sm->result, $result{"175209W_re"}, "--weeknumber";
 }
 
 done_testing;

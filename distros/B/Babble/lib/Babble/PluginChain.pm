@@ -1,6 +1,7 @@
 package Babble::PluginChain;
 
 use Babble::Grammar;
+use Babble::Config;
 use Module::Runtime qw(use_module);
 use Mu;
 
@@ -19,7 +20,12 @@ sub add_plugin {
 sub transform_document {
   my ($self, $document) = @_;
   my $top = $self->grammar->match(Document => $document);
-  $_->transform_to_plain($top) for @{$self->plugins};
+  for my $plugin (@{$self->plugins}) {
+    next if Babble::Config::BAIL_OUT_EARLY
+      && $plugin->can('check_bail_out_early')
+      && $plugin->check_bail_out_early($top);
+    $plugin->transform_to_plain($top)
+  }
   return $top->text;
 }
 

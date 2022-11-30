@@ -9,26 +9,33 @@ our @EXPORT_OK = qw/is_sanctioned set_sanction_file get_sanction_file/;
 
 use Carp;
 use Data::Validate::Sanctions::Fetcher;
+use Data::Validate::Sanctions::Redis;
 use File::stat;
 use File::ShareDir;
-use YAML::XS qw/DumpFile LoadFile/;
+use YAML::XS     qw/DumpFile LoadFile/;
 use Scalar::Util qw(blessed);
 use Date::Utility;
 use Data::Compare;
 use List::Util qw(any uniq max min);
 use Locale::Country;
 use Text::Trim qw(trim);
+use Clone      qw(clone);
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
-my $sanction_file = _default_sanction_file();
+my $sanction_file;
 my $instance;
 
 # for OO
 sub new {    ## no critic (RequireArgUnpacking)
     my ($class, %args) = @_;
 
+    my $storage = delete $args{storage} // '';
+
+    return Data::Validate::Sanctions::Redis->new(%args) if $storage eq 'redis';
+
     my $self = {};
+
     $self->{sanction_file} = $args{sanction_file} // _default_sanction_file();
 
     $self->{args} = {%args};
@@ -43,18 +50,27 @@ sub update_data {
     $self->_load_data();
 
     my $new_data = Data::Validate::Sanctions::Fetcher::run($self->{args}->%*, %args);
-
-    my $updated;
+    my $updated  = 0;
     foreach my $k (keys %$new_data) {
         $self->{_data}->{$k}            //= {};
         $self->{_data}->{$k}->{updated} //= 0;
         $self->{_data}->{$k}->{content} //= [];
-        if ($self->{_data}{$k}->{updated} != $new_data->{$k}->{updated}
+
+        if (!$new_data->{$k}->{error} && $self->{_data}->{$k}->{error}) {
+            delete $self->{_data}->{$k}->{error};
+            $updated = 1;
+        }
+
+        if ($new_data->{$k}->{error}) {
+            warn "$k list update failed because: $new_data->{$k}->{error}";
+            $self->{_data}->{$k}->{error} = $new_data->{$k}->{error};
+            $updated = 1;
+        } elsif ($self->{_data}{$k}->{updated} != $new_data->{$k}->{updated}
             || scalar $self->{_data}{$k}->{content}->@* != scalar $new_data->{$k}->{content}->@*)
         {
+            print "Source $k is updated with new data \n" if $args{verbose};
             $self->{_data}->{$k} = $new_data->{$k};
             $updated = 1;
-            print "Source $k is updated with new data \n" if $args{verbose};
         } else {
             print "Source $k is not changed \n" if $args{verbose};
         }
@@ -76,7 +92,7 @@ sub last_updated {
         return $self->{_data}->{$list}->{updated};
     } else {
         $self->_load_data();
-        return max(map { $_->{updated} } values %{$self->{_data}});
+        return max(map { $_->{updated} // 0 } values %{$self->{_data}});
     }
 }
 
@@ -87,6 +103,7 @@ sub set_sanction_file {    ## no critic (RequireArgUnpacking)
 }
 
 sub get_sanction_file {
+    $sanction_file //= _default_sanction_file();
     return $instance ? $instance->{sanction_file} : $sanction_file;
 }
 
@@ -101,6 +118,14 @@ It returns 1 if a match is found, otherwise 0.
 
 sub is_sanctioned {    ## no critic (RequireArgUnpacking)
     return (get_sanctioned_info(@_))->{matched};
+}
+
+sub data {
+    my ($self) = @_;
+
+    $self->_load_data() unless $self->{_data};
+
+    return $self->{_data};
 }
 
 =head2 _match_other_fields
@@ -173,9 +198,12 @@ It returns a hash-ref containg the following data:
 =over 4
 
 =item - matched:      1 if a match was found; 0 otherwise
-        list:         the source for the matched entry,
-        matched_args: a name-value hash-ref of the similar arguments,
-        comment:      additional comments if necessary,
+
+=item - list:         the source for the matched entry,
+
+=item - matched_args: a name-value hash-ref of the similar arguments,
+
+=item - comment:      additional comments if necessary,
 
 =back
 
@@ -184,7 +212,7 @@ It returns a hash-ref containg the following data:
 sub get_sanctioned_info {    ## no critic (RequireArgUnpacking)
     my $self = blessed($_[0]) ? shift : $instance;
     unless ($self) {
-        $instance = __PACKAGE__->new(sanction_file => $sanction_file);
+        $instance = __PACKAGE__->new(sanction_file => get_sanction_file());
         $self     = $instance;
     }
 
@@ -320,10 +348,11 @@ Indexes data by name. Each name may have multiple matching entries.
 sub _index_data {
     my $self = shift;
 
+    $self->{_data} //= {};
     $self->{_index} = {};
     for my $source (keys $self->{_data}->%*) {
-        my @content = ($self->{_data}->{$source}->{content} // [])->@*;
-        warn "Content is empty for the sanction source $source. The sanctions file should be updated." unless @content;
+        my @content = clone($self->{_data}->{$source}->{content} // [])->@*;
+
         for my $entry (@content) {
             $entry->{source} = $source;
             for my $name ($entry->{names}->@*) {
@@ -390,6 +419,12 @@ sub _name_matches {
     return 1 if ($name_matches_count > 1) || ($name_matches_count == 1 && $small_tokens_size == 1);
 
     return 0;
+}
+
+sub export_data {
+    my ($self, $path) = @_;
+
+    return DumpFile($path, $self->{_data});
 }
 
 1;
@@ -486,6 +521,15 @@ set sanction_file which is used by L</is_sanctioned> (procedure-oriented)
 =head2 _name_matches
 
 Pass in the client's name and sanctioned individual's name to see if they are similar or not
+
+
+=head2 export_data
+
+Exports the sanction lists to a local file in YAML format.
+
+=head2 data
+
+Gets the sanction list content with lazy loading.
 
 =head1 AUTHOR
 

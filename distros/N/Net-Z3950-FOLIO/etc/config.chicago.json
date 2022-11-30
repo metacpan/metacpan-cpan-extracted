@@ -4,7 +4,7 @@
     "tenant": "uchicago"
   },
   "login": {
-    "username": "${OKAPI_USER-uchicago_admin}",
+    "username": "${OKAPI_USER-edgeZ3950}",
     "password": "${OKAPI_CHICAGO_PASSWORD}"
   },
   "indexMap": {
@@ -28,6 +28,24 @@
       "e": "_enumeration",
       "y": "_yearCaption",
       "c": "_chronology"
+    }
+  },
+  "postProcessing": {
+    "opac": {
+      "holding": {
+        "callNumber": {
+          "op": "regsub",
+          "pattern": "(.*)",
+          "replacement": "%{_callNumberPrefix}$1%{_callNumberSuffix}"
+        }
+      },
+      "circulation": {
+        "itemId": {
+          "op": "regsub",
+          "pattern": "$",
+          "replacement": "/%{_enumeration}"
+        }
+      }
     }
   }
 }

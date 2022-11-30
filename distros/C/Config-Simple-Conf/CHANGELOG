@@ -1,4 +1,7 @@
-11/02/2019 v.2.006	Add Config::Simple::Conf->argv function to return the conten
+02/03/2021 v.2.007	Add Config::Simple::Conf->set function to allow for updates and changes
+			to the configuration values
+
+11/02/2019 v.2.006	Add Config::Simple::Conf->argv function to return the content
                         of the @ARGV_CLEAN list
 
 11/02/2019 v.2.005	Remove @ARGV_ORIG export, add @ARGV_CLEAN export

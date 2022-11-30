@@ -1,4 +1,3 @@
-* prove -Ilib
 * check perlbrew is active on terminal
 * ppi_version change $old_version $new_version
 * git grep $old_version, update anything remaining

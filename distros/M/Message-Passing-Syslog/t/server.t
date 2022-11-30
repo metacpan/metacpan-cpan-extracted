@@ -42,32 +42,9 @@ my $idle; $idle = AnyEvent->idle(cb => sub {
 
 $cv->recv;
 
-ok scalar(@msgs);
-
-delete $msgs[0]->{message_raw};
-delete $msgs[0]->{datetime_raw};
-my $time = delete $msgs[0]->{epochtime};
-like $time, qr/^\d+$/;
-
-is_deeply \@msgs, [
-    {
-        preamble        => '155',
-        priority        => 'err',
-        priority_int    => 3,
-        facility        => 'local3',
-        facility_int    => 152,
-        host_raw        => '127.0.1.1',
-        host            => '127.0.1.1',
-        domain          => undef,
-        program_raw     => 'progname',
-        program_name    => 'progname',
-        program_sub     => undef,
-        program_pid     => undef,
-        content         => 'foo',
-        message         => 'progname: foo',
-        received_from   => $host,
-    }
-];
+is scalar(@msgs), 1, 'one syslog received';
+like $msgs[0]->{epochtime}, qr/^\d+$/;
+is $msgs[0]->{content}, 'foo', 'content ok';
 
 done_testing;
 

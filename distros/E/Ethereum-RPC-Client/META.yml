@@ -7,29 +7,77 @@ build_requires:
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
+  JSON: '2.97001'
   Test::CheckDeps: '0.010'
   Test::More: '0.96'
+  perl: '5.014'
 configure_requires:
-  ExtUtils::MakeMaker: '7.1101'
+  ExtUtils::MakeMaker: '7.64'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Ethereum-RPC-Client
+no_index:
+  directory:
+    - eg
+    - share
+    - shares
+    - t
+    - xt
+provides:
+  Ethereum::RPC::Client:
+    file: lib/Ethereum/RPC/Client.pm
+    version: '0.04'
+  Ethereum::RPC::Contract:
+    file: lib/Ethereum/RPC/Contract.pm
+    version: '0.04'
+  Ethereum::RPC::Contract::ContractResponse:
+    file: lib/Ethereum/RPC/Contract/ContractResponse.pm
+    version: '0.04'
+  Ethereum::RPC::Contract::ContractTransaction:
+    file: lib/Ethereum/RPC/Contract/ContractTransaction.pm
+    version: '0.04'
+  Ethereum::RPC::Contract::Helper::ImportHelper:
+    file: lib/Ethereum/RPC/Contract/Helper/ImportHelper.pm
+    version: '0.04'
+  Ethereum::RPC::Contract::Helper::UnitConversion:
+    file: lib/Ethereum/RPC/Contract/Helper/UnitConversion.pm
+    version: '0.04'
 requires:
+  Digest::Keccak: '0.05'
+  Encode: '0'
   Future: '0.37'
   JSON: '2.97001'
   JSON::MaybeXS: '1.003008'
-  Math::BigFloat: '1.999811'
-  Math::BigInt: '1.999811'
+  List::Util: '0'
+  Math::BigFloat: '1.999814'
+  Math::BigInt: '1.999814'
   Mojo::UserAgent: '0'
   Moo: '0'
+  Path::Tiny: '0'
+  Scalar::Util: '0'
   perl: '5.014'
+  strict: '0'
+  warnings: '0'
 resources:
   bugtracker: https://github.com/binary-com/perl-Ethereum-RPC-Client/issues
-  repository: git://github.com/binary-com/perl-Ethereum-RPC-Client.git
-version: '0.03'
+  homepage: https://github.com/binary-com/perl-Ethereum-RPC-Client
+  repository: https://github.com/binary-com/perl-Ethereum-RPC-Client.git
+version: '0.04'
+x_authority: cpan:DERIV
+x_contributors:
+  - 'regcostajr <regcostajr@gmail.com>'
+  - 'chylli-binary <chylli@binary.com>'
+  - 'Fayland Lam <fayland@gmail.com>'
+  - 'Jean-Yves Sireau <jy@binary.com>'
+  - 'Reginaldo Costa <53163145+reginaldo-binary@users.noreply.github.com>'
+  - 'Raunak Kathuria <raunakkathuria@gmail.com>'
+  - 'chylli-binary <52912308+chylli-binary@users.noreply.github.com>'
+  - 'Torsten Förtsch <torsten@binary.com>'
+  - 'Zak B. Elep <zakame@zakame.net>'
 x_generated_by_perl: v5.26.2
-x_serialization_backend: 'YAML::Tiny version 1.66'
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -51,7 +51,7 @@ Gets and sets C<dismiss> field. See the L</"DESTROY"> method about the behavior.
 
 =head2 new
 
-  static method new : Scope::Guard ($handler : Scope::Guard::Handler)
+  static method new : Scope::Guard ($handler : Scope::Guard::Handler);
 
 Creates a new C<Scope::Guard> object and returns it.
 
@@ -59,15 +59,17 @@ The C<$handler> is set to the L</"handler"> field.
 
 The C<$handler> is a L<Scope::Guard::Handler|SPVM::Scope::Guard::Handler> object.
 
-The C<$handler> must be defined. Otherwise an exception will be thrown.
+Exceptions:
+
+The C<$handler> must be defined.
 
 =head1 Instance Methods
 
 =head2 DESTROY
 
-  method DESTROY : void ()
+  method DESTROY : void ();
 
-Execute the L</"handler">.
+Executes the L</"handler">.
 
 If L</"dismiss"> is true, the handler is not executed.
 

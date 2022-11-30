@@ -39,7 +39,7 @@ cmp_ok( $bl, '<', 6, "linePattern");
 $x-> color( cl::White);
 $x-> bar( 0, 0, 7, 7);
 $x-> color( cl::Black);
-$x-> lineWidth( 3);
+$x-> lineWidth( 4);
 $x-> line( 3, 4, 5, 4);
 $x-> lineWidth( 1);
 is( $x-> pixel( 2, 4), 0, "lineWidth");
@@ -111,9 +111,10 @@ sub check
 	is( $xsum, $sum, "$test on $subtest");
 }
 
+
 my $can_argb = $::application->get_system_value(sv::LayeredWidgets);
 for my $aa ( 0, 1 ) {
-for my $subtype ( dbt::Bitmap, dbt::Pixmap, dbt::Layered ) {
+for my $subtype ( dbt::Pixmap, dbt::Layered ) {
 	if ( $subtype == dbt::Bitmap ) {
 		$subtest = 'bitmap';
 	} elsif ( $subtype == dbt::Pixmap ) {
@@ -127,8 +128,7 @@ for my $subtype ( dbt::Bitmap, dbt::Pixmap, dbt::Layered ) {
 	}
 	$subtest .= '.aa' if $aa;
 
-	$x = Prima::DeviceBitmap-> create( type => $subtype, width => 8, height => 8, antialias => $aa);
-
+	$x = Prima::DeviceBitmap-> create( type => $subtype, width => 8, height => 8, antialias => 0);
 	$x->rop2(rop::CopyPut);
 	check( "fp0m WB", 1, $fp0m, color => cl::White, backColor => cl::Black );
 	check( "fp0m BW", 3, $fp0m, color => cl::Black, backColor => cl::White );
@@ -149,6 +149,14 @@ for my $subtype ( dbt::Bitmap, dbt::Pixmap, dbt::Layered ) {
 	check( "fp0c", 1, $fp0c, color => cl::White, backColor => cl::Black );
 	check( "fp1c", 3, $fp1c, color => cl::White, backColor => cl::Black );
 	check( "fpXc", 3, $fp1c, color => cl::White, backColor => cl::White );
+
+	$x->rop2(rop::NoOper);
+	$x->backColor(cl::White);
+	$x->clear;
+	check("fp0f", 4, fp::Empty,         color => cl::Black, backColor => cl::White);
+	check("fp8f", 0, fp::Solid,         color => cl::Black, backColor => cl::White);
+	$x->clear;
+	check("fp2f", 2, [(0x55,0xAA) x 4], color => cl::Black, backColor => cl::White);
 }}
 
 if ( $can_argb  ) {

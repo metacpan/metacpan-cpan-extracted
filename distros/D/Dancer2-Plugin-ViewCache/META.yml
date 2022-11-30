@@ -1,0 +1,85 @@
+---
+abstract: 'Create a code for a guest user to use to view a page'
+author:
+  - 'Tracey Clark <traceyc@clearbuilt.com>'
+build_requires:
+  DBIx::Class::Core: '0'
+  DBIx::Class::Schema: '0'
+  Dancer2: '0'
+  Dancer2::Plugin::DBIC: '0'
+  File::Copy: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  FindBin: '0'
+  HTTP::Request::Common: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  JSON::MaybeXS: '0'
+  Plack::Test: '0'
+  Test2::Tools::Subtest: '0'
+  Test2::V0: '0'
+  Test::More: '0.94'
+  base: '0'
+  lib: '0'
+  perl: '5.006'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: '0'
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Plugin-ViewCache
+provides:
+  Dancer2::Plugin::ViewCache:
+    file: lib/Dancer2/Plugin/ViewCache.pm
+    version: '1.0001'
+requires:
+  Carp: '0'
+  Dancer2::Plugin: '0'
+  Modern::Perl: '0'
+version: '1.0001'
+x_BuiltWith:
+  failures:
+    DBIx::Class::Core: 'Module::MetaData could not parse a version from /opt/perl5/perls/perl-5.34.1/lib/site_perl/5.34.1/DBIx/Class/Core.pm'
+    DBIx::Class::Schema: 'Module::MetaData could not parse a version from /opt/perl5/perls/perl-5.34.1/lib/site_perl/5.34.1/DBIx/Class/Schema.pm'
+    Plack::Test: 'Module::MetaData could not parse a version from /opt/perl5/perls/perl-5.34.1/lib/site_perl/5.34.1/Plack/Test.pm'
+  modules:
+    Carp: '1.52'
+    Dancer2: '0.400000'
+    Dancer2::Plugin: '0.400000'
+    Dancer2::Plugin::DBIC: '0.0100'
+    ExtUtils::MakeMaker: '7.62'
+    File::Copy: '2.35'
+    File::Spec: '3.80'
+    File::Temp: '0.2311'
+    FindBin: '1.52'
+    HTTP::Request::Common: '6.44'
+    IO::Handle: '1.46'
+    IPC::Open3: '1.21'
+    JSON::MaybeXS: '1.004004'
+    Modern::Perl: '1.20220515'
+    Test2::Tools::Subtest: '0.000145'
+    Test2::V0: '0.000145'
+    Test::More: '1.302183'
+    base: '2.27'
+    lib: '0.65'
+    strict: '1.12'
+    utf8: '1.24'
+    warnings: '1.51'
+  perl:
+    original: v5.34.1
+    qv: 1
+    version:
+      - 5
+      - 34
+      - 1
+  platform: linux
+x_authority: cpan:CLEARBLT
+x_generated_by_perl: v5.34.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

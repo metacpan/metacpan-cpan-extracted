@@ -1,43 +1,54 @@
-FROM perl:slim-threaded-bullseye AS compile-image
+FROM rshingleton/alpine-perl:5.36.0 AS build-image
+# v1.0
+RUN apk update && apk upgrade && apk add --no-cache \
+        build-base \
+        curl \
+        wget \
+        gcc \
+        gnupg \
+        make \
+        openssl \
+        openssl-dev \
+        tar \
+        zlib \
+        zlib-dev \
+        g++ \
+        ca-certificates \
+    && rm -rf /var/cache/apk/*
 
-RUN apt-get update
-RUN apt-get update && apt-get install -y \
-    curl tar build-essential \
-    wget gnupg ca-certificates \
-    libssl-dev libssl1.1 \
-    g++ git zlib1g zlib1g-dev
+    # curl tar build-essential \
+    # wget gnupg ca-certificates \
+    # libssl-dev libssl1.1 \
+    # g++ git zlib1g zlib1g-dev
     
-RUN curl -LO https://raw.githubusercontent.com/miyagawa/cpanminus/master/cpanm \
-    && chmod +x cpanm \
-    && ./cpanm App::cpanminus
-
-ENV PERL_CPANM_OPT --verbose --mirror https://cpan.metacpan.org --mirror-only
-RUN cpanm Digest::SHA Module::Signature && rm -rf ~/.cpanm
-ENV PERL_CPANM_OPT $PERL_CPANM_OPT --verify
-
-RUN cpanm App::cpm
- 
 COPY cpanfile ./
 
 RUN cpm install --global --show-build-log-on-failure
 
-FROM debian:stable-slim AS build-image
+FROM alpine:latest AS runtime-image
 
-RUN apt-get update && apt-get install  --no-install-recommends --no-install-suggests  -y \
-    curl tar wget ca-certificates \
-    git openssh-client
+ENV PATH="/opt/perl/bin:${PATH}"
 
-COPY --from=compile-image /usr/local /usr/local
-WORKDIR /opt
+# Copy the base Perl installation from the build-image
+COPY --from=build-image /opt/perl /opt/perl
+
+RUN apk update && apk upgrade && apk add --no-cache \
+        curl \
+        openssl \
+        openssl-dev \
+        openssh \
+        wget \
+        git \
+        ca-certificates \
+    && rm -rf /var/cache/apk/*    
+
+WORKDIR /app
 
 ARG VER=1.0
 
-COPY ./lib/Mojo /usr/local/lib/perl5/site_perl/5.34.0/Mojo
-COPY lib/Mojolicious/Plugin/DirectoryHandler.pm /usr/local/lib/perl5/site_perl/5.34.0/Mojolicious/Plugin
-COPY ./script/darkpan /usr/local/bin
-COPY ./script/darkpan_app.pl /usr/local/bin
+COPY . .
 
 EXPOSE 3000
 
 # docker build --progress plain --tag mojo-darkpan:latest .
-# docker run -init mojo-darkpan:latest script/darkpan
+# docker run --init -p 3000:3000 mojo-darkpan:latest script/darkpan

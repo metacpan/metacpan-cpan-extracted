@@ -30,7 +30,7 @@ XSLoader::load('pEFL::Evas::Rectangle');
 sub add {
     my ($class,$parent) = @_;
     my $widget = evas_object_rectangle_add($parent);
-    #$widget->smart_callback_add("del", \&pEFL::PLSide::cleanup, $widget);
+    $widget->event_callback_add(pEFL::Evas::EVAS_CALLBACK_DEL(), \&pEFL::PLSide::cleanup, $widget);
     return $widget;
 }
 

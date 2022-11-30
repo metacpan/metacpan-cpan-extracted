@@ -31,7 +31,16 @@ sub build_proxy {
   return undef if !$space->tryload;
 
   return sub {
-    return $space->build->execute($self, @args);
+    if ($space->package->can('construct')) {
+      my $class = $space->load;
+
+      return $class->construct($self, @args)->execute;
+    }
+    else {
+      my $class = $space->load;
+
+      return $class->new->execute($self, @args);
+    }
   };
 }
 
@@ -59,7 +68,7 @@ Pluggable Role for Perl 5
 
 =head1 SYNOPSIS
 
-  package Example::Plugin::Password;
+  package Example::Plugin::Username;
 
   use Venus::Class;
 
@@ -68,7 +77,27 @@ Pluggable Role for Perl 5
   sub execute {
     my ($self, $example) = @_;
 
-    return Digest::SHA::sha1_hex($example->secret);
+    return Digest::SHA::sha1_hex($example->login);
+  }
+
+  package Example::Plugin::Password;
+
+  use Venus::Class;
+
+  use Digest::SHA ();
+
+  attr 'value';
+
+  sub construct {
+    my ($class, $example) = @_;
+
+    return $class->new(value => $example->secret);
+  }
+
+  sub execute {
+    my ($self) = @_;
+
+    return Digest::SHA::sha1_hex($self->value);
   }
 
   package Example;
@@ -78,12 +107,14 @@ Pluggable Role for Perl 5
   with 'Venus::Role::Proxyable';
   with 'Venus::Role::Pluggable';
 
+  attr 'login';
   attr 'secret';
 
   package main;
 
-  my $example = Example->new(secret => rand);
+  my $example = Example->new(login => 'admin', secret => 'p@ssw0rd');
 
+  # $example->username;
   # $example->password;
 
 =cut

@@ -12,6 +12,7 @@ MANIFEST.bak
 pod2htmd.tmp
 
 ^Makefile$
+^Makefile.old$
 
 MYMETA.json
 MYMETA.yml

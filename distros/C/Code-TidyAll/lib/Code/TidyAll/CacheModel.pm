@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Digest::SHA qw(sha1_hex);
-use Path::Tiny ();
+use Path::Tiny  ();
 use Specio::Declare;
 use Specio::Library::Builtins;
 use Specio::Library::Path::Tiny;
@@ -12,7 +12,7 @@ use Specio::Library::String;
 
 use Moo;
 
-our $VERSION = '0.82';
+our $VERSION = '0.83';
 
 has base_sig => (
     is      => 'ro',
@@ -141,7 +141,7 @@ Code::TidyAll::CacheModel - Caching model for Code::TidyAll
 
 =head1 VERSION
 
-version 0.82
+version 0.83
 
 =head1 SYNOPSIS
 

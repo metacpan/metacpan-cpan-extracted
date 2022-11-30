@@ -4,9 +4,9 @@
       "Zakariyya Mughal <zmughal@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "apache_2_0"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -26,16 +26,17 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Alien::Build" : "0.32",
+            "Alien::Build" : "2.72",
             "Alien::Build::MM" : "0.32",
             "ExtUtils::MakeMaker" : "6.52"
          }
       },
       "configure" : {
          "requires" : {
-            "Alien::Build" : "0.32",
+            "Alien::Build" : "1.19",
             "Alien::Build::MM" : "0.32",
             "Alien::Build::Plugin::Build::Copy" : "0",
+            "Alien::Build::Plugin::Download::GitHub" : "0.10",
             "ExtUtils::MakeMaker" : "6.52",
             "perl" : "5.006"
          }
@@ -66,18 +67,20 @@
          "web" : "https://github.com/EntropyOrg/perl-Alien-Libtensorflow"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_alienfile" : {
       "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.32",
       "requires" : {
          "share" : {
+            "Alien::Build::Plugin::Download::GitHub" : "0.1",
             "Archive::Tar" : "0",
+            "File::Which" : "0",
             "HTTP::Tiny" : "0.044",
             "IO::Socket::SSL" : "1.56",
             "IO::Zlib" : "0",
             "Mojo::DOM" : "0",
-            "Mojo::JSON" : "0",
             "Mojolicious" : "7.00",
+            "Mozilla::CA" : "0",
             "Net::SSLeay" : "1.49",
             "Sort::Versions" : "0",
             "URI" : "0",
@@ -88,6 +91,6 @@
    },
    "x_generated_by_perl" : "v5.26.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.28",
-   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
+   "x_spdx_expression" : "Apache-2.0"
 }
 

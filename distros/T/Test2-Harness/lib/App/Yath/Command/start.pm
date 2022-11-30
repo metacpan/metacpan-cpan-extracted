@@ -2,7 +2,7 @@ package App::Yath::Command::start;
 use strict;
 use warnings;
 
-our $VERSION = '1.000133';
+our $VERSION = '1.000136';
 
 use App::Yath::Util qw/find_pfile/;
 use App::Yath::Options;
@@ -691,21 +691,21 @@ Add a directory to your include paths
 Can be specified multiple times
 
 
-=item --job-count ARG
+=item --job-count 4
 
-=item --job-count=ARG
+=item --job-count 8:2
 
-=item --jobs ARG
+=item --jobs 4
 
-=item --jobs=ARG
+=item --jobs 8:2
 
-=item -j ARG
+=item -j4
 
-=item -j=ARG
+=item -j8:2
 
 =item --no-job-count
 
-Set the number of concurrent jobs to run
+Set the number of concurrent jobs to run. Add a :# if you also wish to designate multiple slots per test. 8:2 means 8 slots, but each test gets 2 slots, so 4 tests run concurrently. Tests can find their concurrency assignemnt in the "T2_HARNESS_MY_JOB_CONCURRENCY" environment variable.
 
 Can also be set with the following environment variables: C<YATH_JOB_COUNT>, C<T2_HARNESS_JOB_COUNT>, C<HARNESS_JOB_COUNT>
 
@@ -782,6 +782,37 @@ Can be specified multiple times
 Use a resource module to assign resource assignments to individual tests
 
 Can be specified multiple times
+
+
+=item --runner-id ARG
+
+=item --runner-id=ARG
+
+=item --no-runner-id
+
+Runner ID (usually a generated uuid)
+
+
+=item --shared-jobs-config .sharedjobslots.yml
+
+=item --shared-jobs-config relative/path/.sharedjobslots.yml
+
+=item --shared-jobs-config /absolute/path/.sharedjobslots.yml
+
+=item --no-shared-jobs-config
+
+Where to look for a shared slot config file. If a filename with no path is provided yath will search the current and all parent directories for the name.
+
+
+=item --slots-per-job 2
+
+=item -x2
+
+=item --no-slots-per-job
+
+This sets the number of slots each job will use (default 1). This is normally set by the ':#' in '-j#:#'.
+
+Can also be set with the following environment variables: C<T2_HARNESS_JOB_CONCURRENCY>
 
 
 =item --switch ARG

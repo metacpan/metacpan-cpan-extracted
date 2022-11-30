@@ -327,17 +327,14 @@ typedef struct
 struct  _drawable_sys_data;
 
 #define VIRGIN_GC_MASK  (       GCBackground    \
-			|       GCCapStyle      \
 			|       GCClipMask      \
 			|       GCForeground    \
 			|       GCFunction      \
-			|       GCJoinStyle     \
 			|       GCFillRule      \
 			|       GCFillStyle      \
 			|       GCTileStipXOrigin \
 			|       GCTileStipYOrigin \
 			|       GCLineStyle     \
-			|       GCLineWidth     \
 			|       GCSubwindowMode )
 
 typedef struct gc_list
@@ -460,7 +457,8 @@ typedef struct {
 #define AI_XdndActionList                49
 #define AI_XdndActionDescription         50
 #define AI_PLAINTEXT_MIME                51
-#define AI_count                         52
+#define AI_NET_WM_ICON                   52
+#define AI_count                         53
 
 #define FXA_RESOLUTION_X            pguts->atoms[AI_FXA_RESOLUTION_X           ]
 #define FXA_RESOLUTION_Y            pguts->atoms[AI_FXA_RESOLUTION_Y           ]
@@ -517,6 +515,7 @@ typedef struct {
 #define XdndActionList              pguts->atoms[AI_XdndActionList             ]
 #define XdndActionDescription       pguts->atoms[AI_XdndActionDescription      ]
 #define PLAINTEXT_MIME              pguts->atoms[AI_PLAINTEXT_MIME             ]
+#define NET_WM_ICON                 pguts->atoms[AI_NET_WM_ICON                ]
 
 #define DEBUG_FONTS 0x01
 #define DEBUG_CLIP  0x02
@@ -669,7 +668,9 @@ typedef struct _UnixGuts
 		long XFillArcs;
 		long XFillPolygon;
 		long XFillRectangles;
+		long NetWMIcon;
 		long request_length;
+		long extended_request_length;
 	}                            limits;
 	Bool                         local_connection;
 	Cursor                       null_pointer;
@@ -824,7 +825,7 @@ typedef struct _drawable_sys_data
 	XDrawable gdrawable;
 	XWindow parent;
 	Point origin, size, bsize;
-	Point transform, btransform;
+	Point btransform;
 	Point ackOrigin, ackSize, ackFrameSize;
 	int menuHeight;
 	int menuColorImmunity;
@@ -847,15 +848,11 @@ typedef struct _drawable_sys_data
 	int fill_mode;
 	Pixmap fp_tile, fp_stipple, fp_render_pen;
 	XID fp_render_picture;
-#if defined(sgi) && !defined(__GNUC__)
-/* multiple compilation and runtime errors otherwise. must be some alignment tricks */
-	char dummy_b_1[2];
-#endif
+	Matrix matrix;
 	int rop;
 	int rop2;
 	int alpha;
 	int line_style;
-	float line_width, miter_limit;
 	unsigned char *dashes;
 	int ndashes;
 	Point clip_mask_extent, shape_extent, shape_offset;
@@ -957,12 +954,12 @@ typedef struct _PaintState
 	} nonpaint;
 	int alpha, fill_mode, n_dashes, rop, rop2;
 	Bool antialias, text_opaque, text_baseline, null_hatch;
-	Point fill_pattern_offset, transform;
+	Point fill_pattern_offset;
 	Handle fill_image;
 	FillPattern fill_pattern;
 	Font font;
-	float line_width, miter_limit;
 	unsigned char *dashes;
+	Matrix matrix;
 
 	unsigned int user_data_size;
 	GCStorageFunction * user_destructor;

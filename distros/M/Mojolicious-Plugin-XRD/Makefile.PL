@@ -13,9 +13,9 @@ WriteMakefile(
     'Test::More' => 0
   },
   PREREQ_PM => {
-    'Mojolicious' => 7.13,
+    'Mojolicious' => 9.17,
     'Mojolicious::Plugin::XML::Loy' => 0.15,
-    'XML::Loy' => 0.49
+    'XML::Loy' => 0.50
   },
   LICENSE      => 'artistic_2',
   META_MERGE   => {

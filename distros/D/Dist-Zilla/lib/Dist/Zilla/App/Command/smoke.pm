@@ -1,4 +1,4 @@
-package Dist::Zilla::App::Command::smoke 6.028;
+package Dist::Zilla::App::Command::smoke 6.029;
 # ABSTRACT: smoke your dist
 
 use Dist::Zilla::Pragmas;
@@ -78,7 +78,7 @@ Dist::Zilla::App::Command::smoke - smoke your dist
 
 =head1 VERSION
 
-version 6.028
+version 6.029
 
 =head1 SYNOPSIS
 

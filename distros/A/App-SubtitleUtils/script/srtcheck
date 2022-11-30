@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-10'; # DATE
+our $DATE = '2022-11-22'; # DATE
 our $DIST = 'App-SubtitleUtils'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/SubtitleUtils/srtcheck",
@@ -38,15 +38,15 @@ srtcheck - Check the properness of SRT file
 
 =head1 VERSION
 
-This document describes version 0.008 of srtcheck (from Perl distribution App-SubtitleUtils), released on 2022-11-10.
+This document describes version 0.011 of srtcheck (from Perl distribution App-SubtitleUtils), released on 2022-11-22.
 
 =head1 SYNOPSIS
 
-B<srtcheck> L<--help|/"--help, -h, -?"> (or L<-h|/"--help, -h, -?">, L<-?|/"--help, -h, -?">)
+B<srtcheck> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
 
-B<srtcheck> L<--version|/"--version, -v"> (or L<-v|/"--version, -v">)
+B<srtcheck> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<srtcheck> [L<--format|/"--format=s">=I<name>|L<--json|/"--json">] [L<--(no)naked-res|/"--naked-res">] [L<--page-result|/"--page-result">[=I<program>]|L<--view-result|/"--view-result">[=I<program>]] -- E<lt>L<filename|/"--filename=s*">E<gt>
+B<srtcheck> [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- E<lt>I<L<filename|/"--filename=s*">>E<gt>
 
 =head1 OPTIONS
 

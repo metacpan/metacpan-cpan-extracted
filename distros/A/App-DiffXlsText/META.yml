@@ -19,7 +19,7 @@ name: App-DiffXlsText
 provides:
   App::DiffXlsText:
     file: lib/App/DiffXlsText.pm
-    version: '0.009'
+    version: '0.011'
 requires:
   CLI::Meta::diff: '0'
   CLI::MetaUtil::Getopt::Long: '0.002'
@@ -40,7 +40,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-DiffXlsText
   homepage: https://metacpan.org/release/App-DiffXlsText
   repository: git://github.com/perlancar/perl-App-DiffXlsText.git
-version: '0.009'
+version: '0.011'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

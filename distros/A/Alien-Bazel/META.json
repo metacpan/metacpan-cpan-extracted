@@ -4,7 +4,7 @@
       "William N. Braswell, Jr. <wbraswell@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "Dist::Zilla version 6.028, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -26,7 +26,7 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Alien::Build" : "0.32",
+            "Alien::Build" : "2.72",
             "Alien::Build::MM" : "0.32",
             "ExtUtils::MakeMaker" : "6.52"
          }
@@ -81,32 +81,39 @@
    "provides" : {
       "Alien::Bazel" : {
          "file" : "lib/Alien/Bazel.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Alien::Bazel::Util" : {
          "file" : "lib/Alien/Bazel/Util.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://gitlab.com/PerlAlien/alien-bazel/-/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "web" : "https://gitlab.com/PerlAlien/alien-bazel"
+      },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_alienfile" : {
       "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.32",
       "requires" : {
          "share" : {
             "Alien::Build" : "1.05",
-            "Alien::Build::Plugin::Download::GitHub" : "0.09",
+            "Alien::Build::Plugin::Download::GitHub" : "0.10",
             "Alien::Build::Plugin::Download::Negotiate" : "1.30",
-            "Archive::Zip" : "0",
             "Config" : "0",
             "File::Which" : "0",
             "HTTP::Tiny" : "0.044",
             "IO::Socket::SSL" : "1.56",
             "Mojo::DOM" : "0",
             "Mojolicious" : "7.00",
+            "Mozilla::CA" : "0",
             "Net::SSLeay" : "1.49",
             "Path::Tiny" : "0",
             "URI" : "0",

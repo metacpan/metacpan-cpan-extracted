@@ -30,6 +30,10 @@ Debian/Ubuntu
   apt-get install libgtk3.0-dev libgif-dev libjpeg-dev libtiff-dev libxpm-dev 
       libwebp-dev libfribidi-dev libharfbuzz-dev libthai-dev libheif-dev
 
+FreeBSD
+-------
+  pkg install gtk3 fribidi harfbuzz libxpm libthai pkgconf tiff webp giflib libheif
+
 OpenSUSE
 --------
 
@@ -106,7 +110,7 @@ You'll need homebrew, XQuartz, and a set of extra libraries.
 - install support libraries:
 
   brew install libiconv libxcomposite libxrandr libxcursor libxft fribidi fontconfig
-     freetype giflib gtk+ harfbuzz jpeg libpng libtiff webp libxpm
+     freetype giflib gtk+3 harfbuzz jpeg libpng libtiff webp libxpm libheif
 
 Note: if Prima crashes in libxft, do this: remove libxft and install custom built xorg libraries, either very minimal
 
@@ -118,7 +122,9 @@ or linux-homebrew's (not tested)
 
   brew install linuxbrew/xorg/libxft
 
-- install libthai from https://github.com/phondanai/homebrew-libthai (not tested)
+- install libthai:
+
+  brew install dk/libthai/libthai
 
 Bidirectional input and complex scripts
 ---------------------------------------
@@ -188,7 +194,7 @@ Try running the toolkit examples, by default installed in
 INSTALLSITEARCH/Prima/examples directory ( find it by running perl
 -V:installsitearch ). All examples and programs included into the distribution
 can be run either by their name or with perl as argument - for example,
-..../generic or perl ..../generic .  ( perl ..../generic.bat for win32 )
+..../helloworld or perl ..../helloworld .  ( perl ..../helloworld.bat for win32 )
 
 Typical code starts with
 
@@ -225,6 +231,11 @@ start with the main manual page.
 Visit http://www.prima.eu.org/ for the recent versions of the toolkit. You can
 use github.com/dk/Prima to keep in touch. The mailing list on the toolkit is
 available, you can ask questions there. See the Prima homepage for details.
+
+Online documentation at MetaCPAN: https://metacpan.org/dist/Prima/view/Prima.pm
+
+Printable documentation: http://prima.eu.org/download/Prima.pdf
+
 
 Copyright
 =========
@@ -274,4 +285,7 @@ Credits
  - Maximilian Lika
  - kmx
  - Mario Roy
+ - Timothy Witham
+ - Mohammad S Anwar
+ - Jean-Damien Durand
 

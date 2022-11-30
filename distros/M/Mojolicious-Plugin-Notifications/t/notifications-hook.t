@@ -53,7 +53,7 @@ if ($err) {
   is($err->text, '');
 };
 
-$err = $t->get_ok('/example?_format=json&format=json')
+$err = $t->get_ok('/example?_format=json')
   ->status_is(200)
   ->json_is("/msg", 'Hallo')
   ->tx->res->dom->at('#error')
@@ -62,7 +62,7 @@ if ($err) {
   is($err->text, '');
 };
 
-$t->get_ok('/example?_format=json&format=json&warn=Oh&warn=Hm&info=Hey!')
+$t->get_ok('/example?_format=json&warn=Oh&warn=Hm&info=Hey!')
   ->status_is(200)
   ->json_is("/msg", 'Hallo')
   ->json_is("/notifications/0/0", 'info')
@@ -86,7 +86,7 @@ $t->app->hook(
   }
 );
 
-$t->get_ok('/example?_format=json&format=json&warn=Oh&warn=Hm&info=Hey!')
+$t->get_ok('/example?_format=json&warn=Oh&warn=Hm&info=Hey!')
   ->status_is(200)
   ->json_is("/msg", 'Hallo')
   ->json_is("/notifications/0/0", 'warn')
@@ -97,7 +97,7 @@ $t->get_ok('/example?_format=json&format=json&warn=Oh&warn=Hm&info=Hey!')
   ->json_is("/notifications/2/1", 'a new message')
   ;
 
-$t->get_ok('/example?_format=json&format=json')
+$t->get_ok('/example?_format=json')
   ->status_is(200)
   ->json_is("/msg", 'Hallo')
   ->json_is("/notifications/0/0", 'unknown')

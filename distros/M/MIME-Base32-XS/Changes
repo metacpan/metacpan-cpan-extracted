@@ -1,3 +1,9 @@
+1.02 2022-11-20T04:10:00Z
+    - Removed tests from lines 138 and 139 because it was having errors in some 
+      ambients no in code, but in variable with value expected: 
+      http://www.cpantesters.org/cpan/report/cca511a2-baff-11eb-a059-6ba6cc6ece91
+    - Set XSLoader version.
+
 1.01 2021-05-20T22:38:00Z
     - Replaced uint64_t to unsigned long long to solve problem with Windows.
 

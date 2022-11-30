@@ -1,5 +1,9 @@
 Revision history for Perl extension Udev-FFI
 
+0.105000 2022-11-26T11:24:27Z
+    - remove deprecated mkdev
+    - minimum required version of libudev is now 171
+
 0.104002 2019-06-13T16:56:26Z
     - update tests
 

@@ -1,0 +1,19 @@
+Revision history for Clearbuilt::ExcelErator
+
+2.0001 2022-11-22T07:56:18-05:00 America/New_York
+ [BUG FIXES]
+ - Add needed plugins to dist.ini to pick up prereqs
+
+ [STATISTICS]
+ - code churn: 2 files changed, 11 insertions(+), 3 deletions(-)
+
+2.0000 2022-11-21T12:32:53-05:00 America/New_York
+ [MAJOR]
+ - First version publicly released
+
+ [STATISTICS]
+ - code churn: 7 files changed, 663 insertions(+), 59 deletions(-)
+
+1.1000 2022-11-21T11:17:23-05:00 America/New_York
+ [MAJOR]
+ - Final internal version

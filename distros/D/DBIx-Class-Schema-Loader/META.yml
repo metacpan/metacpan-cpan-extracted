@@ -15,7 +15,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -44,6 +44,7 @@ requires:
   List::Util: '1.33'
   MRO::Compat: '0.09'
   Scope::Guard: '0.20'
+  String::CamelCase: '0.04'
   String::ToIdentifier::EN: '0.05'
   Sub::Util: '1.40'
   Try::Tiny: '0'
@@ -53,7 +54,8 @@ requires:
 resources:
   IRC: irc://irc.perl.org/#dbix-class
   MailingList: http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/dbix-class
+  bugtracker: https://github.com/dbsrgits/dbix-class-schema-loader/issues
   license: http://dev.perl.org/licenses/
   repository: https://github.com/dbsrgits/dbix-class-schema-loader
-version: '0.07049'
+version: '0.07051'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

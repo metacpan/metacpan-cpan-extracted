@@ -1,5 +1,9 @@
 Revision history for Alien-curl
 
+0.11      2022-11-27 02:16:14 -0700
+  - Fixes for recent versions of curl source on windows
+    (gh#19, gh#20, shawnlaffan++)
+
 0.10      2022-09-26 21:12:26 -0600
   - Improved compatability with Alien::OpenSSL (gh#17)
 

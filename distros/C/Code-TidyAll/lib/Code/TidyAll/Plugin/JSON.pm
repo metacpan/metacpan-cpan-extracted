@@ -8,7 +8,7 @@ use Specio::Library::Builtins;
 
 use Moo;
 
-our $VERSION = '0.82';
+our $VERSION = '0.83';
 
 extends 'Code::TidyAll::Plugin';
 
@@ -50,7 +50,7 @@ Code::TidyAll::Plugin::JSON - Use the JSON::MaybeXS module to tidy JSON document
 
 =head1 VERSION
 
-version 0.82
+version 0.83
 
 =head1 SYNOPSIS
 

@@ -92,8 +92,8 @@ is($remove_extension_1, 'path/users', 'Test removed extension from file name (pa
 my $remove_extension_2 = remove_extension('articles.SQL');
 is($remove_extension_2, 'articles', 'Test removed extension from file name (articles.SQL)');
 
-my $remove_extension_2 = remove_extension('contacts.Sql');
-is($remove_extension_2, 'contacts', 'Test removed extension from file name (contacts.Sql)');
+my $remove_extension_3 = remove_extension('contacts.Sql');
+is($remove_extension_3, 'contacts', 'Test removed extension from file name (contacts.Sql)');
 
 my $trim_1 = trim('  foo   ');
 is($trim_1, 'foo', 'Test remove spaces at start and end');
@@ -101,7 +101,7 @@ is($trim_1, 'foo', 'Test remove spaces at start and end');
 my $trim_2 = trim('  bar');
 is($trim_2, 'bar', 'Test remove spaces at start');
 
-my $trim_2 = trim('baz   ');
-is($trim_2, 'baz', 'Test remove spaces at end');
+my $trim_3 = trim('baz   ');
+is($trim_3, 'baz', 'Test remove spaces at end');
 
 done_testing;

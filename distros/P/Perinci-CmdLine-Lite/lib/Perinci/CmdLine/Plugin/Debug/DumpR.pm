@@ -10,9 +10,9 @@ use parent 'Perinci::CmdLine::PluginBase';
 
 # put global variables alphabetically here
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-04'; # DATE
+our $DATE = '2022-11-24'; # DATE
 our $DIST = 'Perinci-CmdLine-Lite'; # DIST
-our $VERSION = '1.926'; # VERSION
+our $VERSION = '1.928'; # VERSION
 
 sub meta {
     return {
@@ -47,7 +47,7 @@ Perinci::CmdLine::Plugin::Debug::DumpR - Dump request stash ($r), by default aft
 
 =head1 VERSION
 
-This document describes version 1.926 of Perinci::CmdLine::Plugin::Debug::DumpR (from Perl distribution Perinci-CmdLine-Lite), released on 2022-11-04.
+This document describes version 1.928 of Perinci::CmdLine::Plugin::Debug::DumpR (from Perl distribution Perinci-CmdLine-Lite), released on 2022-11-24.
 
 =head1 SYNOPSIS
 

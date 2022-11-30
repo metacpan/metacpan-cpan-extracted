@@ -1,8 +1,10 @@
+#!perl
+
 use 5.010;
 use warnings;
 use strict;
 
-our $VERSION = '2.00';
+our $VERSION = '2.09';
 
 use rlib;
 

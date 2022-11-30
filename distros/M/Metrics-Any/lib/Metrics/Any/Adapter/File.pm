@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
 
-package Metrics::Any::Adapter::File 0.08;
+package Metrics::Any::Adapter::File 0.09;
 
 use v5.14;
 use warnings;
@@ -41,6 +41,8 @@ even though the output goes nowhere.
 
 Distribution and timing metrics are tracked with a running total and count of
 observations.
+
+This adapter type does not support batch mode reporting.
 
 =head1 ARGUMENTS
 

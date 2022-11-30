@@ -14,9 +14,9 @@ use Perinci::Sub::Util qw(err gen_modified_sub);
 require Exporter;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-05'; # DATE
+our $DATE = '2022-11-28'; # DATE
 our $DIST = 'Calendar-Indonesia-Holiday'; # DIST
-our $VERSION = '0.347'; # VERSION
+our $VERSION = '0.348'; # VERSION
 
 our @ISA = qw(Exporter);
 our @EXPORT_OK = (
@@ -1216,9 +1216,42 @@ our %year_holidays;
     );
 }
 
+# decreed oct 11, 2022 (SKB No 1066/2022, 3/2022, 3/2022)
+#
+# ref:
+# - https://www.kemenkopmk.go.id/pemerintah-terapkan-hari-libur-nasional-dan-cuti-bersama-tahun-2023
 {
     # 2023 holidays
-    1;
+    my ($chnewyear2023, $nyepi2023, $eidulf2023, $vesakha2023, $christmas);
+    $year_holidays{2023} = [
+        # - new year
+        ($chnewyear2023 = _h_chnewyear ({_expand_dm("22-01")}, {hyear=>2574})),
+        _h_isramiraj ({_expand_dm("18-02")}, {hyear=>1444}),
+        ($nyepi2023 = _h_nyepi     ({_expand_dm("22-03")}, {hyear=>1945})),
+        _h_goodfri   ({_expand_dm("07-04")}),
+        ($eidulf2023 = _h_eidulf    ({_expand_dm("22-04")}, {hyear=>1444, day=>1})),
+        _h_eidulf    ({_expand_dm("23-04")}, {hyear=>1444, day=>2}),
+        # - labor day
+        _h_ascension ({_expand_dm("18-05")}),
+        # - pancasila day
+        _h_vesakha   ({_expand_dm("04-06")}, {hyear=>2567}),
+        _h_eidula    ({_expand_dm("29-06")}, {hyear=>1444}),
+        _h_hijra     ({_expand_dm("19-07")}, {hyear=>1445}),
+        # - independence day
+        _h_mawlid({_expand_dm("28-09")}, {hyear=>1445}),
+        # - christmas
+    ];
+
+    push @{ $year_holidays{2023} }, (
+        _jointlv     ({_expand_dm("23-01")}, {holiday=>$chnewyear2023}),
+        _jointlv     ({_expand_dm("23-03")}, {holiday=>$nyepi2023}),
+        _jointlv     ({_expand_dm("21-04")}, {holiday=>$eidulf2023}),
+        _jointlv     ({_expand_dm("24-04")}, {holiday=>$eidulf2023}),
+        _jointlv     ({_expand_dm("25-04")}, {holiday=>$eidulf2023}),
+        _jointlv     ({_expand_dm("26-04")}, {holiday=>$eidulf2023}),
+        _jointlv     ({_expand_dm("02-06")}, {holiday=>$vesakha2023}),
+        _jointlv     ({_expand_dm("26-12")}, {holiday=>$christmas}),
+    );
 }
 
 {
@@ -1631,7 +1664,7 @@ Calendar::Indonesia::Holiday - List Indonesian public holidays
 
 =head1 VERSION
 
-This document describes version 0.347 of Calendar::Indonesia::Holiday (from Perl distribution Calendar-Indonesia-Holiday), released on 2022-07-05.
+This document describes version 0.348 of Calendar::Indonesia::Holiday (from Perl distribution Calendar-Indonesia-Holiday), released on 2022-11-28.
 
 =head1 SYNOPSIS
 
@@ -1717,7 +1750,7 @@ This module provides functions to list Indonesian holidays. There is a
 command-line script interface for this module: L<list-idn-holidays> and a few
 others distributed in L<App::IndonesianHolidayUtils> distribution.
 
-Calendar years supported: 1990-2022.
+Calendar years supported: 1990-2023.
 
 Note: Note that sometimes the holiday (as set by law) falls at a different date
 than the actual religious commemoration date. When you use the C<detail> option,
@@ -1761,7 +1794,7 @@ days*. If work_saturdays is set to true, Saturdays are also counted as working
 days. If observe_joint_leaves is set to false, joint leave days are also counted
 as working days.
 
-Contains data from years 1990 to 2022
+Contains data from years 1990 to 2023
 
 This function is not exported by default, but exportable.
 
@@ -1837,19 +1870,35 @@ Arguments ('*' denotes required arguments):
 
 =item * B<date> => I<str>
 
+(No description)
+
 =item * B<day> => I<int>
+
+(No description)
 
 =item * B<detail> => I<bool>
 
+(No description)
+
 =item * B<include_joint_leave> => I<bool>
+
+(No description)
 
 =item * B<month> => I<int>
 
+(No description)
+
 =item * B<quiet> => I<bool>
+
+(No description)
 
 =item * B<reverse> => I<bool>
 
+(No description)
+
 =item * B<year> => I<int>
+
+(No description)
 
 
 =back
@@ -1880,7 +1929,7 @@ days*. If work_saturdays is set to true, Saturdays are also counted as working
 days. If observe_joint_leaves is set to false, joint leave days are also counted
 as working days.
 
-Contains data from years 1990 to 2022
+Contains data from years 1990 to 2023
 
 This function is not exported by default, but exportable.
 
@@ -1890,9 +1939,15 @@ Arguments ('*' denotes required arguments):
 
 =item * B<date> => I<str>
 
+(No description)
+
 =item * B<day> => I<int>
 
+(No description)
+
 =item * B<month> => I<int>
+
+(No description)
 
 =item * B<observe_joint_leaves> => I<bool> (default: 1)
 
@@ -1903,6 +1958,8 @@ If set to 0, do not observe joint leave as holidays.
 If set to 1, Saturday is a working day.
 
 =item * B<year> => I<int>
+
+(No description)
 
 
 =back
@@ -1930,7 +1987,7 @@ List Indonesian holidays in calendar.
 
 List holidays and joint leave days ("cuti bersama").
 
-Contains data from years 1990 to 2022
+Contains data from years 1990 to 2023
 
 This function is not exported by default, but exportable.
 
@@ -2252,9 +2309,26 @@ Only return records where the 'note' field is less than specified value.
 
 Only return records where the 'note' field is greater than specified value.
 
-=item * B<query> => I<str>
+=item * B<queries> => I<array[str]>
 
 Search.
+
+This will search all searchable fields with one or more specified queries. Each
+query can be in the form of C<-FOO> (dash prefix notation) to require that the
+fields do not contain specified string, or C</FOO/> to use regular expression.
+All queries must match if the C<query_boolean> option is set to C<and>; only one
+query should match if the C<query_boolean> option is set to C<or>.
+
+=item * B<query> => I<any>
+
+(No description)
+
+=item * B<query_boolean> => I<str> (default: "and")
+
+Whether records must match all search queries ('and') or just one ('or').
+
+If set to C<and>, all queries must match; if set to C<or>, only one query should
+match. See the C<queries> option for more details on searching.
 
 =item * B<random> => I<bool> (default: 0)
 
@@ -2368,7 +2442,7 @@ days*. If work_saturdays is set to true, Saturdays are also counted as working
 days. If observe_joint_leaves is set to false, joint leave days are also counted
 as working days.
 
-Contains data from years 1990 to 2022
+Contains data from years 1990 to 2023
 
 This function is not exported by default, but exportable.
 
@@ -2517,9 +2591,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,0 +1,135 @@
+=head1 NAME
+
+Value::Diff - find the difference between two Perl values
+
+=head1 SYNOPSIS
+
+	use Value::Diff;
+	use Data::Dumper;
+
+	my $left = {
+		key_one => [1, 2, 3],
+		key_two => undef,
+	};
+
+	my $right = {
+		key_one => [1, 3],
+	};
+
+	if (diff($left, $right, \my $out)) {
+		print Dumper($out);
+	}
+
+	# output:
+	$VAR1 = {
+		'key_one' => [2],
+		'key_two' => undef
+	};
+
+=head1 DESCRIPTION
+
+This module provides a routine C<diff> that finds out a difference between two
+Perl data structures.
+
+Two first arguments order is significant - the left value is treated as the
+comparison base. By applying resulting difference to the right value, it will
+contain at least all the values the left value contains. It is possible the
+altered right value will end up being a superset of the left value - containing
+extra keys.
+
+Supported reference types are C<HASH>, C<ARRAY>, C<SCALAR> and C<REF>. All
+other values are compared using string comparison, which may or may not do the
+right thing.
+
+C<ARRAY>s are treated as sets of values - their index in the array is not taken
+into account, as long as matching value can be found. See L</CAVEATS> for an
+array caveat.
+
+=head1 EXPORTED FUNCTIONS
+
+All functions are exported by default.
+
+=head2 diff
+
+	my $has_diff = diff($left_value, $right_value, \$output);
+
+This function finds out the change that has to be made to C<$right_value> for
+it to contain at least all the values C<$left_value> contains.
+
+The return value of this function indicates whether C<$right_value> need to be
+changed at all. If yes, that difference is put into C<$output> (if passed). If
+no, C<$output> (if passed) is emptied into the empty value of the same
+reference type as C<$left_value>.
+
+If C<$right_value> has more values than C<$left_value> they will not be
+included in the diff. Call the method again with switched value order and merge
+the results to get the full difference.
+
+=head2 EXAMPLES
+
+This module was initially written to allow testing data state that is built incrementally:
+
+	use Value::Diff;
+	use Test::More;
+
+	my $wanted_data = { ... };
+	sub get_messages { ... }
+
+	sub check_received
+	{
+		my ($received) = @_;
+
+		# $received contains something we didn't expect
+		if (diff($received, $wanted_data)) {
+			return 0;
+		}
+
+		# replace $wanted_data with the parts we haven't yet received
+		diff($wanted_data, $received, \$wanted_data);
+		return 1;
+	}
+
+	sub check_finished
+	{
+		# once we want nothing more, we're finished
+		return !%{$wanted_data};
+	}
+
+	foreach my $received (get_messages()) {
+		ok check_received($received), 'received data ok';
+	}
+
+	ok check_finished, 'finished ok';
+
+	done_testing;
+
+=head1 CAVEATS
+
+Since arrays are not treated in order but rather like a set of values, the
+difference in array values returned by the module is always the entire array
+element. It would be nice to get the smallest difference out of all array
+elements, but that could be very resource-intensive to find out. For the time
+being this behavior will stay as it is, but may be changed in the future to be
+more precise.
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<Hash::Diff> is nice, but lacks the ability to handle arrays
+
+=item * L<Struct::Diff> is much more complex
+
+=back
+
+=head1 AUTHOR
+
+Bartosz Jarzyna E<lt>bbrtj.pro@gmail.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2022 by Bartosz Jarzyna
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

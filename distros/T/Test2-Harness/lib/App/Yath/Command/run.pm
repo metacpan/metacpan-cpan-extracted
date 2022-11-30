@@ -2,7 +2,7 @@ package App::Yath::Command::run;
 use strict;
 use warnings;
 
-our $VERSION = '1.000133';
+our $VERSION = '1.000136';
 
 use App::Yath::Options;
 
@@ -87,7 +87,8 @@ sub check_reload_state {
     my $self = shift;
 
     my $state = Test2::Harness::Runner::State->new(
-        workdir      => $self->workdir,
+        workdir => $self->workdir,
+        observe => 1,
     );
 
     $state->poll;

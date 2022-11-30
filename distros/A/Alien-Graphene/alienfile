@@ -9,16 +9,15 @@ plugin 'PkgConfig' => 'graphene-gobject-1.0';
 # http://ebassi.github.io/graphene/
 share {
 	requires 'Alien::Build::Plugin::Gather::Dino';
+	requires 'Alien::Build::Plugin::Download::GitHub';
 	requires 'Devel::FindPerl';
 	requires 'Alien::Meson';
 	requires 'Alien::Ninja';
 
-	plugin Download => (
-		url => 'https://github.com/ebassi/graphene/releases',
-		version => qr/([\d\.]+)\.tar\.gz/,
+	plugin 'Download::GitHub' => (
+		github_user => 'ebassi',
+		github_repo => 'graphene',
 	);
-
-	plugin Extract => 'tar.gz';
 
 	my $prop = meta_prop;
 

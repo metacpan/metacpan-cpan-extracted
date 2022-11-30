@@ -9,7 +9,7 @@ WriteMakefile(
     'VERSION_FROM' => 'lib/Task/Biodiverse/NoGUI.pm', # finds $VERSION
     ($] ge '5.005') ? (
         'AUTHOR' => 'Shawn Laffan (shawn.laffan@unsw.edu.au)',
-        'ABSTRACT' => 'Task for Biodiverse dependencies for non-GUI use',
+        'ABSTRACT' => 'Task for Biodiverse dependencies for non-GUI use [DEPRECATED]',
         )
     : (),
     META_MERGE => {
@@ -35,7 +35,7 @@ WriteMakefile(
         "Clone" => "0.35",
         "Regexp::Common" => "0",
         "rlib" => "0",
-        "Test::Lib" => "0",
+        "Test2::V0" => "0.000130",
         "parent" => "0",
         "Readonly" => "0",
         "URI::Escape::XS" => "0",
@@ -83,10 +83,8 @@ WriteMakefile(
     },
     BUILD_REQUIRES => {
         "Data::Section::Simple" => "0",
-        "Test::Deep" => "0",
-        "Test::NoWarnings" => "0",
         "Perl::Tidy" => "0",
-        "Test::Most" => "0",
+        "Test2::V0" => "0",
         "Devel::Symdump" => "0",
         "File::Compare" => "0",
         "Scalar::Util::Numeric" => "0",

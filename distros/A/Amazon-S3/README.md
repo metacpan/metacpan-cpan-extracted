@@ -70,8 +70,8 @@ portability". That statement is no longer accurate as
 changed the interface in ways that might break your
 applications. However, `Net::Amazon::S3` is today dependent on
 `Moose` which may in fact level the playing field in terms of
-performance penalties that may have been introduced by
-`Amazon::S3`. YMMV, however, this module may still appeal to some
+performance penalties that may have been introduced by recent updates
+to `Amazon::S3`. YMMV, however, this module may still appeal to some
 that favor simplicity of the interface and a lower number of
 dependencies. Below is the original description of the module._
 
@@ -109,15 +109,22 @@ dependencies. Below is the original description of the module._
 
 As noted, this module is no longer a _drop-in_ replacement for
 `Net::Amazon::S3` and has limitations and differences that may make
-the use of this module in your applications questionable.
+the use of this module in your applications
+questionable. Additionally, one of the original intents of this fork
+of `Net::Amazon::S3` was to reduce the dependencies and make it
+_easy to install_. Recent changes to this module have introduced new
+dependencies in order to improve the maintainability and provide
+additional features. Installing CPAN modules is never easy, especially
+when the dependencies of the dependencies are impossible to control
+and include XS modules.
 
 - MINIMUM PERL
 
     Technically, this module should run on versions 5.10 and above,
     however some of the dependencies may require higher versions of
-    `perl` or install new versions some dependencies that conflict with
+    `perl` or some versions of the dependencies that conflict with
     other versions of dependencies...it's a crapshoot when dealing with
-    older `perl` version and CPAN modules.
+    older `perl` versions and CPAN modules.
 
     You may however, be able to build this module by installing older
     versions of those dependencies and take your chances that those older
@@ -138,7 +145,7 @@ the use of this module in your applications questionable.
 
     ...other versions _may_ work...YMMV.
 
-- \* API Signing
+- API Signing
 
     Making calls to AWS APIs requires that the calls be signed.  Amazon
     has added a new signing method (Signature Version 4) to increase
@@ -175,12 +182,12 @@ the use of this module in your applications questionable.
 
         [https://docs.aws.amazon.com/AmazonS3/latest/userguide/RESTAuthentication.html](https://docs.aws.amazon.com/AmazonS3/latest/userguide/RESTAuthentication.html)
 
-- \* New APIs
+- New APIs
 
     This module does not support some of the newer API method calls
     for S3 added after the initial creation of this interface.
 
-- \* Multipart Upload Support
+- Multipart Upload Support
 
     There is limited testing for multipart uploads.
 
@@ -818,19 +825,3 @@ terms of the Artistic License are described at
 http://www.perl.com/language/misc/Artistic.html. Except
 where otherwise noted, `Amazon::S3` is Copyright 2008, Timothy
 Appnel, tima@cpan.org. All rights reserved.
-
-# POD ERRORS
-
-Hey! **The above document had some coding errors, which are explained below:**
-
-- Around line 1555:
-
-    Expected text after =item, not a bullet
-
-- Around line 1596:
-
-    Expected text after =item, not a bullet
-
-- Around line 1601:
-
-    Expected text after =item, not a bullet

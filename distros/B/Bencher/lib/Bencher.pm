@@ -3,9 +3,9 @@ package Bencher;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-02-08'; # DATE
+our $DATE = '2022-11-29'; # DATE
 our $DIST = 'Bencher'; # DIST
-our $VERSION = '1.061'; # VERSION
+our $VERSION = '1.062.1'; # VERSION
 
 1;
 # ABSTRACT: A benchmark framework
@@ -22,7 +22,7 @@ Bencher - A benchmark framework
 
 =head1 VERSION
 
-This document describes version 1.061 of Bencher (from Perl distribution Bencher), released on 2022-02-08.
+This document describes version 1.062.1 of Bencher (from Perl distribution Bencher), released on 2022-11-29.
 
 =head1 SYNOPSIS
 
@@ -699,9 +699,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

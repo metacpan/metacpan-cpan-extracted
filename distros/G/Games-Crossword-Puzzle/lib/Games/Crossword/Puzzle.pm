@@ -1,15 +1,43 @@
 use strict;
 use warnings;
-package Games::Crossword::Puzzle;
-{
-  $Games::Crossword::Puzzle::VERSION = '0.003';
-}
+package Games::Crossword::Puzzle 0.004;
 # ABSTRACT: six letters for "reusable unit of code"
 
+#pod =head1 SYNOPSIS
+#pod
+#pod   my $puzzle = Games::Crossword::Puzzle->from_file('nyt-sunday.puz');
+#pod
+#pod   for my $row ($puzzle->rows) {
+#pod     for my $cell (@$row) {
+#pod       die "Nope, not completed properly"
+#pod         if $cell->value and (not $cell->guess) || $cell->guess ne $cell->value;
+#pod     }
+#pod   }
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod The F<.PUZ> file format is used by many crossword programs and, more
+#pod importantly, is offered by many newspapers.  It servers as both a puzzle and a
+#pod "saved game," storing the grid, the answers, the clues, and guesses.
+#pod
+#pod Games::Crossword::Puzzle reads F<.PUZ> files and produces
+#pod Games::Crossword::Puzzle objects.
+#pod
+#pod A puzzle is a rectangular grid of L<Games::Crossword::Puzzle::Cell> objects.
+#pod
+#pod =cut
 
 use Carp ();
 use Games::Crossword::Puzzle::Cell;
 
+#pod =method from_file
+#pod
+#pod   my $puzzle = Games::Crossword::Puzzle->from_file($filename);
+#pod
+#pod This method reads in a puzzle file and returns a puzzle object.  It will raise
+#pod an exception if the file does not appear to be a valid puzzle file.
+#pod
+#pod =cut
 
 sub from_file {
   my ($class, $filename) = @_;
@@ -77,10 +105,23 @@ sub _read_tables {
   return \%return;
 }
 
+#pod =method height
+#pod
+#pod =method width
+#pod
+#pod These methods return the height and width of the puzzle grid.
+#pod
+#pod =cut
 
 sub height { $_[0]->{height} }
 sub width  { $_[0]->{width} }
 
+#pod =method rows
+#pod
+#pod This method returns a list of arrayrefs, each representing one row of the grid.
+#pod Each arrayref is populated with Games::Crossword::Puzzle::Cell objects.
+#pod
+#pod =cut
 
 sub rows {
   my ($self) = @_;
@@ -88,6 +129,16 @@ sub rows {
   return @{ $self->{grid} };
 }
 
+#pod =method cell
+#pod
+#pod   my $cell = $puzzle->cell($number);
+#pod
+#pod This method returns the cell with the given number.  Not every cell is
+#pod numbered!  Only cells that have clues are numbered.
+#pod
+#pod This method will raise an exception if an invalid cell is requested.
+#pod
+#pod =cut
 
 sub cell {
   my ($self, $number) = @_;
@@ -98,6 +149,23 @@ sub cell {
   return $self->{number}{$number};
 }
 
+#pod =method title
+#pod
+#pod This method returns the puzzle's title.
+#pod
+#pod =method author
+#pod
+#pod This method returns the puzzle's author.
+#pod
+#pod =method copyright
+#pod
+#pod This method returns the puzzle's copyright information.
+#pod
+#pod =method note
+#pod
+#pod This method returns the puzzle's "note," if any.
+#pod
+#pod =cut
 
 sub title     { $_[0]->{title} }
 sub author    { $_[0]->{author} }
@@ -213,6 +281,32 @@ sub _has_down_clue {
   return 1;
 }
 
+#pod =head1 CAVEATS
+#pod
+#pod While there is some basic checking that the input file really is a puzzle file,
+#pod the checksums aren't checked, which could lead to loading an invalid file.  I
+#pod may get around to fixing this in the future.
+#pod
+#pod =head1 THANKS
+#pod
+#pod Josh Myer is a nerd and reverse engineered the PUZ format enough for this
+#pod module to be written.  I used his notes, found here:
+#pod L<http://www.joshisanerd.com/puz/>
+#pod
+#pod =head1 SECRET ORIGINS
+#pod
+#pod Daniel Jalkut, an internet-famous blogger, hyped up a forthcoming product for a
+#pod while, finally revealing that it was Black Ink, a nice crossword program for OS
+#pod X.  I like crosswords, but I didn't want to spend $25 on it, so I had a look
+#pod into the weird "PUZ" format it used.  I wrote this module as phase one in
+#pod producing my own free crossword software, possibly a PUZ-to-DHTML sort of
+#pod thing.  (Warning: I have been known to quit after phase one.)
+#pod
+#pod (My loving wife later bought me a copy of Black Ink, so I didn't have much
+#pod reason to keep working on this, but I did finally add some basic rebus cell
+#pod parsing six years later.)
+#pod
+#pod =cut
 
 1;
 
@@ -220,13 +314,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Games::Crossword::Puzzle - six letters for "reusable unit of code"
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -249,6 +345,18 @@ Games::Crossword::Puzzle reads F<.PUZ> files and produces
 Games::Crossword::Puzzle objects.
 
 A puzzle is a rectangular grid of L<Games::Crossword::Puzzle::Cell> objects.
+
+=head1 PERL VERSION
+
+This module should work on any version of perl still receiving updates from
+the Perl 5 Porters.  This means it should work on any version of perl released
+in the last two to three years.  (That is, if the most recently released
+version is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 METHODS
 
@@ -322,7 +430,23 @@ parsing six years later.)
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <cpan@semiotic.systems>
+
+=head1 CONTRIBUTORS
+
+=for stopwords Ricardo SIGNES Signes
+
+=over 4
+
+=item *
+
+Ricardo SIGNES <rjbs@codesimply.com>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

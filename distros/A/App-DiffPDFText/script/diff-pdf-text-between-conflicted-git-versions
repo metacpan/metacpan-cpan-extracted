@@ -1,0 +1,162 @@
+#!perl
+
+use 5.010001;
+use strict;
+use warnings;
+use Log::ger;
+#use Log::ger::Screen;
+
+use CLI::MetaUtil::Getopt::Long qw(GetOptionsCLIWrapper);
+use File::Temp qw(tempdir);
+use IPC::System::Options 'system', -log=>1, -die=>1;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-09-08'; # DATE
+our $DIST = 'App-DiffPDFText'; # DIST
+our $VERSION = '0.003'; # VERSION
+
+# XXX duplication with diff-pdf-text
+my $opt_transpose_csv;
+
+my $tempdir;
+my $filename;
+
+my $prog = "diff-pdf-text-between-conflicted-git-versions";
+my ($path_ours, $path_theirs);
+GetOptionsCLIWrapper(
+    cli => 'diff',
+    add_opts => {
+        '<>' => sub {
+            die "Please specify only one filename" if defined $filename;
+            $filename = $_[0];
+            (my $basename = $filename) =~ s!.+/!!;
+            my ($content_ours, $content_theirs);
+            system(
+                {capture_stdout => \$content_ours},
+                "git", "show", ":2:$filename",
+            );
+            system(
+                {capture_stdout => \$content_theirs},
+                "git", "show", ":3:$filename",
+            );
+
+            $tempdir = File::Temp::tempdir(CLEANUP => !$ENV{DEBUG});
+            log_trace "Created temporary directory %s", $tempdir;
+
+            $path_ours = "$tempdir/ours.$basename";
+            open my $fh_ours  , ">", $path_ours
+                or die "$prog: Can't write ours: $!";
+            log_trace "Created temporary file for 'ours' PDF %s", $path_ours;
+            print $fh_ours $content_ours;
+            close $fh_ours
+                or die "$prog: Can't write ours: $!";
+
+            $path_theirs = "$tempdir/theirs.$basename";
+            open my $fh_theirs, ">", $path_theirs
+                or die "$prog: Can't write theirs: $!";
+            log_trace "Created temporary file for 'theirs' PDF %s", $path_theirs;
+            print $fh_theirs $content_theirs;
+            close $fh_theirs
+                or die "$prog: Can't write theirs: $!";
+        },
+    },
+);
+
+die "Please specify file" unless defined $path_ours;
+system(
+    "diff-pdf-text", @ARGV,
+    $path_ours, $path_theirs,
+);
+
+# ABSTRACT: Diff the text of two PDF files between conflicted git versions
+# PODNAME: diff-pdf-text-between-conflicted-git-versions
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+diff-pdf-text-between-conflicted-git-versions - Diff the text of two PDF files between conflicted git versions
+
+=head1 VERSION
+
+This document describes version 0.003 of diff-pdf-text-between-conflicted-git-versions (from Perl distribution App-DiffPDFText), released on 2022-09-08.
+
+=head1 SYNOPSIS
+
+ % diff-pdf-text-between-conflicted-git-versions [options] <FILE>
+
+=head1 DESCRIPTION
+
+This is a wrapper for L<diff-pdf-text> to compare two versions ("ours" and
+"theirs") when there is a git merge conflict.
+
+=head1 OPTIONS
+
+See L<diff-pdf-text>.
+
+=head1 ENVIRONMENT
+
+=head2 DEBUG
+
+If set to true, do not cleanup temporary files.
+
+To see which temporary files are created, use:
+
+ % PERL5OPT=-MLog::ger::Screen TRACE=1 diff-pdf-text-between-conflicted-git-versions ...
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-DiffPDFText>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-DiffPDFText>.
+
+=head1 SEE ALSO
+
+L<diff-pdf-text>
+
+Unix command L<diff>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-DiffPDFText>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

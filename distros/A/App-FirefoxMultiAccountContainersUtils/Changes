@@ -1,3 +1,10 @@
+0.014   2022-09-08  Released-By: PERLANCAR; Urgency: medium
+
+        - [cli firefox-container] Observe FIREFOX_CONTAINER_ENV.
+
+        - [optimize] Avoid loading unneeded modules.
+
+
 0.013   2022-09-08  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
         - [incompatible change] firefox-container now becomes a wrapper for

@@ -11,7 +11,7 @@ alien_ok 'Alien::m4';
 alien_ok 'Alien::autoconf';
 plugin_ok 'Build::Autoconf';
 
-run_ok('m4 --version', 'test if the --version option works with m4')
+run_ok("@{[ Alien::m4->exe ]} --version", 'test if the --version option works with m4')
   ->success
   ->note;
 

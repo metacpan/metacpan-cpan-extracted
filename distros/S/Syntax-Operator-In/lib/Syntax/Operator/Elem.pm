@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2022 -- leonerd@leonerd.org.uk
 
-package Syntax::Operator::Elem 0.03;
+package Syntax::Operator::Elem 0.04;
 
 use v5.14;
 use warnings;

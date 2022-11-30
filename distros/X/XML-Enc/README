@@ -2,7 +2,7 @@ NAME
     XML::Enc - XML::Enc Encryption Support
 
 VERSION
-    version 0.06
+    version 0.08
 
 SYNOPSIS
         my $decrypter = XML::Enc->new(
@@ -75,7 +75,7 @@ METHODS
         Specify the encryption method to be used for key transport.
         Supported methods are:
 
-        Used in encryption. Optional. Default method: rsa-1_5
+        Used in encryption. Optional. Default method: rsa-oaep-mgf1p
 
         *   rsa-1_5
             <https://www.w3.org/TR/2002/REC-xmlenc-core-20021210/Overview.ht
@@ -84,6 +84,24 @@ METHODS
         *   rsa-oaep-mgf1p
             <https://www.w3.org/TR/2002/REC-xmlenc-core-20021210/Overview.ht
             ml#rsa-oaep-mgf1p>
+
+        *   rsa-oaep <http://www.w3.org/2009/xmlenc11#rsa-oaep>
+
+    oaep_mgf_alg
+        Specify the Algorithm to be used for rsa-oaep. Supported algorithms
+        are:
+
+        Used in encryption. Optional. Default method: mgf1sha1
+
+        *   mgf1sha1 <http://www.w3.org/2009/xmlenc11#mgf1sha1>
+
+        *   mgf1sha224 <http://www.w3.org/2009/xmlenc11#mgf1sha224>
+
+        *   mgf1sha265 <http://www.w3.org/2009/xmlenc11#mgf1sha256>
+
+        *   mgf1sha384 <http://www.w3.org/2009/xmlenc11#mgf1sha384>
+
+        *   mgf1sha512 <http://www.w3.org/2009/xmlenc11#mgf1sha512>
 
   decrypt( ... )
     Main decryption function.

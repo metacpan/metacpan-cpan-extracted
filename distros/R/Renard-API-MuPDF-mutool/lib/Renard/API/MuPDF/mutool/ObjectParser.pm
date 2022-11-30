@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::API::MuPDF::mutool::ObjectParser;
 # ABSTRACT: Parser for the output of C<mutool show>
-$Renard::API::MuPDF::mutool::ObjectParser::VERSION = '0.005';
+$Renard::API::MuPDF::mutool::ObjectParser::VERSION = '0.006';
 use Moo;
 use Renard::Incunabula::Common::Types qw(Str Bool File InstanceOf);
 use Renard::API::MuPDF::mutool::DateObject;
@@ -205,7 +205,7 @@ Renard::API::MuPDF::mutool::ObjectParser - Parser for the output of C<mutool sho
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 EXTENDS
 

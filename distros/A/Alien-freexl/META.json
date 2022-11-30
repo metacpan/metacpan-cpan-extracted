@@ -4,7 +4,7 @@
       "Shawn Laffan <shawnlaffan@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -23,15 +23,18 @@
       "build" : {
          "requires" : {
             "Alien::Build" : "1.41",
-            "Alien::Build::MM" : "1.41",
+            "Alien::Build::MM" : "1.74",
             "Alien::Build::Plugin::Cleanse::BuildDir" : "0",
-            "Alien::MSYS" : "0.07",
             "Archive::Tar" : "0",
+            "Config" : "0",
             "ExtUtils::MakeMaker" : "6.52",
             "File::Find::Rule" : "0",
-            "HTML::LinkExtor" : "0",
             "HTTP::Tiny" : "0.044",
+            "IO::Socket::SSL" : "1.56",
             "IO::Zlib" : "0",
+            "Mojo::DOM58" : "1.00",
+            "Mozilla::CA" : "0",
+            "Net::SSLeay" : "1.49",
             "PkgConfig" : "0.19026",
             "Sort::Versions" : "0",
             "URI" : "0",
@@ -41,9 +44,8 @@
       "configure" : {
          "requires" : {
             "Alien::Build" : "1.41",
-            "Alien::Build::MM" : "1.41",
+            "Alien::Build::MM" : "1.74",
             "Alien::Build::Plugin::Cleanse::BuildDir" : "0",
-            "Alien::MSYS" : "0",
             "ExtUtils::MakeMaker" : "6.52",
             "File::Find::Rule" : "0",
             "PkgConfig" : "0",
@@ -53,7 +55,7 @@
       "runtime" : {
          "requires" : {
             "Alien::Base" : "1.41",
-            "Alien::Build" : "0.25",
+            "Alien::Build" : "1.74",
             "FFI::CheckLib" : "0.23"
          }
       },
@@ -74,16 +76,19 @@
          "url" : "https://github.com/shawnlaffan/perl-alien-freexl"
       }
    },
-   "version" : "1.03",
+   "version" : "1.04",
    "x_alienfile" : {
-      "generated_by" : "Alien::Build::MM version 1.49",
+      "generated_by" : "Alien::Build::MM version 2.73",
       "requires" : {
          "share" : {
-            "Alien::MSYS" : "0.07",
             "Archive::Tar" : "0",
-            "HTML::LinkExtor" : "0",
+            "Config" : "0",
             "HTTP::Tiny" : "0.044",
+            "IO::Socket::SSL" : "1.56",
             "IO::Zlib" : "0",
+            "Mojo::DOM58" : "1.00",
+            "Mozilla::CA" : "0",
+            "Net::SSLeay" : "1.49",
             "Sort::Versions" : "0",
             "URI" : "0",
             "URI::Escape" : "0"
@@ -91,5 +96,5 @@
          "system" : {}
       }
    },
-   "x_serialization_backend" : "JSON::PP version 2.97001"
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

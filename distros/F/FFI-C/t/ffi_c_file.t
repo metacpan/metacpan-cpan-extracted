@@ -89,19 +89,21 @@ subtest 'freopen' => sub {
   $file->freopen("$path2", "a");
   $file->fwrite(\"bar", 3);
 
-  if($^O =~ /^(MSWin32|opebsd|netbsd)$/)
+  if($^O =~ /^(darwin|linux)$/)
   {
-    $file->fflush;
-    is($path1->slurp_raw, "foo");
-    is($path2->slurp_raw, "bar");
-  }
-  else
-  {
+    note 'testing NULL to freopen';
     $file->freopen(undef, "a");
     $file->fwrite(\"baz", 3);
     $file->fflush;
     is($path1->slurp_raw, "foo");
     is($path2->slurp_raw, "barbaz");
+  }
+  else
+  {
+    note 'not testing NULL to freopen';
+    $file->fflush;
+    is($path1->slurp_raw, "foo");
+    is($path2->slurp_raw, "bar");
   }
 
   is dies { $file->freopen("bogus.txt", "r") }, match qr/^Error opening bogus\.txt with mode r:/;

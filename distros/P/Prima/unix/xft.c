@@ -1436,8 +1436,7 @@ create_no_aa_font( XftFont * font)
 
 #define SORT(a,b)       { int swp; if ((a) > (b)) { swp=(a); (a)=(b); (b)=swp; }}
 #define REVERT(a)       (XX-> size. y - (a) - 1)
-#define SHIFT(a,b)      { (a) += XX-> transform. x + XX-> btransform. x; \
-			(b) += XX-> transform. y + XX-> btransform. y; }
+#define SHIFT(a,b)      { (a) += XX-> btransform. x; (b) += XX-> btransform. y; }
 #define RANGE(a)        { if ((a) < -16383) (a) = -16383; else if ((a) > 16383) a = 16383; }
 #define RANGE2(a,b)     RANGE(a) RANGE(b)
 #define RANGE4(a,b,c,d) RANGE(a) RANGE(b) RANGE(c) RANGE(d)
@@ -1718,7 +1717,6 @@ static void
 overstrike( Handle self, int x, int y, Point *ovx, int advance)
 {
 	DEFXX;
-	float lw = apc_gp_get_line_width( self);
 	int d  = - PDrawable(self)-> font. descent;
 	int ay, x1, y1, x2, y2;
 	double c = XX-> xft_font_cos, s = XX-> xft_font_sin;
@@ -1728,9 +1726,6 @@ overstrike( Handle self, int x, int y, Point *ovx, int advance)
 		XSetForeground( DISP, XX-> gc, XX-> fore. primary);
 		XX-> flags. brush_fore = 1;
 	}
-
-	if ( lw != 1.0)
-		apc_gp_set_line_width( self, 1.0);
 
 	if ( ovx->x < 0 ) ovx->x = 0;
 	if ( ovx->y < 0 ) ovx->y = 0;
@@ -1753,9 +1748,6 @@ overstrike( Handle self, int x, int y, Point *ovx, int advance)
 		y2 = y + advance * s + ay * c + 0.5;
 		XDrawLine( DISP, XX-> gdrawable, XX-> gc, x1, REVERT( y1), x2, REVERT( y2));
 	}
-
-	if ( lw != 1.0)
-		apc_gp_set_line_width( self, lw);
 }
 
 static void
@@ -1952,7 +1944,7 @@ prima_xft_glyphs_out( Handle self, PGlyphsOutRec t, int x, int y)
 	XftFont *font = XX-> font-> xft;
 	int rop = XX-> rop;
 	Point baseline;
-		
+
 	t-> flags |= toAddOverhangs; /* for overstriking etc */
 
 	if ( t->len == 0) return true;
@@ -1996,7 +1988,7 @@ prima_xft_glyphs_out( Handle self, PGlyphsOutRec t, int x, int y)
 	COPY_PUT:
 		xft_draw_glyphs(XX, &xftcolor, x, REVERT(y) + 1, NULL, 0, t);
 	}
-	XCHECKPOINT; 
+	XCHECKPOINT;
 
 	if ( PDrawable( self)-> font. style & (fsUnderlined|fsStruckOut)) {
 		Point ovx;
@@ -2686,5 +2678,5 @@ prima_xft_init_font_substitution(void)
 }
 
 #else
-#error Required: Xft version 2.1.0 or higher; fontconfig version 2.0.1 or higher. To compile without Xft, re-run 'perl Makefile.PL WITH_XFT=0'
+#warning Required Xft version 2.1.0 or higher; fontconfig version 2.0.1 or higher. To compile without Xft, re-run 'perl Makefile.PL WITH_XFT=0'
 #endif /* USE_XFT */

@@ -16,7 +16,7 @@ sub new {
         _udev      => shift
     };
 
-    bless $self, $class;
+    bless($self, $class);
 
     return $self;
 }
@@ -161,13 +161,13 @@ sub scan_subsystems {
 
 
 sub get_list_entries {
-    return Udev::FFI::Helper::get_entries_all( udev_enumerate_get_list_entry( $_[0]->{_enumerate} ) );
+    return Udev::FFI::Helper::get_entries_all( udev_enumerate_get_list_entry($_[0]->{_enumerate}) );
 }
 
 
 
 sub DESTROY {
-    udev_enumerate_unref( $_[0]->{_enumerate} );
+    udev_enumerate_unref($_[0]->{_enumerate});
 }
 
 
@@ -204,9 +204,9 @@ Udev::FFI::Enumerate
         my $device = $udev->new_device_from_syspath($_);
     
         if (defined $device) {
-            print "DEVICE: ".$device->get_sysname()."\n";
-            print "VID: ".$device->get_sysattr_value('idVendor')."\n";
-            print "PID: ".$device->get_sysattr_value('idProduct')."\n\n";
+            print("DEVICE: ".$device->get_sysname()."\n");
+            print("VID: ".$device->get_sysattr_value('idVendor')."\n");
+            print("PID: ".$device->get_sysattr_value('idProduct')."\n\n");
         }
     }
 

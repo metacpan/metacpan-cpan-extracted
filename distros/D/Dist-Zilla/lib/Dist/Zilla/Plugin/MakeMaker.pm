@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::MakeMaker 6.028;
+package Dist::Zilla::Plugin::MakeMaker 6.029;
 # ABSTRACT: build a Makefile.PL that uses ExtUtils::MakeMaker
 
 use Moose;
@@ -50,6 +50,23 @@ has 'make_path' => (
   isa => 'Str',
   is  => 'ro',
   default => $Config{make} || 'make',
+);
+
+#pod =attr main_module
+#pod
+#pod This option sets the name of the main module in your dist. It defaults to the
+#pod name derived from the distribution's name after replacing C<-> with C<::>, (e.g.
+#pod C<Foo::Bar> for distribution C<Foo-Bar>). The value is set as a C<NAME> argument
+#pod for C<WriteMakefile>.
+#pod
+#pod You want to use this option when the name of distribution doesn't reflect any
+#pod module names contained in your distribution e.g. C<LWP> vs C<libwww-perl>.
+#pod
+#pod =cut
+
+has main_module => (
+  isa => 'Str',
+  is  => 'rw',
 );
 
 #pod =attr static_attribution
@@ -183,7 +200,7 @@ PREAMBLE
 sub write_makefile_args {
   my ($self) = @_;
 
-  my $name = $self->zilla->name =~ s/-/::/gr;
+  my $name = $self->main_module || ($self->zilla->name =~ s/-/::/gr);
 
   my @exe_files = map { $_->name }
     @{ $self->zilla->find_files(':ExecFiles') };
@@ -369,7 +386,7 @@ Dist::Zilla::Plugin::MakeMaker - build a Makefile.PL that uses ExtUtils::MakeMak
 
 =head1 VERSION
 
-version 6.028
+version 6.029
 
 =head1 DESCRIPTION
 
@@ -405,6 +422,16 @@ It defaults to the value for C<make> in L<Config>, or to C<make> if that isn't
 set.
 
 You probably won't need to set this option.
+
+=head2 main_module
+
+This option sets the name of the main module in your dist. It defaults to the
+name derived from the distribution's name after replacing C<-> with C<::>, (e.g.
+C<Foo::Bar> for distribution C<Foo-Bar>). The value is set as a C<NAME> argument
+for C<WriteMakefile>.
+
+You want to use this option when the name of distribution doesn't reflect any
+module names contained in your distribution e.g. C<LWP> vs C<libwww-perl>.
 
 =head2 static_attribution
 

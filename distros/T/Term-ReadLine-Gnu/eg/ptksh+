@@ -6,9 +6,9 @@
 # use the callback functions in the GNU Readline Library.  This script
 # is essentially equivalent with executing the following lines in
 # `eg/perlsh';
-#	$PerlSh::term->tkRunning(1);
-#	use Tk;
-#	$mw = MainWindow->new();
+#       $PerlSh::term->tkRunning(1);
+#       use Tk;
+#       $mw = MainWindow->new();
 #
 # Hiroo Hayashi
 
@@ -42,7 +42,7 @@ my $attribs = $term->Attribs;
 $term->callback_handler_install("$name> ", \&doline);
 
 $mw->fileevent(STDIN,'readable',
-	$attribs->{callback_read_char});
+        $attribs->{callback_read_char});
 
 sub quit {
    $mw->fileevent(STDIN,'readable','');
@@ -55,9 +55,9 @@ sub doline {
     my $line = shift;
 
     if (defined $line) {
-        if ($line =~ /^p\s(.*)$/) {              
+        if ($line =~ /^p\s(.*)$/) {
             $line = "print $1, \"!\\n\";";
-        }              
+        }
 
         eval "{package main; $line }";
         print $outstream "$@\n" if $@;
@@ -88,7 +88,7 @@ __END__
 
 =head1 NAME
 
-ptksh+	- Simple perl/Tk shell that uses the Gnu Readline features
+ptksh+  - Simple perl/Tk shell that uses the Gnu Readline features
 
 =head1 SYNOPSIS
 

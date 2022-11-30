@@ -1,5 +1,13 @@
 Revision history for Alien-Build
 
+2.74      2022-11-27 08:26:06 -0700
+  - Patches to Test::Alien to make it safe for C99
+    (gh#383, Florian Weimer++)
+
+2.73      2022-11-20 07:23:46 -0700
+  - Fix Extract::ArchiveZip test when ALIEN_DOWNLOAD_RULE set to
+    digest_or_encrypt (gh#382)
+
 2.72      2022-10-26 06:28:00 -0600
   - Improved diagnostic when all links are excluded by the filter
     stage (gh#380)

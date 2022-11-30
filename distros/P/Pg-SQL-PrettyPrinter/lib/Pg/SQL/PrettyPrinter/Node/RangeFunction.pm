@@ -59,6 +59,9 @@ sub as_text {
     my $self      = shift;
     my $full_name = $self->{ 'functions' }->[ 0 ]->{ 'items' }->[ 0 ]->as_text;
 
+    # Add optional WITH ORDINALITY
+    $full_name .= ' WITH ORDINALITY' if $self->{ 'ordinality' };
+
     # Shortcut
     my $A = $self->{ 'alias' };
     return $full_name unless $A;

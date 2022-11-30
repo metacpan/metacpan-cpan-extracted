@@ -1,0 +1,82 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Net::Async::Blockchain
+at lib/Net/Async/Blockchain.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Net::Async::Blockchain - base for blockchain subscription clients.
+
+=head1 SYNOPSIS
+
+Objects of this type would not normally be constructed directly.
+
+For blockchain clients see:
+- Net::Async::Blockchain::BTC
+- Net::Async::BLockchain::ETH
+
+Which will use this class as base.
+
+=head1 DESCRIPTION
+
+This module contains methods that are shared by the subscription clients.
+
+=over 4
+
+=back
+
+=head2 configure
+
+Any additional configuration that is not described on L<IO::Async::Notifier>
+must be included and removed here.
+
+=over 4
+
+=item * C<subscription_url> Subscription URL it can be TCP for ZMQ and WS for the Websocket subscription
+=item * C<subscription_timeout> Subscription connection timeout
+=item * C<subscription_msg_timeout> Subscription interval between messages timeout
+=item * C<blockchain_code> The blockchain code (eg: bitcoin, litecoin, ....)
+
+=back
+
+=head2 subscription_response
+
+Formate the subscription response message
+
+=over 4
+
+=item * C<$subscription_type> - A string of the subscription type (e.g: blocks)
+
+=item * C<$messgae>           - The recevied subscription message from the blockchain node
+
+=back
+
+Returns a hash reference of:
+
+=over 4
+
+=item * C<blockchain_code>   - A string of the blockchain code (eg: bitcoin, litecoin, ....)
+
+=item * C<subscription_type> - A string of the subscription type (e.g: blocks)
+
+=item * C<message>           - The recevied subscription message from the blockchain node
+
+=back
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<IO::Async::Notifier>
+
+L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/adopt_future>, L<adopted_futures|IO::Async::Notifier/adopted_futures>, L<can_event|IO::Async::Notifier/can_event>, L<children|IO::Async::Notifier/children>, L<configure_unknown|IO::Async::Notifier/configure_unknown>, L<debug_printf|IO::Async::Notifier/debug_printf>, L<get_loop|IO::Async::Notifier/get_loop>, L<invoke_error|IO::Async::Notifier/invoke_error>, L<invoke_event|IO::Async::Notifier/invoke_event>, L<loop|IO::Async::Notifier/loop>, L<make_event_cb|IO::Async::Notifier/make_event_cb>, L<maybe_invoke_event|IO::Async::Notifier/maybe_invoke_event>, L<maybe_make_event_cb|IO::Async::Notifier/maybe_make_event_cb>, L<new|IO::Async::Notifier/new>, L<notifier_name|IO::Async::Notifier/notifier_name>, L<parent|IO::Async::Notifier/parent>, L<remove_child|IO::Async::Notifier/remove_child>, L<remove_from_parent|IO::Async::Notifier/remove_from_parent>
+
+=back
+

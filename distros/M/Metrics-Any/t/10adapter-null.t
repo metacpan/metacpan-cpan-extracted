@@ -43,6 +43,9 @@ ok( defined eval { $metrics->make_timer( "duration" ); 1 },
 ok( defined eval { $metrics->report_timer( "duration", 20 ); 1 },
    '$metrics->report_timer' ) or diag( $@ );
 
+# batch mode is supported (though does nothing)
+ok( $metrics->add_batch_mode_callback( sub {} ), 'Null adapter supports batch mode' );
+
 ok( !$metrics, '$metrics is still false at EOF' );
 
 done_testing;

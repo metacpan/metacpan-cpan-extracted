@@ -1,5 +1,8 @@
 Revision history for Alien::geos::af
 
+1.011 2022-11-26
+    - Share builds: Use https for downloads
+
 1.010 2022-03-26
     - Share builds:
       - Set rpath in compilation so geos.so finds geos_c.so

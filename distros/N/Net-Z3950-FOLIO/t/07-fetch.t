@@ -18,12 +18,11 @@ BEGIN {
     );
 }
 
-use Test::More tests => 6 + 2*scalar(@tests);
+use Test::More tests => 5 + 2*scalar(@tests);
 use Test::Differences;
 oldstyle_diff;
 
 BEGIN { use_ok('Net::Z3950::FOLIO') };
-BEGIN { use_ok('Net::Z3950::FOLIO::PostProcess', qw(postProcess)) };
 
 my $SETNAME = 'dummy';
 my $session = mock_session();

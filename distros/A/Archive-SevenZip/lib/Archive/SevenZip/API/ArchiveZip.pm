@@ -1,12 +1,13 @@
 package Archive::SevenZip::API::ArchiveZip;
 use strict;
+use warnings;
 use Carp qw(croak);
 use Encode qw( decode encode );
 use File::Basename qw(dirname basename);
 use File::Copy;
 use Archive::SevenZip 'AZ_OK';
 
-our $VERSION= '0.17';
+our $VERSION= '0.19';
 
 sub new {
     my( $class, %options )= @_;

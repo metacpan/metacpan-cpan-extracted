@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
 
-package Metrics::Any::Collector 0.08;
+package Metrics::Any::Collector 0.09;
 
 use v5.14;
 use warnings;
@@ -44,6 +44,54 @@ application startup. By carefully writing module code to not report any values
 of metrics until the main activity has actually begin, it should be possible
 to allow programs to configure the metric reporting in a flexible manner
 during program startup.
+
+=head2 Batch-Mode Reporting
+
+Some adapters may support an optional API for implementing metrics in a more
+high-performance manner, suitable for use in low-level (perhaps even XS) code
+that might be invoked at high speed or many times over.
+
+Such code often needs to keep simple counters of particular events that happen
+a lot. Rather than incurring the cost of a full stack of method calls into the
+collector and adapter implementation on every event, the instrumented code can
+register a callback function that the adapter will call on some schedule, that
+will report the actual metrics. In the meantime, the instrumented code can
+maintain its own counters of events, using plain Perl scalars (or native
+integers in XS code), to be reported in bulk when required. This reduces the
+overall CPU cost involved in collecting metrics.
+
+This is most effective with pull-based adapters such as Test or Prometheus,
+where the callback might only need to be invoked at the end of a test run, or
+when the prometheus server polls the C</metrics> HTTP endpoint.
+
+   my $evcounter = 0;
+
+   $metrics->add_batch_mode_callback( sub {
+      $metrics->inc_counter_by( events => $evcounter );
+      $evcounter = 0;
+   } );
+
+   sub do_thing {
+      $evcounter++;
+      ...
+   }
+
+Because not every adapter may implement this mode, instrumented code should be
+prepared to fall back on the regular API to report its counters.
+
+   my $evcounter = 0;
+
+   my $use_batch = $metrics->add_batch_mode_callback( sub {
+      $metrics->inc_counter_by( events => $evcounter );
+      $evcounter = 0;
+   } );
+
+   sub do_thing {
+      $use_batch ? $evcounter++ : $metrics->inc_counter( events => );
+      ...
+   }
+
+Each adapter implementation should document if and how it handles batch mode.
 
 =head1 ENVIRONMENT
 
@@ -293,6 +341,10 @@ use overload
 
 =head1 METHODS
 
+=cut
+
+=head2 package
+
    $package = $metrics->package
 
 Returns the package name that created the collector; the package in which the
@@ -307,6 +359,33 @@ sub package
 {
    my $self = shift;
    return $self->{package};
+}
+
+=head2 add_batch_mode_callback
+
+   $ok = $metrics->add_batch_mode_callback( sub { ... } )
+
+I<Since version 0.09.>
+
+If batch mode is supported on the underlying adapter, adds another callback to
+its list of callbacks, to be invoked when it wishes to collect more metrics;
+if this is supported then the method returns a true value.
+
+If batch mode is not supported, returns false.
+
+=cut
+
+sub add_batch_mode_callback
+{
+   my $self = shift;
+   my ( $cb ) = @_;
+
+   unless( $self->adapter->can( "HAVE_BATCH_MODE" ) and $self->adapter->HAVE_BATCH_MODE ) {
+      return 0;
+   }
+
+   $self->adapter->add_batch_mode_callback( $cb );
+   return 1;
 }
 
 =head1 METRIC TYPES

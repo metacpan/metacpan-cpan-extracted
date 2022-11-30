@@ -1,0 +1,165 @@
+#!/usr/bin/perl
+# ghcn_cacheutil - Manage the cache used by ghcn_fetch
+
+use v5.18;  # minimum for Object::Pad
+
+our $VERSION = 'v0.0.011';
+
+use Weather::GHCN::App::CacheUtil;
+
+Weather::GHCN::App::CacheUtil->run( \@ARGV );
+
+########################################################################
+# Documentation
+########################################################################
+__END__
+
+=head1 NAME
+
+ghcn_cacheutil - Manage the cache used by ghcn_fetch
+
+=head1 VERSION
+
+version v0.0.011
+
+=head1 SYNOPSIS
+
+    ghcn_cacheutil [-location <dir> [-invert|v] ] 
+                   [-country <str>] [-state <str>]
+                   [-age <int>] [-size <int>] [-type <str>]
+                   [-remove] [-clean]
+                   [-cachedir <dir>] 
+                   [-profile <file>] 
+                   [-outclip]
+
+    ghcn_cacheutil [--help | -? | --usage]
+
+=head1 DESCRIPTION
+
+This script provides an easy way to manage the cache used by ghcn_fetch
+(or other applications using the Weather::GHCN::StationTable modules).
+
+Without any parameters, ghcn_cacheutil will list the files in the 
+default cache, as defined in the user profile file (typically 
+~/.ghcn_fetch.yaml).  You can also specify the profile file or the
+cache directory using parameters.
+
+There are two kinds of cached files:  .txt files that contain station
+metadata, and .dly files which contain daily weather data for a specific
+station.  
+
+The script provides selection parameters similar to ghcn_fetch so
+that the list of stations can be filtered by country, state (or province),
+and location name (or station id).  
+
+The -remove option will remove the files that are listed.  
+
+For example, if you've just done some analysis of stations in Maine and
+don't plan to reuse that data in the near future, you can clean up
+the cache using ghcn_cacheutil -country US -state ME -remove.
+
+Typically, you'll use filtering options to see a list of files, 
+adjusting the filters until you have the list of files you want to 
+remove.  Then you'll repeat the command, adding -remove to do the 
+cleanup.
+
+The -clean option will remove all files from the cache.
+
+
+=head1 PARAMETERS
+
+Getoptions::Long is used, so either - or -- may be used.  Parameter
+names may be abbreviated, so long as they remains unambiguous.  Flag
+options may appear after filenames.
+
+=over 4
+
+=item -country <str>
+
+Filter the station list to include only those from a specific
+country.  The string can be a 2-character GEC (formerly FIPS)
+country code, a 3-character UN country code, or a 3-character
+internet country code (including the dot).  Longer strings are
+treated as a pattern and matched (unanchored) against country names.
+
+=item -state <str> (or -province)
+
+Filter the station list to include only those within the specified
+2-character US state or Canadian province code.
+
+=item -location <str>
+
+Filter the station list to include only those whose name matches the
+specified pattern.  For a starts-with match, prefix the pattern with
+^ (or \A).  For an ends-with match, suffix the pattern with $ (or \Z).
+Matching is case-insensitive.
+
+You can also specify a station id (e.g. CA006105978) or a
+comma-delimited list of station id's (e.g. CA006105978,USC00336346).
+
+As a handy shortcut, mappings between user-defined names and a station
+id or id list can be defined in the locations section of .ghcn_fetch.yaml.
+
+=item -invert (or -v)
+
+Invert the -location selection criteria; i.e. select those stations
+where the pattern doesn't match.
+
+=item -remove
+
+Remove the listed items from the cache, with the exception of items that
+correspond to aliases in the user profile.  All items will be reported
+with the word "removed" before the location name.  You should list
+the files first and visually verify they are the ones you want to
+remove before using this option.
+
+=item -age <int>
+
+Select cache files where the file age is greater than or equal to 
+<int> days. Use negative <int> to select less than or equal to.
+To select zero days, use zero.
+
+=item -size <int> (or -kb)
+
+Select cache files where the size is greater than or equal to <int> 
+kilobytes. Use negative <int> to select less than or equal to.
+
+=item -type <str>
+
+There are three types of cache entries:  Daily, Aliased-Daily, and
+Catalog.  You can filter the list by providing a string containing
+any combination of D, A and C.
+
+=item -clean
+
+Remove all files from the cache.
+
+=item -cachedir <dir>
+
+This section defines the location of the cache directory where pages 
+fetched from the NOAA GHCN repository will be saved, in accordance 
+with your -refresh option. Using a cache vastly improves the 
+performance of subsequent invocations of B<ghcn_fetch>, especially when 
+using the same station filtering criteria.
+
+=item -profile <filespec>
+
+Location of the optional user profile YAML file, which can be used
+to define location aliases and set commonly used options such as
+-cachefile.  Defaults to ~/.ghcn_fetch.yaml.
+
+=item -h | -help
+
+Display this documentation.
+
+=back
+
+=head1 AUTHOR
+
+Gary Puckering (jgpuckering@rogers.com)
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2022, Gary Puckering
+
+=cut

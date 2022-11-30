@@ -1,5 +1,10 @@
 Revision history for Pg-SQL-PrettyPrinter
 
+0.7     2022-11-20
+        - Fix missing ORDER BY clause in aggregates
+        - Fix missing "WITH ORDINALITY" clause in functions in FROM
+        - Make sure that "bugs" test try also to test as_text() calls
+
 0.6     2022-11-08
         - Fix bug with display of filtered aggregates that are part of CASE
           statement

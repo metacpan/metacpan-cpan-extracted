@@ -49,18 +49,17 @@ int extract_embedded_file(embedded_file_t *emb_file, const char* ext_name, const
     int fd;
     chunk_t *chunk;
     struct stat statbuf;
-    int len = strlen(stmpdir) + 1 + strlen(ext_name);
     char *tmp_path;
 
-    *ext_path = malloc(len + 1);
+    *ext_path = malloc(strlen(stmpdir) + 1 + strlen(ext_name) + 1);
     sprintf(*ext_path, "%s/%s", stmpdir, ext_name);
 
     if (par_lstat(*ext_path, &statbuf) == 0 && statbuf.st_size == emb_file->size )
         return EXTRACT_ALREADY; /* file already exists and has the expected size */
 
-    tmp_path = malloc(len + 1 + 20 + 1); /* 20 decimal digits should be enough to hold up to 2^64-1 */
+    tmp_path = malloc(strlen(*ext_path) + 1 + 20 + 1); 
+                                /* 20 decimal digits should be enough to hold up to 2^64-1 */
     sprintf(tmp_path, "%s.%lu", *ext_path, (unsigned long)getpid());
-
     fd = open(tmp_path, O_CREAT | O_WRONLY | OPEN_O_BINARY, 0755);
     if ( fd == -1 ) 
         return EXTRACT_FAIL;
@@ -208,7 +207,6 @@ char pp_version_info[] = "@(#) Packed by PAR::Packer " PAR_PACKER_VERSION;
 /* the contents of this string (in the executable myldr/boot)
  * will be patched by script/par.pl if option "--clean" is used with pp
  */
-static char pass_par_clean[] = "__PASS_PAR_CLEAN__               \0";
 
 int main ( int argc, char **argv, char **env )
 {
@@ -229,15 +227,6 @@ typedef BOOL (WINAPI *pALLOW)(DWORD);
 #endif
 
     par_init_env();
-
-    /* check for patched content of pass_par_clean */
-    {
-        char *equals = strchr(pass_par_clean, '=');
-        if (equals != NULL) {
-            equals[2] = '\0';    /* trim value to one byte */
-            par_setenv("PAR_CLEAN", equals + 1);
-        }
-    }
 
     stmpdir = par_mktmpdir( argv );
     if ( !stmpdir ) die("");        /* error message has already been printed */
@@ -277,14 +266,15 @@ typedef BOOL (WINAPI *pALLOW)(DWORD);
             char *arch = malloc(size);
             sysctlbyname("hw.machine", arch, &size, NULL, 0);
 
-            /* Detect if lipo exists, if not die */
+            /* Detect if CLT are installed, if not, die */
+            int x = system("/usr/bin/xcode-select -p 1>/dev/null 2>/dev/null");
+            if (x != 0) 
+              die("%s: Command Line Tools are not installed - "
+                  "run 'xcode-select --install' to install (errno=%i)\n", 
+                  argv[0], errno);
+
+            int exist;
             struct stat buffer;
-            int exist = stat("/usr/bin/lipo", &buffer);
-            if (exist == -1)
-                die("%s: cannot find /usr/bin/lipo to unpack universal binary - "
-                    "do you need install Developer Tools? (errno=%i)\n", 
-                    argv[0], errno);
-          
             char *archthinbin = malloc(strlen(ftmpdir) + 1 + strlen(par_basename(my_prog)) + 1);
             sprintf(archthinbin, "%s/%s", ftmpdir, par_basename(my_prog));
             char* lipo_argv[] = { "lipo", "-extract_family", arch, "-output", archthinbin, my_prog, NULL };

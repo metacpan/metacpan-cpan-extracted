@@ -12,9 +12,9 @@ use IO::Interactive qw(is_interactive);
 
 # put global variables alphabetically here
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-04'; # DATE
+our $DATE = '2022-11-24'; # DATE
 our $DIST = 'Perinci-CmdLine-Lite'; # DIST
-our $VERSION = '1.926'; # VERSION
+our $VERSION = '1.928'; # VERSION
 
 # TODO: this class can actually be a role instead of base class for pericmd &
 # pericmd-lite.
@@ -154,7 +154,7 @@ our %copts = (
         # XXX when option is changed, we need to update this. we should generate
         # usage automatically instead.
         usage   => "--version (or -v)",
-        'usage.alt.fmt.pod' => qq{L<--version|/"--version, -v"> (or L<-v|/"--version, -v">)},
+        'usage.alt.fmt.pod' => qq{B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)},
         handler => sub {
             my ($go, $val, $r) = @_;
             $r->{action} = 'version';
@@ -169,7 +169,7 @@ our %copts = (
         # XXX when option is changed, we need to update this. we should generate
         # usage automatically instead.
         usage   => "--help (or -h, -?)",
-        'usage.alt.fmt.pod' => qq{L<--help|/"--help, -h, -?"> (or L<-h|/"--help, -h, -?">, L<-?|/"--help, -h, -?">)},
+        'usage.alt.fmt.pod' => qq{B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)},
         handler => sub {
             my ($go, $val, $r) = @_;
             $r->{action} = 'help';
@@ -284,7 +284,7 @@ _
         # XXX when option is changed, we need to update this. we should generate
         # usage automatically instead.
         usage   => "--subcommands",
-        'usage.alt.fmt.pod' => qq{L<--subcommands|/"--subcommands">},
+        'usage.alt.fmt.pod' => qq{B<L<--subcommands|/"--subcommands">>},
         show_in_usage => sub {
             my ($self, $r) = @_;
             !$r->{subcommand_name};
@@ -1782,7 +1782,7 @@ sub select_output_handle {
             ## no critic (InputOutput::RequireBriefOpen)
             open $handle, "|-", $pager;
         }
-        $handle //= \*STDOUT;
+        $handle //= $r->{res}[0] >= 400 ? \*STDERR : \*STDOUT;
     }
     $r->{output_handle} = $handle;
 }
@@ -1987,7 +1987,7 @@ Perinci::CmdLine::Base - Base class for Perinci::CmdLine{::Classic,::Lite}
 
 =head1 VERSION
 
-This document describes version 1.926 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2022-11-04.
+This document describes version 1.928 of Perinci::CmdLine::Base (from Perl distribution Perinci-CmdLine-Lite), released on 2022-11-24.
 
 =head1 DESCRIPTION
 

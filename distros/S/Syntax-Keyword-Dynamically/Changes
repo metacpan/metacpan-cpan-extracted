@@ -1,5 +1,10 @@
 Revision history for Syntax-Keyword-Dynamically
 
+0.11    2022-11-22
+        [CHANGES]
+         * Use the new Future::AsyncAwait::ExtensionBuilder
+         * Use the new extension API of Future::AsyncAwait v0.60
+
 0.10    2022-03-16
         [CHANGES]
          * Updates for Devel::MAT::Dumper v0.44

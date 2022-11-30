@@ -1489,6 +1489,18 @@ int32_t SPVM__Sys__Socket__Constant__IPPROTO_IPV6(SPVM_ENV* env, SPVM_VALUE* sta
 
 }
 
+int32_t SPVM__Sys__Socket__Constant__IPPROTO_ICMP(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef IPPROTO_ICMP
+  stack[0].ival = IPPROTO_ICMP;
+  return 0;
+#else
+  env->die(env, stack, "IPPROTO_ICMP is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
 int32_t SPVM__Sys__Socket__Constant__IPV6_ADDRFORM(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 #ifdef IPV6_ADDRFORM
@@ -2525,3 +2537,146 @@ int32_t SPVM__Sys__Socket__Constant__NI_MAXSERV(SPVM_ENV* env, SPVM_VALUE* stack
 
 }
 
+int32_t SPVM__Sys__Socket__Constant__ICMP_ADDRESS(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef ICMP_ADDRESS
+  stack[0].ival = ICMP_ADDRESS;
+  return 0;
+#else
+  env->die(env, stack, "ICMP_ADDRESS is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Sys__Socket__Constant__ICMP_DEST_UNREACH(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef ICMP_DEST_UNREACH
+  stack[0].ival = ICMP_DEST_UNREACH;
+  return 0;
+#else
+  env->die(env, stack, "ICMP_DEST_UNREACH is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Sys__Socket__Constant__ICMP_ECHO(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef ICMP_ECHO
+  stack[0].ival = ICMP_ECHO;
+  return 0;
+#else
+  env->die(env, stack, "ICMP_ECHO is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Sys__Socket__Constant__ICMP_ECHOREPLY(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef ICMP_ECHOREPLY
+  stack[0].ival = ICMP_ECHOREPLY;
+  return 0;
+#else
+  env->die(env, stack, "ICMP_ECHOREPLY is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Sys__Socket__Constant__ICMP_ECHOREQUEST(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef ICMP_ECHOREQUEST
+  stack[0].ival = ICMP_ECHOREQUEST;
+  return 0;
+#else
+  env->die(env, stack, "ICMP_ECHOREQUEST is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Sys__Socket__Constant__ICMP_FILTER(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef ICMP_FILTER
+  stack[0].ival = ICMP_FILTER;
+  return 0;
+#else
+  env->die(env, stack, "ICMP_FILTER is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Sys__Socket__Constant__ICMP_FRAG_NEEDED(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef ICMP_FRAG_NEEDED
+  stack[0].ival = ICMP_FRAG_NEEDED;
+  return 0;
+#else
+  env->die(env, stack, "ICMP_FRAG_NEEDED is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Sys__Socket__Constant__ICMP_PARAMETERPROB(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef ICMP_PARAMETERPROB
+  stack[0].ival = ICMP_PARAMETERPROB;
+  return 0;
+#else
+  env->die(env, stack, "ICMP_PARAMETERPROB is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Sys__Socket__Constant__ICMP_REDIRECT(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef ICMP_REDIRECT
+  stack[0].ival = ICMP_REDIRECT;
+  return 0;
+#else
+  env->die(env, stack, "ICMP_REDIRECT is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Sys__Socket__Constant__ICMP_SOURCE_QUENCH(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef ICMP_SOURCE_QUENCH
+  stack[0].ival = ICMP_SOURCE_QUENCH;
+  return 0;
+#else
+  env->die(env, stack, "ICMP_SOURCE_QUENCH is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Sys__Socket__Constant__ICMP_TIMESTAMP(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef ICMP_TIMESTAMP
+  stack[0].ival = ICMP_TIMESTAMP;
+  return 0;
+#else
+  env->die(env, stack, "ICMP_TIMESTAMP is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}
+
+int32_t SPVM__Sys__Socket__Constant__ICMP_TIME_EXCEEDED(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+#ifdef ICMP_TIME_EXCEEDED
+  stack[0].ival = ICMP_TIME_EXCEEDED;
+  return 0;
+#else
+  env->die(env, stack, "ICMP_TIME_EXCEEDED is not defined on this system", FILE_NAME, __LINE__);
+  return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#endif
+
+}

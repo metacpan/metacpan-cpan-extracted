@@ -5,9 +5,9 @@ use feature qw/postderef signatures/;
 use strict;
 use warnings;
 no warnings qw/experimental/;
-use Path::Tiny 0.108;
+use Path::Tiny;
 use Carp;
-use JSON::MaybeXS;
+use Cpanel::JSON::XS;
 use YAML::XS;
 # use Data::Dumper;
 

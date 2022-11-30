@@ -1,12 +1,12 @@
 #!/usr/bin/perl
-# ghcn_station_counts.pl - Count stations in ghcn_fetch.pl station output
+# ghcn_station_counts - Count stations in ghcn_fetch station output
 
 ########################################################################
 # Pragmas
 ########################################################################
 use v5.18;  # minimum for Object::Pad
 
-our $VERSION = 'v0.0.010';
+our $VERSION = 'v0.0.011';
 
 use Weather::GHCN::App::StationCounts;
 
@@ -19,22 +19,22 @@ __END__
 
 =head1 NAME
 
-ghcn_station_counts.pl - Count stations in ghcn_fetch.pl output
+ghcn_station_counts - Count stations in ghcn_fetch output
 
 =head1 VERSION
 
-version v0.0.010
+version v0.0.011
 
 =head1 SYNOPSIS
 
-    ghcn_station_counts.pl [-input] [-output] [-debug] [-verbose] [ file... ]
+    ghcn_station_counts [-input] [-output] [-debug] [-verbose] [ file... ]
 
-    ghcn_station_counts.pl [--help | -? | --usage]
+    ghcn_station_counts [--help | -? | --usage]
 
 =head1 DESCRIPTION
 
 The purpose of this script is to read a station list produced by
-"ghcn_fetch.pl" and to turn that list into a set of active
+"ghcn_fetch" and to turn that list into a set of active
 station counts for each year.  No report option should be given,
 so it generates a list of stations rather than weather data.
 

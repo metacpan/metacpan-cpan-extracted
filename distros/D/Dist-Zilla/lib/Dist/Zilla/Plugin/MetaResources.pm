@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::MetaResources 6.028;
+package Dist::Zilla::Plugin::MetaResources 6.029;
 # ABSTRACT: provide arbitrary "resources" for distribution metadata
 
 use Moose;
@@ -13,11 +13,11 @@ use namespace::autoclean;
 #pod This plugin adds resources entries to the distribution's metadata.
 #pod
 #pod   [MetaResources]
-#pod   homepage          = http://example.com/~dude/project.asp
+#pod   homepage          = https://example.com/~dude/project.asp
 #pod   bugtracker.web    = https://rt.cpan.org/Public/Dist/Display.html?Name=Project
 #pod   bugtracker.mailto = bug-Project@rt.cpan.org
 #pod   repository.url    = git://github.com/dude/project.git
-#pod   repository.web    = http://github.com/dude/project
+#pod   repository.web    = https://github.com/dude/project
 #pod   repository.type   = git
 #pod
 #pod =cut
@@ -95,18 +95,18 @@ Dist::Zilla::Plugin::MetaResources - provide arbitrary "resources" for distribut
 
 =head1 VERSION
 
-version 6.028
+version 6.029
 
 =head1 DESCRIPTION
 
 This plugin adds resources entries to the distribution's metadata.
 
   [MetaResources]
-  homepage          = http://example.com/~dude/project.asp
+  homepage          = https://example.com/~dude/project.asp
   bugtracker.web    = https://rt.cpan.org/Public/Dist/Display.html?Name=Project
   bugtracker.mailto = bug-Project@rt.cpan.org
   repository.url    = git://github.com/dude/project.git
-  repository.web    = http://github.com/dude/project
+  repository.web    = https://github.com/dude/project
   repository.type   = git
 
 =head1 PERL VERSION

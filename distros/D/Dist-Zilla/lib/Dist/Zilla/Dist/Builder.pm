@@ -1,4 +1,4 @@
-package Dist::Zilla::Dist::Builder 6.028;
+package Dist::Zilla::Dist::Builder 6.029;
 # ABSTRACT: dist zilla subclass for building dists
 
 use Moose 0.92; # role composition fixes
@@ -742,6 +742,7 @@ sub install {
   } else {
     $self->log("all's well; removing $target");
     $target->remove_tree({ safe => 0 });
+    $latest->remove_tree({ safe => 0 }) if -d $latest; # error cannot unlink, is a directory
     $latest->remove if $latest;
   }
 
@@ -778,6 +779,7 @@ sub test {
 
   $self->log("all's well; removing $target");
   $target->remove_tree({ safe => 0 });
+  $latest->remove_tree({ safe => 0 }) if -d $latest; # error cannot unlink, is a directory
   $latest->remove if $latest;
 }
 
@@ -856,6 +858,7 @@ sub run_in_build {
   if ($ok) {
     $self->log("all's well; removing $target");
     $target->remove_tree({ safe => 0 });
+    $latest->remove_tree({ safe => 0 }) if -d $latest; # error cannot unlink, is a directory
     $latest->remove if $latest;
   } else {
     my $error = $@ || '(unknown error)';
@@ -894,7 +897,7 @@ Dist::Zilla::Dist::Builder - dist zilla subclass for building dists
 
 =head1 VERSION
 
-version 6.028
+version 6.029
 
 =head1 PERL VERSION
 

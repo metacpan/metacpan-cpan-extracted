@@ -11,6 +11,7 @@ use Udev::FFI::Functions qw(:all);
 use Udev::FFI::Device;
 
 
+
 sub new {
     my $class = shift;
 
@@ -20,7 +21,7 @@ sub new {
         _is_started => 0
     };
 
-    bless $self, $class;
+    bless($self, $class);
 
     return $self;
 }
@@ -106,7 +107,7 @@ sub start {
     return 1
         if $self->{_is_started};
 
-    if (0 != ($! = udev_monitor_enable_receiving( $self->{_monitor} ))) {
+    if (0 != ($! = udev_monitor_enable_receiving($self->{_monitor}))) {
         $! = -$!;
         return 0;
     }
@@ -135,9 +136,9 @@ sub poll {
         unless $self->{_is_started};
 
     if ($self->{_select}->can_read($timeout)) {
-        my $device = udev_monitor_receive_device( $self->{_monitor} );
+        my $device = udev_monitor_receive_device($self->{_monitor});
 
-        return Udev::FFI::Device->new( $device );
+        return Udev::FFI::Device->new($device);
     }
 
     return undef;
@@ -152,7 +153,7 @@ sub is_started {
 
 
 sub DESTROY {
-    udev_monitor_unref( $_[0]->{_monitor} );
+    udev_monitor_unref($_[0]->{_monitor});
 }
 
 
@@ -177,7 +178,7 @@ Udev::FFI::Monitor
         die("Can't create Udev::FFI object: $@");
     
     my $monitor = $udev->new_monitor() or
-        die ("Can't create udev monitor: $@");
+        die("Can't create udev monitor: $@");
     
     $monitor->filter_by_subsystem_devtype('usb');
     
@@ -186,9 +187,9 @@ Udev::FFI::Monitor
     for (;;) {
         my $device = $monitor->poll(); # blocking read
     
-        print 'ACTION: '.$device->get_action()."\n";
-        print 'SYSNAME: '.$device->get_sysname()."\n";
-        print 'DEVPATH: '.$device->get_devpath()."\n";
+        print('ACTION: '.$device->get_action()."\n");
+        print('SYSNAME: '.$device->get_sysname()."\n");
+        print('DEVPATH: '.$device->get_devpath()."\n");
     }
 
 =head1 METHODS

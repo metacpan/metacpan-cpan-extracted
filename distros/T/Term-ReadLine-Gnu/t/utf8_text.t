@@ -1,10 +1,10 @@
 # -*- perl -*-
-#	utf8_text.t --- Term::ReadLine::Gnu UTF-8 text string test script
+#       utf8_text.t --- Term::ReadLine::Gnu UTF-8 text string test script
 #
-#	Copyright (c) 2016-2019 Hiroo Hayashi.  All rights reserved.
+#       Copyright (c) 2016-2019 Hiroo Hayashi.  All rights reserved.
 #
-#	This program is free software; you can redistribute it and/or
-#	modify it under the same terms as Perl itself.
+#       This program is free software; you can redistribute it and/or
+#       modify it under the same terms as Perl itself.
 
 # The GNU Readline Library start supporting multibyte characters since
 # version 4.3, and is still improving the support.  You should use the
@@ -30,14 +30,14 @@ use Data::Dumper;
 {
     no warnings 'redefine';
     sub note {
-	my $msg = join('', @_);
-	$msg =~ s{\n(?!\z)}{\n# }sg;
-	print "# $msg" . ($msg =~ /\n$/ ? '' : "\n");
+        my $msg = join('', @_);
+        $msg =~ s{\n(?!\z)}{\n# }sg;
+        print "# $msg" . ($msg =~ /\n$/ ? '' : "\n");
     }
 }
 
 BEGIN {
-#    $ENV{PERL_RL} = 'Gnu';	# force to use Term::ReadLine::Gnu
+#    $ENV{PERL_RL} = 'Gnu';     # force to use Term::ReadLine::Gnu
     $ENV{LC_ALL} = 'en_US.UTF-8';
 }
 
@@ -78,7 +78,7 @@ ok(1, 'setlocale');
 my ($in, $line, @layers);
 open ($in, "<", "t/utf8.txt") or die "cannot open utf8.txt: $!";
 
-if (0) {	# This may cause a fail.
+if (0) {        # This may cause a fail.
     $line = <$in>; chomp($line);
     note $line;
     note Dumper($line, "🐪");
@@ -110,7 +110,7 @@ if ($verbose) {
 } else {
     $t = new Term::ReadLine 'ReadLineTest', $in, \*STDOUT;
 }
-print "\n";	# rl_initialize() outputs some escape characters in Term-ReadLine-Gnu less than 6.3, 
+print "\n";     # rl_initialize() outputs some escape characters in Term-ReadLine-Gnu less than 6.3,
 isa_ok($t, 'Term::ReadLine');
 
 @layers = PerlIO::get_layers($t->IN);
@@ -132,8 +132,8 @@ my $a = $t->Attribs;
 if ($verbose) {
     $a->{do_expand} = 1;
     while ($line = $t->readline("🐪🐪> ")) {
-	print {$t->OUT} $line, "\n";
-	print {$t->OUT} Dumper($line), "\n";
+        print {$t->OUT} $line, "\n";
+        print {$t->OUT} Dumper($line), "\n";
     }
     exit 0;
 }
@@ -159,7 +159,7 @@ ok(utf8::is_utf8($line), 'UTF-8 text string: variable');
 # UTF-8 text string works well.
 ok(reverse $line eq '🐪🐪🐪 🐪🐪 🐪', 'This does work.');
 
-if (0) {	# This may cause a fail.
+if (0) {        # This may cause a fail.
     $line = <$in>; chomp($line);
     note $line;
     note Dumper($line, "🐪🐪");

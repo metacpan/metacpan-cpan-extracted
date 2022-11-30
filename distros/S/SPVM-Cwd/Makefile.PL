@@ -8,7 +8,9 @@ use SPVM::Builder::Util::API;
 WriteMakefile(
   NAME              => 'SPVM::Cwd',
   VERSION_FROM      => 'lib/SPVM/Cwd.pm',
-  PREREQ_PM         => {}, # e.g., Module::Name => 1.1
+  PREREQ_PM         => {
+    'SPVM::Sys' => '0.27',
+  }, # e.g., Module::Name => 1.1
   LICENSE           => 'perl_5',
   ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
     (ABSTRACT_FROM  => 'lib/SPVM/Cwd.pm',
@@ -27,16 +29,13 @@ WriteMakefile(
   },
   # SPVM::Builder::Util::API is needed for Makefile.PL
   CONFIGURE_REQUIRES => {
-    'SPVM'              => '0.9617',
+    'SPVM'              => '0.9662',
   },
 );
 
 sub MY::postamble {
 
   my $make_rule = '';
-  
-  $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('Cwd');
-  
   
   return $make_rule;
 }

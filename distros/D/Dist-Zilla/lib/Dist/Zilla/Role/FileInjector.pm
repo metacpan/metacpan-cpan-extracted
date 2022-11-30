@@ -1,4 +1,4 @@
-package Dist::Zilla::Role::FileInjector 6.028;
+package Dist::Zilla::Role::FileInjector 6.029;
 # ABSTRACT: something that can add files to the distribution
 
 use Moose::Role;
@@ -48,7 +48,7 @@ Dist::Zilla::Role::FileInjector - something that can add files to the distributi
 
 =head1 VERSION
 
-version 6.028
+version 6.029
 
 =head1 DESCRIPTION
 

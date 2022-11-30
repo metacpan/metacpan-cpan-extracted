@@ -4,7 +4,7 @@ use warnings;
 use Tie::Scalar;
 
 package Tie::Wx::Widget;
-our $VERSION = '1.0';
+our $VERSION = '1.01';
 our @ISA = 'Tie::Scalar';
 our $complainmethod = 'die';
 
@@ -35,7 +35,7 @@ sub FETCH {
     if (exists $_[0]->{'fetch'}) { &{$_[0]->{'fetch'}}( $_[0]->{'w'} ) }
     else                         { return $_[0]->{'w'}->GetValue       }
 }
-sub STORE { 
+sub STORE {
     return 0 if ref $_[1];
     if (exists $_[0]->{'store'}) { &{$_[0]->{'store'}}( $_[0]->{'w'}, $_[1] ) }
     else                         { return $_[0]->{'w'}->SetValue( $_[1] )     }
@@ -49,7 +49,7 @@ __END__
 
 =head1 NAME
 
-Tie::Wx::Widget - get and set main value of a Wx widget with less syntax and more magic
+Tie::Wx::Widget - implicit access value of a Wx widget
 
 =head1 SYNOPSIS
 
@@ -68,10 +68,10 @@ Tie::Wx::Widget - get and set main value of a Wx widget with less syntax and mor
 
 Often are the widget values coupled with each other. For instance in
 L<App::Spirograph> is a slider, which max value is the value of another slider.
-Once you know this, why keep track of it and change the range by hand 
+Once you know this, why keep track of it and change the range by hand
 any given time?
 
-    tie $tslider, Tie::Wx::Widget, $slider, 
+    tie $tslider, Tie::Wx::Widget, $slider,
         sub { $[0]->SetValue($[1]); $subslider->SetRange(1, $[1]) };
 
 The first parameter to the callback is always the Wx object reference,
@@ -99,7 +99,7 @@ or do later:
 
     Tie::Wx::Widget::warn_mode();
 
-Then will be called C<warn> instead of C<die>. 
+Then will be called C<warn> instead of C<die>.
 But you can switch anytime back with:
 
     Tie::Wx::Widget::die_mode();
@@ -126,49 +126,10 @@ Because if the Wx ref is not good, there will be no tying anyway.
     # doesn't do anything
     $tieobject->DESTROY()
 
-=head1 BUGS
-
-Please report any bugs or feature requests to C<bug-tie-wx-widget at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Tie-Wx-Widget>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
-
-=head1 SUPPORT
-
-You can find documentation for this module with the perldoc command.
-
-    perldoc Tie::Wx::Widget
-
-
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker (report bugs here)
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Tie-Wx-Widget>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/Tie-Wx-Widget>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/Tie-Wx-Widget>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/Tie-Wx-Widget/>
-
-=item * Source Repository: (in case you fant to fork :))
-
-L<http://bitbucket.org/lichtkind/tie-wx-widget>
-
-=back
-
 
 =head1 ACKNOWLEDGEMENTS
 
-This was solely my idea before Linuxtag 2011. Started as a slide for it.
+This was solely my idea before Linuxtag 2011. Started as a slide for my talk there.
 
 =head1 AUTHOR
 
@@ -176,11 +137,10 @@ Herbert Breunung, C<< <lichtkind at cpan.org> >>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2011 Herbert Breunung.
+Copyright 2011-2022 Herbert Breunung.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published
 by the Free Software Foundation; or the Artistic License.
 
 See http://dev.perl.org/licenses/ for more information.
-

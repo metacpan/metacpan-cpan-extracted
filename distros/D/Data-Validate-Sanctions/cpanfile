@@ -19,6 +19,8 @@ requires 'Getopt::Long', '2.42';
 requires 'Syntax::Keyword::Try', '0.18';
 requires 'Locale::Country', '3.66';
 requires 'Text::Trim', 0;
+requires 'JSON::MaybeUTF8', 0;
+requires 'Clone', 0;
 
 on test => sub {
     requires 'Test::More', '0.96';
@@ -26,7 +28,11 @@ on test => sub {
     requires 'Test::Warnings', '0.026';
     requires 'Test::MockModule', '0.15';
     requires 'Test::MockObject', '1.20161202';
+    requires 'Test::MockTime';
+    requires 'Test::Deep', '0';
     requires 'FindBin', '0';
     requires 'Path::Tiny', '0';
     requires 'Class::Unload', '0';
+    requires 'Test::RedisServer', '0.23';
+    requires 'RedisDB', '2.57';
 };

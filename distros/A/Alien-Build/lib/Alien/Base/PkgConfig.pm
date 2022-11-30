@@ -9,7 +9,7 @@ use Path::Tiny qw( path );
 use Capture::Tiny qw( capture_stderr );
 
 # ABSTRACT: Private legacy pkg-config class for Alien::Base
-our $VERSION = '2.72'; # VERSION
+our $VERSION = '2.74'; # VERSION
 
 
 sub new {
@@ -163,7 +163,7 @@ Alien::Base::PkgConfig - Private legacy pkg-config class for Alien::Base
 
 =head1 VERSION
 
-version 2.72
+version 2.74
 
 =head1 DESCRIPTION
 
@@ -245,6 +245,8 @@ Paul Evans (leonerd, PEVANS)
 Håkon Hægland (hakonhagland, HAKONH)
 
 nick nauwelaerts (INPHOBIA)
+
+Florian Weimer
 
 =head1 COPYRIGHT AND LICENSE
 

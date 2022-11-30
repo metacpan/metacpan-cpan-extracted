@@ -19,7 +19,7 @@ use URI;
 
 use parent qw{Class::Accessor::Fast};
 
-our $VERSION = '0.55'; ## no critic
+our $VERSION = '0.56'; ## no critic
 
 __PACKAGE__->mk_accessors(
   qw{bucket creation_date account buffer_size region logger verify_region });
@@ -73,12 +73,14 @@ sub _uri {
     $key =~ s/^\///xsm;
   }
 
+  my $account = $self->account;
+
   my $uri
     = ($key)
-    ? $self->bucket . $SLASH . $self->account->_urlencode($key)
+    ? $self->bucket . $SLASH . $account->_urlencode($key)
     : $self->bucket . $SLASH;
 
-  if ( $self->account->dns_bucket_names ) {
+  if ( $account->dns_bucket_names ) {
     $uri =~ s/^\///xsm;
   } ## end if ( $self->account->dns_bucket_names)
 
@@ -93,8 +95,10 @@ sub add_key {
   croak 'must specify key'
     if !$key || !length $key;
 
+  my $account = $self->account;
+
   if ( $conf->{acl_short} ) {
-    $self->account->_validate_acl_short( $conf->{acl_short} );
+    $account->_validate_acl_short( $conf->{acl_short} );
 
     $conf->{'x-amz-acl'} = $conf->{acl_short};
 
@@ -142,12 +146,13 @@ sub add_key {
   # 301 and you'll only know the region of redirection - no location
   # header provided...
   if ($EVAL_ERROR) {
-    my $rsp = $self->account->last_response;
+    my $rsp = $account->last_response;
+
     if ( $rsp->code eq '301' ) {
       $self->region( $rsp->headers->{'x-amz-bucket-region'} );
     }
 
-    return $self->_add_key(
+    $retval = $self->_add_key(
       { headers => $conf,
         data    => $value,
         key     => $key
@@ -155,15 +160,17 @@ sub add_key {
     );
   }
 
+  return $retval;
 } ## end sub add_key
 
 sub _add_key {
   my ( $self, @args ) = @_;
 
   my ( $data, $headers, $key ) = @{ $args[0] }{qw{data headers key}};
+  my $account = $self->account;
 
   if ( ref $data ) {
-    return $self->account->_send_request_expect_nothing_probed(
+    return $account->_send_request_expect_nothing_probed(
       { method  => 'PUT',
         path    => $self->_uri($key),
         headers => $headers,
@@ -173,7 +180,7 @@ sub _add_key {
     );
   } ## end if ( ref $value )
   else {
-    return $self->account->_send_request_expect_nothing(
+    return $account->_send_request_expect_nothing(
       { method  => 'PUT',
         path    => $self->_uri($key),
         headers => $headers,
@@ -626,9 +633,12 @@ sub get_key {
     }
   );
 
+  my $retval;
+
   my $response = $acct->_do_http( $request, $filename );
 
-  return if $response->code == 404;
+  return $retval
+    if $response->code == 404;
 
   $acct->_croak_if_response_error($response);
 
@@ -639,7 +649,7 @@ sub get_key {
     $etag =~ s/"$//xsm;
   } ## end if ($etag)
 
-  my $return = {
+  $retval = {
     content_length => $response->content_length || 0,
     content_type   => $response->content_type,
     etag           => $etag,
@@ -651,7 +661,7 @@ sub get_key {
     my $md5
       = ( $filename and -f $filename )
       ? file_md5_hex($filename)
-      : md5_hex( $return->{value} );
+      : md5_hex( $retval->{value} );
 
     # Some S3-compatible providers return an all-caps MD5 value in the
     # etag so it should be lc'd for comparison.
@@ -661,10 +671,10 @@ sub get_key {
 
   foreach my $header ( $response->headers->header_field_names ) {
     next if $header !~ /x-amz-meta-/ixsm;
-    $return->{ lc $header } = $response->header($header);
+    $retval->{ lc $header } = $response->header($header);
   } ## end foreach my $header ( $response...)
 
-  return $return;
+  return $retval;
 } ## end sub get_key
 
 ########################################################################
@@ -688,7 +698,9 @@ sub delete_key {
   croak 'must specify key'
     if !$key && length $key;
 
-  return $self->account->_send_request_expect_nothing(
+  my $account = $self->account;
+
+  return $account->_send_request_expect_nothing(
     { method  => 'DELETE',
       region  => $self->region,
       path    => $self->_uri($key),
@@ -766,9 +778,9 @@ sub get_acl {
 ########################################################################
   my ( $self, $key ) = @_;
 
-  my $acct = $self->account;
+  my $account = $self->account;
 
-  my $request = $acct->_make_request(
+  my $request = $account->_make_request(
     { region  => $self->region,
       method  => 'GET',
       path    => $self->_uri($key) . '?acl=',
@@ -776,19 +788,19 @@ sub get_acl {
     }
   );
 
-  my $old_redirectable = $acct->ua->requests_redirectable;
-  $acct->ua->requests_redirectable( [] );
+  my $old_redirectable = $account->ua->requests_redirectable;
+  $account->ua->requests_redirectable( [] );
 
-  my $response = $acct->_do_http($request);
+  my $response = $account->_do_http($request);
 
   if ( $response->code =~ /^30/xsm ) {
-    my $xpc = $self->account->_xpc_of_content( $response->content );
+    my $xpc = $account->_xpc_of_content( $response->content );
     my $uri = URI->new( $response->header('location') );
 
-    my $old_host = $acct->host;
-    $acct->host( $uri->host );
+    my $old_host = $account->host;
+    $account->host( $uri->host );
 
-    my $request = $acct->_make_request(
+    my $request = $account->_make_request(
       { region  => $self->region,
         method  => 'GET',
         path    => $uri->path,
@@ -796,17 +808,21 @@ sub get_acl {
       }
     );
 
-    $response = $acct->_do_http($request);
+    $response = $account->_do_http($request);
 
-    $acct->ua->requests_redirectable($old_redirectable);
-    $acct->host($old_host);
+    $account->ua->requests_redirectable($old_redirectable);
+    $account->host($old_host);
   } ## end if ( $response->code =~...)
 
-  return if $response->code == 404;
+  my $content;
 
-  $acct->_croak_if_response_error($response);
+  # do we test for NOT FOUND, returning undef?
+  if ( $response->code ne '404' ) {
+    $account->_croak_if_response_error($response);
+    $content = $response->content;
+  }
 
-  return $response->content;
+  return $content;
 } ## end sub get_acl
 
 ########################################################################
@@ -831,7 +847,9 @@ sub set_acl {
 
   my $xml = $conf->{acl_xml} || $EMPTY;
 
-  return $self->account->_send_request_expect_nothing(
+  my $account = $self->account;
+
+  return $account->_send_request_expect_nothing(
     { method  => 'PUT',
       path    => $path,
       headers => $hash_ref,
@@ -846,20 +864,25 @@ sub get_location_constraint {
 ########################################################################
   my ($self) = @_;
 
-  my $xpc = $self->account->_send_request(
+  my $account = $self->account;
+
+  my $xpc = $account->_send_request(
     { region => $self->region,
       method => 'GET',
       path   => $self->bucket . '/?location='
     }
   );
 
-  if ( !$xpc ) {
-    $self->account->_remember_errors($xpc);
+  my $lc;
 
-    return;
+  if ( !$xpc ) {
+    croak $account->errstr
+      if $account->_remember_errors($xpc);
+
+    return $lc;
   } ## end if ( !$xpc )
 
-  my $lc = $xpc->{content};
+  $lc = $xpc->{content};
 
   if ( defined $lc && $lc eq $EMPTY ) {
     $lc = undef;
@@ -875,7 +898,7 @@ sub last_response {
 ########################################################################
   my ($self) = @_;
 
-  return $self->account->last_reponse;
+  return $self->account->last_response;
 }
 
 ########################################################################
@@ -1267,7 +1290,7 @@ Returns a boolean indicating the operations success.
 =head2 get_location_constraint
 
 Returns the location constraint (region the bucket resides in) for a
-bucket.
+bucket. Returns undef if no location constraint.
 
 Valid values that may be returned:
 

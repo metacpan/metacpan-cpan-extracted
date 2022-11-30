@@ -14,7 +14,7 @@ use strict;
 use Devel::NYTProf::Core;
 require Devel::NYTProf::Data;
 
-our $VERSION = '6.11';
+our $VERSION = '6.12';
     
 use Data::Dumper;
 use Getopt::Long;
@@ -41,7 +41,7 @@ usage: [perl] nytprofcalls [opts] nytprof-file [...]
  --help,        -h         Print this message
  --verbose,     -v         Be more verbose
 
-This script of part of the Devel::NYTProf distribution.
+This script is part of the Devel::NYTProf distribution.
 See https://metacpan.org/release/Devel-NYTProf for details and copyright.
 END
     exit 0;

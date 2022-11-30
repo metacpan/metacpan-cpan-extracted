@@ -11,6 +11,9 @@ object Prima::Drawable ( Prima::Component)
 	int          alpha;
 	Handle       fillPatternImage;
 
+	DrawablePaintState current_state;
+	DrawablePaintState saved_state;
+
 	property     int           alpha;
 	property     Bool          antialias;
 	property     Color         backColor;
@@ -20,10 +23,12 @@ object Prima::Drawable ( Prima::Component)
 	property     SV *          fillPattern;
 	property     Point         fillPatternOffset;
 	property     int           height;
-	property     int           lineEnd;
+	property     SV *          lineEnd;
+	property     SV *          lineEndIndex(int index);
 	property     int           lineJoin;
 	property     SV *          linePattern;
 	property     double        lineWidth;
+	property     SV *          matrix;
 	property     double        miterLimit;
 	property     SV *          palette;
 	property     SV *          pixel( int x, int y);
@@ -34,7 +39,6 @@ object Prima::Drawable ( Prima::Component)
 	property     Point         size;
 	property     Bool          textOpaque;
 	property     Bool          textOutBaseline;
-	property     Point         translate;
 	property     int           width;
 
 	# globals
@@ -67,6 +71,7 @@ object Prima::Drawable ( Prima::Component)
 	method SV *  get_text_box( SV * text, int from = 0, int len = -1);
 	method SV *  render_glyph( int index, HV * profile);
 	static SV *  render_polyline( SV * obj, SV * points, HV * profile);
+	import Handle render_pattern( SV * obj, SV * pattern, HV * profile);
 	static SV *  render_spline( SV * obj, SV * points, HV * profile);
 	method Bool  graphic_context_push();
 	method Bool  graphic_context_pop();

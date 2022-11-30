@@ -8,7 +8,6 @@ WriteMakefile(
     AUTHOR           => 'Lucas Tiago de Moraes <lucastiagodemoraes@gmail.com>',
     LICENSE          => 'perl_5',
     MIN_PERL_VERSION => '5.008005',
-    OBJECT           => '$(O_FILES)',
     
     META_MERGE => {
         'meta-spec' => {
@@ -31,7 +30,7 @@ WriteMakefile(
     },
     
     PREREQ_PM => {
-        'XSLoader' => 0,
+        'XSLoader' => '0.24',
         'Exporter' => 0
     },
     

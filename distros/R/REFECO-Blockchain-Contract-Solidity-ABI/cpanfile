@@ -9,4 +9,5 @@ on 'test' => sub {
     requires 'Test::Fatal', '=> 0.016';
     requires 'Test::Perl::Critic', '=> 1.04';
     requires 'Test::Code::TidyAll', '=> 0.82';
+    requeres 'Test::Pod', '=> 1.52';
 }

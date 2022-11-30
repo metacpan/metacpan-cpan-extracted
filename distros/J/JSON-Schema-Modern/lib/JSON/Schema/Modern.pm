@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.556-9-gff35211a
+package JSON::Schema::Modern; # git description: v0.557-9-g7a2a81fa
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema
 # KEYWORDS: JSON Schema validator data validation structure specification
 
-our $VERSION = '0.557';
+our $VERSION = '0.558';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -248,6 +248,7 @@ sub traverse ($self, $schema_reference, $config_override = {}) {
     configs => {},
     callbacks => $config_override->{callbacks} // {},
     evaluator => $self,
+    traverse => 1,
   };
 
   try {
@@ -912,21 +913,20 @@ has _media_type => (
   lazy => 1,
   default => sub ($self) {
     my $_json_media_type = sub ($content_ref) {
+      # utf-8 decoding is always done, as per the JSON spec.
+      # other charsets are not supported: see RFC8259 §11
       \ JSON::MaybeXS->new(allow_nonref => 1, utf8 => 1)->decode($content_ref->$*);
     };
     +{
-      # note: utf-8 decoding is NOT done, as we can't be sure that's the correct charset!
-      'application/json' => $_json_media_type,
-      'application/schema+json' => $_json_media_type,
-      'application/schema-instance+json' => $_json_media_type,
+      (map +($_ => $_json_media_type),
+        qw(application/json application/schema+json application/schema-instance+json)),
       map +($_ => sub ($content_ref) { $content_ref }),
-        qw(text/plain application/octet-stream),
+        qw(text/* application/octet-stream),
     };
   },
 );
 
-# get_media_type('TExT/bloop') will match an entry for 'text/*' or '*/*'
-# TODO: support queries for application/schema+json to match entry of application/json
+# get_media_type('TExT/bloop') will fall through to matching an entry for 'text/*' or '*/*'
 around get_media_type => sub ($orig, $self, $type) {
   my $mt = $self->$orig(fc $type);
   return $mt if $mt;
@@ -993,7 +993,7 @@ JSON::Schema::Modern - Validate data against a schema
 
 =head1 VERSION
 
-version 0.557
+version 0.558
 
 =head1 SYNOPSIS
 
@@ -1090,7 +1090,9 @@ number, or integer) the instance value must be for the format validation to be c
 When true, the C<contentMediaType> and C<contentSchema> keywords are not treated as pure annotations:
 C<contentEncoding> (when present) is used to decode the applied data payload and then
 C<contentMediaType> will be used as the media-type for decoding to produce the data payload which is
-then applied to the schema in C<contentSchema> for validation.
+then applied to the schema in C<contentSchema> for validation. (Note that treating these keywords as
+anything beyond simple annotations is contrary to the specification, therefore this option defaults
+to false.)
 
 See L</add_media_type> and L</add_encoding> for adding additional type support.
 
@@ -1380,7 +1382,7 @@ C<application/octet-stream>
 
 =item *
 
-C<text/plain>
+C<text/*>
 
 =back
 
@@ -1392,6 +1394,7 @@ Fetches a decoder sub for the indicated media type. Lookups are performed B<with
 
 You can use it thusly:
 
+  $js->add_media_type('application/furble' => sub { ... }); # as above
   my $decoder = $self->get_media_type('application/furble') or die 'cannot find media type decoder';
   my $content_ref = $decoder->(\$content_string);
 

@@ -25,21 +25,23 @@ my @tests = map { join( '-', @{ $_ } ) }
     sort { $a->[ 0 ] <=> $b->[ 0 ] || $a->[ 1 ] cmp $b->[ 1 ] }
     map  { [ split( /-/, $_, 2 ) ] } uniq
     grep { $_ =~ $want_only_re }
-    map  { s/\.(?:sql|psql)$//; $_ }
-    grep { /^(\d+)-(.*).(?:sql|psql)$/ } readdir $dir;
+    map  { s/\.(?:sql|psql|text)$//; $_ }
+    grep { /^(\d+)-(.*).(?:sql|psql|text)$/ } readdir $dir;
 closedir $dir;
 
-plan 'tests' => scalar @tests;
+plan 'tests' => 2 * scalar @tests;
 
 for my $test ( @tests ) {
     my $input  = load_file( $test . '.sql' );
     my $output = load_file( $test . '.psql' );
+    my $text   = load_file( $test . '.text' );
     my $pp     = Pg::SQL::PrettyPrinter->new(
         'sql'   => $input,
         service => $ENV{ 'TEST_HTTP' }
     );
     $pp->parse();
     is( trim( $pp->{ 'statements' }->[ 0 ]->pretty_print ), trim( $output ), "Test ${test} - pretty_print()" );
+    is( trim( $pp->{ 'statements' }->[ 0 ]->as_text ),      trim( $text ),   "Test ${test} - as_text()" );
 }
 
 exit;

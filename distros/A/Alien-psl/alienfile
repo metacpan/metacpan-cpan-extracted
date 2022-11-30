@@ -1,0 +1,17 @@
+use alienfile;
+
+probe sub { $_[0]->runtime_prop->{ffi_name} = 'psl' };
+plugin qw'Probe::CBuilder libs -lpsl';
+
+share {
+    plugin qw'Download::GitHub github_user rockdaboot github_repo libpsl asset 1';
+    plugin 'Build::Autoconf';
+    build ['%{configure}', '%{make}', '%{make} install'];
+    plugin 'Gather::IsolateDynamic';
+    gather sub {
+        my ($build) = @_;
+        my $prefix = $build->runtime_prop->{prefix};
+        $build->runtime_prop->{cflags} = "-I$prefix/include ";
+        $build->runtime_prop->{libs} = "-L$prefix/lib -lpsl ";
+    }
+};

@@ -3,12 +3,12 @@ package Code::TidyAll::SVN::Util;
 use strict;
 use warnings;
 
-use Cwd qw(realpath);
+use Cwd                 qw(realpath);
 use IPC::System::Simple qw(capturex);
 
 use Exporter qw(import);
 
-our $VERSION = '0.82';
+our $VERSION = '0.83';
 
 our @EXPORT_OK = qw(svn_uncommitted_files);
 
@@ -38,7 +38,7 @@ Code::TidyAll::SVN::Util - Utility functions for SVN hooks
 
 =head1 VERSION
 
-version 0.82
+version 0.83
 
 =head1 SUPPORT
 

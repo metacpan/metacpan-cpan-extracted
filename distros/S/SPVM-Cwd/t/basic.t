@@ -13,8 +13,14 @@ use Cwd 'getcwd';
 
 # getcwd
 {
-  my $cur_dir = getcwd;
-  is(SPVM::TestCase::Cwd->getcwd_value, $cur_dir);
+  my $cur_dir_expected = getcwd;
+  ok(SPVM::TestCase::Cwd->getcwd($cur_dir_expected));
+}
+
+# getdcwd
+if ($^O eq 'MSWin32') {
+  my $cur_dir = Cwd::getdcwd();
+  ok(SPVM::TestCase::Cwd->getdcwd($cur_dir));
 }
 
 # realpath, abs_path
@@ -22,24 +28,25 @@ use Cwd 'getcwd';
   {
     my $path = 't/basic.t';
     my $realpath = SPVM::Cwd->realpath($path);
-    my $perl_realpath = Cwd::realpath($path);
-    warn $realpath;
-    is($realpath, $perl_realpath);
+    my $realpath_expected = Cwd::realpath($path);
+    warn "Got:$realpath, Expected:$realpath_expected";
+    is($realpath, $realpath_expected);
   }
   {
     my $path = 't/lib/../basic.t';
     my $realpath = SPVM::Cwd->realpath($path);
-    my $perl_realpath = Cwd::realpath($path);
-    warn $realpath;
-    is($realpath, $perl_realpath);
+    my $realpath_expected = Cwd::realpath($path);
+    warn "Got:$realpath, Expected:$realpath_expected";
+    is($realpath, $realpath_expected);
   }
 }
 
 # abs_path
 {
   {
-    my $path = 't/basic.t';
+    my $path = 't/lib/../basic.t';
     my $abs_path = SPVM::Cwd->abs_path($path);
+    like($abs_path, qr|\Qt/basic.t|);
     my $realpath = SPVM::Cwd->realpath($path);
     is($abs_path, $realpath);
   }

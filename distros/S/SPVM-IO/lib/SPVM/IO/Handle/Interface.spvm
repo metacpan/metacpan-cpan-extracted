@@ -3,6 +3,8 @@ class IO::Handle::Interface : interface_t {
   
   required method has_interfaces : int ();
   
+  method blocking_flag : int ();
+
   method close : int ();
 
   method eof : int ();
@@ -48,4 +50,6 @@ class IO::Handle::Interface : interface_t {
   method getline : string ();
   
   method getlines : string ();
+  
+  method opened : int ();
 }

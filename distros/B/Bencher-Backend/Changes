@@ -1,3 +1,8 @@
+1.062   2022-11-29  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Add short option alias -B for --render-as-benchmark-pm.
+
+
 1.061   2022-02-08  Released-By: PERLANCAR; Urgency: medium
 
         - [bugfix] Fix missing schema in format_result()'s Rinci metadata.

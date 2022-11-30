@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-10'; # DATE
+our $DATE = '2022-11-22'; # DATE
 our $DIST = 'App-SubtitleUtils'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/SubtitleUtils/srtcombinetext",
@@ -38,19 +38,25 @@ srtcombinetext - Combine the text of two or more subtitle files (e.g. for differ
 
 =head1 VERSION
 
-This document describes version 0.008 of srtcombinetext (from Perl distribution App-SubtitleUtils), released on 2022-11-10.
+This document describes version 0.011 of srtcombinetext (from Perl distribution App-SubtitleUtils), released on 2022-11-22.
 
 =head1 SYNOPSIS
 
-B<srtcombinetext> L<--help|/"--help, -h, -?"> (or L<-h|/"--help, -h, -?">, L<-?|/"--help, -h, -?">)
+B<srtcombinetext> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
 
-B<srtcombinetext> L<--version|/"--version, -v"> (or L<-v|/"--version, -v">)
+B<srtcombinetext> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<srtcombinetext> [L<--eval|/"--eval=s, -e">=I<str>|L<-e|/"--eval=s, -e">=I<str>] [L<--format|/"--format=s">=I<name>|L<--json|/"--json">] [L<--(no)naked-res|/"--naked-res">] [L<--page-result|/"--page-result">[=I<program>]|L<--view-result|/"--view-result">[=I<program>]] -- E<lt>L<filenames|/"--filenames=s@*">E<gt> ...
+B<srtcombinetext> [B<L<--eval|/"--eval=s, -e">>=I<str>|B<L<-e|/"--eval=s, -e">>=I<str>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] -- E<lt>I<L<filenames|/"--filenames=s@*">>E<gt> ...
 
 
 
 See examples in the L</EXAMPLES> section.
+
+=head1 DESCRIPTION
+
+All the subtitle files must contain the same number of entries, with each entry
+containing the exact timestamps. The default is just to concatenate the text of
+each entry together, but you can customize each text using the C<--eval> option.
 
 =head1 OPTIONS
 
@@ -64,9 +70,9 @@ C<*> marks required options.
 
 Perl code to evaluate on every text.
 
-This code will be evaluated for every text of each entry of each SRT. C<$_> will
-be set to the text, C<$entry> to the entry hash, C<$j> to the index of the files
-(starts at 0).
+This code will be evaluated for every text of each entry of each SRT, in the
+C<main> package. C<$_> will be set to the text, C<$main::entry> to the entry hash,
+C<$main::idx> to the index of the files (starts at 0).
 
 The code is expected to modify C<$_>.
 
@@ -200,9 +206,21 @@ For fish and zsh, install L<shcompgen> as described above.
 
 =head1 EXAMPLES
 
-=head2 Display English and French subtitles together
+=head2 Display English and French subtitles together (1)
 
- % srtcombinetext azur-et-asmar.en.srt azur-et-asmar.fr.srt -e 'if ($main::j) { chomp; $_ = "<i></i>\n<i>$_</i>\n" }'
+ % srtcombinetext azur-et-asmar.en.srt azur-et-asmar.fr.srt -e 'if ($main::idx) { chomp; $_ = "<i></i>\n<i>$_</i>\n" }'
+
+The English text is shown at the top, then a blank line (C<< E<lt>iE<gt>E<lt>/iE<gt> >>), followed by
+the French text in italics.
+
+
+=head2 Display English and French subtitles together (2)
+
+ % srtcombine2text azur-et-asmar.en.srt azur-et-asmar.fr.srt
+
+Like the previous examaple, we show the English text at the top, then a blank
+line (C<< E<lt>iE<gt>E<lt>/iE<gt> >>), followed by the French text in italics. This time we use a
+provided wrapper.
 
 =head1 HOMEPAGE
 

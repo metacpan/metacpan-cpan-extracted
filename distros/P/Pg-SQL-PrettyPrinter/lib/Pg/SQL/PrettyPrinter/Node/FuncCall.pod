@@ -38,6 +38,15 @@ If it's called for non-window function, returns empty string.
 In case of window functions with custom frame defitnion returns the frame
 definition as plain text. Otherwise returns undef.
 
+=head2 get_agg_order
+
+Returns empty string, if there is no aggregate order, or aggregate order as
+text.
+
+This is used for queries like:
+
+    select string_agg(a, ',' order by a)
+
 =head2 as_text
 
 Returns this object as plain text, with next to none formatting.

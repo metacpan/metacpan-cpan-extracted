@@ -1,4 +1,4 @@
-if  (eval {require ExtUtils::Constant; 1}) {
+if	(eval {require ExtUtils::Constant; 1}) {
   # If you edit these definitions to change the constants used by this module,
   # you will need to use the generated const-c.inc and const-xs.inc
   # files to replace their "fallback" counterparts before distributing your
@@ -69,14 +69,14 @@ if  (eval {require ExtUtils::Constant; 1}) {
 	{name => 'ELM_CALENDAR_WEEKLY', 'macro' => 1},
 	{name => 'ELM_CALENDAR_MONTHLY', 'macro' => 1},
 	{name => 'ELM_CALENDAR_ANNUALLY', 'macro' => 1},
-    {name => 'ELM_CALENDAR_LAST_DAY_OF_MONTH', 'macro' => 1},
+	{name => 'ELM_CALENDAR_LAST_DAY_OF_MONTH', 'macro' => 1},
 	{name => 'ELM_CALENDAR_REVERSE_DAILY', 'macro' => 1},
-    #
+	#
 	{name => 'ELM_CALENDAR_SELECT_MODE_DEFAULT', 'macro' => 1},
 	{name => 'ELM_CALENDAR_SELECT_MODE_ALWAYS', 'macro' => 1},
 	{name => 'ELM_CALENDAR_SELECT_MODE_NONE', 'macro' => 1},
 	{name => 'ELM_CALENDAR_SELECT_MODE_ONDEMAND', 'macro' => 1},
-    #
+	#
 	{name => 'ELM_CALENDAR_SELECTABLE_NONE', 'macro' => 1},
 	{name => 'ELM_CALENDAR_SELECTABLE_YEAR', 'macro' => 1},
 	{name => 'ELM_CALENDAR_SELECTABLE_MONTH', 'macro' => 1},
@@ -95,25 +95,25 @@ if  (eval {require ExtUtils::Constant; 1}) {
 	{name => 'ELM_CTXPOPUP_DIRECTION_UNKNOWN', 'macro' => 1},
 	# ELM_ENTRY
 	{name => 'ELM_INPUT_PANEL_LAYOUT_NORMAL_VARIATION_NORMAL', 'macro' => 1},
-    {name => 'ELM_INPUT_PANEL_LAYOUT_NORMAL_VARIATION_FILENAME', 'macro' => 1},
-    {name => 'ELM_INPUT_PANEL_LAYOUT_NORMAL_VARIATION_PERSON_NAME', 'macro' => 1},
-    #
-    {name => 'ELM_INPUT_PANEL_LAYOUT_NUMBERONLY_VARIATION_NORMAL', 'macro' => 1},
-    {name => 'ELM_INPUT_PANEL_LAYOUT_NUMBERONLY_VARIATION_SIGNED', 'macro' => 1},
-    {name => 'ELM_INPUT_PANEL_LAYOUT_NUMBERONLY_VARIATION_DECIMAL', 'macro' => 1},
-    {name => 'ELM_INPUT_PANEL_LAYOUT_NUMBERONLY_VARIATION_SIGNED_AND_DECIMAL', 'macro' => 1},
-    #
-    {name => 'ELM_INPUT_PANEL_LAYOUT_PASSWORD_VARIATION_NORMAL', 'macro' => 1},
-    {name => 'ELM_INPUT_PANEL_LAYOUT_PASSWORD_VARIATION_NUMBERONLY', 'macro' => 1},
-    #
-    {name => 'ELM_CNP_MODE_MARKUP', 'macro' => 1},
+	{name => 'ELM_INPUT_PANEL_LAYOUT_NORMAL_VARIATION_FILENAME', 'macro' => 1},
+	{name => 'ELM_INPUT_PANEL_LAYOUT_NORMAL_VARIATION_PERSON_NAME', 'macro' => 1},
+	#
+	{name => 'ELM_INPUT_PANEL_LAYOUT_NUMBERONLY_VARIATION_NORMAL', 'macro' => 1},
+	{name => 'ELM_INPUT_PANEL_LAYOUT_NUMBERONLY_VARIATION_SIGNED', 'macro' => 1},
+	{name => 'ELM_INPUT_PANEL_LAYOUT_NUMBERONLY_VARIATION_DECIMAL', 'macro' => 1},
+	{name => 'ELM_INPUT_PANEL_LAYOUT_NUMBERONLY_VARIATION_SIGNED_AND_DECIMAL', 'macro' => 1},
+	#
+	{name => 'ELM_INPUT_PANEL_LAYOUT_PASSWORD_VARIATION_NORMAL', 'macro' => 1},
+	{name => 'ELM_INPUT_PANEL_LAYOUT_PASSWORD_VARIATION_NUMBERONLY', 'macro' => 1},
+	#
+	{name => 'ELM_CNP_MODE_MARKUP', 'macro' => 1},
 	{name => 'ELM_CNP_MODE_NO_IMAGE', 'macro' => 1},
 	{name => 'ELM_CNP_MODE_PLAINTEXT', 'macro' => 1},
 	# ELM_FILESELECTOR
 	{name => 'ELM_FILESELECTOR_LIST', 'macro' => 1},
 	{name => 'ELM_FILESELECTOR_GRID', 'macro' => 1},
 	{name => 'ELM_FILESELECTOR_LAST', 'macro' => 1},
-    #
+	#
 	{name => 'ELM_FILESELECTOR_SORT_BY_FILENAME_ASC', 'macro' => 1},
 	{name => 'ELM_FILESELECTOR_SORT_BY_FILENAME_DESC', 'macro' => 1},
 	{name => 'ELM_FILESELECTOR_SORT_BY_TYPE_ASC', 'macro' => 1},
@@ -134,17 +134,17 @@ if  (eval {require ExtUtils::Constant; 1}) {
 	{name => 'ELM_FLIP_CUBE_DOWN', 'macro' => 1},
 	{name => 'ELM_FLIP_PAGE_LEFT', 'macro' => 1},
 	{name => 'ELM_FLIP_PAGE_RIGHT', 'macro' => 1},
-    {name => 'ELM_FLIP_PAGE_UP', 'macro' => 1},
+	{name => 'ELM_FLIP_PAGE_UP', 'macro' => 1},
 	{name => 'ELM_FLIP_PAGE_DOWN', 'macro' => 1},
 	{name => 'ELM_FLIP_CROSS_FADE', 'macro' => 1},
-    #
-    {name => 'ELM_FLIP_INTERACTION_NONE', 'macro' => 1},
-    {name => 'ELM_FLIP_INTERACTION_ROTATE', 'macro' => 1},
+	#
+	{name => 'ELM_FLIP_INTERACTION_NONE', 'macro' => 1},
+	{name => 'ELM_FLIP_INTERACTION_ROTATE', 'macro' => 1},
 	{name => 'ELM_FLIP_INTERACTION_CUBE', 'macro' => 1},
 	{name => 'ELM_FLIP_INTERACTION_PAGE', 'macro' => 1},
-    #
+	#
 	{name => 'ELM_FLIP_DIRECTION_UP', 'macro' => 1},
-    {name => 'ELM_FLIP_DIRECTION_DOWN', 'macro' => 1},
+	{name => 'ELM_FLIP_DIRECTION_DOWN', 'macro' => 1},
 	{name => 'ELM_FLIP_DIRECTION_LEFT', 'macro' => 1},
 	{name => 'ELM_FLIP_DIRECTION_RIGHT', 'macro' => 1},
 	# GLVIEW
@@ -166,10 +166,10 @@ if  (eval {require ExtUtils::Constant; 1}) {
 	{name => 'ELM_GLVIEW_MULTISAMPLE_LOW', 'macro' => 1},
 	{name => 'ELM_GLVIEW_MULTISAMPLE_MED', 'macro' => 1},
 	{name => 'ELM_GLVIEW_MULTISAMPLE_HIGH', 'macro' => 1},
-    #
+	#
 	{name => 'ELM_GLVIEW_RESIZE_POLICY_RECREATE', 'macro' => 1},
 	{name => 'ELM_GLVIEW_RESIZE_POLICY_SCALE', 'macro' => 1},
-    #
+	#
 	{name => 'ELM_GLVIEW_RENDER_POLICY_ON_DEMAND', 'macro' => 1},
 	{name => 'ELM_GLVIEW_RENDER_POLICY_ALWAYS', 'macro' => 1},
 	# ELM_HOVER
@@ -181,12 +181,12 @@ if  (eval {require ExtUtils::Constant; 1}) {
 	{name => 'ELM_ICON_NONE', 'macro' => 1},
 	{name => 'ELM_ICON_FILE', 'macro' => 1},
 	{name => 'ELM_ICON_STANDARD', 'macro' => 1},
-    #
+	#
 	{name => 'ELM_ICON_LOOKUP_THEME_FDO', 'macro' => 1},
 	{name => 'ELM_ICON_LOOKUP_FDO', 'macro' => 1},
 	{name => 'ELM_ICON_LOOKUP_THEME', 'macro' => 1},
-    # ELM_IMAGE
-    {name => 'ELM_IMAGE_ORIENT_NONE', 'macro' => 1},
+	# ELM_IMAGE
+	{name => 'ELM_IMAGE_ORIENT_NONE', 'macro' => 1},
 	{name => 'ELM_IMAGE_ORIENT_0', 'macro' => 1},
 	{name => 'ELM_IMAGE_ROTATE_90', 'macro' => 1},
 	{name => 'ELM_IMAGE_ORIENT_90', 'macro' => 1},
@@ -229,12 +229,12 @@ if  (eval {require ExtUtils::Constant; 1}) {
 	{name => 'ELM_SCROLLER_POLICY_ON', 'macro' => 1},
 	{name => 'ELM_SCROLLER_POLICY_OFF', 'macro' => 1},
 	{name => 'ELM_SCROLLER_POLICY_LAST', 'macro' => 1},
-    #
+	#
 	{name => 'ELM_SCROLLER_SINGLE_DIRECTION_NONE', 'macro' => 1},
 	{name => 'ELM_SCROLLER_SINGLE_DIRECTION_SOFT', 'macro' => 1},
 	{name => 'ELM_SCROLLER_SINGLE_DIRECTION_HARD', 'macro' => 1},
 	{name => 'ELM_SCROLLER_SINGLE_DIRECTION_LAST', 'macro' => 1},
-    #
+	#
 	{name => 'ELM_SCROLLER_MOVEMENT_NO_BLOCK', 'macro' => 1},
 	{name => 'ELM_SCROLLER_MOVEMENT_BLOCK_VERTICAL', 'macro' => 1},
 	{name => 'ELM_SCROLLER_MOVEMENT_BLOCK_HORIZONTAL', 'macro' => 1},
@@ -245,18 +245,18 @@ if  (eval {require ExtUtils::Constant; 1}) {
 	{name => 'ELM_SLIDER_INDICATOR_VISIBLE_MODE_NONE', 'macro' => 1},
 	# ELM_TOOLTIP
 	{name => 'ELM_TOOLTIP_ORIENT_NONE', 'macro' => 1}, 
-    {name => 'ELM_TOOLTIP_ORIENT_TOP_LEFT', 'macro' => 1},
-    {name => 'ELM_TOOLTIP_ORIENT_TOP', 'macro' => 1},
-    {name => 'ELM_TOOLTIP_ORIENT_TOP_RIGHT', 'macro' => 1},
-    {name => 'ELM_TOOLTIP_ORIENT_LEFT', 'macro' => 1},
-    {name => 'ELM_TOOLTIP_ORIENT_CENTER', 'macro' => 1},
-    {name => 'ELM_TOOLTIP_ORIENT_RIGHT', 'macro' => 1},
-    {name => 'ELM_TOOLTIP_ORIENT_BOTTOM_LEFT', 'macro' => 1},
-    {name => 'ELM_TOOLTIP_ORIENT_BOTTOM', 'macro' => 1},
-    {name => 'ELM_TOOLTIP_ORIENT_BOTTOM_RIGHT', 'macro' => 1},
-    {name => 'ELM_TOOLTIP_ORIENT_LAST', 'macro' => 1},
-    # ELM_TOOLBAR
-    {name => 'ELM_TOOLBAR_SHRINK_NONE', 'macro' => 1},
+	{name => 'ELM_TOOLTIP_ORIENT_TOP_LEFT', 'macro' => 1},
+	{name => 'ELM_TOOLTIP_ORIENT_TOP', 'macro' => 1},
+	{name => 'ELM_TOOLTIP_ORIENT_TOP_RIGHT', 'macro' => 1},
+	{name => 'ELM_TOOLTIP_ORIENT_LEFT', 'macro' => 1},
+	{name => 'ELM_TOOLTIP_ORIENT_CENTER', 'macro' => 1},
+	{name => 'ELM_TOOLTIP_ORIENT_RIGHT', 'macro' => 1},
+	{name => 'ELM_TOOLTIP_ORIENT_BOTTOM_LEFT', 'macro' => 1},
+	{name => 'ELM_TOOLTIP_ORIENT_BOTTOM', 'macro' => 1},
+	{name => 'ELM_TOOLTIP_ORIENT_BOTTOM_RIGHT', 'macro' => 1},
+	{name => 'ELM_TOOLTIP_ORIENT_LAST', 'macro' => 1},
+	# ELM_TOOLBAR
+	{name => 'ELM_TOOLBAR_SHRINK_NONE', 'macro' => 1},
 	{name => 'ELM_TOOLBAR_SHRINK_HIDE', 'macro' => 1},
 	{name => 'ELM_TOOLBAR_SHRINK_SCROLL', 'macro' => 1},
 	{name => 'ELM_TOOLBAR_SHRINK_MENU', 'macro' => 1},
@@ -271,12 +271,12 @@ if  (eval {require ExtUtils::Constant; 1}) {
 	{name => 'ELM_WIN_INDICATOR_UNKNOWN', 'macro' => 1},
 	{name => 'ELM_WIN_INDICATOR_HIDE', 'macro' => 1},
 	{name => 'ELM_WIN_INDICATOR_SHOW', 'macro' => 1},
-    #
+	#
 	{name => 'ELM_WIN_INDICATOR_OPACITY_UNKNOWN', 'macro' => 1},
 	{name => 'ELM_WIN_INDICATOR_OPAQUE', 'macro' => 1},
 	{name => 'ELM_WIN_INDICATOR_TRANSLUCENT', 'macro' => 1},
 	{name => 'ELM_WIN_INDICATOR_TRANSPARENT', 'macro' => 1},
-    #
+	#
 	{name => 'ELM_WIN_UNKNOWN', 'macro' => 1},
 	{name => 'ELM_WIN_BASIC', 'macro' => 1},
 	{name => 'ELM_WIN_DIALOG_BASIC', 'macro' => 1},
@@ -291,12 +291,12 @@ if  (eval {require ExtUtils::Constant; 1}) {
 	{name => 'ELM_WIN_TOOLTIP', 'macro' => 1},
 	{name => 'ELM_WIN_NOTIFICATION', 'macro' => 1},
 	{name => 'ELM_WIN_COMBO', 'macro' => 1},
-    #
+	#
 	{name => 'ELM_WIN_DND', 'macro' => 1},
 	{name => 'ELM_WIN_INLINED_IMAGE', 'macro' => 1},
 	{name => 'ELM_WIN_SOCKET_IMAGE', 'macro' => 1},
 	{name => 'ELM_WIN_NAVIFRAME_BASIC', 'macro' => 1},
-    #
+	#
 	{name => 'ELM_WIN_KEYBOARD_UNKNOWN', 'macro' => 1},
 	{name => 'ELM_WIN_KEYBOARD_OFF', 'macro' => 1},
 	{name => 'ELM_WIN_KEYBOARD_ON', 'macro' => 1},
@@ -313,13 +313,13 @@ if  (eval {require ExtUtils::Constant; 1}) {
 	{name => 'ELM_WIN_KEYBOARD_URL', 'macro' => 1},
 	{name => 'ELM_WIN_KEYBOARD_KEYPAD', 'macro' => 1},
 	{name => 'ELM_WIN_KEYBOARD_J2ME', 'macro' => 1},
-    #
-    {name => 'ELM_WIN_KEYGRAB_UNKNOWN', 'macro' => 1},
+	#
+	{name => 'ELM_WIN_KEYGRAB_UNKNOWN', 'macro' => 1},
 	{name => 'ELM_WIN_KEYGRAB_SHARED', 'macro' => 1},
 	{name => 'ELM_WIN_KEYGRAB_TOPMOST', 'macro' => 1},
 	{name => 'ELM_WIN_KEYGRAB_EXCLUSIVE', 'macro' => 1},
 	{name => 'ELM_WIN_KEYGRAB_OVERRIDE_EXCLUSIVE', 'macro' => 1},
-    #
+	#
 	{name => 'ELM_WIN_MOVE_RESIZE_MOVE', 'macro' => 1},
 	{name => 'ELM_WIN_MOVE_RESIZE_TOP', 'macro' => 1},
 	{name => 'ELM_WIN_MOVE_RESIZE_BOTTOM', 'macro' => 1},
@@ -352,93 +352,93 @@ if  (eval {require ExtUtils::Constant; 1}) {
 
 
   ExtUtils::Constant::WriteConstants(
-                                     NAME         => 'pEFL::Elm',
-                                     NAMES        => \@names,
-                                     DEFAULT_TYPE => 'IV',
-                                     C_FILE       => 'lib/pEFL/const-c.inc',
-                                     XS_FILE      => 'lib/pEFL/const-xs.inc',
-                                  );
-    my @names_evas = (
-        # EVAS
-        {name => 'EVAS_HINT_EXPAND', 'macro' => 1},
-        {name => 'EVAS_HINT_FILL', 'macro' => 1},
-        #
-        {name => 'EVAS_BUTTON_DOUBLE_CLICK', 'macro' => 1},
-        {name => 'EVAS_BUTTON_TRIPLE_CLICK', 'macro' => 1},
-        #
-        {name => 'EVAS_FONT_HINTING_NONE', 'macro' => 1},
-        {name => 'EVAS_FONT_HINTING_AUTO', 'macro' => 1},
-        {name => 'EVAS_FONT_HINTING_BYTECODE', 'macro' => 1},
-        #
-        {name => 'EVAS_NATIVE_SURFACE_NONE', 'macro' => 1},
-        {name => 'EVAS_NATIVE_SURFACE_X11', 'macro' => 1},
-        {name => 'EVAS_NATIVE_SURFACE_OPENGL', 'macro' => 1},
-        {name => 'EVAS_NATIVE_SURFACE_WL', 'macro' => 1},
-        {name => 'EVAS_NATIVE_SURFACE_TBM', 'macro' => 1},
-        {name => 'EVAS_NATIVE_SURFACE_EVASGL', 'macro' => 1},
-        {name => 'EVAS_NATIVE_SURFACE_WL_DMABUF', 'macro' => 1},
-        #
-        {name => 'EVAS_NATIVE_SURFACE_STATUS_SCANOUT_ON', 'macro' => 1},
-        {name => 'EVAS_NATIVE_SURFACE_STATUS_SCANOUT_OFF', 'macro' => 1},
-        {name => 'EVAS_NATIVE_SURFACE_STATUS_PLANE_ASSIGN', 'macro' => 1},
-        {name => 'EVAS_NATIVE_SURFACE_STATUS_PLANE_RELEASE', 'macro' => 1},
-        #
-        {name => 'EVAS_ASPECT_CONTROL_NONE', 'macro' => 1},
-        {name => 'EVAS_ASPECT_CONTROL_NEITHER', 'macro' => 1},
-        {name => 'EVAS_ASPECT_CONTROL_HORIZONTAL', 'macro' => 1},
-        {name => 'EVAS_ASPECT_CONTROL_VERTICAL', 'macro' => 1},
-        {name => 'EVAS_ASPECT_CONTROL_BOTH', 'macro' => 1},
-        #
-        {name => 'EVAS_IMAGE_ORIENT_NONE', 'macro' => 1},
-        {name => 'EVAS_IMAGE_ORIENT_0', 'macro' => 1},
-        {name => 'EVAS_IMAGE_ORIENT_90', 'macro' => 1},
-        {name => 'EVAS_IMAGE_ORIENT_180', 'macro' => 1},
-        {name => 'EVAS_IMAGE_ORIENT_270', 'macro' => 1},
-        {name => 'EVAS_IMAGE_FLIP_HORIZONTAL', 'macro' => 1},
-        {name => 'EVAS_IMAGE_FLIP_VERTICAL', 'macro' => 1},
-        {name => 'EVAS_IMAGE_FLIP_TRANSPOSE', 'macro' => 1},
-        {name => 'EVAS_IMAGE_FLIP_TRANSVERSE', 'macro' => 1},
-        # TODO: Wrong namespace....????
-        #EFL_GFX_FILL_REFLECT
-        #EFL_GFX_FILL_REPEAT
-        #EFL_GFX_FILL_RESTRICT
-        #EFL_GFX_FILL_RESTRICT_REFLECT
-        #EFL_GFX_FILL_RESTRICT_REPEAT
-        #EFL_GFX_FILL_PAD
-        #
-        {name => 'EVAS_BORDER_FILL_NONE', 'macro' => 1},
-        {name => 'EVAS_BORDER_FILL_DEFAULT', 'macro' => 1},
-        {name => 'EVAS_BORDER_FILL_SOLID', 'macro' => 1},
-        #
-        {name => 'EVAS_VIDEO_SURFACE_MOVE', 'macro' => 1},
-        {name => 'EVAS_VIDEO_SURFACE_RESIZE', 'macro' => 1},
-        {name => 'EVAS_VIDEO_SURFACE_CLIP', 'macro' => 1},
-        {name => 'EVAS_VIDEO_SURFACE_BELOW', 'macro' => 1},
-        {name => 'EVAS_VIDEO_SURFACE_STACKING_CHECK', 'macro' => 1},
-        {name => 'EVAS_VIDEO_SURFACE_IGNORE_WINDOW', 'macro' => 1},
-        #
-        {name => 'EVAS_LOAD_ERROR_NONE', 'macro' => 1},
-        {name => 'EVAS_LOAD_ERROR_GENERIC', 'macro' => 1},
-        {name => 'EVAS_LOAD_ERROR_DOES_NOT_EXIST', 'macro' => 1},
-        {name => 'EVAS_LOAD_ERROR_PERMISSION_DENIED', 'macro' => 1},
-        {name => 'EVAS_LOAD_ERROR_RESOURCE_ALLOCATION_FAILED', 'macro' => 1},
-        {name => 'EVAS_LOAD_ERROR_CORRUPT_FILE', 'macro' => 1},
-        {name => 'EVAS_LOAD_ERROR_UNKNOWN_FORMAT', 'macro' => 1},
-        {name => 'EVAS_LOAD_ERROR_CANCELLED', 'macro' => 1},
-        #
-        {name => 'EVAS_IMAGE_CONTENT_HINT_NONE', 'macro' => 1},
-        {name => 'EVAS_IMAGE_CONTENT_HINT_DYNAMIC', 'macro' => 1},
-        {name => 'EVAS_IMAGE_CONTENT_HINT_STATIC', 'macro' => 1},
-        #
-        {name => 'EVAS_DISPLAY_MODE_NONE', 'macro' => 1},
-        {name => 'EVAS_DISPLAY_MODE_COMPRESS', 'macro' => 1},
-        {name => 'EVAS_DISPLAY_MODE_EXPAND', 'macro' => 1},
-        {name => 'EVAS_DISPLAY_MODE_DONT_CHANGE', 'macro' => 1},
-        #
-        {name => 'EVAS_RENDER_BLEND', 'macro' => 1},
-        {name => 'EVAS_RENDER_COPY', 'macro' => 1},
-        # EVAS_CALLBACKS
-        {name => 'EVAS_CALLBACK_MOUSE_IN', 'macro' => 1},
+									 NAME		  => 'pEFL::Elm',
+									 NAMES		  => \@names,
+									 DEFAULT_TYPE => 'IV',
+									 C_FILE 	  => 'lib/pEFL/const-c.inc',
+									 XS_FILE	  => 'lib/pEFL/const-xs.inc',
+								  );
+	my @names_evas = (
+		# EVAS
+		{name => 'EVAS_HINT_EXPAND', 'macro' => 1},
+		{name => 'EVAS_HINT_FILL', 'macro' => 1},
+		#
+		{name => 'EVAS_BUTTON_DOUBLE_CLICK', 'macro' => 1},
+		{name => 'EVAS_BUTTON_TRIPLE_CLICK', 'macro' => 1},
+		#
+		{name => 'EVAS_FONT_HINTING_NONE', 'macro' => 1},
+		{name => 'EVAS_FONT_HINTING_AUTO', 'macro' => 1},
+		{name => 'EVAS_FONT_HINTING_BYTECODE', 'macro' => 1},
+		#
+		{name => 'EVAS_NATIVE_SURFACE_NONE', 'macro' => 1},
+		{name => 'EVAS_NATIVE_SURFACE_X11', 'macro' => 1},
+		{name => 'EVAS_NATIVE_SURFACE_OPENGL', 'macro' => 1},
+		{name => 'EVAS_NATIVE_SURFACE_WL', 'macro' => 1},
+		{name => 'EVAS_NATIVE_SURFACE_TBM', 'macro' => 1},
+		{name => 'EVAS_NATIVE_SURFACE_EVASGL', 'macro' => 1},
+		{name => 'EVAS_NATIVE_SURFACE_WL_DMABUF', 'macro' => 1},
+		#
+		{name => 'EVAS_NATIVE_SURFACE_STATUS_SCANOUT_ON', 'macro' => 1},
+		{name => 'EVAS_NATIVE_SURFACE_STATUS_SCANOUT_OFF', 'macro' => 1},
+		{name => 'EVAS_NATIVE_SURFACE_STATUS_PLANE_ASSIGN', 'macro' => 1},
+		{name => 'EVAS_NATIVE_SURFACE_STATUS_PLANE_RELEASE', 'macro' => 1},
+		#
+		{name => 'EVAS_ASPECT_CONTROL_NONE', 'macro' => 1},
+		{name => 'EVAS_ASPECT_CONTROL_NEITHER', 'macro' => 1},
+		{name => 'EVAS_ASPECT_CONTROL_HORIZONTAL', 'macro' => 1},
+		{name => 'EVAS_ASPECT_CONTROL_VERTICAL', 'macro' => 1},
+		{name => 'EVAS_ASPECT_CONTROL_BOTH', 'macro' => 1},
+		#
+		{name => 'EVAS_IMAGE_ORIENT_NONE', 'macro' => 1},
+		{name => 'EVAS_IMAGE_ORIENT_0', 'macro' => 1},
+		{name => 'EVAS_IMAGE_ORIENT_90', 'macro' => 1},
+		{name => 'EVAS_IMAGE_ORIENT_180', 'macro' => 1},
+		{name => 'EVAS_IMAGE_ORIENT_270', 'macro' => 1},
+		{name => 'EVAS_IMAGE_FLIP_HORIZONTAL', 'macro' => 1},
+		{name => 'EVAS_IMAGE_FLIP_VERTICAL', 'macro' => 1},
+		{name => 'EVAS_IMAGE_FLIP_TRANSPOSE', 'macro' => 1},
+		{name => 'EVAS_IMAGE_FLIP_TRANSVERSE', 'macro' => 1},
+		# TODO: Wrong namespace....????
+		#EFL_GFX_FILL_REFLECT
+		#EFL_GFX_FILL_REPEAT
+		#EFL_GFX_FILL_RESTRICT
+		#EFL_GFX_FILL_RESTRICT_REFLECT
+		#EFL_GFX_FILL_RESTRICT_REPEAT
+		#EFL_GFX_FILL_PAD
+		#
+		{name => 'EVAS_BORDER_FILL_NONE', 'macro' => 1},
+		{name => 'EVAS_BORDER_FILL_DEFAULT', 'macro' => 1},
+		{name => 'EVAS_BORDER_FILL_SOLID', 'macro' => 1},
+		#
+		{name => 'EVAS_VIDEO_SURFACE_MOVE', 'macro' => 1},
+		{name => 'EVAS_VIDEO_SURFACE_RESIZE', 'macro' => 1},
+		{name => 'EVAS_VIDEO_SURFACE_CLIP', 'macro' => 1},
+		{name => 'EVAS_VIDEO_SURFACE_BELOW', 'macro' => 1},
+		{name => 'EVAS_VIDEO_SURFACE_STACKING_CHECK', 'macro' => 1},
+		{name => 'EVAS_VIDEO_SURFACE_IGNORE_WINDOW', 'macro' => 1},
+		#
+		{name => 'EVAS_LOAD_ERROR_NONE', 'macro' => 1},
+		{name => 'EVAS_LOAD_ERROR_GENERIC', 'macro' => 1},
+		{name => 'EVAS_LOAD_ERROR_DOES_NOT_EXIST', 'macro' => 1},
+		{name => 'EVAS_LOAD_ERROR_PERMISSION_DENIED', 'macro' => 1},
+		{name => 'EVAS_LOAD_ERROR_RESOURCE_ALLOCATION_FAILED', 'macro' => 1},
+		{name => 'EVAS_LOAD_ERROR_CORRUPT_FILE', 'macro' => 1},
+		{name => 'EVAS_LOAD_ERROR_UNKNOWN_FORMAT', 'macro' => 1},
+		{name => 'EVAS_LOAD_ERROR_CANCELLED', 'macro' => 1},
+		#
+		{name => 'EVAS_IMAGE_CONTENT_HINT_NONE', 'macro' => 1},
+		{name => 'EVAS_IMAGE_CONTENT_HINT_DYNAMIC', 'macro' => 1},
+		{name => 'EVAS_IMAGE_CONTENT_HINT_STATIC', 'macro' => 1},
+		#
+		{name => 'EVAS_DISPLAY_MODE_NONE', 'macro' => 1},
+		{name => 'EVAS_DISPLAY_MODE_COMPRESS', 'macro' => 1},
+		{name => 'EVAS_DISPLAY_MODE_EXPAND', 'macro' => 1},
+		{name => 'EVAS_DISPLAY_MODE_DONT_CHANGE', 'macro' => 1},
+		#
+		{name => 'EVAS_RENDER_BLEND', 'macro' => 1},
+		{name => 'EVAS_RENDER_COPY', 'macro' => 1},
+		# EVAS_CALLBACKS
+		{name => 'EVAS_CALLBACK_MOUSE_IN', 'macro' => 1},
 		{name => 'EVAS_CALLBACK_MOUSE_OUT', 'macro' => 1},
 		{name => 'EVAS_CALLBACK_MOUSE_DOWN', 'macro' => 1},
 		{name => 'EVAS_CALLBACK_MOUSE_UP', 'macro' => 1},
@@ -498,8 +498,8 @@ if  (eval {require ExtUtils::Constant; 1}) {
 		#
 		{name => 'EVAS_BIDI_DIRECTION_NEUTRAL', 'macro' => 1},
 		{name => 'EVAS_BIDI_DIRECTION_NATURAL', 'macro' => 1},
-		{name => 'EVAS_BIDI_DIRECTION_LTR', 'macro' => 1},     
-		{name => 'EVAS_BIDI_DIRECTION_RTL', 'macro' => 1},     
+		{name => 'EVAS_BIDI_DIRECTION_LTR', 'macro' => 1},	   
+		{name => 'EVAS_BIDI_DIRECTION_RTL', 'macro' => 1},	   
 		{name => 'EVAS_BIDI_DIRECTION_INHERIT', 'macro' => 1},
 		#
 		{name => 'EVAS_TEXTBLOCK_TEXT_RAW', 'macro' => 1},
@@ -508,28 +508,28 @@ if  (eval {require ExtUtils::Constant; 1}) {
 		#
 		{name => 'EVAS_TEXTBLOCK_CURSOR_UNDER', 'macro' => 1},
 		{name => 'EVAS_TEXTBLOCK_CURSOR_BEFORE', 'macro' => 1},
-    );
-    
-    ExtUtils::Constant::WriteConstants(
-                                     NAME         => 'pEFL::Evas',
-                                     NAMES        => \@names_evas,
-                                     DEFAULT_TYPE => 'IV',
-                                     C_FILE       => 'lib/pEFL/const-evas-c.inc',
-                                     XS_FILE      => 'lib/pEFL/const-evas-xs.inc',
-                                  );
+	);
+	
+	ExtUtils::Constant::WriteConstants(
+									 NAME		  => 'pEFL::Evas',
+									 NAMES		  => \@names_evas,
+									 DEFAULT_TYPE => 'IV',
+									 C_FILE 	  => 'lib/pEFL/const-evas-c.inc',
+									 XS_FILE	  => 'lib/pEFL/const-evas-xs.inc',
+								  );
 my @names_ecore = (
-    {name => 'ECORE_VERSION_MAJOR', 'macro' => 1},
-    {name => 'ECORE_VERSION_MINOR', 'macro' => 1},
-    #
-    {name => 'ECORE_CALLBACK_CANCEL', 'macro' => 1},
-    {name => 'ECORE_CALLBACK_RENEW', 'macro' => 1},
-    #
-    {name => 'ECORE_CALLBACK_PASS_ON', 'macro' => 1},
-    {name => 'ECORE_CALLBACK_DONE', 'macro' => 1},
-    # TODO: IN Poller.xs
-    {name => 'ECORE_POLLER_CORE', 'macro' => 1},
-    # Ecore Event
-    {name => 'ECORE_EVENT_NONE'},
+	{name => 'ECORE_VERSION_MAJOR', 'macro' => 1},
+	{name => 'ECORE_VERSION_MINOR', 'macro' => 1},
+	#
+	{name => 'ECORE_CALLBACK_CANCEL', 'macro' => 1},
+	{name => 'ECORE_CALLBACK_RENEW', 'macro' => 1},
+	#
+	{name => 'ECORE_CALLBACK_PASS_ON', 'macro' => 1},
+	{name => 'ECORE_CALLBACK_DONE', 'macro' => 1},
+	# TODO: IN Poller.xs
+	{name => 'ECORE_POLLER_CORE', 'macro' => 1},
+	# Ecore Event
+	{name => 'ECORE_EVENT_NONE'},
 	{name => 'ECORE_EVENT_SIGNAL_USER'},
 	{name => 'ECORE_EVENT_SIGNAL_HUP'},
 	{name => 'ECORE_EVENT_SIGNAL_EXIT'},
@@ -573,6 +573,40 @@ my @names_ecore = (
 	{name => 'ECORE_MODE', 'macro' => 1},
 	{name => 'ECORE_LAST', 'macro' => 1},
 	#
+	{name => 'ECORE_EVAS_OBJECT_ASSOCIATE_BASE', 'macro' => 1},
+	{name => 'ECORE_EVAS_OBJECT_ASSOCIATE_STACK', 'macro' => 1},
+	{name => 'ECORE_EVAS_OBJECT_ASSOCIATE_LAYER', 'macro' => 1},
+	{name => 'ECORE_EVAS_OBJECT_ASSOCIATE_DEL', 'macro' => 1},
+	#
+	{name => 'ECORE_EVAS_ENGINE_SOFTWARE_BUFFER', 'macro' => 1},
+  	{name => 'ECORE_EVAS_ENGINE_SOFTWARE_XLIB', 'macro' => 1},
+  	{name => 'ECORE_EVAS_ENGINE_XRENDER_X11', 'macro' => 1},
+   	{name => 'ECORE_EVAS_ENGINE_OPENGL_X11', 'macro' => 1},
+   	{name => 'ECORE_EVAS_ENGINE_SOFTWARE_XCB', 'macro' => 1},
+   	{name => 'ECORE_EVAS_ENGINE_XRENDER_XCB', 'macro' => 1},
+   	{name => 'ECORE_EVAS_ENGINE_SOFTWARE_GDI', 'macro' => 1},
+   	{name => 'ECORE_EVAS_ENGINE_SOFTWARE_DDRAW', 'macro' => 1},
+   	{name => 'ECORE_EVAS_ENGINE_DIRECT3D', 'macro' => 1},
+   	{name => 'ECORE_EVAS_ENGINE_OPENGL_GLEW', 'macro' => 1},
+   	{name => 'ECORE_EVAS_ENGINE_OPENGL_COCOA', 'macro' => 1},
+   	{name => 'ECORE_EVAS_ENGINE_SOFTWARE_SDL', 'macro' => 1},
+   	{name => 'ECORE_EVAS_ENGINE_DIRECTFB', 'macro' => 1},
+   	{name => 'ECORE_EVAS_ENGINE_SOFTWARE_FB', 'macro' => 1},
+   	{name => 'ECORE_EVAS_ENGINE_SOFTWARE_8_X11', 'macro' => 1},
+   	{name => 'ECORE_EVAS_ENGINE_SOFTWARE_16_X11', 'macro' => 1},
+   	{name => 'ECORE_EVAS_ENGINE_SOFTWARE_16_DDRAW', 'macro' => 1},
+   	{name => 'ECORE_EVAS_ENGINE_SOFTWARE_16_WINCE', 'macro' => 1},
+   	{name => 'ECORE_EVAS_ENGINE_OPENGL_SDL', 'macro' => 1},
+   	{name => 'ECORE_EVAS_ENGINE_EWS', 'macro' => 1},
+   	{name => 'ECORE_EVAS_ENGINE_PSL1GHT', 'macro' => 1},
+   	{name => 'ECORE_EVAS_ENGINE_WAYLAND_SHM', 'macro' => 1},
+   	{name => 'ECORE_EVAS_ENGINE_WAYLAND_EGL', 'macro' => 1},
+   	{name => 'ECORE_EVAS_ENGINE_DRM', 'macro' => 1},
+   	{name => 'ECORE_EVAS_ENGINE_OPENGL_DRM', 'macro' => 1},
+	#
+	{name => 'ECORE_EVAS_AVOID_DAMAGE_NONE', 'macro' => 1},
+	{name => 'ECORE_EVAS_AVOID_DAMAGE_EXPOSE', 'macro' => 1},
+	{name => 'ECORE_EVAS_AVOID_DAMAGE_BUILT_IN', 'macro' => 1},
     );
     
     ExtUtils::Constant::WriteConstants(
@@ -582,22 +616,226 @@ my @names_ecore = (
                                      C_FILE       => 'lib/pEFL/const-ecore-c.inc',
                                      XS_FILE      => 'lib/pEFL/const-ecore-xs.inc',
                                   );
+
                                   
+
 my @names_eina = (
-    {name => 'EINA_TRUE', 'macro' => 1},
-    {name => 'EINA_FALSE', 'macro' => 1},
-    );
-    
-    ExtUtils::Constant::WriteConstants(
-                                     NAME         => 'pEFL::Eina',
-                                     NAMES        => \@names_eina,
-                                     DEFAULT_TYPE => 'IV',
-                                     C_FILE       => 'lib/pEFL/const-eina-c.inc',
-                                     XS_FILE      => 'lib/pEFL/const-eina-xs.inc',
-                                  );
+	{name => 'EINA_TRUE', 'macro' => 1},
+	{name => 'EINA_FALSE', 'macro' => 1},
+	);
+
+	
+	ExtUtils::Constant::WriteConstants(
+									 NAME		  => 'pEFL::Eina',
+									 NAMES		  => \@names_eina,
+									 DEFAULT_TYPE => 'IV',
+									 C_FILE 	  => 'lib/pEFL/const-eina-c.inc',
+									 XS_FILE	  => 'lib/pEFL/const-eina-xs.inc',
+								  );
+
+
+my @names_edje = (
+	{name => 'EDJE_CURSOR_MAIN', 'macro' => 1},
+	{name => 'EDJE_CURSOR_SELECTION_BEGIN', 'macro' => 1},
+	{name => 'EDJE_CURSOR_SELECTION_END', 'macro' => 1},
+	{name => 'EDJE_CURSOR_PREEDIT_START', 'macro' => 1},
+	{name => 'EDJE_CURSOR_PREEDIT_END', 'macro' => 1},
+	{name => 'EDJE_CURSOR_USER', 'macro' => 1},
+	{name => 'EDJE_CURSOR_USER_EXTRA', 'macro' => 1},
+	#
+	{name => 'EDJE_TEXT_AUTOCAPITAL_TYPE_NONE', 'macro' => 1},
+	{name => 'EDJE_TEXT_AUTOCAPITAL_TYPE_WORD', 'macro' => 1},
+	{name => 'EDJE_TEXT_AUTOCAPITAL_TYPE_SENTENCE', 'macro' => 1},
+	{name => 'EDJE_TEXT_AUTOCAPITAL_TYPE_ALLCHARACTER', 'macro' => 1},
+	#
+	{name => 'EDJE_INPUT_HINT_NONE', 'macro' => 1},
+	{name => 'EDJE_INPUT_HINT_AUTO_COMPLETE', 'macro' => 1},
+	{name => 'EDJE_INPUT_HINT_SENSITIVE_DATA', 'macro' => 1},
+	#
+	{name => 'EDJE_INPUT_PANEL_LANG_AUTOMATIC', 'macro' => 1},
+	{name => 'EDJE_INPUT_PANEL_LANG_ALPHABET', 'macro' => 1},
+	#
+	{name => 'EDJE_INPUT_PANEL_RETURN_KEY_TYPE_DEFAULT', 'macro' => 1},
+	{name => 'EDJE_INPUT_PANEL_RETURN_KEY_TYPE_DONE', 'macro' => 1},
+	{name => 'EDJE_INPUT_PANEL_RETURN_KEY_TYPE_GO', 'macro' => 1},
+	{name => 'EDJE_INPUT_PANEL_RETURN_KEY_TYPE_JOIN', 'macro' => 1},
+	{name => 'EDJE_INPUT_PANEL_RETURN_KEY_TYPE_LOGIN', 'macro' => 1},
+	{name => 'EDJE_INPUT_PANEL_RETURN_KEY_TYPE_NEXT', 'macro' => 1},
+	{name => 'EDJE_INPUT_PANEL_RETURN_KEY_TYPE_SEARCH', 'macro' => 1},
+	{name => 'EDJE_INPUT_PANEL_RETURN_KEY_TYPE_SEND', 'macro' => 1},
+	{name => 'EDJE_INPUT_PANEL_RETURN_KEY_TYPE_SIGNIN', 'macro' => 1},
+	#
+	{name => 'EDJE_INPUT_PANEL_LAYOUT_NORMAL', 'macro' => 1},
+	{name => 'EDJE_INPUT_PANEL_LAYOUT_NUMBER', 'macro' => 1},
+	{name => 'EDJE_INPUT_PANEL_LAYOUT_EMAIL', 'macro' => 1},
+	{name => 'EDJE_INPUT_PANEL_LAYOUT_URL', 'macro' => 1},
+	{name => 'EDJE_INPUT_PANEL_LAYOUT_PHONENUMBER', 'macro' => 1},
+	{name => 'EDJE_INPUT_PANEL_LAYOUT_IP', 'macro' => 1},
+	{name => 'EDJE_INPUT_PANEL_LAYOUT_MONTH', 'macro' => 1},
+	{name => 'EDJE_INPUT_PANEL_LAYOUT_NUMBERONLY', 'macro' => 1},
+	{name => 'EDJE_INPUT_PANEL_LAYOUT_INVALID', 'macro' => 1},
+	{name => 'EDJE_INPUT_PANEL_LAYOUT_HEX', 'macro' => 1},
+	{name => 'EDJE_INPUT_PANEL_LAYOUT_TERMINAL', 'macro' => 1},
+	{name => 'EDJE_INPUT_PANEL_LAYOUT_PASSWORD', 'macro' => 1},
+	{name => 'EDJE_INPUT_PANEL_LAYOUT_DATETIME', 'macro' => 1},
+	{name => 'EDJE_INPUT_PANEL_LAYOUT_EMOTICON', 'macro' => 1},
+	{name => 'EDJE_INPUT_PANEL_LAYOUT_VOICE', 'macro' => 1},
+	#
+	{name => 'EDJE_CHANNEL_EFFECT', 'macro' => 1},
+	{name => 'EDJE_CHANNEL_BACKGROUND', 'macro' => 1},
+	{name => 'EDJE_CHANNEL_MUSIC', 'macro' => 1},
+	{name => 'EDJE_CHANNEL_FOREGROUND', 'macro' => 1},
+	{name => 'EDJE_CHANNEL_INTERFACE', 'macro' => 1},
+	{name => 'EDJE_CHANNEL_INPUT', 'macro' => 1},
+	{name => 'EDJE_CHANNEL_ALERT', 'macro' => 1},
+	{name => 'EDJE_CHANNEL_ALL', 'macro' => 1},
+	#
+	{name => 'EDJE_EXTERNAL_PARAM_TYPE_INT', 'macro' => 1},
+	{name => 'EDJE_EXTERNAL_PARAM_TYPE_DOUBLE', 'macro' => 1},
+	{name => 'EDJE_EXTERNAL_PARAM_TYPE_STRING', 'macro' => 1},
+	{name => 'EDJE_EXTERNAL_PARAM_TYPE_BOOL', 'macro' => 1},
+	{name => 'EDJE_EXTERNAL_PARAM_TYPE_CHOICE', 'macro' => 1},
+	{name => 'EDJE_EXTERNAL_PARAM_TYPE_MAX', 'macro' => 1},
+	#
+	{name => 'EDJE_LOAD_ERROR_NONE', 'macro' => 1},
+	{name => 'EDJE_LOAD_ERROR_GENERIC', 'macro' => 1},
+	{name => 'EDJE_LOAD_ERROR_DOES_NOT_EXIST', 'macro' => 1},
+	{name => 'EDJE_LOAD_ERROR_PERMISSION_DENIED', 'macro' => 1},
+	{name => 'EDJE_LOAD_ERROR_RESOURCE_ALLOCATION_FAILED', 'macro' => 1},
+	{name => 'EDJE_LOAD_ERROR_CORRUPT_FILE', 'macro' => 1},
+	{name => 'EDJE_LOAD_ERROR_UNKNOWN_FORMAT', 'macro' => 1},
+	{name => 'EDJE_LOAD_ERROR_INCOMPATIBLE_FILE', 'macro' => 1},
+	{name => 'EDJE_LOAD_ERROR_UNKNOWN_COLLECTION', 'macro' => 1},
+	{name => 'EDJE_LOAD_ERROR_RECURSIVE_REFERENCE', 'macro' => 1},
+	#
+	{name => 'EDJE_DRAG_DIR_NONE', 'macro' => 1},
+	{name => 'EDJE_DRAG_DIR_X', 'macro' => 1},
+	{name => 'EDJE_DRAG_DIR_Y', 'macro' => 1},
+	{name => 'EDJE_DRAG_DIR_XY', 'macro' => 1},
+	#
+	{name => 'EDJE_ASPECT_CONTROL_NONE', 'macro' => 1},
+	{name => 'EDJE_ASPECT_CONTROL_NEITHER', 'macro' => 1},
+	{name => 'EDJE_ASPECT_CONTROL_HORIZONTAL', 'macro' => 1},
+	{name => 'EDJE_ASPECT_CONTROL_VERTICAL', 'macro' => 1},
+	{name => 'EDJE_ASPECT_CONTROL_BOTH', 'macro' => 1},
+	#
+	{name => 'EDJE_TEXT_FILTER_TEXT', 'macro' => 1},
+	{name => 'EDJE_TEXT_FILTER_FORMAT', 'macro' => 1},
+	{name => 'EDJE_TEXT_FILTER_MARKUP', 'macro' => 1},
+	#
+	{name => 'EDJE_INPUT_PANEL_LAYOUT_NORMAL_VARIATION_NORMAL', 'macro' => 1},
+	{name => 'EDJE_INPUT_PANEL_LAYOUT_NORMAL_VARIATION_FILENAME', 'macro' => 1},
+	{name => 'EDJE_INPUT_PANEL_LAYOUT_NORMAL_VARIATION_PERSON_NAME', 'macro' => 1},
+	#
+	{name => 'EDJE_INPUT_PANEL_LAYOUT_NUMBERONLY_VARIATION_NORMAL', 'macro' => 1},
+	{name => 'EDJE_INPUT_PANEL_LAYOUT_NUMBERONLY_VARIATION_SIGNED', 'macro' => 1},
+	{name => 'EDJE_INPUT_PANEL_LAYOUT_NUMBERONLY_VARIATION_DECIMAL', 'macro' => 1},
+	{name => 'EDJE_INPUT_PANEL_LAYOUT_NUMBERONLY_VARIATION_SIGNED_AND_DECIMAL', 'macro' => 1},
+	#
+	{name => 'EDJE_INPUT_PANEL_LAYOUT_PASSWORD_VARIATION_NORMAL', 'macro' => 1},
+	{name => 'EDJE_INPUT_PANEL_LAYOUT_PASSWORD_VARIATION_NUMBERONLY', 'macro' => 1},
+	#
+	{name => 'EDJE_TWEEN_MODE_NONE', 'macro' => 1},
+	{name => 'EDJE_TWEEN_MODE_LINEAR', 'macro' => 1},
+	{name => 'EDJE_TWEEN_MODE_SINUSOIDAL', 'macro' => 1},
+	{name => 'EDJE_TWEEN_MODE_ACCELERATE', 'macro' => 1},
+	{name => 'EDJE_TWEEN_MODE_DECELERATE', 'macro' => 1},
+	{name => 'EDJE_TWEEN_MODE_ACCELERATE_FACTOR', 'macro' => 1},
+	{name => 'EDJE_TWEEN_MODE_DECELERATE_FACTOR', 'macro' => 1},
+	{name => 'EDJE_TWEEN_MODE_SINUSOIDAL_FACTOR', 'macro' => 1},
+	{name => 'EDJE_TWEEN_MODE_DIVISOR_INTERP', 'macro' => 1},
+	{name => 'EDJE_TWEEN_MODE_BOUNCE', 'macro' => 1},
+	{name => 'EDJE_TWEEN_MODE_SPRING', 'macro' => 1},
+	{name => 'EDJE_TWEEN_MODE_CUBIC_BEZIER', 'macro' => 1},
+	{name => 'EDJE_TWEEN_MODE_LAST', 'macro' => 1},
+	{name => 'EDJE_TWEEN_MODE_MASK', 'macro' => 1},
+	{name => 'EDJE_TWEEN_MODE_OPT_FROM_CURRENT', 'macro' => 1},
+	#
+	{name => 'EDJE_ACTION_TYPE_NONE', 'macro' => 1},
+	{name => 'EDJE_ACTION_TYPE_STATE_SET', 'macro' => 1},
+	{name => 'EDJE_ACTION_TYPE_ACTION_STOP', 'macro' => 1},
+	{name => 'EDJE_ACTION_TYPE_SIGNAL_EMIT', 'macro' => 1},
+	{name => 'EDJE_ACTION_TYPE_DRAG_VAL_SET', 'macro' => 1},
+	{name => 'EDJE_ACTION_TYPE_DRAG_VAL_STEP', 'macro' => 1},
+	{name => 'EDJE_ACTION_TYPE_DRAG_VAL_PAGE', 'macro' => 1},
+	{name => 'EDJE_ACTION_TYPE_SCRIPT', 'macro' => 1},
+	{name => 'EDJE_ACTION_TYPE_FOCUS_SET', 'macro' => 1},
+	{name => 'EDJE_ACTION_TYPE_RESERVED00', 'macro' => 1},
+	{name => 'EDJE_ACTION_TYPE_FOCUS_OBJECT', 'macro' => 1},
+	{name => 'EDJE_ACTION_TYPE_PARAM_COPY', 'macro' => 1},
+	{name => 'EDJE_ACTION_TYPE_PARAM_SET', 'macro' => 1},
+	{name => 'EDJE_ACTION_TYPE_SOUND_SAMPLE', 'macro' => 1},
+	{name => 'EDJE_ACTION_TYPE_SOUND_TONE', 'macro' => 1},
+	{name => 'EDJE_ACTION_TYPE_PHYSICS_IMPULSE', 'macro' => 1},
+	{name => 'EDJE_ACTION_TYPE_PHYSICS_TORQUE_IMPULSE', 'macro' => 1},
+	{name => 'EDJE_ACTION_TYPE_PHYSICS_FORCE', 'macro' => 1},
+	{name => 'EDJE_ACTION_TYPE_PHYSICS_TORQUE', 'macro' => 1},
+	{name => 'EDJE_ACTION_TYPE_PHYSICS_FORCES_CLEAR', 'macro' => 1},
+	{name => 'EDJE_ACTION_TYPE_PHYSICS_VEL_SET', 'macro' => 1},
+	{name => 'EDJE_ACTION_TYPE_PHYSICS_ANG_VEL_SET', 'macro' => 1},
+	{name => 'EDJE_ACTION_TYPE_PHYSICS_STOP', 'macro' => 1},
+	{name => 'EDJE_ACTION_TYPE_PHYSICS_ROT_SET', 'macro' => 1},
+	{name => 'EDJE_ACTION_TYPE_VIBRATION_SAMPLE', 'macro' => 1},
+	{name => 'EDJE_ACTION_TYPE_MO', 'macro' => 1},
+	{name => 'EDJE_ACTION_TYPE_VG_ANIM_STOP', 'macro' => 1},
+	{name => 'EDJE_ACTION_TYPE_VG_ANIM_PAUSE', 'macro' => 1},
+	{name => 'EDJE_ACTION_TYPE_VG_ANIM_RESUME', 'macro' => 1},
+	{name => 'EDJE_ACTION_TYPE_VG_ANIM_PLAY', 'macro' => 1},
+	{name => 'EDJE_ACTION_TYPE_VG_ANIM_REWIND', 'macro' => 1},
+	{name => 'EDJE_ACTION_TYPE_VG_ANIM_LOOP', 'macro' => 1},
+	{name => 'EDJE_ACTION_TYPE_LAST', 'macro' => 1},
+	#
+	{name => 'EDJE_TEXT_EFFECT_NONE', 'macro' => 1},
+	{name => 'EDJE_TEXT_EFFECT_PLAIN', 'macro' => 1},
+	{name => 'EDJE_TEXT_EFFECT_OUTLINE', 'macro' => 1},
+	{name => 'EDJE_TEXT_EFFECT_SOFT_OUTLINE', 'macro' => 1},
+	{name => 'EDJE_TEXT_EFFECT_SHADOW', 'macro' => 1},
+	{name => 'EDJE_TEXT_EFFECT_SOFT_SHADOW', 'macro' => 1},
+	{name => 'EDJE_TEXT_EFFECT_OUTLINE_SHADOW', 'macro' => 1},
+	{name => 'EDJE_TEXT_EFFECT_OUTLINE_SOFT_SHADOW', 'macro' => 1},
+	{name => 'EDJE_TEXT_EFFECT_FAR_SHADOW', 'macro' => 1},
+	{name => 'EDJE_TEXT_EFFECT_FAR_SOFT_SHADOW', 'macro' => 1},
+	{name => 'EDJE_TEXT_EFFECT_GLOW', 'macro' => 1},
+	{name => 'EDJE_TEXT_EFFECT_LAST', 'macro' => 1},
+	#
+	{name => 'EDJE_TEXT_EFFECT_SHADOW_DIRECTION_BOTTOM_RIGHT', 'macro' => 1},
+	{name => 'EDJE_TEXT_EFFECT_SHADOW_DIRECTION_BOTTOM', 'macro' => 1},
+	{name => 'EDJE_TEXT_EFFECT_SHADOW_DIRECTION_BOTTOM_LEFT', 'macro' => 1},
+	{name => 'EDJE_TEXT_EFFECT_SHADOW_DIRECTION_LEFT', 'macro' => 1},
+	{name => 'EDJE_TEXT_EFFECT_SHADOW_DIRECTION_TOP_LEFT', 'macro' => 1},
+	{name => 'EDJE_TEXT_EFFECT_SHADOW_DIRECTION_TOP', 'macro' => 1},
+	{name => 'EDJE_TEXT_EFFECT_SHADOW_DIRECTION_TOP_RIGHT', 'macro' => 1},
+	{name => 'EDJE_TEXT_EFFECT_SHADOW_DIRECTION_RIGHT', 'macro' => 1},
+	#
+	{name => 'EDJE_OBJECT_TABLE_HOMOGENEOUS_NONE', 'macro' => 1},
+	{name => 'EDJE_OBJECT_TABLE_HOMOGENEOUS_TABLE', 'macro' => 1},
+	{name => 'EDJE_OBJECT_TABLE_HOMOGENEOUS_ITEM', 'macro' => 1},
+	#
+	{name => 'EDJE_MESSAGE_NONE', 'macro' => 1},
+	{name => 'EDJE_MESSAGE_SIGNAL', 'macro' => 1},
+	{name => 'EDJE_MESSAGE_STRING', 'macro' => 1},
+	{name => 'EDJE_MESSAGE_INT', 'macro' => 1},
+	{name => 'EDJE_MESSAGE_FLOAT', 'macro' => 1},
+	{name => 'EDJE_MESSAGE_STRING_SET', 'macro' => 1},
+	{name => 'EDJE_MESSAGE_INT_SET', 'macro' => 1},
+	{name => 'EDJE_MESSAGE_FLOAT_SET', 'macro' => 1},
+	{name => 'EDJE_MESSAGE_STRING_INT', 'macro' => 1},
+	{name => 'EDJE_MESSAGE_STRING_FLOAT', 'macro' => 1},
+	{name => 'EDJE_MESSAGE_STRING_INT_SET', 'macro' => 1},
+	{name => 'EDJE_MESSAGE_STRING_FLOAT_SET', 'macro' => 1},
+	);
+
+	
+	ExtUtils::Constant::WriteConstants(
+									 NAME		  => 'pEFL::Edje',
+									 NAMES		  => \@names_edje,
+									 DEFAULT_TYPE => 'IV',
+									 C_FILE 	  => 'lib/pEFL/const-edje-c.inc',
+									 XS_FILE	  => 'lib/pEFL/const-edje-xs.inc',
+								  );
 
 my @names_emotion = (
-    {name => 'EMOTION_ASPECT_KEEP_NONE', 'macro' => 1},
+	{name => 'EMOTION_ASPECT_KEEP_NONE', 'macro' => 1},
 	{name => 'EMOTION_ASPECT_KEEP_WIDTH', 'macro' => 1},
 	{name => 'EMOTION_ASPECT_KEEP_HEIGHT', 'macro' => 1},
 	{name => 'EMOTION_ASPECT_KEEP_BOTH', 'macro' => 1},
@@ -670,21 +908,21 @@ my @names_emotion = (
 	{name => 'EMOTION_EVENT_8', 'macro' => 1},
 	{name => 'EMOTION_EVENT_9', 'macro' => 1},
 	{name => 'EMOTION_EVENT_10', 'macro' => 1},
-    );
-    
-    ExtUtils::Constant::WriteConstants(
-                                     NAME         => 'pEFL::Emotion',
-                                     NAMES        => \@names_emotion,
-                                     DEFAULT_TYPE => 'IV',
-                                     C_FILE       => 'lib/pEFL/const-emotion-c.inc',
-                                     XS_FILE      => 'lib/pEFL/const-emotion-xs.inc',
-                                  );
+	);
+	
+	ExtUtils::Constant::WriteConstants(
+									 NAME		  => 'pEFL::Emotion',
+									 NAMES		  => \@names_emotion,
+									 DEFAULT_TYPE => 'IV',
+									 C_FILE 	  => 'lib/pEFL/const-emotion-c.inc',
+									 XS_FILE	  => 'lib/pEFL/const-emotion-xs.inc',
+								  );
 }
 else {
   use File::Copy;
   use File::Spec;
   foreach my $file ('const-c.inc', 'const-xs.inc') {
-    my $fallback = File::Spec->catfile('fallback', $file);
-    copy ($fallback, $file) or die "Can't copy $fallback to $file: $!";
+	my $fallback = File::Spec->catfile('fallback', $file);
+	copy ($fallback, $file) or die "Can't copy $fallback to $file: $!";
   }
 }

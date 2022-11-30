@@ -6,7 +6,7 @@ build_requires:
   File::Spec: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
-  Perinci::Access::Perl: '0.87'
+  Perinci::Access::Perl: '0.895'
   Test::More: '0.98'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -21,31 +21,31 @@ name: Perinci-To-Doc
 provides:
   Perinci::Sub::To::FuncBase:
     file: lib/Perinci/Sub/To/FuncBase.pm
-    version: '0.879'
+    version: '0.880'
   Perinci::Sub::To::POD:
     file: lib/Perinci/Sub/To/POD.pm
-    version: '0.879'
+    version: '0.880'
   Perinci::Sub::To::Text:
     file: lib/Perinci/Sub/To/Text.pm
-    version: '0.879'
+    version: '0.880'
   Perinci::To::Doc:
     file: lib/Perinci/To/Doc.pm
-    version: '0.879'
+    version: '0.880'
   Perinci::To::Doc::Role::Section:
     file: lib/Perinci/To/Doc/Role/Section.pm
-    version: '0.879'
+    version: '0.880'
   Perinci::To::Doc::Role::Section::AddTextLines:
     file: lib/Perinci/To/Doc/Role/Section/AddTextLines.pm
-    version: '0.879'
+    version: '0.880'
   Perinci::To::POD:
     file: lib/Perinci/To/POD.pm
-    version: '0.879'
+    version: '0.880'
   Perinci::To::PackageBase:
     file: lib/Perinci/To/PackageBase.pm
-    version: '0.879'
+    version: '0.880'
   Perinci::To::Text:
     file: lib/Perinci/To/Text.pm
-    version: '0.879'
+    version: '0.880'
 requires:
   Data::Dump::OneLine: '0'
   Data::Dump::SortKeys: '0.04'
@@ -75,7 +75,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-To-Doc
   homepage: https://metacpan.org/release/Perinci-To-Doc
   repository: git://github.com/perlancar/perl-Perinci-To-Doc.git
-version: '0.879'
+version: '0.880'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -353,7 +353,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::PERLANCAR::Contributing
               name: '@Author::PERLANCAR/PERLANCAR/Contributing'
-              version: '0.292'
+              version: '0.293'
             -
               class: Pod::Weaver::Section::Legal
               name: '@Author::PERLANCAR/Legal'
@@ -361,7 +361,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.780'
+              version: '0.784'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'

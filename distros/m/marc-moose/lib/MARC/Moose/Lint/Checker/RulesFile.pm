@@ -1,6 +1,6 @@
 package MARC::Moose::Lint::Checker::RulesFile;
 # ABSTRACT: A class to 'lint' biblio record based on a rules file
-$MARC::Moose::Lint::Checker::RulesFile::VERSION = '1.0.45';
+$MARC::Moose::Lint::Checker::RulesFile::VERSION = '1.0.46';
 use Moose;
 use Modern::Perl;
 
@@ -296,7 +296,7 @@ MARC::Moose::Lint::Checker::RulesFile - A class to 'lint' biblio record based on
 
 =head1 VERSION
 
-version 1.0.45
+version 1.0.46
 
 =head1 DESCRIPTION
 

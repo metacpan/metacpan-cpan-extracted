@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 package XML::Sig;
-our $VERSION = '0.58';
+our $VERSION = '0.59';
 
 use Encode;
 # ABSTRACT: XML::Sig - A toolkit to help sign and verify XML Digital Signatures
@@ -32,8 +32,6 @@ use constant TRANSFORM_EXC_C14N          => 'http://www.w3.org/2001/10/xml-exc-c
 use constant TRANSFORM_EXC_C14N_COMMENTS => 'http://www.w3.org/2001/10/xml-exc-c14n#WithComments';
 
 sub DESTROY { }
-
-$SIG{INT} = sub { die "Interrupted\n"; };
 
 $| = 1;  # autoflush
 
@@ -1671,7 +1669,7 @@ XML::Sig - XML::Sig - A toolkit to help sign and verify XML Digital Signatures
 
 =head1 VERSION
 
-version 0.58
+version 0.59
 
 =head1 SYNOPSIS
 

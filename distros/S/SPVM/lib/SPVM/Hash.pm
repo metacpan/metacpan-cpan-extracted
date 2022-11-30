@@ -20,7 +20,7 @@ SPVM::Hash - Hash Data Structure
   $book->set_double(price => 3000.0);
   
   my $id = (int)$book->get_int("id");
-  my $name = (string)$book->get_string("name");
+  my $key = (string)$book->get_string("name");
   my $price = (double)$book->get_double("price");
   
 =head1 Description
@@ -29,11 +29,19 @@ C<Hash> is Hash Data Structure. This is generally called associative array.
 
 The hash function is C<siphash-1-3>.
 
+=head1 Interfaces
+
+=over 2
+
+=item * L<Cloneable|SPVM::Cloneable>
+
+=back
+
 =head1 Class Methods
 
 =head2 new
 
-  static method new : Hash ($key_values = undef : object[])
+  static method new : Hash ($key_values = undef : object[]);
 
 Create a new L<Hash|SPVM::Hash> object with key value pairs.
 
@@ -47,21 +55,27 @@ Create a new L<Hash|SPVM::Hash> object with key value pairs.
 
   count : int ()
 
-Count keys.
+Counts keys in the hash.
 
 =head2 copy
 
   copy : Hash ()
 
-Copy hash.
+Copies hash.
 
 This is not deep copy. Address of keys and values is copied into new hash.
+
+=head2 clone
+
+   method clone : Hash ();
+
+The alias for the L</"copy">.
 
 =head2 delete
 
   delete : object ($key : string)
 
-Delete a key value pair. Deleted value is returned.
+Deletes a key value pair. Deleted value is returned.
 
 =head2 exists
 
@@ -73,101 +87,173 @@ Specify the key and check if the value exists. If exists, return 1, otherwise 0.
 
   keys : string[] ()
 
-Get keys. This method do not copy the strings.
+Gets keys. This method do not copy the strings.
 
 =head2 values
 
   values : object[] ()
 
-Get values.
+Gets values.
 
 =head2 get
 
   get : object ($key : string)
 
-Get a value.
+Gets a value.
 
 =head2 get_byte
 
-  get_byte : byte ($name : string)
+  get_byte : int ($key : string)
 
-Get value with a key. the value is converted to byte type.
+Gets the value with a C<$key> from a L<Byte|SPVM::Byte> object.
 
 =head2 get_short
 
-  get_short : short ($name : string)
+  get_short : int ($key : string)
 
-Get value with a key. the value is converted to short type.
+Gets the value with a C<$key> from a L<Short|SPVM::Short> object.
   
 =head2 get_int
 
-  get_int : int ($name : string)
+  get_int : int ($key : string)
 
-Get value with a key. the value is converted to int type.
+Gets the value with a C<$key> from a L<Int|SPVM::Int> object.
   
 =head2 get_long
 
-  get_long : long ($name : string)
+  get_long : long ($key : string)
 
-Get value with a key. the value is converted to long type.
+Gets the value with a C<$key> from a L<Long|SPVM::Long> object.
 
 =head2 get_float
 
-  get_float : float ($name : string)
+  get_float : float ($key : string)
 
-Get value with a key. the value is converted to float type.
+Gets the value with a C<$key> from a L<Float|SPVM::Float> object.
   
 =head2 get_double
 
-  get_double : double ($name : string)
+  get_double : double ($key : string)
 
-Get value with a key. the value is converted to double type.
+Gets the value with a C<$key> from a L<Double|SPVM::Double> object.
 
 =head2 set
   
   set : void ($key : string, $val : object)
 
-Set key value pair.
+Sets the object C<$value> with the C<$key>.
 
 =head2 set_byte
 
-  set_byte : void ($name : string, $value : byte)
+  set_byte : void ($key : string, $value : int)
 
-Set key and value pair. byte value is converted to L<Byte|SPVM::Byte> object.
+Sets the C<byte> C<$value> with the C<$key>. the C<$value> is converted to L<Byte|SPVM::Byte> object.
 
 =head2 set_short
 
-  set_short : void ($name : string, $value : short)
+  set_short : void ($key : string, $value : int)
 
-Set key and value pair. short value is converted to L<Short|SPVM::Short> object.
+Sets the C<short> C<$value> with the C<$key>. the C<$value> is converted to L<Short|SPVM::Short> object.
 
 =head2 set_int
 
-  set_int : void ($name : string, $value : int)
+  set_int : void ($key : string, $value : int)
 
-Set key and value pair. int value is converted to L<Int|SPVM::Int> object.
+Sets the C<int> C<$value> with the C<$key>. the C<$value> is converted to L<Int|SPVM::Int> object.
 
 =head2 set_long
 
-  set_long : void ($name : string, $value : long)
+  set_long : void ($key : string, $value : long)
 
-Set key and value pair. long value is converted to L<Long|SPVM::Long> object.
+Sets the C<long> C<$value> with the C<$key>. the C<$value> is converted to L<Long|SPVM::Long> object.
 
 =head2 set_float
 
-  set_float : void ($name : string, $value : float)
+  set_float : void ($key : string, $value : float)
 
-Set key and value pair. float value is converted to L<Float|SPVM::Float> object.
+Sets the C<float> C<$value> with the C<$key>. the C<$value> is converted to L<Float|SPVM::Float> object.
 
 =head2 set_double
 
-  set_double : void ($name : string, $value : double)
+  set_double : void ($key : string, $value : double)
 
-Set key and value pair. double value is converted to L<Double|SPVM::Double> object.
+Sets the C<double> C<$value> with the C<$key>. the C<$value> is converted to L<Double|SPVM::Double> object.
 
 =head2 set_string
 
-  set_string : void ($name : string, $value : string)
+  set_string : void ($key : string, $value : string)
 
-Set key and value pair with string value.
+Sets the string C<$value> with the C<$key>.
+
+=head2 to_array
+
+  method to_array : object[] ($sort = 0 : int);
+
+Converts the hash to an array.
+
+If C<$sort> is a true value, the keys are sorted by the asc order.
+
+=head2 delete_or_default_byte
+
+  method delete_or_default_byte : int ($key : string, $default : int) {
+
+If the C<$key> exists, the value is deleted and returned with the type cast to C<byte> type.
+
+If not, the C<$default> value with the type cast to C<byte> type is returned.
+
+=head2 delete_or_default_short
+
+  method delete_or_default_short : int ($key : string, $default : int) {
+
+If the C<$key> exists, the value is deleted and returned with the type cast to C<short> type.
+
+If not, the C<$default> value with the type cast to C<short> type is returned.
+
+=head2 delete_or_default_int
+
+  method delete_or_default_int : int ($key : string, $default : int) {
+
+If the C<$key> exists, the value is deleted and returned with the type cast to C<int> type.
+
+If not, the C<$default> value is returned.
+
+=head2 delete_or_default_long
+
+  method delete_or_default_long : long ($key : string, $default : long) {
+
+If the C<$key> exists, the value is deleted and returned with the type cast to C<long> type.
+
+If not, the C<$default> value is returned.
+
+=head2 delete_or_default_float
+
+  method delete_or_default_float : float ($key : string, $default : float) {
+
+If the C<$key> exists, the value is deleted and returned with the type cast to C<float> type.
+
+If not, the C<$default> value is returned.
+
+=head2 delete_or_default_double
+
+  method delete_or_default_double : double ($key : string, $default : double) {
+
+If the C<$key> exists, the value is deleted and returned with the type cast to C<double> type.
+
+If not, the C<$default> value is returned.
+
+=head2 delete_or_default_string
+
+  method delete_or_default_string : string ($key : string, $default : string) {
+
+If the C<$key> exists, the value is deleted and returned with the type cast to C<string> type.
+
+If not, the C<$default> value is returned.
+
+=head2 delete_or_default
+
+  method delete_or_default : object ($key : string, $default : object) {
+
+If the C<$key> exists, the value is deleted and returned.
+
+If not, the C<$default> value is returned.
 

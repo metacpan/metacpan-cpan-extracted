@@ -93,6 +93,8 @@ lib/Test2/Harness/Runner/Preloader/Stage.pm
 lib/Test2/Harness/Runner/Reloader.pm
 lib/Test2/Harness/Runner/Resource.pm
 lib/Test2/Harness/Runner/Resource/JobCount.pm
+lib/Test2/Harness/Runner/Resource/SharedJobSlots.pm
+lib/Test2/Harness/Runner/Resource/SharedJobSlots/State.pm
 lib/Test2/Harness/Runner/Run.pm
 lib/Test2/Harness/Runner/Spawn.pm
 lib/Test2/Harness/Runner/State.pm
@@ -244,6 +246,8 @@ t/integration/retry.t
 t/integration/retry/retry.tx
 t/integration/signals.t
 t/integration/signals/abrt_or_iot.t
+t/integration/slots_per_job.t
+t/integration/slots_per_job2.t
 t/integration/smoke.t
 t/integration/smoke/a.tx
 t/integration/smoke/b.tx
@@ -300,6 +304,7 @@ t/unit/App/Yath/Plugin/Git.t
 t/unit/App/Yath/Plugin/SysInfo.t
 t/unit/App/Yath/Util.t
 t/unit/Test2/Harness/Runner/DepTracer.t
+t/unit/Test2/Harness/Runner/Resource/SharedJobSlots/State.t
 t/unit/Test2/Harness/Settings.t
 t/unit/Test2/Harness/Settings/Prefix.t
 t/unit/Test2/Harness/TestFile.t

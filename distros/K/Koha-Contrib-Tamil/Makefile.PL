@@ -50,6 +50,7 @@ my %WriteMakefileArgs = (
     "Getopt::Long" => 0,
     "IO::File" => 0,
     "JSON" => 0,
+    "Koha::Biblios" => 0,
     "LWP" => 0,
     "LWP::UserAgent" => 0,
     "List::Util" => 0,
@@ -94,7 +95,7 @@ my %WriteMakefileArgs = (
     "File::Find" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.069",
+  "VERSION" => "0.070",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -117,6 +118,7 @@ my %FallbackPrereqs = (
   "Getopt::Long" => 0,
   "IO::File" => 0,
   "JSON" => 0,
+  "Koha::Biblios" => 0,
   "LWP" => 0,
   "LWP::UserAgent" => 0,
   "List::Util" => 0,

@@ -37,6 +37,7 @@ use Log::Any qw($log);
 use Date::Parse;
 use DateTime;
 
+use AsposeSlidesCloud::Object::DataSource;
 use AsposeSlidesCloud::Object::EffectFormat;
 use AsposeSlidesCloud::Object::FillFormat;
 use AsposeSlidesCloud::Object::LineFormat;
@@ -193,6 +194,13 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'data_source_for_series_name' => {
+    	datatype => 'DataSource',
+    	base_name => 'DataSourceForSeriesName',
+    	description => 'Series name data source.',
+    	format => '',
+    	read_only => '',
+    		},
     'is_color_varied' => {
     	datatype => 'boolean',
     	base_name => 'IsColorVaried',
@@ -282,6 +290,7 @@ __PACKAGE__->method_documentation({
 __PACKAGE__->swagger_types( {
     'type' => 'string',
     'name' => 'string',
+    'data_source_for_series_name' => 'DataSource',
     'is_color_varied' => 'boolean',
     'inverted_solid_fill_color' => 'string',
     'smooth' => 'boolean',
@@ -299,6 +308,7 @@ __PACKAGE__->swagger_types( {
 __PACKAGE__->attribute_map( {
     'type' => 'Type',
     'name' => 'Name',
+    'data_source_for_series_name' => 'DataSourceForSeriesName',
     'is_color_varied' => 'IsColorVaried',
     'inverted_solid_fill_color' => 'InvertedSolidFillColor',
     'smooth' => 'Smooth',

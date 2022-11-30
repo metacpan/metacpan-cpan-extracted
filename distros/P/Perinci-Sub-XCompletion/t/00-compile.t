@@ -6,18 +6,13 @@ use warnings;
 
 use Test::More;
 
-plan tests => 9 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 4 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Perinci/Sub/XCompletion.pm',
+    'Perinci/Sub/XCompletion/comma_sep.pm',
     'Perinci/Sub/XCompletion/dirname.pm',
-    'Perinci/Sub/XCompletion/filename.pm',
-    'Perinci/Sub/XCompletion/perl_distname.pm',
-    'Perinci/Sub/XCompletion/perl_modname.pm',
-    'Perinci/Sub/XCompletion/perl_modname_or_prefix.pm',
-    'Perinci/Sub/XCompletion/perl_modprefix.pm',
-    'Perinci/Sub/XCompletion/perl_podname.pm',
-    'Perinci/Sub/XCompletion/riap_url.pm'
+    'Perinci/Sub/XCompletion/filename.pm'
 );
 
 

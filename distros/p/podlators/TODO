@@ -4,21 +4,6 @@ This is a somewhat random and unordered list of things I'd like to see
 fixed or improved, but which I've not yet had a chance to do.  Patches for
 any of the following are very much welcome.
 
- * Revisit the handling of non-ASCII characters.  At this point, it
-   probably makes sense to output UTF-8 by default, which also eliminates
-   all of the frustrations in Pod::Man with turning valid characters into
-   X and would allow massive simplification of the preamble for most
-   pages.  We could also move some of the remaining *roff macros to the
-   accents section and only conditionally output them.  Unfortunately, it
-   looks like all non-man-db, non-groff *roff implementations still don't
-   support Unicode characters, though, and even some groff setups may not
-   support them properly.  So this is still a portability issue.
-
- * Support an output mode that uses groff escapes for all Unicode
-   characters.  We might be able to just use \[uNNNN] for all Unicode
-   code points.  This would work portably on any system that uses groff,
-   and may make sense as the default output format on Linux.
-
  * Escape all hyphens in the text of L<some-command> links.
 
  * Add a =for license stanza that takes license text and embeds it as a
@@ -33,78 +18,6 @@ any of the following are very much welcome.
 
  * Add a test suite for the pod2man and pod2text driver programs.
 
- * There should be some way to turn off all heuristics when people are
-   using POD for some purpose other than Perl or some other programming
-   language with similar needs.  The hooks are there in the code but we
-   need an interface to set or unset them.
-
- * The test suite is still fairly basic, and doesn't test all of the
-   options to the various modules, the scripts, =over/=back, or the
-   guesswork in Pod::Man.  The best way forward would be to add coverage
-   testing and then aim for 100% coverage.  That won't guarantee
-   everything is tested, but it will be much closer.
-
  * Update coding style to my current standards.
 
- * Document all the standard module interfaces from Pod::Simple.
-
  * Optionally suppress the generation of empty man pages in Pod::Man.
-
-The following items require changes to the POD specification and are
-therefore of broader scope than just this code:
-
- * Introduce a new interior sequence for metasyntactic variables, probably
-   M<>, and reserve I<> exclusively for emphasis.  This resolves a
-   significant ambiguity in the current POD specification in a way that
-   would make the Pod::Text output much better.  (Metasyntactic variables
-   should be surrounded in angle brackets and emphasized text should be
-   surrounded by asterisks.)
-
- * Introduce a new interior sequence for footnotes.  There has been
-   extensive discussion of this on pod-people@perl.org.  One proposal is
-   to use a new formatting code for footnotes, probably N<>, and just
-   in-line the footnote as part of the interior sequence.  This doesn't
-   allow multi-paragraph footnotes, however, so a second proposal is to
-   have the content of the N<> formatting code be a unique marker that
-   matches an =item tag in a new =begin footnotes section processed by
-   translators that know how to do footnotes.  (The translator should
-   probably number the footnotes and insert some sort of numerical marker
-   into the text at the point of the footnote.)  This would require
-   translators to formatting languages that do something more interesting
-   with footnotes to parse the entire document, extract the footnote
-   section, and then stick the footnotes back into the main text at the
-   point where they occur, however.
-
-   There are some preliminary patches for Pod::Man and Pod::Text in NOTES.
-   It's possible to do footnotes directly in *roff (it's section T4 of the
-   troff paper), but that relies on header and footer triggers and for
-   terminal display it's becoming common to suppress the headers and
-   footers.  For the purposes of Pod::Man, end notes are probably a better
-   model and can be handled about the same way as they are for Pod::Text.
-
-The following ideas about guesswork and heuristics were all taken from a
-post by Tom Christiansen to pod-people@perl.org:
-
- * All of the following should be okay to use verbatim in any POD text and
-   have the translator do something appropriate:
-
-   FILEHANDLE PackageName
-   $variable @variable %variable &function
-   $var::iable @vari::able %variab::le &functio::n
-   function() fun::ction() fun::ct::ion()
-   manpage(3r)
-   user@host.com
-   http://somewhere.com/stuff/ ftp://somewhere.com/stuff/
-
-   Pod::Man and Pod::Text handle much of this already, but not all of it
-   (and I've not checked to see exactly where they break).
-
- * Something in __ALLCAPS__ should be in code font but perhaps not small,
-   and maybe some magic between the unders, as in \f(CW_\|_ALLCAPS_\|_\fP.
-   (Pod::Man handles the spaces between the underbars, but not putting
-   this into code font.)
-
- * The module version number should be included in the headers/footers
-   where appropriate.  That means that, when processing a module, ideally
-   one wants to pull out the module's $VERSION to use in the footer rather
-   than Perl's version.

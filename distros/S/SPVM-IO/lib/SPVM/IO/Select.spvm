@@ -1,5 +1,8 @@
 class IO::Select {
   use IntList;
+  use Math;
+  use Sys::Time::Timeval;
+  use Sys::Select;
   
   has handles : IntList;
   
@@ -76,26 +79,128 @@ class IO::Select {
   }
 
   method can_read : int[] ($timeout : double) {
-    my $handles = $self->{handles};
+    my $handles_list = $self->{handles};
+    my $handles = $handles_list->to_array;
     
-    return $self->_can_read($handles->to_array, $timeout);
+    my $timeout_int = 0.0;
+    my $timeout_fraction = Math->modf($timeout, \$timeout_int);
+    
+    my $tv = Sys::Time::Timeval->new;
+    $tv->set_tv_sec((int)$timeout_int);
+    $tv->set_tv_usec((int)($timeout_fraction * 1000000));
+    
+    # Set handles to fd_set
+    my $fds = Sys::Select::Fd_set->new;
+    Sys::Select->FD_ZERO($fds);
+    
+    my $max_handle = 0;
+    for (my $i = 0; $i < @$handles; $i++) {
+      my $handle = $handles->[$i];
+      Sys::Select->FD_SET($handle, $fds);
+      if ($handle > $max_handle) {
+        $max_handle = $handle;
+      }
+    }
+    
+    # select
+    my $success_count = Sys::Select->select($max_handle + 1, $fds, undef, undef, $tv);
+    
+    # Can handles
+    my $can_handles = new int[$success_count];
+    
+    my $can_handles_index = 0;
+    for (my $i = 0; $i < @$handles; $i++) {
+      my $handle = $handles->[$i];
+      
+      if (Sys::Select->FD_ISSET($handle, $fds)) {
+        $can_handles->[$can_handles_index++] = $handle;
+      }
+    }
+    
+    return $can_handles;
   }
-  
-  native private method _can_read : int[] ($handles : int[], $timeout : double);
-
+ 
   method can_write : int[] ($timeout : double) {
-    my $handles = $self->{handles};
+    my $handles_list = $self->{handles};
+    my $handles = $handles_list->to_array;
     
-    return $self->_can_write($handles->to_array, $timeout);
+    my $timeout_int = 0.0;
+    my $timeout_fraction = Math->modf($timeout, \$timeout_int);
+    
+    my $tv = Sys::Time::Timeval->new;
+    $tv->set_tv_sec((int)$timeout_int);
+    $tv->set_tv_usec((int)($timeout_fraction * 1000000));
+    
+    # Set handles to fd_set
+    my $fds = Sys::Select::Fd_set->new;
+    Sys::Select->FD_ZERO($fds);
+    
+    my $max_handle = 0;
+    for (my $i = 0; $i < @$handles; $i++) {
+      my $handle = $handles->[$i];
+      Sys::Select->FD_SET($handle, $fds);
+      if ($handle > $max_handle) {
+        $max_handle = $handle;
+      }
+    }
+    
+    # select
+    my $success_count = Sys::Select->select($max_handle + 1, undef, $fds, undef, $tv);
+    
+    # Can handles
+    my $can_handles = new int[$success_count];
+    
+    my $can_handles_index = 0;
+    for (my $i = 0; $i < @$handles; $i++) {
+      my $handle = $handles->[$i];
+      
+      if (Sys::Select->FD_ISSET($handle, $fds)) {
+        $can_handles->[$can_handles_index++] = $handle;
+      }
+    }
+    
+    return $can_handles;
   }
-  
-  native private method _can_write : int[] ($handles : int[], $timeout : double);
 
   method has_exception : int[] ($timeout : double) {
-    my $handles = $self->{handles};
+    my $handles_list = $self->{handles};
+    my $handles = $handles_list->to_array;
     
-    return $self->_has_exception($handles->to_array, $timeout);
+    my $timeout_int = 0.0;
+    my $timeout_fraction = Math->modf($timeout, \$timeout_int);
+    
+    my $tv = Sys::Time::Timeval->new;
+    $tv->set_tv_sec((int)$timeout_int);
+    $tv->set_tv_usec((int)($timeout_fraction * 1000000));
+    
+    # Set handles to fd_set
+    my $fds = Sys::Select::Fd_set->new;
+    Sys::Select->FD_ZERO($fds);
+    
+    my $max_handle = 0;
+    for (my $i = 0; $i < @$handles; $i++) {
+      my $handle = $handles->[$i];
+      Sys::Select->FD_SET($handle, $fds);
+      if ($handle > $max_handle) {
+        $max_handle = $handle;
+      }
+    }
+    
+    # select
+    my $success_count = Sys::Select->select($max_handle + 1, undef, undef, $fds, $tv);
+    
+    # Can handles
+    my $can_handles = new int[$success_count];
+    
+    my $can_handles_index = 0;
+    for (my $i = 0; $i < @$handles; $i++) {
+      my $handle = $handles->[$i];
+      
+      if (Sys::Select->FD_ISSET($handle, $fds)) {
+        $can_handles->[$can_handles_index++] = $handle;
+      }
+    }
+    
+    return $can_handles;
   }
-  
-  native private method _has_exception : int[] ($handles : int[], $timeout : double);
 }

@@ -1,4 +1,4 @@
-#fsdb name id test1 rank
+#fsdb name id test1 rank:q
 d	4	90	1
 f	6	90	1
 a	1	80	3

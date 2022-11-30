@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/Future/AsyncAwait/Metrics.pm
+lib/Future/AsyncAwait/Metrics.xs
+MANIFEST			This list of files
+t/00use.t
+t/01await.t
+t/99pod.t
+README
+LICENSE
+META.yml
+META.json

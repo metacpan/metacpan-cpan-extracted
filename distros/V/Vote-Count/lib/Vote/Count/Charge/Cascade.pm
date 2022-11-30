@@ -16,7 +16,7 @@ use Mojo::Template;
 use Sort::Hash;
 use Data::Dumper;
 use Try::Tiny;
-use JSON::MaybeXS;
+use Cpanel::JSON::XS;
 use YAML::XS;
 use Path::Tiny;
 use Carp;
@@ -72,7 +72,7 @@ sub BUILD {
   $I->{'lastcharge'} = {};
 }
 
-our $coder = JSON->new->ascii->pretty;
+our $coder = Cpanel::JSON::XS->new->ascii->pretty;
 
 sub Round($I) { return $I->{'currentround'}; }
 

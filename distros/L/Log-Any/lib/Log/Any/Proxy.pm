@@ -5,7 +5,7 @@ use warnings;
 package Log::Any::Proxy;
 
 # ABSTRACT: Log::Any generator proxy object
-our $VERSION = '1.710';
+our $VERSION = '1.711';
 
 use Log::Any::Adapter::Util ();
 use overload;
@@ -47,7 +47,7 @@ sub new {
         require Carp;
         Carp::croak("$class requires an 'adapter' parameter");
     }
-    unless ( $self->{category} ) {
+    unless ( defined $self->{category} ) {
         require Carp;
         Carp::croak("$class requires a 'category' parameter");
     }
@@ -67,7 +67,7 @@ sub clone {
 
 sub init { }
 
-for my $attr (qw/adapter filter formatter prefix context/) {
+for my $attr (qw/adapter category filter formatter prefix context/) {
     no strict 'refs';
     *{$attr} = sub { return $_[0]->{$attr} };
 }
@@ -150,7 +150,7 @@ Log::Any::Proxy - Log::Any generator proxy object
 
 =head1 VERSION
 
-version 1.710
+version 1.711
 
 =head1 SYNOPSIS
 
@@ -228,6 +228,11 @@ The default formatter does the following:
 If defined, this string will be prepended to all messages.  It will not
 include a trailing space, so add that yourself if you want.  This is less
 flexible/powerful than L</filter>, but avoids an extra function call.
+
+=head2 context
+
+Logging context data hashref. All the key/value pairs added to this hash
+will be printed with every log message.
 
 =head1 USAGE
 

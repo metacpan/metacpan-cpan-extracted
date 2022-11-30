@@ -16,13 +16,14 @@ MODULE = pEFL::Evas::Image		PACKAGE = pEFL::Evas::Image
 EvasImage *
 evas_object_image_add(e)
 	EvasCanvas *e
-
-MODULE = pEFL::Evas::Image		PACKAGE = EvasImagePtr     PREFIX = evas_object_image_
-
+	
 
 EvasImage *
 evas_object_image_filled_add(e)
 	EvasCanvas *e
+	
+
+MODULE = pEFL::Evas::Image		PACKAGE = EvasImagePtr     PREFIX = evas_object_image_
 
 
 # void

@@ -16,7 +16,7 @@ use namespace::clean;
 # Always remember to do all digits for the version even if they're 0
 # i.e. first release of 0.XX *must* be 0.XX000. This avoids fBSD ports
 # brain damage and presumably various other packaging systems too
-our $VERSION = '0.07049';
+our $VERSION = '0.07051';
 
 __PACKAGE__->mk_group_accessors('inherited', qw/
                                 _loader_args
@@ -659,6 +659,8 @@ bphillips: Brian Phillips <bphillips@cpan.org>
 btilly: Ben Tilly <btilly@gmail.com>
 
 domm: Thomas Klausner <domm@plix.at>
+
+ether: Karen Etheridge <ether@cpan.org>
 
 gugu: Andrey Kostenko <a.kostenko@rambler-co.ru>
 

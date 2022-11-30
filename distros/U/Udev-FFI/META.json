@@ -4,9 +4,9 @@
       "Ilya Pavlov, <ilux@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.2",
+   "generated_by" : "Minilla/v3.1.20",
    "license" : [
-      "lgpl_2_1"
+      "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -36,7 +36,7 @@
          "requires" : {
             "Test::CPAN::Meta" : "0",
             "Test::MinimumVersion::Fast" : "0.04",
-            "Test::PAUSE::Permissions" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
             "Test::Pod" : "1.41",
             "Test::Spellunker" : "v0.2.7"
          }
@@ -58,7 +58,7 @@
    "provides" : {
       "Udev::FFI" : {
          "file" : "lib/Udev/FFI.pm",
-         "version" : "0.104002"
+         "version" : "0.105000"
       },
       "Udev::FFI::Device" : {
          "file" : "lib/Udev/FFI/Device.pm"
@@ -86,15 +86,17 @@
       },
       "homepage" : "https://github.com/Ilya33/udev-ffi",
       "repository" : {
-         "url" : "git://github.com/Ilya33/udev-ffi.git",
+         "type" : "git",
+         "url" : "https://github.com/Ilya33/udev-ffi.git",
          "web" : "https://github.com/Ilya33/udev-ffi"
       }
    },
-   "version" : "0.104002",
+   "version" : "0.105000",
    "x_authority" : "cpan:ILUX",
    "x_contributors" : [
+      "Ilya Pavlov <fsilux@gmail.com>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27300_01",
+   "x_serialization_backend" : "JSON::PP version 4.02",
    "x_static_install" : 0
 }

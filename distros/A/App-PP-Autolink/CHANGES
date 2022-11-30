@@ -1,5 +1,23 @@
 Revision history for App::PP::Autolink
 
+2.10 20221126
+  - Non-windows: Copy pp_autolink.pl to pp_autolink at build time
+    so the docs match.  An imperfect approach but works for now.  
+
+2.09 20221119
+  - add hashbang line to pp_autolink.pl for EUMM to update on install 
+
+2.08 20221119
+  - Set the minimum perl version to 5.14 so we can use s///r.
+    We can revisit if earlier versions are shown to be needed.
+
+2.07 20221115
+  - Add detected Aliens to the pp call if they inherit from Alien::Base.
+    Needed to ensure the share dirs are packed (see Module::ScanDeps#13).
+
+2.06 20221115
+  - Macs: Handle @rpath and @loader_path entries in dependency paths. GH#17
+
 2.05 20220919
   - Unices: Pack system libs, except for libm, libc, libpthread and libdl
       The previous approach overdid things.

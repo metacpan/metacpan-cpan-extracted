@@ -40,7 +40,7 @@ use Carp qw(croak);
 use Scalar::Util qw(blessed);
 use overload ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 method new($class: @rules) {
     my $self = bless {
@@ -316,7 +316,7 @@ my %_nop = (
     attrset => {
         type    => AT_AS_MODIFY_ATTRS,
         content => {},
-    }, 
+    },
     content => undef,
     repeat  => [],
 );

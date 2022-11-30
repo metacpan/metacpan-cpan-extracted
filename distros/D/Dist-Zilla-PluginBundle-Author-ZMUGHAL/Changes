@@ -1,3 +1,8 @@
+0.006 2022-11-28 15:06:17-0500
+  - Add ::OrbitalTransfer plugin bundle.
+  - Implement Babble transformation for Function::Parameters (for
+    use in ::OrbitalTransfer).
+
 0.005 2021-11-15 03:05:37-0500
   - Add MetaNoIndex to ::Basic bundle.
 

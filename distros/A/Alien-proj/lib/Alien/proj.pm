@@ -8,7 +8,7 @@ use Capture::Tiny qw /:all/;
 use File::Which qw /which/;
 use List::Util qw /uniq/;
 
-our $VERSION = '1.24';
+our $VERSION = '1.25';
 
 #  adding to global {DY}LD_LIBRARY_PATH vars is icky but seems
 #  to be needed for utilities and downstream FFI

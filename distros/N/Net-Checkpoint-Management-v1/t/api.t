@@ -96,6 +96,39 @@ ok(my $acme_net_clients = $cpmgmt->create_network({
     'ignore-warnings' => 1,
 }), "create network 'acme_net-clients' successful");
 
+ok(my $dns_domains = $cpmgmt->list_dns_domains(),
+    'list DNS domains successful');
+
+ok(my $dns_domain = $cpmgmt->create_dns_domain({
+    name                => '.www.example.org',
+    'is-sub-domain'     => 0,
+    'ignore-warnings'   => 1,
+}), "create DNS domain 'www.example.org' successful");
+
+ok(my $address_ranges = $cpmgmt->list_address_ranges(),
+    'list address ranges successful');
+
+ok(my $acme_range_test = $cpmgmt->create_address_range({
+    name                    => 'acme_range-test',
+    'ipv4-address-first'    => '192.0.2.10',
+    'ipv4-address-last'     => '192.0.2.20',
+    'ignore-warnings'       => 1,
+}), "create address range 'acme_range-test' successful");
+
+ok(my $groups = $cpmgmt->list_groups(),
+    'list groups successful');
+
+ok(my $acme_group_test = $cpmgmt->create_group({
+    name                    => 'acme_grp-test',
+    members                 => [
+        'acme_host-dns1',
+        'acme_net-clients',
+        '.www.example.org',
+        'acme_range-test',
+    ],
+    'ignore-warnings'       => 1,
+}), "create group 'acme_grp-test' successful");
+
 ok(my $tcp_services = $cpmgmt->list_services_tcp(),
     'list TCP services successful');
 
@@ -155,6 +188,20 @@ is($other_service_gre_by_protocol, hash {
 ok(dies {
     $cpmgmt->find_service_other({ 'ip-protocol' => 0 })
 }, "find other service IP protocol 0 fails");
+
+ok(my $service_groups = $cpmgmt->list_service_groups(),
+    'list service groups successful');
+
+ok(my $acme_service_group_test = $cpmgmt->create_service_group({
+    name                    => 'acme_svcgrp-test',
+    members                 => [
+        'tcp_53',
+        'udp_53',
+        'icmp_echo-request',
+        'gre',
+    ],
+    'ignore-warnings'       => 1,
+}), "create service group 'acme_svcgrp-test' successful");
 
 ok(my $ipv4_object_rule = $cpmgmt->create_accessrule({
     layer       => $acl_uid,

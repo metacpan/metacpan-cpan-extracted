@@ -8,7 +8,7 @@ SYNOPSIS
 
        use Syntax::Operator::In;
     
-       if($x in<eq> @some_strings) {
+       if($x in:eq @some_strings) {
           say "x is one of the given strings";
        }
 
@@ -33,6 +33,8 @@ OPERATORS
 
  in
 
+       my $present = $lhs in:OP @rhs;
+    
        my $present = $lhs in<OP> @rhs;
 
     Yields true if the value on the lefhand side is equal to any of the
@@ -43,21 +45,19 @@ OPERATORS
     match, or any other custom infix operator that is registered in the
     XPI_CLS_EQUALITY classification.
 
+    There are currently two accepted forms of the syntax for this operator,
+    using either a prefix colon or a circumfix pair of angle-brackets. They
+    are entirely identical in semantics, differing only in the
+    surface-level syntax to notate them. This is because I'm still entirely
+    undecided on which notation is better in terms of readable neatness,
+    flexibility, parsing ambiguity and so on. This is somewhat of an
+    experiment to see which will eventually win.
+
 TODO
 
       * Improve runtime performance of compiletime-constant sets of
       strings, by detecting when the RHS contains string constants and
       convert it into a hash lookup.
-
-      * Consider further on the syntax for this operator. Maybe instead of
-      the circumfix anglebrackets, a single colon might look nicer?
-
-         $lhs in:OP @rhs
-      
-         $x in:== @numbers
-         $x in:eq @strings
-
-      Does the lacking of end marker make parsing harder though?
 
       * Consider cross-module integration with Syntax::Keyword::Match,
       permitting

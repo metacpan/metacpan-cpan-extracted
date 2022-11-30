@@ -2,7 +2,7 @@ package App::Yath::Command::resources;
 use strict;
 use warnings;
 
-our $VERSION = '1.000133';
+our $VERSION = '1.000136';
 
 use Term::Table();
 use File::Spec();
@@ -10,12 +10,18 @@ use Time::HiRes qw/sleep/;
 
 use App::Yath::Util qw/find_pfile/;
 
+use App::Yath::Options;
 use Test2::Harness::Runner::State;
 use Test2::Harness::Util::File::JSON();
 use Test2::Harness::Util::Queue();
 
 use parent 'App::Yath::Command';
 use Test2::Harness::Util::HashBase qw/+state/;
+
+include_options(
+    'App::Yath::Options::Debug',
+    'App::Yath::Options::Runner',
+);
 
 sub group { 'state' }
 
@@ -58,7 +64,7 @@ sub state {
     if (my $use = newest($info_file, $pfile)) {
         if ($info_file) {
             my $data = Test2::Harness::Util::File::JSON->new(name => $info_file)->read;
-            return $self->{+STATE} = Test2::Harness::Runner::State->new(%$data);
+            return $self->{+STATE} = Test2::Harness::Runner::State->new(%$data, observe => 1);
         }
 
         if (my $pfile = find_pfile($self->settings, no_fatal => 1)) {
@@ -67,26 +73,67 @@ sub state {
             my $settings = Test2::Harness::Util::File::JSON->new(name => "$workdir/settings.json")->read();
 
             return $self->{+STATE} = Test2::Harness::Runner::State->new(
+                observe  => 1,
                 job_count => $settings->{runner}->{job_count} // 1,
                 workdir   => $data->{dir},
             );
         }
     }
 
-    die "No persistent runner, and no running test found.\n";
+    return;
+}
+
+sub shared {
+    my $self = shift;
+
+    my $shared;
+    eval {
+        require Test2::Harness::Runner::Resource::SharedJobSlots;
+        $shared = Test2::Harness::Runner::Resource::SharedJobSlots->new(
+            settings => $self->settings,
+        );
+        1;
+    };
+
+    return $shared;
 }
 
 sub run {
     my $self = shift;
 
-    my $state = $self->state;
+    my $res;
+
+    if(my $state = $self->state) {
+        my @list;
+        $res = sub {
+            unless (@list) {
+                $state->poll;
+                @list = (@{$state->resources}, undef);
+            }
+
+            return shift @list;
+        };
+    }
+    elsif (my $shared = $self->shared) {
+        my $alt = 0;
+        $res = sub {
+            if ($alt) {
+                $alt = 0;
+                return undef;
+            }
+
+            $alt = 1;
+            return $shared;
+        };
+    }
+
+    die "No persistent runner, no running test, and no shared resources found\n"
+        unless $res;
 
     while (1) {
-        $state->poll;
-
         print "\r\e[2J\r\e[1;1H";
         print "\n==== Resource state ====\n";
-        for my $resource (@{$state->resources}) {
+        while (my $resource = $res->()) {
             my @lines = $resource->status_lines;
             next unless @lines;
             print "\nResource: " . ref($resource) . "\n";
@@ -457,6 +504,243 @@ Do not delete directories when done. This is useful if you want to inspect the d
 =item --no-procname-prefix
 
 Add a prefix to all proc names (as seen by ps).
+
+
+=back
+
+=head3 Runner Options
+
+=over 4
+
+=item --abort-on-bail
+
+=item --no-abort-on-bail
+
+Abort all testing if a bail-out is encountered (default: on)
+
+
+=item --blib
+
+=item -b
+
+=item --no-blib
+
+(Default: include if it exists) Include 'blib/lib' and 'blib/arch' in your module path
+
+
+=item --cover
+
+=item --cover=-silent,1,+ignore,^t/,+ignore,^t2/,+ignore,^xt,+ignore,^test.pl
+
+=item --no-cover
+
+Use Devel::Cover to calculate test coverage. This disables forking. If no args are specified the following are used: -silent,1,+ignore,^t/,+ignore,^t2/,+ignore,^xt,+ignore,^test.pl
+
+
+=item --dump-depmap
+
+=item --no-dump-depmap
+
+When using staged preload, dump the depmap for each stage as json files
+
+
+=item --event-timeout SECONDS
+
+=item --et SECONDS
+
+=item --no-event-timeout
+
+Kill test if no output is received within timeout period. (Default: 60 seconds). Add the "# HARNESS-NO-TIMEOUT" comment to the top of a test file to disable timeouts on a per-test basis. This prevents a hung test from running forever.
+
+
+=item --include ARG
+
+=item --include=ARG
+
+=item -I ARG
+
+=item -I=ARG
+
+=item --no-include
+
+Add a directory to your include paths
+
+Can be specified multiple times
+
+
+=item --job-count 4
+
+=item --job-count 8:2
+
+=item --jobs 4
+
+=item --jobs 8:2
+
+=item -j4
+
+=item -j8:2
+
+=item --no-job-count
+
+Set the number of concurrent jobs to run. Add a :# if you also wish to designate multiple slots per test. 8:2 means 8 slots, but each test gets 2 slots, so 4 tests run concurrently. Tests can find their concurrency assignemnt in the "T2_HARNESS_MY_JOB_CONCURRENCY" environment variable.
+
+Can also be set with the following environment variables: C<YATH_JOB_COUNT>, C<T2_HARNESS_JOB_COUNT>, C<HARNESS_JOB_COUNT>
+
+
+=item --lib
+
+=item -l
+
+=item --no-lib
+
+(Default: include if it exists) Include 'lib' in your module path
+
+
+=item --nytprof
+
+=item --no-nytprof
+
+Use Devel::NYTProf on tests. This will set addpid=1 for you. This works with or without fork.
+
+
+=item --post-exit-timeout SECONDS
+
+=item --pet SECONDS
+
+=item --no-post-exit-timeout
+
+Stop waiting post-exit after the timeout period. (Default: 15 seconds) Some tests fork and allow the parent to exit before writing all their output. If Test2::Harness detects an incomplete plan after the test exits it will monitor for more events until the timeout period. Add the "# HARNESS-NO-TIMEOUT" comment to the top of a test file to disable timeouts on a per-test basis.
+
+
+=item --preload-threshold ARG
+
+=item --preload-threshold=ARG
+
+=item --Pt ARG
+
+=item --Pt=ARG
+
+=item -W ARG
+
+=item -W=ARG
+
+=item --no-preload-threshold
+
+Only do preload if at least N tests are going to be run. In some cases a full preload takes longer than simply running the tests, this lets you specify a minimum number of test jobs that will be run for preload to happen. This has no effect for a persistent runner. The default is 0, and it means always preload.
+
+
+=item --preloads ARG
+
+=item --preloads=ARG
+
+=item --preload ARG
+
+=item --preload=ARG
+
+=item -P ARG
+
+=item -P=ARG
+
+=item --no-preloads
+
+Preload a module before running tests
+
+Can be specified multiple times
+
+
+=item --resource Port
+
+=item --resource +Test2::Harness::Runner::Resource::Port
+
+=item -R Port
+
+=item --no-resource
+
+Use a resource module to assign resource assignments to individual tests
+
+Can be specified multiple times
+
+
+=item --runner-id ARG
+
+=item --runner-id=ARG
+
+=item --no-runner-id
+
+Runner ID (usually a generated uuid)
+
+
+=item --shared-jobs-config .sharedjobslots.yml
+
+=item --shared-jobs-config relative/path/.sharedjobslots.yml
+
+=item --shared-jobs-config /absolute/path/.sharedjobslots.yml
+
+=item --no-shared-jobs-config
+
+Where to look for a shared slot config file. If a filename with no path is provided yath will search the current and all parent directories for the name.
+
+
+=item --slots-per-job 2
+
+=item -x2
+
+=item --no-slots-per-job
+
+This sets the number of slots each job will use (default 1). This is normally set by the ':#' in '-j#:#'.
+
+Can also be set with the following environment variables: C<T2_HARNESS_JOB_CONCURRENCY>
+
+
+=item --switch ARG
+
+=item --switch=ARG
+
+=item -S ARG
+
+=item -S=ARG
+
+=item --no-switch
+
+Pass the specified switch to perl for each test. This is not compatible with preload.
+
+Can be specified multiple times
+
+
+=item --tlib
+
+=item --no-tlib
+
+(Default: off) Include 't/lib' in your module path
+
+
+=item --unsafe-inc
+
+=item --no-unsafe-inc
+
+perl is removing '.' from @INC as a security concern. This option keeps things from breaking for now.
+
+Can also be set with the following environment variables: C<PERL_USE_UNSAFE_INC>
+
+
+=item --use-fork
+
+=item --fork
+
+=item --no-use-fork
+
+(default: on, except on windows) Normally tests are run by forking, which allows for features like preloading. This will turn off the behavior globally (which is not compatible with preloading). This is slower, it is better to tag misbehaving tests with the '# HARNESS-NO-PRELOAD' comment in their header to disable forking only for those tests.
+
+Can also be set with the following environment variables: C<!T2_NO_FORK>, C<T2_HARNESS_FORK>, C<!T2_HARNESS_NO_FORK>, C<YATH_FORK>, C<!YATH_NO_FORK>
+
+
+=item --use-timeout
+
+=item --timeout
+
+=item --no-use-timeout
+
+(default: on) Enable/disable timeouts
 
 
 =back

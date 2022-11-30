@@ -8,7 +8,7 @@ use JSON::MaybeXS;
 use Mojo::UserAgent;
 use Ethereum::RPC::Contract;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 has host => (
     is      => 'ro',
@@ -41,10 +41,10 @@ sub AUTOLOAD {
 
     my $res = $self->http_client->post($url => json => $obj)->result;
 
-    return $res->json->{result} unless $res->is_error;
-    return $res->message if $res;
-    return undef;
-
+    # https://eth.wiki/json-rpc/json-rpc-error-codes-improvement-proposal
+    die sprintf("error code: %d, error message: %s (%s)\n", $res->json->{error}->{code}, $res->json->{error}->{message}, $method)
+        if ($res->json->{error}->{message});
+    return $res->json->{result};
 }
 
 =head2 contract

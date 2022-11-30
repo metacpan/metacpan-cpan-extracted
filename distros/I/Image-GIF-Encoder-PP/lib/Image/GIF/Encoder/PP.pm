@@ -1,6 +1,6 @@
 package Image::GIF::Encoder::PP;
 # Copyright (c) 2021-2022 Gavin Hayes, see LICENSE in the root of the project
-use version; our $VERSION = version->declare("v0.1.0");
+use version 0.77; our $VERSION = qv(v0.1.1);
 use strict;
 use warnings;
 
@@ -82,10 +82,8 @@ sub end_key {
     $gif->{'offset'} = $gif->{'partial'} = 0;
 }
 
-use constant {
-    FRAME_CUR  => 0,
-    FRAME_LAST => 1
-};
+use constant FRAME_CUR  => 0;
+use constant FRAME_LAST => 1;
 
 sub put_image {
     my ($gif, $frameindex, $w, $h, $x, $y) = @_;
@@ -167,12 +165,10 @@ sub get_bbox {
     }
 }
 
-use constant {
-    DM_UNSPEC => 0 << 2,
-    DM_DND    => 1 << 2, # Do Not Dispose
-    DM_RTB    => 2 << 2, # Restore To Background (clear pixel)
-    DM_RTP    => 3 << 2  # Restore To Previous (not currently used)
-};
+use constant DM_UNSPEC => 0 << 2;
+use constant DM_DND    => 1 << 2; # Do Not Dispose
+use constant DM_RTB    => 2 << 2; # Restore To Background (clear pixel)
+use constant DM_RTP    => 3 << 2;  # Restore To Previous (not currently used)
 
 sub add_graphics_control_extension {
     my ($gif, $d, $dm) = @_;
@@ -203,10 +199,10 @@ sub new {
         'fd' => undef,
         'offset' => 0,
         'nframes' => 0,
-        #'frame' => '',
-        #'back' => '',
+        'frame' => '',
+        'back' => '',
         'partial' => 0,
-        #'buffer' => ''
+        'buffer' => ''
     };
     vec($gif->{'frame'}, $width*$height-1, 8) = 0;
     vec($gif->{'back'}, $width*$height-1, 8) = 0;

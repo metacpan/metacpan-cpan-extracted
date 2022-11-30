@@ -78,7 +78,7 @@ find-secret-leakage-in-git-diff.pl - find secrets leaking in a Git repository
 
 =head1 VERSION
 
-version 3.3.0
+version 3.3.1
 
 =head1 SYNOPSIS
 
@@ -166,7 +166,7 @@ is found and fails if it finds at least one.
 
 =item * L<How Bad Can It Git? Characterizing Secret Leakage in Public GitHub Repositories|https://blog.acolyer.org/2019/04/08/how-bad-can-it-git-characterizing-secret-leakage-in-public-github-repositories/>
 
-This blog post sumarizes L<a paper by the same
+This blog post summarizes L<a paper by the same
 name|https://www.ndss-symposium.org/ndss-paper/how-bad-can-it-git-characterizing-secret-leakage-in-public-github-repositories/>
 which studies how secrets such as API keys, authorization tokens, and private
 keys are commonly leaked by being inadvertently pushed to GitHub

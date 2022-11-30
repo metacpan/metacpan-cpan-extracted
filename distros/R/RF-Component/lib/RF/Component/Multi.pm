@@ -144,9 +144,9 @@ vector of results, one result for each L<RF::Component> object in the arrayref.
 	# Save to an MDF:
 	$multi->save('mydata.mdf', vars => { pF => 'value' }, ...)
 
-	# Load an MDIF file:
+	# Load an MDIF file and interpolate from 100 MHz to 1GHz (100e6 - 1e9):
 	my $mdf = RF::Component::Multi->load('t/test-data/muRata/muRata-GQM-0402.mdf',
-			load_options => { freq_min_hz => 100e6, freq_count => 1 }
+			load_options => { freq_range => '100e6 - 1e9 x10' }
 		);
 
 	# Query a single component in the MDIF:

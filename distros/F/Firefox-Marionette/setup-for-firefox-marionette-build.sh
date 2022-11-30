@@ -1,6 +1,7 @@
 #! /bin/sh
 
 SUDO="sudo ";
+SUDO_WITH_ENVIRONMENT="$SUDO -E ";
 OSNAME=`uname`;
 case $OSNAME in
 	Linux)
@@ -13,6 +14,7 @@ case $OSNAME in
 						dbus-x11 \
 						firefox \
 						make \
+						mesa-dri-drivers \
 						perl-Archive-Zip \
 						perl-Config-INI \
 						perl-Crypt-URandom \
@@ -81,6 +83,70 @@ case $OSNAME in
 						make \
 						xvfb
 		fi
+		if [ -e "/etc/alpine-release" ]
+		then
+			${SUDO}apk add \
+				dbus-x11 \
+				firefox \
+				mesa-dri-nouveau \
+				perl \
+				perl-archive-zip \
+				perl-config-ini \
+				perl-crypt-urandom \
+				perl-file-homedir \
+				perl-http-daemon \
+				perl-http-message \
+				perl-io-socket-ssl \
+				perl-json \
+				perl-pdf-api2 \
+				perl-term-readkey \
+				perl-test-simple \
+				perl-text-csv_xs \
+				perl-uri \
+				perl-xml-parser \
+				make \
+				xauth \
+				xvfb
+			if [ $? != 0 ]
+			then
+				cat <<"_APK_REPO_";
+
+Check the /etc/apk/repositories file as it needs to have the community and main repos uncommented and
+probably the edge repositories as well, like so;
+
+#/media/cdrom/apks
+http://dl-cdn.alpinelinux.org/alpine/v3.16/main
+http://dl-cdn.alpinelinux.org/alpine/v3.16/community
+http://dl-cdn.alpinelinux.org/alpine/edge/main
+http://dl-cdn.alpinelinux.org/alpine/edge/community
+http://dl-cdn.alpinelinux.org/alpine/edge/testing
+
+_APK_REPO_
+			fi
+		fi
+		;;
+	DragonFly)
+		${SUDO}pkg install -y \
+					firefox \
+					mesa-dri-gallium \
+					perl5 \
+					p5-Archive-Zip \
+					p5-JSON \
+					p5-Config-INI \
+					p5-Crypt-URandom \
+					p5-File-HomeDir \
+					p5-Digest-SHA \
+					p5-HTTP-Daemon \
+					p5-HTTP-Message \
+					p5-IO-Socket-SSL \
+					p5-PDF-API2 \
+					p5-Text-CSV_XS \
+					p5-Term-ReadKey \
+					p5-Test-Simple \
+					p5-XML-Parser \
+					xauth \
+					xorg-vfbserver
+		${SUDO}dbus-uuidgen --ensure=/etc/machine-id
 		;;
 	FreeBSD)
 		${SUDO}pkg install \
@@ -104,6 +170,82 @@ case $OSNAME in
 					xorg-vfbserver
 		${SUDO}mount -t fdescfs fdesc /dev/fd
 		${SUDO}dbus-uuidgen --ensure=/etc/machine-id
+		;;
+	OpenBSD)
+		${SUDO}pkg_add \
+					firefox \
+					p5-Archive-Zip \
+					p5-JSON \
+					p5-Config-INI \
+					p5-Crypt-URandom \
+					p5-File-HomeDir \
+					p5-HTTP-Daemon \
+					p5-HTTP-Message \
+					p5-IO-Socket-SSL \
+					p5-Params-Util \
+					p5-PerlIO-utf8_strict \
+					p5-PDF-API2 \
+					p5-Sub-Exporter \
+					p5-Sub-Uplevel \
+					p5-Sub-Install \
+					p5-Text-CSV_XS \
+					p5-XML-Parser
+		perl -MConfig::INI -e 'exit 0' || PERL_MM_USE_DEFAULT=1 ${SUDO_WITH_ENVIRONMENT} cpan Config::INI
+		perl -MCrypt::URandom -e 'exit 0' || PERL_MM_USE_DEFAULT=1 ${SUDO_WITH_ENVIRONMENT} cpan Crypt::URandom
+		;;
+	NetBSD)
+		PKG_PATH="http://cdn.NetBSD.org/pub/pkgsrc/packages/NetBSD/$(uname -p)/$(uname -r|cut -f '1 2' -d.)/All/"
+		${SUDO}pkg_add \
+					${PKG_PATH}firefox \
+					${PKG_PATH}p5-Archive-Zip \
+					${PKG_PATH}p5-JSON \
+					${PKG_PATH}p5-Config-INI \
+					${PKG_PATH}p5-Crypt-URandom \
+					${PKG_PATH}p5-File-HomeDir \
+					${PKG_PATH}p5-HTTP-Daemon \
+					${PKG_PATH}p5-HTTP-Message \
+					${PKG_PATH}p5-IO-Socket-SSL \
+					${PKG_PATH}p5-Params-Util \
+					${PKG_PATH}p5-PerlIO-utf8_strict \
+					${PKG_PATH}p5-PDF-API2 \
+					${PKG_PATH}p5-Sub-Exporter \
+					${PKG_PATH}p5-Sub-Uplevel \
+					${PKG_PATH}p5-Sub-Install \
+					${PKG_PATH}p5-Text-CSV_XS \
+					${PKG_PATH}p5-XML-Parser
+		if [ $? != 0 ]
+		then
+			cat <<_PKG_PATH_
+
+pkg_add failed. PKG_PATH was set to $PKG_PATH
+
+_PKG_PATH_
+		fi
+		;;
+	CYGWIN_NT*)
+		PACKAGE_LIST="perl-Archive-Zip"
+		for PACKAGE in perl-JSON \
+					perl-Config-INI \
+					perl-File-HomeDir \
+					perl-Digest-SHA \
+					perl-HTTP-Daemon \
+					perl-HTTP-Message \
+					perl-IO-Socket-SSL \
+					perl-PDF-API2 \
+					perl-PerlIO-utf8_strict \
+					perl-Sub-Exporter \
+					perl-Sub-Uplevel \
+					perl-Text-CSV_XS \
+					perl-Term-ReadKey \
+					perl-Test-Simple \
+					perl-XML-Parser
+		do
+			PACKAGE_LIST="$PACKAGE_LIST,$PACKAGE"
+		done
+		SETUP_EXE=`find /cygdrive -name 'setup-x86_64.exe' -exec grep -ail 'Cygwin installation tool' {} \;`
+		$SETUP_EXE -q -P $PACKAGE_LIST
+		perl -MConfig::INI -e 'exit 0' || PERL_MM_USE_DEFAULT=1 cpan Config::INI
+		perl -MPDF::API2 -e 'exit 0' || PERL_MM_USE_DEFAULT=1 cpan PDF::API2
 		;;
 	*)
 		echo "Any help with patching '$OSNAME' support would be awesome???"

@@ -1,4 +1,6 @@
 #include "apricot.h"
+#include "guts.h"
+#include "img_conv.h"
 #include "Drawable.h"
 #include "Drawable_private.h"
 
@@ -96,17 +98,17 @@ render_point(
 		double f;
 		f = v[s] / v[s+2];
 		if ( result )
-			result-> x = ( f < 0 ) ? (f - .5) : (f + .5);
+			result-> x = floor( f + .5 );
 		else
 			nresult-> x = f;
 		f = v[s+1] / v[s+2];
 		if ( result )
-			result-> y = ( f < 0 ) ? (f - .5) : (f + .5);
+			result-> y = floor( f + .5 );
 		else
 			nresult-> y = f;
 	} else if ( result ) {
-		result-> x = (v[s] < 0) ? (v[s] - .5) : (v[s] + .5);
-		result-> y = (v[s+1] < 0) ? (v[s+1] - .5) : (v[s+1] + .5);
+		result-> x = floor(v[s] + .5);
+		result-> y = floor(v[s+1] + .5);
 	} else {
 		nresult-> x = v[s];
 		nresult-> y = v[s+1];
@@ -362,6 +364,564 @@ EXIT:
 	}
 }
 
+
+#define PI 3.14159265358979323846264338327950288419716939937510
+#define PI_2 (PI / 2)
+#define PI_4 (PI / 4)
+#define RAD (180.0 / PI)
+#define SQRT_2 1.4142135623731
+
+#define NEW_CMD(w,cmd)    av_push((w).path, newSVpv(cmd,0));
+#define ADD_SV(w,sv)      av_push((w).path, sv)
+#define ADD_AV(w)         av_push((w).path, newRV_noinc((SV*) av))
+
+#define ADD_ARC(x,y,dx,dy,as,ae) { \
+	av = newAV();              \
+	av_push(av, newSVnv(x));   \
+	av_push(av, newSVnv(y));   \
+	av_push(av, newSVnv(dx));  \
+	av_push(av, newSVnv(dy));  \
+	av_push(av, newSVnv(as));  \
+	av_push(av, newSVnv(ae));  \
+}
+
+typedef struct {
+	AV                  *path;
+	NPolyPolyline       *poly;
+	DrawablePaintState  *state;
+	Bool                 integer_precision;
+	semistatic_t         lines;
+	double               lw2;
+	List                 up, down; /* store either full av-formed commands or pointers to line_storage here */ 
+	int                  datum_size;
+	char                *datum_type;
+} WidenStruct;
+
+static void
+collide_commands(WidenStruct *w)
+{
+	SV * sv;
+	int i, j, n, n_up_cmd, m;
+	List *up   = &w->up, *down = &w->down;
+	void *heap = w->lines.heap;
+
+/* direct order from up and reverse order from down */
+#define ITEM(x)   (( x < n_up_cmd ) ? up->items[x << 1]       : down->items[down->count - ((x - n_up_cmd) << 1) - 2])
+#define PARAM(x)  (( x < n_up_cmd ) ? up->items[(x << 1) + 1] : down->items[down->count - ((x - n_up_cmd) << 1) - 1])
+	n = (up->count + down->count) / 2;
+	n_up_cmd = up->count / 2;
+	for ( i = 0; i < n; i++) {
+		if ( ITEM(i) != leCmdLine ) {
+			switch (ITEM(i)) {
+			case leCmdArc:   NEW_CMD(*w, "arc");  break;
+			case leCmdConic: NEW_CMD(*w, "conic"); break;
+			case leCmdCubic: NEW_CMD(*w, "cubic"); break;
+			default:
+				warn("panic: bad internal path array");
+				continue;
+			}
+			ADD_SV(*w, newRV_noinc((SV*) PARAM(i)));
+			continue;
+		}
+		for ( j = i, m = 0; j < n; j++ ) {
+			if ( ITEM(j) != leCmdLine ) break;
+			m++;
+		}
+		sv = prima_array_new(w->datum_size * m * 2);
+		if ( w->integer_precision ) {
+			int *dest = (int*) prima_array_get_storage(sv);
+			for ( j = i; j < i + m; j++ ) {
+				int *src = ((int*)(heap)) + (int) PARAM(j);
+				*(dest++) = *(src++);
+				*(dest++) = *(src++);
+			}
+		} else {
+			double *dest = (double*) prima_array_get_storage(sv);
+			for ( j = i; j < i + m; j++ ) {
+				double *src = ((double*)(heap)) + (int) PARAM(j);
+				*(dest++) = *(src++);
+				*(dest++) = *(src++);
+			}
+		}
+
+		NEW_CMD(*w, "line");
+		ADD_SV(*w, prima_array_tie( sv, w->datum_size, w->datum_type));
+		i += m - 1;
+	}
+#undef ITEM
+#undef PARAM
+	w->up.count = w->down.count = 0;
+}
+
+static Bool
+temp_add_point(WidenStruct *w, List* list, double x, double y)
+{
+	if ( list_add(list,leCmdLine) < 0) return false;
+	if ( !semistatic_expand(&w->lines,w->lines.count+2)) return false;
+	if ( list_add(list, (Handle)w->lines.count) < 0) return false;
+	if ( w->integer_precision ) {
+		semistatic_push(w->lines, int, floor(x + .5));
+		semistatic_push(w->lines, int, floor(y + .5));
+	} else {
+		semistatic_push(w->lines, double, x);
+		semistatic_push(w->lines, double, y);
+	}
+	return true;
+}
+
+static Bool
+temp_add_arc(List *list, double x, double y, double d1, double d2, double as, double ae)
+{
+	AV *av;
+	if ( list_add(list,leCmdArc) < 0) return false;
+	ADD_ARC(x,y,d1,d2,as,ae);
+	if ( list_add(list,(Handle) av) < 0) {
+		av_undef(av);
+		return false;
+	}
+	return true;
+}
+
+#define TEMP_ADD_POINT(w,list,x,y) \
+	if ( !temp_add_point(w,list,x,y)) goto FAIL;
+#define TEMP_ADD_ARC(list,x,y,d,as,ae) \
+	if ( !temp_add_arc(list,x,y,d,d,as,ae)) goto FAIL;
+
+static Bool
+temp_add_spline(List *list, PPathCommand pc, NPoint o, double s, double c, double lw2)
+{
+	int i;
+	AV *av;
+	if ( list_add(list, pc->command) < 0) return false;
+	av = newAV();
+	for ( i = 0; i < pc->n_args;  ) {
+		double x = pc->args[i++] * lw2;
+		double y = pc->args[i++] * lw2;
+		av_push( av, newSVnv( x * c - y * s + o.x ));
+		av_push( av, newSVnv( x * s + y * c + o.y ));
+	}
+	if ( list_add(list,(Handle) av) < 0) {
+		av_undef(av);
+		return false;
+	}
+	return true;
+}
+
+static Bool
+lineend_Square( WidenStruct *w, NPoint o, double theta)
+{
+	if ( !temp_add_point( w, &w->up, o.x - SQRT_2 * w->lw2 * cos(theta - PI_4), o.y - w->lw2 * SQRT_2 * sin(theta - PI_4)))
+		return false;
+	if ( !temp_add_point( w, &w->up, o.x - SQRT_2 * w->lw2 * cos(theta + PI_4), o.y - w->lw2 * SQRT_2 * sin(theta + PI_4)))
+		return false;
+	return true;
+}
+
+static Bool
+lineend_Round( WidenStruct *w, NPoint o, double theta)
+{
+	return temp_add_arc( &w->up,
+		o.x, o.y, w->state->line_width, w->state->line_width,
+		RAD * (theta + PI_2), RAD * (theta + 3 * PI_2)
+	);
+}
+
+static Bool
+lineend_Custom( WidenStruct *w, NPoint o, double theta, int index)
+{
+	int i, j;
+	PPathCommand *pc;
+	PPath p    = w->state->line_end[index].path;
+	double
+		s  = sin(theta + PI_2),
+		c  = cos(theta + PI_2);
+
+	c = floor( c * 1.0e15 + .5 ) / 1.0e15;
+	s = floor( s * 1.0e15 + .5 ) / 1.0e15;
+
+	if ( !temp_add_point( w, &w->up,
+		w->lw2 * c + o.x,
+		w->lw2 * s + o.y
+		)) return false;
+
+	for ( i = 0, pc = p->commands; i < p->n_commands; i++, pc++) {
+		double *pts = (*pc)->args;
+		switch ((*pc)->command ) {
+		case leCmdLine:
+			for ( j = 0; j < (*pc)->n_args;  ) {
+				double x = pts[j++] * w->lw2;
+				double y = pts[j++] * w->lw2;
+				if ( !temp_add_point( w, &w->up,
+					x * c - y * s + o.x,
+					x * s + y * c + o.y
+					))
+					return false;
+			}
+			break;
+		case leCmdConic:
+		case leCmdCubic:
+			if ( !temp_add_spline( &w->up, *pc, o, s, c, w->lw2))
+				return false;
+			break;
+		default:
+			warn("panic: bad line_end #%d structure", i);
+			return false;
+		}
+	}
+
+	if ( !temp_add_point( w, &w->up,
+		-w->lw2 * c + o.x,
+		-w->lw2 * s + o.y
+		)) return false;
+
+	return true;
+}
+
+static Bool
+lineend_Flat( WidenStruct *w, NPoint o, double theta)
+{
+	double s = sin(theta + PI_2), c = cos(theta + PI_2);
+	if ( !temp_add_point( w, &w->up, o.x + w->lw2 * c, o.y + w->lw2 * s))
+		return false;
+	if ( !temp_add_point( w, &w->up, o.x - w->lw2 * c, o.y - w->lw2 * s))
+		return false;
+	return true;
+}
+
+static Bool
+widen_line(AV * path, NPolyPolyline *poly, DrawablePaintState *state, Bool integer_precision)
+{
+	Byte line_storage[16384];
+	NPolyPolyline* p, *last_p;
+	int n_points;
+	WidenStruct w;
+
+	Bool ok = false, no_line_ends;
+
+	w.path              = path;
+	w.poly              = poly;
+	w.integer_precision = integer_precision;
+	w.datum_size        = integer_precision ? sizeof(int) : sizeof(double);
+	w.datum_type        = integer_precision ? "i" : "d";
+	w.state             = state;
+	w.lw2               = state->line_width / 2;
+
+	p = last_p = poly;
+	if ( !p ) return false;
+	n_points = 0;
+	while (p) {
+		n_points += p->n_points;
+		p = p->next;
+		if (p) last_p = p;
+	}
+	list_create( &w.up,   n_points, n_points );
+	list_create( &w.down, n_points, n_points );
+
+	no_line_ends = state->line_width < 2.5 && integer_precision;
+
+	semistatic_init(&w.lines, &line_storage, w.datum_size, sizeof(line_storage) / w.datum_size);
+
+	p = poly;
+	while (p) {
+		Bool closed;
+		int i, last, firstsign = 0;
+		NPoint firstin = p->points[0], firstout = p->points[0]; /* no need, just to hush warnings */
+
+		if ( p-> n_points == 0 ) goto NEXT;
+		closed =
+			(p->points[0].x == p->points[p->n_points-1].x) &&
+			(p->points[0].y == p->points[p->n_points-1].y);
+		last = p->n_points - (closed ? 2 : 1);
+
+		if ( last <= 0 ) {
+			/* single pixel line */
+			int j, indexes[2];
+			Bool shape_used = false;
+			double theta    = p->theta;
+			NPoint f        = p->points[0];
+
+			indexes[0] = (p == poly)   ? 2 : 0;
+			indexes[1] = (p == last_p) ? 3 : 1;
+			for ( j = 0; j < 2; j++) {
+				int ix = indexes[j], type;
+				while ( ix > 0 && state->line_end[ix].type == leDefault) 
+					ix = (ix == 3) ? 1 : 0;
+				type = state->line_end[ix].type;
+				if ( type != leCustom && no_line_ends )
+					type = leSquare;
+
+				switch (type) {
+				case leSquare:
+					shape_used = true;
+					lineend_Square(&w, f, theta);
+					break;
+				case leRound:
+					shape_used = true;
+					lineend_Round(&w, f, theta);
+					break;
+				case leCustom:
+					shape_used = true;
+					lineend_Custom(&w, f, theta, ix);
+					break;
+				}
+				theta += PI;
+			}
+			if ( shape_used ) {
+				collide_commands(&w);
+				NEW_CMD(w, "open");
+				ADD_SV(w, NULL_SV);
+			}
+			goto NEXT;
+		}
+
+		for ( i = 0; i <= last; i++) {
+			/* end points */
+			if ( !closed && ( i == 0 || i == last )) {
+				Bool ok;
+				NPoint
+					o    = p->points[i],
+					a    = p->points[i ? last - 1 : 1];
+				int    ix    = (i == 0) ?
+						((p == poly  ) ? 2 : 0) :
+						((p == last_p) ? 3 : 1);
+				int    type;
+				double theta = atan2( a.y - o.y, a.x - o.x );
+				while ( ix > 0 && state->line_end[ix].type == leDefault) 
+					ix = (ix == 3) ? 1 : 0;
+				type = (state->line_end[ix].type != leCustom && no_line_ends) ?
+					leFlat :
+					state->line_end[ix].type;
+				switch ( type ) {
+				case leSquare : ok = lineend_Square(&w, o, theta);     break;
+				case leRound  : ok = lineend_Round (&w, o, theta);     break;
+				case leCustom : ok = lineend_Custom(&w, o, theta, ix); break;
+				default       : ok = lineend_Flat  (&w, o, theta);
+				}
+				if ( !ok ) goto FAIL;
+			} else {
+				/* normal points */
+				int prev, next, sign, lj;
+				NPoint o, a, b, da, db, d1, d2;
+				double theta, alpha;
+				List *in, *out;
+				if ( i > 0 && i < last ) {
+					prev = i - 1;
+					next = i + 1;
+				} else if ( i == 0 ) {
+					prev = last;
+					next = i + 1;
+				} else {
+					prev = i - 1;
+					next = 0;
+				}
+				o = p->points[i];
+				a = p->points[prev];
+				b = p->points[next];
+				da.x = o.x - a.x;
+				da.y = o.y - a.y;
+				db.x = b.x - o.x;
+				db.y = b.y - o.y;
+				theta = atan2( da.y, da.x );
+				alpha = atan2( db.y, db.x ) - theta;
+				alpha += PI * (( alpha > 0 ) ? -1 : 1);
+				/* XXX if ( alpha == 0.0 ) continue */
+				sign  = (alpha > 0) ? -1 : 1;
+				if ( alpha > 0 ) {
+					in  = &w.up;
+					out = &w.down;
+				} else {
+					in  = &w.down;
+					out = &w.up;
+				}
+				d1.x = sign * w.lw2 * cos(theta + PI_2);
+				d1.y = sign * w.lw2 * sin(theta + PI_2);
+				d2.x = sign * w.lw2 * cos(theta + alpha + PI_2);
+				d2.y = sign * w.lw2 * sin(theta + alpha + PI_2);
+
+				lj = state-> line_join;
+#define DMIN 3
+				if (
+					lj != ljMiter &&
+					fabs(da.x) < DMIN &&
+					fabs(da.y) < DMIN &&
+					fabs(db.x) < DMIN &&
+					fabs(db.y) < DMIN
+				)
+					lj = ljMiter;
+				if ( lj == ljMiter && (
+					alpha == 0.0 ||
+					( state-> miter_limit < fabs( 1.0 / sin( alpha / 2 )))
+				))
+					lj = ljBevel;
+#undef DMIN
+				if ( i == 0 ) {
+					firstin.x = o.x + d1.x;
+					firstin.y = o.y + d1.y;
+					firstsign = sign;
+				}
+				if ( da.x == 0.0 && da.y == 0.0 ) continue;
+				if ( db.x == 0.0 && db.y == 0.0 ) continue;
+				TEMP_ADD_POINT( &w, in, o.x + d1.x, o.y + d1.y );
+				TEMP_ADD_POINT( &w, in, o.x - d2.x, o.y - d2.y );
+				if ( lj == ljMiter ) {
+					double miter_width = fabs(w.lw2 / cos(PI_2 - fabs(alpha) / 2));
+					NPoint apex = {
+						o.x + miter_width * cos(theta + alpha / 2),
+						o.y + miter_width * sin(theta + alpha / 2)
+					};
+					TEMP_ADD_POINT(&w, out, apex.x, apex.y);
+					if ( i == 0 ) firstout = apex;
+				} else if ( lj == ljBevel || no_line_ends ) {
+					if ( i == 0 ) {
+						firstout.x = o.x - d1.x;
+						firstout.y = o.y - d1.y;
+					}
+					TEMP_ADD_POINT( &w, out, o.x - d1.x, o.y - d1.y );
+					TEMP_ADD_POINT( &w, out, o.x + d2.x, o.y + d2.y );
+				} else {
+					NPoint arc;
+					if ( i == 0 ) {
+						firstout.x = o.x - d1.x;
+						firstout.y = o.y - d1.y;
+					}
+					if ( alpha > 0 ) {
+						arc.x = theta + alpha - PI_2;
+						arc.y = theta + PI_2;
+					} else {
+						arc.x = theta - PI_2;
+						arc.y = theta + alpha + PI_2;
+					}
+					TEMP_ADD_ARC(out, o.x, o.y, state->line_width, RAD * arc.x, RAD * arc.y );
+				}
+
+				if ( i == last ) {
+					if ( sign != firstsign ) {
+						NPoint f = firstin;
+						firstin = firstout;
+						firstout = f;
+					}
+					TEMP_ADD_POINT(&w, in,  firstin.x, firstin.y);
+					TEMP_ADD_POINT(&w, out, firstout.x,firstout.y);
+				}
+			}
+		}
+
+	NEXT:
+		collide_commands(&w);
+		NEW_CMD(w, "open");
+		ADD_SV(w, NULL_SV);
+		p = p->next;
+	}
+	ok = true;
+
+FAIL:
+	if ( !ok ) {
+		int i;
+		for ( i = 0; i < w.up.count; i+=2)
+			if (w.up.items[i] != leCmdLine)
+				av_undef((AV*) w.up.items[i+1]);
+		for ( i = 0; i < w.down.count; i+=2)
+			if (w.down.items[i] != leCmdLine)
+				av_undef((AV*) w.down.items[i+1]);
+	}
+	semistatic_done(&w.lines);
+	list_destroy( &w.down );
+	list_destroy( &w.up );
+	return ok;
+}
+
+#undef NEW_CMD
+#undef ADD_SV
+#undef ADD_ARC
+#undef TEMP_ADD_POINT
+#undef TEMP_ADD_ARC
+
+/* produce a closed shape so eventual fill() won't try to autoclose it */
+static SV*
+render_line2fill(NPoint *buffer, int count, Bool as_integer)
+{
+	SV *sv;
+	void * storage;
+
+	sv = prima_array_new(count * 4 * (as_integer ? sizeof(int) : sizeof(double)));
+	storage = prima_array_get_storage(sv);
+	prima_array_convert(count * 2, buffer, 'd', storage, as_integer ? 'i' : 'd');
+
+#define REVCPY(type)                                                  \
+	type *src = storage, *dst = ((type*)storage) + count * 4 - 1; \
+	while (src < dst) {                                           \
+		register type x = *(src++);                           \
+		*(dst--) = *(src++);                                  \
+		*(dst--) = x;                                         \
+	}
+	if ( as_integer ) {
+		REVCPY(int);
+	} else {
+		REVCPY(double);
+	}
+#undef REVCPY
+
+	return prima_array_tie( sv,
+		as_integer ? sizeof(int) : sizeof(double),
+		as_integer ? "i" : "d");
+}
+
+static SV *
+render_wide_line( NPoint *points, unsigned int n_points, DrawablePaintState *state, unsigned char * line_pattern, Bool integer_precision )
+{
+	AV* path;
+	NPolyPolyline* poly = NULL, static_poly;
+	Bool ok = false;
+
+	if (
+		state-> line_width < 0.0 ||
+		state-> miter_limit < 0.0 ||
+		state-> line_join < 0 || state-> line_join > ljMax
+	)
+		return NULL;
+
+	if (
+		(strcmp((char*) line_pattern, (char*) lpSolid) == 0) &&
+		integer_precision && state->line_width <= 1.5
+	)
+		return NULL;
+
+	if ( !( poly  = img_polyline2patterns(points, n_points, state->line_width, line_pattern, integer_precision))) {
+		poly = &static_poly;
+		poly-> next     = NULL;
+		poly-> prev     = NULL;
+		poly-> n_points = n_points;
+		poly-> points   = points;
+	}
+
+	path = newAV();
+
+	if (integer_precision && state->line_width <= 1.5) {
+		/* no line widening, return as is */
+		NPolyPolyline* p = poly;
+		while (p) {
+			av_push( path, newSVpv("line", 0));
+			av_push( path, render_line2fill( p->points, p->n_points, integer_precision));
+			av_push( path, newSVpv("open", 0));
+			p = p->next;
+		}
+		ok = true;
+	} else
+		ok = widen_line( path, poly, state, integer_precision );
+
+	if ( poly != &static_poly ) 
+		while (poly) {
+			NPolyPolyline* p = poly->next;
+			free(poly);
+			poly = p;
+		}
+
+	if ( ok ) return newRV_noinc((SV*) path);
+
+	av_undef( path );
+	return NULL;
+}
+
 SV *
 Drawable_render_polyline( SV * obj, SV * points, HV * profile)
 {
@@ -369,36 +929,28 @@ Drawable_render_polyline( SV * obj, SV * points, HV * profile)
 	int count;
 	Bool free_input = false, free_buffer = false, as_integer = false;
 	double *input = NULL, *buffer = NULL, box[4];
-	SV * ret;
+	SV * ret = NULL_SV;
 	void * storage;
 
 	if (( input = (double*) prima_read_array( points, "render_polyline", 'd', 2, 1, -1, &count, &free_input)) == NULL)
-		goto FAIL;
+		goto EXIT;
 
 	if ( pexist(integer)) as_integer = pget_B(integer);
 
 	if ( pexist(matrix) ) {
-		int i;
-		double *src, *dst, *cmatrix;
+		double *cmatrix;
 		if (( cmatrix = (double*) prima_read_array(
 			pget_sv(matrix),
 			"render_polyline.matrix", 'd', 1, 6, 6, NULL, NULL)
 		) == NULL) 
-			goto FAIL;
+			goto EXIT;
 		if ( !( buffer = malloc(sizeof(double) * 2 * count))) {
 			free(cmatrix);
 			warn("Not enough memory");
-			goto FAIL;
+			goto EXIT;
 		}
 		free_buffer = true;
-
-		for ( i = 0, src = input, dst = buffer; i < count; i++) {
-			double x,y;
-			x = *(src++);
-			y = *(src++);
-			*(dst++) = cmatrix[0] * x + cmatrix[2] * y + cmatrix[4];
-			*(dst++) = cmatrix[1] * x + cmatrix[3] * y + cmatrix[5];
-		}
+		prima_matrix_apply2( cmatrix, (NPoint*)input, (NPoint*)buffer, count);
 		free(cmatrix);
 	} else {
 		buffer = input;
@@ -429,22 +981,52 @@ Drawable_render_polyline( SV * obj, SV * points, HV * profile)
 		free_buffer = false;
 		buffer = box;
 		count  = 2;
+	} else if (pexist(path) && pget_B(path)) {
+		Handle self;
+		DrawablePaintState state;
+		unsigned char * line_pattern;
+
+		self = gimme_the_mate(obj);
+		if ( self ) {
+			state = var->current_state;
+		} else {
+			state.line_width       = 1.0;
+			state.miter_limit      = 10.0;
+			state.line_join        = ljMiter;
+			state.line_end[0].type = leSquare;
+			state.line_end[1].type = state.line_end[2].type = state.line_end[3].type = leDefault;
+		}
+		line_pattern = lpSolid; 
+
+		if ( pexist(lineWidth))
+			state.line_width = pget_f(lineWidth);
+		if ( pexist(miterLimit))
+			state.miter_limit = pget_f(miterLimit);
+		if ( pexist(lineEnd))
+			if ( !Drawable_read_line_ends(pget_sv(lineEnd), &state))
+				goto EXIT;
+		if ( pexist(lineJoin))
+			state.line_join = pget_i(lineJoin);
+		if ( pexist(linePattern))
+			line_pattern = (unsigned char*) pget_c(linePattern);
+		else if (self != NULL_HANDLE) {
+			SV * lp = my->get_linePattern(self);
+			if ( lp && lp != NULL_SV) line_pattern = (unsigned char*) SvPV_nolen(lp);
+		}
+
+		ret = render_wide_line(( NPoint*) buffer, count, &state, line_pattern, as_integer );
+		if ( ret == NULL ) {
+			AV * av = newAV();
+			av_push(av, newSVpv("line", 0));
+			av_push(av, render_line2fill((NPoint*) buffer, count, as_integer));
+			ret = newRV_noinc((SV*) av);
+		}
+		goto EXIT;
 	}
 
 	ret = prima_array_new(count * 2 * (as_integer ? sizeof(int) : sizeof(double)));
 	storage = prima_array_get_storage(ret);
-	if ( as_integer ) {
-		int i, *dst;
-		double *src;
-		for ( i = 0, src = buffer, dst = (int*)storage; i < count; i++) {
-			register double x;
-			x = *(src++);
-			*(dst++) = x + ((x < 0) ? -.5 : +.5);
-			x = *(src++);
-			*(dst++) = x + ((x < 0) ? -.5 : +.5);
-		}
-	} else
-		memcpy(storage, buffer, count * 2 * sizeof(double));
+	prima_array_convert(count * 2, buffer, 'd', storage, as_integer ? 'i' : 'd');
 
 	if ( free_buffer ) free( buffer );
 	if ( free_input ) free(input);
@@ -454,11 +1036,11 @@ Drawable_render_polyline( SV * obj, SV * points, HV * profile)
 		as_integer ? sizeof(int) : sizeof(double),
 		as_integer ? "i" : "d");
 
-FAIL:
+EXIT:
 	if ( free_buffer ) free( buffer );
 	if ( free_input ) free(input);
 	hv_clear(profile); /* old gencls bork */
-	return NULL_SV;
+	return ret;
 }
 
 SV *

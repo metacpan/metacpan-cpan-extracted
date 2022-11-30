@@ -1,16 +1,16 @@
 package App::hr;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-10'; # DATE
-our $DIST = 'App-hr'; # DIST
-our $VERSION = '0.267'; # VERSION
-
 use feature 'say';
 use strict 'subs', 'vars';
 use warnings;
 
-use Exporter;
-our @ISA = qw(Exporter);
+use Exporter 'import';
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-09-03'; # DATE
+our $DIST = 'App-hr'; # DIST
+our $VERSION = '0.268'; # VERSION
+
 our @EXPORT_OK = qw(
                        hr
                        hr_r
@@ -21,7 +21,7 @@ our %SPEC;
 
 # from Code::Embeddable
 sub pick {
-    return undef unless @_;
+    return unless @_;
     return $_[@_*rand];
 }
 
@@ -50,7 +50,7 @@ sub hr {
         } elsif (defined $ENV{COLOR}) {
             $ENV{COLOR};
         } else {
-            (-t STDOUT);
+            (-t STDOUT); ## no critic: InputOutput::ProhibitInteractiveTest
         }
     };
     undef $color unless $do_color;
@@ -253,7 +253,7 @@ App::hr - Print horizontal bar on the terminal
 
 =head1 VERSION
 
-This document describes version 0.267 of App::hr (from Perl distribution App-hr), released on 2021-07-10.
+This document describes version 0.268 of App::hr (from Perl distribution App-hr), released on 2022-09-03.
 
 =head1 SYNOPSIS
 
@@ -282,14 +282,8 @@ You can also use the provided CLI L<hr>.
 
 A demo screencast:
 
-=for html <img src="https://st.aticpan.org/source/PERLANCAR/App-hr-0.267/share/images/screencast1.gif" />
+=for html <img src="https://st.aticpan.org/source/PERLANCAR/App-hr-0.268/share/images/screencast1.gif" />
 
-
-=head1 CONTRIBUTOR
-
-=for stopwords Steven Haryanto
-
-Steven Haryanto <sharyanto@cpan.org>
 
 =head1 FUNCTIONS
 
@@ -435,14 +429,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-hr>.
 
 Source repository is at L<https://github.com/perlancar/perl-App-hr>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-hr>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<ruler> (L<App::ruler>)
@@ -451,11 +437,43 @@ L<ruler> (L<App::ruler>)
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2018, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2021, 2020, 2018, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-hr>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

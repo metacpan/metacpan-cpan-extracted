@@ -28,6 +28,7 @@ my @files = (
     't/data/67b8ab574fc3a9a9fd6a0bdaf1231b14.yaml',
     't/data/6f833459bced8cdc42950602d7798680.yaml',
     't/data/7af843bd9c3dad1a054d79ac3f3589c3.yaml',
+    't/data/7b0ee9e9f72f710b9ba858f7d6d29a6e.yaml',
     't/data/83fa7359bc8057bac3f2c4acc452740d.yaml',
     't/data/86a4626fee7782296c09fa39a08ff2d1.yaml',
     't/data/8e44959d30eba57a6feb950e286c977b.yaml',
@@ -35,10 +36,12 @@ my @files = (
     't/data/90b344da741283aed6558f915732b421.yaml',
     't/data/90ff8b49f7fe0526b986d116f4e0c43f.yaml',
     't/data/a3f74b54b664d2f0903f2cb8a110b4cd.yaml',
+    't/data/a56b0b5342eff58ef690cec001771282.yaml',
     't/data/adb23949c66b74145bc0f8084e7307a1.yaml',
     't/data/bb8856f6a2f36d1ff8f747b8f280b3a6.yaml',
     't/data/c06ac2c4540f4e87bd5bb3c70ac39cb0.yaml',
     't/data/c1352d43776bbf2acfb45344101cd74b.yaml',
+    't/data/c65a1749e83c026ab9c37097dc3232be.yaml',
     't/data/e86919071a958d4f24bc13751c2cab47.yaml',
     't/data/f94cae02dd7ef975df7bfd365109690c.yaml'
 );

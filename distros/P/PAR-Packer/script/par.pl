@@ -154,13 +154,13 @@ followed by a 8-bytes magic string: "C<\012PAR.pm\012>".
 
 =cut
 
-my ($PAR_MAGIC, $FILE_offset_size, $CACHE_marker, $cache_name_size);
+my ($PAR_MAGIC, $FILE_offset_size, $cache_name_size);
 # NOTE: must initialize them in BEGIN as they are used in BEGIN below
 BEGIN {
     $PAR_MAGIC = "\nPAR.pm\n";
     $FILE_offset_size = 4;   # pack("N")
-    $cache_marker = "\0CACHE";
     $cache_name_size = 40;
+    $PKZIP_MAGIC = "PK\003\004";
 }
 
 
@@ -173,13 +173,12 @@ sub find_par_magic
     my $buf;
     my $size = -s $fh;
 
-    my $pos = $size - $size % $chunk_size;      # NOTE: $pos is a multiple of $chunk_size
+    my $pos = ($size-1) - ($size-1) % $chunk_size;      # NOTE: $pos is a multiple of $chunk_size
     while ($pos >= 0) {
         seek $fh, $pos, 0;
         read $fh, $buf, $chunk_size + length($PAR_MAGIC);
         if ((my $i = rindex($buf, $PAR_MAGIC)) >= 0) {
-            $pos += $i;
-            return $pos;
+            return $pos + $i;
         }
         $pos -= $chunk_size;
     }
@@ -259,7 +258,7 @@ _set_par_temp();
 outs(qq[\$ENV{PAR_TEMP} = "$ENV{PAR_TEMP}"]);
 
 # Magic string checking and extracting bundled modules {{{
-my ($start_pos, $data_pos);
+my ($start_pos, $start_of_FILE_section);
 MAGIC: {
     local $SIG{__WARN__} = sub {};
 
@@ -277,6 +276,15 @@ MAGIC: {
     }
     outs("Found PAR magic at position $magic_pos");
 
+    # Check for "\0CACHE" 4 bytes below the signature
+    seek _FH, $magic_pos - $FILE_offset_size - length("\0CACHE"), 0;
+    read _FH, $buf, length("\0CACHE");
+    if ($buf ne "\0CACHE" && $buf ne "\0CLEAN") {
+        outs("No cache marker found");
+        last MAGIC;
+    }
+    outs(qq[Cache marker "$buf" found]);
+
     # Seek 4 bytes backward from the signature to get the offset of the
     # first embedded FILE, then seek to it
     seek _FH, $magic_pos - $FILE_offset_size, 0;
@@ -284,7 +292,7 @@ MAGIC: {
     my $offset = unpack("N", $buf);
     outs("Offset from start of FILEs is $offset");
     seek _FH, $magic_pos - $FILE_offset_size - $offset, 0;
-    $data_pos = tell _FH;
+    $start_of_FILE_section = tell _FH;
 
     # }}}
 
@@ -384,7 +392,7 @@ MAGIC: {
 
     # }}}
 
-    unless ($buf eq "PK\003\004") {
+    if ($buf ne $PKZIP_MAGIC) {
         outs(qq[No zip found after FILE section in file "$progname"]);
         last MAGIC ;
     }
@@ -508,7 +516,7 @@ if ($out) {
         open my $ph, '<:raw', $par or die qq[Can't read par file "$par": $!];
         my $buf;
         read $ph, $buf, 4;
-        die qq["$par" is not a par file] unless $buf eq "PK\003\004";
+        die qq["$par" is not a par file] unless $buf eq $PKZIP_MAGIC;
         close $ph;
     }
 
@@ -516,7 +524,7 @@ if ($out) {
 
     my $fh = IO::File->new(
         $out,
-        IO::File::O_CREAT() | IO::File::O_WRONLY() | IO::File::O_TRUNC(),
+        IO::File::O_CREAT() | IO::File::O_RDWR() | IO::File::O_TRUNC(),
         0777,
     ) or die qq[Can't create file "$out": $!];
     $fh->binmode();
@@ -524,8 +532,8 @@ if ($out) {
     seek _FH, 0, 0;
 
     my $loader;
-    if (defined $data_pos) {
-        read _FH, $loader, $data_pos;
+    if (defined $start_of_FILE_section) {
+        read _FH, $loader, $start_of_FILE_section;
     } else {
         local $/ = undef;
         $loader = <_FH>;
@@ -534,18 +542,6 @@ if ($out) {
     if (!$ENV{PAR_VERBATIM} and $loader =~ /^(?:#!|\@rem)/) {
         require PAR::Filter::PodStrip;
         PAR::Filter::PodStrip->apply(\$loader, $0);
-    }
-
-    # Patch a certain string in $loader
-    if ($meta_par{clean}) {
-        my $par_clean = "=1";
-        my $pass_par_clean = uc "__pass_par_clean__";
-        # NOTE: we avoid to mention the contents of pass_par_clean so that
-        # this file doesn't contain it **at all**
-
-        $loader =~ s{(?<=${pass_par_clean})( +)}
-                    {$par_clean . (" " x (length($1) - length($par_clean)))}eg;
-                    # NOTE: the replacement must be the same number of bytes as the match
     }
 
     $fh->print($loader)
@@ -648,24 +644,30 @@ if ($out) {
             or die qq[Error writing zip part of "$out"];
     }
 
-    $cache_name = substr $cache_name, 0, $cache_name_size;
-    if (!$cache_name and my $mtime = (stat($out))[9]) {
-        my $ctx = Digest::SHA->new(1);
-        open my $th, "<:raw", $out;
-        $ctx->addfile($th);
-        close $th;
-
-        $cache_name = $ctx->hexdigest;
+    if ($meta_par{clean}) {
+        $fh->print("\0CLEAN");
     }
-    $cache_name .= "\0" x ($cache_name_size - length $cache_name);
-    $cache_name .= $cache_marker;
-    # compute the offset from the end of $loader to end of "...\0CACHE"
-    my $offset = $fh->tell + length($cache_name) - length($loader);
-    $fh->print($cache_name, 
-               pack('N', $offset),
-               $PAR_MAGIC)
-    && $fh->close
-        or die qq[Error writing trailer of "$out": $!];
+    else {
+        if (!defined $cache_name) {
+            my $ctx = Digest::SHA->new(1);
+            seek $fh, 0, 0;
+            $ctx->addfile($fh);
+            seek $fh, 0, 2;
+            $cache_name = $ctx->hexdigest;
+        }
+        # truncate $cache_name to 40 byes and fill with NULs if necessary
+        $cache_name = substr $cache_name, 0, $cache_name_size;
+        $cache_name .= "\0" x ($cache_name_size - length $cache_name);
+        $fh->print($cache_name, 
+                   "\0CACHE");
+    }
+
+    # compute the offset from the end of $loader to end of "...\0CACHE" or "\0CLEAN"
+    my $offset = $fh->tell - length($loader);
+    $fh->print(pack('N', $offset),
+               $PAR_MAGIC);
+
+    $fh->close or die qq[Error writing trailer of "$out": $!];
     chmod 0755, $out;
     # }}}
 
@@ -833,13 +835,13 @@ sub _set_par_temp {
             if ((my $magic_pos = find_par_magic($fh)) >= 0) {
                 seek $fh, $magic_pos 
                           - $FILE_offset_size 
-                          - length($cache_marker), 0;
+                          - length("\0CACHE"), 0;
                 my $buf;
-                read $fh, $buf, length($cache_marker);
-                if ($buf eq $cache_marker) {
+                read $fh, $buf, length("\0CACHE");
+                if ($buf eq "\0CACHE") {
                     seek $fh, $magic_pos 
                               - $FILE_offset_size 
-                              - length($cache_marker) 
+                              - length("\0CACHE") 
                               - $cache_name_size, 0;
                     read $fh, $buf, $cache_name_size;
                     $buf =~ s/\0//g;

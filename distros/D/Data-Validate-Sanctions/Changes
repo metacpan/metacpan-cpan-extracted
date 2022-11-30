@@ -1,6 +1,10 @@
 Revision history for Data-Validate-Sanctions
 
-0.14      2022-08-05 03:02:40+00:00 UTC
+0.15      2022-11-23 11:12:24+00:00 UTC
+        Sanction data will be fetched on a single server and stored in Redis by a new module Data::Validate::Sanction::Redis
+
+0.14    2022-08-05 03:02:40+00:00 UTC
+
 0.13      2022-07-26 13:55:00 CST
         Improving the search for larger sanction lists
 
@@ -28,7 +32,6 @@ Revision history for Data-Validate-Sanctions
 
 0.06      2017-02-20 02:47:39+00:00 UTC
      switch to dzil
-0.05
 
 0.04  2016-11-15 11:44:58 CST
         - update URL list

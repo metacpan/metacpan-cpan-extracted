@@ -3,12 +3,12 @@ package Code::TidyAll::Git::Prereceive;
 use strict;
 use warnings;
 
-use Capture::Tiny qw(capture);
+use Capture::Tiny       qw(capture);
 use Code::TidyAll::Util qw(tempdir_simple);
 use Code::TidyAll;
-use Digest::SHA qw(sha1_hex);
+use Digest::SHA         qw(sha1_hex);
 use IPC::System::Simple qw(capturex run);
-use Path::Tiny qw(cwd path);
+use Path::Tiny          qw(cwd path);
 use Specio::Library::Builtins;
 use Specio::Library::Numeric;
 use Specio::Library::String;
@@ -16,7 +16,7 @@ use Try::Tiny;
 
 use Moo;
 
-our $VERSION = '0.82';
+our $VERSION = '0.83';
 
 has allow_repeated_push => (
     is      => 'ro',
@@ -196,7 +196,7 @@ Code::TidyAll::Git::Prereceive - Git pre-receive hook that requires files to be 
 
 =head1 VERSION
 
-version 0.82
+version 0.83
 
 =head1 SYNOPSIS
 

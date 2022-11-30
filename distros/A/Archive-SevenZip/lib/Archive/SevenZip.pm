@@ -1,5 +1,6 @@
 package Archive::SevenZip;
 use strict;
+use warnings;
 use Carp qw(croak);
 use Encode qw( decode encode );
 use File::Basename qw(dirname basename);
@@ -31,7 +32,7 @@ Archive::SevenZip - Read/write 7z , zip , ISO9960 and other archives
 
 =cut
 
-our $VERSION= '0.17';
+our $VERSION= '0.19';
 
 # Archive::Zip API
 # Error codes
@@ -694,10 +695,17 @@ sub add {
             );
             my $fh = $self->run( $cmd );
             $self->wait($fh, %options );
+
+            # The stored name may contain a path, but we
+            # use basename() here. Hopefully that's simply OK for everybody.
+            my $sourceName = file($name);
+            if( $sourceName->is_absolute ) {
+                $sourceName = $sourceName->basename;
+            };
             $cmd = $self->get_command(
                 command => 'rn',
                 archivename => $self->archive_or_temp,
-                members => [$name, $storedName],
+                members => [$sourceName, $storedName],
                 #options =>  ],
             );
             $fh = $self->run( $cmd );

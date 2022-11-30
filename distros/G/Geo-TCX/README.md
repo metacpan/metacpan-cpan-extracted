@@ -8,7 +8,9 @@ Geo::TCX - Parse and edit and TCX activity and course files from GPS training de
 
 # DESCRIPTION
 
-`Geo::TCX` enables the parsing and editing of TCX activity and course files. TCX files follow an XML schema developed by Garmin and common to its GPS sports devices. Among other methods, the module enables laps from an activity to be saved as individual \*.tcx files, split into separate laps based on a given point, merged, or converted to courses to plan a future activity.
+`Geo::TCX` enables the parsing and editing of TCX activity and course files, including those from FIT files. TCX files follow an XML schema developed by Garmin and common to its GPS sports devices. Among other methods, the module enables laps from an activity to be saved as individual \*.tcx files, split into separate laps based on a given point, merged, or converted to courses to plan a future activity.
+
+FIT activity and course files are supported provided that [Geo::FIT](https://metacpan.org/pod/Geo%3A%3AFIT) is installed and that the `fit2tcx.pl` script it provides appears on the user's path.
 
 The module supports files containing a single Activity or Course. Database files consisting of multiple activities or courses are not supported.
 
@@ -23,8 +25,6 @@ The documentation regarding TCX files in general uses the terms history and acti
         $o = Geo::TCX->new('2022-08-11-10-27-15.tcx');
       or
         $o = Geo::TCX->new( \'...');
-
-    `work_dir` or `wd` for short can be set to specify where to save any working files (such as with the save\_laps() method). The module never actually [chdir](https://metacpan.org/pod/chdir)'s, it just keeps track of where the user wants to save files (and not have to type filenames with path each time), hence it is always defined.
 
     The optional `work_dir` (or `wd` for short) specifies where to save any working files, such as with the save\_laps() method. It can be supplied as a relative path or as an absolute path. If `work_dir` is omitted, it is set based on the path of the _$filename_ supplied or the current working directory if the constructor is called with an XML string reference (see `set_wd()` for more info).
 
@@ -117,6 +117,8 @@ The documentation regarding TCX files in general uses the terms history and acti
 
     Sets/gets the filename. Returns the name of the file with the complete path.
 
+    If the instance was created from a FIT file, the filename is set to the same name but with a `.tcx` extension by default.
+
 - set\_wd( $folder )
 
     Sets/gets the working directory for any eventual saving of the \*.tcx file and checks the validity of that path. It can be set as a relative path (i.e. relative to the actual [Cwd](https://metacpan.org/pod/Cwd)) or as an absolute path, but is always returned as a full path.
@@ -156,7 +158,7 @@ Patrick Joly
 
 # VERSION
 
-1.02
+1.03
 
 # LICENSE AND COPYRIGHT
 
@@ -166,7 +168,7 @@ This module is free software; you can redistribute it and/or modify it under the
 
 # SEE ALSO
 
-[Geo::Gpx](https://metacpan.org/pod/Geo%3A%3AGpx)
+[Geo::Gpx](https://metacpan.org/pod/Geo%3A%3AGpx), [Geo::FIT](https://metacpan.org/pod/Geo%3A%3AFIT).
 
 # DISCLAIMER OF WARRANTY
 

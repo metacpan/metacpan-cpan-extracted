@@ -2,5 +2,5 @@ requires 'Renard::Incunabula',
 	git => 'https://github.com/project-renard/p5-Renard-Incunabula.git',
 	branch => 'master';
 requires 'Alien::MuPDF',
-	git => 'https://github.com/Intertangle/p5-Alien-MuPDF.git',
+	git => 'https://github.com/PerlGfx/p5-Alien-MuPDF.git',
 	branch => 'master';

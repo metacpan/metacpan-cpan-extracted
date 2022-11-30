@@ -1,5 +1,16 @@
 Revision history for PDL-IO-Touchstone
 
+1.013	2022-11-14T21:58:23-08:00
+	- Removed hash-based frequency interpolation It was buggy and hard to
+	  work with.  The new format is far more flexible and easier to handle.
+	  See POD C<m_interpolate>.
+
+1.012	2022-11-14T21:25:26-08:00
+	- Extend frequency extrapolation in m_interpolate
+	- Added wsnp_hash and rsnp_hash_to_list functions as an inverse to the
+	  existing rsnp_list_to_hash functions.
+	- Updated documentation and added tests
+
 1.011	2022-11-04T17:08:35-07:00
 	- Renamed rsnp_hash to rsnp_list_to_hash
 	- Added rsnp_hash

@@ -56,7 +56,7 @@
    "provides" : {
       "Excel::Grinder" : {
          "file" : "lib/Excel/Grinder.pm",
-         "version" : "1.0"
+         "version" : "1.2"
       }
    },
    "release_status" : "stable",
@@ -70,11 +70,13 @@
          "web" : "https://github.com/ericschernoff/Excel-Grinder"
       }
    },
-   "version" : "1.0",
+   "version" : "1.2",
    "x_authority" : "cpan:ECHERNOF",
    "x_contributors" : [
       "Eric Chernoff <eric@pepper.weaverstreet.net>",
-      "Eric Chernoff <ericschernoff@gmail.com>"
+      "Eric Chernoff <ericschernoff@gmail.com>",
+      "Levi Nystad-Johansen <levi.johansen@kreftforeningen.no>",
+      "root <root@pepper.weaverstreet.net>"
    ],
    "x_serialization_backend" : "JSON::PP version 4.02",
    "x_static_install" : 1

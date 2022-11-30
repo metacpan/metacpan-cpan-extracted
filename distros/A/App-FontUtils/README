@@ -1,8 +1,8 @@
 NAME
-    App::FontUtils - Command-line utilities related fonts and font files
+    App::FontUtils - Command-line utilities related to fonts and font files
 
 VERSION
-    This document describes version 0.001 of App::FontUtils (from Perl
+    This document describes version 0.002 of App::FontUtils (from Perl
     distribution App-FontUtils), released on 2022-08-30.
 
 SYNOPSIS

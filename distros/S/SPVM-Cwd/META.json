@@ -1,5 +1,5 @@
 {
-   "abstract" : "get pathname of current working directory",
+   "abstract" : "Getting Pathname of Current Working Directory",
    "author" : [
       "USER_NAME<USER_MAIL>"
    ],
@@ -27,11 +27,13 @@
       },
       "configure" : {
          "requires" : {
-            "SPVM" : "0.9617"
+            "SPVM" : "0.9662"
          }
       },
       "runtime" : {
-         "requires" : {}
+         "requires" : {
+            "SPVM::Sys" : "0.27"
+         }
       }
    },
    "release_status" : "stable",
@@ -40,6 +42,6 @@
          "type" : "git"
       }
    },
-   "version" : "0.02",
+   "version" : "0.04",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

@@ -1,8 +1,11 @@
 class Hash {
+  interface Cloneable;
+  
   use Hash::Entry;
   use Fn;
   use Array;
   use Time;
+  use Sort;
 
   has bucket_count : int;
   has count : ro int;
@@ -35,7 +38,7 @@ class Hash {
     }
     
     if ($length % 2 != 0) {
-      die "Odd number array is invalid";
+      die "The length of the elements in the \$key_values must be an even number";
     }
     
     if ($key_values) {
@@ -43,7 +46,7 @@ class Hash {
         my $key = (string)$key_values->[$i];
         my $value = $key_values->[$i + 1];
         unless ($key isa string) {
-          die "Key must be string";
+          die "The key in the \$key_values must be string";
         }
 
         $self->set($key => $value);
@@ -57,7 +60,7 @@ class Hash {
 
   method set : void ($key : string, $val : object) {
     unless ($key) {
-      die "key must be defined";
+      die "The \$key must be defined";
     }
     # Rehash
     if (((double)$self->{count} / $self->{bucket_count}) > Hash->_MAX_LOAD_FACTOR()) {
@@ -168,52 +171,75 @@ class Hash {
     return $ret;
   }
 
+  precompile method to_array : object[] ($sort = 0 : int) {
+    my $keys = $self->keys;
+    my $keys_length = @$keys;
+    
+    if ($sort) {
+      Sort->sort_string_asc($keys);
+    }
+    
+    my $array = new object[$keys_length * 2];
+    for (my $i = 0; $i < $keys_length; $i++) {
+      my $key = $keys->[$i];
+      $array->[$i * 2] = $key;
+      my $value = $self->get($key);
+      $array->[$i * 2 + 1] = $value;
+    }
+    
+    return $array;
+  }
+
+  method clone : Hash () {
+    return $self->copy;
+  }
+
   native static method _murmur_hash : long ($string : string, $seed : int);
 
   private native static method _siphash13 : long ($string : string, $seed : string);
 
-  method set_byte : void ($name : string, $value : byte) {
-    $self->set($name => Byte->new($value));
+  method set_byte : void ($key : string, $value : int) {
+    $self->set($key => Byte->new($value));
   }
-  method set_short : void ($name : string, $value : short) {
-    $self->set($name => Short->new($value));
+  method set_short : void ($key : string, $value : int) {
+    $self->set($key => Short->new($value));
   }
-  method set_int : void ($name : string, $value : int) {
-    $self->set($name => Int->new($value));
+  method set_int : void ($key : string, $value : int) {
+    $self->set($key => Int->new($value));
   }
-  method set_string : void ($name : string, $value : string) {
-    $self->set($name => $value);
+  method set_string : void ($key : string, $value : string) {
+    $self->set($key => $value);
   }
-  method set_long : void ($name : string, $value : long) {
-    $self->set($name => Long->new($value));
+  method set_long : void ($key : string, $value : long) {
+    $self->set($key => Long->new($value));
   }
-  method set_float : void ($name : string, $value : float) {
-    $self->set($name => Float->new($value));
+  method set_float : void ($key : string, $value : float) {
+    $self->set($key => Float->new($value));
   }
-  method set_double : void ($name : string, $value : double) {
-    $self->set($name => Double->new($value));
+  method set_double : void ($key : string, $value : double) {
+    $self->set($key => Double->new($value));
   }
 
-  method get_byte : byte ($name : string) {
-    return (byte)$self->get($name);
+  method get_byte : int ($key : string) {
+    return (byte)$self->get($key);
   }
-  method get_short : short ($name : string) {
-    return (short)$self->get($name);
+  method get_short : int ($key : string) {
+    return (short)$self->get($key);
   }
-  method get_int : int ($name : string) {
-    return (int)$self->get($name);
+  method get_int : int ($key : string) {
+    return (int)$self->get($key);
   }
-  method get_string : string ($name : string) {
-    return (string)$self->get($name);
+  method get_string : string ($key : string) {
+    return (string)$self->get($key);
   }
-  method get_long : long ($name : string) {
-    return (long)$self->get($name);
+  method get_long : long ($key : string) {
+    return (long)$self->get($key);
   }
-  method get_float : float ($name : string) {
-    return (float)$self->get($name);
+  method get_float : float ($key : string) {
+    return (float)$self->get($key);
   }
-  method get_double : double ($name : string) {
-    return (double)$self->get($name);
+  method get_double : double ($key : string) {
+    return (double)$self->get($key);
   }
 
   method _bucket_count : int () {
@@ -301,5 +327,149 @@ class Hash {
     }
     $self->{bucket_count} = $new_bucket_count;
     $self->{entries} = $new_entries;
+  }
+
+  method delete_or_default_byte : int ($key : string, $default : int) {
+    
+    unless ($key) {
+      die "The \$key must be defined";
+    }
+    
+    my $value = 0;
+    if ($self->exists($key)) {
+      $value = (byte)$self->get_byte($key);
+      $self->delete($key);
+    }
+    else {
+      $value = (byte)$default;
+    }
+    
+    return $value;
+  }
+
+  method delete_or_default_short : int ($key : string, $default : int) {
+    
+    unless ($key) {
+      die "The \$key must be defined";
+    }
+    
+    my $value = 0;
+    if ($self->exists($key)) {
+      $value = (short)$self->get_short($key);
+      $self->delete($key);
+    }
+    else {
+      $value = (short)$default;
+    }
+    
+    return $value;
+  }
+
+  method delete_or_default_int : int ($key : string, $default : int) {
+    
+    unless ($key) {
+      die "The \$key must be defined";
+    }
+    
+    my $value = 0;
+    if ($self->exists($key)) {
+      $value = $self->get_int($key);
+      $self->delete($key);
+    }
+    else {
+      $value = $default;
+    }
+    
+    return $value;
+  }
+
+  method delete_or_default_long : long ($key : string, $default : long) {
+    
+    unless ($key) {
+      die "The \$key must be defined";
+    }
+    
+    my $value = 0L;
+    if ($self->exists($key)) {
+      $value = (long)$self->get_long($key);
+      $self->delete($key);
+    }
+    else {
+      $value = $default;
+    }
+    
+    return $value;
+  }
+
+  method delete_or_default_float : float ($key : string, $default : float) {
+    
+    unless ($key) {
+      die "The \$key must be defined";
+    }
+    
+    my $value = 0f;
+    if ($self->exists($key)) {
+      $value = $self->get_float($key);
+      $self->delete($key);
+    }
+    else {
+      $value = $default;
+    }
+    
+    return $value;
+  }
+
+  method delete_or_default_double : double ($key : string, $default : double) {
+    
+    unless ($key) {
+      die "The \$key must be defined";
+    }
+    
+    my $value = 0.0;
+    if ($self->exists($key)) {
+      $value = $self->get_double($key);
+      $self->delete($key);
+    }
+    else {
+      $value = $default;
+    }
+    
+    return $value;
+  }
+
+  method delete_or_default_string : string ($key : string, $default : string) {
+    
+    unless ($key) {
+      die "The \$key must be defined";
+    }
+    
+    my $value = (string)undef;
+    if ($self->exists($key)) {
+      $value = $self->get_string($key);
+      $self->delete($key);
+    }
+    else {
+      $value = $default;
+    }
+    
+    return $value;
+  }
+
+  method delete_or_default : object ($key : string, $default : object) {
+    
+    unless ($key) {
+      die "The \$key must be defined";
+    }
+    
+    my $value = (object)undef;
+    if ($self->exists($key)) {
+      $value = $self->get($key);
+      $self->delete($key);
+    }
+    else {
+      $value = $default;
+    }
+    
+    return $value;
   }
 }

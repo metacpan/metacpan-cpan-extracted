@@ -5,7 +5,7 @@ use strict;
 use warnings;
 no indirect;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 use Carp;
 use Digest::Keccak qw(keccak_256_hex);
@@ -123,6 +123,7 @@ Allows you to encode contract ABI arguments
 Appends type signature and the respective values to the encoder.
 
 Usage:
+
     append(signature => value) -> L<REFECO::Blockchain::Contract::Solidity::ABI::Encoder>
 
 =over 4
@@ -139,11 +140,12 @@ Appends the function name to the encoder, this is optional for when you want the
 function signature added to the encoded string or only the function name encoded.
 
 Usage:
+
     function(string) -> L<REFECO::Blockchain::Contract::Solidity::ABI::Encoder>
 
 =over 4
 
-=item * C<function_name> solidity function name e.g. for `transfer(address,uint256)` will be `transfer`
+=item * C<$function_name> solidity function name e.g. for `transfer(address,uint256)` will be `transfer`
 
 =back
 
@@ -152,9 +154,10 @@ Returns C<$self>
 =head2 generate_function_signature
 
 Based on the given function name and type signatures create the complete function
-signature
+signature.
 
 Usage:
+
     generate_function_signature() -> string
 
 =over 4
@@ -168,25 +171,30 @@ Returns the function signature string
 Encode function signature keccak_256/sha3
 
 Usage:
+
     encode_function_signature('transfer(address,uint)') -> encoded string
 
 =over 4
 
-=item C<signature> function signature, if not given, will try to use the appended function name
+=item * C<$signature> (Optional) function signature, if not given, will try to use the appended function name
 
 =back
 
-Returns encoded string 0x prefixed
+Returns the encoded string 0x prefixed
 
 =head2 encode
 
 Encodes appended signatures and the function name (when given)
 
+Usage:
+
+    encode() -> encoded string
+
 =over 4
 
 =back
 
-Returns encoded string, if function name given will be 0x prefixed
+Returns the encoded string, if function name was given will be 0x prefixed
 
 =head1 AUTHOR
 

@@ -1,3 +1,11 @@
+0.002
+
+  Features
+
+  - Use Google Cloud Storage to get binary releases.
+  - Detect/set device type (CPU, GPU) for binary releases.
+  - Optionally build from source using Alien::Bazel.
+
 0.001 2022-09-11 19:22:33-0400
 
   Features

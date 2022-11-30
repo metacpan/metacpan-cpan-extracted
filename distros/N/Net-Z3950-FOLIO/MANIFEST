@@ -6,6 +6,8 @@ MANIFEST.SKIP
 Makefile.PL
 README.md
 bin/z2folio
+descriptors/ModuleDescriptor-template.json
+descriptors/transform-descriptor.pl
 doc/capabilities.md
 doc/from-pod/Makefile
 doc/from-pod/Net-Z3950-FOLIO-Config.md
@@ -42,12 +44,15 @@ etc/folio2opac.xsl
 etc/instances.graphql-query
 etc/mod-search.graphql-query
 etc/yazgfs.xml
+lib/DummyRecord.pm
 lib/Net/Z3950/FOLIO.pm
 lib/Net/Z3950/FOLIO/Config.pm
 lib/Net/Z3950/FOLIO/HoldingsRecords.pm
 lib/Net/Z3950/FOLIO/MARCHoldings.pm
 lib/Net/Z3950/FOLIO/OPACXMLRecord.pm
-lib/Net/Z3950/FOLIO/PostProcess.pm
+lib/Net/Z3950/FOLIO/PostProcess/MARC.pm
+lib/Net/Z3950/FOLIO/PostProcess/OPAC.pm
+lib/Net/Z3950/FOLIO/PostProcess/Transform.pm
 lib/Net/Z3950/FOLIO/RPN.pm
 lib/Net/Z3950/FOLIO/Record.pm
 lib/Net/Z3950/FOLIO/ResultSet.pm
@@ -66,6 +71,8 @@ t/data/config/foo.baz.json
 t/data/config/foo.json
 t/data/config/foo.marcHoldings.json
 t/data/config/foo.postProcess.json
+t/data/config/yazgfs-9996.xml
+t/data/fetch/in00000000007-opac.xml
 t/data/fetch/input-inventory1.json
 t/data/fetch/input-marc1.json
 t/data/fetch/inventory1.xml

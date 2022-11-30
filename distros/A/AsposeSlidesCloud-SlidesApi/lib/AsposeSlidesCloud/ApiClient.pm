@@ -62,6 +62,12 @@ sub new {
     }
 
     my $ua = LWP::UserAgent->new;
+
+    if ($config->{allow_insecure_requests}) {
+        $ua->ssl_opts(SSL_verify_mode => 0);
+        $ua->ssl_opts(verify_hostname => 0);
+    }
+
     if (defined $config->{http_request_timeout}) {
         $ua->{timeout} = $config->{http_request_timeout};
     }

@@ -16,7 +16,7 @@ use Data::Dumper;
 use Time::Piece;
 use Path::Tiny;
 use Carp;
-use JSON::MaybeXS;
+use Cpanel::JSON::XS;
 use YAML::XS;
 # use Storable 3.15 'dclone';
 
@@ -316,7 +316,7 @@ sub WriteSTVEvent( $I) {
   my $jsonpath = $I->LogTo . '_stvevents.json';
   my $yamlpath = $I->LogTo . '_stvevents.yaml';
   # my $yaml = ;
-  my $coder = JSON->new->ascii->pretty;
+  my $coder = Cpanel::JSON::XS->new->ascii->pretty;
   path($jsonpath)->spew( $coder->encode( $I->STVEvent() ) );
   path($yamlpath)->spew( Dump $I->STVEvent() );
 }

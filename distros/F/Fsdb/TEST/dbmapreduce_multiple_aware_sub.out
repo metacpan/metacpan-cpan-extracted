@@ -1,5 +1,5 @@
 #fsdb experiment n
 ufs_mab_sys 2
 ufs_rcp_real 2
-#  | dbroweval -b '{ my $count = 0; my $current_key = ""; @out_args = (-cols =>[qw(experiment n)]); }'  '{  if ($current_key ne _experiment) { if ($current_key ne "") { $ofref = [ $current_key, $count ] }; $count = 1; $current_key = _experiment; } else { $count++; $ofref = undef; };  }' -e '{ $ofref = [ $current_key, $count ]; }'
+#   | dbroweval -b '{ my $count = 0; my $current_key = ""; @out_args = (-cols =>[qw(experiment n)]); }'  '{  if ($current_key ne _experiment) { if ($current_key ne "") { $ofref = [ $current_key, $count ] }; $count = 1; $current_key = _experiment; } else { $count++; $ofref = undef; };  }' -e '{ $ofref = [ $current_key, $count ]; }'
 #   | dbmapreduce -S -S -M -k experiment -f TEST/dbmapreduce_multiple_aware_sub.pl -C simple_reducer

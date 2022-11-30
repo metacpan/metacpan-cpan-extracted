@@ -240,7 +240,8 @@ init_x11( char * error_buf )
 		"XdndActionPrivate",
 		"XdndActionList",
 	 	"XdndActionDescription",
-		"text/plain"
+		"text/plain",
+		"_NET_WM_ICON"
 	};
 	char hostname_buf[256], *hostname = hostname_buf, *env;
 
@@ -344,14 +345,18 @@ init_x11( char * error_buf )
 	guts. mouse_buttons = XGetPointerMapping( DISP, guts. buttons_map, 256);
 	XCHECKPOINT;
 
-	guts. limits. request_length = XMaxRequestSize( DISP);
-	guts. limits. XDrawLines = guts. limits. request_length - 3;
-	guts. limits. XFillPolygon = guts. limits. request_length - 4;
-	guts. limits. XDrawSegments = (guts. limits. request_length - 3) / 2;
-	guts. limits. XDrawRectangles = (guts. limits. request_length - 3) / 2;
-	guts. limits. XFillRectangles = (guts. limits. request_length - 3) / 2;
-	guts. limits. XFillArcs =
+	guts. limits. request_length    = XMaxRequestSize( DISP);
+	guts. limits. extended_request_length = XExtendedMaxRequestSize( DISP);
+	if ( guts. limits. extended_request_length == 0 )
+		guts. limits. extended_request_length = guts. limits. request_length;
+	guts. limits. XDrawLines        = guts. limits. request_length - 3;
+	guts. limits. XFillPolygon      = guts. limits. request_length - 4;
+	guts. limits. XDrawSegments     = (guts. limits. request_length - 3) / 2;
+	guts. limits. XDrawRectangles   = (guts. limits. request_length - 3) / 2;
+	guts. limits. XFillRectangles   = (guts. limits. request_length - 3) / 2;
+	guts. limits. XFillArcs         =
 		guts. limits. XDrawArcs = (guts. limits. request_length - 3) / 3;
+	guts. limits. NetWMIcon         = sqrt(guts. limits. extended_request_length - 16);
 	XCHECKPOINT;
 	SCREEN = DefaultScreen( DISP);
 
@@ -381,7 +386,8 @@ init_x11( char * error_buf )
 	guts. menu_windows = hash_create();
 	guts. ximages = hash_create();
 	gcv. graphics_exposures = false;
-	guts. menugc = XCreateGC( DISP, guts. root, GCGraphicsExposures, &gcv);
+	gcv. cap_style = CapProjecting;
+	guts. menugc = XCreateGC( DISP, guts. root, GCGraphicsExposures | GCCapStyle, &gcv);
 	guts. resolution. x = ( DisplayWidthMM( DISP, SCREEN) > 0) ? 
 		25.4 * guts. displaySize. x / DisplayWidthMM( DISP, SCREEN) + .5:
 		96;
@@ -1007,8 +1013,9 @@ Box *
 apc_application_get_monitor_rects( Handle self, int * nrects)
 {
 #if defined(HAVE_X11_EXTENSIONS_XRANDR_H) && (RANDR_MAJOR > 1 || (RANDR_MAJOR == 1 && RANDR_MINOR > 3))
-	XRRScreenResources * sr;
+	XRRMonitorInfo *m;
 	Box * ret = NULL;
+	int n;
 
 	if ( !guts. randr_extension) {
 		*nrects = 0;
@@ -1016,20 +1023,25 @@ apc_application_get_monitor_rects( Handle self, int * nrects)
 	}
 
 	XCHECKPOINT;
-	sr = XRRGetScreenResourcesCurrent(DISP,guts.root);
-	if ( sr ) {
+	m = XRRGetMonitors(DISP,guts.root,false,&n);
+	if ( m ) {
 		int i;
-		ret = malloc(sizeof(Box) * sr->ncrtc);
-		*nrects = sr->ncrtc;
-		for ( i = 0; i < sr->ncrtc; i++) {
-			XRRCrtcInfo * ci = XRRGetCrtcInfo (DISP, sr, sr->crtcs[i]);
-			ret[i].x      = ci->x;
-			ret[i].y      = guts.displaySize.y - ci->height - ci->y;
-			ret[i].width  = ci->width;
-			ret[i].height = ci->height;
-			XRRFreeCrtcInfo(ci);
+		XRRMonitorInfo * mi = m;
+		ret = malloc(sizeof(Box) * n);
+		*nrects = n;
+		for ( i = 0; i < n; i++, mi++) {
+			ret[i].x      = mi->x;
+			ret[i].y      = guts.displaySize.y - mi->height - mi->y;
+			ret[i].width  = mi->width;
+			ret[i].height = mi->height;
+			if ( i > 0 && mi->primary ) {
+				/* primary comes first, if any */
+				Box first = *ret;
+				*ret = *(ret + i);
+				*(ret + i) = first;
+			}
 		}
-		XRRFreeScreenResources(sr);
+		XRRFreeMonitors(m);
 		XCHECKPOINT;
 	} else {
 		*nrects = 0;

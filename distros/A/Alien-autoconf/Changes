@@ -1,5 +1,8 @@
 Revision history for Alien-autoconf
 
+0.19      2022-11-15 06:45:35 -0700
+  - Update test to work with a system install of Alien::m4 on *BSD (gh#16)
+
 0.18      2022-08-11 16:07:10 -0600
   - Add helpers (gh#15)
 

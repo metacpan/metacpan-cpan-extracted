@@ -329,6 +329,93 @@ void del_tooltip(void *data, Evas_Object *obj, void *event_info) {
 	Safefree(data);
 }
 
+
+void call_perl_edje_message_handler(void *data, Evas_Object *obj, int type, int id,void *msg) {
+	dTHX;
+	dSP;
+
+	int n;
+	int count;
+	SV *s_data, *s_obj, *s_type, *s_id, *s_msg;
+	char messageClass[26];
+	
+	_perl_callback *perl_saved_cb = data;
+	
+	// Get data
+	HV *cb_data = _get_smart_cb_hash(aTHX_ perl_saved_cb->objaddr,perl_saved_cb->event,perl_saved_cb->funcname, "pEFL::PLSide::Callbacks");
+	SV *pclass = *( hv_fetch(cb_data, "pclass",6,FALSE) );
+	SV *func = *( hv_fetch(cb_data, "function",8,FALSE) );
+	
+	// Data
+	s_data = *( hv_fetch(cb_data, "data",4,FALSE) ) ;
+		
+	// Object
+	s_obj = newSV(0);
+	sv_setref_pv(s_obj, SvPV_nolen(pclass), obj);
+	
+	// Type
+	s_type = newSViv(type);
+	
+	//ID
+	s_id = newSViv(id);
+	
+	// msg
+	s_msg  = newSV(0);
+	if (type == EDJE_MESSAGE_STRING) {
+		strcpy(messageClass,"EdjeMessageStringPtr");
+	}
+	else if (type == EDJE_MESSAGE_INT) {
+		strcpy(messageClass,"EdjeMessageStringIntPtr");
+	}
+	else if (type == EDJE_MESSAGE_FLOAT) {
+		strcpy(messageClass,"EdjeMessageFloatPtr");
+	}
+	else if (type == EDJE_MESSAGE_STRING_SET) {
+		strcpy(messageClass,"EdjeMessageStringSetPtr");
+	}
+	else if (type == EDJE_MESSAGE_INT_SET) {
+		strcpy(messageClass,"EdjeMessageIntSetPtr");
+	}
+	else if (type == EDJE_MESSAGE_FLOAT_SET) {
+		strcpy(messageClass,"EdjeMessageFloatSetPtr");
+	}
+	else if (type == EDJE_MESSAGE_STRING_INT) {
+		strcpy(messageClass,"EdjeMessageStringIntPtr");
+	}
+	else if (type == EDJE_MESSAGE_STRING_FLOAT) {
+		strcpy(messageClass,"EdjeMessageStringFloatPtr");
+	}
+	else {
+		croak("Not supported message type\n");
+	}
+	sv_setref_pv(s_msg, messageClass, msg);
+	
+
+	ENTER;
+	SAVETMPS;
+
+	PUSHMARK(SP);
+
+	XPUSHs(s_data);
+	XPUSHs(sv_2mortal(s_obj));
+	XPUSHs(sv_2mortal(s_type));
+	XPUSHs(sv_2mortal(s_id));
+	XPUSHs(sv_2mortal(s_msg));
+
+
+	PUTBACK;
+
+	count = call_sv(func, G_DISCARD);
+	if (count != 0) {
+		croak("Expected 0 value got %d\n", count);
+	}
+
+	FREETMPS;
+	LEAVE;
+
+	/* TODO free data? */
+}
+
 // -----------------
 // FORMAT CB STUFF
 // -----------------

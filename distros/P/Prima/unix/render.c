@@ -11,8 +11,7 @@
 
 #define SORT(a,b)	{ int swp; if ((a) > (b)) { swp=(a); (a)=(b); (b)=swp; }}
 #define REVERT(a)	(XX-> size. y - (a) - 1)
-#define SHIFT(a,b)	{ (a) += XX-> transform. x + XX-> btransform. x; \
-			(b) += XX-> transform. y + XX-> btransform. y; }
+#define SHIFT(a,b)	{ (a) += XX-> btransform. x; (b) += XX-> btransform. y; }
 #define RANGE(a)        { if ((a) < -16383) (a) = -16383; else if ((a) > 16383) a = 16383; }
 #define RANGE2(a,b)     RANGE(a) RANGE(b)
 #define RANGE4(a,b,c,d) RANGE(a) RANGE(b) RANGE(c) RANGE(d)
@@ -174,28 +173,26 @@ pen_update(Handle self)
 		GCForeground      | GCFillStyle       |
 		0;
 	int alpha = XX->alpha, red, green, blue;
+	Color fore, back;
 
 	switch ( XX-> rop) {
 	case ropNotPut:
-		pen.gcv.foreground = ~XX-> fore.primary;
-		pen.gcv.background = ~XX-> back.primary;
+		fore = ~XX->fore.color;
+		back = ~XX->back.color;
 		break;
 	case ropBlackness:
-		pen.gcv.foreground = 0x000000;
-		pen.gcv.background = 0x000000;
+		fore = back = 0x000000;
 		break;
 	case ropWhiteness:
-		pen.gcv.foreground = 0xffffff;
-		pen.gcv.background = 0xffffff;
+		fore = back = 0xffffff;
 		break;
 	case ropNoOper:
-		pen.gcv.foreground = 0x000000;
-		pen.gcv.background = 0x000000;
+		fore = back = 0x000000;
 		alpha = 0;
 		break;
 	default:
-		pen.gcv.foreground = XX-> fore.primary;
-		pen.gcv.background = XX-> back.primary;
+		fore = XX->fore.color;
+		back = XX->back.color;
 	}
 
 #define COMP(src,c) \
@@ -203,14 +200,14 @@ pen_update(Handle self)
 	c &= 0xff; \
 	c = ((c << guts.argb_bits.c##_range) >> 8) << guts.argb_bits.c##_shift;
 
-	COMP(COLOR_R(XX->fore.color),red);
-	COMP(COLOR_G(XX->fore.color),green);
-	COMP(COLOR_B(XX->fore.color),blue);
+	COMP(COLOR_R(fore),red);
+	COMP(COLOR_G(fore),green);
+	COMP(COLOR_B(fore),blue);
 	pen.gcv.foreground = red | green | blue;
 
-	COMP(COLOR_R(XX->back.color),red);
-	COMP(COLOR_G(XX->back.color),green);
-	COMP(COLOR_B(XX->back.color),blue);
+	COMP(COLOR_R(back),red);
+	COMP(COLOR_G(back),green);
+	COMP(COLOR_B(back),blue);
 	pen.gcv.background = red | green | blue;
 #undef COMP
 
@@ -253,7 +250,11 @@ pen_create_tile(Handle self, Pixmap tile)
 	XRenderPictureAttributes xrp_attr;
 	xrp_attr.repeat = RepeatNormal;
 
-	if ( PDrawable(self)-> fillPatternImage && !X(PDrawable(self)-> fillPatternImage)->type.icon ) {
+	if (
+		PDrawable(self)-> fillPatternImage &&
+		PObject(PDrawable(self)->fillPatternImage)->stage == csNormal &&
+		!X(PDrawable(self)-> fillPatternImage)->type.icon
+	) {
 		GC gc;
 		XGCValues gcv;
 
@@ -344,42 +345,62 @@ pen_picture( Handle self)
 }
 
 Bool
-apc_gp_aa_bar( Handle self, double x1, double y1, double x2, double y2)
+apc_gp_aa_bars( Handle self, int nr, NRect *rr)
 {
-	XPointDouble p[5];
-	int ok;
 	DEFXX;
+	int ok = true, i;
+	Picture pen;
+	XRenderPictFormat *format;
 
 	if ( PObject( self)-> options. optInDrawInfo) return false;
 	if ( !XF_IN_PAINT(XX)) return false;
 
 	if ( XT_IS_BITMAP(XX)) {
 		if ( XX->alpha < 0x7f ) return true;
-		return apc_gp_bar(self, x1 + .5, y1 + .5, x2 + .5, y2 + .5);
+
+		if ( nr == 1 ) {
+			Rect r = {rr[0].left + .5, rr[0].bottom + .5, rr[0].right + .5, rr[0].top + .5};
+			return apc_gp_bars(self, 1, &r);
+		} else {
+			Rect *r;
+			if (( r = prima_array_convert( nr * 4, rr, 'd', NULL, 'i')))
+				return false;
+			ok = apc_gp_bars(self, nr, r);
+			free(r);
+			return ok;
+		}
 	}
 
-	x1 += XX-> transform. x + XX-> btransform. x;
-	y1 = REVERT(y1 + XX-> transform. y + XX-> btransform. y) + 1;
-	x2 += XX-> transform. x + XX-> btransform. x + 1;
-	y2 = REVERT(y2 + XX-> transform. y + XX-> btransform. y);
-	RANGE2(x2, y2);
-	p[0].x = x1;
-	p[0].y = y1;
-	p[1].x = x2;
-	p[1].y = y1;
-	p[2].x = x2;
-	p[2].y = y2;
-	p[3].x = x1;
-	p[3].y = y2;
-	p[4].x = x1;
-	p[4].y = y1;
+	pen = pen_picture(self);
+	format = XX->flags.antialias ? guts.xrender_a8_format : guts.xrender_a1_format;
+	for (i = 0; i < nr; i++, rr++) {
+		double x1, y1, x2, y2;
+		XPointDouble p[5];
 
-	ok = my_XRenderCompositeDoublePoly(
-		DISP, PictOpOver, pen_picture(self), XX->argb_picture,
-		XX->flags.antialias ? guts.xrender_a8_format : guts.xrender_a1_format,
-		0, 0, 0, 0, p, 5,
-		EvenOddRule
-	);
+		x1 = rr->left  + XX-> btransform.x;
+		y1 = REVERT(rr->bottom + XX-> btransform. y) + 1;
+		x2 = rr->right + XX-> btransform.x + 1;
+		y2 = REVERT(rr->top + XX-> btransform. y);
+		RANGE2(x1, y1);
+		RANGE2(x2, y2);
+		p[0].x = x1;
+		p[0].y = y1;
+		p[1].x = x2;
+		p[1].y = y1;
+		p[2].x = x2;
+		p[2].y = y2;
+		p[3].x = x1;
+		p[3].y = y2;
+		p[4].x = x1;
+		p[4].y = y1;
+
+		ok = my_XRenderCompositeDoublePoly(
+			DISP, PictOpOver, pen, XX->argb_picture, format,
+			0, 0, 0, 0, p, 5,
+			EvenOddRule
+		);
+		if ( !ok) break;
+	}
 
 	XSync(DISP, false);
 	XCHECKPOINT;
@@ -399,11 +420,8 @@ apc_gp_aa_fill_poly( Handle self, int numPts, NPoint * points)
 	if ( XT_IS_BITMAP(XX)) {
 		Point *p;
 		if ( XX->alpha < 0x7f ) return true;
-		if ( !( p = malloc(( numPts + 1) * sizeof( Point)))) return false;
-		for ( i = 0; i < numPts; i++) {
-			p[i].x = points[i].x + .5;
-			p[i].y = points[i].y + .5;
-		}
+		if ( !( p = prima_array_convert( numPts * 2, points, 'd', NULL, 'i')))
+			return false;
 		ok = apc_gp_fill_poly( self, numPts, p );
 		free(p);
 		return ok;
@@ -412,12 +430,12 @@ apc_gp_aa_fill_poly( Handle self, int numPts, NPoint * points)
 	if ( !( p = malloc(( numPts + 1) * sizeof( XPointDouble)))) return false;
 
 	for ( i = 0; i < numPts; i++) {
-		p[i].x = points[i]. x + XX-> transform. x + XX-> btransform. x;
-		p[i].y = REVERT(points[i]. y + XX-> transform. y + XX-> btransform. y);
+		p[i].x = points[i]. x + XX-> btransform. x;
+		p[i].y = REVERT(points[i]. y + XX-> btransform. y);
 		RANGE2(p[i].x, p[i].y);
 	}
-	p[numPts].x = points[0]. x + XX-> transform. x + XX-> btransform. x;
-	p[numPts].y = REVERT(points[0]. y + XX-> transform. y + XX-> btransform. y);
+	p[numPts].x = points[0]. x + XX-> btransform. x;
+	p[numPts].y = REVERT(points[0]. y + XX-> btransform. y);
 	RANGE2(p[numPts].x, p[numPts].y);
 
 	ok = my_XRenderCompositeDoublePoly(
@@ -456,11 +474,13 @@ apc_gp_aa_fill_poly( Handle self, int numPts, NPoint * points)
  * PERFORMANCE OF THIS SOFTWARE.
  */
 
+//#define EDGE_DEBUG 1
+
 typedef struct _Edge Edge;
 
 struct _Edge {
     XLineFixed	edge;
-    XFixed	current_x;
+    double	current_x;
     Bool	clockWise;
     Edge	*next, *prev;
 };
@@ -473,14 +493,23 @@ CompareEdge (const void *o1, const void *o2)
     return e1->edge.p1.y - e2->edge.p1.y;
 }
 
-static XFixed
+static double
 XRenderComputeX (XLineFixed *line, XFixed y)
 {
-    XFixed  dx = line->p2.x - line->p1.x;
-    double  ex = (double) (y - line->p1.y) * (double) dx;
-    XFixed  dy = line->p2.y - line->p1.y;
-
-    return (XFixed) line->p1.x + (XFixed) (ex / dy);
+    double  dx = XFixedToDouble(line->p2.x - line->p1.x);
+    double  ex = XFixedToDouble(y - line->p1.y) * (double) dx;
+    double  dy = XFixedToDouble(line->p2.y - line->p1.y);
+#if EDGE_DEBUG
+    printf("f(%g:%g - %g:%g, %g) = %g\n",
+    	line->p1.x/65536.0,
+    	line->p1.y/65536.0,
+    	line->p2.x/65536.0,
+    	line->p2.y/65536.0,
+	y/65536.0,
+	XFixedToDouble(line->p1.x) + ex / dy
+    );
+#endif
+    return XFixedToDouble(line->p1.x) + ex / dy;
 }
 
 static double
@@ -531,6 +560,20 @@ XRenderComputeTrapezoids (Edge		*edges,
 
     *ntraps = 0;
     qsort (edges, nedges, sizeof (Edge), CompareEdge);
+#if EDGE_DEBUG
+    {
+    	int i;
+	for ( i = 0; i < nedges; i++) {
+	Edge *e = edges + i;
+		printf("edge %d:%d %-6.2g:%-6.2g - %-6.2g:%-6.2g\n", i, e->clockWise,
+		e->edge.p1.x / 65536.0,
+		e->edge.p1.y / 65536.0,
+		e->edge.p2.x / 65536.0,
+		e->edge.p2.y / 65536.0
+		);
+	}
+    }
+#endif
 
     y = edges[0].edge.p1.y;
     active = NULL;
@@ -560,12 +603,21 @@ XRenderComputeTrapezoids (Edge		*edges,
 	for (e = active; e; e = next)
 	{
 	    next = e->next;
+#if EDGE_DEBUG
+	    if ( !next ) continue;
+	    printf("cmp %d vs %d", e - edges+1, e->next - edges+1);
+#endif
 	    /*
 	     * Find one later in the list that belongs before the
 	     * current one
 	     */
 	    for (en = next; en; en = en->next)
 	    {
+#if EDGE_DEBUG
+	        printf(" (vs %d r%f %f)", en-edges+1,
+			en->current_x, e->current_x
+		);
+#endif
 		if (en->current_x < e->current_x ||
 		    (en->current_x == e->current_x &&
 		     en->edge.p2.x < e->edge.p2.x))
@@ -592,15 +644,21 @@ XRenderComputeTrapezoids (Edge		*edges,
 		     * start over at en
 		     */
 		    next = en;
+#if EDGE_DEBUG
+		    printf("- %d is before %d ", 1+en-edges, 1+e-edges);
+#endif
 		    break;
 		}
 	    }
+#if EDGE_DEBUG
+	    printf("\n");
+#endif
 	}
-#if 0
-	printf ("y: %6.3g:", y / 65536.0);
+#if EDGE_DEBUG
+	printf ("y: %6.3g => ",  y / 65536.0);
 	for (e = active; e; e = e->next)
 	{
-	    printf (" %6.3g", e->current_x / 65536.0);
+	    printf (" %d:%6.3g/%6.3g", 1+e-edges, e->current_x, e-> edge.p2.x / 65536.0);
 	}
 	printf ("\n");
 #endif
@@ -639,8 +697,14 @@ XRenderComputeTrapezoids (Edge		*edges,
 	    traps->left = e->edge;
 	    if ( winding == WindingRule ) {
 	       int cw = (e->clockWise ? 1 : -1) + (en->clockWise ? 1 : -1);
+#if EDGE_DEBUG
+	       printf("* %d:%d %d:%d\n", e->clockWise, 1+e-edges, en->clockWise, 1+en-edges);
+#endif
 	       while (en && cw != 0) {
                    en = en->next;
+#if EDGE_DEBUG
+	           printf("+ %d:%d\n", e, en->clockWise, 1+en-edges);
+#endif
 	           cw += en->clockWise ? 1 : -1;
 	       }
 	       traps->right = en->edge;
@@ -650,6 +714,9 @@ XRenderComputeTrapezoids (Edge		*edges,
 	       }
 	    }
 	    traps->right = en->edge;
+#if EDGE_DEBUG
+	    printf("%strap %g:%d - %g:%d\n", (winding == WindingRule) ? "*" : "", y/65536.0, 1+e-edges, next_y/65536.0, 1+en-edges);
+#endif
 	    traps++;
 	    (*ntraps)++;
 	    if ( --maxtraps <= 0 ) {
@@ -767,7 +834,7 @@ my_XRenderCompositeDoublePoly (Display		    *dpy,
 Bool prima_init_xrender_subsystem(char * error_buf)                 { return true; }
 void prima_done_xrender_subsystem(void)                             { }
 Bool apc_gp_aa_fill_poly( Handle self, int numPts, NPoint * points) { return false; }
-Bool apc_gp_aa_bar( Handle self, double x1, double y1, double x2, double y2) { return false; }
+Bool apc_gp_aa_bars( Handle self, int nr, NRect *rr)                { return false; }
 
 #endif
 

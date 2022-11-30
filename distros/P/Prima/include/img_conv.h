@@ -28,7 +28,7 @@ typedef struct {
 	Point patternOffset;
 	Handle tile;
 	unsigned char * linePattern;
-	PBoxRegionRec region;
+	PRegionRec region;
 	Point translate;
 } ImgPaintContext, *PImgPaintContext;
 
@@ -312,11 +312,11 @@ extern void bc_bgr_a_rgba( Byte * bgr_source, Byte * a_source, Byte * rgba_dest,
 
 extern void ibc_repad( Byte * source, Byte * dest, int srcLineSize, int dstLineSize, int srcDataSize, int dstDataSize, int srcBPP, int dstBPP, void * bit_conv_proc, Bool reverse);
 extern void img_fill_dummy( PImage dummy, int w, int h, int type, Byte * data, RGBColor * palette);
-extern Bool img_put( Handle dest, Handle src, int dstX, int dstY, int srcX, int srcY, int dstW, int dstH, int srcW, int srcH, int rop, PBoxRegionRec region, Byte * color);
+extern Bool img_put( Handle dest, Handle src, int dstX, int dstY, int srcX, int srcY, int dstW, int dstH, int srcW, int srcH, int rop, PRegionRec region, Byte * color);
 extern Bool img_bar( Handle dest, int x, int y, int w, int h, PImgPaintContext ctx);
 extern void img_integral_rotate( Handle self, Byte * new_data, int new_line_size, int degrees);
-extern Bool img_generic_rotate( Handle self, float degrees, PImage output);
-extern Bool img_2d_transform( Handle self, float *matrix, PImage output);
+extern Bool img_generic_rotate( Handle self, float degrees, PImage output, ColorPixel fill);
+extern Bool img_2d_transform( Handle self, float *matrix, ColorPixel fill, PImage output);
 extern void img_mirror( Handle self, Bool vertically);
 extern Bool img_mirror_raw( int type, int w, int h, Byte * data, Bool vertically);
 extern void img_premultiply_alpha_constant( Handle self, int alpha);
@@ -328,18 +328,30 @@ extern void img_find_blend_proc( int rop, BlendFunc ** blend1, BlendFunc ** blen
 extern Bool img_resample_colors( Handle dest, int bpp, PImgPaintContext ctx);
 extern void img_fill_alpha_buf( Byte * dst, Byte * src, int width, int bpp);
 
+typedef struct _NPolyPolyline {
+	unsigned int n_points, size;
+	double theta; /* tangent for single-point polylines */
+	struct _NPolyPolyline *next, *prev;
+	NPoint *points;
+	NPoint buf[1];
+} NPolyPolyline;
+extern NPolyPolyline* img_polyline2patterns( NPoint * points, int n_points, double line_width, unsigned char * line_pattern, Bool integer_precision);
 
 /* regions */
 typedef Bool RegionCallbackFunc( int x, int y, int w, int h, void * param);
 
-extern Box img_region_box(PBoxRegionRec region);
-extern PBoxRegionRec img_region_alloc(PBoxRegionRec old_region, int n_boxes);
+extern Box img_region_box(PRegionRec region);
+#define img_region_new(sz) img_region_alloc(NULL,sz)
+extern PRegionRec img_region_alloc(PRegionRec old_region, int n_size);
+extern PRegionRec img_region_extend(PRegionRec region, int x, int y, int width, int height);
 extern Bool img_region_foreach(
-	PBoxRegionRec region, 
+	PRegionRec region, 
 	int x, int y, int w, int h,
 	RegionCallbackFunc *cb, void *param
 );
-extern Bool img_point_in_region( int x, int y, PBoxRegionRec region);
+extern Bool img_point_in_region( int x, int y, PRegionRec region);
+extern PRegionRec img_region_polygon( Point *pts, int count, int rule);
+extern PRegionRec img_region_mask( Handle mask);
 
 /* istXXX function */
 typedef double FilterFunc( const double x );

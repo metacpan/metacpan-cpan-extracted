@@ -1,5 +1,9 @@
 Revision history for Alien::proj
 
+1.25 2022-11-26
+    - Share builds: use https for downloads
+    - Noisier tests for debug purposes
+
 1.24 2022-03-30
     - Fix dependency versions in Makefile.PL
 

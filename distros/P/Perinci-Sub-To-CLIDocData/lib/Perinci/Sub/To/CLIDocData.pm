@@ -9,9 +9,9 @@ use Perinci::Object;
 use Perinci::Sub::Util qw(err);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-19'; # DATE
+our $DATE = '2022-11-14'; # DATE
 our $DIST = 'Perinci-Sub-To-CLIDocData'; # DIST
-our $VERSION = '0.304'; # VERSION
+our $VERSION = '0.305'; # VERSION
 
 our %SPEC;
 
@@ -444,10 +444,10 @@ sub gen_cli_doc_data_from_meta {
             }
             if ($arg_spec->{req}) {
                 push @plain_args, "<$arg>";
-                push @pod_args  , qq#E<lt>L<$arg|/"$arg_spec_to_opts{$arg0}">E<gt>#;
+                push @pod_args  , qq#E<lt>I<L<$arg|/"$arg_spec_to_opts{$arg0}">>E<gt>#;
             } else {
                 push @plain_args, "[$arg]";
-                push @pod_args  , qq#[L<$arg|/"$arg_spec_to_opts{$arg0}">]#;
+                push @pod_args  , qq#[I<L<$arg|/"$arg_spec_to_opts{$arg0}">>]#;
             }
             $plain_args[-1] .= " ..." if ($arg_spec->{slurpy} // $arg_spec->{greedy});
             $pod_args  [-1] .= " ..." if ($arg_spec->{slurpy} // $arg_spec->{greedy});
@@ -629,7 +629,7 @@ Perinci::Sub::To::CLIDocData - From Rinci function metadata, generate structure 
 
 =head1 VERSION
 
-This document describes version 0.304 of Perinci::Sub::To::CLIDocData (from Perl distribution Perinci-Sub-To-CLIDocData), released on 2022-10-19.
+This document describes version 0.305 of Perinci::Sub::To::CLIDocData (from Perl distribution Perinci-Sub-To-CLIDocData), released on 2022-11-14.
 
 =head1 SYNOPSIS
 
@@ -762,7 +762,7 @@ Sample result:
          },
        },
        "usage_line" => "[[prog]] [--bool1|-z|--no-bool1|--nobool1] [--flag1|-f] -- <str1>",
-       "usage_line.alt.fmt.pod" => "B<[[prog]]> [L<--bool1|/\"-z\">|L<-z|/\"-z\">|L<--no-bool1|/\"-z\">|L<--nobool1|/\"-z\">] [L<--flag1|/\"--flag1, -f\">|L<-f|/\"--flag1, -f\">] -- E<lt>L<str1|/\"--str1=s*\">E<gt>",
+       "usage_line.alt.fmt.pod" => "B<[[prog]]> [B<L<--bool1|/\"-z\">>|B<L<-z|/\"-z\">>|B<L<--no-bool1|/\"-z\">>|B<L<--nobool1|/\"-z\">>] [B<L<--flag1|/\"--flag1, -f\">>|B<L<-f|/\"--flag1, -f\">>] -- E<lt>I<L<str1|/\"--str1=s*\">>E<gt>",
      },
    ];
    $a->[2]{"opts"}{"--bool1"}{tags} = $a->[2]{"opts"}{"--bool1"}{arg_spec}{tags};

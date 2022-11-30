@@ -1,5 +1,9 @@
 Revision history for Perl extension Web::Reactor
 
+2.12  2022.11.18
+
+    1. fixed MANIFEST list missing files
+
 2.11  2022.11.14
 
     1. added sort multi checkbox support

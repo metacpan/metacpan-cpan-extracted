@@ -10,7 +10,7 @@ Application Binary Interface (ABI) utility for encoding and decoding solidity sm
 - [Support and Documentation](#support-and-documentation)
 - [License and Copyright](#license-and-copyright)
 
-# Supports:
+# Supports
 
 - address
 - bool
@@ -21,7 +21,7 @@ Application Binary Interface (ABI) utility for encoding and decoding solidity sm
 
 Also arrays `((\[(\d+)?\])+)?` for the above mentioned types.
 
-# Usage:
+# Usage
 
 ```perl
 my $encoder = REFECO::Blockchain::Contract::Solidity::ABI::Encoder->new();

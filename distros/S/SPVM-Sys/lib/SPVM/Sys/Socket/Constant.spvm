@@ -69,6 +69,8 @@ class Sys::Socket::Constant {
 
   native static method IPPROTO_UDPLITE : int ();
 
+  native static method IPPROTO_ICMP : int ();
+
   native static method IPTOS_LOWDELAY : int ();
 
   native static method IPTOS_MINCOST : int ();
@@ -214,6 +216,8 @@ class Sys::Socket::Constant {
   native static method SOL_SOCKET : int ();
 
   native static method SOMAXCONN : int ();
+
+  native static method SO_BROADCAST : int ();
 
   native static method SO_EE_OFFENDER : int ();
 
@@ -414,4 +418,28 @@ class Sys::Socket::Constant {
   native static method NI_MAXHOST : int ();
 
   native static method NI_MAXSERV : int ();
+
+  native static method ICMP_ADDRESS : int ();
+
+  native static method ICMP_DEST_UNREACH : int ();
+
+  native static method ICMP_ECHO : int ();
+
+  native static method ICMP_ECHOREPLY : int ();
+
+  native static method ICMP_ECHOREQUEST : int ();
+
+  native static method ICMP_FILTER : int ();
+
+  native static method ICMP_FRAG_NEEDED : int ();
+
+  native static method ICMP_PARAMETERPROB : int ();
+
+  native static method ICMP_REDIRECT : int ();
+
+  native static method ICMP_SOURCE_QUENCH : int ();
+
+  native static method ICMP_TIMESTAMP : int ();
+
+  native static method ICMP_TIME_EXCEEDED : int ();
 }

@@ -270,6 +270,20 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'use_frame_size' => {
+    	datatype => 'boolean',
+    	base_name => 'UseFrameSize',
+    	description => 'Determines whether the text frame will be included in a rendering area or not.',
+    	format => '',
+    	read_only => '',
+    		},
+    'use_frame_rotation' => {
+    	datatype => 'boolean',
+    	base_name => 'UseFrameRotation',
+    	description => 'Determines whether to perform the specified rotation of the shape when rendering or not.',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
@@ -285,7 +299,9 @@ __PACKAGE__->swagger_types( {
     'jpeg_quality' => 'int',
     'pictures_compression' => 'string',
     'delete_pictures_cropped_areas' => 'boolean',
-    'external_fonts_handling' => 'string'
+    'external_fonts_handling' => 'string',
+    'use_frame_size' => 'boolean',
+    'use_frame_rotation' => 'boolean'
 } );
 
 __PACKAGE__->attribute_map( {
@@ -301,7 +317,9 @@ __PACKAGE__->attribute_map( {
     'jpeg_quality' => 'JpegQuality',
     'pictures_compression' => 'PicturesCompression',
     'delete_pictures_cropped_areas' => 'DeletePicturesCroppedAreas',
-    'external_fonts_handling' => 'ExternalFontsHandling'
+    'external_fonts_handling' => 'ExternalFontsHandling',
+    'use_frame_size' => 'UseFrameSize',
+    'use_frame_rotation' => 'UseFrameRotation'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

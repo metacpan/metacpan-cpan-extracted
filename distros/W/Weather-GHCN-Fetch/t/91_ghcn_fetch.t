@@ -102,7 +102,6 @@ subtest 'option validation' => sub {
 };
 
 subtest 'output to clipboard' => sub {
-    plan skip_all => 'fails during dzil release, but not during dzil test';
     
     if ( not check_install( module => 'Win32::Clipboard') ) {
         plan skip_all => 'no Win32::Clipboard';
@@ -121,10 +120,11 @@ subtest 'output to clipboard' => sub {
         '-cachedir',    $Cachedir,
         '-outclip',
     );
+    my $got;
     ($stdout, $stderr) = capture {
         Weather::GHCN::App::Fetch->run( \@args );
+        $got = $clip->Get();
     };
-    my $got = $clip->Get();
     like $got, qr/Year\s+Decade\s+TMAX\s+TMIN.*?\d{4}/ms, 'clipboard output';
 };
 

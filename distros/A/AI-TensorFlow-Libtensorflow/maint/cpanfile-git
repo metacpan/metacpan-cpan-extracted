@@ -1,0 +1,6 @@
+requires 'Alien::Libtensorflow',
+	git => 'https://github.com/EntropyOrg/perl-Alien-Libtensorflow.git',
+	branch => 'master';
+requires 'PDL',
+	git => 'https://github.com/PDLPorters/pdl.git',
+	branch => 'master';

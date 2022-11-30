@@ -13,7 +13,7 @@ use parent 'Test::Unit::TestBase';
 use Google::RestApi::Utils qw(:all);
 
 sub test_named_extra : Tests(2) {
-  my %args;
+  my %args = ( validated => {} );
   throws_ok sub { named_extra(%args); }, qr/Missing required/i, "named_extra: No _extra_ key throws";
   %args = ( _extra_ => { joe => 'fred' } );
   is_deeply named_extra(%args), $args{_extra_}, "named_extra: Returns the _extra_ hash";

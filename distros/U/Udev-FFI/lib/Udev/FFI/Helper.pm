@@ -23,7 +23,7 @@ sub get_entries_all {
             my @a = ();
 
             do {
-                push @a, udev_list_entry_get_name($entry);
+                push(@a, udev_list_entry_get_name($entry));
                 $entry = udev_list_entry_get_next($entry);
             } while (defined($entry));
 

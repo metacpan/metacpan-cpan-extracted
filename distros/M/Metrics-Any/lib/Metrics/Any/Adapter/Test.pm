@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020-2022 -- leonerd@leonerd.org.uk
 
-package Metrics::Any::Adapter::Test 0.08;
+package Metrics::Any::Adapter::Test 0.09;
 
 use v5.14;
 use warnings;
@@ -46,6 +46,9 @@ required, the full values can be stored by setting L</use_full_distributions>.
 
 For predictable output of timer metrics in unit tests, a unit test may wish to
 use the L</override_timer_duration> method.
+
+This adapter type supports batch mode reporting. Callbacks are invoked at the
+beginning of the L</metrics> method.
 
 =cut
 

@@ -1,0 +1,7 @@
+0.002 Nov 25 2022
+	- no longer croaks on unknown ref types, tries to handle them with string eq
+	- improved documentation
+
+0.001 Nov 24 2022
+	- first version
+

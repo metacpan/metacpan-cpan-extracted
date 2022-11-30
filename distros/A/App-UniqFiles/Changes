@@ -1,3 +1,11 @@
+0.139   2022-11-15  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Tweak Abstract; we don't *omit* duplicate file contents, only *report*
+          them.
+
+
 0.138   2022-11-14  Released-By: PERLANCAR; Urgency: low
 
         - No functional changes.

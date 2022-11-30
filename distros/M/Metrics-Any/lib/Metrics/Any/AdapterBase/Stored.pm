@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
 
-package Metrics::Any::AdapterBase::Stored 0.08;
+package Metrics::Any::AdapterBase::Stored 0.09;
 
 use v5.14;
 use warnings;
@@ -39,12 +39,23 @@ sub new
    my $class = shift;
 
    # Metrics are keys of $self, named by handle
+   # Special non-metrics values can be stored by prefixing the name with "\x00"
    return bless {}, $class;
 }
 
 =head1 METHODS
 
 =cut
+
+use constant HAVE_BATCH_MODE => 1;
+
+sub add_batch_mode_callback
+{
+   my $self = shift;
+   my ( $cb ) = @_;
+
+   push @{ $self->{"\0batch_callbacks"} }, $cb;
+}
 
 sub _make
 {
@@ -112,7 +123,13 @@ sub walk
    my $self = shift;
    my ( $code ) = @_;
 
+   if( my $cbs = $self->{"\0batch_callbacks"} ) {
+      foreach my $cb ( @$cbs ) { $cb->() }
+   }
+
    foreach my $handle ( sort keys %$self ) {
+      next if $handle =~ m/^\0/;
+
       my $metric = $self->{$handle};
       my $values = $metric->{values};
 

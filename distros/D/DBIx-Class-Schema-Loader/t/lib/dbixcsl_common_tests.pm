@@ -224,9 +224,14 @@ sub setup_schema {
     my $debug = ($self->{verbose} > 1) ? 1 : 0;
 
     if ($ENV{SCHEMA_LOADER_TESTS_USE_MOOSE}) {
+        # on travis, we require the intersection of both sets of prereqs
         if (not DBIx::Class::Schema::Loader::Optional::Dependencies->req_ok_for('use_moose')) {
             die sprintf ("Missing dependencies for SCHEMA_LOADER_TESTS_USE_MOOSE: %s\n",
                 DBIx::Class::Schema::Loader::Optional::Dependencies->req_missing_for('use_moose'));
+        }
+        if (not DBIx::Class::Schema::Loader::Optional::Dependencies->req_ok_for('use_moose_only_autoclean')) {
+            die sprintf ("Missing dependencies for SCHEMA_LOADER_TESTS_USE_MOOSE: %s\n",
+                DBIx::Class::Schema::Loader::Optional::Dependencies->req_missing_for('use_moose_only_autoclean'));
         }
 
         $self->{use_moose} = 1;

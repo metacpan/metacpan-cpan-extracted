@@ -1,0 +1,150 @@
+NAME
+    Acme::CPANModules::DiffingStuffs - List of modules/applications to diff
+    various stuffs
+
+VERSION
+    This document describes version 0.001 of
+    Acme::CPANModules::DiffingStuffs (from Perl distribution
+    Acme-CPANModules-DiffingStuffs), released on 2022-09-08.
+
+DESCRIPTION
+    Archive files
+
+    diff-tarballs (from App::DiffTarballs) diffs two tarballs.
+
+    diff-cpan-releasess (from App::DiffCPANReleases) diffs two CPAN release
+    tarballs.
+
+    Database schema
+
+    DBIx::Diff::Schema compares two databases and reports tables/columns
+    which are added/deleted/modified. App::DiffDBSchemaUtils provides CLI's
+    for it like diff-db-schema, diff-mysql-schema, diff-sqlite-schema,
+    diff-pg-schema.
+
+    PDF files
+
+    diff-doc-text (from App::DiffDocText) diffs two DOC/DOCX/ODT documents
+    by converting the documents to plaintext and diff-ing the plaintext
+    files.
+
+    Spreadsheet files
+
+    diff-xls-text (from App::DiffXlsText) diffs two XLS/XLSX/ODS workbooks
+    by converting each worksheet in each workbook as files in the workbook's
+    directory and then diff-ing the two workbook directories.
+
+    Structured data
+
+    See separated list: Acme::CPANModules::DiffingStructuredData.
+
+    Word processor documents
+
+    diff-doc-text (from App::DiffDocText) diffs two DOC/DOCX/ODT documents
+    by converting the documents to plaintext and diff-ing the plaintext
+    files.
+
+ACME::CPANMODULES ENTRIES
+    *   App::DiffTarballs - Diff contents of two tarballs
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   App::DiffCPANReleases - Diff contents of two CPAN releases
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   DBIx::Diff::Schema - Compare schema of two DBI databases
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   App::DiffDocText - Diff the text of two Office word-processor
+        documents (.doc, .docx, .odt, etc)
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   App::DiffXlsText - Diff the text of two Office spreadsheets (.ods,
+        .xls, .xlsx) as two directories of CSV files
+
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    *   Acme::CPANModules::DiffingStructuredData
+
+FAQ
+  What is an Acme::CPANModules::* module?
+    An Acme::CPANModules::* module, like this module, contains just a list
+    of module names that share a common characteristics. It is a way to
+    categorize modules and document CPAN. See Acme::CPANModules for more
+    details.
+
+  What are ways to use this Acme::CPANModules module?
+    Aside from reading this Acme::CPANModules module's POD documentation,
+    you can install all the listed modules (entries) using cpanm-cpanmodules
+    script (from App::cpanm::cpanmodules distribution):
+
+     % cpanm-cpanmodules -n DiffingStuffs
+
+    Alternatively you can use the cpanmodules CLI (from App::cpanmodules
+    distribution):
+
+        % cpanmodules ls-entries DiffingStuffs | cpanm -n
+
+    or Acme::CM::Get:
+
+        % perl -MAcme::CM::Get=DiffingStuffs -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
+
+    or directly:
+
+        % perl -MAcme::CPANModules::DiffingStuffs -E'say $_->{module} for @{ $Acme::CPANModules::DiffingStuffs::LIST->{entries} }' | cpanm -n
+
+    This Acme::CPANModules module also helps lcpan produce a more meaningful
+    result for "lcpan related-mods" command when it comes to finding related
+    modules for the modules listed in this Acme::CPANModules module. See
+    App::lcpan::Cmd::related_mods for more details on how "related modules"
+    are found.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-DiffingStuffs>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-DiffingStuffs>.
+
+SEE ALSO
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Diff
+    ingStuffs>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

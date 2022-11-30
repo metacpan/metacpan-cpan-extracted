@@ -13,10 +13,19 @@ use File::Spec();
 delete $ENV{PATH};
 delete @ENV{qw(IFS CDPATH ENV BASH_ENV)};
 
+my %os_paths = (
+    freebsd   => '/usr/local/bin',
+    dragonfly => '/usr/local/bin',
+    netbsd    => '/usr/pkg/bin',
+);
 local $ENV{PATH} = '/usr/bin:/bin:/usr/sbin:/sbin'
-  . ( $OSNAME eq 'freebsd' ? ':/usr/local/bin' : q[] );
+  . (
+    defined $os_paths{$OSNAME}
+    ? q[:] . $os_paths{$OSNAME}
+    : q[]
+  );
 
-our $VERSION = '1.32';
+our $VERSION = '1.33';
 
 my $binary  = 'firefox';
 my $ident   = 'ssh-auth-cmd-marionette';
@@ -183,6 +192,7 @@ qr/(?:$quoted_linux_profiles_ini|$quoted_darwin_profiles_ini)\/profiles[.]ini/sm
       @sftp_server_regexs,
       qr/uname[ ][|][|][ ]ver/smx,
       qr/echo[ ]"TMPDIR=\\"\$TMPDIR\\""/smx,
+      qr/echo[ ]"DISPLAY=\\"\$DISPLAY\\""/smx,
       qr/echo[ ]"TMP=\\"\$TMP\\""/smx,
       qr/mkdir[ ](?:\-m[ ]700[ ])?$root_dir_regex/smx,
       qr/mkdir[ ](?:\-m[ ]700[ ])?$root_dir_regex\/$sub_directory_regex/smx,
@@ -323,9 +333,22 @@ sub _filesystem_regexes {
             push @allowed_binaries,           'firefox';
             push @allowed_binary_paths,       '/usr/bin/firefox';
             push @allowed_binary_directories, '/usr/bin';
-            if ( $OSNAME eq 'freebsd' ) {
-                push @allowed_binary_paths,       '/usr/local/bin/firefox';
-                push @allowed_binary_directories, '/usr/local/lib/firefox';
+            my %os_allowed_binary_paths = (
+                freebsd   => '/usr/local/bin/firefox',
+                dragonfly => '/usr/local/bin/firefox',
+                netbsd    => '/usr/pkg/bin/firefox',
+            );
+            if ( $os_allowed_binary_paths{$OSNAME} ) {
+                push @allowed_binary_paths, $os_allowed_binary_paths{$OSNAME};
+            }
+            my %os_allowed_binary_directories = (
+                freebsd   => '/usr/local/lib',
+                dragonfly => '/usr/local/lib/firefox',
+                netbsd    => '/usr/pkg/bin',
+            );
+            if ( $os_allowed_binary_directories{$OSNAME} ) {
+                push @allowed_binary_directories,
+                  $os_allowed_binary_directories{$OSNAME};
             }
         }
         else {
@@ -375,7 +398,7 @@ ssh-auth-cmd-marionette - ssh ~/.ssh/authorized_keys command for Firefox::Marion
 
 =head1 VERSION
 
-Version 1.32
+Version 1.33
 
 =head1 USAGE
 

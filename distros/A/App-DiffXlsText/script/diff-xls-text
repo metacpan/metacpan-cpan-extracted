@@ -14,9 +14,9 @@ use CLI::MetaUtil::Getopt::Long qw(GetOptionsCLIWrapper);
 use IPC::System::Options 'system', -log=>1, -die=>1;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-07'; # DATE
+our $DATE = '2022-09-08'; # DATE
 our $DIST = 'App-DiffXlsText'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 unless (which "xlsx2csv") {
     die "diff-xls-text: This tool requires xlsx2csv from CPAN module Spreadsheet::Read\n";
@@ -113,7 +113,7 @@ diff-xls-text - Diff the text of two Office spreadsheets (.ods, .xls, .xlsx) as 
 
 =head1 VERSION
 
-This document describes version 0.009 of diff-xls-text (from Perl distribution App-DiffXlsText), released on 2022-09-07.
+This document describes version 0.011 of diff-xls-text (from Perl distribution App-DiffXlsText), released on 2022-09-08.
 
 =head1 SYNOPSIS
 
@@ -128,16 +128,6 @@ is an Office spreadsheet (.ods, .xls, or .xlsx) and tries to convert the file to
 a directory of CSV files (where each CSV file is converted from a single
 worksheet) using L<xlsx2csv>. It then passes the converted directories to C<<
 diff -ruN >> command.
-
-=head1 DIFF_CMD
-
-String. Can be used to set path to diff command. See also
-L</DIFF_XLS_TEXT_DIFF_CMD> which takes precedence.
-
-=head2 DIFF_XLS_TEXT_DIFF_CMD
-
-String. Can be used to set path to diff command. The defaultl is L<diffwc> if
-available in PATH, or C<diff>. Takes precedence over L</DIFF_CMD>.
 
 =head1 OPTIONS
 
@@ -160,6 +150,16 @@ you to do column-based instead of row-based diff.
 =head2 DEBUG
 
 If set to true, do not cleanup temporary directories.
+
+=head2 DIFF_CMD
+
+String. Can be used to set path to diff command. See also
+L</DIFF_XLS_TEXT_DIFF_CMD> which takes precedence.
+
+=head2 DIFF_XLS_TEXT_DIFF_CMD
+
+String. Can be used to set path to diff command. The defaultl is L<diffwc> if
+available in PATH, or C<diff>. Takes precedence over L</DIFF_CMD>.
 
 =head1 HOMEPAGE
 

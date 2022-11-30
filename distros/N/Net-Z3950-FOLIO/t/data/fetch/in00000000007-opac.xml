@@ -1,0 +1,53 @@
+<opacRecord>
+  <bibliographicRecord>
+02961nas a22004215i 4500
+001 in00000000007
+005 20200731144048.0
+007 cr nn 008mamaa
+008 150723s||||||||au uu poo||||||   b|EN |d
+022    $a 1436-5065
+024 7  $a 703 $2 local
+035    $a (DE-He213)1436-5065
+210 10 $a Meteorol Atmos Phys
+245 10 $a Meteorology and Atmospheric Physics $h [electronic resource] / $c edited by Clemens Simmer.
+247 00 $a Archives for meteorology, geophysics, and bioclimatology, Series A, Meteorology and atmospheric physics
+247 00 $a Meteorology and geophysics
+247 00 $a Archiv für Meteorologie, Geophysik und Bioklimatologie,Ser. A, Meteorologie und Geophysik
+247 00 $a Archives for meteorology, geophysics, and bioclimatology / A
+247 00 $a Meteorology and atmospheric physics
+264  1 $a Vienna : $b Springer Vienna : $b Imprint: Springer.
+300    $b online resource.
+520    $a Meteorology and Atmospheric Physics accepts original research papers for publication following the recommendations of a review panel. The emphasis lies with the following topic areas: - atmospheric dynamics and general circulation; - synoptic meteorology; - weather systems in specific regions, such as the tropics, the polar caps, the oceans; - atmospheric energetics; - numerical modeling and forecasting; - physical and chemical processes in the atmosphere, including radiation, optical effects, electricity, and atmospheric turbulence and transport processes; - mathematical and statistical techniques applied to meteorological data sets Meteorology and Atmospheric Physics discusses physical and chemical processes - in both clear and cloudy atmospheres - including radiation, optical and electrical effects, precipitation and cloud microphysics.
+650  0 $a Meteorology.
+650  0 $a Atmospheric sciences.
+650  0 $a Environmental sciences.
+650  0 $a Environmental pollution.
+650  0 $a Water pollution.
+650 14 $a Atmospheric Sciences. $0 https://scigraph.springernature.com/ontologies/product-market-codes/G36000
+650 24 $a Meteorology. $0 https://scigraph.springernature.com/ontologies/product-market-codes/312000
+650 24 $a Math. Appl. in Environmental Science. $0 https://scigraph.springernature.com/ontologies/product-market-codes/U24005
+650 24 $a Terrestrial Pollution. $0 https://scigraph.springernature.com/ontologies/product-market-codes/U35030
+650 24 $a Waste Water Technology / Water Pollution Control / Water Management / Aquatic Pollution. $0 https://scigraph.springernature.com/ontologies/product-market-codes/U35040
+700 1  $a Simmer, Clemens. $e editor. $4 edt $4 http://id.loc.gov/vocabulary/relators/edt
+710 2  $a SpringerLink (Online service)
+776 08 $i Printed version:  $x 0177-7971
+856 40 $u http://link.springer.com/journal/703 $z Hybrid
+950    $b Earth and Environmental Science
+999 ff $s 5859d725-5245-48b1-b6b9-941a0887635e $i f0491e38-10f4-45d4-9e77-81d4c062fc2e
+
+  </bibliographicRecord>
+<holdings>
+ <holding>
+  <typeOfRecord>n</typeOfRecord>
+  <encodingLevel>1</encodingLevel>
+  <format>cr</format>
+  <receiptAcqStatus>3</receiptAcqStatus>
+  <generalRetention>|</generalRetention>
+  <completeness>a</completeness>
+  <dateOfReport>||||| </dateOfReport>
+  <nucCode>Københavns Universitet</nucCode>
+  <localLocation>Online</localLocation>
+  <shelvingLocation>Online</shelvingLocation>
+ </holding>
+</holdings>
+</opacRecord>

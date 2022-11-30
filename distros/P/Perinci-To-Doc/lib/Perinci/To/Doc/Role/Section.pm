@@ -10,9 +10,9 @@ has doc_indent_level => (is => 'rw');
 has doc_indent_str => (is => 'rw', default => sub{"  "}); # indent characters
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-05-14'; # DATE
+our $DATE = '2022-10-15'; # DATE
 our $DIST = 'Perinci-To-Doc'; # DIST
-our $VERSION = '0.879'; # VERSION
+our $VERSION = '0.880'; # VERSION
 
 sub add_doc_section_before {
     my ($self, $name, $before) = @_;
@@ -113,7 +113,7 @@ Perinci::To::Doc::Role::Section - Role for class that generates documentation wi
 
 =head1 VERSION
 
-This document describes version 0.879 of Perinci::To::Doc::Role::Section (from Perl distribution Perinci-To-Doc), released on 2022-05-14.
+This document describes version 0.880 of Perinci::To::Doc::Role::Section (from Perl distribution Perinci-To-Doc), released on 2022-10-15.
 
 =head1 DESCRIPTION
 
@@ -204,9 +204,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

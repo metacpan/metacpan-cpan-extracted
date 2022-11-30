@@ -1,6 +1,5 @@
 #!/usr/bin/perl
-package
-  dzil;
+package dzil 6.029;
 use Dist::Zilla::App;
 
 use Dist::Zilla::Pragmas;
@@ -14,7 +13,7 @@ Dist::Zilla::App->run;
 
 #pod =head1 OVERVIEW
 #pod
-#pod For help with L<Dist::Zilla|Dist::Zilla>, start with L<http://dzil.org/> or
+#pod For help with L<Dist::Zilla|Dist::Zilla>, start with L<https://dzil.org/> or
 #pod by running C<dzil commands>.
 #pod
 #pod =cut
@@ -31,11 +30,11 @@ dzil - do stuff with your dist
 
 =head1 VERSION
 
-version 6.028
+version 6.029
 
 =head1 OVERVIEW
 
-For help with L<Dist::Zilla|Dist::Zilla>, start with L<http://dzil.org/> or
+For help with L<Dist::Zilla|Dist::Zilla>, start with L<https://dzil.org/> or
 by running C<dzil commands>.
 
 =head1 PERL VERSION

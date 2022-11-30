@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 13 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 14 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/SubtitleUtils.pm'
@@ -16,6 +16,7 @@ my @scripts = (
     'script/srtadjust',
     'script/srtcalc',
     'script/srtcheck',
+    'script/srtcombine2text',
     'script/srtcombinetext',
     'script/srtparse',
     'script/srtrenumber',

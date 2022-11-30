@@ -6,9 +6,10 @@ use warnings;
 
 use Test::More;
 
-plan tests => 16;
+plan tests => 18;
 
 my @module_files = (
+    'Weather/GHCN/App/CacheUtil.pm',
     'Weather/GHCN/App/Extremes.pm',
     'Weather/GHCN/App/Fetch.pm',
     'Weather/GHCN/App/StationCounts.pm',
@@ -24,6 +25,7 @@ my @module_files = (
 );
 
 my @scripts = (
+    'bin/ghcn_cacheutil',
     'bin/ghcn_extremes',
     'bin/ghcn_fetch',
     'bin/ghcn_station_counts'

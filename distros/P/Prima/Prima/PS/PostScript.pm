@@ -87,36 +87,49 @@ sub change_transform
 	my ( $self, $gsave ) = @_;
 	return if $self-> {delay};
 
-	my @tp = $self-> translate;
-	my @cr = $self-> clipRect;
-	my @sc = $self-> scale;
-	my $ro = $self-> rotate;
+	my ($doClip, @cr);
 	my $rg = $self-> region;
-	$cr[2] -= $cr[0];
-	$cr[3] -= $cr[1];
-	my $doClip = grep { $_ != 0 } @cr;
-	my $doTR   = grep { $_ != 0 } @tp;
-	my $doSC   = grep { $_ != 0 } @sc;
+	unless ( $rg ) {
+		@cr   = $self-> clipRect;
+		$cr[2]  -= $cr[0];
+		$cr[3]  -= $cr[1];
+		$doClip  = grep { $_ != 0 } @cr;
+	}
 
-	if ( !$doClip && !$doTR && !$doSC && !$ro) {
+	my $m = $self-> matrix;
+	if ( $self->{reversed}) {
+		my @t = @$m[4,5];
+		@$m[4,5] = (0,0);
+		$m->rotate(90);
+		my ($x) = $self->point2pixel($self->{pageSize}->[0] - $self->{pageMargins}->[0] - $self->{pageMargins}->[2]);
+		$m->translate($x, 0);
+		$m->translate(-$t[0], $t[1]);
+	}
+	my $doMx = !$m->is_identity;
+
+	if ( !$doClip && !$doMx && !$rg) {
 		$self-> emit(':') if $gsave;
 		return;
 	}
 
-	@cr = $self-> pixel2point( @cr);
-	@tp = $self-> pixel2point( @tp);
-	my $mcr3 = -$cr[3];
-
 	$self-> emit(';') unless $gsave;
 	$self-> emit(':');
-	float_inplace(@cr, @tp, @sc, $mcr3, $ro);
-	$self-> emit(<<CLIP) if $doClip;
-N $cr[0] $cr[1] M 0 $cr[3] L $cr[2] 0 L 0 $mcr3 L X C
-CLIP
-	$self-> emit("@tp T") if $doTR;
-	$self-> emit($rg-> apply_offset) if $rg && !$doClip;
-	$self-> emit("@sc Z") if $doSC;
-	$self-> emit("$ro R") if $ro != 0;
+
+	if ( $rg ) {
+		$self-> emit($rg-> apply_offset);
+	} elsif ( $doClip ) {
+		@cr = $self-> pixel2point( @cr);
+		float_inplace(@cr);
+		$self-> emit("N $cr[0] $cr[1] M 0 $cr[3] L $cr[2] 0 L 0 -$cr[3] L X C");
+	}
+
+	if ( $doMx ) {
+		my @tm = $self-> pixel2point( @$m[4,5] );
+		my @xm = @$m[0..3];
+		float_inplace(@xm, @tm);
+		$self-> emit("[@xm @tm] SM");
+	}
+
 	$self-> {changed}-> {$_} = 1 for qw(fill linePattern lineWidth lineJoin lineEnd miterLimit font);
 }
 
@@ -128,7 +141,7 @@ sub fill
 		$r1 == rop::NoOper &&
 		$r2 == rop::NoOper;
 
-	if ( $r2 != rop::NoOper && $self-> {fpType} ne 'F') {
+	if ( $r2 != rop::NoOper && $self-> {fpType} ne 'F' && $self->{fpType} !~ /^Color/ ) {
 		my $bk =
 			( $r2 == rop::Blackness) ? 0 :
 			( $r2 == rop::Whiteness) ? 0xffffff : $self-> backColor;
@@ -144,6 +157,10 @@ sub fill
 		if ($self-> {changed}-> {fill}) {
 			if ( $self-> {fpType} eq 'F') {
 				$self-> emit( $self-> cmd_rgb( $c));
+			} elsif ( $self->{fpType} =~ /^Color/ ) {
+					$self-> emit(<<IMGPAT);
+\/Pattern SS Pat_$self->{fpType} SC
+IMGPAT
 			} else {
 				my ( $r, $g, $b) = (
 					int((($c & 0xff0000) >> 16) * 100 / 256 + 0.5) / 100,
@@ -225,10 +242,15 @@ sub stroke
 			if ( length( $lp) == 1) {
 				$self-> emit('[] 0 SD');
 			} else {
-				my @x = split('', $lp);
+				my $lw = $self->lineWidth;
+				my @x = map { ord } split('', $lp);
 				push( @x, 0) if scalar(@x) % 1;
-				@x = map { ord($_) } @x;
-				$self-> emit("[@x] 0 SD");
+				my @lp;
+				for ( my $i = 0; $i < @x; $i += 2 ) {
+					push @lp, $x[$i];
+					push @lp, ($x[$i+1] - 1) * $lw / 2;
+				}
+				$self-> emit("[@lp] 0 SD");
 			}
 			$self-> {changed}-> {linePattern} = 0;
 		}
@@ -406,25 +428,54 @@ sub pages { $_[0]-> {pages} }
 
 # properties
 
-sub fillPattern
+sub emit_pattern
 {
-	return $_[0]-> SUPER::fillPattern unless $#_;
-	$_[0]-> SUPER::fillPattern( $_[1]);
-	return unless $_[0]-> {can_draw};
+	my ( $self, $fpid, $fp) = @_;
 
-	my $self = $_[0];
-	my @fp  = @{$self-> SUPER::fillPattern};
-	my $solidBack = ! grep { $_ != 0 } @fp;
-	my $solidFore = ! grep { $_ != 0xff } @fp;
-	my $fpid;
-	my @scaleto = $self-> pixel2point( 8, 8);
-	if ( !$solidBack && !$solidFore) {
-		$fpid = join( '', map { sprintf("%02x", $_)} @fp);
-		unless ( exists $self-> {fp_hash}-> {$fpid}) {
-			$self-> emit( <<PATTERNDEF);
+	return if exists $self-> {fp_hash}-> {$fpid};
+	$self-> {fp_hash}-> {$fpid} = 1;
+
+	my (@sz, $imgdef, $imgcdef, $depth, $paint);
+	$imgdef = '';
+	if ( ref($fp) eq 'ARRAY') {
+		@sz      = (8,8);
+		$paint   = 2;
+		$imgcdef = 'I';
+		$depth   = 'f';
+		$imgdef  = join( '', map { sprintf("%02x", $_)} @$fp);
+	} else {
+		@sz = $fp->size;
+		my ( $ls, $stride, $data );
+		if ( $fp->type == im::BW ) {
+			$paint   = 2;
+			$depth   = 't';
+			$imgcdef = 'I';
+			$stride  = int($fp-> width / 8) +!!+ ($fp->width % 8);
+		} else {
+			$paint   = 1;
+			$depth   = '8';
+			$imgcdef = ($fp->type & im::GrayScale) ? 'image' : 'false 3 colorimage';
+			$fp      = $self->prepare_image($fp);
+			$stride  = $fp->get_bpp * $fp->width / 8;
+		}
+		$ls      = $fp->lineSize;
+		$data    = $fp->data;
+		for my $y ( 0 .. $fp->height - 1 ) {
+			$imgdef .= unpack("H*", substr($data, $y * $ls, $stride));
+		}
+	}
+
+	my @scaleto = $self-> pixel2point(@sz);
+
+	# PatternType 1 = Tiling pattern
+	# PaintType   1 = Colored
+	# PaintType   2 = Uncolored
+	$self-> emit( <<PATTERNDEF);
+:
+[1 0 0 1 0 0] SM
 <<
-\/PatternType 1 \% Tiling pattern
-\/PaintType 2 \% Uncolored
+\/PatternType 1
+\/PaintType $paint
 \/TilingType 1
 \/BBox [ 0 0 @scaleto]
 \/XStep $scaleto[0]
@@ -432,18 +483,47 @@ sub fillPattern
 \/PaintProc { b
 :
 @scaleto Z
-8 8 t
-[8 0 0 8 0 0]
-< $fpid > I
+@sz $depth
+[$sz[0] 0 0 $sz[0] 0 0]
+< $imgdef > $imgcdef
 ;
 e
 } bind
 >> MX MP
 \/Pat_$fpid ~ d
-
+;
 PATTERNDEF
-			$self-> {fp_hash}-> {$fpid} = 1;
+}
+
+sub fillPattern
+{
+	return $_[0]-> SUPER::fillPattern unless $#_;
+	$_[0]-> SUPER::fillPattern( $_[1]);
+	return unless $_[0]-> {can_draw};
+
+	my $self = $_[0];
+	my $fp  = $self-> SUPER::fillPattern;
+	my ($solidBack, $solidFore) = (0,0);
+	my $fpid;
+
+	if( (ref($fp) // '') eq 'ARRAY') {
+		$solidBack = ! grep { $_ != 0    } @$fp;
+		$solidFore = ! grep { $_ != 0xff } @$fp;
+		my @scaleto = $self-> pixel2point( 8, 8);
+		if ( !$solidBack && !$solidFore) {
+			$fpid = join( '', map { sprintf("%02x", $_)} @$fp);
+			$self-> emit_pattern($fpid, $fp);
 		}
+	} elsif ( UNIVERSAL::isa($fp, 'Prima::Image')) {
+		$fpid = "$fp";
+		$fpid =~ s/^Prima::(Image|Icon)=HASH\((.*)\)/$2/; # most common case
+		$fpid =~ s/(\W)/sprintf("%02x", ord($1))/ge;      # just in case
+		$fpid = (( $fp->type == im::BW ) ? "Mono_" : "Color_") . $fpid;
+
+		my $icon    = $fp->isa('Prima::Icon'); # XXX
+		$self-> emit_pattern($fpid, $fp);
+	} else {
+		$solidFore = 1;
 	}
 	$self-> {fpType} = $solidBack ? 'B' : ( $solidFore ? 'F' : $fpid);
 	$self-> {changed}-> {fill} = 1;
@@ -463,11 +543,28 @@ sub pageDevice
 	$_[0]-> {pageDevice} = $_[1] unless $_[0]-> get_paint_state;
 }
 
+sub graphic_context_push
+{
+	my $self = shift;
+	return 0 unless $self->SUPER::graphic_context_push;
+	$self->emit(':');
+	return 1;
+}
+
+sub graphic_context_pop
+{
+	my $self = shift;
+	$self->emit(';');
+	return unless $self->SUPER::graphic_context_pop;
+	return 1;
+}
+
 # primitives
 
 sub arc
 {
 	my ( $self, $x, $y, $dx, $dy, $start, $end) = @_;
+	return $self->primitive( arc => $x, $y, $dx, $dy, $start, $end) if $self-> is_custom_line;
 	my $try = $dy / $dx;
 	( $x, $y, $dx, $dy) = $self-> pixel2point( $x, $y, $dx, $dy);
 	my $rx = $dx / 2;
@@ -481,6 +578,7 @@ ARC
 sub chord
 {
 	my ( $self, $x, $y, $dx, $dy, $start, $end) = @_;
+	return $self->primitive( chord => $x, $y, $dx, $dy, $start, $end) if $self-> is_custom_line(1);
 	my $try = $dy / $dx;
 	( $x, $y, $dx, $dy) = $self-> pixel2point( $x, $y, $dx, $dy);
 	my $rx = $dx / 2;
@@ -494,6 +592,7 @@ CHORD
 sub ellipse
 {
 	my ( $self, $x, $y, $dx, $dy) = @_;
+	return $self->primitive( ellipse => $x, $y, $dx, $dy) if $self-> is_custom_line(1);
 	my $try = $dy / $dx;
 	( $x, $y, $dx, $dy) = $self-> pixel2point( $x, $y, $dx, $dy);
 	my $rx = $dx / 2;
@@ -532,6 +631,7 @@ ELLIPSE
 sub sector
 {
 	my ( $self, $x, $y, $dx, $dy, $start, $end) = @_;
+	return $self->primitive( sector => $x, $y, $dx, $dy, $start, $end) if $self-> is_custom_line(1);
 	my $try = $dy / $dx;
 	( $x, $y, $dx, $dy) = $self-> pixel2point( $x, $y, $dx, $dy);
 	my $rx = $dx / 2;
@@ -735,6 +835,7 @@ sub bars
 sub rectangle
 {
 	my ( $self, $x1, $y1, $x2, $y2) = @_;
+	return $self->primitive( rectangle => $x1, $y1, $x2, $y2) if $self-> is_custom_line(1);
 	( $x1, $y1, $x2, $y2) = float_format($self-> pixel2point( $x1, $y1, $x2, $y2));
 	$self-> stroke( "N $x1 $y1 M $x1 $y2 l $x2 $y2 l $x2 $y1 l X O");
 }
@@ -760,6 +861,7 @@ CLEAR
 sub line
 {
 	my ( $self, $x1, $y1, $x2, $y2) = @_;
+	return $self->primitive( line => $x1, $y1, $x2, $y2) if $self-> is_custom_line(1);
 	( $x1, $y1, $x2, $y2) = float_format($self-> pixel2point( $x1, $y1, $x2, $y2));
 	$self-> stroke("N $x1 $y1 M $x2 $y2 l O");
 }
@@ -767,6 +869,7 @@ sub line
 sub lines
 {
 	my ( $self, $array) = @_;
+	return $self->primitive( lines => $array ) if $self-> is_custom_line(1);
 	my $i;
 	my $c = scalar @$array;
 	my @a = float_format($self-> pixel2point( @$array));
@@ -781,6 +884,7 @@ sub lines
 sub polyline
 {
 	my ( $self, $array) = @_;
+	return $self->primitive( polyline => $array ) if $self-> is_custom_line(1);
 	my $i;
 	my $c = scalar @$array;
 	my @a = float_format($self-> pixel2point( @$array));
@@ -830,57 +934,21 @@ sub put_image_indirect
 	return 0 unless $_[0]-> {can_draw};
 	my ( $self, $image, $x, $y, $xFrom, $yFrom, $xDestLen, $yDestLen, $xLen, $yLen) = @_;
 
-	my $touch;
-	$touch = 1, $image = $image-> image if $image-> isa('Prima::DeviceBitmap');
-
-	unless ( $xFrom == 0 && $yFrom == 0 && $xLen == $image-> width && $yLen == $image-> height) {
-		$image = $image-> extract( $xFrom, $yFrom, $xLen, $yLen);
-		$touch = 1;
-	}
-
-	my $ib = $image-> get_bpp;
-	if ( $ib != $self-> get_bpp) {
-		$image = $image-> dup unless $touch;
-		if ( $self-> {grayscale} || $image-> type & im::GrayScale) {
-			$image-> type( im::Byte);
-		} else {
-			$image-> type( im::RGB);
-		}
-		$touch = 1;
-	} elsif ( $self-> {grayscale} || $image-> type & im::GrayScale) {
-		$image = $image-> dup unless $touch;
-		$image-> type( im::Byte);
-		$touch = 1;
-	}
-
-	$ib = $image-> get_bpp;
-	if ($ib != 8 && $ib != 24) {
-		$image = $image-> dup unless $touch;
-		$image-> type( im::RGB);
-		$touch = 1;
-	}
-
-	if ( $image-> type == im::RGB ) {
-		# invert BGR -> RGB
-		$image = $image-> dup unless $touch;
-		$image-> set(data => $image->data, type => im::fmtBGR | im::RGB);
-		$touch = 1;
-	}
-
 	my @is = $image-> size;
 	($x, $y, $xDestLen, $yDestLen) = $self-> pixel2point( $x, $y, $xDestLen, $yDestLen);
 	my @fullScale = (
 		$is[0] / $xLen * $xDestLen,
 		$is[1] / $yLen * $yDestLen,
 	);
+	float_inplace($x, $y, @fullScale);
+	$self-> emit(": $x $y T @fullScale Z");
 
+	$image = $self->prepare_image($image, $xFrom, $yFrom, $xLen, $yLen);
 	my $g  = $image-> data;
 	my $bt = ( $image-> type & im::BPP) * $is[0] / 8;
 	my $ls = $image->lineSize;
 	my ( $i, $j);
-	float_inplace($x, $y, @fullScale);
 
-	$self-> emit(": $x $y T @fullScale Z");
 	$self-> emit("/scanline $bt string d");
 	$self-> emit("@is 8 [$is[0] 0 0 $is[1] 0 0]");
 	$self-> emit('{currentfile scanline readhexstring pop}');
@@ -928,6 +996,7 @@ package
 use base qw(Prima::PS::Drawable::Path);
 
 my %dict = (
+	newpath   => 'N',
 	lineto    => 'l',
 	moveto    => 'M',
 	curveto   => 'U',
@@ -942,7 +1011,6 @@ sub dict { \%dict }
 sub set_current_point
 {
 	my ( $self, $x, $y ) = @_;
-	$self-> emit('N') unless $self->{move_is_line};
 	$self-> emit($x, $y, $self->{move_is_line} ? 'l' : 'M');
 	$self-> {move_is_line} = 1;
 }
@@ -1051,14 +1119,6 @@ left, bottom, right and top margins in points.
 =item ::reversed
 
 if 1, a 90 degrees rotated document layout is assumed
-
-=item ::rotate and ::scale
-
-along with Prima::Drawable::translate provide PS-specific
-transformation matrix manipulations. ::rotate is number,
-measured in degrees, counter-clockwise. ::scale is array of
-two numbers, respectively x- and y-scale. 1 is 100%, 2 is 200%
-etc.
 
 =back
 

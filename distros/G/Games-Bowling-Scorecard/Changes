@@ -1,5 +1,10 @@
 Changelog for Games-Bowling-Scorecard
 
+0.106     2022-11-25 18:58:53-05:00 America/New_York
+        - update dist metadata
+        - AsText is now nicely box-drawn; AsASCII is just ASCII
+        - you can record a split, which looks nice in non-ASCII form
+
 0.105     2013-09-24 20:56:26 America/New_York
           replace a busted-on-Win32 test file
 

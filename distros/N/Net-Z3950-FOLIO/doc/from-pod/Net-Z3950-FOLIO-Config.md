@@ -53,6 +53,15 @@ Net::Z3950::FOLIO::Config - configuration file for the FOLIO Z39.50 gateway
             { "op": "stripDiacritics" },
             { "op": "regsub", "pattern": "[abc]", "replacement": "*", "flags": "g" }
           ]
+        },
+        "opac": {
+          "holding": {
+            "callNumber": {
+              "op": "regsub",
+              "pattern": "(.*)",
+              "replacement": "%{_callNumberPrefix}$1%{_callNumberSuffix}"
+            }
+          },
         }
       }
     }
@@ -270,20 +279,48 @@ be mapped into MARC fields. It contains up to five elements:
 ## `postProcessing`
 
 Specifies sets of transformations to be applied to the values of
-fields retrieved from the back-end. At present, the only supported key
-is `marc`, which specifies transformations to be applied to MARC
-records (either standalone or as part of OPAC records); in the future,
-post-processing for JSON and XML records may also be supported.
+fields retrieved from the back-end. Two top-level keys are supported,
+for post-processing of two different types of record, and they work
+slightly differently:
 
-Within the `marc` sections, keys are the names of simple MARC fields,
-such as `008`; or of complex field$subfield combinations, such as
-`245$a`. The corresponding values specify the transformations that
-should be applied to the values of these fields and subfields: each
-value may be either a single transformation or an array zero or more
-&#x3d;transformation which will be applied in the specified order.
+- `marc`
 
-Transformations are represented by objects with an `op` key whose
-values specifies the required operation.
+    Specifies transformations to be applied to MARC records (either
+    standalone or as part of OPAC records). The value is an object: keys
+    are the names of simple MARC fields, such as `008`; or of complex
+    field$subfield combinations, such as `245$a`. The corresponding
+    values specify the transformations that should be applied to the
+    values of these fields and subfields -- see below.
+
+- `opac`
+
+    Specifies transformations to be applied to the holdings and
+    circulations parts of OPAC records. The value is an object which can
+    contain either or both `holding` and `circulation` keys; the values
+    corresponding to each of these keys are themselves objects which
+    specify which fields within the holdings records, or their circulation
+    subrecords, to transform.
+
+    The keys within both of these subobjects are XML fieldnames, including
+    both those defined for the OPAC record and the "special fields"
+    beginning with underscores that are listed above in the
+    `itemElements` section -- for example, `_callNumberPrefix`. The
+    corresponding values specify the transformations that should be
+    applied to the values of these fields and subfields -- see below.
+
+In summary, the `marc` section lists fieldnames (both simple and
+complex) directly; whereas the `opac` section contains `holding` and
+`circulation` subsections which list the XML fieldnames of the two
+sections separately.
+
+Post-processing transformation specifications are the same for MARC
+and OPAC records. Each value in the specification may be either a
+single transformation or an array o zero or more transformations which
+will be applied in the specified order.
+
+Individual transformations are represented by objects. The fundamental
+behaviour of each transformations is determined by an `op` key whose
+value specifies the required operation.
 
 The following transformation operations are supported:
 
@@ -316,13 +353,19 @@ The following transformation operations are supported:
         [go and read about regular expressions](https://perldoc.perl.org/perlretut).)
 
         Replacement strings may also include sequences of the form
-        _%{fieldname}_, where _fieldname_ is either a simple control-field
-        tag such as `001` or a field-and-subfield combination like
-        `245$a`. Such sequences cause the value of the specified field within
-        the current record to be interpolated, so that for example a
-        replacement string `%{001}/%{245a}` will cause the text that matches
-        the regular expression to be replaced by the contents of the `001`
-        and `245$a` fields separated by a slash.
+        _%{fieldname}_, where _fieldname_ is interpreted in a manner
+        appropriate for the kind of record being post-processed. For MARC
+        records, _fieldname_ is either a simple control-field tag such as
+        `001` or a field-and-subfield combination like `245$a`; for OPAC
+        records, it is the name of an XML field from the same part of the
+        record (i.e. a holdings field if substituting holdings data, and a
+        circulation field if substituting circulation data).
+
+        Such sequences cause the value of the specified field within the
+        current record to be interpolated, so that for example a replacement
+        string `%{001}/%{245a}` in a MARC-record substitution will cause the
+        text that matches the regular expression to be replaced by the
+        contents of the `001` and `245$a` fields separated by a slash.
 
         This mechanism yields a powerful and general facility allowing
         installations with complex requirements to generate exactly the detail
@@ -337,7 +380,7 @@ The following transformation operations are supported:
             ]
 
         Or a location string could be built in the `$z` subfield from
-        fragments in `$1`, `$2` and `$2`:
+        fragments in the `$1`, `$2` and `$2` subfields:
 
             "952$z": [
               { "op": "regsub", "pattern": ".*", "replacement": "%{952$1}/%{952$2}/%{952$3}" }
@@ -420,7 +463,7 @@ Mike Taylor, <mike@indexdata.com>
 
 # COPYRIGHT AND LICENSE
 
-Copyright (C) 2018 The Open Library Foundation
+Copyright (C) 2018-2022 The Open Library Foundation
 
 This software is distributed under the terms of the Apache License,
 Version 2.0. See the file "LICENSE" for more information.

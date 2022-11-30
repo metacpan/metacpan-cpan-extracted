@@ -4,13 +4,13 @@
       "Noah Petherbridge <kirsle@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "RiveScript",
    "no_index" : {
@@ -39,6 +39,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v2.0.3",
-   "x_serialization_backend" : "JSON::PP version 2.27400"
+   "version" : "v2.0.4",
+   "x_serialization_backend" : "JSON::PP version 4.11"
 }

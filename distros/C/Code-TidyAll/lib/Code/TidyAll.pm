@@ -11,13 +11,13 @@ use Code::TidyAll::Result;
 use Code::TidyAll::Zglob qw(zglob);
 use Data::Dumper;
 use Date::Format;
-use Digest::SHA qw(sha1_hex);
-use File::Find qw(find);
-use File::pushd qw( pushd );
+use Digest::SHA     qw(sha1_hex);
+use File::Find      qw(find);
+use File::pushd     qw( pushd );
 use List::SomeUtils qw(uniq);
 use Module::Runtime qw( use_module );
-use Path::Tiny qw(path);
-use Scalar::Util qw(blessed);
+use Path::Tiny      qw(path);
+use Scalar::Util    qw(blessed);
 use Specio 0.40;
 use Specio::Declare;
 use Specio::Library::Builtins;
@@ -29,7 +29,7 @@ use Try::Tiny;
 
 use Moo 2.000000;
 
-our $VERSION = '0.82';
+our $VERSION = '0.83';
 
 sub default_conf_names { ( 'tidyall.ini', '.tidyallrc' ) }
 
@@ -673,6 +673,12 @@ sub process_source {
     my $was_tidied = !$error && ( $new_contents ne $orig_contents );
     if ( $was_tidied && $self->check_only ) {
         $error = '*** needs tidying';
+
+        # Github annotations parsable output to highlight code in pull requests
+        if ( $ENV{GITHUB_ACTIONS} ) {
+            $error .= "\n::error file=${path}::File ${path} needs tidying";
+        }
+
         foreach my $diff (@diffs) {
             $error .= "\n\n";
             $error .= "$diff->[0] made the following change:\n$diff->[1]";
@@ -850,7 +856,7 @@ Code::TidyAll - Engine for tidyall, your all-in-one code tidier and validator
 
 =head1 VERSION
 
-version 0.82
+version 0.83
 
 =head1 SYNOPSIS
 
@@ -1066,7 +1072,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Adam Herzog Andreas Vögele Andy Jack Bernhard Schmalhofer Finn Smith George Hartzell Graham Knop Gregory Oschwald Joe Crotty Kenneth Ölwing Mark Fowler Grimes Martin Gruner Mohammad S Anwar Nick Tonkin Olaf Alders Pedro Melo Ricardo Signes Sergey Romanov Shlomi Fish timgimyee
+=for stopwords Adam Herzog Andreas Vögele Andy Jack Bernhard Schmalhofer Finn Smith George Hartzell Graham Knop Gregory Oschwald Joe Crotty Kenneth Ölwing Mark Fowler Grimes Martin Gruner Mohammad S Anwar Nick Tonkin Olaf Alders Paulo Custodio Pavel Dostál Pedro Melo Ricardo Signes Sergey Romanov Shlomi Fish timgimyee
 
 =over 4
 
@@ -1133,6 +1139,14 @@ Nick Tonkin <ntonkin@bur-ntonkin-m1.corp.endurance.com>
 =item *
 
 Olaf Alders <olaf@wundersolutions.com>
+
+=item *
+
+Paulo Custodio <pauloscustodio@gmail.com>
+
+=item *
+
+Pavel Dostál <pdostal@suse.cz>
 
 =item *
 

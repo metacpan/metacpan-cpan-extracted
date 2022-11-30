@@ -1,4 +1,14 @@
-1.926   2022-11-04  Released-By: PERLANCAR; Urgency: medium
+1.928   2022-11-24  Released-By: PERLANCAR; Urgency: medium
+
+        - Display error result to STDERR instead of STDOUT.
+
+
+1.927   2022-11-15  Released-By: PERLANCAR; Urgency: low
+
+        - Tweak usage's POD formatting for common options.
+
+
+1.926   2022-11-04  Released-By: PERLANCAR; Urgency: low
 
         - Fix typo in POD usage of --help.
 

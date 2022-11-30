@@ -5,7 +5,7 @@ use warnings;
 
 use 5.008;
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 use NetAddr::IP 4;
 use Scalar::Util qw( blessed );
@@ -25,7 +25,7 @@ our $HAS_SOCKET;
 
 BEGIN {
     local $@ = undef;
-    $HAS_SOCKET = (!$ENV{DVI_NO_SOCKET})
+    $HAS_SOCKET = ( !$ENV{DVI_NO_SOCKET} )
         && eval {
         require Socket;
         Socket->import(qw( AF_INET AF_INET6 inet_pton ));
@@ -34,11 +34,11 @@ BEGIN {
         # when it is called. On others, inet_pton accepts various forms of
         # invalid input.
         defined &Socket::inet_pton
-            && !defined inet_pton(Socket::AF_INET(),  '016.17.184.1')
-            && !defined inet_pton(Socket::AF_INET6(), '2067::1:')
+            && !defined inet_pton( Socket::AF_INET(),  '016.17.184.1' )
+            && !defined inet_pton( Socket::AF_INET6(), '2067::1:' )
 
             # Some old versions of Socket are hopelessly broken
-            && length(inet_pton(Socket::AF_INET(), '1.1.1.1')) == 4;
+            && length( inet_pton( Socket::AF_INET(), '1.1.1.1' ) ) == 4;
         };
 
     if ($HAS_SOCKET) {
@@ -85,7 +85,7 @@ sub _fast_is_ipv4_packed {
 
     return undef unless defined $value;
     return undef if $value =~ /\0/;
-    return inet_pton(Socket::AF_INET(), $value);
+    return inet_pton( Socket::AF_INET(), $value );
 }
 
 sub _slow_is_ip {
@@ -102,13 +102,13 @@ sub _slow_is_ipv4 {
     return undef unless defined($value);
 
     my (@octets) = $value =~ /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/;
-    return undef unless (@octets == 4);
+    return undef unless ( @octets == 4 );
     foreach (@octets) {
         return undef if $_ < 0 || $_ > 255;
         return undef if $_ =~ /^0\d{1,2}$/;
     }
 
-    return join('.', @octets);
+    return join( '.', @octets );
 }
 
 sub _fast_is_ipv6 {
@@ -128,7 +128,7 @@ sub _fast_is_ipv6_packed {
     return undef unless defined $value;
     return undef if $value =~ /\0/;
     return undef if $value =~ /0[[:xdigit:]]{4}/;
-    return inet_pton(Socket::AF_INET6(), $value);
+    return inet_pton( Socket::AF_INET6(), $value );
 }
 
 {
@@ -172,52 +172,52 @@ sub is_innet_ipv4 {
     # accepts.
     if (   $network eq 'default'
         || $network =~ /^$ip_re$/
-        || $network =~ m{^$ip_re/\d\d?$}) {
+        || $network =~ m{^$ip_re/\d\d?$} ) {
 
         $network = NetAddr::IP->new($network) or return undef;
     }
-    elsif (!(blessed $network && $network->isa('NetAddr::IP'))) {
+    elsif ( !( blessed $network && $network->isa('NetAddr::IP') ) ) {
         my $orig = $network;
-        if ($network =~ /^($ip_re)[:\-]($ip_re)$/) {
-            my ($net, $netmask) = ($1, $2);
+        if ( $network =~ /^($ip_re)[:\-]($ip_re)$/ ) {
+            my ( $net, $netmask ) = ( $1, $2 );
 
             my $bits = _netmask_to_bits($netmask)
                 or return undef;
 
             $network = "$net/$bits";
         }
-        elsif ($network =~ /^($ip_re)\#($ip_re)$/) {
-            my ($net, $hostmask) = ($1, $2);
+        elsif ( $network =~ /^($ip_re)\#($ip_re)$/ ) {
+            my ( $net, $hostmask ) = ( $1, $2 );
 
             my $bits = _hostmask_to_bits($hostmask)
                 or return undef;
 
             $network = "$net/$bits";
         }
-        elsif ($network =~ m{^($partial_ip_re)/(\d\d?)$}) {
-            my ($net, $bits) = ($1, $2);
+        elsif ( $network =~ m{^($partial_ip_re)/(\d\d?)$} ) {
+            my ( $net, $bits ) = ( $1, $2 );
 
             # This is a hack to avoid a deprecation warning (Use of implicit
             # split to @_ is deprecated) that shows up on 5.10.1 but not on
             # newer Perls.
             #
             ## no critic(Variables::ProhibitUnusedVarsStricter)
-            my $octets = scalar(my @tmp = split /\./, $net);
+            my $octets = scalar( my @tmp = split /\./, $net );
             $network = $net;
-            $network .= '.0' x (4 - $octets);
+            $network .= '.0' x ( 4 - $octets );
             $network .= "/$bits";
         }
-        elsif ($network =~ /^$partial_ip_re$/) {
+        elsif ( $network =~ /^$partial_ip_re$/ ) {
 
             ## no critic(Variables::ProhibitUnusedVarsStricter)
-            my $octets = scalar(my @tmp = split /\./, $network);
-            if ($octets < 4) {
-                $network .= '.0' x (4 - $octets);
+            my $octets = scalar( my @tmp = split /\./, $network );
+            if ( $octets < 4 ) {
+                $network .= '.0' x ( 4 - $octets );
                 $network .= '/' . $octets * 8;
             }
         }
 
-        if ($orig ne $network) {
+        if ( $orig ne $network ) {
             _deprecation_warn(
                 'Use of non-CIDR notation for networks with is_innet_ipv4() is deprecated'
             );
@@ -369,7 +369,7 @@ sub is_innet_ipv4 {
         },
     );
 
-    _build_is_X_ip_subs(\%ipv4_networks, 4);
+    _build_is_X_ip_subs( \%ipv4_networks, 4 );
 }
 
 {
@@ -390,9 +390,10 @@ sub is_innet_ipv4 {
         private       => { networks => 'fc00::/7' },
         linklocal     => { networks => 'fe80::/10' },
         multicast     => { networks => 'ff00::/8' },
+        unspecified   => { networks => '::/128' },
     );
 
-    _build_is_X_ip_subs(\%ipv6_networks, 6);
+    _build_is_X_ip_subs( \%ipv6_networks, 6 );
 
     # This exists for the benefit of the test code.
     ## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
@@ -400,7 +401,7 @@ sub is_innet_ipv4 {
         my $network = shift;
         my $other   = shift;
 
-        return ($ipv6_networks{$network}{subnet_of} || q{}) eq $other;
+        return ( $ipv6_networks{$network}{subnet_of} || q{} ) eq $other;
     }
 }
 
@@ -415,7 +416,7 @@ sub _build_slow_is_X_ip_subs {
     my @all_nets;
 
     local $@ = undef;
-    for my $type (keys %{$networks}) {
+    for my $type ( keys %{$networks} ) {
         my @nets
             = map { NetAddr::IP->$netaddr_new($_) }
             ref $networks->{$type}{networks}
@@ -425,14 +426,14 @@ sub _build_slow_is_X_ip_subs {
         # Some IPv6 networks (like TEREDO) are a subset of the special block
         # so there's no point in checking for them in the is_public_ipv6()
         # sub.
-        unless ($networks->{$type}{subnet_of}) {
+        unless ( $networks->{$type}{subnet_of} ) {
             push @all_nets, @nets;
         }
 
         # We're using code gen rather than just making an anon sub outright so
         # we don't have to pay the cost of derefencing the $is_ip_sub and the
         # dynamic dispatch cost for $netaddr_new
-        my $sub = eval sprintf( <<'EOF', $is_ip_sub, $netaddr_new);
+        my $sub = eval sprintf( <<'EOF', $is_ip_sub, $netaddr_new );
 sub {
     shift if ref $_[0];
     my $value = shift;
@@ -459,7 +460,7 @@ EOF
         push @EXPORT, $sub_name;
     }
 
-    my $sub = eval sprintf( <<'EOF', $is_ip_sub, $netaddr_new);
+    my $sub = eval sprintf( <<'EOF', $is_ip_sub, $netaddr_new );
 sub {
     shift if ref $_[0];
     my $value = shift;
@@ -496,9 +497,9 @@ sub _build_fast_is_X_ip_subs {
     my @all_nets;
 
     local $@ = undef;
-    for my $type (keys %{$networks}) {
+    for my $type ( keys %{$networks} ) {
         my @nets
-            = map { _packed_network_and_netmask($family, $_) }
+            = map { _packed_network_and_netmask( $family, $_ ) }
             ref $networks->{$type}{networks}
             ? @{ $networks->{$type}{networks} }
             : $networks->{$type}{networks};
@@ -506,14 +507,14 @@ sub _build_fast_is_X_ip_subs {
         # Some IPv6 networks (like TEREDO) are a subset of the special block
         # so there's no point in checking for them in the is_public_ipv6()
         # sub.
-        unless ($networks->{$type}{subnet_of}) {
+        unless ( $networks->{$type}{subnet_of} ) {
             push @all_nets, @nets;
         }
 
         # We're using code gen rather than just making an anon sub outright so
         # we don't have to pay the cost of derefencing the $is_ip_sub and the
         # dynamic dispatch cost for $netaddr_new
-        my $sub = eval sprintf( <<'EOF', $ip_number);
+        my $sub = eval sprintf( <<'EOF', $ip_number );
 sub {
     shift if ref $_[0];
     my $value = shift;
@@ -541,7 +542,7 @@ EOF
         push @EXPORT, $sub_name;
     }
 
-    my $sub = eval sprintf( <<'EOF', $ip_number);
+    my $sub = eval sprintf( <<'EOF', $ip_number );
 sub {
     shift if ref $_[0];
     my $value = shift;
@@ -572,11 +573,11 @@ sub _packed_network_and_netmask {
     my $family  = shift;
     my $network = shift;
 
-    my ($ip, $bits) = split qr{/}, $network, 2;
+    my ( $ip, $bits ) = split qr{/}, $network, 2;
 
     return [
-        inet_pton($family, $ip),
-        _packed_netmask($family, $bits)
+        inet_pton( $family, $ip ),
+        _packed_netmask( $family, $bits )
     ];
 }
 
@@ -587,8 +588,8 @@ sub _packed_netmask {
     my $bit_length = $family == Socket::AF_INET() ? 32 : 128;
 
     my $bit_string
-        = join(q{}, (1) x $bits, (0) x ($bit_length - $bits));
-    return pack('B' . $bit_length, $bit_string);
+        = join( q{}, (1) x $bits, (0) x ( $bit_length - $bits ) );
+    return pack( 'B' . $bit_length, $bit_string );
 }
 
 for my $sub (qw( linklocal loopback multicast private public )) {
@@ -621,7 +622,7 @@ Data::Validate::IP - IPv4 and IPv6 validation methods
 
 =head1 VERSION
 
-version 0.30
+version 0.31
 
 =head1 SYNOPSIS
 
@@ -645,8 +646,8 @@ version 0.30
 
 =head1 DESCRIPTION
 
-This module provides a number IP address validation subs that both validate
-and untaint their input. This includes both basic validation (C<is_ipv4()> and
+This module provides a number IP address validation subs that both validate and
+untaint their input. This includes both basic validation (C<is_ipv4()> and
 C<is_ipv6()>) and special cases like checking whether an address belongs to a
 specific network or whether an address is public or private (reserved).
 
@@ -663,15 +664,15 @@ sufficient if you are dealing with untrusted input. You should always check
 C<is_ipv4($ip)> as well. This applies as well when using IPv6 functions or
 generic functions like C<is_private_ip($ip)>.
 
-There are security implications to this around certain oddly formed
-addresses. Notably, an address like "010.0.0.1" is technically valid, but the
-operating system will treat "010" as an octal number. That means that
-"010.0.0.1" is equivalent to "8.0.0.1", I<not> "10.0.0.1".
+There are security implications to this around certain oddly formed addresses.
+Notably, an address like "010.0.0.1" is technically valid, but the operating
+system will treat "010" as an octal number. That means that "010.0.0.1" is
+equivalent to "8.0.0.1", I<not> "10.0.0.1".
 
 However, this module's C<is_ipv4($ip)> and C<is_ip($ip)> functions will return
-false for addresses like "010.0.0.1" which have octal components. And of
-course that means that it also returns false for C<is_private_ipv4($ip)>
-I<and> C<is_public_ipv4($ip)>.
+false for addresses like "010.0.0.1" which have octal components. And of course
+that means that it also returns false for C<is_private_ipv4($ip)> I<and>
+C<is_public_ipv4($ip)>.
 
 =head1 FUNCTIONS
 
@@ -682,17 +683,18 @@ fails. In theory, this means that you should always check for a defined status
 explicitly but in practice there are no valid IP addresses where the string
 form evaluates to false in Perl.
 
-Note that none of these functions actually attempt to test whether the given
-IP address is routable from your device; they are purely semantic checks.
+Note that none of these functions actually attempt to test whether the given IP
+address is routable from your device; they are purely semantic checks.
 
 =head2 is_ipv4($ip), is_ipv6($ip), is_ip($ip)
 
-These functions simply check whether the address is a valid IPv4 or IPv6 address.
+These functions simply check whether the address is a valid IPv4 or IPv6
+address.
 
 =head2 is_innet_ipv4($ip, $network)
 
-This subroutine checks whether the address belongs to the given IPv4
-network. The C<$network> argument can either be a string in CIDR notation like
+This subroutine checks whether the address belongs to the given IPv4 network.
+The C<$network> argument can either be a string in CIDR notation like
 "15.0.15.0/24" or a L<NetAddr::IP> object.
 
 This subroutine used to accept many more forms of network specifications
@@ -718,8 +720,8 @@ L<RFC 5735|http://tools.ietf.org/html/rfc5735>.
 
 =head2 is_loopback_ipv4($ip)
 
-This subroutine checks whether the address belongs to the IPv4 loopback
-network - C<127.0.0.0/8> - as defined by L<RFC
+This subroutine checks whether the address belongs to the IPv4 loopback network
+- C<127.0.0.0/8> - as defined by L<RFC
 5735|http://tools.ietf.org/html/rfc5735>.
 
 =head2 is_linklocal_ipv4($ip)
@@ -771,29 +773,36 @@ This subroutine checks whether the address belongs to the IPv6 special network
 
 =head2 is_teredo_ipv6($ip)
 
-This subroutine checks whether the address belongs to the IPv6 TEREDO network
-- C<2001::/32> - as defined by L<RFC 4380|http://tools.ietf.org/html/rfc4380>.
+This subroutine checks whether the address belongs to the IPv6 TEREDO network -
+C<2001::/32> - as defined by L<RFC 4380|http://tools.ietf.org/html/rfc4380>.
 
 Note that this network is a subnet of the larger special network at
 C<2001::/23>.
 
 =head2 is_orchid_ipv6($ip)
 
-This subroutine checks whether the address belongs to the IPv6 ORCHID network
-- C<2001::/32> - as defined by L<RFC 4380|http://tools.ietf.org/html/rfc4380>.
+This subroutine checks whether the address belongs to the IPv6 ORCHID network -
+C<2001::/32> - as defined by L<RFC 4380|http://tools.ietf.org/html/rfc4380>.
 
 Note that this network is a subnet of the larger special network at
 C<2001::/23>.
 
-This network is currently scheduled to be returned to the special pool in
-March of 2014 unless the IETF extends its use. If that happens this subroutine
-will continue to exist but will always return false.
+This network is currently scheduled to be returned to the special pool in March
+of 2014 unless the IETF extends its use. If that happens this subroutine will
+continue to exist but will always return false.
 
 =head2 is_documentation_ipv6($ip)
 
 This subroutine checks whether the address belongs to the IPv6 documentation
 network - C<2001:DB8::/32> - as defined by L<RFC
 3849|http://tools.ietf.org/html/rfc3849>.
+
+=head2 is_unspecified_ipv6($ip)
+
+This subroutine checks whether the address belongs to the IPv6 unspecified
+network - C<::0/128> - as defined by L<RFC
+4291|http://tools.ietf.org/html/rfc4291>.. Note that the address in this subnet
+is neither private nor public.
 
 =head2 is_private_ipv6($ip)
 
@@ -902,7 +911,7 @@ Gregory Oschwald <goschwald@maxmind.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Neil Neely.
+This software is copyright (c) 2022 by Neil Neely.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

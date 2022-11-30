@@ -21,6 +21,7 @@
       },
       "configure" : {
          "requires" : {
+            "Future::AsyncAwait::ExtensionBuilder" : "0.60",
             "Module::Build" : "0.4004",
             "XS::Parse::Keyword::Builder" : "0.13"
          }
@@ -40,7 +41,7 @@
    "provides" : {
       "Syntax::Keyword::Dynamically" : {
          "file" : "lib/Syntax/Keyword/Dynamically.pm",
-         "version" : "0.10"
+         "version" : "0.11"
       }
    },
    "release_status" : "stable",
@@ -50,6 +51,6 @@
       ],
       "x_IRC" : "irc://irc.perl.org/#io-async"
    },
-   "version" : "0.10",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.11",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

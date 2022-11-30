@@ -86,15 +86,20 @@ typedef enum _MONITOR_DPI_TYPE {
 static HRESULT (__stdcall *SetProcessDpiAwareness)(PROCESS_DPI_AWARENESS)  = NULL;
 static HRESULT (__stdcall *GetDpiForMonitor)(HMONITOR,MONITOR_DPI_TYPE,UINT*,UINT*) = NULL;
 static HRESULT (__stdcall *DwmIsCompositionEnabled)(BOOL *pfEnabled) = NULL;
+
+#if WINVER < 0x0600
 static BOOL    (__stdcall *GetUserPreferredUILanguages)(DWORD dwFlags, PULONG pulNumLanguages, PZZWSTR pwszLanguagesBuffer, PULONG pcchLanguagesBuffer) = NULL;
+#endif
 
 BOOL
 my_GetUserPreferredUILanguages(
 	DWORD dwFlags, PULONG pulNumLanguages,
 	PZZWSTR pwszLanguagesBuffer, PULONG pcchLanguagesBuffer
 ) {
+#if WINVER < 0x0600
 	if ( GetUserPreferredUILanguages == NULL) 
 		return false;
+#endif
 	return GetUserPreferredUILanguages(dwFlags, pulNumLanguages, pwszLanguagesBuffer, pcchLanguagesBuffer);
 }
 
@@ -244,10 +249,12 @@ window_subsystem_init( char * error_buf)
 		if ( mod ) {
 			LOAD_FUNC(mod, DwmIsCompositionEnabled);
 		}
+#if WINVER < 0x0600
 		mod = LoadLibrary("KERNEL32.DLL");
 		if ( mod ) {
 			LOAD_FUNC(mod, GetUserPreferredUILanguages);
 		}
+#endif
 	}
 
 	/* Win8 - high dpi awareness stuff */
@@ -365,6 +372,16 @@ window_subsystem_init( char * error_buf)
 	{
 		HRESULT r = OleInitialize(NULL);
 		guts. ole_initialized = (r == S_OK || r == S_FALSE );
+	}
+
+	switch (GetACP()) {
+	case 50220: case 50221: case 50222: case 50225: case 50227: case 50229:
+	case 57002: case 57003: case 57004: case 57005: case 57006: case 57007:
+	case 57008: case 57009: case 57010: case 57011: case 65000: case 42:
+		guts.wc2mb_is_fragile = true;
+		break;
+	default:
+		guts.wc2mb_is_fragile = false;
 	}
 
 	return true;

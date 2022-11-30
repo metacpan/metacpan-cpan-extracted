@@ -1,5 +1,5 @@
 {
-   "abstract" : "Command-line utilities related fonts and font files",
+   "abstract" : "Command-line utilities related to fonts and font files",
    "author" : [
       "perlancar <perlancar@cpan.org>"
    ],
@@ -61,7 +61,7 @@
    "provides" : {
       "App::FontUtils" : {
          "file" : "lib/App/FontUtils.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -76,7 +76,7 @@
          "web" : "https://github.com/perlancar/perl-App-FontUtils"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

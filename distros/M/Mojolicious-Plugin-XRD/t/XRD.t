@@ -229,13 +229,13 @@ $t->head_ok('/no_test?res=versuch')
   ->content_type_is('application/xrd+xml')
   ->content_is('');
 
-$t->get_ok('/no_test?res=versuch&format=json&_format=json')
+$t->get_ok('/no_test?res=versuch&_format=json')
   ->status_is(404)
   ->content_type_like(qr!^application/json!)
   ->header_is('Access-Control-Allow-Origin' => '*')
   ->json_is('/subject' => 'versuch');
 
-$t->head_ok('/no_test?res=versuch&format=json&_format=json')
+$t->head_ok('/no_test?res=versuch&_format=json')
   ->status_is(404)
   ->content_type_like(qr!^application/json!)
   ->header_is('Access-Control-Allow-Origin' => '*')
@@ -247,7 +247,7 @@ $t->get_ok('/no_test?res=versuch&_format=jrd')
   ->header_is('Access-Control-Allow-Origin' => '*')
   ->json_is('/subject' => 'versuch');
 
-$t->head_ok('/no_test?res=versuch&format=jrd&_format=jrd')
+$t->head_ok('/no_test?res=versuch&_format=jrd')
   ->status_is(404)
   ->content_type_is('application/jrd+json')
   ->header_is('Access-Control-Allow-Origin' => '*')

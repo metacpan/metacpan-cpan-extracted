@@ -53,13 +53,29 @@ test( fillPattern => $fpx1, $fpx2);
 $d->fillPattern(fp::Solid);
 
 test( fillMode => fm::Alternate, fm::Winding);
+
+$d->lineEnd([ [line=>[1,2]], 1]);
+$d->graphic_context( lineEnd => 0, sub {
+	is( $d->lineEnd, 0, 'in.lineEnd complex');
+});
+my $le = $d->lineEnd;
+is_deeply($le, [[line => [1,2]], 1], 'out.lineEnd complex 1');
+$d->lineEnd([line => [1,2]]);
+is_deeply($d->lineEnd, [line => [1,2]]);
 test( lineEnd => le::Square, le::Flat);
+
 test( lineJoin => lj::Round, lj::Bevel);
 test( linePattern => lp::Dash, lp::Dot);
 test( lineWidth => 5, 2);
 test( miterLimit => 5, 2);
 test( rop => rop::NotSrcXor, rop::AndPut);
 test( rop2 => rop::NotSrcXor, rop::AndPut);
+
+is_deeply( $d->matrix, [1,0,0,1,0,0], 'default.matrix');
+$d->graphic_context( matrix => [1..6], sub {
+	is_deeply( $d->matrix, [1..6], 'in.matrix');
+});
+is_deeply( $d->matrix, [1,0,0,1,0,0], 'out.matrix');
 
 $d-> translate( 2, 1);
 $d-> graphic_context( translate =>[1, 2], sub {

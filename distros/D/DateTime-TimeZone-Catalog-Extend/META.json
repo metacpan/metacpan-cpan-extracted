@@ -1,0 +1,61 @@
+{
+   "abstract" : "Extend DateTime::TimeZone catalog",
+   "author" : [
+      "Jacques Deguest <jack@deguest.jp>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "DateTime-TimeZone-Catalog-Extend",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime::TimeZone::Alias" : "0.06",
+            "Nice::Try" : "v1.3.1",
+            "perl" : "5.026001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DateTime::TimeZone" : "0",
+            "Test::More" : "1.302162"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://gitlab.com/jackdeguest/DateTime-TimeZone-Catalog-Extend/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "web" : "https://gitlab.com/jackdeguest/DateTime-TimeZone-Catalog-Extend"
+      }
+   },
+   "version" : "v0.1.0",
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

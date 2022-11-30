@@ -2,15 +2,15 @@ use 5.006;
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.056
+# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.058
 
 use Test::More;
 
 plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
-    'Bencher/Scenario/SPVM/Sum.pm',
-    'Bencher/ScenarioR/SPVM/Sum.pm',
+    'Bencher/Scenario/SPVM/Prime.pm',
+    'Bencher/ScenarioR/SPVM/Prime.pm',
     'Bencher/Scenarios/SPVM.pm'
 );
 
@@ -45,7 +45,7 @@ for my $lib (@module_files)
     is($?, 0, "$lib loaded ok");
 
     shift @_warnings if @_warnings and $_warnings[0] =~ /^Using .*\bblib/
-        and not eval { require blib; blib->VERSION('1.01') };
+        and not eval { +require blib; blib->VERSION('1.01') };
 
     if (@_warnings)
     {

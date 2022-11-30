@@ -97,9 +97,9 @@ subtest 'object instantiation' => sub {
     # we are left with is the pathname for a directory that no longer exists.
     my $nonexistant_dir = Path::Tiny->tempdir( 'ghcn_15_cacheURI_test_XXXXXX' )->stringify;
 
-    throws_ok { Weather::GHCN::CacheURI->new($nonexistant_dir, 'never') }
-        qr/cache directory does not exist/,
-        'new with nonexistant dir throws exception';
+    my $obj = Weather::GHCN::CacheURI->new($nonexistant_dir, 'never');
+    # instantiating the object with a nonexistant cachedir is ok but may throw an exception later
+    ok $obj, 'new with nonexistant dir';
 
     throws_ok { Weather::GHCN::CacheURI->new($cachedir, 'bad refresh') }
         qr/invalid refresh option/,

@@ -1,0 +1,301 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Log::Any::Adapter::DERIV
+at lib/Log/Any/Adapter/DERIV.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Log::Any::Adapter::DERIV - standardised logging to STDERR and JSON file
+
+=begin markdown
+
+[![Test status](https://circleci.com/gh/binary-com/perl-Log-Any-Adapter-DERIV.svg?style=shield&circle-token=bed2af8f8e388746eafbbf905cf6990f84dbd69e)](https://app.circleci.com/pipelines/github/binary-com/perl-Log-Any-Adapter-DERIV)
+
+=end markdown
+
+=head1 SYNOPSIS
+
+    use Log::Any;
+
+    # print text log to STDERR, json format when inside docker container,
+    # colored text format when STDERR is a tty, non-colored text format when
+    # STDERR is redirected.
+    use Log::Any::Adapter ('DERIV');
+
+    #specify STDERR directly
+    use Log::Any::Adapter ('DERIV', stderr => 1)
+
+    #specify STDERR's format
+    use Log::Any::Adapter ('DERIV', stderr => 'json')
+
+    #specify the json log name
+    use Log::Any::Adapter ('DERIV', json_log_file => '/var/log/program.json.log');
+
+=head1 DESCRIPTION
+
+Applies some opinionated log handling rules for L<Log::Any>.
+
+B<This is extremely invasive>. It does the following, affecting global state
+in various ways:
+
+=over 4
+
+=item * applies UTF-8 encoding to STDERR
+
+=item * writes to a C<.json.log> file.
+
+=item * overrides the default L<Log::Any::Proxy> formatter to provide data as JSON
+
+=item * when stringifying, may replace some problematic objects with simplified versions
+
+=back
+
+An example of the string-replacement approach would be the event loop in asynchronous code:
+it's likely to have many components attached to it, and dumping that would effectively end up
+dumping the entire tree of useful objects in the process. This is a planned future extension,
+not currently implemented.
+
+=head2 Why
+
+This is provided as a CPAN module as an example for dealing with multiple outputs and formatting.
+The existing L<Log::Any::Adapter> modules tend to cover one thing, and it's
+not immediately obvious how to extend formatting, or send data to multiple logging mechanisms at once.
+
+Although the module may not be directly useful, it is hoped that other teams may find
+parts of the code useful for their own logging requirements.
+
+There is a public repository on Github, anyone is welcome to fork that and implement
+their own version or make feature/bug fix suggestions if they seem generally useful:
+
+L<https://github.com/binary-com/perl-Log-Any-Adapter-DERIV>
+
+=head2 PARAMETERS
+
+=over 4
+
+=item * json_log_file
+
+Specify a file name to which you want the json formatted logs printed into.
+If not given, then it prints the logs to STDERR.
+
+=item * STDERR
+
+If it is true, then print logs to STDERR
+
+If the value is json or text, then print logs with that format
+
+If the value is just a true value other than `json` or `text`,
+then if it is running in a container, then it prints the logs in `json` format.
+Else if STDERR is a tty, then it prints `colored text` format.
+Else it prints non-color text format.
+
+=back
+
+If no parameters provided, then default `stderr => 1`;
+
+=head1 METHODS
+
+=head2 apply_filehandle_utf8
+
+Applies UTF-8 to filehandle if it is not utf-flavoured already
+
+    $object->apply_filehandle_utf8($fh);
+
+=over 4
+
+=item * C<$fh> file handle
+
+=back
+
+=head2 format_line
+
+Formatting the log entry with timestamp, from which the message populated,
+severity and message.
+
+If color/colour param passed it adds appropriate color code for timestamp,
+log level, from which this log message populated and actual message.
+For non-color mode, it just returns the formatted message.
+
+    $object->format_line($data, {color => $color});
+
+=over 4
+
+=item * C<$data> hashref - The data with stack info like package method from
+which the message populated, timestamp, severity and message
+
+=item * C<$opts> hashref - the options color
+
+=back
+
+Returns only formatted string if non-color mode. Otherwise returns formatted
+string with embedded ANSI color code using L<Term::ANSIColor>
+
+=head2 log_entry
+
+Add format and add color code using C<format_line> and writes the log entry
+
+    $object->log_entry($data);
+
+=over 4
+
+=item *C<$data> hashref - The log data
+
+=back
+
+=head2 _process_data
+
+Process the data before printing out. Reduce the continues L<Future> stack
+messages and filter the messages based on log level.
+
+    $object->_process_data($data);
+
+=over 4
+
+=item * C<$data> hashref - The log data.
+
+=back
+
+Returns a hashref - the processed data
+
+=head2 _filter_stack
+
+Filter the stack message based on log level.
+
+    $object->_filter_stack($data);
+
+=over 4
+
+=item * C<$data> hashref - Log stack data
+
+=back
+
+Returns hashref - the filtered data
+
+=head2 _collapse_future_stack
+
+Go through the caller stack and if continuous L<Future> messages then keep
+only one at the first.
+
+    $object->_collapse_future_stack($data);
+
+=over 4
+
+=item * C<$data> hashref - Log stack data
+
+=back
+
+Returns a hashref - the reduced log data
+
+=head2 _fh_is_tty
+
+Check the filehandle opened to tty
+
+=over 4
+
+=item * C<$fh> file handle
+
+=back
+
+Returns boolean
+
+=head2 _in_container
+
+Returns true if we think we are currently running in a container.
+
+At the moment this only looks for a C<.dockerenv> file in the root directory;
+future versions may expand this to provide a more accurate check covering
+other container systems such as `runc`.
+
+Returns boolean
+
+=head2 _linux_flock_data
+
+Based on the type of lock requested, it packs into linux binary flock structure
+and return the string of that structure.
+
+Linux struct flock: "s s l l i"
+	short l_type short - Possible values: F_RDLCK(0) - read lock, F_WRLCK(1) - write lock, F_UNLCK(2) - unlock
+	short l_whence - starting offset
+	off_t l_start - relative offset
+	off_t l_len - number of consecutive bytes to lock
+	pid_t l_pid - process ID
+
+=over 4
+
+=item * C<$type> integer lock type - F_WRLCK or F_UNLCK
+
+=back
+
+Returns a string of the linux flock structure
+
+=head2 _flock
+
+call fcntl to lock or unlock a file handle
+
+=over 4
+
+=item * C<$fh> file handle
+
+=item * C<$type> lock type, either F_WRLCK or F_UNLCK
+
+=back
+
+Returns boolean or undef
+
+=head2 _lock
+
+Lock a file handler with fcntl.
+
+=over 4
+
+=item * C<$fh> File handle
+
+=back
+
+Returns boolean
+
+=head2 _unlock
+
+Unlock a file handler locked by fcntl
+
+=over 4
+
+=item * C<$fh> File handle
+
+=back
+
+Returns boolean
+
+=head2 level
+
+Return the current log level name.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Log::Any::Adapter::Coderef>
+
+L<alert|Log::Any::Adapter::Coderef/alert>, L<critical|Log::Any::Adapter::Coderef/critical>, L<debug|Log::Any::Adapter::Coderef/debug>, L<emergency|Log::Any::Adapter::Coderef/emergency>, L<error|Log::Any::Adapter::Coderef/error>, L<info|Log::Any::Adapter::Coderef/info>, L<init|Log::Any::Adapter::Coderef/init>, L<is_alert|Log::Any::Adapter::Coderef/is_alert>, L<is_critical|Log::Any::Adapter::Coderef/is_critical>, L<is_debug|Log::Any::Adapter::Coderef/is_debug>, L<is_emergency|Log::Any::Adapter::Coderef/is_emergency>, L<is_error|Log::Any::Adapter::Coderef/is_error>, L<is_info|Log::Any::Adapter::Coderef/is_info>, L<is_notice|Log::Any::Adapter::Coderef/is_notice>, L<is_trace|Log::Any::Adapter::Coderef/is_trace>, L<is_warning|Log::Any::Adapter::Coderef/is_warning>, L<notice|Log::Any::Adapter::Coderef/notice>, L<trace|Log::Any::Adapter::Coderef/trace>, L<warning|Log::Any::Adapter::Coderef/warning>
+
+=item L<Log::Any::Adapter::Base>
+
+L<delegate_method_to_slot|Log::Any::Adapter::Base/delegate_method_to_slot>
+
+=back
+
+=head1 AUTHOR
+
+Deriv Group Services Ltd. C<DERIV@cpan.org>
+
+=head1 LICENSE
+
+Copyright Deriv Group Services Ltd 2020-2021. Licensed under the same terms as Perl itself.
+

@@ -1,9 +1,19 @@
 Revision history for Perl module Geo-Forward
 
-0.13 2011-12-09
-  - Update Makefile.PL to add Package::New - RT 72236 - andk@cpan.org 
+0.16 2022-11-28
+  - Added GitHub repository
+  - Moved from Perl to MIT license
 
-0.12-5 2011-10-31
+0.15 2018-07-25
+  - Added bbox method
+
+0.14 2011-12-09
+  - Added minimum versions to Perl use statements so that rpmbuild finds them since we dropped them from the spec file for Fedora 16
+
+0.13 2011-12-09
+  - Update Makefile.PL to add Package::New - RT 72236 - andk@cpan.org
+
+0.12_5 2011-10-31
   - Updated t/002_data.t to use deg_dms from Geo::Functions
 
 0.12 2011-10-30
@@ -36,7 +46,7 @@ Revision history for Perl module Geo-Forward
 
 0.05 2006-11-04
   - Documentation
-  
+
 0.04 2006-11-04
   - Documentation
 

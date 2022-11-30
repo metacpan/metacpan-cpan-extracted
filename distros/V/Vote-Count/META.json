@@ -4,7 +4,7 @@
       "John Karr <brainbuz@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.027, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "gpl_3"
    ],
@@ -30,30 +30,33 @@
       "develop" : {
          "requires" : {
             "Test2::Bundle::More" : "0",
+            "Test2::Tools::Exception" : "0",
+            "Test2::Tools::Warnings" : "0",
             "Test2::V0" : "0",
+            "Test::Exception" : "0",
             "Test::Pod" : "0"
          }
       },
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Cpanel::JSON::XS" : "4.19",
+            "Cpanel::JSON::XS" : "4.32",
             "Data::Dumper" : "0",
             "Data::Printer" : "0",
             "Exporter" : "0",
             "Exporter::Easy" : "0",
-            "JSON::MaybeXS" : "1.004000",
-            "List::Util" : "0",
-            "Math::BigInt::GMP" : "1.6003",
-            "Math::BigRat" : "0",
+            "List::Util" : "1.63",
+            "Math::BigInt" : "1.999837",
+            "Math::BigInt::GMP" : "1.6005",
+            "Math::BigRat" : "0.2624",
             "Mojo::Template" : "0",
             "Moose" : "0",
             "Moose::Role" : "0",
             "MooseX::StrictConstructor" : "0",
-            "Path::Tiny" : "0.108",
-            "Ref::Util" : "0.202",
+            "Path::Tiny" : "0.130",
+            "Ref::Util" : "0.204",
             "Sort::Hash" : "0",
-            "Storable" : "3.15",
+            "Storable" : "3.25",
             "String::TtyLength" : "0.02",
             "Test2::API" : "0",
             "Time::Piece" : "0",
@@ -73,6 +76,7 @@
          "requires" : {
             "Carp::Always" : "0",
             "File::Temp" : "0",
+            "JSON::MaybeXS" : "0",
             "Test2::Bundle::More" : "0",
             "Test2::Tools::Class" : "0",
             "Test2::Tools::Exception" : "0",
@@ -81,7 +85,9 @@
             "Test::Exception" : "0",
             "Test::Fatal" : "0",
             "Test::More" : "0",
+            "Test::use::ok" : "0",
             "lib" : "0",
+            "ok" : "0",
             "perl" : "5.024"
          }
       }
@@ -98,7 +104,7 @@
          "web" : "https://github.com/brainbuz/Vote-Count"
       }
    },
-   "version" : "2.02",
+   "version" : "2.03",
    "x_generated_by_perl" : "v5.36.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
    "x_spdx_expression" : "GPL-3.0-only"

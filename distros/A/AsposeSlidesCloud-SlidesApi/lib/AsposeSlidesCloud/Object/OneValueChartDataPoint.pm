@@ -215,6 +215,13 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'value_formula' => {
+    	datatype => 'string',
+    	base_name => 'ValueFormula',
+    	description => 'Spreadsheet formula in A1-style.',
+    	format => '',
+    	read_only => '',
+    		},
     'set_as_total' => {
     	datatype => 'boolean',
     	base_name => 'SetAsTotal',
@@ -237,6 +244,7 @@ __PACKAGE__->swagger_types( {
     'three_d_format' => 'ThreeDFormat',
     'line_format' => 'LineFormat',
     'value' => 'double',
+    'value_formula' => 'string',
     'set_as_total' => 'boolean',
     'invert_if_negative' => 'boolean'
 } );
@@ -247,6 +255,7 @@ __PACKAGE__->attribute_map( {
     'three_d_format' => 'ThreeDFormat',
     'line_format' => 'LineFormat',
     'value' => 'Value',
+    'value_formula' => 'ValueFormula',
     'set_as_total' => 'SetAsTotal',
     'invert_if_negative' => 'InvertIfNegative'
 } );

@@ -3,7 +3,7 @@ package PDF::API2;
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '2.043'; # VERSION
+our $VERSION = '2.044'; # VERSION
 
 use Carp;
 use Encode qw(:all);
@@ -926,7 +926,7 @@ sub page_layout {
                   $name eq 'two_page_right'   ? 'TwoPageRight'   : '');
 
     croak "Invalid page layout: $name" unless $layout;
-    $self->{'catalog'}->{'PageMode'} = PDFName($layout);
+    $self->{'catalog'}->{'PageLayout'} = PDFName($layout);
     $self->{'pdf'}->out_obj($self->{'catalog'});
     return $self;
 }
@@ -1342,8 +1342,8 @@ sub open_page {
 Imports a page from C<$source_pdf> and adds it to the specified position in
 C<$pdf>.
 
-If C<$source_page_num> or C<$target_page_num> is 0 or -1, the last page in the
-document is used.
+If C<$source_page_num> or C<$target_page_num> is 0, -1, or unspecified, the last
+page in the document is used.
 
 B<Note:> If you pass a page object instead of a page number for
 C<$target_page_num>, the contents of the page will be merged into the existing
@@ -1381,6 +1381,7 @@ sub import_page {
     }
     else {
         $s_page = $s_pdf->open_page($s_idx);
+        die "Unable to open page '$s_idx' in source PDF" unless defined $s_page;
     }
 
     if (ref($t_idx) eq 'PDF::API2::Page') {
@@ -2375,10 +2376,13 @@ Generate and return a barcode that can be placed as part of a page's content:
     my $barcode = $pdf->barcode('ean13', '0123456789012');
     $page->object($barcode, 100, 100);
 
+    my $qr_code = $pdf->barcode('qr', 'http://www.example.com');
+    $page->object($qr_code, 100, 300, 144 / $qr_code->width())
+
     $pdf->save('sample.pdf');
 
 C<$format> can be one of C<codabar>, C<code128>, C<code39> (a.k.a. 3 of 9),
-C<ean128>, C<ean13>, or C<itf> (a.k.a. interleaved 2 of 5).
+C<ean128>, C<ean13>, C<itf> (a.k.a. interleaved 2 of 5), or C<qr>.
 
 C<$code> is the value to be encoded.  Start and stop characters are only
 required when they're not static (e.g. for Codabar).
@@ -2501,6 +2505,11 @@ sub barcode {
             $options{'font_size'} //= 10 * $options{'bar_width'};
         }
     }
+    elsif ($format eq 'qr') {
+        $options{'bar_width'} //= 1;
+        $options{'bar_height'} //= $options{'bar_width'};
+        $options{'quiet_zone'} //= 4 * $options{'bar_width'};
+    }
     else {
         croak "Unrecognized barcode format: $format";
     }
@@ -2539,6 +2548,13 @@ sub barcode {
     }
     elsif ($format eq 'itf') {
         return $self->xo_2of5int(%options, -code => $value);
+    }
+    elsif ($format eq 'qr') {
+        my $qr_class = 'PDF::API2::Resource::XObject::Form::BarCode::qrcode';
+        eval "require $qr_class";
+        my $obj = $qr_class->new($self->{'pdf'}, %options, code => $value);
+        # $self->{'pdf'}->out_obj($self->{'pages'});
+        return $obj;
     }
 }
 

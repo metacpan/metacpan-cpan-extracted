@@ -5,7 +5,7 @@ use Open::This qw( parse_text );
 use Path::Tiny qw( path );
 use Test::More import => [qw( done_testing is )];
 use Test::Differences qw( eq_or_diff );
-use Test::Warnings ();
+use Test::Warnings    ();
 
 # This gets really noisy on Travis if $ENV{EDITOR} is not set
 local $ENV{EDITOR} = 'vim';

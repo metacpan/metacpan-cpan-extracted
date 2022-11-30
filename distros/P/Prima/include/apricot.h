@@ -18,7 +18,7 @@
 #	define _GNU_SOURCE
 #endif
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && (_MSC_VER < 1700)
 	#define BROKEN_COMPILER       1
 	#define BROKEN_PERL_PLATFORM  1
 	#define snprintf              _snprintf
@@ -1557,6 +1557,9 @@ prima_read_point( SV *rv_av, int * pt, int number, char * error);
 extern void *
 prima_read_array( SV * points, char * procName, char type, int div, int min, int max, int * n_points, Bool * do_free);
 
+extern void*
+prima_array_convert(int n_points, void * src, char src_type, void * dst, char dst_type);
+
 /* OS types */
 #define APC(const_name) CONSTANT(apc,const_name)
 START_TABLE(apc,UV)
@@ -2860,6 +2863,14 @@ LE(Flat)
 LE(Square)
 #define    leRound          2
 LE(Round)
+#define    leMax            2
+#define    leCustom       (leMax + 1)
+#define    leDefault      (leMax + 2)
+#define    leCmdOpen      (leMax + 3)
+#define    leCmdArc       (leMax + 4)
+#define    leCmdLine      (leMax + 5)
+#define    leCmdConic     (leMax + 6)
+#define    leCmdCubic     (leMax + 7)
 END_TABLE(le,UV)
 #undef LE
 
@@ -2872,6 +2883,7 @@ LJ(Round)
 LJ(Bevel)
 #define    ljMiter          2
 LJ(Miter)
+#define    ljMax            2
 END_TABLE(lj,UV)
 #undef LJ
 
@@ -3469,29 +3481,9 @@ typedef struct {
 
 /* regions */
 
-#define rgnEmpty     0
-#define rgnRectangle 1
-#define rgnPolygon   2
-#define rgnImage     3
-
 typedef struct {
-	int n_points;
-	int fill_mode;
-	Point* points;
-} PolygonRegionRec;
-
-typedef struct {
-	int n_boxes;
+	int n_boxes, size;
 	Box* boxes;
-} BoxRegionRec, *PBoxRegionRec;
-
-typedef struct {
-	int type;
-	union {
-		BoxRegionRec box;
-		PolygonRegionRec polygon;
-		Handle image;
-	} data;
 } RegionRec, *PRegionRec;
 
 #define RGNOP(const_name) CONSTANT(rgnop,const_name)
@@ -3553,7 +3545,34 @@ apc_region_get_handle( Handle self);
 extern PRegionRec
 apc_region_copy_rects( Handle self);
 
+typedef struct {
+	unsigned int command;
+	unsigned int n_args;
+	double *args;
+	double args_buf[1];
+} PathCommand, *PPathCommand;
+
+typedef struct {
+	int refcnt;
+	int n_commands;
+	PPathCommand *commands;
+	PPathCommand commands_buf[1];
+} Path, *PPath;
+
+typedef struct {
+	int type;
+	Path *path;
+} LineEnd, *PLineEnd;
+
 /* gp functions */
+typedef struct {
+	LineEnd line_end[4];
+	int line_join;
+	double line_width;
+	double miter_limit;
+	Matrix matrix;
+} DrawablePaintState;
+
 extern Bool
 apc_gp_init( Handle self);
 
@@ -3561,19 +3580,13 @@ extern Bool
 apc_gp_done( Handle self);
 
 extern Bool
-apc_gp_aa_bar( Handle self, double x1, double y1, double x2, double y2);
+apc_gp_aa_bars( Handle self, int nr, NRect *rr);
 
 extern Bool
 apc_gp_aa_fill_poly( Handle self, int numPts, NPoint * points);
 
 extern Bool
 apc_gp_alpha( Handle self, int alpha, int x1, int y1, int x2, int y2);
-
-extern Bool
-apc_gp_arc( Handle self, int x, int y, int dX, int dY, double angleStart, double angleEnd);
-
-extern Bool
-apc_gp_bar( Handle self, int x1, int y1, int x2, int y2);
 
 extern Bool
 apc_gp_bars( Handle self, int nr, Rect *rr);
@@ -3585,28 +3598,13 @@ extern Bool
 apc_gp_clear( Handle self, int x1, int y1, int x2, int y2);
 
 extern Bool
-apc_gp_chord( Handle self, int x, int y, int dX, int dY, double angleStart, double angleEnd);
-
-extern Bool
 apc_gp_draw_poly( Handle self, int numPts, Point * points);
 
 extern Bool
 apc_gp_draw_poly2( Handle self, int numPts, Point * points);
 
 extern Bool
-apc_gp_ellipse( Handle self, int x, int y, int dX, int dY);
-
-extern Bool
-apc_gp_fill_chord( Handle self, int x, int y, int dX, int dY, double angleStart, double angleEnd);
-
-extern Bool
-apc_gp_fill_ellipse( Handle self, int x, int y, int dX, int dY);
-
-extern Bool
 apc_gp_fill_poly( Handle self, int numPts, Point * points);
-
-extern Bool
-apc_gp_fill_sector( Handle self, int x, int y, int dX, int dY, double angleStart, double angleEnd);
 
 extern Bool
 apc_gp_flood_fill( Handle self, int x, int y, Color borderColor, Bool singleBorder);
@@ -3642,10 +3640,6 @@ apc_gp_put_image( Handle self, Handle image, int x, int y,
 						int xFrom, int yFrom, int xLen, int yLen, int rop);
 extern Bool
 apc_gp_rectangle( Handle self, int x1, int y1, int x2, int y2);
-
-extern Bool
-apc_gp_sector( Handle self, int x, int y, int dX, int dY,
-					double angleStart, double angleEnd);
 
 extern Bool
 apc_gp_set_pixel( Handle self, int x, int y, Color color);
@@ -3758,19 +3752,7 @@ extern ApiHandle
 apc_gp_get_handle( Handle self);
 
 extern int
-apc_gp_get_line_end( Handle self);
-
-extern int
-apc_gp_get_line_join( Handle self);
-
-extern float
-apc_gp_get_line_width( Handle self);
-
-extern int
 apc_gp_get_line_pattern( Handle self, unsigned char * buffer);
-
-extern float
-apc_gp_get_miter_limit( Handle self);
 
 extern Color
 apc_gp_get_nearest_color( Handle self, Color color);
@@ -3820,9 +3802,6 @@ apc_gp_get_text_width( Handle self, const char * text, int len, int flags);
 extern Bool
 apc_gp_get_text_out_baseline( Handle self);
 
-extern Point
-apc_gp_get_transform( Handle self);
-
 typedef void GCStorageFunction( Handle self, void * user_data, unsigned int user_data_size, Bool in_paint);
 
 extern Bool
@@ -3862,19 +3841,7 @@ extern Bool
 apc_gp_set_font( Handle self, PFont font);
 
 extern Bool
-apc_gp_set_line_end( Handle self, int lineEnd);
-
-extern Bool
-apc_gp_set_line_join( Handle self, int lineJoin);
-
-extern Bool
-apc_gp_set_line_width( Handle self, float lineWidth);
-
-extern Bool
 apc_gp_set_line_pattern( Handle self, unsigned char * pattern, int len);
-
-extern Bool
-apc_gp_set_miter_limit( Handle self, float limit);
 
 extern Bool
 apc_gp_set_palette( Handle self);
@@ -3887,9 +3854,6 @@ apc_gp_set_rop( Handle self, int rop);
 
 extern Bool
 apc_gp_set_rop2( Handle self, int rop);
-
-extern Bool
-apc_gp_set_transform( Handle self, int x, int y);
 
 extern Bool
 apc_gp_set_text_opaque( Handle self, Bool opaque);
@@ -4105,6 +4069,9 @@ apc_fs_opendir( const char *path, PDirHandleRec dh);
 extern int
 apc_fs_open_file( const char* path, Bool is_utf8, int flags, int mode);
 
+#ifndef PATH_MAX
+#	define PATH_MAX 2047
+#endif
 #define PATH_MAX_UTF8 (PATH_MAX*6)
 extern Bool
 apc_fs_readdir( PDirHandleRec dh, char * entry);

@@ -33,8 +33,11 @@
             "File::Find::Rule" : "0",
             "HTTP::Tiny" : "0.044",
             "IO::Compress::Bzip2" : "0",
+            "IO::Socket::SSL" : "1.56",
             "IO::Uncompress::Bunzip2" : "0",
             "Mojo::DOM58" : "1.00",
+            "Mozilla::CA" : "0",
+            "Net::SSLeay" : "1.49",
             "Path::Tiny" : "0",
             "PkgConfig" : "0.19026",
             "Sort::Versions" : "0",
@@ -81,9 +84,9 @@
          "url" : "https://github.com/shawnlaffan/perl-alien-geos"
       }
    },
-   "version" : "1.010",
+   "version" : "1.011",
    "x_alienfile" : {
-      "generated_by" : "Alien::Build::MM version 2.48",
+      "generated_by" : "Alien::Build::MM version 2.73",
       "requires" : {
          "share" : {
             "Alien::cmake3" : "0.02",
@@ -91,8 +94,11 @@
             "Config" : "0",
             "HTTP::Tiny" : "0.044",
             "IO::Compress::Bzip2" : "0",
+            "IO::Socket::SSL" : "1.56",
             "IO::Uncompress::Bunzip2" : "0",
             "Mojo::DOM58" : "1.00",
+            "Mozilla::CA" : "0",
+            "Net::SSLeay" : "1.49",
             "Sort::Versions" : "0",
             "URI" : "0",
             "URI::Escape" : "0"
@@ -100,5 +106,5 @@
          "system" : {}
       }
    },
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

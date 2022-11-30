@@ -1,0 +1,34 @@
+---
+expected:
+  SDATA:
+    context@12345:
+      lvl: 2
+    origin:
+      x: 1
+  content: 'some content [bar x=2 y=2]'
+  date: 2018-07-26
+  date_raw: Jul 26 15:50:14
+  datetime_obj: ~
+  datetime_raw: Jul 26 15:50:14
+  datetime_str: 2018-07-26T15:50:14Z
+  domain: ~
+  epoch: 1532620214
+  facility: local4
+  facility_int: 160
+  host: janus
+  host_raw: janus
+  message: 'foobar[4291]: [context@12345 lvl="2"][origin x="1"] some content [bar x=2 y=2]'
+  message_raw: '<163>Jul 26 15:50:14 janus foobar[4291]: [context@12345 lvl="2"][origin x="1"] some content [bar x=2 y=2]'
+  offset: Z
+  preamble: 163
+  priority: err
+  priority_int: 3
+  program_name: foobar
+  program_pid: 4291
+  program_raw: 'foobar[4291]'
+  program_sub: ~
+  time: 15:50:14
+name: RFC5424 Strict Structured Data
+options:
+  RFC5424StructuredDataStrict: 1
+string: '<163>Jul 26 15:50:14 janus foobar[4291]: [context@12345 lvl="2"][origin x="1"] some content [bar x=2 y=2]'

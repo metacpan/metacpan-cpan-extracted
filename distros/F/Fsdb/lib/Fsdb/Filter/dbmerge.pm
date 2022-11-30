@@ -32,8 +32,9 @@ or
 =head1 DESCRIPTION
 
 Merge all provided, pre-sorted input files, producing one sorted result.
-Inputs can both be specified with C<--input>, or one can come
-from standard input and the other from C<--input>.
+Inputs can both be specified with C<--input>,
+or with C<--inputs>,
+or one can come from standard input and the other from C<--input>.
 With C<--xargs>, each line of standard input is a filename for input.
 
 Inputs must have identical schemas (columns, column order,
@@ -44,14 +45,16 @@ input files.
 
 Because this program is intended to merge multiple sources,
 it does I<not> default to reading from standard input.
-If you wish to list F<-> as an explicit input source.
+If you wish to read standard input,
+giv F<-> as an explicit input source.
 
 Also, because we deal with multiple input files,
 this module doesn't output anything until it's run.
 
 L<dbmerge> consumes a fixed amount of memory regardless of input size.
 It therefore buffers output on disk as necessary.
-(Merging is implemented a series of two-way merges,
+(Merging is implemented a series of two-way merges
+and possibly an n-way merge at the end,
 so disk space is O(number of records).)
 
 L<dbmerge> will merge data in parallel, if possible.

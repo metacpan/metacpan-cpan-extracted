@@ -222,10 +222,31 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'x_value_formula' => {
+    	datatype => 'string',
+    	base_name => 'XValueFormula',
+    	description => 'Spreadsheet formula in A1-style.',
+    	format => '',
+    	read_only => '',
+    		},
+    'y_value_formula' => {
+    	datatype => 'string',
+    	base_name => 'YValueFormula',
+    	description => 'Spreadsheet formula in A1-style.',
+    	format => '',
+    	read_only => '',
+    		},
     'bubble_size' => {
     	datatype => 'double',
     	base_name => 'BubbleSize',
     	description => 'Bubble size.',
+    	format => '',
+    	read_only => '',
+    		},
+    'bubble_size_formula' => {
+    	datatype => 'string',
+    	base_name => 'BubbleSizeFormula',
+    	description => 'Spreadsheet formula in A1-style.',
     	format => '',
     	read_only => '',
     		},
@@ -238,7 +259,10 @@ __PACKAGE__->swagger_types( {
     'line_format' => 'LineFormat',
     'x_value' => 'double',
     'y_value' => 'double',
-    'bubble_size' => 'double'
+    'x_value_formula' => 'string',
+    'y_value_formula' => 'string',
+    'bubble_size' => 'double',
+    'bubble_size_formula' => 'string'
 } );
 
 __PACKAGE__->attribute_map( {
@@ -248,7 +272,10 @@ __PACKAGE__->attribute_map( {
     'line_format' => 'LineFormat',
     'x_value' => 'XValue',
     'y_value' => 'YValue',
-    'bubble_size' => 'BubbleSize'
+    'x_value_formula' => 'XValueFormula',
+    'y_value_formula' => 'YValueFormula',
+    'bubble_size' => 'BubbleSize',
+    'bubble_size_formula' => 'BubbleSizeFormula'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

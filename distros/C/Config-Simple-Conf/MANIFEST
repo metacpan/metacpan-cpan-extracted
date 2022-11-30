@@ -10,5 +10,7 @@ example/test_inc.conf		test includes
 example/test_die.conf		test die (should fail)
 example/test_inc_fail.conf	test include failure (should fail)
 example/exists.conf		test includes
+t/00use.t
+t/01set.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

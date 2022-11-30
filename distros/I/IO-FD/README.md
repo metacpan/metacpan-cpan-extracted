@@ -1,13 +1,13 @@
 # NAME
 
-IO::FD - Faster accept, socket, listen, read, write and friends with file descriptors, not handles
+IO::FD - Faster accept, socket, listen with file descriptors, not handles
 
 # SYNOPSIS
 
 Create and bind a STREAM socket (server):
 
 ```perl
-    use IO::FD
+    use IO::FD;
     use Socket ":all";
 
     die "Error creating socket"
@@ -82,13 +82,15 @@ Advanced:
 
 ```
     fctrl...
+
+    #TODO:
     ioctl...
 ```
 
 # DESCRIPTION
 
-IO::FD is an XS module which implements core Perl and system I/O functions on
-top of **file descriptors** instead of Perl **file handles**. Functions include
+IO::FD is an XS module which implements common core Perl system I/O functions
+to use **file descriptors** instead of Perl **file handles**. Functions include
 but are not limited to `accept`, `connect`, `socket`, `bind`, `sysopen`,
 `sysread`, and `syswrite`.
 
@@ -97,7 +99,7 @@ such as `dup` and `mkstemp`.
 
 This module can significantly lower memory usage per file descriptor and
 decrease file/socket opening and socket accepting times.  `accept` performance
-is particularly improved with much higher connection handling rates and lower
+is particularly improved with much higher connection handling rates for a given
 backlog.
 
 Actual byte throughput (read/write) is basically unchanged compared to the core
@@ -120,16 +122,15 @@ For example:
 ```
 
 This modules **IS NOT** intended to be a drop in replacement for core IO
-subroutines in existing code as it does not it does not export anything. If you
-want a 'drop in replacement' please look at [IO::FD::DWIM](https://metacpan.org/pod/IO%3A%3AFD%3A%3ADWIM) which is part of
-the same distribution.
+subroutines in existing code. If you want a 'drop in replacement' please look
+at [IO::FD::DWIM](https://metacpan.org/pod/IO%3A%3AFD%3A%3ADWIM) which is part of the same distribution.
 
 Currently this module is focused on Unix/Linux systems, as this is the natural
 habitat of a file descriptor.
 
 # WHERE SHOULD I USE THIS MODULE?
 
-## Networking ... Yes
+## Networking ... Oh Yes
 
 Socket centric programs will benefit greatly from this module. The process of
 socket creation/opening/accepting/listening, where it is INET/INET6 or UNIX
@@ -141,36 +142,34 @@ If a file can be loaded completely into memory for processing, this module will
 provide improved opening and closing times. Any decoding and line processing
 will need to be done manually
 
-## Line Processing ... No
+## Line Processing ... Hmmm, No
 
-General text file line processing is best left to Perl file handles. File handles
-do the heavy lifting of line splitting, EOL handling, encodings, which this
-modules does not implement.
+General text file line processing is best left to Perl file handles. File
+handles do the heavy lifting of line splitting, EOL handling, encodings, which
+this modules does not implement.
 
 You can do it, but it is not in the scope of this module.
 
 # LIMITATIONS
 
-Perl does a lot of nice things when working with files. When using file
-descriptors directly **you will loose**:
+Perl does a lot of nice things when working with files and handles. When using
+file descriptors directly **you will loose**:
 
-```perl
-    Buffering for file small read/write performance (via print and <FH>)
-    Automatic close when out of scope
-    Close on exec
-    Special variables not supported (ie '_' in stat)
-    No 'readline' support  (ie <FH>)
-    Not a subclass of IO::Handle, so no OO
-```
+- Buffering for file small read/write performance (via print and <FH>)
+- Automatic close when out of scope
+- Close on exec
+- Special variables not supported (ie '\_' in stat)
+- <FH> 'readline' support
+- IO::Handle inheritance
 
 # MOTIVATION
 
 Perl makes working with text files easy, thanks to **file handles**.  Line
 splitting, UTF-8, EOL processing etc. are awesome and make your life easier.
 
-However the benefits of file handles in a network context or binary files are
-not so clear cut. All the nice line ending and encoding support doesn't help
-most of the time in these scenarios.
+However, the benefits of file handles in a network context or binary files are
+not so clear cut. All the nice line ending and encoding support doesn't help in
+these scenarios.
 
 In addition, the OS kernel does a lot of buffering for networking already. Do we
 really need to add more?
@@ -199,6 +198,33 @@ name.
 ### IO::FD::listen
 
 ### IO::FD::accept
+
+### IO::FD::accept\_multiple
+
+```perl
+    my @new_fds;
+    my @peers;
+    my $count=accept_multiple(@new_fds, @peers, $listen_sock);
+```
+
+**Note:** DO NOT use this function on a blocking socket.
+
+Accepts as many new connection sockets as available. The new sockets are stored
+in `new_fds`, which is an array, not a array ref. The corresponding peers to
+the connections are stored in `@peers`, also an array not a reference.
+
+`$listen_sock` is the file descriptor from which  the sockets are accepted
+from. It MUST be configured for non blocking  operation, otherwise your program
+will just loop forever in this function
+
+Because this function will only works for non blocking listening sockets, the
+sockets/fds returned are forced into non blocking mode also. Than means on
+linux an explicit fcntl is called. On BSD type systems the socket will already
+be non blocking
+
+Returns the number of sockets accepted until an error condition occurred.
+Returns `undef` if no sockets where accepted. Check the `$!` for normal
+non blocking error codes.
 
 ### IO::FD::connect
 
@@ -292,7 +318,7 @@ Alias to `IO::FD::fcntl`
 
 ### IO::FD::stat
 
-Likely differences to Perl stat for larger integer values
+Likely differences to Perl stat for larger integer values.
 
 TODO: fix this!
 

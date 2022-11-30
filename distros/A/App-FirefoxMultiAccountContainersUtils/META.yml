@@ -19,7 +19,7 @@ name: App-FirefoxMultiAccountContainersUtils
 provides:
   App::FirefoxMultiAccountContainersUtils:
     file: lib/App/FirefoxMultiAccountContainersUtils.pm
-    version: '0.013'
+    version: '0.014'
 requires:
   App::FirefoxUtils: '0.012'
   Data::Sah::Compiler::perl::TH::any: '0.911'
@@ -46,7 +46,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-FirefoxMultiAccountContainersUtils
   homepage: https://metacpan.org/release/App-FirefoxMultiAccountContainersUtils
   repository: git://github.com/perlancar/perl-App-FirefoxMultiAccountContainersUtils.git
-version: '0.013'
+version: '0.014'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

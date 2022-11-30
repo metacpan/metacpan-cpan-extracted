@@ -1,3 +1,6 @@
+0.002 Nov 21 2022
+	- fix check_ routines checking tile contents, not the type
+
 0.001 Nov 12 2022
 	- first version
 

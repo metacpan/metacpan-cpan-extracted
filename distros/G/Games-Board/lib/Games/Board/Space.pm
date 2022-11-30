@@ -1,14 +1,35 @@
 use strict;
 use warnings;
-package Games::Board::Space;
-{
-  $Games::Board::Space::VERSION = '1.013';
-}
+package Games::Board::Space 1.014;
 # ABSTRACT: a parent class for spaces on game board
 
 use Carp;
 
+#pod =head1 SYNOPSIS
+#pod
+#pod   use Games::Board;
+#pod
+#pod   my $board = Games::Board->new;
+#pod
+#pod   $board->add_space(Games::Board::Space->new(
+#pod     id   => 'go',
+#pod     dir  => { next => 'mediterranean', prev => 'boardwalk' },
+#pod     cost => undef
+#pod   ));
+#pod
+#pod   my $tophat = Games::Board::Piece->new(id => 'tophat')->move(to => 'go');
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod This module provides a base class for representing the spaces on a game board.
+#pod
+#pod =cut
 
+#pod =method new
+#pod
+#pod This method constructs a new space and returns it.
+#pod
+#pod =cut
 
 sub new {
   my $class = shift;
@@ -29,6 +50,11 @@ sub new {
   bless $space => $class;
 }
 
+#pod =method id
+#pod
+#pod This method returns the id of the space.
+#pod
+#pod =cut
 
 sub id {
   my $space = shift;
@@ -36,12 +62,25 @@ sub id {
   return $space->{id};
 }
 
+#pod =method board
+#pod
+#pod This method returns board on which this space sits.
+#pod
+#pod =cut
 
 sub board {
   my $space = shift;
   $space->{board};
 }
 
+#pod =method dir_id
+#pod
+#pod   my $id = $space->dir_id($dir);
+#pod
+#pod This method returns the id of the space found in the given direction from this
+#pod space.
+#pod
+#pod =cut
 
 sub dir_id {
   my ($space, $dir) = @_;
@@ -49,18 +88,39 @@ sub dir_id {
   return $space->{dir}{$dir} if (ref $space->{dir} eq 'HASH');
 }
 
+#pod =method dir
+#pod
+#pod   my $new_space = $space->dir($dir);
+#pod
+#pod This method returns the space found in the given direction from this space.
+#pod
+#pod =cut
 
 sub dir {
   my ($space, $dir) = @_;
   $space->board->space($space->dir_id($dir));
 }
 
+#pod =method contains
+#pod
+#pod   my $bool = $space->contains($piece);
+#pod
+#pod This method returns a true value if the space contains the passed piece.
+#pod
+#pod =cut
 
 sub contains {
   my ($self, $piece) = @_;
   return 1 if grep { $_ eq $piece->id } @{$self->{contents}};
 }
 
+#pod =method receive
+#pod
+#pod   $space->receive($piece);
+#pod
+#pod This method will place the given piece onto this space.
+#pod
+#pod =cut
 
 sub receive {
   my ($self, $piece) = @_;
@@ -72,11 +132,31 @@ sub receive {
   push @{$self->{contents}}, $piece->id;
 }
 
+#pod =method take
+#pod
+#pod   $space->take($piece);
+#pod
+#pod This method removes the piece from this space.
+#pod
+#pod =cut
+
+sub take {
+  my ($self, $piece) = @_;
+
+  return unless eval { $piece->isa('Games::Board::Piece') };
+  return unless $self->contains($piece);
+
+  delete $piece->{current_space};
+  $self->{contents} = [ grep { $_ ne $piece->id } @{$self->{contents}} ];
+}
+
 1;
 
 __END__
 
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -84,7 +164,7 @@ Games::Board::Space - a parent class for spaces on game board
 
 =head1 VERSION
 
-version 1.013
+version 1.014
 
 =head1 SYNOPSIS
 
@@ -103,6 +183,18 @@ version 1.013
 =head1 DESCRIPTION
 
 This module provides a base class for representing the spaces on a game board.
+
+=head1 PERL VERSION
+
+This module should work on any version of perl still receiving updates from
+the Perl 5 Porters.  This means it should work on any version of perl released
+in the last two to three years.  (That is, if the most recently released
+version is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 METHODS
 
@@ -143,9 +235,15 @@ This method returns a true value if the space contains the passed piece.
 
 This method will place the given piece onto this space.
 
+=head2 take
+
+  $space->take($piece);
+
+This method removes the piece from this space.
+
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

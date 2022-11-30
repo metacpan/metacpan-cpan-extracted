@@ -24,7 +24,9 @@
          "requires" : {}
       },
       "configure" : {
-         "requires" : {}
+         "requires" : {
+            "File::Copy" : "0"
+         }
       },
       "runtime" : {
          "requires" : {
@@ -57,6 +59,6 @@
          "url" : "https://github.com/shawnlaffan/perl-pp-autolink"
       }
    },
-   "version" : "2.05",
+   "version" : "2.10",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

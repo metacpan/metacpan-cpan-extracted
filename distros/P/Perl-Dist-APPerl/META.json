@@ -32,7 +32,15 @@
       },
       "runtime" : {
          "requires" : {
-            "perl" : "5.010"
+            "File::Path" : "2.07",
+            "JSON::PP" : "2.0104",
+            "perl" : "5.010",
+            "version" : "0.77"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Pod::LinkCheck::Lite" : "0"
          }
       }
    },
@@ -48,7 +56,7 @@
          "web" : "https://github.com/G4Vi/Perl-Dist-APPerl"
       }
    },
-   "version" : "v0.1.0",
+   "version" : "v0.2.0",
    "x_serialization_backend" : "JSON::PP version 4.12",
    "x_static_install" : 1
 }

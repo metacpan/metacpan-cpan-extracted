@@ -7,7 +7,7 @@ use warnings;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-09-01'; # DATE
 our $DIST = 'App-ListUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our %SPEC;
 
@@ -23,6 +23,20 @@ our %argspec0_input = (
 $SPEC{get_common_prefix} = {
     v => 1.1,
     summary => 'Get common prefix from lines of text',
+    description => <<'_',
+
+Example:
+
+    % cat sample.txt
+    - hamburger
+    - sandwich
+    - fruit salad
+    - rice bowl
+
+    % get-common-prefix sample.txt
+    -
+
+_
     args => {
         %argspec0_input,
     },
@@ -40,6 +54,19 @@ sub get_common_prefix {
 $SPEC{get_common_suffix} = {
     v => 1.1,
     summary => 'Get common suffix from lines of text',
+    description => <<'_',
+
+Example:
+
+    % cat sample.txt
+    asterix
+    vitalstatistix
+    cacofonix
+
+    % get-common-suffix sample.txt
+    ix
+
+_
     args => {
         %argspec0_input,
     },
@@ -85,6 +112,20 @@ sub oredered2bullet {
 $SPEC{bullet2comma} = {
     v => 1.1,
     summary => 'Convert a bulleted list into comma-separated',
+    description => <<'_',
+
+Example:
+
+    % cat sample.txt
+    - hamburger
+    - sandwich
+    - fruit salad
+    - rice bowl
+
+    % bullet2comma sample.txt
+    hamburger, sandwich, fruit salad, rice bowl
+
+_
     args => {
         %argspec0_input,
     },
@@ -117,7 +158,7 @@ App::ListUtils - Command-line utilities related to lists in files
 
 =head1 VERSION
 
-This document describes version 0.001 of App::ListUtils (from Perl distribution App-ListUtils), released on 2022-09-01.
+This document describes version 0.002 of App::ListUtils (from Perl distribution App-ListUtils), released on 2022-09-01.
 
 =head1 SYNOPSIS
 
@@ -145,6 +186,17 @@ Usage:
  bullet2comma(%args) -> any
 
 Convert a bulleted list into comma-separated.
+
+Example:
+
+ % cat sample.txt
+ - hamburger
+ - sandwich
+ - fruit salad
+ - rice bowl
+ 
+ % bullet2comma sample.txt
+ hamburger, sandwich, fruit salad, rice bowl
 
 This function is not exported.
 
@@ -192,6 +244,17 @@ Usage:
 
 Get common prefix from lines of text.
 
+Example:
+
+ % cat sample.txt
+ - hamburger
+ - sandwich
+ - fruit salad
+ - rice bowl
+ 
+ % get-common-prefix sample.txt
+ -
+
 This function is not exported.
 
 Arguments ('*' denotes required arguments):
@@ -214,6 +277,16 @@ Usage:
  get_common_suffix(%args) -> any
 
 Get common suffix from lines of text.
+
+Example:
+
+ % cat sample.txt
+ asterix
+ vitalstatistix
+ cacofonix
+ 
+ % get-common-suffix sample.txt
+ ix
 
 This function is not exported.
 

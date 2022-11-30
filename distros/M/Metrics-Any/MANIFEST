@@ -9,7 +9,11 @@ lib/Metrics/Any/Adapter/Tee.pm
 lib/Metrics/Any/Adapter/Test.pm
 lib/Metrics/Any/AdapterBase/Stored.pm
 lib/Metrics/Any/Collector.pm
+LICENSE
 MANIFEST			This list of files
+META.json
+META.yml
+README
 t/00use.t
 t/01collector.t
 t/02adapter-early.t
@@ -24,7 +28,3 @@ t/20name-prefix.t
 t/21nonstrict.t
 t/22disable-package.t
 t/99pod.t
-README
-LICENSE
-META.yml
-META.json

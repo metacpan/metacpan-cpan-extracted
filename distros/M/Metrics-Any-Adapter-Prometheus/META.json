@@ -4,7 +4,7 @@
       "Paul Evans <leonerd@leonerd.org.uk>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4224",
+   "generated_by" : "Module::Build version 0.4231",
    "license" : [
       "perl_5"
    ],
@@ -24,12 +24,13 @@
             "Net::Prometheus::Counter" : "0",
             "Net::Prometheus::Gauge" : "0",
             "Net::Prometheus::Histogram" : "0.10",
-            "Net::Prometheus::Registry" : "0"
+            "Net::Prometheus::Registry" : "0",
+            "perl" : "5.014"
          }
       },
       "test" : {
          "requires" : {
-            "Metrics::Any" : "0.05",
+            "Metrics::Any" : "0.09",
             "Test::More" : "0.88"
          }
       }
@@ -37,7 +38,7 @@
    "provides" : {
       "Metrics::Any::Adapter::Prometheus" : {
          "file" : "lib/Metrics/Any/Adapter/Prometheus.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -46,6 +47,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.05",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

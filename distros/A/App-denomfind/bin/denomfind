@@ -85,7 +85,9 @@ my $denom = do { $o{g} =~ s/(.+),// && $1 } || 1 ; #　開始する分母の値 
 & main () ; 
 END{
   exit unless $count ; # 1個も分母を探索していないなら、すぐ終了。
-  print STDERR BOLD FAINT @nums . " ratios are given." if @nums > 1 && 0 ne ($o{2}//'') ;
+  exit if 0 eq ($o{2}//'') ;
+  my $sum = 0 ; $sum = "$sum" + "$_" for @nums ;
+  print STDERR BOLD FAINT @nums . " ratios are given (sum=$sum)." if @nums > 1 ; #&& 0 ne ($o{2}//'') ;
   my $ud = [ 'down to','from','up to' ] -> [ ( $o{g} <=> 0 ) + 1 ] ; # 'from' はかなり無理矢理である。正常な使用の想定外。
   $denom += $o{g} > 0 ? -1 : $o{g} < 0 ? 1 : 0 ; # 1個戻す。
   say STDERR BOLD FAINT " $count denominators have found $ud $denom. ($Script)" ; 
@@ -169,7 +171,7 @@ sub dform ( $$ ) {
 }
 
 sub procQ () { 
-  my $str = reduce{$a=~/(\d*)$/;if($b-$1==1){$a=~s/~\d+$//;"$a~$b"}else{"$a,$b"} } @_ ;
+  my $str = reduce{$a=~/(\d*)$/;if($b-$1==1){$a=~s/~\d+$//;"$a~$b"}else{"$a,$b"} } @_ ; # 連続する数は~で結ぶ。
   if ( @_ >= 2 ) { 
     my $gcd = bgcd map { $_ - $_[0] } @_ [ 1 .. $#_ ] ; 
     my $rem = $_[0] % $gcd ;
@@ -187,10 +189,6 @@ sub procQ () {
     } 
   }
   return $str ;
-}
-
-sub npack ( @ )  { 
-  return reduce {  $a =~ /(\d+)$/ ; if( $b-$1==1 ){ "$a~$b" }else{ "$a:$b" } }  @_ ;
 }
 
 sub yfilter ( $ ) { # メモ : state をいくつか使った読解のしにくいプログラムであること、もっと良い方法がありそうなこと。
@@ -341,4 +339,6 @@ sub HELP_MESSAGE {
      * 偶数丸め ( JIS Z 8401 と ISO 31-0 ) に対応したい。-50を割り当てたい。しかし、大幅な改装が必要。
      * 各分母に対して、対数尤度を表示する -Lのオプションを作りたい。
 
+     * "denomfind 90.5%" が意図したとおりにどうさせず。0.905と認識されなかった。90.5と認識された結果が出現し、235,236行目で数値でないという警告が出た。
+     * "denomfind -% 90.5%" の動作もおかしい。0.9050 と認識された。
 =cut

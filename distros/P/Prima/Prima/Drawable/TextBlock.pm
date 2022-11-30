@@ -139,8 +139,13 @@ sub opcode
 	my $len = $_[0] || 0;
 	my $name = $_[1];
 	$len = 0 if $len < 0;
-	my $op = ++$lastop;
-	$opnames{$name} = $op if defined $name;
+	my $op;
+	if ( defined $name && exists $opnames{$name}) {
+		$op = $opnames{$name};
+	} else {
+		$op = ++$lastop;
+		$opnames{$name} = $op if defined $name;
+	}
 	return $op | (( $len + 1 ) << 16);
 }
 
@@ -205,7 +210,7 @@ sub _debug_block
 	} elsif ( $color & COLOR_INDEX) {
 		$color = "index(" . ( $color & ~COLOR_INDEX) . ")";
 	} else {
-		$color = sprintf("%06x", $color);
+		$color = sprintf("%06x", $color & 0xffffff);
 	}
 	print STDERR "COLORS     : $color ";
 	$color = $$b[BLK_BACKCOLOR];
@@ -214,9 +219,10 @@ sub _debug_block
 	} elsif ( $color & COLOR_INDEX) {
 		$color = "index(" . ( $color & ~COLOR_INDEX) . ")";
 	} else {
-		$color = sprintf("%06x", $color);
+		$color = sprintf("%06x%s", $color & 0xffffff, ($color & BACKCOLOR_OFF) ? ',transparent' : '');
 	}
 	print STDERR "$color\n";
+	my %opval = reverse %opnames;
 
 	my ($i, $lim) = (BLK_START, scalar @$b);
 	for ( ; $i < $lim; $i += $$b[$i] >> 16) {
@@ -262,6 +268,10 @@ sub _debug_block
 				$bk = 'backcolor,';
 				$color &= ~BACKCOLOR_FLAG;
 			}
+			if ( $color & BACKCOLOR_OFF ) {
+				$bk = 'transparent,';
+				$color &= ~BACKCOLOR_OFF;
+			}
 			if ( $color & COLOR_INDEX) {
 				$color = "index(" . ( $color & ~COLOR_INDEX) . ")";
 			} else {
@@ -289,6 +299,8 @@ sub _debug_block
 			print STDERR ": OP_MARK $id $x $y\n";
 		} else {
 			my $oplen = $cmd >> 16;
+			$cmd &= 0xffff;
+			$cmd = $opval{$cmd} if defined $opval{$cmd};
 			my @o = ($oplen > 1) ? @$b[ $i + 1 .. $i + $oplen - 1] : ();
 			print STDERR ": OP($cmd) @o\n";
 			last unless $$b[$i] >> 16;
@@ -527,7 +539,7 @@ sub block_wrap
 			$lastTextOffset = $ofs + $tlen unless $can_wrap;
 
 		REWRAP:
-			my $tw  = $canvas-> get_text_shape_width(substr( $$t, $o + $ofs, $tlen), 1, $flags);
+			my $tw  = $canvas-> get_text_shape_width(substr( $$t, $o + $ofs, $tlen), to::AddOverhangs, $flags);
 			my $apx = $state_hash{$state_key}-> {width};
 			if ( $x + $tw + $apx <= $width) {
 				push @$z, OP_TEXT, $ofs, $tlen, $tw;
@@ -554,14 +566,14 @@ sub block_wrap
 						push @$z, OP_TEXT,
 							$ofs, $l + length $leadingSpaces,
 							$tw = $canvas-> get_text_shape_width(
-								$leadingSpaces . substr( $str, 0, $l), 1,
+								$leadingSpaces . substr( $str, 0, $l), to::AddOverhangs,
 								$flags
 							);
 					} else {
 						push @$z, OP_TEXT,
 							$ofs + length $leadingSpaces, $l,
 							$tw = $canvas-> get_text_shape_width(
-								substr( $str, 0, $l), 1,
+								substr( $str, 0, $l), to::AddOverhangs,
 								$flags
 							);
 						$has_text = 1;
@@ -574,7 +586,7 @@ sub block_wrap
 					if ( $str =~ /^(\s+)/) {
 						$ofs  += length $1;
 						$tlen -= length $1;
-						$x    += $canvas-> get_text_shape_width( $1, 1, $flags);
+						$x    += $canvas-> get_text_shape_width( $1, to::AddOverhangs, $flags);
 						$str =~ s/^\s+//;
 					}
 					goto REWRAP if length $str;
@@ -588,7 +600,7 @@ sub block_wrap
 					# but may be some words can be stripped?
 						goto REWRAP if $ox > 0;
 						if ( $word_break && ($str =~ m/^(\S+)(\s*)/)) {
-							$tw = $canvas-> get_text_shape_width( $1, 1, $flags);
+							$tw = $canvas-> get_text_shape_width( $1, to::AddOverhangs, $flags);
 							push @$z, OP_TEXT, $ofs, length $1, $tw;
 							$has_text = 1;
 							$x += $tw;
@@ -597,8 +609,9 @@ sub block_wrap
 							goto REWRAP;
 						}
 					}
+					my $rr = $x;
 					push @$z, OP_TEXT, $ofs, length($str),
-						$x += $canvas-> get_text_shape_width( $str, 1, $flags);
+						$x += $canvas-> get_text_shape_width( $str, to::AddOverhangs, $flags);
 					$has_text = 1;
 				}
 			} elsif ( $haswrapinfo) { # unwrappable, and cannot be fit - retrace
@@ -884,7 +897,7 @@ sub new
 		direction     => 0,
 		fontmap       => [],
 		colormap      => [],
-		text          => '',
+		textRef       => \'',
 		textDirection => 0,
 		block         => undef,
 		resolution    => [72,72],
@@ -895,9 +908,15 @@ sub new
 }
 
 eval "sub $_ { \$#_ ? \$_[0]->{$_} = \$_[1] : \$_[0]->{$_}}" for qw(
-	fontmap colormap block text resolution direction
+	fontmap colormap block textRef resolution direction
 	baseFontSize baseFontStyle restoreCanvas textDirection
 );
+
+sub text
+{
+	return ${ $_[0]->{textRef} } unless $#_;
+	$_[0]->{textRef} = \ $_[1];
+}
 
 sub acquire {}
 
@@ -920,7 +939,7 @@ sub calculate_dimensions
 			my ( undef, undef, undef, $text ) = @_;
 			$b-> [ $ptr + tb::T_WID ] = $canvas->get_text_shape_width(
 				$text,
-				$self->{textDirection} ? to::RTL : 0
+				($self->{textDirection} ? to::RTL : 0) | to::AddOverhangs,
 			);
 
 			my $f = $canvas->get_font;
@@ -949,7 +968,7 @@ sub walk_options
 {
 	my $self = shift;
 	return
-		textPtr => \ $self->{text},
+		textPtr => $self->{textRef},
 		( map { ($_ , $self->{$_}) } qw(fontmap colormap resolution baseFontSize baseFontSize) ),
 		;
 }
@@ -1072,7 +1091,7 @@ sub text_wrap
 	# Ignored options: ExpandTabs, CalcTabs .
 
 	# first, we don't return chunks, period. That's too messy.
-	return $canvas-> text_wrap( $self-> {text}, $width, $opt, $indent)
+	return $canvas-> text_wrap( ${$self-> {textRef}}, $width, $opt, $indent)
 		if $opt & tw::ReturnChunks;
 
 	$self->acquire($canvas, font => 1);
@@ -1136,6 +1155,81 @@ sub height
 	my ( $self, $canvas ) = @_;
 	$self-> acquire( $canvas, dimensions => 1 );
 	return $self->{block}->[tb::BLK_HEIGHT];
+}
+
+package Prima::Drawable::PolyTextBlock;
+use base qw(Prima::Drawable::TextBlock);
+
+
+sub new
+{
+	my ($class, %opt) = @_;
+	my $self = $class->SUPER::new(%opt);
+	$self->{blocks} //= [];
+	return $self;
+}
+
+sub blocks { $_[0]->{blocks} }
+
+sub for_blocks
+{
+	my ( $self, $canvas, $cb ) = @_;
+
+	my $ps = $canvas ? $canvas->get_paint_state : ps::Enabled;
+	$canvas->begin_paint_info if $ps == ps::Disabled;
+
+	for my $b ( @{ $self->{blocks} }) {
+		$self->{block} = $b;
+		$cb->(@_);
+	}
+
+	$canvas->end_paint_info if $ps == ps::Disabled;
+}
+
+sub calculate_dimensions
+{
+	my ( $self, $canvas ) = @_;
+	$self-> for_blocks( $canvas, sub {
+		$self-> SUPER::calculate_dimensions( $canvas );
+	} );
+}
+
+sub text_out
+{
+	my ($self, $canvas, $x, $y) = @_;
+	$self-> for_blocks( $canvas, sub {
+		my $b = $self->{block};
+		$self-> SUPER::text_out( $canvas, $x, $y);
+		$y -= $$b[tb::BLK_HEIGHT];
+	});
+}
+
+sub get_text_width
+{
+	my ( $self, $canvas, $add_overhangs) = @_;
+
+	my $max = 0;
+	$self-> for_blocks( $canvas, sub {
+		my $x = $self-> SUPER::get_text_width( $canvas, $add_overhangs );
+		$max = $x if $max < $x;
+	} );
+	return $max;
+}
+
+sub get_text_box
+{
+	# XXX unimplemented - todo
+}
+
+sub text_wrap
+{
+	my ( $self, $canvas, $width, $opt, $indent) = @_;
+	my @ret;
+	$self-> for_blocks( $canvas, sub {
+		my $x = $self-> SUPER::text_wrap( $canvas, $width, $opt, $indent);
+		push @ret, @$x;
+	} );
+	return \@ret;
 }
 
 1;

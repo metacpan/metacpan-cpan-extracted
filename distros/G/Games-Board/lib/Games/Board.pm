@@ -1,15 +1,36 @@
 use strict;
 use warnings;
-package Games::Board;
-{
-  $Games::Board::VERSION = '1.013';
-}
+package Games::Board 1.014;
 # ABSTRACT: a parent class for board games
 
 use Carp;
 use Games::Board::Space;
 use Games::Board::Piece;
 
+#pod =head1 SYNOPSIS
+#pod
+#pod   use Games::Board;
+#pod
+#pod   my $board = Games::Board->new;
+#pod
+#pod   $board->add_space(
+#pod     id  => 'go',
+#pod     dir => { next => 'mediterranean', prev => 'boardwalk' },
+#pod     cost => undef
+#pod   );
+#pod
+#pod   my $tophat = Games::Board::Piece->new(id => 'tophat')->move(to => 'go');
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod This module provides a base class for representing board games.  
+#pod
+#pod =method new
+#pod
+#pod This method constructs a new game board and returns it.  As constructed it has
+#pod no spaces or pieces on it.
+#pod
+#pod =cut
 
 sub new {
   my $class = shift;
@@ -21,6 +42,14 @@ sub new {
   bless $board => $class;
 }
 
+#pod =method space
+#pod
+#pod   my $space = $board->space($id);
+#pod
+#pod This method returns the space with the given C<$id>.  If no space with that id
+#pod exists, undef is returned.
+#pod
+#pod =cut
 
 sub space {
   my $board = shift;
@@ -29,6 +58,16 @@ sub space {
   return $board->{spaces}{$space};
 }
 
+#pod =method add_space
+#pod
+#pod   my $space = $board->add_space(%args);
+#pod
+#pod This method adds a space to the board.  It is passed a hash of attributes to
+#pod use in creating a Games::Board::Space object.  The object is created by calling
+#pod the constructor on the class whose name is returned by the C<spaceclass>
+#pod method.  This class must inherit from Games::Board::Space.
+#pod
+#pod =cut
 
 sub add_space {
   my ($board, %args) = @_;
@@ -46,12 +85,32 @@ sub add_space {
   }
 }
 
+#pod =method piececlass
+#pod
+#pod This method returns the class used for pieces on this board.
+#pod
+#pod =cut
 
 sub piececlass { 'Games::Board::Piece' }
 
+#pod =method spaceclass
+#pod
+#pod This method returns the class used for spaces on this board.
+#pod
+#pod =cut
 
 sub spaceclass { 'Games::Board::Space' }
 
+#pod =method add_piece
+#pod
+#pod   my $piece = $board->add_piece(%args)
+#pod
+#pod This method adds a piece to the board.  It is passed a hash of attributes to
+#pod use in creating a Games::Board::Piece object.  The object is created by calling
+#pod the constructor on the class whose name is returned by the C<piececlass>
+#pod method.  This class must inherit from Games::Board::Piece.
+#pod
+#pod =cut
 
 sub add_piece {
   my $board = shift;
@@ -72,13 +131,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Games::Board - a parent class for board games
 
 =head1 VERSION
 
-version 1.013
+version 1.014
 
 =head1 SYNOPSIS
 
@@ -97,6 +158,18 @@ version 1.013
 =head1 DESCRIPTION
 
 This module provides a base class for representing board games.  
+
+=head1 PERL VERSION
+
+This module should work on any version of perl still receiving updates from
+the Perl 5 Porters.  This means it should work on any version of perl released
+in the last two to three years.  (That is, if the most recently released
+version is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 METHODS
 
@@ -140,7 +213,27 @@ method.  This class must inherit from Games::Board::Piece.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <cpan@semiotic.systems>
+
+=head1 CONTRIBUTORS
+
+=for stopwords Kaycie Goodman Ricardo SIGNES Signes
+
+=over 4
+
+=item *
+
+Kaycie Goodman <jgoodman1990@gmail.com>
+
+=item *
+
+Ricardo SIGNES <rjbs@codesimply.com>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

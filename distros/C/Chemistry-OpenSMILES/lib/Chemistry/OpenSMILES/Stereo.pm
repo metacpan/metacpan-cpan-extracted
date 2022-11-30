@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 # ABSTRACT: Stereochemistry handling routines
-our $VERSION = '0.8.3'; # VERSION
+our $VERSION = '0.8.4'; # VERSION
 
 require Exporter;
 our @ISA = qw( Exporter );
@@ -22,9 +22,10 @@ use Chemistry::OpenSMILES qw(
     is_single_bond
     toggle_cistrans
 );
+use Chemistry::OpenSMILES::Writer qw( write_SMILES );
 use Graph::Traversal::BFS;
 use Graph::Undirected;
-use List::Util qw( any max min sum sum0 );
+use List::Util qw( all any max min sum sum0 );
 
 sub mark_all_double_bonds
 {
@@ -36,7 +37,8 @@ sub mark_all_double_bonds
 
     # Select non-ring double bonds
     my @double_bonds = grep { is_double_bond( $graph, @$_ ) &&
-                              !is_ring_bond( $graph, @$_ ) }
+                              !is_ring_bond( $graph, @$_ ) &&
+                              !is_unimportant_double_bond( $graph, @$_ ) }
                             $graph->edges;
 
     # Construct a double bond incidence graph. Vertices are double bonds
@@ -283,7 +285,8 @@ sub cis_trans_to_pseudoedges
     # Select non-ring double bonds
     my @double_bonds =
         grep {  is_double_bond( $moiety, @$_ ) &&
-               !is_ring_bond( $moiety, @$_ ) } $moiety->edges;
+               !is_ring_bond( $moiety, @$_ ) &&
+               !is_unimportant_double_bond( $moiety, @$_ ) } $moiety->edges;
 
     # Connect cis/trans atoms in double bonds with pseudo-edges
     for my $bond (@double_bonds) {
@@ -337,6 +340,29 @@ sub is_pseudoedge
 {
     my( $moiety, $a, $b ) = @_;
     return $moiety->has_edge_attribute( $a, $b, 'pseudo' );
+}
+
+# An "unimportant" double bond is one which has leaf atoms on one of its
+# sides and both of these atoms are identical.
+sub is_unimportant_double_bond
+{
+    my( $moiety, $a, $b ) = @_;
+    my @a_neighbours = grep { $_ != $b } $moiety->neighbours( $a );
+    my @b_neighbours = grep { $_ != $a } $moiety->neighbours( $b );
+
+    if( @a_neighbours == 2 &&
+        all { $moiety->degree( $_ ) == 1 } @a_neighbours ) {
+        return 1 if write_SMILES( $a_neighbours[0] ) eq
+                    write_SMILES( $a_neighbours[1] );
+    }
+
+    if( @b_neighbours == 2 &&
+        all { $moiety->degree( $_ ) == 1 } @b_neighbours ) {
+        return 1 if write_SMILES( $b_neighbours[0] ) eq
+                    write_SMILES( $b_neighbours[1] );
+    }
+
+    return;
 }
 
 1;

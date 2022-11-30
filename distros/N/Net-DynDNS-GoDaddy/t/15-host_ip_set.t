@@ -2,7 +2,7 @@ use warnings;
 use strict;
 
 use Mock::Sub;
-use Net::DynDNS::GoDaddy;
+use Net::DynDNS::GoDaddy qw(:all);
 use Test::More;
 
 my $saved_ip = '10.10.10.10';
@@ -52,11 +52,14 @@ if ($ENV{STEVEB_DEV_TESTING}) {
     is $ip, $saved_ip, "Got the saved IP ok";
 }
 else {
-    warn "STEVEB_DEV_TESTING env var not set, not running live tests";
+    print "STEVEB_DEV_TESTING env var not set, not running live tests\n";
 }
 
 # mocked success
 {
+    # Set an API key file for testing
+    api_key_set(2, 3);
+
     my $m = Mock::Sub->new;
     my $r_sub = $m->mock('HTTP::Tiny::request');
 

@@ -12,7 +12,7 @@ use Perinci::CmdLine::Any;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-09-01'; # DATE
 our $DIST = 'App-ListUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/ListUtils/get_common_suffix",
@@ -38,7 +38,7 @@ get-common-suffix - Get common suffix from lines of text
 
 =head1 VERSION
 
-This document describes version 0.001 of get-common-suffix (from Perl distribution App-ListUtils), released on 2022-09-01.
+This document describes version 0.002 of get-common-suffix (from Perl distribution App-ListUtils), released on 2022-09-01.
 
 =head1 SYNOPSIS
 

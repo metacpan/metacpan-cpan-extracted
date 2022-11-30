@@ -4,7 +4,7 @@
       "Zakariyya Mughal <zmughal@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -27,13 +27,16 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "0",
-            "perl" : "5.006"
+            "perl" : "5.010"
          }
       },
       "runtime" : {
          "requires" : {
             "App::scan_prereqs_cpanfile" : "0",
+            "B::Deparse" : "0",
+            "Babble" : "0.090009",
             "Dist::Zilla::Plugin::AutoPrereqs" : "0",
+            "Dist::Zilla::Plugin::Babble" : "0",
             "Dist::Zilla::Plugin::CheckChangeLog" : "0",
             "Dist::Zilla::Plugin::Git" : "0",
             "Dist::Zilla::Plugin::Git::CommitBuild" : "0",
@@ -46,12 +49,16 @@
             "Dist::Zilla::Plugin::PodWeaver" : "0",
             "Dist::Zilla::Plugin::ReadmeAnyFromPod" : "0",
             "Dist::Zilla::Plugin::RunExtraTests" : "0",
+            "Dist::Zilla::Plugin::Test::MinimumVersion" : "0",
             "Dist::Zilla::Plugin::Test::Perl::Critic" : "0",
             "Dist::Zilla::Plugin::Test::PodSpelling" : "0",
             "Dist::Zilla::Role::PluginBundle::Config::Slicer" : "0",
             "Dist::Zilla::Role::PluginBundle::Easy" : "0",
             "Dist::Zilla::Role::PluginBundle::PluginRemover" : "0.103",
+            "Eval::Closure" : "0",
+            "Import::Into" : "0",
             "Moose" : "0",
+            "Mu" : "0",
             "Perl::Critic::Policy::CodeLayout::TabIndentSpaceAlign" : "0",
             "Pod::Coverage" : "0",
             "Pod::Coverage::TrustPod" : "0",
@@ -61,14 +68,18 @@
             "Pod::Weaver::Section::Extends" : "0",
             "Test::Perl::Critic" : "0",
             "Test::Pod::Coverage" : "0",
-            "perl" : "5.006",
+            "perl" : "5.022",
             "strict" : "0",
             "warnings" : "0"
          }
       },
       "test" : {
          "requires" : {
-            "perl" : "5.006"
+            "Babble::Grammar" : "0",
+            "Function::Parameters" : "0",
+            "Test::More" : "0",
+            "lib" : "0",
+            "perl" : "5.022"
          }
       }
    },
@@ -81,9 +92,9 @@
          "web" : "https://github.com/zmughal-CPAN/p5-Dist-Zilla-PluginBundle-Author-ZMUGHAL"
       }
    },
-   "version" : "0.005",
+   "version" : "0.006",
    "x_generated_by_perl" : "v5.26.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.28",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

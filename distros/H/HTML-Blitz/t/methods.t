@@ -93,7 +93,7 @@ _EOF_
     {
         my $fn = $template->compile_to_sub;
         isa_ok $fn, 'CODE', '$template->compile_to_sub';
-        
+
         $blitz->set_keep_doctype(0);
         my $fn2 = $blitz->apply_to_file($tmpl_file)->compile_to_sub;
 

@@ -14,6 +14,7 @@ extern "C" {
 #define inherited CComponent->
 #define my  ((( PDrawable) self)-> self)
 #define var (( PDrawable) self)
+#define GS  var->current_state
 
 #define gpARGS            Bool inPaint = opt_InPaint
 #define gpENTER(fail)     if ( !inPaint) if ( !my-> begin_paint_info( self)) return (fail)
@@ -38,32 +39,22 @@ Drawable_init( Handle self, HV * profile)
 	my-> set_backColor    ( self, pget_i ( backColor));
 	my-> set_fillMode     ( self, pget_i ( fillMode));
 	my-> set_fillPattern  ( self, pget_sv( fillPattern));
-	my-> set_lineEnd      ( self, pget_i ( lineEnd));
+	my-> set_lineEnd      ( self, pget_sv( lineEnd));
 	my-> set_lineJoin     ( self, pget_i ( lineJoin));
 	my-> set_linePattern  ( self, pget_sv( linePattern));
 	my-> set_lineWidth    ( self, pget_f ( lineWidth));
+	my-> set_matrix       ( self, pget_sv( matrix));
 	my-> set_miterLimit   ( self, pget_i ( miterLimit));
 	my-> set_region       ( self, pget_H ( region));
 	my-> set_rop          ( self, pget_i ( rop));
 	my-> set_rop2         ( self, pget_i ( rop2));
 	my-> set_textOpaque   ( self, pget_B ( textOpaque));
 	my-> set_textOutBaseline( self, pget_B ( textOutBaseline));
-	if ( pexist( translate))
+	if ( pexist( fillPatternOffset))
 	{
 		AV * av;
 		Point tr;
 		SV ** holder, *sv;
-
-		sv = pget_sv( translate);
-		if ( sv && SvOK(sv) && SvROK(sv) && SvTYPE(av = (AV*)SvRV(sv)) == SVt_PVAV && av_len(av) == 1) {
-			tr.x = tr.y = 0;
-			holder = av_fetch( av, 0, 0);
-			if ( holder) tr.x = SvIV( *holder); else warn("Array panic on 'translate'");
-			holder = av_fetch( av, 1, 0);
-			if ( holder) tr.y = SvIV( *holder); else warn("Array panic on 'translate'");
-			my-> set_translate( self, tr);
-		} else
-			warn("Array panic on 'translate'");
 
 		sv = pget_sv( fillPatternOffset);
 		if ( sv && SvOK(sv) && SvROK(sv) && SvTYPE(av = (AV*)SvRV(sv)) == SVt_PVAV && av_len(av) == 1) {
@@ -85,11 +76,12 @@ Drawable_init( Handle self, HV * profile)
 void
 Drawable_done( Handle self)
 {
+	Drawable_line_end_refcnt(&GS, -1);
 	if ( var-> fillPatternImage ) {
 		unprotect_object(var-> fillPatternImage);
 		var-> fillPatternImage = NULL_HANDLE;
 	}
-	clear_font_abc_caches( self);
+	Drawable_clear_font_abc_caches( self);
 	apc_gp_done( self);
 	inherited done( self);
 }
@@ -110,14 +102,21 @@ Drawable_begin_paint( Handle self)
 	if ( var-> stage > csFrozen) return false;
 	if ( is_opt( optInDrawInfo)) my-> end_paint_info( self);
 	opt_set( optInDraw);
+	var->saved_state = GS;
+
+	Drawable_line_end_refcnt(&GS, +1);
 	return true;
 }
 
 void
 Drawable_end_paint( Handle self)
 {
-	clear_font_abc_caches( self);
+	Drawable_clear_font_abc_caches( self);
 	opt_clear( optInDraw);
+	Drawable_line_end_refcnt(&GS, -1);
+	GS = var->saved_state;
+	var->alpha     = apc_gp_get_alpha(self);
+	var->antialias = apc_gp_get_antialias( self );
 }
 
 Bool
@@ -127,14 +126,20 @@ Drawable_begin_paint_info( Handle self)
 	if ( is_opt( optInDraw))     return true;
 	if ( is_opt( optInDrawInfo)) return false;
 	opt_set( optInDrawInfo);
+	var->saved_state = GS;
+	Drawable_line_end_refcnt(&GS, +1);
 	return true;
 }
 
 void
 Drawable_end_paint_info( Handle self)
 {
-	clear_font_abc_caches( self);
+	Drawable_clear_font_abc_caches( self);
 	opt_clear( optInDrawInfo);
+	var->alpha     = apc_gp_get_alpha(self);
+	var->antialias = apc_gp_get_antialias( self );
+	Drawable_line_end_refcnt(&GS, -1);
+	GS = var->saved_state;
 }
 
 void
@@ -146,17 +151,6 @@ Drawable_set( Handle self, HV * profile)
 		SvHV_Font( pget_sv( font), &Font_buffer, "Drawable::set");
 		my-> set_font( self, Font_buffer);
 		pdelete( font);
-	}
-
-	if ( pexist( translate)) {
-		AV * av = ( AV *) SvRV( pget_sv( translate));
-		Point tr = {0,0};
-		SV ** holder = av_fetch( av, 0, 0);
-		if ( holder) tr.x = SvIV( *holder); else warn("Array panic on 'translate'");
-		holder = av_fetch( av, 1, 0);
-		if ( holder) tr.y = SvIV( *holder); else warn("Array panic on 'translate'");
-		my-> set_translate( self, tr);
-		pdelete( translate);
 	}
 
 	if ( pexist( width) && pexist( height)) {
@@ -194,21 +188,35 @@ Drawable_set( Handle self, HV * profile)
 	inherited set( self, profile);
 }
 
+static void
+gc_destroy( Handle self, void * user_data, unsigned int user_data_size, Bool in_paint)
+{
+	Drawable_line_end_refcnt( ( DrawablePaintState* ) user_data, -1 );
+}
+
 Bool
 Drawable_graphic_context_push(Handle self)
 {
-	return apc_gp_push(self, NULL, NULL, 0);
+	DrawablePaintState state = GS;
+	Drawable_line_end_refcnt(&state, 1);
+	return apc_gp_push(self, gc_destroy, &state, sizeof(state));
 }
 
 Bool
 Drawable_graphic_context_pop(Handle self)
 {
-	Bool ok = apc_gp_pop(self, NULL);
+	DrawablePaintState state;
+	if ( !apc_gp_pop(self, &state))
+		return false;
+	Drawable_line_end_refcnt(&state, -1);
+	GS = state;
 	if ( var-> fillPatternImage && PObject(var-> fillPatternImage)->stage != csNormal) {
 		unprotect_object(var-> fillPatternImage);
 		var-> fillPatternImage = NULL_HANDLE;
 	}
-	return ok;
+	var->alpha     = apc_gp_get_alpha(self);
+	var->antialias = apc_gp_get_antialias( self );
+	return true;
 }
 
 int
@@ -327,6 +335,8 @@ Drawable_put_image_indirect( Handle self, Handle image, int x, int y, int xFrom,
 		warn("This method is not available on this class because it is not a system Drawable object. You need to implement your own");
 		return false;
 	}
+	x += var-> current_state.matrix[4];
+	y += var-> current_state.matrix[5];
 	if ( xLen == xDestLen && yLen == yDestLen)
 		ok = apc_gp_put_image( self, image, x, y, xFrom, yFrom, xLen, yLen, rop);
 	else
@@ -424,7 +434,7 @@ Drawable_fillPattern( Handle self, Bool set, SV * svpattern)
 	if ( !set) {
 		AV * av;
 		FillPattern * fp;
-		if ( var-> fillPatternImage )
+		if ( var-> fillPatternImage && PObject(var-> fillPatternImage)->stage == csNormal)
 			return newSVsv( PObject(var->fillPatternImage)->mate );
 
 		if ( !( fp = apc_gp_get_fill_pattern( self))) return NULL_SV;
@@ -482,21 +492,12 @@ Drawable_fillPatternOffset( Handle self, Bool set, Point fpo)
 	return fpo;
 }
 
-
-int
-Drawable_lineEnd( Handle self, Bool set, int lineEnd)
-{
-	if (!set) return apc_gp_get_line_end( self);
-	apc_gp_set_line_end( self, lineEnd);
-	return lineEnd;
-}
-
 int
 Drawable_lineJoin( Handle self, Bool set, int lineJoin)
 {
-	if (!set) return apc_gp_get_line_join( self);
-	apc_gp_set_line_join( self, lineJoin);
-	return lineJoin;
+	if (!set) return GS.line_join;
+	if ( lineJoin < 0 || lineJoin > leMax ) lineJoin = 0;
+	return GS.line_join = lineJoin;
 }
 
 SV *
@@ -519,18 +520,48 @@ Drawable_linePattern( Handle self, Bool set, SV * pattern)
 double
 Drawable_lineWidth( Handle self, Bool set, double lineWidth)
 {
-	if (!set) return apc_gp_get_line_width( self);
+	if (!set) return GS.line_width;
 	if ( lineWidth < 0.0 ) lineWidth = 0.0;
-	apc_gp_set_line_width( self, lineWidth);
-	return lineWidth;
+	return GS.line_width = lineWidth;
+}
+
+SV *
+Drawable_matrix( Handle self, Bool set, SV * svmatrix)
+{
+	int i;
+	if ( !set) {
+		AV * av;
+		Matrix *matrix = & var-> current_state.matrix;
+
+		av = newAV();
+		for ( i = 0; i < 6; i++) av_push( av, newSVnv((*matrix)[i]));
+		svmatrix = newRV_noinc(( SV *) av);
+		return sv_bless(svmatrix, gv_stashpv("Prima::matrix", GV_ADD));
+	} else {
+		if ( SvROK(svmatrix) && ( SvTYPE( SvRV(svmatrix)) == SVt_PVAV)) {
+			Matrix *matrix = & var-> current_state.matrix;
+			AV * av = ( AV *) SvRV(svmatrix);
+			if ( av_len( av) != 5) goto FAIL;
+			for ( i = 0; i < 6; i++) {
+				SV ** holder = av_fetch( av, i, 0);
+				if ( !holder) goto FAIL;
+				(*matrix)[i] = SvNV( *holder);
+			}
+		} else {
+		FAIL:
+			warn("Drawable::matrix: must be array of 6 numerics");
+			return NULL_SV;
+		}
+	}
+	return NULL_SV;
 }
 
 double
 Drawable_miterLimit( Handle self, Bool set, double miterLimit)
 {
-	if (!set) return apc_gp_get_miter_limit( self);
-	apc_gp_set_miter_limit( self, miterLimit);
-	return miterLimit;
+	if (!set) return GS.miter_limit;
+	if ( miterLimit < 0.0 )  miterLimit = 0.0;
+	return GS.miter_limit = miterLimit;
 }
 
 SV *
@@ -558,6 +589,8 @@ SV *
 Drawable_pixel( Handle self, Bool set, int x, int y, SV * color)
 {
 	CHECK_GP(0);
+	x += var-> current_state.matrix[4];
+	y += var-> current_state.matrix[5];
 	if (!set)
 		return newSViv( apc_gp_get_pixel( self, x, y));
 	apc_gp_set_pixel( self, x, y, SvIV( color));
@@ -592,7 +625,6 @@ Drawable_region( Handle self, Bool set, Handle mask)
 
 			apc_gp_set_region(self, region);
 			Object_destroy(region);
-
 		} else
 			apc_gp_set_region(self, NULL_HANDLE);
 
@@ -638,14 +670,6 @@ Drawable_textOutBaseline( Handle self, Bool set, Bool textOutBaseline)
 	if (!set) return apc_gp_get_text_out_baseline( self);
 	apc_gp_set_text_out_baseline( self, textOutBaseline);
 	return textOutBaseline;
-}
-
-Point
-Drawable_translate( Handle self, Bool set, Point translate)
-{
-	if (!set) return apc_gp_get_transform( self);
-	apc_gp_set_transform( self, translate. x, translate. y);
-	return translate;
 }
 
 #ifdef __cplusplus

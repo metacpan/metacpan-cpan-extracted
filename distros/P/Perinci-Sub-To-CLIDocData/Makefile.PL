@@ -19,7 +19,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Exporter" => "5.57",
     "Getopt::Long::Negate::EN" => "0.060",
-    "Getopt::Long::Util" => "0.898",
+    "Getopt::Long::Util" => "0.899",
     "Log::ger" => "0.038",
     "Module::Installed::Tiny" => "0.011",
     "Perinci::Object" => "0.311",
@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.304",
+  "VERSION" => "0.305",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,7 +48,7 @@ my %FallbackPrereqs = (
   "Exporter" => "5.57",
   "File::Spec" => 0,
   "Getopt::Long::Negate::EN" => "0.060",
-  "Getopt::Long::Util" => "0.898",
+  "Getopt::Long::Util" => "0.899",
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
   "Log::ger" => "0.038",

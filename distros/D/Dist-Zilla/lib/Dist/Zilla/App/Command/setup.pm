@@ -1,4 +1,4 @@
-package Dist::Zilla::App::Command::setup 6.028;
+package Dist::Zilla::App::Command::setup 6.029;
 # ABSTRACT: set up a basic global config file
 
 use Dist::Zilla::Pragmas;
@@ -170,7 +170,7 @@ Dist::Zilla::App::Command::setup - set up a basic global config file
 
 =head1 VERSION
 
-version 6.028
+version 6.029
 
 =head1 SYNOPSIS
 

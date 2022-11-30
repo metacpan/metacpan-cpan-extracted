@@ -61,6 +61,7 @@
             "Params::Validate" : "0",
             "Path::Tiny" : "0",
             "Text::Glob" : "0",
+            "Try::Tiny" : "0",
             "feature" : "0",
             "perl" : "5.016",
             "strict" : "0",
@@ -84,31 +85,31 @@
    "provides" : {
       "Git::MoreHooks" : {
          "file" : "lib/Git/MoreHooks.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "Git::MoreHooks::CheckCommitAuthorFromMailmap" : {
          "file" : "lib/Git/MoreHooks/CheckCommitAuthorFromMailmap.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "Git::MoreHooks::CheckCommitBase" : {
          "file" : "lib/Git/MoreHooks/CheckCommitBase.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "Git::MoreHooks::CheckIndent" : {
          "file" : "lib/Git/MoreHooks/CheckIndent.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "Git::MoreHooks::CheckPerl" : {
          "file" : "lib/Git/MoreHooks/CheckPerl.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "Git::MoreHooks::GitRepoAdmin" : {
          "file" : "lib/Git/MoreHooks/GitRepoAdmin.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       },
       "Git::MoreHooks::TriggerJenkins" : {
          "file" : "lib/Git/MoreHooks/TriggerJenkins.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       }
    },
    "release_status" : "stable",
@@ -123,7 +124,7 @@
          "web" : "https://github.com/mikkoi/git-morehooks.git"
       }
    },
-   "version" : "0.017",
+   "version" : "0.018",
    "x_contributors" : [
       "Gustavo L. de M. Chaves <gnustavo@cpan.org>"
    ],

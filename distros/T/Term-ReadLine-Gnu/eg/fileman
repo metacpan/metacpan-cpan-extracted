@@ -5,9 +5,9 @@
 # 2.1, "2.5.4 A Short Completion Example".  This program is under GPL.
 #
 # Copyright (C) 1989, 1991 Free Software Foundation, Inc.
-#	Original C version
+#       Original C version
 # Copyright (C) 1998 Hiroo Hayashi
-#	Perl version
+#       Perl version
 
 # fileman.c -- A tiny application which demonstrates how to use the
 # GNU Readline library.  This application interactively allows users
@@ -28,7 +28,7 @@ my %commands =
      'list'   => { func => \&com_list,   doc => "List files in DIR" },
      'ls'     => { func => \&com_list,   doc => "Synonym for `list'" },
      'pwd'    => { func => \&com_pwd,
-		   doc  => "Print the current working directory" },
+                   doc  => "Print the current working directory" },
      'quit'   => { func => \&com_quit,   doc => "Quit using Fileman" },
      'rename' => { func => \&com_rename, doc => "Rename FILE to NEWNAME" },
      'stat'   => { func => \&com_stat, doc => "Print out statistics on FILE" },
@@ -41,23 +41,23 @@ my $progname = $0;
 # When non-zero, this global means the user is done using this program.
 my $done = 0;
 
-my $term = initialize_readline();		# Bind our completer.
-$term->MinLine(0);		## disable implict call of add_history()
+my $term = initialize_readline();   # Bind our completer.
+$term->MinLine(0);                  # disable implict call of add_history()
 
 # Loop reading and executing lines until the user quits.
 while ($done == 0) {
     my $line = $term->readline ("FileMan: ");
-    
+
     last unless defined $line;
-    
+
     # Remove leading and trailing whitespace from the line.  Then, if
     # there is anything left, add it to the history list and execute
     # it.
     my $s = stripwhite($line);
-    
+
     if ($s) {
-	$term->AddHistory($s);	## normally this is done implictly
-	execute_line($s);
+        $term->AddHistory($s);  # normally this is done implictly
+        execute_line($s);
     }
 }
 
@@ -72,8 +72,8 @@ sub execute_line {
     my $command = find_command ($word);
 
     unless ($command) {
-	printf STDERR "$word: No such command for FileMan.\n";
-	return (-1);
+        printf STDERR "$word: No such command for FileMan.\n";
+        return (-1);
     }
 
     # Call the function.
@@ -131,7 +131,7 @@ sub fileman_completion {
     # to complete.  Otherwise it is the name of a file in the current
     # directory.
     @matches = $term->completion_matches ($text, \&command_generator)
-	if ($start == 0);
+        if ($start == 0);
 
     return @matches;
 }
@@ -147,25 +147,25 @@ sub fileman_completion {
     my @name;
 
     sub command_generator {
-	my ($text, $state) = @_;
+        my ($text, $state) = @_;
 
-	# If this is a new word to complete, initialize now.  This
-	# includes saving the length of TEXT for efficiency, and
-	# initializing the index variable to 0.
-	unless ($state) {
-	    $list_index = 0;
-	    @name = keys(%commands);
-	}
+        # If this is a new word to complete, initialize now.  This
+        # includes saving the length of TEXT for efficiency, and
+        # initializing the index variable to 0.
+        unless ($state) {
+            $list_index = 0;
+            @name = keys(%commands);
+        }
 
-	# Return the next name which partially matches from the
-	# command list.
-	while ($list_index <= $#name) {
-	    $list_index++;
-	    return $name[$list_index - 1]
-		if ($name[$list_index - 1] =~ /^$text/);
-	}
-	# If no names matched, then return NULL.
-	return undef;
+        # Return the next name which partially matches from the
+        # command list.
+        while ($list_index <= $#name) {
+            $list_index++;
+            return $name[$list_index - 1]
+                if ($name[$list_index - 1] =~ /^$text/);
+        }
+        # If no names matched, then return NULL.
+        return undef;
     }
 }
 
@@ -201,19 +201,19 @@ sub com_stat {
     return (1) unless valid_argument ("stat", $arg);
 
     my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,
-	$atime,$mtime,$ctime,$blksize,$blocks);
+        $atime,$mtime,$ctime,$blksize,$blocks);
 
     unless (($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,
-	     $atime,$mtime,$ctime,$blksize,$blocks) = stat($arg)) {
-	print STDERR "$arg: $!\n";
-	return (1);
+             $atime,$mtime,$ctime,$blksize,$blocks) = stat($arg)) {
+        print STDERR "$arg: $!\n";
+        return (1);
     }
 
     printf("Statistics for \`$arg\':\n");
 
     printf("%s has %d link%s, and is %d byte%s in length.\n", $arg,
-	   $nlink, ($nlink == 1) ? "" : "s",
-	   $size,  ($size == 1) ? "" : "s");
+           $nlink, ($nlink == 1) ? "" : "s",
+           $size,  ($size == 1) ? "" : "s");
     printf("Inode Last Change at: %s\n", scalar localtime ($ctime));
     printf("      Last access at: %s\n", scalar localtime ($atime));
     printf("    Last modified at: %s\n", scalar localtime ($mtime));
@@ -232,25 +232,25 @@ sub com_help {
     my $printed = 0;
 
     if (defined $arg && $commands{$arg}) {
-	printf ("%s\t\t%s.\n", $arg, $commands{$arg}->{doc});
-	$printed++;
+        printf ("%s\t\t%s.\n", $arg, $commands{$arg}->{doc});
+        $printed++;
     }
 
     unless ($printed) {
-	defined $arg && print "No commands match \`$arg\'.  Possibilties are:\n";
+        defined $arg && print "No commands match \`$arg\'.  Possibilties are:\n";
 
-	foreach (sort keys(%commands)) {
-	    # Print in six columns.
-	    if ($printed == 6) {
-		$printed = 0;
-		print "\n";
+        foreach (sort keys(%commands)) {
+            # Print in six columns.
+            if ($printed == 6) {
+                $printed = 0;
+                print "\n";
             }
 
-	    print "$_\t";
-	    $printed++;
+            print "$_\t";
+            $printed++;
         }
 
-	print "\n" if ($printed);
+        print "\n" if ($printed);
 
     }
     return (0);
@@ -260,8 +260,8 @@ sub com_help {
 sub com_cd {
     my $arg = shift;
     unless (chdir ($arg)) {
-	print STDERR "$arg: $!\n";
-	return 1;
+        print STDERR "$arg: $!\n";
+        return 1;
     }
 
     com_pwd();
@@ -273,8 +273,8 @@ sub com_pwd {
     my $dir = $ENV{PWD} || `pwd`;
 
     unless ($dir) {
-	print ("Error getting pwd: $dir\n");
-	return 1;
+        print ("Error getting pwd: $dir\n");
+        return 1;
     }
 
     print ("Current directory is $dir\n");
@@ -291,8 +291,8 @@ sub com_quit {
 sub too_dangerous {
     my $caller = shift;
     printf STDERR
-	("%s: Too dangerous for me to distribute.  Write it yourself.\n",
-	 $caller);
+        ("%s: Too dangerous for me to distribute.  Write it yourself.\n",
+         $caller);
 }
 
 # Return non-zero if ARG is a valid argument for CALLER, else print an

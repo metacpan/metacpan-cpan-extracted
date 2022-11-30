@@ -3,7 +3,7 @@ package Ethereum::RPC::Contract::ContractTransaction;
 use strict;
 use warnings;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 =head1 NAME
 
@@ -31,9 +31,12 @@ has data => (
     is       => 'ro',
     required => 1
 );
-has from      => (is => 'ro');
-has gas       => (is => 'ro');
-has gas_price => (is => 'ro');
+
+has from                     => (is => 'ro');
+has gas                      => (is => 'ro');
+has gas_price                => (is => 'ro');
+has max_fee_per_gas          => (is => 'ro');
+has max_priority_fee_per_gas => (is => 'ro');
 
 =head2 call_transaction
 
@@ -77,13 +80,16 @@ sub send_transaction {
     my $future = Future->new;
 
     my $params = {
-        to       => $self->contract_address,
-        from     => $self->from,
-        gasPrice => $self->gas_price,
-        data     => $self->data,
+        to   => $self->contract_address,
+        from => $self->from,
+        data => $self->data,
     };
 
-    $params->{gas} = Ethereum::RPC::Contract::Helper::UnitConversion::to_wei($self->gas) if $self->gas;
+    $params->{gas}                  = Ethereum::RPC::Contract::Helper::UnitConversion::to_wei($self->gas) if $self->gas;
+    $params->{gasPrice}             = $self->gas_price                                                    if $self->gas_price;
+    $params->{maxFeePerGas}         = $self->max_fee_per_gas                                              if $self->max_fee_per_gas;
+    $params->{maxPriorityFeePerGas} = $self->max_priority_fee_per_gas                                     if $self->max_priority_fee_per_gas;
+
     my $res = $self->rpc_client->eth_sendTransaction([$params]);
 
     return $future->done(Ethereum::RPC::Contract::ContractResponse->new({response => $res})) if $res and $res =~ /^0x/;

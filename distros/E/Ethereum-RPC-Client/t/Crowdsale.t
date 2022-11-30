@@ -7,11 +7,16 @@ use Ethereum::RPC::Contract::Helper::UnitConversion;
 use Math::BigInt;
 use JSON;
 
+BEGIN {
+    plan skip_all => 'Needs Travis setup'
+        unless $ENV{TRAVIS};
+}
+
 my $rpc_client = Ethereum::RPC::Client->new;
 
 my $coinbase = $rpc_client->eth_coinbase;
 
-my $truffle_project = Ethereum::RPC::Contract::Helper::ImportHelper::from_truffle_build("./t/builds/SimpleCrowdsale.json");
+my $truffle_project = Ethereum::RPC::Contract::Helper::ImportHelper::from_truffle_build("./t/resources/SimpleCrowdsale.json");
 
 die "can't read json" unless $truffle_project;
 
@@ -21,13 +26,6 @@ my $contract = $rpc_client->contract({
     from         => $coinbase,
     gas          => 4000000
 });
-
-my $res = $rpc_client->eth_sendTransaction([{
-    to   => $coinbase,
-    from => $coinbase,
-}]);
-
-sleep 2;
 
 my $block = $rpc_client->eth_getBlockByNumber('latest', JSON->true);
 ok $block;

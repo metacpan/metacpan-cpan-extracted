@@ -280,6 +280,20 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'repeat_until_end_slide' => {
+    	datatype => 'boolean',
+    	base_name => 'RepeatUntilEndSlide',
+    	description => 'Specifies if the effect will repeat until the end of slide.',
+    	format => '',
+    	read_only => '',
+    		},
+    'repeat_until_next_click' => {
+    	datatype => 'boolean',
+    	base_name => 'RepeatUntilNextClick',
+    	description => 'Specifies if the effect will repeat until the next click.',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
@@ -297,7 +311,9 @@ __PACKAGE__->swagger_types( {
     'repeat_duration' => 'double',
     'restart' => 'string',
     'speed' => 'double',
-    'trigger_delay_time' => 'double'
+    'trigger_delay_time' => 'double',
+    'repeat_until_end_slide' => 'boolean',
+    'repeat_until_next_click' => 'boolean'
 } );
 
 __PACKAGE__->attribute_map( {
@@ -315,7 +331,9 @@ __PACKAGE__->attribute_map( {
     'repeat_duration' => 'RepeatDuration',
     'restart' => 'Restart',
     'speed' => 'Speed',
-    'trigger_delay_time' => 'TriggerDelayTime'
+    'trigger_delay_time' => 'TriggerDelayTime',
+    'repeat_until_end_slide' => 'RepeatUntilEndSlide',
+    'repeat_until_next_click' => 'RepeatUntilNextClick'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

@@ -16,7 +16,7 @@ sub new {
         _udev   => shift
     };
 
-    bless $self, $class;
+    bless($self, $class);
 
     return $self;
 }
@@ -104,7 +104,7 @@ sub has_tag {
 sub get_parent {
     my $self = shift;
 
-    my $device = udev_device_get_parent( $self->{_device} );
+    my $device = udev_device_get_parent($self->{_device});
     if (defined($device)) {
         udev_device_ref($device);
 
@@ -120,7 +120,7 @@ sub get_parent_with_subsystem_devtype {
     my $subsystem = shift;
     my $devtype = shift;
 
-    my $device = udev_device_get_parent_with_subsystem_devtype( $self->{_device}, $subsystem, $devtype );
+    my $device = udev_device_get_parent_with_subsystem_devtype($self->{_device}, $subsystem, $devtype);
     if (defined($device)) {
         udev_device_ref($device);
 
@@ -132,25 +132,25 @@ sub get_parent_with_subsystem_devtype {
 
 
 sub get_devlinks_list_entries {
-    return Udev::FFI::Helper::get_entries_all( udev_device_get_devlinks_list_entry( $_[0]->{_device} ) );
+    return Udev::FFI::Helper::get_entries_all( udev_device_get_devlinks_list_entry($_[0]->{_device}) );
 }
 
 sub get_properties_list_entries {
-    return Udev::FFI::Helper::get_entries_all( udev_device_get_properties_list_entry( $_[0]->{_device} ) );
+    return Udev::FFI::Helper::get_entries_all( udev_device_get_properties_list_entry($_[0]->{_device}) );
 }
 
 sub get_tags_list_entries {
-    return Udev::FFI::Helper::get_entries_all( udev_device_get_tags_list_entry( $_[0]->{_device} ) );
+    return Udev::FFI::Helper::get_entries_all( udev_device_get_tags_list_entry($_[0]->{_device}) );
 }
 
 sub get_sysattr_list_entries {
-    return Udev::FFI::Helper::get_entries_all( udev_device_get_sysattr_list_entry( $_[0]->{_device} ) );
+    return Udev::FFI::Helper::get_entries_all( udev_device_get_sysattr_list_entry($_[0]->{_device}) );
 }
 
 
 
 sub DESTROY {
-    udev_device_unref( $_[0]->{_device} );
+    udev_device_unref($_[0]->{_device});
 }
 
 
@@ -176,13 +176,13 @@ Udev::FFI::Device
     
     my $device = $udev->new_device_from_subsystem_sysname('block', 'sda1');
     if (defined($device)) {
-        print "SYSPATH: ".$device->get_syspath()."\n";
+        print("SYSPATH: ".$device->get_syspath()."\n");
 
         if (my $fs = $device->get_property_value('ID_FS_TYPE')) {
-            print "FS: $fs\n";
+            print("FS: $fs\n");
         }
         if (my $uuid = $device->get_property_value('ID_FS_UUID')) {
-            print "UUID: $uuid\n";
+            print("UUID: $uuid\n");
         }
     }
 

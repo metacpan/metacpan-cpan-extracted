@@ -6,6 +6,93 @@ use Config;
 use File::Spec;
 use File::Find;
 use File::Copy;
+use Path::Tiny;
+use URI;
+
+# Settings:
+#
+# - ALIEN_LIBTENSORFLOW_FROM_BINARY_VERSION
+#
+#   Filter of version to download (e.g., "2.9.3" to download
+#   libtensorflow v2.9.3).
+#
+# - ALIEN_LIBTENSORFLOW_FROM_BINARY_ALLOW_RELEASE_CANDIDATES
+#
+#   Boolean that allows release candidate binary releases when true (default: 0).
+#
+# - ALIEN_LIBTENSORFLOW_FROM_SOURCE
+#
+#   Boolean to control if libtensorflow is built from source (default: 0).
+#
+#   When set to 0, will attempt to download binary if available for platform
+#   and builds from source otherwise.
+#
+#   When set to 1, always builds from source.
+#
+# - ALIEN_LIBTENSORFLOW_FROM_SOURCE_BUILD_TYPE
+#
+#   Which type of build to create.
+#
+#   Values:
+#     - "release": release build (default)
+#
+#       This has no debugging symbols.
+#
+#     - "debug": debug build
+#
+# - ALIEN_LIBTENSORFLOW_DEVICE_TYPE
+#
+#   Which device type to use for binary release.
+#
+#   Values:
+#     - "auto": automatically detect type (default)
+#     - "cpu": CPU
+#     - "gpu": GPU (Currently only Nvidia)
+use Env qw(
+	ALIEN_LIBTENSORFLOW_FROM_BINARY_VERSION
+	ALIEN_LIBTENSORFLOW_FROM_BINARY_ALLOW_RELEASE_CANDIDATES
+	ALIEN_LIBTENSORFLOW_FROM_SOURCE
+	ALIEN_LIBTENSORFLOW_FROM_SOURCE_BUILD_TYPE
+	ALIEN_LIBTENSORFLOW_DEVICE_TYPE
+
+	@PATH
+);
+
+my %os_arch_data = (
+	'linux:x86_64' => {
+		device_type => {
+			cpu => {
+				bucket_prefix => 'libtensorflow/libtensorflow-cpu-linux-x86_64',
+				bucket_format => 'tar.gz',
+			},
+			gpu => {
+				bucket_prefix => 'libtensorflow/libtensorflow-gpu-linux-x86_64',
+				bucket_format => 'tar.gz',
+			},
+		}
+	},
+	'darwin:x86_64' => {
+		device_type => {
+			cpu => {
+				bucket_prefix => 'libtensorflow/libtensorflow-cpu-darwin-x86_64',
+				bucket_format => 'tar.gz',
+			}
+		},
+	},
+	'MSWin32:x86_64' => {
+		device_type => {
+			cpu => {
+				bucket_prefix => 'libtensorflow/libtensorflow-cpu-windows-x86_64',
+				bucket_format => 'zip',
+			},
+			gpu => {
+				bucket_prefix => 'libtensorflow/libtensorflow-gpu-windows-x86_64',
+				bucket_format => 'zip',
+			},
+		}
+	},
+
+);
 
 my %os_dynamic_lib = (
 	'linux' => 'libtensorflow.so.2',
@@ -15,16 +102,6 @@ my %os_dynamic_lib = (
 my %other_os_dynamic_lib = (
 	'linux' => 'libtensorflow_framework.so.2',
 	'darwin' => 'libtensorflow_framework.2.dylib',
-);
-my %perl_os_to_tf_os = (
-	'linux' => 'linux',
-	'darwin' => 'darwin',
-	'MSWin32' => 'windows',
-);
-my %perl_os_to_archive_ext = (
-	'linux' => 'tar.gz',
-	'darwin' => 'tar.gz',
-	'MSWin32' => 'zip',
 );
 
 probe sub {
@@ -45,75 +122,201 @@ probe sub {
 	return 'share';
 };
 
+sub detect_gpu {
+	# detect Nvidia
+	if( $^O eq 'linux' ) {
+		return !! File::Which::which('nvidia-smi');
+	} elsif( $^O eq 'MSWin32' ) {
+		local $ENV{PATH} = $ENV{PATH};
+		push @PATH, File::Spec->catfile($ENV{ProgramFiles}, 'NVIDIA Corporation','NVSMI' );
+		return !! File::Which::which('nvidia-smi');
+	}
+
+	return 0;
+}
+
+sub device_type {
+	return 'gpu' if detect_gpu;
+
+	return 'cpu';
+}
+
 share {
 	requires 'HTTP::Tiny' => 0;
 	requires 'Net::SSLeay' => 0;
 	requires 'IO::Socket::SSL' => 0;
-	requires 'Mojo::JSON';
+	requires 'URI' => 0;
+	requires 'File::Which';
+	requires 'Alien::Build::Plugin::Download::GitHub' => 0.10;
 
-	my $bit = defined $Config{'archname64'} ? 64 : 32;
-	die "Only 64-bit install supported at this time" unless $bit == 64;
+	$ENV{ALIEN_LIBTENSORFLOW_FROM_BINARY_ALLOW_RELEASE_CANDIDATES} ||= 0;
 
-	my $proc_type = "cpu"; # cpu|gpu
-	my $arch = "x86_64"; # all downloads are for x86_64 at this time
-	my $re = qr/
-		^
-		libtensorflow-
-		\Q$proc_type\E-
-		\Q@{[ $perl_os_to_tf_os{$^O} ]}\E-
-		\Q$arch\E-
-		(?<version> .* )
-		\. \Q@{[ $perl_os_to_archive_ext{ $^O } ]}\E
-		$
-	/x;
-	plugin Download => (
-		url => "https://www.tensorflow.org/install/lang_c",
-		version => $re,
-	);
+	# 0|1 (default: 0)
+	$ENV{ALIEN_LIBTENSORFLOW_FROM_SOURCE} ||= 0;
 
-	plugin 'Extract' => $perl_os_to_archive_ext{ $^O };
+	# release|debug (default: release)
+	$ENV{ALIEN_LIBTENSORFLOW_FROM_SOURCE_BUILD_TYPE} ||= 'release';
+	die "Unknown value for ALIEN_LIBTENSORFLOW_FROM_SOURCE_BUILD_TYPE = $ALIEN_LIBTENSORFLOW_FROM_SOURCE_BUILD_TYPE"
+		unless $ALIEN_LIBTENSORFLOW_FROM_SOURCE_BUILD_TYPE =~ /^(release|debug)$/;
 
-	patch [
-		sub {
-			my ($build) = @_;
-			my $lib_dir = 'lib';
-			# This is because ExtUtils::Install uses File::Copy::copy()
-			# which does not handle symlinks (it copies the
-			# contents of what the symlinks point to).
-			$build->log("Only keep one copy of library, no symlinks");
-			for my $lib ( map { exists $_->{$^O} ? $_->{$^O} : () } \%os_dynamic_lib, \%other_os_dynamic_lib ) {
-				my $lib_symlink = File::Spec->catfile($lib_dir, $lib );
-				next unless -l $lib_symlink;
-				$build->log( "Processing $lib" );
+	# auto|cpu|gpu (default: auto)
+	$ENV{ALIEN_LIBTENSORFLOW_DEVICE_TYPE} ||= 'auto';
+	die "Unknown value for ALIEN_LIBTENSORFLOW_DEVICE_TYPE = $ALIEN_LIBTENSORFLOW_DEVICE_TYPE"
+		unless $ALIEN_LIBTENSORFLOW_DEVICE_TYPE =~ /^(auto|cpu|gpu)$/;
 
-				my $lib_file = $lib_symlink;
-				$lib_file = File::Spec->rel2abs(readlink $lib_file, $lib_dir) while -l $lib_file;
+	my $os_arch = join ":", ( $^O, meta->prop->{platform}{cpu}{arch}{name} );
+	if(exists $os_arch_data{$os_arch} && !$ENV{ALIEN_LIBTENSORFLOW_FROM_SOURCE}) {
+		my $device_type = $ALIEN_LIBTENSORFLOW_DEVICE_TYPE eq 'auto'
+			? device_type()
+			: $ALIEN_LIBTENSORFLOW_DEVICE_TYPE;
 
-				unlink $lib_symlink;
-				File::Copy::move($lib_file , $lib_symlink);
+		die "Binary release for $os_arch + $device_type does not exist"
+			unless exists $os_arch_data{$os_arch}{device_type}{$device_type};
+
+		my $data = $os_arch_data{$os_arch}{device_type}{$device_type};
+
+		my $version_filter = exists $ENV{ALIEN_LIBTENSORFLOW_FROM_BINARY_VERSION}
+			? $ALIEN_LIBTENSORFLOW_FROM_BINARY_VERSION
+			: '2.';
+
+		(my $bucket_prefix_no_dir = $data->{bucket_prefix}) =~ s,^libtensorflow/,,;
+		my $re = qr{
+			^
+			\Q@{[ $bucket_prefix_no_dir ]}\E
+			-
+			(?<version> .* )
+			\.
+			\Q@{[ $data->{bucket_format} ]}\E
+			$
+		}x;
+
+		my $bucket_url = 'https://storage.googleapis.com/tensorflow/';
+		my $start_url = URI->new($bucket_url);
+		$start_url->query_form( prefix => join('',
+			$data->{bucket_prefix},
+			'-',
+			$version_filter,
+		));
+		start_url $start_url;
+		plugin 'Decode::Mojo';
+		meta->around_hook( fetch => sub {
+			my $orig = shift;
+			my $build = shift;
+
+			my $fetched = $orig->($build, @_);
+
+			if( $fetched->{filename} eq 'tensorflow' ) {
+				# bucket data
+				$fetched->{content} = path($fetched->{path})->slurp_raw if ! exists $fetched->{content} && exists $fetched->{path};
+				my $xml = $build->meta_prop->{plugin_decode_mojo_class}->new( $fetched->{content} );
+				my $list = $xml->find('Key')->map(sub{
+					my $content = $_[0]->content;
+					(my $filename = $content) =~ s,^libtensorflow/,,;
+					my $bucket_item = {
+						filename => $filename,
+						version  => do { $filename =~ $re && $1 },
+						url      => do { join '', $bucket_url, $content },
+						protocol => 'https',
+					};
+
+					if( ! $ALIEN_LIBTENSORFLOW_FROM_BINARY_ALLOW_RELEASE_CANDIDATES && $bucket_item->{version} =~ /-rc/ ) {
+						return ();
+					}
+
+					if( $content !~ /\.\Q@{[ $data->{bucket_format} ]}\E$/ ) {
+						return ();
+					}
+
+					return $bucket_item;
+				});
+				return {
+					type => 'list',
+					list => $list,
+				};
 			}
 
-			my @symlinks;
-			find(sub { push @symlinks, $File::Find::name if -l }, $lib_dir);
-			unlink @symlinks;
-		},
-	];
+			return $fetched;
+		});
+		plugin Download => (
+			version => $re,
+			prefer  => 1,
+		);
 
-	plugin 'Build::Copy';
+		plugin 'Extract' => $data->{bucket_format};
 
-	gather sub {
-		my($build) = @_;
-		my $prefix = $build->runtime_prop->{prefix};
+		patch [
+			sub {
+				my ($build) = @_;
+				my $lib_dir = 'lib';
+				# This is because ExtUtils::Install uses File::Copy::copy()
+				# which does not handle symlinks (it copies the
+				# contents of what the symlinks point to).
+				$build->log("Only keep one copy of library, no symlinks");
+				for my $lib ( map { exists $_->{$^O} ? $_->{$^O} : () } \%os_dynamic_lib, \%other_os_dynamic_lib ) {
+					my $lib_symlink = File::Spec->catfile($lib_dir, $lib );
+					next unless -l $lib_symlink;
+					$build->log( "Processing $lib" );
 
-		my $include_path = File::Spec->catfile($prefix, qw(include));
-		my $lib_path = File::Spec->catfile($prefix, qw(lib));
+					my $lib_file = $lib_symlink;
+					$lib_file = File::Spec->rel2abs(readlink $lib_file, $lib_dir) while -l $lib_file;
 
-		my $cflags = "-I$include_path";
-		my @ldlibs = "-ltensorflow";
-		my $libs = join " ", "-L$lib_path", @ldlibs;
+					unlink $lib_symlink;
+					File::Copy::move($lib_file , $lib_symlink);
+				}
 
-		$build->runtime_prop->{cflags}  = $cflags;
-		$build->runtime_prop->{libs}    = $libs;
-	};
+				my @symlinks;
+				find(sub { push @symlinks, $File::Find::name if -l }, $lib_dir);
+				unlink @symlinks;
+			},
+		];
+
+		plugin 'Build::Copy';
+		meta->after_hook( build => sub {
+			my($build) = @_;
+			$build->runtime_prop->{'style'} = 'binary';
+			$build->runtime_prop->{'device_type'} = $device_type;
+		});
+
+		gather sub {
+			my($build) = @_;
+			my $prefix = $build->runtime_prop->{prefix};
+
+			my $include_path = File::Spec->catfile($prefix, qw(include));
+			my $lib_path = File::Spec->catfile($prefix, qw(lib));
+
+			my $cflags = "-I$include_path";
+			my @ldlibs = "-ltensorflow";
+			my $libs = join " ", "-L$lib_path", @ldlibs;
+
+			$build->runtime_prop->{cflags}  = $cflags;
+			$build->runtime_prop->{libs}    = $libs;
+		};
+	} else {
+		requires 'Alien::Bazel';
+		plugin 'Download::GitHub' => (
+			github_user => 'tensorflow',
+			github_repo => 'tensorflow',
+		);
+
+		build [
+			sub {
+				my ($build) = @_;
+				$build->install_prop->{libtensorflow_dynlib} = $os_dynamic_lib{$^O};
+			},
+			[
+				qw(bazel build),
+				'--verbose_failures',
+				( $ALIEN_LIBTENSORFLOW_FROM_SOURCE_BUILD_TYPE eq 'debug' ? q(--config=dbg) : () ),
+				'//tensorflow:%{.install.libtensorflow_dynlib}'
+			],
+			'%{make_path} %{.install.stage}/lib',
+			"%{cp} bazel-bin/tensorflow/%{.install.libtensorflow_dynlib} %{.install.stage}/lib",
+		];
+		meta->after_hook( build => sub {
+			my($build) = @_;
+			$build->runtime_prop->{'style'} = 'source';
+			$build->runtime_prop->{'build_type'} = $ALIEN_LIBTENSORFLOW_FROM_SOURCE_BUILD_TYPE;
+		});
+	}
 };
 

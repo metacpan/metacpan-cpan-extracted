@@ -4,7 +4,7 @@ Plack::Middleware::Greylist - throttle requests with different rates based on ne
 
 # VERSION
 
-version v0.1.0
+version v0.2.2
 
 # SYNOPSIS
 
@@ -14,6 +14,7 @@ use Plack::Builder;
 builder {
 
   enable "Greylist",
+    file         => sprintf('/run/user/%u/greylist', $>), # cache file
     default_rate => 250,
     greylist     => {
         '192.168.0.0/24' => 'whitelist',
@@ -39,6 +40,13 @@ robots are like houseflies that repeatedly bump against closed windows.
 This is the default maximum number of hits per minute before requests are rejected, for any request not in the ["greylist"](#greylist).
 
 Omitting it will disable the global rate.
+
+## retry\_after
+
+This sets the `Retry-After` header value, in seconds. It defaults to 61 seconds, which is the minimum allowed value.
+
+Note that this does not enforce that a client has waited that amount of time before making a new request, as long as the
+number of hits per minute is within the allowed rate.
 
 ## greylist
 
@@ -82,9 +90,9 @@ The limit may be larger than ["default\_rate"](#default_rate), to allow hosts to
 
 ## file
 
-This is the path of the throttle count file used by the ["cache"](#cache). If omitted, a default will be set.
+This is the path of the throttle count file used by the ["cache"](#cache).
 
-This does not need to be set except for running tests.
+It is required unless you are defining your own ["cache"](#cache).
 
 ## cache
 
@@ -95,6 +103,9 @@ block).
 
 This does not try and enforce any consistency or block overlapping netblocks.  It trusts [Net::IP::Match::Trie](https://metacpan.org/pod/Net%3A%3AIP%3A%3AMatch%3A%3ATrie) to
 handle any overlapping or conflicting network ranges, or to specify exceptions for larger blocks.
+
+Some search engine robots may not respect HTTP 429 responses, and will treat these as errors. You may want to make an
+exception for trusted networks that gives them a higher rate than the default.
 
 # SOURCE
 

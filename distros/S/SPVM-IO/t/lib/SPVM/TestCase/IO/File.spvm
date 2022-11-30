@@ -16,20 +16,20 @@ class TestCase::IO::File {
     return 1;
   }
 
-  static method test_auto_flush : int ($file : string) {
+  static method test_autoflush : int ($file : string) {
     
     my $io_file = IO::File->new($file, ">");
     unless ($io_file) {
       return 0;
     }
     
-    my $io_file_default : byte = $io_file->auto_flush;
+    my $io_file_default = $io_file->autoflush;
     unless ($io_file_default == 0) {
       return 0;
     }
     
-    $io_file->set_auto_flush(1);
-    unless ($io_file->auto_flush == 1) {
+    $io_file->set_autoflush(1);
+    unless ($io_file->autoflush == 1) {
       return 0;
     }
 

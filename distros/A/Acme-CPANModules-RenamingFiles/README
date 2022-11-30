@@ -1,0 +1,150 @@
+NAME
+    Acme::CPANModules::RenamingFiles - List of Perl modules (and scripts) to
+    rename multiple files
+
+VERSION
+    This document describes version 0.001 of
+    Acme::CPANModules::RenamingFiles (from Perl distribution
+    Acme-CPANModules-RenamingFiles), released on 2022-11-14.
+
+DESCRIPTION
+    This list will attempt to catalog Perl modules (and scripts) that can be
+    used to rename multiple files, often by letting you transform the
+    filename using Perl code or regex.
+
+    The granddaddy of all this is of course Larry's own script rename, which
+    appeared as a dozen-line simple example at least as early as 1989 in
+    "eg/" subdirectory of the Perl 3.0 source code (while regex itself was
+    introduced just a year earlier in Perl 2.0). Later in Perl 5.8 the
+    examples subdirectory was removed from the source code. Currently there
+    are at least three evolutions from this script on CPAN: rename by Peder
+    Stray (since 2000), File::Rename by Robin Barker (since 2005), and
+    App::FileTools::BulkRename by Stirling Westrup (since 2010).
+
+    rename by Peder Stray (you might have difficulty installing the archive
+    using CPAN client since it does not include a module) is based on Larry
+    Wall's "rename" script and has grown to feature dry-run mode, backup,
+    interactive prompt, etc.
+
+    rename from File::Rename by Robin Barker is also based on Larry Wall's
+    script and refactors the functionality into a module. It does not have
+    as many options as Peder's version but offers a Unicode option.
+
+    brn from App::FileTools::BulkRename (since 2010) by Stirling Westrup.
+    Another fork of Larry Wall's "rename". It features dry-run mode
+    ("--nop") and saving/loading presets of options (including the Perl
+    expression) into its config file.
+
+    perlmv from App::perlmv (since 2010) is my take in this space. I wanted
+    to reuse my rename one-liners so I made a "scriptlet" feature which you
+    can save and run using the script ("brn" also does this, in the form of
+    presets). "perlmv" features dry-run mode, recursive renaming, reverse
+    ordering (to work around issue like wanting to rename files named 1, 2,
+    3, ... to 2, 3, 4, ...). The distribution also comes with sister scripts
+    perlln, perlln_s, and perlcp.
+
+    perlmv-u from App::perlmv (since 2017) is my other take. The main
+    feature is undo. It does not yet has nearly as many features as its
+    older brother "perlmv".
+
+    pmv from File::PerlMove (since 2007) by Johan Vromans of "Getopt::Long"
+    fame. Like "File::Rename", it also refactors the logic into module. It
+    also added a DWIM for specific Perl expression like "uc", "lc" when
+    dealing with case-insensitive filesystems.
+
+    App::FileRenameUtils, a collection of mass renaming utilities.
+
+ACME::CPANMODULES ENTRIES
+    rename
+    File::Rename
+        Author: RMBARKER <https://metacpan.org/author/RMBARKER>
+
+    App::FileTools::BulkRename
+    App::perlmv
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+    File::PerlMove
+        Author: JV <https://metacpan.org/author/JV>
+
+    App::FileRenameUtils
+        Author: PERLANCAR <https://metacpan.org/author/PERLANCAR>
+
+FAQ
+  What is an Acme::CPANModules::* module?
+    An Acme::CPANModules::* module, like this module, contains just a list
+    of module names that share a common characteristics. It is a way to
+    categorize modules and document CPAN. See Acme::CPANModules for more
+    details.
+
+  What are ways to use this Acme::CPANModules module?
+    Aside from reading this Acme::CPANModules module's POD documentation,
+    you can install all the listed modules (entries) using cpanm-cpanmodules
+    script (from App::cpanm::cpanmodules distribution):
+
+     % cpanm-cpanmodules -n RenamingFiles
+
+    Alternatively you can use the cpanmodules CLI (from App::cpanmodules
+    distribution):
+
+        % cpanmodules ls-entries RenamingFiles | cpanm -n
+
+    or Acme::CM::Get:
+
+        % perl -MAcme::CM::Get=RenamingFiles -E'say $_->{module} for @{ $LIST->{entries} }' | cpanm -n
+
+    or directly:
+
+        % perl -MAcme::CPANModules::RenamingFiles -E'say $_->{module} for @{ $Acme::CPANModules::RenamingFiles::LIST->{entries} }' | cpanm -n
+
+    This Acme::CPANModules module also helps lcpan produce a more meaningful
+    result for "lcpan related-mods" command when it comes to finding related
+    modules for the modules listed in this Acme::CPANModules module. See
+    App::lcpan::Cmd::related_mods for more details on how "related modules"
+    are found.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Acme-CPANModules-RenamingFiles>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Acme-CPANModules-RenamingFiles>.
+
+SEE ALSO
+    Acme::CPANModules - about the Acme::CPANModules namespace
+
+    cpanmodules - CLI tool to let you browse/view the lists
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+CONTRIBUTING
+    To contribute, you can send patches by email/via RT, or send pull
+    requests on GitHub.
+
+    Most of the time, you don't need to build the distribution yourself. You
+    can simply modify the code, then test via:
+
+     % prove -l
+
+    If you want to build the distribution (e.g. to try to install it locally
+    on your system), you can install Dist::Zilla,
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2022 by perlancar <perlancar@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Acme-CPANModules-Rena
+    mingFiles>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+

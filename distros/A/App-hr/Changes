@@ -1,3 +1,9 @@
+0.268   2021-07-09  Released-By: PERLANCAR; Urgency: low
+
+        - [build] Rebuild with newer Perinci::Sub::Complete to add summaries to
+          completion answers.
+
+
 0.267   2021-07-09  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

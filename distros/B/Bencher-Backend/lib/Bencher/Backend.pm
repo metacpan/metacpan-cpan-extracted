@@ -13,9 +13,9 @@ use List::Util qw(first);
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-02-08'; # DATE
+our $DATE = '2022-11-29'; # DATE
 our $DIST = 'Bencher-Backend'; # DIST
-our $VERSION = '1.061'; # VERSION
+our $VERSION = '1.062'; # VERSION
 
 our @EXPORT_OK = qw(
                        bencher
@@ -3272,6 +3272,7 @@ _
         render_as_benchmark_pm => {
             summary => 'Format result like Benchmark.pm',
             schema => 'true*',
+            cmdline_aliases => {B=>{}},
             tags => ['category:output'],
         },
         note => {
@@ -4376,7 +4377,7 @@ Bencher::Backend - Backend for Bencher
 
 =head1 VERSION
 
-This document describes version 1.061 of Bencher::Backend (from Perl distribution Bencher-Backend), released on 2022-02-08.
+This document describes version 1.062 of Bencher::Backend (from Perl distribution Bencher-Backend), released on 2022-11-29.
 
 =head1 FUNCTIONS
 
@@ -4408,6 +4409,8 @@ Arguments ('*' denotes required arguments):
 =over 4
 
 =item * B<action> => I<str> (default: "bench")
+
+(No description)
 
 =item * B<capture_stderr> => I<bool>
 
@@ -4810,7 +4813,11 @@ the scenario specification.
 
 =item * B<scientific_notation> => I<bool>
 
+(No description)
+
 =item * B<sorts> => I<array[str]> (default: ["-time"])
+
+(No description)
 
 =item * B<test> => I<bool>
 
@@ -4897,7 +4904,11 @@ Enveloped result from bencher.
 
 =item * B<overwrite> => I<bool>
 
+(No description)
+
 =item * B<title> => I<str>
+
+(No description)
 
 
 =back
@@ -4942,6 +4953,8 @@ Exclude Formatters specification.
 Formatters specification.
 
 =item * B<$options> => I<hash>
+
+(No description)
 
 
 =back
@@ -5031,6 +5044,8 @@ Fields to split the results on.
 
 =item * B<$options> => I<hash>
 
+(No description)
+
 
 =back
 
@@ -5075,9 +5090,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

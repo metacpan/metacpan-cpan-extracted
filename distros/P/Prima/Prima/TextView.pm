@@ -1,13 +1,7 @@
+package Prima::TextView;
+
 use strict;
 use warnings;
-
-package Prima::TextView::EventContent;
-
-sub on_mousedown {}
-sub on_mousemove {}
-sub on_mouseup   {}
-
-package Prima::TextView;
 
 use Prima;
 use Prima::ScrollBar;
@@ -382,12 +376,11 @@ sub recalc_ymap
 
 sub block_walk_abort { shift->{blockWalk} = 1 }
 
-sub block_walk
+sub block_walk_defaults
 {
-	my ( $self, $block, %commands ) = @_;
-	local $self-> {blockWalk} = 0;
+	my ( $self, %commands ) = @_;
 	my $canvas = $commands{canvas} // $self;
-	return tb::walk( $block,
+	return (
 		textPtr      => $self->{text},
 		canvas       => $canvas,
 		realize      => sub { $self-> realize_state($canvas, @_) },
@@ -395,6 +388,16 @@ sub block_walk
 		semaphore    => \ $self-> {blockWalk},
 		resolution   => $self->{resolution},
 		%commands
+	);
+}
+
+sub block_walk
+{
+	my ( $self, $block, %commands ) = @_;
+	local $self-> {blockWalk} = 0;
+	return tb::walk( $block,
+		semaphore  => \ $self-> {blockWalk},
+		$self->block_walk_defaults(%commands),
 	);
 }
 
@@ -561,7 +564,7 @@ sub on_paint
 			} elsif ( $j == $sy1 ) {
 				# upper selected part
 				$self->paint_selection( $canvas, $b, $j, $x, $y, $sx1, -1);
-			} elsif ( $j == $sy2 ) {
+			} elsif ( $j == $sy2 && $sx2 > 0 ) {
 				# lower selected part
 				$self->paint_selection( $canvas, $b, $j, $x, $y, 0, $sx2 - 1);
 			} elsif ( $j > $sy1 && $j < $sy2) { # simple selection case
@@ -859,19 +862,19 @@ sub text_offset2block
 	my ( $l, $r) = ( 0, scalar @$bx);
 	while ( 1) {
 		my $i = int(( $l + $r) / 2);
+		my $j = $i + 1;
 		last if $i == $ret;
 		$ret = $i;
-		my ( $b1, $b2) = ( $$bx[$i], $$bx[$i+1]);
+		$i-- while $i > 0     && $$bx[$i]->[tb::BLK_TEXT_OFFSET] < 0;
+		$j++ while $j < $#$bx && $$bx[$j]->[tb::BLK_TEXT_OFFSET] < 0;
+
+		my ($b1, $b2) = ( $$bx[$i], $$bx[$j]);
 
 		last if $ofs == $$b1[ tb::BLK_TEXT_OFFSET];
 
 		if ( $ofs > $$b1[ tb::BLK_TEXT_OFFSET]) {
-			if ( $b2) {
-				last if $ofs < $$b2[ tb::BLK_TEXT_OFFSET];
-				$l = $i;
-			} else {
-				last;
-			}
+			last if $ofs < $$b2[ tb::BLK_TEXT_OFFSET];
+			$l = $j;
 		} else {
 			$r = $i;
 		}
@@ -963,7 +966,8 @@ sub on_mouseup
 	my ( $self, $btn, $mod, $x, $y) = @_;
 
 	unless ( $self-> {mouseTransaction}) {
-		( $x, $y) = $self-> screen2point( $x, $y);
+		my @size = $self->size;
+		( $x, $y) = $self-> screen2point( $x, $y, @size);
 		for my $obj ( @{$self-> {contents}}) {
 			unless ( $obj-> on_mouseup( $self, $btn, $mod, $x, $y)) {
 				$self-> clear_event;
@@ -989,7 +993,8 @@ sub on_mousemove
 	my ( $self, $mod, $x, $y) = @_;
 
 	unless ( $self-> {mouseTransaction}) {
-		( $x, $y) = $self-> screen2point( $x, $y);
+		my @size = $self->size;
+		( $x, $y) = $self-> screen2point( $x, $y, @size);
 		for my $obj ( @{$self-> {contents}}) {
 			unless ( $obj-> on_mousemove( $self, $mod, $x, $y)) {
 				$self-> clear_event;
@@ -1293,43 +1298,6 @@ sub clear_all
 	$self-> {blocks} = [];
 	$self-> paneSize( 0, 0);
 	$self-> text('');
-}
-
-
-package Prima::TextView::EventRectangles;
-
-sub new
-{
-	my $class = shift;
-	my %profile = @_;
-	my $self = {};
-	bless( $self, $class);
-	$self-> {$_} = $profile{$_} ? $profile{$_} : []
-		for qw( rectangles references);
-	return $self;
-}
-
-sub contains
-{
-	my ( $self, $x, $y) = @_;
-	my $rec = 0;
-	for ( @{$self-> {rectangles}}) {
-		return $rec if $x >= $$_[0] && $y >= $$_[1] && $x < $$_[2] && $y < $$_[3];
-		$rec++;
-	}
-	return -1;
-}
-
-sub rectangles
-{
-	return $_[0]-> {rectangles} unless $#_;
-	$_[0]-> {rectangles} = $_[1];
-}
-
-sub references
-{
-	return $_[0]-> {references} unless $#_;
-	$_[0]-> {references} = $_[1];
 }
 
 1;

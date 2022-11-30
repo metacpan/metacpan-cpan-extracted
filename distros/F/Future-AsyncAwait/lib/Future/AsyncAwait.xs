@@ -177,6 +177,83 @@ static void panic(char *fmt, ...)
 }
 
 /*
+ * Hook mechanism
+ */
+
+struct HookRegistration
+{
+  const struct AsyncAwaitHookFuncs *funcs;
+  void                             *data;
+};
+
+struct HookRegistrations
+{
+  struct HookRegistration *arr;
+  size_t count, size;
+};
+
+static struct HookRegistrations *S_registrations(pTHX_ bool add)
+{
+  SV *regsv = *hv_fetchs(PL_modglobal, "Future::AsyncAwait/registrations", GV_ADD);
+  if(!SvOK(regsv)) {
+    if(!add)
+      return NULL;
+
+    struct HookRegistrations *registrations;
+    Newx(registrations, 1, struct HookRegistrations);
+
+    registrations->count = 0;
+    registrations->size  = 4;
+    Newx(registrations->arr, registrations->size, struct HookRegistration);
+
+    sv_setuv(regsv, PTR2UV(registrations));
+  }
+
+  return INT2PTR(struct HookRegistrations *, SvUV(regsv));
+}
+#define registrations(add)  S_registrations(aTHX_ add)
+
+static void register_faa_hook(pTHX_ const struct AsyncAwaitHookFuncs *hookfuncs, void *hookdata)
+{
+  /* Currently no flags are recognised; complain if the caller requested any */
+  if(hookfuncs->flags)
+    croak("Unrecognised hookfuncs->flags value %08x", hookfuncs->flags);
+
+  struct HookRegistrations *regs = registrations(TRUE);
+
+  if(regs->count == regs->size) {
+    regs->size *= 2;
+    Renew(regs->arr, regs->size, struct HookRegistration);
+  }
+
+  regs->arr[regs->count].funcs = hookfuncs;
+  regs->arr[regs->count].data  = hookdata;
+  regs->count++;
+}
+
+#define RUN_HOOKS_FWD(func, ...) \
+  {                                                        \
+    int _hooki = 0;                                        \
+    while(_hooki < regs->count) {                          \
+      struct HookRegistration *reg = regs->arr + _hooki;   \
+      if(reg->funcs->func)                                 \
+        (*reg->funcs->func)(aTHX_ __VA_ARGS__, reg->data); \
+      _hooki++;                                            \
+    }                                                      \
+  }
+
+#define RUN_HOOKS_REV(func, ...) \
+  {                                                        \
+    int _hooki = regs->count;                              \
+    while(_hooki > 0) {                                    \
+      _hooki--;                                            \
+      struct HookRegistration *reg = regs->arr + _hooki;   \
+      if(reg->funcs->func)                                 \
+        (*reg->funcs->func)(aTHX_ __VA_ARGS__, reg->data); \
+    }                                                      \
+  }
+
+/*
  * Magic that we attach to suspended CVs, that contains state required to restore
  * them
  */
@@ -486,6 +563,12 @@ static int suspendedstate_free(pTHX_ SV *sv, MAGIC *mg)
   }
 
   if(state->modhookdata) {
+    struct HookRegistrations *regs = registrations(FALSE);
+    /* New hooks first */
+    if(regs)
+      RUN_HOOKS_REV(free, (CV *)sv, state->modhookdata);
+
+    /* Legacy hooks after */
     SV **hookp = hv_fetchs(PL_modglobal, "Future::AsyncAwait/suspendhook", FALSE);
     if(hookp && SvOK(*hookp) && SvUV(*hookp)) {
       SuspendHookFunc *hook = INT2PTR(SuspendHookFunc *, SvUV(*hookp));
@@ -1431,6 +1514,7 @@ static SV *MY_future_done_from_stack(pTHX_ SV *f, SV **mark)
   }
 
   if(f) {
+    assert(SvROK(f));
     *bottom = f;
     method  = "AWAIT_DONE";
   }
@@ -1465,6 +1549,7 @@ static SV *MY_future_fail(pTHX_ SV *f, SV *failure)
 
   PUSHMARK(SP);
   if(f) {
+    assert(SvROK(f));
     PUSHs(f);
     method = "AWAIT_FAIL";
   }
@@ -1490,6 +1575,8 @@ static SV *MY_future_fail(pTHX_ SV *f, SV *failure)
 #define future_new_from_proto(proto)  MY_future_new_from_proto(aTHX_ proto)
 static SV *MY_future_new_from_proto(pTHX_ SV *proto)
 {
+  assert(SvROK(proto));
+
   dSP;
 
   ENTER_with_name("future_new_from_proto");
@@ -1667,12 +1754,30 @@ static OP *pp_leaveasync(pTHX)
   dMARK;
 
   SV *f = NULL;
-  SV *ret;
+  SV *ret = NULL;
 
   SuspendedState *state = suspendedstate_get(find_runcv(0));
   if(state && state->returning_future) {
     f = state->returning_future;
     state->returning_future = NULL;
+  }
+
+  if(f && !SvROK(f)) {
+    /* async sub was abandoned. We just have to tidy up a bit and finish */
+
+    if(SvTRUE(ERRSV)) {
+      /* This error will otherwise go unreported; best we can do is warn() it */
+      CV *curcv = find_runcv(0);
+      GV *gv = CvGV(curcv);
+      if(!CvANON(curcv))
+        warn("Abandoned async sub %s::%s failed: %" SVf,
+          HvNAME(GvSTASH(gv)), GvNAME(gv), SVfARG(ERRSV));
+      else
+        warn("Abandoned async sub CODE(0x%p) in package %s failed: %" SVf,
+          curcv, HvNAME(GvSTASH(gv)), SVfARG(ERRSV));
+    }
+
+    goto abort;
   }
 
   if(SvTRUE(ERRSV)) {
@@ -1682,18 +1787,22 @@ static OP *pp_leaveasync(pTHX)
     ret = future_done_from_stack(f, mark);
   }
 
+  SPAGAIN;
+
+abort: ; /* statement to keep C compilers happy */
   PERL_CONTEXT *cx = CX_CUR();
 
-  SPAGAIN;
   SV **oldsp = PL_stack_base + cx->blk_oldsp;
 
   /* Pop extraneous stack items */
   while(SP > oldsp)
     POPs;
 
-  EXTEND(SP, 1);
-  mPUSHs(ret);
-  PUTBACK;
+  if(ret) {
+    EXTEND(SP, 1);
+    mPUSHs(ret);
+    PUTBACK;
+  }
 
   if(f)
     SvREFCNT_dec(f);
@@ -1728,12 +1837,19 @@ static OP *pp_await(pTHX)
     return docatch(pp_await);
   }
 
+  struct HookRegistrations *regs = registrations(FALSE);
+
   if(state && state->curcop)
     PL_curcop = state->curcop;
 
   TRACEPRINT("ENTER await curcv=%p [%s:%d]\n", curcv, CopFILE(PL_curcop), CopLINE(PL_curcop));
+  if(state)
+    TRACEPRINT(" (state=%p/{awaiting_future=%p, returning_future=%p})\n",
+      state, state->awaiting_future, state->returning_future);
+  else
+    TRACEPRINT(" (no state)\n");
 
-  if(state && state->awaiting_future) {
+  if(state) {
     if(!SvROK(state->returning_future) || future_is_cancelled(state->returning_future)) {
       if(!SvROK(state->returning_future)) {
         GV *gv = CvGV(curcv);
@@ -1751,7 +1867,9 @@ static OP *pp_await(pTHX)
       PUTBACK;
       return PL_ppaddr[OP_RETURN](aTHX);
     }
+  }
 
+  if(state && state->awaiting_future) {
     I32 orig_height;
 
     TRACEPRINT("  RESUME\n");
@@ -1776,6 +1894,7 @@ static OP *pp_await(pTHX)
       POPMARK;
     PUSHMARK(SP);
 
+    /* Legacy ones first */
     {
       SV **hookp = hv_fetchs(PL_modglobal, "Future::AsyncAwait/suspendhook", FALSE);
       if(hookp && SvOK(*hookp) && SvUV(*hookp)) {
@@ -1786,6 +1905,11 @@ static OP *pp_await(pTHX)
         (*hook)(aTHX_ FAA_PHASE_PRERESUME, curcv, state->modhookdata);
       }
     }
+
+    /* New ones after */
+    if(regs)
+      RUN_HOOKS_REV(pre_resume, curcv, state->modhookdata);
+
     suspendedstate_resume(state, curcv);
 
 #ifdef DEBUG_SHOW_STACKS
@@ -1827,8 +1951,15 @@ static OP *pp_await(pTHX)
      * about to capture all the pad slots from the running CV (orig) and
      * they'll be restored into this new one later by resume.
      */
-    curcv = cv_copy_flags(curcv, CV_COPY_NULL_LEXICALS);
+    CV *runcv = curcv;
+    curcv = cv_copy_flags(runcv, CV_COPY_NULL_LEXICALS);
     state = suspendedstate_new(curcv);
+
+    if(regs) {
+      if(!state->modhookdata)
+        state->modhookdata = newHV();
+      RUN_HOOKS_FWD(post_cv_copy, runcv, curcv, state->modhookdata);
+    }
 
     TRACEPRINT("  SUSPEND cloned CV->%p\n", curcv);
     defer_mortal_curcv = TRUE;
@@ -1840,6 +1971,12 @@ static OP *pp_await(pTHX)
   state->curcop = PL_curcop;
 
   suspendedstate_suspend(state, origcv);
+
+  /* New ones first */
+  if(regs)
+    RUN_HOOKS_FWD(post_suspend, curcv, state->modhookdata);
+
+  /* Legacy ones after */
   {
     SV **hookp = hv_fetchs(PL_modglobal, "Future::AsyncAwait/suspendhook", FALSE);
     if(hookp && SvOK(*hookp) && SvUV(*hookp)) {
@@ -1895,10 +2032,11 @@ static OP *pp_await(pTHX)
 
 #ifdef HAVE_FUTURE_CHAIN_CANCEL
   future_chain_on_cancel(state->returning_future, state->awaiting_future);
-#endif
 
   if(!SvROK(state->returning_future))
     panic("ARGH we lost state->returning_future for curcv=%p\n", curcv);
+#endif
+
   if(!SvROK(state->awaiting_future))
     panic("ARGH we lost state->awaiting_future for curcv=%p\n", curcv);
 
@@ -2232,6 +2370,11 @@ BOOT:
 #ifdef HAVE_DMD_HELPER
   DMD_SET_MAGIC_HELPER(&vtbl_suspendedstate, dumpmagic_suspendedstate);
 #endif
+
+  sv_setiv(*hv_fetchs(PL_modglobal, "Future::AsyncAwait/ABIVERSION_MIN", 1), FUTURE_ASYNCAWAIT_ABI_VERSION);
+  sv_setiv(*hv_fetchs(PL_modglobal, "Future::AsyncAwait/ABIVERSION_MAX", 1), FUTURE_ASYNCAWAIT_ABI_VERSION);
+
+  sv_setiv(*hv_fetchs(PL_modglobal, "Future::AsyncAwait/register()@1", 1), PTR2UV(&register_faa_hook));
 
   {
     AV *run_on_loaded = NULL;

@@ -24,6 +24,7 @@ my @files = (
     't/05-invalid-xml.t',
     't/06-test-encryption-methods.t',
     't/07-decrypt-xmlsec.t',
+    't/08-support-oaepparams.t',
     't/author-critic.t',
     't/author-eof.t',
     't/author-eol.t',
@@ -32,7 +33,8 @@ my @files = (
     't/author-pod-syntax.t',
     't/release-trailing-space.t',
     't/sign-certonly.pem',
-    't/sign-private.pem'
+    't/sign-private.pem',
+    't/xmlsec-key.pem'
 );
 
 notabs_ok($_) foreach @files;

@@ -12,7 +12,7 @@ use lib $Bin . '/../lib';
 
 use Weather::GHCN::Measures;
 
-use Test::More tests => 20;
+use Test::More tests => 21;
 use Test::Exception;
 
 use Const::Fast;
@@ -84,7 +84,31 @@ subtest 'get methods' => sub {
     $href = Weather::GHCN::Options->get_option_defaults();
     ok ref $href eq 'HASH', 'get_option_defaults returned a hash';
     $count = keys $href->%*;
-    ok $count > 0, 'get_option_defaults hash is not empty';
+    ok $count > 0, 'get_option_defaults hash is not empty';   
+};
+
+subtest 'get_profile_options' => sub {
+
+    is_deeply Weather::GHCN::Options->get_profile_options(undef), {}, 'get_profile_options(undef) returns {}';
+
+    my $href;
+    my @got_keys;
+    my @expected_keys;
+
+    if ( Weather::GHCN::Options->get_profile_filespec('') ) {
+        $href = Weather::GHCN::Options->get_profile_options("");
+        is ref $href, 'HASH', 'get_profile_options("") loaded a default profile';
+    } else {
+        ok 1, 'no default profile file found';
+    }
+
+
+    my $fname = $FindBin::Bin . '/ghcn_fetch.yaml';
+    $href = Weather::GHCN::Options->get_profile_options($fname);
+    @got_keys = sort keys $href->%*;
+
+    @expected_keys = qw(aliases);
+    is_deeply \@got_keys, \@expected_keys, "get_profile_options($fname)";
 };
 
 # at this point we know the options and config methods work well

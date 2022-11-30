@@ -53,7 +53,8 @@ use vars qw(
 	$SHQUOTE
 	$DEFFILE
 	$OPTIMIZE
-	$OPENMP
+	$CC_OPENMP
+	$LD_OPENMP
 	%ALL_PM_INSTALL
 	%ALL_MAN_INSTALL
 	%MODVERSIONS
@@ -68,6 +69,7 @@ use vars qw(
 	$unix
 	$cygwin
 	$mingw
+	$MacOSX
 	$platform
 	$flavor
 	$path_sep
@@ -84,6 +86,7 @@ use vars qw(
 	%cache_find_files
 	$binary_prereq
 	$compiler_type
+	$compiler_subtype
 	$compiler_version
 	@Prima_exports
 	$win32_use_dlltool
@@ -184,33 +187,33 @@ sub setup_argv
 	$ARGV_STR = join(' ', @ARGV);
 
 	%cmd_options = (
-		X11BASE       => undef,
-		WITH_XFT      => 1,
-		WITH_HARFBUZZ => 1,
-		WITH_FRIBIDI   => 1,
-		WITH_ICONV    => 1,
-		WITH_GTK2     => 0,
-		WITH_GTK3     => 1,
-		WITH_OPENMP   => 1,
-		WITH_COCOA    => ($^O eq 'darwin'),
-		WITH_LIBTHAI  => 1,
-		CYGWIN_WINAPI => 0,
-		DEBUG         => 0,
-		EXTRA_CCFLAGS => '',
-		EXTRA_LDFLAGS => '',
-		VERBOSE       => 0,
+		X11BASE       => $ENV{PRIMA_X11BASE}, # Default value of undef is ok
+		WITH_XFT      => $ENV{PRIMA_WITH_XFT}      // 1,
+		WITH_HARFBUZZ => $ENV{PRIMA_WITH_HARFBUZZ} // 1,
+		WITH_FRIBIDI  => $ENV{PRIMA_WITH_FRIBIDI}  // 1,
+		WITH_ICONV    => $ENV{PRIMA_WITH_ICONV}    // 1,
+		WITH_GTK2     => $ENV{PRIMA_WITH_GTK2}     // 0,
+		WITH_GTK3     => $ENV{PRIMA_WITH_GTK3}     // 1,
+		WITH_OPENMP   => $ENV{PRIMA_WITH_OPENMP}   // 1,
+		WITH_COCOA    => $ENV{PRIMA_WITH_COCOA}    // ($^O eq 'darwin'),
+		WITH_LIBTHAI  => $ENV{PRIMA_WITH_LIBTHAI}  // 1,
+		CYGWIN_WINAPI => $ENV{PRIMA_CYGWIN_WINAPI} // 0,
+		DEBUG         => $ENV{PRIMA_DEBUG}         // 0,
+		EXTRA_CCFLAGS => $ENV{PRIMA_EXTRA_CCFLAGS} // '',
+		EXTRA_LDFLAGS => $ENV{PRIMA_EXTRA_LDFLAGS} // '',
+		VERBOSE       => $ENV{PRIMA_VERBOSE}       // 0,
 
 		# service vars
-		AUTOMATED_RUN => 0,
-		DL_LOAD_FLAGS => undef,
+		AUTOMATED_RUN => $ENV{PRIMA_AUTOMATED_RUN} // 0,
+		DL_LOAD_FLAGS => $ENV{PRIMA_DL_LOAD_FLAGS}, # Default value of undef is ok
 	);
 
 	%passthru_options = (
-		DEFINE        => '',
-		LIBS          => '',
-		INC           => '',
-		LD            => $Config{ld},
-		LDDLFLAGS     => $Config{lddlflags},
+		DEFINE        => $ENV{PRIMA_DEFINE}        // '',
+		LIBS          => $ENV{PRIMA_LIBS}          // '',
+		INC           => $ENV{PRIMA_INC}           // '',
+		LD            => $ENV{PRIMA_LD}            // $Config{ld},
+		LDDLFLAGS     => $ENV{PRIMA_LDDLFLAGS}     // $Config{lddlflags},
 	);
 
 	@ARGV = grep {
@@ -244,6 +247,7 @@ sub setup_variables
 		$platform = 'unix';
 		$unix = 1;
 		$DL_LOAD_FLAGS = -1; # check later
+		$MacOSX = ($^O eq 'darwin') ? 1 : 0;
 	}
 
 	$DL_LOAD_FLAGS = $cmd_options{DL_LOAD_FLAGS} if defined $cmd_options{DL_LOAD_FLAGS};
@@ -377,7 +381,8 @@ sub setup_environment
 		$LDOUTFLAG    = '/OUT:';
 		$LD_LIB_EXT   = '.lib';
 		$OPTIMIZE     = '-Zi' if $cmd_options{DEBUG};
-		$OPENMP       = '/openmp';
+		$CC_OPENMP    = '/openmp';
+		$LD_OPENMP    = '';
 		# link flag is /DEBUG, but we don't care because ActiveState has it on by default anyway
 	}
 	else {
@@ -389,7 +394,8 @@ sub setup_environment
 		$LDOUTFLAG    = '-o ';
 		$LD_LIB_EXT   = '';
 		$OPTIMIZE     = '-g' if $cmd_options{DEBUG};
-		$OPENMP       = '-fopenmp';
+		$CC_OPENMP    = '-fopenmp';
+		$LD_OPENMP    = '-fopenmp';
 		$OPTIMIZE    .= ' -Wall' if gcc;
 		if ($cmd_options{DEBUG}) {
 			$passthru_options{LDDLFLAGS} .= ' -g';
@@ -572,7 +578,7 @@ sub cc_command_line
 	$cc .= ' ' . join(' ', map { "$LDLIBFLAG$_$LD_LIB_EXT"} @LIBS);
 	$cc .= " $passthru_options{LIBS}" if length $passthru_options{LIBS};
 	$cc .= " $cmd_options{EXTRA_LDFLAGS}" if length $cmd_options{EXTRA_LDFLAGS};
-	$cc =~ s/\-bundle// if $^O eq 'darwin';
+	$cc =~ s/\-bundle// if $MacOSX;
 
 	return $cc;
 }
@@ -920,6 +926,16 @@ GLIBC
 sub setup_compiler
 {
 	printlog "Compiler: $compiler_type\n";
+	if ( $compiler_type eq 'gcc' ) {
+		my $r = `$Config{cc} -v 2>&1`;
+		if ( $r =~ /^(.*)\s+version\s+([\d\.]+)/) {
+			$compiler_subtype = $1;
+			$compiler_version = $2;
+			if ( $compiler_subtype =~ /clang/ ) {
+				$cmd_options{EXTRA_CCFLAGS} .= " -Wno-compound-token-split-by-macro";
+			}
+		}
+	}
 
 	printlog "Checking if can compile... ";
 	compile('int a;', 1) or die "no " . see_makefile_log;
@@ -958,10 +974,11 @@ main()
 EOF
 		my $savecc = $cmd_options{EXTRA_CCFLAGS};
 		my $saveld = $passthru_options{LDDLFLAGS};
-		$cmd_options{EXTRA_CCFLAGS} .= " $OPENMP";
-		$passthru_options{LDDLFLAGS} .= " $OPENMP";
+		$cmd_options{EXTRA_CCFLAGS} .= " $CC_OPENMP";
+		$passthru_options{LDDLFLAGS} .= " $LD_OPENMP";
 		my @savelibs = @LIBS;
 #		push @LIBS, 'gomp' if $compiler_type eq 'gcc';
+		push @LIBS, 'vcompd' if $compiler_type eq 'cl';
 		if ( compile_and_run($text)) {
 		YES_OPENMP:
 			$DEFINES{HAVE_OPENMP} = 1;
@@ -970,7 +987,8 @@ EOF
 			if ( $captured_makefile_log =~ /recompile with (\-fpic)/i) {
 				printlog "no, trying with $1 ...";
 				$cmd_options{EXTRA_CCFLAGS} .= " $1";
-				$OPENMP .= " $1";
+				$CC_OPENMP .= " $1";
+				$LD_OPENMP .= " $1";
 				goto YES_OPENMP if compile($text);
 			}
 
@@ -1022,6 +1040,47 @@ MSCVER
 	push @LIBPATH, '/usr/lib/w32api' if $cygwin;
 	if ($^O eq 'solaris') {
 		push @LIBPATH, '/opt/csw/lib';
+	}
+
+	if ( $MacOSX ) {
+		push @INCPATH, '/opt/homebrew/include';
+		push @LIBPATH, '/opt/homebrew/lib', '/opt/homebrew/opt/libiconv/lib';
+	}
+
+	if ( $Win32 ) {
+		printlog "Checking if can compile with GDI+... ";
+		my $gdip = compile(<<'MSCVER');
+#include <windows.h>
+#ifdef _MSC_VER
+#undef __inline__
+#define __inline__ inline
+#undef __extension__
+#define __extension__
+#endif
+#include <gdiplus/gdiplus.h>
+int main() {
+	ULONG_PTR t;
+	GdiplusStartupInput id = { 1, NULL, 0, 0 };
+	GdiplusStartup(&t, &id, NULL);
+	return 0;
+}
+MSCVER
+		unless ( length $gdip ) {
+			printlog "no\n";
+			print <<GDIP;
+
+** Error: Cannot complile with GDI+. If your compiler is MSVC, then it can only
+compile GDI+ headers in C++ mode. Grab a copy of the headers adapted for C at
+
+   http://prima.eu.org/download/gdiplus.zip,
+
+and unpack it in the include catalog so that the headers are in 
+./include/gdiplus/*.h
+
+GDIP
+			exit 1;
+		}
+		printlog "yes\n";
 	}
 }
 
@@ -1182,7 +1241,7 @@ DLERR
 sub setup_pkgconfig
 {
 	printlog "Checking for pkg-config... ";
-	my $v = `pkg-config --version`;
+	my $v = `pkg-config --version` // '';
 	if ( $Win32 && $? ) {
 		$v = `pkg-config.bat --version`;
 		$PKGCONFIG = 'pkg-config.bat';
@@ -1211,7 +1270,7 @@ MIXED
 
 	# it is mac's broken XQuartz setup?
 	my $xquartz_pkgconfig_path = '/opt/X11/lib/pkgconfig';
-	if ( $^O eq 'darwin' && !exists $ENV{PKG_CONFIG_PATH} && -d $xquartz_pkgconfig_path) {
+	if ( $MacOSX && !exists $ENV{PKG_CONFIG_PATH} && -d $xquartz_pkgconfig_path) {
 		printlog "trying PKG_CONFIG_PATH=$xquartz_pkgconfig_path... ";
 		my $add_path;
 		null_output;
@@ -1630,7 +1689,7 @@ differently from Gnome environment. You might want to install
 WARNING
 		return;
 	}
-	if ( $^O eq 'darwin') {
+	if ( $MacOSX ) {
 		printlog "without X11... ";
 		$DEFINES{WITH_GTK_NONX11} = 1 unless compile( "#include <gdk/gdkx.h>\nint main() { return 0; }\n");
 	}
@@ -1771,6 +1830,10 @@ Consider fixing your installation.
 LIBTHAI
 	$END .= <<LIBTHAI if $Win32 and not $cygwin;
 Get libthai binary from http://prima.eu.org/download/libthai-0.1.29-win64.zip
+
+LIBTHAI
+	$END .= <<LIBTHAI if $MacOSX;
+Get it with `brew install dk/libthai/libthai`
 
 LIBTHAI
 }
@@ -2152,7 +2215,7 @@ sub create_config_pm
 		$libsi = '$(lib)' . "/auto/Prima/${LIB_PREFIX}Prima$LIB_EXT";
 	}
 
-	my $cc_openmp = $cmd_options{WITH_OPENMP} ? $OPENMP : '';
+	my $cc_openmp = $cmd_options{WITH_OPENMP} ? $CC_OPENMP : '';
 
 	open F, "> Prima/Config.pm" or die "cannot open Prima/Config.pm:$!\n";
 	print F <<CONFIG;
@@ -2357,38 +2420,38 @@ sub command_bindist
 	}
 
 	clean_dist;
-	my @dirs;
+	my %dirs;
 	my @files;
-	finddepth( sub {
-		return if $_ eq '.' ||
-			($_ eq 'Makefile' && $File::Find::dir eq $CWD) ||
-			m/^\./;
-		return if /\.(pdb|ncb|opt|dsp|dsw)$/i; # MSVC
-		my $f = "$File::Find::dir/$_";
-		return if $f =~ /include.generic|\.git|\.swp|\.log|blib|dll.base|dll.exp|Prima.bs|Prima.def/;
-		return if $f =~ /\.(c|cls|h)$/i;
-		return if $f =~ /$CWD.(img|include|win32|unix|api|class|Makefile.old)/i;
-		if ( -d $f) {
-			$f =~ s/^$CWD/$DISTNAME/;
-			push @dirs, $f;
+
+	open MAN, "<", "MANIFEST" or die "Cannot open MANIFEST:$!\n";
+	for my $path (<MAN>) {
+		chomp $path;
+		my ( $d, $f );
+		if ( $path =~ m[^(.+)/([^\/]+)$]) {
+			($d, $f) = ($1, $2);
 		} else {
-			return if $f =~ m/$Config{_o}$/;
+			($d, $f) = ('', $path);
+		}
+		next if $d =~ m[^(t|img|include|win32|unix|api|class)(/|$)];
+		if ( length $d ) {
+			$dirs{ "$DISTNAME/$d" }++;
+			push @files, "$d/$f";
+		} else {
+			$dirs{ $DISTNAME }++;
 			push @files, $f;
 		}
-	}, $CWD);
+	}
 
 	print "Creating directories...\n";
-	push @dirs, "$DISTNAME/auto/Prima";
-	for ( @dirs) {
+	$dirs{ "$DISTNAME/auto/Prima" }++;
+	for ( sort keys %dirs) {
 		next if -d $_;
 		cleanup( "Can't mkdir $_") unless mkpath $_;
 	}
 
 	print "Copying files...\n";
 	for ( @files) {
-		my $f = $_;
-		$f =~ s/^$CWD/$DISTNAME/;
-		cleanup("Error copying $_ to $_") unless copy $_, $f;
+		cleanup("Error copying $_ to $DISTNAME/$_") unless copy $_, "$DISTNAME/$_";
 	}
 	for (<blib/arch/auto/Prima/*>) {
 		next if m/(\.exists|Prima\.bs|Prima\.pdb)$/;

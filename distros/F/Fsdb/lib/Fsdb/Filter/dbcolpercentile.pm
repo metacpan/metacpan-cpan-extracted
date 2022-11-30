@@ -22,7 +22,7 @@ dbcolpercentile - compute percentiles or ranks for an existing numeric column
 =head1 DESCRIPTION
 
 Compute a percentile, ranking, or weighted percentile of a column of numbers.
-The new column will be called I<percentile> or I<rank> or I<weighted>
+The new column will be called I<percentile:d> or I<rank:q> or I<weighted:d>
 depending on the mode.
 
 Ordering is given by the specifed column.
@@ -35,7 +35,7 @@ Non-numeric values are ignored.
 If the data is pre-sorted and only a rank is requested,
 no extra storage is required.
 In all other cases, a full copy of data is buffered on disk.
-
+Output will be sorted by COLUMN.
 
 =head1 OPTIONS
 
@@ -74,6 +74,7 @@ When repeated, we skip the check.
 =item B<-N NAME> or B<--new-name NAME>
 
 Give the NAME of the new column.
+(If no type is specifed, a type will be assigned based on the mode.)
 
 =item B<-f FORMAT> or B<--format FORMAT>
 
@@ -350,11 +351,17 @@ sub setup ($) {
     # output
     #
     $self->{_destination_column} //= $self->{_mode};
-
+    my($name, $type, $type_speced) = $self->{_in}->colspec_to_name_type_spec($self->{_destination_column});
+    if (!defined($type_speced)) {
+        # default type
+        $self->{_destination_column} .= (($self->{_mode} eq 'rank') ? ":q" : ":d");
+    };
+    
     $self->finish_io_option('output', -clone => $self->{_in}, -outputheader => 'delay');
     $self->{_out}->col_create($self->{_destination_column})
 	or croak($self->{_prog} . ": cannot create column '" . $self->{_destination_column} . "' (maybe it already existed?)\n");
-    $self->{_destination_coli} = $self->{_out}->col_to_i($self->{_destination_column});
+    $self->{_destination_coli} = $self->{_out}->colspec_to_i($self->{_destination_column});
+    croak("interal error: cannot find column " . $self->{_destination_coli}) if (!defined($self->{_destination_coli}));
 }
 
 =head2 _determine_total

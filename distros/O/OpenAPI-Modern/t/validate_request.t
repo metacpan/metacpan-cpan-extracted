@@ -778,7 +778,7 @@ paths:
                   type: string
                   const: ಠ_ಠ
               additionalProperties: false
-          tEXt/HTml:
+          blOOp/HTml:
             schema:
               not: true
           text/plain:
@@ -828,7 +828,7 @@ YAML
   );
 
 
-  $request = request('GET', 'http://example.com/foo', [ 'Content-Type' => 'TEXT/HTML' ], 'html text');
+  $request = request('GET', 'http://example.com/foo', [ 'Content-Type' => 'text/plain; charset=us-ascii' ], 'ascii plain text');
   cmp_deeply(
     ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
     {
@@ -836,9 +836,26 @@ YAML
       errors => [
         {
           instanceLocation => '/request/body',
-          keywordLocation => jsonp(qw(/paths /foo get requestBody content tEXt/HTml)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get requestBody content tEXt/HTml)))->to_string,
-          error => 'EXCEPTION: unsupported Content-Type "text/html": add support with $openapi->add_media_type(...)',
+          keywordLocation => jsonp(qw(/paths /foo get requestBody content text/plain schema const)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get requestBody content text/plain schema const)))->to_string,
+          error => 'value does not match',
+        },
+      ],
+    },
+    'us-ascii text can be decoded and matched',
+  );
+
+  $request = request('GET', 'http://example.com/foo', [ 'Content-Type' => 'blOOp/HTML' ], 'html text (bloop style)');
+  cmp_deeply(
+    ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
+    {
+      valid => false,
+      errors => [
+        {
+          instanceLocation => '/request/body',
+          keywordLocation => jsonp(qw(/paths /foo get requestBody content blOOp/HTml)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get requestBody content blOOp/HTml)))->to_string,
+          error => 'EXCEPTION: unsupported Content-Type "bloop/html": add support with $openapi->add_media_type(...)',
         },
       ],
     },
@@ -847,7 +864,7 @@ YAML
 
 
   # we have to add media-types in foldcased format
-  $openapi->add_media_type('text/html' => sub ($content_ref) { $content_ref });
+  $openapi->add_media_type('bloop/html' => sub ($content_ref) { $content_ref });
 
   cmp_deeply(
     ($result = $openapi->validate_request($request, { path_template => '/foo', path_captures => {} }))->TO_JSON,
@@ -856,8 +873,8 @@ YAML
       errors => [
         {
           instanceLocation => '/request/body',
-          keywordLocation => jsonp(qw(/paths /foo get requestBody content tEXt/HTml schema not)),
-          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get requestBody content tEXt/HTml schema not)))->to_string,
+          keywordLocation => jsonp(qw(/paths /foo get requestBody content blOOp/HTml schema not)),
+          absoluteKeywordLocation => $doc_uri->clone->fragment(jsonp(qw(/paths /foo get requestBody content blOOp/HTml schema not)))->to_string,
           error => 'subschema is valid',
         },
       ],

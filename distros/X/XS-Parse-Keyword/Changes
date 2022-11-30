@@ -1,5 +1,17 @@
 Revision history for XS-Parse-Keyword
 
+0.28    2022-11-25
+        [CHANGES]
+         * Include a XSParseInfixClassification field in the XSParseInfixInfo
+           structure
+         * Do not permit mixed identifier/non characters in the names of
+           registered infix operators
+         * No longer supports XSParseInfix ABI version 0
+
+        [BUGFIXES]
+         * When parsing an infix operator name, make sure not to be confused
+           by additional identifier characters immediately after it
+
 0.27    2022-10-31
         [CHANGES]
          * Updates to XS::Parse::Infix for latest `infix-plugin` perl5 branch

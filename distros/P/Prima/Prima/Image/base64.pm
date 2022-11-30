@@ -17,13 +17,13 @@ sub check_mime
 sub load_class
 {
 	my $class = shift;
+	shift if ($_[0] // '') eq __PACKAGE__;
 
 	check_mime();
 	return (undef, $has_mime) unless 1 eq $has_mime;
 
 	my $scalar = decode_base64(shift);
 	return (undef, "$!") unless open my $f, '<', \ $scalar;
-
 	return $class->load( $f, @_ );
 }
 
@@ -86,7 +86,7 @@ sub save
 
 =head1 NAME
 
-Prima::Image::base64
+Prima::Image::base64 - hard-coded image files
 
 =head1 DESCRIPTION
 

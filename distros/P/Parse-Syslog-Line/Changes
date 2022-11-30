@@ -1,9 +1,69 @@
 ==================================================
-Changes from 2019-02-26 00:00:00 +0000 to present.
+Changes from 2020-11-14 00:00:00 +0000 to present.
 ==================================================
 
 ----------------------------------------
-version 4.7 at 2021-02-25 00:04:16 +0000
+version 5.0 at 2022-11-14 17:01:07 +0000
+----------------------------------------
+
+  Change: 6ca871f422f19a4374187a3a78e0066db774fd47
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2022-11-13 20:46:30 +0000
+
+    Updates for the 5.0 Release
+
+    Breaking Changes ================
+
+    * Shipping with `RFC5424StructuredData` enabled and set to true.
+
+    The biggest effect this could have on users, is the `content` field is now
+    stripped of the components of RFC structured data.
+
+    Given:
+
+    ``` <163>Jul 26 15:50:14 ether janus foobar[4291]: [lvl=2] [foo x=1] some
+    content [bar x=2] ```
+
+    The old behavior with the defaults would produce the following:
+
+    ``` content => '[lvl=2] [foo x=1] some content [bar x=2]', ```
+
+    As of 5.x, this is changed and will now produce:
+
+    ``` content => 'some content', SDATA => {
+
+    bar => {
+
+    x => 2,
+
+    },
+
+    foo => {,
+
+    x => 1,
+
+    },
+
+    lvl => 2, }, ```
+
+    The intent is this change makes the module even more useful as it defaults
+    to parsing structured data correctly according to the RFC. To restore the
+    prior functionality, you can disable this feature.
+
+    ``` $Parse::Syslog::Line::RFC5424StructuredData = 0; ```
+
+    Improvements ============
+
+    * Make `JSON::MaybeXS` a requirement, recommend `Cpanel::JSON::XS` * Remove
+    all `use JSON` from the code * Split up the k/v regex using `/x` so it's
+    more maintainable * Add support for simplistic RFC structured data, ala,
+    `[group k=v]` * Add tests for the RFC structured data parsing * Add
+    `RFC5424StructuredDataStrict` and tests for strict parsing * Squelch
+    warnings in tests and benchmarks * Document environment variables that
+    interact with `Parse::Syslog::Line` 
+
+----------------------------------------
+version 4.7 at 2021-02-25 00:03:01 +0000
 ----------------------------------------
 
   Change: 54fff942c417fdb3c300b3bf08bc584c3d2c972d
@@ -73,82 +133,6 @@ version 4.6 at 2021-02-18 22:40:10 +0000
 
     Fix unless conditional for JSON::MaybeXS loading 
 
-  Change: 90415de755348d5aafb52a84df3b44eb15fe1bde
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-05-20 07:29:26 +0000
-
-    Remove trailing punctuations 
-
-  Change: 176326c6e04abd28c9520e5830ec2a8e35988983
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-05-20 07:29:26 +0000
-
-    Allow K/V's to begin at the start of the syslog content 
-
-  Change: 85a25710986fc30a7fb36d86d950f9ed0590fe1b
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-05-19 22:28:42 +0000
-
-    Added test cases for AutoDetectJSON and AutoDetectKeyValues 
-
-  Change: 8ff5b733149d0a920e16be018f76e6ebd51426bc
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-05-19 22:27:29 +0000
-
-    Add ability to override defaults in the tests and creation script
-
-    Running `./t/bin/create_test_entry.pl -o AutoDetectKeyValues=1` will create
-    a test data file with the necessary overrides. 
-
-  Change: 89924ae311e85223173975e546b9dbc63186b26b
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-05-19 22:03:07 +0000
-
-    Remove leading whitespace from the program_sub field 
-
-  Change: 1430e965c1c9bb0a1f7738ca3dcff22639f8c591
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-05-19 22:00:22 +0000
-
-    Restucture Testing of the Parser
-
-    The `01-parse.t` has been restructured to use the `t/data/*.yaml` files.
-    Added `t/bin/create_test_entry.pl` to allow easier creation of test cases. 
-
-  Change: d09b265f28aaba0a900b206569027a78d4daff3e
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2019-05-19 14:55:32 +0000
-
-    Better processing of program component.
-
-    This supports the `pam(sshd)[pid]` and `postfix/smtp/smtpd[pid]` as well as
-    the rest of the ways program, component, and pid could be represented. 
-
-  Change: 42625fc6fb6d3cd4b3d1f3331a4453201b68a25f
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-09-18 22:19:44 +0000
-
-    Version 4.5 will suport handling mutli-line messages via the
-    parse_syslog_lines() function 
-
-  Change: ca817b09f61647ad998974a3dbaf4211e119472b
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-09-18 22:00:47 +0000
-
-    Fix documentation generation configuration 
-
-  Change: 3b4f2b415ec90dd60f7883d076d3ae21a1b71688
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-09-18 21:53:01 +0000
-
-    Don't attempt to parse lines that aren't syslog generated 
-
-  Change: fd7c40e5f71d3fde60f4d6f333c35f63630b45c3
-  Author: Brad Lhotsky <brad@divisionbyzero.net>
-  Date : 2018-05-29 15:55:42 +0000
-
-    Remove "sub expression" grouping and gender specificity in a comment 
-
 =================================================
-Plus 35 releases after 2019-02-26 00:00:00 +0000.
+Plus 36 releases after 2020-11-14 00:00:00 +0000.
 =================================================

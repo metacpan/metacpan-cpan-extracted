@@ -11,6 +11,7 @@ my %opt = (
 	lpp => 'lp::DotDot',
 	ml  => 10,
 	lw  => 28,
+	sc  => 1,
 );
 $opt{ml} = 10;
 my $aperture = 12;
@@ -18,6 +19,7 @@ my $capture;
 my $prelight;
 my @points;
 @points = (100,200,200,200,200,100,50,10);
+
 
 sub group
 {
@@ -42,6 +44,12 @@ sub lw
 	$mw->repaint;
 }
 
+sub scale
+{
+	$opt{sc} = $mw->menu->text($_[1]);
+	$mw->repaint;
+}
+
 $mw = Prima::MainWindow->new(
 	size => [ 400, 431 ],
 	text => 'Line plotter',
@@ -49,13 +57,20 @@ $mw = Prima::MainWindow->new(
 	menuItems => [
 		['~Options' => [ 
 			[ '@closed'    => '~Closed'    => sub{shift->repaint} ],
-			[ '@compare'   => '~Compare'   => sub{shift->repaint} ],
 			[ '@*hairline' => '~Hairline'  => sub{shift->repaint} ],
 			[ '@aa'        => '~Antialias' => sub{shift->repaint} ],
 			[],
 			[ 'E~xit' => sub { $_[0]->destroy } ],
 		]],
-		[ '~End' => [ group le => qw(Flat Square Round) ]],
+		[ '~End' => [ group le => qw(Flat Square Round Arrow Cusp InvCusp Knob Rect RoundRect Spearhead Tail) ]],
+		[ 'End ~scale' => [
+			[ '(' , 0.5  => \&scale ],
+			[ ''  , 0.75 => \&scale ],
+			[ '*' , 1    => \&scale ],
+			[ ''  , 1.25 => \&scale ],
+			[ ''  , 1.5  => \&scale ],
+			[ ')' , 1.75 => \&scale ],
+		]],
 		[ '~Join' => [
 			group(lj => qw(Round Bevel Miter)),
 			[],
@@ -82,7 +97,7 @@ $mw = Prima::MainWindow->new(
 			Dot DotDot DashDot DashDotDot
 		) ]],
 		[ '~Width' => [
-			(map { my $k = $_; [ $k , sub { lw($k) } ] } (0,1,2,3,5,10,20,30)),
+			(map { my $k = $_; [ $k , sub { lw($k) } ] } (0,0.5,1,2,3,5,10,20,30)),
 		]],
 	],
 	buffered => 1,
@@ -90,7 +105,7 @@ $mw = Prima::MainWindow->new(
 		my ( $self, $canvas ) = @_;
 		my ( $w, $h ) = $self-> size;
 		$canvas->clear();
-		$canvas->lineEnd($opt{le});
+		$canvas->lineEnd(le::scale( $opt{le}, $opt{sc} ));
 		$canvas->lineJoin($opt{lj});
 		$canvas->miterLimit($opt{ml});
 		my $c = $prelight // $capture // -1;
@@ -99,43 +114,19 @@ $mw = Prima::MainWindow->new(
 			$self->menu->checked('closed') ?
 			((@points < 6) ? ( 100, 100, @points, 100, 100 ) : @points[0..$#points,0,1]):
 			( 30, 30, @points, $w - 30, $h - 30);
-		my $cmp;
-		if ( $cmp = $self-> menu->checked('compare')) {
-			$canvas->lineWidth($opt{lw}+2);
-			$canvas->linePattern($opt{lp});
-			$canvas->polyline( \@xpoints);
-			$canvas->lineWidth(1);
-			$canvas->linePattern(lp::Solid);
-		}
-
 
 		$canvas->color(cl::LightRed);
-		$canvas->rop(rop::OrPut) if $cmp;
-		unless ( $self->menu->checked('aa')) {
-			my $p = $canvas->new_path;
-			$p->line(\@xpoints);
-			$p = $p->widen( 
-				lineWidth   => $opt{lw},
-				lineEnd     => $opt{le},
-				lineJoin    => $opt{lj},
-				linePattern => $opt{lp},
-				miterLimit  => $opt{ml},
-			);
-			$canvas->fillMode(fm::Winding|fm::Overlay);
-			$opt{lw} ? $p->fill : $p->stroke;
-		} else {
-			$canvas->lineWidth($opt{lw});
-			$canvas->linePattern($opt{lp});
-			$canvas->antialias(1);
-			$canvas->polyline(\@xpoints);
-			$canvas->antialias(0);
-		}
+		$canvas->lineWidth($opt{lw});
+		$canvas->linePattern($opt{lp});
+		$canvas->antialias($self->menu->checked('aa'));
+		$canvas->polyline(\@xpoints);
+		$canvas->antialias(0);
 
 		$canvas->rop(rop::CopyPut);
 
-		if ( $cmp = $self-> menu->checked('hairline')) {
+		if ( $self-> menu->checked('hairline')) {
 			$canvas->color(cl::White);
-			$canvas->lineWidth(1);
+			$canvas->lineWidth(0);
 			$canvas->linePattern(lp::Solid);
 			$canvas-> polyline( \@xpoints);
 		}

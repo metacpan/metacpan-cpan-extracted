@@ -871,12 +871,14 @@ gray non-8 bit pixel values, by the code:
 
    $image-> resample( $image-> rangeLo, $image-> rangeHi, 0, 255);
 
-=item rotate DEGREES
+=item rotate DEGREES [,FILL_COLOR]
 
 Rotates the image. Where the angle is 90, 180, or 270 degrees, fast pixel
 flipping is used, otherwise fast Paeth rotation is used.  Eventual resampling
 can be controlled by C<scaling> property ( probably not worth it for functions
 with support of more than 1 pixel).
+
+Fills empty pixels with optional fill color.
 
 Resulting images can be 1 pixel too wide due to horizontal shearing applied
 twice, where in worst cases 1 pixel from the original image can take 3
@@ -911,17 +913,36 @@ Returns a scaline from Y in the same raw format as C<data>
 Applies shearing to the image. If the shearing is needed only for one axis, set
 shear factor for the other one to zero.
 
+=item to_icon fill => $MASK_TEMPLATE, %options
+
+Creates an icon from image, with optional C<fill> scalar used for newly populate mask.
+Applies C<%options> to a new object, if any
+
+=item to_rgba TYPE=undef
+
+Creates a new icon with type set to 24 or 8 gray bits and mask type to 8 bit.
+If TYPE is set, uses this type instead.
+
 =item to_region
 
 Creates a new L<Prima::Region> object with the image as the data source.
 
-=item transform @MATRIX
+=item transform matrix => [a,b,c,d,x,y], [ fill => color ]
 
-Applies generic 2D transform matrix to the image, where matrix is 4 numbers.
+Applies generic 2D transform matrix to the image, fills empty pixels with
+optional fill color.
+
+Required option C<matrix> should point to an array of 6 float numbers,
+where these represent a standard 3x2 matrix for 2D transformation, f ex a
+C<Prima::matrix> object.
 
 Tries first to split matrix into series of shear and scale transforms using LDU
-decomposition; if an interim image needs to be too large, fails and returns
-C<false>.
+decomposition; if an interim image is calculated to be too large, fails and
+returns C<false>.
+
+The last two members (X and Y translation) only use mantisse and ignore the
+rest, so setting them f ex to 10.5 will not produce an image 11 pixels larger,
+but only 1.  The translation is thus effectively sub-pixel.
 
 Rotation matrices can be applied too, however, when angles are close to 90 and
 270, either interim images become too big, or defects introduced by shearing
@@ -1003,11 +1024,22 @@ Applies premultiplication formula to each pixel
 where alpha is the corresponding alpha value for each coordinate.
 Only applicable when C<maskType> is <im::bpp8>.
 
+=item rotate, transform
+
+Applies same transformation as in C<Prima::Image> to both color and mask pixels.
+Ignores fill color, fills with zeros both planes.
+
 =item split
 
 Returns two new I<Prima::Image> objects of same dimension.
 Pixels in the first is are duplicated from C<::data> storage,
 in the second - from C<::mask> storage.
+
+=item translate matrix => [a,b,c,d,x,y]
+
+Same as the C<translate> method from C<Prima::Image> except that it also
+rotates the mask, and ignores C<fill> option - all new pixels are filled with
+zeros.
 
 =item ui_scale %OPTIONS
 

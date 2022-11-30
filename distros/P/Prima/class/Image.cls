@@ -38,6 +38,7 @@ object Prima::Image( Prima::Drawable)
 	method UV     add_notification( char * name, SV * subroutine, Handle referer = NULL_HANDLE, int index = -1);
 	method Bool   arc( double x, double y, double dX, double dY, double startAngle, double endAngle);
 	method Bool   bar(double x1, double y1, double x2, double y2);
+	method Bool   bar_alpha(int alpha, int x1=-1, int y1=-1, int x2=-1, int y2=-1);
 	method Bool   bars(SV * rects);
 	method Handle bitmap();
 	method Bool   begin_paint();
@@ -77,7 +78,7 @@ object Prima::Image( Prima::Drawable)
 	method void   premultiply_alpha(SV * alpha);
 	method Bool   put_image_indirect( Handle image, int x, int y, int xFrom, int yFrom, int xDestLen, int yDestLen, int xLen, int yLen, int rop);
 	method void   remove_notification( UV id);
-	method Bool   rotate( double degrees );
+	method Bool   rotate( double degrees, SV * fill = NULL_SV );
 	method Bool   rectangle(double x1, double y1, double x2, double y2);
 	method void   resample( double srcLo, double srcHi, double dstLo, double dstHi);
 	weird  int    save( SV *className, SV *filename, HV * profile);
@@ -85,6 +86,6 @@ object Prima::Image( Prima::Drawable)
 	method void   set( HV * profile);
 	c_only void   reset( int type, RGBColor * palette, int palSize);
 	c_only void   stretch( int width, int height);
-	method Bool   transform( double a, double b, double c, double d );
+	method Bool   transform( HV * options);
 	c_only void   update_change();
 }

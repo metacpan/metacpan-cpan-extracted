@@ -1,5 +1,13 @@
 Revision history for XML-Sig
 
+0.59 -- Thu Nov 24 22:24:32 AST 2022
+
+  - 62f9dda Quiet PerlCritic don't return explicit undef
+  - cca8cbe Fixes #43 Do we need to override {INT} in this module?
+  - ebff177 Merge pull request #42 from waterkip/dist-init
+  - 654bb81 Cleanup dist.ini: AutoPrereq catches most of the deps
+  - f96c3be v0.58
+
 0.58 -- Mon Jul 18 21:45:06 ADT 2022
 
   [Notable Changes since 0.57]

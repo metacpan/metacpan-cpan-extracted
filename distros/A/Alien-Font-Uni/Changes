@@ -1,0 +1,21 @@
+0.3 2022-11-18 lichtkind
+--------
+    * = small distro fixes
+    * / use strict
+    * / lower perl version
+    * & dist filters out github readme
+    * ? linkfix in readme
+
+0.2 2022-11-17 lichtkind
+--------
+    * = small distro fixes
+    * & fixed changes file
+    * & streamline dist.ini
+    * & update github Readme file
+    * & more tests
+    * ? more POD
+
+0.1 2022-11-17 lichtkind
+--------
+    * = init release
+    * + contains unifont version 14.04

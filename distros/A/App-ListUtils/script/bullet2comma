@@ -12,7 +12,7 @@ use Perinci::CmdLine::Any;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-09-01'; # DATE
 our $DIST = 'App-ListUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/ListUtils/bullet2comma",
@@ -38,7 +38,7 @@ bullet2comma - Convert a bulleted list into comma-separated
 
 =head1 VERSION
 
-This document describes version 0.001 of bullet2comma (from Perl distribution App-ListUtils), released on 2022-09-01.
+This document describes version 0.002 of bullet2comma (from Perl distribution App-ListUtils), released on 2022-09-01.
 
 =head1 SYNOPSIS
 

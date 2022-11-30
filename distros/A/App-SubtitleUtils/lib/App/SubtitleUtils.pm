@@ -6,12 +6,14 @@ use warnings;
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-10'; # DATE
+our $DATE = '2022-11-22'; # DATE
 our $DIST = 'App-SubtitleUtils'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 our @EXPORT_OK = qw(
-                       parse_srt
+                       srtparse
+                       srtcheck
+                       srtdump
                        srtcombinetext
                );
 
@@ -33,6 +35,7 @@ $SPEC{srtparse} = {
     args => {
         filename => {
             schema => 'filename*',
+            'x.completion' => [filename => {file_ext_filter=>qr/\.srt$/i}],
             pos => 0,
         },
         string => {
@@ -101,6 +104,7 @@ $SPEC{srtcheck} = {
     args => {
         filename => {
             schema => 'filename*',
+            'x.completion' => [filename => {file_ext_filter=>qr/\.srt$/i}],
             req => 1,
             pos => 0,
         },
@@ -151,9 +155,17 @@ sub srtdump {
 $SPEC{srtcombinetext} = {
     v => 1.1,
     summary => 'Combine the text of two or more subtitle files (e.g. for different languages) into one',
+    description => <<'_',
+
+All the subtitle files must contain the same number of entries, with each entry
+containing the exact timestamps. The default is just to concatenate the text of
+each entry together, but you can customize each text using the `--eval` option.
+
+_
     args => {
         filenames => {
             schema => ['array*', of=>'filename*', min_len=>2],
+            'x.element_completion' => [filename => {file_ext_filter=>qr/\.srt$/i}],
             req => 1,
             pos => 0,
             slurpy => 1,
@@ -164,9 +176,9 @@ $SPEC{srtcombinetext} = {
             cmdline_aliases => {e=>{}},
             description => <<'_',
 
-This code will be evaluated for every text of each entry of each SRT. `$_` will
-be set to the text, `$entry` to the entry hash, `$j` to the index of the files
-(starts at 0).
+This code will be evaluated for every text of each entry of each SRT, in the
+`main` package. `$_` will be set to the text, `$main::entry` to the entry hash,
+`$main::idx` to the index of the files (starts at 0).
 
 The code is expected to modify `$_`.
 
@@ -175,11 +187,32 @@ _
     },
     examples => [
         {
-            summary => 'Display English and French subtitles together',
+            summary => 'Display English and French subtitles together (1)',
+            description => <<'_',
+
+The English text is shown at the top, then a blank line (`<i></i>`), followed by
+the French text in italics.
+
+_
             src_plang => 'bash',
-            src => q|[[prog]] azur-et-asmar.en.srt azur-et-asmar.fr.srt -e 'if ($main::j) { chomp; $_ = "<i></i>\n<i>$_</i>\n" }'|,
+            src => q|[[prog]] azur-et-asmar.en.srt azur-et-asmar.fr.srt -e 'if ($main::idx) { chomp; $_ = "<i></i>\n<i>$_</i>\n" }'|,
             test => 0,
             'x.doc.show_result' => 0,
+        },
+        {
+            summary => 'Display English and French subtitles together (2)',
+            description => <<'_',
+
+Like the previous examaple, we show the English text at the top, then a blank
+line (`<i></i>`), followed by the French text in italics. This time we use a
+provided wrapper.
+
+_
+            src_plang => 'bash',
+            src => q|srtcombine2text azur-et-asmar.en.srt azur-et-asmar.fr.srt|,
+            test => 0,
+            'x.doc.show_result' => 0,
+
         },
     ],
 };
@@ -227,7 +260,7 @@ sub srtcombinetext {
                     }
                     no warnings 'once';
                     local $main::entry = $parsed[$j]{entries}[$i];
-                    local $main::j = $j;
+                    local $main::idx = $j;
                     $code->();
                 }
                 $merged_text .= $_;
@@ -246,6 +279,57 @@ sub srtcombinetext {
     srtdump(parsed => $merged);
 }
 
+$SPEC{srtcombine2text} = {
+    v => 1.1,
+    summary => 'Combine the text of two or more subtitle files (e.g. for different languages) into one',
+    description => <<'_',
+
+This is a thin wrapper for <prog:srtcombinetext>, for convenience. This:
+
+    % srtcombine2text file1.srt file2.srt
+
+is equivalent to:
+
+    % srtcombinetext file1.srt file2.srt -e 'if ($main::idx) { chomp; $_ = "<i></i>\n<i>$_</i>\n" }'
+
+For more customization, use *srtcombinetext* directly.
+
+_
+    args => {
+        filename1 => {
+            schema => 'filename*',
+            'x.completion' => [filename => {file_ext_filter=>qr/\.srt$/i}],
+            req => 1,
+            pos => 0,
+        },
+        filename2 => {
+            schema => 'filename*',
+            'x.completion' => [filename => {file_ext_filter=>qr/\.srt$/i}],
+            req => 1,
+            pos => 0,
+        },
+    },
+    examples => [
+        {
+            summary => 'Display English and French subtitles together (2)',
+            src_plang => 'bash',
+            src => q|[[prog]] azur-et-asmar.en.srt azur-et-asmar.fr.srt|,
+            test => 0,
+            'x.doc.show_result' => 0,
+
+        },
+    ],
+};
+sub srtcombine2text {
+    my %args = @_;
+    my $filename1 = delete $args{filename1};
+    my $filename2 = delete $args{filename2};
+    srtcombinetext(
+        filenames => [$filename1, $filename2],
+        eval => q|if ($main::idx) { chomp; $_ = "<i></i>\n<i>$_</i>\n" }|,
+    );
+}
+
 1;
 # ABSTRACT: Utilities related to video subtitles
 
@@ -261,7 +345,7 @@ App::SubtitleUtils - Utilities related to video subtitles
 
 =head1 VERSION
 
-This document describes version 0.008 of App::SubtitleUtils (from Perl distribution App-SubtitleUtils), released on 2022-11-10.
+This document describes version 0.011 of App::SubtitleUtils (from Perl distribution App-SubtitleUtils), released on 2022-11-22.
 
 =head1 DESCRIPTION
 
@@ -274,6 +358,8 @@ This distributions provides the following command-line utilities:
 =item * L<srtcalc>
 
 =item * L<srtcheck>
+
+=item * L<srtcombine2text>
 
 =item * L<srtcombinetext>
 
@@ -306,13 +392,61 @@ Usage:
 
 Check the properness of SRT file.
 
-This function is not exported.
+This function is not exported by default, but exportable.
 
 Arguments ('*' denotes required arguments):
 
 =over 4
 
 =item * B<filename>* => I<filename>
+
+(No description)
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
+=head2 srtcombine2text
+
+Usage:
+
+ srtcombine2text(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Combine the text of two or more subtitle files (e.g. for different languages) into one.
+
+This is a thin wrapper for L<srtcombinetext>, for convenience. This:
+
+ % srtcombine2text file1.srt file2.srt
+
+is equivalent to:
+
+ % srtcombinetext file1.srt file2.srt -e 'if ($main::idx) { chomp; $_ = "<i></i>\n<i>$_</i>\n" }'
+
+For more customization, use I<srtcombinetext> directly.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<filename1>* => I<filename>
+
+(No description)
+
+=item * B<filename2>* => I<filename>
 
 (No description)
 
@@ -340,6 +474,10 @@ Usage:
 
 Combine the text of two or more subtitle files (e.g. for different languages) into one.
 
+All the subtitle files must contain the same number of entries, with each entry
+containing the exact timestamps. The default is just to concatenate the text of
+each entry together, but you can customize each text using the C<--eval> option.
+
 This function is not exported by default, but exportable.
 
 Arguments ('*' denotes required arguments):
@@ -350,9 +488,9 @@ Arguments ('*' denotes required arguments):
 
 Perl code to evaluate on every text.
 
-This code will be evaluated for every text of each entry of each SRT. C<$_> will
-be set to the text, C<$entry> to the entry hash, C<$j> to the index of the files
-(starts at 0).
+This code will be evaluated for every text of each entry of each SRT, in the
+C<main> package. C<$_> will be set to the text, C<$main::entry> to the entry hash,
+C<$main::idx> to the index of the files (starts at 0).
 
 The code is expected to modify C<$_>.
 
@@ -382,7 +520,7 @@ Usage:
 
  srtdump(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-This function is not exported.
+This function is not exported by default, but exportable.
 
 Arguments ('*' denotes required arguments):
 
@@ -416,7 +554,7 @@ Usage:
 
 Parse SRT and return data structure.
 
-This function is not exported.
+This function is not exported by default, but exportable.
 
 Arguments ('*' denotes required arguments):
 

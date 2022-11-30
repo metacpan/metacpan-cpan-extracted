@@ -69,7 +69,9 @@ sub _makeSingleHoldingsRecord {
         [ 'localLocation', $localLocation ],
         [ 'shelvingLocation', $shelvingLocation ],
         # Z39.50 OPAC record has no way to express item-level callNumber
+        [ '_callNumberPrefix', $holding->{callNumberPrefix} ],
         [ 'callNumber', $holding->{callNumber} ],
+        [ '_callNumberSuffix', $holding->{callNumberSuffix} ],
         [ 'shelvingData', _makeShelvingData($holding) ],
         [ 'copyNumber', $holding->{copyNumber} ], # 852 $t
         [ 'publicNote', _noteOfType($holding->{notes}, qr/public/i) ], # 852 $z

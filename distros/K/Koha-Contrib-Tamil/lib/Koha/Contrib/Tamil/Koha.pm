@@ -1,6 +1,6 @@
 package Koha::Contrib::Tamil::Koha;
 #ABSTRACT: Class exposing info about a Koha instance.
-$Koha::Contrib::Tamil::Koha::VERSION = '0.069';
+$Koha::Contrib::Tamil::Koha::VERSION = '0.070';
 use Moose;
 
 use Modern::Perl;
@@ -11,7 +11,6 @@ use ZOOM;
 use MARC::Record;
 use MARC::File::XML;
 use YAML;
-use C4::Biblio qw/ GetMarcBiblio /;
 use Search::Elasticsearch;
 
 
@@ -33,7 +32,7 @@ has es => ( is => 'rw' );
 
 has es_index => ( is=> 'rw' );
 
-has _old_marc_biblio_sub => ( is => 'rw', isa => 'Bool', default => 0 );
+has koha_version => ( is => 'rw', isa => 'Num', default => 0 );
 
 
 sub BUILD {
@@ -81,10 +80,13 @@ sub BUILD {
     if ( $version =~ /^([0-9]{2})\.([0-9]{2})/ ) {
         $version = "$1.$2";
         $version += 0;
-        $self->_old_marc_biblio_sub(1) if $version <= 17.05;
-    }
-    else {
-        $self->_old_marc_biblio_sub(1);
+        $self->koha_version($version);
+        if ($version < 22.11) {
+            require C4::Biblio;
+        }
+        else {
+            require Koha::Biblios;
+        }
     }
 
 }
@@ -184,13 +186,17 @@ s/[^\x09\x0A\x0D\x{0020}-\x{D7FF}\x{E000}-\x{FFFD}\x{10000}-\x{10FFFF}]//g;
 
 
 sub get_biblio {
-    my ( $self, $id ) = @_; 
+    my ($self, $id) = @_; 
 
-    my $record = $self->_old_marc_biblio_sub
-        ? GetMarcBiblio($id)
-        : GetMarcBiblio({biblionumber => $id});
-    return unless $record;
-    return MARC::Moose::Record::new_from($record, 'Legacy');
+    my $sth = $self->dbh->prepare(
+        "SELECT metadata FROM biblio_metadata WHERE biblionumber=? ");
+    $sth->execute( $id );
+    my ($marcxml) = $sth->fetchrow;
+    return unless $marcxml;
+    $marcxml =~
+s/[^\x09\x0A\x0D\x{0020}-\x{D7FF}\x{E000}-\x{FFFD}\x{10000}-\x{10FFFF}]//g;
+    my $record = MARC::Moose::Record::new_from($marcxml, 'Marcxml');
+    return $record;
 }
 
 
@@ -210,7 +216,7 @@ Koha::Contrib::Tamil::Koha - Class exposing info about a Koha instance.
 
 =head1 VERSION
 
-version 0.069
+version 0.070
 
 =head1 ATTRIBUTES
 
@@ -254,7 +260,7 @@ Return a MARC::Record from its biblionumber
 
 =head2 get_biblio($biblionumber)
 
-Return a MARC::Moose::Record from its biblionumber. It's a wrapper around GetMarcBiblio()
+Return a MARC::Moose::Record from its biblionumber.
 
 =head1 AUTHOR
 

@@ -11,8 +11,8 @@ use File::Temp qw/tempfile/;
 
 use Test::More tests => 4;
 
-my $m = RF::Component::Multi->load('t/test-data/muRata/muRata-GQM-0402.mdf',
-	load_options => { freq_min_hz => 100e6, freq_count => 1 }
+my $m = RF::Component::Multi->load('t/test-data/muRata/muRata-GQM-0402.mdf', 
+		load_options => { freq_range => 100e6 }
 	);
 
 ok(@$m == 53, "load count: ". @$m);

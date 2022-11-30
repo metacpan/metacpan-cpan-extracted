@@ -1,5 +1,5 @@
 package RF::Component;
-our $VERSION = '1.005';
+our $VERSION = '1.006';
 
 
 use strict;
@@ -37,7 +37,10 @@ sub new
 	#
 
 	# Name the matrix S, Z, Y, etc. based on its type:
-	$args{delete $args{param_type}} = delete $args{m};
+	if (defined($args{param_type}) && defined($args{m}))
+	{
+		$args{delete $args{param_type}} = delete $args{m};
+	}
 
 	# We don't need this, always Hz
 	delete $args{funit};
@@ -204,6 +207,14 @@ sub save_snp
 	return wsnp($filename, $self->get_wsnp_list(%args));
 }
 
+sub save_snp_fh
+{
+	my ($self, $fh, %args) = @_;
+
+	return wsnp_fh($fh, $self->get_wsnp_list(%args));
+}
+
+
 sub get_wsnp_list
 {
 	my ($self, %args) = @_;
@@ -283,18 +294,38 @@ sub  is_reciprocal     {  my $self = shift;   abcd_is_reciprocal(     $self->ABC
 sub  is_open_circuit   {  my $self = shift;   abcd_is_open_circuit(   $self->ABCD,  @_)  }
 sub  is_short_circuit  {  my $self = shift;   abcd_is_short_circuit(  $self->ABCD,  @_)  }
 
-sub interpolate
+sub at
 {
-	my ($self, $args) = @_;
+	my ($self, $range, %args) = @_;
 
-	my $f = $self->{freqs};
-	my %clone = %$self;
-	foreach my $t ($self->_available_params)
+	return $self if !length($range);
+
+	if (ref($range))
 	{
-		$clone{$t} = m_interpolate($f, $self->{$t}, $args);
+		croak '\$range must be a scalar, ref='. ref($range);
 	}
 
-	return __PACKAGE__->new(%clone);
+	# Clean it up for caching:
+	$range =~ s/\s+//g;
+	$range = lc($range);
+
+	# Return the cache if it exists:
+	return $self->{_at}{$range} if ($self->{_at}{$range});
+
+	# Only support passing range and the quiet flag:
+	my %opts = (freq_range => $range, quiet => $args{quiet});
+
+	# Clone non-underscore attributes:
+	my %clone = map { $_ => $self->{$_} } grep { !/^_/ } keys %$self;
+
+	foreach my $t ($self->_available_params)
+	{
+		($clone{freqs}, $clone{$t}) = m_interpolate($self->{freqs}, $self->{$t}, \%opts);
+	}
+
+	$self->{_at}{$range} = __PACKAGE__->new(%clone);
+
+	return $self->{_at}{$range};
 }
 
 # return S, A, etc... based on which are defined.
@@ -669,12 +700,67 @@ This defaults to Hz, but supports SI units such as: KHZ, MHz, GHz, ...
 
 =back
 
+=head2 C<RF::Component-E<gt>save_snp_fh> - Write the component to a file descriptor
+
+Same as C<save_snp> but writes to a file handle:
+
+    $cap->save_snp_fh(*STDOUT, %options);
+
 =head1 Calculation Functions
 
 Unless otherwise indicated, the return value from these methods are L<PDL>
 vectors, typically one value per frequency.  For example, C<$pF> as shown above
 will be a N-vector of values in picofarads, with one pF value for each
 frequency.
+
+=head2 C<$self-E<gt>at($f_Hz)> - Frequency extrapolation (object cloning)
+
+It is importatant to easily choose which frequencies will be used for
+calculations because the functions below return vectors with values at each
+frequency for the calculation provided.  In many cases you will want to load a
+Touchstone data file at all frequencies and then use C<$obj-E<gt>at($f_Hz)> to
+reduce or extrapolate to a different frequency or set of freqencies.
+
+Each call to C<$obj-E<gt>at($f_Hz)> will return a new C<RF::Component> object
+as follows:
+
+	$cap = RF::Component->load('my.s2p');
+
+	# Picofarads at 100 MHz (100e6 Hz).
+	$pF = $cap->at(100e6)->capacitance * 1e12;
+
+	# Reactance at 100 MHz and 200 MHz:
+	$X = $cap->at('100e6, 200e6')->reactance;
+
+	# ESR at 1-10 GHz with 20 samples (500 MHz each):
+	$esr = $cap->at('1e9 - 10e9  x20');
+
+	# ESR at 1-10 GHz stepping 500 MHz with 20 samples
+	# (same as the previous above, but different notation)
+	$esr = $cap->at('1e9 += 500e6  x20');
+
+Notes:
+
+=over 4
+
+=item * Each resulting value is a PDL vector containing one value per evaluated
+frequency.
+
+=item * Internally the C<$obj-E<gt>at($f_Hz)> function uses
+L<PDL::IO::Touchstone>'s C<m_interpolate> function so you can use any syntax
+available to C<m_interpolate>.
+
+=item * The C<$obj-E<gt>at($f_Hz)> call caches the resulting interpolated
+object to prevent repeated extrapolation at the same frequency set.  Because of this
+the C<$obj-E<gt>at($f_Hz)> call only supports scalar ranges either using a single
+frequency or the quoted range feature shown above and in
+L<PDL::IO::Touchstone>'s C<m_interpolate> function.
+
+=item * If no range is specified then the original object is returned:
+
+	return $self if !length($range);
+
+=back
 
 =head2 C<$z0n = $self-E<gt>port_z($n)> - Return the complex port impedance vector for each frequency
 

@@ -1,5 +1,5 @@
 ---
-abstract: 'Task for Biodiverse dependencies for non-GUI use'
+abstract: 'Task for Biodiverse dependencies for non-GUI use [DEPRECATED]'
 author:
   - 'Shawn Laffan (shawn.laffan@unsw.edu.au)'
 build_requires:
@@ -8,13 +8,11 @@ build_requires:
   File::Compare: '0'
   Perl::Tidy: '0'
   Scalar::Util::Numeric: '0'
-  Test::Deep: '0'
-  Test::Most: '0'
-  Test::NoWarnings: '0'
+  Test2::V0: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.34, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -64,7 +62,7 @@ requires:
   Spreadsheet::ReadSXC: '0'
   Statistics::Descriptive: '3.0608'
   Statistics::Sampler::Multinomial: '0'
-  Test::Lib: '0'
+  Test2::V0: '0.000130'
   Test::TempDir::Tiny: '0.016'
   Text::CSV_XS: '1.04'
   Text::Fuzzy: '0'
@@ -79,5 +77,5 @@ requires:
 resources:
   bugtracker: https://github.com/shawnlaffan/biodiverse/issues/
   repository: https://github.com/shawnlaffan/biodiverse.git
-version: '3.001'
+version: '3.2'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

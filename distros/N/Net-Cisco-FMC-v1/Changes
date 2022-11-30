@@ -1,4 +1,8 @@
-Revision history for Net-Cisco-FMC-v1: 0.006001
+Revision history for Net-Cisco-FMC-v1: 0.006002
+
+0.006002  2022-11-21 11:34:38+01:00 Europe/Vienna
+    - fix missing source encoding
+    - fix incorrect 'get_accessrule' link in ::Role::FixAccessruleLiterals
 
 0.006001  2021-03-23 13:26:23+01:00 Europe/Vienna
     - automatically relogin when access token becomes invalid

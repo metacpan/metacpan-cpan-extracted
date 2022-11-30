@@ -3,7 +3,7 @@ package PDF::API2::Win32;
 use strict;
 no warnings qw[ deprecated recursion uninitialized ];
 
-our $VERSION = '2.043'; # VERSION
+our $VERSION = '2.044'; # VERSION
 
 package PDF::API2;
 

@@ -1,5 +1,12 @@
 Revision history for Perl extension Text::Markdown::XS.
 
+0.16 Mon Nov 14 21:01:22 UTC 2022
+	- 3f9e817 clean up MANIFEST and dist clean target files
+
+0.15 Sat Nov 12 23:00:16 UTC 2022
+	- NOTE: uploaded 0.14 tar.gz file is broken due to directory name in MANIFEST files was not properly updated when I switched to the name with version number.
+	- eac211d update manifest files
+
 0.14 Sat Nov 12 23:00:16 UTC 2022
 	- e191fde Add missing URL in POD @anirvan
 	- 2544da8 update Discount source code to v2.2.7

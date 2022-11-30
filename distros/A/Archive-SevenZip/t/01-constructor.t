@@ -20,3 +20,5 @@ my $sz3 = Archive::SevenZip->new(
 );
 is $sz3->{"7zip"}, 'set-from-constructor-2',
     "We can set the binary in the constructor even after finding the 7z binary in the path (or environment)";
+
+done_testing(3);

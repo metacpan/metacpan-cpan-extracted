@@ -3,9 +3,9 @@
 ## no critic: TestingAndDebugging::RequireUseStrict
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-10'; # DATE
+our $DATE = '2022-11-22'; # DATE
 our $DIST = 'App-SubtitleUtils'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 die "Usage: $0 frames FILE\n" unless @ARGV >= 1;
 $_ = shift @ARGV;
@@ -37,7 +37,7 @@ subshift - # PODNAME: subshift
 
 =head1 VERSION
 
-This document describes version 0.008 of subshift (from Perl distribution App-SubtitleUtils), released on 2022-11-10.
+This document describes version 0.011 of subshift (from Perl distribution App-SubtitleUtils), released on 2022-11-22.
 
 =head1 SYNOPSIS
 

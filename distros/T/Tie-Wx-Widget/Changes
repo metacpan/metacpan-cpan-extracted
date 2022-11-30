@@ -1,7 +1,15 @@
-Revision history for Tie-Wx-Widget
+1.01 2022-11-18 lichtkind
+--------
+    * = switch to dzil
+    * ? better description
+    * ? deleted obsolete POD
+    * & added contributing file
+    * & adapted my usual dist.ini
+    * & adapted my usual github readme
+    * & drop manifest tests
 
 1.0     3. december
-        doc fixes  
+        doc fixes
 
 0.991   17.july
         accepting also selfderived widget classes

@@ -4,7 +4,6 @@ use Babble::Grammar;
 use Babble::SymbolGenerator;
 use Mu;
 use List::Util 1.45;
-use re 'eval';
 
 ro 'top_rule';
 rwp 'text';
@@ -27,6 +26,7 @@ lazy top_re => sub {
   return "\\A${top}\\Z";
 };
 
+my %SUBMATCHES_COMPILE_CACHE;
 lazy submatches => sub {
   my ($self) = @_;
   return {} unless ref(my $top = $self->top_rule);
@@ -41,7 +41,17 @@ lazy submatches => sub {
       : $_
   } @$top;
   return {} unless @subrules;
-  my @values = $self->text =~ /\A${re}\Z ${\$self->grammar_regexp}/x;
+  my $submatch_re = qq[ \\A${re}\\Z ${\$self->grammar_regexp} ];
+  my $_re;
+  my @values = $self->text =~ (
+    Babble::Config::CACHE_RE ? $SUBMATCHES_COMPILE_CACHE{$submatch_re} : $_re = ( Babble::Config::CACHE_RE ? $SUBMATCHES_COMPILE_CACHE{$submatch_re} : 0 )
+    || do {
+      warn "Cache miss submatches\n" if Babble::Config::CACHE_RE && Babble::Config::DEBUG_CACHE_MISS;
+      use re 'eval';
+      my $re = qr/$submatch_re/x;
+      no re 'eval';
+      $re;
+    });
   die "Match failed" unless @values;
   my %submatches;
   require Babble::SubMatch;
@@ -81,6 +91,7 @@ sub is_valid {
   return !!$self->text =~ /${\$self->top_re} ${\$self->grammar_regexp}/x;
 }
 
+my %MATCH_POS_COMPILE_CACHE;
 sub match_positions_of {
   my ($self, $of) = @_;
   our @F;
@@ -90,7 +101,17 @@ sub match_positions_of {
   my @found = do {
     local @F;
     local $_ = $self->text;
-    /${\$self->top_re} ${wrapped}/x;
+    my $mp_re = qq/${\$self->top_re} ${wrapped}/;
+    my $_re;
+    $_ =~ ( Babble::Config::CACHE_RE ? $MATCH_POS_COMPILE_CACHE{$mp_re} : $_re = ( Babble::Config::CACHE_RE ? $MATCH_POS_COMPILE_CACHE{$mp_re} : 0 )
+      || do {
+        warn "Cache miss match_positions_of(): @{[ $self->top_re ]}\n" if Babble::Config::CACHE_RE && Babble::Config::DEBUG_CACHE_MISS;
+        use re 'eval';
+        my $re = qr/$mp_re/x;
+        no re 'eval';
+        $re;
+      }
+    );
     @F;
   };
   return map { [ split ',', $_ ] }

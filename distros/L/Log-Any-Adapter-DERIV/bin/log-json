@@ -25,13 +25,13 @@ require Log::Any::Adapter::DERIV;
 binmode STDIN, ':encoding(UTF-8)';
 
 my $opts = {};
-$opts->{colour} = 1 if -t STDOUT;
+$opts->{colour} = 1 if -t STDOUT;    ## no critic (ProhibitInteractiveTest)
 
 # Ideally we'd be able to flip between single-line for grep, and multi-line for
 # realtime display, but the log messages already have the JSON formatting applied...
 # $Log::Any::Adapter::DERIV::JSON->pretty($opts->{colour});
 
-while (<>) {
+while (<>) {    ## no critic (WhileDiamondDefaultAssignment)
     chomp;
     print Log::Any::Adapter::DERIV->format_line(decode_json_text($_), $opts) . "\n";
 }

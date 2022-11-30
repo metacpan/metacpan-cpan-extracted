@@ -14,17 +14,20 @@ exclude = [
 ]
 
 [commands.perlimports]
-type = "tidy"
-include = [ "**/*.{pl,pm,t,psgi}" ]
+type = "both"
+include = [ "**/*.{pl,pm,t,psgi}", "script/ot" ]
 cmd = [ "perlimports" ]
-tidy_flags = [
-    "--libs", "lib,t/lib",
-    "--log-filename", "/tmp/perlimports.txt",
-    "--log-level", "debug",
-    "--no-preserve-duplicates",
-    "--no-preserve-unused",
-    "-i",
-    "-f",
-]
+tidy_flags = [ "-i" ]
+lint_flags = [ "--lint" ]
 ok_exit_codes = 0
+expect_stderr = true
+
+[commands.perltidy]
+type = "both"
+include = [ "**/*.{pl,pm,t,psgi}", "script/ot" ]
+cmd = [ "perltidy", "--profile=$PRECIOUS_ROOT/perltidyrc" ]
+lint_flags = [ "--assert-tidy", "--no-standard-output", "--outfile=/dev/null" ]
+tidy_flags = [ "--backup-and-modify-in-place", "--backup-file-extension=/" ]
+ok_exit_codes = 0
+lint_failure_exit_codes = 2
 expect_stderr = true

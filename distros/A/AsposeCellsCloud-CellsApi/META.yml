@@ -20,7 +20,7 @@ provides:
     file: lib/AsposeCellsCloud/ApiFactory.pm
   AsposeCellsCloud::CellsApi:
     file: lib/AsposeCellsCloud/CellsApi.pm
-    version: 22.10
+    version: 22.11
   AsposeCellsCloud::LiteCellsApi:
     file: lib/AsposeCellsCloud/LiteCellsApi.pm
   AsposeCellsCloud::LightCellsApi:
@@ -576,5 +576,5 @@ requires:
   strict: '0'
   utf8: '0'
   warnings: '0'
-version: 22.10
+version: 22.11
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

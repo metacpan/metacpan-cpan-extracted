@@ -1,5 +1,13 @@
 Revision history for Syntax-Operator-In
 
+0.04    2022-11-25
+        [CHANGES]
+         * Accept in:OP notation as well, as it may overall be neater and
+           better. Still the subject of ongoing experimentation
+
+        [BUGFIXES]
+         * Add a brace for C99-challenged compilers (RT144990)
+
 0.03    2022-10-31
         [CHANGES]
          * Use XS::Parse::Infix v0.27 to handle recursion into the infix

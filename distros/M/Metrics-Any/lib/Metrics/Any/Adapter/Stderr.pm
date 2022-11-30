@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
 
-package Metrics::Any::Adapter::Stderr 0.08;
+package Metrics::Any::Adapter::Stderr 0.09;
 
 use v5.14;
 use warnings;
@@ -26,6 +26,8 @@ configure the adapter, a metric log will be written to the terminal as a
 side-effect of running a unit test:
 
    $ METRICS_ANY_ADAPTER=Stderr perl -Mblib t/01test.t
+
+This adapter type does not support batch mode reporting.
 
 =cut
 

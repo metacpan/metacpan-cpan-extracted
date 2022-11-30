@@ -1,5 +1,5 @@
 package App::week;
-our $VERSION = "1.0301";
+our $VERSION = "1.0303";
 
 use v5.14;
 use warnings;
@@ -80,7 +80,7 @@ use Getopt::EX::Hashed; {
     };
 
     has '+weeknumber' => sub {
-	${$_->config}{$_[0]} = $_[1];
+	App::week::CalYear::Configure $_[0] => $_[1];
     };
 
     has '+rgb24' => sub {
@@ -343,7 +343,7 @@ B<week> [ -MI<module> ] [ option ] [ date ]
 
 =head1 VERSION
 
-Version 1.0301
+Version 1.0303
 
 =head1 DESCRIPTION
 

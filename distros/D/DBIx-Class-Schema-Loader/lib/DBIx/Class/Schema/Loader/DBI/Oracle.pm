@@ -8,7 +8,7 @@ use Try::Tiny;
 use DBIx::Class::Schema::Loader::Utils qw/sigwarn_silencer/;
 use namespace::clean;
 
-our $VERSION = '0.07049';
+our $VERSION = '0.07051';
 
 =head1 NAME
 
@@ -57,7 +57,11 @@ sub _system_schemas {
 sub _system_tables {
     my $self = shift;
 
-    return ($self->next::method(@_), 'PLAN_TABLE');
+    return (
+        $self->next::method(@_),
+        'PLAN_TABLE',
+        qr/\ABIN\$.*\$\d+\z/,   # Tables in the recycle bin
+    );
 }
 
 sub _dbh_tables {

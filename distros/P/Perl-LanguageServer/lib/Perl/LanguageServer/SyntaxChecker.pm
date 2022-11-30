@@ -219,7 +219,12 @@ sub background_checker
 
         $text = eval { Encode::encode ('utf-8', $text) ; } ;
         $self -> logger ($@) if ($@) ;    
-    
+
+        my $fn = $uri ;
+        $fn =~ s/^file:\/\/// ;
+        $fn = $self -> uri_client2server ($fn) ;
+        $text = "local \$0; BEGIN { \$0 = '$fn'; if (\$INC{'FindBin.pm'}) { FindBin->again(); } }\n# line 1 \"$fn\"\n" . $text;
+
         my $ret ;
         my $errout ;
         my $out ;
@@ -279,7 +284,10 @@ sub background_checker
         }
     }
 
-=pod
+1; 
+
+__END__
+
 sub xxxx
     {
 
@@ -354,9 +362,6 @@ sub xxxx
     #     });
 
     # return ;
-=cut
-
-=pod    
 
 AnyEvent::Util::fork_call (sub  
    {
@@ -426,6 +431,5 @@ IO::AIO::reinit ;
 
     $self -> send_notification ($result) ;
     }
-=cut
 
 1 ;

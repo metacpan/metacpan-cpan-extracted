@@ -240,18 +240,18 @@ sub stroke_img_primitive
 	return 1 if $self->linePattern eq lp::Null && $self->rop2 == rop::NoOper;
 
 	my $path = $self->new_path;
-	my @offset  = $self->translate;
-	$path->translate(@offset);
+	my $matrix = $self-> matrix;
+	$path->matrix( $matrix );
 	$path->$request(@_);
 	my $ok = 1;
-	if ( int($self->lineWidth + .5) == 0 ) {
+
+	return $self->graphic_context( sub {
 		# paths produce floating point coordinates and line end arcs,
 		# here we need internal pixel-wise plotting
-		for my $pp ( map { @$_ } @{ $path->points } ) {
-			last unless $ok &= $self->polyline($pp);
-		}
-		return $ok;
-	}
+		$self-> matrix( $Prima::matrix::identity );
+		$self-> lineWidth(0);
+		return $path->stroke;
+	}) if $self->lineWidth < 1.5;
 
 	my %widen;
 	my $method;
@@ -270,7 +270,7 @@ sub stroke_img_primitive
 
 	return unless $self->graphic_context_push;
 	$self->fillPattern(fp::Solid);
-	$self->translate(0,0);
+	$self->matrix( $Prima::matrix::identity );
 	if ( $self-> rop2 == rop::CopyPut && $self->linePattern ne lp::Solid && $self->linePattern ne lp::Null ) {
 		$self->color($self->backColor);
 		my $path3 = $path->widen( linePattern => lp::Solid );
@@ -290,21 +290,25 @@ sub stroke_img_primitive
 
 sub fill_img_primitive
 {
-	my ( $self, $request ) = (shift, shift);
+	my ( $self, $request, @p ) = @_;
+
+	return unless $self->graphic_context_push;
 	my $path = $self->new_path;
-	$path->$request(@_);
-	my @offset  = $self->translate;
+	$path->matrix( $self->matrix);
+	$path->$request(@p);
+
 	my $region1 = $path->region( $self-> fillMode);
-	$region1->offset(@offset);
 	my $region2 = $self->region;
 	$region1->combine($region2, rgnop::Intersect) if $region2;
 	my @box = $region1->box;
 	$box[$_+2] += $box[$_] for 0,1;
 	$self->region($region1);
-	$self->translate(0,0);
+
+	$self->matrix($Prima::matrix::identity);
 	my $ok = $self->bar(@box);
-	$self->translate(@offset);
-	$self->region($region2);
+
+	$self->graphic_context_pop;
+
 	return $ok;
 }
 
@@ -319,13 +323,16 @@ sub stroke_imgaa_primitive
 	return 0 unless $aa->can_aa;
 
 	my $path = $self->new_path;
+	$path->matrix( $self-> matrix );
 	$path->$request(@_);
 	$path = $path->widen(
 		linePattern => ( $lp eq lp::Null) ? lp::Solid : $lp
 	);
+
 	return unless $self->graphic_context_push;
 	$self->fillPattern(fp::Solid);
-	$self->fillMode(fm::Winding);
+	$self->fillMode(fm::Winding | fm::Overlay);
+	$self->matrix($Prima::matrix::identity);
 	$self->color($self->backColor) if $lp eq lp::Null;
 	my $ok = 1;
 	for ($path->points(fill => 1)) {
@@ -339,17 +346,26 @@ sub stroke_imgaa_primitive
 sub fill_imgaa_primitive
 {
 	my ( $self, $request ) = (shift, shift);
-	my $path = $self->new_path;
-	$path->$request(@_);
+
 	my $aa = $self->new_aa_surface;
 	return 0 unless $aa->can_aa;
+
+	my $ok = 1;
+	my $path = $self->new_path;
+	my $m = $self->matrix;
+	$path->matrix($m);
+	$path->$request(@_);
+	$self->matrix($Prima::matrix::identity);
 	for ($path->points(fill => 1)) {
-		return 0 unless $aa->fillpoly($_);
+		next if $aa->fillpoly($_);
+		$ok = 0;
+		last;
 	}
-	return 1;
+	$self->matrix($Prima::matrix::identity);
+	return $ok;
 }
 
-sub stroke_aa_primitive
+sub stroke_primitive
 {
 	my ( $self, $request ) = (shift, shift);
 	return 1 if $self->rop == rop::NoOper;
@@ -358,19 +374,25 @@ sub stroke_aa_primitive
 
 	my $path = $self->new_path;
 	$path->$request(@_);
+
+	return $self->graphic_context( sub {
+		$self-> lineWidth(0);
+		return $path->stroke;
+	} ) if !$self->antialias && $self->alpha == 255 && $self->lineWidth < 1.5;
+
 	$path = $path->widen(
-		linePattern => ( $lp eq lp::Null) ? lp::Solid : $lp
+		linePattern => ( $lp eq lp::Null) ? lp::Solid : $lp,
 	);
 	return unless $self->graphic_context_push;
 	$self->fillPattern(fp::Solid);
-	$self->fillMode(fm::Winding);
+	$self->fillMode(fm::Winding | fm::Overlay);
 	$self->color($self->backColor) if $lp eq lp::Null;
 	my $ok = $path->fill;
 	$self->graphic_context_pop;
 	return $ok;
 }
 
-sub fill_aa_primitive
+sub fill_primitive
 {
 	my ( $self, $request ) = (shift, shift);
 	my $path = $self->new_path;
@@ -395,6 +417,7 @@ sub text_shape_out
 sub get_text_shape_width
 {
 	my ( $self, $text, $flags) = @_;
+	Carp::confess unless defined $text;
 	my %flags = (skip_if_simple => 1);
 	$flags{rtl} = $flags & to::RTL if defined $flags;
 	if ( my $glyphs = $self->text_shape($text, %flags)) {
@@ -408,7 +431,17 @@ sub text_wrap_shape
 	my ( $self, $text, $width, %opt) = @_;
 
 	my $opt    = delete($opt{options}) // tw::Default;
-	my $shaped = $self-> text_shape( $text, %opt );
+
+	my $shaped;
+	if ( $opt & ( tw::NewLineBreak | tw::ExpandTabs | tw::SpaceBreak )) {
+		# looking up a newline glyph can be expensive, and unnecessary here
+		my $t = $text;
+		$t =~ s/[\n\r]/ /gs if $opt & tw::NewLineBreak;
+		$t =~ s/\t/ /s if $opt & ( tw::ExpandTabs | tw::SpaceBreak );
+		$shaped = $self-> text_shape( $t, %opt );
+	} else {
+		$shaped = $self-> text_shape( $text, %opt );
+	}
 	return $self->text_wrap( $text, $width // -1, $opt, delete($opt{tabs}) // 8) unless $shaped;
 	my $ret    = $self-> text_wrap( $text, $width // -1, $opt, delete($opt{tabs}) // 8, 0, -1, $shaped);
 
@@ -447,6 +480,146 @@ sub text_wrap_shape
 	}
 
 	return $ret;
+}
+
+sub render_pattern
+{
+	my ( $package, $handle, %opt ) = @_;
+
+	# parse arguments
+	my $matrix = $opt{matrix};
+	my @margin = defined($opt{margin}) ?
+		( ref($opt{margin}) ? @{$opt{margin}} : (($opt{margin}) x 2)) :
+		( 0,0 );
+
+	return unless $matrix || $margin[0] != 0 || $margin[1] != 0;
+	if ( $margin[0] < 0 || $margin[1] < 0 ) {
+		warn "render_patern: bad margin";
+		return;
+	}
+
+	# non-image
+	if ( !ref($handle) || ref($handle) eq 'ARRAY') {
+		my $p = Prima::Image->new(
+			type         => im::BW,
+			size         => [8,8],
+			rop2         => rop::CopyPut,
+			fillPattern  => $handle,
+			preserveType => 1,
+		);
+		$p->bar(0,0,$p->size);
+		$handle = $p;
+	}
+
+	# all calculations are in 32-bit RGBA or 8-bit GA
+	my $source = $handle->to_rgba;
+	$source->transform( matrix => $matrix )
+		if $matrix;
+
+	$matrix //= Prima::matrix->new;
+
+	# target's size is the same as transformed's image enclosure
+	my $target = ref($handle)->new(
+		size        => [ $source-> size ],
+		type        => (( $handle->type & im::GrayScale ) ? im::Byte : im::RGB),
+		maskType    => 8,
+		autoMasking => am::None,
+	);
+
+	if ( $opt{color}) {
+		$target->backColor($opt{color}) if $opt{color};
+		$target->clear;
+	}
+	if ( exists $opt{alpha} && $handle->isa('Prima::Icon')) {
+		my $fill = chr($opt{alpha} & 0xff);
+		$target->mask( $fill x $target->maskSize );
+	}
+
+	#
+	# instead of calculating plotting positions directly, calculate them as if
+	# we're plotting rectangular source ( before the transformation ) on a target
+	# that is inversely transformed. I.e not this:
+	#
+	#  .......
+	#  .     .
+	#  . __  .
+	#  ./_/...
+	#
+	# but this:
+	#   .
+	#  .  .
+	# .  _ .
+	#  .|_| .
+	#   .  .
+	#     .
+	#
+
+	my $enclosure = sub {
+		my @D = @_;
+		my ( $dx1, $dy1, $dx2, $dy2 ) = @D[0,1,0,1];
+		for ( my $i = 0; $i < @D; $i += 2 ) {
+			my ( $x, $y ) = @D[$i,$i+1];
+			$dx1 = $x if $dx1 > $x;
+			$dy1 = $y if $dy1 > $y;
+			$dx2 = $x if $dx2 < $x;
+			$dy2 = $y if $dy2 < $y;
+		}
+		return ( $dx1, $dy1, $dx2, $dy2 );
+	};
+
+	my @s = $handle->size;
+	$s[$_] += $margin[$_] * 2 for 0,1;
+	my @r = $matrix->transform(
+		0,         0,
+		$s[0] - 1, 0,
+		$s[0] - 1, $s[1] - 1,
+		0,         $s[1] - 1
+	);
+
+	my @aperture = $enclosure->(@r);
+	my @d = ($aperture[2] - $aperture[0], $aperture[3] - $aperture[1]);
+	my @D = $matrix->inverse_transform(
+		0,         0,
+		$d[0] - 1, 0,
+		$d[0] - 1, $d[1] - 1,
+		0        , $d[1] - 1
+	);
+
+	my ( $dx1, $dy1, $dx2, $dy2 ) = $enclosure->(@D);
+
+	$dx1 /= $s[0];
+	$dx2 /= $s[0];
+	$dy1 /= $s[1];
+	$dy2 /= $s[1];
+	$dx1 = int($dx1) - 1;
+	$dy1 = int($dy1) - 1;
+	$dx2 = int($dx2) + 1;
+	$dy2 = int($dy2) + 1;
+
+	my $plotter = Prima::matrix->new( map { int }
+		$r[2] - $r[0],
+		$r[3] - $r[1],
+		$r[0] - $r[6],
+		$r[1] - $r[7],
+		$aperture[0] + $margin[0],
+		$aperture[1] + $margin[1],
+	);
+
+	# execute
+	($dy2, $dy1) = (-$dy1, -$dy2);
+	for ( my $y = $dy1; $y <= $dy2; $y++) {
+		for ( my $x = $dx1; $x <= $dx2; $x++) {
+			$target->put_image($plotter->transform($x,$y), $source);
+		}
+	}
+
+	# finalize
+	if ( $handle-> preserveType ) {
+		$target->type( $handle->type);
+		$target->maskType( $handle->maskType ) if $handle->isa('Prima::Icon');
+	}
+
+	return $target;
 }
 
 1;

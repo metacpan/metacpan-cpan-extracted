@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 2.04
+    version 2.05
 
 SYNOPSIS
 
@@ -947,7 +947,7 @@ EXAMPLES
      use FFI::Platypus 2.00;
      
      my $ffi = FFI::Platypus->new(
-       api => 1,
+       api => 2,
        lib => './swap.so',
      );
      
@@ -1157,7 +1157,7 @@ EXAMPLES
      use FFI::Platypus 2.00;
      
      my $ffi = FFI::Platypus->new(
-       api => 1,
+       api => 2,
        lib => './array_reverse.so',
      );
      
@@ -1892,7 +1892,8 @@ EXAMPLES
 
   Discussion
 
-    The libcurl library makes extensive use of "varadic" functions.
+    The libcurl <https://curl.se/> library makes extensive use of "varadic"
+    functions.
 
     The C programming language and ABI have the concept of "varadic"
     functions that can take a variable number and variable type of
@@ -1911,7 +1912,7 @@ EXAMPLES
     but in some cases the performance penalty may be worth it or
     unavoidable.
 
- Callbacks (with libcurl>
+ Callbacks (with libcurl)
 
   C API
 

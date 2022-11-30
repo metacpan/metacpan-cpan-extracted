@@ -35,7 +35,7 @@ resources:
   bugtracker: https://github.com/PerlAlien/Alien-autoconf/issues
   homepage: https://metacpan.org/pod/Alien::autoconf
   repository: git://github.com/PerlAlien/Alien-autoconf.git
-version: '0.18'
+version: '0.19'
 x_alienfile:
   generated_by: 'Dist::Zilla::Plugin::AlienBuild version 0.32'
   requires:
@@ -47,6 +47,7 @@ x_alienfile:
       IO::Socket::SSL: '1.56'
       IO::Zlib: '0'
       Mojo::DOM58: '1.00'
+      Mozilla::CA: '0'
       Net::SSLeay: '1.49'
       Path::Tiny: '0'
       Sort::Versions: '0'

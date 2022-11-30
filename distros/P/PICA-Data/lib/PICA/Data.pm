@@ -1,7 +1,7 @@
 package PICA::Data;
 use v5.14.1;
 
-our $VERSION = '2.04';
+our $VERSION = '2.05';
 
 use Exporter 'import';
 our @EXPORT_OK
@@ -9,16 +9,17 @@ our @EXPORT_OK
     pica_match pica_values pica_value pica_fields pica_subfields
     pica_title pica_holdings pica_items pica_field
     pica_split pica_annotation pica_sort pica_guess clean_pica pica_string pica_id
+    pica_sort_subfields parse_subfield_schedule
     pica_diff pica_patch pica_empty);
 our %EXPORT_TAGS = (all => [@EXPORT_OK]);
 
 our $ILN_PATH = PICA::Path->new('101@a');
 our $EPN_PATH = PICA::Path->new('203@/*$0');
 
-use Carp qw(croak);
+use Carp         qw(croak);
 use Scalar::Util qw(reftype blessed);
-use Encode qw(decode);
-use List::Util qw(first any);
+use Encode       qw(decode);
+use List::Util   qw(first any);
 use IO::Handle;
 use PICA::Path qw(pica_field_matcher);
 use Hash::MultiValue;
@@ -409,6 +410,35 @@ sub pica_annotation {
     }
 }
 
+*parse_subfield_schedule = *PICA::Schema::parse_subfield_schedule;
+
+sub pica_sort_subfields {
+    my ($field, $schedule) = @_;
+    $schedule = parse_subfield_schedule($schedule) unless ref $schedule;
+
+    my @spec = grep {exists $_->{order}} map {
+        {%{$schedule->{$_}}, code => $_}
+    } keys %$schedule;
+
+    my $sf = pica_subfields([$field]);
+    splice @$field, 2;
+
+    for my $sfdef (sort {$a->{order} cmp $b->{order}} @spec) {
+        my $code   = $sfdef->{code};
+        my @values = $sf->get_all($code);
+        next unless @values;
+
+        if ($sfdef->{repeatable}) {
+            push @$field, $code, $_ for @values;
+        }
+        else {
+            push @$field, $code, $values[0];
+        }
+    }
+
+    return @$field > 2 ? $field : undef;
+}
+
 *fields    = *pica_fields;
 *subfields = *pica_subfields;
 *title     = *pica_title;
@@ -560,7 +590,7 @@ PICA::Data - PICA record processing
 
 =begin markdown 
 
-[![Unix build Status](https://travis-ci.com/gbv/PICA-Data.png)](https://travis-ci.com/gbv/PICA-Data)
+[![Linux build status](https://github.com/gbv/PICA-Data/actions/workflows/linux.yml/badge.svg)](https://github.com/gbv/PICA-Data/actions/workflows/linux.yml)
 [![Linux build status](https://github.com/gbv/PICA-Data/actions/workflows/linux.yml/badge.svg)](https://github.com/gbv/PICA-Data/actions/workflows/linux.yml)
 [![Windows build status](https://ci.appveyor.com/api/projects/status/5qjak74x7mjy7ne6?svg=true)](https://ci.appveyor.com/project/nichtich/pica-data)
 [![Coverage Status](https://coveralls.io/repos/gbv/PICA-Data/badge.svg)](https://coveralls.io/r/gbv/PICA-Data)
@@ -827,6 +857,17 @@ limits result to given level, including identifiers (PPN/ILN) of higher levels.
 Returns a copy of the record with sorted fields (first level 1 fields, then
 level 2 fields not belonging to a level 1, then level 1, each followed by level
 2 sorted by EPN). Also available as accessor C<sort>. 
+
+=head2 pica_sort_subfields( $field, $schedule )
+
+Sorts and filters subfields of a PICA field (given as array reference) with an
+L<subfield schedule|https://format.gbv.de/schema/avram/specification#subfield-schedule>.
+The schedule can also be given as string of subfield codes, parsed with
+L<parse_subfield_schedule|PICA::Schema/parse_subfield_schedule>: repeatable
+subfields must be marked with C<*> or C<+>, otherwise or only the first
+subfield of this code is preserved. Undefined and missing subfields are ignored
+as well as subfield without information about its order. Returns the modified
+field, unless it is empty.
 
 =head2 pica_annotation( $field [, $annotation ] )
 

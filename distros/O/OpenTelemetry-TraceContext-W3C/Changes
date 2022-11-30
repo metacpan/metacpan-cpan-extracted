@@ -1,0 +1,9 @@
+Revision history for OpenTelemetry-TraceContext-W3C
+
+0.02      2022-11-21 20:54:05 CET
+
+    - Added missing test dependency
+
+0.01      2022-11-20 16:46:44 CET
+
+    - First public release

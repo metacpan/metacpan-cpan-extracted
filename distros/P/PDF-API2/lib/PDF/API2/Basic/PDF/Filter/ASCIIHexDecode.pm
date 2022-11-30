@@ -5,7 +5,7 @@ use base 'PDF::API2::Basic::PDF::Filter';
 use strict;
 use warnings;
 
-our $VERSION = '2.043'; # VERSION
+our $VERSION = '2.044'; # VERSION
 
 # Maintainer's Note: ASCIIHexDecode is described in the PDF 1.7 spec
 # in section 7.4.2.

@@ -5,7 +5,7 @@
 use v5.12;
 
 package Chart::Property::DataType::Color;
-our $VERSION = 'v2.403.8';
+our $VERSION = 'v2.403.9';
 
 use base qw(Graphics::Toolkit::Color);
 

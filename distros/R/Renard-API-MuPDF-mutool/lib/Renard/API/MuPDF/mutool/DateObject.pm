@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Renard::API::MuPDF::mutool::DateObject;
 # ABSTRACT: An object to store the date
-$Renard::API::MuPDF::mutool::DateObject::VERSION = '0.005';
+$Renard::API::MuPDF::mutool::DateObject::VERSION = '0.006';
 use Moo;
 use Renard::Incunabula::Common::Types qw(Str HashRef InstanceOf);
 
@@ -147,7 +147,7 @@ Renard::API::MuPDF::mutool::DateObject - An object to store the date
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 EXTENDS
 

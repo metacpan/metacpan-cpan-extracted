@@ -4,7 +4,7 @@ NAME
 
 VERSION
 
-    version 2.72
+    version 2.74
 
 SYNOPSIS
 
@@ -1205,6 +1205,8 @@ AUTHOR
     Håkon Hægland (hakonhagland, HAKONH)
 
     nick nauwelaerts (INPHOBIA)
+
+    Florian Weimer
 
 COPYRIGHT AND LICENSE
 

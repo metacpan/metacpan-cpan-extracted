@@ -58,6 +58,8 @@ sub register_smart_cb {
 	$Callbacks{$objaddr}{$key} = $func_struct;
 }
 
+*register_cb = \&register_smart_cb;
+
 sub cleanup {
 	my ($widget) = @_;
 	my $objaddr = $$widget;

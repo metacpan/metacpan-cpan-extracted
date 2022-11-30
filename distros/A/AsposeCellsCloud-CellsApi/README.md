@@ -20,11 +20,11 @@ Perl Cloud SDK wraps Aspose.Cells Cloud API. The SDK enhances your Android apps 
 - Fetch the required shape from worksheet.
 - Leverage the power of named ranges.
 
-## Feature & Enhancements in Version 22.10
+## Feature & Enhancements in Version 22.11
 
-- Add api for converting workbook to pptx.
-- Add api for converting workbook to html.
-- Add api for converting workbook to markdown.
+- Add api for converting workbook to json.
+- Add api for converting workbook to sql.
+- Add api for converting workbook to csv.
  
 ## Read & Write Spreadsheet Formats
 

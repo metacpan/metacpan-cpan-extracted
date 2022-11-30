@@ -3,7 +3,7 @@ package OpenTracing::Implementation::DataDog;
 use strict;
 use warnings;
 
-our $VERSION = 'v0.43.1';
+our $VERSION = 'v0.43.2';
 
 use aliased 'OpenTracing::Implementation::DataDog::Tracer';
 

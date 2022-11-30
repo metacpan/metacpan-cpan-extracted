@@ -4,7 +4,7 @@ use v5.12;
 
 package Chart::Composite;
 our @ISA     = qw(Chart::Base);
-our $VERSION = 'v2.403.8';
+our $VERSION = 'v2.403.9';
 
 use Chart::Base;
 use GD;

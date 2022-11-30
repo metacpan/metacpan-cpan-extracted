@@ -1,5 +1,5 @@
 package Net::Checkpoint::Management::v1;
-$Net::Checkpoint::Management::v1::VERSION = '0.001010';
+$Net::Checkpoint::Management::v1::VERSION = '0.002000';
 # ABSTRACT: Checkpoint Management API version 1.x client library
 
 use 5.024;
@@ -207,6 +207,28 @@ Net::Checkpoint::Management::v1::Role::ObjectMethods->apply([
         get      => 'show-host',
         update   => 'set-host',
         delete   => 'delete-host',
+        list_key => 'objects',
+        id_keys  => [qw( uid name )],
+    },
+    {
+        object   => 'address_ranges',
+        singular => 'address_range',
+        create   => 'add-address-range',
+        list     => 'show-address-ranges',
+        get      => 'show-address-range',
+        update   => 'set-address-range',
+        delete   => 'delete-address-range',
+        list_key => 'objects',
+        id_keys  => [qw( uid name )],
+    },
+    {
+        object   => 'dns_domains',
+        singular => 'dns_domain',
+        create   => 'add-dns-domain',
+        list     => 'show-dns-domains',
+        get      => 'show-dns-domain',
+        update   => 'set-dns-domain',
+        delete   => 'delete-dns-domain',
         list_key => 'objects',
         id_keys  => [qw( uid name )],
     },
@@ -437,7 +459,7 @@ Net::Checkpoint::Management::v1 - Checkpoint Management API version 1.x client l
 
 =head1 VERSION
 
-version 0.001010
+version 0.002000
 
 =head1 SYNOPSIS
 
@@ -524,7 +546,7 @@ Alexander Hartmaier <abraxxa@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2020 by Alexander Hartmaier.
+This software is copyright (c) 2022 by Alexander Hartmaier.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

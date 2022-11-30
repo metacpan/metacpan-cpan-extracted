@@ -16,7 +16,7 @@ use Mojo::URL;
 #     }
 #   };
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 
 my $WK_PATH = '/.well-known/webfinger';

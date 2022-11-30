@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Modern
 
-our $VERSION = '0.557';
+our $VERSION = '0.558';
 
 use 5.020;
 use strictures 2;
@@ -179,15 +179,15 @@ sub unjsonp ($path) {
 }
 
 # get all annotations produced for the current instance data location (that are visible to this
-# schema location)
+# schema location) - remember these are hashrefs, not Annotation objects
 sub local_annotations ($state) {
-  grep $_->instance_location eq $state->{data_path}, $state->{annotations}->@*;
+  grep $_->{instance_location} eq $state->{data_path}, $state->{annotations}->@*;
 }
 
 # shorthand for finding the canonical uri of the present schema location
 # last argument can be an arrayref, usually coming from $state->{_schema_path_suffix}
 sub canonical_uri ($state, @extra_path) {
-  return $state->{initial_schema_uri} if not length($state->{schema_path}) and not @extra_path;
+  return $state->{initial_schema_uri} if not @extra_path and not length($state->{schema_path});
   splice(@extra_path, -1, 1, $extra_path[-1]->@*) if @extra_path and is_plain_arrayref($extra_path[-1]);
   my $uri = $state->{initial_schema_uri}->clone;
   my $fragment = ($uri->fragment//'').(@extra_path ? jsonp($state->{schema_path}, @extra_path) : $state->{schema_path});
@@ -243,23 +243,24 @@ sub E ($state, $error_string, @args) {
 sub A ($state, $annotation) {
   return 1 if not $state->{collect_annotations} or $state->{spec_version} eq 'draft7';
 
-  my $uri = canonical_uri($state, $state->{keyword}, $state->{_schema_path_suffix})
-    ->to_abs($state->{effective_base_uri});
+  # we store the absolute uri in unresolved form until needed,
+  # and perform the rest of the calculations later.
+
+  my $uri = [ canonical_uri($state, $state->{keyword}, $state->{_schema_path_suffix}),
+    $state->{effective_base_uri} ];
 
   my $keyword_location = $state->{traversed_schema_path}
     .jsonp($state->{schema_path}, $state->{keyword}, delete $state->{_schema_path_suffix});
 
-  undef $uri if $uri eq '' and $keyword_location eq ''
-    or ($uri->fragment // '') eq $keyword_location and $uri->clone->fragment(undef) eq '';
-
-  push $state->{annotations}->@*, JSON::Schema::Modern::Annotation->new(
+  push $state->{annotations}->@*, {
     keyword => $state->{keyword},
     instance_location => $state->{data_path},
     keyword_location => $keyword_location,
-    defined $uri ? ( absolute_keyword_location => $uri ) : (),
+    # we calculate absolute_keyword_location when instantiating the Annotation object for Result
+    _uri => $uri,
     annotation => $annotation,
     $state->{_unknown} ? ( unknown => 1 ) : (),
-  );
+  };
 
   return 1;
 }
@@ -364,7 +365,7 @@ JSON::Schema::Modern::Utilities - Internal utilities for JSON::Schema::Modern
 
 =head1 VERSION
 
-version 0.557
+version 0.558
 
 =head1 SYNOPSIS
 

@@ -232,18 +232,14 @@ REFECO::Blockchain::Contract::Solidity::ABI::Type role for solidity variable typ
 
 =head1 SYNOPSIS
 
-In most cases you don't want to use this directly, instead use:
-
-=item * B<Encoder>: L<REFECO::Blockchain::Contract::Solidity::ABI::Encoder>
-
-=item * B<Decoder>: L<REFECO::Blockchain::Contract::Solidity::ABI::Decoder>
-
+In most cases you don't want to use this directly, use L<REFECO::Blockchain::Contract::Solidity::ABI::Encoder> or L<REFECO::Blockchain::Contract::Solidity::ABI::Decoder> instead.
 
 Allows you to define and instantiate a solidity variable type:
 
     my $type = REFECO::Blockchain::Contract::Solidity::ABI::Type::new_type(
-        signature => $type_signature,
-        data      => $param{$type_signature}));
+        signature => $signature,
+        data      => $value
+    );
 
     $type->encode();
     ...
@@ -256,6 +252,7 @@ Create a new L<REFECO::Blockchain::Contract::Solidity::ABI::Type> instance based
 in the given signature.
 
 Usage:
+
     new_type(signature => signature, data => value) -> L<REFECO::Blockchain::Contract::Solidity::ABI::Type::*>
 
 =over 4

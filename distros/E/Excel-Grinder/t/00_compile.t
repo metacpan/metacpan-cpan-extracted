@@ -7,8 +7,7 @@ use_ok $_ for qw(
 );
 
 # and that we can create the object
-my $temp_dir = '/tmp/excel_grinder';
-my $xlsx = Excel::Grinder->new($temp_dir);
+my $xlsx = Excel::Grinder->new();
 isa_ok( $xlsx, 'Excel::Grinder', 'Object created' );
 
 # attempt to create a basic spreadsheet
@@ -49,7 +48,7 @@ ok($data_verified, 'Read data back in from Excel');
 
 # clean up
 unlink $full_file_path;
-rmdir $temp_dir;
+rmdir $xlsx->{default_directory};
 
 done_testing;
 

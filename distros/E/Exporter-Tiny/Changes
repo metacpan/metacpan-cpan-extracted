@@ -6,6 +6,17 @@ Home page:    <https://metacpan.org/release/Exporter-Tiny>
 Bug tracker:  <https://github.com/tobyink/p5-exporter-tiny/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+1.006000	2022-11-21
+
+ [ Packaging ]
+ - Stable version number.
+
+1.005_000	2022-10-17
+
+ - Introduced lexical exporter support on Perl 5.11.2+ using the
+   Lexical::Var module.
+ - Refactored the Perl 5.37.2+ lexical exporter support.
+
 1.004004	2022-10-15
 
  [ Documentation ]

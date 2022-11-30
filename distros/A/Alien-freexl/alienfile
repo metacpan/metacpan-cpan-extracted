@@ -33,7 +33,7 @@ share {
   my $with_cpp11 = '';
 
   #  need to work out how to get latest
-  start_url 'http://www.gaia-gis.it/gaia-sins/freexl-sources/';
+  start_url 'https://www.gaia-gis.it/gaia-sins/freexl-sources/';
   plugin Download => (
     filter  => qr/^freexl-([0-9\.]+)\.tar\.gz$/,
     version => qr/^freexl-([0-9\.]+)\.tar\.gz$/,
@@ -97,6 +97,27 @@ share {
   ];
 
 };
+
+
+gather [
+    \&rename_la_files,
+];
+
+sub rename_la_files {
+    #  need to return if not share
+    return if !$on_windows;
+    
+    use File::Find::Rule;
+    my @la_files
+      = File::Find::Rule->file()
+                        ->name( '*.la' )
+                        ->in( '.' );
+    foreach my $file (@la_files) {
+        say "Renaming $file so it will not intefere with gdal compilation";
+        rename $file, $file . '.bak';
+    }
+
+}
 
 
 sub pause {

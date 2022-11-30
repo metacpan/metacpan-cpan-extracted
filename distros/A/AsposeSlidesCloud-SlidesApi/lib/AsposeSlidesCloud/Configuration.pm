@@ -48,6 +48,7 @@ sub new {
 	$p{timeout} //= 0;
 	$p{http_request_timeout} //= 3000;
 	$p{debug} //= 0;
+	$p{allow_insecure_requests} //= 0;
 	$p{custom_headers} //= {};
 
 	return bless \%p => $self;

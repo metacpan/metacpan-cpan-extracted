@@ -32,8 +32,8 @@
       },
       "runtime" : {
          "requires" : {
-            "PDL::IO::MDIF" : "1.011",
-            "PDL::IO::Touchstone" : "1.011",
+            "PDL::IO::MDIF" : "1.013",
+            "PDL::IO::Touchstone" : "1.013",
             "perl" : "5.010"
          }
       },
@@ -54,6 +54,6 @@
          "web" : "https://github.com/KJ7LNW/perl-RF-Component.git"
       }
    },
-   "version" : "1.005",
+   "version" : "1.006",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

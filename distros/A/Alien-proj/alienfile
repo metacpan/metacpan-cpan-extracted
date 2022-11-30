@@ -113,7 +113,7 @@ share {
     plugin 'Prefer::BadVersion' => '7.1.0';
   }
   
-  start_url 'http://download.osgeo.org/proj/';
+  start_url 'https://download.osgeo.org/proj/';
   #start_url "file://$base_dir";  #  debug
   plugin Download => (
     filter  => qr/^proj-([0-9\.]+)\.tar\.gz$/,

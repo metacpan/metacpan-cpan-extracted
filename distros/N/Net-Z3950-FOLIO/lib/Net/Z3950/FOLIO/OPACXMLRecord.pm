@@ -4,6 +4,9 @@ use strict;
 use warnings;
 
 
+use Net::Z3950::FOLIO::PostProcess::OPAC qw(postProcessHoldings);
+
+
 sub makeOPACXMLRecord {
     my($rec) = @_;
     my $marc = $rec->marcRecord();
@@ -18,6 +21,7 @@ sub makeOPACXMLRecord {
     $marcXML =~ s/^/    /gm;
 
     my $holdingsObjects = $rec->holdings($marc);
+    $holdingsObjects = postProcessHoldings(($rec->rs()->session()->{cfg}->{postProcessing} || {})->{opac}, $holdingsObjects);
     my $holdingsRecords = _resolveHoldingsToXML($holdingsObjects);
 
     return _makeXMLElement(0, 'opacRecord', (

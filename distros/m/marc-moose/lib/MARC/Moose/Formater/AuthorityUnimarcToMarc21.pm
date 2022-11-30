@@ -1,5 +1,5 @@
 package MARC::Moose::Formater::AuthorityUnimarcToMarc21;
-$MARC::Moose::Formater::AuthorityUnimarcToMarc21::VERSION = '1.0.45';
+$MARC::Moose::Formater::AuthorityUnimarcToMarc21::VERSION = '1.0.46';
 # ABSTRACT: Convert authority record from UNIMARC to MARC21
 use Moose;
 
@@ -109,7 +109,7 @@ MARC::Moose::Formater::AuthorityUnimarcToMarc21 - Convert authority record from 
 
 =head1 VERSION
 
-version 1.0.45
+version 1.0.46
 
 =head1 SYNOPSYS
 

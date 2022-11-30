@@ -29,7 +29,7 @@ sub api : Tests(16) {
     request          => HashRef,
     response         => InstanceOf['Furl::Response'],
     decoded_response => HashRef,
-    error            => undef,
+    error            => 0,
   );
   
   $self->_fake_http_auth();
@@ -56,7 +56,6 @@ sub api : Tests(16) {
   # error messages are filled in corresponding to the codes in the _fake_http_response subroutine.
   $self->_fake_http_response(code => 400);
   throws_ok sub { $api->api(uri => 'https://x') }, qr/Bad request/i, 'Get 400 should throw';
-  $valid_trans{decoded_response} = undef;
   $valid_trans{error} = StrMatch[qr/400 Bad request/i];
   is_valid_n $api->transaction(), %valid_trans, 'Transaction 400';
 
@@ -73,7 +72,8 @@ sub api : Tests(16) {
 
   $self->_fake_http_response(code => "die");
   throws_ok sub { $api->api(uri => 'https://x') }, qr/Furl died/i, 'Request that dies should throw';
-  $valid_trans{response} = undef;
+  $valid_trans{response} = 0;
+  $valid_trans{decoded_response} = 0;
   $valid_trans{error} = StrMatch[qr/Furl died/i];
   is_valid_n $api->transaction(), %valid_trans, 'Transaction dies';
   

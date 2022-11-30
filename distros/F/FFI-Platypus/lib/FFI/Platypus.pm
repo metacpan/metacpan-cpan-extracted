@@ -8,7 +8,7 @@ use FFI::Platypus::Function;
 use FFI::Platypus::Type;
 
 # ABSTRACT: Write Perl bindings to non-Perl libraries with FFI. No XS required.
-our $VERSION = '2.04'; # VERSION
+our $VERSION = '2.05'; # VERSION
 
 # Platypus-Man,
 # Platypus-Man,
@@ -598,7 +598,7 @@ FFI::Platypus - Write Perl bindings to non-Perl libraries with FFI. No XS requir
 
 =head1 VERSION
 
-version 2.04
+version 2.05
 
 =head1 SYNOPSIS
 
@@ -1576,7 +1576,7 @@ complexity of C.
  use FFI::Platypus 2.00;
  
  my $ffi = FFI::Platypus->new(
-   api => 1,
+   api => 2,
    lib => './swap.so',
  );
  
@@ -1784,7 +1784,7 @@ buffer into a Perl string and print it out using the Platypus L<cast method|/cas
  use FFI::Platypus 2.00;
  
  my $ffi = FFI::Platypus->new(
-   api => 1,
+   api => 2,
    lib => './array_reverse.so',
  );
  
@@ -2528,7 +2528,7 @@ but now we have an OO interface to the Unix IO functions.
 
 =head3 Discussion
 
-The C<libcurl> library makes extensive use of "varadic" functions.
+The L<libcurl|https://curl.se/> library makes extensive use of "varadic" functions.
 
 The C programming language and ABI have the concept of "varadic" functions
 that can take a variable number and variable type of arguments.  Assuming
@@ -2545,7 +2545,7 @@ L<function method|/function> and call it immediately.  This is not as
 performant either when you create or call as using the L<attach method|/attach>,
 but in some cases the performance penalty may be worth it or unavoidable.
 
-=head2 Callbacks (with libcurl>
+=head2 Callbacks (with libcurl)
 
 =head3 C API
 

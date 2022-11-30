@@ -431,6 +431,12 @@ defines the standards of RiveScript.
 
 # CHANGES
 
+    2.0.4  Nov 25 2022
+    - Fix certain combinations of nested tags causing an infinite loop to
+      parse them.
+    - Fix {weight} tags in triggers not trimming remaining whitespace after
+      they are removed, which affected trigger matching ability.
+
     2.0.3  Aug 26 2016
     - Fix inline comment regexp that was making URLs impossible to represent
       in replies.

@@ -23,16 +23,14 @@ my $meta = {
                                          recommends => { "Class::XSAccessor" => 0 },
                                          requires   => { "Exporter::Shiny" => "1.002000", "perl" => "5.008000" },
                                        },
-                          test      => { requires => { "Test::More" => 0.96 } },
+                          test      => { requires => { "JSON::PP" => 0, "Test::More" => 0.96 } },
                         },
   "provides"         => {
-                          "Object::Adhoc" => { file => "lib/Object/Adhoc.pm", version => 0.005 },
+                          "Object::Adhoc" => { file => "lib/Object/Adhoc.pm", version => 0.006 },
                         },
   "release_status"   => "stable",
   "resources"        => {
-                          bugtracker   => {
-                                            web => "http://rt.cpan.org/Dist/Display.html?Queue=Object-Adhoc",
-                                          },
+                          bugtracker   => { web => "https://github.com/tobyink/p5-object-adhoc/issues" },
                           homepage     => "https://metacpan.org/release/Object-Adhoc",
                           license      => ["http://dev.perl.org/licenses/"],
                           repository   => {
@@ -42,7 +40,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/Object-Adhoc/project",
                         },
-  "version"          => 0.005,
+  "version"          => 0.006,
   "x_static_install" => 1,
 };
 
@@ -117,28 +115,8 @@ else
 	}
 }
 
-sub FixMakefile
-{
-	return unless -d 'inc';
-	my $file = shift;
-	
-	local *MAKEFILE;
-	open MAKEFILE, "< $file" or die "FixMakefile: Couldn't open $file: $!; bailing out";
-	my $makefile = do { local $/; <MAKEFILE> };
-	close MAKEFILE or die $!;
-	
-	$makefile =~ s/\b(test_harness\(\$\(TEST_VERBOSE\), )/$1'inc', /;
-	$makefile =~ s/( -I\$\(INST_ARCHLIB\))/ -Iinc$1/g;
-	$makefile =~ s/( "-I\$\(INST_LIB\)")/ "-Iinc"$1/g;
-	$makefile =~ s/^(FULLPERL = .*)/$1 "-Iinc"/m;
-	$makefile =~ s/^(PERL = .*)/$1 "-Iinc"/m;
-	
-	open  MAKEFILE, "> $file" or die "FixMakefile: Couldn't open $file: $!; bailing out";
-	print MAKEFILE $makefile or die $!;
-	close MAKEFILE or die $!;
-}
 
 my $mm = WriteMakefile(%WriteMakefileArgs);
-FixMakefile($mm->{FIRST_MAKEFILE} || 'Makefile');
+
 exit(0);
 

@@ -1,4 +1,4 @@
-package Dist::Zilla::MVP::Assembler 6.028;
+package Dist::Zilla::MVP::Assembler 6.029;
 # ABSTRACT: Dist::Zilla-specific subclass of Config::MVP::Assembler
 
 use Moose;
@@ -86,7 +86,7 @@ Dist::Zilla::MVP::Assembler - Dist::Zilla-specific subclass of Config::MVP::Asse
 
 =head1 VERSION
 
-version 6.028
+version 6.029
 
 =head1 DESCRIPTION
 

@@ -9,6 +9,8 @@ use Venus::Class 'base';
 
 base 'Venus::Name';
 
+state $SERIAL = 0;
+
 # BUILDERS
 
 sub build_self {
@@ -46,11 +48,13 @@ sub append {
 }
 
 sub array {
-  my ($self, $name) = @_;
+  my ($self, $name, @data) = @_;
 
   no strict 'refs';
 
   my $class = $self->package;
+
+  @{"${class}::${name}"} = @data if @data;
 
   return [@{"${class}::${name}"}];
 }
@@ -280,11 +284,13 @@ sub explain {
 }
 
 sub hash {
-  my ($self, $name) = @_;
+  my ($self, $name, @data) = @_;
 
   no strict 'refs';
 
   my $class = $self->package;
+
+  %{"${class}::${name}"} = (@data) if @data;
 
   return {%{"${class}::${name}"}};
 }
@@ -405,6 +411,18 @@ sub meta {
   return Venus::Meta->new(name => $self->package);
 }
 
+sub mock {
+  my ($self) = @_;
+
+  my $name = sprintf '%s::Mock::%04d::%s', $self->class, ++$SERIAL, $self->package;
+
+  my $space = $self->class->new($name);
+
+  $space->do('init')->array('ISA', $self->package) if !$space->loaded;
+
+  return $space;
+}
+
 sub name {
   my ($self) = @_;
 
@@ -508,11 +526,13 @@ sub root {
 }
 
 sub routine {
-  my ($self, $name) = @_;
+  my ($self, $name, $code) = @_;
 
   no strict 'refs';
 
   my $class = $self->package;
+
+  *{"${class}::${name}"} = $code if $code;
 
   return *{"${class}::${name}"}{"CODE"};
 }
@@ -531,11 +551,13 @@ sub routines {
 }
 
 sub scalar {
-  my ($self, $name) = @_;
+  my ($self, $name, @data) = @_;
 
   no strict 'refs';
 
   my $class = $self->package;
+
+  ${"${class}::${name}"} = $data[0] if @data;
 
   return ${"${class}::${name}"};
 }
@@ -858,9 +880,9 @@ I<Since C<0.01>>
 
 =head2 array
 
-  array(Str $name) (ArrayRef)
+  array(Str $name, Any @data) (ArrayRef)
 
-The array method returns the value for the given package array variable name.
+The array method gets or sets the value for the given package array variable name.
 
 I<Since C<0.01>>
 
@@ -879,6 +901,24 @@ I<Since C<0.01>>
   my $array = $space->array('handler');
 
   # ["start"]
+
+=back
+
+=over 4
+
+=item array example 2
+
+  # given: synopsis;
+
+  package Foo::Bar;
+
+  our @handler = 'start';
+
+  package main;
+
+  my $array = $space->array('handler', 'restart');
+
+  # ["restart"]
 
 =back
 
@@ -1527,9 +1567,9 @@ I<Since C<0.01>>
 
 =head2 hash
 
-  hash(Str $name) (HashRef)
+  hash(Str $name, Any @data) (HashRef)
 
-The hash method returns the value for the given package hash variable name.
+The hash method gets or sets the value for the given package hash variable name.
 
 I<Since C<0.01>>
 
@@ -1550,6 +1590,26 @@ I<Since C<0.01>>
   my $hash = $space->hash('settings');
 
   # { active => 1 }
+
+=back
+
+=over 4
+
+=item hash example 2
+
+  # given: synopsis;
+
+  package Foo::Bar;
+
+  our %settings = (
+    active => 1
+  );
+
+  package main;
+
+  my $hash = $space->hash('settings', inactive => 1);
+
+  # { inactive => 1 }
 
 =back
 
@@ -1993,6 +2053,33 @@ I<Since C<1.02>>
 
 =cut
 
+=head2 mock
+
+  mock() (Space)
+
+The mock method returns a L<Venus::Space> object representing an anonymous
+package that derives from the invoking package.
+
+I<Since C<1.50>>
+
+=over 4
+
+=item mock example 1
+
+  # given: synopsis
+
+  package main;
+
+  my $mock = $space->mock;
+
+  # bless({'name' => 'Venus::Space::Mock::0001::Foo::Bar'}, 'Venus::Space')
+
+  # $mock->isa('Foo::Bar') # true
+
+=back
+
+=cut
+
 =head2 name
 
   name() (Str)
@@ -2399,9 +2486,9 @@ I<Since C<0.01>>
 
 =head2 routine
 
-  routine(Str $name) (CodeRef)
+  routine(Str $name, CodeRef $code) (CodeRef)
 
-The routine method returns the subroutine reference for the given subroutine
+The routine method gets or sets the subroutine reference for the given subroutine
 name.
 
 I<Since C<0.01>>
@@ -2427,6 +2514,32 @@ I<Since C<0.01>>
   my $space = Venus::Space->new('foo');
 
   my $routine = $space->routine('cont');
+
+  # sub { ... }
+
+=back
+
+=over 4
+
+=item routine example 2
+
+  package Foo;
+
+  sub cont {
+    [@_]
+  }
+
+  sub abort {
+    [@_]
+  }
+
+  package main;
+
+  use Venus::Space;
+
+  my $space = Venus::Space->new('foo');
+
+  my $routine = $space->routine('report', sub{[@_]});
 
   # sub { ... }
 
@@ -2473,9 +2586,9 @@ I<Since C<0.01>>
 
 =head2 scalar
 
-  scalar(Str $name) (Any)
+  scalar(Str $name, Any @data) (Any)
 
-The scalar method returns the value for the given package scalar variable name.
+The scalar method gets or sets the value for the given package scalar variable name.
 
 I<Since C<0.01>>
 
@@ -2494,6 +2607,24 @@ I<Since C<0.01>>
   my $scalar = $space->scalar('root');
 
   # "/path/to/file"
+
+=back
+
+=over 4
+
+=item scalar example 2
+
+  # given: synopsis;
+
+  package Foo::Bar;
+
+  our $root = '/path/to/file';
+
+  package main;
+
+  my $scalar = $space->scalar('root', '/tmp/path/to/file');
+
+  # "/tmp/path/to/file"
 
 =back
 

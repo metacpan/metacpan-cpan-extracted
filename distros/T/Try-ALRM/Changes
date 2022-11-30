@@ -39,3 +39,7 @@ Revision history for Perl extension Try::ALRM.
         - thanks to DCANTRELL for convincing me that 'try'
           should be something that doesn't conflict with
           Try::Tiny::try
+
+0.7  Tue Nov 29 11:00:00 2022
+        - updated POD, mainly to add 8 tiny reindeer at the
+          end

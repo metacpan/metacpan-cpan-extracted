@@ -29,6 +29,7 @@ WriteMakefile(
     PREREQ_PM => {
         'SPVM' => '0.9661',
         'SPVM::Sys' => '0.26',
+        'SPVM::Math' => '0.11',
     },
 );
 
@@ -36,15 +37,9 @@ WriteMakefile(
 sub MY::postamble {
 
   my $make_rule = '';
+
+  $make_rule .= SPVM::Builder::Util::API::create_make_rule_native('IO::Util');
   
-  # Precompile make rule
-  $make_rule .= SPVM::Builder::Util::API::create_make_rule_precompile("IO::Select");
-  $make_rule .= SPVM::Builder::Util::API::create_make_rule_precompile("IO::Socket::INET");
-
-  # Native make rule
-  $make_rule .= SPVM::Builder::Util::API::create_make_rule_native("IO::Select");
-  $make_rule .= SPVM::Builder::Util::API::create_make_rule_native("IO::Socket::INET");
-
   return $make_rule;
 }
 

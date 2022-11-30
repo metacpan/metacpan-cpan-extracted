@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
 
-package Metrics::Any::Adapter 0.08;
+package Metrics::Any::Adapter 0.09;
 
 use v5.14;
 use warnings;

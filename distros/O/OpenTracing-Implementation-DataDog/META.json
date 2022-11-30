@@ -41,7 +41,7 @@
             "LWP::UserAgent" : "0",
             "Moo" : "0",
             "Moo::Role" : "0",
-            "MooX::Attribute::ENV" : "0.02",
+            "MooX::Attribute::ENV" : "0.04",
             "MooX::Enumeration" : "0",
             "MooX::HandlesVia" : "0",
             "MooX::Should" : "v0.1.4",
@@ -72,6 +72,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v0.43.1",
+   "version" : "v0.43.2",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

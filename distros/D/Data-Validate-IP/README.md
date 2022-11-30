@@ -4,7 +4,7 @@ Data::Validate::IP - IPv4 and IPv6 validation methods
 
 # VERSION
 
-version 0.30
+version 0.31
 
 # SYNOPSIS
 
@@ -28,8 +28,8 @@ version 0.30
 
 # DESCRIPTION
 
-This module provides a number IP address validation subs that both validate
-and untaint their input. This includes both basic validation (`is_ipv4()` and
+This module provides a number IP address validation subs that both validate and
+untaint their input. This includes both basic validation (`is_ipv4()` and
 `is_ipv6()`) and special cases like checking whether an address belongs to a
 specific network or whether an address is public or private (reserved).
 
@@ -46,15 +46,15 @@ sufficient if you are dealing with untrusted input. You should always check
 `is_ipv4($ip)` as well. This applies as well when using IPv6 functions or
 generic functions like `is_private_ip($ip)`.
 
-There are security implications to this around certain oddly formed
-addresses. Notably, an address like "010.0.0.1" is technically valid, but the
-operating system will treat "010" as an octal number. That means that
-"010.0.0.1" is equivalent to "8.0.0.1", _not_ "10.0.0.1".
+There are security implications to this around certain oddly formed addresses.
+Notably, an address like "010.0.0.1" is technically valid, but the operating
+system will treat "010" as an octal number. That means that "010.0.0.1" is
+equivalent to "8.0.0.1", _not_ "10.0.0.1".
 
 However, this module's `is_ipv4($ip)` and `is_ip($ip)` functions will return
-false for addresses like "010.0.0.1" which have octal components. And of
-course that means that it also returns false for `is_private_ipv4($ip)`
-_and_ `is_public_ipv4($ip)`.
+false for addresses like "010.0.0.1" which have octal components. And of course
+that means that it also returns false for `is_private_ipv4($ip)` _and_
+`is_public_ipv4($ip)`.
 
 # FUNCTIONS
 
@@ -65,17 +65,18 @@ fails. In theory, this means that you should always check for a defined status
 explicitly but in practice there are no valid IP addresses where the string
 form evaluates to false in Perl.
 
-Note that none of these functions actually attempt to test whether the given
-IP address is routable from your device; they are purely semantic checks.
+Note that none of these functions actually attempt to test whether the given IP
+address is routable from your device; they are purely semantic checks.
 
 ## is\_ipv4($ip), is\_ipv6($ip), is\_ip($ip)
 
-These functions simply check whether the address is a valid IPv4 or IPv6 address.
+These functions simply check whether the address is a valid IPv4 or IPv6
+address.
 
 ## is\_innet\_ipv4($ip, $network)
 
-This subroutine checks whether the address belongs to the given IPv4
-network. The `$network` argument can either be a string in CIDR notation like
+This subroutine checks whether the address belongs to the given IPv4 network.
+The `$network` argument can either be a string in CIDR notation like
 "15.0.15.0/24" or a [NetAddr::IP](https://metacpan.org/pod/NetAddr%3A%3AIP) object.
 
 This subroutine used to accept many more forms of network specifications
@@ -101,8 +102,8 @@ networks - `10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16` - as defined by
 
 ## is\_loopback\_ipv4($ip)
 
-This subroutine checks whether the address belongs to the IPv4 loopback
-network - `127.0.0.0/8` - as defined by [RFC
+This subroutine checks whether the address belongs to the IPv4 loopback network
+\- `127.0.0.0/8` - as defined by [RFC
 5735](http://tools.ietf.org/html/rfc5735).
 
 ## is\_linklocal\_ipv4($ip)
@@ -154,29 +155,36 @@ This subroutine checks whether the address belongs to the IPv6 special network
 
 ## is\_teredo\_ipv6($ip)
 
-This subroutine checks whether the address belongs to the IPv6 TEREDO network
-\- `2001::/32` - as defined by [RFC 4380](http://tools.ietf.org/html/rfc4380).
+This subroutine checks whether the address belongs to the IPv6 TEREDO network -
+`2001::/32` - as defined by [RFC 4380](http://tools.ietf.org/html/rfc4380).
 
 Note that this network is a subnet of the larger special network at
 `2001::/23`.
 
 ## is\_orchid\_ipv6($ip)
 
-This subroutine checks whether the address belongs to the IPv6 ORCHID network
-\- `2001::/32` - as defined by [RFC 4380](http://tools.ietf.org/html/rfc4380).
+This subroutine checks whether the address belongs to the IPv6 ORCHID network -
+`2001::/32` - as defined by [RFC 4380](http://tools.ietf.org/html/rfc4380).
 
 Note that this network is a subnet of the larger special network at
 `2001::/23`.
 
-This network is currently scheduled to be returned to the special pool in
-March of 2014 unless the IETF extends its use. If that happens this subroutine
-will continue to exist but will always return false.
+This network is currently scheduled to be returned to the special pool in March
+of 2014 unless the IETF extends its use. If that happens this subroutine will
+continue to exist but will always return false.
 
 ## is\_documentation\_ipv6($ip)
 
 This subroutine checks whether the address belongs to the IPv6 documentation
 network - `2001:DB8::/32` - as defined by [RFC
 3849](http://tools.ietf.org/html/rfc3849).
+
+## is\_unspecified\_ipv6($ip)
+
+This subroutine checks whether the address belongs to the IPv6 unspecified
+network - `::0/128` - as defined by [RFC
+4291](http://tools.ietf.org/html/rfc4291).. Note that the address in this subnet
+is neither private nor public.
 
 ## is\_private\_ipv6($ip)
 
@@ -271,7 +279,7 @@ Gregory Oschwald <goschwald@maxmind.com>
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Neil Neely.
+This software is copyright (c) 2022 by Neil Neely.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,6 @@
 bin/.gitignore
 bin/dbcolize
+bin/dbcoltype
 bin/dbfilecat
 bin/dblistize
 bin/dbrecolize
@@ -817,6 +818,7 @@ TEST/dbrecolize_ex_S.in
 TEST/dbrecolize_ex_S.out
 TEST/dbrow_ex.cmd
 TEST/dbrow_ex.in
+TEST/dbrow_ex.in.gz
 TEST/dbrow_ex.out
 TEST/dbrow_ex_autodecompress.cmd
 TEST/dbrow_ex_autodecompress.out
@@ -1032,5 +1034,4 @@ TEST/yaml_to_db_ex.cmd
 TEST/yaml_to_db_ex.in
 TEST/yaml_to_db_ex.out
 update_modules
-TEST/dbrow_ex.in.gz
 META.json                                Module JSON meta-data (added by MakeMaker)

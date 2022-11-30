@@ -1,4 +1,4 @@
-#fsdb key value weighted
+#fsdb key value weighted:d
 a	4	1
 b	2	0.5
 c	1	0.25

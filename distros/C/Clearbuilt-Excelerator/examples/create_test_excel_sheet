@@ -1,0 +1,105 @@
+#!/usr/bin/env perl
+use Modern::Perl;
+use Carp;
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use Clearbuilt::ExcelErator;
+
+# PODNAME: create_test_excel_sheet
+
+my %spreadsheet = (
+    'title'      => 'Test Title',
+    'col_widths' => {
+        '2-6' => 12
+    },
+    'rows' => [
+        {
+            height => 40,
+            cells  => [
+                {
+                    value  => 'Honking Big Test Report',
+                    across => 'A1:C1',
+                    format => [ font => 'bold26', ],
+                }
+            ],
+        },
+        {
+            cells => [
+                '012345',
+                { as_text => 1,            value  => '00012345' },
+                { value   => 'Top Border', format => [ bt => 2 ] },
+            ],
+        },
+        [
+            '012345',
+            { as_text => 1,               value  => '00012345' },
+            { value   => 'Bottom Border', format => [ bb => 2 ] },
+        ],
+        [
+            {
+                value  => '=sum(A2:A3)',
+                format => [ halign => 'right', type => 'dec1comma' ],
+            },
+            {
+                value  => '=sum(b2:b3)',
+                format => [ halign => 'right', type => 'dec1comma' ],
+            },
+            { value => 'Left Border', format => [ bl => 2 ] },
+
+        ],
+        [
+            'above should be 24,690.0',
+            'above should be 0.0',
+            { value => 'Right Border', format => [ br => 2 ] },
+        ],
+        [],
+        [ undef, 'The cell to the left should be blank!' ],
+        [ { value => 'White Text, Blue Background', format => [ bg => 'blue' ] } ],
+        [],
+        [
+            'Border Colors:',
+            {
+                value  => 'Gray 30%',
+                format => [ bb => 2, bt => 2, bl => 2, br => 2, border_color => 'gray30' ]
+            },
+            undef,
+            {
+                value  => 'Gray 80%',
+                format => [ bb => 2, bt => 2, bl => 2, br => 2, border_color => 'gray80' ]
+            },
+            undef,
+            {
+                value  => 'Blue accent',
+                format => [
+                    bb           => 2,
+                    bt           => 2,
+                    bl           => 2,
+                    br           => 2,
+                    border_color => 'blueaccent1darker50'
+                ]
+            },
+        ],
+        [],
+        [
+             { value => 'blue', format => [ color => 'blue' ] }, 
+             { value => 'red', format => [ color => 'red' ] }, 
+             { value => 'green', format => [ color => 'green' ] }, 
+        ],
+        [],
+        [
+            { value => 'This cell has a comment', comment => 'String Comment' },
+            {
+                value   => '...and so does this one',
+                comment => {
+                    value  => 'Embedded comment with a blue background',
+                    format => [  color => 'blue', font_size=> 16, x_scale => 3.0, visible => 1 ]
+                }
+            },
+        ],
+    ],
+);
+
+my $workbook = Clearbuilt::ExcelErator->new( { filename => 'test_sheet.xlsx' } );
+$workbook->write_the_book( [ \%spreadsheet ] );
+
+exit;

@@ -19,9 +19,9 @@ has parent => (is=>'rw'); # points fo Perinci::To::* object
 has export => (is=>'rw', default=>undef); # undef=unknown, 0=not exported by default but exportable, 1=exported by default, -1=never export
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-05-14'; # DATE
+our $DATE = '2022-10-15'; # DATE
 our $DIST = 'Perinci-To-Doc'; # DIST
-our $VERSION = '0.879'; # VERSION
+our $VERSION = '0.880'; # VERSION
 
 sub BUILD {
     my ($self, $args) = @_;
@@ -242,7 +242,7 @@ Perinci::Sub::To::FuncBase - Base class for Perinci::Sub::To::* function documen
 
 =head1 VERSION
 
-This document describes version 0.879 of Perinci::Sub::To::FuncBase (from Perl distribution Perinci-To-Doc), released on 2022-05-14.
+This document describes version 0.880 of Perinci::Sub::To::FuncBase (from Perl distribution Perinci-To-Doc), released on 2022-10-15.
 
 =for Pod::Coverage .+
 
@@ -271,9 +271,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

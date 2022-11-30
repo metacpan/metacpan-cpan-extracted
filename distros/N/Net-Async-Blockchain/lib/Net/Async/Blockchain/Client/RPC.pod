@@ -1,0 +1,90 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Net::Async::Blockchain::Client::RPC
+at lib/Net/Async/Blockchain/Client/RPC.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Net::Async::Blockchain::Client::RPC - Async RPC Client.
+
+=head1 SYNOPSIS
+
+Objects of this type would not normally be constructed directly.
+
+=head1 DESCRIPTION
+
+Centralize all asynchronous RPC calls.
+
+=over 4
+
+=back
+
+=head2 max_connections
+
+L<https://metacpan.org/pod/Net::Async::HTTP#max_connections_per_host-=%3E-INT>
+
+=over 4
+
+=back
+
+returns the configured max_connections value or DEFAULT_MAX_CONNECTIONS
+
+=head2 http_client
+
+Create an L<Net::Async::HTTP> instance, if it is already defined just return
+the object
+
+=over 4
+
+=back
+
+L<Net::Async::HTTP>
+
+=head2 configure
+
+Any additional configuration that is not described on L<IO::Async::Notifier>
+must be included and removed here.
+
+=over 4
+
+=item * C<endpoint>
+
+=item * C<timeout> connection timeout (seconds)
+
+=item * C<rpc_user> RPC user. (optional, default: undef)
+
+=item * C<rpc_password> RPC password. (optional, default: undef)
+
+=back
+
+=head2 _request
+
+Use any argument as the method parameter for the client RPC call
+
+=over 4
+
+=item * C<method>
+
+=item * C<params> (any parameter required by the RPC call)
+
+=back
+
+L<Future>
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<IO::Async::Notifier>
+
+L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/adopt_future>, L<adopted_futures|IO::Async::Notifier/adopted_futures>, L<can_event|IO::Async::Notifier/can_event>, L<children|IO::Async::Notifier/children>, L<configure_unknown|IO::Async::Notifier/configure_unknown>, L<debug_printf|IO::Async::Notifier/debug_printf>, L<get_loop|IO::Async::Notifier/get_loop>, L<invoke_error|IO::Async::Notifier/invoke_error>, L<invoke_event|IO::Async::Notifier/invoke_event>, L<loop|IO::Async::Notifier/loop>, L<make_event_cb|IO::Async::Notifier/make_event_cb>, L<maybe_invoke_event|IO::Async::Notifier/maybe_invoke_event>, L<maybe_make_event_cb|IO::Async::Notifier/maybe_make_event_cb>, L<new|IO::Async::Notifier/new>, L<notifier_name|IO::Async::Notifier/notifier_name>, L<parent|IO::Async::Notifier/parent>, L<remove_child|IO::Async::Notifier/remove_child>, L<remove_from_parent|IO::Async::Notifier/remove_from_parent>
+
+=back
+

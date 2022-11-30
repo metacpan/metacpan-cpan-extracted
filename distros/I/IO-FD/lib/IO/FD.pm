@@ -18,6 +18,7 @@ our @ISA = qw(Exporter);
 # will save memory.
 our %EXPORT_TAGS = ( 'all' => [ qw(
 	accept
+	accept_multiple
 	listen
 	socket
 	bind
@@ -63,7 +64,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '0.1.2';
+our $VERSION = '0.1.3';
 
 
 sub fileno :prototype($) {

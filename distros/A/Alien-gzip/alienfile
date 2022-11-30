@@ -12,7 +12,7 @@ plugin 'Probe::CommandLine' => (
   args           => [ '--version' ],
   match_stderr   => qr/gzip/,
   version_stderr => qr/gzip ([0-9\.]+)/,
-) if $^O eq 'darwin';
+);
 
 share {
 

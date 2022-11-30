@@ -222,6 +222,20 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'x_value_formula' => {
+    	datatype => 'string',
+    	base_name => 'XValueFormula',
+    	description => 'Spreadsheet formula in A1-style.',
+    	format => '',
+    	read_only => '',
+    		},
+    'y_value_formula' => {
+    	datatype => 'string',
+    	base_name => 'YValueFormula',
+    	description => 'Spreadsheet formula in A1-style.',
+    	format => '',
+    	read_only => '',
+    		},
 });
 
 __PACKAGE__->swagger_types( {
@@ -230,7 +244,9 @@ __PACKAGE__->swagger_types( {
     'three_d_format' => 'ThreeDFormat',
     'line_format' => 'LineFormat',
     'x_value' => 'double',
-    'y_value' => 'double'
+    'y_value' => 'double',
+    'x_value_formula' => 'string',
+    'y_value_formula' => 'string'
 } );
 
 __PACKAGE__->attribute_map( {
@@ -239,7 +255,9 @@ __PACKAGE__->attribute_map( {
     'three_d_format' => 'ThreeDFormat',
     'line_format' => 'LineFormat',
     'x_value' => 'XValue',
-    'y_value' => 'YValue'
+    'y_value' => 'YValue',
+    'x_value_formula' => 'XValueFormula',
+    'y_value_formula' => 'YValueFormula'
 } );
 
 __PACKAGE__->mk_accessors(keys %{__PACKAGE__->attribute_map});

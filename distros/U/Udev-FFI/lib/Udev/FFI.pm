@@ -1,13 +1,7 @@
-# Udev::FFI - Copyright (C) 2017-2019 Ilya Pavlov
-# Udev::FFI is licensed under the
-# GNU Lesser General Public License v2.1
-
 package Udev::FFI;
 
 use strict;
 use warnings;
-
-use Carp qw(croak);
 
 use Udev::FFI::Functions qw(:all);
 use Udev::FFI::Device;
@@ -15,7 +9,7 @@ use Udev::FFI::Monitor;
 use Udev::FFI::Enumerate;
 
 
-$Udev::FFI::VERSION = '0.104002';
+$Udev::FFI::VERSION = '0.105000';
 
 
 
@@ -36,7 +30,7 @@ sub new {
         return undef;
     }
 
-    bless $self, $class;
+    bless($self, $class);
     return $self;
 }
 
@@ -48,7 +42,7 @@ sub new_device_from_syspath {
 
     my $device = udev_device_new_from_syspath($self->{_context}, $syspath);
 
-    return defined($device) ?Udev::FFI::Device->new($device, $self) :undef;
+    return defined($device) ? Udev::FFI::Device->new($device, $self) : undef;
 }
 
 
@@ -60,7 +54,7 @@ sub new_device_from_devnum {
 
     my $device = udev_device_new_from_devnum($self->{_context}, ord($type), $devnum);
 
-    return defined($device) ?Udev::FFI::Device->new($device, $self) :undef;
+    return defined($device) ? Udev::FFI::Device->new($device, $self) : undef;
 }
 
 
@@ -72,7 +66,7 @@ sub new_device_from_subsystem_sysname {
 
     my $device = udev_device_new_from_subsystem_sysname($self->{_context}, $subsystem, $sysname);
 
-    return defined($device) ?Udev::FFI::Device->new($device, $self) :undef;
+    return defined($device) ? Udev::FFI::Device->new($device, $self) : undef;
 }
 
 
@@ -83,7 +77,7 @@ sub new_device_from_device_id {
 
     my $device = udev_device_new_from_device_id($self->{_context}, $id);
 
-    return defined($device) ?Udev::FFI::Device->new($device, $self) :undef;
+    return defined($device) ? Udev::FFI::Device->new($device, $self) : undef;
 }
 
 
@@ -93,17 +87,17 @@ sub new_device_from_environment {
 
     my $device = udev_device_new_from_environment($self->{_context});
 
-    return defined($device) ?Udev::FFI::Device->new($device, $self) :undef;
+    return defined($device) ? Udev::FFI::Device->new($device, $self) : undef;
 }
 
 
 
 sub new_monitor {
     my $self = shift;
-    my $source = shift || 'udev';
+    my $source = shift;
 
-    croak('Valid sources identifiers are "udev" and "kernel"')
-        if $source ne 'udev' && $source ne 'kernel';
+    $source = 'udev'
+        unless (defined($source));
 
     my $monitor = udev_monitor_new_from_netlink($self->{_context}, $source);
     unless (defined($monitor)) {
@@ -131,9 +125,7 @@ sub new_enumerate {
 
 
 sub DESTROY {
-    my $self = shift;
-
-    udev_unref( $self->{_context} );
+    udev_unref($_[0]->{_context});
 }
 
 
@@ -157,21 +149,21 @@ Udev::FFI - Perl bindings for libudev using ffi.
     
     # get udev library version
     my $udev_version = Udev::FFI::udev_version() or
-        die "Can't get udev library version: $@";
+        die("Can't get udev library version: $@");
     
     
     # create Udev::FFI object
     my $udev = Udev::FFI->new() or
-        die "Can't create Udev::FFI object: $@";
+        die("Can't create Udev::FFI object: $@");
     
     
     # create udev monitor
     my $monitor = $udev->new_monitor() or
-        die "Can't create udev monitor: $@";
+        die("Can't create udev monitor: $@");
     
     # add filter to monitor
     unless ($monitor->filter_by_subsystem_devtype('block')) {
-        warn "Ouch!";
+        warn("Ouch!");
     }
     
     # start monitor
@@ -181,9 +173,9 @@ Udev::FFI - Perl bindings for libudev using ffi.
             my $device = $monitor->poll(); # blocking read
             my $action = $device->get_action();
     
-            print 'ACTION: '.$action, "\n";
-            print 'SYSNAME: '.$device->get_sysname(), "\n";
-            print 'DEVNODE: '.$device->get_devnode(), "\n";
+            print("ACTION: $action\n");
+            print('SYSNAME: '.$device->get_sysname()."\n");
+            print('DEVNODE: '.$device->get_devnode()."\n");
     
             last; # for example
         }
@@ -193,12 +185,12 @@ Udev::FFI - Perl bindings for libudev using ffi.
             if (defined(my $device = $monitor->poll(0))) { # non-blocking read like can_read in IO::Select
                 my $action = $device->get_action();
     
-                print 'ACTION: '.$action, "\n";
-                print 'SYSNAME: '.$device->get_sysname(), "\n";
-                print 'DEVNODE: '.$device->get_devnode(), "\n";
+                print("ACTION: $action\n");
+                print('SYSNAME: '.$device->get_sysname()."\n");
+                print('DEVNODE: '.$device->get_devnode()."\n");
             }
     
-            sleep 1;
+            sleep(1);
     
             last; # for example
         }
@@ -207,7 +199,7 @@ Udev::FFI - Perl bindings for libudev using ffi.
     
     # enumerate devices
     my $enumerate = $udev->new_enumerate() or
-        die "Can't create enumerate context: $@";
+        die("Can't create enumerate context: $@");
     
     $enumerate->add_match_subsystem('block');
     $enumerate->scan_devices();
@@ -216,37 +208,37 @@ Udev::FFI - Perl bindings for libudev using ffi.
     
     # scalar context
     my $href = $enumerate->get_list_entries();
-    print Dumper($href), "\n";
+    print(Dumper($href)."\n");
     
     # list context
     my @a = $enumerate->get_list_entries();
-    print Dumper(@a), "\n";
+    print(Dumper(@a)."\n");
     
     if (@a) { # we got devices
         my $device = $udev->new_device_from_syspath($a[0]);
     
         if (defined($device)) {
-            print "Device: ".$device->get_sysname(), "\n";
+            print('Device: '.$device->get_sysname()."\n");
     
             my $devnum = $device->get_devnum();
     
             # major, minor and makedev from Udev::FFI::Devnum
             my ($ma, $mi) = (major($devnum), minor($devnum));
     
-            print "Major: $ma\n";
-            print "Minor: $mi\n";
+            print("Major: $ma\n");
+            print("Minor: $mi\n");
     
             $devnum = makedev($ma, $mi);
-            print "Devnum: $devnum\n";
+            print("Devnum: $devnum\n");
     
     
             # scalar context
             $href = $device->get_properties_list_entries();
-            print Dumper($href), "\n";
+            print(Dumper($href)."\n");
     
             # list context
             @a = $device->get_properties_list_entries();
-            print Dumper(@a), "\n";
+            print(Dumper(@a)."\n");
         }
     }
 
@@ -266,7 +258,7 @@ If the constructor fails undef will be returned and an error message will be in
 $@.
 
     my $udev = Udev::FFI->new() or
-        die "Can't create Udev::FFI object: $@";
+        die("Can't create Udev::FFI object: $@");
 
 =back
 
@@ -282,7 +274,7 @@ Return new L<Udev::FFI::Monitor> object on success, undef with the error in $@
 on failure.
 
     my $monitor = $udev->new_monitor() or
-        die "Can't create udev monitor: $@";
+        die("Can't create udev monitor: $@");
 
 =head2 new_enumerate()
 
@@ -292,7 +284,7 @@ Return new L<Udev::FFI::Enumerate> object on success, undef with the error in $@
 on failure.
 
     my $enumerate = $udev->new_enumerate() or
-        die "Can't create enumerate context: $@";
+        die("Can't create enumerate context: $@");
 
 =head2 new_device_from_syspath( SYSPATH )
 
@@ -367,7 +359,7 @@ Return new L<Udev::FFI::Device> object or undef, if device does not exist.
     
     # in script
     my $udev = Udev::FFI->new() or
-        die "Can't create Udev::FFI object: $@";
+        die("Can't create Udev::FFI object: $@");
     my $device = $udev->new_device_from_environment();
     if (defined($device)) {
         # $device is the device from the udev rule (backlight in this example)
@@ -384,7 +376,7 @@ ENOENT (`udevadm` not found) or EACCES (permission denied).
 
     # simple
     my $udev_version = Udev::FFI::udev_version() or
-        die "Can't get udev library version: $@";
+        die("Can't get udev library version: $@");
     
     # or catch the error
     use Errno qw( :POSIX );
@@ -417,12 +409,11 @@ L<FFI::CheckLib> (Check that a library is available for FFI)
 
 =head1 BUGS AND LIMITATIONS
 
-Udev::FFI supports libudev 175 or newer. Older versions may work too, but it was
+Udev::FFI supports libudev 171 or newer. Older versions may work too, but it was
 not tested.
 
 Please report any bugs through the web interface at
-L<https://github.com/Ilya33/udev-ffi/issues> or via email to the author. Patches
-are always welcome.
+L<https://github.com/Ilya33/udev-ffi/issues>. Patches are always welcome.
 
 =head1 AUTHOR
 
@@ -434,12 +425,8 @@ Mohammad S Anwar
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2017-2018 by Ilya Pavlov
+Copyright (C) 2017-2022 by Ilya Pavlov
 
-This library is free software; you can redistribute it and/or modify it under the terms of the GNU Library General Public License as published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
-
-This library is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Library General Public License for more details.
-
-You should have received a copy of the GNU Library General Public License along with this library; if not, write to the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.
 
 =cut

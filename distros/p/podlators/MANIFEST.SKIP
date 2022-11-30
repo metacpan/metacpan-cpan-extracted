@@ -38,4 +38,4 @@
 
 # CI configuration.  Do not include in the distribution so that it doesn't
 # make its way into Perl core.
-^\.travis\.yml$
+^\.github/workflow/

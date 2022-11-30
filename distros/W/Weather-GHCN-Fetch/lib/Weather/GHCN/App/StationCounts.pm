@@ -8,7 +8,7 @@ Weather::GHCN::App::StationCounts - Count stations in Weather::GHCN::Fetch stati
 
 =head1 VERSION
 
-version v0.0.010
+version v0.0.011
 
 =head1 SYNOPSIS
 
@@ -32,7 +32,7 @@ use v5.18;  # minimum for Object::Pad
 
 package Weather::GHCN::App::StationCounts;
 
-our $VERSION = 'v0.0.010';
+our $VERSION = 'v0.0.011';
 
 use feature 'signatures';
 no  warnings 'experimental::signatures';

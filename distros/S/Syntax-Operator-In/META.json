@@ -27,7 +27,7 @@
       },
       "runtime" : {
          "requires" : {
-            "XS::Parse::Infix" : "0.26",
+            "XS::Parse::Infix" : "0.27",
             "perl" : "5.014"
          }
       },
@@ -40,11 +40,11 @@
    "provides" : {
       "Syntax::Operator::Elem" : {
          "file" : "lib/Syntax/Operator/Elem.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       },
       "Syntax::Operator::In" : {
          "file" : "lib/Syntax/Operator/In.pm",
-         "version" : "0.03"
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -54,6 +54,6 @@
       ],
       "x_IRC" : "irc://irc.perl.org/#io-async"
    },
-   "version" : "0.03",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

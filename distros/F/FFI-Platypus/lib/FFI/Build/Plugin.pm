@@ -6,7 +6,7 @@ use autodie;
 use File::Spec::Functions qw( catdir catfile );
 
 # ABSTRACT: Platform and local customizations of FFI::Build
-our $VERSION = '2.04'; # VERSION
+our $VERSION = '2.05'; # VERSION
 
 
 sub new
@@ -72,7 +72,7 @@ FFI::Build::Plugin - Platform and local customizations of FFI::Build
 
 =head1 VERSION
 
-version 2.04
+version 2.05
 
 =head1 SYNOPSIS
 

@@ -77,7 +77,7 @@ my %WriteMakefileArgs = (
     "Path::Tiny"            => 0,
     "Test2::V0"             => "0.000081"
   },
-  "VERSION" => "0.14",
+  "VERSION" => "0.15",
   "test"    => {
     "TESTS" => "t/*.t"
   }

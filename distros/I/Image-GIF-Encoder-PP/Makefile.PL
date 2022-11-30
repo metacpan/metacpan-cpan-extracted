@@ -14,6 +14,10 @@ my %WriteMakefileArgs = (
         'ExtUtils::MakeMaker' => '0',
     },
     PREREQ_PM => {
+        'version'    => '0.77',
+    },
+    TEST_REQUIRES => {
+        'MIME::Base64' => '0'
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => ['Image-GIF-Encoder-PP-*', 't/*.gif']},
@@ -44,11 +48,18 @@ unless (eval { ExtUtils::MakeMaker->VERSION('6.55_03'); 1 }) {
     @{$WriteMakefileArgs{PREREQ_PM}}{keys %$build_requires} = values %$build_requires;
 }
 
-delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
-    unless eval { ExtUtils::MakeMaker->VERSION('6.52'); 1 };
-delete $WriteMakefileArgs{MIN_PERL_VERSION}
-    unless eval { ExtUtils::MakeMaker->VERSION('6.48'); 1 };
-delete $WriteMakefileArgs{LICENSE}
-    unless eval { ExtUtils::MakeMaker->VERSION('6.31'); 1 };
+my %min_eumm_version = (
+    CONFIGURE_REQUIRES => '6.52',
+    MIN_PERL_VERSION   => '6.48',
+    LICENSE            => '6.31',
+    META_MERGE         => '6.46',
+);
+for my $parameter ( keys %min_eumm_version ) {
+    delete $WriteMakefileArgs{$parameter}
+      unless eval {
+          ExtUtils::MakeMaker->VERSION( $min_eumm_version{$parameter} );
+          1;
+      };
+}
 
 WriteMakefile(%WriteMakefileArgs);

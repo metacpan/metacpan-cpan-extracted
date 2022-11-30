@@ -13,7 +13,7 @@ WriteMakefile(
 	PREREQ_PM		  => {}, # e.g., Module::Name => 1.1
 	ABSTRACT_FROM	  => 'lib/pEFL.pm', # retrieve abstract from module
 	AUTHOR			  => 'Maximilian Lika',
-	LICENSE		   => 'perl',
+	LICENSE 	   => 'perl',
 	#Value must be from legacy list of licenses here
 	#http://search.cpan.org/perldoc?Module%3A%3ABuild%3A%3AAPI
 	LIBS		  => $elm_pkg_info{'libs'} . $evas_pkg_info{'libs'},
@@ -93,6 +93,9 @@ WriteMakefile(
 		},
 		'lib/pEFL/Evas/Object' => {
 			OBJECT => 'lib/pEFL/Evas/Object$(OBJ_EXT) PLSide$(OBJ_EXT)',
+		},
+		'lib/pEFL/Edje/Object' => {
+			OBJECT => 'lib/pEFL/Edje/Object$(OBJ_EXT) PLSide$(OBJ_EXT)',
 		},
 		'lib/pEFL/PLSide' => {
 			OBJECT => 'lib/pEFL/PLSide$(OBJ_EXT) PLSide$(OBJ_EXT)',

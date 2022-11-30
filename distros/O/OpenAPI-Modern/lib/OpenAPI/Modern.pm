@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package OpenAPI::Modern; # git description: v0.034-2-gafe8b36
+package OpenAPI::Modern; # git description: v0.036-2-g96d001a
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI Swagger HTTP request response
 
-our $VERSION = '0.035';
+our $VERSION = '0.037';
 
 use 5.020;
 use Moo;
@@ -288,6 +288,7 @@ sub find_path ($self, $request, $options) {
         'wrong HTTP method %s', $options->{method})
       if $options->{method} and lc $options->{method} ne $method;
 
+    $options->{operation_path} = $operation_path;
     $options->{method} = lc $method;
   }
 
@@ -340,6 +341,7 @@ sub find_path ($self, $request, $options) {
 
       $options->{operation_id} = $self->openapi_document->schema->{paths}{$path_template}{$method}{operationId};
       delete $options->{operation_id} if not defined $options->{operation_id};
+      $options->{operation_path} = jsonp('/paths', $path_template, $method);
       return 1;
     }
 
@@ -348,6 +350,8 @@ sub find_path ($self, $request, $options) {
 
   croak 'at least one of request, $options->{path_template} and $options->{operation_id} must be provided'
     if not $path_template;
+
+  $options->{operation_path} = jsonp('/paths', $path_template, $method);
 
   # note: we aren't doing anything special with escaped slashes. this bit of the spec is hazy.
   my @capture_names = ($path_template =~ m!\{([^/}]+)\}!g);
@@ -386,6 +390,7 @@ sub find_path ($self, $request, $options) {
   $options->@{qw(path_template path_captures operation_id)} =
     ($path_template, \%path_captures, $self->openapi_document->schema->{paths}{$path_template}{$method}{operationId});
   delete $options->{operation_id} if not defined $options->{operation_id};
+  $options->{operation_path} = jsonp('/paths', $path_template, $method);
   return 1;
 }
 
@@ -685,7 +690,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI docume
 
 =head1 VERSION
 
-version 0.035
+version 0.037
 
 =head1 SYNOPSIS
 
@@ -933,7 +938,13 @@ When successful, the options hash will be populated with keys C<path_template>, 
 C<method>, and C<operation_id>,
 and the return value is true.
 When not successful, the options hash will be populated with key C<errors>, an arrayref containing
-a L<JSON::Schema::Modern::Error> object, and the return value is false.
+a L<JSON::Schema::Modern::Error> object, and the return value is false. Other values may also be
+populated if they can be successfully calculated.
+
+In addition, this value is populated in the options hash (when available):
+
+* C<operation_path>: a json pointer string indicating the document location of the operation that
+  was just evaluated against the request
 
 Note that the L<C</servers>|https://spec.openapis.org/oas/v3.1.0#server-object> section of the
 OpenAPI document is not used for path matching at this time, for either scheme and host matching nor

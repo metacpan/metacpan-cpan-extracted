@@ -1,3 +1,8 @@
+0.305   2022-11-14  Released-By: PERLANCAR; Urgency: medium
+
+        - Tweak generated POD usage.
+
+
 0.304   2022-10-19  Released-By: PERLANCAR; Urgency: medium
 
         - Add option: mark_different_lang.

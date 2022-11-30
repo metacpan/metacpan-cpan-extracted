@@ -2,7 +2,7 @@ package App::Yath::Command::runner;
 use strict;
 use warnings;
 
-our $VERSION = '1.000133';
+our $VERSION = '1.000136';
 
 use Config qw/%Config/;
 use File::Spec;
@@ -107,11 +107,14 @@ sub name          { 'runner' }
 sub init { confess(ref($_[0]) . " is not intended to be instantiated") }
 sub run  { confess(ref($_[0]) . " does not implement run()") }
 
+our $RUNNER_PID;
 sub generate_run_sub {
     my $class = shift;
     my ($symbol, $argv, $spawn_settings) = @_;
     my ($dir, %args) = @$argv;
 
+    $RUNNER_PID = $$;
+    my $runner_pid = $$;
     my $settings = Test2::Harness::Settings->new(File::Spec->catfile($dir, 'settings.json'));
 
     my $name = $ENV{NESTED_YATH} ? 'yath-nested-runner' : 'yath-runner';
@@ -120,7 +123,6 @@ sub generate_run_sub {
 
     my $cleanup = $class->cleanup($settings, \%args, $dir);
 
-    my $runner_pid = $$;
     my $jump = setjump "Test-Runner" => sub {
         local $.;
 

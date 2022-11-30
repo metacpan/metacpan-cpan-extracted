@@ -1,5 +1,13 @@
 Revision history for OpenAPI-Modern
 
+0.037     2022-11-27 23:57:29Z
+          - added operation_path to the options hash returned from find_path,
+            validate_response, find_path
+
+0.036     2022-11-19 22:30:06Z
+          - fix some media-type test cases to accomodate changes in
+            JSON::Schema::Modern 0.558
+
 0.035     2022-11-12 20:53:54Z
           - fixes to media-type parsing: correctly ignore any charset included
             with non-text Content-Types, and always interpret application/json

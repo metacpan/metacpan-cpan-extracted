@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 use Getopt::Long qw( GetOptions );
-use Open::This qw(
+use Open::This   qw(
     editor_args_from_parsed_text
     maybe_get_url_from_parsed_text
     parse_text
@@ -74,7 +74,7 @@ ot - parse text and (hopefully) open an editor with the correct arguments
 
 =head1 VERSION
 
-version 0.000030
+version 0.000031
 
 =head1 SYNOPSIS
 

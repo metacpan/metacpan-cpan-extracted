@@ -1,15 +1,213 @@
 class IO::Socket::INET extends IO::Socket {
-
-  native static method new : IO::Socket::INET ($host : string, $port : int);
-  native method read : int ($buffer : byte[]);
-  native method write : int ($buffer : string, $length : int);
-  native method close : void ();
-  native method fileno : int ();
+  use Sys::Socket::Constant as SOCKET;
+  use Sys::Socket::Sockaddr;
+  use Sys::Socket::Sockaddr::In;
+  use Sys::Socket::In_addr;
+  use IO::Util;
   
-  method DESTROY : void () {
-    $self->_cleanup_wsa;
-    $self->close;
+  has peer_address : string;
+  has peer_port : int;
+  has local_address : string;
+  has local_port : int;
+  has proto_number : int;
+  
+  private static method create_socket_address : Sys::Socket::Sockaddr ($address : string, $port : int) {
+    
+    # Socket information
+    my $socket_address = Sys::Socket::Sockaddr::In->new;
+    $socket_address->set_sin_family((byte)SOCKET->AF_INET);
+    $socket_address->set_sin_port(Sys::Socket->htons((short)$port));
+
+    my $res_ref = new Sys::Socket::AddrinfoLinkedList[1];
+    Sys::Socket->getaddrinfo($address, undef, undef, $res_ref);
+    my $res = $res_ref->[0];
+    
+    if ($res) {
+      my $res_array = $res->to_array;
+      $socket_address->set_sin_addr($res_array->[0]->copy_ai_addr->(Sys::Socket::Sockaddr::In)->copy_sin_addr);
+    }
+    else {
+      my $in_addr = Sys::Socket::In_addr->new;
+      Sys::Socket->inet_aton($address, $in_addr);
+      $socket_address->set_sin_addr($in_addr);
+    }
+    
+    return $socket_address;
+  }
+  
+  static method new : IO::Socket::INET ($options = undef : object[]) {
+    my $self = new IO::Socket::INET;
+    
+    $self->init($options);
+    
+    my $domain = $self->sockdomain;
+    my $socktype = $self->socktype;
+    my $proto_number = $self->{proto_number};
+    
+    $self->socket($domain, $socktype, $proto_number);
+    
+    my $local_port = $self->{local_port};
+    my $local_address = $self->{local_address};
+    
+    if ($local_port >= 0) {
+      my $local_socket_address = &create_socket_address($local_address, $local_port);
+      $self->bind($local_socket_address);
+      my $listen = $self->{listen_backlog};
+      $self->listen($listen);
+    }
+    
+    my $peer_address = $self->{peer_address};
+    my $peer_port = $self->{peer_port};
+    
+    if ($peer_address) {
+      my $peer_socket_address = &create_socket_address($peer_address, $peer_port);
+      $self->connect($peer_socket_address);
+    }
+    
+    return $self;
   }
 
-  private native method _cleanup_wsa : void ();
+  method new_instance : IO::Socket::INET ($options = undef : object[]) {
+    {
+      my $self = IO::Socket::INET->new($options);
+      
+      return $self;
+    }
+  }
+  
+  protected method init : void ($options = undef : object[]) {
+    
+    my $options_h = Hash->new($options);
+    
+    # ReuseAddr option
+    my $reuse_addr = IO::Util->delete_int_or_default($options_h, "ReuseAddr", 0);
+    if ($reuse_addr) {
+      $self->setsockopt(SOCKET->SOL_SOCKET, SOCKET->SO_REUSEADDR, 1);
+    }
+
+    # ReusePort option
+    my $reuse_port = IO::Util->delete_int_or_default($options_h, "ReusePort", 0);
+    if ($reuse_port) {
+      $self->setsockopt(SOCKET->SOL_SOCKET, SOCKET->SO_REUSEPORT, 1);
+    }
+
+    # Broadcast option
+    my $broadcast = IO::Util->delete_int_or_default($options_h, "Broadcast", 0);
+    if ($broadcast) {
+      $self->setsockopt(SOCKET->SOL_SOCKET, IO::Util->SO_BROADCAST, 1);
+    }
+
+    # PeerAddr option
+    my $peer_address = IO::Util->delete_string_or_default($options_h, "PeerAddr", undef);
+    $self->{peer_address} = $peer_address;
+
+    # PeerPort option
+    my $peer_port = IO::Util->delete_int_or_default($options_h, "PeerPort", -1);
+    $self->{peer_port} = $peer_port;
+
+    # LocalAddr option
+    my $local_address = IO::Util->delete_string_or_default($options_h, "LocalAddr", undef);
+    $self->{local_address} = $local_address;
+
+    # LocalPort option
+    my $local_port = IO::Util->delete_int_or_default($options_h, "LocalPort", -1);
+    $self->{local_port} = $local_port;
+
+    # LocalPort option
+    my $proto_number = IO::Util->delete_int_or_default($options_h, "Proto", SOCKET->IPPROTO_TCP);
+    $self->{proto_number} = $proto_number;
+    
+    # Domain option
+    $options_h->set_int(Domain => SOCKET->AF_INET);
+
+    # Type option
+    my $type = IO::Util->delete_int_or_default($options_h, "Type", -1);
+    unless ($type >= 0) {
+      if ($proto_number == SOCKET->IPPROTO_TCP) {
+        $type = SOCKET->SOCK_STREAM;
+      }
+      elsif ($proto_number == SOCKET->IPPROTO_UDP) {
+        $type = SOCKET->SOCK_DGRAM;
+      }
+      elsif ($proto_number == IO::Util->IPPROTO_ICMP) {
+        $type = SOCKET->SOCK_RAW;
+      }
+      $options_h->set_int(Type => $type);
+    }
+    
+    my $new_options = IO::Util->hash_to_array($options_h);
+    
+    # Type option
+    # Timeout option
+    # Domain option
+    # Blocking option
+    # Listen option
+    $self->SUPER::init($new_options);
+
+    $options_h->delete("Domain");
+    $options_h->delete("Type");
+    for my $key (@{$options_h->keys}) {
+      die "The \"$key\" option is not available";
+    }
+  }
+
+  method sockaddr : Sys::Socket::In_addr () {
+    my $name = $self->sockname;
+    
+    my $in_addr = $name->(Sys::Socket::Sockaddr::In)->copy_sin_addr;
+    
+    return $in_addr;
+  }
+
+  method sockport : int () {
+    my $name = $self->sockname;
+    
+    my $port_nb_order = $name->(Sys::Socket::Sockaddr::In)->sin_port;
+    
+    my $port = Sys::Socket->ntohs((short)$port_nb_order);
+    
+    return $port;
+  }
+
+  method sockhost : string () {
+    my $name = $self->sockname;
+    
+    my $in_addr = $name->(Sys::Socket::Sockaddr::In)->copy_sin_addr;
+    
+    my $address = (string)undef;
+    if ($in_addr) {
+      $address = Sys::Socket->inet_ntoa($in_addr);
+    }
+    return $address;
+  }
+
+  method peeraddr : Sys::Socket::In_addr () {
+    my $name = $self->peername;
+    
+    my $in_addr = $name->(Sys::Socket::Sockaddr::In)->copy_sin_addr;
+    
+    return $in_addr;
+  }
+
+  method peerport : int () {
+    my $name = $self->peername;
+    
+    my $port_nb_order = $name->(Sys::Socket::Sockaddr::In)->sin_port;
+    
+    my $port = Sys::Socket->ntohs((short)$port_nb_order);
+    
+    return $port;
+  }
+
+  method peerhost : string () {
+    my $name = $self->peername;
+    
+    my $in_addr = $name->(Sys::Socket::Sockaddr::In)->copy_sin_addr;
+    
+    my $address = (string)undef;
+    if ($in_addr) {
+      $address = Sys::Socket->inet_ntoa($in_addr);
+    }
+    return $address;
+  }
 }

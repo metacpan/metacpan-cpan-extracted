@@ -7,7 +7,7 @@ use FFI::C::FFI ();
 use Ref::Util qw( is_ref is_plain_arrayref );
 
 # ABSTRACT: Structured data instance for FFI
-our $VERSION = '0.14'; # VERSION
+our $VERSION = '0.15'; # VERSION
 
 
 sub AUTOLOAD
@@ -186,7 +186,7 @@ FFI::C::Struct - Structured data instance for FFI
 
 =head1 VERSION
 
-version 0.14
+version 0.15
 
 =head1 SYNOPSIS
 

@@ -26,5 +26,5 @@ pm_to_blib$
 .travis.yml$
 examples/
 build/
-^\w+.list$
+\w+\.list$
 .iml$

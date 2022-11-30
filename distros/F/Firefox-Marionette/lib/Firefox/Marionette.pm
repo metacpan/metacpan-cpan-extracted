@@ -62,7 +62,7 @@ our @EXPORT_OK =
   qw(BY_XPATH BY_ID BY_NAME BY_TAG BY_CLASS BY_SELECTOR BY_LINK BY_PARTIAL);
 our %EXPORT_TAGS = ( all => \@EXPORT_OK );
 
-our $VERSION = '1.32';
+our $VERSION = '1.33';
 
 sub _ANYPROCESS                     { return -1 }
 sub _COMMAND                        { return 0 }
@@ -338,7 +338,7 @@ sub _directory_listing {
     else {
         my $handle = DirHandle->new($directory);
         if ($handle) {
-            while ( length( my $entry = $handle->read() ) ) {
+            while ( my $entry = $handle->read() ) {
                 next if ( $entry eq File::Spec->updir() );
                 next if ( $entry eq File::Spec->curdir() );
                 if ($short) {
@@ -602,6 +602,13 @@ sub _setup_ssh {
         }
     }
     $self->_initialise_remote_uname();
+    if ( ( defined $self->_visible() ) && ( $self->_visible() eq 'local' ) ) {
+        if ( !$self->_get_remote_environment_variable_via_ssh('DISPLAY') ) {
+            Firefox::Marionette::Exception->throw(
+                $self->_ssh_address() . ' is not allowing X11 Forwarding' );
+        }
+
+    }
     return;
 }
 
@@ -5238,7 +5245,7 @@ sub _ssh_address {
 
 sub _ssh_arguments {
     my ( $self, %parameters ) = @_;
-    my @arguments = ( '-2', );
+    my @arguments = qw(-2 -a);
     if ( ( $parameters{graphical} ) || ( $parameters{master} ) ) {
         if ( ( defined $self->_visible() ) && ( $self->_visible() eq 'local' ) )
         {
@@ -8690,6 +8697,11 @@ sub _get_remote_environment_command {
     {
         $command = q[echo ] . $name . q[="%] . $name . q[%"];
     }
+    elsif (( $self->_remote_uname() )
+        && ( $self->_remote_uname() =~ /^(?:freebsd|dragonfly)$/smx ) )
+    {
+        $command = 'echo ' . $name . q[=] . q[\\"] . q[$] . $name . q[\\"];
+    }
     else {
         $command =
           'echo "' . $name . q[=] . q[\\] . q["] . q[$] . $name . q[\\] . q[""];
@@ -8700,7 +8712,11 @@ sub _get_remote_environment_command {
 sub _get_remote_environment_variable_via_ssh {
     my ( $self, $name ) = @_;
     my $value;
-    my $output = $self->_execute_via_ssh( {},
+    my $parameters = { ignore_exit_status => 1 };
+    if ( $name eq 'DISPLAY' ) {
+        $parameters->{graphical} = 1;
+    }
+    my $output = $self->_execute_via_ssh( $parameters,
         $self->_get_remote_environment_command($name) );
     if ( defined $output ) {
         foreach my $line ( split /\r?\n/smx, $output ) {
@@ -9844,7 +9860,7 @@ Firefox::Marionette - Automate the Firefox browser with the Marionette protocol
 
 =head1 VERSION
 
-Version 1.32
+Version 1.33
 
 =head1 SYNOPSIS
 

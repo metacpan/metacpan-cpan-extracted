@@ -45,37 +45,43 @@ extern PHash font_substitutions;
 extern int   font_mapper_default_id[N_STYLES];
 
 void
-clear_font_abc_caches( Handle self);
+Drawable_clear_font_abc_caches( Handle self);
 
 PFontABC
-call_get_font_abc( Handle self, unsigned int from, unsigned int to, int flags);
+Drawable_call_get_font_abc( Handle self, unsigned int from, unsigned int to, int flags);
 
 int
-check_length( int from, int len, int real_len );
+Drawable_check_length( int from, int len, int real_len );
 
 unsigned int
-find_font(uint32_t c, int pitch, int style, uint16_t preferred_font);
+Drawable_find_font(uint32_t c, int pitch, int style, uint16_t preferred_font);
 
 char *
-font_key( const char * name, unsigned int style);
+Drawable_font_key( const char * name, unsigned int style);
 
 int
-get_glyphs_width( Handle self, PGlyphsOutRec t, Bool add_overhangs);
+Drawable_get_glyphs_width( Handle self, PGlyphsOutRec t, Bool add_overhangs);
 
 char *
-hop_text(char * start, Bool utf8, int from);
+Drawable_hop_text(char * start, Bool utf8, int from);
 
 void 
-hop_glyphs(GlyphsOutRec * t, int from, int len);
+Drawable_hop_glyphs(GlyphsOutRec * t, int from, int len);
 
 void
-query_ranges(PPassiveFontEntry pfe);
+Drawable_query_ranges(PPassiveFontEntry pfe);
 
 Bool
-read_glyphs( PGlyphsOutRec t, SV * text, Bool indexes_required, const char * caller);
+Drawable_read_glyphs( PGlyphsOutRec t, SV * text, Bool indexes_required, const char * caller);
 
 Bool
-switch_font( Handle self, uint16_t fid);
+Drawable_switch_font( Handle self, uint16_t fid);
+
+Bool
+Drawable_read_line_ends(SV *lineEnd, DrawablePaintState *state);
+
+void
+Drawable_line_end_refcnt( DrawablePaintState *gs, int delta);
 
 #ifdef __cplusplus
 }

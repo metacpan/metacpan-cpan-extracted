@@ -78,6 +78,14 @@ sub restore          { shift->cmd('restore') } # no checks for underflow here, t
 sub precision        { shift->cmd(set => precision => shift) }
 sub antialias        { $#_ ? $_[0]->{antialias} = $_[1] : $_[0]->{antialias} }
 
+sub reset
+{
+	$_[0]->{commands} = [];
+	delete $_[0]->{points};
+	delete $_[0]->{stack};
+	delete $_[0]->{curr};
+}
+
 sub matrix_multiply
 {
 	my ( $m1, $m2 ) = @_;
@@ -94,8 +102,13 @@ sub matrix_multiply
 sub matrix
 {
 	my ( $self, @m ) = @_;
-	@_ == 7 or Carp::croak('bad parameters to matrix');
-	$self->cmd( matrix => @m );
+	if ( (1 == @m) && ref($m[0]) ) {
+		$self->cmd( matrix => @{$m[0]} );
+	} elsif ( @m == 6 ) {
+		$self->cmd( matrix => @m );
+	} else {
+		Carp::croak('bad parameters to matrix');
+	}
 }
 
 sub identity  { 1, 0, 0, 1, 0, 0 }
@@ -121,7 +134,6 @@ sub shear
 	$self-> matrix(1,$y,$x,1,0,0);
 }
 
-
 sub rotate
 {
 	my ( $self, $angle ) = @_;
@@ -129,6 +141,7 @@ sub rotate
 	$angle /= $RAD;
 	my $cos = cos($angle);
 	my $sin = sin($angle);
+	($sin, $cos) = Prima::Utils::nearest_d($sin, $cos);;
 	$self->matrix($cos, $sin, -$sin, $cos, 0, 0);
 }
 
@@ -139,6 +152,8 @@ sub line
 	@$p % 2 and Carp::croak('bad parameters to line');
 	$self->cmd( line => $p );
 }
+
+*polyline = \&line;
 
 sub rline
 {
@@ -226,14 +241,22 @@ sub circular_arc
 sub arc
 {
 	my $self = shift;
-	@_ > 5 or Carp::croak('bad parameters to arcto');
+	@_ > 5 or Carp::croak('bad parameters to arc');
 	my ( $cx, $cy, $dx, $dy, $from, $to, $tilt) = @_;
 	return $self if $from == $to;
-	$self-> save->
-		matrix( $dx / 2, 0, 0, $dy / 2, $cx, $cy )->
-		rotate( $tilt // 0.0)->
-		circular_arc( $from, $to )->
-		restore;
+	if ( $tilt // 0.0 ) {
+		return $self-> save->
+			scale( $dx / 2, $dy / 2)->
+			rotate( $tilt)->
+			translate( $cx, $cy )->
+			circular_arc( $from, $to )->
+			restore;
+	} else {
+		return $self-> save->
+			matrix( $dx / 2, 0, 0, $dy / 2, $cx, $cy )->
+			circular_arc( $from, $to )->
+			restore;
+	}
 }
 
 sub rarc
@@ -363,7 +386,7 @@ sub points
 		}
 		for my $ppp ( @{$self->{points}}) {
 			@$ppp = grep { @$_ > 2 } @$ppp;
-			Prima::array::deduplicate($_,2) for @$ppp;
+			Prima::array::deduplicate($_,2,4) for @$ppp;
 		}
 		$self->{last_matrix} = $self->{curr}->{matrix};
 	}
@@ -404,6 +427,16 @@ sub matrix_apply
 	my ($ref, $points) = $#_ ? (0, [@_]) : (1, $_[0]);
 	my $ret = Prima::Drawable->render_polyline( $points, matrix => $self->{curr}->{matrix} );
 	return $ref ? $ret : @$ret;
+}
+
+sub get_approximate_matrix_scaling
+{
+	my @m = map { abs $_ } @{ shift->{curr}->{matrix} };
+	my $r = $m[A];
+	$r = $m[B] if $r < $m[B];
+	$r = $m[C] if $r < $m[C];
+	$r = $m[D] if $r < $m[D];
+	return $r;
 }
 
 sub _save
@@ -452,7 +485,7 @@ sub  _moveto
 	($mx, $my) = $self->matrix_apply($mx, $my);
 	my ($lx, $ly) = $rel ? $self->last_point : (0,0);
 	my $arr = $self->new_array;
-	push @$arr, $self->{subpixel} ? ($lx + $mx, $ly + $my) : (int($lx + $mx + .5), int($ly + $my + .5));
+	push @$arr, $self->{subpixel} ? ($lx + $mx, $ly + $my) : Prima::Utils::nearest_i($lx + $mx, $ly + $my);
 	push @{$self->{points}->[-1]}, $arr;
 }
 
@@ -471,11 +504,12 @@ sub _close
 sub _line
 {
 	my ( $self, $line ) = @_;
-	if ( $self->{subpixel} ) {
-		push @{ $self->{points}->[-1]->[-1] }, @{ $self-> matrix_apply( $line ) };
-	} else {
-		push @{ $self->{points}->[-1]->[-1] }, map { int($_ + .5) } @{ $self-> matrix_apply( $line ) };
-	}
+	Prima::array::append( $self->{points}->[-1]->[-1],
+		Prima::Drawable->render_polyline( $line,
+			matrix  => $self->{curr}->{matrix},
+			integer => !$self->{subpixel},
+		)
+	);
 }
 
 sub _spline
@@ -487,7 +521,7 @@ sub _spline
 			%$options,
 			integer => !$self->{subpixel},
 		)
-	)
+	);
 }
 
 # Reference:
@@ -534,7 +568,7 @@ sub arc2nurbs
 		@points[0,1,4,5] = @points[4,5,0,1] if $reverse;
 
 		push @set, [
-			\@points,
+			Prima::Utils::nearest_d(\@points),
 			closed    => 0,
 			degree    => 2,
 			weights   => \@weights,
@@ -550,6 +584,7 @@ sub _arc
 {
 	my ( $self, $from, $to, $rel ) = @_;
 
+	my $scaling = $self->get_approximate_matrix_scaling;
 	my $nurbset = $self->arc2nurbs( $from, $to);
 	if ( $rel ) {
 		my ($lx,$ly) = $self->last_point;
@@ -561,25 +596,38 @@ sub _arc
 	}
 
 	my %xopt;
-	$xopt{precision} = $self->{curr}->{precision} if defined $self->{curr}->{precision};
+	$xopt{precision} = $self->{curr}->{precision} // 24;
+	$xopt{precision} = $scaling if $xopt{precision} // 24 > $scaling;
 	$xopt{integer}   = !$self->{subpixel};
-
 	for my $set ( @$nurbset ) {
 		my ( $points, @options ) = @$set;
-		Prima::array::append( $self->{points}->[-1]->[-1],
-			Prima::Drawable->render_spline(
-				$self-> matrix_apply( $points ),
-				@options,
-				%xopt
-			)
-		);
+		my $poly = $self-> matrix_apply( $points );
+		my $m = $self->{curr}->{matrix};
+		if ( $xopt{integer} && $xopt{precision} < 3) {
+			my $n = $self->new_array;
+			push @$n, Prima::Utils::nearest_i(@$poly[0,1,-2,-1]);
+			$poly = $n;
+		} elsif ($xopt{precision} >= 2) {
+			$poly = Prima::Drawable->render_spline( $poly, @options, %xopt);
+		}
+		Prima::array::append( $self->{points}->[-1]->[-1], $poly);
 	}
 }
 
-sub stroke {
+sub acquire
+{
+	my $c = $_[0]->{canvas};
+	$_[0]->{subpixel} = $c->antialias || $c->alpha < 255;
+}
+
+sub stroke
+{
 	return 0 unless $_[0]->{canvas};
+	$_[0]->acquire;
+	my $emulated_aa = $_[0]->{antialias} && !$_[0]->{canvas}->antialias;
 	for ( map { @$_ } @{ $_[0]->points }) {
-		if ( $_[0]->{antialias} && !$_[0]->{canvas}->antialias) {
+		next if 4 > @$_;
+		if ( $emulated_aa ) {
 			return 0 unless $_[0]->{canvas}->new_aa_surface->polyline($_);
 		} else {
 			return 0 unless $_[0]->{canvas}->polyline($_);
@@ -588,9 +636,11 @@ sub stroke {
 	return 1;
 }
 
-sub fill {
+sub fill
+{
 	my ( $self, $fillMode ) = @_;
 	return 0 unless my $c = $self->{canvas};
+	$self->acquire;
 	my @p = $self->points(fill => 1);
 	my $ok = 1;
 	my $save;
@@ -599,6 +649,7 @@ sub fill {
 		$c->fillMode($fillMode);
 	}
 	for ( @p ) {
+		next if 4 > @$_;
 		if ( $self->{antialias} && !$_[0]->{canvas}->antialias) {
 			last unless $ok &= $c->new_aa_surface->fillpoly($_);
 		} else {
@@ -688,6 +739,118 @@ sub flatten
 		canvas   => $self->{canvas},
 		commands => \@dst
 	);
+}
+
+# L.Maisonobe 2003
+# http://www.spaceroots.org/documents/ellipse/elliptical-arc.pdf
+sub arc2cubics
+{
+	my ( undef, $x, $y, $dx, $dy, $start, $end) = @_;
+
+	my ($reverse, @out);
+	($start, $end, $reverse) = ( $end, $start, 1 ) if $start > $end;
+
+	push @out, $start;
+	# see defects appearing after 45 degrees:
+	# https://pomax.github.io/bezierinfo/#circles_cubic
+	while (1) {
+		if ( $end - $start > 45 ) {
+			push @out, $start += 45;
+			$start += 45;
+		} else {
+			push @out, $end;
+			last;
+		}
+	}
+	@out = map { $_ / $RAD } @out;
+
+	my $rx = $dx / 2;
+	my $ry = $dy / 2;
+
+	my @cubics;
+	for ( my $i = 0; $i < $#out; $i++) {
+		my ( $a1, $a2 ) = @out[$i,$i+1];
+		my $b           = $a2 - $a1;
+		my ( $sin1, $cos1, $sin2, $cos2) = ( sin($a1), cos($a1), sin($a2), cos($a2) );
+		my @d1  = ( -$rx * $sin1, -$ry * $cos1 );
+		my @d2  = ( -$rx * $sin2, -$ry * $cos2 );
+		my $tan = sin( $b / 2 ) / cos( $b / 2 );
+		my $a   = sin( $b ) * (sqrt( 4 + 3 * $tan * $tan) - 1) / 3;
+		my @p1  = ( $rx * $cos1, $ry * $sin1 );
+		my @p2  = ( $rx * $cos2, $ry * $sin2 );
+		my @points = (
+			@p1,
+			$p1[0] + $a * $d1[0],
+			$p1[1] - $a * $d1[1],
+			$p2[0] - $a * $d2[0],
+			$p2[1] + $a * $d2[1],
+			@p2
+		);
+		$points[$_] += $x for 0,2,4,6;
+		$points[$_] += $y for 1,3,5,7;
+		@points[0,1,2,3,4,5,6,7] = @points[6,7,4,5,2,3,0,1] if $reverse;
+		push @cubics, Prima::Utils::nearest_d(\@points);
+	}
+	@cubics = reverse @cubics if $reverse;
+	return \@cubics;
+}
+
+sub to_line_end
+{
+	my ($self, $opt_prescale) = @_;
+	local $self->{stack} = [];
+	local $self->{curr}  = {
+		matrix => [ identity ],
+		( map { $_, $self->{$_} } qw(precision ) )
+	};
+	my $c = $self->{commands};
+	my @dst;
+	my @last_point = (0,0);
+	for ( my $i = 0; $i < @$c; ) {
+		my ($cmd,$len) = @$c[$i,$i+1];
+		my @param = @$c[$i+2..$i+$len+1];
+		$i += $len + 2;
+
+		if ( $cmd eq 'arc') {
+			my ( $from, $to, $rel ) = @param;
+			my $cubics = $self->arc2cubics( 0, 0, 2, 2, $from, $to);
+			if ( $rel ) {
+				my ($lx,$ly) = @last_point;
+				my $pts = $cubics->[0];
+				my $m = $self->{curr}->{matrix};
+				my @s = $self->matrix_apply( $pts->[0], $pts->[1]);
+				$m->[4] += $lx - $s[0];
+				$m->[5] += $ly - $s[1];
+			}
+			for my $c (@$cubics) {
+				my $poly = $self-> matrix_apply( $c );
+				push @dst, 'cubic' => $poly;
+				@last_point = @$poly[-2,-1];
+			}
+		} elsif ( $cmd eq 'relative') {
+			my $m  = $self->{curr}->{matrix};
+			my ( $x0, $y0 ) = $self-> matrix_apply(0, 0);
+			$m->[X] += $last_point[0] - $x0;
+			$m->[Y] += $last_point[1] - $y0;
+		} elsif ( $cmd eq 'line') {
+			push @dst, line => $self-> matrix_apply($param[0]);
+			@last_point = @{$dst[-1]}[-2,-1];
+		} elsif ( $cmd eq 'spline') {
+			my ( $points, $options) = @param;
+			push @dst,
+				((($options->{degree} // 2) == 2) ? 'conic' : 'cubic'),
+				$self-> matrix_apply($points)
+				;
+			@last_point = @{$dst[-1]}[-2,-1];
+		} elsif ( $cmd =~ /^(open|close|moveto)$/) {
+			# no warnings, just ignore
+			last;
+		} else {
+			$self-> can("_$cmd")-> ( $self, @param );
+		}
+	}
+
+	return \@dst;
 }
 
 sub contours
@@ -845,14 +1008,22 @@ sub poly2patterns
 			unshift @$first, @$last[2 .. $#$last];
 		}
 	}
-	return \@dst;
+	my @r;
+	for my $r ( @dst ) {
+		my $n = Prima::array->new_double;
+		push @$n, @$r;
+		Prima::array::deduplicate($n,2,2);
+		push @r, $n;
+	}
+	return \@r;
 }
 
 # Adapted from wine/dlls/gdi32/path.c:WidenPath()
 # (c) Martin Boehme, Huw D M Davies, Dmitry Timoshkov, Alexandre Julliard
-sub widen
+sub widen_old
 {
 	my ( $self, %opt ) = @_;
+	$self->acquire;
 
 	my $dst = ref($self)->new( undef,
 		%$self,
@@ -868,19 +1039,26 @@ sub widen
 		$opt;
 	} qw(lineWidth lineJoin lineEnd linePattern);
 
-	my $pp = [ map { @$_ } @{$self->points} ];
+	my $pp;
+	{
+		local $self->{subpixel} = 1;
+		$pp = [ map { @$_ } @{$self->points} ];
+	}
 	return $dst if $lp eq lp::Null;
 	$pp = poly2patterns($pp, $lp, $lw, !$self->{subpixel}) if $lp ne lp::Solid;
 
-	if ( $lw < 1 && !$self->{subpixel} ) {
+	my $no_line_ends = ($lw < 2.5) && !$self->{subpixel};
+
+	if ( $no_line_ends && $lw < 1.5 ) {
 		for my $p ( @$pp ) {
 			$dst->line($p);
 			$dst->line([map { @{$p}[-2*$_,-2*$_+1] } 1..@$p/2 ])
-				if $lp eq lp::Solid;
+				if $lp eq lp::Solid; # so fill() won't autoclose the shape, if any
 			$dst->open;
 		}
 		return $dst;
 	}
+
 	my $ml = exists($opt{miterLimit}) ? $opt{miterLimit} : ($self->{canvas} ? $self->{canvas}->miterLimit : 10);
 	$ml = 20        if $ml > 20;
 	$lw = 16834     if $lw > 16834;
@@ -890,15 +1068,17 @@ sub widen
 
 	my @dst;
 	my $lw2 = $lw / 2;
-	for my $p ( @$pp ) {
+	for ( @$pp ) {
+		next unless @$_;
+
 		my (@u,@d);
-		next unless @$p;
-		my $closed = $p->[0] == $p->[-2] && $p->[1] == $p->[-1];
-		my $last = @$p - ($closed ? 4 : 2);
+		my @p = Prima::array::list($_); # expand once as access is expensive
+		my $closed = $p[0] == $p[-2] && $p[1] == $p[-1];
+		my $last = @p - ($closed ? 4 : 2);
 
 		if ( $last == 0 ) {
-			my ($x,$y) = @$p;
-			if ( $le == le::Square ) {
+			my ($x,$y) = @p;
+			if ( $le == le::Square || $no_line_ends ) {
 				$dst->line( 
 					$x - $lw2, $y - $lw2,
 					$x - $lw2, $y + $lw2,
@@ -915,16 +1095,16 @@ sub widen
 		my ($firstout, $firstin, $firstsign);
 		for ( my $i = 0; $i <= $last; $i += 2 ) {
 			$opt{callback}->(
-				$i, $p, {
+				$i, \@p, {
 					lineJoin  => sub { $lj = shift },
 					lineEnd   => sub { $le = shift },
 					lineWidth => sub { $lw2 = ($lw = shift) / 2 },
 				}
 			) if $opt{callback};
 			if ( !$closed && ($i == 0 || $i == $last )) {
-				my ( $xo, $yo, $xa, $ya) = @$p[ $i ? (map { $i + $_ } 0,1,-2,-1) : (0..3)];
+				my ( $xo, $yo, $xa, $ya) = @p[ $i ? (map { $i + $_ } 0,1,-2,-1) : (0..3)];
         	        	my $theta = atan2( $ya - $yo, $xa - $xo );
-				if ( $le == le::Flat) {
+				if ( $le == le::Flat || $no_line_ends) {
 					my ($sin, $cos) = (sin($theta + $PI_2), cos($theta + $PI_2));
 					push @u, [ line => [
 						$xo + $lw2 * $cos,
@@ -956,7 +1136,7 @@ sub widen
 				} else {
 					($prev, $next) = ($i - 2, 0);
 				}
-				my ($xo,$yo,$xa,$ya,$xb,$yb) = @$p[$i,$i+1,$prev,$prev+1,$next,$next+1];
+				my ($xo,$yo,$xa,$ya,$xb,$yb) = @p[$i,$i+1,$prev,$prev+1,$next,$next+1];
 				my $dya = $yo - $ya;
 				my $dxa = $xo - $xa;
 				my $dyb = $yb - $yo;
@@ -995,7 +1175,7 @@ sub widen
 					]];
 					@$firstout = @{ $out->[-1][1] }
 						if $i == 0;
-				} elsif ( $_lj == lj::Bevel) {
+				} elsif ( $_lj == lj::Bevel || $no_line_ends ) {
 					@$firstout = ( $xo - $dx1, $yo - $dy1 )
 						if $i == 0;
 					push @$out, [ line => [ $xo - $dx1, $yo - $dy1 ]];
@@ -1042,6 +1222,56 @@ sub widen
 	return $dst;
 }
 
+sub widen_new
+{
+	my ( $self, %opt ) = @_;
+	$self->acquire;
+
+	my $dst = ref($self)->new( undef,
+		%$self,
+		canvas   => $self->{canvas},
+		commands => [],
+	);
+
+	my @pp;
+	{
+		local $self->{subpixel} = 1;
+		@pp = map { @$_ } @{$self->points};
+	}
+
+	for my $p ( @pp ) {
+		next unless @$p;
+		my $cmds = $self->{canvas}->render_polyline( $p, %opt,
+			path    => 1,
+			integer => $self->{subpixel} ? 0 : 1,
+		);
+
+		for ( my $i = 0; $i < @$cmds;) {
+			my $cmd   = $cmds->[$i++];
+			my $param = $cmds->[$i++];
+			if ( $cmd eq 'line') {
+				$dst->line( $param );
+			} elsif ( $cmd eq 'arc') {
+				$dst->$cmd( @$param );
+			} elsif ( $cmd eq 'conic') {
+				$dst->spline( $param, degree => 2, closed => 0 );
+			} elsif ( $cmd eq 'cubic') {
+				$dst->spline( $param, degree => 3, closed => 0 );
+			} elsif ( $cmd eq 'open') {
+				$dst->open;
+			} else {
+				warn "** panic: unknown render_polyline command '$cmd'";
+				last;
+			}
+		}
+	}
+
+	return $dst;
+}
+
+*widen = \&widen_new;
+#*widen = \&widen_old;
+
 sub extents
 {
 	my $self = shift;
@@ -1084,7 +1314,20 @@ sub region
 	$rgnop //= rgnop::Union;
 	$reg ? $reg->combine($_, $rgnop) : ($reg = $_)
 		for map { Prima::Region->new( polygon => $_, fillMode => $mode) } $self->points(fill => 1);
-	return $reg;
+	return $reg // Prima::Region->new;
+}
+
+sub _debug_commands
+{
+	my $self = shift;
+	my $c = $self->{commands};
+	for ( my $i = 0; $i < @$c; ) {
+		my ($cmd,$len) = @$c[$i,$i+1];
+		my @p = @$c[$i+2..$i+$len+1];
+		@p = map { 'ARRAY' eq ref($_) ? "[@$_]" : $_ } @p;
+		print STDERR ".$cmd(@p)\n";
+		$i += $len + 2;
+	}
 }
 
 1;
@@ -1332,11 +1575,11 @@ pixels, to be suitable for direct send to the polyline() API call. If PRESCALE
 factor is set, it is used instead to premultiply coordinates of arc anchor
 points used to render the lines.
 
-=item points FOR_FILL_POLY=0
+=item points %opt
 
 Runs all accumulated commands, and returns rendered set of points, suitable
 for further calls to either C<Prima::Drawable::polyline> or C<Prima::Drawable::fillpoly>
-depending on the C<FOR_FILL_POLY> flag.
+depending on the C<$opt{fill}> flag.
 
 =item region MODE=fm::Winding|fm::Overlay, RGNOP=rgnop::Union
 

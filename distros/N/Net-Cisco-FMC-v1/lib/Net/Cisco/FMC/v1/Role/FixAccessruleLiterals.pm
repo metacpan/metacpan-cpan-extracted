@@ -1,5 +1,5 @@
 package Net::Cisco::FMC::v1::Role::FixAccessruleLiterals;
-$Net::Cisco::FMC::v1::Role::FixAccessruleLiterals::VERSION = '0.006001';
+$Net::Cisco::FMC::v1::Role::FixAccessruleLiterals::VERSION = '0.006002';
 # ABSTRACT: Role for Cisco Firepower Management Center (FMC) API version 1 method generation
 
 use 5.024;
@@ -68,7 +68,7 @@ Net::Cisco::FMC::v1::Role::FixAccessruleLiterals - Role for Cisco Firepower Mana
 
 =head1 VERSION
 
-version 0.006001
+version 0.006002
 
 =head1 SYNOPSIS
 
@@ -96,7 +96,7 @@ existing rule or creating a new one based on a reply silently swallows literal
 host and network objects which have their type set to FQDN.
 
 This role works around this bug by modifying the reply of
-L</Net::Cisco::FMC::v1/get_accessrule> and
+L<Net::Cisco::FMC::v1/get_accessrule> and
 L<Net::Cisco::FMC::v1/list_accessrules> and replacing 'FQDN' with 'Network'.
 
 This is how an accessrule API response looks like in 6.2.3.7:
@@ -242,7 +242,7 @@ Alexander Hartmaier <abraxxa@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 - 2020 by Alexander Hartmaier.
+This software is copyright (c) 2018 - 2022 by Alexander Hartmaier.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

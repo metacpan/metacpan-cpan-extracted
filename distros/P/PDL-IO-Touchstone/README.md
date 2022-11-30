@@ -309,23 +309,56 @@ Given any matrix (N,N,M) formatted matrix, this function will return N.
 ## `($f_new, $m_new) = m_interpolate($f, $m, $args)` - Interpolate `$m` to a different frequency set
 
 This function rescales the X-parameter matrix (`$m`) and frequency set (`$f`)
-to fit the requested frequency bounds.  This example will return the
-interpolated `$S_new` and `$f_new` with 10 frequency samples from 100 to 1000
-MHz (inclusive):
+to fit the requested frequency bounds.  This function returns `$f` and `$m`
+without interpolation if no `$args` are passed.
 
+### PDL Frequency-Range Specification
+
+If `$args` is a PDL object then it defines the frequencies that will be used
+for interpolation in Hz.  The values are used verbatim, no additional processing is
+performed.
+
+### Scalar Frequency-Range Specification
+
+The value of `$args` may be one of:
+
+- A scalar float or string.
+- An ARRAY reference.  If using an ARRAY reference then the array will be
+concatinated into a comma-separated string and used as follows:
+
+Each range is split on a comma as follows (whitespace is ignored):
+
+    ($f_new, $S_new) = m_interpolate($f, $S, "1e6, 6e6-9e6 x4, 10e6 += 1e6 x3");
+
+    # or as an arrayref of strings and floats:
+    ($f_new, $S_new) = m_interpolate($f, $S, [ 1e6, '6e6-9e6 x4', '10e6 += 1e6 x3' ]);
+
+Which produces the following frequency selection each in MHz because of the `e6` suffix:
+
+        1, 6, 7, 8, 9, 10, 11, 12
+
+- `N` - The exact frequency in Hz
+- `N - M xC` - Select `C` frequencies from `N` to `M` (inclusive) in Hz.  Thus,
+`6e6-9e6x4` produces the frequencies 6, 7, 8, 9 MHz because of the `e6` suffix. 
+Values for `N` and `M` may be floating-point valued, but `C` must be an integer.
+- `N += SxC` - Select `C` frequencies starting at `N` and stepping by
+`S` in Hz.  Thus, `10e6 += 1e6x3` produces the frequencies 10, 11, 12 in MHz because of the `e6` suffix.
+Values for `N` and `S` may be floating-point valued, but `C` must be an integer.
+
+### Hash Frequency-Range Specification
+
+This example will return the interpolated `$S_new` and `$f_new` with 10
+frequency samples from 100 to 1000 MHz (inclusive):
+
+    # or using Scalar Frequency-Range Specification as part of the hash:
     ($f_new, $S_new) = m_interpolate($f, $S,
-        { freq_min_hz => 100e6, freq_max_hz => 1000e6, freq_count => 10,
+        { freq_range => '100e6 - 1000e6 x10',
           quiet => 1 # optional
         } )
 
-This function returns `$f` and `$m` without interpolation if no `$args` are passed.
-
-- freq\_min\_hz: the minimum frequency at which to interpolate
-- freq\_max\_hz: the maximum frequency at which to interpolate
-- freq\_count: the total number of frequencies sampled.
-
-    If `freq_count` is `1` then only `freq_min_hz` is returned.
-
+- freq\_range: This specifies a scalar or ARRAY or [PDL](https://metacpan.org/pod/PDL) reference as
+defined in "Scalar Frequency-Range Specification".  A hash format is useful for
+additional options such as `quiet` and may be extended further in the future. 
 - quiet: suppress warnings when interpolating beyond the available frequency range
 
 ## `$max_diff = f_uniformity($f)` - Return maximum frequency deviation.
@@ -396,6 +429,10 @@ into the list that `rsnp` returns.
 - \[6\] funit
 - \[7\] orig\_f\_unit
 
+## `%h = rsnp_hash_to_list(rsnp_hash(...))` - Create a list from rsnp\_hash
+
+This is the inverse of `rsnp_list_to_hash`.
+
 ## `%h = rsnp_hash(...)` - Same as `rsnp` but returns a hash.
 
 See hash elements in `rsnp_list_to_hash`
@@ -403,6 +440,14 @@ See hash elements in `rsnp_list_to_hash`
 ## `%h = rsnp_fh_hash(...)` - Same as `rsnp_fh` but returns a hash.
 
 See hash elements in `rsnp_list_to_hash`
+
+## `wsnp_hash(%h)` - Same as `wsnp` but takes a hash.
+
+See hash elements in `rsnp_hash_to_list`
+
+## `wsnp_fh_hash(%h)` - Same as `wsnp_fh` but takes a hash.
+
+See hash elements in `rsnp_hash_to_list`
 
 # SEE ALSO
 

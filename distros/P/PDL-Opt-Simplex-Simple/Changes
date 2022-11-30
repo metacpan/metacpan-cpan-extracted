@@ -1,4 +1,9 @@
 Revision history for PDL-Opt-Simplex-Simple
+
+1.7	2022-11-15T19:12:30-08:00
+	- Reverted fix from 1.6 and increased PDL version requirement to 2.56
+	  per @mohawk.
+
 1.6	2022-11-13T22:37:33-08:00
 	- Hopefully fixed ->sclr regression reported by some testers.
 

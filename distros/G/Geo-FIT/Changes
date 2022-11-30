@@ -1,0 +1,16 @@
+Revision history for Geo-FIT
+
+1.03 [2022-11-27]
+    Updated to FIT 21.94 profile
+        - changes based on fit-python-sdk Github repo
+
+1.02 [2022-11-24]
+    New locations2gpx.pl script to convert FIT locations to gpx waypoints
+
+    Simplified command-line options in fit2tcx.pl
+        - moved to Getopt::Long and removed support for a user configuration file
+        - the configuration file is no longer necessary given the simplified options list
+        - see 'man fit2tcx.pl'
+
+1.01 [2022-11-19]
+    Added module to CPAN

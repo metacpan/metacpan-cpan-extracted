@@ -1,0 +1,41 @@
+;---------------------------------
+author  = perlancar <perlancar@cpan.org>
+copyright_holder = perlancar <perlancar@cpan.org>
+license = Perl_5
+;---------------------------------
+
+version=0.001
+
+name=App-TextWrapUtils
+
+[GenPericmdScript / GenPericmdScript textwrap]
+url=/App/TextWrapUtils/textwrap
+enable_log=1
+read_config=0
+read_env=0
+
+[InsertExecsList]
+
+[@Author::PERLANCAR]
+:version=0.606
+
+[Prereqs]
+perl=5.010001
+strict=0
+warnings=0
+File::Slurper::Dash=0
+Log::ger=0.038
+Text::Wrap=0
+
+[Prereqs / RuntimeRecommends]
+Text::ANSI::Fold=0
+Text::ANSI::Util=0
+Text::ANSI::WideUtil=0
+Text::Fold=0
+Text::LineFold=0
+Text::WideChar::Util=0
+
+[Prereqs / DevelopX_spec]
+-phase=develop
+-relationship=x_spec
+Rinci=1.1.102

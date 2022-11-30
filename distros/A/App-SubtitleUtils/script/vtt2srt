@@ -7,9 +7,9 @@ use Log::ger;
 use Log::ger::Screen;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-10'; # DATE
+our $DATE = '2022-11-22'; # DATE
 our $DIST = 'App-SubtitleUtils'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 sub _strip {
     my $str = shift;
@@ -48,7 +48,7 @@ vtt2srt - Convert .vtt to .srt
 
 =head1 VERSION
 
-This document describes version 0.008 of vtt2srt (from Perl distribution App-SubtitleUtils), released on 2022-11-10.
+This document describes version 0.011 of vtt2srt (from Perl distribution App-SubtitleUtils), released on 2022-11-22.
 
 =head1 SYNOPSIS
 

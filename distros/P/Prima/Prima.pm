@@ -9,7 +9,7 @@ require DynaLoader;
 use vars qw($VERSION @ISA $__import @preload $pid);
 @ISA = qw(DynaLoader);
 sub dl_load_flags { 0x00 }
-$VERSION = '1.66';
+$VERSION = '1.67';
 $pid = $$;
 bootstrap Prima $VERSION;
 unless ( UNIVERSAL::can('Prima', 'init')) {
@@ -80,10 +80,15 @@ sub import
 		my $module = shift @module;
 		next if $module eq 'Prima' || $module eq '';
 		$module = "Prima::$module" unless $module =~ /^Prima::/;
+		next unless $module;
 		local $__import = caller;
-		if ( $module) {
-			eval "use $module;";
-			die $@ if $@;
+		eval "use $module;";
+		die $@ if $@;
+		if ( $module->isa('Exporter') && $module->can('export')) {
+			no strict 'refs';
+			if ( exists ${$module.'::'}{'EXPORT'} && (my $ok = \@{"${module}::EXPORT"})) {
+				$module->export( $__import, @$ok) if @$ok;
+			}
 		}
 		$__import = 0;
 	}
@@ -100,6 +105,11 @@ __END__
 Prima - a perl graphic toolkit
 
 =head1 SYNOPSIS
+
+=for podview <img src="Prima/hello-world.gif">
+
+=for html <p><img src="https://raw.githubusercontent.com/dk/Prima/master/pod/Prima/hello-world.gif">
+
 
 	use Prima qw(Application Buttons);
 
@@ -230,9 +240,18 @@ namespace.
 
 =over
 
-=item message TEXT 
+=item message TEXT
 
 Displays a system message box with TEXT.
+
+=item open_file, save_file
+
+When the C<Prima::Dialog::FileDialog> module is loaded, these shortcut methods
+are registered in the C<Prima::> namespace as an alternative to the same
+methods in the module's own namespace. The methods execute standard file open
+and save dialogs, correspondingly.
+
+See L<Prima::Dialog::FileDialog> for more.
 
 =item run
 
@@ -342,8 +361,6 @@ L<Prima::FrameSet> - frameset widget class
 
 L<Prima::Grids> - grid widgets
 
-L<Prima::Header> - a multi-tabbed header widget
-
 L<Prima::HelpViewer> - the built-in POD file browser
 
 L<Prima::ImageViewer> - bitmap viewer
@@ -436,7 +453,11 @@ L<Prima::Widget::BidiInput> - heuristics for i18n input
 
 L<Prima::Widget::GroupScroller> - optional automatic scroll bars
 
+L<Prima::Widget::Header> - multi-column header widget
+
 L<Prima::Widget::IntIndents> - indenting support
+
+L<Prima::Widget::Link> - links embedded in widgets
 
 L<Prima::Widget::ListBoxUtils> - common paint routine for listboxes
 
@@ -462,13 +483,15 @@ L<prima-gencls>     - C<prima-gencls>, a class compiler tool.
 
 =item Miscellaneous
 
-L<Prima::faq> - frequently asked questions 
+L<Prima::faq> - frequently asked questions
 
-L<Prima::Const> - predefined toolkit constants 
+L<Prima::Const> - predefined toolkit constants
 
 L<Prima::EventHook> - event filtering
 
 L<Prima::Image::Animate> - animate gif and webp files
+
+L<Prima::Image::base64> - hard-coded image files
 
 L<Prima::IniFile> - support of Windows-like initialization files
 
@@ -479,6 +502,8 @@ L<Prima::Stress> - stress test module
 L<Prima::Themes> - widget themes manager
 
 L<Prima::Tie> - tie widget properties to scalars or arrays
+
+L<Prima::types> - builtin types
 
 L<Prima::Utils> - miscellaneous routines
 

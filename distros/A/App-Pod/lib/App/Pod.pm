@@ -15,7 +15,11 @@ use Mojo::File            qw( path );
 use Mojo::JSON            qw( j );
 use Perl::OSType          qw( os_type );
 use Term::ANSIColor       qw( colored );
-use subs                  qw( _sayt );
+use Carp                  qw( cluck );
+use subs                  qw( _sayt uniq );
+
+# Catch eval warnings better.
+$SIG{__WARN__} = sub { cluck shift };
 
 =head1 NAME
 
@@ -30,11 +34,11 @@ App::Pod - Quickly show available class methods and documentation.
 
 =head1 VERSION
 
-Version 0.30
+Version 0.31
 
 =cut
 
-our $VERSION = '0.30';
+our $VERSION = '0.31';
 
 
 =head1 SYNOPSIS
@@ -122,6 +126,7 @@ sub import {
       _cache_pod
       _cache_path
       _cache_name_and_summary
+      _cache_version
       _cache_isa
       _cache_events
       _cache_methods
@@ -147,6 +152,10 @@ sub _dumper {
     say $data;
 }
 
+#
+# Run
+#
+
 =head2 run
 
 Run the main program.
@@ -159,10 +168,6 @@ Or just use the included script:
     % pod
 
 =cut
-
-#
-# Run
-#
 
 sub run {
     my $self = __PACKAGE__->_new;
@@ -737,6 +742,38 @@ sub _get_name_and_summary {
     $name_and_summary;
 }
 
+sub _get_version {
+    my ( $self ) = @_;
+
+    # Use in-memory cache if present.
+    my $version_cache = $self->_cache_version;
+    return $version_cache if $version_cache;
+
+    # Use disk cache if present.
+    my $disk_cache = $self->retrieve_cache;
+    if ( $disk_cache and $disk_cache->{version} ) {
+        $self->_cache_version( $disk_cache->{version} );
+        return $disk_cache->{version};
+    }
+
+    # Otherwise, get the package/class version.
+    my $class = $self->_class;
+
+    # TODO: Be able to get class from path
+    if ( not $self->_get_pod->class_is_path ) {
+        eval "require $class";
+    }
+    my $version = $class->VERSION // '';
+
+    # Cache it in-memory.
+    $self->_cache_version( $version );
+
+    # Flag that disk cache should be stored later.
+    $self->_dirty_cache( 1 );
+
+    $version;
+}
+
 =head2 show_header
 
 Prints a generic header for a module.
@@ -746,7 +783,7 @@ Prints a generic header for a module.
 sub show_header {
     my ( $self )      = @_;
     my $class         = $self->_class;
-    my $version       = $class->VERSION;
+    my $version       = $self->_get_version;
     my $class_is_path = $self->_get_pod->class_is_path;
     my $first_release =
       $class_is_path ? "" : Module::CoreList->first_release( $class );
@@ -803,6 +840,8 @@ sub _get_isa {
     my @classes = ( $self->_class );
     my @isa;
     my %seen;
+
+    # TODO: Be able to get class from path
     if ( not $self->_get_pod->class_is_path ) {
         no strict 'refs';
         while ( my $class = shift @classes ) {
@@ -917,11 +956,22 @@ sub _get_methods {
     my @method_names;
 
     # The provided class is really the path.
-    if ( $pod->class_is_path ) {
-        @method_names = $pod->find( "head2" );
-    }
-    elsif ( $self->_import_class ) {
-        @method_names = sort ( get_full_functions( $self->_class ) );
+    {
+        local *_PodHelper;
+        if ( $pod->class_is_path ) {
+            @method_names = $pod->find( "head2" );
+        }
+        elsif ( $self->_import_class ) {
+            @method_names =
+              sort { $a cmp $b }
+              uniq get_full_functions( "_PodHelper" ),  # ojo would import here.
+              get_full_functions( $self->_class );      # All else here
+
+            # TODO: figure out why "local *_Pod" does
+            # not remove the typeglob at the end.
+            # Also "undef *_Pod" does nothing.
+            delete @_PodHelper::{ keys %_PodHelper:: };
+        }
     }
 
     my @methods =
@@ -940,8 +990,9 @@ sub _import_class {
     my ( $self ) = @_;
     my $class = $self->_class;
 
-    # Since ojo imports its DSL into the current package
-    eval { eval "package $class; use $class"; };
+    # Try not to pollute main.
+    # ojo imports its DSL into the current package by default.
+    eval { eval "package _PodHelper; use $class"; };
 
     my $import_ok = do {
         if ( $@ ) { warn $@; 0 }
@@ -969,7 +1020,22 @@ Show all class methods.
 sub show_methods {
     my ( $self ) = @_;
 
-    my $all_method_names_and_docs = $self->_get_methods;
+    my $all_method_names_and_docs = $self->_get_methods;    # 0: name, 1: doc.
+
+    # Skip some methods unless using --all flag.
+    my %skip_methods =
+      map { $_ => 1 }
+      qw(
+      BEGIN
+      VERSION
+      ISA
+      __ANON__
+      );
+
+    if ( not $self->_opts->{all} ) {
+        @$all_method_names_and_docs =
+          grep { not $skip_methods{ $_->[0] } } @$all_method_names_and_docs;
+    }
 
     # Documented methods
     my @all_method_docs = grep { $_->[1] } @$all_method_names_and_docs;
@@ -1064,6 +1130,7 @@ sub store_cache {
         class            => $self->_class,
         path             => $self->_get_path,
         name_and_summary => $self->_get_name_and_summary,
+        version          => $self->_get_version,
         isa              => $self->_get_isa,
         events           => $self->_get_events,
         methods          => $self->_get_methods,
@@ -1222,6 +1289,15 @@ sub _neon {
 sub _reset {
 
     colored( "@_", "RESET" );
+}
+
+#
+# Misc Support
+#
+
+sub uniq(@) {
+    my %h;
+    grep { not $h{$_}++ } @_;
 }
 
 #

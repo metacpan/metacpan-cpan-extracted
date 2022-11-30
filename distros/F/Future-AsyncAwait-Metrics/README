@@ -1,0 +1,56 @@
+NAME
+
+    Future::AsyncAwait::Metrics - report metrics from Future::AsyncAwait to
+    Metrics::Any
+
+SYNOPSIS
+
+       use Future::AsyncAwait::Metrics;
+    
+       # Additional metrics will now be reported
+
+DESCRIPTION
+
+    This module provides no functions or other import symbols. Instead, by
+    simply loading it somewhere in the program, additional metrics are
+    created and reported to Metrics::Any about the operation of
+    Future::AsyncAwait.
+
+METRICS
+
+    The following metrics are reported:
+
+ asyncawait_suspends
+
+    A counter of the number of times an async sub has been suspended.
+
+ asyncawait_resumes
+
+    A counter of the number of times an async sub has been resumed.
+
+ asyncawait_current_subs
+
+    A gauge giving the current count of async sub instances currently
+    suspended.
+
+ asyncawait_states_created
+
+    A counter of the number of times that async sub context storage has
+    been created. This may be less than asyncawait_suspends because storage
+    is reused for multiple await calls within any one function invocation.
+
+ asyncawait_states_destroyed
+
+    A counter giving the number of times that async sub context storage has
+    been destroyed.
+
+ asyncawait_current_states
+
+    A gauge giving the current count of async sub context storage
+    instances. This may be less than asyncawait_current_subs because not
+    all of them may be currently suspended.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

@@ -9,9 +9,9 @@ use Locale::TextDomain::UTF8 'Perinci-To-Doc';
 extends 'Perinci::Sub::To::FuncBase';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-05-14'; # DATE
+our $DATE = '2022-10-15'; # DATE
 our $DIST = 'Perinci-To-Doc'; # DIST
-our $VERSION = '0.879'; # VERSION
+our $VERSION = '0.880'; # VERSION
 
 sub BUILD {
     my ($self, $args) = @_;
@@ -356,15 +356,22 @@ sub after_gen_doc {
                      " (" . __("default") .
                          ": $ra->{human_arg_default})" : "")
             ), "");
-            if (defined $ra->{summary}) {
+            {
+                my ($summary, $description);
+                $summary = $ra->{summary};
+                $description = $ra->{description};
+                $description = "(No description)" if !defined $summary && !defined $description;
+
+                if (defined $summary) {
+                    $self->add_doc_lines(
+                        $self->_podquote($summary) .
+                        ($summary =~ /\.$/ ? "" : "."),
+                        "");
+                }
                 $self->add_doc_lines(
-                    $self->_podquote($ra->{summary}) .
-                        ($ra->{summary} =~ /\.$/ ? "" : "."),
-                    "");
+                    $self->_md2pod($description),
+                    "") if defined $description;
             }
-            $self->add_doc_lines(
-                $self->_md2pod($ra->{description}),
-                "") if $ra->{description};
         }
         $self->add_doc_lines("", "=back", "");
     } else {
@@ -447,7 +454,7 @@ Perinci::Sub::To::POD - Generate POD documentation from Rinci function metadata
 
 =head1 VERSION
 
-This document describes version 0.879 of Perinci::Sub::To::POD (from Perl distribution Perinci-To-Doc), released on 2022-05-14.
+This document describes version 0.880 of Perinci::Sub::To::POD (from Perl distribution Perinci-To-Doc), released on 2022-10-15.
 
 =head1 SYNOPSIS
 
@@ -488,9 +495,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

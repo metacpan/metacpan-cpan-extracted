@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+README
+bin/foodratio
+lib/Food/Ratio.pm
+references.bib
+t/00-load.t
+t/10-food.t
+t/pod-coverage.t
+t/pod.t
+SIGNATURE    Added here by Module::Build

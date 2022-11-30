@@ -1,16 +1,37 @@
 use strict;
 use warnings;
 
-package Games::Board::Grid;
-{
-  $Games::Board::Grid::VERSION = '1.013';
-}
+package Games::Board::Grid 1.014;
 use parent qw(Games::Board);
 # ABSTRACT: a grid-shaped gameboard
 
 use Carp;
 
+#pod =head1 SYNOPSIS
+#pod
+#pod   use Games::Board::Grid;
+#pod
+#pod   my $chess = Games::Board->new(size => 8);
+#pod
+#pod   my $rook = Games::Board::Piece->new(id => 'KR')->move(to => '7 7');
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod This module provides a base class for representing a board made up of spaces on
+#pod a right-angled grid.
+#pod
+#pod =cut
 
+#pod =method new
+#pod
+#pod   my $board = Games::Board::Grid->new(size => $size);
+#pod
+#pod This method constructs a new game board and returns it.  As constructed it has
+#pod no spaces or pieces on it.  The C<size> argument may be an integer, to produce
+#pod a square board, or an arrayref containing two integers, to produce a
+#pod rectangular board.
+#pod
+#pod =cut
 
 sub new {
   my ($class, %args) = @_;
@@ -24,6 +45,11 @@ sub new {
   $board->init;
 }
 
+#pod =method init
+#pod
+#pod This method sets up the spaces on the board.
+#pod
+#pod =cut
 
 sub init {
   my $board = shift;
@@ -40,15 +66,46 @@ sub init {
   $board;
 }
 
+#pod =method size
+#pod
+#pod =cut
 
 sub size { (shift)->{size} }
 
+#pod =method id2index
+#pod
+#pod   my $index = $board->id2index($id);
+#pod
+#pod This method returns the grid location of an identified space, in the format
+#pod C<[$x, $y]>.  In Games::Board::Grid, the index C<[x,y]> becomes the id C<'x
+#pod y'>.  Yeah, it's ugly, but it works.
+#pod
+#pod Reimplementing this method on a subclass can allow the use of idiomatic space
+#pod identifiers on a grid.  (See, for example, the chess-custom.t test in this
+#pod distribution.)
+#pod
+#pod =cut
 
 sub id2index { [ split(/ /,$_[1]) ] }
 
+#pod =method index2id
+#pod
+#pod   my $id = $board->index2id($index);
+#pod
+#pod This method performs the same translation as C<id2index>, but in reverse.
+#pod
+#pod =cut
 
 sub index2id { join(q{ }, @{$_[1]}) }
 
+#pod =method space
+#pod
+#pod   my $space = $board->space($id);
+#pod
+#pod This method returns the space with the given C<$id>.  If no space with that id
+#pod exists, undef is returned.
+#pod
+#pod =cut
 
 sub space {
   my $board = shift;
@@ -57,14 +114,25 @@ sub space {
   return $board->{spaces}{$id};
 }
 
+#pod =method add_space
+#pod
+#pod This method, provided by Games::Board, will croak immediately if called.
+#pod
+#pod =cut
 
 sub add_space { croak "spaces can't be added to grid board" }
 
+#pod =head2 Games::Board::Grid::Space
+#pod
+#pod The spaces on a grid board are blessed into this class.  It acts like a
+#pod L<Games::Board::Space> object, but directions are given as arrayrefs with x-
+#pod and y-offsets.  For example, a knight's move might be represented as:
+#pod
+#pod   $board->space('1 0')->dir([2,1]);
+#pod
+#pod =cut
 
-package Games::Board::Grid::Space;
-{
-  $Games::Board::Grid::Space::VERSION = '1.013';
-}
+package Games::Board::Grid::Space 1.014;
 use parent qw(Games::Board::Space);
 
 sub dir_id {
@@ -91,13 +159,15 @@ __END__
 
 =pod
 
+=encoding UTF-8
+
 =head1 NAME
 
 Games::Board::Grid - a grid-shaped gameboard
 
 =head1 VERSION
 
-version 1.013
+version 1.014
 
 =head1 SYNOPSIS
 
@@ -111,6 +181,18 @@ version 1.013
 
 This module provides a base class for representing a board made up of spaces on
 a right-angled grid.
+
+=head1 PERL VERSION
+
+This module should work on any version of perl still receiving updates from
+the Perl 5 Porters.  This means it should work on any version of perl released
+in the last two to three years.  (That is, if the most recently released
+version is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 METHODS
 
@@ -168,7 +250,7 @@ and y-offsets.  For example, a knight's move might be represented as:
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@cpan.org>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -2,7 +2,7 @@ package Geo::TCX::Trackpoint;
 use strict;
 use warnings;
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 
 =encoding utf-8
 
@@ -62,9 +62,11 @@ sub new {
     my ($proto, $pt_str) = (shift, shift);
     croak 'too many arguments specified' if @_;
     my $class = ref($proto) || $proto;
-    $pt_str =~ s,\</*Position\>,,g;      # Lat and Long are contained in that tag, not needed
     my $pt = {};
     bless($pt, $class);
+
+    # Lat and Long are contained in that tag, not needed
+    $pt_str =~ s,\</*Position\>,,g;
 
     # initialize fields/attr
     while ($pt_str =~ m,\<([^<>]*)\>(.*?)\</([^<>]*)\>,gs) {
@@ -256,7 +258,7 @@ use warnings;
 use DateTime::Format::ISO8601;
 use Carp qw(confess croak cluck);
 
-our $VERSION = '1.02';
+our $VERSION = '1.03';
 our @ISA=qw(Geo::TCX::Trackpoint);
 
 
@@ -281,6 +283,9 @@ sub new {
     }
     croak 'too many arguments specified' if @_;
     my $class = ref($proto) || $proto;
+
+    # Ignoring Extensions tags, might support them at some point
+    $pt_str =~ s,\<Extensions\>.*?\</Extensions\>,,g;
 
     my $chomped_str = $pt_str;
     if ( $chomped_str =~ m,\s*^\<Trackpoint\>(.*)\</Trackpoint\>\s*$,gs ) {
@@ -673,7 +678,7 @@ Patrick Joly
 
 =head1 VERSION
 
-1.02
+1.03
 
 =head1 SEE ALSO
 

@@ -1,4 +1,32 @@
 Revision history for Plack-Middleware-Greylist
 
+v0.2.2    2022-11-16 21:35:26+00:00 Europe/London
+  [Tests]
+  - Added missing prerequisite.
+
+v0.2.1    2022-11-16 20:43:06+00:00 Europe/London
+  [Bug Fixes]
+  - Removed postderef syntax which required a newer Perl version than declared.
+
+v0.2.0    2022-11-16 14:33:56+00:00 Europe/London
+  [Incompatible Changes]
+  - The cache `file` has no default, and should be set by the user unless the `cache` is overridden.
+
+  [Enhancements]
+  - Added a `retry_after` attribute to change the default Retry-After header.
+
+  [Documentation]
+  - Added note to KNOWN ISSUES about how some search engines handle HTTP 429 responses.
+
+v0.1.2    2022-11-15 14:52:21+00:00 Europe/London
+  [Tests]
+  - Fixed minimum Perl version.
+
+v0.1.1    2022-11-15 12:36:00+00:00 Europe/London
+  [Tests]
+  - Adding missing prerequisite, GH#1 (Thanks Slaven Rezić)
+
+  - Remove unused testing prereq.
+
 v0.1.0    2022-11-14 13:20:32+00:00 Europe/London
-    - First public release.
+  - First public release.

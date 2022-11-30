@@ -2,7 +2,7 @@ package Babble;
 
 use strictures 2;
 
-our $VERSION = '0.090008';
+our $VERSION = '0.090009';
 
 1;
 
@@ -18,7 +18,7 @@ Babble - EXPERIMENTAL Babel-like for perl
 
 =head1 VERSION
 
-0.090008
+0.090009
 
 =head1 SYNOPSIS
 

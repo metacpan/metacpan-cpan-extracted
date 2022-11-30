@@ -5,30 +5,31 @@ use FindBin;
 use Mojo::Base 'Mojolicious', -signatures;
 use Mojo::Darkpan::Config;
 
-sub startup($self) {
+sub startup ($self) {
+
     # https://metacpan.org/pod/Mojolicious::Plugin::BasicAuthPlus
     $self->plugin('basic_auth_plus');
-    $self->plugin('DirectoryHandler',
-        delivery_path => Mojo::Darkpan::Config->new->path);
+    $self->plugin( 'DirectoryHandler',
+        delivery_path => Mojo::Darkpan::Config->new->path );
 
     #----------
     # Router
     #----------
-    my $r = $self->routes;
+    my $r     = $self->routes;
     my $index = $r->any('/');
-    $index->get('/list')->to(controller => 'index', action => 'list');
-    $index->get('/reindex')->to(controller => 'index', action => 'reindex');
+    $index->get('/list')->to( controller => 'index', action => 'list' );
+    $index->get('/reindex')->to( controller => 'index', action => 'reindex' );
 
     my $uploader = $r->any('/publish');
-    $uploader->post('/')->to(controller => 'publish', action => 'upload');
+    $uploader->post('/')->to( controller => 'publish', action => 'upload' );
 
     # goes to the same place as publish, used for compatibility
     my $authenquery = $r->any('/authenquery');
-    $authenquery->post('/')->to(controller => 'publish', action => 'upload');
+    $authenquery->post('/')->to( controller => 'publish', action => 'upload' );
 
 }
 
-our $VERSION = "0.08";
+our $VERSION = "0.09";
 
 1;
 __END__
@@ -291,4 +292,3 @@ it under the same terms as Perl itself.
 rshingleton E<lt>reshingleton@gmail.comE<gt>
 
 =cut
-

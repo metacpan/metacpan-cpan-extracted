@@ -1,5 +1,13 @@
 Revision history for Perl extension Excel-Grinder
 
+1.2 2022-11-23T15:12:46Z
+
+    - Fix unescaped backslash in regex on windows
+
+1.1 2022-11-21T16:32:16Z
+
+    - Support for Windows filesystems
+
 1.0 2021-02-16T05:10:25Z
 
     - original version

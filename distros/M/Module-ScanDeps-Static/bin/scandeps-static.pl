@@ -3,7 +3,9 @@
 use strict;
 use warnings;
 
-our $VERSION = '0.7';
+our $VERSION = '0.9';
+
+use lib 'lib';
 
 use Module::ScanDeps::Static;
 

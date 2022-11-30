@@ -4,7 +4,7 @@
 #
 
 package Term::Tmux::Layout;
-$Term::Tmux::Layout::VERSION = '1.192431';
+$Term::Tmux::Layout::VERSION = '1.223320';
 use v5.8;
 
 # ABSTRACT: Create tmux layout strings programmatically
@@ -390,7 +390,7 @@ Term::Tmux::Layout - Create tmux layout strings programmatically
 
 =head1 VERSION
 
-version 1.192431
+version 1.223320
 
 =head1 SYNOPSIS
 
@@ -459,7 +459,7 @@ the following would be invalid:
 
   1122
   1134
-  5556
+  5554
 
 Tmux divides the entire screen up either horizontally or vertically.
 However, there is no single horizontal or vertical split that would
@@ -532,7 +532,7 @@ Joelle Maslak <jmaslak@antelope.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015-2018 by Joelle Maslak.
+This software is copyright (c) 2015-2022 by Joelle Maslak.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

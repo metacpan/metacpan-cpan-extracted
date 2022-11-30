@@ -5,7 +5,7 @@ use base 'PDF::API2::Resource::BaseFont';
 use strict;
 use warnings;
 
-our $VERSION = '2.043'; # VERSION
+our $VERSION = '2.044'; # VERSION
 
 use Encode qw(:all);
 
@@ -157,11 +157,11 @@ Returns the cid-encoded string from utf8-string.
 sub cidsByUtf {
     my ($self, $s) = @_;
     $s = pack('n*',
-              map { $self->cidByUni($_) }
-              (map {
+              map { $self->cidByUni($_) // 0 }
+              map {
                   ($_ and $_ > 0x7f and $_ < 0xa0) ? uniByName(nameByUni($_)) : $_
-               }
-               unpack('U*', $s)));
+              }
+              unpack('U*', $s));
     utf8::downgrade($s);
     return $s;
 }

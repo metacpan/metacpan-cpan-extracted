@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
 
-package Metrics::Any::Adapter::Null 0.08;
+package Metrics::Any::Adapter::Null 0.09;
 
 use v5.14;
 use warnings;
@@ -20,6 +20,9 @@ do not do anything.
 
 A program would run with this adapter by default unless it has requested a
 different one, via the C<use Metrics::Any::Adapter> statement.
+
+This adapter type claims to support batch mode, though the reporting callback
+will never be invoked.
 
 =cut
 
@@ -39,6 +42,10 @@ foreach my $method (qw(
    no strict 'refs';
    *$method = sub {};
 }
+
+# Batch mode is supported but does nothing
+use constant HAVE_BATCH_MODE => 1;
+sub add_batch_mode_callback {}
 
 =head1 AUTHOR
 

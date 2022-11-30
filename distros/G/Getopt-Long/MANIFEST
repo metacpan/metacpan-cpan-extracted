@@ -1,7 +1,7 @@
 MANIFEST              List of files in this kit
 README                Introductionary text
 INSTALL               Installation information
-CHANGES               List of changes
+Changes               List of changes
 lib/Getopt/Long.pm    Getopt::Long
 lib/newgetopt.pl      newgetopt.pl (subroutine NGetOpt)
 Makefile.PL           Makefile for installation

@@ -24,9 +24,11 @@ CacheModel
 Code
 Config
 Crotty
+Custodio
 DROLSKY
 DROLSKY's
 Dave
+Dostál
 Finn
 Fish
 Fowler
@@ -66,6 +68,8 @@ Oschwald
 PHP
 PHPCodeSniffer
 PREREQS
+Paulo
+Pavel
 PayPal
 Pedro
 PerlCritic
@@ -155,6 +159,8 @@ olaf
 ops
 params
 pathname
+pauloscustodio
+pdostal
 perlcritic
 perlcriticrc
 perltidy

@@ -1,3 +1,4 @@
+Changes
 COPYING
 lib/HTML/Blitz.pm
 lib/HTML/Blitz/ActionType.pm
@@ -18,6 +19,7 @@ Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 t/actions.t
+t/marshal.t
 t/methods.t
 t/selectors.t
 t/template/doc.html

@@ -216,7 +216,6 @@ sub callback_state_change_set {
     $ee->_ecore_evas_callback_state_change_set($func);
 }
 
-
 # Preloaded methods go here.
 
 1;

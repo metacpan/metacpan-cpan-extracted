@@ -126,3 +126,12 @@ Revision history for Perl extension pEFL.
 		(SvTYPE($arg) == SVt_NULL seems to be unreliable)
 	- POD corrections
 	- complete colorselector example
+0.73 Tue Nov 15 08:00:00 2022
+	- Add ECORE_EVAS_ENGINE_|OBJECT_ASSOCIATE_|AVOID_DAMAGE_ Constants
+	- Add pEFL::Evas::Image->filled_add()
+	- Add automatical cleanup for pEFL::Evas::Objects (Image, Line, Polygon, Rect, Textblock, Text)
+	- Add basic support of Edje
+0.74 Tue Nov 20 05:30:00 2022
+	- Add most of the enums/constants of Edje_Common.h
+	- Add support of Edje Messages
+	- Add edje_load_error_str()

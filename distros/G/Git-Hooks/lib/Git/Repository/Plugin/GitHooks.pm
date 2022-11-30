@@ -2,7 +2,7 @@ use warnings;
 
 package Git::Repository::Plugin::GitHooks;
 # ABSTRACT: A Git::Repository plugin with some goodies for hook developers
-$Git::Repository::Plugin::GitHooks::VERSION = '3.3.0';
+$Git::Repository::Plugin::GitHooks::VERSION = '3.3.1';
 use parent qw/Git::Repository::Plugin/;
 
 use v5.16.0;
@@ -382,25 +382,25 @@ sub prepare_hook {
 sub load_plugins {
     my ($git) = @_;
 
-    my %enabled_plugins  = map {($_ => undef)} map {split} $git->get_config(githooks => 'plugin');
+    my %plugins;
 
-    return unless %enabled_plugins; # no one configured
+    foreach my $plugin (map {split} $git->get_config(githooks => 'plugin')) {
+        my ($negation, $prefix, $basename) = ($plugin =~ /^(\!?)((?:.+::)?)(.+)/);
 
-    my %disabled_plugins = map {($_ => undef)} map {split} $git->get_config(githooks => 'disable');
-
-    # Remove disabled plugins from the list of enabled ones
-    foreach my $plugin (keys %enabled_plugins) {
-        my ($prefix, $basename) = ($plugin =~ /^(.+::)?(.+)/);
-
-        if (   exists $disabled_plugins{$plugin}
-            || exists $disabled_plugins{$basename}
-            || exists $ENV{$basename} && ! $ENV{$basename}
-        ) {
-            delete $enabled_plugins{$plugin};
+        if (exists $ENV{$basename} && ! $ENV{$basename}) {
+            delete @plugins{$basename, "$prefix$basename"};
+        } elsif ($negation) {
+            delete $plugins{"$prefix$basename"};
         } else {
-            $enabled_plugins{$plugin} = [$prefix, $basename];
+            $plugins{"$prefix$basename"} = [$prefix, $basename];
         }
     }
+
+    return unless %plugins; # no one configured
+
+    # Remove disabled plugins from the list of plugins
+    my %disabled_plugins = map {($_ => undef)} map {split} $git->get_config(githooks => 'disable');
+    delete @plugins{grep {exists $disabled_plugins{$_}} keys %plugins};
 
     # Define the list of directories where we'll look for the hook
     # plugins. First the local directory 'githooks' under the
@@ -413,10 +413,10 @@ sub load_plugins {
         path($INC{'Git/Hooks.pm'})->parent->child('Hooks'),
     );
 
-    $log->debug(load_plugins => {enabled_plugins => \%enabled_plugins, plugin_dirs => \@plugin_dirs});
+    $log->debug(load_plugins => {plugins => \%plugins, plugin_dirs => \@plugin_dirs});
 
     # Load remaining enabled plugins
-    while (my ($key, $plugin) = each %enabled_plugins) {
+    while (my ($key, $plugin) = each %plugins) {
         my ($prefix, $basename) = @$plugin;
         my $exit = do {
             if ($prefix) {
@@ -770,15 +770,17 @@ sub _githooks_colors {
 sub check_timeout {
     my ($git) = @_;
 
-    state $timeout = $git->get_config_integer(githooks => 'timeout');
+    my $cache = $git->cache('timeout');
 
-    return unless $timeout;
+    $cache->{timeout} = $git->get_config_integer(githooks => 'timeout');
 
-    state $start_time = time;
+    return unless $cache->{timeout};
+
+    $cache->{start_time} = time;
 
     my $now = time;
 
-    if (($now - $start_time) >= $timeout) {
+    if (($now - $cache->{start_time}) >= $cache->{timeout}) {
         $git->fault("Hook timeout");
         $git->fail_on_faults();
     }
@@ -1283,7 +1285,7 @@ sub authenticated_user {
                 croak __PACKAGE__, ": option userenv environment variable ($userenv) is not defined.\n";
             }
         } else {
-            $git->{_plugin_githooks}{authenticated_user} = $ENV{GERRIT_USER_EMAIL} || $ENV{USER} || undef;
+            $git->{_plugin_githooks}{authenticated_user} = $ENV{GERRIT_USER_EMAIL} || $ENV{BB_USER_NAME} || $ENV{GL_USERNAME} || $ENV{USER} || undef;
         }
     }
 
@@ -1301,6 +1303,10 @@ sub repository_name {
             # Bitbucket Server environment variables available for hooks:
             # https://developer.atlassian.com/server/bitbucket/how-tos/write-hook-scripts/
             $git->{_plugin_githooks}{repository_name} = "$ENV{BB_PROJECT_KEY}/$ENV{BB_REPO_SLUG}";
+        } elsif (exists $ENV{GL_PROJECT_PATH}) {
+            # GitLab environment variables available for hooks:
+            # https://docs.gitlab.com/ee/administration/server_hooks.html
+            $git->{_plugin_githooks}{repository_name} = "$ENV{GL_PROJECT_PATH}";
         } else {
             # As a last resort, return GIT_DIR's basename
             my $gitdir = path($git->git_dir());
@@ -1608,7 +1614,7 @@ Git::Repository::Plugin::GitHooks - A Git::Repository plugin with some goodies f
 
 =head1 VERSION
 
-version 3.3.0
+version 3.3.1
 
 =head1 SYNOPSIS
 
@@ -2143,11 +2149,16 @@ groks it from the C<githooks.userenv> configuration variable specification,
 which is described in the L<Git::Hooks> documentation. It's useful for most
 access control check plugins.
 
+If C<githooks.userenv> isn't configured, it tries to grok the username from
+environment variables set by Gerrit, Bitbucket Server, and GitLab before trying
+the C<USER> environment variable as a last resort. If it can't find it, it
+returns undef.
+
 =head2 repository_name
 
 Returns the repository name as a string. Currently it knows how to grok the name
-from Gerrit and Bitbucket servers. Otherwise it tries to grok it from the
-C<GIT_DIR> environment variable, which holds the path to the Git repository.
+from Gerrit, Bitbucket, and GitLab servers. Otherwise it tries to grok it from
+the C<GIT_DIR> environment variable, which holds the path to the Git repository.
 
 =head2 get_current_branch
 
@@ -2346,6 +2357,16 @@ not having a WHO part, are returned in the list.
 =head1 SEE ALSO
 
 C<Git::Repository::Plugin>, C<Git::Hooks>.
+
+=over
+
+=item * L<Writing hook scripts|https://developer.atlassian.com/server/bitbucket/how-tos/write-hook-scripts/> in Bitbucket Server.
+
+=item * L<Git server hooks|Writing hook scripts|https://developer.atlassian.com/server/bitbucket/how-tos/write-hook-scripts> in GitLab.
+
+=item * L<Supported hooks|https://gerrit.googlesource.com/plugins/hooks/+/HEAD/src/main/resources/Documentation/hooks.md> in Gerrit.
+
+=back
 
 =head1 AUTHOR
 

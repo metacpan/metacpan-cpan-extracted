@@ -24,6 +24,11 @@ use constant DEBUG_BAZEL_BOOTSTRAP =>
     ? $ENV{ALIEN_BAZEL_DEBUG_BAZEL_BOOTSTRAP}
     : 0;
 
+use constant FROM_SOURCE =>
+    exists $ENV{ALIEN_BAZEL_FROM_SOURCE}
+    ? $ENV{ALIEN_BAZEL_FROM_SOURCE}
+    : 0;
+
 use lib 'lib';
 use Alien::Bazel::Util;
 
@@ -39,7 +44,7 @@ plugin 'Probe::CommandLine' => (
 share {
     requires 'Path::Tiny';
     requires 'File::Which';
-    requires 'Alien::Build::Plugin::Download::GitHub', '0.09';
+    requires 'Alien::Build::Plugin::Download::GitHub', '0.10';
 
     my $time_start = time();
     print {*STDERR} '<<< DEBUG >>> have $time_start = ', $time_start, ' seconds', "\n";
@@ -47,6 +52,14 @@ share {
     # START HERE, NEED ANSWER: how to handle prerequisites???
     # START HERE, NEED ANSWER: how to handle prerequisites???
     # START HERE, NEED ANSWER: how to handle prerequisites???
+    my %os_arch_to_binary_release = (
+        'darwin:aarch64'  => { suffix => 'darwin-arm64',       },
+        'darwin:x86_64'   => { suffix => 'darwin-x86_64',      },
+        'linux:aarch64'   => { suffix => 'linux-arm64',        },
+        'linux:x86_64'    => { suffix => 'linux-x86_64',       },
+        'MSWin32:aarch64' => { suffix => 'windows-arm64.exe',  },
+        'MSWin32:x86_64'  => { suffix => 'windows-x86_64.exe', },
+    );
 
     # must have prerequisites to compile from source
     # https://bazel.build/install/compile-source#bootstrap-bazel
@@ -61,39 +74,79 @@ share {
     # https://github.com/bazelbuild/bazel/releases
     # Bazel bootstrap archive is always "zip"; the "tar.gz" archives are NOT
     # bootstrap capable
-    plugin 'Download::GitHub' => (
-        github_user  => 'bazelbuild',
-        github_repo  => 'bazel',
-        asset        => 1,
+
+    my %source_asset_info = (
         asset_name   => qr/^bazel-([0-9\.]+)-dist\.zip$/,
         asset_format => 'zip',
     );
 
-    # provides `bash` in crippled operating systems
-    plugin 'Build::MSYS';
+    # from source by default
+    my %asset_info = %source_asset_info;
+    my $binary_release = 0;
 
-    # NEED UPGRADE: verify the signature made by Bazel's release key 3D5919B448457EE0
-    # https://bazel.build/bazel-release.pub.gpg
-
-    meta->prop->{env}->{JAVA_HOME} = Alien::Bazel::Util->_find_jdk_java_home;
-    # https://bazel.build/install/compile-source#bootstrap-bazel
-    # $ env EXTRA_BAZEL_ARGS="--tool_java_runtime_version=local_jdk" bash ./compile.sh
-    meta->prop->{env}->{EXTRA_BAZEL_ARGS} = '--tool_java_runtime_version=local_jdk';
-
-    if( DEBUG_BAZEL_BOOTSTRAP ) {
-        meta->prop->{env}->{VERBOSE} = 'yes';
-        meta->prop->{env}->{BAZEL_DEBUG_JAVA_COMPILATION} = 1;
+    my $os_arch = join ":", ( $^O, meta->prop->{platform}{cpu}{arch}{name} );
+    if( exists $os_arch_to_binary_release{$os_arch} && ! FROM_SOURCE ) {
+        $binary_release = 1;
+        my ($suffix) = @{ $os_arch_to_binary_release{$os_arch} }{qw(suffix)};
+        %asset_info = (
+            asset_name   => qr/^bazel-([0-9\.]+)-\Q${suffix}\E$/,
+            asset_format => 'f',
+        );
     }
-    build [
-        sub {
+
+    plugin 'Download::GitHub' => (
+        github_user  => 'bazelbuild',
+        github_repo  => 'bazel',
+        asset        => 1,
+        %asset_info,
+    );
+
+    if( ! $binary_release ) { # from source
+        # provides `bash` in crippled operating systems
+        plugin 'Build::MSYS';
+
+        # NEED UPGRADE: verify the signature made by Bazel's release key 3D5919B448457EE0
+        # https://bazel.build/bazel-release.pub.gpg
+
+        meta->prop->{env}->{JAVA_HOME} = Alien::Bazel::Util->_find_jdk_java_home;
+        # https://bazel.build/install/compile-source#bootstrap-bazel
+        # $ env EXTRA_BAZEL_ARGS="--tool_java_runtime_version=local_jdk" bash ./compile.sh
+        meta->prop->{env}->{EXTRA_BAZEL_ARGS} = '--tool_java_runtime_version=local_jdk';
+
+        if( DEBUG_BAZEL_BOOTSTRAP ) {
+            meta->prop->{env}->{VERBOSE} = 'yes';
+            meta->prop->{env}->{BAZEL_DEBUG_JAVA_COMPILATION} = 1;
+        }
+        build [
+            sub {
+                my ($build) = @_;
+                $build->log("JAVA_HOME        = $ENV{JAVA_HOME}");
+                $build->log("EXTRA_BAZEL_ARGS = $ENV{EXTRA_BAZEL_ARGS}");
+            },
+            'bash ./compile.sh',
+            '%{make_path} %{.install.stage}/bin',
+            '%{cp} output/bazel %{.install.stage}/bin'
+        ];
+    } else {
+        patch sub {
             my ($build) = @_;
-            $build->log("JAVA_HOME        = $ENV{JAVA_HOME}");
-            $build->log("EXTRA_BAZEL_ARGS = $ENV{EXTRA_BAZEL_ARGS}");
-        },
-        'bash ./compile.sh',
-        '%{make_path} %{.install.stage}/bin',
-        '%{cp} output/bazel %{.install.stage}/bin'
-    ];
+            my ($bazel_file) = Path::Tiny->new('.')->children(qr/^bazel-/);
+            # remove all but 'bazel' prefix and possibly a '.exe' suffix (on
+            # MSWin32) so $exe is either 'bazel' or 'bazel.exe'
+            (my $exe = $bazel_file->basename) =~ s/^ (bazel) .*? ( (?:\.exe)? ) $/$1$2/x;
+            $bazel_file->move( $bazel_file->parent->child($exe) );
+            $build->install_prop->{bazel_exe} = $exe;
+        };
+        build [
+            '%{make_path} %{.install.stage}/bin',
+            "%{cp} %{.install.bazel_exe} %{.install.stage}/bin",
+
+            ( $^O ne 'MSWin32'
+            ? "chmod +x %{.install.stage}/bin/%{.install.bazel_exe}"
+            : ()
+            )
+        ];
+    }
 
     after 'gather' => sub {
         my $time_total = time() - $time_start;

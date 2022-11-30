@@ -2,16 +2,52 @@ package Babble::Plugin::SubstituteAndReturn;
 
 use Moo;
 
-my $s_FLAGS_RE = qr/([msixpodualgcern]*+)$/;
-my $y_FLAGS_RE = qr/([cdsr]*+)$/;
+our ($REGMARK, $REGERROR);
+
+my %OP_TYPE_DATA = (
+  s => {
+    rule  => 'QuotelikeS',
+    flags => qr/([msixpodualgcern]*+)$/,
+  },
+  y => {
+    rule  => 'QuotelikeTR',
+    flags => qr/([cdsr]*+)$/,
+  },
+);
+
+my $OP_TYPE_RE = qr{
+  \A
+  (?:
+          s       (*MARK:s)
+    | (?: y|tr )  (*MARK:y)
+  )
+}x;
 
 sub _get_flags {
   my ($text) = @_;
-  $text =~ /^s/ ? $s_FLAGS_RE : $y_FLAGS_RE;
+
+  if ( $text =~ $OP_TYPE_RE ) {
+    return $OP_TYPE_DATA{$REGMARK}{flags};
+  }
+
+  return '';
 }
 
 sub _transform_binary {
   my ($self, $top) = @_;
+
+  my $chained_re = qr{
+    \G
+      (
+        (?>(?&PerlOWS)) =~ (?>(?&PerlOWS))
+        ((?>
+            (?&PerlSubstitution)
+          | (?&PerlTransliteration)
+        ))
+      )
+      @{[ $top->grammar_regexp ]}
+  }x;
+
   my $replaced;
   do {
     $replaced = 0;
@@ -38,17 +74,7 @@ sub _transform_binary {
       pos( $top_text ) = $m->start + length $m->text;
       my $chained_subs_length = 0;
       my @chained_subs;
-      while( $top_text =~ /
-        \G
-          (
-            (?>(?&PerlOWS)) =~ (?>(?&PerlOWS))
-            ((?>
-                (?&PerlSubstitution)
-              | (?&PerlTransliteration)
-            ))
-          )
-          @{[ $m->grammar_regexp ]}
-        /xg ) {
+      while( $top_text =~ /$chained_re/g ) {
         $chained_subs_length += length $1;
         push @chained_subs, $2;
       }
@@ -88,46 +114,37 @@ sub _transform_binary {
 sub _transform_contextualise {
   my ($self, $top) = @_;
 
-  my $contextual_subst = 0;
   do {
-    my %subst_pos;
+    my @subst_pos; # sorted positions
     # Look for substitution without binding operator:
     # First look for an expression that begins with Substitution.
-    $top->each_match_within(Expression => [
-      [ subst => '(?>
-                      (?&PerlSubstitution)
-                    | (?&PerlTransliteration)
-                  )' ],
-    ] => sub {
+    $top->each_match_of( Expression => sub {
       my ($m) = @_;
-      my ($subst) = @{$m->submatches}{qw(subst)};
-      my ($flags) = $subst->text =~ _get_flags($subst->text);
+      my $expr_text = $m->text;
+      my @start_pos = do {
+        if( $expr_text =~ $OP_TYPE_RE ) {
+          my $rule = $OP_TYPE_DATA{$REGMARK}{rule};
+          my @pos = $m->match_positions_of($rule);
+          return unless @pos && $pos[0][0] == 0;
+          @{ $pos[0] };
+        } else {
+          return;
+        }
+      };
+      my $text = substr($expr_text, $start_pos[0], $start_pos[1]);
+      my ($flags) = $text =~ _get_flags($text);
       return unless $flags =~ /r/;
-      $subst_pos{$m->start} = 1;
-    });
-    # Then remove Substitution within a BinaryExpression
-    $top->each_match_within(BinaryExpression => [
-       [ 'left' => '(?>(?&PerlPrefixPostfixTerm))' ],
-       '(?>(?&PerlOWS)) =~ (?>(?&PerlOWS))',
-       [ 'right' => '(?>
-                         (?&PerlSubstitution)
-                       | (?&PerlTransliteration)
-                     )' ],
-    ] => sub {
-      my ($m) = @_;
-      delete $subst_pos{ $m->start + $m->submatches->{right}->start };
+      push @subst_pos, $m->start;
     });
 
     # Insert context variable and binding operator
-    my @subst_pos = sort keys %subst_pos;
-    $contextual_subst = @subst_pos;
     my $diff = 0;
     my $replace = '$_ =~ ';
     while( my $pos = shift @subst_pos ) {
       $top->replace_substring($pos + $diff, 0, $replace);
       $diff += length $replace;
     }
-  } while( $contextual_subst);
+  };
 }
 
 sub transform_to_plain {
@@ -136,6 +153,11 @@ sub transform_to_plain {
   $self->_transform_contextualise($top);
 
   $self->_transform_binary($top);
+}
+
+sub check_bail_out_early {
+  my ($self, $top) = @_;
+  $top->text !~ m/ \b (?: s|y|tr ) \b /xs;
 }
 
 1;

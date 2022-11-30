@@ -1,5 +1,26 @@
 Revision history for perl module Git-Hooks. -*- text -*-
 
+3.3.1     2022-11-27 19:23:46-03:00 America/Sao_Paulo
+
+[Improvements]
+
+  - Add support for GitLab servers.
+
+  - Groks the authenticated user name from Bitbucket's environment variables.
+
+  - Extends the githooks.plugin option with the ability to disable a plugin by
+    prefixing its name with an exclamation point. This allows one to disable a
+    plugin and re-enable it later, which wasn't possible before.
+
+  - Add POD spelling tests and fix some typos.
+
+  - Document the version after which deprecated options were deprecated.
+
+[Deprecations]
+
+  - The githooks.disable option is being deprecated in favor of the extended
+    githooks.plugin option.
+
 3.3.0     2022-06-11 16:43:20-03:00 America/Sao_Paulo
 
 [New features]

@@ -23,7 +23,7 @@ use Encode;
 use Web::Reactor::Utils;
 use Web::Reactor::HTML::Form;
 
-our $VERSION = '2.11';
+our $VERSION = '2.12';
 
 ##############################################################################
 

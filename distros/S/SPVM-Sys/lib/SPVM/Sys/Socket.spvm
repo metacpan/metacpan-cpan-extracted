@@ -29,6 +29,8 @@ class Sys::Socket {
   
   native static method socket : int ($domain : int, $type : int, $protocol : int);
 
+  native static method connect_raw : int ($sockfd : int, $addr : Sys::Socket::Sockaddr, $addrlen : int);
+  
   native static method connect : int ($sockfd : int, $addr : Sys::Socket::Sockaddr, $addrlen : int);
 
   native static method bind : int ($sockfd : int, $addr : Sys::Socket::Sockaddr, $addrlen : int);
@@ -39,9 +41,9 @@ class Sys::Socket {
 
   native static method shutdown : int ($sockfd : int, $how : int);
 
-  native static method recv : int ($sockfd : int, $buf : mutable string, $len : int, $flags : int);
+  native static method recv : int ($sockfd : int, $buf : mutable string, $len : int, $flags : int, $buf_offset = 0 : int);
 
-  native static method send : int ($sockfd : int, $buf : string, $len : int, $flags : int);
+  native static method send : int ($sockfd : int, $buf : string, $len : int, $flags : int, $buf_offset = 0 : int);
 
   native static method getpeername : int ($sockfd : int, $addr : Sys::Socket::Sockaddr, $addrlen_ref : int*);
 
@@ -79,4 +81,8 @@ class Sys::Socket {
 
   native static method socket_errno : int ();
   native static method socket_strerror : string ($errno : int, $length : int);
+
+  native static method sockatmark : int ($sockfd : int);
+
+  native static method sendto : int ($sockfd : int, $buf : string, $len : int, $flags : int, $addr : Sys::Socket::Sockaddr, $addrlen : int);
 }

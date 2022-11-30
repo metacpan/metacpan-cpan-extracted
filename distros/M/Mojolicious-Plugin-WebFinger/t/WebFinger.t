@@ -81,12 +81,12 @@ is($wf->link('describedby')
      ->attr('type'), 'application/rdf+xml',
    'Webfinger-descrybed_by-type');
 
-$t->get_ok('/.well-known/webfinger?resource='.b($acct)->url_escape . '&format=xml&_format=xml')
+$t->get_ok('/.well-known/webfinger?resource='.b($acct)->url_escape . '&_format=xml')
   ->status_is('200')
   ->content_type_is('application/xrd+xml')
   ->text_is('Subject' => $acct);
 
-$t->get_ok('/.well-known/webfinger?resource=nothing&format=xml&_format=xml')
+$t->get_ok('/.well-known/webfinger?resource=nothing&_format=xml')
   ->status_is('404')
   ->content_type_is('application/xrd+xml')
   ->text_is(Subject => 'nothing');

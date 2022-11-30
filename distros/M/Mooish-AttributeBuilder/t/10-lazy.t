@@ -42,5 +42,23 @@ subtest 'testing lazy with "0"' => sub {
 		'return value ok';
 };
 
+subtest 'testing lazy with default and "1"' => sub {
+	my ($name, %params) = field 'param', lazy => 1, default => undef;
+
+	is_deeply
+		\%params,
+		{is => 'ro', init_arg => undef, lazy => 1, default => undef},
+		'return value ok';
+};
+
+subtest 'testing lazy with builder and "1"' => sub {
+	my ($name, %params) = field 'param', lazy => 1, builder => '_build_it';
+
+	is_deeply
+		\%params,
+		{is => 'ro', init_arg => undef, lazy => 1, builder => '_build_it'},
+		'return value ok';
+};
+
 done_testing;
 

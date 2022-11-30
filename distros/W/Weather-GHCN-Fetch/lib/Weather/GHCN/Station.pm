@@ -8,7 +8,7 @@ Weather::GHCN::Station - class for Station metadata
 
 =head1 VERSION
 
-version v0.0.010
+version v0.0.011
 
 =head1 SYNOPSIS
 
@@ -48,7 +48,7 @@ use Object::Pad 0.66 qw( :experimental(init_expr) );
 package Weather::GHCN::Station;
 class   Weather::GHCN::Station;
 
-our $VERSION = 'v0.0.010';
+our $VERSION = 'v0.0.011';
 
 use Weather::GHCN::Common        qw( rng_new iso_date_time );
 use Const::Fast;

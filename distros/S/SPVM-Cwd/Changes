@@ -1,3 +1,17 @@
+0.04 2022-11-16
+  [Prerequrement Changes]
+    * SPVM::Cwd needs SPVM 0.9662+ adn SPVM::Sys 0.27+.
+  [Document Improvement]
+    * Improved the whole doc.
+0.03 2022-09-16
+  [New Features]
+    * Add the getdcwd method to the Cwd class.
+  [Changes]
+    * The getcwd method in the Cwd calls the getcwd method in the Sys::IO internally.
+    * The realpath method in the Cwd calls the realpath method and the _fullpath method in the Sys::IO internally.
+  [Prerequirement Changes]
+    * Need SPVM::Sys 0.03+.
+
 0.02 2022-07-15
   [New Features]
     * Add the following methods.

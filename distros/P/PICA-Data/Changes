@@ -1,5 +1,8 @@
 Revision history for PICA::Data
 
+2.05 2022-11-15T07:41:31Z
+    - Add functions pica_sort_subfields and parse_subfield_schedule
+
 2.04 2022-09-20T09:31:32Z
     - Add option level to pica_split
     - Support writing annotated PICA / PICA Patch in normalized and binary form

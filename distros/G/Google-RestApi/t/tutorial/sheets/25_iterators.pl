@@ -21,7 +21,7 @@ end("Spreadsheet successfully opened, enter url '$uri' in your browser to follow
 $sheets_api->rest_api()->api_callback(\&show_api);
 
 start("Now we will open the spreadsheet and worksheet.");
-my $ws0 = $ss->open_worksheet(id => 0);
+my $ws0 = $ss->open_worksheet(name => 'Fred');
 end_go("Worksheet is now open.");
 
 my $search = 'Freddie Mercury';

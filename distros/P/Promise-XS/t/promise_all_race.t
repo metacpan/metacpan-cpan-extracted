@@ -23,6 +23,20 @@ $p1->all($p1, $p2)->then( sub {
     );
 } );
 
+$p1->all($p1, 'bar')->then( sub {
+    my (@got)  = @_;
+
+    is_deeply(
+        \@got,
+        [
+            [ 2, 3 ],
+            [ 'bar' ],
+        ],
+        'all() works as a method of the promise object and string',
+    );
+} );
+
+
 Promise::XS::Promise->all($p1, $p2)->then( sub {
     my (@got)  = @_;
 

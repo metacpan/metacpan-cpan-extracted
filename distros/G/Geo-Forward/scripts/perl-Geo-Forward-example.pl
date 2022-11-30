@@ -3,19 +3,18 @@ use strict;
 use warnings;
 use Geo::Forward;
 
-my $gf=Geo::Forward->new;
+my $gf = Geo::Forward->new;
 
 while (<>) {
   chomp;
   my ($lat1, $lon1, $faz, $dist) = split(/\s+/, $_);
-  my ($lat2, $lon2, $baz)        = $gf->forward($lat1,$lon1,$faz,$dist);
+  my ($lat2, $lon2, $baz)        = $gf->forward($lat1, $lon1, $faz, $dist);
 
   print "Input Lat: $lat1  Lon: $lon1\n";
   print "Input Forward Azimuth: $faz\n";
   print "Input Distance: $dist\n";
   print "Output Lat: $lat2 Lon: $lon2\n";
   print "Output Back Azimuth: $baz\n";
-  
 }
 
 __END__

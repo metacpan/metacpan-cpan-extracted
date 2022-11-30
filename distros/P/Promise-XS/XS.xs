@@ -26,6 +26,13 @@
 
 #define UNUSED(x) (void)(x)
 
+#define DEBUG_AWAITABLE 0
+#if DEBUG_AWAITABLE
+#   define _DO_DEBUG_AWAITABLE() fprintf(stderr, "# %s\n", __func__)
+#else
+#   define _DO_DEBUG_AWAITABLE()
+#endif
+
 #define _MAX_RECURSION 254
 
 /* We could look here at the full stack depth
@@ -1472,6 +1479,7 @@ DESTROY(SV* self_sv)
 SV*
 AWAIT_NEW_DONE(...)
     CODE:
+        _DO_DEBUG_AWAITABLE();
         UNUSED(items);
         RETVAL = _create_preresolved_promise(aTHX_ &(ST(1)), items - 1, true);
     OUTPUT:
@@ -1480,6 +1488,7 @@ AWAIT_NEW_DONE(...)
 SV*
 AWAIT_NEW_FAIL(...)
     CODE:
+        _DO_DEBUG_AWAITABLE();
         UNUSED(items);
         RETVAL = _create_prerejected_promise(aTHX_ &(ST(1)), items - 1, true);
     OUTPUT:
@@ -1488,6 +1497,7 @@ AWAIT_NEW_FAIL(...)
 SV*
 AWAIT_CLONE(...)
     CODE:
+        _DO_DEBUG_AWAITABLE();
         UNUSED(items);
 
         xspr_promise_t* promise_p = create_promise(aTHX);
@@ -1495,24 +1505,33 @@ AWAIT_CLONE(...)
         RETVAL = _promise_to_sv(aTHX_ promise_p);
 
         _IMMORTALIZE_PROMISE_SV(RETVAL, promise_p);
+
+        if (DEBUG_AWAITABLE) {
+            fprintf(stderr, "#   SvREFCNT(RETVAL)=%d\n", SvREFCNT(RETVAL));
+            fprintf(stderr, "#   SvREFCNT(SvRV(RETVAL))=%d\n", SvREFCNT(SvRV(RETVAL)));
+            sv_dump(RETVAL);
+        }
     OUTPUT:
         RETVAL
 
 void
 AWAIT_DONE(SV* self_sv, ...)
     CODE:
+        _DO_DEBUG_AWAITABLE();
         PROMISE_CLASS_TYPE* self = _get_promise_from_sv(aTHX_ self_sv);
         _resolve_promise(aTHX_ self->promise, &ST(1), items - 1);
 
 void
 AWAIT_FAIL(SV* self_sv, ...)
     CODE:
+        _DO_DEBUG_AWAITABLE();
         PROMISE_CLASS_TYPE* self = _get_promise_from_sv(aTHX_ self_sv);
         _reject_promise(aTHX_ NULL, self->promise, &ST(1), items - 1);
 
 bool
 AWAIT_IS_READY(SV *self_sv)
     CODE:
+        _DO_DEBUG_AWAITABLE();
         PROMISE_CLASS_TYPE* self = _get_promise_from_sv(aTHX_ self_sv);
 
         RETVAL = (self->promise->state != XSPR_STATE_PENDING);
@@ -1522,6 +1541,7 @@ AWAIT_IS_READY(SV *self_sv)
 void
 AWAIT_GET(SV *self_sv)
     PPCODE:
+        _DO_DEBUG_AWAITABLE();
         DEFERRED_CLASS_TYPE* self = _get_deferred_from_sv(aTHX_ self_sv);
 
         assert(self->promise->state == XSPR_STATE_FINISHED);
@@ -1572,16 +1592,19 @@ AWAIT_GET(SV *self_sv)
 void
 AWAIT_CHAIN_CANCEL(...)
     CODE:
+        _DO_DEBUG_AWAITABLE();
         UNUSED(items);
 
 void
 AWAIT_ON_CANCEL(...)
     CODE:
+        _DO_DEBUG_AWAITABLE();
         UNUSED(items);
 
 UV
 AWAIT_IS_CANCELLED(...)
     CODE:
+        _DO_DEBUG_AWAITABLE();
         UNUSED(items);
         RETVAL = 0;
     OUTPUT:
@@ -1590,6 +1613,7 @@ AWAIT_IS_CANCELLED(...)
 void
 AWAIT_ON_READY(SV *self_sv, SV* coderef)
     CODE:
+        _DO_DEBUG_AWAITABLE();
         PROMISE_CLASS_TYPE* self = _get_promise_from_sv(aTHX_ self_sv);
 
         self->promise->on_ready_immediate = coderef;
@@ -1599,6 +1623,7 @@ AWAIT_ON_READY(SV *self_sv, SV* coderef)
 void
 AWAIT_WAIT(SV* self_sv)
     PPCODE:
+        _DO_DEBUG_AWAITABLE();
         dMY_CXT;
 
         switch (MY_CXT.event_system) {

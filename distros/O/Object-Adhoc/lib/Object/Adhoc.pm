@@ -5,7 +5,7 @@ use warnings;
 package Object::Adhoc;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.005';
+our $VERSION   = '0.006';
 
 use Digest::MD5 qw( md5_hex );
 use Exporter::Shiny qw( object make_class );
@@ -35,6 +35,7 @@ our @RESERVED_METHODS = qw(
 	AUTOLOAD
 	isa DOES does can VERSION
 	meta new
+	TO_JSON
 );
 #
 # Note that tie-related stuff isn't on the list of reserved methods
@@ -107,6 +108,7 @@ sub make_class {
 		*{"$class\::DOES"}     = \&_DOES;
 		*{"$class\::does"}     = \&_DOES;
 		*{"$class\::VERSION"}  = \$VERSION;
+		*{"$class\::TO_JSON"}  = \&_TO_JSON;
 	};
 	
 	$made{$joined} = $class;
@@ -123,6 +125,11 @@ sub _DOES {
 	return !!1 if $_[1] eq __PACKAGE__;
 	return !!1 if $_[1] eq 'HASH';
 	shift->isa(@_);
+}
+
+sub _TO_JSON {
+	my %hash = %{ +shift };
+	\%hash;
 }
 
 1;
@@ -251,7 +258,7 @@ This throws an exception rather than just printing a warning.
 =head1 BUGS
 
 Please report any bugs to
-L<http://rt.cpan.org/Dist/Display.html?Queue=Object-Adhoc>.
+L<https://github.com/tobyink/p5-object-adhoc/issues>.
 
 =head1 SEE ALSO
 
@@ -311,7 +318,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2020 by Toby Inkster.
+This software is copyright (c) 2020-2022 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,6 @@
+0.02 2022-11-16
+    - raise required perl version to 5.24 (for postderef feature)
+    - implement FREEZE/THAW on HTML::Blitz::Template
+
+0.01 2022-11-13
+    - initial release

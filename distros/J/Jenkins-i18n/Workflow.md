@@ -74,6 +74,17 @@ and execute:
 mvn -am -pl war,bom -DskipTests -Dspotbugs.skip -Dspotless.check.skip clean install
 ```
 
+### Issues with NodeJS
+
+You might get errors from not having NodeJS (and yarn) available to compile
+Jenkins frontend. You should install those manually before trying to compile.
+
+NodeJS version 18 or higher is required for that.
+
+If you're using older Linux distribution versions, you might need to compile
+it yourself, as described
+[here](https://github.com/nodesource/distributions/issues/1392).
+
 ## Tips
 
 ### Working in a shell

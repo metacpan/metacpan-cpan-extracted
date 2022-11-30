@@ -1,4 +1,4 @@
-package Dist::Zilla::App::Command::new 6.028;
+package Dist::Zilla::App::Command::new 6.029;
 # ABSTRACT: mint a new dist
 
 use Dist::Zilla::Pragmas;
@@ -109,7 +109,7 @@ Dist::Zilla::App::Command::new - mint a new dist
 
 =head1 VERSION
 
-version 6.028
+version 6.029
 
 =head1 SYNOPSIS
 

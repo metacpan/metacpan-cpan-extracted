@@ -8,7 +8,7 @@ Weather::GHCN::Options - create and manage option lists/objects used by GHCN mod
 
 =head1 VERSION
 
-version v0.0.010
+version v0.0.011
 
 =head1 SYNOPSIS
 
@@ -37,12 +37,14 @@ use Object::Pad 0.66 qw( :experimental(init_expr) );
 package Weather::GHCN::Options;
 class   Weather::GHCN::Options;
 
-our $VERSION = 'v0.0.010';
+our $VERSION = 'v0.0.011';
 
 use Carp                qw(carp croak);
 use Const::Fast;
 use Hash::Wrap          {-lvalue => 1, -defined => 1, -as => '_wrap_hash'};
+use Path::Tiny;
 use Text::Abbrev;
+use Try::Tiny;
 use Weather::GHCN::CountryCodes  qw( search_country );
 use Weather::GHCN::Common        qw( :all );
 use YAML::Tiny;
@@ -385,6 +387,92 @@ method get_option_defaults :common () {
     return \%defaults;
 }
 
+=head2 get_profile_filespec ($filespec='')
+
+Returns the filespec for the user profile file.  If the optional 
+$filespec argument is null or an empty string, then the default 
+profile is returned.  If a $filespec argument is provided, it can 
+contain '~' (to represent the user HOME directory) and that will be 
+converted to an absolute path.
+
+=cut
+
+method get_profile_filespec :common ($filespec=$EMPTY) {
+    # an EMPTY arg will default to ~/.ghcn_fetch.yaml
+    $filespec ||= $DEFAULT_PROFILE_FILE;
+    # Path::Tiny::path will replace ~ or ~username with the corresponding path
+    return path($filespec)->absolute->stringify;
+}
+
+=head2 get_profile_options ($profile='')
+
+Return a hashref containing the options and aliases defined in the
+the user profile file.  If called with undef, returns a ref to an
+empty hash.  If called with an empty string, it reads from the default
+profile file '~/.ghcn_fetch.yaml'.
+
+=cut
+
+method get_profile_options :common ($profile=$EMPTY) {
+
+    #debug# use DDP;
+    #debug# use Log::Dispatch;
+    #debug# my $log = Log::Dispatch->new(
+    #debug#     outputs => [
+    #debug#         [ 'File',   min_level => 'debug', filename => 'c:/sandbox/log.log' ],
+    #debug#         [ 'Screen', min_level => 'debug' ],
+    #debug#
+    #debug#     ]
+    #debug# );
+
+    my $profile_href = {};
+
+    # passing undef will result in an empty config
+    return $profile_href if not defined $profile;
+
+    # #debug# use FindBin;
+    # #debug# open my $fh, '>>', 'c:/sandbox/log.log' or die;
+    # #debug# $log->debug( 'program ' . $0                                   );
+    # #debug# $log->debug( 'caller ' . join(' | ', caller)                   );
+    # #debug# $log->debug( 'received profile_file:           ' . $_profile );
+
+    my $profile_filespec = Weather::GHCN::Options->get_profile_filespec($profile);
+
+    my $yaml_struct;
+    my $msg = $EMPTY;
+
+    # uncoverable branch false
+    if (-e $profile_filespec) {
+        # uncoverable branch false
+        try {
+            $yaml_struct = YAML::Tiny->read($profile_filespec);
+        } catch {
+            $msg = '*W* no cache or aliases: failed reading YAML in ' . $profile_filespec;
+            carp $msg;
+        }
+    } else {
+        return $profile_href;
+    }
+
+    $profile_href = $yaml_struct->[0]
+        if $yaml_struct;
+
+    #debug# $log->( 'yaml_struct length = ' . length $yaml_struct );
+    #debug# $log->( "\n" );
+    #debug# $log->( 'profile_filespec:                ' . $profile_filespec );
+    #debug# $log->( 'carp ' . $msg );
+    #debug# $log->( 'FindBin::Bin                    ' . $FindBin::Bin );
+    #debug# $log->( "\n");
+    #debug# $log->( 'profile_href ' . np($profile_href) );
+    #debug# $log->( "\n" );
+    #debug# $log->( "================" );
+    #debug# $log->( "\n" );
+    #debug# close $fh;
+
+    return $profile_href;
+}
+
+
 =head2 valid_report_type ($rt, \@opttable)
 
 This function is used to validate the report type.  Valid values are
@@ -453,7 +541,6 @@ method deabbrev_refresh_option :common ($refresh) {
     my $deabbreved = $r_abbrev{ lc $refresh };
     return $deabbreved;
 }
-
 
 ######################################################################
 =head1 INSTANCE METHODS
@@ -660,7 +747,7 @@ in a list.
 method validate () {
     my @errors;
     my $bad_range_cnt = 0;
-
+    
     if ( $_opt_obj->defined('aliases') ) {
         foreach my $alias_name ( keys $_opt_obj->aliases->%* ) {
             my $errmsg = '*E* alias names in profile must be lowercase letters with optional underscore prefix: ' . $alias_name;

@@ -1,5 +1,5 @@
 package Game::TileMap::Role::Helpers;
-$Game::TileMap::Role::Helpers::VERSION = '0.001';
+$Game::TileMap::Role::Helpers::VERSION = '0.002';
 use v5.10;
 use strict;
 use warnings;

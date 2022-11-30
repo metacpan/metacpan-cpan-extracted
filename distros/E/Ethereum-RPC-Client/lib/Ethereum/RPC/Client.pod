@@ -1,0 +1,74 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Ethereum::RPC::Client
+at lib/Ethereum/RPC/Client.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head2 contract
+
+Creates a new contract instance
+
+Parameters:
+    contract_address    ( Optional - only if the contract already exists ),
+    contract_abi        ( Required - https://solidity.readthedocs.io/en/develop/abi-spec.html ),
+    from                ( Optional - Address )
+    gas                 ( Optional - Integer gas )
+    gas_price           ( Optional - Integer gasPrice )
+
+Return:
+    New contract instance
+
+=head1 NAME
+
+Ethereum::RPC::Client - Ethereum JSON-RPC Client
+
+=head1 SYNOPSIS
+
+   use Ethereum::RPC::Client;
+
+   # Create Ethereum::RPC::Client object
+   my $eth = Ethereum::RPC::Client->new(
+      host     => "127.0.0.1",
+   );
+
+   my $web3_clientVersion = $eth->web3_clientVersion;
+
+   # https://github.com/ethereum/wiki/wiki/JSON-RPC
+
+=head1 DESCRIPTION
+
+This module implements in PERL the JSON-RPC of Ethereum L<https://github.com/ethereum/wiki/wiki/JSON-RPC>
+
+=head1 SEE ALSO
+
+L<Bitcoin::RPC::Client>
+
+=head1 AUTHOR
+
+Binary.com E<lt>fayland@binary.comE<gt>
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Moo::Object>
+
+L<BUILDALL|Moo::Object/BUILDALL>, L<BUILDARGS|Moo::Object/BUILDARGS>, L<DEMOLISHALL|Moo::Object/DEMOLISHALL>, L<does|Moo::Object/does>, L<meta|Moo::Object/meta>
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright 2017- Binary.com
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

@@ -53,7 +53,7 @@ Color modules:
 
 =head1 VERSION
 
-Version 1.0301
+Version 1.0303
 
 =head1 DESCRIPTION
 
@@ -127,11 +127,12 @@ Using option B<-W> or B<--weeknumber>, week number is printed at the
 end of every week line.  Week number 1 is a week which include January
 1st and count up on every Sunday.
 
-Experimentally B<-W2> print I<standard week number> which start with
-first Sunday of the year, and B<-W3> print ISO 8601 style week number.
-Because ISO week start on Monday, and the command shows a number for
-Sunday, the result is not intuitive and therefore, I guess, useless.
-This option requires L<gcal(1)> command installed.
+Experimentally option B<-W2> print the I<standard week number> which
+start with the first Sunday of the year, and B<-W3> print ISO 8601
+style week number.  Because ISO week start on Monday, and the command
+shows a number of Sunday of the week, the result is not intuitive and
+therefore, I guess, useless.  This option requires L<gcal(1)> command
+installed.
 
 =head1 COLORMAP
 

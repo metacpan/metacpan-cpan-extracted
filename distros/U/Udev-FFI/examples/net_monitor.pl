@@ -8,31 +8,30 @@ use Udev::FFI;
 
 
 my $udev = Udev::FFI->new() or
-    die "Can't create Udev::FFI object: $@.\n";
+    die("Can't create Udev::FFI object: $@.\n");
 
 my $monitor = $udev->new_monitor() or
-    die "Can't create udev monitor: $@.\n";
+    die("Can't create udev monitor: $@.\n");
 
-
-unless($monitor->filter_by_subsystem_devtype('net')) {
-    warn "Ouch!";
+unless ($monitor->filter_by_subsystem_devtype('net')) {
+    warn("Ouch!");
 }
 
-if($monitor->start()) {
+if ($monitor->start()) {
     # now insert your usb ethernet adapter
 
-    for(;;) {
+    for (;;) {
         my $device = $monitor->poll(); # blocking read
         my $action = $device->get_action();
 
-        print 'ACTION: '.$action, "\n";
-        print 'DEVPATH: '.$device->get_devpath(), "\n";
-        print 'SYSNAME: '.$device->get_sysname(), "\n";
+        print("ACTION: $action\n");
+        print('DEVPATH: '.$device->get_devpath()."\n");
+        print('SYSNAME: '.$device->get_sysname()."\n");
 
-        if($action ne 'remove') {
-            print 'MACADDR: '.$device->get_sysattr_value('address'), "\n";
+        if ($action ne 'remove') {
+            print('MACADDR: '.$device->get_sysattr_value('address')."\n");
         }
 
-        print "\n\n";
+        print("\n\n");
     }
 }

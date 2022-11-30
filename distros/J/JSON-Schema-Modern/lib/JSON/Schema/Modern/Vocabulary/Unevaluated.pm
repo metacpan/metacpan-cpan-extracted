@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Unevaluated;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Unevaluated vocabulary
 
-our $VERSION = '0.557';
+our $VERSION = '0.558';
 
 use 5.020;
 use Moo;
@@ -58,19 +58,19 @@ sub _eval_keyword_unevaluatedItems ($self, $data, $schema, $state) {
       : qw(prefixItems items contains unevaluatedItems);
   my %bools; @bools{@boolean_annotation_keywords} = (1)x@boolean_annotation_keywords;
   return 1
-    if any { $bools{$_->keyword} && is_type('boolean', $_->annotation) && $_->annotation }
+    if any { $bools{$_->{keyword}} && is_type('boolean', $_->{annotation}) && $_->{annotation} }
       @annotations;
 
   # otherwise, evaluate at every instance item greater than the max of all 'prefixItems'/numeric
   # 'items' annotations that isn't in a 'contains' annotation
   my $max_index_annotation_keyword = $state->{spec_version} eq 'draft2019-09' ? 'items' : 'prefixItems';
   my $last_index = max(-1, grep is_type('integer', $_),
-    map +($_->keyword eq $max_index_annotation_keyword ? $_->annotation : ()), @annotations);
+    map +($_->{keyword} eq $max_index_annotation_keyword ? $_->{annotation} : ()), @annotations);
 
   return 1 if $last_index == $data->$#*;
 
   my @contains_annotation_indexes = $state->{spec_version} eq 'draft2019-09' ? ()
-    : map +($_->keyword eq 'contains' ? $_->annotation->@* : ()), @annotations;
+    : map +($_->{keyword} eq 'contains' ? $_->{annotation}->@* : ()), @annotations;
 
   my $valid = 1;
   foreach my $idx ($last_index+1 .. $data->$#*) {
@@ -116,9 +116,9 @@ sub _eval_keyword_unevaluatedProperties ($self, $data, $schema, $state) {
   return 1 if not is_type('object', $data);
 
   my @evaluated_properties = map {
-    my $keyword = $_->keyword;
+    my $keyword = $_->{keyword};
     (grep $keyword eq $_, qw(properties additionalProperties patternProperties unevaluatedProperties))
-      ? $_->annotation->@* : ();
+      ? $_->{annotation}->@* : ();
   } local_annotations($state);
 
   my $valid = 1;
@@ -163,7 +163,7 @@ JSON::Schema::Modern::Vocabulary::Unevaluated - Implementation of the JSON Schem
 
 =head1 VERSION
 
-version 0.557
+version 0.558
 
 =head1 DESCRIPTION
 

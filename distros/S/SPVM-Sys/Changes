@@ -1,3 +1,56 @@
+0.28 2022-11-22
+  [New Features]
+    * Added the following methods to the Sys::Socket::Constant class.
+    
+      static method IPPROTO_ICMP : int ();
+      static method ICMP_ADDRESS : int ();
+
+      static method ICMP_DEST_UNREACH : int ();
+
+      static method ICMP_ECHO : int ();
+
+      static method ICMP_ECHOREPLY : int ();
+
+      static method ICMP_ECHOREQUEST : int ();
+
+      static method ICMP_FILTER : int ();
+
+      static method ICMP_FRAG_NEEDED : int ();
+
+      static method ICMP_PARAMETERPROB : int ();
+
+      static method ICMP_REDIRECT : int ();
+
+      static method ICMP_SOURCE_QUENCH : int ();
+
+      static method ICMP_TIMESTAMP : int ();
+
+      static method ICMP_TIME_EXCEEDED : int ();
+
+   * Added the following optional argument to the recv method in the Sys::Socket class.
+     [Before]
+       static method recv : int ($sockfd : int, $buf : mutable string, $len : int, $flags : int);
+     [After]
+       static method recv : int ($sockfd : int, $buf : mutable string, $len : int, $flags : int, $buf_offset = 0 : int);
+
+   * Added the following optional argument to the send method in the Sys::Socket class.
+     [Before]
+       static method send : int ($sockfd : int, $buf : string, $len : int, $flags : int);
+     [After]
+       static method send : int ($sockfd : int, $buf : string, $len : int, $flags : int, $buf_offset = 0 : int);
+    
+    * Added the following methods to the Sys::Socket class
+      static method sockatmark : int ($sockfd : int);
+
+      static method sendto : int ($sockfd : int, $buf : string, $len : int, $flags : int, $addr : Sys::Socket::Sockaddr, $addrlen : int);
+      
+      static method connect_raw : int ($sockfd : int, $addr : Sys::Socket::Sockaddr, $addrlen : int);
+  
+  [Bug Fix]
+    * Added the following methods that is documented but not implemented to the Sys::Socket::Constant class.
+
+      static method SO_BROADCAST : int ();
+
 0.27 2022-11-14
   [Prerequirement Changes]
     * SPVM::Sys needs SPVM 0.9661+.

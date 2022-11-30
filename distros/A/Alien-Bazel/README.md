@@ -4,7 +4,14 @@ Alien::Bazel, Use Perl To Build The Google Bazel Build System On Any Platform
 ## Description
 Alien::Bazel is a Perl distribution, and is meant to be installed as a prerequisite for other Perl distributions (especially other Aliens) which rely on the Bazel build system.  The sole functionality of this distribution is to check if Bazel is already installed, and if not then to build and install it.
 
-## Installation
+## Installation, Download Binary
+```
+# NOTE: option of non-source install will download pre-built binary from Bazel development team
+$ export ALIEN_BAZEL_FROM_SOURCE=0  # optional, defaults to 0
+$ cpanm Alien::Bazel
+```
+
+## Installation, Build Source Code
 ```
 # old Ubuntu v16.04 only, install Bazel dependency JDK 11
 # https://stackoverflow.com/questions/52504825/how-to-install-jdk-11-under-ubuntu
@@ -20,14 +27,49 @@ $ sudo apt-get install build-essential openjdk-11-jdk zip unzip python2
 # OR 
 $ sudo apt-get install build-essential openjdk-11-jdk zip unzip python3
 
-# WARNING: share build AKA Bazel bootstrap can take up to 45 minutes & 2.5 gigabytes storage or more
+# WARNING: option of source code install AKA share build AKA Bazel bootstrap can take up to 45 minutes & 2.5 gigabytes storage or more
+$ export ALIEN_BAZEL_FROM_SOURCE=1
 $ cpanm Alien::Bazel
 ```
 
 ## Developers Only
 ```
-$ dzil authordeps --missing | cpanm
-$ dzil listdeps --missing | cpanm
+# install static dependencies
+$ dzil authordeps | cpanm
+$ dzil listdeps | cpanm
+
+# document changes & insert copyrights before CPAN release
+$ vi Changes       # include latest release info, used by [NextRelease] and [CheckChangesHasContent] plugins
+$ vi dist.ini      # update version number
+$ vi FOO.pm foo.t  # add "# COPYRIGHT" as first  line of file, used by [InsertCopyright] plugin
+$ vi foo.pl        # add "# COPYRIGHT" as second line of file, used by [InsertCopyright] plugin
+
+# build & install dynamic dependencies & test before CPAN release
+$ dzil build
+$ ls -ld Alien-Bazel*
+$ cpanm --installdeps ./Alien-Bazel-FOO.tar.gz  # install dynamic dependencies for share (non-system) build, including Mozilla::CA
+$ dzil test  # needs all dependencies installed by above `cpanm` commands
+
+# inspect build files before CPAN release
+$ cd Alien-Bazel-FOO
+$ ls -l
+$ less Changes 
+$ less LICENSE 
+$ less COPYRIGHT
+$ less CONTRIBUTING
+$ less MANIFEST 
+$ less README.md 
+$ less README
+$ less META.json 
+$ less META.yml
+
+# make CPAN release
+$ git add -A; git commit -av  # CPAN Release, vX.YYY; Codename FOO, BAR Edition
+$ git push origin main
+$ dzil release
+$ git add -A; git commit -av  # CPAN Release, vX.YYY; Changes Auto-Update
+$ git push origin main
+$ git tag -l
 ```
 
 ## Original Creation

@@ -38,6 +38,7 @@
             "Compiler::Lexer" : "0.23",
             "Coro" : "0",
             "Data::Dump" : "0",
+            "Hash::SafeKeys" : "0",
             "IO::AIO" : "0",
             "JSON" : "0",
             "Moose" : "0",
@@ -55,6 +56,6 @@
          "web" : "https://github.com/richterger/Perl-LanguageServer"
       }
    },
-   "version" : "v2.3.0",
+   "version" : "v2.4.0",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

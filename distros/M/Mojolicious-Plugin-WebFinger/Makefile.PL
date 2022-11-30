@@ -13,11 +13,11 @@ WriteMakefile(
     'Test::More' => 0
   },
   PREREQ_PM => {
-    'Mojolicious' => 6.00,
-    'XML::Loy' => 0.49,
-    'Mojolicious::Plugin::XRD' => 0.21,
-    'Mojolicious::Plugin::HostMeta' => 0.25,
-    'Mojolicious::Plugin::Util::Endpoint' => 0.22,
+    'Mojolicious' => 9.17,
+    'XML::Loy' => 0.50,
+    'Mojolicious::Plugin::XRD' => 0.24,
+    'Mojolicious::Plugin::HostMeta' => 0.26,
+    'Mojolicious::Plugin::Util::Endpoint' => 0.24,
     'Mojolicious::Plugin::Util::Callback' => 0.07
   },
   LICENSE      => 'artistic_2',

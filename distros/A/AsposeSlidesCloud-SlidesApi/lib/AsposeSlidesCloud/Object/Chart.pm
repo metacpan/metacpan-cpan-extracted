@@ -42,6 +42,7 @@ use AsposeSlidesCloud::Object::ChartCategory;
 use AsposeSlidesCloud::Object::ChartSeriesGroup;
 use AsposeSlidesCloud::Object::ChartTitle;
 use AsposeSlidesCloud::Object::ChartWall;
+use AsposeSlidesCloud::Object::DataSource;
 use AsposeSlidesCloud::Object::EffectFormat;
 use AsposeSlidesCloud::Object::FillFormat;
 use AsposeSlidesCloud::Object::Hyperlink;
@@ -345,6 +346,13 @@ __PACKAGE__->method_documentation({
     	format => '',
     	read_only => '',
     		},
+    'data_source_for_categories' => {
+    	datatype => 'DataSource',
+    	base_name => 'DataSourceForCategories',
+    	description => 'Data source type for categories.',
+    	format => '',
+    	read_only => '',
+    		},
     'title' => {
     	datatype => 'ChartTitle',
     	base_name => 'Title',
@@ -433,6 +441,7 @@ __PACKAGE__->swagger_types( {
     'show_data_labels_over_maximum' => 'boolean',
     'series' => 'ARRAY[Series]',
     'categories' => 'ARRAY[ChartCategory]',
+    'data_source_for_categories' => 'DataSource',
     'title' => 'ChartTitle',
     'back_wall' => 'ChartWall',
     'side_wall' => 'ChartWall',
@@ -467,6 +476,7 @@ __PACKAGE__->attribute_map( {
     'show_data_labels_over_maximum' => 'ShowDataLabelsOverMaximum',
     'series' => 'Series',
     'categories' => 'Categories',
+    'data_source_for_categories' => 'DataSourceForCategories',
     'title' => 'Title',
     'back_wall' => 'BackWall',
     'side_wall' => 'SideWall',

@@ -6,7 +6,7 @@ package App::PP::Autolink;
 
 use strict;
 use warnings;
-use 5.010;
+use 5.014;
 
 use Carp;
 use English qw / -no_match_vars /;
@@ -24,7 +24,7 @@ use Config;
 use Getopt::ArgvFile default=>1;
 use Getopt::Long qw / GetOptionsFromArray :config pass_through /;
 
-our $VERSION = '2.05';
+our $VERSION = '2.10';
 
 use constant CASE_INSENSITIVE_OS => ($^O eq 'MSWin32');
 
@@ -67,6 +67,7 @@ sub new {
     $self->{script_fullname} = $script_fullname;
 
     $self->{alien_sys_installs} = [];
+    $self->{alien_deps}         = [];
 
     return $self;
 }
@@ -98,12 +99,19 @@ sub build {
       say "No alien system dlls detected\n";
     }
 
-    say 'Detected link list: '   . join ' ', @links;
+    say 'Detected link list: '   . join ' ', grep {$_ ne '--link'} @links;
+    say '';
+
+    my @aliens = uniq @{$self->{alien_deps}};
+    my @alien_deps = map {; '-M' => $_} @aliens;
+    say 'Detected aliens: '  . join ' ', sort @aliens;
+    say '';
 
     my @command = (
         'pp',
         @links,
         #"--cachedeps=$cache_file",
+        @alien_deps,
         @args_for_pp,
     );
 
@@ -250,6 +258,53 @@ sub get_autolink_list {
     return wantarray ? @l2 : \@l2;
 }
 
+sub _resolve_rpath_mac {
+    my ($source, $target) = @_;
+
+    say "Resolving rpath for $source wrt $target";
+
+    #  clean up the target
+    $target =~ s|\@rpath/||;
+
+    my @results = qx /otool -l $source/;
+    while (my $line = shift @results) {
+        last if $line =~ /LC_RPATH/;
+    }
+    my @lc_rpath_chunk;
+    while (my $line = shift @results) {
+        last if $line =~ /LC_/;  #  any other command
+	      push @lc_rpath_chunk, $line;
+    }
+    my @paths
+      = map {s/\s\(offset.+$//r}
+        map {s/^\s+path //r}
+        grep {/^\s+path/}
+        @lc_rpath_chunk;
+    my $loader_path = path ($source)->parent->stringify;
+    my @checked_paths;
+    foreach my $path (@paths) {
+        chomp $path; #  should be done above
+        $path =~ s/\@loader_path/$loader_path/;
+        $path = path($path, $target);
+        if ($path->exists) {
+            $path = $path->realpath->stringify;
+            push @checked_paths, $path;
+        }
+    }
+
+    #  should handle multiple paths
+    return $checked_paths[0];
+}
+
+sub _resolve_loader_path_mac {
+    my ($source, $target) = @_;
+    say "Resolving loader_path for $source wrt $target";
+    my $source_path = path($source)->parent->stringify;
+    $target =~ s/\@loader_path/$source_path/;
+    return $target;
+}
+
+
 sub get_autolink_list_macos {
     my ($self) = @_;
     
@@ -274,9 +329,22 @@ sub get_autolink_list_macos {
         warn qq["otool -L $lib" failed\n]
           if not $? == 0;
         shift @lib_arr;  #  first result is dylib we called otool on
+      DEP_LIB:
         foreach my $line (@lib_arr) {
             $line =~ /^\s+(.+?)\s/;
             my $dylib = $1;
+            if ($dylib =~ /\@rpath/i) {
+                my $orig_name = $dylib;
+                $dylib = _resolve_rpath_mac($lib, $dylib);
+                if (!defined $dylib) {
+                    say STDERR "Cannot resolve rpath for $orig_name, dependency of $lib";
+                    next DEP_LIB;
+                }
+            }
+	    elsif ($dylib =~ /\@loader_path/) {
+                my $orig_name = $dylib;
+		$dylib = _resolve_loader_path_mac($lib, $dylib);
+            }
             next if $seen{$dylib};
             next if $dylib =~ m{^/System};  #  skip system libs
             #next if $dylib =~ m{^/usr/lib/system};
@@ -501,6 +569,7 @@ sub get_dep_dlls {
         if ($package->install_type eq 'system') {
             push @$alien_sys_installs, $package->dynamic_libs;
         }
+        push @{$self->{alien_deps}}, $package;
     } 
     
     my @dll_list = sort keys %dll_hash;

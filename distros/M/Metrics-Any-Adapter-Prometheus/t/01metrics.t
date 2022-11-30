@@ -1,11 +1,11 @@
 #!/usr/bin/perl
 
-use strict;
+use v5.14;
 use warnings;
 
 use Test::More;
 
-use Metrics::Any 0.05 '$metrics';
+use Metrics::Any 0.09 '$metrics';
 use Metrics::Any::Adapter 'Prometheus';
 
 use Net::Prometheus;
@@ -85,6 +85,24 @@ my $prom = Net::Prometheus->new;
       qr/^the_timer_seconds_count 1\nthe_timer_seconds_sum 0\.25/m,
       'Net::Prometheus->render contains Histogram metric for timer'
    );
+}
+
+# batch mode is supported
+{
+   my $called;
+
+   my $batch_ok = $metrics->add_batch_mode_callback( sub {
+      $called++;
+      $metrics->inc_counter_by( counter => 100 );
+   } );
+   ok( $batch_ok, 'Test adapter supports batch mode' );
+
+   ok( !$called, 'Batch mode callback not yet invoked' );
+
+   like( $prom->render,
+      qr/^the_counter_total 101\n/m,
+      'Net::Prometheus->render contains batch-incremented counter' );
+   ok( $called, 'Batch mode callback invoked by ->render' );
 }
 
 done_testing;

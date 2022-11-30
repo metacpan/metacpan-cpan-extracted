@@ -4,12 +4,12 @@ use strict;
 use warnings;
 
 use Digest::SHA qw(sha1_hex);
-use Path::Tiny qw(path);
+use Path::Tiny  qw(path);
 use Specio::Library::Path::Tiny;
 
 use Moo;
 
-our $VERSION = '0.82';
+our $VERSION = '0.83';
 
 has cache_dir => (
     is       => 'ro',
@@ -70,7 +70,7 @@ Code::TidyAll::Cache - A simple caching engine which stores key/value pairs
 
 =head1 VERSION
 
-version 0.82
+version 0.83
 
 =head1 SUPPORT
 

@@ -112,14 +112,6 @@ see `INSTALL` file which is included in `Term-ReadLine-Gnu-1.11`.
 
 #### Install on macOS
 
-On macOS Big Sur or later 'perl Makefile.PL' may be warned as
-
-> Could not find neither libtermcap, libtinfo, libncurses, or libcurses.
-
-You should be able to ignore this warning if you have Xcode installed. See
-https://github.com/Perl-Toolchain-Gang/ExtUtils-MakeMaker/issues/381
-for details. To suppress this message, use `ExtUtils::MakeMaker` 7.58 or later.
-
 `/usr/bin/perl` on macOS 10.5 (Leopard) and later supports
 32bit/64bit universal binary.  Make `Makefile` as follows:
 
@@ -221,3 +213,36 @@ against whichever newer version you have installed.
 % make test
 % make install
 ```
+
+#### MSWin32 (Strawberry Perl)
+
+1. Download and run installer from https://strawberryperl.com/
+
+    - prebuild GNU Readline Library (DLL) is included
+
+2. Open `Perl (command line)` app
+
+3. Build
+
+```sh
+% perl Makefile.PL
+% gmake
+% gmake test
+% gmake install
+```
+
+Some tests of the history-file handling functions in `t/history.t` fail with the
+GNU Readline Library 7.0 and 8.0 on MSYS2 and MSWin32.  Use an older or newer
+versions.
+
+See https://lists.gnu.org/archive/html/bug-readline/2019-04/msg00000.html for
+more information.
+
+Strawberry Perl from 5.30.0.1 (2019-05-23) to 5.32.1.1 (2021-01-24) contains
+version 8.0.  Versions prior to 5.30.0.1 do not contain the GNU Readline
+Library. Until the next version which includes the GNU Readline Library 8.2, you
+have to build it by yourself. See
+[spbuild](https://github.com/StrawberryPerl/spbuild) for more information.
+
+Or if you don't need the history-file, ignore the fails on `gmake test` and run
+`gmake install`.

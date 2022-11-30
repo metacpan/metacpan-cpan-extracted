@@ -9,6 +9,8 @@ sub is_pict
 {
 	my ( $i, $name, $pict ) = @_;
 	my $ok = 1;
+	my $m = $i-> matrix;
+	$i->matrix($Prima::matrix::identity);
 	ALL: for ( my $y = 0; $y < $i->height; $y++) {
 		for ( my $x = 0; $x < $i->width; $x++) {
 			my $actual   = ( $i->pixel($x,$y) > 0) ? 1 : 0;
@@ -19,13 +21,17 @@ sub is_pict
 		}
 	}
 	ok( $ok, $name );
-	return 1 if $ok;
+	if ($ok) {
+		$i->matrix($m);
+		return 1;
+	}
 	warn "# Actual vs expected:\n";
 	for ( my $y = 0; $y < $i->height; $y++) {
 		my $actual   = join '', map { ($i->pixel($_,$i->height-$y-1) > 0) ? '*' : ' ' } 0..$i->width-1;
 		my $expected = substr($pict, $y * $i->width, $i->width);
 		warn "$actual  | $expected\n";
 	}
+	$i->matrix($m);
 	return 0;
 }
 
@@ -292,5 +298,49 @@ is_pict($i, "fill_chord",
 	"     ".
 	"     "
 );
+
+# now with matrix
+$i->matrix([-1,0,0,1,5,0]);
+
+$i->clear;
+$i->fill_chord(2,2,5,5,0,90);
+is_pict($i, "fill_chord with matrix",
+	"   * ".
+	"  *  ".
+	" *   ".
+	"     ".
+	"     "
+);
+
+$i->clear;
+$i->polyline([1,1,4,1,1,4,4,4]);
+is_pict($i, "polyline with matrix",
+	" ****".
+	"   * ".
+	"  *  ".
+	" ****".
+	"     "
+);
+
+$i->clear;
+$i->rectangle(1,1,4,4);
+is_pict($i, "rectangle with matrix",
+	" ****".
+	" *  *".
+	" *  *".
+	" ****".
+	"     "
+);
+
+$i->clear;
+$i->bar(1,1,4,4);
+is_pict($i, "bar with matrix",
+	" ****".
+	" ****".
+	" ****".
+	" ****".
+	"     "
+);
+
 
 done_testing;

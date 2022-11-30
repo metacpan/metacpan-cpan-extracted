@@ -5,20 +5,29 @@ author:
 build_requires:
   Class::Unload: '0'
   ExtUtils::MakeMaker: '0'
+  File::Slurp: '0'
   File::Spec: '0'
   FindBin: '0'
   IO::Handle: '0'
   IPC::Open3: '0'
   Path::Tiny: '0'
+  RedisDB: '2.57'
   Test::CheckDeps: '0.010'
+  Test::Deep: '0'
+  Test::Exception: '0'
+  Test::Fatal: '0'
   Test::MockModule: '0.15'
   Test::MockObject: '1.20161202'
+  Test::MockTime: '0'
   Test::More: '0.96'
+  Test::RedisServer: '0.23'
   Test::Warn: '0.23'
   Test::Warnings: '0.026'
-  perl: '5.014000'
+  YAML: '0'
+  perl: '5.008005'
+  utf8: '0'
 configure_requires:
-  ExtUtils::MakeMaker: '6.48'
+  ExtUtils::MakeMaker: '7.64'
   File::ShareDir::Install: '0.06'
 dynamic_config: 0
 generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
@@ -27,31 +36,76 @@ meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
 name: Data-Validate-Sanctions
+no_index:
+  directory:
+    - eg
+    - share
+    - shares
+    - t
+    - xt
+provides:
+  Data::Validate::Sanctions:
+    file: lib/Data/Validate/Sanctions.pm
+    version: '0.15'
+  Data::Validate::Sanctions::Fetcher:
+    file: lib/Data/Validate/Sanctions/Fetcher.pm
+    version: '0.15'
+  Data::Validate::Sanctions::Redis:
+    file: lib/Data/Validate/Sanctions/Redis.pm
+    version: '0.15'
 requires:
+  Carp: '0'
+  Clone: '0'
   Data::Compare: '0'
   Date::Utility: '0'
   DateTime::Format::Strptime: '0'
+  Exporter: '0'
   File::ShareDir: '0'
   File::Temp: '0'
   File::stat: '0'
   FindBin: '0'
   Getopt::Long: '2.42'
   IO::Uncompress::Unzip: '0'
+  JSON::MaybeUTF8: '0'
   List::Util: '0'
   Locale::Country: '3.66'
   Mojo::UserAgent: '0'
   Path::Tiny: '0'
+  Pod::Usage: '0'
   Scalar::Util: '0'
   Syntax::Keyword::Try: '0.18'
   Text::CSV: '0'
   Text::Trim: '0'
   XML::Fast: '0'
   YAML::XS: '0'
-  perl: '5.014000'
+  parent: '0'
+  perl: '5.008005'
+  strict: '0'
+  warnings: '0'
 resources:
   bugtracker: https://github.com/binary-com/perl-Data-Validate-Sanctions/issues
-  repository: git://github.com/binary-com/perl-Data-Validate-Sanctions.git
-version: '0.14'
+  homepage: https://github.com/binary-com/perl-Data-Validate-Sanctions
+  repository: https://github.com/binary-com/perl-Data-Validate-Sanctions.git
+version: '0.15'
+x_authority: cpan:DERIV
+x_contributors:
+  - 'Tazeek <tazeek.rakib@gmail.com>'
+  - 'Chylli <chylli@binary.com>'
+  - 'Boris Blinov <boris.blinov@binary.com>'
+  - 'Fayland Lam <fayland@gmail.com>'
+  - 'Jean-Yves Sireau <jy@binary.com>'
+  - 'Raunak Kathuria <raunakkathuria@gmail.com>'
+  - 'Tom Molesworth <tom@binary.com>'
+  - 'mat-fs <53427463+mat-fs@users.noreply.github.com>'
+  - 'Kirill Sysoev <55120154+kirill-binary@users.noreply.github.com>'
+  - 'Anthony-Wong <34021543+Anthony-Wong@users.noreply.github.com>'
+  - 'chylli-binary <52912308+chylli-binary@users.noreply.github.com>'
+  - 'Chylli <chylli.email@gmail.com>'
+  - 'Evgeniy Vostrov <107458551+evgeniy-deriv@users.noreply.github.com>'
+  - 'lq <liuqiang1981@gmail.com>'
+  - 'Mahdi Zarei <60599487+mehdi-fs@users.noreply.github.com>'
+  - 'ragheb <91007977+ragheb-deriv@users.noreply.github.com>'
+  - 'Zak B. Elep <zakame@zakame.net>'
 x_generated_by_perl: v5.26.2
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

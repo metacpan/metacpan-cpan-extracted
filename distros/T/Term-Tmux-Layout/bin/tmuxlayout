@@ -36,7 +36,7 @@ tmuxlayout - Configure and reconfigure tmux layouts easily
 
 =head1 VERSION
 
-version 1.192431
+version 1.223320
 
 =head1 SYNOPSIS
 
@@ -129,7 +129,7 @@ by this application.
 =head1 BUGS
 
 Check the issue tracker at:
-L<https://rt.cpan.org/Public/Dist/Display.html?Name=Term-Layout>
+L<https://github.com/jmaslak/Term-Tmux-Layout/issues>
 
 =head1 AUTHOR
 
@@ -137,7 +137,7 @@ Joelle Maslak <jmaslak@antelope.net>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2015-2018 by Joelle Maslak.
+This software is copyright (c) 2015-2022 by Joelle Maslak.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

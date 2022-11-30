@@ -1,5 +1,21 @@
 Revision history for Perl extension IO::FD.
 
+0.1.3   Tue 15 Nov 2022 20:45:17 AEST
+	- Added accept_multiple routine
+	- Fixed IPv6 address corruption bug.
+		  Not enough space was allocated for IPv6 addresses. Now using struct
+		  sockaddr_storage instead of struct sockaddr for sizing.
+	- Fixed sockaddr allocation
+		Routines returning packed sockaddr structures now have SvCUR
+		forced to length of INET/INET6/UNIX sockaddr types. This stops
+		Socket::unpack_sockaddr_in6 for example complaining the length
+		of the SV is too long for the address family.
+	- Documented accept_multiple and small POD typo fixes.
+	- Fixed potential blocking hang in pipe test.
+	  	It attempted to read more data than was written
+	- Disabled  stat testing. IO::FD::stat is currently broken, to be fixed...
+
+
 0.1.2	Sun 23 Oct 2022 18:38:07 AEST
 	- Fixed failing peername test due to 'Temporary failure in name resolution'
 	- Added shutdown to IO::FD and IO::FD::DWIM

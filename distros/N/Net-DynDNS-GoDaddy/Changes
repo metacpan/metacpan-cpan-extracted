@@ -1,5 +1,18 @@
 Revision history for Net-DynDNS-GoDaddy
 
+0.04    2022-11-23
+    - Fix issue where tests were failing in Github Actions because the API key
+      config file isn't saved between test script executions
+    - When checking to see if we croak() if we can't write to the API key file,
+      skip the test if on Windows
+
+0.03    2022-11-23
+    - Fix API key tests so if a test config file is created, it's removed
+      afterwards
+    - Skip api key file write test if we're the root user
+    - Handle situations where if an A record doesn't exist (ie. doesn't have an
+      IP set) to work around undef issues (fixes #1)
+
 0.02    2022-05-17
     - Added t/20-api_fail.t to test non-200 API returns
     - Add prereq of Hook::Output::Tiny for testing t/20

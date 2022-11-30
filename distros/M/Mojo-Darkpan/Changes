@@ -1,5 +1,10 @@
 Revision history for Perl extension Mojo::Darkpan
 
+0.09 2022-11-20T18:20:24Z
+    - Fixed an error where bad regex was causing similarly named packages to show up in the "other_versions" section when looking at the /list API endpoint
+    - Updated the included Dockerfile to use smaller Alpine based image. Noted some warnings when running in Alpine Docker, will investigate later
+    - Added .dockerignore file to exclude some files/folders when doing Docker build
+
 0.08 2022-09-15T14:47:49Z
     - Documentation fixes
 

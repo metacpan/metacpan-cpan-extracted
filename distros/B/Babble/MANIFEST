@@ -8,6 +8,7 @@ META.yml
 README
 lib/App/sigfix.pm
 lib/Babble.pm
+lib/Babble/Config.pm
 lib/Babble/Filter.pm
 lib/Babble/Grammar.pm
 lib/Babble/Match.pm

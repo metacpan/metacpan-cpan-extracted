@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<yazgfs>
+  <!-- Identical to ../../../etc/yazgfs.xml except for the port number -->
+  <!-- There doesn't seem to be a way override the port number specified in that file -->
+  <listen id="tcp9997">tcp:@:9996</listen>
+  <server id="main" listenref="tcp9997">
+    <retrievalinfo>
+      <retrieval syntax="usmarc" />
+      <retrieval syntax="xml" />
+      <retrieval syntax="json" />
+      <retrieval syntax="opac">
+        <backend syntax="xml" name="opac" />
+      </retrieval>
+    </retrievalinfo>
+  </server>
+</yazgfs>

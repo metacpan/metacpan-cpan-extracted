@@ -13,7 +13,7 @@ use base 'PDF::API2::Basic::PDF::Objind';
 use strict;
 use warnings;
 
-our $VERSION = '2.043'; # VERSION
+our $VERSION = '2.044'; # VERSION
 
 =head1 NAME
 

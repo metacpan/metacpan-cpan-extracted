@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Readme 6.028;
+package Dist::Zilla::Plugin::Readme 6.029;
 # ABSTRACT: build a README file
 
 use Moose;
@@ -89,7 +89,7 @@ Dist::Zilla::Plugin::Readme - build a README file
 
 =head1 VERSION
 
-version 6.028
+version 6.029
 
 =head1 DESCRIPTION
 

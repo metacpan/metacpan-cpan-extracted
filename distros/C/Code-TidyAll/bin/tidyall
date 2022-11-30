@@ -2,13 +2,13 @@
 use Capture::Tiny qw(capture_merged);
 use Code::TidyAll;
 use Config;
-use Path::Tiny qw(cwd path);
+use Path::Tiny      qw(cwd path);
 use Module::Runtime qw( use_module );
 use Getopt::Long;
 use strict;
 use warnings;
 
-our $VERSION = '0.82';
+our $VERSION = '0.83';
 
 my $usage = <<'EOF';
 Usage: tidyall [options] [file] ...

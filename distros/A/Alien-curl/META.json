@@ -141,11 +141,12 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "0.10",
+   "version" : "0.11",
    "x_alienfile" : {
       "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.32",
       "requires" : {
          "share" : {
+            "Alien::OpenSSL" : "0.15",
             "Archive::Tar" : "0",
             "Config" : "0",
             "HTTP::Tiny" : "0.044",
@@ -166,8 +167,8 @@
       "Graham Ollis <plicease@cpan.org>",
       "Shawn Laffan (SLAFFAN)"
    ],
-   "x_generated_by_perl" : "v5.36.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.30",
+   "x_generated_by_perl" : "v5.37.5",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_use_unsafe_inc" : 0
 }

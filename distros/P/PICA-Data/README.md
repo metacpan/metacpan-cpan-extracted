@@ -2,7 +2,7 @@
 
 PICA::Data - PICA record processing
 
-[![Unix build Status](https://travis-ci.com/gbv/PICA-Data.png)](https://travis-ci.com/gbv/PICA-Data)
+[![Linux build status](https://github.com/gbv/PICA-Data/actions/workflows/linux.yml/badge.svg)](https://github.com/gbv/PICA-Data/actions/workflows/linux.yml)
 [![Linux build status](https://github.com/gbv/PICA-Data/actions/workflows/linux.yml/badge.svg)](https://github.com/gbv/PICA-Data/actions/workflows/linux.yml)
 [![Windows build status](https://ci.appveyor.com/api/projects/status/5qjak74x7mjy7ne6?svg=true)](https://ci.appveyor.com/project/nichtich/pica-data)
 [![Coverage Status](https://coveralls.io/repos/gbv/PICA-Data/badge.svg)](https://coveralls.io/r/gbv/PICA-Data)
@@ -211,6 +211,17 @@ limits result to given level, including identifiers (PPN/ILN) of higher levels.
 Returns a copy of the record with sorted fields (first level 1 fields, then
 level 2 fields not belonging to a level 1, then level 1, each followed by level
 2 sorted by EPN). Also available as accessor `sort`. 
+
+## pica\_sort\_subfields( $field, $schedule )
+
+Sorts and filters subfields of a PICA field (given as array reference) with an
+[subfield schedule](https://format.gbv.de/schema/avram/specification#subfield-schedule).
+The schedule can also be given as string of subfield codes, parsed with
+[parse\_subfield\_schedule](https://metacpan.org/pod/PICA%3A%3ASchema#parse_subfield_schedule): repeatable
+subfields must be marked with `*` or `+`, otherwise or only the first
+subfield of this code is preserved. Undefined and missing subfields are ignored
+as well as subfield without information about its order. Returns the modified
+field, unless it is empty.
 
 ## pica\_annotation( $field \[, $annotation \] )
 

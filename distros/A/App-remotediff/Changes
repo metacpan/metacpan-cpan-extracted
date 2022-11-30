@@ -1,5 +1,8 @@
 Revision history for App-remotediff
 
+1.13    2022-11-14
+        - bypass test for solaris
+
 1.12    2022-11-08
         - fixed cleanup crash bug
 

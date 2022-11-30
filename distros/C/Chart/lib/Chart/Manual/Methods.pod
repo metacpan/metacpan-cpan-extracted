@@ -15,7 +15,7 @@ This are all methods for the chart user.
 
 Loads all data of a chart (one or more data sets) from a file.
 (Works only if no data yet added.) You have to either provide a filename
-or filehandle (old school or in SCALAR).
+or filehandle (OLD_SCHOOL or $scalar).
 
     $graph->add_dataset( 'file.tsv' );
     $graph->add_dataset( $file_handle );

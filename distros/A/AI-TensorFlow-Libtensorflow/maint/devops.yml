@@ -1,0 +1,10 @@
+native:
+  debian:
+    packages:
+      - libffi-dev
+  macos-homebrew:
+    packages:
+      - libffi
+  msys2-mingw64:
+    packages:
+      - mingw-w64-x86_64-libffi

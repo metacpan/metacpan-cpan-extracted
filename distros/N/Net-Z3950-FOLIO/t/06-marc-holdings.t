@@ -9,6 +9,7 @@ use Cpanel::JSON::XS qw(decode_json);
 use Test::More tests => 2;
 BEGIN { use_ok('Net::Z3950::FOLIO') };
 use Net::Z3950::FOLIO::MARCHoldings qw(insertMARCHoldings);
+use DummyRecord;
 
 my $cfg = new Net::Z3950::FOLIO::Config('t/data/config/foo.marcHoldings');
 
@@ -53,29 +54,3 @@ sub readFile {
     $fh->close();
     return $data;
 }
-
-
-package DummyRecord;
-
-use Net::Z3950::FOLIO::HoldingsRecords qw(makeHoldingsRecords);
-
-sub new {
-    my $class = shift();
-    my($folioHoldings, $marc) = @_;
-
-    return bless {
-	folioHoldings => $folioHoldings,
-	marc => $marc,
-    }, $class;
-}
-
-sub jsonStructure { return shift()->{folioHoldings} }
-sub marcRecord { return shift()->{marc} }
-
-sub holdings {
-    my $this = shift();
-    my($marc) = @_;
-
-    return makeHoldingsRecords($this, $marc)
-};
-

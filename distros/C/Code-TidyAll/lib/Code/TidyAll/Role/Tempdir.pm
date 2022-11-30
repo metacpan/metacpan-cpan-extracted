@@ -9,7 +9,7 @@ use Specio::Library::Path::Tiny;
 
 use Moo::Role;
 
-our $VERSION = '0.82';
+our $VERSION = '0.83';
 
 has _tempdir => (
     is      => 'ro',
@@ -48,7 +48,7 @@ Code::TidyAll::Role::Tempdir - Provides a _tempdir attribute for Code::TidyAll c
 
 =head1 VERSION
 
-version 0.82
+version 0.83
 
 =head1 SYNOPSIS
 

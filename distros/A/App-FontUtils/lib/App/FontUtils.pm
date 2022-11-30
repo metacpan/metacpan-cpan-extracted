@@ -8,7 +8,7 @@ use Log::ger;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-08-30'; # DATE
 our $DIST = 'App-FontUtils'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our %SPEC;
 
@@ -150,7 +150,7 @@ sub otf2ttf {
 }
 
 1;
-# ABSTRACT: Command-line utilities related fonts and font files
+# ABSTRACT: Command-line utilities related to fonts and font files
 
 __END__
 
@@ -160,11 +160,11 @@ __END__
 
 =head1 NAME
 
-App::FontUtils - Command-line utilities related fonts and font files
+App::FontUtils - Command-line utilities related to fonts and font files
 
 =head1 VERSION
 
-This document describes version 0.001 of App::FontUtils (from Perl distribution App-FontUtils), released on 2022-08-30.
+This document describes version 0.002 of App::FontUtils (from Perl distribution App-FontUtils), released on 2022-08-30.
 
 =head1 SYNOPSIS
 

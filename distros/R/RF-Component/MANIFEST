@@ -19,6 +19,7 @@ t/02-write-test-data.t
 t/03-mdif-read.t
 t/04-mdif-write.t
 t/05-rsnp-compat-check.t
+t/06-interpolate.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t

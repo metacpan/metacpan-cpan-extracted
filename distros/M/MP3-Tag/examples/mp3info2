@@ -3,12 +3,12 @@
 use FindBin;
 use lib "$FindBin::Bin";
 
-use MP3::Tag 1.12;		# Need conditional %L; %{mP}
+use MP3::Tag 1.16;		# Need reset_encode_decode_config()
 use Getopt::Std 'getopts';
 use Config;
 use File::Path;
 
-$VERSION = '1.12';
+$VERSION = '1.16';
 use strict;
 
 $Getopt::Std::STANDARD_HELP_VERSION = 1;
@@ -18,7 +18,7 @@ sub MULTIV::STORE {shift; my $k = shift; $opt{$k} ||= []; push @{$opt{$k}}, shif
 
 my %opt_d = (r => '(?i:\.mp3$)', E => 'p/i:Fp');
 my @oARGV = @ARGV;
-my $opts = 'c:a:t:l:n:g:y:uDp:C:P:E:G@Rr:I2e:d:F:xN';
+my $opts = 'c:a:t:l:n:g:y:uDp:C:P:E:G@Rr:I2e:d:F:xNU';
 my %o;
 tie %o, 'MULTIV';
 exec 'perldoc', '-F', $0 unless @ARGV;
@@ -48,6 +48,8 @@ sub my_decode_deep($$) {
   my($e,$t) = (shift, shift);
   if (ref $t eq 'ARRAY') {
     return [map my_decode_deep($e, $_), @$t];
+  } elsif ('Regexp' eq ref $t) {	# do nothing
+    return $t
   } elsif (ref $t) {
     die "panic: reference of type `$t' unexpected"
   }
@@ -56,15 +58,24 @@ sub my_decode_deep($$) {
 }
 
 # if ($opt{e} and exists $opt{p} ? 0 == length $opt{p} : 1) {
+my $uE = (($ENV{LANG}||'') =~ /\.utf-8$/i and not (${^UNICODE} & 0x20) and not $ENV{"MP3INFO_DECODE_ARGV_DEFAULT_RESET"});
+$opt{e} = 15 if ($opt{U} or $uE) and not defined $opt{e};
 if ($opt{e}) {
   my $skip;
-  if ($opt{e} =~ /^[1-7]$/) {
+  if ($opt{e} =~ /^(\d+)$/ and $1 <= 15 ) {
     require Encode;
-    my $locale = $ENV{LC_CTYPE} || $ENV{LC_ALL} || $ENV{LANG};
-    if ($^O eq 'os2' and not eval {Encode::resolve_alias($locale)} ) {
-      require OS2::Process;
-      $locale = 'cp' . OS2::Process::out_codepage();
+    my $locale;
+    if ($opt{U}) {
+      $locale = 'UTF-8';
+    } else {
+      $locale = $ENV{LC_CTYPE} || $ENV{LC_ALL} || $ENV{LANG};
+      if ($^O eq 'os2' and not eval {Encode::resolve_alias($locale)} ) {
+        require OS2::Process;
+        $locale = 'cp' . OS2::Process::out_codepage();
+      }
     }
+    MP3::Tag->reset_encode_decode_config($locale) if $locale and $opt{e} & 0x08;
+#    warn "LOCALE=$locale: e=$opt{e}";
     $skip = !($opt{e} & 1);
     # Reinterpret @ARGV
     @ARGV = map my_decode($locale, $_), @ARGV if $opt{e} & 4;
@@ -76,7 +87,7 @@ if ($opt{e}) {
     binmode STDOUT;
     $skip = 1;
   }
-  binmode STDOUT, ":encoding($opt{e})" unless $skip;
+  binmode STDOUT, ":encoding($opt{e})" if defined $opt{e} and not $skip;
 }
 
 my $e_opt = MP3::Tag->get_config('extra_config_keys');
@@ -123,6 +134,7 @@ my %F_human = qw( composer	TCOM
 		  text_by	TEXT
 		  orchestra	TPE2
 		  conductor	TPE3
+		  track		TRCK
 		  disk_n	TPOS);	# Only most useful, and not -l etc...
 
 my $FNAME = qr/(?:		# 1: Whole specifier
@@ -400,6 +412,8 @@ EOC
       my ($com,$lyr,$p) = map $mp3->interpolate("%{$_}"), qw(TCOM TEXT TPE1);
       my ($perf,$_p) = 'Artist:  %a'; # Fallback; otherwise print "Performer:"
       unless (exists $opt{p} or $opt{I}) {
+#		warn "Title: ", join ' ', map ord, split //, $mp3->interpolate('%t') ;
+#		warn "Artist: ", join ' ', map ord, split //, $mp3->interpolate('%a') ;
 	if (defined $p and not $mp3->{ID3v1}	# No forward propagation problems
 	    and length($_p = $mp3->interpolate('%{TPE1}'))) {
 	  $perf = "Performer: $_p";
@@ -441,6 +455,16 @@ EOC
     }
 }
 
+sub align_numbers ($) {
+  (my $in = shift) =~ s/([\s_]*)(\d+)/ sprintf ' %09d%s', $2, $1 /eg;
+  $in;
+}
+
+# Called with short names; $File::Find::dir is set
+sub preprocess_and_sort_with_aligned_numbers {
+  sort {align_numbers($a) cmp align_numbers($b) or $a cmp $b} @_;
+}
+
 my @f = @ARGV;
 if ($opt{G}) {
   require File::Glob;			# "usual" glob() fails on spaces...
@@ -449,6 +473,7 @@ if ($opt{G}) {
 if ($opt{R}) {
   require File::Find;
   File::Find::find({wanted => sub {return unless -f and /$opt{r}/o; process_file $_},
+		    preprocess => \&preprocess_and_sort_with_aligned_numbers,
 		    no_chdir => 1}, @f);
 } else {
   my $f;
@@ -545,10 +570,18 @@ L<MP3::Tag/"interpolate"> for details of the format of sprintf()-like
 escapes.  If no option C<-p> is given, message in default format will
 be emitted.  The value of option C<-e> is the encoding used for the
 output; if the value is a number, system-specific encoding is guessed
-(and used for the output if bit 0x1 is set); if bit 0x2 is set, then,
-command line options are assumed to be in the guessed encoding; if bit
-0x4 is set, then, command line arguments are assumed to be in the
-guessed encoding.  Use the value C<binary> to do binary output.
+(and used for the output if the bit 0x1 is set); if the bit 0x2 is set,
+then command line options are assumed to be in the guessed encoding; if
+the bit 0x4 is set, then command line arguments are assumed to be in the
+guessed encoding.  If the bit 0x8 is set, the encoding/decoding
+configuration of file input/output of C<MP3::Tag> is redone with the
+the detected encoding.  Use the value C<binary> to do binary output.
+
+In presence of C<-U> option the default for C<-e> is C<15>, and
+the decoding/encoding processing happens as if LANG is set for C<UTF-8>
+encoding.  (For example, for C<-Ue 1> the C<STDOUT> the output message
+of this script happens in UTF-8 mode, which makes it easier to detect 
+decoding/encoding errors in tags.)
 
 With option C<-D> (dry run) no update is performed, no matter what the
 other options are.  With this option, no parsing of tags is performed unless
@@ -613,8 +646,8 @@ modifications for C<?E<lt>>.)
 
 By default, the "VALUE" for C<-F> is C<%>-interpolated; this can be
 changed by option C<-E>.  For user convenience, human-friendlier forms
-C<composer, text_by, orchestra, conductor, disk_n> can be used instead of
-C<TCOM, TEXT, TPE2, TPE3, TPOS>.
+C<composer, text_by, orchestra, conductor, track, disk_n> can be used instead of
+C<TCOM, TEXT, TPE2, TPE3, TRCK, TPOS>.
 
 The option C<-P RECIPE> is a very powerful generalization of what can be done
 by options C<-F>, C<-d>, and C<-t -a -l -y -g -c -n>.  It may be
@@ -1149,14 +1182,22 @@ ID3v2 tag names are output.
 
 =head1 ENVIRONMENT
 
-With C<-e> 1, 2 or 3, this script may consult environment variables
-C<LC_CTYPE, LC_ALL, LANG> to deduce the current encoding.  No other
-environment variables are directly read by this script.
+With C<-e> above 0, this script may consult environment variables
+C<LC_CTYPE, LC_ALL, LANG> to deduce the current encoding.  Moreover,
+we try to auto-detect the C<UTF-8> encoding via C<LANG> environment
+variable (disabled if C<${^UNICODE}> sets translation of the command-line
+arguments).  (This auto-detection may be switched off by the variable
+C<MP3INFO_DECODE_ARGV_DEFAULT_RESET>.)  The
+effects of the variable C<MP3TAG_NORMALIZE_FIELDS> is described in
+the section L<"Normalization of fields">.  No other environment
+variables are directly read by this script.
 
 Note however, that L<MP3::Tag> module has a rich set of defaults for
 encoding settings settable by environment variables; see
 L<MP3::Tag/"ENVIRONMENT">.  So these variables affect (indirectly) how
-this script works.
+this script works.  In particular, starting with v1.14, there is an
+autodetection of encoding of setup files (which this script uses for
+the C<-P> option).  (However, this autodetection may be switched off.)
 
 =head1 OBSOLETE INTERFACE
 

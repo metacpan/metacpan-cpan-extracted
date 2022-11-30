@@ -259,7 +259,7 @@ components:
                 type: string
                 const: ಠ_ಠ
             additionalProperties: false
-        text/html:
+        bloop/html:
           schema: false
         text/plain:
           schema:
@@ -317,16 +317,16 @@ YAML
   );
 
   cmp_deeply(
-    ($result = $openapi->validate_response(response(200, [ 'Content-Type' => 'text/html' ], 'html text'),
+    ($result = $openapi->validate_response(response(200, [ 'Content-Type' => 'bloop/html' ], 'html text'),
       { path_template => '/foo', method => 'post' }))->TO_JSON,
     {
       valid => false,
       errors => [
         {
           instanceLocation => '/response/body',
-          keywordLocation => jsonp(qw(/paths /foo post responses default $ref content text/html)),
-          absoluteKeywordLocation => $doc_uri_rel->clone->fragment(jsonp('/components/responses/default/content', 'text/html'))->to_string,
-          error => 'EXCEPTION: unsupported Content-Type "text/html": add support with $openapi->add_media_type(...)',
+          keywordLocation => jsonp(qw(/paths /foo post responses default $ref content bloop/html)),
+          absoluteKeywordLocation => $doc_uri_rel->clone->fragment(jsonp('/components/responses/default/content', 'bloop/html'))->to_string,
+          error => 'EXCEPTION: unsupported Content-Type "bloop/html": add support with $openapi->add_media_type(...)',
         },
       ],
     },

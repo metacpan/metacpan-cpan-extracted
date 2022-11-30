@@ -1,5 +1,9 @@
 Revision history for Metrics-Any-Adapter-Prometheus
 
+0.06    2022-11-28
+        [CHANGES]
+         * Implement batch-mode API of Metrics::Any v0.09
+
 0.05    2020-05-13
         [CHANGES]
          * Updated for Metrics::Any 0.05

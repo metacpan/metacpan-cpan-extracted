@@ -751,6 +751,12 @@ Get the constant value of C<INET6_ADDRSTRLEN>. If the system doesn't define this
 
 Get the constant value of C<IPPROTO_IPV6>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
 
+=head2 IPPROTO_ICMP
+
+  static method IPPROTO_ICMP : int ();
+
+Get the constant value of C<IPPROTO_ICMP>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
 =head2 IPV6_ADDRFORM
 
   static method IPV6_ADDRFORM : int ();
@@ -1267,3 +1273,74 @@ Get the constant value of C<NI_MAXHOST>. If the system doesn't define this const
 
 Get the constant value of C<NI_MAXSERV>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
 
+=head2 ICMP_ADDRESS
+
+  static method ICMP_ADDRESS : int ();
+
+Get the constant value of C<ICMP_ADDRESS>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+=head2 ICMP_DEST_UNREACH
+
+  static method ICMP_DEST_UNREACH : int ();
+
+Get the constant value of C<ICMP_DEST_UNREACH>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+=head2 ICMP_ECHO
+
+  static method ICMP_ECHO : int ();
+
+Get the constant value of C<ICMP_ECHO>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+=head2 ICMP_ECHOREPLY
+
+  static method ICMP_ECHOREPLY : int ();
+
+Get the constant value of C<ICMP_ECHOREPLY>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+=head2 ICMP_ECHOREQUEST
+
+  static method ICMP_ECHOREQUEST : int ();
+
+Get the constant value of C<ICMP_ECHOREQUEST>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+=head2 ICMP_FILTER
+
+  static method ICMP_FILTER : int ();
+
+Get the constant value of C<ICMP_FILTER>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+=head2 ICMP_FRAG_NEEDED
+
+  static method ICMP_FRAG_NEEDED : int ();
+
+Get the constant value of C<ICMP_FRAG_NEEDED>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+=head2 ICMP_PARAMETERPROB
+
+  static method ICMP_PARAMETERPROB : int ();
+
+Get the constant value of C<ICMP_PARAMETERPROB>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+=head2 ICMP_REDIRECT
+
+  static method ICMP_REDIRECT : int ();
+
+Get the constant value of C<ICMP_REDIRECT>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+=head2 ICMP_SOURCE_QUENCH
+
+  static method ICMP_SOURCE_QUENCH : int ();
+
+Get the constant value of C<ICMP_SOURCE_QUENCH>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+=head2 ICMP_TIMESTAMP
+
+  static method ICMP_TIMESTAMP : int ();
+
+Get the constant value of C<ICMP_TIMESTAMP>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.
+
+=head2 ICMP_TIME_EXCEEDED
+
+  static method ICMP_TIME_EXCEEDED : int ();
+
+Get the constant value of C<ICMP_TIME_EXCEEDED>. If the system doesn't define this constant, an exception will be thrown. The error code is set to the class id of the L<Error::NotSupported|SPVM::Error::NotSupported> class.

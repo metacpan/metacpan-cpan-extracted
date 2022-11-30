@@ -1,0 +1,44 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 c197ca13a0f45810d31ed44d79e2f27256534e586c88d7c769206364d171f2d3 Build.PL
+SHA256 776ff6a25803e4a0ca8a69dd1855691165ab7d30bbebdff089ca26f65826f21c Changes
+SHA256 db739608563af2d9f1763883315451cc38032cb67bdd42a443bfcc7eef1a49b2 LICENSE
+SHA256 d9c050c4f8aefc820e5484db19d67a488e9efe48bd7ab07ca4cdc988992a268b MANIFEST
+SHA256 96f9017fb4671478b40f2ecf447ade4f2b2bbcc8bcf0e39c179a8b89e0dfa154 META.json
+SHA256 eeea45f3dbea7e54270b53a1b251deb36835e87fb750833472612f4b7fe3a2f1 META.yml
+SHA256 8b53f983c8258cced8e48a173149cfa45a668dabd81dad5f361384898f3be29f README
+SHA256 6aedf944d5f456ec269482ff1bdbf17484918e5bd4447e1b58717adcf4e767e4 bin/foodratio
+SHA256 5f2411cf70a62c53d617661d72ec5b8e501526c11cc0cb6c54fdab2e5558d5b1 lib/Food/Ratio.pm
+SHA256 5f7834bbac1be37dc525a56ec67b449c536f794ed190b5bf77dc344b4a5078c7 references.bib
+SHA256 9fb0ba35353673f387ff7670222664e0a34a36b36cd3fc99a7c8964af7671f9b t/00-load.t
+SHA256 27cc411f7355eafc502b4528a0c106c4d1f4c71f7c63bedf989ed3e9b6f63e7c t/10-food.t
+SHA256 d0e9eea88b0e77bfbcbdb88028801f337164eb11c3a53b71723ec46ff2c3eb68 t/pod-coverage.t
+SHA256 26e8eef165b3efeb88516cf0e98ea5ac2455f53e57eabc1259f9cfa6937a51a8 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAEBAwAdFiEElPO2YAAs9b/plKLEs1lvXE/ryKcFAmN1SLAACgkQs1lvXE/r
+yKejIgv9H1PdNZlpXtWPrA/60inxfGUWhLNQY3ApKf+Q/8ZP84jJgAuZH0osx8lx
+7Xc4nGkj7zQ3biTs5r2ZBE8TmCb8+T4Ags23z+ELKd7jPdH2z2JkqJ/ig+lCFrVt
+Y8VH7hWZ0onJMhv5MnTU+VWumzofKDk+Ke10yKabali/Tm27PUw2dtkTi+1Nkr+j
+YcUsUCs+IMYopB4Ojmg6oboqqj57/vi/ralXDe9MLiZWFMfbCFkIMKCaYsFwm/z8
+63Rn03DpBavv9nLsGHmdx5In6lwFHkPg6mNHKxBaLHtvU69oQYLGA+rm7qjn2p0x
+8roEamYtvpYjQnKy50QO2bRGxYElNHnvqdeCM7CaxKyU/NAo9bE5Nd8XZ9MxT87l
+JngDcCNjd5V/tUO1gkBDUdD7U0siWIEnNyIdVhye48iOyK9EepbGl1o38mfIIfZQ
+cuq+PEKThVWNAFGLmmxUWAZyOhIB8M6Bx2X93Qh8Ld7nqM3F7k5WvkWq7pp8OzyF
+JS2c/noc
+=Q3/r
+-----END PGP SIGNATURE-----

@@ -1,3 +1,18 @@
+1.062.1 2022-11-29  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Fix embarassing typos.
+
+
+1.062   2022-11-29  Released-By: PERLANCAR; Urgency: low
+
+        - No spec changes.
+
+        - [ux][doc] In script's Synopsis, start by showing how to write a simple
+          scenario.
+
+
 1.061   2022-02-08  Released-By: PERLANCAR; Urgency: low
 
         - No spec changes.

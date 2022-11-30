@@ -2,11 +2,6 @@ use strict;
 use warnings;
 use Test::More;
 
-BEGIN {
-    do { local $@; eval { require Net::Syslog } }
-        || plan skip_all => "Net::Syslog needed for this test";
-}
-
 use Sys::Hostname::Long qw/ hostname_long /;
 use Message::Passing::Output::Syslog;
 use Message::Passing::Input::Syslog;
@@ -38,31 +33,10 @@ my $idle; $idle = AnyEvent->idle(cb => sub {
 
 $cv->recv;
 
-ok scalar(@msgs);
-delete $msgs[0]->{message_raw};
-delete $msgs[0]->{datetime_raw};
-my $time = delete $msgs[0]->{epochtime};
-like $time, qr/^\d+$/;
+is scalar(@msgs), 1, 'one syslog received';
+like $msgs[0]->{epochtime}, qr/^\d+$/;
+is $msgs[0]->{content}, 'foo', 'content ok';
 
-is_deeply \@msgs, [
-    {
-        preamble        => '171',
-        priority        => 'err',
-        priority_int    => 3,
-        facility        => 'local5',
-        facility_int    => 168,
-        host_raw        => "client.t[$$]:",
-        host            => 'client',
-        domain          => "t[$$]:",
-        program_raw     => undef,
-        program_name    => undef,
-        program_sub     => undef,
-        program_pid     => undef,
-        content         => 'foo',
-        message         => 'foo',
-        received_from   => $host,
-    }
-];
 
 done_testing;
 

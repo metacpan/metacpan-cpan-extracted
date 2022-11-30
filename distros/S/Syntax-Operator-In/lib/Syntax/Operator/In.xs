@@ -33,11 +33,13 @@ static OP *pp_in(pTHX)
   OP cmpop;
   switch(type) {
     case INOP_CUSTOM:
+    {
       ANY *op_any = cBINOP_ANY->op_any;
       cmpop.op_type = OP_CUSTOM;
       cmpop.op_flags = 0;
       cmpop.op_ppaddr = op_any[0].any_ptr;
       break;
+    }
 
     case INOP_NUMBER:
       cmpop.op_type = OP_EQ;
@@ -100,8 +102,11 @@ static OP *pp_in(pTHX)
 
 static void parse_in(pTHX_ U32 flags, SV **parsedata, void *hookdata)
 {
-  if(lex_peek_unichar(0) != '<')
-    croak("Expected '<'");
+  bool using_circumfix = false;
+  if(lex_peek_unichar(0) == '<')
+    using_circumfix = true;
+  else if(lex_peek_unichar(0) != ':')
+    croak("Expected ':' or '<'");
   lex_read_unichar(0);
 
   lex_read_space(0);
@@ -134,9 +139,11 @@ static void parse_in(pTHX_ U32 flags, SV **parsedata, void *hookdata)
   else
     croak("Expected an equality test operator name but found '%s'", info->opname);
 
-  if(lex_peek_unichar(0) != '>')
-    croak("Expected '>'");
-  lex_read_unichar(0);
+  if(using_circumfix) {
+    if(lex_peek_unichar(0) != '>')
+      croak("Expected '>'");
+    lex_read_unichar(0);
+  }
 }
 
 static OP *newop_in(pTHX_ U32 flags, OP *lhs, OP *rhs, SV **parsedata, void *hookdata)

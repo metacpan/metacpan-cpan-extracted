@@ -121,6 +121,10 @@ sub _diag_dynamic_libs_otool {
           if not $? == 0;
         diag "$lib:";
         diag join "", @lib_arr;
+        if ($ENV{DIAG_RPATH}) {  #  noisy so only when called for
+          my $rpath = qx /$OTOOL -l $lib/;
+          diag $rpath;
+        }
         shift @lib_arr;  #  first result is dylib we called otool on
         
         # follow any aliens or non-system paths

@@ -14,6 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Weather-GHCN-Fetch",
   "EXE_FILES" => [
+    "bin/ghcn_cacheutil",
     "bin/ghcn_extremes",
     "bin/ghcn_fetch",
     "bin/ghcn_station_counts"
@@ -39,7 +40,7 @@ my %WriteMakefileArgs = (
     "Math::Trig" => 0,
     "Module::Load::Conditional" => 0,
     "Object::Pad" => "0.66",
-    "Path::Tiny" => 0,
+    "Path::Tiny" => "0.122",
     "Pod::Usage" => 0,
     "Set::IntSpan::Fast" => 0,
     "Text::Abbrev" => 0,
@@ -64,7 +65,7 @@ my %WriteMakefileArgs = (
     "Time::Local" => 0,
     "lib" => 0
   },
-  "VERSION" => "v0.0.010",
+  "VERSION" => "v0.0.011",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -92,7 +93,7 @@ my %FallbackPrereqs = (
   "Math::Trig" => 0,
   "Module::Load::Conditional" => 0,
   "Object::Pad" => "0.66",
-  "Path::Tiny" => 0,
+  "Path::Tiny" => "0.122",
   "Pod::Usage" => 0,
   "Set::IntSpan::Fast" => 0,
   "Test::Exception" => 0,

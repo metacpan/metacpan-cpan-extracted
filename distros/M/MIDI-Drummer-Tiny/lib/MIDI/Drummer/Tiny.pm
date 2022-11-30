@@ -3,7 +3,7 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Glorified metronome
 
-our $VERSION = '0.4007';
+our $VERSION = '0.4012';
 
 use strictures 2;
 use Data::Dumper::Compact qw(ddc);
@@ -139,7 +139,13 @@ has dotted_onetwentyeighth        => (is => 'ro', default => sub { 'dzn' });
 has double_dotted_onetwentyeighth => (is => 'ro', default => sub { 'ddzn' });
 
 
-sub note { return shift->score->n(@_) }
+sub note {
+    my ($self, @spec) = @_;
+    my $size = $spec[0] =~ /^d(\d+)$/ ? $1 / TICKS : dura_size($spec[0]);
+    #warn __PACKAGE__,' L',__LINE__,' ',,"$spec[0] => $size\n";
+    $self->counter( $self->counter + $size );
+    return $self->score->n(@spec);
+}
 
 
 sub accent_note {
@@ -152,14 +158,31 @@ sub accent_note {
 }
 
 
-sub rest { return shift->score->r(@_) }
+sub rest {
+    my ($self, @spec) = @_;
+    my $size = $spec[0] =~ /^d(\d+)$/ ? $1 / TICKS : dura_size($spec[0]);
+    #warn __PACKAGE__,' L',__LINE__,' ',,"$spec[0] => $size\n";
+    $self->counter( $self->counter + $size );
+    return $self->score->r(@spec);
+}
 
 
 sub count_in {
-    my $self = shift;
-    my $bars = shift || $self->bars;
+    my ($self, $args) = @_;
+
+    my $bars  = $self->bars;
+    my $patch = $self->closed_hh;
+
+    if ($args && ref $args) {
+        $bars  = $args->{bars}  if defined $args->{bars};
+        $patch = $args->{patch} if defined $args->{patch};
+    }
+    else {
+        $bars = $args; # given a simple integer
+    }
+
     for my $i ( 1 .. $self->beats * $bars ) {
-        $self->note( $self->quarter, $self->closed_hh );
+        $self->note( $self->quarter, $patch );
     }
 }
 
@@ -393,7 +416,6 @@ sub pattern {
     $args{patterns}   ||= [];
     $args{beats}      ||= $self->beats;
     $args{negate}     ||= 0;
-    $args{count}      ||= 0;
     $args{repeat}     ||= 1;
 
     return unless @{ $args{patterns} };
@@ -425,7 +447,6 @@ sub pattern {
         for ( 1 .. $args{repeat} ) {
             for my $bit ( split //, $pattern ) {
                 $args{vary}{$bit}->($self);
-                $self->counter( $self->counter + $size ) if $args{count};
             }
         }
     }
@@ -591,7 +612,7 @@ MIDI::Drummer::Tiny - Glorified metronome
 
 =head1 VERSION
 
-version 0.4007
+version 0.4012
 
 =head1 SYNOPSIS
 
@@ -627,6 +648,8 @@ version 0.4007
  # Alternate kick and snare
  $d->note($d->quarter, $d->open_hh, $_ % 2 ? $d->kick : $d->snare)
     for 1 .. $d->beats * $d->bars;
+
+ print 'Count: ', $d->counter, "\n";
 
  # Same but with beat-strings:
  $d->sync_patterns(
@@ -723,6 +746,9 @@ Default: C<4>
 Beat counter of durations, where a quarter-note is equal to 1. An
 eighth-note is 0.5, etc.
 
+This is automatically accumulated each time a C<rest> or C<note> is
+added to the score.
+
 =head1 KIT
 
 =over 4
@@ -797,6 +823,8 @@ Add notes to the score.
 
 This method takes the same arguments as L<MIDI::Simple/"Parameters for n/r/noop">.
 
+It also keeps track of the beat count with the C<counter> attribute.
+
 =head2 accent_note
 
   $d->accent_note($accent_value, $d->sixteenth, $d->snare);
@@ -815,13 +843,18 @@ Add a rest to the score.
 
 This method takes the same arguments as L<MIDI::Simple/"Parameters for n/r/noop">.
 
+It also keeps track of the beat count with the C<counter> attribute.
+
 =head2 count_in
 
  $d->count_in;
  $d->count_in($bars);
+ $d->count_in({ bars => $bars, patch => $patch });
 
-Play the closed hihat for the number of beats times the given bars.
-If no bars are given, the default times the number of beats is used.
+Play a patch for the number of beats times the number of bars.
+
+If no bars are given, the object setting is used.  If no patch is
+given, the closed hihat is used.
 
 =head2 metronome38
 
@@ -904,8 +937,8 @@ If not provided the B<snare> is used for the B<grace> and B<patch>
 patches.  Also, 1/2 of the score volume is used for the B<accent>
 if that is not given.
 
-If the B<grace> note is riven as a literal C<'r'>, rest instead adding
-a note to the score.
+If the B<grace> note is given as a literal C<'r'>, rest instead of
+adding a note to the score.
 
 =head2 roll
 
@@ -954,7 +987,7 @@ For example:
   patterns => [qw( 0101 0101 0110 0110 )],
 
 This method accumulates the number of beats in the object's B<counter>
-attribute, if the B<count> option is set.
+attribute.
 
 The B<vary> option is a hashref of coderefs, keyed by single character
 tokens, like the digits 0-9.  Each coderef duration should add up to
@@ -969,7 +1002,6 @@ Defaults:
     duration: quarter-note
     beats: given by constructor
     repeat: 1
-    count: 0 ( keep track of the beat count)
     negate: 0 (flip the bit values)
     vary:
         0 => sub { $self->rest( $args{duration} ) },

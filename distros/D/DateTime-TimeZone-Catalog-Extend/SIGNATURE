@@ -1,0 +1,43 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.88.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA256 0fc11b90d6601b9944863e9cb871b3897fdb6d4bc3818c486fc573a2d7024455 CONTRIBUTING.md
+SHA256 30076d5c58d19eb02cf7a1a1e2b818c684391abcc21091240a713fbb20f845d1 Changes
+SHA256 4bb36edd2bcafef11ca615f69607953a31ee05ae172b69990aee317e95653456 LICENSE
+SHA256 ba978a1eab8334b946a6e40316a2bc572cdaa00113ce61db2e3bf3bc856b37ce MANIFEST
+SHA256 8abb89c0c0e1070bc1fef67bd461f8194c93cb0bbd3d06b5cab91ad81e3006b9 META.json
+SHA256 22fc535901a99a14bf2ef2b94c53c155cec354737cbb7fc645f6d4a115c65729 META.yml
+SHA256 e5d8c977cf62333d4a863a4be1147914ff8aab1e3ad67fb78f11a5193d079fa9 Makefile.PL
+SHA256 6d4ffcfe024b638777e2c1337e10335966d06feceb91137258bb3953a22d96a3 README
+SHA256 7173b18d4e5a0e5a3b46439836d9c3788f9aeed584c9e21a3ff9221a3354cc08 README.md
+SHA256 3d531fab3a631d8fa46cc8db12d210f0d749bbfcd7e38e69e158d944ee07be2e lib/DateTime/TimeZone/Catalog/Extend.pm
+SHA256 fc3cb7e62d105cf1875b280b0f9590c9fc32eb70cd961b74a6dc77329317d33e t/002_extend.t
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBAwAdFiEENa28Ovg1XoRROdiWXzwCYc2y51IFAmOFaOsACgkQXzwCYc2y
+51Jr3BAAodqwNclaTlgZJfb2/NwaXppNZeIi+ujbF0wzs6TOQgFKg7lbZCAfDlFh
+nXtFe/fgLL+meiY+AsPaXojyyqRS5qEQzZQMquu0IKtYyfSvKwq9lEGIn5TmBv0D
+Go3AuDPtI6jApyxQ0YGjII74lfvR0GUcvAPgOCpsvHJlxtLlIeQ02B09+GTpMqWy
+Ge1zA+zCAWATvZmrCTjSp+ZjBdkXeZCNYj+XugeLyQH0aPzd99NBqJyUOrA/AOAF
+V24WBtpO6mGtHVDxMPlpMxL0UVYPvqtcmZEeptXxrbwjkQG81UyULny9kfaxro3b
+DGhCJkNA34MoD9txObWqGq1neeIpX9UZ8druzpzp6hbiEV2i99rhLl4PzDteOEux
+OlfAMPVhKi9Gyd6vlLQKGa/hOKPkkhTi3ttldKOG/ZX73rMA5NUvs6DV0Sx+vQEl
+VoZptf48VNqwKGSZP/zrYI++wh+KZrMQWvpxZLa1bw7TOma4L0XUcOmotTEnCsNn
+j0FTCGb3guy5ZR+em3NV7sLWk+xzfrO9dCt1qqbGH0ZUub8K2Eyd4VvlBiJiSCKi
+DIpJODHZ9gvTJY5u4uKSgS2wUX0gVSp5DxEpCPwmgOmVHNZXa3NUy7VFu+V1sKAr
+iyEHPVfaUgc4XTc/1Tp3OVxU+pBCmAChnIy/vOUDfrdNCuQCdaA=
+=Lu8w
+-----END PGP SIGNATURE-----

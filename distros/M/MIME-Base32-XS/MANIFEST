@@ -7,5 +7,4 @@ README.md
 t/test.t
 lib/MIME/Base32/XS.pm
 XS.xs
-ppport.h
 cpanfile

@@ -1,6 +1,7 @@
 package Babble::Plugin::PostfixDeref;
 
 use Moo;
+use Babble::Config;
 
 my $term_derefable = q{
             # Copied from <PerlTerm> rule in PPR::X@0.001002
@@ -97,6 +98,7 @@ sub transform_to_plain {
   }
   my $tf = sub {
     my ($m, $in_quotelike) = @_;
+    return if Babble::Config::BAIL_OUT_LATE && $m->text !~ m/ \s* -> \s* [\@%\$] /xs;
     my $interpolate = defined $in_quotelike && $in_quotelike;
     my ($term, $postfix) = $m->subtexts(qw(term postfix));
     #warn "Term: $term"; warn "Postfix: $postfix";
@@ -166,6 +168,12 @@ sub transform_to_plain {
     [ postfix => $scalarnospace_post ],
   ] => sub { $tf->(shift, 1) });
   # NOTE ArrayAccessNoSpace also needs to implemented.
+}
+
+sub check_bail_out_early {
+  my ($self, $top) = @_;
+  $top->text !~ m/postderef|postderef_qq/xs
+    && $top->text !~ m/ \s* -> \s* [\@%\$] /xs;
 }
 
 1;

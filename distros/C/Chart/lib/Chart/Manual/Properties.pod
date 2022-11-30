@@ -97,8 +97,8 @@ L</title>.
 
 Summary of all properties, grouped by chart type where there applicable.
 Sections are named after the Chart type in question, except B<All> and B<NoPie>.
+The format is: name ... L<type|/"DATA TYPES">, description; C<default value>.
 
-The format is: name, L<type|/"DATA TYPES">, description, default value
 Click on name for a longer explanation.
 
 

@@ -3,8 +3,8 @@ use 5.008;
 use strict;
 use warnings;
 
-$SIG{__WARN__} = sub { confess(shift); };
-our $VERSION = '1.25';
+local $SIG{__WARN__} = sub { confess(shift); };
+our $VERSION = '1.26';
 
 use Carp qw(confess croak);
 use Exporter;
@@ -38,7 +38,7 @@ sub read {
     $file = $self->{file};
     $testing = $self->{testing};
 
-    if (! $file){ 
+    if (! $file){
         confess "read() requires a file name sent in!";
     }
 
@@ -217,7 +217,7 @@ sub dir {
     }
 
     my $find = File::Find::Rule->new;
-    
+
     $find->maxdepth($self->{maxdepth}) if $self->{maxdepth};
     $find->file;
     $find->name(@types);
@@ -347,7 +347,7 @@ sub _config {
     for (@params){
         delete $self->{$_};
     }
-    
+
     for (keys %p){
         $self->{$_} = $p{$_};
     }
@@ -357,11 +357,11 @@ sub _handle {
 
     my $self = shift;
     my $file = shift;
-   
+
     my $fh;
 
     if ($self->recsep($file, 'hex') ne $self->platform_recsep('hex')){
-        
+
         $fh = $self->_binmode_handle($file);
         my $temp_wfh = $self->tempfile;
         binmode $temp_wfh, ':raw';
@@ -372,12 +372,12 @@ sub _handle {
             $_ = $self->_platform_replace($_);
             print $temp_wfh $_;
         }
-        
+
         close $fh or confess "can't close file $file: $!";
         close $temp_wfh or confess "can't close file $temp_filename: $!";
 
         my $ret_fh = $self->_binmode_handle($temp_filename);
-        
+
         return $ret_fh;
     }
     else {
@@ -640,7 +640,7 @@ NOTE: Although both are optional, at least one of C<line> or C<find> must be
 sent in. If both are sent in, we'll warn, and operate on the line number and
 skip the find parameter.
 
-Returns an array of the modified file contents.  
+Returns an array of the modified file contents.
 
 
 =head2 C<dir>
@@ -734,7 +734,7 @@ You can find documentation for this module with the perldoc command.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2016 Steve Bertrand.
+Copyright 2022 Steve Bertrand.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of either: the GNU General Public License as published

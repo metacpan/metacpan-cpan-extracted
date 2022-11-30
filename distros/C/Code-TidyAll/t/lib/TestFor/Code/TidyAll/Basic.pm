@@ -4,11 +4,11 @@ use Capture::Tiny qw(capture capture_stdout capture_merged);
 use Code::TidyAll::CacheModel::Shared;
 use Code::TidyAll::Util qw(tempdir_simple);
 use Code::TidyAll;
-use File::Find qw(find);
+use File::Find  qw(find);
 use File::pushd qw(pushd);
-use FindBin qw( $Bin );
-use IPC::Run3 qw( run3 );
-use Path::Tiny qw(path);
+use FindBin     qw( $Bin );
+use IPC::Run3   qw( run3 );
+use Path::Tiny  qw(path);
 
 use Test::Class::Most parent => 'TestHelper::Test::Class';
 use Test::Fatal;
@@ -104,7 +104,7 @@ sub test_basic : Tests {
 sub test_filemode : Tests {
     my $self = shift;
 
-    if ( $^O eq 'MSWin32' ) {
+    if ( $^O eq 'MSWin32' || $^O eq 'msys' ) {
         $self->builder->skip('File mode on Windows is weird');
         return;
     }

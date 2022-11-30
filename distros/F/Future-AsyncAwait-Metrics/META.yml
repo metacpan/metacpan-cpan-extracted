@@ -1,0 +1,31 @@
+---
+abstract: 'report metrics from C<Future::AsyncAwait> to C<Metrics::Any>'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  ExtUtils::CBuilder: '0'
+  Test::Metrics::Any: '0'
+  Test::More: '0.88'
+configure_requires:
+  Future::AsyncAwait::ExtensionBuilder: '0.60'
+  Module::Build: '0.4004'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Future-AsyncAwait-Metrics
+provides:
+  Future::AsyncAwait::Metrics:
+    file: lib/Future/AsyncAwait/Metrics.pm
+    version: '0.01'
+requires:
+  Future::AsyncAwait: '0.60'
+  Metrics::Any: '0.09'
+  perl: '5.014'
+resources:
+  IRC: irc://irc.perl.org/#io-async
+  license: http://dev.perl.org/licenses/
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

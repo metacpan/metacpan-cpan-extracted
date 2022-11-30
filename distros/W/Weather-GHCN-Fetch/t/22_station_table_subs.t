@@ -11,7 +11,7 @@ use Weather::GHCN::StationTable;
 
 package Weather::GHCN::StationTable;
 
-use Test::More tests => 9;
+use Test::More tests => 8;
 use Test::Exception;
 
 use Const::Fast;
@@ -109,30 +109,6 @@ subtest 'date functions' => sub {
     is _seasonal_decade(2009,11), '2000', '_seasonal_decade 2009-11';
     is _seasonal_decade(2009,12), '2010', '_seasonal_decade 2009-12';
     is _seasonal_decade(2010,01), '2010', '_seasonal_decade 2010-01';
-};
-
-subtest '_get_profile_options' => sub {
-
-    is_deeply _get_profile_options(undef), {}, '_get_profile_options(undef) returns {}';
-
-    my $href;
-    my @got_keys;
-    my @expected_keys;
-
-    if ( _get_profile_filespec('') ) {
-        $href = _get_profile_options("");
-        is ref $href, 'HASH', '_get_profile_options("") loaded a default profile';
-    } else {
-        ok 1, 'no default profile file found';
-    }
-
-
-    my $fname = $FindBin::Bin . '/ghcn_fetch.yaml';
-    $href = _get_profile_options($fname);
-    @got_keys = sort keys $href->%*;
-
-    @expected_keys = qw(aliases);
-    is_deeply \@got_keys, \@expected_keys, "_get_profile_options($fname)";
 };
 
 subtest '_get_kml_color' => sub {

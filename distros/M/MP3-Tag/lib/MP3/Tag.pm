@@ -42,7 +42,7 @@ use MP3::Tag::ImageExifTool;
 use MP3::Tag::LastResort;
 
 use vars qw/$VERSION @ISA/;
-$VERSION="1.15";
+$VERSION="1.16";
 @ISA = qw( MP3::Tag::User MP3::Tag::Site MP3::Tag::Vendor
 	   MP3::Tag::Implemenation ); # Make overridable
 *config = \%MP3::Tag::Implemenation::config;
@@ -92,10 +92,17 @@ use vars qw/%config/;
 						 mp4 aiff flac ape ram mpc)],
 	    ampersand_joiner		  => ['; '],
 	  );
-{
+
+sub reset_encode_decode_config ($;$) {
+  my(undef, $force_enc) = (shift,shift);
+  my($i_enc, $o_enc) = ($force_enc, $force_enc);
   my %e;
+  $e{FILES} = $i_enc if ($force_enc or (($ENV{LANG}||'') =~ /\.([-\w]+)$/i and $i_enc = $1, 1))
+			and not (${^UNICODE} &  0x8) and not $ENV{"MP3TAG_DECODE_FILES_DEFAULT_RESET"};
+  $e{eF}    = $o_enc if ($force_enc or (($ENV{LANG}||'') =~ /\.([-\w]+)$/i and $o_enc = $1, 1))
+			and not (${^UNICODE} & 0x16) and not $ENV{"MP3TAG_ENCODE_FILES_DEFAULT_RESET"};
   for my $t (qw(V1 V2 FILENAME FILES INF CDDB_FILE CUE)) {
-    $e{$t} = $ENV{"MP3TAG_DECODE_${t}_DEFAULT"};
+    $e{$t} = $ENV{"MP3TAG_DECODE_${t}_DEFAULT"} unless $t eq 'FILES' and not defined $ENV{"MP3TAG_DECODE_${t}_DEFAULT"};
     $e{$t} = $ENV{MP3TAG_DECODE_DEFAULT}  unless defined $e{$t};
     $config{"decode_encoding_" . lc $t} = [$e{$t}] if $e{$t};
   }
@@ -104,11 +111,13 @@ use vars qw/%config/;
   $e{eV1} = $e{V1}			  unless defined $e{eV1};
   $config{encode_encoding_v1} = [$e{eV1}] if $e{eV1};
 
-  $e{eF} = $ENV{MP3TAG_ENCODE_FILES_DEFAULT};
+  $e{eF} = $ENV{MP3TAG_ENCODE_FILES_DEFAULT} if defined $ENV{MP3TAG_ENCODE_FILES_DEFAULT};
   $e{eF} = $ENV{MP3TAG_ENCODE_DEFAULT}	  unless defined $e{eF};
-  $e{eF} = $e{FILES}			  unless defined $e{eF};
+  $e{eF} = $e{FILES}			  if not defined $e{eF} and
+					     (defined $ENV{"MP3TAG_DECODE_FILES_DEFAULT"} or defined $ENV{MP3TAG_DECODE_DEFAULT});
   $config{encode_encoding_files} = [$e{eF}] if $e{eF};
 }
+MP3::Tag->reset_encode_decode_config();
 
 =pod
 
@@ -2137,6 +2146,11 @@ sub process_handlers ($$$$;$$) {	# only 1 level of parens allowed in flags
    $self->_auto_field_from($cond, $handlers, \@f, undef, $args, $set);	# if $set, calls a method in all packages where possible
 }
 
+sub __nonneg ($) {
+  my $in = shift;
+  $in < 0 ? 0 : $in
+}
+
 # $upto TRUE: parse the part including $upto char
 # Very restricted backslashitis: only $upto and \ before $upto-or-end
 # $upto defined but FALSE: interpolate only one %-escape.
@@ -2386,9 +2400,9 @@ sub _interpolate ($$;$$) {
 	if (defined $minwidth) {
 	  $fill = ' ' unless defined $fill;
 	  if ($left) {
-	    $str .= $fill x ($minwidth - length $str);
+	    $str .= $fill x __nonneg($minwidth - length $str);
 	  } else {
-	    $str = $fill x ($minwidth - length $str) . $str;
+	    $str =  $fill x __nonneg($minwidth - length $str) . $str;
 	  }
 	}
 	$res .= $str;
@@ -2436,6 +2450,7 @@ interpolation of C<%{I(flags)text}>.
 
 sub interpolate_with_flags ($$$) {
     my ($self, $data, $flags) = @_;
+#	try::interpolate_with_flags(undef, '__List-j', 'f'); exit;
 
     $data = $self->interpolate($data) if $flags =~ /i/;
     if ($flags =~ /f/) {
@@ -2446,17 +2461,22 @@ sub interpolate_with_flags ($$$) {
 	  die "Can't open file `$data' for parsing: $!";
 	}
 	if ($flags =~ /B/) {
+#	  	warn "binmode -> YES";
 	  binmode F;
 	} else {
+#	  	warn "binmode -> NO";
 	  my $e;
 	  if ($e = $self->get_config('decode_encoding_files') and $e->[0]) {
+#	  	warn "binmode -> :encoding($e->[0])";
 	    eval "binmode F, ':encoding($e->[0])'"; # old binmode won't compile...
 	  }
 	}
 
 	local $/;
 	my $d = <F>;
+#		warn "From file $data (\$^OPEN=${^OPEN}, \$^UNICODE=${^UNICODE}): ", join q( ), map ord, split //, $d;
 	CORE::close F or die "Can't close file `$data' for parsing: $!";
+	$d =~ s/^(?:\x{FEFF}|\xEF\xBB\xBF)// unless $flags =~ /B/;	# strip BOM
 	$data = $d;
     }
     my @data = $data;
@@ -2594,6 +2614,7 @@ sub _parse_rex_microinterpolate ($$$;$) {	# $self->idem($code, $groups, $have_no
     $_[0]++, return '%' if $code eq '%';
     # In these two, allow setting to '', and to 123/789 too...
     push(@$groups, $code), return '((?<!\d)\d{1,3}(?:/\d{1,3})?(?!\d)|\A\Z)' if $code eq 'n';
+#    push(@$groups, $1), return '((?<!\d)\d{1,3}(?!\d)|\A\Z)' if $code =~ /^\{([nm][12])\}$/;
     (push @$groups, $code), return '((?<!\d)[12]\d{3}(?:(?:--|[-:/T\0,])\d(?:|\d|\d\d\d))*(?!\d)|\A\Z)'
 	if $code eq 'y' and ($self->get_config('year_is_timestamp'))->[0];
     (push @$groups, $code), return '((?<!\d)[12]\d{3}(?!\d)|\A\Z)'
@@ -2665,7 +2686,7 @@ sub _parse_rex_prepare ($$$) {
     die "Can't parse pattern, I see `$pattern'" if length $pattern;
     #$pattern =~ s<%(=?{(?:[^\\{}]|\\[\\{}])*}|{U\d+}|=?.)> # (=? is correct!
     #		 ( $self->_parse_rex_microinterpolate($1, $codes, $exact) )seg;
-    my @tags = map { (not ref and length == 1) ? $trans{$_} : $_ } @$codes;
+    my @tags = map { (not ref and (1 == length or (3 >= length and exists $trans{$_}))) ? $trans{$_} : $_ } @$codes;
     return [$o, $p, \@tags, $exact];
 }
 
@@ -2698,6 +2719,7 @@ sub parse_rex_match {	# pattern = [Original, Interpolated, Fields, NumExact]
 	$h{$c} = join $j, grep length, @{ $h{$c} };
     }
     $h{track} =~ s/^0+(?=\d)// if exists $h{track};
+#	warn "Found: ", join ', ', sort keys %h;
     return \%h, \@a if wantarray and @a;
     return \%h;
 }
@@ -3405,6 +3427,12 @@ Defaults for the above:
 (if the second one is not set, the value of the first one is used).
 Value 0 for more specific variable will cancel the effect of the less
 specific variables.
+
+If the C<LANG> environment variable indicates C<UTF-8> encoding, then
+the "C<FILES>" flavors default to C<utf8> (unless this effect is already
+achieved by the C<${^UNICODE}> variable).  This may be disabled by setting
+C<MP3TAG_DECODE_FILES_DEFAULT_RESET> true in the environment (likewise for
+C<EN>-code flavor).
 
 These variables set default configuration settings for C<MP3::Tag>;
 the values are read during the load time of the module.  After load,

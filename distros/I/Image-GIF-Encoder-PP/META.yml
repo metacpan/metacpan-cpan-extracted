@@ -4,6 +4,7 @@ author:
   - 'Gavin Hayes <gahayes@cpan.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  MIME::Base64: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -19,9 +20,10 @@ no_index:
     - inc
 requires:
   perl: '5.006'
+  version: '0.77'
 resources:
   bugtracker: https://github.com/G4Vi/gifenc-pl/issues
   homepage: https://github.com/G4Vi/gifenc-pl
   repository: https://github.com/G4Vi/gifenc-pl.git
-version: v0.1.0
+version: v0.1.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

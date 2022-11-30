@@ -1,0 +1,58 @@
+Runtime-Debugger
+
+ ____              _   _
+|  _ \ _   _ _ __ | |_(_)_ __ ___   ___
+| |_) | | | | '_ \| __| | '_ ` _ \ / _ \
+|  _ <| |_| | | | | |_| | | | | | |  __/
+|_| \_\\__,_|_| |_|\__|_|_| |_| |_|\___|
+
+ ____       _
+|  _ \  ___| |__  _   _  __ _  __ _  ___ _ __
+| | | |/ _ \ '_ \| | | |/ _` |/ _` |/ _ \ '__|
+| |_| |  __/ |_) | |_| | (_| | (_| |  __/ |
+|____/ \___|_.__/ \__,_|\__, |\__, |\___|_|
+                        |___/ |___/
+
+`Runtime::Debugger` - Easy to use REPL with `existing` lexical support.
+
+(emphasis on "existing" since I have not yet found this support in other modules).
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+USAGE
+
+Start the debugger:
+
+    perl -MRuntime::Debugger -E 'eval run'
+
+Same, but with some variables to play with:
+
+    perl -MRuntime::Debugger -E 'my $str1 = "Func"; our $str2 = "Func2"; my @arr1 = "arr-1"; our @arr2 = "arr-2"; my %hash1 = qw(hash 1); our %hash2 = qw(hash 2); my $coderef = sub { "code-ref: @_" }; {package My; sub Func{"My-Func"} sub Func2{"My-Func2"}} my $obj = bless {}, "My"; eval run; say $@'
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Runtime::Debugger
+
+You can also look for information at:
+
+    https://metacpan.org/pod/Runtime::Debugger
+    https://github.com/poti1/runtime-debugger
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2022 by Tim Potapov.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

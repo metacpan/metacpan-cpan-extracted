@@ -1,5 +1,7 @@
 # jenkins-translation-tool
 
+![Unit tests](https://github.com/glasswalk3r/jenkins-translation-tool/actions/workflows/unit.yaml/badge.svg?branch=main)
+
 CLI to generate missing translation keys and missing properties files and remove
 unused keys for a given language.
 
@@ -20,7 +22,7 @@ When compared to `translation-tool.pl`.
 
 #### Search for terms on translated values
 
-For use cases that you need to find a term that is used amount the translated
+For use cases that you need to find a term that is used among the translated
 files, you can use the `--search` options to do that.
 
 If the term is found, warnings are emitted, per file, every time the term was
@@ -158,7 +160,8 @@ Here is a list of ways to do it:
 
 ### Dependencies
 
-See the `Makefile.PL` file for `TEST_REQUIRES` and `PREREQ_PM` entries.
+See the `Makefile.PL` file for `TEST_REQUIRES` and `PREREQ_PM` entries: in
+order to develop, you will need to install by using `cpan` or `cpanm` CLIs.
 
 ### Testing
 
@@ -264,6 +267,7 @@ done.
 - [Jenkins Internationalization](https://www.jenkins.io/doc/developer/internationalization/)
 - [i18n](https://wiki.mageia.org/en/What_is_i18n,_what_is_l10n)
 - [Online convertion of UTF-8 to Java entities](http://itpro.cz/juniconv/)
+- [https://youtu.be/_MhWugMQegs?list=PLCOmiTb5WX3ouggdJ4ty2dVUSrki9uYr1&t=373](Introduction to Jelly)
 
 ## Copyright and licence
 

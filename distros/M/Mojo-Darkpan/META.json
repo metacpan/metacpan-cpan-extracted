@@ -4,7 +4,7 @@
       "rshingleton <reshingleton@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.12",
+   "generated_by" : "Minilla/v3.1.20",
    "license" : [
       "perl_5"
    ],
@@ -62,7 +62,7 @@
    "provides" : {
       "Mojo::Darkpan" : {
          "file" : "lib/Mojo/Darkpan.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       },
       "Mojo::Darkpan::Config" : {
          "file" : "lib/Mojo/Darkpan/Config.pm"
@@ -87,11 +87,12 @@
       },
       "homepage" : "https://github.com/rshingleton/Mojo-Darkpan",
       "repository" : {
-         "url" : "git://github.com/rshingleton/Mojo-Darkpan.git",
+         "type" : "git",
+         "url" : "https://github.com/rshingleton/Mojo-Darkpan.git",
          "web" : "https://github.com/rshingleton/Mojo-Darkpan"
       }
    },
-   "version" : "0.08",
+   "version" : "0.09",
    "x_contributors" : [
       "shingler <shingler@oclc.org>"
    ],

@@ -1,5 +1,10 @@
 Revision history for Alien-gzip
 
+0.07      2022-11-15 06:38:08 -0700
+  - Update system probe to always accept gzip version
+    on stderr instead of stdout (as is the case for
+    NetBSD and macOS) (gh#9)
+
 0.06      2020-02-20 19:44:07 -0500
   - Use https instead of http
   - Fix detection of bundled gzip on macOS

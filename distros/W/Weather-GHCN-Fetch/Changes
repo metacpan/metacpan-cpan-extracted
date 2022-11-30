@@ -1,5 +1,23 @@
 Revision history for Perl module libary Windows-GHCN-Fetch
 
+v0.0.011       2022-11-21
+  - restored printing of reasons for rejection
+  - improved warnings for filter and active range missing data
+  - refactored StationTable _report_gaps to create _find_gaps
+  - added quality % column to missing data reporting, and related improvements
+  - for API use, provided an optional parameter to StationTable::load_stations to receive the station text
+  - corrected some API POD related to the now defunct user_options and profile_options hashes in set_options
+  - eliminated multiple declarations of $PROFILE_FILE
+  - moved _get_profile_options and _get_profile_filespec from StationTable to Options
+  - renamed _get_profile_options and _get_profile_filespec to get_profile_options and get_profile_filespec
+  - moved testing of get_profile_options and get_profile_filespec from 22 to 14_options.t
+  - added a cache maintenance utility script (ghcn_cache)
+  - removed check for valid cachedir that was preventing ghcn_fetch working without a cache
+  - eliminated uninitialized warning in kml report when a station active range has only one value (i.e. end = start)
+  - fixed a problem causing ghcn_fetch to croak when both -cachedir and -profile are empty strings
+  - fixed 91_ghcn_fetch.t 'output to clipboard' test, which was failing during dzil release
+
+
 v0.0.010       2022-11-10
   - moved EXAMPLES POD from Fetch.pm to ghch_fetch
   - fixed: user prompt when stations found > 100 

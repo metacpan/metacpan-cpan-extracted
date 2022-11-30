@@ -1,7 +1,7 @@
 package App::picadata;
 use v5.14.1;
 
-our $VERSION = '2.04';
+our $VERSION = '2.05';
 
 use Getopt::Long qw(GetOptionsFromArray :config bundling);
 use Pod::Usage;

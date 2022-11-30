@@ -501,7 +501,7 @@ method compile($name, $html) {
             } else {
                 $attrset->{type} eq AT_AS_MODIFY_ATTRS
                     or die "Internal error: unexpected attrset replacement type '$attrset->{type}'";
-                
+
                 my $token_attrs = $token->{attrs};
                 my %attrs = map +(
                     $_ => {

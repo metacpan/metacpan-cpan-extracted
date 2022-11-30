@@ -1,5 +1,19 @@
 Revision history for Perl extension XML::Enc.
 
+0.08 -- Mon Nov 21 22:17:44 AST 2022
+
+    - d729f2c Release 0.07-TRIAL as production
+    - 09349ca v0.07
+
+0.07 -- Sun Nov 20 18:02:06 AST 2022
+
+    - c468bb9 Update support files before release
+    - 45b0fa2 rename new parameter before release
+    - 48713f6 Add support for specifying xenc:OAEPparams
+    - a64c613 Move to Crypt::PK::RSA and support OAEP with MGF element
+    - 0c9a35a Get extra values from EncryptionMethod XML
+    - 912180e v0.06
+
 0.06 -- Sat Apr 09 17:41:59 ADT 2022
 
     - f28203a Require Crypt::AuthEnc::GCM 0.062 or higher

@@ -45,6 +45,11 @@ sub transform_to_plain {
   ] => $tf);
 }
 
+sub check_bail_out_early {
+  my ($self, $top) = @_;
+  $top->text !~ m, // ,xs;
+}
+
 1;
 __END__
 

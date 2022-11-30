@@ -4,6 +4,7 @@ package # hide from PAUSE
 use strict;
 use warnings;
 use Test::More;
+use String::CamelCase 'wordsplit';
 use Carp::Clan qw/^DBIx::Class/;
 use List::Util 'all';
 use namespace::clean;
@@ -20,12 +21,6 @@ use constant BY_NON_ALPHANUM =>
 
 my $LF   = "\x0a";
 my $CRLF = "\x0d\x0a";
-
-# Copied from String::CamelCase because of RT#123030
-sub wordsplit {
-    my $s = shift;
-    split /[_\s]+|\b|(?<![A-Z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])/, $s;
-}
 
 sub split_name($;$) {
     my ($name, $v) = @_;

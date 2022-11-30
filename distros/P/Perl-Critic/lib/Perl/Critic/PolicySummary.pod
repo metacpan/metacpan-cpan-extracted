@@ -22,7 +22,7 @@ module for its specific details.
 
 =head2 L<BuiltinFunctions::ProhibitBooleanGrep|Perl::Critic::Policy::BuiltinFunctions::ProhibitBooleanGrep>
 
-Use C<List::MoreUtils::any> instead of C<grep> in boolean context. [Default severity 2]
+Use C<any> from C<List::SomeUtils> or C<List::MoreUtils> instead of C<grep> in boolean context. [Default severity 2]
 
 =head2 L<BuiltinFunctions::ProhibitComplexMappings|Perl::Critic::Policy::BuiltinFunctions::ProhibitComplexMappings>
 
@@ -199,6 +199,10 @@ You can't depend upon the value of C<$@>/C<$EVAL_ERROR> to tell whether an C<eva
 =head2 L<InputOutput::ProhibitBacktickOperators|Perl::Critic::Policy::InputOutput::ProhibitBacktickOperators>
 
 Discourage stuff like C<@files = `ls $directory`>. [Default severity 3]
+
+=head2 L<InputOutput::ProhibitBarewordDirHandles|Perl::Critic::Policy::InputOutput::ProhibitBarewordDirHandles>
+
+Write C<opendir my $dh, $dirname;> instead of C<opendir DH, $dirname;>. [Default severity 5]
 
 =head2 L<InputOutput::ProhibitBarewordFileHandles|Perl::Critic::Policy::InputOutput::ProhibitBarewordFileHandles>
 

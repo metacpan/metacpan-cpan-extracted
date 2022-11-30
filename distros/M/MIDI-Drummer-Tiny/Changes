@@ -1,5 +1,23 @@
 Revision history for MIDI-Drummer
 
+0.4012 2022-11-25 14:00:33
+    - Allow the patch to be set for the count_in() method.
+    - Improve documentation.
+
+0.4011 2022-11-20 15:26:04
+    - Improve the eg/black-page program.
+
+0.4010 2022-11-20 12:42:12
+    - Remove the double-counting from the ->pattern method.
+
+0.4009 2022-11-20 12:37:47
+    - Fix duration size computation for beat counting.
+    - Improve test.
+
+0.4008 2022-11-20 10:34:59
+    - Made beat counting automatic.
+    - Improve documentation.
+
 0.4007 2022-11-13 07:54:23
     - Allow flam() to rest for the grace-note.
 

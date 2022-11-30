@@ -763,7 +763,7 @@ void* SPVM_API_new_object_by_name(SPVM_ENV* env, SPVM_VALUE* stack, const char* 
   
   int32_t id = env->get_basic_type_id(env, class_name);
   if (id < 0) {
-    env->die(env, stack, "The class \"%s\" is not loaded", class_name, file, line);
+    env->die(env, stack, "The \"%s\" class is not loaded", class_name, file, line);
     *error = 1;
     return NULL;
   };
@@ -779,7 +779,7 @@ SPVM_OBJECT* SPVM_API_new_pointer_with_fields_by_name(SPVM_ENV* env, SPVM_VALUE*
   int32_t id = env->get_basic_type_id(env, class_name);
   if (id < 0) {
     *error = 1;
-    env->die(env, stack, "The class \"%s\" is not loaded", class_name, file, line);
+    env->die(env, stack, "The \"%s\" class is not loaded", class_name, file, line);
     return NULL;
   };
   SPVM_OBJECT* object = SPVM_API_new_pointer_with_fields(env, stack, id, pointer, fields_length);
@@ -792,7 +792,7 @@ SPVM_OBJECT* SPVM_API_new_pointer_by_name(SPVM_ENV* env, SPVM_VALUE* stack, cons
   int32_t id = env->get_basic_type_id(env, class_name);
   if (id < 0) {
     *error = 1;
-    env->die(env, stack, "The class \"%s\" is not loaded", class_name, file, line);
+    env->die(env, stack, "The \"%s\" class is not loaded", class_name, file, line);
     return NULL;
   };
   SPVM_OBJECT* object = env->new_pointer(env, stack, id, pointer);
@@ -2812,6 +2812,11 @@ void SPVM_API_dec_ref_count(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* objec
         if (object->flag & SPVM_OBJECT_C_FLAG_HAS_DESTRUCTOR) {
           int32_t args_stack_length = 1;
           SPVM_VALUE save_stack0 = stack[0];
+          void* save_exception = env->get_exception(env, stack);
+          if (save_exception) {
+            env->inc_ref_count(env, stack, save_exception);
+          }
+          
           stack[0].oval = object;
           int32_t error = SPVM_API_call_spvm_method(env, stack, class->destructor_method_id, args_stack_length);
           
@@ -2819,10 +2824,15 @@ void SPVM_API_dec_ref_count(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* objec
           if (error) {
             void* exception = env->get_exception(env, stack);
             const char* exception_chars = env->get_chars(env, stack, exception);
-            fprintf(stderr, "(An exception thrown in the DESTROY method is converted to a warning)%s\n", exception_chars);
+            fprintf(stderr, "[The following exception is coverted to a warning because it is thrown in the DESTROY method]\n%s\n", exception_chars);
           }
           
+          // Restore stack and excetpion
           stack[0] = save_stack0;
+          env->set_exception(env, stack, save_exception);
+          if (save_exception) {
+            env->dec_ref_count(env, stack, save_exception);
+          }
           
           assert(object->ref_count > 0);
         }
@@ -3755,7 +3765,7 @@ int32_t SPVM_API_get_class_id_by_name(SPVM_ENV* env, SPVM_VALUE* stack, const ch
   int32_t class_id = env->get_class_id(env, class_name);
   if (class_id < 0) {
     *error = 1;
-    env->die(env, stack, "The class \"%s\" is not loaded", class_name, file, line);
+    env->die(env, stack, "The \"%s\" class is not loaded", class_name, file, line);
   };
   return class_id;
 }

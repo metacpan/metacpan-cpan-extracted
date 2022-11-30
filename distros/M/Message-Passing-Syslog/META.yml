@@ -4,12 +4,12 @@ author:
   - 'and COPYRIGHT'
 build_requires:
   ExtUtils::MakeMaker: 6.36
-  Test::More: 0.88
+  Test::More: '0.88'
 configure_requires:
   ExtUtils::MakeMaker: 6.36
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.06'
+generated_by: 'Module::Install version 1.19'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -23,8 +23,9 @@ no_index:
 requires:
   AnyEvent: 0
   JSON: 0
-  Message::Passing: 0.104
+  Message::Passing: '0.104'
   Moo: 0
+  Net::Syslog: 0.04
   Parse::Syslog::Line: 1.2
   Socket: 2.008
   Sys::Hostname::Long: 0
@@ -35,5 +36,5 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: git://github.com/suretec/Message-Passing-Syslog.git
-version: 0.011
-x_authority: cpan:GHENRY
+version: '0.014'
+x_authority: cpan:ABRAXXA

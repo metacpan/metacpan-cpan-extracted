@@ -2,7 +2,7 @@ use warnings;
 
 package Git::Hooks::CheckFile;
 # ABSTRACT: Git::Hooks plugin for checking files
-$Git::Hooks::CheckFile::VERSION = '3.3.0';
+$Git::Hooks::CheckFile::VERSION = '3.3.1';
 use v5.16.0;
 use utf8;
 use Carp;
@@ -540,7 +540,7 @@ Git::Hooks::CheckFile - Git::Hooks plugin for checking files
 
 =head1 VERSION
 
-version 3.3.0
+version 3.3.1
 
 =head1 SYNOPSIS
 
@@ -839,7 +839,7 @@ potentially many files (e.g. F<^lib/.*\\.pm$>).
 
 See the L</SYNOPSIS> section for some examples.
 
-=head2 [DEPRECATED] deny-token REGEXP
+=head2 [DEPRECATED after v2.13.0] deny-token REGEXP
 
 This option is deprecated. Please, use the C<CheckDiff::deny-token> option
 instead.

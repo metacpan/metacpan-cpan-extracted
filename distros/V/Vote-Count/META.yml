@@ -5,6 +5,7 @@ author:
 build_requires:
   Carp::Always: '0'
   File::Temp: '0'
+  JSON::MaybeXS: '0'
   Test2::Bundle::More: '0'
   Test2::Tools::Class: '0'
   Test2::Tools::Exception: '0'
@@ -13,13 +14,15 @@ build_requires:
   Test::Exception: '0'
   Test::Fatal: '0'
   Test::More: '0'
+  Test::use::ok: '0'
   lib: '0'
+  ok: '0'
   perl: '5.024'
 configure_requires:
   ExtUtils::MakeMaker: '0'
   perl: '5.024'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.027, CPAN::Meta::Converter version 2.150010'
 license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,23 +35,23 @@ no_index:
     - lib/Vote/Hand_Count.pod
 requires:
   Carp: '0'
-  Cpanel::JSON::XS: '4.19'
+  Cpanel::JSON::XS: '4.32'
   Data::Dumper: '0'
   Data::Printer: '0'
   Exporter: '0'
   Exporter::Easy: '0'
-  JSON::MaybeXS: '1.004000'
-  List::Util: '0'
-  Math::BigInt::GMP: '1.6003'
-  Math::BigRat: '0'
+  List::Util: '1.63'
+  Math::BigInt: '1.999837'
+  Math::BigInt::GMP: '1.6005'
+  Math::BigRat: '0.2624'
   Mojo::Template: '0'
   Moose: '0'
   Moose::Role: '0'
   MooseX::StrictConstructor: '0'
-  Path::Tiny: '0.108'
-  Ref::Util: '0.202'
+  Path::Tiny: '0.130'
+  Ref::Util: '0.204'
   Sort::Hash: '0'
-  Storable: '3.15'
+  Storable: '3.25'
   String::TtyLength: '0.02'
   Test2::API: '0'
   Time::Piece: '0'
@@ -66,7 +69,7 @@ resources:
   bugtracker: https://github.com/brainbuz/Vote-Count/issues
   homepage: https://github.com/brainbuz/Vote-Count
   repository: https://github.com/brainbuz/Vote-Count.git
-version: '2.02'
+version: '2.03'
 x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: GPL-3.0-only

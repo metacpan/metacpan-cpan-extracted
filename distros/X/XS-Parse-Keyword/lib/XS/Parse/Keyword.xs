@@ -16,39 +16,6 @@
 #include "keyword.h"
 #include "infix.h"
 
-/* v0 hooks lacked wrapper_func_name */
-struct XSParseInfixHooks_v0 {
-  U32 flags;
-  enum XSParseInfixClassification cls;
-
-  const char *permit_hintkey;
-  bool (*permit) (pTHX_ void *hookdata);
-
-  OP *(*new_op)(pTHX_ U32 flags, OP *lhs, OP *rhs, void *hookdata);
-  OP *(*ppaddr)(pTHX);
-};
-
-static void XSParseInfix_register_v0(pTHX_ const char *opname, const struct XSParseInfixHooks_v0 *hooks_v0, void *hookdata)
-{
-  warn("XSParseInfix ABI version 0 is deprecated and will soon be removed");
-
-  struct XSParseInfixHooks *hooks;
-  Newx(hooks, 1, struct XSParseInfixHooks);
-
-  hooks->flags = hooks_v0->flags | (1<<15); /* NO_PARSEDATA */
-  hooks->cls   = hooks_v0->cls;
-
-  hooks->wrapper_func_name = NULL;
-
-  hooks->permit_hintkey = hooks_v0->permit_hintkey;
-  hooks->permit         = hooks_v0->permit;
-  hooks->new_op         = (OP *(*)(pTHX_ U32, OP *, OP *, SV **, void *))hooks_v0->new_op;
-  hooks->ppaddr         = hooks_v0->ppaddr;
-  hooks->parse          = NULL;
-
-  XSParseInfix_register(aTHX_ opname, hooks, hookdata);
-}
-
 /* v1 hooks.newop did not pass parsedata */
 struct XSParseInfixHooks_v1 {
   U16 flags;
@@ -108,12 +75,11 @@ BOOT:
   XSParseKeyword_boot(aTHX);
 
 
-  sv_setiv(*hv_fetchs(PL_modglobal, "XS::Parse::Infix/ABIVERSION_MIN", 1), 0);
+  sv_setiv(*hv_fetchs(PL_modglobal, "XS::Parse::Infix/ABIVERSION_MIN", 1), 1);
   sv_setiv(*hv_fetchs(PL_modglobal, "XS::Parse::Infix/ABIVERSION_MAX", 1), XSPARSEINFIX_ABI_VERSION);
 
   sv_setuv(*hv_fetchs(PL_modglobal, "XS::Parse::Infix/parse()@2", 1), PTR2UV(&XSParseInfix_parse));
   sv_setuv(*hv_fetchs(PL_modglobal, "XS::Parse::Infix/new_op()@0", 1), PTR2UV(&XSParseInfix_new_op));
-  sv_setuv(*hv_fetchs(PL_modglobal, "XS::Parse::Infix/register()@0", 1), PTR2UV(&XSParseInfix_register_v0));
   sv_setuv(*hv_fetchs(PL_modglobal, "XS::Parse::Infix/register()@1", 1), PTR2UV(&XSParseInfix_register_v1));
   sv_setuv(*hv_fetchs(PL_modglobal, "XS::Parse::Infix/register()@2", 1), PTR2UV(&XSParseInfix_register));
 

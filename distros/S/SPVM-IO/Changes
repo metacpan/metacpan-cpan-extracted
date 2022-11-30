@@ -1,3 +1,17 @@
+0.13 2022-11-22
+  [New Features]
+    * Added many methods and some classes.
+  [Document Improvement]
+    * Documents of many methods and some classes are added.
+0.12 2022-11-16
+  [Prerequirement Changes]
+    * SPVM::IO needs SPVM::Math 0.11.
+0.12 2022-11-16
+  [Incompatible Changes]
+    * The methods in the IO::Socket::INET is moved to the IO::Socket class.
+    * Removed IO::Socket::INET. This module will be added in the nearly future.
+  [Prerequirement Changes]
+    * SPVM::IO needs SPVM 0.9662+.
 0.11 2022-11-07
   [Prerequirement Changes]
     * SPVM::IO needs SPVM 0.9661+.

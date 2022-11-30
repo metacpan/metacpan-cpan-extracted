@@ -5,7 +5,7 @@ use warnings;
 
 # Version of the Perl RiveScript interpreter. This must be on a single line!
 # See `perldoc version`
-use version; our $VERSION = version->declare('v2.0.3');
+use version; our $VERSION = version->declare('v2.0.4');
 
 # This is not a real module; it's only a current copy of the RiveScript
 # Working Draft. See the latest version at

@@ -26,6 +26,7 @@ t/assets/deferred_leak.pl
 t/assets/promise_leak.pl
 t/async_await.t
 t/async_await__several_awaits.t
+t/async_await__simple.t
 t/async_await_hold_ref.t
 t/async_await_version.t
 t/await_wait__anyevent.t

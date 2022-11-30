@@ -1,0 +1,29 @@
+NAME
+    Alien::Font::Uni - access to Unifont truetype file
+
+SYNOPSIS
+        use Alien::Font::Uni;
+    
+        my $path = Alien::Font::Uni::get_path();
+        my $vstring = Alien::Font::Uni::font_vstring();
+        my $string  = Alien::Font::Uni::font_version();
+
+DESCRIPTION
+    This module was created as an optional dependency of Chart to have
+    access to an unicode complete scaleable font file. Thus only the .ttf
+    file is provided since this is what GD can read. Distros might redirect
+    to pre-existing resources.
+
+FONT
+    Unifont 15, Copyright(c) 1998 - 2022 by Roman Czyborra, Paul Hardy and
+    contributors - Licensed under OFL 1.1
+
+AUTHOR
+    Herbert Breunung (lichtkind@cpan.org)
+
+COPYRIGHT
+    Copyright(c) 2022 by Herbert Breunung
+
+    All rights reserved. This program is free software; you can redistribute
+    it and/or modify it under the same terms as Perl itself.
+

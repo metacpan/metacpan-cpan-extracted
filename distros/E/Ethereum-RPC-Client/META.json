@@ -4,7 +4,7 @@
       "binary.com <BINARY@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.143240",
+   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -13,32 +13,60 @@
       "version" : 2
    },
    "name" : "Ethereum-RPC-Client",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "share",
+         "shares",
+         "t",
+         "xt"
+      ]
+   },
    "prereqs" : {
       "configure" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "7.1101"
+            "ExtUtils::MakeMaker" : "7.64"
          }
       },
       "develop" : {
          "requires" : {
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::Plugin::FileFinder::ByName" : "0",
+            "Dist::Zilla::Plugin::PerlTidy" : "0",
+            "Dist::Zilla::Plugin::Test::NoTabs" : "0",
+            "Dist::Zilla::Plugin::Test::Perl::Critic" : "0",
+            "Dist::Zilla::PluginBundle::Author::DERIV" : "0",
+            "Software::License::Perl_5" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
             "Test::EOL" : "0",
+            "Test::MinimumVersion" : "0",
             "Test::Mojibake" : "0",
-            "Test::More" : "0.88",
+            "Test::More" : "0.96",
+            "Test::NoTabs" : "0",
+            "Test::Perl::Critic" : "0",
             "Test::Pod" : "1.41",
-            "Test::Synopsis" : "0",
+            "Test::Portability::Files" : "0",
             "Test::Version" : "1"
          }
       },
       "runtime" : {
          "requires" : {
+            "Digest::Keccak" : "0.05",
+            "Encode" : "0",
             "Future" : "0.37",
             "JSON" : "2.97001",
             "JSON::MaybeXS" : "1.003008",
-            "Math::BigFloat" : "1.999811",
-            "Math::BigInt" : "1.999811",
+            "List::Util" : "0",
+            "Math::BigFloat" : "1.999814",
+            "Math::BigInt" : "1.999814",
             "Mojo::UserAgent" : "0",
             "Moo" : "0",
-            "perl" : "5.014"
+            "Path::Tiny" : "0",
+            "Scalar::Util" : "0",
+            "perl" : "5.014",
+            "strict" : "0",
+            "warnings" : "0"
          }
       },
       "test" : {
@@ -50,9 +78,37 @@
             "File::Spec" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
+            "JSON" : "2.97001",
             "Test::CheckDeps" : "0.010",
-            "Test::More" : "0.96"
+            "Test::More" : "0.96",
+            "perl" : "5.014"
          }
+      }
+   },
+   "provides" : {
+      "Ethereum::RPC::Client" : {
+         "file" : "lib/Ethereum/RPC/Client.pm",
+         "version" : "0.04"
+      },
+      "Ethereum::RPC::Contract" : {
+         "file" : "lib/Ethereum/RPC/Contract.pm",
+         "version" : "0.04"
+      },
+      "Ethereum::RPC::Contract::ContractResponse" : {
+         "file" : "lib/Ethereum/RPC/Contract/ContractResponse.pm",
+         "version" : "0.04"
+      },
+      "Ethereum::RPC::Contract::ContractTransaction" : {
+         "file" : "lib/Ethereum/RPC/Contract/ContractTransaction.pm",
+         "version" : "0.04"
+      },
+      "Ethereum::RPC::Contract::Helper::ImportHelper" : {
+         "file" : "lib/Ethereum/RPC/Contract/Helper/ImportHelper.pm",
+         "version" : "0.04"
+      },
+      "Ethereum::RPC::Contract::Helper::UnitConversion" : {
+         "file" : "lib/Ethereum/RPC/Contract/Helper/UnitConversion.pm",
+         "version" : "0.04"
       }
    },
    "release_status" : "stable",
@@ -60,14 +116,28 @@
       "bugtracker" : {
          "web" : "https://github.com/binary-com/perl-Ethereum-RPC-Client/issues"
       },
+      "homepage" : "https://github.com/binary-com/perl-Ethereum-RPC-Client",
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/binary-com/perl-Ethereum-RPC-Client.git",
+         "url" : "https://github.com/binary-com/perl-Ethereum-RPC-Client.git",
          "web" : "https://github.com/binary-com/perl-Ethereum-RPC-Client"
       }
    },
-   "version" : "0.03",
+   "version" : "0.04",
+   "x_authority" : "cpan:DERIV",
+   "x_contributors" : [
+      "regcostajr <regcostajr@gmail.com>",
+      "chylli-binary <chylli@binary.com>",
+      "Fayland Lam <fayland@gmail.com>",
+      "Jean-Yves Sireau <jy@binary.com>",
+      "Reginaldo Costa <53163145+reginaldo-binary@users.noreply.github.com>",
+      "Raunak Kathuria <raunakkathuria@gmail.com>",
+      "chylli-binary <52912308+chylli-binary@users.noreply.github.com>",
+      "Torsten F\u00f6rtsch <torsten@binary.com>",
+      "Zak B. Elep <zakame@zakame.net>"
+   ],
    "x_generated_by_perl" : "v5.26.2",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.06"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

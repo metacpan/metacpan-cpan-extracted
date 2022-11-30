@@ -288,6 +288,14 @@ dbixcsl_common_tests->new(
                     name
                 ) where active
             },
+            q{
+                create table pg_loader_test13 (
+                   created DATE PRIMARY KEY DEFAULT now(),
+                   updated DATE DEFAULT now(),
+                   type text,
+                   value integer
+                )
+            }
         ],
         pre_drop_ddl => [
             'DROP SCHEMA dbicsl_test CASCADE',
@@ -296,8 +304,8 @@ dbixcsl_common_tests->new(
             'DROP TYPE pg_loader_test_enum',
             'DROP VIEW pg_loader_test11',
         ],
-        drop  => [ qw/pg_loader_test1 pg_loader_test2 pg_loader_test9 pg_loader_test10 pg_loader_test12/ ],
-        count => 11 + 33 * 2,   # regular + multi-schema * 2
+        drop  => [ map "pg_loader_test$_", 1, 2,9, 10, 12, 13 ],
+        count => 13 + 33 * 2,   # regular + multi-schema * 2
         run   => sub {
             my ($schema, $monikers, $classes) = @_;
 
@@ -512,6 +520,13 @@ dbixcsl_common_tests->new(
                 { $schema->source($monikers->{pg_loader_test12})->unique_constraints },
                 { pg_loader_test12_value => ['value'] },
                 'unique indexes are dumped correctly';
+
+            my $pg_13 = $schema->source($monikers->{pg_loader_test13});
+            is $pg_13->column_info('created')->{retrieve_on_insert}, 1,
+              'adds roi for primary key col w/ non serial default';
+
+            is $pg_13->column_info('updated')->{retrieve_on_insert}, undef,
+              'does not add roi for non-primary keys with a default';
         },
     },
 )->run_tests();

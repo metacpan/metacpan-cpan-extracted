@@ -4,8 +4,8 @@
 # Author          : Johan Vromans
 # Created On      : Sun Sep 15 18:39:01 1996
 # Last Modified By: Johan Vromans
-# Last Modified On: Tue Jul 16 10:00:31 2019
-# Update Count    : 25
+# Last Modified On: Fri Apr 29 14:19:33 2022
+# Update Count    : 27
 # Status          : Unknown, Use with caution!
 
 ################ Common stuff ################
@@ -60,21 +60,20 @@ sub app_options {
 
     # Process options.
     if ( @ARGV > 0 ) {
-	GetOptions('ident'	=> \$ident,
-		   'verbose+'	=> \$verbose,
-		   'quiet'	=> sub { $verbose = 0 },
-		   'trace'	=> \$trace,
-		   'help|?'	=> \$help,
-		   'man'	=> \$man,
-		   'debug'	=> \$debug)
-	  or $pod2usage->(2);
+	GetOptions( 'ident'	=> \$ident,
+		    'verbose+'	=> \$verbose,
+		    'quiet'	=> sub { $verbose = 0 },
+		    'trace'	=> \$trace,
+		    'help|?'	=> \$help,
+		    'man'	=> \$man,
+		    'debug'	=> \$debug )
+	  or $pod2usage->( -exitval => 2, -verbose => 0 );
     }
     if ( $ident or $help or $man ) {
 	print STDERR ("This is $my_package [$my_name $my_version]\n");
     }
     if ( $man or $help ) {
-	$pod2usage->(1) if $help;
-	$pod2usage->(VERBOSE => 2) if $man;
+	$pod2usage->( -exitval => 0, -verbose => $man ? 2 : 0 );
     }
 }
 

@@ -1,5 +1,5 @@
 package Net::Cisco::FMC::v1::Role::REST::Client;
-$Net::Cisco::FMC::v1::Role::REST::Client::VERSION = '0.006001';
+$Net::Cisco::FMC::v1::Role::REST::Client::VERSION = '0.006002';
 # ABSTRACT: Cisco Firepower Management Center (FMC) REST client
 
 use 5.024;
@@ -79,7 +79,7 @@ Net::Cisco::FMC::v1::Role::REST::Client - Cisco Firepower Management Center (FMC
 
 =head1 VERSION
 
-version 0.006001
+version 0.006002
 
 =head1 AUTHOR
 
@@ -87,7 +87,7 @@ Alexander Hartmaier <abraxxa@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 - 2020 by Alexander Hartmaier.
+This software is copyright (c) 2018 - 2022 by Alexander Hartmaier.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

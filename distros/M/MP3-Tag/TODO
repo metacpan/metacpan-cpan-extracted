@@ -1,6 +1,11 @@
 MP3::Tag.pm
 ===========
 
+* It seems that to allow intelligent handling of Unicode file names we need to keep a non-decoded name (e.g., from readdir())
+  and a decoded one (to extract the info from the file name).  Should not we expect that new() may be called with an unicode name???
+
+    What is below is not 100% clear now :-[
+
 * perhaps restructuring of this wrapper module, as it 
   should be easier to say which Tag::modules should be used
 

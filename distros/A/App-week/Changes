@@ -1,5 +1,13 @@
 Revision history for Perl extension App-week
 
+1.0303 2022-11-28T02:50:32Z
+
+    - fix olympic theme color for -W option
+
+1.0302 2022-11-26T23:26:23Z
+
+    - make option -W to work
+
 1.0301 2022-08-29T07:07:09Z
 
     - use Getopt::EX::Hashed new interface

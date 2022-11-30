@@ -1,9 +1,41 @@
-0.002   2017-08-04 (PERLANCAR)
+0.008   2022-11-24  Released-By: PERLANCAR; Urgency: medium
+
+        - Add participant: SPVM_precompile.
+
+
+0.007   2022-11-23  Released-By: PERLANCAR; Urgency: medium
+
+        - Fix C code (though this does not significantly alter the
+          benchmark result).
+
+
+0.006   2022-11-23  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Specify dependency manually because dzil plugin
+          DZP:Bencher::Scenario is not pulling it (RT#144796).
+
+
+0.005   2022-11-23  Released-By: PERLANCAR; Urgency: low
+
+        - Merge Inline C code into the scenario source file.
+
+
+0.004   2022-11-23  Released-By: PERLANCAR; Urgency: low
+
+        - Tweak Abstract and require latest SPVM version.
+
+
+0.003   2022-11-23  Released-By: PERLANCAR; Urgency: medium
+
+        - Update benchmark, replace Sum with Prime.
+
+
+0.002   2017-08-04  Released-By: PERLANCAR
 
 	- Update to latest SPVM (no longer need to use SPVM::int or value()
 	  to get value).
 
 
-0.001   2017-06-21 (PERLANCAR)
+0.001   2017-06-21  Released-By: PERLANCAR
 
         - First release.

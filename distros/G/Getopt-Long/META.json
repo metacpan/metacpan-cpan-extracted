@@ -4,7 +4,7 @@
       "Johan Vromans (jvromans@squirrel.nl)"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.46, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -44,6 +44,6 @@
          "web" : "https://github.com/sciurius/perl-Getopt-Long"
       }
    },
-   "version" : "2.52",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "2.54",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

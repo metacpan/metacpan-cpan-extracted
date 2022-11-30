@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.034000;
+use 5.010000;
 
 use ExtUtils::MakeMaker;
 
@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Plack-Middleware-Greylist",
   "LICENSE" => "artistic_2",
-  "MIN_PERL_VERSION" => "5.034000",
+  "MIN_PERL_VERSION" => "5.010000",
   "NAME" => "Plack::Middleware::Greylist",
   "PREREQ_PM" => {
     "HTTP::Status" => 0,
@@ -29,6 +29,7 @@ my %WriteMakefileArgs = (
     "warnings" => 0
   },
   "TEST_REQUIRES" => {
+    "Cache::FastMmap" => "1.47",
     "File::Spec" => 0,
     "HTTP::Request::Common" => 0,
     "Module::Metadata" => 0,
@@ -36,13 +37,14 @@ my %WriteMakefileArgs = (
     "Plack::Builder" => 0,
     "Plack::Middleware::ContentLength" => 0,
     "Plack::Middleware::Head" => 0,
+    "Plack::Middleware::ReverseProxy" => 0,
     "Plack::Response" => 0,
     "Plack::Test" => 0,
     "Test::Differences" => 0,
     "Test::More" => 0,
     "Test::Most" => 0
   },
-  "VERSION" => "v0.1.0",
+  "VERSION" => "v0.2.2",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -50,6 +52,7 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Cache::FastMmap" => "1.47",
   "File::Spec" => 0,
   "HTTP::Request::Common" => 0,
   "HTTP::Status" => 0,
@@ -62,6 +65,7 @@ my %FallbackPrereqs = (
   "Plack::Middleware" => 0,
   "Plack::Middleware::ContentLength" => 0,
   "Plack::Middleware::Head" => 0,
+  "Plack::Middleware::ReverseProxy" => 0,
   "Plack::Response" => 0,
   "Plack::Test" => 0,
   "Ref::Util" => 0,

@@ -1,17 +1,18 @@
 package Complete::Unix;
 
-our $DATE = '2016-10-26'; # DATE
-our $VERSION = '0.07'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 #use Log::Any '$log';
 
 use Complete::Common qw(:all);
+use Exporter 'import';
 
-require Exporter;
-our @ISA = qw(Exporter);
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-09-02'; # DATE
+our $DIST = 'Complete-Unix'; # DIST
+our $VERSION = '0.080'; # VERSION
+
 our @EXPORT_OK = qw(
                        complete_uid
                        complete_user
@@ -53,10 +54,12 @@ sub complete_uid {
 
     my $res = Unix::Passwd::File::list_users(
         etc_dir=>$args{etc_dir}, detail=>1);
-    return undef unless $res->[0] == 200;
+    return unless $res->[0] == 200;
     Complete::Util::complete_array_elem(
-        array=>[map {$_->{uid}} @{ $res->[2] }],
-        word=>$word);
+        array     => [map {$_->{uid}} @{ $res->[2] }],
+        summaries => [map {$_->{user}} @{ $res->[2] }],
+        word      => $word,
+    );
 }
 
 $SPEC{complete_user} = {
@@ -80,10 +83,11 @@ sub complete_user {
 
     my $res = Unix::Passwd::File::list_users(
         etc_dir=>$args{etc_dir}, detail=>1);
-    return undef unless $res->[0] == 200;
+    return unless $res->[0] == 200;
     Complete::Util::complete_array_elem(
-        array=>[map {$_->{user}} @{ $res->[2] }],
-        word=>$word);
+        array     => [map {$_->{user}} @{ $res->[2] }],
+        summaries => [map {$_->{gecko}} @{ $res->[2] }],
+        word      => $word);
 }
 
 $SPEC{complete_gid} = {
@@ -107,10 +111,11 @@ sub complete_gid {
 
     my $res = Unix::Passwd::File::list_groups(
         etc_dir=>$args{etc_dir}, detail=>1);
-    return undef unless $res->[0] == 200;
+    return unless $res->[0] == 200;
     Complete::Util::complete_array_elem(
-        array=>[map {$_->{gid}} @{ $res->[2] }],
-        word=>$word);
+        array     => [map {$_->{gid}} @{ $res->[2] }],
+        summaries => [map {$_->{group}} @{ $res->[2] }],
+        word      => $word);
 }
 
 $SPEC{complete_group} = {
@@ -134,10 +139,10 @@ sub complete_group {
 
     my $res = Unix::Passwd::File::list_groups(
         etc_dir=>$args{etc_dir}, detail=>1);
-    return undef unless $res->[0] == 200;
+    return unless $res->[0] == 200;
     Complete::Util::complete_array_elem(
-        array=>[map {$_->{group}} @{ $res->[2] }],
-        word=>$word);
+        array     => [map {$_->{group}} @{ $res->[2] }],
+        word      => $word);
 }
 
 $SPEC{complete_pid} = {
@@ -158,9 +163,11 @@ sub complete_pid {
     my %args  = @_;
     my $word  = $args{word} // "";
 
+    my $procs = Proc::Find::find_proc(detail=>1);
     Complete::Util::complete_array_elem(
-        array=>Proc::Find::find_proc(),
-        word=>$word);
+        array     => [map {$_->{pid}} @$procs],
+        summaries => [map {$_->{cmndline}} @$procs],
+        word      => $word);
 }
 
 $SPEC{complete_proc_name} = {
@@ -250,7 +257,7 @@ sub complete_service_port {
         my $res = Parse::Services::parse_services();
         last if $res->[0] != 200;
         for my $row (@{ $res->[2] }) {
-            $services{$row->{port}}++;
+            $services{$row->{port}} = $row->{name};
         }
     }
 
@@ -258,6 +265,7 @@ sub complete_service_port {
     Complete::Util::complete_hash_key(
         word => $word,
         hash => \%services,
+        summaries_from_hash_values => 1,
     );
 }
 
@@ -276,14 +284,18 @@ Complete::Unix - Unix-related completion routines
 
 =head1 VERSION
 
-This document describes version 0.07 of Complete::Unix (from Perl distribution Complete-Unix), released on 2016-10-26.
+This document describes version 0.080 of Complete::Unix (from Perl distribution Complete-Unix), released on 2022-09-02.
 
 =head1 DESCRIPTION
 
 =head1 FUNCTIONS
 
 
-=head2 complete_gid(%args) -> array
+=head2 complete_gid
+
+Usage:
+
+ complete_gid(%args) -> array
 
 Complete from list of Unix GID's.
 
@@ -299,12 +311,18 @@ Arguments ('*' denotes required arguments):
 
 Word to complete.
 
+
 =back
 
 Return value:  (array)
 
 
-=head2 complete_group(%args) -> array
+
+=head2 complete_group
+
+Usage:
+
+ complete_group(%args) -> array
 
 Complete from list of Unix groups.
 
@@ -320,12 +338,18 @@ Arguments ('*' denotes required arguments):
 
 Word to complete.
 
+
 =back
 
 Return value:  (array)
 
 
-=head2 complete_pid(%args) -> array
+
+=head2 complete_pid
+
+Usage:
+
+ complete_pid(%args) -> array
 
 Complete from list of running PIDs.
 
@@ -339,12 +363,18 @@ Arguments ('*' denotes required arguments):
 
 Word to complete.
 
+
 =back
 
 Return value:  (array)
 
 
-=head2 complete_proc_name(%args) -> array
+
+=head2 complete_proc_name
+
+Usage:
+
+ complete_proc_name(%args) -> array
 
 Complete from list of process names.
 
@@ -358,14 +388,20 @@ Arguments ('*' denotes required arguments):
 
 Word to complete.
 
+
 =back
 
 Return value:  (array)
 
 
-=head2 complete_service_name(%args) -> array
 
-Complete from list of service names from /etc/services.
+=head2 complete_service_name
+
+Usage:
+
+ complete_service_name(%args) -> array
+
+Complete from list of service names from E<sol>etcE<sol>services.
 
 This function is not exported by default, but exportable.
 
@@ -377,14 +413,20 @@ Arguments ('*' denotes required arguments):
 
 Word to complete.
 
+
 =back
 
 Return value:  (array)
 
 
-=head2 complete_service_port(%args) -> array
 
-Complete from list of service ports from /etc/services.
+=head2 complete_service_port
+
+Usage:
+
+ complete_service_port(%args) -> array
+
+Complete from list of service ports from E<sol>etcE<sol>services.
 
 This function is not exported by default, but exportable.
 
@@ -396,12 +438,18 @@ Arguments ('*' denotes required arguments):
 
 Word to complete.
 
+
 =back
 
 Return value:  (array)
 
 
-=head2 complete_uid(%args) -> array
+
+=head2 complete_uid
+
+Usage:
+
+ complete_uid(%args) -> array
 
 Complete from list of Unix UID's.
 
@@ -417,12 +465,18 @@ Arguments ('*' denotes required arguments):
 
 Word to complete.
 
+
 =back
 
 Return value:  (array)
 
 
-=head2 complete_user(%args) -> array
+
+=head2 complete_user
+
+Usage:
+
+ complete_user(%args) -> array
 
 Complete from list of Unix users.
 
@@ -438,6 +492,7 @@ Arguments ('*' denotes required arguments):
 
 Word to complete.
 
+
 =back
 
 Return value:  (array)
@@ -448,15 +503,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/Complete-U
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-Complete-Unix>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Complete-Unix>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
+Source repository is at L<https://github.com/perlancar/perl-Complete-Unix>.
 
 =head1 SEE ALSO
 
@@ -466,11 +513,43 @@ L<Complete::Util>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Complete-Unix>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

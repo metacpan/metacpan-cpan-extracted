@@ -1,6 +1,16 @@
 ==================================================
-Changes from 2017-10-21 00:00:00 +0000 to present.
+Changes from 2017-11-21 00:00:00 +0000 to present.
 ==================================================
+
+-----------------------------------------------
+version 5.20221120 at 2022-11-20 12:16:13 +0000
+-----------------------------------------------
+
+  Change: b11bdcf1bf1d761dda3f2a17095d6c5bc68b75c9
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2022-11-20 12:16:13 +0000
+
+    Updated for v5.37.6 
 
 -----------------------------------------------
 version 5.20221020 at 2022-10-20 18:05:55 +0000
@@ -918,34 +928,6 @@ version 3.44 at 2017-12-20 22:36:14 +0000
 
     Updated for v5.27.7 
 
------------------------------------------
-version 3.42 at 2017-11-20 23:24:42 +0000
------------------------------------------
-
-  Change: f9969c44f95f47f541ed64f21be32368d6566d12
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2017-11-20 23:24:42 +0000
-
-    DAGOLDEN has removed .xz for v5.23.6 
-
-  Change: ce509e7fc64975713d83bb05eb97cdf6ead2d871
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2017-11-20 23:18:35 +0000
-
-    XSAWYER has removed all dev and RCs 
-
-  Change: 2f02d02c0e215b3dcff2680013b4e94f17e05458
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2017-11-20 21:41:35 +0000
-
-    Updated for v5.27.6 
-
-  Change: 064a18f9b350102b2298a355d9be7408bc640bdf
-  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
-  Date : 2017-11-20 21:33:20 +0000
-
-    No bz2 tarballs after v5.27.5 
-
 ==================================================
-Plus 168 releases after 2017-10-21 00:00:00 +0000.
+Plus 169 releases after 2017-11-21 00:00:00 +0000.
 ==================================================

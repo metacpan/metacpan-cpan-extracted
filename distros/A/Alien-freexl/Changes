@@ -1,5 +1,8 @@
 Revision history for Alien::freexl
 
+1.04 2022-11-26
+    - use https for downloads
+
 1.03 2019-01-02
     - More feedback in tests
 

@@ -1,3 +1,28 @@
+Release Name: 1.16
+====================
+
+Tag.pm: Quiet warnings on negative count from x.
+	New encoding-setup: auto-detection of UTF-8 environments (currently via LANG only).
+	New encoding-setup: force by calling reset_encode_decode_config('encoding') (at least before start of job).
+	New environment variables: MP3TAG_DECODE_FILES_DEFAULT_RESET, MP3TAG_ENCODE_FILES_DEFAULT_RESET.
+
+mp3info2:
+	Sort with -R (taking into account the numbers inside file names).
+	Allow track=... for -F.
+	Auto-enable unicode processing of CMD line based on LANG (disable by MP3INFO_DECODE_ARGV_DEFAULT_RESET).
+	Allow -e0, and default to -e15 if $LANG indicates utf-8 and there is no appropriate $^UNICODE flags.
+		???  Should not we be more delicate with processing different flags of ${^UNICODE}???
+	New option -U for defaulting to UNICODE unconditionally of LANG.
+		(Needed since -C63 has lexical effects: io only work in the main file!)
+	New bit 0x08 for -e to influence file i/o.
+	Mention MP3TAG_NORMALIZE_FIELDS in the ENVIRONMENT section of the docs.
+	When converting encoding "deep", do not crash on Regexp (needed for audio_rename).
+
+audio_rename:
+	Misprint in docs.
+	New option -U (as for mp3info2).
+	New option -L (as -e for mp3info2, but without 'binary').
+
 Release Name: 1.15
 ====================
 
@@ -21,9 +46,14 @@ Tag.pm: Quiet warnings from 5.22.
 	Recognize ID3v2 frame names as [A-Z]{3}[A-Z\d] (was \w{4}).
 		(Detection frame/vs/handler happens via PACKAGES; so if lang codes inf/cue appear, we may be in trouble.)
 	Use the same code in parse(_rex)?_prepare.  (Now parse() allows the same %-constructs as parse_rex().)
+
 ID3v2.pm:
 	New method have_one_of_frames().
 	New methods *_have() (for simplest fields: title, comment, track, artist, album, genre, year).
+	New encoding-setup: auto-detection of UTF-8 environments (currently via LANG only).
+	New encoding-setup: force by calling reset_encode_decode_config('encoding') (at least before start of job).
+	New environment variables: MP3TAG_DECODE_FILES_DEFAULT_RESET, MP3TAG_ENCODE_FILES_DEFAULT_RESET.
+
 ImageExifTool.pm:
 	Comprehensive docs.
 

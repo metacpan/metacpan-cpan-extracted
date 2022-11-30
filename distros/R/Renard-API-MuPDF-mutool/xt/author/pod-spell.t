@@ -19,6 +19,7 @@ PDF
 PNG
 Project
 Renard
+UTF-16BE
 initialises
 lib
 mutool

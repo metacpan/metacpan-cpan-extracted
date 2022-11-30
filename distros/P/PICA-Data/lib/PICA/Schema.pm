@@ -1,15 +1,17 @@
 package PICA::Schema;
 use v5.14.1;
 
-our $VERSION = '2.04';
+our $VERSION = '2.05';
 
 use Scalar::Util qw(reftype);
-use Storable qw(dclone);
+use Storable     qw(dclone);
+use List::Util   qw(pairs);
 use PICA::Data;
 use PICA::Error;
 
 use Exporter 'import';
-our @EXPORT_OK = qw(field_identifier check_value clean_pica);
+our @EXPORT_OK
+    = qw(field_identifier check_value clean_pica parse_subfield_schedule);
 
 sub new {
     my ($class, $schema) = @_;
@@ -75,7 +77,7 @@ sub check_record {
 sub check_field {
     my ($self, $field, %opts) = @_;
 
-    my $id = $opts{_field_id} || $self->field_identifier($field);
+    my $id   = $opts{_field_id} || $self->field_identifier($field);
     my $spec = $self->{fields}{$id};
 
     if ($opts{allow_deprecated}) {
@@ -316,13 +318,12 @@ sub field_identifier {
             if ($x =~ /^[0-9][0-9]?$/) {
                 return "${tag}x$x" if exists $fields->{"${tag}x$x"};
 
-                return $_
-                    for grep {
+                return $_ for grep {
                            $_ =~ /^${tag}x(..?)-(..?)$/
                         && $x >= $1
                         && $x <= $2
                         && length $1 == length $x
-                    } sort keys %$fields;
+                } sort keys %$fields;
             }
         }
     }
@@ -382,7 +383,7 @@ sub clean_pica {
     for my $field (@$record) {
         if (reftype $field ne 'ARRAY') {
             $error->('PICA field must be array reference');
-            return
+            return;
         }
 
         my ($tag, $occ, @sf) = @$field;
@@ -421,6 +422,26 @@ sub clean_pica {
     }
 
     return $record if $ok;
+}
+
+sub parse_subfield_schedule {
+    my %schedule;
+
+    my $order = 1;
+    for (pairs split "([*+?]?)", $_[0]) {
+        my ($code, $status) = @$_;
+        die "Malformed PICA subfield: $code" if $code !~ /[a-zA-Z0-9]/;
+        die "Invalid subfield schedule string: subfield $code given twice!"
+            if $schedule{$code};
+        $schedule{$code} = {
+            code       => $code,
+            repeatable => ($status eq '+' || $status eq '*' ? 1 : 0),
+            required   => ($status ne '?' && $status ne '*' ? 1 : 0),
+            order      => $order++,
+        };
+    }
+
+    return \%schedule;
 }
 
 1;
@@ -571,6 +592,12 @@ a L<subfield error|PICA::Error/SUBFIELD ERRORS> without C<message> key.
 =head2 check_pattern( $value, $pattern )
 
 Check a value against a pattern and return an error on failure.
+
+=head2 parse_subfield_schedule( $string )
+
+Parse a stringified L<subfield schedule|https://format.gbv.de/schema/avram/specification#subfield-schedule>.
+The string must contain of ordered subfield codes, each optionally followed by C<?>, C<+>, or C<*> to indicate
+repeatability and whether the subfield is required.
 
 =head1 LIMITATIONS
 

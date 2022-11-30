@@ -21,19 +21,21 @@ if (-e $file) {
     like $@, qr/doesn't exist/, "...and error message is sane";
 }
 
-# api_key_set() croak if can't write file
-{
-    open my $fh, '>', $file or die "Can't open $file for creation: $!";
-    chmod(0400, $file) or die "Can't set permissions on $file: $!";
-    close $fh;
+# api_key_set() croak if can't write file (only run if not root user)
+if ($^O !~ /win/i) {
+    if (getpwuid($<) ne 'root') {
+        open my $fh, '>', $file or die "Can't open $file for creation: $!";
+        chmod(0400, $file) or die "Can't set permissions on $file: $!";
+        close $fh;
 
-    is eval {
-        api_key_set(2, 3);
-        1;
-    }, undef, "api_key_set() croaks if can't open file for writing";
-    like $@, qr/for writing/, "...and error message is sane";
+        is eval {
+            api_key_set(2, 3);
+            1;
+        }, undef, "api_key_set() croaks if can't open file for writing";
+        like $@, qr/for writing/, "...and error message is sane";
 
-    chmod(0640, $file) or die "Can't set perms on $file: $!";
+        chmod(0640, $file) or die "Can't set perms on $file: $!";
+    }
 }
 
 # api_key_set() croak on bad params
@@ -77,5 +79,9 @@ if (-e $file) {
 
 if (-e "$file.bak") {
     move("$file.bak", $file) or die "Can't move $file.bak to $file: $!";
+}
+else {
+    unlink $file or die "Can't remove temp config file";
+    is -e $file, undef, "Removed temp config file ok";
 }
 done_testing();

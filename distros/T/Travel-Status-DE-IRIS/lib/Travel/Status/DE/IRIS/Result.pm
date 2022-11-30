@@ -13,17 +13,17 @@ use DateTime;
 use DateTime::Format::Strptime;
 use List::Compare;
 use List::MoreUtils qw(none uniq lastval);
-use Scalar::Util qw(weaken);
+use Scalar::Util    qw(weaken);
 
-our $VERSION = '1.72';
+our $VERSION = '1.74';
 
 my %translation = (
-	1 => 'Nähere Informationen in Kürze',
-	2 => 'Polizeieinsatz',
-	3 => 'Feuerwehreinsatz auf der Strecke',
-	4 => 'Kurzfristiger Personalausfall',            # xlsx: missing
-	5 => 'Ärztliche Versorgung eines Fahrgastes',
-	6 => 'Betätigen der Notbremse',   # xlsx: "Unbefugtes Ziehen der Notbremse"
+	1  => 'Nähere Informationen in Kürze',
+	2  => 'Polizeieinsatz',
+	3  => 'Feuerwehreinsatz auf der Strecke',
+	4  => 'Kurzfristiger Personalausfall',            # xlsx: missing
+	5  => 'Ärztliche Versorgung eines Fahrgastes',
+	6  => 'Betätigen der Notbremse',   # xlsx: "Unbefugtes Ziehen der Notbremse"
 	7  => 'Unbefugte Personen auf der Strecke',
 	8  => 'Notarzteinsatz auf der Strecke',
 	9  => 'Streikauswirkungen',
@@ -40,7 +40,7 @@ my %translation = (
 	20 => 'Tiere im Gleis',                           # xlsx: missing
 	21 => 'Warten auf Anschlussreisende',
 	22 => 'Witterungsbedingte Beeinträchtigung',
-	23 => 'Feuerwehreinsatz auf Bahngelände',        # xlsx: missing
+	23 => 'Feuerwehreinsatz auf Bahngelände',         # xlsx: missing
 	24 => 'Verspätung im Ausland',
 	25 => 'Bereitstellung weiterer Wagen',
 	26 => 'Abhängen von Wagen',
@@ -65,12 +65,11 @@ my %translation = (
 	44 => 'Warten auf einen entgegenkommenden Zug',
 
 	# TODO for Oct 2021: switch 45, 46 to "Vorfahrt eines anderen Zuges"
-	45 =>
-	  'Überholung durch anderen Zug',    # xlsx: "Vorfahrt eines anderen Zuges"
+	45 => 'Überholung durch anderen Zug', # xlsx: "Vorfahrt eines anderen Zuges"
 	46 => 'Warten auf freie Einfahrt',    # xlsx: "Vorfahrt eines anderen Zuges"
 
-	47 => 'Verspätete Bereitstellung'
-	,    # xlsx: "Verspätete Bereitstellung des Zuges"
+	47 =>
+	  'Verspätete Bereitstellung', # xlsx: "Verspätete Bereitstellung des Zuges"
 	48 => 'Verspätung aus vorheriger Fahrt',
 	49 => 'Kurzfristiger Personalausfall',
 	50 => 'Kurzfristige Erkrankung von Personal',
@@ -79,10 +78,9 @@ my %translation = (
 	53 => 'Unwetterauswirkungen',
 	54 => 'Verfügbarkeit der Gleise derzeit eingeschränkt',
 	55 => 'Defekt an einem anderen Zug',
-	56 => 'Warten auf Anschlussreisende',                       # aus einem Bus
-	57 =>
-	  'Zusätzlicher Halt',   # xslx: "Zusätzlicher Halt zum Ein- und Ausstieg"
-	58 => 'Umleitung',        # xlsx: "Umleitung des Zuges"
+	56 => 'Warten auf Anschlussreisende',                     # aus einem Bus
+	57 => 'Zusätzlicher Halt', # xslx: "Zusätzlicher Halt zum Ein- und Ausstieg"
+	58 => 'Umleitung',         # xlsx: "Umleitung des Zuges"
 	59 => 'Schnee und Eis',
 	60 => 'Witterungsbedingt verminderte Geschwindigkeit',
 	61 => 'Defekte Tür',
@@ -111,7 +109,7 @@ my %translation = (
 	85 => 'Ein Wagen fehlt',
 	86 => 'Gesamter Zug ohne Reservierung',
 	87 => 'Einzelne Wagen ohne Reservierung',
-	88 => 'Keine Qualitätsmängel',  # r 80 82 83 85 86 87 90 91 92 93 96 97 98
+	88 => 'Keine Qualitätsmängel',    # r 80 82 83 85 86 87 90 91 92 93 96 97 98
 	89 => 'Reservierungen sind wieder vorhanden',    # -> 86 87
 	90 => 'Kein gastronomisches Angebot',
 	91 => 'Fahrradmitnahme nicht möglich',
@@ -119,8 +117,8 @@ my %translation = (
 	93 => 'Behindertengerechte Einrichtung fehlt',
 	94 => 'Ersatzbewirtschaftung',
 	95 => 'Universal-WC fehlt',
-	96 => 'Der Zug ist stark überbesetzt',          # r 97
-	97 => 'Der Zug ist überbesetzt',                # r 96
+	96 => 'Der Zug ist stark überbesetzt',           # r 97
+	97 => 'Der Zug ist überbesetzt',                 # r 96
 	98 => 'Sonstige Qualitätsmängel',
 	99 => 'Verzögerungen im Betriebsablauf',
 
@@ -130,9 +128,9 @@ my %translation = (
 );
 
 Travel::Status::DE::IRIS::Result->mk_ro_accessors(
-	qw(arrival arrival_delay arrival_has_realtime arrival_is_additional arrival_is_cancelled
+	qw(arrival arrival_delay arrival_has_realtime arrival_is_additional arrival_is_cancelled arrival_hidden
 	  date datetime delay
-	  departure departure_delay departure_has_realtime departure_is_additional departure_is_cancelled
+	  departure departure_delay departure_has_realtime departure_is_additional departure_is_cancelled departure_hidden
 	  ds100 has_realtime is_transfer is_unscheduled is_wing
 	  line_no old_train_id old_train_no operator platform raw_id
 	  realtime_xml route_start route_end
@@ -278,6 +276,10 @@ sub set_ar {
 		$self->{arrival_is_cancelled}  = 0;
 	}
 
+	if ( $attrib{arrival_hidden} ) {
+		$self->{arrival_hidden} = $attrib{arrival_hidden};
+	}
+
 	# unscheduled arrivals may not appear in the plan, but we do need to
 	# know their planned arrival time
 	if ( $attrib{plan_arrival_ts} ) {
@@ -341,6 +343,10 @@ sub set_dp {
 	else {
 		$self->{departure_is_additional} = 0;
 		$self->{departure_is_cancelled}  = 0;
+	}
+
+	if ( $attrib{departure_hidden} ) {
+		$self->{departure_hidden} = $attrib{departure_hidden};
 	}
 
 	# unscheduled arrivals may not appear in the plan, but we do need to
@@ -876,7 +882,7 @@ arrival/departure received by Travel::Status::DE::IRIS
 
 =head1 VERSION
 
-version 1.72
+version 1.74
 
 =head1 DESCRIPTION
 
@@ -910,6 +916,11 @@ no scheduled arrival time (e.g. due to diversions). May be negative.
 =item $result->arrival_has_realtime
 
 True if "arrival" is based on real-time data.
+
+=item $result->arrival_hidden
+
+True if arrival should not be displayed to customers.
+This often indicates an entry-only stop near the beginning of a train's journey.
 
 =item $result->arrival_is_additional
 
@@ -983,6 +994,11 @@ no scheduled departure time (e.g. due to diversions). May be negative.
 =item $result->departure_has_realtime
 
 True if "departure" is based on real-time data.
+
+=item $result->departure_hidden
+
+True if departure should not be displayed to customers.
+This often indicates an exit-only stop near the end of a train's journey.
 
 =item $result->departure_is_additional
 

@@ -680,7 +680,7 @@ internal
 sub establish_new_col_mapping {
     my($self, $colspec) = @_;
 
-    my($colname, $type, $typespec) = $self->_internal_colspec_to_name_type_spec($colspec);
+    my($colname, $type, $typespec) = $self->colspec_to_name_type_spec($colspec);
 
     my $coli = $#{$self->{_cols}} + 1;
     $self->{_cols}->[$coli] = $colname;
@@ -714,15 +714,15 @@ sub col_create {
         $self->update_headerrow;
 }
 
-=head2 _internal_colspec_to_name_type
+=head2 colspec_to_name_type_spec
 
-    ($name, $type, $type_speced) = $fsdb->_internal_colspec_to_name_type($colspec)
+    ($name, $type, $type_speced) = $fsdb->colspec_to_name_type($colspec)
 
 Split a colspec into a name, type, and the type as specified
 (which may be null if no type was given).
 
 =cut
-sub _internal_colspec_to_name_type_spec($$) {
+sub colspec_to_name_type_spec($$) {
     my($self, $colspec) = @_;
     my($name, $type) = split(/:/, $colspec);
     return($name, $type // 'a', $type);
@@ -743,7 +743,7 @@ but do I<not> update the header row
 sub _internal_col_create {
     my($self, $colspec) = @_;
 
-    my($colname, $type, $typespec) = $self->_internal_colspec_to_name_type_spec($colspec);
+    my($colname, $type, $typespec) = $self->colspec_to_name_type_spec($colspec);
 
     if ($self->{_header_set}) {
 	$self->{_error} = "attempt to add column to frozen fsdb handle (reader or writer that's been written to): $colname";
@@ -903,9 +903,10 @@ sub colspecs($) {
 
 =head2 col_to_i
 
-    @fields = $fsdb->col_to_i($column_name);
+    $coli = $fsdb->col_to_i($column_name);
 
 Returns the column index (0-based) of a given $COLUMN_NAME.
+(Names cannot have types with them.)
 
 Note: tests for existence of columns must use C<defined>,
 since the index can be 0 which would be interpreted as false.
@@ -914,6 +915,24 @@ since the index can be 0 which would be interpreted as false.
 
 sub col_to_i {
     my($self, $n) = @_;
+    return $self->{_cols_to_i}->{$n};
+}
+
+=head2 colspec_to_i
+
+    $coli = $fsdb->colspec_to_i($column_specification);
+
+Returns the column index (0-based) of a given $COLUMN_NAME.
+Name may or may not include a type.
+
+Note: tests for existence of columns must use C<defined>,
+since the index can be 0 which would be interpreted as false.
+
+=cut
+
+sub colspec_to_i {
+    my($self, $cs) = @_;
+    my($n) = $self->colspec_to_name_type_spec($cs);
     return $self->{_cols_to_i}->{$n};
 }
 

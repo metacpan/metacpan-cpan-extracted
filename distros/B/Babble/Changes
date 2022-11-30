@@ -1,5 +1,21 @@
 Revision history for Babble
 
+0.090009
+          - Performance improvement [general]: add regex caching for
+            match_positions_of().
+          - Performance improvement [general]: add a mechanism for using
+            heuristics (that do not use the PPR grammar) for quickly
+            bailing out of a plugin/transformation.
+          - Add configuration flags to control caching (default: on),
+            bailing out (default: on), and debugging
+            cache misses (default: off).
+0.090008_02
+          - Performance improvement [SubstituteAndReturn]: extract chained
+            operations regex outside of loop.
+0.090008_01
+          - Performance improvement [general]: cache generated grammar regexps.
+          - Performance improvement [SubstituteAndReturn]: faster approach
+            to finding contextual substitution/transliteration.
 0.090008
           - No change from 0.090007_03.
 

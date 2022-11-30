@@ -1,0 +1,115 @@
+---
+abstract: 'base for blockchain subscription clients.'
+author:
+  - 'DERIV <DERIV@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Async::Loop: '0'
+  IO::Async::Test: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Net::Async::WebSocket::Server: '0'
+  Test::CheckDeps: '0.010'
+  Test::Exception: '0'
+  Test::Fatal: '0'
+  Test::MemoryGrowth: '0'
+  Test::MockModule: '0'
+  Test::More: '0.98'
+  Test::TCP: '0'
+  perl: '5.024'
+configure_requires:
+  ExtUtils::MakeMaker: '7.64'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.028, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Net-Async-Blockchain
+no_index:
+  directory:
+    - eg
+    - share
+    - shares
+    - t
+    - xt
+provides:
+  Net::Async::Blockchain:
+    file: lib/Net/Async/Blockchain.pm
+    version: '0.001'
+  Net::Async::Blockchain::BTC:
+    file: lib/Net/Async/Blockchain/BTC.pm
+    version: '0.001'
+  Net::Async::Blockchain::Client::RPC:
+    file: lib/Net/Async/Blockchain/Client/RPC.pm
+    version: '0.001'
+  Net::Async::Blockchain::Client::RPC::BTC:
+    file: lib/Net/Async/Blockchain/Client/RPC/BTC.pm
+    version: '0.001'
+  Net::Async::Blockchain::Client::RPC::ETH:
+    file: lib/Net/Async/Blockchain/Client/RPC/ETH.pm
+    version: '0.001'
+  Net::Async::Blockchain::Client::RPC::Omni:
+    file: lib/Net/Async/Blockchain/Client/RPC/Omni.pm
+    version: '0.001'
+  Net::Async::Blockchain::Client::Websocket:
+    file: lib/Net/Async/Blockchain/Client/Websocket.pm
+    version: '0.001'
+  Net::Async::Blockchain::Client::ZMQ:
+    file: lib/Net/Async/Blockchain/Client/ZMQ.pm
+    version: '0.001'
+  Net::Async::Blockchain::ETH:
+    file: lib/Net/Async/Blockchain/ETH.pm
+    version: '0.001'
+  Net::Async::Blockchain::Transaction:
+    file: lib/Net/Async/Blockchain/Transaction.pm
+    version: '0.001'
+requires:
+  Digest::Keccak: '0'
+  Future::AsyncAwait: '0.23'
+  IO::Async::Handle: '0'
+  IO::Async::Notifier: '0'
+  IO::Async::SSL: '0'
+  IO::Async::Timer::Periodic: '0.72'
+  JSON::MaybeUTF8: '1.002'
+  JSON::MaybeXS: '0'
+  Math::BigFloat: '1.999814'
+  Math::BigInt: '1.999814'
+  Net::Async::HTTP: '0.43'
+  Net::Async::WebSocket: '0.13'
+  Net::Async::WebSocket::Client: '0'
+  Protocol::WebSocket::Request: '0'
+  Ryu::Async: '0.011'
+  Socket: '0'
+  Syntax::Keyword::Try: '0.09'
+  URI: '0'
+  ZMQ::Constants: '0'
+  ZMQ::LibZMQ3: '1.19'
+  constant: '0'
+  curry: '0'
+  indirect: '0.37'
+  parent: '0'
+  perl: '5.024'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/binary-com/perl-Net-Async-Blockchain/issues
+  homepage: https://github.com/binary-com/perl-Net-Async-Blockchain
+  repository: https://github.com/binary-com/perl-Net-Async-Blockchain.git
+version: '0.001'
+x_authority: cpan:DERIV
+x_contributors:
+  - 'Reginaldo Costa <53163145+reginaldo-binary@users.noreply.github.com>'
+  - 'chylli-binary <chylli@binary.com>'
+  - 'Mohanad Zarzour <51309057+Binary-Mohanad@users.noreply.github.com>'
+  - 'Tanya Sahni <54654631+binary-tanya@users.noreply.github.com>'
+  - 'Reginaldo Costa <regcostajr@gmail.com>'
+  - 'Zak B. Elep <zakame@zakame.net>'
+  - 'Arshad Munir <55420460+arshad-binary@users.noreply.github.com>'
+  - 'chylli-binary <52912308+chylli-binary@users.noreply.github.com>'
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+  - 'Tom Molesworth <tom@binary.com>'
+x_generated_by_perl: v5.26.2
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

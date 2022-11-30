@@ -6,14 +6,14 @@ use 5.014;
 
 no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
-our $VERSION = '1.72';
+our $VERSION = '1.74';
 
 use Carp qw(confess cluck);
 use DateTime;
 use DateTime::Format::Strptime;
-use List::Util qw(first);
+use List::Util      qw(first);
 use List::MoreUtils qw(uniq);
-use List::UtilsBy qw(uniq_by);
+use List::UtilsBy   qw(uniq_by);
 use LWP::UserAgent;
 use Travel::Status::DE::IRIS::Result;
 use XML::LibXML;
@@ -585,9 +585,8 @@ sub add_result {
 		$data{route_pre}   = $e_ar->getAttribute('ppth');
 		$data{route_start} = $e_ar->getAttribute('pde');
 		$data{transfer}    = $e_ar->getAttribute('tra');
+		$data{arrival_hidden}   = $e_ar->getAttribute('hi');
 		$data{arrival_wing_ids} = $e_ar->getAttribute('wings');
-
-		#$data{unk_ar_hi}        = $e_ar->getAttribute('hi');
 	}
 
 	if ($e_dp) {
@@ -597,9 +596,8 @@ sub add_result {
 		$data{route_post}   = $e_dp->getAttribute('ppth');
 		$data{route_end}    = $e_dp->getAttribute('pde');
 		$data{transfer}     = $e_dp->getAttribute('tra');
+		$data{departure_hidden}   = $e_dp->getAttribute('hi');
 		$data{departure_wing_ids} = $e_dp->getAttribute('wings');
-
-		#$data{unk_dp_hi}          = $e_dp->getAttribute('hi');
 	}
 
 	if ( $data{arrival_wing_ids} ) {
@@ -817,6 +815,7 @@ sub parse_realtime {
 				sched_route_pre => $e_ar->getAttribute('ppth'),
 				status          => $e_ar->getAttribute('cs'),
 				status_since    => $e_ar->getAttribute('clt'),
+				arrival_hidden  => $e_ar->getAttribute('hi'),
 
 				# TODO ps='a' -> rerouted and normally unscheduled train?
 			);
@@ -829,6 +828,7 @@ sub parse_realtime {
 				route_post        => $e_dp->getAttribute('cpth'),
 				sched_route_post  => $e_dp->getAttribute('ppth'),
 				status            => $e_dp->getAttribute('cs'),
+				departure_hidden  => $e_dp->getAttribute('hi'),
 			);
 		}
 
@@ -964,7 +964,7 @@ Non-blocking variant (EXPERIMENTAL):
 
 =head1 VERSION
 
-version 1.72
+version 1.74
 
 =head1 DESCRIPTION
 

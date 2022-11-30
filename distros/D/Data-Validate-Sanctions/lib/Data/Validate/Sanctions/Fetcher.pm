@@ -6,7 +6,7 @@ use warnings;
 use DateTime::Format::Strptime;
 use Date::Utility;
 use IO::Uncompress::Unzip qw(unzip $UnzipError);
-use List::Util qw(uniq any);
+use List::Util            qw(uniq any);
 use Mojo::UserAgent;
 use Text::CSV;
 use Text::Trim qw(trim);
@@ -14,7 +14,7 @@ use Syntax::Keyword::Try;
 use XML::Fast;
 use Locale::Country;
 
-our $VERSION = '0.10';
+our $VERSION = '0.15';    # VERSION
 
 =head2 config
 
@@ -234,7 +234,7 @@ sub _ofac_xml {
         $ref->{publshInformation}{Publish_Date} =~ m/(\d{1,2})\/(\d{1,2})\/(\d{4})/
         ? _date_to_epoch("$3-$1-$2")
         : undef;    # publshInformation is a typo in ofac xml tags
-    die 'Publication date is invalid' unless defined $publish_epoch;
+    die "Corrupt data. Release date is invalid\n" unless defined $publish_epoch;
 
     my $parse_list_node = sub {
         my ($entry, $parent, $child, $attribute) = @_;
@@ -301,16 +301,16 @@ sub _hmt_csv {
     my $raw_data = shift;
     my $dataset  = [];
 
-    my $csv = Text::CSV->new({binary => 1}) or die "Cannot use CSV: " . Text::CSV->error_diag();
+    my $csv = Text::CSV->new({binary => 1}) or die "Cannot use CSV: " . Text::CSV->error_diag() . "\n";
 
     my @lines = split("\n", $raw_data);
 
     my $parsed = $csv->parse(trim(shift @lines));
     my @info   = $parsed ? $csv->fields() : ();
-    die 'Publication date was not found' unless @info && _date_to_epoch($info[1]);
+    die "Currupt data. Release date was not found\n" unless @info && _date_to_epoch($info[1]);
 
     my $publish_epoch = _date_to_epoch($info[1]);
-    die 'Publication date is invalid' unless defined $publish_epoch;
+    die "Currupt data. Release date is invalid\n" unless defined $publish_epoch;
 
     $parsed = $csv->parse(trim(shift @lines));
     my @row    = $csv->fields();
@@ -393,7 +393,7 @@ sub _eu_xml {
         my @place_of_birth = map { $_->{'-countryIso2Code'} || () } $entry->{birthdate}->@*;
         my @citizen        = map { $_->{'-countryIso2Code'} || () } $entry->{citizenship}->@*;
         my @residence      = map { $_->{'-countryIso2Code'} || () } $entry->{address}->@*;
-        my @postal_code    = map { $_->{'-zipCode'} || $_->{'-poBox'} || () } $entry->{address}->@*;
+        my @postal_code    = map { $_->{'-zipCode'}         || $_->{'-poBox'} || () } $entry->{address}->@*;
         my @nationality    = map { $_->{'-countryIso2Code'} || () } $entry->{identification}->@*;
         my @national_id    = map { $_->{'-identificationTypeCode'} eq 'id'       ? $_->{'-number'} || () : () } $entry->{identification}->@*;
         my @passport_no    = map { $_->{'-identificationTypeCode'} eq 'passport' ? $_->{'-number'} || () : () } $entry->{identification}->@*;
@@ -415,7 +415,7 @@ sub _eu_xml {
     my @date_parts    = split('T', $ref->{'-generationDate'} // '');
     my $publish_epoch = _date_to_epoch($date_parts[0]        // '');
 
-    die 'Publication date is invalid' unless $publish_epoch;
+    die "Corrupt data. Release date is invalid\n" unless $publish_epoch;
 
     return {
         updated => $publish_epoch,
@@ -440,7 +440,7 @@ sub run {
     foreach my $id (sort keys %$config) {
         my $source = $config->{$id};
         try {
-            die "Url is empty for $id" unless $source->{url};
+            die "Url is empty for $id\n" unless $source->{url};
 
             my $raw_data;
 
@@ -461,8 +461,8 @@ sub run {
                 my $count = $data->{content}->@*;
                 print "Source $id: $count entries fetched \n" if $args{verbose};
             }
-        } catch {
-            warn "$id list update failed because: $@";
+        } catch ($e) {
+            $result->{$id}->{error} = $e;
         }
     }
 
@@ -480,7 +480,7 @@ sub _entries_from_file {
 
     my $entries;
 
-    open my $fh, '<', "$1" or die "Can't open $id file $1 $!";
+    open my $fh, '<', "$1" or die "Can't open $id file $1 $!\n";
     $entries = do { local $/; <$fh> };
     close $fh;
 
@@ -513,16 +513,16 @@ sub _entries_from_remote_src {
         try {
             my $resp = $ua->get($src_url);
 
-            die "File not downloaded for $id" if $resp->result->is_error;
+            die "File not downloaded for $id\n" if $resp->result->is_error;
             $entries = $resp->result->body;
 
             last;
-        } catch {
-            $error_log = $@;
+        } catch ($e) {
+            $error_log = $e;
         }
     }
 
-    return $entries // die "An error occurred while fetching data from '$src_url' due to $error_log";
+    return $entries // die "An error occurred while fetching data from '$src_url' due to $error_log\n";
 }
 
 1;

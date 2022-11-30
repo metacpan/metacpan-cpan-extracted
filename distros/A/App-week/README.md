@@ -42,7 +42,7 @@ Color modules:
 
 # VERSION
 
-Version 1.0301
+Version 1.0303
 
 # DESCRIPTION
 
@@ -116,11 +116,12 @@ Using option **-W** or **--weeknumber**, week number is printed at the
 end of every week line.  Week number 1 is a week which include January
 1st and count up on every Sunday.
 
-Experimentally **-W2** print _standard week number_ which start with
-first Sunday of the year, and **-W3** print ISO 8601 style week number.
-Because ISO week start on Monday, and the command shows a number for
-Sunday, the result is not intuitive and therefore, I guess, useless.
-This option requires [gcal(1)](http://man.he.net/man1/gcal) command installed.
+Experimentally option **-W2** print the _standard week number_ which
+start with the first Sunday of the year, and **-W3** print ISO 8601
+style week number.  Because ISO week start on Monday, and the command
+shows a number of Sunday of the week, the result is not intuitive and
+therefore, I guess, useless.  This option requires [gcal(1)](http://man.he.net/man1/gcal) command
+installed.
 
 # COLORMAP
 

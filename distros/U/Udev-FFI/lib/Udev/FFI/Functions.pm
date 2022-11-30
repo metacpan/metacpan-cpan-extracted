@@ -96,7 +96,7 @@ my $FUNCTIONS = {
     # struct udev_device *udev_device_new_from_device_id(struct udev *udev, const char *id);
     'udev_device_new_from_device_id' => {
         ffi_data => [ ['opaque', 'string'], 'opaque' ],
-        since    => 189
+        since    => 189,
     },
 
     # struct udev_device *udev_device_new_from_environment(struct udev *udev);
@@ -215,12 +215,13 @@ my $FUNCTIONS = {
     #int udev_device_set_sysattr_value(struct udev_device *udev_device, const char *sysattr, char *value);
     'udev_device_set_sysattr_value' => {
         ffi_data => [ ['opaque', 'string', 'string'], 'int' ],
-        since    => 199
+        since    => 199,
     },
 
     #int udev_device_has_tag(struct udev_device *udev_device, const char *tag);
     'udev_device_has_tag' => {
-        ffi_data => [ ['opaque', 'string'], 'int' ]
+        ffi_data => [ ['opaque', 'string'], 'int' ],
+        since    => 172,
     },
 
 
@@ -359,7 +360,8 @@ my $FUNCTIONS = {
 
     # int udev_enumerate_add_match_parent(struct udev_enumerate *udev_enumerate, struct udev_device *parent);
     'udev_enumerate_add_match_parent' => {
-        ffi_data => [ ['opaque', 'opaque'], 'int' ]
+        ffi_data => [ ['opaque', 'opaque'], 'int' ],
+        since    => 172,
     },
 
     # int udev_enumerate_add_match_is_initialized(struct udev_enumerate *udev_enumerate);
@@ -426,6 +428,7 @@ sub udev_version {
     {
         local $SIG{__WARN__} = sub {}; # silence shell output if error
 
+        # TODO timeout
         if (open(my $ph, '-|', $full_path, '--version')) {
             my $out = <$ph>;
 
@@ -454,16 +457,18 @@ my $_function_not_attach = sub {
 
 
 sub init {
-    return 1 if $init;
-
+    return 1
+        if 1 == $init;
 
     my ($libudev) = find_lib(lib => 'udev');
-    unless ($libudev) {
+    unless (defined($libudev) || $libudev eq '') {
         $@ = "Can't find udev library";
         return 0;
     }
 
-    my $udev_version = udev_version() || 0;
+    my $udev_version = udev_version();
+    $udev_version = 0
+        unless defined($udev_version);
 
     my $ffi = FFI::Platypus->new();
     $ffi->lib($libudev);

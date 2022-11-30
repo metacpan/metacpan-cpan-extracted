@@ -8,7 +8,7 @@ Weather::GHCN::CacheURI - URI page fetch with file-based caching
 
 =head1 VERSION
 
-version v0.0.010
+version v0.0.011
 
 =head1 SYNOPSIS
 
@@ -66,7 +66,7 @@ use Object::Pad 0.66 qw( :experimental(init_expr) );
 package Weather::GHCN::CacheURI;
 class   Weather::GHCN::CacheURI;
 
-our $VERSION = 'v0.0.010';
+our $VERSION = 'v0.0.011';
 
 
 use Carp                    qw(carp croak);
@@ -97,7 +97,6 @@ field $_refresh     :reader :param  {};
 BUILD ($cachedir, $refresh) {
     $_cachedir //= $cachedir;
     $_refresh  //= lc $refresh;
-    croak '*E* cache directory does not exist' unless -d $cachedir;
     croak '*E* invalid refresh option' unless $_refresh =~ $REFRESH_RE;
 }
 

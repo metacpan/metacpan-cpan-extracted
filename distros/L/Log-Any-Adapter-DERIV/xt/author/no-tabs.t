@@ -9,6 +9,7 @@ use Test::NoTabs;
 my @files = (
     'bin/log-json',
     'lib/Log/Any/Adapter/DERIV.pm',
+    'lib/Log/Any/Adapter/DERIV.pod',
     't/00-check-deps.t',
     't/00-compile.t',
     't/00-report-prereqs.dd',
@@ -17,6 +18,10 @@ my @files = (
     't/05-filter_stack.t',
     't/10-misc.t',
     't/deriv.t',
+    't/rc/perlcriticrc',
+    't/rc/perltidyrc',
+    'xt/author/critic.t',
+    'xt/author/distmeta.t',
     'xt/author/eol.t',
     'xt/author/minimum-version.t',
     'xt/author/mojibake.t',
@@ -25,8 +30,7 @@ my @files = (
     'xt/author/portability.t',
     'xt/author/test-version.t',
     'xt/release/common_spelling.t',
-    'xt/release/cpan-changes.t',
-    'xt/release/distmeta.t'
+    'xt/release/cpan-changes.t'
 );
 
 notabs_ok($_) foreach @files;

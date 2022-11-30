@@ -14,12 +14,13 @@ use Digest::HMAC_SHA1;
 use Digest::MD5 qw{md5_hex};
 use English qw{-no_match_vars};
 use HTTP::Date;
+use URI;
 use LWP::UserAgent::Determined;
 use MIME::Base64 qw{encode_base64 decode_base64};
 use Scalar::Util qw{ reftype blessed };
-use List::Util qw{ any };
+use List::Util qw{ any pairs };
 use URI::Escape qw{uri_escape_utf8};
-use XML::Simple qw{XMLin};
+use XML::Simple qw{XMLin}; ## no critic (Community::DiscouragedModules)
 
 use parent qw{Class::Accessor::Fast};
 
@@ -50,7 +51,7 @@ __PACKAGE__->mk_accessors(
   }
 );
 
-our $VERSION = '0.55'; ## no critic (ValuesAndExpressions::RequireInterpolationOfMetachars)
+our $VERSION = '0.56'; ## no critic (ValuesAndExpressions::RequireInterpolationOfMetachars)
 
 ########################################################################
 sub new {
@@ -185,6 +186,7 @@ sub new {
 
     my $cipher = Crypt::CBC->new(
       -pass        => $encryption_key,
+      -key         => $encryption_key,
       -cipher      => 'Crypt::Blowfish',
       -nodeprecate => $TRUE,
     );
@@ -350,6 +352,7 @@ sub buckets {
 
   # temporarily cache signer
   my $region = $self->_region;
+  my $bucket_list;
 
   $self->reset_signer_region('us-east-1'); # default region for buckets op
 
@@ -361,7 +364,8 @@ sub buckets {
     }
   );
 
-  return if $self->_remember_errors($r);
+  return $bucket_list
+    if $self->_remember_errors($r);
 
   my $owner_id          = $r->{Owner}{ID};
   my $owner_displayname = $r->{Owner}{DisplayName};
@@ -391,11 +395,13 @@ sub buckets {
 
   $self->reset_signer_region($region); # restore original region
 
-  return {
+  $bucket_list = {
     owner_id          => $owner_id,
     owner_displayname => $owner_displayname,
     buckets           => \@buckets,
   };
+
+  return $bucket_list;
 } ## end sub buckets
 
 ########################################################################
@@ -547,23 +553,37 @@ sub list_bucket {
 
   $conf ||= {};
 
+  my $bucket_list; # return this
   my $path = $bucket . $SLASH;
 
   if ( %{$conf} ) {
-    $path .= $QUESTION_MARK . join $AMPERSAND,
+    my @vars = keys %{$conf};
+
+    # remove undefined elements
+    foreach (@vars) {
+      next if defined $conf->{$_};
+
+      delete $conf->{$_};
+    }
+
+    my $query_string = $QUESTION_MARK . join $AMPERSAND,
       map { $_ . $EQUAL_SIGN . $self->_urlencode( $conf->{$_} ) }
       keys %{$conf};
+
+    $path .= $query_string;
+
   } ## end if ( %{$conf} )
 
   my $r = $self->_send_request(
     { method  => 'GET',
       path    => $path,
       headers => {},
-      region  => $self->region
+      region  => $self->region,
     }
   );
 
-  return if $self->_remember_errors($r);
+  return $bucket_list
+    if $self->_remember_errors($r);
 
   $self->get_logger->debug( sub { return Dumper($r); } );
 
@@ -574,7 +594,7 @@ sub list_bucket {
     $next_marker = 'NextContinuationToken';
   } ## end if ( $conf->{'list-type'...})
 
-  my $return = {
+  $bucket_list = {
     bucket       => $r->{Name},
     prefix       => $r->{Prefix}       // $EMPTY,
     marker       => $r->{$marker}      // $EMPTY,
@@ -607,7 +627,7 @@ sub list_bucket {
       owner_displayname => $node->{Owner}{DisplayName},
       };
   } ## end foreach my $node ( @{ $r->{...}})
-  $return->{keys} = \@keys;
+  $bucket_list->{keys} = \@keys;
 
   if ( $conf->{delimiter} ) {
     my @common_prefixes;
@@ -630,10 +650,10 @@ sub list_bucket {
         push @common_prefixes, $prefix;
       } ## end foreach my $n ( @{$node} )
     } ## end foreach my $node ( $r->{CommonPrefixes...})
-    $return->{common_prefixes} = \@common_prefixes;
+    $bucket_list->{common_prefixes} = \@common_prefixes;
   } ## end if ( $conf->{delimiter...})
 
-  return $return;
+  return $bucket_list;
 } ## end sub list_bucket
 
 ########################################################################
@@ -841,7 +861,28 @@ sub _make_request {
   if ( $path =~ m{\A([^/?]+)(.*)}xsm
     && $self->dns_bucket_names
     && _can_bucket_be_subdomain($1) ) {
-    $url = "$protocol://$1.$host$2";
+
+    my $bucket = $1;
+    my $suffix = $2;
+
+    if ( $host =~ /([^:]+):([^:]\d+)$/xsm ) {
+
+      eval {
+        my $port = $2;
+        $host = $1;
+
+        my $uri = URI->new("http://$bucket.host");
+        $uri->scheme('http');
+        $uri->host("$bucket.$host");
+        $uri->port($port);
+        $uri->path($suffix);
+        $url = $uri;
+      };
+
+    }
+    else {
+      $url = "$protocol://$bucket.$host$suffix";
+    }
   }
 
   my $request = HTTP::Request->new( $method, $url, $http_headers );
@@ -885,10 +926,9 @@ sub _send_request {
 
   if ( $response->code !~ /\A2\d\d\z/xsm ) {
     $self->_remember_errors( $response->content, 1 );
-    return;
+    $content = undef;
   }
-
-  if ( $content && $response->content_type eq 'application/xml' ) {
+  elsif ( $content && $response->content_type eq 'application/xml' ) {
     $content = $self->_xpc_of_content($content);
   } ## end if ( $content && $response...)
 
@@ -926,7 +966,8 @@ sub adjust_region {
   $self->turn_on_special_retry();
 
   # If No error, then nothing to do
-  return 1 if $response->is_success();
+  return $TRUE
+    if $response->is_success();
 
   # If the error is due to the wrong region, then we will get
   # back a block of XML with the details
@@ -938,7 +979,8 @@ sub adjust_region {
       and $error_hash->{'Endpoint'} ) {
 
       # Don't recurse through multiple redirects
-      return if $called_from_redirect;
+      return $FALSE
+        if $called_from_redirect;
 
       # With a permanent redirect error, they are telling us the explicit
       # host to use.  The endpoint will be in the form of bucket.host
@@ -966,7 +1008,7 @@ sub adjust_region {
         $self->host( 's3-' . $error_hash->{'Region'} . '.amazonaws.com' );
       }
 
-      return 1;
+      return $TRUE;
     }
 
     if ( $error_hash->{'Code'} eq 'IllegalLocationConstraintException' ) {
@@ -981,7 +1023,7 @@ sub adjust_region {
         # Set the proper host for the region
         $self->host( 's3.' . $region . '.amazonaws.com' );
 
-        return 1;
+        return $TRUE;
       }
     }
 
@@ -989,7 +1031,7 @@ sub adjust_region {
 
   # Some other error
   $self->_remember_errors( $response->content, 1 );
-  return;
+  return $FALSE;
 }
 
 ########################################################################
@@ -1061,6 +1103,7 @@ sub _send_request_expect_nothing {
   my $request = $self->_make_request(@args);
 
   my $response = $self->_do_http($request);
+  $self->get_logger->debug( Dumper( [$response] ) );
 
   my $content = $response->content;
 
@@ -1271,11 +1314,13 @@ sub _merge_meta {
 
   my $http_header = HTTP::Headers->new;
 
-  while ( my ( $k, $v ) = each %{$headers} ) {
+  foreach my $p ( pairs %{$headers} ) {
+    my ( $k, $v ) = @{$p};
     $http_header->header( $k => $v );
-  } ## end while ( my ( $k, $v ) = each...)
+  }
 
-  while ( my ( $k, $v ) = each %{$metadata} ) {
+  foreach my $p ( pairs %{$metadata} ) {
+    my ( $k, $v ) = @{$p};
     $http_header->header( "$METADATA_PREFIX$k" => $v );
   } ## end while ( my ( $k, $v ) = each...)
 
@@ -1294,7 +1339,8 @@ sub _canonical_string {
 
   my %interesting_headers = ();
 
-  while ( my ( $key, $value ) = each %{$headers} ) {
+  foreach my $p ( pairs %{$headers} ) {
+    my ( $key, $value ) = @{$p};
     my $lk = lc $key;
 
     if ( $lk eq 'content-md5'
@@ -1478,8 +1524,8 @@ C<Net::Amazon::S3> implements much more of the S3 API and may have
 changed the interface in ways that might break your
 applications. However, C<Net::Amazon::S3> is today dependent on
 C<Moose> which may in fact level the playing field in terms of
-performance penalties that may have been introduced by
-C<Amazon::S3>. YMMV, however, this module may still appeal to some
+performance penalties that may have been introduced by recent updates
+to C<Amazon::S3>. YMMV, however, this module may still appeal to some
 that favor simplicity of the interface and a lower number of
 dependencies. Below is the original description of the module.>
 
@@ -1521,7 +1567,14 @@ via L<XML::Simple>.
 
 As noted, this module is no longer a I<drop-in> replacement for
 C<Net::Amazon::S3> and has limitations and differences that may make
-the use of this module in your applications questionable.
+the use of this module in your applications
+questionable. Additionally, one of the original intents of this fork
+of C<Net::Amazon::S3> was to reduce the dependencies and make it
+I<easy to install>. Recent changes to this module have introduced new
+dependencies in order to improve the maintainability and provide
+additional features. Installing CPAN modules is never easy, especially
+when the dependencies of the dependencies are impossible to control
+and include XS modules.
 
 =over 5
 
@@ -1529,9 +1582,9 @@ the use of this module in your applications questionable.
 
 Technically, this module should run on versions 5.10 and above,
 however some of the dependencies may require higher versions of
-C<perl> or install new versions some dependencies that conflict with
+C<perl> or some versions of the dependencies that conflict with
 other versions of dependencies...it's a crapshoot when dealing with
-older C<perl> version and CPAN modules.
+older C<perl> versions and CPAN modules.
 
 You may however, be able to build this module by installing older
 versions of those dependencies and take your chances that those older
@@ -1552,7 +1605,7 @@ In this order install:
 
 ...other versions I<may> work...YMMV.
 
-=item * API Signing
+=item API Signing
 
 Making calls to AWS APIs requires that the calls be signed.  Amazon
 has added a new signing method (Signature Version 4) to increase
@@ -1593,12 +1646,12 @@ L<https://docs.aws.amazon.com/AmazonS3/latest/userguide/RESTAuthentication.html>
 
 =back
 
-=item * New APIs
+=item New APIs
 
 This module does not support some of the newer API method calls
 for S3 added after the initial creation of this interface.
 
-=item * Multipart Upload Support
+=item Multipart Upload Support
 
 There is limited testing for multipart uploads.
 

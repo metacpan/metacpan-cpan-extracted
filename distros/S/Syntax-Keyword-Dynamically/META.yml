@@ -6,6 +6,7 @@ build_requires:
   ExtUtils::CBuilder: '0'
   Test::More: '0.88'
 configure_requires:
+  Future::AsyncAwait::ExtensionBuilder: '0.60'
   Module::Build: '0.4004'
   XS::Parse::Keyword::Builder: '0.13'
 dynamic_config: 1
@@ -18,12 +19,12 @@ name: Syntax-Keyword-Dynamically
 provides:
   Syntax::Keyword::Dynamically:
     file: lib/Syntax/Keyword/Dynamically.pm
-    version: '0.10'
+    version: '0.11'
 requires:
   XS::Parse::Keyword: '0.13'
   perl: '5.014'
 resources:
   IRC: irc://irc.perl.org/#io-async
   license: http://dev.perl.org/licenses/
-version: '0.10'
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

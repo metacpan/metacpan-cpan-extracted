@@ -53,6 +53,11 @@ sub transform_to_plain {
   $top->each_match_of(SubroutineDeclaration => $make_tf->(''));
 }
 
+sub check_bail_out_early {
+  my ($self, $top) = @_;
+  $top->text !~ m/ \b state \b /xs;
+}
+
 1;
 __END__
 

@@ -157,35 +157,12 @@ C<export_lexically> is included in a stable release of Perl.
 
 =head2 Lexical subs on Perl older than 5.37.2
 
-There is this L<Sub::Exporter::Lexical> thing that was designed as a
-plugin for L<Sub::Exporter>, but Exporter::Tiny's API is close enough
-that it will work. Do you remember that global options hash? Just
-use that to tell Exporter::Tiny to use an alternative sub installer.
+If you install L<Lexical::Var>, then lexical imports should work on versions
+of Perl as old as 5.12.
 
-   {
-      use Sub::Exporter::Lexical lexical_installer => { -as => "lex" };
-      use MyUtils { installer => lex }, "frobnicate";
-      
-      frobnicate(...);  # ok
-   }
-   
-   frobnicate(...);  # not ok
-
-Another way to do lexical functions is to import a function into a
-scalar variable:
-
-   my $func;
-   use MyUtils "frobnicate" => { -as => \$func };
-   
-   $func->(...);
-
-You can even provide a hashref to put all imported functions into as
-part of that global options hash I mentioned earlier.
-
-   my %funcs;
-   use MyUtils { into => \%funcs }, "frobnicate";
-   
-   $funcs{frobnicate}->(...);
+That module does have issues that prevent it from being installed on Perl
+5.22+. The L<Alt::Lexical::Var::ButSupportModernPerl> module includes patches
+to fix it.
 
 =head2 Unimporting
 

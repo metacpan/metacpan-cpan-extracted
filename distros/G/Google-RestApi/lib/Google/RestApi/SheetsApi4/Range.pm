@@ -79,7 +79,7 @@ package Google::RestApi::SheetsApi4::Range;
 # too complex, and the simple workaround is to just A1:B2.
 # [A1, B2]
 
-our $VERSION = '1.0.2';
+our $VERSION = '1.0.4';
 
 use Google::RestApi::Setup;
 
@@ -140,7 +140,7 @@ sub factory {
   my $range = $range_args->{range};
   
   # be careful here, recursive.
-  given (${^TYPE_PARAMS_MULTISIG}) {
+  given (${^_TYPE_PARAMS_MULTISIG} || ${^TYPE_PARAMS_MULTISIG}) {
     when (0) { return Col->new(%$range_args); }
     when (1) { return Row->new(%$range_args); }
     when (2) { return Cell->new(%$range_args); }
@@ -169,6 +169,8 @@ sub factory {
       my $named = $range;
       $range = $worksheet->resolve_header_range($named);
       if ($range) {
+        # remove original range so it doesn't screw up Type::Params.
+        delete $range_args->{range};
         $range = factory(%$range_args, range => $range);    ##### recursion
         $range->{header_name} = $named;
         return $range;
@@ -178,6 +180,8 @@ sub factory {
         or LOGDIE("Unable to resolve named range '$named'");
       # we've resolved the name to A1 format, so redrive factory routine to
       # generate a range object with the resolved range.
+      # remove original range so it doesn't screw up Type::Params.
+      delete $range_args->{range};
       $range = factory(%$range_args, range => $range);      ##### recursion
       $range->{named} = $named;
       return $range;

@@ -31,6 +31,9 @@ sub from_rgb { ($_[2] & 0xff) | (($_[1] & 0xff) << 8) | (($_[0] & 0xff) << 16) }
 sub to_rgb   { (( $_[0]>>16) & 0xFF, ($_[0]>>8) & 0xFF, $_[0] & 0xFF) }
 sub from_bgr { ($_[0] & 0xff) | (($_[1] & 0xff) << 8) | (($_[2] & 0xff) << 16) }
 sub to_bgr   { ($_[0] & 0xFF, ($_[0]>>8) & 0xFF, ( $_[0]>>16) & 0xFF) }
+sub to_gray_byte   { my ( $r, $g, $b ) = to_rgb($_[0]); return int(( $r + $g + $b ) / 3 + .5) }
+sub to_gray_rgb    { return from_rgb( (to_gray_byte($_[0])) x 3 ) }
+sub from_gray_byte { return 0x10101 * ($_[0] & 0xff) }
 sub premultiply { from_rgb( map { int($_ * $_[1] / 255) } to_rgb($_[0]) ) }
 
 package
@@ -71,6 +74,62 @@ package
     fp; *AUTOLOAD =  \&Prima::Const::AUTOLOAD;	# fill styles & font pitches
 package
     le; *AUTOLOAD =  \&Prima::Const::AUTOLOAD;	# line ends
+
+use constant Arrow => [
+	conic => [1,0,2.5,0,2.5,-0.5],
+	line  => [0,2.5],
+	conic => [-2.5,-0.5,-2.5,0,-1,0]
+];
+
+use constant Cusp => [
+	line  => [0,2],
+];
+
+use constant InvCusp => [
+	line  => [1,2,0,0,-1,2],
+];
+
+use constant Spearhead => [
+	line  => [1.5,1,0,4,-1.5,1],
+];
+
+use constant RoundRect => [
+	conic => [0,-1.5,1.5,-1.5,1.5,0,1.5,1.5,0,1.5,-1.5,1.5,-1.5,0,-1.5,-1.5,0,-1.5],
+];
+
+use constant Rect => [
+	line  => [0,-1.5,1.5,-1.5,1.5,1.5,-1.5,1.5,-1.5,-1.5,0,-1.5],
+];
+
+use constant Knob => [
+	conic => [0,-1.5,1.5,-1.5,1.5,0],
+	conic => [1.5,0,1.5,1.5,0,1.5],
+	conic => [0,1.5,-1.5,1.5,-1.5,0],
+	conic => [-1.5,0,-1.5,-1.5,0,-1.5],
+];
+
+use constant Tail => [
+	line  => [ 2,1,2,2.25,0,1.75,-2,2.25,-2,1 ]
+];
+
+sub transform
+{
+	my ( $le, $matrix ) = @_;
+	unless ( ref($le) ) {
+		my $can = __PACKAGE__->can($le);
+		return $le unless $can;
+		$le = $can->();
+	}
+
+	my @new;
+	for ( my $i = 0; $i < @$le; $i += 2 ) {
+		push @new, $$le[$i], Prima::matrix::transform($matrix, $$le[$i+1]);
+	}
+	return \@new;
+}
+
+sub scale { transform( $_[0], [ $_[1],0,0,$_[2] // $_[1],0,0 ] ) }
+
 package
     lj; *AUTOLOAD =  \&Prima::Const::AUTOLOAD;	# line joins
 package
@@ -625,6 +684,15 @@ See L<Prima::Drawable/lineEnd>
 	le::Flat
 	le::Square
 	le::Round
+
+	le::Arrow
+	le::Cusp
+	le::InvCusp
+	le::Knob
+	le::Rect
+	le::RoundRect
+	le::Spearhead
+	le::Tail
 
 =head2 lj::  - line join styles
 

@@ -331,7 +331,8 @@ int32_t SPVM__Sys__Socket__socket(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 }
 
-int32_t SPVM__Sys__Socket__connect(SPVM_ENV* env, SPVM_VALUE* stack) {
+
+int32_t SPVM__Sys__Socket__connect_raw(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t sockfd = stack[0].ival;
   
@@ -347,12 +348,19 @@ int32_t SPVM__Sys__Socket__connect(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t status = connect(sockfd, addr, addrlen);
   
+  stack[0].ival = status;
+  
+  return 0;
+}
+
+int32_t SPVM__Sys__Socket__connect(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t status = SPVM__Sys__Socket__connect_raw(env, stack);
+  
   if (status == -1) {
     env->die(env, stack, "[System Error]connect failed: %s", socket_strerror(env, stack, socket_errno(), 0), FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
-  
-  stack[0].ival = status;
   
   return 0;
 }
@@ -432,7 +440,9 @@ int32_t SPVM__Sys__Socket__listen(SPVM_ENV* env, SPVM_VALUE* stack) {
 }
 
 int32_t SPVM__Sys__Socket__recv(SPVM_ENV* env, SPVM_VALUE* stack) {
-  
+
+  int32_t items = env->get_args_stack_length(env, stack);
+
   int32_t sockfd = stack[0].ival;
 
   void* obj_buf = stack[1].oval;
@@ -442,12 +452,21 @@ int32_t SPVM__Sys__Socket__recv(SPVM_ENV* env, SPVM_VALUE* stack) {
   }
   
   char* buf = (char*)env->get_chars(env, stack, obj_buf);
+  int32_t buf_length = env->length(env, stack, obj_buf);
   
   int32_t len = stack[2].ival;
   
   int32_t flags = stack[3].ival;
   
-  int32_t bytes_length = recv(sockfd, buf, len, flags);
+  int32_t buf_offset = 0;
+  if (items > 4) {
+    buf_offset = stack[4].ival;
+  }
+  if (!(len <= buf_length - buf_offset)) {
+    return env->die(env, stack, "The $len must be less than the length of the $buf - the $buf_offset", FILE_NAME, __LINE__);
+  }
+  
+  int32_t bytes_length = recv(sockfd, buf + buf_offset, len, flags);
   
   if (bytes_length == -1) {
     env->die(env, stack, "[System Error]recv failed: %s", socket_strerror(env, stack, socket_errno(), 0), FILE_NAME, __LINE__);
@@ -461,6 +480,8 @@ int32_t SPVM__Sys__Socket__recv(SPVM_ENV* env, SPVM_VALUE* stack) {
 
 int32_t SPVM__Sys__Socket__send(SPVM_ENV* env, SPVM_VALUE* stack) {
   
+  int32_t items = env->get_args_stack_length(env, stack);
+  
   int32_t sockfd = stack[0].ival;
 
   void* obj_buf = stack[1].oval;
@@ -470,12 +491,21 @@ int32_t SPVM__Sys__Socket__send(SPVM_ENV* env, SPVM_VALUE* stack) {
   }
   
   const char* buf = env->get_chars(env, stack, obj_buf);
+  int32_t buf_length = env->length(env, stack, obj_buf);
   
   int32_t len = stack[2].ival;
   
   int32_t flags = stack[3].ival;
   
-  int32_t bytes_length = send(sockfd, buf, len, flags);
+  int32_t buf_offset = 0;
+  if (items > 4) {
+    buf_offset = stack[4].ival;
+  }
+  if (!(len <= buf_length - buf_offset)) {
+    return env->die(env, stack, "The $len must be less than the length of the $buf - the $buf_offset", FILE_NAME, __LINE__);
+  }
+  
+  int32_t bytes_length = send(sockfd, buf + buf_offset, len, flags);
   
   if (bytes_length == -1) {
     env->die(env, stack, "[System Error]send failed: %s", socket_strerror(env, stack, socket_errno(), 0), FILE_NAME, __LINE__);
@@ -884,6 +914,65 @@ int32_t SPVM__Sys__Socket__getnameinfo(SPVM_ENV* env, SPVM_VALUE* stack) {
     env->die(env, stack, "[System Error]getnameinfo failed: %s", ch_gai_strerror, FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
+  
+  return 0;
+}
+
+int32_t SPVM__Sys__Socket__sockatmark(SPVM_ENV* env, SPVM_VALUE* stack) {
+#ifdef _WIN32
+    env->die(env, stack, "[Not Supported]sockatmark is not supported on this system(_WIN32)", FILE_NAME, __LINE__);
+    return SPVM_NATIVE_C_CLASS_ID_ERROR_NOT_SUPPORTED;
+#else
+  
+  int32_t sockfd = stack[0].ival;
+  
+  int32_t status = sockatmark(sockfd);
+  
+  if (status == -1) {
+    env->die(env, stack, "[System Error]shutdown failed: %s", socket_strerror(env, stack, socket_errno(), 0), FILE_NAME, __LINE__);
+    return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
+  }
+  
+  stack[0].ival = status;
+  
+  return 0;
+#endif
+}
+
+int32_t SPVM__Sys__Socket__sendto(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t sockfd = stack[0].ival;
+
+  void* obj_buf = stack[1].oval;
+  
+  if (!obj_buf) {
+    return env->die(env, stack, "The $buf must be defined", FILE_NAME, __LINE__);
+  }
+  
+  const char* buf = env->get_chars(env, stack, obj_buf);
+  
+  int32_t len = stack[2].ival;
+  
+  int32_t flags = stack[3].ival;
+
+  void* obj_addr = stack[4].oval;
+  
+  if (!obj_addr) {
+    return env->die(env, stack, "The $addr must be defined", FILE_NAME, __LINE__);
+  }
+  
+  const struct sockaddr* addr = env->get_pointer(env, stack, obj_addr);
+  
+  int32_t addrlen = stack[5].ival;
+
+  int32_t bytes_length = sendto(sockfd, buf, len, flags, addr, addrlen);
+  
+  if (bytes_length == -1) {
+    env->die(env, stack, "[System Error]sendto failed: %s", socket_strerror(env, stack, socket_errno(), 0), FILE_NAME, __LINE__);
+    return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
+  }
+  
+  stack[0].ival = bytes_length;
   
   return 0;
 }

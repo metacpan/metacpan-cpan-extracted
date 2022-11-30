@@ -50,7 +50,7 @@
          "web" : "https://github.com/ssimms/pdfapi2"
       }
    },
-   "version" : "2.043",
+   "version" : "2.044",
    "x_generated_by_perl" : "v5.32.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.25",
    "x_spdx_expression" : "LGPL-2.1"

@@ -38,7 +38,7 @@
    "provides" : {
       "App::Pod" : {
          "file" : "lib/App/Pod.pm",
-         "version" : "0.30"
+         "version" : "0.31"
       }
    },
    "release_status" : "stable",
@@ -53,6 +53,6 @@
          "url" : "https://github.com/poti1/app-pod"
       }
    },
-   "version" : "0.30",
-   "x_serialization_backend" : "JSON::PP version 4.07"
+   "version" : "0.31",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

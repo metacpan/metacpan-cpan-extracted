@@ -1,0 +1,68 @@
+---
+abstract: 'Write XLSX files in a Clearbuilt-standard way'
+author:
+  - 'D Ruth Holloway <ruthh@clearbuilt.com>'
+build_requires:
+  File::Spec: '0'
+  File::Temp: '0'
+  FindBin: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test2::Plugin::ExitSummary: '0'
+  Test2::Plugin::NoWarnings: '0'
+  Test2::Plugin::Times: '0'
+  Test2::V0: '0'
+  Test::More: '0.94'
+  lib: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: '0'
+generated_by: 'Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Clearbuilt-Excelerator
+provides:
+  Clearbuilt::ExcelErator:
+    file: lib/Clearbuilt/ExcelErator.pm
+    version: '2.0001'
+requires:
+  Excel::Writer::XLSX: '0'
+  Modern::Perl: '0'
+  Moo: '0'
+version: '2.0001'
+x_BuiltWith:
+  modules:
+    Excel::Writer::XLSX: '1.09'
+    ExtUtils::MakeMaker: '7.62'
+    File::Spec: '3.80'
+    File::Temp: '0.2311'
+    FindBin: '1.52'
+    IO::Handle: '1.46'
+    IPC::Open3: '1.21'
+    Modern::Perl: '1.20220515'
+    Moo: '2.005004'
+    Test2::Plugin::ExitSummary: '0.000145'
+    Test2::Plugin::NoWarnings: '0.09'
+    Test2::Plugin::Times: '0.000145'
+    Test2::V0: '0.000145'
+    Test::More: '1.302183'
+    lib: '0.65'
+    strict: '1.12'
+    warnings: '1.51'
+  perl:
+    original: v5.34.1
+    qv: 1
+    version:
+      - 5
+      - 34
+      - 1
+  platform: linux
+x_authority: cpan:CLEARBLT
+x_generated_by_perl: v5.34.1
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

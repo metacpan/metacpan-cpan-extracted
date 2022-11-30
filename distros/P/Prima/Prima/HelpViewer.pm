@@ -91,19 +91,8 @@ sub load_link
 
 	if ( $link =~ /^(https?|ftp):\//) {
 		$self-> owner-> status("Starting browser for $link...");
-		if ( Prima::Application-> get_system_info-> {apc} == apc::Win32) {
-			open UNIQUE_FILE_HANDLE_NEVER_TO_BE_CLOSED, "|start $link";
-			close UNIQUE_FILE_HANDLE_NEVER_TO_BE_CLOSED if 0;
-		} else {
-			my $pg;
-			CMD: for my $cmd ( qw(xdg-open x-www-browser www-browser firefox mozilla sensible-browser netscape)) {
-				for ( split /:/, $ENV{PATH} ) {
-					$pg = "$_/$cmd", last CMD if -x "$_/$cmd";
-				}
-			}
-			$self-> owner-> status("Cannot start browser"), return
-				unless defined $pg && ! system( "$pg $link &");
-		}
+		$self-> owner-> status("Cannot start browser") unless
+			$self->link_handler->open_browser($link);
 		return;
 	}
 
@@ -283,11 +272,15 @@ sub metafile
 	$p = $m1->render_polyline($p, matrix => [$t, 0, 0, $t, -$d, -$d], integer => 1);
 	push @$p, @$p[0,1];
 	$m1->begin_paint;
+	$m1->antialias(1);
+	$m1->lineWidth(1.3);
 	$m1->color(cl::Black);
 	$m1->polyline($p) ;
 	$m1->end_paint;
 	my $m2 = Prima::Drawable::Metafile->new( size => [$t, $t] );
 	$m2->begin_paint;
+	$m2->antialias(1);
+	$m2->lineWidth(1.3);
 	$m2->color(wc::Menu|cl::Hilite);
 	$m2->fillWinding(fm::Winding|fm::Overlay);
 	$m2->fillpoly($p);
@@ -296,6 +289,8 @@ sub metafile
 	$m2->end_paint;
 	my $m3 = Prima::Drawable::Metafile->new( size => [$t, $t], type => dbt::Bitmap);
 	$m3->begin_paint;
+	$m3->antialias(1);
+	$m3->lineWidth(1.3);
 	$m3->color(cl::White);
 	$m3->translate(1,-1);
 	$m3->polyline($p);
@@ -466,7 +461,7 @@ sub increase_font_size
 	$fs = 100 if $fs > 100;
 	return if $fs == $t->{defaultFontSize};
 	$t->{defaultFontSize} = $fs;
-	$t-> format(1);
+	$t-> format(keep_offset => 1);
 	$inifile-> section('View')-> {FontSize} = $fs;
 }
 
@@ -696,7 +691,6 @@ sub find_text
 	my ( $self, $line, $offset, $options) = @_;
 	$self = $self-> {text};
 	return unless scalar @{$self-> {blocks}};
-	$line = '('.quotemeta( $line).')' unless $options & fdo::RegularExpression;
 
 	my @range = $self-> text_range;
 	return if $range[0] >= $range[1];
@@ -704,38 +698,31 @@ sub find_text
 	$offset = $range[1] if $offset > $range[1];
 	return if $offset < $range[0];
 
-	my ( $re, $re2, $esub);
-	$re  = '/';
-	$re .= '\\b' if $options & fdo::WordsOnly;
-	$re .= "$line";
-	$re .= '\\b' if $options & fdo::WordsOnly;
-	$re .= '/';
-	$re2 = '';
-	$re2.= 'i' unless $options & fdo::MatchCase;
+	local $SIG{__WARN__} = sub {};
+	eval {
+		$line = quotemeta($line) unless $options & fdo::RegularExpression;
+		$line = qr/$line/i       unless $options & fdo::MatchCase;
+		$line = qr/\b$line\b/    if $options & fdo::WordsOnly;
+	};
+	Prima::MsgBox::message_box("Text Search", "Error: $@") if $@;
 
 	my $dir = ( $options & fdo::BackwardSearch) ? 0 : 1;
-	my @opt = $dir ? ( $offset, $range[1] - $offset + 1) :
-					( $range[0], $offset - $range[0]);
+	my @opt = $dir ? 
+		( $offset, $range[1] - $offset + 1) :
+		( $range[0], $offset - $range[0]);
 	my @text = split('(\n)', substr( ${$self-> {text}}, $opt[0], $opt[1]));
 	@text = reverse @text unless $dir;
-
-
-	local $SIG{__WARN__}=sub{};
-	$esub = eval(<<FINDER);
-sub {
-	for ( \@text) {
-		\$offset -= length unless $dir;
-		if ( $re$re2) {
-			\$offset += length(\$`);
-			return \$offset, \$offset + length(\$&);
+ 
+	for my $t ( @text) {
+		$offset -= length $t unless $dir;
+		if ( $t =~ /($line)(.*)/) {
+			$offset += length($t) - length($1) - length($2);
+			return $offset, $offset + length($1);
 		}
-		\$offset += length if $dir;
+		$offset += length $t if $dir;
 	}
+
 	return;
-}
-FINDER
-	return unless $esub;
-	return $esub-> ();
 }
 
 sub do_find
@@ -747,7 +734,7 @@ sub do_find
 
 	my ( $offset, $offset2);
 	if ( defined $self-> {find_offset}) {
-	$offset = $self-> {find_offset};
+		$offset = $self-> {find_offset};
 	} else {
 		if ( $$p{scope} != fds::Cursor) {
 			my @scope = ($$p{scope} == fds::Top) ? (0,0) : (-1,-1);
@@ -979,8 +966,10 @@ sub setup_dialog
 
 	return if $setupdlg-> execute != mb::OK;
 
-	$t-> {colorMap}-> [ Prima::PodView::COLOR_LINK_FOREGROUND & ~tb::COLOR_INDEX ] = $setupdlg-> LinkColor-> value;
-	$t-> {colorMap}-> [ Prima::PodView::COLOR_CODE_FOREGROUND & ~tb::COLOR_INDEX ] = $setupdlg-> CodeColor-> value;
+	my $cm = $t->colorMap;
+	$$cm[ Prima::PodView::COLOR_LINK_FOREGROUND & ~tb::COLOR_INDEX ] = $setupdlg-> LinkColor-> value;
+	$$cm[ Prima::PodView::COLOR_CODE_FOREGROUND & ~tb::COLOR_INDEX ] = $setupdlg-> CodeColor-> value;
+	$t-> colorMap($cm);
 
 	my $f1 = $setupdlg-> VarFont-> text;
 	my $f2 = $setupdlg-> FixFont-> text;
@@ -996,7 +985,7 @@ sub setup_dialog
 	if ( $f1 ne $of1 || $f2 ne $of2) {
 		$t-> {fontPalette}-> [0]-> {name} = $f1;
 		$t-> {fontPalette}-> [1]-> {name} = $f2;
-		$t-> format(1);
+		$t-> format(keep_offset => 1);
 	} else {
 		$t-> repaint;
 	}

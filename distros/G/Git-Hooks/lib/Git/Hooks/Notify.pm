@@ -2,7 +2,7 @@ use warnings;
 
 package Git::Hooks::Notify;
 # ABSTRACT: Git::Hooks plugin to notify users via email
-$Git::Hooks::Notify::VERSION = '3.3.0';
+$Git::Hooks::Notify::VERSION = '3.3.1';
 use v5.16.0;
 use utf8;
 use Log::Any '$log';
@@ -91,14 +91,16 @@ sub sha1_link {
         if ($commit_url =~ /%R/) {
             # %R must be replaced by the repository name.
             my $repository_name = $git->repository_name;
-            # HACK: for Bitbucket Server the repository name is composed: a
-            # project ID and a repository name separated by a slash. We have to
-            # insert a "repos/" string between these two parts in order to
-            # construct a valid URL. Ideally we should be able to get the
-            # repository name and the project name separately, but I'll live
-            # with this hack for now, since, as far as I know, only Bitbucket
-            # has this notion of a "project".
-            $repository_name =~ s:/:/repos/:;
+            if (exists $ENV{BB_REPO_SLUG}) {
+                # HACK: for Bitbucket Server the repository name is composed: a
+                # project ID and a repository name separated by a slash. We have
+                # to insert a "repos/" string between these two parts in order
+                # to construct a valid URL. Ideally we should be able to get the
+                # repository name and the project name separately, but I'll live
+                # with this hack for now, since, as far as I know, only
+                # Bitbucket has this notion of a "project".
+                $repository_name =~ s:/:/repos/:;
+            }
             $commit_url =~ s/%R/$repository_name/g;
         }
         return $html ? "<a href=\"$commit_url\">$sha1</a>" : $commit_url;
@@ -314,7 +316,7 @@ Git::Hooks::Notify - Git::Hooks plugin to notify users via email
 
 =head1 VERSION
 
-version 3.3.0
+version 3.3.1
 
 =head1 SYNOPSIS
 
@@ -361,7 +363,7 @@ email about pushed commits affecting specific files in the repository.
 =item * B<post-receive>
 
 This hook is invoked once in the remote repository after a successful C<git
-push>. It's used to notify JIRA of commits citing its issues via comments.
+push>. It's used to notify Jira of commits citing its issues via comments.
 
 =back
 
@@ -446,7 +448,7 @@ It can be disabled for specific references via the C<githooks.ref> and
 C<githooks.noref> options about which you can read in the L<Git::Hooks>
 documentation.
 
-=head2 rule [REFS] [OPTIONS] RECIPIENTS [-- PATHSPECS]
+=head2 rule [REFS] [OPTIONS] RECIPIENTS [-- PATHSPEC ...]
 
 The B<rule> directive adds a notification rule specifying which RECIPIENTS
 should be notified of commits pushed to a reference matching REFS, affecting the
@@ -593,9 +595,9 @@ angle-bracketed names with values appropriate to your context:
 
   <BITBUCKET_BASE_URL>/projects/%R/commits/%H
 
-=item * Gerrit with Gitblit
+=item * Gerrit with Gitiles
 
-  <GERRIT_BASE_URL>/plugins/gitblit/commit/?r=%R&h=%H
+  <GERRIT_BASE_URL>/plugins/gitiles/%R/+/%H
 
 =back
 

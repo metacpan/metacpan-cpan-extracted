@@ -38,7 +38,7 @@ This version is for
         default_context => {
             service_name    => 'MyService',
             service_type    => 'web',
-            resource_name   => 'my_cgi_endpoint,
+            resource_name   => 'my_cgi_endpoint',
         },
     );
 

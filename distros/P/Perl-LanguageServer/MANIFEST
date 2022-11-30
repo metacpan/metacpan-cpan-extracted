@@ -1,5 +1,6 @@
-Changes
+Changes.pod
 lib/Perl/LanguageServer.pm
+lib/Perl/LanguageServer/DebuggerBridge.pm
 lib/Perl/LanguageServer/DebuggerInterface.pm
 lib/Perl/LanguageServer/DebuggerProcess.pm
 lib/Perl/LanguageServer/DevTool.pm
@@ -15,7 +16,8 @@ lib/Perl/LanguageServer/SyntaxChecker.pm
 lib/Perl/LanguageServer/Workspace.pm
 Makefile.PL
 MANIFEST			This list of files
-README
+README.pod
+LICENSE
 t/00-load.t
 
 META.yml                                 Module YAML meta-data (added by MakeMaker)

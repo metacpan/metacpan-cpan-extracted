@@ -47,3 +47,8 @@ Revision history for Perl extension Google::RestApi.
 1.0.2 Mar 13 2022
         - Add support for renaming a worksheet
         - Fix test for win32 file comparisons
+1.0.3 Nov 26 2022
+        - Fixes to support Type::Params upgrade
+        - Fix t/tutorial
+1.0.4 Nov 29 2022
+        - Support both multisig variables in Type::Params

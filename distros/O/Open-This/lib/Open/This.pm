@@ -2,7 +2,7 @@ use strict;
 use warnings;
 package Open::This;
 
-our $VERSION = '0.000030';
+our $VERSION = '0.000031';
 
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(
@@ -18,9 +18,9 @@ use Module::Runtime qw(
     require_module
 );
 use Module::Util ();
-use Path::Tiny qw( path );
-use Try::Tiny qw( catch try );
-use URI ();
+use Path::Tiny   qw( path );
+use Try::Tiny    qw( catch try );
+use URI          ();
 
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
 
@@ -52,6 +52,10 @@ sub parse_text {
     }
     elsif ( my $file_name = _maybe_git_diff_path($text) ) {
         $parsed{file_name} = $file_name;
+    }
+    elsif ( $text =~ m{^[^/]+\.go$} ) {
+        my $file_name = _find_go_files($text);
+        $parsed{file_name} = $file_name if $file_name;
     }
 
     if ( !exists $parsed{file_name} ) {
@@ -157,7 +161,7 @@ sub editor_args_from_parsed_text {
             || $ENV{EDITOR} eq 'vi'
             || $ENV{EDITOR} eq 'vim' ) {
             @args = sprintf(
-                q{+call cursor(%i,%i)},
+                '+call cursor(%i,%i)',
                 $parsed->{line_number},
                 $parsed->{column_number},
             );
@@ -166,7 +170,7 @@ sub editor_args_from_parsed_text {
         # nano +11,2 filename
         if ( $ENV{EDITOR} eq 'nano' ) {
             @args = sprintf(
-                q{+%i,%i},
+                '+%i,%i',
                 $parsed->{line_number},
                 $parsed->{column_number},
             );
@@ -342,6 +346,25 @@ sub _which {
     return;
 }
 
+sub _find_go_files {
+    my $text           = shift;
+    my $threshold_init = shift || 5000;
+
+    my $file_name;
+    my $iter      = path('.')->iterator( { recurse => 1 } );
+    my $threshold = $threshold_init;
+    while ( my $path = $iter->() ) {
+        next unless $path->is_file;    # dirs will never match anything
+        ( $threshold, $file_name ) = ( 0, "$path" )
+            if $path->basename eq $text;
+        last if --$threshold == 0;
+    }
+    if ( $threshold == 0 && !$file_name ) {
+        warn "Only $threshold_init files searched recursively";
+    }
+    return $file_name;
+}
+
 # ABSTRACT: Try to Do the Right Thing when opening files
 1;
 
@@ -357,7 +380,7 @@ Open::This - Try to Do the Right Thing when opening files
 
 =head1 VERSION
 
-version 0.000030
+version 0.000031
 
 =head1 DESCRIPTION
 

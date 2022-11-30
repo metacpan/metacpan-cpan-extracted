@@ -1,6 +1,10 @@
-#fsdb experiment mean stddev pct_rsd conf_range conf_low conf_high conf_pct sum sum_squared min max n
+#fsdb experiment mean:d stddev:d pct_rsd:d conf_range:d conf_low:d conf_high:d conf_pct:d sum:d sum_squared:d min:d max:d n:q
 ufs_mab_sys	37.2	0	0	-	-	-	0.95	37.2	1383.8	37.2	37.2	1
+#   | dbcolstats duration
 ufs_rcp_real	264.5	0	0	-	-	-	0.95	264.5	69960	264.5	264.5	1
+#   | dbcolstats duration
 ufs_mab_sys	37.3	0	0	-	-	-	0.95	37.3	1391.3	37.3	37.3	1
+#   | dbcolstats duration
 ufs_rcp_real	277.9	0	0	-	-	-	0.95	277.9	77228	277.9	277.9	1
+#   | dbcolstats duration
 #   | dbmapreduce -S -S -k experiment dbcolstats duration

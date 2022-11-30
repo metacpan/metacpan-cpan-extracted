@@ -1,7 +1,11 @@
 package Perinci::Sub::XCompletion;
 
-our $DATE = '2019-06-03'; # DATE
-our $VERSION = '0.102'; # VERSION
+use strict;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-11-25'; # DATE
+our $DIST = 'Perinci-Sub-XCompletion'; # DIST
+our $VERSION = '0.103'; # VERSION
 
 1;
 # ABSTRACT: Write completion routines in x.{,element_,index_}completion attributes
@@ -18,7 +22,7 @@ Perinci::Sub::XCompletion - Write completion routines in x.{,element_,index_}com
 
 =head1 VERSION
 
-This document describes version 0.102 of Perinci::Sub::XCompletion (from Perl distribution Perinci-Sub-XCompletion), released on 2019-06-03.
+This document describes version 0.103 of Perinci::Sub::XCompletion (from Perl distribution Perinci-Sub-XCompletion), released on 2022-11-25.
 
 =head1 SYNOPSIS
 
@@ -52,14 +56,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Su
 
 Source repository is at L<https://github.com/perlancar/perl-Perinci-Sub-XCompletion>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Sub-XCompletion>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Perinci::Sub::Complete>
@@ -68,11 +64,43 @@ L<Perinci::Sub::Complete>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019, 2017, 2016, 2015 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2019, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Sub-XCompletion>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

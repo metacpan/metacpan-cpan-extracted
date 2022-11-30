@@ -149,3 +149,4 @@ xt/whitespace.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)
 README                                   README file (added by Distar)
+LICENSE                                  LICENSE file (added by Distar)

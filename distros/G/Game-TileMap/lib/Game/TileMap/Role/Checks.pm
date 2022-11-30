@@ -1,5 +1,5 @@
 package Game::TileMap::Role::Checks;
-$Game::TileMap::Role::Checks::VERSION = '0.001';
+$Game::TileMap::Role::Checks::VERSION = '0.002';
 use v5.10;
 use strict;
 use warnings;
@@ -20,7 +20,7 @@ sub check_within_map
 	return !!0 if $x < 0 || $y < 0;
 
 	my $obj = $self->coordinates->[$x][$y];
-	return $obj && $obj->contents ne Game::TileMap::Legend::WALL_OBJECT;
+	return $obj && $obj->type ne Game::TileMap::Legend::WALL_OBJECT;
 }
 
 sub check_can_be_accessed
@@ -30,7 +30,7 @@ sub check_can_be_accessed
 	return !!0 if $x < 0 || $y < 0;
 
 	my $obj = $self->coordinates->[$x][$y];
-	return $obj && $obj->contents;
+	return $obj && $obj->type;
 }
 
 1;

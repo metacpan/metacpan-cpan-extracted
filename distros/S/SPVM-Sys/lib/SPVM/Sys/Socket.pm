@@ -115,6 +115,10 @@ See the detail of the L<socket|https://linux.die.net/man/2/socket> function in t
 
 If the system call failed, an exception will be thrown with the error code set to the class id of the L<Error::System> class.
 
+=head2 connect_raw
+
+  static method connect_raw : int ($sockfd : int, $addr : Sys::Socket::Sockaddr, $addrlen : int);
+
 =head2 connect
 
   static method connect : int ($sockfd : int, $addr : Sys::Socket::Sockaddr, $addrlen : int);
@@ -177,7 +181,7 @@ If the system call failed, an exception will be thrown with the error code set t
 
 =head2 recv
 
-  static method recv : int ($sockfd : int, $buf : mutable string, $len : int, $flags : int);
+  static method recv : int ($sockfd : int, $buf : mutable string, $len : int, $flags : int, $buf_offset = 0 : int);
 
 The recv() call is normally used only on a connected socket (see connect(2)) and is identical to recvfrom() with a NULL src_addr argument.
 
@@ -189,7 +193,7 @@ If the system call failed, an exception will be thrown with the error code set t
 
 =head2 send
 
-  static method send : int ($sockfd : int, $buf : string, $len : int, $flags : int);
+  static method send : int ($sockfd : int, $buf : string, $len : int, $flags : int, $buf_offset = 0 : int);
 
 The send() call may be used only when the socket is in a connected state (so that the intended recipient is known). The only difference between send() and write(2) is the presence of flags. With a zero flags argument, send() is equivalent to write(2). Also, the following call
 
@@ -358,3 +362,11 @@ Portalbe C<errno> related to the errors of the socket.
   static method socket_strerror : string ($errno : int, $length : int);
 
 Portalbe C<strerror> related to the errors of the socket.
+
+=head2 sockatmark
+
+  static method sockatmark : int ($sockfd : int);
+
+=head2 sendto
+
+  static method sendto : int ($sockfd : int, $buf : string, $len : int, $flags : int, $addr : Sys::Socket::Sockaddr, $addrlen : int);

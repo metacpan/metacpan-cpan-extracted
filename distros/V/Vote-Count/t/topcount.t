@@ -13,8 +13,7 @@ use Path::Tiny;
 
 use Vote::Count;
 use Vote::Count::ReadBallots;
-
-use Data::Dumper;
+# use Data::Dumper;
 
 my $VC1 = Vote::Count->new( BallotSet => read_ballots('t/data/data2.txt'), );
 

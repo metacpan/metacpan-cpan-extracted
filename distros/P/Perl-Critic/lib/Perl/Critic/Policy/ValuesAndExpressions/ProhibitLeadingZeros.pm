@@ -9,7 +9,7 @@ use Readonly;
 use Perl::Critic::Utils qw{ :characters :severities };
 use base 'Perl::Critic::Policy';
 
-our $VERSION = '1.140';
+our $VERSION = '1.142';
 
 #-----------------------------------------------------------------------------
 
@@ -178,6 +178,13 @@ sub _is_fourth_argument_of_sysopen {
     $previous_token =
         _previous_token_that_isnt_a_parenthesis($previous_token);
     return if not $previous_token;
+
+    # GitHub #789
+    if ( $previous_token->content() eq 'my' ) {
+        $previous_token = _previous_token_that_isnt_a_parenthesis(
+            $previous_token );
+        return if not $previous_token;
+    }
 
     return $previous_token->content() eq 'sysopen';
 }

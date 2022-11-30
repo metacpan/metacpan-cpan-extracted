@@ -183,7 +183,7 @@ const char* const* SPVM_OP_C_ID_NAMES(void) {
     "call_method",
     "field_access",
     "var",
-    "convert",
+    "type_cast",
     "undef",
     "array_length",
     "die",
@@ -1369,11 +1369,11 @@ SPVM_OP* SPVM_OP_build_array_init(SPVM_COMPILER* compiler, SPVM_OP* op_array_ini
         if (element_index == 0) {
           // Convert to any object type
           SPVM_OP* op_stab = SPVM_OP_cut_op(compiler, op_operand_element);
-          SPVM_OP* op_convert = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_TYPE_CAST, op_operand_element->file, op_operand_element->line);
+          SPVM_OP* op_type_cast = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_TYPE_CAST, op_operand_element->file, op_operand_element->line);
           SPVM_OP* op_dist_type = SPVM_OP_new_op_any_object_type(compiler, op_operand_element->file, op_operand_element->line);
-          SPVM_OP_build_convert(compiler, op_convert, op_dist_type, op_operand_element, NULL);
-          SPVM_OP_replace_op(compiler, op_stab, op_convert);
-          op_operand_element = op_convert;
+          SPVM_OP_build_type_cast(compiler, op_type_cast, op_dist_type, op_operand_element, NULL);
+          SPVM_OP_replace_op(compiler, op_stab, op_type_cast);
+          op_operand_element = op_type_cast;
         }
         element_index++;
       }
@@ -1848,15 +1848,15 @@ SPVM_OP* SPVM_OP_build_isweak_field(SPVM_COMPILER* compiler, SPVM_OP* op_isweak,
   return op_assign;
 }
 
-SPVM_OP* SPVM_OP_build_convert(SPVM_COMPILER* compiler, SPVM_OP* op_convert, SPVM_OP* op_type, SPVM_OP* op_operand, SPVM_OP* op_attributes) {
+SPVM_OP* SPVM_OP_build_type_cast(SPVM_COMPILER* compiler, SPVM_OP* op_type_cast, SPVM_OP* op_type, SPVM_OP* op_operand, SPVM_OP* op_attributes) {
   
-  SPVM_OP_insert_child(compiler, op_convert, op_convert->last, op_operand);
-  SPVM_OP_insert_child(compiler, op_convert, op_convert->last, op_type);
+  SPVM_OP_insert_child(compiler, op_type_cast, op_type_cast->last, op_operand);
+  SPVM_OP_insert_child(compiler, op_type_cast, op_type_cast->last, op_type);
   
-  op_convert->file = op_type->file;
-  op_convert->line = op_type->line;
+  op_type_cast->file = op_type->file;
+  op_type_cast->line = op_type->line;
 
-  return op_convert;
+  return op_type_cast;
 }
 
 SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP* op_type, SPVM_OP* op_block, SPVM_OP* op_list_attributes, SPVM_OP* op_extends) {
@@ -2072,7 +2072,7 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
 
         // Getter
         if (class_var->has_getter) {
-          // static method FOO : int () {
+          // static method FOO : TYPE () {
           //   return $FOO;
           // }
 
@@ -2080,7 +2080,20 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
           SPVM_CONSTANT_STRING* method_name_string = SPVM_CONSTANT_STRING_new(compiler, class_var->name + 1, strlen(class_var->name) - 1);
           const char* method_name = method_name_string->value;
           SPVM_OP* op_name_method = SPVM_OP_new_op_name(compiler, method_name, op_decl->file, op_decl->line);
-          SPVM_OP* op_return_type = SPVM_OP_new_op_type(compiler, class_var->type, op_decl->file, op_decl->line);
+
+          // If the type of the class_var is byte or short, the return type becomes int
+          SPVM_TYPE* class_var_type = class_var->type;
+          SPVM_TYPE* return_type;
+          if (SPVM_TYPE_is_byte_type(compiler, class_var_type->basic_type->id, class_var_type->dimension, class_var_type->flag)
+            || SPVM_TYPE_is_short_type(compiler, class_var_type->basic_type->id, class_var_type->dimension, class_var_type->flag))
+          {
+            return_type = SPVM_TYPE_new_int_type(compiler);
+          }
+          else {
+            return_type = class_var->type;
+          }
+          SPVM_OP* op_return_type = SPVM_OP_new_op_type(compiler, return_type, op_decl->file, op_decl->line);
+
           SPVM_OP* op_args = SPVM_OP_new_op_list(compiler, op_decl->file, op_decl->line);
           
           SPVM_OP* op_block = SPVM_OP_new_op_block(compiler, op_decl->file, op_decl->line);
@@ -2102,16 +2115,18 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
 
           op_method->uv.method->is_class_var_getter = 1;
           op_method->uv.method->field_method_original_name = class_var->name;
-          
+          op_method->uv.method->field_method_original_type = class_var->type;
+         
           SPVM_LIST_push(class->methods, op_method->uv.method);
         }
 
         // Setter
         if (class_var->has_setter) {
           
-          // method SET_FOO : void ($foo : int) {
+          // method SET_FOO : void ($foo : TYPE) {
           //   $FOO = $foo;
           // }
+          
           SPVM_OP* op_method = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_METHOD, op_decl->file, op_decl->line);
           char* method_name_tmp = SPVM_ALLOCATOR_alloc_memory_block_permanent(compiler->allocator, 4 + strlen(class_var->name) - 1 + 1);
           memcpy(method_name_tmp, "SET_", 4);
@@ -2124,7 +2139,19 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
           SPVM_OP* op_return_type = SPVM_OP_new_op_void_type(compiler, op_decl->file, op_decl->line);
           SPVM_OP* op_args = SPVM_OP_new_op_list(compiler, op_decl->file, op_decl->line);
 
-          SPVM_OP* op_type_value = SPVM_OP_new_op_type(compiler, class_var->type, op_decl->file, op_decl->line);
+          // If the type of the class_var is byte or short, the arg type becomes int
+          SPVM_TYPE* class_var_type = class_var->type;
+          SPVM_TYPE* arg_type;
+          if (SPVM_TYPE_is_byte_type(compiler, class_var_type->basic_type->id, class_var_type->dimension, class_var_type->flag)
+            || SPVM_TYPE_is_short_type(compiler, class_var_type->basic_type->id, class_var_type->dimension, class_var_type->flag))
+          {
+            arg_type = SPVM_TYPE_new_int_type(compiler);
+          }
+          else {
+            arg_type = class_var->type;
+          }
+          SPVM_OP* op_type_value = SPVM_OP_new_op_type(compiler, arg_type, op_decl->file, op_decl->line);
+
           SPVM_OP* op_var_value_name = SPVM_OP_new_op_name(compiler, class_var->name, op_decl->file, op_decl->line);
           SPVM_OP* op_var_value = SPVM_OP_new_op_var(compiler, op_var_value_name);
           SPVM_OP* op_arg_value = SPVM_OP_build_arg(compiler, op_var_value, op_type_value, NULL, NULL);
@@ -2139,9 +2166,13 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
 
           SPVM_OP* op_var_assign_value_name = SPVM_OP_new_op_name(compiler, class_var->name, op_decl->file, op_decl->line);
           SPVM_OP* op_var_assign_value = SPVM_OP_new_op_var(compiler, op_var_assign_value_name);
-          
+
+          SPVM_OP* op_type_cast = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_TYPE_CAST, op_decl->file, op_decl->line);
+          SPVM_OP* op_type_for_cast = SPVM_OP_new_op_type(compiler, class_var_type, op_decl->file, op_decl->line);
+          SPVM_OP_build_type_cast(compiler, op_type_cast, op_type_for_cast, op_var_assign_value, NULL);
+
           SPVM_OP* op_assign = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, op_decl->file, op_decl->line);
-          SPVM_OP_build_assign(compiler, op_assign, op_class_var_access, op_var_assign_value);
+          SPVM_OP_build_assign(compiler, op_assign, op_class_var_access, op_type_cast);
           
           SPVM_OP_insert_child(compiler, op_statements, op_statements->last, op_assign);
           SPVM_OP_insert_child(compiler, op_block, op_block->last, op_statements);
@@ -2154,6 +2185,7 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
           
           op_method->uv.method->is_class_var_setter = 1;
           op_method->uv.method->field_method_original_name = class_var->name;
+          op_method->uv.method->field_method_original_type = class_var->type;
           
           SPVM_LIST_push(class->methods, op_method->uv.method);
         }
@@ -2169,13 +2201,26 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
         
         // Getter
         if (field->has_getter) {
-          // method foo : int () {
+          // method foo : TYPE () {
           //   return $self->{foo};
           // }
           
           SPVM_OP* op_method = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_METHOD, op_decl->file, op_decl->line);
           SPVM_OP* op_name_method = SPVM_OP_new_op_name(compiler, field->name, op_decl->file, op_decl->line);
-          SPVM_OP* op_return_type = SPVM_OP_new_op_type(compiler, field->type, op_decl->file, op_decl->line);
+
+          // If the type of the field is byte or short, the return type becomes int
+          SPVM_TYPE* field_type = field->type;
+          SPVM_TYPE* return_type;
+          if (SPVM_TYPE_is_byte_type(compiler, field_type->basic_type->id, field_type->dimension, field_type->flag)
+            || SPVM_TYPE_is_short_type(compiler, field_type->basic_type->id, field_type->dimension, field_type->flag))
+          {
+            return_type = SPVM_TYPE_new_int_type(compiler);
+          }
+          else {
+            return_type = field->type;
+          }
+          SPVM_OP* op_return_type = SPVM_OP_new_op_type(compiler, return_type, op_decl->file, op_decl->line);
+
           SPVM_OP* op_args = SPVM_OP_new_op_list(compiler, op_decl->file, op_decl->line);
           
           SPVM_OP* op_block = SPVM_OP_new_op_block(compiler, op_decl->file, op_decl->line);
@@ -2198,13 +2243,14 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
           
           op_method->uv.method->is_field_getter = 1;
           op_method->uv.method->field_method_original_name = field->name;
+          op_method->uv.method->field_method_original_type = field->type;
           
           SPVM_LIST_push(class->methods, op_method->uv.method);
         }
 
         // Setter
         if (field->has_setter) {
-          // method set_foo : void ($foo : int) {
+          // method set_foo : void ($foo : TYPE) {
           //   $self->{foo} = $foo;
           // }
 
@@ -2218,7 +2264,19 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
           SPVM_OP* op_return_type = SPVM_OP_new_op_void_type(compiler, op_decl->file, op_decl->line);
           SPVM_OP* op_args = SPVM_OP_new_op_list(compiler, op_decl->file, op_decl->line);
 
-          SPVM_OP* op_type_value = SPVM_OP_new_op_type(compiler, field->type, op_decl->file, op_decl->line);
+          // If the type of the field is byte or short, the arg type becomes int
+          SPVM_TYPE* field_type = field->type;
+          SPVM_TYPE* arg_type;
+          if (SPVM_TYPE_is_byte_type(compiler, field_type->basic_type->id, field_type->dimension, field_type->flag)
+            || SPVM_TYPE_is_short_type(compiler, field_type->basic_type->id, field_type->dimension, field_type->flag))
+          {
+            arg_type = SPVM_TYPE_new_int_type(compiler);
+          }
+          else {
+            arg_type = field->type;
+          }
+          SPVM_OP* op_type_value = SPVM_OP_new_op_type(compiler, arg_type, op_decl->file, op_decl->line);
+
           SPVM_OP* op_var_value_name = SPVM_OP_new_op_name(compiler, field->name, op_decl->file, op_decl->line);
           SPVM_OP* op_var_value = SPVM_OP_new_op_var(compiler, op_var_value_name);
           SPVM_OP* op_arg_value = SPVM_OP_build_arg(compiler, op_var_value, op_type_value, NULL, NULL);
@@ -2237,8 +2295,12 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
           SPVM_OP* op_var_assign_value_name = SPVM_OP_new_op_name(compiler, field->name, op_decl->file, op_decl->line);
           SPVM_OP* op_var_assign_value = SPVM_OP_new_op_var(compiler, op_var_assign_value_name);
           
+          SPVM_OP* op_type_cast = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_TYPE_CAST, op_decl->file, op_decl->line);
+          SPVM_OP* op_type_for_cast = SPVM_OP_new_op_type(compiler, field_type, op_decl->file, op_decl->line);
+          SPVM_OP_build_type_cast(compiler, op_type_cast, op_type_for_cast, op_var_assign_value, NULL);
+
           SPVM_OP* op_assign = SPVM_OP_new_op(compiler, SPVM_OP_C_ID_ASSIGN, op_decl->file, op_decl->line);
-          SPVM_OP_build_assign(compiler, op_assign, op_field_access, op_var_assign_value);
+          SPVM_OP_build_assign(compiler, op_assign, op_field_access, op_type_cast);
           
           SPVM_OP_insert_child(compiler, op_statements, op_statements->last, op_assign);
           SPVM_OP_insert_child(compiler, op_block, op_block->last, op_statements);
@@ -2247,6 +2309,7 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
           
           op_method->uv.method->is_field_setter = 1;
           op_method->uv.method->field_method_original_name = field->name;
+          op_method->uv.method->field_method_original_type = field->type;
           
           SPVM_LIST_push(class->methods, op_method->uv.method);
         }
@@ -2322,7 +2385,7 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
       SPVM_FIELD* found_field = SPVM_HASH_get(class->field_symtable, field_name, strlen(field_name));
       
       if (found_field) {
-        SPVM_COMPILER_error(compiler, "Redeclaration of the field \"%s\" in the class \"%s\" at %s line %d", field_name, class_name, field->op_field->file, field->op_field->line);
+        SPVM_COMPILER_error(compiler, "Redeclaration of the \"%s\" field in the \"%s\" class at %s line %d", field_name, class_name, field->op_field->file, field->op_field->line);
       }
       else {
         SPVM_HASH_set(class->field_symtable, field_name, strlen(field_name), field);
@@ -2340,7 +2403,7 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
       SPVM_CLASS_VAR* found_class_var = SPVM_HASH_get(class->class_var_symtable, class_var_name, strlen(class_var_name));
       
       if (found_class_var) {
-        SPVM_COMPILER_error(compiler, "Redeclaration of the class variable \"$%s\" in the class \"%s\" at %s line %d", class_var_name + 1, class_name, class_var->op_class_var->file, class_var->op_class_var->line);
+        SPVM_COMPILER_error(compiler, "Redeclaration of the class variable \"$%s\" in the \"%s\" class at %s line %d", class_var_name + 1, class_name, class_var->op_class_var->file, class_var->op_class_var->line);
       }
       else {
         SPVM_HASH_set(class->class_var_symtable, class_var_name, strlen(class_var_name), class_var);
@@ -2419,13 +2482,13 @@ SPVM_OP* SPVM_OP_build_class(SPVM_COMPILER* compiler, SPVM_OP* op_class, SPVM_OP
       SPVM_METHOD* found_method = SPVM_HASH_get(class->method_symtable, method_name, strlen(method_name));
       
       if (found_method) {
-        SPVM_COMPILER_error(compiler, "Redeclaration of the method \"%s\" in the class \"%s\" at %s line %d", method_name, class_name, method->op_method->file, method->op_method->line);
+        SPVM_COMPILER_error(compiler, "Redeclaration of the \"%s\" method in the \"%s\" class at %s line %d", method_name, class_name, method->op_method->file, method->op_method->line);
       }
       // Unknown method
       else {
         const char* found_method_name = SPVM_HASH_get(class->method_symtable, method_name, strlen(method_name));
         if (found_method_name) {
-          SPVM_COMPILER_error(compiler, "Redeclaration of the method \"%s\" at %s line %d", method_name, method->op_method->file, method->op_method->line);
+          SPVM_COMPILER_error(compiler, "Redeclaration of the \"%s\" method at %s line %d", method_name, method->op_method->file, method->op_method->line);
         }
         else {
           // Bind standard functions

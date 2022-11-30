@@ -32,7 +32,18 @@ my $dbic_reqs = {
     },
     pod => {
       title => 'use_moose',
-      desc  => 'Modules required for the use_moose option',
+      desc  => 'Modules required for the use_moose option (without only_autoclean)',
+    },
+  },
+  use_moose_only_autoclean => {
+    req => {
+      'Moose' => '2.1400',
+      'MooseX::NonMoose' => '0.25',
+      'namespace::autoclean' => '0.09',
+    },
+    pod => {
+      title => 'use_moose_only_autoclean',
+      desc  => 'Modules required for the use_moose + only_autoclean options',
     },
   },
 
@@ -981,6 +992,7 @@ sub _gen_pod {
 
   File::Path::mkpath([$dir]);
 
+  # used in example pod
   my $moosever = $class->req_list_for('use_moose')->{'Moose'}
     or die "Hrmm? No Moose dep?";
 

@@ -227,6 +227,7 @@ lib/PDK/Utils/Cache.pm
 lib/PDK/Utils/Date.pm
 lib/PDK/Utils/Ip.pm
 lib/PDK/Utils/Mail.pm
+lib/PDK/Utils/OpenSwitchPort.pm
 lib/PDK/Utils/Set.pm
 lib/PDK/Utils/UserAgent.pm
 tests/device/Asa.t
@@ -239,3 +240,4 @@ tests/device/Srx.t
 tests/device/Topsec.t
 tests/device/connector.t
 tests/device/ios.log
+tests/openPort.t

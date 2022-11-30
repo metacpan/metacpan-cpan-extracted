@@ -1,3 +1,6 @@
+0.03 2022-11-16T00:55:00Z
+    - Added method reset in SQL::Load::Method.
+
 0.02 2022-11-08T00:00:00Z
     - Added method reload to get content directly from the file.
     - Making method _get_tmp return a reference of SQL::Load::Method.

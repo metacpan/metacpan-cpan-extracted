@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::CPANFile 6.028;
+package Dist::Zilla::Plugin::CPANFile 6.029;
 # ABSTRACT: produce a cpanfile prereqs file
 
 use Moose;
@@ -131,7 +131,7 @@ Dist::Zilla::Plugin::CPANFile - produce a cpanfile prereqs file
 
 =head1 VERSION
 
-version 6.028
+version 6.029
 
 =head1 SYNOPSIS
 

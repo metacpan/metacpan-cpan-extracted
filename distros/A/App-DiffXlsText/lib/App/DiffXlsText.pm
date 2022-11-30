@@ -3,9 +3,9 @@ package App::DiffXlsText;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-07'; # DATE
+our $DATE = '2022-09-08'; # DATE
 our $DIST = 'App-DiffXlsText'; # DIST
-our $VERSION = '0.009'; # VERSION
+our $VERSION = '0.011'; # VERSION
 
 1;
 # ABSTRACT: Diff the text of two Office spreadsheets (.ods, .xls, .xlsx) as two directories of CSV files
@@ -22,7 +22,7 @@ App::DiffXlsText - Diff the text of two Office spreadsheets (.ods, .xls, .xlsx) 
 
 =head1 VERSION
 
-This document describes version 0.009 of App::DiffXlsText (from Perl distribution App-DiffXlsText), released on 2022-09-07.
+This document describes version 0.011 of App::DiffXlsText (from Perl distribution App-DiffXlsText), released on 2022-09-08.
 
 =head1 SYNOPSIS
 
@@ -35,6 +35,12 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-DiffXl
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-App-DiffXlsText>.
+
+=head1 SEE ALSO
+
+L<App::DiffDocText>
+
+L<App::DiffPDFText>
 
 =head1 AUTHOR
 

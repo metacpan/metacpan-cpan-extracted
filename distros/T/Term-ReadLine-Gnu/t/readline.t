@@ -1,10 +1,10 @@
 # -*- perl -*-
-#	readline.t - Test script for Term::ReadLine:GNU
+#       readline.t - Test script for Term::ReadLine:GNU
 #
-#	Copyright (c) 1996-2020 Hiroo Hayashi.  All rights reserved.
+#       Copyright (c) 1996-2020 Hiroo Hayashi.  All rights reserved.
 #
-#	This program is free software; you can redistribute it and/or
-#	modify it under the same terms as Perl itself.
+#       This program is free software; you can redistribute it and/or
+#       modify it under the same terms as Perl itself.
 
 # Before `make install' is performed this script should be runnable with
 # `make test'. After `make install' it should work as `perl t/readline.t'
@@ -24,8 +24,8 @@ sub note {
 use warnings 'redefine';
 
 BEGIN {
-    $ENV{PERL_RL} = 'Gnu';	# force to use Term::ReadLine::Gnu
-    $ENV{LC_ALL} = 'C';		# LC_ALL is stronger than LANG
+    $ENV{PERL_RL} = 'Gnu';      # force to use Term::ReadLine::Gnu
+    $ENV{LC_ALL} = 'C';         # LC_ALL is stronger than LANG
 }
 
 # 'define @ARGV' is deprecated
@@ -159,9 +159,9 @@ note "2.4 Readline Convenience Functions";
 ########################################################################
 # define some custom functions
 
-sub reverse_line {		# reverse a whole line
-    my($count, $key) = @_;	# ignored in this sample function
-    
+sub reverse_line {              # reverse a whole line
+    my($count, $key) = @_;      # ignored in this sample function
+
     $t->modifying(0, $a->{end}); # save undo information
     $a->{line_buffer} = reverse $a->{line_buffer};
 }
@@ -179,17 +179,17 @@ sub invert_case_line {
 
     # Force it to be within range.
     if ($end > $a->{end}) {
-	$end = $a->{end};
+        $end = $a->{end};
     } elsif ($end < 0) {
-	$end = 0;
+        $end = 0;
     }
 
     return 0 if $start == $end;
 
     if ($start > $end) {
-	my $temp = $start;
-	$start = $end;
-	$end = $temp;
+        my $temp = $start;
+        $start = $end;
+        $end = $temp;
     }
 
     # Tell readline that we are modifying the line, so it will save
@@ -219,8 +219,8 @@ ok(! defined($t->named_function('reverse-line'))
 ($func, $type) = $t->function_of_keyseq("\ct");
 ok($type == ISFUNC && $t->get_function_name($func) eq 'transpose-chars', 'add_defun, function_of_keyseq');
 
-$t->add_defun('reverse-line',		  \&reverse_line, ord "\ct");
-$t->add_defun('invert-case-line',	  \&invert_case_line);
+$t->add_defun('reverse-line',     \&reverse_line, ord "\ct");
+$t->add_defun('invert-case-line', \&invert_case_line);
 
 ok(defined($t->named_function('reverse-line'))
    && defined($t->named_function('invert-case-line'))
@@ -276,7 +276,7 @@ note "2.4.3 Binding Keys";
 
 # test rl_bind_key[_in_map], rl_bind_key_if_unbound[_in_map]!!!,
 # rl_unbind_key[_in_map] (below), rl_unbind_function_in_map (below), rl_unbind_command_in_map (below),
-# rl_bind_keyseq[_in_map]!!!, rl_set_key, rl_bind_keyseq_if_unbound[_in_map]!!!, 
+# rl_bind_keyseq[_in_map]!!!, rl_set_key, rl_bind_keyseq_if_unbound[_in_map]!!!,
 # rl_generic_bind, rl_parse_and_bind
 
 # define subroutine to use again later
@@ -287,13 +287,13 @@ sub bind_my_function {
     $t->parse_and_bind('"\C-xv": display-readline-version');
     $t->bind_key(ord "c", 'invert-case-line', 'emacs-meta');
     if ($version >= 0x0402) {
-	# rl_set_key in introduced by GRL 4.2
-	$t->set_key("\eo", 'change-ornaments');
+        # rl_set_key in introduced by GRL 4.2
+        $t->set_key("\eo", 'change-ornaments');
     } else {
-	$t->bind_key(ord "o", 'change-ornaments', 'emacs-meta');
+        $t->bind_key(ord "o", 'change-ornaments', 'emacs-meta');
     }
     $t->bind_key(ord "^", 'history-expand-line', 'emacs-meta');
-    
+
     # make an original map
     $helpmap = $t->make_bare_keymap();
     $t->bind_key(ord "f", 'dump-functions', $helpmap);
@@ -301,13 +301,13 @@ sub bind_my_function {
     $t->bind_key(ord "v", 'dump-variables', $helpmap);
     # 'dump-macros' is documented but not defined by GNU Readline 2.1
     $t->generic_bind(ISFUNC, "\e?m", 'dump-macros') if $version > 0x0201;
-    
+
     # bind a macro
     $mymacro = "\ca[insert text from the beginning of line]";
     $t->generic_bind(ISMACR, "\e?i", $mymacro);
 }
 
-bind_my_function;		# do bind
+bind_my_function;               # do bind
 
 {
     my ($fn, $ty);
@@ -325,12 +325,12 @@ sub is_boundp {
     my ($seq, $fname) = @_;
     my ($fn, $type) = $t->function_of_keyseq($seq);
     if ($fn) {
-	return ($t->get_function_name($fn) eq $fname
-		&& $type == ISFUNC);
+        return ($t->get_function_name($fn) eq $fname
+                && $type == ISFUNC);
     } else {
-	warn ("No function is bound for sequence \`", toprint($seq),
-	      "\'.  \`$fname\' is expected,");
-	return 0;
+        warn ("No function is bound for sequence \`", toprint($seq),
+              "\'.  \`$fname\' is expected,");
+        return 0;
     }
 }
 
@@ -360,7 +360,7 @@ ok(is_boundp("a", 'self-insert') && is_boundp("b", 'self-insert'), 'bind_key');
 # test rl_unbind_key (rl_unbind_key_in_map),
 #      rl_unbind_command (rl_unbind_command_in_map),
 #      rl_unbind_function (rl_unbind_function_in_map)
-$t->unbind_key(ord "\ct");	# reverse-line
+$t->unbind_key(ord "\ct");      # reverse-line
 $t->unbind_key(ord "f", $helpmap); # dump-function
 $t->unbind_key(ord "v", 'emacs-ctlx'); # display-readline-version
 if ($version > 0x0201) {
@@ -372,9 +372,9 @@ if ($version > 0x0201) {
 }
 
 my @keyseqs = ($t->invoking_keyseqs('reverse-line'),
-	       $t->invoking_keyseqs('dump-functions'),
-	       $t->invoking_keyseqs('display-readline-version'),
-	       $t->invoking_keyseqs('dump-variables'));
+               $t->invoking_keyseqs('dump-functions'),
+               $t->invoking_keyseqs('display-readline-version'),
+               $t->invoking_keyseqs('dump-variables'));
 ok(scalar @keyseqs == 0, "unbind_key\t[@keyseqs]");
 
 SKIP: {
@@ -388,13 +388,13 @@ SKIP: {
 ########################################################################
 note "2.4.4 Associating Function Names and Bindings";
 
-bind_my_function;		# do bind
+bind_my_function;               # do bind
 
 # rl_named_function, get_function_name, rl_function_of_keyseq,
 # rl_invoking_keyseqs[_in_map]
 # rl_function_dumper!!!, rl_list_funmap_names!!!, rl_funmap_names!!!
 # rl_add_funmap_entry (above)
-    
+
 # test rl_invoking_keyseqs
 @keyseqs = $t->invoking_keyseqs('abort', 'emacs-ctlx');
 ok("\\C-g" eq "@keyseqs", 'invoking_keyseqs');
@@ -463,7 +463,11 @@ note "2.4.12 Alternate Interface";
 ########################################################################
 note "2.5 Readline Signal Handling";
 ok($a->{catch_signals} == 1, 'catch_signals');
-ok($a->{catch_sigwinch} == 1, 'catch_sigwinch');
+if ($^O eq 'MSWin32') {
+    ok($a->{catch_sigwinch} == 0, 'catch_sigwinch');
+} else {
+    ok($a->{catch_sigwinch} == 1, 'catch_sigwinch');
+}
 ok($a->{persistent_signal_handlers} == 0, 'persistent_signal_handlers');
 ok($a->{change_environment} == 1, 'change_environment');
 
@@ -545,12 +549,12 @@ my ($INSTR, $line);
 # simulate key input by using a variable 'rl_getc_function'
 $a->{getc_function} = sub {
     unless (length $INSTR) {
-	print $OUT "Error: getc_function: insufficient string, \`\$INSTR\'.";
-	undef $a->{getc_function};
-	return 0;
+        print $OUT "Error: getc_function: insufficient string, \`\$INSTR\'.";
+        undef $a->{getc_function};
+        return 0;
     }
     my $c  = substr $INSTR, 0, 1; # the first char of $INSTR
-    $INSTR = substr $INSTR, 1;	# rest of $INSTR
+    $INSTR = substr $INSTR, 1;  # rest of $INSTR
     return ord $c;
 };
 
@@ -562,23 +566,23 @@ $a->{input_available_hook} = sub {
 # convert control charactors to printable charactors (ex. "\cx" -> '\C-x')
 sub toprint {
     join('',
-	 map{$_ eq "\e" ? '\M-': ord($_)<32 ? '\C-'.lc(chr(ord($_)+64)) : $_}
-	 (split('', $_[0])));
+         map{$_ eq "\e" ? '\M-': ord($_)<32 ? '\C-'.lc(chr(ord($_)+64)) : $_}
+         (split('', $_[0])));
 }
 
 sub check_default_keybind_and_fix {
     my ($seq, $fname) = @_;
     if (is_boundp($seq, $fname)) {
-	ok(1, "  $fname was bound to " . toprint($seq));
+        ok(1, "  $fname was bound to " . toprint($seq));
     } else {
-	# Try to fix the binding.  But tty setting seems have precedence.
-	$t->set_key($seq, $fname);
-	if (is_boundp($seq, $fname)) {
-	    # The default keybinding for $fname was changed. Fixed.
-	    ok(1, "  $fname is now bound to " . toprint($seq));
-	} else {
-	    ok(0, "  $fname cannot be bound to " . toprint($seq));
-	}
+        # Try to fix the binding.  But tty setting seems have precedence.
+        $t->set_key($seq, $fname);
+        if (is_boundp($seq, $fname)) {
+            # The default keybinding for $fname was changed. Fixed.
+            ok(1, "  $fname is now bound to " . toprint($seq));
+        } else {
+            ok(0, "  $fname cannot be bound to " . toprint($seq));
+        }
     }
 }
 note "check_default_keybind_and_fix";
@@ -600,9 +604,9 @@ ok($line eq 'abcdefgh', "self insert\t[$line]");
 $INSTR = "\cAe\cFf\cBg\cEh\cH ij kl\eb\ebm\cDn\cM";
 $line = $t->readline("cursor move> ", 'abcd'); # default string
 SKIP: {
-    # skip on CPAN Testers test. 
-    skip "This 'cursor move' test fails on an active tester's environment, but we could not solve the issue.", 1 
-	if $ENV{AUTOMATED_TESTING} || defined $ENV{PERL_CPAN_REPORTER_CONFIG};
+    # skip on CPAN Testers test.
+    skip "This 'cursor move' test fails on an active tester's environment, but we could not solve the issue.", 1
+        if $ENV{AUTOMATED_TESTING} || defined $ENV{PERL_CPAN_REPORTER_CONFIG};
     ok($line eq 'eagfbcd mnj kl', "cursor move\t[$line]");
 }
 
@@ -626,9 +630,9 @@ ok($line eq '', "ornaments\t[$line]");
 
 # test operate_and_get_next
 $INSTR = "one\cMtwo\cMthree\cM\cP\cP\cP\cO\cO\cO\cM";
-$line = $t->readline("> ");	# one
-$line = $t->readline("> ");	# two
-$line = $t->readline("> ");	# three
+$line = $t->readline("> ");     # one
+$line = $t->readline("> ");     # two
+$line = $t->readline("> ");     # three
 $line = $t->readline("> ");
 ok($line eq 'one', "operate_and_get_next 1\t[$line]");
 $line = $t->readline("> ");
@@ -641,7 +645,7 @@ ok($line eq 'one', "operate_and_get_next 4\t[$line]");
 ########################################################################
 note "test history expansion";
 
-$t->ornaments(0);		# ornaments off
+$t->ornaments(0);               # ornaments off
 
 #print $OUT "\n# history expansion test\n# quit by EOF (\\C-d)\n";
 $a->{do_expand} = 1;
@@ -657,7 +661,7 @@ $INSTR = "!1\cM";
 $line = $t->readline(prompt);
 ok($line eq 'abcdefgh', "history 1\t[$line]");
 
-$INSTR = "123\cM";		# too short
+$INSTR = "123\cM";              # too short
 $line = $t->readline(prompt);
 $INSTR = "!!\cM";
 $line = $t->readline(prompt);
@@ -700,7 +704,7 @@ if ($line eq "${user} ") {
 } elsif ($line eq ${user}) {
     ok(1, 'username completion');
     diag "It seems that there is no user whose name is '${user}' or there is a user whose name starts with '${user}'";
-} else { 
+} else {
     ok(0, "username completion\t[$line]"); # something wrong...
 }
 
@@ -745,9 +749,9 @@ sub sample_completion {
     my ($text, $line, $start, $end) = @_;
     # If first word then username completion, else filename completion
     if (substr($line, 0, $start) =~ /^\s*$/) {
-	return $t->completion_matches($text, $a->{'list_completion_function'});
+        return $t->completion_matches($text, $a->{'list_completion_function'});
     } else {
-	return ();
+        return ();
     }
 }
 
@@ -771,22 +775,22 @@ undef $a->{ignore_some_completions_function};
 
 # char_is_quoted, filename_quoting_function, filename_dequoting_function
 
-sub char_is_quoted ($$) {	# borrowed from bash-2.03:subst.c
+sub char_is_quoted ($$) {       # borrowed from bash-2.03:subst.c
     my ($string, $eindex) = @_;
     my ($i, $pass_next);
 
     for ($i = $pass_next = 0; $i <= $eindex; $i++) {
-	my $c = substr($string, $i, 1);
-	if ($pass_next) {
-	    $pass_next = 0;
-	    return 1 if ($i >= $eindex); # XXX was if (i >= eindex - 1)
-	} elsif ($c eq '\'') {
-	    $i = index($string, '\'', ++$i);
-	    return 1 if ($i == -1 || $i >= $eindex);
-#	} elsif ($c eq '"') {	# ignore double quote
-	} elsif ($c eq '\\') {
-	    $pass_next = 1;
-	}
+        my $c = substr($string, $i, 1);
+        if ($pass_next) {
+            $pass_next = 0;
+            return 1 if ($i >= $eindex); # XXX was if (i >= eindex - 1)
+        } elsif ($c eq '\'') {
+            $i = index($string, '\'', ++$i);
+            return 1 if ($i == -1 || $i >= $eindex);
+#       } elsif ($c eq '"') {   # ignore double quote
+        } elsif ($c eq '\\') {
+            $pass_next = 1;
+        }
     }
     return 0;
 }
@@ -822,11 +826,11 @@ undef $a->{filename_dequoting_function};
 
 # directory_completion_hook
 $a->{directory_completion_hook} = sub {
-    if ($_[0] eq 'comp/') {	# simple alias function
-	$_[0] = 't/comptest/';
-	return 1;
+    if ($_[0] eq 'comp/') {     # simple alias function
+        $_[0] = 't/comptest/';
+        return 1;
     } else {
-	return 0;
+        return 0;
     }
 };
 
@@ -893,10 +897,10 @@ SKIP: {
     skip "GNU Readline Library is older than 4.0.", 1 unless ($version >= 0x0400);
     # See 'eg/perlsh' for better example
     $a->{completion_display_matches_hook} = sub  {
-	my($matches, $num_matches, $max_length) = @_;
-	map { $_ = uc $_; }(@{$matches});
-	$t->display_match_list($matches);
-	$t->forced_update_display;
+        my($matches, $num_matches, $max_length) = @_;
+        map { $_ = uc $_; }(@{$matches});
+        $t->display_match_list($matches);
+        $t->forced_update_display;
     };
     $t->parse_and_bind('set bell-style none'); # make readline quiet
     $INSTR = "Gnu.\cI\cI\cM";
@@ -913,7 +917,7 @@ $INSTR = "\cM\cM\cM\cM\cM\cM\cM";
 print $OUT "# ornaments test\n";
 print $OUT "# Note: Some function may not work on your terminal.\n";
 # Kterm seems to have a bug with 'ue' (End underlining) does not work\n";
-$t->ornaments(1);	# equivalent to 'us,ue,md,me'
+$t->ornaments(1);       # equivalent to 'us,ue,md,me'
 print $OUT "\n" unless defined $t->readline("default ornaments (underline)>");
 # cf. man termcap(5)
 $t->ornaments('so,me,,');
@@ -940,7 +944,7 @@ note "end of non-interactive test";
 unless ($verbose) {
     # Be quiet during CPAN Testers testing.
     diag "Try \`$^X -Mblib t/readline.t verbose\', if you will.\n"
-	if (!$ENV{AUTOMATED_TESTING});
+        if (!$ENV{AUTOMATED_TESTING});
     exit 0;
 }
 undef $a->{getc_function};
@@ -973,11 +977,11 @@ undef $a->{input_available_hook};
 ########################################################################
 # test event_hook
 
-my $timer = 20;			# 20 x 0.1 = 2.0 sec timer
+my $timer = 20;                 # 20 x 0.1 = 2.0 sec timer
 $a->{event_hook} = sub {
     if ($timer-- < 0) {
-	$a->{done} = 1;
-	undef $a->{event_hook};
+        $a->{done} = 1;
+        undef $a->{event_hook};
     }
 };
 $line = $t->readline("input in 2 seconds> ");
@@ -989,8 +993,8 @@ my %TYPE = (0 => 'Function', 1 => 'Keymap', 2 => 'Macro');
 
 print $OUT "\n# Try the following commands.\n";
 foreach ("\co", "\ct", "\cx",
-	 "\cx\cv", "\cxv", "\ec", "\e^",
-	 "\e?f", "\e?v", "\e?m", "\e?i", "\eo") {
+         "\cx\cv", "\cxv", "\ec", "\e^",
+         "\e?f", "\e?v", "\e?m", "\e?i", "\eo") {
     my ($p, $type) = $t->function_of_keyseq($_);
     printf $OUT "%-9s: ", toprint($_);
     (print "\n", next) unless defined $type;

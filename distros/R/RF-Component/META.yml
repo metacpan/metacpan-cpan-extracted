@@ -19,12 +19,12 @@ no_index:
     - t
     - inc
 requires:
-  PDL::IO::MDIF: '1.011'
-  PDL::IO::Touchstone: '1.011'
+  PDL::IO::MDIF: '1.013'
+  PDL::IO::Touchstone: '1.013'
   perl: '5.010'
 resources:
   bugtracker: https://github.com/KJ7LNW/perl-RF-Component/issues
   homepage: https://github.com/KJ7LNW/perl-RF-Component
   repository: https://github.com/KJ7LNW/perl-RF-Component.git
-version: '1.005'
+version: '1.006'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

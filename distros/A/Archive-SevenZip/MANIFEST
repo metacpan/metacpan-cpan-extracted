@@ -14,6 +14,7 @@ META.yml
 README
 README.mkdn
 sysdeps.yml
+t/00-load.t
 t/01-constructor.t
 t/01-identity-7z.t
 t/01-identity.t
@@ -21,6 +22,7 @@ t/02-add-scalar.t
 t/02-env.t
 t/02_main.t
 t/03-archive-from-stdin.t
+t/04-add-with-rename.t
 t/05_tree.t
 t/20_bug_github11.t
 t/21_zip64.t

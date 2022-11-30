@@ -73,4 +73,34 @@ use Metrics::Any::Adapter 'localTestAdapter';
    ], 'metrics to ->walk' );
 }
 
+# batch mode is supported
+{
+   Metrics::Any::Adapter->adapter->clear_values;
+
+   my $called;
+
+   my $batch_ok = $metrics->add_batch_mode_callback( sub {
+      $called++;
+      $metrics->inc_counter_by( counter => 100 );
+      $metrics->set_gauge_to( gauge => 25 );
+   } );
+   ok( $batch_ok, 'Stored adapter supports batch mode' );
+
+   ok( !$called, 'Batch mode callback not yet invoked' );
+
+   my @walkdata;
+   Metrics::Any::Adapter->adapter->walk( sub {
+      my ( $type, $name, $labels, $value ) = @_;
+      push @walkdata, [ $type, $name, $labels, $value ];
+   } );
+
+   is_deeply( \@walkdata, [
+      [ counter => counter => [], 100 ],
+
+      [ gauge => gauge => [], 25 ],
+   ], 'metrics to ->walk contained batch-reported values' );
+
+   ok( $called, 'Batch mode callback invoked by ->walk' );
+}
+
 done_testing;

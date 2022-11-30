@@ -1,4 +1,4 @@
-#fsdb name id test1 percentile
+#fsdb name id test1 percentile:d
 d	4	90	1
 f	6	90	1
 a	1	80	0.66667

@@ -1,5 +1,13 @@
 Revision history for Perl extension Promise::XS:
 
+0.18
+- all() now accepts non-promise values (as Promises.pm does)
+  Thank you, @AnaTofuZ!
+- Async/await is no longer considered experimental.
+- Prevent DEBUGGING perls from running problematic Future::AsyncAwait test.
+  (Fixes CPAN smokers.) Warning added in docs.
+- Fix t/async_await__several_awaits.t’s Mojo test.
+
 0.17 Mon 15 Aug 2022
 - Support Future::AsyncAwait’s top-level await.
 - Internal: Use Easy XS.

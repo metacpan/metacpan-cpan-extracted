@@ -97,6 +97,18 @@ You may want to check out Aspose free [Powerpoint to PDF](https://products.aspos
 * Added **None** to the list of allowed values for **TimeUnitType** enum type.
 * **Level** property of **Category** class is deprecated and will be removed after v22.4.
 
+## Enhancements in Version 22.11
+
+* You can now specify data sources for chart elements. This is done with new **DataSource** type which is use with propertries **Chart.DataSourceForCategories**, **Series.DataSourceForName**, **OneValueSeries.DataSourceForValues**, **XYSeries.DataSourceForXValues**, **XYSeries.DataSourceForYValues**, **BubbleSeries.DataSourceForBubbleSizeValues**.
+* You can now specify formulas for data points using new properties **OneValueChartDataPoint.ValueFormula**, **ScatterChartDataPoint.XValueFormula**, **ScatterChartDataPoint.YValueFormula**, **BubbleChartDataPoint.BubbleSizeFormula**.
+* Added boolean **UseFrameSize** and **UseFrameRotation** properties to **SvgExportOptions** class.
+
+## Enhancements in Version 22.10
+
+* Added new **GetSlideShowProperties** and  **SetSlideShowProperties** methods to get & set slideshow properties.
+* Methods that work with shapes, paragraphs and portions now have an optional **subShape** parameter which can be used to access subshapes (SmartArt elements, grouped shapes). Separate methods for subshapes (**GetSubshapeParagraphs**, **CreateSubshape**, **AlignSubshapes** etc.) have been removed.
+* Added boolean **RepeatUntilEndSlide** and **RepeatUntilNextClick** properties to **Effect** class.
+
 ## Enhancements in Version 22.1
 * New **MathParagraph** property of **Portion** class allows to get and set math formulas. A set of **MathElement** subclasses allows to specify complex mathematical expressions.
 * New **DownloadPortionAsMathMl** and **SavePortionAsMathMl** methods allow to export math formulas to MathML format.

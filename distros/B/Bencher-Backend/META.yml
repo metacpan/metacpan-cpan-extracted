@@ -11,7 +11,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.028, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -20,79 +20,79 @@ name: Bencher-Backend
 provides:
   Bencher::Backend:
     file: lib/Bencher/Backend.pm
-    version: '1.061'
+    version: '1.062'
   Bencher::Formatter:
     file: lib/Bencher/Formatter.pm
-    version: '1.061'
+    version: '1.062'
   Bencher::Formatter::AddComparisonFields:
     file: lib/Bencher/Formatter/AddComparisonFields.pm
-    version: '1.061'
+    version: '1.062'
   Bencher::Formatter::CodeStartup:
     file: lib/Bencher/Formatter/CodeStartup.pm
-    version: '1.061'
+    version: '1.062'
   Bencher::Formatter::DeleteConstantFields:
     file: lib/Bencher/Formatter/DeleteConstantFields.pm
-    version: '1.061'
+    version: '1.062'
   Bencher::Formatter::DeleteNotesFieldIfEmpty:
     file: lib/Bencher/Formatter/DeleteNotesFieldIfEmpty.pm
-    version: '1.061'
+    version: '1.062'
   Bencher::Formatter::DeleteSeqField:
     file: lib/Bencher/Formatter/DeleteSeqField.pm
-    version: '1.061'
+    version: '1.062'
   Bencher::Formatter::ModuleStartup:
     file: lib/Bencher/Formatter/ModuleStartup.pm
-    version: '1.061'
+    version: '1.062'
   Bencher::Formatter::RenderAsBenchmarkPm:
     file: lib/Bencher/Formatter/RenderAsBenchmarkPm.pm
-    version: '1.061'
+    version: '1.062'
   Bencher::Formatter::RenderAsTextTable:
     file: lib/Bencher/Formatter/RenderAsTextTable.pm
-    version: '1.061'
+    version: '1.062'
   Bencher::Formatter::RoundNumbers:
     file: lib/Bencher/Formatter/RoundNumbers.pm
-    version: '1.061'
+    version: '1.062'
   Bencher::Formatter::ScaleRate:
     file: lib/Bencher/Formatter/ScaleRate.pm
-    version: '1.061'
+    version: '1.062'
   Bencher::Formatter::ScaleSize:
     file: lib/Bencher/Formatter/ScaleSize.pm
-    version: '1.061'
+    version: '1.062'
   Bencher::Formatter::ScaleTime:
     file: lib/Bencher/Formatter/ScaleTime.pm
-    version: '1.061'
+    version: '1.062'
   Bencher::Formatter::ShowEnv:
     file: lib/Bencher/Formatter/ShowEnv.pm
-    version: '1.061'
+    version: '1.062'
   Bencher::Formatter::Sort:
     file: lib/Bencher/Formatter/Sort.pm
-    version: '1.061'
+    version: '1.062'
   Bencher::Role::FieldMunger:
     file: lib/Bencher/Role/FieldMunger.pm
-    version: '1.061'
+    version: '1.062'
   Bencher::Role::ResultMunger:
     file: lib/Bencher/Role/ResultMunger.pm
-    version: '1.061'
+    version: '1.062'
   Bencher::Role::ResultRenderer:
     file: lib/Bencher/Role/ResultRenderer.pm
-    version: '1.061'
+    version: '1.062'
   Bencher::Scenario::Example:
     file: lib/Bencher/Scenario/Example.pm
-    version: '1.061'
+    version: '1.062'
   Bencher::Scenario::Example::CmdLineTemplate:
     file: lib/Bencher/Scenario/Example/CmdLineTemplate.pm
-    version: '1.061'
+    version: '1.062'
   Bencher::Scenario::Example::CommandNotFound:
     file: lib/Bencher/Scenario/Example/CommandNotFound.pm
-    version: '1.061'
+    version: '1.062'
   Bencher::Scenario::Example::MultipleArgValues::Array:
     file: lib/Bencher/Scenario/Example/MultipleArgValues/Array.pm
-    version: '1.061'
+    version: '1.062'
   Bencher::Scenario::Example::MultipleArgValues::Hash:
     file: lib/Bencher/Scenario/Example/MultipleArgValues/Hash.pm
-    version: '1.061'
+    version: '1.062'
   Benchmark::Dumb::SimpleTime:
     file: lib/Benchmark/Dumb/SimpleTime.pm
-    version: '1.061'
+    version: '1.062'
 recommends:
   App::perlbrew: '0'
 requires:
@@ -105,9 +105,9 @@ requires:
   Complete::Util: '0.608'
   Data::Clean::ForJSON: '0'
   Data::Clone: '0'
-  Data::Dmp: '0.241'
+  Data::Dmp: '0.242'
   Data::Dump: '0'
-  Data::TableData::Object::aohos: '0.114'
+  Data::TableData::Object::aohos: '0.116'
   Devel::Platform::Info: '0'
   Devel::Size: '0'
   Exporter: '5.57'
@@ -127,7 +127,7 @@ requires:
   Module::XSOrPP: '0'
   PERLANCAR::Module::List: '0.004004'
   POSIX: '0'
-  Perinci::Result::Format::Lite: '0.285'
+  Perinci::Result::Format::Lite: '0.286'
   Permute::Named::Iter: '0'
   Proc::ChildError: '0'
   Role::Tiny: '0'
@@ -147,7 +147,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher-Backend
   homepage: https://metacpan.org/release/Bencher-Backend
   repository: git://github.com/perlancar/perl-Bencher-Backend.git
-version: '1.061'
+version: '1.062'
 x_Dist_Zilla:
   perl:
     version: '5.034000'
@@ -168,62 +168,62 @@ x_Dist_Zilla:
           prune_directory: []
           root: .
       name: '@Filter/@Filter/GatherDir'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@Filter/@Filter/PruneCruft'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Filter/@Filter/ManifestSkip'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Filter/@Filter/MetaYAML'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::License
       name: '@Filter/@Filter/License'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::PodCoverageTests
       name: '@Filter/@Filter/PodCoverageTests'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Filter/@Filter/PodSyntaxTests'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: '@Filter/@Filter/ExtraTests'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Filter/@Filter/ExecDir'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@Filter/@Filter/ShareDir'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
           default_jobs: 1
       name: '@Filter/@Filter/MakeMaker'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Filter/@Filter/Manifest'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Filter/@Filter/ConfirmRelease'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Filter/ExecDir script'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::BeforeBuild
       name: '@Filter/PERLANCAR::BeforeBuild'
@@ -238,8 +238,12 @@ x_Dist_Zilla:
       version: '0.02'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::EnsurePrereqToSpec
+      config:
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000037'
+          version: '0.006'
       name: '@Filter/PERLANCAR::EnsurePrereqToSpec'
-      version: '0.062'
+      version: '0.064'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
       name: '@Filter/PERLANCAR::MetaResources'
@@ -285,11 +289,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Filter/MetaJSON'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Filter/MetaConfig'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::MetaProvides::Package
       config:
@@ -298,7 +302,7 @@ x_Dist_Zilla:
             -
               class: Dist::Zilla::Plugin::FinderCode
               name: '@Filter/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-              version: '6.024'
+              version: '6.028'
           include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
           $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
@@ -421,7 +425,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::PERLANCAR::Contributing
               name: '@Author::PERLANCAR/PERLANCAR/Contributing'
-              version: '0.292'
+              version: '0.293'
             -
               class: Pod::Weaver::Section::Legal
               name: '@Author::PERLANCAR/Legal'
@@ -429,7 +433,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Rinci
               name: '@Author::PERLANCAR/Rinci'
-              version: '0.780'
+              version: '0.784'
             -
               class: Pod::Weaver::Plugin::AppendPrepend
               name: '@Author::PERLANCAR/AppendPrepend'
@@ -449,13 +453,13 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::Sah::Schemas
               name: -Sah::Schemas
-              version: '0.063'
+              version: '0.072'
       name: '@Filter/PodWeaver'
       version: '4.008'
     -
       class: Dist::Zilla::Plugin::PruneFiles
       name: '@Filter/PruneFiles'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::Pod2Readme
       name: '@Filter/Pod2Readme'
@@ -535,7 +539,7 @@ x_Dist_Zilla:
           phase: test
           type: requires
       name: TestRequires
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -543,7 +547,7 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::OSPrereqs
       config:
@@ -558,7 +562,7 @@ x_Dist_Zilla:
           phase: runtime
           type: recommends
       name: RuntimeRecommends
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -566,7 +570,7 @@ x_Dist_Zilla:
           phase: develop
           type: x_spec
       name: DevelopX_spec
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::Acme::CPANModules::Whitelist
       name: Acme::CPANModules::Whitelist
@@ -574,52 +578,52 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.024'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: '@Filter/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-      version: '6.024'
+      version: '6.028'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '6.024'
+    version: '6.028'
 x_authority: cpan:PERLANCAR
 x_generated_by_perl: v5.34.0
 x_serialization_backend: 'YAML::Tiny version 1.73'

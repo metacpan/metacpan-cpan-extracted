@@ -18,8 +18,11 @@ use HTML::Blitz::Atom qw(
 use Carp qw(croak);
 
 use constant {
+    _REPR_VERSION     => 0,
     MAX_NESTED_CONCAT => 100,
 };
+
+our $VERSION = '0.01';
 
 method new($class: :$_scope = 0) {
     bless {
@@ -28,6 +31,53 @@ method new($class: :$_scope = 0) {
             { type => OP_RAW, str => '' },
         ],
     }, $class
+}
+
+method FREEZE($model) {
+    my @todo = [$self, \my @code];
+    while (@todo) {
+        my ($object, $target) = @{pop @todo};
+        @$target = @{$object->{code}};
+        for my $op (@$target) {
+            if ($op->{type} eq OP_LOOP || $op->{type} eq OP_COND) {
+                my $body = $op->{body};
+                push @todo, [$body, my $ref = []];
+                $op = { %$op, body => [$body->{depth}, $ref] };
+                if ($model eq 'JSON' && $op->{type} eq OP_COND) {
+                    $op->{names} = [map ref($_->[1]) eq 'SCALAR' ? [$_->[0], [${$_->[1]}]] : $_, @{$op->{names}}];
+                }
+            }
+        }
+    }
+    _REPR_VERSION, [$self->{depth}, \@code]
+}
+
+method THAW($class: $model, $repr_version, $components) {
+    $repr_version <= _REPR_VERSION
+        or croak "Cannot deserialize data format $repr_version with $class v$VERSION, which only supports data format " . _REPR_VERSION;
+    my @todo = ['init', \my $self, @$components];
+    while (@todo) {
+        my ($type, $ref, $depth, $code) = @{pop @todo};
+        if ($type eq 'exit') {
+            my $obj = $class->new(_scope => $depth);
+            $obj->{code} = $code;
+            $$ref = $obj;
+            next;
+        }
+        $type eq 'init'
+            or die "Internal error: bad THAW stack type '$type'";
+        push @todo, ['exit', $ref, $depth, $code];
+        for my $op (@$code) {
+            if ($op->{type} eq OP_LOOP || $op->{type} eq OP_COND) {
+                if ($model eq 'JSON' && $op->{type} eq OP_COND) {
+                    $op->{names} = [map ref($_->[1]) eq 'ARRAY' ? [$_->[0], \$_->[1][0]] : $_, @{$op->{names}}];
+                }
+                my $body = $op->{body};
+                push @todo, ['init', \$op->{body}, $body->[0], $body->[1]];
+            }
+        }
+    }
+    $self
 }
 
 method scope() {

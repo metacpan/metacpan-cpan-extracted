@@ -1,4 +1,4 @@
-package Dist::Zilla 6.028;
+package Dist::Zilla 6.029;
 # ABSTRACT: distribution builder; installer not included!
 
 use Moose 0.92; # role composition fixes
@@ -40,7 +40,7 @@ use namespace::autoclean;
 #pod make much more ludicrous demands in terms of prerequisites.
 #pod
 #pod If you have access to the web, you can learn more and find an interactive
-#pod tutorial at B<L<dzil.org|http://dzil.org/>>.  If not, try
+#pod tutorial at B<L<dzil.org|https://dzil.org/>>.  If not, try
 #pod L<Dist::Zilla::Tutorial>.
 #pod
 #pod =cut
@@ -835,12 +835,8 @@ __PACKAGE__->meta->make_immutable;
 #pod There are usually people on C<irc.perl.org> in C<#distzilla>, even if they're
 #pod idling.
 #pod
-#pod The L<Dist::Zilla website|http://dzil.org/> has several valuable resources for
+#pod The L<Dist::Zilla website|https://dzil.org/> has several valuable resources for
 #pod learning to use Dist::Zilla.
-#pod
-#pod There is a mailing list to discuss Dist::Zilla.  You can L<join the
-#pod list|http://www.listbox.com/subscribe/?list_id=139292> or L<browse the
-#pod archives|http://listbox.com/member/archive/139292>.
 #pod
 #pod =head1 SEE ALSO
 #pod
@@ -900,7 +896,7 @@ Dist::Zilla - distribution builder; installer not included!
 
 =head1 VERSION
 
-version 6.028
+version 6.029
 
 =head1 DESCRIPTION
 
@@ -913,7 +909,7 @@ published, released code, it can do much more than those tools, and is free to
 make much more ludicrous demands in terms of prerequisites.
 
 If you have access to the web, you can learn more and find an interactive
-tutorial at B<L<dzil.org|http://dzil.org/>>.  If not, try
+tutorial at B<L<dzil.org|https://dzil.org/>>.  If not, try
 L<Dist::Zilla::Tutorial>.
 
 =head1 PERL VERSION
@@ -1125,12 +1121,8 @@ It is nasty, brutish, and large.
 There are usually people on C<irc.perl.org> in C<#distzilla>, even if they're
 idling.
 
-The L<Dist::Zilla website|http://dzil.org/> has several valuable resources for
+The L<Dist::Zilla website|https://dzil.org/> has several valuable resources for
 learning to use Dist::Zilla.
-
-There is a mailing list to discuss Dist::Zilla.  You can L<join the
-list|http://www.listbox.com/subscribe/?list_id=139292> or L<browse the
-archives|http://listbox.com/member/archive/139292>.
 
 =head1 SEE ALSO
 
@@ -1184,7 +1176,7 @@ Ricardo SIGNES 😏 <cpan@semiotic.systems>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Ævar Arnfjörð Bjarmason Alastair McGowan-Douglas Alceu Rodrigues de Freitas Junior Alexei Znamensky Alex Vandiver ambs Andrew Rodland Andy Jack Apocalypse ben hengst Bernardo Rechea Brian Fraser Caleb Cushing Chase Whitener Chisel Christian Walde Christopher Bottoms J. Madsen Chris Weyl Cory G Watson csjewell Curtis Brandt Dagfinn Ilmari Mannsåker Damien KRotkine Dan Book Daniel Böhmer Danijel Tasov Dave Lambley O'Neill Rolsky David E. Wheeler Golden H. Adler Steinbrunner Zurborg Davor Cubranic Dimitar Petrov Doug Bell Erik Carlsson Fayland Lam Felix Ostmann Florian Ragwitz Fred Moyer fREW Schmidt gardnerm Gianni Ceccarelli Graham Barr Knop Ollis Grzegorz Rożniecki Håkon Hægland Hans Dieter Pearcey Hunter McMillen Ivan Bessarabov Jakob Voss jantore Jérôme Quelin Jesse Luehrs Vincent JJ Merelo John Napiorkowski jonasbn Jonathan C. Otsuka Rockway Scott Duff Yu Karen Etheridge Kent Fredric Leon Timmermans Lucas Theisen Luc St-Louis Marcel Gruenauer Martin McGrath Mary Ehlers Mateu X Matthew Horsfall mauke Michael Conrad G. Schwern Jemmeson Mickey Nasriachi Mike Doherty Mohammad S Anwar Moritz Onken Neil Bowers Nickolay Platonov Nick Tonkin nperez Olivier Mengué Paul Cochrane Pedro Melo perlancar (@pc-office) Philippe Bruhat (BooK) raf Randy Stauner Ricardo Signes robertkrimen Rob Hoelz Robin Smidsrød Roy Ivy III Shawn M Moore Shlomi Fish Smylers Steffen Schwigon Steven Haryanto Tatsuhiko Miyagawa Upasana Shukla Van Bugger Vyacheslav Matjukhin Yanick Champoux Yuval Kogman
+=for stopwords Ævar Arnfjörð Bjarmason Alastair McGowan-Douglas Alceu Rodrigues de Freitas Junior Alexei Znamensky Alex Vandiver ambs Andrew Rodland Andy Jack Apocalypse ben hengst Bernardo Rechea Branislav Zahradník Brian Fraser Caleb Cushing Chase Whitener Chisel Christian Walde Christopher Bottoms J. Madsen Chris Weyl Cory G Watson csjewell Curtis Brandt Dagfinn Ilmari Mannsåker Damien KRotkine Dan Book Daniel Böhmer Danijel Tasov Dave Lambley O'Neill Rolsky David E. Wheeler Golden H. Adler Steinbrunner Zurborg Davor Cubranic Dimitar Petrov Doug Bell Elvin Aslanov Erik Carlsson Fayland Lam Felix Ostmann Florian Ragwitz Fred Moyer fREW Schmidt gardnerm Gianni Ceccarelli Graham Barr Knop Ollis Grzegorz Rożniecki Håkon Hægland Hans Dieter Pearcey Hunter McMillen Ivan Bessarabov Jakob Voss jantore Jérôme Quelin Jesse Luehrs Vincent JJ Merelo John Napiorkowski jonasbn Jonathan C. Otsuka Rockway Scott Duff Yu Karen Etheridge Kent Fredric Leon Timmermans Lucas Theisen Luc St-Louis Marcel Gruenauer Mark Flickinger Martin McGrath Mary Ehlers Mateu X Matthew Horsfall mauke Michael Conrad G. Schwern Jemmeson Mickey Nasriachi Mike Doherty Mohammad S Anwar Moritz Onken Neil Bowers Nickolay Platonov Nick Tonkin nperez Olivier Mengué Paul Cochrane Paulo Custodio Pedro Melo perlancar (@pc-office) Philippe Bruhat (BooK) raf Randy Stauner Ricardo Signes robertkrimen Rob Hoelz Robin Smidsrød Roy Ivy III Shawn M Moore Shlomi Fish Shoichi Kaji Smylers Steffen Schwigon Steven Haryanto Tatsuhiko Miyagawa Upasana Shukla Van Bugger Vyacheslav Matjukhin Yanick Champoux Yuval Kogman
 
 =over 4
 
@@ -1231,6 +1223,10 @@ ben hengst <ben.hengst@gmail.com>
 =item *
 
 Bernardo Rechea <brbpub@gmail.com>
+
+=item *
+
+Branislav Zahradník <happy.barney@gmail.com>
 
 =item *
 
@@ -1343,6 +1339,10 @@ Doug Bell <doug@preaction.me>
 =item *
 
 Doug Bell <madcityzen@gmail.com>
+
+=item *
+
+Elvin Aslanov <rwp.primary@gmail.com>
 
 =item *
 
@@ -1490,6 +1490,10 @@ Marcel Gruenauer <hanekomu@gmail.com>
 
 =item *
 
+Mark Flickinger <mark.flickinger@grantstreet.com>
+
+=item *
+
 Martin McGrath <mcgrath.martin@gmail.com>
 
 =item *
@@ -1562,6 +1566,10 @@ Paul Cochrane <paul@liekut.de>
 
 =item *
 
+Paulo Custodio <pauloscustodio@gmail.com>
+
+=item *
+
 Pedro Melo <melo@simplicidade.org>
 
 =item *
@@ -1607,6 +1615,10 @@ Shawn M Moore <sartak@gmail.com>
 =item *
 
 Shlomi Fish <shlomif@shlomifish.org>
+
+=item *
+
+Shoichi Kaji <skaji@cpan.org>
 
 =item *
 

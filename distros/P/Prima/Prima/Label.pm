@@ -3,6 +3,16 @@ use strict;
 use warnings;
 use Prima;
 use base qw(Prima::Widget);
+use Prima::Widget::Link;
+
+{
+my %RNT = (
+	%{Prima::Widget-> notification_types()},
+	%{Prima::Widget::Link-> notification_types()},
+);
+
+sub notification_types { return \%RNT; }
+}
 
 sub profile_default
 {
@@ -16,6 +26,7 @@ sub profile_default
 		focusLink      => undef,
 		height         => 4 + $font-> { height},
 		hotKey         => undef,
+		linkColor      => Prima::Widget::Link->profile_default->{color},
 		ownerBackColor => 1,
 		selectable     => 0,
 		showAccelChar  => 0,
@@ -64,8 +75,9 @@ sub init
 	$self->textJustify($profile{textJustify});
 	$self-> {$_} = $profile{$_} for qw(
 		textDirection alignment valignment autoHeight autoWidth
-		wordWrap focusLink showAccelChar showPartial hotKey
+		wordWrap focusLink showAccelChar showPartial hotKey 
 	);
+	$self->$_($profile{$_}) for qw(linkColor);
 	$self-> check_auto_size;
 	delete $self->{lock};
 	$self->reset_lines;
@@ -92,96 +104,63 @@ sub on_paint
 		$canvas-> bar(0,0,@size);
 	}
 
-	my $fh = $canvas-> font-> height;
-	my $ta = $self-> {alignment};
-	my $ws = $self-> {words};
-	my ($starty,$ycommon) = (0, scalar @{$ws} * $fh);
-
-	if ( $self-> {valignment} == ta::Top)  {
-		$starty = $size[1] - $fh;
-	} elsif ( $self-> {valignment} == ta::Bottom) {
-		$starty = $ycommon - $fh;
-	} else {
-		$starty = ( $size[1] + $ycommon)/2 - $fh;
-	}
-
-	my $y   = $starty;
+	my $fh  = $canvas-> font-> height;
+	my $ws  = $self->{words};
+	my $wx  = $self->{start_x};
+	my $y   = $self->{start_y};
 	my $tl  = $self-> {tildeLine};
 	my $i;
 	my $paintLine = !$self-> {showAccelChar} && defined($tl) && $tl < scalar @{$ws};
 
-	my (@wx, @wss);
-	my %justify = ( %{$self->textJustify}, rtl => $self->textDirection);
-	for ( my $i = 0; $i < @$ws; $i++) {
-		my $s = $canvas->text_shape($ws->[$i], %justify );
-		if ( $s && ref($s)) {
-			$s->justify(
-				$canvas, $ws->[$i], $size[0],
-				%justify,
-				($i == $#$ws) ? (letter => 0, word => 0) : ()
-			);
-			push @wss, $s;
-		} else {
-			push @wss, $ws->[$i];
-		}
-		push @wx, $canvas->get_text_width($wss[-1]);
-	}
-
 	unless ( $self-> enabled) {
 		$canvas-> color( $self-> light3DColor);
-		for ( $i = 0; $i < @wss; $i++) {
-			my $x = 0;
-			if ( $ta == ta::Center) {
-				$x = ( $size[0] - $wx[$i]) / 2;
-			} elsif ( $ta == ta::Right) {
-				$x = $size[0] - $wx[$i];
-			}
-			$canvas-> text_out( $wss[$i], $x + 1, $y - 1);
+		for ( $i = 0; $i < @$ws; $i++) {
+			$canvas-> text_out( $$ws[$i], $$wx[$i] + 1, $y - 1);
 			$y -= $fh;
 		}
-		$y   = $starty;
+		$y = $self->{start_y};
+
 		if ( $paintLine) {
-			my $x = 0;
-			if ( $ta == ta::Center) {
-				$x = ( $size[0] - $wx[$tl]) / 2;
-			} elsif ( $ta == ta::Right) {
-				$x = $size[0] - $wx[$tl];
-			}
+			my $x = $$wx[$tl] + 1;
 			$canvas-> line(
-				$x + $self-> {tildeStart} + 1, $starty - $fh * $tl - 1,
-				$x + $self-> {tildeEnd} + 1,   $starty - $fh * $tl - 1
+				$x + $self-> {tildeStart}, $self->{start_y} - $fh * $tl - 1,
+				$x + $self-> {tildeEnd},   $self->{start_y} - $fh * $tl - 1
 			);
 		}
 	}
 
 	$canvas-> color( $clr[0]);
-	for ( $i = 0; $i < @wss; $i++) {
-		my $x = 0;
-		if ( $ta == ta::Center) {
-			$x = ( $size[0] - $wx[$i]) / 2;
-		} elsif ( $ta == ta::Right) {
-			$x = $size[0] - $wx[$i];
-		}
-		$canvas-> text_out( $wss[$i], $x, $y);
+	for ( $i = 0; $i < @$ws; $i++) {
+		$canvas-> text_out( $$ws[$i], $$wx[$i], $y);
 		$y -= $fh;
 	}
 	if ( $paintLine) {
-		my $x = 0;
-		if ( $ta == ta::Center) { $x = ( $size[0] - $wx[$tl]) / 2; }
-		elsif ( $ta == ta::Right) { $x = $size[0] - $wx[$tl]; }
+		my $x = $$wx[$tl];
 		$canvas-> line(
-			$x + $self-> {tildeStart}, $starty - $fh * $tl,
-			$x + $self-> {tildeEnd},   $starty - $fh * $tl
+			$x + $self-> {tildeStart}, $self->{start_y} - $fh * $tl,
+			$x + $self-> {tildeEnd},   $self->{start_y} - $fh * $tl
 		);
 	}
+	$self->{link_handler}->on_paint( $self, $canvas )
+		if $self->{link_handler};
 }
-
 
 sub set_text
 {
 	my $self = $_[0];
 	$self-> SUPER::set_text( $_[1]);
 	$self-> check_auto_size;
+	undef $self->{link_handler};
+
+	if ( ref($_[1]) ) {
+		my $text = $self->SUPER::text;
+		$self->{link_handler} = Prima::Widget::Link->new(
+			markup => $text,
+			color  => $self->linkColor,
+		) if UNIVERSAL::isa($text, 'Prima::Drawable::Markup');
+	}
+
+	$self-> reset_lines;
 	$self-> repaint;
 }
 
@@ -230,9 +209,24 @@ sub on_keydown
 
 sub on_mousedown
 {
-	my $self = $_[0];
-	$self-> notify( 'Click');
+	my ( $self, $btn, $mod, $x, $y) = @_;
 	$self-> clear_event;
+	return if $self->{link_handler} && $self->{link_handler}->on_mousedown($self, $btn, $mod, $x, $y);
+	$self-> notify( 'Click');
+}
+
+sub on_mousemove
+{
+	my ( $self, $mod, $x, $y) = @_;
+	$self->{link_handler}->on_mousemove($self, $mod, $x, $y)
+		if $self->{link_handler};
+}
+
+sub on_mouseleave
+{
+	my ( $self) = @_;
+	$self->{link_handler}->on_mousemove($self, 0, -1, -1)
+		if $self->{link_handler};
 }
 
 sub on_fontchanged
@@ -245,7 +239,11 @@ sub on_size
 	my $self = shift;
 	return $self-> reset_lines unless $self->{autoHeight};
 
-	return if $self->{auto_height_adjustment};
+	if ($self->{auto_height_adjustment}) {
+		$self->reposition_lines;
+		return;
+	}
+
 	local $self->{auto_height_adjustment} = 1;
 	$self-> check_auto_size;
 }
@@ -281,20 +279,83 @@ sub reset_lines
 
 	$self-> begin_paint_info;
 
-	my $lines = $self-> text_wrap_shape( $self-> text, $width,
+	my $text  = $self-> text;
+	my $lines = $self-> text_wrap_shape( $text, $width,
 		options => $opt,
 		rtl     => $self->textDirection,
 	);
 	my $lastRef = pop @{$lines};
-
 	$self-> {textLines} = scalar @$lines;
 	for( qw( tildeStart tildeEnd tildeLine)) {$self-> {$_} = $lastRef-> {$_}}
 
 	$self-> {accel} = defined($self-> {tildeStart}) ? lc( $lastRef-> {tildeChar}) : undef;
 	splice( @{$lines}, $maxLines) if scalar @{$lines} > $maxLines && !$nomaxlines;
-	$self-> {words} = $lines;
+
+	$self->{words} = [$self->shape_and_justify_text($self, $lines)];
+	$self-> reposition_lines;
 
 	$self-> end_paint_info;
+}
+
+sub reposition_lines
+{
+	my $self = shift;
+
+	my $ps = $self->get_paint_state;
+	$self-> begin_paint_info if $ps == ps::Disabled;
+
+	my $ws = $self->{words};
+	my $fh = $self->font->height;
+	my ($starty,$ycommon) = (0, scalar @$ws * $fh);
+	my @size = $self->size;
+
+	if ( $self-> {valignment} == ta::Top)  {
+		$starty = $size[1] - $fh;
+	} elsif ( $self-> {valignment} == ta::Bottom) {
+		$starty = $ycommon - $fh;
+	} else {
+		$starty = ( $size[1] + $ycommon)/2 - $fh;
+	}
+	$self->{start_y} = $starty;
+
+	my @wx;
+	if ( $self->{alignment} == ta::Left ) {
+		@wx = map { 0 } @$ws;
+	} else {
+		my $ta = $self->{alignment};
+		my @ww = map { $self->get_text_width($_) } @$ws;
+		for ( my $i = 0; $i < @$ws; $i++) {
+			my $x = 0;
+			if ( $ta == ta::Center) {
+				$x = ( $size[0] - $ww[$i]) / 2;
+			} elsif ( $ta == ta::Right) {
+				$x = $size[0] - $ww[$i];
+			}
+			push @wx, $x;
+		}
+	}
+	$self->{start_x} = \@wx;
+
+	if ($self->{link_handler}) {
+		my $ta = $self->{alignment};
+		my (@sx, @sy);
+		for ( my $i = 0; $i < @$ws; $i++) {
+			my $b = $$ws[$i]->block;
+			push @sx, $$b[tb::BLK_X];
+			push @sy, $$b[tb::BLK_Y];
+			$$b[tb::BLK_X] = $wx[$i];
+			$$b[tb::BLK_Y] = $starty;
+			$starty -= $fh;
+		}
+		$self->{link_handler}->reset_positions_markup($ws);
+		for ( my $i = 0; $i < @$ws; $i++) {
+			my $b = $$ws[$i]->block;
+			$$b[tb::BLK_X] = $sx[$i];
+			$$b[tb::BLK_Y] = $sy[$i];
+		}
+	}
+
+	$self-> end_paint_info if $ps == ps::Disabled;
 }
 
 sub check_auto_size
@@ -384,6 +445,14 @@ sub autoHeight    {($#_)?($_[0]-> set_auto_height(  $_[1]))   :return $_[0]-> {a
 sub wordWrap      {($#_)?($_[0]-> set_word_wrap(    $_[1]))   :return $_[0]-> {wordWrap}     }
 sub hotKey        { $#_ ? $_[0]->{hotKey} = $_[1] : $_[0]->{hotKey} }
 
+sub linkColor     {
+	return $_[0]->{linkColor} unless $#_;
+	my ( $self, $lc ) = @_;
+	$self->{linkColor} = $lc;
+	$self->{link_handler}->color($lc) if $self->{link_handler};
+	$self->repaint;
+}
+
 sub textDirection
 {
 	return $_[0]-> {textDirection} unless $#_;
@@ -412,6 +481,31 @@ sub textJustify
 	$self-> text( $self-> text );
 }
 
+sub shape_and_justify_text
+{
+	my ($self, $canvas, $ws) = @_;
+
+	my @size = $canvas-> size;
+	my %justify = ( %{$self->textJustify}, rtl => $self->textDirection);
+	my @wss;
+
+	for ( my $i = 0; $i < @$ws; $i++) {
+		my $s = $canvas->text_shape($ws->[$i], %justify );
+		if ( $s && ref($s)) {
+			$s->justify(
+				$canvas, $ws->[$i], $size[0],
+				%justify,
+				($i == $#$ws) ? (letter => 0, word => 0) : ()
+			);
+			push @wss, $s;
+		} else {
+			push @wss, $ws->[$i];
+		}
+	}
+
+	return @wss;
+}
+
 1;
 
 =pod
@@ -422,12 +516,15 @@ Prima::Label - static text widget
 
 =head1 DESCRIPTION
 
-The class is designed for display of text, and assumes no
-user interaction. The text output capabilities include wrapping,
-horizontal and vertical alignment, and automatic widget resizing to
-match text extension. If text contains a tilde-escaped ( hot ) character, the label can
-explicitly focus the specified widget upon press of the character key, what feature
-is useful for dialog design.
+The class is designed for display of text, and assumes no user interaction. The
+text output capabilities include wrapping, horizontal and vertical alignment,
+and automatic widget resizing to match text extension. If text contains a
+tilde-escaped ( hot ) character, the label can explicitly focus the specified
+widget upon press of the character key, what feature is useful for dialog
+design.
+
+Labels can display rich text with links. See L<Prima::Drawable::Markup> for
+more.
 
 =head1 SYNOPSIS
 
@@ -573,6 +670,6 @@ Dmitry Karasik, E<lt>dmitry@karasik.eu.orgE<gt>.
 
 =head1 SEE ALSO
 
-L<Prima>, L<Prima::Widget>, F<examples/label.pl>
+L<Prima>, L<Prima::Widget>, L<Prima::Drawable::Markup>, L<Prima::Widget::Links>, F<examples/label.pl>
 
 =cut

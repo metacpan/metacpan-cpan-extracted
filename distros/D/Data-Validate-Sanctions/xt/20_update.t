@@ -3,7 +3,7 @@ use warnings;
 
 use Test::More;
 use File::Temp qw(tempfile);
-use FindBin qw($Bin);
+use FindBin    qw($Bin);
 use File::stat;
 use Path::Tiny;
 use YAML::XS qw(Dump);

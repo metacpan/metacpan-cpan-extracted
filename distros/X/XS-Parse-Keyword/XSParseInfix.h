@@ -71,6 +71,8 @@ struct XSParseInfixInfo {
 
   const struct XSParseInfixHooks *hooks;
   void *hookdata;
+
+  enum XSParseInfixClassification cls;
 };
 
 static bool (*parse_infix_func)(pTHX_ enum XSParseInfixSelection select, struct XSParseInfixInfo **infop);

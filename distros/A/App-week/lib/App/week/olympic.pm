@@ -73,7 +73,8 @@ option --olympic-dow \
 	--cm DOW_WE=白/リング黒 \
 	--cm DOW_TH=白/リング緑 \
 	--cm DOW_FR=白/リング赤 \
-	--cm DOW_SA=白/エンブレム青
+	--cm DOW_SA=白/エンブレム青 \
+	--cm DOW_CW=白/エンブレム青
 
 option --paralympic-dow --olympic-dow
 

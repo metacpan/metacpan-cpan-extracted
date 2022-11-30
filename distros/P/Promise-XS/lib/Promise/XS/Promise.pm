@@ -55,44 +55,19 @@ but for now this is what’s what.
 
 =cut
 
-# Lifted from AnyEvent::XSPromises
+# Lifted from Promises::collect
 sub all {
-    my $remaining= @_ - 1;
-    my @values;
-    my $failed= 0;
-    my $then_what= Promise::XS::Deferred::create();
-    my $pending= 1;
-    my $i= 0;
-
-    my $promise = $then_what->promise();
-
-    my $reject_now = sub {
-        if (!$failed++) {
-            $pending= 0;
-            $then_what->reject(@_);
-            undef $then_what;   # proactively eliminate references
-        }
-    };
+    my $all_done = Promise::XS::resolved();
 
     for my $p (@_[1 .. $#_]) {
-        my $i = $i++;
+        my @results;
+        $all_done = $all_done->then( sub {
+            @results = @_;
+            return $p;
+        } )->then(sub{ ( @results, [ @_ ] ) } );
+    }
 
-        $p->then(
-            sub {
-                $values[$i]= \@_;
-                if ((--$remaining) == 0) {
-                    $pending= 0;
-                    $then_what->resolve(@values);
-                    undef $then_what;   # proactively eliminate references
-                }
-            },
-            $reject_now,
-        );
-    }
-    if (!$remaining && $pending) {
-        $then_what->resolve(@values);
-    }
-    return $promise;
+    return $all_done;
 }
 
 # Lifted from Promise::ES6

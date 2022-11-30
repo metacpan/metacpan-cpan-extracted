@@ -36,3 +36,7 @@
 0.0.8 Thu Jun 23 14:16:00 2022
     - for baptise created objects, needed to adjust
       $Util::H2O::_PACKAGE_REGEX to be more general
+
+0.0.9 Fri Nov 25 14:00:00 2022
+    - corrected some minor documentation and code
+      examples for using opt2h2o with Getopt::Long

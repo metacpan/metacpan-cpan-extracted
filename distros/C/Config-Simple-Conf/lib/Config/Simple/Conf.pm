@@ -1,12 +1,12 @@
 package Config::Simple::Conf;
-# Copyright 2016 (C) Colin Faber <cfaber@fpsn.net>
+# Copyright 2016-2021 (C) Colin Faber <cfaber@fpsn.net>
 # Licensed under the terms of perl itself.
 
 use strict;
 use Exporter;
 use base 'Exporter';
 
-our $VERSION = "2.006";
+our $VERSION = "2.007";
 
 our @ARGV_CLEAN;
 our @EXPORT = qw(@ARGV_CLEAN);
@@ -275,6 +275,27 @@ sub keys {
 	} else {
 		return;
 	}
+}
+
+=head2 set(SECTION, KEY, VALUE)
+
+Update or create a new config entry for B<SECTION>, with the B<KEY> containing B<VALUE>
+
+Returns true on success
+
+=cut
+
+sub set {
+	my ($self, $sec, $key, $val) = @_;
+
+	if(defined $sec && defined $key && defined $val){
+		$self->{ lc $sec }->{ $key } = $val;
+		$self->{ lc $sec }->{ $key };
+
+		return 1;
+	}
+
+	return;
 }
 
 # parse the arguments string and configuration files
@@ -563,6 +584,6 @@ Colin Faber <cfaber@fpsn.net>
 
 =head1 LICENSE AND COPYTIGHT
 
-Copyright 2016 (C) Colin Faber
+Copyright 2016-2021 (C) Colin Faber
 
 This library is licensed under the Perl Artistic license and may be freely used and distributed under the terms of Perl itself.

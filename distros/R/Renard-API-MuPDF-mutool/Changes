@@ -1,4 +1,17 @@
-0.005
+0.006 2022-11-29 12:46:48-0500
+
+  Bug fixes
+
+   - Update outline parsing for newer version of `mutool` which adds
+     a key-value syntax (e.g., #page=<page>&zoom=<zoom-type>,<dx>,<dy>).
+
+     See <https://github.com/project-renard/p5-Renard-API-MuPDF-mutool/pull/15>
+
+0.005_01 2020-10-17 02:19:48-0500
+
+  - No change from 0.005. Added date.
+
+0.005 2020-10-17 02:17:53-0500
 
   Renamed from Renard::Incunabula::MuPDF::mutool (previous version
   <https://metacpan.org/release/ZMUGHAL/Renard-Incunabula-MuPDF-mutool-0.004>).

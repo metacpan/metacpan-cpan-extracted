@@ -33,7 +33,7 @@ Fsdb - a flat-text database for shell scripting
 
 
 =cut
-our $VERSION = '3.0';
+our $VERSION = '3.1';
 
 =head1 SYNOPSIS
 
@@ -178,7 +178,7 @@ add to the end of the output the lines
 =item *
 
 The library is mature, supporting large datasets (more than 100GB), 
-corner cases, error handling, backed by an automated test suite.
+parallelism, corner cases, error handling, backed by an automated test suite.
 
 =over 4
 
@@ -190,6 +190,13 @@ skimped on error checking.
 =item **
 
 No more memory thrashing when you try to sort ten million records.
+
+=item **
+
+Makes use of multiple cores in your computer when it can,
+because each pipeline component runs in parallel,
+and because key tools (L<dbsort>, L<dbmapreduce>)
+run in parlallel when possible.
 
 =back
 
@@ -236,39 +243,19 @@ L<http://www.isi.edu/~johnh/SOFTWARE/FSDB/index.html>.
 
 =head1 WHAT'S NEW
 
-=head2 3.0, 2022-04-04
-Complete type support and accordingly bump major version.
+=head2 3.1, 2022-11-22
+A post-3.0 cleanup release with minor fixes.
 
 =over 4
 
-=item NEW
+=item ENHANCEMENT
 
-The major version number is now 3.0 to correspond to the addition of types
-(although they were actually added in 2.75).
-Old fsdb files are supported (Fsdb-3.0 is backwards compatible with databases),
-but older versions will confuse types in new files
-(new Fsdb files are not forward compatible with old versions).
+Type specifications in a few more programs that I missed:
+L<dbrowuniq>, L<dbcolpercentile>.
 
 =item ENHANCEMENT
 
-Type specifications in a few more programs:
-L<dbcolhisto>,
-L<dbcolscorrelate>,
-L<dbcolsregression>,
-L<dbcolstatscores>,
-L<dbrowaccumulate>,
-L<dbrowcount>,
-L<dbrowdiff>,
-L<dbrvstatdiff>.
-
-=item ENHANCEMENT
-
-L<dbcolhisto> now puts an empty value on any empty rows.
-
-=item NEW
-
-L<dbcoltype> redefines column types, or clears them with the C<-v> option.
-
+Minor documentation improvements.
 
 =back
 
@@ -3830,6 +3817,41 @@ IPv4 or IPv6 addresses to their "normal" form
 
 =back
 
+=head2 3.0, 2022-04-04
+Complete type support and accordingly bump major version.
+
+=over 4
+
+=item NEW
+
+The major version number is now 3.0 to correspond to the addition of types
+(although they were actually added in 2.75).
+Old fsdb files are supported (Fsdb-3.0 is backwards compatible with databases),
+but older versions will confuse types in new files
+(new Fsdb files are not forward compatible with old versions).
+
+=item ENHANCEMENT
+
+Type specifications in a few more programs:
+L<dbcolhisto>,
+L<dbcolscorrelate>,
+L<dbcolsregression>,
+L<dbcolstatscores>,
+L<dbrowaccumulate>,
+L<dbrowcount>,
+L<dbrowdiff>,
+L<dbrvstatdiff>.
+
+=item ENHANCEMENT
+
+L<dbcolhisto> now puts an empty value on any empty rows.
+
+=item NEW
+
+L<dbcoltype> redefines column types, or clears them with the C<-v> option.
+
+
+=back
 
 
 =head1 AUTHOR

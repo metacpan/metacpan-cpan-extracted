@@ -73,7 +73,7 @@ subtest "Basic Functionality Test" => sub {
         my $msg = parse_syslog_line($test->{string});
         delete $msg->{$_} for grep { exists $msg->{$_} } @_delete;
         delete $test->{expected}{$_} for grep { exists $test->{expected}{$_} } @_delete;
-        is_deeply( $msg, $test->{expected}, $test->{name} ) || diag( Dumper $test );
+        is_deeply( $msg, $test->{expected}, $test->{name} ) || diag( Dumper $msg );
         # Restore Defaults
         if( keys %restore ) {
             foreach my $k ( keys %restore ) {
@@ -94,7 +94,8 @@ subtest "Basic Functionality Test" => sub {
             delete $msg->{$_} for @_delete;
             $expected{content} = $expected{program_raw} . ': ' . $expected{content};
             $expected{$_} = undef for qw(program_raw program_name program_sub program_pid);
-            is_deeply( $msg, \%expected, "$test->{name} (no extract program)" );
+
+            is_deeply( $msg, \%expected, "$test->{name} (no extract program)" ) || diag(Dumper $msg);
         }
     };
 };

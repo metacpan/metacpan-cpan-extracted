@@ -2,7 +2,7 @@ package Test2::Harness::Runner::State;
 use strict;
 use warnings;
 
-our $VERSION = '1.000133';
+our $VERSION = '1.000136';
 
 use Carp qw/croak/;
 
@@ -53,6 +53,8 @@ use Test2::Harness::Util::HashBase(
         <halted_runs
 
         <reload_state
+
+        <observe
     },
 );
 
@@ -69,14 +71,16 @@ sub init {
         my $resources = $self->{+RESOURCES} //= [];
         for my $res (@{$self->settings->runner->resources}) {
             require(mod2file($res));
-            push @$resources => $res->new(settings => $self->settings);
+            push @$resources => $res->new(settings => $self->settings, observe => $self->{+OBSERVE});
         }
     }
 
     unless (grep { $_->job_limiter } @{$self->{+RESOURCES}}) {
         require Test2::Harness::Runner::Resource::JobCount;
-        unshift @{$self->{+RESOURCES}} => Test2::Harness::Runner::Resource::JobCount->new(job_count => $self->{+JOB_COUNT}, settings => $self->settings);
+        push @{$self->{+RESOURCES}} => Test2::Harness::Runner::Resource::JobCount->new(job_count => $self->{+JOB_COUNT}, settings => $self->settings);
     }
+
+    @{$self->{+RESOURCES}} = sort { $a->sort_weight <=> $b->sort_weight } @{$self->{+RESOURCES}};
 
     $self->{+DISPATCH_FILE} = Test2::Harness::Util::Queue->new(file => File::Spec->catfile($self->{+WORKDIR}, 'dispatch.jsonl'));
 
@@ -635,11 +639,15 @@ sub advance_tasks {
 
     my ($run_stage, $task, $res, %params) = $self->_next();
 
-    return 0 unless $task;
+    my $out = 0;
+    if ($task) {
+        $out = 1;
+        $self->start_task({job_id => $task->{job_id}, stage => $run_stage, res => $res, %params});
+    }
 
-    $self->start_task({job_id => $task->{job_id}, stage => $run_stage, res => $res, %params});
+    $_->discharge() for @{$self->{+RESOURCES}};
 
-    return 1;
+    return $out;
 }
 
 sub _cat_order {

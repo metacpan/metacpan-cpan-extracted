@@ -1,4 +1,8 @@
-Revision history for Net-Checkpoint-Management-v1: 0.001010
+Revision history for Net-Checkpoint-Management-v1: 0.002000
+
+0.002000  2022-11-25 11:36:20+01:00 Europe/Vienna
+    - add dns_domain methods
+    - add address_range methods
 
 0.001010  2022-05-30 15:34:46+02:00 Europe/Vienna
     - fix api_versions successful test

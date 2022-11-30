@@ -43,7 +43,7 @@
             "feature" : "0",
             "indirect" : "0.36",
             "overload" : "0",
-            "perl" : "5.020000",
+            "perl" : "5.024000",
             "strict" : "0",
             "warnings" : "0"
          }
@@ -60,6 +60,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

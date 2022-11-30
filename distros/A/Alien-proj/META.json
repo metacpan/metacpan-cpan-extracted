@@ -26,15 +26,28 @@
             "Alien::Build::MM" : "1.74",
             "Alien::Build::Plugin::Cleanse::BuildDir" : "0",
             "Alien::Build::Plugin::PkgConfig::PPWrapper" : "0",
+            "Alien::cmake3" : "0.02",
+            "Alien::libtiff" : "0",
             "Alien::sqlite" : "1.06",
+            "Archive::Tar" : "0",
+            "Config" : "0",
+            "Env::ShellWords" : "0.01",
             "ExtUtils::MakeMaker" : "6.52",
             "FFI::CheckLib" : "0.28",
             "File::Find::Rule" : "0",
             "File::Which" : "0",
+            "HTTP::Tiny" : "0.044",
+            "IO::Socket::SSL" : "1.56",
+            "IO::Zlib" : "0",
             "List::Util" : "1.45",
+            "Mojo::DOM58" : "1.00",
+            "Mozilla::CA" : "0",
+            "Net::SSLeay" : "1.49",
             "Path::Tiny" : "0",
             "PkgConfig" : "0.19026",
-            "Sort::Versions" : "0"
+            "Sort::Versions" : "0",
+            "URI" : "0",
+            "URI::Escape" : "0"
          },
          "suggests" : {
             "Alien::curl" : "0.08",
@@ -87,9 +100,9 @@
          "url" : "https://github.com/shawnlaffan/perl-alien-proj"
       }
    },
-   "version" : "1.24",
+   "version" : "1.25",
    "x_alienfile" : {
-      "generated_by" : "Alien::Build::MM version 2.48",
+      "generated_by" : "Alien::Build::MM version 2.73",
       "requires" : {
          "share" : {
             "Alien::cmake3" : "0.02",
@@ -99,8 +112,11 @@
             "Config" : "0",
             "Env::ShellWords" : "0.01",
             "HTTP::Tiny" : "0.044",
+            "IO::Socket::SSL" : "1.56",
             "IO::Zlib" : "0",
             "Mojo::DOM58" : "1.00",
+            "Mozilla::CA" : "0",
+            "Net::SSLeay" : "1.49",
             "Sort::Versions" : "0",
             "URI" : "0",
             "URI::Escape" : "0"
@@ -108,5 +124,5 @@
          "system" : {}
       }
    },
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

@@ -14,18 +14,18 @@ typedef Evas_Object ElmObject;
 typedef Elm_Object_Item ElmObjectItem;
 typedef Evas_Object EvasObject;
 
-MODULE = pEFL::Elm::Object		PACKAGE = ElmObjectPtr     PREFIX = elm_object_
+MODULE = pEFL::Elm::Object		PACKAGE = ElmObjectPtr	   PREFIX = elm_object_
 
 void 
 elm_object_text_set(object,text)
-    EvasObject *object
-    char *text
+	EvasObject *object
+	char *text
 
 
 char *
 elm_object_text_get(obj)
 	const EvasObject *obj
-    
+	
 
 void
 elm_object_part_text_set(obj,part,text)
@@ -212,6 +212,8 @@ elm_object_signal_emit(obj,emission,source)
 	const char *emission
 	const char *source
 
+
+# TODO: func is not needed here !
 void
 _elm_object_signal_callback_add(obj,emission,source,func,id)
 	EvasObject *obj
@@ -220,14 +222,14 @@ _elm_object_signal_callback_add(obj,emission,source,func,id)
 	SV* func
 	int id
 PREINIT:
-    UV objaddr;
-    _perl_signal_cb *data;
+	UV objaddr;
+	_perl_signal_cb *data;
 CODE:
-    objaddr = PTR2IV(obj);
-    data = perl_save_signal_cb(aTHX_ objaddr, id);
-    elm_object_signal_callback_add(obj,emission,source,call_perl_signal_cb,data);
+	objaddr = PTR2IV(obj);
+	data = perl_save_signal_cb(aTHX_ objaddr, id);
+	elm_object_signal_callback_add(obj,emission,source,call_perl_signal_cb,data);
 
-    
+	
 
 void *
 _elm_object_signal_callback_del(obj,emission,source,cstructaddr)
@@ -236,26 +238,26 @@ _elm_object_signal_callback_del(obj,emission,source,cstructaddr)
 	const char *source
 	SV* cstructaddr
 PREINIT:
-    _perl_signal_cb *sc = NULL;
-    _perl_signal_cb *del_sc = NULL;
-    UV address;
-    void *data;
+	_perl_signal_cb *sc = NULL;
+	_perl_signal_cb *del_sc = NULL;
+	UV address;
+	void *data;
 CODE:
-    address = SvUV(cstructaddr);
-    sc = INT2PTR(_perl_signal_cb*,address);
-    data = elm_object_signal_callback_del(obj, emission, source, call_perl_signal_cb);
-    while (data != NULL) {
-        del_sc = (_perl_signal_cb *) data;
-        data = elm_object_signal_callback_del(obj, emission, source, call_perl_signal_cb);
-        if (del_sc->signal_id == sc->signal_id) {
-            Safefree(del_sc);
-        }
-        // If signal_ids are different reregister the signal callback
-        else {
-            elm_object_signal_callback_add(obj,emission,source,call_perl_signal_cb,del_sc);
-        }
-        
-    }
+	address = SvUV(cstructaddr);
+	sc = INT2PTR(_perl_signal_cb*,address);
+	data = elm_object_signal_callback_del(obj, emission, source, call_perl_signal_cb);
+	while (data != NULL) {
+		del_sc = (_perl_signal_cb *) data;
+		data = elm_object_signal_callback_del(obj, emission, source, call_perl_signal_cb);
+		if (del_sc->signal_id == sc->signal_id) {
+			Safefree(del_sc);
+		}
+		// If signal_ids are different reregister the signal callback
+		else {
+			elm_object_signal_callback_add(obj,emission,source,call_perl_signal_cb,del_sc);
+		}
+		
+	}
 
 # func = Elm_Event_Cb
 # void
@@ -343,13 +345,13 @@ elm_object_tooltip_content_cb_set(obj,func,data,del_cb)
 	SV *func
 	SV *data
 PREINIT:
-        _perl_callback *sc = NULL;
-        IV tmp;
-        UV objaddr;
+		_perl_callback *sc = NULL;
+		IV tmp;
+		UV objaddr;
 CODE:
-    objaddr = PTR2IV(obj);
-    sc = perl_save_callback(aTHX_ func, objaddr,"tooltip-content","pEFL::PLSide::Callbacks");
-    elm_object_tooltip_content_cb_set(obj,call_perl_tooltip_content_cb,(void *) sc,del_tooltip);
+	objaddr = PTR2IV(obj);
+	sc = perl_save_callback(aTHX_ func, objaddr,"tooltip-content","pEFL::PLSide::Callbacks");
+	elm_object_tooltip_content_cb_set(obj,call_perl_tooltip_content_cb,(void *) sc,del_tooltip);
 
 void
 elm_object_tooltip_unset(obj)

@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021,2022 -- leonerd@leonerd.org.uk
 
-package Syntax::Operator::In 0.03;
+package Syntax::Operator::In 0.04;
 
 use v5.14;
 use warnings;
@@ -23,7 +23,7 @@ On a suitably-patched perl:
 
    use Syntax::Operator::In;
 
-   if($x in<eq> @some_strings) {
+   if($x in:eq @some_strings) {
       say "x is one of the given strings";
    }
 
@@ -70,6 +70,8 @@ sub import_into
 
 =head2 in
 
+   my $present = $lhs in:OP @rhs;
+
    my $present = $lhs in<OP> @rhs;
 
 Yields true if the value on the lefhand side is equal to any of the values in
@@ -78,6 +80,13 @@ the list on the right, according to some equality test operator C<OP>.
 This test operator must be either C<eq> for string match, or C<==> for number
 match, or any other custom infix operator that is registered in the
 C<XPI_CLS_EQUALITY> classification.
+
+There are currently two accepted forms of the syntax for this operator, using
+either a prefix colon or a circumfix pair of angle-brackets. They are entirely
+identical in semantics, differing only in the surface-level syntax to notate
+them. This is because I'm still entirely undecided on which notation is better
+in terms of readable neatness, flexibility, parsing ambiguity and so on. This
+is somewhat of an experiment to see which will eventually win.
 
 =cut
 
@@ -90,18 +99,6 @@ C<XPI_CLS_EQUALITY> classification.
 Improve runtime performance of compiletime-constant sets of strings, by
 detecting when the RHS contains string constants and convert it into a hash
 lookup.
-
-=item *
-
-Consider further on the syntax for this operator. Maybe instead of the
-circumfix anglebrackets, a single colon might look nicer?
-
-   $lhs in:OP @rhs
-
-   $x in:== @numbers
-   $x in:eq @strings
-
-Does the lacking of end marker make parsing harder though?
 
 =item *
 

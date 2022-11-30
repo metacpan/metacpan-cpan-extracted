@@ -1,5 +1,9 @@
+1.08 2022-11-22
+        - Remove deprecated 'format' parameter and upgrade
+          to Mojo 9.17.
+
 1.07 2021-08-26
-        - support _format parameters in tests.
+        - Support _format parameters in tests.
         - Fix tests on text method to accept undef for Mojo >= 9.21.
 
 1.06 2021-02-08

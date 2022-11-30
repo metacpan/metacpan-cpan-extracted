@@ -8,7 +8,7 @@ Weather::GHCN::App::Fetch - Fetch station and weather data from the NOAA GHCN re
 
 =head1 VERSION
 
-version v0.0.010
+version v0.0.011
 
 =head1 SYNOPSIS
 
@@ -52,7 +52,7 @@ use v5.18;  # minimum for Object::Pad
 
 package Weather::GHCN::App::Fetch;
 
-our $VERSION = 'v0.0.010';
+our $VERSION = 'v0.0.011';
 
 use feature 'signatures';
 no warnings 'experimental::signatures';
@@ -145,7 +145,7 @@ const my $NL     => qq(\n);    # perl universal newline (any platform)
 const my $TRUE   => 1;         # perl's usual TRUE
 const my $FALSE  => not $TRUE; # a dual-var consisting of '' and 0
 
-const my $PROFILE_FILE => '~/.ghcn_fetch.yaml';
+const my $PROFILE_FILE => Weather::GHCN::Options->get_profile_filespec();
 
 const my $STN_THRESHOLD     => 100;     # ask if number of selected stations exceeds this
 
@@ -377,6 +377,10 @@ sub run ($progname, $argv_aref, %args) {
         say $EMPTY;
         say 'Stations that failed to meet range or quality criteria:';
         say tsv(\@rejected);
+        say $EMPTY;
+        say 'Reasons for rejection:';
+        my @notes = $ghcn->get_station_note_list;
+        say tsv(\@notes);
     }
 
     if ( $ghcn->has_missing_data ) {

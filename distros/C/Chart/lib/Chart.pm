@@ -1,7 +1,7 @@
 use v5.12;
 
 package Chart;
-our $VERSION = 'v2.403.8';
+our $VERSION = 'v2.403.9';
 
 use Chart::Points;
 use Chart::Lines;
@@ -419,10 +419,7 @@ Ricardo Signes (rjbs@cpan.org)
 
 Petr Pisar (ppisar@redhat.com)
 
-
-
 =back
-
 
 =head1 COPYRIGHT
 

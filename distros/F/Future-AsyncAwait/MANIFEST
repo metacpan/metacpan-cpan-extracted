@@ -13,6 +13,8 @@ lib/Future/AsyncAwait.h
 lib/Future/AsyncAwait.pm
 lib/Future/AsyncAwait.xs
 lib/Future/AsyncAwait/Awaitable.pm
+lib/Future/AsyncAwait/ExtensionBuilder.pm
+lib/Future/AsyncAwait/ExtensionBuilder_data.pm.PL
 lib/Test/Future/AsyncAwait/Awaitable.pm
 LICENSE
 MANIFEST			This list of files

@@ -2,7 +2,7 @@ package Test2::Harness::Runner::Resource;
 use strict;
 use warnings;
 
-our $VERSION = '1.000133';
+our $VERSION = '1.000136';
 
 sub setup {}
 
@@ -14,6 +14,14 @@ sub new {
 sub tick { }
 
 sub refresh { }
+
+sub discharge { }
+
+sub sort_weight {
+    my $class = shift;
+    return 100 if $class->job_limiter;
+    return 50;
+}
 
 sub job_limiter { 0 }
 
@@ -417,6 +425,20 @@ limiter.
 
 True if the limiter has reached its maximum number of running jobs. This is
 used to avoid a resource-allocation loop as an optimization.
+
+=item $number = $inst->sort_weight()
+
+Used to sort resources if you want them to be checked in a specific order. For
+most resources this defaults to 50. For job_limiter resources this defaults to
+100. Lower numbers are sorted to the front of the list, IE they are aquired
+first, before other resources.
+
+Job slots are sorted later (100) so that we do not try to grab a job slot if
+other resources are not available.
+
+Most of the time order will not matter, however with Shared job slots we have a
+race with other test runs to get slots, and checking availability is enough to
+consume a slot, even if other resources are not available.
 
 =back
 

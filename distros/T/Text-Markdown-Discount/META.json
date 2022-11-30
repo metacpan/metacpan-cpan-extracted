@@ -42,6 +42,6 @@
          "web" : "https://github.com/sekimura/text-markdown-discount"
       }
    },
-   "version" : "0.14",
+   "version" : "0.16",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

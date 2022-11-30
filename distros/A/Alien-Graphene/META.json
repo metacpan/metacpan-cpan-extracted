@@ -4,7 +4,7 @@
       "Zakariyya Mughal <zmughal@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Dist::Zilla version 6.024, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -35,6 +35,7 @@
          "requires" : {
             "Alien::Build" : "0.32",
             "Alien::Build::MM" : "0.32",
+            "Alien::Build::Plugin::Download::GitHub" : "0",
             "Alien::Build::Plugin::Gather::Dino" : "0",
             "Devel::FindPerl" : "0",
             "ExtUtils::MakeMaker" : "6.52",
@@ -74,18 +75,20 @@
    },
    "release_status" : "stable",
    "resources" : {
-      "homepage" : "https://github.com/Intertangle/p5-Alien-Graphene",
+      "homepage" : "https://github.com/PerlGfx/p5-Alien-Graphene",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/Intertangle/p5-Alien-Graphene.git",
-         "web" : "https://github.com/Intertangle/p5-Alien-Graphene"
+         "url" : "https://github.com/PerlGfx/p5-Alien-Graphene.git",
+         "web" : "https://github.com/PerlGfx/p5-Alien-Graphene"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_alienfile" : {
       "generated_by" : "Dist::Zilla::Plugin::AlienBuild version 0.32",
       "requires" : {
          "share" : {
+            "Alien::Build::Plugin::Download::GitHub" : "0",
+            "Alien::Build::Plugin::Download::Negotiate" : "1.30",
             "Alien::Build::Plugin::Gather::Dino" : "0",
             "Alien::Meson" : "0",
             "Alien::Ninja" : "0",
@@ -96,8 +99,8 @@
             "IO::Zlib" : "0",
             "Mojo::DOM" : "0",
             "Mojolicious" : "7.00",
+            "Mozilla::CA" : "0",
             "Net::SSLeay" : "1.49",
-            "Sort::Versions" : "0",
             "URI" : "0",
             "URI::Escape" : "0"
          },
@@ -105,7 +108,7 @@
       }
    },
    "x_generated_by_perl" : "v5.26.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.28",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

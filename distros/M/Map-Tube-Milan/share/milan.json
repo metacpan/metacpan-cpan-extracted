@@ -5,6 +5,7 @@
             { "id": "M1", "name": "M1", "color": "red" },
             { "id": "M2", "name": "M2", "color": "green" },
             { "id": "M3", "name": "M3", "color": "yellow" },
+            { "id": "M4", "name": "M4", "color": "blue" },
             { "id": "M5", "name": "M5", "color": "purple" }
         ]
     },
@@ -139,7 +140,14 @@
             { "id": "CAGRANDA", "name": "Ca' Granda", "line": "M5", "link": "ISTRIA,BICOCCA" },
             { "id": "BICOCCA", "name": "Bicocca", "line": "M5", "link": "CAGRANDA,PONALE" },
             { "id": "PONALE", "name": "Ponale", "line": "M5", "link": "BICOCCA,BIGNAMIPARCONORD" },
-            { "id": "BIGNAMIPARCONORD", "name": "Bignami Parco Nord", "line": "M5", "link": "PONALE" }
+            { "id": "BIGNAMIPARCONORD", "name": "Bignami Parco Nord", "line": "M5", "link": "PONALE" },
+
+            { "id": "LINATEAEROPORTO", "name": "Linate Aeroporto", "line": "M4", "link": "REPETTI" },
+            { "id": "REPETTI", "name": "Repetti", "line": "M4", "link": "LINATEAEROPORTO,STAZIONEFORLANINI" },
+            { "id": "STAZIONEFORLANINI", "name": "Stazione Forlanini", "line": "M4", "link": "REPETTI,ARGONNE" },
+            { "id": "ARGONNE", "name": "Argonne", "line": "M4", "link": "STAZIONEFORLANINI,SUSA" },
+            { "id": "SUSA", "name": "Susa", "line": "M4", "link": "ARGONNE,DATEO" },
+            { "id": "DATEO", "name": "Dateo", "line": "M4", "link": "SUSA" }
 
         ]
     }

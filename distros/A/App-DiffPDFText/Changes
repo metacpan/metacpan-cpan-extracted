@@ -1,3 +1,10 @@
+0.003   2022-09-08  Released-By: PERLANCAR; Urgency: medium
+
+        - Add CLI: script/diff-pdf-text-between-conflicted-git-versions.
+
+        - [pod] Fix heading level in POD.
+
+
 0.002   2021-07-17  Released-By: PERLANCAR; Urgency: medium
 
 	- Add option --pdf-pages.

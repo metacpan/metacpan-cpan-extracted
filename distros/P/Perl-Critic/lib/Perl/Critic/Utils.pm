@@ -15,14 +15,14 @@ use File::Spec qw();
 use Scalar::Util qw( blessed );
 use B::Keywords qw();
 use PPI::Token::Quote::Single;
-use List::MoreUtils qw(any);
+use List::SomeUtils qw(any);
 
 use Perl::Critic::Exception::Fatal::Generic qw{ throw_generic };
 use Perl::Critic::Utils::PPI qw< is_ppi_expression_or_generic_statement >;
 
 use Exporter 'import';
 
-our $VERSION = '1.140';
+our $VERSION = '1.142';
 
 #-----------------------------------------------------------------------------
 # Exportable symbols here.
@@ -881,6 +881,11 @@ sub is_in_void_context {
         return if $parent->isa('PPI::Structure::Condition');
         return if $parent->isa('PPI::Structure::Constructor');
         return if $parent->isa('PPI::Structure::Subscript');
+
+        # If it's in a block and not the last statement then it's in void.
+        return 1 if
+                $parent->isa('PPI::Structure::Block')
+            and $token->statement()->snext_sibling();
 
         my $grand_parent = $parent->parent();
         if ($grand_parent) {
@@ -2003,7 +2008,7 @@ Jeffrey Ryan Thalhammer <jeff@imaginative-software.com>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2005-2011 Imaginative Software Systems.  All rights reserved.
+Copyright (c) 2005-2021 Imaginative Software Systems
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.  The full text of this license

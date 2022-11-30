@@ -6,6 +6,7 @@ use Coro ;
 use Coro::AIO ;
 use Data::Dump qw{pp} ;
 use AnyEvent::Util ;
+use Encode;
 
 no warnings 'uninitialized' ;
 
@@ -437,6 +438,11 @@ sub _rpcreq_rangeFormatting
     
     return [] if ($range_text eq '') ;
 
+    my $lang = $ENV{LANG} ;
+    my $encoding = 'UTF-8' ;
+    $encoding = $1 if ($lang =~ /\.(.+)/) ;
+    $range_text = Encode::encode($encoding, $range_text) ;
+
     $self -> logger ("start perltidy $uri from line $start to $end\n") if ($Perl::LanguageServer::debug1) ;
     if ($^O =~ /Win/)
         {
@@ -475,13 +481,15 @@ sub _rpcreq_rangeFormatting
         }
     $workspace -> add_diagnostic_messages ($self, $uri, 'perltidy', \@messages, $files -> {$uri}{version} + 1) ;
 
+    die "perltidy failed with exit code $rc" if ($rc != 0 && $out eq '') ;
+
     # make sure range is numeric
     $range -> {start}{line} += 0 ;
     $range -> {start}{character} = 0 ;
     $range -> {end}{line} += $range -> {end}{character} > 0?1:0 ;
     $range -> {end}{character} = 0 ;
 
-    return [ { newText => $out, range => $range } ] ;
+    return [ { newText => Encode::decode($encoding, $out), range => $range } ] ;
     }
 
 # ---------------------------------------------------------------------------

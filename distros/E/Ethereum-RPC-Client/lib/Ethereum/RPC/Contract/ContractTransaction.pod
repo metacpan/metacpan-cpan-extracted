@@ -1,0 +1,53 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Ethereum::RPC::Contract::ContractTransaction
+at lib/Ethereum/RPC/Contract/ContractTransaction.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+   Ethereum::RPC::Contract::ContractTransaction - Centralize contract transactions
+
+=head2 call_transaction
+
+Call a public functions and variables from a ethereum contract
+
+Return:
+    Ethereum::RPC::Contract::ContractResponse, error message
+
+=head2 send_transaction
+
+Send a transaction to a payable functions from a ethereum contract
+
+The parameter GAS is required to send a payable request.
+
+Return:
+    Ethereum::RPC::Contract::ContractResponse, error message
+
+=head2 get_contract_address
+
+Try to get a contract address based on a transaction hash
+
+Parameters:
+    $wait_seconds    ( Optional - max time to wait for the contract address response ),
+    $send_response     ( Optional - response of the send method, if not informed send a new transaction and then try to get the address ),
+
+Return:
+    Ethereum::Contract::ContractResponse
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Moo::Object>
+
+L<BUILDALL|Moo::Object/BUILDALL>, L<BUILDARGS|Moo::Object/BUILDARGS>, L<DEMOLISHALL|Moo::Object/DEMOLISHALL>, L<does|Moo::Object/does>, L<meta|Moo::Object/meta>
+
+=back
+

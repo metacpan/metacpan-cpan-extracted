@@ -26,7 +26,7 @@ my $test_span = Span->new(
 
 $test_span->finish( 83.500 );
 
-my $struct = Client->to_struct( $test_span );
+my $struct = Client->new->to_struct( $test_span );
 
 cmp_deeply(
     $struct => {
@@ -48,5 +48,11 @@ cmp_deeply(
     },
     "Extracted the right structure, including DataDog specifics"
 );
+
+{
+    local $ENV{DD_ENV} = "production";
+    $struct = Client->new->to_struct($test_span);
+    is $struct->{meta}{env}, 'production', "Passed environment from DD_ENV";
+}
 
 done_testing();

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Getopt::Long with Class - ~/lib/Getopt/Class.pm
-## Version v0.103.2
+## Version v0.103.3
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2020/04/25
-## Modified 2022/10/26
+## Modified 2022/11/23
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -26,7 +26,7 @@ BEGIN
     use Module::Generic::Scalar;
     use Nice::Try;
     use Scalar::Util;
-    our $VERSION = 'v0.103.2';
+    our $VERSION = 'v0.103.3';
 };
 
 use strict;
@@ -824,7 +824,7 @@ sub TIEHASH
     my $bitmask = ( caller( $call_offset - 1 ) )[9];
     my $offset = $warnings::Offsets{uninitialized};
     # print( STDERR "Caller (2)'s bitmask is '$bitmask', warnings offset is '$offset' and vector is '", vec( $bitmask, $offset, 1 ), "'.\n" );
-    my $should_display_warning = vec( $bitmask, $offset, 1 );
+    my $should_display_warning = vec( ( $bitmask // 0 ), $offset, 1 );
     
     my $dict = $opts->{dict} || return( __PACKAGE__->error( "No dictionary was provided to Getopt::Class:Alias" ) );
     if( Scalar::Util::reftype( $dict ) ne 'HASH' )
@@ -1012,7 +1012,7 @@ Getopt::Class - Extended dictionary version of Getopt::Long
 
 =head1 VERSION
 
-    v0.103.2
+    v0.103.3
 
 =head1 DESCRIPTION
 

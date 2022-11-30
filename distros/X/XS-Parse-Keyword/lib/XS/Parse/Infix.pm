@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Infix 0.27;
+package XS::Parse::Infix 0.28;
 
 use v5.14;
 use warnings;
@@ -72,6 +72,8 @@ requirement; e.g.
 
    bool parse_infix(enum XSParseInfixSelection select, struct XSParseInfixInfo **infop);
 
+I<Since version 0.27.>
+
 This function attempts to parse syntax for an infix operator from the current
 parser position. If it is successful, it fills in the variable pointed to by
 I<infop> with a pointer to the actual information structure and returns
@@ -109,6 +111,8 @@ These tokens will all yield an info structure, with the following fields:
 
       struct XSParseInfixHooks *hooks;
       void                     *hookdata;
+
+      enum XSParseInfixClassification cls;  /* since version 0.28 */
    };
 
 If the operator name contains any non-ASCII characters they are presumed to be

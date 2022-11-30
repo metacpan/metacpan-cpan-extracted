@@ -1,5 +1,6 @@
 #include "apricot.h"
 #include "Icon.h"
+#include "Region.h"
 #include "img_conv.h"
 #include <Icon.inc>
 
@@ -395,9 +396,16 @@ Icon_maskIndex( Handle self, Bool set, int index)
 SV *
 Icon_maskPixel( Handle self, Bool set, int x, int y, SV * pixel)
 {
+	Point pt;
+
 	if (!set) {
 		if ( opt_InPaint)
 			return inherited pixel(self,false,x,y,pixel);
+
+		pt = prima_matrix_apply_to_int( var->current_state.matrix, x, y );
+		x = pt.x;
+		y = pt.y;
+
 		if (x >= var->w || x < 0 || y >= var->h || y < 0)
 			return newSViv(clInvalid);
 
@@ -418,6 +426,11 @@ Icon_maskPixel( Handle self, Bool set, int x, int y, SV * pixel)
 		IV color;
 		if ( is_opt( optInDraw))
 			return inherited pixel(self,true,x,y,pixel);
+
+		pt = prima_matrix_apply_to_int( var->current_state.matrix, x, y );
+		x = pt.x;
+		y = pt.y;
+
 
 		if ( x >= var->w || x < 0 || y >= var->h || y < 0)
 			return NULL_SV;
@@ -783,31 +796,75 @@ Icon_premultiply_alpha( Handle self, SV * alpha)
 Bool
 Icon_bar_alpha( Handle self, int alpha, int x1, int y1, int x2, int y2)
 {
-	Point t;
 	Image dummy;
 	ImgPaintContext ctx;
+	Bool free_rgn = false;
+	PRegionRec rgn = var->regionData;
+
 	if (opt_InPaint)
 		return apc_gp_alpha( self, alpha, x1, y1, x2, y2);
 
+	if ( x1 < 0 && y1 < 0 && x2 < 0 && y2 < 0 ) {
+		x1 = 0;
+		y1 = 0;
+		x2 = var-> w - 1;
+		y2 = var-> h - 1;
+	} else {
+		NRect nrect = {x1,y1,x2,y2};
+		NPoint npoly[4];
+
+		if ( prima_matrix_is_square_rectangular( var->current_state.matrix, &nrect, npoly)) {
+			x1 = floor(nrect.left   + .5);
+			y1 = floor(nrect.bottom + .5);
+			x2 = floor(nrect.right  + .5);
+			y2 = floor(nrect.top    + .5);
+		} else {
+			Handle rgn1;
+			PRegionRec rgndata;
+			int i;
+			Point poly[4];
+
+			prima_matrix_apply2_to_int( var->current_state.matrix, npoly, poly, 4 );
+			x1 = x2 = poly[0].x;
+			y1 = y2 = poly[0].y;
+			for ( i = 1; i < 4; i++) {
+				if ( x1 > poly[i].x ) x1 = poly[i].x;
+				if ( y1 > poly[i].y ) y1 = poly[i].y;
+				if ( x2 < poly[i].x ) x2 = poly[i].x;
+				if ( y2 < poly[i].y ) y2 = poly[i].y;
+			}
+			rgndata = img_region_polygon( poly, 4, fmWinding | fmOverlay );
+			rgn1 = Region_create_from_data( NULL_HANDLE, rgndata );
+			free( rgndata );
+
+			if ( var-> regionData ) {
+				Handle rgn2 = Region_create_from_data( NULL_HANDLE, var->regionData );
+				Region_combine(rgn1, rgn2, rgnopUnion);
+				Object_destroy(rgn2);
+			}
+			rgn = Region_update_change(rgn1, true);
+			Object_destroy(rgn1);
+		}
+	}
+
 	img_fill_dummy( &dummy, var-> w, var-> h, var-> maskType | imGrayScale, var-> mask, std256gray_palette);
 
-	t = my->get_translate(self);
-	x1 += t.x;
-	y1 += t.y;
 	bzero(&ctx, sizeof(ctx));
-	ctx. color[0] = alpha & 0xff;
-	ctx. rop = ropCopyPut;
-	ctx. region = var->regionData ? &var->regionData-> data. box : NULL;
 	memset( ctx.pattern, 0xff, sizeof(ctx.pattern));
 	ctx.patternOffset.x = ctx.patternOffset.y = 0;
-	ctx.transparent = false;
+	ctx.transparent     = false;
+	ctx. color[0]       = alpha & 0xff;
+	ctx. rop            = ropCopyPut;
+	ctx. region         = rgn;
 	img_bar((Handle) &dummy, x1, y1, x2 - x1 + 1, y2 - y1 + 1, &ctx);
+
+	if ( free_rgn ) free(rgn);
 
 	return true;
 }
 
 Bool
-Icon_rotate( Handle self, double degrees)
+Icon_rotate( Handle self, double degrees, SV * svfill)
 {
 	Bool ok;
 	Image dummy;
@@ -822,9 +879,9 @@ Icon_rotate( Handle self, double degrees)
 	dummy.scaling = var->scaling;
 	dummy.mate    = var->mate;
 
-	ok = inherited rotate(self, degrees);
+	ok = inherited rotate(self, degrees, NULL_SV);
 	if ( ok ) {
-		ok = Image_rotate((Handle) &dummy, degrees);
+		ok = Image_rotate((Handle) &dummy, degrees, NULL_SV);
 		if ( ok ) {
 			var-> mask     = dummy.data;
 			var-> maskLine = dummy. lineSize;
@@ -843,11 +900,13 @@ Icon_rotate( Handle self, double degrees)
 }
 
 Bool
-Icon_transform( Handle self, double a, double b, double c, double d)
+Icon_transform( Handle self, HV * profile )
 {
+	dPROFILE;
 	Bool ok;
 	Image dummy;
 	int autoMasking = var->autoMasking, maskType = var->maskType;
+	SV * matrix = NULL;
 	var->autoMasking = amNone;
 
 	var->updateLock++;
@@ -858,9 +917,18 @@ Icon_transform( Handle self, double a, double b, double c, double d)
 	dummy.scaling = var->scaling;
 	dummy.mate    = var->mate;
 
-	ok = inherited transform(self, a, b, c, d);
+	pdelete( fill );
+
+	if ( pexist(matrix)) {
+		matrix = pget_sv(matrix);
+		++SvREFCNT(matrix);
+	}
+
+	ok = inherited transform(self, profile);
 	if ( ok ) {
-		ok = Image_transform((Handle) &dummy, a, b, c, d);
+		pset_sv( matrix, matrix );
+		ok = Image_transform((Handle) &dummy, profile );
+		hv_clear(profile);
 		if ( ok ) {
 			var-> mask     = dummy.data;
 			var-> maskLine = dummy. lineSize;
@@ -869,6 +937,8 @@ Icon_transform( Handle self, double a, double b, double c, double d)
 				croak("panic: icon object inconsistent after 2d transform");
 		}
 	}
+	if ( matrix )
+		--SvREFCNT(matrix);
 
 	if (maskType != imbpp8 && is_opt( optPreserveType))
 		my-> set_maskType( self, maskType);

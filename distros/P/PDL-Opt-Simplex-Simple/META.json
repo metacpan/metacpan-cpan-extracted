@@ -33,7 +33,7 @@
       "runtime" : {
          "requires" : {
             "Math::Round" : "0",
-            "PDL" : "2.007",
+            "PDL" : "2.056",
             "perl" : "5.010"
          }
       },
@@ -55,6 +55,6 @@
          "web" : "https://github.com/KJ7LNW/perl-PDL-Opt-Simplex-Simple.git"
       }
    },
-   "version" : "1.6",
+   "version" : "1.7",
    "x_serialization_backend" : "JSON::PP version 2.97001"
 }

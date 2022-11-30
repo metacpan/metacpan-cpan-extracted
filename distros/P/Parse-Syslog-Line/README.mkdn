@@ -4,7 +4,7 @@ Parse::Syslog::Line - Simple syslog line parser
 
 # VERSION
 
-version 4.7
+version 5.0
 
 # SYNOPSIS
 
@@ -42,8 +42,8 @@ parsed out.
     #       content         => 'the rest of the message'
     #       message         => 'program[pid]: the rest of the message',
     #       message_raw     => 'The message as it was passed',
-    #       ntp             => 'ok',           # Only set for Cisco messages
-    #       SDATA           => { ... },  # Decoded JSON or K/V Pairs in the message
+    #       ntp             => 'ok',        # Only set for Cisco messages
+    #       SDATA           => { ... },     # RFC Structured data, decoded JSON, or K/V Pairs in the message
     # };
     ...
 
@@ -149,7 +149,7 @@ defaults to using microsecond resolution.
 ## AutoDetectJSON
 
 Default is false.  If true, we'll autodetect the presence of JSON in the syslog
-message and use [JSON::MaybeXS](https://metacpan.org/pod/JSON::MaybeXS) to decode it.  The detection/decoding is
+message and use [JSON::MaybeXS](https://metacpan.org/pod/JSON%3A%3AMaybeXS) to decode it.  The detection/decoding is
 simple.  If a '{' is detected, everything until the end of the message is
 assumed to be JSON.  The decoded JSON will be added to the `SDATA` field.
 
@@ -162,6 +162,47 @@ key/value pairds in the message stream.  That format is `k1=v1, k2=v2`.
 Resulting K/V pairs will be added to the `SDATA` field.
 
     $Parse::Syslog::Line::AutoDetectKeyValues = 1;
+
+## RFC5424StructuredData
+
+Default is true.  When enabled, this will extract the RFC standard structured data
+from the message content.  That content will be stripped from the message
+`content` field.
+
+Some examples:
+
+    # Input
+    [foo x=1] some words [bar x=2]
+
+    # To (YAML for brevity)
+    ---
+    SDATA:
+      bar:
+        x: 2
+      foo:
+        x: 1
+    content: some words
+
+    # Input
+    [x=1] some words
+
+    # To (YAML for brevity)
+    ---
+    SDATA:
+      x: 1
+    content: some words
+
+To disable:
+
+    $Parse::Syslog::Line::RFC5424StructuredData = 0;
+
+## RFC5424StructuredDataStrict
+
+Require the format:
+
+    [namespace@id property="value"][namespace@id property="value"]
+
+Defaults to 0, set to 1 to only parse the RFC5424 formatted structured data.
 
 ## PruneRaw
 
@@ -266,6 +307,23 @@ a hash reference as such:
         'as_text'   => 'user',
         'as_int'    => 8,
     };
+
+# ENVIRONMENT VARIABLES
+
+There are environment variables that affect how we operate. They are not
+options as they are not intended to be used by our users. Use at your own risk.
+
+## PARSE\_SYSLOG\_LINE\_DEBUG
+
+Outputs debugging information about the parser, not really intended for end-users.
+
+## PARSE\_SYSLOG\_LINE\_QUIET
+
+Disables warnings in the parse\_syslog\_line() function
+
+## TEST\_ACTIVE / TEST2\_ACTIVE
+
+Disables warnings in the parse\_syslog\_line() function
 
 # DEVELOPMENT
 

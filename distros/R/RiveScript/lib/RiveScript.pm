@@ -5,7 +5,7 @@ use warnings;
 
 # Version of the Perl RiveScript interpreter. This must be on a single line!
 # See `perldoc version`
-use version; our $VERSION = version->declare('v2.0.3');
+use version; our $VERSION = version->declare('v2.0.4');
 
 our $SUPPORT = '2.0';  # Which RS standard we support.
 our $basedir = (__FILE__ =~ /^(.+?)\.pm$/i ? $1 : '.');
@@ -2867,7 +2867,7 @@ sub _reply_regexp {
 	$regexp =~ s/\*/(.+?)/ig;        # Convert * into (.+?)
 	$regexp =~ s/\#/(\\d+)/ig;    # Convert # into ([0-9]+?)
 	$regexp =~ s/\_/(\\w+)/ig; # Convert _ into ([A-Za-z]+?)
-	$regexp =~ s/\{weight=\d+\}//ig; # Remove {weight} tags.
+	$regexp =~ s/\s*\{weight=\d+\}\s*//ig; # Remove {weight} tags.
 	$regexp =~ s/<zerowidthstar>/(.*?)/i;
 	while ($regexp =~ /\[(.+?)\]/i) { # Optionals
 		my @parts = split(/\|/, $1);
@@ -3146,7 +3146,7 @@ sub processTags {
 				$insert = "\x00$match\x01";
 			}
 
-			$reply =~ s/<$match>/$insert/i;
+			$reply =~ s/<\Q$match\E>/$insert/i;
 		}
 		else {
 			last; # No more tags remaining.
@@ -3380,6 +3380,12 @@ defines the standards of RiveScript.
 L<http://www.rivescript.com/> - The official homepage of RiveScript.
 
 =head1 CHANGES
+
+  2.0.4  Nov 25 2022
+  - Fix certain combinations of nested tags causing an infinite loop to
+    parse them.
+  - Fix {weight} tags in triggers not trimming remaining whitespace after
+    they are removed, which affected trigger matching ability.
 
   2.0.3  Aug 26 2016
   - Fix inline comment regexp that was making URLs impossible to represent

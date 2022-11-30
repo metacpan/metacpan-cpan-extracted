@@ -11,7 +11,7 @@ WriteMakefile(
         'ExtUtils::MakeMaker' => '6.76',
     },
     LICENSE            => 'agpl_3',
-    MIN_PERL_VERSION   => v5.20.0,
+    MIN_PERL_VERSION   => v5.24.0,
     NAME               => 'HTML::Blitz',
     PREREQ_PM          => {
         constant               => 0,

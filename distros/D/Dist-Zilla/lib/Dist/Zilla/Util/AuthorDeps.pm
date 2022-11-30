@@ -1,4 +1,4 @@
-package Dist::Zilla::Util::AuthorDeps 6.028;
+package Dist::Zilla::Util::AuthorDeps 6.029;
 # ABSTRACT: Utils for listing your distribution's author dependencies
 
 use Dist::Zilla::Pragmas;
@@ -114,7 +114,7 @@ sub extract_author_deps {
         : do {
             my $m = $_;
             ! eval {
-              local @INC = @INC; push @INC, $root;
+              local @INC = @INC; push @INC, "$root";
               # This will die if module is missing
               Module::Runtime::require_module($m);
               my $v = $vermap->{$m};
@@ -146,7 +146,7 @@ Dist::Zilla::Util::AuthorDeps - Utils for listing your distribution's author dep
 
 =head1 VERSION
 
-version 6.028
+version 6.029
 
 =head1 PERL VERSION
 

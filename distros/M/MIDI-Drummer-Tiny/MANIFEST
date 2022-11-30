@@ -8,8 +8,8 @@ Makefile.PL
 README
 README.md
 dist.ini
-eg/The-Black-Page.pdf
 eg/black-page
+eg/bozzios-black-page.pl
 eg/cold-sweat
 eg/crescendo
 eg/disco

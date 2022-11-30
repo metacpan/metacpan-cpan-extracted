@@ -3,7 +3,7 @@
 eval 'exec /usr/bin/perl -w -S $0 ${1+"$@"}'
     if 0; # not running under some shell
 
-$VERSION = '1.03';
+$VERSION = '1.16';
 
 use MP3::Tag 0.9711;
 use Getopt::Std 'getopts';
@@ -17,7 +17,59 @@ my %opt = (E => '', p => '%{mA}%{n0}_%t', e => '.inf|.tag|.mp3', r => qr(\.mp3$)
 # WinCyrillic (win1251), short (CDFS), Keep non-filename chars, Dry run, Glob,
 # path via pattern, |-separated list of associated extensions
 # (PEC@R as in mp3info2)
-getopts('csKDGp:e:P:E:C:@Rx', \%opt);
+getopts('csKDGp:e:P:E:C:@RxUL', \%opt);
+
+sub my_decode($$) {	# If file names are utf-ized, glob fails???
+  # De-utf-ize if possible...
+  join '', map chr ord, split //, &Encode::decode;
+}
+
+sub my_decode_deep($$);
+sub my_decode_deep($$) {
+  my($e,$t) = (shift, shift);
+  if (ref $t eq 'ARRAY') {
+    return [map my_decode_deep($e, $_), @$t];
+  } elsif ('Regexp' eq ref $t) {	# do nothing
+    return $t
+  } elsif (ref $t) {
+    die "panic: reference of type `$t' (", ref $t, ") unexpected"
+  }
+  # De-utf-ize if possible...
+  join '', map chr ord, split //, Encode::decode($e, $t);
+}
+
+# This is borrowed from mp3info2 (changing the option e to L and 'binary' disabled)
+my $uE = (($ENV{LANG}||'') =~ /\.utf-8$/i and not (${^UNICODE} & 0x20) and not $ENV{"MP3INFO_DECODE_ARGV_DEFAULT_RESET"});
+$opt{L} = 15 if ($opt{U} or $uE) and not defined $opt{L};
+if ($opt{L}) {
+  my $skip;
+  if ($opt{L} =~ /^(\d+)$/ and $1 <= 15 ) {
+    require Encode;
+    my $locale;
+    if ($opt{U}) {
+      $locale = 'UTF-8';
+    } else {
+      $locale = $ENV{LC_CTYPE} || $ENV{LC_ALL} || $ENV{LANG};
+      if ($^O eq 'os2' and not eval {Encode::resolve_alias($locale)} ) {
+        require OS2::Process;
+        $locale = 'cp' . OS2::Process::out_codepage();
+      }
+    }
+    MP3::Tag->reset_encode_decode_config($locale) if $locale and $opt{L} & 0x08;
+#    warn "LOCALE=$locale: e=$opt{L}";
+    $skip = !($opt{L} & 1);
+    # Reinterpret @ARGV
+    @ARGV = map my_decode($locale, $_), @ARGV if $opt{L} & 4;
+    # Reinterpret opts
+    @opt{keys %opt} = map my_decode_deep($locale, $_), values %opt
+      if $opt{L} & 2;
+    $opt{L} = $locale;
+#  } elsif ($opt{L} eq 'binary') {
+#    binmode STDOUT;
+#    $skip = 1;
+  }
+  binmode STDOUT, ":encoding($opt{L})" if defined $opt{L} and not $skip;
+}
 
 # Interprete Escape sequences:
 my %r = ( 'n' => "\n", 't' => "\t", '\\' => "\\"  );
@@ -406,8 +458,8 @@ in the given pattern (not slashes coming from interpolated strings).
 
 =item B<-c>
 
-Latinize file names (for portability) assuming they are in WinCyrillic
-encoding.  Needs F<transliterate_win1251.pm> (in F<examples/mod/Encode>
+Latinize file names (for portability) assuming they are in Unicode (or
+WinCyrillic) encoding.  Needs F<transliterate_win1251.pm> (in F<examples/mod/Encode>
 directory of the distribution; put it in the subdirectory F<Encode> of the
 script directory).
 
@@ -416,6 +468,25 @@ script directory).
 Do not convert "exotic" characters to underscores (those characters
 which have a low portability score, so the files will have problem
 being moved between systems).
+
+=item B<-L>
+
+The value of option C<-L> is the encoding used for the
+output; if the value is a number, system-specific encoding is guessed
+(and used for the output if the bit 0x1 is set); if the bit 0x2 is set,
+then command line options are assumed to be in the guessed encoding; if
+the bit 0x4 is set, then command line arguments are assumed to be in the
+guessed encoding.  If the bit 0x8 is set, the encoding/decoding
+configuration of file input/output of C<MP3::Tag> is redone with the
+the detected encoding.
+
+=item B<-U>
+
+In presence of C<-U> option the default for C<-L> is C<15>, and
+the decoding/encoding processing happens as if LANG is set for C<UTF-8>
+encoding.  (For example, for C<-Uee 1> the C<STDOUT> the output message
+of this script happens in UTF-8 mode, which makes it easier to detect 
+decoding/encoding errors in tags.)
 
 =back
 
@@ -432,7 +503,7 @@ utility to set the wanted file name into some ID3v2 frame (such as
 C<TXXX[wanted-target-name]>), and then, after checking for errors, use
 this result similarly to
 
-  audio_rename -p "%{TXXX[wanted-target-name]]}" -R .
+  audio_rename -p "%{TXXX[wanted-target-name]}" -R .
 
 After rename, one can delete this frame from the resulting files.
 

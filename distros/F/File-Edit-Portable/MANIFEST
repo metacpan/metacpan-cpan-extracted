@@ -1,8 +1,9 @@
+.github/workflows/unit_tests.yml
 Changes
 ignore.txt
 lib/File/Edit/Portable.pm
 Makefile.PL
-MANIFEST
+MANIFEST			This list of files
 MANIFEST.SKIP
 README
 t/000-critic.t
@@ -34,6 +35,5 @@ t/orig/unix.txt
 t/pod-coverage.t
 t/pod.t
 xt/boilerplate.t
-rhel_vendor_manifest_test.list
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -10,9 +10,9 @@ use Exporter qw(import);
 use Perinci::Sub::Util qw(gen_modified_sub);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-14'; # DATE
+our $DATE = '2022-11-15'; # DATE
 our $DIST = 'App-UniqFiles'; # DIST
-our $VERSION = '0.138'; # VERSION
+our $VERSION = '0.139'; # VERSION
 
 our @EXPORT_OK = qw(uniq_files);
 
@@ -75,7 +75,7 @@ our %argspecs_filter = (
 
 $SPEC{uniq_files} = {
     v => 1.1,
-    summary => 'Report or omit duplicate file contents',
+    summary => 'Report duplicate or unique file contents',
     description => <<'_',
 
 Given a list of filenames, will check each file size and content for duplicate
@@ -604,7 +604,7 @@ _
 );
 
 1;
-# ABSTRACT: Report or omit duplicate file contents
+# ABSTRACT: Report duplicate or unique file contents
 
 __END__
 
@@ -614,11 +614,11 @@ __END__
 
 =head1 NAME
 
-App::UniqFiles - Report or omit duplicate file contents
+App::UniqFiles - Report duplicate or unique file contents
 
 =head1 VERSION
 
-This document describes version 0.138 of App::UniqFiles (from Perl distribution App-UniqFiles), released on 2022-11-14.
+This document describes version 0.139 of App::UniqFiles (from Perl distribution App-UniqFiles), released on 2022-11-15.
 
 =head1 SYNOPSIS
 
@@ -635,7 +635,7 @@ Usage:
 
  dupe_files(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-Report or omit duplicate file contents.
+Report duplicate or unique file contents.
 
 This is a thin wrapper to L<uniq-files>. It defaults C<report_unique> to 0
 and C<report_duplicate> to 1.
@@ -772,7 +772,7 @@ Usage:
 
  uniq_files(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-Report or omit duplicate file contents.
+Report duplicate or unique file contents.
 
 Given a list of filenames, will check each file size and content for duplicate
 content. Interface is a bit like the C<uniq> Unix command-line program.

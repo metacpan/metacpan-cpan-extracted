@@ -1,5 +1,16 @@
 Revision history for Geo-TCX
 
+1.03 [2022-11-24]
+    Added support for FIT files by converting them to TCX files before parsing
+        - FIT is Garmin's Flexible and Interoperable Data Transfer (FIT) protocol
+
+    New Interactive.pm and tcx_interactive.pl class and script
+        - Geo/TCX/Interactive.pm is a sub-class of Geo::TCX with methods that prompt the user
+        - it is mainly used by tcx_interactive.pl to parse files interactively from the command-line
+        - see 'man tcx_interactive.pl' and 'man Geo::TCX::Interactive'
+
+    Ignore Extensions tags in Trackpoints (may be supported later if a need is identified)
+
 1.02 [2022-10-27]
     Geo::Gpx::Trackpoint->DistanceMeters():
         - new accessor to get (but not set) the value of the DistanceMeters key

@@ -2,7 +2,7 @@ NAME
     App::ListUtils - Command-line utilities related to lists in files
 
 VERSION
-    This document describes version 0.001 of App::ListUtils (from Perl
+    This document describes version 0.002 of App::ListUtils (from Perl
     distribution App-ListUtils), released on 2022-09-01.
 
 SYNOPSIS
@@ -22,6 +22,17 @@ FUNCTIONS
      bullet2comma(%args) -> any
 
     Convert a bulleted list into comma-separated.
+
+    Example:
+
+     % cat sample.txt
+     - hamburger
+     - sandwich
+     - fruit salad
+     - rice bowl
+ 
+     % bullet2comma sample.txt
+     hamburger, sandwich, fruit salad, rice bowl
 
     This function is not exported.
 
@@ -53,6 +64,17 @@ FUNCTIONS
 
     Get common prefix from lines of text.
 
+    Example:
+
+     % cat sample.txt
+     - hamburger
+     - sandwich
+     - fruit salad
+     - rice bowl
+ 
+     % get-common-prefix sample.txt
+     -
+
     This function is not exported.
 
     Arguments ('*' denotes required arguments):
@@ -67,6 +89,16 @@ FUNCTIONS
      get_common_suffix(%args) -> any
 
     Get common suffix from lines of text.
+
+    Example:
+
+     % cat sample.txt
+     asterix
+     vitalstatistix
+     cacofonix
+ 
+     % get-common-suffix sample.txt
+     ix
 
     This function is not exported.
 

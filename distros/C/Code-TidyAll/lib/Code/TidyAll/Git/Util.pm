@@ -3,14 +3,14 @@ package Code::TidyAll::Git::Util;
 use strict;
 use warnings;
 
-use File::pushd qw(pushd);
+use File::pushd         qw(pushd);
 use IPC::System::Simple qw(capturex);
-use List::SomeUtils qw(uniq);
-use Path::Tiny qw(path);
+use List::SomeUtils     qw(uniq);
+use Path::Tiny          qw(path);
 
 use Exporter qw(import);
 
-our $VERSION = '0.82';
+our $VERSION = '0.83';
 
 our @EXPORT_OK = qw(git_files_to_commit git_modified_files);
 
@@ -87,7 +87,7 @@ Code::TidyAll::Git::Util - Utilities for the git hook classes
 
 =head1 VERSION
 
-version 0.82
+version 0.83
 
 =head1 SUPPORT
 

@@ -4,11 +4,11 @@ package Log::Any::Adapter::DERIV;
 use strict;
 use warnings;
 
-our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
-our $VERSION = '0.002';
+our $AUTHORITY = 'cpan:DERIV';    # AUTHORITY
+our $VERSION   = '0.003';
 
 use feature qw(state);
-use parent qw(Log::Any::Adapter::Coderef);
+use parent  qw(Log::Any::Adapter::Coderef);
 
 use utf8;
 
@@ -117,10 +117,10 @@ use JSON::MaybeUTF8 qw(:v1);
 use PerlIO;
 use Config;
 use Term::ANSIColor;
-use Log::Any qw($log);
-use Fcntl qw(:DEFAULT :seek :flock);
+use Log::Any                qw($log);
+use Fcntl                   qw(:DEFAULT :seek :flock);
 use Log::Any::Adapter::Util qw(numeric_level logging_methods);
-use Clone qw(clone);
+use Clone                   qw(clone);
 
 # Used for stringifying data more neatly than Data::Dumper might offer
 our $JSON = JSON::MaybeXS->new(
@@ -144,7 +144,7 @@ our %SEVERITY_COLOUR = (
 );
 
 my @methods     = reverse logging_methods();
-my %num_to_name = map {$_ => $methods[$_]} 0..$#methods;
+my %num_to_name = map { $_ => $methods[$_] } 0 .. $#methods;
 
 # The obvious way to handle this might be to provide our own proxy class:
 #     $Log::Any::OverrideDefaultProxyClass = 'Log::Any::Proxy::DERIV';
@@ -153,7 +153,7 @@ my %num_to_name = map {$_ => $methods[$_]} 0..$#methods;
 # the default anyway.
 # Rather than trying to deal with that, we just provide our own default:
 {
-    no warnings 'redefine';
+    no warnings 'redefine';    ## no critic (ProhibitNoWarnings)
 
     # We expect this to be loaded, but be explicit just in case - we'll be overriding
     # one of the methods, so let's at least make sure it exists first
@@ -177,15 +177,15 @@ my %num_to_name = map {$_ => $methods[$_]} 0..$#methods;
         # is issued from here, which isn't very helpful. Doing something
         # clever would be expensive, so instead we just disable warnings for
         # the final line of this subroutine.
-        no warnings;
+        no warnings;    ## no critic (ProhibitNoWarnings)
         return sprintf($format, @new_params);
     };
 }
 
 # Upgrade any `warn ...` lines to send through Log::Any.
-$SIG{__WARN__} = sub {
-    # We don't expect anything called from here to raise further warnings, but
-    # let's be safe and try to avoid any risk of recursion
+$SIG{__WARN__} = sub {    ## no critic (RequireLocalizedPunctuationVars)
+                          # We don't expect anything called from here to raise further warnings, but
+                          # let's be safe and try to avoid any risk of recursion
     local $SIG{__WARN__} = undef;
     chomp(my $msg = shift);
     $log->warn($msg);
@@ -248,7 +248,7 @@ sub apply_filehandle_utf8 {
     # so we make this check quite lax and skip binmode if there's anything even slightly
     # utf-flavoured in the mix.
     $fh->binmode(':encoding(UTF-8)')
-        unless grep /utf/i, PerlIO::get_layers($fh, output => 1);
+        unless grep { /utf/i } PerlIO::get_layers($fh, output => 1);
     $fh->autoflush(1);
 }
 
@@ -300,9 +300,7 @@ sub format_line {
     my @details = (
         Time::Moment->from_epoch($data->{epoch})->strftime('%Y-%m-%dT%H:%M:%S%3f'),
         uc(substr $data->{severity}, 0, 1),
-        "[$from]",
-        $data->{message}
-    );
+        "[$from]", $data->{message});
 
     # This is good enough if we're in non-colour mode
     return join ' ', @details unless $opts->{colour};
@@ -315,25 +313,7 @@ sub format_line {
     my ($ts, $level) = splice @details, 0, 2;
     $from = shift @details;
 
-    return join ' ',
-        colored(
-            $ts,
-            qw(bright_blue)
-        ),
-        colored(
-            $level,
-            @colours
-        ),
-        colored(
-            $from,
-            qw(grey10)
-        ),
-        map {
-            colored(
-                $_,
-                @colours
-            )
-        } @details;
+    return join ' ', colored($ts, qw(bright_blue)), colored($level, @colours), colored($from, qw(grey10)), map { colored($_, @colours) } @details;
 }
 
 =head2 log_entry
@@ -459,7 +439,7 @@ sub _collapse_future_stack {
     my $previous_is_future;
 
     for my $frame ($stack->@*) {
-        if ($frame->{package} eq 'Future') {
+        if ($frame->{package} eq 'Future' || $frame->{package} eq 'Future::PP') {
             next if ($previous_is_future);
             push @new_stack, $frame;
             $previous_is_future = 1;
@@ -490,7 +470,7 @@ Returns boolean
 sub _fh_is_tty {
     my $fh = shift;
 
-    return -t $fh;
+    return -t $fh;    ## no critic (ProhibitInteractiveTest)
 }
 
 =head2 _in_container

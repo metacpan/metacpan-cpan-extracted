@@ -1,4 +1,4 @@
-use v5.34;
+use v5.10;
 
 use Test::Most;
 
@@ -8,6 +8,7 @@ use Path::Tiny;
 use Plack::Builder;
 use Plack::Response;
 use Plack::Test;
+use Plack::Middleware::ReverseProxy;
 
 my $file = Path::Tiny->tempfile;
 
@@ -42,6 +43,7 @@ my $handler = builder {
 
     enable "Greylist",
       default_rate => 5,
+      retry_after  => 120,
       file         => $file,
       greylist     => \%greylist;
 
@@ -73,11 +75,12 @@ subtest "rate limiting" => sub {
 
         is_deeply \@logs, [ { level => "warn", message => "Rate limiting 127.0.0.1 after 6/5" } ], "logs";
 
-        is $res->header('Retry-After'), 61, "Retry-After";
+        is $res->header('Retry-After'), 120, "Retry-After";
 
       SKIP: {
           skip "RELEASE_TESTING" unless $ENV{RELEASE_TESTING};
 
+          # Even though Retry-After is larger, it's not enforced.
           sleep(61);
           my $res = $cb->($req);
           is $res->code, HTTP_OK, "request ok after delay";

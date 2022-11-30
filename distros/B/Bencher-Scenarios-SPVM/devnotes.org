@@ -1,0 +1,3 @@
+Build with SPVM_BUILD_DIR (e.g. on my laptop
+SPVM_BUILD_DIR=~/tmp/perl/SPVM-0.9662) to allow running the precompile benchmark
+participant.

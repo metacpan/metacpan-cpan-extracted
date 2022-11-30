@@ -1,14 +1,16 @@
 package Perinci::Sub::XCompletion::filename;
 
-our $DATE = '2019-06-03'; # DATE
-our $VERSION = '0.102'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 
 use Complete::Util qw(hashify_answer);
 use Complete::File qw(complete_file);
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-11-25'; # DATE
+our $DIST = 'Perinci-Sub-XCompletion'; # DIST
+our $VERSION = '0.103'; # VERSION
 
 our %SPEC;
 
@@ -41,9 +43,24 @@ Perinci::Sub::XCompletion::filename - Generate completion for filename
 
 =head1 VERSION
 
-This document describes version 0.102 of Perinci::Sub::XCompletion::filename (from Perl distribution Perinci-Sub-XCompletion), released on 2019-06-03.
+This document describes version 0.103 of Perinci::Sub::XCompletion::filename (from Perl distribution Perinci-Sub-XCompletion), released on 2022-11-25.
 
 =head1 SYNOPSIS
+
+In L<argument specification|Rinci::function/"args (function property)"> of your
+L<Rinci> L<function metadata|Rinci::function>:
+
+ 'x.completion' => 'filename',
+
+Only complete with C<*.srt> and C<*.SRT> files:
+
+ 'x.completion' => ['filename' => {file_ext_filter => qr/\.srt$/i}],
+
+=head1 DESCRIPTION
+
+This completion passes arguments to L<Complete::File>'s
+L<complete_file|Complete::File/complete_file>, so see the documentation of that
+module for list of known arguments.
 
 =head1 FUNCTIONS
 
@@ -52,7 +69,7 @@ This document describes version 0.102 of Perinci::Sub::XCompletion::filename (fr
 
 Usage:
 
- gen_completion() -> [status, msg, payload, meta]
+ gen_completion() -> [$status_code, $reason, $payload, \%result_meta]
 
 This function is not exported.
 
@@ -60,12 +77,12 @@ No arguments.
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (payload) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -77,6 +94,35 @@ Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Su
 
 Source repository is at L<https://github.com/perlancar/perl-Perinci-Sub-XCompletion>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2019, 2017, 2016, 2015 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Sub-XCompletion>
@@ -84,16 +130,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2019, 2017, 2016, 2015 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

@@ -33,7 +33,7 @@ requires:
   LWP::UserAgent: '0'
   Moo: '0'
   Moo::Role: '0'
-  MooX::Attribute::ENV: '0.02'
+  MooX::Attribute::ENV: '0.04'
   MooX::Enumeration: '0'
   MooX::HandlesVia: '0'
   MooX::Should: v0.1.4
@@ -50,5 +50,5 @@ requires:
   Types::Standard: '0'
   aliased: '0'
   syntax: '0'
-version: v0.43.1
+version: v0.43.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

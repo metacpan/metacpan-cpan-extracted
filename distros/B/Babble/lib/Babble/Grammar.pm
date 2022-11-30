@@ -4,6 +4,8 @@ use PPR::X;
 use Mu;
 use strictures 2;
 
+use Babble::Config;
+
 lazy base_grammar_regexp => sub { $PPR::X::GRAMMAR };
 
 lazy base_rule_names => sub {
@@ -15,6 +17,8 @@ lazy rules => sub {
   +{ map +($_ => [ undef ]), keys %{ $_[0]->base_rule_names } }
 };
 
+# global cache of compiled grammar regexps
+my %COMPILE_CACHE;
 lazy grammar_regexp => sub {
   my ($self) = @_;
   my @parts;
@@ -31,11 +35,18 @@ lazy grammar_regexp => sub {
   my $base_re = $self->base_grammar_regexp;
   return $base_re unless @parts;
   my $define_block = join "\n", '(?(DEFINE)', '', @parts, '', ')';
-  use re 'eval';
   # This stringify is required for Perl v5.18 - v5.28
   # (RT #126285, RT #144248).
   my $final_re = "${define_block} ${base_re}";
-  return qr{$final_re}x;
+  my $_re;
+  return Babble::Config::CACHE_RE ? $COMPILE_CACHE{$final_re} : $_re = ( Babble::Config::CACHE_RE ? $COMPILE_CACHE{$final_re} : 0 )
+    || do {
+      warn "Cache miss grammar_regexp: ${define_block}\n" if Babble::Config::CACHE_RE && Babble::Config::DEBUG_CACHE_MISS;
+      use re 'eval';
+      my $re = qr{$final_re}x;
+      no re 'eval';
+      $re;
+    }
 };
 
 sub _rule_name {

@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Result;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains the result of a JSON Schema evaluation
 
-our $VERSION = '0.557';
+our $VERSION = '0.558';
 
 use 5.020;
 use Moo;
@@ -20,8 +20,8 @@ use MooX::HandlesVia;
 use JSON::Schema::Modern::Annotation;
 use JSON::Schema::Modern::Error;
 use JSON::PP ();
-use List::Util 1.50 qw(any uniq);
-use Scalar::Util 'refaddr';
+use List::Util 1.50 qw(any uniq all);
+use Scalar::Util qw(refaddr blessed);
 use Safe::Isa;
 use namespace::clean;
 
@@ -56,6 +56,13 @@ has $_.'s' => (
   handles => {
     $_.'s' => 'elements',
     $_.'_count' => 'count',
+  },
+  coerce => do {
+    my $type = $_;
+    sub ($arrayref) {
+      return $arrayref if all { blessed $_ } $arrayref->@*;
+      return [ map +(('JSON::Schema::Modern::'.ucfirst $type)->new($_)), $arrayref->@* ];
+    },
   },
 ) foreach qw(error annotation);
 
@@ -210,7 +217,7 @@ JSON::Schema::Modern::Result - Contains the result of a JSON Schema evaluation
 
 =head1 VERSION
 
-version 0.557
+version 0.558
 
 =head1 SYNOPSIS
 

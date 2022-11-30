@@ -1,0 +1,66 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Ethereum::RPC::Contract::ContractResponse
+at lib/Ethereum/RPC/Contract/ContractResponse.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+    Ethereum::Contract::RPC::ContractResponse - Centralize contract response
+
+=head2 to_big_int
+
+Convert response to a Math::BigInt if not undef
+
+Parameters:
+    hexadecimal response
+
+Return:
+    new Math::BigInt
+
+=head2 to_big_float
+
+Convert response to a Math::BigFloat if not undef
+
+Parameters:
+    hexadecimal response
+
+Return:
+    new Math::BigFloat
+
+=head2 to_string
+
+Convert response to a string if not undef
+
+Parameters:
+    hexadecimal response
+
+Return:
+    string
+
+=head2 to_hex
+
+Convert response to a hexadecimal if not undef and is not already a hex
+
+Parameters:
+    hexadecimal response
+
+Return:
+    hexadecimal string
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Moo::Object>
+
+L<BUILDALL|Moo::Object/BUILDALL>, L<BUILDARGS|Moo::Object/BUILDARGS>, L<DEMOLISHALL|Moo::Object/DEMOLISHALL>, L<does|Moo::Object/does>, L<meta|Moo::Object/meta>
+
+=back
+

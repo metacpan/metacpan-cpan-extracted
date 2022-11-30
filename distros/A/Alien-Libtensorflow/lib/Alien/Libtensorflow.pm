@@ -1,6 +1,10 @@
 package Alien::Libtensorflow;
 # ABSTRACT: Alien for Libtensorflow machine learning library C API
-$Alien::Libtensorflow::VERSION = '0.001';
+# AUTHOR: Zakariyya Mughal <zmughal@cpan.org>
+# OWNER: 2021 Zakariyya Mughal
+# OWNER: 2022 Auto-Parallel Technologies, Inc.
+# LICENSE: Apache_2_0
+$Alien::Libtensorflow::VERSION = '0.002';
 use strict;
 use warnings;
 
@@ -20,17 +24,20 @@ Alien::Libtensorflow - Alien for Libtensorflow machine learning library C API
 
 =head1 VERSION
 
-version 0.001
+version 0.002
+
+=head1 SEE ALSO
+
+L<Alien::Base>
 
 =head1 AUTHOR
 
 Zakariyya Mughal <zmughal@cpan.org>
 
-=head1 COPYRIGHT AND LICENSE
+=head1 COPYRIGHT
 
-This software is copyright (c) 2021 by Zakariyya Mughal.
+This software is copyright (c) 2021 by Zakariyya Mughal, and 2022 by Auto-Parallel Technologies, Inc..
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+This software is available under the Apache License, Version 2.0, January 2004.
 
 =cut

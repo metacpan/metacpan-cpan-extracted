@@ -74,3 +74,5 @@ $rook->move(to => $board->space('b2'));
 is($rook->current_space_id, 'b2', "rook is at b2");
 $rook->move(dir => [2,1]);
 is($rook->current_space_id, 'd3', "rook is at d3");
+
+ok(!$board->space('b2')->contains($rook), "space b2 does not contain rook");

@@ -1,6 +1,6 @@
 package SPVM;
 
-our $VERSION = '0.9661';
+our $VERSION = '0.9663';
 
 use 5.008007;
 use strict;
@@ -559,6 +559,10 @@ motiE<lt>motohiko.ave@gmail.comE<gt>
 =item * Yasuaki Omokawa
 
 =item * Suman Khanal
+
+=item * L<Ryunosuke Murakami|https://github.com/ryun0suke22>
+
+=item * L<Yoshiyuki Itoh|https://github.com/YoshiyukiItoh>
 
 =back
 

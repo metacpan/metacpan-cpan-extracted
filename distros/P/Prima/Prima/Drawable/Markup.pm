@@ -37,14 +37,14 @@ C<U> (underlined text), C<F> (change font), C<S> (change font size), C<C>
 (change foreground color), C<G> (change background color), C<M> (move pointer),
 C<W> (disable wrapping), and C<P> (picture).
 
-The C<F> sequence is used as follows: C<FE<lt>n|textE<gt>>, where C<n> is a
+The C<F> sequence is used as follows: C<< F<n|text> >>, where C<n> is a
 0-based index into the C<fontPalette>.
 
-The C<S> sequence is used as follows: C<SE<lt>n|textE<gt>>, where C<n> is the
+The C<S> sequence is used as follows: C<< S<n|text> >>, where C<n> is the
 number of points relative to the current font size. The font size may
 optionally be preceded by C<+> or C<->.
 
-The C<C> and C<G> sequences are used as follows: C<CE<lt>c|textE<gt>>, where
+The C<C> and C<G> sequences are used as follows: C<< C<c|text> >>, where
 C<c> is either: a color in any form accepted by Prima, including the C<cl>
 constants (C<Black> C<Blue> C<Green> C<Cyan> C<Red> C<Magenta> C<Brown>
 C<LightGray> C<DarkGray> C<LightBlue> C<LightGreen> C<LightCyan> C<LightRed>
@@ -69,6 +69,11 @@ The text inside C<Q> sequence will not be treated as markup.
 The C<P> sequence is used as follows:C<< PE<lt>nE<gt> >>, where C<n> is a
 0-based index into the C<picturePalette>.
 
+The L<URL|text> sequence parsing is resulted into making 1) C<text> of color C<linkColor>,
+and 2) wrapping the text with C<OP_LINK> commands in the block, that do nothing by default
+but could be used by whoever uses the block. See L<Prima::Widget::Link> for more and L<Prima::Label>
+as an example.
+
 The methods C<text_out> and C<get_text_width> are affected by C<Prima::Drawable::Markup>.
 C<text_out> will write formatted text to the canvas, and C<get_text_width> will
 return the width of the formatted text.  B<NOTE>: These methods do not save state
@@ -82,13 +87,25 @@ C<@COLORS, @FONTS, @IMAGES> correspondingly.
 =cut
 
 our (@FONTS, @COLORS, @IMAGES);
+our $LINK_COLOR = cl::Green;
+
+our $OP_LINK = tb::opcode(1, 'link');
+sub op_link_enter { $OP_LINK, 1 }
+sub op_link_leave { $OP_LINK, 0 }
+
 sub M($) {
 	return Prima::Drawable::Markup->new(
-		markup         => $_[0],
-		fontPalette    => \@FONTS,
-		picturePalette => \@IMAGES,
-		colorPalette   => \@COLORS,
-	) 
+		markup  => $_[0],
+		defaults(),
+	)
+}
+
+sub defaults
+{
+	fontPalette    => \@FONTS,
+	picturePalette => \@IMAGES,
+	colorPalette   => \@COLORS,
+	linkColor      => $LINK_COLOR,
 }
 
 sub new
@@ -99,7 +116,7 @@ sub new
 		colormap      => [0,0],
 	);
 	my $self = $class->SUPER::new(%opt);
-	$self-> $_( $opt{$_} || [] ) for qw(fontPalette colorPalette picturePalette);
+	$self-> $_( $opt{$_} || [] ) for qw(fontPalette colorPalette picturePalette linkColor);
 	$self-> markup( $opt{markup} || '');
 	return $self;
 }
@@ -271,6 +288,29 @@ sub parse_quote
 	return 1;
 }
 
+sub parse_link_syntax
+{
+	my ( $self, $mode, $command, $stacks, $state, $block, $url ) = @_;
+
+	if ( $mode ) {
+		push @{$stacks->{color}}, $state->{color};
+
+		$state->{color} = $self->linkColor;
+		push @$block,
+			tb::color($state->{color}),
+			op_link_enter,
+			;
+		push @{ $self->{link_urls} }, $url;
+	} else {
+		$state->{color} = pop @{$stacks->{color}};
+
+		push @$block,
+			op_link_leave,
+			tb::color($state->{color}),
+			;
+	}
+}
+
 sub commands
 {
 	return (
@@ -286,6 +326,7 @@ sub commands
 		W => [ 0, 1, \&parse_wrap ],
 		P => [ 1, 0, \&parse_picture ],
 		Q => [ 0, 1, \&parse_quote ],
+		L => [ 1, 1, \&parse_link_syntax ],
 	);
 }
 
@@ -307,13 +348,21 @@ sub parse
 	my ( $self, $text ) = @_;
 	my (%stacks, @cmd_stack, @delim_stack );
 
+	@{$self->{link_urls}} = ();
+
 	my %commands = $self->commands;
 
 	my @tokens = split /([A-Z]<(?:<+\s+)?|\n\r*)/, $text;
 	my $block  = tb::block_create();
+
 	my $plaintext = '';
 
 	my $state = $self->init_state;
+	$$block[ tb::BLK_COLOR      ] = $state->{color};
+	$$block[ tb::BLK_BACKCOLOR  ] = $state->{backColor};
+	$$block[ tb::BLK_FONT_ID    ] = $state->{fontId};
+	$$block[ tb::BLK_FONT_SIZE  ] = $state->{fontSize};
+	$$block[ tb::BLK_FONT_STYLE ] = $state->{fontStyle};
 
 	while ( @tokens ) {
 		my $token = shift @tokens;
@@ -413,6 +462,11 @@ sub markup
 	$self-> {block} = $block;
 }
 
+sub reparse    { $_[0]->markup( $_[0]-> markup ) }
+sub text_block { $_[0]->{block} }
+sub link_urls  { $_[0]->{link_urls} }
+sub has_links  { scalar( @{ $_[0]->{link_urls} } ) > 0 }
+
 sub acquire
 {
 	my ($self, $canvas, %opt) = @_;
@@ -465,6 +519,12 @@ sub picturePalette
 	$self->{picturePalette} = $pp;
 }
 
+sub linkColor
+{
+	return $_[0]->{linkColor} unless $#_;
+	$_[0]->{linkColor} = $_[1];
+}
+
 sub text_wrap
 {
 	my ( $self, $canvas, $width, $opt, $indent) = @_;
@@ -489,7 +549,7 @@ sub text_wrap
 		my $b = $block->{block};
 		splice( @$b, tb::BLK_START, 0,
 			tb::color( $$b[tb::BLK_COLOR]),
-			tb::color( $$b[tb::BLK_BACKCOLOR]),
+			tb::backColor( $$b[tb::BLK_BACKCOLOR]),
 			tb::fontId( $$b[tb::BLK_FONT_ID]),
 			tb::fontSize( $$b[tb::BLK_FONT_SIZE] - $self->{baseFontSize}),
 			tb::fontStyle( $$b[tb::BLK_FONT_STYLE])

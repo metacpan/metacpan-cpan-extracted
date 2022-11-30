@@ -2,9 +2,9 @@
 use strict;
 use warnings;
 
-use 5.014000;
+use 5.008005;
 
-use ExtUtils::MakeMaker 6.48;
+use ExtUtils::MakeMaker 7.64;
 
 use File::ShareDir::Install;
 $File::ShareDir::Install::INCLUDE_DOTFILES = 1;
@@ -16,7 +16,7 @@ my %WriteMakefileArgs = (
   "ABSTRACT" => "Validate a name against sanctions lists",
   "AUTHOR" => "binary.com <BINARY\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => "6.48",
+    "ExtUtils::MakeMaker" => "7.64",
     "File::ShareDir::Install" => "0.06"
   },
   "DISTNAME" => "Data-Validate-Sanctions",
@@ -24,45 +24,62 @@ my %WriteMakefileArgs = (
     "bin/update_sanctions_csv"
   ],
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.014000",
+  "MIN_PERL_VERSION" => "5.008005",
   "NAME" => "Data::Validate::Sanctions",
   "PREREQ_PM" => {
+    "Carp" => 0,
+    "Clone" => 0,
     "Data::Compare" => 0,
     "Date::Utility" => 0,
     "DateTime::Format::Strptime" => 0,
+    "Exporter" => 0,
     "File::ShareDir" => 0,
     "File::Temp" => 0,
     "File::stat" => 0,
     "FindBin" => 0,
     "Getopt::Long" => "2.42",
     "IO::Uncompress::Unzip" => 0,
+    "JSON::MaybeUTF8" => 0,
     "List::Util" => 0,
     "Locale::Country" => "3.66",
     "Mojo::UserAgent" => 0,
     "Path::Tiny" => 0,
+    "Pod::Usage" => 0,
     "Scalar::Util" => 0,
     "Syntax::Keyword::Try" => "0.18",
     "Text::CSV" => 0,
     "Text::Trim" => 0,
     "XML::Fast" => 0,
-    "YAML::XS" => 0
+    "YAML::XS" => 0,
+    "parent" => 0,
+    "strict" => 0,
+    "warnings" => 0
   },
   "TEST_REQUIRES" => {
     "Class::Unload" => 0,
     "ExtUtils::MakeMaker" => 0,
+    "File::Slurp" => 0,
     "File::Spec" => 0,
     "FindBin" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
     "Path::Tiny" => 0,
+    "RedisDB" => "2.57",
     "Test::CheckDeps" => "0.010",
+    "Test::Deep" => 0,
+    "Test::Exception" => 0,
+    "Test::Fatal" => 0,
     "Test::MockModule" => "0.15",
     "Test::MockObject" => "1.20161202",
+    "Test::MockTime" => 0,
     "Test::More" => "0.96",
+    "Test::RedisServer" => "0.23",
     "Test::Warn" => "0.23",
-    "Test::Warnings" => "0.026"
+    "Test::Warnings" => "0.026",
+    "YAML" => 0,
+    "utf8" => 0
   },
-  "VERSION" => "0.14",
+  "VERSION" => "0.15",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -70,12 +87,16 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Carp" => 0,
   "Class::Unload" => 0,
+  "Clone" => 0,
   "Data::Compare" => 0,
   "Date::Utility" => 0,
   "DateTime::Format::Strptime" => 0,
+  "Exporter" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::ShareDir" => 0,
+  "File::Slurp" => 0,
   "File::Spec" => 0,
   "File::Temp" => 0,
   "File::stat" => 0,
@@ -84,22 +105,35 @@ my %FallbackPrereqs = (
   "IO::Handle" => 0,
   "IO::Uncompress::Unzip" => 0,
   "IPC::Open3" => 0,
+  "JSON::MaybeUTF8" => 0,
   "List::Util" => 0,
   "Locale::Country" => "3.66",
   "Mojo::UserAgent" => 0,
   "Path::Tiny" => 0,
+  "Pod::Usage" => 0,
+  "RedisDB" => "2.57",
   "Scalar::Util" => 0,
   "Syntax::Keyword::Try" => "0.18",
   "Test::CheckDeps" => "0.010",
+  "Test::Deep" => 0,
+  "Test::Exception" => 0,
+  "Test::Fatal" => 0,
   "Test::MockModule" => "0.15",
   "Test::MockObject" => "1.20161202",
+  "Test::MockTime" => 0,
   "Test::More" => "0.96",
+  "Test::RedisServer" => "0.23",
   "Test::Warn" => "0.23",
   "Test::Warnings" => "0.026",
   "Text::CSV" => 0,
   "Text::Trim" => 0,
   "XML::Fast" => 0,
-  "YAML::XS" => 0
+  "YAML" => 0,
+  "YAML::XS" => 0,
+  "parent" => 0,
+  "strict" => 0,
+  "utf8" => 0,
+  "warnings" => 0
 );
 
 

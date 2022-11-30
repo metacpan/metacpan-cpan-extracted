@@ -53,7 +53,7 @@ share {
   my $with_local = '';
   my $with_cpp11 = '';
 
-  start_url 'http://download.osgeo.org/geos';
+  start_url 'https://download.osgeo.org/geos';
   #start_url "file://$base_dir";  #  debug
   plugin Download => (
     filter  => qr/^geos-([0-9\.]+)\.tar\.bz2$/,

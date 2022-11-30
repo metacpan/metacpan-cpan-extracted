@@ -20,7 +20,7 @@
 #  respective owners and no grant or license is provided thereof.
 
 package PDL::IO::Touchstone;
-our $VERSION = '1.011';
+our $VERSION = '1.013';
 
 use 5.010;
 use strict;
@@ -46,8 +46,13 @@ BEGIN {
 		wsnp_fh
 
 		rsnp_list_to_hash
+		rsnp_hash_to_list
+
 		rsnp_hash
 		rsnp_fh_hash
+
+		wsnp_hash
+		wsnp_fh_hash
 
 		n_ports
 		m_interpolate
@@ -116,6 +121,15 @@ sub rsnp_list_to_hash
 	@data{qw/freqs m param_type z0_ref comments output_fmt funit orig_f_unit/} = @data;
 
 	return %data;
+}
+
+sub rsnp_hash_to_list
+{
+	my %data = @_;
+
+	my @data = @data{qw/freqs m param_type z0_ref comments output_fmt funit orig_f_unit/};
+
+	return @data;
 }
 
 sub rsnp_fh
@@ -428,6 +442,9 @@ sub wsnp_fh
 
 	# we don't close the file descriptor here, the caller (or `wsnp`) will.
 }
+
+sub wsnp_hash     {  return  wsnp(rsnp_hash_to_list(@_));     }
+sub wsnp_fh_hash  {  return  wsnp_fh(rsnp_hash_to_list(@_));  }
 
 # https://physics.stackexchange.com/questions/398988/converting-magnitude-ratio-to-complex-form
 sub _cols_to_complex_cols
@@ -1053,57 +1070,108 @@ sub m_interpolate
 
 	croak "caller must expect an array!" if !wantarray;
 
-	# Interpolate frequency range and input data:
-	if ((defined $args->{freq_min_hz} && defined $args->{freq_max_hz} && defined $args->{freq_count}) ||
-		defined $args->{freq_min_hz} && defined $args->{freq_count} && $args->{freq_count} == 1)
-	{
-		my $freq_step;
+	my $f_new = $f;
+	my $quiet;
 
-		if ($args->{freq_count} == 1)
+	if (ref($args) eq 'HASH')
+	{
+		$quiet = $args->{quiet};
+
+		if (defined $args->{freq_range})
 		{
-			$freq_step = 0;
-			$args->{freq_max_hz} = $args->{freq_min_hz};
+			$args = $args->{freq_range};
 		}
 		else
 		{
-			$freq_step = ($args->{freq_max_hz} - $args->{freq_min_hz}) / ($args->{freq_count} - 1);
+			$args = "";
 		}
-
-		if ($freq_step && $args->{freq_min_hz} >= $args->{freq_max_hz})
-		{
-			croak "freq_min_hz=$args->{freq_min_hz} !< freq_max_hz=$args->{freq_max_hz}"
-		}
-
-
-		my $f_new = sequence($args->{freq_count}) * $freq_step + $args->{freq_min_hz};
-
-		# Scale the frequency unit to those requested by the caller:
-		my $funit = $args->{units} || 'Hz';
-		$f_new = _si_scale_hz('Hz', $funit, $f_new);
-
-		my @cx_cols = m_to_pos_vecs($m);
-		my @cx_cols_new;
-		foreach my $cx (@cx_cols)
-		{
-			my ($cx_new, $err) = _interpolate($f_new, $f, $cx);
-			if (!$args->{quiet} && any $err != 0)
-			{
-				carp "Frequency range for interpolation is below/beyond reference frequencies."
-			}
-			push @cx_cols_new, $cx_new;
-		}
-
-		return ($f_new, pos_vecs_to_m(@cx_cols_new));
 	}
-	elsif (defined $args->{freq_min_hz} || defined $args->{freq_max_hz} || defined $args->{freq_count})
+
+	# Not an elsif, the hash above could have had { range => [] } !
+	if (ref($args) eq 'ARRAY')
 	{
-		croak("If any of freq_min_hz, freq_max_hz, or freq_count are defined then all must be defined.");
+		$args = join(',', @$args);
+	}
+
+	# Interpolate frequency range and input data:
+	if (ref($args) eq 'PDL')
+	{
+		$f_new = $args;
+	}
+	elsif (!ref($args) && length($args))
+	{
+		$f_new = [];
+
+		$args =~ s/\s+//g;
+		foreach my $set (split /,/, $args)
+		{
+			if ($set =~ /^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$/)
+			{
+				push @$f_new, $set;
+			}
+			elsif ($set =~ /^([^-]+)-([^x]+)x(\d+)$/)
+			{
+				my ($start, $end, $count) = ($1, $2, $3);
+				my $range = $end - $start;
+
+				if ($count <= 1)
+				{
+					if (abs($end - $start) < 1e-6)
+					{
+						push @$f_new, $start;
+					}
+					else
+					{
+						croak "Invalid element: $start-$end x$count";
+					}
+				}
+				else
+				{
+					# Count is known to be > 1, so no div-by-zero:
+					my $step = $range/($count-1);
+
+					push @$f_new, map { $start + $step*$_ } (0 .. $count-1);
+				}
+			}
+			elsif ($set =~ /^([^+]+)\+=([^x]+)x(\d+)$/)
+			{
+				my ($start, $step, $count) = ($1, $2, $3);
+				push @$f_new, map { $start + $step*$_ } (0 .. $count-1);
+			}
+			else
+			{
+				croak "Invalid range specification ($args) at '$set'";
+			}
+
+		}
+
+		# Sort in ascending order, just in case:
+		$f_new = pdl(sort { $a <=> $b } @$f_new);
+	}
+	elsif (ref($args))
+	{
+		croak "\$args is invalid, ref=" . ref($args);
 	}
 	else
 	{
 		# Do nothing, just return the original values.
 		return ($f, $m);
 	}
+
+	# At this point $f_new has frequencies to interpolate:
+	my @cx_cols = m_to_pos_vecs($m);
+	my @cx_cols_new;
+	foreach my $cx (@cx_cols)
+	{
+		my ($cx_new, $err) = _interpolate($f_new, $f, $cx);
+		if (!$quiet && any $err != 0)
+		{
+			carp "Frequency range for interpolation is below/beyond reference frequencies."
+		}
+		push @cx_cols_new, $cx_new;
+	}
+
+	return ($f_new, pos_vecs_to_m(@cx_cols_new));
 }
 
 # Return the maximum difference between an ideal uniformally-spaced frequency set
@@ -1691,26 +1759,70 @@ Given any matrix (N,N,M) formatted matrix, this function will return N.
 =head2 C<($f_new, $m_new) = m_interpolate($f, $m, $args)> - Interpolate C<$m> to a different frequency set
 
 This function rescales the X-parameter matrix (C<$m>) and frequency set (C<$f>)
-to fit the requested frequency bounds.  This example will return the
-interpolated C<$S_new> and C<$f_new> with 10 frequency samples from 100 to 1000
-MHz (inclusive):
+to fit the requested frequency bounds.  This function returns C<$f> and C<$m>
+without interpolation if no C<$args> are passed.
 
-    ($f_new, $S_new) = m_interpolate($f, $S,
-	{ freq_min_hz => 100e6, freq_max_hz => 1000e6, freq_count => 10,
-	  quiet => 1 # optional
-	} )
+=head3 PDL Frequency-Range Specification
 
-This function returns C<$f> and C<$m> without interpolation if no C<$args> are passed.
+If C<$args> is a PDL object then it defines the frequencies that will be used
+for interpolation in Hz.  The values are used verbatim, no additional processing is
+performed.
+
+=head3 Scalar Frequency-Range Specification
+
+The value of C<$args> may be one of:
 
 =over 4
 
-=item * freq_min_hz: the minimum frequency at which to interpolate
+=item * A scalar float or string.
 
-=item * freq_max_hz: the maximum frequency at which to interpolate
+=item * An ARRAY reference.  If using an ARRAY reference then the array will be
+concatinated into a comma-separated string and used as follows:
 
-=item * freq_count: the total number of frequencies sampled.
+=back
 
-If C<freq_count> is C<1> then only C<freq_min_hz> is returned.
+Each range is split on a comma as follows (whitespace is ignored):
+
+    ($f_new, $S_new) = m_interpolate($f, $S, "1e6, 6e6-9e6 x4, 10e6 += 1e6 x3");
+
+    # or as an arrayref of strings and floats:
+    ($f_new, $S_new) = m_interpolate($f, $S, [ 1e6, '6e6-9e6 x4', '10e6 += 1e6 x3' ]);
+
+Which produces the following frequency selection each in MHz because of the C<e6> suffix:
+
+	1, 6, 7, 8, 9, 10, 11, 12
+
+=over 4
+
+=item * C<N> - The exact frequency in Hz
+
+=item * C<N - M xC> - Select C<C> frequencies from C<N> to C<M> (inclusive) in Hz.  Thus,
+C<6e6-9e6x4> produces the frequencies 6, 7, 8, 9 MHz because of the C<e6> suffix. 
+Values for C<N> and C<M> may be floating-point valued, but C<C> must be an integer.
+
+=item * C<N += SxC> - Select C<C> frequencies starting at C<N> and stepping by
+C<S> in Hz.  Thus, C<10e6 += 1e6x3> produces the frequencies 10, 11, 12 in MHz because of the C<e6> suffix.
+Values for C<N> and C<S> may be floating-point valued, but C<C> must be an integer.
+
+=back
+
+=head3 Hash Frequency-Range Specification
+
+This example will return the interpolated C<$S_new> and C<$f_new> with 10
+frequency samples from 100 to 1000 MHz (inclusive):
+
+    # or using Scalar Frequency-Range Specification as part of the hash:
+    ($f_new, $S_new) = m_interpolate($f, $S,
+	{ freq_range => '100e6 - 1000e6 x10',
+	  quiet => 1 # optional
+	} )
+
+
+=over 4
+
+=item * freq_range: This specifies a scalar or ARRAY or L<PDL> reference as
+defined in "Scalar Frequency-Range Specification".  A hash format is useful for
+additional options such as C<quiet> and may be extended further in the future. 
 
 =item * quiet: suppress warnings when interpolating beyond the available frequency range
 
@@ -1797,6 +1909,10 @@ into the list that C<rsnp> returns.
 
 =back
 
+=head2 C<%h = rsnp_hash_to_list(rsnp_hash(...))> - Create a list from rsnp_hash
+
+This is the inverse of C<rsnp_list_to_hash>.
+
 =head2 C<%h = rsnp_hash(...)> - Same as C<rsnp> but returns a hash.
 
 See hash elements in C<rsnp_list_to_hash>
@@ -1804,6 +1920,14 @@ See hash elements in C<rsnp_list_to_hash>
 =head2 C<%h = rsnp_fh_hash(...)> - Same as C<rsnp_fh> but returns a hash.
 
 See hash elements in C<rsnp_list_to_hash>
+
+=head2 C<wsnp_hash(%h)> - Same as C<wsnp> but takes a hash.
+
+See hash elements in C<rsnp_hash_to_list>
+
+=head2 C<wsnp_fh_hash(%h)> - Same as C<wsnp_fh> but takes a hash.
+
+See hash elements in C<rsnp_hash_to_list>
 
 =head1 SEE ALSO
 

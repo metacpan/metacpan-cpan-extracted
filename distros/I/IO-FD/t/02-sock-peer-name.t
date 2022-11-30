@@ -47,7 +47,7 @@ die "could not get address" if $error;
 
 #NOTE: Nonblocking connect will return with EINPROGRESS.
 # We assume all is ok as the accepting socket is blocking.
-unless(IO::FD::connect($client, $res[0]{addr})){
+unless(defined IO::FD::connect($client, $res[0]{addr})){
 	die "Error in connect" if $! != EINPROGRESS;
 }
 

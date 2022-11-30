@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Annotation;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Contains a single annotation from a JSON Schema evaluation
 
-our $VERSION = '0.557';
+our $VERSION = '0.558';
 
 use 5.020;
 use Moo;
@@ -47,6 +47,20 @@ has unknown => (
   default => 0,
 );
 
+around BUILDARGS => sub ($orig, $class, @args) {
+  my $args = $class->$orig(@args);
+
+  if (my $uri = delete $args->{_uri}) {
+    # as if we did canonical_uri(..)->to_abs($state->{effective_base_uri} in A(..)
+    $uri = $uri->[0]->to_abs($uri->[1]);
+    undef $uri if $uri eq '' and $args->{keyword_location} eq ''
+      or ($uri->fragment // '') eq $args->{keyword_location} and $uri->clone->fragment(undef) eq '';
+    $args->{absolute_keyword_location} = $uri if defined $uri;
+  }
+
+  return $args;
+};
+
 sub TO_JSON ($self) {
   return +{
     # note that locations are JSON pointers, not uri fragments!
@@ -80,7 +94,7 @@ JSON::Schema::Modern::Annotation - Contains a single annotation from a JSON Sche
 
 =head1 VERSION
 
-version 0.557
+version 0.558
 
 =head1 SYNOPSIS
 
@@ -132,6 +146,8 @@ A boolean flag, indicating whether the keyword is a known vocabulary keyword or 
 The actual annotation value (which may or may not be a string).
 
 =head1 METHODS
+
+=for Pod::Coverage BUILDARGS
 
 =head2 TO_JSON
 

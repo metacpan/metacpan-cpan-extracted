@@ -13,7 +13,7 @@ Git::Hooks Tutorial - Gentle introduction to Git::Hooks
 
 =head1 VERSION
 
-version 3.3.0
+version 3.3.1
 
 =head1 NAME
 
@@ -154,8 +154,8 @@ crafted commit message from the F<.git/COMMIT_EDITMSG> file afterwards.
 
 The section C<githooks "checkjira"> contains some global configuration for the
 C<CheckJira> plugin, which I enable only for some repositories. Since the
-C<CheckJira> plugin has to connect to our JIRA server, it needs the server URL
-and some credentials to authenticate. The C<matchlog> regex makes JIRA issue
+C<CheckJira> plugin has to connect to our Jira server, it needs the server URL
+and some credentials to authenticate. The C<matchlog> regex makes Jira issue
 keys be looked for only inside a pair of brackets at the beginning of the commit
 messages's title line.
 
@@ -163,7 +163,7 @@ I enable other plugins for specific repositories, since they depend on the
 context in which they are developed.
 
 At L<CPQD|http://www.cpqd.com.br/> we use
-L<JIRA|http://www.atlassian.com/software/jira> and
+L<Jira|http://www.atlassian.com/software/jira> and
 L<Gerrit|https://code.google.com/p/gerrit/>. So, for my work-related
 repositories I have this in their F<.git/config>:
 
@@ -176,8 +176,8 @@ repositories I have this in their F<.git/config>:
 C<GerritChangeId> doesn't require any configuration. It simply inserts a
 C<Change-Id> line in the messages of all commits. These are required by Gerrit.
 
-I use C<CheckJira> to remind me to cite a JIRA issue in every commit
-message. The C<jql> filter makes it accept only issues of the CDS JIRA project
+I use C<CheckJira> to remind me to cite a Jira issue in every commit
+message. The C<jql> filter makes it accept only issues of the CDS Jira project
 for this particular repository.
 
 =head3 Disabling plugins locally
@@ -267,8 +267,8 @@ using some of the available plugins:
 
 In the server the C<CheckCommit>, C<CheckJira>, and C<CheckLog> plugins are
 enabled for every repository. The <githooks.checkjira> section specifies the URL
-and credentials of the JIRA server as well as where in the commit message the
-JIRA references are to be looked for.
+and credentials of the Jira server as well as where in the commit message the
+Jira references are to be looked for.
 
 The C<githooks.checkcommit> enables the C<email-valid> check to guarantee that
 authors and committers use sane email addresses in their commits.
@@ -337,7 +337,7 @@ F<.git/config> files:
 
 Using include files you can manage complex configurations more easily.
 
-=head1 TUTORIAL FOR GERRIT ADMINITRATORS
+=head1 TUTORIAL FOR GERRIT ADMINISTRATORS
 
 Gerrit is a Git server but since it uses L<JGit|http://eclipse.org/jgit/>
 instead of standard Git, it doesn't support the standard Git hooks. It supports
@@ -407,7 +407,7 @@ mechanism has no such notion, but you can fake it using the same L<include
 mechanism discussed above|/Distributed configuration>. But you have to do it
 manually, though.
 
-=head1 TUTORIAL FOR BITBUCKET ADMINISTRATORS
+=head1 TUTORIAL FOR BITBUCKET SERVER ADMINISTRATORS
 
 L<Bitbucket Server|https://www.atlassian.com/software/bitbucket/server> is a
 proprietary Git server made by Atlassian. It doesn't support the standard Git
@@ -432,6 +432,14 @@ directory in the server, go to its I<repository details> page in the
 I<repository settings> section in Bitbucket's web interface. The page shows the
 repository's B<location on disk> where you find the F<config> file which you
 must edit to configure Git::Hooks plugins.
+
+=head1 TUTORIAL FOR GITLAB ADMINISTRATORS
+
+L<GitLab|https://about.gitlab.com/> is another very well known Git server, with
+proprietary and free software versions. It supports the standard Git hooks
+natively. Follow L<these
+instructions|https://docs.gitlab.com/ee/administration/server_hooks.html> to
+know where you have to install hooks for the repositories.
 
 =head1 TUTORIAL FOR HOOK DEVELOPERS
 

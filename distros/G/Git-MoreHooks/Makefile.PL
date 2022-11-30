@@ -31,6 +31,7 @@ my %WriteMakefileArgs = (
     "Params::Validate" => 0,
     "Path::Tiny" => 0,
     "Text::Glob" => 0,
+    "Try::Tiny" => 0,
     "feature" => 0,
     "strict" => 0,
     "utf8" => 0,
@@ -45,7 +46,7 @@ my %WriteMakefileArgs = (
     "Test::Git" => 0,
     "Test::Requires::Git" => 0
   },
-  "VERSION" => "0.017",
+  "VERSION" => "0.018",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -74,6 +75,7 @@ my %FallbackPrereqs = (
   "Test::Git" => 0,
   "Test::Requires::Git" => 0,
   "Text::Glob" => 0,
+  "Try::Tiny" => 0,
   "feature" => 0,
   "strict" => 0,
   "utf8" => 0,

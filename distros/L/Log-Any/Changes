@@ -2,6 +2,15 @@ Revision history for Log-Any
 
 ** denotes an incompatible change
 
+1.711     2022-11-22 11:28:01-06:00 America/Chicago
+
+  [Fixed]
+
+  - Fixed proxy not exposing 'category' attribute (#86). Thanks
+    @andrew-grechkin!
+  - Fixed not being able to get a proxy for the "root" category (empty
+    string) (#90). Thanks @XSven!
+
 1.710     2021-08-02 10:11:33-05:00 America/Chicago
 
     [Other]

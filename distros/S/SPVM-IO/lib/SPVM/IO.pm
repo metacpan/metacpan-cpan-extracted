@@ -1,6 +1,6 @@
 package SPVM::IO;
 
-our $VERSION = '0.11';
+our $VERSION = '0.13';
 
 1;
 
@@ -10,20 +10,20 @@ SPVM::IO - File IO, Socket, Select/Polling.
 
 =head1 Description
 
-C<IO> is a L<SPVM> module for File IO, Socket, Select/Polling.
-
-=head1 Caution
-
-C<IO> is in the early stages of development. So many incompatible changes will be done.
+C<IO> provide for File IO, Socket, Select/Polling.
 
 =head1 Modules
 
 =over 2 
 
-* L<SPVM::IO::File>
+=item * L<IO::Handle|SPVM::IO::Handle>
 
-* L<SPVM::IO::Socket>
+=item * L<IO::File|SPVM::IO::File>
 
-* L<SPVM::IO::Select>
+=item * L<IO::Socket|SPVM::IO::Socket>
+
+=item * L<IO::Socket::INET|SPVM::IO::Socket::INET>
+
+=item * L<IO::Select|SPVM::IO::Select>
 
 =back

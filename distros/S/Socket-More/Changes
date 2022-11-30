@@ -1,0 +1,28 @@
+Revision history for Perl extension Socket::More.
+
+0.2.0  Fri Nov 25 08:20:29 AEST 2022
+	- Reduces memory usage
+	  Replaced Net::IP with Net::IP::Lite;
+	  Direct copy of IP required 'group' table and functions from Net::IP
+	  Replaced Test::Deep with Data::Cmp
+	  Only Load Scalar::Util when using socket
+
+	- Attempting to fix failing tests
+	  Removed interface index mapping tests due to possible race condition
+	  Conditionally perform a couple of tests relating to IPv6, only if IPv6 is available
+	 
+	- Actually runs on FreeBSD now
+	  In generating the string to integer mapping for the SOCK_* constants,
+	  SOCK_CLOEXEC and SOCK_NONBLOCK where also added. These are large
+	  integers intended to be use as a mask, not a socket type. These are
+	  filtered out of the mapping now to previent all your memory being
+	  consumed!
+
+	- Added has_IPv4_interface and has_IPv6_interface routines to help test if
+	  IPv4/IPv6 is available on at least one interface
+
+
+0.1.0  Fri Oct 21 21:05:49 2022
+	- original version; created by h2xs 1.23 with options
+		--name Socket::More
+

@@ -13,3 +13,4 @@ dist.ini
 doap.ttl
 lib/Object/Adhoc.pm
 t/01basic.t
+t/02json.t

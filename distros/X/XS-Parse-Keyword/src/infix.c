@@ -136,13 +136,13 @@ struct Registration {
   struct XSParseInfixInfo info;
 
   STRLEN      oplen;
-  enum XSParseInfixClassification cls;
 
   struct HooksAndData hd;
 
   STRLEN permit_hintkey_len;
 
   int opname_is_WIDE : 1;
+  int opname_is_ident : 1;
 };
 
 static struct Registration *registrations;
@@ -345,8 +345,11 @@ bool XSParseInfix_parse(pTHX_ enum XSParseInfixSelection select, struct XSParseI
       continue;
     if(!strnEQ(buf, reg->info.opname, reg->oplen))
       continue;
-
-    if(!(selection & (1 << reg->cls)))
+    /* If the operator name is an identifer then we don't want to capture a
+     * longer identifier from the incoming source of which this is just a
+     * prefix
+     */
+    if(reg->opname_is_ident && isIDCONT_utf8_safe(buf + reg->oplen, PL_parser->bufend))
       continue;
 
     if(reg->hd.hooks && reg->hd.hooks->permit_hintkey &&
@@ -356,6 +359,12 @@ bool XSParseInfix_parse(pTHX_ enum XSParseInfixSelection select, struct XSParseI
     if(reg->hd.hooks && reg->hd.hooks->permit &&
       !(*reg->hd.hooks->permit)(aTHX_ reg->hd.data))
       continue;
+
+    /* At this point we're committed to this being the best match of operator.
+     * Is it selected by the filter?
+     */
+    if(!(selection & (1 << reg->info.cls)))
+      return FALSE;
 
     *infop = &reg->info;
 
@@ -636,9 +645,9 @@ static void reg_builtin(pTHX_ const char *opname, enum XSParseInfixClassificatio
   reg->info.opname = savepv(opname);
   reg->info.opcode = opcode;
   reg->info.hooks  = NULL;
+  reg->info.cls    = cls;
 
   reg->oplen  = strlen(opname);
-  reg->cls    = cls;
 
   reg->hd.hooks = NULL;
   reg->hd.data  = NULL;
@@ -653,6 +662,27 @@ static void reg_builtin(pTHX_ const char *opname, enum XSParseInfixClassificatio
 
 void XSParseInfix_register(pTHX_ const char *opname, const struct XSParseInfixHooks *hooks, void *hookdata)
 {
+  STRLEN oplen = strlen(opname);
+  const char *opname_end = opname + oplen;
+  bool opname_is_ident = isIDFIRST_utf8_safe(opname, opname_end);
+
+  {
+    const char *s = opname;
+    s += UTF8SKIP(s);
+
+    while(s < opname_end) {
+      if(opname_is_ident) {
+        if(!isIDCONT_utf8_safe(s, opname_end))
+          croak("Infix operator name that starts with an identifier may not have non-identifier characters in it");
+      }
+      else {
+        if(isIDFIRST_utf8_safe(s, opname_end))
+          croak("Infix operator name that does not start with an identifer may not have identifier characters in it");
+      }
+      s += UTF8SKIP(s);
+    }
+  }
+
   switch(hooks->flags) {
     case (1<<15):
       /* undocumented internal flag to indicate v1-compatible ->new_op hook function */
@@ -730,9 +760,10 @@ void XSParseInfix_register(pTHX_ const char *opname, const struct XSParseInfixHo
   reg->info.opcode = OP_CUSTOM;
   reg->info.hooks    = hooks;
   reg->info.hookdata = hookdata;
+  reg->info.cls      = hooks->cls;
 
-  reg->oplen  = strlen(opname);
-  reg->cls    = hooks->cls;
+  reg->oplen           = oplen;
+  reg->opname_is_ident = opname_is_ident;
 
   reg->hd.hooks = hooks;
   reg->hd.data  = hookdata;

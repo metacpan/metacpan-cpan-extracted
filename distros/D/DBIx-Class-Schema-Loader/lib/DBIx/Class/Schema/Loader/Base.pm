@@ -31,7 +31,7 @@ use File::Temp 'tempfile';
 use curry;
 use namespace::clean;
 
-our $VERSION = '0.07049';
+our $VERSION = '0.07051';
 
 __PACKAGE__->mk_group_ro_accessors('simple', qw/
                                 schema
@@ -990,12 +990,13 @@ are methods, which will cause namespace::autoclean to spare them from removal.
 
 This prevents the "Hey, where'd my overloads go?!" effect.
 
-If you don't care about operator overloads, enabling this option falls back to
-just using L<namespace::autoclean> itself.
+If you don't care about operator overloads (or if you know your Moose is at at
+least version 2.1400, where MooseX::MarkAsMethods is no longer necessary),
+enabling this option falls back to just using L<namespace::autoclean> itself.
 
 If none of the above made any sense, or you don't have some pressing need to
 only use L<namespace::autoclean>, leaving this set to the default is
-recommended.
+just fine.
 
 =head2 col_collision_map
 
@@ -1181,9 +1182,17 @@ sub new {
     $self->_validate_result_roles_map;
 
     if ($self->use_moose) {
-        if (not DBIx::Class::Schema::Loader::Optional::Dependencies->req_ok_for('use_moose')) {
-            die sprintf "You must install the following CPAN modules to enable the use_moose option: %s.\n",
-                DBIx::Class::Schema::Loader::Optional::Dependencies->req_missing_for('use_moose');
+        if ($self->only_autoclean) {
+            if (not DBIx::Class::Schema::Loader::Optional::Dependencies->req_ok_for('use_moose_only_autoclean')) {
+                die sprintf "You must install the following CPAN modules to enable the use_moose and only_autoclean options: %s.\n",
+                    DBIx::Class::Schema::Loader::Optional::Dependencies->req_missing_for('use_moose_only_autoclean');
+            }
+        }
+        else {
+            if (not DBIx::Class::Schema::Loader::Optional::Dependencies->req_ok_for('use_moose')) {
+                die sprintf "You must install the following CPAN modules to enable the use_moose option: %s.\n",
+                    DBIx::Class::Schema::Loader::Optional::Dependencies->req_missing_for('use_moose');
+            }
         }
     }
 

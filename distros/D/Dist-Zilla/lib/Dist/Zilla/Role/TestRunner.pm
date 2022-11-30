@@ -1,4 +1,4 @@
-package Dist::Zilla::Role::TestRunner 6.028;
+package Dist::Zilla::Role::TestRunner 6.029;
 # ABSTRACT: something used as a delegating agent to 'dzil test'
 
 use Moose::Role;
@@ -64,7 +64,7 @@ Dist::Zilla::Role::TestRunner - something used as a delegating agent to 'dzil te
 
 =head1 VERSION
 
-version 6.028
+version 6.029
 
 =head1 DESCRIPTION
 

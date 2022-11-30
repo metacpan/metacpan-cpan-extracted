@@ -38,13 +38,18 @@ else {
     $local_ip = myip();
 }
 
-my $current_ip = host_ip_get($host, $domain);
+my $current_ip = host_ip_get($host, $domain) || '';
 
 if ($current_ip ne $local_ip) {
     my $result = host_ip_set($host, $domain, $local_ip);
 
     if ($result) {
-        print "Updated record for '$host.$domain' from $current_ip to $local_ip\n";
+        if ($current_ip) {
+            print "Updated record for '$host.$domain' from $current_ip to $local_ip\n";
+        }
+        else {
+            print "Set record for '$host.$domain' to $local_ip\n";
+        }
     }
     else {
         print "Encountered an error, couldn't update record\n";

@@ -20,7 +20,7 @@ Somewhere in your build-file (e.g. L<ExtUtils::MakeMaker>'s F<Makefile.PL>):
 
   $EUMM_ARGS{CONFIGURE_REQUIRES} = {
     %{ $EUMM_ARGS{CONFIGURE_REQUIRES} || {} },
-    'DBIx::Class::Schema::Loader' => '0.07049',
+    'DBIx::Class::Schema::Loader' => '0.07051',
   };
 
   ...
@@ -328,13 +328,29 @@ Modules required for testing POD in this distribution
 
 =head3 use_moose
 
-Modules required for the use_moose option
+Modules required for the use_moose option (without only_autoclean)
 
 =over
 
 =item * Moose >= 1.12
 
 =item * MooseX::MarkAsMethods >= 0.13
+
+=item * MooseX::NonMoose >= 0.25
+
+=item * namespace::autoclean >= 0.09
+
+=back
+
+=head2 use_moose_only_autoclean
+
+=head3 use_moose_only_autoclean
+
+Modules required for the use_moose + only_autoclean options
+
+=over
+
+=item * Moose >= 2.1400
 
 =item * MooseX::NonMoose >= 0.25
 

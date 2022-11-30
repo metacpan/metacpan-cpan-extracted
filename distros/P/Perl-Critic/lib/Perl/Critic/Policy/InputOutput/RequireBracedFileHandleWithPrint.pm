@@ -8,7 +8,7 @@ use Readonly;
 use Perl::Critic::Utils qw{ :severities :classification :data_conversion };
 use base 'Perl::Critic::Policy';
 
-our $VERSION = '1.140';
+our $VERSION = '1.142';
 
 #-----------------------------------------------------------------------------
 
@@ -99,7 +99,7 @@ supports an optional file handle argument.  Conway suggests wrapping
 this argument in braces to make it visually stand out from the other
 arguments.  When you put braces around any of the special
 package-level file handles like C<STDOUT>, C<STDERR>, and C<DATA>, you
-must the C<'*'> sigil or else it won't compile under C<use strict
+must add the C<'*'> sigil or else it won't compile under C<use strict
 'subs'>.
 
   print $FH   "Mary had a little lamb\n";  #not ok

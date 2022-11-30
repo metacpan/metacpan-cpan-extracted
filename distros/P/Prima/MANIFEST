@@ -15,6 +15,7 @@ api/exception.c
 api/file.c
 api/hash.c
 api/list.c
+api/matrix.c
 api/omp.c
 api/options.c
 api/perl.c
@@ -35,6 +36,7 @@ class/DeviceBitmap.cls
 class/Drawable.c
 class/Drawable/mapper.c
 class/Drawable/fonts.c
+class/Drawable/line_ends.c
 class/Drawable/primitives.c
 class/Drawable/render.c
 class/Drawable/text.c
@@ -46,6 +48,9 @@ class/File.cls
 class/Icon.c
 class/Icon.cls
 class/Image.c
+class/Image/conv.c
+class/Image/io.c
+class/Image/primitive.c
 class/Image.cls
 class/Menu.c
 class/Menu.cls
@@ -91,11 +96,11 @@ examples/fading_text.pl
 examples/fontdlg.pl
 examples/frames.pl
 examples/f_fill.pl
-examples/generic.pl
 examples/gradient.pl
 examples/grid.pl
 examples/grip.pl
 examples/Hand.gif
+examples/helloworld.pl
 examples/iv.pl
 examples/keys.pl
 examples/keyselector.pl
@@ -167,6 +172,7 @@ include/guts.h
 include/img.h
 include/img_conv.h
 include/Drawable_private.h
+include/Image_private.h
 include/unix/guts.h
 include/unix/queue.h
 include/win32/win32guts.h
@@ -197,11 +203,14 @@ pod/Prima/faq.pod
 pod/Prima/File.pod
 pod/Prima/fills.gif
 pod/Prima/fontabc.gif
+pod/Prima/frameset.gif
 pod/Prima/gauge.gif
 pod/Prima/gettextbox.gif
 pod/Prima/gp-problems.pod
 pod/Prima/gradient.gif
 pod/Prima/grid.gif
+pod/Prima/hello-world.gif
+pod/Prima/Image/transparency.gif
 pod/Prima/image-load.pod
 pod/Prima/Image.pod
 pod/Prima/imageviewer.gif
@@ -211,6 +220,10 @@ pod/Prima/kashida.gif
 pod/Prima/label.gif
 pod/Prima/leadings.gif
 pod/Prima/lineends.gif
+pod/Prima/lineends1.gif
+pod/Prima/lineends2.gif
+pod/Prima/lineends3.gif
+pod/Prima/lineends4.gif
 pod/Prima/linejoins.gif
 pod/Prima/linepats.gif
 pod/Prima/markup.gif
@@ -247,8 +260,10 @@ pod/Prima/tutorial/menu1.gif
 pod/Prima/tutorial/menu2.gif
 pod/Prima/tutorial/menu3.gif
 pod/Prima/tutorial.pod
+pod/Prima/types.pod
 pod/Prima/Widget/pack.pod
 pod/Prima/Widget/place.pod
+pod/Prima/Widget/link.gif
 pod/Prima/Widget.pod
 pod/Prima/windings.gif
 pod/Prima/Window.pod
@@ -285,7 +300,6 @@ Prima/EventHook.pm
 Prima/ExtLists.pm
 Prima/FrameSet.pm
 Prima/Grids.pm
-Prima/Header.pm
 Prima/HelpViewer.fm
 Prima/HelpViewer.pm
 Prima/Image/Animate.pm
@@ -302,7 +316,6 @@ Prima/Image/webp.pm
 Prima/ImageViewer.pm
 Prima/IniFile.pm
 Prima/InputLine.pm
-Prima/IntUtils.pm
 Prima/KeySelector.pm
 Prima/Label.pm
 Prima/Lists.pm
@@ -348,8 +361,11 @@ Prima/Themes.pm
 Prima/Tie.pm
 Prima/Utils.pm
 Prima/Widget/BidiInput.pm
+Prima/Widget/EventRectangles.pm
 Prima/Widget/GroupScroller.pm
+Prima/Widget/Header.pm
 Prima/Widget/IntIndents.pm
+Prima/Widget/Link.pm
 Prima/Widget/ListBoxUtils.pm
 Prima/Widget/MouseScroller.pm
 Prima/Widget/Panel.pm

@@ -1,5 +1,5 @@
 {
-   "abstract" : "Custom (x_*) keys in CPAN distribution metadata being used in the wild",
+   "abstract" : "Catalog of custom (x_*) keys in CPAN distribution metadata being used in the wild",
    "author" : [
       "perlancar <perlancar@cpan.org>"
    ],
@@ -39,11 +39,11 @@
    "provides" : {
       "CPAN::Meta::X" : {
          "file" : "lib/CPAN/Meta/X.pm",
-         "version" : "0.007"
+         "version" : "0.009"
       },
       "CPAN::Meta::X::Old" : {
          "file" : "lib/CPAN/Meta/X/Old.pm",
-         "version" : "0.007"
+         "version" : "0.009"
       }
    },
    "release_status" : "stable",
@@ -58,7 +58,7 @@
          "web" : "https://github.com/perlancar/perl-CPAN-Meta-X"
       }
    },
-   "version" : "0.007",
+   "version" : "0.009",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
@@ -410,7 +410,7 @@
                      {
                         "class" : "Pod::Weaver::Section::PERLANCAR::Contributing",
                         "name" : "@Author::PERLANCAR/PERLANCAR/Contributing",
-                        "version" : "0.292"
+                        "version" : "0.293"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Legal",
@@ -420,7 +420,7 @@
                      {
                         "class" : "Pod::Weaver::Plugin::Rinci",
                         "name" : "@Author::PERLANCAR/Rinci",
-                        "version" : "0.780"
+                        "version" : "0.784"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::AppendPrepend",

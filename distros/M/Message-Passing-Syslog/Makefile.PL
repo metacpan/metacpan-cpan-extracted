@@ -8,7 +8,7 @@ use Module::Install::Authority;
 all_from 'lib/Message/Passing/Syslog.pm';
 
 license 'perl';
-authority('cpan:GHENRY');
+authority('cpan:ABRAXXA');
 resources(
     repository => "git://github.com/suretec/Message-Passing-Syslog.git",
 );
@@ -23,6 +23,7 @@ requires 'Message::Passing' => '0.104';
 requires 'Sys::Hostname::Long';
 requires 'Time::ParseDate';
 requires 'Parse::Syslog::Line' => 1.2;
+requires 'Net::Syslog' => 0.04;
 requires 'Socket' => 2.008;
 
 test_requires 'Test::More' => '0.88';
@@ -34,7 +35,6 @@ author_requires(
     'Pod::Coverage' => '0.19',
     'Pod::Coverage::TrustPod' => '0',
     'Test::Spelling' => '0',
-    'Net::Syslog' => '0',
 );
 
 author_tests 't/author';

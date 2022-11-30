@@ -36,21 +36,102 @@ long Utils_floor( double x)
 	return floor( x);
 }
 
+
+XS(Utils_nearest_i_FROMPERL)
+{
+	dXSARGS;
+
+	if ( items == 0 ) {
+		SPAGAIN;
+	} else if ( items == 1 ) {
+		SV *x = ST(0);
+		SPAGAIN;
+		SP -= items;
+		if ( !SvROK(x)) {
+			XPUSHs( newSViv( floor( SvNV(x) + .5 )  ) );
+		}
+		else if ( SvTYPE( x = SvRV(x) ) != SVt_PVAV ) {
+			XPUSHs( NULL_SV );
+		} else {
+			int i,l;
+			AV *sav, *dav;
+			sav = (AV*)x;
+			l   = av_len(sav);
+			dav = newAV();
+			for ( i = 0; i <= l; i++) {
+				SV **h;
+				if ( !( h = av_fetch(sav, i, 0)) || !SvOK(*h))
+					break;
+				av_push(dav, newSViv( floor(SvNV(*h) + .5) ));
+			}
+			XPUSHs( newRV_noinc((SV*) dav) );
+		}
+	} else {
+		int i;
+		EXTEND( sp, items );
+		for ( i = 0; i < items; i++ )
+			PUSHs( newSViv( floor(SvNV(ST(i)) + .5) ));
+	}
+	PUTBACK;
+	return;
+}
+
+XS(Utils_nearest_d_FROMPERL)
+{
+	dXSARGS;
+
+	if ( items == 0 ) {
+		SPAGAIN;
+	} else if ( items == 1 ) {
+		SV *x = ST(0);
+		SPAGAIN;
+		SP -= items;
+		if ( !SvROK(x)) {
+			XPUSHs( newSVnv( floor( SvNV(x) * 1.0e15 + .5 ) / 1.0e15 ) );
+		}
+		else if ( SvTYPE( x = SvRV(x) ) != SVt_PVAV ) {
+			XPUSHs( NULL_SV );
+		} else {
+			int i,l;
+			AV *sav, *dav;
+			sav = (AV*)x;
+			l   = av_len(sav);
+			dav = newAV();
+			for ( i = 0; i <= l; i++) {
+				SV **h;
+				if ( !( h = av_fetch(sav, i, 0)) || !SvOK(*h))
+					break;
+				av_push(dav, newSVnv( floor(SvNV(*h) * 1.0e15 + .5) / 1.0e15 ));
+			}
+			XPUSHs( newRV_noinc((SV*) dav) );
+		}
+	} else {
+		int i;
+		EXTEND( sp, items );
+		for ( i = 0; i < items; i++ )
+			PUSHs( newSVnv( floor(SvNV(ST(i)) * 1.0e15 + .5) / 1.0e15 ));
+	}
+	PUTBACK;
+	return;
+}
+
 static Bool
-is_valid_utf8( unsigned char * str )
+is_valid_utf8( unsigned char * str, int maxlen )
 {
 	int len = 0, hi8 = 0;
 	unsigned char * c = str;
-	while (*c) {
+	while ((maxlen < 0) ? *c : (len < maxlen)) {
 		len++;
 		if ( *c > 0x7f ) hi8 = 1;
 		c++;
 	}
-	if ( !hi8 ) return false;
+	if ( !hi8 )
+		return false;
 #if PERL_PATCHLEVEL >= 22
 	while ( str < c ) {
 		unsigned char * end = utf8_hop( str, 1 );
-		if ( end > c ) return false;
+		if ( end > c )
+			return false;
 		if ( !isUTF8_CHAR(str, end))
 			return false;
 		str = end;
@@ -79,7 +160,7 @@ XS(Utils_getdir_FROMPERL) {
 			for ( i = 0; i < dirlist-> count; i++) {
 				char * entry = ( char *)dirlist-> items[i];
 				SV * sv      = newSVpv(entry, 0);
-				if (is_valid_utf8((unsigned char*) entry))
+				if (is_valid_utf8((unsigned char*) entry, -1))
 					SvUTF8_on(sv);
 				PUSHs( sv_2mortal(sv));
 				free(( char *)dirlist-> items[i]);
@@ -159,7 +240,7 @@ Utils_getcwd()
 	if (( cwd = apc_fs_getcwd()) == NULL )
 		return NULL_SV;
 	ret = newSVpv( cwd, 0 );
-	if ( is_valid_utf8((unsigned char*) cwd))
+	if ( is_valid_utf8((unsigned char*) cwd, -1))
 		SvUTF8_on(ret);
 	free(cwd);
 	return ret;
@@ -176,7 +257,7 @@ Utils_getenv(SV * varname)
 	if (( val = apc_fs_getenv(SvPV_nolen(varname), is_utf8, &do_free)) == NULL )
 		return NULL_SV;
 	ret = newSVpv( val, 0 );
-	if ( is_valid_utf8((unsigned char*) val))
+	if ( is_valid_utf8((unsigned char*) val, -1))
 		SvUTF8_on(ret);
 	if ( do_free ) free(val);
 	return ret;
@@ -218,13 +299,13 @@ Utils_local2sv(SV * text)
 		return NULL_SV;
 	if ( buf == src ) {
 		ret = newSVsv( text );
-		if ( is_valid_utf8((unsigned char*) src))
+		if ( is_valid_utf8((unsigned char*) src, xlen))
 			SvUTF8_on(ret);
 		return ret;
 	}
 
 	ret = newSVpv( buf, len );
-	if ( is_valid_utf8((unsigned char*) buf))
+	if ( is_valid_utf8((unsigned char*) buf, len))
 		SvUTF8_on(ret);
 	free(buf);
 
@@ -293,7 +374,7 @@ Utils_read_dir(SV * dh)
 	if ( !apc_fs_readdir(d, buf)) return NULL_SV;
 
 	ret = newSVpv(buf, 0);
-	if (is_valid_utf8((unsigned char*) buf))
+	if (is_valid_utf8((unsigned char*) buf, -1))
 		SvUTF8_on(ret);
 
 	return ret;

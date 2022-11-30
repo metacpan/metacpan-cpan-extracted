@@ -16,6 +16,7 @@ t/06-aparams.t
 t/10-s_port_z.t
 t/100-mdif-rewrite.t
 t/11-m_interpolate.t
+t/12-m_interpolate-range.t
 t/20-y_calcs.t
 t/manifest.t
 t/pod-coverage.t

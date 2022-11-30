@@ -1,7 +1,15 @@
+0.31  2022-11-28
+
+- Fixed handling of the ::0/128 subnet. This is a special subnet(/address)
+  that is called the "unspecified address". It is not public or
+  routable. Reported by Dan Sherry. GH #13.
+
+
 0.30  2021-03-29
 
 - Added some more details to the security docs to include mentions of the
-  is_*_ip() functions too.
+  is_*_ip() functions too. See https://nvd.nist.gov/vuln/detail/CVE-2021-29662
+  for details on the potential security issues with these functions.
 
 
 0.29  2021-03-29

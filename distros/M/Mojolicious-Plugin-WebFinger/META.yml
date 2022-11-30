@@ -18,16 +18,16 @@ no_index:
     - t
     - inc
 requires:
-  Mojolicious: '6'
-  Mojolicious::Plugin::HostMeta: '0.25'
+  Mojolicious: '9.17'
+  Mojolicious::Plugin::HostMeta: '0.26'
   Mojolicious::Plugin::Util::Callback: '0.07'
-  Mojolicious::Plugin::Util::Endpoint: '0.22'
-  Mojolicious::Plugin::XRD: '0.21'
-  XML::Loy: '0.49'
+  Mojolicious::Plugin::Util::Endpoint: '0.24'
+  Mojolicious::Plugin::XRD: '0.24'
+  XML::Loy: '0.5'
   perl: '5.010001'
 resources:
   bugtracker: https://github.com/Akron/Mojolicious-Plugin-WebFinger/issues
   license: http://www.opensource.org/licenses/artistic-license-2.0
   repository: https://github.com/Akron/Mojolicious-Plugin-WebFinger.git
-version: '0.12'
+version: '0.13'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

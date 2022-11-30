@@ -8,7 +8,7 @@ Weather::GHCN::StationTable - collect station objects and weather data
 
 =head1 VERSION
 
-version v0.0.010
+version v0.0.011
 
 =head1 SYNOPSIS
 
@@ -17,12 +17,10 @@ version v0.0.010
   my $ghcn = Weather::GHCN::StationTable->new;
 
   my ($opt, @errors) = $ghcn->set_options(
-    user_options => {
-        country     => 'US',
-        state       => 'NY',
-        location    => 'New York',
-        report      => 'yearly',
-    },
+    country     => 'US',
+    state       => 'NY',
+    location    => 'New York',
+    report      => 'yearly',
   );
   die @errors if @errors;
 
@@ -69,7 +67,7 @@ use Object::Pad 0.66 qw( :experimental(init_expr) );
 package Weather::GHCN::StationTable;
 class   Weather::GHCN::StationTable;
 
-our $VERSION = 'v0.0.010';
+our $VERSION = 'v0.0.011';
 
 # directly used by this module
 use Carp                qw( carp croak );
@@ -79,10 +77,8 @@ use Devel::Size;
 use FindBin;
 use Math::Trig;
 use Path::Tiny;
-use Try::Tiny;
 use Weather::GHCN::Common        qw( :all );
 use Weather::GHCN::TimingStats;
-#use Hash::Wrap          {-lvalue => 1, -defined => 1, -as => '_wrap_hash' };
 
 # included so consumers of this module don't have to include these
 use Weather::GHCN::CacheURI;
@@ -98,8 +94,6 @@ const my $TAB    => qq(\t); # tab character
 const my $NL     => qq(\n); # perl platform-universal newline
 const my $TRUE   => 1;      # perl's usual TRUE
 const my $FALSE  => not $TRUE; # a dual-var consisting of '' and 0
-
-const my $DEFAULT_PROFILE_FILE => '~/.ghcn_fetch.yaml';
 
 const my %MMM_TO_MM => (
     Jan=>1, Feb=>2, Mar=>3, Apr=>4, May=>5, Jun=>6,
@@ -355,20 +349,21 @@ method get_footer ( %args ) {
     my @output;
 
     push @output, 'Notes:';
-    push @output, '  1. Data is obtained from the GHCN GHCN repository, specifically:';
+    push @output, '  * Data is obtained from the GHCN GHCN repository, specifically:';
     push @output, $TAB . $GHCN_STN_LIST_URL;
     push @output, $TAB . $GHCN_STN_INVEN_URL;
     push @output, $TAB . $GHCN_DATA;
-    push @output, '  2. Temperatures are in Celsius, precipitation in mm and snowfall/depth in cm.';
-    push @output, '  3. TAVG is a daily average computed at each station; Tavg is the average of TMAX and TMIN.';
-    push @output, '  4. Data is averaged at the daily level across multiple stations.';
-    push @output, '  5. Data is summarized at the monthly or yearly level using different rules depending on the measure:';
+    push @output, '  * Temperatures are in Celsius, precipitation in mm and snowfall/depth in cm.';
+    push @output, '  * TAVG is a daily average computed at each station; Tavg is the average of TMAX and TMIN.';
+    push @output, '  * Data is averaged at the daily level across multiple stations.';
+    push @output, '  * Data is summarized at the monthly or yearly level using different rules depending on the measure:';
     push @output, $TAB . '- TMAX is aggregated by max(); TMIN is aggregated by min().';
     push @output, $TAB . '- TAVG and Tavg are aggregated by average().';
     push @output, $TAB . '- PRCP and SNOW are aggregated by sum().';
     push @output, $TAB . '- SNWD is aggregated by max().';
-    push @output, '  6. Decades begin on Jan 1 in calendar years ending in zero.';
-    push @output, '  7. Seasonal decades/year/quarters begin Dec 1 of the previous calendar year.';
+    push @output, '  * Decades begin on Jan 1 in calendar years ending in zero.';
+    push @output, '  * Seasonal decades/year/quarters begin Dec 1 of the previous calendar year.';
+    push @output, '  * Quality is the ratio of non-missing data days to days in the year, as a %\'tage.';
 
     return $return_list ? @output : tsv(\@output);
 }
@@ -531,7 +526,7 @@ method get_missing_data_ranges ( %args ) {
 
     my @output;
 
-    push @output, ['Missing year, months and days by station id and year (for selected stations):']
+    push @output, [ 'StnId', 'Year', 'Quality%', 'Missing months and days']
         unless $args{no_header};
 
     foreach my $stnid ( sort keys $_missing_href->%* ) {
@@ -540,9 +535,11 @@ method get_missing_data_ranges ( %args ) {
         my $yyyy_href = $_missing_href->{$stnid};
 
         foreach my $yyyy ( sort keys $yyyy_href->%* ) {
-            my $values_href = $yyyy_href->{$yyyy};
-            foreach my $v ( keys $values_href->%* ) {
-                push @output, [ $stnid, $yyyy, $v ];
+            my $gaps_href = $yyyy_href->{$yyyy};
+            foreach my $key ( keys $gaps_href->%* ) {
+                my $gap_text = $key;
+                my $quality_pct = $gaps_href->{$key};
+                push @output, [ $stnid, $yyyy, $quality_pct, $gap_text ];
             }
         }
     }
@@ -748,7 +745,6 @@ rejection.
 
 =cut
 
-# TODO: consider removing this as it is no longer used anywere
 method get_station_note_list () {
     my @stn_notes;
 
@@ -981,7 +977,7 @@ method load_data ( %args ) {
     return;
 }
 
-=head2 load_stations ()
+=head2 load_stations ( content => undef )
 
 Read the GHCN stations list and the stations inventory list and create
 a hash of Station objects, keyed on station id, filtered according
@@ -990,6 +986,14 @@ to the options provided in set_options().
 Returns a hash of Weather::GHCN::Station objects, keyed on station id.
 
 =over 4
+
+=item argument: content => undef
+
+Normally, load_stations will fetch the stations list from the cache,
+or if not in the cache (or its stale) then from the GHCN web repository.
+However, an API caller might want to obtain the station text by some
+other means, in which case it can use the optional 'content' keyword
+argument to just pass in a scalar containing the station text.
 
 =item option: country <str>
 
@@ -1033,21 +1037,22 @@ cos-surface-network-gsn-program-overview>
 
 =cut
 
-method load_stations () {
+method load_stations (%args) {
 
-    my $stations_content = $self->_fetch_url( $GHCN_STN_LIST_URL, 'URI::Fetch_stn');
+    my $content = $args{content} // $self->_fetch_url( $GHCN_STN_LIST_URL, 'URI::Fetch_stn');
 
-    if ( $stations_content =~ m{<title>(.*?)</title>}xms ) {
+    if ( $content =~ m{<title>(.*?)</title>}xms ) {
         croak '*E* unable to fetch data from ' . $GHCN_STN_LIST_URL . ': ' . $1;
     }
 
     ## no critic [InputOutput::RequireBriefOpen]
-    open my $stn_fh, '<', \$stations_content
+    open my $stn_fh, '<', \$content
         or croak '*E* unable to open stations_content string';
 
     $_tstats->start('Parse_stn');
 
-    my $is_stnid_filter = keys $_stnid_filter_href->%*
+    my $is_stnid_filter;
+    $is_stnid_filter = keys %{ $_stnid_filter_href }
         if $_stnid_filter_href;
 
     my %stnidx;
@@ -1062,7 +1067,6 @@ method load_stations () {
         # (stationid).(latitu).(longitu).(elev).st.--name-----------------------
         # ACW00011604  17.1167  -61.7833   10.1    ST JOHNS COOLIDGE FLD
 
-        ## no critic [ProhibitDoubleSigils]
         ## no critic [ProhibitMagicNumbers]
         my $id = substr $line, 0, 11;
 
@@ -1152,7 +1156,7 @@ placemarks across time.
 =item argument: list
 
 If the argument list contains the 'list' keyword and a true value,
-then a perl list is returned.  Otherwise, a string consisting of lines 
+then a perl list is returned.  Otherwise, a string consisting of lines
 of text is returned.
 
 =item option: kml
@@ -1192,6 +1196,7 @@ method report_kml ( %arg ) {
         next if $stn->error_count;
         # TODO:  use ->sets to get a list of spans and use the first span instead of splitting run_list
         my ($start, $end) = split m{ [-] }xms, $stn->active;
+        $end //= $start;
 
         my $desc = $stn->description();
 
@@ -1223,14 +1228,14 @@ stations that meet the selection criteria.
 =item argument: list
 
 If the argument list contains the 'list' keyword and a true value,
-then a perl list is returned.  Otherwise, a string consisting of lines 
+then a perl list is returned.  Otherwise, a string consisting of lines
 of text is returned.
 
 =item argument: curl
 
 If the argument list contains the 'curl' keyword and a true value,
 then the output will be a set of lines that can be saved in a file
-for subsequent input to the B<curl> program using the B<-K> option.  
+for subsequent input to the B<curl> program using the B<-K> option.
 This facilitates bulk fetching of .dly files into the cache.
 
 =back
@@ -1242,16 +1247,16 @@ method report_urls ( %arg ) {
 
     my @output;
 
-    push @output, "# Use curl -K <this_file> to download these URL's"
+    push @output, '# Use curl -K <this_file> to download these URL\'s'
         if $arg{curl};
-        
+
     foreach my $stn ( values %_station ) {
         next if $stn->error_count;
         # TODO:  use ->sets to get a list of spans and use the first span instead of splitting run_list
         my ($start, $end) = split m{ [-] }xms, $stn->active;
-        
+
         if ( $arg{curl} ) {
-            my @parts = split '/', $stn->url;
+            my @parts = split m{ [/] }xms, $stn->url;
             push @output, 'output = ' . $parts[-1];
             push @output, 'url = ' . $stn->url;
         } else {
@@ -1305,10 +1310,10 @@ memory statistics.
 
 method set_options (%user_options) {
 
-    if ( defined $user_options{'profile'} ) {
+    if ( $user_options{'profile'} ) {
         # save the expanded profile file path in the object
         $_profile_file = path( $user_options{'profile'} )->absolute()->stringify;
-        $_profile_href = _get_profile_options($_profile_file);
+        $_profile_href = Weather::GHCN::Options->get_profile_options($_profile_file);
     }
 
     $_ghcn_opt_obj //= Weather::GHCN::Options->new();
@@ -1607,7 +1612,7 @@ method _compute_quality ($stn, $context_msg, $day_count, $range, $quality) {
     my $data_quality = int(($day_count / $expected_days) * 1000 + 0.5) / 10.0;
 
     if ( $data_quality < $quality ) {
-        my $msg = sprintf "%s\tinsufficient data\tstation only has %d days in %s and needs %d (%0.1f%% < %d%%)",
+        my $msg = sprintf "%s\tstation only has %d days in %s and needs %d (%0.1f%% < %d%%)",
             $stn->id, $day_count, $context_msg, $expected_days, $data_quality, $quality;
         $stn->add_note($ERR_INSUFF, $msg);
         $insufficient_quality++;
@@ -1681,6 +1686,22 @@ method _filter_stations ($stations_href) {
     my $count = grep { $_->error_count == 0 } values $stations_href->%*;
 
     return $count;
+}
+
+method _find_gaps ($stn, $range, $type, $noteid, $years_aref) {
+    my $nrs = rng_new( $range );
+    my $years_nrs = rng_new( $years_aref->@* );
+    my $gap_nrs = $nrs->diff( $years_nrs );
+    if ($gap_nrs->cardinality) {
+        my $msg = sprintf "%s\tmissing data in the $type range\tyears %s", $stn->id, $gap_nrs->as_string;
+        $stn->add_note($noteid, $msg, $TRUE);
+        my $iter = $gap_nrs->iterate_runs();
+        while (my ( $from, $to ) = $iter->()) {
+            foreach my $yyyy ($from .. $to) {
+                $_missing_href->{$stn->id}{$yyyy}{$EMPTY}++;
+            }
+        }
+    }
 }
 
 method _initialize_flag_cnts () {
@@ -1931,38 +1952,15 @@ method _report_gaps ($stn, $gaps_href) {
     my @years = sort keys $gaps_href->%*;
 
     if ( $Opt->active ) {
-        my $active_nrs = rng_new( $Opt->active );
-        my $years_nrs = rng_new( @years );
-        my $gap_nrs = $active_nrs->diff( $years_nrs );
-        if ($gap_nrs->cardinality) {
-            my $msg = sprintf "%s\tmissing data in the active range\tyears %s", $stn->id, $gap_nrs->as_string;
-            $stn->add_note($WARN_MISS_YA, $msg, $Opt->verbose);
-            my $iter = $gap_nrs->iterate_runs();
-            while (my ( $from, $to ) = $iter->()) {
-                foreach my $yyyy ($from .. $to) {
-                    $_missing_href->{$stn->id}{$yyyy}{$EMPTY}++;
-                }
-            }
-        }
+        $self->_find_gaps($stn, $Opt->active, 'active', $WARN_MISS_YA, \@years);
+    }
+
+    if ( $Opt->range ) {
+        $self->_find_gaps($stn, $Opt->range, 'range', $WARN_MISS_YF, \@years);
     }
 
     my $opt_range_nrs    = rng_new($Opt->range);
     my $opt_baseline_nrs = rng_new($Opt->baseline);
-
-    if ( $Opt->range ) {
-        my $years_nrs = rng_new( @years );
-        my $gap_nrs = $opt_range_nrs->diff( $years_nrs );
-        if ($gap_nrs->cardinality) {
-            my $msg = sprintf "%s\tmissing data in the filter range\tyears %s", $stn->id, $gap_nrs->as_string;
-            $stn->add_note($WARN_MISS_YF, $msg, $Opt->verbose);
-            my $iter = $gap_nrs->iterate_runs();
-            while (my ( $from, $to ) = $iter->()) {
-                foreach my $yyyy ($from .. $to) {
-                    $_missing_href->{$stn->id}{$yyyy}{$EMPTY}++;
-                }
-            }
-        }
-    }
 
     my (undef, undef, undef , $mday, $mon, $year) = localtime time;
     ## no critic [ValuesAndExpressions::ProhibitMagicNumbers]
@@ -1974,6 +1972,10 @@ method _report_gaps ($stn, $gaps_href) {
               ( $opt_range_nrs and not $opt_range_nrs->contains($yyyy)
               or
                 $Opt->anomalies and not $opt_baseline_nrs->contains($yyyy) );
+
+        my $gap_months = $EMPTY;
+        my $days_missing = 0;
+
 
         ## no critic [ProhibitDoubleSigils]
         ## no critic [ProhibitMagicNumbers]
@@ -1990,10 +1992,10 @@ method _report_gaps ($stn, $gaps_href) {
         $month_gap_nrs->remove( @months );
 
         if ($month_gap_nrs->cardinality) {
-            my $gap_months = join $SPACE, _month_names($month_gap_nrs->as_array);
-            my $msg = sprintf "%s\tmissing data: year %d months %s", $stn->id, $yyyy, $gap_months;
-            $stn->add_note($WARN_MISS_MO, $msg, $Opt->verbose);
-            $_missing_href->{$stn->id}{$yyyy}{$gap_months}++;
+            foreach my $mm ($month_gap_nrs->as_array) {
+                $days_missing += _days_in_month($yyyy,$mm);
+            }
+            $gap_months = join $SPACE, _month_names($month_gap_nrs->as_array);
         }
 
         my $opt_fday_nrs   = rng_new($Opt->fday);
@@ -2030,96 +2032,30 @@ method _report_gaps ($stn, $gaps_href) {
 
             my $day_gap_nrs = $days_in_month_nrs->diff($days_nrs);
 
+            $days_missing += $day_gap_nrs->cardinality;
+
             $gap_text .= $SPACE . _month_names($mm) . '[' . $day_gap_nrs->as_string . ']'
                 unless $day_gap_nrs->is_empty;
         }
 
+        $gap_text = join $SPACE, $gap_months, $gap_text
+            if $gap_months;
+
+        $gap_text =~ s{ \A \s+ }{}xms;  # trim leading whitespace
+
         if ( $gap_text !~ m{\A \s* \Z}xms ) {
-            my $msg = sprintf "%s\tmissing data: %d days %s", $stn->id, $yyyy, $gap_text;
+            my $days_of_data = _days_in_year($yyyy) - $days_missing;
+            my $quality = sprintf '%6.1f', 100 * ( $days_of_data / _days_in_year($yyyy) );
+            my $msg = sprintf "%s\tmissing data: %d %s %s", $stn->id, $yyyy, $quality, $gap_text;
             $stn->add_note($WARN_MISS_DY, $msg, $Opt->verbose);
             $gap_text =~ s{\A \s+ }{}xms;
-            $_missing_href->{$stn->id}{$yyyy}{$gap_text}++;
+            $_missing_href->{$stn->id}{$yyyy}{$gap_text} = $quality;
         }
     }
 
     $_tstats->stop('Report_gaps');
 
     return;
-}
-
-#----------------------------------------------------------------------
-# Configuration Helper functions
-#----------------------------------------------------------------------
-
-sub _get_profile_options ($profile=$EMPTY) {
-
-    #debug# use DDP;
-    #debug# use Log::Dispatch;
-    #debug# my $log = Log::Dispatch->new(
-    #debug#     outputs => [
-    #debug#         [ 'File',   min_level => 'debug', filename => 'c:/sandbox/log.log' ],
-    #debug#         [ 'Screen', min_level => 'debug' ],
-    #debug#
-    #debug#     ]
-    #debug# );
-
-    my $profile_href = {};
-
-    # passing undef will result in an empty config
-    return $profile_href if not defined $profile;
-
-    #debug# use FindBin;
-    #debug# open my $fh, '>>', 'c:/sandbox/log.log' or die;
-    #debug# $log->debug( 'program ' . $0                                   );
-    #debug# $log->debug( 'caller ' . join(' | ', caller)                   );
-    #debug# $log->debug( 'received profile_file:           ' . $_profile );
-
-    my $profile_filespec = _get_profile_filespec($profile);
-
-    my $yaml_struct;
-    my $msg = $EMPTY;
-
-    # uncoverable branch false
-    if (-e $profile_filespec) {
-        # uncoverable branch false
-        try {
-            $yaml_struct = YAML::Tiny->read($profile_filespec);
-        } catch {
-            $msg = '*W* no cache or aliases: failed reading YAML in ' . $profile_filespec;
-            carp $msg;
-        }
-    } else {
-        return $profile_href;
-    }
-
-    $profile_href = $yaml_struct->[0]
-        if $yaml_struct;
-
-    #debug# $log->( 'yaml_struct length = ' . length $yaml_struct );
-    #debug# $log->( "\n" );
-    #debug# $log->( 'profile_filespec:                ' . $profile_filespec );
-    #debug# $log->( 'carp ' . $msg );
-    #debug# $log->( 'FindBin::Bin                    ' . $FindBin::Bin );
-    #debug# $log->( "\n");
-    #debug# $log->( 'profile_href ' . np($profile_href) );
-    #debug# $log->( "\n" );
-    #debug# $log->( "================" );
-    #debug# $log->( "\n" );
-    #debug# close $fh;
-
-    return $profile_href;
-}
-
-sub _get_profile_filespec ($profile) {
-
-    # an EMPTY arg will default to ~/.ghcn_fetch.yaml
-    $profile ||= $DEFAULT_PROFILE_FILE;
-
-    # Path::Tiny::path will replace ~ or ~username with the corresponding path
-    my $profile_filespec = path($profile);
-    #debug# say {$fh} 'profile_filespec (canon):        ', $profile_filespec;
-
-    return $profile_filespec;
 }
 
 #----------------------------------------------------------------------

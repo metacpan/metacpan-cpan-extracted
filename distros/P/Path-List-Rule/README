@@ -1,0 +1,90 @@
+Path::List::Rule
+
+"Path::List::Rule" is a subclass of Path::Iterator::Rule which uses a
+list of paths (passed to the constructor) as a proxy for a filesystem.
+
+The list of paths doesn't contain any metadata to allow
+"Path::List::Rule" to distinguish between directories and files, so it
+does its best:
+
+1   If a path is used as a component in another path, it's a directory.
+
+2   If it ends with "/", it's a directory.
+
+3   Otherwise it's a file.
+
+"Path:List::Rule" objects behave just like Path::Iterator::Rule objects,
+except that methods which would ordinarily return paths as strings
+return them as "Path::List::Rule::Entry" objects instead.
+
+  Path::List::Rule::Entry
+
+These objects overload the stringification operator to provide the
+initial path. (A "stringify" method is also available).
+
+They also respond to the standard Perl file test operators (e.g. "-f",
+"-d"). The following operators are supported; all others will result in
+a thrown exception.
+
+"-e"
+    True if the object represents an entry found in the paths passed to
+    the "Path::List::Rule" constructor.
+
+"-l"
+    Always returns false.
+
+"-r"
+    Always returns true.
+
+"-d"
+    Returns true if the object represents a directory found in the paths
+    passed to the "Path::List::Rule" constructor.
+
+"-f"
+    Returns true if the object represents a file found in the paths
+    passed to the "Path::List::Rule" constructor.
+
+Note! This minimal set of file operations significantly limits the
+Path::Iterator::Rule tests which may be used.
+
+   Methods
+
+"is_dir"
+    Returns true if the object represents a directory found in the paths
+    passed to the "Path::List::Rule" constructor.
+
+"is_file"
+    Returns true if the object represents a file found in the paths
+    passed to the "Path::List::Rule" constructor.
+
+"exists"
+    Returns true if the object represents a entry found in the paths
+    passed to the "Path::List::Rule" constructor.
+
+"stringify"
+    Return the path as a string.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022 by Smithsonian Astrophysical
+Observatory.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

@@ -1,4 +1,4 @@
-#fsdb event i count
+#fsdb event i count:q
 singleton	9	1
 _null_getpage+128	15	6
 _null_getpage+4	21	6

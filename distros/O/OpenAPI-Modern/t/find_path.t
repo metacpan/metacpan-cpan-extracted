@@ -217,6 +217,7 @@ YAML
       method => 'post',
       path_template => '/foo/{foo_id}',
       path_captures => { bloop => 'bar' },
+      operation_path => '/paths/~1foo~1{foo_id}/post',
       errors => [
         methods(TO_JSON => {
           instanceLocation => '/request/uri/path',
@@ -240,6 +241,7 @@ YAML
       path_template => '/foo/bar',
       path_captures => {},
       operation_id => 'my-get-path',
+      operation_path => '/paths/~1foo~1bar/get',
       errors => [],
     },
     'path_template and operation_id can both be passed, if consistent',
@@ -255,6 +257,7 @@ YAML
       method => 'get',
       path_template => '/foo/bar',
       path_captures => {},
+      operation_path => '/paths/~1foo~1bar/get',
       errors => [
         methods(TO_JSON => {
           instanceLocation => '/request/uri/path',
@@ -277,6 +280,7 @@ YAML
       method => 'post',
       path_template => '/foo/{foo_id}',
       path_captures => { foo_id => 123 },
+      operation_path => '/paths/~1foo~1{foo_id}/post',
       errors => [
         methods(TO_JSON => {
           instanceLocation => '/request/uri/path',
@@ -298,6 +302,7 @@ YAML
     {
       method => 'post',
       path_template => '/foo/{foo_id}',
+      operation_path => '/paths/~1foo~1{foo_id}/post',
       errors => [
         methods(TO_JSON => {
           instanceLocation => '/request/uri/path',
@@ -320,6 +325,7 @@ YAML
       method => 'get',
       path_captures => {},
       operation_id => 'my-get-path',
+      operation_path => '/paths/~1foo~1bar/get',
       errors => [
         methods(TO_JSON => {
           instanceLocation => '/request/uri/path',
@@ -342,6 +348,7 @@ YAML
       method => 'post',
       path_captures => { foo_id => 'goodbye' },
       operation_id => 'my-post-path',
+      operation_path => '/paths/~1foo~1{foo_id}/post',
       errors => [
         methods(TO_JSON => {
           instanceLocation => '/request/uri/path',
@@ -406,6 +413,7 @@ YAML
       path_template => '/foo/{foo_id}',
       path_captures => { foo_id => '123' },
       method => 'get',
+      operation_path => '/paths/~1foo~1{foo_id}/get',
       errors => [],
     },
     'path capture values and method are extracted from the path template and request uri',
@@ -423,6 +431,7 @@ YAML
       path_template => '/foo/{foo_id}',
       path_captures => { foo_id => '123' },
       method => 'get',
+      operation_path => '/paths/~1foo~1{foo_id}/get',
       errors => [],
     },
     'path capture values are extracted from the operation id and request uri',
@@ -438,6 +447,7 @@ YAML
       path_captures => { foo_id => '123' },
       method => 'get',
       operation_id => 'my-get-path',
+      operation_path => '/paths/~1foo~1{foo_id}/get',
       errors => [],
     },
     'path_item and path_capture variables are returned in the provided options hash',
@@ -496,6 +506,7 @@ YAML
       path_template => '/foo/{foo_id}',
       path_captures => { foo_id => 'hello // there ಠ_ಠ!' },
       operation_id => 'my-get-path',
+      operation_path => '/paths/~1foo~1{foo_id}/get',
       errors => [],
     },
     'path capture variables are found to be consistent with the URI when some values are url-escaped',
@@ -510,6 +521,7 @@ YAML
       path_captures => { foo_id => 'hello // there ಠ_ಠ!' },
       path_template => '/foo/{foo_id}',
       method => 'get',
+      operation_path => '/paths/~1foo~1{foo_id}/get',
       errors => [],
     },
     'path captures can be properly extracted from the URI when some values are url-escaped',
@@ -565,6 +577,7 @@ YAML
       path_template => '/foo/{foo_id}',
       path_captures => { foo_id => 'bar' },
       method => 'get',
+      operation_path => '/paths/~1foo~1{foo_id}/get',
       errors => [],
     },
     'no path_template provided; no operation_id is recorded, because one does not exist in the schema document',
@@ -579,6 +592,7 @@ YAML
       path_template => '/foo/{foo_id}',
       path_captures => { foo_id => 'bar' },
       method => 'get',
+      operation_path => '/paths/~1foo~1{foo_id}/get',
       errors => [],
     },
     'path_template provided; no operation_id is recorded, because one does not exist in the schema document',
@@ -636,6 +650,7 @@ YAML
       path_template => '/foo/{foo_id}',
       path_captures => {},
       method => 'get',
+      operation_path => '/paths/~1foo~1{foo_id}/get',
       errors => [
         methods(TO_JSON => {
           instanceLocation => '/request/uri/path',
@@ -656,6 +671,7 @@ YAML
       path_captures => { foo_id => 'a' },
       path_template => '/foo/{foo_id}',
       method => 'get',
+      operation_path => '/paths/~1foo~1{foo_id}/get',
       errors => [],
     },
     'no request provided; path_template and method are extracted from operation_id and path_captures',
@@ -669,6 +685,7 @@ YAML
       path_captures => { foo_id => 'a' },
       path_template => '/foo/{foo_id}',
       method => 'get',
+      operation_path => '/paths/~1foo~1{foo_id}/get',
       errors => [],
     },
     'no request provided; operation_id are extracted from method and path_template',
@@ -693,6 +710,7 @@ YAML
       path_template => '/foo/{foo_id}',
       path_captures => { foo_id => 'bar' },
       method => 'get',
+      operation_path => '/paths/~1foo~1{foo_id}/get',
       errors => [],
     },
     'no operation_id is recorded, because one does not exist in the schema document',

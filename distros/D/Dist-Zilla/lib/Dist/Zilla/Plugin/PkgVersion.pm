@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::PkgVersion 6.028;
+package Dist::Zilla::Plugin::PkgVersion 6.029;
 # ABSTRACT: add a $VERSION to your packages
 
 use Moose;
@@ -227,6 +227,11 @@ sub munge_perl {
       if $version =~ /\P{ASCII}/;
 
     if ($self->use_package) {
+      my $version_token = $version =~ m/\.\d+\./
+          ? PPI::Token::Number::Version->new(version->parse($version)->normal)
+          : PPI::Token::Number->new($version)
+          ;
+
       if (my ($block) = grep {; $_->isa('PPI::Structure::Block') } $stmt->schildren) {
         # Okay, we've encountered `package NAME BLOCK` and want to turn it into
         # `package NAME VERSION BLOCK` but, to quote the PPI documentation,
@@ -250,8 +255,9 @@ sub munge_perl {
         }
 
         # Okay, there's a block (which we have in $block) but no version.  So,
-        # we stick a Number in front of the block, then a space between them.
-        $block->insert_before( PPI::Token::Number->new($version) );
+        # we stick a Number / Number::Version in front of the block, then a
+        # space between them.
+        $block->insert_before( $version_token );
         $block->insert_before( PPI::Token::Whitespace->new(q{ }) );
         $munged = 1;
         next STATEMENT;
@@ -269,7 +275,7 @@ sub munge_perl {
 
       # Oh, good!  It's just a normal `package NAME` and we are going to add
       # VERSION to it.  This is stupid, but gets the job done.
-      my $perl = sprintf 'package %s %s;', $package, $version;
+      my $perl = sprintf 'package %s %s;', $package, $version_token->content;
       $perl .= ' # TRIAL' if $self->zilla->is_trial;
 
       my $newstmt = PPI::Token::Unknown->new($perl);
@@ -386,7 +392,7 @@ Dist::Zilla::Plugin::PkgVersion - add a $VERSION to your packages
 
 =head1 VERSION
 
-version 6.028
+version 6.029
 
 =head1 SYNOPSIS
 

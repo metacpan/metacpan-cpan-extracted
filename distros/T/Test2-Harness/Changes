@@ -1,3 +1,16 @@
+1.000136  2022-11-29 13:56:37-08:00 America/Los_Angeles
+
+    - Add ability to sort resource plugins to get them in order.
+
+1.000135  2022-11-29 10:44:53-08:00 America/Los_Angeles
+
+    - Add ability to specify a umask for shared slots files
+
+1.000134  2022-11-29 10:03:09-08:00 America/Los_Angeles
+
+    - Add ability to assign multiple slots to jobs
+    - Add shared job slots
+
 1.000133  2022-09-07 13:44:03-07:00 America/Los_Angeles
 
     - Order tests with conflicts earlier than others

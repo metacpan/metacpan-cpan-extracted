@@ -9,7 +9,7 @@ use Perl::Critic::Utils qw{ $EMPTY hashify };
 
 use Exporter 'import';
 
-our $VERSION = '1.140';
+our $VERSION = '1.142';
 
 #-----------------------------------------------------------------------------
 
@@ -91,10 +91,12 @@ Readonly::Array our @STRICT_EQUIVALENT_MODULES => qw(
     Moose::Role
     Moose::Exporter
     Moose::Util::TypeConstraints
+    Test::Class::Moose
 
     MooseX::NonMoose
     MooseX::Singleton
     MooseX::Role::Parameterized
+    MooseX::MethodAttributes::Role
 
     Mouse
     Mouse::Role

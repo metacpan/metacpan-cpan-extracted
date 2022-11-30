@@ -3,17 +3,17 @@ package Code::TidyAll::SVN::Precommit;
 use strict;
 use warnings;
 
-use Capture::Tiny qw(capture_stdout capture_stderr);
+use Capture::Tiny       qw(capture_stdout capture_stderr);
 use Code::TidyAll::Util qw(tempdir_simple);
 use Code::TidyAll;
-use Log::Any qw($log);
+use Log::Any   qw($log);
 use Path::Tiny qw(path);
 use SVN::Look;
 use Try::Tiny;
 
 use Moo;
 
-our $VERSION = '0.82';
+our $VERSION = '0.83';
 
 # Public
 has conf_name                => ( is => 'ro' );
@@ -182,7 +182,7 @@ Code::TidyAll::SVN::Precommit - Subversion pre-commit hook that requires files t
 
 =head1 VERSION
 
-version 0.82
+version 0.83
 
 =head1 SYNOPSIS
 

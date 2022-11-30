@@ -1,0 +1,115 @@
+# NAME
+
+Clearbuilt::ExcelErator - Write XLSX files in a Clearbuilt-standard way
+
+# VERSION
+
+version 2.0001
+
+# SYNOPSIS
+
+    use Clearbuilt::ExcelErator;
+
+    my %spreadsheet = (
+       'title'      => 'Summary',
+       'col_widths' => {
+          '1-3' => 12
+       },
+       'rows' => [
+          [ { value => 'The Report Title', format => [ font => 'bold' ], nowidth => 1 } ],
+          [],
+          [
+             '',
+             { value => 'Qty', format => [ bb => 2, font => 'bold', halign => 'center' ] },
+             { value => 'Cost', format => [ bb => 2, font => 'bold', halign => 'center' ] },
+             { value => 'Total Cost', format => [ bb => 2, font => 'bold', halign => 'center' ] },
+          ],
+          [ 'Widget 1',
+             { value => $qty_of_widget_1,  format => [ halign => 'right', type => 'dec1comma' ] },
+             { value => $cost_of_widget_1, format => [ halign => 'right', type => 'currencyacct' ] },
+             { value => $qty_of_widget_1 * $cost_of_widget_1,
+                  format => [ halign => 'right', type => 'currencyacct' ] },
+          ],
+          [ 'Widget 2',
+             { value => $qty_of_widget_2,  format => [ halign => 'right', type => 'dec1comma' ] },
+             { value => $cost_of_widget_2, format => [ halign => 'right', type => 'currencyacct' ] },
+             { value => $qty_of_widget_2 * $cost_of_widget_2,
+                  format => [ halign => 'right', type => 'currencyacct' ] },
+          ],
+          [ 'Totals',
+             { value  => "=sum(B3:B4)", format => [ tb => 2, halign => 'right', type => 'dec1comma' ] },
+             { value  => "=sum(C3:C4)", format => [ tb => 2, halign => 'right', type => 'currencyacct' ] },
+             { value  => "=sum(D3:D4)", format => [ tb => 2, halign => 'right', type => 'currencyacct' ] },
+          ],
+       ],
+    );
+    my $workbook = Clearbuilt::ExcelErator->new( { filename => 'my_workbook.xlsx' } );
+    $workbook->write_the_book( [\%spreadsheet] );
+
+# DESCRIPTION
+
+Clearbuilt::Excelerator is a wrapper around [Excel::Writer::XLSX](https://metacpan.org/pod/Excel%3A%3AWriter%3A%3AXLSX) that
+simplifies and standardizes its usage. You create a hash defining your
+spradsheet, and it does the rest for you!
+
+More documentation of the hash will be added later, but the ["SYNOPSIS"](#synopsis) above shows a 
+simple and common usage, with frequently-used options. A more-extensive example can be found
+in the package, in `examples/create_test_excel_sheet`.
+
+# THE WORKBOOK ARRAY
+
+The workbook is an array of hashes, each of which is a worksheet.
+
+Note that the hash for this simple example is sent as an arrayref-to-the-hash.
+The implication of that it is, of course, that you could create multiple
+hashes, push them into an array in the order you want, and send a reference
+to that array to `write_the_book` and get a multi-sheet workbook.
+
+# THE WORKSHEET HASH
+
+There are only three valid elements in this hash:
+
+- `title`: The title of the spreadsheet, which will show up in the tabs at the bottom.
+- `col_widths`: A hashref of column widths. The key is the column number (beginning with 1), and the value is the desired width.
+- `rows`: The array of rows for the sheet.
+
+# THE WORKSHEET ROWS ARRAY
+
+The `rows` array is an array of arrayrefs; each of **those** is an arrayref of cells.  The cell can be a 
+scalar, in which case it is displayed with default formatting, or a hashref with a `value` and optionally
+a `format`.  If you do not specify a `format`, you get the default for that cell.
+
+# EXPORTED METHODS
+
+## new({ filename => &lt;filespec>})>
+
+Opens the desired file for writing.  At this time, `filename` is the only parameter, which is passed
+verbatim into [Excel::Writer::XLSX](https://metacpan.org/pod/Excel%3A%3AWriter%3A%3AXLSX); there may be other options in the future.
+
+## write\_the\_book(\\%spreadsheet);
+
+Writes the file, and closes it.  Easy-peasy!
+
+# REQUIRES
+
+- [Modern::Perl](https://metacpan.org/pod/Modern%3A%3APerl)
+- [Moo](https://metacpan.org/pod/Moo)
+- [Excel::Writer::XLSX](https://metacpan.org/pod/Excel%3A%3AWriter%3A%3AXLSX)
+
+# ROADMAP
+
+- Add other formatting functions
+- Default column formatting
+- More documentation
+- A robust unit test for `write_the_book`
+
+# AUTHOR
+
+D Ruth Holloway <ruthh@clearbuilt.com>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022 by Clearbuilt.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

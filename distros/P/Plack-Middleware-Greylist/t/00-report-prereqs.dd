@@ -18,8 +18,7 @@ do { my $x = {
                                       'Test::Pod::Coverage' => '1.08',
                                       'Test::Pod::LinkCheck' => '0',
                                       'Test::Portability::Files' => '0',
-                                      'Test::TrailingSpace' => '0.0203',
-                                      'Test::Vars' => '0.015'
+                                      'Test::TrailingSpace' => '0.0203'
                                     }
                     },
        'runtime' => {
@@ -36,7 +35,7 @@ do { my $x = {
                                       'Ref::Util' => '0',
                                       'Time::Seconds' => '0',
                                       'parent' => '0',
-                                      'perl' => 'v5.34.0',
+                                      'perl' => 'v5.10.0',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }
@@ -46,6 +45,7 @@ do { my $x = {
                                      'CPAN::Meta' => '2.120900'
                                    },
                    'requires' => {
+                                   'Cache::FastMmap' => '1.47',
                                    'File::Spec' => '0',
                                    'HTTP::Request::Common' => '0',
                                    'Module::Metadata' => '0',
@@ -53,12 +53,12 @@ do { my $x = {
                                    'Plack::Builder' => '0',
                                    'Plack::Middleware::ContentLength' => '0',
                                    'Plack::Middleware::Head' => '0',
+                                   'Plack::Middleware::ReverseProxy' => '0',
                                    'Plack::Response' => '0',
                                    'Plack::Test' => '0',
                                    'Test::Differences' => '0',
                                    'Test::More' => '0',
-                                   'Test::Most' => '0',
-                                   'perl' => 'v5.34.0'
+                                   'Test::Most' => '0'
                                  }
                  }
      };

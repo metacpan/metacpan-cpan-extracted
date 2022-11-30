@@ -74,6 +74,7 @@
             "Test::More" : "1.302170",
             "Text::ParseWords" : "0",
             "Time::HiRes" : "0",
+            "YAML::Tiny" : "0",
             "base" : "0",
             "constant" : "0",
             "goto::file" : "0.005",
@@ -110,7 +111,7 @@
          "url" : "https://github.com/Test-More/Test2-Harness/"
       }
    },
-   "version" : "1.000133",
+   "version" : "1.000136",
    "x_generated_by_perl" : "v5.32.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.26",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

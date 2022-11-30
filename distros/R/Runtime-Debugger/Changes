@@ -1,0 +1,90 @@
+Revision history for Runtime-Debugger
+
+====
+0.10
+====
+
+2022-11-29
+Fixed pod typos.
+Fixed some edge case issues.
+Test cases work now with lexical values.
+Improved array and hash completions.
+Finished main tests.
+Remove dependency: Module::Functions.
+
+====
+0.09
+====
+
+2022-11-28
+Improved help command.
+
+====
+0.08
+====
+
+2022-11-26
+Fixed some typos in the pod.
+Finished description section.
+
+====
+0.07
+====
+
+2022-11-24
+Updated pod typos.
+Updated README.
+Updated Changes format.
+Improved documentation (WIP).
+Cleaned up test.
+Added many variables tests (TODO).
+Showing help on init.
+
+====
+0.06
+====
+
+2022-11-24
+Moveds commands to a function.
+Fixed minor bugs (like h<ENTER>).
+
+====
+0.05
+====
+
+2022-11-22
+Improved autocompletion (much smarter).
+Performance Improvement by caching lexicals at the start.
+
+====
+0.04
+====
+
+2022-11-21
+Added commands: help, history.
+
+====
+0.03
+====
+
+2022-11-20
+Added maxdepth option when printing.
+Displaying message now on error.
+
+====
+0.02
+====
+
+2022-11-20
+Loading and saving history of commands.
+
+2022-11-19
+Added lexical variable tab completion.
+
+====
+0.01
+====
+
+2022-11-18
+First version, released on an unsuspecting world.
+

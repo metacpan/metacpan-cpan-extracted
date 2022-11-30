@@ -149,7 +149,13 @@ make_screenshot(int x, int y, int w, int h)
 	GError          *error = NULL;
 	char             filename[256];
 
-	app = g_application_new("org.gnome.Screenshot", G_APPLICATION_FLAGS_NONE);
+	app = g_application_new("org.gnome.Screenshot", 
+#ifdef GLIB_AVAILABLE_ENUMERATOR_IN_2_74
+		G_APPLICATION_DEFAULT_FLAGS
+#else
+		G_APPLICATION_FLAGS_NONE
+#endif
+	);
 	if ( !g_application_register (app, NULL, NULL)) {
 		g_object_unref(app);
 		Mdebug("cannot register another gtk application\n");
@@ -520,7 +526,9 @@ prima_gtk_init(void)
 Bool
 prima_gtk_done(void)
 {
+#ifdef DBUS_SCREENSHOT
 	terminate_screenshot_app();
+#endif
 	if ( gtk_filters) {
 		int i;
 		for ( i = 0; i < gtk_filters-> count; i++)

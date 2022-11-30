@@ -3,7 +3,7 @@ package PDF::API2::Resource::Colors;
 use strict;
 use warnings;
 
-our $VERSION = '2.043'; # VERSION
+our $VERSION = '2.044'; # VERSION
 
 # This is an amalgamation of the X11, SGML, and (X)HTML specification sets
 sub get_colors {

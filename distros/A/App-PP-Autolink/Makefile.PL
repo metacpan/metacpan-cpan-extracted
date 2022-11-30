@@ -1,8 +1,19 @@
 use strict;
 use warnings;
-use 5.010;
+use 5.014;
 use ExtUtils::MakeMaker;
 
+my @exe_copy;
+if ($^O ne 'MSWin32') {
+    #  Make a copy of the scipt without the .pl extension.
+    #  Clunky as it is not considered by "make clean".
+    use File::Copy;
+    my $success = eval {copy 'bin/pp_autolink.pl', 'bin/pp_autolink'; 1};
+    warn $@ if $@;
+    if ($success) {
+        @exe_copy = ('bin/pp_autolink');
+    }
+}
 
 my %WriteMakefileArgs = (
     "ABSTRACT" => "Pack PAR executables, finding dynamic libs automatically",
@@ -10,6 +21,7 @@ my %WriteMakefileArgs = (
     "NAME"     => "App::PP::Autolink",
     "VERSION_FROM" => "lib/App/PP/Autolink.pm",
     "CONFIGURE_REQUIRES" => {
+        "File::Copy" => 0,
     },
     "BUILD_REQUIRES" => {
     },
@@ -31,6 +43,7 @@ my %WriteMakefileArgs = (
     },
     EXE_FILES		=> [
         'bin/pp_autolink.pl',
+        @exe_copy,
     ],
     META_MERGE => {
         'meta-spec' => { version => 2 },

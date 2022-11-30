@@ -1,5 +1,5 @@
 package Game::TileMap::Legend;
-$Game::TileMap::Legend::VERSION = '0.001';
+$Game::TileMap::Legend::VERSION = '0.002';
 use v5.10;
 use strict;
 use warnings;

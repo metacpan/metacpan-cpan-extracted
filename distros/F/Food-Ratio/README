@@ -1,0 +1,21 @@
+Food-Ratio - calculate ingredient ratios
+
+this module can be installed using cpanm:
+
+    cpanm Food::Ratio
+
+run perldoc(1) on Food::Ratio for documentation, or see foodratio(1) for
+the command line tool
+
+
+to author a new release:
+
+    perl Build.PL
+    RELEASE_TESTING=1 ./Build test
+    ./Build testcover
+    ./Build disttest
+    git tag -u ... -s v...
+    ./Build dist
+    cpan-upload ...
+    git push ...
+    ./Build realclean

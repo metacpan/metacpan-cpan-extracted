@@ -38,5 +38,6 @@ t/05-kqueue.t.dis
 t/06-stat.t
 t/07-dwim.t
 t/08-shutdown.t
+t/09-accept-multiple.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

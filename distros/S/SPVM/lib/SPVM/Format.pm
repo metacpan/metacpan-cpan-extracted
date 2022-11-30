@@ -60,6 +60,9 @@ SPVM::Format - Format Utilities
   # %x - "ffffffff"
   my $result = Format->sprintf("%x", -1);
 
+  # %p - "0x8000000000000000"
+  my $result = Format->sprintf("%p", $object);
+
 =head1 Description
 
 C<Format> is a formatting utilities for C<sprintf> method.
@@ -68,9 +71,9 @@ C<Format> is a formatting utilities for C<sprintf> method.
 
 =head2 sprintf
 
-  static method sprintf : string ($format : string, $args : object[]...)
+  static method sprintf : string ($format : string, $args : object[]...);
 
-Create a formatted string form the format and the values.
+Creates a formatted string form the C<$format> and the C<$args>.
 
 =head3 Specifiers
 

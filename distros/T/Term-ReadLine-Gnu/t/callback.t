@@ -1,10 +1,10 @@
 # -*- perl -*-
-#	callback.t - Test script for Term::ReadLine:GNU callback function
+#       callback.t - Test script for Term::ReadLine:GNU callback function
 #
-#	Copyright (c) 1999-2016 Hiroo Hayashi.  All rights reserved.
+#       Copyright (c) 1999-2016 Hiroo Hayashi.  All rights reserved.
 #
-#	This program is free software; you can redistribute it and/or
-#	modify it under the same terms as Perl itself.
+#       This program is free software; you can redistribute it and/or
+#       modify it under the same terms as Perl itself.
 
 use strict;
 use warnings;
@@ -20,7 +20,7 @@ sub note {
 use warnings 'redefine';
 
 BEGIN {
-    $ENV{PERL_RL} = 'Gnu';	# force to use Term::ReadLine::Gnu
+    $ENV{PERL_RL} = 'Gnu';      # force to use Term::ReadLine::Gnu
 }
 
 # 'define @ARGV' is deprecated
@@ -43,11 +43,11 @@ my ($version) = $attribs->{library_version} =~ /(\d+\.\d+)/;
 # check Tk is installed and X Window is available
 {
     if (eval "use Tk; 1" && $ENV{DISPLAY} && $ENV{DISPLAY} ne '') {
-	ok(1, 'use Tk');
+        ok(1, 'use Tk');
     } else {
-	diag 'skipped since Tk is not available.';
-	ok(1, 'skipped since Tk is not available') for 1..5;
-	exit 0;
+        diag 'skipped since Tk is not available.';
+        ok(1, 'skipped since Tk is not available') for 1..5;
+        exit 0;
     }
 }
 
@@ -106,9 +106,9 @@ sub quit {
     ok(1, 'callback_handler_remove and destroy');
 
     unless ($verbose) {
-	# Be quiet during CPAN Testers testing.
-	diag "Try \`$^X -Mblib t/callback.t verbose\', if you will.\n"
-	    if (!$ENV{AUTOMATED_TESTING});
+        # Be quiet during CPAN Testers testing.
+        diag "Try \`$^X -Mblib t/callback.t verbose\', if you will.\n"
+            if (!$ENV{AUTOMATED_TESTING});
     }
     exit 0;
 }

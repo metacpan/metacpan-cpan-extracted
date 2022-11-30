@@ -1,3 +1,18 @@
-0.001   2017-06-21 (PERLANCAR)
+0.004   2022-11-24  Released-By: PERLANCAR; Urgency: medium
+
+        - Add SPVM/Examples/Prime_precompile.spvm.
+
+
+0.003   2022-11-23  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] Fix is_prime code, derp.
+
+
+0.002   2022-11-23  Released-By: PERLANCAR; Urgency: medium
+
+        - Update example.
+
+
+0.001   2017-06-21  Released-By: PERLANCAR
 
          - First release.

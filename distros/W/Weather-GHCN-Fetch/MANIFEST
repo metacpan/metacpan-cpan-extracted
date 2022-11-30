@@ -8,9 +8,11 @@ META.yml
 Makefile.PL
 README
 README.md
+bin/ghcn_cacheutil
 bin/ghcn_extremes
 bin/ghcn_fetch
 bin/ghcn_station_counts
+lib/Weather/GHCN/App/CacheUtil.pm
 lib/Weather/GHCN/App/Extremes.pm
 lib/Weather/GHCN/App/Fetch.pm
 lib/Weather/GHCN/App/StationCounts.pm
@@ -38,6 +40,7 @@ t/81_timing_stats.t
 t/91_ghcn_fetch.t
 t/92_ghcn_extremes.t
 t/93_ghcn_station_counts.t
+t/94_ghcn_cacheutil.t
 t/ghcn_cache/CA006105976.dly
 t/ghcn_cache/CA006105978.dly
 t/ghcn_cache/USC00305816.dly

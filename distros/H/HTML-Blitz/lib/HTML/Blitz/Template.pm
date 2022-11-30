@@ -1,8 +1,12 @@
 package HTML::Blitz::Template;
 use HTML::Blitz::pragma;
+use HTML::Blitz::CodeGen ();
 use Carp qw(croak);
+use constant {
+    _REPR_VERSION => 0,
+};
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 method new($class: :$_codegen) {
     bless {
@@ -12,6 +16,17 @@ method new($class: :$_codegen) {
 
 method _codegen() {
     $self->{_codegen}
+}
+
+method FREEZE($model) {
+    _REPR_VERSION, $self->{_codegen}->FREEZE($model)
+}
+
+method THAW($class: $model, $repr_version, @components) {
+    $repr_version <= _REPR_VERSION
+        or croak "Cannot deserialize data format $repr_version with $class v$VERSION, which only supports data format " . _REPR_VERSION;
+    my $codegen = HTML::Blitz::CodeGen->THAW($model, @components);
+    $class->new(_codegen => $codegen)
 }
 
 method _perl_src() {
@@ -228,6 +243,32 @@ created; otherwise it is overwritten.)
 If C<< do_sync => 1 >> is passed, L<< IO::Handle/"$io->sync" >> is called
 before the file is closed, which flushes file data at the OS level (see
 L<fsync(2)>).
+
+=head2 FREEZE
+
+    my @pieces = $template->FREEZE($data_model);
+
+Implements the L<generic object serialization protocol|Types::Serialiser/A GENERIC OBJECT SERIALIATION PROTOCOL>
+from L<Types::Serialiser>. This allows template objects to be serialized by
+L<Cpanel::JSON:::XS|Cpanel::JSON::XS/OBJECT SERIALIZATION> with
+L<< C<allow_tags>|Cpanel::JSON::XS/"$json = $json->allow_tags ([$enable])" >>
+enabled (creating a non-standard superset of JSON) or
+L<Sereal::Encoder|Sereal::Encoder/FREEZE/THAW CALLBACK MECHANISM> with
+L<C<freeze_callbacks>|Sereal::Encoder/freeze_callbacks> enabled.
+
+Any other generic serializer should also work, provided it can encode C<undef>,
+numbers, strings, as well as references to scalars, arrays, and hashes.
+
+=head2 THAW
+
+    my $template = HTML::Blitz::Template->THAW($data_model, @pieces);
+
+Implements the L<generic object serialization protocol|Types::Serialiser/A GENERIC OBJECT SERIALIATION PROTOCOL>
+from L<Types::Serialiser>. This allows template objects to be deserialized by
+L<Cpanel::JSON:::XS|Cpanel::JSON::XS/OBJECT SERIALIZATION> with
+L<< C<allow_tags>|Cpanel::JSON::XS/"$json = $json->allow_tags ([$enable])" >>
+enabled (parsing a non-standard superset of JSON) or
+L<Sereal::Decoder|Sereal::Decoder/FREEZE/THAW CALLBACK MECHANISM>.
 
 =head1 AUTHOR
 

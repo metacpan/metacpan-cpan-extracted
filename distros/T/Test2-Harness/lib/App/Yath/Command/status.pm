@@ -2,7 +2,7 @@ package App::Yath::Command::status;
 use strict;
 use warnings;
 
-our $VERSION = '1.000133';
+our $VERSION = '1.000136';
 
 use Term::Table();
 use File::Spec();
@@ -33,7 +33,8 @@ sub run {
     my $data = $self->pfile_data();
 
     my $state = Test2::Harness::Runner::State->new(
-        workdir      => $self->workdir,
+        workdir => $self->workdir,
+        observe => 1,
     );
 
     $state->poll;

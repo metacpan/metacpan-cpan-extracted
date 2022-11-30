@@ -2,9 +2,9 @@ NAME
     Calendar::Indonesia::Holiday - List Indonesian public holidays
 
 VERSION
-    This document describes version 0.347 of Calendar::Indonesia::Holiday
+    This document describes version 0.348 of Calendar::Indonesia::Holiday
     (from Perl distribution Calendar-Indonesia-Holiday), released on
-    2022-07-05.
+    2022-11-28.
 
 SYNOPSIS
      use Calendar::Indonesia::Holiday qw(
@@ -89,7 +89,7 @@ DESCRIPTION
     command-line script interface for this module: list-idn-holidays and a
     few others distributed in App::IndonesianHolidayUtils distribution.
 
-    Calendar years supported: 1990-2022.
+    Calendar years supported: 1990-2023.
 
     Note: Note that sometimes the holiday (as set by law) falls at a
     different date than the actual religious commemoration date. When you
@@ -131,7 +131,7 @@ FUNCTIONS
     counted as working days. If observe_joint_leaves is set to false, joint
     leave days are also counted as working days.
 
-    Contains data from years 1990 to 2022
+    Contains data from years 1990 to 2023
 
     This function is not exported by default, but exportable.
 
@@ -200,19 +200,35 @@ FUNCTIONS
 
     *   date => *str*
 
+        (No description)
+
     *   day => *int*
+
+        (No description)
 
     *   detail => *bool*
 
+        (No description)
+
     *   include_joint_leave => *bool*
+
+        (No description)
 
     *   month => *int*
 
+        (No description)
+
     *   quiet => *bool*
+
+        (No description)
 
     *   reverse => *bool*
 
+        (No description)
+
     *   year => *int*
+
+        (No description)
 
     Returns an enveloped result (an array).
 
@@ -240,7 +256,7 @@ FUNCTIONS
     counted as working days. If observe_joint_leaves is set to false, joint
     leave days are also counted as working days.
 
-    Contains data from years 1990 to 2022
+    Contains data from years 1990 to 2023
 
     This function is not exported by default, but exportable.
 
@@ -248,9 +264,15 @@ FUNCTIONS
 
     *   date => *str*
 
+        (No description)
+
     *   day => *int*
 
+        (No description)
+
     *   month => *int*
+
+        (No description)
 
     *   observe_joint_leaves => *bool* (default: 1)
 
@@ -261,6 +283,8 @@ FUNCTIONS
         If set to 1, Saturday is a working day.
 
     *   year => *int*
+
+        (No description)
 
     Returns an enveloped result (an array).
 
@@ -285,7 +309,7 @@ FUNCTIONS
 
     List holidays and joint leave days ("cuti bersama").
 
-    Contains data from years 1990 to 2022
+    Contains data from years 1990 to 2023
 
     This function is not exported by default, but exportable.
 
@@ -669,9 +693,29 @@ FUNCTIONS
         Only return records where the 'note' field is greater than specified
         value.
 
-    *   query => *str*
+    *   queries => *array[str]*
 
         Search.
+
+        This will search all searchable fields with one or more specified
+        queries. Each query can be in the form of "-FOO" (dash prefix
+        notation) to require that the fields do not contain specified
+        string, or "/FOO/" to use regular expression. All queries must match
+        if the "query_boolean" option is set to "and"; only one query should
+        match if the "query_boolean" option is set to "or".
+
+    *   query => *any*
+
+        (No description)
+
+    *   query_boolean => *str* (default: "and")
+
+        Whether records must match all search queries ('and') or just one
+        ('or').
+
+        If set to "and", all queries must match; if set to "or", only one
+        query should match. See the "queries" option for more details on
+        searching.
 
     *   random => *bool* (default: 0)
 
@@ -793,7 +837,7 @@ FUNCTIONS
     counted as working days. If observe_joint_leaves is set to false, joint
     leave days are also counted as working days.
 
-    Contains data from years 1990 to 2022
+    Contains data from years 1990 to 2023
 
     This function is not exported by default, but exportable.
 
@@ -927,10 +971,10 @@ CONTRIBUTING
 
     If you want to build the distribution (e.g. to try to install it locally
     on your system), you can install Dist::Zilla,
-    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
-    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
-    steps required beyond that are considered a bug and can be reported to
-    me.
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
     This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016,

@@ -6,10 +6,10 @@
 #include "ppport.h"
 
 #include <Ecore.h>
+#include <Ecore_Evas.h>
 #include <Ecore_Input.h>
 
 #include "const-ecore-c.inc"
-
 
 MODULE = pEFL::Ecore		PACKAGE = pEFL::Ecore	PREFIX = ecore_
 

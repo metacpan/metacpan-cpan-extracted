@@ -1,7 +1,7 @@
 #!/usr/bin/perl 
 
 package Main;
-$Main::VERSION = '0.069';
+$Main::VERSION = '0.070';
 use Modern::Perl;
 use utf8;
 use Pod::Usage;
@@ -69,7 +69,7 @@ Main
 
 =head1 VERSION
 
-version 0.069
+version 0.070
 
 =head1 DESCRIPTION
 

@@ -41,7 +41,7 @@ class TestCase::Module::ByteList {
   static method new : int () {
     # new with array
     {
-      my $list = ByteList->new([(byte)3, 5, Fn->BYTE_MAX()]);
+      my $list = ByteList->new([(byte)3, 5, (byte)Fn->BYTE_MAX]);
       
       unless ($list->get(0) == 3) {
         return 0;
@@ -51,7 +51,7 @@ class TestCase::Module::ByteList {
         return 0;
       }
       
-      unless ($list->get(2) == Fn->BYTE_MAX()) {
+      unless ($list->get(2) == Fn->BYTE_MAX) {
         return 0;
       }
       
@@ -68,7 +68,7 @@ class TestCase::Module::ByteList {
     
     # capcity
     {
-      my $list = ByteList->new([(byte)3, 5, Fn->BYTE_MAX()], 10);
+      my $list = ByteList->new([(byte)3, 5, (byte)Fn->BYTE_MAX], 10);
       
       unless ($list->get(0) == 3) {
         return 0;
@@ -78,7 +78,7 @@ class TestCase::Module::ByteList {
         return 0;
       }
       
-      unless ($list->get(2) == Fn->BYTE_MAX()) {
+      unless ($list->get(2) == Fn->BYTE_MAX) {
         return 0;
       }
       
@@ -134,7 +134,7 @@ class TestCase::Module::ByteList {
       
       $list->unshift(3);
       $list->unshift(5);
-      $list->unshift(Fn->BYTE_MAX());
+      $list->unshift(Fn->BYTE_MAX);
       
       my $length = $list->length;
       unless ($length == 3) {
@@ -192,7 +192,7 @@ class TestCase::Module::ByteList {
     
     {
       eval { ByteList->new_len(-1); };
-      unless (Fn->contains($@, "The length must be greater than or equal to 0")) {
+      unless (Fn->contains($@, "The \$length must be greater than or equal to 0")) {
         return 0;
       }
     }
@@ -203,13 +203,13 @@ class TestCase::Module::ByteList {
   # Instance methods
   static method get : int () {
     {
-      my $list = ByteList->new([(byte)3, 5, Fn->BYTE_MAX()]);
+      my $list = ByteList->new([(byte)3, 5, (byte)Fn->BYTE_MAX]);
       
       unless ($list->get(0) == 3) {
         return 0;
       }
       
-      unless ($list->get(0) isa byte) {
+      unless ($list->get(0) isa int) {
         return 0;
       }
       
@@ -217,7 +217,7 @@ class TestCase::Module::ByteList {
         return 0;
       }
       
-      unless ($list->get(2) == Fn->BYTE_MAX()) {
+      unless ($list->get(2) == Fn->BYTE_MAX) {
         return 0;
       }
       
@@ -227,12 +227,12 @@ class TestCase::Module::ByteList {
       }
       
       eval { $list->get(-1); };
-      unless (Fn->contains($@, "The index must be greater than or equal to 0")) {
+      unless (Fn->contains($@, "The \$index must be greater than or equal to 0")) {
         return 0;
       }
       
       eval { $list->get(3); };
-      unless (Fn->contains($@, "The index must be less than the length of the list")) {
+      unless (Fn->contains($@, "The \$index must be less than the length of the \$list")) {
         return 0;
       }
       
@@ -280,7 +280,7 @@ class TestCase::Module::ByteList {
     {
       my $list = ByteList->new([(byte)1, 2, 3]);
       eval {  $list->insert(-1 => 2); };
-      unless (Fn->contains($@, "The index must be greater than or equal to 0")) {
+      unless (Fn->contains($@, "The \$index must be greater than or equal to 0")) {
         return 0;
       }
     }
@@ -289,7 +289,7 @@ class TestCase::Module::ByteList {
     {
       my $list = ByteList->new([(byte)1, 2, 3]);
       eval { $list->insert(4 => 2); };
-      unless (Fn->contains($@, "The index must be less than or equal to the length of the list")) {
+      unless (Fn->contains($@, "The \$index must be less than or equal to the length of the \$list")) {
         return 0;
       }
     }
@@ -305,13 +305,13 @@ class TestCase::Module::ByteList {
       
       $list->push(3);
       $list->push(5);
-      $list->push(Fn->BYTE_MAX());
+      $list->push(Fn->BYTE_MAX);
       
       my $pop0 = $list->pop;
-      unless ($pop0 == Fn->BYTE_MAX()) {
+      unless ($pop0 == Fn->BYTE_MAX) {
         return 0;
       }
-      unless ($pop0 isa byte) {
+      unless ($pop0 isa int) {
         return 0;
       }
       
@@ -331,7 +331,7 @@ class TestCase::Module::ByteList {
       {
         my $list = ByteList->new_len(0);
         eval { $list->pop; };
-        unless (Fn->contains($@, "The length of the list must be greater than 0")) {
+        unless (Fn->contains($@, "The length of the \$list must be greater than 0")) {
           return 0;
         }
       }
@@ -348,14 +348,14 @@ class TestCase::Module::ByteList {
       
       $list->push(3);
       $list->push(5);
-      $list->push(Fn->BYTE_MAX());
+      $list->push(Fn->BYTE_MAX);
       
       my $length = $list->length;
       unless ($length == 3) {
         return 0;
       }
       
-      unless ($list->get(0) == 3 && $list->get(1) == 5 && $list->get(2) == Fn->BYTE_MAX()) {
+      unless ($list->get(0) == 3 && $list->get(1) == 5 && $list->get(2) == Fn->BYTE_MAX) {
         return 0;
       }
     }
@@ -419,7 +419,7 @@ class TestCase::Module::ByteList {
     {
       my $list = ByteList->new([(byte)1, 2, 3]);
       eval { $list->remove(-1); };
-      unless (Fn->contains($@, "The index must be greater than or equal to 0")) {
+      unless (Fn->contains($@, "The \$index must be greater than or equal to 0")) {
         return 0;
       }
     }
@@ -429,7 +429,7 @@ class TestCase::Module::ByteList {
     {
       my $list = ByteList->new([(byte)1, 2, 3]);
       eval { $list->remove(3); };
-      unless (Fn->contains($@, "The index must be less than the length of the list")) {
+      unless (Fn->contains($@, "The \$index must be less than the length of the \$list")) {
         return 0;
       }
     }
@@ -482,7 +482,7 @@ class TestCase::Module::ByteList {
     {
       my $list = ByteList->new([(byte)1, 2, 3, 4]);
       eval { $list->replace(-1, 3, [(byte)30, 40]); };
-      unless (Fn->contains($@, "The offset must be greater than or equal to 0")) {
+      unless (Fn->contains($@, "The \$offset must be greater than or equal to 0")) {
         return 0;
       }
     }
@@ -490,7 +490,7 @@ class TestCase::Module::ByteList {
     {
       my $list = ByteList->new([(byte)1, 2, 3, 4]);
       eval { $list->replace(2, 3, [(byte)30, 40, 50]); };
-      unless (Fn->contains($@, "The offset + the removing lenght must be less than or equal to the length of the list")) {
+      unless (Fn->contains($@, "The \$offset + the \$removing lenght must be less than or equal to the length of the \$list")) {
         return 0;
       }
     }
@@ -506,14 +506,14 @@ class TestCase::Module::ByteList {
     {
       my $list = ByteList->new([(byte)1]);
       eval { $list->replace(2, 0, [(byte)1, 2]); };
-      unless (Fn->contains($@, "The offset + the removing lenght must be less than or equal to the length of the list")) {
+      unless (Fn->contains($@, "The \$offset + the \$removing lenght must be less than or equal to the length of the \$list")) {
         return 0;
       }
     }
     {
       my $list = ByteList->new([(byte)1]);
       eval { $list->replace(1, 2, [(byte)1, 2]); };
-      unless (Fn->contains($@, "The offset + the removing lenght must be less than or equal to the length of the list")) {
+      unless (Fn->contains($@, "The \$offset + the \$removing lenght must be less than or equal to the length of the \$list")) {
         return 0;
       }
     }
@@ -521,7 +521,7 @@ class TestCase::Module::ByteList {
     {
       my $list = ByteList->new([(byte)1]);
       eval { $list->replace(2, 2, [(byte)1, 2]); };
-      unless (Fn->contains($@, "The offset + the removing lenght must be less than or equal to the length of the list")) {
+      unless (Fn->contains($@, "The \$offset + the \$removing lenght must be less than or equal to the length of the \$list")) {
         return 0;
       }
     }
@@ -651,7 +651,7 @@ class TestCase::Module::ByteList {
       $list->push($b);
       $list->push($c);
       eval { $list->resize(-1); };
-      unless (Fn->contains($@, "The new length must be greater than or equal to 0")) {
+      unless (Fn->contains($@, "The \$new_length must be greater than or equal to 0")) {
         return 0;
       }
     }
@@ -666,7 +666,7 @@ class TestCase::Module::ByteList {
       
       $list->set(0 => 3);
       $list->set(1 => 5);
-      $list->set(2 => Fn->BYTE_MAX());
+      $list->set(2 => Fn->BYTE_MAX);
       
       unless ($list->get(0) == 3) {
         return 0;
@@ -676,7 +676,7 @@ class TestCase::Module::ByteList {
         return 0;
       }
 
-      unless ($list->get(2) == Fn->BYTE_MAX()) {
+      unless ($list->get(2) == Fn->BYTE_MAX) {
         return 0;
       }
       
@@ -686,12 +686,12 @@ class TestCase::Module::ByteList {
       }
       
       eval { $list->get(-1); };
-      unless (Fn->contains($@,"The index must be greater than or equal to 0")) {
+      unless (Fn->contains($@,"The \$index must be greater than or equal to 0")) {
         return 0;
       }
       
       eval { $list->get(3); };
-      unless (Fn->contains($@, "The index must be less than the length of the list")) {
+      unless (Fn->contains($@, "The \$index must be less than the length of the \$list")) {
         return 0;
       }
       
@@ -715,7 +715,7 @@ class TestCase::Module::ByteList {
     {
       my $list = ByteList->new([(byte)1, 2, 3]);
       eval { $list->set_array(undef); };
-      unless (Fn->contains($@, "The array must be defined")) {
+      unless (Fn->contains($@, "The \$array must be defined")) {
         return 0;
       }
     }
@@ -724,7 +724,7 @@ class TestCase::Module::ByteList {
     {
       my $list = ByteList->new([(byte)1, 2, 3]);
       eval { $list->set_array([(byte)1, 2, 3, 4]); };
-      unless (Fn->contains($@, "The length of the array must be the same as the length of the list")) {
+      unless (Fn->contains($@, "The length of the \$array must be the \$same as the length of the \$list")) {
         return 0;
       }
     }
@@ -741,9 +741,9 @@ class TestCase::Module::ByteList {
       
       $list->unshift(3);
       $list->unshift(5);
-      $list->unshift(Fn->BYTE_MAX());
+      $list->unshift(Fn->BYTE_MAX);
       
-      unless ($list->shift == Fn->BYTE_MAX()) {
+      unless ($list->shift == Fn->BYTE_MAX) {
         return 0;
       }
       
@@ -761,7 +761,7 @@ class TestCase::Module::ByteList {
       }
       
       eval { $list->shift; };
-      unless (Fn->contains($@, "The length of the list must be greater than 0")) {
+      unless (Fn->contains($@, "The length of the \$list must be greater than 0")) {
         return 0;
       }
       $@ = undef;
@@ -772,7 +772,7 @@ class TestCase::Module::ByteList {
   
   static method to_array : int () {
     {
-      my $list = ByteList->new([(byte)3, 5, Fn->BYTE_MAX()]);
+      my $list = ByteList->new([(byte)3, 5, (byte)Fn->BYTE_MAX]);
       
       my $array = $list->to_array;
       
@@ -788,7 +788,7 @@ class TestCase::Module::ByteList {
         return 0;
       }
 
-      unless ($array->[2] == Fn->BYTE_MAX()) {
+      unless ($array->[2] == Fn->BYTE_MAX) {
         return 0;
       }
       
@@ -808,14 +808,14 @@ class TestCase::Module::ByteList {
       
       $list->unshift(3);
       $list->unshift(5);
-      $list->unshift(Fn->BYTE_MAX());
+      $list->unshift(Fn->BYTE_MAX);
       
       my $length = $list->length;
       unless ($length == 3) {
         return 0;
       }
       
-      unless ($list->get(0) == Fn->BYTE_MAX() && $list->get(1) == 5 && $list->get(2) == 3) {
+      unless ($list->get(0) == Fn->BYTE_MAX && $list->get(1) == 5 && $list->get(2) == 3) {
         return 0;
       }
     }

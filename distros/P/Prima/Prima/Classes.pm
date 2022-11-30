@@ -84,6 +84,13 @@ sub clone
 	return __PACKAGE__->new($pack, $buf);
 }
 
+sub list
+{
+	return @{$_[0]} unless is_array($_[0]);
+	my $self = tied @{$_[0]};
+	return unpack($self->[PACK] . '*', $self->[REF]);
+}
+
 sub TIEARRAY  { bless \@_, shift }
 sub FETCH     { unpack( $_[0]->[PACK], CORE::substr( $_[0]->[REF], $_[1] * $_[0]->[SIZE], $_[0]->[SIZE] )) }
 sub STORE     { CORE::substr( $_[0]->[REF], $_[1] * $_[0]->[SIZE], $_[0]->[SIZE], pack( $_[0]->[PACK], $_[2] )) }
@@ -96,6 +103,7 @@ sub STORESIZE {
 		(CORE::substr( $_[0]->[REF], $_[1] * $_[0]->[SIZE] ) = '' )
 }
 sub DELETE    { warn "This array does not implement delete functionality" }
+sub PUSH      { $_[0]->[REF] .= pack( $_[0]->[PACK] . '*', @_[1..$#_] ) if $#_ }
 
 package Prima::rect;
 
@@ -169,6 +177,82 @@ sub enlarge
 }
 
 sub shrink { $_[0]->enlarge( -$_[1] ) }
+
+package Prima::matrix;
+
+our $identity = [1,0,0,1,0,0];
+
+sub new
+{
+	my $self  = bless [ @$identity ], shift;
+	$self->set(@_);
+	return $self;
+}
+
+sub set
+{
+	my $self = shift;
+	@$self[0..$#_] = @_ if @_;
+	return $self;
+}
+
+sub clone       { ref($_[0])->new(@{$_[0]})                           }
+sub identity    { @{$_[0]} = @$identity; $_[0]                        }
+sub A           { $#_ ? $_[0]->[0] = $_[1] : $_[0]->[0]               }
+sub B           { $#_ ? $_[0]->[1] = $_[1] : $_[0]->[1]               }
+sub C           { $#_ ? $_[0]->[2] = $_[1] : $_[0]->[2]               }
+sub D           { $#_ ? $_[0]->[3] = $_[1] : $_[0]->[3]               }
+sub X           { $#_ ? $_[0]->[4] = $_[1] : $_[0]->[4]               }
+sub Y           { $#_ ? $_[0]->[5] = $_[1] : $_[0]->[5]               }
+sub translate   { $_[0]->[4]+=$_[1]; $_[0]->[5]+=$_[2];     $_[0]     }
+sub scale       { $_[0]->multiply([$_[1],0,0,$_[2] // $_[1],0,0])     }
+sub shear       { $_[0]->multiply([1,$_[2] // $_[1],$_[1],1,0,0])     }
+sub is_identity { 0 == (grep { $identity->[$_] != $_[0]->[$_] } 0..5) }
+
+our $PI  = 3.14159265358979323846264338327950288419716939937510;
+our $RAD = 180.0 / $PI;
+sub rotate
+{
+	my ( $self, $angle ) = @_;
+	return if $angle == 0.0;
+	$angle /= $RAD;
+	my $cos = cos($angle);
+	my $sin = sin($angle);
+	return $self->multiply([$cos, $sin, -$sin, $cos, 0, 0]);
+}
+
+sub multiply
+{
+	my ( $m1, $m2 ) = @_;
+	$m1->set(
+		$m1->[0] * $m2->[0] + $m1->[1] * $m2->[2],
+		$m1->[0] * $m2->[1] + $m1->[1] * $m2->[3],
+		$m1->[2] * $m2->[0] + $m1->[3] * $m2->[2],
+		$m1->[2] * $m2->[1] + $m1->[3] * $m2->[3],
+		$m1->[4] * $m2->[0] + $m1->[5] * $m2->[2] + $m2->[4],
+		$m1->[4] * $m2->[1] + $m1->[5] * $m2->[3] + $m2->[5]
+	);
+	return $m1;
+}
+
+sub transform
+{
+	my $self   = shift;
+	my ($ref, $points) = $#_ ? (0, [@_]) : (1, $_[0]);
+	my $ret = Prima::Drawable->render_polyline( $points, matrix => $self );
+	return $ref ? $ret : @$ret;
+}
+
+sub inverse_transform
+{
+	my $self   = shift;
+	my ($ref, $points) = $#_ ? (0, [@_]) : (1, $_[0]);
+	$points = Prima::Drawable->render_polyline( $points, matrix => [1,0,0,1,-$self->[4],-$self->[5]])
+		if $self->[4] != 0.0 || $self->[5] != 0.0;
+	my @inverse_matrix = ( $self->[3], -$self->[1], -$self->[2], $self->[0], 0, 0 );
+	my $ret = Prima::Drawable->render_polyline( $points, matrix => \@inverse_matrix);
+	return $ref ? $ret : @$ret;
+}
 
 # class Object; base class of all Prima classes
 package Prima::Object;
@@ -477,6 +561,16 @@ package Prima::Region;
 use vars qw(@ISA);
 @ISA = qw(Prima::Component);
 
+sub profile_default
+{
+	my $def = $_[ 0]-> SUPER::profile_default;
+	my %prf = (
+		owner           => undef,
+	);
+	@$def{keys %prf} = values %prf;
+	return $def;
+}
+
 sub origin { (shift->box)[0,1] }
 sub size   { (shift->box)[2,3] }
 sub rect
@@ -546,6 +640,7 @@ sub profile_default
 		lineJoin        => lj::Round,
 		linePattern     => lp::Solid,
 		lineWidth       => 0,
+		matrix          => [1,0,0,1,0,0],
 		miterLimit      => 10.0,
 		owner           => undef,
 		palette         => [],
@@ -554,7 +649,6 @@ sub profile_default
 		rop2            => rop::NoOper,
 		textOutBaseline => 0,
 		textOpaque      => 0,
-		translate       => [ 0, 0],
 	);
 	@$def{keys %prf} = values %prf;
 	return $def;
@@ -568,6 +662,8 @@ sub profile_check_in
 	$p-> { font} = Prima::Drawable-> font_match( $p-> { font}, $default-> { font});
 	$p->{fillMode} = ( delete($p->{fillWinding}) ? fm::Winding : fm::Alternate) | fm::Overlay
 		if exists $p->{fillWinding} && ! exists $p->{fillMode}; # compatibility
+	$p->{matrix} = [1,0,0,1,@{$p->{translate}}]
+		if exists $p->{translate} && ! exists $p->{matrix}; # compatibility
 }
 
 sub font
@@ -627,9 +723,23 @@ sub graphic_context
 	my $cb   = pop;
 	return unless $self->graphic_context_push;
 	$self->set(@_);
-	$cb->();
-	return $self->graphic_context_pop;
+	my $ok = $cb->();
+	return unless $self->graphic_context_pop;
+	return $ok;
 }
+
+sub translate
+{
+	return @{$_[0]->matrix}[4,5] unless $#_;
+	my $m = $_[0]->matrix;
+	@{$m}[4,5] = ref($_[1]) ? @{$_[1]} : @_[1,2];
+	$_[0]->matrix($m);
+}
+
+sub lineTail  { $#_ ? $_[0]->lineEndIndex(-1, $_[1])  : $_[0]->lineEndIndex(-1) }
+sub lineHead  { $#_ ? $_[0]->lineEndIndex(-2, $_[1])  : $_[0]->lineEndIndex(-2) }
+sub arrowTail { $#_ ? $_[0]->lineEndIndex(-3, $_[1])  : $_[0]->lineEndIndex(-3) }
+sub arrowHead { $#_ ? $_[0]->lineEndIndex(-4, $_[1])  : $_[0]->lineEndIndex(-4) }
 
 package Prima::Image;
 use vars qw( @ISA);
@@ -738,22 +848,49 @@ sub ui_scale
 
 sub dataSize  { $_[0]->lineSize * $_[0]->height }
 sub scanline  { substr( $_[0]->data, $_[0]->lineSize * $_[1], $_[0]-> lineSize ) }
-sub shear     { $_[0]->transform(1,@_[2,1],1) }
+sub shear     { $_[0]->transform(matrix => [1,@_[2,1],1,0,0]) }
 sub to_region { Prima::Region->new( image => shift ) }
+
+sub to_rgba
+{
+	my ($self, $type) = @_;
+
+	unless ( defined $type ) {
+		$type = ( $self->type & im::GrayScale ) ? im::Byte : im::RGB;
+	}
+
+	if ( $self->isa('Prima::Icon')) {
+		return $self->clone( type => $type, maskType => im::bpp8 );
+	} else {
+		my $i = $self->to_icon( maskType => 8, fill => "\xff" );
+		$i->type($type);
+		return $i;
+	}
+}
 
 sub to_icon
 {
 	my ( $self, %set ) = @_;
+	return if $self->isa('Prima::Icon');
+
 	my $fill = delete $set{fill};
 	my $type = delete $set{maskType} // 1;
-	my $and = Prima::Icon->new(
-		size => [ $self-> size ],
-		type => $type,
+	my @size = $self->size;
+
+	return Prima::Icon->new(
+		%set,
+		size     => \@size,
+		maskType => $type,
+		( map { $_ => $self->$_() } qw(
+			data type palette scaling conversion preserveType
+		)),
+		(( defined $fill && length $fill ) ? (
+			autoMasking => am::None,
+			mask        => ( $fill x ((
+				($size[0] * $type + 31 ) / 32 * 4 * $size[1]
+			) / length $fill ))
+		) : ())
 	);
-	if ( defined $fill && length $fill ) {
-		$and->data( $fill  x ( $and->dataSize / (length $fill)));
-	}
-	return Prima::Icon->create_combined( $self, $and, %set );
 }
 
 sub load_stream
@@ -1081,17 +1218,6 @@ sub notification_types { return \%RNT; }
 	y_centered        => 0,
 );
 
-my $_markup_loaded;
-sub _markup($)
-{
-	unless ( $_markup_loaded ) {
-		eval "use Prima::Drawable::Markup;";
-		die $@ if $@;
-		$_markup_loaded++;
-	}
-	return Prima::Drawable::Markup::M( ${ $_[0] } );
-}
-
 sub profile_default
 {
 	my $def = $_[ 0]-> SUPER::profile_default;
@@ -1125,7 +1251,7 @@ sub profile_check_in
 	delete $p-> { font} unless defined $orgFont;
 
 	for my $tx ( qw(text hint)) {
-		$p->{$tx} = _markup $p->{$tx} if defined $p->{$tx} && (ref($p->{$tx}) // '') eq 'SCALAR';
+		$p->{$tx} = $self->_parse_markup($tx, $p->{$tx}) if defined $p->{$tx} && (ref($p->{$tx}) // '') eq 'SCALAR';
 	}
 
 	my $name = defined $p-> {name} ? $p-> {name} : $default-> {name};
@@ -1335,13 +1461,13 @@ sub y_centered       {($#_)?$_[0]-> set_centered(0,1)      :$_[0]-> raise_wo("y_
 sub hint
 {
 	return $_[0]->get_hint unless $#_;
-	$_[0]->set_hint( (( ref($_[1]) // '') eq 'SCALAR') ? _markup $_[1] : $_[1] );
+	$_[0]->set_hint( (( ref($_[1]) // '') eq 'SCALAR') ? $_[0]->_parse_markup(hint => $_[1]) : $_[1] );
 }
 
 sub text
 {
 	return $_[0]->get_text unless $#_;
-	$_[0]->set_text( (( ref($_[1]) // '') eq 'SCALAR') ? _markup $_[1] : $_[1] );
+	$_[0]->set_text( (( ref($_[1]) // '') eq 'SCALAR') ? $_[0]->_parse_markup(text => $_[1]) : $_[1] );
 }
 
 sub insert
@@ -1438,6 +1564,20 @@ sub select      { $_[0]-> selected(1); }
 sub deselect    { $_[0]-> selected(0); }
 sub focus       { $_[0]-> focused(1); }
 sub defocus     { $_[0]-> focused(0); }
+
+my $_markup_loaded;
+sub _parse_markup
+{
+	my ( $self, $prop, $markup ) = @_;
+	unless ( $_markup_loaded ) {
+		eval "use Prima::Drawable::Markup;";
+		die $@ if $@;
+		$_markup_loaded++;
+	}
+	return $self->parse_markup( $prop, $$markup );
+}
+
+sub parse_markup { Prima::Drawable::Markup::M( $_[2] ) }
 
 # Tk namespace and syntax compatibility
 
@@ -2019,6 +2159,8 @@ sub profile_default
 	return $def;
 }
 
+sub max_extents { map { $_ / 2 } $::application->size }
+
 sub on_change
 {
 	my $self = $_[0];
@@ -2028,10 +2170,17 @@ sub on_change
 		my $x = $self-> get_text_width( $_);
 		$maxLn = $x if $maxLn < $x;
 	}
-	$self-> size(
-		$maxLn + 6,
-		( $self-> font-> height * scalar @ln) + 2
-	);
+	my @sz = ( $maxLn + 6, 2);
+	if ( ref($ln[0])) {
+		$sz[1] += $_ for map { $_->height($self) } @ln;
+	} else {
+		$sz[1] += $self-> font-> height * @ln;
+	}
+	my @as = $self->max_extents;
+	for (0,1) {
+		$sz[$_] = $as[$_] if $sz[$_] > $as[0];
+	}
+	$self-> size(@sz);
 }
 
 sub on_paint
@@ -2040,12 +2189,12 @@ sub on_paint
 	my @size = $canvas-> size;
 	$canvas-> clear( 1, 1, $size[0]-2, $size[1]-2);
 	$canvas-> rectangle( 0, 0, $size[0]-1, $size[1]-1);
-	my $fh = $canvas-> font-> height;
-	my ( $x, $y) = ( 3, $size[1] - 1 - $fh);
-	my @ln = $canvas->text_split_lines($self->text);
-	for ( @ln) {
-		$canvas-> text_shape_out( $_, $x, $y);
-		$y -= $fh;
+
+	my @ln = $canvas->text_split_lines($self->text) or return;
+	my ($x, $y, $fh) = ( 3, $size[1] - 1, $self->font->height);
+	for my $t (@ln) {
+		$y -= ref($t) ? $t->height($canvas) : $fh;
+		$canvas-> text_shape_out( $t, $x, $y);
 	}
 }
 

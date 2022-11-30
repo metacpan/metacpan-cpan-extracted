@@ -1,14 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2020-2022 -- leonerd@leonerd.org.uk
 
-package Metrics::Any::Adapter::Prometheus;
+package Metrics::Any::Adapter::Prometheus 0.06;
 
-use strict;
+use v5.14;
 use warnings;
-
-our $VERSION = '0.05';
 
 use Carp;
 
@@ -44,22 +42,69 @@ of export data, by setting the C<use_histograms> import argument to false:
 Timer metrics are implemented as distribution metrics with the units set to
 C<seconds>.
 
+This adapter type supports batch mdoe reporting. Callbacks are invoked at the
+beginning of the C<Net::Prometheus> C<render> method.
+
 =cut
+
+package Metrics::Any::Adapter::Prometheus::_BatchCollector
+{
+   sub new
+   {
+      my $class = shift;
+
+      return bless [], $class;
+   }
+
+   sub collect
+   {
+      my $self = shift;
+
+      foreach my $cb ( @$self ) { $cb->(); }
+
+      return ();
+   }
+
+   sub add_callback
+   {
+      my $self = shift;
+      my ( $cb ) = @_;
+
+      push @$self, $cb;
+   }
+}
 
 sub new
 {
    my $class = shift;
    my ( %args ) = @_;
 
-   return bless {
+   my $self = bless {
       metrics => {},
+      batch_collector => Metrics::Any::Adapter::Prometheus::_BatchCollector->new,
       use_histograms => $args{use_histograms} // 1,
    }, $class;
+
+   # Need to register this one early before metrics are created, so it runs at
+   # the right time
+   Net::Prometheus::Registry->register( $self->{batch_collector} );
+
+   return $self;
 }
 
 =head1 METHODS
 
 =cut
+
+use constant HAVE_BATCH_MODE => 1;
+
+sub add_batch_mode_callback
+{
+   my $self = shift;
+   my ( $cb ) = @_;
+
+   $self->{batch_collector}->add_callback( $cb );
+}
 
 sub mangle_name
 {

@@ -1,0 +1,191 @@
+=encoding utf8
+
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Ethereum::RPC::Contract
+at lib/Ethereum/RPC/Contract.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+    Ethereum::Contract - Support for interacting with Ethereum contracts using the geth RPC interface
+
+=head2 BUILD
+
+Constructor: Here we get all functions and events from the given ABI and set
+it to the contract class.
+
+=over 4
+
+=item contract_address => string (optional)
+
+=item contract_abi => string (required, https://solidity.readthedocs.io/en/develop/abi-spec.html)
+
+=item rpc_client => L<Ethereum::RPC::Client> (optional, default: L<Ethereum::RPC::Client>)
+
+=item from => string (optional)
+
+=item gas => numeric (optional)
+
+=item gas_price => numeric (optional)
+
+=item max_fee_per_gas => numeric (optional)
+
+=item max_priority_fee_per_gas => numeric (optional)
+
+=back
+
+=head2 invoke
+
+Prepare a function to be called/sent to a contract.
+
+=over 4
+
+=item name => string (required)
+
+=item params => array (optional, the function params)
+
+=back
+
+Returns a L<Ethereum::Contract::ContractTransaction> object.
+
+=head2 get_function_id
+
+The function ID is derived from the function signature using: SHA3(approve(address,uint256)).
+
+=over 4
+
+=item fuction_name => string (required)
+
+=item params_size => numeric (required, size of inputs called by the function)
+
+=back
+
+Returns a string hash
+
+=head2 _prepare_transaction
+
+Join the data and parameters and return a prepared transaction to be called as send, call or deploy.
+
+=over 4
+
+=item compiled_data => string (required, function signature or the contract bytecode)
+
+=item function_name => string (contract function as specified in the ABI)
+
+=item params => array (required)
+
+=back
+
+L<Future> object
+on_done: L<Ethereum::Contract::ContractTransaction>
+on_fail: error string
+
+=head2 encode
+
+Encode function arguments to the ABI format
+
+=over 4
+
+=item C<function_name> ABI function name
+
+=item C<params> all the values for the function in the same order than the ABI
+
+=back
+
+Returns an encoded data string
+
+=head2 get_function_offset
+
+Get the abi function total offset
+
+For the cases we have arrays as parameters we can have a dynamic size
+for the static values, for sample if the basic type has a fixed value
+and also the array is fixed, we will have all the items on the array
+being added with the static items before the dynamic items in the encoded
+data
+
+=over 4
+
+=item C<input_list> the json input from the abi data
+
+=back
+
+return the integer offset
+
+=head2 get_hex_param
+
+Convert parameter list to the ABI format:
+https://solidity.readthedocs.io/en/develop/abi-spec.html#function-selector-and-argument-encoding
+
+=over 4
+
+=item C<current_offset_count> The offset where we should base the calculation for the next dynamic value
+
+=item C<input_type> The input type specified in the abi sample: string, bytes, uint
+
+=item C<param> The input value
+
+=back
+
+Returns 2 arrays
+
+Static => contains the static values from the conversion
+Dynamic => contains the dynamic values from the conversion
+
+=head2 read_event
+
+Read the specified log from the specified block to the latest block
+
+=over 4
+
+=item from_block => numeric (optional)
+
+=item event => string (required)
+
+=item event_params_size => numeric (required)
+
+=back
+
+Returns a json encoded object: https://github.com/ethereum/wiki/wiki/JSON-RPC#returns-42
+
+=head2 invoke_deploy
+
+Prepare a deploy transaction.
+
+=over 4
+
+=item compiled (required, contract bytecode)
+
+=item params (required, constructor params)
+
+=back
+
+Returns a L<Ethereum::Contract::ContractTransaction> object.
+
+=head2 append_prefix
+
+Ensure that the given hexadecimal string starts with 0x.
+
+=over 4
+
+=item str => string (hexadecimal)
+
+=back
+
+Returns a string hexadecimal
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Moo::Object>
+
+L<BUILDALL|Moo::Object/BUILDALL>, L<BUILDARGS|Moo::Object/BUILDARGS>, L<DEMOLISHALL|Moo::Object/DEMOLISHALL>, L<does|Moo::Object/does>, L<meta|Moo::Object/meta>
+
+=back
+

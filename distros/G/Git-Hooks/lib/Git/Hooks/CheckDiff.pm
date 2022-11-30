@@ -2,7 +2,7 @@ use warnings;
 
 package Git::Hooks::CheckDiff;
 # ABSTRACT: Git::Hooks plugin to enforce commit policies
-$Git::Hooks::CheckDiff::VERSION = '3.3.0';
+$Git::Hooks::CheckDiff::VERSION = '3.3.1';
 use v5.16.0;
 use utf8;
 use Carp;
@@ -244,7 +244,7 @@ Git::Hooks::CheckDiff - Git::Hooks plugin to enforce commit policies
 
 =head1 VERSION
 
-version 3.3.0
+version 3.3.1
 
 =head1 SYNOPSIS
 
@@ -338,7 +338,7 @@ It can be disabled for specific references via the C<githooks.ref> and
 C<githooks.noref> options about which you can read in the L<Git::Hooks>
 documentation.
 
-=head2 deny-token REGEXP [-- FILTER...]
+=head2 deny-token REGEXP [-- FILTER ...]
 
 This directive rejects commits or pushes which add lines matching REGEXP, which
 is a Perl regular expression. This is a multi-valued directive, i.e., you can

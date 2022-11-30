@@ -10,7 +10,7 @@ use File::HomeDir;
 use HTTP::Tiny;
 use JSON;
 
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 our @EXPORT = qw(host_ip_get host_ip_set);
 our @EXPORT_OK = qw(api_key_get api_key_set);

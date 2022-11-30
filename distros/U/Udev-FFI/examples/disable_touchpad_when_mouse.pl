@@ -76,7 +76,7 @@ sub _check_for_mouse_devices {
         die("Can't scan devices: $!");
 
     my $devices = $enumerate->get_list_entries() or
-        die "Can't get devices: $!";
+        die("Can't get devices: $!");
 
     for (keys(%$devices)) {
         if (defined(my $device = $udev->new_device_from_syspath($_))) {
@@ -92,17 +92,16 @@ sub _check_for_mouse_devices {
 
 
 $udev = Udev::FFI->new() or
-    die "Can't create Udev::FFI object: $@.\n";
-
+    die("Can't create Udev::FFI object: $@.\n");
 
 my $monitor = $udev->new_monitor() or
-    die "Can't create udev monitor: $@";
+    die("Can't create udev monitor: $@");
 
 $monitor->filter_by_subsystem_devtype('input') or
-    die "Can't add filter to udev monitor: $!";
+    die("Can't add filter to udev monitor: $!");
 
 $monitor->start() or
-    die "Can't start udev monitor: $!";
+    die("Can't start udev monitor: $!");
 
 
 if (1 == _check_for_mouse_devices()) {

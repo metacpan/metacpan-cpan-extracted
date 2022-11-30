@@ -94,7 +94,7 @@ SKIP: {
     my $timer_cr = sub {
         my $d = Promise::XS::deferred();
 
-        Mojo::IOLoop->timer( 0.01, $d->resolve(42, 53) );
+        Mojo::IOLoop->timer( 0.01, sub { $d->resolve(42, 53) } );
 
         return $d->promise();
     };

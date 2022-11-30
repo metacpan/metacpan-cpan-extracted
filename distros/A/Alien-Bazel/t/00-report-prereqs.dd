@@ -1,7 +1,7 @@
 do { my $x = {
        'build' => {
                     'requires' => {
-                                    'Alien::Build' => '0.32',
+                                    'Alien::Build' => '2.72',
                                     'Alien::Build::MM' => '0.32',
                                     'ExtUtils::MakeMaker' => '6.52'
                                   }

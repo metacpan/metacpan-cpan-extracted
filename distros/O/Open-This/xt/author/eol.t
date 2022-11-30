@@ -28,6 +28,7 @@ my @files = (
     't/test-data/file with spaces',
     't/test-data/file-with-numbers-0.000020.txt',
     't/test-data/foo/bar/baz.html.ep',
+    't/test-data/foo/bar/test.go',
     't/vim.t',
     't/which.t'
 );

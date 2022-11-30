@@ -71,15 +71,23 @@ push(@defs, '-O') if ($Config{ccflags} =~ /-D_FORTIFY_SOURCE=/);
 # if user hasn't provided RLLIB or RLINC....
 # OS X uses libedit, but they've named it libreadline...
 # see if user has installed gnu readline via homebrew
-if ($Config{osname} eq 'darwin' && !(@RLLIB || @RLINC)) {
-    foreach ('readline', 'ncurses') {
-        my $homebrew_prefix = `brew --prefix $_`;
-        chomp $homebrew_prefix;
-        if ($homebrew_prefix
-            && ((substr($Config{osvers}, 0, index($Config{osvers}, '.')) > 19) || -d $homebrew_prefix)) {
-            push(@RLLIB, "-L$homebrew_prefix/lib");
-            push(@LIBPTH,  "$homebrew_prefix/lib");
-            push(@RLINC, "-I$homebrew_prefix/include");
+if ($Config{osname} eq 'darwin' && !(@RLLIB || @RLINC)
+    && system('brew -v >/dev/null 2>&1') == 0) {
+    chomp(my $homebrew_prefix = `brew --prefix --installed readline`);
+    if ($homebrew_prefix
+        && (substr($Config{osvers}, 0, index($Config{osvers}, '.')) > 19)) {
+        push(@RLLIB, "-L$homebrew_prefix/lib");
+        push(@LIBPTH,  "$homebrew_prefix/lib");
+        push(@RLINC, "-I$homebrew_prefix/include");
+
+        chomp(my @deps = split(' ', `brew deps readline`));
+        if (@deps) {
+            foreach (@deps) {
+                chomp(my $homebrew_prefix = `brew --prefix --installed $_`);
+                push(@RLLIB, "-L$homebrew_prefix/lib");
+                push(@LIBPTH,  "$homebrew_prefix/lib");
+                push(@RLINC, "-I$homebrew_prefix/include");
+            }
         }
     }
 }
@@ -100,10 +108,9 @@ if ($Config{osname} eq 'os2') {
     if (compile_rlver($frlver, "@RLINC", "@RLLIB", "@defs", "@lddflags", "@libs", 1)) {
         # If failed, compile rlver.c with terminal library.
         # See https://github.com/hirooih/perl-trg/issues/6 for details
-        if (my $termlib = search_termlib()) {
-            push(@libs, $termlib);
-            if (compile_rlver($frlver, "@RLINC", "@RLLIB", "@defs", "@lddflags", "@libs", 0)) {
-                warn <<EOM;
+        push(@libs, search_termlib());
+        if (compile_rlver($frlver, "@RLINC", "@RLLIB", "@defs", "@lddflags", "@libs", 0)) {
+            warn <<EOM;
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 Could not compile $frlver.c.
 
@@ -124,24 +131,7 @@ here.  Update it to version 2.1 and/or later.
 Read INSTALL for more details.
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 EOM
-                exit $err;
-            }
-            # Succeeded
-        } else {
-            warn "Could not find neither libtermcap, libtinfo, libncurses, or libcurses.\n";
-            if ($Config{osname} eq 'darwin'
-                && substr($Config{osvers}, 0, index($Config{osvers}, '.')) > 19
-                && $ExtUtils::MakeMaker::VERSION < 7.58) {
-                # may not reach here
-                warn <<EOM;
-Install XCode or use Homebrew package.
-macOS Big Sur or later requires ExtUtils::MakeMaker 7.58 or later.
-See https://github.com/Perl-Toolchain-Gang/ExtUtils-MakeMaker/issues/381 for details.
-EOM
-                # don't exit for now
-            } else {
-                exit $err;
-            }
+            exit $err;
         }
     }
 }
@@ -221,12 +211,16 @@ sub search_termlib {
     # libtermcap.a on HPUX cannot be used for dynamically linked binary.
     # Old Cygwin may require setting false (0).
     # tinfo is for Debian. [Debian Bug Report #644423]
+    #
+    # Return `-lcurses` as a last resort. This is also a work-around for
+    # https://github.com/Perl-Toolchain-Gang/ExtUtils-MakeMaker/issues/381.
+    # macOS Big Sur or later requires ExtUtils::MakeMaker 7.58 or later.
     if ($Config{osname} eq 'aix' || $Config{osname} eq 'hpux' || $Config{osname} eq 'cygwin') {
         return (search_lib('-lncurses') || search_lib('-ltermcap')
-                || search_lib('-ltinfo') || search_lib('-lcurses'));
+                || search_lib('-ltinfo') || '-lcurses');
     } else {
         return (search_lib('-ltermcap') || search_lib('-ltinfo')
-                || search_lib('-lncurses') || search_lib('-lcurses'));
+                || search_lib('-lncurses') || '-lcurses');
     }
 }
 
@@ -293,7 +287,7 @@ sub compile_rlver {
     my ($base, $RLINC, $RLLIB, $defs, $lddflags, $libs, $quiet) = @_;
 
     my $comp_cmd = "$Config{cc} $RLINC $Config{ccflags} $defs $base.c -o $base $RLLIB $lddflags $Config{ldflags} $libs";
-    $comp_cmd .= " >/dev/null 2>&1" if $quiet;
+    $comp_cmd .= " >/dev/null 2>&1" if $quiet && !$verbose;
     print $comp_cmd, "\n" if $verbose;
     system($comp_cmd);
     return $?;

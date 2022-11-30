@@ -1,19 +1,25 @@
 #!perl
 
-use 5.010001;
+#use 5.010001;
 use strict;
 use warnings;
-use Log::ger;
-
-use App::FirefoxMultiAccountContainersUtils;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-09-08'; # DATE
 our $DIST = 'App-FirefoxMultiAccountContainersUtils'; # DIST
-our $VERSION = '0.013'; # VERSION
+our $VERSION = '0.014'; # VERSION
 
-if (defined $ENV{FIREFOX_CONTAINER}) {
-    exec "open-firefox-container", $ENV{FIREFOX_CONTAINER}, @ARGV;
+my $container;
+if (defined(my $n = $ENV{FIREFOX_CONTAINER_ENV})) {
+    if (defined(my $c = $ENV{$n})) {
+        $container = $c;
+    }
+} elsif (defined(my $c = $ENV{FIREFOX_CONTAINER})) {
+    $container = $c;
+}
+
+if (defined $container) {
+    exec "open-firefox-container", $container, @ARGV;
 } else {
     exec "firefox", @ARGV;
 }
@@ -33,7 +39,7 @@ firefox-container - Firefox wrapper to open URL's in a specific container
 
 =head1 VERSION
 
-This document describes version 0.013 of firefox-container (from Perl distribution App-FirefoxMultiAccountContainersUtils), released on 2022-09-08.
+This document describes version 0.014 of firefox-container (from Perl distribution App-FirefoxMultiAccountContainersUtils), released on 2022-09-08.
 
 =head1 SYNOPSIS
 
@@ -65,6 +71,21 @@ No other options are parsed by this wrapper. All will be passed to C<firefox>.
 =head2 FIREFOX_CONTAINER
 
 Set the name of container to open URL's in.
+
+=head2 FIREFOX_CONTAINER_ENV
+
+Set the name of environment variable to replace the default
+L</FIREFOX_CONTAINER>. Why would one want to do this? Because one will be able
+to use a shorter name for L</FIREFOX_CONTAINER>. So instead of this:
+
+ % FIREFOX_CONTAINER=mycontainer1 firefox-container ...
+ % FIREFOX_CONTAINER=mycontainer2 other-command ...
+
+you can instead use this:
+
+ % export FIREFOX_CONTAINER_ENV=FC
+ % FC=mycontainer1 firefox-container ...
+ % FC=mycontainer2 other-command ...
 
 =head1 HOMEPAGE
 

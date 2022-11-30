@@ -1,0 +1,9 @@
+COPYING
+lib/Subunit.pm
+lib/Subunit/Diff.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README.md
+subunit-diff
+META.json                                Module JSON meta-data (added by MakeMaker)

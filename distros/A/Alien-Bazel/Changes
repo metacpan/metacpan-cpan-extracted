@@ -1,5 +1,11 @@
 Revision history for Alien-Bazel,
 
+0.02      2022-11-23 13:11:35-06:00 America/Chicago
+  - HOLIDAY EDITION: Happy Thanksgiving!  Codename Sweet Genovese
+  - Support binary installation via `export ALIEN_BAZEL_FROM_SOURCE=0` (now default)
+  - Add contributing & copyright information
+
 0.01      2022-10-05 14:30:05-05:00 America/Chicago
   - Initial version
-  - Support build-from-source AKA bootstrapping on Linux operating systems
+  - Support build-from-source installation AKA bootstrapping on Linux operating systems
+  - Tests, run C++ & Java example builds

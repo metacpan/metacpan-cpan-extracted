@@ -113,6 +113,12 @@ my %ipv6_types = (
             2001:0db8:ffff:ffff:ffff:ffff:ffff:ffff
         )
     ],
+    unspecified => [
+        qw(
+            ::
+            ::0
+        )
+    ],
 );
 
 my %ip_types = map { $_ => [ @{ $ipv4_types{$_} }, @{ $ipv6_types{$_} } ] }
@@ -120,15 +126,15 @@ my %ip_types = map { $_ => [ @{ $ipv4_types{$_} }, @{ $ipv6_types{$_} } ] }
 
 sub run_tests {
     _ipv4_basic_tests();
-    _type_tests(\%ipv4_types, 4);
+    _type_tests( \%ipv4_types, 4 );
     _ipv4_innet_tests();
 
     _ipv6_basic_tests();
-    _type_tests(\%ipv6_types, 6);
+    _type_tests( \%ipv6_types, 6 );
 
     # Tests for subs without a family
     _ip_basic_tests();
-    _type_tests(\%ip_types);
+    _type_tests( \%ip_types );
 }
 
 sub _ipv4_basic_tests {
@@ -140,8 +146,8 @@ sub _ipv4_basic_tests {
     );
 
     for my $ip (@valid_ipv4) {
-        is(is_ipv4($ip),          $ip, "is_ipv4($ip) returns $ip");
-        is($object->is_ipv4($ip), $ip, "->is_ipv4($ip) returns $ip");
+        is( is_ipv4($ip),          $ip, "is_ipv4($ip) returns $ip" );
+        is( $object->is_ipv4($ip), $ip, "->is_ipv4($ip) returns $ip" );
     }
 
     my @invalid_ipv4 = (
@@ -160,13 +166,13 @@ sub _ipv4_basic_tests {
     );
 
     for my $ip (@invalid_ipv4) {
-        is(is_ipv4($ip),          undef, "is_ipv4($ip) returns undef");
-        is($object->is_ipv4($ip), undef, "->is_ipv4($ip) returns undef");
+        is( is_ipv4($ip),          undef, "is_ipv4($ip) returns undef" );
+        is( $object->is_ipv4($ip), undef, "->is_ipv4($ip) returns undef" );
 
-        for my $type (sort keys %ipv4_types) {
-            my ($is_sub_name, $is_sub) = _sub_for_type($type, 4);
+        for my $type ( sort keys %ipv4_types ) {
+            my ( $is_sub_name, $is_sub ) = _sub_for_type( $type, 4 );
 
-            is($is_sub->($ip), undef, "$is_sub_name($ip) returns undef");
+            is( $is_sub->($ip), undef, "$is_sub_name($ip) returns undef" );
             is(
                 $object->$is_sub_name($ip), undef,
                 "->$is_sub_name($ip) returns undef"
@@ -199,8 +205,8 @@ sub _ipv4_innet_tests {
     );
 
     my @warnings;
-    for my $triplet (@tests, @deprecated) {
-        my ($ip, $network, $is_member, $is_deprecated) = @{$triplet};
+    for my $triplet ( @tests, @deprecated ) {
+        my ( $ip, $network, $is_member, $is_deprecated ) = @{$triplet};
 
         my $expect = $is_member ? $ip : undef;
 
@@ -210,7 +216,7 @@ sub _ipv4_innet_tests {
             if $is_deprecated;
 
         is(
-            is_innet_ipv4($ip, $network), $expect,
+            is_innet_ipv4( $ip, $network ), $expect,
             "is_innet_ipv4($ip, $network) returns $expect_string"
         );
     }
@@ -255,8 +261,8 @@ sub _ipv6_basic_tests {
     );
 
     for my $ip (@valid) {
-        is(is_ipv6($ip),          $ip, "is_ipv6($ip) returns $ip");
-        is($object->is_ipv6($ip), $ip, "->is_ipv6($ip) returns $ip");
+        is( is_ipv6($ip),          $ip, "is_ipv6($ip) returns $ip" );
+        is( $object->is_ipv6($ip), $ip, "->is_ipv6($ip) returns $ip" );
     }
 
     my @invalid = (
@@ -277,13 +283,13 @@ sub _ipv6_basic_tests {
     );
 
     for my $ip (@invalid) {
-        is(is_ipv6($ip),          undef, "is_ipv6($ip) returns undef");
-        is($object->is_ipv6($ip), undef, "->is_ipv6($ip) returns undef");
+        is( is_ipv6($ip),          undef, "is_ipv6($ip) returns undef" );
+        is( $object->is_ipv6($ip), undef, "->is_ipv6($ip) returns undef" );
 
-        for my $type (sort keys %ipv6_types) {
-            my ($is_sub_name, $is_sub) = _sub_for_type($type, 6);
+        for my $type ( sort keys %ipv6_types ) {
+            my ( $is_sub_name, $is_sub ) = _sub_for_type( $type, 6 );
 
-            is($is_sub->($ip), undef, "$is_sub_name($ip) returns undef");
+            is( $is_sub->($ip), undef, "$is_sub_name($ip) returns undef" );
             is(
                 $object->$is_sub_name($ip), undef,
                 "->$is_sub_name($ip) returns undef"
@@ -296,8 +302,8 @@ sub _ip_basic_tests {
     my @valid = qw( 1.1.1.1 2067:fa88::0 ::1.1.1.1 );
 
     for my $ip (@valid) {
-        is(is_ip($ip),          $ip, "is_ip($ip) returns $ip");
-        is($object->is_ip($ip), $ip, "->is_ip($ip) returns $ip");
+        is( is_ip($ip),          $ip, "is_ip($ip) returns $ip" );
+        is( $object->is_ip($ip), $ip, "->is_ip($ip) returns $ip" );
 
     }
 
@@ -310,8 +316,8 @@ sub _ip_basic_tests {
         "::1\0 invalid"
     );
     for my $ip (@invalid) {
-        is(is_ip($ip),          undef, "is_ip($ip) returns undef");
-        is($object->is_ip($ip), undef, "->is_ip($ip) returns undef");
+        is( is_ip($ip),          undef, "is_ip($ip) returns undef" );
+        is( $object->is_ip($ip), undef, "->is_ip($ip) returns undef" );
     }
 }
 
@@ -322,26 +328,29 @@ sub _type_tests {
     my @types = sort keys %{$types};
 
     for my $type (@types) {
-        for my $test (@{ $types->{$type} }) {
-            my ($ip, $is_also) = ref $test ? @{$test} : ($test, []);
+        for my $test ( @{ $types->{$type} } ) {
+            my ( $ip, $is_also ) = ref $test ? @{$test} : ( $test, [] );
 
-            my ($is_sub_name, $is_sub) = _sub_for_type($type, $ip_number);
+            my ( $is_sub_name, $is_sub ) = _sub_for_type( $type, $ip_number );
 
-            is($is_sub->($ip), $ip, "$is_sub_name($ip) returns $ip");
+            is( $is_sub->($ip), $ip, "$is_sub_name($ip) returns $ip" );
             is(
                 $object->$is_sub_name($ip), $ip,
                 "->$is_sub_name($ip) returns $ip"
             );
 
-            for my $other (sort grep { $_ ne $type } @types) {
+            for my $other ( sort grep { $_ ne $type } @types ) {
                 next if grep { $_ eq $other } @{$is_also};
 
-                my ($other_sub_name, $other_sub)
-                    = _sub_for_type($other, $ip_number);
+                my ( $other_sub_name, $other_sub )
+                    = _sub_for_type( $other, $ip_number );
 
                 ## no critic (Subroutines::ProtectPrivateSubs)
-                if (Data::Validate::IP::_network_is_subnet_of($type, $other))
-                {
+                if (
+                    Data::Validate::IP::_network_is_subnet_of(
+                        $type, $other
+                    )
+                ) {
                     is(
                         $other_sub->($ip), $ip,
                         "$other_sub_name($ip) returns $ip"
@@ -380,7 +389,7 @@ sub _sub_for_type {
         }
         or die "No sub named $sub_name was imported";
 
-    return ($sub_name, $sub);
+    return ( $sub_name, $sub );
 }
 
 1;

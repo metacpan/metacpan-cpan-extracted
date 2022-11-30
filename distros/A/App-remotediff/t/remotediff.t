@@ -9,6 +9,10 @@ if (system("which rsync") != 0)
 {
     plan skip_all => "rsync required for this test";
 }
+elsif ($^O eq "solaris" or $^O eq "sunos")
+{
+    plan skip_all => "diff -q required for this test";	
+}
 else
 {
     plan tests => 1;

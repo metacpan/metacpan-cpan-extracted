@@ -77,7 +77,7 @@ use Test::More;
       }
       {
         my $source = ['class MyClass extends MyParentClass { has x : int; }', 'class MyParentClass { has x : int; }'];
-        compile_ok($source);
+        compile_not_ok($source);
       }
     }
   }
@@ -192,6 +192,55 @@ use Test::More;
     {
       my $source = q|class MyClass { public private enum { ONE } }|;
       compile_not_ok($source);
+    }
+  }
+
+  # Inherit the interface of the parent class
+  {
+    {
+      {
+        my $source = [
+          'class MyClass extends MyClass::Parent {}',
+          'class MyClass::Parent { interface MyClass::Interface; method has_interfaces : int () { return 1; } }',
+          'class MyClass::Interface : interface_t { required method has_interfaces : int (); }',
+        ];
+        compile_ok($source);
+      }
+    }
+  }
+
+  # Search the non-existant parent field
+  {
+    {
+      {
+        my $source = [
+          'class MyClass extends MyClass::Parent { static method main : int () { my $self = new MyClass; $self->{foo}; }}',
+          'class MyClass::Parent { }',
+        ];
+        compile_not_ok($source, qr|The "foo" field is not defined in the "MyClass" class or its super classes|);
+      }
+    }
+  }
+
+  # Search the non-existant parent method
+  {
+    {
+      {
+        my $source = [
+          'class MyClass::Socket::INET extends MyClass::Socket {static method new : MyClass::Socket::INET ($optMyClassns = undef : object[]) { my $self = new MyClass::Socket::INET; $self->blocking; }}',
+          'class MyClass::Socket extends MyClass::Handle {}',
+          'class MyClass::Handle { has blocking : ro int;}',
+        ];
+        compile_ok($source);
+      }
+      {
+        my $source = [
+          'class MyClass::Socket::INET extends MyClass::Socket {static method new : MyClass::Socket::INET ($optMyClassns = undef : object[]) { my $self = new MyClass::Socket::INET; $self->blocking; }}',
+          'class MyClass::Socket extends MyClass::Handle {}',
+          'class MyClass::Handle { }',
+        ];
+        compile_not_ok($source, qr|The "blocking" instance method is not defined in the "MyClass::Socket::INET" class or its super classes|);
+      }
     }
   }
 }

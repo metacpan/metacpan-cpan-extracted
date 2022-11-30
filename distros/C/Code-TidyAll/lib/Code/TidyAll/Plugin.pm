@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 use Code::TidyAll::Util::Zglob qw(zglobs_to_regex);
-use File::Which qw(which);
-use IPC::Run3 qw(run3);
-use Scalar::Util qw(weaken);
+use File::Which                qw(which);
+use IPC::Run3                  qw(run3);
+use Scalar::Util               qw(weaken);
 use Specio::Declare;
 use Specio::Library::Builtins;
 use Specio::Library::Numeric;
@@ -15,7 +15,7 @@ use Text::Diff 1.44 qw(diff);
 
 use Moo;
 
-our $VERSION = '0.82';
+our $VERSION = '0.83';
 
 has argv => (
     is      => 'ro',
@@ -251,7 +251,7 @@ Code::TidyAll::Plugin - Create plugins for tidying or validating code
 
 =head1 VERSION
 
-version 0.82
+version 0.83
 
 =head1 SYNOPSIS
 

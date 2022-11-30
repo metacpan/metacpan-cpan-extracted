@@ -2,13 +2,16 @@
 use strict;
 use Archive::7zip;
 use File::Basename;
-use Test::More tests => 6;
+use Test::More;
 use File::Temp 'tempfile';
 use Data::Dumper;
 
+my $testcount = 6;
+plan tests => 6;
+
 my $version = Archive::7zip->find_7z_executable();
 if( ! $version ) {
-    SKIP: { skip "7z binary not found (not installed?)", 2; }
+    SKIP: { skip "7z binary not found (not installed?)", $testcount; }
     exit;
 };
 diag "7-zip version $version";
@@ -43,7 +46,6 @@ for my $archivename ("$base/def.zip", "$base/fred.7z") {
     # Check that extraction to scalar and extraction to file
     # result in the same output
 
-
     my $originalname = "$base/fred";
     open my $fh, '<', $originalname
         or die "Couldn't read '$originalname': $!";
@@ -55,7 +57,7 @@ for my $archivename ("$base/def.zip", "$base/fred.7z") {
     {
         my @warnings;
         local $SIG{__WARN__} = sub { push @warnings, @_ };
-        diag [$ar->members]->[0]->fileName;
+        my $fn = [$ar->members]->[0]->fileName;
         if(! is_deeply \@warnings, [], "We have no warnings when accessing the ->fileName ($archivename)") {
             diag Dumper \@warnings;
         }
@@ -69,3 +71,5 @@ for my $archivename ("$base/def.zip", "$base/fred.7z") {
     my $disk   = slurp($fh);
     data_matches_ok( $disk, "Direct disk extraction ($archivename)", $original, $originalname );
 }
+
+done_testing(6);
