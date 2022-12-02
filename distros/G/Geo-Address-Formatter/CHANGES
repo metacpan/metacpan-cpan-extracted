@@ -1,6 +1,11 @@
 Revision history for Perl module Geo::Address::Formatter.
 
-1.98   2022-04-21
+1.991  2022-10-30
+       - new optional "no_warnings" parameter to new method to suppress
+         some warnings
+       - newest address-formatting
+
+1.99   2022-04-21
        - internal reorganization so that component aliases now chosen based on
          the order they appear in the components conf file rather than
          alphabetically as they had (mistakenly) been chosen previously

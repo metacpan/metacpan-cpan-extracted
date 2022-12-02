@@ -45,7 +45,7 @@ srs_read.pl - Read out SR830 lock-in amplifier
 
 =head1 VERSION
 
-version 3.830
+version 3.831
 
 =head1 srs_read.pl
 

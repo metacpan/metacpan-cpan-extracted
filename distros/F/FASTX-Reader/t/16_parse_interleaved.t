@@ -3,7 +3,7 @@ use warnings;
 use FindBin qw($RealBin);
 use Test::More;
 use FASTX::Reader;
-use FASTX::PE;
+use FASTX::ReaderPaired;
 
 # TEST: Parse an interleaved file
 
@@ -15,7 +15,7 @@ if (! -e $seq_file) {
   exit 0;
 }
 
-my $data = FASTX::PE->new({ filename => "$seq_file", interleaved => 1, verbose => 1 });
+my $data = FASTX::ReaderPaired->new({ filename => "$seq_file", interleaved => 1, verbose => 1 });
 my $pe = $data->getReads();
 
 ok(defined $pe->{seq1},  "[PE] sequence1 is defined: " . $pe->{name});

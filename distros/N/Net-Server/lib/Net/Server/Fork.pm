@@ -2,7 +2,7 @@
 #
 #  Net::Server::Fork - Net::Server personality
 #
-#  Copyright (C) 2001-2017
+#  Copyright (C) 2001-2022
 #
 #    Paul Seamons <paul@seamons.com>
 #
@@ -144,6 +144,7 @@ sub loop {
         # parent
         close($prop->{'client'}) if !$prop->{'udp_true'};
         $prop->{'children'}->{$pid}->{'status'} = 'processing';
+        $self->register_child($pid, 'fork');
     }
 }
 
@@ -164,7 +165,7 @@ sub accept {
     return undef if ! defined $sock;
 
     # check if this is UDP
-    if (SOCK_DGRAM == $sock->getsockopt(SOL_SOCKET,SO_TYPE)) {
+    if (SOCK_DGRAM == unpack('i', $sock->getsockopt(SOL_SOCKET, SO_TYPE))) {
         $prop->{'udp_true'} = 1;
         $prop->{'client'}   = $sock;
         $prop->{'udp_peer'} = $sock->recv($prop->{'udp_data'}, $sock->NS_recv_len, $sock->NS_recv_flags);

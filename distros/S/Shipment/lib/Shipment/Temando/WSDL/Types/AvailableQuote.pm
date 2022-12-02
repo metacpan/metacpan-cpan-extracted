@@ -1,5 +1,5 @@
 package Shipment::Temando::WSDL::Types::AvailableQuote;
-$Shipment::Temando::WSDL::Types::AvailableQuote::VERSION = '3.09';
+$Shipment::Temando::WSDL::Types::AvailableQuote::VERSION = '3.10';
 use strict;
 use warnings;
 
@@ -209,7 +209,7 @@ __PACKAGE__->_factory(
 
 
 package Shipment::Temando::WSDL::Types::AvailableQuote::_adjustments;
-$Shipment::Temando::WSDL::Types::AvailableQuote::_adjustments::VERSION = '3.09';
+$Shipment::Temando::WSDL::Types::AvailableQuote::_adjustments::VERSION = '3.10';
 use strict;
 use warnings;
 {
@@ -257,7 +257,7 @@ __PACKAGE__->_factory(
 
 
 package Shipment::Temando::WSDL::Types::AvailableQuote::_articles;
-$Shipment::Temando::WSDL::Types::AvailableQuote::_articles::VERSION = '3.09';
+$Shipment::Temando::WSDL::Types::AvailableQuote::_articles::VERSION = '3.10';
 use strict;
 use warnings;
 {
@@ -305,7 +305,7 @@ __PACKAGE__->_factory(
 
 
 package Shipment::Temando::WSDL::Types::AvailableQuote::_extras;
-$Shipment::Temando::WSDL::Types::AvailableQuote::_extras::VERSION = '3.09';
+$Shipment::Temando::WSDL::Types::AvailableQuote::_extras::VERSION = '3.10';
 use strict;
 use warnings;
 {
@@ -353,7 +353,7 @@ __PACKAGE__->_factory(
 
 
 package Shipment::Temando::WSDL::Types::AvailableQuote::_inclusions;
-$Shipment::Temando::WSDL::Types::AvailableQuote::_inclusions::VERSION = '3.09';
+$Shipment::Temando::WSDL::Types::AvailableQuote::_inclusions::VERSION = '3.10';
 use strict;
 use warnings;
 {
@@ -401,7 +401,7 @@ __PACKAGE__->_factory(
 
 
 package Shipment::Temando::WSDL::Types::AvailableQuote::_AvailableQuote::XmlAttr;
-$Shipment::Temando::WSDL::Types::AvailableQuote::_AvailableQuote::XmlAttr::VERSION = '3.09';
+$Shipment::Temando::WSDL::Types::AvailableQuote::_AvailableQuote::XmlAttr::VERSION = '3.10';
 use base qw(SOAP::WSDL::XSD::Typelib::AttributeSet);
 
 { # BLOCK to scope variables
@@ -439,7 +439,7 @@ Shipment::Temando::WSDL::Types::AvailableQuote
 
 =head1 VERSION
 
-version 3.09
+version 3.10
 
 =head1 DESCRIPTION
 

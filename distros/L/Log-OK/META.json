@@ -45,6 +45,6 @@
          "web" : "http://github.com/drclaw1394/perl-log-ok"
       }
    },
-   "version" : "v0.1.4",
+   "version" : "v0.1.5",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

@@ -1,0 +1,3 @@
+requires 'Alien::Kiwisolver',
+	git => 'https://github.com/PerlGfx/p5-Alien-Kiwisolver.git',
+	branch => 'master';

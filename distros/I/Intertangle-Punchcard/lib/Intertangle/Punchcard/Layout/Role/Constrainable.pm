@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Intertangle::Punchcard::Layout::Role::Constrainable;
 # ABSTRACT: A role to hold constraints for bounding boxes
-$Intertangle::Punchcard::Layout::Role::Constrainable::VERSION = '0.001';
+$Intertangle::Punchcard::Layout::Role::Constrainable::VERSION = '0.002';
 use Mu;
 
 has [ qw(top bottom left right) ] => ( is => 'ro' );
@@ -22,7 +22,7 @@ Intertangle::Punchcard::Layout::Role::Constrainable - A role to hold constraints
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 EXTENDS
 

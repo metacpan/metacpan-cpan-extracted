@@ -2,6 +2,23 @@
 use v5.14.0;
 use warnings;
 # PODNAME: module-faker
+# ABSTRACT: fake up CPAN distributions with Module::Faker
+
+#pod =head1 SYNOPSIS
+#pod
+#pod B<module-faker> [B<-s|--src> STR] [B<-d|--dest> STR] [B<-p|--author-dir>]
+#pod
+#pod =head1 OPTIONS
+#pod
+#pod =for :list
+#pod = B<-s> STR, B<--src> STR
+#pod source directory
+#pod = B<-d> STR, B<--dest> STR
+#pod destination directory
+#pod = B<-p>, B<--author-dir>
+#pod write dists into A/U/AUTHOR dirs
+#pod
+#pod =cut
 
 use Getopt::Long::Descriptive;
 use Module::Faker;
@@ -27,15 +44,49 @@ __END__
 
 =head1 NAME
 
-module-faker
+module-faker - fake up CPAN distributions with Module::Faker
 
 =head1 VERSION
 
-version 0.022
+version 0.023
+
+=head1 SYNOPSIS
+
+B<module-faker> [B<-s|--src> STR] [B<-d|--dest> STR] [B<-p|--author-dir>]
+
+=head1 PERL VERSION
+
+This module should work on any version of perl still receiving updates from
+the Perl 5 Porters.  This means it should work on any version of perl released
+in the last two to three years.  (That is, if the most recently released
+version is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-s> STR, B<--src> STR
+
+source directory
+
+=item B<-d> STR, B<--dest> STR
+
+destination directory
+
+=item B<-p>, B<--author-dir>
+
+write dists into A/U/AUTHOR dirs
+
+=back
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

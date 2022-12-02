@@ -4,11 +4,11 @@ package Net::Server::Test;
 use strict;
 use FindBin qw($Bin);
 use lib $Bin;
-use NetServerTest qw(prepare_test ok use_ok diag skip);
+use NetServerTest qw(prepare_test ok use_ok note skip);
 my $env = prepare_test({n_tests => 5, start_port => 20200, n_ports => 1});
 
 if (! eval{ require IO::Multiplex; }) {
-    diag("Error loading IO::Multiplex: $@");
+    note("Error loading IO::Multiplex: $@");
     SKIP: { skip("No IO::Multiplex installed\n", 2) };
     exit;
 }
@@ -79,7 +79,7 @@ my $ok = eval {
                 setsid => 0,
             );
         } || do {
-            diag("Trouble running server: $@");
+            note("Trouble running server: $@");
             kill(9, $ppid) && ok(0, "Failed during run of server");
         };
         exit;
@@ -87,5 +87,5 @@ my $ok = eval {
     alarm(0);
 };
 alarm(0);
-ok($ok, "Got the correct output from the server") || diag("Error: $@");
+ok($ok, "Got the correct output from the server") || note("Error: $@");
 

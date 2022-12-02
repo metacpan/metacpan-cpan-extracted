@@ -1,5 +1,5 @@
 package Shipment::Temando::WSDL::Types::Extra;
-$Shipment::Temando::WSDL::Types::Extra::VERSION = '3.09';
+$Shipment::Temando::WSDL::Types::Extra::VERSION = '3.10';
 use strict;
 use warnings;
 
@@ -72,7 +72,7 @@ __PACKAGE__->_factory(
 
 
 package Shipment::Temando::WSDL::Types::Extra::_adjustments;
-$Shipment::Temando::WSDL::Types::Extra::_adjustments::VERSION = '3.09';
+$Shipment::Temando::WSDL::Types::Extra::_adjustments::VERSION = '3.10';
 use strict;
 use warnings;
 {
@@ -136,7 +136,7 @@ Shipment::Temando::WSDL::Types::Extra
 
 =head1 VERSION
 
-version 3.09
+version 3.10
 
 =head1 DESCRIPTION
 

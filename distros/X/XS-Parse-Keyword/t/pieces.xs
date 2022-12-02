@@ -191,6 +191,13 @@ static const struct XSParseKeywordHooks hooks_termexpr = {
   .build1 = &build_expr,
 };
 
+static const struct XSParseKeywordHooks hooks_prefixedtermexpr_VAR = {
+  .permit_hintkey = hintkey,
+
+  .piece1 = XPK_PREFIXED_TERMEXPR_ENTERLEAVE( XPK_SETUP(&setup_block_VAR) ),
+  .build1 = &build_expr,
+};
+
 static const struct XSParseKeywordHooks hooks_listexpr = {
   .permit_hintkey = hintkey,
 
@@ -315,6 +322,8 @@ BOOT:
   register_xs_parse_keyword("piecearithexpr", &hooks_arithexpr, NULL);
   register_xs_parse_keyword("piecetermexpr", &hooks_termexpr, NULL);
   register_xs_parse_keyword("piecelistexpr", &hooks_listexpr, NULL);
+
+  register_xs_parse_keyword("pieceprefixedtermexpr_VAR", &hooks_prefixedtermexpr_VAR, "$VAR");
 
   register_xs_parse_keyword("pieceident", &hooks_ident, NULL);
   register_xs_parse_keyword("pieceident_opt", &hooks_ident_opt, NULL);

@@ -8,6 +8,8 @@ package Sidef::Types::Number::Polynomial {
     use utf8;
     use 5.016;
 
+    require List::Util;
+
     use parent qw(
       Sidef::Types::Number::Number
     );
@@ -30,7 +32,12 @@ package Sidef::Types::Number::Polynomial {
 
             if (UNIVERSAL::isa($value, 'Sidef::Types::Array::Array')) {
                 my $end = $#{$value};
-                return __PACKAGE__->new(map { ($end - $_) => $value->[$_] } 0 .. $end);
+                return __PACKAGE__->new(
+                    map {
+                        my $t = $value->[$_];
+                        UNIVERSAL::isa($t, 'Sidef::Types::Array::Array') ? (($t->[0], $t->[1])) : (($end - $_) => $t)
+                      } 0 .. $end
+                );
             }
 
             if (UNIVERSAL::isa($value, 'Sidef::Types::Number::Number')) {    # monomial
@@ -142,7 +149,9 @@ package Sidef::Types::Number::Polynomial {
     }
 
     sub __stringify__ {
-        my ($x) = @_;
+        my ($x, $method) = @_;
+
+        $method //= 'to_s';
 
         my $str  = '';
         my @keys = sort { $b <=> $a } CORE::keys %$x;
@@ -151,7 +160,11 @@ package Sidef::Types::Number::Polynomial {
 
             $str .= ' + ';
 
-            my $c_str = ${$x->{$key}->dump};
+            my $v = $x->{$key};
+            my $c_str =
+              (ref($v) eq 'Sidef::Types::Number::Number' and ref($$v) eq 'Math::GMPq')
+              ? Math::GMPq::Rmpq_get_str($$v, 10)
+              : ${$v->$method};
 
             if ($c_str =~ s/^-//) {
                 $str =~ s/ \+ \z/ - /;
@@ -174,7 +187,7 @@ package Sidef::Types::Number::Polynomial {
         $str =~ s/ \+ \z//;
         $str =~ s/^ \- /-/;
         $str =~ s/^\((.*)\)\z/$1/;
-        $str;
+        $str || '0';
     }
 
     sub to_s {
@@ -184,6 +197,11 @@ package Sidef::Types::Number::Polynomial {
 
     *stringify = \&to_s;
 
+    sub pretty {
+        my ($x) = @_;
+        Sidef::Types::String::String->new($x->__stringify__('pretty'));
+    }
+
     sub dump {
         my ($x) = @_;
         Sidef::Types::String::String->new($x->__dump__);
@@ -191,15 +209,7 @@ package Sidef::Types::Number::Polynomial {
 
     sub degree {
         my ($x) = @_;
-        my $degree = 0;
-        foreach my $key (CORE::keys(%$x)) {
-            if ($key > $degree) {
-                if (!$x->{$key}->is_zero) {
-                    $degree = $key;
-                }
-            }
-        }
-        Sidef::Types::Number::Number::_set_int($degree);
+        Sidef::Types::Number::Number::_set_int(List::Util::max(CORE::keys(%$x)) // 0);
     }
 
     sub derivative {
@@ -210,8 +220,8 @@ package Sidef::Types::Number::Polynomial {
     sub eval {
         my ($x, $value) = @_;
         CORE::keys(%$x) || return Sidef::Types::Number::Number::ZERO;
-        Sidef::Types::Number::Number::sum(map { $value->pow(Sidef::Types::Number::Number::_set_int($_))->mul($x->{$_}) }
-                                          CORE::keys %$x);
+        Sidef::Types::Number::Number::sum(
+                  map { $value->pow(Sidef::Types::Number::Number::_set_int($_))->mul($x->{$_}->eval($value)) } CORE::keys %$x);
     }
 
     sub keys {
@@ -252,11 +262,6 @@ package Sidef::Types::Number::Polynomial {
         $prod->div($k->factorial);
     }
 
-    sub neg {
-        my ($x) = @_;
-        __PACKAGE__->new(map { $_ => $x->{$_}->neg } CORE::keys %$x);
-    }
-
     sub add {
         my ($x, $y) = @_;
 
@@ -279,7 +284,7 @@ package Sidef::Types::Number::Polynomial {
         if (ref($y) eq __PACKAGE__) {
             return
               __PACKAGE__->new((map { $_ => (exists($y->{$_}) ? $x->{$_}->sub($y->{$_}) : $x->{$_}) } CORE::keys %$x),
-                               (map { exists($x->{$_}) ? () : ($_ => $y->{$_}->neg) } CORE::keys %$y),);
+                               (map { exists($x->{$_}) ? () : ($_ => $y->{$_}->neg) } CORE::keys %$y));
         }
 
         if (not exists $x->{0}) {
@@ -327,47 +332,109 @@ package Sidef::Types::Number::Polynomial {
     sub divmod {
         my ($x, $y) = @_;
 
-        # TODO: optimize this method for better performance.
+        # Reference:
+        #   https://en.wikipedia.org/wiki/Polynomial_greatest_common_divisor#Euclidean_division
 
-        my @keys_x = sort { $b <=> $a } CORE::keys %$x;
-        my @keys_y = sort { $b <=> $a } CORE::keys %$y;
+        my $deg_r = List::Util::max(CORE::keys(%$x));    # deg(x)
+        $deg_r // return (__PACKAGE__->new(), __PACKAGE__->new());
 
-        @keys_x
-          || return (__PACKAGE__->new(), __PACKAGE__->new());
+        my $deg_y = List::Util::max(CORE::keys(%$y));    # deg(y)
+        $deg_y // return (__PACKAGE__->new(0 => Sidef::Types::Number::Number::inf()), __PACKAGE__->new());
 
-        @keys_y
-          || return (__PACKAGE__->new(0 => Sidef::Types::Number::Number::inf()), __PACKAGE__->new());
+        my $q = __PACKAGE__->new();
+        my $r = $x;
+        my $c = $y->{$deg_y};                            # lc(y)
 
-        my $key_y = shift @keys_y;
-        my $yc    = $y->{$key_y};
+        while ($deg_r >= $deg_y) {
 
-        my $quot = __PACKAGE__->new();
-
-        while (1) {
-            my $key_x = $keys_x[0];
-            my $xc    = $x->{$key_x};
-            my $q     = $xc->div($yc);
+            my $lc = $r->{$deg_r};                       # lc(r)
+            my $t  = $lc->div($c);                       # lc(r)/c
 
             # When the result of division is NaN, the loop never stops
-            if ($q->is_nan) {
+            if ($t->is_nan) {
                 return (__PACKAGE__->new(0 => Sidef::Types::Number::Number::nan()), __PACKAGE__->new());
             }
 
-            # Stop when the degree is < 0
-            if ($key_x < $key_y) {
-                last;
-            }
+            # s := lc(r)/c * x^(deg(r)−deg(y))
+            my $s = __PACKAGE__->new($deg_r - $deg_y, $t);
+            $q = $q->add($s);
+            $r = $r->sub($s->mul($y));
 
-            my $t = __PACKAGE__->new($key_x - $key_y, $q);
-
-            $quot = $quot->add($t);
-            $x    = $x->sub($t->mul($y));
-
-            @keys_x = sort { $b <=> $a } CORE::keys %$x;
-            (@keys_x and $keys_x[0] >= $key_y) or last;
+            # Find deg(r) for the new r
+            $deg_r = List::Util::max(CORE::keys(%$r)) // last;
         }
 
-        return ($quot, $x);
+        return ($q, $r);
+    }
+
+    sub sgn {
+        my ($x) = @_;
+        my $deg = List::Util::max(CORE::keys(%$x)) // return Sidef::Types::Number::Number::ZERO;
+        $x->{$deg}->sgn;
+    }
+
+    sub abs {
+        my ($x) = @_;
+        $x->mul($x->sgn);
+    }
+
+    sub lcm {
+        my ($x, $y) = @_;
+        $x->mul($y)->abs->div($x->gcd($y));
+    }
+
+    sub gcd {
+        my ($x, $y) = @_;
+
+        # Reference:
+        #   https://en.wikipedia.org/wiki/Polynomial_greatest_common_divisor#Euclid's_algorithm
+
+        my $r0 = $x;
+        my $r1 = $y;
+
+        until ($r1->is_zero) {
+            my $r = $r0->mod($r1);
+            ($r0, $r1) = ($r1, $r);
+        }
+
+        return $r0;
+    }
+
+    sub gcdext {
+        my ($x, $y) = @_;
+
+        # Reference:
+        #   https://en.wikipedia.org/wiki/Polynomial_greatest_common_divisor#B%C3%A9zout's_identity_and_extended_GCD_algorithm
+
+        if (ref($y) ne __PACKAGE__) {
+            $y = __PACKAGE__->new(0 => $y);
+        }
+
+        my $r0 = $x;
+        my $r1 = $y;
+
+        my $s0 = Sidef::Types::Number::Number::ONE;
+        my $s1 = Sidef::Types::Number::Number::ZERO;
+        my $t0 = Sidef::Types::Number::Number::ZERO;
+        my $t1 = Sidef::Types::Number::Number::ONE;
+
+        my $i = 1;
+        until ($r1->is_zero) {
+            my ($q) = $r0->divmod($r1);
+            ($r0, $r1) = ($r1, $r0->sub($q->mul($r1)));
+            ($s0, $s1) = ($s1, $s0->sub($q->mul($s1)));
+            ($t0, $t1) = ($t1, $t0->sub($q->mul($t1)));
+            ++$i;
+        }
+
+        my $g = $r0;
+        my $u = $s0;
+        my $v = $t0;
+
+        my $a1 = $t1->mul(Sidef::Types::Number::Number::MONE->ipow(Sidef::Types::Number::Number::_set_int($i - 1)));
+        my $b1 = $s1->mul(Sidef::Types::Number::Number::MONE->ipow(Sidef::Types::Number::Number::_set_int($i)));
+
+        return ($g, $u, $v, $a1, $b1);
     }
 
     sub idiv {
@@ -398,7 +465,13 @@ package Sidef::Types::Number::Polynomial {
                 return $quot;
             }
 
-            return Sidef::Types::Number::Fraction->new($quot->mul($y)->add($rem), $y);
+            my $frac = Sidef::Types::Number::Fraction->new($quot->mul($y)->add($rem), $y);
+
+            if ($frac->is_zero) {
+                return Sidef::Types::Number::Polynomial->new();
+            }
+
+            return $frac;
         }
 
         if ($y->is_zero) {
@@ -408,9 +481,24 @@ package Sidef::Types::Number::Polynomial {
         __PACKAGE__->new(map { $_ => $x->{$_}->div($y) } CORE::keys %$x);
     }
 
+    sub neg {
+        my ($x) = @_;
+        __PACKAGE__->new(map { $_ => $x->{$_}->neg } CORE::keys %$x);
+    }
+
     sub float {
         my ($x) = @_;
         __PACKAGE__->new(map { $_ => $x->{$_}->float } CORE::keys %$x);
+    }
+
+    sub rat {
+        my ($x) = @_;
+        __PACKAGE__->new(map { $_ => $x->{$_}->rat } CORE::keys %$x);
+    }
+
+    sub rat_approx {
+        my ($x) = @_;
+        __PACKAGE__->new(map { $_ => $x->{$_}->rat_approx } CORE::keys %$x);
     }
 
     sub floor {
@@ -441,6 +529,11 @@ package Sidef::Types::Number::Polynomial {
         }
 
         __PACKAGE__->new(map { $_ => Sidef::Types::Number::Mod->new($x->{$_}, $y) } CORE::keys %$x);
+    }
+
+    sub lift {
+        my ($x) = @_;
+        __PACKAGE__->new(map { $_ => $x->{$_}->lift } CORE::keys %$x);
     }
 
     sub inv {
@@ -543,8 +636,8 @@ package Sidef::Types::Number::Polynomial {
 
         if (ref($y) eq __PACKAGE__) {
 
-            my @keys_x = grep { !$x->{$_}->is_zero } sort { $a <=> $b } CORE::keys %$x;
-            my @keys_y = grep { !$y->{$_}->is_zero } sort { $a <=> $b } CORE::keys %$y;
+            my @keys_x = sort { $a <=> $b } CORE::keys %$x;
+            my @keys_y = sort { $a <=> $b } CORE::keys %$y;
 
             scalar(@keys_x) == scalar(@keys_y)
               or return Sidef::Types::Number::Number::_set_int(scalar(@keys_x) <=> scalar(@keys_y));

@@ -7,7 +7,9 @@ use Carp;
 use Exporter 'import';
 
 our @EXPORT = qw(
+    &read_line
     &read_unified_sub &read_unified &read_unified_2
+    &range &terminal_width
     );
 
 our @EXPORT_OK = qw(
@@ -19,6 +21,27 @@ use List::Util qw(sum);
 
 our $MINILLA_CHANGES = 1;
 our $NO_WARNINGS = 0;
+
+sub read_line ($$;@) {
+    local *FH = shift;
+    my $c = shift;
+    my @buf = @_;
+    while ($c--) {
+	last if eof FH;
+	push @buf, scalar <FH>;
+    }
+    wantarray ? @buf : join '', @buf;
+}
+
+sub read_until (&$) {
+    my($sub, $fh) = @_;
+    my @lines;
+    while (<$fh>) {
+	push @lines, $_;
+	return @lines if &$sub;
+    }
+    (@lines, undef);
+}
 
 sub read_unified_2 {
     map {
@@ -117,6 +140,25 @@ sub read_unified {
 	last if $total <= 0;
     }
     @stack;
+}
+
+sub range {
+    local $_ = shift;
+    my($from, $to) = /,/ ? split(/,/) : ($_, $_);
+    wantarray ? ($from, $to) : $to - $from + 1;
+}
+
+sub terminal_width {
+    use Term::ReadKey;
+    my $default = 80;
+    my @size;
+    if (open my $tty, ">", "/dev/tty") {
+	# Term::ReadKey 2.31 on macOS 10.15 has a bug in argument handling
+	# and the latest version 2.38 fails to install.
+	# This code should work on both versions.
+	@size = GetTerminalSize $tty, $tty;
+    }
+    $size[0] or $default;
 }
 
 1;

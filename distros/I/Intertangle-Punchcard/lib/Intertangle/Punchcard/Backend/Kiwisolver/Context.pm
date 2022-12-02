@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Intertangle::Punchcard::Backend::Kiwisolver::Context;
 # ABSTRACT: Context for Kiwisolver backend
-$Intertangle::Punchcard::Backend::Kiwisolver::Context::VERSION = '0.001';
+$Intertangle::Punchcard::Backend::Kiwisolver::Context::VERSION = '0.002';
 use Mu;
 use Intertangle::Punchcard::Backend::Kiwisolver::Solver;
 use Intertangle::Punchcard::Backend::Kiwisolver::Symbolic;
@@ -28,7 +28,7 @@ Intertangle::Punchcard::Backend::Kiwisolver::Context - Context for Kiwisolver ba
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 EXTENDS
 

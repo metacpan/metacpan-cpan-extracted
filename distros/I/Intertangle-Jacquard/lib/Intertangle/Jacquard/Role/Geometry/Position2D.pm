@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Intertangle::Jacquard::Role::Geometry::Position2D;
-# ABSTRACT: A 2D geometry with variable position
-$Intertangle::Jacquard::Role::Geometry::Position2D::VERSION = '0.001';
+# ABSTRACT: A 2-D geometry with variable position
+$Intertangle::Jacquard::Role::Geometry::Position2D::VERSION = '0.002';
 use Mu::Role;
 use Intertangle::Punchcard::Attributes;
 use Intertangle::Yarn::Graphene;
@@ -26,11 +26,11 @@ __END__
 
 =head1 NAME
 
-Intertangle::Jacquard::Role::Geometry::Position2D - A 2D geometry with variable position
+Intertangle::Jacquard::Role::Geometry::Position2D - A 2-D geometry with variable position
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 METHODS
 

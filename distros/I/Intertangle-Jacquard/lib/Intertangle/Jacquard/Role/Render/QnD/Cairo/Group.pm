@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Intertangle::Jacquard::Role::Render::QnD::Cairo::Group;
 # ABSTRACT: Quick-and-dirty Cairo group rendering
-$Intertangle::Jacquard::Role::Render::QnD::Cairo::Group::VERSION = '0.001';
+$Intertangle::Jacquard::Role::Render::QnD::Cairo::Group::VERSION = '0.002';
 use Mu::Role;
 
 method render_cairo($cr) {
@@ -33,7 +33,7 @@ Intertangle::Jacquard::Role::Render::QnD::Cairo::Group - Quick-and-dirty Cairo g
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 CONSUMES
 

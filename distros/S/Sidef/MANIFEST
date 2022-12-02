@@ -193,6 +193,7 @@ scripts/extend_your_language.sf
 'scripts/Extended tests/binomialmod.sf'
 'scripts/Extended tests/chebyshev_factorization_method.sf'
 'scripts/Extended tests/digits2num.pl'
+'scripts/Extended tests/inverse_of_multiplicative_functions.sf'
 'scripts/Extended tests/inverse_sigma.sf'
 'scripts/Extended tests/is_almost_prime.sf'
 'scripts/Extended tests/is_carmichael.sf'
@@ -209,6 +210,7 @@ scripts/extend_your_language.sf
 'scripts/Extended tests/prime_bounds.sf'
 'scripts/Extended tests/prime_count.sf'
 'scripts/Extended tests/prime_power_count.sf'
+'scripts/Extended tests/pseudoprimes.sf'
 'scripts/Extended tests/range_sum.sf'
 'scripts/Extended tests/sqrtmod.pl'
 'scripts/Extended tests/sumdigits.pl'
@@ -514,6 +516,7 @@ scripts/RosettaCode/nth.sf
 scripts/RosettaCode/nth_root.sf
 scripts/RosettaCode/orbital_elements.sf
 scripts/RosettaCode/orbital_elements_2.sf
+scripts/RosettaCode/orbital_elements_3.sf
 scripts/RosettaCode/order_disjoint_list_items.sf
 scripts/RosettaCode/ordered_partitions.sf
 scripts/RosettaCode/pangram_checker.sf
@@ -762,6 +765,7 @@ scripts/Tests/default_var_values.sf
 scripts/Tests/difference_of_powers_factorization.sf
 scripts/Tests/digits_and_sum_of_digits.sf
 scripts/Tests/divisor_functions.sf
+scripts/Tests/divisors_of_factorial_in_range_iterator.sf
 scripts/Tests/draw_grid_of_squares_multi.sf
 scripts/Tests/draw_grid_of_squares_multi_2.sf
 scripts/Tests/dump_cyclic_references.sf
@@ -865,6 +869,7 @@ scripts/Tests/man_or_boy.sf
 scripts/Tests/man_or_boy_2.sf
 scripts/Tests/man_or_boy_3.sf
 scripts/Tests/man_or_boy_cached.sf
+scripts/Tests/math_functions.sf
 scripts/Tests/matrix_class.sf
 scripts/Tests/matrix_determinant.sf
 scripts/Tests/matrix_multiplication.sf
@@ -952,6 +957,7 @@ scripts/Tests/prefix_colon_hash.sf
 scripts/Tests/prefix_methods.sf
 scripts/Tests/prefix_unary_operators.sf
 scripts/Tests/problem_of_apollonius.sf
+scripts/Tests/pseudoprimes.sf
 scripts/Tests/pythagorean_means.sf
 scripts/Tests/quadratic_integers.sf
 scripts/Tests/quadratic_nonresidue.sf
@@ -1145,8 +1151,7 @@ utils/test_parser.pl
 'utils/Web interface/css/main.css'
 'utils/Web interface/index.cgi'
 'utils/Web interface/index.fcgi'
-'utils/Web interface/js/jquery-2.1.3.min.js'
-'utils/Web interface/js/jquery.autosize.min.js'
+'utils/Web interface/js/jquery-3.6.0.min.js'
 'utils/Web interface/js/main.js'
 'utils/Web interface/js/tabby.js'
 SIGNATURE    Added here by Module::Build

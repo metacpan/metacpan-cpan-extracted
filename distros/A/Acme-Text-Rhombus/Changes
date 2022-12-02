@@ -1,5 +1,13 @@
 Revision history for Perl extension Acme::Text::Rhombus.
 
+0.22  2022-12-01  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+0.21_01  2022-11-27  <schubiger@cpan.org>
+
+ - Add rhombus_random().
+
 0.21  2022-04-18  <schubiger@cpan.org>
 
  - Merged development version to stable.

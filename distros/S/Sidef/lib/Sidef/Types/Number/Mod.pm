@@ -30,6 +30,14 @@ package Sidef::Types::Number::Mod {
 
         $n = $n->mod($m);
 
+        if (ref($n) eq 'Sidef::Types::Number::Polynomial' and ref($m) ne 'Sidef::Types::Number::Polynomial') {
+            return $n;
+        }
+
+        if (ref($n) eq 'Sidef::Types::Number::Fraction' and ref($m) ne 'Sidef::Types::Number::Fraction') {
+            return $n;
+        }
+
         if (ref($n) eq __PACKAGE__) {
             return $n;
         }
@@ -47,7 +55,9 @@ package Sidef::Types::Number::Mod {
 
     sub eval {
         my ($x, $v) = @_;
-        $x->{n}->eval($v)->mod($x->{m});
+
+        #$x->{n}->eval($v)->mod($x->{m});
+        __PACKAGE__->new($x->{n}->eval($v), $x->{m});
     }
 
     sub is_zero {
@@ -121,7 +131,15 @@ package Sidef::Types::Number::Mod {
         Sidef::Types::String::String->new($x->__stringify__);
     }
 
-    *dump = \&to_s;
+    sub dump {
+        my ($x) = @_;
+        Sidef::Types::String::String->new(join('', "Mod(", join(', ', $x->{n}->dump, $x->{m}->dump), ')'));
+    }
+
+    sub pretty {
+        my ($x) = @_;
+        Sidef::Types::String::String->new(join('', "Mod(", join(', ', $x->{n}->pretty, $x->{m}->pretty), ')'));
+    }
 
     sub div {
         my ($x, $y) = @_;
@@ -130,7 +148,9 @@ package Sidef::Types::Number::Mod {
             $y = __PACKAGE__->new($y, $x->{m});
         }
 
-        __PACKAGE__->new($x->{n}->mul($y->{n}->invmod($x->{m})), $x->{m});
+        $y = $y->{n} if (ref($y) eq __PACKAGE__);
+
+        __PACKAGE__->new($x->{n}->mul($y->invmod($x->{m})), $x->{m});
     }
 
     sub neg {
@@ -184,6 +204,11 @@ package Sidef::Types::Number::Mod {
     sub sqrt {
         my ($x) = @_;
         __PACKAGE__->new($x->{n}->sqrtmod($x->{m}), $x->{m});
+    }
+
+    sub sqr {
+        my ($x) = @_;
+        __PACKAGE__->new($x->{n}->sqr, $x->{m});
     }
 
     sub znorder {
@@ -275,7 +300,9 @@ package Sidef::Types::Number::Mod {
                     $y = __PACKAGE__->new($y, $x->{m});
                 }
 
-                $x->{n}->$method($y->{n});
+                $y = $y->{n} if (ref($y) eq __PACKAGE__);
+
+                $x->{n}->$method($y);
             };
         }
 
@@ -287,7 +314,9 @@ package Sidef::Types::Number::Mod {
                     $y = __PACKAGE__->new($y, $x->{m});
                 }
 
-                __PACKAGE__->new($x->{n}->$method($y->{n}), $x->{m});
+                $y = $y->{n} if (ref($y) eq __PACKAGE__);
+
+                __PACKAGE__->new($x->{n}->$method($y), $x->{m});
             };
         }
 

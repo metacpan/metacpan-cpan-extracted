@@ -1,8 +1,9 @@
 use strict;
 use warnings;
-package Games::Dice;
+use 5.010;
+package Games::Dice 0.046;
 # ABSTRACT: Perl module to simulate die rolls
-$Games::Dice::VERSION = '0.045';
+
 require Exporter;
 
 our @ISA = qw(Exporter);
@@ -14,100 +15,107 @@ our @EXPORT_OK = qw( roll roll_array);
 # So let's use something that's decent and pure perl
 use if $^O eq "MSWin32", 'Math::Random::MT::Perl' => qw(rand);
 
-sub roll ($) {
-    my($line, $dice_string, $sign, $offset, $sum, @throws, @result);
+sub _parse_spec {
+    my $line = shift;
+    return undef unless $line =~ m{
+                 ^                 # beginning of line
+                 (                 # dice string in $1
+                   (?<count>\d+)?  # optional count
+                   [dD]            # 'd' for dice
+                   (?<type>        # type of dice:
+                      \d+          # either one or more digits
+                    |              # or
+                      %            # a percent sign for d% = d100
+                    |              # pr
+                      F            # a F for a fudge dice
+                   )
+                 )
+                 (?:               # grouping-only parens
+                   (?<sign>[-+xX*/bB])  # a + - * / b(est) in $2
+                   (?<offset>\d+)  # an offset in $3
+                 )?                # both of those last are optional
+                 \s*               # possibly some trailing space (like \n)
+                 $
+              }x;    # whitespace allowed
 
-    $line = shift;
+    my %pr;
+    $pr{$_} = $+{$_} for keys %+;
+
+    $pr{sign}   ||= '';
+    $pr{offset} ||= 0;
+    $pr{count}  ||= 1;
+
+    $pr{sign} = lc $pr{sign};
+
+    return \%pr;
+
+}
+
+sub roll ($) {
+    my $line = shift;
+    my @result;
 
     return $line if $line =~ /\A[0-9]+\z/;
 
-    return undef unless $line =~ m{
-                 ^              # beginning of line
-                 (              # dice string in $1
-                   (?:\d+)?     # optional count
-                   [dD]         # 'd' for dice
-                   (?:          # type of dice:
-                      \d+       # either one or more digits
-                    |           # or
-                      %         # a percent sign for d% = d100
-                    |           # pr
-                      F         # a F for a fudge dice
-                   )
-                 )
-                 (?:            # grouping-only parens
-                   ([-+xX*/bB]) # a + - * / b(est) in $2
-                   (\d+)        # an offset in $3
-                 )?             # both of those last are optional
-                 \s*            # possibly some trailing space (like \n)
-                 $
-              }x;               # whitespace allowed
+    my $pr = _parse_spec($line);
+    return undef unless $pr;
 
-    $dice_string = $1;
-    $sign        = $2 || '';
-    $offset      = $3 || 0;
-
-    $sign        = lc $sign;
-
-    @throws = roll_array( $dice_string );
+    my @throws = _roll_dice($pr);
     return undef unless @throws;
 
-    if( $sign eq 'b' ) {
+    my ( $sign, $offset ) = @$pr{qw(sign offset)};
+
+    if ( $sign eq 'b' ) {
         $offset = 0       if $offset < 0;
         $offset = @throws if $offset > @throws;
 
-        @throws = sort { $b <=> $a } @throws;   # sort numerically, descending
-        @result = @throws[ 0 .. $offset-1 ];    # pick off the $offset first ones
-    } else {
+        @throws = sort { $b <=> $a } @throws;  # sort numerically, descending
+        @result = @throws[ 0 .. $offset - 1 ]; # pick off the $offset first ones
+    }
+    else {
         @result = @throws;
     }
 
-    $sum = 0;
+    my $sum = 0;
     $sum += $_ foreach @result;
-    $sum += $offset if  $sign eq '+';
-    $sum -= $offset if  $sign eq '-';
-    $sum *= $offset if ($sign eq '*' || $sign eq 'x');
+    $sum += $offset if $sign eq '+';
+    $sum -= $offset if $sign eq '-';
+    $sum *= $offset if ( $sign eq '*' || $sign eq 'x' );
     do { $sum /= $offset; $sum = int $sum; } if $sign eq '/';
 
     return $sum;
 }
 
-sub roll_array ($) {
-    my($line, $num, $type, @throws);
+sub _roll_dice {
+    my $pr = shift;
 
-    $line = shift;
+    my ($type,$num) = @$pr{qw(type count)};
 
-    return $line if $line =~ /\A[0-9]+\z/;
-
-    return undef unless $line =~ m{
-                 ^      # beginning of line
-                 (\d+)? # optional count in $1
-                 [dD]   # 'd' for dice
-                 (      # type of dice in $2:
-                    \d+ # either one or more digits
-                  |     # or
-                    %   # a percent sign for d% = d100
-                  |     # pr
-                    F   # a F for a fudge dice
-                 )
-              }x;       # whitespace allowed
-
-    $num    = $1 || 1;
-    $type   = $2;
-
-    my $throw = sub { int (rand $_[0]) + 1 };
+    my $throw = sub { int( rand $_[0] ) + 1 };
 
     if ( $type eq '%' ) {
         $type = 100;
-    } elsif ( $type eq 'F' ) {
+    }
+    elsif ( $type eq 'F' ) {
         $throw = sub { int( rand 3 ) - 1 };
     }
 
-    @throws = ();
-    for( 1 .. $num ) {
-        push @throws, $throw->($type);
+    my @throws;
+    for ( 1 .. $num ) {
+        push @throws, $throw->( $type );
     }
-
     return @throws;
+}
+
+sub roll_array ($) {
+    my $line = shift;
+
+    return $line if $line =~ /\A[0-9]+\z/;
+
+    my $pr = _parse_spec($line);
+    return unless $pr;
+
+    return _roll_dice($pr);
 }
 
 1;
@@ -122,7 +130,7 @@ Games::Dice - Perl module to simulate die rolls
 
 =head1 VERSION
 
-version 0.045
+version 0.046
 
 =head1 SYNOPSIS
 
@@ -173,6 +181,18 @@ anyone wishes to contribute a function along the lines of roll_feng_shui
 to become part of Games::Dice (or to support any other style of die
 rolling), you can contribute it to the author's address, listed below.
 
+=head1 PERL VERSION
+
+This module should work on any version of perl still receiving updates from
+the Perl 5 Porters.  This means it should work on any version of perl released
+in the last two to three years.  (That is, if the most recently released
+version is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 NAME
 
 =head1 AUTHORS
@@ -185,13 +205,13 @@ Philip Newton <pne@cpan.org>
 
 =item *
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <cpan@semiotic.systems>
 
 =back
 
 =head1 CONTRIBUTORS
 
-=for stopwords Mario Domgoergen Mark Allen
+=for stopwords Mario Domgoergen Mark Allen Ricardo Signes
 
 =over 4
 
@@ -202,6 +222,10 @@ Mario Domgoergen <mdom@taz.de>
 =item *
 
 Mark Allen <mrallen1@yahoo.com>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
 
 =back
 

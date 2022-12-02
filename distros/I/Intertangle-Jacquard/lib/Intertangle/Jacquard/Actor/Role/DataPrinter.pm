@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Intertangle::Jacquard::Actor::Role::DataPrinter;
 # ABSTRACT: Role to do Data::Printer things
-$Intertangle::Jacquard::Actor::Role::DataPrinter::VERSION = '0.001';
+$Intertangle::Jacquard::Actor::Role::DataPrinter::VERSION = '0.002';
 use Mu::Role;
 
 requires '_data_printer_internal';
@@ -39,7 +39,7 @@ Intertangle::Jacquard::Actor::Role::DataPrinter - Role to do Data::Printer thing
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 AUTHOR
 

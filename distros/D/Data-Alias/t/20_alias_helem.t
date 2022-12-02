@@ -1,9 +1,9 @@
 #!/usr/bin/perl -w
 
 use strict;
-use warnings qw(FATAL all);
+use warnings qw( FATAL all NONFATAL void );
 use lib 'lib';
-use Test::More tests => 38;
+use Test::More tests => 44;
 
 use Data::Alias;
 
@@ -28,6 +28,9 @@ is \$x{0}, \$x{2};
 alias { is \(local $x{0} = $x{1}), \$x{1}; is \$x{0}, \$x{1} };
 is \$x{0}, \$x{2};
 
+alias { is \(local $x{3} = $x{1}), \$x{1}; is \$x{3}, \$x{1} };
+ok !exists $x{3};
+
 is \alias($x{0} = undef), \undef;
 ok !exists $x{0};
 
@@ -36,9 +39,9 @@ ok exists $x{0};
 
 SKIP: {
 no warnings 'deprecated';
-skip "pseudo-hashes not supported anymore", 19 unless eval { [{1,1},1]->{1} };
+skip "pseudo-hashes not supported anymore", 22 unless eval { [{1,1},1]->{1} };
 
-our $y = [{0 => 1, 1 => 2, 2 => 3}];
+our $y = [{0 => 1, 1 => 2, 2 => 3, 3 => 4}];
 
 is \alias($y->{0} = $y->{1}), \$y->{1};
 is \$y->{0}, \$y->{1};
@@ -57,6 +60,9 @@ is \$y->{0}, \$y->{2};
 
 alias { is \(local $y->{0} = $y->{1}), \$y->{1}; is \$y->{0}, \$y->{1} };
 is \$y->{0}, \$y->{2};
+
+alias { is \(local $y->{3} = $y->{1}), \$y->{1}; is \$y->{3}, \$y->{1} };
+ok !exists $y->{3};
 
 is \alias($y->{0} = undef), \undef;
 ok !exists $y->{0};

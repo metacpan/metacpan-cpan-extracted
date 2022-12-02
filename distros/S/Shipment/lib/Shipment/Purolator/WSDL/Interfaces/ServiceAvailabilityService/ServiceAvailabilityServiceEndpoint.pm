@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDL::Interfaces::ServiceAvailabilityService::ServiceAvailabilityServiceEndpoint;
-$Shipment::Purolator::WSDL::Interfaces::ServiceAvailabilityService::ServiceAvailabilityServiceEndpoint::VERSION = '3.09';
+$Shipment::Purolator::WSDL::Interfaces::ServiceAvailabilityService::ServiceAvailabilityServiceEndpoint::VERSION = '3.10';
 use strict;
 use warnings;
 use Class::Std::Fast::Storable;
@@ -226,7 +226,7 @@ Shipment::Purolator::WSDL::Interfaces::ServiceAvailabilityService::ServiceAvaila
 
 =head1 VERSION
 
-version 3.09
+version 3.10
 
 =head1 SYNOPSIS
 

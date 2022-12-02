@@ -1,3 +1,11 @@
+
+1.21 (2022-12-02)
+    (nicomen) Add possibility to override key generator 
+              (Changes entry was wrong in previous upload, no way to replace package in PAUSE)
+
+1.20 (2022-12-02)
+    (nicomen) Add possibility to override key generator
+
 1.19 (2022-04-29)
     (nicomen) Adjust test to pass with Mojolicious > 9.23 also where gzip is default
 

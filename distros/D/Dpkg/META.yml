@@ -143,7 +143,7 @@ provides:
     version: '0.02'
   Dpkg::Gettext:
     file: lib/Dpkg/Gettext.pm
-    version: '2.00'
+    version: '2.01'
   Dpkg::IPC:
     file: lib/Dpkg/IPC.pm
     version: '1.02'
@@ -158,6 +158,24 @@ provides:
     version: '0.01'
   Dpkg::OpenPGP:
     file: lib/Dpkg/OpenPGP.pm
+    version: '0.01'
+  Dpkg::OpenPGP::Backend:
+    file: lib/Dpkg/OpenPGP/Backend.pm
+    version: '0.01'
+  Dpkg::OpenPGP::Backend::GnuPG:
+    file: lib/Dpkg/OpenPGP/Backend/GnuPG.pm
+    version: '0.01'
+  Dpkg::OpenPGP::Backend::SOP:
+    file: lib/Dpkg/OpenPGP/Backend/SOP.pm
+    version: '0.01'
+  Dpkg::OpenPGP::Backend::Sequoia:
+    file: lib/Dpkg/OpenPGP/Backend/Sequoia.pm
+    version: '0.01'
+  Dpkg::OpenPGP::ErrorCodes:
+    file: lib/Dpkg/OpenPGP/ErrorCodes.pm
+    version: '0.01'
+  Dpkg::OpenPGP::KeyHandle:
+    file: lib/Dpkg/OpenPGP/KeyHandle.pm
     version: '0.01'
   Dpkg::Package:
     file: lib/Dpkg/Package.pm
@@ -196,7 +214,7 @@ provides:
     version: '0.01'
   Dpkg::Source::Package:
     file: lib/Dpkg/Source/Package.pm
-    version: '2.01'
+    version: '2.02'
   Dpkg::Source::Package::V1:
     file: lib/Dpkg/Source/Package/V1.pm
     version: '0.01'
@@ -232,7 +250,7 @@ provides:
     version: '0.03'
   Dpkg::Vendor:
     file: lib/Dpkg/Vendor.pm
-    version: '1.01'
+    version: '1.02'
   Dpkg::Vendor::Debian:
     file: lib/Dpkg/Vendor/Debian.pm
     version: '0.01'
@@ -258,5 +276,5 @@ resources:
   homepage: https://wiki.debian.org/Teams/Dpkg
   license: http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
   repository: https://git.dpkg.org/git/dpkg/dpkg.git
-version: v1.21.9
+version: v1.21.10
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

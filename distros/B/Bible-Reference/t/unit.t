@@ -58,9 +58,9 @@ sub attributes_and_classes {
 
 sub bible_type {
     is( $obj->bible, 'Protestant', 'default bible() set ok');
-    is( $obj->bible('c'), 'Catholic', 'can set "Catholic" with bible("c")' );
+    is( $obj->bible('catholic'), 'Catholic', 'can set "Catholic" with bible("catholic")' );
     is( $obj->bible, 'Catholic', 'bible type set to "Catholic"');
-    is( $obj->bible('ogh'), 'Orthodox', 'can set "Orthodox" with bible("ogh")' );
+    is( $obj->bible('orthodox'), 'Orthodox', 'can set "Orthodox" with bible("orthodox")' );
     is( $obj->bible, 'Orthodox', 'bible type set to "Orthodox"');
 
     like(
@@ -185,10 +185,10 @@ sub books {
 
     $obj->bible('Orthodox');
     @books = $obj->books;
-    is( scalar @books, 83, 'Orthodox book count' );
+    is( scalar @books, 84, 'Orthodox book count' );
     is( $books[0], 'Genesis', 'Orthodox Genesis location' );
     is( $books[1], 'Exodus', 'Orthodox Exodus location' );
-    is( $books[-1], 'Revelation', 'Orthodox Revelation location' );
+    is( $books[65], 'Revelation', 'Orthodox Revelation location' );
 }
 
 sub expand_ranges {
@@ -757,9 +757,9 @@ sub set_bible_data {
 sub get_bible_structure {
     my $structure = $obj->get_bible_structure('Orthodox');
     is( ref($structure), 'ARRAY', 'get_bible_structure returns arrayref' );
-    is( scalar(@$structure), 83, 'get_bible_structure correct size' );
-    is( $structure->[25][0], '4 Maccabees', 'get_bible_structure name correct' );
-    is( scalar( @{ $structure->[23][1] } ), 15, 'get_bible_structure chapters correct' );
+    is( scalar(@$structure), 84, 'get_bible_structure correct size' );
+    is( $structure->[-3][0], '3 Maccabees', 'get_bible_structure name correct' );
+    is( scalar( @{ $structure->[-3][1] } ), 7, 'get_bible_structure chapters correct' );
 }
 
 sub identify_bible {
@@ -770,7 +770,7 @@ sub identify_bible {
     );
 
     is(
-        $obj->identify_bible( 'Gen', 'Lev', '3 Mac' ),
+        [ grep { $_->{name} eq 'Orthodox' } @{ $obj->identify_bible( 'Gen', 'Lev', '3 Mac' ) } ],
         [
             {
                 name  => 'Orthodox',

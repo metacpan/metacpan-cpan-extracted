@@ -2,7 +2,7 @@
 #
 #  Net::Server::SIG - Safer signals
 #
-#  Copyright (C) 2001-2017
+#  Copyright (C) 2001-2022
 #
 #    Paul Seamons <paul@seamons.com>
 #
@@ -133,7 +133,7 @@ to fix the unsafe problem.  If a process is blocking on select() any
 signal will short circuit the select.  Using this concept,
 Net::Server::SIG does the least work possible (changing one bit from 0
 to 1).  And depends upon the actual processing of the signals to take
-place immediately after the the select call via the "check_sigs"
+place immediately after the select call via the "check_sigs"
 function.  See the example shown above and also see the sigtest.pl
 script located in the examples directory of this distribution.
 
@@ -157,9 +157,9 @@ register_sig(SIG,'DEFAULT')
 
 =item C<check_sigs()>
 
-Checks to see if any registered signals have occured.  If so, it will
+Checks to see if any registered signals have occurred.  If so, it will
 play the registered code ref for that signal.  Return value is array
-containing any SIGNAL names that had occured.
+containing any SIGNAL names that had occurred.
 
 =item C<sig_is_registered($SIG)>
 

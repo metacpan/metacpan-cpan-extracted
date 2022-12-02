@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDL::Interfaces::EstimatingService::EstimatingServiceEndpoint;
-$Shipment::Purolator::WSDL::Interfaces::EstimatingService::EstimatingServiceEndpoint::VERSION = '3.09';
+$Shipment::Purolator::WSDL::Interfaces::EstimatingService::EstimatingServiceEndpoint::VERSION = '3.10';
 use strict;
 use warnings;
 use Class::Std::Fast::Storable;
@@ -176,7 +176,7 @@ Shipment::Purolator::WSDL::Interfaces::EstimatingService::EstimatingServiceEndpo
 
 =head1 VERSION
 
-version 3.09
+version 3.10
 
 =head1 SYNOPSIS
 

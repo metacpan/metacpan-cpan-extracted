@@ -21,7 +21,7 @@ use Plack::Util::Accessor qw/ default_rate rules cache file _match greylist retr
 use Ref::Util             qw/ is_plain_arrayref /;
 use Time::Seconds         qw/ ONE_MINUTE /;
 
-our $VERSION = 'v0.2.2';
+our $VERSION = 'v0.3.0';
 
 
 sub prepare_app {
@@ -120,7 +120,8 @@ sub call {
 
         if ($limit) {
 
-            my $msg = "Rate limiting ${ip} after ${limit}/${rate}";
+            my $block = $name || "default";
+            my $msg = "Rate limiting ${ip} after ${limit}/${rate} for ${block}";
 
             if ( my $log = $env->{'psgix.logger'} ) {
                 $log->( { message => $msg, level => 'warn' } );
@@ -167,7 +168,7 @@ Plack::Middleware::Greylist - throttle requests with different rates based on ne
 
 =head1 VERSION
 
-version v0.2.2
+version v0.3.0
 
 =head1 SYNOPSIS
 
@@ -191,7 +192,21 @@ This middleware will apply rate limiting to requests, depending on the requestor
 
 Hosts that exceed their configured per-minute request limit will be rejected with HTTP 429 errors.
 
-Rejections will be logged, which will allow you to use something like L<fail2ban> to block repeat offenders, since bad
+=head2 Log Messages
+
+Rejections will be logged with a message of the form
+
+    Rate limiting $ip after $hits/$rate for $netblock
+
+for example,
+
+    Rate limiting 172.16.0.10 after 225/250 for 172.16.0.0/24
+
+Note that the C<$netblock> for the default rate is simply "default", e.g.
+
+    Rate limiting 192.168.0.12 after 101/100 for default
+
+This will allow you to use something like L<fail2ban> to block repeat offenders, since bad
 robots are like houseflies that repeatedly bump against closed windows.
 
 =head1 ATTRIBUTES

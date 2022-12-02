@@ -1,0 +1,33 @@
+namespace kiwi {
+	/* Implement reference counting for kiwi::Variable */
+	int* get_refcount( kiwi::Variable* obj ) {
+		return &( obj->m_data->m_refcount );
+	}
+
+	void refcnt_inc( kiwi::Variable* obj ) {
+		++(* kiwi::get_refcount( obj ) );
+	}
+	void refcnt_dec( kiwi::Variable* obj ) {
+		--(* kiwi::get_refcount( obj ) );
+	}
+	std::uint32_t refcnt_get( kiwi::Variable* obj ) {
+		return * kiwi::get_refcount( obj );
+	}
+}
+
+namespace kiwi {
+	/* Implement reference counting for kiwi::Constraint */
+	int* get_refcount( kiwi::Constraint* obj ) {
+		return &( obj->m_data->m_refcount );
+	}
+
+	void refcnt_inc( kiwi::Constraint* obj ) {
+		++(* kiwi::get_refcount( obj ) );
+	}
+	void refcnt_dec( kiwi::Constraint* obj ) {
+		--(* kiwi::get_refcount( obj ) );
+	}
+	std::uint32_t refcnt_get( kiwi::Constraint* obj ) {
+		return * kiwi::get_refcount( obj );
+	}
+}

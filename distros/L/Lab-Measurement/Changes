@@ -4,6 +4,9 @@ History for the Lab-Measurement Perl distribution
 This document is work in progress (in the sense of adding
 historical information).
 
+3.831 2022-11-30
+  * Nanonis Tramea: Add more functionality
+
 3.830 2022-11-08
   * Nanonis Tramea: Fix timing issues, speed up a lot
   * R&S RTB2000 oscilloscope and Keysight 33500 AWG: initial driver stubs

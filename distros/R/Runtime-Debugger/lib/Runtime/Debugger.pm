@@ -30,12 +30,12 @@ use feature         qw( say state );
 use parent          qw( Exporter );
 use subs            qw( p uniq );
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 our @EXPORT  = qw( run p );
 
 =head1 NAME
 
-Runtime::Debugger - Easy to use REPL with existing lexical support.
+Runtime::Debugger - Easy to use REPL with existing lexical support and DWIM tab completion.
 
 (emphasis on "existing" since I have not yet found this support in other modules).
 
@@ -152,7 +152,7 @@ wherever you need it.
 
 =head2 Tab Completion
 
-This module has rich tab completion support:
+This module has rich, DWIM tab completion support:
 
  - Press TAB with no input to view commands and available variables in the current scope.
  - Press TAB after an arrow ("->") to auto append either a "{" or "[" or "(".
@@ -163,7 +163,6 @@ This module has rich tab completion support:
 =head2 History
 
 All commands run in the debugger are saved locally and loaded next time the module is loaded.
-
 
 =head2 Data::Dumper
 
@@ -226,14 +225,11 @@ sub _init {
     my $attribs = $term->Attribs;
     $term->ornaments( 0 );    # Remove underline from terminal.
 
-    # Removed these as break chars so that we can complete:
-    # "$scalar", "@array", "%hash" ("%" was already not in the list).
-    #
-    # Removed ">" to be able to complete for method calls: "$obj->$method"
-    #
-    # TODO: After testing is setup, try removing ">$@".
+    # Treat '$my->[' as one word.
     $attribs->{completer_word_break_characters} =~ s/ [>] //xg;
-    $attribs->{completer_word_break_characters} .= '[';    # $my->[
+    $attribs->{completer_word_break_characters} .= '[';
+
+    # Be able to complete: '$scalar', '@array', '%hash'.
     $attribs->{special_prefixes} = '$@%&';
 
     # Build the debugger object.
@@ -244,9 +240,8 @@ sub _init {
         debug        => $ENV{RUNTIME_DEBUGGER_DEBUG} // 0,
     }, $class;
 
-   # https://metacpan.org/pod/Term::ReadLine::Gnu#Custom-Completion
-   # Definition for list_completion_function is here: Term/ReadLine/Gnu/XS.pm
-   # $attribs->{completion_entry_function} = sub { $self->_complete_OLD( @_ ) };
+    # https://metacpan.org/pod/Term::ReadLine::Gnu#Custom-Completion
+    # Definition for list_completion_function is here: Term/ReadLine/Gnu/XS.pm
     $attribs->{attempted_completion_function} = sub { $self->_complete( @_ ) };
 
     $self->_restore_history;
@@ -391,8 +386,6 @@ sub _complete_arrow {
             push @$methods, "{" if reftype( $obj_or_coderef ) eq "HASH";
             push @$methods, @{ $self->{vars_string} };
             @$methods = uniq sort @$methods;
-
-            # push @$methods, $self->{vars_all}; # TODO: Add scalars.
         }
         say "methods: @$methods" if $self->debug;
 
@@ -446,17 +439,11 @@ sub _get_object_functions {
     my @functions = grep {
         !/ ^
         (?:
-              BEGIN
-            | UNITCHECK
-            | INIT
-            | CHECK
-            | END
-            | import
-            | AUTOLOAD
-            | DESTROY
+            import
         )
         $ /x
       }
+      grep { not / ^ [A-Z_]+ $ /x }    # Skip special functions.
       sort
       keys %{"${class}::"};
 
@@ -796,18 +783,21 @@ Can show more:
 
 sub hist {
     my ( $self, $levels ) = @_;
+    my @history_raw = $self->_history;
+    return if not @history_raw;
+
+    my @history =
+      map {
+        sprintf "%s %s",
+          colored( $_ + 1,           "YELLOW" ),
+          colored( $history_raw[$_], "GREEN" );
+      } ( 0 .. $#history_raw );
+
+    # Show a limited amount of items from history.
     $levels //= 20;
-    my @history = $self->_history;
+    @history = splice @history, -$levels if $levels < @history;
 
-    if ( @history and $levels < @history ) {
-        @history = splice @history, -$levels;
-    }
-
-    for my $index ( 0 .. $#history ) {
-        printf "%s %s\n",
-          colored( $index + 1,       "YELLOW" ),
-          colored( $history[$index], "GREEN" );
-    }
+    say for @history;
 }
 
 sub _history {
@@ -891,9 +881,10 @@ sub p {
 
     my $d = Data::Dumper
       ->new( \@_ )
+      ->Indent( 1 )
       ->Sortkeys( 1 )
       ->Terse( 1 )
-      ->Indent( 1 )
+      ->Useqq( 1 )
       ->Maxdepth( $maxdepth );
 
     return $d->Dump if wantarray;

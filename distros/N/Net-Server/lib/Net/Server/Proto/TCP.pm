@@ -2,7 +2,7 @@
 #
 #  Net::Server::Proto::TCP - Net::Server Protocol module
 #
-#  Copyright (C) 2001-2017
+#  Copyright (C) 2001-2022
 #
 #    Paul Seamons <paul@seamons.com>
 #
@@ -22,7 +22,7 @@ use warnings;
 use IO::Socket::INET;
 use Net::Server::Proto;
 
-our @ISA = qw(IO::Socket::INET); # we may dynamically change this to INET6 based upon our server configuration
+our @ISA = qw(IO::Socket::INET); # we may dynamically change this to a v6 compatible class based upon our server configuration
 
 sub NS_proto { 'TCP' }
 sub NS_port   { my $sock = shift; ${*$sock}{'NS_port'}   = shift if @_; return ${*$sock}{'NS_port'}   }
@@ -34,7 +34,8 @@ sub object {
     my ($class, $info, $server) = @_;
 
     # we cannot do this at compile time because we have not yet read the configuration then
-    @ISA = qw(IO::Socket::INET6) if $ISA[0] eq 'IO::Socket::INET' && Net::Server::Proto->requires_ipv6($server);
+    $ISA[0] = Net::Server::Proto->ipv6_package($server)
+        if $ISA[0] eq 'IO::Socket::INET' && Net::Server::Proto->requires_ipv6($server);
 
     my @sock = $class->SUPER::new();
     foreach my $sock (@sock) {
@@ -60,6 +61,7 @@ sub connect {
     my $port = $sock->NS_port;
     my $ipv  = $sock->NS_ipv;
     my $lstn = $sock->NS_listen;
+    my $isa_v6 = Net::Server::Proto->requires_ipv6($server) ? $sock->isa(Net::Server::Proto->ipv6_package($server)) : undef;
 
     $sock->SUPER::configure({
         LocalPort => $port,
@@ -68,7 +70,7 @@ sub connect {
         ReuseAddr => 1,
         Reuse     => 1,
         (($host ne '*') ? (LocalAddr => $host) : ()), # * is all
-        ($sock->isa("IO::Socket::INET6") ? (Domain => ($ipv eq '6') ? Socket6::AF_INET6() : ($ipv eq '4') ? Socket::AF_INET() : Socket::AF_UNSPEC()) : ()),
+        ($isa_v6 ? (Domain => ($ipv eq '6') ? Socket6::AF_INET6() : ($ipv eq '4') ? Socket::AF_INET() : Socket::AF_UNSPEC()) : ()),
     }) || $server->fatal("Can't connect to TCP port $port on $host [$!]");
 
     if ($port eq '0' and $port = $sock->sockport) {
@@ -87,7 +89,8 @@ sub reconnect { # after a sig HUP
     $server->log(3,"Reassociating file descriptor $fd with ".$sock->NS_proto." on [".$sock->NS_host."]:".$sock->NS_port.", using IPv".$sock->NS_ipv);
     $sock->fdopen($fd, 'w') or $server->fatal("Error opening to file descriptor ($fd) [$!]");
 
-    if ($sock->isa("IO::Socket::INET6")) {
+    my $isa_v6 = Net::Server::Proto->requires_ipv6($server) ? $sock->isa(Net::Server::Proto->ipv6_package($server)) : undef;
+    if ($isa_v6) {
         my $ipv = $sock->NS_ipv;
         ${*$sock}{'io_socket_domain'} = ($ipv eq '6') ? Socket6::AF_INET6() : ($ipv eq '4') ? Socket::AF_INET() : Socket::AF_UNSPEC();
     }
@@ -184,7 +187,7 @@ See L<Net::Server> for more information on reading arguments.
 =item C<object>
 
 Returns an object with parameters suitable for eventual creation of
-a IO::Socket::INET object listining on UDP.
+a IO::Socket::INET object listening on UDP.
 
 =item C<log_connect>
 

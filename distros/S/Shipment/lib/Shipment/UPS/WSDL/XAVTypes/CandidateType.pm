@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::XAVTypes::CandidateType;
-$Shipment::UPS::WSDL::XAVTypes::CandidateType::VERSION = '3.09';
+$Shipment::UPS::WSDL::XAVTypes::CandidateType::VERSION = '3.10';
 use strict;
 use warnings;
 
@@ -67,7 +67,7 @@ Shipment::UPS::WSDL::XAVTypes::CandidateType
 
 =head1 VERSION
 
-version 3.09
+version 3.10
 
 =head1 DESCRIPTION
 

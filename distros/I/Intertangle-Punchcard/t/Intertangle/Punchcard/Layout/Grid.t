@@ -71,8 +71,8 @@ subtest "Test grid constraints" => fun() {
 	for my $constraint (@$constraints) {
 		$solver->add_constraint($constraint);
 	}
-	$solver->add_edit_variable($items->[0][0]{x}, Intertangle::API::Kiwisolver::Strength::STRONG );
-	$solver->add_edit_variable($items->[0][0]{y}, Intertangle::API::Kiwisolver::Strength::STRONG );
+	$solver->add_edit_variable($items->[0][0]{x}, Graphics::Layout::Kiwisolver::Strength::STRONG );
+	$solver->add_edit_variable($items->[0][0]{y}, Graphics::Layout::Kiwisolver::Strength::STRONG );
 	$solver->suggest_value($items->[0][0]{x}, 0);
 	$solver->suggest_value($items->[0][0]{y}, 0);
 	$solver->update;

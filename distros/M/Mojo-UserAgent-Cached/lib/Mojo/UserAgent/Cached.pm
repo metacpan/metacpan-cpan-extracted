@@ -26,7 +26,7 @@ use Time::HiRes qw/time/;
 Readonly my $HTTP_OK => 200;
 Readonly my $HTTP_FILE_NOT_FOUND => 404;
 
-our $VERSION = '1.19';
+our $VERSION = '1.21';
 
 # TODO: Timeout, fallback
 # TODO: Expected result content (json etc)
@@ -56,6 +56,7 @@ has 'cache_agent'        => sub {
 };
 has 'cache_opts'                 => sub { {} };
 has 'cache_url_opts'             => sub { {} };
+has 'key_generator'              => sub { \&key_generator_cb; };
 has 'logger'                     => sub { Mojo::Log->new() };
 has 'access_log'                 => sub { $ENV{MUAC_ACCESS_LOG} || '' };
 has 'use_expired_cached_content' => sub { $ENV{MUAC_USE_EXPIRED_CACHED_CONTENT} // 1 };
@@ -155,7 +156,7 @@ sub start {
   my $method  = $tx->req->method;
   my $headers = $tx->req->headers->to_hash(1);
   my $content = $tx->req->content->asset->slurp;
-  $url = $self->sort_query($url) if $self->sorted_queries;
+  $tx->req->url($self->sort_query($url));
 
   delete $headers->{'User-Agent'};
   delete $headers->{'Accept-Encoding'};
@@ -283,9 +284,9 @@ sub _cache_url_opts {
 }
 
 sub set {
-    my ($self, $url, $value) = @_;
+    my ($self, $url, $value, @opts) = @_;
 
-    my $key = $self->generate_key($url);
+    my $key = $self->generate_key($url, @opts);
     $self->logger->debug("Illegal cache key: $key") && return if ref $key;
 
     my $fake_tx = _build_fake_tx({
@@ -318,7 +319,11 @@ sub is_cacheable {
 sub generate_key {
     my ($self, $url, @opts) = @_;
 
-    my $cb = ref $opts[-1] eq 'CODE' ? pop @opts : undef;
+    return $self->key_generator->($self, $url, @opts);
+}
+
+sub key_generator_cb {
+    my ($self, $url, @opts) = @_;
 
     my $key = join q{,}, $self->sort_query($url), (@opts ? to_json(@opts > 1 ? \@opts : $opts[0]) : ());
 
@@ -340,6 +345,8 @@ sub is_considered_error {
 
 sub sort_query {
     my ($self, $url) = @_;
+    return $url unless $self->sorted_queries;
+
     $url = Mojo::URL->new($url);
 
     my $flattened_sorted_url = ($url->protocol ? ( $url->protocol . '://' ) : '' ) .
@@ -349,7 +356,7 @@ sub sort_query {
     $flattened_sorted_url .= '?' . join '&', sort { $a cmp $b } List::Util::pairmap { (($b ne '') ? (join '=', $a, $b) : $a); } @{ $url->query }
         if scalar @{ $url->query };
 
-    return $flattened_sorted_url;
+    return Mojo::URL->new($flattened_sorted_url);
 }
 
 sub _serialize_tx {
@@ -594,6 +601,10 @@ Allows passing in cache options that will be appended to existing options in def
    
 Accepts a hash ref of regexp strings and expire times, this allows you to define cache validity time for individual URLs, hosts etc.
 The first match will be used.
+
+=head2 key_generator
+
+A callback method to generate keys. The method gets ($self, $url, @opts) passed as parameters. The default is set to C<key_generator_cb>
 
 =head2 logger
 

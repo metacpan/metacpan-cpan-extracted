@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Intertangle::Jacquard::Actor::Role::Layoutable;
 # ABSTRACT: A role for actors that can layout their children
-$Intertangle::Jacquard::Actor::Role::Layoutable::VERSION = '0.001';
+$Intertangle::Jacquard::Actor::Role::Layoutable::VERSION = '0.002';
 use Moo::Role;
 
 with qw(Intertangle::Jacquard::Actor::Role::Tree::TreeDAGNode::WithChildren);
@@ -33,7 +33,7 @@ Intertangle::Jacquard::Actor::Role::Layoutable - A role for actors that can layo
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 CONSUMES
 

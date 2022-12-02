@@ -13,3 +13,18 @@ simple:
       - ~
       - 'List Item 1: #{test}'
       - 'List Item 2: #{test}'
+
+nested:
+  users:
+    -
+      name: 'Ivan'
+      surname: 'Petrov'
+    -
+      name: 'Sergey'
+      surname: 'Ivanov'
+
+  users_with_params:
+    -
+      username: 'Ivan Petrov \##{user_id}'
+    -
+      username: 'Sergey Ivanov \##{user_id}'

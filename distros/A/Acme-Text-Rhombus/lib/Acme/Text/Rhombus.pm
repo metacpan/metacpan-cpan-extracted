@@ -10,8 +10,8 @@ use constant FORWARD => 1;
 our ($VERSION, @EXPORT_OK, %EXPORT_TAGS);
 my @subs;
 
-$VERSION = '0.21';
-@subs = qw(rhombus rhombus_letter rhombus_digit);
+$VERSION = '0.22';
+@subs = qw(rhombus rhombus_letter rhombus_digit rhombus_random);
 @EXPORT_OK = @subs;
 %EXPORT_TAGS = ('all' => [ @subs ]);
 
@@ -27,13 +27,16 @@ sub _draw_rhombus
 {
     my ($mode, $lines, $char, $case, $fillup, $forward) = @_;
 
-    my ($is_letter, $is_digit) = ($mode eq 'letter', $mode eq 'digit');
+    my ($is_letter, $is_digit, $is_random) = ($mode eq 'letter', $mode eq 'digit', $mode eq 'random');
 
     my %alter = (
         lower => sub { lc $_[0] },
         upper => sub { uc $_[0] },
     );
     $char = $alter{$case}->($char) if $is_letter;
+
+    my @chars = map chr, (48..57, 65..90, 97..122);
+    $char = $chars[int(rand(@chars))] unless defined $char;
 
     $lines++ if $lines % 2 == 0;
 
@@ -54,6 +57,9 @@ sub _draw_rhombus
         }
         elsif ($is_digit) {
             $char = $forward ? $char + 1 : $char - 1;
+        }
+        elsif ($is_random) {
+            $char = $chars[int(rand(@chars))];
         }
 
         if ($is_letter && $char !~ /[a-zA-Z]/) {
@@ -92,6 +98,16 @@ sub rhombus_digit
     my $forward = $get_opt->(\%opts, 'forward', qr/^[01]$/, FORWARD);
 
     return _draw_rhombus('digit', $lines, $digit, undef, $fillup, $forward);
+}
+
+sub rhombus_random
+{
+    my %opts = @_;
+
+    my $lines  = $get_opt->(\%opts, 'lines',  qr/^\d+$/, LINES);
+    my $fillup = $get_opt->(\%opts, 'fillup', qr/^\S$/,  FILLUP);
+
+    return _draw_rhombus('random', $lines, undef, undef, $fillup, undef);
 }
 
 1;
@@ -202,11 +218,36 @@ Forward digit enumeration. Defaults to boolean C<1>.
 
 =back
 
+=head2 rhombus_random
+
+Draws a rhombus with random letters/digits and returns it as a string.
+
+If no option value is supplied or if it is invalid, then a default
+will be silently assumed (omitting all options will return a rhombus
+of 25 lines).
+
+Given that the specified number of lines is even, it will be
+incremented to satisfy the requirement of being an odd number.
+
+Options:
+
+=over 4
+
+=item * C<lines>
+
+Number of lines to be printed. Defaults to 25.
+
+=item * C<fillup>
+
+The fillup character. Defaults to C<+>.
+
+=back
+
 =head1 EXPORT
 
 =head2 Functions
 
-C<rhombus(), rhombus_letter(), rhombus_digit()> are exportable.
+C<rhombus(), rhombus_letter(), rhombus_digit(), rhombus_random()> are exportable.
 
 =head2 Tags
 

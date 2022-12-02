@@ -39,8 +39,8 @@ data/test.fasta
 data/test.fastq
 data/test2.fastq
 dist.ini
-lib/FASTX/PE.pm
 lib/FASTX/Reader.pm
+lib/FASTX/ReaderPaired.pm
 lib/FASTX/ScriptHelper.pm
 lib/FASTX/Seq.pm
 scripts/Benchmark.pl
@@ -88,6 +88,7 @@ t/40_two_fastas.t
 t/40_two_files.t
 t/51_basic_seq.t
 t/52_methods_seq.t
+t/53_with_fastxseq.t
 t/release-00-pod.t
 t/release-01-pod-coverage.t
 t/release-03-minimum-standards.t

@@ -3,9 +3,9 @@ use warnings;
 use FindBin qw($RealBin);
 use Test::More;
 use FASTX::Reader;
-use FASTX::PE;
+use FASTX::ReaderPaired;
 
-# TEST: Manually compare the reverse complement of R2 with the one produced by FASTX::PE
+# TEST: Manually compare the reverse complement of R2 with the one produced by FASTX::ReaderPaired
 
 my $seqfile1 = "$RealBin/../data/illumina_1.fq.gz";
 my $seqfile2 = "$RealBin/../data/illumina_2.fq.gz";
@@ -23,7 +23,7 @@ my $R2   = FASTX::Reader->new({
 });
 my $revseq = $R2->getRead();
 
-my $data = FASTX::PE->new({ 
+my $data = FASTX::ReaderPaired->new({ 
     filename => "$seqfile1",
     rev      => "$seqfile2",
     revcompl => 1,

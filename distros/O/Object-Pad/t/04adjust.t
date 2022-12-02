@@ -11,25 +11,57 @@ use Object::Pad ':experimental(adjust_params)';
    my %captured;
 
    class WithAdjustParams {
-      ADJUST :params ( :$x, :$y = "default Y" )
+      ADJUST :params ( :$req, :$opt = "default opt" )
       {
-         $captured{x} = $x;
-         $captured{y} = $y;
+         $captured{req} = $req;
+         $captured{opt} = $opt;
       }
    }
 
    undef %captured;
-   WithAdjustParams->new( x => "the X", y => "the Y" );
-   is_deeply( \%captured, { x => "the X", y => "the Y" }, 'ADJUST :params saw x and y' );
+   WithAdjustParams->new( req => "the req", opt => "the opt" );
+   is_deeply( \%captured, { req => "the req", opt => "the opt" }, 'ADJUST :params saw req and opt' );
 
    undef %captured;
-   WithAdjustParams->new( x => "the X" );
-   is_deeply( \%captured, { x => "the X", y => "default Y" }, 'ADJUST :params saw x and default y' );
+   WithAdjustParams->new( req => "the req" );
+   is_deeply( \%captured, { req => "the req", opt => "default opt" }, 'ADJUST :params saw req and default opt' );
 
    my $LINE = __LINE__+1;
    ok( !defined eval { WithAdjustParams->new(); 1 }, 'Missing required parameter throws exception' );
-   like( $@, qr/^Required parameter 'x' is missing for WithAdjustParams constructor at \S+ line $LINE\./,
+   like( $@, qr/^Required parameter 'req' is missing for WithAdjustParams constructor at \S+ line $LINE\./,
       'Exception thrown from constructor with missing parameter' );
+}
+
+{
+   my %captured;
+
+   class WithAdjustParamsDefaults {
+      ADJUST :params ( :$x = "default X", :$y //= "default Y", :$z ||= "default Z" )
+      {
+         $captured{x} = $x;
+         $captured{y} = $y;
+         $captured{z} = $z;
+      }
+   }
+
+   undef %captured;
+   WithAdjustParamsDefaults->new( x => "the X", y => "the Y", z => "the Z" );
+   is_deeply( \%captured, { x => "the X", y => "the Y", z => "the Z" }, 'ADJUST :params saw passed values' );
+
+   undef %captured;
+   WithAdjustParamsDefaults->new();
+   is_deeply( \%captured, { x => "default X", y => "default Y", z => "default Z" },
+      'ADJUST :params saw defaults when absent' );
+
+   undef %captured;
+   WithAdjustParamsDefaults->new( x => undef, y => undef, z => undef );
+   is_deeply( \%captured, { x => undef, y => "default Y", z => "default Z" },
+      'ADJUST :params saw x undef but y z defaults when undef' );
+
+   undef %captured;
+   WithAdjustParamsDefaults->new( x => "", y => "", z => "" );
+   is_deeply( \%captured, { x => "", y => "", z => "default Z" },
+      'ADJUST :params saw x y "" but z defaults when ""' );
 }
 
 {

@@ -2,7 +2,7 @@
 #
 #  Net::Server::INET - Net::Server personality
 #
-#  Copyright (C) 2001-2017
+#  Copyright (C) 2001-2022
 #
 #    Paul Seamons <paul@seamons.com>
 #

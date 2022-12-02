@@ -2,12 +2,13 @@ package Locale::Babelfish;
 
 # ABSTRACT: Perl I18n using https://github.com/nodeca/babelfish format.
 
-our $VERSION = '2.005'; # VERSION
+our $VERSION = '2.10'; # VERSION
 
 
 use utf8;
 use strict;
 use warnings;
+use Data::Dumper;
 
 use Carp qw/ confess /;
 use File::Find qw( find );
@@ -172,6 +173,7 @@ sub t_or_undef {
 
         return $r->( $flat_params );
     }
+
     return $r;
 }
 
@@ -349,9 +351,13 @@ sub _process_list_items {
 
     my @compiled_items;
     for my $item ( @{ $r } ) {
-        if ( defined $item ) {
+        if ( ref $item eq 'HASH' ) {
+            push @compiled_items, _process_nested_hash_item( $item, $locale );
+        }
+        elsif ( ref $item ne 'HASH' && defined $item ) {
             push @compiled_items, $compiler->compile( $parser->parse( $item, $locale ) );
-        } else {
+        }
+        else {
             push @compiled_items, $item;
         }
     }
@@ -360,15 +366,36 @@ sub _process_list_items {
         my $results = [];
 
         for my $item ( @compiled_items )  {
-            if (ref( $item ) eq 'CODE' ) {
+            if ( ref( $item ) eq 'CODE' ) {
                 push @{ $results }, $item->(@_);
-            } else {
+            }
+            # Нужно скомпилить значения в хэшрефе
+            elsif ( ref( $item ) eq 'HASH' ) {
+                while ( my ( $key, $value ) = each ( %$item ) ) {
+                    if ( ref ($value) eq 'CODE' ) {
+                        $item->{$key}  = $value->(@_);
+                    }
+                }
+                push @{ $results }, $item;
+            }
+            else {
                 push @{ $results }, $item;
             }
         }
 
         return $results;
     };
+}
+
+sub _process_nested_hash_item {
+    my ( $hashref, $locale ) = @_;
+
+    while ( my ( $key, $value ) = each ( %$hashref ) ) {
+        my $compiled_value = $compiler->compile( $parser->parse( $value, $locale ) );
+        $hashref->{$key}   = $compiled_value;
+    }
+
+    return $hashref;
 }
 
 
@@ -386,7 +413,7 @@ Locale::Babelfish - Perl I18n using https://github.com/nodeca/babelfish format.
 
 =head1 VERSION
 
-version 2.005
+version 2.10
 
 =head1 DESCRIPTION
 
@@ -494,7 +521,7 @@ $self->{dictionaries}->{ru_RU}->{dictname_key}...
 
 Если просто строка, то возвращаем её as is.
 
-Поддерживается обция watch.
+Поддерживается опция watch.
 
 =head1 METHODS
 
@@ -594,9 +621,10 @@ $params - хэш параметров
 
 =item _process_list_items
 
-    _process_list_items( $dictinary_values);
+    _process_list_items( $dictionary_values);
 
-Обрабатывает ключи словарей содержащие списки, и оборачивает в фунцию для компиляции списка
+Обрабатывает ключи словарей содержащие списки, и оборачивает в функцию для компиляции списка.
+Поддерживаются вложенные в список плоские хэшрефы
 
 =back
 
@@ -623,6 +651,10 @@ REG.RU LLC
 =item *
 
 Kirill Sysoev <k.sysoev@me.com>
+
+=item *
+
+Alexandr Tkach <tkach@reg.ru>
 
 =back
 

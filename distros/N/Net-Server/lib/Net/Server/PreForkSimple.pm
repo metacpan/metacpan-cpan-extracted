@@ -2,7 +2,7 @@
 #
 #  Net::Server::PreForkSimple - Net::Server personality
 #
-#  Copyright (C) 2001-2017
+#  Copyright (C) 2001-2022
 #
 #    Paul Seamons <paul@seamons.com>
 #
@@ -146,6 +146,7 @@ sub run_n_children {
 
         if ($pid) {
             $prop->{'children'}->{$pid}->{'status'} = 'processing';
+            $self->register_child($pid, 'preforksimple');
         } else {
             $self->run_child;
         }
@@ -435,16 +436,16 @@ specified in I<lock_file> (see below).  The semaphore option uses
 IPC::Semaphore (thanks to Bennett Todd) for giving some sample code.
 The pipe option reads on a pipe to choose the next.  the flock option
 should be the most bulletproof while the pipe option should be the
-most portable.  (Flock is able to reliquish the block if the process
+most portable.  (Flock is able to relinquish the block if the process
 dies between accept on the socket and reading of the client connection
 - semaphore and pipe do not).  An option of none will not perform
 any serialization.  If "none" is passed and there are multiple ports
-then a the default serialization will be used insted of "none."
+then a the default serialization will be used instead of "none."
 
 =item lock_file
 
 Filename to use in flock serialized accept in order to serialize the
-accept sequece between the children.  This will default to a generated
+accept sequence between the children.  This will default to a generated
 temporary filename.  If default value is used the lock_file will be
 removed when the server closes.
 
@@ -513,7 +514,7 @@ value pairs.  Comments and white space are ignored.
 
 Process flow follows Net::Server until the loop phase.  At this point
 C<max_servers> are forked and wait for connections.  When a child
-accepts a connection, finishs processing a client, or exits, it relays
+accepts a connection, finishes processing a client, or exits, it relays
 that information to the parent, which keeps track and makes sure there
 are always C<max_servers> running.
 
@@ -528,14 +529,14 @@ hooks provided by the Net::Server base class.  See L<Net::Server>
 
 This hook occurs at the top of run_n_children which is called each
 time the server goes to start more child processes.  This gives the
-parent to do a little of its own accountting (as desired).  Idea for
+parent to do a little of its own accounting (as desired).  Idea for
 this hook came from James FitzGibbon.
 
 =item C<$self-E<gt>child_init_hook()>
 
-This hook takes place immeditately after the child process forks from
+This hook takes place immediately after the child process forks from
 the parent and before the child begins accepting connections.  It is
-intended for any addiotional chrooting or other security measures.  It
+intended for any additional chrooting or other security measures.  It
 is suggested that all perl modules be used by this point, so that the
 most shared memory possible is used.
 

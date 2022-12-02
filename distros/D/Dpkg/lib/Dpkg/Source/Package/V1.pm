@@ -36,7 +36,6 @@ use Dpkg::Source::Patch;
 use Dpkg::Exit qw(push_exit_handler pop_exit_handler);
 use Dpkg::Source::Functions qw(erasedir);
 use Dpkg::Source::Package::V3::Native;
-use Dpkg::OpenPGP;
 
 use parent qw(Dpkg::Source::Package);
 
@@ -166,8 +165,6 @@ sub do_extract {
 	         $sourcestyle);
     }
 
-    my $dscdir = $self->{basedir};
-
     my $basename = $self->get_basename();
     my $basenamerev = $self->get_basename(1);
 
@@ -213,7 +210,9 @@ sub do_extract {
         }
 
         info(g_('unpacking %s'), $tarfile);
-        my $tar = Dpkg::Source::Archive->new(filename => "$dscdir$tarfile");
+        my $tar = Dpkg::Source::Archive->new(
+            filename => File::Spec->catfile($self->{basedir}, $tarfile),
+        );
         $tar->extract($expectprefix);
 
         if ($sourcestyle =~ /u/) {
@@ -238,7 +237,7 @@ sub do_extract {
     }
 
     if ($difffile and not $self->{options}{skip_debianization}) {
-        my $patch = "$dscdir$difffile";
+        my $patch = File::Spec->catfile($self->{basedir}, $difffile);
 	info(g_('applying %s'), $difffile);
 	my $patch_obj = Dpkg::Source::Patch->new(filename => $patch);
 	my $analysis = $patch_obj->apply($newdirectory, force_timestamp => 1);
@@ -426,15 +425,14 @@ sub do_build {
     if ($tarname) {
         $self->add_file($tarname);
         if (-e "$tarname.sig" and not -e "$tarname.asc") {
-            openpgp_sig_to_asc("$tarname.sig", "$tarname.asc");
+            $self->armor_original_tarball_signature("$tarname.sig", "$tarname.asc");
         }
     }
     if ($tarsign and -e $tarsign) {
+        $self->check_original_tarball_signature($dir, $tarsign);
+
         info(g_('building %s using existing %s'), $sourcepackage, $tarsign);
         $self->add_file($tarsign);
-
-        info(g_('verifying %s using existing %s'), $tarname, $tarsign);
-        $self->check_original_tarball_signature($dir, $tarsign);
     } else {
         my $key = $self->get_upstream_signing_key($dir);
         if (-e $key) {
@@ -449,9 +447,7 @@ sub do_build {
                          'giving up; use -sA, -sK or -sP to override'),
                       $origdir);
             }
-            push_exit_handler(sub { erasedir($origdir) });
             erasedir($origdir);
-            pop_exit_handler();
         } elsif ($! != ENOENT) {
             syserr(g_("unable to check for existence of orig directory '%s'"),
                     $origdir);

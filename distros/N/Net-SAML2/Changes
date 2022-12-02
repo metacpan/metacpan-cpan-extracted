@@ -1,5 +1,19 @@
 Revision history for Perl extension Net::SAML2.
 
+0.62 -- Wed Nov 30 21:13:55 AST 2022
+
+  - e59ce1b Increment Version in Git Repo
+  - 165661e testapp allow the metadata or authnreq to be unsigned
+  - 9f41ae3 Fix testapp metadata generation
+  - 303a8a2 Fixes: #128 Support ForceAuthn and IsPassive in AuthnRequest
+  - 29b45e4 Minor pod updates
+  - 17772d7 Update version number for release
+  - 1a5796b Add support to SP for SSO redirect binding without signed auth request
+  - 736bf78 Merge pull request #119 from dakkar/optional-sp-key
+  - 2de5268 fix POD typo
+  - 80658ae Redirect::key still optional, but more explicitly so
+  - bf7f771 make Redirect::key optional
+
 0.61 -- Tue Oct 04 23:37:21 ADT 2022
 
   [ Significant Changes since 0.59 ]

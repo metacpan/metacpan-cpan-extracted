@@ -1,7 +1,7 @@
 package Net::SAML2::Binding::Redirect;
 use Moose;
 
-our $VERSION = '0.61'; # VERSION
+our $VERSION = '0.62'; # VERSION
 
 use Carp qw(croak);
 use Crypt::OpenSSL::RSA;
@@ -24,6 +24,8 @@ use URI;
 has 'cert' => (isa => 'ArrayRef[Str]', is => 'ro', required => 0, predicate => 'has_cert');
 has 'url'  => (isa => Uri, is => 'ro', required => 0, coerce => 1, predicate => 'has_url');
 has 'key'  => (isa => 'Str', is => 'ro', required => 0, predicate => 'has_key');
+
+has 'insecure'  => (isa => 'Bool', is => 'ro', default => 0 );
 
 has 'param' => (
     isa      => SAMLRequestType,
@@ -51,7 +53,7 @@ sub BUILD {
 
     if ($self->param eq 'SAMLRequest') {
         croak("Need to have an URL specified") unless $self->has_url;
-        croak("Need to have a key specified") unless $self->has_key;
+        croak("Need to have a key specified") unless $self->has_key || $self->insecure;
     }
     elsif ($self->param eq 'SAMLResponse') {
         croak("Need to have a cert specified") unless $self->has_cert;
@@ -79,18 +81,33 @@ around BUILDARGS => sub {
 };
 
 
-sub sign {
-    my ($self, $request, $relaystate) = @_;
+sub get_redirect_uri {
+    my $self    = shift;
+    my $request = shift;
 
-    my $input = "$request";
+    if (!defined $request) {
+        croak("Unable to create redirect URI without a request");
+    }
+
+    my $relaystate = shift;
+
+    my $input  = "$request";
     my $output = '';
 
     rawdeflate \$input => \$output;
     my $req = encode_base64($output, '');
 
-    my $u = URI->new($self->url);
-    $u->query_param($self->param, $req);
-    $u->query_param('RelayState', $relaystate) if defined $relaystate;
+    my $uri = URI->new($self->url);
+    $uri->query_param($self->param, $req);
+    $uri->query_param('RelayState', $relaystate) if defined $relaystate;
+
+    return $uri->as_string if $self->insecure;
+    return $self->_sign_redirect_uri($uri);
+}
+
+sub _sign_redirect_uri {
+    my $self = shift;
+    my $uri  = shift;
 
     my $key_string = read_text($self->key);
     my $rsa_priv = Crypt::OpenSSL::RSA->new_private_key($key_string);
@@ -98,46 +115,26 @@ sub sign {
     my $method = "use_" . $self->sig_hash . "_hash";
     $rsa_priv->$method;
 
-    $u->query_param('SigAlg',
+    $uri->query_param('SigAlg',
         $self->sig_hash eq 'sha1'
         ? 'http://www.w3.org/2000/09/xmldsig#rsa-sha1'
         : 'http://www.w3.org/2001/04/xmldsig-more#rsa-' . $self->sig_hash);
 
-    my $to_sign = $u->query;
+    my $to_sign = $uri->query;
     my $sig = encode_base64($rsa_priv->sign($to_sign), '');
-    $u->query_param('Signature', $sig);
-
-    return $u->as_string;
+    $uri->query_param('Signature', $sig);
+    return $uri->as_string;
 }
 
-sub _verify {
-    my ($self, $sigalg, $signed, $sig) = @_;
 
-    foreach my $crt (@{$self->cert}) {
-        my $cert = Crypt::OpenSSL::X509->new_from_string($crt);
-        my $rsa_pub = Crypt::OpenSSL::RSA->new_public_key($cert->pubkey);
+sub sign {
+    my $self = shift;
 
-        if ($sigalg eq 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha256') {
-            $rsa_pub->use_sha256_hash;
-        } elsif ($sigalg eq 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha224') {
-            $rsa_pub->use_sha224_hash;
-        } elsif ($sigalg eq 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha384') {
-            $rsa_pub->use_sha384_hash;
-        } elsif ($sigalg eq 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha512') {
-            $rsa_pub->use_sha512_hash;
-        } elsif ($sigalg eq 'http://www.w3.org/2000/09/xmldsig#rsa-sha1') {
-            $rsa_pub->use_sha1_hash;
-        }
-        else {
-            warn "Unsupported Signature Algorithim: $sigalg, defaulting to sha256" if $self->debug;
-        }
-
-        return 1 if $rsa_pub->verify($signed, $sig);
-
-        warn "Unable to verify with " . $cert->subject if $self->debug;
+    if ($self->insecure) {
+        croak("Cannot sign an insecure request!");
     }
 
-    croak("Unable to verify the XML signature");
+    return $self->get_redirect_uri(@_);
 }
 
 
@@ -172,6 +169,36 @@ sub verify {
     return ($request, $relaystate);
 }
 
+sub _verify {
+    my ($self, $sigalg, $signed, $sig) = @_;
+
+    foreach my $crt (@{$self->cert}) {
+        my $cert = Crypt::OpenSSL::X509->new_from_string($crt);
+        my $rsa_pub = Crypt::OpenSSL::RSA->new_public_key($cert->pubkey);
+
+        if ($sigalg eq 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha256') {
+            $rsa_pub->use_sha256_hash;
+        } elsif ($sigalg eq 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha224') {
+            $rsa_pub->use_sha224_hash;
+        } elsif ($sigalg eq 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha384') {
+            $rsa_pub->use_sha384_hash;
+        } elsif ($sigalg eq 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha512') {
+            $rsa_pub->use_sha512_hash;
+        } elsif ($sigalg eq 'http://www.w3.org/2000/09/xmldsig#rsa-sha1') {
+            $rsa_pub->use_sha1_hash;
+        }
+        else {
+            warn "Unsupported Signature Algorithim: $sigalg, defaulting to sha256" if $self->debug;
+        }
+
+        return 1 if $rsa_pub->verify($signed, $sig);
+
+        warn "Unable to verify with " . $cert->subject if $self->debug;
+    }
+
+    croak("Unable to verify the XML signature");
+}
+
 __PACKAGE__->meta->make_immutable;
 
 __END__
@@ -186,7 +213,7 @@ Net::SAML2::Binding::Redirect - Net::SAML2::Binding::Redirect - HTTP Redirect bi
 
 =head1 VERSION
 
-version 0.61
+version 0.62
 
 =head1 SYNOPSIS
 
@@ -217,7 +244,12 @@ Arguments:
 The SP's (Service Provider) also known as your application's signing key
 that your application uses to sign the AuthnRequest.  Some IdPs may not
 verify the signature.
-Required with B<param> being C<SAMLRequest>.
+
+Usually required when B<param> is C<SAMLRequest>.
+
+If you don't want to sign the request, you can pass C<< insecure => 1
+>> and not provide a key; in this case, C<sign> will return a
+non-signed URL.
 
 =item B<cert>
 
@@ -254,6 +286,18 @@ Output extra debugging information
 
 =for Pod::Coverage BUILD
 
+=head2 get_redirect_uri($authn_request, $relaystate)
+
+Get the redirect URI for a given request, and returns the URL to which the
+user's browser should be redirected.
+
+Accepts an optional RelayState parameter, a string which will be
+returned to the requestor when the user returns from the
+authentication process with the IdP.
+
+The request is signed unless the the object has been instantiated with
+C<<insecure => 1>>.
+
 =head2 sign( $request, $relaystate )
 
 Signs the given request, and returns the URL to which the user's
@@ -262,6 +306,8 @@ browser should be redirected.
 Accepts an optional RelayState parameter, a string which will be
 returned to the requestor when the user returns from the
 authentication process with the IdP.
+
+Returns the signed (or unsigned) URL for the SAML2 redirect
 
 =head2 verify( $query_string )
 
@@ -273,6 +319,9 @@ Requires the *raw* query string to be passed, because L<URI> parses and
 re-encodes URI-escapes in uppercase (C<%3f> becomes C<%3F>, for instance),
 which leads to signature verification failures if the other party uses lower
 case (or mixed case).
+
+Returns an ARRAY of containing the verified request and relaystate (if it exists).
+Croaks on errors.
 
 =head1 AUTHOR
 

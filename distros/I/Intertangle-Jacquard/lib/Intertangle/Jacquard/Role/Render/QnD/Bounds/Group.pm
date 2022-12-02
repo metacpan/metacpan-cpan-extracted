@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Intertangle::Jacquard::Role::Render::QnD::Bounds::Group;
 # ABSTRACT: Quick-and-dirty group bounds
-$Intertangle::Jacquard::Role::Render::QnD::Bounds::Group::VERSION = '0.001';
+$Intertangle::Jacquard::Role::Render::QnD::Bounds::Group::VERSION = '0.002';
 use Moo::Role;
 use Intertangle::Yarn::Graphene;
 use Intertangle::Yarn::Types qw(Point Size);
@@ -32,7 +32,7 @@ Intertangle::Jacquard::Role::Render::QnD::Bounds::Group - Quick-and-dirty group 
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 METHODS
 

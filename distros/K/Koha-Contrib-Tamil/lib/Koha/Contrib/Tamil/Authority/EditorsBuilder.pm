@@ -1,5 +1,5 @@
 package Koha::Contrib::Tamil::Authority::EditorsBuilder;
-$Koha::Contrib::Tamil::Authority::EditorsBuilder::VERSION = '0.070';
+$Koha::Contrib::Tamil::Authority::EditorsBuilder::VERSION = '0.071';
 use Moose;
 
 extends 'AnyEvent::Processor';
@@ -153,7 +153,7 @@ Koha::Contrib::Tamil::Authority::EditorsBuilder
 
 =head1 VERSION
 
-version 0.070
+version 0.071
 
 =head1 AUTHOR
 

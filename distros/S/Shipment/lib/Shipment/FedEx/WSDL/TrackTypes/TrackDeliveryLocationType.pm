@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::TrackTypes::TrackDeliveryLocationType;
-$Shipment::FedEx::WSDL::TrackTypes::TrackDeliveryLocationType::VERSION = '3.09';
+$Shipment::FedEx::WSDL::TrackTypes::TrackDeliveryLocationType::VERSION = '3.10';
 use strict;
 use warnings;
 
@@ -25,7 +25,7 @@ Shipment::FedEx::WSDL::TrackTypes::TrackDeliveryLocationType
 
 =head1 VERSION
 
-version 3.09
+version 3.10
 
 =head1 DESCRIPTION
 

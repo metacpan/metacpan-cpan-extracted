@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2022 -- leonerd@leonerd.org.uk
 
-package Object::Pad 0.71;
+package Object::Pad 0.72;
 
 use v5.14;
 use warnings;
@@ -256,7 +256,7 @@ supported.
 If the package providing the superclass does not exist, an attempt is made to
 load it by code equivalent to
 
-   require CLASS ();
+   require CLASS;
 
 and thus it must either already exist, or be locatable via the usual C<@INC>
 mechanisms.
@@ -384,7 +384,7 @@ implements the role.
       requires METHOD;
    }
 
-A role can provide instance fields. These are visible to any C<BUILD> blocks
+A role can provide instance fields. These are visible to any C<ADJUST> blocks
 or methods provided by that role.
 
 I<Since version 0.33.>
@@ -392,7 +392,7 @@ I<Since version 0.33.>
    role Name {
       field $f;
 
-      BUILD { $f = "a value"; }
+      ADJUST { $f = "a value"; }
 
       method field { return $f; }
    }
@@ -787,15 +787,6 @@ will fail with a compiletime error, to avoid this confusion.
       ...
    }
 
-   ADJUST ( $params ) {    # on perl 5.26 onwards
-      ...
-   }
-
-   ADJUST {
-      my $params = shift;
-      ...
-   }
-
 I<Since version 0.43.>
 
 Declares an adjust block for this component class. This block of code runs
@@ -803,19 +794,20 @@ within the constructor, after any C<BUILD> blocks and automatic field value
 assignment. It can make any final adjustments to the instance (such as
 initialising fields from calculated values).
 
-I<Since version 0.66> it receives a reference to the hash containing the
-current constructor parameters. This hash will not contain any constructor
-parameters already consumed by L</:param> declarations on any fields, but only
-the leftovers once those are processed.
-
-The code in the block should C<delete> from this hash any parameters it wishes
-to consume. Once all the C<ADJUST> blocks have run, any remaining keys in the
-hash will be considered errors, subject to the L</:strict(params)> check.
-
 An adjust block is not a subroutine and thus is not permitted to use
 subroutine attributes (except see below). Note that an C<ADJUST> block is a
 named phaser block and not a method; it does not use the C<sub> or C<method>
 keyword.
+
+Currently, an C<ADJUST> block receives a reference to the hash containing the
+current constructor arguments, as per L</ADJUSTPARAMS> (see below). This was
+added in version 0.66 but will be removed again as it conflicts with the more
+flexible and generally nicer named-parameter C<ADJUST :params> syntax
+(see below). Such uses should be considered deprecated. A warning will be
+printed to indicate this whenever an C<ADJUST> block uses a signature. This
+warning can be quieted by using C<ADJUSTPARAMS> instead. Additionally, a
+warning may be printed on code that attempts to access the params hashref via
+the C<@_> array.
 
 =head2 ADJUST :params
 
@@ -859,6 +851,13 @@ will be filled in by the expression if not provided. Because these parameters
 are named and not positional, there is no ordering constraint; required and
 optional parameters can be freely mixed.
 
+Optional parameters can also use the C<//=> and C<||=> operators to provide a
+default expression. In these cases, the default will be applied if the caller
+did not provide the named argument at all, or if the provided value was not
+defined (for C<//=>) or not true (for C<||=>).
+
+   ADJUST :params ( :$name //= "unnamed" ) { ... }
+
 Like with subroutine signature parameters, every declared named parameter is
 visible to the defaulting expression of all the later ones. This permits
 values to be calculated based on other ones. For example,
@@ -892,12 +891,66 @@ perl's subroutine signature syntax).
 
 I<Since version 0.51.>
 
-A synonym for C<ADJUST>.
+   ADJUSTPARAMS ( $params ) {    # on perl 5.26 onwards
+      ...
+   }
 
-Prior to version 0.66, the C<ADJUSTPARAMS> keyword created a different kind of
-adjust block that receives a reference to the parameters hash. Since version
-0.66, regular C<ADJUST> blocks also receive this, so the two keywords are now
-synonyms.
+   ADJUST {
+      my $params = shift;
+      ...
+   }
+
+A variant of an C<ADJUST> block that receives a reference to the hash
+containing the current constructor parameters. This hash will not contain any
+constructor parameters already consumed by L</:param> declarations on any
+fields, but only the leftovers once those are processed.
+
+The code in the block should C<delete> from this hash any parameters it wishes
+to consume. Once all the C<ADJUST> blocks have run, any remaining keys in the
+hash will be considered errors, subject to the L</:strict(params)> check.
+
+=head2 __CLASS__
+
+   my $classname = __CLASS__;
+
+I<Since version 0.72.>
+
+Only valid within the body (or signature) of a C<method>, an C<ADJUST> block,
+or the initialising expression of a C<field>. Yields the class name of the
+instance that the method, block or expression is invoked on.
+
+This is similar to the core perl C<__PACKAGE__> constant, except that it cares
+about the dynamic class of the actual instance, not the static class the code
+belongs to. When invoked by a subclass instance that inherited code from its
+superclass it yields the name of the class of the instance regardless of which
+class defined the code.
+
+For example,
+
+   class BaseClass {
+      ADJUST { say "Constructing an instance of " . __CLASS__; }
+   }
+
+   class DerivedClass :isa(BaseClass) { }
+
+   my $obj = DerivedClass->new;
+
+Will produce the following output
+
+   Constructing an instance of DerivedClass
+
+This is particularly useful in field initialisers for invoking (constant)
+methods on the invoking class to provide default values for fields. This way a
+subclass could provide a different value.
+
+   class Timer {
+      use constant DEFAULT_DURATION => 60;
+      field $duration = __CLASS__->DEFAULT_DURATION;
+   }
+
+   class ThreeMinuteTimer :isa(Timer) {
+      use constant DEFAULT_DURATION => 3 * 60;
+   }
 
 =head2 requires
 
@@ -960,7 +1013,8 @@ the constructor. This is supported here since C<Object::Pad> version 0.19.
 Note however that any methods invoked by the superclass constructor may not
 see the object in a fully consistent state. (This fact is not specific to
 using C<Object::Pad> and would happen in classic Perl OO as well). The field
-initialisers will have been invoked but the C<BUILD> blocks will not.
+initialisers will have been invoked but the C<BUILD> and C<ADJUST> blocks will
+not.
 
 For example; in the following
 
@@ -975,7 +1029,7 @@ For example; in the following
 
    class DerivedClass :isa(ClassicPerlBaseClass) {
       has $_value = "B";
-      BUILD {
+      ADJUST {
          $_value = "C";
       }
       method get_value { return $_value }
@@ -985,10 +1039,10 @@ For example; in the following
    say "Value seen by user is ", $obj->get_value;
 
 Until the C<ClassicPerlBaseClass::new> superconstructor has returned the
-C<BUILD> block will not have been invoked. The C<$_value> field will still
+C<ADJUST> block will not have been invoked. The C<$_value> field will still
 exist, but its value will be C<B> during the superconstructor. After the
-superconstructor, the C<BUILD> blocks are invoked before the completed object
-is returned to the user. The result will therefore be:
+superconstructor, the C<BUILD> and C<ADJUST> blocks are invoked before the
+completed object is returned to the user. The result will therefore be:
 
    Value seen by superconstructor is B
    Value seen by user is C

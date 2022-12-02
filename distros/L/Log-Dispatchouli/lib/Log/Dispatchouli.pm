@@ -1,11 +1,12 @@
-use strict;
+use v5.20;
 use warnings;
-package Log::Dispatchouli;
+package Log::Dispatchouli 3.001;
 # ABSTRACT: a simple wrapper around Log::Dispatch
-$Log::Dispatchouli::VERSION = '2.023';
+
 use Carp ();
 use File::Spec ();
 use Log::Dispatch;
+use Log::Fmt ();
 use Params::Util qw(_ARRAY0 _HASH0 _CODELIKE);
 use Scalar::Util qw(blessed weaken);
 use String::Flogger;
@@ -311,11 +312,11 @@ sub log {
       my @flogged = map {; $flogger->flog($_) } @rest;
       $message    = @flogged > 1 ? $self->_join(\@flogged) : $flogged[0];
 
-      my $prefix  = _ARRAY0($arg->{prefix})
-                  ? [ @{ $arg->{prefix} } ]
-                  : [ $arg->{prefix} ];
+      my @prefix  = _ARRAY0($arg->{prefix})
+                  ? @{ $arg->{prefix} }
+                  : $arg->{prefix};
 
-      for (reverse grep { defined } $self->get_prefix, @$prefix) {
+      for (reverse grep { defined } $self->get_prefix, @prefix) {
         if (_CODELIKE( $_ )) {
           $message = $_->($message);
         } else {
@@ -381,6 +382,114 @@ sub log_debug {
   local $arg->{level} = defined $arg->{level} ? $arg->{level} : 'debug';
 
   $self->log($arg, @rest);
+}
+
+#pod =method log_event
+#pod
+#pod This method is like C<log>, but is used for structured logging instead of free
+#pod form text.  It's invoked like this:
+#pod
+#pod   $logger->log($event_type => $data_ref);
+#pod
+#pod C<$event_type> should be a simple string, probably a valid identifier, that
+#pod identifies the kind of event being logged.  It is suggested, but not required,
+#pod that all events of the same type have the same kind of structured data in them.
+#pod
+#pod C<$data_ref> is a set of key/value pairs of data to log in this event.  It can
+#pod be an arrayref (in which case the ordering of pairs is preserved) or a hashref
+#pod (in which case they are sorted by key).
+#pod
+#pod The logged string will be in logfmt format, meaning a series of key=value
+#pod pairs separated by spaces and following these rules:
+#pod
+#pod =for :list
+#pod * an "identifier" is a string of printable ASCII characters between C<!> and
+#pod   C<~>, excluding C<\> and C<=>
+#pod * keys must be valid identifiers
+#pod * if a key is empty, C<~> is used instead
+#pod * if a key contains characters not permitted in an identifier, they are
+#pod   replaced by C<?>
+#pod * values must I<either> be valid identifiers, or be quoted
+#pod * quoted value start and end with C<">
+#pod * in a quoted value, C<"> becomes C<\">, C<\> becomes C<\\>, newline and
+#pod   carriage return become C<\n> and C<\r> respectively, and other control
+#pod   characters are replaced with C<\u{....}> where the contents of the braces are
+#pod   the hex value of the control character
+#pod
+#pod When values are undef, they are represented as C<~>.
+#pod
+#pod When values are array references, the index/values are mapped over, so that:
+#pod
+#pod   key => [ 'a', 'b' ]
+#pod
+#pod becomes
+#pod
+#pod   key.0=a key.1=b
+#pod
+#pod When values are hash references, the key/values are mapped, with keys sorted,
+#pod so that:
+#pod
+#pod   key => { b => 2, a => 1 }
+#pod
+#pod becomes
+#pod
+#pod   key.a=1 key.b=2
+#pod
+#pod This expansion is performed recursively.  If a value itself recurses,
+#pod appearances of a reference after the first time will be replaced with a string
+#pod like C<&foo.bar>, pointing to the first occurrence.  I<This is not meant to be
+#pod a robust serialization mechanism.>  It's just here to help you be a little
+#pod lazy.  Don't push the limits.
+#pod
+#pod If the value in C<$data_ref> is a code reference, it will be called and its
+#pod result logged.  If its result is also a code reference, you get whatever
+#pod garbage that code reference stringifies to.
+#pod
+#pod =cut
+
+sub log_event {
+  my ($self, $type, $data) = @_;
+
+  return $self->_log_event($type, undef, $data);
+}
+
+sub _compute_proxy_ctx_kvstr_aref {
+  return [];
+}
+
+sub _log_event {
+  my ($self, $type, $ctx, $data) = @_;
+
+  return if $self->get_muted;
+
+  my $kv_aref = Log::Fmt->_pairs_to_kvstr_aref([
+    event => $type,
+    (_ARRAY0($data) ? @$data : $data->%{ sort keys %$data })
+  ]);
+
+  splice @$kv_aref, 1, 0, @$ctx if $ctx;
+
+  $self->dispatcher->log(
+    level   => 'info',
+    message => join q{ }, @$kv_aref,
+  );
+
+  return;
+}
+
+#pod =method log_debug_event
+#pod
+#pod This method is just like C<log_event>, but will log nothing unless the logger
+#pod has its C<debug> property set to true.
+#pod
+#pod =cut
+
+sub log_debug_event {
+  my ($self, $type, $data) = @_;
+
+  return unless $self->get_debug;
+
+  $self->log_event($type, $data);
 }
 
 #pod =method set_debug
@@ -616,6 +725,10 @@ sub clear_events {
 #pod = proxy_prefix
 #pod This is a prefix that will be applied to anything the proxy logger logs, and
 #pod cannot be changed.
+#pod = proxy_ctx
+#pod This is data to be inserted in front of event data logged through the proxy.
+#pod It will appear I<after> the C<event> key but before the logged event data.  It
+#pod can be in the same format as the C<$data_ref> argument to C<log_event>.
 #pod = debug
 #pod This can be set to true or false to change the proxy's "am I in debug mode?"
 #pod setting.  It can be changed or cleared later on the proxy.
@@ -630,12 +743,20 @@ sub proxy {
   my ($self, $arg) = @_;
   $arg ||= {};
 
-  $self->proxy_class->_new({
+  my $proxy = $self->proxy_class->_new({
     parent => $self,
     logger => $self,
     proxy_prefix => $arg->{proxy_prefix},
     (exists $arg->{debug} ? (debug => ($arg->{debug} ? 1 : 0)) : ()),
   });
+
+  if (my $ctx = $arg->{proxy_ctx}) {
+    $proxy->{proxy_ctx} = _ARRAY0($ctx)
+                        ? [ @$ctx ]
+                        : [ $ctx->%{ sort keys %$ctx } ];
+  }
+
+  return $proxy;
 }
 
 #pod =head2 parent
@@ -739,7 +860,7 @@ Log::Dispatchouli - a simple wrapper around Log::Dispatch
 
 =head1 VERSION
 
-version 2.023
+version 3.001
 
 =head1 SYNOPSIS
 
@@ -775,10 +896,10 @@ logged as is, arrayrefs are taken as (sprintf format, args), and subroutines
 are called only if needed.  For more information read the L<String::Flogger>
 docs.
 
-=head1 PERL VERSION SUPPORT
+=head1 PERL VERSION
 
-This module has a long-term perl support period.  That means it will not
-require a version of perl released fewer than five years ago.
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
 
 Although it may work on older versions of perl, no guarantee is made that the
 minimum required version will not be increased.  The version may be increased
@@ -855,6 +976,90 @@ the logger object has its debug property set to true.
 This method can also be called as C<debug>, to match other popular logging
 interfaces.  B<If you want to override this method, you must override
 C<log_debug> and not C<debug>>.
+
+=head2 log_event
+
+This method is like C<log>, but is used for structured logging instead of free
+form text.  It's invoked like this:
+
+  $logger->log($event_type => $data_ref);
+
+C<$event_type> should be a simple string, probably a valid identifier, that
+identifies the kind of event being logged.  It is suggested, but not required,
+that all events of the same type have the same kind of structured data in them.
+
+C<$data_ref> is a set of key/value pairs of data to log in this event.  It can
+be an arrayref (in which case the ordering of pairs is preserved) or a hashref
+(in which case they are sorted by key).
+
+The logged string will be in logfmt format, meaning a series of key=value
+pairs separated by spaces and following these rules:
+
+=over 4
+
+=item *
+
+an "identifier" is a string of printable ASCII characters between C<!> and C<~>, excluding C<\> and C<=>
+
+=item *
+
+keys must be valid identifiers
+
+=item *
+
+if a key is empty, C<~> is used instead
+
+=item *
+
+if a key contains characters not permitted in an identifier, they are replaced by C<?>
+
+=item *
+
+values must I<either> be valid identifiers, or be quoted
+
+=item *
+
+quoted value start and end with C<">
+
+=item *
+
+in a quoted value, C<"> becomes C<\">, C<\> becomes C<\\>, newline and carriage return become C<\n> and C<\r> respectively, and other control characters are replaced with C<\u{....}> where the contents of the braces are the hex value of the control character
+
+=back
+
+When values are undef, they are represented as C<~>.
+
+When values are array references, the index/values are mapped over, so that:
+
+  key => [ 'a', 'b' ]
+
+becomes
+
+  key.0=a key.1=b
+
+When values are hash references, the key/values are mapped, with keys sorted,
+so that:
+
+  key => { b => 2, a => 1 }
+
+becomes
+
+  key.a=1 key.b=2
+
+This expansion is performed recursively.  If a value itself recurses,
+appearances of a reference after the first time will be replaced with a string
+like C<&foo.bar>, pointing to the first occurrence.  I<This is not meant to be
+a robust serialization mechanism.>  It's just here to help you be a little
+lazy.  Don't push the limits.
+
+If the value in C<$data_ref> is a code reference, it will be called and its
+result logged.  If its result is also a code reference, you get whatever
+garbage that code reference stringifies to.
+
+=head2 log_debug_event
+
+This method is just like C<log_event>, but will log nothing unless the logger
+has its C<debug> property set to true.
 
 =head2 set_debug
 
@@ -1040,6 +1245,12 @@ C<%arg> is optional.  It may contain the following entries:
 This is a prefix that will be applied to anything the proxy logger logs, and
 cannot be changed.
 
+=item proxy_ctx
+
+This is data to be inserted in front of event data logged through the proxy.
+It will appear I<after> the C<event> key but before the logged event data.  It
+can be in the same format as the C<$data_ref> argument to C<log_event>.
+
 =item debug
 
 This can be set to true or false to change the proxy's "am I in debug mode?"
@@ -1100,7 +1311,7 @@ L<String::Flogger>
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 CONTRIBUTORS
 
@@ -1142,6 +1353,10 @@ Randy Stauner <randy@magnificent-tears.com>
 
 =item *
 
+Ricardo Signes <rjbs@semiotic.systems>
+
+=item *
+
 Ricardo Signes <rjbs@users.noreply.github.com>
 
 =item *
@@ -1152,7 +1367,7 @@ Sawyer X <xsawyerx@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Ricardo SIGNES.
+This software is copyright (c) 2022 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

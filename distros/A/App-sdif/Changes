@@ -1,5 +1,9 @@
 Revision history for Perl application 'sdif-tools'.
 
+4.23.0 2022-12-01T02:20:07Z
+
+    - Use Getopt::EX::Hashed for option handling.
+
 4.22.3 2022-09-16T05:27:56Z
 
     - Deprecate VISIBLE colormap of cdif.

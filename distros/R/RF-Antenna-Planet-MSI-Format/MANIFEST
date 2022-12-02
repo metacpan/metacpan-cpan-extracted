@@ -10,6 +10,7 @@ t/003_read.t
 t/004_load.t
 t/005_gain_freq.t
 t/006_read_scalar.t
+t/006_read_scalar_empty.t
 t/007_read_fromZipMember.t
 t/008_read_assumed_name.t
 t/009_freq.t

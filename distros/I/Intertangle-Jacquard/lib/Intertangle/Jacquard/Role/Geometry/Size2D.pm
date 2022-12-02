@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Intertangle::Jacquard::Role::Geometry::Size2D;
-# ABSTRACT: A 2D geometry with variable size
-$Intertangle::Jacquard::Role::Geometry::Size2D::VERSION = '0.001';
+# ABSTRACT: A 2-D geometry with variable size
+$Intertangle::Jacquard::Role::Geometry::Size2D::VERSION = '0.002';
 use Mu::Role;
 use Intertangle::Punchcard::Attributes;
 
@@ -18,11 +18,11 @@ __END__
 
 =head1 NAME
 
-Intertangle::Jacquard::Role::Geometry::Size2D - A 2D geometry with variable size
+Intertangle::Jacquard::Role::Geometry::Size2D - A 2-D geometry with variable size
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 AUTHOR
 

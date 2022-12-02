@@ -4,7 +4,7 @@ use strict;
 use IO::Socket;
 use Exporter;
 @NetServerTest::ISA = qw(Exporter);
-@NetServerTest::EXPORT_OK = qw(prepare_test client_connect ok is like use_ok skip diag);
+@NetServerTest::EXPORT_OK = qw(prepare_test client_connect ok is like use_ok skip note diag);
 my %env;
 use constant debug => $ENV{'NS_DEBUG'} ? 1 : 0;
 
@@ -16,8 +16,9 @@ END {
 sub client_connect {
     shift if $_[0] && $_[0] eq __PACKAGE__;
     if ($env{'ipv'} && $env{'ipv'} ne 4) {
-        require IO::Socket::INET6;
-        return IO::Socket::INET6->new(@_);
+        return IO::Socket::IP->new(@_)    if eval { require IO::Socket::IP };
+        return IO::Socket::INET6->new(@_) if eval { require IO::Socket::INET6 };
+        die "Could not load IO::Socket::IP or IO::Socket::INET6: $@";
     } else {
         return IO::Socket::INET->new(@_);
     }
@@ -189,10 +190,17 @@ sub skip {
     last SKIP;
 }
 
-sub diag {
+sub note {
     for my $line (@_) {
         chomp $line;
         print "# $line\n";
+    }
+}
+
+sub diag {
+    for my $line (@_) {
+        chomp $line;
+        warn "# $line\n";
     }
 }
 

@@ -2,7 +2,7 @@ package Log::OK;
 
 use strict;
 use warnings;
-use version; our $VERSION=version->declare("v0.1.4");
+use version; our $VERSION=version->declare("v0.1.5");
 
 use Carp qw<croak carp>;
 use constant::more ();
@@ -19,6 +19,29 @@ my %systems=(
 );
 
 
+my $sub;
+CHECK{  
+  my $message= "Log::OK could not automatically sync log levels with your logger";
+  if($sub==\&log_any){
+    #carp $message;
+  }
+  elsif($sub==\&log_ger){
+    carp $message unless eval '
+      require Log::ger::Util;
+      Log::ger::Util::set_level Log::OK::LEVEL;
+      1;
+      ';
+  }
+  elsif($sub==\&log_dispatch){
+    #carp $message;
+  }
+  elsif($sub==\&log_log4perl){
+    #carp $message;
+  }
+  else {
+    #carp $message;
+  }
+}
 use constant::more();
 sub import {
 	#arguments are lvl , opt, env, cat in hash ref
@@ -30,7 +53,6 @@ sub import {
 
 	my $caller=caller;
 	
-	my $sub;
 	if($hr->{sys}){
 		#manual selection of logging system
 		$sub=$systems{$hr->{sys}};
@@ -40,25 +62,21 @@ sub import {
 		#attempt to auto detect the logging system
 		$sub=auto_detect();
 	}
-
 	constant::more->import({
 			logging=>{
-
 				val=>$hr->{lvl},
 				opt=>$hr->{opt}?$hr->{opt}.":s" : undef,
 				env=>$hr->{env},
 				sys=>$hr->{sys},
 				sub=>$sub,
 			}
-		});
+	});
 };
 
 sub auto_detect {
 	#check for Log::Any first
-	DEBUG_ and say "log any adapter ".keys %Log::Any::Adapter:: ;
-	DEBUG_ and say "log ger :. ".%Log::ger::Output::;
-	(%Log::Any::Adapter:: )and return \&log_any;
-	(%Log::ger::Output::) and return \&log_ger;
+	(%Log::Any:: )and return \&log_any;
+	(%Log::ger::) and return \&log_ger;
 	(%Log::Dispatch::) and return \&log_dispatch;
 	(%Log::Log4perl::) and return \&log_log4perl;
 
@@ -68,7 +86,7 @@ sub auto_detect {
 }
 
 sub log_any {
-        DEBUG_ and say "setup for Log::Any";
+        DEBUG_ and say STDERR "setup for Log::Any";
         my ($opt, $value)=@_;
         state $lookup= {
 
@@ -103,8 +121,8 @@ sub log_any {
 		}
 	}
 
-        DEBUG_ and say "Level input $value";
-        DEBUG_ and say "Level output $level";
+        DEBUG_ and say STDERR "Level input $value";
+        DEBUG_ and say STDERR "Level output $level";
 
         (
                 #Contants to define
@@ -127,7 +145,7 @@ sub log_any {
 
 sub log_ger {
 	
-	DEBUG_ and say "setup for Log::ger";
+	DEBUG_ and say STDERR "setup for Log::ger";
 	my ($opt, $value)=@_;
 	state $lookup={
 		fatal   => 10,
@@ -154,6 +172,7 @@ sub log_ger {
 		}
 	}
 
+
 	(
 		#TODO: these values don't work well with 
 		#incremental logging levels from the command line
@@ -171,7 +190,7 @@ sub log_ger {
 }
 
 sub log_dispatch {
-	DEBUG_ and say "setup for Log::Dispatch";
+	DEBUG_ and say STDERR "setup for Log::Dispatch";
 	my ($opt, $value)=@_;
 	state $lookup={
 		debug=>0,
@@ -234,7 +253,7 @@ sub log_dispatch {
 }
 
 sub log_log4perl {
-	DEBUG_ and say "setup for Log::Log4perl";
+	DEBUG_ and say STDERR "setup for Log::Log4perl";
 
 	my ($opt, $value)=@_;
 	state $lookup={
@@ -251,8 +270,8 @@ sub log_log4perl {
 
 	state $levels=[ 0,5000,10000,20000,30000,40000,50000,(2**31)-1];
 
-	DEBUG_ and say "";
-	DEBUG_ and say "VALUE: $value";
+	DEBUG_ and say STDERR "";
+	DEBUG_ and say STDERR "VALUE: $value";
 	my $level;
 	state $index=@$levels-1;
 
@@ -279,7 +298,7 @@ sub log_log4perl {
 	}
 
 
-	DEBUG_ and say "LEVEL: $level";
+	DEBUG_ and say STDERR "LEVEL: $level";
 
 	(
 		#TODO: these values don't work well with 
@@ -300,7 +319,7 @@ sub log_log4perl {
 
 #Define all supported constants as false.
 sub no_logger {
-	DEBUG_ and say "NO LOGGER DETECTED";
+	DEBUG_ and say STDERR "NO LOGGER DETECTED";
 	(
 		"Log::OK::OFF"=>0,
 		"Log::OK::FATAL"=>0,

@@ -4,11 +4,10 @@ package Net::Server::Test;
 use strict;
 use FindBin qw($Bin);
 use lib $Bin;
-use NetServerTest qw(prepare_test ok use_ok diag skip);
+use NetServerTest qw(prepare_test ok use_ok note skip);
 my $env = prepare_test({n_tests => 5, start_port => 20200, n_ports => 1}); # runs three of its own tests
 
-if (! eval { require File::Temp }
-    || ! eval { require IO::Socket::SSL }
+if (! eval { require IO::Socket::SSL }
    ) {
   SKIP: { skip("Cannot load IO::Socket::SSL libraries to test Socket SSL server: $@", 2); };
     exit;
@@ -66,11 +65,6 @@ YftRX/a/t18CpitrzViVgQ+l
 -----END PRIVATE KEY-----
 PEM
 
-my ($pem_fh, $pem_filename) =
-  File::Temp::tempfile(SUFFIX => '.pem', UNLINK => 1);
-print $pem_fh $pem;
-$pem_fh->close;
-
 use_ok qw(Net::Server::Proto::SSL) or exit;
 require Net::Server;
 @Net::Server::Test::ISA = qw(Net::Server);
@@ -104,10 +98,10 @@ my $ok = eval {
 
         my $line = <$remote>;
         die "Didn't get the type of line we were expecting: ($line)" if $line !~ /Net::Server/;
-        diag $line;
+        note $line;
         print $remote "exit\n";
         my $line2 = <$remote>;
-        diag $line2;
+        note $line2;
         return 1;
 
     ### child does the server
@@ -120,13 +114,13 @@ my $ok = eval {
                 port  => $env->{'ports'}->[0],
                 proto => 'ssl',
                 ipv   => '*', # $env->{'ipv'}, # IO::Socket::SSL always tries INET6 if it is available so we should listen on 6 if it is available
-                SSL_cert_file => $pem_filename,
-                SSL_key_file  => $pem_filename,
+                SSL_cert_file => "$Bin/self_signed.crt",
+                SSL_key_file  => "$Bin/self_signed.key",
                 background => 0,
                 setsid => 0,
                 );
         } || do {
-            diag("Trouble running server: $@");
+            note("Trouble running server: $@");
             kill(9, $ppid) && ok(0, "Failed during run of server");
         };
         exit;
@@ -134,4 +128,4 @@ my $ok = eval {
     alarm(0);
 };
 alarm(0);
-ok($ok, "Got the correct output from the server") || diag("Error: $@");
+ok($ok, "Got the correct output from the server") || note("Error: $@");

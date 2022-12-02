@@ -1,6 +1,6 @@
 
 package Shipment::UPS::WSDL::XAVElements::XAVResponse;
-$Shipment::UPS::WSDL::XAVElements::XAVResponse::VERSION = '3.09';
+$Shipment::UPS::WSDL::XAVElements::XAVResponse::VERSION = '3.10';
 use strict;
 use warnings;
 
@@ -102,7 +102,7 @@ Shipment::UPS::WSDL::XAVElements::XAVResponse
 
 =head1 VERSION
 
-version 3.09
+version 3.10
 
 =head1 DESCRIPTION
 

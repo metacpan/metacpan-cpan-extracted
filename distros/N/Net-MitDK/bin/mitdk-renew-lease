@@ -1,6 +1,7 @@
 #!env perl
 use strict;
 use warnings;
+use subs 'log';
 use Fcntl ':flock', ':seek';
 use IO::Handle;
 use IO::Socket;
@@ -49,6 +50,11 @@ GetOptions(\%opt,
 
 $opt{help} and usage();
 
+sub log($)
+{
+	print "$_[0]\n" if $opt{verbose};
+}
+
 sub renew
 {
 	my $profile = shift;
@@ -57,40 +63,42 @@ sub renew
 	die "error (profile=$profile): bad profile\n" unless ref($e->config) eq 'HASH';
 
 	unless ( $e->token ) {
-		print "$profile: no first login yet\n" if $opt{verbose};
+		log "$profile: no first login yet";
 		return;
 	}
 
-	print "loaded profile $profile, expires on " . localtime($e->token->{dpp}->{expires_on}) . "\n" if $opt{verbose};
-
-	my $maybe_expired = time > $e->token->{dpp}->{expires_on};
-	if ( $maybe_expired && $e->config->{renewer}->{expired} ) {
-		print "is expired and notification was done already, skipping\n" if $opt{verbose};
-		return;
-	}
+	log "loaded profile $profile, expires on " . localtime($e->token->{dpp}->{expires_on});
 
 	if ( $opt{dry}) {
-		print "not renewed as running read-only\n" if $opt{verbose};
+		log "not renewed as running read-only";
 		return;
 	}
 
-	if ( exists $e->config->{renewer}->{expired}) {
-		delete $e->config->{renewer}->{expired};
-		$e->update_config;
-	}
 
 	my $ok;
 	($ok, $error) = $e->renew_lease->wait;
 	if ( !$ok ) {
-		if ( $maybe_expired ) {
-			print "will skip this error next time\n" if $opt{verbose};
-			$e->config->{renewer}->{expired} = 1;
-			$e->update_config;
+		if ( $error =~ /(Rest Exception\: \<ServerErrorException\>|Status 500|Internal Server Error)/) {
+			# everyone should wrap xml errors in json
+			log "skipping error: $error";
+			return;
 		}
+		my $newerr = $error;
+		$newerr =~ s/traceId\:\s+\S+//g;
+		if (( $e->config->{renewer}->{error} // '') eq $newerr) {
+			log "Skipping repetitive error $error";
+			return;
+		}
+
+		$e->config->{renewer}->{error} = $newerr;
+		$e->update_config;
 		die "error (profile=$profile): $error\n";
+	} elsif ( defined $e->config->{renewer}->{error}) {
+		delete $e->config->{renewer}->{error};
+		$e->update_config;
 	}
 
-	print "renewed, expires on " . localtime($e->token->{dpp}->{expires_on}) . "\n" if $opt{verbose};
+	log "renewed, expires on " . localtime($e->token->{dpp}->{expires_on});
 }
 
 my ($server, $sno);
@@ -106,7 +114,7 @@ if ( $opt{port} ) {
 			ReuseAddr => ($^O !~ /win32/i),
 		);
 		die "Cannot listen on port $opt{port} : $!\n" unless $server;
-		print "Listening on $opt{port}\n" if $opt{verbose};
+		log "Listening on $opt{port}";
 		$sno = '';
 		vec($sno, fileno($server), 1) = 1;
 	}
@@ -153,14 +161,14 @@ if ($opt{loop}) {
 		my $n = select($R, undef, undef, $timeout);
 		if ( $n ) {
 			my $h = IO::Handle-> new;
-			print "New control connection\n" if $opt{verbose};
+			log "New control connection";
 			if ( accept( $h, $server) ) {
 				my $cmd = <$h>;
 				chomp $cmd;
-				print "Got command: $cmd\n" if $opt{verbose};
+				log "Got command: $cmd";
 				close $h;
 				if ( $cmd eq 'stop') {
-					print "Exiting\n" if $opt{verbose};
+					log "Exiting";
 					exit(0);
 				}
 			}

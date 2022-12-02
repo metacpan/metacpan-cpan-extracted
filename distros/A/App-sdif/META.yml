@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.19, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.20, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -40,7 +40,7 @@ provides:
     file: lib/App/cdif/default.pm
   App::sdif:
     file: lib/App/sdif.pm
-    version: v4.22.3
+    version: v4.23.0
   App::sdif::Divert:
     file: lib/App/sdif/Divert.pm
   App::sdif::LabelStack:
@@ -57,7 +57,7 @@ provides:
     file: lib/App/watchdiff.pm
 requires:
   Getopt::EX: v1.25.0
-  Getopt::EX::Hashed: '0.9920'
+  Getopt::EX::Hashed: '1.05'
   Getopt::EX::termcolor: '1.07'
   List::Util: '1.45'
   Term::ReadKey: '0'
@@ -69,7 +69,7 @@ resources:
   bugtracker: https://github.com/kaz-utashiro/sdif-tools/issues
   homepage: https://github.com/kaz-utashiro/sdif-tools
   repository: https://github.com/kaz-utashiro/sdif-tools.git
-version: 4.22.3
+version: 4.23.0
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

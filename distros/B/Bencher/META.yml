@@ -19,7 +19,7 @@ name: Bencher
 provides:
   Bencher:
     file: lib/Bencher.pm
-    version: v1.62.1
+    version: v1.62.2
 requires:
   Bencher::Backend: '1.062'
   Data::Sah::Coerce::perl::To_array::From_str::comma_sep: '0'
@@ -48,11 +48,15 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Bencher
   homepage: https://metacpan.org/release/Bencher
   repository: git://github.com/perlancar/perl-Bencher.git
-version: 1.062.1
+version: 1.062.2
 x_Dist_Zilla:
   perl:
     version: '5.034000'
   plugins:
+    -
+      class: Dist::Zilla::Plugin::InsertCodeOutput
+      name: InsertCodeOutput
+      version: '0.045'
     -
       class: Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease
       name: '@Author::PERLANCAR/PERLANCAR::CheckPendingRelease'

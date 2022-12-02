@@ -1,14 +1,14 @@
 #!/usr/bin/perl -w
 
 use strict;
-use warnings qw(FATAL all);
+use warnings qw( FATAL all NONFATAL void );
 use lib 'lib';
 use Test::More tests => 5;
 
 use Data::Alias;
 
-alias my $foo = "foo";
-alias my $bar = $foo;
+alias our $foo = "foo";
+alias our $bar = $foo;
 
 is \$foo, \$bar;
 

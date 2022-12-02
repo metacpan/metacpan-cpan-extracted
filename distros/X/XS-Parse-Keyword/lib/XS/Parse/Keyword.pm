@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Keyword 0.28;
+package XS::Parse::Keyword 0.29;
 
 use v5.14;
 use warnings;
@@ -308,6 +308,18 @@ an optree in the I<op> field.
 =head2 XPK_TERMEXPR_VOIDCTX, XPK_TERMEXPR_SCALARCTX
 
 Variants of C<XPK_TERMEXPR> which puts the expression in void or scalar context.
+
+=head2 XPK_PREFIXED_TERMEXPR_ENTERLEAVE
+
+   XPK_PREFIXED_TERMEXPR_ENTERLEAVE(pieces ...)
+
+A variant of C<XPK_TERMEXPR> which expects a sequence pieces first before it
+parses a term expression, similar to how C<XPK_PREFIXED_BLOCK_ENTERLEAVE>
+works. The entire operation is wrapped in an C<ENTER>/C<LEAVE> pair.
+
+This is intended just for use of C<XPK_SETUP> pieces as prefixes. Any other
+pieces which actually parse real input are likely to cause overly-complex,
+subtle, or outright ambiguous grammars, and should be avoided.
 
 =head2 XPK_LISTEXPR
 

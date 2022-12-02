@@ -4,7 +4,6 @@
 [![Version](https://img.shields.io/cpan/v/FASTX-Reader.svg)](https://metacpan.org/pod/FASTX::Reader)
 [![Tests](https://img.shields.io/badge/Tests-Grid-1abc9c.svg)](https://www.cpantesters.org/distro/F/FASTX-Reader.html) 
 [![Kwalitee](https://cpants.cpanauthors.org/release/PROCH/FASTX-Reader-0.05.svg)](https://cpants.cpanauthors.org/release/PROCH/FASTX-Reader-0.60)
-[![Actions](https://img.shields.io/github/workflow/status/telatin/FASTQ-Parser/CI)](https://github.com/telatin/FASTQ-Parser/actions)
 [![Bioconda](https://img.shields.io/conda/vn/bioconda/perl-fastx-reader)](https://anaconda.org/bioconda/perl-fastx-reader)
 
 ## A Perl module to parse FASTA and FASTQ files

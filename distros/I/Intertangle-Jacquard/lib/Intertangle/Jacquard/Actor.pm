@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Intertangle::Jacquard::Actor;
 # ABSTRACT: Base class for scene graph objects
-$Intertangle::Jacquard::Actor::VERSION = '0.001';
+$Intertangle::Jacquard::Actor::VERSION = '0.002';
 use Moo;
 
 with qw(
@@ -25,7 +25,7 @@ Intertangle::Jacquard::Actor - Base class for scene graph objects
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 EXTENDS
 

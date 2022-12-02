@@ -1,0 +1,26 @@
+Revision history for Perl module Geo-Inverse
+
+0.07 2022-11-29
+  - Changed license from Perl to MIT
+  - Added GitHub repository
+
+0.06 2011-10-31
+  - Added tests pod.t kwalitee.t changes.t pod-coverage.t
+  - Updated to pass tests
+  - Imported new constructor from Package::New
+
+0.05 2007-04-07
+  - Added inverse.for to distribution
+
+0.04 2007-04-06
+  - Added scalar context to inverse function should be 100% backward compatable
+
+0.03 2006-12-08
+  - Merged set and ellipsoid methods
+  - Updated build requirment versions
+
+0.02 2006-12-03
+  - Imported Geo::Constants Geo::Functions
+
+0.01 2006-10-30
+  - Original version

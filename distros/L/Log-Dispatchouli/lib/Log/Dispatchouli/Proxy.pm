@@ -1,8 +1,9 @@
-use strict;
+use v5.20;
 use warnings;
-package Log::Dispatchouli::Proxy;
+package Log::Dispatchouli::Proxy 3.001;
 # ABSTRACT: a simple wrapper around Log::Dispatch
-$Log::Dispatchouli::Proxy::VERSION = '2.023';
+
+use Log::Fmt ();
 use Params::Util qw(_ARRAY0 _HASH0);
 
 #pod =head1 DESCRIPTION
@@ -34,6 +35,7 @@ sub _new {
     logger => $arg->{logger},
     debug  => $arg->{debug},
     proxy_prefix => $arg->{proxy_prefix},
+    proxy_ctx    => $arg->{proxy_ctx},
   };
 
   bless $guts => $class;
@@ -43,12 +45,21 @@ sub proxy  {
   my ($self, $arg) = @_;
   $arg ||= {};
 
-  (ref $self)->_new({
+  my @proxy_ctx;
+
+  if (my $ctx = $arg->{proxy_ctx}) {
+    @proxy_ctx = _ARRAY0($ctx)
+               ? (@proxy_ctx, @$ctx)
+               : (@proxy_ctx, $ctx->%{ sort keys %$ctx });
+  }
+
+  my $prox = (ref $self)->_new({
     parent => $self,
     logger => $self->logger,
     debug  => $arg->{debug},
     muted  => $arg->{muted},
     proxy_prefix => $arg->{proxy_prefix},
+    proxy_ctx    => \@proxy_ctx,
   });
 }
 
@@ -126,6 +137,41 @@ sub log_debug {
   $self->log($arg, @rest);
 }
 
+sub _compute_proxy_ctx_kvstr_aref {
+  my ($self) = @_;
+
+  return $self->{proxy_ctx_kvstr} //= do {
+    my @kvstr = $self->parent->_compute_proxy_ctx_kvstr_aref->@*;
+
+    if ($self->{proxy_ctx}) {
+      my $our_kv = Log::Fmt->_pairs_to_kvstr_aref($self->{proxy_ctx});
+      push @kvstr, @$our_kv;
+    }
+
+    \@kvstr;
+  };
+}
+
+sub log_event {
+  my ($self, $event, $data) = @_;
+
+  return if $self->get_muted;
+
+
+  my $message = $self->logger->_log_event($event,
+    $self->_compute_proxy_ctx_kvstr_aref,
+    [ _ARRAY0($data) ? @$data : $data->%{ sort keys %$data } ]
+  );
+}
+
+sub log_debug_event {
+  my ($self, $event, $data) = @_;
+
+  return unless $self->get_debug;
+
+  return $self->log_event($event, $data);
+}
+
 sub info  { shift()->log(@_); }
 sub fatal { shift()->log_fatal(@_); }
 sub debug { shift()->log_debug(@_); }
@@ -149,7 +195,7 @@ Log::Dispatchouli::Proxy - a simple wrapper around Log::Dispatch
 
 =head1 VERSION
 
-version 2.023
+version 3.001
 
 =head1 DESCRIPTION
 
@@ -176,10 +222,10 @@ C<log_debug> messages will be redispatched to C<log> (to the 'debug' logging lev
 
 =back
 
-=head1 PERL VERSION SUPPORT
+=head1 PERL VERSION
 
-This module has a long-term perl support period.  That means it will not
-require a version of perl released fewer than five years ago.
+This library should run on perls released even a long time ago.  It should work
+on any version of perl released in the last five years.
 
 Although it may work on older versions of perl, no guarantee is made that the
 minimum required version will not be increased.  The version may be increased
@@ -188,11 +234,11 @@ the minimum required perl.
 
 =head1 AUTHOR
 
-Ricardo SIGNES <rjbs@semiotic.systems>
+Ricardo SIGNES <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021 by Ricardo SIGNES.
+This software is copyright (c) 2022 by Ricardo SIGNES.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

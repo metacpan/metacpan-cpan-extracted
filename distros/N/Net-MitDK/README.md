@@ -92,16 +92,22 @@ the mitdk2pop server runs as `nobody` and needs to use the login leases.
 Lease renewal
 -------------
 
-MidDK only allows sessions for 20 minutes, then it requires a NemID relogin.
-Therefore there is added a daemon, `mitdk-renew-lease`. You can run it from
-cron (unix), or as a standalone program as `mitdk-renew-lease -la` (windows).
-It then will renegotiate a lease every 10 minutes. If you installed the module
-using `mitdk-install-win32` as described above, this program is added to your
-startup folder automatically.
+MidDK only allows sessions for 20 minutes, thereafter it may require a NemID
+relogin.  Therefore there is added a daemon, `mitdk-renew-lease`. You can run
+it from cron (unix), or as a standalone program as `mitdk-renew-lease -la`
+(windows).  It then will renegotiate a lease every 10 minutes. If you installed
+the module using `mitdk-install-win32` as described above, this program is
+added to your startup folder automatically.
 
-Unix/cron: If for some reason the lease expires, it will warn you (once)
-through cron mail. Windows: otherwise there's no need to restart it after you
-made a successful relogin with `mitdk-authenticate`.
+If for some reason the lease expires, it will warn you, once (by remembering
+the last error). On unix, if you won't redirect the output to a logfile, you
+will be notified through the standard cron mail. On windows there's so far no
+notification mechanism developed.
+
+In case the lease will get invalidated for one or another reason, you shall
+need to relogin with `mitdk-authenticate` again. However after relogin you
+won't need to do anything with the renewer, it will pick up the new lease
+automatically.
 
 Lease migration
 ---------------

@@ -1,6 +1,6 @@
 package Koha::Contrib::Tamil::Logger;
 # ABSTRACT: Base class pour logger
-$Koha::Contrib::Tamil::Logger::VERSION = '0.070';
+$Koha::Contrib::Tamil::Logger::VERSION = '0.071';
 
 use Moose;
 use Modern::Perl;
@@ -56,7 +56,7 @@ Koha::Contrib::Tamil::Logger - Base class pour logger
 
 =head1 VERSION
 
-version 0.070
+version 0.071
 
 =head1 SYNOPSYS
 

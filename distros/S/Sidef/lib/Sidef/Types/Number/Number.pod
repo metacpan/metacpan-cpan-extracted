@@ -186,7 +186,7 @@ When C<a> and C<b> are integers, this is equivalent with:
 
     floor(a/b)
 
-Aliases: I<idiv>
+Aliases: I<fld>, I<idiv>, I<idiv_floor>
 
 =cut
 
@@ -688,6 +688,18 @@ Arithmetic-geometric mean of C<a> and C<b>.
 Airy function of the first kind: C<Ai(x)>.
 
 Aliases: I<airy>
+
+=cut
+
+=head2 aliquot
+
+    aliquot(n)
+
+Returns the sum of divisors of C<n> that are less than C<n>.
+
+Equivalent with:
+
+    sigma(n) - n
 
 =cut
 
@@ -1288,6 +1300,60 @@ Aliases: I<complex_add>
 
 =cut
 
+=head2 carmichael
+
+    k.carmichael(n)
+    k.carmichael(a, b)
+
+Returns an array with all the Carmichael numbers <= n or in the range C<a..b> that have exactly C<k> prime factors.
+
+    say 3.carmichael(1e4)           # 3-Carmichael numbers <= 1e4
+    say 4.carmichael(1e4, 1e6)      # 4-Carmichael numbers in range 1e4..1e6
+
+=cut
+
+=head2 carmichael_each
+
+    k.carmichael_each(n, { ... })
+    k.carmichael_each(a, b, { ... })
+
+Iterates over the Carmichael <= n or in the range C<a..b> that have exactly C<k> prime factors.
+
+    3.carmichael_each(1e5, {|n| say n })          # iterate over 3-Carmichael numbers <= 1e5
+    4.carmichael_each(1e5, 1e6, {|n| say n })     # iterate over 4-Carmichael in range 1e5..1e6
+
+Aliases: I<each_carmichael>
+
+=cut
+
+=head2 carmichael_strong_fermat
+
+    k.carmichael_strong_fermat(base, n)
+    k.carmichael_strong_fermat(base, a, b)
+
+Returns an array with all the Carmichael numbers <= n or in the range C<a..b> that are also strong Fermat pseudoprimes to C<base> and have exactly C<k> prime factors.
+
+    say 3.carmichael_strong_fermat(2, 1e7)       # 3-Carmichael strong Fermat pseudoprimes to base 2 <= 1e7
+    say 4.carmichael_strong_fermat(2, 1e7, 1e9)  # 4-Carmichael strong Fermat pseudoprimes to base 2, in range 1e7..1e9
+
+Aliases: I<strong_fermat_carmichael>, I<carmichael_strong_psp>
+
+=cut
+
+=head2 carmichael_strong_fermat_each
+
+    k.carmichael_strong_fermat_each(base, n, { ... })
+    k.carmichael_strong_fermat_each(base, a, b, { ... })
+
+Iterates over the Carmichael <= n or in the range C<a..b> that are also strong Fermat pseudoprimes to C<base> and have exactly C<k> prime factors.
+
+    3.carmichael_strong_fermat_each(2, 1e7, {|n| say n })          # iterate over 3-Carmichael strong Fermat to base 2 <= 1e7
+    4.carmichael_strong_fermat_each(2, 1e5, 1e9, {|n| say n })     # iterate over 4-Carmichael strong Fermat to base 2 in range 1e5..1e9
+
+Aliases: I<carmichael_strong_psp_each>, I<each_carmichael_strong_psp>, I<each_carmichael_strong_fermat>, I<each_strong_fermat_carmichael>, I<strong_fermat_carmichael_each>
+
+=cut
+
 =head2 catalan
 
     n.catalan
@@ -1366,7 +1432,7 @@ This method is particularly effective for numbers that have a prime factor C<p> 
 
     say chebyshev_factor(1124075136413 * 3556516507813, 4000, 3)
 
-The product of the factors, will give back C<n>. However, some factors may be composite.
+The product of the factors will give back C<n>. However, some factors may be composite.
 
 =cut
 
@@ -1477,6 +1543,20 @@ Returns an array of arrays with the circular permutations of the integers in the
 Euler's formula applied on C<x>, defined as:
 
     cis(x) = cos(x) + sin(x)*i
+
+=cut
+
+=head2 idiv_ceil
+
+    idiv_ceil(a,b)
+
+Integer division of integers C<a> and C<b>, rounded towards +Infinity.
+
+When C<a> and C<b> are integers, this is equivalent with:
+
+    ceil(a/b)
+
+Aliases: I<cld>
 
 =cut
 
@@ -1692,7 +1772,7 @@ Congruence of Powers (CoP) factorization method, trying to find algebraic factor
 
 An additional argument can be given to limit the number of iterations.
 
-The product of the factors, will give back C<n>. However, some factors may be composite.
+The product of the factors will give back C<n>. However, some factors may be composite.
 
 =cut
 
@@ -1841,7 +1921,7 @@ Factorization method, based on cyclotomic polynomials, trying to find algebraic 
 
 An optional list of bases can be given to restrict the search only to the given bases.
 
-The product of the factors, will give back C<n>. However, some factors may be composite.
+The product of the factors will give back C<n>. However, some factors may be composite.
 
 =cut
 
@@ -2128,7 +2208,7 @@ Difference of Powers (DoP) factorization method, trying to find algebraic factor
 
 An additional argument can be given to limit the number of iterations.
 
-The product of the factors, will give back C<n>. However, some factors may be composite.
+The product of the factors will give back C<n>. However, some factors may be composite.
 
 =cut
 
@@ -2197,14 +2277,42 @@ Aliases: I<composites_each>
 
 =cut
 
+=head2 each_fermat_psp
+
+    k.fermat_psp_each(base, n, { ... })
+    k.fermat_psp_each(base, a, b, { ... })
+
+Iterates over the C<k>-omega Fermat pseudoprimes <= n or in the range C<a..b>.
+
+    3.fermat_psp_each(2, 1e5, {|n| say n })          # iterate over 3-Fermat psp to base 2 <= 1e5
+    4.fermat_psp_each(2, 1e5, 1e6, {|n| say n })     # iterate over 4-Fermat psp to base 2 in range 1e4..1e6
+
+Aliases: I<fermat_psp_each>
+
+=cut
+
+=head2 each_lucas_carmichael
+
+    k.lucas_carmichael_each(n, { ... })
+    k.lucas_carmichael_each(a, b, { ... })
+
+Iterates over the Lucas-Carmichael <= n or in the range C<a..b> that have exactly C<k> prime factors.
+
+    3.lucas_carmichael_each(1e5, {|n| say n })          # iterate over 3-Lucas-Carmichael numbers <= 1e5
+    4.lucas_carmichael_each(1e5, 1e6, {|n| say n })     # iterate over 4-Lucas-Carmichael in range 1e4..1e6
+
+Aliases: I<lucas_carmichael_each>
+
+=cut
+
 =head2 each_omega_prime
 
     k.omega_primes_each(n, { ... })
     k.omega_primes_each(a, b, { ... })
 
-Iterates over the k-omega primes <= n, or in the range C<a..b>.
+Iterates over the C<k>-omega primes <= n, or in the range C<a..b>.
 
-k-omega primes are numbers C<n> that satisfy C<omega(n) == k>.
+C<k>-omega primes are numbers C<n> that satisfy C<omega(n) == k>.
 
     1.omega_primes_each(100, {|n| say n })          # iterate over prime powers <= 100
     2.omega_primes_each(50, 100, {|n| say n })      # iterate over 2-omega primes in range 50..100
@@ -2316,6 +2424,62 @@ Aliases: I<squarefree_almost_primes_each>
 
 =cut
 
+=head2 each_squarefree_fermat_psp
+
+    k.squarefree_fermat_psp_each(base, n, { ... })
+    k.squarefree_fermat_psp_each(base, a, b, { ... })
+
+Iterates over the squarefree Fermat pseudoprimes <= n or in the range C<a..b> that have exactly C<k> prime factors.
+
+    3.squarefree_fermat_psp_each(2, 1e5, {|n| say n })          # iterate over squarefree 3-Fermat psp to base 2 <= 1e5
+    4.squarefree_fermat_psp_each(2, 1e5, 1e6, {|n| say n })     # iterate over squarefree 4-Fermat psp to base 2 in range 1e4..1e6
+
+Aliases: I<squarefree_fermat_psp_each>
+
+=cut
+
+=head2 each_squarefree_semiprime
+
+    n.each_squarefree_semiprime { ... }
+    each_squarefree_semiprime(a,b, { ... })
+
+Iterate over the squarefree semiprimes <= n, or in the range C<a..b>:
+
+    100.each_squarefree_semiprime {|k| say k }         # iterate over squarefree semiprimes <= 100
+    each_squarefree_semiprime(50, 100, {|k| say k })   # iterate over squarefree semiprimes in the range [50, 100]
+
+Aliases: I<squarefree_semiprimes_each>
+
+=cut
+
+=head2 each_squarefree_strong_fermat_psp
+
+    k.each_squarefree_strong_fermat_psp(base, n, { ... })
+    k.each_squarefree_strong_fermat_psp(base, a, b, { ... })
+
+Iterates over the squarefree strong Fermat pseudoprimes <= n or in the range C<a..b> that have exactly C<k> prime factors.
+
+    3.each_squarefree_strong_fermat_psp(2, 1e6, {|n| say n })          # iterate over squarefree strong 3-Fermat psp to base 2 <= 1e6
+    4.each_squarefree_strong_fermat_psp(2, 1e7, 1e8, {|n| say n })     # iterate over squarefree strong 4-Fermat psp to base 2 in range 1e7..1e8
+
+Aliases: I<squarefree_strong_fermat_psp_each>
+
+=cut
+
+=head2 each_strong_fermat_psp
+
+    k.each_strong_fermat_psp(base, n, { ... })
+    k.each_strong_fermat_psp(base, a, b, { ... })
+
+Iterates over the C<k>-omega strong Fermat pseudoprimes <= n or in the range C<a..b>.
+
+    3.each_strong_fermat_psp(2, 1e6, {|n| say n })          # iterate over 3-omega strong Fermat psp to base 2 <= 1e6
+    4.each_strong_fermat_psp(2, 1e7, 1e8, {|n| say n })     # iterate over 4-omega strong Fermat psp to base 2 in range 1e7..1e8
+
+Aliases: I<strong_fermat_psp_each>
+
+=cut
+
 =head2 ecm_factor
 
     n.ecm_factor
@@ -2324,7 +2488,7 @@ Aliases: I<squarefree_almost_primes_each>
 
 Hendrik Lenstra's elliptic curve factorization method (ECM).
 
-The product of the factors, will give back C<n>. However, some factors may be composite.
+The product of the factors will give back C<n>. However, some factors may be composite.
 
 =cut
 
@@ -2474,7 +2638,7 @@ Aliases: I<powmod>
 
     expnorm(n, b=10)
 
-Returns C<exp(n)> normalized in the range C<[0,1)>.
+Returns C<exp(n)> normalized in the range C<[0,1)>. The base C<b> can be value > 1.
 
     say expnorm(log(2) * 20996011)          #=> 0.125976895450330105020494309574...
 
@@ -2489,6 +2653,20 @@ Complex numbers are also supported:
 
     say expnorm(log(-1))            #=> 0.06682015101903....+0.074398033695749....i
     say expnorm(log(-1234)).abs     #=> 0.1234
+
+Equivalent with:
+
+    exp(n) / b**k        # for some positive integer value of k
+
+=cut
+
+=head2 to_f
+
+    x.to_f
+
+Convert C<x> to a floating-point value number.
+
+Aliases: I<f>, I<float>, I<to_float>
 
 =cut
 
@@ -2673,7 +2851,19 @@ Tries to factorize a given number using Fermat's factorization method (using at 
 
 Works for odd composite non-power numbers C<n> that have two divisors close to C<sqrt(n)>.
 
-The product of the factors, will give back C<n>. However, some factors may be composite.
+The product of the factors will give back C<n>. However, some factors may be composite.
+
+=cut
+
+=head2 fermat_psp
+
+    k.fermat_psp(base, n)
+    k.fermat_psp(base, a, b)
+
+Returns an array with all the C<k>-omega Fermat pseudoprimes to the given C<base> that are <= n or in the range C<a..b>.
+
+    say 3.fermat_psp(2, 10000)            # 3-omega Fermat psp to base 2
+    say 4.fermat_psp(2, 10000, 100000)    # 4-omega Fermat psp to base 2 in range
 
 =cut
 
@@ -2753,7 +2943,7 @@ Example (try with base 3 and give up after 10^6 iterations):
 
     say flt_factor(2**64 + 1, 3, 1e6)   #=> [274177, 67280421310721]
 
-The product of the factors, will give back C<n>. However, some factors may be composite.
+The product of the factors will give back C<n>. However, some factors may be composite.
 
 =cut
 
@@ -2920,7 +3110,7 @@ Aliases: I<hermite_polynomialHe>
 
 Hart's OLF method (variant of Fermat's method).
 
-The product of the factors, will give back C<n>. However, some factors may be composite.
+The product of the factors will give back C<n>. However, some factors may be composite.
 
 =cut
 
@@ -2981,18 +3171,6 @@ Integer cube root of n.
 
 =cut
 
-=head2 idiv_ceil
-
-    idiv_ceil(a,b)
-
-Integer division of integers C<a> and C<b>, rounded towards +Infinity.
-
-When C<a> and C<b> are integers, this is equivalent with:
-
-    ceil(a/b)
-
-=cut
-
 =head2 idivisors
 
     idivisors(n)
@@ -3002,30 +3180,6 @@ Returns an array with the infinitary divisors (or i-divisors) of n.
     say 96.idivisors        #=> [1, 2, 3, 6, 16, 32, 48, 96]
 
 Aliases: I<infinitary_divisors>
-
-=cut
-
-=head2 idiv_round
-
-    idiv_round(a,b)
-
-Integer division of integers C<a> and C<b>, rounded towards nearest integer.
-
-When C<a> and C<b> are integers, this is equivalent with:
-
-    floor(a/b + 1/2)
-
-=cut
-
-=head2 idiv_trunc
-
-    idiv_trunc(a,b)
-
-Integer division of integers C<a> and C<b>, rounded towards 0.
-
-When C<a> and C<b> are integers, this is equivalent with:
-
-    trunc(a/b)
 
 =cut
 
@@ -3609,6 +3763,14 @@ Aliases: I<is_lucasu_psp>, I<is_lucasU_psp>, I<is_fibonacci_psp>, I<is_lucasU_ps
 
 =cut
 
+=head2 is_float
+
+    x.is_float
+
+Returns true if C<x> is stored as a floating-point number.
+
+=cut
+
 =head2 is_frobenius_psp
 
     n.is_frobenius_psp(a,b)
@@ -3850,9 +4012,9 @@ Returns true when C<n> is an odd composite integer.
 
     n.is_omega_prime(k=2)
 
-Return true if C<n> is a k-omega prime (i.e.: true if C<n> is divisible by exactly C<k> different primes).
+Return true if C<n> is a C<k>-omega prime (i.e.: true if C<n> is divisible by exactly C<k> different primes).
 
-Equivalently, k-omega primes are numbers n such that C<omega(n) == k>.
+Equivalently, C<k>-omega primes are numbers n such that C<omega(n) == k>.
 
     say 20.by { .is_omega_prime(1) }   # prime powers
     say 20.by { .is_omega_prime(2) }   # numbers n such that omega(n) == 2
@@ -4225,6 +4387,14 @@ Equivalently, k-almost primes are numbers C<n> that satisfy C<bigomega(n) == ome
 
 =cut
 
+=head2 is_squarefree_semiprime
+
+    is_squarefree_semiprime(n)
+
+Returns true if C<n> is a squarefree semiprime (i.e.: C<n = p*q>, where C<p> and C<q> are two distinct primes).
+
+=cut
+
 =head2 is_stronger_lucas_psp
 
     n.is_stronger_lucas_psp
@@ -4503,6 +4673,14 @@ Dilogarithm function, defined as the integral of C<-log(1-t)/t> from 0 to x.
 
 =cut
 
+=head2 lift
+
+    n.lift
+
+Returns the self object.
+
+=cut
+
 =head2 liouville
 
     liouville(n)
@@ -4661,6 +4839,18 @@ Returns the n-th Lucas number.
 
 =cut
 
+=head2 lucas_carmichael
+
+    k.lucas_carmichael(n)
+    k.lucas_carmichael(a, b)
+
+Returns an array with all the Lucas-Carmichael numbers <= n or in the range C<a..b> that have exactly C<k> prime factors.
+
+    say 3.lucas_carmichael(10000)         # 3-Lucas-Carmichael numbers
+    say 4.lucas_carmichael(10000, 100000) # 4-Lucas-Carmichael numbers in range
+
+=cut
+
 =head2 lucas_factor
 
     n.lucas_factor(j=1, tries=100)
@@ -4669,7 +4859,7 @@ Effective in factoring Carmichael numbers, Fermat pseudoprimes, Lucas pseudoprim
 
     say lucas_factor(2425361208749736840354501506901183117777758034612345610725789878400467)
 
-The product of the factors, will give back C<n>. However, some factors may be composite.
+The product of the factors will give back C<n>. However, some factors may be composite.
 
 Aliases: I<lucas_miller_factor>
 
@@ -4785,7 +4975,7 @@ Example:
 
     say mbe_factor(2**64 + 1, 1)   #=> [274177, 67280421310721]
 
-The product of the factors, will give back C<n>. However, some factors may be composite.
+The product of the factors will give back C<n>. However, some factors may be composite.
 
 =cut
 
@@ -4829,11 +5019,11 @@ Aliases: I<mfactorial>, I<multi_factorial>
 
 Effective in factoring Carmichael numbers and Fermat pseudoprimes.
 
-It returns an array with the factors of C<n>. However, sometimes, not all factors are prime.
+It returns an array with the factors of C<n>:
 
     say miller_factor(58571442634534443082821160508299574798027946748324125518533225605795841)
 
-The product of the factors, will give back C<n>. However, some factors may be composite.
+The product of the factors will give back C<n>. However, some factors may be composite.
 
 Aliases: I<miller_rabin_factor>
 
@@ -4945,16 +5135,16 @@ Returns the count of the non-bi-unitary divisors of n.
 
 =cut
 
-=head2 n_composites
+=head2 next_composites
 
-    n_composites(n, start=4)
+    n.next_composites(start=4)
 
-Returns n consecutive composite numbers starting from C<start>.
+Returns an Array with C<n> consecutive composite numbers starting from C<start>.
 
-    say n_composites(10)        #=> [4, 6, 8, 9, 10, 12, 14, 15, 16, 18]
-    say n_composites(5, 50)     #=> [50, 51, 52, 54, 55]
+    say 5.next_composites        #=> [4, 6, 8, 9, 10]
+    say 5.next_composites(50)    #=> [50, 51, 52, 54, 55]
 
-Aliases: I<ncomposites>, I<next_composites>
+Aliases: I<ncomposites>, I<n_composites>
 
 =cut
 
@@ -5038,7 +5228,7 @@ Given a non-negative integer C<n>, returns the next composite number greater tha
 
     n.next_omega_prime(k=2)
 
-Returns the next k-omega prime greater than C<n>.
+Returns the next C<k>-omega prime greater than C<n>.
 
 =cut
 
@@ -5191,20 +5381,20 @@ Returns the normalized value of C<x>: C<abs(x)^2>.
 
 =cut
 
-=head2 n_primes
+=head2 next_primes
 
-    n_primes(n, start=2)
+    n.next_primes(start=2)
 
-Returns an array containing C<n> consecutive primes that are `>= start` (if omitted, then start = 2).
+Returns an Array containing C<n> consecutive primes that are `>= start` (if omitted, then start = 2).
 
-    say n_primes(10)        #=> [2, 3, 5, 7, 11, 13, 17, 19, 23, 29]
-    say n_primes(10, 1000)  #=> [1009, 1013, 1019, 1021, 1031, 1033, 1039, 1049, 1051, 1061]
+    say 10.next_primes        #=> [2, 3, 5, 7, 11, 13, 17, 19, 23, 29]
+    say 10.next_primes(1000)  #=> [1009, 1013, 1019, 1021, 1031, 1033, 1039, 1049, 1051, 1061]
 
 The value for C<start> can be any arbitrarily large integer:
 
-    say n_primes(10, 2**128 + 1)    # first 10 primes > 2^128
+    say 10.next_primes(2**128 + 1)    # first 10 primes >= 2^128
 
-Aliases: I<nprimes>, I<next_primes>
+Aliases: I<nprimes>, I<n_primes>
 
 =cut
 
@@ -5224,7 +5414,7 @@ Returns the n-th k-almost prime.
 
     nth_omega_prime(n, k=2)
 
-Returns the n-th k-omega prime.
+Returns the C<n>-th C<k>-omega prime.
 
     say nth_omega_prime(1e7, 2)    #=> 42314023
     say nth_omega_prime(1e7, 3)    #=> 28013887
@@ -5382,11 +5572,11 @@ Returns an array with n elements mapped to the given block. The block is called 
     n.omega_prime_divisors
     n.omega_prime_divisors(k)
 
-Returns the k-omega prime divisors of n.
+Returns the C<k>-omega prime divisors of n.
 
     say 5040.omega_prime_divisors(4)    #=> [210, 420, 630, 840, 1260, 1680, 2520, 5040]
 
-When C<k> is omitted, an array of arrays with the k-omega prime divisors of n, for each k in the range C<0..omega(n)>, is returned:
+When C<k> is omitted, an array of arrays with the C<k>-omega prime divisors of C<n>, for each C<k> in the range C<0..omega(n)>, is returned:
 
     say 120.omega_prime_divisors        #=> [[1], [2, 3, 4, 5, 8], [6, 10, 12, 15, 20, 24, 40], [30, 60, 120]]
 
@@ -5397,7 +5587,7 @@ When C<k> is omitted, an array of arrays with the k-omega prime divisors of n, f
     k.omega_prime_count(n)
     k.omega_prime_count(a,b)
 
-Returns the number of k-omega primes <= n, or in the range C<a..b>.
+Returns the number of C<k>-omega primes <= n, or in the range C<a..b>.
 
     say 1.omega_prime_count(100)            # number prime powers <= 100
     say 2.omega_prime_count(50, 100)        # number of 2-omega primes in range 50..100
@@ -5411,9 +5601,9 @@ Aliases: I<omega_primepi>
     k.omega_primes(n)
     k.omega_primes(a,b)
 
-Returns an array with k-omega primes <= n, or in the range C<a..b>.
+Returns an array with C<k>-omega primes <= n, or in the range C<a..b>.
 
-k-omega primes are numbers C<n> that satisfy C<omega(n) == k>.
+C<k>-omega primes are numbers C<n> that satisfy C<omega(n) == k>.
 
     say 1.omega_primes(100)         # prime powers <= 100
     say 2.omega_primes(50, 100)     # 2-omega primes in range 50..100
@@ -5456,7 +5646,7 @@ Returns an array with the real and imaginary parts of C<x>.
 
 Pollard-Brent rho factorization method.
 
-The product of the factors, will give back C<n>. However, some factors may be composite.
+The product of the factors will give back C<n>. However, some factors may be composite.
 
 =cut
 
@@ -5470,7 +5660,7 @@ This method is particularly effective for numbers that have factors close to C<s
 
     say pell_factor(10**120 - 10**40)
 
-The product of the factors, will give back C<n>. However, some factors may be composite.
+The product of the factors will give back C<n>. However, some factors may be composite.
 
 =cut
 
@@ -5504,6 +5694,23 @@ Returns an array of arrays with the permutations of the integers in the range C<
 
 =cut
 
+=head2 phi_finder_factor
+
+    n.phi_finder_factor(tries=1e4)
+
+Tries to find a factor of C<n>, using the Phi-finder factorization method due to Kyle Kloster (2010).
+
+This method is particularly effective for semiprimes C<n = p*q> such that C<p> and C<q> are relatively close to each other.
+
+Example:
+
+    say phi_finder_factor(622882096110539)          #=> [23099599, 26965061]
+    say phi_finder_factor(132750061135361, 1e5)     #=> [9369673, 14168057]
+
+The product of the factors will give back C<n>. However, some factors may be composite.
+
+=cut
+
 =head2 pi_k
 
     k.almost_prime_count(n)
@@ -5525,7 +5732,7 @@ Aliases: I<almost_primepi>, I<almost_prime_count>
 
 Pollard p-1 factorization method.
 
-The product of the factors, will give back C<n>. However, some factors may be composite.
+The product of the factors will give back C<n>. However, some factors may be composite.
 
 Aliases: I<pminus1_factor>
 
@@ -5859,7 +6066,7 @@ Returns the number of the k-th power unitary divisors of n.
 
 Williams' p+1 factorization method.
 
-The product of the factors, will give back C<n>. However, some factors may be composite.
+The product of the factors will give back C<n>. However, some factors may be composite.
 
 Aliases: I<pplus1_factor>
 
@@ -5897,6 +6104,25 @@ Aliases: I<perfect_power_udivisors>, I<perfect_power_unitary_divisors>
 
 =cut
 
+=head2 prev_composite
+
+    prev_composite(n)
+
+Returns the previous composite number smaller than C<n>.
+
+=cut
+
+=head2 prev_composites
+
+    n.prev_composites(start)
+
+Returns an Array with C<n> consecutive decreasing composite numbers starting from C<start>.
+
+    say 5.prev_composites(10)   #=> [10, 9, 8, 6, 4]
+    say 5.prev_composites(97)   #=> [96, 95, 94, 93, 92]
+
+=cut
+
 =head2 prev_pow
 
     n.prev_pow(b)
@@ -5914,7 +6140,17 @@ Aliases: I<prev_power>
 
     n.prev_prime
 
-Returns the previous prime smaller than n.
+Returns the previous prime smaller than C<n>.
+
+=cut
+
+=head2 prev_primes
+
+    n.prev_primes(start)
+
+Returns an Array with C<n> consecutive decreasing prime numbers starting from C<start>.
+
+    say 5.prev_primes(100)  #=> [97, 89, 83, 79, 73]
 
 =cut
 
@@ -5925,7 +6161,7 @@ Returns the previous prime smaller than n.
 
 Pollard rho factorization method.
 
-The product of the factors, will give back C<n>. However, some factors may be composite.
+The product of the factors will give back C<n>. However, some factors may be composite.
 
 =cut
 
@@ -6202,9 +6438,9 @@ Equivalent with:
 =head2 prime_sum
 
     prime_sum(n)
-    prime_sum(a,b)
+    prime_sum(a,b,k=1)
 
-Sum of the prime numbers <= n, or in the range C<a..b>.
+Sum of the prime numbers <= n, or in the range C<a..b>, each prime raised to the k-th power.
 
 Aliases: I<primes_sum>, I<sum_primes>
 
@@ -6271,7 +6507,7 @@ Example:
 
 =head2 primorial
 
-    Number.primorial()
+    x.primorial
 
 Returns the
 
@@ -6340,7 +6576,7 @@ Aliases: I<quadratic_nonresidue>
 
 Pomerance's Quadratic Sieve factorization method (SIMPQS).
 
-The product of the factors, will give back C<n>. However, some factors may be composite.
+The product of the factors will give back C<n>. However, some factors may be composite.
 
 =cut
 
@@ -6541,6 +6777,20 @@ Given a real number C<x>, it returns a very good (sometimes exact) rational appr
     say rat_approx(zeta(-5)).as_frac    #=> -1/252
 
 Returns C<NaN> when C<x> is not a real number.
+
+=cut
+
+=head2 idiv_round
+
+    idiv_round(a,b)
+
+Integer division of integers C<a> and C<b>, rounded towards nearest integer.
+
+When C<a> and C<b> are integers, this is equivalent with:
+
+    floor(a/b + 1/2)
+
+Aliases: I<rdd>
 
 =cut
 
@@ -6913,7 +7163,7 @@ The method returns an array with the factors of C<n>:
 
     say special_factor((3**120 + 1) * (5**240 - 1))
 
-The product of the factors, will give back C<n>. However, some factors may be composite.
+The product of the factors will give back C<n>. However, some factors may be composite.
 
 Aliases: I<special_factors>
 
@@ -7081,6 +7331,18 @@ Returns an array with the square-free divisors of n.
 
 =cut
 
+=head2 squarefree_fermat_psp
+
+    k.squarefree_fermat_psp(base, n)
+    k.squarefree_fermat_psp(base, a, b)
+
+Returns an array with all the squarefree Fermat pseudoprimes to the given C<base> that are <= n or in the range C<a..b> and have exactly C<k> prime factors.
+
+    say 3.squarefree_fermat_psp(2, 10000)           # squarefree 3-Fermat psp to base 2
+    say 4.squarefree_fermat_psp(2, 10000, 100000)   # squarefree 4-Fermat psp to base 2 in range
+
+=cut
+
 =head2 squarefree_pi_k
 
     k.squarefree_almost_prime_count(n)
@@ -7095,6 +7357,31 @@ Aliases: I<squarefree_almost_primepi>, I<squarefree_almost_prime_count>
 
 =cut
 
+=head2 squarefree_semiprime_count
+
+    squarefree_semiprime_count(n)
+    squarefree_semiprime_count(a,b)
+
+Counts the number of squarefree semiprimes <= n (OEIS: A072613), or in the range C<a..b>.
+
+    say 10.of {|k| squarefree_semiprime_count(10**k) }  # OEIS: A036351
+
+Aliases: I<squarefree_semiprimes_count>
+
+=cut
+
+=head2 squarefree_semiprimes
+
+    squarefree_semiprimes(n)
+    squarefree_semiprimes(a,b)
+
+Returns an array with the squarefree semiprimes <= n, or in the range C<a..b>.
+
+    say squarefree_semiprimes(100)       # squarefree semiprimes <= 100
+    say squarefree_semiprimes(50, 100)   # squarefree semiprimes in the range [50, 100]
+
+=cut
+
 =head2 squarefree_sigma
 
     squarefree_sigma(n,k=1)
@@ -7103,6 +7390,18 @@ Sum of the square free divisors of C<n>, each divisor raised to power C<k>.
 
     say squarefree_sigma(5040)      #=> 576
     say squarefree_sigma(5040, 2)   #=> 65000
+
+=cut
+
+=head2 squarefree_strong_fermat_psp
+
+    k.squarefree_strong_fermat_psp(base, n)
+    k.squarefree_strong_fermat_psp(base, a, b)
+
+Returns an array with all the squarefree strong Fermat pseudoprimes to the given C<base> that are <= n or in the range C<a..b> and have exactly C<k> prime factors.
+
+    say 3.squarefree_strong_fermat_psp(2, 1e6)        # squarefree strong 3-Fermat psp to base 2 <= 1e6
+    say 4.squarefree_strong_fermat_psp(2, 1e7, 1e8)   # squarefree strong 4-Fermat psp to base 2, in range 1e7..1e8
 
 =cut
 
@@ -7229,7 +7528,7 @@ Returns the number of unitary square divisors of C<n>.
 
 Shanks' SQUFOF method.
 
-The product of the factors, will give back C<n>. However, some factors may be composite.
+The product of the factors will give back C<n>. However, some factors may be composite.
 
 =cut
 
@@ -7256,6 +7555,18 @@ Stirling numbers of the second kind.
     stirling3(n,k)
 
 Stirling numbers of the third kind (also known as Lah numbers).
+
+=cut
+
+=head2 strong_fermat_psp
+
+    k.strong_fermat_psp(base, n)
+    k.strong_fermat_psp(base, a, b)
+
+Returns an array with all the strong Fermat pseudoprimes to the given C<base> that are <= n or in the range C<a..b> and have C<k> distinct prime factors.
+
+    say 3.strong_fermat_psp(2, 1e6)         # 3-omega strong Fermat psp to base 2
+    say 4.strong_fermat_psp(2, 1e6, 1e7)    # 4-omega strong Fermat psp to base 2 in range
 
 =cut
 
@@ -7382,16 +7693,6 @@ Call a given block of code C<n> times with k = 0,1,2,...,n-1.
 
 =cut
 
-=head2 to_f
-
-    x.to_f
-
-Convert C<x> to a floating-point value number.
-
-Aliases: I<float>, I<to_float>
-
-=cut
-
 =head2 to_n
 
     x.to_n
@@ -7431,13 +7732,27 @@ Aliases: I<euler_phi>, I<eulerphi>, I<euler_totient>
 
 =cut
 
+=head2 idiv_trunc
+
+    idiv_trunc(a,b)
+
+Integer division of integers C<a> and C<b>, rounded towards 0.
+
+When C<a> and C<b> are integers, this is equivalent with:
+
+    trunc(a/b)
+
+Aliases: I<trd>
+
+=cut
+
 =head2 trial_factor
 
     n.trial_factor(limit)
 
 Trial division.
 
-The product of the factors, will give back C<n>. However, some factors may be composite.
+The product of the factors will give back C<n>. However, some factors may be composite.
 
 =cut
 

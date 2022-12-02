@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Plate",
    "prereqs" : {
@@ -34,17 +34,17 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/vlyon/Plate/issues"
+         "web" : "https://github.com/vlyon/plate/issues"
       },
-      "homepage" : "https://github.com/vlyon/Plate",
+      "homepage" : "https://github.com/vlyon/plate",
       "repository" : {
          "type" : "git",
-         "url" : "https://github.com/vlyon/Plate.git",
-         "web" : "https://github.com/vlyon/Plate"
+         "url" : "https://github.com/vlyon/plate.git",
+         "web" : "https://github.com/vlyon/plate"
       }
    },
-   "version" : "1.4",
+   "version" : "1.5",
    "x_generated_by_perl" : "v5.28.1",
-   "x_serialization_backend" : "JSON::XS version 4.03"
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.26"
 }
 

@@ -153,10 +153,9 @@ subtest 'Cache with request headers' => sub {
     my $keys = {
         'http://www.non-existent-server.com' => ['http://www.non-existent-server.com'],
         'http://www.non-existent-server.com,{"X-Test":"Test"}' => ['http://www.non-existent-server.com', { 'X-Test' => 'Test' } ],
-        'http://www.non-existent-server.com,{"X-Test":"Test"}' => ['http://www.non-existent-server.com', { 'X-Test' => 'Test' }, sub { } ],
         'http://www.non-existent-server.com,[{},"form",{"a":"b"}]' => ['http://www.non-existent-server.com', {}, form => { 'a' => 'b' } ],
-        'http://www.non-existent-server.com,[{"X-Test":"Test"},"form",{"a":"b"}]' => ['http://www.non-existent-server.com', { 'X-Test' => 'Test' }, form => { 'a' => 'b' }, sub { } ],
-        'http://www.non-existent-server.com,[{"X-Test":"Test"},"json",{"a":"b"}]' => ['http://www.non-existent-server.com', { 'X-Test' => 'Test' }, json => { 'a' => 'b' }, sub { } ],
+        'http://www.non-existent-server.com,[{"X-Test":"Test"},"form",{"a":"b"}]' => ['http://www.non-existent-server.com', { 'X-Test' => 'Test' }, form => { 'a' => 'b' } ],
+        'http://www.non-existent-server.com,[{"X-Test":"Test"},"json",{"a":"b"}]' => ['http://www.non-existent-server.com', { 'X-Test' => 'Test' }, json => { 'a' => 'b' } ],
     };
     while (my ($k, $v) = each %{$keys}) {
         is $ua->generate_key(@{$v}), $k, "generate_key " . (join " ", @{$v}) . " => $k";
@@ -177,6 +176,22 @@ subtest 'Cache with request headers' => sub {
     my $tx2 = $ua->get(@params);
     ok $tx2->res->headers->header('X-Mojo-UserAgent-Cached-Age') > 0, 'response is cached';
 
+};
+
+subtest 'Test overridable key generator' => sub {
+  my $ua = Mojo::UserAgent::Cached->new;
+
+  my $url = 'http://test.com?c=1&b=2&a=3';
+  my @opts = ( 'X-Test' => 'Test' );
+
+  $ua->key_generator(sub {
+    my ($self, $url, @opts) = @_;
+    $url = Mojo::URL->new($url) unless ref $url eq 'Mojo::URL';
+    $url->query->remove('b');
+    return $self->key_generator_cb($url, @opts);
+  });
+
+  is $ua->generate_key($url, @opts), 'http://test.com?a=3&c=1,["X-Test","Test"]', 'Correct key generated';
 };
 
 subtest 'Should run callbacks even if content is local' => sub {

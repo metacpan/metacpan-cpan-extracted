@@ -1,6 +1,17 @@
 Revision history for Runtime-Debugger
 
 ====
+0.11
+====
+
+2022-12-01
+Updated pod.
+Added some more test cases.
+Remove some TODOs.
+Improved history command.
+Added tests for simple array and hash operations.
+
+====
 0.10
 ====
 

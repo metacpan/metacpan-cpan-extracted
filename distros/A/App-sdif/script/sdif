@@ -16,13 +16,15 @@ sdif - side-by-side diff viewer for ANSI terminal
 
 =head1 VERSION
 
-Version 4.22.3
+Version 4.23.0
 
 =head1 SYNOPSIS
 
-sdif file_1 file_2
+    sdif file_1 file_2
 
-diff ... | sdif
+    diff ... | sdif
+
+  OPTIONS:
 
     -i, --ignore-case
     -b, --ignore-space-change
@@ -37,13 +39,13 @@ diff ... | sdif
     --unified, -u, -U#	unified diff
 
     --width=#, -W#	specify width of output (default 80)
-    --margin=#          specify margin column number (default 0)
-    --runin=#           specify run-in column number (default --margin)
-    --runout=#          specify run-out column number (default --margin)
+    --margin=#		specify margin column number (default 0)
+    --runin=#		specify run-in column number (default --margin)
+    --runout=#		specify run-out column number (default --margin)
     --mark=position	mark position (right, left, center, side) or no
     --column=order	set column order (default ONM)
     --view, -v		viewer mode
-    --ambiguous=s       ambiguous character width (detect, wide, narrow)
+    --ambiguous=s	ambiguous character width (detect, wide, narrow)
     --[no]command	print diff control command (default on)
     --[no]prefix	process git --graph output (default on)
     --prefix-pattern    prefix pattern
@@ -58,11 +60,12 @@ diff ... | sdif
     --diff=s		set diff command
     --diffopts=s	set diff command options
 
-    --[no]lenience      supress unexpected input warning (default on)
+    --[no]lenience	supress unexpected input warning (default on)
     --visible xx=1	set visible chars
     --tabhead=char	set tabhead char
     --tabspace=char	set tabspace char
     --tabstyle=style	set tabstyle (dot, symbol, shade, bar, dash...)
+    --tabstop=#		set tabstop width (default 8)
 
     --[no]cdif		use ``cdif'' as word context diff backend
     --unit=s		pass through to cdif (word, char, mecab)
@@ -80,158 +83,144 @@ use charnames ':full';
 use List::Util qw(min max reduce sum pairmap first);
 use Pod::Usage;
 use Text::ParseWords qw(shellwords);
-use Data::Dumper;
-$Data::Dumper::Terse = 1;
+use Data::Dumper; {
+    $Data::Dumper::Terse = 1;
+}
 
 use App::sdif;
 my $version = $App::sdif::VERSION;
 
 use App::sdif::Util;
 
-sub read_until (&$) {
-    my($sub, $fh) = @_;
-    my @lines;
-    while (<$fh>) {
-	push @lines, $_;
-	return @lines if &$sub;
-    }
-    (@lines, undef);
-}
+my $default_cdif = 'cdif';
+my @default_cdifopts = qw(--sdif);
+my $default_lenience = 1;
+my $default_256 = 1;
+my $default_prefix = 1;
+my $default_prefix_pattern = q/(?:\\| )*(?:  )?/;
+my @cdifopts;
+my $read_stdin;
 
-my $opt_n;
-my $opt_l;
-my $opt_s;
-my $opt_q;
-my $opt_d;
-my $opt_command = 1;
-my $opt_truncate = 0;
-my $opt_onword = 1;
-my $default_opt_cdif = 'cdif';
-my $opt_cdif = '';
-my @default_opt_cdifopts = qw(--sdif);
-my @opt_cdifopts;
-my $opt_env = 1;
-my @opt_colormap;
-my $opt_colordump;
-my @opt_diffopts;
-my $opt_diff = 'diff';
-my $opt_digit = 4;
-my $opt_column;
-my $opt_view;
-my $opt_ambiguous = 'narrow';
-my $opt_margin = 0;
-my $opt_runin;
-my $opt_runout;
-my $opt_lenience = my $opt_lenience_default = 1;
 our $screen_width;
 
-my $opt_color = 'always';
-my $opt_256 = my $opt_256_default = 1;
-my $opt_mark = "center";
-my $opt_prefix = my $opt_prefix_default = 1;
-my $opt_prefix_pattern = q/(?:\\| )*(?:  )?/;
-my $opt_W;
-my $opt_colortable;
-my %opt_visible;
-my $opt_tabstop  = 8;
-my $opt_tabstyle = undef;
-my $opt_tabhead  = undef;
-my $opt_tabspace = undef;
-
-#
-# options only for cdif
-#
-my $opt_unit;
-
-##
-## Special treatment --noenv option.
-##
-if (grep { $_ eq '--noenv' } @ARGV) {
-    $opt_env = 0;
-}
-if ($opt_env and my $env = $ENV{'SDIFOPTS'}) {
-    unshift(@ARGV, shellwords($env));
+if (my $env = $ENV{'SDIFOPTS'}) {
+    unshift @ARGV, shellwords($env);
 }
 
 use open IO => ':utf8', ':std';
 map { $_ = decode 'utf8', $_ unless utf8::is_utf8($_) } @ARGV;
 
-my @optargs = (
-    "n|number!" => \$opt_n,
-    "digit=i" => \$opt_digit,
-    "column=s" => \$opt_column,
-    "truncate|t!" => \$opt_truncate,
-    "onword!" => \$opt_onword,
-    "mark=s" => \$opt_mark,
-    "prefix!" => \$opt_prefix,
-    "prefix-pattern=s" => \$opt_prefix_pattern,
-    "l" => \$opt_l,
-    "s" => \$opt_s,
-    "width|W=i" => \$opt_W,
-    "margin=i" => \$opt_margin,
-    "runin=i" => \$opt_runin,
-    "runout=i" => \$opt_runout,
-    "view|v!" => \$opt_view,
-    "ambiguous=s" => \$opt_ambiguous,
-    "command!" => \$opt_command,
+my $app;
 
-    "d+" => \$opt_d,
-    "h|help" => sub { usage() },
-    "man" => sub { pod2usage({-verbose => 2}) },
+use Getopt::EX::Hashed; {
 
-    "env!" => \$opt_env,
-    "diff=s" => \$opt_diff,
-    "diffopts=s" => \@opt_diffopts,
-    "color=s" => \$opt_color,
-    "nocolor|no-color" => sub { $opt_color = 'never' },
-    "colormap|cm=s" => \@opt_colormap,
-    "colordump" => \$opt_colordump,
-    "256!" => \$opt_256,
-    "i|ignore-case"         => sub { push @opt_diffopts, '-i'; push @opt_cdifopts, '-i' },
-    "b|ignore-space-change" => sub { push @opt_diffopts, '-b'; push @opt_cdifopts, '-w' },
-    "w|ignore-all-space"    => sub { push @opt_diffopts, '-w'; push @opt_cdifopts, '-w' },
-    "B|ignore-blank-lines"  => sub { push @opt_diffopts, '-B' },
-    "c|context"             => sub { push @opt_diffopts, '-c' },
-    "u|unified"             => sub { push @opt_diffopts, '-u' },
-    "C=i"                   => sub { push @opt_diffopts, '-C' . $_[1] },
-    "U=i"                   => sub { push @opt_diffopts, '-U' . $_[1] },
-    "cdif:s" => \$opt_cdif,
-    "nocdif|no-cdif" => sub { $opt_cdif = undef },
-    "cdifopts=s" => sub { push @opt_cdifopts, shellwords $_[1] },
-    "colortable" => \$opt_colortable,
-    "lenience!"  => \$opt_lenience,
-    "visible=i"  => \%opt_visible,
-    "tabstop=i"  => \$opt_tabstop,
-    "tabhead=s"  => \$opt_tabhead,
-    "tabstyle=s" => \$opt_tabstyle,
-    "tabspace=s" => \$opt_tabspace,
+    Getopt::EX::Hashed->configure( DEFAULT => [ is => 'rw' ] );
 
-    "unit|by=s"  => \$opt_unit,
-    "mecab!"     => sub { $opt_unit = $_[1] ? 'mecab' : undef },
-);
+    has help           => ' h   ' ;
+    has man            => '     ' ;
+    has debug          => 'd +  ' ;
+    has number         => 'n !  ' ;
+    has digit          => '  =i ' , default => 4 ;
+    has column         => '  =s ' ;
+    has truncate       => 't !  ' ;
+    has onword         => '  !  ' , default => 1 ;
+    has mark           => '  =s ' , default => 'center' ;
+    has prefix         => '  !  ' , default => $default_prefix ;
+    has prefix_pattern => '  =s ' , default => $default_prefix_pattern ;
+    has width          => 'W =i ' ;
+    has margin         => '  =i ' , default => 0 ;
+    has runin          => '  =i ' ;
+    has runout         => '  =i ' ;
+    has view           => 'v !  ' ;
+    has ambiguous      => '  =s ' , default => 'narrow' ;
+    has command        => '  !  ' , default => 1 ;
+    has diff           => '  =s ' , default => 'diff' ;
+    has diffopts       => '  =s@' , default => [] ;
+    has color          => '  =s ' , default => 'always' ;
+    has colormap       => 'cm=s@' , default => [] ;
+    has colordump      => '     ' ;
+    has 256            => '  !  ' , default => $default_256 ;
+    has cdif           => '  :s ' , default => '';
+    has cdifopts       => '  =s ' ;
+    has colortable     => '     ' ;
+    has lenience       => '  !  ' , default => $default_lenience ;
+    has visible        => '  =i%' , default => {} ;
+    has tabstop        => '  =i ' , default => 8;
+    has tabhead        => '  =s ' ;
+    has tabstyle       => '  =s ' ;
+    has tabspace       => '  =s ' ;
+    has unit           => 'by=s ' ;
+
+    has ignore_case         => 'i    ' ;
+    has ignore_space_change => 'b    ' ;
+    has ignore_all_space    => 'w    ' ;
+    has ignore_blank_lines  => 'B    ' ;
+    has context             => 'C  =i' ;
+    has unified             => 'U  =i' ;
+    has c                   => '     ' ;
+    has u                   => '     ' ;
+
+    has '+cdifopts'
+	=> sub { push @cdifopts, shellwords $_[1] } ;
+
+    has '+ignore_case'
+	=> sub { push @{$app->diffopts}, '-i'; push @cdifopts, '-i' } ;
+    has '+ignore_space_change'
+	=> sub { push @{$app->diffopts}, '-b'; push @cdifopts, '-w' } ;
+    has '+ignore_all_space'
+	=> sub { push @{$app->diffopts}, '-w'; push @cdifopts, '-w' } ;
+    has '+ignore_blank_lines'
+	=> sub { push @{$app->diffopts}, '-B' } ;
+
+    has '+c'       => sub { push @{$app->diffopts}, '-c' } ;
+    has '+u'       => sub { push @{$app->diffopts}, '-u' } ;
+    has '+context' => sub { push @{$app->diffopts}, '-C' . $_[1] } ;
+    has '+unified' => sub { push @{$app->diffopts}, '-U' . $_[1] } ;
+
+    has nocolor => 'no-color' , action => sub { $app->color = 'never' } ;
+    has nocdif  => 'no-cdif'  , action => sub { $app->cdif = undef } ;
+
+    has mecab   => '!' , action => sub { $app->unit = $_[1] ? 'mecab' : undef } ;
+
+    has '+ambiguous' => sub {
+	if ($_[1] =~ /^(?:wide|full)/) {
+	    $Text::VisualWidth::PP::EastAsian = 1;
+	    Text::ANSI::Fold->configure(ambiguous => 'wide');
+	}
+    } ;
+
+    has '+help' => sub { usage() } ;
+    has '+man'  => sub { pod2usage {-verbose => 2} } ;
+
+} no Getopt::EX::Hashed;
+
+$app = Getopt::EX::Hashed->new() or die;
 
 my @SAVEDARGV = @ARGV;
 use Getopt::EX::Long qw(:DEFAULT Configure ExConfigure);
 ExConfigure BASECLASS => [ "App::sdif", "Getopt::EX" ];
 Configure "bundling";
-GetOptions @optargs or usage({status => 1});
+$app->getopt or usage({status => 1});
 
-warn "\@ARGV = (@SAVEDARGV)\n" if $opt_d;
+warn "\@ARGV = (@SAVEDARGV)\n" if $app->debug;
 
-$App::sdif::Util::NO_WARNINGS = $opt_lenience;
+$App::sdif::Util::NO_WARNINGS = $app->lenience;
 
 use Text::VisualWidth::PP qw(vwidth);
-use Text::ANSI::Fold qw(ansi_fold :constants);
-Text::ANSI::Fold->configure(padding => 1, expand => 1, tabstop => $opt_tabstop);
+use Text::ANSI::Fold qw(ansi_fold :constants); {
+    Text::ANSI::Fold->configure(padding => 1,
+				expand  => 1,
+				tabstop => $app->tabstop);
+}
 
-$opt_visible{ht} //= 1 if $opt_tabstyle;
-if ($opt_visible{ht}) {
+$app->visible->{ht} //= 1 if $app->tabstyle;
+if ($app->visible->{ht}) {
     Text::ANSI::Fold->configure(
-	tabstyle => $opt_tabstyle,
+	tabstyle => $app->tabstyle,
 	map  { $_->[0] => unicode($_->[1]) }
 	grep { $_->[1] }
-	[ tabhead  => $opt_tabhead  ],
-	[ tabspace => $opt_tabspace ],
+	[ tabhead  => $app->tabhead  ],
+	[ tabspace => $app->tabspace ],
 	);
 }
 
@@ -244,27 +233,17 @@ sub unicode {
     }
 }
 
-if ($opt_ambiguous =~ /^(?:detect|auto)$/) {
-    use Unicode::EastAsianWidth::Detect qw(is_cjk_lang);
-    $opt_ambiguous = is_cjk_lang() ? 'wide' : 'narrow';
-}
-
-if ($opt_ambiguous =~ /^(?:wide|full)/) {
-    $Text::VisualWidth::PP::EastAsian = 1;
-    Text::ANSI::Fold->configure(ambiguous => 'wide');
-}
-
-if ($opt_margin > 0) {
+if ($app->margin > 0) {
     Text::ANSI::Fold->configure(
 	linebreak => LINEBREAK_ALL,
-	margin    => $opt_margin,
-	runin     => $opt_runin // $opt_margin,
-	runout    => $opt_runout // $opt_margin,
+	margin    => $app->margin,
+	runin     => $app->runin // $app->margin,
+	runout    => $app->runout // $app->margin,
 	);
 }
 
 my %colormap = do {
-    my $col = $opt_256 ? 0 : 1;
+    my $col = $app->{256} ? 0 : 1;
     pairmap { $a => (ref $b eq 'ARRAY') ? $b->[$col] : $b } (
 	UNKNOWN  =>    ""         ,
 	OCOMMAND =>  [ "555/010"  , "GS"  ],
@@ -293,22 +272,22 @@ $Getopt::EX::Colormap::NO_RESET_EL = 1;
 use constant SGR_RESET => "\e[m";
 my $color_handler = Getopt::EX::Colormap
     ->new(HASH => \%colormap)
-    ->load_params(@opt_colormap);
+    ->load_params(@{$app->colormap});
 
 $colormap{OUMARK} ||= $colormap{UMARK} || $colormap{OMARK};
 $colormap{NUMARK} ||= $colormap{UMARK} || $colormap{NMARK};
 $colormap{OULINE} ||= $colormap{ULINE} || $colormap{OLINE};
 $colormap{NULINE} ||= $colormap{ULINE} || $colormap{NLINE};
 
-if ($opt_colordump) {
+if ($app->colordump) {
     print $color_handler->colormap(
 	name => '--changeme', option => '--colormap');
     exit;
 }
 
 my $painter = do {
-    if (($opt_color eq 'always')
-	or (($opt_color eq 'auto') and (-t STDOUT))) {
+    if (($app->color eq 'always')
+	or (($app->color eq 'auto') and (-t STDOUT))) {
 	sub { $color_handler->color(@_) };
     } else {
 	sub { $_[1] } ;
@@ -318,44 +297,44 @@ my $painter = do {
 ##
 ## setup cdif command and option
 ##
-if (defined $opt_cdif and $opt_cdif eq '') {
-    $opt_cdif = $default_opt_cdif;
+if (defined $app->cdif and $app->cdif eq '') {
+    $app->cdif = $default_cdif;
 }
 
 for (
-    [ "unit"     , "=" , \$opt_unit     , undef     ] ,
-    [ "256"      , "!" , \$opt_256      , $opt_256_default      ] ,
-    [ "prefix"   , "!" , \$opt_prefix   , $opt_prefix_default   ] ,
-    [ "lenience" , "!" , \$opt_lenience , $opt_lenience_default ] ,
+    [ "unit"     , "=" , $app->unit     , undef             ] ,
+    [ "256"      , "!" , $app->{256}    , $default_256      ] ,
+    [ "prefix"   , "!" , $app->prefix   , $default_prefix   ] ,
+    [ "lenience" , "!" , $app->lenience , $default_lenience ] ,
     )
 {
     my($name, $type, $var, $default) = @$_;
     if ($type eq "!") {
-	next if not defined $$var;
-	next if $$var == $default;
-	unshift @opt_cdifopts, sprintf("--%s%s", $$var ? '' : 'no-', $name);
+	next if not defined $var;
+	next if $var == $default;
+	unshift @cdifopts, sprintf("--%s%s", $var ? '' : 'no-', $name);
     } elsif ($type eq "=") {
-	next if not defined $$var;
-	unshift @opt_cdifopts, sprintf("--%s=%s", $name, $$var);
+	next if not defined $var;
+	unshift @cdifopts, sprintf("--%s=%s", $name, $var);
     } else {
 	die;
     }
 }
 
-unshift @opt_cdifopts, @default_opt_cdifopts;
+unshift @cdifopts, @default_cdifopts;
 
 my($OLD, $NEW, $DIFF);
 if (@ARGV == 2) {
     ($OLD, $NEW) = @ARGV;
-    $DIFF = "$opt_diff @opt_diffopts $OLD $NEW |";
+    $DIFF = "$app->{diff} @{$app->{diffopts}} $OLD $NEW |";
 } elsif (@ARGV < 2) {
     $DIFF = shift || '-';
-    $opt_s++;
+    $read_stdin++;
 } else {
     usage({status => 1}, "Unexpected arguments.\n\n");
 }
 my $readfile =
-    ($OLD and $NEW) && !$opt_s && !(grep { /^-[cuCU]/ } @opt_diffopts);
+    ($OLD and $NEW) && !$read_stdin && !(grep { /^-[cuCU]/ } @{$app->diffopts});
 
 use constant {
     RIGHT => 'right',
@@ -369,24 +348,24 @@ my %markpos = (
     left   => [ LEFT  , LEFT  , LEFT  ],
     no     => [ NO    , NO    , NO    ],
     );
-unless ($markpos{$opt_mark}) {
+unless ($markpos{$app->mark}) {
     my @keys = sort keys %markpos;
     usage "Use one from (@keys) for option --mark\n\n";
 }
-my @markpos = @{$markpos{$opt_mark}};
+my @markpos = @{$markpos{$app->mark}};
 my($omarkpos, $nmarkpos, $mmarkpos) = @markpos;
 
-my $num_format = "%${opt_digit}d";
+my $num_format = sprintf '%%%dd', $app->digit;
 
-$screen_width = $opt_W || &terminal_width;
+$screen_width = $app->width || &terminal_width;
 
 sub column_width {
     my $column = shift;
     state %column_width;
-    $column_width{$screen_width, $column} //= do {
+    $column_width{$screen_width * 1000 + $column} //= do {
 	use integer;
 	my $w = $screen_width;
-	$w -= $column if $opt_mark;
+	$w -= $column if $app->mark;
 	max 1, $w / $column;
     };
 }
@@ -394,7 +373,7 @@ sub column_width {
 ##
 ## --colortable
 ##
-if ($opt_colortable) {
+if ($app->colortable) {
     Getopt::EX::Colormap::colortable($screen_width);
     exit;
 }
@@ -402,30 +381,30 @@ if ($opt_colortable) {
 ##
 ## Column order
 ##
-my @column = !$opt_column ? () : do {
+my @column = !$app->column ? () : do {
     map { $_ - 1 }
     map { { O=>1, N=>2, M=>3 }->{$_} // $_ }
-    $opt_column =~ /[0-9ONM]/g;
+    $app->column =~ /[0-9ONM]/g;
 };
 
 ##
 ## Git --graph prefix pattern
 ##
 my $prefix_re = do {
-    if ($opt_prefix) {
-	qr/$opt_prefix_pattern/;
+    if ($app->prefix) {
+	qr/$app->{prefix_pattern}/;
     } else {
 	"";
     }
 };
 
-if ($opt_d) {
+if ($app->debug) {
     printf STDERR "\$OLD = %s\n", $OLD // "undef";
     printf STDERR "\$NEW = %s\n", $NEW // "undef";
     printf STDERR "\$DIFF = %s\n", $DIFF // "undef";
 }
 
-if ($opt_cdif) {
+if ($app->cdif) {
     my $pid = open DIFF, '-|';
     if (not defined $pid) {
 	die "$!" if not defined $pid;
@@ -435,7 +414,7 @@ if ($opt_cdif) {
 	if ($DIFF ne '-') {
 	    open(STDIN, $DIFF) || die "cannot open diff: $!\n";
 	}
-	do { exec shellwords($opt_cdif), @opt_cdifopts } ;
+	do { exec shellwords($app->cdif), @cdifopts } ;
 	warn "exec failed: $!";
 	print while <>;
 	exit;
@@ -463,7 +442,7 @@ if ($readfile) {
     seek NEW, 0, 0 or die unless -p NEW;
 }
 
-my @boundary = $opt_onword ? (boundary => 'word') : ();
+my @boundary = $app->onword ? (boundary => 'word') : ();
 my $color_re = qr{ \e \[ [\d;]* [mK] }x;
 
 my $oline = 1;
@@ -484,7 +463,7 @@ while (<DIFF>) {
 	    my $identical_line = $l1 - $oline + 1 - ($ctrl ne 'a');
 	    print_identical($identical_line);
 	}
-	if ($opt_d || $opt_s) {
+	if ($app->debug || $read_stdin) {
 	    print_command_n($_, $_);
 	}
 	if ($ctrl eq 'd' || $ctrl eq 'c') {
@@ -643,7 +622,7 @@ sub merge_diffc {
 
     my @buf;
     while (@o or @n) {
-	
+
 	push @buf, \( my( @common, @old, @new ) );
 
 	while (@o and $o[0] =~ /^ /) {
@@ -671,7 +650,7 @@ sub flush_buffer {
 
     push @_, [] while @_ % 3;
 
-    if ($opt_view) {
+    if ($app->view) {
 	@_ = do {
 	    map { @$_ }
 	    reduce {
@@ -709,7 +688,7 @@ sub flush_buffer_3 {
 
     push @_, [] while @_ % 4;
 
-    if ($opt_view) {
+    if ($app->view) {
 	@_ = do {
 	    map { @$_ }
 	    reduce {
@@ -756,12 +735,7 @@ sub print_identical {
 	my $old = <OLD>;
 	my $new = <NEW>;
 	defined $old or defined $new or last;
-	if ($opt_l) {
-	    print linenum($oline), " " if $opt_n;
-	    print expand_tab($old);
-	} else {
-	    print_column_23(' ', $old, ' ', $new);
-	}
+	print_column_23(' ', $old, ' ', $new);
 	$oline++;
 	$nline++;
 	$mline++;
@@ -770,14 +744,14 @@ sub print_identical {
 
 sub linenum {
     my $n = shift;
-    defined $n ? (sprintf $num_format, $n) : (' ' x $opt_digit);
+    defined $n ? (sprintf $num_format, $n) : (' ' x $app->digit);
 }
 
 sub print_column_23 {
     my $column = @_ / 2;
     my $width = column_width $column;
     my($omark, $old, $nmark, $new, $mmark, $mrg) = @_;
-    my $print_number = $opt_n;
+    my $print_number = $app->number;
 
     my($onum, $nnum, $mnum) = ('', '', '');
     my $nspace = $print_number ? ' ' : '';
@@ -828,7 +802,7 @@ sub print_column_23 {
 	}
 	print_field_n(@f);
 
-	last if $opt_truncate;
+	last if $app->truncate;
 	last unless $old ne '' or $new ne '' or ($mrg and $mrg ne '');
 
 	if ($print_number) {
@@ -843,7 +817,7 @@ sub print_column_23 {
 }
 
 sub print_command_n {
-    $opt_command or return;
+    $app->command or return;
 
     my $opt = ref $_[0] ? shift : {};
     my $column = @_;
@@ -883,36 +857,6 @@ sub print_field_n {
     print "\n";
 }
 
-sub read_line {
-    local *FH = shift;
-    my $c = shift;
-    my @buf = @_;
-    while ($c--) {
-	last if eof FH;
-	push @buf, scalar <FH>;
-    }
-    wantarray ? @buf : join '', @buf;
-}
-
-sub range {
-    local $_ = shift;
-    my($from, $to) = /,/ ? split(/,/) : ($_, $_);
-    wantarray ? ($from, $to) : $to - $from + 1;
-}
-
-sub terminal_width {
-    use Term::ReadKey;
-    my $default = 80;
-    my @size;
-    if (open my $tty, ">", "/dev/tty") {
-	# Term::ReadKey 2.31 on macOS 10.15 has a bug in argument handling
-	# and the latest version 2.38 fails to install.
-	# This code should work on both versions.
-	@size = GetTerminalSize $tty, $tty;
-    }
-    $size[0] or $default;
-}
-
 __END__
 
 =pod
@@ -924,8 +868,8 @@ feature of sdif is making a side-by-side listing of two different
 files.  All contents of two files are listed on left and right sides.
 Center column is used to indicate how different those lines are.  No
 mark means no difference.  Added, deleted and modified lines are
-marked with minus (`-') and plus (`+') character, and wrapped line is
-marked with period (`.').
+marked with minus C<-> and plus C<+> character, and wrapped line is
+marked with period C<.>.
 
     1 deleted  -
     2 same          1 same
@@ -935,13 +879,13 @@ marked with period (`.').
                 +   4 added
 
 It also reads and formats the output from B<diff> command from
-standard input.  Besides normal diff output, context diff I<-c> and
-unified diff I<-u> output will be handled properly.  Combined diff
+standard input.  Besides normal diff output, context diff B<-c> and
+unified diff B<-u> output will be handled properly.  Combined diff
 format is also supported, but currently limited up to three files.
 
 =head2 STARTUP and MODULE
 
-B<sdif> utilizes Perl L<Getopt::EX> module, and reads I<~/.sdifrc>
+B<sdif> utilizes Perl L<Getopt::EX> module, and reads C<~/.sdifrc>
 file if available when starting up.  You can define original and
 default option there.  To show the line number always, define like
 this:
@@ -992,10 +936,10 @@ to disable.
 
 While B<sdif> doesn't care about the contents of each modified lines,
 it can read the output from B<cdif> command which show the word
-context differences of each lines.  Option B<--cdif> set the
-appropriate options for B<cdif>.  Set I<--no-cc>, I<--no-mc> options
-at least when invoking B<cdif> manually.  Option I<--no-tc> is
-preferable because text color can be handled by B<sdif>.
+context differences of each lines.  Use B<cdif> command with option
+B<--sdif> to set the appropriate options for B<sdif>.  Set B<--no-cc>,
+B<--no-mc> options at least when invoking B<cdif> manually.  Option
+B<--no-tc> is preferable because text color can be handled by B<sdif>.
 
 From version 4.1.0, option B<--cdif> is set by default, so use
 B<--no-cdif> option to disable it.  Option B<--unit> (default word)
@@ -1029,7 +973,7 @@ head-and-end of line.  Margin columns are used for run-in/run-out
 columns unless they are given explicitly.  See `perldoc
 Text::ANSI::Fold` for detail.
 
-=item B<-->[B<no->]B<number>, B<-n>
+=item B<-n>, B<-->[B<no->]B<number>
 
 Print line number on each lines.
 Default false.
@@ -1052,13 +996,15 @@ change it.
 
 =item B<-B>, B<--ignore-blank-lines>
 
-=item B<-c>, B<-C>I<n>, B<-u>, B<-U>I<n>
+=item B<-c>, B<--context>=I<n>, B<-C>I<n>
+
+=item B<-u>, B<--unified>=I<n>, B<-U>I<n>
 
 Passed through to the back-end diff command.  Sdif can interpret the
-output from normal, context (I<diff -c>) and unified diff (I<diff
+output from normal, context (B<diff -c>) and unified diff (B<diff
 -u>).
 
-=item B<-->[B<no->]B<truncate>, B<-t>
+=item B<-t>, B<-->[B<no->]B<truncate>
 
 Truncate lines if they are longer than printing width.
 Default false.
@@ -1078,9 +1024,9 @@ option accepts optional parameter as an actual B<cdif> command.
 
 Specify options for back-end B<cdif> command.
 
-=item B<--unit>=C<word>|C<letter>|C<char>|C<mecab>
+=item B<--unit>=[C<word>,C<letter>,C<char>,C<mecab>]
 
-=item B<--by>=C<word>|C<letter>|C<char>|C<mecab>
+=item B<--by>=[C<word>,C<letter>,C<char>,C<mecab>]
 
 =item B<--mecab>
 
@@ -1135,7 +1081,7 @@ Use ANSI 256 color mode.  Default is true.
 
 Show table of ANSI 216 colors.
 
-=item B<--view>, B<-v>
+=item B<-v>, B<--view>
 
 Viewer mode.  Display each files in straightforward order.  Without
 this option, unchanged lines are placed at the same position.
@@ -1206,7 +1152,7 @@ names.
 B<cdif> shows non-space control characters visible by default. See
 L<cdif/--visible>.
 
-=item B<--tabstyle>=C<space>|C<dot>|C<symbol>|C<shade>|C<bar>|C<dash>...
+=item B<--tabstyle>=[C<space>,C<dot>,C<symbol>,C<shade>,C<bar>,C<dash>...]
 
 Option B<--tabstyle> allow to set B<--tabhead> and B<--tabspace>
 characters at once according to the given style name.  Select from

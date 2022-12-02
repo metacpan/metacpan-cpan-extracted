@@ -1,12 +1,10 @@
 use strict;
 use warnings;
 use lib 'lib';
-use Test::More;
+use Test::More tests => 7+1;
 use Test::Warn;
-use Clone qw(clone);
+use Test::NoWarnings;
 use File::Basename qw(dirname);
-use Data::Dumper;
-use Text::Hogan::Compiler;
 use utf8;
 
 my $CLASS = 'Geo::Address::Formatter';
@@ -120,8 +118,46 @@ Spain
 }
 
 
+# does it warn if no country_code
+{
+    my $rh_components = {
+        "city"          => "Barcelona",
+        "city_district" => "Sarrià - Sant Gervasi",
+        "country"       => "Spain",
+        "county"        => "BCN",
+        "house_number"  => "68",
+        "neighbourhood" => "Sant Gervasi",
+        "postcode"      => "08017",
+        "road"          => "Carrer de Calatrava",
+        "state"         => "Catalonia",
+        "suburb"        => "les Tres Torres",
+    };
+    warning_like {
+        my $out = $GAF->format_address($rh_components, {abbreviate => 1});
+    } qr /no country_code, unable to abbreviate/, 'got warning';
+}
 
-done_testing();
+
+# shouldnt warn if we set no_warnings
+{
+    my $GAF_nw  = $CLASS->new(conf_path => $path, no_warnings => 1);
+        my $rh_components = {
+        "city"          => "Barcelona",
+        "city_district" => "Sarrià - Sant Gervasi",
+        "country"       => "Spain",
+        "county"        => "BCN",
+        "house_number"  => "68",
+        "neighbourhood" => "Sant Gervasi",
+        "postcode"      => "08017",
+        "road"          => "Carrer de Calatrava",
+        "state"         => "Catalonia",
+        "suburb"        => "les Tres Torres",
+    };
+    my $out = $GAF_nw->format_address($rh_components, {abbreviate => 1});
+}
+
+
+
 
 1;
 

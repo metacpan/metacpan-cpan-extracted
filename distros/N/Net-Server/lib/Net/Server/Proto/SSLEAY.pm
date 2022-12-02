@@ -2,7 +2,7 @@
 #
 #  Net::Server::Proto::SSLEAY - Net::Server Protocol module
 #
-#  Copyright (C) 2010-2017
+#  Copyright (C) 2010-2022
 #
 #    Paul Seamons <paul@seamons.com>
 #
@@ -65,7 +65,8 @@ sub object {
     };
 
     # we cannot do this at compile time because we have not yet read the configuration then
-    @ISA = qw(IO::Socket::INET6) if $ISA[0] eq 'IO::Socket::INET' && Net::Server::Proto->requires_ipv6($server);
+    $ISA[0] = Net::Server::Proto->ipv6_package($server)
+        if $ISA[0] eq 'IO::Socket::INET' && Net::Server::Proto->requires_ipv6($server);
 
     my @sock = $class->SUPER::new();
     foreach my $sock (@sock) {
@@ -100,6 +101,7 @@ sub connect { # connect the first time
     my $port = $sock->NS_port;
     my $ipv  = $sock->NS_ipv;
     my $lstn = $sock->NS_listen;
+    my $isa_v6 = Net::Server::Proto->requires_ipv6($server) ? $sock->isa(Net::Server::Proto->ipv6_package($server)) : undef;
 
     $sock->SUPER::configure({
         LocalPort => $port,
@@ -108,7 +110,7 @@ sub connect { # connect the first time
         ReuseAddr => 1,
         Reuse     => 1,
         (($host ne '*') ? (LocalAddr => $host) : ()), # * is all
-        ($sock->isa("IO::Socket::INET6") ? (Domain => ($ipv eq '6') ? Socket6::AF_INET6() : ($ipv eq '4') ? Socket::AF_INET() : Socket::AF_UNSPEC()) : ()),
+        ($isa_v6 ? (Domain => ($ipv eq '6') ? Socket6::AF_INET6() : ($ipv eq '4') ? Socket::AF_INET() : Socket::AF_UNSPEC()) : ()),
     }) || $server->fatal("Can't connect to SSLEAY port $port on $host [$!]");
 
     if ($port eq '0' and $port = $sock->sockport) {
@@ -129,7 +131,8 @@ sub reconnect { # connect on a sig -HUP
     $server->log(3,"Reassociating file descriptor $fd with ".$sock->NS_proto." on [".$sock->NS_host."]:".$sock->NS_port.", using IPv".$sock->NS_ipv);
     my $resp = $sock->fdopen( $fd, 'w' ) or $server->fatal("Error opening to file descriptor ($fd) [$!]");
 
-    if ($sock->isa("IO::Socket::INET6")) {
+    my $isa_v6 = Net::Server::Proto->requires_ipv6($server) ? $sock->isa(Net::Server::Proto->ipv6_package($server)) : undef;
+    if ($isa_v6) {
         my $ipv = $sock->NS_ipv;
         ${*$sock}{'io_socket_domain'} = ($ipv eq '6') ? Socket6::AF_INET6() : ($ipv eq '4') ? Socket::AF_INET() : Socket::AF_UNSPEC();
     }
@@ -311,6 +314,7 @@ sub read_until {
 sub read {
     my ($client, $buf, $size, $offset) = @_;
     my ($ok, $read) = $client->read_until($size, undef, 1);
+    defined($_[1]) or $_[1] = '';
     substr($_[1], $offset || 0, defined($buf) ? length($buf) : 0, $read);
     return length $read;
 }
@@ -528,7 +532,7 @@ See L<Net::Server::Proto>.
 
 This module has reliably been used in situations receiving millions of
 hits on a single box per day.  If anybody has any successes or ideas
-for improvment under SSLEAY, please email <paul@seamons.com>.
+for improvement under SSLEAY, please email <paul@seamons.com>.
 
 Protocol module for Net::Server.  This module implements a secure
 socket layer over tcp (also known as SSL).  See L<Net::Server::Proto>.

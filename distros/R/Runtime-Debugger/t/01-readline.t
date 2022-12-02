@@ -11,7 +11,7 @@ package MyTest;
 use 5.006;
 use strict;
 use warnings;
-use Test::More tests => 67;
+use Test::More tests => 73;
 use Runtime::Debugger;
 use Term::ANSIColor qw( colorstrip );
 use feature         qw( say );
@@ -105,20 +105,7 @@ sub _define_expected_vars {
         ],
         debug        => 0,
         history_file => "$ENV{HOME}/.runtime_debugger_testmode.info",
-
-        # TODO: uncomment.
-        # Need to remove coderefs and objects first though.
-        #
-        # peek_all               => 'HASH(0x55e5a86f9148)',
-        # peek_my                => 'HASH(0x55e5a873f7f8)',
-        # peek_our => {
-        #     '$our_str'  => 'Func2',
-        #     '%our_hash' => {
-        #         'hash' => 'our'
-        #     },
-        #     '@our_array' => ['array-our']
-        # },
-        vars_all => [
+        vars_all     => [
             '$COMPLETION_RETURN', '$EOL',
             '$INSTR',             '$_repl',
             '$case',              '$eval_return',
@@ -282,7 +269,7 @@ sub _define_test_cases {
             input            => 'hist 3',
             nocolor          => ["stdout"],
             expected_results => {
-                stdout => [ '1 abc2', '2 hist', '3 hist 3' ],
+                stdout => [ '3 abc2', '4 hist', '5 hist 3' ],
             },
         },
         {
@@ -378,6 +365,8 @@ sub _define_test_cases {
                 stdout => [],
             },
         },
+
+        # Print - TAB complete partial.
         {
             name             => 'Print TAB complete: "p $<TAB>"',
             input            => 'p $' . $TAB,
@@ -390,7 +379,7 @@ sub _define_test_cases {
             name             => 'Print TAB complete: p $o ',
             input            => 'p $o' . $TAB,
             expected_results => {
-                comp   => [ grep { / ^ \$o /x } @{ $_repl->{vars_scalar} } ],
+                comp   => [ grep { / ^ \$o /x } @{ $_repl->{vars_all} } ],
                 stdout => [],
             },
         },
@@ -398,7 +387,7 @@ sub _define_test_cases {
             name  => 'Print TAB complete: p $o<TAB>_ ',
             input => 'p $o' . $TAB . '_',    # Does not expand after tab.
             expected_results => {
-                comp   => [ grep { / ^ \$o /x } @{ $_repl->{vars_scalar} } ],
+                comp   => [ grep { / ^ \$o /x } @{ $_repl->{vars_all} } ],
                 stdout => [],
             },
         },
@@ -406,8 +395,25 @@ sub _define_test_cases {
             name             => 'Print TAB complete: p $<TAB>_str ',
             input            => 'p $o' . $TAB . '_str',
             expected_results => {
-                comp   => [ grep { / ^ \$o /x } @{ $_repl->{vars_scalar} } ],
+                comp   => [ grep { / ^ \$o /x } @{ $_repl->{vars_all} } ],
                 stdout => [],
+            },
+        },
+        {
+            name             => 'Print TAB complete: "p $my_<TAB> . $our_str"',
+            input            => 'p $my_' . $TAB . ' . $our_str',
+            expected_results => {
+                comp   => [ grep { / ^ \$my_ /x } @{ $_repl->{vars_all} } ],
+                line   => 'p $my_ . $our_str',
+                stdout => [],
+            },
+        },
+        {
+            name             => 'Print TAB complete: "p $my_s<TAB> . $our_str"',
+            input            => 'p $my_s' . $TAB . ' . $our_str',
+            expected_results => {
+                line   => 'p $my_str . $our_str',
+                stdout => [ '"' . $my_str . $our_str . '"' ],
             },
         },
 
@@ -605,6 +611,23 @@ sub _define_test_cases {
             },
         },
 
+        # Can update an array.
+        {
+            name  => 'Can update an array - add element',
+            input => 'push @my_array, qw( elem1 elem2 ); p \@my_array',
+            expected_results => {
+                'stdout' =>
+                  [ '[', '  "array-my",', '  "elem1",', '  "elem2"', ']' ]
+            },
+        },
+        {
+            name             => 'Can update an array - remove element',
+            input            => 'shift @my_array; p \@my_array',
+            expected_results => {
+                'stdout' => [ '[', '  "elem1",', '  "elem2"', ']' ]
+            },
+        },
+
         #
         # Hashs.
         #
@@ -714,6 +737,28 @@ sub _define_test_cases {
                 comp   => [ sort keys %our_hash, @{ $_repl->{vars_string} } ],
                 line   => '$our_hash{',
                 stdout => [],
+            },
+        },
+
+        # Can update a hash.
+        {
+            name             => 'Can update a hash - add key',
+            input            => '$my_hash{new_key} = "new_val"; p \%my_hash',
+            expected_results => {
+                'stdout' => [
+                    '{',
+                    '  "key1" => "a",',
+                    '  "key2" => "b",',
+                    '  "new_key" => "new_val"', '}'
+                ]
+            },
+        },
+        {
+            name             => 'Can update a hash - remove key',
+            input            => 'delete $my_hash{key1}; p \%my_hash',
+            expected_results => {
+                'stdout' =>
+                  [ '{', '  "key2" => "b",', '  "new_key" => "new_val"', '}' ]
             },
         },
 

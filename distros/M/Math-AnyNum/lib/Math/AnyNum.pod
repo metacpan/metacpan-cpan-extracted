@@ -6,7 +6,7 @@ Math::AnyNum - Arbitrary size precision for integers, rationals, floating-points
 
 =head1 VERSION
 
-Version 0.39
+Version 0.40
 
 =head1 SYNOPSIS
 
@@ -1212,7 +1212,7 @@ Computes C<(a + b*sqrt(w))**n % m>, returning C<(x,y)> satisfying:
     isqrt(n)                                      #=> Int | NaN
     icbrt(n)                                      #=> Int | NaN
 
-The integer square root of C<n> and the integer cube root of C<n>. Returns NaN when a real root does not exists.
+The integer square root of C<n> and the integer cube root of C<n>. Returns NaN when a real root does not exist.
 
 =head2 isqrtrem
 
@@ -1224,7 +1224,7 @@ The integer part of the square root of C<n> and the remainder C<n - isqrt(n)**2>
 
     iroot(n, m)                                   #=> Int | NaN
 
-The integer C<m-th> root of C<n>. Returns NaN when a real does not exists.
+The integer C<m-th> root of C<n>. Returns NaN when a real does not exist.
 
 =head2 irootrem
 
@@ -1232,7 +1232,7 @@ The integer C<m-th> root of C<n>. Returns NaN when a real does not exists.
 
 The integer part of the root of C<n> and the remainder C<n - iroot(n,m)**m>.
 
-Returns C<(NaN,NaN)> when a real root does not exists.
+Returns C<(NaN,NaN)> when a real root does not exist.
 
 =head2 ilog
 
@@ -1829,7 +1829,7 @@ Example:
 
     ipolygonal_root(n, k)                         #=> Int | NaN
 
-Integer k-gonal root of C<n>. Returns NaN when a real root does not exists.
+Integer k-gonal root of C<n>. Returns NaN when a real root does not exist.
 
 Example:
 
@@ -1840,7 +1840,7 @@ Example:
 
     ipolygonal_root2(n, k)                        #=> Int | NaN
 
-Second integer k-gonal root of C<n>. Returns NaN when a real root does not exists.
+Second integer k-gonal root of C<n>. Returns NaN when a real root does not exist.
 
 Example:
 

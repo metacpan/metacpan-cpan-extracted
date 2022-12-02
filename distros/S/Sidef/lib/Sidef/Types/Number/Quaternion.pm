@@ -41,7 +41,12 @@ package Sidef::Types::Number::Quaternion {
 
     sub eval {
         my ($x, $v) = @_;
-        __PACKAGE__->new($x->{a}->eval($v), $x->{b}->eval($v), $x->{c}->eval($v), $x->{d}->eval($v),);
+        __PACKAGE__->new($x->{a}->eval($v), $x->{b}->eval($v), $x->{c}->eval($v), $x->{d}->eval($v));
+    }
+
+    sub lift {
+        my ($x) = @_;
+        __PACKAGE__->new($x->{a}->lift, $x->{b}->lift, $x->{c}->lift, $x->{d}->lift);
     }
 
     sub a {
@@ -108,6 +113,8 @@ package Sidef::Types::Number::Quaternion {
         my ($x) = @_;
         $x->to_gauss->stringify;
     }
+
+    *pretty = \&stringify;
 
     sub to_n {
         my ($x) = @_;

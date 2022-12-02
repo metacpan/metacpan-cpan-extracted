@@ -1,3 +1,7 @@
+0.22      2022-12-01 22:00:25-06:00 America/Chicago
+    * Handle deparsing new optimizations for empty array- and hash-ref
+      assignments in 5.37.6
+
 0.21      2022-10-26 15:23:25-05:00 America/Chicago
     * Handle deparsing constructs like "my $a = sub { ... }" after changes
       in 5.37.5

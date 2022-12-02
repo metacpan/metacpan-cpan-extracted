@@ -43,7 +43,6 @@ use Dpkg::Source::Functions qw(erasedir chmod_if_needed fs_time);
 use Dpkg::Vendor qw(run_vendor_hook);
 use Dpkg::Control;
 use Dpkg::Changelog::Parse;
-use Dpkg::OpenPGP;
 
 use parent qw(Dpkg::Source::Package);
 
@@ -162,8 +161,6 @@ sub do_extract {
     my ($self, $newdirectory) = @_;
     my $fields = $self->{fields};
 
-    my $dscdir = $self->{basedir};
-
     my $basename = $self->get_basename();
     my $basenamerev = $self->get_basename(1);
 
@@ -217,7 +214,9 @@ sub do_extract {
 
     # Extract main tarball
     info(g_('unpacking %s'), $tarfile);
-    my $tar = Dpkg::Source::Archive->new(filename => "$dscdir$tarfile");
+    my $tar = Dpkg::Source::Archive->new(
+        filename => File::Spec->catfile($self->{basedir}, $tarfile),
+    );
     $tar->extract($newdirectory,
                   options => [ '--anchored', '--no-wildcards-match-slash',
                                '--exclude', '*/.pc', '--exclude', '.pc' ]);
@@ -238,7 +237,9 @@ sub do_extract {
                     $subdir);
             erasedir("$newdirectory/$subdir");
         }
-        $tar = Dpkg::Source::Archive->new(filename => "$dscdir$file");
+        $tar = Dpkg::Source::Archive->new(
+            filename => File::Spec->catfile($self->{basedir}, $file),
+        );
         $tar->extract("$newdirectory/$subdir");
     }
 
@@ -248,7 +249,9 @@ sub do_extract {
     # Extract debian tarball after removing the debian directory
     info(g_('unpacking %s'), $debianfile);
     erasedir("$newdirectory/debian");
-    $tar = Dpkg::Source::Archive->new(filename => "$dscdir$debianfile");
+    $tar = Dpkg::Source::Archive->new(
+        filename => File::Spec->catfile($self->{basedir}, $debianfile),
+    );
     $tar->extract($newdirectory, in_place => 1);
 
     # Apply patches (in a separate method as it might be overridden)
@@ -346,10 +349,7 @@ sub after_build {
     my $applied = File::Spec->catfile($dir, 'debian', 'patches', '.dpkg-source-applied');
     my $reason = '';
     if (-e $applied) {
-        open(my $applied_fh, '<', $applied)
-            or syserr(g_('cannot read %s'), $applied);
-        $reason = <$applied_fh>;
-        close($applied_fh);
+        $reason = file_slurp($applied);
     }
     my $opt_unapply = $self->{options}{unapply_patches};
     if (($opt_unapply eq 'auto' and $reason =~ /^# During preparation/) or
@@ -420,7 +420,7 @@ sub _generate_patch {
 
         # Check for an upstream signature.
         if (-e "$file.sig" and not -e "$file.asc") {
-            openpgp_sig_to_asc("$file.sig", "$file.asc");
+            $self->armor_original_tarball_signature("$file.sig", "$file.asc");
         }
         if (-e "$file.asc") {
             push @origtarfiles, "$file.asc";
@@ -433,11 +433,6 @@ sub _generate_patch {
           $self->_upstream_tarball_template()) unless $tarfile;
 
     if ($opts{usage} eq 'build') {
-        foreach my $origtarfile (@origtarfiles) {
-            info(g_('building %s using existing %s'),
-                 $self->{fields}{'Source'}, $origtarfile);
-        }
-
         if (@origtarsigns) {
             $self->check_original_tarball_signature($dir, @origtarsigns);
         } else {
@@ -445,6 +440,11 @@ sub _generate_patch {
             if (-e $key) {
                 warning(g_('upstream signing key but no upstream tarball signature'));
             }
+        }
+
+        foreach my $origtarfile (@origtarfiles) {
+            info(g_('building %s using existing %s'),
+                 $self->{fields}{'Source'}, $origtarfile);
         }
     }
 
@@ -637,15 +637,16 @@ it.\n";
     run_vendor_hook('extend-patch-header', \$text, $ch_info);
     $text .= "\n---
 The information above should follow the Patch Tagging Guidelines, please
-checkout http://dep.debian.net/deps/dep3/ to learn about the format. Here
+checkout https://dep.debian.net/deps/dep3/ to learn about the format. Here
 are templates for supplementary fields that you might want to add:
 
-Origin: <vendor|upstream|other>, <url of original patch>
-Bug: <url in upstream bugtracker>
+Origin: (upstream|backport|vendor|other), (<patch-url>|commit:<commit-id>)
+Bug: <upstream-bugtracker-url>
 Bug-Debian: https://bugs.debian.org/<bugnumber>
 Bug-Ubuntu: https://launchpad.net/bugs/<bugnumber>
-Forwarded: <no|not-needed|url proving that it has been forwarded>
-Reviewed-By: <name and email of someone who approved the patch>
+Forwarded: (no|not-needed|<patch-forwarded-url>)
+Applied-Upstream: <version>, (<commit-url>|commit:<commid-id>)
+Reviewed-By: <name and email of someone who approved/reviewed the patch>
 Last-Update: $yyyy_mm_dd\n\n";
     return $text;
 }

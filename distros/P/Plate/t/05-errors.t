@@ -118,9 +118,6 @@ ok !eval { $plate->serve('err') }, "Can't use precompiled %def blocks during run
 is 0+$!, 2, 'Expected errno';
 is $@, "Can't read .missing.plate: $! at err line 5.\n", 'Expected error';
 
-ok !eval { $plate->define(err => '<& bad |filter &>') }, 'Invalid filter';
-like $@, qr"^No 'filter' filter defined ", 'Expected error';
-
 $plate->set(cache_code => 1, filters => { gone => sub {''}, html => undef });
 like eval { $plate->serve(\'<% 1 %>') } // $@,
 qr"^No 'html' filter defined ", 'Invalid auto_filter';
@@ -133,6 +130,18 @@ qr"^No 'gone' filter defined ", 'Deleted filter';
 $plate->define(err => '<& err &>');
 is eval { $plate->serve_with(\' ', 'err') } // $@,
 qq'Call depth limit exceeded while calling "err" at err line 1.\n', 'Error on deep recursion';
+
+$plate->set(max_call_depth => 9);
+$plate->define(err => <<'PLATE');
+% if (my $v = shift) {
+<% $v |%><& err, @_ &>
+% }
+PLATE
+is eval { $plate->serve('err', 1..8) } // $@,
+'12345678', 'No error on shallow recursion';
+
+is eval { $plate->serve('err', 1..9) } // $@,
+qq'Call depth limit exceeded while calling "err" at err line 2.\n', 'Error on shallow recursion (set max_call_depth)';
 
 rmdir 't/tmp_dir' or diag "Can't remove t/tmp_dir: $!" if -d 't/tmp_dir';
 $plate->set(path => 't', cache_path => 't/tmp_dir', umask => 027);

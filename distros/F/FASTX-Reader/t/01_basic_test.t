@@ -7,7 +7,7 @@ use Test::More tests => 3;
 # and that the object is correctly blessed as FASTX::Reader
 
 use_ok 'FASTX::Reader';
-use_ok 'FASTX::PE';
+use_ok 'FASTX::ReaderPaired';
 my $seq = "$RealBin/../data/test.fastq";
 
 #SKIP if seq not found, but expects 2 test

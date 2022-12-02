@@ -1,5 +1,9 @@
 Revision history for Module-Faker
 
+0.023     2022-11-30 07:52:25-05:00 America/New_York
+        - add some more Pod (thanks gregor herrmann and Debian!)
+        - update dist metadata
+
 0.022     2019-04-28 15:04:47+01:00 Europe/London
         - add meta_munger facility to allow creation of really weird metadata
 

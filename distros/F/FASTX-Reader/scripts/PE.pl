@@ -2,13 +2,13 @@
 use 5.012;
 use FindBin qw($RealBin);
 use lib "$RealBin/../lib";
-use FASTX::PE;
+use FASTX::ReaderPaired;
 use Data::Dumper;
 
-print "PE: $FASTX::PE::VERSION\n";
+print "PE: $FASTX::ReaderPaired::VERSION\n";
 
 my $i = 0;
-my $PE = FASTX::PE->new({ filename => "$ARGV[0]", interleaved => $i});
+my $PE = FASTX::ReaderPaired->new({ filename => "$ARGV[0]", interleaved => $i});
 
 say Dumper $PE;
 my $c = 0;

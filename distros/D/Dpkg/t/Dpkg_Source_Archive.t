@@ -20,27 +20,16 @@ use Test::More tests => 4;
 use Test::Dpkg qw(:paths);
 
 use File::Spec;
-use File::Path qw(make_path rmtree);
+use File::Path qw(make_path);
 
 BEGIN {
     use_ok('Dpkg::Source::Archive');
 }
 
 use Dpkg;
+use Dpkg::File;
 
 my $tmpdir = test_get_temp_path();
-
-rmtree($tmpdir);
-
-sub test_touch
-{
-    my ($name, $data) = @_;
-
-    open my $fh, '>', $name
-        or die "cannot touch file $name\n";
-    print { $fh } $data if $data;
-    close $fh;
-}
 
 sub test_path_escape
 {
@@ -54,31 +43,31 @@ sub test_path_escape
     # This is the base directory, where we are going to be extracting stuff
     # into, which include traps.
     make_path("$treedir/subdir-a");
-    test_touch("$treedir/subdir-a/file-a");
-    test_touch("$treedir/subdir-a/file-pre-a");
+    file_touch("$treedir/subdir-a/file-a");
+    file_touch("$treedir/subdir-a/file-pre-a");
     make_path("$treedir/subdir-b");
-    test_touch("$treedir/subdir-b/file-b");
-    test_touch("$treedir/subdir-b/file-pre-b");
+    file_touch("$treedir/subdir-b/file-b");
+    file_touch("$treedir/subdir-b/file-pre-b");
     symlink File::Spec->abs2rel($outdir, $treedir), "$treedir/symlink-escape";
     symlink File::Spec->abs2rel("$outdir/nonexistent", $treedir), "$treedir/symlink-nonexistent";
     symlink "$treedir/file", "$treedir/symlink-within";
-    test_touch("$treedir/supposed-dir");
+    file_touch("$treedir/supposed-dir");
 
     # This is the overlay directory, which we'll pack and extract over the
     # base directory.
     make_path($overdir);
     make_path("$overdir/subdir-a/aa");
-    test_touch("$overdir/subdir-a/aa/file-aa", 'aa');
-    test_touch("$overdir/subdir-a/file-a", 'a');
+    file_dump("$overdir/subdir-a/aa/file-aa", 'aa');
+    file_dump("$overdir/subdir-a/file-a", 'a');
     make_path("$overdir/subdir-b/bb");
-    test_touch("$overdir/subdir-b/bb/file-bb", 'bb');
-    test_touch("$overdir/subdir-b/file-b", 'b');
+    file_dump("$overdir/subdir-b/bb/file-bb", 'bb');
+    file_dump("$overdir/subdir-b/file-b", 'b');
     make_path("$overdir/symlink-escape");
-    test_touch("$overdir/symlink-escape/escaped-file", 'escaped');
-    test_touch("$overdir/symlink-nonexistent", 'nonexistent');
+    file_dump("$overdir/symlink-escape/escaped-file", 'escaped');
+    file_dump("$overdir/symlink-nonexistent", 'nonexistent');
     make_path("$overdir/symlink-within");
     make_path("$overdir/supposed-dir");
-    test_touch("$overdir/supposed-dir/supposed-file", 'something');
+    file_dump("$overdir/supposed-dir/supposed-file", 'something');
 
     # Generate overlay tar.
     system($Dpkg::PROGTAR, '-cf', "$overdir.tar", '-C', $overdir, qw(

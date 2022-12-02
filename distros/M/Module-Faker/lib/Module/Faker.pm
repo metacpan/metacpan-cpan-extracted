@@ -1,6 +1,6 @@
-package Module::Faker;
+package Module::Faker 0.023;
 # ABSTRACT: build fake dists for testing CPAN tools
-$Module::Faker::VERSION = '0.022';
+
 use 5.008;
 use Moose 0.33;
 
@@ -44,7 +44,7 @@ use File::Next ();
 #pod   dist_class - the class used to fake dists; default: Module::Faker::Dist
 #pod
 #pod The source files are essentially a subset of CPAN::Meta files with some
-#pod optional extra features.  All the you really require are the name and
+#pod optional extra features.  All you really require are the name and
 #pod abstract.  Other bits like requirements can be specified and will be passed
 #pod through.  Out of the box the module will create the main module file based
 #pod on the module name and a single test file.  You can either use the provides
@@ -170,7 +170,7 @@ Module::Faker - build fake dists for testing CPAN tools
 
 =head1 VERSION
 
-version 0.022
+version 0.023
 
 =head1 SYNOPSIS
 
@@ -186,6 +186,18 @@ importantly, fake CPAN distributions.  These are useful for running tools that
 operate against CPAN distributions without having to use real CPAN
 distributions.  This is much more useful when testing an entire CPAN instance,
 rather than a single distribution, for which see L<CPAN::Faker|CPAN::Faker>.
+
+=head1 PERL VERSION
+
+This module should work on any version of perl still receiving updates from
+the Perl 5 Porters.  This means it should work on any version of perl released
+in the last two to three years.  (That is, if the most recently released
+version is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 METHODS
 
@@ -210,7 +222,7 @@ methods of the same name.  Valid arguments are:
   dist_class - the class used to fake dists; default: Module::Faker::Dist
 
 The source files are essentially a subset of CPAN::Meta files with some
-optional extra features.  All the you really require are the name and
+optional extra features.  All you really require are the name and
 abstract.  Other bits like requirements can be specified and will be passed
 through.  Out of the box the module will create the main module file based
 on the module name and a single test file.  You can either use the provides
@@ -282,11 +294,11 @@ The supported keys from CPAN::Meta are,
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 CONTRIBUTORS
 
-=for stopwords Colin Newell David Golden Steinbrunner Jeffrey Ryan Thalhammer Moritz Onken Randy Stauner
+=for stopwords Colin Newell David Golden Steinbrunner gregor herrmann Jeffrey Ryan Thalhammer Mohammad S Anwar Moritz Onken Randy Stauner Ricardo Signes
 
 =over 4
 
@@ -304,7 +316,15 @@ David Steinbrunner <dsteinbrunner@pobox.com>
 
 =item *
 
+gregor herrmann <gregoa@debian.org>
+
+=item *
+
 Jeffrey Ryan Thalhammer <jeff@imaginative-software.com>
+
+=item *
+
+Mohammad S Anwar <mohammad.anwar@yahoo.com>
 
 =item *
 
@@ -313,6 +333,14 @@ Moritz Onken <onken@netcubed.de>
 =item *
 
 Randy Stauner <randy@magnificent-tears.com>
+
+=item *
+
+Ricardo Signes <rjbs@semiotic.systems>
+
+=item *
+
+Ricardo Signes <rjbs@users.noreply.github.com>
 
 =back
 

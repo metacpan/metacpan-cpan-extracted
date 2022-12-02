@@ -1,6 +1,6 @@
 package Lab::Instrument::ITC;
 #ABSTRACT: Oxford Instruments ITC Intelligent Temperature Control
-$Lab::Instrument::ITC::VERSION = '3.830';
+$Lab::Instrument::ITC::VERSION = '3.831';
 use v5.20;
 
 use strict;
@@ -456,7 +456,7 @@ Lab::Instrument::ITC - Oxford Instruments ITC Intelligent Temperature Control
 
 =head1 VERSION
 
-version 3.830
+version 3.831
 
 =head1 SYNOPSIS
 

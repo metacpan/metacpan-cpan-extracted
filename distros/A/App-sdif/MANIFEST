@@ -28,6 +28,12 @@ share/cdif.el
 t/00_compile.t
 t/01_run.t
 t/10_mecab.t
+t/DIFF-c.out
+t/DIFF-graph.out
+t/DIFF-u.out
+t/DIFF.out
+t/JA-new.txt
+t/JA-old.txt
 t/cdif/arabic.01.new.txt
 t/cdif/arabic.01.old.txt
 t/cdif/ch.01.new.txt

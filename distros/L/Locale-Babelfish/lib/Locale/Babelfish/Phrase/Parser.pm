@@ -13,7 +13,7 @@ use Locale::Babelfish::Phrase::PluralFormsParser ();
 
 use parent qw( Locale::Babelfish::Phrase::ParserBase );
 
-our $VERSION = '2.005'; # VERSION
+our $VERSION = '2.10'; # VERSION
 
 __PACKAGE__->mk_accessors( qw( locale mode pieces escape pf0 ) );
 
@@ -186,7 +186,7 @@ Locale::Babelfish::Phrase::Parser - Babelfish syntax parser.
 
 =head1 VERSION
 
-version 2.005
+version 2.10
 
 =head1 METHODS
 
@@ -235,6 +235,10 @@ REG.RU LLC
 =item *
 
 Kirill Sysoev <k.sysoev@me.com>
+
+=item *
+
+Alexandr Tkach <tkach@reg.ru>
 
 =back
 

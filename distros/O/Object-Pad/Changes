@@ -1,5 +1,14 @@
 Revision history for Object-Pad
 
+0.72    2022-11-30
+        [CHANGES]
+         * Accept `//=` and `||=` in named signature-like syntax for
+           `ADJUST :params` blocks
+         * Added `__CLASS__`
+         * Deprecate use of params hashref in `ADJUST` blocks; needs to be
+           written as `ADJUSTPARAMS`, which is not longer exactly synonymous
+           with `ADJUST`
+
 0.71    2022-11-01
         [CHANGES]
          * Add a =head2 heading to docs on `ADJUST :params` for ease of

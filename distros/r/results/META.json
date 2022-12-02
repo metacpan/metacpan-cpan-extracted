@@ -1,0 +1,109 @@
+{
+   "abstract" : "why throw exceptions when you can return them?",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "results",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Dist::Inkt" : "0.001"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Devel::StrictMode" : "0",
+            "Exporter::Shiny" : "0",
+            "Role::Tiny" : "0",
+            "Scalar::Util" : "0",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "Type::Utils" : "0"
+         },
+         "requires" : {
+            "Test2::Require::AuthorTesting" : "0",
+            "Test2::Require::Module" : "0",
+            "Test2::Tools::Spec" : "0",
+            "Test2::V0" : "0",
+            "Type::Nano" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Result::Err" : {
+         "file" : "lib/Result/Err.pm",
+         "version" : "0.006"
+      },
+      "Result::Ok" : {
+         "file" : "lib/Result/Ok.pm",
+         "version" : "0.006"
+      },
+      "Result::OkList" : {
+         "file" : "lib/Result/OkList.pm",
+         "version" : "0.006"
+      },
+      "Result::Trait" : {
+         "file" : "lib/Result/Trait.pm",
+         "version" : "0.006"
+      },
+      "results" : {
+         "file" : "lib/results.pm",
+         "version" : "0.006"
+      },
+      "results::exceptions" : {
+         "file" : "lib/results/exceptions.pm",
+         "version" : "0.006"
+      },
+      "results::wrap" : {
+         "file" : "lib/results/wrap.pm",
+         "version" : "0.006"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tobyink/p5-results/issues"
+      },
+      "homepage" : "https://metacpan.org/release/results",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-results.git",
+         "web" : "https://github.com/tobyink/p5-results"
+      },
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/results/project"
+   },
+   "version" : "0.006",
+   "x_serialization_backend" : "JSON::PP version 4.09"
+}

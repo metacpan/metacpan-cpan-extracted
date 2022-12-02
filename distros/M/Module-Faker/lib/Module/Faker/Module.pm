@@ -1,6 +1,6 @@
-package Module::Faker::Module;
+package Module::Faker::Module 0.023;
 # ABSTRACT: a faked module
-$Module::Faker::Module::VERSION = '0.022';
+
 use Moose;
 with 'Module::Faker::Appendix';
 
@@ -53,11 +53,23 @@ Module::Faker::Module - a faked module
 
 =head1 VERSION
 
-version 0.022
+version 0.023
+
+=head1 PERL VERSION
+
+This module should work on any version of perl still receiving updates from
+the Perl 5 Porters.  This means it should work on any version of perl released
+in the last two to three years.  (That is, if the most recently released
+version is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
 
 =head1 AUTHOR
 
-Ricardo Signes <rjbs@cpan.org>
+Ricardo Signes <cpan@semiotic.systems>
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDLV2::Types::OptionPrice;
-$Shipment::Purolator::WSDLV2::Types::OptionPrice::VERSION = '3.09';
+$Shipment::Purolator::WSDLV2::Types::OptionPrice::VERSION = '3.10';
 use strict;
 use warnings;
 
@@ -72,7 +72,7 @@ Shipment::Purolator::WSDLV2::Types::OptionPrice
 
 =head1 VERSION
 
-version 3.09
+version 3.10
 
 =head1 DESCRIPTION
 

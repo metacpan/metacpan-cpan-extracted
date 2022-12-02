@@ -2343,6 +2343,77 @@ package Sidef::Types::Array::Array {
         $poly;
     }
 
+    sub solve_rec_seq {
+        my ($self) = @_;
+
+        # Reference:
+        #   https://yewtu.be/watch?v=NO1_-qptr6c
+
+        my $x = Sidef::Types::Number::Polynomial->new(Sidef::Types::Number::Number::ONE);
+
+        my @seq = @$self;
+        my @A   = (Sidef::Types::Number::Number::ONE) x scalar(@seq);
+        my @B   = map { $seq[$_ + 1]->sub($x->mul($seq[$_])) } 0 .. $#seq - 1;
+
+        for (; ;) {
+
+            my @C;
+            my $all_zero = 1;
+
+            foreach my $i (1 .. $#B - 1) {
+
+                $A[$i]     // next;
+                $B[$i]     // next;
+                $B[$i + 1] // next;
+                $B[$i - 1] // next;
+
+                if ($A[$i]->is_zero) {    # division by zero
+                    next;
+                }
+
+                my $entry = $B[$i - 1]->mul($B[$i + 1])->sub($B[$i]->sqr)->div($A[$i]->neg);
+
+                if ($entry->is_nan) {
+                    next;
+                }
+
+                if ($all_zero) {
+                    $entry->is_zero or do {
+                        $all_zero = 0;
+                    }
+                }
+
+                $C[$i - 1] = $entry;
+            }
+
+            if ($all_zero) {
+                my $poly = (grep { defined($_) && ref($_) eq 'Sidef::Types::Number::Polynomial' } @B)[0];
+
+                if (!defined($poly)) {
+                    return Sidef::Types::Array::Array->new;
+                }
+
+                my $degree = CORE::int($poly->degree);
+
+                my @cf = @{$poly->coeffs};
+                my $d  = (CORE::pop(@cf) // [0, Sidef::Types::Number::Number::ZERO])->[1];
+                my $fc = Sidef::Types::Number::Polynomial->new(map { @$_ } @cf)->div($d->neg)->coeffs;
+
+                my %lookup = (map { @$_ } @$fc);
+                return Sidef::Types::Array::Array->new(
+                                  [map { $lookup{$_} // Sidef::Types::Number::Number::ZERO } CORE::reverse(0 .. $degree - 1)]);
+            }
+
+            @A = @B;
+            @B = @C;
+
+            CORE::pop(@A);
+            CORE::shift(@A);
+        }
+    }
+
+    *find_linear_recurrence = \&solve_rec_seq;
+
     sub binsplit {
         my ($self, $block) = @_;
         Sidef::Types::Number::Number::_binsplit([@$self], $block);
@@ -3109,7 +3180,7 @@ package Sidef::Types::Array::Array {
         }
 
         $n = $n->int;
-        $n = ref($$n) eq 'Math::GMPz' ? Math::GMPz::Rmpz_init_set($$n) : return undef;
+        $n = Sidef::Types::Number::Number::_any2mpz($$n) // return undef;
 
         my $sgn = Math::GMPz::Rmpz_sgn($n);
 

@@ -8,11 +8,13 @@ use Log::ger;
 use Hash::Subset qw(hash_subset);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-25'; # DATE
+our $DATE = '2022-12-02'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '0.046'; # VERSION
+our $VERSION = '0.051'; # VERSION
 
 our %SPEC;
+
+our $sch_req_str_or_code = ['any*', of=>['str*', 'code*']];
 
 sub _read_file {
     my $filename = shift;
@@ -189,19 +191,21 @@ sub _complete_field_or_field_list {
         $row = [map {"field$_"} 1 .. @$row];
     }
 
+    if ($which =~ /sort/) {
+        $row = [map {($_,"-$_","+$_","~$_")} @$row];
+    }
+
     require Complete::Util;
-    if ($which eq 'field') {
-        return Complete::Util::complete_array_elem(
-            word => $word,
-            array => $row,
-        );
-    } else {
-        # field_list
-        # XXX sort_field_list: add optional -/~/+ prefix to field name
+    if ($which =~ /field_list/) {
         return Complete::Util::complete_comma_sep(
             word => $word,
             elems => $row,
             uniq => 1,
+        );
+    } else {
+        return Complete::Util::complete_array_elem(
+            word => $word,
+            array => $row,
         );
     }
 }
@@ -218,6 +222,10 @@ sub _complete_sort_field_list {
     _complete_field_or_field_list('sort_field_list', @_);
 }
 
+sub _complete_sort_field {
+    _complete_field_or_field_list('sort_field', @_);
+}
+
 sub _array2hash {
     my ($row, $fields) = @_;
     my $rowhash = {};
@@ -231,6 +239,14 @@ sub _select_fields {
     my ($fields, $field_idxs, $args) = @_;
 
     my @selected_fields;
+
+    if ($args->{pick_num}) {
+        require List::Util;
+        @selected_fields = List::Util::shuffle(@$fields);
+        if ($args->{pick_num} < @selected_fields) {
+            splice @selected_fields, 0, (@selected_fields-$args->{pick_num});
+        }
+    }
 
     if (defined $args->{include_field_pat}) {
         for my $field (@$fields) {
@@ -278,7 +294,7 @@ sub _select_fields {
     [100, "Continue", [\@selected_fields, \@selected_field_idxs_array]];
 }
 
-our %args_common = (
+our %argspecs_common = (
     header => {
         summary => 'Whether input CSV has a header row',
         schema => 'bool*',
@@ -339,7 +355,7 @@ _
     },
 );
 
-our %args_csv_output = (
+our %argspecs_csv_output = (
     output_header => {
         summary => 'Whether output CSV should have a header row',
         schema => 'bool*',
@@ -407,7 +423,7 @@ _
     },
 );
 
-our %arg_filename_1 = (
+our %argspec_filename_1 = (
     filename => {
         summary => 'Input CSV file or URL',
         description => <<'_',
@@ -422,7 +438,7 @@ _
     },
 );
 
-our %arg_filename_0 = (
+our %argspec_filename_0 = (
     filename => {
         summary => 'Input CSV file or URL',
         description => <<'_',
@@ -437,7 +453,7 @@ _
     },
 );
 
-our %arg_filenames_0 = (
+our %argspec_filenames_0plus = (
     filenames => {
         'x.name.is_plural' => 1,
         summary => 'Input CSV files or URLs',
@@ -510,7 +526,7 @@ _
     },
 );
 
-our %argopt_field = (
+our %argspecopt_field = (
     field => {
         summary => 'Field name',
         schema => 'str*',
@@ -518,7 +534,7 @@ our %argopt_field = (
     },
 );
 
-our %arg_field_1 = (
+our %argspec_field_1 = (
     field => {
         summary => 'Field name',
         schema => 'str*',
@@ -529,13 +545,29 @@ our %arg_field_1 = (
     },
 );
 
-our %arg_field_1_nocomp = (
+# without completion, for adding new field
+our %argspec_field_1_nocomp = (
     field => {
         summary => 'Field name',
         schema => 'str*',
         cmdline_aliases => { F=>{} },
         req => 1,
         pos => 1,
+    },
+);
+
+# without completion, for adding new fields
+our %argspec_fields_1plus_nocomp = (
+    fields => {
+        'x.name.is_plural' => 1,
+        'x.name.singular' => 'field',
+        summary => 'Field names',
+        'summary.alt.plurality.singular' => 'Field name',
+        schema => ['array*', of=>['str*', min_len=>1], min_len=>1],
+        cmdline_aliases => { F=>{} },
+        req => 1,
+        pos => 1,
+        slurpy => 1,
     },
 );
 
@@ -598,7 +630,7 @@ our %argspecsopt_field_selection = (
         tags => ['category:field-selection'],
     },
     ignore_unknown_fields => {
-        summary => 'When unknown fields are specified in --include-field (--field) or --exclude_field options, ignore them instead of throwing an error',
+        summary => 'When unknown fields are specified in --include-field (--field) or --exclude-field options, ignore them instead of throwing an error',
         schema => 'bool*',
     },
     show_selected_fields => {
@@ -622,80 +654,56 @@ our %argspecsopt_vcf = (
     },
 );
 
-our %arg_eval_1 = (
+our %argspec_eval = (
     eval => {
-        summary => 'Perl code to do munging',
-        schema => ['any*', of=>['str*', 'code*']],
+        summary => 'Perl code',
+        schema => $sch_req_str_or_code,
+        cmdline_aliases => { e=>{} },
+        req => 1,
+    },
+);
+
+our %argspecopt_eval = (
+    eval => {
+        summary => 'Perl code',
+        schema => $sch_req_str_or_code,
+        cmdline_aliases => { e=>{} },
+    },
+);
+
+our %argspec_eval_1 = (
+    eval => {
+        summary => 'Perl code',
+        schema => $sch_req_str_or_code,
         cmdline_aliases => { e=>{} },
         req => 1,
         pos => 1,
     },
 );
 
-our %arg_eval_2 = (
+our %argspec_eval_2 = (
     eval => {
-        summary => 'Perl code to do munging',
-        schema => ['any*', of=>['str*', 'code*']],
+        summary => 'Perl code',
+        schema => $sch_req_str_or_code,
         cmdline_aliases => { e=>{} },
         req => 1,
         pos => 2,
     },
 );
 
-our %args_sort_rows_short = (
-    reverse => {
-        schema => ['bool', is=>1],
-        cmdline_aliases => {r=>{}},
+our %argspecopt_eval_2 = (
+    eval => {
+        summary => 'Perl code',
+        schema => $sch_req_str_or_code,
+        cmdline_aliases => { e=>{} },
+        pos => 2,
     },
-    ci => {
-        schema => ['bool', is=>1],
-        cmdline_aliases => {i=>{}},
-    },
-    by_fields => {
-        summary => 'Sort by a comma-separated list of field specification',
-        description => <<'_',
+);
 
-`+FIELD` to mean sort numerically ascending, `-FIELD` to sort numerically
-descending, `FIELD` to mean sort ascibetically ascending, `~FIELD` to mean sort
-ascibetically descending.
-
-_
-        schema => ['str*'],
-        completion => \&_complete_sort_field_list,
-    },
-    key => {
-        summary => 'Generate sort keys with this Perl code',
-        description => <<'_',
-
-If specified, then will compute sort keys using Perl code and sort using the
-keys. Relevant when sorting using `--by-code` or `--by-sortsub`. If specified,
-then instead of rows the code/Sort::Sub routine will receive these sort keys to
-sort against.
-
-The code will receive the row as the argument.
-
-_
-        schema => ['any*', of=>['str*', 'code*']],
-        cmdline_aliases => {k=>{}},
-    },
-    by_sortsub => {
-        schema => 'str*',
-        description => <<'_',
-
-Usually combined with `--key` because most Sort::Sub routine expects a string to
-be compared against.
-
-_
-        summary => 'Sort using a Sort::Sub routine',
-        'x.completion' => ['sortsub_spec'],
-    },
-    sortsub_args => {
-        summary => 'Arguments to pass to Sort::Sub routine',
-        schema => ['hash*', of=>'str*'],
-    },
+our %argspecopt_by_code = (
     by_code => {
         summary => 'Sort using Perl code',
-        schema => ['any*', of=>['str*', 'code*']],
+        schema => $sch_req_str_or_code,
         description => <<'_',
 
 `$a` and `$b` (or the first and second argument) will contain the two rows to be
@@ -706,20 +714,72 @@ _
     },
 );
 
-our %args_sort_fields = (
+our %argspecsopt_sortsub = (
+    by_sortsub => {
+        schema => 'str*',
+        description => <<'_',
+
+When sorting rows, usually combined with `--key` because most Sort::Sub routine
+expects a string to be compared against.
+
+When sorting fields, the Sort::Sub routine will get the field name as argument.
+
+_
+        summary => 'Sort using a Sort::Sub routine',
+        'x.completion' => ['sortsub_spec'],
+    },
+    sortsub_args => {
+        summary => 'Arguments to pass to Sort::Sub routine',
+        schema => ['hash*', of=>'str*'],
+    },
+);
+
+our %argspecopt_key = (
+    key => {
+        summary => 'Generate sort keys with this Perl code',
+        description => <<'_',
+
+If specified, then will compute sort keys using Perl code and sort using the
+keys. Relevant when sorting using `--by-code` or `--by-sortsub`. If specified,
+then instead of row when sorting rows, the code (or Sort::Sub routine) will
+receive these sort keys to sort against.
+
+Tthe code will receive the row (arrayref) as the argument.
+
+_
+        schema => $sch_req_str_or_code,
+        cmdline_aliases => {k=>{}},
+    },
+);
+
+# argspecs for csvutil
+our %argspecsopt_sort = (
     sort_reverse => {
         schema => ['bool', is=>1],
     },
     sort_ci => {
         schema => ['bool', is=>1],
     },
-    sort_example => {
-        schema => ['array*', of=>'str*',
-                   'x.perl.coerce_rules' => ['From_str::comma_sep']],
+    sort_by_sortsub => {
+        schema => 'str*',
+    },
+    sort_sortsub_args => {
+        schema => ['hash*'],
+    },
+    sort_by_code => {
+        schema => $sch_req_str_or_code,
+    },
+    sort_key => {
+        schema => $sch_req_str_or_code,
+    },
+    # for csv-sort-fields
+    sort_examples => {
+        schema => ['array*', of=>'str*'],
     },
 );
 
-our %args_sort_fields_short = (
+# argspecs for csv-sort-rows
+our %argspecs_sort_rows_short = (
     reverse => {
         schema => ['bool', is=>1],
         cmdline_aliases => {r=>{}},
@@ -728,38 +788,57 @@ our %args_sort_fields_short = (
         schema => ['bool', is=>1],
         cmdline_aliases => {i=>{}},
     },
-    example => {
-        summary => 'A comma-separated list of field names',
-        schema => ['str*'],
-        completion => \&_complete_field_list,
+    by_fields => {
+        summary => 'Sort by a list of field specifications',
+        'summary.alt.plurality.singular' => 'Add a sort field specification',
+        'x.name.is_plural' => 1,
+        'x.name.singular' => 'by_field',
+        description => <<'_',
+
+Each field specification is a field name with an optional prefix. `FIELD`
+(without prefix) means sort asciibetically ascending (smallest to largest),
+`~FIELD` means sort asciibetically descending (largest to smallest), `+FIELD`
+means sort numerically ascending, `-FIELD` means sort numerically descending.
+
+_
+        schema => ['array*', of=>'str*'],
+        element_completion => \&_complete_sort_field,
     },
+    %argspecopt_key,
+    %argspecsopt_sortsub,
+    %argspecopt_by_code,
 );
 
-our %arg_with_data_rows = (
+# argspecs for csv-sort-fields
+our %argspecs_sort_fields_short = (
+    reverse => {
+        schema => ['bool', is=>1],
+        cmdline_aliases => {r=>{}},
+    },
+    ci => {
+        schema => ['bool', is=>1],
+        cmdline_aliases => {i=>{}},
+    },
+    by_examples => {
+        summary => 'A list of field names to sort by example',
+        'summary.alt.plurality.singular' => 'Add a field to sort by example',
+        'x.name.is_plural' => 1,
+        'x.name.singular' => 'by_example',
+        schema => ['array*', of=>'str*'],
+        element_completion => \&_complete_field,
+    },
+    %argspecopt_by_code,
+    %argspecsopt_sortsub,
+);
+
+our %argspec_with_data_rows = (
     with_data_rows => {
         summary => 'Whether to also output data rows',
         schema => 'bool',
     },
 );
 
-our %arg_eval = (
-    eval => {
-        summary => 'Perl code',
-        schema => ['any*', of=>['str*', 'code*']],
-        cmdline_aliases => { e=>{} },
-        req => 1,
-    },
-);
-
-our %argopt_eval = (
-    eval => {
-        summary => 'Perl code to do munging',
-        schema => ['any*', of=>['str*', 'code*']],
-        cmdline_aliases => { e=>{} },
-    },
-);
-
-our %arg_hash = (
+our %argspec_hash = (
     hash => {
         summary => 'Provide row in $_ as hashref instead of arrayref',
         schema => ['bool*', is=>1],
@@ -772,10 +851,10 @@ $SPEC{csvutil} = {
     summary => 'Perform action on a CSV file',
     'x.no_index' => 1,
     args => {
-        %args_common,
+        %argspecs_common,
         action => {
             schema => ['str*', in=>[
-                'add-field',
+                'add-fields',
                 'list-field-names',
                 'info',
                 'delete-fields',
@@ -786,7 +865,7 @@ $SPEC{csvutil} = {
                 'sort-fields',
                 'sum',
                 'avg',
-                'select-row',
+                'select-rows',
                 'split',
                 'grep',
                 'map',
@@ -804,18 +883,20 @@ $SPEC{csvutil} = {
                 'get-cells',
                 'fill-template',
                 'convert-to-vcf',
+                'pick-rows',
             ]],
             req => 1,
             pos => 0,
             cmdline_aliases => {a=>{}},
         },
-        %arg_filename_1,
+        %argspec_filename_1,
         %argspecopt_output_filename_2,
         %argspecopt_overwrite,
-        %argopt_eval,
-        %argopt_field,
+        %argspecopt_eval,
+        %argspecopt_field,
         %argspecsopt_field_selection,
         %argspecsopt_vcf,
+        %argspecsopt_sort,
     },
     args_rels => {
     },
@@ -898,13 +979,21 @@ sub csvutil {
                 $field_idxs{$row->[$j]} = $j;
             }
 
-
             if ($action eq 'sort-fields') {
-                if (my $eg = $args{sort_example}) {
-                    $eg = [split /\s*,\s*/, $eg] unless ref($eg) eq 'ARRAY';
+                if (my $eg = $args{sort_examples}) {
                     require Sort::ByExample;
                     my $sorter = Sort::ByExample::sbe($eg);
                     $sorted_fields = [$sorter->(@$row)];
+                } elsif ($args{sort_by_code} || $args{sort_by_sortsub}) {
+                    my $code;
+                    if ($args{sort_by_code}) {
+                        $code = _compile($args{sort_by_code});
+                    } elsif (defined $args{sort_by_sortsub}) {
+                        require Sort::Sub;
+                        $code = Sort::Sub::get_sorter(
+                            $args{sort_by_sortsub}, $args{sort_sortsub_args});
+                    }
+                    $sorted_fields = [sort { local $main::a=$a; local $main::b=$b; $code->($main::a,$main::b) } @$fields];
                 } else {
                     # alphabetical
                     if ($args{sort_ci}) {
@@ -917,10 +1006,12 @@ sub csvutil {
                     if $args{sort_reverse};
                 $row = $sorted_fields;
             }
+
             if ($action eq 'sum' || $action eq 'avg') {
                 @summary_row = map {0} @$row;
             }
-            if ($action eq 'select-row') {
+
+            if ($action eq 'select-rows') {
                 my $spec = $args{row_spec};
                 my @codestr;
                 for my $spec_item (split /\s*,\s*/, $spec) {
@@ -935,6 +1026,7 @@ sub csvutil {
                 $row_spec_sub = eval 'sub { my $i = shift; '.join(" || ", @codestr).' }'; ## no critic: BuiltinFunctions::ProhibitStringyEval
                 return [400, "BUG: Invalid row_spec code: $@"] if $@;
             }
+
             if ($action eq 'convert-to-vcf') {
                 for my $field (@$fields) {
                     if ($field =~ /name/i && !defined($fields_for{N})) {
@@ -1008,7 +1100,7 @@ sub csvutil {
                 }
             }
             $res .= _get_csv_row($csv_emitter, $row, $i, $outputs_header);
-        } elsif ($action eq 'add-field') {
+        } elsif ($action eq 'add-fields') {
             if ($i == 1) {
                 if (defined $args{_at}) {
                     $field_idx = $args{_at}-1;
@@ -1019,7 +1111,7 @@ sub csvutil {
                             last;
                         }
                     }
-                    return [400, "Field '$args{before}' not found"]
+                    return [400, "Field '$args{before}' (to add new fields before) not found"]
                         unless defined $field_idx;
                 } elsif (defined $args{after}) {
                     for (0..$#{$row}) {
@@ -1028,12 +1120,12 @@ sub csvutil {
                             last;
                         }
                     }
-                    return [400, "Field '$args{after}' not found"]
+                    return [400, "Field '$args{after}' (to add new fields after) not found"]
                         unless defined $field_idx;
                 } else {
                     $field_idx = @$row;
                 }
-                splice @$row, $field_idx, 0, $args{field};
+                splice @$row, $field_idx, 0, @{ $args{fields} };
                 for (keys %field_idxs) {
                     if ($field_idxs{$_} >= $field_idx) {
                         $field_idxs{$_}++;
@@ -1042,24 +1134,32 @@ sub csvutil {
                 $fields = $row;
             } else {
                 unless ($code) {
-                    $code = _compile($args{eval});
-                    if (!defined($args{field}) || !length($args{field})) {
-                        return [400, "Please specify field (-F)"];
+                    $code = _compile($args{eval} // 'return');
+                    if (!defined($args{fields}) || !@{ $args{fields} }) {
+                        return [400, "Please specify one or more fields (-F)"];
                     }
-                    if (defined $field_idxs{$args{field}}) {
-                        return [412, "Field '$args{field}' already exists"];
+                    for (@{ $args{fields} }) {
+                        unless (length $_) {
+                            return [400, "New field name cannot be empty"];
+                        }
+                        if (defined $field_idxs{$_}) {
+                            return [412, "Field '$_' already exists"];
+                        }
                     }
                 }
                 {
-                    local $_;
+                    local $_ = $args{hash} ? _array2hash($row, $fields) : $row;
                     local $main::row = $row;
                     local $main::rownum = $i;
                     local $main::csv = $csv_parser;
                     local $main::field_idxs = \%field_idxs;
-                    eval { $_ = $code->() };
-                    die "Error while adding field '$args{field}' for row #$i: $@\n"
+                    my @vals;
+                    eval { @vals = $code->() };
+                    die "Error while adding field(s) '".join(",", @{$args{fields}})."' for row #$i: $@\n"
                         if $@;
-                    splice @$row, $field_idx, 0, $_;
+                    if (ref $vals[0] eq 'ARRAY') { @vals = @{ $vals[0] } }
+                    splice @$row, $field_idx, 0,
+                        (map { $_ // '' } @vals[0 .. $#{$args{fields}} ]);
                 }
             }
             $res .= _get_csv_row($csv_emitter, $row, $i, $outputs_header);
@@ -1125,7 +1225,7 @@ sub csvutil {
                 $field_idx = _get_field_idx($args{field}, \%field_idxs);
                 $freqtable{ $row->[$field_idx] }++;
             }
-        } elsif ($action eq 'select-row') {
+        } elsif ($action eq 'select-rows') {
             if ($i == 1 || $row_spec_sub->($i)) {
                 $res .= _get_csv_row($csv_emitter, $row, $i, $outputs_header);
             }
@@ -1187,6 +1287,25 @@ sub csvutil {
             }
         } elsif ($action eq 'sort-rows') {
             push @$rows, $row unless $i == 1;
+        } elsif ($action eq 'pick-rows') {
+            if ($i > 1) {
+                if ($args{pick_num} == 1) {
+                    # algorithm from Learning Perl
+                    $rows->[0] = $row if rand($i-1) < 1;
+                } else {
+                    # algorithm from Learning Perl, modified
+                    if (@$rows < $args{pick_num}) {
+                        # we haven't reached $pick_num, put row to result in a
+                        # random position
+                        splice @$rows, rand(@$rows+1), 0, $row;
+                    } else {
+                        # we have reached $pick_num, just replace an item
+                        # randomly, using algorithm from Learning Perl, slightly
+                        # modified
+                        rand($i-1) < @$rows and splice @$rows, rand(@$rows), 1, $row;
+                    }
+                }
+            }
         } elsif ($action eq 'transpose') {
             push @$rows, $row;
         } elsif ($action eq 'convert-to-hash') {
@@ -1303,19 +1422,38 @@ sub csvutil {
         return [200, "OK", $rows];
     }
 
+    if ($action eq 'pick-rows') {
+        if ($has_header) {
+            $csv_emitter->combine(@$fields);
+            $res .= $csv_emitter->string . "\n";
+        }
+        for my $row (@$rows) {
+            $res .= _get_csv_row($csv_emitter, $row, $i, $outputs_header);
+        }
+    }
+
     if ($action eq 'sort-rows') {
 
         # whether we should compute keys
         my @keys;
         if ($args{sort_key}) {
             my $code_gen_key = _compile($args{sort_key});
-            for my $row (@$rows) {
-                local $_ = $args{hash} ? _array2hash($row, $fields) : $row;
-                push @keys, $code_gen_key->($_);
+            if ($action eq 'sort-rows') {
+                for my $row (@$rows) {
+                    local $_ = $args{hash} ? _array2hash($row, $fields) : $row;
+                    push @keys, $code_gen_key->($_);
+                }
+            } else {
+                # sort-fields
+                for my $field (@$fields) {
+                    local $_ = $field;
+                    push @keys, $code_gen_key->($_);
+                }
             }
         }
 
         if ($args{sort_by_code} || $args{sort_by_sortsub}) {
+
             my $code0;
             if ($args{sort_by_code}) {
                 $code0 = _compile($args{sort_by_code});
@@ -1332,30 +1470,34 @@ sub csvutil {
                     local $main::b = $keys[$b];
                     $code0->($main::a, $main::b);
                 };
-            } elsif ($args{hash}) {
-                # compare two rowhashes
-                $code = sub {
-                    local $main::a = _array2hash($a, $fields);
-                    local $main::b = _array2hash($b, $fields);
-                    $code0->($main::a, $main::b);
-                };
             } else {
-                # compare two arrayref rows
-                $code = $code0;
+                if ($args{hash}) {
+                    # compare two rowhashes
+                    $code = sub {
+                        local $main::a = _array2hash($a, $fields);
+                        local $main::b = _array2hash($b, $fields);
+                        $code0->($main::a, $main::b);
+                    };
+                } else {
+                    # compare two arrayref rows
+                    $code = $code0;
+                }
             }
 
             if (@keys) {
-                # sort indices according to keys first, then return sorted rows
-                # according to indices
+                # sort indices according to keys first, then return sorted
+                # rows according to indices
                 my @sorted_indices = sort { local $main::a=$a; local $main::b=$b; $code->($main::a,$main::b) } 0..$#{$rows};
                 $rows = [map {$rows->[$_]} @sorted_indices];
             } else {
                 $rows = [sort { local $main::a=$a; local $main::b=$b; $code->($main::a,$main::b) } @$rows];
             }
+
         } elsif ($args{sort_by_fields}) {
+
             my @fields;
             my $code_str = "";
-            for my $field_spec (split /,/, $args{sort_by_fields}) {
+            for my $field_spec (@{ $args{sort_by_fields} }) {
                 my ($prefix, $field) = $field_spec =~ /\A([+~-]?)(.+)/;
                 my $field_idx = $field_idxs{$field};
                 return [400, "Unknown field '$field' (known fields include: ".
@@ -1388,10 +1530,14 @@ sub csvutil {
             }
             $code = _compile($code_str);
             $rows = [sort { local $main::a = $a; local $main::b = $b; $code->($main::a, $main::b) } @$rows];
+
         } else {
+
             return [400, "Please specify by_fields or by_sortsub or by_code"];
+
         }
 
+        # output csv
         if ($has_header) {
             $csv_emitter->combine(@$fields);
             $res .= $csv_emitter->string . "\n";
@@ -1446,30 +1592,39 @@ Encoding: The utilities in this module/distribution accept and emit UTF8 text.
 
 _
 
-$SPEC{csv_add_field} = {
+$SPEC{csv_add_fields} = {
     v => 1.1,
-    summary => 'Add a field to CSV file',
+    summary => 'Add one or more fields to CSV file',
     description => <<'_' . $common_desc,
 
-Your Perl code (-e) will be called for each row (excluding the header row) and
-should return the value for the new field. `$main::row` is available and
-contains the current row. `$main::rownum` contains the row number (2 means the
+The new fields by default will be added at the end, unless you specify one of
+`--after` (to put after a certain field), `--before` (to put before a certain
+field), or `--at` (to put at specific position, 1 means as the first field). The
+new fields will be clustered together though, you currently cannot set the
+position of each new field. But you can later reorder fields using
+<prog:csv-sort-fields>.
+
+If supplied, your Perl code (`-e`) will be called for each row (excluding the
+header row) and should return the value for the new fields (either as a list or
+as an arrayref). `$_` contains the current row (as arrayref, or if you specify
+`-H`, as a hashref). `$main::row` is available and contains the current row
+(always as an arrayref). `$main::rownum` contains the row number (2 means the
 first data row). `$csv` is the <pm:Text::CSV_XS> object. `$main::field_idxs` is
 also available for additional information.
 
-Field by default will be added as the last field, unless you specify one of
-`--after` (to put after a certain field), `--before` (to put before a certain
-field), or `--at` (to put at specific position, 1 means as the first field).
+If `-e` is not supplied, the new fields will be getting the default value of
+empty string (`''`).
 
 _
     args => {
-        %args_common,
-        %args_csv_output,
-        %arg_filename_0,
+        %argspecs_common,
+        %argspecs_csv_output,
+        %argspec_filename_0,
         %argspecopt_output_filename,
         %argspecopt_overwrite,
-        %arg_field_1_nocomp,
-        %arg_eval_2,
+        %argspec_fields_1plus_nocomp,
+        %argspecopt_eval,
+        %argspec_hash,
         after => {
             summary => 'Put the new field after specified field',
             schema => 'str*',
@@ -1489,12 +1644,38 @@ _
     args_rels => {
         choose_one => [qw/after before at/],
     },
+    examples => [
+        {
+            summary => 'Add a few new blank fields at the end',
+            argv => ['file.csv', 'field4', 'field6', 'field5'],
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+        {
+            summary => 'Add a few new blank fields after a certain field',
+            argv => ['file.csv', 'field4', 'field6', 'field5', '--after', 'field2'],
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+        {
+            summary => 'Add a new field and set its value',
+            argv => ['file.csv', 'after_tax', '-e', '$main::row->[5] * 1.11'],
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+        {
+            summary => 'Add a couple new fields and set their values',
+            argv => ['file.csv', 'tax_rate', 'after_tax', '-e', '(0.11, $main::row->[5] * 1.11)'],
+            test => 0,
+            'x.doc.show_result' => 0,
+        },
+    ],
     tags => ['outputs_csv'],
 };
-sub csv_add_field {
+sub csv_add_fields {
     my %args = @_;
     csvutil(
-        %args, action=>'add-field',
+        %args, action=>'add-fields',
         _after  => $args{after},
         _before => $args{before},
         _at     => $args{at},
@@ -1505,8 +1686,8 @@ $SPEC{csv_list_field_names} = {
     v => 1.1,
     summary => 'List field names of CSV file',
     args => {
-        %args_common,
-        %arg_filename_0,
+        %argspecs_common,
+        %argspec_filename_0,
     },
     description => '' . $common_desc,
 };
@@ -1519,8 +1700,8 @@ $SPEC{csv_info} = {
     v => 1.1,
     summary => 'Show information about CSV file (number of rows, fields, etc)',
     args => {
-        %args_common,
-        %arg_filename_0,
+        %argspecs_common,
+        %argspec_filename_0,
     },
     description => '' . $common_desc,
 };
@@ -1533,9 +1714,9 @@ $SPEC{csv_delete_fields} = {
     v => 1.1,
     summary => 'Delete one or more fields from CSV file',
     args => {
-        %args_common,
-        %args_csv_output,
-        %arg_filename_0,
+        %argspecs_common,
+        %argspecs_csv_output,
+        %argspec_filename_0,
         %argspecsopt_field_selection,
         %argspecopt_output_filename_1,
         %argspecopt_overwrite,
@@ -1563,13 +1744,13 @@ To munge multiple fields, use <prog:csv-munge-row>.
 
 _
     args => {
-        %args_common,
-        %args_csv_output,
-        %arg_filename_0,
+        %argspecs_common,
+        %argspecs_csv_output,
+        %argspec_filename_0,
         %argspecopt_output_filename,
         %argspecopt_overwrite,
-        %arg_field_1,
-        %arg_eval_2,
+        %argspec_field_1,
+        %argspec_eval_2,
     },
     tags => ['outputs_csv'],
 };
@@ -1597,17 +1778,17 @@ The modified `$_` will be rendered back to CSV row.
 You can also munge a single field using <prog:csv-munge-field>.
 
 You cannot add new fields using this utility. To do so, use
-<prog:csv-add-field>.
+<prog:csv-add-fields>.
 
 _
     args => {
-        %args_common,
-        %args_csv_output,
-        %arg_filename_0,
+        %argspecs_common,
+        %argspecs_csv_output,
+        %argspec_filename_0,
         %argspecopt_output_filename,
         %argspecopt_overwrite,
-        %arg_eval_1,
-        %arg_hash,
+        %argspec_eval_1,
+        %argspec_hash,
     },
     tags => ['outputs_csv'],
 };
@@ -1629,9 +1810,9 @@ newline (`--with-nothing`), replace with encoded representation
 
 _
     args => {
-        %args_common,
-        %args_csv_output,
-        %arg_filename_0,
+        %argspecs_common,
+        %argspecs_csv_output,
+        %argspec_filename_0,
         %argspecopt_output_filename,
         %argspecopt_overwrite,
         %argspecopt_output_filename_1,
@@ -1685,7 +1866,7 @@ This utility sorts the rows in the CSV. Example input CSV:
     Ben,30
     Jerry,30
 
-Example output CSV (using `--by-fields +age` which means by age numerically and
+Example output CSV (using `--by-field +age` which means by age numerically and
 ascending):
 
     name,age
@@ -1694,7 +1875,7 @@ ascending):
     Ben,30
     Jerry,30
 
-Example output CSV (using `--by-fields -age`, which means by age numerically and
+Example output CSV (using `--by-field -age`, which means by age numerically and
 descending):
 
     name,age
@@ -1703,7 +1884,7 @@ descending):
     Andy,20
     Dennis,15
 
-Example output CSV (using `--by-fields name`, which means by name ascibetically
+Example output CSV (using `--by-field name`, which means by name ascibetically
 and ascending):
 
     name,age
@@ -1712,7 +1893,7 @@ and ascending):
     Dennis,15
     Jerry,30
 
-Example output CSV (using `--by-fields ~name`, which means by name ascibetically
+Example output CSV (using `--by-field ~name`, which means by name ascibetically
 and descending):
 
     name,age
@@ -1721,7 +1902,7 @@ and descending):
     Ben,30
     Andy,20
 
-Example output CSV (using `--by-fields +age,~name`):
+Example output CSV (using `--by-field +age --by-field ~name`):
 
     name,age
     Dennis,15
@@ -1731,10 +1912,10 @@ Example output CSV (using `--by-fields +age,~name`):
 
 You can also reverse the sort order (`-r`) or sort case-insensitively (`-i`).
 
-For more flexibility, instead of `--by-fields` you can use `--by-code`:
+For more flexibility, instead of `--by-field` you can use `--by-code`:
 
 Example output `--by-code '$a->[1] <=> $b->[1] || $b->[0] cmp $a->[0]'` (which
-is equivalent to `--by-fields +age,~name`):
+is equivalent to `--by-field +age --by-field ~name`):
 
     name,age
     Dennis,15
@@ -1757,13 +1938,13 @@ descending length of name):
 
 _
     args => {
-        %args_common,
-        %args_csv_output,
-        %arg_filename_0,
+        %argspecs_common,
+        %argspecs_csv_output,
+        %argspec_filename_0,
         %argspecopt_output_filename_1,
         %argspecopt_overwrite,
-        %args_sort_rows_short,
-        %arg_hash,
+        %argspecs_sort_rows_short,
+        %argspec_hash,
     },
     args_rels => {
         req_one => ['by_fields', 'by_code', 'by_sortsub'],
@@ -1774,8 +1955,9 @@ sub csv_sort_rows {
     my %args = @_;
 
     my %csvutil_args = (
-        hash_subset(\%args, \%args_common, \%args_csv_output),
+        hash_subset(\%args, \%argspecs_common, \%argspecs_csv_output),
         filename => $args{filename},
+        output_filename => $args{output_filename},
         action => 'sort-rows',
         sort_reverse => $args{reverse},
         sort_ci => $args{ci},
@@ -1788,6 +1970,34 @@ sub csv_sort_rows {
     );
 
     csvutil(%csvutil_args);
+}
+
+$SPEC{csv_shuf_rows} = {
+    v => 1.1,
+    summary => 'Shuffle CSV rows',
+    description => <<'_' . $common_desc,
+
+This is basically like Unix command `shuf` except it does not shuffle the header
+row.
+
+_
+    args => {
+        %argspecs_common,
+        %argspecs_csv_output,
+        %argspec_filename_0,
+        %argspecopt_output_filename_1,
+        %argspecopt_overwrite,
+    },
+    tags => ['outputs_csv'],
+};
+sub csv_shuf_rows {
+    my %args = @_;
+    csvutil(
+        %args,
+        action => 'sort-rows',
+        # TODO: this feels less shuffled
+        sort_by_code => sub { int(rand 3)-1 }, # return -1,0,1 randomly
+    );
 }
 
 $SPEC{csv_sort_fields} = {
@@ -1808,16 +2018,17 @@ Example output CSV:
     6,4,5
 
 You can also reverse the sort order (`-r`), sort case-insensitively (`-i`), or
-provides the ordering, e.g. `--example a,c,b`.
+provides the ordering example, e.g. `--by-examples-json '["a","c","b"]'`, or use
+`--by-code` or `--by-sortsub`.
 
 _
     args => {
-        %args_common,
-        %args_csv_output,
-        %arg_filename_0,
+        %argspecs_common,
+        %argspecs_csv_output,
+        %argspec_filename_0,
         %argspecopt_output_filename_1,
         %argspecopt_overwrite,
-        %args_sort_fields_short,
+        %argspecs_sort_fields_short,
     },
     tags => ['outputs_csv'],
 };
@@ -1825,27 +2036,53 @@ sub csv_sort_fields {
     my %args = @_;
 
     my %csvutil_args = (
-        hash_subset(\%args, \%args_common, \%args_csv_output),
+        hash_subset(\%args, \%argspecs_common, \%argspecs_csv_output),
         filename => $args{filename},
         action => 'sort-fields',
-        (sort_example => $args{example}) x !!defined($args{example}),
         sort_reverse => $args{reverse},
         sort_ci => $args{ci},
+        (sort_examples => $args{by_examples}) x !!defined($args{by_examples}),
+        (sort_by_code => $args{by_code}) x !!defined($args{by_code}),
+        (sort_by_sortsub => $args{by_sortsub}) x !!defined($args{by_sortsub}),
     );
-
     csvutil(%csvutil_args);
+}
+
+$SPEC{csv_shuf_fields} = {
+    v => 1.1,
+    summary => 'Shuffle CSV fields',
+    description => <<'_' . $common_desc,
+
+_
+    args => {
+        %argspecs_common,
+        %argspecs_csv_output,
+        %argspec_filename_0,
+        %argspecopt_output_filename_1,
+        %argspecopt_overwrite,
+    },
+    tags => ['outputs_csv'],
+};
+sub csv_shuf_fields {
+    my %args = @_;
+    csvutil(
+        %args,
+        action => 'sort-fields',
+        # TODO: this feels less shuffled
+        sort_by_code => sub { int(rand 3)-1 }, # return -1,0,1 randomly
+    );
 }
 
 $SPEC{csv_sum} = {
     v => 1.1,
     summary => 'Output a summary row which are arithmetic sums of data rows',
     args => {
-        %args_common,
-        %args_csv_output,
-        %arg_filename_0,
+        %argspecs_common,
+        %argspecs_csv_output,
+        %argspec_filename_0,
         %argspecopt_output_filename_1,
         %argspecopt_overwrite,
-        %arg_with_data_rows,
+        %argspec_with_data_rows,
     },
     description => '' . $common_desc,
     tags => ['outputs_csv'],
@@ -1860,12 +2097,12 @@ $SPEC{csv_avg} = {
     v => 1.1,
     summary => 'Output a summary row which are arithmetic averages of data rows',
     args => {
-        %args_common,
-        %args_csv_output,
-        %arg_filename_0,
+        %argspecs_common,
+        %argspecs_csv_output,
+        %argspec_filename_0,
         %argspecopt_output_filename_1,
         %argspecopt_overwrite,
-        %arg_with_data_rows,
+        %argspec_with_data_rows,
     },
     description => '' . $common_desc,
     tags => ['outputs_csv'],
@@ -1880,9 +2117,9 @@ $SPEC{csv_freqtable} = {
     v => 1.1,
     summary => 'Output a frequency table of values of a specified field in CSV',
     args => {
-        %args_common,
-        %arg_filename_0,
-        %arg_field_1,
+        %argspecs_common,
+        %argspec_filename_0,
+        %argspec_field_1,
     },
     description => '' . $common_desc,
 };
@@ -1892,13 +2129,13 @@ sub csv_freqtable {
     csvutil(%args, action=>'freqtable');
 }
 
-$SPEC{csv_select_row} = {
+$SPEC{csv_select_rows} = {
     v => 1.1,
     summary => 'Only output specified row(s)',
     args => {
-        %args_common,
-        %args_csv_output,
-        %arg_filename_0,
+        %argspecs_common,
+        %argspecs_csv_output,
+        %argspec_filename_0,
         %argspecopt_output_filename_1,
         %argspecopt_overwrite,
         row_spec => {
@@ -1915,10 +2152,10 @@ $SPEC{csv_select_row} = {
     ],
     tags => ['outputs_csv'],
 };
-sub csv_select_row {
+sub csv_select_rows {
     my %args = @_;
 
-    csvutil(%args, action=>'select-row');
+    csvutil(%args, action=>'select-rows');
 }
 
 $SPEC{csv_split} = {
@@ -1938,9 +2175,9 @@ Interface is loosely based on the `split` Unix utility.
 
 _
     args => {
-        %args_common,
-        %args_csv_output,
-        %arg_filename_0,
+        %argspecs_common,
+        %argspecs_csv_output,
+        %argspec_filename_0,
         lines => {
             schema => ['uint*', min=>1],
             default => 1000,
@@ -1953,7 +2190,7 @@ _
         # --number, -n (chunks)
     },
     links => [
-        {url=>"prog:csv-select-row"},
+        {url=>"prog:csv-select-rows"},
     ],
     tags => ['outputs_csv'],
 };
@@ -1980,13 +2217,13 @@ where Perl expression returns true will be included in the result.
 
 _
     args => {
-        %args_common,
-        %args_csv_output,
-        %arg_filename_0,
+        %argspecs_common,
+        %argspecs_csv_output,
+        %argspec_filename_0,
         %argspecopt_output_filename_1,
         %argspecopt_overwrite,
-        %arg_eval,
-        %arg_hash,
+        %argspec_eval,
+        %argspec_hash,
     },
     examples => [
         {
@@ -2014,6 +2251,34 @@ sub csv_grep {
     csvutil(%args, action=>'grep');
 }
 
+$SPEC{csv_pick_rows} = {
+    v => 1.1,
+    summary => 'Return one or more random rows from CSV',
+    args => {
+        %argspecs_common,
+        %argspecs_csv_output,
+        %argspec_filename_0,
+        %argspecopt_output_filename_1,
+        %argspecopt_overwrite,
+        num => {
+            summary => 'Number of rows to pick',
+            schema => 'posint*',
+            default => 1,
+            cmdline_aliases => {n=>{}},
+        },
+    },
+    description => '' . $common_desc,
+    tags => ['outputs_csv'],
+};
+sub csv_pick_rows {
+    my %args = @_;
+    csvutil(
+        %args,
+        action=>'pick-rows',
+        pick_num => $args{num} // 1,
+    );
+}
+
 $SPEC{csv_map} = {
     v => 1.1,
     summary => 'Return result of Perl code for every row',
@@ -2031,12 +2296,12 @@ data. This utility will then print out the resulting string.
 
 _
     args => {
-        %args_common,
-        %arg_filename_0,
+        %argspecs_common,
+        %argspec_filename_0,
         %argspecopt_output_filename_1,
         %argspecopt_overwrite,
-        %arg_eval,
-        %arg_hash,
+        %argspec_eval,
+        %argspec_hash,
         add_newline => {
             summary => 'Whether to make sure each string ends with newline',
             schema => 'bool*',
@@ -2070,10 +2335,10 @@ This is like csv_map, except result of code is not printed.
 
 _
     args => {
-        %args_common,
-        %arg_filename_0,
-        %arg_eval,
-        %arg_hash,
+        %argspecs_common,
+        %argspec_filename_0,
+        %argspec_eval,
+        %argspec_hash,
     },
     examples => [
         {
@@ -2096,8 +2361,8 @@ $SPEC{csv_convert_to_hash} = {
     v => 1.1,
     summary => 'Return a hash of field names as keys and first row as values',
     args => {
-        %args_common,
-        %arg_filename_0,
+        %argspecs_common,
+        %argspec_filename_0,
         row_number => {
             schema => ['int*', min=>2],
             default => 2,
@@ -2118,9 +2383,9 @@ $SPEC{csv_transpose} = {
     v => 1.1,
     summary => 'Transpose a CSV',
     args => {
-        %args_common,
-        %args_csv_output,
-        %arg_filename_0,
+        %argspecs_common,
+        %argspecs_csv_output,
+        %argspec_filename_0,
         %argspecopt_output_filename_1,
         %argspecopt_overwrite,
     },
@@ -2143,8 +2408,8 @@ to munge table data.
 
 _
     args => {
-        %args_common,
-        %arg_filename_0,
+        %argspecs_common,
+        %argspec_filename_0,
     },
     description => '' . $common_desc,
 };
@@ -2164,8 +2429,8 @@ will guess from the field name. If that also fails, will warn/bail out.
 
 _
     args => {
-        %args_common,
-        %arg_filename_0,
+        %argspecs_common,
+        %argspec_filename_0,
         %argspecsopt_vcf,
     },
     description => '' . $common_desc,
@@ -2214,9 +2479,9 @@ will result in:
 
 _
     args => {
-        %args_common,
-        %args_csv_output,
-        %arg_filenames_0,
+        %argspecs_common,
+        %argspecs_csv_output,
+        %argspec_filenames_0plus,
         %argspecopt_output_filename_1,
         %argspecopt_overwrite,
     },
@@ -2281,9 +2546,9 @@ $SPEC{csv_select_fields} = {
     v => 1.1,
     summary => 'Only output selected field(s)',
     args => {
-        %args_common,
-        %args_csv_output,
-        %arg_filename_0,
+        %argspecs_common,
+        %argspecs_csv_output,
+        %argspec_filename_0,
         %argspecopt_output_filename_1,
         %argspecopt_overwrite,
         %argspecsopt_field_selection,
@@ -2296,12 +2561,40 @@ sub csv_select_fields {
     csvutil(%args, action=>'select-fields');
 }
 
+$SPEC{csv_pick_fields} = {
+    v => 1.1,
+    summary => 'Select one or more random fields from CSV',
+    args => {
+        %argspecs_common,
+        %argspecs_csv_output,
+        %argspec_filename_0,
+        %argspecopt_output_filename_1,
+        %argspecopt_overwrite,
+        num => {
+            summary => 'Number of fields to pick',
+            schema => 'posint*',
+            default => 1,
+            cmdline_aliases => {n=>{}},
+        },
+    },
+    description => '' . $common_desc,
+    tags => ['outputs_csv'],
+};
+sub csv_pick_fields {
+    my %args = @_;
+    csvutil(
+        %args,
+        action=>'select-fields',
+        pick_num => $args{num} // 1,
+    );
+}
+
 $SPEC{csv_get_cells} = {
     v => 1.1,
     summary => 'Get one or more cells from CSV',
     args => {
-        %args_common,
-        %arg_filename_0,
+        %argspecs_common,
+        %argspec_filename_0,
         coordinates => {
             'x.name.is_plural' => 1,
             'x.name.singular' => 'coordinate',
@@ -2329,8 +2622,8 @@ $SPEC{csv_fill_template} = {
     v => 1.1,
     summary => 'Substitute template values in a text file with fields from CSV rows',
     args => {
-        %args_common,
-        %arg_filename_0,
+        %argspecs_common,
+        %argspec_filename_0,
         %argspecopt_output_filename_1,
         %argspecopt_overwrite,
         template_filename => {
@@ -2360,9 +2653,9 @@ $SPEC{csv_dump} = {
     v => 1.1,
     summary => 'Dump CSV as data structure (array of array/hash)',
     args => {
-        %args_common,
-        %arg_filename_0,
-        %arg_hash,
+        %argspecs_common,
+        %argspec_filename_0,
+        %argspec_hash,
     },
     description => '' . $common_desc,
 };
@@ -2381,12 +2674,12 @@ character, for one.
 
 _
     args => {
-        %args_common,
-        %args_csv_output,
-        %arg_filename_0,
+        %argspecs_common,
+        %argspecs_csv_output,
+        %argspec_filename_0,
         %argspecopt_output_filename_1,
         %argspecopt_overwrite,
-        %arg_hash,
+        %argspec_hash,
     },
 };
 sub csv_csv {
@@ -2396,7 +2689,7 @@ sub csv_csv {
 
 $SPEC{csv_setop} = {
     v => 1.1,
-    summary => 'Set operation against several CSV files',
+    summary => 'Set operation (union/unique concatenation of rows, intersection/common rows, difference of rows) against several CSV files',
     description => <<'_' . $common_desc,
 
 Example input:
@@ -2472,10 +2765,10 @@ Finally you can print out certain fields using `--result-fields`.
 
 _
     args => {
-        %args_common,
-        %args_csv_output,
-        %arg_filenames_0,
-        %argspecopt_output_filename_1,
+        %argspecs_common,
+        %argspecs_csv_output,
+        %argspec_filenames_0plus,
+        %argspecopt_output_filename,
         %argspecopt_overwrite,
         op => {
             summary => 'Set operation to perform',
@@ -2763,8 +3056,8 @@ client_email:email,client_phone:phone`. The result will be:
 
 _
     args => {
-        %args_common,
-        %args_csv_output,
+        %argspecs_common,
+        %argspecs_csv_output,
         %argspecopt_output_filename,
         %argspecopt_overwrite,
         target => {
@@ -2966,7 +3259,7 @@ App::CSVUtils - CLI utilities related to CSV
 
 =head1 VERSION
 
-This document describes version 0.046 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2022-10-25.
+This document describes version 0.051 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2022-12-02.
 
 =head1 DESCRIPTION
 
@@ -2974,7 +3267,7 @@ This distribution contains the following CLI utilities:
 
 =over
 
-=item * L<csv-add-field>
+=item * L<csv-add-fields>
 
 =item * L<csv-avg>
 
@@ -3010,13 +3303,25 @@ This distribution contains the following CLI utilities:
 
 =item * L<csv-munge-row>
 
+=item * L<csv-pick>
+
+=item * L<csv-pick-fields>
+
+=item * L<csv-pick-rows>
+
 =item * L<csv-replace-newline>
 
 =item * L<csv-select-fields>
 
-=item * L<csv-select-row>
+=item * L<csv-select-rows>
 
 =item * L<csv-setop>
+
+=item * L<csv-shuf>
+
+=item * L<csv-shuf-fields>
+
+=item * L<csv-shuf-rows>
 
 =item * L<csv-sort>
 
@@ -3211,23 +3516,65 @@ Return value:  (any)
 
 
 
-=head2 csv_add_field
+=head2 csv_add_fields
 
 Usage:
 
- csv_add_field(%args) -> [$status_code, $reason, $payload, \%result_meta]
+ csv_add_fields(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-Add a field to CSV file.
+Add one or more fields to CSV file.
 
-Your Perl code (-e) will be called for each row (excluding the header row) and
-should return the value for the new field. C<$main::row> is available and
-contains the current row. C<$main::rownum> contains the row number (2 means the
+Examples:
+
+=over
+
+=item * Add a few new blank fields at the end:
+
+ csv_add_fields(filename => "file.csv", fields => ["field4", "field6", "field5"]);
+
+=item * Add a few new blank fields after a certain field:
+
+ csv_add_fields(
+     filename => "file.csv",
+   fields   => ["field4", "field6", "field5"],
+   after    => "field2"
+ );
+
+=item * Add a new field and set its value:
+
+ csv_add_fields(
+     filename => "file.csv",
+   fields => ["after_tax"],
+   eval => "\$main::row->[5] * 1.11"
+ );
+
+=item * Add a couple new fields and set their values:
+
+ csv_add_fields(
+     filename => "file.csv",
+   fields => ["tax_rate", "after_tax"],
+   eval => "(0.11, \$main::row->[5] * 1.11)"
+ );
+
+=back
+
+The new fields by default will be added at the end, unless you specify one of
+C<--after> (to put after a certain field), C<--before> (to put before a certain
+field), or C<--at> (to put at specific position, 1 means as the first field). The
+new fields will be clustered together though, you currently cannot set the
+position of each new field. But you can later reorder fields using
+L<csv-sort-fields>.
+
+If supplied, your Perl code (C<-e>) will be called for each row (excluding the
+header row) and should return the value for the new fields (either as a list or
+as an arrayref). C<$_> contains the current row (as arrayref, or if you specify
+C<-H>, as a hashref). C<$main::row> is available and contains the current row
+(always as an arrayref). C<$main::rownum> contains the row number (2 means the
 first data row). C<$csv> is the L<Text::CSV_XS> object. C<$main::field_idxs> is
 also available for additional information.
 
-Field by default will be added as the last field, unless you specify one of
-C<--after> (to put after a certain field), C<--before> (to put before a certain
-field), or C<--at> (to put at specific position, 1 means as the first field).
+If C<-e> is not supplied, the new fields will be getting the default value of
+empty string (C<''>).
 
 I<Common notes for the utilities>
 
@@ -3257,19 +3604,23 @@ Specify character to escape value in field in input CSV, will be passed to Text:
 
 Defaults to C<\\> (backslash). Overrides C<--tsv> option.
 
-=item * B<eval>* => I<str|code>
+=item * B<eval> => I<str|code>
 
-Perl code to do munging.
+Perl code.
 
-=item * B<field>* => I<str>
+=item * B<fields>* => I<array[str]>
 
-Field name.
+Field names.
 
 =item * B<filename>* => I<filename>
 
 Input CSV file or URL.
 
 Use C<-> to read from stdin, use C<clipboard:> to read from clipboard.
+
+=item * B<hash> => I<bool>
+
+Provide row in $_ as hashref instead of arrayref.
 
 =item * B<header> => I<bool> (default: 1)
 
@@ -3935,7 +4286,7 @@ and so on.
 
 =item * B<ignore_unknown_fields> => I<bool>
 
-When unknown fields are specified in --include-field (--field) or --exclude_field options, ignore them instead of throwing an error.
+When unknown fields are specified in --include-field (--field) or --exclude-field options, ignore them instead of throwing an error.
 
 =item * B<include_field_pat> => I<re>
 
@@ -4135,7 +4486,7 @@ Examples:
 
  csv_each_row(
      filename => "users.csv",
-   eval => "unlink qq(/home/data/\$_->{username}.dat)",
+   eval => "\"unlink qq(/home/data/\$_->{username}.dat)\"",
    hash => 1
  );
 
@@ -4985,7 +5336,7 @@ Examples:
 
  csv_map(
      filename => "file.csv",
-   eval => "INSERT INTO mytable (id,amount) VALUES (\$_->{id}, \$_->{amount});",
+   eval => "\"INSERT INTO mytable (id,amount) VALUES (\$_->{id}, \$_->{amount});\"",
    hash => 1
  );
 
@@ -5125,7 +5476,7 @@ Defaults to C<\\> (backslash). Overrides C<--tsv> option.
 
 =item * B<eval>* => I<str|code>
 
-Perl code to do munging.
+Perl code.
 
 =item * B<field>* => I<str>
 
@@ -5260,7 +5611,7 @@ The modified C<$_> will be rendered back to CSV row.
 You can also munge a single field using L<csv-munge-field>.
 
 You cannot add new fields using this utility. To do so, use
-L<csv-add-field>.
+L<csv-add-fields>.
 
 I<Common notes for the utilities>
 
@@ -5280,7 +5631,7 @@ Defaults to C<\\> (backslash). Overrides C<--tsv> option.
 
 =item * B<eval>* => I<str|code>
 
-Perl code to do munging.
+Perl code.
 
 =item * B<filename>* => I<filename>
 
@@ -5301,6 +5652,276 @@ field names (and the second row contains the first data row). When you declare
 that CSV does not have header row (C<--no-header>), the first row of the CSV is
 assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
 and so on.
+
+=item * B<output_escape_char> => I<str>
+
+Specify character to escape value in field in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--escape-char> option but for output instead of input.
+
+Defaults to C<\\> (backslash). Overrides C<--output-tsv> option.
+
+=item * B<output_filename> => I<filename>
+
+Output filename or URL.
+
+Use C<-> to output to stdout (the default if you don't specify this option), use
+C<clipboard:> to write to clipboard.
+
+=item * B<output_header> => I<bool>
+
+Whether output CSV should have a header row.
+
+By default, a header row will be output I<if> input CSV has header row. Under
+C<--output-header>, a header row will be output even if input CSV does not have
+header row (value will be something like "col0,col1,..."). Under
+C<--no-output-header>, header row will I<not> be printed even if input CSV has
+header row. So this option can be used to unconditionally add or remove header
+row.
+
+=item * B<output_quote_char> => I<str>
+
+Specify field quote character in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--quote-char> option but for output instead of input.
+
+Defaults to C<"> (double quote). Overrides C<--output-tsv> option.
+
+=item * B<output_sep_char> => I<str>
+
+Specify field separator character in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--sep-char> option but for output instead of input.
+
+Defaults to C<,> (comma). Overrides C<--output-tsv> option.
+
+=item * B<output_tsv> => I<bool>
+
+Inform that output file is TSV (tab-separated) format instead of CSV.
+
+This is like C<--tsv> option but for output instead of input.
+
+Overriden by C<--output-sep-char>, C<--output-quote-char>, C<--output-escape-char>
+options. If one of those options is specified, then C<--output-tsv> will be
+ignored.
+
+=item * B<overwrite> => I<bool>
+
+Whether to override existing output file.
+
+=item * B<quote_char> => I<str>
+
+Specify field quote character in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to C<"> (double quote). Overrides C<--tsv> option.
+
+=item * B<sep_char> => I<str>
+
+Specify field separator character in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to C<,> (comma). Overrides C<--tsv> option.
+
+=item * B<tsv> => I<bool>
+
+Inform that input file is in TSV (tab-separated) format instead of CSV.
+
+Overriden by C<--sep-char>, C<--quote-char>, C<--escape-char> options. If one of
+those options is specified, then C<--tsv> will be ignored.
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
+=head2 csv_pick_fields
+
+Usage:
+
+ csv_pick_fields(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Select one or more random fields from CSV.
+
+I<Common notes for the utilities>
+
+Encoding: The utilities in this module/distribution accept and emit UTF8 text.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<escape_char> => I<str>
+
+Specify character to escape value in field in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to C<\\> (backslash). Overrides C<--tsv> option.
+
+=item * B<filename>* => I<filename>
+
+Input CSV file or URL.
+
+Use C<-> to read from stdin, use C<clipboard:> to read from clipboard.
+
+=item * B<header> => I<bool> (default: 1)
+
+Whether input CSV has a header row.
+
+By default (C<--header>), the first row of the CSV will be assumed to contain
+field names (and the second row contains the first data row). When you declare
+that CSV does not have header row (C<--no-header>), the first row of the CSV is
+assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
+and so on.
+
+=item * B<num> => I<posint> (default: 1)
+
+Number of fields to pick.
+
+=item * B<output_escape_char> => I<str>
+
+Specify character to escape value in field in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--escape-char> option but for output instead of input.
+
+Defaults to C<\\> (backslash). Overrides C<--output-tsv> option.
+
+=item * B<output_filename> => I<filename>
+
+Output filename or URL.
+
+Use C<-> to output to stdout (the default if you don't specify this option), use
+C<clipboard:> to write to clipboard.
+
+=item * B<output_header> => I<bool>
+
+Whether output CSV should have a header row.
+
+By default, a header row will be output I<if> input CSV has header row. Under
+C<--output-header>, a header row will be output even if input CSV does not have
+header row (value will be something like "col0,col1,..."). Under
+C<--no-output-header>, header row will I<not> be printed even if input CSV has
+header row. So this option can be used to unconditionally add or remove header
+row.
+
+=item * B<output_quote_char> => I<str>
+
+Specify field quote character in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--quote-char> option but for output instead of input.
+
+Defaults to C<"> (double quote). Overrides C<--output-tsv> option.
+
+=item * B<output_sep_char> => I<str>
+
+Specify field separator character in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--sep-char> option but for output instead of input.
+
+Defaults to C<,> (comma). Overrides C<--output-tsv> option.
+
+=item * B<output_tsv> => I<bool>
+
+Inform that output file is TSV (tab-separated) format instead of CSV.
+
+This is like C<--tsv> option but for output instead of input.
+
+Overriden by C<--output-sep-char>, C<--output-quote-char>, C<--output-escape-char>
+options. If one of those options is specified, then C<--output-tsv> will be
+ignored.
+
+=item * B<overwrite> => I<bool>
+
+Whether to override existing output file.
+
+=item * B<quote_char> => I<str>
+
+Specify field quote character in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to C<"> (double quote). Overrides C<--tsv> option.
+
+=item * B<sep_char> => I<str>
+
+Specify field separator character in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to C<,> (comma). Overrides C<--tsv> option.
+
+=item * B<tsv> => I<bool>
+
+Inform that input file is in TSV (tab-separated) format instead of CSV.
+
+Overriden by C<--sep-char>, C<--quote-char>, C<--escape-char> options. If one of
+those options is specified, then C<--tsv> will be ignored.
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
+=head2 csv_pick_rows
+
+Usage:
+
+ csv_pick_rows(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Return one or more random rows from CSV.
+
+I<Common notes for the utilities>
+
+Encoding: The utilities in this module/distribution accept and emit UTF8 text.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<escape_char> => I<str>
+
+Specify character to escape value in field in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to C<\\> (backslash). Overrides C<--tsv> option.
+
+=item * B<filename>* => I<filename>
+
+Input CSV file or URL.
+
+Use C<-> to read from stdin, use C<clipboard:> to read from clipboard.
+
+=item * B<header> => I<bool> (default: 1)
+
+Whether input CSV has a header row.
+
+By default (C<--header>), the first row of the CSV will be assumed to contain
+field names (and the second row contains the first data row). When you declare
+that CSV does not have header row (C<--no-header>), the first row of the CSV is
+assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
+and so on.
+
+=item * B<num> => I<posint> (default: 1)
+
+Number of rows to pick.
 
 =item * B<output_escape_char> => I<str>
 
@@ -5584,7 +6205,7 @@ and so on.
 
 =item * B<ignore_unknown_fields> => I<bool>
 
-When unknown fields are specified in --include-field (--field) or --exclude_field options, ignore them instead of throwing an error.
+When unknown fields are specified in --include-field (--field) or --exclude-field options, ignore them instead of throwing an error.
 
 =item * B<include_field_pat> => I<re>
 
@@ -5689,11 +6310,11 @@ Return value:  (any)
 
 
 
-=head2 csv_select_row
+=head2 csv_select_rows
 
 Usage:
 
- csv_select_row(%args) -> [$status_code, $reason, $payload, \%result_meta]
+ csv_select_rows(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Only output specified row(s).
 
@@ -5830,7 +6451,7 @@ Usage:
 
  csv_setop(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-Set operation against several CSV files.
+Set operation (unionE<sol>unique concatenation of rows, intersectionE<sol>common rows, difference of rows) against several CSV files.
 
 Example input:
 
@@ -6042,6 +6663,271 @@ Return value:  (any)
 
 
 
+=head2 csv_shuf_fields
+
+Usage:
+
+ csv_shuf_fields(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Shuffle CSV fields.
+
+I<Common notes for the utilities>
+
+Encoding: The utilities in this module/distribution accept and emit UTF8 text.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<escape_char> => I<str>
+
+Specify character to escape value in field in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to C<\\> (backslash). Overrides C<--tsv> option.
+
+=item * B<filename>* => I<filename>
+
+Input CSV file or URL.
+
+Use C<-> to read from stdin, use C<clipboard:> to read from clipboard.
+
+=item * B<header> => I<bool> (default: 1)
+
+Whether input CSV has a header row.
+
+By default (C<--header>), the first row of the CSV will be assumed to contain
+field names (and the second row contains the first data row). When you declare
+that CSV does not have header row (C<--no-header>), the first row of the CSV is
+assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
+and so on.
+
+=item * B<output_escape_char> => I<str>
+
+Specify character to escape value in field in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--escape-char> option but for output instead of input.
+
+Defaults to C<\\> (backslash). Overrides C<--output-tsv> option.
+
+=item * B<output_filename> => I<filename>
+
+Output filename or URL.
+
+Use C<-> to output to stdout (the default if you don't specify this option), use
+C<clipboard:> to write to clipboard.
+
+=item * B<output_header> => I<bool>
+
+Whether output CSV should have a header row.
+
+By default, a header row will be output I<if> input CSV has header row. Under
+C<--output-header>, a header row will be output even if input CSV does not have
+header row (value will be something like "col0,col1,..."). Under
+C<--no-output-header>, header row will I<not> be printed even if input CSV has
+header row. So this option can be used to unconditionally add or remove header
+row.
+
+=item * B<output_quote_char> => I<str>
+
+Specify field quote character in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--quote-char> option but for output instead of input.
+
+Defaults to C<"> (double quote). Overrides C<--output-tsv> option.
+
+=item * B<output_sep_char> => I<str>
+
+Specify field separator character in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--sep-char> option but for output instead of input.
+
+Defaults to C<,> (comma). Overrides C<--output-tsv> option.
+
+=item * B<output_tsv> => I<bool>
+
+Inform that output file is TSV (tab-separated) format instead of CSV.
+
+This is like C<--tsv> option but for output instead of input.
+
+Overriden by C<--output-sep-char>, C<--output-quote-char>, C<--output-escape-char>
+options. If one of those options is specified, then C<--output-tsv> will be
+ignored.
+
+=item * B<overwrite> => I<bool>
+
+Whether to override existing output file.
+
+=item * B<quote_char> => I<str>
+
+Specify field quote character in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to C<"> (double quote). Overrides C<--tsv> option.
+
+=item * B<sep_char> => I<str>
+
+Specify field separator character in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to C<,> (comma). Overrides C<--tsv> option.
+
+=item * B<tsv> => I<bool>
+
+Inform that input file is in TSV (tab-separated) format instead of CSV.
+
+Overriden by C<--sep-char>, C<--quote-char>, C<--escape-char> options. If one of
+those options is specified, then C<--tsv> will be ignored.
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
+=head2 csv_shuf_rows
+
+Usage:
+
+ csv_shuf_rows(%args) -> [$status_code, $reason, $payload, \%result_meta]
+
+Shuffle CSV rows.
+
+This is basically like Unix command C<shuf> except it does not shuffle the header
+row.
+
+I<Common notes for the utilities>
+
+Encoding: The utilities in this module/distribution accept and emit UTF8 text.
+
+This function is not exported.
+
+Arguments ('*' denotes required arguments):
+
+=over 4
+
+=item * B<escape_char> => I<str>
+
+Specify character to escape value in field in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to C<\\> (backslash). Overrides C<--tsv> option.
+
+=item * B<filename>* => I<filename>
+
+Input CSV file or URL.
+
+Use C<-> to read from stdin, use C<clipboard:> to read from clipboard.
+
+=item * B<header> => I<bool> (default: 1)
+
+Whether input CSV has a header row.
+
+By default (C<--header>), the first row of the CSV will be assumed to contain
+field names (and the second row contains the first data row). When you declare
+that CSV does not have header row (C<--no-header>), the first row of the CSV is
+assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
+and so on.
+
+=item * B<output_escape_char> => I<str>
+
+Specify character to escape value in field in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--escape-char> option but for output instead of input.
+
+Defaults to C<\\> (backslash). Overrides C<--output-tsv> option.
+
+=item * B<output_filename> => I<filename>
+
+Output filename or URL.
+
+Use C<-> to output to stdout (the default if you don't specify this option), use
+C<clipboard:> to write to clipboard.
+
+=item * B<output_header> => I<bool>
+
+Whether output CSV should have a header row.
+
+By default, a header row will be output I<if> input CSV has header row. Under
+C<--output-header>, a header row will be output even if input CSV does not have
+header row (value will be something like "col0,col1,..."). Under
+C<--no-output-header>, header row will I<not> be printed even if input CSV has
+header row. So this option can be used to unconditionally add or remove header
+row.
+
+=item * B<output_quote_char> => I<str>
+
+Specify field quote character in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--quote-char> option but for output instead of input.
+
+Defaults to C<"> (double quote). Overrides C<--output-tsv> option.
+
+=item * B<output_sep_char> => I<str>
+
+Specify field separator character in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--sep-char> option but for output instead of input.
+
+Defaults to C<,> (comma). Overrides C<--output-tsv> option.
+
+=item * B<output_tsv> => I<bool>
+
+Inform that output file is TSV (tab-separated) format instead of CSV.
+
+This is like C<--tsv> option but for output instead of input.
+
+Overriden by C<--output-sep-char>, C<--output-quote-char>, C<--output-escape-char>
+options. If one of those options is specified, then C<--output-tsv> will be
+ignored.
+
+=item * B<overwrite> => I<bool>
+
+Whether to override existing output file.
+
+=item * B<quote_char> => I<str>
+
+Specify field quote character in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to C<"> (double quote). Overrides C<--tsv> option.
+
+=item * B<sep_char> => I<str>
+
+Specify field separator character in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to C<,> (comma). Overrides C<--tsv> option.
+
+=item * B<tsv> => I<bool>
+
+Inform that input file is in TSV (tab-separated) format instead of CSV.
+
+Overriden by C<--sep-char>, C<--quote-char>, C<--escape-char> options. If one of
+those options is specified, then C<--tsv> will be ignored.
+
+
+=back
+
+Returns an enveloped result (an array).
+
+First element ($status_code) is an integer containing HTTP-like status code
+(200 means OK, 4xx caller error, 5xx function error). Second element
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
+
+Return value:  (any)
+
+
+
 =head2 csv_sort_fields
 
 Usage:
@@ -6063,7 +6949,8 @@ Example output CSV:
  6,4,5
 
 You can also reverse the sort order (C<-r>), sort case-insensitively (C<-i>), or
-provides the ordering, e.g. C<--example a,c,b>.
+provides the ordering example, e.g. C<--by-examples-json '["a","c","b"]'>, or use
+C<--by-code> or C<--by-sortsub>.
 
 I<Common notes for the utilities>
 
@@ -6075,6 +6962,27 @@ Arguments ('*' denotes required arguments):
 
 =over 4
 
+=item * B<by_code> => I<str|code>
+
+Sort using Perl code.
+
+C<$a> and C<$b> (or the first and second argument) will contain the two rows to be
+compared. Which are arrayrefs; or if C<--hash> (C<-H>) is specified, hashrefs; or
+if C<--key> is specified, whatever the code in C<--key> returns.
+
+=item * B<by_examples> => I<array[str]>
+
+A list of field names to sort by example.
+
+=item * B<by_sortsub> => I<str>
+
+Sort using a Sort::Sub routine.
+
+When sorting rows, usually combined with C<--key> because most Sort::Sub routine
+expects a string to be compared against.
+
+When sorting fields, the Sort::Sub routine will get the field name as argument.
+
 =item * B<ci> => I<bool>
 
 (No description)
@@ -6084,10 +6992,6 @@ Arguments ('*' denotes required arguments):
 Specify character to escape value in field in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<\\> (backslash). Overrides C<--tsv> option.
-
-=item * B<example> => I<str>
-
-A comma-separated list of field names.
 
 =item * B<filename>* => I<filename>
 
@@ -6177,6 +7081,10 @@ Specify field separator character in input CSV, will be passed to Text::CSV_XS.
 
 Defaults to C<,> (comma). Overrides C<--tsv> option.
 
+=item * B<sortsub_args> => I<hash>
+
+Arguments to pass to Sort::Sub routine.
+
 =item * B<tsv> => I<bool>
 
 Inform that input file is in TSV (tab-separated) format instead of CSV.
@@ -6216,7 +7124,7 @@ This utility sorts the rows in the CSV. Example input CSV:
  Ben,30
  Jerry,30
 
-Example output CSV (using C<--by-fields +age> which means by age numerically and
+Example output CSV (using C<--by-field +age> which means by age numerically and
 ascending):
 
  name,age
@@ -6225,7 +7133,7 @@ ascending):
  Ben,30
  Jerry,30
 
-Example output CSV (using C<--by-fields -age>, which means by age numerically and
+Example output CSV (using C<--by-field -age>, which means by age numerically and
 descending):
 
  name,age
@@ -6234,7 +7142,7 @@ descending):
  Andy,20
  Dennis,15
 
-Example output CSV (using C<--by-fields name>, which means by name ascibetically
+Example output CSV (using C<--by-field name>, which means by name ascibetically
 and ascending):
 
  name,age
@@ -6243,7 +7151,7 @@ and ascending):
  Dennis,15
  Jerry,30
 
-Example output CSV (using C<--by-fields ~name>, which means by name ascibetically
+Example output CSV (using C<--by-field ~name>, which means by name ascibetically
 and descending):
 
  name,age
@@ -6252,7 +7160,7 @@ and descending):
  Ben,30
  Andy,20
 
-Example output CSV (using C<--by-fields +age,~name>):
+Example output CSV (using C<--by-field +age --by-field ~name>):
 
  name,age
  Dennis,15
@@ -6262,10 +7170,10 @@ Example output CSV (using C<--by-fields +age,~name>):
 
 You can also reverse the sort order (C<-r>) or sort case-insensitively (C<-i>).
 
-For more flexibility, instead of C<--by-fields> you can use C<--by-code>:
+For more flexibility, instead of C<--by-field> you can use C<--by-code>:
 
 Example output C<< --by-code '$a-E<gt>[1] E<lt>=E<gt> $b-E<gt>[1] || $b-E<gt>[0] cmp $a-E<gt>[0]' >> (which
-is equivalent to C<--by-fields +age,~name>):
+is equivalent to C<--by-field +age --by-field ~name>):
 
  name,age
  Dennis,15
@@ -6304,20 +7212,23 @@ C<$a> and C<$b> (or the first and second argument) will contain the two rows to 
 compared. Which are arrayrefs; or if C<--hash> (C<-H>) is specified, hashrefs; or
 if C<--key> is specified, whatever the code in C<--key> returns.
 
-=item * B<by_fields> => I<str>
+=item * B<by_fields> => I<array[str]>
 
-Sort by a comma-separated list of field specification.
+Sort by a list of field specifications.
 
-C<+FIELD> to mean sort numerically ascending, C<-FIELD> to sort numerically
-descending, C<FIELD> to mean sort ascibetically ascending, C<~FIELD> to mean sort
-ascibetically descending.
+Each field specification is a field name with an optional prefix. C<FIELD>
+(without prefix) means sort asciibetically ascending (smallest to largest),
+C<~FIELD> means sort asciibetically descending (largest to smallest), C<+FIELD>
+means sort numerically ascending, C<-FIELD> means sort numerically descending.
 
 =item * B<by_sortsub> => I<str>
 
 Sort using a Sort::Sub routine.
 
-Usually combined with C<--key> because most Sort::Sub routine expects a string to
-be compared against.
+When sorting rows, usually combined with C<--key> because most Sort::Sub routine
+expects a string to be compared against.
+
+When sorting fields, the Sort::Sub routine will get the field name as argument.
 
 =item * B<ci> => I<bool>
 
@@ -6355,10 +7266,10 @@ Generate sort keys with this Perl code.
 
 If specified, then will compute sort keys using Perl code and sort using the
 keys. Relevant when sorting using C<--by-code> or C<--by-sortsub>. If specified,
-then instead of rows the code/Sort::Sub routine will receive these sort keys to
-sort against.
+then instead of row when sorting rows, the code (or Sort::Sub routine) will
+receive these sort keys to sort against.
 
-The code will receive the row as the argument.
+Tthe code will receive the row (arrayref) as the argument.
 
 =item * B<output_escape_char> => I<str>
 
@@ -6899,9 +7810,21 @@ Query CSV with SQL using L<fsql> from L<App::fsql>
 
 L<csvgrep> from L<csvgrep>
 
+=head2 Other non-Perl-based CSV utilities
+
+=head3 Python
+
+B<csvkit>, L<https://csvkit.readthedocs.io/en/latest/>
+
 =head1 AUTHOR
 
 perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTOR
+
+=for stopwords Adam Hopkins
+
+Adam Hopkins <violapiratejunky@gmail.com>
 
 =head1 CONTRIBUTING
 

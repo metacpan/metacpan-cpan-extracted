@@ -1,0 +1,14 @@
+Release history for Plack-Middleware-LogAny
+
+0.001     2012-11-02
+          - initial release
+
+0.001001  2022-12-01
+          - adoption (original author:
+            Michael Alan Dorman <mdorman@ironicdesign.com>)
+          - change authoring tool
+            (from Dist::Zilla to ExtUtils::MakeMaker::CPANfile)
+          - add this Changes file
+          - tidy source code and test script
+          - increase test coverage to 100%
+          - handle 0 category accurately

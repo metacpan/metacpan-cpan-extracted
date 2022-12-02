@@ -138,7 +138,7 @@ FASTX::Seq - A class for representing a sequence for FASTX::Reader
 
 =head1 VERSION
 
-version 1.5.0
+version 1.6.0
 
 =head1 SYNOPSIS
 

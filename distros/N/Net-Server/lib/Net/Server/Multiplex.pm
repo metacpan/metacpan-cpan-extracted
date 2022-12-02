@@ -4,7 +4,7 @@
 #
 #  $Id$
 #
-#  Copyright (C) 2001-2017
+#  Copyright (C) 2001-2022
 #
 #    Rob Brown <bbb@cpan,org>
 #
@@ -158,7 +158,7 @@ our @ISA = qw(Net::Server::Multiplex);
 sub init {
     my $package  = shift;
     my $net_server= shift;
-    # On-the-fly runtime molymorphism hack
+    # On-the-fly runtime polymorphism hack
     # to ISA the same type of thing passed.
     @ISA = (ref $net_server);
     my $self     = bless {
@@ -311,7 +311,7 @@ convenient inet style STDIN/STDOUT handling, logging features,
 deamonization and pid tracking, and restartability -SIGHUP) and some
 nice features of IO::Multiplex (automatic buffered IO and
 per-file-handle objects) and combines them for an easy-to-use
-interace.
+interface.
 
 See examples/samplechat.pl distributed with Net::Server for a simple
 chat server that uses several of these features.

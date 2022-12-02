@@ -91,9 +91,30 @@ FUNCTIONS
 
         Forward digit enumeration. Defaults to boolean 1.
 
+  rhombus_random
+    Draws a rhombus with random letters/digits and returns it as a string.
+
+    If no option value is supplied or if it is invalid, then a default will
+    be silently assumed (omitting all options will return a rhombus of 25
+    lines).
+
+    Given that the specified number of lines is even, it will be incremented
+    to satisfy the requirement of being an odd number.
+
+    Options:
+
+    *   "lines"
+
+        Number of lines to be printed. Defaults to 25.
+
+    *   "fillup"
+
+        The fillup character. Defaults to "+".
+
 EXPORT
   Functions
-    "rhombus(), rhombus_letter(), rhombus_digit()" are exportable.
+    "rhombus(), rhombus_letter(), rhombus_digit(), rhombus_random()" are
+    exportable.
 
   Tags
     ":all - *()"

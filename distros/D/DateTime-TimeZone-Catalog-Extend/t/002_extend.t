@@ -33,6 +33,9 @@ foreach my $alias ( sort( keys( %$DateTime::TimeZone::Catalog::Extend::ALIAS_CAT
     }
 }
 
+my $ref = DateTime::TimeZone::Catalog::Extend->aliases;
+is( scalar( @$ref ), scalar( keys( %$DateTime::TimeZone::Catalog::Extend::ALIAS_CATALOG ) ), 'aliases' );
+
 done_testing();
 
 __END__

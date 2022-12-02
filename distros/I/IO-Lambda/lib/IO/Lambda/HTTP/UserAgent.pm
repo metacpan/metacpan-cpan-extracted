@@ -47,7 +47,8 @@ sub request
 		$h-> header($k, $v) unless defined $h-> header($k);
 	}
 
-	return IO::Lambda::HTTP::Client->new($req,
+	my $class = $xopt{class} // 'IO::Lambda::HTTP::Client';
+	return $class->new($req,
 		%xopt,
 		cookie_jar => $self->cookie_jar,
 		conn_cache => $self->conn_cache,
@@ -97,11 +98,26 @@ Shared instance of a C<HTTP::Cookies> object
 
 Default is C<HTTP/1.1>
 
+=item request HTTP::Request, %OPTIONS
+
+Creates a lambda that would end when the request is finished.
+The lambda returns either a C<HTTP::Response> object or an error string
+
+Options:
+
+=over
+
+=item class $STRING = IO::Lambda::HTTP::Client
+
+Sets class of a HTTP client.
+
+=back
+
 =item signature $STRING
 
 The default C<User-Agent> header
 
-=item signature $STRING
+=item timeout $INTEGER
 
 Timeout for requests, default 60 seconds.
 

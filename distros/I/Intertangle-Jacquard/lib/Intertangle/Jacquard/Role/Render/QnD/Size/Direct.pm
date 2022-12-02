@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Intertangle::Jacquard::Role::Render::QnD::Size::Direct;
 # ABSTRACT: Quick-and-dirty role for computing size from width / height
-$Intertangle::Jacquard::Role::Render::QnD::Size::Direct::VERSION = '0.001';
+$Intertangle::Jacquard::Role::Render::QnD::Size::Direct::VERSION = '0.002';
 use Mu::Role;
 
 lazy size => method() {
@@ -25,7 +25,7 @@ Intertangle::Jacquard::Role::Render::QnD::Size::Direct - Quick-and-dirty role fo
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 AUTHOR
 

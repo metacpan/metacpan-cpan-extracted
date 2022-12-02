@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Intertangle::Punchcard;
 # ABSTRACT: A constraint modelling meta-system
-$Intertangle::Punchcard::VERSION = '0.001';
+$Intertangle::Punchcard::VERSION = '0.002';
 use Mu;
 
 1;
@@ -18,7 +18,7 @@ Intertangle::Punchcard - A constraint modelling meta-system
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 EXTENDS
 

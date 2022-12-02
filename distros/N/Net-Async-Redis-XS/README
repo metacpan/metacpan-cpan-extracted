@@ -1,0 +1,37 @@
+NAME
+
+    Net::Async::Redis::XS - like Net::Async::Redis but faster
+
+SYNOPSIS
+
+     use feature qw(say);
+     use Future::AsyncAwait;
+     use IO::Async::Loop;
+     use Net::Async::Redis::XS;
+     my $loop = IO::Async::Loop->new;
+     $loop->add(my $redis = Net::Async::Redis::XS);
+     await $redis->connect;
+     await $redis->set('some-key', 'some-value');
+     say await $redis->get('some-key');
+
+DESCRIPTION
+
+    This is a wrapper around Net::Async::Redis with faster protocol
+    parsing.
+
+    It implements the Net::Async::Redis::Protocol protocol code in XS for
+    better performance, and will eventually be extended to optimise some
+    other slow paths as well in future.
+
+    API and behaviour should be identical to Net::Async::Redis, see there
+    for instructions.
+
+AUTHOR
+
+    Tom Molesworth <TEAM@cpan.org>
+
+LICENSE
+
+    Copyright Tom Molesworth 2022. Licensed under the same terms as Perl
+    itself.
+

@@ -118,6 +118,18 @@ is $items_ru[0], undef, 'Undefined list item return as is';
 is $items_ru[1], 'Элемент списка 1: content', 'Fisrt list item is correct in ru locale';
 is $items_ru[2], 'Элемент списка 2: content', 'Second list item is correct in ru locale';
 
+# Вложенные в списки словари
+my @nested_items = @{ $l10n->t('test.nested.users' ) };
+is scalar( @nested_items ), 2;
+is_deeply $nested_items[0], { name => 'Ivan' , surname => 'Petrov' }, 'nested hash w/o params';
+is_deeply $nested_items[1], { name => 'Sergey' , surname => 'Ivanov' }, 'nested hash w/o params';
+
+# Вложенные в списки словари с параметрами
+my @nested_items_with_params = @{ $l10n->t( 'test.nested.users_with_params', { user_id => 26532 } ) };
+is scalar( @nested_items_with_params ), 2;
+is_deeply $nested_items_with_params[0], { username => 'Ivan Petrov #26532' }, 'nested hash with params';
+is_deeply $nested_items_with_params[1], { username => 'Sergey Ivanov #26532' }, 'nested hash with params';
+
 # Переключаем язык
 $l10n->locale('en_US');
 
@@ -144,9 +156,20 @@ is $l10n->t('test.simple.escapes', { who => 'Man', count => '1' }), 'I have #{wh
 # списки
 my @items_en = @{ $l10n->t('test.simple.list', { test => 'content' } ) };
 is $items_en[0], undef, 'Undefined list item return as is';
-is $items_en[1], 'List Item 1: content', 'Fisrt list item is correct in en locale';
+is $items_en[1], 'List Item 1: content', 'First list item is correct in en locale';
 is $items_en[2], 'List Item 2: content', 'Second list item is correct in en locale';
 
+# Вложенные в списки словари
+my @nested_items_en = @{ $l10n->t('test.nested.users' ) };
+is scalar( @nested_items_en ), 2;
+is_deeply $nested_items_en[0], { name => 'Ivan' , surname => 'Petrov' }, 'nested hash w/o params';
+is_deeply $nested_items_en[1], { name => 'Sergey' , surname => 'Ivanov' }, 'nested hash w/o params';
+
+# Вложенные в списки словари с параметрами
+my @nested_items_with_params_en = @{ $l10n->t( 'test.nested.users_with_params', { user_id => 26532 } ) };
+is scalar( @nested_items_with_params_en ), 2;
+is_deeply $nested_items_with_params_en[0], { username => 'Ivan Petrov #26532' }, 'nested hash with params';
+is_deeply $nested_items_with_params_en[1], { username => 'Sergey Ivanov #26532' }, 'nested hash with params';
 
 # передача невалидных данных должна давать warning.
 

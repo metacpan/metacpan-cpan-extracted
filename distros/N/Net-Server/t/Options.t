@@ -64,6 +64,7 @@ my $obj = eval { FooServer->new };
 ok($obj, "Got an object ($@)");
 
 my $server = eval { FooServer->run };
+
 ok($server, "Got a server ($@)");
 my $prop = eval { $server->{'server'} } || {};
 is($prop->{'log_level'}, 2,  "Correct default log_level");
@@ -81,6 +82,7 @@ if ($sock->NS_ipv == 4) {
 }
 is(eval { $sock->NS_port  }, 20203, "Right port");
 is(eval { $sock->NS_proto }, 'TCP', "Right proto");
+
 
 ###----------------------------------------------------------------###
 

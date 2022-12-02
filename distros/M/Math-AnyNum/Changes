@@ -1,5 +1,9 @@
 Revision history for Math-AnyNum
 
+0.40    2022-12-01
+
+        - Fixed the numification of integers on 32-bit systems with 64-bit Perl.
+
 0.39    2022-06-11
 
         [ADDITIONS]

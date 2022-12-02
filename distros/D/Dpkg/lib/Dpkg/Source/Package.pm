@@ -34,7 +34,7 @@ is the one that supports the extraction of the source package.
 use strict;
 use warnings;
 
-our $VERSION = '2.01';
+our $VERSION = '2.02';
 our @EXPORT_OK = qw(
     get_default_diff_ignore_regex
     set_default_diff_ignore_regex
@@ -47,6 +47,7 @@ use Carp;
 use File::Temp;
 use File::Copy qw(cp);
 use File::Basename;
+use File::Spec;
 
 use Dpkg::Gettext;
 use Dpkg::ErrorHandling;
@@ -58,6 +59,7 @@ use Dpkg::Path qw(check_files_are_the_same check_directory_traversal);
 use Dpkg::Vendor qw(run_vendor_hook);
 use Dpkg::Source::Format;
 use Dpkg::OpenPGP;
+use Dpkg::OpenPGP::ErrorCodes;
 
 my $diff_ignore_default_regex = '
 # Ignore general backup files
@@ -212,6 +214,7 @@ sub new {
         format => Dpkg::Source::Format->new(),
         options => {},
         checksums => Dpkg::Checksums->new(),
+        openpgp => Dpkg::OpenPGP->new(needs => { api => 'verify' }),
     };
     bless $self, $class;
     if (exists $args{options}) {
@@ -225,6 +228,13 @@ sub new {
         $self->upgrade_object_type(0);
         $self->init_options();
     }
+
+    if ($self->{options}{require_valid_signature}) {
+        $self->{report_verify} = \&error;
+    } else {
+        $self->{report_verify} = \&warning;
+    }
+
     return $self;
 }
 
@@ -393,7 +403,7 @@ sub find_original_tarballs {
     foreach my $dir ('.', $self->{basedir}, $self->{options}{origtardir}) {
         next unless defined($dir) and -d $dir;
         opendir(my $dir_dh, $dir) or syserr(g_('cannot opendir %s'), $dir);
-        push @tar, map { "$dir/$_" } grep {
+        push @tar, map { File::Spec->catfile($dir, $_) } grep {
 		($opts{include_main} and
 		 /^\Q$basename\E\.orig\.tar\.$opts{extension}$/) or
 		($opts{include_supplementary} and
@@ -416,6 +426,24 @@ sub get_upstream_signing_key {
     return "$dir/debian/upstream/signing-key.asc";
 }
 
+=item $p->armor_original_tarball_signature($bin, $asc)
+
+Convert a signature from binary to ASCII armored form. If the signature file
+does not exist, it is a no-op. If the signature file is already ASCII armored
+then simply copy it, otherwise convert it from binary to ASCII armored form.
+
+=cut
+
+sub armor_original_tarball_signature {
+    my ($self, $bin, $asc) = @_;
+
+    if (-e $bin) {
+        return $self->{openpgp}->armor('SIGNATURE', $bin, $asc);
+    }
+
+    return;
+}
+
 =item $p->check_original_tarball_signature($dir, @asc)
 
 Verify the original upstream tarball signatures @asc using the upstream
@@ -434,21 +462,15 @@ sub check_original_tarball_signature {
         return;
     }
 
-    my $keyring = File::Temp->new(UNLINK => 1, SUFFIX => '.gpg');
-    my %opts = (
-        require_valid_signature => $self->{options}{require_valid_signature},
-    );
-    Dpkg::OpenPGP::import_key($upstream_key,
-        %opts,
-        keyring => $keyring,
-    );
-
     foreach my $asc (@asc) {
-        Dpkg::OpenPGP::verify_signature($asc,
-            %opts,
-            keyrings => [ $keyring ],
-            datafile => $asc =~ s/\.asc$//r,
-        );
+        my $datafile = $asc =~ s/\.asc$//r;
+
+        info(g_('verifying %s'), $asc);
+        my $rc = $self->{openpgp}->verify($datafile, $asc, $upstream_key);
+        if ($rc) {
+            $self->{report_verify}->(g_('cannot verify upstream tarball signature for %s: %s'),
+                                     $datafile, openpgp_errorcode_to_string($rc));
+        }
     }
 }
 
@@ -477,22 +499,21 @@ then any problem will result in a fatal error.
 sub check_signature {
     my $self = shift;
     my $dsc = $self->get_filename();
-    my @keyrings;
+    my @certs;
 
-    if (length $ENV{HOME} and -r "$ENV{HOME}/.gnupg/trustedkeys.gpg") {
-        push @keyrings, "$ENV{HOME}/.gnupg/trustedkeys.gpg";
-    }
+    push @certs, $self->{openpgp}->get_trusted_keyrings();
+
     foreach my $vendor_keyring (run_vendor_hook('package-keyrings')) {
         if (-r $vendor_keyring) {
-            push @keyrings, $vendor_keyring;
+            push @certs, $vendor_keyring;
         }
     }
 
-    my %opts = (
-        keyrings => \@keyrings,
-        require_valid_signature => $self->{options}{require_valid_signature},
-    );
-    Dpkg::OpenPGP::verify_signature($dsc, %opts);
+    my $rc = $self->{openpgp}->inline_verify($dsc, undef, @certs);
+    if ($rc) {
+        $self->{report_verify}->(g_('cannot verify inline signature for %s: %s'),
+                                 $dsc, openpgp_errorcode_to_string($rc));
+    }
 }
 
 sub describe_cmdline_options {
@@ -681,6 +702,10 @@ sub write_dsc {
 =back
 
 =head1 CHANGES
+
+=head2 Version 2.02 (dpkg 1.21.10)
+
+New method: armor_original_tarball_signature().
 
 =head2 Version 2.01 (dpkg 1.20.1)
 

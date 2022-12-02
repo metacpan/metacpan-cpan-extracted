@@ -67,10 +67,14 @@ class Counter {
 }
 
 {
+   my $class_in_fieldblock;
+
    class AllTheTypesByBlock {
       field $scalar { "one" }
       field @array  { "two", "three" }
       field %hash   { four => "five" }
+
+      field $__dummy { $class_in_fieldblock = __CLASS__ }
 
       method test {
          Test::More::is( $scalar, "one", '$scalar field' );
@@ -80,6 +84,8 @@ class Counter {
    }
 
    AllTheTypesByBlock->new->test;
+
+   is( $class_in_fieldblock, "AllTheTypesByBlock" );
 }
 
 # Variant of RT132228 about individual field lexicals

@@ -32,6 +32,7 @@ my @files = (
     't/Phrase/Node.t',
     't/Phrase/Parser.t',
     't/Phrase/PluralFormsParser.t',
+    't/author-distmeta.t',
     't/author-eol.t',
     't/author-no-tabs.t',
     't/author-pod-coverage.t',
@@ -46,7 +47,7 @@ my @files = (
     't/locales/sub/test.ru_RU.yaml',
     't/locales/test.en_US.yaml',
     't/locales/test.ru_RU.yaml',
-    't/release-distmeta.t'
+    't/t.pl'
 );
 
 eol_unix_ok($_, { trailing_whitespace => 1 }) foreach @files;

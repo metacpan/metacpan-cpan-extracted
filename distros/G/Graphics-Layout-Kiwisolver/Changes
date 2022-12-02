@@ -1,0 +1,19 @@
+0.002 2022-11-30 13:42:55-0500
+
+  Refactoring
+
+   - Change name from `Intertangle::API::Kiwisolver` to
+     `Graphics::Layout::Kiwisolver` to reflect more general usage.
+     Add deprecated class for `Intertangle::API::Kiwisolver`.
+   - Remove dependency on `Renard::Incunabula::Common::Setup`
+     and `Function::Parameters`.
+
+  Build changes
+
+   - Make sure `_output` directory is not in tarball.
+
+0.001 2020-10-17 00:12:18-0500
+
+  Features
+
+   - First release.

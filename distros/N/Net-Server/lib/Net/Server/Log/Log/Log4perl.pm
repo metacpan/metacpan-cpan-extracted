@@ -2,7 +2,7 @@
 #
 #  Net::Server::Log::Log::Log4perl - Net::Server Logging module
 #
-#  Copyright (C) 2012-2017
+#  Copyright (C) 2012-2022
 #
 #    Paul Seamons <paul@seamons.com>
 #
@@ -97,7 +97,7 @@ is not readable, will die.
 
 =item log4perl_poll
 
-If set to a value, will initialise with Log::Log4perl::init_and_watch
+If set to a value, will initialize with Log::Log4perl::init_and_watch
 with this polling value. This can also be the string "HUP" to re-read
 the log4perl_conf when a HUP signal is received. If set to 0, no
 polling is done. See L<Log::Log4perl> for more details.

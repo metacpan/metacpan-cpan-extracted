@@ -40,6 +40,11 @@ package Sidef::Types::Number::Gauss {
         __PACKAGE__->new($x->{a}->eval($v), $x->{b}->eval($v));
     }
 
+    sub lift {
+        my ($x) = @_;
+        __PACKAGE__->new($x->{a}->lift, $x->{b}->lift);
+    }
+
     sub i {
         my ($x) = @_;
 
@@ -105,6 +110,8 @@ package Sidef::Types::Number::Gauss {
         my ($x) = @_;
         Sidef::Types::String::String->new(join(' + ', $x->{a}->stringify, join('', '(', $x->{b}->stringify, ')*1i')));
     }
+
+    *pretty = \&stringify;
 
     sub abs {
         my ($x) = @_;

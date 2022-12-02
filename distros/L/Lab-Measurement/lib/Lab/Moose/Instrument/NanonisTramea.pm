@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::NanonisTramea;
-$Lab::Moose::Instrument::NanonisTramea::VERSION = '3.830';
+$Lab::Moose::Instrument::NanonisTramea::VERSION = '3.831';
 #ABSTRACT: Nanonis Tramea
 
 use v5.20;
@@ -953,6 +953,21 @@ sub threeDSwp_TimingSend {
   $self->write(command=>$head);
 }
 
+
+sub threeDSwp_FilePathsGet {
+  my $self = shift;
+  my $command_name = "3dswp.filepathsget";
+  my $head = 
+  $self->write(command=>$self->nt_header($command_name,0,1));
+  my $response = $self->binary_read();
+  my $strArraySize = unpack("N!", substr $response,40,4);
+  my $strNumber = unpack("N!", substr $response, 44, 4 );
+  my $strArray = substr $response,48,$strArraySize;
+  my %strings = $self->strArrayUnpacker($strNumber,$strArray);
+  return %strings;
+}
+
+
 sub Signals_NamesGet {
   my $self =shift;
   my $command_name="signals.namesget";
@@ -1400,6 +1415,17 @@ sub Util_SessionPathGet {
     return substr $response,44,unpack("N!",substr $response,40,4);
 }
 
+sub Util_SessionPathSet {  
+  my $self = shift ;
+  my $command_name ="util.sessionpathset" ;
+  my $session_path = shift;
+  my $save_settings = shift;
+  my $bodysize = 8 + length($session_path);
+  my $head = $self->nt_header($command_name,$bodysize,1) ;
+  $self->write(command=>$head.nt_int(length($session_path)).$session_path.nt_uint32($save_settings));
+  $self->_end_of_com();
+}
+
 sub Util_SettingsLoad {
   #Not sure if working
   my $self = shift;
@@ -1555,15 +1581,34 @@ sub Util_RTOversamplGet {
 }
 #Some modules are missing
 
+sub File_datLoad {
+  my $self = shift;
+  my $file_path = shift;
+  my $header_only = shift;
+  my $command_name = "file.datload";
+  my $bodysize = 8 + length($file_path);
+  my $head = $self->nt_header($command_name,$bodysize,1);
+  $self->write(command=>$head.nt_int(length($file_path)).$file_path.nt_int($header_only));
+  print($self->binary_read());
+
+
+}
+
 
 
 has _Session_Path => (
     is => 'rw',
     isa => 'Str',
+    lazy => 1,
     reader => 'Session_Path',
     writer => '_Session_Path',
-    default => ''
+    builder =>'_build_Session_Path'
 );
+
+sub _build_Session_Path {
+  my $self = shift ;
+  return $self->Util_SessionPathGet();
+}
 
 has sweep_prop_configuration => (
     is=>'rw',
@@ -1584,16 +1629,30 @@ sub _build_sweep_prop_configuration {
   $hash{save_all}=-1;
   return \%hash;
 }
-#This is needed due to the contraint on Stp Channel2
 
 has signals => (
     is=>'ro',
     isa => 'HashRef',
     reader => "signals",
+    lazy =>1,
     builder => '_signals_builder',
 );
 
 sub _signals_builder {
+  my $self = shift;
+  my %hash = $self->Signals_InSlotsGet();
+  return \%hash;
+}
+
+has outputs => (
+  is => 'rw',
+  isa => 'HashRef',
+  reader =>'outputs',
+  writer => '_outputs',
+  builder => '_outputs_builder'
+);
+
+sub _outputs_builder {
   my $self = shift;
   my %hash;
   $hash{0}="Plunger Gate (V)";
@@ -1605,7 +1664,6 @@ sub _signals_builder {
   $hash{6}="Output 7 (V)";
   $hash{7}="Output 8 (V)";
   return \%hash;
-
 }
 
 has step1_prop_configuration => (
@@ -1663,21 +1721,27 @@ sub _build_sweep_save_configuration {
 
 
 sub set_Session_Path {
-  my($self,$value,%args) = validated_setter(
+  my($self,%params) = validated_hash(
     \@_,
-    value => {isa => 'Str'}
+    session_path => {isa => 'Str'},
+    save_settings => {isa => 'Int',optional => 1}
     );
-  if($value =~ /(\/[\s\S]+?(?:$|\n))/){
-    if(-s $value."/Nanonis-Session.ini"){
-        $self->_Session_Path($value);
+  
+  if($params{session_path} =~ /^([a-zA-Z]:)(([\\]?[\w _!#()-]+)*[\\])?$/)
+  {
+    if(exists($params{save_settings}))
+    {
+      $self->Util_SessionPathSet($params{session_path},$params{save_settings});
     }
-    else {
-      die "No Nanonis-Session.ini detected at Path";
-    } 
+    else
+    {
+      $self->Util_SessionPathSet($params{session_path},0);
+    }
+    $self->_Session_Path($params{session_path});
   }
   else
   {
-    die "Invalid path in set_Session_Path: Path is not Unix Path";
+    die "Invalid path in set_Session_Path: Path is not Windows Directory Path";
   }
 }
 
@@ -1896,7 +1960,8 @@ sub sweep {
     \@_,
     sweep_channel => {isa => "Int"},
     step1_channel => {isa => "Int", optional=>1},
-    step2_channel => {isa => "Int", optional=>1},
+    step2_channel_idx => {isa => "Int", optional=>1},
+    step2_channel_name => {isa => "Str", optional=>1},
     aquisition_channels => {isa=>"ArrayRef[Int]"},
     lower_limit_sweep =>{isa=>"Num"},
     upper_limit_sweep =>{isa=>"Num"},
@@ -1959,10 +2024,24 @@ sub sweep {
   {
     $self->threeDSwp_StpCh1SignalSet(-1);
   }
+
+
   # PARAMETER CONTROLL FOR Step channel 2
-   if(exists($params{step2_channel}))
+  if(exists($params{step2_channel_idx})&&exists($params{step2_channel_name}))
+  {
+    croak "Supply either step2_channel_idx or step2_channel_name";
+  }
+  elsif(exists($params{step2_channel_idx}) or exists($params{step2_channel_name}))
   { 
-    if($params{step2_channel}>=0)
+    if (exists($params{step2_channel_idx}))
+    {
+      $params{step2_channel_name}=" ";
+    }
+    elsif(exists($params{step2_channel_name}))
+    {
+      $params{step2_channel_idx}=-1;
+    }
+    if($params{step2_channel_idx}>=0 or $params{step2_channel_name} ne " ")
      { 
        if(exists($params{point_number_step2}) && $params{point_number_step2}!= $self->step2_prop_configuration()->{point_number})
        {
@@ -1974,8 +2053,14 @@ sub sweep {
 
         if(exists($params{upper_limit_step2}))
         { 
-
-          $self->threeDSwp_StpCh2SignalSet($self->signals->{$params{step2_channel}});
+          if($params{step2_channel_idx}>=0)
+          {
+            $self->threeDSwp_StpCh2SignalSet($self->outputs->{$params{step2_channel_idx}});
+          }
+          elsif($params{step2_channel_name} ne " ")
+          {
+            $self->threeDSwp_StpCh2SignalSet($params{step2_channel_name});
+          }
           $self->threeDSwp_StpCh2LimitsSet($params{lower_limit_step2},$params{upper_limit_step2})
         }
         else
@@ -1991,7 +2076,7 @@ sub sweep {
      }
     else
     {
-      die "Invalid value for step2_channel, value must be greter or equal  to 0!"
+      die "Invalid value for step2_channel_idx, value must be greter or equal  to 0!"
     }     
   }
   else
@@ -2097,12 +2182,17 @@ Lab::Moose::Instrument::NanonisTramea - Nanonis Tramea
 
 =head1 VERSION
 
-version 3.830
+version 3.831
 
 =head1 SYNOPSIS
 
  my $tramea = instrument(
      type => 'NanonisTramea',
+     connection_type => 'Socket',
+     connection_options => { host => '000.000.000.00',
+                             port => '0000',
+                             write_termchar => ''
+                            }
  );
 
 =head1 FORMATTERS
@@ -2167,6 +2257,8 @@ C<float32_array> refers to float32 array binary.
 
 =head2 3DSwp.Timing
 
+=head2 3DSwp.FilePathsGet
+
 =head1 Signals
 
 =head1 User
@@ -2174,6 +2266,8 @@ C<float32_array> refers to float32 array binary.
 =head1 Digita Lines 
 
 =head1 Utilities
+
+=head1 File
 
 =head1 High Level COM
 

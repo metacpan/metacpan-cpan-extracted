@@ -35,4 +35,15 @@ EOPERL
       'message from failure of method' );
 }
 
+{
+   ok( !eval <<'EOPERL',
+      class BClass {
+         my $c = __CLASS__;
+      }
+EOPERL
+      '__CLASS__ outside method fails' );
+   like( $@, qr/^Cannot use __CLASS__ outside of a /,
+      'message from failure of __CLASS__' );
+}
+
 done_testing;

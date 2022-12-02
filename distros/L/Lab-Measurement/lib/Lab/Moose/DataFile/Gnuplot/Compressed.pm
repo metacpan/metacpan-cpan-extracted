@@ -1,5 +1,5 @@
 package Lab::Moose::DataFile::Gnuplot::Compressed;
-$Lab::Moose::DataFile::Gnuplot::Compressed::VERSION = '3.830';
+$Lab::Moose::DataFile::Gnuplot::Compressed::VERSION = '3.831';
 #ABSTRACT: Text based data file ('Gnuplot style'), auto-compressed
 
 use v5.20;
@@ -89,7 +89,7 @@ Lab::Moose::DataFile::Gnuplot::Compressed - Text based data file ('Gnuplot style
 
 =head1 VERSION
 
-version 3.830
+version 3.831
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
 package Shipment::Temando::WSDL::Types::Client;
-$Shipment::Temando::WSDL::Types::Client::VERSION = '3.09';
+$Shipment::Temando::WSDL::Types::Client::VERSION = '3.10';
 use strict;
 use warnings;
 
@@ -172,7 +172,7 @@ Shipment::Temando::WSDL::Types::Client
 
 =head1 VERSION
 
-version 3.09
+version 3.10
 
 =head1 DESCRIPTION
 

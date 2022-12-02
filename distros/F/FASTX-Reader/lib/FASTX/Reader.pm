@@ -5,10 +5,12 @@ use Carp qw(confess);
 use Data::Dumper;
 use PerlIO::encoding;
 $Data::Dumper::Sortkeys = 1;
+use FASTX::Seq;
 use File::Basename;
-$FASTX::Reader::VERSION = '1.5.0';
+$FASTX::Reader::VERSION = '1.6.0';
 require Exporter;
 our @ISA = qw(Exporter);
+
 #ABSTRACT: A simple module to parse FASTA and FASTQ files, supporting compressed files and paired-ends.
 
 use constant GZIP_SIGNATURE => pack('C3', 0x1f, 0x8b, 0x08);
@@ -190,18 +192,13 @@ sub getRead {
 
 sub next {
   my $self   = shift;
-  my $class  = "FASTX::Seq";
   my $scalar_read = $self->getRead();
-  if (not defined $scalar_read->{seq} ) {
-    return;
-  }
-  my $seq = bless {}, $class;
-  $seq->{seq}  = $scalar_read->{seq}  // '';
-  $seq->{name}   = $scalar_read->{name}   // undef;
-  $seq->{comment} = $scalar_read->{comment} // undef;
-  $seq->{qual} = $scalar_read->{qual} // undef;
- 
-  return $seq;
+
+
+  return FASTX::Seq->new( $scalar_read->{seq}  // '', 
+                          $scalar_read->{name}   // undef, 
+                          $scalar_read->{comment} // undef, 
+                          $scalar_read->{qual} // undef);
  
 }
 
@@ -443,7 +440,7 @@ FASTX::Reader - A simple module to parse FASTA and FASTQ files, supporting compr
 
 =head1 VERSION
 
-version 1.5.0
+version 1.6.0
 
 =head1 SYNOPSIS
 
@@ -458,11 +455,6 @@ version 1.5.0
 
 =head1 BUILD TEST
 
-=for html <p>
-<a href="https://github.com/telatin/FASTQ-Parser/actions/workflows/perl-test.yml" title="CI tests">
-<img src="https://github.com/telatin/FASTQ-Parser/actions/workflows/perl-test.yml/badge.svg" alt="CI Badge"></a></p>
-
-The GitHub repository is tested with a L<GitHub Action|[![CI](https://github.com/telatin/FASTQ-Parser/actions/workflows/perl-test.yml/badge.svg)](https://github.com/telatin/FASTQ-Parser/actions/workflows/perl-test.yml)>.
 Every CPAN release is tested by the L<CPAN testers grid|http://matrix.cpantesters.org/?dist=FASTX-Reader>.
 
 =head1 METHODS

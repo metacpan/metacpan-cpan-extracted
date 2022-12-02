@@ -4,7 +4,7 @@
       "Kazumasa Utashiro"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.19",
+   "generated_by" : "Minilla/v3.1.20",
    "license" : [
       "perl_5"
    ],
@@ -43,7 +43,7 @@
       "runtime" : {
          "requires" : {
             "Getopt::EX" : "v1.25.0",
-            "Getopt::EX::Hashed" : "0.9920",
+            "Getopt::EX::Hashed" : "1.05",
             "Getopt::EX::termcolor" : "1.07",
             "List::Util" : "1.45",
             "Term::ReadKey" : "0",
@@ -83,7 +83,7 @@
       },
       "App::sdif" : {
          "file" : "lib/App/sdif.pm",
-         "version" : "v4.22.3"
+         "version" : "v4.23.0"
       },
       "App::sdif::Divert" : {
          "file" : "lib/App/sdif/Divert.pm"
@@ -119,12 +119,12 @@
          "web" : "https://github.com/kaz-utashiro/sdif-tools"
       }
    },
-   "version" : "4.22.3",
+   "version" : "4.23.0",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.07",
+   "x_serialization_backend" : "JSON::PP version 4.12",
    "x_static_install" : 0
 }

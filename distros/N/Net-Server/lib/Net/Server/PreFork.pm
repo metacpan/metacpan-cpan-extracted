@@ -2,7 +2,7 @@
 #
 #  Net::Server::PreFork - Net::Server personality
 #
-#  Copyright (C) 2001-2017
+#  Copyright (C) 2001-2022
 #
 #    Paul Seamons <paul@seamons.com>
 #
@@ -174,7 +174,8 @@ sub run_n_children {
             }
 
             $prop->{'children'}->{$pid}->{'status'} = 'waiting';
-            $prop->{'tally'}->{'waiting'} ++;
+            $prop->{'tally'}->{'waiting'}++;
+            $self->register_child($pid, 'prefork');
 
         } else { # child
             if ($prop->{'child_communication'}) {
@@ -636,7 +637,7 @@ value pairs.  Comments and white space are ignored.
 
 Process flow follows Net::Server until the loop phase.  At this point
 C<min_servers> are forked and wait for connections.  When a child
-accepts a connection, finishs processing a client, or exits, it relays
+accepts a connection, finishes processing a client, or exits, it relays
 that information to the parent, which keeps track and makes sure there
 are enough children to fulfill C<min_servers>, C<min_spare_servers>,
 C<max_spare_servers>, and C<max_servers>.
@@ -652,7 +653,7 @@ provided by PreForkSimple.  See L<Net::Server::PreForkSimple>.
 
 This hook occurs at the top of run_n_children which is called each
 time the server goes to start more child processes.  This gives the
-parent to do a little of its own accountting (as desired).  Idea for
+parent to do a little of its own accounting (as desired).  Idea for
 this hook came from James FitzGibbon.
 
 =item C<$self-E<gt>parent_read_hook()>

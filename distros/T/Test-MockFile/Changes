@@ -1,5 +1,8 @@
 Revision history for Test-MockFile
 
+0.035   11/30/2022
+- GH #180 - Prevent open() and sysopen() from opening GLOB(..)-like paths.
+
 0.034   4/25/2022
 - GH #176: Add file handle support for BINMODE. This does nothing at this
   time but at least it doesn't die.

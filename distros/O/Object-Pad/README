@@ -233,7 +233,7 @@ KEYWORDS
     If the package providing the superclass does not exist, an attempt is
     made to load it by code equivalent to
 
-       require CLASS ();
+       require CLASS;
 
     and thus it must either already exist, or be locatable via the usual
     @INC mechanisms.
@@ -366,7 +366,7 @@ KEYWORDS
           requires METHOD;
        }
 
-    A role can provide instance fields. These are visible to any BUILD
+    A role can provide instance fields. These are visible to any ADJUST
     blocks or methods provided by that role.
 
     Since version 0.33.
@@ -374,7 +374,7 @@ KEYWORDS
        role Name {
           field $f;
     
-          BUILD { $f = "a value"; }
+          ADJUST { $f = "a value"; }
     
           method field { return $f; }
        }
@@ -778,15 +778,6 @@ KEYWORDS
        ADJUST {
           ...
        }
-    
-       ADJUST ( $params ) {    # on perl 5.26 onwards
-          ...
-       }
-    
-       ADJUST {
-          my $params = shift;
-          ...
-       }
 
     Since version 0.43.
 
@@ -795,20 +786,20 @@ KEYWORDS
     value assignment. It can make any final adjustments to the instance
     (such as initialising fields from calculated values).
 
-    Since version 0.66 it receives a reference to the hash containing the
-    current constructor parameters. This hash will not contain any
-    constructor parameters already consumed by ":param" declarations on any
-    fields, but only the leftovers once those are processed.
-
-    The code in the block should delete from this hash any parameters it
-    wishes to consume. Once all the ADJUST blocks have run, any remaining
-    keys in the hash will be considered errors, subject to the
-    ":strict(params)" check.
-
     An adjust block is not a subroutine and thus is not permitted to use
     subroutine attributes (except see below). Note that an ADJUST block is
     a named phaser block and not a method; it does not use the sub or
     method keyword.
+
+    Currently, an ADJUST block receives a reference to the hash containing
+    the current constructor arguments, as per "ADJUSTPARAMS" (see below).
+    This was added in version 0.66 but will be removed again as it
+    conflicts with the more flexible and generally nicer named-parameter
+    ADJUST :params syntax (see below). Such uses should be considered
+    deprecated. A warning will be printed to indicate this whenever an
+    ADJUST block uses a signature. This warning can be quieted by using
+    ADJUSTPARAMS instead. Additionally, a warning may be printed on code
+    that attempts to access the params hashref via the @_ array.
 
  ADJUST :params
 
@@ -852,6 +843,13 @@ KEYWORDS
     parameters are named and not positional, there is no ordering
     constraint; required and optional parameters can be freely mixed.
 
+    Optional parameters can also use the //= and ||= operators to provide a
+    default expression. In these cases, the default will be applied if the
+    caller did not provide the named argument at all, or if the provided
+    value was not defined (for //=) or not true (for ||=).
+
+       ADJUST :params ( :$name //= "unnamed" ) { ... }
+
     Like with subroutine signature parameters, every declared named
     parameter is visible to the defaulting expression of all the later
     ones. This permits values to be calculated based on other ones. For
@@ -887,12 +885,68 @@ KEYWORDS
 
     Since version 0.51.
 
-    A synonym for ADJUST.
+       ADJUSTPARAMS ( $params ) {    # on perl 5.26 onwards
+          ...
+       }
+    
+       ADJUST {
+          my $params = shift;
+          ...
+       }
 
-    Prior to version 0.66, the ADJUSTPARAMS keyword created a different
-    kind of adjust block that receives a reference to the parameters hash.
-    Since version 0.66, regular ADJUST blocks also receive this, so the two
-    keywords are now synonyms.
+    A variant of an ADJUST block that receives a reference to the hash
+    containing the current constructor parameters. This hash will not
+    contain any constructor parameters already consumed by ":param"
+    declarations on any fields, but only the leftovers once those are
+    processed.
+
+    The code in the block should delete from this hash any parameters it
+    wishes to consume. Once all the ADJUST blocks have run, any remaining
+    keys in the hash will be considered errors, subject to the
+    ":strict(params)" check.
+
+ __CLASS__
+
+       my $classname = __CLASS__;
+
+    Since version 0.72.
+
+    Only valid within the body (or signature) of a method, an ADJUST block,
+    or the initialising expression of a field. Yields the class name of the
+    instance that the method, block or expression is invoked on.
+
+    This is similar to the core perl __PACKAGE__ constant, except that it
+    cares about the dynamic class of the actual instance, not the static
+    class the code belongs to. When invoked by a subclass instance that
+    inherited code from its superclass it yields the name of the class of
+    the instance regardless of which class defined the code.
+
+    For example,
+
+       class BaseClass {
+          ADJUST { say "Constructing an instance of " . __CLASS__; }
+       }
+    
+       class DerivedClass :isa(BaseClass) { }
+    
+       my $obj = DerivedClass->new;
+
+    Will produce the following output
+
+       Constructing an instance of DerivedClass
+
+    This is particularly useful in field initialisers for invoking
+    (constant) methods on the invoking class to provide default values for
+    fields. This way a subclass could provide a different value.
+
+       class Timer {
+          use constant DEFAULT_DURATION => 60;
+          field $duration = __CLASS__->DEFAULT_DURATION;
+       }
+    
+       class ThreeMinuteTimer :isa(Timer) {
+          use constant DEFAULT_DURATION => 3 * 60;
+       }
 
  requires
 
@@ -957,8 +1011,8 @@ SUBCLASSING CLASSIC PERL CLASSES
     Note however that any methods invoked by the superclass constructor may
     not see the object in a fully consistent state. (This fact is not
     specific to using Object::Pad and would happen in classic Perl OO as
-    well). The field initialisers will have been invoked but the BUILD
-    blocks will not.
+    well). The field initialisers will have been invoked but the BUILD and
+    ADJUST blocks will not.
 
     For example; in the following
 
@@ -973,7 +1027,7 @@ SUBCLASSING CLASSIC PERL CLASSES
     
        class DerivedClass :isa(ClassicPerlBaseClass) {
           has $_value = "B";
-          BUILD {
+          ADJUST {
              $_value = "C";
           }
           method get_value { return $_value }
@@ -983,10 +1037,10 @@ SUBCLASSING CLASSIC PERL CLASSES
        say "Value seen by user is ", $obj->get_value;
 
     Until the ClassicPerlBaseClass::new superconstructor has returned the
-    BUILD block will not have been invoked. The $_value field will still
+    ADJUST block will not have been invoked. The $_value field will still
     exist, but its value will be B during the superconstructor. After the
-    superconstructor, the BUILD blocks are invoked before the completed
-    object is returned to the user. The result will therefore be:
+    superconstructor, the BUILD and ADJUST blocks are invoked before the
+    completed object is returned to the user. The result will therefore be:
 
        Value seen by superconstructor is B
        Value seen by user is C

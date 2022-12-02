@@ -1,17 +1,25 @@
 package Geo::Inverse;
+use strict;
+use warnings;
+use base qw{Package::New};
+use Geo::Constants qw{PI};
+use Geo::Functions qw{rad_deg deg_rad};
+use Geo::Ellipsoids;
+
+our $VERSION = '0.07';
 
 =head1 NAME
 
-Geo::Inverse - Calculate geographic distance from a lat & lon pair.
+Geo::Inverse - Calculate geographic distance from a latitude and longitude pair
 
 =head1 SYNOPSIS
 
   use Geo::Inverse;
-  my $obj = Geo::Inverse->new(); # default "WGS84"
-  my ($lat1,$lon1,$lat2,$lon2)=(38.87, -77.05, 38.95, -77.23);
-  my ($faz, $baz, $dist)=$obj->inverse($lat1,$lon1,$lat2,$lon2); #array context
-  my $dist=$obj->inverse($lat1,$lon1,$lat2,$lon2);              #scalar context
-  print "Input Lat: $lat1  Lon: $lon1\n";
+  my $obj                         = Geo::Inverse->new();                    #default "WGS84"
+  my ($lat1, $lon1, $lat2, $lon2) = (38.87, -77.05, 38.95, -77.23);
+  my ($faz, $baz, $dist)          = $obj->inverse($lat1,$lon1,$lat2,$lon2); #array context
+  my $dist=$obj->inverse($lat1, $lon1, $lat2, $lon2);                       #scalar context
+  print "Input Lat: $lat1 Lon: $lon1\n";
   print "Input Lat: $lat2 Lon: $lon2\n";
   print "Output Distance: $dist\n";
   print "Output Forward Azimuth: $faz\n";
@@ -21,16 +29,6 @@ Geo::Inverse - Calculate geographic distance from a lat & lon pair.
 
 This module is a pure Perl port of the NGS program in the public domain "inverse" by Robert (Sid) Safford and Stephen J. Frakes.  
 
-
-=cut
-
-use strict;
-use vars qw($VERSION);
-use Geo::Constants qw{PI};
-use Geo::Functions qw{rad_deg deg_rad};
-
-$VERSION = sprintf("%d.%02d", q{Revision: 0.05} =~ /(\d+)\.(\d+)/);
-
 =head1 CONSTRUCTOR
 
 =head2 new
@@ -39,24 +37,15 @@ The new() constructor may be called with any parameter that is appropriate to th
 
   my $obj = Geo::Inverse->new(); # default "WGS84"
 
-=cut
-
-sub new {
-  my $this = shift();
-  my $class = ref($this) || $this;
-  my $self = {};
-  bless $self, $class;
-  $self->initialize(@_);
-  return $self;
-}
-
 =head1 METHODS
+
+=head2 initialize
 
 =cut
 
 sub initialize {
-  my $self = shift();
-  my $param = shift()||undef();
+  my $self  = shift;
+  my $param = shift || undef;
   $self->ellipsoid($param);
 }
 
@@ -64,7 +53,7 @@ sub initialize {
 
 Method to set or retrieve the current ellipsoid object.  The ellipsoid is a Geo::Ellipsoids object.
 
-  my $ellipsoid=$obj->ellipsoid;  #Default is WGS84
+  my $ellipsoid = $obj->ellipsoid;  #Default is WGS84
 
   $obj->ellipsoid('Clarke 1866'); #Built in ellipsoids from Geo::Ellipsoids
   $obj->ellipsoid({a=>1});        #Custom Sphere 1 unit radius
@@ -74,9 +63,8 @@ Method to set or retrieve the current ellipsoid object.  The ellipsoid is a Geo:
 sub ellipsoid {
   my $self = shift();
   if (@_) {
-    my $param=shift();
-    use Geo::Ellipsoids;
-    my $obj=Geo::Ellipsoids->new($param);
+    my $param = shift();
+    my $obj   = Geo::Ellipsoids->new($param);
     $self->{'ellipsoid'}=$obj;
   }
   return $self->{'ellipsoid'};
@@ -86,18 +74,18 @@ sub ellipsoid {
 
 This method is the user frontend to the mathematics. This interface will not change in future versions.
 
-  my ($faz, $baz, $dist)=$obj->inverse($lat1,$lon1,$lat2,$lon2);
+  my ($faz, $baz, $dist) = $obj->inverse($lat1,$lon1,$lat2,$lon2);
 
 =cut
 
 sub inverse {
-  my $self=shift();
-  my $lat1=shift();      #degrees
-  my $lon1=shift();      #degrees
-  my $lat2=shift();      #degrees
-  my $lon2=shift();      #degrees
-  my ($faz, $baz, $dist)=$self->_inverse(rad_deg($lat1), rad_deg($lon1),
-                                         rad_deg($lat2), rad_deg($lon2));
+  my $self               = shift();
+  my $lat1               = shift();      #degrees
+  my $lon1               = shift();      #degrees
+  my $lat2               = shift();      #degrees
+  my $lon2               = shift();      #degrees
+  my ($faz, $baz, $dist) = $self->_inverse(rad_deg($lat1), rad_deg($lon1),
+                                           rad_deg($lat2), rad_deg($lon2));
   return wantarray ? (deg_rad($faz), deg_rad($baz), $dist) : $dist;
 }
 
@@ -197,35 +185,24 @@ sub _inverse {
   return($faz, $baz, $s);
 }
 
-1;
-
-__END__
-
-=head1 TODO
-
-Add more tests.
-
 =head1 BUGS
 
-Please send to the geo-perl email list.
+Please open an issue on GitHub
 
 =head1 LIMITS
 
 No guarantees that Perl handles all of the double precision calculations in the same manner as Fortran.
 
-=head1 AUTHOR
-
-Michael R. Davis qw/perl michaelrdavis com/
-
 =head1 LICENSE
 
-Copyright (c) 2006 Michael R. Davis (mrdvt92)
+MIT License
 
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+Copyright (c) 2022 Michael R. Davis
 
 =head1 SEE ALSO
 
-Net::GPSD
-Geo::Ellipsoid
-GIS::Distance::GeoEllipsoid
+L<Geo::Ellipsoid>, L<GIS::Distance::GeoEllipsoid>, L<Geo::Calc>
+
+=cut
+
+1;

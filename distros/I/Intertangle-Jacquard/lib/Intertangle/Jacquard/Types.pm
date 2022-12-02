@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Intertangle::Jacquard::Types;
 # ABSTRACT: Type library for Jacquard
-$Intertangle::Jacquard::Types::VERSION = '0.001';
+$Intertangle::Jacquard::Types::VERSION = '0.002';
 use Type::Library 0.008 -base,
 	-declare => [qw(
 		Actor
@@ -31,7 +31,7 @@ Intertangle::Jacquard::Types - Type library for Jacquard
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 EXTENDS
 

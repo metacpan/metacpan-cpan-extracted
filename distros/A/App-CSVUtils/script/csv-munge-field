@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-25'; # DATE
+our $DATE = '2022-12-02'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '0.046'; # VERSION
+our $VERSION = '0.051'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/CSVUtils/csv_munge_field",
@@ -39,15 +39,15 @@ csv-munge-field - Munge a field in every row of CSV file with Perl code
 
 =head1 VERSION
 
-This document describes version 0.046 of csv-munge-field (from Perl distribution App-CSVUtils), released on 2022-10-25.
+This document describes version 0.051 of csv-munge-field (from Perl distribution App-CSVUtils), released on 2022-12-02.
 
 =head1 SYNOPSIS
 
-B<csv-munge-field> L<--help|/"--help, -h, -v"> (or L<-h|/"--help, -h, -v">, L<-?|/"--help, -h, -v">)
+B<csv-munge-field> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
 
-B<csv-munge-field> L<--version|/"--version, -v"> (or L<-v|/"--version, -v">)
+B<csv-munge-field> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<csv-munge-field> [L<--escape-char|/"--escape-char=s">=I<str>] [L<--format|/"--format=s">=I<name>|L<--json|/"--json">] [L<--header|/"--no-header, --input-header">|L<--input-header|/"--no-header, --input-header">|L<--no-header|/"--no-header, --input-header">|L<--noheader|/"--no-header, --input-header">] [L<--(no)naked-res|/"--naked-res">] [L<--output-escape-char|/"--output-escape-char=s">=I<str>] [L<--output-filename|/"--output-filename=s, -o">=L<filename|Sah::Schema::filename>|L<-o|/"--output-filename=s, -o">=L<filename|Sah::Schema::filename>] [L<--output-header|/"--output-header">|L<--no-output-header|/"--output-header">|L<--nooutput-header|/"--output-header">] [L<--output-quote-char|/"--output-quote-char=s">=I<str>] [L<--output-sep-char|/"--output-sep-char=s">=I<str>] [L<--output-tsv|/"--output-tsv">|L<--no-output-tsv|/"--output-tsv">|L<--nooutput-tsv|/"--output-tsv">] [L<--overwrite|/"--overwrite, -O">|L<-O|/"--overwrite, -O">|L<--no-overwrite|/"--overwrite, -O">|L<--nooverwrite|/"--overwrite, -O">] [L<--page-result|/"--page-result">[=I<program>]|L<--view-result|/"--view-result">[=I<program>]] [L<--quote-char|/"--quote-char=s">=I<str>] [L<--sep-char|/"--sep-char=s">=I<str>] [L<--tsv|/"--tsv, --input-tsv">|L<--input-tsv|/"--tsv, --input-tsv">|L<--no-tsv|/"--tsv, --input-tsv">|L<--notsv|/"--tsv, --input-tsv">] -- E<lt>L<filename|/"--filename=s*">E<gt> E<lt>L<field|/"--field=s*, -F">E<gt> E<lt>L<eval|/"--eval=s*">E<gt>
+B<csv-munge-field> [B<L<--escape-char|/"--escape-char=s">>=I<str>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--header|/"--no-header, --input-header">>|B<L<--input-header|/"--no-header, --input-header">>|B<L<--no-header|/"--no-header, --input-header">>|B<L<--noheader|/"--no-header, --input-header">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--output-escape-char|/"--output-escape-char=s">>=I<str>] [B<L<--output-filename|/"--output-filename=s, -o">>=I<L<filename|Sah::Schema::filename>>|B<L<-o|/"--output-filename=s, -o">>=I<L<filename|Sah::Schema::filename>>] [B<L<--output-header|/"--output-header">>|B<L<--no-output-header|/"--output-header">>|B<L<--nooutput-header|/"--output-header">>] [B<L<--output-quote-char|/"--output-quote-char=s">>=I<str>] [B<L<--output-sep-char|/"--output-sep-char=s">>=I<str>] [B<L<--output-tsv|/"--output-tsv">>|B<L<--no-output-tsv|/"--output-tsv">>|B<L<--nooutput-tsv|/"--output-tsv">>] [B<L<--overwrite|/"--overwrite, -O">>|B<L<-O|/"--overwrite, -O">>|B<L<--no-overwrite|/"--overwrite, -O">>|B<L<--nooverwrite|/"--overwrite, -O">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--quote-char|/"--quote-char=s">>=I<str>] [B<L<--sep-char|/"--sep-char=s">>=I<str>] [B<L<--tsv|/"--tsv, --input-tsv">>|B<L<--input-tsv|/"--tsv, --input-tsv">>|B<L<--no-tsv|/"--tsv, --input-tsv">>|B<L<--notsv|/"--tsv, --input-tsv">>] -- E<lt>I<L<filename|/"--filename=s*">>E<gt> E<lt>I<L<field|/"--field=s*, -F">>E<gt> E<lt>I<L<eval|/"--eval=s*">>E<gt>
 
 =head1 DESCRIPTION
 
@@ -73,7 +73,7 @@ C<*> marks required options.
 
 =item B<--eval-json>=I<s>, B<-e>
 
-Perl code to do munging (JSON-encoded).
+Perl code (JSON-encoded).
 
 See C<--eval>.
 
@@ -81,7 +81,7 @@ Can also be specified as the 3rd command-line argument.
 
 =item B<--eval>=I<s>*
 
-Perl code to do munging.
+Perl code.
 
 Can also be specified as the 3rd command-line argument.
 

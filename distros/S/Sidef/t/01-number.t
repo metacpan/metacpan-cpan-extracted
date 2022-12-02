@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 167;
+use Test::More tests => 185;
 
 use Sidef;
 
@@ -17,6 +17,10 @@ sub re($) {
 # general tests
 
 my $o = 'Sidef::Types::Number::Number';
+
+my $zero = $o->new(0);
+my $one  = $o->new(1);
+my $mone = $o->new(-1);
 
 {
     my $x = $o->new(1234);
@@ -150,7 +154,8 @@ my $o = 'Sidef::Types::Number::Number';
     like($o->new(2)->sqrt,                qr/^1\.414213562/);
     like($o->new(100)->log,               qr/^4\.605170185/);
     like($o->new(10)->exp,                qr/^22026\.46579/);
-    like($o->new(-4.5)->abs,              qr/^4.5\z/);
+    like($o->new(-4.5)->abs->float,       qr/^4.5\z/);
+    like($o->new(-4.5)->float->abs,       qr/^4.5\z/);
     like($o->new(10)->abs,                qr/^10\z/);
     like($o->new(2.9)->floor,             qr/^2\z/);
     like($o->new(2.5)->floor,             qr/^2\z/);
@@ -167,10 +172,6 @@ my $o = 'Sidef::Types::Number::Number';
     my $x    = $o->new(1227);
     my $pow  = $o->new(42);
     my $bint = $x->ipow($pow);
-
-    my $zero = $o->new(0);
-    my $one  = $o->new(1);
-    my $mone = $o->new(-1);
 
     ok($mone->is_pow($o->new(3)));
     ok(!($mone->is_pow($o->new(2))));
@@ -283,9 +284,9 @@ ok(!($x->gt($y)));
 ok($x->lt($y));
 ok(!($x->eq($y)));
 
-#$x = $o->new('-124');
-#$y = $o->new('-122');
-#is($x->acmp($y), $o->new(1));
+$x = $o->new('-124');
+$y = $o->new('-122');
+is($x->acmp($y), $o->new(1));
 
 $x = $o->new('-124');
 $y = $o->new('-122');
@@ -360,15 +361,19 @@ is("$x", '8');
 
 $x = $o->new('1/2')->pow($o->new('3'));
 is($x->as_frac->get_value, '1/8');
-is("$x",                   '0.125');
+
+#is("$x",                   '1/8');
+is("$x", '0.125');
 
 $x = $o->new('1/3')->pow($o->new('4'));
 is($x->as_frac->get_value, '1/81');
-like("$x", qr/^0\.0123456790123456790123456790123456790123456790\d*\z/);
+
+#is("$x", '1/81');
 
 $x = $o->new('2/3')->pow($o->new(4));
 is($x->as_frac->get_value, '16/81');
-like("$x", qr/^0\.197530864197530864197530864197530864197530864\d*\z/);
+
+#is("$x", "16/81");
 
 $x = $o->new('2/3')->pow($o->new('5/3'));
 like("$x", qr/^0\.50876188557925/);
@@ -494,6 +499,38 @@ $x = $o->new('80/8');
 like($x->as_hex(), re 'a');
 like($x->as_bin(), re '1010');
 like($x->as_oct(), re '12');
+
+##############################################################################
+# shift_left(), shift_right()
+
+$x = $o->new(5);
+$y = $o->new(7);
+
+like($x->shift_left($y),          re '640');
+like($x->shift_left($o->new(50)), re '5629499534213120');
+like($x->shift_left($o->new(62)), re '23058430092136939520');
+
+like($zero->shift_left($o->new(5)), re '0');
+like($one->shift_left($o->new(64)), re '18446744073709551616');
+like($one->shift_left($o->new(65)), re '36893488147419103232');
+
+like($mone->shift_left($x), re '-32');
+like($mone->shift_left($y), re '-128');
+
+like($x->shift_left($mone), re '2');
+like($y->shift_left($mone), re '3');
+
+like($x->shift_right($mone), re '10');
+like($y->shift_right($mone), re '14');
+
+like($zero->shift_right($o->new(5)),                   re '0');
+like($y->shift_right($x),                              re '0');
+like($x->shift_right($y),                              re '0');
+like($o->new('12312631237')->shift_right($o->new(10)), re '12024053');
+
+$x = $o->new('12312631237999999999123');
+like($x->shift_right($o->new(9)),  re '24048107886718749998');
+like($x->shift_right($o->new(10)), re '12024053943359374999');
 
 ##############################################################################
 # done

@@ -2,7 +2,7 @@
 #
 #  Net::Server::Daemonize - Daemonization utilities.
 #
-#  Copyright (C) 2001-2017
+#  Copyright (C) 2001-2022
 #
 #    Jeremy Howard
 #    j+daemonize@howard.fm
@@ -124,7 +124,7 @@ sub get_gid {
     }
 
     die "No group found in arguments.\n" unless @gid;
-    return join(" ",$gid[0],@gid);
+    return join(" ", $gid[0], @gid);
 }
 
 ### change the process to run as this uid
@@ -194,7 +194,7 @@ sub daemonize ($$$) {
 
     my $uid = get_uid($user);
     my $gid = get_gid($group); # returns list of groups
-    $gid = (split /\s+/, $gid)[0];
+    $gid = (split /[\s,]+/, $gid)[0];
 
     my $pid = safe_fork();
 

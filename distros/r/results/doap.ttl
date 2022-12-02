@@ -1,0 +1,136 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/results/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.014"^^doap-deps:CpanId ], [ doap-deps:on "Carp"^^doap-deps:CpanId ], [ doap-deps:on "Devel::StrictMode"^^doap-deps:CpanId ], [ doap-deps:on "Exporter::Shiny"^^doap-deps:CpanId ], [ doap-deps:on "Role::Tiny"^^doap-deps:CpanId ], [ doap-deps:on "Scalar::Util"^^doap-deps:CpanId ];
+	doap-deps:test-recommendation [ doap-deps:on "Type::Utils"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Type::Nano"^^doap-deps:CpanId ], [ doap-deps:on "Test2::V0"^^doap-deps:CpanId ], [ doap-deps:on "Test2::Tools::Spec"^^doap-deps:CpanId ], [
+		doap-deps:on "Test2::Require::AuthorTesting"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "Test2::Require::Module"^^doap-deps:CpanId;
+	];
+	doap:bug-database    <https://github.com/tobyink/p5-results/issues>;
+	doap:created         "2022-11-29"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/results>;
+	doap:homepage        <https://metacpan.org/release/results>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "results";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/results/v_0-001>, <http://purl.org/NET/cpan-uri/dist/results/v_0-002>, <http://purl.org/NET/cpan-uri/dist/results/v_0-003>, <http://purl.org/NET/cpan-uri/dist/results/v_0-004>, <http://purl.org/NET/cpan-uri/dist/results/v_0-005>, <http://purl.org/NET/cpan-uri/dist/results/v_0-006>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-results>;
+	];
+	doap:shortdesc       "why throw exceptions when you can return them?".
+
+<http://purl.org/NET/cpan-uri/dist/results/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "results-0.001"^^xsd:string;
+	dc:issued            "2022-11-30"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/results-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/results/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "results-0.002"^^xsd:string;
+	dc:issued            "2022-11-30"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Minor fixes and improvements to documentation.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/results-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/results/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "results-0.003"^^xsd:string;
+	dc:issued            "2022-12-01"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Document exports.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Explain use of results::exceptions more.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Other minor fixes and improvements to documentation.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/results-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/results/v_0-004>
+	a                    doap:Version;
+	dc:identifier        "results-0.004"^^xsd:string;
+	dc:issued            "2022-12-02"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Provide the results::wrap module.";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "Add unit tests for results::exceptions.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/results-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/results/v_0-005>
+	a                    doap:Version;
+	dc:identifier        "results-0.005"^^xsd:string;
+	dc:issued            "2022-12-02"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Minor fixes and improvements to documentation.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/results-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/results/v_0-006>
+	a                    doap:Version;
+	dc:identifier        "results-0.006"^^xsd:string;
+	dc:issued            "2022-12-02"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Functions can now use a `:Result` attribute to indicate they return a Result. They may optionally include a type constraint, like `:Result(Int)`.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Clarify that wantarray in functions returning a Result is useless.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/results-0.006.tar.gz>;
+	doap:revision        "0.006"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+

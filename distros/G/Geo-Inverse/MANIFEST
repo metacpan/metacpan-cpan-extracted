@@ -1,8 +1,13 @@
-CHANGES
+Changes
 LICENSE
 Makefile.PL
 MANIFEST
-META.yml
-README
+README.md
+CONTRIBUTING.md
 lib/Geo/Inverse.pm
 t/base.t
+doc/inverse.for
+doc/Makefile
+perl-Geo-Inverse.spec
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

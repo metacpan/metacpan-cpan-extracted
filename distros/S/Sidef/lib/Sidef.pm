@@ -3,7 +3,7 @@ package Sidef {
     use utf8;
     use 5.016;
 
-    our $VERSION = '22.07';
+    our $VERSION = '22.12';
 
     our $SPACES      = 0;    # the current number of indentation spaces
     our $SPACES_INCR = 4;    # the number of indentation spaces
@@ -29,6 +29,14 @@ package Sidef {
     }
 
     *call = \&new;
+
+    sub version {
+        Sidef::Types::String::String->new('v' . $VERSION);
+    }
+
+    sub numeric_version {
+        Sidef::Types::Number::Number->new($VERSION =~ s{_}{}rg);
+    }
 
     sub parse_code {
         my ($self, $code) = @_;

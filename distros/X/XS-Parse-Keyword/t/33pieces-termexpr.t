@@ -35,4 +35,9 @@ my $ret;
    is( $ret, "(x)y", 'termexpr treats (PARENS) as entire expression' );
 }
 
+{
+   $ret = pieceprefixedtermexpr_VAR $VAR . ", world!";
+   is( $ret, "(Hello, world!)", 'result of pieceprefixedtermexpr_VAR' );
+}
+
 done_testing;

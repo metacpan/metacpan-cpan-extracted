@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Intertangle::Punchcard::Attributes;
 # ABSTRACT: Attributes for constraint variables
-$Intertangle::Punchcard::Attributes::VERSION = '0.001';
+$Intertangle::Punchcard::Attributes::VERSION = '0.002';
 use Moo::_Utils qw(_install_coderef);
 use Intertangle::Punchcard::Backend::Kiwisolver::Symbolic;
 
@@ -40,7 +40,7 @@ Intertangle::Punchcard::Attributes - Attributes for constraint variables
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 AUTHOR
 

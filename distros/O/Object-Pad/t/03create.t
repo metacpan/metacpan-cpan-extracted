@@ -48,6 +48,7 @@ class WithBuildargs {
 
 {
    my @called;
+   my $class_in_ADJUST;
 
    class WithAdjust {
       BUILD {
@@ -56,18 +57,21 @@ class WithBuildargs {
 
       ADJUST {
          push @called, "ADJUST";
+         $class_in_ADJUST = __CLASS__;
       }
    }
 
    WithAdjust->new;
    is_deeply( \@called, [qw( BUILD ADJUST )], 'ADJUST invoked after BUILD' );
+
+   is( $class_in_ADJUST, "WithAdjust", '__CLASS__ during ADJUST block' )
 }
 
 {
    my $paramvalue;
 
    class StrictParams :strict(params) {
-      ADJUST {
+      ADJUSTPARAMS {
          my ($href) = @_;
          $paramvalue = delete $href->{param};
       }

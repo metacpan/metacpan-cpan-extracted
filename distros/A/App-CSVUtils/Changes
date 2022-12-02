@@ -1,3 +1,63 @@
+0.051   2022-12-02  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
+
+        [Incompatible changes]
+
+        - Rename csv-select-row to csv-select-rows for consistency.
+
+        - [cli csv-sort-fields] Rename by_example to by_examples argument
+          and make it an array, on CLI specify one example at a time with
+          --by-example, to allow header name that contains comma.
+
+        [Enhancements]
+
+        - Add utilities csv-pick-rows, csv-pick-fields, csv-shuf-rows,
+          csv-shuf-fields.
+
+        - [cli csv-sort-fields] Add options --by-code, --by-sortsub.
+
+
+0.050   2022-12-02  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [build] Rebuild to work around bug in my toolchain that still uses the
+          old module to generate POD.
+
+
+0.049   2022-12-02  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [cli csv-sort-rows] Update documentation (no more --by-fields).
+
+
+0.048   2022-12-02  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
+
+        [Incompatible changes]
+
+        - [cli csv-sort-rows] Make by_fields argument an array and specify on
+          CLI one field at a time with --by-field to allow header name which
+          contains comma (RT#145282).
+
+        [Enhancements]
+
+        - Improve --by-field tab completion (provide +FIELD, -FIELD, ~FIELD).
+
+
+0.047   2022-12-01  Released-By: PERLANCAR; Urgency: medium
+
+        - [cli csv-add-field] Rename to csv-add-fields, now can add multiple
+          fields, -e is now optional, also add -H (RT#145276, RT#145268).
+
+        - [bugfix] [cli csv-sort, csv-sort-rows] output_filename was not
+          passed to csvutil() (RT#145267).
+
+        - [bugfix] [cli csv-setop] Fix argument parsing (output_filename
+          clashes with filename) (RT#145275).
+
+        - [doc] Tweak Abtract for csv-setop to make it a bit more discoverable.
+
+
 0.046   2022-10-25  Released-By: PERLANCAR; Urgency: medium
 
         - Add utility: csv2vcf.

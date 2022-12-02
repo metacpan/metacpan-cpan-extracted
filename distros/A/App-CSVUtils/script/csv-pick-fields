@@ -1,0 +1,348 @@
+#!perl
+
+# Note: This script is a CLI for Riap function /App/CSVUtils/csv_pick_fields
+# and generated automatically using Perinci::CmdLine::Gen version 0.502
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-12-02'; # DATE
+our $DIST = 'App-CSVUtils'; # DIST
+our $VERSION = '0.051'; # VERSION
+
+my $cmdline = Perinci::CmdLine::Any->new(
+    url => "/App/CSVUtils/csv_pick_fields",
+    program_name => "csv-pick-fields",
+    read_config => 0,
+    read_env => 0,
+    use_utf8 => 1,
+);
+
+$cmdline->run;
+
+# ABSTRACT: Select one or more random fields from CSV
+# PODNAME: csv-pick-fields
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+csv-pick-fields - Select one or more random fields from CSV
+
+=head1 VERSION
+
+This document describes version 0.051 of csv-pick-fields (from Perl distribution App-CSVUtils), released on 2022-12-02.
+
+=head1 SYNOPSIS
+
+B<csv-pick-fields> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
+
+B<csv-pick-fields> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
+
+B<csv-pick-fields> [B<L<--escape-char|/"--escape-char=s">>=I<str>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--header|/"--no-header, --input-header">>|B<L<--input-header|/"--no-header, --input-header">>|B<L<--no-header|/"--no-header, --input-header">>|B<L<--noheader|/"--no-header, --input-header">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--num|/"--num=s, -n">>=I<L<posint|Sah::Schema::posint>>|B<L<-n|/"--num=s, -n">>=I<L<posint|Sah::Schema::posint>>] [B<L<--output-escape-char|/"--output-escape-char=s">>=I<str>] [B<L<--output-header|/"--output-header">>|B<L<--no-output-header|/"--output-header">>|B<L<--nooutput-header|/"--output-header">>] [B<L<--output-quote-char|/"--output-quote-char=s">>=I<str>] [B<L<--output-sep-char|/"--output-sep-char=s">>=I<str>] [B<L<--output-tsv|/"--output-tsv">>|B<L<--no-output-tsv|/"--output-tsv">>|B<L<--nooutput-tsv|/"--output-tsv">>] [B<L<--overwrite|/"--overwrite, -O">>|B<L<-O|/"--overwrite, -O">>|B<L<--no-overwrite|/"--overwrite, -O">>|B<L<--nooverwrite|/"--overwrite, -O">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--quote-char|/"--quote-char=s">>=I<str>] [B<L<--sep-char|/"--sep-char=s">>=I<str>] [B<L<--tsv|/"--tsv, --input-tsv">>|B<L<--input-tsv|/"--tsv, --input-tsv">>|B<L<--no-tsv|/"--tsv, --input-tsv">>|B<L<--notsv|/"--tsv, --input-tsv">>] -- E<lt>I<L<filename|/"--filename=s*">>E<gt> [I<L<output_filename|/"--output-filename=s, -o">>]
+
+=head1 DESCRIPTION
+
+I<Common notes for the utilities>
+
+Encoding: The utilities in this module/distribution accept and emit UTF8 text.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Main options
+
+=over
+
+=item B<--num>=I<s>, B<-n>
+
+Number of fields to pick.
+
+Default value:
+
+ 1
+
+=back
+
+=head2 Input options
+
+=over
+
+=item B<--escape-char>=I<s>
+
+Specify character to escape value in field in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to C<\\> (backslash). Overrides C<--tsv> option.
+
+
+=item B<--filename>=I<s>*
+
+Input CSV file or URL.
+
+Use C<-> to read from stdin, use C<clipboard:> to read from clipboard.
+
+
+Can also be specified as the 1st command-line argument.
+
+=item B<--no-header>, B<--input-header>
+
+By default (C<--header>), the first row of the CSV will be assumed to contain
+field names (and the second row contains the first data row). When you declare
+that CSV does not have header row (C<--no-header>), the first row of the CSV is
+assumed to contain the first data row. Fields will be named C<field1>, C<field2>,
+and so on.
+
+
+=item B<--quote-char>=I<s>
+
+Specify field quote character in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to C<"> (double quote). Overrides C<--tsv> option.
+
+
+=item B<--sep-char>=I<s>
+
+Specify field separator character in input CSV, will be passed to Text::CSV_XS.
+
+Defaults to C<,> (comma). Overrides C<--tsv> option.
+
+
+=item B<--tsv>, B<--input-tsv>
+
+Inform that input file is in TSV (tab-separated) format instead of CSV.
+
+Overriden by C<--sep-char>, C<--quote-char>, C<--escape-char> options. If one of
+those options is specified, then C<--tsv> will be ignored.
+
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+C<--naked-res> so you just get:
+
+ [1,2,3]
+
+
+=item B<--output-escape-char>=I<s>
+
+Specify character to escape value in field in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--escape-char> option but for output instead of input.
+
+Defaults to C<\\> (backslash). Overrides C<--output-tsv> option.
+
+
+=item B<--output-filename>=I<s>, B<-o>
+
+Output filename or URL.
+
+Use C<-> to output to stdout (the default if you don't specify this option), use
+C<clipboard:> to write to clipboard.
+
+
+Can also be specified as the 2nd command-line argument.
+
+=item B<--output-header>
+
+Whether output CSV should have a header row.
+
+By default, a header row will be output I<if> input CSV has header row. Under
+C<--output-header>, a header row will be output even if input CSV does not have
+header row (value will be something like "col0,col1,..."). Under
+C<--no-output-header>, header row will I<not> be printed even if input CSV has
+header row. So this option can be used to unconditionally add or remove header
+row.
+
+
+=item B<--output-quote-char>=I<s>
+
+Specify field quote character in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--quote-char> option but for output instead of input.
+
+Defaults to C<"> (double quote). Overrides C<--output-tsv> option.
+
+
+=item B<--output-sep-char>=I<s>
+
+Specify field separator character in output CSV, will be passed to Text::CSV_XS.
+
+This is like C<--sep-char> option but for output instead of input.
+
+Defaults to C<,> (comma). Overrides C<--output-tsv> option.
+
+
+=item B<--output-tsv>
+
+Inform that output file is TSV (tab-separated) format instead of CSV.
+
+This is like C<--tsv> option but for output instead of input.
+
+Overriden by C<--output-sep-char>, C<--output-quote-char>, C<--output-escape-char>
+options. If one of those options is specified, then C<--output-tsv> will be
+ignored.
+
+
+=item B<--overwrite>, B<-O>
+
+Whether to override existing output file.
+
+=item B<--page-result>
+
+Filter output through a pager.
+
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
+=item B<--view-result>
+
+View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C csv-pick-fields csv-pick-fields
+
+in your bash startup (e.g. F<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install modules using L<cpanm-shcompgen>
+which can activate shell completion for scripts immediately.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete csv-pick-fields 'p/*/`csv-pick-fields`/'
+
+in your tcsh startup (e.g. F<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install L<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install L<shcompgen> as described above.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/App-CSVUtils>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-App-CSVUtils>.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-CSVUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

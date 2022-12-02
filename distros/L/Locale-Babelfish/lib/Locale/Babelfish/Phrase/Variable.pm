@@ -6,7 +6,7 @@ use utf8;
 use strict;
 use warnings;
 
-our $VERSION = '2.005'; # VERSION
+our $VERSION = '2.10'; # VERSION
 
 use parent qw( Locale::Babelfish::Phrase::Node );
 
@@ -32,7 +32,7 @@ Locale::Babelfish::Phrase::Variable - Babelfish AST Variable substitution node.
 
 =head1 VERSION
 
-version 2.005
+version 2.10
 
 =head1 AUTHORS
 
@@ -57,6 +57,10 @@ REG.RU LLC
 =item *
 
 Kirill Sysoev <k.sysoev@me.com>
+
+=item *
+
+Alexandr Tkach <tkach@reg.ru>
 
 =back
 

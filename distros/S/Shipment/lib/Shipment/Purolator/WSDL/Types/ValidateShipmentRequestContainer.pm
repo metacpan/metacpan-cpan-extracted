@@ -1,5 +1,5 @@
 package Shipment::Purolator::WSDL::Types::ValidateShipmentRequestContainer;
-$Shipment::Purolator::WSDL::Types::ValidateShipmentRequestContainer::VERSION = '3.09';
+$Shipment::Purolator::WSDL::Types::ValidateShipmentRequestContainer::VERSION = '3.10';
 use strict;
 use warnings;
 
@@ -65,7 +65,7 @@ Shipment::Purolator::WSDL::Types::ValidateShipmentRequestContainer
 
 =head1 VERSION
 
-version 3.09
+version 3.10
 
 =head1 DESCRIPTION
 

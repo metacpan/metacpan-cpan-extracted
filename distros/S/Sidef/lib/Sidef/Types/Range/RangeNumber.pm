@@ -63,61 +63,87 @@ package Sidef::Types::Range::RangeNumber {
 
             if (    ref($step) eq 'Sidef::Types::Number::Number'
                 and ref($from) eq 'Sidef::Types::Number::Number'
-                and ref($$from) eq 'Math::GMPz'
-                and ref($$step) eq 'Math::GMPz') {
+                and (ref($$from) eq 'Math::GMPz' or ref($$from) eq '')
+                and (ref($$step) eq 'Math::GMPz' or ref($$step) eq '')) {
 
                 $from = $$from;
                 $step = $$step;
 
                 if (    ref($to) eq 'Sidef::Types::Number::Number'
-                    and ref($$to) eq 'Math::GMPz'
-                    and Math::GMPz::Rmpz_fits_slong_p($$to)
-                    and Math::GMPz::Rmpz_fits_slong_p($from)
-                    and Math::GMPz::Rmpz_fits_slong_p($step)) {
+                    and (ref($$to) eq ''  or (ref($$to) eq 'Math::GMPz' and Math::GMPz::Rmpz_fits_slong_p($$to)))
+                    and (ref($from) eq '' or Math::GMPz::Rmpz_fits_slong_p($from))
+                    and (ref($step) eq '' or Math::GMPz::Rmpz_fits_slong_p($step))) {
 
-                    $from = Math::GMPz::Rmpz_get_si($from);
-                    $step = Math::GMPz::Rmpz_get_si($step);
+                    $from = Math::GMPz::Rmpz_get_si($from) if ref($from);
+                    $step = Math::GMPz::Rmpz_get_si($step) if ref($step);
 
                     return Sidef::Types::Block::Block->new(
                         code => sub {
                             --$repetitions >= 0 or return undef;
-
-                            if ($from < 8192 and $from >= 0) {
-                                my $obj = ($cache[$from] //=
-                                           bless(\Math::GMPz::Rmpz_init_set_ui($from), 'Sidef::Types::Number::Number'));
-                                $from += $step;
-                                return $obj;
-                            }
-
-                            if (Math::GMPz::get_refcnt($$Sidef::Types::Number::Number::MPZ) > 1) {
-                                $Sidef::Types::Number::Number::MPZ =
-                                  bless(\Math::GMPz::Rmpz_init_set_si($from), 'Sidef::Types::Number::Number');
-                            }
-                            else {
-                                Math::GMPz::Rmpz_set_si($$Sidef::Types::Number::Number::MPZ, $from);
-                            }
-
+                            my $obj = $from;
                             $from += $step;
-                            $Sidef::Types::Number::Number::MPZ;
+                            bless(\$obj, 'Sidef::Types::Number::Number');
                         },
                     );
                 }
 
-                my $counter_mpz = Math::GMPz::Rmpz_init_set($from);
+                if (    (ref($from) eq '' or Math::GMPz::Rmpz_fits_slong_p($from))
+                    and (ref($step) eq '' or Math::GMPz::Rmpz_fits_slong_p($step))) {
+
+                    $from = Math::GMPz::Rmpz_get_si($from) if ref($from);
+                    $step = Math::GMPz::Rmpz_get_si($step) if ref($step);
+
+                    my $counter_mpz = undef;
+                    my $prev        = $from;
+
+                    return Sidef::Types::Block::Block->new(
+                        code => sub {
+                            --$repetitions >= 0 or return undef;
+                            my $obj = $from;
+
+                            if (    $obj < Sidef::Types::Number::Number::ULONG_MAX
+                                and $obj > Sidef::Types::Number::Number::LONG_MIN) {
+                                $prev = $obj;
+                                $from += $step;
+                                if (    $from < Sidef::Types::Number::Number::ULONG_MAX
+                                    and $from > Sidef::Types::Number::Number::LONG_MIN) {
+                                    return bless(\$obj, 'Sidef::Types::Number::Number');
+                                }
+                            }
+
+                            # The code below handles overflow
+                            $counter_mpz //=
+                              ($prev < 0)
+                              ? Math::GMPz::Rmpz_init_set_si($prev)
+                              : Math::GMPz::Rmpz_init_set_ui($prev);
+
+                            my $value = bless(\Math::GMPz::Rmpz_init_set($counter_mpz), 'Sidef::Types::Number::Number');
+
+                            ref($step)      ? Math::GMPz::Rmpz_add($counter_mpz, $counter_mpz, $step)
+                              : ($step < 0) ? Math::GMPz::Rmpz_sub_ui($counter_mpz, $counter_mpz, -$step)
+                              :               Math::GMPz::Rmpz_add_ui($counter_mpz, $counter_mpz, $step);
+
+                            $value;
+                        }
+                    );
+                }
+
+                my $counter_mpz =
+                    ref($from)  ? Math::GMPz::Rmpz_init_set($from)
+                  : ($from < 0) ? Math::GMPz::Rmpz_init_set_si($from)
+                  :               Math::GMPz::Rmpz_init_set_ui($from);
 
                 return Sidef::Types::Block::Block->new(
                     code => sub {
                         --$repetitions >= 0 or return undef;
-                        if (Math::GMPz::get_refcnt($$Sidef::Types::Number::Number::MPZ) > 1) {
-                            $Sidef::Types::Number::Number::MPZ =
-                              bless(\Math::GMPz::Rmpz_init_set($counter_mpz), 'Sidef::Types::Number::Number');
-                        }
-                        else {
-                            Math::GMPz::Rmpz_set($$Sidef::Types::Number::Number::MPZ, $counter_mpz);
-                        }
 
-                        Math::GMPz::Rmpz_add($counter_mpz, $counter_mpz, $step);
-                        $Sidef::Types::Number::Number::MPZ;
+                        my $value = bless(\Math::GMPz::Rmpz_init_set($counter_mpz), 'Sidef::Types::Number::Number');
+
+                        ref($step)      ? Math::GMPz::Rmpz_add($counter_mpz, $counter_mpz, $step)
+                          : ($step < 0) ? Math::GMPz::Rmpz_sub_ui($counter_mpz, $counter_mpz, -$step)
+                          :               Math::GMPz::Rmpz_add_ui($counter_mpz, $counter_mpz, $step);
+
+                        $value;
                     },
                 );
             }
@@ -365,6 +391,12 @@ package Sidef::Types::Range::RangeNumber {
                             predicate  => sub { $_[0]->is_semiprime },
                            },
                            {
+                            each_name  => 'each_squarefree_semiprime',
+                            arr_name   => 'squarefree_semiprimes',
+                            count_name => 'squarefree_semiprime_count',
+                            predicate  => sub { $_[0]->is_squarefree_semiprime },
+                           },
+                           {
                             each_name  => 'each_composite',
                             arr_name   => 'composites',
                             count_name => 'composite_count',
@@ -479,7 +511,23 @@ package Sidef::Types::Range::RangeNumber {
                  count_name => 'squarefree_almost_prime_count',
                  predicate  => sub {
                      my ($k) = @_;
-                     sub { $_[0]->is_squarefree && $_[0]->is_almost_prime($k) };
+                     sub { $_[0]->is_squarefree_almost_prime($k) };
+                 },
+                },
+                {
+                 arr_name  => 'carmichael',
+                 each_name => 'each_carmichael',
+                 predicate => sub {
+                     my ($k) = @_;
+                     sub { $_[0]->is_carmichael && $_[0]->is_almost_prime($k) };
+                 },
+                },
+                {
+                 arr_name  => 'lucas_carmichael',
+                 each_name => 'each_lucas_carmichael',
+                 predicate => sub {
+                     my ($k) = @_;
+                     sub { $_[0]->is_lucas_carmichael && $_[0]->is_almost_prime($k) };
                  },
                 },
                 {

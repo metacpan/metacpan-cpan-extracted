@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 use strict;
-use warnings qw(FATAL all);
+use warnings qw( FATAL all NONFATAL void );
 use lib 'lib';
 use Test::More tests => 17;
 
@@ -39,7 +39,7 @@ is $x, $y;
 eval "{;}\n\nalias { Data::Alias::deref = 42 };\n\n{;}\n";
 like $@, qr/^Unsupported alias target .* line 3\b/;
 
-eval "{;}\n\n\$x = alias \$y;\n\n{;}\n";
+eval "{;}\n\nuse warnings qw( FATAL void ); \$x = alias \$y;\n\n{;}\n";
 like $@, qr/^Useless use of alias .* line 3\b/;
 
 is \alias(sub { $x })->(), \$x;

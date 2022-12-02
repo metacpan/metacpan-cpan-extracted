@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Intertangle::Jacquard::Role::Render::QnD::SVG::Group;
 # ABSTRACT: Quick-and-dirty SVG group rendering
-$Intertangle::Jacquard::Role::Render::QnD::SVG::Group::VERSION = '0.001';
+$Intertangle::Jacquard::Role::Render::QnD::SVG::Group::VERSION = '0.002';
 use Moo::Role;
 
 method render($svg) {
@@ -27,7 +27,7 @@ Intertangle::Jacquard::Role::Render::QnD::SVG::Group - Quick-and-dirty SVG group
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 CONSUMES
 

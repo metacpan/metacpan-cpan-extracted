@@ -783,6 +783,8 @@ static void setup_parse_field_initexpr(pTHX_ void *hookdata)
 
   CvOUTSIDE(PL_compcv)     = (CV *)SvREFCNT_inc(was_compcv);
   CvOUTSIDE_SEQ(PL_compcv) = PL_cop_seqmax;
+
+  hv_stores(GvHV(PL_hintgv), "Object::Pad/__CLASS__", newSVsv(&PL_sv_yes));
 }
 
 static const struct XSParseKeywordHooks kwhooks_field = {
@@ -906,6 +908,7 @@ static void parse_method_pre_subparse(pTHX_ struct XSParseSublikeContext *ctx, v
   compmethodmeta->is_common = false;
 
   hv_stores(ctx->moddata, "Object::Pad/compmethodmeta", newSVuv(PTR2UV(compmethodmeta)));
+  hv_stores(GvHV(PL_hintgv), "Object::Pad/__CLASS__", newSVsv(&PL_sv_yes));
 }
 
 static bool parse_method_filter_attr(pTHX_ struct XSParseSublikeContext *ctx, SV *attr, SV *val, void *hookdata)
@@ -993,6 +996,8 @@ static void parse_method_post_blockstart(pTHX_ struct XSParseSublikeContext *ctx
       /* Should now follow a sequence of comma-separated elements; each element is
        *   :$NAME    or
        *   :$NAME = EXPR
+       *   :$NAME //= EXPR
+       *   :$NAME ||= EXPR
        * The final one may also be
        *   %NAME
        */
@@ -1030,11 +1035,19 @@ static void parse_method_post_blockstart(pTHX_ struct XSParseSublikeContext *ctx
         av_push(params, newSVuv(PTR2UV((SV *)parammeta)));
         hv_store_ent(parammap, paramname, (SV *)parammeta, 0);
 
-        if(lex_peek_unichar(0) == '=') {
-          lex_read_unichar(0);
+        if(lex_consume("=")) {
           lex_read_space(0);
-
           parammeta->adjust.defexpr = parse_termexpr(0);
+        }
+        else if(lex_consume("//=")) {
+          lex_read_space(0);
+          parammeta->adjust.defexpr = parse_termexpr(0);
+          parammeta->adjust.def_if_undef = 1;
+        }
+        else if(lex_consume("||=")) {
+          lex_read_space(0);
+          parammeta->adjust.defexpr = parse_termexpr(0);
+          parammeta->adjust.def_if_false = 1;
         }
 
         intro_my();
@@ -1096,6 +1109,40 @@ static OP *pp_bind_params_hv(pTHX)
   return NORMAL;
 }
 
+#define walk_optree_warn_for_defargs(o)  S_walk_optree_warn_for_defargs(aTHX_ o)
+static void S_walk_optree_warn_for_defargs(pTHX_ OP *o);
+static void S_walk_optree_warn_for_defargs(pTHX_ OP *o)
+{
+  OP *kid;
+
+  switch(o->op_type) {
+    case OP_NEXTSTATE:
+    case OP_DBSTATE:
+      PL_curcop = (COP *)o;
+      break;
+
+    case OP_RV2AV:
+      /* check for @_; also catches $_[0] as part of AELEM etc */
+      if(o->op_flags & OPf_KIDS &&
+          (kid = cUNOPo->op_first) &&
+          kid->op_type == OP_GV &&
+          kGVOP_gv == PL_defgv)
+        warn_deprecated("Use of @_ is deprecated in ADJUST");
+      break;
+
+    case OP_SHIFT:
+    case OP_POP:
+      if(o->op_flags & OPf_SPECIAL)
+        warn_deprecated("Implicit use of @_ in %s is deprecated in ADJUST", PL_op_name[o->op_type]);
+      break;
+  }
+
+  if(o->op_flags & OPf_KIDS) {
+    for(kid = cUNOPo->op_first; kid; kid = OpSIBLING(kid))
+      walk_optree_warn_for_defargs(kid);
+  }
+}
+
 static void parse_method_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, void *hookdata)
 {
   enum PhaserType type = PTR2UV(hookdata);
@@ -1103,6 +1150,53 @@ static void parse_method_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, v
   MethodMeta *compmethodmeta = NUM2PTR(MethodMeta *, SvUV(*hv_fetchs(ctx->moddata, "Object::Pad/compmethodmeta", 0)));
 
   SV **svp;
+
+  if(type == PHASER_ADJUST) {
+    ENTER;
+    SAVEVPTR(PL_curcop);
+
+#if HAVE_PERL_VERSION(5, 26, 0)
+    OP *o = ctx->body;
+
+    /* Try to find the first significant op in the tree. There's a few
+     * standard tricks we can do to attempt to find the OP_ARGCHECK if there
+     * is one. */
+    while(1) {
+redo:
+      if(!o)
+        break;
+      switch(o->op_type) {
+        case OP_NULL:
+          if(o->op_targ == OP_ARGCHECK) {
+            o = cUNOPo->op_first;
+            goto redo;
+          }
+
+          o = NULL;
+          break;
+
+        case OP_NEXTSTATE:
+        case OP_DBSTATE:
+          PL_curcop = (COP *)o;
+          o = OpSIBLING(o);
+          goto redo;
+
+        case OP_LINESEQ:
+          o = cLISTOPo->op_first;
+          goto redo;
+      }
+      break;
+    }
+
+    if(o && o->op_type == OP_ARGCHECK) {
+      warn_deprecated("Use of ADJUST (signature) {BLOCK} is now deprecated");
+    }
+#endif
+
+    walk_optree_warn_for_defargs(ctx->body);
+
+    LEAVE;
+  }
 
   if(type == PHASER_ADJUST && (svp = hv_fetchs(ctx->moddata, "Object::Pad/ADJUST:params", 0))) {
     AV *params = AV_FROM_REF(*svp);
@@ -1123,23 +1217,46 @@ static void parse_method_pre_blockend(pTHX_ struct XSParseSublikeContext *ctx, v
           newSVpvf("Required parameter '%" SVf "' is missing for %" SVf " constructor",
             SVfARG(paramname), SVfARG(compclassmeta->name)));
 
+      OP *rhs;
+      if(parammeta->adjust.def_if_undef) {
+        /* delete $(params){KEY} // DEFEXPR */
+        rhs = newLOGOP(OP_DOR, 0,
+              newUNOP(OP_DELETE, 0,
+                newBINOP(OP_HELEM, 0,
+                  newPADxVOP(OP_PADHV, OPf_REF, PADIX_PARAMS),
+                  newSVOP(OP_CONST, 0, SvREFCNT_inc(paramname)))),
+              defexpr);
+      }
+      else if(parammeta->adjust.def_if_false) {
+        /* delete $(params){KEY} || DEFEXPR */
+        rhs = newLOGOP(OP_OR, 0,
+              newUNOP(OP_DELETE, 0,
+                newBINOP(OP_HELEM, 0,
+                  newPADxVOP(OP_PADHV, OPf_REF, PADIX_PARAMS),
+                  newSVOP(OP_CONST, 0, SvREFCNT_inc(paramname)))),
+              defexpr);
+      }
+      else {
+        /* exists $(params){KEY} ? delete $(params){KEY} : DEFEXPR; */
+        rhs = newCONDOP(0,
+              /* first */
+              /* OP_EXISTS has to be created a weird way... */
+              newUNOP(OP_EXISTS, 0,
+                newBINOP(OP_HELEM, 0,
+                  newPADxVOP(OP_PADHV, OPf_REF, PADIX_PARAMS),
+                  newSVOP(OP_CONST, 0, SvREFCNT_inc(paramname)))),
+              /* trueop */
+              newUNOP(OP_DELETE, 0,
+                newBINOP(OP_HELEM, 0,
+                  newPADxVOP(OP_PADHV, OPf_REF, PADIX_PARAMS),
+                  newSVOP(OP_CONST, 0, SvREFCNT_inc(paramname)))),
+              /* falseop */
+              defexpr);
+      }
+
       paramsops = op_append_elem(OP_LINESEQ, paramsops,
-        /* $var = exists $(params){KEY} ? delete $(params){KEY} : DEFEXPR; */
         newBINOP(OP_SASSIGN, 0,
-          newCONDOP(0,
-            /* first */
-            /* OP_EXISTS has to be created a weird way... */
-            newUNOP(OP_EXISTS, 0,
-              newBINOP(OP_HELEM, 0,
-                newPADxVOP(OP_PADHV, OPf_REF, PADIX_PARAMS),
-                newSVOP(OP_CONST, 0, SvREFCNT_inc(paramname)))),
-            /* trueop */
-            newUNOP(OP_DELETE, 0,
-              newBINOP(OP_HELEM, 0,
-                newPADxVOP(OP_PADHV, OPf_REF, PADIX_PARAMS),
-                newSVOP(OP_CONST, 0, SvREFCNT_inc(paramname)))),
-            /* falseop */
-            defexpr),
+          rhs,
           newPADxVOP(OP_PADSV, OPf_MOD|OPf_REF, parammeta->adjust.padix)));
     }
 
@@ -1265,6 +1382,58 @@ static const struct XSParseKeywordHooks kwhooks_BUILD = {
 static const struct XSParseKeywordHooks kwhooks_ADJUST = {
   .permit_hintkey = "Object::Pad/ADJUST",
   .parse = &parse_phaser,
+};
+
+static void check_uuCLASS(pTHX_ void *hookdata)
+{
+  /* We test this other hints key purely to get a more useful error message
+   * in cases like   class X { say "My class is", __CLASS__; }
+   */
+
+  SV **svp;
+  if(!(svp = hv_fetchs(GvHV(PL_hintgv), "Object::Pad/__CLASS__", 0)) ||
+      !SvTRUE(*svp))
+    croak("Cannot use __CLASS__ outside of a method, ADJUST block or field initialiser");
+}
+
+static OP *pp_curclass(pTHX)
+{
+  dSP;
+
+  SV *self = PAD_SVl(PADIX_SELF);
+
+  assert(SvROK(self) && SvOBJECT(SvRV(self)));
+
+  EXTEND(SP, 1);
+
+  PUSHs(sv_newmortal());
+#if HAVE_PERL_VERSION(5, 24, 0)
+  sv_ref(*SP, SvRV(self), TRUE);
+#else
+  HV *stash = SvSTASH(SvRV(self));
+  sv_setpv(*SP, HvNAME(stash));
+  if(HvNAMEUTF8(stash))
+    SvUTF8_on(*SP);
+#endif
+
+  RETURN;
+}
+
+static int build_uuCLASS(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, void *hookdata)
+{
+  *out = newOP_CUSTOM(&pp_curclass, 0);
+
+  return KEYWORD_PLUGIN_EXPR;
+}
+
+static const struct XSParseKeywordHooks kwhooks_uuCLASS = {
+  .flags = 0 /* TODO: Can't set XPK_FLAG_EXPR yet because of bug */,
+  .permit_hintkey = "Object::Pad/class",
+
+  .check = &check_uuCLASS,
+
+  .pieces = (const struct XSParseKeywordPieceType []){ {0} },
+  .build  = &build_uuCLASS,
 };
 
 static void check_requires(pTHX_ void *hookdata)
@@ -1841,6 +2010,8 @@ BOOT:
   register_xs_parse_keyword("BUILD",        &kwhooks_BUILD, (void *)PHASER_BUILD);
   register_xs_parse_keyword("ADJUST",       &kwhooks_ADJUST, (void *)PHASER_ADJUST);
   register_xs_parse_keyword("ADJUSTPARAMS", &kwhooks_ADJUST, (void *)PHASER_ADJUSTPARAMS);
+
+  register_xs_parse_keyword("__CLASS__", &kwhooks_uuCLASS, NULL);
 
   register_xs_parse_keyword("requires", &kwhooks_requires, NULL);
 

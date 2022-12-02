@@ -18,10 +18,7 @@ package Dpkg::OpenPGP;
 use strict;
 use warnings;
 
-use POSIX qw(:sys_wait_h);
-use Exporter qw(import);
-use File::Temp;
-use File::Copy;
+use List::Util qw(none);
 
 use Dpkg::Gettext;
 use Dpkg::ErrorHandling;
@@ -29,148 +26,130 @@ use Dpkg::IPC;
 use Dpkg::Path qw(find_command);
 
 our $VERSION = '0.01';
-our @EXPORT = qw(
-    openpgp_sig_to_asc
+
+my @BACKENDS = qw(
+    sop
+    sq
+    gpg
+);
+my %BACKEND = (
+    sop => 'SOP',
+    sq => 'Sequoia',
+    gpg => 'GnuPG',
 );
 
-sub _armor_gpg {
-    my ($sig, $asc) = @_;
+sub new {
+    my ($this, %opts) = @_;
+    my $class = ref($this) || $this;
 
-    my @gpg_opts = qw(--no-options);
+    my $self = {};
+    bless $self, $class;
 
-    open my $fh_asc, '>', $asc
-        or syserr(g_('cannot create signature file %s'), $asc);
-    open my $fh_gpg, '-|', 'gpg', @gpg_opts, '-o', '-', '--enarmor', $sig
-        or syserr(g_('cannot execute %s program'), 'gpg');
-    while (my $line = <$fh_gpg>) {
-        next if $line =~ m/^Version: /;
-        next if $line =~ m/^Comment: /;
+    my $backend = $opts{backend} // 'auto';
+    my %backend_opts = (
+        cmdv => $opts{cmdv} // 'auto',
+        cmd => $opts{cmd} // 'auto',
+    );
 
-        $line =~ s/ARMORED FILE/SIGNATURE/;
+    if ($backend eq 'auto') {
+        # Defaults for stateless full API auto-detection.
+        $opts{needs}{api} //= 'full';
+        $opts{needs}{keystore} //= 0;
 
-        print { $fh_asc } $line;
+        if (none { $opts{needs}{api} eq $_ } qw(full verify)) {
+            error(g_('unknown OpenPGP api requested %s'), $opts{needs}{api});
+        }
+
+        $self->{backend} = $self->_auto_backend($opts{needs}, %backend_opts);
+    } elsif (exists $BACKEND{$backend}) {
+        $self->{backend} = $self->_load_backend($BACKEND{$backend}, %backend_opts);
+        if (! $self->{backend}) {
+            error(g_('cannot load OpenPGP backend %s'), $backend);
+        }
+    } else {
+        error(g_('unknown OpenPGP backend %s'), $backend);
     }
 
-    close $fh_gpg or subprocerr('gpg');
-    close $fh_asc or syserr(g_('cannot write signature file %s'), $asc);
-
-    return $asc;
+    return $self;
 }
 
-sub openpgp_sig_to_asc
-{
-    my ($sig, $asc) = @_;
+sub _load_backend {
+    my ($self, $backend, %opts) = @_;
 
-    if (-e $sig) {
-        my $is_openpgp_ascii_armor = 0;
+    my $module = "Dpkg::OpenPGP::Backend::$backend";
+    eval qq{
+        pop \@INC if \$INC[-1] eq '.';
+        require $module;
+    };
+    return if $@;
 
-        open my $fh_sig, '<', $sig or syserr(g_('cannot open %s'), $sig);
-        while (<$fh_sig>) {
-            if (m/^-----BEGIN PGP /) {
-                $is_openpgp_ascii_armor = 1;
-                last;
-            }
-        }
-        close $fh_sig;
+    return $module->new(%opts);
+}
 
-        if ($is_openpgp_ascii_armor) {
-            notice(g_('signature file is already OpenPGP ASCII armor, copying'));
-            copy($sig, $asc);
-            return $asc;
-        }
+sub _auto_backend {
+    my ($self, $needs, %opts) = @_;
 
-        if (find_command('gpg')) {
-            return _armor_gpg($sig, $asc);
+    foreach my $backend (@BACKENDS) {
+        my $module = $self->_load_backend($BACKEND{$backend}, %opts);
+
+        if ($needs->{api} eq 'verify') {
+            next if ! $module->has_verify_cmd();
         } else {
-            warning(g_('cannot OpenPGP ASCII armor signature file due to missing gpg'));
+            next if ! $module->has_backend_cmd();
         }
+        next if $needs->{keystore} && ! $module->has_keystore();
+
+        return $module;
     }
 
-    return;
+    # Otherwise load a dummy backend.
+    return Dpkg::OpenPGP::Backend->new();
 }
 
-sub _exec_openpgp
-{
-    my ($exec, $exec_opts, $opts, $errmsg) = @_;
+sub can_use_secrets {
+    my ($self, $key) = @_;
 
-    my ($stdout, $stderr);
-    spawn(exec => $exec, wait_child => 1, nocheck => 1, timeout => 10,
-          to_string => \$stdout, error_to_string => \$stderr, %{$exec_opts});
-    if (WIFEXITED($?)) {
-        my $status = WEXITSTATUS($?);
-        print { *STDERR } "$stdout$stderr" if $status;
-        if ($status == 1 or ($status && $opts->{require_valid_signature})) {
-            error($errmsg);
-        } elsif ($status) {
-            warning($errmsg);
-        }
-    } else {
-        subprocerr("@{$exec}");
-    }
+    return 0 unless $self->{backend}->has_backend_cmd();
+    return 0 if $key->type eq 'keyfile' && ! -f $key->handle;
+    return 0 if $key->type eq 'keystore' && ! -e $key->handle;
+    return 0 unless $self->{backend}->can_use_key($key);
+    return 1;
 }
 
-sub import_key {
-    my ($asc, %opts) = @_;
+sub get_trusted_keyrings {
+    my $self = shift;
 
-    $opts{require_valid_signature} //= 1;
-
-    my @exec;
-    if (find_command('gpg')) {
-        push @exec, 'gpg';
-    } elsif ($opts{require_valid_signature}) {
-        error(g_('cannot import key in %s since GnuPG is not installed'),
-              $asc);
-    } else {
-        warning(g_('cannot import key in %s since GnuPG is not installed'),
-                $asc);
-        return;
-    }
-
-    my $gpghome = File::Temp->newdir('dpkg-import-key.XXXXXXXX', TMPDIR => 1);
-
-    push @exec, '--homedir', $gpghome;
-    push @exec, '--no-options', '--no-default-keyring', '-q', '--import';
-    push @exec, '--keyring', $opts{keyring};
-    push @exec, $asc;
-
-    my $errmsg = sprintf g_('cannot import key %s into %s'), $asc, $opts{keyring};
-    _exec_openpgp(\@exec, {}, \%opts, $errmsg);
+    return $self->{backend}->get_trusted_keyrings();
 }
 
-sub verify_signature {
-    my ($sig, %opts) = @_;
+sub armor {
+    my ($self, $type, $in, $out) = @_;
 
-    $opts{require_valid_signature} //= 1;
+    return $self->{backend}->armor($type, $in, $out);
+}
 
-    my @gpg_weak_digest = map {
-        (qw(--weak-digest), $_)
-    } qw(SHA1 RIPEMD160);
+sub dearmor {
+    my ($self, $type, $in, $out) = @_;
 
-    my @exec;
-    if (find_command('gpgv')) {
-        push @exec, 'gpgv', @gpg_weak_digest;
-    } elsif (find_command('gpg')) {
-        my @gpg_opts = (qw(--no-options --no-default-keyring -q), @gpg_weak_digest);
-        push @exec, 'gpg', @gpg_opts, '--verify';
-    } elsif ($opts{require_valid_signature}) {
-        error(g_('cannot verify signature on %s since GnuPG is not installed'),
-              $sig);
-    } else {
-        warning(g_('cannot verify signature on %s since GnuPG is not installed'),
-                $sig);
-        return;
-    }
+    return $self->{backend}->dearmor($type, $in, $out);
+}
 
-    my $gpghome = File::Temp->newdir('dpkg-verify-sig.XXXXXXXX', TMPDIR => 1);
-    push @exec, '--homedir', $gpghome;
-    foreach my $keyring (@{$opts{keyrings}}) {
-        push @exec, '--keyring', $keyring;
-    }
-    push @exec, $sig;
-    push @exec, $opts{datafile} if exists $opts{datafile};
+sub inline_verify {
+    my ($self, $inlinesigned, $data, @certs) = @_;
 
-    my $errmsg = sprintf g_('cannot verify signature %s'), $sig;
-    _exec_openpgp(\@exec, {}, \%opts, $errmsg);
+    return $self->{backend}->inline_verify($inlinesigned, $data, @certs);
+}
+
+sub verify {
+    my ($self, $data, $sig, @certs) = @_;
+
+    return $self->{backend}->verify($data, $sig, @certs);
+}
+
+sub inline_sign {
+    my ($self, $data, $inlinesigned, $key) = @_;
+
+    return $self->{backend}->inline_sign($data, $inlinesigned, $key);
 }
 
 1;

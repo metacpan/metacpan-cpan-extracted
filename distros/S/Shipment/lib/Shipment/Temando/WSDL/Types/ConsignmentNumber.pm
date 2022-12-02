@@ -1,5 +1,5 @@
 package Shipment::Temando::WSDL::Types::ConsignmentNumber;
-$Shipment::Temando::WSDL::Types::ConsignmentNumber::VERSION = '3.09';
+$Shipment::Temando::WSDL::Types::ConsignmentNumber::VERSION = '3.10';
 use strict;
 use warnings;
 
@@ -25,7 +25,7 @@ Shipment::Temando::WSDL::Types::ConsignmentNumber
 
 =head1 VERSION
 
-version 3.09
+version 3.10
 
 =head1 DESCRIPTION
 

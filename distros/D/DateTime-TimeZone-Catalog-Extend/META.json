@@ -56,6 +56,6 @@
          "web" : "https://gitlab.com/jackdeguest/DateTime-TimeZone-Catalog-Extend"
       }
    },
-   "version" : "v0.1.0",
+   "version" : "v0.2.0",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

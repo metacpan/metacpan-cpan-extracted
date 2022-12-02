@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Intertangle::Punchcard::Data::Constraint;
 # ABSTRACT: Base class for a constraint
-$Intertangle::Punchcard::Data::Constraint::VERSION = '0.001';
+$Intertangle::Punchcard::Data::Constraint::VERSION = '0.002';
 use Mu;
 
 method inputs($context) {
@@ -26,7 +26,7 @@ Intertangle::Punchcard::Data::Constraint - Base class for a constraint
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 EXTENDS
 

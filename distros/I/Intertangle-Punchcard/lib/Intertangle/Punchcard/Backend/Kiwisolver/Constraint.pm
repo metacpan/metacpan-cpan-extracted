@@ -1,8 +1,8 @@
 use Renard::Incunabula::Common::Setup;
 package Intertangle::Punchcard::Backend::Kiwisolver::Constraint;
 # ABSTRACT: Kiwisolver constraint
-$Intertangle::Punchcard::Backend::Kiwisolver::Constraint::VERSION = '0.001';
-use Intertangle::API::Kiwisolver;
+$Intertangle::Punchcard::Backend::Kiwisolver::Constraint::VERSION = '0.002';
+use Graphics::Layout::Kiwisolver;
 use Mu;
 
 1;
@@ -19,7 +19,7 @@ Intertangle::Punchcard::Backend::Kiwisolver::Constraint - Kiwisolver constraint
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 EXTENDS
 

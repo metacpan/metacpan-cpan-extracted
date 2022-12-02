@@ -1,5 +1,14 @@
 Revision history for Plack-Middleware-Greylist
 
+v0.3.0    2022-11-30 09:34:51+00:00 Europe/London
+  [Enhancements]
+  - Append the netblock from the configuration to the log message when a request is blocked.
+
+    Note that this might be an incompatible change if you are parsing the logs for fail2ban rules.
+
+  [Documentation]
+  - Document the log message.
+
 v0.2.2    2022-11-16 21:35:26+00:00 Europe/London
   [Tests]
   - Added missing prerequisite.

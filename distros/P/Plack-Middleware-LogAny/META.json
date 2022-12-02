@@ -1,0 +1,65 @@
+{
+   "abstract" : "Use Log::Any to handle logging from your Plack app",
+   "author" : [
+      "Sven Willenbuecher <sven.willenbuecher@kuehne-nagel.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Plack-Middleware-LogAny",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker::CPANfile" : "0.09"
+         }
+      },
+      "develop" : {
+         "suggests" : {
+            "App::Software::License" : "0",
+            "Pod::Markdown::Github" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Log::Any" : "1.711",
+            "Plack::Middleware" : "0",
+            "Plack::Util::Accessor" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/XSven/Plack-Middleware-LogAny/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/XSven/Plack-Middleware-LogAny.git",
+         "web" : "https://github.com/XSven/Plack-Middleware-LogAny"
+      }
+   },
+   "version" : "0.001001",
+   "x_serialization_backend" : "JSON::PP version 4.12"
+}

@@ -15,3 +15,18 @@ simple:
 
 markdown: 'воспользоваться [предыдущей версией](#{link})'
 zero_plural: 'у меня ((=0 нет гвоздей))'
+
+nested:
+  users:
+    -
+      name: 'Ivan'
+      surname: 'Petrov'
+    -
+      name: 'Sergey'
+      surname: 'Ivanov'
+
+  users_with_params:
+    -
+      username: 'Ivan Petrov \##{user_id}'
+    -
+      username: 'Sergey Ivanov \##{user_id}'

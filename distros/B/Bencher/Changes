@@ -1,13 +1,22 @@
+1.062.2  2022-11-30  Released-By: PERLANCAR; Urgency: low
+
+         - No spec & functional changes.
+
+         - [ux] Show usage in script's Synopsis.
+
+
 1.062.1 2022-11-29  Released-By: PERLANCAR; Urgency: low
 
-        - No functional changes.
+        - No spec & functional changes.
 
         - Fix embarassing typos.
 
 
 1.062   2022-11-29  Released-By: PERLANCAR; Urgency: low
 
-        - No spec changes.
+        - No spec & functional changes.
+
+        - Update to Bencher::Backend 1.062 (add -B short alias option).
 
         - [ux][doc] In script's Synopsis, start by showing how to write a simple
           scenario.

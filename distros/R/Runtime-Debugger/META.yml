@@ -1,5 +1,5 @@
 ---
-abstract: 'Easy to use REPL with existing lexical support.'
+abstract: 'Easy to use REPL with existing lexical support and DWIM tab completion.'
 author:
   - 'Tim Potapov <tim.potapov[AT]gmail.com>'
 build_requires:
@@ -16,7 +16,7 @@ name: Runtime-Debugger
 provides:
   Runtime::Debugger:
     file: lib/Runtime/Debugger.pm
-    version: '0.10'
+    version: '0.11'
 requires:
   Class::Tiny: '1.008'
   PadWalker: '2.5'
@@ -26,5 +26,5 @@ resources:
   bugtracker: https://github.com/poti1/runtime-debugger/issues
   license: http://opensource.org/licenses/artistic-license-2.0.php
   repository: https://github.com/poti1/runtime-debugger
-version: '0.10'
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

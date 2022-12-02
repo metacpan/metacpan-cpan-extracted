@@ -2,7 +2,7 @@
 #
 #  Net::Server::Proto::UDP - Net::Server Protocol module
 #
-#  Copyright (C) 2001-2017
+#  Copyright (C) 2001-2022
 #
 #    Paul Seamons <paul@seamons.com>
 #
@@ -39,7 +39,8 @@ sub object {
 
     # we cannot do this at compile time because we have not yet read the configuration then
     # (this is the height of rudeness changing another's class on their behalf)
-    @Net::Server::Proto::TCP::ISA = qw(IO::Socket::INET6) if $Net::Server::Proto::TCP::ISA[0] eq 'IO::Socket::INET' && Net::Server::Proto->requires_ipv6($server);
+    $Net::Server::Proto::TCP::ISA[0] = Net::Server::Proto->ipv6_package($server)
+        if $Net::Server::Proto::TCP::ISA[0] eq 'IO::Socket::INET' && Net::Server::Proto->requires_ipv6($server);
 
     my $udp = $server->{'server'}->{'udp_args'} ||= do {
         my %temp = map {$_ => undef} @udp_args;
@@ -75,6 +76,7 @@ sub connect {
     my $host = $sock->NS_host;
     my $port = $sock->NS_port;
     my $ipv  = $sock->NS_ipv;
+    my $isa_v6 = Net::Server::Proto->requires_ipv6($server) ? $sock->isa(Net::Server::Proto->ipv6_package($server)) : undef;
 
     $sock->SUPER::configure({
         LocalPort => $port,
@@ -82,7 +84,7 @@ sub connect {
         ReuseAddr => 1,
         Reuse => 1, # may not be needed on UDP
         (($host ne '*') ? (LocalAddr => $host) : ()), # * is all
-        ($sock->isa("IO::Socket::INET6") ? (Domain => ($ipv eq '6') ? Socket6::AF_INET6() : ($ipv eq '4') ? Socket::AF_INET() : Socket::AF_UNSPEC()) : ()),
+        ($isa_v6 ? (Domain => ($ipv eq '6') ? Socket6::AF_INET6() : ($ipv eq '4') ? Socket::AF_INET() : Socket::AF_UNSPEC()) : ()),
         ($sock->NS_broadcast ? (Broadcast => 1) : ()),
     }) or $server->fatal("Cannot bind to UDP port $port on $host [$!]");
 
@@ -117,7 +119,7 @@ See L<Net::Server::Proto>.
 
 =head1 PARAMETERS
 
-The following paramaters may be specified in addition to
+The following parameters may be specified in addition to
 normal command line parameters for a Net::Server.  See
 L<Net::Server> for more information on reading arguments.
 
@@ -155,7 +157,7 @@ Default is undef.
 =item C<object>
 
 Returns an object with parameters suitable for eventual creation of
-a IO::Socket::INET object listining on UDP.
+a IO::Socket::INET object listening on UDP.
 
 =item C<connect>
 

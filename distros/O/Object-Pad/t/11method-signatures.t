@@ -46,4 +46,30 @@ class Greeter {
    );
 }
 
+{
+   my @keys;
+
+   class WithAdjustParams {
+      ADJUSTPARAMS ( $params ) { @keys = sort keys %$params; %$params = () }
+   }
+
+   WithAdjustParams->new( x => 1, y => 2, z => 3 );
+   is_deeply( \@keys, [qw( x y z )], 'Keys captured from $params' );
+}
+
+{
+   my $warnings;
+   my $LINE;
+
+   BEGIN { $SIG{__WARN__} = sub { $warnings .= $_[0] }; }
+   class WithAdjustSignature {
+      $LINE = __LINE__+1;
+      ADJUST ( $params ) { }
+   }
+   BEGIN { undef $SIG{__WARN__}; }
+
+   like( $warnings, qr/^Use of ADJUST \(signature\) \{BLOCK\} is now deprecated at \S+ line $LINE\./,
+      'ADJUST (signature) { BLOCK } raises a warning' );
+}
+
 done_testing;

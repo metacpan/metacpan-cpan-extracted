@@ -1,5 +1,5 @@
 package Geo::Address::Formatter;
-$Geo::Address::Formatter::VERSION = '1.99';
+$Geo::Address::Formatter::VERSION = '1.991';
 # ABSTRACT: take structured address data and format it according to the various global/country rules
 
 use strict;
@@ -18,6 +18,7 @@ use YAML::XS qw(LoadFile);
 use utf8;
 
 my $THC = Text::Hogan::Compiler->new;
+my $show_warnings = 1;
 my $debug = 0;
 
 
@@ -26,6 +27,8 @@ sub new {
 
     my $self      = {};
     my $conf_path = $params{conf_path} || die "no conf_path set";
+    $show_warnings = 0 if (defined($params{no_warnings}) && $params{no_warnings});
+
     $self->{final_components} = undef;
     bless($self, $class);
 
@@ -148,7 +151,7 @@ sub final_components {
     if (defined($self->{final_components})) {
         return $self->{final_components};
     }
-    warn 'final_components not yet set';
+    warn 'final_components not yet set' if ($show_warnings);
     return;
 }
 
@@ -525,14 +528,15 @@ sub _add_code {
     my $self          = shift;
     my $keyname       = shift // return;
     my $rh_components = shift;
-    return if !$rh_components->{country_code}; # de we know country?
+    return if !$rh_components->{country_code}; # do we know country?
     return if !$rh_components->{$keyname};     # do we know state/county?
 
     my $code = $keyname . '_code';
 
     if (defined($rh_components->{$code})) {    # do we already have code?
-                                               # but could have situation where code and long name are same
-                                               # which we want to correct
+                                               # but could have situation
+                                               # where code and long name are
+                                               # the same which we want to correct
         if ($rh_components->{$code} ne $rh_components->{$keyname}) {
             return;
         }
@@ -642,11 +646,13 @@ sub _abbreviate {
 
     # do we know the country?
     if (!defined($rh_comp->{country_code})) {
-        my $error_msg = 'no country_code, unable to abbreviate';
-        if (defined($rh_comp->{country})) {
-            $error_msg .= ' - country: ' . $rh_comp->{country};
+        if ($show_warnings){
+            my $error_msg = 'no country_code, unable to abbreviate';
+            if (defined($rh_comp->{country})) {
+                $error_msg .= ' - country: ' . $rh_comp->{country};
+            }
+            warn $error_msg
         }
-        warn $error_msg;
         return;
     }
 
@@ -864,7 +870,7 @@ Geo::Address::Formatter - take structured address data and format it according t
 
 =head1 VERSION
 
-version 1.99
+version 1.991
 
 =head1 SYNOPSIS
 
@@ -873,6 +879,7 @@ version 1.99
   # git clone git@github.com:OpenCageData/address-formatting.git
   #
   my $GAF = Geo::Address::Formatter->new( conf_path => '/path/to/templates' );
+
   my $components = { ... }
   my $text = $GAF->format_address($components, { country => 'FR' } );
   my $rh_final_components = $GAF->final_components();
@@ -885,14 +892,21 @@ version 1.99
 
   my $GAF = Geo::Address::Formatter->new( conf_path => '/path/to/templates' );
 
-Returns one instance. The conf_path is required.
+Returns one instance. The I<conf_path> is required.
+
+Optional parameters are:
+
+I<debug>: prints tons of debugging info for use in development.
+
+I<no_warnings>: turns off a few warnings if configuration is not optimal.
 
 =head2 final_components
 
   my $rh_components = $GAF->final_components();
 
 returns a reference to a hash of the final components that are set at the
-completion of B<format_address>. Warns if called before they have been set.
+completion of B<format_address>. Warns if called before they have been set 
+(unless I<no_warnings> was set at object creation).
 
 =head2 format_address
 

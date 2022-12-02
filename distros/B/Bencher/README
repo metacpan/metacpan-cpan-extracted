@@ -2,8 +2,8 @@ NAME
     Bencher - A benchmark framework
 
 VERSION
-    This document describes version 1.062.1 of Bencher (from Perl
-    distribution Bencher), released on 2022-11-29.
+    This document describes version 1.062.2 of Bencher (from Perl
+    distribution Bencher), released on 2022-11-30.
 
 SYNOPSIS
     See bencher CLI.

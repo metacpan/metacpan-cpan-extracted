@@ -1,5 +1,15 @@
 Revision history for XS-Parse-Keyword
 
+0.29    2022-12-01
+        [CHANGES]
+         * Added XPK_PREFIXED_TERMEXPR_ENTERLEAVE
+
+        [BUGFIXES]
+         * Don't try to call `SvPVX()` on a `newSV(0)` because -DDEBUGGING
+           perls get upset (RT145278)
+         * Remember to `break` out of switch block cases when testing for
+           `KEYWORD_PLUGIN_*` return values
+
 0.28    2022-11-25
         [CHANGES]
          * Include a XSParseInfixClassification field in the XSParseInfixInfo

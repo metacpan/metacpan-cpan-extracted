@@ -1,7 +1,7 @@
 #!perl -T
 use 5.020;
 use warnings;
-use Test::More tests => 47;
+use Test::More tests => 49;
 
 BEGIN {
     if ($ENV{AUTHOR_TESTING}) {
@@ -60,15 +60,19 @@ is Plate::_path(''), '', 'Empty path remains empty';
 my $plate = new Plate path => 't', cache_path => '';
 like $$plate{cache_path}, qr/^\./, 'Empty cache_path set to relative path';
 
-$plate->set(cache_path => 't/tmp_dir', umask => 027);
+$plate->set(cache_path => 't/tmp_dir', umask => 027, cache_suffix => '.plate.pl');
 ok -d 't/tmp_dir', 'Created cache_path directory';
 
 ok $plate->does_exist('data/test'), "Plate 'data/test' does exist";
 ok $plate->can_serve('data/test'), "Plate 'data/test' can be served";
 
+$plate->set(suffix => '.nope');
+ok !$plate->does_exist('data/test'), "Plate 'data/test' does not exist (wrong suffix)";
+ok !$plate->can_serve('data/test'), "Plate 'data/test' can not be served (wrong suffix)";
+
 ok -d 't/tmp_dir/data', 'Created cache file path';
-ok -f 't/tmp_dir/data/test.pl', 'Created cache file';
-unlink 't/tmp_dir/data/test.pl' or diag "Can't delete t/tmp_dir/data/test.pl: $!";
+ok -f 't/tmp_dir/data/test.plate.pl', 'Created cache file';
+unlink 't/tmp_dir/data/test.plate.pl' or diag "Can't delete t/tmp_dir/data/test.plate.pl: $!";
 rmdir or diag "Can't delete $_: $!" for qw(t/tmp_dir/data t/tmp_dir);
 
 $plate = new Plate path => 't/data', cache_path => 't/data', cache_code => undef;

@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-10-25'; # DATE
+our $DATE = '2022-12-02'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '0.046'; # VERSION
+our $VERSION = '0.051'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/CSVUtils/csv_dump",
@@ -39,15 +39,15 @@ dump-csv - Dump CSV as data structure (array of array/hash)
 
 =head1 VERSION
 
-This document describes version 0.046 of dump-csv (from Perl distribution App-CSVUtils), released on 2022-10-25.
+This document describes version 0.051 of dump-csv (from Perl distribution App-CSVUtils), released on 2022-12-02.
 
 =head1 SYNOPSIS
 
-B<dump-csv> L<--help|/"--help, -h, -v"> (or L<-h|/"--help, -h, -v">, L<-?|/"--help, -h, -v">)
+B<dump-csv> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, B<L<-?|/"--help, -h, -?">>)
 
-B<dump-csv> L<--version|/"--version, -v"> (or L<-v|/"--version, -v">)
+B<dump-csv> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<dump-csv> [L<--escape-char|/"--escape-char=s">=I<str>] [L<--format|/"--format=s">=I<name>|L<--json|/"--json">] [L<--hash|/"--hash, -H">|L<-H|/"--hash, -H">] [L<--header|/"--no-header, --input-header">|L<--input-header|/"--no-header, --input-header">|L<--no-header|/"--no-header, --input-header">|L<--noheader|/"--no-header, --input-header">] [L<--(no)naked-res|/"--naked-res">] [L<--page-result|/"--page-result">[=I<program>]|L<--view-result|/"--view-result">[=I<program>]] [L<--quote-char|/"--quote-char=s">=I<str>] [L<--sep-char|/"--sep-char=s">=I<str>] [L<--tsv|/"--tsv, --input-tsv">|L<--input-tsv|/"--tsv, --input-tsv">|L<--no-tsv|/"--tsv, --input-tsv">|L<--notsv|/"--tsv, --input-tsv">] -- E<lt>L<filename|/"--filename=s*">E<gt>
+B<dump-csv> [B<L<--escape-char|/"--escape-char=s">>=I<str>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--hash|/"--hash, -H">>|B<L<-H|/"--hash, -H">>] [B<L<--header|/"--no-header, --input-header">>|B<L<--input-header|/"--no-header, --input-header">>|B<L<--no-header|/"--no-header, --input-header">>|B<L<--noheader|/"--no-header, --input-header">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--quote-char|/"--quote-char=s">>=I<str>] [B<L<--sep-char|/"--sep-char=s">>=I<str>] [B<L<--tsv|/"--tsv, --input-tsv">>|B<L<--input-tsv|/"--tsv, --input-tsv">>|B<L<--no-tsv|/"--tsv, --input-tsv">>|B<L<--notsv|/"--tsv, --input-tsv">>] -- E<lt>I<L<filename|/"--filename=s*">>E<gt>
 
 =head1 DESCRIPTION
 

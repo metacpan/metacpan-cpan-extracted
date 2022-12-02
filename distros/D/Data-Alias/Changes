@@ -1,5 +1,18 @@
 Revision history for Perl module Data::Alias
 
+1.27  2022-12-02  XMATH
+    - Fix tests on older perl versions
+
+1.26  2022-12-01  XMATH
+    - Fix compile error when using perl 5.37.2 or later
+    - Improve diagnostic output from tests
+
+1.25_01  2021-05-15  XMATH
+    - Fix localized alias-assignment to previously non-existing hash element.
+    - Avoid testing threading on broken perl versions
+    - Fix certain linker errors by making sure perl's global variables are
+      accessed through their accessor functions when applicable.
+
 1.25  2021-05-11  XMATH
     - Reformatted this file per CPAN::Changes::Spec
     - Switched from Module::Install to ExtUtils::MakeMaker

@@ -1,0 +1,44 @@
+results
+=======
+
+Created:      2022-11-29
+Home page:    <https://metacpan.org/release/results>
+Bug tracker:  <https://github.com/tobyink/p5-results/issues>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.006	2022-12-02
+
+ [ Documentation ]
+ - Clarify that wantarray in functions returning a Result is useless.
+
+ [ Other ]
+ - Added: Functions can now use a `:Result` attribute to indicate they
+   return a Result. They may optionally include a type constraint, like
+   `:Result(Int)`.
+
+0.005	2022-12-02
+
+ [ Documentation ]
+ - Minor fixes and improvements to documentation.
+
+0.004	2022-12-02
+
+ [ Test Suite ]
+ - Add unit tests for results::exceptions.
+
+ [ Other ]
+ - Added: Provide the results::wrap module.
+
+0.003	2022-12-01
+
+ [ Documentation ]
+ - Document exports.
+ - Explain use of results::exceptions more.
+ - Other minor fixes and improvements to documentation.
+
+0.002	2022-11-30
+
+ [ Documentation ]
+ - Minor fixes and improvements to documentation.
+
+0.001	2022-11-30	Initial release

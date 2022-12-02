@@ -17,9 +17,9 @@ name: Plate
 requires:
   perl: '5.020'
 resources:
-  bugtracker: https://github.com/vlyon/Plate/issues
-  homepage: https://github.com/vlyon/Plate
-  repository: https://github.com/vlyon/Plate.git
-version: '1.4'
+  bugtracker: https://github.com/vlyon/plate/issues
+  homepage: https://github.com/vlyon/plate
+  repository: https://github.com/vlyon/plate.git
+version: '1.5'
 x_generated_by_perl: v5.28.1
 x_serialization_backend: 'YAML::Tiny version 1.73'

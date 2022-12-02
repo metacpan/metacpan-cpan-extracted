@@ -35,6 +35,8 @@ package Sidef::Types::Number::Fraction {
                                     join('/', join('', '(', $x->{a}->stringify, ')'), join('', '(', $x->{b}->stringify, ')')));
     }
 
+    *pretty = \&stringify;
+
     sub is_nan {
         my ($x) = @_;
         if ($x->{a}->is_zero and $x->{b}->is_zero) {
@@ -56,6 +58,11 @@ package Sidef::Types::Number::Fraction {
         $x->{a}->eval($v)->div($x->{b}->eval($v));
     }
 
+    sub lift {
+        my ($x) = @_;
+        __PACKAGE__->new($x->{a}->lift, $x->{b}->lift);
+    }
+
     sub to_n {
         my ($x) = @_;
         my $r = $x->{a}->to_n->div($x->{b}->to_n);
@@ -67,13 +74,12 @@ package Sidef::Types::Number::Fraction {
         return $r;
     }
 
-    *lift        = \&to_n;
     *__boolify__ = \&to_n;
     *__numify__  = \&to_n;
 
     sub __stringify__ {
         my ($x) = @_;
-        "Fraction($x->{a}, $x->{b})";
+        'Fraction(' . join(', ', $x->{a}->dump, $x->{b}->dump) . ')';
     }
 
     sub to_s {
@@ -81,7 +87,10 @@ package Sidef::Types::Number::Fraction {
         Sidef::Types::String::String->new($x->__stringify__);
     }
 
-    *dump = \&to_s;
+    sub dump {
+        my ($x) = @_;
+        Sidef::Types::String::String->new($x->__stringify__);
+    }
 
     sub nu {
         $_[0]->{a};
@@ -239,7 +248,7 @@ package Sidef::Types::Number::Fraction {
         my ($x, $y) = @_;
 
         if (ref($y) ne __PACKAGE__) {
-            return __PACKAGE__->new(Sidef::Types::Number::Mod->new($x->{a}, $y), Sidef::Types::Number::Mod->new($x->{b}, $y),);
+            return __PACKAGE__->new(Sidef::Types::Number::Mod->new($x->{a}, $y), Sidef::Types::Number::Mod->new($x->{b}, $y));
         }
 
         $x->sub($y->mul($x->div($y)->floor));

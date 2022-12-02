@@ -7,7 +7,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010'
 license: open_source
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,7 +21,7 @@ requires:
   DateTime: '0'
   Digest::SHA: '0'
   Getopt::Long: '0'
-  IO::Lambda: '1.31'
+  IO::Lambda: '1.32'
   IO::Socket::SSL: '0'
   JSON::XS: '0'
   LWP: '0'
@@ -30,5 +30,5 @@ requires:
   perl: '5.018'
 resources:
   repository: http://github.com/dk/Net-MitDK
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

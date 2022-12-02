@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 package Net::SAML2::SP;
-our $VERSION = '0.61'; # VERSION
+our $VERSION = '0.62'; # VERSION
 
 use Moose;
 
@@ -155,11 +155,16 @@ sub _build_cert_text {
 
 sub authn_request {
     my $self = shift;
+    my $destination     = shift;
+    my $nameid_format   = shift;
+    my (%params)        = @_;
+
     return Net::SAML2::Protocol::AuthnRequest->new(
         issueinstant  => DateTime->now,
         issuer        => $self->id,
-        destination   => $_[0],
-        nameid_format => $_[1],
+        destination   => $destination,
+        nameid_format => $nameid_format || '',
+        %params,
     );
 
 }
@@ -214,10 +219,20 @@ sub artifact_request {
 sub sso_redirect_binding {
     my ($self, $idp, $param) = @_;
 
+    unless ($idp) {
+        croak("Unable to create a redirect binding without an IDP");
+    }
+
+    $param = 'SAMLRequest' unless $param;
+
     my $redirect = Net::SAML2::Binding::Redirect->new(
         url   => $idp->sso_url('urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect'),
         cert  => $idp->cert('signing'),
-        key   => $self->key,
+        $self->authnreq_signed ? (
+            key   => $self->key,
+        ) : (
+            insecure => 1,
+        ),
         param => $param,
     );
 
@@ -412,7 +427,7 @@ Net::SAML2::SP - Net::SAML2::SP - SAML Service Provider object
 
 =head1 VERSION
 
-version 0.61
+version 0.62
 
 =head1 SYNOPSIS
 
@@ -537,10 +552,28 @@ Consumer Services.
 
 =back
 
-=head2 authn_request( $destination, $nameid_format )
+=head2 authn_request( $destination, $nameid_format, %params )
 
 Returns an AuthnRequest object created by this SP, intended for the
 given destination, which should be the identity URI of the IdP.
+
+%params is a hash containing parameters valid for
+Net::SAML2::Protocol::AuthnRequest.  For example:
+
+=over
+
+my %params = (
+        force_authn => 1,
+        is_passive  => 1,
+    )
+
+my $authnreq = authn_request(
+                'https://keycloak.local:8443/realms/Foswiki/protocol/saml',
+                'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent',
+                %params
+            );
+
+=back
 
 =head2 logout_request( $destination, $nameid, $nameid_format, $session )
 

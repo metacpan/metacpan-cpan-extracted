@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Intertangle::Jacquard::Layout::Grid;
 # ABSTRACT: Grid layout
-$Intertangle::Jacquard::Layout::Grid::VERSION = '0.001';
+$Intertangle::Jacquard::Layout::Grid::VERSION = '0.002';
 use Mu;
 use Intertangle::Punchcard::Backend::Kiwisolver::Context;
 use List::AllUtils qw(reduce);
@@ -73,8 +73,8 @@ method update($actor) {
 		for my $constraint (@$constraints) {
 			$solver->add_constraint($constraint);
 		}
-		$solver->add_edit_variable($first_item->x, Intertangle::API::Kiwisolver::Strength::STRONG );
-		$solver->add_edit_variable($first_item->y, Intertangle::API::Kiwisolver::Strength::STRONG );
+		$solver->add_edit_variable($first_item->x, Graphics::Layout::Kiwisolver::Strength::STRONG );
+		$solver->add_edit_variable($first_item->y, Graphics::Layout::Kiwisolver::Strength::STRONG );
 	}
 
 	#$solver->suggest_value($first_item->x, $actor->x->value);
@@ -98,7 +98,7 @@ Intertangle::Jacquard::Layout::Grid - Grid layout
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 EXTENDS
 

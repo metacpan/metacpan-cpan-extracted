@@ -1,3 +1,10 @@
+0.004   2022-09-08  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [doc] Mention App::DiffDocText, App::DiffXlsText.
+
+
 0.003   2022-09-08  Released-By: PERLANCAR; Urgency: medium
 
         - Add CLI: script/diff-pdf-text-between-conflicted-git-versions.

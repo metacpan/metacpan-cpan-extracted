@@ -1,12 +1,17 @@
 use warnings;
 use strict;
+use Config;
 
 BEGIN {
-	eval { require threads; };
-	if($@ =~ /\AThis Perl not built to support threads/) {
+	unless($Config{usethreads}) {
 		require Test::More;
 		Test::More::plan(skip_all => "non-threading perl build");
 	}
+	if($] < 5.010001) {
+		require Test::More;
+		Test::More::plan(skip_all => "threads are broken in this perl version");
+	}
+	eval { require threads; };
 	if($@ ne "") {
 		require Test::More;
 		Test::More::plan(skip_all => "threads unavailable");

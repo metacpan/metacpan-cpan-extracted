@@ -1,5 +1,5 @@
 package Shipment::Temando::WSDL::Types::Request;
-$Shipment::Temando::WSDL::Types::Request::VERSION = '3.09';
+$Shipment::Temando::WSDL::Types::Request::VERSION = '3.10';
 use strict;
 use warnings;
 
@@ -97,7 +97,7 @@ __PACKAGE__->_factory(
 
 
 package Shipment::Temando::WSDL::Types::Request::_anythings;
-$Shipment::Temando::WSDL::Types::Request::_anythings::VERSION = '3.09';
+$Shipment::Temando::WSDL::Types::Request::_anythings::VERSION = '3.10';
 use strict;
 use warnings;
 {
@@ -145,7 +145,7 @@ __PACKAGE__->_factory(
 
 
 package Shipment::Temando::WSDL::Types::Request::_quotes;
-$Shipment::Temando::WSDL::Types::Request::_quotes::VERSION = '3.09';
+$Shipment::Temando::WSDL::Types::Request::_quotes::VERSION = '3.10';
 use strict;
 use warnings;
 {
@@ -193,7 +193,7 @@ __PACKAGE__->_factory(
 
 
 package Shipment::Temando::WSDL::Types::Request::_Request::XmlAttr;
-$Shipment::Temando::WSDL::Types::Request::_Request::XmlAttr::VERSION = '3.09';
+$Shipment::Temando::WSDL::Types::Request::_Request::XmlAttr::VERSION = '3.10';
 use base qw(SOAP::WSDL::XSD::Typelib::AttributeSet);
 
 { # BLOCK to scope variables
@@ -231,7 +231,7 @@ Shipment::Temando::WSDL::Types::Request
 
 =head1 VERSION
 
-version 3.09
+version 3.10
 
 =head1 DESCRIPTION
 

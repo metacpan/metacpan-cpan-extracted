@@ -2,9 +2,6 @@ do { my $x = {
        'configure' => {
                         'requires' => {
                                         'ExtUtils::MakeMaker' => '6.78'
-                                      },
-                        'suggests' => {
-                                        'JSON::PP' => '2.27300'
                                       }
                       },
        'develop' => {
@@ -31,6 +28,7 @@ do { my $x = {
                                       'Sys::Syslog' => '0.16',
                                       'Try::Tiny' => '0.04',
                                       'overload' => '0',
+                                      'perl' => 'v5.20.0',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }
@@ -44,11 +42,13 @@ do { my $x = {
                                    'File::Spec' => '0',
                                    'File::Spec::Functions' => '0',
                                    'File::Temp' => '0',
+                                   'JSON::MaybeXS' => '0',
                                    'Test::Deep' => '0',
                                    'Test::Fatal' => '0',
                                    'Test::More' => '0.96',
                                    'base' => '0',
-                                   'lib' => '0'
+                                   'lib' => '0',
+                                   'utf8' => '0'
                                  }
                  }
      };

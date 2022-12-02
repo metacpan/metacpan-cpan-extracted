@@ -64,7 +64,7 @@ EOPERL
 {
    my $param;
    class WithAdjustParams {
-      ADJUST {
+      ADJUSTPARAMS {
          my ( $href ) = @_;
          $param = delete $href->{param};
       }

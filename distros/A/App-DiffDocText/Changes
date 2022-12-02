@@ -1,3 +1,14 @@
+0.004   2022-09-08  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Tweak script's Abstract.
+
+        - [doc] Mention App::DiffPDFText, App::DiffXlsText.
+
+        - [pod] Fix heading level in POD.
+
+
 0.003   2021-07-12  Released-By: PERLANCAR; Urgency: low
 
 	- Also observe DIFF_CMD.

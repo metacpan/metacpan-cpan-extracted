@@ -3,9 +3,9 @@ package Bencher;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-29'; # DATE
+our $DATE = '2022-11-30'; # DATE
 our $DIST = 'Bencher'; # DIST
-our $VERSION = '1.062.1'; # VERSION
+our $VERSION = '1.062.2'; # VERSION
 
 1;
 # ABSTRACT: A benchmark framework
@@ -22,7 +22,7 @@ Bencher - A benchmark framework
 
 =head1 VERSION
 
-This document describes version 1.062.1 of Bencher (from Perl distribution Bencher), released on 2022-11-29.
+This document describes version 1.062.2 of Bencher (from Perl distribution Bencher), released on 2022-11-30.
 
 =head1 SYNOPSIS
 

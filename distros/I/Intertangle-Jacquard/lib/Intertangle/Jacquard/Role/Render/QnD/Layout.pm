@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Intertangle::Jacquard::Role::Render::QnD::Layout;
 # ABSTRACT: Quick-and-dirty layout role
-$Intertangle::Jacquard::Role::Render::QnD::Layout::VERSION = '0.001';
+$Intertangle::Jacquard::Role::Render::QnD::Layout::VERSION = '0.002';
 use Moo::Role;
 
 has layout => (
@@ -27,7 +27,7 @@ Intertangle::Jacquard::Role::Render::QnD::Layout - Quick-and-dirty layout role
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 ATTRIBUTES
 

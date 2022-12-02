@@ -1,5 +1,5 @@
 package Shipment::CanadaPost::XSD;
-$Shipment::CanadaPost::XSD::VERSION = '3.09';
+$Shipment::CanadaPost::XSD::VERSION = '3.10';
 use strict;
 use warnings;
 
@@ -1586,7 +1586,7 @@ Shipment::CanadaPost::XSD
 
 =head1 VERSION
 
-version 3.09
+version 3.10
 
 =head1 AUTHOR
 

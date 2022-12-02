@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Extend DateTime::TimeZone catalog - ~/lib/DateTime/TimeZone/Catalog/Extend.pm
-## Version v0.1.0
+## Version v0.2.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/11/29
-## Modified 2022/11/29
+## Modified 2022/12/01
 ## All rights reserved
 ## 
 ## 
@@ -22,7 +22,7 @@ BEGIN
     our @ISA = qw( Exporter );
     use DateTime::TimeZone::Alias;
     use Nice::Try;
-    our $VERSION = 'v0.1.0';
+    our $VERSION = 'v0.2.0';
 };
 
 use strict;
@@ -315,8 +315,10 @@ sub import
     }
 }
 
-1;
+sub aliases { return( [sort(keys( %$ALIAS_CATALOG ) )] ); }
 
+1;
+# NOTE: POD
 __END__
 
 =encoding utf-8
@@ -335,9 +337,12 @@ DateTime::TimeZone::Catalog::Extend - Extend DateTime::TimeZone catalog
     # This would normally trigger an exception, but not anymore
     my $tz = DateTime::TimeZone->new( name => 'JST' );
 
+    # Get the list of all aliases
+    my $aliases = DateTime::TimeZone::Catalog::Extend->aliases;
+
 =head1 VERSION
 
-    v0.1.0
+    v0.2.0
 
 =head1 DESCRIPTION
 
@@ -736,6 +741,18 @@ Here is the list of those time zone aliases and their offset:
 =item 193. C<YEKT> +05:00 (Yekaterinburg Time)
 
 =back
+
+=head1 METHODS
+
+=head2 aliases
+
+Returns an array reference of the time zone aliases.
+
+    my $aliases = DateTime::TimeZone::Catalog::Extend->aliases;
+
+You can also achieve the same result by accessing directly the package variable C<$ALIAS_CATALOG>
+
+    my $aliases = [sort( keys( %$DateTime::TimeZone::Catalog::Extend::ALIAS_CATALOG ) )];
 
 =head1 AUTHOR
 

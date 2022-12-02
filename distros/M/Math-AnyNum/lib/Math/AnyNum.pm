@@ -10,14 +10,14 @@ use List::Util qw();
 use Math::MPFR qw();
 use Math::GMPq qw();
 use Math::GMPz qw();
-use Math::MPC qw();
+use Math::MPC  qw();
 
 use constant {
               ULONG_MAX => Math::GMPq::_ulong_max(),
               LONG_MIN  => Math::GMPq::_long_min(),
              };
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 our ($ROUND, $PREC);
 
 BEGIN {
@@ -1548,12 +1548,13 @@ sub numify {    # used in overloading
 
   Math_MPFR: {
         if (Math::MPFR::Rmpfr_integer_p($x)) {
-            if (Math::MPFR::Rmpfr_fits_slong_p($x, $ROUND)) {
-                return Math::MPFR::Rmpfr_get_si($x, $ROUND);
-            }
 
             if (Math::MPFR::Rmpfr_fits_ulong_p($x, $ROUND)) {
                 return Math::MPFR::Rmpfr_get_ui($x, $ROUND);
+            }
+
+            if (Math::MPFR::Rmpfr_fits_slong_p($x, $ROUND)) {
+                return Math::MPFR::Rmpfr_get_si($x, $ROUND);
             }
         }
 
@@ -1572,15 +1573,15 @@ sub numify {    # used in overloading
 
   Math_GMPz: {
 
-        if (Math::GMPz::Rmpz_fits_slong_p($x)) {
-            return Math::GMPz::Rmpz_get_si($x);
-        }
-
         if (Math::GMPz::Rmpz_fits_ulong_p($x)) {
             return Math::GMPz::Rmpz_get_ui($x);
         }
 
-        return Math::GMPz::Rmpz_get_d($x);
+        if (Math::GMPz::Rmpz_fits_slong_p($x)) {
+            return Math::GMPz::Rmpz_get_si($x);
+        }
+
+        return Math::GMPz::Rmpz_get_str($x, 10);
     }
 
   Math_MPC: {

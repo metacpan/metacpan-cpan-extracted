@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateTypes::DangerousGoodsDetail;
-$Shipment::FedEx::WSDL::RateTypes::DangerousGoodsDetail::VERSION = '3.09';
+$Shipment::FedEx::WSDL::RateTypes::DangerousGoodsDetail::VERSION = '3.10';
 use strict;
 use warnings;
 
@@ -87,7 +87,7 @@ Shipment::FedEx::WSDL::RateTypes::DangerousGoodsDetail
 
 =head1 VERSION
 
-version 3.09
+version 3.10
 
 =head1 DESCRIPTION
 

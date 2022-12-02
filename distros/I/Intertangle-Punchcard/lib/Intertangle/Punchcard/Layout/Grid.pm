@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Intertangle::Punchcard::Layout::Grid;
 # ABSTRACT: Grid layout
-$Intertangle::Punchcard::Layout::Grid::VERSION = '0.001';
+$Intertangle::Punchcard::Layout::Grid::VERSION = '0.002';
 use Mu;
 
 method constraints() {
@@ -23,7 +23,7 @@ Intertangle::Punchcard::Layout::Grid - Grid layout
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 EXTENDS
 

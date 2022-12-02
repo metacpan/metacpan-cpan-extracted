@@ -5,7 +5,7 @@ use strict;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-09-08'; # DATE
 our $DIST = 'App-DiffPDFText'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 1;
 # ABSTRACT: Diff the text of two PDF documents
@@ -22,7 +22,7 @@ App::DiffPDFText - Diff the text of two PDF documents
 
 =head1 VERSION
 
-This document describes version 0.003 of App::DiffPDFText (from Perl distribution App-DiffPDFText), released on 2022-09-08.
+This document describes version 0.004 of App::DiffPDFText (from Perl distribution App-DiffPDFText), released on 2022-09-08.
 
 =head1 SYNOPSIS
 
@@ -35,6 +35,12 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-DiffPD
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-App-DiffPDFText>.
+
+=head1 SEE ALSO
+
+L<App::DiffDocText>
+
+L<App::DiffXlsText>
 
 =head1 AUTHOR
 

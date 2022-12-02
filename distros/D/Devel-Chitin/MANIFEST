@@ -359,5 +359,6 @@ t/21-deparse-trace-fib.t
 t/21-deparse-trace-statements.t
 t/22-sub-name-bug.t
 t/lib/Devel/NullDB.pm
+t/lib/Devel/SimpleCoverage.pm
 t/lib/SampleCode.pm
 t/lib/TestHelper.pm

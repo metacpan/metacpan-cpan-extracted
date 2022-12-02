@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::XAVTypes::AddressKeyFormatType;
-$Shipment::UPS::WSDL::XAVTypes::AddressKeyFormatType::VERSION = '3.09';
+$Shipment::UPS::WSDL::XAVTypes::AddressKeyFormatType::VERSION = '3.10';
 use strict;
 use warnings;
 
@@ -107,7 +107,7 @@ Shipment::UPS::WSDL::XAVTypes::AddressKeyFormatType
 
 =head1 VERSION
 
-version 3.09
+version 3.10
 
 =head1 DESCRIPTION
 

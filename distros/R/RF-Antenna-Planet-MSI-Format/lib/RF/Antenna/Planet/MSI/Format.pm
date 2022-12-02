@@ -5,7 +5,8 @@ use Scalar::Util qw();
 use Tie::IxHash qw{};
 use Path::Class qw{};
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
+our $PACKAGE = __PACKAGE__;
 
 =head1 NAME
 
@@ -111,6 +112,7 @@ sub read {
   my $self        = shift;
   my $file        = shift;
   my $blob        = ref($file) eq 'SCALAR' ? ${$file} : Path::Class::file($file)->slurp;
+  die(qq{Error: Package: $PACKAGE: Method: read, file: "$file" is empty}) unless length($blob);
   $self->{'blob'} = $blob; #store for blob method
   my @lines       = split(/[\n\r]+/, $blob);
   my $loop        = 0;

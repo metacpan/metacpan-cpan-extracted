@@ -13,7 +13,7 @@ use IPC::System::Options 'system', -log=>1, -die=>1;
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-09-08'; # DATE
 our $DIST = 'App-DiffPDFText'; # DIST
-our $VERSION = '0.003'; # VERSION
+our $VERSION = '0.004'; # VERSION
 
 # XXX duplication with diff-pdf-text
 my $opt_transpose_csv;
@@ -68,7 +68,7 @@ system(
     $path_ours, $path_theirs,
 );
 
-# ABSTRACT: Diff the text of two PDF files between conflicted git versions
+# ABSTRACT: Diff the text of PDF file between conflicted git versions
 # PODNAME: diff-pdf-text-between-conflicted-git-versions
 
 __END__
@@ -79,11 +79,11 @@ __END__
 
 =head1 NAME
 
-diff-pdf-text-between-conflicted-git-versions - Diff the text of two PDF files between conflicted git versions
+diff-pdf-text-between-conflicted-git-versions - Diff the text of PDF file between conflicted git versions
 
 =head1 VERSION
 
-This document describes version 0.003 of diff-pdf-text-between-conflicted-git-versions (from Perl distribution App-DiffPDFText), released on 2022-09-08.
+This document describes version 0.004 of diff-pdf-text-between-conflicted-git-versions (from Perl distribution App-DiffPDFText), released on 2022-09-08.
 
 =head1 SYNOPSIS
 

@@ -2,7 +2,7 @@
 #
 #  Net::Server::Log::Sys::Syslog - Net::Server Logging module
 #
-#  Copyright (C) 2012-2017
+#  Copyright (C) 2012-2022
 #
 #    Paul Seamons <paul@seamons.com>
 #
@@ -25,6 +25,9 @@ sub initialize {
     my ($class, $server) = @_;
     my $prop = $server->{'server'};
 
+    my $syslog_version = $Sys::Syslog::VERSION;
+    $syslog_version =~ s/_.*//;
+
     $server->configure({
         syslog_logsock  => \$prop->{'syslog_logsock'},
         syslog_ident    => \$prop->{'syslog_ident'},
@@ -36,12 +39,12 @@ sub initialize {
         # do nothing - assume they have what they want
     } else {
         if (! defined $prop->{'syslog_logsock'}) {
-            $prop->{'syslog_logsock'} = ($Sys::Syslog::VERSION < 0.15) ? 'unix' : '';
+            $prop->{'syslog_logsock'} = ($syslog_version < 0.15) ? 'unix' : '';
         }
         if ($prop->{'syslog_logsock'} =~ /^(|native|tcp|udp|unix|inet|stream|console)$/) {
             $prop->{'syslog_logsock'} = $1;
         } else {
-            $prop->{'syslog_logsock'} = ($Sys::Syslog::VERSION < 0.15) ? 'unix' : '';
+            $prop->{'syslog_logsock'} = ($syslog_version < 0.15) ? 'unix' : '';
         }
     }
 

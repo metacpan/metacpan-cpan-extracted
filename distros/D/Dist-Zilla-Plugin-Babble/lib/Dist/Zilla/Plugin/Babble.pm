@@ -1,5 +1,5 @@
 package Dist::Zilla::Plugin::Babble;
-$Dist::Zilla::Plugin::Babble::VERSION = '0.002';
+$Dist::Zilla::Plugin::Babble::VERSION = '0.003';
 use Carp 'croak';
 use Moose;
 use MooseX::Types::Moose qw/ArrayRef Str/;
@@ -48,6 +48,9 @@ my %supported_since = (
 	'::DefinedOr'             => '5.010',
 	'::PostfixDeref'          => '5.020',
 	'::SubstituteAndReturn'   => '5.014',
+	'::Ellipsis'              => '5.012',
+	'::PackageBlock'          => '5.014',
+	'::PackageVersion'        => '5.012',
 );
 
 sub _build_plugins {
@@ -125,7 +128,7 @@ Dist::Zilla::Plugin::Babble - EXPERIMENTAL Automatic Babble substitution in Dist
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

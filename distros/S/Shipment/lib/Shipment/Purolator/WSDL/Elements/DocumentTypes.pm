@@ -1,6 +1,6 @@
 
 package Shipment::Purolator::WSDL::Elements::DocumentTypes;
-$Shipment::Purolator::WSDL::Elements::DocumentTypes::VERSION = '3.09';
+$Shipment::Purolator::WSDL::Elements::DocumentTypes::VERSION = '3.10';
 use strict;
 use warnings;
 
@@ -34,7 +34,7 @@ Shipment::Purolator::WSDL::Elements::DocumentTypes
 
 =head1 VERSION
 
-version 3.09
+version 3.10
 
 =head1 DESCRIPTION
 

@@ -11,7 +11,7 @@ package FooServer;
 use strict;
 use FindBin qw($Bin);
 use lib $Bin;
-use NetServerTest qw(prepare_test ok is use_ok diag skip);
+use NetServerTest qw(prepare_test ok is use_ok note skip);
 prepare_test({
     n_tests   => 51,
     plan_only => 1,
@@ -52,7 +52,7 @@ sub p_c { # port check
     my ($pkg, $file, $line) = caller;
     my ($args, $hash, $args_to_new) = @_;
     my $prop = eval { ($args_to_new ? FooServer->new(@$args)->run : FooServer->run(@$args))->{'server'} }
-        || do { diag "$@ at line $line"; {} };
+        || do { note "$@ at line $line"; {} };
 #    use CGI::Ex::Dump qw(debug);
 #    debug $prop;
     my $got = {bind => $prop->{'_bind'}};
@@ -68,7 +68,7 @@ sub p_c { # port check
     if ($result eq $test && $str !~ /\|\|/) {
         ok(1, "$str");
     } else {
-        diag "Failed at line $line";
+        note "Failed at line $line";
         is($result, $test, "$str");
         exit;
     }
@@ -357,10 +357,10 @@ if (!eval { require IO::Socket::SSL }) {
 
 if (!eval {
     require Socket6;
-    require IO::Socket::INET6;
-    IO::Socket::INET6->new->configure({LocalPort => 20203, Proto => 'tcp', Listen => 1, ReuseAddr => 1, Domain => Socket6::AF_INET6()}) or die;
-    IO::Socket::INET6->new->configure({LocalAddr => '::1', LocalPort => 20203, Proto => 'tcp', Listen => 1, ReuseAddr => 1, Domain => Socket6::AF_INET6()}) or die;
-    IO::Socket::INET6->new->configure({LocalAddr => 'localhost', LocalPort => 20203, Proto => 'tcp', Listen => 1, ReuseAddr => 1, Domain => Socket6::AF_INET6()}) or die;
+    my $pkg = eval { require IO::Socket::IP } ? 'IO::Socket::IP' : eval { require IO::Socket::INET6 } ? 'IO::Socket::INET6' : die "Could not load IO::Socket::IP or IO::Socket::INET6: $@";
+    $pkg->new->configure({LocalPort => 20203, Proto => 'tcp', Listen => 1, ReuseAddr => 1, Domain => Socket6::AF_INET6()}) or die;
+    $pkg->new->configure({LocalAddr => '::1', LocalPort => 20203, Proto => 'tcp', Listen => 1, ReuseAddr => 1, Domain => Socket6::AF_INET6()}) or die;
+    $pkg->new->configure({LocalAddr => 'localhost', LocalPort => 20203, Proto => 'tcp', Listen => 1, ReuseAddr => 1, Domain => Socket6::AF_INET6()}) or die;
 }) {
     chomp(my $err = $@);
   SKIP: {

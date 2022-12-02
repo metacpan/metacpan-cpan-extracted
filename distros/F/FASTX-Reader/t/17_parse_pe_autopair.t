@@ -3,7 +3,7 @@ use warnings;
 use FindBin qw($RealBin);
 use Test::More;
 use FASTX::Reader;
-use FASTX::PE;
+use FASTX::ReaderPaired;
 BEGIN {
 
     eval {
@@ -14,7 +14,7 @@ BEGIN {
     };
 }
 
-# TEST: Test FASTX::PE working letting the module calculating the R2
+# TEST: Test FASTX::ReaderPaired working letting the module calculating the R2
 
 my $seqfile1 = "$RealBin/../data/illumina_1.fq.gz";
 my $expected = "$RealBin/../data/illumina_2.fq.gz";
@@ -27,7 +27,7 @@ if (! -e $expected) {
   print STDERR "Skip test: $expected (R2) not found\n";
   exit 0;
 }
-my $data = FASTX::PE->new({
+my $data = FASTX::ReaderPaired->new({
   filename => "$seqfile1",
   verbose => 1,
 });

@@ -9,10 +9,13 @@ SYNOPSIS
         # This would normally trigger an exception, but not anymore
         my $tz = DateTime::TimeZone->new( name => 'JST' );
 
+        # Get the list of all aliases
+        my $aliases = DateTime::TimeZone::Catalog::Extend->aliases;
+
 VERSION
 =======
 
-        v0.1.0
+        v0.2.0
 
 DESCRIPTION
 ===========
@@ -800,10 +803,25 @@ Here is the list of those time zone aliases and their offset:
 
 :   
 
+METHODS
+=======
+
+aliases
+-------
+
+Returns an array reference of the time zone aliases.
+
+        my $aliases = DateTime::TimeZone::Catalog::Extend->aliases;
+
+You can also achieve the same result by accessing directly the package
+variable `$ALIAS_CATALOG`
+
+        my $aliases = [sort( keys( %$DateTime::TimeZone::Catalog::Extend::ALIAS_CATALOG ) )];
+
 AUTHOR
 ======
 
-Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x563d65eed550)"}\>
+Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x55e09004be00)"}\>
 
 SEE ALSO
 ========

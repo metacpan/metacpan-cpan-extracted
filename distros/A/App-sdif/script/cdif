@@ -20,8 +20,7 @@ use Pod::Usage;
 use List::Util qw(first sum pairmap);
 use Text::ParseWords qw(shellwords);
 use Text::VisualWidth::PP qw(vwidth);
-use Data::Dumper;
-{
+use Data::Dumper; {
     no warnings 'redefine';
     *Data::Dumper::qquote = sub { qq["${\(shift)}"] };
     $Data::Dumper::Terse = 1;
@@ -30,48 +29,16 @@ use Data::Dumper;
 }
 
 use App::sdif;
-my $version = $App::sdif::VERSION;
+our $VERSION = $App::sdif::VERSION;
 
 use App::sdif::Util;
 use App::cdif::Command::Mecab;
 
-sub read_until (&$) {
-    my($sub, $fh) = @_;
-    my @lines;
-    while (<$fh>) {
-	push @lines, $_;
-	return @lines if &$sub;
-    }
-    (@lines, undef);
-}
-
 ##
 ## options
 ##
-my @opt_d;
-my $opt_q;
-my $opt_n;
-my $opt_unit = my $opt_unit_default = 'word';
 
-my $opt_env = 1;
-my $opt_stat;
-my $opt_color = 1;
-my $opt_256 = 1;
-my @opt_colormap;
-my $opt_colordump;
-my $opt_commandcolor = 1;
-my $opt_markcolor = 1;
-my $opt_textcolor = 1;
-my $opt_unknowncolor = 1;
-my $opt_old = 1;
-my $opt_new = 1;
-my $opt_unknown = 1;
-my $opt_command = 1;
-my $opt_mark = 1;
-my $opt_prefix = 1;
-my $opt_prefix_pattern = q/(?:\\| )*(?:  )*/;
-my $opt_lenience = 1;
-
+use charnames ':full';
 my %visible = (
     nul => [ 1, "\000" => "\N{SYMBOL FOR NULL}" ],
     bel => [ 1, "\007" => "\N{SYMBOL FOR BELL}" ],
@@ -89,115 +56,123 @@ my %opt_visible = do {
     map { $_ => splice @{$visible{$_}}, 0, 1 }
     keys %visible;
 };
-my @opt_visible;
 
-my $opt_c;
-my $opt_u;
-my $opt_i;
-my $opt_b;
-my $opt_w;
-my $opt_t;
-
-my $rcs;
 my @rcsopt;
-my $diff;
 my @diffopts;
-my $sub_diff = 'diff';
 my @sub_diffopts;
 
 binmode STDOUT, ":encoding(utf8)";
 binmode STDERR, ":encoding(utf8)";
 
-##
-## Special treatment --noenv option.
-##
-if (grep { $_ eq '--noenv' } @ARGV) {
-    $opt_env = 0;
-}
-if ($opt_env and my $env = $ENV{'CDIFOPTS'}) {
+if (my $env = $ENV{'CDIFOPTS'}) {
     unshift(@ARGV, shellwords($env));
 }
 
-my @optargs = (
-    "d=s" => \@opt_d,
-    "diff=s" => \$diff,
-    "subdiff=s" => \$sub_diff,
-    "color!" => \$opt_color,
-    "256!" => \$opt_256,
-    "commandcolor|cc!" => \$opt_commandcolor,
-    "markcolor|mc!" => \$opt_markcolor,
-    "textcolor|tc!" => \$opt_textcolor,
-    "unknowncolor|uc!" => \$opt_unknowncolor,
-    "sdif" => sub {
-	$opt_commandcolor = 0;
-	$opt_markcolor    = 0;
-	$opt_textcolor    = 0;
-	$opt_unknowncolor = 0;
-    },
-    "colormap|cm=s" => \@opt_colormap,
-    "colordump" => \$opt_colordump,
-    "h|help" => sub { usage() },
-    "man" => sub { pod2usage({-verbose => 2}) },
-    "env!" => \$opt_env,
-    "stat!" => \$opt_stat,
-    "unit|by=s" => \$opt_unit,
-    "mecab!" => sub { $opt_unit = $_[1] ? 'mecab' : $opt_unit_default },
-    "old!" => \$opt_old,
-    "new!" => \$opt_new,
-    "command!" => \$opt_command,
-    "unknown!" => \$opt_unknown,
-    "mark!" => \$opt_mark,
-    "prefix!" => \$opt_prefix,
-    "prefix-pattern=s" => \$opt_prefix_pattern,
-    "visible=s" => \@opt_visible,
-    "visible-cr|vcr!" => sub { $opt_visible{cr} = $_[1] },
-    "visible-esc|vesc!" => sub { $opt_visible{esc} = $_[1] },
-    "lenience!" => \$opt_lenience,
+my $unit_default = 'word';
+my $prefix_default = q/(?:\\| )*(?:  )*/;
 
-    "i|ignore-case" => \$opt_i,
-    "b|ignore-space-change" => \$opt_b,
-    "w|ignore-all-space" => \$opt_w,
-    "t|expand-tabs" => \$opt_t,
-    "c|context" => sub { push @diffopts, "-c" },
-    "u|unified" => sub { push @diffopts, "-u" },
-    "C=i" => sub { push @diffopts, "-C" . $_[1] },
-    "U=i" => sub { push @diffopts, "-U" . $_[1] },
+my $app;
 
-    "rcs" => \$rcs,
-    "r=s" => sub { push @rcsopt, "-r$_[1]" },
-    "q" => sub { push @rcsopt, "-q" },
-);
+use Getopt::EX::Hashed; {
+
+    Getopt::EX::Hashed->configure( DEFAULT => [ is => 'rw' ] ) ;
+
+    has help           => '        ' ;
+    has version        => '        ' ;
+    has man            => '        ' ;
+    has debug          => ' d  =s@ ' , default => [] ;
+    has diff           => '    =s  ' ;
+    has subdiff        => '    =s  ' , default => 'diff' ;
+    has color          => '    !   ' , default => 1 ;
+    has 256            => '    !   ' , default => 1 ;
+    has commandcolor   => ' cc !   ' , default => 1 ;
+    has markcolor      => ' mc !   ' , default => 1 ;
+    has textcolor      => ' tc !   ' , default => 1 ;
+    has unknowncolor   => ' uc !   ' , default => 1 ;
+    has colormap       => ' cm =s@ ' , default => [] ;
+    has colordump      => '        ' ;
+    has sdif           => '        ' ;
+    has stat           => '    !   ' ;
+    has unit           => ' by =s  ' , default => $unit_default ;
+    has show_old       => '    !   ' , default => 1 , alias => 'old' ;
+    has show_new       => '    !   ' , default => 1 , alias => 'new' ;
+    has command        => '    !   ' , default => 1 ;
+    has unknown        => '    !   ' , default => 1 ;
+    has mark           => '    !   ' , default => 1 ;
+    has prefix         => '    !   ' , default => 1 ;
+    has prefix_pattern => '    =s  ' , default => $prefix_default ;
+    has visible        => '    =s@ ' , default => [] ;
+    has lenience       => '    !   ' , default => 1 ;
+
+    has ignore_case         => 'i' ;
+    has ignore_space_change => 'b' ;
+    has ignore_all_space    => 'w' ;
+    has expand_tabs         => 't' ;
+
+    has rcs                 => '' ;
+
+    has '+sdif' => sub {
+	$app->commandcolor = 0;
+	$app->markcolor    = 0;
+	$app->textcolor    = 0;
+	$app->unknowncolor = 0;
+    } ;
+    has mecab => '!', action => sub {
+	$app->unit = $_[1] ? 'mecab' : $unit_default;
+    } ;
+    has visible_cr  => ' vcr  !  ' , action => sub { $opt_visible{cr} = $_[1] } ;
+    has visible_esc => ' vesc !  ' , action => sub { $opt_visible{esc} = $_[1] } ;
+    has context     => ' c       ' , action => sub { push @diffopts, "-c" } ;
+    has unified     => ' u       ' , action => sub { push @diffopts, "-u" } ;
+    has C           => '      =i ' , action => sub { push @diffopts, "-C" . $_[1] } ;
+    has U           => '      =i ' , action => sub { push @diffopts, "-U" . $_[1] } ;
+    has r           => '      =s ' , action => sub { push @rcsopt, "-r$_[1]" } ;
+    has q           => '         ' , action => sub { push @rcsopt, "-q" } ;
+
+    has '+help' => sub {
+	pod2usage
+	    -verbose  => 99,
+	    -sections => [ qw(SYNOPSIS VERSION) ];
+    };
+    has '+man' => sub {
+	pod2usage -verbose => 2;
+    };
+    has '+version' => sub {
+	print "Version: $VERSION\n";
+	exit;
+    };
+
+} no Getopt::EX::Hashed;
+
+$app = Getopt::EX::Hashed->new() or die;
 
 use Getopt::EX::Long qw(:DEFAULT Configure ExConfigure);
 ExConfigure BASECLASS => [ "App::cdif", "Getopt::EX" ];
 Configure("bundling");
-GetOptions(@optargs) || usage({status => 1});
+$app->getopt || usage({status => 1});
 
-my %opt_d;
-for my $opt_d (@opt_d) {
-    map { $opt_d{$_}++ } split //, $opt_d;
-}
+my %debug = map { $_ => 1 } map { split // } @{$app->debug};
 
-$App::sdif::Util::NO_WARNINGS = $opt_lenience;
-$App::cdif::Command::Mecab::debug = 1 if $opt_d{m};
+$App::sdif::Util::NO_WARNINGS = $app->lenience;
+$App::cdif::Command::Mecab::debug = 1 if $debug{m};
 
-$rcs++ if @rcsopt;
-$diff = $rcs ? 'rcsdiff' : 'diff' unless $diff;
+$app->rcs++ if @rcsopt;
+my $diff = $app->rcs ? 'rcsdiff' : 'diff' unless $app->diff;
 
 push @diffopts, map { $_->[1] } grep { $_->[0] } (
-    [ $opt_i, "-i" ],
-    [ $opt_b, "-b" ],
-    [ $opt_w, "-w" ],
-    [ $opt_t, "-t" ],
+    [ $app->ignore_case,         "-i" ],
+    [ $app->ignore_space_change, "-b" ],
+    [ $app->ignore_all_space,    "-w" ],
+    [ $app->expand_tabs,         "-t" ],
 );
 
 push @sub_diffopts, map { $_->[1] } grep { $_->[0] } (
-    [ $opt_i, "-i" ],
-    [ $opt_w, "-w" ],
+    [ $app->ignore_case,      "-i" ],
+    [ $app->ignore_all_space, "-w" ],
 );
 
 my %colormap = do {
-    my $col = $opt_256 ? 0 : 1;
+    my $col = $app->{256} ? 0 : 1;
     pairmap { $a => (ref $b eq 'ARRAY') ? $b->[$col] : $b } (
 	UNKNOWN =>   ""   ,
 	CMARK   =>   "GS" ,
@@ -220,21 +195,21 @@ my %colormap = do {
 use Getopt::EX::Colormap qw(ansi_code);
 my $color_handler = Getopt::EX::Colormap
     ->new(HASH => \%colormap)
-    ->load_params(@opt_colormap);
+    ->load_params(@{$app->colormap});
 
 map  { $colormap{$_} = "" }
 map  { splice @$_, 1 }
 grep { not $_->[0] }
 (
-    [ $opt_unknowncolor => 'UNKNOWN' ],
-    [ $opt_commandcolor => 'COMMAND' ],
-    [ $opt_markcolor    =>  grep /MARK$/, keys %colormap ],
-    [ $opt_textcolor    =>  grep /TEXT$/, keys %colormap ],
+    [ $app->unknowncolor => 'UNKNOWN' ],
+    [ $app->commandcolor => 'COMMAND' ],
+    [ $app->markcolor    =>  grep /MARK$/, keys %colormap ],
+    [ $app->textcolor    =>  grep /TEXT$/, keys %colormap ],
 );
 
-warn 'colormap = ', Dumper \%colormap if $opt_d{c};
+warn 'colormap = ', Dumper \%colormap if $debug{c};
 
-if ($opt_colordump) {
+if ($app->colordump) {
     print $color_handler->colormap(
 	name => '--changeme', option => '--colormap');
     exit;
@@ -245,8 +220,8 @@ sub color {
 }
 
 my $prefix_re = do {
-    if ($opt_prefix) {
-	qr/$opt_prefix_pattern/;
+    if ($app->prefix) {
+	qr/$app->{prefix_pattern}/;
     } else {
 	"";
     }
@@ -256,7 +231,7 @@ my $DIFF;
 my $OLD;
 my $NEW;
 
-if ($rcs) {
+if ($app->rcs) {
     my $rcsfile = shift || usage("No RCS filename\n\n");
     $DIFF = "$diff @diffopts @rcsopt $rcsfile|";
 } elsif (@ARGV == 2) {
@@ -267,10 +242,10 @@ if ($rcs) {
 } else {
     usage("Arguments error.\n\n") if @ARGV;
 }
-warn "DIFF = \"$DIFF\"\n" if $opt_d{f};
+warn "DIFF = \"$DIFF\"\n" if $debug{f};
 
 my %func = do {
-    my $col = $opt_color ? 0 : 1;
+    my $col = $app->color ? 0 : 1;
     pairmap { $a => $b->[$col] } (
 	DELETE  => [ sub { color("DELETE",  @_) }, \&bd ],
 	APPEND  => [ sub { color("APPEND",  @_) }, \&bd ],
@@ -281,10 +256,10 @@ my %func = do {
 };
 
 my $w_pattern = do {
-    if ($opt_unit =~ /^char/) {
+    if ($app->unit =~ /^char/) {
 	qr/\X/s;
     } else {
-	my $w = $opt_unit eq 'letter' ? '' : '_';
+	my $w = $app->unit eq 'letter' ? '' : '_';
 	qr{
 	    \p{Han} | \p{InHiragana}+ | \p{InKatakana}+ |
 	    [$w\p{Latin}]+    |
@@ -306,7 +281,7 @@ my($converter, $effector);
 use Getopt::EX::LabeledParam;
 Getopt::EX::LabeledParam
     ->new(HASH => \%opt_visible)
-    ->load_params (@opt_visible);
+    ->load_params (@{$app->visible});
 if (my @names = grep $opt_visible{$_}, keys %opt_visible) {
     my @chars = map $visible{$_}->[0], @names;
     my %hash = map { @$_ } values %visible;
@@ -386,7 +361,7 @@ while (<DIFF>) {
 	    compare(\$old, \$new, qr/<[ \t]/, qr/>[ \t]/);
 	}
 
-	if ($opt_color) {
+	if ($app->color) {
 	    $old =~ s{^(<[ \t])(.*)}{
 		color("OMARK", $1) . color("OTEXT", $2)
 	    }mge if $old;
@@ -395,9 +370,9 @@ while (<DIFF>) {
 	    }mge if $new;
 	}
 
-	print $old if $old and $opt_old;
+	print $old if $old and $app->show_old;
 	print $del if $del;
-	print $new if $new and $opt_new;
+	print $new if $new and $app->show_new;
     }
     #
     # diff -c
@@ -431,7 +406,7 @@ while (<DIFF>) {
 		if ($i % 2) {
 		    compare(\$old[$i], \$new[$i], $mark_re);
 		}
-		if ($opt_color) {
+		if ($app->color) {
 		    $old[$i] =~ s{^([\-\!][ \t])(.*)}{
 			color("OMARK", $1) . color("OTEXT", $2)
 		    }mge;
@@ -441,9 +416,9 @@ while (<DIFF>) {
 		}
 	    }
 	}
-	print @old if $opt_old;
+	print @old if $app->show_old;
 	print $new;
-	print @new if $opt_new;
+	print @new if $app->show_new;
     }
     #
     # diff --combined (generic)
@@ -494,8 +469,8 @@ while (<DIFF>) {
 	for my $buf (@buf) {
 	    my @result = compare_unified($column, $buf, $mark_re);
 	    if (@result == 3) {
-		$opt_new or splice @result, 2, 1;
-		$opt_old or splice @result, 1, 1;
+		$app->show_new or splice @result, 2, 1;
+		$app->show_old or splice @result, 1, 1;
 	    }
 	    print @result;
 	}
@@ -531,7 +506,7 @@ while (<DIFF>) {
 	}
     }
     else {
-	if ($opt_unknown) {
+	if ($app->unknown) {
 	    if (my $f = $func{UNKNOWN}) {
 		print $f->($_);
 	    } else {
@@ -555,7 +530,7 @@ my $exit = $DIFF =~ /\|$/ ? $? >> 8 : 0;
 
 select STDOUT;
 
-if ($opt_stat) {
+if ($app->stat) {
     select STDERR;
 
     print("TOTAL: ");
@@ -589,17 +564,17 @@ sub compare_unified_generic {
     my $o = $buf->collect(qr/[-]/);
     my $n = $buf->collect(qr/[+]/);
     compare(\$o, \$n, $mark_re);
-    if ($opt_color) {
-	$c =~ s/^$mark_re//mg if not $opt_mark;
+    if ($app->color) {
+	$c =~ s/^$mark_re//mg if not $app->mark;
 	map {
 	    my($buf, $m, $t) = @$_;
 	    $$buf =~ s{^($mark_re)(.*)}{
-	    ($opt_mark ? color($m, $1) : '') . color($t, $2)
+	    ($app->mark ? color($m, $1) : '') . color($t, $2)
 	    }mge;
 	} ( [ \$o, 'OMARK', 'OTEXT' ],
 	    [ \$n, 'NMARK', 'NTEXT' ] );
     } else {
-	map { s/^$mark_re//mg } $c, $o, $n if not $opt_mark;
+	map { s/^$mark_re//mg } $c, $o, $n if not $app->mark;
     }
     ($c, $o, $n);
 }
@@ -624,12 +599,12 @@ sub compare_unified_3 {
 	$r[7] = compare(\@buf{q/--/, q/ +/}, $mark_re) unless $r[6];
     }
 
-    if ($opt_color) {
-	map { s/^$mark_re//mg } $buf{q/  /} if not $opt_mark;
+    if ($app->color) {
+	map { s/^$mark_re//mg } $buf{q/  /} if not $app->mark;
 	map {
 	    my($s, $m, $t) = @$_;
 	    $$s =~ s{^($mark_re)(.*)}{
-	    ($opt_mark ? color($m, $1) : '') . color($t, $2)
+	    ($app->mark ? color($m, $1) : '') . color($t, $2)
 	    }mge if $$s;
 	} ( [ \$buf{q/--/}, 'CMARK', 'CTEXT' ],
 	    [ \$buf{q/- /}, 'OMARK', 'OTEXT' ],
@@ -638,16 +613,16 @@ sub compare_unified_3 {
 	    [ \$buf{q/ +/}, 'MMARK', 'MTEXT' ],
 	    [ \$buf{q/++/}, 'MMARK', 'MTEXT' ] );
     } else {
-	map { s/^$mark_re//mg } @buf{@mark} if not $opt_mark;
+	map { s/^$mark_re//mg } @buf{@mark} if not $app->mark;
     }
 
     @buf{$buf->labels};
 }
 
 sub print_command {
-    return unless $opt_command;
+    return unless $app->command;
     my $line = shift;
-    if ($opt_color) {
+    if ($app->color) {
 	$line = color($colormap{COMMAND}, $line);
     }
     print $line;
@@ -686,7 +661,7 @@ sub context {
     my($old, $new) = @_;
     local $_;
 
-    if ($opt_d{s}) {
+    if ($debug{s}) {
 	print STDERR "****************************** Comparing ...\n";
 	print STDERR $old;
 	print STDERR "****************************** and\n";
@@ -697,7 +672,7 @@ sub context {
     my @owlist = wordlist($old);
     my @nwlist = wordlist($new);
 
-    if ($opt_d{w}) {
+    if ($debug{w}) {
 	print STDERR "****************************** Comparing ...\n";
 	print STDERR debug_list @owlist;
 	print STDERR "****************************** and\n";
@@ -708,13 +683,13 @@ sub context {
     maketmp($T1, @owlist);
     maketmp($T2, @nwlist);
 
-    my $diff = sprintf "$sub_diff @sub_diffopts %s %s", $T1->path, $T2->path;
+    my $diff = sprintf "$app->{subdiff} @sub_diffopts %s %s", $T1->path, $T2->path;
     open my $cdif, "$diff |" or die "diff: $!\n";
     binmode $cdif, ":encoding(utf8)";
     my @command;
     my %c = (a => 0, d => 0, c => 0);
     while (<$cdif>) {
-	warn $_ if $opt_d{d};
+	warn $_ if $debug{d};
 
 	## Quick hack to read `git diff` unified output
 	if (/^\@\@ \s+ \-(\d+)(?:,(\d+))? \s+ \+(\d+)(?:,(\d+))? \s+ \@\@/x) {
@@ -732,7 +707,7 @@ sub context {
     }
     close $cdif;
 
-    if ($opt_d{d}) {
+    if ($debug{d}) {
 	printf(STDERR "old=%d new=%d command=%d\n",
 	       @owlist+0, @nwlist+0, @command+0);
 	printf(STDERR "append=$c{a} delete=$c{d} change=$c{c}\n");
@@ -747,7 +722,7 @@ sub context {
 
 sub wordlist {
     my $text = shift;
-    if ($opt_unit eq 'mecab' and $text =~ /\P{ASCII}/) {
+    if ($app->unit eq 'mecab' and $text =~ /\P{ASCII}/) {
 	mecab_words($text);
     } else {
 	normal_words($text);
@@ -773,7 +748,7 @@ sub maketmp {
     my($tmpfile, @list) = @_;
     $tmpfile->reset;
     for (@list) {
-	s/[ \t]+// if $opt_b || $opt_w;
+	s/[ \t]+// if $app->ignore_space_change || $app->ignore_all_space;
 	$tmpfile->write($_);
 	$tmpfile->write("\n") unless /\n\z/;
     }
@@ -878,12 +853,6 @@ sub bd {
     $_;
 }
 
-sub range {
-    local $_ = shift;
-    my($from, $to) = /,/ ? split(/,/) : ($_, $_);
-    wantarray ? ($from, $to) : $to == 0 ? 0 : $to - $from + 1;
-}
-
 sub wc_l {
     my $file = shift;
     my $line;
@@ -894,15 +863,9 @@ sub wc_l {
 }
 
 sub eval {
-    print STDERR &unctrl($_[0]), "\n" x ($_[0] !~ /\n$/) if $_[1] || $opt_d{e};
-    eval shift;
+    print STDERR &unctrl($_[0]), "\n" x ($_[0] !~ /\n$/) if $_[1] || $debug{e};
+    CORE::eval shift;
     die sprintf("eval failed in file %s on line %s\n$@", (caller)[1,2]) if $@;
-}
-
-sub unctrl {
-    local $_ = shift;
-    s/([\000-\010\013-\037])/'^' . pack('c', ord($1)|0100)/ge;
-    $_;
 }
 
 ######################################################################
@@ -913,7 +876,7 @@ cdif - word context diff
 
 =head1 VERSION
 
-Version 4.22.3
+Version 4.23.0
 
 =head1 SYNOPSIS
 
@@ -1037,9 +1000,9 @@ when B<-r>I<rev> is supplied.
 
 =end deprecated
 
-=item B<-->B<unit>=C<word>|C<letter>|C<char>|C<mecab>
+=item B<-->B<unit>=[C<word>,C<letter>,C<char>,C<mecab>]
 
-=item B<-->B<by>=C<word>|C<letter>|C<char>|C<mecab>
+=item B<-->B<by>=[C<word>,C<letter>,C<char>,C<mecab>]
 
 Specify the comparing unit.  Default is I<word> and compare each line
 word-by-word.  Specify C<char> if you want to compare them

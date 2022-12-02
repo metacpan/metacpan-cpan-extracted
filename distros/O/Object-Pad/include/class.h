@@ -97,6 +97,8 @@ typedef struct ParamMeta {
       /* TODO: store the block itself sometime?? */
       PADOFFSET padix;
       OP *defexpr;
+      unsigned int def_if_undef : 1;
+      unsigned int def_if_false : 1;
     } adjust;
   };
 } ParamMeta;

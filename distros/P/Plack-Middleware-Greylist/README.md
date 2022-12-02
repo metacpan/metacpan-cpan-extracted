@@ -4,7 +4,7 @@ Plack::Middleware::Greylist - throttle requests with different rates based on ne
 
 # VERSION
 
-version v0.2.2
+version v0.3.0
 
 # SYNOPSIS
 
@@ -30,7 +30,27 @@ This middleware will apply rate limiting to requests, depending on the requestor
 
 Hosts that exceed their configured per-minute request limit will be rejected with HTTP 429 errors.
 
-Rejections will be logged, which will allow you to use something like [fail2ban](https://metacpan.org/pod/fail2ban) to block repeat offenders, since bad
+## Log Messages
+
+Rejections will be logged with a message of the form
+
+```
+Rate limiting $ip after $hits/$rate for $netblock
+```
+
+for example,
+
+```
+Rate limiting 172.16.0.10 after 225/250 for 172.16.0.0/24
+```
+
+Note that the `$netblock` for the default rate is simply "default", e.g.
+
+```
+Rate limiting 192.168.0.12 after 101/100 for default
+```
+
+This will allow you to use something like [fail2ban](https://metacpan.org/pod/fail2ban) to block repeat offenders, since bad
 robots are like houseflies that repeatedly bump against closed windows.
 
 # ATTRIBUTES

@@ -70,7 +70,7 @@
    "provides" : {
       "Bencher" : {
          "file" : "lib/Bencher.pm",
-         "version" : "v1.62.1"
+         "version" : "v1.62.2"
       }
    },
    "release_status" : "stable",
@@ -85,12 +85,17 @@
          "web" : "https://github.com/perlancar/perl-Bencher"
       }
    },
-   "version" : "1.062.1",
+   "version" : "1.062.2",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"
       },
       "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::InsertCodeOutput",
+            "name" : "InsertCodeOutput",
+            "version" : "0.045"
+         },
          {
             "class" : "Dist::Zilla::Plugin::PERLANCAR::CheckPendingRelease",
             "name" : "@Author::PERLANCAR/PERLANCAR::CheckPendingRelease",

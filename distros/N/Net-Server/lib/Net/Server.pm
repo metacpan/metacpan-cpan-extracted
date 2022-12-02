@@ -3,7 +3,7 @@
 #  Net::Server
 #    ABSTRACT: Extensible Perl internet server
 #
-#  Copyright (C) 2001-2017
+#  Copyright (C) 2001-2022
 #
 #    Paul Seamons <paul@seamons.com>
 #
@@ -29,7 +29,7 @@ use Net::Server::Proto ();
 use Net::Server::Daemonize qw(check_pid_file create_pid_file safe_fork
                               get_uid get_gid set_uid set_gid);
 
-our $VERSION = '2.010';
+our $VERSION = '2.012';
 
 sub new {
     my $class = shift || die "Missing class";
@@ -143,7 +143,7 @@ sub post_configure {
         }
     }
 
-    if (! $prop->{'_is_inet'}) { # completetly daemonize by closing STDIN, STDOUT (should be done before fork)
+    if (! $prop->{'_is_inet'}) { # completetely daemonize by closing STDIN, STDOUT (should be done before fork)
         if ($prop->{'setsid'} || length($prop->{'log_file'})) {
             open(STDIN,  '<', '/dev/null') || die "Cannot read /dev/null  [$!]";
             open(STDOUT, '>', '/dev/null') || die "Cannot write /dev/null [$!]";
@@ -180,6 +180,10 @@ sub post_configure {
 
     # make sure that allow and deny look like array refs
     $prop->{$_} = [] for grep {! ref $prop->{$_}} qw(allow deny cidr_allow cidr_deny);
+
+    $prop->{'reverse_lookups'} ||= 1 if $prop->{'double_reverse_lookups'};
+    $prop->{'double_reverse_lookups'} = $1 || $prop->{'double_reverse_lookups'} || 1
+        if $prop->{'reverse_lookups'} && $prop->{'reverse_lookups'} =~ /^(?:double|2)(.*)$/i;
 }
 
 sub initialize_logging {
@@ -191,7 +195,15 @@ sub initialize_logging {
     }
 
     # pluggable logging
-    if ($prop->{'log_file'} =~ /^([a-zA-Z]\w*(?:::[a-zA-Z]\w*)*)$/) {
+    if (my $code = $prop->{'log_function'}) {
+        if (ref $code ne 'CODE') {
+            require Scalar::Util;
+            die "Passed log_function $code was not a valid method of server, or was not a code object\n" if ! $self->can($code);
+            my $copy = $self;
+            $prop->{'log_function'} = sub { $copy->$code(@_) };
+            Scalar::Util::weaken($copy);
+        }
+    } elsif ($prop->{'log_file'} =~ /^([a-zA-Z]\w*(?:::[a-zA-Z]\w*)*)$/) {
         my $pkg  = "Net::Server::Log::$prop->{'log_file'}";
         (my $file = "$pkg.pm") =~ s|::|/|g;
         if (eval { require $file }) {
@@ -338,8 +350,8 @@ sub post_bind { # secure the process and background it
     if (! defined $prop->{'group'}) {
         $self->log(1, "Group Not Defined.  Defaulting to EGID '$)'");
         $prop->{'group'} = $);
-    } elsif ($prop->{'group'} =~ /^([\w-]+(?: [\w-]+)*)$/) {
-        $prop->{'group'} = eval { get_gid($1) };
+    } elsif ($prop->{'group'} =~ /^([\w.-]+(?:[ ,][\w.-]+)*)$/) {
+            $prop->{'group'} = eval { get_gid($1) };
         $self->fatal(my $e = $@) if $@;
     } else {
         $self->fatal("Invalid group \"$prop->{'group'}\"");
@@ -348,7 +360,7 @@ sub post_bind { # secure the process and background it
     if (! defined $prop->{'user'}) {
         $self->log(1, "User Not Defined.  Defaulting to EUID '$>'");
         $prop->{'user'} = $>;
-    } elsif ($prop->{'user'} =~ /^([\w-]+)$/) {
+    } elsif ($prop->{'user'} =~ /^([\w.-]+)$/) {
         $prop->{'user'} = eval { get_uid($1) };
         $self->fatal(my $e = $@) if $@;
     } else {
@@ -510,7 +522,7 @@ sub get_client_info {
     my $client = shift || $prop->{'client'};
 
     if ($client->NS_proto =~ /^UNIX/) {
-        delete @$prop{qw(sockaddr sockport peeraddr peerport peerhost)};
+        delete @$prop{qw(sockaddr sockport peeraddr peerport peerhost peerhost_rev)};
         $self->log(3, $self->log_time." CONNECT ".$client->NS_proto." Socket: \"".$client->NS_port."\"") if $prop->{'log_level'} && 3 <= $prop->{'log_level'};
         return;
     }
@@ -541,18 +553,24 @@ sub get_client_info {
         @{ $prop }{qw(peeraddr peerhost peerport)} = ('0.0.0.0', 'inet.test', 0); # commandline
     }
 
-    if ($addr && defined $prop->{'reverse_lookups'}) {
-        if ($INC{'Socket6.pm'} && Socket6->can('getnameinfo')) {
-            my @res = Socket6::getnameinfo($addr, 0);
+    delete @$prop{qw(peerhost peerhost_rev)};
+    if ($addr && $prop->{'reverse_lookups'}) {
+        if ($client->can('peerhostname')) {
+            $prop->{'peerhost'} = $client->peerhostname;
+        } elsif ($INC{'Socket6.pm'} && Socket6->can('getnameinfo')) {
+            my @res = Socket6::getnameinfo($client->peername, 0);
             $prop->{'peerhost'} = $res[0] if @res > 1;
-        }else{
+        } else {
             $prop->{'peerhost'} = gethostbyaddr($addr, AF_INET);
+        }
+        if ($prop->{'peerhost'} && $prop->{'double_reverse_lookups'}) {
+            $prop->{'peerhost_rev'} = {map {$_->[0] => 1} Net::Server::Proto->get_addr_info($prop->{'peerhost'})};
         }
     }
 
     $self->log(3, $self->log_time
                ." CONNECT ".$client->NS_proto
-               ." Peer: \"[$prop->{'peeraddr'}]:$prop->{'peerport'}\""
+               ." Peer: \"[$prop->{'peeraddr'}]:$prop->{'peerport'}\"".($prop->{'peerhost'} ? " ($prop->{'peerhost'}) " : '')
                ." Local: \"[$prop->{'sockaddr'}]:$prop->{'sockport'}\"") if $prop->{'log_level'} && 3 <= $prop->{'log_level'};
 }
 
@@ -566,15 +584,19 @@ sub allow_deny {
     # unix sockets are immune to this check
     return 1 if $sock && $sock->NS_proto =~ /^UNIX/;
 
+    # work around Net::CIDR::cidrlookup() croaking,
+    # if first parameter is an IPv4 address in IPv6 notation.
+    my $peeraddr = ($prop->{'peeraddr'} =~ /^\s*::ffff:(\d+(?:\.\d+){3})$/) ? $1 : $prop->{'peeraddr'};
+
+    if ($prop->{'double_reverse_lookups'}) {
+        return 0 if ! $self->double_reverse_lookup($peeraddr, $prop->{'peerhost'}, $prop->{'peerhost_rev'}, $prop->{'peeraddr'})
+    }
+
     # if no allow or deny parameters are set, allow all
     return 1 if ! @{ $prop->{'allow'} }
              && ! @{ $prop->{'deny'} }
              && ! @{ $prop->{'cidr_allow'} }
              && ! @{ $prop->{'cidr_deny'} };
-
-    # work around Net::CIDR::cidrlookup() croaking,
-    # if first parameter is an IPv4 address in IPv6 notation.
-    my $peeraddr = ($prop->{'peeraddr'} =~ /^\s*::ffff:([0-9.]+\s*)$/) ? $1 : $prop->{'peeraddr'};
 
     # if the addr or host matches a deny, reject it immediately
     foreach (@{ $prop->{'deny'} }) {
@@ -599,6 +621,30 @@ sub allow_deny {
     }
 
     return 0;
+}
+
+sub double_reverse_lookup {
+    my ($self, $addr, $host, $rev_addrs, $orig_addr) = @_;
+    my $cfg = $self->{'server'}->{'double_reverse_lookups'} || '';
+    if (! $host) {
+        $self->log(3, $self->log_time ." Double reverse missing host from addr $addr");
+        return 0;
+    } elsif (! $rev_addrs) {
+        $self->log(3, $self->log_time ." Double reverse missing reverse addrs from host $host ($addr)");
+        return 0;
+    }
+    my $extra = ($orig_addr && $orig_addr ne $addr) ? ",  orig_addr: $orig_addr" : '';
+    if (! $rev_addrs->{$addr} && ! $rev_addrs->{$orig_addr}) {
+        $self->log(3, $self->log_time ." Double reverse did not match:  addr: $addr,  host: $host"
+            .($cfg =~ /detail/i ? ",  addrs: (".join(' ', sort keys %$rev_addrs).")$extra" : ''));
+        return 0;
+    } elsif ($cfg =~ /autofail/i) {
+        $self->log(3, $self->log_time ." Double reverse autofail:  addr: $addr,  host: $host,  addrs: (".join(' ', sort keys %$rev_addrs).")$extra");
+        return 0;
+    } elsif ($cfg =~ /debug/) {
+        $self->log(3, $self->log_time ." Double reverse debug:  addr: $addr,  host: $host,  addrs: (".join(' ', sort keys %$rev_addrs).")$extra");
+    }
+    return 1;
 }
 
 sub allow_deny_hook { 1 } # false to deny request
@@ -668,6 +714,7 @@ sub done {
 }
 
 sub pre_fork_hook {}
+sub register_child {}
 sub child_init_hook {}
 sub child_finish_hook {}
 
@@ -691,6 +738,7 @@ sub run_dequeue { # fork off a child process to handle dequeuing
 
     $self->{'server'}->{'children'}->{$pid}->{'status'} = 'dequeue'
         if $self->{'server'}->{'children'};
+    $self->register_child($pid, 'dequeue');
 }
 
 sub default_port { 20203 }
@@ -708,7 +756,7 @@ sub server_close {
     ### if this is a child process, signal the parent and close
     ### normally the child shouldn't, but if they do...
     ### otherwise the parent continues with the shutdown
-    ### this is safe for non standard forked child processes
+    ### this is safe for nonstandard forked child processes
     ### as they will not have server_close as a handler
     if (defined($prop->{'ppid'})
         && $prop->{'ppid'} != $$
@@ -752,6 +800,9 @@ sub server_close {
         && defined($prop->{'pid_file_unlink'})) {
         unlink($prop->{'pid_file'}) || $self->log(1, "Couldn't unlink \"$prop->{'pid_file'}\" [$!]");
     }
+    if (defined($prop->{'sem'})) {
+        $prop->{'sem'}->remove();
+    }
 
     if ($prop->{'_HUP'}) {
         $self->restart_close_hook();
@@ -787,7 +838,7 @@ sub close_parent {
     my $self = shift;
     my $prop = $self->{'server'};
     die "Missing parent pid (ppid)" if ! $prop->{'ppid'};
-    kill 2, $prop->{'ppid'};
+    kill 'INT', $prop->{'ppid'};
 }
 
 ### SIG INT the children
@@ -799,7 +850,7 @@ sub close_children {
 
     foreach my $pid (keys %{ $prop->{'children'} }) {
         $self->log(4, "Kill TERM pid $pid");
-        if (kill(15, $pid) || ! kill(0, $pid)) { # if it is killable, kill it
+        if (kill('TERM', $pid) || ! kill(0, $pid)) { # if it is killable, kill it
             $self->delete_child($pid);
         }
     }
@@ -819,7 +870,7 @@ sub hup_children {
 
     for my $pid (keys %{ $prop->{'children'} }) {
         $self->log(4, "Kill HUP pid $pid");
-        kill(1, $pid) or $self->log(2, "Failed to kill pid $pid: $!");
+        kill('HUP', $pid) or $self->log(2, "Failed to kill pid $pid: $!");
     }
 }
 
@@ -841,7 +892,7 @@ sub sig_hup {
 
         # hold on to the socket copy until exec;
         # just temporary: any socket domain will do,
-        # forked process will decide to use IO::Socket::INET6 if necessary
+        # forked process will decide to use IO::Socket::IP or IO::Socket::INET6 if necessary
         $prop->{'_HUP'}->[$i] = IO::Socket::INET->new;
         $prop->{'_HUP'}->[$i]->fdopen($fd, 'w') || $self->fatal("Cannot open to file descriptor [$!]");
 
@@ -956,8 +1007,8 @@ sub options {
 
     foreach (qw(conf_file
                 user group chroot log_level
-                log_file pid_file background setsid
-                listen reverse_lookups
+                log_file log_function pid_file background setsid
+                listen ipv6_package reverse_lookups double_reverse_lookups
                 no_close_by_child
                 no_client_stdout tie_client_stdout tied_stdout_callback tied_stdin_callback
                 leave_children_open_on_hup
@@ -1023,7 +1074,9 @@ sub _read_conf {
         warn "Couldn't open conf \"$file\" [$!]\n";
     };
     while (defined(my $line = <$fh>)) {
-        push @args, $1, $2 if $line =~ m/^\s* ((?:--)?\w+) (?:\s*[=:]\s*|\s+) (\S+)/x;
+        $line = $1 if $line =~ /(.*?)(?<!\\)#/; # trim comments from line
+        $line =~ s/\\#/#/g;
+        push @args, $1, $2 if $line =~ m/^\s*((?:--)?\w+)(?:\s*[=:]\s*|\s+)(.+)/;
     }
     close $fh;
     return \@args;
@@ -1048,7 +1101,7 @@ sub delete_child {
             $prop->{'children'}->{$pid}->{'sock'}->close;
         }
     }
-    
+
     $self->delete_child_hook($pid);   # user customizable hook
 
     delete $prop->{'children'}->{$pid};

@@ -34,8 +34,9 @@ CODE:
 
 		if (SvROK(val)) {
 			SV * tmp = SvRV(val);
-			stype = SvTYPE(tmp);
-			if (stype == SVt_PVGV)
+			if (SvOBJECT(tmp))
+				constant = TRUE;
+			else if ((stype = SvTYPE(tmp)) == SVt_PVGV)
 				val = tmp;
 			else if (ix && (stype < SVt_PVAV || stype > SVt_PVCV)) {
 				goto new_ref;

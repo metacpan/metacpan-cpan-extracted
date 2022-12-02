@@ -2,7 +2,7 @@
 #
 #  Net::Server::PSGI - Extensible Perl HTTP PSGI base server
 #
-#  Copyright (C) 2011-2017
+#  Copyright (C) 2011-2022
 #
 #    Paul Seamons <paul@seamons.com>
 #
@@ -17,6 +17,7 @@ package Net::Server::PSGI;
 
 use strict;
 use base qw(Net::Server::HTTP);
+use Scalar::Util qw(blessed);
 
 sub net_server_type { __PACKAGE__ }
 
@@ -50,7 +51,7 @@ sub process_request {
         $self->process_headers;
 
         alarm($self->timeout_idle);
-        my $env = \%ENV;
+        my $env = { %ENV };
         $env->{'psgi.version'}      = [1, 0];
         $env->{'psgi.url_scheme'}   = ($ENV{'HTTPS'} && $ENV{'HTTPS'} eq 'on') ? 'https' : 'http';
         $env->{'psgi.input'}        = $self->{'server'}->{'client'};
@@ -102,20 +103,11 @@ sub app {
 
 sub print_psgi_headers {
     my ($self, $status, $headers) = @_;
-    $self->send_status($status);
-    my $request_info = $self->{'request_info'};
-    my $out = '';
-    for my $i (0 .. @{ $headers || [] } / 2 - 1) {
-        my $key = "\u\L$headers->[$i*2]";
-        my $val = $headers->[$i*2 + 1];
-        $key =~ y/_/-/;
-        $out .= "$key: $val\015\012";
-        push @{ $request_info->{'response_headers'} }, [$key, $val];
-    }
-    $out .= "\015\012";
-    $request_info->{'response_header_size'} += length $out;
-    $self->{'server'}->{'client'}->print($out);
-    $request_info->{'headers_sent'} = 1;
+    $headers ||= [];
+    $self->send_status({
+        status => $status,
+        headers => [map {[@$headers[$_*2, $_*2+1]]} 0 .. $#$headers / 2],
+    });
 }
 
 sub print_psgi_body {
@@ -142,6 +134,9 @@ sub print_psgi_body {
 
 sub psgi_echo_handler {
     my $env = shift;
+    if ($env->{'PATH_INFO'} && $env->{'PATH_INFO'} eq '/simple') {
+        return [200, [content_type => 'text/html'], ['Simple']];
+    }
     my $txt = qq{<form method="post" action="/bam"><input type="text" name="foo"><input type="submit"></form>\n};
     if (eval { require Data::Dumper }) {
         local $Data::Dumper::Sortkeys = 1;
@@ -202,7 +197,7 @@ rudimentary, then Net::Server::PSGI may be good for you.
 Net::Server::PSGI takes Net::Server::HTTP one level farther.  It
 begins with base type MultiType defaulting to Net::Server::Fork.  It
 is easy to change it to any of the other Net::Server flavors by
-passing server_type => $other_flavor in the server configurtation.
+passing server_type => $other_flavor in the server configuration.
 The port has also been defaulted to port 80 - but could easily be
 changed to another through the server configuration.  You can also
 very easily add ssl by including, proto=>"ssl" and provide a

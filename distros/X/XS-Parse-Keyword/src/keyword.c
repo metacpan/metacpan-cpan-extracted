@@ -342,14 +342,35 @@ static bool probe_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
   croak("TODO: probe_piece on type=%d\n", type);
 }
 
+static void parse_prefix_pieces(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKeywordPieceType *pieces, void *hookdata)
+{
+  while(pieces->type) {
+    if(pieces->type == XS_PARSE_KEYWORD_SETUP)
+      (pieces->u.callback)(aTHX_ hookdata);
+    else {
+      parse_piece(aTHX_ argsv, argidx, pieces, hookdata);
+      lex_read_space(0);
+    }
+
+    pieces++;
+  }
+
+  intro_my();  /* in case any of the pieces was XPK_LEXVAR_MY */
+}
+
 static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKeywordPieceType *piece, void *hookdata)
 {
   int argi = *argidx;
 
-  if(argi >= (SvLEN(argsv) / sizeof(XSParseKeywordPiece)))
-    SvGROW(argsv, SvLEN(argsv) * 2);
+#define CHECK_GROW_ARGSV  \
+  do {                                                       \
+    if(argi >= (SvLEN(argsv) / sizeof(XSParseKeywordPiece))) \
+      SvGROW(argsv, SvLEN(argsv) * 2);                       \
+  } while(0)
 
 #define THISARG ((XSParseKeywordPiece *)SvPVX(argsv))[argi]
+
+  CHECK_GROW_ARGSV;
 
   THISARG.line = 
 #if HAVE_PERL_VERSION(5, 20, 0)
@@ -399,27 +420,11 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
       I32 save_ix = block_start(1);
 
       if(piece->u.pieces) {
-        /* The prefix pieces */
-        const struct XSParseKeywordPieceType *pieces = piece->u.pieces;
-
-        while(pieces->type) {
-          if(pieces->type == XS_PARSE_KEYWORD_SETUP)
-            (pieces->u.callback)(aTHX_ hookdata);
-          else {
-            parse_piece(aTHX_ argsv, argidx, pieces, hookdata);
-            lex_read_space(0);
-          }
-
-          pieces++;
-        }
+        parse_prefix_pieces(aTHX_ argsv, argidx, piece->u.pieces, hookdata);
 
         if(*argidx > argi) {
           argi = *argidx;
-
-          if(argi >= (SvLEN(argsv) / sizeof(XSParseKeywordPiece)))
-            SvGROW(argsv, SvLEN(argsv) * 2);
-
-          intro_my();  /* in case any of the pieces was XPK_LEXVAR_MY */
+          CHECK_GROW_ARGSV;
         }
       }
 
@@ -465,6 +470,19 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
 
     case XS_PARSE_KEYWORD_ARITHEXPR:
     case XS_PARSE_KEYWORD_TERMEXPR:
+    {
+      if(is_enterleave)
+        ENTER;
+
+      if(piece->u.pieces) {
+        parse_prefix_pieces(aTHX_ argsv, argidx, piece->u.pieces, hookdata);
+
+        if(*argidx > argi) {
+          argi = *argidx;
+          CHECK_GROW_ARGSV;
+        }
+      }
+
       /* TODO: This auto-parens behaviour ought to be tuneable, depend on how
        * many args, open at i=0 and close at i=MAX, etc...
        */
@@ -495,7 +513,12 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
         THISARG.op = op_contextualize(THISARG.op, want);
 
       (*argidx)++;
+
+      if(is_enterleave)
+        LEAVE;
+
       return;
+    }
 
     case XS_PARSE_KEYWORD_LISTEXPR:
       THISARG.op = parse_listexpr(0);
@@ -787,9 +810,13 @@ static int parse(pTHX_ OP **op, struct Registration *reg)
   if(hooks->build) {
     /* build function takes an array of pointers to piece structs, so we can
      * add new fields to the end of them without breaking back-compat. */
-    SV *ptrssv = newSV(argidx * sizeof(XSParseKeywordPiece *));
-    XSParseKeywordPiece **argptrs = (XSParseKeywordPiece **)SvPVX(ptrssv);
-    SAVEFREESV(ptrssv);
+    XSParseKeywordPiece **argptrs = NULL;
+    if(argidx) {
+      SV *ptrssv = newSV(argidx * sizeof(XSParseKeywordPiece *));
+      SAVEFREESV(ptrssv);
+
+      argptrs = (XSParseKeywordPiece **)SvPVX(ptrssv);
+    }
 
     int i;
     for(i = 0; i < argidx; i++)
@@ -813,11 +840,13 @@ static int parse(pTHX_ OP **op, struct Registration *reg)
       if(ret && (ret != KEYWORD_PLUGIN_EXPR))
         yycroakf("Expected parse function for '%s' keyword to return KEYWORD_PLUGIN_EXPR but it did not",
           reg->kwname);
+      break;
 
     case XPK_FLAG_STMT:
       if(ret && (ret != KEYWORD_PLUGIN_STMT))
         yycroakf("Expected parse function for '%s' keyword to return KEYWORD_PLUGIN_STMT but it did not",
           reg->kwname);
+      break;
   }
 
   return ret;

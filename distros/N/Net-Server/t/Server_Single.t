@@ -3,7 +3,7 @@
 use strict;
 use FindBin qw($Bin);
 use lib $Bin;
-use NetServerTest qw(prepare_test ok use_ok diag);
+use NetServerTest qw(prepare_test ok use_ok note);
 prepare_test({n_tests => 1, plan_only => 1});
 
 use_ok('Net::Server::Single');

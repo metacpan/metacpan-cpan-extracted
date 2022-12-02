@@ -2,7 +2,7 @@
 #
 #  Net::Server::Proto::SSL - Net::Server Protocol module
 #
-#  Copyright (C) 2001-2017
+#  Copyright (C) 2001-2022
 #
 #    Paul Seamons <paul@seamons.com>
 #
@@ -21,7 +21,7 @@ use strict;
 use warnings;
 
 BEGIN {
-    # IO::Socket::SSL will automatically become IO::Socket::INET6 if it is available.
+    # IO::Socket::SSL will automatically become IO::Socket::IP if it is available.
     # This is different from Net::Server::Proto::SSLEAY that only does it if IPv6 is requested.
     if (! eval { require IO::Socket::SSL }) {
         die "Module IO::Socket::SSL is required for SSL - you may alternately try SSLEAY. $@";
@@ -43,6 +43,7 @@ my @ssl_args = qw(
     SSL_max_getline_length
     SSL_error_callback
     SSL_verify_callback
+    SSL_version
 );
 
 sub NS_proto { 'SSL' }
@@ -102,9 +103,11 @@ sub connect {
         ReuseAddr => 1,
         Reuse     => 1,
         (($host ne '*') ? (LocalAddr => $host) : ()), # * is all
-        ($sock->isa('IO::Socket::INET6') ? (Domain => ($ipv eq '6') ? Socket6::AF_INET6() : ($ipv eq '4') ? Socket::AF_INET() : Socket::AF_UNSPEC()) : ()),
+        (($sock->isa('IO::Socket::IP') || $sock->isa('IO::Socket::INET6'))
+            ? (Domain => ($ipv eq '6') ? Socket6::AF_INET6() : ($ipv eq '4') ? Socket::AF_INET() : Socket::AF_UNSPEC()) : ()),
         (map {$_ => $sock->$_();} grep {/^SSL_/} keys %{*$sock}),
         SSL_server => 1,
+        SSL_startHandshake => 0,
     }) or $server->fatal("Cannot connect to SSL port $port on $host [$!]");
 
     if ($port eq '0' and $port = $sock->sockport) {
@@ -125,10 +128,11 @@ sub reconnect { # after a sig HUP
     $sock->configure_SSL({
         (map {$_ => $sock->$_();} grep {/^SSL_/} keys %{*$sock}),
         SSL_server => 1,
+        SSL_startHandshake => 0,
     });
     $sock->IO::Socket::INET::fdopen($fd, 'w') or $server->fatal("Error opening to file descriptor ($fd) [$!]");
 
-    if ($sock->isa("IO::Socket::INET6")) {
+    if ($sock->isa("IO::Socket::IP") || $sock->isa("IO::Socket::INET6")) {
         my $ipv = $sock->NS_ipv;
         ${*$sock}{'io_socket_domain'} = ($ipv eq '6') ? Socket6::AF_INET6() : ($ipv eq '4') ? Socket::AF_INET() : Socket::AF_UNSPEC();
     }
@@ -143,11 +147,20 @@ sub reconnect { # after a sig HUP
 sub accept {
     my ($sock, $class) = @_;
     my ($client, $peername);
-    my $code = $sock->isa('IO::Socket::INET6') ? 'IO::Socket::INET6'->can('accept') : 'IO::Socket::INET'->can('accept'); # TODO - cache this lookup
-    if (wantarray) {
-        ($client, $peername) = $code->($sock, $class || ref($sock));
+    # SSL_startHandshake = 0 introduced in 1.994 makes accept not call accept_SSL
+    if ($IO::Socket::SSL::VERSION < 1.994) {
+        my $code = $sock->isa('IO::Socket::IP') ? 'IO::Socket::IP'->can('accept')
+            : $sock->isa('IO::Socket::INET6') ? 'IO::Socket::INET6'->can('accept')
+            : 'IO::Socket::INET'->can('accept'); # TODO - cache this lookup
+        if (wantarray) {
+            ($client, $peername) = $code->($sock, $class || ref($sock));
+        } else {
+            $client = $code->($sock, $class || ref($sock));
+        }
+    } elsif (wantarray) {
+        ($client, $peername) = $sock->SUPER::accept($class || ref($sock));
     } else {
-        $client = $code->($sock, $class || ref($sock));
+        $client = $sock->SUPER::accept($class || ref($sock));
     }
     ${*$client}{'_parent_sock'} = $sock;
 
@@ -236,7 +249,7 @@ Net::Server::Proto::SSL - Net::Server SSL protocol.
 
 =head1 SYNOPSIS
 
-Until this release, it was preferrable to use the Net::Server::Proto::SSLEAY
+Until this release, it was preferable to use the Net::Server::Proto::SSLEAY
 module.  Recent versions include code that overcomes original limitations.
 
 See L<Net::Server::Proto>.
@@ -299,8 +312,8 @@ Net::SSLeay.  See L<Net::Server::Proto>.
 
 If you know that your server will only need IPv4 (which is the default
 for Net::Server), you can load IO::Socket::SSL in inet4 mode which
-will prevent it from using Socket6 and IO::Socket::INET6 since they
-would represent additional and unsued overhead.
+will prevent it from using Socket6, IO::Socket::IP, or IO::Socket::INET6 since they
+would represent additional and unused overhead.
 
     use IO::Socket::SSL qw(inet4);
     use base qw(Net::Server::Fork);

@@ -7,7 +7,7 @@ our @EXPORT      = qw(usage);
 our %EXPORT_TAGS = ();
 our @EXPORT_OK   = qw();
 
-our $VERSION = "4.22.3";
+our $VERSION = "4.23.0";
 
 use Pod::Usage;
 
@@ -30,13 +30,13 @@ App::sdif - sdif and family tools, cdif and watchdiff
 
 =head1 SYNOPSIS
 
-sdif f1 f2
+    sdif f1 f2
 
-diff -c f1 f2 | cdif
+    diff -c f1 f2 | cdif
 
-git diff | sdif -n
+    git diff | sdif -n
 
-watchdiff df
+    watchdiff df
 
 =head1 DESCRIPTION
 
@@ -58,8 +58,6 @@ See individual manual of each command for detail.
 =head2 CPANM
 
     $ cpanm App::sdif
-    or
-    $ curl -sL http://cpanmin.us | perl - App::sdif
 
 =head2 GIT
 
@@ -67,27 +65,31 @@ Those are sample configurations using B<sdif> family in git
 environment.  You need to install B<mecab> command to use B<--mecab>
 option.
 
-	~/.gitconfig
-		[pager]
-		        log  = sdif | less
-		        show = sdif | less
-		        diff = sdif | less
+    ~/.gitconfig
+        [pager]
+            log  = sdif | less
+            show = sdif | less
+            diff = sdif | less
 
-	~/.sdifrc
-		option default -n --margin=4
+    ~/.sdifrc
+        option default -n --margin=4
 
-	~/.cdifrc
-		option default --mecab
+    ~/.cdifrc
+        option default --mecab
 
-	~/.profile
-		export LESS="-cR"
-		export LESSANSIENDCHARS="mK"
+    ~/.profile
+        export LESS="-cR"
+        export LESSANSIENDCHARS="mK"
 
 You can write everything in ~/.gitconfig:
 
+    [pager]
         log  = sdif -n --margin=4 --mecab | env LESSANSIENDCHARS=mK less -cR
         show = sdif -n --margin=4 --mecab | env LESSANSIENDCHARS=mK less -cR
         diff = sdif -n --margin=4 --mecab | env LESSANSIENDCHARS=mK less -cR
+
+=for html
+<p><img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/sdif-tools/master/docs/images/git.jpg"></p>
 
 =head1 SEE ALSO
 

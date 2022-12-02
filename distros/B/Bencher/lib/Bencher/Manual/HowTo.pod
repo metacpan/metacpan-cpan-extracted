@@ -20,7 +20,7 @@ Bencher::Manual::HowTo - How-to guides for Bencher
 
 =head1 VERSION
 
-This document describes version 1.062.1 of Bencher::Manual::HowTo (from Perl distribution Bencher), released on 2022-11-29.
+This document describes version 1.062.2 of Bencher::Manual::HowTo (from Perl distribution Bencher), released on 2022-11-30.
 
 =head1 DESCRIPTION
 

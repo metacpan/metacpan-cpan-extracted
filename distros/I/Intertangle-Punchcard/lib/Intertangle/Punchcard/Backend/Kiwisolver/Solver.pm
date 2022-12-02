@@ -1,16 +1,16 @@
 use Renard::Incunabula::Common::Setup;
 package Intertangle::Punchcard::Backend::Kiwisolver::Solver;
 # ABSTRACT: Solver wrapper for Kiwisolver
-$Intertangle::Punchcard::Backend::Kiwisolver::Solver::VERSION = '0.001';
+$Intertangle::Punchcard::Backend::Kiwisolver::Solver::VERSION = '0.002';
 use Mu;
-use Intertangle::API::Kiwisolver;
+use Graphics::Layout::Kiwisolver;
 use Renard::Incunabula::Common::Types qw(InstanceOf);
 
 has _delegate => (
 	is => 'ro',
-	isa => InstanceOf['Intertangle::API::Kiwisolver::Solver'],
+	isa => InstanceOf['Graphics::Layout::Kiwisolver::Solver'],
 	default => method() {
-		Intertangle::API::Kiwisolver::Solver->new;
+		Graphics::Layout::Kiwisolver::Solver->new;
 	},
 );
 
@@ -44,7 +44,7 @@ Intertangle::Punchcard::Backend::Kiwisolver::Solver - Solver wrapper for Kiwisol
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 EXTENDS
 

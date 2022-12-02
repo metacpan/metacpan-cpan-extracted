@@ -26,6 +26,7 @@ write_text("$dir/1.tsv", "f1\tf2\tf3\n1\t2\t3\n4\t5\t6\n7\t8\t9\n");
 write_text("$dir/sep_char-semicolon.csv", "f1;f2\n1;2\n3;4\n");
 
 write_text("$dir/sort-rows.csv", qq(f1,f2\n2,andy\n1,Andy\n10,Chuck\n));
+write_text("$dir/sort-fields.csv", qq(four,two,eighteen\n4,2,18));
 
 # XXX test with opt: --no-header
 
@@ -37,25 +38,29 @@ subtest "common option: sep_char" => sub {
         or diag explain $res;
 };
 
-subtest csv_add_field => sub {
+subtest csv_add_fields => sub {
     my $res;
 
-    dies_ok { App::CSVUtils::csv_add_field(filename=>"$dir/1.csv", field=>"f4", eval=>"blah +") }
+    dies_ok { App::CSVUtils::csv_add_fields(filename=>"$dir/1.csv", fields=>["f4"], eval=>"blah +") }
         "error in eval code -> dies";
 
-    $res = App::CSVUtils::csv_add_field(filename=>"$dir/1.csv", field=>"f3", eval=>"1");
+    $res = App::CSVUtils::csv_add_fields(filename=>"$dir/1.csv", fields=>["f3"], eval=>"1");
     is($res->[0], 412, "adding existing field -> error");
 
-    $res = App::CSVUtils::csv_add_field(filename=>"$dir/1.csv", field=>"", eval=>"1");
+    $res = App::CSVUtils::csv_add_fields(filename=>"$dir/1.csv", fields=>[""], eval=>"1");
     is($res->[0], 400, "empty field -> error");
 
-    $res = App::CSVUtils::csv_add_field(filename=>"$dir/1.csv", field=>"f4", eval=>'$main::rownum*2');
-    is_deeply($res, [200,"OK","f1,f2,f3,f4\n1,2,3,4\n4,5,6,6\n7,8,9,8\n",{'cmdline.skip_format'=>1}], "result");
-    $res = App::CSVUtils::csv_add_field(filename=>"$dir/1.csv", field=>"f4", eval=>'$main::rownum*2', after=>'f1');
+    $res = App::CSVUtils::csv_add_fields(filename=>"$dir/1.csv", fields=>["f4"]);
+    is_deeply($res, [200,"OK","f1,f2,f3,f4\n1,2,3,\n4,5,6,\n7,8,9,\n",{'cmdline.skip_format'=>1}], "result (with no eval)");
+    $res = App::CSVUtils::csv_add_fields(filename=>"$dir/1.csv", fields=>["f4"], eval=>'$main::rownum*2');
+    is_deeply($res, [200,"OK","f1,f2,f3,f4\n1,2,3,4\n4,5,6,6\n7,8,9,8\n",{'cmdline.skip_format'=>1}], "result (with eval)");
+    $res = App::CSVUtils::csv_add_fields(filename=>"$dir/1.csv", fields=>["f4","f6","f5"], eval=>'[11,13,12]');
+    is_deeply($res, [200,"OK","f1,f2,f3,f4,f6,f5\n1,2,3,11,13,12\n4,5,6,11,13,12\n7,8,9,11,13,12\n",{'cmdline.skip_format'=>1}], "result (with eval, multiple fields)");
+    $res = App::CSVUtils::csv_add_fields(filename=>"$dir/1.csv", fields=>["f4"], eval=>'$main::rownum*2', after=>'f1');
     is_deeply($res, [200,"OK","f1,f4,f2,f3\n1,4,2,3\n4,6,5,6\n7,8,8,9\n",{'cmdline.skip_format'=>1}], "result (with 'after' option)");
-    $res = App::CSVUtils::csv_add_field(filename=>"$dir/1.csv", field=>"f4", eval=>'$main::rownum*2', before=>'f2');
+    $res = App::CSVUtils::csv_add_fields(filename=>"$dir/1.csv", fields=>["f4"], eval=>'$main::rownum*2', before=>'f2');
     is_deeply($res, [200,"OK","f1,f4,f2,f3\n1,4,2,3\n4,6,5,6\n7,8,8,9\n",{'cmdline.skip_format'=>1}], "result (with 'before' option)");
-    $res = App::CSVUtils::csv_add_field(filename=>"$dir/1.csv", field=>"f4", eval=>'$main::rownum*2', at=>2);
+    $res = App::CSVUtils::csv_add_fields(filename=>"$dir/1.csv", fields=>["f4"], eval=>'$main::rownum*2', at=>2);
     is_deeply($res, [200,"OK","f1,f4,f2,f3\n1,4,2,3\n4,6,5,6\n7,8,8,9\n",{'cmdline.skip_format'=>1}], "result (with 'at' option)");
 };
 
@@ -139,31 +144,40 @@ subtest csv_sort_fields => sub {
     # ci alphabetical
     $res = App::CSVUtils::csv_sort_fields(filename=>"$dir/4.csv", ci=>1);
     is_deeply($res, [200,"OK",qq(f1,f2,F3\n1,3,2\n4,6,5\n),{'cmdline.skip_format'=>1}], "result (ci alphabetical)");
-    # example
-    $res = App::CSVUtils::csv_sort_fields(filename=>"$dir/4.csv", example=>["f2","F3","f1"]);
-    is_deeply($res, [200,"OK",qq(f2,F3,f1\n3,2,1\n6,5,4\n),{'cmdline.skip_format'=>1}], "result (example)");
-    # reverse example
-    $res = App::CSVUtils::csv_sort_fields(filename=>"$dir/4.csv", example=>["f2","F3","f1"], reverse=>1);
-    is_deeply($res, [200,"OK",qq(f1,F3,f2\n1,2,3\n4,5,6\n),{'cmdline.skip_format'=>1}], "result (reverse example)");
+    # by_examples
+    $res = App::CSVUtils::csv_sort_fields(filename=>"$dir/4.csv", by_examples=>["f2","F3","f1"]);
+    is_deeply($res, [200,"OK",qq(f2,F3,f1\n3,2,1\n6,5,4\n),{'cmdline.skip_format'=>1}], "result (by_examples)");
+    # reverse by_examples
+    $res = App::CSVUtils::csv_sort_fields(filename=>"$dir/4.csv", by_examples=>["f2","F3","f1"], reverse=>1);
+    is_deeply($res, [200,"OK",qq(f1,F3,f2\n1,2,3\n4,5,6\n),{'cmdline.skip_format'=>1}], "result (reverse by_example)");
+    # by_code
+    $res = App::CSVUtils::csv_sort_fields(filename=>"$dir/4.csv", by_code=>sub { lc($a) cmp lc($b) });
+    is_deeply($res, [200,"OK",qq(f1,f2,F3\n1,3,2\n4,6,5\n),{'cmdline.skip_format'=>1}], "result (by_code)");
+    # by_sortsub
+    subtest by_sortsub => sub {
+        test_needs 'Sort::Sub', 'Sort::Sub::by_length';
+        $res = App::CSVUtils::csv_sort_fields(filename=>"$dir/sort-fields.csv", by_sortsub=>"by_length");
+        is_deeply($res, [200,"OK",qq(two,four,eighteen\n2,4,18\n),{'cmdline.skip_format'=>1}], "result (by sortsub)");
+    };
 };
 
 subtest csv_sort_rows => sub {
     my $res;
 
     # alphabetical
-    $res = App::CSVUtils::csv_sort_rows(filename=>"$dir/sort-rows.csv", by_fields=>"f2");
+    $res = App::CSVUtils::csv_sort_rows(filename=>"$dir/sort-rows.csv", by_fields=>["f2"]);
     is_deeply($res, [200,"OK",qq(f1,f2\n1,Andy\n10,Chuck\n2,andy\n),{'cmdline.skip_format'=>1}]);
     # reverse alphabetical
-    $res = App::CSVUtils::csv_sort_rows(filename=>"$dir/sort-rows.csv", by_fields=>"~f2");
+    $res = App::CSVUtils::csv_sort_rows(filename=>"$dir/sort-rows.csv", by_fields=>["~f2"]);
     is_deeply($res, [200,"OK",qq(f1,f2\n2,andy\n10,Chuck\n1,Andy\n),{'cmdline.skip_format'=>1}]);
     # numeric
-    $res = App::CSVUtils::csv_sort_rows(filename=>"$dir/sort-rows.csv", by_fields=>"+f1");
+    $res = App::CSVUtils::csv_sort_rows(filename=>"$dir/sort-rows.csv", by_fields=>["+f1"]);
     is_deeply($res, [200,"OK",qq(f1,f2\n1,Andy\n2,andy\n10,Chuck\n),{'cmdline.skip_format'=>1}]);
     # reverse numeric
-    $res = App::CSVUtils::csv_sort_rows(filename=>"$dir/sort-rows.csv", by_fields=>"-f1");
+    $res = App::CSVUtils::csv_sort_rows(filename=>"$dir/sort-rows.csv", by_fields=>["-f1"]);
     is_deeply($res, [200,"OK",qq(f1,f2\n10,Chuck\n2,andy\n1,Andy\n),{'cmdline.skip_format'=>1}]);
     # ci
-    $res = App::CSVUtils::csv_sort_rows(filename=>"$dir/sort-rows.csv", by_fields=>"f2,+f1", ci=>1);
+    $res = App::CSVUtils::csv_sort_rows(filename=>"$dir/sort-rows.csv", by_fields=>["f2","+f1"], ci=>1);
     is_deeply($res, [200,"OK",qq(f1,f2\n1,Andy\n2,andy\n10,Chuck\n),{'cmdline.skip_format'=>1}]);
 
     # by code
@@ -212,18 +226,18 @@ subtest csv_avg => sub {
     is_deeply($res, [200,"OK",qq(f1,f2,f3\n0,0,0\n),{'cmdline.skip_format'=>1}], "result (no rows)");
 };
 
-subtest csv_select_row => sub {
+subtest csv_select_rows => sub {
     my $res;
 
-    $res = App::CSVUtils::csv_select_row(filename=>"$dir/5.csv", row_spec=>'10');
+    $res = App::CSVUtils::csv_select_rows(filename=>"$dir/5.csv", row_spec=>'10');
     is_deeply($res, [200,"OK",qq(f1\n),{'cmdline.skip_format'=>1}], "result (n, outside range)");
-    $res = App::CSVUtils::csv_select_row(filename=>"$dir/5.csv", row_spec=>'4');
+    $res = App::CSVUtils::csv_select_rows(filename=>"$dir/5.csv", row_spec=>'4');
     is_deeply($res, [200,"OK",qq(f1\n3\n),{'cmdline.skip_format'=>1}], "result (n)");
-    $res = App::CSVUtils::csv_select_row(filename=>"$dir/5.csv", row_spec=>'4-6');
+    $res = App::CSVUtils::csv_select_rows(filename=>"$dir/5.csv", row_spec=>'4-6');
     is_deeply($res, [200,"OK",qq(f1\n3\n4\n5\n),{'cmdline.skip_format'=>1}], "result (n-m)");
-    $res = App::CSVUtils::csv_select_row(filename=>"$dir/5.csv", row_spec=>'2,4-6');
+    $res = App::CSVUtils::csv_select_rows(filename=>"$dir/5.csv", row_spec=>'2,4-6');
     is_deeply($res, [200,"OK",qq(f1\n1\n3\n4\n5\n),{'cmdline.skip_format'=>1}], "result (n1,n2-m)");
-    $res = App::CSVUtils::csv_select_row(filename=>"$dir/5.csv", row_spec=>'1-');
+    $res = App::CSVUtils::csv_select_rows(filename=>"$dir/5.csv", row_spec=>'1-');
     is($res->[0], 400, "error in spec -> status 400");
 };
 

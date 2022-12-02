@@ -1,7 +1,7 @@
 use Modern::Perl;
 package Intertangle::Jacquard::Error;
 # ABSTRACT: Exceptions
-$Intertangle::Jacquard::Error::VERSION = '0.001';
+$Intertangle::Jacquard::Error::VERSION = '0.002';
 use custom::failures qw/
 	Layout::MaximumNumberOfActors
 	/;
@@ -20,7 +20,7 @@ Intertangle::Jacquard::Error - Exceptions
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 EXTENDS
 

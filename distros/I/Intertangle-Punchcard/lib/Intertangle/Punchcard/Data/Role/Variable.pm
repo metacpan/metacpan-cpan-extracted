@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Intertangle::Punchcard::Data::Role::Variable;
 # ABSTRACT: A variable role
-$Intertangle::Punchcard::Data::Role::Variable::VERSION = '0.001';
+$Intertangle::Punchcard::Data::Role::Variable::VERSION = '0.002';
 use Mu::Role;
 
 with qw(Intertangle::Punchcard::Data::Role::HasValue);
@@ -20,7 +20,7 @@ Intertangle::Punchcard::Data::Role::Variable - A variable role
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 CONSUMES
 

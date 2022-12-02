@@ -1,6 +1,6 @@
 use 5.020;
 use warnings;
-package Plate 1.4;
+package Plate 1.5;
 
 use Carp 'croak';
 use File::Spec;
@@ -41,21 +41,21 @@ Plate - Fast templating engine with support for embedded Perl
 my $re_pre = qr'(.*?)(?:
     ^%%\h*(\V*?)\h*(?:\R|\z)|
     ^<%%(perl)>(?:\R|\z)(?:(.*?)^</%%\g-2>(?:\R|\z))?|
-    ^<%%def\h+([\w/\.-]+)>(?:\R|\z)|
+    ^<%%(def|filter)\h+([\w/\.-]+)>(?:\R|\z)|
     <%%(\s*(?:\#.+?)?)%%>|
     <%%\s*(.+?)\s*(?:\|\h*(|\w+(?:\s*\|\h*\w+)*)\s*)?%%>|
     <&&(\|)?\s*(.+?)\s*(?:\|\h*(|\w+(?:\s*\|\h*\w+)*)\s*)?&&>|
-    </(%%def|%%perl)>(?:\R|\z)|
+    </(%%def|%%filter|%%perl)>(?:\R|\z)|
     </(&&)>|\z
 )'mosx;
 my $re_run = qr'(.*?)(?:
     ^%\h*(\V*?)\h*(?:\R|\z)|
     ^<%(perl)>(?:\R|\z)(?:(.*?)^</%\g-2>(?:\R|\z))?|
-    ^<%def\h+([\w/\.-]+)>(?:\R|\z)|
+    ^<%(def|filter)\h+([\w/\.-]+)>(?:\R|\z)|
     <%(\s*(?:\#.+?)?)%>|
     <%\s*(.+?)\s*(?:\|\h*(|\w+(?:\s*\|\h*\w+)*)\s*)?%>|
     <&(\|)?\s*(.+?)\s*(?:\|\h*(|\w+(?:\s*\|\h*\w+)*)\s*)?&>|
-    </(%def|%perl)>(?:\R|\z)|
+    </(%def|%filter|%perl)>(?:\R|\z)|
     </(&)>|\z
 )'mosx;
 
@@ -83,10 +83,7 @@ sub _parse_fltr {
     my $expr = $_[0];
     $expr .= "//''" unless $$Plate::_s{keep_undef};
     if (length $_[1]) {
-        for (split /\s*\|\s*/, $_[1]) {
-            exists $$Plate::_s{filters}{$_} or croak "No '$_' filter defined";
-            $expr = "Plate::_f($_=>$expr)";
-        }
+        $expr = "Plate::_f($_=>$expr)" for split /\s*\|\s*/, $_[1];
     } elsif (not $$Plate::_s{keep_undef}) {
         $expr = "($expr)";
     }
@@ -146,54 +143,57 @@ sub _parse {
             $stmt .= "\n$4\n";
 
         } elsif (defined $5) {
-            # <%def ...>
+            # <%def ...> or <%filter ...>
             $expr2stmt->();
-            local $_[3] = ($pre && '%').'%def';
-            $stmt .= 'local$$Plate::_s{mem}{'._parse_defn($5)."}=\nsub{".&_parse.'};';
+            local $_[3] = ($pre && '%')."%$5";
+            my $n = _parse_defn $6;
+            $stmt .= $5 eq 'def'
+            ? "local\$\$Plate::_s{mem}{$n}=\nsub{".&_parse.'};'
+            : "local\$\$Plate::_s{filters}{$n}=\nsub{my\$_c=\$_[0];local\@Plate::_c=sub{\$_c};".&_parse.'};';
 
-        } elsif (defined $6) {
+        } elsif (defined $7) {
             # <%# ... %>
-            my $add_lines = $6 =~ tr/\n//;
+            my $add_lines = $7 =~ tr/\n//;
             (@expr ? $expr[-1] : defined $stmt ? $stmt : ($expr[0] = "''")) .= "\n" x $add_lines if $add_lines;
             $fix_line_num = @expr if $fix_line_num;
 
-        } elsif (defined $7) {
+        } elsif (defined $8) {
             # <% ... %>
-            my $nl1 = "\n" x substr($_[0], $+[1], $-[7] - $+[1]) =~ tr/\n//;
-            my $nl2 = "\n" x substr($_[0], $+[7], $+[0] - $+[7]) =~ tr/\n//;
+            my $nl1 = "\n" x substr($_[0], $+[1], $-[8] - $+[1]) =~ tr/\n//;
+            my $nl2 = "\n" x substr($_[0], $+[8], $+[0] - $+[8]) =~ tr/\n//;
             $expr2stmt->(1) if $fix_line_num;
             $fix_line_num = push @expr,
-            _parse_fltr "do{$nl1$7}$nl2", $8 // $$Plate::_s{auto_filter};
+            _parse_fltr "do{$nl1$8}$nl2", $9 // $$Plate::_s{auto_filter};
             $expr2stmt->() if $pre;
 
-        } elsif (defined $10) {
+        } elsif (defined $11) {
             # <& ... &> or <&| ... &>
-            my $nl = "\n" x (substr($_[0], $+[1], $+[0] - $+[1]) =~ tr/\n// - $10 =~ tr/\n//);
-            my($tmpl, $args) = do { $10 =~ /^([\w\/\.-]+)\s*(?:,\s*(.*))?$/s };
+            my $nl = "\n" x (substr($_[0], $+[1], $+[0] - $+[1]) =~ tr/\n// - $11 =~ tr/\n//);
+            my($tmpl, $args) = do { $11 =~ /^([\w\/\.-]+)\s*(?:,\s*(.*))?$/s };
             $expr2stmt->(!$pre) if $pre or $fix_line_num;
             if (defined $tmpl) {
                 if ($tmpl eq '_') {
-                    $fix_line_num = push @expr, _parse_fltr defined $9
+                    $fix_line_num = push @expr, _parse_fltr defined $10
                     ? do {
                         $args = defined $args ? "($args)" : '';
                         local $_[3] = $pre ? '&&' : '&';
                         '(@Plate::_c?do{local@Plate::_c=@Plate::_c;&{splice@Plate::_c,-1,1,sub{'.&_parse."}}$args}:undef)$nl"
                     }
-                    : defined $args ? "do{Plate::content($args)}$nl" : "do{&Plate::content}$nl", $11;
+                    : defined $args ? "do{Plate::content($args)}$nl" : "do{&Plate::content}$nl", $12;
                     $expr2stmt->() if $pre and $nl;
                     next;
                 }
                 $tmpl = defined $args ? "Plate::_r('$tmpl',($args)," : "Plate::_r('$tmpl',";
             } else {
-                $tmpl = "Plate::_r($10,";
+                $tmpl = "Plate::_r($11,";
             }
             $fix_line_num = push @expr,
-            _parse_fltr "do{$tmpl".(defined $9 ? (local $_[3] = $pre ? '&&' : '&', 'sub{'.&_parse.'}') : 'undef').")}$nl", $11;
+            _parse_fltr "do{$tmpl".(defined $10 ? (local $_[3] = $pre ? '&&' : '&', 'sub{'.&_parse.'}') : 'undef').")}$nl", $12;
             $expr2stmt->() if $pre and $nl;
 
         } else {
             # </%...> or </&> or \z
-            my $tag = $12 // $13 // '';
+            my $tag = $13 // $14 // '';
             if ($tag ne $_[3]) {
                 my $line = 1 + join('', $stmt // '', @expr) =~ y/\n//;
                 $line = "$_[2] line $line.\nPlate ".($pre && 'pre').'compilation failed';
@@ -209,7 +209,7 @@ sub _parse {
             }
             : @expr ? join('.', @expr) : "''";
             $pl .= '=~s/\R\z//r' if !$pre and $$Plate::_s{chomp};
-            $pl .= "\n" if defined $12;
+            $pl .= "\n" if defined $13;
             return $pl;
         }
 
@@ -372,7 +372,7 @@ caching compiled templates,
 variable escaping/filtering,
 localised global variables.
 Templates can also include other templates, with optional content
-and even define or override templates locally.
+and even define or override templates & filters locally.
 
 All templates have strict, warnings, utf8 and Perl 5.20 features enabled.
 
@@ -461,12 +461,6 @@ Newline characters can be escaped with a backslash, Eg:
 
 This will result in the output C<abc>, all on one line.
 
-=head3 Content
-
-    <& _ &>
-
-A template can be served with content. This markup will insert the content provided, if any.
-
 =head3 Include other templates
 
     <& header, 'My Title' &>
@@ -485,6 +479,12 @@ A template can include other templates with optional arguments.
 
 An included template can have its own content passed in.
 
+=head3 Content
+
+    <& _ &>
+
+A template can be served with content. This markup will insert the content provided, if any.
+
 =head3 Def blocks
 
     <%def copyright>
@@ -494,7 +494,23 @@ An included template can have its own content passed in.
     <& copyright, 2018 &>
 
 Local templates can be defined in a template.
-They can even override existing templates.
+They will override existing templates until the end of the template or block.
+
+=head3 Filter blocks
+
+    <%filter one_line>
+    <% $_[0] =~ tr/\n/ / |%>
+    </%filter>
+    
+    <%filter bold>
+    <b><& _ &></b>
+    </%filter>
+    
+    <% "Single\nLine\nOnly" |one_line |bold %>
+
+Local filters can also be defined in a template.
+They will override existing filters until the end of the template or block.
+The text to be filtered will be passed in as the only argument and also as content.
 
 =head1 SUBROUTINES/METHODS
 
@@ -591,7 +607,8 @@ The C<umask> used when creating cache files and directories.
 
 A hash of vars to set for use in templates.
 This will define new local variables to be imported into the templating package when compiling and running templates.
-If the value is not a reference it will be a constant in the templating package.
+Values to be imported must be unblessed references.
+If the value is a blessed object or not a reference it will be imported as a constant into the templating package.
 To remove a var pass C<undef> as it's value.
 
 To remove all vars pass C<undef> instead of a HASH ref.
@@ -768,68 +785,70 @@ my %sigil = (
     HASH => '%',
 );
 
+eval "sub _set_$_ { \$_[0]{$_} = \$_[1] }" for qw(auto_filter cache_code chomp keep_undef max_call_depth static umask);
+eval "sub _set_$_ { \$_[0]{$_} = \$_[1] // '' }" for qw(cache_suffix init io_layers once suffix);
+sub _set_cache_path {
+    # A relative cache_path must start with "./" to prevent searching @INC when sourcing the file
+    $_[0]{cache_path} = defined $_[1] ? _path $_[1], 1 : $_[1];
+}
+sub _set_encoding {
+    $_[0]->_set_io_layers(length $_[1] ? $_[1] eq 'utf8' ? ':utf8' : ":encoding($_[1])" : '');
+}
+sub _set_filters {
+    $_[1] // return undef %{$_[0]{filters}};
+    ref $_[1] eq 'HASH'
+        or croak "Invalid filters (not a hash reference)";
+
+    while (my($name, $code) = each %{$_[1]}) {
+        $name =~ /^\w+$/
+            or croak "Invalid filter name '$name'";
+        if (defined $code) {
+            ref $code eq 'CODE'
+                or $code = ($code =~ /(.*)::(.*)/
+                ? $1->can($2)
+                : do {
+                    my($i,$p) = 0;
+                    $i++ while __PACKAGE__ eq ($p = caller $i);
+                    $p->can($code)
+                })
+                or croak "Invalid subroutine '$_[1]{$name}' for filter '$name'";
+            $_[0]{filters}{$name} = $code;
+        } else {
+            delete $_[0]{filters}{$name};
+        }
+    }
+}
+sub _set_path {
+    $_[0]{path} = length $_[1] ? _path $_[1] : $_[1];
+}
+sub _set_package {
+    defined $_[1] and $_[1] =~ /^[A-Z_a-z][0-9A-Z_a-z]*(?:::[0-9A-Z_a-z]+)*$/
+        or croak "Invalid package name '".($_[1]  // '')."'";
+    $_[0]{package} = $_[1];
+}
+sub _set_vars {
+    $_[1] // return undef %{$_[0]{vars}};
+    ref $_[1] eq 'HASH'
+        or croak "Invalid vars (not a hash reference)";
+
+    while (my($name, $ref) = each %{$_[1]}) {
+        if (defined $ref) {
+            my $sigil = $sigil{Scalar::Util::reftype $ref // 'CODE'} // '$';
+            $name =~ s/^\Q$sigil\E?/$sigil ne '&' && $sigil/e;
+            $_[0]{vars}{$name} = $ref;
+        } else {
+            delete $_[0]{vars}{$name};
+        }
+    }
+}
+
 sub set {
     my($self, %opt) = @_;
 
     while (my($k, $v) = each %opt) {
-        if ($k eq 'encoding') {
-            $k = 'io_layers';
-            $v = length $v ? $v eq 'utf8' ? ':utf8' : ":encoding($v)" : '';
-        } elsif ($k eq 'path') {
-            $v = _path $v if length $v;
-        } elsif ($k eq 'cache_path') {
-            # A relative cache_path must start with "./" to prevent searching @INC when sourcing the file
-            $v = _path $v, 1 if defined $v;
-        } elsif ($k =~ /^(?:(?:cache_)?suffix|init|io_layers|once)$/) {
-            $v //= '';
-        } elsif ($k eq 'filters') {
-            if (defined $v) {
-                ref $v eq 'HASH' or croak "Invalid $k (not a hash reference)";
-                while (my($name, $code) = each %$v) {
-                    $name =~ /^\w+$/
-                        or croak "Invalid filter name '$name'";
-                    if (defined $code) {
-                        ref $code eq 'CODE'
-                            or $code = ($code =~ /(.*)::(.*)/
-                            ? $1->can($2)
-                            : do {
-                                my($i,$p) = 0;
-                                $i++ while __PACKAGE__ eq ($p = caller $i);
-                                $p->can($code)
-                            })
-                            or croak "Invalid subroutine '$$v{$name}' for filter '$name'";
-                        $$self{filters}{$name} = $code;
-                    } else {
-                        delete $$self{filters}{$name};
-                    }
-                }
-            } else {
-                undef %{$$self{$k}};
-            }
-            next;
-        } elsif ($k eq 'vars') {
-            if (defined $v) {
-                ref $v eq 'HASH' or croak "Invalid $k (not a hash reference)";
-                while (my($name, $ref) = each %$v) {
-                    if (defined $ref) {
-                        my $sigil = $sigil{Scalar::Util::reftype $ref // 'CODE'} // '$';
-                        $name =~ s/^\Q$sigil\E?/$sigil ne '&' && $sigil/e;
-                        $$self{vars}{$name} = $ref;
-                    } else {
-                        delete $$self{vars}{$name};
-                    }
-                }
-            } else {
-                undef %{$$self{$k}};
-            }
-            next;
-        } elsif ($k eq 'package') {
-            defined $v and $v =~ /^[A-Z_a-z][0-9A-Z_a-z]*(?:::[0-9A-Z_a-z]+)*$/
-                or croak "Invalid package name '".($v // '')."'";
-        } elsif ($k !~ /^(?:auto_filter|cache_code|chomp|keep_undef|max_call_depth|static|umask)$/) {
-            croak "Invalid setting '$k'";
-        }
-        $$self{$k} = $v;
+        my $c = $self->can("_set_$k")
+            or croak "Invalid setting '$k'";
+        $c->($self, $v);
     }
 
     if (defined $$self{path}) {

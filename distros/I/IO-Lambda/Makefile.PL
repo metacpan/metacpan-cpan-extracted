@@ -1,4 +1,6 @@
-# $Id: Makefile.PL,v 1.13 2008/11/20 19:32:26 dk Exp $
+use strict;
+use warnings;
+use 5.012;
 use Getopt::Long  qw(GetOptions);
 use ExtUtils::MakeMaker;
 use IO::Socket::INET;
@@ -14,17 +16,15 @@ unless ( defined $online_tests) {
 		PeerAddr => "www.google.com:80",
 		Timeout  => 10,
 	);
-		
 	if ($s) {
 		close($s);
-		
 		print <<EOT;
-	
+
 You appear to be directly connected to the Internet.  I have some tests
 that try to query live nameservers and google.
-	
+
 EOT
-	
+
 		$online_tests = prompt("Do you want to enable these tests?", "y") =~ /^y/i ? 1 : 0;
 	}
 }
@@ -63,4 +63,5 @@ WriteMakefile(
 			repository => 'https://github.com/dk/IO-Lambda'
 		},
 	},
+	MIN_PERL_VERSION  => 5.012,
 );

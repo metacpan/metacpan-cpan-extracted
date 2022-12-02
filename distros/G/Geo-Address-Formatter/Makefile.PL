@@ -32,9 +32,10 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "Test::Exception" => 0,
     "Test::More" => "0.88",
+    "Test::NoWarnings" => 0,
     "Test::Warn" => 0
   },
-  "VERSION" => "1.99",
+  "VERSION" => "1.991",
   "test" => {
     "TESTS" => "t/blackbox/*.t t/unit/*.t"
   }
@@ -52,6 +53,7 @@ my %FallbackPrereqs = (
   "Scalar::Util" => 0,
   "Test::Exception" => 0,
   "Test::More" => "0.88",
+  "Test::NoWarnings" => 0,
   "Test::Warn" => 0,
   "Text::Hogan" => "2.03",
   "Try::Catch" => 0,

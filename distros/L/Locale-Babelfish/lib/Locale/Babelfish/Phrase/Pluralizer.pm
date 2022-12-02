@@ -8,7 +8,7 @@ use warnings;
 
 use List::Util qw( first );
 
-our $VERSION = '2.005'; # VERSION
+our $VERSION = '2.10'; # VERSION
 
 
 my %rules;
@@ -450,7 +450,7 @@ Locale::Babelfish::Phrase::Pluralizer - Babelfish pluralizer.
 
 =head1 VERSION
 
-version 2.005
+version 2.10
 
 =head1 DESCRIPTION
 
@@ -497,6 +497,10 @@ REG.RU LLC
 =item *
 
 Kirill Sysoev <k.sysoev@me.com>
+
+=item *
+
+Alexandr Tkach <tkach@reg.ru>
 
 =back
 

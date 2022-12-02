@@ -1,5 +1,8 @@
 Revision history for Perl extension RF::Antenna::Planet::MSI::Format.
 
+0.09 2022-12-01
+  - Updated package to die on empty files
+
 0.08 2022-10-20
   - Added new blob method
   - Added _parse_polarization function inside read method to support horizontal and vertical quirks from vendors

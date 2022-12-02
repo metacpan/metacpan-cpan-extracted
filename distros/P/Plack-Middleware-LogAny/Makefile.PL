@@ -1,62 +1,57 @@
+#<<<
+use strict; use warnings;
+#>>>
 
-use strict;
-use warnings;
-
-
-
-use ExtUtils::MakeMaker 6.30;
-
-
+use ExtUtils::MakeMaker::CPANfile qw( WriteMakefile );
 
 my %WriteMakefileArgs = (
-  "ABSTRACT" => "Use Log::Any to handle logging from your Plack app",
-  "AUTHOR" => "Michael Alan Dorman <mdorman\@ironicdesign.com>",
-  "BUILD_REQUIRES" => {
-    "HTTP::Request::Common" => 0,
-    "Log::Any::Test" => 0,
-    "Plack::Test" => 0,
-    "Test::More" => 0,
-    "Try::Tiny" => 0
+  NAME          => 'Plack::Middleware::LogAny',
+  AUTHOR        => 'Sven Willenbuecher <sven.willenbuecher@kuehne-nagel.com>',
+  VERSION_FROM  => 'lib/Plack/Middleware/LogAny.pm',
+  ABSTRACT_FROM => 'lib/Plack/Middleware/LogAny.pod',
+  LICENSE       => 'Perl_5',
+  META_MERGE    => {
+    'meta-spec' => { version => 2 },
+    resources   => {
+      repository => {
+        type => 'git',
+        url  => 'git://github.com/XSven/Plack-Middleware-LogAny.git',
+        web  => 'https://github.com/XSven/Plack-Middleware-LogAny',
+      },
+      bugtracker => {
+        web => 'https://github.com/XSven/Plack-Middleware-LogAny/issues',
+      },
+    },
   },
-  "CONFIGURE_REQUIRES" => {
-    "ExtUtils::MakeMaker" => "6.30"
-  },
-  "DISTNAME" => "Plack-Middleware-LogAny",
-  "EXE_FILES" => [],
-  "LICENSE" => "perl",
-  "NAME" => "Plack::Middleware::LogAny",
-  "PREREQ_PM" => {
-    "Log::Any" => 0,
-    "Plack::Middleware" => 0,
-    "Plack::Util::Accessor" => 0,
-    "parent" => 0,
-    "strict" => 0,
-    "warnings" => 0
-  },
-  "VERSION" => "0.001",
-  "test" => {
-    "TESTS" => "t/*.t"
-  }
+  dist      => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+  clean     => { FILES    => 'Plack-Middleware-LogAny-* cover_db' },
+  realclean => { FILES    => 'local' },
 );
 
+unless ( exists( $ENV{ MAKELEVEL } ) ) {
+  my $local_lib = "$ENV{ PWD }/local/lib/perl5";
+  require lib; lib->import( $local_lib );
 
-unless ( eval { ExtUtils::MakeMaker->VERSION(6.56) } ) {
-  my $br = delete $WriteMakefileArgs{BUILD_REQUIRES};
-  my $pp = $WriteMakefileArgs{PREREQ_PM};
-  for my $mod ( keys %$br ) {
-    if ( exists $pp->{$mod} ) {
-      $pp->{$mod} = $br->{$mod} if $br->{$mod} > $pp->{$mod};
-    }
-    else {
-      $pp->{$mod} = $br->{$mod};
-    }
+  no warnings 'once';
+  *MY::postamble = sub {
+    my $make_fragment .= <<"MAKE_FRAGMENT";
+ifdef PERL5LIB
+  PERL5LIB := $local_lib:\$(PERL5LIB)
+else
+  export PERL5LIB := $local_lib
+endif
+
+.PHONY: installdeps
+installdeps: cpanfile
+	cpanm --no-man-pages --local-lib-contained $local_lib/../.. --installdeps .
+
+.PHONY: cover
+cover:
+	cover -test -ignore local -report vim
+MAKE_FRAGMENT
+
+    return $make_fragment;
   }
 }
 
-delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
-  unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
-
-WriteMakefile(%WriteMakefileArgs);
-
-
-
+WriteMakefile( %WriteMakefileArgs );

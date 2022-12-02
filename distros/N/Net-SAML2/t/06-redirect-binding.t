@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use Test::Lib;
 use Test::Net::SAML2;
+use URI;
 
 use Net::SAML2::IdP;
 use Net::SAML2::Binding::Redirect;
@@ -43,6 +44,11 @@ like(
     qr#\Qhttp://sso.dev.venda.com/opensso/SSORedirect/metaAlias/idp?SAMLRequest=\E#,
     "location checks out"
 );
+
+my $uri = URI->new($location);
+is($uri->host, 'sso.dev.venda.com', "Correct hostname on the location");
+my %query = $uri->query_form;
+cmp_deeply([sort qw(SAMLRequest RelayState SigAlg Signature)], [sort keys %query], "Signed redirect URI");
 
 my ($request, $relaystate) = $redirect->verify($location);
 
@@ -94,5 +100,39 @@ throws_ok(
     qr/Need to have a key specified/,
     "Need a key for SAMLRequest"
 );
+
+{
+    my $binding;
+    lives_ok(
+        sub {
+            $binding = Net::SAML2::Binding::Redirect->new(
+                url      => 'https://foo.example.com',
+                insecure => 1,
+            );
+        },
+        "We don't need a key for an insecure SAMLRequest"
+    );
+
+    my $uri = $binding->get_redirect_uri($authnreq, 'https://foo.bar.example.com') ;
+    $uri = URI->new($uri);
+    my %query = $uri->query_form;
+    cmp_deeply([sort qw(SAMLRequest RelayState)], [sort keys %query], "Unsigned redirect URI");
+
+    my $sp = net_saml2_sp(authnreq_signed => 0);
+    $binding = $sp->sso_redirect_binding($idp, 'SAMLRequest');
+
+    throws_ok(
+        sub {
+            $binding->sign($authnreq, 'https://foo.bar.example.com') ;
+        },
+        qr#Cannot sign an insecure request#,
+        "Unable to sign insecure requests"
+    );
+
+    $uri = $binding->get_redirect_uri($authnreq, 'https://foo.bar.example.com') ;
+    $uri = URI->new($uri);
+    %query = $uri->query_form;
+    cmp_deeply([sort qw(SAMLRequest RelayState)], [sort keys %query], "Unsigned redirect URI via SP");
+}
 
 done_testing;

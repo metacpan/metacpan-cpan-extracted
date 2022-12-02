@@ -90,11 +90,33 @@ BEGIN {
    is_deeply( $paramsref, { key => "val" }, 'ADJUSTPARAMS received HASHref' );
 }
 
-BEGIN {
-   local $TODO = "ADJUSTPARAMS";
+my $ADJUST_LINE;
+class FClass {
+   ADJUST {
+      BEGIN { $ADJUST_LINE = __LINE__+1 }
+      my @d0 = @_;
+      my $d1 = shift;
+      my $d2 = shift @_;
+      my $d3 = $_[0];
+   }
+}
 
-   like( $warnings, qr/^ADJUSTPARAMS is now the same as ADJUST; you should use ADJUST instead at /,
-      'ADJUSTPARAMS provokes warning' );
+BEGIN {
+   my $line0 = $ADJUST_LINE;
+   like( $warnings, qr/^Use of \@_ is deprecated in ADJUST at \S+ line $line0\./m,
+      '@_ in ADJUST prints deprecation warning' );
+
+   my $line1 = $ADJUST_LINE+1;
+   like( $warnings, qr/^Implicit use of \@_ in shift is deprecated in ADJUST at \S+ line $line1\./m,
+      'shift in ADJUST prints deprecation warning' );
+
+   my $line2 = $ADJUST_LINE+2;
+   like( $warnings, qr/^Use of \@_ is deprecated in ADJUST at \S+ line $line2\./m,
+      'shift @_ in ADJUST prints deprecation warning' );
+
+   my $line3 = $ADJUST_LINE+3;
+   like( $warnings, qr/^Use of \@_ is deprecated in ADJUST at \S+ line $line3\./m,
+      '$_[0] in ADJUST prints deprecation warning' );
 
    undef $warnings;
 }

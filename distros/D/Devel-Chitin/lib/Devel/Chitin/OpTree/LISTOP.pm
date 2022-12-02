@@ -1,7 +1,7 @@
 package Devel::Chitin::OpTree::LISTOP;
 use base Devel::Chitin::OpTree::BINOP;
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 use Fcntl qw(:DEFAULT :flock SEEK_SET SEEK_CUR SEEK_END);
 use POSIX qw(:sys_wait_h);
@@ -128,6 +128,13 @@ sub pp_list {
     ($params{skip_parens} ? '' : '(')
         . join($joiner, map { $_->deparse(%params) } @$children[1 .. $#$children]) # skip the first op: pushmark
         . ($params{skip_parens} ? '' :')');
+}
+
+sub pp_emptyavhv {
+    my $self = shift;
+    my $deparsed = ($self->op->private & B::OPpEMPTYAVHV_IS_HV()) ? '{}' : '[]';
+    my $target = $self->_maybe_targmy;
+    "${target}${deparsed}";
 }
 
 sub pp_aslice {

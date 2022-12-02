@@ -30,7 +30,7 @@ DESCRIPTION
     Features include preprocessing templates, caching compiled templates,
     variable escaping/filtering, localised global variables. Templates can
     also include other templates, with optional content and even define or
-    override templates locally.
+    override templates & filters locally.
 
     All templates have strict, warnings, utf8 and Perl 5.20 features
     enabled.
@@ -122,13 +122,6 @@ DESCRIPTION
 
     This will result in the output abc, all on one line.
 
-  Content
-
-        <& _ &>
-
-    A template can be served with content. This markup will insert the
-    content provided, if any.
-
   Include other templates
 
         <& header, 'My Title' &>
@@ -147,6 +140,13 @@ DESCRIPTION
 
     An included template can have its own content passed in.
 
+  Content
+
+        <& _ &>
+
+    A template can be served with content. This markup will insert the
+    content provided, if any.
+
   Def blocks
 
         <%def copyright>
@@ -155,8 +155,24 @@ DESCRIPTION
         
         <& copyright, 2018 &>
 
-    Local templates can be defined in a template. They can even override
-    existing templates.
+    Local templates can be defined in a template. They will override
+    existing templates until the end of the template or block.
+
+  Filter blocks
+
+        <%filter one_line>
+        <% $_[0] =~ tr/\n/ / |%>
+        </%filter>
+        
+        <%filter bold>
+        <b><& _ &></b>
+        </%filter>
+        
+        <% "Single\nLine\nOnly" |one_line |bold %>
+
+    Local filters can also be defined in a template. They will override
+    existing filters until the end of the template or block. The text to be
+    filtered will be passed in as the only argument and also as content.
 
 SUBROUTINES/METHODS
 
@@ -255,9 +271,10 @@ SUBROUTINES/METHODS
 
       A hash of vars to set for use in templates. This will define new
       local variables to be imported into the templating package when
-      compiling and running templates. If the value is not a reference it
-      will be a constant in the templating package. To remove a var pass
-      undef as it's value.
+      compiling and running templates. Values to be imported must be
+      unblessed references. If the value is a blessed object or not a
+      reference it will be imported as a constant into the templating
+      package. To remove a var pass undef as it's value.
 
       To remove all vars pass undef instead of a HASH ref.
 

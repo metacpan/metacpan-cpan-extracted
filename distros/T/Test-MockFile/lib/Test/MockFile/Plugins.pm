@@ -3,7 +3,7 @@ package Test::MockFile::Plugins;
 use strict;
 use warnings;
 
-our $VERSION = '0.034';
+our $VERSION = '0.035';
 
 our @NAMESPACES = (q[Test::MockFile::Plugin]);
 

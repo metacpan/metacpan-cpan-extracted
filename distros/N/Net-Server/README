@@ -807,12 +807,12 @@ DEFAULT ARGUMENTS FOR Net::Server
         server is still running as root. Defaults to undef.
 
     user
-        Userid or username to become after the bind process has occured.
+        Userid or username to become after the bind process has occurred.
         Defaults to "nobody." If you would like the server to run as root,
         you will have to specify "user" equal to "root".
 
     group
-        Groupid or groupname to become after the bind process has occured.
+        Groupid or groupname to become after the bind process has occurred.
         Defaults to "nobody." If you would like the server to run as root,
         you will have to specify "group" equal to "root".
 
@@ -1239,7 +1239,7 @@ HOOKS
 
     "$self->pre_loop_hook()"
         This hook occurs after chroot, change of user, and change of group
-        has occured. It allows for preparation before looping begins.
+        has occurred. It allows for preparation before looping begins.
 
     "$self->can_read_hook()"
         This hook occurs after a socket becomes readible on an
@@ -1365,7 +1365,7 @@ OTHER METHODS
         Called when log_file is set to 'Sys::Syslog' and an error occurs
         while writing to the syslog. It is passed two arguments, the value
         of $@, and an arrayref containing the arguments that were passed to
-        the log method when the error occured.
+        the log method when the error occurred.
 
     "$self->log"
         Parameters are a log_level and a message.

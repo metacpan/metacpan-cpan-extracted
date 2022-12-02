@@ -1,10 +1,8 @@
-.gitignore
 Alias.xs
 Changes
 lib/Data/Alias.pm
 Makefile.PL
 MANIFEST
-META.yml
 README
 t/01_deref.t
 t/03_copy.t
@@ -39,7 +37,9 @@ t/lib/Test/Builder.pm
 t/lib/Test/More.pm
 t/lib/Test/Simple.pm
 t/padrange.t
+t/parens_bug.t
 t/pod_cvg.t
 t/pod_syn.t
 t/threads.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

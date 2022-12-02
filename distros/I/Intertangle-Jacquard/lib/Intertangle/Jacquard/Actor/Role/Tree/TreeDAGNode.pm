@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Intertangle::Jacquard::Actor::Role::Tree::TreeDAGNode;
 # ABSTRACT: Store in Tree::DAG_Node
-$Intertangle::Jacquard::Actor::Role::Tree::TreeDAGNode::VERSION = '0.001';
+$Intertangle::Jacquard::Actor::Role::Tree::TreeDAGNode::VERSION = '0.002';
 use Moo::Role;
 
 use Renard::Incunabula::Common::Types qw(InstanceOf);
@@ -37,7 +37,7 @@ Intertangle::Jacquard::Actor::Role::Tree::TreeDAGNode - Store in Tree::DAG_Node
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 ATTRIBUTES
 

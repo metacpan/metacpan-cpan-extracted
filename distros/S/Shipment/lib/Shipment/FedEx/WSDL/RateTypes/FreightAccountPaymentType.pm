@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateTypes::FreightAccountPaymentType;
-$Shipment::FedEx::WSDL::RateTypes::FreightAccountPaymentType::VERSION = '3.09';
+$Shipment::FedEx::WSDL::RateTypes::FreightAccountPaymentType::VERSION = '3.10';
 use strict;
 use warnings;
 
@@ -25,7 +25,7 @@ Shipment::FedEx::WSDL::RateTypes::FreightAccountPaymentType
 
 =head1 VERSION
 
-version 3.09
+version 3.10
 
 =head1 DESCRIPTION
 

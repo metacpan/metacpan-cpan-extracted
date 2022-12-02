@@ -1,5 +1,5 @@
 use strict;
-use warnings qw(FATAL all);
+use warnings qw( FATAL all NONFATAL void );
 use Test::More tests => 38;
 
 use Data::Alias qw(alias);

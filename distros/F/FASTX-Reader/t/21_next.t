@@ -3,7 +3,7 @@ use warnings;
 use FindBin qw($RealBin);
 use Test::More;
 use FASTX::Reader;
-use FASTX::PE;
+use FASTX::ReaderPaired;
 use Data::Dumper;
 # TEST: Parse a regular file as interleaved (error)
 

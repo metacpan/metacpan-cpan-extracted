@@ -1,15 +1,30 @@
-# http://module-build.sourceforge.net/META-spec.html
-#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
-name:         Geo-Inverse
-version:      0.05
-version_from: lib/Geo/Inverse.pm
-installdirs:  site
+---
+abstract: 'Calculate geographic distance from a latitude and longitude pair'
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.52, CPAN::Meta::Converter version 2.150001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Geo-Inverse
+no_index:
+  directory:
+    - t
+    - inc
 requires:
-    Geo::Constants:                0.04
-    Geo::Ellipsoids:               0.09
-    Geo::Functions:                0.03
-    strict:                        0
-    vars:                          0
-
-distribution_type: module
-generated_by: ExtUtils::MakeMaker version 6.30
+  Geo::Constants: '0.04'
+  Geo::Ellipsoids: '0.09'
+  Geo::Functions: '0.03'
+  Package::New: '0'
+  Test::Simple: '0.44'
+resources:
+  bugtracker: https://github.com/mrdvt92/perl-Geo-Inverse/issues
+  homepage: https://github.com/mrdvt92/perl-Geo-Inverse
+  repository: https://github.com/mrdvt92/perl-Geo-Inverse.git
+version: '0.07'

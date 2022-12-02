@@ -2,7 +2,7 @@ NAME
     Net::SAML2 - SAML2 bindings and protocol implementation
 
 VERSION
-    version 0.61
+    version 0.62
 
 SYNOPSIS
       See TUTORIAL.md for implementation documentation and

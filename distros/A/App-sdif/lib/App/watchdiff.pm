@@ -23,28 +23,28 @@ my $version = $App::sdif::VERSION;
 
 use Getopt::EX::Hashed 'has'; {
 
-    Getopt::EX::Hashed->configure(DEFAULT => [ is => 'ro' ]);
+    Getopt::EX::Hashed->configure(DEFAULT => [ is => 'rw' ]);
 
     has help     => ' h      ' ;
     has version  => ' v      ' ;
     has debug    => ' d      ' ;
-    has unit     => '    =s  ' , default => '';
+    has unit     => '    =s  ' , default => '' ;
     has diff     => '    =s  ' ;
-    has exec     => ' e  =s@ ' , default => [];
-    has refresh  => ' r  :1  ' , default => 1;
-    has interval => ' i  =i  ' , default => 2;
-    has count    => ' c  =i  ' , default => 1000;
-    has clear    => '    !   ' , default => 1;
-    has silent   => ' s  !   ' , default => 0;
-    has mark     => ' M  !   ' , default => 0;
-    has old      => ' O  !   ' , default => 0;
-    has date     => ' D  !   ' , default => 1;
-    has newline  => ' N  !   ' , default => 1;
-    has context  => ' U  =i  ' , default => 100;
-    has colormap => ' cm =s@ ' , default => [];
+    has exec     => ' e  =s@ ' , default => [] ;
+    has refresh  => ' r  :1  ' , default => 1 ;
+    has interval => ' i  =i  ' , default => 2 ;
+    has count    => ' c  =i  ' , default => 1000 ;
+    has clear    => '    !   ' , default => 1 ;
+    has silent   => ' s  !   ' , default => 0 ;
+    has mark     => ' M  !   ' , default => 0 ;
+    has old      => ' O  !   ' , default => 0 ;
+    has date     => ' D  !   ' , default => 1 ;
+    has newline  => ' N  !   ' , default => 1 ;
+    has context  => ' C  =i  ' , default => 100 , alias => 'U';
+    has colormap => ' cm =s@ ' , default => [] ;
     has plain    => ' p      ' ,
 	action   => sub {
-	    $_->{date} = $_->{newline} = 0;
+	    $_->date = $_->newline = 0;
 	};
 
     has '+help' => action => sub {
@@ -212,11 +212,11 @@ Options:
 	--[no]newline       print newline result (default on)
 	--[no]clear         clear screen after output (default on)
 	--diff=command      diff command used to compare result
-	--unit=unit         comparison unit (word/char/mecab)
+	--unit=unit         comparison unit (word/letter/char/mecab)
 
 =head1 VERSION
 
-Version 4.22.3
+Version 4.23.0
 
 =head1 EXAMPLES
 

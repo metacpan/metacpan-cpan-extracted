@@ -4,7 +4,7 @@ package Net::Server::Test;
 use strict;
 use FindBin qw($Bin);
 use lib $Bin;
-use NetServerTest qw(prepare_test ok use_ok diag);
+use NetServerTest qw(prepare_test ok use_ok note);
 my $env = prepare_test({n_tests => 6, start_port => 20100, n_ports => 3}); # runs three of its own tests
 
 use_ok('Net::Server');
@@ -44,13 +44,13 @@ my $ok = eval {
                 background => 0,
                 setsid => 0,
             );
-        } || diag("Trouble running server: $@");
+        } || note("Trouble running server: $@");
         exit;
     }
     alarm(0);
 };
 alarm(0);
-ok($ok, "Got the correct output from the server") || diag("Error: $@");
+ok($ok, "Got the correct output from the server") || note("Error: $@");
 
 
 ### start up a multiport server and connect to it
@@ -91,7 +91,7 @@ $ok = eval {
                 setsid => 0,
             );
         } || do {
-            diag("Trouble running server: $@");
+            note("Trouble running server: $@");
             kill(9, $ppid) && ok(0, "Failed during run of server");
         };
         exit;
@@ -99,4 +99,4 @@ $ok = eval {
     alarm(0);
 };
 alarm(0);
-ok($ok, "Got the correct output from the multiport server") || diag("Error: $@");
+ok($ok, "Got the correct output from the multiport server") || note("Error: $@");

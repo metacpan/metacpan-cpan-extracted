@@ -1,5 +1,4 @@
-use warnings;
-no warnings "void";
+use warnings qw( FATAL all NONFATAL void );
 use strict;
 
 BEGIN {

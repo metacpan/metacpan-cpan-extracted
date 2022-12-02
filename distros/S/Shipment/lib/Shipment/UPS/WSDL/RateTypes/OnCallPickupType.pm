@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::RateTypes::OnCallPickupType;
-$Shipment::UPS::WSDL::RateTypes::OnCallPickupType::VERSION = '3.09';
+$Shipment::UPS::WSDL::RateTypes::OnCallPickupType::VERSION = '3.10';
 use strict;
 use warnings;
 
@@ -62,7 +62,7 @@ Shipment::UPS::WSDL::RateTypes::OnCallPickupType
 
 =head1 VERSION
 
-version 3.09
+version 3.10
 
 =head1 DESCRIPTION
 

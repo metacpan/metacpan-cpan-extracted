@@ -1,5 +1,5 @@
 package Shipment::UPS;
-$Shipment::UPS::VERSION = '3.09';
+$Shipment::UPS::VERSION = '3.10';
 use strict;
 use warnings;
 
@@ -158,9 +158,9 @@ has 'signature_type_map' => (
     default => sub {
         {
             'default'      => undef,
-            'required'     => '1',
+            'required'     => '2',
             'not_required' => undef,
-            'adult'        => '2',
+            'adult'        => '3',
         };
     }
 );
@@ -1583,7 +1583,7 @@ Shipment::UPS
 
 =head1 VERSION
 
-version 3.09
+version 3.10
 
 =head1 SYNOPSIS
 

@@ -5,16 +5,17 @@
       "Igor Mironov <grif@cpan.org>",
       "Victor Efimov <efimov@reg.ru>",
       "REG.RU LLC",
-      "Kirill Sysoev <k.sysoev@me.com>"
+      "Kirill Sysoev <k.sysoev@me.com>",
+      "Alexandr Tkach <tkach@reg.ru>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.011, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Locale-Babelfish",
    "no_index" : {
@@ -101,43 +102,43 @@
    "provides" : {
       "Locale::Babelfish" : {
          "file" : "lib/Locale/Babelfish.pm",
-         "version" : "2.005"
+         "version" : "2.10"
       },
       "Locale::Babelfish::Phrase::Compiler" : {
          "file" : "lib/Locale/Babelfish/Phrase/Compiler.pm",
-         "version" : "2.005"
+         "version" : "2.10"
       },
       "Locale::Babelfish::Phrase::Literal" : {
          "file" : "lib/Locale/Babelfish/Phrase/Literal.pm",
-         "version" : "2.005"
+         "version" : "2.10"
       },
       "Locale::Babelfish::Phrase::Node" : {
          "file" : "lib/Locale/Babelfish/Phrase/Node.pm",
-         "version" : "2.005"
+         "version" : "2.10"
       },
       "Locale::Babelfish::Phrase::Parser" : {
          "file" : "lib/Locale/Babelfish/Phrase/Parser.pm",
-         "version" : "2.005"
+         "version" : "2.10"
       },
       "Locale::Babelfish::Phrase::ParserBase" : {
          "file" : "lib/Locale/Babelfish/Phrase/ParserBase.pm",
-         "version" : "2.005"
+         "version" : "2.10"
       },
       "Locale::Babelfish::Phrase::PluralForms" : {
          "file" : "lib/Locale/Babelfish/Phrase/PluralForms.pm",
-         "version" : "2.005"
+         "version" : "2.10"
       },
       "Locale::Babelfish::Phrase::PluralFormsParser" : {
          "file" : "lib/Locale/Babelfish/Phrase/PluralFormsParser.pm",
-         "version" : "2.005"
+         "version" : "2.10"
       },
       "Locale::Babelfish::Phrase::Pluralizer" : {
          "file" : "lib/Locale/Babelfish/Phrase/Pluralizer.pm",
-         "version" : "2.005"
+         "version" : "2.10"
       },
       "Locale::Babelfish::Phrase::Variable" : {
          "file" : "lib/Locale/Babelfish/Phrase/Variable.pm",
-         "version" : "2.005"
+         "version" : "2.10"
       }
    },
    "release_status" : "stable",
@@ -152,7 +153,9 @@
          "web" : "https://github.com/regru/Locale-Babelfish"
       }
    },
-   "version" : "2.005",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0239"
+   "version" : "2.10",
+   "x_generated_by_perl" : "v5.30.3",
+   "x_serialization_backend" : "JSON::XS version 4.02",
+   "x_spdx_expression" : "MIT"
 }
 

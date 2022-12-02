@@ -7,7 +7,7 @@ use File::Spec::Functions qw(catfile);
 use English qw($UID $GID);
 use FindBin qw($Bin);
 use lib $Bin;
-use NetServerTest qw(prepare_test ok use_ok diag skip);
+use NetServerTest qw(prepare_test ok use_ok note skip);
 my $env = prepare_test({n_tests => 5, start_port => 20800, n_ports => 1}); # runs three of its own tests
 
 if ($^O eq 'MSWin32') {
@@ -37,6 +37,12 @@ sub allow_deny_hook {
     }
 }
 
+sub process_request {
+    my ($self, $client) = @_;
+    print $client "NS_port: ".$client->NS_port."\n";
+    return $self->SUPER::process_request($client);
+}
+
 my $ok = eval {
     local $SIG{'ALRM'} = sub { die "Timeout\n" };
     alarm $env->{'timeout'};
@@ -52,6 +58,8 @@ my $ok = eval {
         my $remote = IO::Socket::UNIX->new(Peer => $socket_file);
         die "No socket returned [$!]" if ! defined $remote;
         my $line = <$remote>;
+        note "# unix port - $line";
+        $line = <$remote>;
         die "Didn't get the type of line we were expecting: ($line)" if $line !~ /Net::Server/;
         print $remote "quite\n";
 
@@ -61,6 +69,8 @@ my $ok = eval {
             PeerPort => $env->{'ports'}->[0],
             Proto    => 'tcp') || die "Couldn't open to sock: $!";
 
+        $line = <$remote>;
+        note "# tcp port - $line";
         $line = <$remote>;
         die "Didn't get the type of line we were expecting: ($line)" if $line !~ /Net::Server/;
         print $remote "exit\n";
@@ -81,7 +91,7 @@ my $ok = eval {
                 setsid => 0,
             );
         } || do {
-            diag("Trouble running server: $@");
+            note("Trouble running server: $@");
             kill(9, $ppid) && ok(0, "Failed during run of server");
         };
         exit;
@@ -89,4 +99,4 @@ my $ok = eval {
     alarm(0);
 };
 alarm(0);
-ok($ok, "Got the correct output from the server") || diag("Error: $@");
+ok($ok, "Got the correct output from the server") || note("Error: $@");

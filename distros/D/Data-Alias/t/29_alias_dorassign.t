@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 use strict;
-use warnings qw(FATAL all);
+use warnings qw( FATAL all NONFATAL void );
 use lib 'lib';
 use Test::More;
 
@@ -15,12 +15,12 @@ BEGIN {
 
 use Data::Alias;
 
-my $U;
-my $E = "";
-my $Z = 0;
+our $U;
+our $E = "";
+our $Z = 0;
 
-my $x;
-my $rx = \$x;
+our $x;
+our $rx = \$x;
 
 is \alias($x //= $U), \$U;
 is \$x, \$U;

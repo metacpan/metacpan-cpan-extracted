@@ -1,11 +1,13 @@
 do { my $x = {
        'configure' => {
                         'requires' => {
-                                        'ExtUtils::MakeMaker' => '0'
+                                        'ExtUtils::MakeMaker' => '6.78'
                                       }
                       },
        'develop' => {
                       'requires' => {
+                                      'Encode' => '0',
+                                      'Test::More' => '0',
                                       'Test::Pod' => '1.41'
                                     }
                     },
@@ -13,7 +15,7 @@ do { my $x = {
                       'requires' => {
                                       'Exporter' => '0',
                                       'if' => '0',
-                                      'perl' => '5.010',
+                                      'perl' => '5.012',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }
@@ -25,6 +27,7 @@ do { my $x = {
                    'requires' => {
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
+                                   'Test::MockRandom' => '0',
                                    'Test::More' => '0.96'
                                  }
                  }

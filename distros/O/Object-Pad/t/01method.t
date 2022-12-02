@@ -12,6 +12,8 @@ class Point {
    BUILD { @$self = @_; }
 
    method where { sprintf "(%d,%d)", @$self }
+
+   method classname { return __CLASS__ }
 }
 
 {
@@ -20,6 +22,8 @@ class Point {
 
    is( $p->where, "(10,20)", '$p->where' );
    is_oneref( $p, '$p has refcount 1 after method' );
+
+   is( $p->classname, "Point", '__CLASS__ inside method' );
 }
 
 # anon methods

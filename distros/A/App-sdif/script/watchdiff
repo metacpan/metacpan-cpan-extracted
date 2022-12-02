@@ -24,52 +24,52 @@ watchdiff - repeat command and watch differences
 
 =head1 SYNOPSIS
 
-watchdiff option -- command
+    watchdiff option -- command
 
-Options:
+  OPTIONS:
 
-	-r, --refresh:1     refresh screen count (default 1)
-	-i, --interval=i    interval time in second (default 2)
-	-c, --count=i       command repeat count (default 1000)
-	-e, --exec=s        set executing commands
-	-s, --silent        do not show same result
-	-p, --plain         shortcut for --nodate --nonewline
-	--[no-]date         show date at the beginning (default on)
-	--[no-]newline      print newline result (default on)
-	--[no-]clear        clear screen after output (default on)
-	--diff=command      diff command used to compare result
-	--unit=unit         comparison unit (word/char/mecab)
+    -r, --refresh:1     refresh screen count (default 1)
+    -i, --interval=i    interval time in second (default 2)
+    -c, --count=i       command repeat count (default 1000)
+    -e, --exec=s        set executing commands
+    -s, --silent        do not show same result
+    -p, --plain         shortcut for --nodate --nonewline
+    --[no-]date         show date at the beginning (default on)
+    --[no-]newline      print newline result (default on)
+    --[no-]clear        clear screen after output (default on)
+    --diff=command      diff command used to compare result
+    --unit=unit         comparison unit (word/char/mecab)
 
-	-M, --mark          show diff mark (default off)
-	-O, --old           show old data (default off)
-	-U, --context=i     diff before/after context (default 100)
+    -M, --mark          show diff mark (default off)
+    -O, --old           show old data (default off)
+    -C, --context=i     diff before/after context (default 100)
 
-	-h, --help          show help
-	-v, --version       show version
+    -h, --help          show help
+    -v, --version       show version
 
 =head1 VERSION
 
-Version 4.22.3
+Version 4.23.0
 
 =head1 EXAMPLES
 
-	watchdiff ifconfig -a
+    watchdiff ifconfig -a
 
-	watchdiff df
+    watchdiff df
 
-	watchdiff --silent df
+    watchdiff --silent df
 
-	watchdiff --refresh 5 --noclear df
+    watchdiff --refresh 5 --noclear df
 
-	watchdiff -sri1 -- netstat -sp icmp
+    watchdiff -sri1 -- netstat -sp icmp
 
-	watchdiff -e uptime -e iostat -e df
+    watchdiff -e uptime -e iostat -e df
 
-	watchdiff -ps --diff 'sdif --no-command -U-1' netstat -S -I en0
+    watchdiff -ps --diff 'sdif --no-command -U-1' netstat -S -I en0
 
-	watchdiff -pc18i10r0 date; say tea is ready
+    watchdiff -pc18i10r0 date; say tea is ready
 
-	watchdiff -sU2 du -h ~/Music
+    watchdiff -sU2 du -h ~/Music
 
 =head1 DESCRIPTION
 
@@ -77,7 +77,7 @@ Use C<^C> to terminate.
 
 Basically B<watchdiff> command expect the command output is small
 enough to fit within a terminal screen size.  If the output is longer
-than the screen height, only the final part is shown.  Use B<-U>
+than the screen height, only the final part is shown.  Use B<-C>
 option if the output is large and you want to see modified part only.
 
 =head1 AUTHOR

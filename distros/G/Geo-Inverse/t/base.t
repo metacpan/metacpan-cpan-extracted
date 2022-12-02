@@ -1,20 +1,6 @@
-#!/usr/bin/perl -w
-# -*- perl -*-
-
-#
-# $Id: base.t,v 0.1 2006/02/21 eserte Exp $
-# Author: Michael R. Davis
-#
-
-=head1 Test Examples
-
-base.t - Good examples concerning how to use this module
-
-=cut
-
+#!/usr/bin/perl
 use strict;
-use lib q{lib};
-use lib q{../lib};
+use warnings;
 use constant NEAR_DEFAULT => 7;
 
 sub near {

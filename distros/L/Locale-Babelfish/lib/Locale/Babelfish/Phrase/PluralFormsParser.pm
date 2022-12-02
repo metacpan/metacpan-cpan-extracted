@@ -10,7 +10,7 @@ use feature 'state';
 use Locale::Babelfish::Phrase::Parser ();
 
 
-our $VERSION = '2.005'; # VERSION
+our $VERSION = '2.10'; # VERSION
 
 use parent qw( Class::Accessor::Fast );
 
@@ -78,7 +78,7 @@ Locale::Babelfish::Phrase::PluralFormsParser - Babelfish plurals syntax parser.
 
 =head1 VERSION
 
-version 2.005
+version 2.10
 
 =head1 DESCRIPTION
 
@@ -129,6 +129,10 @@ REG.RU LLC
 =item *
 
 Kirill Sysoev <k.sysoev@me.com>
+
+=item *
+
+Alexandr Tkach <tkach@reg.ru>
 
 =back
 

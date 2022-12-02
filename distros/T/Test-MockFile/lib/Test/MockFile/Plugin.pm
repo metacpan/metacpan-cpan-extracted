@@ -6,7 +6,7 @@ use warnings;
 use Carp qw(croak);
 require Test::MockFile;    # load Test::MockFile without setting the strict mode
 
-our $VERSION = '0.034';
+our $VERSION = '0.035';
 
 sub new {
     my ( $class, %opts ) = @_;

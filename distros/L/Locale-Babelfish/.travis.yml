@@ -2,11 +2,13 @@ language: perl
 
 notifications:
     recipients:
-        - mironov.igor@reg.ru
         - a.gerasimov@reg.ru
-        - akzhan.abdulin@reg.ru
+        - tkach@reg.ru
+        - ustinova@reg.ru
+        - efimov@reg.ru
 
 perl:
+    - "5.28"
     - "5.20"
     - "5.18"
     - "5.16"

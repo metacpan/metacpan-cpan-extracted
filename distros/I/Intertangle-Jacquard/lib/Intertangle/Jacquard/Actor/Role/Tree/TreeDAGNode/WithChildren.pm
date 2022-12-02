@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Intertangle::Jacquard::Actor::Role::Tree::TreeDAGNode::WithChildren;
 # ABSTRACT: A role for actors with child actors
-$Intertangle::Jacquard::Actor::Role::Tree::TreeDAGNode::WithChildren::VERSION = '0.001';
+$Intertangle::Jacquard::Actor::Role::Tree::TreeDAGNode::WithChildren::VERSION = '0.002';
 use Moo::Role;
 use Intertangle::Jacquard::Types qw(Actor);
 
@@ -49,7 +49,7 @@ Intertangle::Jacquard::Actor::Role::Tree::TreeDAGNode::WithChildren - A role for
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 CONSUMES
 

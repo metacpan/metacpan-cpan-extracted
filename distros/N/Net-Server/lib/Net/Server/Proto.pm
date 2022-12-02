@@ -2,7 +2,7 @@
 #
 #  Net::Server::Proto - Net::Server Protocol compatibility layer
 #
-#  Copyright (C) 2001-2017
+#  Copyright (C) 2001-2022
 #
 #    Paul Seamons <paul@seamons.com>
 #
@@ -22,6 +22,7 @@ use warnings;
 use Socket ();
 
 my $requires_ipv6 = 0;
+my $ipv6_package;
 
 sub parse_info {
     my ($class, $port, $host, $proto, $ipv, $server) = @_;
@@ -79,7 +80,7 @@ sub parse_info {
         foreach my $row (@rows) {
             my ($host, $port, $ipv, $warn) = @$row;
             push @_info, {host => $host, port => $port, ipv => $ipv, proto => $info->{'proto'}, $warn ? (warn => $warn) : ()};
-            $requires_ipv6++ if $ipv ne '4' && $proto ne 'ssl'; # we need to know if Proto::TCP needs to reparent as a child of IO::Socket::INET6
+            $requires_ipv6++ if $ipv ne '4' && $proto ne 'ssl'; # we need to know if Proto::TCP needs to reparent as a child of an IPv6 compatible socket library
         }
         if (@rows > 1 && $rows[0]->[1] == 0) {
             $server->log(2, "Determining auto-assigned port (0) for host $info->{'host'} (prebind)");
@@ -115,7 +116,7 @@ sub get_addr_info {
     if ($host =~ /^\d+(?:\.\d+){3}$/) {
         my $addr = Socket::inet_aton($host) or die "Unresolveable host [$host]:$port: invalid ip\n";
         push @info, [Socket::inet_ntoa($addr), $port, 4]
-    } elsif (!$ENV{'NO_IPV6'} && eval { require Socket6; require IO::Socket::INET6 }) {
+    } elsif (!$ENV{'NO_IPV6'} && eval { require Socket6 } && (eval { require IO::Socket::IP } || eval { require IO::Socket::INET6 })) {
         my $proto_id = getprotobyname(lc($proto) eq 'udp' ? 'udp' : 'tcp');
         my $socktype = lc($proto) eq 'udp' ? Socket::SOCK_DGRAM() : Socket::SOCK_STREAM();
         my @res = Socket6::getaddrinfo($host eq '*' ? '' : $host, $port, Socket::AF_UNSPEC(), $socktype, $proto_id, Socket6::AI_PASSIVE());
@@ -195,17 +196,34 @@ sub object {
     return $proto_class->object($info, $server);
 }
 
-sub requires_ipv6 {
-    my ($class, $server) = @_;
-    return if ! $requires_ipv6;
+sub requires_ipv6 { $requires_ipv6 ? 1 : undef }
 
-    if (! $INC{'IO/Socket/INET6.pm'}) {
-        eval {
-            require Socket6;
-            require IO::Socket::INET6;
-        } or $server->fatal("Port configuration using IPv6 could not be started becauses of Socket6 library issues: $@");
+sub ipv6_package {
+    my ($class, $server) = @_;
+    return $ipv6_package if $ipv6_package;
+
+    eval { require Socket6 }
+        or $server->fatal("Port configuration using IPv6 could not be started becauses of Socket6 library issues: $@");
+
+    my $pkg = $server->{'server'}->{'ipv6_package'};
+    if ($pkg) {
+        (my $file = "$pkg.pm") =~ s|::|/|g;
+        eval { require $file } or $server->fatal("Could not load ipv6_package $pkg: $@");
+    } elsif ($INC{'IO/Socket/IP.pm'}) { # already loaded
+        $pkg = 'IO::Socket::IP';
+    } elsif ($INC{'IO/Socket/INET6.pm'}) {
+        $pkg = 'IO::Socket::INET6';
+    } elsif (eval { require IO::Socket::IP }) {
+        $pkg = 'IO::Socket::IP';
+    } else {
+        my $err = $@;
+        if (eval { require IO::Socket::INET6 }) {
+            $pkg = 'IO::Socket::INET6';
+        } else {
+            $server->fatal("Port ocnfiguration using IPv6 could not be started.  Could not find or load IO::Socket::IP or IO::Socket::INET6:\n  $err  $@")
+        }
     }
-    return 1;
+    return $ipv6_package = $pkg;
 }
 
 1;
@@ -224,6 +242,11 @@ Net::Server::Proto - Net::Server Protocol compatibility layer
           bound.  You can force IPv4 only by adding an ipv => 4
           configuration in any of the half dozen ways we let you
           specify it.
+
+    NOTE: For IPv6 Net::Server will first try and use the module
+          listed in server config ipv6_package, then
+          $Net::Server::ipv6_package, then IO::Socket::IP, then
+          IO::Socket::INET6 (which is deprecated).
 
     # Net::Server::Proto and its accompanying modules are not
     # intended to be used outside the scope of Net::Server.
@@ -411,7 +434,7 @@ a bare hostname, or a hostname with IPv* specifications.
 
 In addition to being able to specify IPV as a separate parameter, ipv may
 also be passed as a part of the host, as part of the port, as part of the protocol
-or may be specified via $ENV{'IPV'}.  The order of precidence is as follows:
+or may be specified via $ENV{'IPV'}.  The order of precedence is as follows:
 
      1) Explicit IPv4 or IPv6 address - wins
      2) ipv specified in port

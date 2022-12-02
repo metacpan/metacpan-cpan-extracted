@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Intertangle::Jacquard::Role::Render::QnD::Bounds::Direct;
 # ABSTRACT: Quick-and-dirty role for computing bounds directly using position and size
-$Intertangle::Jacquard::Role::Render::QnD::Bounds::Direct::VERSION = '0.001';
+$Intertangle::Jacquard::Role::Render::QnD::Bounds::Direct::VERSION = '0.002';
 use Mu::Role;
 
 requires 'origin_point';
@@ -28,7 +28,7 @@ Intertangle::Jacquard::Role::Render::QnD::Bounds::Direct - Quick-and-dirty role 
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 AUTHOR
 

@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Intertangle::Jacquard::Layout::Box;
 # ABSTRACT: Box layout
-$Intertangle::Jacquard::Layout::Box::VERSION = '0.001';
+$Intertangle::Jacquard::Layout::Box::VERSION = '0.002';
 use Mu;
 use Intertangle::Punchcard::Backend::Kiwisolver::Context;
 use Intertangle::Punchcard::Attributes;
@@ -62,8 +62,8 @@ method update($actor) {
 			$solver->add_constraint($constraint);
 		}
 
-		$solver->add_edit_variable($self->outer_x, Intertangle::API::Kiwisolver::Strength::STRONG );
-		$solver->add_edit_variable($self->outer_y, Intertangle::API::Kiwisolver::Strength::STRONG );
+		$solver->add_edit_variable($self->outer_x, Graphics::Layout::Kiwisolver::Strength::STRONG );
+		$solver->add_edit_variable($self->outer_y, Graphics::Layout::Kiwisolver::Strength::STRONG );
 	}
 
 	$solver->suggest_value( $self->outer_x, 0);
@@ -85,7 +85,7 @@ Intertangle::Jacquard::Layout::Box - Box layout
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 EXTENDS
 

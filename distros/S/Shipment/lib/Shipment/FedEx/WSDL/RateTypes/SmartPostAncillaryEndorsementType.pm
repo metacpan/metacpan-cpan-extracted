@@ -1,5 +1,5 @@
 package Shipment::FedEx::WSDL::RateTypes::SmartPostAncillaryEndorsementType;
-$Shipment::FedEx::WSDL::RateTypes::SmartPostAncillaryEndorsementType::VERSION = '3.09';
+$Shipment::FedEx::WSDL::RateTypes::SmartPostAncillaryEndorsementType::VERSION = '3.10';
 use strict;
 use warnings;
 
@@ -25,7 +25,7 @@ Shipment::FedEx::WSDL::RateTypes::SmartPostAncillaryEndorsementType
 
 =head1 VERSION
 
-version 3.09
+version 3.10
 
 =head1 DESCRIPTION
 

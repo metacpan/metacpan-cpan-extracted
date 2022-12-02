@@ -1,5 +1,5 @@
 package Shipment::CanadaPost;
-$Shipment::CanadaPost::VERSION = '3.09';
+$Shipment::CanadaPost::VERSION = '3.10';
 use strict;
 use warnings;
 
@@ -706,7 +706,7 @@ Shipment::CanadaPost
 
 =head1 VERSION
 
-version 3.09
+version 3.10
 
 =head1 SYNOPSIS
 

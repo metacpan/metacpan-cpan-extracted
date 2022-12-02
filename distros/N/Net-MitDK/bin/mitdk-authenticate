@@ -1,6 +1,18 @@
 #!perl
 use strict;
 use warnings;
+
+package Step2;
+use base 'IO::Lambda::HTTP::Client';
+
+sub redirect
+{
+	my $uri = shift->SUPER::redirect(@_);
+	$uri->path('/login.aspx/noeglekort') if $uri->path eq '/login.aspx/mitid';
+	return $uri;
+}
+
+package main;
 # BEGIN { $ENV{IO_LAMBDA_DEBUG} = 'http=2' }
 use IO::Socket::INET;
 use IO::Lambda qw(:all);
@@ -18,6 +30,7 @@ use Digest::SHA qw(sha256);
 use JSON::XS qw(decode_json);
 use Net::MitDK;
 
+
 $|++;
 
 my $win32_install = (( $ARGV[0] // '' ) eq '--win32-install');
@@ -26,7 +39,19 @@ my ($server, $error, $e);
 my ($state, $code_challenge, $code_verifier, $nonce);
 my $ua = IO::Lambda::HTTP::UserAgent->new;
 my $mgr = Net::MitDK::ProfileManager->new;
-my $profile = [$mgr->list]->[0] // 'default';
+my $profile = [$mgr->list]->[0];
+
+unless ( defined $profile ) {
+	print "Creating default profile...";
+	$profile = 'default';
+	my ( $ok, $error ) = $mgr->create($profile);
+	if ( $ok ) {
+		print "ok\n";
+	} else {
+		print "error: $!\n";
+		exit 1;
+	}
+}
 
 sub socket_check
 {
@@ -73,7 +98,7 @@ sub handle_saml
 	my $saml = "$1=" . uri_escape($2);
 
 	$resp = $ua->request( HTTP::Request::Common::POST(
-		'https://gateway.digitalpost.dk/auth/s9/nemlogin/ssoack',
+		'https://gateway.digitalpost.dk/auth/s9/mit-dk-nemlogin/ssoack',
 		Content => $saml
 	))->wait;
 	return error("NemID ticket is received but cannot login. Did you regsiter at <a href='https://mit.dk'>Digital Post</a>?")
@@ -204,26 +229,48 @@ the requestor is "Mit-DK login".
 INIT
 	},
 
+	'/myproxy' => sub {
+		my ($req, $host, $uri) = @_;
+		$req->uri("https://$host/$uri");
+		$req->header( Host   => $host );
+		$req->header( Origin => $host);
+		return $ua->request($req);
+	},
+
 	'/step2' => sub {
 		init_oauth();
 		$ua->cookie_jar->clear;
-		$ua->request( HTTP::Request->new(
-			GET => 'https://gateway.mit.dk/view/client/authorization/login?'.
-				'client_id=view-client-id-mobile-prod-1-id&'.
-				'response_type=code&'.
-				'scope=openid&'.
-				"state=$state&".
-				"code_challenge=$code_challenge&".
-				'code_challenge_method=S256&'.
-				'response_mode=query&'.
-				"nonce=$nonce&".
-				'redirect_uri=com.netcompany.mitdk://nem-callback&'.
-				'deviceName=mitdk-authenticator-perl&'.
-				'deviceId=pc&'.
-				'lang=en_US'
-			),
-			max_redirect => 20,
-		);
+		return lambda {
+			context $ua->request( HTTP::Request->new(
+				GET => 'https://gateway.mit.dk/view/client/authorization/login?'.
+					'client_id=view-client-id-mobile-prod-1-id&'.
+					'response_type=code&'.
+					'scope=openid&'.
+					"state=$state&".
+					"code_challenge=$code_challenge&".
+					'code_challenge_method=S256&'.
+					'response_mode=query&'.
+					"nonce=$nonce&".
+					'redirect_uri=com.netcompany.mitdk://nem-callback&'.
+					'deviceName=mitdk-authenticator-perl&'.
+					'deviceId=pc&'.
+					'lang=en_US'
+				),
+				max_redirect => 20,
+				class        => 'Step2',
+			);
+			tail {
+				my $resp = shift;
+				if ( ref $resp ) {
+					$resp->header( 'Access-Control-Allow-Origin'  => '*');
+					$resp->header( 'Cross-Origin-Resource-Policy' => 'cross-origin');
+					my $c = $resp->content;
+					$c =~ s[https://(www.mitid.dk)][/myproxy/$1]g;
+					$resp->content($c);
+				}
+				return $resp;
+			};
+		};
 	},
 
 	# case with private only
@@ -277,6 +324,8 @@ $routes{'/'} = $win32_install ? $routes{'/win32_install'} : $routes{'/auth'};
 	my $req = shift;
 	if ( my $cb = $routes{$req->uri}) {
 		return $cb->($req);
+	} elsif ($req->uri =~ m[^(/myproxy)/([^\/]+)/(.*)]) {
+		return $routes{$1}->($req, $2, $3);
 	} else {
 		$req->uri("https://nemlog-in.mitid.dk" . $req->uri->path);
 		$req->header( Host    => 'nemlog-in.mitid.dk');
@@ -290,7 +339,6 @@ $routes{'/'} = $win32_install ? $routes{'/win32_install'} : $routes{'/auth'};
 		}
 		$req->headers->remove_header('Cookie');
 		$req->header( 'Accept-Encoding' => 'identity');
-
 		return $ua->request($req);
 	}
 } "localhost:$port", timeout => 10;

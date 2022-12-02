@@ -9,9 +9,9 @@ use Function::Fallback::CoreOrPP qw(clone);
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-29'; # DATE
+our $DATE = '2022-11-30'; # DATE
 our $DIST = 'Bencher'; # DIST
-our $VERSION = '1.062.1'; # VERSION
+our $VERSION = '1.062.2'; # VERSION
 
 our %SPEC;
 
@@ -56,7 +56,7 @@ bencher-fmt - Format bencher result
 
 =head1 VERSION
 
-This document describes version 1.062.1 of bencher-fmt (from Perl distribution Bencher), released on 2022-11-29.
+This document describes version 1.062.2 of bencher-fmt (from Perl distribution Bencher), released on 2022-11-30.
 
 =head1 SYNOPSIS
 

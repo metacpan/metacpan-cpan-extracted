@@ -8,6 +8,7 @@ require Exporter;
 our @ISA    = qw(Exporter);
 our @EXPORT = qw(
     get_xpath
+    test_xml_attribute_exists
     test_xml_attribute_ok
     test_xml_value_ok
     get_single_node_ok
@@ -218,6 +219,14 @@ sub get_single_node_ok {
     my $nodes = $xpc->findnodes($xpath);
     is($nodes->size, 1, "Got 1 node for $xpath");
     return $nodes->get_node(1);
+}
+
+sub test_xml_attribute_exists {
+    my ($xpath, $search, $value) = @_;
+    my $exists = $xpath->exists($search);
+    my $msg = "$search node exists? " . ( $exists ? "true" : "false");
+    is($exists, $value, $msg);
+    return $exists;
 }
 
 sub test_xml_attribute_ok {

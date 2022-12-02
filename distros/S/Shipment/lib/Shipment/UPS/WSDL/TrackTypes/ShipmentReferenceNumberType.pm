@@ -1,5 +1,5 @@
 package Shipment::UPS::WSDL::TrackTypes::ShipmentReferenceNumberType;
-$Shipment::UPS::WSDL::TrackTypes::ShipmentReferenceNumberType::VERSION = '3.09';
+$Shipment::UPS::WSDL::TrackTypes::ShipmentReferenceNumberType::VERSION = '3.10';
 use strict;
 use warnings;
 
@@ -72,7 +72,7 @@ Shipment::UPS::WSDL::TrackTypes::ShipmentReferenceNumberType
 
 =head1 VERSION
 
-version 3.09
+version 3.10
 
 =head1 DESCRIPTION
 

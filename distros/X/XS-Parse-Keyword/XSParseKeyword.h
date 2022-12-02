@@ -107,6 +107,10 @@ enum {
 #define XPK_LISTEXPR              XPK_LISTEXPR_flags(0)
 #define XPK_LISTEXPR_LISTCTX      XPK_LISTEXPR_flags(XPK_TYPEFLAG_G_LIST)
 
+#define XPK_PREFIXED_TERMEXPR_flags(flags,...) \
+  {.type = XS_PARSE_KEYWORD_TERMEXPR|(flags), .u.pieces = (const struct XSParseKeywordPieceType []){ __VA_ARGS__, {0} }}
+#define XPK_PREFIXED_TERMEXPR_ENTERLEAVE(...) XPK_PREFIXED_TERMEXPR_flags(XPK_TYPEFLAG_ENTERLEAVE, __VA_ARGS__)
+
 #define XPK_IDENT           {.type = XS_PARSE_KEYWORD_IDENT                       }
 #define XPK_IDENT_OPT       {.type = XS_PARSE_KEYWORD_IDENT      |XPK_TYPEFLAG_OPT}
 #define XPK_PACKAGENAME     {.type = XS_PARSE_KEYWORD_PACKAGENAME                 }

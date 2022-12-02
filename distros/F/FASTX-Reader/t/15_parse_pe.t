@@ -3,9 +3,9 @@ use warnings;
 use FindBin qw($RealBin);
 use Test::More;
 use FASTX::Reader;
-use FASTX::PE;
+use FASTX::ReaderPaired;
 
-# TEST: Test FASTX::PE working providing explicitly two files (gzipped)
+# TEST: Test FASTX::ReaderPaired working providing explicitly two files (gzipped)
 
 my $seqfile1 = "$RealBin/../data/illumina_1.fq.gz";
 my $seqfile2 = "$RealBin/../data/illumina_2.fq.gz";
@@ -19,11 +19,11 @@ if (! -e $seqfile2) {
   exit 0;
 }
 
-my $data = FASTX::PE->new({ 
+my $data = FASTX::ReaderPaired->new({ 
     filename => "$seqfile1",
     rev      => "$seqfile2",
 });
-isa_ok($data, 'FASTX::PE');
+isa_ok($data, 'FASTX::ReaderPaired');
 my $pe = $data->getReads();
 
 ok(defined $pe->{seq1},  "[PE] sequence1 is defined");

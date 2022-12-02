@@ -1,7 +1,7 @@
 use Renard::Incunabula::Common::Setup;
 package Intertangle::Jacquard::Role::Render::QnD::SVG;
 # ABSTRACT: Quick-and-dirty SVG rendering
-$Intertangle::Jacquard::Role::Render::QnD::SVG::VERSION = '0.001';
+$Intertangle::Jacquard::Role::Render::QnD::SVG::VERSION = '0.002';
 use Mu::Role;
 
 
@@ -24,7 +24,7 @@ Intertangle::Jacquard::Role::Render::QnD::SVG - Quick-and-dirty SVG rendering
 
 =head1 VERSION
 
-version 0.001
+version 0.002
 
 =head1 METHODS
 

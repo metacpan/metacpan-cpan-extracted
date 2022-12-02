@@ -2,7 +2,7 @@
 #
 #  Net::Server::MultiType - Net::Server personality
 #
-#  Copyright (C) 2001-2017
+#  Copyright (C) 2001-2022
 #
 #    Paul Seamons <paul@seamons.com>
 #
@@ -67,7 +67,7 @@ sub run {
             @{"${pkg}::ISA"} = ($_pkg);
         }
 
-        # cludgy - doesn't allow multiple Net::Server::MultiType servers within same process
+        # kludgy - doesn't allow multiple Net::Server::MultiType servers within same process
         # but it is probably better than modifying our child's class for it
         @Net::Server::MultiType::ISA = ($pkg);
         last;

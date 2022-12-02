@@ -1,7 +1,7 @@
 package Net::SAML2::Binding::SOAP;
 use Moose;
 
-our $VERSION = '0.61'; # VERSION
+our $VERSION = '0.62'; # VERSION
 
 use MooseX::Types::URI qw/ Uri /;
 use Net::SAML2::XML::Util qw/ no_comments /;
@@ -181,7 +181,7 @@ Net::SAML2::Binding::SOAP - Net::SAML2::Binding::SOAP - SOAP binding for SAML
 
 =head1 VERSION
 
-version 0.61
+version 0.62
 
 =head1 SYNOPSIS
 
