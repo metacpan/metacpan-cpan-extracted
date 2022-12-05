@@ -17,6 +17,7 @@ t/00-compile.t
 t/00-report-prereqs.dd
 t/00-report-prereqs.t
 t/decode.t
+t/set_get.t
 typemap
 xt/author/distmeta.t
 xt/author/eol.t

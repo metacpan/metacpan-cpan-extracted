@@ -41,7 +41,7 @@ my %regexes = (
 
 lock_hash(%OPTIONS_MAP);
 
-our $VERSION = '0.015'; # VERSION
+our $VERSION = '0.016'; # VERSION
 
 =head1 NAME
 

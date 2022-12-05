@@ -32,6 +32,7 @@
       },
       "runtime" : {
          "requires" : {
+            "Class::Accessor" : "0.51",
             "Config::Properties" : "1.8",
             "DateTime::Tiny" : "1.07",
             "File::Path" : "2.18",
@@ -50,6 +51,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.08",
-   "x_serialization_backend" : "JSON::PP version 4.08"
+   "version" : "0.09",
+   "x_serialization_backend" : "JSON::PP version 4.12"
 }

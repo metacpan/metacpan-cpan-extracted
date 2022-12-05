@@ -1,0 +1,99 @@
+NAME
+
+    String::Tagged::Markdown - parse and emit text with Markdown inline
+    formatting
+
+SYNOPSIS
+
+       use String::Tagged::Markdown;
+    
+       my $st = String::Tagged::Markdown->parse_markdown( $markdown );
+    
+       # Conforms to the String::Tagged::Formatting API
+       String::Tagged::Terminal->new_from_formatting(
+          $st->as_formatting
+       )->say_to_terminal;
+
+DESCRIPTION
+
+    This subclass of String::Tagged handles text that contains inline
+    markers to give formatting hints, in the style used by Markdown. For
+    example, text wrapped in double-asterisks indicates it should be bold
+    (as **bold**), or single-asterisks to indicate italics (as *italics*).
+
+    This module does not provide a full Markdown parser, but it does handle
+    enough of the simple inline markers that it could be used to handle
+    Markdown-style formatting hints of small paragraphs of text.
+
+TAGS
+
+    This module provides the following tags.
+
+ bold, italic, strike, fixed
+
+    Boolean values indicating bold, italics, strike-through or fixed-width.
+
+ link
+
+    String value indicating a link. The value itself is the link target.
+
+CONSTRUCTORS
+
+ parse_markdown
+
+       $st = String::Tagged::InlineFormatted->parse_markdown( $str )
+
+    Parses a text string containing Markdown-like formatting as described
+    above.
+
+    Recognises the following kinds of inline text markers:
+
+       **bold**
+    
+       *italic*
+    
+       ~~strike~~
+    
+       `fixed`
+    
+       [link](target)
+    
+       backslashes escape any special characters as \*
+
+    In addition, within `fixed` width spans, the other formatting markers
+    are not recognised and are interpreted literally.
+
+ new_from_formatting
+
+       $st = String::Tagged::Markdown->new_from_formatting( $fmt )
+
+    Returns a new instance by convertig String::Tagged::Formatting standard
+    tags.
+
+    The bold, italic and strike tags are preserved. monospace is renamed to
+    fixed.
+
+METHODS
+
+ build_markdown
+
+       $str = $st->build_markdown
+
+    Returns a plain text string containing Markdown-like inline formatting
+    markers to format the tags in the given instance. Uses the notation
+    given in the "parse_markdown" method above.
+
+ as_formatting
+
+       $fmt = $st->as_formatting
+
+    Returns a new String::Tagged instance tagged with
+    String::Tagged::Formatting standard tags.
+
+    The bold, italic and strike tags are preserved, fixed is renamed to
+    monospace. The link tag is currently not represented at all.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

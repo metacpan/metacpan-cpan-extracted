@@ -7,10 +7,12 @@ use v5.26;
 
 use Object::Pad;
 
-package App::sdview::Output::Markdown 0.08;
+package App::sdview::Output::Markdown 0.09;
 class App::sdview::Output::Markdown
-   does App::sdview::Output
+   :does(App::sdview::Output)
    :strict(params);
+
+use String::Tagged::Markdown 0.02;
 
 use constant format => "Markdown";
 
@@ -92,35 +94,16 @@ method output_table ( $para )
 
 method _convert_str ( $s )
 {
-   my $ret = "";
-
-   my %active;
-
-   $s->iter_substr_nooverlap(
-      sub ( $substr, %tags ) {
-         my $md = $substr =~ s/([*`\\])/\\$1/gr;
-
-         # No need to escape _ if it's ``-wrapped
-         if( $tags{C} ) {
-            $md = "`$md`";
-         }
-         else {
-            $md =~ s/_/\\_/g;
-         }
-
-         $md = "**$md**" if $tags{B};
-         $md = "*$md*"   if $tags{I};
-
-         # There isn't a "filename" format in Markdown, we'll just use italics
-         $md = "_${md}_" if $tags{F};
-
-         $md = "[$md]($tags{L}{target})" if $tags{L};
-
-         $ret .= $md;
+   return String::Tagged::Markdown->clone( $s,
+      only_tags => [qw( C B I F L )],
+      convert_tags => {
+         C => "fixed",
+         B => "bold",
+         I => "italic",
+         F => "italic", # There isn't a "filename" format in Markdown
+         L => sub ($t, $v) { return link => $v->{target} },
       }
-   );
-
-   return $ret;
+   )->build_markdown;
 }
 
 0x55AA;

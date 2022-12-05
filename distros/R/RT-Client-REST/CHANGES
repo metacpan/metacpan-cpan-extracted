@@ -1,5 +1,8 @@
 ﻿Revision history for Perl module RT::Client::REST
 
+0.71 Mon Dec 5 2022 "Dean Hamstead" <dean@fragfest.com.au>
+  - Fixed GH#27 Missing fields
+
 0.70 Sun Sep 25 2022 "Dean Hamstead" <dean@fragfest.com.au>
   - GH#26 Swap from Error's try to Try::Tiny
   - GH#26 Remove Error entirely

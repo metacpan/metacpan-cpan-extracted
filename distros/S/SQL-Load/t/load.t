@@ -20,7 +20,8 @@ can_ok(
     'next',
     'first',
     'last',
-    'replace'
+    'replace',
+    'reset'
 );
 
 use_ok('SQL::Load::Util');

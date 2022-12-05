@@ -1,5 +1,12 @@
 Revision history for Device-Serial-SLuRM
 
+0.04    2022-12-05
+        [CHANGES]
+         * Additionally report a request_duration metric
+         * Updated for Object::Pad v0.73:
+            + Use `//=` operator in ADJUST :params block
+            + Use `field NAME = EXPR` syntax
+
 0.03    2022-10-29
         [CHANGES]
          * Fixes and improvements to metrics

@@ -85,6 +85,22 @@ If you're using older Linux distribution versions, you might need to compile
 it yourself, as described
 [here](https://github.com/nodesource/distributions/issues/1392).
 
+### Using a virtual machine to compile Jenkins
+
+Giving the **bad** management of versions and packages for NodeJS, I decided
+that using a virtual machine to build Jenkins was easier than fixing the mess
+that NodeJS environment is.
+
+You can find in the root of this repository a `Vagrantfile` that can be used
+with [Vagrant](https://www.vagrantup.com/).
+
+In order to use it, it is required to have both Vagrant and Virtualbox
+installed.
+
+Once that is done, it is just a matter to enter with `vagrant up` in a shell
+and once the VM is ready, enter with `vagrant ssh`, `git clone` the Jenkins
+repository and start compiling.
+
 ## Tips
 
 ### Working in a shell

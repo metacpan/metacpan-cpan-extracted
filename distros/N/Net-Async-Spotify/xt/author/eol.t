@@ -213,6 +213,8 @@ my @files = (
     'lib/Net/Async/Spotify/Object/Image.pod',
     'lib/Net/Async/Spotify/Object/LinkedTrack.pm',
     'lib/Net/Async/Spotify/Object/LinkedTrack.pod',
+    'lib/Net/Async/Spotify/Object/MultiAudioFeatures.pm',
+    'lib/Net/Async/Spotify/Object/MultiAudioFeatures.pod',
     'lib/Net/Async/Spotify/Object/Paging.pm',
     'lib/Net/Async/Spotify/Object/Paging.pod',
     'lib/Net/Async/Spotify/Object/PlayHistory.pm',

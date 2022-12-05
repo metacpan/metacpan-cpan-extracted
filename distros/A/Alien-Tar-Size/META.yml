@@ -31,9 +31,9 @@ resources:
   bugtracker: https://github.com/G4Vi/MHFS/issues
   homepage: https://github.com/G4Vi/MHFS
   repository: https://github.com/G4Vi/MHFS.git
-version: v0.2.1
+version: v0.2.2
 x_alienfile:
-  generated_by: 'Alien::Build::MM version 2.72'
+  generated_by: 'Alien::Build::MM version 2.74'
   requires:
     share:
       Alien::Build::Plugin::Gather::IsolateDynamic: '0.48'

@@ -1,6 +1,7 @@
 =encoding utf8
 
 =for comment POD_DERIVED_INDEX_GENERATED
+
 The following documentation is automatically generated.  Please do not edit
 this file, but rather the original, inline with Net::Async::Spotify::API::Tracks
 at lib/Net/Async/Spotify/API/Tracks.pm
@@ -27,11 +28,11 @@ Will hold all extra functionality for Spotify Tracks API
 
 =item L<Net::Async::Spotify::API::Generated::Tracks>
 
-L<get_audio_analysis|Net::Async::Spotify::API::Generated::Tracks/get_audio_analysis>, L<get_audio_features|Net::Async::Spotify::API::Generated::Tracks/get_audio_features>, L<get_several_audio_features|Net::Async::Spotify::API::Generated::Tracks/get_several_audio_features>, L<get_several_tracks|Net::Async::Spotify::API::Generated::Tracks/get_several_tracks>, L<get_track|Net::Async::Spotify::API::Generated::Tracks/get_track>
+L<get_audio_analysis|Net::Async::Spotify::API::Generated::Tracks/get_audio_analysis>, L<get_audio_features|Net::Async::Spotify::API::Generated::Tracks/get_audio_features>, L<get_several_audio_features|Net::Async::Spotify::API::Generated::Tracks/get_several_audio_features>, L<get_several_tracks|Net::Async::Spotify::API::Generated::Tracks/get_several_tracks>, L<get_track|Net::Async::Spotify::API::Generated::Tracks/get_track>, L<mapping|Net::Async::Spotify::API::Generated::Tracks/mapping>
 
 =item L<Net::Async::Spotify::API::Base>
 
-L<call_api|Net::Async::Spotify::API::Base/call_api>, L<new|Net::Async::Spotify::API::Base/new>, L<spotify|Net::Async::Spotify::API::Base/spotify>
+L<call_api|Net::Async::Spotify::API::Base/call_api>, L<decode_response|Net::Async::Spotify::API::Base/decode_response>, L<parse_response|Net::Async::Spotify::API::Base/parse_response>, L<spotify|Net::Async::Spotify::API::Base/spotify>
 
 =back
 

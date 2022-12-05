@@ -7,10 +7,12 @@ struct XSParseKeywordPieceType;
 struct XSParseKeywordPieceType {
   int type;
   union {
-    char                                  c;      /* LITERALCHAR */
-    const char                           *str;    /* LITERALSTR */
+    char c;                                       /* LITERALCHAR */
+    const char *str;                              /* LITERALSTR */
     const struct XSParseKeywordPieceType *pieces; /* SCOPEs */
-    void                                (*callback)(pTHX_ void *hookdata); /* SETUP */
+    void (*callback)(pTHX_ void *hookdata);       /* SETUP, ANONSUB PREPARE+START */
+
+    OP *(*op_wrap_callback)(pTHX_ OP *o, void *hookdata);
   } u;
 };
 
@@ -45,6 +47,11 @@ enum {
   XS_PARSE_KEYWORD_INFIX = 0x40,      /* infix */
 
   XS_PARSE_KEYWORD_SETUP = 0x70,      /* invokes callback, emits nothing */
+
+  XS_PARSE_KEYWORD_ANONSUB_PREPARE,   /* invokes callback, emits nothing */
+  XS_PARSE_KEYWORD_ANONSUB_START,     /* invokes callback, emits nothing */
+  XS_PARSE_KEYWORD_ANONSUB_END,       /* invokes op_wrap_callback, emits nothing */
+  XS_PARSE_KEYWORD_ANONSUB_WRAP,      /* invokes op_wrap_callback, emits nothing */
 
   XS_PARSE_KEYWORD_SEQUENCE = 0x80,   /* contained */
   XS_PARSE_KEYWORD_REPEATED,          /* i, contained */
@@ -94,6 +101,14 @@ enum {
 #define XPK_SETUP(setup)       {.type = XS_PARSE_KEYWORD_SETUP, .u.callback = setup}
 
 #define XPK_ANONSUB {.type = XS_PARSE_KEYWORD_ANONSUB}
+
+#define XPK_ANONSUB_PREPARE(func)  {.type = XS_PARSE_KEYWORD_ANONSUB_PREPARE, .u.callback = func}
+#define XPK_ANONSUB_START(func)    {.type = XS_PARSE_KEYWORD_ANONSUB_START, .u.callback = func}
+#define XPK_ANONSUB_END(func)      {.type = XS_PARSE_KEYWORD_ANONSUB_END, .u.op_wrap_callback = func}
+#define XPK_ANONSUB_WRAP(func)     {.type = XS_PARSE_KEYWORD_ANONSUB_WRAP, .u.op_wrap_callback = func}
+
+#define XPK_STAGED_ANONSUB(...) \
+  {.type = XS_PARSE_KEYWORD_ANONSUB, .u.pieces = (const struct XSParseKeywordPieceType []){ __VA_ARGS__, {0} }}
 
 #define XPK_ARITHEXPR_flags(flags) {.type = XS_PARSE_KEYWORD_ARITHEXPR|(flags)}
 #define XPK_ARITHEXPR              XPK_ARITHEXPR_flags(0)

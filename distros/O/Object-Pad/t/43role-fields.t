@@ -6,15 +6,15 @@ use warnings;
 use Test::More;
 use Test::Refcount;
 
-use Object::Pad;
+use Object::Pad ':experimental(init_expr)';
 
 role ARole {
-   has $one = 1;
+   field $one = 1;
    method one { $one }
 }
 
 class AClass :does(ARole) {
-   has $two = 2;
+   field $two = 2;
    method two { $two }
 }
 
@@ -27,7 +27,7 @@ class AClass :does(ARole) {
 }
 
 class BClass :isa(AClass) {
-   has $three = 3;
+   field $three = 3;
    method three { $three }
 }
 
@@ -40,7 +40,7 @@ class BClass :isa(AClass) {
 }
 
 role CRole :does(ARole) {
-   has $three = 3;
+   field $three = 3;
    method three { $three }
 }
 
@@ -57,7 +57,7 @@ class CClass :does(CRole) {}
 # diamond inheritence scenario
 {
    role DRole {
-      has $field = 1;
+      field $field = 1;
       ADJUST { $field++ }
       method field { $field }
    }
@@ -83,7 +83,7 @@ class CClass :does(CRole) {}
    my $arr = [];
 
    role WithWeakRole {
-      has $field :param :weak;
+      field $field :param :weak;
    }
 
    class implWithWeak :does(WithWeakRole) {}

@@ -210,8 +210,13 @@ Revision history for "ptkftp".
       popup example program in Strawberry Perl install on M$-Windows.
       - Fix type that required Tk::HMListbox (instad of Tk::HListbox) to use 
       with Tk::HListbox.
-5.24  - Numerous defined-checks added to address CPAN bug# 131589 - 
+5.24  Thu Jul 3, 2020  
+      - Numerous defined-checks added to address CPAN bug# 131589 - 
       I doubt this catches every one of 'em, so leaving bug open, but this 
       should address nearly all of 'em.  This module was written long before 
       all the anal "use Strict; use warnings" thing became the rage! ;)
       - Also fixed minor issue with the archaic "-colorstate" option.
+5.25  Fri Dec 2, 2022
+      - Fix bug causing right-arrow list search in text field to always fail.
+      - Clarify -fixedlist focus behaviour & how a list can be set to both 
+      "fixed" and "bouncy" at the same time.

@@ -84,6 +84,7 @@ The following abbreviations may be used:
    мрт
    марта
    март
+   мар
 
    апр
    апр.

@@ -113,6 +113,7 @@ stdonly
    America/Noronha
    Etc/GMT-2
    B
+   America/Nuuk
    America/Scoresbysund
    Atlantic/Cape_Verde
    Atlantic/Azores
@@ -124,6 +125,7 @@ stdonly
    America/Noronha
    Etc/GMT-2
    B
+   America/Nuuk
    America/Scoresbysund
    Atlantic/Cape_Verde
    Atlantic/Azores

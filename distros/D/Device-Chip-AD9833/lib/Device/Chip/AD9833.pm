@@ -1,12 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2020-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2020-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.57;
+use Object::Pad 0.73 ':experimental(init_expr)';
 
-package Device::Chip::AD9833 0.03;
+package Device::Chip::AD9833 0.04;
 class Device::Chip::AD9833
    :isa(Device::Chip);
 
@@ -58,7 +58,7 @@ sub SPI_options
    return ( mode => 2 );
 }
 
-has $_config = 0;
+field $_config = 0;
 
 async method _write ( $word )
 {

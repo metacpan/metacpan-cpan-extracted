@@ -9,12 +9,12 @@ BEGIN {
    $] >= 5.026000 or plan skip_all => "No parse_subsignature()";
 }
 
-use Object::Pad;
+use Object::Pad ':experimental(init_expr)';
 
 # See also
 #   https://rt.cpan.org/Ticket/Display.html?id=134456
 class C {
-   has $x = "initial";
+   field $x = "initial";
 
    method m ( $x = $x ) { $x; }
 }

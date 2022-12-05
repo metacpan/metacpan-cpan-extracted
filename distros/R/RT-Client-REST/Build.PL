@@ -24,7 +24,7 @@ my %module_build_args = (
     "Dean Hamstead <dean\@fragfest.com.au>"
   ],
   "dist_name" => "RT-Client-REST",
-  "dist_version" => "0.70",
+  "dist_version" => "0.71",
   "license" => "perl",
   "module_name" => "RT::Client::REST",
   "recursive_test_files" => 1,

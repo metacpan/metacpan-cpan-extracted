@@ -7,10 +7,12 @@ use Data::ULID qw();
 use Data::ULID::XS qw();
 use Benchmark qw(cmpthese);
 
-cmpthese -3, {
-	perl_text => sub { Data::ULID::ulid() },
-	perl_binary => sub { Data::ULID::binary_ulid() },
-	xs_text => sub { Data::ULID::XS::ulid() },
-	xs_binary => sub { Data::ULID::XS::binary_ulid() },
+my $benches = {
+	'Data::ULID::ulid' => sub { Data::ULID::ulid() },
+	'Data::ULID::binary_ulid' => sub { Data::ULID::binary_ulid() },
+	'Data::ULID::XS::ulid' => sub { Data::ULID::XS::ulid() },
+	'Data::ULID::XS::binary_ulid' => sub { Data::ULID::XS::binary_ulid() },
 };
+
+cmpthese -3, $benches;
 

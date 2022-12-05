@@ -3,15 +3,15 @@ package Complete::Unix;
 use 5.010001;
 use strict;
 use warnings;
-#use Log::Any '$log';
+use Log::ger;
 
 use Complete::Common qw(:all);
 use Exporter 'import';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-02'; # DATE
+our $DATE = '2022-09-08'; # DATE
 our $DIST = 'Complete-Unix'; # DIST
-our $VERSION = '0.080'; # VERSION
+our $VERSION = '0.081'; # VERSION
 
 our @EXPORT_OK = qw(
                        complete_uid
@@ -57,9 +57,8 @@ sub complete_uid {
     return unless $res->[0] == 200;
     Complete::Util::complete_array_elem(
         array     => [map {$_->{uid}} @{ $res->[2] }],
-        summaries => [map {$_->{user}} @{ $res->[2] }],
-        word      => $word,
-    );
+        summaries => [map {$_->{user} . (length $_->{gecos} ? " ($_->{gecos})" : "") } @{ $res->[2] }],
+        word=>$word);
 }
 
 $SPEC{complete_user} = {
@@ -86,8 +85,8 @@ sub complete_user {
     return unless $res->[0] == 200;
     Complete::Util::complete_array_elem(
         array     => [map {$_->{user}} @{ $res->[2] }],
-        summaries => [map {$_->{gecko}} @{ $res->[2] }],
-        word      => $word);
+        summaries => [map {(length $_->{gecos} ? "$_->{gecos} " : "") . "(UID $_->{uid})" } @{ $res->[2] }],
+        word=>$word);
 }
 
 $SPEC{complete_gid} = {
@@ -115,7 +114,7 @@ sub complete_gid {
     Complete::Util::complete_array_elem(
         array     => [map {$_->{gid}} @{ $res->[2] }],
         summaries => [map {$_->{group}} @{ $res->[2] }],
-        word      => $word);
+        word=>$word);
 }
 
 $SPEC{complete_group} = {
@@ -142,7 +141,8 @@ sub complete_group {
     return unless $res->[0] == 200;
     Complete::Util::complete_array_elem(
         array     => [map {$_->{group}} @{ $res->[2] }],
-        word      => $word);
+        summaries => [map {"(GID $_->{gid})"} @{ $res->[2] }],
+        word=>$word);
 }
 
 $SPEC{complete_pid} = {
@@ -163,11 +163,12 @@ sub complete_pid {
     my %args  = @_;
     my $word  = $args{word} // "";
 
-    my $procs = Proc::Find::find_proc(detail=>1);
+    my $procs = Proc::Find::find_proc(detail => 1);
+
     Complete::Util::complete_array_elem(
         array     => [map {$_->{pid}} @$procs],
         summaries => [map {$_->{cmndline}} @$procs],
-        word      => $word);
+        word=>$word);
 }
 
 $SPEC{complete_proc_name} = {
@@ -221,8 +222,8 @@ sub complete_service_name {
         my $res = Parse::Services::parse_services();
         last if $res->[0] != 200;
         for my $row (@{ $res->[2] }) {
-            $services{$row->{name}}++;
-            $services{$_}++ for @{$row->{aliases}};
+            $services{$row->{name}} = "$row->{proto} port $row->{port}".(@{$row->{aliases}} ? " (aliases: ".join(", ", @{$row->{aliases}}).")" : "");
+            $services{$_} = "$row->{proto} port $row->{port} (alias for $row->{name})" for @{$row->{aliases}};
         }
     }
 
@@ -230,6 +231,7 @@ sub complete_service_name {
     Complete::Util::complete_hash_key(
         word => $word,
         hash => \%services,
+        summaries_from_hash_values => 1,
     );
 }
 
@@ -257,7 +259,7 @@ sub complete_service_port {
         my $res = Parse::Services::parse_services();
         last if $res->[0] != 200;
         for my $row (@{ $res->[2] }) {
-            $services{$row->{port}} = $row->{name};
+            $services{$row->{port}} = "$row->{name}".(@{$row->{aliases}} ? "/".join("/", @{$row->{aliases}}) : "")." ($row->{proto})";
         }
     }
 
@@ -284,7 +286,7 @@ Complete::Unix - Unix-related completion routines
 
 =head1 VERSION
 
-This document describes version 0.080 of Complete::Unix (from Perl distribution Complete-Unix), released on 2022-09-02.
+This document describes version 0.081 of Complete::Unix (from Perl distribution Complete-Unix), released on 2022-09-08.
 
 =head1 DESCRIPTION
 

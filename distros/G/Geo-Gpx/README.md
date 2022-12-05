@@ -25,7 +25,7 @@ Geo::Gpx - Create and parse GPX files
 
     Create and return a new `Geo::Gpx` instance based on a \*.gpx file (_$fname_), an open filehandle (_$fh_), or an XML string (_$xml_). GPX 1.0 and 1.1 are supported.
 
-    The optional `work_dir` (or `wd` for short) specifies where to save any working files, such as with the save() method. It can be supplied as a relative path or as an absolute path. If `work_dir` is omitted, it is set based on the path of the _$filename_ supplied or the current working directory if the constructor is called with an XML string or a filehandle (see `set_wd()` for more info).
+    The optional `work_dir` (or `wd` for short) specifies where to save any working files, such as with the save() method. It can be supplied as a relative path or as an absolute path. If `work_dir` is omitted, it is set based on the path of the _$fname_ supplied or the current working directory if the constructor is called with an XML string or a filehandle (see `set_wd()` for more info).
 
 - clone()
 
@@ -179,9 +179,9 @@ Geo::Gpx - Create and parse GPX files
 
 - set\_wd( $folder )
 
-    Sets/gets the working directory for any eventual saving of the \*.gpx file and checks the validity of that path. It can can be set as a relative path (i.e. relative to the actual [Cwd::cwd](https://metacpan.org/pod/Cwd%3A%3Acwd)) or as an absolute path, but is always returned as a full path.
+    Sets/gets the working directory for any eventual saving of the \*.gpx file and checks the validity of that path. It can be set as a relative path (i.e. relative to the actual [Cwd](https://metacpan.org/pod/Cwd)) or as an absolute path, but is always returned as a full path.
 
-    This working directory is always defined. The previous one is also stored in memory, such that `set_wd('-')` switches back and forth between two directories. The module never actually [chdir](https://metacpan.org/pod/chdir)'s, it just keeps track of where the user wishes to save files.
+    This working directory is always defined. The previous one is also stored in memory, such that `set_wd('-')` switches back and forth between two directories. The module never actually `chdir`'s, it just keeps track of where the user wishes to save files.
 
 ## Accessors
 
@@ -216,9 +216,11 @@ Geo::Gpx - Create and parse GPX files
 
 # DEPENDENCIES
 
-[DateTime::Format::ISO8601](https://metacpan.org/pod/DateTime%3A%3AFormat%3A%3AISO8601),
 [DateTime](https://metacpan.org/pod/DateTime),
+[DateTime::Format::ISO8601](https://metacpan.org/pod/DateTime%3A%3AFormat%3A%3AISO8601),
+[Geo::Coordinates::Transform](https://metacpan.org/pod/Geo%3A%3ACoordinates%3A%3ATransform),
 [HTML::Entities](https://metacpan.org/pod/HTML%3A%3AEntities),
+[Math::Trig](https://metacpan.org/pod/Math%3A%3ATrig),
 [Scalar::Util](https://metacpan.org/pod/Scalar%3A%3AUtil),
 [XML::Descent](https://metacpan.org/pod/XML%3A%3ADescent)
 
@@ -242,7 +244,7 @@ Please visit the project page at: [https://github.com/patjoly/geo-gpx](https://g
 
 # VERSION
 
-1.07
+1.08
 
 # LICENSE AND COPYRIGHT
 

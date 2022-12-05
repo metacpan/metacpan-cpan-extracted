@@ -2,7 +2,7 @@
     # automatically generated file, don't edit
 
     package Number::Phone::Country::Data;
-    $VERSION = '2.20220902220705';
+    $VERSION = '2.20221202210916';
         %Number::Phone::Country::idd_codes = (
     20 => 'EG',
 211 => 'SS',

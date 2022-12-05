@@ -15,6 +15,7 @@ my @files = (
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
     't/decode.t',
+    't/set_get.t',
     'xt/author/distmeta.t',
     'xt/author/eol.t',
     'xt/author/minimum-version.t',

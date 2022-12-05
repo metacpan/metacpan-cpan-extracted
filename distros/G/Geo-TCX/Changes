@@ -1,5 +1,8 @@
 Revision history for Geo-TCX
 
+1.04 [2022-12-03]
+    Removed Geo::Calc from dependencies
+
 1.03 [2022-11-24]
     Added support for FIT files by converting them to TCX files before parsing
         - FIT is Garmin's Flexible and Interoperable Data Transfer (FIT) protocol

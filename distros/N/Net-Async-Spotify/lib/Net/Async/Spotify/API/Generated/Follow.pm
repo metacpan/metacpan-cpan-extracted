@@ -3,7 +3,7 @@ package Net::Async::Spotify::API::Generated::Follow;
 use strict;
 use warnings;
 
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 our $AUTHORITY = 'cpan:VNEALV'; # AUTHORITY
 
 use mro;
@@ -26,6 +26,8 @@ Check C<crawl-api-doc.pl> for more information.
 =head1 METHODS
 
 =cut
+
+sub mapping { shift->{mapping} }
 
 =head2 check_current_user_follows
 
@@ -75,9 +77,10 @@ On error, the header status code is an error code and the response body contains
 async sub check_current_user_follows {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'GET';
-    $request->{uri}    = 'https://api.spotify.com/v1/me/following/contains';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{check_current_user_follows}{method} // 'GET';
+    $request->{uri}    = $mapping->{check_current_user_follows}{uri} // 'https://api.spotify.com/v1/me/following/contains';
+    $request->{param}  = $mapping->{check_current_user_follows}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -95,7 +98,7 @@ async sub check_current_user_follows {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{check_current_user_follows}{response} // [
         'error object',
 
     ];
@@ -157,9 +160,10 @@ On error, the header status code is an error code and the response body contains
 async sub check_if_user_follows_playlist {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'GET';
-    $request->{uri}    = 'https://api.spotify.com/v1/playlists/{playlist_id}/followers/contains';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{check_if_user_follows_playlist}{method} // 'GET';
+    $request->{uri}    = $mapping->{check_if_user_follows_playlist}{uri} // 'https://api.spotify.com/v1/playlists/{playlist_id}/followers/contains';
+    $request->{param}  = $mapping->{check_if_user_follows_playlist}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -179,7 +183,7 @@ async sub check_if_user_follows_playlist {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{check_if_user_follows_playlist}{response} // [
         'error object',
 
     ];
@@ -253,9 +257,10 @@ On error, the header status code is an error code and the response body contains
 async sub follow_artists_users {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'PUT';
-    $request->{uri}    = 'https://api.spotify.com/v1/me/following';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{follow_artists_users}{method} // 'PUT';
+    $request->{uri}    = $mapping->{follow_artists_users}{uri} // 'https://api.spotify.com/v1/me/following';
+    $request->{param}  = $mapping->{follow_artists_users}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -283,7 +288,7 @@ async sub follow_artists_users {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{follow_artists_users}{response} // [
         'error object',
 
     ];
@@ -350,9 +355,10 @@ On error, the header status code is an error code and the response body contains
 async sub follow_playlist {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'PUT';
-    $request->{uri}    = 'https://api.spotify.com/v1/playlists/{playlist_id}/followers';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{follow_playlist}{method} // 'PUT';
+    $request->{uri}    = $mapping->{follow_playlist}{uri} // 'https://api.spotify.com/v1/playlists/{playlist_id}/followers';
+    $request->{param}  = $mapping->{follow_playlist}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -376,7 +382,7 @@ async sub follow_playlist {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{follow_playlist}{response} // [
         'error object',
 
     ];
@@ -438,9 +444,10 @@ On error, the header status code is an error code and the response body contains
 async sub get_followed {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'GET';
-    $request->{uri}    = 'https://api.spotify.com/v1/me/following';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{get_followed}{method} // 'GET';
+    $request->{uri}    = $mapping->{get_followed}{uri} // 'https://api.spotify.com/v1/me/following';
+    $request->{param}  = $mapping->{get_followed}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -462,7 +469,7 @@ async sub get_followed {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{get_followed}{response} // [
         'paging object',
 
     ];
@@ -534,9 +541,10 @@ On error, the header status code is an error code and the response body contains
 async sub unfollow_artists_users {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'DELETE';
-    $request->{uri}    = 'https://api.spotify.com/v1/me/following';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{unfollow_artists_users}{method} // 'DELETE';
+    $request->{uri}    = $mapping->{unfollow_artists_users}{uri} // 'https://api.spotify.com/v1/me/following';
+    $request->{param}  = $mapping->{unfollow_artists_users}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -564,7 +572,7 @@ async sub unfollow_artists_users {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{unfollow_artists_users}{response} // [
         'error object',
 
     ];
@@ -615,9 +623,10 @@ On error, the header status code is an error code and the response body contains
 async sub unfollow_playlist {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'DELETE';
-    $request->{uri}    = 'https://api.spotify.com/v1/playlists/{playlist_id}/followers';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{unfollow_playlist}{method} // 'DELETE';
+    $request->{uri}    = $mapping->{unfollow_playlist}{uri} // 'https://api.spotify.com/v1/playlists/{playlist_id}/followers';
+    $request->{param}  = $mapping->{unfollow_playlist}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -631,7 +640,7 @@ async sub unfollow_playlist {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{unfollow_playlist}{response} // [
         'error object',
 
     ];

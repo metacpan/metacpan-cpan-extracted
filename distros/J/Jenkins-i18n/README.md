@@ -127,6 +127,60 @@ included with the `---TranslateMe` prefix (which must be removed, obviously).
 Some known key values like URLs and proper names are just ignored when comparing
 the original values (in English) with the selected language (`--lang`).
 
+### State of Jenkins translations
+
+`jtt` also can report the state of translations for all identified language
+codes in the Jenkins repository:
+
+```
+$ jtt --all
+Hang on, this might take a while.
+Searching for all translatable files... Warning: ignoring the files at src/test and target/.
+Done! ✓
+Now searching for all available languages... Done! ✓
+Now verifying each language translated status...
+
+         Translation Status
+
+    Language code        %
+    ------------------------
+    pt_BR              98.98
+    it                 83.67
+    zh_TW              70.87
+    bg                 66.68
+    de                 66.63
+    ja                 57.82
+    sr                 57.05
+    es                 52.33
+    ru                 44.15
+    da                 42.60
+    fr                 42.32
+    pl                 34.66
+    lt                 30.90
+    nl                 24.98
+    tr                 18.63
+    lv                 14.49
+    sv_SE              14.10
+    ko                 12.51
+    sk                 11.02
+    fi                 9.484
+    nb_NO              8.762
+    cs                 8.570
+    uk                 8.088
+    pt_PT              7.896
+    he                 6.451
+    et                 5.055
+    ca                 4.622
+    ro                 4.188
+    sl                 3.996
+    el                 3.851
+    es_AR              2.888
+    zh_CN              0.722
+    en_GB              0.192
+```
+
+This report was retrieve at 2022-11-15 14:15:18-03:00.
+
 ## See also
 
 - A suggested [workflow](Workflow.md) to carry on translations with `jtt`.
@@ -267,7 +321,7 @@ done.
 - [Jenkins Internationalization](https://www.jenkins.io/doc/developer/internationalization/)
 - [i18n](https://wiki.mageia.org/en/What_is_i18n,_what_is_l10n)
 - [Online convertion of UTF-8 to Java entities](http://itpro.cz/juniconv/)
-- [https://youtu.be/_MhWugMQegs?list=PLCOmiTb5WX3ouggdJ4ty2dVUSrki9uYr1&t=373](Introduction to Jelly)
+- Introduction to Jelly: https://youtu.be/_MhWugMQegs?list=PLCOmiTb5WX3ouggdJ4ty2dVUSrki9uYr1&t=373
 
 ## Copyright and licence
 

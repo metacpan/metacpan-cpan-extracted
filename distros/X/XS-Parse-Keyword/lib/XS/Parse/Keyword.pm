@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
 
-package XS::Parse::Keyword 0.29;
+package XS::Parse::Keyword 0.30;
 
 use v5.14;
 use warnings;
@@ -277,11 +277,70 @@ restored again when parsing has finished.
 
 =head2 XPK_ANONSUB
 
-I<atomic, emits op.>
+I<atomic, emits cv.>
 
 A brace-delimited block of code is expected, and assembled into the body of a
 new anonymous subroutine. This will be passed as a protosub CV in the I<cv>
 field.
+
+=head2 XPK_STAGED_ANONSUB
+
+   XPK_STAGED_ANONSUB(stages ...)
+
+I<structural, emits cv.>
+
+A variant of C<XPK_ANONSUB> which accepts additional function pointers to be
+invoked at various points during parsing and compilation. These can be used to
+interrupt the normal parsing in a manner similar to L<XS::Parse::Sublike>,
+though currently somewhat less flexibly.
+
+The I<stages> list may contain elements of the following types. Not every
+stage must be present, but any that are present must be in the following
+order. Multiple copies of each stage are permitted; they are invoked in the
+written order, with parser code happening inbetween.
+
+=over 4
+
+=item XPK_ANONSUB_PREPARE
+
+   XPK_ANONSUB_PREPARE(&callback)
+
+I<atomic, emits nothing.>
+
+Invokes the callback before C<start_subparse()>.
+
+=item XPK_ANONSUB_START
+
+   XPK_ANONSUB_START(&callback)
+
+I<atomic, emits nothing.>
+
+Invokes the callback after C<block_start()> but before parsing the actual
+block contents.
+
+=item XPK_ANONSUB_END
+
+   OP *op_wrapper_callback(pTHX_ OP *o, void *hookdata);
+
+   XPK_ANONSUB_END(&op_wrapper_callback)
+
+I<atomic, emits nothing.>
+
+Invokes the callback after parsing the block contents but before calling
+C<block_end()>. The callback may modify the optree if required and return a
+new one.
+
+=item XPK_ANONSUB_WRAP
+
+   XPK_ANONSUB_WRAP(&op_wrapper_callback)
+
+I<atomic, emits nothing.>
+
+Invokes the callback after C<block_end()> but before passing the optree to
+C<newATTRSUB()>. The callback may modify the optree if required and return a
+new one.
+
+=back
 
 =head2 XPK_ARITHEXPR
 

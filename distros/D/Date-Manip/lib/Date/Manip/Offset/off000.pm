@@ -6,9 +6,9 @@ Date::Manip::Offset::off000;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Thu Sep  1 10:36:28 EDT 2022
-#    Data version: tzdata2022c
-#    Code version: tzcode2022c
+#    Generated on: Fri Dec  2 12:33:24 EST 2022
+#    Data version: tzdata2022g
+#    Code version: tzcode2022g
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -19,7 +19,7 @@ use warnings;
 require 5.010000;
 
 our ($VERSION);
-$VERSION='6.89';
+$VERSION='6.90';
 END { undef $VERSION; }
 
 our ($Offset,%Offset);
@@ -44,8 +44,8 @@ $Offset        = '+00:00:00';
       'africa/bissau',
       'america/danmarkshavn',
       'etc/gmt',
+      'etc/utc',
       'ut',
-      'utc',
       'z',
       'antarctica/troll',
       'africa/casablanca',
@@ -65,7 +65,6 @@ $Offset        = '+00:00:00';
       'europe/paris',
       'pacific/kanton',
       'america/yellowknife',
-      'america/pangnirtung',
       'america/cambridge_bay',
       'africa/lagos',
       'antarctica/casey',

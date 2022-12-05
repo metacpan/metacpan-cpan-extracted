@@ -1,112 +1,60 @@
-NAME
-    Win32::Wlan - Query wlan properties
+Win32::Wlan - Query wlan properties
 
-SYNOPSIS
-        require Win32::Wlan;
-        my $wlan = Win32::Wlan->new;
-        if ($wlan->available) {
-            print "Connected to ", $wlan->connection->{profile_name},"\n";
-            print "I see the following networks\n";
-            for ($wlan->visible_networks) {
-                printf "%s\t-%d dbm\n", $_->{name}, $_->{signal_quality};
-            };
 
-        } else {
-            print "No Wlan detected (or switched off)\n";
-        };
 
-METHODS
-  `Win32::Wlan->new( %args )'
-        my $wlan = Win32::Wlan->new();
+INSTALLATION
 
-    Creates a new Win32::Wlan object.
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
 
-    *   `available' - optional argument to force detection of general Wlan
-        availability
+  cpanm .
+  cpan  .
+  cpanp -i .
 
-    *   `handle' - optional argument to give an existing Wlan handle to the
-        object
+Consult https://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
 
-    *   `interface' - optional argument to give an existing guuid to the
-        object
+  perl Makefile.PL
+  make
+  make test
+  make install
 
-  `$wlan->handle'
-    Returns the Windows API handle for the Wlan API.
-
-  `$wlan->interface'
-        print $wlan->interface->{name};
-
-    Returns a hashref describing the interface. The keys are `guuid' for the
-    guuid, `name' for the human-readable name and `status' for the status of
-    the interface.
-
-  `$wlan->available'
-        $wlan->available
-            or warn "Wlan API is not available";
-
-    Returns whether the Wlan API is available. The Wlan API is available on
-    Windows XP SP3 or higher.
-
-  `$wlan->connected'
-        $wlan->connected
-            or warn "Wlan connection unavailable";
-
-    Returns whether a Wlan connection is established. No connection is
-    established when Wlan is switched off or no access point is in range.
-
-  `$wlan->connection'
-        if ($wlan->connected) {
-            print "Connected to ";
-            print $wlan->connection->{profile_name};
-        };
-
-    Returns information about the current connection in a hashref. The keys
-    are
-
-    *   `profile_name' - the name of the profile of the current connection
-
-  `$wlan->visible_networks'
-    Returns information about the currently visible networks as a list of
-    hashrefs.
-
-    *   `ssid' - the SSID of the network
-
-    *   `signal_quality' - the signal quality ranging linearly from 0 to 100
-        meaning -100 dbm to -50 dbm
-
-SIMPLIFICATIONS
-    This module only supports the first wireless connection. If your machine
-    has more than one wireless connection, you will need to use
-    Win32::Wlan::API directly.
-
-    Currently, the module also has no way of determining whether Wlan gets
-    switched on or off.
-
-SEE ALSO
-    Win32::Wlan::API - the wrapper for the Windows API
-
-    Windows Native Wifi Reference
-
-    http://msdn.microsoft.com/en-us/library/ms706274%28v=VS.85%29.aspx
 
 REPOSITORY
-    The public repository of this module is
-    http://github.com/Corion/Win32-Wlan.
+
+The public repository of this module is
+L<https://github.com/Corion/Win32-Wlan>.
 
 SUPPORT
-    The public support forum of this module is http://perlmonks.org/.
+
+The public support forum of this module is
+L<https://perlmonks.org/>.
+
+
 
 BUG TRACKER
-    Please report bugs in this module via the RT CPAN bug queue at
-    https://rt.cpan.org/Public/Dist/Display.html?Name=Win32-Wlan or via mail
-    to win32-wlan-Bugs@rt.cpan.org.
+
+Please report bugs in this module via the RT CPAN bug queue at
+L<https://rt.cpan.org/Public/Dist/Display.html?Name=Win32-Wlan>
+or via mail to L<win32-wlan-Bugs@rt.cpan.org>.
+
+
+SEE ALSO
+
+L<Win32::Wlan::API> - the wrapper for the Windows API
+
+Windows Native Wifi Reference
+
+L<https://msdn.microsoft.com/en-us/library/ms706274%28v=VS.85%29.aspx>
 
 AUTHOR
-    Max Maischein `corion@cpan.org'
 
-COPYRIGHT (c)
-    Copyright 2011-2011 by Max Maischein `corion@cpan.org'.
+Max Maischein C<corion@cpan.org>
 
 LICENSE
-    This module is released under the same terms as Perl itself.
 
+This module is released under the same terms as Perl itself.
+
+COPYRIGHT (c)
+
+Copyright 2011-2022 by Max Maischein C<corion@cpan.org>.

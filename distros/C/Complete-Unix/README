@@ -2,8 +2,8 @@ NAME
     Complete::Unix - Unix-related completion routines
 
 VERSION
-    This document describes version 0.080 of Complete::Unix (from Perl
-    distribution Complete-Unix), released on 2022-09-02.
+    This document describes version 0.081 of Complete::Unix (from Perl
+    distribution Complete-Unix), released on 2022-09-08.
 
 DESCRIPTION
 FUNCTIONS

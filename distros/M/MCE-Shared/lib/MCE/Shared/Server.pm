@@ -13,7 +13,7 @@ no warnings qw( threads recursion uninitialized numeric once );
 
 package MCE::Shared::Server;
 
-our $VERSION = '1.878';
+our $VERSION = '1.879';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
@@ -79,7 +79,7 @@ use constant {
 
 use constant {
    # Max data channels. This cannot be greater than 8 on MSWin32.
-   DATA_CHANNELS => ($^O eq 'MSWin32') ? 8 : 10,
+   DATA_CHANNELS => 8,
 
    SHR_M_NEW => 'M~NEW',  # New share
    SHR_M_CID => 'M~CID',  # ClientID request
@@ -1005,13 +1005,6 @@ sub _loop {
          chomp($_id  = <$_DAU_R_SOCK>),
          chomp($_key = <$_DAU_R_SOCK>);
 
-         if (! chop $_key) {
-            delete $_obj{ $_id }{ 'S'.$_key };
-            delete $_obj{ $_id }{ 'R'.$_key };
-
-            return;
-         }
-
          my $error  = delete $_obj{ $_id }{ 'S'.$_key } // '';
          my $result = delete $_obj{ $_id }{ 'R'.$_key } // '';
 
@@ -1437,15 +1430,13 @@ sub _get_hobo_data {
       $_is_MSWin32 ? CORE::lock $_DAT_LOCK : $_dat_ex->();
 
       print({$_DAT_W_SOCK} 'O~DAT'.$LF . $_chn.$LF),
-      print({$_DAU_W_SOCK} $_[0]->[_ID].$LF . $_[1].$_[2].$LF);
+      print({$_DAU_W_SOCK} $_[0]->[_ID].$LF . $_[1].$LF);
 
-      if ( $_[2] ) {
-         chomp(my $_le1 = <$_DAU_W_SOCK>),
-         chomp(my $_le2 = <$_DAU_W_SOCK>);
+      chomp(my $_le1 = <$_DAU_W_SOCK>),
+      chomp(my $_le2 = <$_DAU_W_SOCK>);
 
-         read($_DAU_W_SOCK, $_error,  $_le1) if $_le1;
-         read($_DAU_W_SOCK, $_result, $_le2) if $_le2;
-      }
+      read($_DAU_W_SOCK, $_error,  $_le1) if $_le1;
+      read($_DAU_W_SOCK, $_result, $_le2) if $_le2;
 
       $_dat_un->() if !$_is_MSWin32;
    }
@@ -1943,7 +1934,7 @@ MCE::Shared::Server - Server/Object packages for MCE::Shared
 
 =head1 VERSION
 
-This document describes MCE::Shared::Server version 1.878
+This document describes MCE::Shared::Server version 1.879
 
 =head1 DESCRIPTION
 

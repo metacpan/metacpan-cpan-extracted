@@ -27,6 +27,7 @@
       },
       "configure" : {
          "requires" : {
+            "Config" : "0",
             "ExtUtils::MakeMaker::CPANfile" : "0.09"
          }
       },
@@ -60,6 +61,6 @@
          "web" : "https://github.com/XSven/Plack-Middleware-LogAny"
       }
    },
-   "version" : "0.001001",
+   "version" : "0.001002",
    "x_serialization_backend" : "JSON::PP version 4.12"
 }

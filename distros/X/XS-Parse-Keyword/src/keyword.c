@@ -453,15 +453,38 @@ static void parse_piece(pTHX_ SV *argsv, size_t *argidx, const struct XSParseKey
 
     case XS_PARSE_KEYWORD_ANONSUB:
     {
+      const struct XSParseKeywordPieceType *stages = piece->u.pieces;
+
+      while(stages && stages->type == XS_PARSE_KEYWORD_ANONSUB_PREPARE) {
+        (*stages->u.callback)(aTHX_ hookdata);
+        stages++;
+      }
+
       I32 floor_ix = start_subparse(FALSE, CVf_ANON);
       SAVEFREESV(PL_compcv);
 
       I32 save_ix = block_start(0);
+
+      while(stages && stages->type == XS_PARSE_KEYWORD_ANONSUB_START) {
+        (*stages->u.callback)(aTHX_ hookdata);
+        stages++;
+      }
+
       OP *body = parse_block(0);
       CHECK_PARSEFAIL;
 
+      while(stages && stages->type == XS_PARSE_KEYWORD_ANONSUB_END) {
+        body = (*stages->u.op_wrap_callback)(aTHX_ body, hookdata);
+        stages++;
+      }
+
       SvREFCNT_inc(PL_compcv);
       body = block_end(save_ix, body);
+
+      while(stages && stages->type == XS_PARSE_KEYWORD_ANONSUB_WRAP) {
+        body = (*stages->u.op_wrap_callback)(aTHX_ body, hookdata);
+        stages++;
+      }
 
       THISARG.cv = newATTRSUB(floor_ix, NULL, NULL, NULL, body);
       (*argidx)++;

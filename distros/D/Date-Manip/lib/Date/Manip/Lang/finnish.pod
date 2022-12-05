@@ -89,30 +89,41 @@ The following month names may be used:
 The following abbreviations may be used:
 
    tammi
+   tam
 
    helmi
+   hel
 
    maalis
+   maa
 
    huhti
+   huh
 
    touko
+   tou
 
    kesa
    kesä
+   kes
 
    heina
    heinä
+   hei
 
    elo
 
    syys
+   syy
 
    loka
+   lok
 
    marras
+   mar
 
    joulu
+   jou
 
 
 =item B<Day names and abbreviations>

@@ -70,6 +70,7 @@ perl -I../lib date.parse.dst.t 1
 perl -I../lib date.parse.dutch.t 1
 perl -I../lib date.parse.english.t 1
 perl -I../lib date.parse.french.t 1
+perl -I../lib date.parse.german.t 1
 perl -I../lib date.parse.holidays.t 1
 perl -I../lib date.parse.invalid.t 1
 perl -I../lib date.parse.iso.t 1
@@ -79,6 +80,7 @@ perl -I../lib date.parse.misc.1.t 1
 perl -I../lib date.parse.mmmyyyy.first.t 1
 perl -I../lib date.parse.mmmyyyy.last.t 1
 perl -I../lib date.parse.mmmyyyy.t 1
+perl -I../lib date.parse.norwegian.t 1
 perl -I../lib date.parse.period.t 1
 perl -I../lib date.parse.polish.t 1
 perl -I../lib date.parse.portuguese.t 1

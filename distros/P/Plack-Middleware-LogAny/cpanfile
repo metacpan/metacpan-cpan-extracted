@@ -3,6 +3,7 @@ use strict; use warnings;
 #>>>
 
 on 'configure' => sub {
+  requires 'Config'                        => '0';
   requires 'ExtUtils::MakeMaker::CPANfile' => '0';
 };
 

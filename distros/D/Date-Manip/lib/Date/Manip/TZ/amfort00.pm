@@ -6,9 +6,9 @@ Date::Manip::TZ::amfort00;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Thu Sep  1 10:29:04 EDT 2022
-#    Data version: tzdata2022c
-#    Code version: tzcode2022c
+#    Generated on: Fri Dec  2 12:31:47 EST 2022
+#    Data version: tzdata2022g
+#    Code version: tzcode2022g
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -25,7 +25,7 @@ END {
 }
 
 our ($VERSION);
-$VERSION='6.89';
+$VERSION='6.90';
 END { undef $VERSION; }
 
 %Dates         = (

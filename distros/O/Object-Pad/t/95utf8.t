@@ -8,7 +8,7 @@ BEGIN { binmode STDOUT, ":encoding(UTF-8)" }
 
 use Test::More;
 
-use Object::Pad ':experimental(mop)';
+use Object::Pad ':experimental(init_expr mop)';
 
 # A bunch of test cases with non-ASCII, non-Latin1. Esperanto is good for that
 # as the accented characters are not in Latin1.
@@ -18,7 +18,7 @@ my $manĝis;
 class Sandviĉon {
    method manĝu { $manĝis++ }
 
-   has $tranĉaĵoj :param :reader :writer = undef;
+   field $tranĉaĵoj :param :reader :writer = undef;
 }
 
 my $s = Sandviĉon->new;

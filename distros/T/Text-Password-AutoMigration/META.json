@@ -4,7 +4,7 @@
       "Yuki Yoshida(worthmine) <worthmine!at!gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.0.13",
+   "generated_by" : "Minilla/v3.1.14",
    "license" : [
       "perl_5"
    ],
@@ -35,7 +35,7 @@
          "requires" : {
             "Test::CPAN::Meta" : "0",
             "Test::MinimumVersion::Fast" : "0.04",
-            "Test::PAUSE::Permissions" : "0.04",
+            "Test::PAUSE::Permissions" : "0.07",
             "Test::Pod" : "1.41",
             "Test::Spellunker" : "v0.2.7"
          }
@@ -58,19 +58,19 @@
    "provides" : {
       "Text::Password::AutoMigration" : {
          "file" : "lib/Text/Password/AutoMigration.pm",
-         "version" : "0.15"
+         "version" : "0.16"
       },
       "Text::Password::CoreCrypt" : {
          "file" : "lib/Text/Password/CoreCrypt.pm",
-         "version" : "0.15"
+         "version" : "0.16"
       },
       "Text::Password::MD5" : {
          "file" : "lib/Text/Password/MD5.pm",
-         "version" : "0.15"
+         "version" : "0.16"
       },
       "Text::Password::SHA" : {
          "file" : "lib/Text/Password/SHA.pm",
-         "version" : "0.15"
+         "version" : "0.16"
       }
    },
    "release_status" : "stable",
@@ -84,12 +84,13 @@
          "web" : "https://github.com/worthmine/Text-Password-AutoMigration"
       }
    },
-   "version" : "0.15",
+   "version" : "0.16",
    "x_authority" : "cpan:WORTHMINE",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
-      "Yuki Yoshida <worthmine@gmail.com>",
-      "Yuki Yoshida <worthmine@users.noreply.github.com>"
+      "Yuki Yoshida <worthmine@users.noreply.github.com>",
+      "worthmine <worthmine@gmail.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.93"
+   "x_serialization_backend" : "JSON::PP version 4.07",
+   "x_static_install" : 1
 }

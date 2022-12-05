@@ -6,26 +6,21 @@ use Alien::Build::MM;
 use Config;
 use File::Spec;
 
-# test we have headers as an OS check
+# test preprocessor has needed symbols
+{
+    my @scmd = ($Config{cc}, '-E', 'tarsize/tarsize.c');
+    print join(' ', @scmd)."\n";
 
-## Build the command
-my @scmd = ($Config{cc}, '-D_GNU_SOURCE');
-push @scmd, '-include', $_ foreach ('errno.h', 'dlfcn.h');
-push @scmd, '-E', '-';
+    # backup stdout
+    open(my $oldout, '>&STDOUT') or die('cant dup STDOUT');
 
-## Redirect STDIN and STDOUT to /dev/null or equivalent (stdin is unused though an input file must be provided, it dumps the preprocessor input to STDOUT)
-open(my $oldin, "<&STDIN") or die "Can't dup STDIN:";
-open(my $oldout, '>&STDOUT') or die('cant dup STDOUT');
-open(my $devnull, '+<', File::Spec->devnull());
-open(STDOUT, '>&', $devnull) or die('error redirecting stdout');
-open(STDIN, '<&', $devnull) or die('error redirecting stdin ');
+    open(my $devnull, '>', File::Spec->devnull()) or die "$!";
+    open(STDOUT, '>&', $devnull) or die('error redirecting stdout');
+    system(@scmd) == 0 or die('OS unsupported');
 
-## finally run the command
-system(@scmd) == 0 or die('OS unsupported');
-
-## Restore STDIN and STDOUT
-open(STDOUT, '>&', $oldout) or die('error restoring stdout');
-open(STDIN, '<&', $oldin) or die('error restoring stdin');
+    ## restore STDOUT
+    open(STDOUT, '>&', $oldout) or die('error restoring stdout');
+}
 
 my $abmm = Alien::Build::MM->new;
 my %WriteMakefileArgs = (

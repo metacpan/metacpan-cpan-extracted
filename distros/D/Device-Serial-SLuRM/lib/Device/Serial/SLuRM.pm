@@ -4,9 +4,9 @@
 #  (C) Paul Evans, 2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.70 ':experimental(init_expr adjust_params)';
+use Object::Pad 0.73 ':experimental(init_expr adjust_params)';
 
-package Device::Serial::SLuRM 0.03;
+package Device::Serial::SLuRM 0.04;
 class Device::Serial::SLuRM;
 
 use Carp;
@@ -18,6 +18,7 @@ use Future::Buffer 0.03;
 use Future::IO;
 
 use Digest::CRC qw( crc8 );
+use Time::HiRes qw( gettimeofday tv_interval );
 
 use constant DEBUG => $ENV{SLURM_DEBUG} // 0;
 
@@ -158,6 +159,12 @@ if( defined $METRICS ) {
       units => "",
       buckets => [ 1 .. 3 ],
    );
+
+   $METRICS->make_timer( request_duration =>
+      description => "How long it took to get a response to each request",
+      buckets => [ 0.001, 0.002, 0.005, 0.01, 0.02, 0.05, 0.1, 0.2, 0.5 ],
+   );
+
    $METRICS->make_counter( retransmits =>
       description => "Number of retransmits of packets",
    );
@@ -234,19 +241,17 @@ C<request> method will make up to 3 attempts).
 
 =cut
 
-field $_fh :param { undef };
+field $_fh :param = undef;
 
 ADJUST :params (
-   :$dev  = undef,
-   :$baud = undef,
+   :$dev    = undef,
+   :$baud //= 115200,
 ) {
    if( defined $_fh ) {
       # fine
    }
    elsif( defined $dev ) {
       require IO::Termios;
-
-      $baud //= 115200;
 
       $_fh = IO::Termios->open( $dev, "$baud,8,n,1" ) or
          croak "Cannot open device $dev - $!";
@@ -258,14 +263,14 @@ ADJUST :params (
    }
 }
 
-field $_retransmit_delay :param { 0.05 };
-field $_retransmit_count :param { 2 };
+field $_retransmit_delay :param = 0.05;
+field $_retransmit_count :param = 2;
 
 field $_on_notify;
 
 field $_did_reset;
 
-field $_seqno_tx { 0 };
+field $_seqno_tx = 0 ;
 field $_seqno_rx :reader(_seqno_rx); # :reader just for unit-test purposes
 
 =head1 METHODS
@@ -390,6 +395,9 @@ async method _run
                warn "Received reply to unsent request seqno=$seqno\n";
                next;
             }
+
+            $METRICS and
+               $METRICS->report_timer( request_duration => tv_interval $slot->{start_time} );
 
             if( $pktctrl == SLURM_PKTCTRL_RESPONSE ) {
                printf STDERR "SLuRM rx-RESPONSE(%d): %v02X\n", $seqno, $payload
@@ -613,6 +621,7 @@ async method request ( $payload )
       payload          => $payload,
       response_f       => my $f = $_run_f->new,
       retransmit_count => $_retransmit_count,
+      start_time       => [ gettimeofday ],
    };
 
    $self->_set_retransmit( $seqno );

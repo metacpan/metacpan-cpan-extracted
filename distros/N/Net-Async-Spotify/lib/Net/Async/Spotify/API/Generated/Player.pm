@@ -3,7 +3,7 @@ package Net::Async::Spotify::API::Generated::Player;
 use strict;
 use warnings;
 
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 our $AUTHORITY = 'cpan:VNEALV'; # AUTHORITY
 
 use mro;
@@ -26,6 +26,8 @@ Check C<crawl-api-doc.pl> for more information.
 =head1 METHODS
 
 =cut
+
+sub mapping { shift->{mapping} }
 
 =head2 add_to_queue
 
@@ -74,9 +76,10 @@ A completed request will return a 204 NO CONTENT response code, and then issue t
 async sub add_to_queue {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'POST';
-    $request->{uri}    = 'https://api.spotify.com/v1/me/player/queue';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{add_to_queue}{method} // 'POST';
+    $request->{uri}    = $mapping->{add_to_queue}{uri} // 'https://api.spotify.com/v1/me/player/queue';
+    $request->{param}  = $mapping->{add_to_queue}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -94,7 +97,7 @@ async sub add_to_queue {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{add_to_queue}{response} // [
 
     ];
 
@@ -137,9 +140,10 @@ When no available devices are found, the request will return a 200 OK response w
 async sub get_a_users_available_devices {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'GET';
-    $request->{uri}    = 'https://api.spotify.com/v1/me/player/devices';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{get_a_users_available_devices}{method} // 'GET';
+    $request->{uri}    = $mapping->{get_a_users_available_devices}{uri} // 'https://api.spotify.com/v1/me/player/devices';
+    $request->{param}  = $mapping->{get_a_users_available_devices}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -147,7 +151,7 @@ async sub get_a_users_available_devices {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{get_a_users_available_devices}{response} // [
         'device object',
 
     ];
@@ -205,9 +209,10 @@ When no available devices are found, the request will return a 200 OK response b
 async sub get_information_about_the_users_current_playback {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'GET';
-    $request->{uri}    = 'https://api.spotify.com/v1/me/player';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{get_information_about_the_users_current_playback}{method} // 'GET';
+    $request->{uri}    = $mapping->{get_information_about_the_users_current_playback}{uri} // 'https://api.spotify.com/v1/me/player';
+    $request->{param}  = $mapping->{get_information_about_the_users_current_playback}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -225,7 +230,7 @@ async sub get_information_about_the_users_current_playback {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{get_information_about_the_users_current_playback}{response} // [
 
     ];
 
@@ -289,9 +294,10 @@ On success, the HTTP status code in the response header is 200 OK and the respon
 async sub get_recently_played {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'GET';
-    $request->{uri}    = 'https://api.spotify.com/v1/me/player/recently-played';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{get_recently_played}{method} // 'GET';
+    $request->{uri}    = $mapping->{get_recently_played}{uri} // 'https://api.spotify.com/v1/me/player/recently-played';
+    $request->{param}  = $mapping->{get_recently_played}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -313,7 +319,7 @@ async sub get_recently_played {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{get_recently_played}{response} // [
         'history object',
 
     ];
@@ -374,9 +380,10 @@ A successful request will return a 200 OK response code with a json payload that
 async sub get_the_users_currently_playing_track {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'GET';
-    $request->{uri}    = 'https://api.spotify.com/v1/me/player/currently-playing';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{get_the_users_currently_playing_track}{method} // 'GET';
+    $request->{uri}    = $mapping->{get_the_users_currently_playing_track}{uri} // 'https://api.spotify.com/v1/me/player/currently-playing';
+    $request->{param}  = $mapping->{get_the_users_currently_playing_track}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -394,7 +401,7 @@ async sub get_the_users_currently_playing_track {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{get_the_users_currently_playing_track}{response} // [
 
     ];
 
@@ -442,9 +449,10 @@ A completed request will return a 204 NO CONTENT response code, and then issue t
 async sub pause_a_users_playback {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'PUT';
-    $request->{uri}    = 'https://api.spotify.com/v1/me/player/pause';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{pause_a_users_playback}{method} // 'PUT';
+    $request->{uri}    = $mapping->{pause_a_users_playback}{uri} // 'https://api.spotify.com/v1/me/player/pause';
+    $request->{param}  = $mapping->{pause_a_users_playback}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -458,7 +466,7 @@ async sub pause_a_users_playback {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{pause_a_users_playback}{response} // [
 
     ];
 
@@ -514,9 +522,10 @@ A completed request will return a 204 NO CONTENT response code, and then issue t
 async sub seek_to_position_in_currently_playing_track {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'PUT';
-    $request->{uri}    = 'https://api.spotify.com/v1/me/player/seek';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{seek_to_position_in_currently_playing_track}{method} // 'PUT';
+    $request->{uri}    = $mapping->{seek_to_position_in_currently_playing_track}{uri} // 'https://api.spotify.com/v1/me/player/seek';
+    $request->{param}  = $mapping->{seek_to_position_in_currently_playing_track}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -534,7 +543,7 @@ async sub seek_to_position_in_currently_playing_track {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{seek_to_position_in_currently_playing_track}{response} // [
 
     ];
 
@@ -592,9 +601,10 @@ A completed request will return a 204 NO CONTENT response code, and then issue t
 async sub set_repeat_mode_on_users_playback {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'PUT';
-    $request->{uri}    = 'https://api.spotify.com/v1/me/player/repeat';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{set_repeat_mode_on_users_playback}{method} // 'PUT';
+    $request->{uri}    = $mapping->{set_repeat_mode_on_users_playback}{uri} // 'https://api.spotify.com/v1/me/player/repeat';
+    $request->{param}  = $mapping->{set_repeat_mode_on_users_playback}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -612,7 +622,7 @@ async sub set_repeat_mode_on_users_playback {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{set_repeat_mode_on_users_playback}{response} // [
 
     ];
 
@@ -665,9 +675,10 @@ A completed request will return a 204 NO CONTENT response code, and then issue t
 async sub set_volume_for_users_playback {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'PUT';
-    $request->{uri}    = 'https://api.spotify.com/v1/me/player/volume';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{set_volume_for_users_playback}{method} // 'PUT';
+    $request->{uri}    = $mapping->{set_volume_for_users_playback}{uri} // 'https://api.spotify.com/v1/me/player/volume';
+    $request->{param}  = $mapping->{set_volume_for_users_playback}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -685,7 +696,7 @@ async sub set_volume_for_users_playback {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{set_volume_for_users_playback}{response} // [
 
     ];
 
@@ -733,9 +744,10 @@ A completed request will return a 204 NO CONTENT response code, and then issue t
 async sub skip_users_playback_to_next_track {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'POST';
-    $request->{uri}    = 'https://api.spotify.com/v1/me/player/next';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{skip_users_playback_to_next_track}{method} // 'POST';
+    $request->{uri}    = $mapping->{skip_users_playback_to_next_track}{uri} // 'https://api.spotify.com/v1/me/player/next';
+    $request->{param}  = $mapping->{skip_users_playback_to_next_track}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -749,7 +761,7 @@ async sub skip_users_playback_to_next_track {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{skip_users_playback_to_next_track}{response} // [
 
     ];
 
@@ -798,9 +810,10 @@ A completed request will return a 204 NO CONTENT response code, and then issue t
 async sub skip_users_playback_to_previous_track {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'POST';
-    $request->{uri}    = 'https://api.spotify.com/v1/me/player/previous';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{skip_users_playback_to_previous_track}{method} // 'POST';
+    $request->{uri}    = $mapping->{skip_users_playback_to_previous_track}{uri} // 'https://api.spotify.com/v1/me/player/previous';
+    $request->{param}  = $mapping->{skip_users_playback_to_previous_track}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -814,7 +827,7 @@ async sub skip_users_playback_to_previous_track {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{skip_users_playback_to_previous_track}{response} // [
 
     ];
 
@@ -888,9 +901,10 @@ A completed request will return a 204 NO CONTENT response code, and then issue t
 async sub start_a_users_playback {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'PUT';
-    $request->{uri}    = 'https://api.spotify.com/v1/me/player/play';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{start_a_users_playback}{method} // 'PUT';
+    $request->{uri}    = $mapping->{start_a_users_playback}{uri} // 'https://api.spotify.com/v1/me/player/play';
+    $request->{param}  = $mapping->{start_a_users_playback}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -922,7 +936,7 @@ async sub start_a_users_playback {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{start_a_users_playback}{response} // [
 
     ];
 
@@ -977,9 +991,10 @@ A completed request will return a 204 NO CONTENT response code, and then issue t
 async sub toggle_shuffle_for_users_playback {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'PUT';
-    $request->{uri}    = 'https://api.spotify.com/v1/me/player/shuffle';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{toggle_shuffle_for_users_playback}{method} // 'PUT';
+    $request->{uri}    = $mapping->{toggle_shuffle_for_users_playback}{uri} // 'https://api.spotify.com/v1/me/player/shuffle';
+    $request->{param}  = $mapping->{toggle_shuffle_for_users_playback}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -997,7 +1012,7 @@ async sub toggle_shuffle_for_users_playback {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{toggle_shuffle_for_users_playback}{response} // [
 
     ];
 
@@ -1050,9 +1065,10 @@ A completed request will return a 204 NO CONTENT response code, and then issue t
 async sub transfer_a_users_playback {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'PUT';
-    $request->{uri}    = 'https://api.spotify.com/v1/me/player';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{transfer_a_users_playback}{method} // 'PUT';
+    $request->{uri}    = $mapping->{transfer_a_users_playback}{uri} // 'https://api.spotify.com/v1/me/player';
+    $request->{param}  = $mapping->{transfer_a_users_playback}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -1070,7 +1086,7 @@ async sub transfer_a_users_playback {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{transfer_a_users_playback}{response} // [
 
     ];
 

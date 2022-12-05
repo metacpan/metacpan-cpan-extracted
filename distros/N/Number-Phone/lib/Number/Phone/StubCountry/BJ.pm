@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20220903144935;
+our $VERSION = 1.20221202211023;
 
 my $formatters = [
                 {
@@ -38,7 +38,8 @@ my $validators = {
             02|
             1[037]|
             2[45]|
-            3[68]
+            3[68]|
+            4\\d
           )\\d{5}
         ',
                 'geographic' => '
@@ -46,7 +47,8 @@ my $validators = {
             02|
             1[037]|
             2[45]|
-            3[68]
+            3[68]|
+            4\\d
           )\\d{5}
         ',
                 'mobile' => '
@@ -64,45 +66,46 @@ my $validators = {
                 'voip' => '857[58]\\d{4}'
               };
 my %areanames = ();
-$areanames{en} = {"2292255", "Savè",
-"2292022", "Kandiévé",
-"2292134", "Ouidah",
-"2292029", "Ouémé\/Plateau\ departments",
-"2292026", "Sakété\/Igolo",
-"2292137", "Allada",
-"2292131", "Ganhi",
-"2292380", "Djougou",
-"2292249", "Mono\/Kouffo\/Zou\/Collines\ departments",
-"2292367", "Malanville",
+$areanames{en} = {"2292253", "Dassa\-Zoumé",
+"2292130", "Cadjehoun",
+"2292365", "Banikoara",
 "2292259", "Mono\/Kouffo\/Zou\/Collines\ departments",
-"2292361", "Parakou",
-"2292250", "Abomey",
-"2292246", "Dogbo",
-"2292382", "Natitingou",
-"2292383", "Tanguiéta",
-"2292252", "Covè",
+"2292135", "Godomey",
 "2292243", "Come",
-"2292253", "Dassa\-Zoumé",
-"2292025", "Pobè\/Kétou",
-"2292251", "Bohicon",
+"2292380", "Djougou",
+"2292252", "Covè",
+"2292138", "Kouhounou",
+"2292134", "Ouidah",
+"2292367", "Malanville",
+"2292137", "Allada",
+"2292249", "Mono\/Kouffo\/Zou\/Collines\ departments",
+"22924", "Tanguiéta",
+"2292026", "Sakété\/Igolo",
+"2292254", "Savalou",
+"2292132", "Jéricho",
+"2292362", "Nikki\/Ndali",
+"2292383", "Tanguiéta",
+"2292255", "Savè",
+"2292139", "Littoral\/Atlantique\ departments",
+"2292021", "Ongala",
+"2292250", "Abomey",
+"2292133", "Akpakpa",
+"2292363", "Kandi\/Gogounou\/Ségbana",
+"2292382", "Natitingou",
+"2292131", "Ganhi",
+"2292361", "Parakou",
+"2292029", "Ouémé\/Plateau\ departments",
+"2292022", "Kandiévé",
+"2292136", "Abomey\-Calaci",
+"2292027", "Adjohoun",
 "2292241", "Lokossa",
 "2292024", "Sèmè",
-"2292139", "Littoral\/Atlantique\ departments",
-"2292130", "Cadjehoun",
-"2292136", "Abomey\-Calaci",
-"2292363", "Kandi\/Gogounou\/Ségbana",
-"2292362", "Nikki\/Ndali",
-"2292133", "Akpakpa",
-"2292132", "Jéricho",
-"2292365", "Banikoara",
-"2292135", "Godomey",
-"2292254", "Savalou",
-"2292027", "Adjohoun",
-"2292021", "Ongala",
-"2292138", "Kouhounou",};
+"2292246", "Dogbo",
+"2292025", "Pobè\/Kétou",
+"2292251", "Bohicon",};
 $areanames{fr} = {"2292139", "Départements\ Littoral\/Atlantique",
-"2292259", "Départements\ Mono\/Couffo\/Zou\/Collines",
 "2292249", "Départements\ Mono\/Couffo\/Zou\/Collines",
+"2292259", "Départements\ Mono\/Couffo\/Zou\/Collines",
 "2292029", "Départements\ Ouémé\/Plateau",};
 
     sub new {

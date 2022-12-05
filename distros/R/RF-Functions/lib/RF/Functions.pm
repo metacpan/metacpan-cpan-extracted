@@ -5,11 +5,12 @@ use POSIX qw{log10};
 use base qw{Exporter};
 use Math::Round qw{};
 
-our $VERSION = '0.03';
+our $VERSION   = '0.04';
 our @EXPORT_OK = qw(
                     db_ratio ratio2db
                     ratio_db db2ratio
                     fsl_hz_m fsl_mhz_km fsl_ghz_km fsl_mhz_mi
+                    dbd_dbi dbi_dbd dbd2dbi dbi2dbd dipole_gain
                    );
 
 =head1 NAME
@@ -52,6 +53,40 @@ sub ratio_db {10 ** (shift()/10)};
 
 sub db2ratio {10 ** (shift()/10)};
 
+=head2 dbi_dbd, dbd2dbi
+
+Returns dBi given dBd.  Converts the given antenna gain in dBd to dBi. 
+
+  my $eirp = dbi_dbd($erp);
+
+=cut
+
+sub dbi_dbd {shift() + dipole_gain()};
+
+sub dbd2dbi {shift() + dipole_gain()};
+
+=head2 dbd_dbi, dbi2dbd
+
+Returns dBd given dBi. Converts the given antenna gain in dBi to dBd.
+
+  my $erp = dbd_dbi($eirp);
+
+=cut
+
+sub dbd_dbi {shift() - dipole_gain()};
+
+sub dbi2dbd {shift() - dipole_gain()};
+
+=head2 dipole_gain
+
+Returns the gain of a reference half-wave dipole in dBi.
+
+  my $dipole_gain = dipole_gain(); #always 2.15 dBi
+
+=cut
+
+sub dipole_gain {2.15}; #FCC 10Log(1.64) ~ 2.15
+
 =head2 fsl_hz_m, fsl_mhz_km, fsl_ghz_km, fsl_mhz_mi
 
 Return power loss in dB given frequency and distance in the specified units of measure
@@ -81,9 +116,9 @@ sub fsl_mhz_mi {
 }
 
 sub _fsl_constant {
-  my $freq  = shift;
-  my $dist  = shift;
-  my $const = shift;
+  my $freq  = shift; die("Error: Frequency must be positive number") unless $freq > 0;
+  my $dist  = shift; die("Error: Distance must be non-negative number") unless $dist >= 0;
+  my $const = shift or die("Error: Constant required");
   #Equvalent to 20log($freq) + 20log($dist) + $const for performance
   return Math::Round::nearest(0.001, 20 * log10($freq * $dist) + $const);
 }
@@ -95,6 +130,8 @@ L<POSIX/log10>, L<Math::Round/nearest>
 L<https://en.wikipedia.org/wiki/Decibel#Power_quantities>
 
 L<https://en.wikipedia.org/wiki/Free-space_path_loss#Free-space_path_loss_in_decibels>
+
+L<https://en.wikipedia.org/wiki/Dipole_antenna#Dipole_as_a_reference_standard>
 
 =head1 AUTHOR
 

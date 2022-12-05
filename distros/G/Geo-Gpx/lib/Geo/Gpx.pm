@@ -3,7 +3,7 @@ package Geo::Gpx;
 use warnings;
 use strict;
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 use Carp;
 use DateTime::Format::ISO8601;
@@ -91,17 +91,16 @@ BEGIN {
 }
 
 sub _time_string_to_epoch {
-  my ( $self, $str ) = @_;
-  my $dt = DateTime::Format::ISO8601->parse_datetime( $str );
+  my $dt = DateTime::Format::ISO8601->parse_datetime( shift );
   return $dt->epoch
 }
 
 sub _time_epoch_to_string {
-  my ( $self, $tm) = @_;
-  $tm = DateTime->from_epoch( epoch => $tm, time_zone => 'UTC' );
-  my $ts = $tm->strftime( '%Y-%m-%dT%H:%M:%S%z' );
-  $ts =~ s/(\d{2})$/:$1/;
-  return $ts
+  my $dt = DateTime->from_epoch( epoch => shift, time_zone => 'UTC' );
+  my $str = $dt->strftime( '%Y-%m-%dT%H:%M:%S%z' );
+  $str =~ s/(\d{2})$/:$1/;
+  $str =~ s/\+00:00$/Z/;
+  return $str
 }
 
 sub _init_shiny_new {
@@ -118,7 +117,7 @@ sub _init_shiny_new {
       return {@_};
     },
     time => sub {
-      return $self->_time_epoch_to_string( $_[0] );
+      return _time_epoch_to_string( $_[0] );
     },
   };
 }
@@ -131,7 +130,7 @@ sub _init_shiny_new {
 
 Create and return a new C<Geo::Gpx> instance based on a *.gpx file (I<$fname>), an open filehandle (I<$fh>), or an XML string (I<$xml>). GPX 1.0 and 1.1 are supported.
 
-The optional C<work_dir> (or C<wd> for short) specifies where to save any working files, such as with the save() method. It can be supplied as a relative path or as an absolute path. If C<work_dir> is omitted, it is set based on the path of the I<$filename> supplied or the current working directory if the constructor is called with an XML string or a filehandle (see C<< set_wd() >> for more info).
+The optional C<work_dir> (or C<wd> for short) specifies where to save any working files, such as with the save() method. It can be supplied as a relative path or as an absolute path. If C<work_dir> is omitted, it is set based on the path of the I<$fname> supplied or the current working directory if the constructor is called with an XML string or a filehandle (see C<< set_wd() >> for more info).
 
 =back
 
@@ -214,7 +213,7 @@ sub _parse {
         },
         time => sub {
           my ( $elem, $attr, $ctx ) = @_;
-          my $tm = $self->_time_string_to_epoch( _trim( $p->text() ) );
+          my $tm = _time_string_to_epoch( _trim( $p->text() ) );
           $ctx->{$elem} = $tm if defined $tm;
         }
       );
@@ -521,11 +520,10 @@ sub waypoint_closest_to {
     } else { croak $croak_msg }
     croak $croak_msg if @_;
 
-    my $gc = $to_pt->to_geocalc;
     my ($closest_pt, $min_dist);
     my $iter = $gpx->iterate_waypoints();
     while ( my $pt = $iter->() ) {
-        my $distance = $gc->distance_to({ lat => $pt->lat, lon => $pt->lon });
+        my $distance = $to_pt->distance_to( $pt );
         $min_dist = $distance unless (defined $min_dist); # nb: $min_dist can be 0
         $closest_pt ||= $pt;
         if ($distance < $min_dist) {
@@ -706,7 +704,7 @@ sub tracks_add {
     # let's try a default behaviour of adding time of first point if name is not defined (could provide option to turn this off)
     if ( ! defined $c->{name} ) {
         my $first_pt_time = $c->{segments}[0]{points}[0]->time;
-        $c->{name} = $o->_time_epoch_to_string( $first_pt_time ) if $first_pt_time;
+        $c->{name} = _time_epoch_to_string( $first_pt_time ) if $first_pt_time;
     }
     push @{ $o->{tracks} }, $c;
     return 1
@@ -1125,10 +1123,6 @@ sub save {
     if ( ! $opts{meta_time} ) {
         $xml_string =~ s/\n*\w*<time>[^<]*<\/time>//;
     }
-    if ( ! $opts{time_nano} ) {             # undocumented for now
-        $xml_string =~ s/(<time>.*?)\+\d{2,2}:\d{2,2}(<\/time>)/$1Z$2/g;
-        $xml_string =~ s/(<name>.*?)\+\d{2,2}:\d{2,2}(<\/name>)/$1Z$2/g
-    }
 
     if (defined ($opts{encoding}) and ( $opts{encoding} eq 'latin1') ) {
         open( $fh, ">:encoding(latin1)", $fname) or  die "can't open file $fname: $!";
@@ -1179,9 +1173,9 @@ sub set_filename {
 
 =item set_wd( $folder )
 
-Sets/gets the working directory for any eventual saving of the *.gpx file and checks the validity of that path. It can can be set as a relative path (i.e. relative to the actual L<Cwd::cwd>) or as an absolute path, but is always returned as a full path.
+Sets/gets the working directory for any eventual saving of the *.gpx file and checks the validity of that path. It can be set as a relative path (i.e. relative to the actual L<Cwd>) or as an absolute path, but is always returned as a full path.
 
-This working directory is always defined. The previous one is also stored in memory, such that C<set_wd('-')> switches back and forth between two directories. The module never actually L<chdir>'s, it just keeps track of where the user wishes to save files.
+This working directory is always defined. The previous one is also stored in memory, such that C<set_wd('-')> switches back and forth between two directories. The module never actually C<chdir>'s, it just keeps track of where the user wishes to save files.
 
 =back
 
@@ -1270,9 +1264,11 @@ Returns the schema version of a GPX document. Versions 1.0 and 1.1 are supported
 
 =head1 DEPENDENCIES
 
-L<DateTime::Format::ISO8601>,
 L<DateTime>,
+L<DateTime::Format::ISO8601>,
+L<Geo::Coordinates::Transform>,
 L<HTML::Entities>,
+L<Math::Trig>,
 L<Scalar::Util>,
 L<XML::Descent>
 
@@ -1296,7 +1292,7 @@ Please visit the project page at: L<https://github.com/patjoly/geo-gpx>.
 
 =head1 VERSION
 
-1.07
+1.08
 
 =head1 LICENSE AND COPYRIGHT
 

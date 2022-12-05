@@ -5,7 +5,8 @@ use warnings;
 use Test::More;
 
 if ( not $ENV{TEST_AUTHOR} ) {
-    my $msg = 'Author test.  Set TEST_AUTHOR environment variable to a true value to run.';
+    my $msg
+        = 'Author test.  Set TEST_AUTHOR environment variable to a true value to run.';
     plan( skip_all => $msg );
 }
 
@@ -25,16 +26,21 @@ for my $dir ( split /:/, $ENV{PATH} ) {
 plan skip_all => "Test::Spelling required for testing POD spelling" if $@;
 plan skip_all => "spell command required for testing POD spelling" if !$found;
 
-add_stopwords(qw/
-    NSW
-    Hornsby
-    Param
-    IDE
-    VTide
-    vtide
-    programmatic
-    tmux
-    env
-    ctags
-/);
+add_stopwords(
+    qw/
+        NSW
+        Hornsby
+        Param
+        ctags
+        env
+        IDE
+        params
+        pm
+        programmatic
+        tmux
+        Truthy
+        vtide
+        VTide
+        /
+);
 all_pod_files_spelling_ok();

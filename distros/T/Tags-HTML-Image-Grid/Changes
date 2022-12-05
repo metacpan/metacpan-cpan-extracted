@@ -1,3 +1,10 @@
+0.03 2022-12-04T18:03:23+01:00
+ - Add parameters (img_border_color_cb and img_border_width) to use border
+   for some images. img_border_width is global parameter and color could be
+   variable.
+ - Fix border of image.
+ - Fix existing of value in comment.
+
 0.02 2022-11-05T17:33:05+01:00
  - Fix existing of value in select callback.
 

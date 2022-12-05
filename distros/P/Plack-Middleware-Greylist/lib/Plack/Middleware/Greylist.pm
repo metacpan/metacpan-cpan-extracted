@@ -13,7 +13,7 @@ use warnings;
 use parent qw( Plack::Middleware );
 
 use HTTP::Status qw/ HTTP_FORBIDDEN HTTP_TOO_MANY_REQUESTS /;
-use List::Util   qw/ pairs /;
+use List::Util   1.29 qw/ pairs /;
 use Module::Load qw/ load /;
 use Net::IP::Match::Trie;
 use Plack::Util;
@@ -21,7 +21,7 @@ use Plack::Util::Accessor qw/ default_rate rules cache file _match greylist retr
 use Ref::Util             qw/ is_plain_arrayref /;
 use Time::Seconds         qw/ ONE_MINUTE /;
 
-our $VERSION = 'v0.3.0';
+our $VERSION = 'v0.3.1';
 
 
 sub prepare_app {
@@ -168,7 +168,7 @@ Plack::Middleware::Greylist - throttle requests with different rates based on ne
 
 =head1 VERSION
 
-version v0.3.0
+version v0.3.1
 
 =head1 SYNOPSIS
 
@@ -272,6 +272,9 @@ It is required unless you are defining your own L</cache>.
 
 This is a code reference to a function that increments the cache counter for a key (usually the IP address or net
 block).
+
+If you customise this, then you need to ensure that the counter resets or expires counts after a set period of time,
+e.g. one minute.  If you use a different time interval, then you may need to adjust the L</retry_after> time.
 
 =head1 KNOWN ISSUES
 

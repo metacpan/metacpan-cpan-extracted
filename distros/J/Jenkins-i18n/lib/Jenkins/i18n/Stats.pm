@@ -3,10 +3,17 @@ package Jenkins::i18n::Stats;
 use 5.014004;
 use strict;
 use warnings;
+use base       qw(Class::Accessor);
 use Hash::Util qw(lock_keys);
-use Carp qw(confess);
+use Carp       qw(confess);
+use Set::Tiny;
 
-our $VERSION = '0.08';
+my @ATTRIBUTES = qw(files missing unused empty same no_jenkins keys);
+
+__PACKAGE__->follow_best_practice;
+__PACKAGE__->mk_ro_accessors(@ATTRIBUTES);
+
+our $VERSION = '0.09';
 
 =pod
 
@@ -26,45 +33,6 @@ C<Jenkins::i18n::Stats>
 
 None by default.
 
-=head1 ATTRIBUTES
-
-All attributes are counters.
-
-=over
-
-=item *
-
-files: all the found translation files.
-
-=item *
-
-keys: all the keys loaded from the properties files.
-
-=item *
-
-missing: all keys that are missing after comparing a language to the original
-in English,
-
-=item *
-
-unused: all keys that are available in the a language but not in the original
-English.
-
-=item *
-
-empty: all keys in the language that are available but doesn't actually have a
-translated value.
-
-=item *
-
-same: all keys that have the same values as the original in English. Not
-necessarilly an error.
-
-=item *
-
-no_jenkins: all keys that are not related to Jenkins, but coming from Hudson.
-
-=back
 
 =head1 METHODS
 
@@ -76,34 +44,147 @@ Creates a new instance.
 
 sub new {
     my $class = shift;
-    my $self  = {
-        files      => 0,
-        keys       => 0,
-        missing    => 0,
-        unused     => 0,
-        empty      => 0,
-        same       => 0,
-        no_jenkins => 0
-    };
+    my $self  = {};
+
+    foreach my $attrib (@ATTRIBUTES) {
+        $self->{$attrib} = 0;
+    }
+
+    $self->{unique_keys} = Set::Tiny->new;
 
     bless $self, $class;
     lock_keys( %{$self} );
     return $self;
 }
 
-=head2 inc
+=head2 get_keys
 
-Increments a counter.
+Return the number of all keys retrieve from all files processed, ignoring if
+they are repeated several times.
+
+=head2 get_files
+
+Returns the number of found translation files.
+
+=head2 get_missing
+
+Returns the number of keys that are missing after comparing a language to the
+original in English.
+
+=head2 get_unused
+
+Returns the number of keys that are available in the a language but not in the
+original English.
+
+=head2 get_empty
+
+Returns the number of keys in the language that are available but doesn't
+actually have a translated value.
+
+=head2 get_same
+
+Returns the number of keys that have the same values as the original in
+English. Not necessarilly an error.
+
+=head2 get_no_jenkins
+
+Returns the number of keys that are not related to Jenkins, but coming from
+Hudson.
 
 =cut
 
-sub inc {
+sub _inc {
     my ( $self, $item ) = @_;
     confess "item is a required parameter" unless ($item);
     confess "there is no such counter '$item'"
         unless ( exists( $self->{$item} ) );
     $self->{$item}++;
     return 1;
+}
+
+=head2 inc_files
+
+Increments the C<files> counter.
+
+=cut
+
+sub inc_files {
+    shift->_inc('files');
+}
+
+=head2 inc_missing
+
+Increments the C<missing> counter.
+
+=cut
+
+sub inc_missing {
+    shift->_inc('missing');
+}
+
+=head2 inc_unused
+
+Increments the C<unused> counter.
+
+=cut
+
+sub inc_unused {
+    shift->_inc('unused');
+}
+
+=head2 inc_empty
+
+Increments the C<empty> counter.
+
+=cut
+
+sub inc_empty {
+    shift->_inc('empty');
+}
+
+=head2 inc_same
+
+Increments the C<same> counter.
+
+=cut
+
+sub inc_same {
+    shift->_inc('same');
+}
+
+=head2 inc_no_jenkins
+
+Increments the C<no_jenkins> counter.
+
+=cut
+
+sub inc_no_jenkins {
+    shift->_inc('no_jenkins');
+}
+
+=head2 add_key
+
+Increments the keys counters.
+
+This is required in order to allow the counting of unique keys processed, as
+well all the keys processed.
+
+=cut
+
+sub add_key {
+    my ( $self, $key ) = @_;
+    $self->_inc('keys');
+    $self->{unique_keys}->insert($key);
+}
+
+=head2 get_unique_keys
+
+Returns the number of unique keys processed.
+
+=cut
+
+sub get_unique_keys {
+    return shift->{unique_keys}->size();
 }
 
 sub _done {
@@ -155,7 +236,6 @@ sub summary {
 
     }
 
-    warn "Not a single key was processed\n";
     return {};
 }
 

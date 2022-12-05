@@ -5,11 +5,11 @@ use warnings;
 
 use Test::More;
 
-use Object::Pad;
+use Object::Pad ':experimental(init_expr)';
 
 class Point {
-   has $x :param;
-   has $y :param = 0;
+   field $x :param;
+   field $y :param = 0;
 
    method pos { return ( $x, $y ); }
 }
@@ -27,7 +27,7 @@ class Point {
 }
 
 class Point3D :isa(Point) {
-   has $z :param = 0;
+   field $z :param = 0;
 
    method pos { return ( $self->next::method, $z ) }
 }
@@ -50,9 +50,9 @@ class Point3D :isa(Point) {
 # Strict params checking
 {
    class Colour :strict(params) {
-      has $red   :param = 0;
-      has $green :param = 0;
-      has $blue  :param = 0;
+      field $red   :param = 0;
+      field $green :param = 0;
+      field $blue  :param = 0;
    }
 
    my $LINE = __LINE__+1;

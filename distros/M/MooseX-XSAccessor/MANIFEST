@@ -20,6 +20,8 @@ t/02accel.t
 t/03funky.t
 t/04chained.t
 t/05lvalue.t
+t/06roles.t
+t/99is_xs.t
 t/lib/MyMoose.pm
 t/lib/MyMoose/Role.pm
 t/moose_accessor_context.t

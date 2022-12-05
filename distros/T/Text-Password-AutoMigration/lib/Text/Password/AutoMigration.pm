@@ -1,5 +1,5 @@
 package Text::Password::AutoMigration;
-our $VERSION = "0.15";
+our $VERSION = "0.16";
 
 use Carp;
 use Moose;

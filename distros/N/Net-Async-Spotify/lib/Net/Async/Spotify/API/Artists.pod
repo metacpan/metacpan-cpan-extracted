@@ -1,6 +1,7 @@
 =encoding utf8
 
 =for comment POD_DERIVED_INDEX_GENERATED
+
 The following documentation is automatically generated.  Please do not edit
 this file, but rather the original, inline with Net::Async::Spotify::API::Artists
 at lib/Net/Async/Spotify/API/Artists.pm
@@ -27,11 +28,11 @@ Will hold all extra functionality for Spotify Artists API
 
 =item L<Net::Async::Spotify::API::Generated::Artists>
 
-L<get_an_artist|Net::Async::Spotify::API::Generated::Artists/get_an_artist>, L<get_an_artists_albums|Net::Async::Spotify::API::Generated::Artists/get_an_artists_albums>, L<get_an_artists_related_artists|Net::Async::Spotify::API::Generated::Artists/get_an_artists_related_artists>, L<get_an_artists_top_tracks|Net::Async::Spotify::API::Generated::Artists/get_an_artists_top_tracks>, L<get_multiple_artists|Net::Async::Spotify::API::Generated::Artists/get_multiple_artists>
+L<get_an_artist|Net::Async::Spotify::API::Generated::Artists/get_an_artist>, L<get_an_artists_albums|Net::Async::Spotify::API::Generated::Artists/get_an_artists_albums>, L<get_an_artists_related_artists|Net::Async::Spotify::API::Generated::Artists/get_an_artists_related_artists>, L<get_an_artists_top_tracks|Net::Async::Spotify::API::Generated::Artists/get_an_artists_top_tracks>, L<get_multiple_artists|Net::Async::Spotify::API::Generated::Artists/get_multiple_artists>, L<mapping|Net::Async::Spotify::API::Generated::Artists/mapping>
 
 =item L<Net::Async::Spotify::API::Base>
 
-L<call_api|Net::Async::Spotify::API::Base/call_api>, L<new|Net::Async::Spotify::API::Base/new>, L<spotify|Net::Async::Spotify::API::Base/spotify>
+L<call_api|Net::Async::Spotify::API::Base/call_api>, L<decode_response|Net::Async::Spotify::API::Base/decode_response>, L<parse_response|Net::Async::Spotify::API::Base/parse_response>, L<spotify|Net::Async::Spotify::API::Base/spotify>
 
 =back
 

@@ -8,7 +8,7 @@ my $build = Module::Build->new(
    requires => {
       'perl' => '5.026',
       'Future::AsyncAwait' => '0.47', # toplevel await
-      'Object::Pad' => '0.19',
+      'Object::Pad' => '0.66',
 
       'Data::Bitfield' => 0,
       'Device::Chip' => '0.03',

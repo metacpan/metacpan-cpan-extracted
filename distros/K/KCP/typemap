@@ -1,0 +1,20 @@
+TYPEMAP
+kcp_t *    T_PTROBJ_KCP
+IUINT32    T_UV
+
+INPUT
+T_PTROBJ_KCP
+    if (sv_derived_from($arg, \"KCP\"))
+    {
+        IV tmp = SvIV((SV*)SvRV($arg));
+        $var = ($type) tmp;
+    }
+    else
+    {
+        croak(\"$var is not of type KCP\");
+    }
+
+
+OUTPUT
+T_PTROBJ_KCP
+    sv_setref_pv($arg, \"KCP\", (void*)$var);

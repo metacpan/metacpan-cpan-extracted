@@ -506,10 +506,6 @@ lib/Date/Manip/Offset/off404.pm
 lib/Date/Manip/Offset/off405.pm
 lib/Date/Manip/Offset/off406.pm
 lib/Date/Manip/Offset/off407.pm
-lib/Date/Manip/Offset/off408.pm
-lib/Date/Manip/Offset/off409.pm
-lib/Date/Manip/Offset/off410.pm
-lib/Date/Manip/Offset/off411.pm
 lib/Date/Manip/Problems.pod
 lib/Date/Manip/Recur.pm
 lib/Date/Manip/Recur.pod
@@ -558,6 +554,7 @@ lib/Date/Manip/TZ/amcaye00.pm
 lib/Date/Manip/TZ/amcent00.pm
 lib/Date/Manip/TZ/amchic00.pm
 lib/Date/Manip/TZ/amchih00.pm
+lib/Date/Manip/TZ/amciud00.pm
 lib/Date/Manip/TZ/amcord00.pm
 lib/Date/Manip/TZ/amcost00.pm
 lib/Date/Manip/TZ/amcuia00.pm
@@ -611,13 +608,11 @@ lib/Date/Manip/TZ/ammont01.pm
 lib/Date/Manip/TZ/ammont02.pm
 lib/Date/Manip/TZ/amnew_00.pm
 lib/Date/Manip/TZ/amnew_01.pm
-lib/Date/Manip/TZ/amnipi00.pm
 lib/Date/Manip/TZ/amnome00.pm
 lib/Date/Manip/TZ/amnoro00.pm
 lib/Date/Manip/TZ/amnuuk00.pm
 lib/Date/Manip/TZ/amojin00.pm
 lib/Date/Manip/TZ/ampana00.pm
-lib/Date/Manip/TZ/ampang00.pm
 lib/Date/Manip/TZ/ampara00.pm
 lib/Date/Manip/TZ/ampete00.pm
 lib/Date/Manip/TZ/amphoe00.pm
@@ -625,7 +620,6 @@ lib/Date/Manip/TZ/amport00.pm
 lib/Date/Manip/TZ/amport01.pm
 lib/Date/Manip/TZ/ampuer00.pm
 lib/Date/Manip/TZ/ampunt00.pm
-lib/Date/Manip/TZ/amrain00.pm
 lib/Date/Manip/TZ/amrank00.pm
 lib/Date/Manip/TZ/amreci00.pm
 lib/Date/Manip/TZ/amregi00.pm
@@ -646,7 +640,6 @@ lib/Date/Manip/TZ/amswif00.pm
 lib/Date/Manip/TZ/amtegu00.pm
 lib/Date/Manip/TZ/amtell00.pm
 lib/Date/Manip/TZ/amthul00.pm
-lib/Date/Manip/TZ/amthun00.pm
 lib/Date/Manip/TZ/amtiju00.pm
 lib/Date/Manip/TZ/amtoro00.pm
 lib/Date/Manip/TZ/amtucu00.pm
@@ -793,6 +786,7 @@ lib/Date/Manip/TZ/etgmtp08.pm
 lib/Date/Manip/TZ/etgmtp09.pm
 lib/Date/Manip/TZ/etgmtp10.pm
 lib/Date/Manip/TZ/etgmtp11.pm
+lib/Date/Manip/TZ/etutc00.pm
 lib/Date/Manip/TZ/euando00.pm
 lib/Date/Manip/TZ/euastr00.pm
 lib/Date/Manip/TZ/euathe00.pm
@@ -826,12 +820,10 @@ lib/Date/Manip/TZ/eusofi00.pm
 lib/Date/Manip/TZ/eutall00.pm
 lib/Date/Manip/TZ/eutira00.pm
 lib/Date/Manip/TZ/euulya00.pm
-lib/Date/Manip/TZ/euuzhg00.pm
 lib/Date/Manip/TZ/euvien00.pm
 lib/Date/Manip/TZ/euviln00.pm
 lib/Date/Manip/TZ/euvolg00.pm
 lib/Date/Manip/TZ/euwars00.pm
-lib/Date/Manip/TZ/euzapo00.pm
 lib/Date/Manip/TZ/euzuri00.pm
 lib/Date/Manip/TZ/f00.pm
 lib/Date/Manip/TZ/g00.pm
@@ -883,7 +875,6 @@ lib/Date/Manip/TZ/s00.pm
 lib/Date/Manip/TZ/t00.pm
 lib/Date/Manip/TZ/u00.pm
 lib/Date/Manip/TZ/ut00.pm
-lib/Date/Manip/TZ/utc00.pm
 lib/Date/Manip/TZ/v00.pm
 lib/Date/Manip/TZ/w00.pm
 lib/Date/Manip/TZ/wet00.pm
@@ -977,6 +968,7 @@ t/date.parse.dst.t
 t/date.parse.dutch.t
 t/date.parse.english.t
 t/date.parse.french.t
+t/date.parse.german.t
 t/date.parse.holidays.t
 t/date.parse.invalid.t
 t/date.parse.iso.t
@@ -986,6 +978,7 @@ t/date.parse.misc.1.t
 t/date.parse.mmmyyyy.first.t
 t/date.parse.mmmyyyy.last.t
 t/date.parse.mmmyyyy.t
+t/date.parse.norwegian.t
 t/date.parse.period.t
 t/date.parse.polish.t
 t/date.parse.portuguese.t

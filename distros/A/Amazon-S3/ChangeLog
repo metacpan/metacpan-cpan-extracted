@@ -1,3 +1,12 @@
+Sat Dec  3 14:09:29 2022  Rob Lauer  <rlauer6@comcast.net>
+
+	[0.57 - rpm packaging]:
+	* VERSION: bump
+	* perl-Amazon-S3.spec.in
+	(Requires): Net::Amazon::Signature::V4
+	* src/main/perl/lib/Makefile.am
+	- install Amazon::S3::Signature::V4 to correct directory
+
 Tue Nov 29 10:39:43 2022  Rob Lauer  <rlauer6@comcast.net>
 
 	[0.56 - minor bug, 0.55 issues #8]:

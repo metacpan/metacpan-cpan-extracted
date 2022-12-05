@@ -6,7 +6,7 @@ use warnings;
 use Carp qw(confess);
 use parent 'Config::Properties';
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =pod
 
@@ -128,7 +128,7 @@ interpreters (version 5.6.0).
 sub process_line {
     my ( $self, $file ) = @_;
     my $line = $self->read_line($file);
-    defined $line or return undef;
+    defined $line or return;
 
     my $ln = $self->{last_line_number};
 

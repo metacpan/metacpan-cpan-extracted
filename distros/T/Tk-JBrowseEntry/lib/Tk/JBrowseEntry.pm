@@ -413,6 +413,14 @@ Specifying B<-fixedlist> => I<"top"> will instead display the listbox
 I<above> the rest of the widget.  Default: 0 - drop-down list is not 
 fixed (pre-v5.10 behavior).
 
+NOTE:  A list can be set to both "fixed" ("-fixedlist => ...") and "bouncy" 
+("-altbinding => 'list=bouncy'") at the same time.  This will ensure that 
+the focus always jumps right back to the text field whenever the user 
+selects an entry from the list.  Otherwise, "fixed" lists alternate 
+focus between the list and the entry field when the user clicks on 
+the list to select a value, as if the list is alternating between 
+"popped down" and "popped up" - this is not considered a bug.
+
 =item B<-indicator>
 
 Only used if B<-listboxtype> is set to HListbox, otherwise ignored.  
@@ -839,7 +847,7 @@ package Tk::JBrowseEntry;
 BEGIN
 {
 	use vars qw($VERSION $haveHListbox);
-	$VERSION = '5.24';
+	$VERSION = '5.25';
 
 	use strict;
 	use Carp;
@@ -1180,7 +1188,6 @@ no strict 'refs';
 		$w->configure(-textvariable => \$var_ref);
 	}
 
-#print STDERR "---1=".$_[1]."= w=$w= default=".$_[1]->{'-default'}."= var=".$_[1]->{'-variable'}."=\n";
 	eval { $w->{'default'} = $_[1]->{'-default'} || (defined($_[1]->{'-variable'}) ? ${$_[1]->{'-variable'}}
 			: undef); };
 }
@@ -1196,8 +1203,8 @@ sub focus   #CALLED WHENEVER MAIN WIDGET TAKES FOCUS:
 	}
 	my ($state) = $w->cget( "-state" );
 	my $fw = ($state eq 'readonly') ? 'frame' : 'entry';
-#	$w->Subwidget($fw)->configure(-highlightcolor => $w->Subwidget('frame')->cget('-background'))
-#			if ($fw eq 'entry');  #CLEAN UP ANY MESS MADE BY setPalette!
+	$w->Subwidget($fw)->configure(-highlightcolor => $w->Subwidget('frame')->cget('-background'))
+			if ($fw eq 'entry');  #CLEAN UP ANY MESS MADE BY setPalette!
 	$w->Subwidget($fw)->focus;
 
 	#BUTTON GETS FOCUS IF BUTTON TAKES FOCUS, BUT WIDGET ITSELF DOESN'T.
@@ -1282,7 +1289,7 @@ sub SetBindings
 
 no strict 'refs';
 		my $var_ref = $w->cget( '-textvariable' );
-		return  unless (defined($var_re) && defined($$var_ref) && $$var_ref =~ /\S/o);  #TEXT FIELD EMPTY, PUNT!
+		return  unless (defined($var_ref) && defined($$var_ref) && $$var_ref =~ /\S/o);  #TEXT FIELD EMPTY, PUNT!
 
 		my @listsels = $w->getText('0','end');
 		return  if ($#listsels < 0);  #NO LIST TO SEARCH, SO PUNT!
@@ -2228,7 +2235,7 @@ sub LbFindSelection
 	}
 
 	my $index = $w->{'searchindx'} || 0;
-		
+
 	foreach my $i (0..$#listsels)   #SEARCH W/O REGARD TO CASE, START W/CURRENT SELECTION.
 	{
 		#if ($listsels[$index] =~ /^$srchval/i)

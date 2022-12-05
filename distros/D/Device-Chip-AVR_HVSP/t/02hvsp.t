@@ -2,6 +2,7 @@
 
 use v5.26;
 use warnings;
+use experimental 'signatures';
 
 use Test::More;
 use Test::Device::Chip::Adapter;
@@ -29,9 +30,7 @@ $adapter->check_and_clear( 'mount' );
    my @expectations;
 
    no warnings 'redefine';
-   *Device::Chip::AVR_HVSP::_transfer = sub {
-      shift;
-      my ( $sdi, $sii ) = @_;
+   *Device::Chip::AVR_HVSP::_transfer = sub ( $self, $sdi, $sii ){
       my $next = shift @expectations or
          return Future->fail( "Expected no more transfers, got {sdi=$sdi sii=$sii}" );
 
@@ -46,9 +45,8 @@ $adapter->check_and_clear( 'mount' );
       return Test::Future::Deferred->done_later( $next->[2] );
    };
 
-   sub expect_transfer
+   sub expect_transfer ( $sdi, $sii, $sdo = undef )
    {
-      my ( $sdi, $sii, $sdo ) = @_;
       push @expectations, [ $sdi, $sii, $sdo ];
    }
 
@@ -76,12 +74,12 @@ $adapter->check_and_clear( 'mount' );
       $adapter->expect_read_gpios( [ 'sdo' ] )->returns( { sdo => 1 } );
    }
 
-   sub expect_done
+   sub expect_done ( $title )
    {
       @expectations and
          return fail "Expected another transfer but no more happened";
       pass "End of expectations";
-      $adapter->check_and_clear;
+      $adapter->check_and_clear( $title );
    }
 }
 
@@ -93,7 +91,7 @@ $adapter->check_and_clear( 'mount' );
 
    await $chip->chip_erase;
 
-   expect_done;
+   expect_done '->chip_erase';
 }
 
 # read_signature
@@ -109,7 +107,7 @@ $adapter->check_and_clear( 'mount' );
    is( await $chip->read_signature, "ABC",
       '$chip->read_signature yields signature' );
 
-   expect_done;
+   expect_done '->read_signature';
 }
 
 # read_calibration
@@ -121,7 +119,7 @@ $adapter->check_and_clear( 'mount' );
    is( await $chip->read_calibration, "x",
       '$chip->read_calibration yields byte' );
 
-   expect_done;
+   expect_done '->read_calibration';
 }
 
 # lock
@@ -133,7 +131,7 @@ $adapter->check_and_clear( 'mount' );
    is( await $chip->read_lock, "\x03",
       '$chip->read_lock yields lock' );
 
-   expect_done;
+   expect_done '->read_lock';
 
    # write
    expect_cmd 0x20;
@@ -143,7 +141,7 @@ $adapter->check_and_clear( 'mount' );
 
    await $chip->write_lock( 0x01 );
 
-   expect_done;
+   expect_done '->write_lock';
 }
 
 # fuses
@@ -155,7 +153,7 @@ $adapter->check_and_clear( 'mount' );
    is( await $chip->read_fuse_byte( 'lfuse' ), 0xFD,
       '$chip->read_fuse yields fuse' );
 
-   expect_done;
+   expect_done '->read_fuse_byte';
 
    # write
    expect_cmd 0x40;
@@ -165,7 +163,7 @@ $adapter->check_and_clear( 'mount' );
 
    await $chip->write_fuse_byte( lfuse => 0xFB );
 
-   expect_done;
+   expect_done '->write_fuse_byte';
 }
 
 # start
@@ -200,7 +198,7 @@ $adapter->check_and_clear( 'mount' );
    is( await $chip->read_flash( start => 20, bytes => 2 ), "\x12\x34",
       '$chip->read_flash yields bytes' );
 
-   expect_done;
+   expect_done '->read_flash';
 
    # write
    # TODO: There isn't yet API to write a small fragment, so we'll have to test
@@ -223,7 +221,7 @@ $adapter->check_and_clear( 'mount' );
 
    await $chip->write_flash( "\x55\xAA" x 1024 );
 
-   expect_done;
+   expect_done '->write_flash';
 }
 
 # eeprom
@@ -237,7 +235,7 @@ $adapter->check_and_clear( 'mount' );
    is( await $chip->read_eeprom( start => 10, bytes => 1 ), "\x56",
       '$chip->read_eeprom yields bytes' );
 
-   expect_done;
+   expect_done '->read_eeprom';
 
    # write
    # TODO: There isn't yet API to write a small fragment, so we'll have to test
@@ -258,7 +256,7 @@ $adapter->check_and_clear( 'mount' );
 
    await $chip->write_eeprom( "X" x 128 );
 
-   expect_done;
+   expect_done '->write_eeprom';
 }
 
 done_testing;

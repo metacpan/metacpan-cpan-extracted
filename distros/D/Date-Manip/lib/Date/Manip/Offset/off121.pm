@@ -6,9 +6,9 @@ Date::Manip::Offset::off121;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Thu Sep  1 10:36:28 EDT 2022
-#    Data version: tzdata2022c
-#    Code version: tzcode2022c
+#    Generated on: Fri Dec  2 12:33:24 EST 2022
+#    Data version: tzdata2022g
+#    Code version: tzcode2022g
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -19,7 +19,7 @@ use warnings;
 require 5.010000;
 
 our ($VERSION);
-$VERSION='6.89';
+$VERSION='6.90';
 END { undef $VERSION; }
 
 our ($Offset,%Offset);
@@ -28,55 +28,11 @@ END {
    undef %Offset;
 }
 
-$Offset        = '+06:00:00';
+$Offset        = '+06:06:36';
 
 %Offset        = (
    0 => [
-      'asia/urumqi',
-      'asia/almaty',
-      'asia/bishkek',
-      'asia/omsk',
-      'asia/dhaka',
-      'asia/qostanay',
-      'asia/thimphu',
-      'indian/chagos',
-      'etc/gmt+6',
-      's',
-      'asia/qyzylorda',
-      'asia/barnaul',
-      'asia/novosibirsk',
-      'asia/tomsk',
-      'asia/yekaterinburg',
-      'asia/novokuznetsk',
-      'asia/colombo',
-      'asia/krasnoyarsk',
-      'asia/dushanbe',
-      'asia/tashkent',
-      'asia/aqtau',
-      'asia/aqtobe',
-      'asia/atyrau',
-      'asia/oral',
-      'asia/samarkand',
       'asia/hovd',
-      'antarctica/mawson',
-      ],
-   1 => [
-      'asia/yekaterinburg',
-      'asia/karachi',
-      'asia/bishkek',
-      'asia/aqtobe',
-      'asia/qostanay',
-      'asia/qyzylorda',
-      'asia/atyrau',
-      'asia/aqtau',
-      'asia/samarkand',
-      'asia/almaty',
-      'asia/dushanbe',
-      'asia/omsk',
-      'asia/tashkent',
-      'asia/ashgabat',
-      'asia/oral',
-      'asia/colombo',
       ],
 );
 

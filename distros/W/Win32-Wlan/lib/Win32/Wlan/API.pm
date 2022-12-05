@@ -1,17 +1,18 @@
 package Win32::Wlan::API;
 use strict;
 use Carp qw(croak);
+use Config;
 
 use Encode qw(decode);
 
 use Exporter 'import';
 
 use vars qw($VERSION $wlan_available %API @signatures @EXPORT_OK);
-$VERSION = '0.06';
+$VERSION = '0.07';
 
-sub Zero() { "\0\0\0\0" };
-# just in case we ever get a 64bit Win32::API
-# Zero will have to return 8 bytes of zeroes
+# This is used to determine whether we have a 64bit Win32::API
+# or a 32bit Win32::API - a pointer is 8 or 4 bytes wide
+sub Zero() { "\0" x $Config{ptrsize} };
 
 BEGIN {
     @signatures = (
@@ -20,11 +21,13 @@ BEGIN {
         ['WlanFreeMemory' => 'I' => 'I'],
         ['WlanEnumInterfaces' => 'IIP' => 'I'],
         ['WlanQueryInterface' => 'IPIIPPI' => 'I'],
-        ['WlanGetAvailableNetworkList' => 'IPIIP' => 'I'],
+        ['WlanGetAvailableNetworkList' => 'IPIIP' => 'N'],
     );
 
     @EXPORT_OK = (qw<$wlan_available WlanQueryCurrentConnection>, map { $_->[0] } @signatures);
 };
+
+use constant ERROR_NDIS_DOT11_POWER_STATE_INVALID => 0x80342002;
 
 use constant {
   not_ready               => 0,
@@ -34,7 +37,7 @@ use constant {
   disconnected            => 4,
   associating             => 5,
   discovering             => 6,
-  authenticating          => 7 
+  authenticating          => 7
 };
 
 if (! load_functions()) {
@@ -43,6 +46,11 @@ if (! load_functions()) {
 } else {
     $wlan_available = 1;
 };
+
+sub Win32_Error_String {
+    my( $rc ) = @_;
+    return eval { require Win32; Win32::FormatMessage($rc) } || "Error $rc"
+}
 
 sub unpack_struct {
     # Unpacks a string into a hash
@@ -68,8 +76,11 @@ sub WlanOpenHandle {
     croak "Wlan functions are not available" unless $wlan_available;
     my $version = Zero;
     my $handle = Zero;
-    $API{ WlanOpenHandle }->Call(2,0,$version,$handle) == 0
-        or croak $^E;
+    my $rc;
+    $wlan_available = 0; # Assume unavailibility
+    ($rc = $API{ WlanOpenHandle }->Call(2,0,$version,$handle)) == 0
+        or croak Win32_Error_String($rc);
+    $wlan_available = 1; # Ok, finally
     my $h = unpack "V", $handle;
     $h
 };
@@ -116,14 +127,14 @@ sub WlanEnumInterfaces {
         $_->[1] = decode('UTF-16LE' => $_->[1]);
         $_->[1] =~ s/\0+$//;
         # The third element is the status of the interface
-        
+
         +{
             guuid => $_->[0],
             name =>  $_->[1],
             status => $_->[2],
         };
     } @items;
-    
+
     $interfaces = unpack 'V', $interfaces;
     WlanFreeMemory($interfaces);
     @items
@@ -136,10 +147,10 @@ sub WlanQueryInterface {
     my $data = Zero;
     $API{ WlanQueryInterface }->Call($handle, $interface, $op, 0, $size, $data, 0) == 0
         or return;
-        
+
     $size = unpack 'V', $size;
     my $payload = unpack "P$size", $data;
-    
+
     $data = unpack 'V', $data;
     WlanFreeMemory($data);
     $payload
@@ -164,7 +175,7 @@ One of the following
   Win32::Wlan::API::disconnected            => 4,
   Win32::Wlan::API::associating             => 5,
   Win32::Wlan::API::discovering             => 6,
-  Win32::Wlan::API::authenticating          => 7 
+  Win32::Wlan::API::authenticating          => 7
 
 =item *
 
@@ -178,7 +189,7 @@ C<< bss_type >>
 
   infrastructure   = 1,
   independent      = 2,
-  any              = 3 
+  any              = 3
 
 =item *
 
@@ -192,7 +203,7 @@ auth_algorithm
   DOT11_AUTH_ALGO_RSNA               = 6, # wpa2
   DOT11_AUTH_ALGO_RSNA_PSK           = 7, # wpa2
   DOT11_AUTH_ALGO_IHV_START          = 0x80000000,
-  DOT11_AUTH_ALGO_IHV_END            = 0xffffffff 
+  DOT11_AUTH_ALGO_IHV_END            = 0xffffffff
 
 =item *
 
@@ -207,16 +218,16 @@ cipher_algorithm
   DOT11_CIPHER_ALGO_RSN_USE_GROUP   = 0x100,
   DOT11_CIPHER_ALGO_WEP             = 0x101,
   DOT11_CIPHER_ALGO_IHV_START       = 0x80000000,
-  DOT11_CIPHER_ALGO_IHV_END         = 0xffffffff 
+  DOT11_CIPHER_ALGO_IHV_END         = 0xffffffff
 
 =back
 
-=cut 
+=cut
 
 sub WlanQueryCurrentConnection {
     my ($handle,$interface) = @_;
     my $info = WlanQueryInterface($handle,$interface,7) || '';
-    
+
     my @WLAN_CONNECTION_ATTRIBUTES = (
         state => 'V',
         mode  => 'V',
@@ -237,15 +248,15 @@ sub WlanQueryCurrentConnection {
         auth_algorithm   => 'V',
         cipher_algorithm => 'V',
     );
-    
+
     my %res = unpack_struct(\@WLAN_CONNECTION_ATTRIBUTES, $info);
-    
+
     $res{ profile_name } = decode('UTF-16LE', $res{ profile_name }) || '';
     $res{ profile_name } =~ s/\0+$//;
     $res{ ssid } = substr $res{ ssid }, 0, $res{ ssid_len };
-    
+
     $res{ mac_address } = sprintf "%02x:%02x:%02x:%02x:%02x:%02x", unpack 'C*', $res{ mac_address };
-    
+
     %res
 }
 
@@ -253,10 +264,15 @@ sub WlanGetAvailableNetworkList {
     my ($handle,$interface,$flags) = @_;
     $flags ||= 0;
     my $list = Zero;
-    $API{ WlanGetAvailableNetworkList }->Call($handle,$interface,$flags,0,$list) == 0
-        or croak $^E;
+    my $rc = $API{ WlanGetAvailableNetworkList }->Call($handle,$interface,$flags,0,$list);
+    if( $rc == ERROR_NDIS_DOT11_POWER_STATE_INVALID()) {
+        return;
+    }
+    if( $rc != 0 ) {
+        croak Win32_Error_String($rc);
+    }
                                                 # name ssid_len ssid bss  bssids connectable
-    my @items = _unpack_counted_array($list, join( '', 
+    my @items = _unpack_counted_array($list, join( '',
         'a512', # name
         'V',    # ssid_len
         'a32',  # ssid
@@ -287,7 +303,7 @@ sub WlanGetAvailableNetworkList {
                   flags
                   reserved
         )} = @$_;
-        
+
         # Decode the elements
         $info{ ssid } = substr( $info{ ssid }, 0, $info{ ssid_len });
         $info{ name } = decode('UTF-16LE', $info{ name });
@@ -296,7 +312,7 @@ sub WlanGetAvailableNetworkList {
 
         $_ = \%info;
     };
-    
+
     $list = unpack 'V', $list;
     WlanFreeMemory($list);
     @items
@@ -337,7 +353,7 @@ Win32::Wlan::API - Access to the Win32 WLAN API
         # Network adapters are identified by guuid
         print $interfaces[0]->{name};
         my $info = WlanQueryCurrentConnection($handle,$ih);
-        print "Connected to $info{ profile_name }\n";        
+        print "Connected to $info{ profile_name }\n";
 
     } else {
         print "No Wlan detected (or switched off)\n";
@@ -347,17 +363,17 @@ Win32::Wlan::API - Access to the Win32 WLAN API
 
 Windows Native Wifi Reference
 
-L<http://msdn.microsoft.com/en-us/library/ms706274%28v=VS.85%29.aspx>
+L<https://msdn.microsoft.com/en-us/library/ms706274%28v=VS.85%29.aspx>
 
 =head1 REPOSITORY
 
-The public repository of this module is 
-L<http://github.com/Corion/Win32-Wlan>.
+The public repository of this module is
+L<https://github.com/Corion/Win32-Wlan>.
 
 =head1 SUPPORT
 
 The public support forum of this module is
-L<http://perlmonks.org/>.
+L<https://perlmonks.org/>.
 
 =head1 BUG TRACKER
 
@@ -371,7 +387,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2011-2011 by Max Maischein C<corion@cpan.org>.
+Copyright 2011-2022 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

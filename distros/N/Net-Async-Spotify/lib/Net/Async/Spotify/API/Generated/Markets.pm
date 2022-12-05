@@ -3,7 +3,7 @@ package Net::Async::Spotify::API::Generated::Markets;
 use strict;
 use warnings;
 
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 our $AUTHORITY = 'cpan:VNEALV'; # AUTHORITY
 
 use mro;
@@ -26,6 +26,8 @@ Check C<crawl-api-doc.pl> for more information.
 =head1 METHODS
 
 =cut
+
+sub mapping { shift->{mapping} }
 
 =head2 get_available_markets
 
@@ -58,9 +60,10 @@ On success, the HTTP status code in the response header is 200 OK and the respon
 async sub get_available_markets {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'GET';
-    $request->{uri}    = 'https://api.spotify.com/v1/markets';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{get_available_markets}{method} // 'GET';
+    $request->{uri}    = $mapping->{get_available_markets}{uri} // 'https://api.spotify.com/v1/markets';
+    $request->{param}  = $mapping->{get_available_markets}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -68,7 +71,7 @@ async sub get_available_markets {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{get_available_markets}{response} // [
         'error object',
 
     ];

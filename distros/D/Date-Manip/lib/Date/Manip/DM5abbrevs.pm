@@ -32,7 +32,7 @@ use strict;
 use warnings;
 
 our($VERSION);
-$VERSION='6.89';
+$VERSION='6.90';
 
 END {
    my $tmp;
@@ -95,7 +95,6 @@ $Date::Manip::DM5::Abbrevs = join(' ',qw(
       c      -0300
       cast   +0300
       cat    +0200
-      cddt   -0400
       cdt    -0500
       cemt   +0300
       cest   +0200
@@ -108,7 +107,6 @@ $Date::Manip::DM5::Abbrevs = join(' ',qw(
       d      -0400
       e      -0500
       eat    +0300
-      eddt   -0300
       edt    -0400
       eest   +0300
       eet    +0200
@@ -165,7 +163,6 @@ $Date::Manip::DM5::Abbrevs = join(' ',qw(
       kst    +0900
       l      -1100
       m      -1200
-      mddt   -0500
       mdt    -0600
       mest   +0200
       met    +0100
@@ -186,7 +183,6 @@ $Date::Manip::DM5::Abbrevs = join(' ',qw(
       nzst   +1200
       o      +0200
       p      +0300
-      pddt   -0600
       pdt    -0700
       pkst   +0600
       pkt    +0500
@@ -260,7 +256,6 @@ The following timezones are defined:
       CADT   +1030
       CAST   +0300
       CAT    +0200
-      CDDT   -0400
       CDT    -0500
       CEMT   +0300
       CEST   +0200
@@ -275,7 +270,6 @@ The following timezones are defined:
       E      -0500
       EADT   +1100
       EAT    +0300
-      EDDT   -0300
       EDT    -0400
       EEST   +0300
       EET    +0200
@@ -340,7 +334,6 @@ The following timezones are defined:
       KST    +0900
       L      -1100
       M      -1200
-      MDDT   -0500
       MDT    -0600
       MEST   +0200
       MESZ   +0200
@@ -367,7 +360,6 @@ The following timezones are defined:
       NZT    +1200
       O      +0200
       P      +0300
-      PDDT   -0600
       PDT    -0700
       PKST   +0600
       PKT    +0500

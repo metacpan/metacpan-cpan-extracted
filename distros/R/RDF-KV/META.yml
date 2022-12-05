@@ -34,4 +34,4 @@ resources:
   homepage: https://github.com/doriantaylor/p5-rdf-kv
   license: http://www.apache.org/licenses/LICENSE-2.0
   repository: git://github.com/doriantaylor/p5-rdf-kv.git
-version: '0.08'
+version: '0.13'

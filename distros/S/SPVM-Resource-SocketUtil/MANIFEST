@@ -1,0 +1,18 @@
+.gitignore
+Changes
+lib/SPVM/Resource/SocketUtil.config
+lib/SPVM/Resource/SocketUtil.native/include/.gitkeep
+lib/SPVM/Resource/SocketUtil.native/include/spvm_socket_util.h
+lib/SPVM/Resource/SocketUtil.native/src/.gitkeep
+lib/SPVM/Resource/SocketUtil.native/src/spvm_socket_util.c
+lib/SPVM/Resource/SocketUtil.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/lib/SPVM/TestCase/Resource/SocketUtil.c
+t/lib/SPVM/TestCase/Resource/SocketUtil.config
+t/lib/SPVM/TestCase/Resource/SocketUtil.spvm
+t/use_spvm_class.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

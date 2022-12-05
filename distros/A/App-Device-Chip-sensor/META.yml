@@ -18,17 +18,19 @@ name: App-Device-Chip-sensor
 provides:
   App::Device::Chip::sensor:
     file: lib/App/Device/Chip/sensor.pm
-    version: '0.04'
+    version: '0.05'
 requires:
   Device::Chip::Adapter: '0'
   Device::Chip::Sensor: '0.19'
   Feature::Compat::Defer: '0'
+  Feature::Compat::Try: '0'
   Future::AsyncAwait: '0'
   Future::IO: '0.08'
   Future::IO::Impl::IOAsync: '0'
-  Object::Pad: '0.57'
+  List::Util: '1.29'
+  Object::Pad: '0.74'
   perl: '5.026'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -9,8 +9,9 @@ use JSON;
 use List::Util qw(any);
 use XML::LibXML;
 
+my $json     = JSON->new->utf8;
 my $json_str = read_file('stations.json');
-my $stations = JSON->new->utf8->decode($json_str);
+my $stations = $json->decode($json_str);
 @{$stations} = sort { $a->{name} cmp $b->{name} } @{$stations};
 
 my %station_by_ds100;
@@ -25,22 +26,29 @@ for my $station ( @{$stations} ) {
 
 my %station_by_name;
 for my $station ( @{$stations} ) {
-	$station_by_name{ $station->{name} } = $station;
+	push( @{ $station_by_name{ $station->{name} } }, $station );
 }
 
-my %xml_by_name;
+my %xml_by_ds100;
 my %xml_by_eva;
+my %xml_by_name;
 
 my $xml_str = read_file('stations.xml');
 my $tree    = XML::LibXML->load_xml( string => $xml_str );
 
 my @missing;
 
-if ( -e "missing.txt" ) {
-	for my $line ( read_file("missing.txt") ) {
+if ( -e 'missing.txt' ) {
+	for my $line ( read_file('missing.txt') ) {
 		chomp $line;
 		push( @missing, $line );
 	}
+}
+
+my %renamed;
+if ( -e 'renamed.json' ) {
+	$json_str = read_file('renamed.json');
+	%renamed  = %{ $json->decode($json_str) };
 }
 
 for my $station ( $tree->findnodes('//station') ) {
@@ -55,8 +63,22 @@ for my $station ( $tree->findnodes('//station') ) {
 		ds100 => $ds100,
 		is_db => $is_db,
 	};
-	$xml_by_name{$name} = $xml_station;
-	$xml_by_eva{$eva}   = $xml_station;
+	$xml_by_ds100{$ds100} = $xml_station;
+	$xml_by_eva{$eva}     = $xml_station;
+
+	if ( exists $xml_by_eva{$name} ) {
+		push( @{ $xml_by_name{$name}{extra} }, $xml_station );
+	}
+	else {
+		$xml_by_name{$name} = $xml_station;
+	}
+}
+
+for my $station ( $tree->findnodes('//station') ) {
+	my $name  = $station->getAttribute('name');
+	my $eva   = $station->getAttribute('eva');
+	my $ds100 = $station->getAttribute('ds100');
+	my $is_db = $station->getAttribute('db') eq 'true';
 
 	my $found = 0;
 
@@ -69,8 +91,8 @@ for my $station ( $tree->findnodes('//station') ) {
 	{
 		printf( "%8s has been renamed: %30s -> %30s\n",
 			$ds100, $station_by_ds100{$ds100}{name}, $name );
-
-		#$station_by_ds100{$ds100}{name} = $name;
+		$renamed{ $station_by_ds100{$ds100}{name} } = $name;
+		$station_by_ds100{$ds100}{name} = $name;
 	}
 	elsif ( $station_by_eva{$eva} and $station_by_eva{$eva}{name} ne $name ) {
 		printf(
@@ -80,20 +102,34 @@ for my $station ( $tree->findnodes('//station') ) {
 		);
 	}
 	elsif ( $station_by_name{$name}
-		and $station_by_name{$name}{ds100} ne $ds100
-		and $is_db
-		and $ds100 !~ m{ ^ PQ }x )
+		and not any { $_->{ds100} eq $ds100 } @{ $station_by_name{$name} }
+		and $is_db )
 	{
-		printf( "%30s has been recoded: %8s -> %8s\n",
-			$name, $station_by_name{$name}{ds100}, $ds100 );
+		printf( "%30s has a new DS100 alias: %8s\n", $name, $ds100 );
+		my $station = {
+			name  => $name,
+			ds100 => $ds100,
+			eva   => $eva,
+		};
+		push( @{$stations}, $station );
+		$station_by_eva{$eva}     = $station;
+		$station_by_ds100{$ds100} = $station;
+		push( @{ $station_by_name{$name} }, $station );
 	}
 	elsif ( $station_by_name{$name}
-		and $station_by_name{$name}{eva} ne $eva
-		and $is_db
-		and $ds100 !~ m{ ^ PQ }x )
+		and not any { $_->{eva} eq $eva } @{ $station_by_name{$name} }
+		and $is_db )
 	{
-		printf( "%30s has been recoded: %d -> %d\n",
-			$name, $station_by_name{$name}{eva}, $eva );
+		printf( "%30s has a new EVA alias: %d\n", $name, $eva );
+		my $station = {
+			name  => $name,
+			ds100 => $ds100,
+			eva   => $eva,
+		};
+		push( @{$stations}, $station );
+		$station_by_eva{$eva}     = $station;
+		$station_by_ds100{$ds100} = $station;
+		push( @{ $station_by_name{$name} }, $station );
 	}
 
 	if ( not $found
@@ -130,5 +166,8 @@ for my $i (@to_delete) {
 	splice( @{$stations}, $i, 1 );
 }
 
-my $json_out = JSON->new->utf8->canonical->pretty->encode($stations);
+my $json_out = $json->canonical->pretty->encode($stations);
 write_file( 'stations.json', $json_out );
+
+$json_out = $json->encode( \%renamed );
+write_file( 'renamed.json', $json_out );

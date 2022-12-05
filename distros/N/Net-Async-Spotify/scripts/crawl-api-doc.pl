@@ -107,10 +107,27 @@ my $http = Net::Async::HTTP->new(
 );
 $loop->add($http);
 
-my $docs_resonse = await $http->do_request(uri => URI->new($docs_uri));
+my $docs_response = await $http->do_request(uri => URI->new($docs_uri));
 
-my $docs_dom = Mojo::DOM->new($docs_resonse->content);
+my $docs_dom = Mojo::DOM->new($docs_response->content);
 
+#warn Dumper($docs_response);
+#warn Dumper($docs_dom);
+
+warn $docs_dom->at('#sub-menu')->find('optgroup')->map(attr => 'label')->join("\n");
+warn Dumper($docs_dom->at('#sub-menu')->find('optgroup')->first->children);
+
+$docs_dom->at('#sub-menu')->find('optgroup')->each(sub {
+		my $optgroup = $_;
+		print "Category: " . $optgroup->attr('label') . "\n\n";
+		my $next = $optgroup->next;
+		while ( $next->tag eq 'option' ) {
+	            print "- Call: " . $next->text . " | URL: " . $next->attr('value') . "\n";
+		    $next = $next->next;
+		}
+	});
+
+die;
 my $endpoints;
 my $objects;
 

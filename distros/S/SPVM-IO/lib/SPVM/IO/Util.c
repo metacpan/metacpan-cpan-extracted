@@ -18,7 +18,7 @@ int32_t SPVM__IO__Util__sockatmark(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t status = sockatmark(sockfd);
   
   if (status == -1) {
-    env->die(env, stack, "[System Error]shutdown failed: %s", socket_strerror(env, stack, socket_errno(), 0), FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]shutdown failed: %s", spvm_socket_strerror(env, stack, spvm_socket_errno(), 0), FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
   
@@ -57,7 +57,7 @@ int32_t SPVM__IO__Util__sendto(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t bytes_length = sendto(sockfd, buf, len, flags, addr, addrlen);
   
   if (bytes_length == -1) {
-    env->die(env, stack, "[System Error]sendto failed: %s", socket_strerror(env, stack, socket_errno(), 0), FILE_NAME, __LINE__);
+    env->die(env, stack, "[System Error]sendto failed: %s", spvm_socket_strerror(env, stack, spvm_socket_errno(), 0), FILE_NAME, __LINE__);
     return SPVM_NATIVE_C_CLASS_ID_ERROR_SYSTEM;
   }
   

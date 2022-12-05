@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20220903144934;
+our $VERSION = 1.20221202211022;
 
 my $formatters = [
                 {
@@ -69,36 +69,36 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"97172", "Ras\ Alkhaimah",
-"97148", "Dubai",
-"9712", "Abu\ dhabi",
-"97147", "Dubai",
-"97145", "Dubai",
-"97144", "Dubai",
-"97192", "Fujairah",
-"97162", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
-"97198", "Fujairah",
-"97167", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
-"97175", "Ras\ Alkhaimah",
-"97174", "Ras\ Alkhaimah",
+$areanames{en} = {"9713", "Al\ Ain",
+"97166", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
+"97146", "Dubai",
 "97197", "Fujairah",
+"97195", "Fujairah",
+"97176", "Ras\ Alkhaimah",
+"97164", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
+"9712", "Abu\ dhabi",
+"97144", "Dubai",
+"97174", "Ras\ Alkhaimah",
+"97192", "Fujairah",
+"97198", "Fujairah",
+"97193", "Fujairah",
 "97168", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
 "97142", "Dubai",
-"97194", "Fujairah",
-"97178", "Ras\ Alkhaimah",
-"97195", "Fujairah",
-"97164", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
-"97165", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
-"97177", "Ras\ Alkhaimah",
-"9713", "Al\ Ain",
 "97163", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
-"97193", "Fujairah",
+"97143", "Dubai",
+"97162", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
+"97148", "Dubai",
 "97173", "Ras\ Alkhaimah",
-"97176", "Ras\ Alkhaimah",
-"97166", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
+"97178", "Ras\ Alkhaimah",
+"97172", "Ras\ Alkhaimah",
+"97194", "Fujairah",
+"97147", "Dubai",
+"97145", "Dubai",
+"97165", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
+"97167", "Sharjah\,\ Ajman\,\ Umm\ Al\-Qaiwain",
+"97177", "Ras\ Alkhaimah",
 "97196", "Fujairah",
-"97146", "Dubai",
-"97143", "Dubai",};
+"97175", "Ras\ Alkhaimah",};
 
     sub new {
       my $class = shift;

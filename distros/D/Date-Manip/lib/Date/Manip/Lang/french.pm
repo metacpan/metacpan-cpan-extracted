@@ -13,7 +13,7 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='6.89';
+$VERSION='6.90';
 
 our($Language,@Encodings,$LangName,$YearAdded);
 @Encodings = qw(utf-8 iso-8859-1 perl);
@@ -21,6 +21,7 @@ $LangName  = "French";
 $YearAdded = 1996;
 
 $Language = {
+  _special_rules => { },
   ampm => [['du matin'], ['du soir']],
   at => ['a', 'à'],
   day_abb => [
@@ -58,15 +59,15 @@ $Language = {
     ['professionel', 'ouvrable', 'ouvrables'],
   ],
   month_abb => [
-    ['jan', 'jan.'],
-    ['fév', 'fev', 'fev.', 'fév.'],
+    ['jan', 'janv', 'jan.', 'janv.'],
+    ['fév', 'fev', 'févr', 'fev.', 'fév.', 'févr.'],
     ['mar', 'mar.'],
     ['avr', 'avr.'],
     ['mai', 'mai.'],
-    ['juin', 'juin.'],
-    ['juil', 'juil.'],
-    ['août', 'aout', 'aout.', 'août.'],
-    ['sept', 'sept.'],
+    ['juin', 'jui', 'juin.', 'jui.'],
+    ['juil', 'jul', 'juil.', 'jul.'],
+    ['août', 'aout', 'aoû', 'aou', 'aout.', 'août.'],
+    ['sept', 'sep', 'sept.', 'sep.'],
     ['oct', 'oct.'],
     ['nov', 'nov.'],
     ['déc', 'dec', 'dec.', 'déc.'],

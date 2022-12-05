@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2022 -- leonerd@leonerd.org.uk
 
-package Object::Pad 0.72;
+package Object::Pad 0.74;
 
 use v5.14;
 use warnings;
@@ -42,8 +42,8 @@ On perl version 5.26 onwards:
    use Object::Pad;
 
    class Point {
-      has $x :param = 0;
-      has $y :param = 0;
+      field $x :param = 0;
+      field $y :param = 0;
 
       method move ($dX, $dY) {
          $x += $dX;
@@ -62,8 +62,8 @@ Or, for older perls that lack signatures:
    use Object::Pad;
 
    class Point {
-      has $x :param = 0;
-      has $y :param = 0;
+      field $x :param = 0;
+      field $y :param = 0;
 
       method move {
          my ($dX, $dY) = @_;
@@ -210,10 +210,10 @@ I<Since version 0.41.>
       ...
    }
 
-Prior to version 0.41 this was called C<extends>, which is currently
-recognised as a compatibility synonym. Both C<extends> and C<isa> keywords are
-now deprecated, in favour of the L</:isa> attribute which is preferred
-because it follows a more standard grammar without this special-case.
+Prior to version 0.41 this was called C<extends>, but I<since version 0.73>
+this is no longer recognised. The C<isa> keyword is now deprecated, in favour
+of the L</:isa> attribute which is preferred because it follows a more
+standard grammar without this special-case.
 
 One or more roles can be composed into the class by the keyword C<does>
 
@@ -223,10 +223,10 @@ I<Since version 0.41.>
       ...
    }
 
-Prior to version 0.41 this was called C<implements>, which is currently
-recognised as a compatibility synonym. Both C<implements> and C<does> keywords
-are now deprecated, in favour of the L</:does> attribute which is preferred
-because it follows a more standard grammar without this special-case.
+Prior to version 0.41 this was called C<implements>, but I<since version 0.73>
+this is no longer recognised. The C<does> keyword is now deprecated, in favour
+of the L</:does> attribute which is preferred because it follows a more
+standard grammar without this special-case.
 
 An optional list of attributes may be supplied in similar syntax as for subs
 or lexical variables. (These are annotations about the class itself; the
@@ -428,7 +428,7 @@ written in classical Perl that has not yet been rewritten to use
 C<Object::Pad>.
 
 The tradeoff is that a C<:compat(invokable)> role may not create field data
-using the L</has> keyword. Whatever behaviours the role wishes to perform
+using the L</field> keyword. Whatever behaviours the role wishes to perform
 must be provided only by calling other methods on C<$self>, or perhaps by
 making assumptions about the representation type of instances.
 
@@ -444,6 +444,8 @@ the role.
    field %var;
 
    field $var :ATTR ATTR...;
+
+   field $var = EXPR;
 
    field $var { BLOCK }
 
@@ -583,8 +585,8 @@ to invoke the constructor without a named argument for this will throw an
 exception. In order to make a parameter optional, make sure to give it a
 default expression - even if that expression is C<undef>:
 
-   has $x :param;          # this is required
-   has $z :param = undef;  # this is optional
+   field $x :param;          # this is required
+   field $z :param = undef;  # this is optional
 
 Any field that has a C<:param> and an initialisation block will only run the
 code in the block if required by the constructor. If a named parameter is
@@ -594,7 +596,7 @@ executed.
 Values for fields are assigned by the constructor before any C<BUILD> blocks
 are invoked.
 
-=head3 Field Initialiser Blocks
+=head3 Field Initialiser Expressions
 
 I<Since version 0.54> a deferred statement block is also permitted, on any
 field variable type. This permits code to be executed as part of the instance
@@ -602,13 +604,26 @@ constructor, rather than running just once when the class is set up. Code in a
 field initialisation block is roughly equivalent to being placed in a C<BUILD>
 or C<ADJUST> block.
 
+I<Since version 0.73> this may also be written as a plain expression
+introduced by an equals symbol (C<=>). This is equivalent to using a block.
+Note carefully: the equals symbol is part of the C<field> syntax; it is I<not>
+simply a runtime assignment operator that happens once at the time the class
+is declared. Just like the block form describe above, the expression is
+evaluated during the constructor of every instance.
+
+Note that C<$self> is specifically I<not> visible during an initialiser
+expression. This is because the object is not yet fully constructed, so it
+would be dangerous to allow access to it while in this state. However, the
+C<__CLASS__> keyword is available, so initialiser expressions can make use of
+class-based dispatch to invoke class-level methods to help provide values.
+
 This feature should be considered B<experimental>, and will emit warnings to
 that effect. They can be silenced with
 
    use Object::Pad qw( :experimental(init_expr) );
 
-Control flow that attempts to leave a field initialiser block is not
-permitted. This includes any C<return> expression, any C<next/last/redo>
+Control flow that attempts to leave a field initialiser expression or block is
+not permitted. This includes any C<return> expression, any C<next/last/redo>
 outside of a loop, with a dynamically-calculated label expression, or with a
 label that it doesn't appear in. C<goto> statements are also currently
 forbidden, though known-safe ones may be permitted in future.
@@ -632,16 +647,20 @@ they appear within are permitted.
 
 An older version of the L</field> keyword.
 
-This generally behaves like C<field>, except that inline expressions are also
-permitted.
+This generally behaves like C<field>, except that inline expressions are
+evaluated immediately, once, during class declaration time. These are I<not>
+stored to be evaluated for each constructor.
 
-A scalar field may provide a expression that gives an initialisation value,
-which will be assigned into the field of every instance during the constructor
-before the C<BUILD> blocks are invoked. I<Since version 0.29> this expression
-does not have to be a compiletime constant, though it is evaluated exactly
-once, at runtime, after the class definition has been parsed. It is not
-evaluated individually for every object instance of that class. I<Since
-version 0.54> this is also permitted on array and hash fields.
+Because of the one-shot immediate nature of these initialisation expressions
+(and a bunch of other reasons), the C<has> keyword is now discouraged for use.
+Use the C<field> keyword instead.
+
+If you need to evaluate an expression exactly once during the class
+declaration and assign its now-constant value to every instace, store it in a
+regular C<my> variable instead:
+
+   my $default_var = EXPR;
+   field $var = $default_var;
 
 =head2 method
 
@@ -1028,7 +1047,7 @@ For example; in the following
    }
 
    class DerivedClass :isa(ClassicPerlBaseClass) {
-      has $_value = "B";
+      field $_value = "B";
       ADJUST {
          $_value = "C";
       }
@@ -1097,7 +1116,7 @@ be implied by the C<class> keyword.
 
    # other use statements
 
-   # has, methods, etc.. can go here
+   # field, methods, etc.. can go here
 
 =head2 Field Names
 
@@ -1252,7 +1271,7 @@ on object instance fields:
    use Syntax::Keyword::Dynamically;
 
    class Container {
-      has $value = 1;
+      field $value = 1;
 
       method example {
          dynamically $value = 2;

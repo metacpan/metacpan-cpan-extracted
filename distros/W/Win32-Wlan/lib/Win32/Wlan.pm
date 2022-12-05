@@ -10,7 +10,7 @@ use Win32::Wlan::API qw<
     $wlan_available
 >;
 use vars qw<$VERSION>;
-$VERSION = '0.06';
+$VERSION = '0.07';
 
 # Ideally, the handle should be (another) singleton
 # that fetches and keeps the handle until the application
@@ -63,20 +63,30 @@ C<interface> - optional argument to give an existing guuid to the object
 
 sub new {
     my ($class,%args) = @_;
-    
+
     if ($args{ available } or !exists $args{ available }) {
-        $args{available} ||= $wlan_available;
-        $args{handle} ||= WlanOpenHandle();
-        if (! $args{ interface }) {
-            my @interfaces = WlanEnumInterfaces($args{handle});
-            if (@interfaces > 1) {
-                warn "More than one Wlan interface found. Using first.";
-            };
-            $args{interface} = $interfaces[0];
-        };
-    };
+        if (! $args{handle}) {
+            $args{handle} = eval { WlanOpenHandle() };
+            $args{available} = $wlan_available;
+        } else {
+            #
+            # User gave a handle, so assume availibility is true
+            #
+            $args{available} = 1;
+        }
+        if ($args{available}) {
+            if (! $args{ interface }) {
+                my @interfaces = WlanEnumInterfaces($args{handle});
+                if (@interfaces > 1) {
+                    warn "More than one Wlan interface found. Using first.";
+                }
+                $args{interface} = $interfaces[0];
+            }
+        }
+    }
     bless \%args => $class;
 };
+
 
 sub DESTROY {
     my ($self) = @_;
@@ -205,17 +215,17 @@ L<Win32::Wlan::API> - the wrapper for the Windows API
 
 Windows Native Wifi Reference
 
-L<http://msdn.microsoft.com/en-us/library/ms706274%28v=VS.85%29.aspx>
+L<https://msdn.microsoft.com/en-us/library/ms706274%28v=VS.85%29.aspx>
 
 =head1 REPOSITORY
 
-The public repository of this module is 
-L<http://github.com/Corion/Win32-Wlan>.
+The public repository of this module is
+L<https://github.com/Corion/Win32-Wlan>.
 
 =head1 SUPPORT
 
 The public support forum of this module is
-L<http://perlmonks.org/>.
+L<https://perlmonks.org/>.
 
 =head1 BUG TRACKER
 
@@ -229,7 +239,7 @@ Max Maischein C<corion@cpan.org>
 
 =head1 COPYRIGHT (c)
 
-Copyright 2011-2011 by Max Maischein C<corion@cpan.org>.
+Copyright 2011-2022 by Max Maischein C<corion@cpan.org>.
 
 =head1 LICENSE
 

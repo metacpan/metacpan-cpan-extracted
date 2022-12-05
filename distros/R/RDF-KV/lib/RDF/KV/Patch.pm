@@ -17,11 +17,11 @@ RDF::KV::Patch - Representation of RDF statements to be added or removed
 
 =head1 VERSION
 
-Version 0.08
+Version 0.13
 
 =cut
 
-our $VERSION = '0.08';
+our $VERSION = '0.13';
 
 =head1 SYNOPSIS
 
@@ -330,6 +330,48 @@ patch.
 sub dont_remove_this {
     my $self = shift;
     my ($s, $p, $o, $g) = _validate(@_);
+}
+
+=head2 affected_graphs
+
+Return the set of graph identifiers affected by the patch, including
+C<undef> for the null graph.
+
+=cut
+
+sub affected_graphs {
+    my $self = shift;
+    my %seen;
+
+    map { $seen{$_} = 1 } (keys %{$self->_pos}, keys %{$self->_neg});
+
+    map { _node($_) } keys %seen;
+}
+
+=head2 subjects_affected [$use_graphs]
+
+Return the set of subjects that are affected by the patch,
+irrespective of graph.
+
+=cut
+
+sub affected_subjects {
+    my ($self, $use_graphs) = @_;
+    my %seen;
+
+    for my $stmt ($self->to_add, $self->to_remove) {
+        my $g = $stmt->graph;
+        my $x = $seen{$g ? $g->value : ''} ||= {};
+        $x->{$stmt->subject->value} = $stmt->subject;
+    }
+
+    unless ($use_graphs) {
+        my %out = map {
+            map { $_->value => $_ } values %{$seen{$_}} } keys %seen;
+        return values %out;
+    }
+
+    map { [_node($_), [values %{$seen{$_}} ] ] } keys %seen;
 }
 
 =head2 to_add

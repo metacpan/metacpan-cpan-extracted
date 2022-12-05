@@ -18,17 +18,17 @@ name: Device-Chip-AVR_HVSP
 provides:
   Device::Chip::AVR_HVSP:
     file: lib/Device/Chip/AVR_HVSP.pm
-    version: '0.05'
+    version: '0.06'
   Device::Chip::AVR_HVSP::FuseInfo:
     file: lib/Device/Chip/AVR_HVSP/FuseInfo.pm
-    version: '0.05'
+    version: '0.06'
 requires:
   Device::Chip: '0.04'
   Future::AsyncAwait: '0.47'
-  Object::Pad: '0.19'
+  Object::Pad: '0.66'
   Struct::Dumb: '0'
   perl: '5.026'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.05'
+version: '0.06'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -68,6 +68,7 @@ The following abbreviations may be used:
    febr
 
    mart
+   mar
 
    apr
 
@@ -80,10 +81,12 @@ The following abbreviations may be used:
    aug
 
    sept
+   sep
 
    oct
 
    nov
+   noi
 
    dec
 
@@ -100,6 +103,7 @@ The following day names may be used:
    marți
    marti
    marþi
+   marţi
 
    miercuri
 
@@ -117,19 +121,26 @@ The following day names may be used:
 The following abbreviations may be used:
 
    lun
+   lu
 
    mar
+   ma
 
    mie
+   mi
 
    joi
+   jo
 
    vin
+   vi
 
    sâm
    sam
+   sb
 
    dum
+   du
 
 
 The following short (1-2 characters) abbreviations may be used:

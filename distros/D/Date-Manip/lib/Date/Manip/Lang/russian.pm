@@ -13,14 +13,17 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='6.89';
+$VERSION='6.90';
 
 our($Language,@Encodings,$LangName,$YearAdded);
-@Encodings = qw(utf-8 koi8-r cp1251 perl);
+@Encodings = qw(utf-8 iso8859-5 koi8-r cp1251 perl);
 $LangName  = "Russian";
 $YearAdded = 2001;
 
 $Language = {
+  _special_rules => { 'remove_parens'          => 1,
+                      'strip_word'             => [ 'г.' ],
+                    },
   ampm => [
     ['ДП', 'дп', 'Д.П.', 'ночи', 'утра', 'до полудня'],
     ['ПП', 'пп', 'П.П.', 'дня', 'вечера', 'после полудня', 'по полудню', 'пополудню'],
@@ -60,7 +63,7 @@ $Language = {
   month_abb => [
     ['янв', 'янв.'],
     ['фев', 'фвр', 'февр.'],
-    ['мрт', 'марта', 'март'],
+    ['мрт', 'марта', 'март', 'мар'],
     ['апр', 'апр.'],
     ['май', 'мая'],
     ['июн', 'июня', 'июнь'],

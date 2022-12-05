@@ -1,6 +1,12 @@
 
 Revision history for Perl module MCE::Shared.
 
+1.879 Fri Dec 02 21:00:00 EST 2022
+
+  * Update the error status if MCE::Hobo died due to receiving a signal.
+  * Improved the timeout handler in MCE::Hobo and MCE::Shared::Condvar.
+  * Fixed private functions _quit and _trap not setting the return value.
+
 1.878 Mon Oct 10 04:00:00 EST 2022
 
   * Improved reliability on the Windows platform.

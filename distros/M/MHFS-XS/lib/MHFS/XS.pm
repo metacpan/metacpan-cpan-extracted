@@ -3,7 +3,7 @@ package MHFS::XS;
 use 5.020002;
 use strict;
 use warnings;
-use version; our $VERSION = version->declare("v0.2.2");
+use version; our $VERSION = version->declare("v0.2.3");
 
 require Exporter;
 

@@ -1,20 +1,25 @@
-Revision history for App-ParseNetstat
+0.150   2022-12-04  Released-By: PERLANCAR; Urgency: low
 
-0.14    2016-10-17 (PERLANCAR)
+        - [ux] Simplify CLI, don't read from config & env.
+
+        - [doc] Update generated doc to Parse::Netstat 0.150.
+
+
+0.14    2016-10-17  Released-By: PERLANCAR
 
 	- No functional changes.
 
 	- [doc] Mention Parse::Netstat.
 
 
-0.13    2016-01-18 (PERLANCAR)
+0.13    2016-01-18  Released-By: PERLANCAR
 
         - No functional changes.
 
         - [build] Rebuild to fix POD rendering.
 
 
-0.12    2015-09-03 (PERLANCAR)
+0.12    2015-09-03  Released-By: PERLANCAR
 
 	- No functional changes.
 
@@ -23,14 +28,14 @@ Revision history for App-ParseNetstat
 	  requirement.
 
 
-0.11    2014-12-02 (PERLANCAR)
+0.11    2014-12-02  Released-By: PERLANCAR
 
         - No functional changes.
 
         - [build] Rebuild with Parse::Netstat 0.11.
 
 
-0.10    2014-12-01 (PERLANCAR)
+0.10    2014-12-01  Released-By: PERLANCAR
 
         - First release, split from Parse-Netstat to reduce Parse::Netstat's
           dependencies.

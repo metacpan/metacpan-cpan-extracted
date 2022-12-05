@@ -1,5 +1,17 @@
 Revision history for App-Device-Chip-sensor
 
+0.05    2022-12-05
+        [CHANGES]
+         * Updated for Object::Pad v0.73:
+            + Use `field NAME = EXPR` syntax
+            + Use ADJUSTPARAMS instead of BUILD block in unit tests
+         * In --verbose mode also print the timestamp
+         * Abort the exporter if three or more chips fail, or if any given
+           chip fails 5 times in a row
+         * Support reading a config file in exporter, to reduce the amount of
+           commandline configuration
+         * Catch failures to shut down power and turn them into warnings
+
 0.04    2022-04-28
         [CHANGES]
          * Also accept -M for mountparam options to chip arguments

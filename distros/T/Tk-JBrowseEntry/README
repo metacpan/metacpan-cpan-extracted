@@ -405,6 +405,15 @@ WIDGET-SPECIFIC OPTIONS
         display the listbox *above* the rest of the widget. Default: 0 -
         drop-down list is not fixed (pre-v5.10 behavior).
 
+        NOTE: A list can be set to both "fixed" ("-fixedlist => ...") and
+        "bouncy" ("-altbinding => 'list=bouncy'") at the same time. This
+        will ensure that the focus always jumps right back to the text field
+        whenever the user selects an entry from the list. Otherwise, "fixed"
+        lists alternate focus between the list and the entry field when the
+        user clicks on the list to select a value, as if the list is
+        alternating between "popped down" and "popped up" - this is not
+        considered a bug.
+
     -indicator
         Only used if -listboxtype is set to HListbox, otherwise ignored.
         Specifies whether an indicator image may be included with HListbox

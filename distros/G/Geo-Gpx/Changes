@@ -1,5 +1,8 @@
 Revision history for Geo-Gpx
 
+1.08 [2022-12-03]
+    Removed Geo::Calc from dependencies and added Math::Trig
+
 1.07 [2022-10-26]
     Removed > 15 year old legacy bits likely to conflict with newly added support for tracks and routes
 
@@ -9,10 +12,10 @@ Revision history for Geo-Gpx
     Removed use_datetime option in Geo::Gpx->new() in favour of the new Geo::Gpx::Point method above
 
 1.05 [2022-10-23]
-    Various new methods for waypoints: 
+    Various new methods for waypoints:
         - waypoints_search(), waypoints_merge(), waypoints_count(), waypoints_delete_all(), waypoint_delete(), waypoint_closest_to()
 
-    Other new methods: routes_count(), tracks_count(), 
+    Other new methods: routes_count(), tracks_count(),
 
 1.04 [2022-10-20]
     The waypoints() method now gets but no longer sets:

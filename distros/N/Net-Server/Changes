@@ -1,5 +1,8 @@
 Revision history for Perl extension Net::Server.
 
+2.013  Dec 03 2022
+        - Update MANIFEST for missing file
+
 2.012  Dec 02 2022
         - More code/documentation typo fixes
         - Add /simple routes to HTTP and PSGI echo handlers for doing static request samples.

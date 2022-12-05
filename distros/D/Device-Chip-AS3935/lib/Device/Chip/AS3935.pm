@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.19;
+use Object::Pad 0.66;
 
-package Device::Chip::AS3935 0.02;
+package Device::Chip::AS3935 0.03;
 class Device::Chip::AS3935
-   extends Device::Chip;
+   :isa(Device::Chip);
 
 use Device::Chip::Sensor 0.19 -declare;
 
@@ -164,7 +164,7 @@ bitfield { format => "bytes-LE" }, CONFIG =>
 my @NF_MAP_INDOOR  = ( 28, 45, 62, 78, 95, 112, 130, 146 );
 my @NF_MAP_OURDOOR = ( 390, 630, 860, 1100, 1140, 1570, 1800, 2000 );
 
-has $_CONFIG;
+field $_CONFIG;
 
 async method read_config ()
 {
@@ -277,7 +277,7 @@ async method read_distance ()
    return $distance;
 }
 
-has $_pending_read_int_f;
+field $_pending_read_int_f;
 
 method next_read_int
 {

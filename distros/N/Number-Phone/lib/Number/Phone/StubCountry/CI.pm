@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20220903144936;
+our $VERSION = 1.20221202211024;
 
 my $formatters = [
                 {
@@ -44,7 +44,8 @@ my $validators = {
               2(?:
                 0[23]|
                 1[2357]|
-                [23][45]|
+                2[245]|
+                3[45]|
                 4[3-5]
               )|
               3(?:
@@ -62,7 +63,8 @@ my $validators = {
               2(?:
                 0[23]|
                 1[2357]|
-                [23][45]|
+                2[245]|
+                3[45]|
                 4[3-5]
               )|
               3(?:
@@ -73,16 +75,7 @@ my $validators = {
             )
           )\\d{5}
         ',
-                'mobile' => '
-          0704[0-7]\\d{5}|
-          0(?:
-            [15]\\d\\d|
-            7(?:
-              0[0-37-9]|
-              [4-9][7-9]
-            )
-          )\\d{6}
-        ',
+                'mobile' => '0[157]\\d{8}',
                 'pager' => '',
                 'personal_number' => '',
                 'specialrate' => '',
@@ -90,43 +83,45 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{fr} = {};
-$areanames{en} = {"2252136", "Korhogo",
+$areanames{en} = {"2252135", "Abengourou",
 "2252130", "Yamoussoukro",
 "2252120", "Plateau\,\ Abidjan",
-"2252721", "Abidjan\-sud",
-"2252132", "Daloa",
-"2252133", "Man",
-"2252531", "Bouaké",
+"2252736", "Korhogo",
+"2252536", "Korhogo",
 "2252731", "Bouaké",
-"2252122", "Cocody\,\ Abidjan",
+"2252531", "Bouaké",
+"2252721", "Abidjan\-sud",
 "2252521", "Abidjan\-sud",
-"2252123", "Banco\,\ Abidjan",
-"2252135", "Abengourou",
-"2252724", "Abobo\,\ Abidjan",
-"2252534", "San\-Pédro",
-"2252734", "San\-Pédro",
-"2252524", "Abobo\,\ Abidjan",
-"2252735", "Abengourou",
 "2252124", "Abobo\,\ Abidjan",
 "2252134", "San\-Pédro",
-"2252535", "Abengourou",
-"2252523", "Banco\,\ Abidjan",
-"2252732", "Daloa",
-"2252121", "Abidjan\-sud",
-"2252522", "Cocody\,\ Abidjan",
-"2252733", "Man",
-"2252533", "Man",
-"2252722", "Cocody\,\ Abidjan",
+"2252122", "Cocody\,\ Abidjan",
+"2252132", "Daloa",
+"2252123", "Banco\,\ Abidjan",
+"2252133", "Man",
+"2252724", "Abobo\,\ Abidjan",
+"2252524", "Abobo\,\ Abidjan",
+"2252534", "San\-Pédro",
+"2252734", "San\-Pédro",
 "2252131", "Bouaké",
-"2252723", "Banco\,\ Abidjan",
-"2252532", "Daloa",
-"2252520", "Plateau\,\ Abidjan",
-"2252736", "Korhogo",
+"2252121", "Abidjan\-sud",
 "2252730", "Yamoussoukro",
 "2252530", "Yamoussoukro",
+"22527222", "Abidjan\-sud",
 "2252720", "Plateau\,\ Abidjan",
-"2252536", "Korhogo",};
+"2252520", "Plateau\,\ Abidjan",
+"2252136", "Korhogo",
+"2252535", "Abengourou",
+"2252735", "Abengourou",
+"2252723", "Banco\,\ Abidjan",
+"2252523", "Banco\,\ Abidjan",
+"2252733", "Man",
+"22527224", "Cocody\,\ Abidjan",
+"2252533", "Man",
+"22527225", "Cocody\,\ Abidjan",
+"2252522", "Cocody\,\ Abidjan",
+"2252532", "Daloa",
+"2252732", "Daloa",};
+$areanames{fr} = {};
 
     sub new {
       my $class = shift;

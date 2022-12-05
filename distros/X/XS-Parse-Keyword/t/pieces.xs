@@ -134,6 +134,40 @@ static void setup_block_VAR(pTHX_ void *hookdata)
   sv_setpvs(PAD_SVl(padix), "Hello");
 }
 
+static void callback_catpv_stages(pTHX_ const char *pv)
+{
+  SV *sv = get_sv("main::STAGES", GV_ADD);
+  if(!SvPOK(sv))
+    sv_setpvs(sv, "");
+
+  if(SvCUR(sv))
+    sv_catpvs(sv, ",");
+
+  sv_catpv(sv, pv);
+}
+
+static void callback_PREPARE(pTHX_ void *hookdata)
+{
+  callback_catpv_stages(aTHX_ "PREPARE");
+}
+
+static void callback_START(pTHX_ void *hookdata)
+{
+  callback_catpv_stages(aTHX_ "START");
+}
+
+static OP *callback_END(pTHX_ OP *o, void *hookdata)
+{
+  callback_catpv_stages(aTHX_ "END");
+  return o;
+}
+
+static OP *callback_WRAP(pTHX_ OP *o, void *hookdata)
+{
+  callback_catpv_stages(aTHX_ "WRAP");
+  return o;
+}
+
 static const struct XSParseKeywordHooks hooks_block = {
   .permit_hintkey = hintkey,
 
@@ -174,6 +208,19 @@ static const struct XSParseKeywordHooks hooks_anonsub = {
   .permit_hintkey = hintkey,
 
   .piece1 = XPK_ANONSUB,
+  .build1 = &build_anonsub,
+};
+
+static const struct XSParseKeywordHooks hooks_stagedanonsub = {
+  .permit_hintkey = hintkey,
+
+  .piece1 = XPK_STAGED_ANONSUB(
+    XPK_ANONSUB_PREPARE(&callback_PREPARE),
+    XPK_ANONSUB_START(&callback_START),
+    XPK_ANONSUB_START(&setup_block_VAR),
+    XPK_ANONSUB_END(&callback_END),
+    XPK_ANONSUB_WRAP(&callback_WRAP)
+  ),
   .build1 = &build_anonsub,
 };
 
@@ -319,6 +366,9 @@ BOOT:
   register_xs_parse_keyword("pieceprefixedblock_VAR", &hooks_prefixedblock_VAR, "$VAR");
 
   register_xs_parse_keyword("pieceanonsub", &hooks_anonsub, NULL);
+
+  register_xs_parse_keyword("piecestagedanonsub", &hooks_stagedanonsub, "$VAR");
+
   register_xs_parse_keyword("piecearithexpr", &hooks_arithexpr, NULL);
   register_xs_parse_keyword("piecetermexpr", &hooks_termexpr, NULL);
   register_xs_parse_keyword("piecelistexpr", &hooks_listexpr, NULL);

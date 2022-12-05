@@ -10,11 +10,11 @@ Test::WWW::Mechanize - Testing-specific WWW::Mechanize subclass
 
 =head1 VERSION
 
-Version 1.58
+Version 1.60
 
 =cut
 
-our $VERSION = '1.58';
+our $VERSION = '1.60';
 
 =head1 SYNOPSIS
 
@@ -67,13 +67,7 @@ results in
 
 use HTML::TokeParser ();
 use WWW::Mechanize ();
-use Test::LongString qw(
-    contains_string
-    is_string
-    lacks_string
-    like_string
-    unlike_string
-);
+use Test::LongString;
 use Test::Builder ();
 use Carp ();
 use Carp::Assert::More qw(
@@ -189,6 +183,12 @@ sub get_ok {
 
     my ($url,$desc,%opts) = $self->_unpack_args( 'GET', @_ );
 
+    if ( !defined($url) ) {
+        my $ok = $TB->ok( 0, $desc );
+        $TB->diag( 'URL cannot be undef.' );
+        return $ok;
+    }
+
     $self->get( $url, %opts );
     my $ok = $self->success;
 
@@ -269,6 +269,12 @@ sub head_ok {
 
     my ($url,$desc,%opts) = $self->_unpack_args( 'HEAD', @_ );
 
+    if ( !defined($url) ) {
+        my $ok = $TB->ok( 0, $desc );
+        $TB->diag( 'URL cannot be undef.' );
+        return $ok;
+    }
+
     $self->head( $url, %opts );
     my $ok = $self->success;
 
@@ -306,6 +312,12 @@ sub post_ok {
 
     my ($url,$desc,%opts) = $self->_unpack_args( 'POST', @_ );
 
+    if ( !defined($url) ) {
+        my $ok = $TB->ok( 0, $desc );
+        $TB->diag( 'URL cannot be undef.' );
+        return $ok;
+    }
+
     $self->post( $url, \%opts );
     my $ok = $self->success;
     $ok = $self->_post_load_validation( $ok, $desc );
@@ -328,6 +340,13 @@ sub put_ok {
     my $self = shift;
 
     my ($url,$desc,%opts) = $self->_unpack_args( 'PUT', @_ );
+
+    if ( !defined($url) ) {
+        my $ok = $TB->ok( 0, $desc );
+        $TB->diag( 'URL cannot be undef.' );
+        return $ok;
+    }
+
     $opts{content} = '' if !exists $opts{content};
     $self->put( $url, %opts );
 
@@ -358,6 +377,12 @@ sub delete_ok {
     my $self = shift;
 
     my ($url,$desc,%opts) = $self->_unpack_args( 'DELETE', @_ );
+
+    if ( !defined($url) ) {
+        my $ok = $TB->ok( 0, $desc );
+        $TB->diag( 'URL cannot be undef.' );
+        return $ok;
+    }
 
     if ($self->can('delete')) {
         $self->delete( $url, %opts );
@@ -470,7 +495,7 @@ sub follow_link_ok {
        Carp::croak 'FATAL: parameters must be given as a hashref';
     }
 
-    # return from follow_link() is an HTTP::Response or undef
+    # The return from follow_link() is an HTTP::Response or undef.
     my $response = $self->follow_link( %{$parms} );
 
     my $ok = $response && $response->is_success;
@@ -1800,7 +1825,7 @@ sub lacks_ids_ok {
 
 =head2 $mech->button_exists( $button )
 
-Returns a boolean saying whether the submit C<$button> exists. Does not
+Returns a boolean saying whether a submit button with the name C<$button> exists. Does not
 do a test. For that you want C<button_exists_ok> or C<lacks_button_ok>.
 
 =cut
@@ -1829,7 +1854,7 @@ sub button_exists_ok {
 
     my $self   = shift;
     my $button = shift;
-    my $msg    = shift;
+    my $msg    = shift || qq{Button named "$button" exists};
 
     return $TB->ok( $self->button_exists( $button ), $msg );
 }
@@ -1837,7 +1862,7 @@ sub button_exists_ok {
 
 =head2 $mech->lacks_button_ok( $button [, $msg] )
 
-Asserts that the button exists on the page.
+Asserts that no button named C<$button> exists on the page.
 
 =cut
 
@@ -1846,7 +1871,7 @@ sub lacks_button_ok {
 
     my $self   = shift;
     my $button = shift;
-    my $msg    = shift;
+    my $msg    = shift || qq{No button named "$button" exists};
 
     return $TB->ok( !$self->button_exists( $button ), $msg );
 }
@@ -2067,13 +2092,13 @@ sub stuff_inputs {
     assert_isa( $options, 'HASH' );
     assert_in( $_, ['ignore', 'fill', 'specs'] ) foreach ( keys %{$options} );
 
-    # set up the fill we'll use unless a field overrides it
+    # Set up the fill we'll use unless a field overrides it.
     my $default_fill = '@';
-    if ( exists $options->{fill} && defined $options->{fill} && length($options->{fill}) > 0 ) {
+    if ( defined $options->{fill} && length($options->{fill}) > 0 ) {
         $default_fill = $options->{fill};
     }
 
-    # fields in the form to not stuff
+    # Fields in the form to not stuff
     my $ignore = {};
     if ( exists $options->{ignore} ) {
         assert_isa( $options->{ignore}, 'ARRAY' );
@@ -2098,10 +2123,10 @@ sub stuff_inputs {
 
         my $name = $field->name();
 
-        # skip if it's one of the fields to ignore
+        # Skip if it's one of the fields to ignore.
         next if exists $ignore->{ $name };
 
-        # fields with no maxlength will get this many characters
+        # Fields with no maxlength will get this many characters.
         my $maxlength = 66000;
 
         # maxlength from the HTML
@@ -2115,7 +2140,7 @@ sub stuff_inputs {
         my $fill = $default_fill;
 
         if ( exists $specs->{$name} ) {
-            # process the per-field info
+            # Process the per-field info.
 
             if ( exists $specs->{$name}->{fill} && defined $specs->{$name}->{fill} && length($specs->{$name}->{fill}) > 0 ) {
                 $fill = $specs->{$name}->{fill};
@@ -2130,11 +2155,9 @@ sub stuff_inputs {
 
         # stuff it
         if ( ($maxlength % length($fill)) == 0 ) {
-            # the simple case
             $field->value( $fill x ($maxlength/length($fill)) );
         }
         else {
-            # can be improved later
             $field->value( substr( $fill x int(($maxlength + length($fill) - 1)/length($fill)), 0, $maxlength ) );
         }
     } # for @inputs
@@ -2275,8 +2298,6 @@ sub _diag_url {
 
 
 =head1 TODO
-
-Add HTML::Tidy capabilities.
 
 Other ideas for features are at https://github.com/petdance/test-www-mechanize
 

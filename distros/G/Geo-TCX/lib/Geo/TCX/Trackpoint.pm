@@ -2,7 +2,7 @@ package Geo::TCX::Trackpoint;
 use strict;
 use warnings;
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 =encoding utf-8
 
@@ -24,7 +24,6 @@ TCX trackpoints are different from GPX trackpoints in that they contain tags suc
 
 =cut
 
-use Geo::Calc;
 use Geo::Gpx::Point;
 use Carp qw(confess croak cluck);
 use vars qw($AUTOLOAD %possible_attr);
@@ -146,8 +145,8 @@ Returns a trackpoint as a L<Geo::Gpx::Point>.
 sub to_gpx {
     my ($pt, %attr) = @_;           # call to new() will handle error check
     my %fields = (  lat => $pt->LatitudeDegrees, lon => $pt->LongitudeDegrees );
-    $fields{ele} = $pt->AltitudeMeters if defined $pt->AltitudeMeters;
-    $fields{time} = $pt->{_time_epoch} if defined $pt->Time;
+    $fields{ele} = $pt->AltitudeMeters if defined $pt->{AltitudeMeters};
+    $fields{time} = $pt->{_time_epoch} if defined $pt->{Time};
     return Geo::Gpx::Point->new( %fields, %attr );
 }
 
@@ -155,13 +154,14 @@ sub to_gpx {
 
 =item to_geocalc()
 
-Returns a trackpoint as a L<Geo::Calc> object.
+Returns a trackpoint as a L<Geo::Calc> object. (Requires that the L<Geo::Calc> module be installed.)
 
 =back
 
 =cut
 
 sub to_geocalc {
+    require Geo::Calc;
     my $pt = shift;
     croak "to_geocalc() takes no arguments" if @_;
     return Geo::Calc->new( lat => $pt->LatitudeDegrees, lon => $pt->LongitudeDegrees );
@@ -191,7 +191,7 @@ sub to_basic {
 
 =item distance_to ( $trackpoint )
 
-Calculates and returns the distance to the specified I<$trackpoint> object using the L<Geo::Calc> module.
+Calculates and returns the distance to the specified I<$trackpoint> object.
 
 =back
 
@@ -200,8 +200,7 @@ Calculates and returns the distance to the specified I<$trackpoint> object using
 sub distance_to {
     my ($from, $to) = (shift, shift);
     croak 'expects a single trackpoint as argument' if @_ or ! $to->isa('Geo::TCX::Trackpoint');
-    my $g = Geo::Calc->new( lat => $from->LatitudeDegrees, lon => $from->LongitudeDegrees );
-    my $dist = $g->distance_to( { lat => $to->LatitudeDegrees, lon => $to->LongitudeDegrees } );
+    my $dist = $from->to_gpx->distance_to( lat => $to->LatitudeDegrees, lon => $to->LongitudeDegrees );
     return $dist
 }
 
@@ -258,7 +257,7 @@ use warnings;
 use DateTime::Format::ISO8601;
 use Carp qw(confess croak cluck);
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 our @ISA=qw(Geo::TCX::Trackpoint);
 
 
@@ -678,7 +677,7 @@ Patrick Joly
 
 =head1 VERSION
 
-1.03
+1.04
 
 =head1 SEE ALSO
 

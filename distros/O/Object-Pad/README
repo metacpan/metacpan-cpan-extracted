@@ -10,8 +10,8 @@ SYNOPSIS
        use Object::Pad;
     
        class Point {
-          has $x :param = 0;
-          has $y :param = 0;
+          field $x :param = 0;
+          field $y :param = 0;
     
           method move ($dX, $dY) {
              $x += $dX;
@@ -30,8 +30,8 @@ SYNOPSIS
        use Object::Pad;
     
        class Point {
-          has $x :param = 0;
-          has $y :param = 0;
+          field $x :param = 0;
+          field $y :param = 0;
     
           method move {
              my ($dX, $dY) = @_;
@@ -185,11 +185,10 @@ KEYWORDS
           ...
        }
 
-    Prior to version 0.41 this was called extends, which is currently
-    recognised as a compatibility synonym. Both extends and isa keywords
-    are now deprecated, in favour of the ":isa" attribute which is
-    preferred because it follows a more standard grammar without this
-    special-case.
+    Prior to version 0.41 this was called extends, but since version 0.73
+    this is no longer recognised. The isa keyword is now deprecated, in
+    favour of the ":isa" attribute which is preferred because it follows a
+    more standard grammar without this special-case.
 
     One or more roles can be composed into the class by the keyword does
 
@@ -199,11 +198,10 @@ KEYWORDS
           ...
        }
 
-    Prior to version 0.41 this was called implements, which is currently
-    recognised as a compatibility synonym. Both implements and does
-    keywords are now deprecated, in favour of the ":does" attribute which
-    is preferred because it follows a more standard grammar without this
-    special-case.
+    Prior to version 0.41 this was called implements, but since version
+    0.73 this is no longer recognised. The does keyword is now deprecated,
+    in favour of the ":does" attribute which is preferred because it
+    follows a more standard grammar without this special-case.
 
     An optional list of attributes may be supplied in similar syntax as for
     subs or lexical variables. (These are annotations about the class
@@ -410,7 +408,7 @@ KEYWORDS
     has not yet been rewritten to use Object::Pad.
 
     The tradeoff is that a :compat(invokable) role may not create field
-    data using the "has" keyword. Whatever behaviours the role wishes to
+    data using the "field" keyword. Whatever behaviours the role wishes to
     perform must be provided only by calling other methods on $self, or
     perhaps by making assumptions about the representation type of
     instances.
@@ -427,6 +425,8 @@ KEYWORDS
        field %var;
     
        field $var :ATTR ATTR...;
+    
+       field $var = EXPR;
     
        field $var { BLOCK }
 
@@ -570,8 +570,8 @@ KEYWORDS
     sure to give it a default expression - even if that expression is
     undef:
 
-       has $x :param;          # this is required
-       has $z :param = undef;  # this is optional
+       field $x :param;          # this is required
+       field $z :param = undef;  # this is optional
 
     Any field that has a :param and an initialisation block will only run
     the code in the block if required by the constructor. If a named
@@ -581,7 +581,7 @@ KEYWORDS
     Values for fields are assigned by the constructor before any BUILD
     blocks are invoked.
 
-  Field Initialiser Blocks
+  Field Initialiser Expressions
 
     Since version 0.54 a deferred statement block is also permitted, on any
     field variable type. This permits code to be executed as part of the
@@ -589,16 +589,31 @@ KEYWORDS
     set up. Code in a field initialisation block is roughly equivalent to
     being placed in a BUILD or ADJUST block.
 
+    Since version 0.73 this may also be written as a plain expression
+    introduced by an equals symbol (=). This is equivalent to using a
+    block. Note carefully: the equals symbol is part of the field syntax;
+    it is not simply a runtime assignment operator that happens once at the
+    time the class is declared. Just like the block form describe above,
+    the expression is evaluated during the constructor of every instance.
+
+    Note that $self is specifically not visible during an initialiser
+    expression. This is because the object is not yet fully constructed, so
+    it would be dangerous to allow access to it while in this state.
+    However, the __CLASS__ keyword is available, so initialiser expressions
+    can make use of class-based dispatch to invoke class-level methods to
+    help provide values.
+
     This feature should be considered experimental, and will emit warnings
     to that effect. They can be silenced with
 
        use Object::Pad qw( :experimental(init_expr) );
 
-    Control flow that attempts to leave a field initialiser block is not
-    permitted. This includes any return expression, any next/last/redo
-    outside of a loop, with a dynamically-calculated label expression, or
-    with a label that it doesn't appear in. goto statements are also
-    currently forbidden, though known-safe ones may be permitted in future.
+    Control flow that attempts to leave a field initialiser expression or
+    block is not permitted. This includes any return expression, any
+    next/last/redo outside of a loop, with a dynamically-calculated label
+    expression, or with a label that it doesn't appear in. goto statements
+    are also currently forbidden, though known-safe ones may be permitted
+    in future.
 
     Loop control expressions that are known at compiletime to affect a loop
     that they appear within are permitted.
@@ -620,16 +635,19 @@ KEYWORDS
     An older version of the "field" keyword.
 
     This generally behaves like field, except that inline expressions are
-    also permitted.
+    evaluated immediately, once, during class declaration time. These are
+    not stored to be evaluated for each constructor.
 
-    A scalar field may provide a expression that gives an initialisation
-    value, which will be assigned into the field of every instance during
-    the constructor before the BUILD blocks are invoked. Since version 0.29
-    this expression does not have to be a compiletime constant, though it
-    is evaluated exactly once, at runtime, after the class definition has
-    been parsed. It is not evaluated individually for every object instance
-    of that class. Since version 0.54 this is also permitted on array and
-    hash fields.
+    Because of the one-shot immediate nature of these initialisation
+    expressions (and a bunch of other reasons), the has keyword is now
+    discouraged for use. Use the field keyword instead.
+
+    If you need to evaluate an expression exactly once during the class
+    declaration and assign its now-constant value to every instace, store
+    it in a regular my variable instead:
+
+       my $default_var = EXPR;
+       field $var = $default_var;
 
  method
 
@@ -1026,7 +1044,7 @@ SUBCLASSING CLASSIC PERL CLASSES
        }
     
        class DerivedClass :isa(ClassicPerlBaseClass) {
-          has $_value = "B";
+          field $_value = "B";
           ADJUST {
              $_value = "C";
           }
@@ -1089,7 +1107,7 @@ STYLE SUGGESTIONS
     
        # other use statements
     
-       # has, methods, etc.. can go here
+       # field, methods, etc.. can go here
 
  Field Names
 
@@ -1129,7 +1147,7 @@ WITH OTHER MODULES
        use Syntax::Keyword::Dynamically;
     
        class Container {
-          has $value = 1;
+          field $value = 1;
     
           method example {
              dynamically $value = 2;

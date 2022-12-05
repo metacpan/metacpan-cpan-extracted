@@ -1,5 +1,12 @@
 Revision history for App-sdview
 
+0.09    2022-12-05
+        [CHANGES]
+         * Updated for Object::Pad v0.73:
+            + Use `:isa` and `:does`
+            + Use `field NAME = EXPR` syntax
+         * Moved Markdown span parsing/output to new String::Tagged::Markdown
+
 0.08    2022-10-29
         [CHANGES]
          * Updates for Object::Pad v0.70:

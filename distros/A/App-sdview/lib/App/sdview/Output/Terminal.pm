@@ -8,8 +8,10 @@ use utf8;
 
 use Object::Pad;
 
-package App::sdview::Output::Terminal 0.08;
-class App::sdview::Output::Terminal isa App::sdview::Output::Formatted :strict(params);
+package App::sdview::Output::Terminal 0.09;
+class App::sdview::Output::Terminal
+   :isa(App::sdview::Output::Formatted)
+   :strict(params);
 
 use constant format => "terminal";
 

@@ -1,0 +1,14 @@
+Build.PL
+Changes
+examples/markdown-to-term.pl
+lib/String/Tagged/Markdown.pm
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00use.t
+t/01parse.t
+t/02build.t
+t/10formatting.t
+t/99pod.t

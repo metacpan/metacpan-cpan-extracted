@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 7;
+use Test::More tests => 8;
 use Test::Builder::Tester;
 
 use Test::WWW::Mechanize ();
@@ -15,11 +15,13 @@ my $server      = TestServer->new;
 my $pid         = $server->background;
 my $server_root = $server->root;
 
-my $mech = Test::WWW::Mechanize->new( autocheck => 0 );
-isa_ok($mech,'Test::WWW::Mechanize');
-
 my $text = 'This is what we are putting';
 GOOD_PUT: {
+    local @ENV{qw( http_proxy HTTP_PROXY )};
+
+    my $mech = Test::WWW::Mechanize->new( autocheck => 0 );
+    isa_ok($mech,'Test::WWW::Mechanize');
+
     my $scratch = "$server_root/scratch.html";
 
     $mech->put_ok($scratch, {content => $text});
@@ -37,6 +39,20 @@ GOOD_PUT: {
     test_test('PUTs existing URI and reports success - default desc');
 }
 
+
+UNDEF_URL: {
+    my $mech = Test::WWW::Mechanize->new();
+    test_out( 'not ok 1 - Passing undef for a URL' );
+    test_fail( +2 );
+    test_diag( 'URL cannot be undef.' );
+    my $ok = $mech->put_ok( undef, 'Passing undef for a URL' );
+    test_test( 'Undef URLs' );
+}
+
+
 $server->stop;
 
 done_testing();
+
+
+exit 0;

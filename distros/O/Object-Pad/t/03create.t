@@ -7,11 +7,11 @@ use Test::More;
 
 use Scalar::Util qw( reftype );
 
-use Object::Pad;
+use Object::Pad ':experimental(init_expr)';
 
 class Point {
-   has $x = 0;
-   has $y = 0;
+   field $x = 0;
+   field $y = 0;
 
    BUILD {
       ( $x, $y ) = @_;
@@ -119,7 +119,7 @@ class WithBuildargs {
 # Create a base class with HASH representation
 {
    class NativelyHash :repr(HASH) {
-      has $field = "value";
+      field $field = "value";
       method field { $field }
    }
 

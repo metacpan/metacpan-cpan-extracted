@@ -4,7 +4,7 @@ Plack::Middleware::Greylist - throttle requests with different rates based on ne
 
 # VERSION
 
-version v0.3.0
+version v0.3.1
 
 # SYNOPSIS
 
@@ -118,6 +118,9 @@ It is required unless you are defining your own ["cache"](#cache).
 
 This is a code reference to a function that increments the cache counter for a key (usually the IP address or net
 block).
+
+If you customise this, then you need to ensure that the counter resets or expires counts after a set period of time,
+e.g. one minute.  If you use a different time interval, then you may need to adjust the ["retry\_after"](#retry_after) time.
 
 # KNOWN ISSUES
 

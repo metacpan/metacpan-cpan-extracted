@@ -4,6 +4,7 @@ lib/SPVM/IO/File.pm
 lib/SPVM/IO/File.spvm
 lib/SPVM/IO/Handle.pm
 lib/SPVM/IO/Handle.spvm
+lib/SPVM/IO/Handle/Interface.pm
 lib/SPVM/IO/Handle/Interface.spvm
 lib/SPVM/IO/Select.config
 lib/SPVM/IO/Select.pm

@@ -230,7 +230,7 @@ add_method(self, mname, ...)
       croak("Adding a method called BUILD is not supported; use ->add_BUILD directly");
     }
 
-    MethodMeta *methodmeta = mop_class_add_method(meta, mname);
+    MethodMeta *methodmeta = mop_class_add_method_cv(meta, mname, (CV *)SvREFCNT_inc(CV_FROM_REF(ref)));
 
     static const char *args[] = {
       "common",
@@ -243,17 +243,6 @@ add_method(self, mname, ...)
           break;
       }
     }
-
-    I32 klen = SvCUR(mname);
-    if(SvUTF8(mname))
-      klen = -klen;
-
-    GV **gvp = (GV **)hv_fetch(meta->stash, SvPVX(mname), klen, GV_ADD);
-
-    gv_init_sv(*gvp, meta->stash, mname, 0);
-    GvMULTI_on(*gvp);
-
-    GvCV_set(*gvp, (CV *)SvREFCNT_inc(CV_FROM_REF(ref)));
 
     RETVAL = newSV(0);
     sv_setref_uv(RETVAL, "Object::Pad::MOP::Method", PTR2UV(methodmeta));

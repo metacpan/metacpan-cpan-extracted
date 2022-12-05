@@ -1,5 +1,8 @@
 Revision history for Perl extension RF::Functions.
 
+0.04 2022-12-02
+  - Added functions dbi_dbd, dbd2dbi, dbd_dbi, dbi2dbd, dipole_gain
+
 0.03 2022-09-20
   - Added function fsl_mhz_mi
 

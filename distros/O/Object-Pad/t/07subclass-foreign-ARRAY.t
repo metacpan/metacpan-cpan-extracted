@@ -6,7 +6,7 @@ use warnings;
 use Test::More;
 use Test::Fatal;
 
-use Object::Pad;
+use Object::Pad ':experimental(init_expr)';
 
 package Base::Class {
    sub new {
@@ -25,7 +25,7 @@ package Base::Class {
 }
 
 class Derived::Class :isa(Base::Class) {
-   has $derived_field = 456;
+   field $derived_field = 456;
 
    BUILD {
       my @args = @_;

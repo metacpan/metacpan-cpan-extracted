@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.57;
 
-package Device::Chip::ADC121Sx 0.13;
+package Device::Chip::ADC121Sx 0.14;
 class Device::Chip::ADC121Sx
    :isa(Device::Chip);
 

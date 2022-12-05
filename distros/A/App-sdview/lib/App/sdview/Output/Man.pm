@@ -5,18 +5,18 @@
 
 use v5.26;
 
-use Object::Pad 0.66 ':experimental(init_expr)';
+use Object::Pad 0.73 ':experimental(init_expr)';
 
-package App::sdview::Output::Man 0.08;
+package App::sdview::Output::Man 0.09;
 class App::sdview::Output::Man
-   does App::sdview::Output
+   :does(App::sdview::Output)
    :strict(params);
 
 use constant format => "Man";
 
 use List::Util qw( any );
 
-field $_current_mode { "" };
+field $_current_mode = "";
 
 method output_head1 ( $para ) { $self->_output_head( ".SH", $para ); }
 method output_head2 ( $para ) { $self->_output_head( ".SS", $para ); }

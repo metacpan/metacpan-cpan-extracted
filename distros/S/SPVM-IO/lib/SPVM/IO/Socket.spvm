@@ -1,5 +1,4 @@
 class IO::Socket extends IO::Handle {
-  interface IO::Socket::Interface;
   use Sys::Socket;
   use Sys::Socket::Constant as SOCKET;
   use Sys::Socket::Sockaddr;
@@ -9,10 +8,13 @@ class IO::Socket extends IO::Handle {
   use Sys::Socket::In_addr;
   use IO::Select;
   use Hash;
-  use IO::Util;
   use Errno;
   use Scope::Guard;
-
+  
+  # Interfaces
+  interface IO::Socket::Interface;
+  
+  # Fields
   has timeout : protected ro int;
   has sockdomain : protected ro int;
   has socktype : protected ro int;
@@ -20,9 +22,8 @@ class IO::Socket extends IO::Handle {
   has peername : protected ro Sys::Socket::Sockaddr;
   has fd : protected ro int;
   has listen_backlog : protected ro int;
-
-  method has_interfaces : int () { return 1; }
-
+  
+  # Class Methods
   static method new : IO::Socket ($options = undef : object[]) {
     
     my $self = new IO::Socket;
@@ -32,6 +33,9 @@ class IO::Socket extends IO::Handle {
     return $self;
   }
   
+  # Instance Methods
+  method has_interfaces : int () { return 1; }
+
   method new_instance : IO::Socket ($options = undef : object[]) {
     {
       my $self = IO::Socket->new($options);
@@ -47,31 +51,31 @@ class IO::Socket extends IO::Handle {
     my $options_h = Hash->new($options);
     
     # Timeout option
-    my $timeout = IO::Util->delete_int_or_default($options_h, "Timeout", -1);
+    my $timeout = $options_h->delete_or_default_int("Timeout", -1);
     $self->{timeout} = $timeout;
     
     # Domain option
-    my $sockdomain = IO::Util->delete_int_or_default($options_h, "Domain", -1);
+    my $sockdomain = $options_h->delete_or_default_int("Domain", -1);
     $self->{sockdomain} = $sockdomain;
     unless ($sockdomain >= 0) {
       die "The \"Domain\" option must be defined";
     }
     
     # Type option
-    my $socktype = IO::Util->delete_int_or_default($options_h, "Type", -1);
+    my $socktype = $options_h->delete_or_default_int("Type", -1);
     $self->{socktype} = $socktype;
     
     # Listen option
-    my $listen_backlog = IO::Util->delete_int_or_default($options_h, "Listen", 5);
+    my $listen_backlog = $options_h->delete_or_default_int("Listen", 5);
     $self->{listen_backlog} = $listen_backlog;
 
     # Timeout option
-    my $fd = IO::Util->delete_int_or_default($options_h, "fd", -1);
+    my $fd = $options_h->delete_or_default_int("fd", -1);
     $self->{fd} = $fd;
     
     my $registered_domain = [SOCKET->AF_INET, SOCKET->AF_INET6, SOCKET->AF_UNIX];
 
-    my $new_options = IO::Util->hash_to_array($options_h);
+    my $new_options = $options_h->to_array;
     
     # Blocking option
     $self->SUPER::init($new_options);
@@ -155,7 +159,7 @@ class IO::Socket extends IO::Handle {
     
     my $send_length = 0;
     if ($to) {
-      $send_length = IO::Util->sendto($fd, $buffer, length $buffer, $flags, $peername, $peername->sizeof);
+      $send_length = Sys::Socket->sendto($fd, $buffer, length $buffer, $flags, $peername, $peername->sizeof);
     }
     else {
       $send_length = Sys::Socket->send($fd, $buffer, length $buffer, $flags);
@@ -246,7 +250,7 @@ class IO::Socket extends IO::Handle {
   method atmark : int () {
     my $fd = $self->{fd};
     
-    my $status = IO::Util->sockatmark($fd);
+    my $status = Sys::Socket->sockatmark($fd);
     
     return $status;
   }

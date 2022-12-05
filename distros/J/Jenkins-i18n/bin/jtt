@@ -9,7 +9,6 @@ use utf8;
 use File::Basename;
 use File::Path;
 use Getopt::Long;
-use Set::Tiny 0.04;
 use Term::ANSIColor 5.01;
 use Term::ProgressBar 2.22;
 use IO::Interactive 1.023 qw(is_interactive);
@@ -21,14 +20,16 @@ use feature 'say';
 
 use Jenkins::i18n (
     'remove_unused', 'find_files', 'load_properties', 'load_jelly',
-    'find_langs'
+    'find_langs',    'all_data',   'dump_keys',       'merge_data',
+    'find_missing'
 );
 use Jenkins::i18n::Stats;
 use Jenkins::i18n::Warnings;
 use Jenkins::i18n::ProcOpts;
 use Jenkins::i18n::License;
+use Jenkins::i18n::Assertions qw(can_ignore has_hudson);
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 my $current_dir = getcwd;
 my (
     $lang, $dir,   $add, $remove, $counter, $target,
@@ -58,22 +59,6 @@ if ($version) {
 pod2usage( -exitval => 0, -verbose => 0 ) if ($help);
 pod2usage( -exitval => 0, -verbose => 2 ) if ($man);
 
-# TODO: move this variables to a module
-my $empty_regex  = qr/empty/i;
-my $jelly_regex  = qr/.jelly$/;
-my $hudson_regex = qr/Hudson/;
-my $ignore_same  = Set::Tiny->new(
-    (
-        'https://www.jenkins.io/redirect/log-levels',
-        'Maven',
-        'Jenkins',
-        'JDK',
-        'Javadoc',
-        'https://www.jenkins.io/redirect/fingerprint',
-        'https://www.jenkins.io/redirect/search-box'
-    )
-);
-
 if ($all_langs) {
     my ( $files_ref, $all_langs );
     binmode( STDOUT, ':encoding(UTF-8)' );
@@ -84,11 +69,11 @@ if ($all_langs) {
 
         my $done = 'Done! ' . colored( '✓', 'green' );
         print 'Hang on, this might take a while.', "\n",
-            'Searching for all translatable files... ';
-        $files_ref = find_files($dir);
-        say $done;
-        print 'Now searching for all available languages... ';
+            'Searching for all available languages... ';
         $all_langs = find_langs($dir);
+        say $done;
+        print 'Searching for all translatable files... ';
+        $files_ref = find_files( $dir, $all_langs );
         say $done, "\n", 'Now verifying each language translated status...';
     }
 
@@ -157,90 +142,87 @@ unless ( $lang and ( $lang ne 'en' ) ) {
     pod2usage( -exitval => 1, -verbose => 1 );
 }
 
-print "Searching for files ...\n";
+print_summary( evaluate_translation($debug) );
 
-# look for Message.properties and *.jelly files in the provided folder
-my $files_ref = find_files($dir);
-print 'Found ', scalar( @{$files_ref} ), ' files', "\n";
+# SUBS
+# TODO: maintain here only the subs that handle interaction with the end user
 
-my $stats    = Jenkins::i18n::Stats->new;
-my $warnings = Jenkins::i18n::Warnings->new;
-my $processor
-    = Jenkins::i18n::ProcOpts->new( $dir, $target, $counter, $remove, $add,
-    $debug, $lang, $search );
+sub evaluate_translation {
+    my $debug = shift;
+    print "Searching for files ...\n";
 
-# process each file
-foreach my $file ( @{$files_ref} ) {
-    $stats->inc('files');
-    process_file( $file, $stats, $warnings, $processor );
-    $warnings->reset;
+    my $all_known    = find_langs($dir);
+    my $find_results = find_files( $dir, $all_known );
+
+    if ($debug) {
+        warn 'Total languages identified: ' . $all_known->size . "\n";
+        warn 'Total translation files identified: '
+            . $find_results->size . "\n";
+        my $next = $find_results->warnings;
+
+        while ( my $warning = $next->() ) {
+            warn "$warning\n";
+        }
+    }
+
+    my $stats     = Jenkins::i18n::Stats->new;
+    my $warnings  = Jenkins::i18n::Warnings->new;
+    my $processor = Jenkins::i18n::ProcOpts->new(
+        {
+            source_dir  => $dir,
+            target_dir  => $target,
+            use_counter => $counter,
+            is_remove   => $remove,
+            is_add      => $add,
+            is_debug    => $debug,
+            lang        => $lang,
+            search      => $search
+        }
+    );
+
+    my $license          = Jenkins::i18n::License->new;
+    my $next_file        = $find_results->files;
+    my $processed_source = Set::Tiny->new;
+
+    # process each file
+    while ( my $file = $next_file->() ) {
+        $stats->inc_files;
+        process_file( $file, $stats, $warnings, $processor, $license );
+        $warnings->reset;
+    }
+
+    return $stats;
 }
-
-print_summary($stats);
 
 # This is the main method with is run for each file
 sub process_file {
-    my ( $file, $stats, $warnings, $processor ) = @_;
-    print "Working on $file\n" if ( $processor->is_debug );
-    my ( $curr_lang_file, $english_file ) = $processor->define_files($file);
+    my ( $file, $stats, $warnings, $processor, $license ) = @_;
+    my ( $jelly_entries_ref, $lang_entries_ref, $english_entries_ref )
+        = all_data( $file, $processor );
 
-   # entries_ref -> keys used in jelly or Message.properties files
-   # lang_entries_ref -> keys/values in the desired language which are already
-   # present in the file
-    my ( $entries_ref, $lang_entries_ref, $english_entries_ref );
+    # TODO: invoke merge_data() from all_data(), since only merged keys
+    # will be in use?
+    my $merged_ref = merge_data( $jelly_entries_ref, $english_entries_ref );
+    find_missing( $merged_ref, $lang_entries_ref, $stats, $warnings );
 
-    # Read .jelly or Message.properties files, and fill a hash with the keys
-    # found
-    if ( $file =~ $jelly_regex ) {
-        $entries_ref = load_jelly($file);
-        $english_entries_ref
-            = load_properties( $english_file, $processor->is_debug );
-    }
-    else {
-        $english_entries_ref = load_properties( $file, $processor->is_debug );
-        $entries_ref         = $english_entries_ref;
-    }
-
-    $lang_entries_ref
-        = load_properties( $curr_lang_file, $processor->is_debug );
-
-    foreach my $entry ( keys %{$entries_ref} ) {
-        $stats->inc('keys');
-
-        # TODO: skip increasing missing if operation is to delete those
-        unless (( exists( $lang_entries_ref->{$entry} ) )
-            and ( defined( $lang_entries_ref->{$entry} ) ) )
-        {
-            $stats->inc('missing');
-            $warnings->add( 'missing', $entry );
-            next;
-        }
-
-        if ( $lang_entries_ref->{$entry} eq '' ) {
-            unless ( $entry =~ $empty_regex ) {
-                $stats->inc('empty');
-                $warnings->add( 'empty', $entry );
-            }
-            else {
-                $warnings->add( 'ignored', $entry );
-            }
-        }
-    }
-
+    # TODO: create separated function
     foreach my $entry ( keys %{$lang_entries_ref} ) {
-        unless ( defined $entries_ref->{$entry} ) {
-            $stats->inc('unused');
+        unless (( exists( $merged_ref->{$entry} ) )
+            and ( defined $merged_ref->{$entry} ) )
+        {
+            $stats->inc_unused;
             $warnings->add( 'unused', $entry );
         }
     }
 
+    # TODO: create separated function
     foreach my $entry ( keys %{$lang_entries_ref} ) {
         if (   $lang_entries_ref->{$entry}
             && $english_entries_ref->{$entry}
             && $lang_entries_ref->{$entry} eq $english_entries_ref->{$entry} )
         {
-            unless ( $ignore_same->has( $lang_entries_ref->{$entry} ) ) {
-                $stats->inc('same');
+            unless ( can_ignore( $lang_entries_ref->{$entry} ) ) {
+                $stats->inc_same;
                 $warnings->add( 'same', $entry );
             }
             else {
@@ -249,13 +231,14 @@ sub process_file {
         }
     }
 
+    # TODO: create separated function
     foreach my $entry ( keys %{$lang_entries_ref} ) {
-        if (   $lang_entries_ref->{$entry}
-            && $lang_entries_ref->{$entry} =~ $hudson_regex )
+        if ( $lang_entries_ref->{$entry}
+            && has_hudson( $lang_entries_ref->{$entry} ) )
         {
             $warnings->add( 'non_jenkins',
                 ( "$entry -> " . $lang_entries_ref->{$entry} ) );
-            $stats->inc('no_jenkins');
+            $stats->inc_no_jenkins;
         }
     }
 
@@ -273,17 +256,19 @@ sub process_file {
 
     }
 
+    # TODO: avoid calling define_files() twice, create an attribute
+    # to store such state
+    my $curr_lang_file = ( $processor->define_files($file) )[0];
     $warnings->summary($curr_lang_file);
-    my $license = Jenkins::i18n::License->new;
 
     # write new keys in our file adding the English translation as a reference
     if ( $processor->is_add and $warnings->has_missing ) {
-        $license->print_license($curr_lang_file)
+        $license->print($curr_lang_file)
             unless ( -f $curr_lang_file );
         open( my $out, '>>', $curr_lang_file )
             or die "Cannot write to $curr_lang_file: $!\n";
 
-        foreach my $entry ( keys %{$entries_ref} ) {
+        foreach my $entry ( keys %{$merged_ref} ) {
             unless ( exists( $lang_entries_ref->{$entry} ) ) {
 
                 unless ( $lang_entries_ref->{$entry} ) {
@@ -292,6 +277,7 @@ sub process_file {
                         if ( $processor->use_counter );
                     push( @todo, '--- ' );
 
+                 # TODO: use merged_ref, testing if the key has a value or not
                     if ( $english_entries_ref->{$entry} ) {
                         push( @todo, $english_entries_ref->{$entry} );
                     }
@@ -311,16 +297,21 @@ sub process_file {
     if ( $processor->is_remove and $warnings->has_unused ) {
         my $removed
             = remove_unused( $curr_lang_file,
-            Set::Tiny->new( keys( %{$entries_ref} ) ),
-            $license->read_license );
+            Set::Tiny->new( keys( %{$merged_ref} ) ),
+            $license->read );
         print "Removed $removed keys\n";
     }
 
 }
 
 sub print_summary {
-    my $stats       = shift;
+    my $stats = shift;
+    die "Must receive a Jenkins::i18n::Stats instance as parameter"
+        unless ( ref($stats) eq 'Jenkins::i18n::Stats' );
     my $summary_ref = $stats->summary;
+    warn "Not a single translation key was identified"
+        if ( scalar( keys( %{$summary_ref} ) ) == 0 );
+
     my ( $item, $total, $percent );
 
     format SUMMARY_TOP =

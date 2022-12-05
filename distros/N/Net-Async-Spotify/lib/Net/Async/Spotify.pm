@@ -3,7 +3,7 @@ package Net::Async::Spotify;
 use strict;
 use warnings;
 
-our $VERSION = 0.001;
+our $VERSION = 0.002;
 our $AUTHORITY = 'cpan:VNEALV'; # AUTHORITY
 
 # ABSTRACT: Interaction with spotify.com API

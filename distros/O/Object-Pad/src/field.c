@@ -32,13 +32,11 @@ FieldMeta *ObjectPad_mop_create_field(pTHX_ SV *fieldname, ClassMeta *classmeta)
 
   assert(classmeta->next_fieldix > -1);
 
-  fieldmeta->name = SvREFCNT_inc(fieldname);
-  fieldmeta->class = classmeta;
-  fieldmeta->fieldix = classmeta->next_fieldix;
-  fieldmeta->defaultexpr = NULL;
-  fieldmeta->paramname = NULL;
-
-  fieldmeta->hooks = NULL;
+  *fieldmeta = (FieldMeta){
+    .name    = SvREFCNT_inc(fieldname),
+    .class   = classmeta,
+    .fieldix = classmeta->next_fieldix,
+  };
 
   return fieldmeta;
 }
@@ -66,11 +64,13 @@ static void S_mop_field_set_param(pTHX_ FieldMeta *fieldmeta, SV *paramname)
   ParamMeta *parammeta;
   Newx(parammeta, 1, struct ParamMeta);
 
-  parammeta->name = SvREFCNT_inc(paramname);
-  parammeta->class = classmeta;
-  parammeta->type = PARAM_FIELD;
-  parammeta->field.fieldmeta = fieldmeta;
-  parammeta->field.fieldix   = fieldmeta->fieldix;
+  *parammeta = (struct ParamMeta){
+    .name  = SvREFCNT_inc(paramname),
+    .class = classmeta,
+    .type  = PARAM_FIELD,
+    .field.fieldmeta = fieldmeta,
+    .field.fieldix   = fieldmeta->fieldix,
+  };
 
   fieldmeta->paramname = SvREFCNT_inc(paramname);
 
@@ -153,9 +153,11 @@ static void register_field_attribute(const char *name, const struct FieldHookFun
   FieldAttributeRegistration *reg;
   Newx(reg, 1, struct FieldAttributeRegistration);
 
-  reg->name     = name;
-  reg->funcs    = funcs;
-  reg->funcdata = funcdata;
+  *reg = (struct FieldAttributeRegistration){
+    .name     = name,
+    .funcs    = funcs,
+    .funcdata = funcdata,
+  };
 
   if(funcs->permit_hintkey)
     reg->permit_hintkeylen = strlen(funcs->permit_hintkey);
@@ -209,9 +211,11 @@ void ObjectPad_mop_field_apply_attribute(pTHX_ FieldMeta *fieldmeta, const char 
   struct FieldHook *hook;
   Newx(hook, 1, struct FieldHook);
 
-  hook->funcs = reg->funcs;
-  hook->hookdata = hookdata;
-  hook->funcdata = reg->funcdata;
+  *hook = (struct FieldHook){
+    .funcs    = reg->funcs,
+    .hookdata = hookdata,
+    .funcdata = reg->funcdata,
+  };
 
   av_push(fieldmeta->hooks, (SV *)hook);
 }
@@ -575,10 +579,10 @@ static void S_generate_field_accessor_method(pTHX_ FieldMeta *fieldmeta, SV *mna
   SvREFCNT_inc(PL_compcv);
   ops = block_end(save_ix, ops);
 
-  CV *cv = newATTRSUB(floor_ix, newSVOP(OP_CONST, 0, mname_fq), NULL, NULL, ops);
+  CV *cv = newATTRSUB(floor_ix, NULL, NULL, NULL, ops);
   CvMETHOD_on(cv);
 
-  mop_class_add_method(classmeta, mname);
+  mop_class_add_method_cv(classmeta, mname, cv);
 
   LEAVE;
 }

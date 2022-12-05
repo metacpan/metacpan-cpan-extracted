@@ -13,3 +13,4 @@ blib
 .cvsignore
 .gitignore
 .build
+.git/

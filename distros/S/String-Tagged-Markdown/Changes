@@ -1,0 +1,8 @@
+Revision history for String-Tagged-Markdown
+
+0.02    2022-12-04
+        [BUGFIXES]
+         * Don't need to escape most formatting characters inside `fixed` text
+
+0.01    2022-12-04
+        First version, released on an unsuspecting world.

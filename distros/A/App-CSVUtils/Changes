@@ -1,3 +1,9 @@
+0.052   2022-12-05  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix][clis csv-sort-rows, csv-sort-fields, csv-concat] Didn't
+          observe -O and/or -o (RT#145283).
+
+
 0.051   2022-12-02  Released-By: PERLANCAR; Urgency: medium; Backward-Incompatible: yes
 
         [Incompatible changes]

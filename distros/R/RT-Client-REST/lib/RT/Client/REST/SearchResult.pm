@@ -7,7 +7,7 @@ use strict;
 use warnings;
 
 package RT::Client::REST::SearchResult;
-$RT::Client::REST::SearchResult::VERSION = '0.70';
+$RT::Client::REST::SearchResult::VERSION = '0.71';
 sub new {
     my $class = shift;
 
@@ -69,7 +69,7 @@ RT::Client::REST::SearchResult - search results object.
 
 =head1 VERSION
 
-version 0.70
+version 0.71
 
 =head1 SYNOPSIS
 

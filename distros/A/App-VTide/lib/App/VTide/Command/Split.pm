@@ -15,7 +15,7 @@ use YAML::Syck;
 
 extends 'App::VTide::Command::Start';
 
-our $VERSION = version->new('0.1.18');
+our $VERSION = version->new('0.1.19');
 our $NAME    = 'split';
 our $OPTIONS = [ 'test|t!', 'verbose|v+', ];
 our $LOCAL   = 1;
@@ -54,7 +54,7 @@ App::VTide::Command::Split - Split tmux terminal helper
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command::Split version 0.1.18
+This documentation refers to App::VTide::Command::Split version 0.1.19
 
 =head1 SYNOPSIS
 

@@ -13,7 +13,7 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='6.89';
+$VERSION='6.90';
 
 
 our($Language,@Encodings,$LangName,$YearAdded);
@@ -22,6 +22,7 @@ $LangName  = "Finnish";
 $YearAdded = 2012;
 
 $Language = {
+  _special_rules => { },
   ampm => [
     ['AM', 'A.M.', 'aamulla', 'aamupäivällä', 'aamupaivalla'],
     ['PM', 'P.M.', 'illalla', 'iltapäivällä', 'iltapaivalla'],
@@ -54,18 +55,18 @@ $Language = {
     ['arkipaiva', 'arkipäivä'],
   ],
   month_abb => [
-    ['tammi'],
-    ['helmi'],
-    ['maalis'],
-    ['huhti'],
-    ['touko'],
-    ['kesa', 'kesä'],
-    ['heina', 'heinä'],
+    ['tammi', 'tam'],
+    ['helmi', 'hel'],
+    ['maalis', 'maa'],
+    ['huhti', 'huh'],
+    ['touko', 'tou'],
+    ['kesa', 'kesä', 'kes'],
+    ['heina', 'heinä', 'hei'],
     ['elo'],
-    ['syys'],
-    ['loka'],
-    ['marras'],
-    ['joulu'],
+    ['syys', 'syy'],
+    ['loka', 'lok'],
+    ['marras', 'mar'],
+    ['joulu', 'jou'],
   ],
   month_name => [
     ['tammikuu', 'tammikuun', 'tammikuuta'],

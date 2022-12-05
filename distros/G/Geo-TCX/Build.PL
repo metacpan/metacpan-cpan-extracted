@@ -19,15 +19,14 @@ my %module_build_args = (
     "Patrick Joly <patjol\@cpan.org>"
   ],
   "dist_name" => "Geo-TCX",
-  "dist_version" => "1.03",
+  "dist_version" => "1.04",
   "license" => "perl",
   "module_name" => "Geo::TCX",
   "recursive_test_files" => 1,
   "requires" => {
     "DateTime" => "1.44",
     "DateTime::Format::ISO8601" => 0,
-    "Geo::Calc" => 0,
-    "Geo::Gpx" => "1.02",
+    "Geo::Gpx" => "1.08",
     "IPC::System::Simple" => "1.30",
     "Test::More" => 0,
     "perl" => "5.008"

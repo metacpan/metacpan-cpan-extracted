@@ -1,5 +1,10 @@
 Revision history for Bible::OBML::Gateway
 
+2.05      2022-12-05 10:20:44-08:00 America/Los_Angeles
+        - fetch() will attempt references that fail a Bible::Reference check
+        - More precise parsing of: Joel 3 (CJB), John 7 (NCB), John 8 (NIV), Psalm 3 (ESV)
+        - Fix over-stripping of para-text for 1 Chr 1 (NIV) and similiar
+
 2.04      2022-03-30 18:03:00-07:00 America/Los_Angeles
         - b.inline-h3 filter and patch missing initial verse number
 

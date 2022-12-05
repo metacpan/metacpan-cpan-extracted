@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More;
 
-use Object::Pad ':experimental(mop)';
+use Object::Pad ':experimental(init_expr mop)';
 
 {
    package AClass {
@@ -24,7 +24,7 @@ use Object::Pad ':experimental(mop)';
       '->begin_class can create a class' );
 }
 
-class Parent { has $thing = "parent"; }
+class Parent { field $thing = "parent"; }
 
 {
    package Child {
@@ -35,7 +35,7 @@ class Parent { has $thing = "parent"; }
 
          ::is( $classmeta->name, "Child", '$classmeta->name for Child' );
       }
-      has $other = "child";
+      field $other = "child";
       method other { return $other }
    }
 

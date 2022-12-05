@@ -4,9 +4,16 @@
 #include "XSUB.h"
 #include <math.h>
 
+/* Back-compatibility */
+#ifndef G_LIST
+#define G_LIST G_ARRAY
+#endif
+
+/* Types of data structures that can nest */
 enum PendingStackType {
     array, map, set, attribute, push
 };
+/* Container representation - basic stack of nested lists */
 struct pending_stack {
     AV *data;
     struct pending_stack *prev;
@@ -47,17 +54,24 @@ PPCODE:
     AV *results = (AV *) sv_2mortal((SV *) newAV());
     int extracted_item = 0;
     SV *extracted = &PL_sv_undef;
-    /* Shortcut for "we have incomplete data" */
+    /* Perl strings _should_ guarantee this, so perhaps better as an assert? */
     if(*end != '\0') {
         croak("no trailing null?");
     }
 
-    if(len >= 3 && *(end - 1) == '\x0A' && *(end - 2) == '\x0D') {
+    /* The shortest command is a single-character null, which has the
+     * type `_` followed by CRLF terminator, so that's at least 3
+     * characters for a valid command.
+     */
+    if(len >= 3) { // && *(end - 1) == '\x0A' && *(end - 2) == '\x0D') {
         while(*ptr && ptr < end) {
+            /* First step is to check the data type and extract it if we can */
             switch(*ptr++) {
+                case '~': /* set */
                 case '*': { /* array */
                     int n = 0;
-                    while(*ptr >= '0' && *ptr <= '9' && ptr < end) {
+                    /* We effectively want grok_atoUV behaviour, but without having a full UV */
+                    while(*ptr >= '0' && *ptr <= '9') {
                         n = (n * 10) + (*ptr - '0');
                         ++ptr;
                     }
@@ -68,6 +82,7 @@ PPCODE:
                         croak("protocol violation - array length not followed by CRLF");
                     }
                     ptr += 2;
+
                     AV *x = (AV *) sv_2mortal((SV *)newAV());
                     if(n > 0) {
                         av_extend(x, n);
@@ -82,7 +97,7 @@ PPCODE:
                 }
                 case '>': { /* push (pubsub) */
                     int n = 0;
-                    while(*ptr >= '0' && *ptr <= '9' && ptr < end) {
+                    while(*ptr >= '0' && *ptr <= '9') {
                         n = (n * 10) + (*ptr - '0');
                         ++ptr;
                     }
@@ -93,6 +108,7 @@ PPCODE:
                         croak("protocol violation - push length not followed by CRLF");
                     }
                     ptr += 2;
+
                     AV *x = (AV *) sv_2mortal((SV *)newAV());
                     if(n > 0) {
                         av_extend(x, n);
@@ -107,13 +123,14 @@ PPCODE:
                 }
                 case '%': { /* hash */
                     int n = 0;
-                    while(*ptr >= '0' && *ptr <= '9' && ptr < end) {
+                    while(*ptr >= '0' && *ptr <= '9') {
                         n = (n * 10) + (*ptr - '0');
                         ++ptr;
                     }
                     if(ptr + 2 > end) {
                         goto end_parsing;
                     }
+
                     /* Hash of key/value pairs */
                     n = n * 2;
                     if(ptr[0] != '\x0D' || ptr[1] != '\x0A') {
@@ -169,21 +186,29 @@ PPCODE:
                         negative = 1;
                         ++ptr;
                     }
-                    int fraction = 0;
-                    int digits = 0;
-                    while((*ptr == '.' || (*ptr >= '0' && *ptr <= '9')) && ptr < end) {
-                        if(*ptr == '.') {
-                            fraction = 1;
-                        } else {
-                            n = (n * 10) + (*ptr - '0');
-                            if(fraction) {
-                                ++digits;
-                            }
+                    if(*ptr == 'i' || *ptr == 'n') {
+                        if(!strncmp(ptr, "inf", 3)) {
+                            n = NV_INF;
+                        } else if(!strncmp(ptr, "nan", 3)) {
+                            n = NV_NAN;
                         }
-                        ++ptr;
-                    }
-                    if(digits > 0) {
-                        n = n / pow(10, digits);
+                    } else {
+                        int fraction = 0;
+                        int digits = 0;
+                        while((*ptr == '.' || (*ptr >= '0' && *ptr <= '9')) && ptr < end) {
+                            if(*ptr == '.') {
+                                fraction = 1;
+                            } else {
+                                n = (n * 10) + (*ptr - '0');
+                                if(fraction) {
+                                    ++digits;
+                                }
+                            }
+                            ++ptr;
+                        }
+                        if(digits > 0) {
+                            n = n / pow(10, digits);
+                        }
                     }
                     if(negative) {
                         n = -n;
@@ -204,6 +229,7 @@ PPCODE:
                     }
                     break;
                 }
+                case '=': /* verbatim string - fall through */
                 case '$': { /* bulk string */
                     int n = 0;
                     SV *v;
@@ -241,6 +267,7 @@ PPCODE:
                     }
                     break;
                 }
+                case '(': /* big number - treat as a string for now */
                 case '+': { /* string */
                     const char *start = ptr;
                     while(*ptr && (ptr[0] != '\x0D' && ptr[1] != '\x0A' && ptr < end)) {
@@ -275,11 +302,8 @@ PPCODE:
                         croak("protocol violation - error not terminated by CRLF");
                     }
                     int n = ptr - start;
-                    char *str = Newx(str, n + 1, char);
-                    strncpy(str, start, n);
-                    str[n] = '\0';
+                    SV *v = newSVpvn(start, n);
                     ptr += 2;
-                    SV *v = newSVpvn(str, n);
                     SV *rv = SvRV(this);
 
                     /* Remove anything we processed - we're doing this _before_ the call,
@@ -319,7 +343,7 @@ PPCODE:
                         goto end_parsing;
                     }
                     if(ptr[0] != '\x0D' || ptr[1] != '\x0A') {
-                        croak("protocol violation");
+                        croak("protocol violation - single-character null not followed by CRLF");
                     }
                     ptr += 2;
                     if(ps) {
@@ -334,6 +358,10 @@ PPCODE:
                     croak("Unknown type %d, bail out", ptr[-1]);
             }
 
+            /* Do some housekeeping after parsing: see if we've accumulated enough
+             * data to fill the requirements for one or more levels of our nested container
+             * handling.
+             */
             while(ps && av_count(ps->data) >= ps->expected) {
                 AV *data = ps->data;
                 struct pending_stack *orig = ps;
@@ -346,9 +374,9 @@ PPCODE:
                    );
                 } else {
                     switch(orig->type) {
-                    case push: {
+                    case push: { /* pub/sub is treated as an out-of-bound message */
                         SV *rv = SvRV(this);
-                        if(hv_exists((HV *) rv, "pubsub", 5)) {
+                        if(hv_exists((HV *) rv, "pubsub", 6)) {
                             SV **cv_ptr = hv_fetchs((HV *) rv, "pubsub", 0);
                             if(cv_ptr) {
                                 CV *cv = (CV *) *cv_ptr;
@@ -370,10 +398,39 @@ PPCODE:
                         }
                         break;
                     }
-                    case attribute:
-                        warn("attribute received, but ignored");
+                    case attribute: {
+                        /* attributes aren't used much: for now, we emit as an event,
+                         * but eventually would aim to apply this to the response,
+                         * by returning a blessed object for example
+                         */
+                        SV *rv = SvRV(this);
+                        if(hv_exists((HV *) rv, "attribute", 9)) {
+                            SV **cv_ptr = hv_fetchs((HV *) rv, "attribute", 0);
+                            if(cv_ptr) {
+                                CV *cv = (CV *) *cv_ptr;
+                                dSP;
+                                ENTER;
+                                SAVETMPS;
+                                PUSHMARK(SP);
+                                EXTEND(SP, 1);
+                                PUSHs(sv_2mortal(value_ref));
+                                PUTBACK;
+                                call_sv((SV *) cv, G_VOID | G_DISCARD);
+                                FREETMPS;
+                                LEAVE;
+                            } else {
+                                warn("no CV for ->{attribute}");
+                            }
+                        } else {
+                            warn("no ->{attribute} handler");
+                        }
                         break;
+                    }
                     default:
+                        /* Yes, we fall through as a default for map and array: unless the
+                         * hashrefs option is set, we want to map all key/value pairs to plain
+                         * arrays anyway.
+                         */
                         av_push(
                             results,
                             value_ref
@@ -384,12 +441,18 @@ PPCODE:
                 }
                 Safefree(orig);
             }
+
+            /* Every time we reach the end of a complete item, we update
+             * our parsed string progress and add to our list of things to
+             * return.
+             */
             if(extracted_item) {
                 /* Remove anything we processed */
                 sv_chop(p, ptr);
                 ptr = SvPVbyte(p, len);
                 end = ptr + len;
                 extracted_item = 0;
+                /* ... and our "list" is only ever going to be a single item if we're in scalar context */
                 if (GIMME_V == G_SCALAR) {
                     extracted = av_shift(results);
                     break;

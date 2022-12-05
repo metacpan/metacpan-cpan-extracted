@@ -18,25 +18,6 @@ class AClass {
 my $warnings = "";
 BEGIN { $SIG{__WARN__} = sub { $warnings .= $_[0] }; }
 
-class BClass extends AClass implements ARole {}
-
-{
-   my $obj = BClass->new;
-   isa_ok( $obj, "BClass", '$obj' );
-
-   is( $obj->rolem, "ARole", 'BClass has ->rolem' );
-   is( $obj->classm, "AClass", 'BClass has ->classm' );
-}
-
-BEGIN {
-   like( $warnings, qr/^'extends' modifier keyword is deprecated; use :isa\(\) attribute instead at /m,
-      'extends keyword provokes deprecation warnings' );
-   like( $warnings, qr/^'implements' modifier keyword is deprecated; use :does\(\) attribute instead /m,
-      'implements keyword provokes deprecation warnings' );
-
-   undef $warnings;
-}
-
 class CClass isa AClass does ARole {}
 
 {

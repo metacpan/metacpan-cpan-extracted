@@ -3,7 +3,7 @@ package Net::Async::Spotify::API::Generated::Browse;
 use strict;
 use warnings;
 
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 our $AUTHORITY = 'cpan:VNEALV'; # AUTHORITY
 
 use mro;
@@ -26,6 +26,8 @@ Check C<crawl-api-doc.pl> for more information.
 =head1 METHODS
 
 =cut
+
+sub mapping { shift->{mapping} }
 
 =head2 get_a_categories_playlists
 
@@ -90,9 +92,10 @@ On success, the HTTP status code in the response header is 200 OK and the respon
 async sub get_a_categories_playlists {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'GET';
-    $request->{uri}    = 'https://api.spotify.com/v1/browse/categories/{category_id}/playlists';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{get_a_categories_playlists}{method} // 'GET';
+    $request->{uri}    = $mapping->{get_a_categories_playlists}{uri} // 'https://api.spotify.com/v1/browse/categories/{category_id}/playlists';
+    $request->{param}  = $mapping->{get_a_categories_playlists}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -120,7 +123,7 @@ async sub get_a_categories_playlists {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{get_a_categories_playlists}{response} // [
         'playlist object',
 
     ];
@@ -186,9 +189,10 @@ On success, the HTTP status code in the response header is 200 OK and the respon
 async sub get_a_category {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'GET';
-    $request->{uri}    = 'https://api.spotify.com/v1/browse/categories/{category_id}';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{get_a_category}{method} // 'GET';
+    $request->{uri}    = $mapping->{get_a_category}{uri} // 'https://api.spotify.com/v1/browse/categories/{category_id}';
+    $request->{param}  = $mapping->{get_a_category}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -212,7 +216,7 @@ async sub get_a_category {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{get_a_category}{response} // [
         'category object',
 
     ];
@@ -277,9 +281,10 @@ On success, the HTTP status code in the response header is 200 OK and the respon
 async sub get_categories {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'GET';
-    $request->{uri}    = 'https://api.spotify.com/v1/browse/categories';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{get_categories}{method} // 'GET';
+    $request->{uri}    = $mapping->{get_categories}{uri} // 'https://api.spotify.com/v1/browse/categories';
+    $request->{param}  = $mapping->{get_categories}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -305,7 +310,7 @@ async sub get_categories {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{get_categories}{response} // [
         'an object',
 
     ];
@@ -376,9 +381,10 @@ On success, the HTTP status code in the response header is 200 OK and the respon
 async sub get_featured_playlists {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'GET';
-    $request->{uri}    = 'https://api.spotify.com/v1/browse/featured-playlists';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{get_featured_playlists}{method} // 'GET';
+    $request->{uri}    = $mapping->{get_featured_playlists}{uri} // 'https://api.spotify.com/v1/browse/featured-playlists';
+    $request->{param}  = $mapping->{get_featured_playlists}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -408,7 +414,7 @@ async sub get_featured_playlists {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{get_featured_playlists}{response} // [
         'playlist object',
         'playlist object',
 
@@ -469,9 +475,10 @@ On success, the HTTP status code in the response header is 200 OK and the respon
 async sub get_new_releases {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'GET';
-    $request->{uri}    = 'https://api.spotify.com/v1/browse/new-releases';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{get_new_releases}{method} // 'GET';
+    $request->{uri}    = $mapping->{get_new_releases}{uri} // 'https://api.spotify.com/v1/browse/new-releases';
+    $request->{param}  = $mapping->{get_new_releases}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -493,7 +500,7 @@ async sub get_new_releases {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{get_new_releases}{response} // [
         'album object',
 
     ];
@@ -532,9 +539,10 @@ On success, the HTTP status code in the response header is 200 OK and the respon
 async sub get_recommendation_genres {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'GET';
-    $request->{uri}    = 'https://api.spotify.com/v1/recommendations/available-genre-seeds';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{get_recommendation_genres}{method} // 'GET';
+    $request->{uri}    = $mapping->{get_recommendation_genres}{uri} // 'https://api.spotify.com/v1/recommendations/available-genre-seeds';
+    $request->{param}  = $mapping->{get_recommendation_genres}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -542,7 +550,7 @@ async sub get_recommendation_genres {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{get_recommendation_genres}{response} // [
         'response object',
 
     ];
@@ -822,9 +830,10 @@ On success, the HTTP status code in the response header is 200 OK and the respon
 async sub get_recommendations {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'GET';
-    $request->{uri}    = 'https://api.spotify.com/v1/recommendations';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{get_recommendations}{method} // 'GET';
+    $request->{uri}    = $mapping->{get_recommendations}{uri} // 'https://api.spotify.com/v1/recommendations';
+    $request->{param}  = $mapping->{get_recommendations}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -1022,7 +1031,7 @@ async sub get_recommendations {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{get_recommendations}{response} // [
         'response object',
 
     ];

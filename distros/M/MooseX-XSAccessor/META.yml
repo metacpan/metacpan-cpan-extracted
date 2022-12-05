@@ -29,21 +29,21 @@ optional_features: {}
 provides:
   MooseX::XSAccessor:
     file: lib/MooseX/XSAccessor.pm
-    version: '0.009'
+    version: '0.010'
   MooseX::XSAccessor::Trait::Attribute:
     file: lib/MooseX/XSAccessor/Trait/Attribute.pm
-    version: '0.009'
+    version: '0.010'
 requires:
   Class::XSAccessor: '1.09'
   Moose: '2.0600'
   perl: '5.008'
 resources:
   Identifier: http://purl.org/NET/cpan-uri/dist/MooseX-XSAccessor/project
-  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=MooseX-XSAccessor
+  bugtracker: https://github.com/tobyink/p5-moosex-xsaccessor/issues
   homepage: https://metacpan.org/release/MooseX-XSAccessor
   license: http://dev.perl.org/licenses/
   repository: git://github.com/tobyink/p5-moosex-xsaccessor.git
-version: '0.009'
+version: '0.010'
 x_contributors:
   - 'Florian Ragwitz (FLORA) <flora@cpan.org>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

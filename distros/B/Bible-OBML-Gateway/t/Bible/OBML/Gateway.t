@@ -31,7 +31,6 @@ my $ua = mock( 'Mojo::UserAgent',
 is( $self->structure, { answer => 42 }, 'structure' );
 
 $ua->add(
-    body => sub { $_[0] },
     dom  => sub { $_[0] },
     find => sub { Mojo::Collection->new(
         mock( 'obj', set => [
@@ -54,13 +53,9 @@ is( $self->translations, [ {
     } ],
 } ], 'translations' );
 
-like(
-    dies { $self->get('Romans 12:13-17, 19') },
-    qr/"Romans 12:13-17, 19" not understood as a single chapter or single run of verses/,
-    'get() with invalid reference',
-);
-
-$ua->override( body => sub { Mojo::DOM->new( join( '', <DATA> ) ) } );
+my $body = join( '', <DATA> );
+$ua->add( body => sub { $body } );
+$ua->add( at => sub { 0 } );
 
 my $obml = mock( 'Bible::OBML',
     set => [

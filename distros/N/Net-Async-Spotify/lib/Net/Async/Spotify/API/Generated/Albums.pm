@@ -3,7 +3,7 @@ package Net::Async::Spotify::API::Generated::Albums;
 use strict;
 use warnings;
 
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 our $AUTHORITY = 'cpan:VNEALV'; # AUTHORITY
 
 use mro;
@@ -26,6 +26,8 @@ Check C<crawl-api-doc.pl> for more information.
 =head1 METHODS
 
 =cut
+
+sub mapping { shift->{mapping} }
 
 =head2 get_an_album
 
@@ -80,9 +82,10 @@ On success, the HTTP status code in the response header is 200 OK and the respon
 async sub get_an_album {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'GET';
-    $request->{uri}    = 'https://api.spotify.com/v1/albums/{id}';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{get_an_album}{method} // 'GET';
+    $request->{uri}    = $mapping->{get_an_album}{uri} // 'https://api.spotify.com/v1/albums/{id}';
+    $request->{param}  = $mapping->{get_an_album}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -102,7 +105,7 @@ async sub get_an_album {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{get_an_album}{response} // [
         'album object',
 
     ];
@@ -175,9 +178,10 @@ On success, the HTTP status code in the response header is 200 OK and the respon
 async sub get_an_albums_tracks {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'GET';
-    $request->{uri}    = 'https://api.spotify.com/v1/albums/{id}/tracks';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{get_an_albums_tracks}{method} // 'GET';
+    $request->{uri}    = $mapping->{get_an_albums_tracks}{uri} // 'https://api.spotify.com/v1/albums/{id}/tracks';
+    $request->{param}  = $mapping->{get_an_albums_tracks}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -205,7 +209,7 @@ async sub get_an_albums_tracks {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{get_an_albums_tracks}{response} // [
         'album object',
 
     ];
@@ -262,9 +266,10 @@ On success, the HTTP status code in the response header is 200 OK and the respon
 async sub get_multiple_albums {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'GET';
-    $request->{uri}    = 'https://api.spotify.com/v1/albums';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{get_multiple_albums}{method} // 'GET';
+    $request->{uri}    = $mapping->{get_multiple_albums}{uri} // 'https://api.spotify.com/v1/albums';
+    $request->{param}  = $mapping->{get_multiple_albums}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -282,7 +287,7 @@ async sub get_multiple_albums {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{get_multiple_albums}{response} // [
         'an object',
         'an object',
 

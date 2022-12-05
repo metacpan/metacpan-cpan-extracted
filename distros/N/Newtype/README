@@ -1,0 +1,237 @@
+NAME
+    Newtype - Perl implementation of an approximation for Haskell's newtype
+
+SYNOPSIS
+      package MyClass;
+  
+      use HTTP::Tiny ();
+      use Newtype HttpTiny => { inner => 'HTTP::Tiny' };
+  
+      use Moo;
+  
+      has ua => (
+        is => 'ro',
+        isa => HttpTiny(),
+        coerce => 1,
+      );
+
+DESCRIPTION
+    This module allows you to create a new type which is a subclass of an
+    existing type.
+
+    Why?
+
+    Well maybe you want to add some new methods to the new type:
+
+      use HTTP::Tiny ();
+      use Newtype HttpTiny => {
+        inner => 'HTTP::Tiny',
+        methods => {
+          'post_or_get' => sub {
+            my $self = shift;
+            my $res = $self->post( @_ );
+            return $res if $res->{success};
+            return $self->get( @_ );
+          },
+      };
+
+    Or maybe you need to differentiate between two different kinds of things
+    which are otherwise the same class.
+
+      use Newtype (
+        SecureUA    => { inner => 'HTTP::Tiny' },
+        InsecureUA  => { inner => 'HTTP::Tiny' },
+      );
+  
+      ...;
+  
+      my $ua = InsecureUA( HTTP::Tiny->new );
+  
+      ...;
+  
+      if ( $ua->isa(SecureUA) ) {
+        ...;
+      }
+
+    Newtype can also create new types which "inherit" from Perl builtins.
+
+      use Types::Common qw( ArrayRef PositiveInt );
+      use Newtype Numbers => { inner => ArrayRef[PositiveInt] };
+  
+      my $nums = Numbers( [] );
+      $nums->push(  1 );
+      $nums->push(  2 );
+      $nums->push( -1 );  # dies
+
+    See Hydrogen for the list of available methods for builtins.
+
+    Newtypes which inherit from builtins use overloading to attempt to provide
+    transparency.
+
+    Although there will be exceptions to this general rule of thumb
+    (especially if your newtype is inheriting from a Perl builtin), you can
+    think of things like this: if you create a type NewFoo from existing type
+    Foo, then instances of NewFoo should be accepted everywhere instances of
+    Foo are. But instances of Foo will not be automatically accepted where
+    instances of NewFoo are.
+
+  Creating a newtype
+    The general form for creating newtypes is:
+
+      use Newtype $typename => {
+        inner => $inner_type,
+        %other_options,
+      };
+
+    The inner type is required, and must be either a string class name or a
+    Type::Tiny type constraint indicating what type of thing you want to wrap.
+
+    Other supported options are:
+
+    `methods`
+        A hashref of methods to add to the newtype. Keys are the method names.
+        Values are coderefs.
+
+    `kind`
+        This allows you to give Newtype a hint for how to delegate to the
+        inner value. Supported kinds (case-sensitive) are: Array, Bool, Code,
+        Counter, Hash, Number, Object, and String. Usually Newtype will be
+        able to guess based on `inner` though.
+
+  Creating values belonging to the newtype
+    When you import a newtype Foo, you import a function `Foo()` into your
+    namespace. You can create instances of the newtype using:
+
+      Foo( $inner_value )
+
+    Where $inner_value is an instance of the type you're wrapping.
+
+    For example:
+
+      use HTTP::Tiny;
+      use Newtype UA => { inner => 'HTTP::Tiny' };
+  
+      my $ua = UA( HTTP::Tiny->new );
+
+    *Note:* you also get `is_Foo`, `assert_Foo`, and `to_Foo` functions
+    imported! `is_Foo( $x )` checks if $x is a Foo object and returns a
+    boolean. `assert_Foo( $x )` does the same, but dies if it fails. `to_Foo(
+    $x )` attempts to coerce $x to a Foo object.
+
+  Integration with Moose, Mouse, and Moo
+    If your imported newtype is Foo, then calling `Foo()` with no arguments
+    will return a Type::Tiny type constraint for the newtype.
+
+      use HTTP::Tiny;
+      use Newtype UA => { inner => 'HTTP::Tiny' };
+  
+      use Moo;
+      has my_ua => ( is => 'ro', isa => UA() );
+
+    Now people instantiating your class will need to pass you a wrapped
+    HTTP::Tiny object instead of passing a normal HTTP::Tiny object. You may
+    wish to allow them to pass you a normal HTTP::Tiny object though. That
+    should be easy with coercions:
+
+      has my_ua => ( is => 'ro', isa => UA(), coerce => 1 );
+
+  Accessing the inner value
+    You can access the original wrapped value using the `INNER` method.
+
+      my $ua = UA( HTTP::Tiny->new );
+      my $http_tiny_object = $ua->INNER;
+
+  Introspection
+    If your newtype is called MyNewtype, then you can introspect it using a
+    few methods:
+
+    `MyNewtype->class`
+        The class powering the newtype.
+
+    `MyNewtype->inner_type`
+        The type constraint for the inner value.
+
+    `MyNewtype->kind`
+        The kind of delegation being used.
+
+    The object returned by `MyNewtype()` is also a Type::Tiny object, so you
+    can call any method from Type::Tiny, such as `MyNewtype->check( $value )`
+    or `MyNewtype->coerce( $value )`.
+
+EXAMPLES
+  Using newtypes instead of named parameters
+    Let's say you have a function like this:
+
+      sub run_processes {
+        my ( $runtime_processes, $startup_processes, $shutdown_processes ) = @_;
+        $_->() for @$startup_processes;
+        $_->() for @$runtime_processes;
+        $_->() for @$shutdown_processes;
+      }
+
+    This function takes three arrayrefs of coderefs. It's very easy for the
+    caller to forget what order to pass them in, and potentially pass them in
+    the wrong order.
+
+    Let's bring some newtypes into the mix:
+
+      use feature 'state';
+      use Types::Common qw( CodeRef, ArrayRef );
+      use Type::Params qw( signature );
+      use Newtype (
+        StartupProcessList  => { inner => ArrayRef[CodeRef] },
+        RuntimeProcessList  => { inner => ArrayRef[CodeRef] },
+        ShutdownProcessList => { inner => ArrayRef[CodeRef] },
+      );
+  
+      sub run_processes {
+        state $sig = signature positional => [
+          RuntimeProcessList->no_coercions,
+          StartupProcessList->no_coercions,
+          ShutdownProcessList->no_coercions,
+        ];
+        my ( $runtime_processes, $startup_processes, $shutdown_processes ) = &$sig;
+        $_->() for @$startup_processes;
+        $_->() for @$runtime_processes;
+        $_->() for @$shutdown_processes;
+      }
+
+    Now your function no longer accepts bare arrayrefs. Instead the caller
+    needs to convert their arrayrefs into your newtype. The need to call your
+    function like this:
+
+      run_processes(
+        RuntimeProcessList( \@coderefs1 ),
+        StartupProcessList( \@coderefs2 ),
+        ShutdownProcessList( \@coderefs3 ),
+      );
+
+    If they try to pass the lists in the wrong order, they'll get a type
+    constraint error.
+
+    Exporting the `RuntimeProcessList`, `StartupProcessList`, and
+    `ShutdownProcessList` functions to your caller is left as an exercise for
+    the reader!
+
+BUGS
+    Please report any bugs to <https://github.com/tobyink/p5-newtype/issues>.
+
+SEE ALSO
+    Type::Tiny::Class, Subclass::Of.
+
+    <https://wiki.haskell.org/Newtype>.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2022 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

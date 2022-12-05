@@ -21,6 +21,14 @@ do { my $x = {
                                       'Test::Version' => '1'
                                     }
                     },
+       'runtime' => {
+                      'requires' => {
+                                      'Future::AsyncAwait' => '0.61',
+                                      'IO::Async::Loop' => '0',
+                                      'Net::Async::Redis' => '3.002',
+                                      'perl' => '5.032'
+                                    }
+                    },
        'test' => {
                    'recommends' => {
                                      'CPAN::Meta' => '2.120900'
@@ -31,7 +39,11 @@ do { my $x = {
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
                                    'Test::CheckDeps' => '0.010',
-                                   'Test::More' => '0.94'
+                                   'Test::Deep' => '0',
+                                   'Test::Fatal' => '0.016',
+                                   'Test::HexString' => '0',
+                                   'Test::MemoryGrowth' => '0',
+                                   'Test::More' => '0.98'
                                  }
                  }
      };

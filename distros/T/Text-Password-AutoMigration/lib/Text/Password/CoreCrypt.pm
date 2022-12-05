@@ -1,29 +1,27 @@
 package Text::Password::CoreCrypt;
-our $VERSION = "0.15";
+our $VERSION = "0.16";
 
-use 5.8.8;
+require 5.008_008;
+use Carp qw(croak carp);
+
 use Moose;
 use Moose::Util::TypeConstraints;
 
 has minimum => ( is => 'ro', isa => 'Int', default => 4 );
 
-subtype 'Default',
-    as 'Int',
-    where { $_ >=  4 },
-    message {"The Default must be 4 or higher."};
-has default => ( is => 'rw', isa => 'Default', default => 8 );
-
-has readability => ( is => 'rw', isa => 'Bool', default => 1 );
+subtype 'Default', as 'Int', where { $_ >= 4 }, message {"The Default must be 4 or higher."};
+has default     => ( is => 'rw', isa => 'Default', default => 8 );
+has readability => ( is => 'rw', isa => 'Bool',    default => 1 );
 
 __PACKAGE__->meta->make_immutable;
 no Moose;
 
-use Carp;
 my @ascii = (
-    '!', '"', '#', qw| $ % & ' ( ) * + |, ',', qw| - . / |,
-    0 .. 9, qw( : ; < = > ? @ ),
-    'A'..'Z', qw( [ \ ] ^ _ ` ), # to void syntax highlighting -> `
-    'a'..'z', qw( { | } ~ ),
+    '!', '#', qw! " $ % & ' ( ) * + !, ',', qw! - . / !,
+
+    0 .. 9,     qw( : ; < = > ? @ ),
+    'A' .. 'Z', qw( [ \ ] ^ _ ` ),     # to void syntax highlighting -> `
+    'a' .. 'z', qw( { | } ~ ),
 );
 
 =encoding utf-8
@@ -83,7 +81,9 @@ returns true if the verification succeeds.
 sub verify {
     my $self = shift;
     my ( $input, $data ) = @_;
-    warn "CORE::crypt makes 13bytes hash strings. Your data must be wrong: $data" if $data !~ /^[!-~]{13}$/;
+    warn "CORE::crypt makes 13bytes hash strings. Your data must be wrong: $data"
+        if $data !~ /^[ !-~]{13}$/;
+
     return $data eq CORE::crypt( $input, $data );
 }
 
@@ -96,16 +96,16 @@ the length defaults to 8($self->default).
 =cut
 
 sub nonce {
-    my $self = shift;
+    my $self   = shift;
     my $length = shift || 8;
     croak "Unvalid length for nonce was set" unless $length =~ /^\d+$/ and $length >= 4;
 
-    my $n;
-    do {	# redo unless it gets enough strength
-        $n = '';
+    my $n = '';
+    my @w = ( 0 .. 9, 'a' .. 'z', 'A' .. 'Z' );
+    do {    # redo unless it gets enough strength
+        $n = $w[ rand @w ];
         $n .= $ascii[ rand @ascii ] until length $n >= $length;
-    }while( $n =~ /^\w+$/ or $n =~ /^\W+$/ or $n !~ /\d/ or $n !~ /[A-Z]/ or $n !~ /[a-z]/ );
-
+    } while $n =~ /^\w+$/ or $n =~ /^\W+$/ or $n !~ /\d/ or $n !~ /[A-Z]/ or $n !~ /[a-z]/;
     return $n;
 }
 
@@ -118,11 +118,11 @@ salt will be made automatically.
 =cut
 
 sub encrypt {
-    my $self = shift;
+    my $self  = shift;
     my $input = shift;
-    my $min = $self->minimum();
-    carp __PACKAGE__ . " requires at least $min length" if length $input < $min;
-    carp __PACKAGE__  . " ignores the password with over 8 bytes" if length $input > 8;
+    my $min   = $self->minimum();
+    carp __PACKAGE__ . " requires at least $min length"          if length $input < $min;
+    carp __PACKAGE__ . " ignores the password with over 8 bytes" if length $input > 8;
     carp __PACKAGE__ . " doesn't allow any Wide Characters or white spaces\n" if $input =~ /[^ -~]/;
 
     return CORE::crypt( $input, $self->_salt() );
@@ -140,28 +140,27 @@ the length defaults to 8($self->default).
 =cut
 
 sub generate {
-    my $self = shift;
+    my $self   = shift;
     my $length = shift || $self->default();
-    my $min = $self->minimum();
+    my $min    = $self->minimum();
 
-    croak "unvalid length was set" unless $length =~ /^\d+$/;
+    croak "unvalid length was set"                        unless $length =~ /^\d+$/;
     croak ref($self) . "::generate requires list context" unless wantarray;
     croak ref($self) . "::generate requires at least $min length" if $length < $min;
 
     my $raw;
-    do {	# redo unless it gets enough readability
+    do {    # redo unless it gets enough readability
         $raw = $self->nonce($length);
         return $raw, $self->encrypt($raw) unless $self->readability();
-    }while( $raw =~ /[0Oo1Il|!2Zz5sS\$6b9qCcKkUuVvWwXx.,:;~\-^'"`]/i );
+    } while ( $raw =~ /[0Oo1Il|!2Zz5sS\$6b9qCcKkUuVvWwXx.,:;~\-^'"`]/i );
 
     return $raw, $self->encrypt($raw);
 }
 
 sub _salt {
-    my $self = shift;
-
+    my $self  = shift;
     my @seeds = ( 'a' .. 'z', 'A' .. 'Z', 0 .. 9, '.', '/' );
-    my $salt = '';
+    my $salt  = '';
     $salt .= $seeds[ rand @seeds ] until length $salt == 2;
     return $salt;
 }

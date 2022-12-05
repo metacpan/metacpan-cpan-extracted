@@ -2,6 +2,7 @@
 use strict; use warnings;
 #>>>
 
+use Config                        qw( %Config );
 use ExtUtils::MakeMaker::CPANfile qw( WriteMakefile );
 
 my %WriteMakefileArgs = (
@@ -28,7 +29,7 @@ my %WriteMakefileArgs = (
   realclean => { FILES    => 'local' },
 );
 
-unless ( exists( $ENV{ MAKELEVEL } ) ) {
+unless ( $Config{ osname } =~ m/\A(?:freebsd|openbsd|solaris)\z/ or exists( $ENV{ MAKELEVEL } ) ) {
   my $local_lib = "$ENV{ PWD }/local/lib/perl5";
   require lib; lib->import( $local_lib );
 

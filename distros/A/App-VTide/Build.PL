@@ -12,7 +12,6 @@ my $builder = Module::Build->new(
         'Algorithm::Cron'     => '0.10',
         'Array::Utils'        => 0,
         'File::chdir'         => '0.1008',
-        'File::Touch'         => '0.11',
         'Getopt::Alt'         => '0.5.2',
         'Hash::Merge::Simple' => '0.051',
         'IO::Prompt'          => 0,

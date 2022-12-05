@@ -10,7 +10,7 @@ use List::MoreUtils qw(none);
 use Scalar::Util qw(blessed);
 use Unicode::UTF8 qw(decode_utf8);
 
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 # Constructor.
 sub new {
@@ -18,12 +18,18 @@ sub new {
 
 	# Create object.
 	my ($object_params_ar, $other_params_ar) = split_params(
-		['css_image_grid', 'img_link_cb', 'img_select_cb', 'img_src_cb',
-		'img_width', 'title'], @params);
+		['css_image_grid', 'img_border_color_cb', 'img_border_width', 'img_link_cb',
+		'img_select_cb', 'img_src_cb', 'img_width', 'title'], @params);
 	my $self = $class->SUPER::new(@{$other_params_ar});
 
 	# Form CSS style.
 	$self->{'css_image_grid'} = 'image-grid';
+
+	# Image border color callback.
+	$self->{'img_border_color_cb'} = undef;
+
+	# Image border width (in pixels).
+	$self->{'img_border_width'} = undef;
 
 	# Image link callback.
 	$self->{'img_link_cb'} = undef;
@@ -44,6 +50,7 @@ sub new {
 	set_params($self, @{$object_params_ar});
 
 	# Check callback codes.
+	$self->_check_callback('img_border_color_cb');
 	$self->_check_callback('img_link_cb');
 	$self->_check_callback('img_select_cb');
 	$self->_check_callback('img_src_cb');
@@ -99,26 +106,21 @@ sub _process {
 		);
 	}
 	foreach my $image (@{$images_ar}) {
+
+		# Begin of image link.
 		if (defined $self->{'img_link_cb'}) {
 			$self->{'tags'}->put(
 				['b', 'a'],
 				['a', 'href', $self->{'img_link_cb'}->($image)],
 			);
 		}
+
+		# Begin of figure.
 		$self->{'tags'}->put(
 			['b', 'figure'],
 		);
-		my $image_url;
-		if (defined $image->url) {
-			$image_url = $image->url;
-		} elsif (defined $image->url_cb) {
-			$image_url = $image->url_cb->($image);
-		} elsif (defined $self->{'img_src_cb'}) {
-			$image_url = $self->{'img_src_cb'}->($image);
-		} else {
-			err 'No image URL.';
-		}
 
+		# Select information.
 		if (defined $self->{'img_select_cb'}) {
 			my $select_hr = $self->{'img_select_cb'}->($self, $image);
 			if (ref $select_hr eq 'HASH' && exists $select_hr->{'value'}) {
@@ -135,21 +137,49 @@ sub _process {
 			}
 		}
 
+		# Image.
+		my $image_url;
+		if (defined $image->url) {
+			$image_url = $image->url;
+		} elsif (defined $image->url_cb) {
+			$image_url = $image->url_cb->($image);
+		} elsif (defined $self->{'img_src_cb'}) {
+			$image_url = $self->{'img_src_cb'}->($image);
+		} else {
+			err 'No image URL.';
+		}
+		my $img_style;
+		if (defined $self->{'img_border_width'} && defined $self->{'img_border_color_cb'}) {
+			my $border_color = $self->{'img_border_color_cb'}->($self, $image);
+			if (defined $border_color) {
+				$img_style = 'border:'.$self->{'img_border_width'}.'px solid '.$border_color.';';
+			}
+		}
 		$self->{'tags'}->put(
 			['b', 'img'],
+			defined $img_style ? (
+				['a', 'style', $img_style],
+				['a', 'class', 'border'],
+			) : (),
 			['a', 'src', $image_url],
 			['e', 'img'],
 		);
-		if ($image->comment) {
+
+		# Image comment.
+		if (defined $image->comment) {
 			$self->{'tags'}->put(
 				['b', 'figcaption'],
 				['d', $image->comment],
 				['e', 'figcaption'],
 			);
 		}
+
+		# Enf of figure.
 		$self->{'tags'}->put(
 			['e', 'figure'],
 		);
+
+		# End of image link.
 		if (defined $self->{'img_link_cb'}) {
 			$self->{'tags'}->put(
 				['e', 'a'],
@@ -171,6 +201,13 @@ sub _process {
 
 sub _process_css {
 	my $self = shift;
+
+	# Compute image width and height.
+	my ($img_width, $img_height) = ($self->{'img_width'}, $self->{'img_width'});
+	if (defined $self->{'img_border_width'}) {
+		$img_width -= 2 * $self->{'img_border_width'};
+		$img_height -= 2 * $self->{'img_border_width'};
+	}
 
 	$self->{'css'}->put(
 
@@ -195,7 +232,6 @@ sub _process_css {
 		['d', 'height', $self->{'img_width'}.'px'],
 		['d', 'position', 'relative'],
 		['d', 'overflow', 'hidden'],
-		['d', 'border', '1px solid white'],
 		['d', 'margin', 0],
 		['d', 'padding', 0],
 		['e'],
@@ -204,6 +240,13 @@ sub _process_css {
 		['d', 'object-fit', 'cover'],
 		['d', 'width', '100%'],
 		['d', 'height', '100%'],
+		['d', 'vertical-align', 'middle'],
+		['e'],
+
+		['s', '.'.$self->{'css_image_grid'}.' img.border'],
+		['d', 'object-fit', 'cover'],
+		['d', 'width', $img_width.'px'],
+		['d', 'height', $img_height.'px'],
 		['d', 'vertical-align', 'middle'],
 		['e'],
 
@@ -283,6 +326,21 @@ Default value is undef.
 Form CSS style.
 
 Default value is 'image-grid'.
+
+=item * C<img_border_color_cb>
+
+Image border callback. This is used with 'img_border_width' parameter.
+Border will be present only for image which has color defined.
+
+Callback arguments are: C<$self> and C<$image> object.
+
+Default value is undef.
+
+=item * C<img_border_width>
+
+Image border width if need to use.
+
+Default value is undef.
 
 =item * C<img_link_cb>
 
@@ -506,6 +564,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

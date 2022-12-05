@@ -6,18 +6,19 @@ if ( $^O eq 'MSWin32' ) {
 }
 
 WriteMakefile(
-    NAME => 'Jenkins::i18n',
-    VERSION_FROM => 'lib/Jenkins/i18n.pm', # finds $VERSION, requires EU::MM from perl >= 5.5
+    NAME          => 'Jenkins::i18n',
+    VERSION_FROM  => 'lib/Jenkins/i18n.pm', # finds $VERSION, requires EU::MM from perl >= 5.5
     ABSTRACT_FROM => 'lib/Jenkins/i18n.pm',
     AUTHOR        => 'Alceu Rodrigue de Freitas Junior',
     EXE_FILES     => ['bin/jtt'],
     PREREQ_PM     => {
+        'Class::Accessor'    => 0.51,
         'Config::Properties' => 1.80,
+        'DateTime::Tiny'     => 1.07,
+        'File::Path'         => 2.18,
         'Set::Tiny'          => 0.04,
         'Term::ANSIColor'    => 5.01,
         'Term::ProgressBar'  => 2.22,
-        'File::Path'         => 2.18,
-        'DateTime::Tiny'     => 1.07
     },
     TEST_REQUIRES => {
         'Test::TempDir::Tiny' => 0.018,

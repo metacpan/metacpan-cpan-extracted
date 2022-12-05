@@ -3,13 +3,16 @@ package Net::Async::Spotify::Object::Base;
 use strict;
 use warnings;
 
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 our $AUTHORITY = 'cpan:VNEALV'; # AUTHORITY
 
 use Log::Any qw($log);
 use Syntax::Keyword::Try;
 use Module::Runtime qw(require_module);
 use Time::Moment;
+use JSON::MaybeUTF8 qw(:v1);
+use Scalar::Util 'blessed';
+use Net::Async::Spotify::Util qw(hash_to_string);
 
 =head1 NAME
 
@@ -27,17 +30,21 @@ Defined fields are specific to each L<Net::Async::Spotify::Object> and can be vi
 
 =cut
 
+sub fields { shift->{fields} }
+
 sub new {
     my ( $class, $fields, %args ) = @_;
     my $self = bless {}, $class;
-    $self->generate($fields, %args);
+    $self->{fields} = $fields;
+    $self->generate(%args);
     return $self;
 }
 
 sub generate {
-    my ( $self, $fields, %args ) = @_;
+    my ( $self, %args ) = @_;
+    my %fields = $self->fields->%*;
 
-    for my $field (keys %$fields) {
+    for my $field (keys %fields) {
         next if $field eq '';
         my $accessor = join '::', ref($self), $field;
         {
@@ -51,7 +58,7 @@ sub generate {
                 my ( $self, $value ) = @_;
 
                 if (defined $value) {
-                    $value = $self->apply_type($fields->{$field}, $value);
+                    $value = $self->apply_type($fields{$field}, $value, $field);
                     $self->{$field} = $value;
                 }
                 return $self->{$field};
@@ -62,7 +69,7 @@ sub generate {
     }
     # Fields that are added but not present in documentation and current Object class
     for my $k (keys %args) {
-        $log->debugf('Unknown field %s passed | Object: %s', $k, ref $self);
+        $log->tracef('Unknown field %s passed | Object: %s | will add to `extra_fields`', $k, ref $self);
         $self->{extra_fields}{$k} = $args{$k};
     }
 
@@ -111,8 +118,7 @@ Array[L<Net::Async::Spotify::Object>]
 =cut
 
 sub apply_type {
-    my ($self, $type, $value) = @_;
-    $log->tracef('applying type %s', $type);
+    my ($self, $type, $value, $field) = @_;
     # TODO: Implement better Type casting, maybe Inline C ?
     if ( $type eq 'Integer' ) {
         $value = 0 unless $value;
@@ -128,7 +134,7 @@ sub apply_type {
         try {
             return Time::Moment->from_string($value);
         } catch ($e) {
-            $log->warnf('Unrecognized Timestamp string: %s | Error: %s', $value, $e);
+            $log->warnf('Unrecognized Timestamp string: %s | Error: %s | %s | %s', $value, $e, ref($self), $field);
             return {corrupt_timestamp => $value};
         }
     } elsif ( my ( $obj ) = $type =~ /^(?!Array)(.*?)(Object)/ ) {
@@ -136,7 +142,7 @@ sub apply_type {
         try {
             require_module($module);
         } catch($e) {
-            $log->errorf('Unrecognized Object type %s | Error: %s', $module, $e);
+            $log->errorf('Unrecognized Object type %s | Error: %s | %s | %s', $module, $e, ref($self), $field);
         }
         # When $value is empty.
         # Not sure if I want to pass it as empty hashref
@@ -152,7 +158,7 @@ sub apply_type {
                 # TODO: check if this step can be removed.
                 require_module($module);
             } catch($e) {
-                $log->errorf('Unrecognized Object type %s | Error: %s', $module, $e);
+                $log->errorf('Unrecognized Object type %s | Error: %s | %s | %s', $module, $e, ref($self), $field);
             }
             if ( $value ) {
                 # Can be attached to pagination object.
@@ -172,7 +178,7 @@ sub apply_type {
         }
         return $array;
     }
-    $log->errorf('Unmatching Type. %s is not %s | %s', $value, $type, ref $self);
+    $log->debugf('Unmatching Type. %s is not %s | %s | %s', $value, $type, ref($self), $field);
     return $value;
 }
 
@@ -183,5 +189,63 @@ Special field, where it holds any undefined keys passed when creating.
 =cut
 
 sub extra_fields { shift->{extra_fields} }
+
+=head2 to_hash
+
+Converts object into a hash rather than blessed object with methods.
+
+=cut
+
+sub to_hash {
+    my $self = shift;
+
+    my %hash = ();
+    for my $attr (sort keys $self->fields->%*) {
+        if ( $self->$attr ) {
+            if (blessed $self->$attr and $self->$attr->can('to_hash') )  {
+                $hash{$attr} = $self->$attr->to_hash;
+            } elsif (ref $self->$attr eq 'ARRAY' ) {
+                my @array = ();
+                for my $e ( $self->$attr->@* ) {
+                    if (blessed $e and $e->can('to_hash') )  {
+                        push @array, $e->to_hash;
+                    } else {
+                        push @array, $e;
+                    }
+                }
+                $hash{$attr} = \@array;
+            } else {
+                $hash{$attr} = $self->$attr;
+            }
+        }
+    }
+    $hash{extra_fields} = $self->extra_fields if defined $self->extra_fields;
+    return \%hash;
+}
+
+=head2 to_json
+
+return object as JSON encoded string
+
+=cut
+
+sub to_json {
+    my $self = shift;
+
+    return encode_json_utf8($self->to_hash);
+
+}
+
+=head2 to_human
+
+return object as readable string
+
+=cut
+
+sub to_human {
+    my $self = shift;
+
+    return hash_to_string($self->to_hash);
+}
 
 1;

@@ -28,7 +28,7 @@ do { my $x = {
                                       },
                       'requires' => {
                                       'HTTP::Status' => '0',
-                                      'List::Util' => '0',
+                                      'List::Util' => '1.29',
                                       'Module::Load' => '0',
                                       'Net::IP::Match::Trie' => '0',
                                       'Plack::Middleware' => '0',

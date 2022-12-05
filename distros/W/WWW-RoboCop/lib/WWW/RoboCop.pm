@@ -3,7 +3,7 @@ use warnings;
 use feature qw( state );
 
 package WWW::RoboCop;
-our $VERSION = '0.000101';
+our $VERSION = '0.000102';
 
 use Moo;
 
@@ -126,7 +126,7 @@ WWW::RoboCop - Police your URLs!
 
 =head1 VERSION
 
-version 0.000101
+version 0.000102
 
 =head1 SYNOPSIS
 

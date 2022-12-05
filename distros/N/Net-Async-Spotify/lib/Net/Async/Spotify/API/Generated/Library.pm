@@ -3,7 +3,7 @@ package Net::Async::Spotify::API::Generated::Library;
 use strict;
 use warnings;
 
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 our $AUTHORITY = 'cpan:VNEALV'; # AUTHORITY
 
 use mro;
@@ -26,6 +26,8 @@ Check C<crawl-api-doc.pl> for more information.
 =head1 METHODS
 
 =cut
+
+sub mapping { shift->{mapping} }
 
 =head2 check_users_saved_albums
 
@@ -70,9 +72,10 @@ On error, the header status code is an error code and the response body contains
 async sub check_users_saved_albums {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'GET';
-    $request->{uri}    = 'https://api.spotify.com/v1/me/albums/contains';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{check_users_saved_albums}{method} // 'GET';
+    $request->{uri}    = $mapping->{check_users_saved_albums}{uri} // 'https://api.spotify.com/v1/me/albums/contains';
+    $request->{param}  = $mapping->{check_users_saved_albums}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -86,7 +89,7 @@ async sub check_users_saved_albums {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{check_users_saved_albums}{response} // [
         'error object',
 
     ];
@@ -138,9 +141,10 @@ On error, the header status code is an error code and the response body contains
 async sub check_users_saved_episodes {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'GET';
-    $request->{uri}    = 'https://api.spotify.com/v1/me/episodes/contains';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{check_users_saved_episodes}{method} // 'GET';
+    $request->{uri}    = $mapping->{check_users_saved_episodes}{uri} // 'https://api.spotify.com/v1/me/episodes/contains';
+    $request->{param}  = $mapping->{check_users_saved_episodes}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -154,7 +158,7 @@ async sub check_users_saved_episodes {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{check_users_saved_episodes}{response} // [
         'error object',
 
     ];
@@ -204,9 +208,10 @@ On success, the HTTP status code in the response header is 200 OK and the respon
 async sub check_users_saved_shows {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'GET';
-    $request->{uri}    = 'https://api.spotify.com/v1/me/shows/contains';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{check_users_saved_shows}{method} // 'GET';
+    $request->{uri}    = $mapping->{check_users_saved_shows}{uri} // 'https://api.spotify.com/v1/me/shows/contains';
+    $request->{param}  = $mapping->{check_users_saved_shows}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -220,7 +225,7 @@ async sub check_users_saved_shows {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{check_users_saved_shows}{response} // [
         'error object',
 
     ];
@@ -271,9 +276,10 @@ On error, the header status code is an error code and the response body contains
 async sub check_users_saved_tracks {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'GET';
-    $request->{uri}    = 'https://api.spotify.com/v1/me/tracks/contains';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{check_users_saved_tracks}{method} // 'GET';
+    $request->{uri}    = $mapping->{check_users_saved_tracks}{uri} // 'https://api.spotify.com/v1/me/tracks/contains';
+    $request->{param}  = $mapping->{check_users_saved_tracks}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -287,7 +293,7 @@ async sub check_users_saved_tracks {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{check_users_saved_tracks}{response} // [
         'error object',
 
     ];
@@ -348,9 +354,10 @@ On success, the HTTP status code in the response header is 200 OK and the respon
 async sub get_users_saved_albums {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'GET';
-    $request->{uri}    = 'https://api.spotify.com/v1/me/albums';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{get_users_saved_albums}{method} // 'GET';
+    $request->{uri}    = $mapping->{get_users_saved_albums}{uri} // 'https://api.spotify.com/v1/me/albums';
+    $request->{param}  = $mapping->{get_users_saved_albums}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -372,7 +379,7 @@ async sub get_users_saved_albums {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{get_users_saved_albums}{response} // [
         'album object',
         'error object',
 
@@ -439,9 +446,10 @@ and Response Objects being:
 async sub get_users_saved_episodes {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'GET';
-    $request->{uri}    = 'https://api.spotify.com/v1/me/episodes';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{get_users_saved_episodes}{method} // 'GET';
+    $request->{uri}    = $mapping->{get_users_saved_episodes}{uri} // 'https://api.spotify.com/v1/me/episodes';
+    $request->{param}  = $mapping->{get_users_saved_episodes}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -463,7 +471,7 @@ async sub get_users_saved_episodes {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{get_users_saved_episodes}{response} // [
         'episode object',
 
     ];
@@ -520,9 +528,10 @@ On error, the header status code is an error code and the response body contains
 async sub get_users_saved_shows {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'GET';
-    $request->{uri}    = 'https://api.spotify.com/v1/me/shows';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{get_users_saved_shows}{method} // 'GET';
+    $request->{uri}    = $mapping->{get_users_saved_shows}{uri} // 'https://api.spotify.com/v1/me/shows';
+    $request->{param}  = $mapping->{get_users_saved_shows}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -540,7 +549,7 @@ async sub get_users_saved_shows {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{get_users_saved_shows}{response} // [
         'show object',
 
     ];
@@ -600,9 +609,10 @@ On success, the HTTP status code in the response header is 200 OK and the respon
 async sub get_users_saved_tracks {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'GET';
-    $request->{uri}    = 'https://api.spotify.com/v1/me/tracks';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{get_users_saved_tracks}{method} // 'GET';
+    $request->{uri}    = $mapping->{get_users_saved_tracks}{uri} // 'https://api.spotify.com/v1/me/tracks';
+    $request->{param}  = $mapping->{get_users_saved_tracks}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -624,7 +634,7 @@ async sub get_users_saved_tracks {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{get_users_saved_tracks}{response} // [
         'track object',
 
     ];
@@ -690,9 +700,10 @@ On success, the HTTP status code in the response header is 200 Success. On err
 async sub remove_albums_user {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'DELETE';
-    $request->{uri}    = 'https://api.spotify.com/v1/me/albums';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{remove_albums_user}{method} // 'DELETE';
+    $request->{uri}    = $mapping->{remove_albums_user}{uri} // 'https://api.spotify.com/v1/me/albums';
+    $request->{param}  = $mapping->{remove_albums_user}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -716,7 +727,7 @@ async sub remove_albums_user {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{remove_albums_user}{response} // [
         'error object',
 
     ];
@@ -783,9 +794,10 @@ On success, the HTTP status code in the response header is 200 Success. On err
 async sub remove_episodes_user {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'DELETE';
-    $request->{uri}    = 'https://api.spotify.com/v1/me/episodes';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{remove_episodes_user}{method} // 'DELETE';
+    $request->{uri}    = $mapping->{remove_episodes_user}{uri} // 'https://api.spotify.com/v1/me/episodes';
+    $request->{param}  = $mapping->{remove_episodes_user}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -809,7 +821,7 @@ async sub remove_episodes_user {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{remove_episodes_user}{response} // [
         'error object',
 
     ];
@@ -870,9 +882,10 @@ On error, the header status code is an error code and the response body contains
 async sub remove_shows_user {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'DELETE';
-    $request->{uri}    = 'https://api.spotify.com/v1/me/shows';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{remove_shows_user}{method} // 'DELETE';
+    $request->{uri}    = $mapping->{remove_shows_user}{uri} // 'https://api.spotify.com/v1/me/shows';
+    $request->{param}  = $mapping->{remove_shows_user}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -890,7 +903,7 @@ async sub remove_shows_user {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{remove_shows_user}{response} // [
         'error object',
 
     ];
@@ -956,9 +969,10 @@ On success, the HTTP status code in the response header is 200 Success. On err
 async sub remove_tracks_user {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'DELETE';
-    $request->{uri}    = 'https://api.spotify.com/v1/me/tracks';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{remove_tracks_user}{method} // 'DELETE';
+    $request->{uri}    = $mapping->{remove_tracks_user}{uri} // 'https://api.spotify.com/v1/me/tracks';
+    $request->{param}  = $mapping->{remove_tracks_user}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -982,7 +996,7 @@ async sub remove_tracks_user {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{remove_tracks_user}{response} // [
         'error object',
 
     ];
@@ -1048,9 +1062,10 @@ On success, the HTTP status code in the response header is 201 Created. On err
 async sub save_albums_user {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'PUT';
-    $request->{uri}    = 'https://api.spotify.com/v1/me/albums';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{save_albums_user}{method} // 'PUT';
+    $request->{uri}    = $mapping->{save_albums_user}{uri} // 'https://api.spotify.com/v1/me/albums';
+    $request->{param}  = $mapping->{save_albums_user}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -1074,7 +1089,7 @@ async sub save_albums_user {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{save_albums_user}{response} // [
         'error object',
 
     ];
@@ -1141,9 +1156,10 @@ On success, the HTTP status code in the response header is 200 OK. On error, t
 async sub save_episodes_user {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'PUT';
-    $request->{uri}    = 'https://api.spotify.com/v1/me/episodes';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{save_episodes_user}{method} // 'PUT';
+    $request->{uri}    = $mapping->{save_episodes_user}{uri} // 'https://api.spotify.com/v1/me/episodes';
+    $request->{param}  = $mapping->{save_episodes_user}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -1167,7 +1183,7 @@ async sub save_episodes_user {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{save_episodes_user}{response} // [
         'error object',
 
     ];
@@ -1217,9 +1233,10 @@ On success, the HTTP status code in the response header is 200 OK. On error, the
 async sub save_shows_user {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'PUT';
-    $request->{uri}    = 'https://api.spotify.com/v1/me/shows';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{save_shows_user}{method} // 'PUT';
+    $request->{uri}    = $mapping->{save_shows_user}{uri} // 'https://api.spotify.com/v1/me/shows';
+    $request->{param}  = $mapping->{save_shows_user}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -1233,7 +1250,7 @@ async sub save_shows_user {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{save_shows_user}{response} // [
         'error object',
 
     ];
@@ -1299,9 +1316,10 @@ On success, the HTTP status code in the response header is 200 OK. On error, t
 async sub save_tracks_user {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'PUT';
-    $request->{uri}    = 'https://api.spotify.com/v1/me/tracks';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{save_tracks_user}{method} // 'PUT';
+    $request->{uri}    = $mapping->{save_tracks_user}{uri} // 'https://api.spotify.com/v1/me/tracks';
+    $request->{param}  = $mapping->{save_tracks_user}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -1325,7 +1343,7 @@ async sub save_tracks_user {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{save_tracks_user}{response} // [
         'error object',
 
     ];

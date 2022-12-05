@@ -60,9 +60,11 @@ static void register_class_attribute(const char *name, const struct ClassHookFun
   ClassAttributeRegistration *reg;
   Newx(reg, 1, struct ClassAttributeRegistration);
 
-  reg->name = name;
-  reg->funcs = funcs;
-  reg->funcdata = funcdata;
+  *reg = (struct ClassAttributeRegistration){
+    .name     = name,
+    .funcs    = funcs,
+    .funcdata = funcdata,
+  };
 
   if(funcs->permit_hintkey)
     reg->permit_hintkeylen = strlen(funcs->permit_hintkey);
@@ -125,9 +127,11 @@ void ObjectPad_mop_class_apply_attribute(pTHX_ ClassMeta *classmeta, const char 
     struct ClassHook *hook;
     Newx(hook, 1, struct ClassHook);
 
-    hook->funcs = reg->funcs;
-    hook->funcdata = reg->funcdata;
-    hook->hookdata = hookdata;
+    *hook = (struct ClassHook){
+      .funcs    = reg->funcs,
+      .funcdata = reg->funcdata,
+      .hookdata = hookdata,
+    };
 
     av_push(classmeta->hooks, (SV *)hook);
 
@@ -149,6 +153,11 @@ ClassMeta *ObjectPad_mop_get_class_for_stash(pTHX_ HV *stash)
     croak("Unable to find ClassMeta for %" HEKf, HEKfARG(HvNAME_HEK(stash)));
 
   return NUM2PTR(ClassMeta *, SvUV(SvRV(GvSV(*gvp))));
+}
+
+SV *ObjectPad_mop_class_get_name(pTHX_ ClassMeta *class)
+{
+  return class->name;
 }
 
 #define make_instance_fields(classmeta, backingav, roleoffset)  S_make_instance_fields(aTHX_ classmeta, backingav, roleoffset)
@@ -631,11 +640,29 @@ MethodMeta *ObjectPad_mop_class_add_method(pTHX_ ClassMeta *meta, SV *methodname
   MethodMeta *methodmeta;
   Newx(methodmeta, 1, MethodMeta);
 
-  methodmeta->name = SvREFCNT_inc(methodname);
-  methodmeta->class = meta;
-  methodmeta->role = NULL;
+  *methodmeta = (MethodMeta){
+    .name  = SvREFCNT_inc(methodname),
+    .class = meta,
+  };
 
   av_push(methods, (SV *)methodmeta);
+
+  return methodmeta;
+}
+
+MethodMeta *ObjectPad_mop_class_add_method_cv(pTHX_ ClassMeta *meta, SV *methodname, CV *cv)
+{
+  MethodMeta *methodmeta = mop_class_add_method(meta, methodname);
+
+  I32 klen = SvCUR(methodname);
+  if(SvUTF8(methodname))
+    klen = -klen;
+  GV **gvp = (GV **)hv_fetch(meta->stash, SvPVX(methodname), klen, GV_ADD);
+  gv_init_sv(*gvp, meta->stash, methodname, 0);
+  GvMULTI_on(*gvp);
+
+  GvCV_set(*gvp, cv);
+  CvGV_set(cv, *gvp);
 
   return methodmeta;
 }
@@ -705,7 +732,9 @@ void ObjectPad_mop_class_add_ADJUST(pTHX_ ClassMeta *meta, CV *cv)
   AdjustBlock *block;
   Newx(block, 1, struct AdjustBlock);
 
-  block->cv = cv;
+  *block = (struct AdjustBlock){
+    .cv = cv,
+  };
 
   meta->has_adjust = true;
 
@@ -905,10 +934,12 @@ static struct FieldHook *S_embed_fieldhook(pTHX_ struct FieldHook *roleh, FIELDO
   struct FieldHook *classh;
   Newx(classh, 1, struct FieldHook);
 
-  classh->fieldix   = roleh->fieldix + offset;
-  classh->fieldmeta = roleh->fieldmeta;
-  classh->funcs     = roleh->funcs;
-  classh->hookdata  = roleh->hookdata;
+  *classh = (struct FieldHook){
+    .fieldix   = roleh->fieldix + offset,
+    .fieldmeta = roleh->fieldmeta,
+    .funcs     = roleh->funcs,
+    .hookdata  = roleh->hookdata,
+  };
 
   return classh;
 }
@@ -951,9 +982,11 @@ static void S_mop_class_apply_role(pTHX_ RoleEmbedding *embedding)
       ParamMeta *classparammeta;
       Newx(classparammeta, 1, struct ParamMeta);
 
-      classparammeta->name  = SvREFCNT_inc(roleparammeta->name);
-      classparammeta->class = roleparammeta->class;
-      classparammeta->type  = roleparammeta->type;
+      *classparammeta = (struct ParamMeta){
+        .name  = SvREFCNT_inc(roleparammeta->name),
+        .class = roleparammeta->class,
+        .type  = roleparammeta->type,
+      };
 
       switch(roleparammeta->type) {
         case PARAM_FIELD:
@@ -1228,11 +1261,13 @@ void ObjectPad_mop_class_seal(pTHX_ ClassMeta *meta)
           struct FieldHook *fasth;
           Newx(fasth, 1, struct FieldHook);
 
-          fasth->fieldix   = fieldmeta->fieldix;
-          fasth->fieldmeta = fieldmeta;
-          fasth->funcs     = h->funcs;
-          fasth->funcdata  = h->funcdata;
-          fasth->hookdata  = h->hookdata;
+          *fasth = (struct FieldHook){
+            .fieldix   = fieldmeta->fieldix,
+            .fieldmeta = fieldmeta,
+            .funcs     = h->funcs,
+            .funcdata  = h->funcdata,
+            .hookdata  = h->hookdata,
+          };
 
           av_push(meta->fieldhooks_initfield, (SV *)fasth);
         }
@@ -1244,11 +1279,13 @@ void ObjectPad_mop_class_seal(pTHX_ ClassMeta *meta)
           struct FieldHook *fasth;
           Newx(fasth, 1, struct FieldHook);
 
-          fasth->fieldix   = fieldmeta->fieldix;
-          fasth->fieldmeta = fieldmeta;
-          fasth->funcs     = h->funcs;
-          fasth->funcdata  = h->funcdata;
-          fasth->hookdata  = h->hookdata;
+          *fasth = (struct FieldHook){
+            .fieldix   = fieldmeta->fieldix,
+            .fieldmeta = fieldmeta,
+            .funcs     = h->funcs,
+            .funcdata  = h->funcdata,
+            .hookdata  = h->hookdata,
+          };
 
           av_push(meta->fieldhooks_construct, (SV *)fasth);
         }
@@ -1722,46 +1759,33 @@ ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name)
 {
   assert(type == METATYPE_CLASS || type == METATYPE_ROLE);
 
+  HV *stash = gv_stashsv(name, GV_ADD);
+
   ClassMeta *meta;
   Newx(meta, 1, ClassMeta);
 
-  meta->type = type;
-  meta->name = SvREFCNT_inc(name);
+  *meta = (ClassMeta){
+    .type = type,
+    .repr = REPR_AUTOSELECT,
+    .name = SvREFCNT_inc(name),
 
-  HV *stash = meta->stash = gv_stashsv(name, GV_ADD);
+    .stash = stash,
 
-  meta->sealed = false;
-  meta->role_is_invokable = false;
-  meta->strict_params = false;
-  meta->has_adjust = false;
-  meta->has_superclass = false;
-  meta->start_fieldix = 0;
-  meta->next_fieldix = -1;
-  meta->hooks   = NULL;
-  meta->direct_fields = newAV();
-  meta->direct_methods = newAV();
-  meta->parammap = NULL;
-  meta->requiremethods = newAV();
-  meta->repr   = REPR_AUTOSELECT;
-  meta->pending_submeta = NULL;
-  meta->buildblocks = NULL;
-  meta->adjustblocks = NULL;
-  meta->initfields = NULL;
+    .next_fieldix = -1,
 
-  meta->fieldhooks_initfield = NULL;
-  meta->fieldhooks_construct = NULL;
+    .direct_fields  = newAV(),
+    .direct_methods = newAV(),
+    .requiremethods = newAV(),
+  };
 
   switch(type) {
     case METATYPE_CLASS:
-      meta->cls.supermeta = NULL;
-      meta->cls.foreign_new = NULL;
-      meta->cls.foreign_does = NULL;
-      meta->cls.direct_roles = newAV();
+      meta->cls.direct_roles   = newAV();
       meta->cls.embedded_roles = newAV();
       break;
 
     case METATYPE_ROLE:
-      meta->role.superroles = newAV();
+      meta->role.superroles      = newAV();
       meta->role.applied_classes = newHV();
       break;
   }

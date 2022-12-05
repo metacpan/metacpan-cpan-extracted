@@ -5,10 +5,10 @@ use warnings;
 
 use Test::More;
 
-use Object::Pad;
+use Object::Pad ':experimental(init_expr)';
 
 class BaseClass {
-   has $data = 123;
+   field $data = 123;
 }
 
 package ExtendedClass {

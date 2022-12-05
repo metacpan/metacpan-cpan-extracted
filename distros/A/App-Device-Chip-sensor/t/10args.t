@@ -68,9 +68,9 @@ class Device::Chip::Adapter::_ATestAdapter :does(Device::Chip::Adapter)
 {
    sub new_from_description { shift->new( @_ ) }
 
-   BUILD
+   ADJUSTPARAMS
    {
-      %adapterargs = @_;
+      %adapterargs = %{ $_[0] };
    }
 }
 $INC{"Device/Chip/Adapter/_ATestAdapter.pm"} = __FILE__;

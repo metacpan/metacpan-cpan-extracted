@@ -1,10 +1,16 @@
 ==================================================
-Changes from 2021-03-26 00:00:00 +0000 to present.
+Changes from 2021-12-04 00:00:00 +0000 to present.
 ==================================================
 
 ------------------------------------------
-version 0.015 at 2022-03-26 22:08:08 +0000
+version 0.016 at 2022-12-04 21:15:15 +0000
 ------------------------------------------
+
+  Change: bf9933e20b83668c7d3d917be1ad1090813a2935
+  Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>
+  Date : 2022-12-04 16:16:03 +0000
+
+    fix: added missing requirement 
 
   Change: edff644e8fa6b590578341353be5b7ad5afcceed
   Author: Alceu Rodrigues de Freitas Junior <glasswalk3r@yahoo.com.br>

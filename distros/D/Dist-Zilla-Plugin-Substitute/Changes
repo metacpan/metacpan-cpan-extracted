@@ -1,5 +1,8 @@
 Revision history for Dist-Zilla-Plugin-Substitute
 
+0.007     2022-12-02 23:32:38+01:00 Europe/Amsterdam
+          - Add a mode parameter to plugin
+
 0.006     2015-08-14 00:34:13+02:00 Europe/Amsterdam
           - fix mangling of whitespace
           - make "file" option work

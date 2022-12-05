@@ -2,7 +2,7 @@ NAME
     Complete::Random - Complete from a list of random string
 
 VERSION
-    This document describes version 0.001 of Complete::Random (from Perl
+    This document describes version 0.002 of Complete::Random (from Perl
     distribution Complete-Random), released on 2022-09-08.
 
 DESCRIPTION
@@ -30,6 +30,10 @@ FUNCTIONS
 
         Will observe "COMPLETE_RANDOM_STRING_NUM" environment variable for
         the default, or fall back to 50.
+
+    *   summaries => *bool*
+
+    *   summary_len => *int* (default: 50)
 
     Returns an enveloped result (an array).
 

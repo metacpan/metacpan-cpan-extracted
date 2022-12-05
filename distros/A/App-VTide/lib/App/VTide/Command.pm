@@ -14,12 +14,11 @@ use English qw/ -no_match_vars /;
 use File::chdir;
 use Path::Tiny;
 use YAML::Syck;
+use List::MoreUtils qw/uniq/;
 
-our $VERSION = version->new('0.1.18');
+our $VERSION = version->new('0.1.19');
 
-has [qw/ defaults options /] => (
-    is => 'rw',
-);
+has [qw/ defaults options /] => ( is => 'rw', );
 
 has vtide => (
     is       => 'rw',
@@ -42,7 +41,7 @@ sub save_session {
     my ( $self, $name, $dir ) = @_;
 
     my $file     = $self->history;
-    my $sessions = eval { LoadFile( $file ) } || {};
+    my $sessions = eval { LoadFile($file) } || {};
 
     $sessions->{sessions}{$name} = {
         time => scalar time,
@@ -62,23 +61,25 @@ sub session_dir {
     #  1. Passed in directly
     #  2. Set from the environment variable VTIDE_NAME
     #  3. Found in a config file in the current directory
-    if ( ! $name ) {
+    if ( !$name ) {
         die "No session name found!\n" if !-f '.vtide.yml';
         my $config = LoadFile('.vtide.yml');
         $name = $config->{name};
     }
 
     my $file     = $self->history;
-    my $sessions = eval { LoadFile( $file ) } || {};
+    my $sessions = eval { LoadFile($file) } || {};
 
-    my $dir = ref $sessions->{sessions}{$name} ?
-        $sessions->{sessions}{$name}{dir}
-        : $sessions->{sessions}{$name}
-            || $ENV{VTIDE_DIR} || path('.')->absolute;
+    my $dir =
+      ref $sessions->{sessions}{$name}
+      ? $sessions->{sessions}{$name}{dir}
+      : $sessions->{sessions}{$name}
+      || $ENV{VTIDE_DIR}
+      || path('.')->absolute;
 
     my $config = path $dir, '.vtide.yml';
 
-    $self->config->local_config( $config );
+    $self->config->local_config($config);
     $self->env( $name, $dir, $config );
 
     return ( $name, $dir );
@@ -90,11 +91,12 @@ sub env {
     $dir ||= path( $ENV{VTIDE_DIR} || '.' )->absolute;
     $dir = path($dir);
 
-    $config ||= $ENV{VTIDE_CONFIG} || $dir->path( '.vtide.yml' );
-    $name   ||= $ENV{VTIDE_NAME}
-        || $self->defaults->{name}
-        || $self->config->get->{name}
-        || $dir->basename;
+    $config ||= $ENV{VTIDE_CONFIG} || $dir->path('.vtide.yml');
+    $name ||=
+         $ENV{VTIDE_NAME}
+      || $self->defaults->{name}
+      || $self->config->get->{name}
+      || $dir->basename;
 
     $ENV{VTIDE_NAME}   = "$name";
     $ENV{VTIDE_DIR}    = "$dir";
@@ -106,12 +108,12 @@ sub env {
 sub auto_complete {
     my ($self) = @_;
 
-    warn lc ( ref $self =~ /.*::/ ), " has no --auto-complete support\n";
+    warn lc( ref $self =~ /.*::/ ), " has no --auto-complete support\n";
     return;
 }
 
 sub _dglob {
-    my ($self, $glob) = @_;
+    my ( $self, $glob ) = @_;
 
     # if the "glob" is actually a single file then just return it
     return ($glob) if -f $glob;
@@ -121,13 +123,13 @@ sub _dglob {
         push @files, glob $deep_glob;
     }
 
-    return @files;
+    return uniq @files;
 }
 
 sub _globable {
-    my ($self, $glob) = @_;
+    my ( $self, $glob ) = @_;
 
-    my ($base, $rest) = $glob =~ m{^(.*?) [*][*] /? (.*)$}xms;
+    my ( $base, $rest ) = $glob =~ m{^(.*?) [*][*] /? (.*)$}xms;
 
     return ($glob) if !$rest;
 
@@ -150,7 +152,7 @@ App::VTide::Command - Base class for VTide sub commands
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command version 0.1.18
+This documentation refers to App::VTide::Command version 0.1.19
 
 =head1 SYNOPSIS
 

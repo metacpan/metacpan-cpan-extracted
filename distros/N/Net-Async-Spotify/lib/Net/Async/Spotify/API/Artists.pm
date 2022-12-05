@@ -3,7 +3,7 @@ package Net::Async::Spotify::API::Artists;
 use strict;
 use warnings;
 
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 our $AUTHORITY = 'cpan:VNEALV'; # AUTHORITY
 
 use mro;
@@ -23,5 +23,11 @@ Will hold all extra functionality for Spotify Artists API
 =head1 METHODS
 
 =cut
+
+sub new {
+    my $self  = (shift)->next::method(@_);
+    $self->mapping->{get_an_artists_albums}{response} = ['Album'];
+    return $self;
+}
 
 1;

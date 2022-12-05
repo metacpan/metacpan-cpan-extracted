@@ -2,7 +2,7 @@ package Geo::Gpx::Point;
 use strict;
 use warnings;
 
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 =encoding utf8
 
@@ -20,10 +20,11 @@ L<Geo::Gpx::Point> provides a data structure for GPX points and provides accesso
 
 =cut
 
-use DateTime::Format::ISO8601;
-use Geo::Calc;
+use Geo::Gpx;
 use Geo::Coordinates::Transform;
+use Math::Trig;
 use Carp qw(confess croak cluck);
+use Scalar::Util qw( blessed );
 use vars qw($AUTOLOAD %possible_attr);
 use overload ('""' => 'as_string');
 
@@ -66,8 +67,7 @@ sub new {
     }
 
     if (defined $wpt->{time} and $wpt->{time} =~ /-|:/ ) {
-        my $dt = DateTime::Format::ISO8601->parse_datetime( $wpt->{time} );
-        $wpt->{time} = $dt->epoch
+        $wpt->{time} = Geo::Gpx::_time_string_to_epoch( $wpt->{time} )
     }
     return $wpt
 }
@@ -174,15 +174,64 @@ sub AUTOLOAD {
 
 =over 4
 
+=item distance_to( $pt or lat => $lat, lon => $lon, [ %options ] )
+
+Returns the distance in meters from the C<Geo::Gpx::Point> I<$pt> or from the coordinates provided by I<$lat> and I<$lon>. The distance is calculated as the straight-line distance, ignoring any topography. I<$pt> must be the first argument if specified.
+
+I<%options> may be any of the following I<key/value> pairs (all optional):
+
+Z<>    C<< dec => I<$decimals> >>: how many digits to return after the decimal point. Defaults to 6 but this will change to 1 or 2 in the future.
+Z<>    C<< km  => I<boole> >>:     scale the return value to kilometers rather than meters (default is false).
+Z<>    C<< rad => I<$radius> >>:   the earth's radius in kilometers (see below).
+
+I<$radius> should rarely be specified unless the user knows what they are doing. The default is the global average of 6371 kilometers and any value outside the 6357 to 6378 range will be ignored. This implies that a given value would affect the returned distance by at most 0.16 percent versus the global average.
+
+=back
+
+=cut
+
+sub distance_to {
+    my $pt = shift;
+
+    my ($pt_to, %opts);
+    if (blessed $_[0]) {
+        croak 'object as argument must be a Geo::Gpx::Point' unless $_[0]->isa('Geo::Gpx::Point');
+        $pt_to = shift
+    }
+    %opts = @_;
+    $pt_to = Geo::Gpx::Point->new( lat => $opts{lat}, lon => $opts{lon} ) unless $pt_to;
+
+    my ($radius_default, $radius, $decimal_pts, $scale);
+    $radius_default = 6371;
+    $radius      = $opts{rad} || $radius_default;
+    $radius      = ($radius < 6357 || $radius > 6378) ? $radius_default : $radius;
+    $decimal_pts = $opts{dec} || 6;
+    $scale       = ( $opts{km} ) ? 1 : 1000;
+
+    my ( $lat1, $lon1, $lat2, $lon2 ) = (
+            Math::Trig::deg2rad( $pt->lat ),
+            Math::Trig::deg2rad( $pt->lon ),
+            Math::Trig::deg2rad( $pt_to->lat ),
+            Math::Trig::deg2rad( $pt_to->lon ),
+    );
+
+    my $t = sin( ($lat2 - $lat1)/2 ) ** 2 + ( cos( $lat1 ) ** 2 ) * ( sin( ( $lon2 - $lon1 )/2 ) ** 2 );
+    my $d = $radius * ( 2 * atan2( sqrt($t), sqrt(1-$t) ) );
+    return sprintf( "%.${decimal_pts}f", $d * $scale )
+}
+
+=over 4
+
 =item to_geocalc()
 
-Returns a point as a L<Geo::Calc> object.
+Returns a point as a L<Geo::Calc> object. (Requires that the L<Geo::Calc> module be installed.)
 
 =back
 
 =cut
 
 sub to_geocalc {
+    require Geo::Calc;
     my $pt = shift;
     croak "to_geocalc() takes no arguments" if @_;
     return Geo::Calc->new( lat => $pt->lat, lon => $pt->lon );
@@ -192,14 +241,14 @@ sub to_geocalc {
 
 =item to_tcx()
 
-Returns a point as a basic L<Geo::TCX::Trackpoint> object, i.e. a point with only Position information. (Requires the L<Geo::TCX> module.)
+Returns a point as a basic L<Geo::TCX::Trackpoint> object, i.e. a point with only Position information. (Requires that the L<Geo::TCX> module be installed.)
 
 =back
 
 =cut
 
 sub to_tcx {
-    require 'Geo::TCX';
+    require Geo::TCX;
     my $pt = shift;
     croak "to_tcx() takes no arguments" if @_;
     my $xml = '<Position><LatitudeDegrees>'  . $pt->lat . '</LatitudeDegrees>' .
@@ -222,7 +271,7 @@ sub time_datetime    {
     my $pt = shift;
     my %opts = @_;
     croak 'Geo::Gpx::Point has no time field' unless $pt->time;
-    my $dt = DateTime->from_epoch( $pt->time );
+    my $dt = DateTime->from_epoch( epoch => $pt->time );
     $dt->set_time_zone( $opts{time_zone} ) if $opts{time_zone};
     return  $dt
 }
@@ -280,7 +329,7 @@ Patrick Joly C<< <patjol@cpan.org> >>.
 
 =head1 VERSION
 
-1.07
+1.08
 
 =head1 SEE ALSO
 

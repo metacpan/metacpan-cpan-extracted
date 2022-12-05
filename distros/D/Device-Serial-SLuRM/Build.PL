@@ -9,7 +9,7 @@ my $build = Module::Build->new(
    requires => {
       'perl' => '5.026',
       'Future::AsyncAwait' => 0,
-      'Object::Pad' => '0.70',
+      'Object::Pad' => '0.73',
       'Syntax::Keyword::Match' => 0,
 
       'Digest::CRC' => 0,

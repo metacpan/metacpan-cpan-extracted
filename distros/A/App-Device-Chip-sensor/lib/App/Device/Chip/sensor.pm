@@ -1,24 +1,25 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2020-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2020-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.19;
+use Object::Pad 0.73 ':experimental(init_expr)';
 
-package App::Device::Chip::sensor 0.04;
+package App::Device::Chip::sensor 0.05;
 class App::Device::Chip::sensor;
 
 use Carp;
 
 use Feature::Compat::Defer;
+use Feature::Compat::Try;
 use Future::AsyncAwait;
 
 use Device::Chip::Adapter;
 use Device::Chip::Sensor 0.19; # ->type
 use Future::IO 0.08; # ->alarm
 use Getopt::Long qw( GetOptionsFromArray );
-use List::Util qw( all max );
+use List::Util 1.29 qw( all max pairgrep );
 use Scalar::Util qw( refaddr );
 
 =head1 NAME
@@ -85,18 +86,25 @@ Enable "middle-of-3" filtering of gauge values, to reduce sensor noise from
 unreliable sensors. At each round of readings, the most recent three values
 from the sensor are sorted numerically and the middle one is reported.
 
+=item * --best-effort, -B
+
+Enables best-effort mode, which causes failures of sensor readings to be
+ignored, reporting C<undef> instead. In this mode, the C<on_sensor_fail>
+method may be invoked for failures; it can further refine what the behaviour
+should be.
+
 =back
 
 =cut
 
-has @_CHIPCONFIGS;
+field @_CHIPCONFIGS;
 method _chipconfigs { @_CHIPCONFIGS }  # for unit testing
 
-has $_interval :reader = 10;
+field $_interval :reader = 10;
 
-has $_best_effort;
+field $_best_effort;
 
-has $_mid3;
+field $_mid3;
 
 method OPTSPEC
 {
@@ -149,28 +157,68 @@ method parse_argv ( $argv = \@ARGV )
 
          $adapter //= Device::Chip::Adapter->new_from_description( $ADAPTERDESC );
 
-         my $config = {
+         my %config = (
             type    => $chiptype,
             adapter => $adapter,
-         };
+         );
 
          while( length $opts ) {
             if( $opts =~ s/^-C:(.*?)=(.*)(?:$|,)// ) {
-               $config->{config}{$1} = $2;
+               $config{config}{$1} = $2;
             }
             elsif( $opts =~ s/^-M:(.*?)=(.*)(?:$|,)// ) {
-               $config->{mountopts}{$1} = $2;
+               $config{mountopts}{$1} = $2;
             }
             else {
                croak "Unable to parse chip configuration options '$opts' for $chiptype'";
             }
          }
 
-         push @_CHIPCONFIGS, $config;
+         $self->add_chip( %config );
       },
    ) or exit 1;
 
    return $self;
+}
+
+=head2 add_chip
+
+   $app->add_chip( %config );
+
+I<Since version 0.05.>
+
+Adds a new chip to the stored configuration, as if it had been given as a
+commandline argument. Takes the following named arguments:
+
+=over 4
+
+=item type => STR
+
+Required string that gives the name of the chip class.
+
+=item adapter => Device::Chip::Adapter
+
+Required L<Device::Chip::Adapter> instance.
+
+=item mountopts => HASH
+
+Optional hASH reference containing extra mount parameters.
+
+=item config => HASH
+
+Optional HASH reference containing extra chip configuration to set up using
+the C<configure> method once mounted.
+
+=back
+
+=cut
+
+method add_chip ( %config )
+{
+   $config{type}    // croak "Require 'type'";
+   $config{adapter} // croak "Require 'adapter'";
+
+   push @_CHIPCONFIGS, { pairgrep { defined $b } %config{qw( type adapter mountopts config )} };
 }
 
 =head2 chips
@@ -183,7 +231,7 @@ arguments after the options are parsed.
 
 =cut
 
-has $_chips; # arrayref
+field $_chips; # arrayref
 async method chips
 {
    return @$_chips if $_chips;
@@ -228,10 +276,10 @@ instances of each of the configured chips (from the L</chips> method).
 
 =cut
 
-has $_sensors; # arrayref
+field $_sensors; # arrayref
 
-has $_chipname_width;
-has $_sensorname_width;
+field $_chipname_width;
+field $_sensorname_width;
 
 sub _chipname ( $chip ) { return ( ref $chip ) =~ s/^Device::Chip:://r }
 
@@ -276,12 +324,17 @@ async method run ()
    $SIG{INT} = $SIG{TERM} = sub { exit 1; };
 
    defer {
-      $chips[0] and $chips[0]->protocol->power(0)->get;
+      try {
+         $chips[0] and $chips[0]->protocol->power(0)->get;
+      }
+      catch ($e) {
+         warn "Failed to turn off power while shutting down: $e";
+      }
    }
 
    my @sensors = await $self->sensors;
 
-   my %readings_by_chip;
+   my %readings_by_sensor;
 
    my $waittime = Time::HiRes::time();
    while(1) {
@@ -292,12 +345,16 @@ async method run ()
          map {
             my $sensor = $_;
             my $f = $sensor->read;
-            $f = $f->else( async sub ($failure, @) {
-               my $sensorname = $sensor->name;
-               my $chipname   = ref ( $sensor->chip );
-               warn "Unable to read $sensorname of $chipname: $failure";
-               return undef;
-            } ) if $_best_effort;
+            $f = $f->then(
+               async sub ($reading) {
+                  $self->on_sensor_ok( $sensor );
+                  return $reading;
+               },
+               async sub ($failure, @) {
+                  $self->on_sensor_fail( $sensor, $failure );
+                  return undef;
+               },
+            ) if $_best_effort;
             $f;
          } @sensors
       );
@@ -310,7 +367,7 @@ async method run ()
             next unless $sensor->type eq "gauge";
 
             # Accumulate the past 3 readings
-            my $readings = $readings_by_chip{ refaddr $sensor } //= [];
+            my $readings = $readings_by_sensor{ refaddr $sensor } //= [];
             push @$readings, $value;
             shift @$readings while @$readings > 3;
 
@@ -413,10 +470,10 @@ superclass version, and append any extra argument specifications it requires.
 
 As this is invoked as a regular instance method, a convenient way to store the
 parsed values is to pass references to instance slot variables created by the
-L<Object::Pad> C<has> keyword:
+L<Object::Pad> C<field> keyword:
 
-   has $_title;
-   has $_bgcol = "#cccccc";
+   field $_title;
+   field $_bgcol = "#cccccc";
 
    method OPTSPEC :override
    {
@@ -439,6 +496,39 @@ such as creating database files with knowledge of the specific sensor data
 types, or other such behaviours.
 
 =cut
+
+=head2 on_sensor_ok
+
+   $app->on_sensor_ok( $sensor )
+
+This method is invoked in C<--best-effort> mode after a successful reading
+from sensor; typically this is used to clear a failure state.
+
+The default implementation does nothing.
+
+=cut
+
+method on_sensor_ok ( $sensor ) { }
+
+=head2 on_sensor_fail
+
+   $app->on_sensor_fail( $sensor, $failure )
+
+This method is invoked in C<--best-effort> mode after a failure of the given
+sensor. The caught exception is passed as C<$failure>.
+
+The defaullt implementation prints this as a warning using the core C<warn()>
+function.
+
+=cut
+
+method on_sensor_fail ( $sensor, $failure )
+{
+   my $sensorname = $sensor->name;
+   my $chipname   = ref ( $sensor->chip );
+
+   warn "Unable to read ${sensorname} of ${chipname}: $failure";
+}
 
 =head1 AUTHOR
 

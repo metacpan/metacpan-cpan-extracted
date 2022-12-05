@@ -22,13 +22,13 @@
       "configure" : {
          "requires" : {
             "Module::Build" : "0.4004",
-            "XS::Parse::Keyword::Builder" : "0.22",
+            "XS::Parse::Keyword::Builder" : "0.29",
             "XS::Parse::Sublike::Builder" : "0.15"
          }
       },
       "runtime" : {
          "requires" : {
-            "XS::Parse::Keyword" : "0.22",
+            "XS::Parse::Keyword" : "0.29",
             "XS::Parse::Sublike" : "0.15",
             "perl" : "5.018"
          }
@@ -44,31 +44,31 @@
    "provides" : {
       "Object::Pad" : {
          "file" : "lib/Object/Pad.pm",
-         "version" : "0.72"
+         "version" : "0.74"
       },
       "Object::Pad::ExtensionBuilder" : {
          "file" : "lib/Object/Pad/ExtensionBuilder.pm",
-         "version" : "0.72"
+         "version" : "0.74"
       },
       "Object::Pad::MOP::Class" : {
          "file" : "lib/Object/Pad/MOP/Class.pm",
-         "version" : "0.72"
+         "version" : "0.74"
       },
       "Object::Pad::MOP::Field" : {
          "file" : "lib/Object/Pad/MOP/Field.pm",
-         "version" : "0.72"
+         "version" : "0.74"
       },
       "Object::Pad::MOP::FieldAttr" : {
          "file" : "lib/Object/Pad/MOP/FieldAttr.pm",
-         "version" : "0.72"
+         "version" : "0.74"
       },
       "Object::Pad::MOP::Method" : {
          "file" : "lib/Object/Pad/MOP/Method.pm",
-         "version" : "0.72"
+         "version" : "0.74"
       },
       "Object::Pad::MetaFunctions" : {
          "file" : "lib/Object/Pad/MetaFunctions.pm",
-         "version" : "0.72"
+         "version" : "0.74"
       }
    },
    "release_status" : "stable",
@@ -77,6 +77,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.72",
+   "version" : "0.74",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

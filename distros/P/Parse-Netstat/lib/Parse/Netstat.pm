@@ -1,14 +1,14 @@
 package Parse::Netstat;
 
-our $DATE = '2017-02-10'; # DATE
-our $VERSION = '0.14'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 
-require Exporter;
-our @ISA = qw(Exporter);
+use Exporter 'import';
+
+our $DATE = '2022-12-04'; # DATE
+our $VERSION = '0.150'; # VERSION
+
 our @EXPORT_OK = qw(parse_netstat);
 
 our %SPEC;
@@ -18,7 +18,7 @@ $SPEC{parse_netstat} = {
     summary => 'Parse the output of "netstat" command',
     description => <<'_',
 
-This program support several flavors of netstat. The default flavor is `linux`.
+This utility support several flavors of netstat. The default flavor is `linux`.
 Use `--flavor` to select which flavor you want.
 
 Since different flavors provide different fields and same-named fields might
@@ -33,7 +33,7 @@ _
             summary => 'Output of netstat command',
             description => <<'_',
 
-This function only parses program's output. You need to invoke "netstat" on your
+This utility only parses program's output. You need to invoke "netstat" on your
 own.
 
 _
@@ -119,7 +119,7 @@ Parse::Netstat - Parse the output of "netstat" command
 
 =head1 VERSION
 
-This document describes version 0.14 of Parse::Netstat (from Perl distribution Parse-Netstat), released on 2017-02-10.
+This document describes version 0.150 of Parse::Netstat (from Perl distribution Parse-Netstat), released on 2022-12-04.
 
 =head1 SYNOPSIS
 
@@ -133,11 +133,11 @@ This document describes version 0.14 of Parse::Netstat (from Perl distribution P
 
 Usage:
 
- parse_netstat(%args) -> [status, msg, result, meta]
+ parse_netstat(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
 Parse the output of "netstat" command.
 
-This program support several flavors of netstat. The default flavor is C<linux>.
+This utility support several flavors of netstat. The default flavor is C<linux>.
 Use C<--flavor> to select which flavor you want.
 
 Since different flavors provide different fields and same-named fields might
@@ -160,7 +160,7 @@ Flavor of netstat.
 
 Output of netstat command.
 
-This function only parses program's output. You need to invoke "netstat" on your
+This utility only parses program's output. You need to invoke "netstat" on your
 own.
 
 =item * B<tcp> => I<bool> (default: 1)
@@ -175,16 +175,17 @@ Parse UDP connections.
 
 Parse Unix socket connections.
 
+
 =back
 
 Returns an enveloped result (an array).
 
-First element (status) is an integer containing HTTP status code
+First element ($status_code) is an integer containing HTTP-like status code
 (200 means OK, 4xx caller error, 5xx function error). Second element
-(msg) is a string containing error message, or 'OK' if status is
-200. Third element (result) is optional, the actual result. Fourth
-element (meta) is called result metadata and is optional, a hash
-that contains extra information.
+($reason) is a string containing error message, or something like "OK" if status is
+200. Third element ($payload) is the actual result, but usually not present when enveloped result is an error response ($status_code is not 2xx). Fourth
+element (%result_meta) is called result metadata and is optional, a hash
+that contains extra information, much like how HTTP response headers provide additional metadata.
 
 Return value:  (any)
 
@@ -196,14 +197,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Parse-Nets
 
 Source repository is at L<https://github.com/perlancar/perl-Parse-Netstat>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Parse-Netstat>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 Parse::Netstat::* for per-flavor notes and sample outputs.
@@ -214,11 +207,43 @@ L<parse-netstat> from L<App::ParseNetstat> is a CLI for this module.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2017, 2015, 2014, 2012, 2011 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2017, 2015, 2014, 2012, 2011 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Parse-Netstat>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

@@ -1,5 +1,28 @@
 Revision history for Object-Pad
 
+0.74    2022-12-04
+        [BUGFIXES]
+         * Ensure that all struct fields are initialised after Newx(), by
+           using a C99-style struct assignment, ensuring no uninitialised
+           behaviour (RT145289)
+
+0.73    2022-12-03
+        [CHANGES]
+         * Accept `field VAR = EXPR;` syntax; evaluated within constructor
+           similarly to block form
+         * Generally prefer `field` over `has` in docs, unit tests, etc...
+         * Long-deprecated `extends` and `implements` keywords are now
+           immediate compile-time failures
+         * Extended the C-level extension API
+            + Added `get_compclassmeta()`
+            + Added `mop_class_add_method_cv()` and `mop_class_get_name()`
+            + Optional integration with XS::Parse::Keyword via the addition
+              of the `OPXKP_*` macros
+
+        [BUGFIXES]
+         * Account for bleadperl's slightly changed warning message of
+           "bareword found ..."
+
 0.72    2022-11-30
         [CHANGES]
          * Accept `//=` and `||=` in named signature-like syntax for

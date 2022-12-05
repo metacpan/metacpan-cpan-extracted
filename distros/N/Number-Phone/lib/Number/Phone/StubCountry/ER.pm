@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20220903144940;
+our $VERSION = 1.20221202211026;
 
 my $formatters = [
                 {

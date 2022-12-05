@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20220903144936;
+our $VERSION = 1.20221202211023;
 
 my $formatters = [
                 {
@@ -124,7 +124,7 @@ my $validators = {
             321|
             7(?:
               [1-7]\\d|
-              8[01]
+              8[0-4]
             )
           )\\d{5}
         ',
@@ -149,44 +149,44 @@ my $validators = {
               };
 my %areanames = ();
 $areanames{en} = {"267393", "Gaborone",
-"26749", "Palapye",
+"267538", "Ramotswa",
 "267392", "Gaborone",
+"26749", "Palapye",
+"267310", "Gaborone\ \(outer\)",
+"267313", "Gaborone",
+"267312", "Gaborone",
+"267390", "Gaborone",
+"26757", "Mochudi",
+"26735", "Gaborone",
+"267371", "Gaborone",
+"26746", "Serowe",
+"26758", "Jwaneng",
+"267659", "Gantsi",
+"267534", "Lobatse",
+"267319", "Gaborone",
+"26747", "Mahalapye",
+"267395", "Gaborone",
+"267317", "Gaborone",
+"267539", "Ramotswa",
+"267654", "Kgalagadi",
+"267370", "Gaborone",
+"26726", "Selebi\-Phikwe",
+"26754", "Barolong\/Ngwaketse",
+"26759", "Molepolole",
+"267394", "Gaborone",
+"267315", "Gaborone",
+"267397", "Gaborone",
 "267533", "Lobatse",
 "26768", "Maun",
-"26735", "Gaborone",
-"267659", "Gantsi",
-"267654", "Kgalagadi",
-"26729", "Letlhakane\/Orapa",
-"267539", "Ramotswa",
-"267534", "Lobatse",
-"267310", "Gaborone\ \(outer\)",
-"26724", "Francistown",
-"267394", "Gaborone",
-"267395", "Gaborone",
-"26762", "Kasane",
-"267317", "Gaborone",
-"26747", "Mahalapye",
-"267318", "Gaborone",
-"267313", "Gaborone",
-"26746", "Serowe",
-"267312", "Gaborone",
-"26726", "Selebi\-Phikwe",
-"267370", "Gaborone",
-"26754", "Barolong\/Ngwaketse",
-"267391", "Gaborone",
 "267316", "Gaborone",
-"26758", "Jwaneng",
-"26757", "Mochudi",
-"267390", "Gaborone",
-"267315", "Gaborone",
-"267651", "Kgalagadi",
-"26759", "Molepolole",
-"267371", "Gaborone",
-"267530", "Lobatse",
-"267319", "Gaborone",
-"267538", "Ramotswa",
+"267391", "Gaborone",
+"26762", "Kasane",
 "26736", "Gaborone",
-"267397", "Gaborone",};
+"267651", "Kgalagadi",
+"26724", "Francistown",
+"26729", "Letlhakane\/Orapa",
+"267318", "Gaborone",
+"267530", "Lobatse",};
 
     sub new {
       my $class = shift;

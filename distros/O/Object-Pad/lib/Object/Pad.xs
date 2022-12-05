@@ -332,6 +332,14 @@ static void S_compclassmeta_set(pTHX_ ClassMeta *meta)
   sv_setiv(sv, (IV)meta);
 }
 
+ClassMeta *ObjectPad_get_compclassmeta(pTHX)
+{
+  if(!have_compclassmeta)
+    croak("An Object::Pad class is not currently under compilation");
+
+  return compclassmeta;
+}
+
 XS_INTERNAL(xsub_mop_class_seal)
 {
   dXSARGS;
@@ -443,7 +451,9 @@ static int build_classlike(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t n
 
   if(args[argi++]->i) {
     /* extends */
-    warn_deprecated("'%s' modifier keyword is deprecated; use :isa() attribute instead", args[argi]->i ? "isa" : "extends");
+    if(!args[argi]->i)
+      croak("'extends' modifier keyword is no longer supported; use :isa() attribute instead");
+    warn_deprecated("'isa' modifier keyword is deprecated; use :isa() attribute instead");
     argi++; /* ignore the XPK_CHOICE() integer; `extends` and `isa` are synonyms */
     if(type != METATYPE_CLASS)
       croak("Only a class may extend another");
@@ -481,7 +491,9 @@ static int build_classlike(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t n
   if(nimplements) {
     int i;
     for(i = 0; i < nimplements; i++) {
-      warn_deprecated("'%s' modifier keyword is deprecated; use :does() attribute instead", args[argi]->i ? "does" : "implements");
+      if(!args[argi]->i)
+        croak("'implements' modifier keyword is no longer supported; use :does() attribute instead");
+      warn_deprecated("'does' modifier keyword is deprecated; use :does() attribute instead");
       argi++; /* ignore the XPK_CHOICE() integer; `implements` and `does` are synonyms */
       int nroles = args[argi++]->i;
       while(nroles--) {
@@ -692,7 +704,8 @@ static int build_field(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs
    * because scalar assignment tries to peephole far too deply into us and
    * everything breaks... :/
    */
-  switch(args[argi++]->i) {
+  int inittype = args[argi++]->i;
+  switch(inittype) {
     case -1:
       /* no expr */
       break;
@@ -739,11 +752,13 @@ field_array_hash_common:
     break;
 
     case 1:
+    case 2:
     {
       OP *op = args[argi++]->op;
       U8 want = 0;
 
-      forbid_outofblock_ops(op, "a field initialiser block");
+      forbid_outofblock_ops(op,
+        inittype == 2 ? "a field initialiser expression" : "a field initialiser block");
 
       switch(sigil) {
         case '$':
@@ -765,14 +780,15 @@ field_array_hash_common:
   return KEYWORD_PLUGIN_STMT;
 }
 
-static void setup_parse_field_initexpr(pTHX_ void *hookdata)
+static void setup_parse_field(pTHX_ bool is_block)
 {
   CV *was_compcv = PL_compcv;
   HV *hints = GvHV(PL_hintgv);
 
   if(!hints || !hv_fetchs(hints, "Object::Pad/experimental(init_expr)", 0))
     Perl_ck_warner(aTHX_ packWARN(WARN_EXPERIMENTAL),
-      "field initialiser expression is experimental and may be changed or removed without notice");
+      "field initialiser %s is experimental and may be changed or removed without notice",
+        is_block ? "block" : "expression");
 
   resume_compcv_and_save(&compclassmeta->initfields_compcv);
 
@@ -785,6 +801,24 @@ static void setup_parse_field_initexpr(pTHX_ void *hookdata)
   CvOUTSIDE_SEQ(PL_compcv) = PL_cop_seqmax;
 
   hv_stores(GvHV(PL_hintgv), "Object::Pad/__CLASS__", newSVsv(&PL_sv_yes));
+
+  if(!is_block) {
+    /* Hide the $self lexical by scrubbing its name */
+    PADNAME *pn_self = PadnamelistARRAY(PadlistNAMES(CvPADLIST(PL_compcv)))[PADIX_SELF];
+
+    SAVEI8(PadnamePV(pn_self)[1]);
+    PadnamePV(pn_self)[1] = '\0';
+  }
+}
+
+static void setup_parse_field_initblock(pTHX_ void *hookdata)
+{
+  setup_parse_field(aTHX_ TRUE);
+}
+
+static void setup_parse_field_initexpr(pTHX_ void *hookdata)
+{
+  setup_parse_field(aTHX_ FALSE);
 }
 
 static const struct XSParseKeywordHooks kwhooks_field = {
@@ -797,8 +831,10 @@ static const struct XSParseKeywordHooks kwhooks_field = {
     XPK_LEXVARNAME(XPK_LEXVAR_ANY),
     XPK_ATTRIBUTES,
     XPK_TAGGEDCHOICE(
-      /* An optional choice of only one item; for compat. with kwhooks_has */
-      XPK_PREFIXED_BLOCK_ENTERLEAVE(XPK_SETUP(&setup_parse_field_initexpr)), XPK_TAG(1)
+      XPK_PREFIXED_BLOCK_ENTERLEAVE(XPK_SETUP(&setup_parse_field_initblock)),
+        XPK_TAG(1),
+      XPK_SEQUENCE(XPK_EQUALS, XPK_PREFIXED_TERMEXPR_ENTERLEAVE(XPK_SETUP(&setup_parse_field_initexpr)), XPK_AUTOSEMI),
+        XPK_TAG(2)
     ),
     {0}
   },
@@ -815,8 +851,7 @@ static const struct XSParseKeywordHooks kwhooks_has = {
     XPK_ATTRIBUTES,
     XPK_CHOICE(
       XPK_SEQUENCE(XPK_EQUALS, XPK_TERMEXPR, XPK_AUTOSEMI),
-      XPK_PREFIXED_BLOCK_ENTERLEAVE(XPK_SETUP(&setup_parse_field_initexpr)),
-      {0}
+      XPK_PREFIXED_BLOCK_ENTERLEAVE(XPK_SETUP(&setup_parse_field_initblock))
     ),
     {0}
   },
@@ -902,10 +937,9 @@ static void parse_method_pre_subparse(pTHX_ struct XSParseSublikeContext *ctx, v
   MethodMeta *compmethodmeta;
   Newx(compmethodmeta, 1, MethodMeta);
 
-  compmethodmeta->name = SvREFCNT_inc(ctx->name);
-  compmethodmeta->class = NULL;
-  compmethodmeta->role  = NULL;
-  compmethodmeta->is_common = false;
+  *compmethodmeta = (MethodMeta){
+    .name = SvREFCNT_inc(ctx->name),
+  };
 
   hv_stores(ctx->moddata, "Object::Pad/compmethodmeta", newSVuv(PTR2UV(compmethodmeta)));
   hv_stores(GvHV(PL_hintgv), "Object::Pad/__CLASS__", newSVsv(&PL_sv_yes));
@@ -1026,11 +1060,12 @@ static void parse_method_post_blockstart(pTHX_ struct XSParseSublikeContext *ctx
         ParamMeta *parammeta;
         Newx(parammeta, 1, struct ParamMeta);
 
-        parammeta->name = paramname;
-        parammeta->class = compclassmeta;
-        parammeta->type = PARAM_ADJUST;
-        parammeta->adjust.padix   = padix;
-        parammeta->adjust.defexpr = NULL;
+        *parammeta = (struct ParamMeta){
+          .name  = paramname,
+          .class = compclassmeta,
+          .type  = PARAM_ADJUST,
+          .adjust.padix = padix,
+        };
 
         av_push(params, newSVuv(PTR2UV((SV *)parammeta)));
         hv_store_ent(parammap, paramname, (SV *)parammeta, 0);
@@ -1427,7 +1462,7 @@ static int build_uuCLASS(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nar
 }
 
 static const struct XSParseKeywordHooks kwhooks_uuCLASS = {
-  .flags = 0 /* TODO: Can't set XPK_FLAG_EXPR yet because of bug */,
+  .flags = XPK_FLAG_EXPR,
   .permit_hintkey = "Object::Pad/class",
 
   .check = &check_uuCLASS,
@@ -1999,7 +2034,7 @@ BOOT:
   DMD_SET_PACKAGE_HELPER("Object::Pad::MOP::Class", &dumppackage_class);
 #endif
 
-  boot_xs_parse_keyword(0.22); /* XPK_AUTOSEMI */
+  boot_xs_parse_keyword(0.29); /* XPK_PREFIXED_TERMEXPR_ENTERLEAVE */
 
   register_xs_parse_keyword("class", &kwhooks_class, (void *)METATYPE_CLASS);
   register_xs_parse_keyword("role",  &kwhooks_role,  (void *)METATYPE_ROLE);

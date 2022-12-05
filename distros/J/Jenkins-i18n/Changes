@@ -1,5 +1,16 @@
 Revision history for Perl extension Jenkins::i18n.
 
+0.09 Sat Dec 3 12:30:27 -03 2022
+    - Fixed bug for cases where the Jelly file has more keys than the
+    respective Properties in English
+    - Refactored the CLI code, moving code to functions and those to modules.
+    - Refactored the Jenkins::i18n::ProcOpts new method due the large number of
+    required arguments.
+    - The new Jenkins::i18n::FindResults now stores the found files and any
+    warnings. That provides better handling of both results, without having to
+    see warnings when it is not desirable.
+    - Added new test cases for uncovered corner cases.
+
 0.08 Mon Nov 14 02:03:46 -03 2022
     - New copyright line for translators in the license.
     - Refactored license generation into a new class, moving code from the CLI.

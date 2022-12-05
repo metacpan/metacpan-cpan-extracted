@@ -13,7 +13,7 @@ no warnings qw( threads recursion uninitialized once redefine );
 
 package MCE::Hobo;
 
-our $VERSION = '1.878';
+our $VERSION = '1.879';
 
 ## no critic (BuiltinFunctions::ProhibitStringyEval)
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
@@ -32,8 +32,10 @@ use overload (
 );
 
 sub import {
-   no strict 'refs'; no warnings 'redefine';
-   *{ caller().'::mce_async' } = \&mce_async;
+   if (caller !~ /^MCE::/) {
+      no strict 'refs'; no warnings 'redefine';
+      *{ caller().'::mce_async' } = \&mce_async;
+   }
    return;
 }
 
@@ -232,7 +234,7 @@ sub create {
       else {                                                # child
          %{ $_LIST } = (), $_SELF = $self;
 
-         local $SIG{TERM} = local $SIG{INT} = \&_trap,
+         local $SIG{TERM} = local $SIG{INT} = local $SIG{ABRT} = \&_trap,
          local $SIG{SEGV} = local $SIG{HUP} = \&_trap,
          local $SIG{QUIT} = \&_quit;
          local $SIG{CHLD};
@@ -636,39 +638,40 @@ sub _dispatch {
    my $void_context = ( exists $_SELF->{void_context} )
       ? $_SELF->{void_context} : $mngd->{void_context};
 
-   my @res; local $SIG{'ALRM'} = sub { alarm 0; die "Hobo timed out\n" };
+   my @res; my $timed_out = 0;
+
+   local $SIG{'ALRM'} = sub {
+      alarm 0; $timed_out = 1; $SIG{__WARN__} = sub {};
+      die "Hobo timed out\n";
+   };
 
    if ( $void_context || $_SELF->{IGNORE} ) {
       no strict 'refs';
-      eval {
-         alarm( $hobo_timeout || 0 );
-         $func->( @{ $args } );
-      };
+      eval { alarm($hobo_timeout || 0); $func->(@{ $args }) };
    }
    else {
       no strict 'refs';
-      @res = eval {
-         alarm( $hobo_timeout || 0 );
-         $func->( @{ $args } );
-      };
+      @res = eval { alarm($hobo_timeout || 0); $func->(@{ $args }) };
    }
 
    alarm 0;
+   $@ = "Hobo timed out" if $timed_out;
 
    if ( $@ ) {
       _exit($?) if ( $@ =~ /^Hobo exited \(\S+\)$/ );
-      my $err = $@; $? = 1;
+      my $err = $@; $? = 1; $err =~ s/, <__ANONIO__> line \d+//;
 
       if ( ! $_SELF->{IGNORE} ) {
          $_DATA->{ $_SELF->{PKG} }->set('S'.$$, $err),
-         $_DATA->{ $_SELF->{PKG} }->set('R'.$$, @res ? $_freeze->(\@res) : '');
+         $_DATA->{ $_SELF->{PKG} }->set('R'.$$, '');
       }
 
-      if ( $err ne "Hobo timed out" && !$mngd->{on_finish} ) {
+      if ( !$timed_out && !$mngd->{on_finish} && !$INC{'MCE/Simple.pm'} ) {
          use bytes; warn "Hobo $$ terminated abnormally: reason $err\n";
       }
    }
    else {
+      shift(@res) if ref($res[0]) =~ /^MCE::(?:Barrier|Semaphore)::_guard/s;
       $_DATA->{ $_SELF->{PKG} }->set('R'.$$, @res ? $_freeze->(\@res) : '')
          if ( ! $_SELF->{IGNORE} );
    }
@@ -691,7 +694,7 @@ sub _exit {
    my $posix_exit = ( exists $_SELF->{posix_exit} )
       ? $_SELF->{posix_exit} : $_MNGD->{ $_SELF->{PKG} }{posix_exit};
 
-   if ( ( $posix_exit || $_SELF->{SIGNALED} ) && !$_is_MSWin32 ) {
+   if ( $posix_exit && !$_SELF->{SIGNALED} && !$_is_MSWin32 ) {
       eval { MCE::Mutex::Channel::_destroy() };
       POSIX::_exit($exit_status) if $INC{'POSIX.pm'};
       CORE::kill('KILL', $$);
@@ -725,11 +728,16 @@ sub _force_reap {
 sub _quit {
    return MCE::Signal::defer($_[0]) if $MCE::Signal::IPC;
 
-   my ( $name ) = @_;
+   alarm 0; my ( $name ) = @_;
    $_SELF->{SIGNALED} = 1, $name =~ s/^SIG//;
 
    $SIG{$name} = sub {}, CORE::kill($name, -$$)
       if ( exists $SIG{$name} );
+
+   if ( ! $_SELF->{IGNORE} ) {
+      my ( $pkg, $wrk_id ) = ( $_SELF->{PKG}, $_SELF->{WRK_ID} );
+      $_DATA->{$pkg}->set('R'.$wrk_id, '');
+   } 
 
    _exit(0);
 }
@@ -738,30 +746,27 @@ sub _reap_hobo {
    my ( $hobo, $wait_flag ) = @_;
    return unless $hobo;
 
-   my $void_context = ( exists $hobo->{void_context} )
-      ? $hobo->{void_context} : $_MNGD->{ $hobo->{PKG} }{void_context};
-
-   local @_ = $_DATA->{ $hobo->{PKG} }->get(
-      $hobo->{WRK_ID}, $wait_flag, $void_context
-   );
+   local @_ = $_DATA->{ $hobo->{PKG} }->get($hobo->{WRK_ID}, $wait_flag);
 
    ( $hobo->{ERROR}, $hobo->{RESULT}, $hobo->{REAPED} ) =
       ( pop || '', length $_[0] ? $_thaw->(pop) : [], 1 );
 
    return if $hobo->{IGNORE};
 
+   my ( $exit, $err ) = ( $? || 0, $hobo->{ERROR} );
+   my ( $code, $sig ) = ( $exit >> 8, $exit & 0x7f );
+
+   if ( $code > 100 && !$err ) {
+      $code = 2, $sig = 1,  $err = 'Hobo received SIGHUP'  if $code == 101;
+      $code = 2, $sig = 2,  $err = 'Hobo received SIGINT'  if $code == 102;
+      $code = 2, $sig = 6,  $err = 'Hobo received SIGABRT' if $code == 106;
+      $code = 2, $sig = 11, $err = 'Hobo received SIGSEGV' if $code == 111;
+      $code = 2, $sig = 15, $err = 'Hobo received SIGTERM' if $code == 115;
+
+      $hobo->{ERROR} = $err;
+   }
+
    if ( my $on_finish = $_MNGD->{ $hobo->{PKG} }{on_finish} ) {
-      my ( $exit, $err ) = ( $? || 0, $hobo->{ERROR} );
-      my ( $code, $sig ) = ( $exit >> 8, $exit & 0x7f );
-
-      if ( ( $code > 100 || $sig == 9 ) && !$err ) {
-         $code = 2, $sig = 1,  $err = 'received SIGHUP'  if $code == 101;
-         $code = 2, $sig = 2,  $err = 'received SIGINT'  if $code == 102;
-         $code = 2, $sig = 11, $err = 'received SIGSEGV' if $code == 111;
-         $code = 2, $sig = 15, $err = 'received SIGTERM' if $code == 115;
-         $code = 2, $sig = 9,  $err = 'received SIGKILL' if $sig  == 9;
-      }
-
       $on_finish->(
          $hobo->{WRK_ID}, $code, $hobo->{ident}, $sig, $err,
          @{ $hobo->{RESULT} }
@@ -774,7 +779,7 @@ sub _reap_hobo {
 sub _trap {
    return MCE::Signal::defer($_[0]) if $MCE::Signal::IPC;
 
-   my ( $exit_status, $name ) = ( 2, @_ );
+   alarm 0; my ( $exit_status, $name ) = ( 2, @_ );
    $_SELF->{SIGNALED} = 1, $name =~ s/^SIG//;
 
    $SIG{$name} = sub {}, CORE::kill($name, -$$)
@@ -782,8 +787,14 @@ sub _trap {
 
    if    ( $name eq 'HUP'  ) { $exit_status = 101 }
    elsif ( $name eq 'INT'  ) { $exit_status = 102 }
+   elsif ( $name eq 'ABRT' ) { $exit_status = 106 }
    elsif ( $name eq 'SEGV' ) { $exit_status = 111 }
    elsif ( $name eq 'TERM' ) { $exit_status = 115 }
+
+   if ( ! $_SELF->{IGNORE} ) {
+      my ( $pkg, $wrk_id ) = ( $_SELF->{PKG}, $_SELF->{WRK_ID} );
+      $_DATA->{$pkg}->set('R'.$wrk_id, '');
+   } 
 
    _exit($exit_status);
 }
@@ -872,7 +883,7 @@ sub exists { ${ $_[0] }->exists($_[1]); }
 sub set    { ${ $_[0] }->set($_[1], $_[2]); }
 
 sub get {
-   my ( $self, $wrk_id, $wait_flag, $void_context ) = @_;
+   my ( $self, $wrk_id, $wait_flag ) = @_;
 
    if ( $wait_flag ) {
       local $!;
@@ -887,7 +898,7 @@ sub get {
       };
    }
 
-   ${ $self }->_get_hobo_data($wrk_id, $void_context ? 0 : 1);
+   ${ $self }->_get_hobo_data($wrk_id);
 }
 
 package # hide from rpm
@@ -958,7 +969,7 @@ MCE::Hobo - A threads-like parallelization module
 
 =head1 VERSION
 
-This document describes MCE::Hobo version 1.878
+This document describes MCE::Hobo version 1.879
 
 =head1 SYNOPSIS
 

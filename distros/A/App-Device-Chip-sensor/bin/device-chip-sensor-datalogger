@@ -3,7 +3,7 @@
 use v5.26;
 use warnings;
 
-use Object::Pad 0.57;
+use Object::Pad 0.73 ':experimental(init_expr)';
 
 use Future::AsyncAwait;
 use Future::IO::Impl::IOAsync;
@@ -31,8 +31,8 @@ class MyApp :isa(App::Device::Chip::sensor)
    use Text::CSV;
    use POSIX qw( strftime );
 
-   has $_OUTFILE;
-   has $_TIMESTAMP = "%Y-%m-%d %H:%M:%S";
+   field $_OUTFILE;
+   field $_TIMESTAMP = "%Y-%m-%d %H:%M:%S";
 
 =head1 COMMANDLINE OPTIONS
 
@@ -65,8 +65,8 @@ Defaults to C<"%Y-%m-%d %H:%M:%S">.
       );
    }
 
-   has $_csv;
-   has $_outh;
+   field $_csv;
+   field $_outh;
 
    async method after_sensors :override ( @sensors )
    {

@@ -6,7 +6,7 @@ use strict;
 use warnings;
 
 package RT::Client::REST::Forms;
-$RT::Client::REST::Forms::VERSION = '0.70';
+$RT::Client::REST::Forms::VERSION = '0.71';
 use Exporter;
 
 use vars qw(@EXPORT @ISA);
@@ -71,11 +71,24 @@ sub form_parse {
                 next LINE
             }
 
-            if ($state <= 1 && $line =~ m/^($field: )(.*)?$/s) {
+            if ($state <= 1 && $line =~ m/^($field:) ?$/s) {
+                # Empty field
+                my $f = $1;
+                $f =~ s/:?$//;
+
+                push(@$o, $f) unless exists $k->{$f};
+                vpush($k, $f, undef);
+
+                $state = 1;
+
+                next LINE
+            }
+
+            if ($state <= 1 && $line =~ m/^($field:) (.*)?$/s) {
                 # Read a field: value specification.
                 my $f     = $1;
                 my $value = $2;
-                $f =~ s/: ?$//;
+                $f =~ s/:?$//;
 
                 # Read continuation lines, if any.
                 while (@lines && ($lines[0] eq "\n" || $lines[0] =~ m/^ +/)) {
@@ -249,7 +262,7 @@ RT::Client::REST::Forms - This package provides functions from RT::Interface::RE
 
 =head1 VERSION
 
-version 0.70
+version 0.71
 
 =head2 METHODS
 

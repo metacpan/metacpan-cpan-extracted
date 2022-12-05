@@ -37,7 +37,7 @@ Creates a new object and loads data from other sources
                                                         NAME          => "My Antenna Name",
                                                         MAKE          => "My Manufacturer Name",
                                                         FREQUENCY     => "2437" || "2437 MHz" || "2.437 GHz",
-                                                        GAIN          => "10.0" || "10.0 dBd" || "12.14 dBi",
+                                                        GAIN          => "10.0" || "10.0 dBd" || "12.15 dBi",
                                                         COMMENT       => "My Comment",
                                                         horizontal    => [[0.00, 0.96], [1.00, 0.04], ..., [180.00, 31.10], ..., [359.00, 0.04]],
                                                         vertical      => [[0.00, 1.08], [1.00, 0.18], ..., [180.00, 31.23], ..., [359.00, 0.18]],
@@ -59,6 +59,10 @@ Assumptions:
 Reads an antenna pattern file from a zipped archive and parses the data into the object data structure.
 
     $antenna->read_fromZipMember($zip_filename, $member_filename);
+
+## blob
+
+Returns the data blob that was read by the read($file), read($scalar\_ref), or read\_fromZipMember($,$) methods.
 
 ## write
 
@@ -127,17 +131,25 @@ Assumed: Less than about 40 ASCII characters
 Sets and returns the frequency string as displayed in header structure
 
     my $frequency = $antenna->frequency;
-    $antenna->frequency("2450");     #correct format in MHz
-    $antenna->frequency("2450 MHz"); #acceptable format
-    $antenna->frequency("2.45 GHz"); #common format but technically not to spec
+    $antenna->frequency("2450");          #correct format in MHz
+    $antenna->frequency("2450 MHz");      #acceptable format
+    $antenna->frequency("2.45 GHz");      #common format but technically not to spec
+    $antenna->frequency("2450-2550");     #common range format but technically not to spec
+    $antenna->frequency("2.45-2.55 GHz"); #common range format but technically not to spec
 
-## frequency\_mhz, frequency\_ghz
+## frequency\_mhz, frequency\_ghz, frequency\_mhz\_lower, frequency\_mhz\_upper, frequency\_ghz\_lower, frequency\_ghz\_upper
 
 Attempts to read and parse the string header value and return the frequency as a number in the requested unit of measure.
 
 ## gain
 
-Antenna gain string as displayed in file (dBd is the default unit of measure)
+Sets and returns the antenna gain string as displayed in file (dBd is the default unit of measure)
+
+    my $gain = $antenna->gain;
+    $antenna->gain("9.1");          #correct format in dBd
+    $antenna->gain("9.1 dBd");      #correct format in dBd
+    $antenna->gain("9.1 dBi");      #correct format in dBi
+    $antenna->gain("(dBi) 9.1");    #supported format
 
 ## gain\_dbd, gain\_dbi
 

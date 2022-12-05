@@ -22,18 +22,16 @@ EWT reset =>
    America/New_York
    America/Detroit
    America/Iqaluit
-   America/Nipigon
-   America/Thunder_Bay
    America/Toronto
 
 EWT
 America/New_York
 America/Iqaluit
-America/Thunder_Bay
+   America/Toronto
    =>
    America/New_York
    America/Iqaluit
-   America/Thunder_Bay
+   America/Toronto
 ";
 
 $::ti->tests(func  => \&test,

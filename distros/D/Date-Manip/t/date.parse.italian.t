@@ -77,6 +77,7 @@ l'altroieri => "2000011900:00:00"
 
 'una settimana fa di mercoledì' => "2000011212:30:45"
 
+'lun 3 gen 2022, 11:00:00, EST' => "2022010311:00:00"
 };
 
 $::ti->tests(func  => \&test,

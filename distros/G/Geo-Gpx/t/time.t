@@ -1,4 +1,4 @@
-# t/time.t 
+# t/time.t
 
 use DateTime;
 use DateTime::Format::ISO8601;
@@ -30,32 +30,20 @@ $dt_u = DateTime->new(
 #
 # Show that epoch time is "unique" and always reflects UTC time
 
-my ($dt_t_epoch, $dt_u_epoch);
-$dt_t_epoch   = $dt_t->epoch;
-$dt_u_epoch   = $dt_u->epoch;
-
-my $epoch_diff_t_vs_u = ($dt_t_epoch - $dt_u_epoch) / 3600;
+my $epoch_diff_t_vs_u = ($dt_t->epoch - $dt_u->epoch) / 3600;
 is($epoch_diff_t_vs_u, 4, "    time(): same hour and minute b/w EST (in DST) and UTC should be 4 hours appart, epoch wise");
-# exactly four hours (that time is in DST here), makes sense
-
 is($dt_t->stringify, '2022-10-25T09:45:00',      "    stringify(): produce time as a string in local timezone (unless time_zone specified in DT object)");
 is($dt_u->stringify, '2022-10-25T09:45:00',      "    stringify(): produce time as a string in local timezone (unless time_zone specified in DT object)");
 
 my ($dt_min4, $dt_min4_z);
 $dt_min4 =   DateTime::Format::ISO8601->parse_datetime('2022-10-25T09:45:00-04:00');
 $dt_min4_z = DateTime::Format::ISO8601->parse_datetime('2022-10-25T13:45:00Z');
-
-my ($dt_min4_epoch, $dt_min4_z_epoch);
-$dt_min4_epoch   = $dt_min4->epoch;
-$dt_min4_z_epoch = $dt_min4_z->epoch;
-my $epoch_diff_min4_vs_z = ($dt_min4_epoch - $dt_min4_z_epoch) / 3600;
+my $epoch_diff_min4_vs_z = ($dt_min4->epoch - $dt_min4_z->epoch) / 3600;
 is($epoch_diff_min4_vs_z, 0, "    time(): should produce same value for epoch in Gpx and Gpx::Point constructors");
-# same epoch time 
-
 is($dt_min4->stringify,   '2022-10-25T09:45:00', "    stringify(): produce time as a string in local timezone");
 is($dt_min4_z->stringify, '2022-10-25T13:45:00', "    stringify(): produce time as a string in local timezone (Z as same effect it seems as specifying time_zone => 'UTC'");
 
-# 
+#
 # Test that Geo::Gpx->new() and Geo::Gpx::Point-new() parse date strings the same way
 
 # First, NB that within <time>...</time> tags in the xml, the date is *always* a string, never epoch i.e.
@@ -81,9 +69,10 @@ is($gpx->waypoints(3)->time, $pt3->time,   "    time(): should produce same valu
 is($gpx->waypoints(4)->time, $pt4->time,   "    time(): should produce same value for epoch in Gpx and Gpx::Point constructors");
 
 
-# stringification of the points is always done in perspective of the local time (unless time_zone is specified in DT object)
-# the DateTime manpage states the from_epoch() method create a DT object with time_zone => 'UTC' as the default, so the stringification of the DT
-# object returned by Point->time_datetime() will represent UTC time and not local time (for the same epoch)
+# stringification of the points is done in perspective of the local time (**unless** time_zone is specified in DT object). The
+# DateTime manpage states the from_epoch() method creates a DT object **with** a time_zone, which is  time_zone => 'UTC' as the default,
+# so the stringification of the DT object returned by Point->time_datetime() will represent UTC time and not local time (for the same epoch).
+# If a a differe time_zone is specified upon construction, the string will represent the time of that time_zone
 
 my $str1 = $pt1->time_datetime->stringify;
 my $str2 = $pt2->time_datetime->stringify;

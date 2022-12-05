@@ -4,9 +4,11 @@ WriteMakefile(
     VERSION_FROM   => 'lib/RF/Antenna/Planet/MSI/Format.pm',
     PREREQ_PM      => {
                        'Test::Simple'             => 0,    #Test::More
+                       'Test::Number::Delta'      => 0,
                        'Scalar::Util'             => 0,    #looks_like_number
                        'Tie::IxHash'              => 0,    #ordered header
                        'Path::Class'              => 0.12, #slurp
+                       'RF::Functions'            => 0.04, #dbi_dbd dbd_dbi
                        'File::Temp'               => 0,    #write to tmp file  #optional
                        'Archive::Zip'             => 0,    #read_fromZipMember #optional
                        'Archive::Zip::MemberRead' => 0,    #read_fromZipMember #optional

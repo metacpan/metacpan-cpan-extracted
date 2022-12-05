@@ -1,0 +1,53 @@
+{
+   "abstract" : "Extensible Perl internet server",
+   "author" : [
+      "Paul Seamons <paul@seamons.com> and Rob Brown <bbb@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.008, CPAN::Meta::Converter version 2.133380, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Net-Server",
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "IO::Socket" : "0",
+            "POSIX" : "0",
+            "Socket" : "0",
+            "Time::HiRes" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {}
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-project@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Net-Server"
+      },
+      "homepage" : "https://github.com/rhandom/perl-net-server",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/rhandom/perl-net-server.git",
+         "web" : "https://github.com/rhandom/perl-net-server"
+      }
+   },
+   "version" : "2.013",
+   "x_serialization_backend" : "JSON::PP version 4.06"
+}

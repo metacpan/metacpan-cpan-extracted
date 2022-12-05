@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package Commandable::Finder::SubAttributes 0.08;
+package Commandable::Finder::SubAttributes 0.09;
 
 use v5.14;
 use warnings;
@@ -162,7 +162,7 @@ sub new
    HAVE_ATTRIBUTE_STORAGE or
       croak "Cannot create a $class as Attribute::Storage is not available";
 
-   my $package = ( delete $args{package} ) or croak "Require 'packaage'";
+   my $package = ( delete $args{package} ) or croak "Require 'package'";
 
    my $name_prefix = ( delete $args{name_prefix} )          // "command_";
    my $conv_under  = ( delete $args{underscore_to_hyphen} ) // 1;
@@ -215,6 +215,14 @@ sub new_for_main
    return $class->new( package => "main", @_ );
 }
 
+sub _wrap_code
+{
+   my $self = shift;
+   my ( $code ) = @_;
+
+   return $code;
+}
+
 sub _commands
 {
    my $self = shift;
@@ -252,7 +260,7 @@ sub _commands
          arguments   => $args,
          options     => $opts,
          package     => $self->{package},
-         code        => $code,
+         code        => $self->_wrap_code( $code ),
       );
    }
 

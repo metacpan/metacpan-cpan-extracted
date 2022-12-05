@@ -3,11 +3,12 @@ package Net::Async::Spotify::API::Personalization;
 use strict;
 use warnings;
 
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 our $AUTHORITY = 'cpan:VNEALV'; # AUTHORITY
 
 use mro;
 use parent qw(Net::Async::Spotify::API::Generated::Personalization);
+use Future::AsyncAwait;
 
 =encoding utf8
 
@@ -23,5 +24,13 @@ Will hold all extra functionality for Spotify Personalization API
 =head1 METHODS
 
 =cut
+
+async sub get_users_top_artists_and_tracks {
+    my $self = shift;
+    my %args = @_;
+    $self->mapping->{get_users_top_artists_and_tracks}{response} = ['Track'] if $args{type} eq 'tracks';
+    $self->mapping->{get_users_top_artists_and_tracks}{response} = ['Artist'] if $args{type} eq 'artists';
+    await $self->next::method(@_);
+}
 
 1;

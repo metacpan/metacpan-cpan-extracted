@@ -1,5 +1,23 @@
 Revision history for Net-Async-Redis-XS
 
+0.006     2022-12-03 19:28:42+08:00 Asia/Singapore
+    [Bugs fixed]
+    - memory leak when handling error responses
+
+0.005     2022-12-03 09:20:45+08:00 Asia/Singapore
+    [New features]
+    - support for inf/nan as decimal (floating point) values
+    - support for verbatim strings (`=`)
+    - support for sets (`~`) and big numbers (`(`)
+    - this version may possibly work on versions of perl before 5.36.0
+    [Bugs fixed]
+    - pubsub handling fixes - was not picking up the callback correctly before
+    [Dependencies]
+    - previous `cpanfile` did not list dependencies, now resolved
+
+    Also enables CircleCI tests, thanks to some initial work from SZABGAB in prompting this:
+    https://dev.to/szabgab/day-2-add-github-action-ci-to-the-net-async-redis-xs-perl-module-9oo
+
 0.004     2022-12-02 07:01:37+08:00 Asia/Singapore
     [New features]
     - support for RESP3 decimal (floating point) numbers (`,`)

@@ -477,15 +477,6 @@
       "name" : "Ahrensfelde Nord"
    },
    {
-      "ds100" : "AARF",
-      "eva" : 8071338,
-      "latlong" : [
-         53.233409,
-         8.818139
-      ],
-      "name" : "Ahrensfelde(Bz. Bremen)"
-   },
-   {
       "ds100" : "KAH",
       "eva" : 8000448,
       "latlong" : [
@@ -603,15 +594,6 @@
       "name" : "Akkrum"
    },
    {
-      "ds100" : "XUAI",
-      "eva" : 5300096,
-      "latlong" : [
-         46.0563473,
-         23.576231
-      ],
-      "name" : "Alba Iulia"
-   },
-   {
       "ds100" : "RAL",
       "eva" : 8000463,
       "latlong" : [
@@ -653,6 +635,15 @@
       "latlong" : [
          48.936839,
          8.415256
+      ],
+      "name" : "Albgaubad, Ettlingen"
+   },
+   {
+      "ds100" : "PQEAB",
+      "eva" : 723572,
+      "latlong" : [
+         48.936835,
+         8.414946
       ],
       "name" : "Albgaubad, Ettlingen"
    },
@@ -1908,15 +1899,6 @@
       "name" : "Amstetten NÖ"
    },
    {
-      "ds100" : "TAM M",
-      "eva" : 8079075,
-      "latlong" : [
-         48.577852,
-         9.873959
-      ],
-      "name" : "Amstetten(W) Lokalbahn"
-   },
-   {
       "ds100" : "TAM",
       "eva" : 8000577,
       "latlong" : [
@@ -2304,15 +2286,6 @@
       "name" : "Appingedam"
    },
    {
-      "ds100" : "XUA",
-      "eva" : 5300002,
-      "latlong" : [
-         46.189565,
-         21.325546
-      ],
-      "name" : "Arad"
-   },
-   {
       "ds100" : "XSAB",
       "eva" : 8506308,
       "latlong" : [
@@ -2320,15 +2293,6 @@
          9.43333858590703
       ],
       "name" : "Arbon"
-   },
-   {
-      "ds100" : "XSABS",
-      "eva" : 8506110,
-      "latlong" : [
-         47.5126421316245,
-         9.44032100861396
-      ],
-      "name" : "Arbon (See)"
    },
    {
       "ds100" : "PSCTD",
@@ -2952,6 +2916,15 @@
       "name" : "Aufhausen(b Erding)"
    },
    {
+      "ds100" : "PQKAG",
+      "eva" : 150074,
+      "latlong" : [
+         48.998968,
+         8.403593
+      ],
+      "name" : "Augartenstraße, Karlsruhe"
+   },
+   {
       "ds100" : "RKAG",
       "eva" : 721323,
       "latlong" : [
@@ -3025,10 +2998,19 @@
    },
    {
       "ds100" : "PQKAB",
+      "eva" : 361104,
+      "latlong" : [
+         49.023913,
+         8.375663
+      ],
+      "name" : "August-Bebel-Straße, Karlsruhe"
+   },
+   {
+      "ds100" : "RKABE",
       "eva" : 723603,
       "latlong" : [
-         49.024161,
-         8.375802
+         49.024165,
+         8.375798
       ],
       "name" : "August-Bebel-Straße, Karlsruhe"
    },
@@ -3796,15 +3778,6 @@
          7.310871
       ],
       "name" : "Bad Hönningen"
-   },
-   {
-      "ds100" : "TIMN",
-      "eva" : 8070309,
-      "latlong" : [
-         48.404155,
-         8.770092
-      ],
-      "name" : "Bad Imnau"
    },
    {
       "ds100" : "XAIS",
@@ -4761,15 +4734,6 @@
       "name" : "Bad Windsheim"
    },
    {
-      "ds100" : "TBW",
-      "eva" : 8000769,
-      "latlong" : [
-         47.910258,
-         9.889739
-      ],
-      "name" : "Bad Wurzach"
-   },
-   {
       "ds100" : "MBWH",
       "eva" : 8000768,
       "latlong" : [
@@ -5256,15 +5220,6 @@
       "name" : "Barcelona Sants"
    },
    {
-      "ds100" : "ABCL",
-      "eva" : 8071336,
-      "latlong" : [
-         53.471851,
-         9.027667
-      ],
-      "name" : "Barchel"
-   },
-   {
       "ds100" : "PIFAN",
       "eva" : 8346045,
       "latlong" : [
@@ -5317,15 +5272,6 @@
          11.620875
       ],
       "name" : "Barleben"
-   },
-   {
-      "ds100" : "LBAS",
-      "eva" : 8011112,
-      "latlong" : [
-         52.214328,
-         11.640852
-      ],
-      "name" : "Barleber See"
    },
    {
       "ds100" : "ABMS",
@@ -6100,6 +6046,15 @@
          14.305071
       ],
       "name" : "Benesov n. Ploucnici"
+   },
+   {
+      "ds100" : "OTBP",
+      "eva" : 5400034,
+      "latlong" : [
+         49.779484,
+         14.682756
+      ],
+      "name" : "Benesov u Prahy"
    },
    {
       "ds100" : "XFBTR",
@@ -7911,15 +7866,6 @@
       "name" : "Berlin-Zehlendorf"
    },
    {
-      "ds100" : "XSBLS",
-      "eva" : 8506159,
-      "latlong" : [
-         47.6753379822752,
-         9.0176698078502
-      ],
-      "name" : "Berlingen URh"
-   },
-   {
       "ds100" : "XSBLG",
       "eva" : 8506135,
       "latlong" : [
@@ -8532,15 +8478,6 @@
       "name" : "Bichlbach-Berwang"
    },
    {
-      "ds100" : "RBIC",
-      "eva" : 8077777,
-      "latlong" : [
-         47.967528,
-         9.101812
-      ],
-      "name" : "Bichtlingen"
-   },
-   {
       "ds100" : "FBI",
       "eva" : 8000948,
       "latlong" : [
@@ -8964,15 +8901,6 @@
       "name" : "Binz LB"
    },
    {
-      "ds100" : "RBZN",
-      "eva" : 8070323,
-      "latlong" : [
-         47.631409,
-         7.621048
-      ],
-      "name" : "Binzen"
-   },
-   {
       "ds100" : "OFBIO",
       "eva" : 8700723,
       "latlong" : [
@@ -9213,7 +9141,7 @@
          48.565034,
          6.385848
       ],
-      "name" : "Blainville-Damelevieres"
+      "name" : "Blainville-Damelevières"
    },
    {
       "ds100" : "XUBL",
@@ -9297,6 +9225,15 @@
       "name" : "Blankenloch"
    },
    {
+      "ds100" : "PQSBK",
+      "eva" : 721220,
+      "latlong" : [
+         49.064724,
+         8.471434
+      ],
+      "name" : "Blankenloch Kirche, Stutensee"
+   },
+   {
       "ds100" : "PQSBI",
       "eva" : 721245,
       "latlong" : [
@@ -9304,6 +9241,15 @@
          8.471398
       ],
       "name" : "Blankenloch Kirche, Stutensee"
+   },
+   {
+      "ds100" : "PQSBM",
+      "eva" : 720333,
+      "latlong" : [
+         49.068769,
+         8.474652
+      ],
+      "name" : "Blankenloch Mühlenweg, Stutensee"
    },
    {
       "ds100" : "PQSBL",
@@ -9320,6 +9266,15 @@
       "latlong" : [
          49.073306,
          8.467376
+      ],
+      "name" : "Blankenloch Nord, Stutensee"
+   },
+   {
+      "ds100" : "PQSBR",
+      "eva" : 723540,
+      "latlong" : [
+         49.073264,
+         8.46756
       ],
       "name" : "Blankenloch Nord, Stutensee"
    },
@@ -9889,6 +9844,15 @@
          18.359444
       ],
       "name" : "Bohumin"
+   },
+   {
+      "ds100" : "OTBHO",
+      "eva" : 5400525,
+      "latlong" : [
+         50.491312,
+         14.149453
+      ],
+      "name" : "Bohusovice nad Ohri"
    },
    {
       "ds100" : "KBOI",
@@ -11169,15 +11133,6 @@
       "name" : "Bremervörde"
    },
    {
-      "ds100" : "KBK",
-      "eva" : 8071651,
-      "latlong" : [
-         50.432442,
-         7.168888
-      ],
-      "name" : "Brenk"
-   },
-   {
       "ds100" : "XIBN",
       "eva" : 8300092,
       "latlong" : [
@@ -11572,15 +11527,6 @@
          11.315972
       ],
       "name" : "Bronzolo/Branzoll"
-   },
-   {
-      "ds100" : "XTBRT",
-      "eva" : 5400612,
-      "latlong" : [
-         50.951596,
-         14.438788
-      ],
-      "name" : "Brtniky"
    },
    {
       "ds100" : "FBB",
@@ -12492,15 +12438,6 @@
       "name" : "Burgthann"
    },
    {
-      "ds100" : "TBUW",
-      "eva" : 8001281,
-      "latlong" : [
-         47.922765,
-         9.343805
-      ],
-      "name" : "Burgweiler"
-   },
-   {
       "ds100" : "HBUR",
       "eva" : 8001301,
       "latlong" : [
@@ -12807,15 +12744,6 @@
       "name" : "Böblingen Zimmerschlag"
    },
    {
-      "ds100" : "NBOB",
-      "eva" : 8070667,
-      "latlong" : [
-         49.052994,
-         13.014504
-      ],
-      "name" : "Böbrach"
-   },
-   {
       "ds100" : "TBCS",
       "eva" : 8070159,
       "latlong" : [
@@ -13032,6 +12960,15 @@
       "name" : "Büches-Düdelsheim"
    },
    {
+      "ds100" : "PQSB",
+      "eva" : 720488,
+      "latlong" : [
+         49.04795,
+         8.461034
+      ],
+      "name" : "Büchig, Stutensee"
+   },
+   {
       "ds100" : "PQSBC",
       "eva" : 721230,
       "latlong" : [
@@ -13136,6 +13073,15 @@
       "latlong" : [
          49.645125,
          8.459072
+      ],
+      "name" : "Bürstadt"
+   },
+   {
+      "ds100" : "FBUP",
+      "eva" : 8098360,
+      "latlong" : [
+         49.645086,
+         8.459254
       ],
       "name" : "Bürstadt"
    },
@@ -13740,7 +13686,7 @@
          45.571498,
          5.919756
       ],
-      "name" : "Chambery-Challes-E"
+      "name" : "Chambéry-Challes-les-Eaux"
    },
    {
       "ds100" : "NCHA",
@@ -14373,6 +14319,15 @@
       "name" : "Cintegabelle"
    },
    {
+      "ds100" : "OTCTV",
+      "eva" : 5400688,
+      "latlong" : [
+         50.366974,
+         14.419722
+      ],
+      "name" : "Citov"
+   },
+   {
       "ds100" : "OTCZA",
       "eva" : 5400769,
       "latlong" : [
@@ -14958,15 +14913,6 @@
       "name" : "Cursdorf"
    },
    {
-      "ds100" : "XUCU",
-      "eva" : 5300001,
-      "latlong" : [
-         46.341013,
-         21.2977
-      ],
-      "name" : "Curtici"
-   },
-   {
       "ds100" : "ACV",
       "eva" : 8001352,
       "latlong" : [
@@ -15165,15 +15111,6 @@
       "name" : "Dahn"
    },
    {
-      "ds100" : "SDAS",
-      "eva" : 8079081,
-      "latlong" : [
-         49.148557,
-         7.777208
-      ],
-      "name" : "Dahn Süd"
-   },
-   {
       "ds100" : "ONDAL",
       "eva" : 8400161,
       "latlong" : [
@@ -15233,6 +15170,15 @@
       "latlong" : [
          48.984199,
          8.403732
+      ],
+      "name" : "Dammerstock, Karlsruhe"
+   },
+   {
+      "ds100" : "PQKDS",
+      "eva" : 723865,
+      "latlong" : [
+         48.984208,
+         8.403575
       ],
       "name" : "Dammerstock, Karlsruhe"
    },
@@ -15444,6 +15390,24 @@
       "name" : "Daxlanden Dornröschenweg, Karlsruhe"
    },
    {
+      "ds100" : "PQKDD",
+      "eva" : 720567,
+      "latlong" : [
+         48.992847,
+         8.335293
+      ],
+      "name" : "Daxlanden Dornröschenweg, Karlsruhe"
+   },
+   {
+      "ds100" : "PQKDF",
+      "eva" : 373205,
+      "latlong" : [
+         48.996083,
+         8.338196
+      ],
+      "name" : "Daxlanden Karl-Delisle-Straße, Karlsruhe"
+   },
+   {
       "ds100" : "PQKDK",
       "eva" : 720569,
       "latlong" : [
@@ -15451,6 +15415,15 @@
          8.338135
       ],
       "name" : "Daxlanden Karl-Delisle-Straße, Karlsruhe"
+   },
+   {
+      "ds100" : "PQKDB",
+      "eva" : 365609,
+      "latlong" : [
+         48.988846,
+         8.332866
+      ],
+      "name" : "Daxlanden Nussbaumweg, Karlsruhe"
    },
    {
       "ds100" : "PQKDN",
@@ -15467,6 +15440,15 @@
       "latlong" : [
          48.998837,
          8.341087
+      ],
+      "name" : "Daxlanden Thomas-Mann-Straße, Karlsruhe"
+   },
+   {
+      "ds100" : "PQKDM",
+      "eva" : 720563,
+      "latlong" : [
+         48.999238,
+         8.34154
       ],
       "name" : "Daxlanden Thomas-Mann-Straße, Karlsruhe"
    },
@@ -15604,15 +15586,6 @@
          11.515572
       ],
       "name" : "Deining(Oberpf)"
-   },
-   {
-      "ds100" : "ADS",
-      "eva" : 8070349,
-      "latlong" : [
-         53.5319,
-         9.442568
-      ],
-      "name" : "Deinste"
    },
    {
       "ds100" : "ONDM",
@@ -16146,15 +16119,6 @@
       "name" : "Deutzen"
    },
    {
-      "ds100" : "XUD",
-      "eva" : 5300073,
-      "latlong" : [
-         45.8842727,
-         22.9102492
-      ],
-      "name" : "Deva"
-   },
-   {
       "ds100" : "XNDV",
       "eva" : 8400173,
       "latlong" : [
@@ -16306,15 +16270,6 @@
          8.7522798034753
       ],
       "name" : "Diessenhofen"
-   },
-   {
-      "ds100" : "XSDHS",
-      "eva" : 8506152,
-      "latlong" : [
-         47.6904192083997,
-         8.74885906156379
-      ],
-      "name" : "Diessenhofen URh"
    },
    {
       "ds100" : "NDT",
@@ -16740,6 +16695,15 @@
       "name" : "Doksy"
    },
    {
+      "ds100" : "OTDLX",
+      "eva" : 5403665,
+      "latlong" : [
+         50.224189,
+         14.348941
+      ],
+      "name" : "Dolany"
+   },
+   {
       "ds100" : "XFDO",
       "eva" : 8700116,
       "latlong" : [
@@ -16785,6 +16749,15 @@
       "name" : "Dollnstein"
    },
    {
+      "ds100" : "OTDBE",
+      "eva" : 5400864,
+      "latlong" : [
+         50.389752,
+         14.435705
+      ],
+      "name" : "Dolni Berkovice"
+   },
+   {
       "ds100" : "XTDH",
       "eva" : 5400870,
       "latlong" : [
@@ -16792,15 +16765,6 @@
          14.335824
       ],
       "name" : "Dolni Habartice"
-   },
-   {
-      "ds100" : "XTDKR",
-      "eva" : 5400872,
-      "latlong" : [
-         50.956423,
-         14.518703
-      ],
-      "name" : "Dolni Krecany"
    },
    {
       "ds100" : "XTDD",
@@ -17541,15 +17505,6 @@
       "name" : "Dottenheim"
    },
    {
-      "ds100" : "TDOD",
-      "eva" : 8029358,
-      "latlong" : [
-         48.228455,
-         8.781119
-      ],
-      "name" : "Dotternhausen-Dormettingen"
-   },
-   {
       "ds100" : "XSDO",
       "eva" : 8502212,
       "latlong" : [
@@ -17584,15 +17539,6 @@
          11.124636
       ],
       "name" : "Drahtzug"
-   },
-   {
-      "ds100" : "XLDF",
-      "eva" : 8270360,
-      "latlong" : [
-         50.014874,
-         6.006621
-      ],
-      "name" : "Drauffelt"
    },
    {
       "ds100" : "BDR",
@@ -18135,6 +18081,15 @@
       "name" : "Durach"
    },
    {
+      "ds100" : "PQKDH",
+      "eva" : 724001,
+      "latlong" : [
+         49.006915,
+         8.471686
+      ],
+      "name" : "Durlach Hubstraße, Karlsruhe"
+   },
+   {
       "ds100" : "RKDUH",
       "eva" : 724002,
       "latlong" : [
@@ -18142,6 +18097,15 @@
          8.472393
       ],
       "name" : "Durlach Hubstraße, Karlsruhe"
+   },
+   {
+      "ds100" : "PQKUU",
+      "eva" : 364010,
+      "latlong" : [
+         49.001872,
+         8.455946
+      ],
+      "name" : "Durlach Untermühlstraße, Karlsruhe"
    },
    {
       "ds100" : "RKDUU",
@@ -18153,6 +18117,24 @@
       "name" : "Durlach Untermühlstraße, Karlsruhe"
    },
    {
+      "ds100" : "RKDTU",
+      "eva" : 301001,
+      "latlong" : [
+         49.008802,
+         8.417724
+      ],
+      "name" : "Durlacher Tor/KIT-Campus Süd (U), Karlsruhe"
+   },
+   {
+      "ds100" : "PQKTO",
+      "eva" : 401001,
+      "latlong" : [
+         49.009045,
+         8.416546
+      ],
+      "name" : "Durlacher Tor/KIT-Campus Süd (U), Karlsruhe"
+   },
+   {
       "ds100" : "PQKTR",
       "eva" : 501001,
       "latlong" : [
@@ -18162,11 +18144,38 @@
       "name" : "Durlacher Tor/KIT-Campus Süd (U), Karlsruhe"
    },
    {
+      "ds100" : "PQKDR",
+      "eva" : 801001,
+      "latlong" : [
+         49.00882,
+         8.41758
+      ],
+      "name" : "Durlacher Tor/KIT-Campus Süd (U), Karlsruhe"
+   },
+   {
       "ds100" : "RKDTD",
+      "eva" : 377803,
+      "latlong" : [
+         49.008784,
+         8.418083
+      ],
+      "name" : "Durlacher Tor/KIT-Campus Süd, Karlsruhe"
+   },
+   {
+      "ds100" : "RKDTB",
       "eva" : 377903,
       "latlong" : [
-         49.009485,
-         8.418562
+         49.009513,
+         8.418641
+      ],
+      "name" : "Durlacher Tor/KIT-Campus Süd, Karlsruhe"
+   },
+   {
+      "ds100" : "PQKDT",
+      "eva" : 723606,
+      "latlong" : [
+         49.009261,
+         8.417751
       ],
       "name" : "Durlacher Tor/KIT-Campus Süd, Karlsruhe"
    },
@@ -18934,6 +18943,15 @@
          9.936645
       ],
       "name" : "Eckartshausen-Ilshofen"
+   },
+   {
+      "ds100" : "PQKEC",
+      "eva" : 723609,
+      "latlong" : [
+         49.005773,
+         8.350421
+      ],
+      "name" : "Eckenerstraße, Karlsruhe"
    },
    {
       "ds100" : "PQKEK",
@@ -19773,15 +19791,6 @@
       "name" : "Eisenberg(Pfalz)"
    },
    {
-      "ds100" : "NEHM",
-      "eva" : 8070856,
-      "latlong" : [
-         49.869412,
-         10.153426
-      ],
-      "name" : "Eisenheim"
-   },
-   {
       "ds100" : "BEHS",
       "eva" : 8011471,
       "latlong" : [
@@ -20322,24 +20331,6 @@
       "name" : "Endingen am Kaiserstuhl"
    },
    {
-      "ds100" : "TEND",
-      "eva" : 8029356,
-      "latlong" : [
-         48.257384,
-         8.83688
-      ],
-      "name" : "Endingen(Württ)"
-   },
-   {
-      "ds100" : "KENG",
-      "eva" : 8070368,
-      "latlong" : [
-         50.424945,
-         7.156853
-      ],
-      "name" : "Engeln"
-   },
-   {
       "ds100" : "KENL",
       "eva" : 8001789,
       "latlong" : [
@@ -20493,11 +20484,20 @@
       "name" : "Enspel"
    },
    {
-      "ds100" : "PQKEF",
+      "ds100" : "RKEFN",
       "eva" : 370051,
       "latlong" : [
-         49.011029,
-         8.357809
+         49.010088,
+         8.359213
+      ],
+      "name" : "Entenfang, Karlsruhe"
+   },
+   {
+      "ds100" : "RKEFO",
+      "eva" : 724202,
+      "latlong" : [
+         49.009998,
+         8.359276
       ],
       "name" : "Entenfang, Karlsruhe"
    },
@@ -20943,15 +20943,6 @@
       "name" : "Ermatingen"
    },
    {
-      "ds100" : "XSEMS",
-      "eva" : 8506162,
-      "latlong" : [
-         47.6752332637346,
-         9.08544469808097
-      ],
-      "name" : "Ermatingen URh"
-   },
-   {
       "ds100" : "ONER",
       "eva" : 8400216,
       "latlong" : [
@@ -21078,15 +21069,6 @@
       "name" : "Erzingen(Baden)"
    },
    {
-      "ds100" : "TERZ",
-      "eva" : 8029357,
-      "latlong" : [
-         48.255409,
-         8.815709
-      ],
-      "name" : "Erzingen(Württ)"
-   },
-   {
       "ds100" : "XDE",
       "eva" : 8600508,
       "latlong" : [
@@ -21184,15 +21166,6 @@
          11.187945
       ],
       "name" : "Eschenlohe"
-   },
-   {
-      "ds100" : "NESD",
-      "eva" : 8070857,
-      "latlong" : [
-         49.86674,
-         10.165791
-      ],
-      "name" : "Escherndorf-Vogelsburg"
    },
    {
       "ds100" : "FEN",
@@ -21319,15 +21292,6 @@
          9.455955
       ],
       "name" : "Espenau-Mönchehof"
-   },
-   {
-      "ds100" : "AESL",
-      "eva" : 8071334,
-      "latlong" : [
-         53.487691,
-         9.272382
-      ],
-      "name" : "Essel"
    },
    {
       "ds100" : "EE",
@@ -21564,6 +21528,15 @@
       "name" : "Essen-Überruhr"
    },
    {
+      "ds100" : "PQKEW",
+      "eva" : 360626,
+      "latlong" : [
+         49.009315,
+         8.431828
+      ],
+      "name" : "Essenweinstraße, Karlsruhe"
+   },
+   {
       "ds100" : "PQKES",
       "eva" : 370626,
       "latlong" : [
@@ -21681,6 +21654,24 @@
       "name" : "Ettlingen West"
    },
    {
+      "ds100" : "PQKEE",
+      "eva" : 121012,
+      "latlong" : [
+         49.005917,
+         8.403611
+      ],
+      "name" : "Ettlinger Tor/Staatstheater (U), Karlsruhe"
+   },
+   {
+      "ds100" : "PQKEO",
+      "eva" : 131012,
+      "latlong" : [
+         49.005773,
+         8.403593
+      ],
+      "name" : "Ettlinger Tor/Staatstheater (U), Karlsruhe"
+   },
+   {
       "ds100" : "RKME",
       "eva" : 901012,
       "latlong" : [
@@ -21789,6 +21780,24 @@
       "name" : "Eupen"
    },
    {
+      "ds100" : "PQKEA",
+      "eva" : 140060,
+      "latlong" : [
+         49.00998,
+         8.39463
+      ],
+      "name" : "Europaplatz/Postgalerie (U), Karlsruhe"
+   },
+   {
+      "ds100" : "RKSEU",
+      "eva" : 401004,
+      "latlong" : [
+         49.010088,
+         8.393579
+      ],
+      "name" : "Europaplatz/Postgalerie (U), Karlsruhe"
+   },
+   {
       "ds100" : "PQKEU",
       "eva" : 501004,
       "latlong" : [
@@ -21798,11 +21807,47 @@
       "name" : "Europaplatz/Postgalerie (U), Karlsruhe"
    },
    {
+      "ds100" : "PQKER",
+      "eva" : 720619,
+      "latlong" : [
+         49.010088,
+         8.393705
+      ],
+      "name" : "Europaplatz/Postgalerie (U), Karlsruhe"
+   },
+   {
+      "ds100" : "PQKE",
+      "eva" : 375031,
+      "latlong" : [
+         49.010007,
+         8.394487
+      ],
+      "name" : "Europaplatz/Postgalerie, Karlsruhe"
+   },
+   {
       "ds100" : "RKSEP",
       "eva" : 721358,
       "latlong" : [
          49.010104,
          8.393553
+      ],
+      "name" : "Europaplatz/Postgalerie, Karlsruhe"
+   },
+   {
+      "ds100" : "RKSE",
+      "eva" : 722002,
+      "latlong" : [
+         49.009405,
+         8.394891
+      ],
+      "name" : "Europaplatz/Postgalerie, Karlsruhe"
+   },
+   {
+      "ds100" : "RKSEK",
+      "eva" : 723614,
+      "latlong" : [
+         49.009647,
+         8.395017
       ],
       "name" : "Europaplatz/Postgalerie, Karlsruhe"
    },
@@ -22374,15 +22419,6 @@
       "name" : "Ferno-Lonate Pozzolo"
    },
    {
-      "ds100" : "XIFE",
-      "eva" : 8300209,
-      "latlong" : [
-         44.843119,
-         11.603837
-      ],
-      "name" : "Ferrara"
-   },
-   {
       "ds100" : "NFT",
       "eva" : 8001978,
       "latlong" : [
@@ -22851,6 +22887,15 @@
       "name" : "Forbach(Schwarzw)"
    },
    {
+      "ds100" : "PQRFH",
+      "eva" : 720557,
+      "latlong" : [
+         48.978805,
+         8.317728
+      ],
+      "name" : "Forchheim Hallenbad, Rheinstetten"
+   },
+   {
       "ds100" : "PQRFB",
       "eva" : 720562,
       "latlong" : [
@@ -22858,6 +22903,15 @@
          8.316833
       ],
       "name" : "Forchheim Hallenbad, Rheinstetten"
+   },
+   {
+      "ds100" : "PQRFA",
+      "eva" : 723911,
+      "latlong" : [
+         48.974724,
+         8.312127
+      ],
+      "name" : "Forchheim Hauptstraße, Rheinstetten"
    },
    {
       "ds100" : "PQRFS",
@@ -22892,6 +22946,15 @@
       "latlong" : [
          48.970273,
          8.307766
+      ],
+      "name" : "Forchheim Oberfeldstraße, Rheinstetten"
+   },
+   {
+      "ds100" : "PQRFF",
+      "eva" : 720614,
+      "latlong" : [
+         48.970266,
+         8.307822
       ],
       "name" : "Forchheim Oberfeldstraße, Rheinstetten"
    },
@@ -24300,6 +24363,15 @@
       "name" : "Friedrichstal Mitte, Stutensee"
    },
    {
+      "ds100" : "PQSFT",
+      "eva" : 721310,
+      "latlong" : [
+         49.104304,
+         8.475228
+      ],
+      "name" : "Friedrichstal Mitte, Stutensee"
+   },
+   {
       "ds100" : "PQSFN",
       "eva" : 721297,
       "latlong" : [
@@ -24307,6 +24379,24 @@
          8.47671
       ],
       "name" : "Friedrichstal Nord, Stutensee"
+   },
+   {
+      "ds100" : "PQSFR",
+      "eva" : 721312,
+      "latlong" : [
+         49.108574,
+         8.476378
+      ],
+      "name" : "Friedrichstal Nord, Stutensee"
+   },
+   {
+      "ds100" : "PQSFS",
+      "eva" : 721300,
+      "latlong" : [
+         49.101113,
+         8.474473
+      ],
+      "name" : "Friedrichstal Saint-Riquier-Platz, Stutensee"
    },
    {
       "ds100" : "PQSFP",
@@ -24397,15 +24487,6 @@
          11.301957
       ],
       "name" : "Friesdorf"
-   },
-   {
-      "ds100" : "LFIO",
-      "eva" : 8011587,
-      "latlong" : [
-         51.59775,
-         11.323154
-      ],
-      "name" : "Friesdorf Ost"
    },
    {
       "ds100" : "RFH",
@@ -24937,15 +25018,6 @@
          8.798832
       ],
       "name" : "Gallarate"
-   },
-   {
-      "ds100" : "WGAL",
-      "eva" : 8011593,
-      "latlong" : [
-         53.516641,
-         12.129379
-      ],
-      "name" : "Gallin"
    },
    {
       "ds100" : "TGAM",
@@ -25983,15 +26055,6 @@
       "name" : "Gersfeld(Rhön)"
    },
    {
-      "ds100" : "TGSN",
-      "eva" : 8007075,
-      "latlong" : [
-         48.624836,
-         10.022662
-      ],
-      "name" : "Gerstetten"
-   },
-   {
       "ds100" : "MGHF",
       "eva" : 8002256,
       "latlong" : [
@@ -26523,15 +26586,6 @@
       "name" : "Gnarrenburg"
    },
    {
-      "ds100" : "AGNBN",
-      "eva" : 8070036,
-      "latlong" : [
-         53.393287,
-         9.015403
-      ],
-      "name" : "Gnarrenburg Nord"
-   },
-   {
       "ds100" : "WGNV",
       "eva" : 8011646,
       "latlong" : [
@@ -26872,15 +26926,6 @@
          12.983435
       ],
       "name" : "Gotteszell"
-   },
-   {
-      "ds100" : "XSGL",
-      "eva" : 8506163,
-      "latlong" : [
-         47.6646656888434,
-         9.13467870405456
-      ],
-      "name" : "Gottlieben (Schifflände)"
    },
    {
       "ds100" : "RG",
@@ -28134,15 +28179,6 @@
       "name" : "Gräfenroda"
    },
    {
-      "ds100" : "LGRK",
-      "eva" : 8011685,
-      "latlong" : [
-         51.602127,
-         11.404255
-      ],
-      "name" : "Gräfenstuhl-Klippmühle"
-   },
-   {
       "ds100" : "UGTA",
       "eva" : 8011687,
       "latlong" : [
@@ -28332,15 +28368,6 @@
       "name" : "Grüntal-Wittlensweiler"
    },
    {
-      "ds100" : "NSDT",
-      "eva" : 8070669,
-      "latlong" : [
-         49.064357,
-         12.944043
-      ],
-      "name" : "Gstadt(Wanderbahn)"
-   },
-   {
       "ds100" : "BGU",
       "eva" : 8010357,
       "latlong" : [
@@ -28494,15 +28521,6 @@
       "name" : "Gurten OÖ"
    },
    {
-      "ds100" : "TGSS",
-      "eva" : 8007074,
-      "latlong" : [
-         48.639901,
-         9.957623
-      ],
-      "name" : "Gussenstadt"
-   },
-   {
       "ds100" : "KGUS",
       "eva" : 8002477,
       "latlong" : [
@@ -28618,15 +28636,6 @@
          13.737704
       ],
       "name" : "Göhren(Rügen)"
-   },
-   {
-      "ds100" : "FGLD",
-      "eva" : 8070257,
-      "latlong" : [
-         49.599376,
-         8.016444
-      ],
-      "name" : "Göllheim-Dreisen"
    },
    {
       "ds100" : "RGOE",
@@ -29043,15 +29052,6 @@
       "name" : "Hagen(Han)"
    },
    {
-      "ds100" : "AHGN",
-      "eva" : 8071337,
-      "latlong" : [
-         53.550361,
-         9.460078
-      ],
-      "name" : "Hagen(Kr. Stade)"
-   },
-   {
       "ds100" : "EHGI",
       "eva" : 8002512,
       "latlong" : [
@@ -29169,6 +29169,15 @@
       "name" : "Hagsfeld Bahnhof, Karlsruhe"
    },
    {
+      "ds100" : "PQKHA",
+      "eva" : 721068,
+      "latlong" : [
+         49.027599,
+         8.453842
+      ],
+      "name" : "Hagsfeld Bahnhof, Karlsruhe"
+   },
+   {
       "ds100" : "PQKHG",
       "eva" : 720672,
       "latlong" : [
@@ -29178,11 +29187,29 @@
       "name" : "Hagsfeld Geroldsäcker, Karlsruhe"
    },
    {
+      "ds100" : "PQKHE",
+      "eva" : 721072,
+      "latlong" : [
+         49.032444,
+         8.455317
+      ],
+      "name" : "Hagsfeld Geroldsäcker, Karlsruhe"
+   },
+   {
       "ds100" : "PQKHJ",
       "eva" : 720555,
       "latlong" : [
          49.035898,
          8.456256
+      ],
+      "name" : "Hagsfeld Jenaer Straße, Karlsruhe"
+   },
+   {
+      "ds100" : "PQKHN",
+      "eva" : 720559,
+      "latlong" : [
+         49.035905,
+         8.456189
       ],
       "name" : "Hagsfeld Jenaer Straße, Karlsruhe"
    },
@@ -29203,6 +29230,24 @@
          8.460884
       ],
       "name" : "Hagsfeld Reitschulschlag, Karlsruhe"
+   },
+   {
+      "ds100" : "PQKHR",
+      "eva" : 723594,
+      "latlong" : [
+         49.043024,
+         8.460791
+      ],
+      "name" : "Hagsfeld Reitschulschlag, Karlsruhe"
+   },
+   {
+      "ds100" : "PQKHS",
+      "eva" : 723859,
+      "latlong" : [
+         49.02448,
+         8.449617
+      ],
+      "name" : "Hagsfeld Süd, Karlsruhe"
    },
    {
       "ds100" : "PQKHD",
@@ -31005,15 +31050,6 @@
       "name" : "Hatting in Tirol"
    },
    {
-      "ds100" : "EHTM",
-      "eva" : 8002640,
-      "latlong" : [
-         51.397198,
-         7.180538
-      ],
-      "name" : "Hattingen(R) Mitte"
-   },
-   {
       "ds100" : "EHAT",
       "eva" : 8002639,
       "latlong" : [
@@ -31021,6 +31057,15 @@
          7.169865
       ],
       "name" : "Hattingen(Ruhr)"
+   },
+   {
+      "ds100" : "EHTM",
+      "eva" : 8002640,
+      "latlong" : [
+         51.397198,
+         7.180538
+      ],
+      "name" : "Hattingen(Ruhr) Mitte"
    },
    {
       "ds100" : "HHTF",
@@ -31095,11 +31140,83 @@
       "name" : "Haupeltshofen"
    },
    {
+      "ds100" : "PQKHP",
+      "eva" : 363402,
+      "latlong" : [
+         49.013468,
+         8.431091
+      ],
+      "name" : "Hauptfriedhof, Karlsruhe"
+   },
+   {
+      "ds100" : "PQKHX",
+      "eva" : 364402,
+      "latlong" : [
+         49.013477,
+         8.431046
+      ],
+      "name" : "Hauptfriedhof, Karlsruhe"
+   },
+   {
+      "ds100" : "PQKHV",
+      "eva" : 372402,
+      "latlong" : [
+         49.013252,
+         8.428322
+      ],
+      "name" : "Hauptfriedhof, Karlsruhe"
+   },
+   {
+      "ds100" : "PQKHK",
+      "eva" : 373402,
+      "latlong" : [
+         49.012982,
+         8.431127
+      ],
+      "name" : "Hauptfriedhof, Karlsruhe"
+   },
+   {
+      "ds100" : "PQKHQ",
+      "eva" : 375402,
+      "latlong" : [
+         49.013594,
+         8.430884
+      ],
+      "name" : "Hauptfriedhof, Karlsruhe"
+   },
+   {
       "ds100" : "PQKHC",
       "eva" : 720576,
       "latlong" : [
          49.013115,
          8.431048
+      ],
+      "name" : "Hauptfriedhof, Karlsruhe"
+   },
+   {
+      "ds100" : "PQKHM",
+      "eva" : 721454,
+      "latlong" : [
+         49.013791,
+         8.430138
+      ],
+      "name" : "Hauptfriedhof, Karlsruhe"
+   },
+   {
+      "ds100" : "PQKH",
+      "eva" : 723618,
+      "latlong" : [
+         49.013639,
+         8.429212
+      ],
+      "name" : "Hauptfriedhof, Karlsruhe"
+   },
+   {
+      "ds100" : "PQKHH",
+      "eva" : 723619,
+      "latlong" : [
+         49.013315,
+         8.428223
       ],
       "name" : "Hauptfriedhof, Karlsruhe"
    },
@@ -31131,10 +31248,10 @@
       "name" : "Hauptwil"
    },
    {
-      "ds100" : "PQKBM",
+      "ds100" : "RKHB",
       "eva" : 721372,
       "latlong" : [
-         49.033528,
+         49.033532,
          8.376661
       ],
       "name" : "Haus Bethlehem, Karlsruhe"
@@ -32119,15 +32236,6 @@
          11.183186
       ],
       "name" : "Heldrungen"
-   },
-   {
-      "ds100" : "BHEL",
-      "eva" : 8011853,
-      "latlong" : [
-         52.278758,
-         14.478219
-      ],
-      "name" : "Helenesee"
    },
    {
       "ds100" : "NHB",
@@ -33318,15 +33426,6 @@
       "name" : "Hinterweidenthal Ort"
    },
    {
-      "ds100" : "SHW",
-      "eva" : 8079147,
-      "latlong" : [
-         49.203132,
-         7.773047
-      ],
-      "name" : "Hinterweidenthal Ost"
-   },
-   {
       "ds100" : "RHIZ",
       "eva" : 8002848,
       "latlong" : [
@@ -33397,6 +33496,15 @@
          7.681008
       ],
       "name" : "Hirschhorn(Pfalz)"
+   },
+   {
+      "ds100" : "PQKHW",
+      "eva" : 363403,
+      "latlong" : [
+         49.017486,
+         8.439496
+      ],
+      "name" : "Hirtenweg/Technologiepark, Karlsruhe"
    },
    {
       "ds100" : "PQKHT",
@@ -33543,11 +33651,11 @@
       "name" : "Hochstetten"
    },
    {
-      "ds100" : "PQLHA",
+      "ds100" : "RHOSA",
       "eva" : 721187,
       "latlong" : [
-         49.13254,
-         8.418277
+         49.132539,
+         8.418281
       ],
       "name" : "Hochstetten Altenheim, Linkenheim-Hochstetten"
    },
@@ -33775,15 +33883,6 @@
          7.642479
       ],
       "name" : "Hohegrete"
-   },
-   {
-      "ds100" : "BHOW",
-      "eva" : 8080710,
-      "latlong" : [
-         52.672398,
-         13.271342
-      ],
-      "name" : "Hohen Neuendorf West"
    },
    {
       "ds100" : "BHN",
@@ -34443,15 +34542,6 @@
       "name" : "Horn(Bodensee)"
    },
    {
-      "ds100" : "XSHBS",
-      "eva" : 8506111,
-      "latlong" : [
-         47.496639074807,
-         9.46295013675514
-      ],
-      "name" : "Horn(Bodensee), SF"
-   },
-   {
       "ds100" : "EHBM",
       "eva" : 8003000,
       "latlong" : [
@@ -34504,6 +34594,15 @@
          14.436597
       ],
       "name" : "Horni Kamenice"
+   },
+   {
+      "ds100" : "OTHPO",
+      "eva" : 5401121,
+      "latlong" : [
+         50.422788,
+         14.386381
+      ],
+      "name" : "Horni Pocaply"
    },
    {
       "ds100" : "XTHP",
@@ -34686,6 +34785,15 @@
       "name" : "Hranice na Morave"
    },
    {
+      "ds100" : "OTHDL",
+      "eva" : 5401192,
+      "latlong" : [
+         50.48538,
+         14.173697
+      ],
+      "name" : "Hrdly"
+   },
+   {
       "ds100" : "XTHY",
       "eva" : 5401220,
       "latlong" : [
@@ -34693,6 +34801,15 @@
          12.581061
       ],
       "name" : "Hrebeny"
+   },
+   {
+      "ds100" : "OTHCB",
+      "eva" : 5401200,
+      "latlong" : [
+         50.458106,
+         14.229798
+      ],
+      "name" : "Hrobce"
    },
    {
       "ds100" : "RHAR",
@@ -34927,6 +35044,15 @@
          11.97177
       ],
       "name" : "Hämerten"
+   },
+   {
+      "ds100" : "PQKEH",
+      "eva" : 377044,
+      "latlong" : [
+         49.011194,
+         8.369299
+      ],
+      "name" : "Händelstraße, Karlsruhe"
    },
    {
       "ds100" : "RKEH",
@@ -35226,6 +35352,15 @@
       "name" : "Höxter-Ottbergen"
    },
    {
+      "ds100" : "PQKHY",
+      "eva" : 377505,
+      "latlong" : [
+         49.005494,
+         8.373119
+      ],
+      "name" : "Hübschstraße, Karlsruhe"
+   },
+   {
       "ds100" : "PQKHB",
       "eva" : 721382,
       "latlong" : [
@@ -35242,15 +35377,6 @@
          6.274149
       ],
       "name" : "Hückelhoven-Baal"
-   },
-   {
-      "ds100" : "RHFH",
-      "eva" : 8007439,
-      "latlong" : [
-         49.291132,
-         9.086804
-      ],
-      "name" : "Hüffenhardt"
    },
    {
       "ds100" : "RHFM",
@@ -35305,15 +35431,6 @@
          9.642462
       ],
       "name" : "Hütten"
-   },
-   {
-      "ds100" : "AHTB",
-      "eva" : 8007119,
-      "latlong" : [
-         53.273296,
-         8.962154
-      ],
-      "name" : "Hüttenbusch"
    },
    {
       "ds100" : "UHUE",
@@ -39105,15 +39222,6 @@
       "name" : "Klostermansfeld"
    },
    {
-      "ds100" : "LKMR",
-      "eva" : 8010204,
-      "latlong" : [
-         51.590999,
-         11.498588
-      ],
-      "name" : "Klostermansfeld Randsiedlung"
-   },
-   {
       "ds100" : "RKLB",
       "eva" : 8003343,
       "latlong" : [
@@ -39159,6 +39267,15 @@
       "name" : "Knesebeck"
    },
    {
+      "ds100" : "PQKEG",
+      "eva" : 370106,
+      "latlong" : [
+         49.033181,
+         8.338439
+      ],
+      "name" : "Knielingen Eggensteiner Straße, Karlsruhe"
+   },
+   {
       "ds100" : "RKEG",
       "eva" : 723871,
       "latlong" : [
@@ -39166,6 +39283,15 @@
          8.338104
       ],
       "name" : "Knielingen Eggensteiner Straße, Karlsruhe"
+   },
+   {
+      "ds100" : "PQKRW",
+      "eva" : 370105,
+      "latlong" : [
+         49.030125,
+         8.341423
+      ],
+      "name" : "Knielingen Herweghstraße, Karlsruhe"
    },
    {
       "ds100" : "RKIH",
@@ -39186,6 +39312,15 @@
       "name" : "Knielingen Rheinbergstraße (Schleife), Karlsruhe"
    },
    {
+      "ds100" : "PQKSI",
+      "eva" : 362104,
+      "latlong" : [
+         49.025235,
+         8.346224
+      ],
+      "name" : "Knielingen Siemens, Karlsruhe"
+   },
+   {
       "ds100" : "RKIS",
       "eva" : 721520,
       "latlong" : [
@@ -39196,10 +39331,19 @@
    },
    {
       "ds100" : "PQKKA",
+      "eva" : 364593,
+      "latlong" : [
+         49.018897,
+         8.375277
+      ],
+      "name" : "Knielinger Allee/Städt. Klinikum, Karlsruhe"
+   },
+   {
+      "ds100" : "RKKN",
       "eva" : 721389,
       "latlong" : [
-         49.018841,
-         8.375443
+         49.018843,
+         8.375447
       ],
       "name" : "Knielinger Allee/Städt. Klinikum, Karlsruhe"
    },
@@ -39456,6 +39600,33 @@
       "name" : "Komarom"
    },
    {
+      "ds100" : "PQKKZ",
+      "eva" : 121013,
+      "latlong" : [
+         49.002995,
+         8.40326
+      ],
+      "name" : "Kongresszentrum (U), Karlsruhe"
+   },
+   {
+      "ds100" : "PQKOU",
+      "eva" : 131013,
+      "latlong" : [
+         49.002888,
+         8.403251
+      ],
+      "name" : "Kongresszentrum (U), Karlsruhe"
+   },
+   {
+      "ds100" : "PQKOZ",
+      "eva" : 141013,
+      "latlong" : [
+         49.002168,
+         8.403062
+      ],
+      "name" : "Kongresszentrum (U), Karlsruhe"
+   },
+   {
       "ds100" : "RKMK",
       "eva" : 901013,
       "latlong" : [
@@ -39470,6 +39641,15 @@
       "latlong" : [
          49.003793,
          8.404054
+      ],
+      "name" : "Kongresszentrum, Karlsruhe"
+   },
+   {
+      "ds100" : "PQKV",
+      "eva" : 720472,
+      "latlong" : [
+         49.00384,
+         8.403979
       ],
       "name" : "Kongresszentrum, Karlsruhe"
    },
@@ -39544,6 +39724,15 @@
          6.573757
       ],
       "name" : "Konz Mitte"
+   },
+   {
+      "ds100" : "PQKKB",
+      "eva" : 373510,
+      "latlong" : [
+         49.003804,
+         8.400096
+      ],
+      "name" : "Konzerthaus, Karlsruhe"
    },
    {
       "ds100" : "PQKKH",
@@ -39645,15 +39834,6 @@
       "name" : "Korschenbroich"
    },
    {
-      "ds100" : "XDKS",
-      "eva" : 8601343,
-      "latlong" : [
-         55.357201,
-         11.135125
-      ],
-      "name" : "Korsoer st"
-   },
-   {
       "ds100" : "XBKO",
       "eva" : 8800249,
       "latlong" : [
@@ -39753,7 +39933,7 @@
       "name" : "Krakow Glowny"
    },
    {
-      "ds100" : "OPKRP",
+      "ds100" : "XPKP",
       "eva" : 5100240,
       "latlong" : [
          50.035092,
@@ -40158,13 +40338,49 @@
       "name" : "Kronberg(Taunus)"
    },
    {
+      "ds100" : "PQKKD",
+      "eva" : 131002,
+      "latlong" : [
+         49.009261,
+         8.410811
+      ],
+      "name" : "Kronenplatz (U), Karlsruhe"
+   },
+   {
       "ds100" : "RKBP",
-      "eva" : 721394,
+      "eva" : 301002,
       "latlong" : [
          49.009426,
          8.408456
       ],
       "name" : "Kronenplatz (U), Karlsruhe"
+   },
+   {
+      "ds100" : "RKBPU",
+      "eva" : 401002,
+      "latlong" : [
+         49.009243,
+         8.410991
+      ],
+      "name" : "Kronenplatz (U), Karlsruhe"
+   },
+   {
+      "ds100" : "PQKBU",
+      "eva" : 501002,
+      "latlong" : [
+         49.009378,
+         8.410011
+      ],
+      "name" : "Kronenplatz (U), Karlsruhe"
+   },
+   {
+      "ds100" : "PQKKE",
+      "eva" : 364080,
+      "latlong" : [
+         49.008982,
+         8.410146
+      ],
+      "name" : "Kronenplatz, Karlsruhe"
    },
    {
       "ds100" : "RKBPS",
@@ -40534,6 +40750,15 @@
          14.075341
       ],
       "name" : "Kurort Rathen"
+   },
+   {
+      "ds100" : "PQKKU",
+      "eva" : 361105,
+      "latlong" : [
+         49.030026,
+         8.376203
+      ],
+      "name" : "Kurt-Schumacher-Straße, Karlsruhe"
    },
    {
       "ds100" : "PQKKS",
@@ -41193,11 +41418,20 @@
       "name" : "Kövenig"
    },
    {
-      "ds100" : "PQKKG",
+      "ds100" : "RKKK",
+      "eva" : 723921,
+      "latlong" : [
+         49.006106,
+         8.366881
+      ],
+      "name" : "Kühler Krug, Karlsruhe"
+   },
+   {
+      "ds100" : "PQKKK",
       "eva" : 723922,
       "latlong" : [
-         49.006077,
-         8.366821
+         49.006079,
+         8.366818
       ],
       "name" : "Kühler Krug, Karlsruhe"
    },
@@ -41533,6 +41767,24 @@
          8.283476
       ],
       "name" : "Lambsheim"
+   },
+   {
+      "ds100" : "PQKLM",
+      "eva" : 366058,
+      "latlong" : [
+         49.013288,
+         8.354521
+      ],
+      "name" : "Lameyplatz, Karlsruhe"
+   },
+   {
+      "ds100" : "PQKLP",
+      "eva" : 371058,
+      "latlong" : [
+         49.013162,
+         8.354458
+      ],
+      "name" : "Lameyplatz, Karlsruhe"
    },
    {
       "ds100" : "RKSL",
@@ -42163,6 +42415,15 @@
          5.3891668319702
       ],
       "name" : "Lansingerland-Zoetermeer"
+   },
+   {
+      "ds100" : "OALSO",
+      "eva" : 8101178,
+      "latlong" : [
+         48.460991,
+         14.521471
+      ],
+      "name" : "Lasberg-St. Oswald"
    },
    {
       "ds100" : "OJLAS",
@@ -43732,10 +43993,19 @@
    },
    {
       "ds100" : "PQKL",
+      "eva" : 364507,
+      "latlong" : [
+         49.004317,
+         8.384643
+      ],
+      "name" : "Lessingstraße, Karlsruhe"
+   },
+   {
+      "ds100" : "RKLE",
       "eva" : 721405,
       "latlong" : [
-         49.004435,
-         8.383842
+         49.004434,
+         8.383843
       ],
       "name" : "Lessingstraße, Karlsruhe"
    },
@@ -43990,6 +44260,24 @@
          2.769966
       ],
       "name" : "Lezignan"
+   },
+   {
+      "ds100" : "OTLVL",
+      "eva" : 5401734,
+      "latlong" : [
+         50.188924,
+         14.37243
+      ],
+      "name" : "Libcice n.Vlt.-Letky"
+   },
+   {
+      "ds100" : "OTLNV",
+      "eva" : 5401733,
+      "latlong" : [
+         50.199828,
+         14.364322
+      ],
+      "name" : "Libcice nad Vltavou"
    },
    {
       "ds100" : "XTL",
@@ -44622,24 +44910,6 @@
       "name" : "Litija"
    },
    {
-      "ds100" : "XTLM",
-      "eva" : 5401791,
-      "latlong" : [
-         50.532482,
-         14.138833
-      ],
-      "name" : "Litomerice mesto"
-   },
-   {
-      "ds100" : "XILI",
-      "eva" : 8300157,
-      "latlong" : [
-         43.553983,
-         10.336626
-      ],
-      "name" : "Livorno Centrale"
-   },
-   {
       "ds100" : "XBLJ",
       "eva" : 8800235,
       "latlong" : [
@@ -44989,6 +45259,15 @@
          14.059588
       ],
       "name" : "Lovosice"
+   },
+   {
+      "ds100" : "OTLSM",
+      "eva" : 5401840,
+      "latlong" : [
+         50.521732,
+         14.045492
+      ],
+      "name" : "Lovosice mesto"
    },
    {
       "ds100" : "HLOX",
@@ -46728,15 +47007,6 @@
       "name" : "Mammendorf"
    },
    {
-      "ds100" : "XSMMS",
-      "eva" : 8506155,
-      "latlong" : [
-         47.6482873603292,
-         8.91673503093438
-      ],
-      "name" : "Mammern URh"
-   },
-   {
       "ds100" : "XSMM",
       "eva" : 8506137,
       "latlong" : [
@@ -46780,15 +47050,6 @@
          10.834224
       ],
       "name" : "Manndorf"
-   },
-   {
-      "ds100" : "XSMBS",
-      "eva" : 8506160,
-      "latlong" : [
-         47.6751705431517,
-         9.04756474024539
-      ],
-      "name" : "Mannenbach URh"
    },
    {
       "ds100" : "XSMB",
@@ -47286,6 +47547,24 @@
       "name" : "Marktoberdorf Schule"
    },
    {
+      "ds100" : "PQKMZ",
+      "eva" : 121003,
+      "latlong" : [
+         49.009737,
+         8.401669
+      ],
+      "name" : "Marktplatz (Kaiserstraße U), Karlsruhe"
+   },
+   {
+      "ds100" : "RKMAU",
+      "eva" : 301003,
+      "latlong" : [
+         49.009576,
+         8.403152
+      ],
+      "name" : "Marktplatz (Kaiserstraße U), Karlsruhe"
+   },
+   {
       "ds100" : "PQKMU",
       "eva" : 401003,
       "latlong" : [
@@ -47295,11 +47574,56 @@
       "name" : "Marktplatz (Kaiserstraße U), Karlsruhe"
    },
    {
+      "ds100" : "PQKMR",
+      "eva" : 601003,
+      "latlong" : [
+         49.009737,
+         8.401543
+      ],
+      "name" : "Marktplatz (Kaiserstraße U), Karlsruhe"
+   },
+   {
+      "ds100" : "PQKPU",
+      "eva" : 131011,
+      "latlong" : [
+         49.008209,
+         8.403728
+      ],
+      "name" : "Marktplatz (Pyramide U), Karlsruhe"
+   },
+   {
+      "ds100" : "PQKPY",
+      "eva" : 141011,
+      "latlong" : [
+         49.008299,
+         8.403719
+      ],
+      "name" : "Marktplatz (Pyramide U), Karlsruhe"
+   },
+   {
       "ds100" : "PQKPZ",
       "eva" : 151011,
       "latlong" : [
          49.00896,
          8.40376
+      ],
+      "name" : "Marktplatz (Pyramide U), Karlsruhe"
+   },
+   {
+      "ds100" : "PQKPM",
+      "eva" : 301011,
+      "latlong" : [
+         49.009117,
+         8.403853
+      ],
+      "name" : "Marktplatz (Pyramide U), Karlsruhe"
+   },
+   {
+      "ds100" : "RKMAP",
+      "eva" : 401011,
+      "latlong" : [
+         49.009117,
+         8.403808
       ],
       "name" : "Marktplatz (Pyramide U), Karlsruhe"
    },
@@ -47592,11 +47916,38 @@
       "name" : "Massing"
    },
    {
+      "ds100" : "RKMTY",
+      "eva" : 366062,
+      "latlong" : [
+         49.002168,
+         8.394361
+      ],
+      "name" : "Mathystraße, Karlsruhe"
+   },
+   {
       "ds100" : "PQKMY",
       "eva" : 367062,
       "latlong" : [
          49.002532,
          8.393813
+      ],
+      "name" : "Mathystraße, Karlsruhe"
+   },
+   {
+      "ds100" : "RKMYW",
+      "eva" : 723622,
+      "latlong" : [
+         49.002699,
+         8.393228
+      ],
+      "name" : "Mathystraße, Karlsruhe"
+   },
+   {
+      "ds100" : "PQKM",
+      "eva" : 723623,
+      "latlong" : [
+         49.002528,
+         8.393812
       ],
       "name" : "Mathystraße, Karlsruhe"
    },
@@ -48330,15 +48681,6 @@
       "name" : "Mengersgereuth-Hämmern Ost"
    },
    {
-      "ds100" : "RMEN",
-      "eva" : 8077779,
-      "latlong" : [
-         48.0067397,
-         9.1609604
-      ],
-      "name" : "Menningen-Leitishofen"
-   },
-   {
       "ds100" : "XFME",
       "eva" : 8700150,
       "latlong" : [
@@ -48681,15 +49023,6 @@
       "name" : "Metzingen(Württ)"
    },
    {
-      "ds100" : "TNHU",
-      "eva" : 8070678,
-      "latlong" : [
-         48.532647,
-         9.307106
-      ],
-      "name" : "Metzingen-Neuhausen"
-   },
-   {
       "ds100" : "XFMU",
       "eva" : 8714732,
       "latlong" : [
@@ -48913,24 +49246,6 @@
          14.336654
       ],
       "name" : "Mikulasovice dolni nadrazi"
-   },
-   {
-      "ds100" : "XTMHN",
-      "eva" : 5401976,
-      "latlong" : [
-         50.956468,
-         14.390211
-      ],
-      "name" : "Mikulasovice horni nadrazi"
-   },
-   {
-      "ds100" : "XTMHS",
-      "eva" : 5401977,
-      "latlong" : [
-         50.962356,
-         14.357535
-      ],
-      "name" : "Mikulasovice stred"
    },
    {
       "ds100" : "OPMKU",
@@ -49284,6 +49599,15 @@
       "name" : "Mlada Boleslav mesto"
    },
    {
+      "ds100" : "OTMVY",
+      "eva" : 5402019,
+      "latlong" : [
+         50.319079,
+         14.347539
+      ],
+      "name" : "Mlcechvosty"
+   },
+   {
       "ds100" : "OPMLK",
       "eva" : 5102284,
       "latlong" : [
@@ -49379,6 +49703,15 @@
       "latlong" : [
          49.015707,
          8.375209
+      ],
+      "name" : "Moltkestraße/Städt. Klinikum, Karlsruhe"
+   },
+   {
+      "ds100" : "PQKSM",
+      "eva" : 723631,
+      "latlong" : [
+         49.015374,
+         8.375061
       ],
       "name" : "Moltkestraße/Städt. Klinikum, Karlsruhe"
    },
@@ -49552,15 +49885,6 @@
          9.991744
       ],
       "name" : "Moorbekhalle"
-   },
-   {
-      "ds100" : "SMBT",
-      "eva" : 8079265,
-      "latlong" : [
-         49.165954,
-         7.754959
-      ],
-      "name" : "Moosbachtal"
    },
    {
       "ds100" : "XAMB",
@@ -50274,6 +50598,24 @@
       "name" : "Mörlenbach"
    },
    {
+      "ds100" : "PQRMG",
+      "eva" : 374900,
+      "latlong" : [
+         48.956971,
+         8.285322
+      ],
+      "name" : "Mörsch Am Hang, Rheinstetten"
+   },
+   {
+      "ds100" : "PQRMH",
+      "eva" : 723651,
+      "latlong" : [
+         48.956494,
+         8.285564
+      ],
+      "name" : "Mörsch Am Hang, Rheinstetten"
+   },
+   {
       "ds100" : "PQRMA",
       "eva" : 723652,
       "latlong" : [
@@ -50290,6 +50632,15 @@
          8.284194
       ],
       "name" : "Mörsch Bach-West, Rheinstetten"
+   },
+   {
+      "ds100" : "PQRMM",
+      "eva" : 724171,
+      "latlong" : [
+         48.952925,
+         8.290931
+      ],
+      "name" : "Mörsch Merkurstraße, Rheinstetten"
    },
    {
       "ds100" : "PQRMK",
@@ -50310,6 +50661,24 @@
       "name" : "Mörsch Narzissenstraße, Rheinstetten"
    },
    {
+      "ds100" : "PQRMN",
+      "eva" : 721815,
+      "latlong" : [
+         48.965834,
+         8.302033
+      ],
+      "name" : "Mörsch Narzissenstraße, Rheinstetten"
+   },
+   {
+      "ds100" : "PQRME",
+      "eva" : 723653,
+      "latlong" : [
+         48.958562,
+         8.294266
+      ],
+      "name" : "Mörsch Rheinaustraße, Rheinstetten"
+   },
+   {
       "ds100" : "PQRMD",
       "eva" : 723654,
       "latlong" : [
@@ -50319,6 +50688,15 @@
       "name" : "Mörsch Rheinaustraße, Rheinstetten"
    },
    {
+      "ds100" : "PQRMC",
+      "eva" : 361818,
+      "latlong" : [
+         48.961573,
+         8.297475
+      ],
+      "name" : "Mörsch Römerstraße, Rheinstetten"
+   },
+   {
       "ds100" : "PQRMO",
       "eva" : 721818,
       "latlong" : [
@@ -50326,6 +50704,15 @@
          8.297293
       ],
       "name" : "Mörsch Römerstraße, Rheinstetten"
+   },
+   {
+      "ds100" : "PQRMR",
+      "eva" : 720273,
+      "latlong" : [
+         48.967695,
+         8.305143
+      ],
+      "name" : "Mörsch Rösselsbrünnle, Rheinstetten"
    },
    {
       "ds100" : "PQRMS",
@@ -50463,6 +50850,15 @@
       "name" : "Mühlbach(Pirna)"
    },
    {
+      "ds100" : "PQKMH",
+      "eva" : 370103,
+      "latlong" : [
+         49.020147,
+         8.350817
+      ],
+      "name" : "Mühlburg West, Karlsruhe"
+   },
+   {
       "ds100" : "RKMW",
       "eva" : 721416,
       "latlong" : [
@@ -50472,13 +50868,58 @@
       "name" : "Mühlburg West, Karlsruhe"
    },
    {
-      "ds100" : "PQKMD",
+      "ds100" : "PQKMF",
       "eva" : 370503,
       "latlong" : [
          49.008038,
-         8.36322
+         8.363222
       ],
       "name" : "Mühlburger Feld, Karlsruhe"
+   },
+   {
+      "ds100" : "RKMF",
+      "eva" : 721417,
+      "latlong" : [
+         49.007724,
+         8.364175
+      ],
+      "name" : "Mühlburger Feld, Karlsruhe"
+   },
+   {
+      "ds100" : "PQKMK",
+      "eva" : 363449,
+      "latlong" : [
+         49.010564,
+         8.382639
+      ],
+      "name" : "Mühlburger Tor, Karlsruhe"
+   },
+   {
+      "ds100" : "PQKME",
+      "eva" : 370321,
+      "latlong" : [
+         49.010915,
+         8.3845
+      ],
+      "name" : "Mühlburger Tor, Karlsruhe"
+   },
+   {
+      "ds100" : "PQKMO",
+      "eva" : 374649,
+      "latlong" : [
+         49.010519,
+         8.383646
+      ],
+      "name" : "Mühlburger Tor, Karlsruhe"
+   },
+   {
+      "ds100" : "PQKMG",
+      "eva" : 721714,
+      "latlong" : [
+         49.011355,
+         8.384661
+      ],
+      "name" : "Mühlburger Tor, Karlsruhe"
    },
    {
       "ds100" : "PQKMB",
@@ -50614,15 +51055,6 @@
          8.703318
       ],
       "name" : "Mühltal"
-   },
-   {
-      "ds100" : "TMRN",
-      "eva" : 8070494,
-      "latlong" : [
-         48.420328,
-         8.760169
-      ],
-      "name" : "Mühringen"
    },
    {
       "ds100" : "EMLR",
@@ -51732,15 +52164,6 @@
       "name" : "Neckarbischofsheim Nord"
    },
    {
-      "ds100" : "RNHS",
-      "eva" : 8007434,
-      "latlong" : [
-         49.296035,
-         8.963686
-      ],
-      "name" : "Neckarbischofsheim Stadt"
-   },
-   {
       "ds100" : "RNB",
       "eva" : 8004215,
       "latlong" : [
@@ -51982,6 +52405,24 @@
          12.730079
       ],
       "name" : "Nejdek-Tisova"
+   },
+   {
+      "ds100" : "OTNEL",
+      "eva" : 5402112,
+      "latlong" : [
+         50.283527,
+         14.308634
+      ],
+      "name" : "Nelahozeves"
+   },
+   {
+      "ds100" : "OTNLZ",
+      "eva" : 5402113,
+      "latlong" : [
+         50.2626,
+         14.302386
+      ],
+      "name" : "Nelahozeves zamek"
    },
    {
       "ds100" : "TNL",
@@ -52929,11 +53370,11 @@
       "name" : "Neuratting"
    },
    {
-      "ds100" : "PQKNA",
+      "ds100" : "RKNEA",
       "eva" : 721887,
       "latlong" : [
          49.050827,
-         8.385261
+         8.385264
       ],
       "name" : "Neureut Adolf-Ehrmann-Bad, Karlsruhe"
    },
@@ -52945,6 +53386,15 @@
          8.378614
       ],
       "name" : "Neureut Bärenweg, Karlsruhe"
+   },
+   {
+      "ds100" : "PQKNN",
+      "eva" : 371110,
+      "latlong" : [
+         49.044454,
+         8.373919
+      ],
+      "name" : "Neureut Welschneureuter Straße, Karlsruhe"
    },
    {
       "ds100" : "PQKNW",
@@ -53260,6 +53710,15 @@
          7.473132
       ],
       "name" : "Neuwied"
+   },
+   {
+      "ds100" : "PQREN",
+      "eva" : 378420,
+      "latlong" : [
+         48.95297,
+         8.400321
+      ],
+      "name" : "Neuwiesenreben, Ettlingen"
    },
    {
       "ds100" : "RETN",
@@ -54504,15 +54963,6 @@
       "name" : "Nordhorn-Blanke"
    },
    {
-      "ds100" : "ANDS",
-      "eva" : 8007116,
-      "latlong" : [
-         53.332837,
-         8.980288
-      ],
-      "name" : "Nordsode"
-   },
-   {
       "ds100" : "HNOS",
       "eva" : 8000282,
       "latlong" : [
@@ -54666,6 +55116,15 @@
       "name" : "Nove Hamry"
    },
    {
+      "ds100" : "OTNOL",
+      "eva" : 5402191,
+      "latlong" : [
+         50.301568,
+         14.31658
+      ],
+      "name" : "Nove Ouholice"
+   },
+   {
       "ds100" : "XYNZ",
       "eva" : 5600025,
       "latlong" : [
@@ -54754,33 +55213,6 @@
          5.8927779197693
       ],
       "name" : "Nuth"
-   },
-   {
-      "ds100" : "NNBS",
-      "eva" : 8070668,
-      "latlong" : [
-         49.070682,
-         12.965009
-      ],
-      "name" : "Nußberg-Schönau"
-   },
-   {
-      "ds100" : "XDNE",
-      "eva" : 8613687,
-      "latlong" : [
-         55.652421,
-         12.516317
-      ],
-      "name" : "Ny Ellebjerg st"
-   },
-   {
-      "ds100" : "XDNY",
-      "eva" : 8601739,
-      "latlong" : [
-         55.314068,
-         10.802921
-      ],
-      "name" : "Nyborg st"
    },
    {
       "ds100" : "XMNH",
@@ -54941,6 +55373,15 @@
       "latlong" : [
          49.4454,
          11.055338
+      ],
+      "name" : "Nürnberg Rothenburger Str."
+   },
+   {
+      "ds100" : "PQNRS",
+      "eva" : 8070729,
+      "latlong" : [
+         49.444608,
+         11.055303
       ],
       "name" : "Nürnberg Rothenburger Str."
    },
@@ -55321,15 +55762,6 @@
          11.333429
       ],
       "name" : "Oberferrieden"
-   },
-   {
-      "ds100" : "ROGI",
-      "eva" : 8007437,
-      "latlong" : [
-         49.255404,
-         9.044019
-      ],
-      "name" : "Obergimpern"
    },
    {
       "ds100" : "XSOB",
@@ -56925,6 +57357,15 @@
       "name" : "Ostendstraße, Karlsruhe"
    },
    {
+      "ds100" : "PQKOS",
+      "eva" : 721668,
+      "latlong" : [
+         49.004946,
+         8.416537
+      ],
+      "name" : "Ostendstraße, Karlsruhe"
+   },
+   {
       "ds100" : "LOB",
       "eva" : 8012568,
       "latlong" : [
@@ -57609,15 +58050,6 @@
       "name" : "Pansdorf"
    },
    {
-      "ds100" : "XTPAN",
-      "eva" : 5402315,
-      "latlong" : [
-         50.948252,
-         14.463796
-      ],
-      "name" : "Pansky"
-   },
-   {
       "ds100" : "XFPAN",
       "eva" : 8704174,
       "latlong" : [
@@ -57814,15 +58246,6 @@
          13.450776
       ],
       "name" : "Passau Hbf"
-   },
-   {
-      "ds100" : "WPAW",
-      "eva" : 8012612,
-      "latlong" : [
-         53.50811,
-         12.054112
-      ],
-      "name" : "Passow(Meckl)"
    },
    {
       "ds100" : "WPS",
@@ -58455,6 +58878,24 @@
       "name" : "Philipp-Reis-Straße, Karlsruhe"
    },
    {
+      "ds100" : "PQKPS",
+      "eva" : 721660,
+      "latlong" : [
+         49.004452,
+         8.411413
+      ],
+      "name" : "Philipp-Reis-Straße, Karlsruhe"
+   },
+   {
+      "ds100" : "PQKPR",
+      "eva" : 721666,
+      "latlong" : [
+         49.004443,
+         8.411458
+      ],
+      "name" : "Philipp-Reis-Straße, Karlsruhe"
+   },
+   {
       "ds100" : "RPB",
       "eva" : 8004813,
       "latlong" : [
@@ -58480,6 +58921,15 @@
          6.625693
       ],
       "name" : "Philippsheim"
+   },
+   {
+      "ds100" : "PQKEP",
+      "eva" : 372045,
+      "latlong" : [
+         49.011373,
+         8.364876
+      ],
+      "name" : "Philippstraße, Karlsruhe"
    },
    {
       "ds100" : "RKEP",
@@ -58624,15 +59074,6 @@
          13.935361
       ],
       "name" : "Pirna-Copitz Nord"
-   },
-   {
-      "ds100" : "XIPI",
-      "eva" : 8300169,
-      "latlong" : [
-         43.707973,
-         10.398174
-      ],
-      "name" : "Pisa Centrale"
    },
    {
       "ds100" : "OTPS",
@@ -59157,6 +59598,15 @@
       "name" : "Poststraße, Karlsruhe"
    },
    {
+      "ds100" : "PQKAP",
+      "eva" : 723870,
+      "latlong" : [
+         48.99522,
+         8.403979
+      ],
+      "name" : "Poststraße, Karlsruhe"
+   },
+   {
       "ds100" : "BPDC",
       "eva" : 8010280,
       "latlong" : [
@@ -59353,6 +59803,42 @@
          14.440013
       ],
       "name" : "Praha-Holesovice"
+   },
+   {
+      "ds100" : "OTPHX",
+      "eva" : 5403680,
+      "latlong" : [
+         50.106143,
+         14.437188
+      ],
+      "name" : "Praha-Holesovice zastavka"
+   },
+   {
+      "ds100" : "XTPL",
+      "eva" : 5400130,
+      "latlong" : [
+         50.100686,
+         14.502297
+      ],
+      "name" : "Praha-Liben"
+   },
+   {
+      "ds100" : "XTPPO",
+      "eva" : 5457027,
+      "latlong" : [
+         50.113739,
+         14.400297
+      ],
+      "name" : "Praha-Podbaba"
+   },
+   {
+      "ds100" : "XTPSE",
+      "eva" : 5402511,
+      "latlong" : [
+         50.132373,
+         14.393663
+      ],
+      "name" : "Praha-Sedlec"
    },
    {
       "ds100" : "XTPM",
@@ -59607,15 +60093,6 @@
       "name" : "Pritzwalk"
    },
    {
-      "ds100" : "WPRH",
-      "eva" : 8074703,
-      "latlong" : [
-         53.170082,
-         12.20592
-      ],
-      "name" : "Pritzwalk Hainholz"
-   },
-   {
       "ds100" : "WPRW",
       "eva" : 8017347,
       "latlong" : [
@@ -59679,15 +60156,6 @@
       "name" : "Prora Ost"
    },
    {
-      "ds100" : "NPM",
-      "eva" : 8070858,
-      "latlong" : [
-         49.864518,
-         10.123567
-      ],
-      "name" : "Prosselsheim"
-   },
-   {
       "ds100" : "OTPR",
       "eva" : 5400172,
       "latlong" : [
@@ -59712,7 +60180,7 @@
          49.783664,
          22.776364
       ],
-      "name" : "Przemysl Gl."
+      "name" : "Przemysl Glowny"
    },
    {
       "ds100" : "OPPMZ",
@@ -61686,6 +62154,15 @@
       "name" : "Reußen"
    },
    {
+      "ds100" : "OTREZ",
+      "eva" : 5402747,
+      "latlong" : [
+         50.178677,
+         14.354416
+      ],
+      "name" : "Rez"
+   },
+   {
       "ds100" : "ERHA",
       "eva" : 8005055,
       "latlong" : [
@@ -61794,13 +62271,31 @@
       "name" : "Rheinfelden(CH)"
    },
    {
-      "ds100" : "RK  H",
+      "ds100" : "RKHN",
       "eva" : 362391,
       "latlong" : [
-         49.015578,
-         8.347322
+         49.01558,
+         8.34732
       ],
       "name" : "Rheinhafen, Karlsruhe"
+   },
+   {
+      "ds100" : "RK  H",
+      "eva" : 721428,
+      "latlong" : [
+         49.015571,
+         8.347437
+      ],
+      "name" : "Rheinhafen, Karlsruhe"
+   },
+   {
+      "ds100" : "PQKR",
+      "eva" : 723923,
+      "latlong" : [
+         49.001404,
+         8.344875
+      ],
+      "name" : "Rheinhafenstraße, Karlsruhe"
    },
    {
       "ds100" : "PQKRH",
@@ -62253,15 +62748,6 @@
       "name" : "Rimbach"
    },
    {
-      "ds100" : "XIRI",
-      "eva" : 8300221,
-      "latlong" : [
-         44.064237,
-         12.574016
-      ],
-      "name" : "Rimini"
-   },
-   {
       "ds100" : "WRIW",
       "eva" : 8012768,
       "latlong" : [
@@ -62339,6 +62825,15 @@
       "latlong" : [
          49.020968,
          8.445062
+      ],
+      "name" : "Rintheim Sinsheimer Straße, Karlsruhe"
+   },
+   {
+      "ds100" : "PQKRS",
+      "eva" : 722280,
+      "latlong" : [
+         49.020731,
+         8.444628
       ],
       "name" : "Rintheim Sinsheimer Straße, Karlsruhe"
    },
@@ -62811,15 +63306,6 @@
       "name" : "Romanshorn"
    },
    {
-      "ds100" : "XSRHF",
-      "eva" : 8506112,
-      "latlong" : [
-         47.5655617030878,
-         9.37997531046235
-      ],
-      "name" : "Romanshorn (See)"
-   },
-   {
       "ds100" : "XFRO",
       "eva" : 8700369,
       "latlong" : [
@@ -62937,15 +63423,6 @@
       "name" : "Rorschach Hafen"
    },
    {
-      "ds100" : "XSRSS",
-      "eva" : 8506113,
-      "latlong" : [
-         47.4789070232403,
-         9.49250636652451
-      ],
-      "name" : "Rorschach Hafen (See)"
-   },
-   {
       "ds100" : "FROS",
       "eva" : 8005163,
       "latlong" : [
@@ -63018,15 +63495,6 @@
       "name" : "Rosenheim Aicherpark"
    },
    {
-      "ds100" : "MROS",
-      "eva" : 8005173,
-      "latlong" : [
-         47.866304,
-         12.104178
-      ],
-      "name" : "Rosenheim Hochschule"
-   },
-   {
       "ds100" : "WROW",
       "eva" : 8012792,
       "latlong" : [
@@ -63034,15 +63502,6 @@
          12.343197
       ],
       "name" : "Rosenwinkel"
-   },
-   {
-      "ds100" : "XDRK",
-      "eva" : 8602026,
-      "latlong" : [
-         55.639014,
-         12.088854
-      ],
-      "name" : "Roskilde st"
    },
    {
       "ds100" : "ONROS",
@@ -63475,6 +63934,24 @@
          11.033601
       ],
       "name" : "Rovereto"
+   },
+   {
+      "ds100" : "XTROZ",
+      "eva" : 5402699,
+      "latlong" : [
+         50.159934,
+         14.398463
+      ],
+      "name" : "Roztoky u Prahy"
+   },
+   {
+      "ds100" : "OTRYZ",
+      "eva" : 5402700,
+      "latlong" : [
+         50.168348,
+         14.366111
+      ],
+      "name" : "Roztoky-Zalov"
    },
    {
       "ds100" : "SROB",
@@ -64116,15 +64593,6 @@
       "name" : "Rümlang"
    },
    {
-      "ds100" : "RRMM",
-      "eva" : 8070524,
-      "latlong" : [
-         47.642926,
-         7.640709
-      ],
-      "name" : "Rümmingen"
-   },
-   {
       "ds100" : "KRUN",
       "eva" : 8005218,
       "latlong" : [
@@ -64159,6 +64627,24 @@
          8.404045
       ],
       "name" : "Rüppurr Tulpenstraße, Karlsruhe"
+   },
+   {
+      "ds100" : "PQKRT",
+      "eva" : 140085,
+      "latlong" : [
+         49.00482,
+         8.410335
+      ],
+      "name" : "Rüppurrer Tor, Karlsruhe"
+   },
+   {
+      "ds100" : "RKRTK",
+      "eva" : 150085,
+      "latlong" : [
+         49.005881,
+         8.409768
+      ],
+      "name" : "Rüppurrer Tor, Karlsruhe"
    },
    {
       "ds100" : "RKRT",
@@ -65025,15 +65511,6 @@
       "name" : "Sauerlach"
    },
    {
-      "ds100" : "RSDO",
-      "eva" : 8077776,
-      "latlong" : [
-         47.944482,
-         9.0946518
-      ],
-      "name" : "Sauldorf"
-   },
-   {
       "ds100" : "MSGB",
       "eva" : 8005302,
       "latlong" : [
@@ -65196,15 +65673,6 @@
       "name" : "Schalksmühle"
    },
    {
-      "ds100" : "TSKS",
-      "eva" : 8007072,
-      "latlong" : [
-         48.611798,
-         9.91133
-      ],
-      "name" : "Schalkstetten"
-   },
-   {
       "ds100" : "RSAL",
       "eva" : 8005317,
       "latlong" : [
@@ -65275,15 +65743,6 @@
          12.245847
       ],
       "name" : "Scharstorf"
-   },
-   {
-      "ds100" : "MSC",
-      "eva" : 8005327,
-      "latlong" : [
-         47.927051,
-         12.126724
-      ],
-      "name" : "Schechen"
    },
    {
       "ds100" : "XNSE",
@@ -65482,6 +65941,15 @@
          7.12934
       ],
       "name" : "Schiffweiler"
+   },
+   {
+      "ds100" : "PQKS",
+      "eva" : 363040,
+      "latlong" : [
+         49.01042,
+         8.379852
+      ],
+      "name" : "Schillerstraße, Karlsruhe"
    },
    {
       "ds100" : "RKMS",
@@ -65705,6 +66173,15 @@
       "latlong" : [
          49.003638,
          8.427361
+      ],
+      "name" : "Schloss Gottesaue, Karlsruhe"
+   },
+   {
+      "ds100" : "PQKGO",
+      "eva" : 721671,
+      "latlong" : [
+         49.003616,
+         8.42736
       ],
       "name" : "Schloss Gottesaue, Karlsruhe"
    },
@@ -66816,24 +67293,6 @@
       "name" : "Schöllkrippen"
    },
    {
-      "ds100" : "TSCS",
-      "eva" : 8072211,
-      "latlong" : [
-         48.21129,
-         8.771335
-      ],
-      "name" : "Schömberg Stausee"
-   },
-   {
-      "ds100" : "TSCB",
-      "eva" : 8029359,
-      "latlong" : [
-         48.205743,
-         8.758503
-      ],
-      "name" : "Schömberg(b Balingen)"
-   },
-   {
       "ds100" : "DSN",
       "eva" : 8012898,
       "latlong" : [
@@ -67192,15 +67651,6 @@
          14.272563
       ],
       "name" : "Sebnitz(Sachs)"
-   },
-   {
-      "ds100" : "XTSBZ",
-      "eva" : 5402772,
-      "latlong" : [
-         50.593048,
-         14.053958
-      ],
-      "name" : "Sebuzin"
    },
    {
       "ds100" : "FSN",
@@ -67878,15 +68328,6 @@
       "name" : "Siegburg/Bonn"
    },
    {
-      "ds100" : "RSGB",
-      "eva" : 8007438,
-      "latlong" : [
-         49.271227,
-         9.087386
-      ],
-      "name" : "Siegelsbach"
-   },
-   {
       "ds100" : "NSDF",
       "eva" : 8005557,
       "latlong" : [
@@ -68130,15 +68571,6 @@
       "name" : "Simbach(Inn)"
    },
    {
-      "ds100" : "XUSI",
-      "eva" : 5300003,
-      "latlong" : [
-         45.846272,
-         23.013784
-      ],
-      "name" : "Simeria"
-   },
-   {
       "ds100" : "NSHU",
       "eva" : 8005572,
       "latlong" : [
@@ -68380,15 +68812,6 @@
          9.9246973
       ],
       "name" : "Skanderborg st"
-   },
-   {
-      "ds100" : "XDSGE",
-      "eva" : 8602254,
-      "latlong" : [
-         55.407553,
-         11.348057
-      ],
-      "name" : "Slagelse st"
    },
    {
       "ds100" : "XRSL",
@@ -68796,15 +69219,6 @@
       "name" : "Sorge"
    },
    {
-      "ds100" : "XDSOR",
-      "eva" : 8602350,
-      "latlong" : [
-         55.419019,
-         11.568794
-      ],
-      "name" : "Soroe st"
-   },
-   {
       "ds100" : "XPSI",
       "eva" : 5100133,
       "latlong" : [
@@ -69098,6 +69512,15 @@
       "latlong" : [
          49.111495,
          8.50091
+      ],
+      "name" : "Spöck Hochhaus, Stutensee"
+   },
+   {
+      "ds100" : "PQSSO",
+      "eva" : 721334,
+      "latlong" : [
+         49.111504,
+         8.500191
       ],
       "name" : "Spöck Hochhaus, Stutensee"
    },
@@ -69777,15 +70200,6 @@
       "name" : "Starckstraße, Karlsruhe"
    },
    {
-      "ds100" : "XTSKR",
-      "eva" : 5402921,
-      "latlong" : [
-         50.947794,
-         14.491942
-      ],
-      "name" : "Stare Krecany"
-   },
-   {
       "ds100" : "XTSSY",
       "eva" : 5402925,
       "latlong" : [
@@ -69892,15 +70306,6 @@
          8.9810085806098
       ],
       "name" : "Steckborn"
-   },
-   {
-      "ds100" : "XSSBS",
-      "eva" : 8506157,
-      "latlong" : [
-         47.6686469246848,
-         8.98143540966547
-      ],
-      "name" : "Steckborn URh"
    },
    {
       "ds100" : "HSTF",
@@ -70396,15 +70801,6 @@
          8.59613281647753
       ],
       "name" : "Stettbach"
-   },
-   {
-      "ds100" : "TSTT",
-      "eva" : 8070548,
-      "latlong" : [
-         48.353415,
-         8.812741
-      ],
-      "name" : "Stetten (b. Haigerloch)"
    },
    {
       "ds100" : "TSHG",
@@ -70990,15 +71386,6 @@
          14.033515
       ],
       "name" : "Stubbenfelde"
-   },
-   {
-      "ds100" : "TSBH",
-      "eva" : 8007071,
-      "latlong" : [
-         48.593792,
-         9.920377
-      ],
-      "name" : "Stubersheim"
    },
    {
       "ds100" : "OASU",
@@ -72855,6 +73242,15 @@
       "name" : "Tittmoning-Wiesmühl"
    },
    {
+      "ds100" : "PQKTV",
+      "eva" : 379084,
+      "latlong" : [
+         48.996595,
+         8.410424
+      ],
+      "name" : "Tivoli, Karlsruhe"
+   },
+   {
       "ds100" : "RKTI",
       "eva" : 721450,
       "latlong" : [
@@ -73476,6 +73872,33 @@
       "name" : "Tschagguns"
    },
    {
+      "ds100" : "PQKTU",
+      "eva" : 360107,
+      "latlong" : [
+         49.006321,
+         8.431657
+      ],
+      "name" : "Tullastraße/Alter Schlachthof, Karlsruhe"
+   },
+   {
+      "ds100" : "PQKTL",
+      "eva" : 364807,
+      "latlong" : [
+         49.007328,
+         8.431576
+      ],
+      "name" : "Tullastraße/Alter Schlachthof, Karlsruhe"
+   },
+   {
+      "ds100" : "PQKTA",
+      "eva" : 721736,
+      "latlong" : [
+         49.006052,
+         8.432502
+      ],
+      "name" : "Tullastraße/Alter Schlachthof, Karlsruhe"
+   },
+   {
       "ds100" : "RKTU",
       "eva" : 723632,
       "latlong" : [
@@ -73915,6 +74338,15 @@
          11.462662
       ],
       "name" : "Uhlstädt"
+   },
+   {
+      "ds100" : "OTUHY",
+      "eva" : 5403232,
+      "latlong" : [
+         50.170523,
+         14.351485
+      ],
+      "name" : "Uholicky"
    },
    {
       "ds100" : "BUD",
@@ -75006,24 +75438,6 @@
       "name" : "Vaterstetten"
    },
    {
-      "ds100" : "LVT",
-      "eva" : 8013182,
-      "latlong" : [
-         51.597687,
-         11.428993
-      ],
-      "name" : "Vatterode"
-   },
-   {
-      "ds100" : "LVTT",
-      "eva" : 8079152,
-      "latlong" : [
-         51.598127,
-         11.412183
-      ],
-      "name" : "Vatteröder Teich"
-   },
-   {
       "ds100" : "HVEC",
       "eva" : 8006060,
       "latlong" : [
@@ -75192,7 +75606,7 @@
          48.836308,
          14.45318
       ],
-      "name" : "Velesyn mesto"
+      "name" : "Velesin mesto"
    },
    {
       "ds100" : "WV",
@@ -75202,15 +75616,6 @@
          12.803137
       ],
       "name" : "Velgast"
-   },
-   {
-      "ds100" : "XTVZ",
-      "eva" : 5403344,
-      "latlong" : [
-         50.526096,
-         14.080554
-      ],
-      "name" : "Velke Zernoseky"
    },
    {
       "ds100" : "XTVV",
@@ -75490,6 +75895,15 @@
          14.361327
       ],
       "name" : "Vesele pod Rabstejnem"
+   },
+   {
+      "ds100" : "OTV",
+      "eva" : 5400113,
+      "latlong" : [
+         49.193791,
+         14.717014
+      ],
+      "name" : "Veseli nad Luznici"
    },
    {
       "ds100" : "BV",
@@ -75906,15 +76320,6 @@
       "name" : "Vitry le François Gare"
    },
    {
-      "ds100" : "XFVT",
-      "eva" : 8700520,
-      "latlong" : [
-         48.202506,
-         5.941865
-      ],
-      "name" : "Vittel"
-   },
-   {
       "ds100" : "XNVT",
       "eva" : 8400651,
       "latlong" : [
@@ -76068,15 +76473,6 @@
       "name" : "Volders-Baumkirchen"
    },
    {
-      "ds100" : "NVOLA",
-      "eva" : 8070860,
-      "latlong" : [
-         49.864345,
-         10.217033
-      ],
-      "name" : "Volkach-Astheim"
-   },
-   {
       "ds100" : "FVA",
       "eva" : 8006107,
       "latlong" : [
@@ -76192,6 +76588,15 @@
          9.735868
       ],
       "name" : "Voßloch"
+   },
+   {
+      "ds100" : "OTVNY",
+      "eva" : 5403444,
+      "latlong" : [
+         50.335233,
+         14.371513
+      ],
+      "name" : "Vranany"
    },
    {
       "ds100" : "ONVZV",
@@ -76590,15 +76995,6 @@
       "name" : "Waldfischbach"
    },
    {
-      "ds100" : "TWHS",
-      "eva" : 8007073,
-      "latlong" : [
-         48.635308,
-         9.907723
-      ],
-      "name" : "Waldhausen(b Geislingen)"
-   },
-   {
       "ds100" : "TWY",
       "eva" : 8006157,
       "latlong" : [
@@ -76896,15 +77292,6 @@
       "name" : "Waltershausen Schnepfenthal"
    },
    {
-      "ds100" : "OFWL",
-      "eva" : 8702265,
-      "latlong" : [
-         49.22391,
-         6.15963
-      ],
-      "name" : "Walygator Parc"
-   },
-   {
       "ds100" : "UWA",
       "eva" : 8013226,
       "latlong" : [
@@ -77146,6 +77533,15 @@
          9.898016
       ],
       "name" : "Wasbek"
+   },
+   {
+      "ds100" : "PQEWA",
+      "eva" : 372664,
+      "latlong" : [
+         48.945231,
+         8.398694
+      ],
+      "name" : "Wasen, Ettlingen"
    },
    {
       "ds100" : "RETW",
@@ -77868,11 +78264,47 @@
       "name" : "Weimar West"
    },
    {
+      "ds100" : "PQKWR",
+      "eva" : 360603,
+      "latlong" : [
+         49.005638,
+         8.376715
+      ],
+      "name" : "Weinbrennerplatz, Karlsruhe"
+   },
+   {
+      "ds100" : "PQKWZ",
+      "eva" : 375603,
+      "latlong" : [
+         49.005665,
+         8.376697
+      ],
+      "name" : "Weinbrennerplatz, Karlsruhe"
+   },
+   {
+      "ds100" : "PQKWN",
+      "eva" : 720997,
+      "latlong" : [
+         49.005306,
+         8.377821
+      ],
+      "name" : "Weinbrennerplatz, Karlsruhe"
+   },
+   {
       "ds100" : "PQKWI",
       "eva" : 721834,
       "latlong" : [
          49.006297,
          8.378263
+      ],
+      "name" : "Weinbrennerplatz, Karlsruhe"
+   },
+   {
+      "ds100" : "PQKWB",
+      "eva" : 723636,
+      "latlong" : [
+         49.005971,
+         8.377902
       ],
       "name" : "Weinbrennerplatz, Karlsruhe"
    },
@@ -77967,6 +78399,15 @@
       "name" : "Weinsberg/Ellhofen Gewerbegebiet"
    },
    {
+      "ds100" : "PQKWW",
+      "eva" : 366909,
+      "latlong" : [
+         49.004371,
+         8.441563
+      ],
+      "name" : "Weinweg, Karlsruhe"
+   },
+   {
       "ds100" : "RKDW",
       "eva" : 721461,
       "latlong" : [
@@ -78046,15 +78487,6 @@
          13.802003
       ],
       "name" : "Weixdorf Bad"
-   },
-   {
-      "ds100" : "RWZ",
-      "eva" : 8070569,
-      "latlong" : [
-         47.768832,
-         8.476514
-      ],
-      "name" : "Weizen"
    },
    {
       "ds100" : "MWZH",
@@ -78379,6 +78811,15 @@
          12.926189
       ],
       "name" : "Werder(Havel)"
+   },
+   {
+      "ds100" : "PQKWD",
+      "eva" : 361483,
+      "latlong" : [
+         49.000451,
+         8.410613
+      ],
+      "name" : "Werderstraße, Karlsruhe"
    },
    {
       "ds100" : "RKWE",
@@ -79677,15 +80118,6 @@
       "name" : "Wiltingen(Saar)"
    },
    {
-      "ds100" : "XLWW",
-      "eva" : 8271120,
-      "latlong" : [
-         49.988201,
-         6.00081
-      ],
-      "name" : "Wilwerwiltz"
-   },
-   {
       "ds100" : "XFWI",
       "eva" : 8702269,
       "latlong" : [
@@ -80160,7 +80592,7 @@
          50.007989,
          18.476374
       ],
-      "name" : "Wodzislaw Sl."
+      "name" : "Wodzislaw Slaski"
    },
    {
       "ds100" : "XNWO",
@@ -80231,6 +80663,15 @@
       "latlong" : [
          49.003569,
          8.423098
+      ],
+      "name" : "Wolfartsweierer Straße, Karlsruhe"
+   },
+   {
+      "ds100" : "PQKWO",
+      "eva" : 721669,
+      "latlong" : [
+         49.003535,
+         8.422937
       ],
       "name" : "Wolfartsweierer Straße, Karlsruhe"
    },
@@ -81214,6 +81655,24 @@
          15.099578
       ],
       "name" : "Ybbs a.d. Donau"
+   },
+   {
+      "ds100" : "PQKYN",
+      "eva" : 371041,
+      "latlong" : [
+         49.011032,
+         8.375205
+      ],
+      "name" : "Yorckstraße, Karlsruhe"
+   },
+   {
+      "ds100" : "PQKY",
+      "eva" : 372041,
+      "latlong" : [
+         49.01087,
+         8.376194
+      ],
+      "name" : "Yorckstraße, Karlsruhe"
    },
    {
       "ds100" : "RKMY",

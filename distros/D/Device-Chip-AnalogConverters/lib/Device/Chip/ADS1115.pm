@@ -4,9 +4,9 @@
 #  (C) Paul Evans, 2017-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.57;
+use Object::Pad 0.66;
 
-package Device::Chip::ADS1115 0.13;
+package Device::Chip::ADS1115 0.14;
 class Device::Chip::ADS1115
    :isa(Device::Chip::Base::RegisteredI2C);
 
@@ -100,8 +100,8 @@ bitfield { format => "integer" }, CONFIG =>
    COMP_LAT  => boolfield(2),
    COMP_QUE  => enumfield(0, qw( 1 2 4 DIS ));
 
-has $_config;
-has $_fullscale_f;
+field $_config;
+field $_fullscale_f;
 
 async method read_config ()
 {

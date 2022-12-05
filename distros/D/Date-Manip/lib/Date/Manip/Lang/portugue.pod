@@ -97,20 +97,26 @@ The following day names may be used:
 
    segunda
    segunda-feira
+   segunda feira
 
    terça
    terca
    terça-feira
    terca-feira
+   terça feira
+   terca feira
 
    quarta
    quarta-feira
+   quarta feira
 
    quinta
    quinta-feira
+   quinta feira
 
    sexta
    sexta-feira
+   sexta feira
 
    sábado
    sabado

@@ -27,6 +27,8 @@ Check C<crawl-api-doc.pl> for more information.
 
 =cut
 
+sub mapping { shift->{mapping} }
+
 [% FOREACH ep IN endpoints.keys.sort -%]
 =head2 [% ep %]
 
@@ -64,9 +66,10 @@ and Response Objects being:
 async sub [% ep %] {
     my ($self, %args) = @_;
 
-    my $request->{method} = '[% endpoints.$ep.method %]';
-    $request->{uri}    = '[% endpoints.$ep.uri %]';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{[% ep %]}{method} // '[% endpoints.$ep.method %]';
+    $request->{uri}    = $mapping->{[% ep %]}{uri} // '[% endpoints.$ep.uri %]';
+    $request->{param}  = $mapping->{[% ep %]}{param} // {
 [% FOREACH req_param IN endpoints.$ep.request.keys.sort -%]
         [% req_param %] => {
 [% FOREACH param IN endpoints.$ep.request.$req_param.keys.sort -%]
@@ -78,7 +81,7 @@ async sub [% ep %] {
         },
 [% END -%]
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{[% ep %]}{response} // [
 [% FOREACH res_obj IN endpoints.$ep.response.objects -%]
         '[% res_obj %]',
 [% END %]

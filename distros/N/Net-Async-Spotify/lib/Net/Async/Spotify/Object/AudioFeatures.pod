@@ -1,6 +1,7 @@
 =encoding utf8
 
 =for comment POD_DERIVED_INDEX_GENERATED
+
 The following documentation is automatically generated.  Please do not edit
 this file, but rather the original, inline with Net::Async::Spotify::Object::AudioFeatures
 at lib/Net/Async/Spotify/Object/AudioFeatures.pm
@@ -31,7 +32,7 @@ L<new|Net::Async::Spotify::Object::Generated::AudioFeatures/new>
 
 =item L<Net::Async::Spotify::Object::Base>
 
-L<apply_type|Net::Async::Spotify::Object::Base/apply_type>, L<extra_fields|Net::Async::Spotify::Object::Base/extra_fields>, L<generate|Net::Async::Spotify::Object::Base/generate>
+L<apply_type|Net::Async::Spotify::Object::Base/apply_type>, L<extra_fields|Net::Async::Spotify::Object::Base/extra_fields>, L<fields|Net::Async::Spotify::Object::Base/fields>, L<generate|Net::Async::Spotify::Object::Base/generate>, L<to_hash|Net::Async::Spotify::Object::Base/to_hash>, L<to_human|Net::Async::Spotify::Object::Base/to_human>, L<to_json|Net::Async::Spotify::Object::Base/to_json>
 
 =back
 

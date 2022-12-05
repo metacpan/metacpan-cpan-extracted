@@ -23,10 +23,6 @@ L<IO::Handle|SPVM::IO::Handle>.
 
 =head1 Fields
 
-=head2 autoflush;
-
-  has autoflush : rw byte;
-
 =head2 stream
 
   has stream : Sys::IO::FileStream;

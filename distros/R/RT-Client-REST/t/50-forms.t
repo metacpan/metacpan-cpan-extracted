@@ -6,7 +6,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 6;
+use Test::More tests => 9;
 
 use RT::Client::REST::Forms qw(form_parse);
 use File::Spec::Functions   qw(catfile);
@@ -50,6 +50,64 @@ EOF
 }
 
 {
+    my $body = qq|
+id: ticket/971216
+Queue: whatever
+Owner: Nobody
+Creator: someone\@example.com
+Subject: Problems
+Status: new
+Priority: 10
+InitialPriority: 10
+FinalPriority: 50
+Requestors: someone\@example.com\nCc:\nAdminCc:\nCreated: Fri Nov 04 15:38:18 2022
+Starts: Not set
+Started: Not set
+Due: Sun Nov 06 15:38:18 2022
+Resolved: Not set
+Told: Not set
+LastUpdated: Fri Nov 04 16:19:43 2022
+TimeEstimated: 0
+TimeWorked: 0
+TimeLeft: 0
+CF.{AdminURI}: \n
+|;
+    my $form = form_parse($body);
+    is( ref($form), 'ARRAY', 'form is an array reference' );
+    my ( $c, $o, $k, $e ) = @{ $$form[0] };
+    is( ref($k), 'HASH', 'third element ($k) is a hash reference' );
+    is_deeply(
+        $k,
+        {
+            'id'              => 'ticket/971216',
+            'Queue'           => 'whatever',
+            'Owner'           => 'Nobody',
+            'Creator'         => 'someone@example.com',
+            'Subject'         => 'Problems',
+            'Status'          => 'new',
+            'Priority'        => '10',
+            'InitialPriority' => '10',
+            'FinalPriority'   => '50',
+            'Requestors'      => 'someone@example.com',
+            'Cc'              => undef,
+            'AdminCc'         => undef,
+            'Created'         => 'Fri Nov 04 15:38:18 2022',
+            'Starts'          => 'Not set',
+            'Started'         => 'Not set',
+            'Due'             => 'Sun Nov 06 15:38:18 2022',
+            'Resolved'        => 'Not set',
+            'Told'            => 'Not set',
+            'LastUpdated'     => 'Fri Nov 04 16:19:43 2022',
+            'TimeEstimated'   => '0',
+            'TimeWorked'      => '0',
+            'TimeLeft'        => '0',
+            'CF.{AdminURI}'   => undef,
+        },
+        'Empty fields undertood'
+    );
+}
+
+{
     my $body = create_http_body($contents);
     my $form = form_parse($body);
     is( ref($form), 'ARRAY', 'form is an array reference' );
@@ -60,7 +118,7 @@ EOF
 }
 
 {
-my $body = qq|id: 17217
+    my $body = qq|id: 17217
 Subject: \nCreator: 12
 Created: 2022-09-24 21:26:55
 Transaction: 37112
@@ -87,3 +145,4 @@ Content: dude this is a text attachment
     ok( $k->{Content} eq "dude this is a text attachment\n",
         'form parsed out contents correctly' );
 }
+

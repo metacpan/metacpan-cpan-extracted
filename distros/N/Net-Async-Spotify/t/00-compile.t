@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 134 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 135 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Net/Async/Spotify.pm',
@@ -114,6 +114,7 @@ my @module_files = (
     'Net/Async/Spotify/Object/Generated/TuneableTrack.pm',
     'Net/Async/Spotify/Object/Image.pm',
     'Net/Async/Spotify/Object/LinkedTrack.pm',
+    'Net/Async/Spotify/Object/MultiAudioFeatures.pm',
     'Net/Async/Spotify/Object/Paging.pm',
     'Net/Async/Spotify/Object/PlayHistory.pm',
     'Net/Async/Spotify/Object/PlayerError.pm',

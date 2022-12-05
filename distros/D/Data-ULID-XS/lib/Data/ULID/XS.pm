@@ -1,5 +1,5 @@
 package Data::ULID::XS;
-$Data::ULID::XS::VERSION = '0.003';
+$Data::ULID::XS::VERSION = '0.005';
 use strict;
 use warnings;
 
@@ -7,13 +7,13 @@ use Exporter qw(import);
 use Data::ULID qw(:all);
 
 use Time::HiRes qw();
-use Crypt::PRNG::Sober128 qw();
+use Crypt::PRNG qw();
 
 our @EXPORT = @Data::ULID::EXPORT;
 our @EXPORT_OK = @Data::ULID::EXPORT_OK;
 our %EXPORT_TAGS = %Data::ULID::EXPORT_TAGS;
 
-our $RNG = Crypt::PRNG::Sober128->new;
+our $RNG = Crypt::PRNG->new('Sober128');
 
 require XSLoader;
 XSLoader::load('Data::ULID::XS', $Data::ULID::XS::VERSION);
@@ -34,8 +34,8 @@ Data::ULID::XS - XS backend for ULID generation
 =head1 DESCRIPTION
 
 This module replaces some parts of L<Data::ULID> that are performance-critical
-with XS counterparts. Its interface should be the same as Data::ULID, but you
-get free XS speedups.
+with XS counterparts. Its interface is the same as Data::ULID, but you get free
+XS speedups.
 
 B<Beta quality>: while this module works well in general cases, it may also
 contain errors common to C code like memory leaks or access violations. Please
@@ -43,24 +43,26 @@ do report if you encounter any problems.
 
 =head1 FUNCTIONS
 
-Same as L<Data::ULID>. All functions should work exactly the same, but the
-generation part of C<ulid> and C<binary_ulid> should be XS-boosted.
+Same as L<Data::ULID>. All functions should work exactly the same, but C<ulid>
+and C<binary_ulid> called with no arguments are reimplemented in XS.
 
 =head1 BENCHMARK
 
 Comparing speeds of Perl and XS implementations:
 
-	                Rate   perl_text perl_binary     xs_text   xs_binary
-	perl_text   109194/s          --        -68%        -83%        -88%
-	perl_binary 342646/s        214%          --        -46%        -62%
-	xs_text     629138/s        476%         84%          --        -31%
-	xs_binary   908050/s        732%        165%         44%          --
+	                                 Rate Data::ULID::ulid Data::ULID::binary_ulid Data::ULID::XS::ulid Data::ULID::XS::binary_ulid
+	Data::ULID::ulid              97342/s               --                    -68%                 -88%                        -91%
+	Data::ULID::binary_ulid      301501/s             210%                      --                 -62%                        -71%
+	Data::ULID::XS::ulid         793885/s             716%                    163%                   --                        -24%
+	Data::ULID::XS::binary_ulid 1043509/s             972%                    246%                  31%                          --
 
 Benchmark ran on Thinkpad T480 (i7-8650U) and FreeBSD 12.3.
 
 =head1 SEE ALSO
 
 L<Data::ULID>
+
+L<Types::ULID>
 
 =head1 AUTHOR
 

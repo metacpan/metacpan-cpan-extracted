@@ -1,4 +1,7 @@
 Revision history for MHFS-XS, note the CHANGELOG.md of the repository is much more comprehensive
+v0.2.3  2022-12-03
+        Disable unused miniaudio APIs to remove threading requirement
+
 v0.2.2  2022-07-19
         Require Alien::libFLAC-v0.2.0 to fix build errors
 

@@ -6,9 +6,9 @@
 use v5.26;
 use warnings;
 
-use Object::Pad 0.70 ':experimental(adjust_params)';
+use Object::Pad 0.73 ':experimental(adjust_params init_expr)';
 
-package Electronics::PSU::DPSxxxx 0.03;
+package Electronics::PSU::DPSxxxx 0.04;
 class Electronics::PSU::DPSxxxx;
 
 use Carp;
@@ -51,7 +51,7 @@ the F<DPS3005>, when connected over a serial port.
 
 The interface is currently an ad-hoc collection of whatever seems to work
 here, but my hope is to find a more generic shareable interface that multiple
-differenet modules can use, to provide interfaces to various kinds of
+different modules can use, to provide interfaces to various kinds of
 electronics test equipment.
 
 The intention is that it should eventually be possible to write a script for
@@ -61,8 +61,8 @@ like L<DBI>, or L<Device::Chip>, so there should be plenty of ideas to borrow.
 
 =cut
 
-has $_fh   :param = undef;
-has $_addr :param = 1;
+field $_fh   :param = undef;
+field $_addr :param = 1;
 
 ADJUST :params (
    :$dev = undef,
@@ -160,7 +160,7 @@ use constant {
    REG_USET    => 0x00, # centivolts
    REG_ISET    => 0x01, # miliamps
    REG_UOUT    => 0x02, # centivolts (RO)
-   REG_IOUT    => 0x03, # miliiamps (RO)
+   REG_IOUT    => 0x03, # miliamps (RO)
    REG_POWER   => 0x04, # (RO)
    REG_UIN     => 0x05, # centivolts (RO)
    REG_LOCK    => 0x06, # 0=off 1=on

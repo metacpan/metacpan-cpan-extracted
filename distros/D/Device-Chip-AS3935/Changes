@@ -1,5 +1,11 @@
 Revision history for Device-Chip-AS3935
 
+0.03    2022-12-05
+        [CHANGES]
+         * Updated for Object::Pad v0.66:
+            + Use `:isa` instead of `extends`
+            + Use `field` instead of `has`
+
 0.02    2021-10-22
         [CHANGES]
          * Implement the Device::Chip::Sensor API

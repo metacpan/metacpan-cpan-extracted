@@ -20,7 +20,7 @@ App::CSVUtils::Manual::Cookbook - App::CSVUtils cookbook
 
 =head1 VERSION
 
-This document describes version 0.051 of App::CSVUtils::Manual::Cookbook (from Perl distribution App-CSVUtils), released on 2022-12-02.
+This document describes version 0.052 of App::CSVUtils::Manual::Cookbook (from Perl distribution App-CSVUtils), released on 2022-12-05.
 
 =head1 DESCRIPTION
 

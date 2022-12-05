@@ -27,4 +27,4 @@ resources:
   bugtracker: https://github.com/mrdvt92/perl-RF-Functions/issues
   homepage: https://github.com/mrdvt92/perl-RF-Functions
   repository: https://github.com/mrdvt92/perl-RF-Functions.git
-version: '0.03'
+version: '0.04'

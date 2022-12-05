@@ -1,0 +1,56 @@
+{
+   "abstract" : "declare lvalue accessors on C<Object::Pad> classes",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4231",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Object-Pad-Keyword-Accessor",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004",
+            "Object::Pad::ExtensionBuilder" : "0.73",
+            "XS::Parse::Keyword::Builder" : "0.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Object::Pad" : "0.60",
+            "XS::Parse::Keyword" : "0",
+            "perl" : "5.030"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "Object::Pad::Keyword::Accessor" : {
+         "file" : "lib/Object/Pad/Keyword/Accessor.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.07"
+}

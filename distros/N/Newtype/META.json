@@ -1,0 +1,86 @@
+{
+   "abstract" : "Perl implementation of an approximation for Haskell's newtype",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Newtype",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Dist::Inkt" : "0.001"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Eval::TypeTiny" : "2.000000",
+            "Sub::HandlesVia" : "0.045",
+            "Sub::Util" : "1.40",
+            "Type::Tiny::Class" : "2.000000",
+            "Types::Common" : "2.000000",
+            "namespace::autoclean" : "0",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Moo" : "2.000000",
+            "Test2::Require::AuthorTesting" : "0",
+            "Test2::Require::Module" : "0",
+            "Test2::Tools::Spec" : "0",
+            "Test2::V0" : "0",
+            "Type::Registry" : "2.000000",
+            "Types::Common" : "2.000000"
+         }
+      }
+   },
+   "provides" : {
+      "Newtype" : {
+         "file" : "lib/Newtype.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tobyink/p5-newtype/issues"
+      },
+      "homepage" : "https://metacpan.org/release/Newtype",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-newtype.git",
+         "web" : "https://github.com/tobyink/p5-newtype"
+      },
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Newtype/project"
+   },
+   "version" : "0.001",
+   "x_serialization_backend" : "JSON::PP version 4.09",
+   "x_static_install" : 1
+}

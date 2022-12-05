@@ -32,4 +32,4 @@ is($content, "package Bar;\n1;\n", 'file contents were transformed');
 
 done_testing;
 
-# vim: ts=2 sts=2 sw=2 noet :
+# vim: ts=4 sts=4 sw=4 noet :

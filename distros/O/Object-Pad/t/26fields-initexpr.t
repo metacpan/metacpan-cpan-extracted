@@ -11,7 +11,7 @@ use Object::Pad ':experimental(init_expr)';
 {
    class SerialNumbered {
       my $next_seq = 1;
-      has $seq :reader { $next_seq++ }
+      field $seq :reader = $next_seq++;
    }
 
    is( SerialNumbered->new->seq, 1, 'first instance 1' );
@@ -21,7 +21,7 @@ use Object::Pad ':experimental(init_expr)';
 # state works correctly inside them
 {
    class SerialNumberedByState {
-      has $seq :reader { state $next = 1; $next++ }
+      field $seq :reader { state $next = 1; $next++ }
    }
 
    is( SerialNumberedByState->new->seq, 1, 'first instance 1 by state' );
@@ -32,9 +32,9 @@ use Object::Pad ':experimental(init_expr)';
 {
    my @inited;
    class WithThreeFields {
-      has $x { push @inited, "x" }
-      has $y { push @inited, "y" }
-      has $z { push @inited, "z" }
+      field $x { push @inited, "x" }
+      field $y { push @inited, "y" }
+      field $z { push @inited, "z" }
    }
 
    WithThreeFields->new;
@@ -45,8 +45,8 @@ use Object::Pad ':experimental(init_expr)';
 {
    my %init_called;
    class WithParams {
-      has $one :param :reader { $init_called{one} = 1 }
-      has $two :param :reader { $init_called{two} = 2 }
+      field $one :param :reader { $init_called{one} = 1 }
+      field $two :param :reader { $init_called{two} = 2 }
    }
 
    my $obj = WithParams->new( one => 11 );

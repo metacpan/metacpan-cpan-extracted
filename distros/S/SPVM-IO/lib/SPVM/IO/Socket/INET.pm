@@ -117,27 +117,27 @@ L<IO::Socket|SPVM::IO::Socket>
 
 =head2 sockaddr
 
-  method sockaddr : Sys::Socket::In_addr () {
+  method sockaddr : Sys::Socket::In_addr ();
 
 =head2 sockport
 
-  method sockport : int () {
+  method sockport : int ();
 
 =head2 sockhost
 
-  method sockhost : string () {
+  method sockhost : string ();
 
 =head2 peeraddr
 
-  method peeraddr : Sys::Socket::In_addr () {
+  method peeraddr : Sys::Socket::In_addr ();
 
 =head2 peerport
 
-  method peerport : int () {
+  method peerport : int ();
 
 =head2 peerhost
 
-  method peerhost : string () {
+  method peerhost : string ();
 
 =head1 See Also
 

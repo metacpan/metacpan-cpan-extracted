@@ -4,7 +4,7 @@
 #  (C) Paul Evans, 2018-2020 -- leonerd@leonerd.org.uk
 
 package Device::Chip::AnalogConverters;
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 =head1 NAME
 

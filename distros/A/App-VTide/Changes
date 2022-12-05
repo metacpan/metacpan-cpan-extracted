@@ -1,5 +1,17 @@
 Revision history for App-VTide
 
+0.1.19   2022-12-04
+        Updating for release of version 0.1.19
+        Adding missing tests (Ivan Wills)
+        Ignoring require should not use strings (it must in these cases (Ivan Wills)
+        Fixing expected spellings errors (Ivan Wills)
+        Returned accedentally deleted line (Ivan Wills)
+        Adding helper new commands (Ivan Wills)
+        Adding logging of run errors (Ivan Wills)
+        Fixing duplicate files (Ivan Wills)
+        Making this more mac compatible (Ivan Wills)
+        Removing File::Touch (Ivan Wills)
+
 0.1.18   2022-10-09
         Updating for release of version 0.1.18
         Adding the ability to search or exclude from history (Ivan Wills)

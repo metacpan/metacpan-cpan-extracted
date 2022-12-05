@@ -41,6 +41,32 @@ like(
     'Test if last return sql insert into articles'
 );
 
+###
+
+like(
+    $sql_load->load('list#1'),
+    qr/CREATE TABLE users [^;]+;/,
+    'Test if at 1 return sql create table users using method load with file#at'
+);
+
+like(
+    $sql_load->load('list#2'),
+    qr/CREATE TABLE articles [^;]+;/,
+    'Test if at 2 return sql create table articles using method load with file#at'
+);
+
+like(
+    $sql_load->load('list#3'),
+    qr/INSERT INTO users [^;]+;/,
+    'Test if at 3 return sql insert into users using method load with file#at'
+);
+
+like(
+    $sql_load->load('list#4'),
+    qr/INSERT INTO articles [^;]+;/,
+    'Test if at 4 return sql insert into articles using method load with file#at'
+);
+
 my $num = 1;
 while (my $sql = $list->next) {
     is(

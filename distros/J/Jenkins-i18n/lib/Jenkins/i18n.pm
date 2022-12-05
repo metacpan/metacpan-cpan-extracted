@@ -9,6 +9,8 @@ use File::Spec;
 use Set::Tiny;
 
 use Jenkins::i18n::Properties;
+use Jenkins::i18n::FindResults;
+use Jenkins::i18n::Assertions qw(is_jelly_file has_empty);
 
 =pod
 
@@ -18,7 +20,7 @@ Jenkins::i18n - functions for the jtt CLI
 
 =head1 SYNOPSIS
 
-  use Jenkins::i18n qw(remove_unused find_files load_properties load_jelly find_langs);
+    use Jenkins::i18n qw(remove_unused find_files load_properties load_jelly find_langs);
 
 =head1 DESCRIPTION
 
@@ -31,18 +33,216 @@ This module implements some of the functions used by the CLI.
 use Exporter 'import';
 our @EXPORT_OK = (
     'remove_unused', 'find_files', 'load_properties', 'load_jelly',
-    'find_langs'
+    'find_langs',    'all_data',   'dump_keys',       'merge_data',
+    'find_missing'
 );
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
-=head2 EXPORT
+=head1 EXPORT
 
 None by default.
 
-=head2 FUNCTIONS
+=head1 FUNCTIONS
 
-=head3 remove_unused
+=head2 find_missing
+
+Compares the keys available from the source (Jelly and/or Properties files)
+with the i18n file and updates the statistics based on the B<missing keys>,
+i.e., the keys that exists in the source but not in the i18n Properties file.
+
+Expects as parameters the following:
+
+=over
+
+=item 1.
+
+a hash reference with all the keys/values from the Jelly/Properties file.
+
+=item 2.
+
+a hash reference with all the keys/values from the i18n Properties file.
+
+=item 3.
+
+a instance of a L<Jenkins::i18n::Stats> class.
+
+=item 4.
+
+a instance of L<Jenkins::i18n::Warnings> class.
+
+=back
+
+=cut
+
+sub find_missing {
+    my ( $source_ref, $i18n_ref, $stats, $warnings ) = @_;
+
+    foreach my $entry ( keys %{$source_ref} ) {
+        $stats->add_key($entry);
+
+        # TODO: skip increasing missing if operation is to delete those
+        unless (( exists( $i18n_ref->{$entry} ) )
+            and ( defined( $i18n_ref->{$entry} ) ) )
+        {
+            $stats->inc_missing;
+            $warnings->add( 'missing', $entry );
+            next;
+        }
+
+        if ( $i18n_ref->{$entry} eq '' ) {
+            unless ( has_empty($entry) ) {
+                $stats->inc('empty');
+                $warnings->add( 'empty', $entry );
+            }
+            else {
+                $warnings->add( 'ignored', $entry );
+            }
+        }
+    }
+}
+
+=head2 merge_data
+
+Merges the translation data from a Jelly file and a Properties file.
+
+Expects as parameters:
+
+=over
+
+=item 1.
+
+A hash reference with all the keys/values from a Jelly file.
+
+=item 2.
+
+A hash reference with all the keys/values from a Properties file.
+
+=back
+
+This methods considers the way Jenkins is translated nowadays, considering
+different scenarios where the Jelly and Properties have different data.
+
+Returns a hash reference with the keys and values merged.
+
+=cut
+
+sub merge_data {
+    my ( $jelly_ref, $properties_ref ) = @_;
+    confess('A hash reference of the Jelly keys is required')
+        unless ($jelly_ref);
+    confess('The Jelly type is invalid') unless ( ref($jelly_ref) eq 'HASH' );
+    confess('A hash reference of the Properties keys is required')
+        unless ($properties_ref);
+    confess('The Properties type is invalid')
+        unless ( ref($properties_ref) eq 'HASH' );
+    my %merged;
+
+    if ( scalar( keys( %{$jelly_ref} ) ) == 0 ) {
+        return $properties_ref;
+    }
+
+    foreach my $prop_key ( keys( %{$jelly_ref} ) ) {
+        if ( exists( $properties_ref->{$prop_key} ) ) {
+            $merged{$prop_key} = $properties_ref->{$prop_key};
+        }
+        else {
+            $merged{$prop_key} = $prop_key;
+        }
+    }
+    return \%merged;
+}
+
+=head2 dump_keys
+
+Prints to C<STDOUT> all keys from a hash, using some formatting to make it
+easier to read.
+
+Expects as parameter a hash reference.
+
+=cut
+
+sub dump_keys {
+    my $entries_ref = shift;
+    foreach my $key ( keys( %{$entries_ref} ) ) {
+        print "\t$key\n";
+    }
+}
+
+=head2 all_data
+
+Retrieves all translation data from a single given file as reference.
+
+Expects as parameter a complete path to a file.
+
+This file can be a Properties or Jelly file. From that file name, it will be
+defined the related other files, by convention.
+
+Returns a array reference, where each index is:
+
+=over
+
+=item 1.
+
+A hash reference with all keys/values for the English language.
+
+=item 2.
+
+A hash reference with all the keys/values for the related language.
+
+=item 3.
+
+A hash reference for the keys retrieved from the respective Jelly file.
+
+=back
+
+Any of the return references may point to an empty hash, but at list the first
+reference must point to a non-empty hash.
+
+=cut
+
+sub all_data {
+    my ( $file, $processor ) = @_;
+    print "#####\nWorking on $file\n" if ( $processor->is_debug );
+    my ( $curr_lang_file, $english_file, $jelly_file )
+        = $processor->define_files($file);
+
+    if ( $processor->is_debug ) {
+        print "For file $file:\n",
+            "\tthe localization file is $curr_lang_file\n",
+            "\tand the source is $english_file\n";
+    }
+
+   # entries_ref -> keys used in jelly or Message.properties files
+   # lang_entries_ref -> keys/values in the desired language which are already
+   # present in the file
+    my ( $jelly_entries_ref, $lang_entries_ref, $english_entries_ref );
+
+    if ( -f $jelly_file ) {
+        $jelly_entries_ref = load_jelly($jelly_file);
+    }
+    else {
+        $jelly_entries_ref = {};
+    }
+
+    $english_entries_ref
+        = load_properties( $english_file, $processor->is_debug );
+    $lang_entries_ref
+        = load_properties( $curr_lang_file, $processor->is_debug );
+
+    if ( $processor->is_debug ) {
+        print "All keys retrieved from $jelly_file:\n";
+        dump_keys($jelly_entries_ref);
+        print "All keys retrieved from $english_file:\n";
+        dump_keys($english_entries_ref);
+        print "All keys retrieved from $curr_lang_file:\n";
+        dump_keys($lang_entries_ref);
+    }
+
+    return ( $jelly_entries_ref, $lang_entries_ref, $english_entries_ref );
+}
+
+=head2 remove_unused
 
 Remove unused keys from a properties file.
 
@@ -57,16 +257,16 @@ Expects as positional parameters:
 
 =over
 
-=item 1
+=item 1.
 
 file: the complete path to the translation file to be checked.
 
-=item 2
+=item 2.
 
 keys: a L<Set::Tiny> instance of the keys from the original English properties
 file.
 
-=item 3
+=item 3.
 
 license: a scalar reference with a license to include the header of the
 translated properties file.
@@ -127,44 +327,114 @@ Find all Jelly and Java Properties files that could be translated from English,
 i.e., files that do not have a ISO 639-1 standard language based code as a
 filename prefix (before the file extension).
 
-Expects as parameter a complete path to a directory that might contain such
-files.
+Expects as parameters:
 
-Returns an sorted array reference with the complete path to those files.
+=over
+
+=item 1.
+
+The complete path to a directory that might contain such files.
+
+=item 2.
+
+An instance of L<Set::Tiny> with all the languages codes identified. See
+C<find_langs>.
+
+=back
+
+Returns an L<Jenkins::i18n::FindResults> instance.
 
 =cut
 
 # Relative paths inside the Jenkins project repository
-my $src_test_path = File::Spec->catfile( 'src',    'test' );
-my $target_path   = File::Spec->catfile( 'target', '' );
-my $src_regex     = qr/$src_test_path/;
-my $target_regex  = qr/$target_path/;
-my $msgs_regex    = qr/Messages\.properties$/;
-my $jelly_regex   = qr/\.jelly$/;
+my $src_test_path    = File::Spec->catfile( 'src',    'test' );
+my $target_path      = File::Spec->catfile( 'target', '' );
+my $src_regex        = qr/$src_test_path/;
+my $target_regex     = qr/$target_path/;
+my $msgs_regex       = qr/Messages\.properties$/;
+my $jelly_regex      = qr/\.jelly$/;
+my $properties_regex = qr/\.properties$/;
 
 sub find_files {
-    my $dir = shift;
+    my ( $dir, $all_known_langs ) = @_;
     confess 'Must provide a string, invalid directory parameter'
         unless ($dir);
     confess 'Must provide a string as directory, not a reference'
         unless ( ref($dir) eq '' );
-    confess "Directory $dir must exists" unless ( -d $dir );
-    my @files;
+    confess "Directory '$dir' must exist" unless ( -d $dir );
+    confess "Must receive a Set::Tiny instance for langs parameter"
+        unless ( ref($all_known_langs) eq 'Set::Tiny' );
+
+    my $country_code_length = 2;
+    my $lang_code_length    = 2;
+    my $min_file_pieces     = 2;
+    my $under_regex         = qr/_/;
+    my $result              = Jenkins::i18n::FindResults->new;
+    $result->add_warning(
+"Warning: ignoring the files at $src_test_path and $target_path paths."
+    );
 
     find(
         sub {
             my $file = $File::Find::name;
 
             unless ( ( $file =~ $src_regex ) or ( $file =~ $target_regex ) ) {
-                push( @files, $file )
-                    if ( ( $file =~ $msgs_regex )
-                    or ( $file =~ $jelly_regex ) );
+                if (   ( $file =~ $msgs_regex )
+                    or ( $file =~ $jelly_regex ) )
+                {
+                    $result->add_file($file);
+                }
+                else {
+
+                    if ( $file =~ $properties_regex ) {
+                        my $file_name = ( File::Spec->splitpath($file) )[-1];
+                        $file_name =~ s/$properties_regex//;
+                        my @pieces = split( $under_regex, $file_name );
+
+                        # we must ignore a "_" at the beginning of the file
+                        shift @pieces if ( $pieces[0] eq '' );
+
+                        if ( scalar(@pieces) < $min_file_pieces ) {
+                            $result->add_file($file);
+                        }
+                        else {
+                            if (
+                                    ( scalar(@pieces) == $min_file_pieces )
+                                and
+                                ( length( $pieces[-1] ) == $lang_code_length )
+                                )
+                            {
+                                $result->add_warning("Ignoring $file")
+                                    if (
+                                    $all_known_langs->member( $pieces[-1] ) );
+                            }
+                            elsif (
+                                ( scalar(@pieces) > $min_file_pieces )
+                                and (
+                                    length( $pieces[-1] )
+                                    == $country_code_length )
+                                and
+                                ( length( $pieces[-2] ) == $lang_code_length )
+                                )
+                            {
+                                $result->add_warning("Ignoring $file")
+                                    if (
+                                    $all_known_langs->member(
+                                        $pieces[-2] . '_' . $pieces[-1]
+                                    )
+                                    );
+                            }
+                            else {
+                                $result->add_file($file);
+                            }
+                        }
+                    }
+                }
             }
         },
         $dir
     );
-    my @sorted = sort(@files);
-    return \@sorted;
+    return $result;
 }
 
 my $regex = qr/_([a-z]{2})(_[A-Z]{2})?\.properties$/;
@@ -183,6 +453,10 @@ files.
 Returns a instance of the L<Set::Tiny> class containing all the language codes
 that were identified.
 
+Find all files Jelly and Java Properties files that could be translated from
+English, i.e., files that do not have a ISO 639-1 standard language based code
+as a filename prefix (before the file extension).
+
 =cut
 
 sub find_langs {
@@ -191,7 +465,7 @@ sub find_langs {
         unless ($dir);
     confess 'Must provide a string as directory, not a reference'
         unless ( ref($dir) eq '' );
-    confess "Directory $dir must exists" unless ( -d $dir );
+    confess "Directory '$dir' must exist" unless ( -d $dir );
     my $langs = Set::Tiny->new;
 
     find(

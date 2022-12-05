@@ -13,7 +13,7 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='6.89';
+$VERSION='6.90';
 
 
 our($Language,@Encodings,$LangName,$YearAdded);
@@ -22,6 +22,7 @@ $LangName  = "English";
 $YearAdded = 1995;
 
 $Language = {
+  _special_rules => { },
   ampm => [['AM', 'A.M.'], ['PM', 'P.M.']],
   at => ['at'],
   day_abb => [

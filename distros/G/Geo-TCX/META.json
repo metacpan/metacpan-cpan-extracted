@@ -29,8 +29,7 @@
          "requires" : {
             "DateTime" : "1.44",
             "DateTime::Format::ISO8601" : "0",
-            "Geo::Calc" : "0",
-            "Geo::Gpx" : "1.02",
+            "Geo::Gpx" : "1.08",
             "IPC::System::Simple" : "1.30",
             "Test::More" : "0",
             "perl" : "5.008"
@@ -56,7 +55,7 @@
          "web" : "https://github.com/patjoly/geo-tcx"
       }
    },
-   "version" : "1.03",
+   "version" : "1.04",
    "x_generated_by_perl" : "v5.36.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

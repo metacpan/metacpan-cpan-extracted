@@ -3,7 +3,7 @@ package Net::Async::Spotify::API::Generated::Tracks;
 use strict;
 use warnings;
 
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 our $AUTHORITY = 'cpan:VNEALV'; # AUTHORITY
 
 use mro;
@@ -26,6 +26,8 @@ Check C<crawl-api-doc.pl> for more information.
 =head1 METHODS
 
 =cut
+
+sub mapping { shift->{mapping} }
 
 =head2 get_audio_analysis
 
@@ -71,9 +73,10 @@ On success, the HTTP status code in the response header is 200 OK and the respon
 async sub get_audio_analysis {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'GET';
-    $request->{uri}    = 'https://api.spotify.com/v1/audio-analysis/{id}';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{get_audio_analysis}{method} // 'GET';
+    $request->{uri}    = $mapping->{get_audio_analysis}{uri} // 'https://api.spotify.com/v1/audio-analysis/{id}';
+    $request->{param}  = $mapping->{get_audio_analysis}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -87,7 +90,7 @@ async sub get_audio_analysis {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{get_audio_analysis}{response} // [
         'analysis object',
 
     ];
@@ -138,9 +141,10 @@ On success, the HTTP status code in the response header is 200 OK and the respon
 async sub get_audio_features {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'GET';
-    $request->{uri}    = 'https://api.spotify.com/v1/audio-features/{id}';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{get_audio_features}{method} // 'GET';
+    $request->{uri}    = $mapping->{get_audio_features}{uri} // 'https://api.spotify.com/v1/audio-features/{id}';
+    $request->{param}  = $mapping->{get_audio_features}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -154,7 +158,7 @@ async sub get_audio_features {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{get_audio_features}{response} // [
         'features object',
 
     ];
@@ -208,9 +212,10 @@ whose value is an array of audio features objects in JSON format.Objects are ret
 async sub get_several_audio_features {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'GET';
-    $request->{uri}    = 'https://api.spotify.com/v1/audio-features';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{get_several_audio_features}{method} // 'GET';
+    $request->{uri}    = $mapping->{get_several_audio_features}{uri} // 'https://api.spotify.com/v1/audio-features';
+    $request->{param}  = $mapping->{get_several_audio_features}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -224,7 +229,7 @@ async sub get_several_audio_features {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{get_several_audio_features}{response} // [
         'an object',
         'an object',
 
@@ -286,9 +291,10 @@ in JSON format.Objects are returned in the order requested. If an object is not 
 async sub get_several_tracks {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'GET';
-    $request->{uri}    = 'https://api.spotify.com/v1/tracks';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{get_several_tracks}{method} // 'GET';
+    $request->{uri}    = $mapping->{get_several_tracks}{uri} // 'https://api.spotify.com/v1/tracks';
+    $request->{param}  = $mapping->{get_several_tracks}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -306,7 +312,7 @@ async sub get_several_tracks {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{get_several_tracks}{response} // [
         'an object',
         'an object',
 
@@ -377,9 +383,10 @@ and the response body contains an error object.Try in our Web Console
 async sub get_track {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'GET';
-    $request->{uri}    = 'https://api.spotify.com/v1/tracks/{id}';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{get_track}{method} // 'GET';
+    $request->{uri}    = $mapping->{get_track}{uri} // 'https://api.spotify.com/v1/tracks/{id}';
+    $request->{param}  = $mapping->{get_track}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -399,7 +406,7 @@ async sub get_track {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{get_track}{response} // [
         'track object',
 
     ];

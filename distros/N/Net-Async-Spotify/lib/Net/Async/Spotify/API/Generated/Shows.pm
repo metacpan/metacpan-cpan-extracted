@@ -3,7 +3,7 @@ package Net::Async::Spotify::API::Generated::Shows;
 use strict;
 use warnings;
 
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 our $AUTHORITY = 'cpan:VNEALV'; # AUTHORITY
 
 use mro;
@@ -26,6 +26,8 @@ Check C<crawl-api-doc.pl> for more information.
 =head1 METHODS
 
 =cut
+
+sub mapping { shift->{mapping} }
 
 =head2 get_a_show
 
@@ -94,9 +96,10 @@ If a show is unavailable in the given market the HTTP status code in the respons
 async sub get_a_show {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'GET';
-    $request->{uri}    = 'https://api.spotify.com/v1/shows/{id}';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{get_a_show}{method} // 'GET';
+    $request->{uri}    = $mapping->{get_a_show}{uri} // 'https://api.spotify.com/v1/shows/{id}';
+    $request->{param}  = $mapping->{get_a_show}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -116,7 +119,7 @@ async sub get_a_show {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{get_a_show}{response} // [
         'show object',
 
     ];
@@ -194,9 +197,10 @@ If a show is unavailable in the given market the HTTP status code in the respons
 async sub get_a_shows_episodes {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'GET';
-    $request->{uri}    = 'https://api.spotify.com/v1/shows/{id}/episodes';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{get_a_shows_episodes}{method} // 'GET';
+    $request->{uri}    = $mapping->{get_a_shows_episodes}{uri} // 'https://api.spotify.com/v1/shows/{id}/episodes';
+    $request->{param}  = $mapping->{get_a_shows_episodes}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -224,7 +228,7 @@ async sub get_a_shows_episodes {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{get_a_shows_episodes}{response} // [
         'episode object',
 
     ];
@@ -290,9 +294,10 @@ in JSON format.Objects are returned in the order requested. If an object is not 
 async sub get_multiple_shows {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'GET';
-    $request->{uri}    = 'https://api.spotify.com/v1/shows';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{get_multiple_shows}{method} // 'GET';
+    $request->{uri}    = $mapping->{get_multiple_shows}{uri} // 'https://api.spotify.com/v1/shows';
+    $request->{param}  = $mapping->{get_multiple_shows}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -310,7 +315,7 @@ async sub get_multiple_shows {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{get_multiple_shows}{response} // [
         'an object',
         'an object',
 

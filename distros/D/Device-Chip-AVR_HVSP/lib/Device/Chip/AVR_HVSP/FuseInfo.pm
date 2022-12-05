@@ -3,12 +3,10 @@
 #
 #  (C) Paul Evans, 2014-2015 -- leonerd@leonerd.org.uk
 
-package Device::Chip::AVR_HVSP::FuseInfo;
+package Device::Chip::AVR_HVSP::FuseInfo 0.06;
 
 use v5.26;
 use warnings;
-
-our $VERSION = '0.05';
 
 use Carp;
 
@@ -34,7 +32,9 @@ user-interactive manner.
 
 =head1 CONSTRUCTOR
 
-=head2 $fuseinfo = Device::Chip::AVR_HVSP::FuseInfo->for_part( $part )
+=head2 for_part
+
+   $fuseinfo = Device::Chip::AVR_HVSP::FuseInfo->for_part( $part )
 
 Returns a new C<Device::Chip::AVR_HVSP::FuseInfo> instance containing
 information about the fuses for the given part name.
@@ -55,24 +55,26 @@ sub for_part
 
 =cut
 
-=head2 @fuses = $fuseinfo->fuses
+=head2 fuses
+
+   @fuses = $fuseinfo->fuses
 
 Returns a list of objects, each one representing a single configuration fuse.
 Each has the following fields:
 
- $fuse->name
- $fuse->offset
- $fuse->mask
- $fuse->caption
- @values = $fuse->values
+   $fuse->name
+   $fuse->offset
+   $fuse->mask
+   $fuse->caption
+   @values = $fuse->values
 
 If the C<values> method gives a non-empty list of values, then the fuse is an
 enumeration; otherwise it is a simple boolean true/false flag. For enumeration
 fuses, each value item has the following fields:
 
- $value->name
- $value->value
- $value->caption
+   $value->name
+   $value->value
+   $value->caption
 
 =cut
 
@@ -82,7 +84,9 @@ sub fuses
    return @{ $self->{fuses} };
 }
 
-=head2 %fields = $fuseinfo->unpack( $bytes )
+=head2 unpack
+
+   %fields = $fuseinfo->unpack( $bytes )
 
 Given a byte string containing all the fuses read from the device, unpacks
 them and returns a key-value list giving the current value of every fuse.
@@ -104,7 +108,9 @@ sub unpack
    return %ret;
 }
 
-=head2 $bytes = $fuseinfo->pack( %fields )
+=head2 pack
+
+   $bytes = $fuseinfo->pack( %fields )
 
 Given a key-value list containing fuse values, packs them into a byte string
 suitable to write onto the device and returns it.

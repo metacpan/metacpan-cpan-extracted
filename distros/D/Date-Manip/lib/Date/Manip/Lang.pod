@@ -133,6 +133,39 @@ ASCII equivalent, just include the UTF-8 representation.
 
 Feel free to contact me if you have any questions.
 
+=head1 LANGUAGE SPECIFIC RULES
+
+In the language file, there is one special value named _special_rules.
+This is a hash of special parsing rules that will be applied for this
+language.
+
+Currently the following rules are available:
+
+=over 4
+
+=item remove_trailing_period
+
+If this is set, trailing periods will be removed.
+
+For example, in German, default output of the date command includes a
+day of month with a trailing period.  For example:
+
+   Mo 3. Jan 11:00:00 EST 2022
+
+If this rule is set, periods followed by whitespace (or an end of string) are
+stripped.
+
+=item remove_parens
+
+This will strip parentheses () from a string.
+
+=item strip_word
+
+This is a list of words that will be stripped from a string.  Each word must be
+bracketed by the start/end of the string or whitespace.
+
+=back
+
 =head1 SEE ALSO
 
 L<Date::Manip>        - main module documentation

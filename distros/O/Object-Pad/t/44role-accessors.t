@@ -5,10 +5,10 @@ use warnings;
 
 use Test::More;
 
-use Object::Pad;
+use Object::Pad ':experimental(init_expr)';
 
 role ARole {
-   has $one :reader = 1;
+   field $one :reader = 1;
 }
 
 class AClass :does(ARole) {

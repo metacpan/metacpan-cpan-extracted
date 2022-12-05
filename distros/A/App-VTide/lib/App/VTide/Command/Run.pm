@@ -9,25 +9,22 @@ package App::VTide::Command::Run;
 use Moo;
 use warnings;
 use version;
-use Carp qw/carp longmess/;
-use English qw/ -no_match_vars /;
+use Carp                qw/carp longmess/;
+use English             qw/ -no_match_vars /;
 use Hash::Merge::Simple qw/ merge /;
 use Path::Tiny;
 use File::stat;
 use File::chdir;
 use IO::Prompt qw/prompt/;
 use Algorithm::Cron;
+use List::MoreUtils qw/uniq/;
+use Data::Dumper    qw/Dumper/;
 
 extends 'App::VTide::Command';
 
-our $VERSION = version->new('0.1.18');
+our $VERSION = version->new('0.1.19');
 our $NAME    = 'run';
-our $OPTIONS = [
-    'name|n=s',
-    'test|T!',
-    'save|s=s',
-    'verbose|v+',
-];
+our $OPTIONS = [ 'name|n=s', 'test|T!', 'save|s=s', 'verbose|v+', ];
 our $LOCAL   = 1;
 sub details_sub { return ( $NAME, $OPTIONS, $LOCAL ) }
 
@@ -36,18 +33,27 @@ has first => (
     default => 1,
 );
 
+has base => ( is => 'rw', );
+
 sub run {
     my ($self) = @_;
 
-    my ( $name ) = $self->session_dir($self->defaults->{name});
+    my ($name) = $self->session_dir( $self->defaults->{name} );
     my $cmd = $self->options->files->[0] || '';
     $ENV{VTIDE_TERM} = $cmd;
 
-    my $params = $self->params( $cmd );
-    my @cmd    = $self->command( $params );
+    my $params = $self->params($cmd);
+    my @cmd    = $self->command($params);
 
     @ARGV = ();
-    if ( !( $self->first && ($params->{watch} || $params->{cron}) && $params->{wait} ) ) {
+    if (
+        !(
+               $self->first
+            && ( $params->{watch} || $params->{cron} )
+            && $params->{wait}
+        )
+      )
+    {
 
         if ( $params->{clear} ) {
             system 'clear';
@@ -57,15 +63,16 @@ sub run {
         }
 
         if ( $params->{heading} ) {
+
             # show terminal heading if desired
             print $params->{heading}, "\n";
         }
 
-        if ( ! $self->defaults->{test} && $params->{wait} ) {
+        if ( !$self->defaults->{test} && $params->{wait} ) {
             print join ' ', @cmd, "\n";
             print "Press enter to start : ";
             my $ans = <ARGV>;
-            if (!$ans || !ord $ans) {
+            if ( !$ans || !ord $ans ) {
                 print "\n";
                 return;
             }
@@ -73,26 +80,27 @@ sub run {
 
         $self->load_env( $params->{env} );
         local $CWD = $CWD;
-        if ( $params->{dir} ) {
+        $self->base($CWD);
+        if ( $params->{dir} && -d $params->{dir} ) {
             $CWD = $params->{dir};
         }
 
         if ( $self->defaults->{verbose} || $self->defaults->{test} ) {
             warn "Will wait before starting\n" if $params->{wait};
-            warn "Will restart on exit\n" if $params->{restart};
+            warn "Will restart on exit\n"      if $params->{restart};
         }
 
         # run any hooks for run_running
-        $self->hooks->run('run_running', \@cmd);
+        $self->hooks->run( 'run_running', \@cmd );
 
         # start the terminal
-        $self->runit( @cmd );
+        $self->runit(@cmd);
     }
 
     # flag this is no longer the first run
     $self->first(0);
 
-    if ( ! $self->defaults->{test} && $self->restart($cmd) ) {
+    if ( !$self->defaults->{test} && $self->restart($cmd) ) {
         return $self->run;
     }
 
@@ -100,14 +108,14 @@ sub run {
 }
 
 sub restart {
-    my ($self, $cmd, $no_watch) = @_;
+    my ( $self, $cmd, $no_watch ) = @_;
 
-    my $params = $self->params( $cmd );
+    my $params = $self->params($cmd);
 
     return $self->watch($cmd) if !$no_watch && $params->{watch};
-    return $self->cron($cmd) if !$no_watch && $params->{cron};
+    return $self->cron($cmd)  if !$no_watch && $params->{cron};
 
-    return if ! $params->{restart};
+    return if !$params->{restart};
 
     my %action = (
         q => {
@@ -118,16 +126,16 @@ sub restart {
             msg  => 'clear screen',
             exec => sub {
                 system "clear";
-                $self->restart($cmd, $no_watch);
+                $self->restart( $cmd, $no_watch );
             },
         },
         s => {
             msg  => 'Show command',
             exec => sub {
-                my $params = $self->params( $cmd );
+                my $params = $self->params($cmd);
                 print "\nThis terminals command:\n";
-                print join ' ', $self->command( $params ), "\n\n";
-                $self->restart($cmd, $no_watch);
+                print join ' ', $self->command($params), "\n\n";
+                $self->restart( $cmd, $no_watch );
             },
         },
         r => {
@@ -136,7 +144,7 @@ sub restart {
         },
     );
 
-    if ($params->{restart} ne 1) {
+    if ( $params->{restart} ne 1 ) {
         my ($letter) = $params->{restart} =~ /^(.)/xms;
         $action{$letter} = {
             msg  => $params->{restart},
@@ -146,7 +154,7 @@ sub restart {
 
     # show restart menu
     my $menu = "Options:\n";
-    for my $letter (sort keys %action) {
+    for my $letter ( sort keys %action ) {
         $menu .= "$letter - $action{$letter}{msg}\n";
     }
     print $menu;
@@ -160,9 +168,9 @@ sub restart {
     $answer ||= $params->{default} || '';
 
     # ask the question
-    while ( ! $action{$answer} ) {
+    while ( !$action{$answer} ) {
         print $menu;
-        print "Please choose one of " . (join ', ', sort keys %action) . "\n";
+        print "Please choose one of " . ( join ', ', sort keys %action ) . "\n";
         $answer = <ARGV>;
         chomp $answer if $answer;
         $answer ||= $params->{default} || '';
@@ -172,9 +180,9 @@ sub restart {
 }
 
 sub watch {
-    my ($self, $cmd) = @_;
+    my ( $self, $cmd ) = @_;
 
-    my $params = $self->params( $cmd );
+    my $params = $self->params($cmd);
     my @files  = $self->command(
         {
             editor => { command => undef },
@@ -190,7 +198,8 @@ sub watch {
 
     while (1) {
         my $done = 0;
-        local $SIG{INT} = sub { $done = $self->restart($cmd, 1) ? 1 : undef; };
+        local $SIG{INT} =
+          sub { $done = $self->restart( $cmd, 1 ) ? 1 : undef; };
 
         sleep 1;
 
@@ -198,6 +207,7 @@ sub watch {
 
             # return if interrupted
             return 1 if $done;
+
             # return if asked to quit
             return if !defined $done;
 
@@ -211,32 +221,35 @@ sub watch {
 }
 
 sub cron {
-    my ($self, $cmd) = @_;
+    my ( $self, $cmd ) = @_;
 
-    my $params = $self->params( $cmd );
-    my $cron = Algorithm::Cron->new(
-       base => 'local',
-       crontab => $params->{cron},
-   );
+    my $params = $self->params($cmd);
+    my $cron   = Algorithm::Cron->new(
+        base    => 'local',
+        crontab => $params->{cron},
+    );
 
     while (1) {
         my $done = 0;
-        local $SIG{INT} = sub { $done = $self->restart($cmd, 1) ? 1 : undef; };
+        local $SIG{INT} =
+          sub { $done = $self->restart( $cmd, 1 ) ? 1 : undef; };
 
         my $next_time = $cron->next_time(time);
+
         #sleep $next_time - time;
         sleep 1;
 
         # return if interrupted
         return 1 if $done;
+
         # return if asked to quit
         return if !defined $done;
 
-        if ($params->{cron_verbose}) {
-            print {*STDERR} "\33[2K\r" . pretty_time($next_time - time);
+        if ( $params->{cron_verbose} ) {
+            print {*STDERR} "\33[2K\r" . pretty_time( $next_time - time );
         }
-        if ($next_time <= time) {
-            if ($params->{cron_verbose}) {
+        if ( $next_time <= time ) {
+            if ( $params->{cron_verbose} ) {
                 print {*STDERR} "\33[2K\r";
             }
             return 1;
@@ -249,9 +262,9 @@ sub cron {
 sub pretty_time {
     my ($time) = @_;
 
-    my $pretty = '';
-    my $days = int $time / (24 * 60 * 60);
-    my $hours = int $time / (60 * 60) - $days * 24;
+    my $pretty  = '';
+    my $days    = int $time / ( 24 * 60 * 60 );
+    my $hours   = int $time / ( 60 * 60 ) - $days * 24;
     my $minutes = int $time / 60 - $days * 24 * 60 - $hours * 60;
     my $seconds = $time % 60;
 
@@ -261,7 +274,7 @@ sub pretty_time {
 sub params {
     my ( $self, $cmd ) = @_;
 
-    if ( ! $cmd ) {
+    if ( !$cmd ) {
         warn "No \$cmd passed to params()\n", longmess();
     }
 
@@ -269,12 +282,12 @@ sub params {
     my $params = $config->{terminals}{$cmd} || {};
 
     if ( ref $params eq 'ARRAY' ) {
-        $params = { command => @{ $params } ? $params : '' };
+        $params = { command => @{$params} ? $params : '' };
     }
 
-    if ( ! $params->{command} && ! $params->{edit} ) {
+    if ( !$params->{command} && !$params->{edit} ) {
         $params->{command} = 'bash';
-        $params->{wait} = 0;
+        $params->{wait}    = 0;
     }
 
     return merge $config->{default} || {}, $params;
@@ -285,7 +298,7 @@ sub command_param {
 
     my ($user_param) = $param =~ /^[{]:(\w+):[}]$/;
 
-    return $param if ! $user_param;
+    return $param if !$user_param;
 
     my $value = prompt "$user_param : ";
     chomp $value;
@@ -296,33 +309,36 @@ sub command_param {
 sub command {
     my ( $self, $params ) = @_;
 
-    if ( ! $params->{edit} ) {
-        return ref $params->{command}
-            ? map {$self->command_param($_)} @{ $params->{command} }
-            : ( $params->{command} );
+    if ( !$params->{edit} ) {
+        return
+          ref $params->{command}
+          ? map { $self->command_param($_) } @{ $params->{command} }
+          : ( $params->{command} );
     }
 
-    my $editor = ref $params->{editor}{command}
-        ? $params->{editor}{command}
-        : $self->config->get->{editor}{command};
+    my $editor =
+      ref $params->{editor}{command}
+      ? $params->{editor}{command}
+      : $self->config->get->{editor}{command};
 
-    my @globs = ref $params->{edit} ? @{ $params->{edit} } : ( $params->{edit} );
+    my @globs =
+      ref $params->{edit} ? @{ $params->{edit} } : ( $params->{edit} );
 
     my $title = $params->{title} || $globs[0];
-    my $max = 15;
-    if (length $title > $max) {
-        $title = substr $title, (length $title) - $max, $max + 1;
+    my $max   = 15;
+    if ( length $title > $max ) {
+        $title = substr $title, ( length $title ) - $max, $max + 1;
     }
 
     eval { require Term::Title; }
-        and Term::Title::set_titlebar($title);
+      and Term::Title::set_titlebar($title);
     system 'tmux', 'rename-window', $title;
 
     my $helper_text = $self->config->get->{editor}{helper};
     my $helper;
     eval {
         if ($helper_text) {
-            $helper = eval $helper_text;  ## no critic
+            $helper = eval $helper_text;    ## no critic
             die "No helper generated!" if !$helper;
         }
         else {
@@ -335,41 +351,41 @@ sub command {
     };
 
     my $groups = $self->config->get->{editor}{files};
-    my @files = $self->_globs2files($groups, $helper, @globs);
+    my @files  = $self->_globs2files( $groups, $helper, @globs );
 
     return ( @$editor, @files );
 }
 
 sub _globs2files {
-    my ($self, $groups, $helper, @globs) = @_;
+    my ( $self, $groups, $helper, @globs ) = @_;
     my @files;
     my $count = 0;
 
-    GLOB:
+  GLOB:
     while ( my $glob = shift @globs ) {
         last if $count++ > 30;
         my ($not_glob) = $glob =~ /^[!](.*)$/;
 
-        if ( $not_glob ) {
+        if ($not_glob) {
             my %not_files = map { $_ => 1 }
-                $self->_globs2files($groups, $helper, $not_glob);
-            @files = grep { ! $not_files{$_} } @files;
+              $self->_globs2files( $groups, $helper, $not_glob );
+            @files = grep { !$not_files{$_} } @files;
             next GLOB;
         }
         elsif ( $groups->{$glob} ) {
             unshift @globs, @{ $groups->{$glob} };
             next GLOB;
         }
-        elsif ( $helper ) {
+        elsif ($helper) {
             my @g;
             eval {
-                @g = $helper->($self, $glob);
+                @g = $helper->( $self, $glob );
                 1;
             } or do { warn $@ };
 
             if (@g) {
                 push @files, grep { -f $_ } @g;
-                unshift @globs, grep { ! -f $_ } @g;
+                unshift @globs, grep { !-f $_ } @g;
                 next GLOB;
             }
         }
@@ -377,7 +393,7 @@ sub _globs2files {
         push @files, $self->_dglob($glob);
     }
 
-    return @files;
+    return uniq @files;
 }
 
 sub _shell_quote {
@@ -387,9 +403,9 @@ sub _shell_quote {
 }
 
 sub load_env {
-    my ($self, $env_extra) = @_;
+    my ( $self, $env_extra ) = @_;
     if ( $env_extra && ref $env_extra eq 'HASH' ) {
-        for my $env ( keys %{ $env_extra } ) {
+        for my $env ( keys %{$env_extra} ) {
             my $orig = $ENV{$env};
             $ENV{$env} = $env_extra->{$env};
             $ENV{$env} =~ s/[\$]$env/$orig/xms;
@@ -402,7 +418,8 @@ sub load_env {
 sub runit {
     my ( $self, @cmd ) = @_;
 
-    print +(join " \\\n  ", @cmd), "\n" if $self->defaults->{test} || $self->defaults->{verbose};
+    print +( join " \\\n  ", @cmd ), "\n"
+      if $self->defaults->{test} || $self->defaults->{verbose};
 
     return if $self->defaults->{test};
 
@@ -415,18 +432,29 @@ sub runit {
             }
         }
 
-        if ( ! $found ) {
+        if ( !$found ) {
             @cmd = ( join ' ', @cmd );
         }
     }
 
-    return system @cmd;
+    my $fh = path( $self->base, '.vtide', 'run.log' )->opena;
+    print {$fh} '['
+      . localtime
+      . "] RUN $ENV{VTIDE_TERM} "
+      . ( join ' ', @cmd ) . "\n";
+    my $err = system @cmd;
+    if ($err) {
+        print {$fh} '['
+          . localtime
+          . "] RUN ERRORED $ENV{VTIDE_TERM} "
+          . ( join ' ', @cmd ) . "\n";
+    }
 }
 
 sub auto_complete {
     my ($self) = @_;
 
-    my $env = $self->options->files->[-1];
+    my $env   = $self->options->files->[-1];
     my @files = sort keys %{ $self->config->get->{terminals} };
 
     print join ' ', grep { $env ne 'run' ? /^$env/xms : 1 } @files;
@@ -444,7 +472,7 @@ App::VTide::Command::Run - Run a terminal command
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command::Run version 0.1.18
+This documentation refers to App::VTide::Command::Run version 0.1.19
 
 =head1 SYNOPSIS
 

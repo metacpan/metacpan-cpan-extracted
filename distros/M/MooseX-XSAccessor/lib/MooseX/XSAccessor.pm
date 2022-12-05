@@ -10,7 +10,7 @@ use Scalar::Util qw(blessed);
 
 BEGIN {
 	$MooseX::XSAccessor::AUTHORITY = 'cpan:TOBYINK';
-	$MooseX::XSAccessor::VERSION   = '0.009';
+	$MooseX::XSAccessor::VERSION   = '0.010';
 }
 
 our $LVALUE;
@@ -18,34 +18,33 @@ our $LVALUE;
 use Moose::Exporter;
 "Moose::Exporter"->setup_import_methods;
 
-sub init_meta
-{
+sub init_meta {
 	shift;
 	my %p = @_;
 	Moose::Util::MetaRole::apply_metaroles(
 		for             => $p{for_class},
 		class_metaroles => {
-			attribute => [qw( MooseX::XSAccessor::Trait::Attribute )],
+			attribute         => [qw( MooseX::XSAccessor::Trait::Attribute )],
+		},
+		role_metaroles  => {
+			applied_attribute => [qw( MooseX::XSAccessor::Trait::Attribute )],
 		},
 	);
 }
 
-sub is_xs
-{
+sub is_xs {
 	my $sub = $_[0];
-	
-	if (blessed($sub) and $sub->isa("Class::MOP::Method"))
-	{
+
+	if ( blessed($sub) and $sub->isa( "Class::MOP::Method" ) ) {
 		$sub = $sub->body;
 	}
-	elsif (not ref $sub)
-	{
+	elsif ( not ref $sub ) {
 		no strict "refs";
 		$sub = \&{$sub};
 	}
-	
+
 	require B;
-	!! B::svref_2object($sub)->XSUB;
+	!! B::svref_2object( $sub )->XSUB;
 }
 
 1;
@@ -262,7 +261,7 @@ usually able to detect such situations and silently switch itself off.
 =head1 BUGS
 
 Please report any bugs to
-L<http://rt.cpan.org/Dist/Display.html?Queue=MooseX-XSAccessor>.
+L<https://github.com/tobyink/p5-moosex-xsaccessor/issues>.
 
 =head1 SEE ALSO
 
@@ -276,7 +275,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013, 2017 by Toby Inkster.
+This software is copyright (c) 2013, 2017, 2022 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

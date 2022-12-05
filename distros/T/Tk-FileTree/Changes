@@ -1,0 +1,11 @@
+Revision history for Tk-FileTree
+
+1.00    2022/12/02
+        First version, released on an unsuspecting world.
+        - Derived from Tk::DirTree, adding ability to include files in the 
+        tree along with directories.  Also supports filters and is disableable.
+        Much better documentation (than Tk::DirTree) have been added, and it 
+        is capable of being used as a drop-in replacement for Tk::DirTree by 
+        containing a superset of it's options and features.
+1.01    
+        Some doc. changes, edits & improvements.  No code changes.

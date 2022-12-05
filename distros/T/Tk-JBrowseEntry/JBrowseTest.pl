@@ -20,23 +20,32 @@ $jb1 = $MainWin->JBrowseEntry(
 	-variable => \$dbname1,
 	-state => 'normal',
 #	-arrowimage => $MainWin->Getimage('balArrow'),
-	-choices => [qw(pigs cows foxes goats)],
+	-choices => [qw(pigs cows foxes goats cats)],
 	-width  => 12);
 $jb1->pack(
+	-side   => 'top', -pady => '10', -anchor => 'w');
+$jb2a = $MainWin->JBrowseEntry(
+#	-arrowimage => $MainWin->Getimage('balArrow'),
+	-label => 'Text:',
+	-variable => \$dbname2,
+	-state => 'text',
+	-choices => [qw(pigs cows foxes goats cats)],
+	-width  => 12);
+$jb2a->pack(
 	-side   => 'top', -pady => '10', -anchor => 'w');
 $jb2 = $MainWin->JBrowseEntry(
 #	-arrowimage => $MainWin->Getimage('balArrow'),
 	-label => 'TextOnly:',
 	-variable => \$dbname2,
 	-state => 'textonly',
-	-choices => [qw(pigs cows foxes goats)],
+	-choices => [qw(pigs cows foxes goats cats)],
 	-width  => 12);
 $jb2->pack(
 	-side   => 'top', -pady => '10', -anchor => 'w');
 $jb3 = $MainWin->JBrowseEntry(
 	-label => 'ReadOnly:',
 	-variable => \$dbname3,
-	-choices => [qw(pigs cows foxes goats)],
+	-choices => [qw(pigs cows foxes goats cats)],
 	-state => 'readonly',
 	-width  => 12);
 $jb3->pack(
@@ -45,7 +54,7 @@ $jb4 = $MainWin->JBrowseEntry(
 	-label => 'Disabled:',
 	-variable => \$dbname3,
 	-state => 'disabled',
-	-choices => [qw(pigs cows foxes goats)],
+	-choices => [qw(pigs cows foxes goats cats)],
 	-width  => 12);
 $jb4->pack(
 	-side   => 'top', -pady => '10', -anchor => 'w');
@@ -62,7 +71,7 @@ $jb5 = $MainWin->JBrowseEntry(
 $jb5->pack(
 	-side   => 'top', -pady => '10', -anchor => 'w');
 $jb6 = $MainWin->JBrowseEntry(
-	-label => 'Button Focus:',
+	-label => 'Button Focus Also:',
 	-btntakesfocus => 1,
 #	-arrowimage => $MainWin->Getimage('balArrow'),
 #	-farrowimage => $MainWin->Getimage('cbxarrow'),

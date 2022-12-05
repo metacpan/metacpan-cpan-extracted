@@ -1,23 +1,29 @@
-0.06 20110422
-    . Add some documentation
-    . Rename the keys
+0.07 2022-12-04
+    * Fix for 64-bit Windows, this addresses Github issue #1
+	* Support networks being unavailable while Wlan is active
+	  Contributed by jddurand, many thanks!
+	* Distribution packaging chores
+
+0.06 2011-04-22
+    * Add some documentation
+    * Rename the keys
         dot11_default_auth_algorithm => default_auth_algorithm
         dot11_default_cipher_algorithm => default_cipher_algorithm
-    . WlanCurrentConnection() now also decodes and returns
+    * WlanCurrentConnection() now also decodes and returns
       the "security" status and encryption algorithm for the
       current connection
 
-0.05 20110320
-    . Fix ->connected to return false if WLAN is switched off
+0.05 2011-03-20
+    * Fix ->connected to return false if WLAN is switched off
 
-0.04 20110307
-    . Fix t/06-synopsis-api.t, spotted by Thomas Fahle
+0.04 2011-03-07
+    * Fix t/06-synopsis-api.t, spotted by Thomas Fahle
 
-0.03 20110222
-    . Fix missing prerequisite, thanks to the CPAN testers
+0.03 2011-02-22
+    * Fix missing prerequisite, thanks to the CPAN testers
 
-0.02 20110220
-    . Pass tests on more platforms by making them more robust
+0.02 2011-02-20
+    * Pass tests on more platforms by making them more robust
 
-0.01 20110220
-    . Released unto a propably suspecting audience
+0.01 2011-02-20
+    * Released unto a propably suspecting audience

@@ -5,7 +5,10 @@ use Test::More;
 use Test::Fatal;
 use Net::Async::Redis::XS;
 
-my $instance = Net::Async::Redis::Protocol::XS->new;
+my $instance = Net::Async::Redis::Protocol::XS->new(
+    error  => sub { note 'error callback: ' . shift },
+    pubsub => sub { note 'pubsub callback: ' . shift },
+);
 
 ++$|;
 like(exception {
@@ -40,6 +43,25 @@ is_deeply([ Net::Async::Redis::XS::decode_buffer($instance, "*1$Z*1$Z*0$Z") ], [
     is_deeply([ Net::Async::Redis::XS::decode_buffer($instance, "-error$Z") ], [ ], 'error should yield no items');
     is($err, 'error', 'callback received error message');
 }
+
+{
+    my $target = "*1$Z*1$Z*2$Z:8$Z*6$Z+a$Z+1$Z+b$Z+2$Z+c$Z";
+    for(0..length($target)) {
+        my $data = substr($target, 0, $_);
+        is_deeply(
+            [ Net::Async::Redis::XS::decode_buffer(
+                $instance,
+                $data,
+            ) ], [ ], 'empty response on partial input',
+        );
+        is(
+            Net::Async::Redis::XS::decode_buffer(
+                $instance,
+                $data,
+            ), undef, 'empty response on partial input',
+        );
+    }
+}
 is_deeply(
     Net::Async::Redis::XS::decode_buffer($instance,
         "*1$Z*1$Z*2$Z:8$Z*6$Z+a$Z+1$Z+b$Z+2$Z+c$Z+3$Z"
@@ -55,7 +77,12 @@ is_deeply(
     'can decode_buffer'
 );
 
-is_deeply([ Net::Async::Redis::XS::decode_buffer($instance, ">1$Z:8$Z") ], [ ], 'can decode_buffer for pubsub with no data');
+{
+    my $pubsub;
+    local $instance->{pubsub} = sub { fail('called more than once') if $pubsub; $pubsub = shift; };
+    is_deeply([ Net::Async::Redis::XS::decode_buffer($instance, ">1$Z:8$Z") ], [ ], 'can decode_buffer for pubsub with no data');
+    is_deeply($pubsub, [ 8 ]);
+}
 
 is_deeply(
     Net::Async::Redis::XS::decode_buffer($instance,

@@ -20,7 +20,7 @@ use strict;
 use warnings;
 
 our $VERSION;
-$VERSION='6.89';
+$VERSION='6.90';
 
 our ($dmb);
 $dmb = new Date::Manip::Base;
@@ -212,12 +212,16 @@ sub do_list {
    # the tzdata package.
    #
 
-   my(@zone);
+   my(@zone,@link);
 
    foreach my $file (@Date::Manip::TZdata::StdFiles) {
       my @tmp = `grep '^Zone' tzdata/$file | awk '{print \$2}'`;
       chomp(@tmp);
       push(@zone,@tmp);
+
+      @tmp = `grep '^Link' tzdata/$file | awk '{print \$2,\$3}'`;
+      chomp(@tmp);
+      push(@link,@tmp);
    }
 
    #
@@ -268,6 +272,11 @@ sub do_list {
       } else {
          warn "[do_list] unknown type [$zone: $type]\n";
       }
+   }
+
+   foreach my $link (@link) {
+      my($zone,$alias) = split(/\s+/,$link);
+      $alias{$alias} = [ $zone, "alias" ];
    }
 
    # Write out the official list of zones and aliases.

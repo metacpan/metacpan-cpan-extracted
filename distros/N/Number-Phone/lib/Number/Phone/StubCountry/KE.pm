@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20220903144941;
+our $VERSION = 1.20221202211027;
 
 my $formatters = [
                 {
@@ -96,33 +96,33 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"25440", "Kwale\/Ukunda\/Msambweni\/Lungalunga",
-"25442", "Malindi\/Lamu\/Garsen",
-"25465", "Nyahururu\/Maralal",
-"25464", "Meru\/Maua\/Chuka",
-"25467", "Kiambu\/Kikuyu",
-"25468", "Embu",
-"25444", "Machakos\/Makueni\/Mwingi\/Kitui",
-"25445", "Kajiado\/Ngong\/Loitokitok\/Athi\ River",
-"25462", "Nanyuki",
-"2542", "Nairobi",
-"25453", "Eldoret\/Turbo\/Kapsabet\/Iten\/Kabarnet",
-"25469", "Marsabit\/Moyale",
-"25460", "Muranga\/Kerugoya",
-"25456", "Kakamega\/Mbale\/Butere\/Mumias\/Vihiga",
+$areanames{en} = {"25445", "Kajiado\/Ngong\/Loitokitok\/Athi\ River",
 "25451", "Nakuru\/Njoro\/Molo",
-"25455", "Bungoma\/Busia",
+"25467", "Kiambu\/Kikuyu",
+"25465", "Nyahururu\/Maralal",
 "25454", "Kitale\/Moi\'s\ Bridge\/Kapenguria\/Lodwar",
-"25458", "Kisii\/Kilgoris\/Oyugis\/Nyamira",
-"25457", "Kisumu\/Siaya\/Maseno",
+"25459", "Homabay\/Migori",
+"25468", "Embu",
+"25442", "Malindi\/Lamu\/Garsen",
+"25440", "Kwale\/Ukunda\/Msambweni\/Lungalunga",
+"25460", "Muranga\/Kerugoya",
 "25443", "Voi\/Wundanyi\/Mwatate\/Taveta",
-"25446", "Garissa\/Hola\/Wajir\/Mandera",
-"25441", "Mombasa\/Mariakani\/Kilifi",
-"25466", "Thika\/Ruiru",
-"25450", "Naivasha\/Narok\/Gilgil",
+"25462", "Nanyuki",
+"25456", "Kakamega\/Mbale\/Butere\/Mumias\/Vihiga",
+"2542", "Nairobi",
+"25469", "Marsabit\/Moyale",
+"25464", "Meru\/Maua\/Chuka",
+"25444", "Machakos\/Makueni\/Mwingi\/Kitui",
 "25461", "Nyeri\/Karatina",
-"25452", "Kericho\/Bomet",
-"25459", "Homabay\/Migori",};
+"25441", "Mombasa\/Mariakani\/Kilifi",
+"25455", "Bungoma\/Busia",
+"25457", "Kisumu\/Siaya\/Maseno",
+"25466", "Thika\/Ruiru",
+"25446", "Garissa\/Hola\/Wajir\/Mandera",
+"25458", "Kisii\/Kilgoris\/Oyugis\/Nyamira",
+"25453", "Eldoret\/Turbo\/Kapsabet\/Iten\/Kabarnet",
+"25450", "Naivasha\/Narok\/Gilgil",
+"25452", "Kericho\/Bomet",};
 
     sub new {
       my $class = shift;

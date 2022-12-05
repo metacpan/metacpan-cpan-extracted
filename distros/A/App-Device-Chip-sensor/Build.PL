@@ -10,13 +10,15 @@ my $build = Module::Build->new(
    requires => {
       'perl' => '5.026',
       'Feature::Compat::Defer' => 0,
+      'Feature::Compat::Try' => 0,
       'Future::AsyncAwait' => 0,
-      'Object::Pad' => '0.57',
+      'Object::Pad' => '0.74', # 0.73 + bugfix
 
       'Device::Chip::Adapter' => 0,
       'Device::Chip::Sensor' => '0.19',
       'Future::IO' => '0.08',
       'Future::IO::Impl::IOAsync' => 0,
+      'List::Util' => '1.29',
    },
    test_requires => {
       'Test::More' => '0.88', # done_testing

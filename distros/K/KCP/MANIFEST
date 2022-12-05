@@ -1,0 +1,25 @@
+Changes
+KCP.xs
+lib/KCP.pm
+lib/KCP/Test.pm
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/01_new.t
+t/02_get_conv.t
+t/03_get_interval.t
+t/04_nodelay.t
+t/05_set_mode.t
+t/06_set_output.t
+t/07_update.t
+t/08_send.t
+t/09_input_and_recv_and_flush_and_peeksize.t
+t/10_mtu.t
+t/11_sndwnd_and_rcvwnd.t
+t/12_get_waitsnd.t
+typemap
+ikcp.h
+libkcp.a
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

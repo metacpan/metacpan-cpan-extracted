@@ -4,8 +4,9 @@ use warnings;
 use Scalar::Util qw();
 use Tie::IxHash qw{};
 use Path::Class qw{};
+use RF::Functions 0.04, qw{dbd_dbi dbi_dbd};
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 our $PACKAGE = __PACKAGE__;
 
 =head1 NAME
@@ -47,7 +48,7 @@ Creates a new object and loads data from other sources
                                                       NAME          => "My Antenna Name",
                                                       MAKE          => "My Manufacturer Name",
                                                       FREQUENCY     => "2437" || "2437 MHz" || "2.437 GHz",
-                                                      GAIN          => "10.0" || "10.0 dBd" || "12.14 dBi",
+                                                      GAIN          => "10.0" || "10.0 dBd" || "12.15 dBi",
                                                       COMMENT       => "My Comment",
                                                       horizontal    => [[0.00, 0.96], [1.00, 0.04], ..., [180.00, 31.10], ..., [359.00, 0.04]],
                                                       vertical      => [[0.00, 1.08], [1.00, 0.18], ..., [180.00, 31.23], ..., [359.00, 0.18]],
@@ -514,17 +515,11 @@ sub gain_dbd {
   my $number = undef;
   if (defined($string)) {
 
-    my $scale  = 0; #default dBd
-    if ($string =~ m/dBi/i) {
-      $scale = -2.14;
-    } elsif ($string =~ m/dBd/i) {
-      $scale = 0;
-    }
-
     if (Scalar::Util::looks_like_number($string)) { #entire string looks like a number
-      $number = $string + $scale; #default: dBd
-    } elsif ($string =~ m/([+-]?[0-9]*\.?[0-9]+)/) { #one real number
-      $number = $1 + $scale;
+      $number = $string + 0; #default: dBd
+    } elsif ($string =~ m/([+-]?[0-9]*\.?[0-9]+)/) { #extract number
+      my $match = $1;
+      $number   = $string =~ m/dBi/i ? dbd_dbi($match) : $match + 0;
     }
 
   }
@@ -534,7 +529,7 @@ sub gain_dbd {
 sub gain_dbi {
   my $self = shift;
   my $dbd  = $self->gain_dbd;
-  return defined($dbd) ? $dbd + 2.14 : undef;
+  return defined($dbd) ? dbi_dbd($dbd) : undef;
 }
 
 =head2 electrical_tilt

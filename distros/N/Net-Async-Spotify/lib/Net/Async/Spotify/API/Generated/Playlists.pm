@@ -3,7 +3,7 @@ package Net::Async::Spotify::API::Generated::Playlists;
 use strict;
 use warnings;
 
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 our $AUTHORITY = 'cpan:VNEALV'; # AUTHORITY
 
 use mro;
@@ -26,6 +26,8 @@ Check C<crawl-api-doc.pl> for more information.
 =head1 METHODS
 
 =cut
+
+sub mapping { shift->{mapping} }
 
 =head2 add_tracks_to_playlist
 
@@ -107,9 +109,10 @@ On success, the HTTP status code in the response header is 201 Created. The res
 async sub add_tracks_to_playlist {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'POST';
-    $request->{uri}    = 'https://api.spotify.com/v1/playlists/{playlist_id}/tracks';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{add_tracks_to_playlist}{method} // 'POST';
+    $request->{uri}    = $mapping->{add_tracks_to_playlist}{uri} // 'https://api.spotify.com/v1/playlists/{playlist_id}/tracks';
+    $request->{param}  = $mapping->{add_tracks_to_playlist}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -147,7 +150,7 @@ async sub add_tracks_to_playlist {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{add_tracks_to_playlist}{response} // [
         'error object',
 
     ];
@@ -230,9 +233,10 @@ On success the HTTP status code in the response header is 200 OK.On error, the h
 async sub change_playlist_details {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'PUT';
-    $request->{uri}    = 'https://api.spotify.com/v1/playlists/{playlist_id}';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{change_playlist_details}{method} // 'PUT';
+    $request->{uri}    = $mapping->{change_playlist_details}{uri} // 'https://api.spotify.com/v1/playlists/{playlist_id}';
+    $request->{param}  = $mapping->{change_playlist_details}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -268,7 +272,7 @@ async sub change_playlist_details {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{change_playlist_details}{response} // [
         'error object',
 
     ];
@@ -354,9 +358,10 @@ endpoint for the new playlist.On error, the header status code is an error code 
 async sub create_playlist {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'POST';
-    $request->{uri}    = 'https://api.spotify.com/v1/users/{user_id}/playlists';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{create_playlist}{method} // 'POST';
+    $request->{uri}    = $mapping->{create_playlist}{uri} // 'https://api.spotify.com/v1/users/{user_id}/playlists';
+    $request->{param}  = $mapping->{create_playlist}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -392,7 +397,7 @@ async sub create_playlist {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{create_playlist}{response} // [
         'playlist object',
         'error object',
 
@@ -452,9 +457,10 @@ On success, the HTTP status code in the response header is 200 OK and the respon
 async sub get_a_list_of_current_users_playlists {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'GET';
-    $request->{uri}    = 'https://api.spotify.com/v1/me/playlists';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{get_a_list_of_current_users_playlists}{method} // 'GET';
+    $request->{uri}    = $mapping->{get_a_list_of_current_users_playlists}{uri} // 'https://api.spotify.com/v1/me/playlists';
+    $request->{param}  = $mapping->{get_a_list_of_current_users_playlists}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -472,7 +478,7 @@ async sub get_a_list_of_current_users_playlists {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{get_a_list_of_current_users_playlists}{response} // [
         'playlist object',
 
     ];
@@ -541,9 +547,10 @@ On success, the HTTP status code in the response header is 200 OK and the respon
 async sub get_list_users_playlists {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'GET';
-    $request->{uri}    = 'https://api.spotify.com/v1/users/{user_id}/playlists';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{get_list_users_playlists}{method} // 'GET';
+    $request->{uri}    = $mapping->{get_list_users_playlists}{uri} // 'https://api.spotify.com/v1/users/{user_id}/playlists';
+    $request->{param}  = $mapping->{get_list_users_playlists}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -567,7 +574,7 @@ async sub get_list_users_playlists {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{get_list_users_playlists}{response} // [
         'playlist object',
 
     ];
@@ -657,9 +664,10 @@ On success, the response body contains a playlist object in JSON format and the 
 async sub get_playlist {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'GET';
-    $request->{uri}    = 'https://api.spotify.com/v1/playlists/{playlist_id}';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{get_playlist}{method} // 'GET';
+    $request->{uri}    = $mapping->{get_playlist}{uri} // 'https://api.spotify.com/v1/playlists/{playlist_id}';
+    $request->{param}  = $mapping->{get_playlist}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -687,7 +695,7 @@ async sub get_playlist {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{get_playlist}{response} // [
         'playlist object',
 
     ];
@@ -738,9 +746,10 @@ On success, the response body contains a list of image objects in JSON format an
 async sub get_playlist_cover {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'GET';
-    $request->{uri}    = 'https://api.spotify.com/v1/playlists/{playlist_id}/images';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{get_playlist_cover}{method} // 'GET';
+    $request->{uri}    = $mapping->{get_playlist_cover}{uri} // 'https://api.spotify.com/v1/playlists/{playlist_id}/images';
+    $request->{param}  = $mapping->{get_playlist_cover}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -754,7 +763,7 @@ async sub get_playlist_cover {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{get_playlist_cover}{response} // [
         'image object',
 
     ];
@@ -852,9 +861,10 @@ On success, the response body contains an array of track objects and episode obj
 async sub get_playlists_tracks {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'GET';
-    $request->{uri}    = 'https://api.spotify.com/v1/playlists/{playlist_id}/tracks';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{get_playlists_tracks}{method} // 'GET';
+    $request->{uri}    = $mapping->{get_playlists_tracks}{uri} // 'https://api.spotify.com/v1/playlists/{playlist_id}/tracks';
+    $request->{param}  = $mapping->{get_playlists_tracks}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -890,7 +900,7 @@ async sub get_playlists_tracks {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{get_playlists_tracks}{response} // [
         'track object',
 
     ];
@@ -976,9 +986,10 @@ Not at the moment, the delete operation needs to be specified through a DELETE r
 async sub remove_tracks_playlist {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'DELETE';
-    $request->{uri}    = 'https://api.spotify.com/v1/playlists/{playlist_id}/tracks';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{remove_tracks_playlist}{method} // 'DELETE';
+    $request->{uri}    = $mapping->{remove_tracks_playlist}{uri} // 'https://api.spotify.com/v1/playlists/{playlist_id}/tracks';
+    $request->{param}  = $mapping->{remove_tracks_playlist}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -1006,7 +1017,7 @@ async sub remove_tracks_playlist {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{remove_tracks_playlist}{response} // [
         'error object',
 
     ];
@@ -1121,9 +1132,10 @@ Trying to set an item when you do not have the user’s authorization returns e
 async sub reorder_or_replace_playlists_tracks {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'PUT';
-    $request->{uri}    = 'https://api.spotify.com/v1/playlists/{playlist_id}/tracks';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{reorder_or_replace_playlists_tracks}{method} // 'PUT';
+    $request->{uri}    = $mapping->{reorder_or_replace_playlists_tracks}{uri} // 'https://api.spotify.com/v1/playlists/{playlist_id}/tracks';
+    $request->{param}  = $mapping->{reorder_or_replace_playlists_tracks}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -1169,7 +1181,7 @@ async sub reorder_or_replace_playlists_tracks {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{reorder_or_replace_playlists_tracks}{response} // [
         'error object',
 
     ];
@@ -1227,9 +1239,10 @@ If this happens, have a look in the Retry-After header, where you will see a num
 async sub upload_custom_playlist_cover {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'PUT';
-    $request->{uri}    = 'https://api.spotify.com/v1/playlists/{playlist_id}/images';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{upload_custom_playlist_cover}{method} // 'PUT';
+    $request->{uri}    = $mapping->{upload_custom_playlist_cover}{uri} // 'https://api.spotify.com/v1/playlists/{playlist_id}/images';
+    $request->{param}  = $mapping->{upload_custom_playlist_cover}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -1247,7 +1260,7 @@ async sub upload_custom_playlist_cover {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{upload_custom_playlist_cover}{response} // [
 
     ];
 

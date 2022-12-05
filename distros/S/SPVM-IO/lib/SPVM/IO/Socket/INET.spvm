@@ -3,14 +3,15 @@ class IO::Socket::INET extends IO::Socket {
   use Sys::Socket::Sockaddr;
   use Sys::Socket::Sockaddr::In;
   use Sys::Socket::In_addr;
-  use IO::Util;
   
+  # Fields
   has peer_address : string;
   has peer_port : int;
   has local_address : string;
   has local_port : int;
   has proto_number : int;
   
+  # Class Methods
   private static method create_socket_address : Sys::Socket::Sockaddr ($address : string, $port : int) {
     
     # Socket information
@@ -66,7 +67,8 @@ class IO::Socket::INET extends IO::Socket {
     
     return $self;
   }
-
+  
+  # Instance Methods
   method new_instance : IO::Socket::INET ($options = undef : object[]) {
     {
       my $self = IO::Socket::INET->new($options);
@@ -80,48 +82,48 @@ class IO::Socket::INET extends IO::Socket {
     my $options_h = Hash->new($options);
     
     # ReuseAddr option
-    my $reuse_addr = IO::Util->delete_int_or_default($options_h, "ReuseAddr", 0);
+    my $reuse_addr = $options_h->delete_or_default_int("ReuseAddr", 0);
     if ($reuse_addr) {
       $self->setsockopt(SOCKET->SOL_SOCKET, SOCKET->SO_REUSEADDR, 1);
     }
 
     # ReusePort option
-    my $reuse_port = IO::Util->delete_int_or_default($options_h, "ReusePort", 0);
+    my $reuse_port = $options_h->delete_or_default_int("ReusePort", 0);
     if ($reuse_port) {
       $self->setsockopt(SOCKET->SOL_SOCKET, SOCKET->SO_REUSEPORT, 1);
     }
 
     # Broadcast option
-    my $broadcast = IO::Util->delete_int_or_default($options_h, "Broadcast", 0);
+    my $broadcast = $options_h->delete_or_default_int("Broadcast", 0);
     if ($broadcast) {
-      $self->setsockopt(SOCKET->SOL_SOCKET, IO::Util->SO_BROADCAST, 1);
+      $self->setsockopt(SOCKET->SOL_SOCKET, SOCKET->SO_BROADCAST, 1);
     }
 
     # PeerAddr option
-    my $peer_address = IO::Util->delete_string_or_default($options_h, "PeerAddr", undef);
+    my $peer_address = $options_h->delete_or_default_string("PeerAddr", undef);
     $self->{peer_address} = $peer_address;
 
     # PeerPort option
-    my $peer_port = IO::Util->delete_int_or_default($options_h, "PeerPort", -1);
+    my $peer_port = $options_h->delete_or_default_int("PeerPort", -1);
     $self->{peer_port} = $peer_port;
 
     # LocalAddr option
-    my $local_address = IO::Util->delete_string_or_default($options_h, "LocalAddr", undef);
+    my $local_address = $options_h->delete_or_default_string("LocalAddr", undef);
     $self->{local_address} = $local_address;
 
     # LocalPort option
-    my $local_port = IO::Util->delete_int_or_default($options_h, "LocalPort", -1);
+    my $local_port = $options_h->delete_or_default_int("LocalPort", -1);
     $self->{local_port} = $local_port;
 
     # LocalPort option
-    my $proto_number = IO::Util->delete_int_or_default($options_h, "Proto", SOCKET->IPPROTO_TCP);
+    my $proto_number = $options_h->delete_or_default_int("Proto", SOCKET->IPPROTO_TCP);
     $self->{proto_number} = $proto_number;
     
     # Domain option
     $options_h->set_int(Domain => SOCKET->AF_INET);
 
     # Type option
-    my $type = IO::Util->delete_int_or_default($options_h, "Type", -1);
+    my $type = $options_h->delete_or_default_int("Type", -1);
     unless ($type >= 0) {
       if ($proto_number == SOCKET->IPPROTO_TCP) {
         $type = SOCKET->SOCK_STREAM;
@@ -129,13 +131,13 @@ class IO::Socket::INET extends IO::Socket {
       elsif ($proto_number == SOCKET->IPPROTO_UDP) {
         $type = SOCKET->SOCK_DGRAM;
       }
-      elsif ($proto_number == IO::Util->IPPROTO_ICMP) {
+      elsif ($proto_number == SOCKET->IPPROTO_ICMP) {
         $type = SOCKET->SOCK_RAW;
       }
       $options_h->set_int(Type => $type);
     }
     
-    my $new_options = IO::Util->hash_to_array($options_h);
+    my $new_options = $options_h->to_array;
     
     # Type option
     # Timeout option

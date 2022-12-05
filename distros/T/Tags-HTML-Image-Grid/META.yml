@@ -22,6 +22,7 @@ meta-spec:
 name: Tags-HTML-Image-Grid
 no_index:
   directory:
+    - examples
     - inc
     - t
     - xt
@@ -37,4 +38,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Tags-HTML-Image-Grid
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Tags-HTML-Image-Grid
-version: '0.02'
+version: '0.03'

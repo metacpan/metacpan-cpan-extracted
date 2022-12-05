@@ -1,5 +1,11 @@
 Revision history for Net-Async-Spotify
 
+0.002     2022-12-02 23:14:29+00:00 UTC
+
+  - Last working version before API page update
+  - Various fixes
+  - Fixed rece condition in returned object type.
+
 0.001     2021-06-27 16:17:25+00:00 UTC
 
   Initial Release!

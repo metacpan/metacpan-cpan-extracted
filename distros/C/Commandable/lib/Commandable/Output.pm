@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2022 -- leonerd@leonerd.org.uk
 
-package Commandable::Output 0.08;
+package Commandable::Output 0.09;
 
 use v5.14;
 use warnings;

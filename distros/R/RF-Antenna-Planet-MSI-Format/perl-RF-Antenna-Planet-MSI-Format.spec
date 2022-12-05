@@ -1,5 +1,5 @@
 Name:           perl-RF-Antenna-Planet-MSI-Format
-Version:        0.09
+Version:        0.10
 Release:        1%{?dist}
 Summary:        RF Antenna Pattern File Reader and Writer in Planet MSI Format
 License:        mit
@@ -10,11 +10,15 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch:      noarch
 BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl(Path::Class) >= 0.12
+BuildRequires:  perl(Test::Number::Delta)
+BuildRequires:  perl(Test::More)
 BuildRequires:  perl(Scalar::Util)
 BuildRequires:  perl(Tie::IxHash)
+BuildRequires:  perl(RF::Functions) >= 0.04
 Requires:       perl(Path::Class) >= 0.12
 Requires:       perl(Scalar::Util)
 Requires:       perl(Tie::IxHash)
+Requires:       perl(RF::Functions) >= 0.04
 Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 
 %description

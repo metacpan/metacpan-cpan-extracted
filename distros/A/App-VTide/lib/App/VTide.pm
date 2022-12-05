@@ -15,10 +15,9 @@ use Getopt::Alt;
 use App::VTide::Config;
 use App::VTide::Hooks;
 use Path::Tiny;
-use File::Touch;
 use YAML::Syck qw/ LoadFile DumpFile /;
 
-our $VERSION = version->new('0.1.18');
+our $VERSION = version->new('0.1.19');
 
 has config => (
     is      => 'rw',
@@ -42,7 +41,8 @@ sub run {
     my @sub_commands = keys %{ $self->sub_commands };
 
     my ( $options, $cmd, $opt ) = get_options(
-        {   name          => 'vtide',
+        {
+            name          => 'vtide',
             conf_prefix   => '.',
             helper        => 1,
             default       => { test => 0, },
@@ -53,8 +53,8 @@ sub run {
                     print join ' ', sort @sub_commands;
                     return;
                 }
-                elsif ( grep {/^$sub_command./} @sub_commands ) {
-                    print join ' ', sort grep {/^$sub_command/} @sub_commands;
+                elsif ( grep { /^$sub_command./ } @sub_commands ) {
+                    print join ' ', sort grep { /^$sub_command/ } @sub_commands;
                     return;
                 }
                 elsif ( !$self->sub_commands->{$sub_command} ) {
@@ -63,18 +63,18 @@ sub run {
                 }
                 eval {
                     $self->load_subcommand( $sub_command, $option )
-                        ->auto_complete($auto);
+                      ->auto_complete($auto);
                     1;
                 } or do {
                     print join ' ',
-                        grep {/$sub_command/xms} sort @sub_commands;
+                      grep { /$sub_command/xms } sort @sub_commands;
                 }
             },
             auto_complete_shortener => sub {
                 my ( $getopt, @args ) = @_;
                 my $sub_command = shift @args || '';
 
-                if ( grep {/^$sub_command./} @sub_commands ) {
+                if ( grep { /^$sub_command./ } @sub_commands ) {
                     $getopt->cmd($sub_command);
                 }
                 elsif ( !$self->sub_commands->{$sub_command} ) {
@@ -91,10 +91,11 @@ sub run {
             help_package  => __PACKAGE__,
             help_packages => {
                 map { $_ => __PACKAGE__ . '::Command::' . ucfirst $_ }
-                    @sub_commands,
+                  @sub_commands,
             },
         },
-        [   'name|n=s',
+        [
+            'name|n=s',
             'test|T!',
             'verbose|v+',
         ],
@@ -108,16 +109,15 @@ sub run {
 
     my $subcommand = eval { $self->load_subcommand( $opt->cmd, $opt ) };
     if ( !$subcommand ) {
-        $subcommand
-            = $self->load_subcommand( $ENV{VTIDE_DIR} ? 'edit' : 'start',
-            $opt );
+        $subcommand =
+          $self->load_subcommand( $ENV{VTIDE_DIR} ? 'edit' : 'start', $opt );
         my ( undef, $dir ) = $subcommand->session_dir( $opt->cmd );
         if ( !$dir ) {
             my $error = $@;
             warn $@ if $opt->opt->verbose;
             warn "Unknown command '$cmd'!\n",
-                "Valid commands - ", ( join ', ', sort @sub_commands ),
-                "\n";
+              "Valid commands - ", ( join ', ', sort @sub_commands ),
+              "\n";
             require Pod::Usage;
             Pod::Usage::pod2usage(
                 -verbose => 1,
@@ -178,7 +178,6 @@ sub _generate_sub_command {
     }
 
     DumpFile( $sub_file, $sub_commands );
-    File::Touch->new( reference => $0 )->touch($sub_file);
 
     return $sub_commands;
 }
@@ -193,7 +192,7 @@ App::VTide - A vim/tmux based IDE for the terminal
 
 =head1 VERSION
 
-This documentation refers to App::VTide version 0.1.18
+This documentation refers to App::VTide version 0.1.19
 
 =head1 SYNOPSIS
 

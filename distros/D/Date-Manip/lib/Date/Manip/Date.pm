@@ -28,7 +28,7 @@ use Date::Manip::Base;
 use Date::Manip::TZ;
 
 our $VERSION;
-$VERSION='6.89';
+$VERSION='6.90';
 END { undef $VERSION; }
 
 ########################################################################
@@ -124,6 +124,36 @@ sub parse {
          my(@tmp,$tmp);
          $$self{'err'} = '';
 
+         ###################
+         # Handle some special language-specific rules
+
+         # Some languages add a trailing period in some places.  For example,
+         # the default German date format (running the system date command)
+         # produces:   Mo 3. Jan 11:00:00 EST 2022
+         # The '3.' needs to have the period stripped.
+
+         if ($self->_parse_rule('remove_trailing_period')) {
+            $string =~ s/\.\s/ /g;
+            $string =~ s/\.$//;
+         }
+
+         # Some languages add parenthese.  For example, the default date
+         # output in russian in some cases puts the timezone in parentheses.
+
+         if ($self->_parse_rule('remove_parens')) {
+            $string =~ s/\(//g;
+            $string =~ s/\)//;
+         }
+
+         my $words = $self->_parse_rule('strip_word');
+         if ($words) {
+            foreach my $w (@$words) {
+               $string =~ s/(?:^|\s)\Q$w\E(?:\s|$)/ /;
+            }
+         }
+
+         ###################
+
          # Check the standard date format
 
          $tmp = $dmb->split('date',$string);
@@ -207,7 +237,13 @@ sub parse {
 
          (@tmp) = $self->_parse_date($string,$dow,\$noupdate,%opts);
          if (@tmp) {
-            ($y,$m,$d,$dow) = @tmp;
+            my $dow2;
+            ($y,$m,$d,$dow2) = @tmp;
+            if ($dow2  &&  $dow  &&  $dow != $dow2) {
+               $$self{'err'} = '[parse] Day of week invalid';
+               last PARSE;
+            }
+            $dow = $dow2  if ($dow2);
             $default_time = 1;
             last PARSE;
          }
@@ -951,6 +987,21 @@ BEGIN {
       $$dmb{'data'}{'format'}{$format} = [0, qr/$re/i];
       return @{ $$dmb{'data'}{'format'}{$format} };
    }
+}
+
+# This returns 1 if a given rule is set in the language _special_rules.
+#
+sub _parse_rule {
+   my($self,$rule) = @_;
+
+   my $dmt = $$self{'tz'};
+   my $dmb = $$dmt{'base'};
+
+   if (exists $$dmb{'data'}{'lang'}{'_special_rules'}  &&
+       exists $$dmb{'data'}{'lang'}{'_special_rules'}{$rule}) {
+      return $$dmb{'data'}{'lang'}{'_special_rules'}{$rule};
+   }
+   return 0;
 }
 
 ########################################################################

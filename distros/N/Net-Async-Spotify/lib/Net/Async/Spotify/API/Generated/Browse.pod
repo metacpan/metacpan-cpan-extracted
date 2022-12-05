@@ -1,6 +1,7 @@
 =encoding utf8
 
 =for comment POD_DERIVED_INDEX_GENERATED
+
 The following documentation is automatically generated.  Please do not edit
 this file, but rather the original, inline with Net::Async::Spotify::API::Generated::Browse
 at lib/Net/Async/Spotify/API/Generated/Browse.pm
@@ -582,7 +583,7 @@ On success, the HTTP status code in the response header is 200 OK and the respon
 
 =item L<Net::Async::Spotify::API::Base>
 
-L<call_api|Net::Async::Spotify::API::Base/call_api>, L<new|Net::Async::Spotify::API::Base/new>, L<spotify|Net::Async::Spotify::API::Base/spotify>
+L<call_api|Net::Async::Spotify::API::Base/call_api>, L<decode_response|Net::Async::Spotify::API::Base/decode_response>, L<new|Net::Async::Spotify::API::Base/new>, L<parse_response|Net::Async::Spotify::API::Base/parse_response>, L<spotify|Net::Async::Spotify::API::Base/spotify>
 
 =back
 

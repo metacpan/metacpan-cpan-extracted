@@ -104,21 +104,19 @@ BEGIN {
 
    is ( $res, "2", 'check wait_one' );
 
-   my @result; local $_;
+   my (@procs, @result); local $_;
 
-   MCE::Hobo->create(\&task, $_) for ( 1..3 );
+   push @procs, MCE::Hobo->create(\&task, $_) for ( 1..3 );
 
-   my @hobos = MCE::Hobo->wait_all();
+   MCE::Hobo->wait_all();
 
-   for my $hobo ( @hobos ) {
+   for my $hobo ( @procs ) {
       my $err = $hobo->error // 'no error';
       my $res = $hobo->result;
       my $pid = $hobo->pid;
 
       push @result, $res;
    }
-
-   @result = sort @result;
 
    is ( "@result", "1 2 3", 'check wait_all' );
    is ( $cnt_start , 4, 'check on_start'  );

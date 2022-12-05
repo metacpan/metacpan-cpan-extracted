@@ -106,6 +106,9 @@ enum {
 
 /* Function prototypes */
 
+#define get_compclassmeta()  ObjectPad_get_compclassmeta(aTHX)
+ClassMeta *ObjectPad_get_compclassmeta(pTHX);
+
 #define extend_pad_vars(meta)  ObjectPad_extend_pad_vars(aTHX_ meta)
 void ObjectPad_extend_pad_vars(pTHX_ const ClassMeta *meta);
 
@@ -135,6 +138,9 @@ ClassMeta *ObjectPad_mop_create_class(pTHX_ enum MetaType type, SV *name);
 #define mop_get_class_for_stash(stash)  ObjectPad_mop_get_class_for_stash(aTHX_ stash)
 ClassMeta *ObjectPad_mop_get_class_for_stash(pTHX_ HV *stash);
 
+#define mop_class_get_name(class)  ObjectPad_mop_class_get_name(aTHX_ class)
+SV *ObjectPad_mop_class_get_name(pTHX_ ClassMeta *class);
+
 #define mop_class_set_superclass(class, super)  ObjectPad_mop_class_set_superclass(aTHX_ class, super)
 void ObjectPad_mop_class_set_superclass(pTHX_ ClassMeta *class, SV *superclassname);
 
@@ -152,6 +158,9 @@ void ObjectPad_mop_class_add_role(pTHX_ ClassMeta *class, ClassMeta *role);
 
 #define mop_class_add_method(class, methodname)  ObjectPad_mop_class_add_method(aTHX_ class, methodname)
 MethodMeta *ObjectPad_mop_class_add_method(pTHX_ ClassMeta *meta, SV *methodname);
+
+#define mop_class_add_method_cv(class, methodname, cv)  ObjectPad_mop_class_add_method_cv(aTHX_ class, methodname, cv)
+MethodMeta *ObjectPad_mop_class_add_method_cv(pTHX_ ClassMeta *meta, SV *methodname, CV *cv);
 
 #define mop_class_add_field(class, fieldname)  ObjectPad_mop_class_add_field(aTHX_ class, fieldname)
 FieldMeta *ObjectPad_mop_class_add_field(pTHX_ ClassMeta *meta, SV *fieldname);
@@ -202,5 +211,44 @@ void ObjectPad_mop_field_set_default_sv(pTHX_ FieldMeta *fieldmeta, SV *sv);
 #define register_field_attribute(name, funcs, funcdata)  ObjectPad_register_field_attribute(aTHX_ name, funcs, funcdata)
 void ObjectPad_register_field_attribute(pTHX_ const char *name, const struct FieldHookFuncs *funcs, void *funcdata);
 
+/* Integration with XS::Parse::Keyword v0.30
+ *   To enable this you must #include "XSParseKeyword.h" before this file
+ */
+#ifdef XPK_STAGED_ANONSUB
+  /* These are not really API functions but we need to see them to let these call it */
+  void ObjectPad__prepare_method_parse(pTHX_ ClassMeta *meta);
+  void ObjectPad__start_method_parse(pTHX_ ClassMeta *meta, bool is_common);
+  OP *ObjectPad__finish_method_parse(pTHX_ ClassMeta *meta, bool is_common, OP *body);
+
+  static void opxpk_anonsub_prepare(pTHX_ void *hookdata)
+  {
+    ObjectPad__prepare_method_parse(aTHX_ get_compclassmeta());
+  }
+
+  static void opxpk_anonsub_start(pTHX_ void *hookdata)
+  {
+    ObjectPad__start_method_parse(aTHX_ get_compclassmeta(), FALSE);
+  }
+
+  static OP *opxpk_anonsub_wrap(pTHX_ OP *o, void *hookdata)
+  {
+    return ObjectPad__finish_method_parse(aTHX_ get_compclassmeta(), FALSE, o);
+  }
+
+  /* OPXPK_ANONMETHOD is like XPK_ANONSUB but constructs an anonymous method
+   * CV in the currently compiling class. As usual it will have $self and all
+   * the field lexicals visible inside it
+   */
+#define OPXPK_ANONMETHOD_PREPARE   XPK_ANONSUB_PREPARE(&opxpk_anonsub_prepare)
+#define OPXPK_ANONMETHOD_START     XPK_ANONSUB_START  (&opxpk_anonsub_start)
+#define OPXPK_ANONMETHOD_WRAP      XPK_ANONSUB_WRAP   (&opxpk_anonsub_wrap)
+
+#define OPXPK_ANONMETHOD \
+  XPK_STAGED_ANONSUB(         \
+    OPXPK_ANONMETHOD_PREPARE, \
+    OPXPK_ANONMETHOD_START,   \
+    OPXPK_ANONMETHOD_WRAP     \
+  )
+#endif
 
 #endif

@@ -9,7 +9,7 @@ use SQL::Load::Util qw/
 /;
 use SQL::Load::Method;
 
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 sub new {
     my ($class, $path) = @_;
@@ -28,22 +28,33 @@ sub new {
 }
 
 sub load {
-    my ($self, $name, $reload) = @_;
+    my ($self, $file_name, $reload) = @_;
     
-    $name = remove_extension($name);
+    my $name;
     
-    if ($name && $name =~ /^[\w-]+$/) {
+    if ($file_name =~ /^([\w\-\/\.]+)\#([\w\-]+)$/) {
+        $file_name = remove_extension($1);
+        $name      = $2; 
+    } else {
+        $file_name = remove_extension($file_name);
+    }
+    
+    if ($file_name && $file_name =~ /^[\w\-\/]+$/) {
         # if true not get tmp
         unless ($reload) {
             # check if exist the key to get tmp
-            my $key = $self->_key($name);
+            my $key = $self->_key($file_name);
             
             # check if tmp exists, if true return
-            return $self->_get_tmp($key) if $key;
+            if ($key) {
+                return $name 
+                     ? $self->_get_tmp($key)->name($name)
+                     : $self->_get_tmp($key);
+            }
         }
         
         # get name list
-        my $name_list = name_list($name);
+        my $name_list = name_list($file_name);
         
         # get file from name list
         my $file = $self->_find_file($name_list);   
@@ -54,16 +65,18 @@ sub load {
         # set tmp
         $self->_set_tmp($content, $file, $name_list);
         
-        return SQL::Load::Method->new($content);
+        return $name 
+             ? SQL::Load::Method->new($content)->name($name)
+             : SQL::Load::Method->new($content);
     }
     
-    croak "the name '$name' is invalid!";
+    croak "the name '$file_name' is invalid!";
 }
 
 sub reload {
-    my ($self, $name) = @_;
+    my ($self, $file_name) = @_;
     
-    return $self->load($name, 1);
+    return $self->load($file_name, 1);
 }
 
 sub _find_file {
@@ -174,9 +187,13 @@ Code:
     # load users.sql file
     my $users = $sql->load('users');
      
-    print $users->name('find')     # SELECT * FROM users WHERE id = ?;
-    print $users->name('find-all') # SELECT * FROM users ORDER BY id DESC;
-    print $users->name('insert')   # INSERT INTO users (name, login, password) VALUES (?, ?, ?);
+    print $users->name('find');     # SELECT * FROM users WHERE id = ?;
+    print $users->name('find-all'); # SELECT * FROM users ORDER BY id DESC;
+    print $users->name('insert');   # INSERT INTO users (name, login, password) VALUES (?, ?, ?);
+    
+    print $sql->load('users#find');     # SELECT * FROM users WHERE id = ?; 
+    print $sql->load('users#find-all'); # SELECT * FROM users ORDER BY id DESC;
+    print $sql->load('users#insert');   # INSERT INTO users (name, login, password) VALUES (?, ?, ?);
   
 =head1 DESCRIPTION
 
@@ -194,7 +211,10 @@ Construct a new L<SQL::Load>, passing the folder path is required.
 
     my $method = $sql_load->load('file_name'); 
     my $method = $sql_load->load('file_name.sql');
+    my $method = $sql_load->load('file_name#sql_name'); 
+    my $method = $sql_load->load('file_name#sql_at');
     my $method = $sql_load->load('file_name', 1); # reload to get content directly from the file
+    
     
 Load the content in the reference and return an instance of L<SQL::Load::Method>.
 
@@ -203,6 +223,8 @@ Load the content in the reference and return an instance of L<SQL::Load::Method>
     my $method = $sql_load->reload('file_name'); 
     my $method = $sql_load->reload('file_name.sql');
     my $method = $sql_load->reload('file_name');
+    my $method = $sql_load->reload('file_name#sql_name');
+    my $method = $sql_load->reload('file_name#sql_at');
     
 Reload to get content directly from the file without getting from the tmp from reference.
 

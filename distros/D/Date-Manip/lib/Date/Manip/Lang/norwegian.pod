@@ -67,14 +67,18 @@ The following abbreviations may be used:
    feb
 
    mar
+   mars
 
    apr
+   april
 
    mai
 
    jun
+   juni
 
    jul
+   juli
 
    aug
 
@@ -114,20 +118,27 @@ The following day names may be used:
 The following abbreviations may be used:
 
    man
+   ma
 
    tir
+   ti
 
    ons
+   on
 
    tor
+   to
 
    fre
+   fr
 
    lør
    loer
+   lø
 
    søn
    soen
+   sø
 
 
 The following short (1-2 characters) abbreviations may be used:
@@ -294,250 +305,197 @@ The following words may be used to specify a business delta:
 Numbers may be spelled out in a variety of ways.  The following sets correspond
 to the numbers from 1 to 53:
 
-   1.
    første
    foerste
    en
 
-   2.
    andre
    to
 
-   3.
    tredje
    tre
 
-   4.
    fjerde
    fire
 
-   5.
    femte
    fem
 
-   6.
    sjette
    seks
 
-   7.
    syvende
    syv
 
-   8.
    åttende
    aattende
    åtte
    aatte
 
-   9.
    niende
    ni
 
-   10.
    tiende
    ti
 
 
-   11.
    ellevte
    elleve
 
-   12.
    tolvte
    tolv
 
-   13.
    trettende
    tretten
 
-   14.
    fjortende
    fjorten
 
-   15.
    femtende
    femten
 
-   16.
    sekstende
    seksten
 
-   17.
    syttende
    sytten
 
-   18.
    attende
    atten
 
-   19.
    nittende
    nitten
 
-   20.
    tjuende
    tjue
 
 
-   21.
    tjueførste
    tjuefoerste
    tjueen
 
-   22.
    tjueandre
    tjueto
 
-   23.
    tjuetredje
    tjuetre
 
-   24.
    tjuefjerde
    tjuefire
 
-   25.
    tjuefemte
    tjuefem
 
-   26.
    tjuesjette
    tjueseks
 
-   27.
    tjuesyvende
    tjuesyv
 
-   28.
    tjueåttende
    tjueaattende
    tjueåtte
    tjueaatte
 
-   29.
    tjueniende
    tjueni
 
-   30.
    trettiende
    tretti
 
 
-   31.
    trettiførste
    trettifoerste
    trettien
 
-   32.
    trettiandre
    trettito
 
-   33.
    trettitredje
    trettitre
 
-   34.
    trettifjerde
    trettifire
 
-   35.
    trettifemte
    trettifem
 
-   36.
    trettisjette
    trettiseks
 
-   37.
    trettisyvende
    trettisyv
 
-   38.
    trettiåttende
    trettiaattende
    trettiåtte
    trettiaatte
 
-   39.
    trettiniende
    trettini
 
-   40.
    førtiende
    foertiende
    førti
    foerti
 
 
-   41.
    førtiførste
    foertifoerste
    førtien
    foertien
 
-   42.
    førtiandre
    foertiandre
    førtito
    foertito
 
-   43.
    førtitredje
    foertitredje
    førtitre
    foertitre
 
-   44.
    førtifjerde
    foertifjerde
    førtifire
    foertifire
 
-   45.
    førtifemte
    foertifemte
    førtifem
    foertifem
 
-   46.
    førtisjette
    foertisjette
    førtiseks
    foertiseks
 
-   47.
    førtisyvende
    foertisyvende
    førtisyv
    foertisyv
 
-   48.
    førtiåttende
    foertiaattende
    førtiåtte
    foertiaatte
 
-   49.
    førtiniende
    foertiniende
    førtini
    foertini
 
-   50.
    femtiende
    femti
 
 
-   51.
    femtiførste
    femtifoerste
    femtien
 
-   52.
    femtiandre
    femtito
 
-   53.
    femtitredje
    femtitre
 

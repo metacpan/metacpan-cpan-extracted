@@ -1,5 +1,11 @@
 Revision history for Commandable
 
+0.09    2022-12-04
+        [CHANGES]
+         * Added Commandable::Finder::MethodAttributes for handling commands
+           provided by an object instance by capturing the instance itself in
+           the code refs
+
 0.08    2022-07-13
         [CHANGES]
          * Allow "slurpy" arguments

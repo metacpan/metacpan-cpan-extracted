@@ -10,7 +10,7 @@ use B qw(perlstring);
 
 BEGIN {
 	$MooseX::XSAccessor::Trait::Attribute::AUTHORITY = 'cpan:TOBYINK';
-	$MooseX::XSAccessor::Trait::Attribute::VERSION   = '0.009';
+	$MooseX::XSAccessor::Trait::Attribute::VERSION   = '0.010';
 }
 
 # Map Moose terminology to Class::XSAccessor options.
@@ -25,8 +25,7 @@ $cxsa_opt{predicate} = "exists_predicates"
 
 use Moose::Role;
 
-sub accessor_is_simple
-{
+sub accessor_is_simple {
 	my $self = shift;
 	return !!0 if $self->has_type_constraint && $self->type_constraint ne "Any";
 	return !!0 if $self->should_coerce;
@@ -37,16 +36,14 @@ sub accessor_is_simple
 	!!1;
 }
 
-sub reader_is_simple
-{
+sub reader_is_simple {
 	my $self = shift;
 	return !!0 if $self->is_lazy;
 	return !!0 if $self->should_auto_deref;
 	!!1;
 }
 
-sub writer_is_simple
-{
+sub writer_is_simple {
 	my $self = shift;
 	return !!0 if $self->has_type_constraint && $self->type_constraint ne "Any";
 	return !!0 if $self->should_coerce;
@@ -55,67 +52,63 @@ sub writer_is_simple
 	!!1;
 }
 
-sub predicate_is_simple
-{
+sub predicate_is_simple {
 	my $self = shift;
 	!!1;
 }
 
 # Class::XSAccessor doesn't do clearers
-sub clearer_is_simple
-{
+sub clearer_is_simple {
 	!!0;
 }
 
 after install_accessors => sub {
 	my $self = shift;
-	
+
 	my $slot      = $self->name;
 	my $class     = $self->associated_class;
 	my $classname = $class->name;
-	
+
 	# Don't attempt to do anything with instances that are not blessed hashes.
-	my $is_hash = reftype($class->get_meta_instance->create_instance) eq q(HASH);
+	my $is_hash = q(HASH) eq reftype( $class->get_meta_instance->create_instance );
 	return unless $is_hash && $class->get_meta_instance->is_inlinable;
-	
+
 	# Use inlined get method as a heuristic to detect weird shit.
-	my $inline_get = $self->_inline_instance_get('$X');
-	return unless $inline_get eq sprintf('$X->{%s}', perlstring $slot);
-	
+	my $inline_get = $self->_inline_instance_get( '$X' );
+	return unless $inline_get eq sprintf( '$X->{%s}', perlstring $slot );
+
 	# Detect use of MooseX::Attribute::Chained
-	my $is_chained = $self->does('MooseX::Traits::Attribute::Chained');
-	
+	my $is_chained = $self->does( 'MooseX::Traits::Attribute::Chained' );
+
 	# Detect use of MooseX::LvalueAttribute
-	my $is_lvalue = $self->does('MooseX::LvalueAttribute::Trait::Attribute');
-	
-	for my $type (qw/ accessor reader writer predicate clearer /)
-	{
+	my $is_lvalue = $self->does( 'MooseX::LvalueAttribute::Trait::Attribute' );
+
+	for my $type ( qw/ accessor reader writer predicate clearer / ) {
+
 		# Only accelerate methods if CXSA can deal with them
 		next unless exists $cxsa_opt{$type};
-		
+
 		# Only accelerate methods that exist!
 		next unless $self->${\"has_$type"};
-		
+
 		# Check to see they're simple (no type constraint checks, etc)
 		next unless $self->${\"$type\_is_simple"};
-		
+
 		my $methodname = $self->$type;
-		my $metamethod = $class->get_method($methodname);
-		
+		my $metamethod = $class->get_method( $methodname );
+
 		# Perform the actual acceleration
-		if ($type eq 'accessor' and $is_lvalue)
-		{
+		if ( $type eq 'accessor' and $is_lvalue ) {
 			next if $is_chained;
 			next if !$MooseX::XSAccessor::LVALUE;
-			
+
 			"Class::XSAccessor"->import(
 				class             => $classname,
 				replace           => 1,
 				lvalue_accessors  => +{ $methodname => $slot },
 			);
 		}
-		else
-		{
+		else {
 			"Class::XSAccessor"->import(
 				class             => $classname,
 				replace           => 1,
@@ -123,7 +116,7 @@ after install_accessors => sub {
 				$cxsa_opt{$type}  => +{ $methodname => $slot },
 			);
 		}
-		
+
 		# Naughty stuff!!!
 		# We've overwritten a Moose-generated accessor, so now we need to
 		# inform Moose's metathingies about the new coderef.
@@ -132,7 +125,7 @@ after install_accessors => sub {
 		no strict "refs";
 		$metamethod->{"body"} = \&{"$classname\::$methodname"};
 	}
-	
+
 	return;
 };
 
@@ -188,7 +181,7 @@ over the accessor's duties.
 =head1 BUGS
 
 Please report any bugs to
-L<http://rt.cpan.org/Dist/Display.html?Queue=MooseX-XSAccessor>.
+L<https://github.com/tobyink/p5-moosex-xsaccessor/issues>.
 
 =head1 SEE ALSO
 
@@ -200,7 +193,7 @@ Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
 
 =head1 COPYRIGHT AND LICENCE
 
-This software is copyright (c) 2013 by Toby Inkster.
+This software is copyright (c) 2013, 2022 by Toby Inkster.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

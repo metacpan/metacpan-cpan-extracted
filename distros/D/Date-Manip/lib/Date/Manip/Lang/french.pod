@@ -66,12 +66,16 @@ The following month names may be used:
 The following abbreviations may be used:
 
    jan
+   janv
    jan.
+   janv.
 
    fév
    fev
+   févr
    fev.
    fév.
+   févr.
 
    mar
    mar.
@@ -83,18 +87,26 @@ The following abbreviations may be used:
    mai.
 
    juin
+   jui
    juin.
+   jui.
 
    juil
+   jul
    juil.
+   jul.
 
    août
    aout
+   aoû
+   aou
    aout.
    août.
 
    sept
+   sep
    sept.
+   sep.
 
    oct
    oct.

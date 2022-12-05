@@ -23,7 +23,11 @@ my $meta = {
                             suggests => { "MooseX::Attribute::Chained" => 0, "MooseX::LvalueAttribute" => 0 },
                           },
                           test => {
-                            recommends => { "MooseX::Attribute::Chained" => 0, "MooseX::LvalueAttribute" => 0 },
+                            recommends => {
+                                            "MooseX::Attribute::Chained" => 0,
+                                            "MooseX::FunkyAttributes"    => 0,
+                                            "MooseX::LvalueAttribute"    => 0,
+                                          },
                             requires   => {
                                             "Import::Into"   => "1.001000",
                                             "Test::Fatal"    => 0,
@@ -34,17 +38,15 @@ my $meta = {
                           },
                         },
   "provides"         => {
-                          "MooseX::XSAccessor" => { file => "lib/MooseX/XSAccessor.pm", version => 0.009 },
+                          "MooseX::XSAccessor" => { file => "lib/MooseX/XSAccessor.pm", version => "0.010" },
                           "MooseX::XSAccessor::Trait::Attribute" => {
                             file => "lib/MooseX/XSAccessor/Trait/Attribute.pm",
-                            version => 0.009,
+                            version => "0.010",
                           },
                         },
   "release_status"   => "stable",
   "resources"        => {
-                          bugtracker   => {
-                                            web => "http://rt.cpan.org/Dist/Display.html?Queue=MooseX-XSAccessor",
-                                          },
+                          bugtracker   => { web => "https://github.com/tobyink/p5-moosex-xsaccessor/issues" },
                           homepage     => "https://metacpan.org/release/MooseX-XSAccessor",
                           license      => ["http://dev.perl.org/licenses/"],
                           repository   => {
@@ -54,7 +56,7 @@ my $meta = {
                                           },
                           x_identifier => "http://purl.org/NET/cpan-uri/dist/MooseX-XSAccessor/project",
                         },
-  "version"          => 0.009,
+  "version"          => "0.010",
   "x_contributors"   => ["Florian Ragwitz (FLORA) <flora\@cpan.org>"],
   "x_static_install" => 1,
 };
@@ -130,28 +132,8 @@ else
 	}
 }
 
-sub FixMakefile
-{
-	return unless -d 'inc';
-	my $file = shift;
-	
-	local *MAKEFILE;
-	open MAKEFILE, "< $file" or die "FixMakefile: Couldn't open $file: $!; bailing out";
-	my $makefile = do { local $/; <MAKEFILE> };
-	close MAKEFILE or die $!;
-	
-	$makefile =~ s/\b(test_harness\(\$\(TEST_VERBOSE\), )/$1'inc', /;
-	$makefile =~ s/( -I\$\(INST_ARCHLIB\))/ -Iinc$1/g;
-	$makefile =~ s/( "-I\$\(INST_LIB\)")/ "-Iinc"$1/g;
-	$makefile =~ s/^(FULLPERL = .*)/$1 "-Iinc"/m;
-	$makefile =~ s/^(PERL = .*)/$1 "-Iinc"/m;
-	
-	open  MAKEFILE, "> $file" or die "FixMakefile: Couldn't open $file: $!; bailing out";
-	print MAKEFILE $makefile or die $!;
-	close MAKEFILE or die $!;
-}
 
 my $mm = WriteMakefile(%WriteMakefileArgs);
-FixMakefile($mm->{FIRST_MAKEFILE} || 'Makefile');
+
 exit(0);
 

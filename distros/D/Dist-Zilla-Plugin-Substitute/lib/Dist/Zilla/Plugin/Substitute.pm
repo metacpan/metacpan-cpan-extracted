@@ -1,10 +1,12 @@
 package Dist::Zilla::Plugin::Substitute;
-$Dist::Zilla::Plugin::Substitute::VERSION = '0.006';
+$Dist::Zilla::Plugin::Substitute::VERSION = '0.007';
 use Moose;
 use Moose::Util::TypeConstraints;
 use MooseX::Types::Moose qw/ArrayRef CodeRef Str/;
 use List::Util 'first';
 use Carp 'croak';
+
+enum 'Mode', [qw/lines whole/];
 
 with 'Dist::Zilla::Role::FileMunger',
 	'Dist::Zilla::Role::FileFinderUser' => {
@@ -41,6 +43,12 @@ sub mvp_aliases {
 	};
 }
 
+has mode => (
+	is => 'ro',
+	isa => 'Mode',
+	default => 'lines',
+);
+
 has files => (
 	isa     => ArrayRef[Str],
 	traits  => ['Array'],
@@ -68,10 +76,19 @@ sub munge_files {
 
 sub munge_file {
 	my ($self, $file) = @_;
-	my @content = split /^/m, $file->content;
+
 	my $code = $self->code;
-	$code->() for @content;
-	$file->content(join '', @content);
+
+	if ($self->mode eq 'lines') {
+		my @content = split /^/m, $file->content;
+		$code->() for @content;
+		$file->content(join '', @content);
+	}
+	else {
+		my $content = $file->content;
+		$code->() for $content;
+		$file->content($content);
+	}
 
 	if ($self->_has_filename_code) {
 		my $filename      = $file->name;
@@ -99,7 +116,7 @@ Dist::Zilla::Plugin::Substitute - Substitutions for files in dzil
 
 =head1 VERSION
 
-version 0.006
+version 0.007
 
 =head1 SYNOPSIS
 
@@ -123,6 +140,10 @@ This module performs substitutions on files in Dist::Zilla.
 
 An arrayref of lines of code. This is converted into a sub that's called for each line, with C<$_> containing that line. Alternatively, it may be a subref if passed from for example a pluginbundle. Mandatory.
 
+=head2 mode
+
+Either C<lines>(the default) or C<whole>. This determines if the substitution is done per line or per whole file.
+
 =head2 filename_code
 
 Like C<content_code> but the resulting sub is called for the filename.
@@ -136,7 +157,7 @@ The finders to use for the substitutions. Defaults to C<:InstallModules, :ExecFi
 
 The files to substitute. It defaults to the files in C<finders>. May also be spelled as C<file> in the dist.ini.
 
-# vim: ts=2 sts=2 sw=2 noet :
+# vim: ts=4 sts=4 sw=4 noet :
 
 =head1 AUTHOR
 

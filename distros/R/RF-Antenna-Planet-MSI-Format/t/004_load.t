@@ -30,7 +30,7 @@ is($antenna->frequency_mhz,   5555, 'frequency_mhz');
 is($antenna->frequency_ghz,   5.555, 'frequency_ghz');
 is($antenna->gain,            '14.12', 'gain');
 is($antenna->gain_dbd,        14.12, 'gain_dbd');
-is($antenna->gain_dbi,        16.26, 'gain_dbi');
+is($antenna->gain_dbi,        16.27, 'gain_dbi');
 is($antenna->electrical_tilt, 'MECHANICAL', 'electrical_tilt');
 is($antenna->comment,         'My Comment', 'comment');
 

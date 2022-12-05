@@ -1,14 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.19;
+use Object::Pad 0.66;
 
-package Device::Chip::AVR_HVSP 0.05;
+package Device::Chip::AVR_HVSP 0.06;
 class Device::Chip::AVR_HVSP
-   extends Device::Chip;
+   :isa(Device::Chip);
 
 use Carp;
 
@@ -125,7 +125,7 @@ my %DEFAULT_PINS = (
    },
 );
 
-has %_pins;
+field %_pins;
 
 async method mount ( $adapter, %params )
 {
@@ -139,7 +139,7 @@ async method mount ( $adapter, %params )
       $_pins{$pin} = $params{$pin};
    }
 
-   await $self->SUPER::mount( @_ );
+   await $self->SUPER::mount( $adapter, %params );
 
    await $self->protocol->write_gpios( {
       $_pins{sdi} => 0,
@@ -173,9 +173,9 @@ my %PARTS;
    }
 }
 
-has $_partname :reader;
-has $_partinfo;
-has @_memories;
+field $_partname :reader;
+field $_partinfo;
+field @_memories;
 
 async method start ()
 {

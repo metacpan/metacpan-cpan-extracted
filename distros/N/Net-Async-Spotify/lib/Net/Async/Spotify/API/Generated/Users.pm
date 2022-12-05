@@ -3,7 +3,7 @@ package Net::Async::Spotify::API::Generated::Users;
 use strict;
 use warnings;
 
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 our $AUTHORITY = 'cpan:VNEALV'; # AUTHORITY
 
 use mro;
@@ -26,6 +26,8 @@ Check C<crawl-api-doc.pl> for more information.
 =head1 METHODS
 
 =cut
+
+sub mapping { shift->{mapping} }
 
 =head2 get_current_users_profile
 
@@ -59,9 +61,10 @@ On success, the HTTP status code in the response header is 200 OK and the respon
 async sub get_current_users_profile {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'GET';
-    $request->{uri}    = 'https://api.spotify.com/v1/me';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{get_current_users_profile}{method} // 'GET';
+    $request->{uri}    = $mapping->{get_current_users_profile}{uri} // 'https://api.spotify.com/v1/me';
+    $request->{param}  = $mapping->{get_current_users_profile}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -69,7 +72,7 @@ async sub get_current_users_profile {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{get_current_users_profile}{response} // [
         'user object',
 
     ];
@@ -121,9 +124,10 @@ On success, the HTTP status code in the response header is 200 OK and the respon
 async sub get_users_profile {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'GET';
-    $request->{uri}    = 'https://api.spotify.com/v1/users/{user_id}';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{get_users_profile}{method} // 'GET';
+    $request->{uri}    = $mapping->{get_users_profile}{uri} // 'https://api.spotify.com/v1/users/{user_id}';
+    $request->{param}  = $mapping->{get_users_profile}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -137,7 +141,7 @@ async sub get_users_profile {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{get_users_profile}{response} // [
         'user object',
 
     ];

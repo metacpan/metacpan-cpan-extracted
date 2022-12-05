@@ -1,0 +1,10 @@
+Active Internet connections (servers and established)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State      
+tcp6       0      0 :::1716                 :::*                    LISTEN     
+udp6       0      0 :::37442                :::*                               
+udp6       0      0 :::5353                 :::*                               
+udp6       0      0 :::1716                 :::*                               
+udp6       0      0 fe80::b1f3:2c:3c6c::123 :::*                               
+udp6       0      0 ::1:123                 :::*                               
+udp6       0      0 :::123                  :::*                               
+raw6       0      0 :::58                   :::*                    7          

@@ -14,6 +14,7 @@ t/load_list.t
 t/load_users.t
 t/name_list.t
 t/reload.t
+t/sql/client/users.sql
 t/sql/foo.sql
 t/sql/list.sql
 t/sql/read.sql

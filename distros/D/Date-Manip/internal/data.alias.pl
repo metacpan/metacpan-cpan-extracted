@@ -198,10 +198,10 @@
    # handling of the tzdata files, but this is simpler.
 
    "GMT"              => [ qw(alias    Etc/GMT) ],
-   "UTC"              => [ qw(offset   0:00:00) ],
-   "UCT"              => [ qw(alias    UTC) ],
-   "Etc/UCT"          => [ qw(alias    UTC) ],
-   "Etc/UTC"          => [ qw(alias    UTC) ],
+   "Etc/UTC"          => [ qw(offset   0:00:00) ],
+#  "UCT"              => [ qw(alias    UTC) ],
+#  "Etc/UCT"          => [ qw(alias    UTC) ],
+#  "Etc/UTC"          => [ qw(alias    UTC) ],
    "Pacific/Johnston" => [ qw(alias    Pacific/Honolulu) ],
    "HST"              => [ qw(ignore) ],
    "EST"              => [ qw(ignore) ],

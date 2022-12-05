@@ -7,12 +7,14 @@ use v5.26;
 
 use Object::Pad 0.66;
 
-package App::sdview::Parser::Markdown 0.08;
+package App::sdview::Parser::Markdown 0.09;
 class App::sdview::Parser::Markdown
-   does App::sdview::Parser
+   :does(App::sdview::Parser)
    :strict(params);
 
 use File::Slurper 'read_text';
+
+use String::Tagged::Markdown;
 
 use constant format => "Markdown";
 
@@ -208,37 +210,16 @@ method parse_string ( $str )
 
 method _handle_spans ( $s )
 {
-   my $ret = String::Tagged->new;
-
-   my %tags;
-
-   pos($s) = 0;
-   while( pos $s < length $s ) {
-      if( $s =~ m/\G\\(.)/gc ) {
-         $ret->append_tagged( $1, %tags );
-      }
-      elsif( $s =~ m/\G`/gc ) {
-         # Pull the contents ourselves so as to disarm the meaning of other
-         # chars, especially * and _, inside the code
-         $s =~ m/\G(.*?)`/gc;
-         $ret->append_tagged( $1, C => 1 );
-      }
-      elsif( $s =~ m/\G(([*_])\2?)/gc ) {
-         my $tag = ( length $1 > 1 ) ? "B" : "I";
-         $tags{$tag} ? delete $tags{$tag} : $tags{$tag}++;
-      }
-      elsif( $s =~ m/\G\[(.*?)\]/gc ) {
-         my $label = $1;
-         $s =~ m/\((.*?)\)/gc; my $target = $1;
-
-         $ret->append_tagged( $label, L => { target => $target }, %tags );
-      }
-      elsif( $s =~ m/\G([^`\\*_[]+)/gc ) {
-         $ret->append_tagged( $1, %tags );
-      }
-   }
-
-   return $ret;
+   return String::Tagged::Markdown->parse_markdown( $s )
+      ->clone(
+         convert_tags => {
+            bold   => "B",
+            italic => "I",
+            fixed  => "C",
+            link   => sub ($t, $v) { return L => { target => $v } },
+         },
+         only_tags => [qw( bold italic fixed link )],
+      );
 }
 
 0x55AA;

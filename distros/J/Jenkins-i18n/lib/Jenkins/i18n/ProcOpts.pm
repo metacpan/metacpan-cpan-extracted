@@ -3,11 +3,15 @@ package Jenkins::i18n::ProcOpts;
 use 5.014004;
 use strict;
 use warnings;
+use base       qw(Class::Accessor);
 use Hash::Util qw(lock_hash unlock_value lock_value);
-use Carp qw(confess);
+use Carp       qw(confess);
 use File::Spec;
 
-our $VERSION = '0.08';
+__PACKAGE__->follow_best_practice;
+__PACKAGE__->mk_ro_accessors(qw(language source_dir target_dir counter));
+
+our $VERSION = '0.09';
 
 =pod
 
@@ -17,7 +21,17 @@ Jenkins::i18n::ProcOpts - process files definitions based on CLI options
 
 =head1 SYNOPSIS
 
-  use Jenkins::i18n::ProcOpts;
+    use Jenkins::i18n::ProcOpts;
+    my $proc = Jenkins::i18n::ProcOpts->new({
+        source_dir  => $source,
+        target_dir  => $target,
+        use_counter => 1,
+        is_remove   => 1,
+        is_add      => 1,
+        is_debug    => 0,
+        lang        => 'pt_BR',
+        search      => 'foobar'
+    });
 
 =head1 DESCRIPTION
 
@@ -34,75 +48,80 @@ None by default.
 
 Creates a new instance.
 
-Expects as positional parameters:
+Expects a hash reference as parameter, with the following keys:
 
 =over
 
-=item 1
+=item *
 
-A string representing the path where the files should be reviewed.
+C<source_dir>: a string representing the path where the files should be
+reviewed.
 
-=item 2
+=item *
 
-A string representing the path where the processed files should be written to.
+C<target_dir>: a string representing the path where the processed files should
+be written to.
 
-=item 3
+=item *
 
-A boolean (in Perl terms) if a counter is to be used.
+C<use_counter>: A boolean (in Perl terms) if a counter is to be used.
 
-=item 4
+=item *
 
-A boolean (in Perl terms) if deprecated files should be removed.
+C<is_remove>: A boolean (in Perl terms) if deprecated files should be removed.
 
-=item 5
+=item *
 
-A boolean (in Perl terms) if new files should be added.
+C<is_add>: a boolean (in Perl terms) if new files should be added.
 
-=item 6
+=item *
 
-A boolean (in Perl terms) if CLI is running in debug mode.
+C<is_debug>: a boolean (in Perl terms) if CLI is running in debug mode.
 
-=item 7
+=item * 
 
-A string identifying the chosen language for processing.
+C<lang>: a string identifying the chosen language for processing.
 
-=item 8
+=item *
 
-An optional string of a regular expression to match the content of the
-translated properties.
+C<search>: optional, an string of a regular expression to match the content of
+the translated properties, with you want to use that. Otherwise, just provide
+C<undef> as a value.
 
 =back
 
 =cut
 
 sub new {
-    my (
-        $class,  $source_dir, $target_dir, $use_counter, $is_remove,
-        $is_add, $is_debug,   $lang,       $search
-    ) = @_;
+    my ( $class, $params_ref ) = @_;
+    confess 'Must receive an hash reference as parameter'
+        unless ( ref($params_ref) eq 'HASH' );
+    my @expected_keys
+        = qw(source_dir target_dir use_counter is_remove is_add is_debug lang search);
     my $self = {
-        source_dir  => $source_dir,
-        target_dir  => $target_dir,
-        use_counter => $use_counter,
-        is_remove   => $is_remove,
-        is_add      => $is_add,
-        is_debug    => $is_debug,
-        language    => $lang,
-        counter     => 0,
-        ext_sep     => qr/\./
+        counter => 0,
+        ext_sep => qr/\./
     };
 
-    foreach my $attrib ( keys( %{$self} ) ) {
+    foreach my $attrib (@expected_keys) {
         confess "must receive $attrib as parameter"
-            unless ( defined( $self->{$attrib} ) );
+            unless ( exists( $params_ref->{$attrib} ) );
     }
+
+    my @to_copy
+        = qw(source_dir target_dir use_counter is_remove is_add is_debug);
+    foreach my $attrib (@to_copy) {
+        $self->{$attrib} = $params_ref->{$attrib};
+    }
+
+    $self->{language} = $params_ref->{lang};
 
     confess
 'Removing or adding translation files are excluding operations, they cannot be both true at the same time'
-        if ( $is_remove and $is_add );
+        if ( $params_ref->{is_remove} and $params_ref->{is_add} );
 
-    if ( defined($search) ) {
-        $self->{search}     = qr/$search/;
+    if ( defined( $params_ref->{search} ) ) {
+        $self->{search}     = qr/$params_ref->{search}/;
         $self->{has_search} = 1;
     }
     else {
@@ -143,35 +162,14 @@ sub search_term {
 
 Returns a string identifying the chosen language for processing.
 
-=cut
-
-sub get_language {
-    my $self = shift;
-    return $self->{language};
-}
-
-=head2 get_source
+=head2 get_source_dir
 
 Returns string of the path where the translation files should be looked for.
 
-=cut
-
-sub get_source {
-    my $self = shift;
-    return $self->{source_dir};
-}
-
-=head2 get_target
+=head2 get_target_dir
 
 Returns a string of the path where the reviewed translation files should be
 written to.
-
-=cut
-
-sub get_target {
-    my $self = shift;
-    return $self->{target_dir};
-}
 
 =head2 inc
 
@@ -209,13 +207,6 @@ sub use_counter {
 
 Returns an integer representing the number of translation files already
 processed.
-
-=cut
-
-sub get_counter {
-    my $self = shift;
-    return $self->{counter};
-}
 
 =head2 is_remove
 
@@ -269,46 +260,65 @@ The path to the current language file location.
 
 =item 2
 
-The path to the English file location.
+The path to the English Properties file location.
+
+=item 3
+
+The path to the corresponding Jelly file.
 
 =back
+
+All three items are formed based on convention, that doesn't mean that any of
+them actually exists in the file system.
 
 =cut
 
 sub define_files {
-    my ( $self, $file ) = @_;
-    my ( $volume, $dirs, $filename ) = File::Spec->splitpath($file);
+    my ( $self, $file_path ) = @_;
+    confess 'Must receive a file path as parameter' unless ($file_path);
+    my ( $volume, $dirs, $filename ) = File::Spec->splitpath($file_path);
     my @file_parts      = split( $self->{ext_sep}, $filename );
     my $filename_ext    = pop(@file_parts);
     my $filename_prefix = join( '.', @file_parts );
-    my ( $curr_lang_file, $english_file );
+    my ( $curr_lang_file, $english_file, $jelly_file );
 
     if ( $filename_ext eq 'jelly' ) {
         $curr_lang_file
             = $filename_prefix . '_' . $self->{language} . '.properties';
         $english_file = "$filename_prefix.properties";
+        $jelly_file   = $filename;
     }
     elsif ( $filename_ext eq 'properties' ) {
         $curr_lang_file
             = $filename_prefix . '_' . $self->{language} . '.properties';
         $english_file = $filename;
+        $jelly_file   = "$filename_prefix.jelly";
     }
     else {
-        confess "Unexpected file extension '$filename_ext' in $file";
+        confess "Unexpected file extension '$filename_ext' in $file_path";
     }
 
-    my $english_file_path
-        = File::Spec->catfile( $volume, $dirs, $english_file );
+    my @dirs;
+    push( @dirs, $volume ) unless ( $volume eq '' );
+    push( @dirs, $dirs )   unless ( $dirs eq '' );
+
+    my $english_file_path = File::Spec->catfile( @dirs, $english_file );
+    my $jelly_file_path   = File::Spec->catfile( @dirs, $jelly_file );
 
     if ( $self->{source_dir} eq $self->{target_dir} ) {
-        return ( File::Spec->catfile( $volume, $dirs, $curr_lang_file ),
-            $english_file_path );
+        return ( File::Spec->catfile( @dirs, $curr_lang_file ),
+            $english_file_path, $jelly_file_path );
     }
 
-    $dirs =~ s/$self->{source_dir}/$self->{target_dir}/;
+    if ( $dirs ne '' ) {
+        $dirs =~ s/$self->{source_dir}/$self->{target_dir}/;
+        @dirs = ();
+        push( @dirs, $volume ) unless ( $volume eq '' );
+        push( @dirs, $dirs );
+    }
 
-    return ( File::Spec->catfile( $volume, $dirs, $curr_lang_file ),
-        $english_file_path );
+    return ( File::Spec->catfile( @dirs, $curr_lang_file ),
+        $english_file_path, $jelly_file_path );
 
 }
 

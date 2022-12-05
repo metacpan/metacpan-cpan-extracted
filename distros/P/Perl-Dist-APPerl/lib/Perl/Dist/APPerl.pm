@@ -1,6 +1,6 @@
 package Perl::Dist::APPerl;
 # Copyright (c) 2022 Gavin Hayes, see LICENSE in the root of the project
-use version 0.77; our $VERSION = qv(v0.2.0);
+use version 0.77; our $VERSION = qv(v0.2.1);
 use strict;
 use warnings;
 use JSON::PP 2.0104 qw(decode_json);
@@ -9,7 +9,6 @@ use Cwd qw(abs_path getcwd);
 use Data::Dumper qw(Dumper);
 use File::Basename qw(basename dirname);
 use File::Copy qw(copy move cp);
-use Env qw(@PATH);
 use FindBin qw();
 use Getopt::Long qw(GetOptionsFromArray);
 Getopt::Long::Configure qw(gnu_getopt);
@@ -978,7 +977,7 @@ sub _find_zip {
         return 'zip';
     }
     else {
-        foreach my $dir (@PATH) {
+        foreach my $dir (split(':', $ENV{PATH})) {
             my $zippath = "$dir/zip.exe";
             return $zippath if(-f $zippath);
         }

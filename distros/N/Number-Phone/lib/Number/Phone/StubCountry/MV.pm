@@ -22,14 +22,14 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20220903144942;
+our $VERSION = 1.20221202211027;
 
 my $formatters = [
                 {
                   'format' => '$1-$2',
                   'leading_digits' => '
             [3467]|
-            9[13-9]
+            9[1-9]
           ',
                   'pattern' => '(\\d{3})(\\d{4})'
                 },
@@ -48,9 +48,9 @@ my $validators = {
               3[0-59]
             )|
             6(?:
-              [57][02468]|
+              [58][024689]|
               6[024-68]|
-              8[024689]
+              7[02468]
             )
           )\\d{4}
         ',
@@ -61,9 +61,9 @@ my $validators = {
               3[0-59]
             )|
             6(?:
-              [57][02468]|
+              [58][024689]|
               6[024-68]|
-              8[024689]
+              7[02468]
             )
           )\\d{4}
         ',
@@ -71,7 +71,7 @@ my $validators = {
           46[46]\\d{4}|
           (?:
             7\\d|
-            9[13-9]
+            9[1-9]
           )\\d{5}
         ',
                 'pager' => '',
@@ -86,39 +86,40 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"960680", "Laamu",
-"960666", "Alifu\ Alifu",
-"960670", "Vaavu",
-"960332", "Malé\/Hulhulé\/Aarah",
-"960650", "Haa\ Alifu",
-"960333", "Malé\/Hulhulé\/Aarah",
-"960662", "Lhaviyani",
-"960658", "Raa",
-"960301", "Malé\/Hulhulé\/Aarah",
-"960678", "Thaa",
-"960688", "Addu",
+$areanames{en} = {"960688", "Addu",
+"960686", "Gnaviyani",
 "960339", "Vilimalé",
-"960334", "Malé\/Hulhulé\/Aarah",
-"960300", "Malé\/Hulhulé\/Aarah",
-"960335", "Hulhumalé",
-"960664", "Kaafu",
-"960665", "Kaafu",
-"960654", "Shaviyani",
-"960303", "Malé\ Region",
 "960674", "Faafu",
-"960302", "Malé\ Region",
-"960689", "Addu",
+"960654", "Shaviyani",
+"960300", "Malé\/Hulhulé\/Aarah",
+"960662", "Lhaviyani",
+"960330", "Malé\/Hulhulé\/Aarah",
+"960678", "Thaa",
+"960658", "Raa",
+"960332", "Malé\/Hulhulé\/Aarah",
+"960333", "Malé\/Hulhulé\/Aarah",
 "960684", "Gaafu\ Dhaalu",
-"960331", "Malé\/Hulhulé\/Aarah",
+"960660", "Baa",
+"960303", "Malé\ Region",
+"960656", "Noonu",
+"960676", "Dhaalu",
+"960302", "Malé\ Region",
 "960668", "Alifu\ Dhaalu",
 "960652", "Haa\ Dhaalu",
-"960682", "Gaafu\ Alifu",
 "960672", "Meemu",
-"960330", "Malé\/Hulhulé\/Aarah",
-"960656", "Noonu",
-"960686", "Gnaviyani",
-"960660", "Baa",
-"960676", "Dhaalu",};
+"960689", "Addu",
+"960666", "Alifu\ Alifu",
+"960301", "Malé\/Hulhulé\/Aarah",
+"960670", "Vaavu",
+"960650", "Haa\ Alifu",
+"960331", "Malé\/Hulhulé\/Aarah",
+"960659", "Raa",
+"960334", "Malé\/Hulhulé\/Aarah",
+"960682", "Gaafu\ Alifu",
+"960665", "Kaafu",
+"960335", "Hulhumalé",
+"960664", "Kaafu",
+"960680", "Laamu",};
 
     sub new {
       my $class = shift;

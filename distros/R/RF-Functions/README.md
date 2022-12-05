@@ -26,7 +26,25 @@ Returns power ratio given dB.
 
     my $power_ratio = ratio_db(3); #2
 
-## fsl\_hz\_m, fsl\_mhz\_km, fsl\_ghz\_km
+## dbi\_dbd, dbd2dbi
+
+Returns dBi given dBd.  Converts the given antenna gain in dBd to dBi. 
+
+    my $eirp = dbi_dbd($erp);
+
+## dbd\_dbi, dbi2dbd
+
+Returns dBd given dBi. Converts the given antenna gain in dBi to dBd.
+
+    my $erp = dbd_dbi($eirp);
+
+## dipole\_gain
+
+Returns the gain of a reference half-wave dipole in dBi.
+
+    my $dipole_gain = dipole_gain(); #always 2.15 dBi
+
+## fsl\_hz\_m, fsl\_mhz\_km, fsl\_ghz\_km, fsl\_mhz\_mi
 
 Return power loss in dB given frequency and distance in the specified units of measure
 
@@ -39,6 +57,8 @@ Return power loss in dB given frequency and distance in the specified units of m
 [https://en.wikipedia.org/wiki/Decibel#Power\_quantities](https://en.wikipedia.org/wiki/Decibel#Power_quantities)
 
 [https://en.wikipedia.org/wiki/Free-space\_path\_loss#Free-space\_path\_loss\_in\_decibels](https://en.wikipedia.org/wiki/Free-space_path_loss#Free-space_path_loss_in_decibels)
+
+[https://en.wikipedia.org/wiki/Dipole\_antenna#Dipole\_as\_a\_reference\_standard](https://en.wikipedia.org/wiki/Dipole_antenna#Dipole_as_a_reference_standard)
 
 # AUTHOR
 

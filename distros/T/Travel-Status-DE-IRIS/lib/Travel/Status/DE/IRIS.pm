@@ -6,7 +6,7 @@ use 5.014;
 
 no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
-our $VERSION = '1.74';
+our $VERSION = '1.75';
 
 use Carp qw(confess cluck);
 use DateTime;
@@ -491,6 +491,9 @@ sub get_station {
 		my $station_node = ( $xml_st->findnodes('//station') )[0];
 
 		if ( not $station_node ) {
+			if ( $self->{developer_mode} ) {
+				say '  no timetable';
+			}
 			if ( $opt{root} ) {
 				$self->{errstr}
 				  = "Station '$station' has no associated timetable";
@@ -680,6 +683,12 @@ sub get_timetable {
 	for my $s ( $xml->findnodes('/timetable/s') ) {
 
 		$self->add_result( $station, $eva, $s );
+	}
+
+	if ( $self->{developer_mode}
+		and not scalar $xml->findnodes('/timetable/s') )
+	{
+		say '  no scheduled trains';
 	}
 
 	return $self;
@@ -964,7 +973,7 @@ Non-blocking variant (EXPERIMENTAL):
 
 =head1 VERSION
 
-version 1.74
+version 1.75
 
 =head1 DESCRIPTION
 

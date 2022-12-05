@@ -1,5 +1,5 @@
 package Text::Password::SHA;
-our $VERSION = "0.15";
+our $VERSION = "0.16";
 
 use Moose;
 extends 'Text::Password::MD5';

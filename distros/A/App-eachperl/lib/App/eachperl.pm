@@ -1,18 +1,19 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2020-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.54;  # slot init BLOCK
+use Object::Pad 0.73 ':experimental(init_expr)';
 
-package App::eachperl 0.06;
+package App::eachperl 0.07;
 class App::eachperl;
-
-use Object::Pad qw( :experimental(init_expr) );
 
 use Config::Tiny;
 use Syntax::Keyword::Dynamically;
+
+use Commandable::Finder::MethodAttributes ':attrs';
+use Commandable::Invocation;
 
 use IO::Term::Status;
 use IPC::Run ();
@@ -30,9 +31,6 @@ my %COL = (
 # Allow conversion of signal numbers into names
 use Config;
 my @SIGNAMES = split m/\s+/, $Config{sig_name};
-
-use Struct::Dumb qw( struct );
-struct Perl => [qw( name fullpath version is_threads selected )];
 
 =head1 NAME
 
@@ -58,16 +56,25 @@ For more detail see the manpage for the eachperl(1) script.
 
 =cut
 
-has $_perls;
-has $_no_system_perl :param;
-has $_no_test        :param;
-has $_since_version  :param;
-has $_until_version  :param;
-has $_only_if        :param;
-has $_reverse        :param;
-has $_stop_on_fail   :param;
+field $_perls;
+field $_no_system_perl :param;
+field $_no_test        :param;
+field $_since_version  :param;
+field $_until_version  :param;
+field $_only_if        :param;
+field $_reverse        :param;
+field $_stop_on_fail   :param;
 
-has $_io_term { IO::Term::Status->new_for_stdout };
+field $_io_term = IO::Term::Status->new_for_stdout;
+
+class App::eachperl::_Perl {
+   field $name         :param :reader;
+   field $fullpath     :param :reader;
+   field $version      :param :reader;
+   field $is_threads   :param :reader;
+   field $is_debugging :param :reader;
+   field $selected            :mutator;
+}
 
 ADJUST
 {
@@ -106,13 +113,20 @@ method postprocess_config ()
          chomp( my $fullpath = `which $perl` );
          $? and warn( "Can't find perl at $perl" ), next;
 
-         my ( $ver, $threads ) = split m/\n/,
-            scalar `$fullpath -MConfig -e 'print "\$]\\n\$Config{usethreads}\\n"'`;
+         my ( $ver, $usethreads, $ccflags ) = split m/\n/,
+            scalar `$fullpath -MConfig -e 'print "\$]\\n\$Config{usethreads}\\n\$Config{ccflags}\\n"'`;
 
          $ver = version->parse( $ver )->normal;
-         $threads = ( $threads eq "define" );
+         my $threads = ( $usethreads eq "define" );
+         my $debug = $ccflags =~ m/-DDEBUGGING\b/;
 
-         push @perls, Perl( $perl, $fullpath, $ver, $threads, undef );
+         push @perls, App::eachperl::_Perl->new(
+            name         => $perl,
+            fullpath     => $fullpath,
+            version      => $ver,
+            is_threads   => $threads,
+            is_debugging => $debug,
+         );
       }
    }
 }
@@ -150,25 +164,26 @@ method run ( @argv )
       unshift @argv, "exec";
    }
 
-   ( my $cmd = shift @argv ) =~ s/-/_/g;
-   my $code = $self->can( "run_$cmd" ) or
-      die "Unrecognised eachperl command $cmd\n";
-
-   return $self->$code( @argv );
+   return Commandable::Finder::MethodAttributes->new( object => $self )
+      ->find_and_invoke( Commandable::Invocation->new_from_tokens( @argv ) );
 }
 
-method run_list ()
+method command_list
+   :Command_description("List the available perls")
+   ()
 {
    foreach my $perl ( $self->perls ) {
-      printf "%s%s: %s (%s%s)\n",
+      printf "%s%s: %s (%s%s%s)\n",
          ( $perl->selected ? "* " : "  " ),
          $perl->name, $perl->fullpath, $perl->version,
-         $perl->is_threads ? ",threads" : "";
+         $perl->is_threads ? ",threads" : "",
+         $perl->is_debugging ? ",DEBUGGING" : "",
+      ;
    }
    return 0;
 }
 
-method run_exec ( @argv )
+method exec ( @argv )
 {
    my %opts = %{ shift @argv } if @argv and ref $argv[0] eq "HASH";
 
@@ -269,12 +284,20 @@ method run_exec ( @argv )
    return 0;
 }
 
-method run_cpan ( @argv )
+method command_exec
+   :Command_description("Execute a given command on each selected perl")
+   :Command_arg("argv...", "commandline arguments")
+   ( $argv )
 {
-   return $self->run_exec( "-MCPAN", "-e", join( " ", @argv ) );
+   return $self->exec( @$argv );
 }
 
-method _invoke_local ( %opts )
+method cpan ( $e, @argv )
+{
+   return $self->exec( "-MCPAN", "-e", $e, @argv );
+}
+
+method invoke_local ( %opts )
 {
    my $perl = "";
    my @args;
@@ -302,55 +325,74 @@ EOPERL
 
    $perl .= ' and system( $^X, @ARGV ) == 0', push @args, "--", @{$opts{perl}} if $opts{perl};
 
-   return $self->run_exec( "-e", $perl . <<'EOPERL', @args);
+   return $self->exec( "-e", $perl . <<'EOPERL', @args);
          and print "-- PASS -\n" or print "-- FAIL --\n";
       kill $?, $$ if $? & 127;
       exit +($? >> 8);
 EOPERL
 }
 
-method run_install ( $module )
+method command_install
+   :Command_description("Installs a given module")
+   :Command_arg("module", "name of the module (or \".\" for current directory)")
+   ( $module )
 {
    dynamically $_no_system_perl = 1;
 
-   return $self->run_install_local if $module eq ".";
-   return $self->run_cpan( install => "\"$module\"" );
+   return $self->command_install_local if $module eq ".";
+   return $self->cpan( 'CPAN::Shell->install($ARGV[0])', $module );
 }
 
-method run_install_local ()
+method command_install_local
+   :Command_description("Installs a module from the current directory")
+   ()
 {
-   $self->_invoke_local( test => !$_no_test, install => 1 );
+   $self->invoke_local( test => !$_no_test, install => 1 );
 }
 
-method run_test ( $module )
+method command_test
+   :Command_description("Tests a given module")
+   :Command_arg("module", "name of the module (or \".\" for current directory)")
+   ( $module )
 {
-   return $self->run_test_local if $module eq ".";
-   return $self->run_cpan( test => "\"$module\"" );
+   return $self->command_test_local if $module eq ".";
+   return $self->cpan( 'CPAN::Shell->test($ARGV[0])', $module );
 }
 
-method run_test_local ()
+method command_test_local
+   :Command_description("Tests a module from the current directory")
+   ()
 {
-   $self->_invoke_local( test => 1 );
+   $self->invoke_local( test => 1 );
 }
 
-method run_build_then_perl ( @argv )
+method command_build_then_perl
+   :Command_description("Build the module in the current directory then run a perl command")
+   :Command_arg("argv...", "commandline arguments")
+   ( $argv )
 {
-   $self->_invoke_local( test => !$_no_test, perl => \@argv );
+   $self->invoke_local( test => !$_no_test, perl => [ @$argv ] );
 }
 
-method run_modversion ( $module )
+method command_modversion
+   :Command_description("Print the installed module version")
+   :Command_arg("module", "name of the module")
+   ( $module )
 {
-   return $self->run_exec(
+   return $self->exec(
       { oneline => 1, no_summary => 1 },
       "-M$module", "-e", "print ${module}\->VERSION, qq(\\n);"
    );
 }
 
-method run_modpath ( $module )
+method command_modpath
+   :Command_description("Print the installed module path")
+   :Command_arg("module", "name of the module")
+   ( $module )
 {
    ( my $filename = "$module.pm" ) =~ s{::}{/}g;
 
-   return $self->run_exec(
+   return $self->exec(
       { oneline => 1, no_summary => 1 },
       "-M$module", "-e", "print \$INC{qq($filename)}, qq(\\n);"
    );

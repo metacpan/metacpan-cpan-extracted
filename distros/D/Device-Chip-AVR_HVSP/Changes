@@ -1,5 +1,12 @@
 Revision history for Device-Chip-AVR_HVSP
 
+0.06    2022-12-05
+        [CHANGES]
+         * Updated for perl 5.26+ - use signatures
+         * Updated for Object::Pad 0.66
+            + Use `:new` instead of `:extends`
+            + Use `field`
+
 0.05    2020-12-06
         [CHANGES]
          * Add unit tests

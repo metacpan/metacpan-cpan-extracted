@@ -50,6 +50,6 @@
          "web" : "https://github.com/G4Vi/MHFS"
       }
    },
-   "version" : "v0.2.2",
-   "x_serialization_backend" : "JSON::PP version 4.10"
+   "version" : "v0.2.3",
+   "x_serialization_backend" : "JSON::PP version 4.12"
 }

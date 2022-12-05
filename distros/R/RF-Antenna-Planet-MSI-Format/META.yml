@@ -22,11 +22,13 @@ requires:
   Archive::Zip::MemberRead: '0'
   File::Temp: '0'
   Path::Class: '0.12'
+  RF::Functions: '0.04'
   Scalar::Util: '0'
+  Test::Number::Delta: '0'
   Test::Simple: '0'
   Tie::IxHash: '0'
 resources:
   bugtracker: https://github.com/mrdvt92/perl-RF-Antenna-Planet-MSI-Format/issues
   homepage: https://github.com/mrdvt92/perl-RF-Antenna-Planet-MSI-Format
   repository: https://github.com/mrdvt92/perl-RF-Antenna-Planet-MSI-Format.git
-version: '0.09'
+version: '0.10'

@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 18;
+use Test::More tests => 20;
 use Geo::Gpx;
 use File::Temp qw/ tempfile tempdir /;
 use Cwd qw(cwd abs_path);
@@ -70,7 +70,7 @@ my $track1 = $o_trk_only1->tracks( 1 );
 my $track2 = $o_trk_only2->tracks( 1 );
 $o_wpt_only1->tracks_add( $track1, name => 'My first track' );
 $o_wpt_only1->tracks_add( $track2 );
-my $get_track = $o_wpt_only1->tracks( name => '2020-10-25T20:36:07+00:00' );
+my $get_track = $o_wpt_only1->tracks( name => '2020-10-25T20:36:07Z' );
 is($o_wpt_only1->tracks_count, 2,      "    tracks_add(): test the number of tracks found");
 
 # tracks_add(): test also with aref's
@@ -111,7 +111,6 @@ my @search;
 @search = $o_wpt_only1->waypoints_search( desc => qr/(?i:limoges)/);
 
 # waypoints_merge():
-$DB::single=1;
 my $n_merged = $o->waypoints_merge( $o_wpt_only1, qr/LP[4-9]/ );
 is($n_merged, 2,                       "    waypoints_merge(): number of waypoints merged");
 is($o->waypoints_count, 6,             "    waypoints_merge(): number of waypoints found");
@@ -119,6 +118,8 @@ is($o->waypoints_count, 6,             "    waypoints_merge(): number of waypoin
 # waypoint_closest_to();
 my $pt2 = Geo::Gpx::Point->new( lat => 45.405441, lon => -75.137497 );
 my ($closest, $dist) = $o_wpt_only1->waypoint_closest_to( $pt2 );
+isa_ok ($closest,  'Geo::Gpx::Point');
+is($dist, 241.593745,                  "    waypoints_closest_to(): check the distance to the closest waypoint");
 
 # waypoint_delete():
 $o_wpt_only1->waypoint_delete('LP1');
@@ -136,6 +137,5 @@ $o_wpt_only1->set_wd( '-' );
 my $saved_then_read  = Geo::Gpx->new( input => $tmp_dir . '/test_save.gpx' );
 isa_ok ($saved_then_read,  'Geo::Gpx');
 
-$DB::single = 1;
 print "so debugger doesn't exit\n";
 

@@ -46,15 +46,6 @@ Files: t/moose_accessor_context.t
 Copyright: Copyright 2013 Infinity Interactive, Inc.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: lib/MooseX/XSAccessor.pm
- t/01basic.t
- t/02accel.t
- t/03funky.t
- t/04chained.t
- t/05lvalue.t
-Copyright: This software is copyright (c) 2013, 2017 by Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
 Files: CREDITS
  Changes
  LICENSE
@@ -64,6 +55,14 @@ Files: CREDITS
 Copyright: Copyright 1970 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
+Files: t/01basic.t
+ t/02accel.t
+ t/03funky.t
+ t/04chained.t
+ t/05lvalue.t
+Copyright: This software is copyright (c) 2013, 2017 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 Files: dist.ini
  examples/bench.pl
  t/lib/MyMoose.pm
@@ -71,9 +70,9 @@ Files: dist.ini
 Copyright: Copyright 2013 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
-Files: META.json
- META.yml
-Copyright: Copyright 2018 Toby Inkster.
+Files: t/06roles.t
+ t/99is_xs.t
+Copyright: This software is copyright (c) 2022 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: INSTALL
@@ -86,23 +85,32 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
+Files: META.json
+ META.yml
+Copyright: Copyright 2022 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 Files: t/moose_accessor_overwrite_warning.t
 Copyright: Copyright 2017 Infinity Interactive, Inc.
 License: GPL-1.0+ or Artistic-1.0
 
+Files: lib/MooseX/XSAccessor.pm
+Copyright: This software is copyright (c) 2013, 2017, 2022 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 Files: lib/MooseX/XSAccessor/Trait/Attribute.pm
-Copyright: This software is copyright (c) 2013 by Toby Inkster.
+Copyright: This software is copyright (c) 2013, 2022 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 License: Artistic-1.0
- This software is Copyright (c) 2018 by the copyright holder(s).
+ This software is Copyright (c) 2022 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2018 by the copyright holder(s).
+ This software is Copyright (c) 2022 by the copyright holder(s).
  
  This is free software, licensed under:
  

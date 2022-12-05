@@ -15,7 +15,29 @@ Also, the Changes document is automatically generated from the document:
 and that document should be considered the canonical source for all change
 related information.
 
-6.90  2022-09-01
+6.90  2022-12-02
+  -  Time zone fixes
+         Aliases in the tzdata database were not being added to the timezone
+         data. Reported in GitHub issue #40.
+
+         The UTC timezone is now named Etc/UTC instead of UTC to be in line
+         with the aliases.
+
+         Newest zoneinfo data (tzdata 2022g).
+
+  -  Language fixes
+         Additions to the Polish translation. GitHub issue #41.
+
+         Additions to several languages. GitHub issue #42.
+
+         Added some support for per-language parsing rules to respond to
+         GitHub issue #42.
+
+  -  Documentation fixes
+         The version numbers in the change log was messed up due to a
+         skipped release (no new timezone fixes that time). Fixed.
+
+6.89  2022-09-01
   -  (!) Date::Manip 5.xx interface to be removed
          The old version of Date::Manip (version 5.xx) has been distributed
          as part of the package in order to support versions of perl older
@@ -27,22 +49,21 @@ related information.
   -  Time zone fixes
          Newest zoneinfo data (tzdata 2022c).
 
-6.89  2022-06-02
+6.88  2022-06-02
   -  Packaging problem.
          I generated a broken MANIFEST file in the previous release.
          Reported in GitHub issue #39.
 
-6.88  2022-06-01
+6.87  2022-06-01
+  -  Bug fixes
+         The package was being generated with an incorrect MANIFEST file.
+         This is now fixed. RT 140075
+
   -  Time zone fixes
          There were no new timezone fixes on 2022-03-01, so no release made
          then.
 
          Newest zoneinfo data (tzdata 2022a).
-
-6.87  2022-03-01
-  -  Bug fixes
-         The package was being generated with an incorrect MANIFEST file.
-         This is now fixed. RT 140075
 
 6.86  2021-11-15
   -  Change warn to carp

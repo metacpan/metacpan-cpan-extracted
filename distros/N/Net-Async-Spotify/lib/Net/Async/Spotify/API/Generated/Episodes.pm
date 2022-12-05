@@ -3,7 +3,7 @@ package Net::Async::Spotify::API::Generated::Episodes;
 use strict;
 use warnings;
 
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 our $AUTHORITY = 'cpan:VNEALV'; # AUTHORITY
 
 use mro;
@@ -26,6 +26,8 @@ Check C<crawl-api-doc.pl> for more information.
 =head1 METHODS
 
 =cut
+
+sub mapping { shift->{mapping} }
 
 =head2 get_an_episode
 
@@ -93,9 +95,10 @@ If an episode is unavailable in the given market the HTTP status code in the res
 async sub get_an_episode {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'GET';
-    $request->{uri}    = 'https://api.spotify.com/v1/episodes/{id}';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{get_an_episode}{method} // 'GET';
+    $request->{uri}    = $mapping->{get_an_episode}{uri} // 'https://api.spotify.com/v1/episodes/{id}';
+    $request->{param}  = $mapping->{get_an_episode}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -115,7 +118,7 @@ async sub get_an_episode {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{get_an_episode}{response} // [
         'episode object',
 
     ];
@@ -183,9 +186,10 @@ On error, the header status code is an error code and the response body contains
 async sub get_multiple_episodes {
     my ($self, %args) = @_;
 
-    my $request->{method} = 'GET';
-    $request->{uri}    = 'https://api.spotify.com/v1/episodes';
-    $request->{param}  = {
+    my $mapping = $self->mapping;
+    my $request->{method} = $mapping->{get_multiple_episodes}{method} // 'GET';
+    $request->{uri}    = $mapping->{get_multiple_episodes}{uri} // 'https://api.spotify.com/v1/episodes';
+    $request->{param}  = $mapping->{get_multiple_episodes}{param} // {
         header => {
             'Authorization' => {
                 type     => 'string',
@@ -203,7 +207,7 @@ async sub get_multiple_episodes {
             },
         },
     };
-    my $response_objs = [
+    my $response_objs = $mapping->{get_multiple_episodes}{response} // [
         'an object',
         'an object',
 

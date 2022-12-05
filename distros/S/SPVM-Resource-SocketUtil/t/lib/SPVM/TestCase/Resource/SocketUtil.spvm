@@ -1,0 +1,3 @@
+class TestCase::Resource::SocketUtil {
+  native static method test : int ();
+}

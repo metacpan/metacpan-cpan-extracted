@@ -3,7 +3,7 @@ package Net::Async::Spotify::Object::Artist;
 use strict;
 use warnings;
 
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 our $AUTHORITY = 'cpan:VNEALV'; # AUTHORITY
 
 use mro;
@@ -23,5 +23,16 @@ Will hold all extra functionality for Spotify Artist Object
 =head1 METHODS
 
 =cut
+
+sub to_human {
+    my $self = shift;
+    return join(' | ',
+        $self->id,
+        $self->name,
+        $self->type,
+        join(', ', $self->genres->@*),
+        $self->popularity
+    );
+}
 
 1;

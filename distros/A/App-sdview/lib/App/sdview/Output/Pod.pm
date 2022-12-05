@@ -7,9 +7,9 @@ use v5.26;
 
 use Object::Pad 0.66;
 
-package App::sdview::Output::Pod 0.08;
+package App::sdview::Output::Pod 0.09;
 class App::sdview::Output::Pod
-   does App::sdview::Output
+   :does(App::sdview::Output)
    :strict(params);
 
 use constant format => "POD";

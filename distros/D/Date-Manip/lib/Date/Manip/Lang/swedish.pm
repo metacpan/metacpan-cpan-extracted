@@ -13,7 +13,7 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='6.89';
+$VERSION='6.90';
 
 our($Language,@Encodings,$LangName,$YearAdded);
 @Encodings = qw(utf-8 ISO-8859-15 perl);
@@ -21,6 +21,7 @@ $LangName  = "Swedish";
 $YearAdded = 1996;
 
 $Language = {
+  _special_rules => { },
   ampm => [['FM'], ['EM']],
   at => ['kl', 'kl.', 'klockan'],
   day_abb => [

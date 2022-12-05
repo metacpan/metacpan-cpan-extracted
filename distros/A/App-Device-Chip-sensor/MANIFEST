@@ -15,4 +15,5 @@ t/11chips.t
 t/12readings.t
 t/13print_readings.t
 t/20mid3.t
+t/21reliability.t
 t/99pod.t

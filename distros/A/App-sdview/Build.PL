@@ -13,10 +13,11 @@ my $build = Module::Build->new(
       'File::Slurper' => 0,
       'List::Keywords' => 0,
       'List::Util' => 0,
-      'Object::Pad' => '0.70',
+      'Object::Pad' => '0.74', # 0.73 + bugfix
       'Parse::Man::DOM' => '0.03',
       'Pod::Simple' => 0,
       'String::Tagged' => '0.15',
+      'String::Tagged::Markdown' => '0.02',
       'String::Tagged::Terminal' => 0,
       'Term::Size' => 0,
    },

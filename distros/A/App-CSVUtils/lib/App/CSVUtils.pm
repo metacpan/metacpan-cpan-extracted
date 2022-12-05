@@ -8,9 +8,9 @@ use Log::ger;
 use Hash::Subset qw(hash_subset);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-12-02'; # DATE
+our $DATE = '2022-12-05'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '0.051'; # VERSION
+our $VERSION = '0.052'; # VERSION
 
 our %SPEC;
 
@@ -1940,11 +1940,13 @@ _
     args => {
         %argspecs_common,
         %argspecs_csv_output,
+
         %argspec_filename_0,
         %argspecopt_output_filename_1,
         %argspecopt_overwrite,
-        %argspecs_sort_rows_short,
         %argspec_hash,
+
+        %argspecs_sort_rows_short,
     },
     args_rels => {
         req_one => ['by_fields', 'by_code', 'by_sortsub'],
@@ -1956,9 +1958,13 @@ sub csv_sort_rows {
 
     my %csvutil_args = (
         hash_subset(\%args, \%argspecs_common, \%argspecs_csv_output),
+        action => 'sort-rows',
+
         filename => $args{filename},
         output_filename => $args{output_filename},
-        action => 'sort-rows',
+        overwrite => $args{overwrite},
+        hash => $args{hash},
+
         sort_reverse => $args{reverse},
         sort_ci => $args{ci},
         sort_key => $args{key},
@@ -1966,7 +1972,6 @@ sub csv_sort_rows {
         sort_by_code   => $args{by_code},
         sort_by_sortsub => $args{by_sortsub},
         sort_sortsub_args => $args{sortsub_args},
-        hash => $args{hash},
     );
 
     csvutil(%csvutil_args);
@@ -2025,9 +2030,11 @@ _
     args => {
         %argspecs_common,
         %argspecs_csv_output,
+
         %argspec_filename_0,
         %argspecopt_output_filename_1,
         %argspecopt_overwrite,
+
         %argspecs_sort_fields_short,
     },
     tags => ['outputs_csv'],
@@ -2037,8 +2044,12 @@ sub csv_sort_fields {
 
     my %csvutil_args = (
         hash_subset(\%args, \%argspecs_common, \%argspecs_csv_output),
-        filename => $args{filename},
         action => 'sort-fields',
+
+        filename => $args{filename},
+        output_filename => $args{output_filename},
+        overwrite => $args{overwrite},
+
         sort_reverse => $args{reverse},
         sort_ci => $args{ci},
         (sort_examples => $args{by_examples}) x !!defined($args{by_examples}),
@@ -2539,7 +2550,7 @@ sub csv_concat {
             $csv_emitter->error_input;
         $res .= $csv_emitter->string . "\n";
     }
-    [200, "OK", $res, {"cmdline.skip_format"=>1}];
+    _return_or_write_file([200, "OK", $res, {"cmdline.skip_format"=>1}], $args{output_filename}, $args{overwrite});
 }
 
 $SPEC{csv_select_fields} = {
@@ -3259,7 +3270,7 @@ App::CSVUtils - CLI utilities related to CSV
 
 =head1 VERSION
 
-This document describes version 0.051 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2022-12-02.
+This document describes version 0.052 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2022-12-05.
 
 =head1 DESCRIPTION
 

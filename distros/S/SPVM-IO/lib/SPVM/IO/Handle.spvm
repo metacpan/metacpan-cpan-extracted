@@ -1,25 +1,25 @@
 class IO::Handle {
+  use Sys;
   use Sys::IO;
+  use Sys::IO::Constant as IO;
+  use Sys::Ioctl;
+  use Sys::Ioctl::Constant as IOCTL;
+  use Sys::IO::Stat;
   use Fn;
   use Format;
   use Scope::Guard;
-  use Sys;
   use Hash;
-  use IO::Util;
- 
-  use IO::File;
-  use Sys::IO::Constant as IO;
-  use Sys::Ioctl::Constant as IOCTL;
-  use Sys::IO::Stat;
   
-  has autoflush : wo byte;
+  # Interfaces
+  interface IO::Handle::Interface;
+  
+  # Fields
+  has autoflush : rw byte;
   has input_line_number : ro int;
   has opened : ro protected int;
   has blocking_flag : rw protected int;
   
-  interface IO::Handle::Interface;
-  
-  # Class methods
+  # Class Methods
   static method new : IO::Handle ($options : object[]) {
     my $self = new IO::Handle;
     
@@ -28,22 +28,19 @@ class IO::Handle {
     return $self;
   }
   
+  # Instance Methods
   method has_interfaces : int () { return 1; }
   
   method init : void ($options = undef : object[]) {
     my $options_h = Hash->new($options);
     
     # Blocking option
-    my $blocking_flag = IO::Util->delete_int_or_default($options_h, "Blocking", 1);
+    my $blocking_flag = $options_h->delete_or_default_int("Blocking", 1);
     $self->{blocking_flag} = $blocking_flag;
     
     for my $key (@{$options_h->keys}) {
       die "The \"$key\" option is not available";
     }
-  }
-  
-  method get_autoflush : byte () {
-    return $self->{autoflush};
   }
   
   method close : int () {
@@ -96,11 +93,11 @@ class IO::Handle {
   }
 
   method printflush : int ($string : string) {
-    my $old_autoflush = $self->get_autoflush;
+    my $old_autoflush = $self->autoflush;
     
     # Restores the autoflush field at the end of the scope.
     my $handle = $self;
-    my $scope_guard = Scope::Guard->new([$handle : IO::Handle, $old_autoflush : byte] method : void () {
+    my $scope_guard = Scope::Guard->new([$handle : IO::Handle, $old_autoflush : int] method : void () {
       $handle->set_autoflush($old_autoflush);
     });
     

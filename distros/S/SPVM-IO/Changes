@@ -1,3 +1,21 @@
+0.14 2022-12-03
+  [Prerequrement Changes]
+    * SPVM::IO needs SPVM 0.9664+.
+    * SPVM::IO needs SPVM::Sys 0.28+.
+  [Incompatible Document Changes]
+    * Removed the is_io_handlable method in the IO::Handle class in the doc.
+      This was removed in the past.
+  [Document Improvement]
+    * Added the doc of the IO::Handle.
+    * Added the doc of the IO::Handle::Interface.
+  [Incompatible Changes]
+    * Removed the autoflush method in the IO::File class.
+    * Removed the get_autoflush in the IO::Handle class.
+    * Changed the definitions of the following fields in the IO::Handle class.
+      [Before]
+      has autoflush : wo byte;
+      [After]
+      has autoflush : rw byte;
 0.13 2022-11-22
   [New Features]
     * Added many methods and some classes.

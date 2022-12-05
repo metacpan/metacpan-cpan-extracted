@@ -3,7 +3,7 @@ package Net::Async::Spotify::API::Browse;
 use strict;
 use warnings;
 
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 our $AUTHORITY = 'cpan:VNEALV'; # AUTHORITY
 
 use mro;
@@ -23,5 +23,12 @@ Will hold all extra functionality for Spotify Browse API
 =head1 METHODS
 
 =cut
+
+sub new {
+    my $self  = (shift)->next::method(@_);
+    $self->mapping->{get_recommendation_genres}{response} = ['RecommendationSeed'];
+    $self->mapping->{get_recommendations}{response} = ['Recommendations'];
+    return $self;
+}
 
 1;

@@ -12,3 +12,7 @@ Release history for Plack-Middleware-LogAny
           - tidy source code and test script
           - increase test coverage to 100%
           - handle 0 category accurately
+
+0.001002  2022-12-05
+          - do not create authoring related MakeMaker postamble section
+            on some platforms (background: the make syntax differs)

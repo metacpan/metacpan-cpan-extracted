@@ -6,7 +6,7 @@ use warnings;
 use Test::More;
 use Test::Fatal;
 
-use Object::Pad;
+use Object::Pad ':experimental(init_expr)';
 
 package Base::Class {
    sub new {
@@ -27,7 +27,7 @@ package Base::Class {
 my @BUILDS_INVOKED;
 
 class Derived::Class :isa(Base::Class) {
-   has $derived_field = 456;
+   field $derived_field = 456;
 
    BUILD {
       my @args = @_;
@@ -104,7 +104,7 @@ class Derived::Class :isa(Base::Class) {
 # Test case two - read from an initialised field
 {
    class RT132263::Child2 :isa(RT132263::Parent) {
-      has $value = 456;
+      field $value = 456;
       method example_method { $value }
    }
 

@@ -3,7 +3,7 @@ package Net::Async::Spotify::API::Base;
 use strict;
 use warnings;
 
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 our $AUTHORITY = 'cpan:VNEALV'; # AUTHORITY
 
 use Future::AsyncAwait;
@@ -33,7 +33,8 @@ sub new {
     my $self = bless { @_[1..$#_] }, $_[0];
     die "Net::Async::Spotify has to be provided" unless $self->spotify and $self->spotify->isa('Net::Async::Spotify');
     weaken($self->{spotify}) unless isweak($self->spotify);
-    $self;
+    $self->{mapping} = {};
+    return $self;
 }
 
 sub spotify { shift->{spotify} }
@@ -48,13 +49,11 @@ Allowing also to accept user passed response type C<obj_type> as member of C<%ar
 
 async sub call_api {
     my ($self, $request, $response_objs, %args) = @_;
-    $log->tracef('CALL API CALLED: %s | %s | %s', $request, $response_objs, \%args);
 
-    my ( $result, $request_headers, $request_uri, $request_content, $res_hash, $decoded_res, $mapped_res );
+    my ( $result, $request_headers, $request_uri, $request_content );
     # Prepare needed response params.
     # override if response type passed explicitly
     $response_objs = [$args{obj_type}] if exists $args{obj_type};
-    $res_hash = {response_objs => $response_objs, uri => $request->{uri}};
     # Path Parameter
     if (my $path_parameter = $request->{param}{path_parameter} ) {
         # Path parameters should be always required.
@@ -99,11 +98,14 @@ async sub call_api {
     # Body parameters
     for my $bp (keys $request->{param}{json_body_parameter}->%*) {
         if ( exists $args{$bp} ) {
-            unless ( $request->{param}{json_body_parameter}{$bp}{type} =~ /^array/
-                or ref($args{$bp}) eq 'ARRAY' ) {
-                $request_content->{content}{$bp} = $args{$bp};
+            if ( $request->{param}{json_body_parameter}{$bp}{type} =~ /^array/ ) {
+                if ( ref($args{$bp}) eq 'ARRAY' ) {
+                    $request_content->{content}{$bp} = $args{$bp};
+                } else {
+                    push $request_content->{content}{$bp}->@*, split ',', $args{$bp};
+                }
             } else {
-                push $request_content->{content}{$bp}->@*, split ',', $args{$bp};
+                $request_content->{content}{$bp} = $args{$bp};
             }
         } elsif ( $request->{param}{json_body_parameter}{$bp}{required} eq 'required' ) {
             $log->errorf('Missing Required Body Parameter: %s', $bp);
@@ -113,33 +115,52 @@ async sub call_api {
 
     $request_content->{content} = encode_json_utf8($request_content->{content}) if exists $request_content->{content};
     try {
+        $log->tracef('Requesting Spotify API: request: %s | uri: %s | content: %s', $request, $request_uri, $request_content);
         $result = await $self->spotify->http->do_request(
             method => $request->{method},
             uri => $request_uri,
             defined $request_content ? ($request_content->%*) : (),
             headers => $request_headers,
         );
+        $log->tracef('Spotify API response: %s', $result);
     } catch ($e) {
         use Data::Dumper;
         $log->errorf('Error calling Spotify API request: %s | Error: %s', $request_uri->as_string, Dumper($e));
         return;
     }
 
+    if ( $result->content ) {
+        return {
+            status_line => $result->status_line,
+            content => $self->parse_response($self->decode_response($result->content), $response_objs)
+        };
+    }
+    return { status_line => $result->status_line, content => $result->content };
+
+}
+
+sub decode_response {
+    my ( $self, $content ) = @_;
+
     try {
-        $decoded_res = $result->content ? decode_json_utf8($result->content) : $result->content;
+        return decode_json_utf8($content);
     } catch ($e) {
         $log->warnf('Could not JSON decode Spotify API Response | Error: %s', $e);
-        return { status_line => $result->status_line, content => $result->content };
+        return 0;
     }
-    # Separate Try/Catch for better error isolation
-    try {
-        $mapped_res = $decoded_res ? Net::Async::Spotify::Object->new($decoded_res, $res_hash) : $decoded_res;
-    } catch ($e) {
-        $log->warnf('Could not Map Spotify API Response to its Object %s | Error: %s | data: %s', $res_hash, $e, $decoded_res);
-        return { status_line => $result->status_line, content => $decoded_res };
-    }
+}
 
-    return { status_line => $result->status_line, content => $mapped_res };
+sub parse_response {
+    my ( $self, $decoded_res, $expected ) = @_;
+
+    $log->tracef('API Base Mapping: %s', $self->mapping);
+
+    try {
+        return $decoded_res ? Net::Async::Spotify::Object->new($decoded_res, $expected) : $decoded_res;
+    } catch ($e) {
+        $log->warnf('Could not Map Spotify API Response to its Object %s | Error: %s | data: %s', $expected, $e, $decoded_res);
+        return $decoded_res;
+    }
 }
 
 1;

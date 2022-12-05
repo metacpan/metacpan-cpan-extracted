@@ -21,13 +21,14 @@
       },
       "runtime" : {
          "requires" : {
+            "Commandable::Finder::MethodAttributes" : "0",
+            "Commandable::Invocation" : "0",
             "Config::Tiny" : "0",
             "Convert::Color::XTerm" : "0.06",
             "IO::Term::Status" : "0",
             "IPC::Run" : "0",
-            "Object::Pad" : "0.63",
+            "Object::Pad" : "0.74",
             "String::Tagged" : "0.17",
-            "Struct::Dumb" : "0",
             "Syntax::Keyword::Dynamically" : "0",
             "perl" : "5.026"
          }
@@ -41,7 +42,7 @@
    "provides" : {
       "App::eachperl" : {
          "file" : "lib/App/eachperl.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       }
    },
    "release_status" : "stable",
@@ -50,6 +51,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.06",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.07",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

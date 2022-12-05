@@ -26,8 +26,7 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "DateTime" => "1.44",
     "DateTime::Format::ISO8601" => 0,
-    "Geo::Calc" => 0,
-    "Geo::Gpx" => "1.02",
+    "Geo::Gpx" => "1.08",
     "IPC::System::Simple" => "1.30",
     "Test::More" => 0
   },
@@ -36,7 +35,7 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.03",
+  "VERSION" => "1.04",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -48,8 +47,7 @@ my %FallbackPrereqs = (
   "DateTime::Format::ISO8601" => 0,
   "ExtUtils::MakeMaker" => 0,
   "File::Spec" => 0,
-  "Geo::Calc" => 0,
-  "Geo::Gpx" => "1.02",
+  "Geo::Gpx" => "1.08",
   "IPC::System::Simple" => "1.30",
   "Module::Build" => "0.28",
   "Test::More" => 0

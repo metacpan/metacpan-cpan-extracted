@@ -4,9 +4,9 @@
 #  (C) Paul Evans, 2017-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.57;
+use Object::Pad 0.73 ':experimental(init_expr)';
 
-package Device::Chip::MAX11200 0.13;
+package Device::Chip::MAX11200 0.14;
 class Device::Chip::MAX11200
    :isa(Device::Chip);
 
@@ -281,7 +281,7 @@ one. Initialised to 120.
 
 =cut
 
-has $_default_trigger_rate = 120;
+field $_default_trigger_rate = 120;
 method default_trigger_rate :lvalue { $_default_trigger_rate }
 
 async method trigger ( $rate = $_default_trigger_rate )
@@ -429,7 +429,7 @@ method as_gpio_adapter
 class Device::Chip::MAX11200::_GPIOAdapter {
    use Carp;
 
-   has $_chip :param;
+   field $_chip :param;
 
    async method make_protocol ( $pname )
    {
@@ -448,8 +448,8 @@ class Device::Chip::MAX11200::_GPIOAdapter {
       } $self->list_gpios;
    }
 
-   has $_dir = "";
-   has $_val = "";
+   field $_dir = "";
+   field $_val = "";
 
    async method write_gpios ( $values )
    {

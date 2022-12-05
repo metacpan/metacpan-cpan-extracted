@@ -6,9 +6,9 @@ Date::Manip::Offset::off198;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Thu Sep  1 10:36:29 EDT 2022
-#    Data version: tzdata2022c
-#    Code version: tzcode2022c
+#    Generated on: Fri Dec  2 12:33:24 EST 2022
+#    Data version: tzdata2022g
+#    Code version: tzcode2022g
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -19,7 +19,7 @@ use warnings;
 require 5.010000;
 
 our ($VERSION);
-$VERSION='6.89';
+$VERSION='6.90';
 END { undef $VERSION; }
 
 our ($Offset,%Offset);
@@ -28,35 +28,11 @@ END {
    undef %Offset;
 }
 
-$Offset        = '+12:00:00';
+$Offset        = '+12:13:48';
 
 %Offset        = (
    0 => [
-      'pacific/tarawa',
-      'pacific/fiji',
-      'asia/anadyr',
-      'asia/kamchatka',
-      'pacific/auckland',
-      'pacific/nauru',
-      'pacific/kwajalein',
-      'etc/gmt+12',
-      'y',
-      'asia/magadan',
-      'asia/srednekolymsk',
-      'asia/ust-nera',
-      'pacific/kosrae',
-      ],
-   1 => [
-      'pacific/norfolk',
-      'asia/magadan',
-      'asia/srednekolymsk',
-      'asia/ust-nera',
-      'asia/anadyr',
-      'asia/kamchatka',
-      'pacific/noumea',
-      'asia/sakhalin',
-      'pacific/efate',
-      'pacific/auckland',
+      'pacific/chatham',
       ],
 );
 

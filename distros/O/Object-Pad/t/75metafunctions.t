@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More;
 
-use Object::Pad ':experimental( mop )';
+use Object::Pad ':experimental(init_expr mop)';
 use Object::Pad::MetaFunctions qw(
    metaclass
    deconstruct_object
@@ -14,17 +14,17 @@ use Object::Pad::MetaFunctions qw(
 );
 
 class Point {
-   has $x :param = 0;
-   has $y :param = 0;
+   field $x :param = 0;
+   field $y :param = 0;
 }
 
 is( metaclass( Point->new ), Object::Pad::MOP::Class->for_class( "Point" ),
    'metaclass() returns Point metaclass' );
 
 class AllFieldTypes {
-   has $s = "scalar";
-   has @a = ( "array", "values" );
-   has %h = ( key => "value" );
+   field $s = "scalar";
+   field @a = ( "array", "values" );
+   field %h = ( key => "value" );
 }
 
 is_deeply( [ deconstruct_object( AllFieldTypes->new ) ],
@@ -35,13 +35,13 @@ is_deeply( [ deconstruct_object( AllFieldTypes->new ) ],
   'deconstruct_object on AllFieldTypes' );
 
 class AClass {
-   has $a = "a";
+   field $a = "a";
 }
 role BRole {
-   has $b = "b";
+   field $b = "b";
 }
 class CClass :isa(AClass) :does(BRole) {
-   has $c = "c";
+   field $c = "c";
 }
 
 is_deeply( [ deconstruct_object( CClass->new ) ],

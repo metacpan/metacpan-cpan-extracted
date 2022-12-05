@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20220903144941;
+our $VERSION = 1.20221202211027;
 
 my $formatters = [
                 {
@@ -93,35 +93,35 @@ my $validators = {
                 'voip' => ''
               };
 my %areanames = ();
-$areanames{en} = {"9465", "Batticaloa",
-"9431", "Negombo\,\ Gampaha",
-"9435", "Kegalle",
-"9426", "Trincomalee",
-"9427", "Polonnaruwa",
-"9423", "Mannar",
-"9447", "Hambantota",
-"9424", "Vavuniya",
-"9451", "Hatton\,\ Nuwara\ Eliya",
-"9455", "Badulla",
-"9425", "Anuradhapura",
-"9421", "Jaffna",
-"9452", "Nuwara\ Eliya",
+$areanames{en} = {"9435", "Kegalle",
 "9433", "Gampaha",
+"9457", "Bandarawela\,\ Badulla",
+"9454", "Nawalapitiya\,\ Kandy",
+"9441", "Matara",
+"9463", "Ampara",
+"9465", "Batticaloa",
+"9425", "Anuradhapura",
+"9423", "Mannar",
+"9438", "Panadura\,\ Kalutara",
+"9432", "Chilaw\,\ Puttalam",
+"9411", "Colombo",
+"9447", "Hambantota",
+"9451", "Hatton\,\ Nuwara\ Eliya",
+"9491", "Galle",
 "9466", "Matale",
+"9424", "Vavuniya",
 "9437", "Kurunegala",
+"9426", "Trincomalee",
+"9455", "Badulla",
 "9436", "Avissawella\,\ Colombo",
 "9467", "Kalmunai\,\ Ampara",
-"9463", "Ampara",
-"9454", "Nawalapitiya\,\ Kandy",
-"9491", "Galle",
-"9457", "Bandarawela\,\ Badulla",
+"9427", "Polonnaruwa",
 "9482", "Kandy",
 "9434", "Kalutara",
-"9411", "Colombo",
-"9432", "Chilaw\,\ Puttalam",
-"9438", "Panadura\,\ Kalutara",
+"9421", "Jaffna",
+"9452", "Nuwara\ Eliya",
 "9445", "Ratnapura",
-"9441", "Matara",};
+"9431", "Negombo\,\ Gampaha",};
 
     sub new {
       my $class = shift;

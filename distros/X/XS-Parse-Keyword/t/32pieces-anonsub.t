@@ -16,4 +16,13 @@ BEGIN { $^H{"t::pieces/permit"} = 1; }
    is( $ret->(), "sub value", 'result of invoking' );
 }
 
+{
+   my $ret = piecestagedanonsub { return "$VAR, world" };
+
+   is( ref $ret, "CODE", 'result of piecestagedanonsub is CODE reference' );
+   is( $ret->(), "Hello, world", 'result of invoking' );
+
+   is( $::STAGES, "PREPARE,START,END,WRAP", 'All ANONSUB stages were invoked' );
+}
+
 done_testing;

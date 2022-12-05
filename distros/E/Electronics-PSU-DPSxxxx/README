@@ -24,7 +24,7 @@ DESCRIPTION
 
     The interface is currently an ad-hoc collection of whatever seems to
     work here, but my hope is to find a more generic shareable interface
-    that multiple differenet modules can use, to provide interfaces to
+    that multiple different modules can use, to provide interfaces to
     various kinds of electronics test equipment.
 
     The intention is that it should eventually be possible to write a

@@ -3,7 +3,7 @@ package Net::Async::Spotify::Object::CurrentlyPlayingContext;
 use strict;
 use warnings;
 
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 our $AUTHORITY = 'cpan:VNEALV'; # AUTHORITY
 
 use mro;
@@ -23,5 +23,17 @@ Will hold all extra functionality for Spotify CurrentlyPlayingContext Object
 =head1 METHODS
 
 =cut
+
+sub to_human {
+    my $self = shift;
+    return join(' | ',
+        $self->currently_playing_type,
+        $self->item->id,
+        $self->item->name,
+        join(' & ', map {$_->name} $self->item->artists->@*),
+        $self->item->album->name,
+        $self->device->name . '( ' . $self->device->volume_percent .'% )'
+    );
+}
 
 1;

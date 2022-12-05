@@ -1,3 +1,7 @@
+0.04 2022-12-03T09:43:00Z
+    - Added an option to get the SQL using 'name' and 'at' from the methods 
+      load and reload (file-name#name or file-name#at).
+
 0.03 2022-11-16T00:55:00Z
     - Added method reset in SQL::Load::Method.
 

@@ -97,7 +97,7 @@
          "web" : "https://github.com/RT-Client-REST/RT-Client-REST"
       }
    },
-   "version" : "0.70",
+   "version" : "0.71",
    "x_contributors" : [
       "Abhijit Menon-Sen <ams@wiw.org>",
       "belg4mit <belg4mit>",

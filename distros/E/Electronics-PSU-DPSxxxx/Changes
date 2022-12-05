@@ -1,5 +1,10 @@
 Revision history for Electronics-PSU-DPSxxxx
 
+0.04    2022-10-05
+        [CHANGES]
+         * Updated for Object::Pad v0.73:
+            + Use `field NAME = EXPR` syntax
+
 0.03    2022-10-29
         [CHANGES]
          * Updates for Object::Pad v0.70

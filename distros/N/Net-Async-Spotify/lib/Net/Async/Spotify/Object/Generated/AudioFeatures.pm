@@ -3,7 +3,7 @@ package Net::Async::Spotify::Object::Generated::AudioFeatures;
 use strict;
 use warnings;
 
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 our $AUTHORITY = 'cpan:VNEALV'; # AUTHORITY
 
 use mro;

@@ -13,7 +13,7 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='6.89';
+$VERSION='6.90';
 
 our($Language,@Encodings,$LangName,$YearAdded);
 @Encodings = qw(utf-8 iso-8859-1 perl);
@@ -21,6 +21,7 @@ $LangName  = "Catalan";
 $YearAdded = 2003;
 
 $Language = {
+  _special_rules => { },
   ampm => [['AM', 'A.M.', 'de la matinada'], ['PM', 'P.M.', 'de la tarda']],
   at => ['a les', 'a', 'al'],
   day_abb => [

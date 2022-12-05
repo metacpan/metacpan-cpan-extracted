@@ -1,0 +1,502 @@
+NAME
+    Tk::FileTree - Tk::DirTree like widget for displaying & manipulating
+    directories (and files).
+
+SYNOPSIS
+            #!/usr/bin/perl
+
+            use Tk;
+
+            use Tk::FileTree;
+
+            my $bummer = ($^O =~ /MSWin/);
+
+            my $top = MainWindow->new;
+
+            my $tree = $top->Scrolled('FileTree',
+
+                    -scrollbars => 'osoe',
+
+                    -selectmode => 'extended',
+
+                    -width => 40,
+
+                    -height => 16,
+
+                    -takefocus => 1,
+
+            )->pack( -fill => 'both', -expand => 1);
+
+            my $ok = $top->Button( qw/-text Show -underline 0/, -command => \&showme );
+
+            my $cancel = $top->Button( qw/-text Quit -underline 0/, -command => sub { exit } );
+
+            $ok->pack(     qw/-side left  -padx 10 -pady 10/ );
+
+            $cancel->pack( qw/-side right -padx 10 -pady 10/ );
+
+            my ($root, $home);
+
+            if ($bummer) {
+
+                    $home = $ENV{'HOMEDRIVE'} . $ENV{'HOMEPATH'};
+
+                    $home ||= $ENV{'USERPROFILE'};
+
+                    ($root = $home) =~ s#\\[^\\]*$##;
+
+            } else {
+
+                    $root = '/home';
+
+                    $home = "/home/$ENV{'USER'}";
+
+                    $home = $root = '/'  unless (-d $home);
+
+            }
+
+            print "--home=$home= root=$root=\n";
+
+            $tree->set_dir($home, -root => $root);
+
+            MainLoop;
+
+            sub showme {
+
+                    my @selection = $tree->selectionGet;
+
+                    print "--Show me:  active=".$tree->index('active')."=\n";
+
+                    print "--selected=".join('|',@selection)."=\n";
+
+                    foreach my $i (@selection) {
+
+                            print "-----$i selected.\n";
+
+                    }
+
+                    my $state = $tree->state();
+
+                    print "--state=$state=\n";
+
+                    print (($state =~ /d/) ? "--enabling.\n" : "--disabling.\n");
+
+                    $tree->state(($state =~ /d/) ? 'normal' : 'disabled');
+
+            }
+
+DESCRIPTION
+    Creates a widget to display a file-system (or part of it) in a tree
+    format. Works very similar to Tk::DirTree, but displays both files and
+    subdirectories by default. Each subdirectory includes an indicator icon
+    resembling [+] or [-] to either expand and view it's contents (files and
+    subdiretories) or collapse them respectively. A separate icon is
+    displayed for files and subdirectories making it easier to tell them
+    apart. Options allow users to select a file, a directory, or multiple
+    entries (like a listbox) which can be returned to the program for
+    further processing.
+
+    This widget is derived from Tk::DirTree. It provides additional
+    features, including listing files, in addition to the subdirectories,
+    options (filters) to limit which files are displayed (by specificy
+    including or excluding a list of file extensions), and additional
+    bindings and functions to enable user-selection and interaction with
+    specific files and directories from within other programs.
+
+    I took Tk::DirTree, renamed it and modified it to create this module
+    primarily to be able to add a "tree-view" option to my Perl-Tk based
+    filemanager called JFM5, which allows users to select and perform common
+    functions on files and directories on their system, and others (via
+    Net::xFTP). I have previously created other modules toward this effort,
+    namely Tk::HMListbox and Tk::JThumbnail. These modules provide the
+    different "views": Detailed list, Image list, and now Tree-view,
+    respectively.
+
+STANDARD OPTIONS
+    -background -borderwidth -cursor -disabledforeground -exportselection
+    -font -foreground -height -highlightbackground -highlightcolor
+    -highlightthickness -relief -scrollbars -selectbackground
+    -selectborderwidth -selectforeground -state -takefocus -width
+    -xscrollcommand -yscrollcommand
+
+    See Tk::options for details of the standard options.
+
+WIDGET-SPECIFIC OPTIONS
+    Name: activeForeground
+    Class: activeForeground
+    Switch: -activeforeground
+        Specifies an alternate color for the foreground of the "active"
+        entry (the one the text cursor is on). This entry is also shown with
+        a hashed box around it. NOTE: The "activebackground" color, however,
+        is always fixed to the same color as the widget's background, due to
+        the fact that the underlying Tk::HList module only sets the text and
+        icon areas to the active background, rather than the entire row
+        resulting in a somewhat ugly appearance if the row is "active" but
+        not "selected".
+
+        DEFAULT: Same color as the widget's foreground color.
+
+    Name: browseCmd
+    Class: BrowseCmd
+    Switch: -browsecmd
+        Specifies a callback to call whenever the user browses on a file or
+        directory (usually by single-clicking on the name). The callback is
+        called with one argument: the complete pathname of the file /
+        directory.
+
+    Name: command
+    Class: Command
+    Switch: -command
+        Specifies the callback to be called when the user activates on a
+        file or directory (usually by double-clicking on the name). The
+        callback is called with one argument, the complete pathname of the
+        file / directory.
+
+    Name: dirCmd
+    Class: DirCmd
+    Switch: -dircmd
+        Callback function to obtain the list of directories and files for
+        display. A sensible default is provided and it should not be
+        overridden unless you know what you are doing! It takes three
+        arguments: a widget object handle, a directory path, and a boolean
+        value (TRUE for include hidden (dot) files or FALSE to exclude
+        them).
+
+        Tk::DirTree documentation: Specifies the callback to be called when
+        a directory listing is needed for a particular directory. If this
+        option is not specified, by default the DirTree widget will attempt
+        to read the directory as a Unix directory. On special occasions, the
+        application programmer may want to supply a special method for
+        reading directories: for example, when he needs to list remote
+        directories. In this case, the -dircmd option can be used. The
+        specified callback accepts two arguments: the first is the name of
+        the directory to be listed; the second is a Boolean value indicating
+        whether hidden sub-directories should be listed. This callback
+        returns a list of names of the sub-directories of this directory.
+
+    Name: dirTree
+    Class: DirTree
+    Switch: -dirtree
+        Boolean option to only show directories (like Tk::DirTree) if TRUE,
+        show both directories and files if FALSE. Use this to work as a
+        drop-in replacement for Tk::DirTree. To truly emulate Tk::DirTree's
+        behavior, one should probably also specify "-takefocus => 1", as
+        that seems to be it's default focus model.
+
+        DEFAULT: *FALSE* (Show both directories and files).
+
+    Name: exclude
+    Class: Exclude
+    Switch: -exclude
+        Specify a reference to an array of file-extensions to be excluded.
+        Note: Not applicable to directory names (case insensitive). See
+        also: -include.
+
+        DEFAULT: *[]* (Do not exclude any files).
+
+        EXAMPLE: -exclude => ['exe', 'obj'] (Exclude M$-Windows object and
+        executable files).
+
+    Switch: -height
+        Specifies the desired height for the window. I'm not sure what units
+        it uses, so users will need to use trial and error and seems to work
+        differently than the -width option. See also: -width.
+
+    Name: fileimage
+    Class: Image
+    Switch: -fileimage
+        Specify an alternate xpm (tiny icon) image to be displayed to the
+        left of each file displayed which is not a directory). See also:
+        -image.
+
+        DEFAULT: A sensible default icon of a white sheet of paper with a
+        dogeared corner is provided.
+
+    Name: image
+    Class: Image
+    Switch: -image
+        Specify an alternate xpm (tiny icon) image to be displayed to the
+        left of each directory). See also: -fileimage.
+
+        DEFAULT: A sensible default icon of a yellow folder is provided (the
+        same one used by Tk::DirTree).
+
+    Name: include
+    Class: Include
+    Switch: -include
+        Specify a reference to an array of file-extensions to be included,
+        all other entensions will be excluded. Note: Not applied to
+        directory names (case insensitive). See also: -exclude.
+
+        DEFAULT: *[]* (Include all files).
+
+        EXAMPLE: -include => ['pl', 'pm'] (Include only Perl files).
+
+    Name: root
+    Class: Directory
+    Switch: -root
+        Specify a "root path" above which the user will not be able to
+        expand to view any other subdirectories or files (by clicking the
+        little [-] icon next to each directory).
+
+        DEFAULT: *"/"* (Allow user to expand any level).
+
+    Name: selectMode
+    Class: SelectMode
+    Switch: -selectmode
+        Specifies one of several styles for manipulating the selection. The
+        value of the option may be arbitrary, but the default bindings
+        expect it to be either single, browse, multiple, extended or
+        dragdrop.
+
+        DEFAULT: *browse*.
+
+    Name: -showcursoralways
+    Class: -showcursoralways
+    Switch: -showcursoralways
+        This option, when set to 1 always shows the active cursor. When set
+        to 0, the active cursor is only shown when the widget has the
+        keyboard focus. NOTE: The option: *-takefocus => 1* will cause the
+        mouse to give keyboard focus to the widget when clicked on an item,
+        which while activating the item clicked on will also make the active
+        cursor visible.
+
+        DEFAULT: *0* (Hide cursor when focus leaves the widget).
+
+    Name: showHidden
+    Class: ShowHidden
+    Switch: -showhidden
+        Boolean option to include hidden (dot) files and directories (if
+        TRUE), otherwise, exclude them.
+
+        DEFAULT: *FALSE* (Exclude hidden directories and files (those that
+        begin with a dot (".")).
+
+    Switch: -state
+        Specifies one of two states for the widget: normal or disabled. If
+        the widget is disabled then items may not be selected, items are
+        drawn in the -disabledforeground color, and selection cannot be
+        modified and is not shown (though selection information is
+        retained). Note: The active and any selected items are saved when
+        disabling the widget, and restored when re-enabled.
+
+    Name: takeFocus
+    Class: TakeFocus
+    Switch: -takefocus
+        There are actually three different focusing options: Specify 1 to
+        both allow the widget to take keyboard focus itself and to enable
+        grabbing the keyboard focus when a user clicks on a row in the tree.
+        Specify '' to allow the widget to take focus (via the <TAB>
+        circulate order) but do not grab the focus when a user clicks on
+        (selects) a row. This is the default focusing model. Specify 0 to
+        not allow the widget to receive the keyboard focus. Disabling the
+        widget will also prevent focus while disabled, but restore the
+        previous focusing policy when re-enabled.
+
+        DEFAULT: *""* (Empty string, also a "false" value, the default Tk
+        focusing option), but different from *0* (zero), as explained above.
+
+    Name: width
+    Class: Width
+    Switch: -width
+        Seems to specify the desired width for the widget in tenths of
+        inches, though I haven't confirmed if this is absolute. It also
+        seems to work differently than the -height option. See also -height.
+
+WIDGET METHODS
+    The FileTree method creates a widget object. The widget object can also
+    be created via Scrolled('FileTree'). This object supports the configure
+    and cget methods described in Tk::options which can be used to enquire
+    and modify the options described above. The widget also inherits the
+    methods provided by the generic Tk::Widget, Tk::HList and Tk::Tree
+    classes.
+
+    To create a FileTree widget:
+
+    *$widget* = *$parent*->FileTree(?*options*?);
+
+    The following additional methods are available for FileTree widgets:
+
+    *$widget*->activate(*index*)
+        Sets the active element and the selection anchor to the one
+        indicated by *index*. If *index* is outside the range of elements in
+        the tree no element is activated. The active element is drawn with a
+        thin hashed border, and its index may be retrieved with the index
+        active or anchor. Note: The "*index*" for FileTree widgets (if not
+        *active* or anchor, must be a full path-name to a file or directory
+        in the tree. Also note, if the activated entry is not visible
+        (inside a collapsed directory), the directories above it will be
+        expanded (as if the user clicked the [+] icon) to make it visible
+        (as the parent *Tk::Tree* widget requires this in order to be able
+        to activate an entry.
+
+    *$widget*->add_pathimage(*path*, *ExpandedImage [+]*, *CollapsedImage
+    [-]*)
+        Overrides the default "[+]" and "[-]" icon images (black foreground)
+        used for each directory in the tree. Normally, this is unnecessary,
+        but one specific use (useful for users) is adding a matching set
+        with a white foreground if setting the palette or background color
+        to a "dark" color (where the foreground text is all set to white
+        because a black text foreground is difficult to see). NOTE: Any
+        program allowing users to change the color palette to be changed
+        will also need to unpack, destroy, recreate, add the additional pair
+        of images (with white foregrounds) and repack the FileTree widget if
+        it determines that the foreground color is being changed from black
+        to white (ie. palette has changed from a "light" to a "dark"
+        background). The reason for this extra work is due to the fact that
+        there is no known way to go through and reset and redraw all the
+        icons displayed when the palette is changed. Tk does not include
+        white-foreground bitmaps of these two images, so the author of such
+        a program will need to either also create these two bitmaps and
+        include them in the Tk directory itself (ie.
+        /usr/local/lib/site_perl/Tk); or simply use the two corresponding
+        "*_night.xpm" icon images included with this module!
+
+    *$widget*->chdir(*full_directory_path* [, *ops* ])
+        Synonym for *$widget*->set_dir(*full_directory_path* [, *ops* ]) - a
+        holdover from Tk::DirTree. See setdir below.
+
+    *$widget*->close(*index*)
+        Collapses the display of the directory specified by *index*, if it
+        is a directory and it is currently expanded (files and
+        subdirectories are currently displayed. If successful, it also
+        activates and scrolls the entry into view. See also the open method.
+
+    *$widget*->curselection
+        Convenience method that returns a list containing the "indices"
+        (values) of all of the elements in the HListbox that are currently
+        selected. If there are no elements selected in the tree then an
+        empty list is returned. The values returned are always
+        fully-qualified file and directory names. It is equivalent to
+        *$widget*->selectionGet.
+
+    *$widget*->delete(*index*)
+        Deletes one or all elements of the HListbox. The "*index*" must
+        eiter be must be a full path-name to a file or directory in the tree
+        or "*all*", meaning delete the entire tree.
+
+    *$widget*->hide([*-entry* => ] *index*)
+        Given an *index*, sets the entry to "hidden" so that it does not
+        display in the tree (but maintains it's index. The "*-entry*"
+        argument is unnecessary, but retained for Tk::HList compatability.
+        See also the show method.
+
+    *$widget*->index(*index*)
+        Returns the "normalized" version of the entry that corresponds to
+        *index*. "normalized" means that file and directory paths are
+        converted into a valid "*nix" format ("/" instead of "\"), any
+        trailing "/" is removed unless the path is "/" (root). This can
+        still be passed to any of the public methods, which will ensure
+        they're in the proper format for the host operating system. Two
+        special values may also be given for *index*: *active* and *anchor*,
+        which are similar for *Tk::HList*-based widgets and return the
+        current active element's index. The subtle difference is that
+        "*anchor*" is not valid when the widget is disabled, but "*active*"
+        will still return the saved anchor position.
+
+    *$widget*->open(*index* [, *ops* ])
+        Expands the display of the directory specified by *index*, if it is
+        a directory and it is currently collapsed (files and subdirectories
+        are currently not displayed. If successful, it also activates and
+        scrolls the entry into view. The optional *ops* represents a hash of
+        additional options. Currently, the only valid value is "*-silent
+        =<gt* 1>", meaning just open, but don't activate or scroll the
+        window position. See also the close method.
+
+    *$widget*->see(*index*)
+        Adjust the view in the tree so that the element given by *index* is
+        visible. If the element is already visible then the command has no
+        effect; if the element is near one edge of the window then the
+        widget scrolls to bring the element into view at the edge. If
+        *index* is hidden or not a valid entry, this function is ignored.
+
+    *$widget*->selectionClear([*index*])
+        If *index* is specified and it's element is currently selected, it
+        will be unselected. If no *index* is specified, all selected items
+        will be unselected, clearing the selection list.
+
+    *$widget*->selectionIncludes(*index*)
+        Returns 1 if the element indicated by *index* is currently selected,
+        0 if it isn't.
+
+    *$widget*->selectionSet(*index*)
+        Adds entry specified by *index* to the selected list if it is not
+        already selected. Note: Unlike listboxes, etc. only a single element
+        may be selected per call. Ranges are not accepted (ignored).
+
+    *$widget*->selectionToggle(*index*)
+        If the entry specified by *index* is currently selected, it will be
+        unselected, otherwise, it will be selected.
+
+    *$widget*->set_dir(*full_directory_path* [, *ops* ])
+        Sets the directory path to be opened and displayed in the widget.
+        The entire file-system (drive-letter in M$-Windows) will be
+        accessible, but initially collapsed. It can add any new files and
+        subdirectories it finds in the tree if it has changed since the
+        previous call.
+
+        To limit how far up the file-system that users can can expand,
+        specify *-root* =<gt> "*directory_path*", for example:
+        $widget->set_dir("/home/user/documents", -root => "/home/user").
+        This would open the user "user"'s "documents" directory expanded,
+        but not permit him to expand either root ("/" or "/home" to see
+        their contents.
+
+    *$widget*->show([*-entry* => ] *index*)
+        Given an *index*, sets the hidden entry to visible so that it is
+        displayed in the tree (but maintains it's index. The "*-entry*"
+        argument is unnecessary, but retained for Tk::HList compatability.
+        See also the hide method.
+
+AUTHOR
+    Jim Turner, "<https://metacpan.org/author/TURNERJW>".
+
+LICENSE AND COPYRIGHT
+    Copyright (c) 2022 Jim Turner.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the the Artistic License (2.0). You may obtain a copy
+    of the full license at:
+
+    <http://www.perlfoundation.org/artistic_license_2_0>
+
+    Any use, modification, and distribution of the Standard or Modified
+    Versions is governed by this Artistic License. By using, modifying or
+    distributing the Package, you accept this license. Do not use, modify,
+    or distribute the Package, if you do not accept this license.
+
+    If your Modified Version has been derived from a Modified Version made
+    by someone other than you, you are nevertheless required to ensure that
+    your Modified Version complies with the requirements of this license.
+
+    This license does not grant you the right to use any trademark, service
+    mark, tradename, or logo of the Copyright Holder.
+
+    This license includes the non-exclusive, worldwide, free-of-charge
+    patent license to make, have made, use, offer to sell, sell, import and
+    otherwise transfer the Package with respect to any patent claims
+    licensable by the Copyright Holder that are necessarily infringed by the
+    Package. If you institute patent litigation (including a cross-claim or
+    counterclaim) against any party alleging that the Package constitutes
+    direct or contributory patent infringement, then this Artistic License
+    to you shall terminate on the date that such litigation is filed.
+
+    Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+    AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+    THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+    PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+    YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+    CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+    EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+ACKNOWLEDGEMENTS
+    Tk::FileTree is a derived work from Tk::DirTree: Perl/TK version by
+    Chris Dean <ctdean@cogit.com>. Original Tcl/Tix version by Ioi Kim Lam.
+
+KEYWORDS
+    filetree dirtree filesystem
+
+SEE ALSO
+    Tk::DirTree, Tk::Tree, Tk::HList.
+

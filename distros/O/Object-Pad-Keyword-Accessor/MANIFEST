@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/Object/Pad/Keyword/Accessor.pm
+lib/Object/Pad/Keyword/Accessor.xs
+MANIFEST			This list of files
+t/00use.t
+t/01accessor.t
+t/99pod.t
+README
+LICENSE
+META.yml
+META.json

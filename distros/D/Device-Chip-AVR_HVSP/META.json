@@ -23,7 +23,7 @@
          "requires" : {
             "Device::Chip" : "0.04",
             "Future::AsyncAwait" : "0.47",
-            "Object::Pad" : "0.19",
+            "Object::Pad" : "0.66",
             "Struct::Dumb" : "0",
             "perl" : "5.026"
          }
@@ -39,11 +39,11 @@
    "provides" : {
       "Device::Chip::AVR_HVSP" : {
          "file" : "lib/Device/Chip/AVR_HVSP.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "Device::Chip::AVR_HVSP::FuseInfo" : {
          "file" : "lib/Device/Chip/AVR_HVSP/FuseInfo.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -52,6 +52,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.05",
-   "x_serialization_backend" : "JSON::PP version 4.05"
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

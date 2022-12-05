@@ -8,7 +8,7 @@ use utf8;
 
 use Object::Pad;
 
-package App::sdview 0.08;
+package App::sdview 0.09;
 class App::sdview :strict(params);
 
 use List::Keywords qw( first );

@@ -1,0 +1,39 @@
+do { my $x = {
+       'build' => {
+                    'requires' => {
+                                    'Module::Build' => '0.28'
+                                  }
+                  },
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0',
+                                        'Module::Build' => '0.28'
+                                      }
+                      },
+       'runtime' => {
+                      'requires' => {
+                                      'DateTime' => '1.44',
+                                      'DateTime::Format::ISO8601' => '0.16',
+                                      'Geo::Coordinates::Transform' => '0',
+                                      'HTML::Entities' => '0',
+                                      'Math::Trig' => '0',
+                                      'Scalar::Util' => '0',
+                                      'Test::More' => '0',
+                                      'XML::Descent' => '0',
+                                      'perl' => '5.008',
+                                      'version' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Test::More' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

@@ -5,10 +5,10 @@ use warnings;
 
 use Test::More;
 
-use Object::Pad;
+use Object::Pad ':experimental(init_expr)';
 
 class Counter;
-has $count = 0;
+field $count = 0;
 method count :lvalue { $count }
 method inc { $count++ }
 

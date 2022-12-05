@@ -7,7 +7,7 @@ use strict;
 use warnings;
 
 package RT::Client::REST::Attachment;
-$RT::Client::REST::Attachment::VERSION = '0.70';
+$RT::Client::REST::Attachment::VERSION = '0.71';
 use parent 'RT::Client::REST::Object';
 
 use Params::Validate qw(:types);
@@ -158,7 +158,7 @@ RT::Client::REST::Attachment - attachment object representation.
 
 =head1 VERSION
 
-version 0.70
+version 0.71
 
 =head1 SYNOPSIS
 

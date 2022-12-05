@@ -36,30 +36,41 @@ exist including full names and abbreviations.
 The following month names may be used:
 
    stycznia
+   styczeń
 
    luty
+   lutego
 
    marca
+   marzec
 
    kwietnia
+   kwiecień
 
    maja
 
    czerwca
+   czerwiec
 
    lipca
+   lipiec
 
    sierpnia
+   sierpień
 
    września
    wrzesnia
+   wrzesień
 
    października
    pazdziernika
+   październik
 
    listopada
+   listopad
 
    grudnia
+   grudzień
 
 
 The following abbreviations may be used:
@@ -136,11 +147,17 @@ The following abbreviations may be used:
 
    wt
    wt.
+   wto
+   wto.
 
    śr
    śr.
    sr.
    sr
+   śro
+   śro.
+   sro.
+   sro
 
    cz
    cz.
@@ -149,12 +166,20 @@ The following abbreviations may be used:
 
    pi
    pi.
+   ptk
+   ptk.
+   pią
 
    so
    so.
+   sob
+   sob.
 
    ni
    ni.
+   ndz
+   ndz.
+   nie
 
 
 The following short (1-2 characters) abbreviations may be used:

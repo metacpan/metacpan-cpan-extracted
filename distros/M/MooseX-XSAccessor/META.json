@@ -11,7 +11,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "MooseX-XSAccessor",
    "no_index" : {
@@ -44,6 +44,7 @@
       "test" : {
          "recommends" : {
             "MooseX::Attribute::Chained" : "0",
+            "MooseX::FunkyAttributes" : "0",
             "MooseX::LvalueAttribute" : "0"
          },
          "requires" : {
@@ -58,17 +59,17 @@
    "provides" : {
       "MooseX::XSAccessor" : {
          "file" : "lib/MooseX/XSAccessor.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       },
       "MooseX::XSAccessor::Trait::Attribute" : {
          "file" : "lib/MooseX/XSAccessor/Trait/Attribute.pm",
-         "version" : "0.009"
+         "version" : "0.010"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=MooseX-XSAccessor"
+         "web" : "https://github.com/tobyink/p5-moosex-xsaccessor/issues"
       },
       "homepage" : "https://metacpan.org/release/MooseX-XSAccessor",
       "license" : [
@@ -81,10 +82,10 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/MooseX-XSAccessor/project"
    },
-   "version" : "0.009",
+   "version" : "0.010",
    "x_contributors" : [
       "Florian Ragwitz (FLORA) <flora@cpan.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 2.27400_02",
+   "x_serialization_backend" : "JSON::PP version 4.09",
    "x_static_install" : 1
 }

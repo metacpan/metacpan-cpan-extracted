@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.57;
 
-package Device::Chip::LTC2400 0.13;
+package Device::Chip::LTC2400 0.14;
 class Device::Chip::LTC2400
    :isa(Device::Chip);
 

@@ -4,14 +4,14 @@ Changes
 examples/tinyfuse.pl
 lib/Device/Chip/AVR_HVSP.pm
 lib/Device/Chip/AVR_HVSP/FuseInfo.pm
-LICENSE
 MANIFEST			This list of files
-META.json
-META.yml
-README
 t/00use.t
 t/01transfer.t
 t/02hvsp.t
 t/99pod.t
 update-fuseinfo.pl
 update-partinfo.pl
+README
+LICENSE
+META.yml
+META.json

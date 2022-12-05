@@ -7,10 +7,10 @@ use v5.26;
 
 use Object::Pad 0.66;
 
-package App::sdview::Parser::Pod 0.08;
+package App::sdview::Parser::Pod 0.09;
 class App::sdview::Parser::Pod
-   isa Pod::Simple
-   does App::sdview::Parser
+   :isa(Pod::Simple)
+   :does(App::sdview::Parser)
    :strict(params);
 
 use List::Keywords qw( any );

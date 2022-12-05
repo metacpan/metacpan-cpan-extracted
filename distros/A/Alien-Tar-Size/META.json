@@ -60,9 +60,9 @@
          "web" : "https://github.com/G4Vi/MHFS"
       }
    },
-   "version" : "v0.2.1",
+   "version" : "v0.2.2",
    "x_alienfile" : {
-      "generated_by" : "Alien::Build::MM version 2.72",
+      "generated_by" : "Alien::Build::MM version 2.74",
       "requires" : {
          "share" : {
             "Alien::Build::Plugin::Gather::IsolateDynamic" : "0.48"

@@ -22,7 +22,7 @@ use base qw(Number::Phone::StubCountry);
 use strict;
 use warnings;
 use utf8;
-our $VERSION = 1.20220903144943;
+our $VERSION = 1.20221202211028;
 
 my $formatters = [
                 {
@@ -38,6 +38,11 @@ my $formatters = [
                   'pattern' => '(\\d{2})(\\d{3})(\\d{4})'
                 },
                 {
+                  'format' => '$1 $2',
+                  'leading_digits' => '5',
+                  'pattern' => '(\\d{2})(\\d{7})'
+                },
+                {
                   'format' => '$1 $2 $3',
                   'leading_digits' => '[67]',
                   'national_rule' => '0$1',
@@ -51,8 +56,8 @@ my $validators = {
                 'mobile' => '
           77[2-9]\\d{6}|
           (?:
-            6[1-9]|
-            7[1-689]
+            6[125-9]|
+            7[13-689]
           )\\d{7}
         ',
                 'pager' => '',
@@ -68,12 +73,12 @@ my $validators = {
               };
 my %areanames = ();
 $areanames{en} = {"25528", "Mwanza\/Shinyanga\/Mara\/Geita\/Simiyu\/Kagera\/Kigoma",
-"25527", "Arusha\/Manyara\/Kilimanjaro\/Tanga",
+"25526", "Dodoma\/Iringa\/Njombe\/Singida\/Tabora",
 "25523", "Coast\/Morogoro\/Lindi\/Mtwara",
 "25524", "Zanzibar",
+"25527", "Arusha\/Manyara\/Kilimanjaro\/Tanga",
 "25525", "Mbeya\/Songwe\/Ruvuma\/Katavi\/Rukwa",
-"25522", "Dar\-Es\-Salaam",
-"25526", "Dodoma\/Iringa\/Njombe\/Singida\/Tabora",};
+"25522", "Dar\-Es\-Salaam",};
 
     sub new {
       my $class = shift;

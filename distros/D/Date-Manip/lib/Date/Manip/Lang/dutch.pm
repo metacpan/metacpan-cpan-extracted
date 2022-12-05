@@ -13,7 +13,7 @@ use warnings;
 use utf8;
 
 our($VERSION);
-$VERSION='6.89';
+$VERSION='6.90';
 
 our($Language,@Encodings,$LangName,$YearAdded);
 @Encodings = qw();
@@ -21,6 +21,7 @@ $LangName  = "Dutch";
 $YearAdded = 1998;
 
 $Language = {
+  _special_rules => { },
   ampm => [
     [
       'am',

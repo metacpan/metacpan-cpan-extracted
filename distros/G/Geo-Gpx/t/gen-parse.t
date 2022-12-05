@@ -232,7 +232,7 @@ __END__
   <desc>Test data</desc>
   <author>Andy Armstrong</author>
   <email>andy@hexten.net</email>
-  <time>2007-02-11T00:54:27+00:00</time>
+  <time>2007-02-11T00:54:27Z</time>
   <keywords>this, that, the other</keywords>
   <copyright>(c) Anyone</copyright>
   <url>http://www.topografix.com/GPX</url>
@@ -306,7 +306,7 @@ __END__
     <sat>3</sat>
     <src>Testing</src>
     <sym>pin</sym>
-    <time>2007-02-11T00:54:27+00:00</time>
+    <time>2007-02-11T00:54:27Z</time>
     <type>unknown</type>
     <vdop>10</vdop>
   </wpt>
@@ -328,7 +328,7 @@ __END__
       </link>
       <name>Andy Armstrong</name>
     </author>
-    <time>2007-02-11T00:54:27+00:00</time>
+    <time>2007-02-11T00:54:27Z</time>
     <keywords>this, that, the other</keywords>
     <copyright>(c) Anyone</copyright>
     <link href="http://www.topografix.com/GPX">
@@ -407,7 +407,7 @@ __END__
     <sat>3</sat>
     <src>Testing</src>
     <sym>pin</sym>
-    <time>2007-02-11T00:54:27+00:00</time>
+    <time>2007-02-11T00:54:27Z</time>
     <type>unknown</type>
     <vdop>10</vdop>
   </wpt>

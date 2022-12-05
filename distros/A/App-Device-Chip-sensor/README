@@ -61,6 +61,13 @@ COMMANDLINE OPTIONS
       recent three values from the sensor are sorted numerically and the
       middle one is reported.
 
+      * --best-effort, -B
+
+      Enables best-effort mode, which causes failures of sensor readings to
+      be ignored, reporting undef instead. In this mode, the on_sensor_fail
+      method may be invoked for failures; it can further refine what the
+      behaviour should be.
+
 PROVIDED METHODS
 
     The following methods are provided on the base class, intended for
@@ -77,6 +84,32 @@ PROVIDED METHODS
 
     This uses "OPTSPEC" to collect the defined arguments, whose references
     should handle the results.
+
+ add_chip
+
+       $app->add_chip( %config );
+
+    Since version 0.05.
+
+    Adds a new chip to the stored configuration, as if it had been given as
+    a commandline argument. Takes the following named arguments:
+
+    type => STR
+
+      Required string that gives the name of the chip class.
+
+    adapter => Device::Chip::Adapter
+
+      Required Device::Chip::Adapter instance.
+
+    mountopts => HASH
+
+      Optional hASH reference containing extra mount parameters.
+
+    config => HASH
+
+      Optional HASH reference containing extra chip configuration to set up
+      using the configure method once mounted.
 
  chips
 
@@ -161,10 +194,10 @@ OVERRIDABLE METHODS
 
     As this is invoked as a regular instance method, a convenient way to
     store the parsed values is to pass references to instance slot
-    variables created by the Object::Pad has keyword:
+    variables created by the Object::Pad field keyword:
 
-       has $_title;
-       has $_bgcol = "#cccccc";
+       field $_title;
+       field $_bgcol = "#cccccc";
     
        method OPTSPEC :override
        {
@@ -183,6 +216,25 @@ OVERRIDABLE METHODS
     sensor instances. The application may wish to perform one-time startup
     tasks in here, such as creating database files with knowledge of the
     specific sensor data types, or other such behaviours.
+
+ on_sensor_ok
+
+       $app->on_sensor_ok( $sensor )
+
+    This method is invoked in --best-effort mode after a successful reading
+    from sensor; typically this is used to clear a failure state.
+
+    The default implementation does nothing.
+
+ on_sensor_fail
+
+       $app->on_sensor_fail( $sensor, $failure )
+
+    This method is invoked in --best-effort mode after a failure of the
+    given sensor. The caught exception is passed as $failure.
+
+    The defaullt implementation prints this as a warning using the core
+    warn() function.
 
 AUTHOR
 

@@ -9,22 +9,29 @@ use Data::ULID qw();
 
 isnt \&ulid, \&Data::ULID::ulid, 'not the same ulid function ok';
 
-my $generated = ulid;
+my %seen;
 
-is length $generated, 26, 'length ok';
+# generating randomness - test a couple of times to make sure corner case random values are covered
+for (1 .. 20) {
+	my $generated = ulid;
 
-note $generated;
+	is length $generated, 26, 'length ok';
+	ok !$seen{$generated}, 'ulid unique ok';
 
-my $perl_generated = Data::ULID::ulid;
-my $perl_regenerated = Data::ULID::ulid($generated);
+	note $generated;
 
-# time part is 10 characters, but it represents microtime, so lets just test first 8
-is substr($generated, 0, 8), substr($perl_generated, 0, 8), 'time part ok';
-is $generated, $perl_regenerated, 'perl regenerated ok';
+	my $perl_generated = Data::ULID::ulid;
+	my $perl_regenerated = Data::ULID::ulid($generated);
 
-my $regenerated = ulid($perl_generated);
+	# time part is 10 characters, but it represents microtime, so lets just test first 7
+	# this gives us 15 bit window in which the tests will pass - 32 seconds
+	is substr($generated, 0, 7), substr($perl_generated, 0, 7), 'time part ok';
+	is $generated, $perl_regenerated, 'perl regenerated ok';
 
-is $perl_generated, $regenerated, 'xs regenerated ok';
+	my $regenerated = ulid($perl_generated);
+
+	is $perl_generated, $regenerated, 'xs regenerated ok';
+}
 
 done_testing;
 

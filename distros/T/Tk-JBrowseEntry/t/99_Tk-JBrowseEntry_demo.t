@@ -43,22 +43,30 @@ $SIG{__WARN__} = sub { };
 				-label => 'Normal:',
 				-variable => \$dbname1,
 				-state => 'normal',
-				-choices => [qw(pigs cows foxes goats)],
+				-choices => [qw(pigs cows foxes goats cats)],
 				-width  => 12);
 			$jb1->pack(
+				-side   => 'top', -pady => '10', -anchor => 'w');
+			my $jb2a = $MainWin->JBrowseEntry(
+				-label => 'Text:',
+				-variable => \$dbname2,
+				-state => 'text',
+				-choices => [qw(pigs cows foxes goats cats)],
+				-width  => 12);
+			$jb2a->pack(
 				-side   => 'top', -pady => '10', -anchor => 'w');
 			my $jb2 = $MainWin->JBrowseEntry(
 				-label => 'TextOnly:',
 				-variable => \$dbname2,
 				-state => 'textonly',
-				-choices => [qw(pigs cows foxes goats)],
+				-choices => [qw(pigs cows foxes goats cats)],
 				-width  => 12);
 			$jb2->pack(
 				-side   => 'top', -pady => '10', -anchor => 'w');
 			my $jb3 = $MainWin->JBrowseEntry(
 				-label => 'ReadOnly:',
 				-variable => \$dbname3,
-				-choices => [qw(pigs cows foxes goats)],
+				-choices => [qw(pigs cows foxes goats cats)],
 				-state => 'readonly',
 				-width  => 12);
 			$jb3->pack(
@@ -67,7 +75,7 @@ $SIG{__WARN__} = sub { };
 				-label => 'Disabled:',
 				-variable => \$dbname3,
 				-state => 'disabled',
-				-choices => [qw(pigs cows foxes goats)],
+				-choices => [qw(pigs cows foxes goats cats)],
 				-width  => 12);
 			$jb4->pack(
 				-side   => 'top', -pady => '10', -anchor => 'w');
@@ -84,7 +92,7 @@ $SIG{__WARN__} = sub { };
 			$jb5->pack(
 				-side   => 'top', -pady => '10', -anchor => 'w');
 			my $jb6 = $MainWin->JBrowseEntry(
-				-label => 'Button Focus:',
+				-label => 'Button Focus Also:',
 				-btntakesfocus => 1,
 				-width => 12,
 				-height => 4,

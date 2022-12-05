@@ -31,6 +31,10 @@ sub with_crc8
 
 # Send request (ideal)
 {
+   if( HAVE_TEST_METRICS_ANY ) {
+      Metrics::Any::Adapter::Test->override_timer_duration( 0.1 );
+   }
+
    $controller->use_sysread_buffer( "DummyFH" );
 
    # Auto-reset
@@ -62,6 +66,8 @@ sub with_crc8
          "slurm_packets dir:rx type:RESPONSE" => 1,
          "slurm_packets dir:tx type:ACK"      => 2,
          "slurm_request_success_attempts[1]"  => 1,
+         "slurm_request_duration[0.100]"      => 1,
+         "slurm_request_duration_count"       => 1,
       }, 'Request/response transaction increments metrics' );
    }
 

@@ -2,6 +2,10 @@
  
 SQL::Load - This module is a simple SQL file loader
 
+# VERSION
+
+0.04
+
 # SYNOPSIS
 
 File SQL: users.sql
@@ -27,6 +31,10 @@ Code:
     print $users->name('find')     # SELECT * FROM users WHERE id = ?;
     print $users->name('find-all') # SELECT * FROM users ORDER BY id DESC;
     print $users->name('insert')   # INSERT INTO users (name, login, password) VALUES (?, ?, ?);
+    
+    print $sql->load('users#find');     # SELECT * FROM users WHERE id = ?; 
+    print $sql->load('users#find-all'); # SELECT * FROM users ORDER BY id DESC;
+    print $sql->load('users#insert');   # INSERT INTO users (name, login, password) VALUES (?, ?, ?);    
   
 # DESCRIPTION
 
@@ -44,6 +52,8 @@ Construct a new L<SQL::Load>, passing the folder path is required.
 
     my $method = $sql_load->load('file_name'); 
     my $method = $sql_load->load('file_name.sql');
+    my $method = $sql_load->load('file_name#sql_name'); 
+    my $method = $sql_load->load('file_name#sql_at');    
     my $method = $sql_load->load('file_name', 1); # reload to get content directly from the file
     
 Load the content in the reference and return an instance of L<SQL::Load::Method>.
@@ -53,6 +63,8 @@ Load the content in the reference and return an instance of L<SQL::Load::Method>
     my $method = $sql_load->reload('file_name'); 
     my $method = $sql_load->reload('file_name.sql');
     my $method = $sql_load->reload('file_name');
+    my $method = $sql_load->reload('file_name#sql_name');
+    my $method = $sql_load->reload('file_name#sql_at');
     
 Reload to get content directly from the file without getting from the tmp from reference.
 

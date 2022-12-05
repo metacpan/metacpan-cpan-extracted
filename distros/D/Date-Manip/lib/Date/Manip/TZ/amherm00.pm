@@ -6,9 +6,9 @@ Date::Manip::TZ::amherm00;
 
 # This file was automatically generated.  Any changes to this file will
 # be lost the next time 'tzdata' is run.
-#    Generated on: Thu Sep  1 10:29:09 EDT 2022
-#    Data version: tzdata2022c
-#    Code version: tzcode2022c
+#    Generated on: Fri Dec  2 12:31:52 EST 2022
+#    Data version: tzdata2022g
+#    Code version: tzcode2022g
 
 # This module contains data from the zoneinfo time zone database.  The original
 # data was obtained from the URL:
@@ -25,7 +25,7 @@ END {
 }
 
 our ($VERSION);
-$VERSION='6.89';
+$VERSION='6.90';
 END { undef $VERSION; }
 
 %Dates         = (
@@ -56,7 +56,7 @@ END { undef $VERSION; }
    1931 =>
      [
         [ [1931,5,2,6,0,0],[1931,5,2,0,0,0],'-06:00:00',[-6,0,0],
-          'CST',0,[1931,10,1,5,59,59],[1931,9,30,23,59,59],
+          'MDT',1,[1931,10,1,5,59,59],[1931,9,30,23,59,59],
           '1931050206:00:00','1931050200:00:00','1931100105:59:59','1931093023:59:59' ],
         [ [1931,10,1,6,0,0],[1931,9,30,23,0,0],'-07:00:00',[-7,0,0],
           'MST',0,[1932,4,1,6,59,59],[1932,3,31,23,59,59],

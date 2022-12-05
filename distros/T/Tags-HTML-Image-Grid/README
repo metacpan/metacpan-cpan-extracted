@@ -26,6 +26,22 @@ METHODS
 
             Default value is 'image-grid'.
 
+    *       "img_border_color_cb"
+
+            Image border callback. This is used with 'img_border_width'
+            parameter. Border will be present only for image which has color
+            defined.
+
+            Callback arguments are: $self and $image object.
+
+            Default value is undef.
+
+    *       "img_border_width"
+
+            Image border width if need to use.
+
+            Default value is undef.
+
     *       "img_link_cb"
 
             Image link callback.
@@ -231,5 +247,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.02
+    0.03
 

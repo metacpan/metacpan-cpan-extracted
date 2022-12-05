@@ -22,7 +22,7 @@ is($antenna->frequency_mhz,   2450, 'frequency_mhz');
 is($antenna->frequency_ghz,   2.45, 'frequency_ghz');
 is($antenna->gain,            '7.69 dBd', 'gain');
 is($antenna->gain_dbd,        7.69, 'gain_dbd');
-is($antenna->gain_dbi,        9.83, 'gain_dbi');
+is($antenna->gain_dbi,        9.84, 'gain_dbi');
 is($antenna->electrical_tilt, '0', 'electrical_tilt');
 is($antenna->comment,         'This is an anonymous antenna file', 'comment');
 

@@ -7,7 +7,6 @@ class IO::File extends IO::Handle {
   use StringBuffer;
   
   # Fields
-  has autoflush : rw byte;
   has stream : private Sys::IO::FileStream;
   
   # Class methods

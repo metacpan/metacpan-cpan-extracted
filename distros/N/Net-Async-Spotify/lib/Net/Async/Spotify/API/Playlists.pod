@@ -1,6 +1,7 @@
 =encoding utf8
 
 =for comment POD_DERIVED_INDEX_GENERATED
+
 The following documentation is automatically generated.  Please do not edit
 this file, but rather the original, inline with Net::Async::Spotify::API::Playlists
 at lib/Net/Async/Spotify/API/Playlists.pm
@@ -27,11 +28,11 @@ Will hold all extra functionality for Spotify Playlists API
 
 =item L<Net::Async::Spotify::API::Generated::Playlists>
 
-L<add_tracks_to_playlist|Net::Async::Spotify::API::Generated::Playlists/add_tracks_to_playlist>, L<change_playlist_details|Net::Async::Spotify::API::Generated::Playlists/change_playlist_details>, L<create_playlist|Net::Async::Spotify::API::Generated::Playlists/create_playlist>, L<get_a_list_of_current_users_playlists|Net::Async::Spotify::API::Generated::Playlists/get_a_list_of_current_users_playlists>, L<get_list_users_playlists|Net::Async::Spotify::API::Generated::Playlists/get_list_users_playlists>, L<get_playlist|Net::Async::Spotify::API::Generated::Playlists/get_playlist>, L<get_playlist_cover|Net::Async::Spotify::API::Generated::Playlists/get_playlist_cover>, L<get_playlists_tracks|Net::Async::Spotify::API::Generated::Playlists/get_playlists_tracks>, L<remove_tracks_playlist|Net::Async::Spotify::API::Generated::Playlists/remove_tracks_playlist>, L<reorder_or_replace_playlists_tracks|Net::Async::Spotify::API::Generated::Playlists/reorder_or_replace_playlists_tracks>, L<upload_custom_playlist_cover|Net::Async::Spotify::API::Generated::Playlists/upload_custom_playlist_cover>
+L<add_tracks_to_playlist|Net::Async::Spotify::API::Generated::Playlists/add_tracks_to_playlist>, L<change_playlist_details|Net::Async::Spotify::API::Generated::Playlists/change_playlist_details>, L<create_playlist|Net::Async::Spotify::API::Generated::Playlists/create_playlist>, L<get_a_list_of_current_users_playlists|Net::Async::Spotify::API::Generated::Playlists/get_a_list_of_current_users_playlists>, L<get_list_users_playlists|Net::Async::Spotify::API::Generated::Playlists/get_list_users_playlists>, L<get_playlist|Net::Async::Spotify::API::Generated::Playlists/get_playlist>, L<get_playlist_cover|Net::Async::Spotify::API::Generated::Playlists/get_playlist_cover>, L<get_playlists_tracks|Net::Async::Spotify::API::Generated::Playlists/get_playlists_tracks>, L<mapping|Net::Async::Spotify::API::Generated::Playlists/mapping>, L<remove_tracks_playlist|Net::Async::Spotify::API::Generated::Playlists/remove_tracks_playlist>, L<reorder_or_replace_playlists_tracks|Net::Async::Spotify::API::Generated::Playlists/reorder_or_replace_playlists_tracks>, L<upload_custom_playlist_cover|Net::Async::Spotify::API::Generated::Playlists/upload_custom_playlist_cover>
 
 =item L<Net::Async::Spotify::API::Base>
 
-L<call_api|Net::Async::Spotify::API::Base/call_api>, L<new|Net::Async::Spotify::API::Base/new>, L<spotify|Net::Async::Spotify::API::Base/spotify>
+L<call_api|Net::Async::Spotify::API::Base/call_api>, L<decode_response|Net::Async::Spotify::API::Base/decode_response>, L<parse_response|Net::Async::Spotify::API::Base/parse_response>, L<spotify|Net::Async::Spotify::API::Base/spotify>
 
 =back
 

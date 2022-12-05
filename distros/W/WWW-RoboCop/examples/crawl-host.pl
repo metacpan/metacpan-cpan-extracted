@@ -20,11 +20,10 @@ use Data::Printer filters => ['URI'];
 use File::XDG              ();
 use Getopt::Kingpin        ();
 use HTTP::Status           qw( is_success );
-use Path::Tiny             qw( path );
 use WWW::RoboCop           ();
 use WWW::Mechanize::Cached ();
 
-use LWP::Protocol::https;
+use LWP::Protocol::https;    ## no perlimports
 my $ua
     = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/103.0.0.0 Safari/537.36';
 
@@ -33,7 +32,7 @@ $cache_dir->mkpath;
 
 my $cache = CHI->new(
     driver   => 'File',
-    root_dir => path('~/.www-robocop-cache')->stringify,
+    root_dir => $cache_dir->stringify,
 );
 
 my $kingpin = Getopt::Kingpin->new;

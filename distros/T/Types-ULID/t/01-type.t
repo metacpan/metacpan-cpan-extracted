@@ -6,6 +6,8 @@ use Test::More;
 use Types::ULID qw(is_ULID to_ULID is_BinaryULID to_BinaryULID);
 use Data::ULID qw(ulid binary_ulid);
 
+diag 'backend: ' . Types::ULID::ULID_BACKEND;
+
 subtest 'testing ULID' => sub {
 	ok is_ULID('00000000010000000000000001'), 'small ulid ok';
 	ok is_ULID('01B3Z3A7GQ6627FZPDQHQP87PM'), 'old ulid ok';
@@ -36,6 +38,16 @@ subtest 'testing BinaryULID' => sub {
 
 	ok is_BinaryULID(to_BinaryULID(undef)), 'coercion ok';
 	is to_BinaryULID('aaa'), 'aaa', 'invalid coercion ok';
+};
+
+subtest 'testing ULID functions' => sub {
+	can_ok 'Types::ULID', 'ulid';
+	can_ok 'Types::ULID', 'binary_ulid';
+
+	my $backend = Types::ULID::ULID_BACKEND;
+
+	is (Types::ULID->can('ulid'), $backend->can('ulid'), 'ulid function ref ok');
+	is (Types::ULID->can('binary_ulid'), $backend->can('binary_ulid'), 'binary_ulid function ref ok');
 };
 
 done_testing;

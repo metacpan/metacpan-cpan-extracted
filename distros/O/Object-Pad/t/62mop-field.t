@@ -6,10 +6,10 @@ use warnings;
 use Test::More;
 use Test::Fatal;
 
-use Object::Pad ':experimental(mop)';
+use Object::Pad ':experimental(init_expr mop)';
 
 class Example {
-   has $field :mutator :param(initial_field) = undef;
+   field $field :mutator :param(initial_field) = undef;
 }
 
 my $classmeta = Object::Pad::MOP::Class->for_class( "Example" );
@@ -52,14 +52,14 @@ is_deeply( [ $classmeta->fields ], [ $fieldmeta ],
 # fieldmeta on roles (RT138927)
 {
    role ARole {
-      has $data = 42;
+      field $data = 42;
    }
 
    my $fieldmeta = Object::Pad::MOP::Class->for_class( 'ARole' )->get_field( '$data' );
    is( $fieldmeta->name, '$data', '$fieldmeta->name for field of role' );
 
    class AClass :does(ARole) {
-      has $data = 21;
+      field $data = 21;
    }
 
    my $obja = AClass->new;
@@ -67,7 +67,7 @@ is_deeply( [ $classmeta->fields ], [ $fieldmeta ],
       '$fieldmeta->value as accessor on role instance fetches correct field' );
 
    class BClass :isa(AClass) {
-      has $data = 63;
+      field $data = 63;
    }
 
    my $objb = BClass->new;

@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.57;
 
-package Device::Chip::DAC7513 0.13;
+package Device::Chip::DAC7513 0.14;
 class Device::Chip::DAC7513
    :isa(Device::Chip::DAC75xx);
 

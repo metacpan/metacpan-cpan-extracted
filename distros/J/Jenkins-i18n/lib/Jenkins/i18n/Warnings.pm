@@ -4,10 +4,10 @@ use 5.014004;
 use strict;
 use warnings;
 use Hash::Util qw(lock_keys);
-use Carp qw(confess);
+use Carp       qw(confess);
 use Cwd;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 =pod
 

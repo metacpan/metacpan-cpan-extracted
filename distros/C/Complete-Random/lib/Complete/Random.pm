@@ -10,7 +10,7 @@ use Exporter 'import';
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
 our $DATE = '2022-09-08'; # DATE
 our $DIST = 'Complete-Random'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 our @EXPORT_OK = qw(
                        complete_random_string
@@ -18,6 +18,16 @@ our @EXPORT_OK = qw(
 
 
 our %SPEC;
+
+sub _random_summary {
+    my ($len) = @_;
+
+    my $text = "Just a random summary ".int(rand(100_000)).". ";
+    if (length $text < $len) {
+        $text = $text x (int($len / length($text))+1);
+    }
+    substr($text, 0, $len);
+}
 
 $SPEC{complete_random_string} = {
     v => 1.1,
@@ -37,6 +47,13 @@ or fall back to 50.
 
 _
         },
+        summaries => {
+            schema => 'bool*',
+        },
+        summary_len => {
+            schema => 'int*',
+            default => 50,
+        },
     },
 };
 sub complete_random_string {
@@ -45,16 +62,20 @@ sub complete_random_string {
     my %args = @_;
     my $len = $args{len} // 10;
     my $num = $args{num} // $ENV{COMPLETE_RANDOM_STRING_NUM} // 50;
+    my $summary_len = $args{summary_len} // 50;
 
     my @ary;
+    my @summaries;
     for (1..$num) {
         my $str = join('', map {chr(65+rand(26))} 1..$len);
         push @ary, $str;
+        push @summaries, _random_summary($summary_len) if $args{summaries};
     }
 
     Complete::Util::complete_array_elem(
         array => \@ary,
-        word => $args{word},
+        ($args{summaries} ? (summaries => \@summaries) : ()),
+        word  => $args{word},
     );
 }
 
@@ -73,7 +94,7 @@ Complete::Random - Complete from a list of random string
 
 =head1 VERSION
 
-This document describes version 0.001 of Complete::Random (from Perl distribution Complete-Random), released on 2022-09-08.
+This document describes version 0.002 of Complete::Random (from Perl distribution Complete-Random), released on 2022-09-08.
 
 =head1 DESCRIPTION
 
@@ -106,6 +127,10 @@ Number of random string answers to generate.
 
 Will observe C<COMPLETE_RANDOM_STRING_NUM> environment variable for the default,
 or fall back to 50.
+
+=item * B<summaries> => I<bool>
+
+=item * B<summary_len> => I<int> (default: 50)
 
 
 =back

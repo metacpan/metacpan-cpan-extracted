@@ -17,15 +17,15 @@ name: Device-Chip-AS3935
 provides:
   Device::Chip::AS3935:
     file: lib/Device/Chip/AS3935.pm
-    version: '0.02'
+    version: '0.03'
 requires:
   Data::Bitfield: '0'
   Device::Chip: '0.03'
   Device::Chip::Sensor: '0.19'
   Future::AsyncAwait: '0.47'
-  Object::Pad: '0.19'
+  Object::Pad: '0.66'
   perl: '5.026'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

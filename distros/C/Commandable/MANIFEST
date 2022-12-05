@@ -3,6 +3,7 @@ Changes
 lib/Commandable.pm
 lib/Commandable/Command.pm
 lib/Commandable/Finder.pm
+lib/Commandable/Finder/MethodAttributes.pm
 lib/Commandable/Finder/Packages.pm
 lib/Commandable/Finder/SubAttributes.pm
 lib/Commandable/Finder/SubAttributes/Attrs.pm
@@ -18,6 +19,7 @@ t/01invocation.t
 t/10finder-packages-namemethod.t
 t/11finder-packages-namepkg.t
 t/12finder-subattributes.t
+t/13finder-methodattributes.t
 t/20command-args.t
 t/21command-opts.t
 t/30finder-invoke.t

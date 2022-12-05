@@ -3,7 +3,7 @@ package Net::Async::Spotify::API::Tracks;
 use strict;
 use warnings;
 
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 our $AUTHORITY = 'cpan:VNEALV'; # AUTHORITY
 
 use mro;
@@ -23,5 +23,11 @@ Will hold all extra functionality for Spotify Tracks API
 =head1 METHODS
 
 =cut
+
+sub new {
+    my $self  = (shift)->next::method(@_);
+    $self->mapping->{get_several_audio_features}{response} = ['MultiAudioFeatures'];
+    return $self;
+}
 
 1;

@@ -4,9 +4,9 @@
 #  (C) Paul Evans, 2017-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.57;
+use Object::Pad 0.66;
 
-package Device::Chip::AD5691R 0.13;
+package Device::Chip::AD5691R 0.14;
 class Device::Chip::AD5691R
    :isa(Device::Chip);
 
@@ -101,7 +101,7 @@ initialised to power-on defaults, and tracked by the C<change_config> method.
 
 =cut
 
-has $_config;
+field $_config;
 
 async method read_config ()
 {

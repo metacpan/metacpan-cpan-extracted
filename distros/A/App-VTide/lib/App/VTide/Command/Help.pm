@@ -15,7 +15,7 @@ use Pod::Usage;
 
 extends 'App::VTide::Command::Run';
 
-our $VERSION = version->new('0.1.18');
+our $VERSION = version->new('0.1.19');
 our $NAME    = 'help';
 our $OPTIONS = [ 'test|T!', 'verbose|v+', ];
 sub details_sub { return ( $NAME, $OPTIONS ) }
@@ -29,7 +29,7 @@ sub run {
     if ($command) {
         my $module = $self->cmd2module($command);
         if ( !$INC{$module} ) {
-            require "$module";
+            require "$module";    ## no critic
         }
 
         pod2usage(
@@ -43,7 +43,7 @@ sub run {
             my $file = $self->cmd2module($cmd);
 
             if ( !$INC{$file} ) {
-                require "$file";
+                require "$file";    ## no critic
             }
             if ( length $cmd > $max ) {
                 $max = length $cmd;
@@ -121,7 +121,7 @@ App::VTide::Command::Help - Show help for vtide commands
 
 =head1 VERSION
 
-This documentation refers to App::VTide::Command::Help version 0.1.18
+This documentation refers to App::VTide::Command::Help version 0.1.19
 
 =head1 SYNOPSIS
 

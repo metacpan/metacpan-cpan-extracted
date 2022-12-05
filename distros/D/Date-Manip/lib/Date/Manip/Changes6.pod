@@ -30,16 +30,45 @@ incompatible. These are marked with an exclamation mark (!).
 #=head1 VERSION 7.00 (expected 2024-12-01)
 #    Remove DM5
 #=head1 VERSION 6.99 (expected )
-#=head1 VERSION 6.98 (expected 2024-09-01)
-#=head1 VERSION 6.97 (expected 2024-06-01)
-#=head1 VERSION 6.96 (expected 2024-03-01)
-#=head1 VERSION 6.95 (expected 2023-12-01)
-#=head1 VERSION 6.94 (expected 2023-09-01)
-#=head1 VERSION 6.93 (expected 2023-06-01)
-#=head1 VERSION 6.92 (expected 2023-03-01)
-#=head1 VERSION 6.91 (expected 2022-12-01)
+#=head1 VERSION 6.98 (expected 2024-12-01)
+#=head1 VERSION 6.97 (expected 2024-09-01)
+#=head1 VERSION 6.96 (expected 2024-06-01)
+#=head1 VERSION 6.95 (expected 2024-03-01)
+#=head1 VERSION 6.94 (expected 2023-12-01)
+#=head1 VERSION 6.93 (expected 2023-09-01)
+#=head1 VERSION 6.92 (expected 2023-06-01)
+#=head1 VERSION 6.91 (expected 2023-03-01)
 
-=head1 VERSION 6.90 (2022-09-01)
+=head1 VERSION 6.90 (2022-12-02)
+
+=over 5
+
+=item Time zone fixes
+
+Aliases in the tzdata database were not being added to the timezone
+data.  Reported in GitHub issue #40.
+
+The UTC timezone is now named Etc/UTC instead of UTC to be in line
+with the aliases.
+
+Newest zoneinfo data (tzdata 2022g).
+
+=item Language fixes
+
+Additions to the Polish translation.  GitHub issue #41.
+
+Additions to several languages.  GitHub issue #42.
+
+Added some support for per-language parsing rules to respond to GitHub issue #42.
+
+=item Documentation fixes
+
+The version numbers in the change log was messed up due to a skipped release (no
+new timezone fixes that time).  Fixed.
+
+=back
+
+=head1 VERSION 6.89 (2022-09-01)
 
 =over 5
 
@@ -57,7 +86,7 @@ Newest zoneinfo data (tzdata 2022c).
 
 =back
 
-=head1 VERSION 6.89 (2022-06-02)
+=head1 VERSION 6.88 (2022-06-02)
 
 =over 5
 
@@ -68,20 +97,7 @@ in GitHub issue #39.
 
 =back
 
-=head1 VERSION 6.88 (2022-06-01)
-
-=over 5
-
-=item Time zone fixes
-
-There were no new timezone fixes on 2022-03-01, so no
-release made then.
-
-Newest zoneinfo data (tzdata 2022a).
-
-=back
-
-=head1 VERSION 6.87 (2022-03-01)
+=head1 VERSION 6.87 (2022-06-01)
 
 =over 5
 
@@ -89,6 +105,13 @@ Newest zoneinfo data (tzdata 2022a).
 
 The package was being generated with an incorrect MANIFEST file.  This is now
 fixed.  RT 140075
+
+=item Time zone fixes
+
+There were no new timezone fixes on 2022-03-01, so no
+release made then.
+
+Newest zoneinfo data (tzdata 2022a).
 
 =back
 
