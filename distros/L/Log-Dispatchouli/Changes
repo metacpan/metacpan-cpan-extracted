@@ -1,5 +1,9 @@
 Revision history for Log-Dispatchouli
 
+3.002     2022-12-06 09:49:34-05:00 America/New_York
+        - restore v5.20 compatibility by turning on "postderef" feature
+          explicitly
+
 3.001     2022-12-01 11:55:43-05:00 America/New_York
         - no changes, just stable
 

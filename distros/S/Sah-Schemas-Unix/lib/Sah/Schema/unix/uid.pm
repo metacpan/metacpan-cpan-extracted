@@ -3,9 +3,9 @@ package Sah::Schema::unix::uid;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-24'; # DATE
+our $DATE = '2022-09-08'; # DATE
 our $DIST = 'Sah-Schemas-Unix'; # DIST
-our $VERSION = '0.020'; # VERSION
+our $VERSION = '0.021'; # VERSION
 
 our $schema = [uint => {
     summary => 'User identifier (UID)',
@@ -17,6 +17,8 @@ schema.
 
 _
 
+    'prefilters' => ['Unix::convert_unix_user_to_uid'],
+    'x.completion' => ['unix_user_or_uid'],
     examples => [
         {value=>-1, valid=>0},
         {value=>0, valid=>1},
@@ -40,7 +42,7 @@ Sah::Schema::unix::uid - User identifier (UID)
 
 =head1 VERSION
 
-This document describes version 0.020 of Sah::Schema::unix::uid (from Perl distribution Sah-Schemas-Unix), released on 2022-07-24.
+This document describes version 0.021 of Sah::Schema::unix::uid (from Perl distribution Sah-Schemas-Unix), released on 2022-09-08.
 
 =head1 SYNOPSIS
 
@@ -73,7 +75,7 @@ valid, a non-empty error message otherwise):
  
  # a sample invalid data
  $data = -1;
- my $errmsg = $validator->($data); # => "Must be at least 0"
+ my $errmsg = $validator->($data); # => "Unknown Unix user '-1'"
 
 Often a schema has coercion rule or default value, so after validation the
 validated value is different. To return the validated (set-as-default, coerced,
@@ -88,7 +90,7 @@ prefiltered) value:
  
  # a sample invalid data
  $data = -1;
- my $res = $validator->($data); # => ["Must be at least 0",-1]
+ my $res = $validator->($data); # => ["Unknown Unix user '-1'",-1]
 
 Data::Sah can also create validator that returns a hash of detailed error
 message. Data::Sah can even create validator that targets other language, like
@@ -182,9 +184,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -26,7 +26,7 @@ use Time::HiRes qw/time/;
 Readonly my $HTTP_OK => 200;
 Readonly my $HTTP_FILE_NOT_FOUND => 404;
 
-our $VERSION = '1.21';
+our $VERSION = '1.22';
 
 # TODO: Timeout, fallback
 # TODO: Expected result content (json etc)
@@ -157,7 +157,6 @@ sub start {
   my $headers = $tx->req->headers->to_hash(1);
   my $content = $tx->req->content->asset->slurp;
   $tx->req->url($self->sort_query($url));
-
   delete $headers->{'User-Agent'};
   delete $headers->{'Accept-Encoding'};
   my @opts = (($method eq 'GET' ? () : $method), (keys %{ $headers || {} } ? $headers : ()), $content || ());
@@ -351,6 +350,7 @@ sub sort_query {
 
     my $flattened_sorted_url = ($url->protocol ? ( $url->protocol . '://' ) : '' ) .
                                ($url->host     ? ( $url->host_port        ) : '' ) .
+                               ($url->userinfo ? ( $url->userinfo         ) : '' ) .
                                ($url->path     ? ( $url->path             ) : '' ) ;
 
     $flattened_sorted_url .= '?' . join '&', sort { $a cmp $b } List::Util::pairmap { (($b ne '') ? (join '=', $a, $b) : $a); } @{ $url->query }

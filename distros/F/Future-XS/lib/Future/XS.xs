@@ -124,16 +124,18 @@ fail(SV *self, ...)
 SV *
 on_cancel(SV *self, SV *code)
   CODE:
+    RETVAL = newSVsv(self);
     future_on_cancel(self, code);
-    RETVAL = SvREFCNT_inc(self);
   OUTPUT:
     RETVAL
 
 SV *
 on_ready(SV *self, SV *code)
   CODE:
+    /* Need to copy the return value first in case on_ready destroys it
+     *   RT145168 */
+    RETVAL = newSVsv(self);
     future_on_ready(self, code);
-    RETVAL = SvREFCNT_inc(self);
   OUTPUT:
     RETVAL
 
@@ -171,8 +173,8 @@ result(SV *self)
 SV *
 on_done(SV *self, SV *code)
   CODE:
+    RETVAL = newSVsv(self);
     future_on_done(self, code);
-    RETVAL = SvREFCNT_inc(self);
   OUTPUT:
     RETVAL
 
@@ -198,8 +200,8 @@ failure(SV *self)
 SV *
 on_fail(SV *self, SV *code)
   CODE:
+    RETVAL = newSVsv(self);
     future_on_fail(self, code);
-    RETVAL = SvREFCNT_inc(self);
   OUTPUT:
     RETVAL
 

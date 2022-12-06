@@ -20,6 +20,12 @@ lib/Data/Sah/Filter/perl/Unix/try_convert_gid_to_unix_group.pm
 lib/Data/Sah/Filter/perl/Unix/try_convert_uid_to_unix_user.pm
 lib/Data/Sah/Filter/perl/Unix/try_convert_unix_group_to_gid.pm
 lib/Data/Sah/Filter/perl/Unix/try_convert_unix_user_to_uid.pm
+lib/Perinci/Sub/XCompletion/unix_gid.pm
+lib/Perinci/Sub/XCompletion/unix_group.pm
+lib/Perinci/Sub/XCompletion/unix_group_or_gid.pm
+lib/Perinci/Sub/XCompletion/unix_uid.pm
+lib/Perinci/Sub/XCompletion/unix_user.pm
+lib/Perinci/Sub/XCompletion/unix_user_or_uid.pm
 lib/Sah/Schema/unix/dirname.pm
 lib/Sah/Schema/unix/filename.pm
 lib/Sah/Schema/unix/gid.pm
@@ -51,5 +57,6 @@ t/00-compile.t
 t/author-critic.t
 t/author-pod-coverage.t
 t/author-pod-syntax.t
+t/release-rinci.t
 t/release-sah-schema.t
 weaver.ini

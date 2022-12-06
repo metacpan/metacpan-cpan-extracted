@@ -1,5 +1,9 @@
 Revision history for Plack-Middleware-Greylist
 
+v0.3.2    2022-12-06 16:10:07+00:00 Europe/London
+  [Bux Fixes]
+  - Fix the minimum version of List::Util.
+
 v0.3.1    2022-12-04 09:22:27+00:00 Europe/London
   [Bux Fixes]
   - Specify minimum version of List::Util.

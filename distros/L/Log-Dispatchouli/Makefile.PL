@@ -31,6 +31,7 @@ my %WriteMakefileArgs = (
     "Sub::Exporter::GlobExporter" => "0.002",
     "Sys::Syslog" => "0.16",
     "Try::Tiny" => "0.04",
+    "experimental" => 0,
     "overload" => 0,
     "strict" => 0,
     "warnings" => 0
@@ -48,7 +49,7 @@ my %WriteMakefileArgs = (
     "lib" => 0,
     "utf8" => 0
   },
-  "VERSION" => "3.001",
+  "VERSION" => "3.002",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -78,6 +79,7 @@ my %FallbackPrereqs = (
   "Test::More" => "0.96",
   "Try::Tiny" => "0.04",
   "base" => 0,
+  "experimental" => 0,
   "lib" => 0,
   "overload" => 0,
   "strict" => 0,

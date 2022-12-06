@@ -3,7 +3,7 @@
 
 package Perl::Critic::Utils;
 
-use 5.006001;
+use 5.010001;
 use strict;
 use warnings;
 use Readonly;
@@ -22,7 +22,7 @@ use Perl::Critic::Utils::PPI qw< is_ppi_expression_or_generic_statement >;
 
 use Exporter 'import';
 
-our $VERSION = '1.142';
+our $VERSION = '1.144';
 
 #-----------------------------------------------------------------------------
 # Exportable symbols here.
@@ -1102,6 +1102,7 @@ sub all_perl_files {
                 }
                 return;
             },
+            untaint => 1,
         },
         @arg,
     );
@@ -1119,9 +1120,7 @@ sub all_perl_files {
 
 sub _is_backup {
     my ($file) = @_;
-    return 1 if $file =~ m{ [.] swp \z}xms;
-    return 1 if $file =~ m{ [.] bak \z}xms;
-    return 1 if $file =~ m{  ~ \z}xms;
+    return 1 if $file =~ m{ (?: [.] swp | [.] bak | ~ ) \z}xms;
     return 1 if $file =~ m{ \A [#] .+ [#] \z}xms;
     return;
 }
@@ -1135,10 +1134,7 @@ sub _is_perl {
     my ($file) = @_;
 
     #Check filename extensions
-    return 1 if $file =~ m{ [.] PL    \z}xms;
-    return 1 if $file =~ m{ [.] p[lm] \z}xms;
-    return 1 if $file =~ m{ [.] psgi  \z}xms;
-    return 1 if $file =~ m{ [.] t     \z}xms;
+    return 1 if $file =~ m{ [.] (?: PL | p[lm] | psgi | t ) \z}xms;
 
     #Check for shebang
     open my $fh, '<', $file or return;
@@ -1460,23 +1456,21 @@ ignored, so things like C<$ARGV> or C<$ENV> will still return true.
 
 Given a L<PPI::Token::Word|PPI::Token::Word>,
 L<PPI::Statement::Sub|PPI::Statement::Sub>, or string, returns true if
-that token represents a call to any of the builtin functions defined
-in Perl 5.8.8.
+that token represents a call to any of the builtin functions.
 
 
 =item C<is_perl_bareword( $element )>
 
 Given a L<PPI::Token::Word|PPI::Token::Word>,
 L<PPI::Statement::Sub|PPI::Statement::Sub>, or string, returns true if
-that token represents a bareword (e.g. "if", "else", "sub", "package")
-defined in Perl 5.8.8.
+that token represents a bareword (e.g. "if", "else", "sub", "package").
 
 
 =item C<is_perl_filehandle( $element )>
 
 Given a L<PPI::Token::Word|PPI::Token::Word>, or string, returns true
 if that token represents one of the global filehandles (e.g. C<STDIN>,
-C<STDERR>, C<STDOUT>, C<ARGV>) that are defined in Perl 5.8.8.  Note
+C<STDERR>, C<STDOUT>, C<ARGV>).  Note
 that this function will return false if given a filehandle that is
 represented as a typeglob (e.g. C<*STDIN>)
 
@@ -1485,40 +1479,40 @@ represented as a typeglob (e.g. C<*STDIN>)
 
 Given a L<PPI::Token::Word|PPI::Token::Word>,
 L<PPI::Statement::Sub|PPI::Statement::Sub>, or string, returns true if
-that token represents a call to any of the builtin functions defined
-in Perl 5.8.8 that provide a list context to the following tokens.
+that token represents a call to any of the builtin functions
+that provide a list context to the following tokens.
 
 
 =item C<is_perl_builtin_with_multiple_arguments( $element )>
 
 Given a L<PPI::Token::Word|PPI::Token::Word>,
 L<PPI::Statement::Sub|PPI::Statement::Sub>, or string, returns true if
-that token represents a call to any of the builtin functions defined
-in Perl 5.8.8 that B<can> take multiple arguments.
+that token represents a call to any of the builtin functions that B<can>
+take multiple arguments.
 
 
 =item C<is_perl_builtin_with_no_arguments( $element )>
 
 Given a L<PPI::Token::Word|PPI::Token::Word>,
 L<PPI::Statement::Sub|PPI::Statement::Sub>, or string, returns true if
-that token represents a call to any of the builtin functions defined
-in Perl 5.8.8 that B<cannot> take any arguments.
+that token represents a call to any of the builtin functions that
+B<cannot> take any arguments.
 
 
 =item C<is_perl_builtin_with_one_argument( $element )>
 
 Given a L<PPI::Token::Word|PPI::Token::Word>,
 L<PPI::Statement::Sub|PPI::Statement::Sub>, or string, returns true if
-that token represents a call to any of the builtin functions defined
-in Perl 5.8.8 that takes B<one and only one> argument.
+that token represents a call to any of the builtin functions that takes
+B<one and only one> argument.
 
 
 =item C<is_perl_builtin_with_optional_argument( $element )>
 
 Given a L<PPI::Token::Word|PPI::Token::Word>,
 L<PPI::Statement::Sub|PPI::Statement::Sub>, or string, returns true if
-that token represents a call to any of the builtin functions defined
-in Perl 5.8.8 that takes B<no more than one> argument.
+that token represents a call to any of the builtin functions that takes
+B<no more than one> argument.
 
 The sets of values for which
 C<is_perl_builtin_with_multiple_arguments()>,
@@ -1533,8 +1527,8 @@ C<is_perl_builtin()> will return true for.
 
 Given a L<PPI::Token::Word|PPI::Token::Word>,
 L<PPI::Statement::Sub|PPI::Statement::Sub>, or string, returns true if
-that token represents a call to any of the builtin functions defined
-in Perl 5.8.8 that takes no and/or one argument.
+that token represents a call to any of the builtin functions that takes
+no and/or one argument.
 
 Returns true if any of C<is_perl_builtin_with_no_arguments()>,
 C<is_perl_builtin_with_one_argument()>, and

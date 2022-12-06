@@ -27,6 +27,7 @@ do { my $x = {
                                       'Sub::Exporter::GlobExporter' => '0.002',
                                       'Sys::Syslog' => '0.16',
                                       'Try::Tiny' => '0.04',
+                                      'experimental' => '0',
                                       'overload' => '0',
                                       'perl' => 'v5.20.0',
                                       'strict' => '0',

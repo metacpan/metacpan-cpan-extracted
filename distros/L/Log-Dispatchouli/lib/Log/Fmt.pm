@@ -1,7 +1,9 @@
 use v5.20;
 use warnings;
-package Log::Fmt 3.001;
+package Log::Fmt 3.002;
 # ABSTRACT: a little parser and emitter of structured log lines
+
+use experimental 'postderef'; # Not dangerous.  Is accepted without changed.
 
 use Params::Util qw(_ARRAY0 _HASH0 _CODELIKE);
 use Scalar::Util qw(refaddr);
@@ -188,7 +190,7 @@ Log::Fmt - a little parser and emitter of structured log lines
 
 =head1 VERSION
 
-version 3.001
+version 3.002
 
 =head1 OVERVIEW
 

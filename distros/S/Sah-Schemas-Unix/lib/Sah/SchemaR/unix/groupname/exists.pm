@@ -1,10 +1,10 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::unix::groupname::exists;
 
-our $DATE = '2022-07-24'; # DATE
-our $VERSION = '0.020'; # VERSION
+our $DATE = '2022-09-08'; # DATE
+our $VERSION = '0.021'; # VERSION
 
-our $rschema = do{my$var={base=>"unix::groupname",clsets_after_base=>[{description=>"\nSupport coercion from GID.\n\n",prefilters=>["Unix::convert_gid_to_unix_group","Unix::check_unix_group_exists"],summary=>"Unix group name that must exist on the system"}],clsets_after_type=>[{description=>"\nThe checking follows POSIX rules: does not begin with a hyphen and only contains\n[A-Za-z0-9._-].\n\nThe above rule allows integers like 1234, which can be confused with GID, so\nthis schema disallows pure integers.\n\nThe maximum length is 32 following libc6's limit.\n\nNote that this schema does not check whether the group name exists (has record\nin the user database e.g. `/etc/group`). To do that, use the\n`unix::groupname::exists` schema.\n\n",examples=>[{valid=>0,value=>""},{valid=>1,value=>"foo"},{valid=>0,value=>"-andy"},{valid=>0,value=>1234},{valid=>1,value=>"andy2"},{valid=>0,value=>"an dy"},{valid=>1,value=>"an.dy"},{summary=>"Too long",valid=>0,value=>"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}],match=>qr((?=\A[A-Za-z0-9._][A-Za-z0-9._-]{0,31}\z)(?=.*[A-Za-z._-])),max_len=>32,min_len=>1,summary=>"Unix group name"},'$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_type}[0]','$var->{clsets_after_base}[0]'],resolve_path=>["str","unix::groupname"],type=>"str",v=>2};$var->{clsets_after_type}[1]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_type}[0];$var->{"clsets_after_type.alt.merge.merged"}[1]=$var->{clsets_after_base}[0];$var};
+our $rschema = do{my$var={base=>"unix::groupname",clsets_after_base=>[{description=>"\nSupport coercion from GID.\n\n",prefilters=>["Unix::convert_gid_to_unix_group","Unix::check_unix_group_exists"],summary=>"Unix group name that must exist on the system"}],clsets_after_type=>[{description=>"\nThe checking follows POSIX rules: does not begin with a hyphen and only contains\n[A-Za-z0-9._-].\n\nThe above rule allows integers like 1234, which can be confused with GID, so\nthis schema disallows pure integers.\n\nThe maximum length is 32 following libc6's limit.\n\nNote that this schema does not check whether the group name exists (has record\nin the user database e.g. `/etc/group`). To do that, use the\n`unix::groupname::exists` schema.\n\n",examples=>[{valid=>0,value=>""},{valid=>1,value=>"foo"},{valid=>0,value=>"-andy"},{valid=>0,value=>1234},{valid=>1,value=>"andy2"},{valid=>0,value=>"an dy"},{valid=>1,value=>"an.dy"},{summary=>"Too long",valid=>0,value=>"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"}],match=>qr((?=\A[A-Za-z0-9._][A-Za-z0-9._-]{0,31}\z)(?=.*[A-Za-z._-])),max_len=>32,min_len=>1,prefilters=>["Unix::convert_gid_to_unix_group"],summary=>"Unix group name","x.completion"=>["unix_group_or_gid"]},'$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_type}[0]','$var->{clsets_after_base}[0]'],resolve_path=>["str","unix::groupname"],type=>"str",v=>2};$var->{clsets_after_type}[1]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_type}[0];$var->{"clsets_after_type.alt.merge.merged"}[1]=$var->{clsets_after_base}[0];$var};
 
 1;
 # ABSTRACT: Unix group name that must exist on the system
@@ -21,7 +21,7 @@ Sah::SchemaR::unix::groupname::exists - Unix group name that must exist on the s
 
 =head1 VERSION
 
-This document describes version 0.020 of Sah::SchemaR::unix::groupname::exists (from Perl distribution Sah-Schemas-Unix), released on 2022-07-24.
+This document describes version 0.021 of Sah::SchemaR::unix::groupname::exists (from Perl distribution Sah-Schemas-Unix), released on 2022-09-08.
 
 =head1 DESCRIPTION
 
@@ -54,9 +54,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

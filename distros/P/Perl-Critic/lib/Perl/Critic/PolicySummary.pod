@@ -94,7 +94,7 @@ AUTOLOAD methods should be avoided. [Default severity 3]
 
 =head2 L<ClassHierarchies::ProhibitExplicitISA|Perl::Critic::Policy::ClassHierarchies::ProhibitExplicitISA>
 
-Employ C<use base> instead of C<@ISA>. [Default severity 3]
+Employ C<use parent> instead of C<@ISA>. [Default severity 3]
 
 =head2 L<ClassHierarchies::ProhibitOneArgBless|Perl::Critic::Policy::ClassHierarchies::ProhibitOneArgBless>
 

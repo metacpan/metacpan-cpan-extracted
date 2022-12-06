@@ -313,15 +313,41 @@ EOF
 1.0
 EOF
 
-     [["-e", 'm{(\d+) wallclock secs}; $1'], <<EOF, <<EOF, 1, 1],
+     do {
+         my $in = <<EOF;
 Files=1, Tests=3,  3 wallclock secs ( 0.02 usr  0.02 sys +  0.09 cusr  0.01 csys =  0.14 CPU)
 Files=1, Tests=3,  0 wallclock secs ( 0.02 usr  0.02 sys +  0.09 cusr  0.01 csys =  0.14 CPU)
 Files=1, Tests=3,  2 wallclock secs ( 0.02 usr  0.02 sys +  0.09 cusr  0.01 csys =  0.14 CPU)
+Files=1, Tests=3, 11 wallclock secs (10.02 usr  0.02 sys +  0.09 cusr  0.01 csys = 10.14 CPU)
 EOF
+	 my $out = <<EOF;
 Files=1, Tests=3,  0 wallclock secs ( 0.02 usr  0.02 sys +  0.09 cusr  0.01 csys =  0.14 CPU)
 Files=1, Tests=3,  2 wallclock secs ( 0.02 usr  0.02 sys +  0.09 cusr  0.01 csys =  0.14 CPU)
 Files=1, Tests=3,  3 wallclock secs ( 0.02 usr  0.02 sys +  0.09 cusr  0.01 csys =  0.14 CPU)
+Files=1, Tests=3, 11 wallclock secs (10.02 usr  0.02 sys +  0.09 cusr  0.01 csys = 10.14 CPU)
 EOF
+	 (
+	  [["-n", "-e", 'm{(\d+) wallclock secs}; $1'], $in, $out, 1, 1],
+	  [["-n", "--rx", '(\d+) wallclock secs'], $in, $out, 1, 1],
+	 )
+     },
+
+     do {
+	 my $in = <<EOF;
+xxx c
+zzz b
+yyy a
+EOF
+	 my $out = <<EOF;
+yyy a
+zzz b
+xxx c
+EOF
+	 (
+	  [["-e", 'substr $_, 4'], $in, $out, 1, 1],
+	  [["--rx", '\S+\s+(\S+)'], $in, $out, 1, 1],
+	 )
+     },
 
      [["-C", '$a cmp $b'], <<EOF, <<EOF, 1, 1],
 c

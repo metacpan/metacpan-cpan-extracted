@@ -1,6 +1,6 @@
 #!perl
 
-use 5.006001;
+use 5.010001;
 use strict;
 use warnings;
 
@@ -25,7 +25,7 @@ use Perl::Critic::Utils::PPI qw< :all >;
 
 use Test::More tests => 64;
 
-our $VERSION = '1.142';
+our $VERSION = '1.144';
 
 use Perl::Critic::TestUtils;
 Perl::Critic::TestUtils::assert_version( $VERSION );
@@ -286,7 +286,7 @@ can_ok('main', 'is_in_subroutine');
             $input = $doc->first_element();
         }
 
-        my $name = defined $code ? $code : '<undef>';
+        my $name = $code // '<undef>';
 
         local $Test::Builder::Level = $Test::Builder::Level + 1; ## no critic (Variables::ProhibitPackageVars)
         is(
@@ -323,7 +323,7 @@ can_ok('main', 'is_in_subroutine');
             $input = $transform->($doc);
         }
 
-        my $name = defined $code ? $code : '<undef>';
+        my $name = $code // '<undef>';
 
         local $Test::Builder::Level = $Test::Builder::Level + 1; ## no critic (Variables::ProhibitPackageVars)
         is(

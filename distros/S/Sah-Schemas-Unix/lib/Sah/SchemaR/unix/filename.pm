@@ -1,8 +1,8 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::unix::filename;
 
-our $DATE = '2022-07-24'; # DATE
-our $VERSION = '0.020'; # VERSION
+our $DATE = '2022-09-08'; # DATE
+our $VERSION = '0.021'; # VERSION
 
 our $rschema = do{my$var={base=>"filename::unix",clsets_after_base=>[{description=>"\nThis is just a convenient alias for filename::unix.\n\n",examples=>[],summary=>"File name (with optional path) on a Unix system"}],clsets_after_type=>[{examples=>[{valid=>0,value=>""},{valid=>1,value=>"foo"},{valid=>1,value=>"foo/bar"},{valid=>1,validated_value=>"foo/bar",value=>"foo//bar"},{summary=>"Path element too long",valid=>0,value=>"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},{summary=>"Contains null character",valid=>0,value=>"foo\0"}],match=>"\\A(?:/|/?(?:[^/\\0]{1,255})(?:/[^/\\0]{1,255})*)\\z",prefilters=>["Path::expand_tilde","Path::strip_slashes"],summary=>"Filesystem file name on a Unix system","x.completion"=>["filename"]},'$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_type}[0]','$var->{clsets_after_base}[0]'],resolve_path=>["str","filename::unix"],type=>"str",v=>2};$var->{clsets_after_type}[1]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_type}[0];$var->{"clsets_after_type.alt.merge.merged"}[1]=$var->{clsets_after_base}[0];$var};
 
@@ -21,7 +21,7 @@ Sah::SchemaR::unix::filename - File name (with optional path) on a Unix system
 
 =head1 VERSION
 
-This document describes version 0.020 of Sah::SchemaR::unix::filename (from Perl distribution Sah-Schemas-Unix), released on 2022-07-24.
+This document describes version 0.021 of Sah::SchemaR::unix::filename (from Perl distribution Sah-Schemas-Unix), released on 2022-09-08.
 
 =head1 DESCRIPTION
 
@@ -54,9 +54,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

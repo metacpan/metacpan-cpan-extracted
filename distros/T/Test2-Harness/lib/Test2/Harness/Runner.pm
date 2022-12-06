@@ -2,7 +2,7 @@ package Test2::Harness::Runner;
 use strict;
 use warnings;
 
-our $VERSION = '1.000136';
+our $VERSION = '1.000138';
 
 use File::Spec();
 
@@ -294,6 +294,7 @@ sub spawn_scheduler {
 
     my $guard = Scope::Guard->new(sub {
         print STDERR "\n\nEscaped Scope!!!!\n\n";
+        print STDERR $@;
         exit 255;
     });
 

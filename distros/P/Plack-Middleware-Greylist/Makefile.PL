@@ -18,7 +18,7 @@ my %WriteMakefileArgs = (
   "NAME" => "Plack::Middleware::Greylist",
   "PREREQ_PM" => {
     "HTTP::Status" => 0,
-    "List::Util" => "1.29",
+    "List::Util" => "1.39",
     "Module::Load" => 0,
     "Net::IP::Match::Trie" => 0,
     "Plack::Middleware" => 0,
@@ -44,7 +44,7 @@ my %WriteMakefileArgs = (
     "Test::More" => 0,
     "Test::Most" => 0
   },
-  "VERSION" => "v0.3.1",
+  "VERSION" => "v0.3.2",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -56,7 +56,7 @@ my %FallbackPrereqs = (
   "File::Spec" => 0,
   "HTTP::Request::Common" => 0,
   "HTTP::Status" => 0,
-  "List::Util" => "1.29",
+  "List::Util" => "1.39",
   "Module::Load" => 0,
   "Module::Metadata" => 0,
   "Net::IP::Match::Trie" => 0,

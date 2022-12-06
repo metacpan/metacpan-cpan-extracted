@@ -1,0 +1,6 @@
+Revision history for TimeZone::Solar
+
+0.1.0 2022-12-06T07:13:22+00:00 UTC
+ [MINOR]
+ - initial release: DateTime & DateTime::TimeZone compatibility; 5100+
+   tests

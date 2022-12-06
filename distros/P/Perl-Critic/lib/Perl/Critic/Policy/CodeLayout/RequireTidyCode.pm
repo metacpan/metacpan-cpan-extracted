@@ -1,6 +1,6 @@
 package Perl::Critic::Policy::CodeLayout::RequireTidyCode;
 
-use 5.006001;
+use 5.010001;
 use strict;
 use warnings;
 
@@ -11,9 +11,9 @@ use Readonly;
 use Perl::Tidy qw< >;
 
 use Perl::Critic::Utils qw{ :booleans :characters :severities };
-use base 'Perl::Critic::Policy';
+use parent 'Perl::Critic::Policy';
 
-our $VERSION = '1.142';
+our $VERSION = '1.144';
 
 #-----------------------------------------------------------------------------
 

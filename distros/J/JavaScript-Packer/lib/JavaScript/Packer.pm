@@ -8,7 +8,7 @@ use Regexp::RegGrp;
 
 # =========================================================================== #
 
-our $VERSION = "2.10";
+our $VERSION = "2.11";
 
 our @BOOLEAN_ACCESSORS = ( 'no_compress_comment', 'remove_copyright' );
 
@@ -883,6 +883,9 @@ Johnson (LEEJO)
 
 This module will break code that relies on ASI, see L<https://github.com/leejo/javascript-packer-perl/issues/5>
 for more information.
+
+This module uses regular expressions to parse the JavaScript so is prone
+to bugs and edge cases, especially when the JavaScript standard is updated
 
 Please report any bugs or feature requests through the web interface at
 L<http://github.com/leejo/javascript-packer-perl/issues>.

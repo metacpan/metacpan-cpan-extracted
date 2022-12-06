@@ -4,6 +4,13 @@
 All modifications are made by Mark Overmeer, unless explicitly stated
 differently.
 
+version 1.09: Tue  6 Dec 13:28:37 CET 2022
+
+	Improvements:
+	- configure retries and retry-wait times on communication errors.
+	- fail when the number of retries is reached.  [Andy Beverley]
+	- improve network failure reporting. Issue #3 [Gábor Szabó]
+
 version 1.08: Sun 13 Nov 17:10:36 CET 2022
 
 	Fixes:

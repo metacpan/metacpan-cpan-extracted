@@ -17,6 +17,9 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.010001",
   "NAME" => "Sah::Schemas::Unix",
   "PREREQ_PM" => {
+    "Complete::Unix" => "0.07",
+    "Complete::Util" => "0.608",
+    "Perinci::Sub::XCompletion::dirname" => 0,
     "Sah::Schema::dirname::unix" => 0,
     "Sah::Schema::filename::unix" => 0,
     "Sah::Schema::pathname::unix" => 0,
@@ -31,7 +34,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.020",
+  "VERSION" => "0.021",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -39,9 +42,12 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
+  "Complete::Unix" => "0.07",
+  "Complete::Util" => "0.608",
   "File::Spec" => 0,
   "IO::Handle" => 0,
   "IPC::Open3" => 0,
+  "Perinci::Sub::XCompletion::dirname" => 0,
   "Sah::Schema::dirname::unix" => 0,
   "Sah::Schema::filename::unix" => 0,
   "Sah::Schema::pathname::unix" => 0,

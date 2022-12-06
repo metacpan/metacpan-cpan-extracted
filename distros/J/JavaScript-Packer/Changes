@@ -1,5 +1,8 @@
 Revision history for JavaScript-Packer
 
+2.11       2022-12-06
+    - Add note to docs this module is increasingly unreliable
+
 2.10       2022-10-03
     - Fix template literals, as in: don't do any minifying in them (GH #12)
 

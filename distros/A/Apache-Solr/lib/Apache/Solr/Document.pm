@@ -8,7 +8,7 @@
 
 package Apache::Solr::Document;
 use vars '$VERSION';
-$VERSION = '1.08';
+$VERSION = '1.09';
 
 
 use warnings;

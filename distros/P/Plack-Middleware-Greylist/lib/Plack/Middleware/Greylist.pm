@@ -13,7 +13,7 @@ use warnings;
 use parent qw( Plack::Middleware );
 
 use HTTP::Status qw/ HTTP_FORBIDDEN HTTP_TOO_MANY_REQUESTS /;
-use List::Util   1.29 qw/ pairs /;
+use List::Util   1.39 qw/ pairs /;
 use Module::Load qw/ load /;
 use Net::IP::Match::Trie;
 use Plack::Util;
@@ -21,7 +21,7 @@ use Plack::Util::Accessor qw/ default_rate rules cache file _match greylist retr
 use Ref::Util             qw/ is_plain_arrayref /;
 use Time::Seconds         qw/ ONE_MINUTE /;
 
-our $VERSION = 'v0.3.1';
+our $VERSION = 'v0.3.2';
 
 
 sub prepare_app {
@@ -168,7 +168,7 @@ Plack::Middleware::Greylist - throttle requests with different rates based on ne
 
 =head1 VERSION
 
-version v0.3.1
+version v0.3.2
 
 =head1 SYNOPSIS
 

@@ -42,6 +42,7 @@
             "Sub::Exporter::GlobExporter" : "0.002",
             "Sys::Syslog" : "0.16",
             "Try::Tiny" : "0.04",
+            "experimental" : "0",
             "overload" : "0",
             "perl" : "v5.20.0",
             "strict" : "0",
@@ -79,7 +80,7 @@
          "web" : "https://github.com/rjbs/Log-Dispatchouli"
       }
    },
-   "version" : "3.001",
+   "version" : "3.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.037002"
@@ -469,7 +470,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "3.001",
+                  "tag" : "3.002",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },

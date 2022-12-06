@@ -1,6 +1,6 @@
 package Perl::Critic::Annotation;
 
-use 5.006001;
+use 5.010001;
 use strict;
 use warnings;
 
@@ -13,7 +13,7 @@ use Readonly;
 
 #-----------------------------------------------------------------------------
 
-our $VERSION = '1.142';
+our $VERSION = '1.144';
 
 Readonly::Scalar my $LAST_ELEMENT => -1;
 

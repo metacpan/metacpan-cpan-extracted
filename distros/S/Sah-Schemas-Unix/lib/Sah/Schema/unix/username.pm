@@ -3,9 +3,9 @@ package Sah::Schema::unix::username;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-24'; # DATE
+our $DATE = '2022-09-08'; # DATE
 our $DIST = 'Sah-Schemas-Unix'; # DIST
-our $VERSION = '0.020'; # VERSION
+our $VERSION = '0.021'; # VERSION
 
 our $schema = [str => {
     summary => 'Unix account name',
@@ -24,6 +24,9 @@ the user database e.g. `/etc/group`). To do that, use the
 `unix::username::exists` schema.
 
 _
+    'prefilters' => ['Unix::convert_uid_to_unix_user'],
+    'x.completion' => ['unix_user_or_uid'],
+
     min_len => 1,
     max_len => 32,
     match => qr/(?=\A[A-Za-z0-9._][A-Za-z0-9._-]{0,31}\z)(?=.*[A-Za-z._-])/,
@@ -56,7 +59,7 @@ Sah::Schema::unix::username - Unix account name
 
 =head1 VERSION
 
-This document describes version 0.020 of Sah::Schema::unix::username (from Perl distribution Sah-Schemas-Unix), released on 2022-07-24.
+This document describes version 0.021 of Sah::Schema::unix::username (from Perl distribution Sah-Schemas-Unix), released on 2022-09-08.
 
 =head1 SYNOPSIS
 
@@ -94,11 +97,11 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data);
  
  # a sample valid data
- $data = "an.dy";
+ $data = "foo";
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
- $data = "";
+ $data = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
  my $errmsg = $validator->($data); # => "Must match regex pattern qr((?=\\A[A-Za-z0-9._][A-Za-z0-9._-]{0,31}\\z)(?=.*[A-Za-z._-]))"
 
 Often a schema has coercion rule or default value, so after validation the
@@ -109,12 +112,12 @@ prefiltered) value:
  my $res = $validator->($data); # [$errmsg, $validated_val]
  
  # a sample valid data
- $data = "an.dy";
- my $res = $validator->($data); # => ["","an.dy"]
+ $data = "foo";
+ my $res = $validator->($data); # => ["","foo"]
  
  # a sample invalid data
- $data = "";
- my $res = $validator->($data); # => ["Must match regex pattern qr((?=\\A[A-Za-z0-9._][A-Za-z0-9._-]{0,31}\\z)(?=.*[A-Za-z._-]))",""]
+ $data = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+ my $res = $validator->($data); # => ["Must match regex pattern qr((?=\\A[A-Za-z0-9._][A-Za-z0-9._-]{0,31}\\z)(?=.*[A-Za-z._-]))","aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"]
 
 Data::Sah can also create validator that returns a hash of detailed error
 message. Data::Sah can even create validator that targets other language, like
@@ -216,9 +219,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

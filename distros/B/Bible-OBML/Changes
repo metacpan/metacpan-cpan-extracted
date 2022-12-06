@@ -1,5 +1,8 @@
 Revision history for Bible::OBML
 
+2.05      2022-12-05 10:30:43-08:00 America/Los_Angeles
+        - Remove extra spacing if it exists in OBML output
+
 2.04      2022-03-30 09:01:16-07:00 America/Los_Angeles
         - Avoid wrapping and dewrapping any indented content
 

@@ -4,7 +4,7 @@ package Net::Async::Redis::XS;
 use strict;
 use warnings;
 
-our $VERSION = '0.006';
+our $VERSION = '0.007';
 
 use parent qw(Net::Async::Redis);
 
@@ -67,6 +67,8 @@ sub wire_protocol {
 =head1 AUTHOR
 
 Tom Molesworth <TEAM@cpan.org>
+
+with contributions from C<< PEVANS@cpan.org >>.
 
 =head1 LICENSE
 

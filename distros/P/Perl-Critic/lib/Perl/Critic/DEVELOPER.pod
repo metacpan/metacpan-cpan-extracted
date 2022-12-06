@@ -79,7 +79,7 @@ don't want Perl::Critic to be a hypocrite, now do we?
     use Readonly;
 
     use Perl::Critic::Utils qw{ :severities :classification :ppi };
-    use base 'Perl::Critic::Policy';
+    use parent 'Perl::Critic::Policy';
 
     our $VERSION = '1.05';
 
@@ -370,8 +370,7 @@ have something like this:
         $self->{_foo} = $config->get{foo};
         $self->{_factor} = $config->get{factor};
 
-        my $selections = $config->get{selections};
-        $selections = defined $selections ? $selections : $EMPTY_STRING;
+        my $selections = $config->get{selections} // $EMPTY_STRING;
         $self->{_selections} = [ words_from_string($selections) ];
 
         return $TRUE;

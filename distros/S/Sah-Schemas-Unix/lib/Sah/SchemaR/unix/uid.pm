@@ -1,10 +1,10 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::unix::uid;
 
-our $DATE = '2022-07-24'; # DATE
-our $VERSION = '0.020'; # VERSION
+our $DATE = '2022-09-08'; # DATE
+our $VERSION = '0.021'; # VERSION
 
-our $rschema = do{my$var={base=>"uint",clsets_after_base=>[{description=>"\nNote that this schema does not check whether the UID exists (has record in the\nuser database e.g. `/etc/passwd`). To do that, use the `unix::uid::exists`\nschema.\n\n",examples=>[{valid=>0,value=>-1},{valid=>1,value=>0},{valid=>1,value=>1}],summary=>"User identifier (UID)"}],clsets_after_type=>[{description=>"\nSee also `posint` for integers that start from 1.\n\n",examples=>[{data=>0,valid=>1},{data=>1,valid=>1},{data=>-1,valid=>0}],min=>0,summary=>"Non-negative integer (0, 1, 2, ...)"},'$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_type}[0]','$var->{clsets_after_base}[0]'],resolve_path=>["int","uint"],type=>"int",v=>2};$var->{clsets_after_type}[1]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_type}[0];$var->{"clsets_after_type.alt.merge.merged"}[1]=$var->{clsets_after_base}[0];$var};
+our $rschema = do{my$var={base=>"uint",clsets_after_base=>[{description=>"\nNote that this schema does not check whether the UID exists (has record in the\nuser database e.g. `/etc/passwd`). To do that, use the `unix::uid::exists`\nschema.\n\n",examples=>[{valid=>0,value=>-1},{valid=>1,value=>0},{valid=>1,value=>1}],prefilters=>["Unix::convert_unix_user_to_uid"],summary=>"User identifier (UID)","x.completion"=>["unix_user_or_uid"]}],clsets_after_type=>[{description=>"\nSee also `posint` for integers that start from 1.\n\n",examples=>[{data=>0,valid=>1},{data=>1,valid=>1},{data=>-1,valid=>0}],min=>0,summary=>"Non-negative integer (0, 1, 2, ...)"},'$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_type}[0]','$var->{clsets_after_base}[0]'],resolve_path=>["int","uint"],type=>"int",v=>2};$var->{clsets_after_type}[1]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_type}[0];$var->{"clsets_after_type.alt.merge.merged"}[1]=$var->{clsets_after_base}[0];$var};
 
 1;
 # ABSTRACT: User identifier (UID)
@@ -21,7 +21,7 @@ Sah::SchemaR::unix::uid - User identifier (UID)
 
 =head1 VERSION
 
-This document describes version 0.020 of Sah::SchemaR::unix::uid (from Perl distribution Sah-Schemas-Unix), released on 2022-07-24.
+This document describes version 0.021 of Sah::SchemaR::unix::uid (from Perl distribution Sah-Schemas-Unix), released on 2022-09-08.
 
 =head1 DESCRIPTION
 
@@ -54,9 +54,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,13 +1,13 @@
 package Perl::Critic::Policy::ValuesAndExpressions::ProhibitMismatchedOperators;
-use 5.006001;
+use 5.010001;
 use strict;
 use warnings;
 use Readonly;
 
 use Perl::Critic::Utils qw{ :booleans :severities };
-use base 'Perl::Critic::Policy';
+use parent 'Perl::Critic::Policy';
 
-our $VERSION = '1.142';
+our $VERSION = '1.144';
 
 #-----------------------------------------------------------------------------
 
@@ -37,6 +37,12 @@ Readonly::Hash my %OPERATOR_TYPES => (
     # string
     map { $_ => $TOKEN_COMPATIBILITY_INDEX_STRING }
         qw< eq ne lt gt le ge . .= >,
+);
+
+Readonly::Scalar my $TOKEN_COMPATIBILITY_SPECIAL_STRING_OPERATOR => qw{+};
+Readonly::Hash my %SPECIAL_STRING_VALUES => (
+    map { $_ => 1}
+        qw('nan' 'inf' '-inf' '+inf')
 );
 
 #-----------------------------------------------------------------------------
@@ -87,6 +93,8 @@ sub violates {
         &&  defined $leading_operator_compatibility
         &&  ! $leading_operator_compatibility->[$operator_type]
         &&  $self->_have_stringy_x($leading_operator); # RT 54524
+
+    return if $self->_is_special_string_number_addion($elem_text, $leading_operator, $next_elem);
 
     return $self->violation($DESC, $EXPL, $elem);
 }
@@ -150,6 +158,21 @@ sub _is_file_operator {
     return !! $FILE_OPERATOR_COMPATIBILITY{ $elem->content() }
 }
 
+#-----------------------------------------------------------------------------
+
+sub _is_special_string_number_addion {
+    my ($self, $elem_operator, $element_1, $element_2, $check_recursive) = @_;
+
+    return 1 if $elem_operator
+        &&  $elem_operator eq $TOKEN_COMPATIBILITY_SPECIAL_STRING_OPERATOR
+        &&  $SPECIAL_STRING_VALUES{lc($element_1->content()//0)}
+        &&  $element_2->isa('PPI::Token::Number')
+        &&  $element_2->content() == 0;
+    return 1 if !$check_recursive && $self->_is_special_string_number_addion($elem_operator, $element_2, $element_1, 1);
+
+    return;
+}
+
 1;
 
 __END__
@@ -185,6 +208,7 @@ string equality operator with a numeric value, or vice-versa.
 
 This Policy is not configurable except for the standard options.
 
+=for stopwords NaN struct
 
 =head1 NOTES
 
@@ -192,6 +216,12 @@ If L<warnings|warnings> are enabled, the Perl interpreter usually
 warns you about using mismatched operators at run-time.  This Policy
 does essentially the same thing, but at author-time.  That way, you
 can find out about them sooner.
+
+Perl handles the strings 'NaN' and 'inf' as special numbers and creates an NV struct when compared with a numeric operator.
+Although not necessary it is allowed to write code such as:
+    my $i = 'inf'+0;
+This pattern helps others understand that the variable is indeed the Infinite or NaN numbers as Perl interprets them.
+Only these two special string numbers are allowed to have the '+' operator which would otherwise be allowed only for strings.
 
 
 =head1 AUTHOR
@@ -201,7 +231,7 @@ Peter Guzis <pguzis@cpan.org>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2006-2011 Peter Guzis.  All rights reserved.
+Copyright (c) 2006-2022 Peter Guzis.  All rights reserved.
 
 This program is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.  The full text of this license

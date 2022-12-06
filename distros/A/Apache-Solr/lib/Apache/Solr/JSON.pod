@@ -51,6 +51,8 @@ Extends L<"Constructors" in Apache::Solr|Apache::Solr/"Constructors">.
   core            Apache::Solr     undef
   format          Apache::Solr     'JSON'
   json                             <created internally>
+  retry_max       Apache::Solr     60
+  retry_wait      Apache::Solr     5
   server          Apache::Solr     <required>
   server_version  Apache::Solr     <latest>
 
@@ -67,6 +69,10 @@ Extends L<"Constructors" in Apache::Solr|Apache::Solr/"Constructors">.
 =item json => JSON object
 
 By default, an JSON object is created for you, in utf8 mode.
+
+=item retry_max => COUNT
+
+=item retry_wait => SECONDS
 
 =item server => URL
 
@@ -132,8 +138,8 @@ Extends L<"DETAILS" in Apache::Solr|Apache::Solr/"DETAILS">.
  
 =head1 SEE ALSO
 
-This module is part of Apache-Solr distribution version 1.08,
-built on November 13, 2022. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Apache-Solr distribution version 1.09,
+built on December 06, 2022. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

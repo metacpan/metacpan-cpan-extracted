@@ -4,7 +4,7 @@
 #
 # Author: Slaven Rezic
 #
-# Copyright (C) 2009,2011,2013,2015,2016,2018 Slaven Rezic. All rights reserved.
+# Copyright (C) 2009,2011,2013,2015,2016,2018,2019,2022 Slaven Rezic. All rights reserved.
 # This program is free software; you can redistribute it and/or
 # modify it under the same terms as Perl itself.
 #
@@ -16,7 +16,15 @@ use strict;
 use Getopt::Long;
 
 use vars qw($VERSION);
-$VERSION = "0.09";
+$VERSION = "0.10";
+
+
+sub _has_capture_groups {
+    my $qr = shift;
+    $qr =~ /(?<!\\)\([^(?:)]/;
+}
+
+return 1 if caller;
 
 my $sort_type = 'alpha';
 my $reverse;
@@ -26,6 +34,7 @@ my $ignore_leading_blanks;
 my $ignore_case;
 my $ignore_nonprinting;
 my $perlscript;
+my $rx;
 my @modules;
 my $cmp_perlscript;
 
@@ -42,6 +51,7 @@ GetOptions(
 	   "c|check"              => \$check,
 	   "u|unique"             => \$unique,
 	   "e|field-function=s"   => \$perlscript,
+	   "rx=s"                 => \$rx,
 	   'M|module=s@'          => \@modules,
 	   'm=s@'                 => sub {
                push @modules, $_[1] =~ /=/ ? $_[1] : "$_[1]=";
@@ -62,6 +72,7 @@ Comparison functions:
 Sort key selection:
 -b: ignore leading blanks
 -e: perl oneliner, should return the value to be compared as last value
+--rx: capture sort value by regexp
 -f: ignore case
 -i: ignore non-printing characters
 
@@ -97,11 +108,23 @@ if ($cmp_perlscript) {
 }
 
 my @data;
-my $cb = defined $perlscript ? do {
-    my $sub = eval "no strict; sub { $perlscript }";
+my $cb;
+defined $perlscript and defined $rx
+    and die "Cannot define -e/--field-function and --rx together\n";
+if (defined $perlscript) {
+    $cb = eval "no strict; sub { $perlscript }";
     die "Cannot compile code: $@" if $@;
-    $sub;
-} : sub { $_ };
+} elsif ($rx) {
+    my $qr = eval { qr{$rx} };
+    die "Cannot compile regular expression '$rx': $@" if $@;
+    if (!_has_capture_groups($qr)) {
+	$qr = eval { qr{($rx)} };
+	die $@ if $@; # should not happen
+    }
+    $cb = sub { m{$rx}; $1 };
+} else {
+    $cb = sub { $_ };
+}
 
 if (@ARGV) {
     for my $file (@ARGV) {
@@ -271,6 +294,25 @@ Examples:
 Note that it is possible to put C<BEGIN { ... }> blocks into the
 comparison function.
 
+=item --rx
+
+Use a regular expression for extracting the sorting field. If a
+capture group is detected in the regexp, then this capture group is
+used for the extraction, otherwise the whole matched portion is used.
+
+For example, the above mentioned C<-e> snippet
+
+    -e '/(\d+) wallclock/ && $1'
+
+could be written as
+
+    --rx '(\d+) wallclock'
+
+Only the first capture group is used, others are ignored (for now).
+
+The capture group detection code just uses a heuristic, which may fail
+in special cases.
+
 =item -f, --ignore-case
 
 Fold all characters to its uppercased version for comparison.
@@ -344,6 +386,13 @@ Currently the longish one-liner has to be used:
 
     psort -MUnicode::Collate -MEncode=decode -e 'decode("utf-8", $_)' -C 'BEGIN { $Collator = Unicode::Collate->new } $Collator->cmp($a,$b)'
 
+=item Sort specific columns (<-k>)
+
+Currently one has to use something like the following to sort by
+columns:
+
+    psort -e '@F=split; $F[...]'
+
 =item C<--locale>
 
 Specify a locale.
@@ -377,5 +426,7 @@ at your option, any later version of Perl 5 you may have available.
 =head1 SEE ALSO
 
 L<sort(1)>, L<Sort::Naturally>, L<CPAN::Version>.
+
+An alternative perl-enhanced sort program: L<subsort> (in L<App::subsort>).
 
 =cut

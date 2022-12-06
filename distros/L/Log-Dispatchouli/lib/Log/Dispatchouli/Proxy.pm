@@ -1,7 +1,9 @@
 use v5.20;
 use warnings;
-package Log::Dispatchouli::Proxy 3.001;
+package Log::Dispatchouli::Proxy 3.002;
 # ABSTRACT: a simple wrapper around Log::Dispatch
+
+use experimental 'postderef'; # Not dangerous.  Is accepted without changed.
 
 use Log::Fmt ();
 use Params::Util qw(_ARRAY0 _HASH0);
@@ -195,7 +197,7 @@ Log::Dispatchouli::Proxy - a simple wrapper around Log::Dispatch
 
 =head1 VERSION
 
-version 3.001
+version 3.002
 
 =head1 DESCRIPTION
 

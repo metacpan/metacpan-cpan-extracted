@@ -8,7 +8,7 @@
 
 package Apache::Solr;
 use vars '$VERSION';
-$VERSION = '1.08';
+$VERSION = '1.09';
 
 
 use warnings;
@@ -25,7 +25,11 @@ use URI            ();
 use LWP::UserAgent ();
 use MIME::Types    ();
 
-use constant LATEST_SOLR_VERSION => '4.5';  # newest support by this module
+use constant
+  { LATEST_SOLR_VERSION => '4.5'  # newest support by this module
+  , ENETDOWN    => 100   # error codes may not be available on all platforms
+  , ENETUNREACH => 101   #    so cannot use Errno.
+  };
 
 # overrule this when your host has a different unique field
 our $uniqueKey  = 'id';
@@ -58,6 +62,8 @@ sub init($)
     $self->{AS_core}     = $args->{core};
     $self->{AS_commit}   = exists $args->{autocommit} ? $args->{autocommit} : 1;
     $self->{AS_sversion} = $args->{server_version} || LATEST_SOLR_VERSION;
+    $self->{AS_retry_wait} = $args->{retry_wait} // 5;  # seconds
+    $self->{AS_retry_max}  = $args->{retry_max}  // 60;
 
     $http_agent = $self->{AS_agent}
        = $args->{agent} || $http_agent || LWP::UserAgent->new(keep_alive=>1);
@@ -286,7 +292,8 @@ sub extractDocument(@)
 
     $self->_extract([%p], $data, $ct);
 }
-sub _extract($){panic "not implemented"}
+
+sub _extract($) { panic "not implemented" }
 
 #-------------------------
 
@@ -294,8 +301,7 @@ sub _core_admin($@)
 {   my ($self, $action, $params) = @_;
     $params->{core} ||= $self->core;
     
-    my $endpoint = $self->endpoint('cores', core => 'admin'
-      , params => $params);
+    my $endpoint = $self->endpoint('cores', core => 'admin', params => $params);
 
     my @params   = %$params;
     my $result   = Apache::Solr::Result->new(params => [ %$params ]
@@ -501,11 +507,7 @@ sub request($$;$$)
 {   my ($self, $url, $result, $body, $body_ct) = @_;
 
     my $req;
-    if(!$body)
-    {   # request without payload
-        $req = HTTP::Request->new(GET => $url);
-    }
-    else
+    if($body)
     {   # request with 'form' payload
         $req       = HTTP::Request->new
           ( POST => $url
@@ -515,20 +517,41 @@ sub request($$;$$)
           , (ref $body eq 'SCALAR' ? $$body : $body)
           );
     }
+    else
+    {   # request without payload
+        $req = HTTP::Request->new(GET => $url);
+    }
 
     $result->request($req);
 
     my $resp;
-  RETRY:
+    my $retries = $self->{AS_retry_max};
+    my $wait    = $self->{AS_retry_wait};
+    my $start   = time;
+
+    while($retries--)
     {   $resp = $self->agent->request($req);
-        unless($resp->is_success)
+        last if $resp->is_success;
+
+        if($resp->code != 500)
         {   alert "Solr request failed with ".$resp->code;
-            sleep 5;    # let remote settle a bit
-            goto RETRY;
+            last;
         }
+
+        $! = ENETDOWN;  # HTTP(500) -> unix error
+        alert __x"Solr request failed with {code}, {retries} retries left",
+            code => $resp->code, retries => $retries;
+
+        sleep $wait if $wait && $retries;    # let remote settle a bit
     }
-#use Data::Dumper;
-#warn Dumper $resp;
+
+    unless($resp->is_success)
+    {   my $elapse = time - $start;
+        $! = $resp->code==500 ? ENETDOWN : ENETUNREACH;
+        fault __x"Solr request failed after {elapse} seconds after {retries} retries",
+            elapse => $elapse, retries => $self->{AS_retry_max} - $retries -1;
+    }
+
     $result->response($resp);
     $resp;
 }

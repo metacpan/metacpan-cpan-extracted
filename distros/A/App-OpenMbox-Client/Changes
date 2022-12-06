@@ -1,0 +1,11 @@
+Revision history for App-OpenMbox-Client
+
+0.10    2022-12-06
+        First version
+
+0.11    2022-12-06
+        Change Makefile.PL to add SSL requirements
+
+0.12    2022-12-06
+        Updates the POD
+

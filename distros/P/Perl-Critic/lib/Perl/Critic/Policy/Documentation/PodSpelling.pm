@@ -1,6 +1,6 @@
 package Perl::Critic::Policy::Documentation::PodSpelling;
 
-use 5.006001;
+use 5.010001;
 use strict;
 use warnings;
 
@@ -22,9 +22,9 @@ use Perl::Critic::Utils qw{
 };
 use Perl::Critic::Exception::Fatal::Generic qw{ throw_generic };
 
-use base 'Perl::Critic::Policy';
+use parent 'Perl::Critic::Policy';
 
-our $VERSION = '1.142';
+our $VERSION = '1.144';
 
 #-----------------------------------------------------------------------------
 

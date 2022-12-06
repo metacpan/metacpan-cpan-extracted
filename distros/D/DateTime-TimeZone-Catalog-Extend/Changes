@@ -1,6 +1,10 @@
 Revision history for Perl module DateTime::TimeZone::Catalog::Extend
 
-v0.2.0 2022-12-01T07:51:38+0900
+v0.3.0 2022-12-06T14:23:33+0900
+    - Expanded the extended catalog with 158 time zone aliases
+    - Added the zone_map class function
+
+v0.2.0 2022-12-01T07:51:38Z +0900
     - Added method aliases()
 
 v0.1.0 2022-11-28T21:28:41Z +0900

@@ -1,4 +1,7 @@
 
+1.22 (2022-12-05)
+    (nicomen) Avoid losing userinfo when sorting query
+
 1.21 (2022-12-02)
     (nicomen) Add possibility to override key generator 
               (Changes entry was wrong in previous upload, no way to replace package in PAUSE)

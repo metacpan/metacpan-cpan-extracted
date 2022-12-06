@@ -2,7 +2,7 @@ package Test2::Harness::Runner::Resource::JobCount;
 use strict;
 use warnings;
 
-our $VERSION = '1.000136';
+our $VERSION = '1.000138';
 
 use parent 'Test2::Harness::Runner::Resource';
 use Test2::Harness::Util::HashBase qw/<settings <job_count <used <free/;
@@ -41,7 +41,14 @@ sub available {
     my $self = shift;
     my ($task) = @_;
 
-    my $concurrency = min(grep { $_ } ($task->{slots_per_job} // 1), $self->settings->runner->slots_per_job);
+    my $rmin = $self->settings->runner->slots_per_job;
+    my $tmin = $task->{min_slots} // 1;
+    my $tmax = $task->{max_slots} // $tmin;
+
+    return -1 if $self->{+JOB_COUNT} < $tmin;
+    return -1 if $rmin < $tmin;
+
+    my $concurrency = min(grep { $_ } $tmax, $rmin);
     $concurrency ||= 1;
 
     return 1 if @{$self->{+FREE}} >= $concurrency;
@@ -52,7 +59,10 @@ sub assign {
     my $self = shift;
     my ($task, $state) = @_;
 
-    my $concurrency = min(grep { $_ } ($task->{slots_per_job} // 1), $self->settings->runner->slots_per_job);
+    my $rmin = $self->settings->runner->slots_per_job;
+    my $tmin = $task->{min_slots} // 1;
+    my $tmax = $task->{max_slots} // $tmin;
+    my $concurrency = min(grep { $_ } $tmax, $rmin);
     $concurrency ||= 1;
 
     $state->{record} = {

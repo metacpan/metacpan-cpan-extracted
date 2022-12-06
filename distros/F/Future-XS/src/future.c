@@ -705,7 +705,8 @@ void Future_donev(pTHX_ SV *f, SV **svp, size_t n)
     return;
 
   if(self->ready)
-    croak("(SELF) is already (STATE) and cannot be ->done");
+    croak("%" SVf " is already (STATE) and cannot be ->done",
+        SVfARG(f));
   // TODO: test subs
 
   self->result = newAV_svn_dup(svp, n);
@@ -720,7 +721,8 @@ void Future_failv(pTHX_ SV *f, SV **svp, size_t n)
     return;
 
   if(self->ready)
-    croak("(SELF) is already (STATE) and cannot be ->fail'ed");
+    croak("%" SVf " is already (STATE) and cannot be ->fail'ed",
+        SVfARG(f));
 
   if(n == 1 &&
       SvROK(svp[0]) && SvOBJECT(SvRV(svp[0])) &&
@@ -809,7 +811,8 @@ void Future_failp(pTHX_ SV *f, const char *s)
     return;
 
   if(self->ready)
-    croak("(SELF) is already (STATE) and cannot be ->fail'ed");
+    croak("%" SVf " is already (STATE) and cannot be ->fail'ed",
+        SVfARG(f));
 
   self->failure = newAV();
   av_push(self->failure, newSVpv(s, strlen(s)));
@@ -980,7 +983,8 @@ AV *Future_get_result_av(pTHX_ SV *f, bool await)
   }
 
   if(self->cancelled)
-    croak("(SELF) was cancelled");
+    croak("%" SVf " was cancelled",
+        SVfARG(f));
 
   if(!self->result)
     self->result = newAV();

@@ -60,6 +60,8 @@ server.
   autocommit      true
   core            undef
   format          'XML'
+  retry_max       60
+  retry_wait      5
   server          <required>
   server_version  <latest>
 
@@ -95,6 +97,22 @@ the live environment.
 
 Communication format between client and server.  You may also instantiate
 L<Apache::Solr::XML|Apache::Solr::XML> or L<Apache::Solr::JSON|Apache::Solr::JSON> directly.
+
+=item retry_max => COUNT
+
+[1.09] When the server(-connection) persists in producing errors, it
+may not recover at all.  Let's not block the main code.  Of course, it
+may take considerable time for each error to show, so the communication
+failure can take much, much longer than C<retry_wait> times C<retry_max>
+seconds.
+
+You can disable retries with with '0'.
+
+=item retry_wait => SECONDS
+
+[1.09] When the connection to the Solr server fails, or when the server
+does not respond correctly, a retry is attempted after waiting a few
+seconds.  You may use '0' to avoid waiting.
 
 =item server => URL
 
@@ -521,7 +539,7 @@ example:
     , mlt   => { fl => 'manu,cat', mindf => 1, mintf => 1 }
     , stats => { field => [ 'price', 'popularity' ] }
     , group => { query => 'price:[0 TO 99.99]', limit => 3 }
-     );
+    );
 
   # becomes (one line)
   ...?rows=10&q=inStock:true
@@ -614,8 +632,8 @@ differences is that C<Apache::Solr> has much more abstraction.
 
 =head1 SEE ALSO
 
-This module is part of Apache-Solr distribution version 1.08,
-built on November 13, 2022. Website: F<http://perl.overmeer.net/CPAN/>
+This module is part of Apache-Solr distribution version 1.09,
+built on December 06, 2022. Website: F<http://perl.overmeer.net/CPAN/>
 
 =head1 LICENSE
 

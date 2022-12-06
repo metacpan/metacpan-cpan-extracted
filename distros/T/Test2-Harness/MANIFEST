@@ -248,6 +248,7 @@ t/integration/signals.t
 t/integration/signals/abrt_or_iot.t
 t/integration/slots_per_job.t
 t/integration/slots_per_job2.t
+t/integration/slots_per_job3.t
 t/integration/smoke.t
 t/integration/smoke/a.tx
 t/integration/smoke/b.tx

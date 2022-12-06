@@ -1,5 +1,8 @@
 Revision history for psort.
 
+0.10    2022-12-06
+	- --rx option
+
 0.09	2018-10-28
 	- just a minor Pod change
 

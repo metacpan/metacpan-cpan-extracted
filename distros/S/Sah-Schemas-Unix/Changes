@@ -1,3 +1,9 @@
+0.021   2022-09-08  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Add completion and prefilter for conversion between uid/gid
+          <-> user/group for all schemas, not just the ::exists variants.
+
+
 0.020   2022-07-24  Released-By: PERLANCAR; Urgency: medium
 
         - Fix error message in Sah filter.

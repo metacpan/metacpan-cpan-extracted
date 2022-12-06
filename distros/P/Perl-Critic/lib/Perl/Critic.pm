@@ -1,6 +1,6 @@
 package Perl::Critic;
 
-use 5.006001;
+use 5.010001;
 use strict;
 use warnings;
 
@@ -22,7 +22,7 @@ use Perl::Critic::Utils qw< :characters hashify shebang_line >;
 
 #-----------------------------------------------------------------------------
 
-our $VERSION = '1.142';
+our $VERSION = '1.144';
 
 Readonly::Array our @EXPORT_OK => qw(critique);
 
@@ -223,7 +223,7 @@ Hukins Omer Gazit Zacks Howarth Walde Rolsky Jakub Wilk Trosien Creenan
 Balhatchet Paaske Tørholm Raspass Tonkin Katz Berndt Sergey Gabor Szabo
 Knop Eldridge Steinbrunner Kimmel Guillaume Aubert Anirvan Chatterjee
 Rinaldo Ollis Etheridge Brømsø Slaven Rezić Szymon Nieznański
-Oschwald Mita
+Oschwald Mita Amory Meltzer Grechkin Bernhard Schmalhofer TOYAMA Nao Wyant
 
 =head1 NAME
 
@@ -270,7 +270,7 @@ from L<http://www.activestate.com>.
 
 =head1 PREREQUISITES
 
-Perl::Critic runs on Perl back to Perl 5.6.1. It relies on the L<PPI>
+Perl::Critic runs on Perl back to Perl 5.10.1. It relies on the L<PPI>
 module to do the heavy work of parsing Perl.
 
 
@@ -948,6 +948,11 @@ L<http://www.perlfoundation.org/april_1_2007_new_grant_awards>
 
 Thanks also to this incomplete laundry list of folks who have contributed
 to Perl::Critic in some way:
+Tom Wyant,
+TOYAMA Nao,
+Bernhard Schmalhofer,
+Amory Meltzer,
+Andrew Grechkin,
 Daniel Mita,
 Gregory Oschwald,
 Mike O'Regan,
@@ -1001,7 +1006,7 @@ Jeffrey Ryan Thalhammer <jeff@imaginative-software.com>
 
 =head1 COPYRIGHT
 
-Copyright (c) 2005-2021 Imaginative Software Systems.  All rights reserved.
+Copyright (c) 2005-2022 Imaginative Software Systems.  All rights reserved.
 
 This program is free software; you can redistribute it and/or modify it under
 the same terms as Perl itself.  The full text of this license can be found in

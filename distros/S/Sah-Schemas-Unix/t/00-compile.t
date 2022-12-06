@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 39 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 45 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Data/Sah/Filter/perl/Unix/check_gid_exists.pm',
@@ -21,6 +21,12 @@ my @module_files = (
     'Data/Sah/Filter/perl/Unix/try_convert_uid_to_unix_user.pm',
     'Data/Sah/Filter/perl/Unix/try_convert_unix_group_to_gid.pm',
     'Data/Sah/Filter/perl/Unix/try_convert_unix_user_to_uid.pm',
+    'Perinci/Sub/XCompletion/unix_gid.pm',
+    'Perinci/Sub/XCompletion/unix_group.pm',
+    'Perinci/Sub/XCompletion/unix_group_or_gid.pm',
+    'Perinci/Sub/XCompletion/unix_uid.pm',
+    'Perinci/Sub/XCompletion/unix_user.pm',
+    'Perinci/Sub/XCompletion/unix_user_or_uid.pm',
     'Sah/Schema/unix/dirname.pm',
     'Sah/Schema/unix/filename.pm',
     'Sah/Schema/unix/gid.pm',

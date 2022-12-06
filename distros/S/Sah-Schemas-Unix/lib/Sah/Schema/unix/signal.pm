@@ -3,9 +3,9 @@ package Sah::Schema::unix::signal;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-24'; # DATE
+our $DATE = '2022-09-08'; # DATE
 our $DIST = 'Sah-Schemas-Unix'; # DIST
-our $VERSION = '0.020'; # VERSION
+our $VERSION = '0.021'; # VERSION
 
 our $schema = ['str' => {
     'summary' => 'Unix signal name (e.g. TERM or KILL) or number (9 or 15)',
@@ -36,7 +36,7 @@ Sah::Schema::unix::signal - Unix signal name (e.g. TERM or KILL) or number (9 or
 
 =head1 VERSION
 
-This document describes version 0.020 of Sah::Schema::unix::signal (from Perl distribution Sah-Schemas-Unix), released on 2022-07-24.
+This document describes version 0.021 of Sah::Schema::unix::signal (from Perl distribution Sah-Schemas-Unix), released on 2022-09-08.
 
 =head1 SYNOPSIS
 
@@ -128,7 +128,7 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data);
  
  # a sample valid data
- $data = "TTIN";
+ $data = "ABRT";
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
@@ -143,8 +143,8 @@ prefiltered) value:
  my $res = $validator->($data); # [$errmsg, $validated_val]
  
  # a sample valid data
- $data = "TTIN";
- my $res = $validator->($data); # => ["","TTIN"]
+ $data = "ABRT";
+ my $res = $validator->($data); # => ["","ABRT"]
  
  # a sample invalid data
  $data = undef;
@@ -236,9 +236,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

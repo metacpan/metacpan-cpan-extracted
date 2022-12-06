@@ -1,6 +1,6 @@
 package Perl::Critic::Config;
 
-use 5.006001;
+use 5.010001;
 use strict;
 use warnings;
 
@@ -25,11 +25,10 @@ use Perl::Critic::Utils::Constants qw<
     :profile_strictness
     $_MODULE_VERSION_TERM_ANSICOLOR
 >;
-use Perl::Critic::Utils::DataConversion qw< boolean_to_number dor >;
 
 #-----------------------------------------------------------------------------
 
-our $VERSION = '1.142';
+our $VERSION = '1.144';
 
 #-----------------------------------------------------------------------------
 
@@ -112,17 +111,14 @@ sub _init {
         $args{'-program-extensions'}, $errors);
 
     # If given, these options can be true or false (but defined)
-    # We normalize these to numeric values by multiplying them by 1;
-    $self->{_force} = boolean_to_number( dor( $args{-force}, $options_processor->force() ) );
-    $self->{_only}  = boolean_to_number( dor( $args{-only},  $options_processor->only()  ) );
-    $self->{_color} = boolean_to_number( dor( $args{-color}, $options_processor->color() ) );
+    $self->{_force} = _boolean_to_number( $args{-force} // $options_processor->force() );
+    $self->{_only}  = _boolean_to_number( $args{-only}  // $options_processor->only()  );
+    $self->{_color} = _boolean_to_number( $args{-color} // $options_processor->color() );
     $self->{_unsafe_allowed} =
-        boolean_to_number(
-            dor( $args{'-allow-unsafe'}, $options_processor->allow_unsafe()
-        ) );
+        _boolean_to_number( $args{'-allow-unsafe'} // $options_processor->allow_unsafe() );
     $self->{_criticism_fatal} =
-        boolean_to_number(
-            dor( $args{'-criticism-fatal'}, $options_processor->criticism_fatal() )
+        _boolean_to_number(
+            $args{'-criticism-fatal'} // $options_processor->criticism_fatal()
         );
 
 
@@ -150,6 +146,12 @@ sub _init {
     }
 
     return $self;
+}
+
+#-----------------------------------------------------------------------------
+
+sub _boolean_to_number {  ## no critic (RequireArgUnpacking)
+    return $_[0] ? $TRUE : $FALSE;
 }
 
 #-----------------------------------------------------------------------------
@@ -668,7 +670,7 @@ sub _validate_and_save_pager {
 
     my $pager;
     if ( $args_value ) {
-        $pager = defined $args_value ? $args_value : $EMPTY;
+        $pager = $args_value;
     }
     elsif ( $ENV{PERLCRITIC_PAGER} ) {
         $pager = $ENV{PERLCRITIC_PAGER};

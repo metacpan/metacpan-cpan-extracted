@@ -10,7 +10,7 @@ use Mojo::Util 'html_unescape';
 use Text::Wrap 'wrap';
 use Bible::Reference;
 
-our $VERSION = '2.04'; # VERSION
+our $VERSION = '2.05'; # VERSION
 
 has _load             => {};
 has indent_width      => 4;
@@ -117,6 +117,7 @@ sub _clean_html_to_obml ( $self, $html ) {
 
     # de-XML
     $obml =~ s|</?obml>||g;
+#    $obml =~ s|</p>| </p>|g;
     $obml =~ s|</?p>||g;
     $obml =~ s|</?woj>|\*|g;
     $obml =~ s|</?i>|\^|g;
@@ -151,6 +152,7 @@ sub _clean_html_to_obml ( $self, $html ) {
         } split( /\n/, $obml ) ) . "\n";
     }
     $obml =~ s|<br>||g;
+#    $obml =~ s|[ ]+$||mg;
 
     chomp $obml;
     return $obml;
@@ -334,7 +336,7 @@ Bible::OBML - Open Bible Markup Language parser and renderer
 
 =head1 VERSION
 
-version 2.04
+version 2.05
 
 =for markdown [![test](https://github.com/gryphonshafer/Bible-OBML/workflows/test/badge.svg)](https://github.com/gryphonshafer/Bible-OBML/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Bible-OBML/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Bible-OBML)

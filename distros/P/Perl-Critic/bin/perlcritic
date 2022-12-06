@@ -2,7 +2,7 @@
 
 package main;
 
-use 5.006001;
+use 5.010001;
 use strict;
 use warnings;
 
@@ -10,7 +10,7 @@ use Perl::Critic::Command qw< run >;
 
 #-----------------------------------------------------------------------------
 
-our $VERSION = '1.142';
+our $VERSION = '1.144';
 
 #-----------------------------------------------------------------------------
 # Begin program.  Don't run when loaded as a library

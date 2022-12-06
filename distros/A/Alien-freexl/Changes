@@ -1,5 +1,8 @@
 Revision history for Alien::freexl
 
+1.05 2022-12-06
+    - Skip cflags and libs tests on system installs
+
 1.04 2022-11-26
     - use https for downloads
 

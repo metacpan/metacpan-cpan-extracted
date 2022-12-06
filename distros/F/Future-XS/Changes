@@ -1,5 +1,12 @@
 Revision history for Future-XS
 
+0.07    2022-12-06
+        [BUGFIXES]
+         * Ensure that `$f->retain` on a completed Future::XS returns the
+           future and not undef (RT145168)
+         * Include the real stringified future SV in croak messages rather
+           than the placeholder `(SELF)` text
+
 0.06    2022-09-27
         [BUGFIXES]
          * Bugfixes for convergent constructors on pre-cancelled futures

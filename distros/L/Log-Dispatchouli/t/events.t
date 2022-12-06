@@ -1,6 +1,8 @@
 use strict;
 use warnings;
 
+use experimental 'postderef'; # Not dangerous.  Is accepted without changed.
+
 use utf8;
 
 use JSON::MaybeXS;

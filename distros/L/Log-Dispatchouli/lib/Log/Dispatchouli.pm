@@ -1,7 +1,9 @@
 use v5.20;
 use warnings;
-package Log::Dispatchouli 3.001;
+package Log::Dispatchouli 3.002;
 # ABSTRACT: a simple wrapper around Log::Dispatch
+
+use experimental 'postderef'; # Not dangerous.  Is accepted without changed.
 
 use Carp ();
 use File::Spec ();
@@ -860,7 +862,7 @@ Log::Dispatchouli - a simple wrapper around Log::Dispatch
 
 =head1 VERSION
 
-version 3.001
+version 3.002
 
 =head1 SYNOPSIS
 

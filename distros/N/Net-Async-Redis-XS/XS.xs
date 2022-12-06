@@ -41,7 +41,7 @@ AV *
 decode_buffer(SV *this, SV *p)
 PPCODE:
     /* Plain bytestring required: no magic, no UTF-8, no nonsense */
-    if(SvTYPE(p) != SVt_PV)
+    if(!SvPOK(p))
         croak("expected a string");
     if(SvUTF8(p))
         sv_utf8_downgrade(p, true);
@@ -180,47 +180,19 @@ PPCODE:
                     break;
                 }
                 case ',': { /* decimal floating-point */
-                    float n = 0;
-                    int negative = 0;
-                    if(*ptr == '-') {
-                        negative = 1;
-                        ++ptr;
+                    char *terminator = strchr(ptr, '\x0D');
+                    if(terminator == NULL) {
+                        goto end_parsing;
                     }
-                    if(*ptr == 'i' || *ptr == 'n') {
-                        if(!strncmp(ptr, "inf", 3)) {
-                            n = NV_INF;
-                        } else if(!strncmp(ptr, "nan", 3)) {
-                            n = NV_NAN;
-                        }
-                    } else {
-                        int fraction = 0;
-                        int digits = 0;
-                        while((*ptr == '.' || (*ptr >= '0' && *ptr <= '9')) && ptr < end) {
-                            if(*ptr == '.') {
-                                fraction = 1;
-                            } else {
-                                n = (n * 10) + (*ptr - '0');
-                                if(fraction) {
-                                    ++digits;
-                                }
-                            }
-                            ++ptr;
-                        }
-                        if(digits > 0) {
-                            n = n / pow(10, digits);
-                        }
-                    }
-                    if(negative) {
-                        n = -n;
-                    }
+                    SV *v = newSVnv(my_strtod(ptr, &terminator));
+                    ptr = terminator;
                     if(ptr + 2 > end) {
                         goto end_parsing;
                     }
                     if(ptr[0] != '\x0D' || ptr[1] != '\x0A') {
-                        croak("protocol violation - decimal numebr not followed by CRLF\n");
+                        croak("protocol violation - decimal number not followed by CRLF\n");
                     }
                     ptr += 2;
-                    SV *v = newSVnv(n);
                     if(ps) {
                         add_value(ps, v);
                     } else {

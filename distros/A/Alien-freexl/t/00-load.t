@@ -15,6 +15,7 @@ diag(
         $Alien::freexl::VERSION, $], $^X
     )
 );
+diag "Install type is " . Alien::freexl->install_type;
 
 done_testing();
 
