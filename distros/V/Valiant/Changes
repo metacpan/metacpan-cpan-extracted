@@ -1,5 +1,14 @@
 The following logs changes for the CPAN distribution Valiant
 
+0.001017 2022 December 6
+          - Lots of updates and additions to the example application.
+          - Lots of updates to the totally undocumented tag builder ;)
+          - Improvements to the DBIC value glue code, especially around adding and deleting
+            related models.
+          - Formbuilding bug fixes and documentation updates.
+          - Happy 16th anniversary of my Wife and Son arriving in the US.  It's been a crazy
+            ride and a fun one!  I hope the next 16 are as sweet.
+
 0.001016 2022 September 11
           - Distribution is no longer labled 'early access'.  This means I've used it on
             enough projects to feel there are no massive bugs / gotchas and that I'm pretty

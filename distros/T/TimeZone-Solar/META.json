@@ -41,9 +41,10 @@
             "autodie" : "0",
             "feature" : "0",
             "overload" : "0",
-            "perl" : "> v5.26.0",
+            "perl" : "> v5.20.0",
             "strict" : "0",
-            "utf8" : "0"
+            "utf8" : "0",
+            "warnings" : "0"
          }
       },
       "test" : {
@@ -51,8 +52,7 @@
             "DateTime" : "0",
             "IO::File" : "0",
             "Test::Exception" : "0",
-            "Test::More" : "0",
-            "warnings" : "0"
+            "Test::More" : "0"
          }
       }
    },
@@ -67,7 +67,7 @@
          "web" : "https://github.com/ikluft/LongitudeTZ"
       }
    },
-   "version" : "0.1.0",
+   "version" : "0.2.0",
    "x_generated_by_perl" : "v5.36.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"

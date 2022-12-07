@@ -13,7 +13,7 @@ use warnings;
 use parent qw( Plack::Middleware );
 
 use HTTP::Status qw/ HTTP_FORBIDDEN HTTP_TOO_MANY_REQUESTS /;
-use List::Util   1.39 qw/ pairs /;
+use List::Util   1.29 qw/ pairs /;
 use Module::Load qw/ load /;
 use Net::IP::Match::Trie;
 use Plack::Util;
@@ -21,7 +21,7 @@ use Plack::Util::Accessor qw/ default_rate rules cache file _match greylist retr
 use Ref::Util             qw/ is_plain_arrayref /;
 use Time::Seconds         qw/ ONE_MINUTE /;
 
-our $VERSION = 'v0.3.2';
+our $VERSION = 'v0.3.3';
 
 
 sub prepare_app {
@@ -81,8 +81,7 @@ sub prepare_app {
 
     for my $line ( pairs @blocks ) {
 
-        my $block = $line->key;
-        my $rule  = $line->value;
+        my ( $block, $rule ) = @{$line};
         $rule = [ split /\s+/, $rule ] unless is_plain_arrayref($rule);
 
         my ( $rate, $type ) = @{ $rule };
@@ -168,7 +167,7 @@ Plack::Middleware::Greylist - throttle requests with different rates based on ne
 
 =head1 VERSION
 
-version v0.3.2
+version v0.3.3
 
 =head1 SYNOPSIS
 
@@ -283,6 +282,14 @@ handle any overlapping or conflicting network ranges, or to specify exceptions f
 
 Some search engine robots may not respect HTTP 429 responses, and will treat these as errors. You may want to make an
 exception for trusted networks that gives them a higher rate than the default.
+
+This does not enforce consistent rates for named blocks. For example, if you specified
+
+    '10.0.0.0/16'    => [  60, 'named-group' ],
+    '172.16.0.0/16'  => [ 100, 'named-group' ],
+
+Requests from both netblocks would be counted together, but requests from 10./16 netblock would be rejected after 60
+requests. This is probably not something that you want.
 
 =head1 SOURCE
 

@@ -1,5 +1,8 @@
 Revision history for Geo-FIT
 
+1.04 [2022-12-06]
+    Added --version option to ./fit2tcx.pl script
+
 1.03 [2022-11-27]
     Updated to FIT 21.94 profile
         - changes based on fit-python-sdk Github repo

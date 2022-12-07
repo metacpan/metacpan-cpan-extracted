@@ -6,13 +6,14 @@
 **  or the GNU General Public License, as specified in the README file.
 */
 
-#include "CursesDef.h"
+#include "config.h"
 #include "c-config.h"
 #ifdef WIN32
   #include <Windows.h>
 #else
   #include <unistd.h>
 #endif
+#include "CursesDef.h"
 
 static void
 sleepSeconds(unsigned int seconds) {

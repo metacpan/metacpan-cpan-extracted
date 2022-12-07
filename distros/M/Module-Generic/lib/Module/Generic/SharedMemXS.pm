@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/SharedMemXS.pm
-## Version v0.1.2
+## Version v0.1.3
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 1970/01/01
-## Modified 2022/09/27
+## Modified 2022/11/18
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -109,7 +109,7 @@ EOT
             lock    => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
             'flock' => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
     );
-    our $VERSION = 'v0.1.2';
+    our $VERSION = 'v0.1.3';
 };
 
 use strict;
@@ -256,6 +256,10 @@ sub exists
             return(0);
         }
         return( $shm->id );
+    }
+    catch( $e where { /shmget[[:blank:]\h]+not[[:blank:]\h]+implemented/i } )
+    {
+        return( $self->error( "IPC SysV is supported, but somehow shmget is not implemented: $e" ) );
     }
     catch( $e )
     {
@@ -1282,7 +1286,7 @@ Module::Generic::SharedMemXS - Shared Memory Manipulation with XS API
 
 =head1 VERSION
 
-    v0.1.2
+    v0.1.3
 
 =head1 DESCRIPTION
 

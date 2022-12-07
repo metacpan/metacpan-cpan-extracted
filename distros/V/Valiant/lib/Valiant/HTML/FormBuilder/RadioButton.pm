@@ -5,6 +5,13 @@ extends 'Valiant::HTML::FormBuilder';
 
 has 'parent_builder' => (is=>'ro', required=>1);
 
+sub default_theme {
+  my $self = shift;
+  return $self->parent_builder->can('default_theme') ?
+    $self->parent_builder->default_theme :
+    +{};
+}
+
 sub text { 
   my $self = shift;
   return $self->tag_value_for_attribute($self->options->{label_method});
@@ -31,8 +38,21 @@ around 'radio_button', sub {
   $attrs = +{} unless defined($attrs);
   $attrs->{name} = $self->name;
   $attrs->{checked} = $self->checked;
+  $attrs->{id} = $self->tag_id_for_attribute($self->value);
+  $attrs = $self->merge_theme_field_opts(radio_button=>$attrs->{attribute}, $attrs);
 
-  return $self->$orig($self->value, $self->value, $attrs);
+  my $has_error = 0;
+  if(my $errors = $self->options->{errors}) {
+    foreach my $error(@$errors) {
+      $has_error = 1 if $error->bad_value eq $self->value;
+    }
+  }
+
+  my $errors_classes = exists($attrs->{errors_classes}) ? delete($attrs->{errors_classes}) : undef;
+  $attrs->{class} = join(' ', (grep { defined $_ } $attrs->{class}, $errors_classes))
+    if $errors_classes && $has_error;
+
+  return $self->$orig($self->options->{attribute}, $self->value, $attrs);
 };
 
 1;

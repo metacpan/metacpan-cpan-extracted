@@ -12,7 +12,7 @@ sub register :Chained(../unauth) CaptureArgs(0) ($self, $c, $user) {
 }
 
   sub create :Chained(register) Args(0) PathPart('') Verbs(GET, POST) ($self, $c, $user) {
-    $c->view('HTML::Register', registration => $c->model('RegistrationForm', model=>$user));
+    $c->view('HTML::Register', registration => $user);
   }
 
     sub POST :Action RequestModel(RegistrationRequest) ($self, $c, $request) {    

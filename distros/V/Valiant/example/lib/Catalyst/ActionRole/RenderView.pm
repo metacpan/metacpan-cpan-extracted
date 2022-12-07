@@ -35,45 +35,6 @@ around 'execute', sub {
   return @return;
 };
 
-## Will remove this monkey patch when Catalyst is updated
-sub Catalyst::Dispatcher::_invoke_as_component {
-  my ( $self, $c, $component_or_class, $method ) = @_;
-
-  my $component = $self->_find_component($c, $component_or_class);
-  my $component_class = blessed $component || return 0;
-
-  if (my $code = $component_class->can('action_for')) {
-      my $possible_action = $component->$code($method);
-      return $possible_action if $possible_action;
-  }
-
-  my $component_in_waiting = blessed($component_or_class) ?
-    $component_or_class : 
-      $component_class;
-
-  if ( my $code = $component_in_waiting->can($method) ) {
-      return $self->_method_action_class->new(
-          {
-              name      => $method,
-              code      => $code,
-              reverse   => "$component_class->$method",
-              class     => $component_in_waiting,
-              namespace => Catalyst::Utils::class2prefix(
-                  $component_class, ref($c)->config->{case_sensitive}
-              ),
-          }
-      );
-  }
-  else {
-      my $error =
-        qq/Couldn't forward to "$component_class". Does not implement "$method"/;
-      $c->error($error);
-      $c->log->debug($error)
-        if $c->debug;
-      return 0;
-  }
-}
-
 1;
 
 =head1 NAME

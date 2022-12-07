@@ -229,9 +229,10 @@ is( $n2->precision, 2, 'Precision' );
 is( $n2->currency, '€', 'Currency symbol' );
 isa_ok( $n2->currency, 'Module::Generic::Scalar', 'Returns property as string object' );
 
+diag( "Number to unformat is '$n'" ) if( $DEBUG );
 my $n3 = $n2->unformat( $n );
-# diag( "Unformatting \"$n\"." );
 isa_ok( $n3, 'Module::Generic::Number', 'Unformat result in new object using unformat()' );
+diag( "Error unformating $n: ", $n2->error ) if( !defined( $n3 ) && $DEBUG );
 is( $n3, 1281284, 'Unformat resulting value' );
 is( $n3->precision, 2, 'New object precision' );
 $dec_sep = '' if( !defined( $dec_sep ) );
@@ -341,6 +342,7 @@ is( $nan->max( 10 ), 10, 'NaN with max' );
 is( $nan * 10, 'NaN', 'NaN overloaded' );
 
 # diag( "Formatting as bytes '$n4'." );
+$n4->debug($DEBUG);
 is( $n4->format_bytes, "1${dec_sep}22M", 'Formatting as bytes' );
 # diag( "Current value is: $n4" );
 is( $n4->format_hex, '0x138D04', 'Formatting as hexadecimal -> 0x138D04' );

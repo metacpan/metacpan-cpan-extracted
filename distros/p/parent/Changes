@@ -1,3 +1,9 @@
+0.239 2022-12-06
+    . Harden against changes to require error messages. The '@INC contains'
+      may change in a future release of perl, this hardens the test to
+      not be sensitive to the exact words chosen. See:
+      https://github.com/Perl/perl5/pull/20547
+
 0.238 2020-02-07
     . Move the prerequisite Test::More from being a runtime prerequisite
       to a test time / build time prerequisite (PR #11, by Haarg)

@@ -9,11 +9,12 @@
 # pragmas to silence some warnings from Perl::Critic
 ## no critic (Modules::RequireExplicitPackage)
 # This solves a catch-22 where parts of Perl::Critic want both package and use-strict to be first
-use Modern::Perl qw(2018);
+use strict;
+use warnings;
 ## use critic (Modules::RequireExplicitPackage)
 
 package TimeZone::Solar;
-$TimeZone::Solar::VERSION = '0.1.0';
+$TimeZone::Solar::VERSION = '0.2.0';
 use utf8;
 use autodie;
 use overload
@@ -55,7 +56,15 @@ Readonly::Hash my %constants => (                                             # 
 # this must be before the BEGIN block which uses it
 sub _tz_subclass
 {
-    my $class = shift;
+    my ( $class, %opts ) = @_;
+
+    # for test coverage: if $opts{test_break_eval} is set, break the eval below
+    # under normal circumstances, %opts parameters should be omitted
+    my $result_cmd = (
+        ( exists $opts{test_break_eval} and $opts{test_break_eval} )
+        ? "croak 'break due to test_break_eval'"    # for testing we can force the eval to break
+        : "1"                                       # normally the class definition returns 1
+    );
 
     ## no critic (BuiltinFunctions::ProhibitStringyEval)
     my $class_check = 0;
@@ -68,7 +77,8 @@ sub _tz_subclass
             . $class
             . "::VERSION = \$"
             . __PACKAGE__
-            . "::VERSION;" . "1;" . "}";
+            . "::VERSION;"
+            . "$result_cmd; " . "}";
     };
     if ( not $class_check ) {
         croak __PACKAGE__ . "::_tz_subclass: unable to create class $class";
@@ -196,7 +206,7 @@ sub _tz_params_latitude
         croak __PACKAGE__ . "::_tz_params_latitude: latitude when provided must be in range -90..+90";
     }
 
-    # special case: use Solar+00 (equal to UTC) within 10° latitude of poles
+    # special case: use East00/Lon000E (equal to UTC) within 10° latitude of poles
     if ( abs( $param_ref->{latitude} ) >= $LIMIT_LATITUDE - $PRECISION_FP ) {
         my $use_lon_tz = ( exists $param_ref->{use_lon_tz} and $param_ref->{use_lon_tz} );
         $param_ref->{short_name} = $use_lon_tz ? "Lon000E" : "East00";
@@ -314,11 +324,11 @@ sub _tz_instance
         croak __PACKAGE__ . "::_tz_instance: received non-hash " . ( ref $hashref ) . " for object";
     }
     if ( not exists $hashref->{short_name} ) {
-        croak __PACKAGE__ . "::_tz_instance: name attribute missing";
+        croak __PACKAGE__ . "::_tz_instance: short_name attribute missing";
     }
     if ( $hashref->{short_name} !~ $TZSOLAR_ZONE_RE ) {
         croak __PACKAGE__
-            . "::_tz_instance: name attrbute "
+            . "::_tz_instance: short_name attrbute "
             . $hashref->{short_name}
             . " is not a valid Solar timezone";
     }
@@ -416,25 +426,17 @@ sub latitude
     return $self->{latitude};
 }
 
-# name: read/write accessor
+# name: read accessor
 sub name
 {
-    my @args = @_;
-    my $self = $args[0];
-    if ( scalar @args > 1 ) {
-        $self->{name} = $args[1];
-    }
+    my $self = shift;
     return $self->{name};
 }
 
-# short_name: read/write accessor
+# short_name: read accessor
 sub short_name
 {
-    my @args = @_;
-    my $self = $args[0];
-    if ( scalar @args > 1 ) {
-        $self->{short_name} = $args[1];
-    }
+    my $self = shift;
     return $self->{short_name};
 }
 
@@ -540,21 +542,9 @@ TimeZone::Solar - local solar timezone lookup and utilities including DateTime c
 
 =head1 VERSION
 
-version 0.1.0
+version 0.2.0
 
 =head1 SYNOPSIS
-
-Using TimeZone::Solar alone, with longitude and latitude:
-
-  use TimeZone::Solar;
-  use feature qw(say);
-
-  # example with latitude (location: SJC airport, San Jose, California)
-  my $solar_tz_lat = TimeZone::Solar->new( latitude => 37.363,
-    longitude => -121.929, use_lon_tz => 1 );
-  say $solar_tz_lat;
-
-This outputs "Solar/Lon122W -08:08" using a longitude-based time zone.
 
 Using TimeZone::Solar alone, with longitude only:
 
@@ -567,6 +557,18 @@ Using TimeZone::Solar alone, with longitude only:
     $solar_tz->offset_min );
 
 This outputs "Solar/West08 West08 -08:00 -480" using an hour-based time zone.
+
+Using TimeZone::Solar alone, with longitude and latitude:
+
+  use TimeZone::Solar;
+  use feature qw(say);
+
+  # example with latitude (location: SJC airport, San Jose, California)
+  my $solar_tz_lat = TimeZone::Solar->new( latitude => 37.363,
+    longitude => -121.929, use_lon_tz => 1 );
+  say $solar_tz_lat;
+
+This outputs "Solar/Lon122W -08:08" using a longitude-based time zone.
 
 Using TimeZone::Solar with DateTime:
 

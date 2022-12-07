@@ -13,7 +13,7 @@ package mb;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.51';
+$VERSION = '0.52';
 $VERSION = $VERSION;
 
 # internal use
@@ -99,6 +99,11 @@ sub import {
     else {
         set_script_encoding($system_encoding);
     }
+
+    # tie my %mb, __PACKAGE__; # makes: Parentheses missing around "my" list
+    no strict qw(refs);
+    tie my %mb, 'mb';
+    *{caller().'::mb'} = \%mb;
 
     # $^X($EXECUTABLE_NAME) for execute MBCS Perl script
     $mb::PERL = qq{$^X @{[__FILE__]}};
@@ -5260,6 +5265,26 @@ sub escape_to_hex {
 }
 
 #---------------------------------------------------------------------
+# compatible routines for %mb of UTF8::R2 module
+#
+# tie my %mb, 'mb';
+# $result = $_ =~ $mb{qr/$utf8regex/imsxo}
+# $result = $_ =~ m<\G$mb{qr/$utf8regex/imsxo}>gc
+# $result = $_ =~ s<$mb{qr/before/imsxo}><after>egr
+
+sub TIEHASH  { bless { }, $_[0] }
+sub FETCH    { $_[1] }
+sub STORE    { }
+sub FIRSTKEY { }
+sub NEXTKEY  { }
+sub EXISTS   { }
+sub DELETE   { }
+sub CLEAR    { }
+sub UNTIE    { }
+sub DESTROY  { }
+sub SCALAR   { }
+
+#---------------------------------------------------------------------
 
 1;
 
@@ -5409,11 +5434,11 @@ This software has the following features
 
 =item * does not change features of octet-oriented built-in functions
 
+=item * You have using mb::* subroutines if you want codepoint semantics
+
 =item * lc(), lcfirst(), uc(), and ucfirst() convert US-ASCII only
 
 =item * codepoint range by hyphen of tr/// and y/// support US-ASCII only
-
-=item * You have using mb::* subroutines if you want codepoint semantics
 
 =back
 
@@ -5798,37 +5823,37 @@ Traditional functions of Perl are useful still now in octet-oriented semantics.
 
   elder <<<---                                   age                                   --->>> younger
   ---------------------------------------------------------------------------------------------------
-  bare Perl4       JPerl4           use utf8;        UTF8::R2                mb.pm
-  bare Perl5       JPerl5           pragma           module                  modulino
+  bare Perl4       JPerl4           use utf8;        mb.pm                   use UTF8::R2 qw(*mb);   
+  bare Perl5       JPerl5           pragma           modulino                module                  
   ---------------------------------------------------------------------------------------------------
   chop             ---              ---              chop                    chop
   chr              chr              bytes::chr       chr                     chr
   getc             getc             ---              getc                    getc
   index            ---              bytes::index     index                   index
-  lc               ---              ---              CORE::lc                CORE::lc (acts as tr/\x41-\x5A/\x61-\x7A/)
-  lcfirst          ---              ---              CORE::lcfirst           CORE::lcfirst (acts as tr/\x41-\x5A/\x61-\x7A/)
+  lc               ---              ---              CORE::lc                CORE::lc (= tr/A-Z/a-z/)
+  lcfirst          ---              ---              CORE::lcfirst           CORE::lcfirst (= tr/A-Z/a-z/)
   length           length           bytes::length    length                  length
   ord              ord              bytes::ord       ord                     ord
   reverse          reverse          ---              reverse                 reverse
   rindex           ---              bytes::rindex    rindex                  rindex
   substr           substr           bytes::substr    substr                  substr
-  uc               ---              ---              CORE::uc                CORE::uc (acts as tr/\x61-\x7A/\x41-\x5A/)
-  ucfirst          ---              ---              CORE::ucfirst           CORE::ucfirst (acts as tr/\x61-\x7A/\x41-\x5A/)
-  ---              chop             chop             UTF8::R2::chop          mb::chop
-  ---              ---              chr              UTF8::R2::chr           mb::chr
-  ---              ---              getc             UTF8::R2::getc          mb::getc
-  ---              index            ---              UTF8::R2::index_byte    mb::index_byte
-  ---              ---              index            UTF8::R2::index         mb::index
-  ---              lc               ---              lc                      lc (also mb::lc)
-  ---              lcfirst          ---              lcfirst                 lcfirst (also mb::lcfirst)
-  ---              ---              length           UTF8::R2::length        mb::length
-  ---              ---              ord              UTF8::R2::ord           mb::ord
-  ---              ---              reverse          UTF8::R2::reverse       mb::reverse
-  ---              rindex           ---              UTF8::R2::rindex_byte   mb::rindex_byte
-  ---              ---              rindex           UTF8::R2::rindex        mb::rindex
-  ---              ---              substr           UTF8::R2::substr        mb::substr
-  ---              uc               ---              uc                      uc (also mb::uc)
-  ---              ucfirst          ---              ucfirst                 ucfirst (also mb::ucfirst)
+  uc               ---              ---              CORE::uc                CORE::uc (= tr/a-z/A-Z/)
+  ucfirst          ---              ---              CORE::ucfirst           CORE::ucfirst (= tr/a-z/A-Z/)
+  ---              chop             chop             mb::chop                mb::chop
+  ---              ---              chr              mb::chr                 mb::chr
+  ---              ---              getc             mb::getc                mb::getc
+  ---              index            ---              mb::index_byte          mb::index_byte
+  ---              ---              index            mb::index               mb::index
+  ---              lc               ---              lc                      lc (= mb::lc)
+  ---              lcfirst          ---              lcfirst                 lcfirst (= mb::lcfirst)
+  ---              ---              length           mb::length              mb::length
+  ---              ---              ord              mb::ord                 mb::ord
+  ---              ---              reverse          mb::reverse             mb::reverse
+  ---              rindex           ---              mb::rindex_byte         mb::rindex_byte
+  ---              ---              rindex           mb::rindex              mb::rindex
+  ---              ---              substr           mb::substr              mb::substr
+  ---              uc               ---              uc                      uc (= mb::uc)
+  ---              ucfirst          ---              ucfirst                 ucfirst (= mb::ucfirst)
   ---              ---              lc               (mb::Casing::lc)        (mb::Casing::lc)
   ---              ---              lcfirst          (mb::Casing::lcfirst)   (mb::Casing::lcfirst)
   ---              ---              uc               (mb::Casing::uc)        (mb::Casing::uc)
@@ -5839,15 +5864,15 @@ Traditional functions of Perl are useful still now in octet-oriented semantics.
   require 'file'   ---              require 'file'   require 'file'          require 'file'
   use Module       ---              use Module       use Module              use Module
   no Module        ---              no Module        no Module               no Module
-  ---              do 'file'        do 'file'        do 'file'               mb::do 'file'
-  ---              eval 'string'    eval 'string'    eval 'string'           mb::eval 'string'
-  ---              require 'file'   require 'file'   require 'file'          mb::require 'file'
-  ---              use Module       use Module       use Module              mb::use Module
-  ---              no Module        no Module        no Module               mb::no Module
+  ---              do 'file'        do 'file'        mb::do 'file'           mb::do 'file'
+  ---              eval 'string'    eval 'string'    mb::eval 'string'       mb::eval 'string'
+  ---              require 'file'   require 'file'   mb::require 'file'      mb::require 'file'
+  ---              use Module       use Module       mb::use Module          use Module
+  ---              no Module        no Module        mb::no Module           no Module
   $^X              ---              $^X              $^X                     $^X
-  ---              $^X              $^X              $^X                     $mb::PERL
-  $0               $0               $0               $0                      $mb::ORIG_PROGRAM_NAME
-  ---              ---              ---              ---                     $0
+  ---              $^X              $^X              $mb::PERL               $mb::PERL
+  $0               $0               $0               $mb::ORIG_PROGRAM_NAME  $mb::ORIG_PROGRAM_NAME
+  ---              ---              ---              $0                      $0
   ---------------------------------------------------------------------------------------------------
 
 DOS-like glob() as MBCS subroutine
@@ -6003,6 +6028,55 @@ When you need multibyte functionally, you need to use subroutines in the "mb" pa
   use Module qw(ARGUMENTS)  mb::use Module qw(ARGUMENTS)
   use Module ()             mb::use Module ()
   -----------------------------------------------------------------
+
+=head1 Porting from script with UTF8::R2 module
+
+=head2 Remove this line first
+
+  use UTF8::R2 qw( *mb );
+
+=head2 Use "mb::use" or "mb::no" to support modules in UTF-8
+
+Have to write like this
+
+  mb::use Any::UTF8::module qw(list);
+  mb::no  Any::UTF8::module qw(list);
+
+Instead of this
+
+  use Any::UTF8::module qw(list);
+  no  Any::UTF8::module qw(list);
+
+=head2 Use $mb::* variables to support modules in UTF-8
+
+Have to write like this
+
+  $mb::PERL
+  $mb::ORIG_PROGRAM_NAME
+
+Instead of this
+
+  $^X
+  $0
+
+=head1 Syntax Sugar of mb.pm modulino
+
+This software provides some syntax-sugars for easy learning.
+These "mb::" prefix are not required.
+
+"mb::split()" helps you to port scripts from UTF8::R2 environment.
+
+  -----------------------------------------------------------------------------
+  allowed sugar syntax                       sugarless syntax
+  -----------------------------------------------------------------------------
+  mb::do { block }                           do { block }
+  mb::eval { block }                         eval { block }
+  mb::lc                                     lc
+  mb::lcfirst                                lcfirst
+  mb::uc                                     uc
+  mb::ucfirst                                ucfirst
+  mb::split                                  split
+  -----------------------------------------------------------------------------
 
 =head1 What are DAMEMOJI?
 
@@ -6380,6 +6454,9 @@ This software automatically transpiles MBCS literal strings in scripts to octet-
   split qr'^'                                mb::_split qr{@{[qr'^'m ]}}
   split qr'MBCS-quotee'cgimosx               mb::_split qr{@{[mb::_ignorecase(qr'OO-quotee'mosx)]}}cg
   split qr'MBCS-quotee'cgmosx                mb::_split qr{@{[qr'OO-quotee'mosx ]}}cg
+  mb::split qr'^'                            mb::_split qr{@{[qr'^'m ]}}
+  mb::split qr'MBCS-quotee'cgimosx           mb::_split qr{@{[mb::_ignorecase(qr'OO-quotee'mosx)]}}cg
+  mb::split qr'MBCS-quotee'cgmosx            mb::_split qr{@{[qr'OO-quotee'mosx ]}}cg
   qq/MBCS-quotee/                            qq/OO-quotee/
   qq'MBCS-quotee'                            qq'OO-quotee'
   qx/MBCS-quotee/                            qx/OO-quotee/
@@ -6398,6 +6475,9 @@ This software automatically transpiles MBCS literal strings in scripts to octet-
   split qr/^/                                mb::_split qr{@{[qr/^/m ]}}
   split qr/MBCS-quotee/cgimosx               mb::_split qr{@{[mb::_ignorecase(qr/OO-quotee/mosx)]}}cg
   split qr/MBCS-quotee/cgmosx                mb::_split qr{@{[qr/OO-quotee/mosx ]}}cg
+  mb::split qr/^/                            mb::_split qr{@{[qr/^/m ]}}
+  mb::split qr/MBCS-quotee/cgimosx           mb::_split qr{@{[mb::_ignorecase(qr/OO-quotee/mosx)]}}cg
+  mb::split qr/MBCS-quotee/cgmosx            mb::_split qr{@{[qr/OO-quotee/mosx ]}}cg
   m:MBCS-quotee:cgimosx                      m{\G${mb::_anchor}@{[mb::_ignorecase(qr`OO-quotee`mosx)]}@{[mb::_m_passed()]}}cg
   m:MBCS-quotee:cgmosx                       m{\G${mb::_anchor}@{[qr`OO-quotee`mosx ]}@{[mb::_m_passed()]}}cg
   s:MBCS-regexp:MBCS-replacement:eegimosxr   s{(\G${mb::_anchor})@{[mb::_ignorecase(qr`OO-regexp`mosx)]}@{[mb::_s_passed()]}}{$1 . mb::eval mb::eval q:OO-replacement:}egr
@@ -6410,6 +6490,9 @@ This software automatically transpiles MBCS literal strings in scripts to octet-
   split qr:^:                                mb::_split qr{@{[qr`^`m ]}}
   split qr:MBCS-quotee:cgimosx               mb::_split qr{@{[mb::_ignorecase(qr`OO-quotee`mosx)]}}cg
   split qr:MBCS-quotee:cgmosx                mb::_split qr{@{[qr`OO-quotee`mosx ]}}cg
+  mb::split qr:^:                            mb::_split qr{@{[qr`^`m ]}}
+  mb::split qr:MBCS-quotee:cgimosx           mb::_split qr{@{[mb::_ignorecase(qr`OO-quotee`mosx)]}}cg
+  mb::split qr:MBCS-quotee:cgmosx            mb::_split qr{@{[qr`OO-quotee`mosx ]}}cg
   m@MBCS-quotee@cgimosx                      m{\G${mb::_anchor}@{[mb::_ignorecase(qr`OO-quotee`mosx)]}@{[mb::_m_passed()]}}cg
   m@MBCS-quotee@cgmosx                       m{\G${mb::_anchor}@{[qr`OO-quotee`mosx ]}@{[mb::_m_passed()]}}cg
   s@MBCS-regexp@MBCS-replacement@eegimosxr   s{(\G${mb::_anchor})@{[mb::_ignorecase(qr`OO-regexp`mosx)]}@{[mb::_s_passed()]}}{$1 . mb::eval mb::eval q@OO-replacement@}egr
@@ -6422,6 +6505,9 @@ This software automatically transpiles MBCS literal strings in scripts to octet-
   split qr@^@                                mb::_split qr{@{[qr`^`m ]}}
   split qr@MBCS-quotee@cgimosx               mb::_split qr{@{[mb::_ignorecase(qr`OO-quotee`mosx)]}}cg
   split qr@MBCS-quotee@cgmosx                mb::_split qr{@{[qr`OO-quotee`mosx ]}}cg
+  mb::split qr@^@                            mb::_split qr{@{[qr`^`m ]}}
+  mb::split qr@MBCS-quotee@cgimosx           mb::_split qr{@{[mb::_ignorecase(qr`OO-quotee`mosx)]}}cg
+  mb::split qr@MBCS-quotee@cgmosx            mb::_split qr{@{[qr`OO-quotee`mosx ]}}cg
   m#MBCS-quotee#cgimosx                      m{\G${mb::_anchor}@{[mb::_ignorecase(qr#OO-quotee#mosx)]}@{[mb::_m_passed()]}}cg
   m#MBCS-quotee#cgmosx                       m{\G${mb::_anchor}@{[qr#OO-quotee#mosx ]}@{[mb::_m_passed()]}}cg
   s#MBCS-regexp#MBCS-replacement#eegimosxr   s{(\G${mb::_anchor})@{[mb::_ignorecase(qr#OO-regexp#mosx)]}@{[mb::_s_passed()]}}{$1 . mb::eval mb::eval q#OO-replacement#}egr
@@ -6434,6 +6520,9 @@ This software automatically transpiles MBCS literal strings in scripts to octet-
   split qr#^#                                mb::_split qr{@{[qr#^#m ]}}
   split qr#MBCS-quotee#cgimosx               mb::_split qr{@{[mb::_ignorecase(qr#OO-quotee#mosx)]}}cg
   split qr#MBCS-quotee#cgmosx                mb::_split qr{@{[qr#OO-quotee#mosx ]}}cg
+  mb::split qr#^#                            mb::_split qr{@{[qr#^#m ]}}
+  mb::split qr#MBCS-quotee#cgimosx           mb::_split qr{@{[mb::_ignorecase(qr#OO-quotee#mosx)]}}cg
+  mb::split qr#MBCS-quotee#cgmosx            mb::_split qr{@{[qr#OO-quotee#mosx ]}}cg
   /[abc 123]/xx                              m{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[abc123])]})/xx ]}@{[mb::_m_passed()]}}
   m/[abc 123]/xx                             m{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[abc123])]})/xx ]}@{[mb::_m_passed()]}}
   qr/[abc 123]/xx                            qr{\G${mb::_anchor}@{[qr/(?:@{[mb::_cc(qq[abc123])]})/xx ]}@{[mb::_m_passed()]}}

@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.28.5
+## Version v0.29.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2022/10/30
+## Modified 2022/11/30
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -18,10 +18,18 @@ BEGIN
     use strict;
     use warnings;
     use warnings::register;
-    use vars qw( $MOD_PERL $AUTOLOAD $ERROR $PARAM_CHECKER_LOAD_ERROR $VERBOSE $DEBUG 
-                 $SILENT_AUTOLOAD $PARAM_CHECKER_LOADED $CALLER_LEVEL $COLOUR_NAME_TO_RGB 
-                 $true $false $DEBUG_LOG_IO %RE $stderr $stderr_raw $SERIALISER 
-                 $AUTOLOAD_SUBS $SUB_ATTR_LIST $DATA_POS $HAS_LOCAL_TZ );
+    use vars qw(
+    $MOD_PERL $AUTOLOAD $ERROR $PARAM_CHECKER_LOAD_ERROR $VERBOSE $DEBUG 
+    $SILENT_AUTOLOAD $PARAM_CHECKER_LOADED $CALLER_LEVEL $COLOUR_NAME_TO_RGB 
+    $true $false $DEBUG_LOG_IO %RE $stderr $stderr_raw $SERIALISER 
+    $AUTOLOAD_SUBS $SUB_ATTR_LIST $DATA_POS $HAS_LOCAL_TZ $VERSION_LAX_REGEX
+    $PARSE_DATE_FRACTIONAL1_RE $PARSE_DATE_WITH_MILI_SECONDS_RE $PARSE_DATE_HTTP_RE
+    $PARSE_DATE_NON_STDANDARD_RE $PARSE_DATE_ONLY_RE $PARSE_DATE_ONLY_US_SHORT_RE
+    $PARSE_DATE_ONLY_EU_SHORT_RE $PARSE_DATE_ONLY_US_LONG_RE $PARSE_DATE_ONLY_EU_LONG_RE
+    $PARSE_DATE_DOTTED_ONLY_EU_RE $PARSE_DATE_ROMAN_RE $PARSE_DATE_DIGITS_ONLY_RE
+    $PARSE_DATE_ONLY_JP_RE $PARSE_DATE_TIMESTAMP_RE $PARSE_DATETIME_RELATIVE_RE
+    $PARSE_DATES_ALL_RE $PARSE_DATE_NON_STDANDARD2_RE
+    );
     use Config;
     use Class::Load ();
     use Clone ();
@@ -43,7 +51,7 @@ BEGIN
     our @EXPORT      = qw( );
     our @EXPORT_OK   = qw( subclasses );
     our %EXPORT_TAGS = ();
-    our $VERSION     = 'v0.28.5';
+    our $VERSION     = 'v0.29.0';
     # local $^W;
     # mod_perl/2.0.10
     if( exists( $ENV{MOD_PERL} )
@@ -83,6 +91,16 @@ BEGIN
         (?: [[:blank:]\h]* : [[:blank:]\h]* | [[:blank:]\h]ss+ (?! :) )
         )*
     }x;
+    # From version::regex
+    $VERSION_LAX_REGEX = qr/(?^x: (?^x:
+        (?<has_v>v) (?<ver>(?^:[0-9]+) (?: (?^:\.[0-9]+)+ (?^:_[0-9]+)? )?)
+        |
+        (?<ver>(?^:[0-9]+)? (?^:\.[0-9]+){2,} (?^:_[0-9]+)?)
+    ) | (?^x: (?<ver>(?^:[0-9]+) (?: (?^:\.[0-9]+) | \. )? (?^:_[0-9]+)?)
+        |
+        (?<ver>(?^:\.[0-9]+) (?^:_[0-9]+)?)
+        )
+    )/;
     use constant COLOUR_OPEN  => '<';
     use constant COLOUR_CLOSE => '>';
     use constant HAS_THREADS  => ( $Config{useithreads} && $INC{'threads.pm'} );
@@ -770,7 +788,7 @@ EOT
             }
             elsif( exists( $opts->{io} ) )
             {
-                return( $self->error( "File handle provided ($opts->{io}) is not an actual file handle to get data to deserialise." ) ) if( Scalar::Util::reftype( $opts->{io} ) ne 'GLOB' );
+                return( $self->error( "File handle provided ($opts->{io}) is not an actual file handle to get data to deserialise." ) ) if( ( Scalar::Util::reftype( $opts->{io} ) // '' ) ne 'GLOB' );
                 if( defined( $base64 ) )
                 {
                     my $data = '';
@@ -1228,15 +1246,15 @@ sub init
                 {
                     if( ref( $data->{ $name } ) eq 'ARRAY' )
                     {
-                        return( $self->error( "$name parameter expects an array reference, but instead got '$val'." ) ) if( Scalar::Util::reftype( $val ) ne 'ARRAY' );
+                        return( $self->error( "$name parameter expects an array reference, but instead got '$val'." ) ) if( ( Scalar::Util::reftype( $val ) // '' ) ne 'ARRAY' );
                     }
                     elsif( ref( $data->{ $name } ) eq 'HASH' )
                     {
-                        return( $self->error( "$name parameter expects an hash reference, but instead got '$val'." ) ) if( Scalar::Util::reftype( $val ) ne 'HASH' );
+                        return( $self->error( "$name parameter expects an hash reference, but instead got '$val'." ) ) if( ( Scalar::Util::reftype( $val ) // '' ) ne 'HASH' );
                     }
                     elsif( ref( $data->{ $name } ) eq 'SCALAR' )
                     {
-                        return( $self->error( "$name parameter expects a scalar reference, but instead got '$val'." ) ) if( Scalar::Util::reftype( $val ) ne 'SCALAR' );
+                        return( $self->error( "$name parameter expects a scalar reference, but instead got '$val'." ) ) if( ( Scalar::Util::reftype( $val ) // '' ) ne 'SCALAR' );
                     }
                 }
             }
@@ -1722,6 +1740,30 @@ sub new_tempfile
     return( Module::Generic::File::tempfile( @_ ) );
 }
 
+sub new_version
+{
+    my $self = shift( @_ );
+    my $v = shift( @_ );
+    if( !defined( $v ) )
+    {
+        return( $self->error( "No version was provided." ) );
+    }
+    elsif( !CORE::length( "$v" ) )
+    {
+        return( $self->error( "Value provided, to create a version object, is empty." ) );
+    }
+    
+    try
+    {
+        my $vers = version->parse( "$v" );
+        return( $vers );
+    }
+    catch( $e )
+    {
+        return( $self->error( "Unable to create a version object from '$v': $e" ) );
+    }
+}
+
 sub noexec { $_[0]->{_msg_no_exec_sub} = 1; return( $_[0] ); }
 
 # Purpose is to get an error object thrown from, possibly another package, 
@@ -2023,7 +2065,7 @@ sub serialise
             }
             elsif( exists( $opts->{io} ) )
             {
-                return( $self->error( "File handle provided ($opts->{io}) is not an actual file handle to serialise data to." ) ) if( Scalar::Util::reftype( $opts->{io} ) ne 'GLOB' );
+                return( $self->error( "File handle provided ($opts->{io}) is not an actual file handle to serialise data to." ) ) if( ( Scalar::Util::reftype( $opts->{io} ) // '' ) ne 'GLOB' );
                 if( defined( $base64 ) )
                 {
                     my $serialised = &{"${class}\::freeze"}( $data );
@@ -2224,7 +2266,7 @@ sub _get_args_as_hash
             for( my $i = 0; $i < scalar( @$this ); $i++ )
             {
                 if( defined( $this->[$i] ) && $this->[$i] eq 'args_list' && 
-                    defined( $this->[$i+1] ) && Scalar::Util::reftype( $this->[$i+1] ) eq 'ARRAY' )
+                    defined( $this->[$i+1] ) && ( Scalar::Util::reftype( $this->[$i+1] ) // '' ) eq 'ARRAY' )
                 {
                     my $list = $this->[$i+1];
                     @$ok{ @$list } = (1) x scalar( @$list );
@@ -2271,8 +2313,8 @@ sub _get_args_as_hash
         $ref = shift( @_ );
         $order = $self->new_array( [sort( keys( %$ref ) )] ) if( $need_list );
     }
-    elsif( scalar( @_ ) == 1 && Scalar::Util::reftype( $_[0] ) eq 'ARRAY' ||
-           ( scalar( @_ ) == 3 && Scalar::Util::reftype( $_[0] ) eq 'ARRAY' && defined( $_[1] ) && $_[1] eq 'args_list' && defined( $_[2] ) && Scalar::Util::reftype( $_[2] ) eq 'ARRAY' ) )
+    elsif( scalar( @_ ) == 1 && ( Scalar::Util::reftype( $_[0] ) // '' ) eq 'ARRAY' ||
+           ( scalar( @_ ) == 3 && ( Scalar::Util::reftype( $_[0] ) // '' ) eq 'ARRAY' && defined( $_[1] ) && $_[1] eq 'args_list' && defined( $_[2] ) && ( Scalar::Util::reftype( $_[2] ) // '' ) eq 'ARRAY' ) )
     {
         if( @_ > 1 )
         {
@@ -2477,7 +2519,7 @@ sub _is_scalar
 {
     return(0) if( scalar( @_ < 2 ) );
     return(0) if( !defined( $_[1] ) );
-    return( Scalar::Util::reftype( $_[1] ) eq 'SCALAR' );
+    return( ( Scalar::Util::reftype( $_[1] ) // '' ) eq 'SCALAR' );
 }
 
 sub _is_uuid
@@ -2547,11 +2589,11 @@ sub _obj2h
         };
         return( bless( $hash => $class ) );
     }
-    elsif( Scalar::Util::reftype( $self ) eq 'HASH' )
+    elsif( ( Scalar::Util::reftype( $self ) // '' ) eq 'HASH' )
     {
         return( $self );
     }
-    elsif( Scalar::Util::reftype( $self ) eq 'GLOB' )
+    elsif( ( Scalar::Util::reftype( $self ) // '' ) eq 'GLOB' )
     {
         if( ref( *$self ) eq 'HASH' )
         {
@@ -2680,6 +2722,7 @@ sub _set_get_array_as_object : lvalue
     }
     if( !$data->{ $field } || !$self->_is_object( $data->{ $field } ) )
     {
+        require Module::Generic::Array;
         my $o = Module::Generic::Array->new( ( defined( $data->{ $field } ) && CORE::length( $data->{ $field } ) ) ? $data->{ $field } : [] );
         $data->{ $field } = $o;
     }
@@ -2728,7 +2771,7 @@ sub _set_get_boolean : lvalue
         {
             $data->{ $field } = $val;
         }
-        elsif( Scalar::Util::reftype( $val ) eq 'SCALAR' )
+        elsif( ( Scalar::Util::reftype( $val ) // '' ) eq 'SCALAR' )
         {
             $data->{ $field } = defined( $$val )
                 ? $$val
@@ -2859,8 +2902,6 @@ sub _set_get_code : lvalue
     my $has_arg = 0;
     my $arg;
     my $opts = {};
-    $opts->{undef_ok} //= 0;
-    $opts->{return_undef} //= 0;
     
     if( want( qw( LVALUE ASSIGN ) ) )
     {
@@ -2898,6 +2939,8 @@ sub _set_get_code : lvalue
             rreturn( $self->error( $error ) );
         }
     }
+    $opts->{undef_ok} //= 0;
+    $opts->{return_undef} //= 0;
     
     if( $has_arg )
     {
@@ -3013,7 +3056,7 @@ sub _set_get_glob : lvalue
     
     if( $has_arg )
     {
-        if( Scalar::Util::reftype( $arg ) ne 'GLOB' )
+        if( ( Scalar::Util::reftype( $arg ) // '' ) ne 'GLOB' )
         {
             my $error = "Method $field takes only a glob, but value provided ($arg) is not supported";
             if( $has_arg eq 'assign' )
@@ -3257,16 +3300,17 @@ sub _set_get_number : lvalue
     my $this  = $self->_obj2h;
     no overload;
     my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+    my $opts = {};
     
     my $callbacks = {};
     if( ref( $field ) eq 'HASH' )
     {
-        my $def = $field;
-        if( CORE::exists( $def->{field} ) && 
-            defined( $def->{field} ) && 
-            CORE::length( $def->{field} ) )
+        $opts = $field;
+        if( CORE::exists( $opts->{field} ) && 
+            defined( $opts->{field} ) && 
+            CORE::length( $opts->{field} ) )
         {
-            $field = $def->{field};
+            $field = $opts->{field};
         }
         else
         {
@@ -3280,8 +3324,9 @@ sub _set_get_number : lvalue
             return( $self->error( $error ) ) if( want( 'LVALUE' ) );
             rreturn( $self->error( $error ) );
         }
-        $callbacks = $def->{callbacks} if( CORE::exists( $def->{callbacks} ) && ref( $def->{callbacks} ) eq 'HASH' );
+        $callbacks = $opts->{callbacks} if( CORE::exists( $opts->{callbacks} ) && ref( $opts->{callbacks} ) eq 'HASH' );
     }
+    $opts->{undef_ok} //= 0;
     
     my $do_callback = sub
     {
@@ -3305,10 +3350,17 @@ sub _set_get_number : lvalue
     }
     else
     {
-        @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
+        @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) && !$opts->{undef_ok} );
         if( @_ )
         {
-            $data->{ $field } = Module::Generic::Number->new( shift( @_ ) );
+            if( !defined( $_[0] ) && $opts->{undef_ok} )
+            {
+                $data->{ $field } = shift( @_ );
+            }
+            else
+            {
+                $data->{ $field } = Module::Generic::Number->new( shift( @_ ) );
+            }
             $do_callback->();
         }
         
@@ -3316,7 +3368,8 @@ sub _set_get_number : lvalue
         {
             $data->{ $field } = Module::Generic::Number->new( $data->{ $field } );
         }
-        elsif( !CORE::length( $data->{ $field } ) && want( 'OBJECT' ) )
+        elsif( ( !defined( $data->{ $field } ) || !CORE::length( $data->{ $field } ) ) && 
+               want( 'OBJECT' ) )
         {
             require Module::Generic::Null;
             my $null = Module::Generic::Null->new( '', { debug => $this->{debug} });
@@ -4226,6 +4279,133 @@ sub _set_get_uuid : lvalue
     }
 }
 
+sub _set_get_version : lvalue
+{
+    my $self = shift( @_ );
+    my $field = shift( @_ );
+    my $this  = $self->_obj2h;
+    my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
+    my $has_arg = 0;
+    my $arg;
+    if( want( qw( LVALUE ASSIGN ) ) )
+    {
+        ( $arg ) = want( 'ASSIGN' );
+        $has_arg = 'assign';
+    }
+    else
+    {
+        if( @_ )
+        {
+            $arg = shift( @_ );
+            $has_arg++;
+        }
+    }
+    
+    my $version_class = 'version';
+    if( ref( $field ) eq 'HASH' )
+    {
+        my $def = $field;
+        $field = $def->{field} if( CORE::exists( $def->{field} ) && defined( $def->{field} ) && CORE::length( $def->{field} ) );
+        $version_class = $def->{class} if( CORE::exists( $def->{class} ) );
+    }
+    
+    $self->_load_class( $version_class ) || do
+    {
+        my $error = $self->error;
+        if( $has_arg eq 'assign' )
+        {
+            $self->error( $error );
+            my $dummy = 'dummy';
+            return( $dummy );
+        }
+        return( $self->error( $error ) ) if( want( 'LVALUE' ) );
+        rreturn( $self->error( $error ) );
+    };
+    
+    if( $has_arg )
+    {
+        my $v = $arg;
+        my $version;
+        # If the user wants to remove it
+        if( !defined( $v ) )
+        {
+            $data->{ $field } = $v;
+        }
+        elsif( $self->_is_a( $v => $version_class ) )
+        {
+            $version = $v;
+        }
+        # If the user provided a string, let's check it
+        elsif( length( $v ) )
+        {
+            my $error;
+            if( $v !~ /^$VERSION_LAX_REGEX$/ )
+            {
+                $error = "Value provided is not a valid version.";
+            }
+            else
+            {
+                try
+                {
+                    $version = $version_class->can( 'parse' ) ? $version_class->parse( "$v" ) : $version_class->new( "$v" );
+                }
+                catch( $e )
+                {
+                    $error = "Value provided is not a valid version: $e";
+                }
+            }
+            
+            if( defined( $error ) )
+            {
+                if( $has_arg eq 'assign' )
+                {
+                    $self->error( $error );
+                    my $dummy = 'dummy';
+                    return( $dummy );
+                }
+                return( $self->error( $error ) ) if( want( 'LVALUE' ) );
+                rreturn( $self->error( $error ) );
+            }
+        }
+        $data->{ $field } = $version;
+    }
+    
+    if( !CORE::defined( $data->{ $field } ) )
+    {
+        if( Want::want( 'OBJECT' ) )
+        {
+            # We might have need to specify, because I found a race condition where
+            # even though the context is object, once in Null, the context became 'code'
+            require Module::Generic::Null;
+            return( Module::Generic::Null->new( wants => 'OBJECT' ) ) if( want( 'LVALUE' ) );
+            rreturn( Module::Generic::Null->new( wants => 'OBJECT' ) );
+        }
+        else
+        {
+            return if( want( 'LVALUE' ) );
+            rreturn;
+        }
+    }
+    else
+    {
+        my $v = $data->{ $field };
+        if( CORE::length( "$v" ) &&
+            !$self->_is_a( $v => $version_class ) )
+        {
+            try
+            {
+                $v = $version_class->can( 'parse' ) ? $version_class->parse( "$v" ) : $version_class->new( "$v" );
+            }
+            catch( $e )
+            {
+                warn( "Value set for property '${field}' is not a valid version: $e\n" );
+            }
+        }
+        return( $v ) if( want( 'LVALUE' ) );
+        rreturn( $v );
+    }
+}
+
 sub _to_array_object
 {
     my $self = shift( @_ );
@@ -4416,7 +4596,14 @@ sub clone
     my $self  = shift( @_ );
     try
     {
-        return( Clone::clone( $self ) );
+        if( $self->_is_object( $self ) )
+        {
+            return( Clone::clone( $self ) );
+        }
+        else
+        {
+            return( $self->new );
+        }
     }
     catch( $e )
     {
@@ -5391,6 +5578,384 @@ EOT
     return( $class );
 }
 PERL
+    # NOTE: _get_datetime_regexp
+    _get_datetime_regexp => <<'PERL',
+sub _get_datetime_regexp
+{
+    my $self = shift( @_ );
+    my $elem = shift( @_ );
+    use utf8;
+    unless( defined( $PARSE_DATE_FRACTIONAL1_RE ) )
+    {
+        $PARSE_DATE_FRACTIONAL1_RE = qr/
+            (?<year>\d{4})
+            (?<d_sep>\D)
+            (?<month>\d{1,2})
+            \D
+            (?<day>\d{1,2})
+            (?<sep>[\s\t]+)
+            (?<hour>\d{1,2})
+            (?<t_sep>\D)
+            (?<minute>\d{1,2})
+            (?:\D(?<second>\d{1,2}))?
+            (?<tz>([+-])(\d{2})(\d{2}))
+        /x;
+    }
+    
+    # 2019-06-19 23:23:57.000000000+0900
+    # From PostgreSQL: 2019-06-20 11:02:36.306917+09
+    # From SQLite: 2019-06-20 02:03:14
+    # From MySQL: 2019-06-20 11:04:01
+    # ISO 8601: 2019-06-20T11:08:27
+    # ISO 8601: 2019-06-20T11:08:27Z
+    # 2022-11-17T08:12:31+0900
+    unless( defined( $PARSE_DATE_WITH_MILI_SECONDS_RE ) )
+    {
+        $PARSE_DATE_WITH_MILI_SECONDS_RE = qr/
+        (?<year>\d{4})
+        (?<d_sep>[-|\/])
+        (?<month>\d{1,2})
+        [-|\/]
+        (?<day>\d{1,2})
+        (?<sep>[[:blank:]]+|T)
+        (?:
+            (?<time>\d{1,2}:\d{1,2}:\d{1,2})
+            |
+            (?<time_short>\d{1,2}:\d{1,2})
+        )
+        (?:\.(?<milli>\d+))?
+        (?:
+            (?<tz>(?:\+|\-)(?:\d{2,4}|\d{2}:\d{2}))
+            |
+            (?<tz_utc>Z)
+        )?
+        /x;
+    }
+
+    # e.g. Sun, 06 Oct 2019 06:41:11 GMT
+    unless( defined( $PARSE_DATE_HTTP_RE ) )
+    {
+        $PARSE_DATE_HTTP_RE = qr/
+        (?:Mon|Tue|Wed|Thu|Fri|Sat|Sun)
+        ,[[:blank:]]+
+        (?<day>\d{2})
+        [[:blank:]]+
+        (?<month>Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)
+        [[:blank:]]+
+        (?<year>\d{4})
+        [[:blank:]]+
+        (?<hour>\d{2})
+        :
+        (?<minute>\d{2})
+        :
+        (?<second>\d{2})
+        [[:blank:]]+
+        GMT
+        /x;
+    }
+    
+    # 12 March 2001 17:07:30 JST
+    # 12-March-2001 17:07:30 JST
+    # 12/March/2001 17:07:30 JST
+    # 12 March 2001 17:07
+    # 12 March 2001 17:07 JST
+    # 12 March 2001 17:07:30+0900
+    # 12 March 2001 17:07:30 +0900
+    # Monday, 12 March 2001 17:07:30 JST
+    # Monday, 12 Mar 2001 17:07:30 JST
+    # 03/Feb/1994:00:00:00 0000
+    unless( defined( $PARSE_DATE_NON_STDANDARD_RE ) )
+    {
+        my $aliases = [qw( JST )];
+        if( $self->_load_class( 'DateTime::TimeZone::Catalog::Extend', { version => 'v0.2.0' } ) )
+        {
+            $aliases = DateTime::TimeZone::Catalog::Extend->aliases;
+        }
+        my $tz_aliases = join( '|', @$aliases );
+        
+        $PARSE_DATE_NON_STDANDARD_RE = qr/
+        (?:
+            (?:
+                (?<wd>Mon|Tue|Wed|Thu|Fri|Sat|Sun)
+                |
+                (?<wd_long>Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)
+            )
+            (?<wd_comma>\,)?(?<blank0>[[:blank:]]+)
+        )?
+        (?<day>\d{1,2})
+        (?<sep1>[[:blank:]]+|[-\/])
+        (?:
+            (?<month>Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)
+            |
+            (?<month_long>January|February|March|April|May|June|July|August|September|Octocber|November|December)
+        )
+        (?<sep2>[[:blank:]]+|[-\/])
+        (?<year>\d{2}|\d{4})
+        (?<blank1>[[:blank:]]+|\:)
+        (?<hour>\d{1,2})
+        :
+        (?<minute>\d{1,2})
+        (?:\:(?<second>\d{1,2}))?
+        (?<tz>
+            (?:
+                (?<blank2>[[:blank:]]*)
+                (?<tz1>[-+]?\d{2,4})
+            )
+            |
+            (?:
+                (?<blank2>[[:blank:]]+)
+                (?<tz2>$tz_aliases)
+            )
+        )?
+        /x;
+    }
+
+    # Fri Mar 25 12:18:36 2011
+    # Fri Mar 25 12:16:25 ADT 2011
+    # Fri Mar 25 2011
+    unless( defined( $PARSE_DATE_NON_STDANDARD2_RE ) )
+    {
+        my $aliases = [qw( JST )];
+        if( $self->_load_class( 'DateTime::TimeZone::Catalog::Extend', { version => 'v0.2.0' } ) )
+        {
+            $aliases = DateTime::TimeZone::Catalog::Extend->aliases;
+        }
+        my $tz_aliases = join( '|', @$aliases );
+        
+        $PARSE_DATE_NON_STDANDARD2_RE = qr/
+        (?:
+            (?<wd>Mon|Tue|Wed|Thu|Fri|Sat|Sun)
+            |
+            (?<wd_long>Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)
+        )
+        (?<blank1>[[:blank:]\h]+)
+        (?:
+            (?<month>Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)
+            |
+            (?<month_long>January|February|March|April|May|June|July|August|September|Octocber|November|December)
+        )
+        (?<blank2>[[:blank:]\h]+)
+        (?<day>\d{1,2})
+        (?<blank3>[[:blank:]\h]+)
+        (?:
+            (?<time>\d{1,2}:\d{1,2}:\d{1,2})
+            (?<blank4>[[:blank:]\h]+)
+            (?:
+                (?<tz>$tz_aliases)
+                (?<blank5>[[:blank:]\h]+)
+            )?
+        )?
+        (?<year>\d{4})
+        /x;
+    }
+    
+    # 2019-06-20
+    # 2019/06/20
+    # 2016.04.22
+    unless( defined( $PARSE_DATE_ONLY_RE ) )
+    {
+        $PARSE_DATE_ONLY_RE = qr/
+        (?<year>\d{4})
+        (?<d_sep>\D)
+        (?<month>\d{1,2})
+        \D
+        (?<day>\d{1,2})
+        /x;
+    }
+    
+    # 2014, Feb 17
+    unless( defined( $PARSE_DATE_ONLY_US_SHORT_RE ) )
+    {
+        $PARSE_DATE_ONLY_US_SHORT_RE = qr/
+            (?<year>\d{4})
+            ,(?<sep1>[[:blank:]\h]+)
+            (?<month>[a-zA-Z]{3,4})
+            (?<sep2>[[:blank:]\h]+)
+            (?<day>\d{1,2})
+        /x;
+    }
+    
+    # 17 Feb, 2014
+    unless( defined( $PARSE_DATE_ONLY_EU_SHORT_RE ) )
+    {
+        $PARSE_DATE_ONLY_EU_SHORT_RE = qr/
+            (?<day>\d{1,2})
+            (?<sep1>[[:blank:]\h]+)
+            (?<month>[a-zA-Z]{3,4})
+            ,(?<sep2>[[:blank:]\h]+)
+            (?<year>\d{4})
+        /x;
+    }
+    
+    # February 17, 2009
+    unless( defined( $PARSE_DATE_ONLY_US_LONG_RE ) )
+    {
+        $PARSE_DATE_ONLY_US_LONG_RE = qr/
+            (?<month>[a-zA-Z]{3,9})
+            (?<sep1>[[:blank:]\h]+)
+            (?<day>\d{1,2})
+            ,(?<sep2>[[:blank:]\h]+)
+            (?<year>\d{4})
+        /x;
+    }
+    
+    # 15 July 2021
+    unless( defined( $PARSE_DATE_ONLY_EU_LONG_RE ) )
+    {
+        $PARSE_DATE_ONLY_EU_LONG_RE = qr/
+            (?<day>\d{1,2})
+            (?<sep1>[[:blank:]\h]+)
+            (?<month>[a-zA-Z]{3,9})
+            (?<sep2>[[:blank:]\h]+)
+            (?<year>\d{4})
+        /x;
+    }
+    
+    # 22.04.2016
+    # 22-04-2016
+    # 17. 3. 2018.
+    unless( defined( $PARSE_DATE_DOTTED_ONLY_EU_RE ) )
+    {
+        $PARSE_DATE_DOTTED_ONLY_EU_RE = qr/
+            (?<day>\d{1,2})
+            (?<sep>\D)
+            (?<blank1>[[:blank:]\h]+)?
+            (?<month>\d{1,2})
+            \D
+            (?<blank2>[[:blank:]\h]+)?
+            (?<year>\d{4})
+            (?<trailing_dot>\.)?
+        /x;
+    }
+    
+    # 17.III.2020
+    # 17. III. 2018.
+    unless( defined( $PARSE_DATE_ROMAN_RE ) )
+    {
+        $PARSE_DATE_ROMAN_RE = qr/
+            (?<day>\d{1,2})
+            \.
+            (?<blank1>[[:blank:]\h]+)?
+            (?<month>XI{0,2}|I{0,3}|IV|VI{0,3}|IX)
+            \.
+            (?<blank2>[[:blank:]\h]+)?
+            (?<year>\d{4})
+            (?<trailing_dot>\.)?
+        /x;
+    }
+    
+    # 20030613
+    unless( defined( $PARSE_DATE_DIGITS_ONLY_RE ) )
+    {
+        $PARSE_DATE_DIGITS_ONLY_RE = qr/
+            (?<year>\d{4})
+            (?<month>\d{2})
+            (?<day>\d{2})
+        /x;
+    }
+    
+    # 2021年7月14日
+    # 令和3年7月14日
+    # 2021年7月14日18時7分10秒
+    # 2021年7月14日18時7分
+    # 令和3年7月14日18時7分10秒
+    # 令和3年7月14日18時7分
+    unless( defined( $PARSE_DATETIME_JP_RE ) )
+    {
+        $PARSE_DATETIME_JP_RE = qr/
+            (?<era>[\p{Han}]+)?
+            (?<year>\d{1,4})年
+            (?<month>\d{1,2})月
+            (?<day>\d{1,2})日
+            (?<time>
+                (?<hour>[\d]{1,2})(?<hour_suffix>時)?
+                (?:
+                    (?<hour_sep>|:|：)?(?<minute>[\d]{1,2})(?<minute_suffix>分)
+                    (?:
+                        (?<minute_sep>|:|：)?(?<second>[\d]{1,2})(?<second_suffix>秒)
+                    )?
+                )?
+            )?
+        /x;
+    }
+    
+    unless( defined( $PARSE_DATE_TIMESTAMP_RE ) )
+    {
+        $PARSE_DATE_TIMESTAMP_RE = qr/
+            (?<timestamp>\d{1,10})
+            (?:\.(?<milli>\d+))?
+        /x;
+    }
+    
+    unless( defined( $PARSE_DATETIME_RELATIVE_RE ) )
+    {
+        $PARSE_DATETIME_RELATIVE_RE = qr/
+            ([\+\-]?\d+)
+            ([YyMDdhms])?
+        /x;
+    }
+    
+    unless( defined( $PARSE_DATES_ALL_RE ) )
+    {
+        $PARSE_DATES_ALL_RE = qr/
+        (?<parse_datetime>
+            $PARSE_DATE_FRACTIONAL1_RE
+            |
+            $PARSE_DATE_WITH_MILI_SECONDS_RE
+            |
+            $PARSE_DATE_HTTP_RE
+            |
+            $PARSE_DATE_NON_STDANDARD_RE
+            |
+            $PARSE_DATE_NON_STDANDARD2_RE
+            |
+            $PARSE_DATE_ONLY_RE
+            |
+            $PARSE_DATE_ONLY_US_SHORT_RE
+            |
+            $PARSE_DATE_ONLY_EU_SHORT_RE
+            |
+            $PARSE_DATE_ONLY_US_LONG_RE
+            |
+            $PARSE_DATE_ONLY_EU_LONG_RE
+            |
+            $PARSE_DATE_DOTTED_ONLY_EU_RE
+            |
+            $PARSE_DATE_ROMAN_RE
+            |
+            $PARSE_DATE_DIGITS_ONLY_RE
+            |
+            $PARSE_DATETIME_JP_RE
+            |
+            $PARSE_DATE_TIMESTAMP_RE
+            |
+            $PARSE_DATETIME_RELATIVE_RE
+        )
+        /x;
+    }
+    my $def = 
+    {
+        incomplete => $PARSE_DATE_FRACTIONAL1_RE,
+        iso8601 => $PARSE_DATE_WITH_MILI_SECONDS_RE,
+        http => $PARSE_DATE_HTTP_RE,
+        non_standard => $PARSE_DATE_NON_STDANDARD_RE,
+        non_standard2 => $PARSE_DATE_NON_STDANDARD2_RE,
+        date_only => $PARSE_DATE_ONLY_RE,
+        us_short => $PARSE_DATE_ONLY_US_SHORT_RE,
+        eu_short => $PARSE_DATE_ONLY_EU_SHORT_RE,
+        us_long => $PARSE_DATE_ONLY_US_LONG_RE,
+        eu_long => $PARSE_DATE_ONLY_EU_LONG_RE,
+        date_only_eu => $PARSE_DATE_DOTTED_ONLY_EU_RE,
+        date_roman => $PARSE_DATE_ROMAN_RE,
+        date_digits => $PARSE_DATE_DIGITS_ONLY_RE,
+        japan => $PARSE_DATETIME_JP_RE,
+        unix => $PARSE_DATE_TIMESTAMP_RE,
+        relative => $PARSE_DATETIME_RELATIVE_RE,
+        all => $PARSE_DATES_ALL_RE,
+    };
+    return( ( CORE::defined( $elem ) && CORE::exists( $def->{ $elem } ) ) ? $def->{ $elem } : $def );
+}
+PERL
     # NOTE: _has_base64()
     _has_base64 => <<'PERL',
 sub _has_base64
@@ -5599,10 +6164,13 @@ sub _parse_timestamp
     my $str  = shift( @_ );
     # No value was actually provided
     return if( !length( $str ) );
+    my $params = $self->_get_args_as_hash( @_ );
     $str = "$str";
     my $this = $self->_obj2h;
     my $class = ref( $self ) || $self;
-    require DateTime::Format::Strptime;
+    # Load the regular expressions
+    $self->_get_datetime_regexp;
+    $self->_load_class( 'DateTime::Format::Strptime' ) || return( $self->pass_error );
     my $tz;
     # DateTime::TimeZone::Local will die ungracefully if the local timezeon is not set with the error:
     # "Cannot determine local time zone"
@@ -5610,7 +6178,7 @@ sub _parse_timestamp
     {
         try
         {
-            require DateTime::TimeZone;
+            $self->_load_class( 'DateTime::TimeZone' ) || return( $self->pass_error );
             $tz = DateTime::TimeZone->new( name => 'local' );
             $HAS_LOCAL_TZ = 1;
         }
@@ -5620,12 +6188,26 @@ sub _parse_timestamp
             $HAS_LOCAL_TZ = 0;
             warn( "Your system is missing key timezone components. ${class}::_parse_timestamp is reverting to UTC instead of local time zone.\n" );
         }
+        
+        try
+        {
+            if( CORE::exists( $params->{tz} ) && CORE::defined( $params->{tz} ) && $params->{tz} )
+            {
+                $tz = DateTime::TimeZone->new( name => "$params->{tz}" );
+            }
+        }
+        catch( $e )
+        {
+            warn( "Failed setting the specified time zone $params->{tz}: $e\n" ) if( $self->_warnings_is_enabled );
+        }
     }
     else
     {
         try
         {
-            $tz = DateTime::TimeZone->new( name => ( $HAS_LOCAL_TZ ? 'local' : 'UTC' ) );
+            $tz = ( CORE::exists( $params->{tz} ) && CORE::defined( $params->{tz} ) && $params->{tz} )
+                ? DateTime::TimeZone->new( name => "$params->{tz}" )
+                : DateTime::TimeZone->new( name => ( $HAS_LOCAL_TZ ? 'local' : 'UTC' ) );
         }
         catch( $e )
         {
@@ -5702,7 +6284,8 @@ sub _parse_timestamp
     # GNU PO file
     # 2019-10-03 19-44+0000
     # 2019-10-03 19:44:01+0000
-    if( $str =~ /^(?<year>\d{4})(?<d_sep>\D)(?<month>\d{1,2})\D(?<day>\d{1,2})(?<sep>[\s\t]+)(?<hour>\d{1,2})(?<t_sep>\D)(?<minute>\d{1,2})(?:\D(?<second>\d{1,2}))?(?<tz>([+-])(\d{2})(\d{2}))$/ )
+    # if( $str =~ /^(?<year>\d{4})(?<d_sep>\D)(?<month>\d{1,2})\D(?<day>\d{1,2})(?<sep>[\s\t]+)(?<hour>\d{1,2})(?<t_sep>\D)(?<minute>\d{1,2})(?:\D(?<second>\d{1,2}))?(?<tz>([+-])(\d{2})(\d{2}))$/ )
+    if( $str =~ /^$PARSE_DATE_FRACTIONAL1_RE$/x )
     {
         my $re = { %+ };
         $fmt->{pattern} = join( $re->{d_sep}, qw( %Y %m %d ) ) . $re->{sep} . join( $re->{t_sep}, qw( %H %M ) );
@@ -5718,11 +6301,12 @@ sub _parse_timestamp
     # 2019-06-19 23:23:57.000000000+0900
     # From PostgreSQL: 2019-06-20 11:02:36.306917+09
     # ISO 8601: 2019-06-20T11:08:27
-    elsif( $str =~ /^(?<year>\d{4})(?<d_sep>[-|\/])(?<month>\d{1,2})[-|\/](?<day>\d{1,2})(?<sep>[[:blank:]]+|T)(?<time>\d{1,2}:\d{1,2}:\d{1,2})(?:\.(?<milli>\d+))?(?<tz>(?:\+|\-)\d{2,4})?$/ )
+    # elsif( $str =~ /^(?<year>\d{4})(?<d_sep>[-|\/])(?<month>\d{1,2})[-|\/](?<day>\d{1,2})(?<sep>[[:blank:]]+|T)(?<time>\d{1,2}:\d{1,2}:\d{1,2})(?:\.(?<milli>\d+))?(?<tz>(?:\+|\-)\d{2,4})?$/ )
+    elsif( $str =~ /^$PARSE_DATE_WITH_MILI_SECONDS_RE$/x )
     {
         my $re = { %+ };
-        $opt->{pattern} = join( $re->{d_sep}, qw( %Y %m %d ) ) . $re->{sep} . '%T';
-        $str = join( $re->{d_sep}, @$re{qw( year month day )} ) . $re->{sep} . $re->{time};
+        $opt->{pattern} = join( $re->{d_sep}, qw( %Y %m %d ) ) . $re->{sep} . ( defined( $re->{time_short} ) ? '%H:%M' : '%T' );
+        $str = join( $re->{d_sep}, @$re{qw( year month day )} ) . $re->{sep} . ( defined( $re->{time_short} ) ? $re->{time_short} : $re->{time} );
         if( length( $re->{milli} ) )
         {
             $opt->{pattern} .= '.%' . length( $re->{milli} ) . 'N';
@@ -5737,6 +6321,13 @@ sub _parse_timestamp
             $str .= $re->{tz};
             $fmt->{pattern} .= '%z';
             $fmt->{time_zone} = $opt->{time_zone} = $re->{tz};
+        }
+        elsif( length( $re->{tz_utc} // '' ) )
+        {
+            $str .= $re->{tz_utc};
+            $opt->{pattern} .= 'Z';
+            $fmt->{pattern} .= 'Z';
+            $fmt->{time_zone} = $opt->{time_zone} = 'UTC';
         }
     }
     # From SQLite: 2019-06-20 02:03:14
@@ -5757,7 +6348,8 @@ sub _parse_timestamp
         $opt->{pattern} .= '%z';
     }
     # e.g. Sun, 06 Oct 2019 06:41:11 GMT
-    elsif( $str =~ /^(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun),[[:blank:]]+(?<day>\d{2})[[:blank:]]+(?<month>Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[[:blank:]]+(?<year>\d{4})[[:blank:]]+(?<hour>\d{2}):(?<minute>\d{2}):(?<second>\d{2})[[:blank:]]+GMT$/ )
+    # elsif( $str =~ /^(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun),[[:blank:]]+(?<day>\d{2})[[:blank:]]+(?<month>Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[[:blank:]]+(?<year>\d{4})[[:blank:]]+(?<hour>\d{2}):(?<minute>\d{2}):(?<second>\d{2})[[:blank:]]+GMT$/ )
+    elsif( $str =~ /^$PARSE_DATE_HTTP_RE$/x )
     {
         my $re = { %+ };
         $opt->{pattern} = $fmt->{pattern} = q{%a, %d %b %Y %T GMT};
@@ -5773,46 +6365,15 @@ sub _parse_timestamp
     # Monday, 12 March 2001 17:07:30 JST
     # Monday, 12 Mar 2001 17:07:30 JST
     # 03/Feb/1994:00:00:00 0000
-    elsif( $str =~ /^
-        (?:
-            (?:
-                (?<wd>Mon|Tue|Wed|Thu|Fri|Sat|Sun)
-                |
-                (?<wd_long>Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)
-            )
-            (?<wd_comma>\,)?(?<blank0>[[:blank:]]+)
-        )?
-        (?<day>\d{1,2})
-        (?<sep1>[[:blank:]]+|[-\/])
-        (?:
-            (?<month>Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)
-            |
-            (?<month_long>January|February|March|April|May|June|July|August|September|Octocber|November|December)
-        )
-        (?<sep2>[[:blank:]]+|[-\/])
-        (?<year>\d{2}|\d{4})
-        (?<blank1>[[:blank:]]+)
-        (?<hour>\d{1,2})
-        :
-        (?<minute>\d{1,2})
-        (?:\:(?<second>\d{1,2}))?
-        (?<tz>
-            (?:
-                (?<blank2>[[:blank:]]*)
-                (?<tz1>[-+]?\d{2,4})
-            )
-            |
-            (?:
-                (?<blank2>[[:blank:]]+)
-                (?<tz2>(?![APap][Mm]\b)[A-Za-z]+)
-            )
-        )?$/x )
+    elsif( $str =~ /^$PARSE_DATE_NON_STDANDARD_RE$/x )
     {
         my $re = { %+ };
         my @buff = ();
+        my @buff_fmt = ();
         if( $re->{wd} || $re->{wd_long} )
         {
-            push( @buff, ( $re->{wd} || $re->{wd_long} ) );
+            # push( @buff, ( $re->{wd} || $re->{wd_long} ) );
+            push( @buff, ( defined( $re->{wd} ) ? '%a' : '%A' ) );
             push( @buff, ',' ) if( $re->{wd_comma} );
             push( @buff, $re->{blank0} );
         }
@@ -5831,41 +6392,136 @@ sub _parse_timestamp
             push( @buff, '%H:%M' );
         }
         
-        if( length( $re->{tz} ) )
+        push( @buff_fmt, @buff );
+        if( CORE::defined( $re->{tz} ) || CORE::defined( $re->{tz2} ) )
         {
-            push( @buff, ( length( $re->{tz1} ) ? ( ( $re->{blank2} // '' ) . $re->{tz1} ) : ( $re->{blank2} . $re->{tz2} ) ) );
+            if( CORE::defined( $re->{tz1} ) && length( $re->{tz1} ) )
+            {
+                my $tz_sign = substr( $re->{tz1}, 0, 1 );
+                if( $tz_sign eq '+' || $tz_sign eq '-' )
+                {
+#                     my( $blank, $tzval ) = @$re{qw( blank2 tz1 )};
+#                     $str =~ s/\Q$re->{blank2}$re->{tz1}\E$/$re->{blank2}\+$re->{tz1}/;
+                    push( @buff, ( $re->{blank2} // '' ) . '%z' );
+                    push( @buff_fmt, ( $re->{blank2} // '' ) . '%z' );
+                    CORE::delete( $fmt->{time_zone} );
+                    CORE::delete( $opt->{time_zone} );
+                }
+                else
+                {
+                    push( @buff_fmt, $re->{blank2} . $re->{tz1} );
+                }
+            }
+            elsif( CORE::defined( $re->{tz2} ) && length( $re->{tz2} ) )
+            {
+                $self->_load_class( 'DateTime::TimeZone::Catalog::Extend' ) ||
+                    warn( "Warning only: could not load module DateTime::TimeZone::Catalog::Extend: ", $self->error, "\n" ) if( $self->_warnings_is_enabled );
+                my $map = DateTime::TimeZone::Catalog::Extend->zone_map;
+                $opt->{zone_map} = $map;
+                try
+                {
+                    $tz = DateTime::TimeZone->new( name => $re->{tz2} );
+                }
+                catch( $e )
+                {
+                    warn( "Warning only: error trying to set the time zone object using '$re->{tz2}': $e\n" ) if( $self->_warnings_is_enabled );
+                }
+                push( @buff, ( $re->{blank2} // '' ) . '%O' );
+                push( @buff_fmt, ( $re->{blank2} // '' ) . $re->{tz2} );
+                $opt->{time_zone} = $fmt->{time_zone} = $tz->name;
+            }
+#             push( @buff, (
+#                 ( CORE::defined( $re->{tz1} ) && length( $re->{tz1} ) )
+#                     ? ( ( $re->{blank2} // '' ) . '%z' )
+#                     : ( CORE::defined( $re->{tz2} ) && length( $re->{tz2} ) )
+#                         ? ( $re->{blank2} . '%Z' )
+#                         : ()
+#             ) );
         }
-        $opt->{pattern} = $fmt->{pattern} = join( '', @buff );
+        $opt->{pattern} = join( '', @buff );
+        $fmt->{pattern} = join( '', @buff_fmt );
+    }
+    # Fri Mar 25 12:18:36 2011
+    # Fri Mar 25 12:16:25 ADT 2011
+    # Fri Mar 25 2011
+    elsif( $str =~ /^$PARSE_DATE_NON_STDANDARD2_RE$/x )
+    {
+        my $re = { %+ };
+        my @buff = ();
+        my @buff_fmt = ();
+        if( $re->{wd} || $re->{wd_long} )
+        {
+            push( @buff, ( defined( $re->{wd} ) ? '%a' : '%A' ) );
+            push( @buff, ',' ) if( $re->{wd_comma} );
+            push( @buff, $re->{blank1} );
+        }
+        push( @buff, ( $re->{month} ? '%b' : '%B' ) );
+        push( @buff, $re->{blank2} );
+        push( @buff, length( $re->{day} ) > 1 ? '%d' : '%e' );
+        push( @buff, $re->{blank3} );
+        if( defined( $re->{time} ) )
+        {
+            push( @buff, '%T' );
+            push( @buff, $re->{blank4} );
+        }
+        push( @buff_fmt, @buff );
+        if( length( $re->{tz} // '' ) )
+        {
+            $self->_load_class( 'DateTime::TimeZone::Catalog::Extend' ) ||
+                warn( "Warning only: could not load module DateTime::TimeZone::Catalog::Extend: ", $self->error, "\n" ) if( $self->_warnings_is_enabled );
+            my $map = DateTime::TimeZone::Catalog::Extend->zone_map;
+            $opt->{zone_map} = $map;
+            try
+            {
+                $tz = DateTime::TimeZone->new( name => $re->{tz} );
+            }
+            catch( $e )
+            {
+                warn( "Warning only: error trying to set the time zone object using '$re->{tz}': $e\n" ) if( $self->_warnings_is_enabled );
+            }
+            push( @buff, '%O' . ( $re->{blank5} // '' ) );
+            push( @buff_fmt, $re->{tz} . ( $re->{blank5} // '' ) );
+            $opt->{time_zone} = $fmt->{time_zone} = $tz->name;
+        }
+        push( @buff, length( $re->{year} ) == 2 ? '%y' : '%Y' );
+        push( @buff_fmt, length( $re->{year} ) == 2 ? '%y' : '%Y' );
+        $opt->{pattern} = join( '', @buff );
+        $fmt->{pattern} = join( '', @buff_fmt );
     }
     # 2019-06-20
     # 2019/06/20
     # 2016.04.22
-    elsif( $str =~ /^(?<year>\d{4})(?<d_sep>\D)(?<month>\d{1,2})\D(?<day>\d{1,2})$/ )
+    # elsif( $str =~ /^(?<year>\d{4})(?<d_sep>\D)(?<month>\d{1,2})\D(?<day>\d{1,2})$/ )
+    elsif( $str =~ /^$PARSE_DATE_ONLY_RE$/x )
     {
         my $re = { %+ };
         $str = join( $re->{d_sep}, @$re{qw( year month day )} );
         $opt->{pattern} = $fmt->{pattern} = join( $re->{d_sep}, qw( %Y %m %d ) );
     }
     # 2014, Feb 17
-    elsif( $str =~ /^(?<year>\d{4}),(?<sep1>[[:blank:]\h]+)(?<month>[a-zA-Z]{3,4})(?<sep2>[[:blank:]\h]+)(?<day>\d{1,2})$/ )
+    # elsif( $str =~ /^(?<year>\d{4}),(?<sep1>[[:blank:]\h]+)(?<month>[a-zA-Z]{3,4})(?<sep2>[[:blank:]\h]+)(?<day>\d{1,2})$/ )
+    elsif( $str =~ /^$PARSE_DATE_ONLY_US_SHORT_RE$/x )
     {
         my $re = { %+ };
         $opt->{pattern} = $fmt->{pattern} = '%Y,' . $re->{sep1} . '%b' . $re->{sep2} . '%d';
     }
     # 17 Feb, 2014
-    elsif( $str =~ /^(?<day>\d{1,2})(?<sep1>[[:blank:]\h]+)(?<month>[a-zA-Z]{3,4}),(?<sep2>[[:blank:]\h]+)(?<year>\d{4})$/ )
+    # elsif( $str =~ /^(?<day>\d{1,2})(?<sep1>[[:blank:]\h]+)(?<month>[a-zA-Z]{3,4}),(?<sep2>[[:blank:]\h]+)(?<year>\d{4})$/ )
+    elsif( $str =~ /^$PARSE_DATE_ONLY_EU_SHORT_RE$/x )
     {
         my $re = { %+ };
         $opt->{pattern} = $fmt->{pattern} = '%d' . $re->{sep1} . '%b,' . $re->{sep2} . '%Y';
     }
     # February 17, 2009
-    elsif( $str =~ /^(?<month>[a-zA-Z]{3,9})(?<sep1>[[:blank:]\h]+)(?<day>\d{1,2}),(?<sep2>[[:blank:]\h]+)(?<year>\d{4})$/ )
+    # elsif( $str =~ /^(?<month>[a-zA-Z]{3,9})(?<sep1>[[:blank:]\h]+)(?<day>\d{1,2}),(?<sep2>[[:blank:]\h]+)(?<year>\d{4})$/ )
+    elsif( $str =~ /^$PARSE_DATE_ONLY_US_LONG_RE$/x )
     {
         my $re = { %+ };
         $opt->{pattern} = $fmt->{pattern} = '%B' . $re->{sep1} . '%d,' . $re->{sep2} . '%Y';
     }
     # 15 July 2021
-    elsif( $str =~ /^(?<day>\d{1,2})(?<sep1>[[:blank:]\h]+)(?<month>[a-zA-Z]{3,9})(?<sep2>[[:blank:]\h]+)(?<year>\d{4})$/ )
+    # elsif( $str =~ /^(?<day>\d{1,2})(?<sep1>[[:blank:]\h]+)(?<month>[a-zA-Z]{3,9})(?<sep2>[[:blank:]\h]+)(?<year>\d{4})$/ )
+    elsif( $str =~ /^$PARSE_DATE_ONLY_EU_LONG_RE$/x )
     {
         my $re = { %+ };
         $opt->{pattern} = $fmt->{pattern} = '%d' . $re->{sep1} . '%B' . $re->{sep2} . '%Y';
@@ -5873,7 +6529,8 @@ sub _parse_timestamp
     # 22.04.2016
     # 22-04-2016
     # 17. 3. 2018.
-    elsif( $str =~ /^(?<day>\d{1,2})(?<sep>\D)(?<blank1>[[:blank:]\h]+)?(?<month>\d{1,2})\D(?<blank2>[[:blank:]\h]+)?(?<year>\d{4})(?<trailing_dot>\.)?$/ )
+    # elsif( $str =~ /^(?<day>\d{1,2})(?<sep>\D)(?<blank1>[[:blank:]\h]+)?(?<month>\d{1,2})\D(?<blank2>[[:blank:]\h]+)?(?<year>\d{4})(?<trailing_dot>\.)?$/ )
+    elsif( $str =~ /^$PARSE_DATE_DOTTED_ONLY_EU_RE$/x )
     {
         my $re = { %+ };
         # $opt->{pattern} = $fmt->{pattern} = join( $re->{sep}, qw( %d %m %Y ) );
@@ -5913,7 +6570,8 @@ sub _parse_timestamp
     }
     # 17.III.2020
     # 17. III. 2018.
-    elsif( $str =~ /^(?<day>\d{1,2})\.(?<blank1>[[:blank:]\h]+)?(?<month>XI{0,2}|I{0,3}|IV|VI{0,3}|IX)\.(?<blank2>[[:blank:]\h]+)?(?<year>\d{4})(?<trailing_dot>\.)?$/i )
+    # elsif( $str =~ /^(?<day>\d{1,2})\.(?<blank1>[[:blank:]\h]+)?(?<month>XI{0,2}|I{0,3}|IV|VI{0,3}|IX)\.(?<blank2>[[:blank:]\h]+)?(?<year>\d{4})(?<trailing_dot>\.)?$/i )
+    elsif( $str =~ /^$PARSE_DATE_ROMAN_RE$/xi )
     {
         my $re = { %+ };
         $re->{month} = $roman2regular->{ $re->{month} };
@@ -5963,7 +6621,8 @@ sub _parse_timestamp
         $formatter = 'DateTime::Format::RomanDDXXXYYYY';
     }
     # 20030613
-    elsif( $str =~ /^(?<year>\d{4})(?<month>\d{2})(?<day>\d{2})$/ )
+    # elsif( $str =~ /^(?<year>\d{4})(?<month>\d{2})(?<day>\d{2})$/ )
+    elsif( $str =~ /^$PARSE_DATE_DIGITS_ONLY_RE$/x )
     {
         my $re = { %+ };
         $opt->{pattern} = '%F';
@@ -5973,49 +6632,80 @@ sub _parse_timestamp
     }
     # 2021年7月14日
     # 令和3年7月14日
-    elsif( $str =~ /^(?<era>\p{Han})?(?<year>\d{1,4})年(?<month>\d{1,2})月(?<day>\d{1,2})日$/ )
+    # elsif( $str =~ /^(?<era>\p{Han})?(?<year>\d{1,4})年(?<month>\d{1,2})月(?<day>\d{1,2})日$/ )
+    elsif( $str =~ /^$PARSE_DATETIME_JP_RE$/x )
     {
         my $re = { %+ };
-        if( $re->{era} )
+        use utf8;
+        try
         {
+            $self->_load_class( 'DateTime::Format::JP' ) || return( $self->pass_error );
+            my $pattern;
+            if( defined( $re->{era} ) && $re->{era} )
+            {
+                $pattern = '%E%y年%m月%d日';
+            }
+            else
+            {
+                $pattern = '%Y年%m月%d日';
+            }
+            
+            if( $re->{time} )
+            {
+                $pattern .= '%H' . ( $re->{hour_suffix} // '' );
+                if( $re->{minute} )
+                {
+                    $pattern .= ( $re->{hour_sep} // '' ) . '%M' . ( $re->{minute_suffix} // '' );
+                }
+                if( $re->{second} )
+                {
+                    $pattern .= ( $re->{minute_sep} // '' ) . '%S' . ( $re->{second_suffix} // '' );
+                }
+            }
+            
+            my $use_full_width = 0;
+            if( $re->{year} =~ /^[\x{FF10}-\x{FF19}]+$/ )
+            {
+                $use_full_width++;
+            }
+            
+            my $parser;
             try
             {
-                require DateTime::Format::JP;
-                my $parser;
-                try
-                {
-                    $parser = DateTime::Format::JP->new( pattern => '%E%Y年%m月%d日', time_zone => $tz );
-                }
-                catch( $e )
-                {
-                    warn( "Your system is missing key timezone components. ${class}::_parse_timestamp is reverting to UTC instead of local time zone.\n" );
-                    $parser = DateTime::Format::JP->new( pattern => '%E%Y年%m月%d日', time_zone => 'UTC' );
-                }
-                my $dt = $parser->parse_datetime( $str );
-                $dt->set_formatter( $parser );
-                return( $dt );
+                $parser = DateTime::Format::JP->new(
+                    pattern => $pattern,
+                    time_zone => $tz,
+                    ( $use_full_width ? ( zenkaku => 1 ) : () ),
+                );
             }
             catch( $e )
             {
-                return( $self->error( "An error occurred while trying to use DateTime::Format::JP: $e" ) );
+                warn( "Your system is missing key timezone components. ${class}::_parse_timestamp is reverting to UTC instead of local time zone.\n" );
+                $parser = DateTime::Format::JP->new(
+                    pattern => $pattern,
+                    time_zone => 'UTC',
+                    ( $use_full_width ? ( zenkaku => 1 ) : () ),
+                );
             }
+            my $dt = $parser->parse_datetime( $str );
+            $dt->set_formatter( $parser );
+            return( $dt );
         }
-        else
+        catch( $e )
         {
-            $opt->{pattern} = '%F';
-            $str = join( '-', @$re{qw( year month day )} );
-            use utf8;
-            $fmt->{pattern} = '%Y年%m月%d日';
+            return( $self->error( "An error occurred while trying to use DateTime::Format::JP: $e" ) );
         }
     }
     # <https://en.wikipedia.org/wiki/Date_format_by_country>
     # Possibly followed by a dot and some integer for milliseconds as provided by Time::HiRes
-    elsif( $str =~ /^\d{1,10}(?:\.\d+)?$/ )
+    # elsif( $str =~ /^\d{1,10}(?:\.\d+)?$/ )
+    elsif( $str =~ /^$PARSE_DATE_TIMESTAMP_RE$/x )
     {
+        my $re = { %+ };
         try
         {
             my $dt = DateTime->from_epoch( epoch => $str, time_zone => $tz );
-            $opt->{pattern} = ( CORE::index( $str, '.' ) != -1 ? '%s.%N' : '%s' );
+            $opt->{pattern} = ( CORE::index( $str, '.' ) != -1 ? '%s.%' . CORE::length( $re->{milli} ) . 'N' : '%s' );
             my $strp = DateTime::Format::Strptime->new( %$opt );
             $dt->set_formatter( $strp );
             return( $dt );
@@ -6025,7 +6715,8 @@ sub _parse_timestamp
             return( $self->error( "An error occurred while parsing the time stamp based on the unix timestamp '$str': $e" ) );
         }
     }
-    elsif( $str =~ /^([\+\-]?\d+)([YyMDdhms])?$/ )
+    # elsif( $str =~ /^([\+\-]?\d+)([YyMDdhms])?$/ )
+    elsif( $str =~ /^$PARSE_DATETIME_RELATIVE_RE$/x )
     {
         my( $num, $unit ) = ( $1, $2 );
         $unit = 's' if( !length( $unit ) );
@@ -6109,6 +6800,22 @@ sub _set_get_datetime : lvalue
         }
     }
     
+    my $opts;
+    if( ref( $field ) eq 'HASH' )
+    {
+        my $def = { %$field };
+        if( CORE::exists( $def->{field} ) && defined( $def->{field} ) && CORE::length( $def->{field} ) )
+        {
+            $field = CORE::delete( $def->{field} );
+        }
+        else
+        {
+            warn( "No 'field' parameter provided in calling _set_get_datetime\n" ) if( $self->_warnings_is_enabled );
+        }
+        # The rest of the options are passed to _parse_timestamp() as parameters
+        $opts = $def;
+    }
+    
     my $process = sub
     {
         my $time = shift( @_ );
@@ -6124,7 +6831,7 @@ sub _set_get_datetime : lvalue
             return( $self->error( "DateTime value ($time) provided for field $field does not look like a unix timestamp" ) );
         }
         # Parsed successfully and transformed into a DateTime object
-        elsif( $now = $self->_parse_timestamp( $time ) )
+        elsif( $now = $self->_parse_timestamp( $time, ( CORE::defined( $opts ) ? ( %$opts ) : () ) ) )
         {
             # Found a parsed datetime value
             # $data->{ $field } = $now;
@@ -6155,16 +6862,29 @@ sub _set_get_datetime : lvalue
                         );
                         $HAS_LOCAL_TZ = 0;
                     }
+                    
+                    if( CORE::defined( $opts ) && 
+                        CORE::exists( $opts->{tz} ) && 
+                        CORE::defined( $opts->{tz} ) && 
+                        CORE::length( $opts->{tz} ) )
+                    {
+                        $now = DateTime->from_epoch(
+                            epoch => $time,
+                            time_zone => "$opts->{tz}",
+                        );
+                    }
                 }
                 else
                 {
                     try
                     {
-                        $now = DateTime->from_epoch( epoch => $time, time_zone => ( $HAS_LOCAL_TZ ? 'local' : 'UTC' ) );
+                        $now = ( CORE::defined( $opts ) && CORE::exists( $opts->{tz} ) && CORE::defined( $opts->{tz} ) && CORE::length( $opts->{tz} ) )
+                            ? DateTime->from_epoch( epoch => $time, time_zone => "$opts->{tz}" )
+                            : DateTime->from_epoch( epoch => $time, time_zone => ( $HAS_LOCAL_TZ ? 'local' : 'UTC' ) );
                     }
                     catch( $e )
                     {
-                        warn( "Error trying to set a DateTime object using ", ( $HAS_LOCAL_TZ ? 'local' : 'UTC' ), " time zone -> $e\n" );
+                        warn( "Error trying to set a DateTime object using ", ( ( CORE::defined( $opts ) && CORE::exists( $opts->{tz} ) && CORE::defined( $opts->{tz} ) && CORE::length( $opts->{tz} ) ) ? $opts->{tz} : ( $HAS_LOCAL_TZ ? 'local' : 'UTC' ) ), " time zone -> $e\n" );
                         $now = DateTime->from_epoch( epoch => $time, time_zone => 'UTC' );
                    }
                 }
@@ -6249,7 +6969,7 @@ sub _set_get_hash_as_object
     {
         ## No class was provided
         # if( ref( $_[0] ) eq 'HASH' )
-        if( Scalar::Util::reftype( $_[0] ) eq 'HASH' )
+        if( ( Scalar::Util::reftype( $_[0] ) // '' ) eq 'HASH' )
         {
             my $new_class = $field;
             $new_class =~ tr/-/_/;
@@ -6329,7 +7049,7 @@ sub FREEZE
     my $class = CORE::ref( $self );
     my $ref = $self->_obj2h;
     my %hash = %$ref;
-    $hash{_is_glob} = Scalar::Util::reftype( $self ) eq 'GLOB' ? 1 : 0;
+    $hash{_is_glob} = ( Scalar::Util::reftype( $self ) // '' ) eq 'GLOB' ? 1 : 0;
     # Return an array reference rather than a list so this works with Sereal and CBOR
     # On or before Sereal version 4.023, Sereal did not support multiple values returned
     CORE::return( [$class, \%hash] ) if( $serialiser eq 'Sereal' && Sereal::Encoder->VERSION <= version->parse( '4.023' ) );
@@ -6715,7 +7435,7 @@ Module::Generic - Generic Module to inherit from
 
 =head1 VERSION
 
-    v0.28.5
+    v0.29.0
 
 =head1 DESCRIPTION
 
@@ -7486,6 +8206,12 @@ Returns a new temporary directory by calling L<Module::Generic::File/tempdir>
 =head2 new_tempfile
 
 Returns a new temporary directory by calling L<Module::Generic::File/tempfile>
+
+=head2 new_version
+
+Provided with a version and this will return a new L<version> object.
+
+If the value provided is not a suitable version, this will set an L<error|Module::Generic/error> and return C<undef>
 
 =head2 noexec
 
@@ -8541,13 +9267,17 @@ This hash reference can contain the following properties:
 
 =over 4
 
-=item field
+=item * C<callbacks>
+
+An hash reference of operation type (C<add> or C<remove>) to callback subroutine name or code reference pairs.
+
+=item * C<field>
 
 The object property name
 
-=item callbacks
+=item * C<undef_ok>
 
-An hash reference of operation type (C<add> or C<remove>) to callback subroutine name or code reference pairs.
+If this is set to a true value, this support method will allow undef to be set. Default to false, which means an undefined value passed will be ignored.
 
 =back
 
@@ -8687,7 +9417,7 @@ The object property name
 
 =item I<class>
 
-The URI class to use. By default, L<URI>, but you could also use L<URI::Fast>, or other class of your choice.
+The URI class to use. By default, L<URI>, but you could also use L<URI::Fast>, or other class of your choice. That class will be loaded, if it is not loaded already.
 
 =back
 
@@ -8697,11 +9427,47 @@ It returns the current value, if any, so the return value could be undef, thus i
 
 =head2 _set_get_uuid
 
-Provided with an object property name, and an UUID (Universal Unique Identifier) and this stores it as an object of L<Module::Generic::Scalar>.
+Provided with an object, a property name, and an UUID (Universal Unique Identifier) and this stores it as an object of L<Module::Generic::Scalar>.
 
 If an empty or undefined value is provided, it will be stored as is.
 
 However, if there is no value and this method is called in object context, such as in chaining, this will return a special L<Module::Generic::Null> object that prevents perl error that whatever method follows was called on an undefined value.
+
+=head2 _set_get_version
+
+    sub version { return( shift->_set_get_version( 'version', @_ ) ); }
+    # or
+    sub version : lvalue { return( shift->_set_get_version( 'version', @_ ) ); }
+    # or
+    sub version : lvalue { return( shift->_set_get_version( { field => 'version', class => 'Perl::Version' }, @_ ) ); }
+
+Provided with an object, a property name, and a version string and this stores it as an object of L<version> by default.
+
+Alternatively, the property name can be an hash with the following properties:
+
+=over 4
+
+=item I<field>
+
+The object property name
+
+=item I<class>
+
+The version class to use. By default, L<version>, but you could also use L<Perl::Version>, or other class of your choice. That class will be loaded, if it is not loaded already.
+
+=back
+
+The value can also be assigned as an lvalue. Assuming you have a method C<version> that implements C<_set_get_version>:
+
+    $obj->version = $version;
+
+would work, but of course also:
+
+    $obj->version( $version );
+
+The value can be a legitimate version string, or a version object matching the C<class> to be used, which is by default L<version>. If it is a string, it will be made an object of the class specified using C<parse> if that class supports it, or by simply calling C<new>.
+
+When called in get mode, it will convert any value pre-set, if any, into a version object of the specified class if the value is not an object of that class already, and return it, or else it will return an empty string or undef whatever you will have set in your object for this property.
 
 =head2 _to_array_object
 

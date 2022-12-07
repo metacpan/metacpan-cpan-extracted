@@ -1,5 +1,12 @@
 Revision history for Plack-Middleware-Greylist
 
+v0.3.3    2022-12-07 17:01:40+00:00 Europe/London
+  [Enhancements]
+  - Remove use of blessed pairs, which allows List::Util to be downgraded.
+
+  [Documentation]
+  - Documented known issue with inconsistent rates in named groups.
+
 v0.3.2    2022-12-06 16:10:07+00:00 Europe/London
   [Bux Fixes]
   - Fix the minimum version of List::Util.

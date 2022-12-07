@@ -1,4 +1,4 @@
-requires 'Catalyst', '5.90114';
+requires 'Catalyst', '5.90130';
 requires 'Catalyst::Model::DBIC::Schema', '0.65';
 requires 'Catalyst::Plugin::ConfigLoader', '0.34';
 requires 'Catalyst::Plugin::RedirectTo', '0.003';
@@ -13,7 +13,7 @@ requires 'Catalyst::Plugin::CurrentComponents', '0.010';
 requires 'Catalyst::Plugin::ServeFile', '0.004';
 requires 'Catalyst::Plugin::CSRFToken', '0.001';
 requires 'CatalystX::Errors', '0.001009';
-requires 'CatalystX::RequestModel', '0.008';
+requires 'CatalystX::RequestModel', '0.009';
 requires 'Catalyst::ControllerPerContext', '0.002';
 requires 'Catalyst::View::BasePerRequest', '0.009';
 
@@ -23,6 +23,8 @@ requires 'DBIx::Class::Schema::Loader', '0.07046';
 requires 'DBIx::Class::TimeStamp', '0.14';
 requires 'DBIx::Class::BcryptColumn', '0.001003';
 requires 'DBIx::Class::ResultSet::SetControl';
+requires 'DBIx::Class::ResultClass::TrackColumns', '0.001002';
+
 requires 'Gazelle', '0.46';
 requires 'Module::Runtime';
 requires 'experimental', '0.020';

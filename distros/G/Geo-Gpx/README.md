@@ -244,7 +244,7 @@ Please visit the project page at: [https://github.com/patjoly/geo-gpx](https://g
 
 # VERSION
 
-1.08
+1.09
 
 # LICENSE AND COPYRIGHT
 

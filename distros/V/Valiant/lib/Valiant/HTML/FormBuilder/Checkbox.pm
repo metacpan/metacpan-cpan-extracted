@@ -1,9 +1,17 @@
 package Valiant::HTML::FormBuilder::Checkbox;
 
 use Moo;
+use Valiant::HTML::Util::Collection;
 extends 'Valiant::HTML::FormBuilder';
 
 has 'parent_builder' => (is=>'ro', required=>1);
+
+sub default_theme {
+  my $self = shift;
+  return $self->parent_builder->can('default_theme') ?
+    $self->parent_builder->default_theme :
+    +{};
+}
 
 sub text { 
   my $self = shift;
@@ -33,6 +41,26 @@ around 'checkbox', sub {
   $attrs->{id} = $self->tag_id_for_attribute($self->options->{attribute_value_method});
   $attrs->{include_hidden} = 0;
   $attrs->{checked} = $self->checked;
+  $attrs = $self->merge_theme_field_opts(checkbox=>$attrs->{attribute}, $attrs);
+
+  my $has_error = 0;
+  my $attribute_value_method = $self->options->{attribute_value_method};
+  if(my $errors = $self->options->{errors}) {
+    foreach my $error(@$errors) {
+      my $bad_value_collection = $error->bad_value;
+      $bad_value_collection = Valiant::HTML::Util::Collection->new(@$bad_value_collection)
+        if (ref($bad_value_collection)||'') eq 'ARRAY';
+
+      while(my $bad_value = $bad_value_collection->next) {
+        next if $bad_value->can('is_marked_for_deletion') and $bad_value->is_marked_for_deletion;
+        $has_error = 1 if $bad_value->$attribute_value_method eq $self->value;
+      }
+      $bad_value_collection->reset if $bad_value_collection->can('reset');
+    }
+  }
+  my $errors_classes = exists($attrs->{errors_classes}) ? delete($attrs->{errors_classes}) : undef;
+  $attrs->{class} = join(' ', (grep { defined $_ } $attrs->{class}, $errors_classes))
+    if $errors_classes && $has_error;
 
   return $self->$orig($self->options->{value_method}, $attrs, $self->value);
 };

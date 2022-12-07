@@ -113,7 +113,7 @@ gen-ltz.pl - generate longitude-based solar timezone info files
 
 =head1 VERSION
 
-version 0.1.0
+version 0.2.0
 
 =head1 USAGE
 

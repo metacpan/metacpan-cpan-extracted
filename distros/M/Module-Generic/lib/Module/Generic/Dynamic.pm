@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Dynamic.pm
-## Version v1.2.1
+## Version v1.2.2
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2022/08/05
+## Modified 2022/11/12
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -19,7 +19,7 @@ BEGIN
     use warnings::register;
     use Scalar::Util ();
     # use Class::ISA;
-    our $VERSION = 'v1.2.1';
+    our $VERSION = 'v1.2.2';
 };
 
 use strict;
@@ -35,7 +35,7 @@ sub new
     $self->{_data_repo} = '_data';
     my $hash = {};
     @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
-    if( scalar( @_ ) == 1 && Scalar::Util::reftype( $_[0] ) eq 'HASH' )
+    if( scalar( @_ ) == 1 && ( Scalar::Util::reftype( $_[0] ) // '' ) eq 'HASH' )
     {
         $hash = shift( @_ );
     }

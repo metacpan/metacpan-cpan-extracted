@@ -1,11 +1,11 @@
 package Text::Password::MD5;
-our $VERSION = "0.16";
+our $VERSION = "0.17";
 
-use Moose;
-extends 'Text::Password::CoreCrypt';
-
-use Carp;
-use Crypt::PasswdMD5;
+use Moo;
+use strictures 2;
+use autouse 'Carp'             => qw(croak carp);
+use autouse 'Crypt::PasswdMD5' => qw(unix_md5_crypt);
+use constant Min => 4;
 
 =encoding utf-8
 
@@ -18,7 +18,8 @@ Text::Password::MD5 - generate and verify Password with unix_md5_crypt()
  my $pwd = Text::Password::MD5->new();
  my( $raw, $hash ) = $pwd->genarate();          # list context is required
  my $input = $req->body_parameters->{passwd};
- my $data = $pwd->encrypt($input);              # salt is made automatically
+my $data = $pwd->encrypt($input);    # you don't have to care about salt
+
  my $flag = $pwd->verify( $input, $data );
 
 =head1 DESCRIPTION
@@ -50,7 +51,7 @@ It must be a boolean, default is 1.
 If it was set as 0, you can generate stronger passwords with generate().
 
  $pwd = Text::Pasword::AutoMiglation->new( readability => 0 );
- 
+
 =back
 
 =head2 Methods and Subroutines
@@ -61,24 +62,23 @@ returns true if the verification succeeds.
 
 =cut
 
-override 'verify' => sub {
-    my $self = shift;
-    my ( $input, $data ) = @_;
-    carp ref($self). " doesn't allow any Wide Characters or white spaces\n" if $input =~ /[^ -~]/;
-    return super() if $data =~ /^[!-~]{13}$/; # with crypt in Perl
-    return $data eq unix_md5_crypt( $input, $data );
-};
+extends 'Text::Password::CoreCrypt';
 
-__PACKAGE__->meta->make_immutable;
-no Moose;
+sub verify {
+    my ( $self, $input, $data ) = ( shift, @_ );
+    carp ref $self, " doesn't allow any Wide Characters or white spaces" if $input =~ /[^ -~]/;
+    return $data eq unix_md5_crypt(@_);
 
-=head3 nonce($length)
+}
+
+=head3 nonce( I<Int> )
 
 generates the random strings with enough strength.
 
-the length defaults to 8($self->default).
+the length defaults to 8 || $self->default().
 
-=head3 encrypt($raw)
+=head3 encrypt( I<Str> )
+
 
 returns hash with unix_md5_crypt().
 
@@ -87,33 +87,26 @@ salt will be made automatically.
 =cut
 
 sub encrypt {
-    my $self = shift;
-    my $input = shift;
-    my $min = $self->minimum();
-    croak ref($self) ." requires at least $min length" if length $input < $min;
-    carp ref($self). " doesn't allow any Wide Characters or white spaces\n" if $input =~ /[^ -~]/;
+    my ( $self, $input ) = @_;
+    croak ref $self, " requires at least ", Min, " length" if length $input < Min;
+    croak ref $self, " doesn't allow any Wide Characters or white spaces" if $input =~ /[^ -~]/;
 
-    return unix_md5_crypt( $input, $self->_salt() );
+    my $salt = '';
+    do { $salt = $self->nonce() } until $salt !~ /\$/;
+
+    return unix_md5_crypt( $input, $salt );
 }
 
-=head3 generate($length)
+=head3 generate( I<Int> )
 
 genarates pair of new password and it's hash.
 
-less readable characters(0Oo1Il|!2Zz5sS$6b9qCcKkUuVvWwXx.,:;~-^'"`) are forbidden
-unless $self->readability is 0.
+less readable characters I<(0Oo1Il|!2Zz5sS$6b9qCcKkUuVvWwXx.,:;~-^'"`)>
+are forbiddenunless $self->readability is 0.
 
-the length defaults to 8($self->default).
- 
+the length defaults to 8 || $self->default().
+
 =cut
-
-sub _salt {
-    my $self = shift;
-
-    my $salt = '';
-    do { $salt = $self->nonce(8) } while $salt =~ /\$/;
-    return $salt;
-}
 
 1;
 
@@ -128,4 +121,4 @@ it under the same terms as Perl itself.
 
 =head1 AUTHOR
 
-Yuki Yoshida(worthmine) E<lt>worthmine!at!gmail.comE<gt>
+Yuki Yoshida E<lt>worthmine@users.noreply.github.comE<gt>

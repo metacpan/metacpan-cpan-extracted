@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '1.03';
+our $VERSION = '1.04';
 
 =encoding utf-8
 
@@ -12,8 +12,9 @@ fit2tcx.pl - script to convert a FIT file to a TCX file
 
 =head1 SYNOPSIS
 
-  fit2tcx.pl --help
   fit2tcx.pl [ --must=$list --tp_exclude=$list --indent=# --verbose ] $fit_activity_file [ $new_filename ]
+  fit2tcx.pl --help
+  fit2tcx.pl --version
 
 =head1 DESCRIPTION
 
@@ -28,14 +29,19 @@ use FileHandle;
 use Getopt::Long;
 use Time::Local;
 
-my ($must, $tp_exclude, $indent_n, $verbose, $help) = ('Time', '', 2, 0);
+my ($must, $tp_exclude, $indent_n, $verbose, $version, $help) = ('Time', '', 2, 0);
 sub usage { "Usage: $0 [ --help --must=\$list --tp_exclude=\$list --indent=# --verbose ] \$fit_activity_file [ \$new_filename ]\n" }
 GetOptions( "must=s"       =>  \$must,
             "tp_exclude=s" =>  \$tp_exclude,
             "indent=i"     =>  \$indent_n,
             "verbose"      =>  \$verbose,
+            "version"      =>  \$version,
             "help"         =>  \$help,
 )  or die usage();
+if ($version) {
+    print $0, " version: ", $VERSION, "\n";
+    exit
+}
 die usage() if $help;
 
 my ($from, $to);
@@ -969,7 +975,7 @@ Please visit the project page at: L<https://github.com/patjoly/geo-fit>.
 
 =head1 VERSION
 
-1.03
+1.04
 
 =head1 LICENSE AND COPYRIGHT
 

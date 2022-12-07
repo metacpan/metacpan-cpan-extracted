@@ -18,6 +18,9 @@ Module::Generic::Number - Number Manipulation Object Class
         # Display currency symbol before or after the number
         precede => 1,
     });
+    # Even accepts numbers in Japanese double bytes
+    # Will be converted automatically to regular digits.
+    my $n = Moule::Generic::Number->new( "−１２３４５６７" ); # becomes -1234567
     # or, to get all the defaults based on language code
     my $n = Module::Generic::Number->new( 10, 
     {
@@ -44,7 +47,14 @@ Module::Generic::Number - Number Manipulation Object Class
     $n->cbrt->floor # 2
     $n *= 100;
     $n->format # 1,000.00
-    $n->format( 0 ) # 1,000
+    $n->format(0) # 1,000
+    $n->format(
+        precision => 0,
+        # Boolean value
+        decimal_fill => 0,
+        thousand => ',',
+        decimal => '.',
+    );
     $n->format_binary # 1111101000
     my $n2 = $n->clone;
     $n2 += 24
@@ -68,14 +78,7 @@ Module::Generic::Number - Number Manipulation Object Class
     $n->log10 # 3
     $n->max( 2000 ) # 2000
     $n->min( 2000 ) # 1000
-    $n->mod( 3 ) # 1
-    my $fmt = $n->new_formatter({
-        thousand => '.',
-        decimal => ',',
-        symbol => '€',
-        precision => 2,
-        precede => 0,
-    });
+    $n->mod(3) # 1
     my $perm = Module::Generic::Number->new( '0700' );
     $perm->oct # 448
     printf( "%o\n", 448 ) # 700
@@ -97,7 +100,7 @@ Module::Generic::Number - Number Manipulation Object Class
 
 =head1 VERSION
 
-    v1.2.1
+    v2.0.0
 
 =head1 DESCRIPTION
 
@@ -152,15 +155,15 @@ Possible optional parameters are:
 
 =over 4
 
-=item I<decimal>
+=item C<decimal>
 
 Specifies the decimal separator. This can also be changed or retrieved with the method L</"decimal">
 
-=item I<grouping>
+=item C<grouping>
 
 The sizes of the groups of digits, except for currency values. unpack( "C*", $grouping ) will give the number in question. This is typically 3.
 
-=item I<lang>
+=item C<lang>
 
 If provided with a language tag as specified in L<rfc5646|https://tools.ietf.org/html/rfc5646>, and this will the number format properties based on the locale dictionary. It uses L<POSIX/"setlocale"> to achieve that, but without disturbing your own locale settings.
 
@@ -184,53 +187,53 @@ When no I<lang> is provided, it uses the default language set in the system to r
 
 Any of those properties can be overriden by specifying its value when creating an object.
 
-=item I<position_neg>
+=item C<position_neg>
 
 Boolea value to define whether the negative sign (typically "-") should be positioned at the begining (true) or at the end (false) of the negative numbers.
 
-=item I<position_pos>
+=item C<position_pos>
 
 Boolea value to define whether the positive sign (typically and empty string) should be positioned at the begining (true) or at the end (false) of the positive numbers.
 
-=item I<precede>
+=item C<precede>
 
 If set to true, this will set the currency symbol before the number and when set to false, it will set it after the number
 
 This can also be changed or retrieved with the method L</"precede">
 
-=item I<precede_neg>
+=item C<precede_neg>
 
 If set to true, this will set the currency symbol before the negative number and when set to false, it will set it after the negative number
 
 This can also be changed or retrieved with the method L</"precede_neg">
 
-=item I<precision>
+=item C<precision>
 
-Sets the decimal precision of the number.  This can also be changed or retrieved with the method L</"precision">
+Sets the decimal precision of the number. This can also be changed or retrieved with the method L</"precision">
 
-=item I<sign_neg>
+=item C<sign_neg>
 
 The character used to denote negative currency values, usually a minus sign.
 
-=item I<sign_pos>
+=item C<sign_pos>
 
 The separator between groups of digits before the decimal point, except for currency values.
 
-=item I<space>
+=item C<space>
 
 Boolean value to define whether there should be a space between the currency sign and the number value.
 
-=item I<space_neg>
+=item C<space_neg>
 
 Boolean value to define whether there should be a space between the currency sign and the number value for negative numbers.
 
-=item I<symbol>
+=item C<symbol>
 
 Sets the currency symbol to be used upon formatting of the number as money with the method L</"format_money">
 
  This can also be changed or retrieved with the method L</"symbol">
 
-=item I<thousand>
+=item C<thousand>
 
 Sets the thousand separator to be used uppon formatting.
 
@@ -254,6 +257,17 @@ Return the number object as  a L<Module::Generic::Boolean> object.
 
 Return the number object as  a L<Module::Generic::Scalar> object.
 
+=head2 as_string
+
+Returns the object string as a string.
+
+    my $n = Module::Generic::Number->new( 1000 );
+    print( "I have $n books\n" );
+    # I have 1000 books
+    # But better like ths:
+    printf( "I have %s bools\n", $n->format( 0 ) );
+    # I have 1,000 books
+
 =head2 atan
 
 Returns the arcus tangent for the number object. See L<POSIX/"atan">
@@ -265,17 +279,6 @@ Returns the arcus tangent for the number object. See L<POSIX/"atan">
 =head2 atan2
 
 Returns the arctangent of Y/X in the range -PI to PI. See L<perlfunc/"atan2">
-
-=head2 as_string
-
-Returns the object string as a string.
-
-    my $n = Module::Generic::Number->new( 1000 );
-    print( "I have $n books\n" );
-    # I have 1000 books
-    # But better like ths:
-    printf( "I have %s bools\n", $n->format( 0 ) );
-    # I have 1,000 books
 
 =head2 cbrt
 
@@ -306,6 +309,8 @@ It can take an optional number that will be used
     my $n2 = $n->clone( 2020 );
     # Same properties as $n, but now the number is 2020 instead of 1000 and this is a new object
 
+=for Pod::Coverage compute
+
 =head2 cos
 
 Returns the cosine of the number object. See L<perlfunc/"cos">
@@ -317,6 +322,10 @@ Sets or gets the currency symbol to be used for formatting the number object wit
 =head2 decimal
 
 Sets or gets the decimal separator to be used for formatting the number object
+
+=head2 decimal_fill
+
+Boolean. Sets or gets whether to pad the decimal with zeroes. This is used in conjonction with L</precision>
 
 =head2 default
 
@@ -341,6 +350,20 @@ Returns the largest integer value less than or equal to the number object. See L
 Provided with an optional precision and this format the number in a human readable way using thousand and decimal separators and floating number precision
 
     $n->format # 1,000.00
+    $n->format(
+        precision => 2,
+        # Override object value
+        thousand => ',',
+        decimal => '.',
+        # Boolean
+        decimal_fill => 1,
+    );
+
+If the number is too large or great to work with as a regular number, but instead must be shown in scientific notation, returns that number in scientific notation without further formatting.
+
+    Module::Generic::Number->new("0.000020000E+00")->format(7); # 2e-05
+
+It returns a L<scalar object|Module::Generic::Scalar> upon success or an L<error|Module::Generic/error> if an error occurred.
 
 =head2 format_binary
 
@@ -352,6 +375,45 @@ Provided with an optional precision and this format the number in a human readab
     # Assuming the number object is 1,234,567
     $n->format_bytes # 1.18M
 
+Provided with an hash or hash reference of options, and this formats number with suffix K, M or G depending if it exceeds gigabytes, megabytes or kilobytes; or the IEC
+standard 60027 C<KiB>, C<MiB>, or C<GiB> depending on the option C<mode>
+
+It returns a L<scalar object|Module::Generic::Scalar> upon success or an L<error|Module::Generic/error> if an error occurred.
+
+The following options are supported:
+
+=over 4
+
+=item * C<base>
+
+Sets the number at which the suffix set with L</kilo_suffix> is added.
+Default is 1024. Set to any value; the only other useful value is probably 1000.
+
+If the mode (see below) is set to C<iec> or C<iec60027> then setting the C<base> option returns an error.
+
+=item * C<mode>
+
+This can be C<trad>, C<traditional>, C<iec> or C<iec60027>
+
+=item * C<precision>
+
+The decimal precision. Defaults to the value set with L</precision>
+
+=item * C<unit>
+
+By default, this is guessed based on the value of the number, but can be explicitly specified here.
+
+In other words, numbers greater than or equal to 1024 (or other number given by the C<base> option) will be divided by 1024 and suffix set with L</kilo_suffix> or L</kibi_suffix> added; if greater than or equal to 1048576 (1024*1024), it will be divided by 1048576 and suffix set with L</mega_suffix> or L</mebi_suffix> appended to the end; etc.
+
+Possible values are: C<auto> (default), C<kilo>, C<mega>, C<giga>
+
+If a value other than C<auto> is specified, that value will be used instead no matter the number. For example:
+
+    Module::Generic::Number->new( 1048576 )->format_bytes( unit => 'k' );
+    # Produces 1,024K and not 1M
+
+=back
+
 =head2 format_hex
 
     # Assuming the number object is 1000
@@ -359,28 +421,46 @@ Provided with an optional precision and this format the number in a human readab
 
 =head2 format_money
 
-Provided with an optional precision, this format the number object, using the inital format parameters specified during object instantiation.
+Provided with an optional precision, and an optional currency symbol and this format the number accordingly.
+It uses the object initial value set with L</precision> and L</currency> if not explicitly specified.
+object, using the inital format parameters specified during object instantiation.
 
     # Assuming the number object is 1000
     $n->format_money # € 1,000.00
+    $n->format_money(3) # € 1,000.000
+
+It returns a L<scalar object|Module::Generic::Scalar> upon success or an L<error|Module::Generic/error> if an error occurred.
 
 =head2 format_negative
 
-Provided with a format which must includes the character C<x> and this format the number object, assuming it is negative.
+Provided with an optional format, or by default uses the value set with L</neg_format> which must include the character C<x> and this format the number object, assuming it is negative.
 
 For example, suitable for accounting:
 
     $n->format_negative( '(x)' ); # (1,000)
 
+It returns a L<scalar object|Module::Generic::Scalar> upon success or an L<error|Module::Generic/error> if an error occurred.
+
 =head2 format_picture
 
-Format the string based on the patter provided
+Format the string based on the pattern provided, which will have the C<#> characters replaced by the digits from the number.
 
     $n->format_picture( '##,###.##' ); # 1,000.00
 
-=head2 formatter
+If the length of the integer part of $number is too large to fit, the C<#> characters are replaced with asterisks (C<*>) instead. For examples:
 
-Sets or gets the L<Number::Format> object used for formatting.
+    # Assuming 100023
+    $n->format_picture( 'EUR ##,###.##' ); # EUR **,***.**
+    # Assuming 1.00023
+    $n->format_picture( 'EUR #.###,###' ); # EUR 1.002,300
+
+The comma C<,> and period C<.> used in the example above are taken from the value set with L</thousand> and L</decimal> respectively.
+However, the C<thousand> characters in the C<picture> provided, does not need to occur every three digits; the
+I<only> use of that variable by this function is to remove leading commas (see the first example above).
+
+There may not be more than one instance of C<decimal> in the C<picture> provided though, or an error will be returned.
+
+It returns a L<scalar object|Module::Generic::Scalar> upon success or an L<error|Module::Generic/error> if an error occurred.
 
 =head2 from_binary
 
@@ -393,6 +473,14 @@ Returns a number object based on a binary number.
 Returns a number object based on an hex number.
 
     my $n2 = $n->from_hex( "0x400" ); # 1024
+
+=head2 gibi_suffix
+
+Sets or gets the gibi suffix.
+
+=head2 giga_suffix
+
+Sets or gets the gigabytes suffix.
 
 =head2 grouping
 
@@ -408,6 +496,10 @@ Returns the integer portion of the number object. See L<perlfunc/"int"> for more
 =head2 is_decimal
 
 Returns true if the number is a decimal number.
+
+=head2 is_empty
+
+Returns true if the length of the underlying number is zero. This always returns true, because an instance of this class can never be C<undef>. This is here for consistency with other classes of L<Module::Generic>
 
 =head2 is_even
 
@@ -461,6 +553,14 @@ Alias for L</is_positive>
 
 Returns true if the number object is positive, false otherwise. See L<POSIX/"signbit">
 
+=head2 kibi_suffix
+
+Sets or gets the kibi suffix.
+
+=head2 kilo_suffix
+
+Sets or gets the kilobytes suffix.
+
 =head2 lang
 
 Returns the current language used for the number formatting properties.
@@ -501,9 +601,23 @@ Returns the lowest number of either the number object, or the additional number 
 
     $n->min( 2000 ) # 2000
 
+=head2 mebi_suffix
+
+Sets or gets the mebi suffix.
+
+=head2 mega_suffix
+
+Sets or gets the megabytes suffix.
+
 =head2 min
 
 Provided with another number and this returns the smallest of the two as an L<Module::Generic::Number> object.
+
+=head2 neg_format
+
+Sets or gets the format for formatting negative numbers.
+
+Returns a L<scalar object|Module::Generic::Scalar>
 
 =head2 mod
 
@@ -511,10 +625,6 @@ Returns the remainder for the number bject divided by another number provided as
 
     # Assuming 1000
     $n->mod(3) # 1
-
-=head2 new_formatter
-
-Given an optional hash of parameters similar to the oens provided to L</"new"> and this return a new L<Number::Format> object or undef with an L<Module::Generic/"error"> set upon error
 
 =head2 oct
 
@@ -566,13 +676,15 @@ See L<perlfunc/"rand"> for more information.
 
 Provided with an optional precision, this will round the number object. Internally it uses L<perldoc/"sprintf"> to achieve that.
 
+This returns an error if more than 1 argument was provided. To use two arguments, use L</round2>
+
 =head2 round_zero
 
 This will round the number using L<POSIX/round>, which will return "the integer (but still as floating point) nearest to the argument"
 
 =head2 round2
 
-Round the number using L<Number::Format/round>. It will pass through whatever argument that is provided.
+Provided with a number and an optional precision, or by default the one set with L</precision>, and this will round the number using an alternative approach based on L<Number::Format/round>.
 
 =head2 scalar
 
@@ -624,7 +736,16 @@ Special method called by L<JSON> to transform this object into a string suitable
 
 =head2 unformat
 
-Provided with a string containing a number, and this returns a number as a L<Module::Generic::Number> object.
+Provided with a string containing a number, and an optional hash or hash reference of options, and this returns a number as a L<Module::Generic::Number> object.
+
+It returns an L<error|Module::Generic/error> if the string provided does not contain any number.
+
+    my $n = Module::Generic::Number->unformat('USD 12.95'); # 12.95
+    # Same
+    my $n = $n1->unformat('USD 12.95'); # 12.95
+    my $n = Module::Generic::Number->unformat('USD 12.00'); # 12
+    my $n = Module::Generic::Number->unformat('foobar'); # return error (undef)
+    my $n = Module::Generic::Number->unformat('1234-567@.8'); # 1234567.8
 
 =head1 SERIALISATION
 
@@ -635,8 +756,6 @@ Provided with a string containing a number, and this returns a number as a L<Mod
 =for Pod::Coverage STORABLE_thaw
 
 =for Pod::Coverage THAW
-
-=for Pod::Coverage TO_JSON
 
 Serialisation by L<CBOR|CBOR::XS>, L<Sereal> and L<Storable::Improved> (or the legacy L<Storable>) is supported by this package. To that effect, the following subroutines are implemented: C<FREEZE>, C<THAW>, C<STORABLE_freeze> and C<STORABLE_thaw>
 

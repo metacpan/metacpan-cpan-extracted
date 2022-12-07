@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Scalar.pm
-## Version v1.3.2
+## Version v1.3.3
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2022/11/05
+## Modified 2022/11/12
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -78,7 +78,7 @@ BEGIN
     );
     $DEBUG = 0;
     $ERRORS = {};
-    our $VERSION = 'v1.3.2';
+    our $VERSION = 'v1.3.3';
 };
 
 use strict;
@@ -768,8 +768,21 @@ sub _array
 {
     my $self = shift( @_ );
     my $arr  = shift( @_ );
-    return if( !defined( $arr ) );
-    return( $arr ) if( Scalar::Util::reftype( $arr ) ne 'ARRAY' );
+    if( !defined( $arr ) )
+    {
+        if( Want::want( 'OBJECT' ) )
+        {
+            # We might have need to specify, because I found a race condition where
+            # even though the context is object, once in Null, the context became 'code'
+            require Module::Generic::Null;
+            return( Module::Generic::Null->new( wants => 'OBJECT' ) );
+        }
+        else
+        {
+            return;
+        }
+    }
+    return( $arr ) if( ( Scalar::Util::reftype( $arr ) // '' ) ne 'ARRAY' );
     return( Module::Generic::Array->new( $arr ) );
 }
 
@@ -777,7 +790,20 @@ sub _number
 {
     my $self = shift( @_ );
     my $num = shift( @_ );
-    return if( !defined( $num ) );
+    if( !defined( $num ) )
+    {
+        if( Want::want( 'OBJECT' ) )
+        {
+            # We might have need to specify, because I found a race condition where
+            # even though the context is object, once in Null, the context became 'code'
+            require Module::Generic::Null;
+            return( Module::Generic::Null->new( wants => 'OBJECT' ) );
+        }
+        else
+        {
+            return;
+        }
+    }
     return( $num ) if( !CORE::length( $num ) );
     return( Module::Generic::Number->new( $num ) );
 }
@@ -962,7 +988,7 @@ sub TO_JSON { CORE::return( ${$_[0]} ); }
     {
         my( $class, $opts ) = @_;
         $opts //= {};
-        if( Scalar::Util::reftype( $opts ) ne 'HASH' )
+        if( ( Scalar::Util::reftype( $opts ) // '' ) ne 'HASH' )
         {
             warn( "Options provided (", overload::StrVal( $opts ), ") is not an hash reference\n" );
             $opts = {};
@@ -984,7 +1010,7 @@ sub TO_JSON { CORE::return( ${$_[0]} ); }
         {
         callback_add => $opts->{add},
         callback_remove => $opts->{remove},
-        data => ( Scalar::Util::reftype( $opts->{data} ) eq 'SCALAR' ? \"${$opts->{data}}" : \undef ),
+        data => ( ( Scalar::Util::reftype( $opts->{data} ) // '' ) eq 'SCALAR' ? \"${$opts->{data}}" : \undef ),
         debug => $opts->{debug},
         };
         print( STDERR ( ref( $class ) || $class ), "::TIESCALAR: Using ", CORE::length( ${$ref->{data}} ), " bytes of data in scalar vs ", CORE::length( ${$opts->{data}} ), " bytes received via opts->data.\n" ) if( $ref->{debug} );

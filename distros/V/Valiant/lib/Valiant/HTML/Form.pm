@@ -36,7 +36,8 @@ sub _instantiate_builder {
   $args{index} = $options->{index} if exists $options->{index};
   $args{parent_builder} = $options->{parent_builder} if exists $options->{parent_builder};
   $args{theme} = $options->{theme} if exists $options->{theme};
-
+  $args{view} = $options->{view} if exists $options->{view};
+  
   if( exists($options->{parent_builder}) && exists($options->{parent_builder}{theme}) ) {
     $args{theme} = +{ %{$args{theme}||+{}}, %{$options->{parent_builder}{theme}} };
   }
@@ -240,7 +241,17 @@ the object is representing data which is stored in the backing storage solution.
 this does not mean that the object is synchronized with the backing storage since its possible that
 the object has been changed by the user.
 
+=head2 is_attribute_changed
+
+    $model->is_attribute_changed($attr); # true or false
+
+Optional method.  If provided returns a boolean if the attribute has been changed from its initial state,
+as defined by either being different from the backing store (if it exists) or being changed from its default
+value when created as a new model.
+
 =head2 human_attribute_name
+
+    $model->human_attribute_name('user'); # User 
 
 Optional.  If provided, uses the model to look up a displayable version of the attribute name, for
 example used in a label for an input control.  If not present we use L<Valiant::HTML::FormTags\_humanize>
@@ -248,9 +259,11 @@ to create a displayable name from the attribute name.
 
 =head2 read_attribute_for_html
 
+    $model->read_attribute_for_html('user'); # User 
+
 Optional.  If provided must access the string name of the field or attribute and should return the model
 value for that attribute suitable for HTML form display.  You might wish to use this as a way to deflate
-or otherwise stringify non string values.  If not provided we just use the attribute can call it as an
+or otherwise stringify non string values.  If not provided we just use the attribute name and call it as an
 accessor against the model.
 
 =head2 errors

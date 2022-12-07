@@ -1,4 +1,7 @@
 The following logs changes for the CPAN distribution DBIx-Class-ResultClass-TrackColumns
 
+0.01002   06 December 2022
+          - fix error when no tracked columns are defined
+
 0.001001  01 October 2022
           - First Post!

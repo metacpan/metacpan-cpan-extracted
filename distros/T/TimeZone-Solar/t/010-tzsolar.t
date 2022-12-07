@@ -8,7 +8,8 @@
 # pragmas to silence some warnings from Perl::Critic
 ## no critic (Modules::RequireExplicitPackage)
 # This solves a catch-22 where parts of Perl::Critic want both package and use-strict to be first
-use Modern::Perl qw(2018);
+use strict;
+use warnings;
 ## use critic (Modules::RequireExplicitPackage)
 
 use utf8;
@@ -59,7 +60,7 @@ sub count_tests
 {
     return (
         4                                             # in test_functions()
-            + $total_constants                        # number of constants, in test_constants()
+            + $total_constants + 1                    # number of constants, in test_constants()
             + ( $constants{MAX_DEGREES} + 1 ) * 10    # per-degree tests from -180 to +180, in test_lon()
             + ( scalar @polar_test_points )           # in test_polar()
     );
@@ -97,6 +98,7 @@ sub test_functions
 # check constants
 sub test_constants
 {
+    # check defined constants
     foreach my $key ( sort keys %constants ) {
         if ( substr( $key, -3 ) eq "_FP" ) {
 
@@ -111,6 +113,9 @@ sub test_constants
             is( TimeZone::Solar->_get_const($key), $constants{$key}, "constant check: $key = $constants{$key}" );
         }
     }
+
+    # non-existent constant throws exception
+    dies_ok( sub { TimeZone::Solar->_get_const("non-existent") }, "non-existent constant fails as expected" );
 }
 
 # formatting functions
@@ -234,7 +239,9 @@ sub test_polar
             ( abs( $test_point->{latitude} ) <= $constants{LIMIT_LATITUDE} - $precision )
             ? $test_point->{longitude}
             : 0;
-        my %expected  = expect_lon2tz( longitude => $use_lon, use_lon_tz => $test_point->{use_lon_tz} );
+        my %expected = expect_lon2tz( longitude => $use_lon, use_lon_tz => $test_point->{use_lon_tz} );
+        $expected{longitude} = $test_point->{longitude};
+        $expected{latitude}  = $test_point->{latitude};
         my $test_name = sprintf(
             "longitude=%-10s latitude=%-9s use_lon_tz=%d",
             $test_point->{longitude},
@@ -247,6 +254,8 @@ sub test_polar
         my $expect_class = "DateTime::TimeZone::Solar::" . $stz->short_name();
         is_deeply(
             {
+                longitude  => $stz->longitude(),
+                latitude   => $stz->latitude(),
                 short_name => $stz->short_name(),
                 offset_min => $stz->offset_min(),
                 offset     => $stz->offset(),

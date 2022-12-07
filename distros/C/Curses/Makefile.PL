@@ -380,7 +380,7 @@ my %libClass = (
 
 
 
-sub makeConfigH($) {
+sub makeCConfigH($) {
     my ($libType) = @_;
 #-----------------------------------------------------------------------------
 #  $libType is the kind of Curses library we are using - e.g. 'bsd',
@@ -396,7 +396,7 @@ sub makeConfigH($) {
 
         if (!defined($libClass)) {
             print STDERR ("Internal error: invalid library type '$libType' " .
-                          "in makeConfigH()\n");
+                          "in makeCConfigH()\n");
             exit 1;
         }
     }
@@ -518,7 +518,7 @@ if (defined($inc) && defined($libs)) {
 }
 
 if (not -e "c-config.h") {
-    makeConfigH($libType);
+    makeCConfigH($libType);
 }
 
 #  Major cheese alert.  Any -L for the curses library is probably
@@ -572,7 +572,8 @@ if ($forms and $form_inc !~ m{-I} and -f('/usr/include/form.h')) {
     print("file.\n");
 }
 
-my $clean = 'CursesDef.h c-config.h cdemo testsym testint testtyp *.i *.s';
+my $clean =
+    'config.h CursesDef.h c-config.h cdemo testsym testint testtyp *.i *.s';
 my $realc = $gen
     ? 'list.syms Curses.pm ' .
       'CursesFun.c CursesVar.c CursesCon.c CursesTyp.h CursesBoot.c'
@@ -602,13 +603,16 @@ sub MY::postamble {
     my $objext = $OSNAME eq 'MSWin32' ? 'obj' : 'o';
     my $mf   = <<EOM;
 
-CursesDef.h: c-config.h Makefile.PL list.syms
+config.h:
+	./makeConfig $args{COMPONENTS} >\$@
+
+CursesDef.h: c-config.h Makefile.PL list.syms config.h
 	CC='\$(CC)' \\
 	INC='\$(INC)' \\
 	CCFLAGS='\$(CCFLAGS)' \\
 	LDLOADLIBS='\$(LDLOADLIBS)' \\
 	LDDLFLAGS='\$(LDDLFLAGS)' \\
-	\$(PERL) test.syms \$(TEST_SYMS_OPTS) $args{COMPONENTS}
+	\$(PERL) testsyms \$(TESTSYMS_OPTS)
 
 c-config.h:
 	@ $echo "You need to make a c-config.h.  See the INSTALL document.";

@@ -312,50 +312,50 @@ is $fb->collection_select({roles => 'id'}, $roles_collection, id=>'label'),
   '</select>';
 
 is $fb->collection_checkbox({roles => 'id'}, $roles_collection, id=>'label'), 
-  '<input id="person_roles_0__nop" name="person.roles[0]._nop" type="hidden" value="1"/>'.
+  '<div id="person_roles"><input id="person_roles_0__nop" name="person.roles[0]._nop" type="hidden" value="1"/>'.
   '<label for="person_roles_1_id">user</label>'.
   '<input checked id="person_roles_1_id" name="person.roles[1].id" type="checkbox" value="1"/>'.
   '<label for="person_roles_2_id">admin</label>'.
   '<input checked id="person_roles_2_id" name="person.roles[2].id" type="checkbox" value="2"/>'.
   '<label for="person_roles_3_id">guest</label>'.
-  '<input id="person_roles_3_id" name="person.roles[3].id" type="checkbox" value="3"/>';
+  '<input id="person_roles_3_id" name="person.roles[3].id" type="checkbox" value="3"/></div>';
 
 is $fb->collection_checkbox({roles => 'id'}, $roles_collection, id=>'label', {include_hidden=>0}), 
-  '<label for="person_roles_4_id">user</label>'.
+  '<div id="person_roles"><label for="person_roles_4_id">user</label>'.
   '<input checked id="person_roles_4_id" name="person.roles[4].id" type="checkbox" value="1"/>'.
   '<label for="person_roles_5_id">admin</label>'.
   '<input checked id="person_roles_5_id" name="person.roles[5].id" type="checkbox" value="2"/>'.
   '<label for="person_roles_6_id">guest</label>'.
-  '<input id="person_roles_6_id" name="person.roles[6].id" type="checkbox" value="3"/>';
+  '<input id="person_roles_6_id" name="person.roles[6].id" type="checkbox" value="3"/></div>';
 
 is $fb->collection_checkbox({roles => 'id'}, $roles_collection, id=>'label', sub {
   my $fb_roles = shift;
   return  $fb_roles->checkbox({class=>'form-check-input'}),
           $fb_roles->label({class=>'form-check-label'});
-}), '<input id="person_roles_7__nop" name="person.roles[7]._nop" type="hidden" value="1"/><input checked class="form-check-input" id="person_roles_8_id" name="person.roles[8].id" type="checkbox" value="1"/><label class="form-check-label" for="person_roles_8_id">user</label><input checked class="form-check-input" id="person_roles_9_id" name="person.roles[9].id" type="checkbox" value="2"/><label class="form-check-label" for="person_roles_9_id">admin</label><input class="form-check-input" id="person_roles_10_id" name="person.roles[10].id" type="checkbox" value="3"/><label class="form-check-label" for="person_roles_10_id">guest</label>';
+}), '<div id="person_roles"><input id="person_roles_7__nop" name="person.roles[7]._nop" type="hidden" value="1"/><input checked class="form-check-input" id="person_roles_8_id" name="person.roles[8].id" type="checkbox" value="1"/><label class="form-check-label" for="person_roles_8_id">user</label><input checked class="form-check-input" id="person_roles_9_id" name="person.roles[9].id" type="checkbox" value="2"/><label class="form-check-label" for="person_roles_9_id">admin</label><input class="form-check-input" id="person_roles_10_id" name="person.roles[10].id" type="checkbox" value="3"/><label class="form-check-label" for="person_roles_10_id">guest</label></div>';
 
 is $fb->collection_radio_buttons('state_id', $states_collection, id=>'name'),
-  '<input id="person_state_id_hidden" name="person.state_id" type="hidden" value=""/>'.
+  '<div id="person_state_id"><input id="person_state_id_hidden" name="person.state_id" type="hidden" value=""/>'.
   '<label for="person_state_id_1">TX</label>'.
-  '<input checked id="person_state_id_1_1" name="person.state_id" type="radio" value="1"/>'.
+  '<input checked id="person_state_id_1" name="person.state_id" type="radio" value="1"/>'.
   '<label for="person_state_id_2">NY</label>'.
-  '<input id="person_state_id_2_2" name="person.state_id" type="radio" value="2"/>'.
+  '<input id="person_state_id_2" name="person.state_id" type="radio" value="2"/>'.
   '<label for="person_state_id_3">CA</label>'.
-  '<input id="person_state_id_3_3" name="person.state_id" type="radio" value="3"/>';
+  '<input id="person_state_id_3" name="person.state_id" type="radio" value="3"/></div>';
 
 is $fb->collection_radio_buttons('state_id', $states_collection, id=>'name', {include_hidden=>0}),
-  '<label for="person_state_id_1">TX</label>'.
-  '<input checked id="person_state_id_1_1" name="person.state_id" type="radio" value="1"/>'.
+  '<div id="person_state_id"><label for="person_state_id_1">TX</label>'.
+  '<input checked id="person_state_id_1" name="person.state_id" type="radio" value="1"/>'.
   '<label for="person_state_id_2">NY</label>'.
-  '<input id="person_state_id_2_2" name="person.state_id" type="radio" value="2"/>'.
+  '<input id="person_state_id_2" name="person.state_id" type="radio" value="2"/>'.
   '<label for="person_state_id_3">CA</label>'.
-  '<input id="person_state_id_3_3" name="person.state_id" type="radio" value="3"/>';
+  '<input id="person_state_id_3" name="person.state_id" type="radio" value="3"/></div>';
 
 is $fb->collection_radio_buttons('state_id', $states_collection, id=>'name', sub {
   my $fb_states = shift;
   return  $fb_states->radio_button({class=>'form-check-input'}),
           $fb_states->label({class=>'form-check-label'});  
-}), '<input id="person_state_id_hidden" name="person.state_id" type="hidden" value=""/><input checked class="form-check-input" id="person_state_id_1_1" name="person.state_id" type="radio" value="1"/><label class="form-check-label" for="person_state_id_1">TX</label><input class="form-check-input" id="person_state_id_2_2" name="person.state_id" type="radio" value="2"/><label class="form-check-label" for="person_state_id_2">NY</label><input class="form-check-input" id="person_state_id_3_3" name="person.state_id" type="radio" value="3"/><label class="form-check-label" for="person_state_id_3">CA</label>';
+}), '<div id="person_state_id"><input id="person_state_id_hidden" name="person.state_id" type="hidden" value=""/><input checked class="form-check-input" id="person_state_id_1" name="person.state_id" type="radio" value="1"/><label class="form-check-label" for="person_state_id_1">TX</label><input class="form-check-input" id="person_state_id_2" name="person.state_id" type="radio" value="2"/><label class="form-check-label" for="person_state_id_2">NY</label><input class="form-check-input" id="person_state_id_3" name="person.state_id" type="radio" value="3"/><label class="form-check-label" for="person_state_id_3">CA</label></div>';
 
 done_testing;
 

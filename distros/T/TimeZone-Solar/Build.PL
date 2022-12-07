@@ -18,7 +18,7 @@ my %module_build_args = (
     "Ian Kluft <ian.kluft+github\@gmail.com>"
   ],
   "dist_name" => "TimeZone-Solar",
-  "dist_version" => "0.1.0",
+  "dist_version" => "0.2.0",
   "license" => "perl",
   "module_name" => "TimeZone::Solar",
   "recursive_test_files" => 1,
@@ -31,9 +31,10 @@ my %module_build_args = (
     "autodie" => 0,
     "feature" => 0,
     "overload" => 0,
-    "perl" => "> v5.26.0",
+    "perl" => "> v5.20.0",
     "strict" => 0,
-    "utf8" => 0
+    "utf8" => 0,
+    "warnings" => 0
   },
   "script_files" => [
     "bin/gen-ltz.pl"
@@ -42,8 +43,7 @@ my %module_build_args = (
     "DateTime" => 0,
     "IO::File" => 0,
     "Test::Exception" => 0,
-    "Test::More" => 0,
-    "warnings" => 0
+    "Test::More" => 0
   }
 );
 
@@ -53,8 +53,7 @@ my %fallback_build_requires = (
   "IO::File" => 0,
   "Module::Build" => "0.28",
   "Test::Exception" => 0,
-  "Test::More" => 0,
-  "warnings" => 0
+  "Test::More" => 0
 );
 
 

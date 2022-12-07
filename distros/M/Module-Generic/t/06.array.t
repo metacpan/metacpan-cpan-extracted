@@ -255,7 +255,7 @@ $a7->for(sub
         $a7->splice( $i, 1 );
         # return( \-1 );
     }
-    return( 1 );
+    return(1);
 });
 is( "@$a7", 'Jack John Gabriel Raphael Emmanuel', 'for changing offset position' );
 
@@ -270,7 +270,8 @@ $a8->for(sub
     $a9->for(sub
     {
         my( $j, $v ) = @_;
-        $a8->return( undef() ) if( $n == 7 && $v == 27 );
+        #$a8->return( undef() ) if( $n == 7 && $v == 27 );
+        $a8->break if( $n == 7 && $v == 27 );
     });
 });
 is( $pos, 7, 'return undef' );
@@ -283,8 +284,8 @@ $a10->for(sub
     my( $i, $n ) = @_;
     $a11->push( $n );
     # tell it to skip Peter
-    $a10->return( +1 ) if( $n eq 'John' );
-    return( 1 );
+    $a10->return(+1) if( $n eq 'John' );
+    return(1);
 });
 is( "@$a11", 'Jack John Paul Gabriel Raphael Emmanuel', 'return skip 1' );
 
@@ -298,7 +299,8 @@ $a8->for(sub
     {
         my( $j, $v ) = @_;
         # should have no effect, because $a10 is sending the return value and $a10 is not an enclosing loop
-        $a10->return( undef() ) if( $n == 7 && $v == 27 );
+        # $a10->return( undef() ) if( $n == 7 && $v == 27 );
+        $a10->break if( $n == 7 && $v == 27 );
     });
 });
 is( $pos, 10, 'ineffective return' );

@@ -243,6 +243,61 @@ sub throw
     die( $e );
 }
 
+# Devel::StackTrace has a stringification overloaded so users can use the object to get more information or simply use it as a string to get the stack trace equivalent of doing $trace->as_string
+sub trace { return( shift->_set_get_object( 'trace', 'Devel::StackTrace', @_ ) ); }
+
+sub type { return( shift->_set_get_scalar( 'type', @_ ) ); }
+
+sub _obj_eq
+{
+    ##return overload::StrVal( $_[0] ) eq overload::StrVal( $_[1] );
+    no overloading;
+    my $self = shift( @_ );
+    my $other = shift( @_ );
+    my $me;
+    if( Scalar::Util::blessed( $other ) && $other->isa( 'Module::Generic::Exception' ) )
+    {
+        if( $self->message eq $other->message &&
+            $self->file eq $other->file &&
+            $self->line == $other->line )
+        {
+            return( 1 );
+        }
+        else
+        {
+            return( 0 );
+        }
+    }
+    # Compare error message
+    elsif( !ref( $other ) )
+    {
+        my $me = $self->message;
+        return( $me eq $other );
+    }
+    # Otherwise some reference data to which we cannot compare
+    return( 0 ) ;
+}
+
+# NOTE: AUTOLOAD
+AUTOLOAD
+{
+    my( $method ) = our $AUTOLOAD =~ /([^:]+)$/;
+    no overloading;
+    my $self = shift( @_ );
+    my $class = ref( $self ) || $self;
+    my $code;
+    if( $code = $self->can( $method ) )
+    {
+        return( $code->( @_ ) );
+    }
+    else
+    {
+        eval( "sub ${class}::${method} { return( shift->_set_get_scalar( '$method', \@_ ) ); }" );
+        die( $@ ) if( $@ );
+        return( $self->$method( @_ ) );
+    }
+};
+
 sub FREEZE
 {
     my $self = CORE::shift( @_ );
@@ -286,60 +341,6 @@ sub THAW
 }
 
 sub TO_JSON { return( shift->as_string ); }
-
-# Devel::StackTrace has a stringification overloaded so users can use the object to get more information or simply use it as a string to get the stack trace equivalent of doing $trace->as_string
-sub trace { return( shift->_set_get_object( 'trace', 'Devel::StackTrace', @_ ) ); }
-
-sub type { return( shift->_set_get_scalar( 'type', @_ ) ); }
-
-sub _obj_eq
-{
-    ##return overload::StrVal( $_[0] ) eq overload::StrVal( $_[1] );
-    no overloading;
-    my $self = shift( @_ );
-    my $other = shift( @_ );
-    my $me;
-    if( Scalar::Util::blessed( $other ) && $other->isa( 'Module::Generic::Exception' ) )
-    {
-        if( $self->message eq $other->message &&
-            $self->file eq $other->file &&
-            $self->line == $other->line )
-        {
-            return( 1 );
-        }
-        else
-        {
-            return( 0 );
-        }
-    }
-    # Compare error message
-    elsif( !ref( $other ) )
-    {
-        my $me = $self->message;
-        return( $me eq $other );
-    }
-    # Otherwise some reference data to which we cannot compare
-    return( 0 ) ;
-}
-
-AUTOLOAD
-{
-    my( $method ) = our $AUTOLOAD =~ /([^:]+)$/;
-    no overloading;
-    my $self = shift( @_ );
-    my $class = ref( $self ) || $self;
-    my $code;
-    if( $code = $self->can( $method ) )
-    {
-        return( $code->( @_ ) );
-    }
-    else
-    {
-        eval( "sub ${class}::${method} { return( shift->_set_get_scalar( '$method', \@_ ) ); }" );
-        die( $@ ) if( $@ );
-        return( $self->$method( @_ ) );
-    }
-};
 
 1;
 

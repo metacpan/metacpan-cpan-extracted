@@ -14,7 +14,11 @@ my $latest_stable_perl = Versions::latest_stable_perl();
 my $latest_dev_perl = Versions::latest_dev_perl();
 
 # fake the current perl version to be something old.
-local $] = '5.024000';
+{
+  use Dist::Zilla::Plugin::EnsureLatestPerl;
+  no warnings 'redefine';
+  *Dist::Zilla::Plugin::EnsureLatestPerl::_PERLVERSION = sub { '5.024000' }
+}
 
 $ENV{DZIL_ANY_PERL} = 0;
 

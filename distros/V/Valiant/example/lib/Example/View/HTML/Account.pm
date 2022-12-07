@@ -13,18 +13,7 @@ __PACKAGE__->views(
   form_for => 'HTML::FormFor',
 );
 
-has 'account' => (
-  is=>'ro', 
-  required=>1,
-  handles=>{
-    states => 'available_states',
-    roles => 'available_roles',
-  },
-);
-
-sub status_options($self) {
-  return [map { [ucfirst($_) => $_] } $self->account->profile->status_options ];
-}
+has 'account' => ( is=>'ro', required=>1 );
 
 sub render($self, $c) {
   $self->layout(page_title=>'Homepage', sub($layout) {
@@ -34,21 +23,21 @@ sub render($self, $c) {
       fieldset [
         $fb->legend,
         div +{ class=>'form-group' },
-          $fb->model_errors(+{class=>'alert alert-danger', role=>'alert', show_message_on_field_errors=>'Please fix validation errors'}),
+          $fb->model_errors(+{show_message_on_field_errors=>'Please fix validation errors'}),
         div +{ class=>'form-group' }, [
           $fb->label('first_name'),
-          $fb->input('first_name', +{ class=>'form-control', errors_classes=>'is-invalid' }),
-          $fb->errors_for('first_name', +{ class=>'invalid-feedback' }),
+          $fb->input('first_name'),
+          $fb->errors_for('first_name'),
         ],
         div +{ class=>'form-group' }, [
           $fb->label('last_name'),
-          $fb->input('last_name', +{ class=>'form-control', errors_classes=>'is-invalid' }),
-          $fb->errors_for('last_name', +{ class=>'invalid-feedback' }),
+          $fb->input('last_name'),
+          $fb->errors_for('last_name'),
         ],
         div +{ class=>'form-group' }, [
           $fb->label('username'),
-          $fb->input('username', +{ class=>'form-control', errors_classes=>'is-invalid' }),
-          $fb->errors_for('username', +{ class=>'invalid-feedback' }),
+          $fb->input('username'),
+          $fb->errors_for('username'),
         ],
       ],
       fieldset [
@@ -57,70 +46,87 @@ sub render($self, $c) {
         $fb->fields_for('profile', sub ($fb_profile, $profile) {
           div +{ class=>'form-group' }, [
             $fb_profile->label('address'),
-            $fb_profile->input('address', +{ class=>'form-control', errors_classes=>'is-invalid' }),
-            $fb_profile->errors_for('address', +{ class=>'invalid-feedback' }),
+            $fb_profile->input('address'),
+            $fb_profile->errors_for('address'),
           ],
           div +{ class=>'form-group' }, [
             $fb_profile->label('city'),
-            $fb_profile->input('city', +{ class=>'form-control', errors_classes=>'is-invalid' }),
-            $fb_profile->errors_for('city', +{ class=>'invalid-feedback' }),
+            $fb_profile->input('city'),
+            $fb_profile->errors_for('city'),
           ],
           div +{ class=>'form-row' }, [
             div +{ class=>'col form-group' }, [
               $fb_profile->label('state_id'),
-              $fb_profile->collection_select('state_id', $self->states, id=>'name', +{ include_blank=>1, class=>'form-control', errors_classes=>'is-invalid'}),
-              $fb_profile->errors_for('state_id', +{ class=>'invalid-feedback' }),
+              $fb_profile->collection_select(state_id => 'state_select_options', +{ include_blank=>1 }),
+              $fb_profile->errors_for('state_id'),
             ],
             div +{ class=>'col form-group' }, [
               $fb_profile->label('zip'),
-              $fb_profile->input('zip', +{ class=>'form-control', errors_classes=>'is-invalid' }),
-              $fb_profile->errors_for('zip', +{ class=>'invalid-feedback' }),
+              $fb_profile->input('zip'),
+              $fb_profile->errors_for('zip'),
             ],
           ],
           div +{ class=>'form-row' }, [
             div +{ class=>'col form-group' }, [
               $fb_profile->label('phone_number'),
-              $fb_profile->input('phone_number', +{ class=>'form-control', errors_classes=>'is-invalid' }),
-              $fb_profile->errors_for('phone_number', +{ class=>'invalid-feedback' }),
+              $fb_profile->input('phone_number'),
+              $fb_profile->errors_for('phone_number'),
             ],
             div +{ class=>'col form-group' }, [
               $fb_profile->label('birthday'),
-              $fb_profile->date_field('birthday', +{ class=>'form-control', errors_classes=>'is-invalid' }),
-              $fb_profile->errors_for('birthday', +{ class=>'invalid-feedback' }),
+              $fb_profile->date_field('birthday'),
+              $fb_profile->errors_for('birthday'),
             ],
           ],
-           div +{ class=>'form-row' }, [
+          div +{ class=>'form-row' }, [
             div +{ class=>'col form-group' }, [
-              div + { class=>'form-check' }, [
-                $fb_profile->checkbox('registered', +{ class=>'form-check-input', errors_classes=>'is-invalid' }),
-                $fb_profile->label('registered', +{ class=>'form-check-label'}),
-                $fb_profile->errors_for('registered', +{ class=>'invalid-feedback' }),
+              fieldset [
+                $fb->legend_for('person_roles'),
+                  $fb->collection_checkbox({person_roles => 'role_id'}, 'role_checkbox_options', sub ($fb_roles) {
+                    div +{class=>'form-check'}, [
+                      $fb_roles->checkbox(),
+                      $fb_roles->label({class=>'form-check-label'}),
+                    ],
+                  }),
+                  $fb->errors_for('person_roles'),
               ],
             ],
             div +{ class=>'col form-group' }, [
               fieldset [
                 $fb_profile->legend_for('status'),
-                $fb_profile->radio_buttons('status', $self->status_options, sub ($fb_status) {
-                  div +{class=>'form-check'}, [
-                    $fb_status->radio_button({class=>'form-check-input'}),
-                    $fb_status->label({class=>'form-check-label'}),
+                $fb_profile->radio_buttons(status => 'status_options', sub ($fb_status) {
+                  div +{class=>'custom-control custom-radio'}, [
+                    $fb_status->radio_button(),
+                    $fb_status->label({class=>'custom-control-label'}),
                   ],
                 }),
+                $fb_profile->errors_for('status'),
+              ]
+            ],
+            div +{ class=>'col form-group' }, [
+              fieldset [
+                $fb_profile->legend_for('employment_id'),
+                $fb_profile->collection_radio_buttons(employment_id => 'employment_radio_options', sub ($fb_emp) {
+                  div +{class=>'custom-control custom-radio'}, [
+                    $fb_emp->radio_button(),
+                    $fb_emp->label({class=>'custom-control-label'}),
+                  ],
+                }),
+                $fb_profile->errors_for('employment_id'),
               ]
             ],
           ],
-        }),
-      ],
-      fieldset [
-        legend $self->account->human_attribute_name('roles'),
-        $fb->errors_for('person_roles', +{ class=>'alert alert-danger', role=>'alert' }),
-        div +{ class=>'form-group' },
-          $fb->collection_checkbox({person_roles => 'role_id'}, $self->roles, id=>'label', sub ($fb_roles) {
-            div +{class=>'form-check'}, [
-              $fb_roles->checkbox({class=>'form-check-input'}),
-              $fb_roles->label({class=>'form-check-label'}),
+          div +{ class=>'form-group' }, [
+            fieldset [
+              legend $self->account->human_attribute_name('Registration'),
+                div + { class=>'form-check' }, [
+                  $fb_profile->checkbox('registered'),
+                  $fb_profile->label('registered', +{ class=>'form-check-label'}),
+                  $fb_profile->errors_for('registered'),
+                ], 
             ],
-          }),
+          ],
+        }),
       ],
       fieldset [
         legend $self->account->human_attribute_name('credit_cards'),
@@ -130,25 +136,27 @@ sub render($self, $c) {
             div +{ class=>'form-row' }, [
               div +{ class=>'col form-group' }, [
                 $fb_cc->label('card_number'),
-                $fb_cc->input('card_number', +{ class=>'form-control', errors_classes=>'is-invalid' }),
-                $fb_cc->errors_for('card_number', +{ class=>'invalid-feedback' }),
+                $fb_cc->input('card_number'),
+                $fb_cc->errors_for('card_number'),
               ],
               div +{ class=>'col form-group col-4' }, [
                 $fb_cc->label('expiration'),
-                $fb_cc->date_field('expiration', +{ class=>'form-control', errors_classes=>'is-invalid' }),
-                $fb_cc->errors_for('expiration', +{ class=>'invalid-feedback' }),
+                $fb_cc->date_field('expiration'),
+                $fb_cc->errors_for('expiration'),
               ],
               div +{ class=>'col form-group col-2' }, [
-                $fb_cc->label('_delete'), br,
-                $fb_cc->checkbox('_delete', +{ checked=>$fb_cc->model->is_marked_for_deletion }),
+                div + { class=>'form-check' }, [
+                  $fb_cc->checkbox('_delete'),
+                  $fb_cc->label('_delete'),
+                ],
               ],
             ]
           }, sub ($fb_final, $new_cc) {
-            $fb_final->button( '_add', +{ class=>'btn btn-lg btn-primary btn-block', value=>1 }, 'Add Credit Card')
+            $fb_final->button( '_add', 'Add Credit Card')
           }),
         ],
       ],
-      fieldset $fb->submit(+{class=>'btn btn-lg btn-primary btn-block'}),
+      fieldset $fb->submit(),
     }),
   });
 }

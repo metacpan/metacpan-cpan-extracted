@@ -10,7 +10,7 @@ sub find_by_id($self, $id) {
 sub account_for($self, $user) {
   my $account = $self->find(
     { 'me.id' => $user->id },
-    { prefetch => ['profile', 'credit_cards', {person_roles => 'role' }] }
+    { prefetch => ['profile', {profile=>'state'}, {profile=>'employment'}, 'credit_cards', {person_roles => 'role' }] }
   );
   $account->build_related_if_empty('profile'); # Needed since the relationship is optional
   $account->profile->status('pending') unless defined($account->profile->status);

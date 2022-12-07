@@ -1,7 +1,7 @@
 {
    "abstract" : "generate and verify Password with any contexts",
    "author" : [
-      "Yuki Yoshida(worthmine) <worthmine!at!gmail.com>"
+      "Yuki Yoshida <worthmine@users.noreply.github.com>"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Minilla/v3.1.14",
@@ -43,13 +43,17 @@
       "runtime" : {
          "requires" : {
             "Crypt::Passwd::XS" : "0.601",
-            "Crypt::PasswdMD5" : "1.4",
-            "Digest::SHA" : "0",
-            "Moose" : "2.2006",
-            "perl" : "5.008008"
+            "Moo" : "2.005004",
+            "Types::Standard" : "1.012004",
+            "perl" : "5.008008",
+            "strictures" : "2.000006"
          }
       },
       "test" : {
+         "recommends" : {
+            "Crypt::PasswdMD5" : "1.4",
+            "Digest::SHA" : "5.96"
+         },
          "requires" : {
             "Test::More" : "0.98"
          }
@@ -58,19 +62,19 @@
    "provides" : {
       "Text::Password::AutoMigration" : {
          "file" : "lib/Text/Password/AutoMigration.pm",
-         "version" : "0.16"
+         "version" : "0.17"
       },
       "Text::Password::CoreCrypt" : {
          "file" : "lib/Text/Password/CoreCrypt.pm",
-         "version" : "0.16"
+         "version" : "0.17"
       },
       "Text::Password::MD5" : {
          "file" : "lib/Text/Password/MD5.pm",
-         "version" : "0.16"
+         "version" : "0.17"
       },
       "Text::Password::SHA" : {
          "file" : "lib/Text/Password/SHA.pm",
-         "version" : "0.16"
+         "version" : "0.17"
       }
    },
    "release_status" : "stable",
@@ -84,12 +88,11 @@
          "web" : "https://github.com/worthmine/Text-Password-AutoMigration"
       }
    },
-   "version" : "0.16",
+   "version" : "0.17",
    "x_authority" : "cpan:WORTHMINE",
    "x_contributors" : [
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
-      "Yuki Yoshida <worthmine@users.noreply.github.com>",
-      "worthmine <worthmine@gmail.com>"
+      "Yuki Yoshida <worthmine@gmail.com>"
    ],
    "x_serialization_backend" : "JSON::PP version 4.07",
    "x_static_install" : 1

@@ -22,7 +22,11 @@ my $fakenow = 2**31;    # January 2038
 set_absolute_time($fakenow);
 
 # fake the current perl version to be the latest known stable release.
-local $] = Versions::latest_stable_perl();
+{
+  use Dist::Zilla::Plugin::EnsureLatestPerl;
+  no warnings 'redefine';
+  *Dist::Zilla::Plugin::EnsureLatestPerl::_PERLVERSION = sub { Versions::latest_stable_perl() };
+}
 
 $ENV{DZIL_ANY_PERL} = 0;
 

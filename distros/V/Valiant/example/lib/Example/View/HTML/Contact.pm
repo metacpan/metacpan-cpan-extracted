@@ -19,10 +19,11 @@ sub render($self, $c) {
     $self->navbar(active_link=>'/contacts'),
     $self->form_for($self->contact, +{style=>'width:35em; margin:auto'}, sub ($ff, $fb, $contact) {
       div +{ cond=>$fb->successfully_updated, class=>'alert alert-success', role=>'alert' }, 'Successfully Saved!',
+
       fieldset [
         $fb->legend,
         div +{ class=>'form-group' },
-          $fb->model_errors(),
+          $fb->model_errors({show_message_on_field_errors=>'Please fix the listed errors.'}),
         div +{ class=>'form-group' }, [
           $fb->label('first_name'),
           $fb->input('first_name'),

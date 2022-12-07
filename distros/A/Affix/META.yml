@@ -1,0 +1,209 @@
+---
+X_No_Archive: Yes
+abstract: 'A Foreign Function Interface eXtension'
+author:
+  - 'Sanko Robinson <sanko@cpan.org>'
+build_requires:
+  Data::Dumper: '0'
+  Test::More: '0.98'
+configure_requires:
+  Archive::Tar: '0'
+  CPAN::Meta: '0'
+  Devel::CheckBin: '0'
+  ExtUtils::Config: '0.003'
+  ExtUtils::Helpers: '0.02'
+  ExtUtils::Install: '0'
+  ExtUtils::InstallPaths: '0.002'
+  File::Basename: '0'
+  File::Find: '0'
+  File::Path: '0'
+  File::Spec::Functions: '0'
+  Getopt::Long: '2.36'
+  IO::Uncompress::Unzip: '0'
+  JSON::PP: '2'
+  Module::Build::Tiny: '0.035'
+  Path::Tiny: '0'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.20, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Affix
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Affix:
+    file: lib/Affix.pm
+    version: '0.04'
+  Affix::Pointer:
+    file: lib/Affix.pm
+    version: '0.04'
+  Affix::Type::Aggregate:
+    file: lib/Affix.pm
+    version: '0.04'
+  Affix::Type::Any:
+    file: lib/Affix.pm
+    version: '0.04'
+  Affix::Type::ArrayRef:
+    file: lib/Affix.pm
+    version: '0.04'
+  Affix::Type::Base:
+    file: lib/Affix.pm
+    version: '0.04'
+  Affix::Type::Bool:
+    file: lib/Affix.pm
+    version: '0.04'
+  Affix::Type::CC_ARM_ARM:
+    file: lib/Affix.pm
+    version: '0.04'
+  Affix::Type::CC_ARM_THUMB:
+    file: lib/Affix.pm
+    version: '0.04'
+  Affix::Type::CC_CDECL:
+    file: lib/Affix.pm
+    version: '0.04'
+  Affix::Type::CC_DEFAULT:
+    file: lib/Affix.pm
+    version: '0.04'
+  Affix::Type::CC_ELLIPSIS:
+    file: lib/Affix.pm
+    version: '0.04'
+  Affix::Type::CC_ELLIPSIS_VARARGS:
+    file: lib/Affix.pm
+    version: '0.04'
+  Affix::Type::CC_FASTCALL_GNU:
+    file: lib/Affix.pm
+    version: '0.04'
+  Affix::Type::CC_FASTCALL_MS:
+    file: lib/Affix.pm
+    version: '0.04'
+  Affix::Type::CC_STDCALL:
+    file: lib/Affix.pm
+    version: '0.04'
+  Affix::Type::CC_SYSCALL:
+    file: lib/Affix.pm
+    version: '0.04'
+  Affix::Type::CC_THISCALL:
+    file: lib/Affix.pm
+    version: '0.04'
+  Affix::Type::CC_THISCALL_GNU:
+    file: lib/Affix.pm
+    version: '0.04'
+  Affix::Type::CC_THISCALL_MS:
+    file: lib/Affix.pm
+    version: '0.04'
+  Affix::Type::Char:
+    file: lib/Affix.pm
+    version: '0.04'
+  Affix::Type::CharEnum:
+    file: lib/Affix.pm
+    version: '0.04'
+  Affix::Type::CodeRef:
+    file: lib/Affix.pm
+    version: '0.04'
+  Affix::Type::Double:
+    file: lib/Affix.pm
+    version: '0.04'
+  Affix::Type::Enum:
+    file: lib/Affix.pm
+    version: '0.04'
+  Affix::Type::Float:
+    file: lib/Affix.pm
+    version: '0.04'
+  Affix::Type::InstanceOf:
+    file: lib/Affix.pm
+    version: '0.04'
+  Affix::Type::Int:
+    file: lib/Affix.pm
+    version: '0.04'
+  Affix::Type::IntEnum:
+    file: lib/Affix.pm
+    version: '0.04'
+  Affix::Type::Long:
+    file: lib/Affix.pm
+    version: '0.04'
+  Affix::Type::LongLong:
+    file: lib/Affix.pm
+    version: '0.04'
+  Affix::Type::Pointer:
+    file: lib/Affix.pm
+    version: '0.04'
+  Affix::Type::SSize_t:
+    file: lib/Affix.pm
+    version: '0.04'
+  Affix::Type::Short:
+    file: lib/Affix.pm
+    version: '0.04'
+  Affix::Type::Size_t:
+    file: lib/Affix.pm
+    version: '0.04'
+  Affix::Type::Str:
+    file: lib/Affix.pm
+    version: '0.04'
+  Affix::Type::Struct:
+    file: lib/Affix.pm
+    version: '0.04'
+  Affix::Type::UChar:
+    file: lib/Affix.pm
+    version: '0.04'
+  Affix::Type::UInt:
+    file: lib/Affix.pm
+    version: '0.04'
+  Affix::Type::UIntEnum:
+    file: lib/Affix.pm
+    version: '0.04'
+  Affix::Type::ULong:
+    file: lib/Affix.pm
+    version: '0.04'
+  Affix::Type::ULongLong:
+    file: lib/Affix.pm
+    version: '0.04'
+  Affix::Type::UShort:
+    file: lib/Affix.pm
+    version: '0.04'
+  Affix::Type::Union:
+    file: lib/Affix.pm
+    version: '0.04'
+  Affix::Type::Void:
+    file: lib/Affix.pm
+    version: '0.04'
+  Affix::Var:
+    file: lib/Affix.pm
+    version: '0.04'
+  Dyn:
+    file: lib/Dyn.pm
+    version: '0.04'
+  Dyn::Call:
+    file: lib/Dyn/Call.pm
+    version: '0.04'
+  Dyn::Callback:
+    file: lib/Dyn/Callback.pm
+    version: '0.04'
+  Dyn::Load:
+    file: lib/Dyn/Load.pm
+    version: '0.04'
+requires:
+  Attribute::Handlers: '0'
+  Config: '0'
+  File::Spec: '0'
+  Sub::Util: '0'
+  Text::ParseWords: '0'
+  XSLoader: '0'
+  perl: '5.030000'
+resources:
+  bugtracker: https://github.com/sanko/Affix.pm/issues
+  homepage: https://github.com/sanko/Affix.pm
+  repository: https://github.com/sanko/Affix.pm.git
+version: '0.04'
+x_authority: cpan:SANKO
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 0

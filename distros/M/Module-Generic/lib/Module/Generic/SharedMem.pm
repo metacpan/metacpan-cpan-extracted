@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/SharedMem.pm
-## Version v0.3.5
+## Version v0.3.6
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/01/18
-## Modified 2022/11/09
+## Modified 2022/11/18
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -41,11 +41,16 @@ BEGIN
     if( $Config{extensions} =~ /$SUPPORTED_RE/ && 
         $^O !~ /^(?:Android|dos|MSWin32|os2|VMS|riscos)/i &&
         # we need semaphore and messages
-        $Config{d_sem} eq 'define' &&
         $Config{d_msg} eq 'define' &&
+        $Config{d_sem} eq 'define' &&
         $Config{d_semctl} eq 'define' &&
         $Config{d_semget} eq 'define' &&
-        $Config{d_semop} eq 'define'
+        $Config{d_semop} eq 'define' &&
+        $Config{d_shm} eq 'define' &&
+        $Config{d_shmat} eq 'define' &&
+        $Config{d_shmctl} eq 'define' &&
+        $Config{d_shmdt} eq 'define' &&
+        $Config{d_shmget} eq 'define'
         )
     {
         require IPC::SysV;
@@ -112,7 +117,7 @@ EOT
             lock    => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
             'flock' => [qw( LOCK_EX LOCK_SH LOCK_NB LOCK_UN )],
     );
-    our $VERSION = 'v0.3.5';
+    our $VERSION = 'v0.3.6';
 };
 
 # use strict;
@@ -414,21 +419,35 @@ sub open
         $create = $self->create;
     }
     my $flags = $self->flags( create => $create, ( $opts->{mode} =~ /^\d+$/ ? $opts->{mode} : () ) );
-    my $id = shmget( $serial, $opts->{size}, $flags );
-    if( defined( $id ) )
+    
+    my $id;
+    try
     {
-    }
-    else
-    {
-        my $newflags = ( $flags & &IPC::SysV::IPC_CREAT ) ? $flags : ( $flags | &IPC::SysV::IPC_CREAT );
-        my $limit = ( $serial + 10 );
-        # &IPC::SysV::ftok has likely made the serial unique, but as stated in the manual page, there is no guarantee
-        while( $serial <= $limit )
+        $id = shmget( $serial, $opts->{size}, $flags );
+        if( defined( $id ) )
         {
-            $id = shmget( $serial, $opts->{size}, $newflags | &IPC::SysV::IPC_CREAT );
-            $serial++;
-            last if( defined( $id ) );
+            # All is ok.
         }
+        else
+        {
+            my $newflags = ( $flags & &IPC::SysV::IPC_CREAT ) ? $flags : ( $flags | &IPC::SysV::IPC_CREAT );
+            my $limit = ( $serial + 10 );
+            # &IPC::SysV::ftok has likely made the serial unique, but as stated in the manual page, there is no guarantee
+            while( $serial <= $limit )
+            {
+                $id = shmget( $serial, $opts->{size}, $newflags | &IPC::SysV::IPC_CREAT );
+                $serial++;
+                last if( defined( $id ) );
+            }
+        }
+    }
+    catch( $e where { /shmget[[:blank:]\h]+not[[:blank:]\h]+implemented/i } )
+    {
+        return( $self->error( "IPC SysV is supported, but somehow shmget is not implemented: $e" ) );
+    }
+    catch( $e )
+    {
+        return( $self->error( "Error while trying to get the shared memory id: $e" ) );
     }
     
     if( !defined( $id ) )
@@ -439,13 +458,26 @@ sub open
     
     # The value 3 can be anything above 0 and below the limit set by SEMMSL. On Linux system, this is usually 32,000. Seem semget(2) man page:
     # "The argument nsems can be 0 (a don't care) when a semaphore set is  not being  created.   Otherwise, nsems must be greater than 0 and less than or equal  to  the  maximum  number  of  semaphores  per  semaphore  set (SEMMSL)."
-    my $semid = semget( $serial, ( $create ? 3 : 0 ), $flags );
-    if( !defined( $semid ) )
+    my $semid;
+    try
     {
-        my $newflags = ( $flags | &IPC::SysV::IPC_CREAT );
-        $semid = semget( $serial, 3, $newflags );
-        return( $self->error( "Unable to get a semaphore for shared memory key \"", ( $opts->{key} || $self->key ), "\" wth id \"$id\": $!" ) ) if( !defined( $semid ) );
+        $semid = semget( $serial, ( $create ? 3 : 0 ), $flags );
+        if( !defined( $semid ) )
+        {
+            my $newflags = ( $flags | &IPC::SysV::IPC_CREAT );
+            $semid = semget( $serial, 3, $newflags );
+            return( $self->error( "Unable to get a semaphore for shared memory key \"", ( $opts->{key} || $self->key ), "\" wth id \"$id\": $!" ) ) if( !defined( $semid ) );
+        }
     }
+    catch( $e where { /semget[[:blank:]\h]+not[[:blank:]\h]+implemented/i } )
+    {
+        return( $self->error( "IPC SysV is supported, but somehow semget is not implemented: $e" ) );
+    }
+    catch( $e )
+    {
+        return( $self->error( "Error while trying to get the semaphore for shared memory id: $e" ) );
+    }
+    
     my $new = $self->new(
         key     => ( $opts->{key} || $self->key ),
         debug   => $self->debug,
@@ -508,8 +540,15 @@ sub rand
     my $self = shift( @_ );
     my $size = $self->size || 1024;
     no strict 'subs';
-    my $key  = shmget( &IPC::SysV::IPC_PRIVATE, $size, &IPC::SysV::S_IRWXU | &IPC::SysV::S_IRWXG | &IPC::SysV::S_IRWXO ) || return( $self->error( "Unable to generate a share memory key: $!" ) );
-    return( $key );
+    try
+    {
+        my $key  = shmget( &IPC::SysV::IPC_PRIVATE, $size, &IPC::SysV::S_IRWXU | &IPC::SysV::S_IRWXG | &IPC::SysV::S_IRWXO ) || return( $self->error( "Unable to generate a share memory key: $!" ) );
+        return( $key );
+    }
+    catch( $e )
+    {
+        return( $self->error( "Error trying to get a random private key using shmget and IPC_PRIVATE: $e" ) );
+    }
 }
 
 # $self->read( $buffer, $size );

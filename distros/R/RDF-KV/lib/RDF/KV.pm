@@ -29,11 +29,11 @@ RDF::KV - Embed RDF linked data in plain old HTML forms
 
 =head1 VERSION
 
-Version 0.13
+Version 0.14
 
 =cut
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 class_type 'URI';
 

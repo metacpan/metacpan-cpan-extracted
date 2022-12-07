@@ -1,6 +1,6 @@
 package DBIx::Class::ResultClass::TrackColumns;
 
-our $VERSION = '0.001001';
+our $VERSION = '0.001002';
  
 use strict;
 use warnings; 
@@ -11,6 +11,7 @@ __PACKAGE__->mk_classdata('_storage_tracked_columns');
 sub _track_storage_value {
   my ($self, $col) = @_;
   return 1 if $self->next::method($col);
+  return 0 unless $self->_storage_tracked_columns;
   return $self->_storage_tracked_columns->{$col} ? 1:0;
 }
 

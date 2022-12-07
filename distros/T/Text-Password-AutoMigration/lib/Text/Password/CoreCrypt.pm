@@ -1,28 +1,23 @@
 package Text::Password::CoreCrypt;
-our $VERSION = "0.16";
+our $VERSION = "0.17";
 
 require 5.008_008;
 use Carp qw(croak carp);
 
-use Moose;
-use Moose::Util::TypeConstraints;
+use Moo;
+use strictures 2;
 
-has minimum => ( is => 'ro', isa => 'Int', default => 4 );
+use Types::Standard qw(Int Bool);
+use constant Min => 4;
 
-subtype 'Default', as 'Int', where { $_ >= 4 }, message {"The Default must be 4 or higher."};
-has default     => ( is => 'rw', isa => 'Default', default => 8 );
-has readability => ( is => 'rw', isa => 'Bool',    default => 1 );
+has default => ( is => 'rw', isa => Int->where('$_ >= 8'), default => sub {8} );
+has readability => ( is => 'rw', isa => Bool, default => 1 );
 
-__PACKAGE__->meta->make_immutable;
-no Moose;
+no Moo::sification;
 
-my @ascii = (
-    '!', '#', qw! " $ % & ' ( ) * + !, ',', qw! - . / !,
-
-    0 .. 9,     qw( : ; < = > ? @ ),
-    'A' .. 'Z', qw( [ \ ] ^ _ ` ),     # to void syntax highlighting -> `
-    'a' .. 'z', qw( { | } ~ ),
-);
+my @w     = ( 'a' .. 'z', 'A' .. 'Z', 0 .. 9 );
+my @seeds = ( @w,     '.', '/' );
+my @ascii = ( @seeds, '#', ',', qw# ! " $ % & ' ( ) * + - : ; < = > ? @ [ \ ] ^ _ ` { | } ~ # );
 
 =encoding utf-8
 
@@ -35,12 +30,13 @@ Text::Password::CoreCrypt - generate and verify Password with perl CORE::crypt()
  my $pwd = Text::Password::CoreCrypt->new();
  my( $raw, $hash ) = $pwd->genarate();          # list context is required
  my $input = $req->body_parameters->{passwd};
- my $data = $pwd->encrypt($input);              # salt is made automatically
+my $data = $pwd->encrypt($input);    # you don't have to care about salt
+
  my $flag = $pwd->verify( $input, $data );
 
 =head1 DESCRIPTION
 
-Text::Password::CoreCrypt is base module for Text::Password::AutoMigration.
+Text::Password::CoreCrypt is a base module for Text::Password::AutoMigration.
 
 B<DON'T USE> directly.
 
@@ -52,13 +48,17 @@ No arguments are required. But you can set some parameters.
 
 =over
 
-=item default
+
+=item default( I<Int> )
+
 
 You can set default length with param 'default' like below:
 
  $pwd = Text::Pasword::AutoMiglation->new( default => 12 );
 
-=item readablity
+
+=item readablity( I<Bool> )
+
 
 Or you can set default strength for password with param 'readablity'.
 
@@ -81,35 +81,38 @@ returns true if the verification succeeds.
 sub verify {
     my $self = shift;
     my ( $input, $data ) = @_;
-    warn "CORE::crypt makes 13bytes hash strings. Your data must be wrong: $data"
-        if $data !~ /^[ !-~]{13}$/;
 
+    warn __PACKAGE__, " makes 13 bytes hash strings. Your data must be wrong: ", $data
+        unless $data =~ /^[ !-~]{13}$/;
     return $data eq CORE::crypt( $input, $data );
+
 }
 
-=head3 nonce($length)
+=head3 nonce( I<Int> )
 
 generates the random strings with enough strength.
 
-the length defaults to 8($self->default).
+the length defaults to 8 || $self->default().
 
 =cut
 
 sub nonce {
     my $self   = shift;
-    my $length = shift || 8;
-    croak "Unvalid length for nonce was set" unless $length =~ /^\d+$/ and $length >= 4;
+    my $length = shift || $self->default();
+
+    croak "Unvalid length for nonce was set" if $length !~ /^\d+$/ or $length < Min;
 
     my $n = '';
-    my @w = ( 0 .. 9, 'a' .. 'z', 'A' .. 'Z' );
+
     do {    # redo unless it gets enough strength
         $n = $w[ rand @w ];
-        $n .= $ascii[ rand @ascii ] until length $n >= $length;
+        $n .= $ascii[ rand @ascii ] while length $n < $length;
+
     } while $n =~ /^\w+$/ or $n =~ /^\W+$/ or $n !~ /\d/ or $n !~ /[A-Z]/ or $n !~ /[a-z]/;
     return $n;
 }
 
-=head3 encrypt($raw)
+=head3 encrypt( I<Str> )
 
 returns hash with CORE::crypt().
 
@@ -118,51 +121,40 @@ salt will be made automatically.
 =cut
 
 sub encrypt {
-    my $self  = shift;
-    my $input = shift;
-    my $min   = $self->minimum();
-    carp __PACKAGE__ . " requires at least $min length"          if length $input < $min;
-    carp __PACKAGE__ . " ignores the password with over 8 bytes" if length $input > 8;
-    carp __PACKAGE__ . " doesn't allow any Wide Characters or white spaces\n" if $input =~ /[^ -~]/;
+    my ( $self, $input ) = @_;
+    croak __PACKAGE__, " requires at least ", Min, "length" if length $input < Min;
+    carp __PACKAGE__, " ignores the password with over 8 bytes" if length $input > 8;
+    croak __PACKAGE__, " doesn't allow any Wide Characters or white spaces" if $input =~ /[^ -~]/;
 
-    return CORE::crypt( $input, $self->_salt() );
+    return CORE::crypt( $input, $seeds[ rand @seeds ] . $seeds[ rand @seeds ] );
 }
 
-=head3 generate($length)
+=head3 generate( I<Int> )
 
 genarates pair of new password and it's hash.
 
 less readable characters(0Oo1Il|!2Zz5sS$6b9qCcKkUuVvWwXx.,:;~-^'"`) are forbidden
 unless $self->readability is 0.
 
-the length defaults to 8($self->default).
+the length defaults to 8 || $self->default().
 
 =cut
 
 sub generate {
     my $self   = shift;
     my $length = shift || $self->default();
-    my $min    = $self->minimum();
 
-    croak "unvalid length was set"                        unless $length =~ /^\d+$/;
-    croak ref($self) . "::generate requires list context" unless wantarray;
-    croak ref($self) . "::generate requires at least $min length" if $length < $min;
+    croak "Invalid length was set" unless $length =~ /^\d+$/;
+    croak ref $self, "::generate requires at least ", Min, " length" if $length < Min;
+    croak ref $self, "::generate requires list context" unless wantarray;
 
     my $raw;
     do {    # redo unless it gets enough readability
         $raw = $self->nonce($length);
         return $raw, $self->encrypt($raw) unless $self->readability();
-    } while ( $raw =~ /[0Oo1Il|!2Zz5sS\$6b9qCcKkUuVvWwXx.,:;~\-^'"`]/i );
 
+    } while $raw =~ /[0Oo1Il|!2Zz5sS\$6b9qCcKkUuVvWwXx.,:;~\-^'"`]/;
     return $raw, $self->encrypt($raw);
-}
-
-sub _salt {
-    my $self  = shift;
-    my @seeds = ( 'a' .. 'z', 'A' .. 'Z', 0 .. 9, '.', '/' );
-    my $salt  = '';
-    $salt .= $seeds[ rand @seeds ] until length $salt == 2;
-    return $salt;
 }
 
 1;
@@ -178,4 +170,4 @@ it under the same terms as Perl itself.
 
 =head1 AUTHOR
 
-Yuki Yoshida(worthmine) E<lt>worthmine!at!gmail.comE<gt>
+Yuki Yoshida E<lt>worthmine@users.noreply.github.comE<gt>

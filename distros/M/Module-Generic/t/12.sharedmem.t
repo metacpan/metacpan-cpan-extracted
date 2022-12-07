@@ -65,7 +65,7 @@ SKIP:
         $s->unlock;
         $s->remove;
     };
-    skip( "Failed to create shared memory object. Your system does not seem to support shared memory: $!", 21 ) if( !defined( $s ) );
+    skip( "Failed to create shared memory object. Your system does not seem to support shared memory: " . $shem->error->message, 21 ) if( !defined( $s ) );
     ok( defined( $s ), 'open return value' );
 
     isa_ok( $s, ['Module::Generic::SharedMem'], 'Shared memory object' );
@@ -197,7 +197,7 @@ SKIP:
         };
         exit(0);
     }
-}
+};
 
 subtest 'Module::Generic::SharedMemXS' => sub
 {
@@ -216,7 +216,11 @@ subtest 'Module::Generic::SharedMemXS' => sub
         $shem->create(1);
         ok( $shem->create == 1, 'create updated value' );
         my $exists = $shem->exists;
-        diag( "Error calling exists: ", $shem->error ) if( !defined( $exists ) );
+        diag( "Error calling exists: ", $shem->error ) if( ( $ENV{AUTOMATED_TESTING} || $DEBUG ) && !defined( $exists ) );
+        if( !defined( $exists ) && $shem->error->message =~ /not[[:blank:]\h]+implemented/i )
+        {
+            skip( "IPC SysV key components are not implemented on your system", 22 );
+        }
         # Some previous test did not cleanup
         if( defined( $exists ) && $exists )
         {

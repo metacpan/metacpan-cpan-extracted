@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File/IO.pm
-## Version v0.1.2
+## Version v0.1.3
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2022/04/26
-## Modified 2022/10/31
+## Modified 2022/11/12
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -27,7 +27,7 @@ BEGIN
     push( @EXPORT, @{$Fcntl::EXPORT_TAGS{flock}}, @{$Fcntl::EXPORT_TAGS{seek}} );
     our @EXPORT_OK = qw( wraphandle );
     our $THAW_REOPENS_FILE = 1;
-    our $VERSION = 'v0.1.2';
+    our $VERSION = 'v0.1.3';
 };
 
 use strict;
@@ -299,7 +299,7 @@ sub _filehandle_method
 sub DESTROY
 {
     # NOTE: Storable creates a dummy object as a SCALAR instead of GLOB, so we need to check.
-    shift->close if( Scalar::Util::reftype( $_[0] ) eq 'GLOB' );
+    shift->close if( ( Scalar::Util::reftype( $_[0] ) // '' ) eq 'GLOB' );
 }
 
 sub FREEZE
@@ -386,7 +386,7 @@ Module::Generic::File::IO - File IO Object Wrapper
 
 =head1 VERSION
 
-    v0.1.2
+    v0.1.3
 
 =head1 DESCRIPTION
 
@@ -412,7 +412,7 @@ A file descriptor. When this is provided, the newly created object will perform 
 
 =item C<mode>
 
-A mode which will be used along with C<fileno> to fdopen the file descriptor. Possible values can be C<< < >>, C<< >+ >>, etc and C<r>, C<w>, C<r+>
+A mode which will be used along with C<fileno> to fdopen the file descriptor. Possible values can be C<< < >>, C<< +< >>, C<< >+ >>, C<< +> >>, etc and C<r>, C<r+>, C<w>, C<w+>. C<a> and C<a+>
 
 =back
 

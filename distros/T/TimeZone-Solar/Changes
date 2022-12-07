@@ -1,5 +1,13 @@
 Revision history for TimeZone::Solar
 
+0.2.0 2022-12-07T10:17:01+00:00 UTC
+ [BUG FIXES]
+ - added tests to improve code coverage
+
+ [MINOR]
+ - changed minimum Perl version from 5.26 to 5.20
+ - fixed name & short_name accessors to match documentation
+
 0.1.0 2022-12-06T07:13:22+00:00 UTC
  [MINOR]
  - initial release: DateTime & DateTime::TimeZone compatibility; 5100+

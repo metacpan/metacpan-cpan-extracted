@@ -59,7 +59,7 @@ MANIFEST
 ppport.h
 README
 t/00-load.t
-test.syms
+testsyms
 testcurses
 testint.c
 testsym.c

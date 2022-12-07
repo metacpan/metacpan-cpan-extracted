@@ -18,7 +18,7 @@ sub contact :Chained(../contacts) PathPart('') CaptureArgs(0) ($self, $c, $colle
 
     sub POST_create :Action RequestModel(ContactRequest) ($self, $c, $r, $contact) {
       return $contact->set_from_request($r) ?
-        $c->view->set_http_created(location => $c->uri($self->action_for('update'), $contact->id) ) :
+        $c->redirect_to($self->action_for('edit'), $contact->id) : 
           $c->view->set_http_bad_request;
     }
 

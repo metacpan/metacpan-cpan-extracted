@@ -27,6 +27,7 @@ on 'test' => sub {
     requires 'Test::Refcount', '>= 0.07';
     requires 'Test::MockModule', '>= 0.171';
     requires 'Log::Any::Test', '>= 1.710';
+    requires 'Log::Any::Adapter::TAP';
     requires 'File::Temp';
 };
 

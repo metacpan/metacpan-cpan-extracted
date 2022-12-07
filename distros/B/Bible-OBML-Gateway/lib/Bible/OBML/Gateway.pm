@@ -13,7 +13,7 @@ use Mojo::UserAgent;
 use Mojo::URL;
 use Mojo::Util 'html_unescape';
 
-our $VERSION = '2.05'; # VERSION
+our $VERSION = '2.06'; # VERSION
 
 has translation => 'NIV';
 has url         => Mojo::URL->new('https://www.biblegateway.com/passage/');
@@ -108,10 +108,10 @@ sub parse ( $self, $html ) {
     $_->parent->strip if ( $_ = $block->find('div.poetry > h2')->first );
 
     $block->descendant_nodes->grep( sub { $_->type eq 'comment' } )->each('remove');
-    $block
-        ->find('.il-text, hidden, hr, .translation-note, span.inline-note, a.full-chap-link, b.inline-h3')
-        ->each('remove');
-    $block->find('.std-text, hgroup, b, em, versenum')->each('strip');
+    $block->find(
+        '.il-text, hidden, hr, .translation-note, span.inline-note, a.full-chap-link, b.inline-h3, top1'
+    )->each('remove');
+    $block->find('.std-text, hgroup, b, em, versenum, char')->each('strip');
     $block
         ->find('i, .italic, .trans-change, .idiom, .catch-word, selah, span.selah')
         ->each( sub { _retag( $_, 'i' ) } );
@@ -314,7 +314,7 @@ sub parse ( $self, $html ) {
     $block->at('p')->prepend_content('<verse_number>1</verse_number>')
         if ( $block->at('p') and not $block->at('p')->at('verse_number') );
 
-    $block->find('div, span, u, sup, bk')->each('strip');
+    $block->find('div, span, u, sup, bk, verse, start-chapter')->each('strip');
 
     $html = html_unescape( $block->to_string );
     $html =~ s/<p>[ ]+/<p>/g;
@@ -340,7 +340,7 @@ Bible::OBML::Gateway - Bible Gateway content conversion to Open Bible Markup Lan
 
 =head1 VERSION
 
-version 2.05
+version 2.06
 
 =for markdown [![test](https://github.com/gryphonshafer/Bible-OBML-Gateway/workflows/test/badge.svg)](https://github.com/gryphonshafer/Bible-OBML-Gateway/actions?query=workflow%3Atest)
 [![codecov](https://codecov.io/gh/gryphonshafer/Bible-OBML-Gateway/graph/badge.svg)](https://codecov.io/gh/gryphonshafer/Bible-OBML-Gateway)

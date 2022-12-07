@@ -1,5 +1,8 @@
 Revision history for Bible::OBML::Gateway
 
+2.06      2022-12-07 10:49:01-08:00 America/Los_Angeles
+        - Minor parse additions to solve for CEV edge cases
+
 2.05      2022-12-05 10:20:44-08:00 America/Los_Angeles
         - fetch() will attempt references that fail a Bible::Reference check
         - More precise parsing of: Joel 3 (CJB), John 7 (NCB), John 8 (NIV), Psalm 3 (ESV)

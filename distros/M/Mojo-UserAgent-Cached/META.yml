@@ -42,4 +42,4 @@ resources:
   bugtracker: https://github.com/nicomen/mojo-useragent-cached/issues
   license: http://dev.perl.org/licenses/
   repository: http://github.com/nicomen/mojo-useragent-cached
-version: '1.22'
+version: '1.24'

@@ -25,7 +25,6 @@ __PACKAGE__->mk_classdata( auto_validation => 1 );
 __PACKAGE__->mk_classdata( _nested => [] );
 __PACKAGE__->mk_classdata( _src_info => '' );
 
-
 sub many_to_many {
   my $class = shift;
   my ($meth_name, $link, $far_side) = @_;
@@ -323,6 +322,11 @@ sub inject_attribute {
   die $@ if $@;
 }
 
+sub is_attribute_changed {
+  my ($self, $attr) = @_;
+  return $self->is_column_changed($attr);
+}
+
 # We override here because we really want the uninflated values for the columns.
 # Otherwise if we try to inflate first we can get an error since the value has not
 # been validated and may not inflate.  We see this very commonly on date type columns
@@ -350,6 +354,16 @@ sub read_attribute_for_validation {
   debug 2, "Failing back @{[ $self->can($attribute) ? 'succeeds':'failed' ]}";
 
   return $self->$attribute if $self->can($attribute); 
+  my %columns = $self->get_columns;
+  return $columns{$attribute} if exists($columns{$attribute});
+}
+
+sub read_attribute_for_html {
+  my ($self, $attribute) = @_;
+
+  return $self->is_marked_for_deletion if $attribute eq '_delete';
+  return 1 if $attribute eq '_add';
+  return $self->read_attribute_for_validation($attribute);
 }
 
 # Provide basic uniqueness checking for columns.  This is basically a dumb DB lookup.  
@@ -747,7 +761,8 @@ sub set_multi_related_from_params {
 
       if($was_add) {
         debug 3, "Since @{[ ref $related_model]} was an _add we won't validate since its empty";
-        $related_model->skip_validate;
+        #$related_model->errors->add(undef, 'newwww');
+        #$related_model->skip_validate;   Need to leave this off for now because doesn't play well with new models
         $related_model->{__valiant_donot_insert} = 1;
       }
 

@@ -59,6 +59,7 @@ do { my $x = {
                                    'File::Temp' => '0',
                                    'IO::Handle' => '0',
                                    'IPC::Open3' => '0',
+                                   'Log::Any::Adapter::TAP' => '0',
                                    'Log::Any::Test' => '1.710',
                                    'Test::CheckDeps' => '0.010',
                                    'Test::Fatal' => '0.010',

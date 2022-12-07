@@ -59,7 +59,7 @@ SYNOPSIS
 VERSION
 =======
 
-        v0.27.1
+        v0.29.0
 
 DESCRIPTION
 ===========
@@ -145,13 +145,13 @@ calling package, so the end user may do a test such as:
         $obj->some_method( 'some arguments' );
         die( $obj->error() ) if( $obj->error() );
 
-        ## some_method() would then contain something like:
+        # some_method() would then contain something like:
         sub some_method
         {
             my $self = shift( @_ );
             ## Clear all previous error, so we may set our own later one eventually
             $self->clear_error();
-            ## ...
+            # ...
         }
 
 This way the end user may be sure that if `$obj-`error()\> returns true
@@ -281,6 +281,22 @@ here to set light color if the value is less than 1. For example :
 
         print( $o->coloured( 'underline rgba(255, 0, 0, 0.5)', "Hello everyone!" ), "\n" );
 
+debug
+-----
+
+Set or get the debug level. This takes and return an integer.
+
+Based on the value, [\"message\"](#message){.perl-module} will or will
+not print out messages. For example :
+
+        $self->debug( 2 );
+        $self->message( 2, "Debugging message here." );
+
+Since `2` used in [\"message\"](#message){.perl-module} is equal to the
+debug value, the debugging message is printed.
+
+If the debug value is switched to 1, the message will be silenced.
+
 deserialise
 -----------
 
@@ -289,20 +305,41 @@ deserialise
         my $ref = $self->deserialise( $serialised_data, %hash_of_options );
         my $ref = $self->deserialise( $serialised_data, $hash_reference_of_options );
 
-This method deserialise data previously serialised by either
-[CBOR](https://metacpan.org/pod/CBOR::XS){.perl-module},
-[Sereal](https://metacpan.org/pod/Sereal){.perl-module} or
-[Storable](https://metacpan.org/pod/Storable::Improved){.perl-module}.
+This method use a specified serialiser class and deserialise the given
+data either directly from a specified file or being provided, and
+returns the perl data.
+
+The serialisers currently supported are:
+[CBOR::Free](https://metacpan.org/pod/CBOR::Free){.perl-module},
+[CBOR::XS](https://metacpan.org/pod/CBOR::XS){.perl-module},
+[JSON](https://metacpan.org/pod/JSON){.perl-module},
+[Sereal](https://metacpan.org/pod/Sereal){.perl-module} and
+[Storable::Improved](https://metacpan.org/pod/Storable::Improved){.perl-module}
+(or the legacy
+[Storable](https://metacpan.org/pod/Storable){.perl-module}). They are
+not required by
+[Module::Generic](https://metacpan.org/pod/Module::Generic){.perl-module},
+so you must install them yourself. If the serialiser chosen is not
+installed, this will set an
+[errr](https://metacpan.org/pod/Module::Generic#error){.perl-module} and
+return `undef`.
 
 It takes an hash or hash reference of options. You can also provide the
 data to deserialise as the first argument followed by an hash or hash
 reference of options.
 
+It can then:
+
+-   retrieve data directly from File
+-   retrieve data from a file handle (only with
+    [Storable](https://metacpan.org/pod/Storable){.perl-module})
+-   Return the deserialised data
+
 The supported options are:
 
-`base64`
+-   `base64`
 
-:   Thise can be set to a true value like `1`, or to your preferred
+    Thise can be set to a true value like `1`, or to your preferred
     base64 encoder/decoder, or to an array reference containing 2 code
     references, the first one for encoding and the second one for
     decoding.
@@ -319,23 +356,32 @@ The supported options are:
     If this option is set and no appropriate module could be found,
     `deserialise` will return an error.
 
-`data`
+-   `data`
 
-:   Data to be deserialised.
+    Data to be deserialised.
 
-`file`
+-   `file`
 
-:   Provides a file path from which to read the serialised data.
+    Provides a file path from which to read the serialised data.
 
-`io`
+-   `io`
 
-:   A filehandle to read the data to deserialise from. This option only
-    works with
-    [Storable](https://metacpan.org/pod/Storable::Improved){.perl-module}
+    A file handle. This is used when the serialiser is
+    [Storable](https://metacpan.org/pod/Storable){.perl-module} to call
+    its function [\"store\_fd\" in
+    Storable::Improved](https://metacpan.org/pod/Storable::Improved#store_fd){.perl-module}
+    and [\"fd\_retrieve\" in
+    Storable::Improved](https://metacpan.org/pod/Storable::Improved#fd_retrieve){.perl-module}
 
-`serialiser`
+-   *lock*
 
-:   Specify the class name of the serialiser to use. Supported
+    Boolean. If true, this will lock the file before reading from it.
+    This works only in conjonction with *file* and the serialiser
+    [Storable::Improved](https://metacpan.org/pod/Storable::Improved){.perl-module}
+
+-   `serialiser`
+
+    Specify the class name of the serialiser to use. Supported
     serialiser can either be `CBOR` or
     [CBOR::XS](https://metacpan.org/pod/CBOR::XS){.perl-module},
     [Sereal](https://metacpan.org/pod/Sereal){.perl-module} and
@@ -363,111 +409,6 @@ The supported options are:
 
     See [Sereal](https://metacpan.org/pod/Sereal){.perl-module} for
     detail on those options.
-
-deserialize
------------
-
-Alias for [\"deserialise\"](#deserialise){.perl-module}
-
-debug
------
-
-Set or get the debug level. This takes and return an integer.
-
-Based on the value, [\"message\"](#message){.perl-module} will or will
-not print out messages. For example :
-
-        $self->debug( 2 );
-        $self->message( 2, "Debugging message here." );
-
-Since `2` used in [\"message\"](#message){.perl-module} is equal to the
-debug value, the debugging message is printed.
-
-If the debug value is switched to 1, the message will be silenced.
-
-deserialise
------------
-
-This method use a specified serialiser class and deserialise the given
-data either directly from a specified file or being provided, and
-returns the perl data.
-
-The 2 serialisers currently supported are:
-[Sereal](https://metacpan.org/pod/Sereal){.perl-module} and
-[Storable::Improved](https://metacpan.org/pod/Storable::Improved){.perl-module}
-(or the legacy
-[Storable](https://metacpan.org/pod/Storable){.perl-module}). They are
-not required by
-[Module::Generic](https://metacpan.org/pod/Module::Generic){.perl-module},
-so you must install them yourself. If the serialiser chosen is not
-installed, this will set an
-[errr](https://metacpan.org/pod/Module::Generic#error){.perl-module} and
-return `undef`.
-
-This method takes some parameters as an hash or hash reference. It can
-then:
-
--   retrieve data directly from File
--   retrieve data from a file handle (only with
-    [Storable](https://metacpan.org/pod/Storable){.perl-module})
--   Return the deserialised data
-
-The supported parameters are:
-
--   *data*
-
-    String of data to deserialise.
-
--   *file*
-
-    String. A file path where to store the serialised data.
-
--   *io*
-
-    A file handle. This is used when the serialiser is
-    [Storable](https://metacpan.org/pod/Storable){.perl-module} to call
-    its function [\"store\_fd\" in
-    Storable::Improved](https://metacpan.org/pod/Storable::Improved#store_fd){.perl-module}
-    and [\"fd\_retrieve\" in
-    Storable::Improved](https://metacpan.org/pod/Storable::Improved#fd_retrieve){.perl-module}
-
--   *lock*
-
-    Boolean. If true, this will lock the file before reading from it.
-    This works only in conjonction with *file* and the serialiser
-    [Storable::Improved](https://metacpan.org/pod/Storable::Improved){.perl-module}
-
--   *serialiser* or *serializer*
-
-    A string being the class of the serialiser to use. This can be only
-    either [Sereal](https://metacpan.org/pod/Sereal){.perl-module} or
-    [Storable](https://metacpan.org/pod/Storable){.perl-module} or
-    [Storable::Improved](https://metacpan.org/pod/Storable::Improved){.perl-module}
-
-Additionally the following options are supported and passed through
-directly to each serialiser:
-
--   [CBOR](https://metacpan.org/pod/CBOR::XS){.perl-module}:
-    `max_depth`, `max_size`, `allow_unknown`, `allow_sharing`,
-    `allow_cycles`, `forbid_objects`, `pack_strings`, `text_keys`,
-    `text_strings`, `validate_utf8`, `filter`
--   [JSON](https://metacpan.org/pod/JSON){.perl-module}: `allow_blessed`
-    `allow_nonref` `allow_unknown` `allow_tags` `ascii` `boolean_values`
-    `canonical` `convert_blessed` `filter_json_object`
-    `filter_json_single_key_object` `indent` `latin1` `max_depth`
-    `max_size` `pretty` `relaxed` `space_after` `space_before` `utf8`
--   [\"decode\" in
-    Sereal::Decoder](https://metacpan.org/pod/Sereal::Decoder#decode){.perl-module}
-    if the serialiser is
-    [Sereal](https://metacpan.org/pod/Sereal){.perl-module}:
-    `alias_smallint`, `alias_varint_under`, `incremental`,
-    `max_num_array_entries`, `max_num_hash_entries`,
-    `max_recursion_depth`, `max_string_length`, `max_uncompressed_size`,
-    `no_bless_objects`, `refuse_objects`, `refuse_snappy`,
-    `set_readonly`, `set_readonly_scalars`, `use_undef`, `validate_utf8`
--   [Storable::Improved](https://metacpan.org/pod/Storable::Improved){.perl-module}
-    / [Storable](https://metacpan.org/pod/Storable){.perl-module}: no
-    option available
 
 If an error occurs, this sets an
 [error](https://metacpan.org/pod/Module::Generic#error){.perl-module}
@@ -867,11 +808,11 @@ provided as first argument, the message will not be displayed.
 
 For example:
 
-        ## Set debugness to 3
+        # Set debugness to 3
         $obj->debug( 3 );
-        ## This message will not be printed
+        # This message will not be printed
         $obj->message( 4, "Some detailed debugging stuff that we might not want." );
-        ## This will be displayed
+        # This will be displayed
         $obj->message( 2, "Some more common message we want the user to see." );
 
 Now, why debug is used and not verbose level? Well, because mostly, the
@@ -1048,6 +989,16 @@ object. If any arguments are provided, it will pass it to [\"new\" in
 Module::Generic::File](https://metacpan.org/pod/Module::Generic::File#new){.perl-module}
 and return the object.
 
+new\_glob
+---------
+
+This method is called instead of [\"new\"](#new){.perl-module} in your
+package for GLOB type module.
+
+It will set an hash of options provided and call
+[\"init\"](#init){.perl-module} and return the newly instantiated object
+upon success, or `undef` upon error.
+
 new\_hash
 ---------
 
@@ -1206,6 +1157,16 @@ new\_tempfile
 Returns a new temporary directory by calling [\"tempfile\" in
 Module::Generic::File](https://metacpan.org/pod/Module::Generic::File#tempfile){.perl-module}
 
+new\_version
+------------
+
+Provided with a version and this will return a new
+[version](https://metacpan.org/pod/version){.perl-module} object.
+
+If the value provided is not a suitable version, this will set an
+[error](https://metacpan.org/pod/Module::Generic#error){.perl-module}
+and return `undef`
+
 noexec
 ------
 
@@ -1290,8 +1251,10 @@ serialise
 This method use a specified serialiser class and serialise the given
 data either by returning it or by saving it directly to a given file.
 
-The 3 serialisers currently supported are:
-[CBOR](https://metacpan.org/pod/CBOR::XS){.perl-module},
+The serialisers currently supported are:
+[CBOR::Free](https://metacpan.org/pod/CBOR::Free){.perl-module},
+[CBOR::XS](https://metacpan.org/pod/CBOR::XS){.perl-module},
+[JSON](https://metacpan.org/pod/JSON){.perl-module},
 [Sereal](https://metacpan.org/pod/Sereal){.perl-module} and
 [Storable::Improved](https://metacpan.org/pod/Storable::Improved){.perl-module}
 (or the legacy version
@@ -1367,6 +1330,9 @@ The supported parameters are:
 Additionally the following options are supported and passed through
 directly for each serialiser:
 
+-   [CBOR::Free](https://metacpan.org/pod/CBOR::Free){.perl-module}:
+    `canonical`, `string_encode_mode`, `preserve_references`,
+    `scalar_references`
 -   [CBOR](https://metacpan.org/pod/CBOR::XS){.perl-module}:
     `max_depth`, `max_size`, `allow_unknown`, `allow_sharing`,
     `allow_cycles`, `forbid_objects`, `pack_strings`, `text_keys`,
@@ -2006,6 +1972,151 @@ object. So when the
 [DateTime](https://metacpan.org/pod/DateTime){.perl-module} object is
 stringified, it displays the same string that was originally parsed.
 
+Supported formats are:
+
+`2019-10-03 19-44+0000` or `2019-10-03 19:44:01+0000`
+
+:   Found in GNU PO files for example.
+
+`2019-06-19 23:23:57.000000000+0900`
+
+:   Found in PostgreSQL
+
+`2019-06-20T11:08:27`
+
+:   Matching ISO8601 format
+
+`2019-06-20 02:03:14`
+
+:   Found in SQLite
+
+`2019-06-20 11:04:01`
+
+:   Found in MySQL
+
+`Sun, 06 Oct 2019 06:41:11 GMT`
+
+:   Standard HTTP dates
+
+`12 March 2001 17:07:30 JST`
+
+:   
+
+`12-March-2001 17:07:30 JST`
+
+:   
+
+`12/March/2001 17:07:30 JST`
+
+:   
+
+`12 March 2001 17:07`
+
+:   
+
+`12 March 2001 17:07 JST`
+
+:   
+
+`12 March 2001 17:07:30+0900`
+
+:   
+
+`12 March 2001 17:07:30 +0900`
+
+:   
+
+`Monday, 12 March 2001 17:07:30 JST`
+
+:   
+
+`Monday, 12 Mar 2001 17:07:30 JST`
+
+:   
+
+`03/Feb/1994:00:00:00 0000`
+
+:   
+
+`2019-06-20`
+
+:   
+
+`2019/06/20`
+
+:   
+
+`2016.04.22`
+
+:   
+
+`2014, Feb 17`
+
+:   
+
+`17 Feb, 2014`
+
+:   
+
+`February 17, 2009`
+
+:   
+
+`15 July 2021`
+
+:   
+
+`22.04.2016`
+
+:   
+
+`22-04-2016`
+
+:   
+
+`17. 3. 2018.`
+
+:   
+
+`17.III.2020`
+
+:   
+
+`17. III. 2018.`
+
+:   
+
+`20030613`
+
+:   
+
+`2021年7月14日`
+
+:   Japanese regular date using occidental years
+
+`令和3年7月14日`
+
+:   Japanese regular date using Japanese era years
+
+Unix timestamp possibly followed by a dot and milliseconds
+
+:   
+
+Relative date to current date and time
+
+:   Example:
+
+            -5Y - 5 years
+            +2M + 2 months
+            +3D + 3 days
+            -2h - 2 hours
+            -4m - 4 minutes
+            -10s - 10 seconds
+
+\'now\'
+
+:   The word now will set the return value to the current date and time
+
 \_set\_get
 ----------
 
@@ -2520,14 +2631,20 @@ removal of value.
 
 This hash reference can contain the following properties:
 
-field
+-   `callbacks`
 
-:   The object property name
-
-callbacks
-
-:   An hash reference of operation type (`add` or `remove`) to callback
+    An hash reference of operation type (`add` or `remove`) to callback
     subroutine name or code reference pairs.
+
+-   `field`
+
+    The object property name
+
+-   `undef_ok`
+
+    If this is set to a true value, this support method will allow undef
+    to be set. Default to false, which means an undefined value passed
+    will be ignored.
 
 For example:
 
@@ -2728,7 +2845,8 @@ properties:
     [URI](https://metacpan.org/pod/URI){.perl-module}, but you could
     also use
     [URI::Fast](https://metacpan.org/pod/URI::Fast){.perl-module}, or
-    other class of your choice.
+    other class of your choice. That class will be loaded, if it is not
+    loaded already.
 
 It accepts an [URI](https://metacpan.org/pod/URI){.perl-module} object
 (or any other URI class object), an uri or urn string, or an absolute
@@ -2742,7 +2860,7 @@ object ?
 \_set\_get\_uuid
 ----------------
 
-Provided with an object property name, and an UUID (Universal Unique
+Provided with an object, a property name, and an UUID (Universal Unique
 Identifier) and this stores it as an object of
 [Module::Generic::Scalar](https://metacpan.org/pod/Module::Generic::Scalar){.perl-module}.
 
@@ -2753,6 +2871,56 @@ context, such as in chaining, this will return a special
 [Module::Generic::Null](https://metacpan.org/pod/Module::Generic::Null){.perl-module}
 object that prevents perl error that whatever method follows was called
 on an undefined value.
+
+\_set\_get\_version
+-------------------
+
+        sub version { return( shift->_set_get_version( 'version', @_ ) ); }
+        # or
+        sub version : lvalue { return( shift->_set_get_version( 'version', @_ ) ); }
+        # or
+        sub version : lvalue { return( shift->_set_get_version( { field => 'version', class => 'Perl::Version' }, @_ ) ); }
+
+Provided with an object, a property name, and a version string and this
+stores it as an object of
+[version](https://metacpan.org/pod/version){.perl-module} by default.
+
+Alternatively, the property name can be an hash with the following
+properties:
+
+*field*
+
+:   The object property name
+
+*class*
+
+:   The version class to use. By default,
+    [version](https://metacpan.org/pod/version){.perl-module}, but you
+    could also use
+    [Perl::Version](https://metacpan.org/pod/Perl::Version){.perl-module},
+    or other class of your choice. That class will be loaded, if it is
+    not loaded already.
+
+The value can also be assigned as an lvalue. Assuming you have a method
+`version` that implements `_set_get_version`:
+
+        $obj->version = $version;
+
+would work, but of course also:
+
+        $obj->version( $version );
+
+The value can be a legitimate version string, or a version object
+matching the `class` to be used, which is by default
+[version](https://metacpan.org/pod/version){.perl-module}. If it is a
+string, it will be made an object of the class specified using `parse`
+if that class supports it, or by simply calling `new`.
+
+When called in get mode, it will convert any value pre-set, if any, into
+a version object of the specified class if the value is not an object of
+that class already, and return it, or else it will return an empty
+string or undef whatever you will have set in your object for this
+property.
 
 \_to\_array\_object
 -------------------
@@ -2961,7 +3129,7 @@ and
 AUTHOR
 ======
 
-Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x5649fc5c7690)"}\>
+Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x555acd7fd000)"}\>
 
 COPYRIGHT & LICENSE
 ===================

@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Dist::Zilla::Plugin::EnsureLatestPerl; # git description: v0.008-7-g2af63e3
+package Dist::Zilla::Plugin::EnsureLatestPerl; # git description: v0.009-2-g9f213bb
 # vim: set ts=8 sts=2 sw=2 tw=115 et :
 # ABSTRACT: Ensure the author is releasing using the latest Perl
 # KEYWORDS: plugin release develop author perl version latest
 
-our $VERSION = '0.009';
+our $VERSION = '0.010';
 
 use Moose;
 with 'Dist::Zilla::Role::BeforeRelease';
@@ -13,6 +13,8 @@ with 'Dist::Zilla::Role::BeforeRelease';
 use Module::CoreList;
 use List::Util 'first';
 use namespace::autoclean;
+
+sub _PERLVERSION { $] }
 
 around dump_config => sub
 {
@@ -58,8 +60,8 @@ sub before_release
     my $latest_dev_perl = first { /^5\.(\d{3})/; defined $1 and $1 % 2 == 1 } @all_perl_releases;
 
     $self->log_fatal([ 'current perl (%s) is neither the latest stable nor development perl (%s, %s) -- %s',
-            $], $latest_stable_perl, $latest_dev_perl, $error_suffix ])
-        if "$]" ne $latest_stable_perl and "$]" ne $latest_dev_perl;
+            _PERLVERSION, $latest_stable_perl, $latest_dev_perl, $error_suffix ])
+        if _PERLVERSION.'' ne $latest_stable_perl and _PERLVERSION.'' ne $latest_dev_perl;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -76,7 +78,7 @@ Dist::Zilla::Plugin::EnsureLatestPerl - Ensure the author is releasing using the
 
 =head1 VERSION
 
-version 0.009
+version 0.010
 
 =head1 SYNOPSIS
 

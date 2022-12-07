@@ -4,7 +4,7 @@
       "Tom Molesworth <TEAM@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -83,6 +83,7 @@
             "File::Temp" : "0",
             "IO::Handle" : "0",
             "IPC::Open3" : "0",
+            "Log::Any::Adapter::TAP" : "0",
             "Log::Any::Test" : "1.710",
             "Test::CheckDeps" : "0.010",
             "Test::Fatal" : "0.010",
@@ -95,11 +96,11 @@
    "provides" : {
       "Database::Async::Engine::PostgreSQL" : {
          "file" : "lib/Database/Async/Engine/PostgreSQL.pm",
-         "version" : "1.000"
+         "version" : "1.001"
       },
       "Database::Async::Engine::PostgreSQL::DDL" : {
          "file" : "lib/Database/Async/Engine/PostgreSQL/DDL.pm",
-         "version" : "1.000"
+         "version" : "1.001"
       }
    },
    "release_status" : "stable",
@@ -114,14 +115,14 @@
          "web" : "https://github.com/team-at-cpan/Database-Async-Engine-PostgreSQL"
       }
    },
-   "version" : "1.000",
+   "version" : "1.001",
    "x_authority" : "cpan:TEAM",
    "x_contributors" : [
       "Arash <arashThr@outlook.com>",
       "Tom M <tom@audioboundary.com>",
       "Torsten Foertsch <torsten@binary.com>"
    ],
-   "x_generated_by_perl" : "v5.34.0",
+   "x_generated_by_perl" : "v5.36.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }

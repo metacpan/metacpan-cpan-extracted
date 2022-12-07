@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Hash.pm
-## Version v1.2.2
+## Version v1.2.3
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2022/11/09
+## Modified 2022/11/12
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -39,7 +39,7 @@ BEGIN
         'ge'     => sub { _obj_comp( @_, 'ge') },
         fallback => 1,
     );
-    our( $VERSION ) = 'v1.2.2';
+    our( $VERSION ) = 'v1.2.3';
 };
 
 use strict;
@@ -54,7 +54,7 @@ sub new
     my $class = ref( $that ) || $that;
     my $data = {};
     $data = shift( @_ ) if( scalar( @_ ) );
-    return( $that->error( "I was expecting an hash, but instead got '$data'." ) ) if( Scalar::Util::reftype( $data ) ne 'HASH' );
+    return( $that->error( "I was expecting an hash, but instead got '$data'." ) ) if( ( Scalar::Util::reftype( $data ) // '' ) ne 'HASH' );
     my $tied = tied( %$data );
     return( $that->error( "Hash provided is already tied to ", ref( $tied ), " and our package $class cannot use it, or it would disrupt the tie." ) ) if( $tied );
     my %hash = ();
@@ -210,7 +210,7 @@ sub merge
     my $self = shift( @_ );
     my $hash = {};
     $hash = shift( @_ );
-    return( $self->error( "No valid hash provided." ) ) if( !$hash || Scalar::Util::reftype( $hash ) ne 'HASH' );
+    return( $self->error( "No valid hash provided." ) ) if( !$hash || ( Scalar::Util::reftype( $hash ) // '' ) ne 'HASH' );
     my $opts = {};
     $opts = pop( @_ ) if( @_ && ref( $_[-1] ) eq 'HASH' );
     $opts->{overwrite} = 1 unless( CORE::exists( $opts->{overwrite} ) );
@@ -238,7 +238,7 @@ sub merge
                 }
                 else
                 {
-                    $to->{ $k } = {} unless( CORE::defined( $to->{ $k } ) && Scalar::Util::reftype( $to->{ $k } ) eq 'HASH' );
+                    $to->{ $k } = {} unless( CORE::defined( $to->{ $k } ) && ( Scalar::Util::reftype( $to->{ $k } ) // '' ) eq 'HASH' );
                     $copy->( $this->{ $k }, $to->{ $k } );
                 }
                 $seen->{ $addr } = $this->{ $k };
@@ -270,7 +270,7 @@ sub values
     my $code;
     $code = shift( @_ ) if( @_ && ref( $_[0] ) eq 'CODE' );
     my $opts = {};
-    $opts = pop( @_ ) if( Scalar::Util::reftype( $_[-1] ) eq 'HASH' );
+    $opts = pop( @_ ) if( ( Scalar::Util::reftype( $_[-1] ) // '' ) eq 'HASH' );
     if( $code )
     {
         if( $opts->{sort} )
@@ -381,7 +381,7 @@ sub _obj_eq
     {
         $strB = $other->dump;
     }
-    elsif( Scalar::Util::reftype( $other ) eq 'HASH' )
+    elsif( ( Scalar::Util::reftype( $other ) // '' ) eq 'HASH' )
     {
         $strB = $self->_dumper( $other )
     }

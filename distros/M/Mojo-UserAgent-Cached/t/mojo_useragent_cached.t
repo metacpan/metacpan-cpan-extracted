@@ -151,6 +151,7 @@ subtest 'Cache with request headers' => sub {
     $ua->server->app($app);
 
     my $keys = {
+        'http://user:pass@www.non-existent-server.com' => ['http://user:pass@www.non-existent-server.com'],
         'http://www.non-existent-server.com' => ['http://www.non-existent-server.com'],
         'http://www.non-existent-server.com,{"X-Test":"Test"}' => ['http://www.non-existent-server.com', { 'X-Test' => 'Test' } ],
         'http://www.non-existent-server.com,[{},"form",{"a":"b"}]' => ['http://www.non-existent-server.com', {}, form => { 'a' => 'b' } ],

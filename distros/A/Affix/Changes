@@ -1,0 +1,22 @@
+Revision history for Perl extension Affix.pm and Dyn.pm
+
+0.04 2022-12-07T00:30:25Z
+
+    - Affix.pm is born
+
+0.03 2021-12-05T01:23:23Z
+
+    - Attach a native call to a perl sub with :Dyn attribute (demo and subject to change before v1.0)
+    - Cut down time to execute regular ol' variable based bound bindings by ~75%
+
+0.02 2021-11-18T15:34:12Z
+
+    - Callbacks work (better than before)
+        - now store their own DCCallVM for speed and to use dyncall itself for arg handling
+    - Documentation is somewhat less non-existent
+    - Windows examples using user32.dll joins libm example from 0.01
+
+0.01 2021-11-17T04:52:02Z
+
+    - Release early. Check.
+    - Release often. Let's hope so.

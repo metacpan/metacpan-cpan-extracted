@@ -1,17 +1,17 @@
 package Complete::Bash;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-07-24'; # DATE
-our $DIST = 'Complete-Bash'; # DIST
-our $VERSION = '0.336'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 use Log::ger;
 
-require Exporter;
-our @ISA = qw(Exporter);
+use Exporter 'import';
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-09-08'; # DATE
+our $DIST = 'Complete-Bash'; # DIST
+our $VERSION = '0.337'; # VERSION
+
 our @EXPORT_OK = qw(
                        point
                        parse_cmdline
@@ -411,6 +411,16 @@ sub _terminal_width {
     }
 }
 
+sub _terminal_height {
+    # XXX need to cache?
+    if (eval { require Term::Size; 1 }) {
+        my (undef, $lines) = Term::Size::chars(*STDOUT{IO});
+        $lines // 25;
+    } else {
+        $ENV{LINES} // 25;
+    }
+}
+
 # given terminal width & number of columns, calculate column width
 sub _column_width {
     my ($terminal_width, $num_columns) = @_;
@@ -700,6 +710,9 @@ sub format_completion {
         last if $ENV{INSIDE_EMACS};
         last unless $ENV{COMPLETE_BASH_FZF};
         my $items = $ENV{COMPLETE_BASH_FZF_ITEMS} // 100;
+        if ($items == -1) {
+            $items = _terminal_height();
+        }
         last unless @words >= $items;
 
         require File::Which;
@@ -760,7 +773,7 @@ Complete::Bash - Completion routines for bash shell
 
 =head1 VERSION
 
-This document describes version 0.336 of Complete::Bash (from Perl distribution Complete-Bash), released on 2021-07-24.
+This document describes version 0.337 of Complete::Bash (from Perl distribution Complete-Bash), released on 2022-09-08.
 
 =head1 DESCRIPTION
 
@@ -1155,7 +1168,21 @@ Will not pass to fzf if inside emacs (C<INSIDE_EMACS> environment is true).
 =head2 COMPLETE_BASH_FZF_ITEMS
 
 Uint. Default 100. The minimum number of items to trigger passing completion
-answer to fzf. See also: L</COMPLETE_BASH_FZF>.
+answer to C<fzf>.
+
+A special value of -1 means to use terminal height. However, since terminal
+height (and width) normally cannot be read during tab completion anyway, it's
+better if you do something like this in your bash startup file:
+
+ export COMPLETE_BASH_FZF_ITEMS=$LINES
+
+because without passing to C<fzf>, as soon as the number of completion answers
+exceeds C<$LINES>, C<bash> will start paging the answer to its internal pager,
+which is limited like C<more>. If you set the above, then as soon as the number
+of completion answers exceeds terminal height, you will avoid the bash internal
+pager and use the nicer C<fzf>.
+
+See also: L</COMPLETE_BASH_FZF>.
 
 =head2 COMPLETE_BASH_MAX_COLUMNS
 
@@ -1205,14 +1232,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Complete-B
 
 Source repository is at L<https://github.com/perlancar/perl-Complete-Bash>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Complete-Bash>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Complete>, the convention that this module follows.
@@ -1244,15 +1263,41 @@ Mary Ehlers <regina.verb.ae@gmail.com>
 
 =item *
 
-Steven Haryanto <sharyanto@cpan.org>
+Steven Haryanto <stevenharyanto@gmail.com>
 
 =back
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2018, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2020, 2019, 2018, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Complete-Bash>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

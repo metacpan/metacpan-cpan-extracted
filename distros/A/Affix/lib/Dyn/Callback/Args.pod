@@ -1,0 +1,114 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Dyn::Callback::Args - dyncall args C API
+
+=head1 DESCRIPTION
+
+dyncall args provides serialized access to arguments of a function call.
+
+These functions are used in hand rolled Dyn::Callback systems.
+
+=head1 Methods
+
+This package exposes the following functions...
+
+=head2 C<dcbArgBool( $args )>
+
+Returns the next value on the stack and assumes it is a C<bool>.
+
+=head2 C<dcbArgChar( $args )>
+
+Returns the next value on the stack and assumes it is a C<char>.
+
+=head2 C<dcbArgUChar( $args )>
+
+Returns the next value on the stack and assumes it is an C<unsigned char>.
+
+=head2 C<dcbArgShort( $args )>
+
+Returns the next value on the stack and assumes it is a C<short>.
+
+=head2 C<dcbArgUShort( $args )>
+
+Returns the next value on the stack and assumes it is a C<unsigned short>.
+
+=head2 C<dcbArgInt( $args )>
+
+Returns the next value on the stack and assumes it is an C<int>.
+
+=head2 C<dcbArgUInt( $args )>
+
+Returns the next value on the stack and assumes it is an C<unsigned int>.
+
+=head2 C<dcbArgLong( $args )>
+
+Returns the next value on the stack and assumes it is a C<long>.
+
+=head2 C<dcbArgULong( $args )>
+
+Returns the next value on the stack and assumes it is a C<unsigned long>.
+
+=head2 C<dcbArgLongLong( $args )>
+
+Returns the next value on the stack and assumes it is a C<long long>.
+
+=head2 C<dcbArgULongLong( $args )>
+
+Returns the next value on the stack and assumes it is an C<unsigned long long>.
+
+=head2 C<dcbArgFloat( $args )>
+
+Returns the next value on the stack and assumes it is a C<float>.
+
+=head2 C<dcbArgDouble( $args )>
+
+Returns the next value on the stack and assumes it is a C<double>.
+
+=head2 C<dcbArgPointer( $args )>
+
+Returns the next value on the stack and assumes it is a pointer (C<void *>).
+
+=head2 C<dcbArgAggr( $args, $target )>
+
+Returns the next value on the stack and assumes it is an aggregate.
+
+For trivial aggrs, C<$target> points to space to copy the aggregate to, and
+C<$target> is returned.
+
+For C++ non-trivial aggrs, C<$target> is ignored, and a pointer to the
+aggregate is returned.
+
+=head2 C<dcbArgString( $args )>
+
+Returns the next value on the stack and assumes it is a string (C<const char
+*>).
+
+=head2 C<dcbReturnAggr( $args, $result, $ret )>
+
+This is a helper function to put a to be returned struct-by-value into the
+C<$result> param of the callback handler; for C++ non-trivial aggrs, pass
+C<undef> in C<$ret>, then copy the aggregate into C<< $result-E<gt>p >>.
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under
+the terms found in the Artistic License 2. Other copyrights, terms, and
+conditions may apply to data transmitted through this module.
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=begin stopwords
+
+dyncall aggrs const
+
+=end stopwords
+
+=cut

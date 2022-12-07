@@ -27,7 +27,7 @@ Steps to release:
 
     Or do:
 
-       $ cpan-upload-http -user ... -mailto ... /tmp/Curses-1.33.tgz
+       $ cpan-upload-http -user ... -mailto ... /tmp/Curses-1.33.tar.gz
        (Get cpan-upload-http from CPAN)
 
     It goes into CPAN in the directory belonging to the user who uploaded it.

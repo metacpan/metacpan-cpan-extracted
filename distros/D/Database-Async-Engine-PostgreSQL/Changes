@@ -1,5 +1,10 @@
 Revision history for Database-Async-Engine-PostgreSQL
 
+1.001     2022-12-07 19:36:46+08:00 Asia/Singapore
+    [New features]
+
+    - better flow-control support for incoming data
+
 1.000     2022-09-07 05:02:18+08:00 Asia/Singapore
     [New features]
 

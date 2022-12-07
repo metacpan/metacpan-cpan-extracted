@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/TieHash.pm
-## Version v1.1.0
-## Copyright(c) 2021 DEGUEST Pte. Ltd.
+## Version v1.1.1
+## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2022/02/27
+## Modified 2022/11/12
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -18,7 +18,7 @@ BEGIN
     use warnings;
     # use parent qw( Module::Generic );
     use Scalar::Util ();
-    our $VERSION = 'v1.1.0';
+    our $VERSION = 'v1.1.1';
 };
 
 use strict;
@@ -29,15 +29,15 @@ sub TIEHASH
     my $self  = shift( @_ );
     my $opts  = {};
     $opts = shift( @_ ) if( @_ );
-    if( Scalar::Util::reftype( $opts ) ne 'HASH' )
+    if( ( Scalar::Util::reftype( $opts ) // '' ) ne 'HASH' )
     {
         warn( "Parameters provided ($opts) is not an hash reference.\n" ) if( $self->_warnings_is_enabled );
         return;
     }
     my $disable = [];
-    $disable = $opts->{disable} if( Scalar::Util::reftype( $opts->{disable} ) );
+    $disable = $opts->{disable} if( ( Scalar::Util::reftype( $opts->{disable} ) // '' ) eq 'ARRAY' );
     my $list = {};
-    @$list{ @$disable } = ( 1 ) x scalar( @$disable );
+    @$list{ @$disable } = (1) x scalar( @$disable );
     my $hash =
     {
     # The caller sets this to its class, so we can differentiate calls from inside and outside our caller's package
@@ -201,7 +201,7 @@ Module::Generic - Generic Tie Hash Mechanism for Object Oriented Hashes
 
 =head1 VERSION
 
-    v1.1.0
+    v1.1.1
 
 =head1 AUTHOR
 

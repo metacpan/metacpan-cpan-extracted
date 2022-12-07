@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Array.pm
-## Version v1.5.4
+## Version v2.0.0
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2022/10/30
+## Modified 2022/11/30
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -31,9 +31,10 @@ BEGIN
         '%{}' => 'as_hash',
         fallback => 1,
     );
+    use constant BREAK_LOOP => \"BREAK";
     $DEBUG  = 0;
     $RETURN = {};
-    our $VERSION = 'v1.5.4';
+    our $VERSION = 'v2.0.0';
 };
 
 use strict;
@@ -77,7 +78,7 @@ sub as_hash
 {
     my $self = CORE::shift( @_ );
     my $opts = {};
-    $opts = CORE::shift( @_ ) if( Scalar::Util::reftype( $opts ) eq 'HASH' );
+    $opts = CORE::shift( @_ ) if( ( Scalar::Util::reftype( $opts ) // '' ) eq 'HASH' );
     my $ref = {};
     my $offsets = $self->keys;
     if( $opts->{start_from} )
@@ -100,6 +101,13 @@ sub as_string
     $sort = CORE::shift( @_ ) if( @_ );
     CORE::return( $self->sort->as_string ) if( $sort );
     CORE::return( "@$self" );
+}
+
+sub break
+{
+    my $self = CORE::shift( @_ );
+    my $id   = Scalar::Util::refaddr( $self );
+    CORE::return( $RETURN->{ $id } = BREAK_LOOP );
 }
 
 sub callback
@@ -222,11 +230,13 @@ sub each
         warn( "I was expecting a reference to a subroutine for the callback to each, but got '$code' instead.\n" ) if( $self->_warnings_is_enabled );
         CORE::return;
     }
-    ## Index starts from 0
+    # Index starts from 0
     while( my( $i, $v ) = CORE::each( @$self ) )
     {
         local $_ = $v;
-        CORE::defined( $code->( $i, $v ) ) || CORE::last;
+        # CORE::defined( $code->( $i, $v ) ) || CORE::last;
+        my $rv = $code->( $i, $v );
+        CORE::last if( defined( $rv ) && $rv eq BREAK_LOOP );
     }
     CORE::return( $self );
 }
@@ -257,7 +267,7 @@ sub except
         $ref = CORE::shift( @_ );
     }
     elsif( scalar( @_ ) == 1 &&
-           Scalar::Util::reftype( $_[0] ) eq 'ARRAY' )
+           ( Scalar::Util::reftype( $_[0] ) // '' ) eq 'ARRAY' )
     {
         $ref = $self->new( CORE::shift( @_ ) );
     }
@@ -313,9 +323,8 @@ sub for
     CORE::for( my $i = 0; $i < scalar( @$self ); $i++ )
     {
         local $_ = $self->[ $i ];
-        # CORE::defined( $code->( $i, $self->[ $i ] ) ) || CORE::last;
         my $rv = $code->( $i, $self->[ $i ] );
-        CORE::last if( !CORE::defined( $rv ) );
+        CORE::last if( CORE::defined( $rv ) && $rv eq BREAK_LOOP );
         if( defined( my $ret = $self->return ) )
         {
             $rv = $ret;
@@ -324,7 +333,7 @@ sub for
         
         if( CORE::ref( $rv ) eq 'SCALAR' )
         {
-            if( !defined( $$rv ) )
+            if( !CORE::defined( $$rv ) || !CORE::length( $$rv ) || $rv eq BREAK_LOOP )
             {
                 CORE::last;
             }
@@ -347,7 +356,7 @@ sub foreach
     {
         local $_ = $v;
         my $rv = $code->( $v );
-        CORE::defined( $rv ) || CORE::last;
+        CORE::last if( CORE::defined( $rv ) && $rv eq BREAK_LOOP );
         if( CORE::defined( my $ret = $self->return ) )
         {
             $rv = $ret;
@@ -355,13 +364,13 @@ sub foreach
         }
         if( CORE::ref( $rv ) eq 'SCALAR' )
         {
-            if( $$rv =~ /^[\-\+]?\d+$/ )
-            {
-                $i += int( $$rv );
-            }
-            elsif( !defined( $$rv ) )
+            if( !CORE::defined( $$rv ) || !CORE::length( $$rv ) || $rv eq BREAK_LOOP )
             {
                 CORE::last;
+            }
+            elsif( $$rv =~ /^[\-\+]?\d+$/ )
+            {
+                $i += int( $$rv );
             }
         }
     }
@@ -376,7 +385,7 @@ sub get
     my $self = CORE::shift( @_ );
     my $offset = CORE::int( CORE::shift( @_ ) );
     # offset may be out of bound, which will lead Module::Generic::Scalar to hold an undefined value or the offset exists but contains an undef value which will lead to the same
-    if( want( 'OBJECT' ) && ( !ref( $self->[ $offset ] ) || Scalar::Util::reftype( $self->[ $offset ] ) eq 'SCALAR' ) )
+    if( want( 'OBJECT' ) && ( !ref( $self->[ $offset ] ) || ( Scalar::Util::reftype( $self->[ $offset ] ) // '' ) eq 'SCALAR' ) )
     {
         require Module::Generic::Scalar;
         rreturn( Module::Generic::Scalar->new( $self->[ $offset ] ) );
@@ -394,7 +403,7 @@ sub get_null
     my $offset = CORE::int( CORE::shift( @_ ) );
     if( CORE::defined( $self->[ $offset ] ) && CORE::length( $self->[ $offset ] ) )
     {
-        if( want( 'OBJECT' ) && ( !ref( $self->[ $offset ] ) || Scalar::Util::reftype( $self->[ $offset ] ) eq 'SCALAR' ) )
+        if( want( 'OBJECT' ) && ( !ref( $self->[ $offset ] ) || ( Scalar::Util::reftype( $self->[ $offset ] ) // '' ) eq 'SCALAR' ) )
         {
             require Module::Generic::Scalar;
             rreturn( Module::Generic::Scalar->new( $self->[ $offset ] ) );
@@ -449,7 +458,7 @@ sub index
 {
     my $self = CORE::shift( @_ );
     my $pos  = CORE::int( CORE::shift( @_ ) );
-    if( want( 'OBJECT' ) && ( !ref( $self->[ $pos ] ) || Scalar::Util::reftype( $self->[ $pos ] ) eq 'SCALAR' ) )
+    if( want( 'OBJECT' ) && ( !ref( $self->[ $pos ] ) || ( Scalar::Util::reftype( $self->[ $pos ] ) // '' ) eq 'SCALAR' ) )
     {
         require Module::Generic::Scalar;
         rreturn( Module::Generic::Scalar->new( $self->[ $pos ] ) );
@@ -585,7 +594,7 @@ sub pack
 sub pop
 {
     my $self = CORE::shift( @_ );
-    if( Want::want( 'OBJECT' ) && ( !ref( $self->[-1] ) || Scalar::Util::reftype( $self->[-1] ) eq 'SCALAR' ) )
+    if( Want::want( 'OBJECT' ) && ( !ref( $self->[-1] ) || ( Scalar::Util::reftype( $self->[-1] ) // '' ) eq 'SCALAR' ) )
     {
         require Module::Generic::Scalar;
         rreturn( Module::Generic::Scalar->new( CORE::pop( @$self ) ) );
@@ -643,7 +652,7 @@ sub remove
         $ref = CORE::shift( @_ );
     }
     elsif( scalar( @_ ) == 1 &&
-           Scalar::Util::reftype( $_[0] ) eq 'ARRAY' )
+           ( Scalar::Util::reftype( $_[0] ) // '' ) eq 'ARRAY' )
     {
         $ref = $self->new( CORE::shift( @_ ) );
     }
@@ -685,7 +694,7 @@ sub return
     if( @_ )
     {
         $RETURN->{ $id } = \( CORE::shift( @_ ) );
-        CORE::return( undef() ) if( !CORE::defined( ${$RETURN->{ $id }} ) );
+        CORE::return( '' ) if( !CORE::defined( ${$RETURN->{ $id }} ) );
     }
     CORE::return( $RETURN->{ $id } );
 }
@@ -728,7 +737,7 @@ sub seventh { CORE::return( CORE::shift->get_null(6) ); }
 sub shift
 {
     my $self = CORE::shift( @_ );
-    if( Want::want( 'OBJECT' ) && ( !ref( $self->[0] ) || Scalar::Util::reftype( $self->[0] ) eq 'SCALAR' ) )
+    if( Want::want( 'OBJECT' ) && ( !ref( $self->[0] ) || ( Scalar::Util::reftype( $self->[0] ) // '' ) eq 'SCALAR' ) )
     {
         require Module::Generic::Scalar;
         rreturn( Module::Generic::Scalar->new( CORE::shift( @$self ) ) );
@@ -906,8 +915,8 @@ sub _obj_eq
     {
         $strB = $other->as_string(1);
     }
-    ## Compare error message
-    elsif( Scalar::Util::reftype( $other ) eq 'ARRAY' )
+    # Compare error message
+    elsif( ( Scalar::Util::reftype( $other ) // '' ) eq 'ARRAY' )
     {
         $strB = $self->new( $other )->as_string(1);
     }
@@ -994,7 +1003,7 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
     {
         my( $class, $opts ) = @_;
         $opts //= {};
-        if( Scalar::Util::reftype( $opts ) ne 'HASH' )
+        if( ( Scalar::Util::reftype( $opts ) // '' ) ne 'HASH' )
         {
             warn( "Options provided (", overload::StrVal( $opts ), ") is not an hash reference\n" );
             $opts = {};
@@ -1016,7 +1025,7 @@ sub TO_JSON { CORE::return( [ @{$_[0]} ] ); }
         {
         callback_add => $opts->{add},
         callback_remove => $opts->{remove},
-        data => ( Scalar::Util::reftype( $opts->{data} ) eq 'ARRAY' ? [@{$opts->{data}}] : [] ),
+        data => ( ( Scalar::Util::reftype( $opts->{data} ) // '' ) eq 'ARRAY' ? [@{$opts->{data}}] : [] ),
         debug => $opts->{debug},
         };
         print( STDERR ( ref( $class ) || $class ), "::TIEARRAY: Using ", scalar( @{$ref->{data}} ), " elements in array vs ", scalar( @{$opts->{data}} ), " received via opts->data.\n" ) if( $ref->{debug} );

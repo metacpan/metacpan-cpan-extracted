@@ -6,7 +6,7 @@ use warnings;
 
 use utf8;
 
-our $VERSION = '1.000';
+our $VERSION = '1.001';
 
 use parent qw(Database::Async::Engine);
 
@@ -711,10 +711,16 @@ sub protocol {
                 data_row => $self->$curry::weak(sub {
                     my ($self, $msg) = @_;
                     $log->tracef('Have row data %s', $msg);
+                    $self->{fc} ||= $self->active_query->row_data->flow_control->each($self->$curry::weak(sub {
+                        my ($self) = @_;
+                        $log->tracef('Flow control event - will %s stream', $_ ? 'resume' : 'pause');
+                        $self->stream->want_readready($_) if $self->stream;
+                    }));
                     $self->active_query->row([ map $self->decode_text($_), $msg->fields ]);
                 }),
                 command_complete => $self->$curry::weak(sub {
                     my ($self, $msg) = @_;
+                    delete $self->{fc};
                     my $query = delete $self->{active_query} or do {
                         $log->warnf('Command complete but no query');
                         return;
@@ -753,6 +759,7 @@ sub protocol {
                 }),
                 close_complete => $self->$curry::weak(sub {
                     my ($self, $msg) = @_;
+                    delete $self->{fc};
                     $log->tracef('Close complete for query %s', $self->active_query);
                 }),
                 empty_query_response => $self->$curry::weak(sub {

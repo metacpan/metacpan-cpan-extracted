@@ -36,11 +36,11 @@
             "Clone" : "0.43",
             "Config" : "0",
             "Data::Dump" : "1.23",
-            "Data::Dumper" : "0",
             "Data::UUID" : "1.226",
             "DateTime" : "1.57",
             "DateTime::Format::Strptime" : "1.79",
             "DateTime::TimeZone" : "2.51",
+            "DateTime::TimeZone::Catalog::Extend" : "v0.3.0",
             "Devel::StackTrace" : "0",
             "Encode" : "0",
             "Exporter" : "5.70",
@@ -60,7 +60,6 @@
             "List::Util" : "1.56",
             "Module::Metadata" : "1.000037",
             "Nice::Try" : "v1.2.0",
-            "Number::Format" : "1.75",
             "POSIX" : "1.53_01",
             "Regexp::Common" : "2017060201",
             "Scalar::Util" : "1.50",
@@ -76,6 +75,7 @@
             "parent" : "0",
             "perl" : "5.026001",
             "strict" : "0",
+            "utf8" : "0",
             "version" : "0",
             "warnings" : "0"
          }
@@ -92,6 +92,7 @@
             "Test::More" : "1.302162",
             "Test::Pod" : "1.52",
             "Test::Time" : "0",
+            "open" : "0",
             "utf8" : "0"
          }
       }
@@ -106,6 +107,6 @@
          "web" : "https://gitlab.com/jackdeguest/Module-Generic"
       }
    },
-   "version" : "v0.28.5",
+   "version" : "v0.29.0",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

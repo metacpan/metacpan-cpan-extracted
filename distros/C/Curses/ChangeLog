@@ -4,6 +4,19 @@ information, see the file 'HISTORY'.
 Note that the filename "ChangeLog" is recognized by the CPAN machinery as the
 name of a change log.
 
+New in 1.42 (Released December 07, 2022)
+
+  Add missing return type declarations so it works with modern C compilers.
+
+  Fix build failure with newer compilers: test compiles to find Curses library
+  capabilities fail because necessary header files are not included because
+  C_PANELFUNCTION etc are not defined because the test compiles do not include
+  CursesFun.h, which they can't because the test compiles are part of creating
+  CursesFun.h.  Solution: put C_PANELFUNCTION, etc in new config.h.
+
+  Rename test.syms program to testsyms, because it is a more conventional
+  name format.
+
 New in 1.41 (Released August 18, 2022)
 
   Fix bug in previous release causing non-GNU make to fail.

@@ -6,7 +6,7 @@ require Exporter;
 use base qw(Exporter);
 our @EXPORT_OK = qw/strip_diacritics strip_alphabet fast_strip/;
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 use Unicode::UCD 'charinfo';
 
 sub strip_diacritics
@@ -43,8 +43,13 @@ sub decompose
 	return $character;
     }
     # Get the first character of the decomposition
-    my @decomposition_chars = split /\s+/, $decomposition;
-    $character = chr hex $decomposition_chars[0];
+    my @dc = split /\s+/, $decomposition;
+    # Remove <compat> etc.
+    if ($dc[0] =~ /</) {
+	print "$character $decomposition\n";
+    }
+    @dc = grep !/<.*?>/, @dc;
+    $character = chr hex $dc[0];
     # A character may have multiple decompositions, so repeat this
     # process until there are none left.
     return decompose ($character);
@@ -589,6 +594,29 @@ my %strip = (
 'ỷ' => 'y',
 'Ỹ' => 'Y',
 'ỹ' => 'y',
+# Various ligatures
+'Œ' => 'OE',
+'œ' => 'oe',
+'ƕ' => 'hv',
+'Ǆ' => 'DZ',
+'ǅ' => 'Dz',
+'ǆ' => 'dz',
+'Ǉ' => 'LJ',
+'ǈ' => 'Lj',
+'ǉ' => 'lj',
+'Ǌ' => 'NJ',
+'ǋ' => 'Nj',
+'ǌ' => 'nj',
+'Ǣ' => 'AE',
+'ǣ' => 'ae',
+'Ǳ' => 'DZ',
+'ǲ' => 'Dz',
+'ǳ' => 'dz',
+'Ǽ' => 'AE',
+'ǽ' => 'ae',
+# Thorn
+'Þ' => 'Th',
+'þ' => 'th',
 );
 
 my $strip_keys = join '', keys %strip;
@@ -596,10 +624,6 @@ my $strip_keys = join '', keys %strip;
 sub fast_strip
 {
     my ($word) = @_;
-    # Expand ligatures.
-    $word =~ s/œ/oe/g;
-    # Thorn is "th".
-    $word =~ s/Þ|þ/th/g;
     # Remove all diacritics
     $word =~ s/([$strip_keys])/$strip{$1}/g;
     $word =~ s/\p{InCombiningDiacriticalMarks}//g;

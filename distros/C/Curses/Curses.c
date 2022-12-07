@@ -14,9 +14,10 @@
       and having bool already defined seems to stop Curses header files from
       doing that.  See further discussion of 'bool' below.
    */
+#include "config.h"
+#include "c-config.h"
 #include "CursesDef.h"
 #include "CursesTyp.h"
-#include "c-config.h"
 
 /* c-config.h above includes Ncurses header files that define macro
    'instr'.  Unfortunately, perl.h (below) also defines 'instr'.

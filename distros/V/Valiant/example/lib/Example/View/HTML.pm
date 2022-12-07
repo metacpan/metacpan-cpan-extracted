@@ -11,6 +11,10 @@ sub flatten_rendered($self, @rendered) {
   return concat grep { defined($_) } @rendered;
 }
 
+sub link($self, @args) {
+  return $self->ctx->uri(@args);
+}
+
 __PACKAGE__->config(
   content_type=>'text/html',
 );

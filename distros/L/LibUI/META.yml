@@ -1,0 +1,157 @@
+---
+abstract: 'Simple, Portable, Native GUI Library'
+author:
+  - 'Sanko Robinson <sanko@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.20, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: LibUI
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  LibUI:
+    file: lib/LibUI.pm
+    version: '0.01'
+  LibUI::Align:
+    file: lib/LibUI/Align.pm
+    version: '0.01'
+  LibUI::At:
+    file: lib/LibUI/At.pm
+    version: '0.01'
+  LibUI::Button:
+    file: lib/LibUI/Button.pm
+    version: '0.01'
+  LibUI::Checkbox:
+    file: lib/LibUI/Checkbox.pm
+    version: '0.01'
+  LibUI::ColorButton:
+    file: lib/LibUI/ColorButton.pm
+    version: '0.01'
+  LibUI::Combobox:
+    file: lib/LibUI/Combobox.pm
+    version: '0.01'
+  LibUI::Control:
+    file: lib/LibUI/Control.pm
+    version: '0.01'
+  LibUI::DatePicker:
+    file: lib/LibUI/DatePicker.pm
+    version: '0.01'
+  LibUI::DateTimePicker:
+    file: lib/LibUI/DateTimePicker.pm
+    version: '0.01'
+  LibUI::EditableCombobox:
+    file: lib/LibUI/EditableCombobox.pm
+    version: '0.01'
+  LibUI::Entry:
+    file: lib/LibUI/Entry.pm
+    version: '0.01'
+  LibUI::FontButton:
+    file: lib/LibUI/FontButton.pm
+    version: '0.01'
+  LibUI::FontDescriptor:
+    file: lib/LibUI/FontDescriptor.pm
+    version: '0.01'
+  LibUI::Form:
+    file: lib/LibUI/Form.pm
+    version: '0.01'
+  LibUI::Grid:
+    file: lib/LibUI/Grid.pm
+    version: '0.01'
+  LibUI::Group:
+    file: lib/LibUI/Group.pm
+    version: '0.01'
+  LibUI::HBox:
+    file: lib/LibUI/HBox.pm
+    version: '0.01'
+  LibUI::HorizontalSeparator:
+    file: lib/LibUI/HorizontalSeparator.pm
+    version: '0.01'
+  LibUI::Label:
+    file: lib/LibUI/Label.pm
+    version: '0.01'
+  LibUI::Menu:
+    file: lib/LibUI/Menu.pm
+    version: '0.01'
+  LibUI::MenuItem:
+    file: lib/LibUI/MenuItem.pm
+    version: '0.01'
+  LibUI::MultilineEntry:
+    file: lib/LibUI/MultilineEntry.pm
+    version: '0.01'
+  LibUI::NonWrappingMultilineEntry:
+    file: lib/LibUI/NonWrappingMultilineEntry.pm
+    version: '0.01'
+  LibUI::PasswordEntry:
+    file: lib/LibUI/PasswordEntry.pm
+    version: '0.01'
+  LibUI::ProgressBar:
+    file: lib/LibUI/ProgressBar.pm
+    version: '0.01'
+  LibUI::RadioButtons:
+    file: lib/LibUI/RadioButtons.pm
+    version: '0.01'
+  LibUI::SearchEntry:
+    file: lib/LibUI/SearchEntry.pm
+    version: '0.01'
+  LibUI::Slider:
+    file: lib/LibUI/Slider.pm
+    version: '0.01'
+  LibUI::Spinbox:
+    file: lib/LibUI/Spinbox.pm
+    version: '0.01'
+  LibUI::Tab:
+    file: lib/LibUI/Tab.pm
+    version: '0.01'
+  LibUI::TextItalic:
+    file: lib/LibUI/TextItalic.pm
+    version: '0.01'
+  LibUI::TextStretch:
+    file: lib/LibUI/TextStretch.pm
+    version: '0.01'
+  LibUI::TextWeight:
+    file: lib/LibUI/TextWeight.pm
+    version: '0.01'
+  LibUI::Time:
+    file: lib/LibUI/Time.pm
+    version: '0.01'
+  LibUI::TimePicker:
+    file: lib/LibUI/TimePicker.pm
+    version: '0.01'
+  LibUI::VBox:
+    file: lib/LibUI/VBox.pm
+    version: '0.01'
+  LibUI::VerticalSeparator:
+    file: lib/LibUI/VerticalSeparator.pm
+    version: '0.01'
+  LibUI::Window:
+    file: lib/LibUI/Window.pm
+    version: '0.01'
+requires:
+  Affix: '0'
+  Alien::libui: '0'
+  Time::Local: '1.30'
+  Time::Piece: '0'
+  perl: '5.014000'
+resources:
+  bugtracker: https://github.com/sanko/LibUI.pm/issues
+  homepage: https://github.com/sanko/LibUI.pm
+  repository: https://github.com/sanko/LibUI.pm.git
+version: '0.01'
+x_authority: cpan:SANKO
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

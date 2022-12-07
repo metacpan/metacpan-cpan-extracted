@@ -24,7 +24,7 @@ sub render($self, $c) {
     $self->form_for($self->todo, +{style=>'width:35em; margin:auto'}, sub ($ff, $fb, $todo) {
       fieldset [
         $fb->legend,
-        $fb->model_errors,
+        $fb->model_errors({show_message_on_field_errors=>'Please fix the listed errors.'}),
 
         $self->last_page_warning,
         $self->page_window_info,
@@ -37,7 +37,7 @@ sub render($self, $c) {
             ],
           tbody { repeat=>$self->list }, sub ($todo, $i) {
             trow [
-             td a +{ href=>"/todos/@{[ $todo->id ]}" }, $todo->title,
+             td a +{ href=>$self->link('#TodoEdit', [$todo->id]) }, $todo->title,
              td $todo->status,
             ],
           },
@@ -75,27 +75,21 @@ sub page_window_info($self) {
 sub pagelist($self) {
   my @page_html = ();
   foreach my $page (1..$self->pager->last_page) {
-    my $query = "?page=${page};status=@{[ $self->status ]}";
-    push @page_html, a {href=>$query, style=>'margin: .5rem'}, $page == $self->pager->current_page ? b u $page : $page;
+    push @page_html, a {href=>$self->link('#TodosList', +{page=>$page, status=>$self->status}), style=>'margin: .5rem'}, $page == $self->pager->current_page ? b u $page : $page;
   }
   return @page_html;
 }
 
 sub status_filter_box($self) {
   div {style=>'text-align:center; margin-bottom: 1rem'}, [
-    map { $self->status_link($_) } qw/all active completed/,
+    map { $self->status_filter($_) } qw/all active completed/,
   ];
 }
 
-sub status_link($self, $status) {
-  my @label = $self->status_label($status);
-  return span {style=>'margin: .5rem'}, \@label if $self->status eq $status;
-  return a { href=>"?status=$status;page=1", style=>'margin: .5rem'}, \@label;
+sub status_filter($self, $status) {
+  return span {style=>'margin: .5rem'}, [b u $status] if $self->status eq $status;
+  return a { href=>$self->link('#TodosList', +{page=>1, status=>$status}), style=>'margin: .5rem'}, $status;
 }
 
-sub status_label($self, $status) {
-  return b u $status if $status eq $self->status;
-  return $status;
-}
 
 1;

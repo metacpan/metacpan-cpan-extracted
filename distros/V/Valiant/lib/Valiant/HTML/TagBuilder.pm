@@ -39,16 +39,32 @@ our %HTML_CONTENT_ELEMENTS = map { $_ => 1 } qw(
   var video);
 
 our @ALL_HTML_TAGS = ('trow', keys(%HTML_VOID_ELEMENTS), keys(%HTML_CONTENT_ELEMENTS));
-our @ALL_FLOW_CONTROL = (qw(cond otherwise over loop));
-our @EXPORT_OK = (qw(tag content_tag capture), @ALL_HTML_TAGS, @ALL_FLOW_CONTROL);
+our @ALL_FLOW_CONTROL = (qw(cond otherwise over loop default_case));
+our @EXPORT_OK = (qw(tag content_tag capture), @ALL_HTML_TAGS, @ALL_FLOW_CONTROL, '$sf');
 our %EXPORT_TAGS = (
   all => \@EXPORT_OK,
-  utils => ['tag', 'content_tag', 'capture', @ALL_FLOW_CONTROL],
+  utils => ['tag', 'content_tag', 'capture', @ALL_FLOW_CONTROL, '$sf'],
   html => \@ALL_HTML_TAGS,
   form =>[qw/form input select options button datalist fieldset label legend meter optgroup output progress textarea/],
   headers => [qw/h1 h2 h3 h4 5 h6 header/],
   table => [qw/table td th tbody thead tfoot trow caption/],
 );
+
+our $sf = sub {
+  if(blessed $_[0]) {
+    my ($src_object, $format) = @_;
+    $format =~ s/\{(.*?)\:([^}]+)\}/ $src_object->can($2) ? ($1 ? sprintf($1,$src_object->$2) : $src_object->$2) : die("Source object '@{[ ref $src_object ]}' has no method '$2'") /gex;
+    return safe($format);
+  } else {
+    my ($format, %args) = @_;
+    my $collapse = delete $args{collapse};
+    $format =~ s/\{(.*?)\:([^}]+)\}/ exists($args{$2})? ($1 ? sprintf($1,$args{$2}) : $args{$2}) : die("Source data has no value '$2'") /gex;
+    if($collapse) {
+      $format =~s/\s+/ /gsm;
+    }
+    return safe($format);
+  }
+};
 
 sub _dasherize {
   my $value = shift;
@@ -114,10 +130,12 @@ sub capture {
   return flattened_safe $block->(@_);
 }
 
-## TODO 
-## trinary or some sort of otherwise for cond
-## better $index for things like is_last is_first is_even/odd, etc
+## TODO ??
+## else for if, finally for repeat
+## ??? better $index for things like is_last is_first is_even/odd, etc ???
 
+our @_SWITCH_CTX = ();
+sub default_case { return default_case=>1 }
 sub html_content_tag {
   my $tag = shift;
   my $attrs = (ref($_[0])||'') eq 'HASH' ? shift(@_) : +{};
@@ -152,6 +170,31 @@ sub html_content_tag {
     return \@content, @_;
   }
 
+  if(exists $attrs->{case}) {
+    my $case = delete $attrs->{case};
+    if($case) {
+      if($HTML_VOID_ELEMENTS{$tag}) {
+        unshift @_SWITCH_CTX, [$tag, $attrs];
+      } else {
+        unshift @_SWITCH_CTX, [$tag, $attrs, shift];
+      }      
+      return @_;
+    } else {
+      shift @_ unless $HTML_VOID_ELEMENTS{$tag}; # throw away the content if a content tag
+      return @_;
+    }
+  }
+
+  if(exists $attrs->{default_case}) {
+    my $case = delete $attrs->{default_case};
+    if($HTML_VOID_ELEMENTS{$tag}) {
+      unshift @_SWITCH_CTX, [$tag, $attrs];
+    } else {
+      unshift @_SWITCH_CTX, [$tag, $attrs, shift];
+    }
+    return @_;
+  }
+
   if( (ref(\$_[0])||'') eq 'SCALAR' ) {  # or isa SafeString...
     $content = shift(@_);
   } elsif(blessed($_[0]) && $_[0]->isa('Valiant::HTML::SafeString') ) {
@@ -178,9 +221,21 @@ sub html_content_tag {
       }
       $content = concat(@content);
     }
-    $content = concat(shift->()) unless $content;
-  }
+    if(defined(my $switch = delete $attrs->{switch})) {
+      local @_SWITCH_CTX = ();
+      $code->($switch);
+      if(my $found = shift @_SWITCH_CTX) {
+        ($content) = html_content_tag(@$found);
+      } else {
+        return @_;
+      }
+    }
+    if(defined(my $scope = delete $attrs->{scope})) {
+      $content = concat($code->($scope));
+    }
 
+    $content = concat($code->()) unless $content;
+  }
 
   return defined($content) ?
     (content_tag($tag, $content, $attrs), @_) :
@@ -197,6 +252,33 @@ sub html_tag {
       shift @_ unless $HTML_VOID_ELEMENTS{$tag}; # throw away the content if a content tag
       return @_;
     }
+  }
+
+  if(exists $attrs->{case}) {
+    my $case = delete $attrs->{case};
+    warn "$tag $case";
+    use Devel::Dwarn; Dwarn @_SWITCH_CTX;
+    if($case) {
+      if($HTML_VOID_ELEMENTS{$tag}) {
+        unshift @_SWITCH_CTX, [$tag, $attrs];
+      } else {
+        unshift @_SWITCH_CTX, [$tag, $attrs, shift];
+      }      
+      return @_;
+    } else {
+      shift @_ unless $HTML_VOID_ELEMENTS{$tag}; # throw away the content if a content tag
+      return @_;
+    }
+  }
+
+  if(exists $attrs->{default_case}) {
+    my $case = delete $attrs->{default_case};
+    if($HTML_VOID_ELEMENTS{$tag}) {
+      unshift @_SWITCH_CTX, [$tag, $attrs];
+    } else {
+      unshift @_SWITCH_CTX, [$tag, $attrs, shift];
+    }
+    return @_;
   }
 
   if(exists $attrs->{map}) {
@@ -229,6 +311,10 @@ sub html_tag {
 
 foreach my $e (keys %HTML_CONTENT_ELEMENTS) {
   eval "sub $e { html_content_tag('$e', \@_) }";
+}
+
+sub divb($$) {
+  return html_content_tag('div', @_);
 }
 
 foreach my $e (keys %HTML_VOID_ELEMENTS) {

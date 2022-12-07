@@ -24,6 +24,7 @@ has name => ( is => 'ro', required => 1 );
 has options => ( is => 'ro', required => 1, default => sub { +{} } );  
 has index => ( is => 'ro', required => 0, predicate => 'has_index' );
 has namespace => ( is => 'ro', required => 0, predicate => 'has_namespace' );
+has view => ( is => 'ro', required => 0, predicate => 'has_view' );
 has _theme => ( is => 'rw', required => 1, init_arg=>'theme', default => sub { +{} } );
 has _nested_child_index => (is=>'rw', init_arg=>undef, required=>1, default=>sub { +{} });
 
@@ -47,17 +48,6 @@ sub theme {
   return +{ %$default_theme, %{$self->_theme} };
 }
 
-sub sanitized_object_name {
-  my $self = shift;
-  return $self->{__cached_sanitized_object_name} if exists $self->{__cached_sanitized_object_name};
-
-  my $value = $self->name;
-  $value =~ s/\]\[|[^a-zA-Z0-9:-]/_/g;
-  $value =~s/_$//;
-  $self->{__cached_sanitized_object_name} = $value;
-  return $value;
-}
-
 sub nested_child_index {
   my ($self, $attribute) = @_;
   if(exists($self->_nested_child_index->{$attribute})) {
@@ -69,23 +59,21 @@ sub nested_child_index {
 
 sub tag_id_for_attribute {
   my ($self, $attribute, @extra) = @_;
-  my $id = $self->has_namespace ? $self->namespace . '_' : '';
-  $id .= $self->has_index ?
-    "@{[$self->sanitized_object_name]}_@{[ $self->index ]}_${attribute}" :
-    "@{[$self->sanitized_object_name]}_${attribute}";
-  $id = join('_', $id, @extra) if @extra;
-  return $id;
+  my $opts = +{};
+  $opts->{namespace} = $self->namespace if $self->has_namespace;
+  $opts->{index} = $self->index if $self->has_index;
+
+  return Valiant::HTML::FormTags::field_id($self->name, $attribute, $opts, @extra);
 }
 
 # $self->tag_name_for_attribute($attribute, +{ multiple=>1 });
 sub tag_name_for_attribute {
-  my ($self, $attribute, $opts) = @_;  
-  my $name = $self->has_index ?
-    "@{[$self->name]}\[@{[ $self->index ]}\].${attribute}" :
-    "@{[$self->name]}.${attribute}";
-  $name .= '[]' if $opts->{multiple};
+  my ($self, $attribute, $opts, @extra) = @_;
+  $opts = +{} unless defined $opts;
+  $opts->{namespace} = $self->namespace if $self->has_namespace;
+  $opts->{index} = $self->index if $self->has_index;
 
-  return $name;
+  return Valiant::HTML::FormTags::field_name($self->name, $attribute, $opts, @extra);
 }
 
 sub tag_value_for_attribute {
@@ -176,14 +164,14 @@ sub merge_theme {
 }
 
 sub merge_theme_field_opts {
-  my ($self, $type, $attribute, $existing) = @_;
+  my ($self, $tag_type, $attribute, $existing) = @_;
   my $theme = $self->theme;
 
-  if(exists $theme->{$type}) {
-    $existing = +{ %{$theme->{$type}}, %$existing };
+  if(exists $theme->{$tag_type}) {
+    $existing = +{ %{$theme->{$tag_type}}, %$existing };
   }
-  if($attribute && exists $theme->{attributes}{$attribute}{$type}) {
-    $existing = +{ %{$theme->{attributes}{$attribute}{$type}}, %$existing };
+  if($attribute && exists $theme->{attributes}{$attribute}{$tag_type}) {
+    $existing = +{ %{$theme->{attributes}{$attribute}{$tag_type}}, %$existing };
   }
   return $existing;
 }
@@ -281,7 +269,7 @@ sub input {
   $options = $self->merge_theme_field_opts($options->{type} || 'input', $attribute, $options);
   my $errors_classes = exists($options->{errors_classes}) ? delete($options->{errors_classes}) : undef;
   my $model = $self->model->can('to_model') ? $self->model->to_model : $self->model;
-  
+ 
   $options->{class} = join(' ', (grep { defined $_ } $options->{class}, $errors_classes))
     if $errors_classes && $model->can('errors') && $model->errors->where($attribute);
 
@@ -289,7 +277,6 @@ sub input {
   set_unless_defined(id => $options, $self->tag_id_for_attribute($attribute));
   set_unless_defined(name => $options, $self->tag_name_for_attribute($attribute));
   $options->{value} = $self->tag_value_for_attribute($attribute) unless defined($options->{value});
-
 
   return Valiant::HTML::FormTags::input_tag $attribute, $self->process_options($attribute, $options);
 }
@@ -374,7 +361,7 @@ sub radio_button {
   $options->{type} = 'radio';
   $options->{value} = $value unless exists($options->{value});
   $options->{checked} = do { $self->tag_value_for_attribute($attribute) eq $value ? 1:0 } unless exists($options->{checked});
-  $options->{id} = $self->tag_id_for_attribute($attribute, $value);
+  $options->{id} = $self->tag_id_for_attribute($attribute, $value) unless exists($options->{id});
 
   return $self->input($attribute, $self->process_options($attribute, $options));
 }
@@ -382,7 +369,7 @@ sub radio_button {
 sub date_field {
   my ($self, $attribute, $options) = (@_, +{});
   my $value = $self->tag_value_for_attribute($attribute);
-
+  $options = $self->merge_theme_field_opts('date_field', $attribute, $options);
   $options->{type} = 'date';
   $options->{value} ||= Scalar::Util::blessed($value) ? $value->ymd : $value;
   $options->{min} = $options->{min}->ymd if exists($options->{min}) && Scalar::Util::blessed($options->{min});
@@ -394,6 +381,7 @@ sub date_field {
 sub datetime_local_field {
   my ($self, $attribute, $options) = (@_, +{});
   my $value = $self->tag_value_for_attribute($attribute);
+  $options = $self->merge_theme_field_opts('datetime_local_field', $attribute, $options);
 
   $options->{type} = 'datetime-local';
   $options->{value} ||= Scalar::Util::blessed($value) ? $value->strftime('%Y-%m-%dT%T') : $value;
@@ -406,6 +394,7 @@ sub datetime_local_field {
 sub time_field {
   my ($self, $attribute, $options) = (@_, +{});
   my $value = $self->tag_value_for_attribute($attribute);
+  $options = $self->merge_theme_field_opts('time_field', $attribute, $options);
   my $format = (exists($options->{include_seconds}) && !delete($options->{include_seconds})) ? '%H:%M' : '%T.%3N';
 
   $options->{type} = 'time';
@@ -528,6 +517,7 @@ sub fields_for {
   $options->{include_id} = $self->options->{include_id} if !exists($options->{include_id}) && !defined($options->{include_id}) && defined($self->options->{include_id});
   $options->{namespace} = $self->namespace if $self->has_namespace;
   $options->{parent_builder} = $self;
+  $options->{view} = $self->view if $self->has_view;
 
   my $related_record = $self->tag_value_for_attribute($related_attribute);
   my $name = "@{[ $self->name ]}.@{[ $related_attribute ]}";
@@ -606,6 +596,11 @@ sub select {
   my $options = (ref($_[-1])||'') eq 'HASH' ? pop(@_) : +{};
   $options = $self->merge_theme_field_opts('select', undef, $options);
 
+  my ($attribute) = (ref($attribute_proto)||'') eq 'HASH' ? %$attribute_proto : $attribute_proto;
+  my $errors_classes = exists($options->{errors_classes}) ? delete($options->{errors_classes}) : undef; 
+  $options->{class} = join(' ', (grep { defined $_ } $options->{class}, $errors_classes))
+    if $errors_classes && $self->model->can('errors') && $self->model->errors->where($attribute);
+
   my $model = $self->model->can('to_model') ? $self->model->to_model : $self->model;
   my $include_hidden = exists($options->{include_hidden}) ? $options->{include_hidden} : 1;
   my $unselected_default = exists($options->{unselected_value}) ? delete($options->{unselected_value}) : undef;
@@ -671,11 +666,12 @@ sub collection_select {
   my ($self, $method_proto, $collection) = (shift, shift, shift);
   my $options = (ref($_[-1])||'') eq 'HASH' ? pop(@_) : +{};
   $options = $self->merge_theme_field_opts('collection_select', undef, $options);
-
+  
   my ($value_method, $label_method) = (@_, 'value', 'label');
   my $model = $self->model->can('to_model') ? $self->model->to_model : $self->model;
-  my $include_hidden = exists($options->{include_hidden}) ? delete($options->{include_hidden}) : 1; 
-  
+  my $include_hidden = exists($options->{include_hidden}) ? delete($options->{include_hidden}) : 1;
+  $collection = $model->$collection unless Scalar::Util::blessed($collection); 
+
   my (@selected, $name, $id) = @_;
   if(ref $method_proto) {
     $options->{multiple} = 1 unless exists($options->{multiple});
@@ -741,6 +737,7 @@ sub collection_checkbox {
   my $label_method = @_ ? shift(@_) : 'label';
   my $model = $self->model->can('to_model') ? $self->model->to_model : $self->model;
   my $include_hidden = exists($options->{include_hidden}) ? delete($options->{include_hidden}) : $self->default_collection_checkbox_include_hidden;
+  my $container_tag = exists($options->{container_tag}) ? delete($options->{container_tag}) : 'div';
 
   # It's either +{ person_roles => role_id } or roles 
   my ($attribute, $attribute_value_method) = ();
@@ -764,21 +761,29 @@ sub collection_checkbox {
 
   my @checkboxes = ();
   my $checkbox_builder_options = +{
-    builder => (exists($options->{builder}) ? $options->{builder} : $self->DEFAULT_COLLECTION_CHECKBOX_BUILDER),
+    builder => (exists($options->{builder}) ? delete($options->{builder}) : $self->DEFAULT_COLLECTION_CHECKBOX_BUILDER),
     value_method => $value_method,
     label_method => $label_method,
     attribute_value_method => $attribute_value_method,
     parent_builder => $self,
+    attribute => $attribute,
+    errors => [$model->errors->where($attribute)],
   };
   $checkbox_builder_options->{namespace} = $self->namespace if $self->has_namespace;
+  $checkbox_builder_options->{view} = $self->view if $self->has_view;
+
+  $collection = $model->$collection unless Scalar::Util::blessed($collection);
 
   while (my $checkbox_model = $collection->next) {
     my $index = $self->nested_child_index($attribute); 
     my $name = "@{[ $self->name ]}.${attribute}";
-    my $checked = grep { $_ eq $checkbox_model->$value_method } @checked_values;
+    my $checked = grep {
+      my $current_value = $checkbox_model->can('read_attribute_for_html') ? $checkbox_model->read_attribute_for_html($value_method) : $checkbox_model->$value_method;
+      $_ eq $current_value;
+    } @checked_values;
 
     if($include_hidden && !scalar(@checkboxes)) { # Add nop as first to handle empty list
-      my $hidden_fb = Valiant::HTML::Form::_instantiate_builder($name, $value_collection->build, {index=>$index});
+      my $hidden_fb = Valiant::HTML::Form::_instantiate_builder($name, $value_collection->build, {%$checkbox_builder_options, index=>$index});
       push @checkboxes, $hidden_fb->hidden('_nop', +{value=>'1'});
       $index = $self->nested_child_index($attribute);
     }
@@ -786,12 +791,20 @@ sub collection_checkbox {
     $checkbox_builder_options->{index} = $index;
     $checkbox_builder_options->{checked} = $checked;
     $checkbox_builder_options->{parent_builder} = $self;
-
     my $checkbox_fb = Valiant::HTML::Form::_instantiate_builder($name, $checkbox_model, $checkbox_builder_options);
     push @checkboxes, $codeblock->($checkbox_fb);
   }
   $collection->reset if $collection->can('reset');
-  return shift(@checkboxes)->concat(@checkboxes);
+  my $checkbox_content = shift(@checkboxes)->concat(@checkboxes);
+
+  my $errors_classes = exists($options->{errors_classes}) ? delete($options->{errors_classes}) : undef;
+  $options->{class} = join(' ', (grep { defined $_ } $options->{class}, $errors_classes))
+    if $errors_classes && $model->can('errors') && $model->errors->where($attribute);
+
+  return Valiant::HTML::TagBuilder::content_tag $container_tag, $checkbox_content, +{
+    id => $self->tag_id_for_attribute($attribute),
+    %$options,
+  }; 
 }
 
 sub _default_collection_checkbox_content {
@@ -810,33 +823,39 @@ sub collection_radio_buttons {
   my ($self, $attribute, $collection) = (shift, shift, shift);
   my $codeblock = (ref($_[-1])||'') eq 'CODE' ? pop(@_) : undef;
   my $options = (ref($_[-1])||'') eq 'HASH' ? pop(@_) : +{};
-  $options = $self->merge_theme_field_opts('radio_button', $attribute, $options);
+  $options = $self->merge_theme_field_opts('collection_radio_buttons', $attribute, $options);
 
   my $value_method = @_ ? shift(@_) : 'value';
   my $label_method = @_ ? shift(@_) : 'label';
   my $model = $self->model->can('to_model') ? $self->model->to_model : $self->model;
-  my $checked_value = exists($options->{checked_value}) ? $options->{checked_value} : $self->tag_value_for_attribute($attribute);
+  my $checked_value = exists($options->{checked_value}) ? delete($options->{checked_value}) : $self->tag_value_for_attribute($attribute);
   my $include_hidden = exists($options->{include_hidden}) ? delete($options->{include_hidden}) : $self->default_collection_radio_buttons_include_hidden;
-
+  my $container_tag = exists($options->{container_tag}) ? delete($options->{container_tag}) : 'div';
 
   $codeblock = $self->_default_collection_radio_buttons_content unless defined($codeblock);
 
   my @radio_buttons = ();
   my $radio_buttons_builder_options = +{
-    builder => (exists($options->{builder}) ? $options->{builder} : $self->DEFAULT_COLLECTION_RADIO_BUTTON_BUILDER),
+    builder => (exists($options->{builder}) ? delete($options->{builder}) : $self->DEFAULT_COLLECTION_RADIO_BUTTON_BUILDER),
     value_method => $value_method,
     label_method => $label_method,
     checked_value => $checked_value,
     parent_builder => $self,
+    attribute => $attribute,
+    errors => [$model->errors->where($attribute)],
   };
   $radio_buttons_builder_options->{namespace} = $self->namespace if $self->has_namespace;
+  $radio_buttons_builder_options->{view} = $self->view if $self->has_view;
+
+  $collection = $model->$collection unless Scalar::Util::blessed($collection);
 
   while (my $radio_button_model = $collection->next) {
     my $name = "@{[ $self->name ]}.${attribute}";
-    my $checked = $radio_button_model->$value_method eq ($checked_value||'') ? 1:0;
+    my $current_value = $radio_button_model->can('read_attribute_for_html') ? $radio_button_model->read_attribute_for_html($value_method) : $radio_button_model->$value_method;
+    my $checked = $current_value eq ($checked_value||'') ? 1:0;
 
     if($include_hidden && !scalar(@radio_buttons) ) { # Add nop as first to handle empty list
-      my $hidden_fb = Valiant::HTML::Form::_instantiate_builder($name, $model);
+      my $hidden_fb = Valiant::HTML::Form::_instantiate_builder($name, $model, $radio_buttons_builder_options);
       push @radio_buttons, $hidden_fb->hidden($name, +{name=>$name, id=>$self->tag_id_for_attribute($attribute).'_hidden', value=>''});
     }
 
@@ -846,7 +865,16 @@ sub collection_radio_buttons {
     push @radio_buttons, $codeblock->($radio_button_fb);
   }
   $collection->reset if $collection->can('reset');
-  return shift(@radio_buttons)->concat(@radio_buttons);
+  my $radios = shift(@radio_buttons)->concat(@radio_buttons);
+
+  my $errors_classes = exists($options->{errors_classes}) ? delete($options->{errors_classes}) : undef;
+  $options->{class} = join(' ', (grep { defined $_ } $options->{class}, $errors_classes))
+    if $errors_classes && $model->can('errors') && $model->errors->where($attribute);
+
+  return Valiant::HTML::TagBuilder::content_tag $container_tag, $radios, +{
+    id => $self->tag_id_for_attribute($attribute),
+    %$options,
+  }; 
 }
 
 sub _default_collection_radio_buttons_content {
@@ -861,6 +889,7 @@ sub _default_collection_radio_buttons_content {
 
 sub radio_buttons {
   my ($self, $attribute, $collection_proto) = (shift, shift, shift);
+  $collection_proto = $self->model->$collection_proto unless (ref($collection_proto)||'') eq 'ARRAY';
   my $collection = Valiant::HTML::Util::Collection->new(@$collection_proto);
   return $self->collection_radio_buttons($attribute, $collection, @_);
 }
@@ -997,6 +1026,11 @@ The current index of a collection for which the current formbuilder is one item 
 =head2 namespace
 
 Used to add a prefix to the ID for your form elements.
+
+=head2 view
+
+Optional.  The view or template object that is using the formbuilder.  If available can be used to
+influence how the HTML for controls are created.
 
 =head1 METHODS
 
@@ -1794,9 +1828,10 @@ Where C<$attribute_proto> is one of:
                               # and a $method to be called on the value of that sub model (
                               # or on each item sub model if the $attribute is a collection).
 
-Similar to L</select> but works with a $collection instead of delineated options.  Its a type of
-shortcut to reduce boilerplate at the expense of some flexibility (if you need that you'll need
-to use L</select>).  Examples:
+Similar to L</select> but works with a $collection instead of delineated options.  The collection can be
+an actual collection object, or the string name of a method on the model which provides the actual
+collection objection.  Its a type of shortcut to reduce boilerplate at the expense of some flexibility (
+if you need that you'll need to use L</select>).  Examples:
 
     $fb->collection_select('state_id', $states_collection, id=>'name');
     # <select id="person.state_id" name="person.state_id">
@@ -1849,6 +1884,9 @@ Examples:
 Where the $attribute C<roles> refers to a collection of sub models, each of which provides a method C<id>
 which is used to fetch a matching value and $roles_collection refers to the full set of available roles
 which can be added or removed from the parent model.
+
+In these examples C<$collection> and C<$roles_collection> can be either a collection object or a string
+which is the method name on the current model which provides the collection.
 
     $fb->collection_checkbox({roles => 'id'}, $roles_collection, id=>'label'); 
     # <input id="person_roles_0__nop" name="person.roles[0]._nop" type="hidden" value="1"/>
@@ -1939,17 +1977,52 @@ L<Valiant::HTML::FormBuilder::RadioButton>):
       return  $fb_states->radio_button({class=>'form-check-input'}),
               $fb_states->label({class=>'form-check-label'});  
     });
-    # <input id="person_state_id_hidden" name="person.state_id" type="hidden" value=""/>
-    # <input checked class="form-check-input" id="person_state_id_1_1" name="person.state_id" type="radio" value="1"/>
-    # <label class="form-check-label" for="person_state_id_1">TX</label>
-    # <input class="form-check-input" id="person_state_id_2_2" name="person.state_id" type="radio" value="2"/>
-    # <label class="form-check-label" for="person_state_id_2">NY</label>
-    # <input class="form-check-input" id="person_state_id_3_3" name="person.state_id" type="radio" value="3"/>
-    # <label class="form-check-label" for="person_state_id_3">CA</label>
+    # <div id='person_state_id'>
+    #   <input id="person_state_id_hidden" name="person.state_id" type="hidden" value=""/>
+    #   <input checked class="form-check-input" id="person_state_id_1_1" name="person.state_id" type="radio" value="1"/>
+    #   <label class="form-check-label" for="person_state_id_1">TX</label>
+    #   <input class="form-check-input" id="person_state_id_2_2" name="person.state_id" type="radio" value="2"/>
+    #   <label class="form-check-label" for="person_state_id_2">NY</label>
+    #   <input class="form-check-input" id="person_state_id_3_3" name="person.state_id" type="radio" value="3"/>
+    #   <label class="form-check-label" for="person_state_id_3">CA</label>
+    # </div>
 
 In addition to overriding C<radio_button> and C<label> to already contain value and state (if its checked or
 not) information.   This special builder contains some additional methods of possible use, you should see
 the documentation of L<Valiant::HTML::FormBuilder::RadioButton> for more.
+
+Please note that the generated radio inputs will be wrapped in a containing C<div> tag.  You can change this tag
+using the C<container_tag> option.  For example:
+
+    $fb->collection_radio_buttons('state_id', $states_collection, id=>'name', +{container_tag=>'span'}, sub {
+      my $fb_states = shift;
+      return  $fb_states->radio_button({class=>'form-check-input'}),
+              $fb_states->label({class=>'form-check-label'});  
+    });
+
+Here's all the values for the '%options' argument.  Any options that are not one of these will be passed to 
+the container tag as html attributes:
+
+=over4
+
+=item checked_value
+
+This is the current value of the attribute.  By default its the attribute value (via L<\tag_value_for_attribute>)
+but you can override as needed.
+
+=item include_hidden.
+
+Defaults to true.  The value returned if you don't check one of the radio buttons.  
+
+=item container_tag
+
+The tag that contains the generated radio buttons.
+
+=item builder
+
+The builder subclass used in the radio input generator.
+
+=back
 
 =head2 radio_buttons
 

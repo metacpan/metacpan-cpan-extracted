@@ -16,12 +16,12 @@ resources (
 build_requires 'Test::More';
 
 requires 'Moose'              => '2.0';
-requires 'URI::BNode'         => '0.05';
-requires 'RDF::Trine'         => '1.007';
-requires 'URI::NamespaceMap'  => '0.06';
+requires 'URI::BNode'         => '0.06';
+requires 'RDF::Trine'         => '1.019';
+requires 'URI::NamespaceMap'  => '1.10';
 requires 'XML::RegExp'        => '0.04';
-requires 'Data::UUID::NCName' => '0.03';
-requires 'Data::GUID::Any'    => '0.004';
+requires 'Data::UUID::NCName' => '0.07';
+requires 'Data::GUID::Any'    => '0.005';
 
 auto_install;
 

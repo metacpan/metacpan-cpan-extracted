@@ -5,13 +5,13 @@ with 'Valiant::Proxy';
 
 sub read_attribute_for_validation {
   my ($self, $attribute) = @_;
-  
-  if(defined $self->for->[$attribute]) {
+  if( $attribute=~m/^\d+$/ && defined $self->for->[$attribute]) {
     return  $self->for->[$attribute];
   } else {
     return undef; # TODO Might need a flag to allow die here?
   }
 }
+
 1;
 
 =head1 NAME

@@ -11,7 +11,7 @@ package UTF8::R2;
 use 5.00503;    # Universal Consensus 1998 for primetools
 # use 5.008001; # Lancaster Consensus 2013 for toolchains
 
-$VERSION = '0.25';
+$VERSION = '0.26';
 $VERSION = $VERSION;
 
 use strict;
@@ -1068,25 +1068,25 @@ UTF8::R2 - makes UTF-8 scripting easy for enterprise use
 
 =head1 SYNOPSIS
 
-  use UTF8::R2;
-  use UTF8::R2 ver.sion;            # match or die
-  use UTF8::R2 qw( RFC3629 );       # m/./ matches RFC3629 codepoint (default)
-  use UTF8::R2 qw( RFC2279 );       # m/./ matches RFC2279 codepoint
-  use UTF8::R2 qw( WTF8 );          # m/./ matches WTF-8 codepoint
-  use UTF8::R2 qw( RFC3629.ja_JP ); # optimized RFC3629 for ja_JP
-  use UTF8::R2 qw( WTF8.ja_JP );    # optimized WTF-8 for ja_JP
-  use UTF8::R2 qw( %mb );           # multibyte regex by %mb
-  use UTF8::R2 qw( *mb );           # multibyte regex by %mb, and mb::* subroutines
+  Any one of them:
+    use UTF8::R2 qw( *mb );               # multibyte regex by %mb, and mb::* subroutines
+    use UTF8::R2 qw( ver.sion *mb );      # version match or die
+    use UTF8::R2 qw( *mb RFC3629 );       # m/./ matches RFC3629 codepoint (default)
+    use UTF8::R2 qw( *mb RFC2279 );       # m/./ matches RFC2279 codepoint
+    use UTF8::R2 qw( *mb WTF8 );          # m/./ matches WTF-8 codepoint
+    use UTF8::R2 qw( *mb RFC3629.ja_JP ); # optimized RFC3629 for ja_JP
+    use UTF8::R2 qw( *mb WTF8.ja_JP );    # optimized WTF-8 for ja_JP
 
-  UTF8::R2::length($_)
-  UTF8::R2::qr(qr/ utf8_regex_here . \D \H \N \R \S \V \W \b \d \h \s \v \w \x{UTF8hex} [ \D \H \S \V \W \b \d \h \s \v \w \x{UTF8hex} \x{UTF8hex}-\x{UTF8hex} [:POSIX:] [:^POSIX:] ] ? + * {n} {n,} {n,m} /imsxo) # no /gc
-  UTF8::R2::split(qr/$utf8regex/imsxo, $_, 3)
-  UTF8::R2::substr($_, 0, 5)
-  UTF8::R2::tr($_, 'ABC', 'XYZ', 'cdsr')
-  use UTF8::R2 qw(%mb);
-    $_ =~ $mb{qr/$utf8regex/imsxo} # no /gc
+  UTF-8 subroutines:
+    mb::length($_)
+    mb::substr($_, 0, 5)
+    mb::tr($_, 'ABC', 'XYZ', 'cdsr')
+
+  UTF-8 regular expressions:
+    $mb_regex =~ $mb{qr/ utf8_regex_here . \D \H \N \R \S \V \W \b \d \h \s \v \w \x{UTF8hex} [ \D \H \S \V \W \b \d \h \s \v \w \x{UTF8hex} \x{UTF8hex}-\x{UTF8hex} [:POSIX:] [:^POSIX:] ] ? + * {n} {n,} {n,m} /imsxo} # no /gc
     $_ =~ m<\G$mb{qr/$utf8regex/imsxo}>gc
     $_ =~ s<$mb{qr/before/imsxo}><after>egr
+    mb::split(qr/$utf8regex/imsxo, $_, 3)
 
   supported encodings:
     UTF-8(RFC3629), UTF-8(RFC2279), WTF8, RFC3629.ja_JP, and WTF8.ja_JP
@@ -1133,11 +1133,11 @@ This software has the following features
 
 =item * does not change features of octet-oriented built-in functions
 
-=item * You have using UTF8::R2::* subroutines if you want codepoint semantics
+=item * You have using mb::* subroutines if you want codepoint semantics
 
-=item * UTF8::R2::lc(), UTF8::R2::lcfirst(), UTF8::R2::uc(), and UTF8::R2::ucfirst() convert US-ASCII only
+=item * lc(), lcfirst(), uc(), and ucfirst() convert US-ASCII only
 
-=item * codepoint range by hyphen of UTF8::R2::tr() supports US-ASCII only
+=item * codepoint range by hyphen of mb::tr() supports US-ASCII only
 
 =back
 
@@ -1294,63 +1294,63 @@ L<http://simonsapin.github.io/wtf-8/>
 
 This software provides traditional feature "as was."
 The new UTF-8 features are provided by subroutines with new names.
-If you like utf8 pragma, UTF8::R2::* subroutines will help you.
+If you like utf8 pragma, mb::* subroutines will help you.
 On other hand, If you love JPerl, those subroutines will not help you very much.
 Traditional functions of Perl are useful still now in octet-oriented semantics.
 
-  elder <<<---                                               age                                               --->>> younger
-  ---------------------------------------------------------------------------------------------------------------------------
-  bare Perl4       JPerl4           use utf8;        use UTF8::R2;           use UTF8::R2 qw(*mb);   mb.pm
-  bare Perl5       JPerl5           pragma           module                  module                  modulino
-  ---------------------------------------------------------------------------------------------------------------------------
-  chop             ---              ---              chop                    chop                    chop
-  chr              chr              bytes::chr       chr                     chr                     chr
-  getc             getc             ---              getc                    getc                    getc
-  index            ---              bytes::index     index                   index                   index
-  lc               ---              ---              CORE::lc                CORE::lc                CORE::lc (= tr/A-Z/a-z/)
-  lcfirst          ---              ---              CORE::lcfirst           CORE::lcfirst           CORE::lcfirst (= tr/A-Z/a-z/)
-  length           length           bytes::length    length                  length                  length
-  ord              ord              bytes::ord       ord                     ord                     ord
-  reverse          reverse          ---              reverse                 reverse                 reverse
-  rindex           ---              bytes::rindex    rindex                  rindex                  rindex
-  substr           substr           bytes::substr    substr                  substr                  substr
-  uc               ---              ---              CORE::uc                CORE::uc                CORE::uc (= tr/a-z/A-Z/)
-  ucfirst          ---              ---              CORE::ucfirst           CORE::ucfirst           CORE::ucfirst (= tr/a-z/A-Z/)
-  ---              chop             chop             UTF8::R2::chop          mb::chop                mb::chop
-  ---              ---              chr              UTF8::R2::chr           mb::chr                 mb::chr
-  ---              ---              getc             UTF8::R2::getc          mb::getc                mb::getc
-  ---              index            ---              UTF8::R2::index_byte    mb::index_byte          mb::index_byte
-  ---              ---              index            UTF8::R2::index         mb::index               mb::index
-  ---              lc               ---              lc                      lc                      lc (= mb::lc)
-  ---              lcfirst          ---              lcfirst                 lcfirst                 lcfirst (= mb::lcfirst)
-  ---              ---              length           UTF8::R2::length        mb::length              mb::length
-  ---              ---              ord              UTF8::R2::ord           mb::ord                 mb::ord
-  ---              ---              reverse          UTF8::R2::reverse       mb::reverse             mb::reverse
-  ---              rindex           ---              UTF8::R2::rindex_byte   mb::rindex_byte         mb::rindex_byte
-  ---              ---              rindex           UTF8::R2::rindex        mb::rindex              mb::rindex
-  ---              ---              substr           UTF8::R2::substr        mb::substr              mb::substr
-  ---              uc               ---              uc                      uc                      uc (= mb::uc)
-  ---              ucfirst          ---              ucfirst                 ucfirst                 ucfirst (= mb::ucfirst)
-  ---              ---              lc               (mb::Casing::lc)        (mb::Casing::lc)        (mb::Casing::lc)
-  ---              ---              lcfirst          (mb::Casing::lcfirst)   (mb::Casing::lcfirst)   (mb::Casing::lcfirst)
-  ---              ---              uc               (mb::Casing::uc)        (mb::Casing::uc)        (mb::Casing::uc)
-  ---              ---              ucfirst          (mb::Casing::ucfirst)   (mb::Casing::ucfirst)   (mb::Casing::ucfirst)
-  ---------------------------------------------------------------------------------------------------------------------------
-  do 'file'        ---              do 'file'        do 'file'               do 'file'               do 'file'
-  eval 'string'    ---              eval 'string'    eval 'string'           eval 'string'           eval 'string'
-  require 'file'   ---              require 'file'   require 'file'          require 'file'          require 'file'
-  use Module       ---              use Module       use Module              use Module              use Module
-  no Module        ---              no Module        no Module               no Module               no Module
-  ---              do 'file'        do 'file'        do 'file'               mb::do 'file'           mb::do 'file'
-  ---              eval 'string'    eval 'string'    eval 'string'           mb::eval 'string'       mb::eval 'string'
-  ---              require 'file'   require 'file'   require 'file'          mb::require 'file'      mb::require 'file'
-  ---              use Module       use Module       use Module              use Module              mb::use Module
-  ---              no Module        no Module        no Module               no Module               mb::no Module
-  $^X              ---              $^X              $^X                     $^X                     $^X
-  ---              $^X              $^X              $^X                     $mb::PERL               $mb::PERL
-  $0               $0               $0               $0                      $mb::ORIG_PROGRAM_NAME  $mb::ORIG_PROGRAM_NAME
-  ---              ---              ---              ---                     ---                     $0
-  ---------------------------------------------------------------------------------------------------------------------------
+  elder <<<---                                   age                                   --->>> younger
+  ---------------------------------------------------------------------------------------------------
+  bare Perl4       JPerl4           use utf8;        mb.pm                   use UTF8::R2 qw(*mb);   
+  bare Perl5       JPerl5           pragma           modulino                module                  
+  ---------------------------------------------------------------------------------------------------
+  chop             ---              ---              chop                    chop
+  chr              chr              bytes::chr       chr                     chr
+  getc             getc             ---              getc                    getc
+  index            ---              bytes::index     index                   index
+  lc               ---              ---              CORE::lc                CORE::lc (= tr/A-Z/a-z/)
+  lcfirst          ---              ---              CORE::lcfirst           CORE::lcfirst (= tr/A-Z/a-z/)
+  length           length           bytes::length    length                  length
+  ord              ord              bytes::ord       ord                     ord
+  reverse          reverse          ---              reverse                 reverse
+  rindex           ---              bytes::rindex    rindex                  rindex
+  substr           substr           bytes::substr    substr                  substr
+  uc               ---              ---              CORE::uc                CORE::uc (= tr/a-z/A-Z/)
+  ucfirst          ---              ---              CORE::ucfirst           CORE::ucfirst (= tr/a-z/A-Z/)
+  ---              chop             chop             mb::chop                mb::chop
+  ---              ---              chr              mb::chr                 mb::chr
+  ---              ---              getc             mb::getc                mb::getc
+  ---              index            ---              mb::index_byte          mb::index_byte
+  ---              ---              index            mb::index               mb::index
+  ---              lc               ---              lc                      lc (= mb::lc)
+  ---              lcfirst          ---              lcfirst                 lcfirst (= mb::lcfirst)
+  ---              ---              length           mb::length              mb::length
+  ---              ---              ord              mb::ord                 mb::ord
+  ---              ---              reverse          mb::reverse             mb::reverse
+  ---              rindex           ---              mb::rindex_byte         mb::rindex_byte
+  ---              ---              rindex           mb::rindex              mb::rindex
+  ---              ---              substr           mb::substr              mb::substr
+  ---              uc               ---              uc                      uc (= mb::uc)
+  ---              ucfirst          ---              ucfirst                 ucfirst (= mb::ucfirst)
+  ---              ---              lc               (mb::Casing::lc)        (mb::Casing::lc)
+  ---              ---              lcfirst          (mb::Casing::lcfirst)   (mb::Casing::lcfirst)
+  ---              ---              uc               (mb::Casing::uc)        (mb::Casing::uc)
+  ---              ---              ucfirst          (mb::Casing::ucfirst)   (mb::Casing::ucfirst)
+  ---------------------------------------------------------------------------------------------------
+  do 'file'        ---              do 'file'        do 'file'               do 'file'
+  eval 'string'    ---              eval 'string'    eval 'string'           eval 'string'
+  require 'file'   ---              require 'file'   require 'file'          require 'file'
+  use Module       ---              use Module       use Module              use Module
+  no Module        ---              no Module        no Module               no Module
+  ---              do 'file'        do 'file'        mb::do 'file'           mb::do 'file'
+  ---              eval 'string'    eval 'string'    mb::eval 'string'       mb::eval 'string'
+  ---              require 'file'   require 'file'   mb::require 'file'      mb::require 'file'
+  ---              use Module       use Module       mb::use Module          use Module
+  ---              no Module        no Module        mb::no Module           no Module
+  $^X              ---              $^X              $^X                     $^X
+  ---              $^X              $^X              $mb::PERL               $mb::PERL
+  $0               $0               $0               $mb::ORIG_PROGRAM_NAME  $mb::ORIG_PROGRAM_NAME
+  ---              ---              ---              $0                      $0
+  ---------------------------------------------------------------------------------------------------
 
 index brothers
 
@@ -1359,13 +1359,13 @@ index brothers
   ------------------------------------------------------------------------------------------
   index                   octet           octet           useful, bare Perl like
   rindex                  octet           octet           useful, bare Perl like
-  UTF8::R2::index         codepoint       codepoint       not so useful, utf8 pragma like
-  UTF8::R2::rindex        codepoint       codepoint       not so useful, utf8 pragma like
-  UTF8::R2::index_byte    codepoint       octet           useful, JPerl like
-  UTF8::R2::rindex_byte   codepoint       octet           useful, JPerl like
+  mb::index               codepoint       codepoint       not so useful, utf8 pragma like
+  mb::rindex              codepoint       codepoint       not so useful, utf8 pragma like
+  mb::index_byte          codepoint       octet           useful, JPerl like
+  mb::rindex_byte         codepoint       octet           useful, JPerl like
   ------------------------------------------------------------------------------------------
 
-The most useful of the above are UTF8::R2::index_byte() and UTF8::R2::rindex_byte(), but it's more convenient to use regular expressions than those.
+The most useful of the above are mb::index_byte() and mb::rindex_byte(), but it's more convenient to use regular expressions than those.
 So you can forget about these subroutines.
 
 =head1 Codepoint-Semantics Regular Expression
@@ -1377,15 +1377,12 @@ UTF-8 codepoint semantics of regular expression is provided by new sintax.
 
   ------------------------------------------------------------------------------------------------------------------------------------------
   Octet-semantics         UTF-8 Codepoint-semantics
-  by traditional sintax   by new sintax                              Note and Limitations
+  by traditional sintax   use UTF8::R2 qw(*mb);                      Note and Limitations
   ------------------------------------------------------------------------------------------------------------------------------------------
-  // or m// or qr//       UTF8::R2::qr(qr/$utf8regex/imsxo)          not supports metasymbol \X that match grapheme
-                          m<@{[UTF8::R2::qr(qr/$utf8regex/imsxo)]}>gc
-                            or                                       not supports named character (such as \N{GREEK SMALL LETTER EPSILON}, \N{greek:epsilon}, or \N{epsilon})
-                          use UTF8::R2 qw(%mb);                      not supports character properties (like \p{PROP} and \P{PROP})
+  // or m// or qr//       $mb{qr/ utf8_regex_here . \D \H \N \R \S \V \W \b \d \h \s \v \w \x{UTF8hex} [ \D \H \S \V \W \b \d \h \s \v \w \x{UTF8hex} \x{UTF8hex}-\x{UTF8hex} [:POSIX:] [:^POSIX:] ] ? + * {n} {n,} {n,m} /imsxo}
                           $mb{qr/$utf8regex/imsxo}                   modifier i, m, s, x, o work on compile time
                           m<\G$mb{qr/$utf8regex/imsxo}>gc            modifier g,c work on run time
-
+                          
                           Special Escapes in Regex                   Support Perl Version
                           --------------------------------------------------------------------------------------------------
                           $mb{qr/ \x{UTF8hex} /}                     since perl 5.005
@@ -1400,16 +1397,14 @@ UTF-8 codepoint semantics of regular expression is provided by new sintax.
                           $mb{qr/ \V /}                              since perl 5.010
                           $mb{qr/ \R /}                              since perl 5.010
                           $mb{qr/ \N /}                              since perl 5.012
+                          --------------------------------------------------------------------------------------------------
                           (max \x{UTF8hex} is \x{7FFFFFFF}, so cannot 4 octet codepoints, pardon me please!)
   ------------------------------------------------------------------------------------------------------------------------------------------
-  s/before/after/imsxoegr s<@{[UTF8::R2::qr(qr/before/imsxo)]}><after>egr
-                            or
-                          use UTF8::R2 qw(%mb);
-                          s<$mb{qr/before/imsxo}><after>egr
+  s/before/after/imsxoegr s<$mb{qr/before/imsxo}><after>egr
   ------------------------------------------------------------------------------------------------------------------------------------------
-  split//                 UTF8::R2::split(qr/$utf8regex/imsxo, $_, 3)  *CAUTION* UTF8::R2::split(/re/,$_,3) means UTF8::R2::split($_ =~ /re/,$_,3)
+  split//                 mb::split(qr/$utf8regex/imsxo, $_, 3)      *CAUTION* mb::split(/re/,$_,3) means mb::split($_ =~ /re/,$_,3)
   ------------------------------------------------------------------------------------------------------------------------------------------
-  tr/// or y///           UTF8::R2::tr($_, 'A-C', 'X-Z', 'cdsr')     range of codepoint by hyphen supports ASCII only
+  tr/// or y///           mb::tr($_, 'A-C', 'X-Z', 'cdsr')           range of codepoint by hyphen supports ASCII only
   ------------------------------------------------------------------------------------------------------------------------------------------
 
 =head1 Porting from script in bare Perl4, and bare Perl5
@@ -1425,24 +1420,24 @@ Running an US-ASCII script using UTF8::R2 allows you to treat UTF-8 codepoints a
 
 There are only a few places that need to be rewritten.
 If you write the functionality of "index()" and "rindex()" in regular expressions, the only difference left is "chop()".
-If you want "chop()" that like JPerl, you need to write "UTF8::R2::chop()" when UTF8::R2 environment.
+If you want "chop()" that like JPerl, you need to write "mb::chop()" when UTF8::R2 environment.
 
   -----------------------------------------------------------------
   original script in        script with
-  JPerl4, JPerl5            UTF8::R2 module
+  JPerl4, JPerl5            use UTF8::R2 qw(*mb);
   -----------------------------------------------------------------
-  chop                      UTF8::R2::chop
-  index                     UTF8::R2::index_byte
-  rindex                    UTF8::R2::rindex_byte
+  chop                      mb::chop
+  index                     mb::index_byte
+  rindex                    mb::rindex_byte
   -----------------------------------------------------------------
 
 However substantially is ...
 
   -----------------------------------------------------------------
   original script in        script with
-  JPerl4, JPerl5            UTF8::R2 module
+  JPerl4, JPerl5            use UTF8::R2 qw(*mb);
   -----------------------------------------------------------------
-  chop                      95% to chomp, 4% to UTF8::R2::chop, 1% to chop
+  chop                      95% to chomp, 4% to mb::chop, 1% to chop
   index                     (already written in regular expression)
   rindex                    (already written in regular expression)
   -----------------------------------------------------------------
@@ -1455,37 +1450,60 @@ Substantially put, JPerl users can write programs the same way they used to.
 
 Like traditional style, Perl's built-in functions without package names provide octet-oriented functionality.
 Thus, "length()" and "substr()" work on an octet basis, universally.
-When you need multibyte functionally, you need to use subroutines in the "UTF8::R2" package, on every time.
+When you need multibyte functionally, you need to use subroutines in the "mb::" package, on every time.
 
   -----------------------------------------------------------------
   original script with      script with
-  utf8 pragma               UTF8::R2 module
+  utf8 pragma               use UTF8::R2 qw(*mb);
   -----------------------------------------------------------------
-  chop                      UTF8::R2::chop
-  chr                       UTF8::R2::chr
-  getc                      UTF8::R2::getc
-  index                     UTF8::R2::index
+  chop                      mb::chop
+  chr                       mb::chr
+  getc                      mb::getc
+  index                     mb::index
   lc                        ---
   lcfirst                   ---
-  length                    UTF8::R2::length
-  ord                       UTF8::R2::ord
-  reverse                   UTF8::R2::reverse
-  rindex                    UTF8::R2::rindex
-  substr                    UTF8::R2::substr
+  length                    mb::length
+  ord                       mb::ord
+  reverse                   mb::reverse
+  rindex                    mb::rindex
+  substr                    mb::substr
   uc                        ---
   ucfirst                   ---
   -----------------------------------------------------------------
 
 =head1 Porting from script with mb.pm modulino
 
-=head2 mb.pm Compatible Routines, and Variables of UTF8::R2 module
-
 You can call subroutines by mb.pm-like names using "use UTF8::R2 qw(*mb);".
+
+=head2 Add this line first
+
+  use UTF8::R2 qw( *mb );
+
+=head2 Add $mb{...} (or "mb::" of mb::split) to UTF-8 regular expressions like this
+
+  $_ =~ $mb{qr/ utf8_regex_here /imsxo}
+  $_ =~ m<\G$mb{qr/ utf8_regex_here /imsxo}>gc
+  $_ =~ s<$mb{qr/ before /imsxo}>< after >egr
+  mb::split(qr/ utf8_regex_here /imsxo, ...); # *MUST* qr/.../, *NOT* /.../
+
+=head2 Use mb::tr() subroutine for tr/// that supports UTF-8
+
+Have to write like this
+
+  mb::tr($_, 'ABC', 'XYZ', 'cdsr');
+
+Instead of this
+
+  $_ =~ tr/ABC/XYZ/csdsr;
+
+=head2 Use mb::* subroutines
+
+You can use subroutines by mb.pm-like names.
 
   subroutines to scripts born in mb.pm modulino
   --------------------------------------------------
-  mb.pm                     use UTF8::R2 qw(*mb);   
-  modulino                  module                  
+  mb.pm                     script with
+  modulino                  use UTF8::R2 qw(*mb);
   --------------------------------------------------
   mb::chop                  mb::chop                
   mb::chr                   mb::chr                 
@@ -1500,23 +1518,25 @@ You can call subroutines by mb.pm-like names using "use UTF8::R2 qw(*mb);".
   mb::reverse               mb::reverse             
   mb::rindex                mb::rindex              
   mb::rindex_byte           mb::rindex_byte         
-  mb::split                 mb::split               
   mb::substr                mb::substr              
-  mb::tr                    mb::tr                  
   --------------------------------------------------
-  However...
+
+However...
+
   --------------------------------------------------
   mb::use Module            use Module              
   mb::no Module             no Module               
   mb::dosglob               glob                    
   --------------------------------------------------
 
-You can use variables by mb.pm-like names using "use UTF8::R2 qw(*mb);".
+=head2 Use mb::* variables
+
+You can use variables by mb.pm-like names.
 
   variables to scripts born in mb.pm modulino
   --------------------------------------------------
-  mb.pm                     use UTF8::R2 qw(*mb);   
-  modulino                  module                  
+  mb.pm                     script with
+  modulino                  use UTF8::R2 qw(*mb);
   --------------------------------------------------
   $mb::PERL                 $mb::PERL               
   $mb::ORIG_PROGRAM_NAME    $mb::ORIG_PROGRAM_NAME  
@@ -1784,7 +1804,7 @@ The following is a description of all the situations in this software is used in
   |             |    Sjis      |                                  |                                  |
   |             |              |                                  |                                  |
   |    Sjis     +--------------+----------------------------------+----------------------------------+
-  |             |              |                                  | use UTF8::R2;                    |
+  |             |              |                                  | use UTF8::R2 qw(*mb);            |
   |             |    UTF-8     |                                  |                                  |
   |             |              |                                  | use mb::Encode;  # file-path     |
   +-------------+--------------+----------------------------------+----------------------------------+
@@ -1792,7 +1812,7 @@ The following is a description of all the situations in this software is used in
   |             |    Sjis      |                                  |                                  |
   |             |              |  use mb::Encode; # file-path     |                                  |
   |    UTF-8    +--------------+----------------------------------+----------------------------------+
-  |             |              |                                  | use UTF8::R2;                    |
+  |             |              |                                  | use UTF8::R2 qw(*mb);            |
   |             |    UTF-8     |                                  |                                  |
   |             |              |                                  |                                  |
   +-------------+--------------+----------------------------------+----------------------------------+
@@ -1874,9 +1894,9 @@ We can use each advantages using following hints.
 
 =item * have to write "s<$mb{qr/before/imsxo}><after>egr" to do "s/before/after/imsxoegr" that works as codepoint
 
-=item * have to write "UTF8::R2::split(qr/regexp/, $_, 3)" to do "split(/regexp/, $_, 3)" that works as codepoint
+=item * have to write "mb::split(qr/regexp/, $_, 3)" to do "split(/regexp/, $_, 3)" that works as codepoint
 
-=item * have to write "UTF8::R2::tr($_, 'A-C', 'X-Z', 'cdsr')" to do "$_ =~ tr/A-C/X-Z/cdsr" that works as codepoint
+=item * have to write "mb::tr($_, 'A-C', 'X-Z', 'cdsr')" to do "$_ =~ tr/A-C/X-Z/cdsr" that works as codepoint
 
 =back
 

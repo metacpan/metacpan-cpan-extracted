@@ -22,7 +22,7 @@ describe 'Config::AWS environment tests' => sub {
 
         delete $ENV{AWS_SHARED_CREDENTIALS_FILE};
         is path( Config::AWS::credentials_file )
-            ->relative('~/.aws/credentials')->stringify, '.';
+            ->relative( path('~/.aws/credentials') )->stringify, '.';
 
         unlike Config::AWS::credentials_file, qr/^~/, 'tilde is expanded';
     };
@@ -33,7 +33,7 @@ describe 'Config::AWS environment tests' => sub {
 
         delete $ENV{AWS_CONFIG_FILE};
         is path( Config::AWS::config_file )
-            ->relative('~/.aws/config')->stringify, '.';
+            ->relative( path('~/.aws/config') )->stringify, '.';
 
         unlike Config::AWS::config_file, qr/^~/, 'tilde is expanded';
     };

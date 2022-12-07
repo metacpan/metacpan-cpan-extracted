@@ -25,7 +25,7 @@ Module::Generic::Array - An Array Manipulation Object Class
         print( "I got $_\n" );
         # could also write:
         # print( "I got $_[1] at offset $_[0]\n" );
-        return; # stop looping
+        $ar->break; # stop looping
     });
     $ar->empty; # $ar is now empty
     # Same as contains:
@@ -114,7 +114,7 @@ Module::Generic::Array - An Array Manipulation Object Class
         {
             my( $j, $v ) = @_;
             # Tell loop for array $a to stop
-            $a->return( undef() ) if( $n == 7 && $v == 27 );
+            $a->break if( $n == 7 && $v == 27 );
         });
         # some more stuff here....
     });
@@ -124,8 +124,9 @@ Module::Generic::Array - An Array Manipulation Object Class
     {
         my( $i, $n ) = @_;
         # tell it to skip Peter
-        $a->return( +1 ) if( $n eq 'John' );
-        return( 1 );
+        $a->return(+1) if( $n eq 'John' );
+        # No need to return a true value anymore
+        # Ending the loop must be explicitly expressed using break
     });
 
     $ar->reverse; # Mary John Joe
@@ -175,7 +176,7 @@ Module::Generic::Array - An Array Manipulation Object Class
 
 =head1 VERSION
 
-    v1.5.4
+    v2.0.0
 
 =head1 DESCRIPTION
 
@@ -225,6 +226,48 @@ This simply returns the current object, so it does nothing special. It is here, 
 Returns the array as string, which is essentially the same as C<"@array">
 
 It takes an optional boolean value that, if true, will sort the array before.
+
+=head2 break
+
+Instructs the loop of the given object to exit the loop.
+
+You can return on the call of break to immediately exit any loop you are in. For example:
+
+    $a->for(sub
+    {
+        # Do something
+        return( $a->break ) if( $true );
+        # And something more
+    });
+
+It also works if you are within another loop, because L</break> returns a code that exit the current loop as well. For example:
+
+    $a->for(sub
+    {
+        # Do something
+        $b->foreach(sub
+        {
+            # Now exit the $b loop and the $a loop as well
+            return( $a->break ) if( $true );
+            # And something more
+        });
+    });
+
+It will not work though if you are in 3 loops deep. That's the limitation for now. For example:
+
+    $a->for(sub
+    {
+        # Do something
+        $b->foreach(sub
+        {
+            $c->foreach(sub
+            {
+                # Now exit the $c loop and the $a loop only at the end of the $b loop iteration
+                return( $a->break ) if( $true );
+                # And something more
+            });
+        });
+    });
 
 =head2 callback
 
@@ -377,11 +420,11 @@ Provided with a code reference such as a reference to a subroutine, and this wil
         # print( "I got $_[1] at offset $_[0]\n" );
     });
 
-To exit the loop, return C<undef()>, for example:
+To exit the loop, return L</break>, for example:
 
     $a->each(sub
     {
-        return if( $_ eq $not_this_one );
+        return( $a->break ) if( $_ eq $not_this_one );
         print( "ok, this one\n" );
     });
 
@@ -514,21 +557,30 @@ C<$_> is made available and contains the value of C<$val>
 
 It returns the object itself so this can be chained.
 
-To exit the loop, return C<undef()>, for example:
+To exit the loop, call L</break>. You can even return the value returned by calling L</break>. for example:
 
     $a->for(sub
     {
-        return if( $_ eq $not_this_one );
+        # exit now
+        return( $a->break ) if( $_ eq $not_this_one );
         print( "ok, this one\n" );
     });
 
-But, you can also use L<perlfunc/last> as it will affect the loop. For example:
+Or you can use L</return>
 
     $a->for(sub
     {
-        last if( $_ eq $not_this_one );
-        print( "ok, this one\n" );
+        if( $_ eq $not_this_one )
+        {
+            $a->return( $a->break );
+        }
+        else
+        {
+            print( "ok, this one\n" );
+        }
     });
+
+In version on or anterior to v1.5.4 you could exit the loop by just returning C<undef>, but since there are unfortunate opportunities for implicit C<undef> being returned, this led to some issues and now it is required to return false, but defined.
 
 If you wanted to affect the current offset position relative to the current counter value, you can return a scalar reference containing an integer. For example:
 
@@ -543,7 +595,7 @@ If you wanted to affect the current offset position relative to the current coun
             return( \-1 );
         }
         # return true
-        return( 1 );
+        return(1);
     });
     say "@$a"; # Jack John Gabriel Raphael Emmanuel
 
@@ -558,23 +610,11 @@ And if you wanted to modify the counter value itself, you can change the value o
             $_[0]--;
         }
         # return true
-        return( 1 );
+        return(1);
     });
     say "@$a"; # Jack John Gabriel Raphael Emmanuel
 
 This is useful if you want to modify the array and avoid getting unexpected results.
-
-You can also use L<perlfunc/next> to move to the next iteration like in a regular loop, such as:
-
-    $a->for(sub
-    {
-        my( $i, $name ) = @_;
-        if( $name eq 'Peter' )
-        {
-            next;
-        }
-        print( "$name\n" );
-    });
 
 =head2 foreach
 
@@ -594,15 +634,16 @@ Instead use L</for>. See example provided there on how to do it.
 
 C<$_> is made available and contains the value of C<$val>
 
-To exit the loop, return C<undef()>, for example:
+To exit the loop, call L</break>. You can even return the value returned by calling L</break>. for example:
 
     $a->foreach(sub
     {
-        return if( $_ eq $not_this_one );
+        # Exit the loop immediately
+        return( $a->break ) if( $_ eq $not_this_one );
         print( "ok, this one\n" );
     });
 
-Or just like for L</for> you can use L<perlfunc/next> and L<perlfunc/last> for the flow control.
+In version on or anterior to v1.5.4 you could exit the loop by just returning C<undef>, but since there are unfortunate opportunities for implicit C<undef> being returned, this led to some issues and now it is required to return false, but defined.
 
 =head2 fourth
 

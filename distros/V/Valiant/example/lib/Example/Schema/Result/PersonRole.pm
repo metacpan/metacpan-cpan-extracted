@@ -24,7 +24,8 @@ __PACKAGE__->belongs_to(
 __PACKAGE__->belongs_to(
   role =>
   'Example::Schema::Result::Role',
-  { 'foreign.id' => 'self.role_id' }
+  { 'foreign.id' => 'self.role_id' },
+  { proxy_checkbox_options => {value=>'id', label=>'label'} },
 );
 
 sub is_user {

@@ -1,0 +1,147 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Dyn::Callback::Value - dyncall value variant
+
+=head1 DESCRIPTION
+
+Value variant union-type that carries all supported dyncall types.
+
+=head1 Methods
+
+This package is object oriented and brings along the following methods...
+
+=head2 C<new( )>
+
+    my $value = Dyn::Callback::Value->new();
+
+Generates a new Dyn::Callback::Value object.
+
+=head2 C<B( [...] )>
+
+    if ( $value->B ) { ... }
+    $value->B( !0 );
+
+Gets and potentially sets the boolean value of the underlying union.
+
+=head2 C<c( [...] )>
+
+    if ( $value->c ) { ... }
+    $value->c( ord 'a' );
+
+Gets and potentially sets the char value of the underlying union.
+
+=head2 C<C( [...] )>
+
+    if ( $value->C ) { ... }
+    $value->C( ord 'a' );
+
+Gets and potentially sets the unsigned char value of the underlying union.
+
+=head2 C<s( [...] )>
+
+    if ( $value->s == -5 ) { ... }
+    $value->s( -16 );
+
+Gets and potentially sets the short value of the underlying union.
+
+=head2 C<S( [...] )>
+
+    if ( $value->S > 3 ) { ... }
+    $value->S( 44 );
+
+Gets and potentially sets the unsigned short value of the underlying union.
+
+=head2 C<i( [...] )>
+
+    if ( $value->i == -5 ) { ... }
+    $value->i( -16 );
+
+Gets and potentially sets the int value of the underlying union.
+
+=head2 C<I( [...] )>
+
+    if ( $value->I > 3 ) { ... }
+    $value->I( 44 );
+
+Gets and potentially sets the unsigned int value of the underlying union.
+
+=head2 C<j( [...] )>
+
+    if ( $value->j == -5 ) { ... }
+    $value->j( -16 );
+
+Gets and potentially sets the long value of the underlying union.
+
+=head2 C<J( [...] )>
+
+    if ( $value->J > 3 ) { ... }
+    $value->J( 44 );
+
+Gets and potentially sets the unsigned long value of the underlying union.
+
+=head2 C<l( [...] )>
+
+    if ( $value->l == -5 ) { ... }
+    $value->j( -16 );
+
+Gets and potentially sets the long long value of the underlying union.
+
+=head2 C<L( [...] )>
+
+    if ( $value->L > 3 ) { ... }
+    $value->L( 44 );
+
+Gets and potentially sets the unsigned long long value of the underlying union.
+
+=head2 C<f( [...] )>
+
+    if ( $value->f == -5 ) { ... }
+    $value->f( -16 );
+
+Gets and potentially sets the float value of the underlying union.
+
+=head2 C<d( [...] )>
+
+    if ( $value->d > 3 ) { ... }
+    $value->d( 44 );
+
+Gets and potentially sets the double value of the underlying union.
+
+=head2 C<p( [...] )>
+
+    if ( $value->p ) { ... }
+    $value->p( $window );
+
+Gets and potentially sets the void pointer value of the underlying union.
+
+=head2 C<Z( [...] )>
+
+    if ( $value->Z eq 'Keep things going.' ) { ... }
+    $value->Z( 'Do you know?' );
+
+Gets and potentially sets the const char pointer (...a string) value of the
+underlying union.
+
+=head1 LICENSE
+
+Copyright (C) Sanko Robinson.
+
+This library is free software; you can redistribute it and/or modify it under
+the terms found in the Artistic License 2. Other copyrights, terms, and
+conditions may apply to data transmitted through this module.
+
+=head1 AUTHOR
+
+Sanko Robinson E<lt>sanko@cpan.orgE<gt>
+
+=begin stopwords
+
+dyncall const
+
+=end stopwords
+
+=cut

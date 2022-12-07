@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/File.pm
-## Version v0.5.4
+## Version v0.5.5
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/20
-## Modified 2022/10/31
+## Modified 2022/11/12
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -127,7 +127,7 @@ BEGIN
     # Catching non-ascii characters: [^\x00-\x7F]
     # Credits to: File::Util
     $ILLEGAL_CHARACTERS = qr/[\x5C\/\|\015\012\t\013\*\"\?\<\:\>]/;
-    our $VERSION = 'v0.5.4';
+    our $VERSION = 'v0.5.5';
 };
 
 use strict;
@@ -1267,7 +1267,7 @@ sub find
     # It can be files or directories to skip
     if( $opts->{skip} )
     {
-        return( $self->error( "Parameter \"skip\" was provided, but it is not an array reference." ) ) if( Scalar::Util::reftype( $opts->{skip} ) ne 'ARRAY' );
+        return( $self->error( "Parameter \"skip\" was provided, but it is not an array reference." ) ) if( ( Scalar::Util::reftype( $opts->{skip} ) // '' ) ne 'ARRAY' );
         foreach my $f ( @{$opts->{skip}} )
         {
             my $this = file( $f );
@@ -2278,9 +2278,14 @@ sub open
             {
                 $mode = '>>';
             }
+            my $map = 
+            {
+            '<+' => '+<',
+            };
+            $mode = $map->{ $mode } if( CORE::exists( $map->{ $mode } ) );
             try
             {
-                $io = Module::Generic::File::IO->new( $file, $mode, @_ ) || return( $self->error( "Unable to open file \"$file\": $!" ) );
+                $io = Module::Generic::File::IO->new( $file, "$mode", @_ ) || return( $self->error( "Unable to open file \"$file\": ", Module::Generic::File::IO->error ) );
             }
             catch( $err )
             {
@@ -2529,7 +2534,7 @@ sub resolve
     my $path = shift( @_ ) || $self->filename;
     my $opts = $self->_get_args_as_hash( @_ );
     $opts->{recurse} //= 0;
-    my $max_recursion = $self->max_recursion;
+    my $max_recursion = $self->max_recursion // 0;
     return( $self->error( "Too many recursion. Exceeded the threshold of $max_recursion" ) ) if( $max_recursion > 0 && $opts->{recurse} >= $max_recursion );
     my $os = $self->{os} || $^O;
     my $globbing = CORE::exists( $opts->{globbing} ) ? $opts->{globbing} : $self->{globbing};
@@ -3162,6 +3167,7 @@ sub unload_json
     my $equi =
     {
         ordered => 'canonical',
+        sorted => 'canonical',
     };
     
     try
@@ -3572,7 +3578,7 @@ sub _move_or_copy
         # we return it as is, unless we can such as in File::Temp who has the 'filename' method
         # If the destination provided was a IO::Dir directory handle, it will have been turned 
         # into a directory path earlier on.
-        elsif( Scalar::Util::reftype( $dest ) eq 'GLOB' )
+        elsif( ( Scalar::Util::reftype( $dest ) // '' ) eq 'GLOB' )
         {
             if( $self->_is_object( $dest ) && $dest->can( 'filename' ) )
             {
@@ -4231,7 +4237,7 @@ Module::Generic::File - File Object Abstraction Class
 
 =head1 VERSION
 
-    v0.5.4
+    v0.5.5
 
 =head1 DESCRIPTION
 

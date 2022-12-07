@@ -1,5 +1,9 @@
 Revision history for perl module Unicode::Diacritic::Strip
 
+0.14 2022-12-07
+
+* Remove <compat> etc. when doing decompositions
+
 0.13 2019-10-21
 
 * "Encode" dependency removed

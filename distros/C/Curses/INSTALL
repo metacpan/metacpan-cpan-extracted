@@ -126,7 +126,7 @@ then.
 6) make
 
    'make' starts off by creating the file "CursesDef.h", by running the
-   program 'test.syms'.  You will see hundreds of messages telling you which
+   program 'testsyms'.  You will see hundreds of messages telling you which
    functions it found in your system Curses library and which ones it didn't.
    It is a very common build failure mode for it not to find any of the
    functions.  If you see that happening, stop and see TROUBLESHOOTING below.
@@ -213,22 +213,22 @@ TROUBLESHOOTING
    not finding any of the Curses functions.
 
    The first thing 'make' does is create the file "CursesDef.h" by running the
-   program 'test.syms', which investigates what the Curses libraries are like
+   program 'testsyms', which investigates what the Curses libraries are like
    on your system.
 
-   test.syms is very brittle -- it works via test compiles, and if any number
+   'testsyms' is very brittle -- it works via test compiles, and if any number
    of things goes wrong with the test compile, it makes bad assumptions,
    usually that you don't have a certain function in your Curses library.  If
-   test.syms tells you it can't find functions that you think you have, run
-   the make with variable TEST_SYMS_OPTS set to "-v":
+   'testsyms' tells you it can't find functions that you think you have, run
+   the make with variable TESTSYMS_OPTS set to "-v":
 
-     $ make TEST_SYMS_OPTS=-v
+     $ make TESTSYMS_OPTS=-v
      
    That will show you the error messages from the test compiles and you can
    figure out what's going wrong and fix it.  Typically, you'll find that you
    need to do better on your CURSES_* environment variables (see above).
 
-   Alternatively, if you see that test.syms is picking the wrong values, you
+   Alternatively, if you see that 'testsyms' is picking the wrong values, you
    can edit "CursesDef.h" by hand and follow the directions.  If you have to
    "roll your own", be sure to save a copy.  A "make clean" will delete
    "CursesDef.h".

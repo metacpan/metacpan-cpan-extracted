@@ -11,7 +11,7 @@ use Module::Runtime ();
 our @EXPORT_OK = qw(
   button_tag checkbox_tag fieldset_tag form_tag label_tag radio_button_tag input_tag option_tag
   text_area_tag submit_tag password_tag hidden_tag select_tag options_for_select _merge_attrs
-  options_from_collection_for_select field_value legend_tag
+  options_from_collection_for_select legend_tag field_value field_id field_name
 );
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
@@ -295,7 +295,7 @@ sub options_from_collection_for_select {
   @selected = ($selected_proto) if ((ref(\$selected_proto)||'') eq 'SCALAR') && defined($selected_proto);
 
   while(my $item = $collection->next) {
-    push @options, [ $item->$label_method => $item->$value_method, option_html_attributes($item) ];
+    push @options, [ field_value($item,$label_method),  field_value($item, $value_method), option_html_attributes($item) ];
     push @selected, $item->$value_method if ((ref($selected_proto)||'') eq 'CODE') && $selected_proto->($item);
   }
 
@@ -303,10 +303,47 @@ sub options_from_collection_for_select {
   return options_for_select \@options, +{ selected=>\@selected, disabled=>\@disabled, %global_attributes};
 }
 
+my %_sanitized_name_cache = ();
+sub _sanitize {
+  my $value = shift;
+  return $_sanitized_name_cache{$value} if exists $_sanitized_name_cache{$value};
+
+  my $original_value = $value;
+  $value =~ s/\]\[|[^a-zA-Z0-9:-]/_/g;
+  $value =~s/_$//;
+  $_sanitized_name_cache{$original_value} = $value;
+  return $value;
+}
+
 sub field_value {
   my ($model, $attribute) = @_;
   return  $model->can('read_attribute_for_html') ? $model->read_attribute_for_html($attribute) : $model->$attribute;
 }
+
+sub field_id {
+  my ($model_name, $attribute, $options, @extra) = @_;
+  my $sanitized_object_name = _sanitize($model_name);
+  my $id = exists($options->{namespace}) ? $options->{namespace} . '_' : '';
+
+  $id .= exists($options->{index}) ?
+    "@{[ $sanitized_object_name ]}_@{[ $options->{index} ]}_${attribute}" :
+    "@{[ $sanitized_object_name ]}_${attribute}";
+
+  $id = join('_', $id, @extra) if scalar @extra;
+  return $id;
+}
+
+sub field_name {
+  my ($model_name, $attribute, $options, @names) = @_;
+  my $names = @names ? join("", map { "[$_]" } @names) : '';
+  my $name = exists($options->{index}) ?
+    "@{[ $model_name ]}\[@{[ $options->{index}]}\].${attribute}${names}" :
+    "@{[ $model_name ]}.${attribute}${names}";
+  $name .= '[]' if $options->{multiple};
+
+  return $name;
+}
+
 
 1;
 

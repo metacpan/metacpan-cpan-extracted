@@ -41,8 +41,21 @@ __PACKAGE__->accept_nested_for('emails', +{allow_destroy=>1});
 __PACKAGE__->accept_nested_for('phones', +{allow_destroy=>1});
 
 sub set_from_request($self, $r) {
-  $self->set_columns_recursively($r->nested_params)
-      ->insert_or_update;
+
+use Devel::Dwarn;
+Dwarn $r->nested_params;
+
+  $self->set_columns_recursively($r->nested_params);
+
+      Dwarn $self->in_storage;
+      Dwarn $self->emails->first->in_storage;
+
+  Dwarn $self->validated;
+  Dwarn $self->skip_validation;
+
+  $self->insert_or_update;
+
+  Dwarn $self->validated;
   return $self->valid;
 }
 

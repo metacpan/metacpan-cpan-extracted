@@ -1,5 +1,8 @@
 Revision history for Geo-Gpx
 
+1.09 [2022-12-06]
+    Fixed bug in parsing absolute and relative paths in MSWin32
+
 1.08 [2022-12-03]
     Removed Geo::Calc from dependencies and added Math::Trig
 

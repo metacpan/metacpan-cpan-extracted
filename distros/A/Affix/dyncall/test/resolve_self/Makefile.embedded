@@ -1,0 +1,22 @@
+APP = resolve_self
+OBJS = main.o
+
+TOP      = ../..
+CFLAGS  += -I${TOP}/dynload
+LDFLAGS += -L${TOP}/dynload
+LDLIBS  += -ldynload_s
+
+all: ${APP}
+
+.PHONY: all clean install
+
+${APP}: ${OBJS} 
+	# some linkers (e.g. older apple mach-o linkers) don't know
+	# --export-dynamic, so try without if link fails; this is a bit hacky and
+	#  should prob be part of of the ./configure run
+	${CC} ${CFLAGS} ${LDFLAGS} -Wl,--export-dynamic ${OBJS} ${LDLIBS_D} ${LDLIBS} -o ${APP} || \
+		${CC} ${CFLAGS} ${LDFLAGS} ${OBJS} ${LDLIBS_D} ${LDLIBS} -o ${APP}
+
+clean:
+	rm -f ${APP} ${OBJS}
+

@@ -3,6 +3,7 @@ package Example;
 use Catalyst;
 use Moose;
 use Example::Syntax;
+use Valiant::I18N; # Needed to load $HOME/locale
 
 __PACKAGE__->setup_plugins([qw/
   Session
@@ -40,7 +41,6 @@ has user => (
   clearer => 'clear_user',
 );
 
-# This should probably return an empty user rather than undef
 sub get_user_from_session($self) {
   my $id = $self->model('Session')->user_id // return $self->model('Schema::Person')->unauthenticated_user;
   my $person = $self->model('Schema::Person')->find_by_id($id) // $self->logout && die "Bad ID '$id' in session";

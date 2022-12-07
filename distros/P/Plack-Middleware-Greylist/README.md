@@ -4,7 +4,7 @@ Plack::Middleware::Greylist - throttle requests with different rates based on ne
 
 # VERSION
 
-version v0.3.2
+version v0.3.3
 
 # SYNOPSIS
 
@@ -129,6 +129,16 @@ handle any overlapping or conflicting network ranges, or to specify exceptions f
 
 Some search engine robots may not respect HTTP 429 responses, and will treat these as errors. You may want to make an
 exception for trusted networks that gives them a higher rate than the default.
+
+This does not enforce consistent rates for named blocks. For example, if you specified
+
+```perl
+'10.0.0.0/16'    => [  60, 'named-group' ],
+'172.16.0.0/16'  => [ 100, 'named-group' ],
+```
+
+Requests from both netblocks would be counted together, but requests from 10./16 netblock would be rejected after 60
+requests. This is probably not something that you want.
 
 # SOURCE
 
