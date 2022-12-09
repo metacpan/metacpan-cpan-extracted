@@ -9,7 +9,7 @@ Tk-GtkSettings.t*activeBackground: #CAB595
 Tk-GtkSettings.t*activeForeground: #000000
 Tk-GtkSettings.t*backPageColor: #CAB595
 Tk-GtkSettings.t*background: #dec9a9
-Tk-GtkSettings.t*font: Noto-Sans   10
+Tk-GtkSettings.t*font: {Noto Sans} 10 
 Tk-GtkSettings.t*foreground: #000000
 Tk-GtkSettings.t*highlightBackground: #dec9a9
 Tk-GtkSettings.t*highlightColor: #75511a

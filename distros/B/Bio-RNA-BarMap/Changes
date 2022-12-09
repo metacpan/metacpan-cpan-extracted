@@ -1,5 +1,11 @@
 Revision history for Bio-RNA-BarMap
 
+0.04    2022-12-08
+        Added LICENSE file to MANIFEST.
+
+0.03    2022-12-08
+        Added GPLv3 LICENSE file.
+
 0.02    2022-01-13
         - fixed "multiplication with hash" errors encountered with old Perl
           versions in two tests

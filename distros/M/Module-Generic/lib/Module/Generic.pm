@@ -1,11 +1,11 @@
 ## -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic.pm
-## Version v0.29.0
+## Version v0.29.1
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/08/24
-## Modified 2022/11/30
+## Modified 2022/12/09
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -51,7 +51,7 @@ BEGIN
     our @EXPORT      = qw( );
     our @EXPORT_OK   = qw( subclasses );
     our %EXPORT_TAGS = ();
-    our $VERSION     = 'v0.29.0';
+    our $VERSION     = 'v0.29.1';
     # local $^W;
     # mod_perl/2.0.10
     if( exists( $ENV{MOD_PERL} )
@@ -2261,7 +2261,7 @@ sub _get_args_as_hash
     {
         my $this = shift( @_ );
         # Check if among the parameters there is a special args_list one and its value is an array reference
-        if( scalar( grep( $_ eq 'args_list', @$this ) ) )
+        if( scalar( grep( !Scalar::Util::blessed( $_ ) && $_ eq 'args_list', @$this ) ) )
         {
             for( my $i = 0; $i < scalar( @$this ); $i++ )
             {
@@ -3135,6 +3135,33 @@ sub _set_get_hash_as_mix_object : lvalue
     my $data  = $this->{_data_repo} ? $this->{ $this->{_data_repo} } : $this;
     my $has_arg = 0;
     my $arg;
+    my $opts = {};
+    
+    if( ref( $field ) eq 'HASH' )
+    {
+        $opts = $field;
+        if( CORE::exists( $opts->{field} ) && 
+            defined( $opts->{field} ) && 
+            CORE::length( $opts->{field} ) )
+        {
+            $field = $opts->{field};
+        }
+        else
+        {
+            my $error = "No field name was provided.";
+            if( $has_arg eq 'assign' )
+            {
+                $self->error( $error );
+                my $dummy = 'dummy';
+                return( $dummy );
+            }
+            return( $self->error( $error ) ) if( want( 'LVALUE' ) );
+            rreturn( $self->error( $error ) );
+        }
+    }
+    $opts->{undef_ok} //= 0;
+    $opts->{return_undef} //= 0;
+    
     if( want( qw( LVALUE ASSIGN ) ) )
     {
         ( $arg ) = want( 'ASSIGN' );
@@ -3142,7 +3169,7 @@ sub _set_get_hash_as_mix_object : lvalue
     }
     else
     {
-        @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) );
+        @_ = () if( scalar( @_ ) == 1 && !defined( $_[0] ) && !$opts->{undef_ok} );
         if( @_ )
         {
             if( ref( $_[0] ) eq 'HASH' )
@@ -3156,6 +3183,10 @@ sub _set_get_hash_as_mix_object : lvalue
             elsif( ( @_ % 2 ) )
             {
                 $arg = { @_ };
+            }
+            elsif( !defined( $_[0] ) && $opts->{undef_ok} )
+            {
+                $arg = undef;
             }
             else
             {
@@ -3173,10 +3204,15 @@ sub _set_get_hash_as_mix_object : lvalue
             $has_arg++;
         }
     }
+
     if( $has_arg )
     {
         my $val = $arg;
-        if( ref( $val ) eq 'Module::Generic::Hash' )
+        if( !defined( $val ) )
+        {
+            $data->{ $field } = undef;
+        }
+        elsif( ref( $val ) eq 'Module::Generic::Hash' )
         {
             $data->{ $field } = $val;
             return( $data->{ $field } ) if( want( 'LVALUE' ) );
@@ -3188,7 +3224,24 @@ sub _set_get_hash_as_mix_object : lvalue
             $data->{ $field } = Module::Generic::Hash->new( $val );
         }
     }
-    if( $data->{ $field } && !$self->_is_object( $data->{ $field } ) )
+    
+    if( !defined( $data->{ $field } ) )
+    {
+        if( Want::want( 'OBJECT' ) )
+        {
+            # We might have need to specify, because I found a race condition where
+            # even though the context is object, once in Null, the context became 'code'
+            require Module::Generic::Null;
+            return( Module::Generic::Null->new( wants => 'OBJECT' ) ) if( want( 'LVALUE' ) );
+            rreturn( Module::Generic::Null->new( wants => 'OBJECT' ) );
+        }
+        else
+        {
+            return if( want( 'LVALUE' ) );
+            rreturn;
+        }
+    }
+    elsif( $data->{ $field } && !$self->_is_object( $data->{ $field } ) )
     {
         require Module::Generic::Hash;
         my $o = Module::Generic::Hash->new( $data->{ $field } );
@@ -6186,7 +6239,7 @@ sub _parse_timestamp
         {
             $tz = DateTime::TimeZone->new( name => 'UTC' );
             $HAS_LOCAL_TZ = 0;
-            warn( "Your system is missing key timezone components. ${class}::_parse_timestamp is reverting to UTC instead of local time zone.\n" );
+            warn( "Your system is missing key timezone components. ${class}::_parse_timestamp is reverting to UTC instead of local time zone.\n" ) if( $self->_warnings_is_enabled );
         }
         
         try
@@ -6680,7 +6733,7 @@ sub _parse_timestamp
             }
             catch( $e )
             {
-                warn( "Your system is missing key timezone components. ${class}::_parse_timestamp is reverting to UTC instead of local time zone.\n" );
+                warn( "Your system is missing key timezone components. ${class}::_parse_timestamp is reverting to UTC instead of local time zone.\n" ) if( $self->_warnings_is_enabled );
                 $parser = DateTime::Format::JP->new(
                     pattern => $pattern,
                     time_zone => 'UTC',
@@ -6741,7 +6794,7 @@ sub _parse_timestamp
         # Exception raised by DateTime::TimeZone::Local
         catch( $e where { /Cannot[[:blank:]\h]+determine[[:blank:]\h]+local[[:blank:]\h]+time[[:blank:]\h]+zone/i } )
         {
-            warn( "Your system is missing key timezone components. ${class}::_parse_timestamp is reverting to UTC instead of local time zone.\n" );
+            warn( "Your system is missing key timezone components. ${class}::_parse_timestamp is reverting to UTC instead of local time zone.\n" ) if( $self->_warnings_is_enabled );
             $dt = DateTime->from_epoch( epoch => $ts, time_zone => 'UTC' );
             return( $dt );
         }
@@ -7435,7 +7488,7 @@ Module::Generic - Generic Module to inherit from
 
 =head1 VERSION
 
-    v0.29.0
+    v0.29.1
 
 =head1 DESCRIPTION
 

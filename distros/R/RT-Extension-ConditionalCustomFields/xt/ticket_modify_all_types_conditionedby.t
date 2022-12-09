@@ -232,7 +232,7 @@ $m->submit_form_ok({
 });
 
 my $mjs = WWW::Mechanize::PhantomJS->new();
-$mjs->driver->ua->timeout(540);
+$mjs->driver->ua->timeout(600);
 $mjs->get($m->rt_base_url . '?user=root;pass=password');
 
 # Condition met

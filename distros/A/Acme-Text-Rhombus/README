@@ -8,26 +8,26 @@ SYNOPSIS
          lines   =>       15,
          letter  =>      'c',
          case    =>  'upper',
-         fillup  =>      '+',
+         fillup  =>      '.',
          forward =>        1,
      );
 
      __OUTPUT__
-     +++++++C+++++++
-     ++++++DDD++++++
-     +++++EEEEE+++++
-     ++++FFFFFFF++++
-     +++GGGGGGGGG+++
-     ++HHHHHHHHHHH++
-     +IIIIIIIIIIIII+
+     .......C.......
+     ......DDD......
+     .....EEEEE.....
+     ....FFFFFFF....
+     ...GGGGGGGGG...
+     ..HHHHHHHHHHH..
+     .IIIIIIIIIIIII.
      JJJJJJJJJJJJJJJ
-     +KKKKKKKKKKKKK+
-     ++LLLLLLLLLLL++
-     +++MMMMMMMMM+++
-     ++++NNNNNNN++++
-     +++++OOOOO+++++
-     ++++++PPP++++++
-     +++++++Q+++++++
+     .KKKKKKKKKKKKK.
+     ..LLLLLLLLLLL..
+     ...MMMMMMMMM...
+     ....NNNNNNN....
+     .....OOOOO.....
+     ......PPP......
+     .......Q.......
 
 FUNCTIONS
   rhombus, rhombus_letter
@@ -57,7 +57,7 @@ FUNCTIONS
 
     *   "fillup"
 
-        The fillup character. Defaults to "+".
+        The fillup character. Defaults to '.'.
 
     *   "forward"
 
@@ -85,7 +85,7 @@ FUNCTIONS
 
     *   "fillup"
 
-        The fillup character. Defaults to "+".
+        The fillup character. Defaults to '.'.
 
     *   "forward"
 
@@ -109,7 +109,7 @@ FUNCTIONS
 
     *   "fillup"
 
-        The fillup character. Defaults to "+".
+        The fillup character. Defaults to '.'.
 
 EXPORT
   Functions

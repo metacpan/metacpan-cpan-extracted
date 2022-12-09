@@ -23,7 +23,8 @@ my %WriteMakefileArgs = (
 	'Scalar::Util' => '0',
 	'Time::HiRes' => '0',
 	'Want' => '0',
-	'Digest::SHA' => '0'
+	'Digest::SHA' => '0',
+	'B' => '0',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Terse-*' },

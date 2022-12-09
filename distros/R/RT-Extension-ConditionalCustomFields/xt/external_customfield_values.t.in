@@ -70,7 +70,7 @@ is($cf_conditioned_by_CF_options[1], $cf_conditioned_by_child->id, 'Can be condi
 is($cf_conditioned_by_CF_options[2], $cf_condition->id, 'Can be conditioned by Condition CF');
 
 my $mjs = WWW::Mechanize::PhantomJS->new();
-$mjs->driver->ua->timeout(540);
+$mjs->driver->ua->timeout(600);
 $mjs->get($m->rt_base_url . '?user=root;pass=password');
 $mjs->get($m->rt_base_url . 'Admin/CustomFields/Modify.html?id=' . $cf_conditioned_by->id);
 ok($mjs->content =~ /Customfield is conditioned by/, 'Can be conditioned by select cf (with js)');

@@ -2,7 +2,7 @@ package Geo::TCX;
 use strict;
 use warnings;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 
 =encoding utf-8
 
@@ -29,7 +29,7 @@ The documentation regarding TCX files in general uses the terms history and acti
 use Geo::TCX::Lap;
 use File::Basename;
 use File::Temp qw/ tempfile /;
-use IPC::System::Simple qw(system);
+use IPC::System::Simple qw(run capture);
 use Cwd qw(cwd abs_path);
 use Carp qw(confess croak cluck);
 
@@ -655,8 +655,10 @@ sub set_filename {
     my ($name, $path, $ext);
     ($name, $path, $ext) = fileparse( $fname, '\..*' );
     if ($wd) {
-        if ( ! ($fname =~ /^\// ) ) {
-            # ie if fname is not an abolsute path, adjust $path to be relative to work_dir
+        my $is_relative_path;
+        $is_relative_path = 1 if $fname =~ m,^[^/],;
+        $is_relative_path = 0 if $^O eq 'MSWin32' and $fname =~ m/^[A-Z]:/;
+        if ($is_relative_path) {
             ($name, $path, $ext) = fileparse( $wd . $fname, '\..*' )
         }
     }
@@ -700,7 +702,11 @@ sub set_wd {
         $dir =~ s/~/$ENV{'HOME'}/ if $dir =~ /^~/;
         $dir = $o->_set_wd_old    if $dir eq '-';
 
-        if ($dir =~ m,^[^/], ) {                # convert rel path to full
+        my $is_relative_path;
+        $is_relative_path = 1 if $dir =~ m,^[^/],;
+        $is_relative_path = 0 if $^O eq 'MSWin32' and $dir =~ m/^[A-Z]:/;
+
+        if ($is_relative_path) {                # convert rel path to full
             $dir =  $first_call ? cwd . '/' . $dir : $o->{work_dir} . $dir
         }
         $dir =~ s,/*$,/,;                       # some more cleaning
@@ -854,19 +860,65 @@ sub _lap_number {
     return $lap_i
 }
 
-our $FitConvertPl;
+our $Script_File;
+our $Script_Version;
+my  $version_at_least = 1.04;
+
 sub _convert_fit_to_tcx {
-    require Geo::FIT;
     my ( $fname, $tmp_fname ) = @_;
-    if (!defined $FitConvertPl) {
-        for (split /:/, $ENV{PATH} ) {
-            $FitConvertPl  = $_ . '/fit2tcx.pl';
-            last if -f $FitConvertPl
+
+    _check_fit2tcx_pl_version( $version_at_least ) unless defined $Script_File;
+
+    my @args = ($fname, $tmp_fname);
+    run($^X, $Script_File, @args);
+    return 1
+}
+
+sub _check_fit2tcx_pl_version {                 # Called by _convert_fit_to_tcx and t/fit.t
+    my $at_least = shift;
+    $at_least ||= $version_at_least;
+
+    require Geo::FIT;
+    croak "version of Geo::FIT $at_least or higher is required\n"    if Geo::FIT->version < $at_least;
+    croak "fit2tcx.pl from Geo::FIT is not available on your path\n" unless _get_path_to_fit2tcx_pl();
+
+    my ($exit_value, $did_start);               # Can we run it?
+    eval { $exit_value = run([0], $^X, $Script_File, '--version'); };
+    if ($@ =~ /failed to start: "(.*)"/ ) {
+        my $reason    = $!;
+        my $shell_msg = $1;                     # same (not) as $reason under linux (windows)
+        croak "fit2tcx.pl could not be run: ${reason}\n"
+    } elsif (defined $exit_value && $exit_value == 0) {
+        $did_start = 1
+    } else { croak "Something else happened: $@\n" }
+
+    if ($did_start) {                           # Is the version high enough?
+        my ($output, $version_msg);
+        $output = capture($^X, $Script_File, '--version');
+        chomp $output;
+
+        ($version_msg, $Script_Version) = split /: (?=\d+\.\d+)/, $output;
+        croak "version of fit2tcx.pl $at_least or higher is needed\n" if $Script_Version < $at_least;
+        return $Script_Version
+    }
+    return 0
+}
+
+sub _get_path_to_fit2tcx_pl {
+    if (!defined $Script_File) {
+        my @path;
+        @path = $^O eq 'MSWin32' ? split /;/, $ENV{PATH} : split /:/, $ENV{PATH};
+        for (@path) {
+            my $try_file  = $_ . '/fit2tcx.pl';
+            if (-f $try_file) {
+                $try_file =~ s,/,\\,g if $^O eq 'MSWin32';
+                $Script_File = $try_file;
+                last
+            }
         }
     }
-    my @args = ($fname, $tmp_fname);
-    system($^X, $FitConvertPl, @args);
-    return 1
+    return $Script_File if defined $Script_File;
+    return 0
 }
 
 =head1 EXAMPLES
@@ -883,7 +935,7 @@ Patrick Joly
 
 =head1 VERSION
 
-1.04
+1.05
 
 =head1 LICENSE AND COPYRIGHT
 

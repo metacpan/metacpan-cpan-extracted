@@ -25,6 +25,8 @@ RT->Config->Set('CustomFieldGroupings',
     ],
 );
 
+my $fake_ticket = RT::Ticket->new(RT->SystemUser);
+$fake_ticket->Create(Queue => 'General', Subject => 'Fake ticket to have ticket id not equal to queue id');
 my $ticket = RT::Ticket->new(RT->SystemUser);
 $ticket->Create(Queue => 'General', Subject => 'Test Ticket ConditionalCF');
 $ticket->AddCustomFieldValue(Field => $cf_condition->id , Value => $cf_values->[0]->Name);
@@ -33,7 +35,7 @@ $ticket->AddCustomFieldValue(Field => $cf_conditioned_by_child->id , Value => 'S
 
 my ($base, $m) = RT::Extension::ConditionalCustomFields::Test->started_ok;
 my $mjs = WWW::Mechanize::PhantomJS->new();
-$mjs->driver->ua->timeout(540);
+$mjs->driver->ua->timeout(600);
 $mjs->get($m->rt_base_url . '?user=root;pass=password');
 
 $mjs->get($m->rt_base_url . 'Ticket/Display.html?id=' . $ticket->id);

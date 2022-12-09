@@ -7,7 +7,7 @@ use Test::More;
 BEGIN { require "./t/utils.pl" }
 our (@AvailableDrivers);
 
-use constant TESTS_PER_DRIVER => 98;
+use constant TESTS_PER_DRIVER => 104;
 
 my $total = scalar(@AvailableDrivers) * TESTS_PER_DRIVER;
 plan tests => $total;
@@ -57,39 +57,44 @@ diag "generate data" if $ENV{TEST_VERBOSE};
 
 # ASC order
 foreach my $direction ( qw(ASC DESC) ) {
-    my $objs = TestApp::Objects->new($handle);
-    $objs->UnLimit;
-    my $tags_alias = $objs->Join(
-        TYPE   => 'LEFT',
-        ALIAS1 => 'main',
-        FIELD1 => 'id',
-        TABLE2 => 'Tags',
-        FIELD2 => 'Object',
-    );
-    ok($tags_alias, "joined tags table");
-    $objs->OrderBy( ALIAS => $tags_alias, FIELD => 'Name', ORDER => $direction );
+    for my $field ( 'Name',
+        $d eq 'Oracle' ? 'TO_CHAR(Name)' : $d eq 'mysql' ? 'BINARY(Name)' : 'CAST(Name AS TEXT)' )
+    {
+        my $objs = TestApp::Objects->new($handle);
+        $objs->UnLimit;
+        my $tags_alias = $objs->Join(
+            TYPE   => 'LEFT',
+            ALIAS1 => 'main',
+            FIELD1 => 'id',
+            TABLE2 => 'Tags',
+            FIELD2 => 'Object',
+        );
+        ok($tags_alias, "joined tags table");
+        # Generated SQL is MIN(Name) or nested functions like MIN(CAST(Name AS TEXT))
+        $objs->OrderBy( ALIAS => $tags_alias, FIELD => $field, ORDER => $direction );
 
-    ok($objs->First, 'ok, we have at least one result');
-    $objs->GotoFirstItem;
-
-    my ($order_ok, $last) = (1, $direction eq 'ASC'? '-': 'zzzz');
-    while ( my $obj = $objs->Next ) {
-        my $tmp;
-        if ( $direction eq 'ASC' ) {
-            $tmp = (substr($last, 0, 1) cmp substr($obj->Name, 0, 1));
-        } else {
-            $tmp = -(substr($last, -1, 1) cmp substr($obj->Name, -1, 1));
-        }
-        if ( $tmp > 0 ) {
-            $order_ok = 0; last;
-        }
-        $last = $obj->Name;
-    }
-    ok($order_ok, "$direction order is correct") or do {
-        diag "Wrong $direction query: ". $objs->BuildSelectQuery;
+        ok($objs->First, 'ok, we have at least one result');
         $objs->GotoFirstItem;
+
+        my ($order_ok, $last) = (1, $direction eq 'ASC'? '-': 'zzzz');
         while ( my $obj = $objs->Next ) {
-            diag($obj->id .":". $obj->Name);
+            my $tmp;
+            if ( $direction eq 'ASC' ) {
+                $tmp = (substr($last, 0, 1) cmp substr($obj->Name, 0, 1));
+            } else {
+                $tmp = -(substr($last, -1, 1) cmp substr($obj->Name, -1, 1));
+            }
+            if ( $tmp > 0 ) {
+                $order_ok = 0; last;
+            }
+            $last = $obj->Name;
+        }
+        ok($order_ok, "$direction order is correct") or do {
+            diag "Wrong $direction query: ". $objs->BuildSelectQuery;
+            $objs->GotoFirstItem;
+            while ( my $obj = $objs->Next ) {
+                diag($obj->id .":". $obj->Name);
+            }
         }
     }
 }

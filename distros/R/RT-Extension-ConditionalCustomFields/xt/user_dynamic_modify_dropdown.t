@@ -20,7 +20,7 @@ $cf_conditioned_by_child->Create(Name => 'Child', LookupType => 'RT::User', Type
 
 my ($base, $m) = RT::Extension::ConditionalCustomFields::Test->started_ok;
 my $mjs = WWW::Mechanize::PhantomJS->new();
-$mjs->driver->ua->timeout(540);
+$mjs->driver->ua->timeout(600);
 $mjs->get($m->rt_base_url . '?user=root;pass=password');
 
 my $user = RT::User->new(RT->SystemUser);

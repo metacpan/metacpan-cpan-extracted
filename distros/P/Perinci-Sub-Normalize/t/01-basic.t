@@ -56,6 +56,31 @@ subtest normalize_function_metadata => sub {
               'normalize prop(LANG) to prop.alt.lang.LANG (DefHash 1.0.10)');
     # regression in 0.10
     dies_ok { normalize_function_metadata({v=>1.1, "summary (id)" => "fu"}) } "property/attribute name still checked after normalization of prop(LANG)";
+
+    subtest "check" => sub {
+        subtest "check args" => sub {
+            subtest "check args pos" => sub {
+                lives_ok { normalize_function_metadata({v=>1.1, args=>{a1=>{schema=>'int*', pos=>0}}}) }
+                    'basics 1';
+                lives_ok { normalize_function_metadata({v=>1.1, args=>{ a1=>{schema=>'int*', pos=>0}, a2=>{schema=>'int*', pos=>1}, a3=>{schema=>'int*', pos=>2} }}) }
+                    'basics 2';
+                dies_ok { normalize_function_metadata({v=>1.1, args=>{a1=>{schema=>'int*', pos=>1}}}) }
+                    'Missing argument with pos=0';
+                dies_ok { normalize_function_metadata({v=>1.1, args=>{a1=>{schema=>'int*', pos=>0}, a2=>{schema=>'int*', pos=>0}}}) }
+                    'Duplicate position';
+                dies_ok { normalize_function_metadata({v=>1.1, args=>{a1=>{schema=>'int*', pos=>-1}}}) }
+                    'Negative pos';
+                dies_ok { normalize_function_metadata({v=>1.1, args=>{a1=>{schema=>'int*', slurpy=>1}}}) }
+                    'Slurpy without pos';
+                dies_ok { normalize_function_metadata({v=>1.1, args=>{a1=>{schema=>'int*', greedy=>1}}}) }
+                    'greedy property still observed';
+                dies_ok { normalize_function_metadata({v=>1.1, args=>{a1=>{schema=>'int*', pos=>0, slurpy=>1}, a1=>{schema=>'int*', pos=>1, slurpy=>1}}}) }
+                    'Multiple slurpies';
+                dies_ok { normalize_function_metadata({v=>1.1, args=>{a1=>{schema=>'int*', pos=>0, slurpy=>1}, a1=>{schema=>'int*', pos=>1}}}) }
+                    'Clash between slurpy and pos';
+            };
+        };
+    };
 };
 
 DONE_TESTING:

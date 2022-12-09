@@ -7,7 +7,7 @@ use PerlIO::encoding;
 $Data::Dumper::Sortkeys = 1;
 use FASTX::Seq;
 use File::Basename;
-$FASTX::Reader::VERSION = '1.6.0';
+$FASTX::Reader::VERSION = '1.6.1';
 require Exporter;
 our @ISA = qw(Exporter);
 
@@ -440,7 +440,7 @@ FASTX::Reader - A simple module to parse FASTA and FASTQ files, supporting compr
 
 =head1 VERSION
 
-version 1.6.0
+version 1.6.1
 
 =head1 SYNOPSIS
 
@@ -450,7 +450,7 @@ version 1.6.0
   my $fasta_reader = FASTX::Reader->new({ filename => "$filepath" });
 
   while (my $seq = $fasta_reader->getRead() ) {
-    f $seq->{name}, "\t", $seq->{seq}, "\t", $seq->{qual}, "\n";
+    print $seq->{name}, "\t", $seq->{seq}, "\t", $seq->{qual}, "\n";
   }
 
 =head1 BUILD TEST

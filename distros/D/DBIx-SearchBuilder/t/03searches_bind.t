@@ -4,7 +4,7 @@ use Test::More;
 BEGIN { require "./t/utils.pl" }
 our (@AvailableDrivers);
 
-use constant TESTS_PER_DRIVER => 39;
+use constant TESTS_PER_DRIVER => 45;
 
 my $total = scalar(@AvailableDrivers) * TESTS_PER_DRIVER;
 plan tests => $total;
@@ -62,6 +62,20 @@ SKIP: {
             [ "Baggins' Frodo", "Bilbo\\Baggins" ],
             '2 Baggins',
         );
+        $users_obj->OrderBy( FIELD => 'id', ORDER => 'ASC' );
+        $users_obj->RowsPerPage(1);
+
+        is( $users_obj->First->Login, "Bilbo\\Baggins", "Bilbo\\Baggins on the first page" );
+        is( $users_obj->Count, 1, "1 value on the first page" );
+        ok( $users_obj->BuildSelectQuery =~ /LIMIT\s*\?|rownum\s*<=\s*\?.*limitrownum\s*>=\s*\?/i,
+            'found placeholders in limit in select query' );
+
+        $users_obj->GotoPage(1);
+        is( $users_obj->First->Login, "Baggins' Frodo", "Baggins' Frodo on the second page" );
+        is( $users_obj->Count, 1, "1 value on the second page" );
+        ok( $users_obj->BuildSelectQuery =~ /LIMIT\s*\?,\s*\?|LIMIT\s*\? OFFSET|rownum\s*<=\s*\?.*limitrownum\s*>=\s*\?/i,
+            'found placeholders in limit in select query' );
+
         $users_obj->CleanSlate;
 
         for my $name ( "Shire's Bag End", 'The Fellowship of the Ring' ) {

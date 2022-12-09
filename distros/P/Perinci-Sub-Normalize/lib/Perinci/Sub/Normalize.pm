@@ -1,19 +1,58 @@
 package Perinci::Sub::Normalize;
 
-our $DATE = '2021-08-01'; # DATE
-our $VERSION = '0.202'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
 
-require Exporter;
-our @ISA = qw(Exporter);
+use Exporter 'import';
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-12-09'; # DATE
+our $DIST = 'Perinci-Sub-Normalize'; # DIST
+our $VERSION = '0.204'; # VERSION
+
 our @EXPORT_OK = qw(
                        normalize_function_metadata
                );
 
-sub _normalize{
+sub _check {
+    my $meta = shift; # must be normalized
+
+  CHECK_ARGS: {
+        my $argspecs = $meta->{args};
+      CHECK_ARGS_POS: {
+            my @pos;
+            my $slurpy_pos;
+            for my $argname (keys %$argspecs) {
+                my $argspec = $argspecs->{$argname};
+                if (defined $argspec->{pos}) {
+                    return "Argument $argname: Negative pos" if $argspec->{pos} < 0;
+                    return "Duplicate position $argspec->{pos}" if defined $pos[ $argspec->{pos} ];
+                    $pos[ $argspec->{pos} ] = $argname;
+                }
+                if ($argspec->{slurpy} || $argspec->{greedy}) { # greedy is deprecated, but we should keep observing to make us properly strict
+                    return "Argument $argname: slurpy=1 without setting pos"
+                        unless defined $argspec->{pos};
+                    return "Multiple args with slurpy=1" if defined $slurpy_pos;
+                }
+            }
+            if (defined $slurpy_pos && $slurpy_pos < @pos) {
+                return "Clash of argument positions: slurpy=1 defined for pos >= $slurpy_pos but there is another argument with pos > $slurpy_pos";
+            }
+            # we have holes
+            return "There needs to be more arguments that define pos"
+                if grep { !defined } @pos;
+            if ($meta->{args_as} && $meta->{args_as} =~ /\Aarray(ref)?\z/) {
+                return "Function accepts array/arrayref but there are arguments with no pos defined"
+                    if scalar(keys %$argspecs) > @pos;
+            }
+        }
+    }
+
+    undef;
+}
+
+sub _normalize {
     my ($meta, $ver, $opts, $proplist, $nmeta, $prefix, $modprefix) = @_;
 
     my $opt_aup = $opts->{allow_unknown_properties};
@@ -127,12 +166,11 @@ sub _normalize{
                 $nmeta->{$nk} = $meta->{$k};
             }
         }
-    }
-
+    } # for each key
     $nmeta;
 }
 
-sub normalize_function_metadata($;$) {
+sub normalize_function_metadata($;$) { ## no critic: Subroutines::ProhibitSubroutinePrototypes
     my ($meta, $opts) = @_;
 
     $opts //= {};
@@ -146,7 +184,12 @@ sub normalize_function_metadata($;$) {
     my $sch_proplist = $sch->[1]{_prop}
         or die "BUG: Rinci schema structure changed (1a)";
 
-    _normalize($meta, 1.1, $opts, $sch_proplist, {}, '');
+    my $nmeta = _normalize($meta, 1.1, $opts, $sch_proplist, {}, '');
+
+    my $err = _check($meta);
+    die $err if $err;
+
+    $nmeta;
 }
 
 1;
@@ -164,19 +207,13 @@ Perinci::Sub::Normalize - Normalize Rinci function metadata
 
 =head1 VERSION
 
-This document describes version 0.202 of Perinci::Sub::Normalize (from Perl distribution Perinci-Sub-Normalize), released on 2021-08-01.
+This document describes version 0.204 of Perinci::Sub::Normalize (from Perl distribution Perinci-Sub-Normalize), released on 2022-12-09.
 
 =head1 SYNOPSIS
 
  use Perinci::Sub::Normalize qw(normalize_function_metadata);
 
  my $nmeta = normalize_function_metadata($meta);
-
-=head1 CONTRIBUTOR
-
-=for stopwords Steven Haryanto
-
-Steven Haryanto <sharyanto@cpan.org>
 
 =head1 FUNCTIONS
 
@@ -215,14 +252,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Su
 
 Source repository is at L<https://github.com/perlancar/perl-Perinci-Sub-Normalize>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Sub-Normalize>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<Rinci::function>
@@ -231,11 +260,43 @@ L<Rinci::function>
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTOR
+
+=for stopwords Steven Haryanto
+
+Steven Haryanto <stevenharyanto@gmail.com>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2018, 2016, 2015, 2014 by perlancar@cpan.org.
+This software is copyright (c) 2022, 2018, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Sub-Normalize>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

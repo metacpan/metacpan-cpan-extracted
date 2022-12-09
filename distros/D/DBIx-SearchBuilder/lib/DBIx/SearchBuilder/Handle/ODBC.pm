@@ -1,5 +1,3 @@
-# $Header: /home/jesse/DBIx-SearchBuilder/history/SearchBuilder/Handle/ODBC.pm,v 1.8 2001/10/12 05:27:05 jesse Exp $
-
 package DBIx::SearchBuilder::Handle::ODBC;
 
 use strict;
@@ -16,7 +14,7 @@ use base qw(DBIx::SearchBuilder::Handle);
 
 =head1 DESCRIPTION
 
-This module provides a subclass of DBIx::SearchBuilder::Handle that 
+This module provides a subclass of DBIx::SearchBuilder::Handle that
 compensates for some of the idiosyncrasies of ODBC.
 
 =head1 METHODS

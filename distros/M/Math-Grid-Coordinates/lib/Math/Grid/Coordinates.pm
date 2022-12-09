@@ -7,13 +7,15 @@ use List::AllUtils qw/max/;
 use POSIX qw/ceil/;
 
 # number of items
-has [ qw/grid_width grid_height/ ] => ( is => 'rw', isa => 'Int' );
+has [ qw/grid_width grid_height page_width page_height/ ] => ( is => 'rw', isa => 'Int' );
+
+has [ qw/page_width page_height/ ] => ( is => 'rw', isa => 'Num' );
 
 # item size
 has [ qw/item_width item_height/ ] => ( is => 'rw', isa => 'Num' );
 
 # gutter border
-has [ qw/gutter border/ ] => ( is => 'rw', isa => 'Num' );
+has [ qw/gutter gutter_h gutter_v border border_l border_r border_t border_b/ ] => ( is => 'rw', isa => 'Num' );
 
 subtype 'Seq', as 'Str', where { /[h,v]/i };
 has arrange => ( is => 'rw', isa => 'Seq', default => sub { 'h' } );
@@ -24,29 +26,41 @@ has arrange => ( is => 'rw', isa => 'Seq', default => sub { 'h' } );
 around BUILDARGS => sub {
     my $orig  = shift;
     my $class = shift;
+    my $opts;
 
     if ( !ref $_[0] ) {
-	
 	my %h;
 	@h{qw/grid_width grid_height item_width item_height gutter border/} = grep { /[^a-z]/i } @_;
 
 	($h{arrange}) = (grep { /^[h,v]i/ } @_) || ('h');
 	$h{gutter} ||= 0;
 	$h{border} ||= 0;
-	return $class->$orig( \%h );
+	# return $class->$orig( \%h );
+	$opts = \%h;
     } else {
-	return $class->$orig(@_);
+	$opts = shift;
     }
+    $opts->{gutter_h} //= $opts->{gutter} // 0;
+    $opts->{gutter_v} //= $opts->{gutter} // $opts->{gutter_v} // 0;
+
+    $opts->{border_t} //= $opts->{border} // $opts->{gutter_v} // 0;
+    $opts->{border_b} //= $opts->{border_t} // $opts->{border} // $opts->{gutter_v} // 0;
+
+    $opts->{border_l} //= $opts->{border} // $opts->{gutter_h} // 0;
+    $opts->{border_r} //= $opts->{border_l};
+
+    my $obj = $class->$orig($opts);
+    return $obj;
 };
 
 sub total_height {
     my $self = shift;
-    return $self->border + $self->item_height * $self->grid_height + $self->gutter * ($self->grid_height - 1) + $self->border
+    return $self->border_t + $self->item_height * $self->grid_height + $self->gutter_v * ($self->grid_height - 1) + $self->border_b;
 };
 
 sub total_width {
     my $self = shift;
-    return $self->border + $self->item_width * $self->grid_width + $self->gutter * ($self->grid_width - 1) + $self->border
+    return $self->border_l + $self->item_width * $self->grid_width + $self->gutter_h * ($self->grid_width - 1) + $self->border_r
 };
 
 sub bbox {
@@ -68,37 +82,70 @@ sub sequence {
     return @sequence;
 }
 
-# sub position {
-#     my $self = shift;
-#     my ($x, $y, $x1, $y1, $x2, $y2) = @_;
-#     my ($gw, $gh, $iw, $ih, $gt, $pb) = map { $self->$_ } qw/grid_width grid_height item_width item_height gutter border/; 
+sub position {
+    my $self = shift;
 
-#     # $_->[0] = $iw * $_->[0] + ($gt * $_->[0]) + $pb;
-#     # $_->[1] = $ih * $_->[1] + ($gt * $_->[1]) + $pb
-# }
+    my ($x, $y) = @_;
+    my ($iw, $ih, $gt_h, $gt_v, $bl, $bt) = map { $self->$_ } qw/item_width item_height gutter_h gutter_v border_l border_t/; 
+
+    return (
+	    $bl + $iw * $x + $gt_h * $x,
+	    $bt + $ih * $y + $gt_v * $y
+	   )
+}
 
 sub positions {
     my $self = shift;
-    my ($x1, $y1, $x2, $y2) = @_;
-    for ($x1, $y1) { $_ ||= 0 }; 
-    my ($gw, $gh, $iw, $ih, $gt, $pb) = map { $self->$_ } qw/grid_width grid_height item_width item_height gutter border/; 
+    # my ($x1, $y1, $x2, $y2) = @_;
+
+    # for ($x1, $y1) { $_ ||= 0 }; 
+
+    # my ($gw, $gh, $iw, $ih, $gt_h, $gt_v, $bl, $br, $bt, $bb) = map { $self->$_ }
+    # 	qw/grid_width grid_height item_width item_height gutter_h gutter_v border_l border_r border_t border_b/; 
 
     # first assign positions in terms of page coordinates
     my @grid = $self->sequence;
 
     # then calculate and assign the actual position
-    for (@grid) {
-	$_->[0] = $iw * $_->[0] + ($gt * $_->[0]) + $pb + $x1;
-	$_->[1] = $ih * $_->[1] + ($gt * $_->[1]) + $pb + $y1
-    };
+    my @pos = map {
+	[ $self->position(@$_) ]
+    } @grid;
 
-    if (defined $x2 || defined $y2) { for (@grid) {
-	$_->[2] = $_->[0] + $x2;
-	$_->[3] = $_->[1] + $y2;
-    } }
-    
-    return @grid;
+    return @pos;
 }
+
+sub guides {
+    my $self = shift;
+    my @guides;
+    my ($h, $w, $ih, $iw) = map { $self->$_ } qw/page_height page_width item_height item_width/;
+
+    for (0..$self->grid_width-1) {
+	my $p = [ $self->position($_, 0) ]->[0];
+	push @guides, [ [ $p, 0 ], [ $p, $h ] ];
+	push @guides, [ [ $p + $iw, 0 ], [ $p + $iw, $h ] ];
+    }
+    for (0..$self->grid_height-1) {
+	my $p = [ $self->position(0, $_) ]->[1];
+	push @guides, [ [ 0, $p ], [ $w, $p ] ];
+	push @guides, [ [ 0, $p + $ih ], [ $w, $p + $ih ] ];
+    }
+    return @guides;
+}
+
+sub calculate {
+    my $self = shift;
+
+    my $avail_v = $self->page_height - ($self->border_t + $self->gutter_v * ($self->grid_height - 1) + $self->border_b);
+    my $avail_h = $self->page_width  - ($self->border_l + $self->gutter_h * ($self->grid_width  - 1) + $self->border_r);
+
+    # print $avail_h, $avail_v;
+
+    $self->item_width($avail_h / $self->grid_width);
+    $self->item_height($avail_v / $self->grid_height);
+
+    return $self;
+}
+
 
 sub numbers {
     my $self = shift;
@@ -123,7 +170,7 @@ Grid - create geometric grids
 
 =head1 DESCRIPTION
 
-Grid creates an array of x-y positions for items of a given height and wdith arranged in a grid. This is used to create grid layouts on a page, or repeate items on a number of pages of the same size.
+Grid creates an array of x-y positions for items of a given height and width arranged in a grid. This is used to create grid layouts on a page, or repeate items on a number of pages of the same size.
 
 =head1 REQUIRES
 
@@ -188,7 +235,7 @@ Returns the sequence of x-y grid item coordinates, with the top left item as ite
 
  $grid->positions();
 
-Returns the sequence of x-y grid coordinates, taking optional offsets. If two offsets are provided, the x-y position is offset accordingly, and if four are provided, it returns a boumding box.
+Returns the sequence of x-y grid coordinates.
 
 =head2 total_height
 

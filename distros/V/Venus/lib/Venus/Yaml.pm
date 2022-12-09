@@ -222,7 +222,7 @@ sub TO_BOOL {
     return $value;
   }
 
-  return Venus::Boolean::TO_BOOL_OBJ($value);
+  return Venus::Boolean::TO_BOOL_JPO($value);
 }
 
 1;

@@ -731,13 +731,13 @@ elm_config_focus_highlight_clip_disabled_set(disable)
 	Eina_Bool disable
 	
 	
-#Elm_Focus_Move_Policy
-#elm_config_focus_move_policy_get()	 
+int
+elm_config_focus_move_policy_get()	 
 
 
-#void
-#elm_config_focus_move_policy_set(policy)
-#	Elm_Focus_Move_Policy policy
+void
+elm_config_focus_move_policy_set(policy)
+	int policy
 
 Eina_Bool
 elm_config_item_select_on_focus_disabled_get()

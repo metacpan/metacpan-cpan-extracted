@@ -2,6 +2,18 @@ Revision history for Log-Any
 
 ** denotes an incompatible change
 
+1.712     2022-12-09 11:05:10-06:00 America/Chicago
+
+  [Added]
+
+  - Added `Log::Any::Proxy::WithStackTrace` to provide a stack trace at
+    the caller site. Thanks @larryl and @GrantStreetGroup for providing
+    this feature!
+
+  [Other]
+
+  - Removed Travis, as they stopped supporting free Github repos :(
+
 1.711     2022-11-22 11:28:01-06:00 America/Chicago
 
   [Fixed]

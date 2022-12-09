@@ -4,13 +4,13 @@ use strict;
 use warnings;
 use base qw(Exporter);
 use constant LINES   => 25;
-use constant FILLUP  => '+';
+use constant FILLUP  => '.';
 use constant FORWARD => 1;
 
 our ($VERSION, @EXPORT_OK, %EXPORT_TAGS);
 my @subs;
 
-$VERSION = '0.22';
+$VERSION = '0.23';
 @subs = qw(rhombus rhombus_letter rhombus_digit rhombus_random);
 @EXPORT_OK = @subs;
 %EXPORT_TAGS = ('all' => [ @subs ]);
@@ -125,26 +125,26 @@ Acme::Text::Rhombus - Draw a rhombus with letters/digits
      lines   =>       15,
      letter  =>      'c',
      case    =>  'upper',
-     fillup  =>      '+',
+     fillup  =>      '.',
      forward =>        1,
  );
 
  __OUTPUT__
- +++++++C+++++++
- ++++++DDD++++++
- +++++EEEEE+++++
- ++++FFFFFFF++++
- +++GGGGGGGGG+++
- ++HHHHHHHHHHH++
- +IIIIIIIIIIIII+
+ .......C.......
+ ......DDD......
+ .....EEEEE.....
+ ....FFFFFFF....
+ ...GGGGGGGGG...
+ ..HHHHHHHHHHH..
+ .IIIIIIIIIIIII.
  JJJJJJJJJJJJJJJ
- +KKKKKKKKKKKKK+
- ++LLLLLLLLLLL++
- +++MMMMMMMMM+++
- ++++NNNNNNN++++
- +++++OOOOO+++++
- ++++++PPP++++++
- +++++++Q+++++++
+ .KKKKKKKKKKKKK.
+ ..LLLLLLLLLLL..
+ ...MMMMMMMMM...
+ ....NNNNNNN....
+ .....OOOOO.....
+ ......PPP......
+ .......Q.......
 
 =head1 FUNCTIONS
 
@@ -177,7 +177,7 @@ Lower/upper case of the letters within the rhombus. Defaults to C<upper>.
 
 =item * C<fillup>
 
-The fillup character. Defaults to C<+>.
+The fillup character. Defaults to C<'.'>.
 
 =item * C<forward>
 
@@ -210,7 +210,7 @@ Digit to start with. Defaults to C<0>.
 
 =item * C<fillup>
 
-The fillup character. Defaults to C<+>.
+The fillup character. Defaults to C<'.'>.
 
 =item * C<forward>
 
@@ -239,7 +239,7 @@ Number of lines to be printed. Defaults to 25.
 
 =item * C<fillup>
 
-The fillup character. Defaults to C<+>.
+The fillup character. Defaults to C<'.'>.
 
 =back
 

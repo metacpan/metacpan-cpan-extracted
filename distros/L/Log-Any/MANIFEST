@@ -26,6 +26,7 @@ lib/Log/Any/Manager.pm
 lib/Log/Any/Proxy.pm
 lib/Log/Any/Proxy/Null.pm
 lib/Log/Any/Proxy/Test.pm
+lib/Log/Any/Proxy/WithStackTrace.pm
 lib/Log/Any/Test.pm
 t/00-compile.t
 t/00-report-prereqs.dd
@@ -48,6 +49,7 @@ t/log-any-test.t
 t/memory.t
 t/multiplex.t
 t/null-proxy.t
+t/proxy-with-stack-trace.t
 t/proxy.t
 t/release-backcompat.t
 t/replace_log.t

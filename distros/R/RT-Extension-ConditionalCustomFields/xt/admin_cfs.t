@@ -114,7 +114,7 @@ is($cf_conditioned_by_CF_options[16], $cf_condition_text_single->id, 'Can be con
 is($cf_conditioned_by_CF_options[17], $cf_condition_wikitext_single->id, 'Can be conditioned by ConditionWikitextSingle CF');
 
 my $mjs = WWW::Mechanize::PhantomJS->new(phantomjs_arg => ["--ssl-protocol=any"]);
-$mjs->driver->ua->timeout(540);
+$mjs->driver->ua->timeout(600);
 $mjs->get($m->rt_base_url . '?user=root;pass=password');
 $mjs->get($m->rt_base_url . 'Admin/CustomFields/Modify.html?id=' . $cf_conditioned_by->id);
 ok($mjs->content =~ /Customfield is conditioned by/, 'Can be conditioned by (with js)');

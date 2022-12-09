@@ -29,7 +29,7 @@ no_index:
 provides:
   Dist::Zilla::PluginBundle::Author::DERIV:
     file: lib/Dist/Zilla/PluginBundle/Author/DERIV.pm
-    version: '0.004'
+    version: '0.005'
 requires:
   Dist::Zilla::Plugin::ArchiveRelease: '0'
   Dist::Zilla::Plugin::Authority: '0'
@@ -101,13 +101,14 @@ resources:
   bugtracker: https://github.com/binary-com/perl-Dist-Zilla-PluginBundle-Author-DERIV/issues
   homepage: https://github.com/binary-com/perl-Dist-Zilla-PluginBundle-Author-DERIV
   repository: https://github.com/binary-com/perl-Dist-Zilla-PluginBundle-Author-DERIV.git
-version: '0.004'
+version: '0.005'
 x_authority: cpan:DERIV
 x_contributors:
   - 'chylli-binary <chylli@binary.com>'
-  - 'Tom Molesworth <tom@binary.com>'
-  - 'Eyad Arnabeh <eyadof@gmail.com>'
   - 'Shantanu Patil <shantanu@regentmarkets.com>'
+  - 'Tom Molesworth <tom@binary.com>'
+  - 'chylli-binary <52912308+chylli-binary@users.noreply.github.com>'
+  - 'Eyad Arnabeh <eyadof@gmail.com>'
 x_generated_by_perl: v5.26.2
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

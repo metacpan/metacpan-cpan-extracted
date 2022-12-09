@@ -5,13 +5,13 @@ use strict;
 use warnings;
 
 use Config;
-use IO::Socket;
 use Readonly;
+use Socket;
 
 our $ERROR_MESSAGE;
 Readonly::Array our @EXPORT_OK => qw(check_socket $ERROR_MESSAGE);
 
-our $VERSION = 0.02;
+our $VERSION = 0.04;
 
 sub check_socket {
 	my ($config_hr, $os, $env_hr) = @_;
@@ -157,8 +157,8 @@ Returns 0/1.
 
 L<Config>,
 L<Exporter>,
-L<IO::Socket>,
-L<Readonly>.
+L<Readonly>,
+L<Socket>.
 
 =head1 SEE ALSO
 
@@ -188,6 +188,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.04
 
 =cut

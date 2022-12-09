@@ -7,7 +7,7 @@ use Test::More;
 BEGIN { require "./t/utils.pl" }
 our (@AvailableDrivers);
 
-use constant TESTS_PER_DRIVER => 150;
+use constant TESTS_PER_DRIVER => 151;
 
 my $total = scalar(@AvailableDrivers) * TESTS_PER_DRIVER;
 plan tests => $total;
@@ -313,6 +313,7 @@ SKIP: {
     $users_obj->UnLimit;
 	$users_obj->OrderBy(FIELD => 'Login');
     $users_obj->RowsPerPage(2);
+    is($users_obj->Count, 2, 'user count on first page' );
     {
         my %seen;
         my $saw_on_page = 0;

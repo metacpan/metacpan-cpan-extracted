@@ -1,3 +1,7 @@
+2022-12-09  Dave Cross <dave@perlhacks.com>
+
+        * Support ExcludeArch, ExclusiveArch, ExcluseOS, ExclusiveOS
+
 2021-01-23  Dave Cross <dave@perlhacks.com>
 
 	* Version 1.0.3

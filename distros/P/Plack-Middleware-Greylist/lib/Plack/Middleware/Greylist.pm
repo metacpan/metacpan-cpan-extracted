@@ -21,7 +21,7 @@ use Plack::Util::Accessor qw/ default_rate rules cache file _match greylist retr
 use Ref::Util             qw/ is_plain_arrayref /;
 use Time::Seconds         qw/ ONE_MINUTE /;
 
-our $VERSION = 'v0.3.3';
+our $VERSION = 'v0.3.4';
 
 
 sub prepare_app {
@@ -167,7 +167,7 @@ Plack::Middleware::Greylist - throttle requests with different rates based on ne
 
 =head1 VERSION
 
-version v0.3.3
+version v0.3.4
 
 =head1 SYNOPSIS
 
@@ -293,13 +293,13 @@ requests. This is probably not something that you want.
 
 =head1 SOURCE
 
-The development version is on github at L<https://github.com/robrwo/Plack-Middleware-Greylist->
-and may be cloned from L<git://github.com/robrwo/Plack-Middleware-Greylist-.git>
+The development version is on github at L<https://github.com/robrwo/Plack-Middleware-Greylist>
+and may be cloned from L<git://github.com/robrwo/Plack-Middleware-Greylist.git>
 
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website
-L<https://github.com/robrwo/Plack-Middleware-Greylist-/issues>
+L<https://github.com/robrwo/Plack-Middleware-Greylist/issues>
 
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired

@@ -9,6 +9,6 @@ print rhombus(
     lines   =>       31,
     letter  =>      'c',
     case    =>  'upper',
-    fillup  =>      '+',
+    fillup  =>      '.',
     forward =>        1,
 );

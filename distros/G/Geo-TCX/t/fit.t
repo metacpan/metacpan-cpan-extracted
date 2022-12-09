@@ -6,8 +6,14 @@ use Geo::TCX;
 
 eval "use Geo::FIT";
 if ($@) {
-    plan skip_all => "requires Geo::FIT"
+    plan skip_all => "Geo::FIT not available"
 } else {
+    eval "Geo::TCX::_check_fit2tcx_pl_version()";
+    if ($@) {
+        my $msg;
+        $msg = $1 if $@ =~ m/(.*)\n/;
+        plan skip_all => $msg;
+    }
     plan tests => 2;
 }
 

@@ -1,5 +1,3 @@
-# $Header: /home/jesse/DBIx-SearchBuilder/history/SearchBuilder/Handle/Oracle.pm,v 1.14 2002/01/28 06:11:37 jesse Exp $
-
 package DBIx::SearchBuilder::Handle::Oracle;
 
 use strict;
@@ -8,7 +6,7 @@ use warnings;
 use base qw/DBIx::SearchBuilder::Handle/;
 
 use DBD::Oracle qw(:ora_types ORA_OCI);
-         
+
 =head1 NAME
 
   DBIx::SearchBuilder::Handle::Oracle - An oracle specific Handle object
@@ -18,7 +16,7 @@ use DBD::Oracle qw(:ora_types ORA_OCI);
 
 =head1 DESCRIPTION
 
-This module provides a subclass of DBIx::SearchBuilder::Handle that 
+This module provides a subclass of DBIx::SearchBuilder::Handle that
 compensates for some of the idiosyncrasies of Oracle.
 
 =head1 METHODS
@@ -28,21 +26,23 @@ compensates for some of the idiosyncrasies of Oracle.
 
 =head2 Connect PARAMHASH: Driver, Database, Host, User, Password
 
-Takes a paramhash and connects to your DBI datasource. 
+Takes a paramhash and connects to your DBI datasource.
 
 =cut
 
 sub Connect  {
-  my $self = shift;
-  
-  my %args = ( Driver => undef,
-	       Database => undef,
-	       User => undef,
-	       Password => undef, 
-	       SID => undef,
-	       Host => undef,
-	       @_);
-  
+    my $self = shift;
+
+    my %args = (
+        Driver   => undef,
+        Database => undef,
+        User     => undef,
+        Password => undef,
+        SID      => undef,
+        Host     => undef,
+        @_
+    );
+
     my $rv = $self->SUPER::Connect(%args);
     
     $self->dbh->{LongTruncOk}=1;
@@ -53,8 +53,8 @@ sub Connect  {
             "ALTER SESSION set NLS_${setting}_FORMAT = 'YYYY-MM-DD HH24:MI:SS'"
         );
     }
-    
-    return ($rv); 
+
+    return ($rv);
 }
 
 =head2 BuildDSN
@@ -111,39 +111,32 @@ are an array of key-value pairs to be inserted.
 =cut
 
 sub Insert  {
-	my $self = shift;
-	my $table = shift;
+    my $self = shift;
+    my $table = shift;
     my ($sth);
 
-
-
-  # Oracle Hack to replace non-supported mysql_rowid call
+    # Oracle Hack to replace non-supported mysql_rowid call
 
     my %attribs = @_;
     my ($unique_id, $QueryString);
 
     if ($attribs{'Id'} || $attribs{'id'}) {
         $unique_id = ($attribs{'Id'} ? $attribs{'Id'} : $attribs{'id'} );
-    }
-    else {
- 
-    $QueryString = "SELECT ".$table."_seq.nextval FROM DUAL";
- 
-    $sth = $self->SimpleQuery($QueryString);
-    if (!$sth) {
-       if ($main::debug) {
-    	die "Error with $QueryString";
-      }
-       else {
-	 return (undef);
-       }
-     }
+    } else {
+        $QueryString = "SELECT ".$table."_seq.nextval FROM DUAL";
+        $sth = $self->SimpleQuery($QueryString);
+        if (!$sth) {
+            if ($main::debug) {
+                die "Error with $QueryString";
+            } else {
+                return (undef);
+            }
+        }
 
-     #needs error checking
-    my @row = $sth->fetchrow_array;
+        #needs error checking
+        my @row = $sth->fetchrow_array;
 
-    $unique_id = $row[0];
-
+        $unique_id = $row[0];
     }
 
     #TODO: don't hardcode this to id pull it from somewhere else
@@ -153,18 +146,17 @@ sub Insert  {
     delete $attribs{'Id'};
     $sth =  $self->SUPER::Insert( $table, %attribs);
 
-   unless ($sth) {
-     if ($main::debug) {
-        die "Error with $QueryString: ". $self->dbh->errstr;
+    unless ($sth) {
+        if ($main::debug) {
+            die "Error with $QueryString: ". $self->dbh->errstr;
+        } else {
+            return (undef);
+        }
     }
-     else {
-         return (undef);
-     }
-   }
 
     $self->{'id'} = $unique_id;
     return( $self->{'id'}); #Add Succeded. return the id
-  }
+}
 
 =head2 InsertFromSelect
 
@@ -202,14 +194,14 @@ sub InsertFromSelect {
     return $self->SUPER::InsertFromSelect( $table, $columns, "($query)", @binds);
 }
 
-=head2 KnowsBLOBs     
+=head2 KnowsBLOBs
 
-Returns 1 if the current database supports inserts of BLOBs automatically.      
-Returns undef if the current database must be informed of BLOBs for inserts.    
+Returns 1 if the current database supports inserts of BLOBs automatically.
+Returns undef if the current database must be informed of BLOBs for inserts.
 
 =cut
 
-sub KnowsBLOBs {     
+sub KnowsBLOBs {
     my $self = shift;
     return(undef);
 }
@@ -218,19 +210,20 @@ sub KnowsBLOBs {
 
 =head2 BLOBParams FIELD_NAME FIELD_TYPE
 
-Returns a hash ref for the bind_param call to identify BLOB types used by 
+Returns a hash ref for the bind_param call to identify BLOB types used by
 the current database for a particular column type.
 The current Oracle implementation only supports ORA_CLOB types (112).
 
 =cut
 
-sub BLOBParams { 
+sub BLOBParams {
     my $self = shift;
     my $field = shift;
     #my $type = shift;
     # Don't assign to key 'value' as it is defined later.
-    return ( { ora_field => $field, ora_type => ORA_CLOB,
-});    
+    return (
+        { ora_field => $field, ora_type => ORA_CLOB, }
+    );
 }
 
 
@@ -239,7 +232,6 @@ sub BLOBParams {
 
 takes an SQL SELECT statement and massages it to return ROWS_PER_PAGE starting with FIRST_ROW;
 
-
 =cut
 
 sub ApplyLimits {
@@ -247,35 +239,41 @@ sub ApplyLimits {
     my $statementref = shift;
     my $per_page = shift;
     my $first = shift;
+    my $sb = shift;
 
     # Transform an SQL query from:
     #
-    # SELECT main.* 
-    #   FROM Tickets main   
-    #  WHERE ((main.EffectiveId = main.id)) 
-    #    AND ((main.Type = 'ticket')) 
-    #    AND ( ( (main.Status = 'new')OR(main.Status = 'open') ) 
-    #    AND ( (main.Queue = '1') ) )  
+    # SELECT main.*
+    #   FROM Tickets main
+    #  WHERE ((main.EffectiveId = main.id))
+    #    AND ((main.Type = 'ticket'))
+    #    AND ( ( (main.Status = 'new')OR(main.Status = 'open') )
+    #    AND ( (main.Queue = '1') ) )
     #
-    # to: 
+    # to:
     #
     # SELECT * FROM (
     #     SELECT limitquery.*,rownum limitrownum FROM (
-    #             SELECT main.* 
-    #               FROM Tickets main   
-    #              WHERE ((main.EffectiveId = main.id)) 
-    #                AND ((main.Type = 'ticket')) 
-    #                AND ( ( (main.Status = 'new')OR(main.Status = 'open') ) 
-    #                AND ( (main.Queue = '1') ) )  
+    #             SELECT main.*
+    #               FROM Tickets main
+    #              WHERE ((main.EffectiveId = main.id))
+    #                AND ((main.Type = 'ticket'))
+    #                AND ( ( (main.Status = 'new')OR(main.Status = 'open') )
+    #                AND ( (main.Queue = '1') ) )
     #     ) limitquery WHERE rownum <= 50
     # ) WHERE limitrownum >= 1
     #
 
     if ($per_page) {
         # Oracle orders from 1 not zero
-        $first++; 
+        $first++;
         # Make current query a sub select
-        $$statementref = "SELECT * FROM ( SELECT limitquery.*,rownum limitrownum FROM ( $$statementref ) limitquery WHERE rownum <= " . ($first + $per_page - 1) . " ) WHERE limitrownum >= " . $first;
+        my $last = $first + $per_page - 1;
+        if ( $sb->{_bind_values} ) {
+            push @{ $sb->{_bind_values} }, $last, $first;
+            $first = $last = '?';
+        }
+        $$statementref = "SELECT * FROM ( SELECT limitquery.*,rownum limitrownum FROM ( $$statementref ) limitquery WHERE rownum <= " . $last . " ) WHERE limitrownum >= " . $first;
     }
 }
 

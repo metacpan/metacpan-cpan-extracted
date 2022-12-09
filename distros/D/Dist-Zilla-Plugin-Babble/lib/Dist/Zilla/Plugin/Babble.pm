@@ -1,5 +1,5 @@
 package Dist::Zilla::Plugin::Babble;
-$Dist::Zilla::Plugin::Babble::VERSION = '0.003';
+$Dist::Zilla::Plugin::Babble::VERSION = '0.004';
 use Carp 'croak';
 use Moose;
 use MooseX::Types::Moose qw/ArrayRef Str/;
@@ -9,7 +9,18 @@ use List::Util 'any';
 with 'Dist::Zilla::Role::FileMunger',
 	'Dist::Zilla::Role::FileFinderUser' => {
 		default_finders => [ ':InstallModules', ':ExecFiles' ],
+	},
+	'Dist::Zilla::Role::FileFinderUser' => {
+		method           => 'found_test_files',
+		finder_arg_names => [ 'test_finder' ],
+		default_finders	 => [ ':TestFiles' ],
+	},
+	'Dist::Zilla::Role::FileFinderUser' => {
+		method           => 'found_configure_files',
+		finder_arg_names => [ 'configure_finder' ],
+		default_finders	 => [],
 	};
+
 
 sub mvp_multivalue_args {
 	return qw/files plugins/;
@@ -32,6 +43,16 @@ has files => (
 	},
 );
 
+has extra_plugins => (
+	isa     => ArrayRef[Str],
+	traits  => ['Array'],
+	lazy    => 1,
+	default => sub { [] },
+	handles => {
+		extra_plugins => 'elements',
+	},
+);
+
 has plugins => (
 	isa     => ArrayRef[Str],
 	traits  => ['Array'],
@@ -41,6 +62,17 @@ has plugins => (
 		plugins => 'elements',
 	},
 );
+
+has filter_plugins => (
+	isa     => ArrayRef[Str],
+	traits  => ['Array'],
+	lazy    => 1,
+	default => sub { [] },
+	handles => {
+		filter_plugins => 'elements',
+	},
+);
+
 
 my %supported_since = (
 	'::CoreSignatures'        => '5.028',
@@ -56,6 +88,9 @@ my %supported_since = (
 sub _build_plugins {
 	my $self = shift;
 	my @plugins = grep { $supported_since{$_} > $self->for_version } keys %supported_since;
+	my %filter = map { $_ => 1 } $self->filter_plugins;
+	@plugins = grep { not $filter{$_} } @plugins;
+	push @plugins, $self->extra_plugins;
 	return \@plugins;
 }
 
@@ -80,17 +115,26 @@ sub _build_transformer {
 	return $pc;
 }
 
+sub get_files {
+	my $self = shift;
+	my @result = @{ $self->found_files };
+	push @result, grep { $_->name =~ /\.t/ } @{ $self->found_test_files };
+	return @result;
+}
+
 sub munge_files {
 	my $self = shift;
 
+	$self->log("Starting to babble source");
 	if (my %filename = map { $_ => 1 } $self->files) {
 		foreach my $file (@{ $self->zilla->files }) {
 			$self->munge_file($file) if $filename{$file->name};
 		}
 	}
 	else {
-		$self->munge_file($_) for @{ $self->found_files };
+		$self->munge_file($_) for $self->get_files;;
 	}
+	$self->log("Finished babbling source");
 
 	return;
 }
@@ -128,7 +172,7 @@ Dist::Zilla::Plugin::Babble - EXPERIMENTAL Automatic Babble substitution in Dist
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

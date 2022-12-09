@@ -1,7 +1,7 @@
 # Bio/RNA/BarMap/Mapping/MinMappingEntry.pm
 
 package Bio::RNA::BarMap::Mapping::MinMappingEntry;
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 use 5.012;
 use warnings;

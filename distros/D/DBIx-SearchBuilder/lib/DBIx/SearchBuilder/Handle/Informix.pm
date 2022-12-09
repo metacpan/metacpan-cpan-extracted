@@ -1,5 +1,3 @@
-# $Header:  $
-
 package DBIx::SearchBuilder::Handle::Informix;
 
 use strict;
@@ -16,7 +14,7 @@ use base qw(DBIx::SearchBuilder::Handle);
 
 =head1 DESCRIPTION
 
-This module provides a subclass of DBIx::SearchBuilder::Handle that 
+This module provides a subclass of DBIx::SearchBuilder::Handle that
 compensates for some of the idiosyncrasies of Informix.
 
 =head1 METHODS
@@ -38,9 +36,9 @@ sub Insert  {
 
     my $sth = $self->SUPER::Insert(@_);
     if (!$sth) {
-            print "no sth! (".$self->dbh->{ix_sqlerrd}[1].")\n";
-	    return ($sth);
-     }
+        print "no sth! (".$self->dbh->{ix_sqlerrd}[1].")\n";
+        return ($sth);
+    }
 
 
     $self->{id}=$self->dbh->{ix_sqlerrd}[1];
@@ -49,9 +47,9 @@ sub Insert  {
   }
 
 
-=head2 CaseSensitive 
+=head2 CaseSensitive
 
-Returns 1, since Informix's searches are case sensitive by default 
+Returns 1, since Informix's searches are case sensitive by default
 
 =cut
 
@@ -69,19 +67,21 @@ Builder for Informix DSNs.
 
 sub BuildDSN {
     my $self = shift;
-  my %args = ( Driver => undef,
-               Database => undef,
-               Host => undef,
-               Port => undef,
-           SID => undef,
-               RequireSSL => undef,
-               @_);
+    my %args = (
+        Driver => undef,
+        Database => undef,
+        Host => undef,
+        Port => undef,
+        SID => undef,
+        RequireSSL => undef,
+        @_
+    );
 
-  my $dsn = "dbi:$args{'Driver'}:";
+    my $dsn = "dbi:$args{'Driver'}:";
 
-  $dsn .= "$args{'Database'}" if (defined $args{'Database'} && $args{'Database'});
+    $dsn .= "$args{'Database'}" if (defined $args{'Database'} && $args{'Database'});
 
-  $self->{'dsn'}= $dsn;
+    $self->{'dsn'}= $dsn;
 }
 
 
@@ -100,20 +100,20 @@ sub ApplyLimits {
 
     # XXX TODO THIS only works on the FIRST page of results. that's a bug
     if ($per_page) {
-	$$statementref =~ s[^\s*SELECT][SELECT FIRST $per_page]i;
+        $$statementref =~ s[^\s*SELECT][SELECT FIRST $per_page]i;
     }
 }
 
 
 sub Disconnect  {
-  my $self = shift;
-  if ($self->dbh) {
-      my $status = $self->dbh->disconnect();
-      $self->dbh( undef);
-      return $status;
-  } else {
-      return;
-  }
+    my $self = shift;
+    if ($self->dbh) {
+        my $status = $self->dbh->disconnect();
+        $self->dbh( undef);
+        return $status;
+    } else {
+        return;
+    }
 }
 
 

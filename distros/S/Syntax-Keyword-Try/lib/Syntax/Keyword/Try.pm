@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2016-2022 -- leonerd@leonerd.org.uk
 
-package Syntax::Keyword::Try 0.27;
+package Syntax::Keyword::Try 0.28;
 
 use v5.14;
 use warnings;

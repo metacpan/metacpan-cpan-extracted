@@ -345,9 +345,10 @@ if	(eval {require ExtUtils::Constant; 1}) {
 	{name => 'ELM_FOCUS_AUTOSCROLL_MODE_SHOW', 'macro' => 1},
 	{name => 'ELM_FOCUS_AUTOSCROLL_MODE_NONE', 'macro' => 1},
 	{name => 'ELM_FOCUS_AUTOSCROLL_MODE_BRING_IN', 'macro' => 1},
-	
+	#
 	{name => 'ELM_FOCUS_MOVE_POLICY_CLICK', 'macro' => 1},
 	{name => 'ELM_FOCUS_MOVE_POLICY_IN', 'macro' => 1},
+	{name => 'ELM_FOCUS_MOVE_POLICY_KEY_ONLY', 'macro' => 1},
 	);
 
 

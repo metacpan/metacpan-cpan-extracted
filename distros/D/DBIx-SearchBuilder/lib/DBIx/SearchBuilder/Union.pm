@@ -49,11 +49,11 @@ Create a new DBIx::SearchBuilder::Union object.  No arguments.
 
 sub new {
   bless {
-		 data => [],
-		 curp => 0,				# current offset in data
-		 item => 0,				# number of indiv items from First
-		 count => undef,
-		}, shift;
+      data => [],
+      curp => 0,				# current offset in data
+      item => 0,				# number of indiv items from First
+      count => undef,
+  }, shift;
 }
 
 =head2 add $sb
@@ -66,14 +66,14 @@ It must be the same type as the first object added.
 
 sub add {
     my $self   = shift;
-	my $newobj = shift;
+    my $newobj = shift;
 
-	unless ( @{$self->{data}} == 0
-			 || ref($newobj) eq ref($self->{data}[0]) ) {
-	  die "All elements of a DBIx::SearchBuilder::Union must be of the same type.  Looking for a " . ref($self->{data}[0]) .".";
-	}
+    unless ( @{$self->{data}} == 0
+                 || ref($newobj) eq ref($self->{data}[0]) ) {
+        die "All elements of a DBIx::SearchBuilder::Union must be of the same type.  Looking for a " . ref($self->{data}[0]) .".";
+    }
 
-	$self->{count} = undef;
+    $self->{count} = undef;
     push @{$self->{data}}, $newobj;
 }
 
@@ -88,11 +88,11 @@ element.
 sub First {
     my $self = shift;
 
-	die "No elements in DBIx::SearchBuilder::Union"
-	  unless @{$self->{data}};
+    die "No elements in DBIx::SearchBuilder::Union"
+        unless @{$self->{data}};
 
     $self->{curp} = 0;
-	$self->{item} = 0;
+    $self->{item} = 0;
     $self->{data}[0]->First;
 }
 
@@ -128,10 +128,10 @@ Returns the last item
 =cut
 
 sub Last {
-  die "Last doesn't work right now";
-  my $self = shift;
-  $self->GotoItem( ( $self->Count ) - 1 );
-  return ( $self->Next );
+    die "Last doesn't work right now";
+    my $self = shift;
+    $self->GotoItem( ( $self->Count ) - 1 );
+    return ( $self->Next );
 }
 
 =head2 Count
@@ -164,22 +164,22 @@ if you'd just started iterating through the result set.
 =cut
 
 sub GotoFirstItem {
-  my $self = shift;
-  $self->GotoItem(0);
+    my $self = shift;
+    $self->GotoItem(0);
 }
 
 sub GotoItem {
-  my $self = shift;
-  my $item = shift;
+    my $self = shift;
+    my $item = shift;
 
-  die "We currently only support going to the First item"
-	unless $item == 0;
+    die "We currently only support going to the First item"
+        unless $item == 0;
 
-  $self->{curp} = 0;
-  $self->{item} = 0;
-  $self->{data}[0]->GotoItem(0);
+    $self->{curp} = 0;
+    $self->{item} = 0;
+    $self->{data}[0]->GotoItem(0);
 
-  return $item;
+    return $item;
 }
 
 =head2 IsLast
@@ -191,12 +191,12 @@ Returns true if the current row is the last record in the set.
 sub IsLast {
     my $self = shift;
 
-	$self->{item} == $self->Count ? 1 : undef;
+    $self->{item} == $self->Count ? 1 : undef;
 }
 
 =head2 ItemsArrayRef
 
-Return a refernece to an array containing all objects found by this search.
+Return a reference to an array containing all objects found by this search.
 
 Will destroy any positional state.
 
@@ -207,13 +207,13 @@ sub ItemsArrayRef {
 
     return [] unless $self->Count;
 
-	$self->GotoFirstItem();
-	my @ret;
-	while( my $r = $self->Next ) {
-	  push @ret, $r;
-	}
+    $self->GotoFirstItem();
+    my @ret;
+    while( my $r = $self->Next ) {
+        push @ret, $r;
+    }
 
-	return \@ret;
+    return \@ret;
 }
 
 =head1 AUTHOR

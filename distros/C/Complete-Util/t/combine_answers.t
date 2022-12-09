@@ -14,6 +14,12 @@ test_combine(
 );
 
 test_combine(
+    name   => 'undef',
+    input  => [undef],
+    result => undef,
+);
+
+test_combine(
     name   => 'arrays of scalars',
     input  => [[1, 2], [4, 2, 3]],
     result => [1, 2, 4, 3],

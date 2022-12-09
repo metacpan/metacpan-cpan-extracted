@@ -1,5 +1,5 @@
 {
-   "abstract" : "lightweight JSON APIs.",
+   "abstract" : "Lightweight Web Framework",
    "author" : [
       "LNATION <email@lnation.org>"
    ],
@@ -32,6 +32,7 @@
       },
       "runtime" : {
          "requires" : {
+            "B" : "0",
             "Digest::SHA" : "0",
             "JSON" : "0",
             "Plack::Request" : "0",
@@ -49,6 +50,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.04",
+   "version" : "0.110",
    "x_serialization_backend" : "JSON::PP version 4.02"
 }

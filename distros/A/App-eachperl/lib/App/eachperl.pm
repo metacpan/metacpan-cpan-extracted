@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.73 ':experimental(init_expr)';
 
-package App::eachperl 0.07;
+package App::eachperl 0.08;
 class App::eachperl;
 
 use Config::Tiny;
@@ -61,6 +61,7 @@ field $_no_system_perl :param;
 field $_no_test        :param;
 field $_since_version  :param;
 field $_until_version  :param;
+field $_use_devel      :param;
 field $_only_if        :param;
 field $_reverse        :param;
 field $_stop_on_fail   :param;
@@ -73,6 +74,7 @@ class App::eachperl::_Perl {
    field $version      :param :reader;
    field $is_threads   :param :reader;
    field $is_debugging :param :reader;
+   field $is_devel     :param :reader;
    field $selected            :mutator;
 }
 
@@ -119,6 +121,7 @@ method postprocess_config ()
          $ver = version->parse( $ver )->normal;
          my $threads = ( $usethreads eq "define" );
          my $debug = $ccflags =~ m/-DDEBUGGING\b/;
+         my $devel = ( $ver =~ m/^v\d+\.(\d+)/ )[0] % 2;
 
          push @perls, App::eachperl::_Perl->new(
             name         => $perl,
@@ -126,6 +129,7 @@ method postprocess_config ()
             version      => $ver,
             is_threads   => $threads,
             is_debugging => $debug,
+            is_devel     => $devel,
          );
       }
    }
@@ -144,6 +148,7 @@ method perls ()
       $selected = 0 if $_since_version and $ver lt $_since_version;
       $selected = 0 if $_until_version and $ver gt $_until_version;
       $selected = 0 if $_no_system_perl and $perl->fullpath eq $^X;
+      $selected = 0 if defined $_use_devel and $perl->is_devel ^ $_use_devel;
 
       if( $selected and defined $_only_if ) {
          IPC::Run::run(
@@ -173,11 +178,15 @@ method command_list
    ()
 {
    foreach my $perl ( $self->perls ) {
-      printf "%s%s: %s (%s%s%s)\n",
+      my @flags;
+      push @flags, $perl->version;
+      push @flags, "threads"   if $perl->is_threads;
+      push @flags, "DEBUGGING" if $perl->is_debugging;
+      push @flags, "devel"     if $perl->is_devel;
+
+      printf "%s%s: %s (%s)\n",
          ( $perl->selected ? "* " : "  " ),
-         $perl->name, $perl->fullpath, $perl->version,
-         $perl->is_threads ? ",threads" : "",
-         $perl->is_debugging ? ",DEBUGGING" : "",
+         $perl->name, $perl->fullpath, join( ",", @flags ),
       ;
    }
    return 0;

@@ -136,11 +136,9 @@ sub result {
 
   my $result;
   my $matched = 0;
-
   my $value = $self->value;
 
   local $_ = $value;
-
   return wantarray ? ($result, $matched) : $result if !$self->on_only->($value);
 
   for (my $i = 0; $i < @{$self->on_when}; $i++) {
@@ -250,7 +248,8 @@ Match Class for Perl 5
 =head1 DESCRIPTION
 
 This package provides an object-oriented interface for complex pattern matching
-operations.
+operations on scalar values. See L<Venus::Gather> for operating on collections
+of data, e.g. array references.
 
 =cut
 
@@ -346,8 +345,8 @@ I<Since C<1.23>>
 
   data(HashRef $data) (Match)
 
-The data method takes a hashref (i.e. lookup table) and match conditions and
-actions based on the keys and values found.
+The data method takes a hashref (i.e. lookup table) and creates match
+conditions and actions based on the keys and values found.
 
 I<Since C<0.07>>
 

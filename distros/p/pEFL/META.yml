@@ -1,5 +1,5 @@
 ---
-abstract: 'Perl bindings for the Enlightenment Foundation Libraries'
+abstract: 'Perl binding to the Enlightenment Foundation Libraries'
 author:
   - 'Maximilian Lika'
 build_requires:
@@ -25,5 +25,5 @@ no_index:
 requires: {}
 resources:
   repository: https://github.com/MaxPerl/Perl-Efl
-version: '0.74'
+version: '0.75'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

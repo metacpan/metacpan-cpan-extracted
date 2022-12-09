@@ -1,5 +1,26 @@
 Revision history for Perl extension DBIx::SearchBuilder.
 
+1.73 2022-12-08
+ - Remove very old CVS headers from files
+ - Standardize whitespace
+ - Remove an unused cache parameter remaining from a previous refactor
+ - Update a test to work around a change in numeric values returned on
+   Postgres starting in version 14
+ - Fix a doc typo
+ - Fix a bind value issue with Limit on Postgres
+ - Disable finding count in searches for older versions of MySQL and
+   MariaDB that don't support window functions (OVER)
+ - Truncate values before checking for changes to fix a bug where
+   values bigger than a column would be inserted even when they were
+   not changed
+
+1.72_01 2022-09-20
+ - Simplify count's internal logic to always use the "count_all" key
+ - Fix Count method to always returns count in selected page
+ - Support search and count in same query
+ - Redo search only if ORDER/GROUP BY is really updated
+ - Add bind values support for LIMIT clauses
+
 1.71 2021-09-24
  - Add dot to load utils in tests for perl 5.26+
 

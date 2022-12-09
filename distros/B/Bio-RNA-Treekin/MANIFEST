@@ -5,6 +5,7 @@ lib/Bio/RNA/Treekin/MultiRecord.pm
 lib/Bio/RNA/Treekin/PopulationDataRecord.pm
 lib/Bio/RNA/Treekin/Record.pm
 lib/IO/File/RecordStream.pm
+LICENSE
 MANIFEST			This list of files
 META.json
 META.yml

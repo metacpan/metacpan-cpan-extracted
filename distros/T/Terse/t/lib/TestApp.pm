@@ -8,7 +8,11 @@ sub auth {
 }
 
 sub hello_world {
-	$_[1]->response->hello = "world";
+	my ($self, $t) = @_;
+	$t->delayed_response(sub {
+		$t->response->hello = "world";
+		return $t->response;
+	});
 }
 
 sub error {

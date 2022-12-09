@@ -207,6 +207,7 @@ subtest 'serialisation with cbor' => sub
         my $s = $cache->open({ mode => 'w' });
         diag( "Error opening mmap cache file: ", $cache->error ) if( $DEBUG && !defined( $s ) );
         ok( $s, 'mmap cache opened' );
+        skip( "Failed to instantiate a mmap object.", 6 ) if( !defined( $s ) );
         ok( $s->write({ name => 'John Doe', location => 'Tokyo' }), 'write to cache mmap' );
         try
         {

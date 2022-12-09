@@ -133,7 +133,7 @@
    "provides" : {
       "Dist::Zilla::PluginBundle::Author::DERIV" : {
          "file" : "lib/Dist/Zilla/PluginBundle/Author/DERIV.pm",
-         "version" : "0.004"
+         "version" : "0.005"
       }
    },
    "release_status" : "stable",
@@ -148,13 +148,14 @@
          "web" : "https://github.com/binary-com/perl-Dist-Zilla-PluginBundle-Author-DERIV"
       }
    },
-   "version" : "0.004",
+   "version" : "0.005",
    "x_authority" : "cpan:DERIV",
    "x_contributors" : [
       "chylli-binary <chylli@binary.com>",
+      "Shantanu Patil <shantanu@regentmarkets.com>",
       "Tom Molesworth <tom@binary.com>",
-      "Eyad Arnabeh <eyadof@gmail.com>",
-      "Shantanu Patil <shantanu@regentmarkets.com>"
+      "chylli-binary <52912308+chylli-binary@users.noreply.github.com>",
+      "Eyad Arnabeh <eyadof@gmail.com>"
    ],
    "x_generated_by_perl" : "v5.26.2",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.27",

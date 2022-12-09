@@ -1,5 +1,5 @@
 package Bio::RNA::Barriers::Results;
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 use 5.012;
 use strict;
@@ -153,6 +153,30 @@ sub get_global_min {
     my ($self) = @_;
     my $mfe_min = $self->get_min(1);            # basin 1 == mfe basin
     return $mfe_min;
+}
+
+# Get the global minimum free energy.
+sub mfe {
+    my ($self) = @_;
+    my $mfe = $self->get_global_min->mfe;
+    return $mfe;
+}
+
+# Get the delta_E of the landscape, i. e. the energy difference between the
+# (global) minimum free energy and and the highest energy encountered.
+sub delta_energy {
+    my ($self) = @_;
+    # Barrier height of the mfe basin is the explored energy bandwidth
+    my $delta_energy = $self->get_global_min->barrier_height;
+    return $delta_energy;
+}
+
+# Get the maximum energy of any structure in the landscape.
+sub max_energy {
+    my ($self) = @_;
+    # Energy values from Bar file have only 2 digits precision.
+    my $max_energy = sprintf "%.2f", $self->mfe + $self->delta_energy;
+    return $max_energy;
 }
 
 sub min_count {
@@ -435,6 +459,19 @@ results file).
 =head3 $res->get_global_min()
 
 Returns the basin represented by the (global) mfe structure (i.e. basin 1).
+
+=head3 $res->mfe()
+
+Get the global minimum free energy.
+
+=head3 $res->delta_energy()
+
+Get the delta_E of the landscape, i. e. the energy difference between the
+(global) minimum free energy and and the highest energy encountered.
+
+=head3 $res->max_energy()
+
+Get the maximum energy of any structure in the landscape.
 
 =head3 $res->min_count()
 

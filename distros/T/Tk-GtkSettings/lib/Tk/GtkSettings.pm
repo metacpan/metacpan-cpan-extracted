@@ -9,7 +9,7 @@ Tk::GtkSettings - Give Tk applications the looks of Gtk applications
 use strict;
 use warnings;
 use File::Basename;
-our $VERSION = '0.03';
+our $VERSION = '0.04';
 
 use Exporter;
 our @ISA = qw(Exporter);
@@ -79,6 +79,79 @@ my %gtksettings = ();
 my %groups = (main => [[''], {}]);
 my $app_name = basename($0);
 my $marker;
+
+my @basegtkeys = qw(
+	theme_fg_color
+	theme_bg_color
+	theme_text_color
+	theme_base_color
+	theme_view_hover_decoration_color
+	theme_hovering_selected_bg_color
+	theme_selected_bg_color
+	theme_selected_fg_color
+	theme_view_active_decoration_color
+	theme_button_background_normal
+	theme_button_decoration_hover
+	theme_button_decoration_focus
+	theme_button_foreground_normal
+	theme_button_foreground_active
+	borders
+	warning_color
+	success_color
+	error_color
+	theme_unfocused_fg_color
+	theme_unfocused_text_color
+	theme_unfocused_bg_color
+	theme_unfocused_base_color
+	theme_unfocused_selected_bg_color_alt
+	theme_unfocused_selected_bg_color
+	theme_unfocused_selected_fg_color
+	theme_button_background_backdrop
+	theme_button_decoration_hover_backdrop
+	theme_button_decoration_focus_backdrop
+	theme_button_foreground_backdrop
+	theme_button_foreground_active_backdrop
+	unfocused_borders
+	warning_color_backdrop
+	success_color_backdrop
+	error_color_backdrop
+	insensitive_fg_color
+	insensitive_base_fg_color
+	insensitive_bg_color
+	insensitive_base_color
+	insensitive_selected_bg_color
+	insensitive_selected_fg_color
+	theme_button_background_insensitive
+	theme_button_decoration_hover_insensitive
+	theme_button_decoration_focus_insensitive
+	theme_button_foreground_insensitive
+	theme_button_foreground_active_insensitive
+	insensitive_borders
+	warning_color_insensitive
+	success_color_insensitive
+	error_color_insensitive
+	insensitive_unfocused_fg_color
+	theme_unfocused_view_text_color
+	insensitive_unfocused_bg_color
+	theme_unfocused_view_bg_color
+	insensitive_unfocused_selected_bg_color
+	insensitive_unfocused_selected_fg_color
+	theme_button_background_backdrop_insensitive
+	theme_button_decoration_hover_backdrop_insensitive
+	theme_button_decoration_focus_backdrop_insensitive
+	theme_button_foreground_backdrop_insensitive
+	theme_button_foreground_active_backdrop_insensitive
+	unfocused_insensitive_borders
+	warning_color_insensitive_backdrop
+	success_color_insensitive_backdrop
+	error_color_insensitive_backdrop
+	link_color
+	link_visited_color
+	tooltip_text
+	tooltip_background
+	tooltip_border
+	content_view_bg
+);
 
 my @contentwidgets = qw(
 	CodeText
@@ -158,11 +231,7 @@ appName(basename($0));
 
 =head1 ABSTRACT
 
-=over 4
-
 Apply Gtk colors and fonts to your perl/Tk application
-
-=back
 
 =head1 DESCRIPTION
 
@@ -273,11 +342,11 @@ sub applyGtkSettings {
 
 =item B<appName>(I<$name>)
 
-Sets and returns your application name. By default it is set to what is in B<$0>. Your Gtk settings
-will only be applied to your application in xrdb. You can set it to an empty string. Then it will 
-apply your Gtk settings to all your applications.
-
 =over 4
+
+Sets and returns your application name. By default it is set to the basename of what is in B<$0>. Your Gtk settings
+will only be applied to your application in xrdb. You can set it to an empty string. Then it will 
+apply your Gtk settings to all your perl/Tk applications.
 
 =back
 
@@ -310,6 +379,39 @@ sub convertColorCode {
 		my $b = substr(sprintf("0x%X", $3), 2);
 		return "#$r$g$b"
 	}
+}
+
+=item B<decodeFont(I<$gtkfontstring>)
+
+=over 4
+
+Converts the font string in gtk to something Tk can handle
+
+=back
+
+=cut
+
+# {Khmer OS Battambang} -12 bold italic
+sub decodeFont {
+	my $rawfont = shift;
+	my $family = '';
+	my $style = '';
+	my $size = '';
+	if ($rawfont =~ s/^([^,]+),//) {
+		$family = $1;
+	}
+	$rawfont =~ s/^\s*//; #remove leading spaces
+	if ($rawfont =~ s/^([^\d]+)//) {
+		$style = $1;
+		$style =~ s/^\s*//; #remove leading spaces
+		$style =~ s/\s*!//; #remove trailing spaces
+		$style = lc($style);
+	}
+	if ($rawfont =~ s/^(\d+)//) {
+		$size = $1;
+		$size =~ s/\s*!//; #remove trailing spaces
+	}
+	return "{$family} $size $style"
 }
 
 =item B<export2file>(I<$file>, ?I<$removeflag>?)
@@ -399,7 +501,6 @@ sub export2Xresources {
 =over 4
 
 exports your Gtk settings directly to the xrdb database.
-If $removeflag is set it will remove your settings from the xrdb database.
 
 =back
 
@@ -444,7 +545,7 @@ sub generateOutput {
 			my $member = $_;
 			for (sort keys %$options) {
 				my $val = gtkKey($options->{$_});
-				$val = $_ unless defined $val;
+				$val = $options->{$_} unless defined $val;
 				unless ($name eq 'main') {
 					$output = $output . $app_name . "*$member." . $_ . ": " . $val . "\n";
 				} else {
@@ -600,7 +701,7 @@ sub groupMembersReplace {
 	my $group = shift;
 	if (groupExists($group)) {
 		if ($group eq 'main') {
-			warn "no access to main group members";
+			warn "No access to main group members";
 			return
 		}
 		my $l = $groups{$group}->[0];
@@ -612,7 +713,8 @@ sub groupMembersReplace {
 
 =over 4
 
-Sets and returns the value of $option in $groupname.
+Sets and returns the value of $option in $groupname. $value should be a corresponding key from
+the Gtk hash. If that key is not found, it assumes a direct value.
 
 =back
 
@@ -817,6 +919,7 @@ sub loadGtkInfo {
 					my $key = $1;
 					my $color = $2;
 					$color = convertColorCode($color) if $color =~ /^rgb\(/;
+					$key = _truncate($key);
 					$gtksettings{$key} = $color
 				}
 			}
@@ -836,15 +939,8 @@ sub loadGtkInfo {
 		}
 		close OFILE;
 		if (exists $gtksettings{'gtk-font-name'}) {
-			my $rawfont = $gtksettings{'gtk-font-name'};
-			if ($rawfont =~ /(\D+)(\d+)/) {
-				my $name = $1;
-				my $size = $2;
-				$name =~ s/\s*!//;
-				$name =~ s/,//;
-				$name =~ s/\s/-/;
-				$gtksettings{'gtk-font-name'} = "$name $size";
-			}
+			my $font = decodeFont($gtksettings{'gtk-font-name'});
+			$gtksettings{'gtk-font-name'} = $font;
 		}
 	} else {
 		warn "cannot open Gtk settings.ini" if $verbose;
@@ -966,6 +1062,17 @@ sub rgb2hex {
 	my $b = hexstring($blue);
 	return "#$r$g$b"
 
+}
+
+sub _truncate {
+	my $name = shift;
+	for (@basegtkeys) {
+		my $key = $_;
+		if (substr($name, 0, length($key)) eq $key) {
+			return $key
+		}
+	}
+	return $name
 }
 
 =back

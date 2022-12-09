@@ -14,6 +14,7 @@ GetOptions(
    'since=s'        => \( my $SINCE_VERSION ),
    'until=s'        => \( my $UNTIL_VERSION ),
    'only-if=s'      => \( my $ONLY_IF ),
+   'devel!'         => \( my $USE_DEVEL ),
    'reverse|r'      => \( my $REVERSE ),
    'stop-on-fail|s' => \( my $STOP_ON_FAIL ),
 ) or exit 1;
@@ -24,6 +25,7 @@ exit App::eachperl->new(
    since_version  => $SINCE_VERSION,
    until_version  => $UNTIL_VERSION,
    only_if        => $ONLY_IF,
+   use_devel      => $USE_DEVEL,
    reverse        => $REVERSE,
    stop_on_fail   => $STOP_ON_FAIL,
 )->run( @ARGV );
@@ -162,6 +164,11 @@ Any perl binaries older than this will be skipped.
 
 Selects only perl versions that are at least as old as the requested version.
 Any perl binaries newer than this will be skipped.
+
+=head2 --devel, --no-devel
+
+Selects only perl versions that are (or are not) development versions (i.e.
+having an odd-numbered minor version).
 
 =head2 --only-if EXPR
 

@@ -4,7 +4,7 @@
       "Jan Henning Thorsen <jan.henning@thorsen.pm>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -16,12 +16,16 @@
    "no_index" : {
       "directory" : [
          "t",
-         "inc"
+         "inc",
+         "examples",
+         "t"
       ]
    },
    "prereqs" : {
       "build" : {
-         "requires" : {}
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
       },
       "configure" : {
          "requires" : {
@@ -33,8 +37,9 @@
             "Text::Markdown" : "v1.0.31"
          },
          "requires" : {
-            "JSON::Validator" : "5.10",
-            "Mojolicious" : "9.00"
+            "JSON::Validator" : "5.13",
+            "Mojolicious" : "9.00",
+            "perl" : "5.016"
          }
       },
       "test" : {
@@ -49,18 +54,43 @@
          "web" : "https://github.com/jhthorsen/mojolicious-plugin-openapi/issues"
       },
       "homepage" : "https://github.com/jhthorsen/mojolicious-plugin-openapi",
+      "license" : [
+         "http://www.opensource.org/licenses/artistic-license-2.0"
+      ],
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/jhthorsen/mojolicious-plugin-openapi.git",
          "web" : "https://github.com/jhthorsen/mojolicious-plugin-openapi"
+      },
+      "x_IRC" : {
+         "url" : "irc://irc.libera.chat/#perl-openapi",
+         "web" : "https://web.libera.chat/#perl-openapi"
       }
    },
-   "version" : "5.07",
+   "version" : "5.08",
    "x_contributors" : [
-      "Henrik Andersen",
-      "Ilya Rassadin",
-      "Jan Henning Thorsen",
-      "Joel Berger"
+      "Bernhard Graf <augensalat@gmail.com>",
+      "Doug Bell <doug@preaction.me>",
+      "Ed J <mohawk2@users.noreply.github.com>",
+      "Henrik Andersen <hem@hamster.dk>",
+      "Ilya Rassadin <elcamlost@gmail.com>",
+      "Jan Henning Thorsen <jhthorsen@cpan.org>",
+      "Ji-Hyeon Gim <potatogim@gluesys.com>",
+      "Joel Berger <joel.a.berger@gmail.com>",
+      "Krasimir Berov <k.berov@gmail.com>",
+      "Lars Thegler <lth@fibia.dk>",
+      "Lee Johnson <lee@givengain.ch>",
+      "Linn-Hege Kristensen <linn-hege@stix.no>",
+      "Manuel <manuel@mausz.at>",
+      "Martin Renvoize <martin.renvoize@ptfs-europe.com>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
+      "Nick Morrott <knowledgejunkie@gmail.com>",
+      "Renee <reb@perl-services.de>",
+      "Roy Storey <kiwiroy@users.noreply.github.com>",
+      "SebMourlhou <35918953+SebMourlhou@users.noreply.github.com>",
+      "Søren Lund <sl@keycore.dk>",
+      "Stephan Hradek <github@hradek.net>",
+      "Stephan Hradek <stephan.hradek@eco.de>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

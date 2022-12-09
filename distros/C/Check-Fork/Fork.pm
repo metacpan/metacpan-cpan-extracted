@@ -10,7 +10,7 @@ use Readonly;
 our $ERROR_MESSAGE;
 Readonly::Array our @EXPORT_OK => qw(check_fork $ERROR_MESSAGE);
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 sub check_fork {
 	my ($config_hr, $os) = @_;
@@ -196,6 +196,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

@@ -24,7 +24,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '0.74';
+our $VERSION = '0.75';
 
 require XSLoader;
 XSLoader::load('pEFL', $VERSION);
@@ -36,11 +36,11 @@ our $Debug = 0;
 
 1;
 __END__
-# Below is stub documentation for your module. You'd better edit it!
+
 
 =head1 NAME
 
-pEFL - Perl bindings for the Enlightenment Foundation Libraries
+pEFL - Perl binding to the Enlightenment Foundation Libraries
 
 =head1 SYNOPSIS
 
@@ -86,35 +86,35 @@ pEFL - Perl bindings for the Enlightenment Foundation Libraries
 
 =head1 DESCRIPTION
 
-Perl bindings for the Enlightenment Foundation Libraries (EFL). The module gives a nice object-oriented interface. Apart from that the API is deliberatly kept close to the Elementary API. The perl method names generally remove the prefix at the beginning of the c functions. Therefore applying the C documentation should be no problem. 
+This module provides a nice object-oriented interface to the L<Enlightenment Foundation Libraries (EFL)|https://www.enlightenment.org>. Apart from that the API is deliberately kept close to the Elementary C API. The Perl method names generally remove the prefix at the beginning of the C functions. Therefore applying the C documentation should be no problem. 
 
-For the documentation in detail please study the single modules and the documentation at https://www.enlightenment.org/docs/start
+For the documentation in detail please study the single modules and the L<C documentation|https://www.enlightenment.org/docs/start>
 
 =head1 SPECIFICS OF THE BINDING
 
-=head2 Perl specific variants of methods (_pv, "perl value"-methods)
+=head2 Perl specific variants of methods (_pv, "Perl Value"-methods)
 
-If a method returns an Eina_List there usually is a version with the suffix _pv (for perl value) that returns a perl array (for example in pEFL::Elm::List the method C<< items_get_pv() >>). It is recommended to use these perl adjusted methods. If you find a method, where the adaption is missing, please open an issue on github.
+If a method returns an C<Eina_List> there usually is a version with the suffix C<_pv> (for Perl Value) that returns a Perl array (for example in L<pEFL::Elm::List> the method C<< items_get_pv() >>). It is recommended to use these Perl adjusted methods. If you find a method, where the adaption is missing, please open an issue on L<github|https://github.com/MaxPerl/Perl-EFL>.
 
-Sometimes a method returns an EvasObject which can be any Elm Widget Type (e.g. C<< $nav->item_pop() >>, C<< $object->content_get >>, C<< $object_item->content_get() >>). In this case there will be a "perl value" version that tries to bless the returned variable to the appropriate perl class, too (e.g. C<< $naviframe->item_pop_pv() >>, C<< $object->[part_]content_get_pv() >>, C<< $object_item->[part_]content_get_pv() >>).
+Sometimes a method returns an C<EvasObject> which can be any Elm Widget Type (e.g. C<< $nav->item_pop() >>, C<< $object->content_get >>, C<< $object_item->content_get() >>). In this case there will be a "Perl Value"-version that tries to bless the returned variable to the appropriate Perl class, too (e.g. C<< $naviframe->item_pop_pv() >>, C<< $object->[part_]content_get_pv() >>, C<< $object_item->[part_]content_get_pv() >>).
 
 =head2 Output Parameters
 
-pEFL sometimes uses output parameters. See for example C<< void elm_calendar_min_max_year_get(Evas_Object *obj,int *min,int *max) >>, where you have to pass in C a pointer to max and min. In perl this is translated to C<< my ($min, $max) = $calendar->min_max_year_get(); >>. Sometimes the C function returns a status or similar as in C<< Eina_Bool elm_entry_cursor_geometry_get(Evas_Object *obj,int *x,int *y,int *w,int *h) >>. In Perl this status variable is given, too. So the function C<< elm_entry_cursor_geometry_get >> for example is translated into C<< my ($status,$x,$y,$w,$h) = $entry->cursor_geometry_get; >>.
+L<pEFL> sometimes uses output parameters. See for example C<< void elm_calendar_min_max_year_get(Evas_Object *obj,int *min,int *max) >>, where you have to pass in C a pointer to max and min. In Perl this is translated to C<< my ($min, $max) = $calendar->min_max_year_get() >>. Sometimes the C function returns a status or similar as in C<< Eina_Bool elm_entry_cursor_geometry_get(Evas_Object *obj,int *x,int *y,int *w,int *h) >>. In Perl this status variable is given, too. So the function C<< elm_entry_cursor_geometry_get >> for example is translated into C<< my ($status,$x,$y,$w,$h) = $entry->cursor_geometry_get >>.
 
 =head1 FUNCTIONS IN EFL
 
-The pEFL modules gives you the following functions:
+The L<pEFL> module gives you the following functions:
 
 =over 4
 
-=item pEFL::ev_info2s($ev_info) 
+=item C<< pEFL::ev_info2s($event_info) >> 
 
-if event info is a string, this function converts the void pointer to a perl string
+if C<$event_info> contains the address to a C string, this function converts the addressed C void pointer to a Perl string.
 
-=item pEFL::ev_info2obj($ev_info, "pEFL::Evas::Event::MouseUp")
+=item C<< pEFL::ev_info2obj($event_info, "pEFL::Evas::Event::MouseUp") >>
 
-if event info is a c stuct, this function converts the void pointer to a perl scalar, that is blessed to the given class. The perl class gives the necessary methods to get the members of the struc. At the moment the following c structs are (among others) supported:
+if C<$event_info> contains the address to a C struct, this function converts the addressed void pointer to a Perl scalar, that is blessed to the given class. The Perl class gives the necessary methods to get the members of the struct. At the moment the following C structs are (among others) supported:
 
 =over 8
 
@@ -160,33 +160,31 @@ if event info is a c stuct, this function converts the void pointer to a perl sc
 
 =back
 
-Some events pass an Elementary Widget or an Evas Object as event info. Of course you can use C<< ev_info2obj() >> to convert these pointers to a appropiate blessed perl scalar, too. See for instance examples/colorselector.pl, where the Elm Widget Itemq Elm_Colorselector_Palette_Item is passed as event_info. This must converted by C<< pEFL::ev_info2obj($ev_info, "pEFL::Elm::ColorselectorPaletteItem"); >> 
+Some events pass an Elementary Widget or an Evas Object as C<$event_info>. Of course you can use C<< ev_info2obj() >> to convert these pointers to a appropiate blessed Perl scalar, too. See for instance examples/colorselector.pl, where the Elm Widget Item Elm_Colorselector_Palette_Item is passed as C<$event_info>. This must converted by C<< pEFL::ev_info2obj($ev_info, "pEFL::Elm::ColorselectorPaletteItem"); >> 
 
-The provision of perl classes for event_info c structs is work in progress. If you need a specific binding for a c struct that is not supported at the moment, please send an issue report.
+The provision of Perl classes for event_info C structs is work in progress. If you need a specific binding for a C struct that is not supported at the moment, please send an issue report.
 
 =head1 STATE OF THE BINDING
 
-The perl binding is in an early development state. So things may change in the future and some functionalities are missing at the moment. Nevertheless especially the Elementary binding is very usable and complete.
+The Perl binding is in an early development state. So things may change in the future and some functionalities are missing at the moment. Nevertheless especially the Elementary binding is very usable and complete.
 
-If you miss something or find issues, please report it to github (see below). 
+If you miss something or find issues, please report it to L<Github|https://github.com/MaxPerl/Perl-EFL>. 
 
 =head1 WHY THE NAME "pEFL"
 
 Originally the name of the distribution was Efl. Unfortunately there was a conflict with the existing distribution EFL which isn't maintained any more and can't be compiled with newer versions of efl. Therefore the name pEFL was chosen whereby the "p" stands for "perl". 
 
-=head2 EXPORT
-
-None by default.
-
 =head1 SEE ALSO
 
-L<https://www.enlightenment.org/docs/start>
+L<Enlightenment Foundation Libraries|https://www.enlightenment.org/docs/start>
 
-L<https://github.com/MaxPerl/Perl-EFL>
+L<Perl-EFL Github Repository|https://github.com/MaxPerl/Perl-EFL>
+
+L<Caecilia.pl - a ABC notation editor using pEFL|https://github.com/MaxPerl/Perl-EFL>
 
 =head1 AUTHOR
 
-Maximilian Lika
+Maximilian Lika (perlmax@cpan.org)
 
 =head1 COPYRIGHT AND LICENSE
 

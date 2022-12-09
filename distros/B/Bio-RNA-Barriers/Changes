@@ -1,5 +1,8 @@
 Revision history for Bio-RNA-Barriers
 
-0.01    Date/time
-        First version, released on an unsuspecting world.
-
+0.03    2022-12-08
+        Added the LICENSE file to the manifest.
+0.02    2022-12-08
+        Added GPLv3 LICENSE file to the distribution.
+0.01    2021-12-13
+        Initial release.

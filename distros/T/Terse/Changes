@@ -1,5 +1,41 @@
 Revision history for Terse
 
-0.01    Date/time
-        First version, released on an unsuspecting world.
+0.110    [2022-12-09]
+	- Provide plugins and models connect callback with application context.
 
+0.109    [2022-12-09]
+	- Fixes Terse::Plugin connect callback.
+
+0.108    [2022-12-09]
+	- Adds Terse::Plugin to make code more reusable.
+
+0.107    [2022-12-09]
+	- Add basic support for custom headers and cookies.
+
+0.106    [2022-12-09]
+	- Add support for delayed responses to Terse and Terse::Controller.
+
+0.105    [2022-12-09]
+	- Add support for :path(any/(.*)/thing/(.*)/endpint) and :capture(2) to Terse::Controller's
+
+0.103    [2022-12-08]
+	- Add support for :path(any/(.*)/thing/(.*)/endpint) to Terse::Controllers
+
+0.103    [2022-12-08]
+	- Adds full restfullness to Terse::App with captured args aka # /app/211/testing/112/update.
+
+0.102    [2022-12-08]
+	- Adds Terse::View.
+
+0.101    [2022-12-08]
+	- Adds Terse::Model.
+
+0.09    [2022-12-08]
+	- Fix handling of booleans.
+
+0.08    [2022-12-08]
+	- Tidy Terse::Controller API
+
+0.07    [2022-12-08]
+	- Adds support for custom dispatchers.
+	- Adds Terse::Controller

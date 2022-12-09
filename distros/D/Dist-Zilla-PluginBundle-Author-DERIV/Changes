@@ -1,6 +1,9 @@
 Revision history for Dist-Zilla-PluginBundle-Author-DERIV
 
-0.004     2022-09-29 00:15:58+00:00 UTC
+0.005     2022-12-09 14:13:38+00:00 UTC
+    add exclude_filename option to exclude some more files by Git::GatherDir
+
+0.004     2022-09-28 11:51:02+00:00 UTC
     fix bump version problem
 
 0.003     2022-04-19 08:33:08+08:00 Asia/Shanghai

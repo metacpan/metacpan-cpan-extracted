@@ -73,7 +73,7 @@ EXAMPLE2
      # We could use fork and socket communication.
 
 DEPENDENCIES
-    Config, Exporter, IO::Socket, Readonly.
+    Config, Exporter, Readonly, Socket.
 
 SEE ALSO
     Check::Fork
@@ -93,5 +93,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.02
+    0.04
 

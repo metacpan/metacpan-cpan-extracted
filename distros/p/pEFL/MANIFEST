@@ -240,6 +240,8 @@ lib/pEFL/Elm/Spinner.pm
 lib/pEFL/Elm/Spinner.xs
 lib/pEFL/Elm/Table.pm
 lib/pEFL/Elm/Table.xs
+lib/pEFL/Elm/Theme.pm
+lib/pEFL/Elm/Theme.xs
 lib/pEFL/Elm/Toolbar.pm
 lib/pEFL/Elm/Toolbar.xs
 lib/pEFL/Elm/ToolbarItem.pm

@@ -46,26 +46,26 @@
    "provides" : {
       "Bio::RNA::Treekin" : {
          "file" : "lib/Bio/RNA/Treekin.pm",
-         "version" : "0.03"
+         "version" : "0.05"
       },
       "Bio::RNA::Treekin::MultiRecord" : {
          "file" : "lib/Bio/RNA/Treekin/MultiRecord.pm",
-         "version" : "0.03"
+         "version" : "0.05"
       },
       "Bio::RNA::Treekin::PopulationDataRecord" : {
          "file" : "lib/Bio/RNA/Treekin/PopulationDataRecord.pm",
-         "version" : "0.03"
+         "version" : "0.05"
       },
       "Bio::RNA::Treekin::Record" : {
          "file" : "lib/Bio/RNA/Treekin/Record.pm",
-         "version" : "0.03"
+         "version" : "0.05"
       },
       "IO::File::RecordStream" : {
          "file" : "lib/IO/File/RecordStream.pm",
-         "version" : "0.03"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
-   "version" : "0.03",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 2.27400"
 }

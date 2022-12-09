@@ -13,6 +13,7 @@
 typedef Evas_Object ElmObject;
 typedef Elm_Object_Item ElmObjectItem;
 typedef Evas_Object EvasObject;
+typedef Elm_Theme ElmTheme;
 
 MODULE = pEFL::Elm::Object		PACKAGE = ElmObjectPtr	   PREFIX = elm_object_
 
@@ -38,6 +39,17 @@ char *
 elm_object_part_text_get(obj,part)
 	const EvasObject *obj
 	const char *part
+
+
+void
+elm_object_focus_allow_set(obj,focus)
+	EvasObject *obj
+	Eina_Bool focus
+
+
+Eina_Bool
+elm_object_focus_allow_get(obj)
+	const EvasObject *obj
 
 
 void
@@ -428,4 +440,18 @@ elm_object_scroll_item_loop_enabled_set(obj,enable)
 
 Eina_Bool
 elm_object_scroll_item_loop_enabled_get(obj)
+	const EvasObject *obj
+	
+###############
+# from elm_theme.h
+##############
+
+void
+elm_object_theme_set(obj,th)
+	EvasObject *obj
+	ElmTheme *th
+
+
+ElmTheme *
+elm_object_theme_get(obj)
 	const EvasObject *obj

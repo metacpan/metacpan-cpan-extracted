@@ -5,6 +5,7 @@ author:
 build_requires:
   Config: 0
   ExtUtils::MakeMaker: 6.59
+  Socket: 0
   Test::More: 0
   Test::NoWarnings: 0
 configure_requires:
@@ -26,12 +27,12 @@ no_index:
 requires:
   Config: 0
   Exporter: 0
-  IO::Socket: 0
   Readonly: 0
+  Socket: 0
   perl: 5.6.2
 resources:
   bugtracker: https://github.com/michal-josef-spacek/Check-Socket/issues
   homepage: https://github.com/michal-josef-spacek/Check-Socket
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Check-Socket
-version: '0.02'
+version: '0.04'

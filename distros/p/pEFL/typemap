@@ -90,6 +90,8 @@ ElmSlider * 						T_EVAS_OBJECT
 const ElmSlider *					T_EVAS_OBJECT
 ElmSpinner *						T_EVAS_OBJECT
 const ElmSpinner *					T_EVAS_OBJECT
+ElmTheme *							T_EVAS_OBJECT
+const ElmTheme *					T_EVAS_OBJECT
 ElmToolbar *						T_EVAS_OBJECT
 const ElmToolbar *					T_EVAS_OBJECT
 ElmToolbarItem *					T_EVAS_OBJECT

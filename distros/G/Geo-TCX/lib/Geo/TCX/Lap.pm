@@ -2,7 +2,7 @@ package Geo::TCX::Lap;
 use strict;
 use warnings;
 
-our $VERSION = '1.04';
+our $VERSION = '1.05';
 our @ISA=qw(Geo::TCX::Track);
 
 =encoding utf-8
@@ -618,7 +618,7 @@ Patrick Joly
 
 =head1 VERSION
 
-1.04
+1.05
 
 =head1 SEE ALSO
 

@@ -31,7 +31,7 @@ $user->AddCustomFieldValue(Field => $cf_conditioned_by_child->id , Value => 'See
 
 my ($base, $m) = RT::Extension::ConditionalCustomFields::Test->started_ok;
 my $mjs = WWW::Mechanize::PhantomJS->new();
-$mjs->driver->ua->timeout(540);
+$mjs->driver->ua->timeout(600);
 $mjs->get($m->rt_base_url . '?user=root;pass=password');
 
 $mjs->get($m->rt_base_url . 'User/Summary.html?id=' . $user->id);

@@ -13,12 +13,12 @@ typedef Eo EvasCanvas;
 typedef Evas_Object EvasObject;
 typedef Eina_List EinaList;
 
-
-MODULE = pEFL::Evas::Canvas		PACKAGE = EvasCanvasPtr     PREFIX = evas_
+MODULE = pEFL::Evas::Canvas		PACKAGE = pEFL::Evas::Canvas     
 
 EvasCanvas *
 evas_new()
 
+MODULE = pEFL::Evas::Canvas		PACKAGE = EvasCanvasPtr     PREFIX = evas_
 
 EvasObject *
 evas_object_bottom_get(obj)

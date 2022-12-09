@@ -15,7 +15,7 @@ use base qw(DBIx::SearchBuilder::Handle);
 
 =head1 DESCRIPTION
 
-This module provides a subclass of DBIx::SearchBuilder::Handle that 
+This module provides a subclass of DBIx::SearchBuilder::Handle that
 compensates for some of the idiosyncrasies of SQLite.
 
 =head1 METHODS
@@ -77,13 +77,13 @@ sub Insert  {
 
     warn "$self no row id returned on row creation" unless ($self->{'id'});
     return( $self->{'id'}); #Add Succeded. return the id
-  }
+}
 
 
 
-=head2 CaseSensitive 
+=head2 CaseSensitive
 
-Returns undef, since SQLite's searches are not case sensitive by default 
+Returns undef, since SQLite's searches are not case sensitive by default
 
 =cut
 
@@ -92,7 +92,7 @@ sub CaseSensitive {
     return(1);
 }
 
-sub BinarySafeBLOBs { 
+sub BinarySafeBLOBs {
     return undef;
 }
 

@@ -35,7 +35,7 @@ DBIx::SearchBuilder::Unique - Ensure uniqueness of records in a collection
     my $collection = Foo::Collection->New();
     $collection->SetupComplicatedJoins;
     $collection->OrderByMagic;
-    
+
     while (my $thing = $collection->Next) {
         # $thing is going to be distinct
     }

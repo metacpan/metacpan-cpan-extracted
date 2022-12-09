@@ -36,7 +36,7 @@ SYNOPSIS
 VERSION
 =======
 
-        v0.1.3
+        v0.2.4
 
 DESCRIPTION
 ===========
@@ -60,7 +60,7 @@ Also, there is a script in `scripts` that can be used to transcode `.po`
 or `mo` files into json format and vice versa.
 
 CONSTRUCTOR
------------
+===========
 
 new
 ---
@@ -548,7 +548,7 @@ Takes a meta field name and sets or gets its value.
 AUTHOR
 ======
 
-Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x56303c9d3578)"}\>
+Jacques Deguest \<`jack@deguest.jp`{classes="ARRAY(0x5555a1bf3230)"}\>
 
 SEE ALSO
 ========

@@ -44,7 +44,14 @@ SKIP: {
     );
 
     while ( my $user = $users->Next ) {
-        is $user->__Value( $column ), $user->Result;
+        if ( defined $user->Result ) {
+            # Use an explicit numeric compare rather than 'is' to
+            # work around values like 90061.000000 returned in Pg 14+
+            ok( $user->__Value($column) == $user->Result );
+        }
+        else {
+            ok( !defined $user->__Value($column) );
+        }
     }
 
     $users = TestApp::Users->new( $handle );
@@ -57,7 +64,14 @@ SKIP: {
     );
 
     while ( my $user = $users->Next ) {
-        is $user->__Value( $column ), $user->Result;
+        if ( defined $user->Result ) {
+            # Use an explicit numeric compare rather than 'is' to
+            # work around values like 90061.000000 returned in Pg 14+
+            ok( $user->__Value($column) == $user->Result );
+        }
+        else {
+            ok( !defined $user->__Value($column) );
+        }
     }
 
     cleanup_schema( 'TestApp', $handle );

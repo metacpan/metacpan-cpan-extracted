@@ -4,7 +4,7 @@ package Dist::Zilla::PluginBundle::Author::DERIV;
 use strict;
 use warnings;
 
-our $VERSION = '0.004';
+our $VERSION = '0.005';
 our $AUTHORITY = 'cpan:DERIV'; # AUTHORITY
 
 =head1 NAME
@@ -57,12 +57,19 @@ has allow_dirty => (
     default => sub {shift->payload->{allow_dirty} // [] },
 );
 
-sub mvp_multivalue_args{ qw(allow_dirty) }
+has exclude_filename => (
+    is     => 'ro',
+    lazy   => 1,
+    default => sub {shift->payload->{exclude_filename} // [] },
+);
+
+
+sub mvp_multivalue_args{ qw(allow_dirty exclude_filename) }
 
 sub configure {
     my $self = shift;
     my @copy_from_build     = qw(LICENSE Makefile.PL);
-    my @gather_exclude      = (@copy_from_build, qw(README.md));
+    my @gather_exclude      = (@copy_from_build, qw(README.md), @{$self->exclude_filename});
     my @no_index            = qw(eg share shares t xt);
     my @allow_dirty         = (@copy_from_build, @{$self->allow_dirty}, qw(Changes LICENSE README.md));
     my @git_remotes         = qw(github origin);

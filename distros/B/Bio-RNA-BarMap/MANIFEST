@@ -6,8 +6,8 @@ lib/Bio/RNA/BarMap/Mapping/FileMappingEntry.pm
 lib/Bio/RNA/BarMap/Mapping/MinMappingEntry.pm
 lib/Bio/RNA/BarMap/Mapping/Set.pm
 lib/Bio/RNA/BarMap/Mapping/Type.pm
+LICENSE
 MANIFEST			This list of files
-MANIFEST.SKIP
 META.json
 META.yml
 README

@@ -1,6 +1,6 @@
 # Bio/RNA/Treekin/MultiRecord.pm
 package Bio::RNA::Treekin::MultiRecord;
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use 5.006;
 use strict;

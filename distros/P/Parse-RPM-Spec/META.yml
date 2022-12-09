@@ -17,7 +17,7 @@ name: Parse-RPM-Spec
 provides:
   Parse::RPM::Spec:
     file: lib/Parse/RPM/Spec.pm
-    version: v1.0.3
+    version: v1.1.0
 requires:
   Moose: '0'
   perl: v5.6.0
@@ -25,5 +25,5 @@ resources:
   bugtracker: https://github.com/davorg/parse-rpm-spec/issues
   license: http://dev.perl.org/licenses/
   repository: git://github.com/davorg/parse-rpm-spec.git
-version: v1.0.3
+version: v1.1.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

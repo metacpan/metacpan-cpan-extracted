@@ -19,16 +19,16 @@ name: Bio-RNA-Barriers
 provides:
   Bio::RNA::Barriers:
     file: lib/Bio/RNA/Barriers.pm
-    version: '0.01'
+    version: '0.03'
   Bio::RNA::Barriers::Minimum:
     file: lib/Bio/RNA/Barriers/Minimum.pm
-    version: '0.01'
+    version: '0.03'
   Bio::RNA::Barriers::RateMatrix:
     file: lib/Bio/RNA/Barriers/RateMatrix.pm
-    version: '0.01'
+    version: '0.03'
   Bio::RNA::Barriers::Results:
     file: lib/Bio/RNA/Barriers/Results.pm
-    version: '0.01'
+    version: '0.03'
 requires:
   File::Spec: '3.75'
   IPC::System::Simple: '1.25'
@@ -39,5 +39,5 @@ requires:
   Scalar::Util: '1.5'
   autodie: '2.29'
   namespace::autoclean: '0.28'
-version: '0.01'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

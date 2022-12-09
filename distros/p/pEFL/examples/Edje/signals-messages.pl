@@ -116,11 +116,7 @@ sub on_mouse_over {
 	my @colors = $msg->val();
 	print "RGB @colors\n";
 	
-	my $str = "Hello";
-	my $str2 = "World";
-	my $str3 = "frim Perl";
-	#my @str = ($str, $str2,$str3);
-	my @str = ("Hello", "Wordl", "from Perl", "DU ", "PFEIFE", "ARSCH", "DEPP", "PENN", "GEHTS NOCH");
+	my @str = ("Hello", "World", "from Perl");
 	my $str_msg = pEFL::Edje::Message::StringSet->new(@str);
 	my @strings = $str_msg->str();
 	print "STRINGS @strings\n";
@@ -132,7 +128,6 @@ sub on_mouse_over {
 	#my $sstr_msg = pEFL::Edje::Message::String->new("Hello World");
 	#my $s = $sstr_msg->str();
 	#print "STRING $s\n";
-	
 	
 	$edje_obj->message_send(EDJE_MESSAGE_INT_SET,$msg_color,$msg);
 }

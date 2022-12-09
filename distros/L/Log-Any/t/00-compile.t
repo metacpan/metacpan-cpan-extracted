@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 17 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 18 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Log/Any.pm',
@@ -25,6 +25,7 @@ my @module_files = (
     'Log/Any/Proxy.pm',
     'Log/Any/Proxy/Null.pm',
     'Log/Any/Proxy/Test.pm',
+    'Log/Any/Proxy/WithStackTrace.pm',
     'Log/Any/Test.pm'
 );
 

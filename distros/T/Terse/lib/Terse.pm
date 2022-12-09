@@ -1,5 +1,5 @@
 package Terse;
-our $VERSION = '0.04';
+our $VERSION = '0.110';
 use 5.006;
 use strict;
 use warnings;
@@ -16,7 +16,7 @@ BEGIN {
 	$JSON = JSON->new->utf8->canonical(1)->allow_blessed->convert_blessed;
 	%PRIVATE = (
 		map { $_ => 1 } 
-		qw/new run logger logInfo logError raiseError graft pretty serialize DESTROY TO_JSON AUTOLOAD/
+		qw/new run logger logInfo logError delayed_response content_type raiseError graft pretty serialize DESTROY TO_JSON AUTOLOAD/
 	);
 }
 
@@ -43,12 +43,13 @@ sub run {
 		logout => 'logout',
 		auth => 'auth',
 		insecure_session => 0,
+		content_type => 'application/json',
 		%args
 	);
 
 	$j->request = Plack::Request->new($args{plack_env});
 	$j->response = $pkg->new(
-		authenticated => 0,
+		authenticated => \0,
 		error => \0,
 		errors => [],
 	);
@@ -58,6 +59,12 @@ sub run {
 		return $j->_response($j->response);
 	}
 
+	$j->{_application}->build_terse($j) if $j->{_application}->can('build_terse');
+
+	$j->{_application_has_dispatcher} = !! $j->{_application}->can('dispatch');
+	$j->{_application_has_response_handler} = !! $j->{_application}->can('response_handle');
+	$j->{_application_has_delayed_response_handler} = !! $j->{_application}->can('delayed_response_handle');
+	
 	my $content_type = $j->request->content_type;
 	if ($content_type && $content_type =~ m/application\/json/) {
 		$j->graft('params', $j->request->raw_body || "{}");
@@ -82,10 +89,17 @@ sub run {
 		$j->sid = $h->hexdigest;
 	}
 
+	$j->sid = {
+		value => $j->is_logout ? "" : $j->sid,
+		path  => $j->request->uri,
+		secure => !$j->{_insecure_session},
+	};
+
 	my $auth = $j->{_auth};
-	my $session = $j->{_application}->$auth($j, $pkg->new());
+	my ($session) = $j->_dispatch($auth, $pkg->new());
 	my $req = $j->params->req;
 	$req =~ /^([a-z][0-9a-zA-Z_]{1,31})$/; $req = $1 // '';
+	$req = $j->{_application}->preprocess_req($req, $j) if $j->{_application}->can('preprocess_req');
 	if (!$req || !$session || $PRIVATE{$req}) {
 		$j->response->raiseError('Invalid request', 400);
 		return $j->_response($j->response);
@@ -94,47 +108,100 @@ sub run {
 	$j->response->authenticated = \1;
 	$j->session = $session;
 
-	unless ($j->{_application}->can($req)) {
-		$j->response->raiseError('Invalid request', 400);
-		return $j->_response($j->response);
-	}
+	$j->sid->expires = (ref $j->session && $j->session->expires) || (time + 24 * 60 * 60) 
+		if (!$j->sid->expires);
 
-	my ($login, $logout) = (
+	($j->is_login, $j->is_logout) = (
 		$j->{_login} eq $req,
 		$j->{_logout} eq $req
 	);
 
-	my $out = eval { $j->{_application}->$req($j) };
-	if ($@) {
-		$j->response->raiseError(['Unclassified Error', $@], 400);
-		return $j->_response($j->response);
-	}
-	$j->session = $out if ( $login || $logout );
+	my ($out) = $j->_dispatch($req); 
+	
+	return $j->_response($j->response) if $j->response->error;
 
-	$j->session = $j->{_application}->$auth($j, $j->session) if $j->response->authenticated;
+	$j->session = $out if ( $j->is_login || $j->is_logout );
 
-	if ((!$j->response->authenticated || !$j->session) && !($login || $logout)) {
+	($j->session) = $j->_dispatch($auth, $j, $j->session)  if $j->response->authenticated;
+
+	if ((!$j->response->authenticated || !$j->session) && !($j->is_login || $j->is_logout)) {
 		$j->response->raiseError('Unauthenticated during the request', 400);
 		return $j->_response($j->response);
 	}
 
-	my $cookie = {
-		value => $logout ? "" : $j->sid,
-		path  => $j->request->uri,
-		secure => !$j->{_insecure_session},
-		expires => $logout ? time : ((ref $j->session && $j->session->expires) || time + 24 * 60 * 60),
-	};
+	return $j->_response($j->response, $j->content_type, $j->sid);
+}
 
-	return $j->_response($j->response, $cookie);
+sub _build_response {
+	my ($self, $sid, $content, $status) = @_;
+	my $res = $self->request->new_response($self->response->{status_code} ||= $status);
+	$res->cookies($self->cookies) if $self->cookies;
+	$res->headers($self->headers) if $self->headers;
+	$res->cookies->{sid} = $sid if $sid;
+	$res->content_type($content);
+	return $res;
+}
+
+sub delayed_response {
+	my ($self, $response, $sid, $ct, $status) = @_;
+	$sid ||= $self->sid;
+	$status ||= 200;
+	$ct ||= 'application/json';
+	return $self->{_application}->delayed_response_handle(
+		$self, $response, $sid, $ct, $status
+	) if $self->{_application_has_delayed_response_handler};
+	$self->{_delayed_response} = sub {
+		my $responder = shift;
+		my $res = $self->_build_response($sid, $ct, $status);
+		$res = [splice @{$res->finalize}, 0, 2];
+		my $writer = $responder->($res);
+		$response = eval { $response->($writer); };
+		if ($@ || $self->response->error) {
+			$res->[0] = $self->response->status_code || 500;
+			$self->raiseError($@) if $@;
+			push @{$res}, [$self->response->serialize];
+			return $responder->($res);
+		}
+		elsif ($response) {
+			$writer->write($response->serialize);
+		}
+		$writer->close;
+	};
+	return $self;
+}
+
+sub content_type { 
+	$_[0]->{_content_type} = $_[1] if $_[1];
+	return $_[0]->{_content_type};
 }
 
 sub _response {
-	my ($self, $response_body, $cookie, $status) = @_;
-	my $res = $self->request->new_response($response_body->status_code ||= $status ||= 200);
-	$res->cookies->{sid} = $cookie if $cookie;
-	$res->content_type('application/json');
+	my ($self, $response_body, $sid, $ct, $status) = @_;
+	return $self->{_application}->response_handle(@_) if $self->{_application_has_response_handler};
+	$ct ||= 'application/json';
+	my $res = $self->{_delayed_response};
+	return $res if ($res); 
+	$res = $self->_build_response($sid, $ct, $status);
 	$res->body($response_body->serialize());
 	return $res->finalize;
+}
+
+sub _dispatch {
+	my ($self, $method, @params) = @_;
+	my @out = $self->{_application_has_dispatcher} ? eval {
+		$self->{_application}->dispatch($method, $self, @params)
+	} : eval {
+		unless ($self->{_application}->can($method)) {
+			$self->response->raiseError('Invalid request', 400);
+			return;
+		}
+		$self->{_application}->$method($self, @params);
+	};
+	if ($@) {
+		$self->response->raiseError(['Error while dispatching the request', $@], 400);
+		return;
+	}
+	return @out;
 }
 
 sub logger {
@@ -241,7 +308,7 @@ sub AUTOLOAD : lvalue {
 	my $retval = $_[0]->{$key};
 	return $retval->(@_) if (ref $retval eq 'CODE');
 	my $isBool = Want::want('SCALAR BOOL') && ((reftype($retval) // '') eq 'SCALAR');
-	$retval = $$retval if $isBool;
+	return $$retval if $isBool;
 	$_[0]->{$key} = $_[1] // $retval // $miss;
 	$_[0]->_bless_tree($_[0]->{$key}) if ref $_[0]->{$key} eq 'HASH' || ref $_[0]->{$key} eq 'ARRAY';
 	$_[0]->{$key};
@@ -253,11 +320,11 @@ __END__
 
 =head1 NAME
 
-Terse - lightweight JSON APIs.
+Terse - Lightweight Web Framework
 
 =head1 VERSION
 
-Version 0.04
+Version 0.110
 
 =cut
 
@@ -282,6 +349,21 @@ Version 0.04
 		}
 
 		$t->response->hello = "world";
+	}
+
+	sub delayed_hello_world {
+		my ($self, $t) = @_;
+		$t->delayed_response(sub {
+			if ($t->params->throw_error) {
+				$t->logError('throw 500 error which is also logged', 500);
+				return;
+			}
+
+			... do something which takes a long time ...
+
+			$t->response->hello = "world";
+			return $t->response;
+		});
 	}
 
 	.... MyAPI.psgi ...
@@ -310,7 +392,7 @@ Version 0.04
 
 	plackup MyAPI.psgi
 
-	GET http://localhost:5000/?req=hello_world
+	GET http://localhost:5000/?req=delayed_hello_world
 	# {"authenticated":1,"error":false,"errors":[],"hello":"world","status_code":200}
 	GET http://localhost:5000/?req=hello_world&not=1 
 	# {"authenticated":0,"error":true,"errors":["Invalid request"],"status_code":400}
@@ -375,6 +457,7 @@ Returns the Plack::Request.
 	$terse->request;
 
 =cut
+
 
 =head2 session
 
@@ -447,6 +530,17 @@ Set JSON to pretty print mode.
 Encode a perl struct as a JSON string.
 
 	$terse->serialize({ ... });
+
+=cut
+
+=head2 delayed_response
+
+Delay the response for non-blocking I/O based server streaming or long-poll Comet push technology.
+
+	$terse->delayed_response(sub {
+		$terse->response->test = 'okay';
+		return $terse->response;
+	});
 
 =cut
 

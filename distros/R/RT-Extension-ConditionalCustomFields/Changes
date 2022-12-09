@@ -1,5 +1,9 @@
 Revision history for RT-Extension-ConditionalCustomFields
 
+1.05 2022-12-08
+ - Add a second ticket in tests so ticket id is distinct from queue id
+ - Fix checking whether condition cf is applied to current object
+
 1.04 2019-12-19
  - Add SelfServiceCustomFieldGroupings configuration variable to allow cfs groupings in SelfService
 

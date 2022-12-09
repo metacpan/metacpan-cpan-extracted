@@ -159,7 +159,7 @@ is($o->lap(5)->TotalTimeSeconds, 417.34,    "   merge_laps(): test lap aggregate
 # activity_to_course()
 
 my $course;
-$course = $o->activity_to_course(lap => 2, filename => 'my-acadian-day-test.tcx', course_name => 'Bromont-Acadian', work_dir => '/tmp');
+$course = $o->activity_to_course(lap => 2, filename => 'my-acadian-day-test.tcx', course_name => 'Bromont-Acadian', work_dir => $tmp_dir );
 isa_ok($course, 'Geo::TCX');
 is($course->lap(1)->is_course,   1,         "    is_course()");
 $course->save_laps(force => 1);

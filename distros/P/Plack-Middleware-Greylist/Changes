@@ -1,5 +1,9 @@
 Revision history for Plack-Middleware-Greylist
 
+v0.3.4    2022-12-08 13:33:03+00:00 Europe/London
+  [Other]
+  - Fixed typo in git repository URL, GH#2, thanks @szabgab.
+
 v0.3.3    2022-12-07 17:01:40+00:00 Europe/London
   [Enhancements]
   - Remove use of blessed pairs, which allows List::Util to be downgraded.

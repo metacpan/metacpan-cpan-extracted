@@ -1,5 +1,12 @@
 Revision history for perl distribution Mojo-IRC
 
+0.47 2022-12-09T10:16:04
+ - Removed deprecated method track_any()
+ - Passthrough ctcpreply events from Parse::IRC #32
+   Contributor: Dominik Hassler
+ - Text for NOTICE is in the second param #33
+   Contributor: Dan Book
+
 0.46 2020-02-16
  - Fix insecure option for Mojolicious 9.0
  - Add write_p method returning a Mojo::Promise

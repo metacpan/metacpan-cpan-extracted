@@ -1,5 +1,5 @@
 package Bio::RNA::BarMap::Mapping;
-our $VERSION = '0.02';
+our $VERSION = '0.04';
 
 use 5.012;
 use warnings;

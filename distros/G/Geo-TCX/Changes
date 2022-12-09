@@ -1,5 +1,8 @@
 Revision history for Geo-TCX
 
+1.05 [2022-12-07]
+    Fixed bugs in the parsing of paths on MSWin32
+
 1.04 [2022-12-03]
     Removed Geo::Calc from dependencies
 
@@ -15,17 +18,16 @@ Revision history for Geo-TCX
     Ignore Extensions tags in Trackpoints (may be supported later if a need is identified)
 
 1.02 [2022-10-27]
-    Geo::Gpx::Trackpoint->DistanceMeters():
+    Geo::TCX::Trackpoint->DistanceMeters():
         - new accessor to get (but not set) the value of the DistanceMeters key
         - removed DistanceMeters from the list of AUTOLOAD'ables
 
     Require version 1.44 of DateTime for the stringify() method
 
 1.01 [2022-10-13]
-    Fixed bug in 01_main.t test file
-    Changed time- and distance-related methods in Geo::GPX::Trackpoint
+    Changed time- and distance-related methods in Geo::TCX::Trackpoint
         - new Time() and time_datetime() accessors
-        - most time-related functions rename time_*
+        - most time-related functions renamed time_*
 
 1.00 [2022-10-10]
     Added module to CPAN

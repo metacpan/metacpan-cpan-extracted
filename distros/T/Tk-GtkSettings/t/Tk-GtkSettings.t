@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 21;
+use Test::More tests => 20;
 use File::Copy;
 sub compare_files;
 
@@ -54,8 +54,8 @@ my @groups = groupAll;
 @groups = sort @groups;
 ok ((($groups[0] eq 'content') and ($groups[1] eq 'list') and ($groups[2] eq 'main')), "Groups set");
 
-my $size = gtkKeyAll;
-ok (($size eq 83), "Gtk info loaded");
+# my $size = gtkKeyAll;
+# ok (($size eq 83), "Gtk info loaded");
 
 my $color1 = alterColor('#000000', 1);
 ok (($color1 eq '#010101'), 'Alter color');

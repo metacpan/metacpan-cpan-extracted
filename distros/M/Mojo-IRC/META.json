@@ -4,7 +4,7 @@
       "Jan Henning Thorsen <jhthorsen@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.58, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -16,12 +16,16 @@
    "no_index" : {
       "directory" : [
          "t",
-         "inc"
+         "inc",
+         "examples",
+         "t"
       ]
    },
    "prereqs" : {
       "build" : {
-         "requires" : {}
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
       },
       "configure" : {
          "requires" : {
@@ -32,9 +36,10 @@
          "requires" : {
             "IRC::Utils" : "0.12",
             "List::Util" : "1.33",
-            "Mojolicious" : "7.54",
+            "Mojolicious" : "8.00",
             "Parse::IRC" : "1.20",
-            "Unicode::UTF8" : "0.59"
+            "Unicode::UTF8" : "0.59",
+            "perl" : "5.016"
          }
       },
       "test" : {
@@ -49,12 +54,20 @@
          "web" : "https://github.com/jhthorsen/mojo-irc/issues"
       },
       "homepage" : "https://github.com/jhthorsen/mojo-irc",
+      "license" : [
+         "http://www.opensource.org/licenses/artistic-license-2.0"
+      ],
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/jhthorsen/mojo-irc.git",
          "web" : "https://github.com/jhthorsen/mojo-irc"
+      },
+      "x_IRC" : {
+         "url" : "irc://irc.libera.chat/#convos",
+         "web" : "https://web.libera.chat/#convos"
       }
    },
-   "version" : "0.46",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.47",
+   "x_contributors" : [],
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

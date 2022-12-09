@@ -16,15 +16,6 @@ static OP *S_newAELEMOP(pTHX_ U32 flags, OP *first, I32 key)
   return newBINOP(OP_AELEM, flags, first, newSVOP(OP_CONST, 0, newSViv(key)));
 }
 
-#define newPADxVOP(type, padix, flags, private)  S_newPADxVOP(aTHX_ type, padix, flags, private)
-static OP *S_newPADxVOP(pTHX_ I32 type, PADOFFSET padix, I32 flags, U32 private)
-{
-  OP *op = newOP(type, flags);
-  op->op_targ = padix;
-  op->op_private = private;
-  return op;
-}
-
 #if HAVE_PERL_VERSION(5, 22, 0)
 #  define HAVE_UNOP_AUX
 #endif
@@ -78,5 +69,16 @@ static OP *S_newMETHOD_REDIR_OP(pTHX_ SV *rclass, SV *methname, I32 flags)
     newSVOP(OP_CONST, 0, newSVpvf("%" SVf "::%" SVf, rclass, methname)));
 #endif
 
+  return op;
+}
+
+/* If `@_` is called "snail", then elements of it can be called "slugs"; i.e.
+ * snails without their container
+ */
+#define newSLUGOP(idx)  S_newSLUGOP(aTHX_ idx)
+static OP *S_newSLUGOP(pTHX_ int idx)
+{
+  OP *op = newGVOP(OP_AELEMFAST, 0, PL_defgv);
+  op->op_private = idx;
   return op;
 }

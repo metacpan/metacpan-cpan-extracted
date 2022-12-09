@@ -254,6 +254,7 @@ sub display ($;%) {
 
     foreach my $fdata (@{$fields}) {
         my $name=$fdata->{'name'};
+        my $param=$fdata->{'param'} || uc($name);
 
         my $cgivalue=$cgi->param($name);
         $have_cgivalues++ if defined($cgivalue);
@@ -304,9 +305,9 @@ sub display ($;%) {
             # No checks for textarea
         }
         elsif($style eq 'file') {
-	    if(!$value) {
-		$newerr=$self->Tx("No filename given");
-	    }
+            if(!$value) {
+                $newerr=$self->Tx("No filename given");
+            }
         }
         elsif($style eq 'email') {
             if(length($value) && $value !~ /^[\w\.\+\/\$\%\&\`{}'=-]+\@([a-z0-9-]+\.)+[a-z]+$/i) {
@@ -523,9 +524,98 @@ sub display ($;%) {
             $newerr = '';
         }
 
-        # Generating HTML for some field styles.
+        # Adding error description to the list if there was an
+        # error. Storing value otherwise.
         #
+        if($newerr) {
+            $errstr.=($fdata->{'text'} || $name) .  ": " . $newerr . "<br />\n";
+            $fdata->{'errstr'}=$newerr;
+        }
+        else {
+            $fdata->{'value'}=$value;
+        }
+
+        $fdata->{'rawvalue'}=$value;
+
+        # Filling formparams hash
+        #
+        $formparams{"$param.VALUE"}=defined($value) ? $value : "";
+        $formparams{"$param.TEXT"}=$fdata->{'text'} || $name;
+        $formparams{"$param.NAME"}=$name;
+        $formparams{"$param.REQUIRED"}=$fdata->{'required'} ? 1 : 0;
+        $formparams{"$param.SIZE"}=$fdata->{'size'} || 30;
+        $formparams{"$param.ROWS"}=$fdata->{'rows'} || 1;
+        $formparams{"$param.MAXLENGTH"}=$fdata->{'maxlength'} || 100;
+        $formparams{"$param.MINLENGTH"}=$fdata->{'minlength'} || 0;
+        $formparams{"$param.ERRSTR"}=$fdata->{'errstr'} || '';
+    }
+
+    # Checking content for general compatibility by overriden
+    # method. Called only if data are basicly good.
+    #
+    if($have_submit && $have_cgivalues && !$errstr) {
+        my @rc=$self->check_form(merge_refs($args,\%formparams));
+        if(@rc<2) {
+            $formparams{"ERRSTR.CHECK_FORM"}=$errstr=($rc[0] || '');
+        }
+        elsif(scalar(@rc)%2 == 0) {
+            for(my $i=0; $i<@rc; $i+=2) {
+                my $e=($rc[$i] || '');
+                next unless $e;
+                my $fname=$rc[$i+1];
+                if($fname) {
+                    my $fdata=$self->field_desc($fname);
+                    my $param=$fdata->{'param'} || uc($fdata->{'name'});
+
+                    if($fdata->{'errstr'}) {
+                        $fdata->{'errstr'}.=($fdata->{'errstr'} =~ /\.\s*$/ ? ' ' : '; ') . $e;
+                        $formparams{"$param.ERRSTR"}=$fdata->{'errstr'};
+                    }
+                    else {
+                        $fdata->{'errstr'}=$formparams{"$param.ERRSTR"}=$e;
+                    }
+
+                    $errstr.="\n<br />" if $errstr;
+                    $errstr.=$e;
+                }
+                else {
+                    $errstr.="\n<br />" if $errstr;
+                    $formparams{'ERRSTR.CHECK_FORM'}.="\n<br />" if $errstr;
+                    $errstr.=$e;
+                    $formparams{'ERRSTR.CHECK_FORM'}.=$e;
+                }
+            }
+        }
+        else {
+            throw $self "display - wrong number of results (".join('|',@rc).")";
+        }
+    }
+    $formparams{"ERRSTR.CHECK_FORM"}||='';
+
+    # If the form is not filled at all we remove errstr's from
+    # individual fields.
+    #
+    if(!$have_submit || !$have_cgivalues) {
+        $errstr='';
+        foreach my $fdata (@{$fields}) {
+            my $param=$fdata->{'param'} || uc($fdata->{'name'});
+            $formparams{"$param.ERRSTR"}='';
+        }
+    }
+
+    # Building form element HTML values. Need to do this after error
+    # checking, because the element HTML might be reliant on error
+    # checking status.
+    #
+    foreach my $fdata (@{$fields}) {
+        my $name=$fdata->{'name'};
         my $param=$fdata->{'param'} || uc($name);
+
+        my $value=$fdata->{'rawvalue'};
+
+        my $style=$fdata->{'style'} || $fdata->{'type'} ||
+            throw $self "- no style or type in field '$name'";
+
         my $seloptions;
         my $selcompare;
         if($style eq 'country') {
@@ -576,9 +666,9 @@ sub display ($;%) {
                 path    => '/bits/fillout-form/html-checkbox',
                 NAME    => $name,
                 VALUE   => $fdata->{'value'} || '',
-                CHECKED => $value ? ' checked' : '',
+                CHECKED => $value ? ' checked ' : '',
                 HTMLID  => $fdata->{'htmlid'} || $name,
-                ERRSTR  => $newerr || ''
+                ERRSTR  => $fdata->{'errstr'} // '',
             );
         }
         elsif($style eq 'selection') {
@@ -592,20 +682,20 @@ sub display ($;%) {
             $fdata->{'html'}=$obj->expand(
                 path    => '/bits/fillout-form/html-text',
                 NAME    => $name,
-                VALUE   => defined($value) ? $value : '',
+                VALUE   => $value // '',
                 MAXLENGTH => $fdata->{'maxlength'} || 100,
                 SIZE    => $fdata->{'size'} || 30,
-                ERRSTR  => defined($newerr) ? $newerr : ''
+                ERRSTR  => $fdata->{'errstr'} // '',
             );
         }
         elsif($style eq 'textarea') {
             $fdata->{'html'}=$obj->expand(
                 path    => '/bits/fillout-form/html-textarea',
                 NAME    => $name,
-                VALUE   => defined($value) ? $value : '',
+                VALUE   => $value // '',
                 SIZE    => $fdata->{'size'} || 30,
                 ROWS    => $fdata->{'rows'} || 8,
-                ERRSTR  => defined($newerr) ? $newerr : ''
+                ERRSTR  => $fdata->{'errstr'} // '',
             );
         }
         elsif($style eq 'file') {
@@ -613,17 +703,17 @@ sub display ($;%) {
                 path    => '/bits/fillout-form/html-file',
                 NAME    => $name,
                 SIZE    => $fdata->{'size'} || 30,
-                ERRSTR  => defined($newerr) ? $newerr : ''
+                ERRSTR  => $fdata->{'errstr'} // '',
             );
         }
         elsif($style eq 'password') {
             $fdata->{'html'}=$obj->expand(
                 path    => '/bits/fillout-form/html-password',
                 NAME    => $name,
-                VALUE   => defined $value ? $value : '',
+                VALUE   => $value // '',
                 MAXLENGTH => $fdata->{'maxlength'} || 100,
                 SIZE    => $fdata->{'size'} || 30,
-                ERRSTR  => $newerr || ''
+                ERRSTR  => $fdata->{'errstr'} // '',
             );
         }
 
@@ -694,88 +784,13 @@ sub display ($;%) {
             $fdata->{'html'}=$obj->expand(
                 path    => '/bits/fillout-form/html-select',
                 NAME    => $name,
-                VALUE   => defined $value ? $value : '',
+                VALUE   => $value // '',
                 OPTIONS => $html,
-                ERRSTR  => $newerr || ''
+                ERRSTR  => $fdata->{'errstr'},
             );
         }
 
-        # Adding error description to the list if there was an
-        # error. Storing value otherwise.
-        #
-        if($newerr) {
-            $errstr.=($fdata->{'text'} || $name) .  ": " . $newerr . "<br />\n";
-            $fdata->{'errstr'}=$newerr;
-        }
-        else {
-            $fdata->{'value'}=$value;
-        }
-
-        # Filling formparams hash
-        #
-        $formparams{"$param.VALUE"}=defined($value) ? $value : "";
-        $formparams{"$param.TEXT"}=$fdata->{'text'} || $name;
-        $formparams{"$param.NAME"}=$name;
         $formparams{"$param.HTML"}=$fdata->{'html'} || "";
-        $formparams{"$param.REQUIRED"}=$fdata->{'required'} ? 1 : 0;
-        $formparams{"$param.SIZE"}=$fdata->{'size'} || 30;
-        $formparams{"$param.ROWS"}=$fdata->{'rows'} || 1;
-        $formparams{"$param.MAXLENGTH"}=$fdata->{'maxlength'} || 100;
-        $formparams{"$param.MINLENGTH"}=$fdata->{'minlength'} || 0;
-        $formparams{"$param.ERRSTR"}=$fdata->{'errstr'} || '';
-    }
-
-    # Checking content for general compatibility by overriden
-    # method. Called only if data are basicly good.
-    #
-    if($have_submit && $have_cgivalues && !$errstr) {
-        my @rc=$self->check_form(merge_refs($args,\%formparams));
-        if(@rc<2) {
-            $formparams{"ERRSTR.CHECK_FORM"}=$errstr=($rc[0] || '');
-        }
-        elsif(scalar(@rc)%2 == 0) {
-            for(my $i=0; $i<@rc; $i+=2) {
-                my $e=($rc[$i] || '');
-                next unless $e;
-                my $fname=$rc[$i+1];
-                if($fname) {
-                    my $fdata=$self->field_desc($fname);
-                    my $param=$fdata->{'param'} || uc($fdata->{'name'});
-
-                    if($fdata->{'errstr'}) {
-                        $fdata->{'errstr'}.=($fdata->{'errstr'} =~ /\.\s*$/ ? ' ' : '; ') . $e;
-                        $formparams{"$param.ERRSTR"}=$fdata->{'errstr'};
-                    }
-                    else {
-                        $fdata->{'errstr'}=$formparams{"$param.ERRSTR"}=$e;
-                    }
-
-                    $errstr.="\n<br />" if $errstr;
-                    $errstr.=$e;
-                }
-                else {
-                    $errstr.="\n<br />" if $errstr;
-                    $formparams{'ERRSTR.CHECK_FORM'}.="\n<br />" if $errstr;
-                    $errstr.=$e;
-                    $formparams{'ERRSTR.CHECK_FORM'}.=$e;
-                }
-            }
-        }
-        else {
-            throw $self "display - wrong number of results (".join('|',@rc).")";
-        }
-    }
-    $formparams{"ERRSTR.CHECK_FORM"}||='';
-
-    # If the form is not filled at all we remove errstr's from
-    # individual fields.
-    #
-    if(!$have_submit || !$have_cgivalues) {
-        $errstr='';
-        foreach my $fdata (@{$fields}) {
-            my $param=$fdata->{'param'} || uc($fdata->{'name'});
-            $formparams{"$param.ERRSTR"}='';
-        }
     }
 
     # If there were errors then displaying the form. We also display

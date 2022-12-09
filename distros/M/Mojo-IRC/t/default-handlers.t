@@ -13,10 +13,10 @@ for my $event (qw( irc_ping irc_nick irc_notice irc_rpl_welcome err_nicknameinus
   ok $irc->has_subscribers($event), "registered $event";
 }
 
-$irc->irc_notice({params => ['yikes!']});
+$irc->irc_notice({params => ['nick', 'yikes!']});
 is_deeply \@main::buf, [], 'no pass notice';
 
-$irc->irc_notice({params => ['Ident broken stuff and other things QUOTE PASS S3creT']});
+$irc->irc_notice({params => ['nick', 'Ident broken stuff and other things QUOTE PASS S3creT']});
 is_deeply \@main::buf, ["QUOTE PASS S3creT\r\n"], 'pass notice';
 
 @main::buf = ();

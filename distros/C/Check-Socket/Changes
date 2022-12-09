@@ -1,3 +1,10 @@
+0.04 2022-12-08T08:22:24+01:00
+ - Add diag output to real test.
+
+0.03 2022-12-08T00:02:54+01:00
+ - Fix dependecy to Socket (instead of IO::Socket).
+ - Improve and fix test to catch real situations.
+
 0.02 2022-08-26T12:09:40+02:00
  - Add Check::Socket::HardcodedUsage doc.
  - Add example to doc for test of fork and socket functionality.

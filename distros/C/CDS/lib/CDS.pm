@@ -1,4 +1,4 @@
-# This is part of the Condensation Perl Module 0.27 (cli) built on 2022-02-10.
+# This is part of the Condensation Perl Module 0.31 (cli) built on 2022-12-08.
 # See https://condensation.io for information about the Condensation Data System.
 
 use strict;
@@ -37,9 +37,9 @@ use Time::Local;
 use utf8;
 package CDS;
 
-our $VERSION = '0.27';
+our $VERSION = '0.31';
 our $edition = 'cli';
-our $releaseDate = '2022-02-10';
+our $releaseDate = '2022-12-08';
 
 sub now { time * 1000 }
 
@@ -917,27 +917,22 @@ sub setMyGroupDataFlag {
 
 ### Actor group
 
+sub groupMemberSelector {
+	my $o = shift;
+	my $actorHash = shift; die 'wrong type '.ref($actorHash).' for $actorHash' if defined $actorHash && ref $actorHash ne 'CDS::Hash';
+
+	return $o->{actorGroupSelector}->child(substr($actorHash->bytes, 0, 16));
+}
+
 sub isGroupMember {
 	my $o = shift;
 	my $actorHash = shift; die 'wrong type '.ref($actorHash).' for $actorHash' if defined $actorHash && ref $actorHash ne 'CDS::Hash';
 
 	return 1 if $actorHash->equals($o->{keyPair}->publicKey->hash);
-	my $memberSelector = $o->findMember($actorHash) // return;
-	return ! $memberSelector->child('revoked')->isSet;
-}
-
-sub findMember {
-	my $o = shift;
-	my $memberHash = shift; die 'wrong type '.ref($memberHash).' for $memberHash' if defined $memberHash && ref $memberHash ne 'CDS::Hash';
-
-	for my $child ($o->{actorGroupSelector}->children) {
-		my $record = $child->record;
-		my $hash = $record->child('hash')->hashValue // next;
-		next if ! $hash->equals($memberHash);
-		return $child;
-	}
-
-	return;
+	my $memberSelector = $o->groupMemberSelector($actorHash) // return;
+	return 0 if $memberSelector->child('revoked')->isSet;
+	my $record = $memberSelector->record;
+	return $actorHash->equals($record->child('hash')->hashValue);
 }
 
 sub forgetOldIdleActors {
@@ -950,6 +945,34 @@ sub forgetOldIdleActors {
 		next if $child->revision > $limit;
 		$child->forgetBranch;
 	}
+}
+
+sub setGroupMember {
+	my $o = shift;
+	my $publicKey = shift; die 'wrong type '.ref($publicKey).' for $publicKey' if defined $publicKey && ref $publicKey ne 'CDS::PublicKey';
+	my $storeUrl = shift;
+	my $active = shift;
+	my $groupData = shift;
+
+	my $memberSelector = $o->groupMemberSelector($publicKey->hash);
+	my $record = CDS::Record->new;
+	$record->add('hash')->addHash($publicKey->hash);
+	$record->add('store')->addText($storeUrl);
+	$memberSelector->set($record);
+	$memberSelector->addObject($publicKey->hash, $publicKey->object);
+
+	$memberSelector->child('active')->setBoolean($active);
+	$memberSelector->child('group data')->setBoolean($groupData);
+}
+
+sub revokeGroupMember {
+	my $o = shift;
+	my $actorHash = shift; die 'wrong type '.ref($actorHash).' for $actorHash' if defined $actorHash && ref $actorHash ne 'CDS::Hash';
+	my $storeUrl = shift;
+
+	my $memberSelector = $o->groupMemberSelector($actorHash);
+	return if ! $memberSelector->isSet;
+	$memberSelector->child('revoked')->setBoolean(1);
 }
 
 ### Group data members
@@ -974,7 +997,7 @@ sub getGroupDataMembers {
 		# Keep
 		my $member = $o->{cachedGroupDataMembers}->{$child->label};
 		my $storeUrl = $record->child('store')->textValue;
-		next if $member && $member->storeUrl eq $storeUrl && $member->actorOnStore->publicKey->hash->equals($hash);
+		next if $member && $member->{storeUrl} eq $storeUrl && $member->{actorOnStore}->publicKey->hash->equals($hash);
 
 		# Verify the store
 		my $store = $o->onVerifyMemberStore($storeUrl, $child);
@@ -984,8 +1007,8 @@ sub getGroupDataMembers {
 		}
 
 		# Reuse the public key and add
-		if ($member && $member->actorOnStore->publicKey->hash->equals($hash)) {
-			my $actorOnStore = CDS::ActorOnStore->new($member->actorOnStore->publicKey, $store);
+		if ($member && $member->{actorOnStore}->publicKey->hash->equals($hash)) {
+			my $actorOnStore = CDS::ActorOnStore->new($member->{actorOnStore}->publicKey, $store);
 			$o->{cachedEntrustedKeys}->{$child->label} = {storeUrl => $storeUrl, actorOnStore => $actorOnStore};
 		}
 
@@ -1083,7 +1106,7 @@ sub savePrivateDataAndShareGroupData {
 
 	$o->{localDocument}->save;
 	$o->{groupDocument}->save;
-	$o->groupDataSharer->share;
+	$o->{groupDataSharer}->share;
 	my $entrustedKeys = $o->getEntrustedKeys // return;
 	my ($ok, $missingHash) = $o->{storagePrivateRoot}->save($entrustedKeys);
 	return 1 if $ok;
@@ -1239,6 +1262,135 @@ sub boxLabel { shift->{boxLabel} }
 sub url {
 	my $o = shift;
 	 $o->{accountToken}->url.'/'.$o->{boxLabel} }
+
+package CDS::CLI;
+
+sub run {
+	my $class = shift;
+
+	my $isTTY = -t STDOUT;
+	my $isCompletion = exists $ENV{COMP_LINE};
+	my $ui = CDS::UI->new(*STDOUT, $isCompletion || ! $isTTY);
+
+	my $actor = CDS::CLIActor->openOrCreateDefault($ui) // return 1;
+	my $parser = CDS::Parser->new($actor, 'cds');
+	my $cds = CDS::Parser::Node->new(0, {constructor => \&CDS::CLI::new, function => \&CDS::CLI::default});
+	my $help = CDS::Parser::Node->new(1, {constructor => \&CDS::Commands::Help::new, function => \&CDS::Commands::Help::help});
+	$cds->addArrow($help, 1, 0, 'help');
+	$parser->start->addDefault($cds);
+
+	CDS::Commands::ActorGroup->register($cds, $help);
+	CDS::Commands::Announce->register($cds, $help);
+	CDS::Commands::Book->register($cds, $help);
+	CDS::Commands::CheckKeyPair->register($cds, $help);
+	CDS::Commands::CollectGarbage->register($cds, $help);
+	CDS::Commands::CreateKeyPair->register($cds, $help);
+	CDS::Commands::Curl->register($cds, $help);
+	CDS::Commands::DiscoverActorGroup->register($cds, $help);
+	CDS::Commands::EntrustedActors->register($cds, $help);
+	CDS::Commands::FolderStore->register($cds, $help);
+	CDS::Commands::Get->register($cds, $help);
+	CDS::Commands::Help->register($cds, $help);
+	CDS::Commands::List->register($cds, $help);
+	CDS::Commands::Modify->register($cds, $help);
+	CDS::Commands::OpenEnvelope->register($cds, $help);
+	CDS::Commands::Put->register($cds, $help);
+	CDS::Commands::Remember->register($cds, $help);
+	CDS::Commands::Select->register($cds, $help);
+	CDS::Commands::ShowCard->register($cds, $help);
+	CDS::Commands::ShowKeyPair->register($cds, $help);
+	CDS::Commands::ShowMessages->register($cds, $help);
+	CDS::Commands::ShowObject->register($cds, $help);
+	CDS::Commands::ShowPrivateData->register($cds, $help);
+	CDS::Commands::ShowTree->register($cds, $help);
+	CDS::Commands::StartHTTPServer->register($cds, $help);
+	CDS::Commands::Transfer->register($cds, $help);
+	CDS::Commands::UseCache->register($cds, $help);
+	CDS::Commands::UseStore->register($cds, $help);
+	CDS::Commands::Welcome->register($cds, $help);
+	CDS::Commands::WhatIs->register($cds, $help);
+
+	if ($isCompletion) {
+		my $line = $ENV{COMP_LINE};
+		$line = substr($line, 0, $ENV{COMP_POINT}) if exists $ENV{COMP_POINT};
+		$parser->showCompletions($line);
+	} else {
+		$actor->ui->pushIndent;
+		$parser->execute(@ARGV);
+		$actor->ui->popIndent;
+		$actor->ui->removeProgress;
+		return 1 if $actor->ui->hasError;
+	}
+
+	return 0;
+}
+
+sub new {
+	my $class = shift;
+	my $actor = shift;
+
+	return bless {actor => $actor};
+}
+
+sub default {
+	my $o = shift;
+	my $cmd = shift;
+
+	my $ui = $o->{actor}->ui;
+
+	# Version
+	$ui->space;
+	$ui->title('Condensation CLI');
+	$ui->line('Version ', $CDS::VERSION, ', ', $CDS::releaseDate, '.');
+
+	# Welcome message
+	my $welcome = CDS::Commands::Welcome->new($o->{actor});
+	if ($welcome->isEnabled) {
+		$welcome->show;
+	} else {
+		$ui->line('Type "cds help" to get help.');
+	}
+
+	# Actor info
+	$ui->space;
+	$ui->title('Your key pair');
+	CDS::Commands::ShowKeyPair->new($o->{actor})->show($o->{actor}->keyPairToken);
+
+	$ui->space;
+	$ui->title('Your stores');
+	$ui->line($ui->darkBold('Storage store    '), $o->{actor}->storageStore->url);
+	$ui->line($ui->darkBold('Messaging store  '), $o->{actor}->messagingStoreUrl);
+
+	# Read messages to merge any data before displaying the rest
+	$ui->space;
+	$o->{actor}->readMessages;
+
+	$ui->space;
+	$ui->title('Your actor group');
+	$o->{actor}->registerIfNecessary;
+	CDS::Commands::ActorGroup->new($o->{actor})->show;
+
+	$ui->space;
+	$ui->title('Your entrusted actors');
+	CDS::Commands::EntrustedActors->new($o->{actor})->show;
+
+	$ui->space;
+	$ui->title('Selection (in this terminal)');
+	CDS::Commands::Select->new($o->{actor})->showSelection;
+
+	$ui->space;
+	$ui->title('Remembered values');
+	CDS::Commands::Remember->new($o->{actor})->showRememberedValues;
+
+	# Announce if necessary
+	$ui->space;
+	$o->{actor}->announceIfNecessary;
+
+	# Save any changes
+	$o->{actor}->saveOrShowError;
+	$ui->space;
+	return;
+}
 
 package CDS::CLIActor;
 
@@ -2939,7 +3091,7 @@ sub run {
 	# Process all accounts
 	$o->{ui}->space;
 	$o->{ui}->title($o->{ui}->left(64, 'Accounts'), '   ', $o->{ui}->right(10, 'messages'), ' ', $o->{ui}->right(10, 'private'), ' ', $o->{ui}->right(10, 'public'), '   ', 'last modification');
-	$o->startProgress('accounts');
+	$o->startProgress('linked objects');
 	$o->{usedHashes} = {};
 	$o->{missingObjects} = {};
 	$o->{brokenOrigins} = {};
@@ -5114,59 +5266,58 @@ sub register {
 	my $node000 = CDS::Parser::Node->new(0);
 	my $node001 = CDS::Parser::Node->new(0);
 	my $node002 = CDS::Parser::Node->new(0);
-	my $node003 = CDS::Parser::Node->new(0);
+	my $node003 = CDS::Parser::Node->new(1, {constructor => \&new, function => \&help});
 	my $node004 = CDS::Parser::Node->new(0);
-	my $node005 = CDS::Parser::Node->new(1, {constructor => \&new, function => \&help});
+	my $node005 = CDS::Parser::Node->new(0);
 	my $node006 = CDS::Parser::Node->new(0);
 	my $node007 = CDS::Parser::Node->new(0);
 	my $node008 = CDS::Parser::Node->new(0);
 	my $node009 = CDS::Parser::Node->new(0);
-	my $node010 = CDS::Parser::Node->new(1);
+	my $node010 = CDS::Parser::Node->new(0);
 	my $node011 = CDS::Parser::Node->new(0);
-	my $node012 = CDS::Parser::Node->new(0);
+	my $node012 = CDS::Parser::Node->new(1);
 	my $node013 = CDS::Parser::Node->new(0);
 	my $node014 = CDS::Parser::Node->new(0);
-	my $node015 = CDS::Parser::Node->new(0);
-	my $node016 = CDS::Parser::Node->new(1);
+	my $node015 = CDS::Parser::Node->new(1);
+	my $node016 = CDS::Parser::Node->new(0);
 	my $node017 = CDS::Parser::Node->new(0);
-	my $node018 = CDS::Parser::Node->new(0);
-	my $node019 = CDS::Parser::Node->new(1, {constructor => \&new, function => \&get});
-	my $node020 = CDS::Parser::Node->new(1);
-	my $node021 = CDS::Parser::Node->new(0);
-	my $node022 = CDS::Parser::Node->new(1, {constructor => \&new, function => \&get});
-	$cds->addArrow($node000, 1, 0, 'get');
-	$cds->addArrow($node001, 1, 0, 'save');
-	$cds->addArrow($node002, 1, 0, 'get');
-	$cds->addArrow($node003, 1, 0, 'get');
-	$cds->addArrow($node009, 1, 0, 'save', \&collectSave);
-	$help->addArrow($node005, 1, 0, 'get');
-	$help->addArrow($node005, 1, 0, 'save');
-	$node000->addArrow($node010, 1, 0, 'HASH', \&collectHash);
-	$node001->addArrow($node004, 1, 0, 'data');
-	$node002->addArrow($node006, 1, 0, 'HASH', \&collectHash1);
-	$node003->addArrow($node010, 1, 0, 'OBJECT', \&collectObject);
-	$node004->addArrow($node009, 1, 0, 'of', \&collectOf);
+	my $node018 = CDS::Parser::Node->new(1, {constructor => \&new, function => \&get});
+	my $node019 = CDS::Parser::Node->new(1);
+	my $node020 = CDS::Parser::Node->new(0);
+	my $node021 = CDS::Parser::Node->new(1, {constructor => \&new, function => \&get});
+	$cds->addArrow($node000, 1, 0, 'save');
+	$cds->addArrow($node001, 1, 0, 'hex');
+	$cds->addArrow($node004, 1, 0, 'get');
+	$cds->addArrow($node005, 1, 0, 'save', \&collectSave);
+	$help->addArrow($node003, 1, 0, 'get');
+	$help->addArrow($node003, 1, 0, 'save');
+	$node000->addArrow($node002, 1, 0, 'data');
+	$node001->addArrow($node004, 1, 0, 'dump', \&collectDump);
+	$node002->addArrow($node005, 1, 0, 'of', \&collectOf);
+	$node004->addArrow($node006, 1, 0, 'HASH', \&collectHash);
+	$node004->addArrow($node012, 1, 0, 'HASH', \&collectHash1);
+	$node004->addArrow($node012, 1, 0, 'OBJECT', \&collectObject);
+	$node005->addArrow($node009, 1, 0, 'HASH', \&collectHash);
+	$node005->addArrow($node015, 1, 0, 'HASH', \&collectHash1);
+	$node005->addArrow($node015, 1, 0, 'OBJECT', \&collectObject1);
 	$node006->addArrow($node007, 1, 0, 'on');
 	$node006->addArrow($node008, 0, 0, 'from');
-	$node007->addArrow($node010, 1, 0, 'STORE', \&collectStore);
-	$node008->addArrow($node010, 0, 0, 'STORE', \&collectStore);
-	$node009->addArrow($node013, 1, 0, 'HASH', \&collectHash1);
-	$node009->addArrow($node016, 1, 0, 'HASH', \&collectHash);
-	$node009->addArrow($node016, 1, 0, 'OBJECT', \&collectObject1);
-	$node010->addArrow($node011, 1, 0, 'decrypted');
-	$node010->addDefault($node019);
-	$node011->addArrow($node012, 1, 0, 'with');
-	$node012->addArrow($node019, 1, 0, 'AESKEY', \&collectAeskey);
-	$node013->addArrow($node014, 1, 0, 'on');
-	$node013->addArrow($node015, 0, 0, 'from');
-	$node014->addArrow($node016, 1, 0, 'STORE', \&collectStore);
-	$node015->addArrow($node016, 0, 0, 'STORE', \&collectStore);
-	$node016->addArrow($node017, 1, 0, 'decrypted');
-	$node016->addDefault($node020);
-	$node017->addArrow($node018, 1, 0, 'with');
-	$node018->addArrow($node020, 1, 0, 'AESKEY', \&collectAeskey);
-	$node020->addArrow($node021, 1, 0, 'as');
-	$node021->addArrow($node022, 1, 0, 'FILENAME', \&collectFilename);
+	$node007->addArrow($node012, 1, 0, 'STORE', \&collectStore);
+	$node008->addArrow($node012, 0, 0, 'STORE', \&collectStore);
+	$node009->addArrow($node010, 1, 0, 'on');
+	$node009->addArrow($node011, 0, 0, 'from');
+	$node010->addArrow($node015, 1, 0, 'STORE', \&collectStore);
+	$node011->addArrow($node015, 0, 0, 'STORE', \&collectStore);
+	$node012->addArrow($node013, 1, 0, 'decrypted');
+	$node012->addDefault($node018);
+	$node013->addArrow($node014, 1, 0, 'with');
+	$node014->addArrow($node018, 1, 0, 'AESKEY', \&collectAeskey);
+	$node015->addArrow($node016, 1, 0, 'decrypted');
+	$node015->addDefault($node019);
+	$node016->addArrow($node017, 1, 0, 'with');
+	$node017->addArrow($node019, 1, 0, 'AESKEY', \&collectAeskey);
+	$node019->addArrow($node020, 1, 0, 'as');
+	$node020->addArrow($node021, 1, 0, 'FILENAME', \&collectFilename);
 }
 
 sub collectAeskey {
@@ -5175,6 +5326,14 @@ sub collectAeskey {
 	my $value = shift;
 
 	$o->{aesKey} = $value;
+}
+
+sub collectDump {
+	my $o = shift;
+	my $label = shift;
+	my $value = shift;
+
+	$o->{hexDump} = 1;
 }
 
 sub collectFilename {
@@ -5191,7 +5350,6 @@ sub collectHash {
 	my $value = shift;
 
 	$o->{hash} = $value;
-	$o->{store} = $o->{actor}->preferredStore;
 }
 
 sub collectHash1 {
@@ -5200,6 +5358,7 @@ sub collectHash1 {
 	my $value = shift;
 
 	$o->{hash} = $value;
+	$o->{store} = $o->{actor}->preferredStore;
 }
 
 sub collectObject {
@@ -5275,6 +5434,9 @@ sub help {
 	$ui->command('cds save data of … as FILENAME');
 	$ui->p('Saves the object\'s data to FILENAME.');
 	$ui->space;
+	$ui->command('cds hex dump …');
+	$ui->p('Writes the object as hex string to STDOUT.');
+	$ui->space;
 	$ui->title('Related commands');
 	$ui->line('cds open envelope OBJECT');
 	$ui->line('cds show record OBJECT [decrypted with AESKEY]');
@@ -5301,6 +5463,8 @@ sub get {
 	} elsif ($o->{saveObject}) {
 		CDS->writeBytesToFile($o->{filename}, $object->bytes) // return $o->{ui}->error('Failed to write object to "', $o->{filename}, '".');
 		$o->{ui}->pGreen(length $object->bytes, ' bytes written to ', $o->{filename}, '.');
+	} elsif ($o->{hexDump}) {
+		$o->{ui}->raw(unpack('H*', $object->bytes)."\n");
 	} else {
 		$o->{ui}->raw($object->bytes);
 	}
@@ -10570,7 +10734,7 @@ sub add {
 
 	my $permissions = $o->{permissions};
 
-	next if ! CDS->isValidBoxLabel($boxLabel);
+	return if ! CDS->isValidBoxLabel($boxLabel);
 	my $accountFolder = $o->{folder}.'/accounts/'.$accountHash->hex;
 	$permissions->mkdir($accountFolder, $permissions->accountFolderMode);
 	my $boxFolder = $accountFolder.'/'.$boxLabel;
@@ -10589,10 +10753,10 @@ sub remove {
 	my $hash = shift; die 'wrong type '.ref($hash).' for $hash' if defined $hash && ref $hash ne 'CDS::Hash';
 	my $keyPair = shift; die 'wrong type '.ref($keyPair).' for $keyPair' if defined $keyPair && ref $keyPair ne 'CDS::KeyPair';
 
-	next if ! CDS->isValidBoxLabel($boxLabel);
+	return if ! CDS->isValidBoxLabel($boxLabel);
 	my $accountFolder = $o->{folder}.'/accounts/'.$accountHash->hex;
 	my $boxFolder = $accountFolder.'/'.$boxLabel;
-	next if ! -d $boxFolder;
+	return if ! -d $boxFolder;
 	unlink $boxFolder.'/'.$hash->hex;
 	return;
 }
@@ -11566,12 +11730,24 @@ sub reply303 {
 	my $o = shift;
 	my $location = shift;
 	 $o->reply(303, 'See Other', {'Location' => $location}) }
-sub reply400 { shift->reply(400, 'Bad Request', &textContentType, @_) }
-sub reply403 { shift->reply(403, 'Forbidden', &textContentType, @_) }
-sub reply404 { shift->reply(404, 'Not Found', &textContentType, @_) }
-sub reply405 { shift->reply(405, 'Method Not Allowed', &textContentType, @_) }
-sub reply500 { shift->reply(500, 'Internal Server Error', &textContentType, @_) }
-sub reply503 { shift->reply(503, 'Service Not Available', &textContentType, @_) }
+sub reply400 {
+	my $o = shift;
+	 $o->reply(400, 'Bad Request', &textContentType, @_) }
+sub reply403 {
+	my $o = shift;
+	 $o->reply(403, 'Forbidden', &textContentType, @_) }
+sub reply404 {
+	my $o = shift;
+	 $o->reply(404, 'Not Found', &textContentType, @_) }
+sub reply405 {
+	my $o = shift;
+	 $o->reply(405, 'Method Not Allowed', &textContentType, @_) }
+sub reply500 {
+	my $o = shift;
+	 $o->reply(500, 'Internal Server Error', &textContentType, @_) }
+sub reply503 {
+	my $o = shift;
+	 $o->reply(503, 'Service Not Available', &textContentType, @_) }
 
 sub reply {
 	my $o = shift;
@@ -11884,6 +12060,11 @@ sub box {
 
 	# List box
 	if ($request->method eq 'HEAD' || $request->method eq 'GET') {
+		if ($o->{checkSignatures}) {
+			my $actorHash = $request->checkSignature($o->{store});
+			return $request->reply403 if ! $o->verifyList($actorHash, $accountHash, $boxLabel);
+		}
+
 		my $watch = $request->headers->{'condensation-watch'} // '';
 		my $timeout = $watch =~ /^(\d+)\s*ms$/ ? $1 + 0 : 0;
 		$timeout = $o->{maximumWatchTimeout} if $timeout > $o->{maximumWatchTimeout};
@@ -11911,7 +12092,6 @@ sub boxEntry {
 	if ($request->method eq 'PUT') {
 		if ($o->{checkSignatures}) {
 			my $actorHash = $request->checkSignature($o->{store});
-			return $request->reply403 if ! $actorHash;
 			return $request->reply403 if ! $o->verifyAddition($actorHash, $accountHash, $boxLabel, $hash);
 		}
 
@@ -11924,7 +12104,6 @@ sub boxEntry {
 	if ($request->method eq 'DELETE') {
 		if ($o->{checkSignatures}) {
 			my $actorHash = $request->checkSignature($o->{store});
-			return $request->reply403 if ! $actorHash;
 			return $request->reply403 if ! $o->verifyRemoval($actorHash, $accountHash, $boxLabel, $hash);
 		}
 
@@ -11953,7 +12132,6 @@ sub accounts {
 
 		if ($o->{checkSignatures}) {
 			my $actorHash = $request->checkSignature(CDS::CheckSignatureStore->new($o->{store}, $modifications->objects), $bytes);
-			return $request->reply403 if ! $actorHash;
 			return $request->reply403 if ! $o->verifyModifications($actorHash, $modifications);
 		}
 
@@ -11963,6 +12141,18 @@ sub accounts {
 	}
 
 	return $request->reply405;
+}
+
+sub verifyList {
+	my $o = shift;
+	my $actorHash = shift; die 'wrong type '.ref($actorHash).' for $actorHash' if defined $actorHash && ref $actorHash ne 'CDS::Hash';
+	my $accountHash = shift; die 'wrong type '.ref($accountHash).' for $accountHash' if defined $accountHash && ref $accountHash ne 'CDS::Hash';
+	my $boxLabel = shift;
+
+	return 1 if $boxLabel eq 'public';
+	return if ! $actorHash;
+	return 1 if $accountHash->equals($actorHash);
+	return;
 }
 
 sub verifyModifications {
@@ -11988,8 +12178,9 @@ sub verifyAddition {
 	my $boxLabel = shift;
 	my $hash = shift; die 'wrong type '.ref($hash).' for $hash' if defined $hash && ref $hash ne 'CDS::Hash';
 
-	return 1 if $accountHash->equals($actorHash);
 	return 1 if $boxLabel eq 'messages';
+	return if ! $actorHash;
+	return 1 if $accountHash->equals($actorHash);
 	return;
 }
 
@@ -12000,6 +12191,7 @@ sub verifyRemoval {
 	my $boxLabel = shift;
 	my $hash = shift; die 'wrong type '.ref($hash).' for $hash' if defined $hash && ref $hash ne 'CDS::Hash';
 
+	return if ! $actorHash;
 	return 1 if $accountHash->equals($actorHash);
 
 	# Get the envelope
@@ -12062,7 +12254,7 @@ sub put {
 
 	my $headers = HTTP::Headers->new;
 	$headers->header('Content-Type' => 'application/condensation-object');
-	my $response = $o->request('PUT', $o->{url}.'/objects/'.$hash->hex, $headers, $keyPair, $object->bytes);
+	my $response = $o->request('PUT', $o->{url}.'/objects/'.$hash->hex, $headers, $keyPair, $object->bytes, 1);
 	return if $response->is_success;
 	return 'put ==> HTTP '.$response->status_line;
 }
@@ -12072,7 +12264,7 @@ sub book {
 	my $hash = shift; die 'wrong type '.ref($hash).' for $hash' if defined $hash && ref $hash ne 'CDS::Hash';
 	my $keyPair = shift; die 'wrong type '.ref($keyPair).' for $keyPair' if defined $keyPair && ref $keyPair ne 'CDS::KeyPair';
 
-	my $response = $o->request('POST', $o->{url}.'/objects/'.$hash->hex, HTTP::Headers->new, $keyPair);
+	my $response = $o->request('POST', $o->{url}.'/objects/'.$hash->hex, HTTP::Headers->new, $keyPair, undef, 1);
 	return if $response->code == 404;
 	return 1 if $response->is_success;
 	return undef, 'book ==> HTTP '.$response->status_line;
@@ -12088,7 +12280,8 @@ sub list {
 	my $boxUrl = $o->{url}.'/accounts/'.$accountHash->hex.'/'.$boxLabel;
 	my $headers = HTTP::Headers->new;
 	$headers->header('Condensation-Watch' => $timeout.' ms') if $timeout > 0;
-	my $response = $o->request('GET', $boxUrl, $headers);
+	my $needsSignature = $boxLabel ne 'public';
+	my $response = $o->request('GET', $boxUrl, $headers, $keyPair, undef, $needsSignature);
 	return undef, 'list ==> HTTP '.$response->status_line if ! $response->is_success;
 	my $bytes = $response->decoded_content(charset => 'none');
 
@@ -12113,7 +12306,8 @@ sub add {
 	my $keyPair = shift; die 'wrong type '.ref($keyPair).' for $keyPair' if defined $keyPair && ref $keyPair ne 'CDS::KeyPair';
 
 	my $headers = HTTP::Headers->new;
-	my $response = $o->request('PUT', $o->{url}.'/accounts/'.$accountHash->hex.'/'.$boxLabel.'/'.$hash->hex, $headers, $keyPair);
+	my $needsSignature = $boxLabel ne 'messages';
+	my $response = $o->request('PUT', $o->{url}.'/accounts/'.$accountHash->hex.'/'.$boxLabel.'/'.$hash->hex, $headers, $keyPair, undef, $needsSignature);
 	return if $response->is_success;
 	return 'add ==> HTTP '.$response->status_line;
 }
@@ -12126,7 +12320,7 @@ sub remove {
 	my $keyPair = shift; die 'wrong type '.ref($keyPair).' for $keyPair' if defined $keyPair && ref $keyPair ne 'CDS::KeyPair';
 
 	my $headers = HTTP::Headers->new;
-	my $response = $o->request('DELETE', $o->{url}.'/accounts/'.$accountHash->hex.'/'.$boxLabel.'/'.$hash->hex, $headers, $keyPair);
+	my $response = $o->request('DELETE', $o->{url}.'/accounts/'.$accountHash->hex.'/'.$boxLabel.'/'.$hash->hex, $headers, $keyPair, undef, 1);
 	return if $response->is_success;
 	return 'remove ==> HTTP '.$response->status_line;
 }
@@ -12137,9 +12331,10 @@ sub modify {
 	my $keyPair = shift; die 'wrong type '.ref($keyPair).' for $keyPair' if defined $keyPair && ref $keyPair ne 'CDS::KeyPair';
 
 	my $bytes = $modifications->toRecord->toObject->bytes;
+	my $needsSignature = $modifications->needsSignature($keyPair);
 	my $headers = HTTP::Headers->new;
 	$headers->header('Content-Type' => 'application/condensation-modifications');
-	my $response = $o->request('POST', $o->{url}.'/accounts', $headers, $keyPair, $bytes, 1);
+	my $response = $o->request('POST', $o->{url}.'/accounts', $headers, $keyPair, $bytes, $needsSignature, 1);
 	return if $response->is_success;
 	return 'modify ==> HTTP '.$response->status_line;
 }
@@ -12152,12 +12347,13 @@ sub request {
 	my $headers = shift;
 	my $keyPair = shift; die 'wrong type '.ref($keyPair).' for $keyPair' if defined $keyPair && ref $keyPair ne 'CDS::KeyPair';
 	my $data = shift;
+	my $addSignature = shift;
 	my $signData = shift;
 		# private
 	$headers->date(time);
 	$headers->header('User-Agent' => CDS->version);
 
-	if ($keyPair) {
+	if ($addSignature && $keyPair) {
 		my $hostAndPath = $url =~ /^https?:\/\/(.*)$/ ? $1 : $url;
 		my $date = CDS::ISODate->millisecondString;
 		my $bytesToSign = $date."\0".uc($method)."\0".$hostAndPath;
@@ -16358,31 +16554,6 @@ sub remove {
 	push @{$o->{removals}}, {accountHash => $accountHash, boxLabel => $boxLabel, hash => $hash};
 }
 
-sub executeIndividually {
-	my $o = shift;
-	my $store = shift;
-	my $keyPair = shift; die 'wrong type '.ref($keyPair).' for $keyPair' if defined $keyPair && ref $keyPair ne 'CDS::KeyPair';
-
-	# Process objects
-	for my $entry (values %{$o->{objects}}) {
-		my $error = $store->put($entry->{hash}, $entry->{object}, $keyPair);
-		return $error if $error;
-	}
-
-	# Process additions
-	for my $entry (@{$o->{additions}}) {
-		my $error = $store->add($entry->{accountHash}, $entry->{boxLabel}, $entry->{hash}, $keyPair);
-		return $error if $error;
-	}
-
-	# Process removals (and ignore errors)
-	for my $entry (@{$o->{removals}}) {
-		$store->remove($entry->{accountHash}, $entry->{boxLabel}, $entry->{hash}, $keyPair);
-	}
-
-	return;
-}
-
 # Returns a text representation of box additions and removals.
 sub toRecord {
 	my $o = shift;
@@ -16472,6 +16643,43 @@ sub readEntriesFromRecord {
 	}
 
 	return 1;
+}
+
+sub executeIndividually {
+	my $o = shift;
+	my $store = shift;
+	my $keyPair = shift; die 'wrong type '.ref($keyPair).' for $keyPair' if defined $keyPair && ref $keyPair ne 'CDS::KeyPair';
+
+	# Process objects
+	for my $entry (values %{$o->{objects}}) {
+		my $error = $store->put($entry->{hash}, $entry->{object}, $keyPair);
+		return $error if $error;
+	}
+
+	# Process additions
+	for my $entry (@{$o->{additions}}) {
+		my $error = $store->add($entry->{accountHash}, $entry->{boxLabel}, $entry->{hash}, $keyPair);
+		return $error if $error;
+	}
+
+	# Process removals (and ignore errors)
+	for my $entry (@{$o->{removals}}) {
+		$store->remove($entry->{accountHash}, $entry->{boxLabel}, $entry->{hash}, $keyPair);
+	}
+
+	return;
+}
+
+sub needsSignature {
+	my $o = shift;
+
+	return 0 if scalar @{$o->{removals}};
+
+	for my $addition (@{$o->{additions}}) {
+		return 1 if $addition->{boxLabel} ne 'messages';
+	}
+
+	return 0;
 }
 
 package CDS::StreamCache;

@@ -1,3 +1,19 @@
+0.204   2022-12-09  Released-By: PERLANCAR; Urgency: high
+
+        - [bugfix] Fix logic bug caused by typo.
+
+        - Enable support for deprecated argument spec property 'greedy' because
+          it will make us properly strict in this case.
+
+
+0.203   2022-12-09  Released-By: PERLANCAR; Urgency: medium; Broken: yes
+
+        - Perform some checks on function metadata (currently only check
+          pos/slurpy).
+
+        - UPDATE: this release is broken due to a bug, please use 0.204.
+
+
 0.202   2021-08-01  Released-By: PERLANCAR; Urgency: medium
 
 	- Bump prereq version Sah::Schema::rinci::function_meta to 1.1.96.0

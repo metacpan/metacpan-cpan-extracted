@@ -1,5 +1,11 @@
 Revision history for Syntax-Keyword-Try
 
+0.28    2022-12-08
+        [CHANGES]
+         * Account for the new structure of ->cop_warnings in perl v5.37.6
+         * Updated to latest hax/ support files; accounting for newPADxVOP in
+           latest bleadperl
+
 0.27    2022-02-22
         [CHANGES]
          * Updates to support Feature::Compat::Try 0.05 with new `finally {}`

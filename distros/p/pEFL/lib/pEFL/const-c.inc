@@ -1767,10 +1767,11 @@ constant_30 (pTHX_ const char *name, IV *iv_return) {
      ELM_CALENDAR_LAST_DAY_OF_MONTH ELM_CTXPOPUP_DIRECTION_UNKNOWN
      ELM_FLIP_ROTATE_XZ_CENTER_AXIS ELM_FLIP_ROTATE_YZ_CENTER_AXIS
      ELM_FOCUS_AUTOSCROLL_MODE_NONE ELM_FOCUS_AUTOSCROLL_MODE_SHOW
-     ELM_GENLIST_ITEM_FIELD_CONTENT ELM_GENLIST_ITEM_SCROLLTO_NONE
-     ELM_GLVIEW_RESIZE_POLICY_SCALE ELM_OBJECT_SELECT_MODE_DEFAULT
-     ELM_SCROLLER_MOVEMENT_NO_BLOCK ELM_TOOLBAR_ITEM_SCROLLTO_LAST
-     ELM_TOOLBAR_ITEM_SCROLLTO_NONE ELM_TOOLTIP_ORIENT_BOTTOM_LEFT */
+     ELM_FOCUS_MOVE_POLICY_KEY_ONLY ELM_GENLIST_ITEM_FIELD_CONTENT
+     ELM_GENLIST_ITEM_SCROLLTO_NONE ELM_GLVIEW_RESIZE_POLICY_SCALE
+     ELM_OBJECT_SELECT_MODE_DEFAULT ELM_SCROLLER_MOVEMENT_NO_BLOCK
+     ELM_TOOLBAR_ITEM_SCROLLTO_LAST ELM_TOOLBAR_ITEM_SCROLLTO_NONE
+     ELM_TOOLTIP_ORIENT_BOTTOM_LEFT */
   /* Offset 8 gives the best switch position.  */
   switch (name[8]) {
   case 'B':
@@ -1841,6 +1842,11 @@ constant_30 (pTHX_ const char *name, IV *iv_return) {
     if (memEQ(name, "ELM_FOCUS_AUTOSCROLL_MODE_SHOW", 30)) {
     /*                       ^                            */
       *iv_return = ELM_FOCUS_AUTOSCROLL_MODE_SHOW;
+      return PERL_constant_ISIV;
+    }
+    if (memEQ(name, "ELM_FOCUS_MOVE_POLICY_KEY_ONLY", 30)) {
+    /*                       ^                            */
+      *iv_return = ELM_FOCUS_MOVE_POLICY_KEY_ONLY;
       return PERL_constant_ISIV;
     }
     break;
@@ -2273,6 +2279,7 @@ my @names = (qw(),
             {name=>"ELM_FOCUS_AUTOSCROLL_MODE_SHOW", type=>"IV", macro=>"1"},
             {name=>"ELM_FOCUS_MOVE_POLICY_CLICK", type=>"IV", macro=>"1"},
             {name=>"ELM_FOCUS_MOVE_POLICY_IN", type=>"IV", macro=>"1"},
+            {name=>"ELM_FOCUS_MOVE_POLICY_KEY_ONLY", type=>"IV", macro=>"1"},
             {name=>"ELM_GENLIST_ITEM_FIELD_ALL", type=>"IV", macro=>"1"},
             {name=>"ELM_GENLIST_ITEM_FIELD_CONTENT", type=>"IV", macro=>"1"},
             {name=>"ELM_GENLIST_ITEM_FIELD_STATE", type=>"IV", macro=>"1"},

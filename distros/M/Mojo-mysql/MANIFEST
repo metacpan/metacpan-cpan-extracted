@@ -1,6 +1,4 @@
-.perltidyrc
 Changes
-cpanfile
 examples/blog/blog.conf
 examples/blog/lib/Blog.pm
 examples/blog/lib/Blog/Controller/Posts.pm
@@ -21,13 +19,10 @@ lib/Mojo/mysql/PubSub.pm
 lib/Mojo/mysql/Results.pm
 lib/Mojo/mysql/Transaction.pm
 lib/SQL/Abstract/mysql.pm
-local/async_query_in_flight.pl
-local/TODO
 Makefile.PL
 MANIFEST			This list of files
-MANIFEST.SKIP
-README.md
-t/00-basic.t
+Mojo-mysql-1.26.tar.gz
+t/00-project.t
 t/async_query_in_flight.t
 t/blocking-leak.t
 t/connection.t

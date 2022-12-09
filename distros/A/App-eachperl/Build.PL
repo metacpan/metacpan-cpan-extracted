@@ -9,6 +9,7 @@ my $build = Module::Build->new(
       'perl' => 5.026,
       'Object::Pad' => '0.74', # 0.73 + bugfix
 
+      'Attribute::Storage' => 0,
       'Commandable::Finder::MethodAttributes' => 0,
       'Commandable::Invocation' => 0,
       'Config::Tiny' => 0,

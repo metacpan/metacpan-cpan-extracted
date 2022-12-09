@@ -4,7 +4,7 @@ package DBIx::SearchBuilder;
 use strict;
 use warnings;
 
-our $VERSION = "1.71";
+our $VERSION = "1.73";
 
 use Clone qw();
 use Encode qw();
@@ -19,22 +19,22 @@ DBIx::SearchBuilder - Encapsulate SQL queries and rows in simple perl objects
 =head1 SYNOPSIS
 
   use DBIx::SearchBuilder;
-  
+
   package My::Things;
   use base qw/DBIx::SearchBuilder/;
-  
+
   sub _Init {
       my $self = shift;
       $self->Table('Things');
       return $self->SUPER::_Init(@_);
   }
-  
+
   sub NewItem {
       my $self = shift;
       # MyThing is a subclass of DBIx::SearchBuilder::Record
       return(MyThing->new);
   }
-  
+
   package main;
 
   use DBIx::SearchBuilder::Handle;
@@ -51,9 +51,9 @@ DBIx::SearchBuilder - Encapsulate SQL queries and rows in simple perl objects
 
 =head1 DESCRIPTION
 
-This module provides an object-oriented mechanism for retrieving and updating data in a DBI-accesible database. 
+This module provides an object-oriented mechanism for retrieving and updating data in a DBI-accesible database.
 
-In order to use this module, you should create a subclass of C<DBIx::SearchBuilder> and a 
+In order to use this module, you should create a subclass of C<DBIx::SearchBuilder> and a
 subclass of C<DBIx::SearchBuilder::Record> for each table that you wish to access.  (See
 the documentation of C<DBIx::SearchBuilder::Record> for more information on subclassing it.)
 
@@ -101,7 +101,7 @@ sub new {
 
 =head2 _Init
 
-This method is called by C<new> with whatever arguments were passed to C<new>.  
+This method is called by C<new> with whatever arguments were passed to C<new>.
 By default, it takes a C<DBIx::SearchBuilder::Handle> object as a C<Handle>
 argument, although this is not necessary if your subclass overrides C<_Handle>.
 
@@ -143,7 +143,6 @@ sub CleanSlate {
     delete $self->{$_} for qw(
         items
         left_joins
-        raw_rows
         count_all
         subclauses
         restrictions
@@ -154,6 +153,7 @@ sub CleanSlate {
         query_hint
         _bind_values
         _prefer_bind
+        _combine_search_and_count
     );
 
     #we have no limit statements. DoSearch won't work.
@@ -178,7 +178,7 @@ sub Clone
     );
     $obj->{'must_redo_search'} = 1;
     $obj->{'itemscount'}       = 0;
-    
+
     $obj->{ $_ } = Clone::clone( $obj->{ $_ } )
         foreach grep exists $self->{ $_ }, $self->_ClonedAttributes;
     return $obj;
@@ -235,19 +235,36 @@ it is called automatically the first time that you actually need results
 sub _DoSearch {
     my $self = shift;
 
+    if ( $self->{_combine_search_and_count} ) {
+        my ($count) = $self->_DoSearchAndCount;
+        return $count;
+    }
+
     my $QueryString = $self->BuildSelectQuery();
+    my $records     = $self->_Handle->SimpleQuery( $QueryString, @{ $self->{_bind_values} || [] } );
+    return $self->__DoSearch($records);
+}
+
+sub __DoSearch {
+    my $self    = shift;
+    my $records = shift;
 
     # If we're about to redo the search, we need an empty set of items and a reset iterator
     delete $self->{'items'};
     $self->{'itemscount'} = 0;
 
-    my $records = $self->_Handle->SimpleQuery( $QueryString, @{ $self->{_bind_values} || [] } );
     return 0 unless $records;
 
     while ( my $row = $records->fetchrow_hashref() ) {
-	my $item = $self->NewItem();
-	$item->LoadFromHash($row);
-	$self->AddRecord($item);
+
+        # search_builder_count_all is from combine search
+        if ( !$self->{count_all} && $row->{search_builder_count_all} ) {
+            $self->{count_all} = $row->{search_builder_count_all};
+        }
+
+        my $item = $self->NewItem();
+        $item->LoadFromHash($row);
+        $self->AddRecord($item);
     }
     return $self->_RecordCount if $records->err;
 
@@ -294,7 +311,11 @@ it is used by C<Count> and C<CountAll>.
 
 sub _DoCount {
     my $self = shift;
-    my $all  = shift || 0;
+
+    if ( $self->{_combine_search_and_count} ) {
+        (undef, my $count_all) = $self->_DoSearchAndCount;
+        return $count_all;
+    }
 
     my $QueryString = $self->BuildSelectCountQuery();
     my $records     = $self->_Handle->SimpleQuery( $QueryString, @{ $self->{_bind_values} || [] } );
@@ -303,16 +324,32 @@ sub _DoCount {
     my @row = $records->fetchrow_array();
     return 0 if $records->err;
 
-    $self->{ $all ? 'count_all' : 'raw_rows' } = $row[0];
+    $self->{'count_all'} = $row[0];
 
     return ( $row[0] );
 }
 
+=head2 _DoSearchAndCount
 
+This internal private method actually executes the search and also counting on the database;
+
+=cut
+
+sub _DoSearchAndCount {
+    my $self = shift;
+
+    my $QueryString = $self->BuildSelectAndCountQuery();
+    my $records     = $self->_Handle->SimpleQuery( $QueryString, @{ $self->{_bind_values} || [] } );
+
+    $self->{count_all} = 0;
+    # __DoSearch updates count_all
+    my $count     = $self->__DoSearch($records);
+    return ( $count, $self->{count_all} );
+}
 
 =head2 _ApplyLimits STATEMENTREF
 
-This routine takes a reference to a scalar containing an SQL statement. 
+This routine takes a reference to a scalar containing an SQL statement.
 It massages the statement to limit the returned rows to only C<< $self->RowsPerPage >>
 rows, skipping C<< $self->FirstRow >> rows.  (That is, if rows are numbered
 starting from 0, row number C<< $self->FirstRow >> will be the first row returned.)
@@ -325,15 +362,15 @@ enforcing an ordering on the rows (with C<OrderByCols>, say).
 sub _ApplyLimits {
     my $self = shift;
     my $statementref = shift;
-    $self->_Handle->ApplyLimits($statementref, $self->RowsPerPage, $self->FirstRow);
+    $self->_Handle->ApplyLimits($statementref, $self->RowsPerPage, $self->FirstRow, $self);
     $$statementref =~ s/main\.\*/join(', ', @{$self->{columns}})/eg
-	    if $self->{columns} and @{$self->{columns}};
+        if $self->{columns} and @{$self->{columns}};
 }
 
 
 =head2 _DistinctQuery STATEMENTREF
 
-This routine takes a reference to a scalar containing an SQL statement. 
+This routine takes a reference to a scalar containing an SQL statement.
 It massages the statement to ensure a distinct result set is returned.
 
 =cut
@@ -346,6 +383,21 @@ sub _DistinctQuery {
     $self->_Handle->DistinctQuery($statementref, $self)
 }
 
+=head2 _DistinctQueryAndCount STATEMENTREF
+
+This routine takes a reference to a scalar containing an SQL statement.
+It massages the statement to ensure a distinct result set and total number
+of potential records are returned.
+
+=cut
+
+sub _DistinctQueryAndCount {
+    my $self = shift;
+    my $statementref = shift;
+
+    $self->_Handle->DistinctQueryAndCount($statementref, $self);
+}
+
 =head2 _BuildJoins
 
 Build up all of the joins we need to perform this query.
@@ -356,12 +408,11 @@ Build up all of the joins we need to perform this query.
 sub _BuildJoins {
     my $self = shift;
 
-        return ( $self->_Handle->_BuildJoins($self) );
-
+    return ( $self->_Handle->_BuildJoins($self) );
 }
 
 
-=head2 _isJoined 
+=head2 _isJoined
 
 Returns true if this SearchBuilder will be joining multiple tables together.
 
@@ -445,7 +496,7 @@ sub BuildSelectQuery {
 
     my $QueryString = $self->_BuildJoins . " ";
     $QueryString .= $self->_WhereClause . " "
-      if ( $self->_isLimited > 0 );
+        if ( $self->_isLimited > 0 );
 
     $self->_OptimizeQuery(\$QueryString, @_);
 
@@ -490,7 +541,7 @@ sub BuildSelectCountQuery {
     my $QueryString = $self->_BuildJoins . " ";
 
     $QueryString .= $self->_WhereClause . " "
-      if ( $self->_isLimited > 0 );
+        if ( $self->_isLimited > 0 );
 
     $self->_OptimizeQuery(\$QueryString, @_);
 
@@ -506,7 +557,43 @@ sub BuildSelectCountQuery {
     return ($QueryString);
 }
 
+=head2 BuildSelectAndCountQuery PreferBind => 1|0
 
+Builds a query string that is a combination of BuildSelectQuery and
+BuildSelectCountQuery.
+
+=cut
+
+sub BuildSelectAndCountQuery {
+    my $self = shift;
+
+    # Generally it's BuildSelectQuery plus extra COUNT part.
+    my $QueryString = $self->_BuildJoins . " ";
+    $QueryString .= $self->_WhereClause . " "
+        if ( $self->_isLimited > 0 );
+
+    $self->_OptimizeQuery( \$QueryString, @_ );
+
+    my $QueryHint = $self->QueryHintFormatted;
+
+    if ( my $clause = $self->_GroupClause ) {
+        $QueryString
+            = "SELECT" . $QueryHint . "main.*, COUNT(main.id) OVER() AS search_builder_count_all FROM $QueryString";
+        $QueryString .= $clause;
+        $QueryString .= $self->_OrderClause;
+    }
+    elsif ( !$self->{'joins_are_distinct'} && $self->_isJoined ) {
+        $self->_DistinctQueryAndCount( \$QueryString );
+    }
+    else {
+        $QueryString
+            = "SELECT" . $QueryHint . "main.*, COUNT(main.id) OVER() AS search_builder_count_all FROM $QueryString";
+        $QueryString .= $self->_OrderClause;
+    }
+
+    $self->_ApplyLimits( \$QueryString );
+    return ($QueryString);
+}
 
 
 =head2 Next
@@ -663,7 +750,7 @@ sub DistinctFieldValues {
 
 =head2 ItemsArrayRef
 
-Return a refernece to an array containing all objects found by this search.
+Return a reference to an array containing all objects found by this search.
 
 =cut
 
@@ -686,7 +773,7 @@ sub ItemsArrayRef {
 
 =head2 NewItem
 
-NewItem must be subclassed. It is used by DBIx::SearchBuilder to create record 
+NewItem must be subclassed. It is used by DBIx::SearchBuilder to create record
 objects for each row returned from the database.
 
 =cut
@@ -712,7 +799,26 @@ sub RedoSearch {
     $self->{'must_redo_search'} = 1;
 }
 
+=head2 CombineSearchAndCount 1|0
 
+Tells DBIx::SearchBuilder if it shall search both records and the total count
+in a single query.
+
+=cut
+
+sub CombineSearchAndCount {
+    my $self = shift;
+    if ( @_ ) {
+        if ( $self->_Handle->HasSupportForCombineSearchAndCount ) {
+            $self->{'_combine_search_and_count'} = shift;
+        }
+        else {
+            warn "Current database version " . $self->_Handle->DatabaseVersion . " does not support CombineSearchAndCount. Consider upgrading to a newer version with support for windowing functions.";
+            return undef;
+        }
+    }
+    return $self->{'_combine_search_and_count'};
+}
 
 
 =head2 UnLimit
@@ -735,10 +841,10 @@ Limit takes a hash of parameters with the following keys:
 
 =over 4
 
-=item TABLE 
+=item TABLE
 
 Can be set to something different than this table if a join is
-wanted (that means we can't do recursive joins as for now).  
+wanted (that means we can't do recursive joins as for now).
 
 =item ALIAS
 
@@ -765,7 +871,7 @@ check. See L</CombineFunctionWithField> for rules.
 
 =item VALUE
 
-Should always be set and will always be quoted. 
+Should always be set and will always be quoted.
 
 =item OPERATOR
 
@@ -809,7 +915,7 @@ and first column is used.
 
 =back
 
-=item ENTRYAGGREGATOR 
+=item ENTRYAGGREGATOR
 
 Can be C<AND> or C<OR> (or anything else valid to aggregate two clauses in SQL).
 Special value is C<none> which means that no entry aggregator should be used.
@@ -999,7 +1105,7 @@ sub _GenericRestriction {
     my $restriction;
     if ( $args{'LEFTJOIN'} ) {
         if ( $args{'ENTRYAGGREGATOR'} ) {
-            $self->{'left_joins'}{ $args{'LEFTJOIN'} }{'entry_aggregator'} = 
+            $self->{'left_joins'}{ $args{'LEFTJOIN'} }{'entry_aggregator'} =
                 $args{'ENTRYAGGREGATOR'};
         }
         $restriction = $self->{'left_joins'}{ $args{'LEFTJOIN'} }{'criteria'}{ $ClauseId } ||= [];
@@ -1120,7 +1226,7 @@ sub _CompileGenericRestrictions {
 
 Orders the returned results by ALIAS.FIELD ORDER.
 
-Takes a paramhash of ALIAS, FIELD and ORDER.  
+Takes a paramhash of ALIAS, FIELD and ORDER.
 ALIAS defaults to C<main>.
 FIELD has no default value.
 ORDER defaults to ASC(ending). DESC(ending) is also a valid value for OrderBy.
@@ -1145,8 +1251,12 @@ sub OrderByCols {
     my $self = shift;
     my @args = @_;
 
+    my $old_value = $self->_OrderClause;
     $self->{'order_by'} = \@args;
-    $self->RedoSearch();
+
+    if ( $self->_OrderClause ne $old_value ) {
+        $self->RedoSearch();
+    }
 }
 
 =head2 _OrderClause
@@ -1166,29 +1276,29 @@ sub _OrderClause {
     foreach my $row ( @{$self->{'order_by'}} ) {
 
         my %rowhash = ( ALIAS => 'main',
-			FIELD => undef,
-			ORDER => 'ASC',
-			%$row
-		      );
+                        FIELD => undef,
+                        ORDER => 'ASC',
+                        %$row
+                      );
         if ($rowhash{'ORDER'} && $rowhash{'ORDER'} =~ /^des/i) {
-	    $rowhash{'ORDER'} = "DESC";
+            $rowhash{'ORDER'} = "DESC";
             $rowhash{'ORDER'} .= ' '. $nulls_order->{'DESC'} if $nulls_order;
         }
         else {
-	    $rowhash{'ORDER'} = "ASC";
+            $rowhash{'ORDER'} = "ASC";
             $rowhash{'ORDER'} .= ' '. $nulls_order->{'ASC'} if $nulls_order;
         }
         $rowhash{'ALIAS'} = 'main' unless defined $rowhash{'ALIAS'};
 
         if ( defined $rowhash{'ALIAS'} and
-	     $rowhash{'FIELD'} and
+             $rowhash{'FIELD'} and
              $rowhash{'ORDER'} ) {
 
-	    if ( length $rowhash{'ALIAS'} && $rowhash{'FIELD'} =~ /^(\w+\()(.*\))$/ ) {
-		# handle 'FUNCTION(FIELD)' formatted fields
-		$rowhash{'ALIAS'} = $1 . $rowhash{'ALIAS'};
-		$rowhash{'FIELD'} = $2;
-	    }
+            if ( length $rowhash{'ALIAS'} && $rowhash{'FIELD'} =~ /^(.*\()(.*\))$/ ) {
+                # handle 'FUNCTION(FIELD)' formatted fields
+                $rowhash{'ALIAS'} = $1 . $rowhash{'ALIAS'};
+                $rowhash{'FIELD'} = $2;
+            }
 
             $clause .= ($clause ? ", " : " ");
             $clause .= $rowhash{'ALIAS'} . "." if length $rowhash{'ALIAS'};
@@ -1212,8 +1322,12 @@ sub GroupByCols {
     my $self = shift;
     my @args = @_;
 
+    my $old_value = $self->_GroupClause;
     $self->{'group_by'} = \@args;
-    $self->RedoSearch();
+
+    if ( $self->_GroupClause ne $old_value ) {
+        $self->RedoSearch();
+    }
 }
 
 =head2 _GroupClause
@@ -1309,11 +1423,11 @@ sub _GetAlias {
 
 =head2 Join
 
-Join instructs DBIx::SearchBuilder to join two tables.  
+Join instructs DBIx::SearchBuilder to join two tables.
 
-The standard form takes a param hash with keys ALIAS1, FIELD1, ALIAS2 and 
+The standard form takes a param hash with keys ALIAS1, FIELD1, ALIAS2 and
 FIELD2. ALIAS1 and ALIAS2 are column aliases obtained from $self->NewAlias or
-a $self->Limit. FIELD1 and FIELD2 are the fields in ALIAS1 and ALIAS2 that 
+a $self->Limit. FIELD1 and FIELD2 are the fields in ALIAS1 and ALIAS2 that
 should be linked, respectively.  For this type of join, this method
 has no return value.
 
@@ -1476,33 +1590,29 @@ sub _ItemsCounter {
 
 =head2 Count
 
-Returns the number of records in the set.
+Returns the number of records in the set. When L</RowsPerPage> is set,
+returns number of records in the page only, otherwise the same as
+L</CountAll>.
 
 =cut
 
 sub Count {
     my $self = shift;
 
-    # An unlimited search returns no tickets    
+    # An unlimited search returns no tickets
     return 0 unless ($self->_isLimited);
 
-
-    # If we haven't actually got all objects loaded in memory, we
-    # really just want to do a quick count from the database.
     if ( $self->{'must_redo_search'} ) {
-
-        # If we haven't already asked the database for the row count, do that
-        $self->_DoCount unless ( $self->{'raw_rows'} );
-
-        #Report back the raw # of rows in the database
-        return ( $self->{'raw_rows'} );
+        if ( $self->RowsPerPage ) {
+            $self->_DoSearch;
+        }
+        else {
+            # No RowsPerPage means Count == CountAll
+            return $self->CountAll;
+        }
     }
 
-    # If we have loaded everything from the DB we have an
-    # accurate count already.
-    else {
-        return $self->_RecordCount;
-    }
+    return $self->_RecordCount;
 }
 
 
@@ -1514,31 +1624,10 @@ L</RowsPerPage> settings.
 
 =cut
 
-# 22:24 [Robrt(500@outer.space)] It has to do with Caching.
-# 22:25 [Robrt(500@outer.space)] The documentation says it ignores the limit.
-# 22:25 [Robrt(500@outer.space)] But I don't believe thats true.
-# 22:26 [msg(Robrt)] yeah. I
-# 22:26 [msg(Robrt)] yeah. I'm not convinced it does anything useful right now
-# 22:26 [msg(Robrt)] especially since until a week ago, it was setting one variable and returning another
-# 22:27 [Robrt(500@outer.space)] I remember.
-# 22:27 [Robrt(500@outer.space)] It had to do with which Cached value was returned.
-# 22:27 [msg(Robrt)] (given that every time we try to explain it, we get it Wrong)
-# 22:27 [Robrt(500@outer.space)] Because Count can return a different number than actual NumberOfResults
-# 22:28 [msg(Robrt)] in what case?
-# 22:28 [Robrt(500@outer.space)] CountAll _always_ used the return value of _DoCount(), as opposed to Count which would return the cached number of 
-#           results returned.
-# 22:28 [Robrt(500@outer.space)] IIRC, if you do a search with a Limit, then raw_rows will == Limit.
-# 22:31 [msg(Robrt)] ah.
-# 22:31 [msg(Robrt)] that actually makes sense
-# 22:31 [Robrt(500@outer.space)] You should paste this conversation into the CountAll docs.
-# 22:31 [msg(Robrt)] perhaps I'll create a new method that _actually_ do that.
-# 22:32 [msg(Robrt)] since I'm not convinced it's been doing that correctly
-
-
 sub CountAll {
     my $self = shift;
 
-    # An unlimited search returns no tickets    
+    # An unlimited search returns no tickets
     return 0 unless ($self->_isLimited);
 
     # If we haven't actually got all objects loaded in memory, we
@@ -1546,12 +1635,12 @@ sub CountAll {
     # or if we have paging enabled then we count as well and store it in count_all
     if ( $self->{'must_redo_search'} || ( $self->RowsPerPage && !$self->{'count_all'} ) ) {
         # If we haven't already asked the database for the row count, do that
-        $self->_DoCount(1);
+        $self->_DoCount;
 
         #Report back the raw # of rows in the database
         return ( $self->{'count_all'} );
     }
-    
+
     # if we have paging enabled and have count_all then return it
     elsif ( $self->RowsPerPage ) {
         return ( $self->{'count_all'} );
@@ -1895,9 +1984,10 @@ sub _OptimizeQuery {
     undef $self->{_bind_values};
     if ( $args{PreferBind} ) {
         ( $$query, my @bind_values ) = $self->_Handle->_ExtractBindValues($$query);
-        if (@bind_values) {
-            $self->{_bind_values} = \@bind_values;
-        }
+
+        # Set _bind_values even if no values are extracted, as we use it in
+        # ApplyLimits to determine if bind is enabled.
+        $self->{_bind_values} = \@bind_values;
     }
 }
 
@@ -1943,7 +2033,7 @@ sub DEBUG { warn "DEBUG is deprecated" }
 
 
 if( eval { require capitalization } ) {
-	capitalization->unimport( __PACKAGE__ );
+    capitalization->unimport( __PACKAGE__ );
 }
 
 1;
@@ -1982,7 +2072,7 @@ or via the web at
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (C) 2001-2014, Best Practical Solutions LLC.
+Copyright (C) 2001-2022, Best Practical Solutions LLC.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

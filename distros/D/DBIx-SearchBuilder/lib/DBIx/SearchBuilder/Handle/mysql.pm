@@ -1,5 +1,3 @@
-# $Header: /home/jesse/DBIx-SearchBuilder/history/SearchBuilder/Handle/mysql.pm,v 1.8 2001/10/12 05:27:05 jesse Exp $
-
 package DBIx::SearchBuilder::Handle::mysql;
 
 use strict;
@@ -35,19 +33,19 @@ sub Insert  {
 
     my $sth = $self->SUPER::Insert(@_);
     if (!$sth) {
-	    return ($sth);
-     }
+        return ($sth);
+    }
 
     $self->{'id'}=$self->dbh->{'mysql_insertid'};
- 
+
     # Yay. we get to work around mysql_insertid being null some of the time :/
     unless ($self->{'id'}) {
 	$self->{'id'} =  $self->FetchResult('SELECT LAST_INSERT_ID()');
     }
     warn "$self no row id returned on row creation" unless ($self->{'id'});
-    
+
     return( $self->{'id'}); #Add Succeded. return the id
-  }
+}
 
 
 =head2 SimpleUpdateFromSelect
@@ -143,13 +141,13 @@ sub DatabaseVersion {
     my $self = shift;
     my $v = $self->SUPER::DatabaseVersion();
 
-   $v =~ s/\-.*$//;
-   return ($v);
+    $v =~ s/\-.*$//;
+    return ($v);
 }
 
-=head2 CaseSensitive 
+=head2 CaseSensitive
 
-Returns undef, since mysql's searches are not case sensitive by default 
+Returns undef, since mysql's searches are not case sensitive by default
 
 =cut
 
@@ -353,6 +351,24 @@ sub _RequireQuotedTables {
         return 1;
     }
     return 0;
+}
+
+=head2 HasSupportForCombineSearchAndCount
+
+MariaDB 10.2+ and MySQL 8+ support this.
+
+=cut
+
+sub HasSupportForCombineSearchAndCount {
+    my $self = shift;
+    my ($version) = $self->DatabaseVersion =~ /^(\d+\.\d+)/;
+
+    if ( $self->_IsMariaDB ) {
+        return $version >= 10.2 ? 1 : 0;
+    }
+    else {
+        return $version >= 8 ? 1 : 0;
+    }
 }
 
 1;

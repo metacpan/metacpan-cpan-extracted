@@ -3,9 +3,9 @@
 # Stores a data from a single row of the Treekin file, i.e. the populations of
 # all minima at a given time point.
 package Bio::RNA::Treekin::Record;
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
-use 5.006;
+use v5.14;                          # required for non-destructive subst m///r
 use strict;
 use warnings;
 
@@ -334,28 +334,6 @@ sub _read_record_lines {
     confess 'No population data lines found in Treekin file'
         unless @population_data_lines;
     chomp @population_data_lines;
-
-    ###################### Old implementation #################
-
-    # # Separate lines into header and population data.  All header lines
-    # # begin with a '# ' (remove it!)
-    # my ($current_line, @header_lines);
-    # while (defined ($current_line = <$record_handle>)) {
-    #     next if $current_line =~ /^@/;  # drop xmgrace annotations
-    #     # header lines start with '# ', remove it
-    #     last unless $current_line =~ s/^# //;
-    #     push @header_lines, $current_line;
-    # }
-    # chomp @header_lines;
-
-    # confess 'Unexpected end of record while parsing header'
-    #     unless defined $current_line;
-
-    # my @population_data_lines = ($current_line);
-    # while (defined ($current_line = <$record_handle>)) {
-    #     push @population_data_lines, $current_line;
-    # }
-    # chomp @population_data_lines;
 
     return \@header_lines, \@population_data_lines;
 }

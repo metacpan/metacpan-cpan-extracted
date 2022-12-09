@@ -1,11 +1,11 @@
 #!/usr/local/bin/perl
 ##----------------------------------------------------------------------------
-## PO Files Manipulation - ~/scripts/po.pl
-## Version v0.1.1
+## PO Files Manipulation - ~/lib//media/sf_src/perl/Text-PO/scripts/po.pl
+## Version v0.1.2
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/07/24
-## Modified 2021/07/30
+## Modified 2022/11/23
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -25,7 +25,7 @@ BEGIN
     use Text::PO::MO;
     use Text::Wrap ();
     our $PLURALS = {};
-    our $VERSION = 'v0.1.1';
+    our $VERSION = 'v0.1.2';
 };
 
 {
@@ -75,13 +75,13 @@ BEGIN
     pot                 => { type => 'string', class => [qw( init )] },
     project             => { type => 'string', class => [qw( init meta )] },
     revised_on          => { type => 'datetime', class => [qw( init meta )] },
-    team                => { type => 'string', class => [qw( init meta )], alias => [qw( language-team )] },
     settings            => { type => 'string' },
+    team                => { type => 'string', class => [qw( init meta )], alias => [qw( language-team )] },
     translator          => { type => 'string', class => [qw( init meta )] },
     tz                  => { type => 'string', alias => [qw( time_zone timezone )], class => [qw( init meta )] },
     version             => { type => 'string', class => [qw( init meta )] },
 
-    ## Generic options
+    # Generic options
     quiet               => { type => 'boolean', default => 0 },
     debug               => { type => 'integer', alias => [qw(d)], default => \$DEBUG },
     verbose             => { type => 'integer', default => \$VERBOSE },
@@ -94,7 +94,7 @@ BEGIN
     $opt->usage( sub{ pod2usage(2) } );
     our $opts = $opt->exec || die( "An error occurred executing Getopt::Class: ", $opt->error, "\n" );
 
-    ## Unless the log level has been set directly with a command line option
+    # Unless the log level has been set directly with a command line option
     unless( $LOG_LEVEL )
     {
         $LOG_LEVEL = 1 if( $VERBOSE );
@@ -864,7 +864,7 @@ sub _messagec
     }
     return( _message( $required_level, $opt->colour_parse( @_ ) ) );
 }
-
+# NOTE: POD
 __END__
 
 =encoding utf8
@@ -887,6 +887,7 @@ po - GNU PO file manager
     --domain                The po file domain
     --dump                  Dump the PO file in a format suitable for a .po file
     --init                  Create an initial po file such as .pot
+    --sync                  Synchronise a GNU PO file with another one
     
     --bugs-to               Sets the value for the meta field C<Report-Msgid-Bugs-To>
     --charset               Sets the character encoding value in C<Content-Type>
@@ -922,7 +923,7 @@ po - GNU PO file manager
 
 =head1 VERSION
 
-    v0.1.1
+    v0.1.2
 
 =head1 OPTIONS
 
@@ -944,6 +945,31 @@ Takes a C<.mo> or C<.json> file and transcode it to a po file
 
     po --as-po --output fr_FR.po ./fr_FR/com.example.api.json
 
+=head2 --bugs-to
+
+The string to be used for the PO file header field C<Bugs-To>
+
+=head2 --charset
+
+The PO file character set. This should be C<utf-8>
+
+=head2 --compile
+
+Takes a po file and compiles it into a binary file wth extension C<mo>
+
+    po --compile ./fr_FR/com.example.api.json
+    # Will create ./fr_FR/com.example.api.mo
+
+=head2 --create-on
+
+The PO file creation date. This can be an ISO 8601 date, or a unix timestamp, or even a relative date such as C<+1D>. See L<Module::Generic/_set_get_datetime> for more information
+
+=head2 --domain
+
+The PO file domain
+
+    po --init --domain com.example.api ./fr_FR/com.example.api.po
+
 =head2 --dump
 
 Dump the data contained as a GNU PO file to the STDOUT
@@ -952,6 +978,38 @@ Dump the data contained as a GNU PO file to the STDOUT
     # Maybe?
     diff /some/file.po new_file.po
 
+=head2 --encoding
+
+The PO file encoding. This defaults to C<8bit>. There is no reason to change this.
+
+=head2 --header
+
+The PO file meta information header
+
+=head2 --init
+
+Init a new PO file
+
+    po --init --domain com.example.api --lang fr_FR ./fr_FR/com.example.api.po
+    # or as a json file
+    po --init --domain com.example.api --lang fr_FR  --as-json ./fr_FR/com.example.api.json
+
+=head2 --lang
+
+The PO file locale language
+
+    po --init --domain com.example.api --lang fr_FR ./fr_FR/com.example.api.po
+
+=head2 --msgid
+
+The localised string original text.
+
+=head2 --msgstr
+
+The localised string
+
+=head2 --output
+
 =head2 --output-dir
 
 The output directory. For example to read multiple po file and create their related mo files under a given directory:
@@ -959,6 +1017,50 @@ The output directory. For example to read multiple po file and create their rela
     po --compile --output-dir ./en_GB/LC_MESSAGES en_GB.*.po
 
 This will read all the po files for language en_GB as selected in write their related mo files under C<./en_GB/LC_MESSAGES>. This directory will be created if it does not exist. The domain will be derived from the po file.
+
+=head2 --overwrite
+
+Boolean. If true, this will allow overwriting existing PO file. Default is false
+
+=head2 --po-debug
+
+An integer value to set the level of debugging. Default is o (no debugging enabled)
+
+=head2 --pot
+
+The PO template file to use
+
+=head2 --project
+
+The PO file project name
+
+=head2 --revised-on
+
+The PO file revision date. This can be an ISO 8601 date, or a unix timestamp, or even a relative date such as C<+1D>. See L<Module::Generic/_set_get_datetime> for more information
+
+=head2 --settings
+
+The file path to the C<settings.json> json file containing all the default values
+
+This is convenient to set various default values rather than specifying each of of them as option
+
+    po --init --settings /some/where/settings.json --domain com.example.api --lang fr_FR ./fr_FR/com.example.api.po
+
+=head2 --team
+
+The team in charge of this PO file maintenance
+
+=head2 --translator
+
+The PO file C<Translator> field containing the name of the person or group in charge of the translation for this file.
+
+=head2 --tz, --time-zone, --timezone
+
+The time zone to use in the PO file meta information header
+
+=head2 --version
+
+Displays this utility version number and quits.
 
 =head2 --help
 

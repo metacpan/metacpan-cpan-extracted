@@ -1,5 +1,8 @@
 Revision history for Perl module Module::Generic
 
+v0.29.1 2022-12-09T19:30:04+0900
+    - Improvement of method _set_get_hash_as_mix_object in Module::Generic
+
 v0.29.0 2022-12-07T11:51:47+0900
     - Mitigation around the use of Scalar::Util::reftype that returns undef for false, which in turn yields a perl warning of 'uninitialized value' when used in string comparison such as: Scalar::Util::reftype( $this ) eq 'ARRAY'
     - Corrected resolve() in Module::Generic::File to default $max_recursion to 0 if undefined.

@@ -12,6 +12,7 @@ BuildArch:      noarch
 BuildRequires:  perl >= 1:5.6.0
 BuildRequires:  perl(Module::Build)
 Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
+ExclusiveArch:  megaCPU
 
 %description
 If you have two arrays and you want to know if they are the same or

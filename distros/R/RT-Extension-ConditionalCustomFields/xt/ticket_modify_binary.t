@@ -38,7 +38,7 @@ $m->content_contains('ee-rt.pdf added');
 $m->content_contains('/Download/CustomFieldValue/' .$cf_condition->id . '/ee-rt.pdf');
 
 my $mjs = WWW::Mechanize::PhantomJS->new();
-$mjs->driver->ua->timeout(540);
+$mjs->driver->ua->timeout(600);
 $mjs->get($m->rt_base_url . '?user=root;pass=password');
 
 # Operator: matches, condition met

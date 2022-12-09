@@ -1,0 +1,10 @@
+2022-12-08  0.0.8
+
+* skip test under windows
+* add checks in cavaspazi for the presence of the required files
+
+2022-12-07  0.0.7
+
+* A new module in the Acmesphere
+* Remove spaces
+* Celebrate bioinformatics

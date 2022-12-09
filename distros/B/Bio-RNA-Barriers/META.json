@@ -10,7 +10,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Bio-RNA-Barriers",
    "prereqs" : {
@@ -44,22 +44,22 @@
    "provides" : {
       "Bio::RNA::Barriers" : {
          "file" : "lib/Bio/RNA/Barriers.pm",
-         "version" : "0.01"
+         "version" : "0.03"
       },
       "Bio::RNA::Barriers::Minimum" : {
          "file" : "lib/Bio/RNA/Barriers/Minimum.pm",
-         "version" : "0.01"
+         "version" : "0.03"
       },
       "Bio::RNA::Barriers::RateMatrix" : {
          "file" : "lib/Bio/RNA/Barriers/RateMatrix.pm",
-         "version" : "0.01"
+         "version" : "0.03"
       },
       "Bio::RNA::Barriers::Results" : {
          "file" : "lib/Bio/RNA/Barriers/Results.pm",
-         "version" : "0.01"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
-   "version" : "0.01",
-   "x_serialization_backend" : "JSON::PP version 4.02"
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
 }

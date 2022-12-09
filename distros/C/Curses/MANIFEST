@@ -54,6 +54,7 @@ HISTORY
 INSTALL
 list.syms
 MAINTENANCE
+makeConfig
 Makefile.PL
 MANIFEST
 ppport.h

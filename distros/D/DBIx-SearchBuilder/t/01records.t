@@ -7,7 +7,7 @@ use Test::More;
 BEGIN { require "./t/utils.pl" }
 our (@AvailableDrivers);
 
-use constant TESTS_PER_DRIVER => 66;
+use constant TESTS_PER_DRIVER => 69;
 
 my $total = scalar(@AvailableDrivers) * TESTS_PER_DRIVER;
 plan tests => $total;
@@ -93,6 +93,13 @@ SKIP: {
 	$val = $rec->TruncateValue(Phone => '12345678901234567890');
 	is($val, '123456789012345678', 'truncate by length attribute');
 
+# Confirm we truncate before comparing values and
+# don't try to update again with the same value
+
+    ($val,$msg) = $rec->SetName('1234567890123456789012345678901234567890');
+    ok(!$val, $msg);
+    is($msg, 'That is already the current value', 'No update for same value');
+    is($rec->Name, '12345678901234', "Value is the same");
 
 # Test unicode truncation:
 	my $univalue = "這是個測試";

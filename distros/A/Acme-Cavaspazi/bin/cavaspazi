@@ -1,0 +1,126 @@
+#!/usr/bin/env perl
+# PODNAME: cavaspazi
+# ABSTRACT: a simple script to remove spaces from filenames or file contents
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use File::Basename;
+use File::Spec;
+my $rename = 0;
+my $substitute = 0;
+my $dry_run;
+my $verbose;
+my $help;
+GetOptions(
+    'rename|r' => \$rename,
+    'substitute|s' => \$substitute,
+    'dry-run|n' => \$dry_run,
+    'verbose' => \$verbose,
+    'h|help' => \$help,
+);
+
+pod2usage({-exitval => 0, -verbose => 2}) if $help;
+
+for my $file (@ARGV) {
+    my $basename = basename($file);
+    my $dirname = dirname($file);
+    # check if file exists
+    if (!-e $file) {
+        print STDERR "File $file does not exist. Skipping...\n";
+        next;
+    }
+    if ($verbose) {
+            my $type = -d $file ? 'directory' : 'file';
+            print STDERR "Processing [$type] $file...\n"
+    }
+    if ($rename) {
+
+        my $new_file = $basename;
+        $new_file =~ s/ /_/g;
+        my $dest = File::Spec->catfile($dirname, $new_file);
+        if ($dry_run) {
+            print STDERR "#mv \"$file\" \"$new_file\"";
+        } else {
+            rename "$file", "$dest" or die "Can't rename $file to $dest: $!";
+        }
+    }
+    elsif ($substitute) {
+        open my $fh, '<', $file or die "Can't open $file: $!";
+        my $content = do { local $/; <$fh> };
+        close $fh;
+        $content =~ s/ /_/g;
+        open $fh, '>', $file or die "Can't open $file: $!";
+        print $fh $content;
+        print STDERR $content;
+        close $fh;
+    }
+    else {
+        die "You must specify either the -r or -s option";
+    }
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+cavaspazi - a simple script to remove spaces from filenames or file contents
+
+=head1 VERSION
+
+version 0.0.8
+
+=head1 SYNOPSIS
+
+cavaspazi [-r|-s] file1 file2 ...
+
+=head1 SUMMARY
+
+Cavaspazi - a simple script to remove spaces from filenames or file contents.
+To remove spaces from filenames use the C<-r, --rename> option.
+To remove spaces from files, use the C<-s, --substitute> option.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-r, --rename>
+
+Rename files by removing spaces from their names.
+
+=item B<-s, --substitute>
+
+Substitute spaces with underscores in the contents of the files.
+
+=item B<-n, --dry-run>
+
+Do not actually rename or substitute anything, just print what would be done.
+
+=item B<-v, --verbose>
+
+Print what is being done.
+
+=item B<-h, --help>
+
+Print a brief help message and exits.
+
+=back
+
+=head1 AUTHOR
+
+Andrea Telatin <proch@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2022 by Andrea Telatin, Nicola Vitulo.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

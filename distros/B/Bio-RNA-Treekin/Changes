@@ -1,5 +1,12 @@
 Revision history for Bio-RNA-Treekin
 
+0.05    2022-12-08
+        Added LICENSE file to MANIFEST.
+
+0.04    2022-12-08
+        - added Perl v5.14 requirement to the distribution meta data
+        - added GPLv3 LICENSE file
+
 0.03    2022-01-13
         - removed debug output spamming the terminal when reading a file
 

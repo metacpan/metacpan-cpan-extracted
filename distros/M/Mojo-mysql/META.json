@@ -4,7 +4,7 @@
       "Jan Henning Thorsen <jhthorsen@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
@@ -16,12 +16,16 @@
    "no_index" : {
       "directory" : [
          "t",
-         "inc"
+         "inc",
+         "examples",
+         "t"
       ]
    },
    "prereqs" : {
       "build" : {
-         "requires" : {}
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
       },
       "configure" : {
          "requires" : {
@@ -33,7 +37,8 @@
             "DBD::mysql" : "4.050",
             "DBI" : "1.643",
             "Mojolicious" : "8.03",
-            "SQL::Abstract" : "1.86"
+            "SQL::Abstract" : "1.86",
+            "perl" : "5.016"
          }
       },
       "test" : {
@@ -48,19 +53,40 @@
          "web" : "https://github.com/jhthorsen/mojo-mysql/issues"
       },
       "homepage" : "https://github.com/jhthorsen/mojo-mysql",
+      "license" : [
+         "http://www.opensource.org/licenses/artistic-license-2.0"
+      ],
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/jhthorsen/mojo-mysql.git",
          "web" : "https://github.com/jhthorsen/mojo-mysql"
+      },
+      "x_IRC" : {
+         "url" : "irc://irc.libera.chat/#convos",
+         "web" : "https://web.libera.chat/#convos"
       }
    },
-   "version" : "1.25",
+   "version" : "1.26",
    "x_contributors" : [
+      "Adam Hopkins <violapiratejunky@gmail.com>",
+      "Alexander Karelas <alex.karelas@gmail.com>",
       "Curt Hochwender <hochwender@centurytel.net>",
-      "Dan Book <dbook@cpan.org>",
+      "Dan Book <grinnz@grinnz.com>",
+      "Doug Bell <doug@preaction.me>",
+      "Florian Heyer <info@heyer-it.de>",
+      "Hernan Lopes <hernanlopes@gmail.com>",
       "Jan Henning Thorsen <jhthorsen@cpan.org>",
-      "Mike Magowan",
-      "Rolf Stöckli <tekki@cpan.org>"
+      "Karl Rune Nilsen <krunen@gmail.com>",
+      "Larry Leszczynski <larryl@emailplus.org>",
+      "Lucas Tiago de Moraes <lucastiagodemoraes@gmail.com>",
+      "Matt S Trout <mst@shadowcat.co.uk>",
+      "Mike Magowan <mike@magowan.co.uk>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
+      "Rolf Stöckli <tekki@cpan.org>",
+      "Sebastian Riedel <sri@cpan.org>",
+      "Svetoslav Naydenov <harry@bix.bg>",
+      "Svetoslav Naydenov <harryl@cpan.org>",
+      "Tekki <tekki@tekki.ch>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

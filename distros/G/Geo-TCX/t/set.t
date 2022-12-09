@@ -20,6 +20,9 @@ isa_ok ($oo, 'Geo::TCX');
 mkdir 't/test_set_filename';
 my $fname_initial = $o->set_filename();
 my $wd_initial    = $o->set_wd();
+my $tmp_dir_str = $tmp_dir;
+$tmp_dir_str =~ s,\\,/,g if $^O eq 'MSWin32';
+
 is($o->set_filename('foo.txt'),       $cwd  . '/t/foo.txt',            "    set_filename(): should be in same folder");
 is($o->set_filename('test_set_filename/foo.txt'),     $cwd . '/t/test_set_filename/foo.txt',"    set_filename(): should be in folder one level up");
 is($o->set_filename('./foo.txt'),     $cwd  . '/t/foo.txt',            "    set_filename(): should be in same folder");
@@ -27,7 +30,7 @@ is($o->set_filename('../foo.txt'),    $cwd  . '/foo.txt',              "    set_
 if ($^O eq 'darwin') {
     is($o->set_filename($tmp_dir . '/foo.txt'), '/private' . $tmp_dir . '/foo.txt',     "    set_filename(): with an absolute path");
 } else {
-    is($o->set_filename($tmp_dir . '/foo.txt'), $tmp_dir . '/foo.txt',     "    set_filename(): with an absolute path");
+    is($o->set_filename($tmp_dir . '/foo.txt'), $tmp_dir_str . '/foo.txt', "    set_filename(): with an absolute path");
 }
 is($o->set_wd(),                      $cwd  . '/t/',                   "    set_wd(): work_dir should not have changed throughout");
 is($o->set_wd('test_set_filename'),   $cwd  . '/t/test_set_filename/', "    set_wd(): going down 2-levels so we can then test saving a file up 2-levels");

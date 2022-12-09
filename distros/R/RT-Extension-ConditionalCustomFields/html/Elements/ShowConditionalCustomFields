@@ -25,7 +25,7 @@ jQuery(function() {
     var condition_vals = ["<% join('", "', @condition_vals) |n%>"];
     var cf_condition_vals = ["<% join('", "', @cf_condition_vals) |n%>"];
     var condition_met = false;
-%           if ($condition_cf->IsAdded($Object->id)) {
+%           if (scalar(grep {$_ eq $condition_cf->id} map {$_->id} @{$Object->CustomFields->ItemsArrayRef})) {
     if (jQuery(condition_selector).is(':visible')) {
         condition_met = condition_is_met(condition_vals, cf_condition_vals, "<% $condition->{op} |n%>", '<% $session{CurrentUser}->LanguageHandle->language_tag %>');
     }

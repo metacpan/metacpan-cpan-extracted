@@ -1,6 +1,6 @@
 # Bio/RNA/Treekin.pm
 package Bio::RNA::Treekin;
-our $VERSION = '0.03';
+our $VERSION = '0.05';
 
 use 5.006;
 use strict;

@@ -1,7 +1,22 @@
 Revision history:
 
+0.31  2022-12-08
+	Added "cds hex dump ..."
+	Fix in ActorWithDocument
+	Fix in StoreModifications
+	Fix in FolderStore
+	Fix in envelope display on the command line
+
+0.27  2022-02-10
+	Added short POD documentation.
+	"cds transfer ..." now transfers boxes and accounts.
+
+0.26  2022-02-08
+	Fixed StoreModification.
+	Minor restructuring of HTTP server code for easier use in combination with Net::Server.
+
 0.25  2022-02-05
-	Fixed C code for Windows
+	Fixed C code for Windows.
 
 0.24  2022-02-03
 	First public release.

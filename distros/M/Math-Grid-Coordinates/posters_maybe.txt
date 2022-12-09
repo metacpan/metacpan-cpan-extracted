@@ -1,0 +1,1092 @@
+/home/simone/.tldr/tldr/images/logo.svg
+/home/simone/.tldr/tldr/images/tldr.svg
+/home/simone/.tldr/tldr/images/banner.svg
+/home/simone/casette.svg
+/home/simone/New document 1.2022_04_05_13_43_44.1.svg
+/home/simone/random_squares.svg
+/home/simone/appartamento_milano.svg
+/home/simone/foo.svg
+/home/simone/foo_reworked.svg
+/home/simone/existenzgruendung/abrechnung/htmlinvoice/prince-14.3-ubuntu20.04-amd64/lib/prince/dtd/xhtml-math-svg
+/home/simone/existenzgruendung/abrechnung/htmlinvoice/1656_248_456_383_maize_srl_giulia_balboni.svg
+/home/simone/existenzgruendung/abrechnung/htmlinvoice/template.svg
+/home/simone/existenzgruendung/abrechnung/htmlinvoice/noun-hedgehog-1604156.svg
+/home/simone/existenzgruendung/abrechnung/htmlinvoice/1656_248_696_028_maize_srl_michele_scian.svg
+/home/simone/existenzgruendung/abrechnung/htmlinvoice/1656_248_568_955_maize_srl_francesco_tarasconi.svg
+/home/simone/existenzgruendung/abrechnung/htmlinvoice/noun-hedgehog-58011.svg
+/home/simone/existenzgruendung/abrechnung/htmlinvoice/1656_279_710_553_maize_srl_tomas_barazza.svg
+/home/simone/existenzgruendung/docs/20201209_GZ_Antrag-Muster_page_2.svg
+/home/simone/pioneer/public/icons/phone.svg
+/home/simone/pioneer/public/icons/radio.svg
+/home/simone/pioneer/public/icons/listing.svg
+/home/simone/moduli_asl/scans/firme_01.svg
+/home/simone/moduli_asl/scans/firme_02.svg
+/home/simone/moduli_asl/scans/giacomo_firma.svg
+/home/simone/moduli_asl/scans/simone_firma.svg
+/home/simone/moduli_asl/scans/sandra_firma.svg
+/home/simone/Downloads/ordine_1110447580_files/ikeagiftcard.svg
+/home/simone/Downloads/ordine_1110447580_files/visa.svg
+/home/simone/Downloads/ordine_1110447580_files/paypal.svg
+/home/simone/Downloads/ordine_1110447580_files/mastercard.svg
+/home/simone/Downloads/ordine_1110447580_files/ikea-logo.svg
+/home/simone/Downloads/ordine_1110447580_files/amex.svg
+/home/simone/Downloads/signature-16243134137.svg
+/home/simone/Downloads/ordine_ikea_cucina_files/ikeagiftcard.svg
+/home/simone/Downloads/ordine_ikea_cucina_files/visa.svg
+/home/simone/Downloads/ordine_ikea_cucina_files/broken-image.svg
+/home/simone/Downloads/ordine_ikea_cucina_files/paypal.svg
+/home/simone/Downloads/ordine_ikea_cucina_files/mastercard.svg
+/home/simone/Downloads/ordine_ikea_cucina_files/ikea-logo.svg
+/home/simone/Downloads/ordine_ikea_cucina_files/amex.svg
+/home/simone/Downloads/ordine_1119910182_files/ikea-logo.svg
+/home/simone/Downloads/foo.svg
+/home/simone/Downloads/vectorized(1).svg
+/home/simone/Downloads/test_05.svg
+/home/simone/Downloads/undraw_teamwork_hpdk.svg
+/home/simone/Downloads/distribuzione piano primo.svg
+/home/simone/Downloads/SW2698_tech.svg
+/home/simone/Downloads/image(4).svg
+/home/simone/Downloads/image(13).svg
+/home/simone/Downloads/image(1).svg
+/home/simone/Downloads/vectorized(2).svg
+/home/simone/Downloads/paper.svg
+/home/simone/Downloads/cv_gdpr_watermark_it.svg
+/home/simone/Downloads/image(16).svg
+/home/simone/Downloads/soggiorno.svg
+/home/simone/Downloads/image(12).svg
+/home/simone/Downloads/vimle.svg
+/home/simone/Downloads/theThing.svg
+/home/simone/Downloads/vimle_calc.svg
+/home/simone/Downloads/signature-16243141226.svg
+/home/simone/Downloads/image(17).svg
+/home/simone/Downloads/paper(2).svg
+/home/simone/Downloads/image(3).svg
+/home/simone/Downloads/image(6).svg
+/home/simone/Downloads/image(2).svg
+/home/simone/Downloads/paper(3).svg
+/home/simone/Downloads/Digital Image Processing - Image Sharpening and Edge Detection - Programmer Sought_files/logo.svg
+/home/simone/Downloads/Digital Image Processing - Image Sharpening and Edge Detection - Programmer Sought_files/cross.svg
+/home/simone/Downloads/baz1629747145516.svg
+/home/simone/Downloads/signature-16243143970.svg
+/home/simone/Downloads/undraw_Work_time_re_hdyv.svg
+/home/simone/Downloads/image(5).svg
+/home/simone/Downloads/image(7).svg
+/home/simone/Downloads/noun_Sword_13123.svg
+/home/simone/Downloads/ordine_1115781393_files/ikeagiftcard.svg
+/home/simone/Downloads/ordine_1115781393_files/visa.svg
+/home/simone/Downloads/ordine_1115781393_files/paypal.svg
+/home/simone/Downloads/ordine_1115781393_files/mastercard.svg
+/home/simone/Downloads/ordine_1115781393_files/ikea-logo.svg
+/home/simone/Downloads/ordine_1115781393_files/amex.svg
+/home/simone/Downloads/webgl - GLSL Canny Shader - Stack Overflow_files/teams-illo-free-sidebar-promo.svg
+/home/simone/Downloads/signature-16243145009.svg
+/home/simone/Downloads/image.svg
+/home/simone/Downloads/signature-16243134004.svg
+/home/simone/Downloads/foo(2).svg
+/home/simone/Downloads/signature-16243904501.svg
+/home/simone/Downloads/of POCs MVPs and scaling.svg
+/home/simone/Downloads/vectorized(3).svg
+/home/simone/Downloads/signature-16243906185.svg
+/home/simone/Downloads/app.ingi.ro_files/logo.svg
+/home/simone/Downloads/distribuzione piano terra scala.svg
+/home/simone/Downloads/ordine_1119270701_files/ikea-logo.svg
+/home/simone/Downloads/image(15).svg
+/home/simone/Downloads/foo(3).svg
+/home/simone/Downloads/paper(1).svg
+/home/simone/Downloads/signature-16243144925.svg
+/home/simone/Downloads/image(14).svg
+/home/simone/Downloads/image(11).svg
+/home/simone/Downloads/theThing(1).svg
+/home/simone/Downloads/svg2roughjs.svg
+/home/simone/Downloads/foo(1).svg
+/home/simone/Downloads/image(8).svg
+/home/simone/Downloads/image(10).svg
+/home/simone/Downloads/image(9).svg
+/home/simone/Downloads/signature-16514256791.svg
+/home/simone/Downloads/vectorized.svg
+/home/simone/Downloads/baz-1629753475853.svg
+/home/simone/Downloads/signature-16243133209.svg
+/home/simone/ashes_and_diamonds_big.svg
+/home/simone/HistoMan/public/foo.svg
+/home/simone/HistoMan/public/vectorized-3.svg
+/home/simone/HistoMan/public/cursorcircle.svg
+/home/simone/vuedev/Unperspective/public/experiments/hough-20210107180707.svg
+/home/simone/vuedev/Unperspective/public/experiments/one_dot.svg
+/home/simone/vuedev/Unperspective/public/experiments/hough.svg
+/home/simone/vuedev/Unperspective/public/experiments/canny.svg
+/home/simone/vuedev/Unperspective/public/experiments/hough-20210107181530.svg
+/home/simone/vuedev/Unperspective/public/experiments/hough-20210107180129.svg
+/home/simone/vuedev/Unperspective/public/experiments/hough-20210107180744.svg
+/home/simone/vuedev/Unperspective/public/experiments/hough-20210107180651.svg
+/home/simone/vuedev/Unperspective/public/experiments/hough-20210107180635.svg
+/home/simone/vuedev/Unperspective/public/experiments/hough-20210107180034.svg
+/home/simone/vuedev/Unperspective/public/experiments/hough-20210107180000.svg
+/home/simone/vuedev/Unperspective/public/experiments/hough-20210107180305.svg
+/home/simone/vuedev/Unperspective/public/experiments/hough-20210107180319.svg
+/home/simone/vuedev/Unperspective/public/experiments/hough-20210107181541.svg
+/home/simone/vuedev/Unperspective/text.svg
+/home/simone/vuedev/Burro/foo.svg
+/home/simone/vuedev/Burro/simone.svg
+/home/simone/vuedev/Burro/signature.svg
+/home/simone/vuedev/Burro/portrait.svg
+/home/simone/vuedev/Burro/bar_01.svg
+/home/simone/vuedev/Synesthesia/public/favicon.svg
+/home/simone/perl5/perlbrew/perls/perl-5.30.2/lib/site_perl/5.30.2/Mojolicious/Plugin/Minion/resources/public/minion/webfonts/fa-brands-400.svg
+/home/simone/perl5/perlbrew/perls/perl-5.30.2/lib/site_perl/5.30.2/Mojolicious/Plugin/Minion/resources/public/minion/webfonts/fa-regular-400.svg
+/home/simone/perl5/perlbrew/perls/perl-5.30.2/lib/site_perl/5.30.2/Mojolicious/Plugin/Minion/resources/public/minion/webfonts/fa-solid-900.svg
+/home/simone/perl5/perlbrew/perls/perl-5.30.2/lib/site_perl/5.30.2/Mojolicious/Plugin/resources/public/mojo-status/webfonts/fa-brands-400.svg
+/home/simone/perl5/perlbrew/perls/perl-5.30.2/lib/site_perl/5.30.2/Mojolicious/Plugin/resources/public/mojo-status/webfonts/fa-regular-400.svg
+/home/simone/perl5/perlbrew/perls/perl-5.30.2/lib/site_perl/5.30.2/Mojolicious/Plugin/resources/public/mojo-status/webfonts/fa-solid-900.svg
+/home/simone/perl5/perlbrew/perls/perl-5.30.2/lib/site_perl/5.30.2/Mojolicious/resources/public/mojo/webfonts/fa-brands-400.svg
+/home/simone/perl5/perlbrew/perls/perl-5.30.2/lib/site_perl/5.30.2/Mojolicious/resources/public/mojo/webfonts/fa-regular-400.svg
+/home/simone/perl5/perlbrew/perls/perl-5.30.2/lib/site_perl/5.30.2/Mojolicious/resources/public/mojo/webfonts/fa-solid-900.svg
+/home/simone/inkscape_test.svg
+/home/simone/shoe_02_for_blender.svg
+/home/simone/snap/snap-store/common/.cache/gnome-software/cssresource/fedc0f0ce761a59579d1423b59ca57afc3900815-slack-logo.svg
+/home/simone/snap/snap-store/common/.cache/gnome-software/cssresource/df0c61ce552fea4dba8ade1f6541da4833f342b1-steam-logo.svg
+/home/simone/shoe_03.svg
+/home/simone/shoe_02.svg
+/home/simone/TVRemote/public/speaker.svg
+/home/simone/TVRemote/public/mute.svg
+/home/simone/mojodev/Arancione/europe_6.svg
+/home/simone/mojodev/AR/public/assets/marker.svg
+/home/simone/mojodev/GimmeToken/FB-FSE-REV5-BAHNHOF.svg
+/home/simone/mojodev/Skedulo/templates/result.svg
+/home/simone/mojodev/MaybeVersion/public/logo.svg
+/home/simone/mojodev/Marti/logo.svg
+/home/simone/mojodev/Marti/foo.svg
+/home/simone/mojodev/Marti/pompidou.svg
+/home/simone/mojodev/Marti/components/patterns.svg
+/home/simone/mojodev/Marti/stampi/edera-fascia-1.svg
+/home/simone/mojodev/Marti/stampi/tellus-angolo.svg
+/home/simone/mojodev/Marti/stampi/decoro-quadratino.svg
+/home/simone/mojodev/Marti/stampi/none.svg
+/home/simone/mojodev/Marti/stampi/decoro-iris.svg
+/home/simone/mojodev/Marti/stampi/decoro-narciso-scaled.svg
+/home/simone/mojodev/Marti/stampi/decoro-iris-scaled.svg
+/home/simone/mojodev/Marti/stampi/decoro-pompei.svg
+/home/simone/mojodev/Marti/stampi/decoro-gallipoli.svg
+/home/simone/mojodev/Marti/stampi/diana-fascia-1.svg
+/home/simone/mojodev/Marti/stampi/tellus-fascia.svg
+/home/simone/mojodev/Marti/stampi/penelope-fascia-1.svg
+/home/simone/mojodev/Marti/stampi/edera-angolo-1.svg
+/home/simone/mojodev/Marti/stampi/tozzetto-fascia-1.svg
+/home/simone/mojodev/Marti/stampi/penelope-angolo-1.svg
+/home/simone/mojodev/Marti/stampi/decoro-iride.svg
+/home/simone/mojodev/Marti/stampi/diana-angolo-1.svg
+/home/simone/mojodev/Marti/stampi/decoro-lecce.svg
+/home/simone/mojodev/Marti/stampi/decoro-lecce-scaled.svg
+/home/simone/mojodev/Marti/stampi/decoro-narciso.svg
+/home/simone/mojodev/Marti/stampi/decoro-siena.svg
+/home/simone/mojodev/Marti/stampi/tozzetto-angolo-1.svg
+/home/simone/mojodev/Marti/tile_03.svg
+/home/simone/mojodev/Marti/pinheiro.svg
+/home/simone/mojodev/Marti/lines_02.svg
+/home/simone/mojodev/Marti/lines.svg
+/home/simone/mojodev/Marti/tile_01.svg
+/home/simone/mojodev/Marti/tile_02.svg
+/home/simone/mojodev/Marti/skunk/curve.svg
+/home/simone/decision_tree.svg
+/home/simone/Meshroom-2021.1.0-av2.4.0-centos7-cuda10.2/lib/meshroom/ui/img/meshroom.svg
+/home/simone/Meshroom-2021.1.0-av2.4.0-centos7-cuda10.2/lib/meshroom/ui/img/meshroom-tagline-vertical.svg
+/home/simone/New document 1.2022_08_16_17_33_06.0.svg
+/home/simone/shoe_02_for_blender.svg.2021_11_29_19_00_29.0.svg
+/home/simone/the_texture.ep.svg
+/home/simone/the_texture.svg
+/home/simone/hfarm/maxmara/Book13.svg
+/home/simone/hfarm/paperwork/TFR, modulo T2-2-002.svg
+/home/simone/hfarm/paperwork/TFR, modulo T2-2-001.svg
+/home/simone/hfarm/paperwork/Detrazioni d'imposta.svg
+/home/simone/hfarm/wethod/appunti.svg
+/home/simone/hfarm/datascience/flowchart.svg
+/home/simone/hfarm/pocs.svg
+/home/simone/hfarm/b/piano.svg
+/home/simone/hfarm/clo_export/test.svg
+/home/simone/hfarm/clo_export/screenshots/final_output.svg
+/home/simone/hfarm/clo_export/screenshots/blender_screenshots/multiple_vs_single/single_thick.svg
+/home/simone/hfarm/clo_export/screenshots/blender_screenshots/multiple_vs_single/multiple_thick.svg
+/home/simone/hfarm/clo_export/screenshots/blender_screenshots/thin_vs_thick/single_thin_weld.svg
+/home/simone/hfarm/clo_export/screenshots/blender_screenshots/thin_vs_thick/single_thick_weld.svg
+/home/simone/hfarm/clo_export/screenshots/cropped_params/107_thin_vs_thick.svg
+/home/simone/hfarm/clo_export/screenshots/cropped_params/drawing-1.svg
+/home/simone/hfarm/clo_export/screenshots/cropped_params/108_uv_coordinates.svg
+/home/simone/hfarm/clo_export/screenshots/cropped_params/009_xdotoolwindowactivate48234518mousemovewindow48234518995518click1_cropped_params.svg
+/home/simone/hfarm/clo_export/screenshots/cropped_params/drawing.svg
+/home/simone/hfarm/clo_export/screenshots/cropped_params/007_sleep2_cropped_params.svg
+/home/simone/hfarm/clo_export/screenshots/cropped_params/008_xdotoolwindowactivate48234518mousemovewindow48234518993413click1_cropped_params.svg
+/home/simone/hfarm/clo_export/screenshots/cropped_params/010_clo_uom_cropped_params.svg
+/home/simone/hfarm/clo_export/screenshots/cropped_params/107_single_vs_multiple.svg
+/home/simone/hfarm/clo_export/screenshots/cropped_params/miba_industrial.svg
+/home/simone/hfarm/clo_export/screenshots/cropped_logo/003_xdotoolwindowactivate48234518mousemovewindow4823451893223click1_cropped_logo.svg
+/home/simone/hfarm/clo_export/screenshots/cropped_logo/103_pick_fbxsvg.svg
+/home/simone/hfarm/clo_export/clo_uom.svg
+/home/simone/hfarm/thelios/modeling/d.svg
+/home/simone/hfarm/thelios/modeling/temple.svg
+/home/simone/hfarm/thelios/modeling/front.svg
+/home/simone/hfarm/grid/drawing.svg
+/home/simone/hfarm/maize_form/maize_form-001.svg
+/home/simone/hfarm/maize_form/maize_form-002.svg
+/home/simone/hfarm/autocorrelation_textures/crop_norm.svg
+/home/simone/hfarm/autocorrelation_textures/crop_deskew.svg
+/home/simone/hfarm/bulgari_poc/scans-20220722/foo.svg
+/home/simone/hfarm/bulgari_poc/scans-20220722/drawing-1.svg
+/home/simone/hfarm/bulgari_poc/scans-20220722/scan4163.svg
+/home/simone/hfarm/bulgari_poc/scans-20220722/scan4164.svg
+/home/simone/hfarm/bulgari_poc/scans-20220722/scan4162.svg
+/home/simone/hfarm/bulgari_poc/scans-20220722/scan0241.svg
+/home/simone/hfarm/bulgari_poc/scans-20220722/scan0239.svg
+/home/simone/hfarm/bulgari_poc/scans-20220722/scan0240.svg
+/home/simone/hfarm/bulgari_poc/scans-20220722/scan0238.svg
+/home/simone/hfarm/nft/approx.svg
+/home/simone/hfarm/nft/drawing-2.svg
+/home/simone/hfarm/nft/drawing-2.svg.2022_08_25_23_29_41.0.svg
+/home/simone/hfarm/nft/circle.svg
+/home/simone/hfarm/florence/florence-01.svg
+/home/simone/hfarm/florence/florence-02.svg
+/home/simone/hfarm/florence/florence-03.svg
+/home/simone/shoe_03.svg.2021_10_21_03_54_34.0.svg
+/home/simone/pseudo_sinus.svg
+/home/simone/miba/märklin/Miba Spezial 75 Anschlieber und Werksbahnen-091.svg
+/home/simone/miba/märklin/Miba Spezial 75 Anschlieber und Werksbahnen-094.svg
+/home/simone/miba/märklin/Miba Spezial 75 Anschlieber und Werksbahnen-090.svg
+/home/simone/miba/märklin/Miba Spezial 75 Anschlieber und Werksbahnen-089.svg
+/home/simone/miba/märklin/drawing-2.svg
+/home/simone/miba/märklin/Miba Spezial 75 Anschlieber und Werksbahnen-093.svg
+/home/simone/miba/märklin/Miba Spezial 75 Anschlieber und Werksbahnen-092.svg
+/home/simone/miba/märklin/Miba Spezial 75 Anschlieber und Werksbahnen-087.svg
+/home/simone/miba/märklin/Miba Spezial 75 Anschlieber und Werksbahnen-088.svg
+/home/simone/miba/märklin/drawing-2.svg.2022_08_16_23_29_33.0.svg
+/home/simone/graphviz_nodes/foo.svg
+/home/simone/cucina-20220530.svg
+/home/simone/sunglasses.svg
+/home/simone/fastpres/comments.svg
+/home/simone/fastpres/arrows_03.svg
+/home/simone/fastpres/text_02.svg
+/home/simone/fastpres/text_03.svg
+/home/simone/fastpres/text.svg
+/home/simone/fastpres/foo_01.svg
+/home/simone/fastpres/foo_02.svg
+/home/simone/fastpres/arrows.svg
+/home/simone/recinzione.svg
+/home/simone/drawing-2.svg
+/home/simone/bank/tools/css/fonts/fontawesome-webfont.svg
+/home/simone/bank/tools/static/css/fonts/fontawesome-webfont.svg
+/home/simone/bank/tools/static/fonts/fontawesome-webfont.svg
+/home/simone/bank/tools/fonts/fontawesome-webfont.svg
+/home/simone/perldev/CSS-Parser/skunk/css-tests/grid-level-01/refrends/example039.svg
+/home/simone/perldev/CSS-Parser/skunk/css-tests/grid-level-01/refrends/example036.svg
+/home/simone/perldev/CSS-Parser/skunk/css-tests/css3/c/clip-rule.svg
+/home/simone/perldev/CSS-Parser/skunk/css-tests/css3/c/clip-path.svg
+/home/simone/perldev/CSS-Parser/skunk/css-tests/css3/c/filter.svg
+/home/simone/perldev/CSS-Parser/skunk/css-tests/css3/f/SwitzeraADF-Regular.svg
+/home/simone/perldev/CSS-Parser/skunk/css-tests/css3/i/cloud.svg
+/home/simone/perldev/CSS-Parser/skunk/css-tests/css3/i/hatchgrid.svg
+/home/simone/perldev/CSS-Parser/skunk/css-tests/css3/i/hexlike.svg
+/home/simone/perldev/CSS-Parser/skunk/css-tests/css3-tests/f/SwitzeraADF-Regular.svg
+/home/simone/buco_import_blender.svg
+/home/simone/scrapedev/venezia/simonecesano.github.io/pavimenti/floorplan.svg
+/home/simone/scrapedev/venezia/simonecesano.github.io/pavimenti/piano_terra.svg
+/home/simone/scrapedev/venezia/simonecesano.github.io/static/fonts/fontawesome-webfont.svg
+/home/simone/scrapedev/venezia/simonecesano.github.io/vacation_maps/marker_clean_no.svg
+/home/simone/cucina_granito-20220530.svg
+/home/simone/portfolio_luca/1 20_Exhibition Unit Plan-inkscape.svg
+/home/simone/portfolio_luca/1 20_Exhibition Sections-inkscape.svg
+/home/simone/portfolio_luca/1 20_Exhibition Unit Plan-pdftools.svg
+/home/simone/portfolio_luca/1 20_Exhibition Sections-pdftools.svg
+/home/simone/portfolio_luca/11000_Masterplan-ISO A1-inkscape.svg
+/home/simone/portfolio_luca/11000_Masterplan-ISO A1-pdftools.svg
+/home/simone/Desktop/clo_stuff/occhiale.svg
+/home/simone/Desktop/clo_stuff/0001.svg
+/home/simone/algo.svg
+/home/simone/abito.svg
+/home/simone/ordini_ikea_2021_reso/html/Dettagli dell'acquisto | Cronologia degli acquisti_files/master-card-id-check.svg
+/home/simone/ordini_ikea_2021_reso/html/Dettagli dell'acquisto | Cronologia degli acquisti_files/american-express-safe-key.svg
+/home/simone/ordini_ikea_2021_reso/html/Dettagli dell'acquisto | Cronologia degli acquisti_files/american-express.svg
+/home/simone/ordini_ikea_2021_reso/html/Dettagli dell'acquisto | Cronologia degli acquisti_files/visa.svg
+/home/simone/ordini_ikea_2021_reso/html/Dettagli dell'acquisto | Cronologia degli acquisti_files/master-card.svg
+/home/simone/ordini_ikea_2021_reso/html/Dettagli dell'acquisto | Cronologia degli acquisti_files/paypal.svg
+/home/simone/ordini_ikea_2021_reso/html/Dettagli dell'acquisto | Cronologia degli acquisti_files/ikea-gift-card.svg
+/home/simone/ordini_ikea_2021_reso/html/Dettagli dell'acquisto | Cronologia degli acquisti_files/visa-secure.svg
+/home/simone/ordini_ikea_2021_reso/html/Dettagli dell'acquisto | Cronologia degli acquisti_files/ikea-logo.svg
+/home/simone/ordini_ikea_2021_reso/orig/Dettagli dell'acquisto | Cronologia degli acquisti_files/master-card-id-check.svg
+/home/simone/ordini_ikea_2021_reso/orig/Dettagli dell'acquisto | Cronologia degli acquisti_files/american-express-safe-key.svg
+/home/simone/ordini_ikea_2021_reso/orig/Dettagli dell'acquisto | Cronologia degli acquisti_files/american-express.svg
+/home/simone/ordini_ikea_2021_reso/orig/Dettagli dell'acquisto | Cronologia degli acquisti_files/visa.svg
+/home/simone/ordini_ikea_2021_reso/orig/Dettagli dell'acquisto | Cronologia degli acquisti_files/master-card.svg
+/home/simone/ordini_ikea_2021_reso/orig/Dettagli dell'acquisto | Cronologia degli acquisti_files/paypal.svg
+/home/simone/ordini_ikea_2021_reso/orig/Dettagli dell'acquisto | Cronologia degli acquisti_files/ikea-gift-card.svg
+/home/simone/ordini_ikea_2021_reso/orig/Dettagli dell'acquisto | Cronologia degli acquisti_files/visa-secure.svg
+/home/simone/ordini_ikea_2021_reso/orig/Dettagli dell'acquisto | Cronologia degli acquisti_files/ikea-logo.svg
+/home/simone/lvmh_pictures/apollo/slides/apollo-1.0_with-010.svg
+/home/simone/lvmh_pictures/apollo/slides/apollo-1.0_with-013.svg
+/home/simone/lvmh_pictures/apollo/slides/apollo-1.0_with-003.svg
+/home/simone/lvmh_pictures/apollo/slides/apollo-1.0_with-004.svg
+/home/simone/lvmh_pictures/apollo/slides/apollo-1.0_with-006.svg
+/home/simone/lvmh_pictures/apollo/slides/apollo-1.0_with-014.svg
+/home/simone/lvmh_pictures/apollo/slides/apollo-1.0_with-015.svg
+/home/simone/lvmh_pictures/apollo/slides/apollo-1.0_with-001.svg
+/home/simone/lvmh_pictures/apollo/slides/apollo-1.0_with-009.svg
+/home/simone/lvmh_pictures/apollo/slides/apollo-1.0_with-002.svg
+/home/simone/lvmh_pictures/apollo/slides/apollo-1.0_with-012.svg
+/home/simone/lvmh_pictures/apollo/slides/apollo-1.0_with-011.svg
+/home/simone/lvmh_pictures/apollo/slides/apollo-1.0_with-007.svg
+/home/simone/lvmh_pictures/apollo/slides/apollo-1.0_with-008.svg
+/home/simone/lvmh_pictures/apollo/slides/apollo-1.0_with-005.svg
+/home/simone/lvmh_pictures/svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-096.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-101.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-032.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-034.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-040.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-124.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-118.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-110.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-042.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-008.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-082.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-035.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-103.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-049.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-072.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-094.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-007.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-100.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-051.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-088.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-036.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-117.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-108.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-119.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-014.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-109.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-107.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-126.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-059.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-106.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-038.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-018.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-074.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-076.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-019.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-102.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-114.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-006.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-115.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-023.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-013.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-081.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-044.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-056.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-031.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-047.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-029.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-024.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-053.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-061.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-078.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-015.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-105.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-016.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-030.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-116.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-092.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-113.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-123.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-104.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-080.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-033.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-111.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-054.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-083.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-026.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-060.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-050.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-068.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-070.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-028.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-005.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-079.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-098.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-043.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-122.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-066.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-120.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-041.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-077.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-025.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-089.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-017.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-022.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-004.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-009.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-093.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-075.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-021.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-001.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-055.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-073.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-086.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-095.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-099.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-069.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-087.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-084.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-048.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-052.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-062.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-057.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-027.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-037.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-112.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-121.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-011.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-067.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-058.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-012.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-091.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-046.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-085.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-002.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-045.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-125.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-065.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-097.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-064.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-063.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-010.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-071.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-003.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-020.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-090.svg
+/home/simone/lvmh_pictures/svg/Estratto da LVMH_Product Discovery_TrendResearch-039.svg
+/home/simone/lvmh_pictures/ripping/Estratto da LVMH_Product Discovery_TrendResearch.svg
+/home/simone/lvmh_pictures/hand_sketches/scanner@h-farm.com_20220325_092358-001.svg
+/home/simone/lvmh_pictures/hand_sketches/set_01-008.svg
+/home/simone/lvmh_pictures/hand_sketches/set_01-003.svg
+/home/simone/lvmh_pictures/hand_sketches/adoption_curve.svg
+/home/simone/lvmh_pictures/hand_sketches/users_and_features.svg
+/home/simone/lvmh_pictures/hand_sketches/scanner@h-farm.com_20220325_092358-002.svg
+/home/simone/lvmh_pictures/hand_sketches/set_01-005.svg
+/home/simone/lvmh_pictures/hand_sketches/scaling.svg
+/home/simone/lvmh_pictures/hand_sketches/set_01-007.svg
+/home/simone/lvmh_pictures/hand_sketches/set_01-001.svg
+/home/simone/lvmh_pictures/hand_sketches/set_02.svg
+/home/simone/lvmh_pictures/hand_sketches/set_01-004.svg
+/home/simone/lvmh_pictures/hand_sketches/set_01-009.svg
+/home/simone/lvmh_pictures/hand_sketches/set_04.svg
+/home/simone/lvmh_pictures/hand_sketches/set_01-006.svg
+/home/simone/lvmh_pictures/hand_sketches/risk_and_effort.svg
+/home/simone/lvmh_pictures/hand_sketches/time_to_failure.svg
+/home/simone/lvmh_pictures/hand_sketches/set_01-002.svg
+/home/simone/lvmh_pictures/hand_sketches/set_03-001.svg
+/home/simone/install/include/boost/geometry/io/svg
+/home/simone/blender_learning/dxf-20210915/lukaszlaba-dxf2svg-e2b641734145/dxf2svg
+/home/simone/font_posters/BookmanSpec.svg
+/home/simone/font_posters/AkzidenzGroteskspecAIB1.svg
+/home/simone/font_posters/Futura_Specimen.svg
+/home/simone/.config/inkscape/extensions/org.inkscape.inkman/inkman/data/pixmaps/default_icon.svg
+/home/simone/.config/inkscape/extensions/org.inkscape.inkman/inkman/data/pixmaps/star-some.svg
+/home/simone/.config/inkscape/extensions/org.inkscape.inkman/inkman/data/pixmaps/orphan_icon.svg
+/home/simone/.config/inkscape/extensions/org.inkscape.inkman/inkman/data/pixmaps/icon.svg
+/home/simone/.config/inkscape/extensions/org.inkscape.inkman/inkman/data/pixmaps/core_icon.svg
+/home/simone/.config/inkscape/extensions/org.inkscape.inkman/inkman/data/pixmaps/default.svg
+/home/simone/.config/inkscape/extensions/org.inkscape.inkman/inkman/data/pixmaps/star-lots.svg
+/home/simone/.config/inkscape/extensions/org.inkscape.inkman/inkman/data/pixmaps/module_icon.svg
+/home/simone/.config/inkscape/extensions/org.inkscape.inkman/inkman/data/pixmaps/star-none.svg
+/home/simone/.config/inkscape/extensions/node_modules/psl/browserstack-logo.svg
+/home/simone/.config/inkscape/extensions/node_modules/jsdom/lib/jsdom/living/svg
+/home/simone/.config/inkscape/extensions/node_modules/jsdom/lib/jsdom/living/helpers/svg
+/home/simone/.config/inkscape/extensions/node_modules/paper/examples/Node.js/in.svg
+/home/simone/.config/blender/2.92/scripts/addons/blender.script.io_export_svg
+/home/simone/scans_luca/stitched.svg
+/home/simone/malevich/.#perlin.svg
+/home/simone/malevich/base.svg
+/home/simone/malevich/1552332717.svg
+/home/simone/malevich/malevich_02.svg
+/home/simone/malevich/blend.svg
+/home/simone/malevich/so_03.svg
+/home/simone/malevich/composite.svg
+/home/simone/malevich/malevich_03.svg
+/home/simone/malevich/1550794462.svg
+/home/simone/malevich/composite_02.svg
+/home/simone/malevich/1546647942.svg
+/home/simone/malevich/.#base.svg
+/home/simone/malevich/so_05.svg
+/home/simone/malevich/drawing.svg
+/home/simone/malevich/so_01.svg
+/home/simone/malevich/composite_03.svg
+/home/simone/malevich/malevich_01.svg
+/home/simone/malevich/perlin.svg
+/home/simone/malevich/so_02.svg
+/home/simone/malevich/so_04.svg
+/home/simone/malevich/turbulence.svg
+/home/simone/reso_ikea/ordini_originali/ordine_1110447580_files/ikeagiftcard.svg
+/home/simone/reso_ikea/ordini_originali/ordine_1110447580_files/visa.svg
+/home/simone/reso_ikea/ordini_originali/ordine_1110447580_files/paypal.svg
+/home/simone/reso_ikea/ordini_originali/ordine_1110447580_files/mastercard.svg
+/home/simone/reso_ikea/ordini_originali/ordine_1110447580_files/ikea-logo.svg
+/home/simone/reso_ikea/ordini_originali/ordine_1110447580_files/amex.svg
+/home/simone/reso_ikea/ordini_originali/ordine_1119910182_files/ikea-logo.svg
+/home/simone/reso_ikea/ordini_originali/ordine_1115781393_files/ikeagiftcard.svg
+/home/simone/reso_ikea/ordini_originali/ordine_1115781393_files/visa.svg
+/home/simone/reso_ikea/ordini_originali/ordine_1115781393_files/paypal.svg
+/home/simone/reso_ikea/ordini_originali/ordine_1115781393_files/mastercard.svg
+/home/simone/reso_ikea/ordini_originali/ordine_1115781393_files/ikea-logo.svg
+/home/simone/reso_ikea/ordini_originali/ordine_1115781393_files/amex.svg
+/home/simone/reso_ikea/ordini_originali/ordine_1119270701_files/ikea-logo.svg
+/home/simone/adidas_stuff/org_chart_template.svg
+/home/simone/adidas_stuff/foo.svg
+/home/simone/adidas_stuff/org_ver_01.svg
+/home/simone/adidas_stuff/klage/manual_org_charts/scan3657.svg
+/home/simone/adidas_stuff/klage/manual_org_charts/scan3658.svg
+/home/simone/adidas_stuff/klage/manual_org_charts/scan3655.svg
+/home/simone/adidas_stuff/klage/manual_org_charts/scan3656.svg
+/home/simone/adidas_stuff/klage/manual_org_charts/backup/scan3657.svg
+/home/simone/adidas_stuff/klage/manual_org_charts/backup/scan3658.svg
+/home/simone/adidas_stuff/klage/manual_org_charts/backup/scan3655.svg
+/home/simone/adidas_stuff/klage/manual_org_charts/backup/scan3656.svg
+/home/simone/adidas_stuff/klage/manual_org_charts/backup/scan3654.svg
+/home/simone/adidas_stuff/klage/manual_org_charts/scan3654.svg
+/home/simone/adidas_stuff/org_box.svg
+/home/simone/adidas_stuff/org_ver_02.svg
+/home/simone/lines.svg
+/home/simone/fatture/strauss-20220328/scan3740_filled_in.svg
+/home/simone/fatture/20200424/page_01.svg
+/home/simone/fatture/canada_2020/firma.svg
+/home/simone/fatture/canada_2021/form_front.svg
+/home/simone/fatture/canada_2021/form_back.svg
+/home/simone/fatture/20220409/scan3965.svg
+/home/simone/fatture/20220409/scan3966.svg
+/home/simone/fatture/scan3415.svg
+/home/simone/fatture/scan3415_grid.svg
+/home/simone/hadmin/rimpatrio.svg
+/home/simone/hadmin/rimpatrio_signed.pdf.2022_07_28_13_24_32.0.svg
+/home/simone/occhiale.svg
+/home/simone/rect.svg
+/home/simone/.local/bin/cairosvg
+/home/simone/.local/lib/python3.8/site-packages/matplotlib/mpl-data/images/back.svg
+/home/simone/.local/lib/python3.8/site-packages/matplotlib/mpl-data/images/subplots-symbolic.svg
+/home/simone/.local/lib/python3.8/site-packages/matplotlib/mpl-data/images/move-symbolic.svg
+/home/simone/.local/lib/python3.8/site-packages/matplotlib/mpl-data/images/qt4_editor_options.svg
+/home/simone/.local/lib/python3.8/site-packages/matplotlib/mpl-data/images/filesave-symbolic.svg
+/home/simone/.local/lib/python3.8/site-packages/matplotlib/mpl-data/images/home-symbolic.svg
+/home/simone/.local/lib/python3.8/site-packages/matplotlib/mpl-data/images/zoom_to_rect.svg
+/home/simone/.local/lib/python3.8/site-packages/matplotlib/mpl-data/images/help-symbolic.svg
+/home/simone/.local/lib/python3.8/site-packages/matplotlib/mpl-data/images/matplotlib.svg
+/home/simone/.local/lib/python3.8/site-packages/matplotlib/mpl-data/images/subplots.svg
+/home/simone/.local/lib/python3.8/site-packages/matplotlib/mpl-data/images/forward-symbolic.svg
+/home/simone/.local/lib/python3.8/site-packages/matplotlib/mpl-data/images/filesave.svg
+/home/simone/.local/lib/python3.8/site-packages/matplotlib/mpl-data/images/hand.svg
+/home/simone/.local/lib/python3.8/site-packages/matplotlib/mpl-data/images/move.svg
+/home/simone/.local/lib/python3.8/site-packages/matplotlib/mpl-data/images/home.svg
+/home/simone/.local/lib/python3.8/site-packages/matplotlib/mpl-data/images/forward.svg
+/home/simone/.local/lib/python3.8/site-packages/matplotlib/mpl-data/images/back-symbolic.svg
+/home/simone/.local/lib/python3.8/site-packages/matplotlib/mpl-data/images/help.svg
+/home/simone/.local/lib/python3.8/site-packages/matplotlib/mpl-data/images/zoom_to_rect-symbolic.svg
+/home/simone/.local/lib/python3.8/site-packages/notebook/static/components/font-awesome/fonts/fontawesome-webfont.svg
+/home/simone/.local/lib/python3.8/site-packages/dxf2svg
+/home/simone/.local/lib/python3.8/site-packages/cairosvg
+/home/simone/.local/lib/python3.8/site-packages/trimesh/resources/templates/base.svg
+/home/simone/.local/lib/python3.8/site-packages/trimesh/resources/templates/path.svg
+/home/simone/.local/lib/python3.8/site-packages/meshio/svg
+/home/simone/.local/share/Trash/files/p_and_l-20220211.svg
+/home/simone/.local/share/Trash/files/annotate-202204051149.svg
+/home/simone/.local/share/Trash/files/007_sleep2_cropped_params (copy).svg
+/home/simone/.local/share/Trash/files/annotate.svg
+/home/simone/.local/share/Trash/files/scan3962.jpg.2022_04_05_13_43_44.0.svg
+/home/simone/.local/share/Trash/files/annotate-20220405140437.svg
+/home/simone/.local/share/Trash/files/rimpatrio_signed.pdf.svg
+/home/simone/ashes_and_diamonds.svg
+/home/simone/luca_scans/scan_03.svg
+/home/simone/richiesta_residenza_matino/dichiarazione_di_residenza-002.svg
+/home/simone/richiesta_residenza_matino/dichiarazione_di_residenza-001.svg
+/home/simone/richiesta_residenza_matino/dichiarazione_di_residenza-003.svg
+/home/simone/richiesta_residenza_matino/dichiarazione_di_residenza-004.svg
+/home/simone/richiesta_residenza_matino/dichiarazione_di_residenza-005.svg
+/home/simone/foobar.svg
+/home/simone/.wine/drive_c/Program Files/Old CLO Standalone OnlineAuth/Preset/DefaultImage/ENV_Icon_01Skylight.svg
+/home/simone/.wine/drive_c/Program Files/Old CLO Standalone OnlineAuth/Preset/DefaultImage/ENV_Icon_04Wind.svg
+/home/simone/.wine/drive_c/Program Files/Old CLO Standalone OnlineAuth/Preset/DefaultImage/ENV_Icon_02Camera.svg
+/home/simone/.wine/drive_c/Program Files/Old CLO Standalone OnlineAuth/Preset/DefaultImage/ENV_Icon_03Light.svg
+/home/simone/more_lines.svg
+/home/simone/BrickLoos/foo.svg
+/home/simone/BrickLoos/grid.svg
+/home/simone/BrickLoos/bricks.svg
+/home/simone/BrickLoos/output.svg
+/home/simone/SEPA_Formular.svg
+/home/simone/rect_swiss.svg
+/home/simone/blender_converted_mesh.svg
+/home/simone/fonts_posters/FrutigerSpec-1.svg
+/home/simone/fonts_posters/JansonSpecimenAIB.svg
+/home/simone/fonts_posters/Source Serif Pro - sample.svg
+/home/simone/fonts_posters/MetroSpecimen.svg
+/home/simone/fonts_posters/Fixedsysfontpreview.svg
+/home/simone/fonts_posters/VeraSansSpecimen.svg
+/home/simone/fonts_posters/Palatino font sample.svg
+/home/simone/fonts_posters/BookmanSpec.svg
+/home/simone/fonts_posters/AdobeGaramondSp.svg
+/home/simone/fonts_posters/ConsolasSP.svg
+/home/simone/fonts_posters/KorinnaAib.svg
+/home/simone/fonts_posters/StencilSp.svg
+/home/simone/fonts_posters/AndaleSans.svg
+/home/simone/fonts_posters/ArcherSpec.svg
+/home/simone/fonts_posters/MinionPro.svg
+/home/simone/fonts_posters/TrebuchetMS SP.svg
+/home/simone/fonts_posters/JoannaSpec.svg
+/home/simone/fonts_posters/DIN 1451.svg
+/home/simone/fonts_posters/Caracteres.svg
+/home/simone/fonts_posters/EurostileSpec.svg
+/home/simone/fonts_posters/Charis SIL specimen.svg
+/home/simone/fonts_posters/GothamSpec.svg
+/home/simone/fonts_posters/Tuladha Jejeg font specimen.svg
+/home/simone/fonts_posters/JohnstonSpecimenEN.svg
+/home/simone/fonts_posters/SourceSansPro-sample.svg
+/home/simone/fonts_posters/FBBentonSans.svg
+/home/simone/fonts_posters/GentiumBlue.svg
+/home/simone/fonts_posters/KristenSpec.svg
+/home/simone/fonts_posters/NewYorkSpecimen.svg
+/home/simone/fonts_posters/ComicSansSpec3.svg
+/home/simone/fonts_posters/Myriadsp.svg
+/home/simone/fonts_posters/CenturySchoolbookSAIB.svg
+/home/simone/fonts_posters/FBInter.svg
+/home/simone/fonts_posters/Vendome.svg
+/home/simone/fonts_posters/Bauer Bodoni Mostra.svg
+/home/simone/fonts_posters/Computer Modern Sample.svg
+/home/simone/fonts_posters/Junicode.svg
+/home/simone/fonts_posters/FFMeta.svg
+/home/simone/fonts_posters/ITCEras.svg
+/home/simone/fonts_posters/Open Sans sample.svg
+/home/simone/fonts_posters/ARsp.svg
+/home/simone/fonts_posters/Colonna MT.svg
+/home/simone/fonts_posters/Windsor fontsample.svg
+/home/simone/fonts_posters/Calypso font example.svg
+/home/simone/fonts_posters/TeX Gyre Heros.svg
+/home/simone/fonts_posters/FranklinGothicSP.svg
+/home/simone/fonts_posters/BastardSpecimen.svg
+/home/simone/fonts_posters/Calisto.svg
+/home/simone/fonts_posters/AldusSpec7.svg
+/home/simone/fonts_posters/TeX Gyre Adventor.svg
+/home/simone/fonts_posters/TheanoDidot.svg
+/home/simone/fonts_posters/VAG Rounded Sample.svg
+/home/simone/fonts_posters/Bitstream Charter spec.svg
+/home/simone/fonts_posters/IBM Plex Serif sample.svg
+/home/simone/fonts_posters/Tahoma.svg
+/home/simone/fonts_posters/Papyrus Font.svg
+/home/simone/fonts_posters/Chandas typeface specimen.svg
+/home/simone/fonts_posters/TrinitéSpecimen.svg
+/home/simone/fonts_posters/Nimbus Sans Specimen.svg
+/home/simone/fonts_posters/DidotSP.svg
+/home/simone/fonts_posters/Exocet sample.svg
+/home/simone/fonts_posters/VanDijk fontsample.svg
+/home/simone/fonts_posters/Coronet fontsample.svg
+/home/simone/fonts_posters/ProFontSP.svg
+/home/simone/fonts_posters/MicrosoftSansSerifSpecimen.svg
+/home/simone/fonts_posters/Noto Serif Font Sample.svg
+/home/simone/fonts_posters/Source Code Pro - sample.svg
+/home/simone/fonts_posters/Bauhaus and Bauhaus 93 Typeface.svg
+/home/simone/fonts_posters/DejaVu Sans Mono.svg
+/home/simone/fonts_posters/Unica77LLSpecimenCH.svg
+/home/simone/fonts_posters/CoppGothicSpec.svg
+/home/simone/fonts_posters/CharcoalSpecimen7.svg
+/home/simone/fonts_posters/Broadway mostra.svg
+/home/simone/fonts_posters/GridnikSpec.svg
+/home/simone/fonts_posters/Linux Libertine.svg
+/home/simone/fonts_posters/CorbelSpec.svg
+/home/simone/fonts_posters/Handel Gothic Type Specimen.svg
+/home/simone/fonts_posters/OCR-B SP.svg
+/home/simone/fonts_posters/AkzidenzGroteskspecAIB1.svg
+/home/simone/fonts_posters/ArnoldBocklinSpec.svg
+/home/simone/fonts_posters/TeX Gyre Bonum.svg
+/home/simone/fonts_posters/Bahnschrift.svg
+/home/simone/fonts_posters/Caladea-sample.svg
+/home/simone/fonts_posters/Nyk Ngayogyan font specimen.svg
+/home/simone/fonts_posters/Candara fontsample.svg
+/home/simone/fonts_posters/BankGothicsp.svg
+/home/simone/fonts_posters/STIX Sample.svg
+/home/simone/fonts_posters/OCR-A SP.svg
+/home/simone/fonts_posters/Literaturnaya sample.svg
+/home/simone/fonts_posters/Inconsolata.svg
+/home/simone/fonts_posters/BCitySp.svg
+/home/simone/fonts_posters/Adobe Jenson.svg
+/home/simone/fonts_posters/CenturyGothicSpecimen.svg
+/home/simone/fonts_posters/DejaVuSans.svg
+/home/simone/fonts_posters/Noto Sans Font Sample.svg
+/home/simone/fonts_posters/Literata typeface sample.svg
+/home/simone/fonts_posters/TeX Gyre Schola.svg
+/home/simone/fonts_posters/TeX Gyre Pagella.svg
+/home/simone/fonts_posters/LetterGothicSP.svg
+/home/simone/fonts_posters/Microgramma Specimen.svg
+/home/simone/fonts_posters/NewYork2019Specimen.svg
+/home/simone/fonts_posters/MistralSpec.svg
+/home/simone/fonts_posters/AndaleMono.svg
+/home/simone/fonts_posters/PTSans.svg
+/home/simone/fonts_posters/Kuenstler.svg
+/home/simone/fonts_posters/Lato-font-plain.svg
+/home/simone/fonts_posters/Lobster Specimen.svg
+/home/simone/fonts_posters/GoudyOSPecimen.svg
+/home/simone/fonts_posters/GillSansEG.svg
+/home/simone/fonts_posters/FreeMono.svg
+/home/simone/fonts_posters/Algerian Specimen.svg
+/home/simone/fonts_posters/Bookerly typeface sample.svg
+/home/simone/fonts_posters/Antique Olive.svg
+/home/simone/fonts_posters/rejected/Clear Sans nameplate.svg
+/home/simone/fonts_posters/rejected/Ellimgton-sample.svg
+/home/simone/fonts_posters/rejected/Nushu-sans.svg
+/home/simone/fonts_posters/rejected/Lato pangram.svg
+/home/simone/fonts_posters/rejected/Jenson 1475 venice laertius.svg
+/home/simone/fonts_posters/rejected/Ad Lib font.svg
+/home/simone/fonts_posters/rejected/Segoe UI sample.svg
+/home/simone/fonts_posters/rejected/Highway Gothic sample.svg
+/home/simone/fonts_posters/rejected/The Guardian.svg
+/home/simone/fonts_posters/rejected/Westminsterfont.svg
+/home/simone/fonts_posters/rejected/Nushu-traditional.svg
+/home/simone/fonts_posters/rejected/Biolinum sample-DE4vekt.svg
+/home/simone/fonts_posters/rejected/Hinweiszeichen 15a-d.svg
+/home/simone/fonts_posters/rejected/草 (From Moegirlpedia).svg
+/home/simone/fonts_posters/rejected/Akzidenz Grotesk Regular & Italic.svg
+/home/simone/fonts_posters/rejected/Neuland font.svg
+/home/simone/fonts_posters/rejected/Liberation Mono Font Sample.svg
+/home/simone/fonts_posters/rejected/Lucida Blackletter sample.svg
+/home/simone/fonts_posters/rejected/Mangal typeface.svg
+/home/simone/fonts_posters/rejected/Brusseline name.svg
+/home/simone/fonts_posters/rejected/Clearview sample.svg
+/home/simone/fonts_posters/rejected/Liberation Sans Narrow Font Sample.svg
+/home/simone/fonts_posters/rejected/MingLiu.svg
+/home/simone/fonts_posters/rejected/AllertaDemonstration.svg
+/home/simone/fonts_posters/rejected/Noto Nastaliq Urdu in Perso-Arabic.svg
+/home/simone/fonts_posters/rejected/Selawik nameplate.svg
+/home/simone/fonts_posters/rejected/Catull sample.svg
+/home/simone/fonts_posters/rejected/Bitstream Vera Sans Mono.svg
+/home/simone/fonts_posters/rejected/Arabic Typesetting Font.svg
+/home/simone/fonts_posters/rejected/GoMono-pangram.svg
+/home/simone/fonts_posters/rejected/Schriftzug Antiqua.svg
+/home/simone/fonts_posters/rejected/Clear Sans pangram.svg
+/home/simone/fonts_posters/rejected/Schriftzug Rotunda.svg
+/home/simone/fonts_posters/rejected/Balloon (typeface) sample.svg
+/home/simone/fonts_posters/rejected/FE-Schrift.svg
+/home/simone/fonts_posters/rejected/Noto Naskh Arabic Regular in Perso-Arabic.svg
+/home/simone/fonts_posters/rejected/Noto Sans Arabic Reqular in Perso-Arabic.svg
+/home/simone/fonts_posters/rejected/Wiesbaden Swing Headline.svg
+/home/simone/fonts_posters/rejected/Andreas sample.svg
+/home/simone/fonts_posters/rejected/Innsbruck, ich muss dich lassen (Textversion 1539).svg
+/home/simone/fonts_posters/rejected/Шрифт Арсенал.svg
+/home/simone/fonts_posters/rejected/Antykwa poltawskiego regular.svg
+/home/simone/fonts_posters/rejected/Founder Lanting black family weights.svg
+/home/simone/fonts_posters/rejected/Antykwa Toruńska.svg
+/home/simone/fonts_posters/rejected/Alexa sample.svg
+/home/simone/fonts_posters/rejected/Allegro.svg
+/home/simone/fonts_posters/rejected/Schriftzug Schwabacher.svg
+/home/simone/fonts_posters/rejected/Deutsche Kurrentschrift.svg
+/home/simone/fonts_posters/rejected/Bitstream Vera Serif.svg
+/home/simone/fonts_posters/rejected/Source Han Serif.svg
+/home/simone/fonts_posters/rejected/AMS Euler.svg
+/home/simone/fonts_posters/rejected/Bookshelf Symbol 7 sample.svg
+/home/simone/fonts_posters/rejected/Blackboard bold.svg
+/home/simone/fonts_posters/rejected/Schriftzug Fraktur.svg
+/home/simone/fonts_posters/rejected/Noto Kufi Arabic Regular in Perso-Arabic.svg
+/home/simone/fonts_posters/rejected/Meiryo font.svg
+/home/simone/fonts_posters/rejected/Roboto (typeface).svg
+/home/simone/fonts_posters/rejected/Yale University logo.svg
+/home/simone/fonts_posters/rejected/FFDAX SAMPLE.svg
+/home/simone/fonts_posters/rejected/Liberation Serif Font Sample.svg
+/home/simone/fonts_posters/rejected/AvantGarde logo.svg
+/home/simone/fonts_posters/rejected/Nirmala UI.svg
+/home/simone/fonts_posters/rejected/Liberation Sans Font Sample.svg
+/home/simone/fonts_posters/rejected/Source Han Sans Version 2 Specimen.svg
+/home/simone/fonts_posters/rejected/LastResort samples.svg
+/home/simone/fonts_posters/rejected/RashiAlphabetVector.svg
+/home/simone/fonts_posters/rejected/Typeface sample Andika.svg
+/home/simone/fonts_posters/rejected/Klavika sample.svg
+/home/simone/fonts_posters/rejected/Lucida Sans Unicode sample.svg
+/home/simone/fonts_posters/rejected/Uniwidth typeface sample.svg
+/home/simone/fonts_posters/rejected/Wikipedia in Urdu in Code 2000.svg
+/home/simone/fonts_posters/DejaVuSerifSpecimen.svg
+/home/simone/fonts_posters/ConstructaSP.svg
+/home/simone/fonts_posters/HoboExample.svg
+/home/simone/fonts_posters/VerdanaSpecimen.svg
+/home/simone/fonts_posters/Rotisng.svg
+/home/simone/fonts_posters/TriplexSpec.svg
+/home/simone/fonts_posters/Roger-Excoffon-Choc.svg
+/home/simone/fonts_posters/RequiemSp.svg
+/home/simone/fonts_posters/ABayer.svg
+/home/simone/fonts_posters/BellGothic.svg
+/home/simone/fonts_posters/News Gothic specimen.svg
+/home/simone/fonts_posters/ArnoPro2.svg
+/home/simone/fonts_posters/Selawik SP.svg
+/home/simone/fonts_posters/IBM Plex Sans Condensed sample.svg
+/home/simone/fonts_posters/CooperBlackspec.svg
+/home/simone/fonts_posters/BulmerMT.svg
+/home/simone/fonts_posters/MonacoSpecimen.svg
+/home/simone/fonts_posters/American-typewriter-typeface-spec.svg
+/home/simone/fonts_posters/Agencyfbfontsample.svg
+/home/simone/fonts_posters/Carlito-sample.svg
+/home/simone/fonts_posters/Times New Roman-sample.svg
+/home/simone/fonts_posters/Clarendon.svg
+/home/simone/fonts_posters/Optima font sample.svg
+/home/simone/fonts_posters/BellCentennial sample.svg
+/home/simone/fonts_posters/TeX Gyre Cursor.svg
+/home/simone/fonts_posters/ArialMTsp.svg
+/home/simone/fonts_posters/LucidaGrandeSpecAIB.svg
+/home/simone/fonts_posters/Ubuntu typeface sample.svg
+/home/simone/fonts_posters/Waltograph.svg
+/home/simone/fonts_posters/CentSp.svg
+/home/simone/fonts_posters/DroidSerifSpecimen.svg
+/home/simone/fonts_posters/Architype VanDerLeck SP.svg
+/home/simone/fonts_posters/Andy-mead-typeface-spec.svg
+/home/simone/fonts_posters/PTSerif.svg
+/home/simone/fonts_posters/Product Sans typeface sample.svg
+/home/simone/fonts_posters/DomCasual fontsample.svg
+/home/simone/fonts_posters/URW_Gothic_L_specimen.svg
+/home/simone/fonts_posters/TeX Gyre Chorus.svg
+/home/simone/fonts_posters/Jomolhari Font Specimen 01.svg
+/home/simone/fonts_posters/GenevaSpecimen.svg
+/home/simone/fonts_posters/Skiaspecimen3.svg
+/home/simone/fonts_posters/BreezeSans.svg
+/home/simone/fonts_posters/TeX Gyre Termes.svg
+/home/simone/fonts_posters/GaramondSpecimenA.svg
+/home/simone/fonts_posters/DroidSansSpecimen.svg
+/home/simone/fonts_posters/PrestigeEliteSP.svg
+/home/simone/fonts_posters/DroidSansMonoSpecimen.svg
+/home/simone/fonts_posters/Courier.svg
+/home/simone/fonts_posters/Constantia sample alt.svg
+/home/simone/fonts_posters/IBM Plex Sans sample.svg
+/home/simone/fonts_posters/Kaufmann fontsample.svg
+/home/simone/fonts_posters/IBM Plex Mono sample.svg
+/home/simone/fonts_posters/HyperFontSP.svg
+/home/simone/fonts_posters/Cambria fontsample.svg
+/home/simone/fonts_posters/Typeface specimen Data 70.svg
+/home/simone/fonts_posters/Jonathan Hoefler Requiem.svg
+/home/simone/fonts_posters/Hobo fontsample.svg
+/home/simone/fonts_posters/XITS Sample.svg
+/home/simone/fonts_posters/Futura Specimen.svg
+/home/simone/fonts_posters/Free Serif.svg
+/home/simone/fonts_posters/Drogowskaz sample.svg
+/home/simone/fonts_posters/Comic Neue Specimen.svg
+/home/simone/fonts_posters/Tiresias Specimen.svg
+/home/simone/fonts_posters/Cantarell2.svg
+/home/simone/fonts_posters/GeorgiaSpecimenAIB.svg
+/home/simone/fonts_posters/BSSpec.svg
+/home/simone/fonts_posters/Free Sans Pfad.svg
+/home/simone/fonts_posters/FFScalaSpecimenAIB.svg
+/home/simone/fonts_posters/CurlzSpec.svg
+/home/simone/fonts_posters/FFScalaSansAIB.svg
+/home/simone/fonts_posters/HelveticaSpecimenCH.svg
+/home/simone/fonts_posters/MonospaceSP.svg
+/home/simone/Documents/noguchi_table.svg
+/home/simone/New document 3.2020_07_07_11_42_01.0.svg
+/home/simone/posters/ribba_40x30_fibonacci.svg
+/home/simone/posters/ribba_30x21.svg
+/home/simone/posters/ribba_40x30.svg
+/home/simone/uv_export.svg
+/home/simone/etichette.svg
+/home/simone/casa_pozzale/images/terra_1.svg
+/home/simone/casa_pozzale/images/secondo_1.svg
+/home/simone/casa_pozzale/images/primo_2.svg
+/home/simone/casa_pozzale/images/terra_2.svg
+/home/simone/casa_pozzale/images/primo_1.svg
+/home/simone/casa_pozzale/images/image2.svg
+/home/simone/casa_pozzale/images/image1.svg
+/home/simone/casa_pozzale/images/secondo_2.svg
+/home/simone/blender_dev/8x8.svg
+/home/simone/blender_dev/8x6.svg
+/home/simone/blender_dev/6x8.svg
+/home/simone/blender_dev/pattern_sewing/foo.svg
+/home/simone/blender_dev/pattern_sewing/square.svg
+/home/simone/blender_dev/pattern_sewing/brutal_tee_question.svg
+/home/simone/blender_dev/pattern_sewing/brutal_tee.svg
+/home/simone/blender_dev/pattern_sewing/The_Shirt_System_sewing_pattern_cleaned.svg
+/home/simone/blender_dev/pattern_sewing/paper.js/test/assets/arcs.svg
+/home/simone/blender_dev/pattern_sewing/paper.js/test/assets/clipping.svg
+/home/simone/blender_dev/pattern_sewing/paper.js/test/assets/gradients-3.svg
+/home/simone/blender_dev/pattern_sewing/paper.js/test/assets/butterfly.svg
+/home/simone/blender_dev/pattern_sewing/paper.js/test/assets/viewbox.svg
+/home/simone/blender_dev/pattern_sewing/paper.js/test/assets/symbol.svg
+/home/simone/blender_dev/pattern_sewing/paper.js/test/assets/gradients-2.svg
+/home/simone/blender_dev/pattern_sewing/paper.js/test/assets/blendModes.svg
+/home/simone/blender_dev/pattern_sewing/paper.js/test/assets/gradients-2-.svg
+/home/simone/blender_dev/pattern_sewing/paper.js/test/assets/gradients-1.svg
+/home/simone/blender_dev/pattern_sewing/paper.js/test/assets/gradients-4.svg
+/home/simone/blender_dev/pattern_sewing/paper.js/test/assets/symbols.svg
+/home/simone/blender_dev/pattern_sewing/paper.js/src/svg
+/home/simone/blender_dev/pattern_sewing/paper.js/examples/Node.js/in.svg
+/home/simone/blender_dev/pattern_sewing/The_Shirt_System_sewing_pattern.svg
+/home/simone/blender_dev/pattern_sewing/svgpathtools/vectorframes.svg
+/home/simone/blender_dev/pattern_sewing/svgpathtools/path.svg
+/home/simone/blender_dev/pattern_sewing/svgpathtools/output2.svg
+/home/simone/blender_dev/pattern_sewing/svgpathtools/test/polygons.svg
+/home/simone/blender_dev/pattern_sewing/svgpathtools/test/rects.svg
+/home/simone/blender_dev/pattern_sewing/svgpathtools/test/test.svg
+/home/simone/blender_dev/pattern_sewing/svgpathtools/test/groups.svg
+/home/simone/blender_dev/pattern_sewing/svgpathtools/test/transforms.svg
+/home/simone/blender_dev/pattern_sewing/svgpathtools/test/circle.svg
+/home/simone/blender_dev/pattern_sewing/svgpathtools/test/ellipse.svg
+/home/simone/blender_dev/pattern_sewing/svgpathtools/test/display_temp.svg
+/home/simone/blender_dev/pattern_sewing/svgpathtools/decorated_ellipse.svg
+/home/simone/blender_dev/pattern_sewing/svgpathtools/test.svg
+/home/simone/blender_dev/pattern_sewing/svgpathtools/examples/zero-radius-arcs.svg
+/home/simone/blender_dev/pattern_sewing/svgpathtools/donate-button.svg
+/home/simone/blender_dev/pattern_sewing/svgpathtools/output_intersections.svg
+/home/simone/blender_dev/pattern_sewing/svgpathtools/offset_curves.svg
+/home/simone/blender_dev/pattern_sewing/svgpathtools/output1.svg
+/home/simone/blender_dev/pattern_sewing/brutal_tee_body.svg
+/home/simone/blender_dev/C:\tmp\algo.svg
+/home/simone/abito_mara.svg
+/home/simone/grey_panel.svg
+/home/simone/photogrammetry/Thats_all_folks.svg
+/home/simone/BezierDoctor/spiral.svg
+/home/simone/BezierDoctor/Simple_Periodic_Table_Chart-en.svg
+/home/simone/BezierDoctor/._Simple_Periodic_Table_Chart-en.svg
+/home/simone/BezierDoctor/decoro-gallipoli.svg
+/home/simone/BezierDoctor/._spiral.svg
+/home/simone/BezierDoctor/._decoro-narciso.svg
+/home/simone/BezierDoctor/._decoro-gallipoli.svg
+/home/simone/BezierDoctor/decoro-narciso.svg
+/home/simone/nautilus/data/icons/hicolor/scalable/apps/org.gnome.Nautilus.svg
+/home/simone/nautilus/data/icons/hicolor/scalable/apps/org.gnome.NautilusDevel.svg
+/home/simone/nautilus/data/icons/hicolor/symbolic/apps/org.gnome.Nautilus-symbolic.svg
+/home/simone/sito_laurita/www.camascia.com/wp-content/themes/camascia/fonts/ITCAvantGardePro-Bold.svg
+/home/simone/sito_laurita/www.camascia.com/wp-content/themes/camascia/fonts/ITCAvantGardePro-Book.svg
+/home/simone/sito_laurita/www.camascia.com/wp-content/themes/camascia/fonts/ITCAvantGardePro-ExtraLite.svg
+/home/simone/sito_laurita/www.camascia.com/wp-content/themes/camascia/fonts/Novecentosanswide-Bold.svg
+/home/simone/sito_laurita/www.camascia.com/wp-content/themes/camascia/fonts/Novecentosanswide-Book.svg
+/home/simone/sito_laurita/www.camascia.com/wp-content/themes/camascia/fonts/ITCAvantGardePro-Medium.svg
+/home/simone/jsdev/my-gridsome-site/node_modules/psl/browserstack-logo.svg
+/home/simone/jsdev/my-gridsome-site/node_modules/sharp/vendor/include/librsvg-2.0/librsvg
+/home/simone/jsdev/my-gridsome-site/node_modules/toposort/graph.svg
+/home/simone/jsdev/my-gridsome-site/node_modules/@hjvedvik/tasks/art/terminal.svg
+/home/simone/jsdev/NodePaper/foo.svg
+/home/simone/jsdev/NodePaper/foo_02_paper.svg
+/home/simone/jsdev/NodePaper/test.svg
+/home/simone/jsdev/NodePaper/node_modules/paper/examples/Node.js/in.svg
+/home/simone/jsdev/NodePaper/foo_paper.svg
+/home/simone/leonardo.svg
+/home/simone/make_dobby/zig_zag.svg
+/home/simone/make_dobby/gradient.svg
+/home/simone/.npm/_npx/1415fee72ff6294b/node_modules/create-vite/template-react-ts/src/logo.svg
+/home/simone/.npm/_npx/1415fee72ff6294b/node_modules/create-vite/template-react-ts/src/favicon.svg
+/home/simone/.npm/_npx/1415fee72ff6294b/node_modules/create-vite/template-vanilla/favicon.svg
+/home/simone/.npm/_npx/1415fee72ff6294b/node_modules/create-vite/template-react/src/logo.svg
+/home/simone/.npm/_npx/1415fee72ff6294b/node_modules/create-vite/template-react/src/favicon.svg
+/home/simone/.npm/_npx/1415fee72ff6294b/node_modules/create-vite/template-vanilla-ts/favicon.svg
+/home/simone/.npm/_npx/1415fee72ff6294b/node_modules/create-vite/template-preact/src/favicon.svg
+/home/simone/.npm/_npx/1415fee72ff6294b/node_modules/create-vite/template-lit-ts/src/favicon.svg
+/home/simone/.npm/_npx/1415fee72ff6294b/node_modules/create-vite/template-lit/src/favicon.svg
+/home/simone/.npm/_npx/1415fee72ff6294b/node_modules/create-vite/template-preact-ts/src/favicon.svg
+/home/simone/New document 1.2021_07_21_08_06_41.0.svg
+/home/simone/cucina.svg
+/home/simone/delete_me_meshroom/MeshroomCache/StructureFromMotion/0ff07502853b0f0a57b089a2f9837bd2376189e4/residuals_histogram.svg
+/home/simone/blender/blender-3.0.1-linux-x64/blender-symbolic.svg
+/home/simone/blender/blender-3.0.1-linux-x64/blender.svg
+/home/simone/blender/blender-3.0.1-linux-x64/3.0/scripts/addons/io_curve_svg
+/home/simone/blender/blender-3.1.2-linux-x64/blender-symbolic.svg
+/home/simone/blender/blender-3.1.2-linux-x64/blender.svg
+/home/simone/blender/blender-3.1.2-linux-x64/3.1/python/lib/python3.10/site-packages/meshio/svg
+/home/simone/blender/blender-3.1.2-linux-x64/3.1/scripts/addons/io_curve_svg
+/home/simone/blender/blender-3.2.0-linux-x64/3.2/scripts/addons/io_curve_svg
+/home/simone/blender/blender-3.2.0-linux-x64/blender-symbolic.svg
+/home/simone/blender/blender-3.2.0-linux-x64/blender.svg
+/home/simone/CenterLine/casette.svg
+/home/simone/CenterLine/archive/foo.svg
+/home/simone/CenterLine/archive/test_02.svg
+/home/simone/CenterLine/archive/test_05.svg
+/home/simone/CenterLine/archive/test_04.svg
+/home/simone/CenterLine/archive/test_03.svg
+/home/simone/CenterLine/archive/test_01.svg
+/home/simone/CenterLine/archive/test_06.svg
+/home/simone/CenterLine/archive/test_06_dirty.svg
+/home/simone/casa/hadmin/fonts/ctan.org/assets/file/makefile.svg
+/home/simone/casa/hadmin/fonts/ctan.org/assets/file/tex.svg
+/home/simone/casa/hadmin/fonts/ctan.org/assets/file/ins.svg
+/home/simone/casa/hadmin/fonts/ctan.org/assets/file/dtx.svg
+/home/simone/casa/hadmin/fonts/ctan.org/assets/file/tgz.svg
+/home/simone/casa/hadmin/fonts/ctan.org/assets/file/bib.svg
+/home/simone/casa/hadmin/fonts/ctan.org/assets/file/info.svg
+/home/simone/casa/hadmin/fonts/ctan.org/assets/file/font-metric.svg
+/home/simone/casa/hadmin/fonts/ctan.org/assets/file/eps.svg
+/home/simone/casa/hadmin/fonts/ctan.org/assets/file/ist.svg
+/home/simone/casa/hadmin/fonts/ctan.org/assets/file/pdf.svg
+/home/simone/casa/hadmin/fonts/ctan.org/assets/file/dvi.svg
+/home/simone/casa/hadmin/fonts/ctan.org/assets/file/link.svg
+/home/simone/casa/hadmin/fonts/ctan.org/assets/file/bst.svg
+/home/simone/casa/hadmin/fonts/ctan.org/assets/file/img.svg
+/home/simone/casa/hadmin/fonts/ctan.org/assets/file/zip.svg
+/home/simone/casa/hadmin/fonts/ctan.org/assets/file/sh.svg
+/home/simone/casa/hadmin/fonts/ctan.org/assets/file/html.svg
+/home/simone/casa/hadmin/fonts/ctan.org/assets/file/ps.svg
+/home/simone/casa/hadmin/fonts/ctan.org/assets/file/exe.svg
+/home/simone/casa/hadmin/fonts/ctan.org/assets/file/font.svg
+/home/simone/casa/hadmin/fonts/ctan.org/assets/file/sty.svg
+/home/simone/casa/hadmin/fonts/ctan.org/assets/file/cls.svg
+/home/simone/casa/hadmin/fonts/ctan.org/assets/file/clo.svg
+/home/simone/casa/hadmin/fonts/ctan.org/assets/file/file.svg
+/home/simone/casa/hadmin/fonts/ctan.org/assets/file/directory.svg
+/home/simone/casa/hadmin/fonts/ctan.org/assets/mflogo/logobf10.svg
+/home/simone/casa/hadmin/fonts/ctan.org/assets/mflogo/logosl10.svg
+/home/simone/casa/hadmin/fonts/ctan.org/assets/mflogo/logo10.svg
+/home/simone/casa/hadmin/fonts/ctan.org/assets/lmsy/LMMathSymbols10-Bold.svg
+/home/simone/casa/hadmin/fonts/ctan.org/assets/lmsy/LMMathSymbols10-Regular.svg
+/home/simone/matino/resine/selezione_resine-20200707193035.svg
+/home/simone/matino/resine/drawing.ep.svg
+/home/simone/matino/resine/dutch_loof_bed_measurements.svg
+/home/simone/matino/resine/drawing-1.svg
+/home/simone/matino/resine/selezione_resine.svg
+/home/simone/matino/resine/drawing-2.svg
+/home/simone/matino/resine/drawing.svg
+/home/simone/matino/resine/ordine_lavandino.svg
+/home/simone/matino/resine/maschere_bagno_sotto.svg
+/home/simone/matino/resine/letto_basso.svg
+/home/simone/matino/resine/slat.svg
+/home/simone/matino/resine/drawing.out.svg
+/home/simone/matino/cucina/output/fronte_con_misure.svg
+/home/simone/matino/cucina/output/fronte.svg
+/home/simone/matino/cucina/output/top.svg
+/home/simone/matino/cucina/output/prospettiva.svg
+/home/simone/matino/cucina/cubes/shared_folder/tops/tops.svg
+/home/simone/matino/cucina/cubes/shared_folder/affettatrice/affetta.svg
+/home/simone/matino/cucina/2d_ref/fornelli.svg
+/home/simone/matino/cucina/2d_ref/forno.svg
+/home/simone/matino/cucina-20200729/studio_tolomeo.svg
+/home/simone/matino/cucina-20200729/cucina_primo_piano_front.svg.2020_07_04_17_29_09.0.svg
+/home/simone/matino/cucina-20200729/foo.svg
+/home/simone/matino/cucina-20200729/cucina_primo_piano.svg
+/home/simone/matino/cucina-20200729/cucina_primo_piano_front-20200704161034.svg
+/home/simone/matino/cucina-20200729/cucina_primo_piano_front.svg
+/home/simone/matino/cucina-20200729/riferimento_calcolo_altezze.svg
+/home/simone/matino/rete_ikea.svg
+/home/simone/matino/sala.svg
+/home/simone/matino/divano/sofa.svg
+/home/simone/matino/letto/letto_01.svg
+/home/simone/Marti/logo.svg
+/home/simone/Marti/foo.svg
+/home/simone/Marti/pompidou.svg
+/home/simone/Marti/components/patterns.svg
+/home/simone/Marti/stampi/edera-fascia-1.svg
+/home/simone/Marti/stampi/tellus-angolo.svg
+/home/simone/Marti/stampi/decoro-quadratino.svg
+/home/simone/Marti/stampi/none.svg
+/home/simone/Marti/stampi/decoro-iris.svg
+/home/simone/Marti/stampi/decoro-narciso-scaled.svg
+/home/simone/Marti/stampi/decoro-iris-scaled.svg
+/home/simone/Marti/stampi/decoro-pompei.svg
+/home/simone/Marti/stampi/decoro-gallipoli.svg
+/home/simone/Marti/stampi/diana-fascia-1.svg
+/home/simone/Marti/stampi/tellus-fascia.svg
+/home/simone/Marti/stampi/penelope-fascia-1.svg
+/home/simone/Marti/stampi/edera-angolo-1.svg
+/home/simone/Marti/stampi/tozzetto-fascia-1.svg
+/home/simone/Marti/stampi/penelope-angolo-1.svg
+/home/simone/Marti/stampi/decoro-iride.svg
+/home/simone/Marti/stampi/diana-angolo-1.svg
+/home/simone/Marti/stampi/decoro-lecce.svg
+/home/simone/Marti/stampi/decoro-lecce-scaled.svg
+/home/simone/Marti/stampi/decoro-narciso.svg
+/home/simone/Marti/stampi/decoro-siena.svg
+/home/simone/Marti/stampi/tozzetto-angolo-1.svg
+/home/simone/Marti/tile_03.svg
+/home/simone/Marti/pinheiro.svg
+/home/simone/Marti/lines_02.svg
+/home/simone/Marti/lines.svg
+/home/simone/Marti/tile_01.svg
+/home/simone/Marti/tile_02.svg
+/home/simone/Marti/skunk/curve.svg
+/home/simone/besta.svg

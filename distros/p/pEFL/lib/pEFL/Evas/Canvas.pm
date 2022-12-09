@@ -27,12 +27,12 @@ our @EXPORT = qw(
 require XSLoader;
 XSLoader::load('pEFL::Evas::Canvas');
 
-# sub new {
-#	 my ($class,$parent) = @_;
-#	 my $widget = elm_bg_add($parent);
-#	 $widget->smart_callback_add("del", \&pEFL::PLSide::cleanup, $widget);
-#	 return $widget;
-#}
+sub new {
+	 my ($class,$parent) = @_;
+	 my $widget = evas_new();
+	 #$widget->smart_callback_add("del", \&pEFL::PLSide::cleanup, $widget);
+	 return $widget;
+}
 
 # *new = \&add;
 

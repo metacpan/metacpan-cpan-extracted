@@ -12,7 +12,7 @@ use constant DEBUG        => $ENV{MOJO_IRC_DEBUG}     || 0;
 use constant DEFAULT_CERT => $ENV{MOJO_IRC_CERT_FILE} || catfile dirname(__FILE__), 'mojo-irc-client.crt';
 use constant DEFAULT_KEY  => $ENV{MOJO_IRC_KEY_FILE}  || catfile dirname(__FILE__), 'mojo-irc-client.key';
 
-our $VERSION = '0.46';
+our $VERSION = '0.47';
 
 our %NUMERIC2NAME = (470 => 'ERR_LINKCHANNEL');
 
@@ -36,7 +36,7 @@ has server_settings => sub {
   return {chantypes => '#', prefix => '(ov)@+'};
 };
 
-has tls => undef;
+has tls  => undef;
 has user => sub { $ENV{USER} || getlogin || getpwuid($<) || 'anonymous' };
 
 sub new {
@@ -78,12 +78,12 @@ sub connect {
     push @extra, local_address => $self->local_address;
   }
   if (my $tls = $self->tls) {
-    push @extra, tls      => 1;
-    push @extra, tls_ca   => $tls->{ca} if $tls->{ca};     # not sure why this should be supported, but adding it anyway
-    push @extra, tls_cert => $tls->{cert} || DEFAULT_CERT;
-    push @extra, tls_key  => $tls->{key} || DEFAULT_KEY;
-    push @extra, tls_verify => 0x00 if $tls->{insecure}; # Mojolicious < 9.0
-    push @extra, tls_options => {SSL_verify_mode => 0x00} if $tls->{insecure}; # Mojolicious >= 9.0
+    push @extra, tls         => 1;
+    push @extra, tls_ca      => $tls->{ca} if $tls->{ca};  # not sure why this should be supported, but adding it anyway
+    push @extra, tls_cert    => $tls->{cert} || DEFAULT_CERT;
+    push @extra, tls_key     => $tls->{key}  || DEFAULT_KEY;
+    push @extra, tls_verify  => 0x00                      if $tls->{insecure};    # Mojolicious < 9.0
+    push @extra, tls_options => {SSL_verify_mode => 0x00} if $tls->{insecure};    # Mojolicious >= 9.0
   }
 
   $port ||= 6667;
@@ -117,7 +117,7 @@ sub connect {
       );
       $stream->on(
         error => sub {
-          $self or return;
+          $self         or return;
           $self->ioloop or return;
           $self->ioloop->remove(delete $self->{stream_id});
           $self->emit(error => $_[1]);
@@ -181,14 +181,6 @@ sub register_default_event_handlers {
   return $self;
 }
 
-sub track_any {
-  warn 'DEPRECATED! Just listen to $self->on(message => sub {}) instead.';
-  my $self = shift;
-  return $self->{track_any} || 0 unless @_;
-  $self->{track_any} = shift;
-  $self;
-}
-
 sub write {
   no warnings 'utf8';
   my $cb   = ref $_[-1] eq 'CODE' ? pop : sub { };
@@ -250,7 +242,7 @@ sub irc_notice {
   my ($self, $message) = @_;
 
   # NOTICE AUTH :*** Ident broken or disabled, to continue to connect you must type /QUOTE PASS 21105
-  if ($message->{params}[0] =~ m!Ident broken.*QUOTE PASS (\S+)!) {
+  if ($message->{params}[1] =~ m!Ident broken.*QUOTE PASS (\S+)!) {
     $self->write(QUOTE => PASS => $1);
   }
 }
@@ -314,7 +306,6 @@ sub _build_nick {
 
 sub _dispatch_message {
   my ($self, $msg) = @_;
-  $self->emit(irc_any => $msg) if $self->{track_any};    # will be deprecated
   $self->emit(message => $msg);
 }
 
@@ -322,7 +313,7 @@ sub _legacy_dispatch_message {
   my ($self, $msg) = @_;
   my $event = $msg->{event};
 
-  $event = "irc_$event" unless $event =~ /^(ctcp|err)_/;
+  $event = "irc_$event" unless $event =~ /^(ctcp(reply)?|err)_/;
   warn "[$self->{debug_key}] === $event\n" if DEBUG == 2;
   $self->emit($event => $msg);
 }
@@ -341,7 +332,7 @@ CHUNK:
     my $msg = $self->parser->parse($1);
     my $cmd = $msg->{command} or next CHUNK;
     $msg->{command} = $NUMERIC2NAME{$cmd} || IRC::Utils::numeric_to_name($cmd) || $cmd if $cmd =~ /^\d+$/;
-    $msg->{event} = lc $msg->{command};
+    $msg->{event}   = lc $msg->{command};
     $self->_dispatch_message($msg);
   }
 }

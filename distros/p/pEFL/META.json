@@ -1,5 +1,5 @@
 {
-   "abstract" : "Perl bindings for the Enlightenment Foundation Libraries",
+   "abstract" : "Perl binding to the Enlightenment Foundation Libraries",
    "author" : [
       "Maximilian Lika"
    ],
@@ -46,6 +46,6 @@
          "url" : "https://github.com/MaxPerl/Perl-Efl"
       }
    },
-   "version" : "0.74",
+   "version" : "0.75",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }
