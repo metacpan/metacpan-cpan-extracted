@@ -9,3 +9,5 @@ Revision history for App-OpenMbox-Client
 0.12    2022-12-06
         Updates the POD
 
+0.13    2022-12-10
+        Changes Makefile.PL to correct format, thanks @Slaven

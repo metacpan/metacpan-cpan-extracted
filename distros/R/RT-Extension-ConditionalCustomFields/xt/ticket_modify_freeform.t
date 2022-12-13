@@ -17,6 +17,7 @@ RT->Config->Set('CustomFieldGroupings',
         'Group two' => ['ConditionedBy'],
     ],
 );
+RT->Config->PostLoadCheck;
 
 my $ticket = RT::Ticket->new(RT->SystemUser);
 $ticket->Create(Queue => 'General', Subject => 'Test Ticket ConditionalCF');
@@ -24,7 +25,7 @@ $ticket->AddCustomFieldValue(Field => $cf_conditioned_by->id , Value => 'See me?
 
 my ($base, $m) = RT::Extension::ConditionalCustomFields::Test->started_ok;
 my $mjs = WWW::Mechanize::PhantomJS->new();
-$mjs->driver->ua->timeout(600);
+$mjs->driver->ua->timeout(900);
 $mjs->get($m->rt_base_url . '?user=root;pass=password');
 
 # Operator: matches, condition met

@@ -13,7 +13,7 @@ use Plack::Util;
 use Plack::Util::Accessor qw/ filter callback /;
 use HTTP::Status ();
 
-our $VERSION = 'v0.2.1';
+our $VERSION = 'v0.2.2';
 
 
 sub prepare_app {
@@ -72,7 +72,7 @@ Plack::Middleware::EmulateOPTIONS - handle OPTIONS requests as HEAD
 
 =head1 VERSION
 
-version v0.2.1
+version v0.2.2
 
 =head1 SYNOPSIS
 

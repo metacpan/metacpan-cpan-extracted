@@ -8,7 +8,7 @@ package Net::FattureInCloud {
     use version;
     use v5.36;
 
-    our $VERSION = qv("v0.1.1");
+    our $VERSION = qv("v0.2.1");
 
     has endpoint_uri => ( is => 'ro', default => sub { 'https://api-v2.fattureincloud.it/' } );
     has token => ( is => 'ro' );
@@ -22,23 +22,25 @@ package Net::FattureInCloud {
         croak 'Please provide company_id' if !exists $args->{company_id};
     }
 
-    # sub request($self, $request, $method, $args = {}) {
-    #     croak 'Please provide request' if !defined $request;
-    #     croak 'Invalid request' if $request !~ m/\w+/xs;
-    #     $method = $self->_validate_method($method);
+    sub request($self, $path, $method, $args = {}) {
+        croak 'Please provide path' if !defined $path;
+        croak 'Invalid path' if $path !~ m/\w+/xs;
+        $method = $self->_validate_method($method);
 
-    #     my $reqargs = {
-    #         %$args,
-    #     };
+        my $reqargs = {
+            %$args,
+        };
 
-    #     my $res = $self->ua->post( $self->endpoint_uri . "$request/$method"
-    #         => {Accept => '*/*'},
-    #         json => $reqargs
-    #     )->result;
-    #     croak $res->message if !$res->is_success;
+        my $datatransport = $method eq 'get' ? 'form' : 'json';
 
-    #     return $res->json;
-    # }
+        my $res = $self->ua->$method( $self->endpoint_uri . "$path" =>
+            { Authorization => 'Bearer ' . $self->token },
+            $datatransport => $reqargs
+        )->result;
+        croak $res->message .': ' . $res->body if !$res->is_success;
+
+        return $res->json;
+    }
 
     sub crequest($self, $path, $method, $args = {}) {
         croak 'Please provide path' if !defined $path;
@@ -49,7 +51,7 @@ package Net::FattureInCloud {
             %$args,
         };
 
-        my $datatransport = $method eq 'GET' ? 'form' : 'json';
+        my $datatransport = $method eq 'get' ? 'form' : 'json';
 
         my $res = $self->ua->$method( $self->endpoint_uri . 'c/' . $self->company_id . "/$path" =>
             { Authorization => 'Bearer ' . $self->token },

@@ -17,19 +17,19 @@ name: Device-Chip-PCF8574
 provides:
   Device::Chip::PCF8574:
     file: lib/Device/Chip/PCF8574.pm
-    version: '0.04'
+    version: '0.05'
   Device::Chip::PCF8575:
     file: lib/Device/Chip/PCF8575.pm
-    version: '0.04'
+    version: '0.05'
   Device::Chip::PCF857x:
     file: lib/Device/Chip/PCF857x.pm
-    version: '0.04'
+    version: '0.05'
 requires:
   Device::Chip: '0'
   Future::AsyncAwait: '0.47'
-  Object::Pad: '0.57'
+  Object::Pad: '0.66'
   perl: '5.026'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.04'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

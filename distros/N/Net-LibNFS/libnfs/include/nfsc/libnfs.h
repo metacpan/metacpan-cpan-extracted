@@ -180,6 +180,24 @@ EXTERN struct nfs_context *nfs_init_context(void);
  */
 EXTERN void nfs_destroy_context(struct nfs_context *nfs);
 
+/*
+ * Commands that are in flight are kept on linked lists and keyed by
+ * XID so that responses received can be matched with a request.
+ * For performance reasons, this would not scale well for applications
+ * that use many concurrent async requests concurrently.
+ * The default setting is to hash the requests into a small number of
+ * lists which should work well for single threaded syncrhonous and
+ * async applications with a moderate number of concurrent requests in flight
+ * at any one time.
+ * If you application uses a significant number of concurrent requests
+ * as in thousands or more, then the default might not be sufficient.
+ * In that case you can change the number of lists that requests will
+ * be hashed into with this function.
+ * NOTE: you can only call this function and modify the number of hashes
+ * before you mount the share.
+ */
+EXTERN int nfs_set_hash_size(struct nfs_context *nfs, int hashes);
+
 
 /*
  * URL parsing functions.
@@ -218,6 +236,13 @@ EXTERN void nfs_destroy_context(struct nfs_context *nfs);
  * mountport=<port>  : Use this port for the MOUNT protocol instead of
  *                     using portmapper. This argument is ignored for NFSv4
  *                     as it does not use the MOUNT protocol.
+ * readdir-buffer=<count> | readdir-buffer=<dircount>,<maxcount>
+ *                   : Set the buffer size for READDIRPLUS, where dircount is
+ *                     the maximum amount of bytes the server should use to
+ *                     retrieve the entry names and maxcount is the maximum
+ *                     size of the response buffer (including attributes).
+ *                     If only one <count> is given it will be used for both.
+ *                     Default is 8192 for both.
  */
 /*
  * Parse a complete NFS URL including, server, path and
@@ -281,8 +306,12 @@ EXTERN void nfs_set_pagecache(struct nfs_context *nfs, uint32_t v);
 EXTERN void nfs_set_pagecache_ttl(struct nfs_context *nfs, uint32_t v);
 EXTERN void nfs_set_readahead(struct nfs_context *nfs, uint32_t v);
 EXTERN void nfs_set_debug(struct nfs_context *nfs, int level);
+EXTERN void nfs_set_auto_traverse_mounts(struct nfs_context *nfs, int enabled);
 EXTERN void nfs_set_dircache(struct nfs_context *nfs, int enabled);
 EXTERN void nfs_set_autoreconnect(struct nfs_context *nfs, int num_retries);
+EXTERN void nfs_set_nfsport(struct nfs_context *nfs, int port);
+EXTERN void nfs_set_mountport(struct nfs_context *nfs, int port);
+EXTERN void nfs_set_readdir_max_buffer_size(struct nfs_context *nfs, uint32_t dircount, uint32_t maxcount);
 
 /*
  * Set NFS version. Supported versions are
@@ -1960,6 +1989,27 @@ struct nfs_server_list *nfs_find_local_servers(void);
 void free_nfs_srvr_list(struct nfs_server_list *srv);
 
 /*
+ * nfs_set_poll_timeout()
+ * This function sets the polling timeout used for nfs rpc calls.
+ *
+ * Function returns nothing.
+ *
+ * int milliseconds : timeout that is passed to poll(2)
+ *                    to be applied in milliseconds (-1 no timeout)
+ */
+EXTERN void nfs_set_poll_timeout(struct nfs_context *nfs, int milliseconds);
+
+/*
+ * nfs_get_poll_timeout()
+ * This function gets the polling timeout used for nfs rpc calls.
+ *
+ * Function returns:
+ * int milliseconds : timeout that is passed to poll(2)
+ *                    to be applied in milliseconds (-1 no timeout)
+ */
+EXTERN int nfs_get_poll_timeout(struct nfs_context *nfs);
+
+/*
  * sync nfs_set_timeout()
  * This function sets the timeout used for nfs rpc calls.
  *
@@ -2009,5 +2059,6 @@ EXTERN void nfs_mt_service_thread_stop(struct nfs_context *nfs);
 #ifdef __cplusplus
 }
 #endif
+
 
 #endif /* !_LIBNFS_H_ */

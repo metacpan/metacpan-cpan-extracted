@@ -1,5 +1,11 @@
 Revision history for Perl extension List-SomeUtils
 
+0.59     2022-12-10
+
+* Require Module::Implementation 0.04. Without this tests fail. Reported by
+  Eric Brine. GH #11.
+
+
 0.58     2019-10-26
 
 [BACKWARDS INCOMPATIBILITY]

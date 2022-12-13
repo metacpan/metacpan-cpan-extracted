@@ -3,15 +3,16 @@
 # bookmarks - Export browser bookmarks as plain text.
 #
 # bookmarks is a tool to export bookmarks from files supplied as arguments, or
-# from browsers default locations (when called without arguments). The following
+# from browsers default locations (when called without arguments). If file is a
+# dash "-", STDIN is read and processed as plain text source. The following
 # sources are supported :
 #
-# - Safari (.plist)
-# - Firefox (.sqlite)
-# - Chrome and Edge (Bookmarks)
-# - Internet Explorer (Favorites)
-# - Markdown (.md)
-# - Gemini (.gmi)
+# - Safari (*.plist)
+# - Firefox (*.sqlite)
+# - Chrome and Edge (*Bookmarks)
+# - Internet Explorer (*Favorites)
+# - Markdown (*.md)
+# - Gemini (*.gmi)
 # - Surfraw (same as plain text)
 # - Plain text (any other extension)
 #
@@ -38,8 +39,10 @@
 # - sources are read as UTF-8.
 #
 # TODO :
-# - document support for arg '-'
 #
+# 2022.12.22 v0.33 jul : fixed utf8 in stdout and firefox
+#                        fixed bug in POD (wrong repo URL)
+#                        doc arg "-" stdin as txt
 # 2022.01.10 v0.32 jul : fixed bug in txt files regex (space)
 #                        fixed bug with option -a (files not existing silently dropped)
 #                        added support for arg '-' (read from STDIN as plain text file)
@@ -75,8 +78,10 @@ use Getopt::Std;
 use File::Basename;
 use File::Temp qw(tempdir);
 use File::Copy qw(copy);
+use open qw(:std :encoding(UTF-8));
+use Encode qw(decode_utf8);
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 my $program  = basename($0);
 my $usage    = <<EOF;
 
@@ -89,6 +94,8 @@ Usage: $program [-hVdas] [-f format] [file ...]
     -f format       any combination of letters t,u,d as title/url/description 
                     (default : tud)
     -s              find schemeless URLs in text files (default : no)
+
+See `perldoc $program` for full documentation.
 EOF
 
 # options
@@ -269,7 +276,7 @@ sub _firefox {
         {
             while ($sth and my $hashref = $sth->fetchrow_hashref)
             {
-                $print_bookmark->( $hashref->{'title'}, $hashref->{'url'}, $hashref->{'description'} );
+                $print_bookmark->( decode_utf8($hashref->{'title'}), decode_utf8($hashref->{'url'}), decode_utf8($hashref->{'description'}) );
             }
         }     
     };
@@ -545,22 +552,23 @@ bookmarks - Export browser bookmarks as plain text.
 =head1 DESCRIPTION
 
 bookmarks is a tool to export bookmarks from files supplied as arguments, or
-from browsers default locations (when called without arguments). The following
+from browsers default locations (when called without arguments). If file is a
+dash "-", STDIN is read and processed as plain text source. The following
 sources are supported :
 
 =over
 
-=item - Safari (.plist)
+=item - Safari (*.plist)
 
-=item - Firefox (.sqlite)
+=item - Firefox (*.sqlite)
 
-=item - Chrome and Edge (Bookmarks)
+=item - Chrome and Edge (*Bookmarks)
 
-=item - Internet Explorer (Favorites)
+=item - Internet Explorer (*Favorites)
 
-=item - Markdown (.md)
+=item - Markdown (*.md)
 
-=item - Gemini (.gmi)
+=item - Gemini (*.gmi)
 
 =item - Surfraw (same as plain text)
 
@@ -591,7 +599,7 @@ Markdown, Gemini and plain text files are processed line by line (as UTF-8) :
 =head1 BUGS
 
 Please report any bugs or feature requests to C<kaldor@cpan.org>, or through
-the web interface at L<https://github.com/kal247/App-uricolor/issues>.
+the web interface at L<https://github.com/kal247/App-bookmarks	/issues>.
 
 =head1 AUTHOR
 

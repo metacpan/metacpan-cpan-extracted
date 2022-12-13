@@ -6,20 +6,20 @@ use warnings;
 
 =head1 NAME
 
-App::OpenMbox - The methods for email management used in OpenMbox.net
+App::OpenMbox - The methods for privacy data management in OpenMbox.net
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =cut
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 
 =head1 SYNOPSIS
 
-Here are several methods used by Open Mbox, a free email provider.
+Here are several methods used by Open Mbox to manage usernames and passwords. OpenMbox.net is a free email provider.
 
     use App::OpenMbox;
 
@@ -39,7 +39,7 @@ Sample input from pass.temp:
     henry OldPassword111  NewPassword111
     hello OldPassword222  NewPassword222
 
-You may know that we don't have RDB in the system for email and user management. We do not record any information about users, nor track user's behavior. For registration, user submits his/her username and password to our system, these username/password are stored in a temp file. A perl program reads data from the file, and updates its content to Dovecot's user database, which is pure text DB for email users and encrypted passwords.
+You may know that we don't have RDB in the system for email and user management. We do not record any information about users, nor track user's behavior. For registration, user submits his/her username and password to our system, these username/password are stored in a temp file. A perl program reads data from the file, and updates its content to Dovecot's user database, which is pure text DB for email users and encrypted passwords. After then the temp file is deleted. We get NO info for your personal data like IP, browser, cookie etc.
 
 To make this program work, you should have Postfix and Dovecot deployed at first. There are many documentation for how to deploy that a system.
 

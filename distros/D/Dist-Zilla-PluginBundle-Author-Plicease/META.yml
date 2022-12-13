@@ -25,6 +25,7 @@ no_index:
 recommends:
   PerlX::Maybe::XS: '0'
 requires:
+  Class::Method::Modifiers: '0'
   Config::INI::Reader: '0'
   Data::Section: '0'
   Dist::Zilla: '6.00'
@@ -39,6 +40,7 @@ requires:
   Dist::Zilla::Plugin::PodWeaver: '4.006'
   Dist::Zilla::Plugin::ReadmeAnyFromPod: '0.150250'
   Dist::Zilla::Plugin::Run::BeforeBuild: '0.035'
+  Dist::Zilla::Role::Plugin: '0'
   Dist::Zilla::Role::PluginBundle::Easy: '0'
   Dist::Zilla::Role::TextTemplate: '0'
   Dist::Zilla::Util::AuthorDeps: '0'
@@ -67,8 +69,8 @@ resources:
   bugtracker: https://github.com/uperl/Dist-Zilla-PluginBundle-Author-Plicease/issues
   homepage: https://metacpan.org/pod/Dist::Zilla::PluginBundle::Author::Plicease
   repository: git://github.com/uperl/Dist-Zilla-PluginBundle-Author-Plicease.git
-version: '2.72'
-x_generated_by_perl: v5.36.0
+version: '2.73'
+x_generated_by_perl: v5.37.4
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
 x_use_unsafe_inc: 0

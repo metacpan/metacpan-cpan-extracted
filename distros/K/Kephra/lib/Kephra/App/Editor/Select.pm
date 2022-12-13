@@ -20,13 +20,13 @@ sub expand_selecton {
         elsif ( $start_pos >= $word_edge[0] and $end_pos <= $word_edge[1] ) { @selection = @word_edge } # select word if got less
 
         unless (@selection) {
-            my @brace_edges = $self->brace_edges( $start_pos, $end_pos, $start_line );
-            
-            my ($begin_style, $end_style) = ( $self->GetStyleAt( $start_pos), $self->GetStyleAt( $end_pos) );
+            my @brace_edges = $self->brace_edges_expand( $start_pos, $end_pos, $start_line );
+            my ($begin_style, $end_style) = ( $self->GetStyleAt( $start_pos), $self->GetStyleAt( $end_pos - 1) );
             my @style_edges = ($begin_style == $end_style and (($begin_style >= 17 and $begin_style <= 30)
                                                           or    $begin_style == 6  or  $begin_style == 7   )) 
                             ? $self->style_edges($start_pos, $end_pos) 
                             : ();
+
             if (@brace_edges and @style_edges){ # delete the wider
                 if ($brace_edges[0] < $style_edges[0] or $brace_edges[1] > $style_edges[1]) { @brace_edges = () }
                 else                                                                        { @style_edges = () }
@@ -38,14 +38,13 @@ sub expand_selecton {
     } 
     unless (@selection) { # select construct: sub for if
         @selection = (0, $self->GetTextLength - 1 ); #  select all
-        my @block_edges = $self->block_edges( $start_pos, $end_pos );
+        my @block_edges = $self->block_edges_expand( $start_pos, $end_pos );
         @selection = @block_edges if @block_edges and ($block_edges[0] >= $selection[0] or $block_edges[1] <= $selection[1]);
-        my @sub_edges = $self->sub_edges( $start_pos, $end_pos );
+        my @sub_edges = $self->sub_edges_expand( $start_pos, $end_pos );
         @selection = @sub_edges   if @sub_edges   and ($sub_edges[0]   >= $selection[0] or $sub_edges[1]  <= $selection[1]);
-        my @loop_edges = $self->loop_edges( $start_pos, $end_pos );
-say "sel: @selection - @loop_edges";
+        my @loop_edges = $self->loop_edges_expand( $start_pos, $end_pos );
         @selection = @loop_edges  if @loop_edges  and ($loop_edges[0]  >= $selection[0] or $loop_edges[1] <= $selection[1]);
-        # select if () {}     # select unless () {} 
+        # my @branch_edges = $self->branch_edges_expand( $start_pos, $end_pos );  select if () {}     # select unless () {} 
     }
     $self->SetSelection( @selection );
     1;    
@@ -54,24 +53,39 @@ say "sel: @selection - @loop_edges";
 sub shrink_selecton {
     my ($self) = @_;
     my ($start_pos, $end_pos) = $self->GetSelection;
-# say "shrink $start_pos, $end_pos ", $self->{'select_stack'};
-    return if $start_pos == $end_pos;
+    my $center = $self->{'set_pos'};
+    my $start_line = $self->LineFromPosition( $start_pos );
+    my $end_line = $self->LineFromPosition( $end_pos );
+    my $line_start = $self->PositionFromLine( $start_line );
+    my $line_end = $self->GetLineEndPosition( $start_line );
     my @selection;
-    $self->SetSelection( $start_pos, $end_pos );
-}
+    #~ return if $start_pos == $end_pos;
+        
+    #~ if ($start_line == $end_line) {
+        #~ my @brace_edge = $self->brace_edges_shrink( $start_pos, $end_pos);
+        #~ @selection = @brace_edge if @brace_edge;
+        
+        #~ my @word_edge = $self->word_edges( $center );
+        #~ @selection = ($start_pos > $word_edge[0] or $end_pos < $word_edge[1])
+                   #~ ?  ($center, $center) : @word_edge;
+#~ say "word @word_edge sel @selection";
+        #~ my $center_style = $self->GetStyleAt( $center );
+        
+        #~ my @style_edge = (($center_style >= 17 and $center_style <= 30)
+                                                #~ or $center_style == 6  or  $center_style == 7   ) 
+                       #~ ? $self->style_edges($start_pos, $end_pos) : ();
 
+        #~ @selection = @style_edge if @style_edge and $style_edge[0] <= $selection[0] and $style_edge[1] >= $selection[1] 
+                                                #~ and $style_edge[0] >= $start_pos    and $style_edge[1] <= $end_pos;
 
-sub expression_edges {
-    my ($self, $start, $end, $line_start, $line_end, $line) = @_;
-    my ($new_start, $new_rend);
-    say $self->	GetLineState( $line );
-    ($start, $end)
-    
-}
-
-sub construct_edges {
-    my ($self, $start, $end) = @_;
-    ($start, $end)
+        #~ my @brace_edge = $self->brace_edges_shrink( $start_pos, $end_pos);
+        #~ @selection = @brace_edge if @brace_edge and $brace_edge[0] <= $selection[0] and $brace_edge[1] >= $selection[1];
+    #~ } else {
+        #~ @selection = $start_pos, $end_pos;
+    #~ }
+#~ # say "shrink $start_pos, $end_pos ", $self->{'select_stack'};
+    #~ $self->SetSelection( @selection );
+    1;    
 }
 
 sub select_line {
@@ -79,16 +93,7 @@ sub select_line {
     $line = $self->GetCurrentLine unless defined $line;
     $self->SetSelection( $self->PositionFromLine( $line ), 
                          $self->PositionFromLine( $line+1 ) );
-    # $self->SetSelection( $self->PositionFromLine( $line ), $self->GetLineEndPosition( $line ) );
-    # $self->GetLineIndentPosition
-}
-
-sub select_block {
-    my ($self, $pos) = @_;
-    $pos = $self->GetCurrentPos unless defined $pos;
-    my $block_start = $self->PositionFromLine( $self->get_prev_block_start( $pos + 1 ) );
-    my $block_end = $self->GetLineEndPosition( $self->get_next_block_end( $pos - 1 ) );
-    $self->SetSelection( $block_start, $block_end );
+    #$self->GetLineEndPosition( $line );     # $self->GetLineIndentPosition
 }
 
 sub select_prev_sub {
@@ -112,8 +117,6 @@ sub select_next_sub {
     $self->SetAnchor($anchor);
     $self->EnsureCaretVisible;
 }
-
-
 
 # # [\w\.\\\$@%&]
 sub select_prev_block {

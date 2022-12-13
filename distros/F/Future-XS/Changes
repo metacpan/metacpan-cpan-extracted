@@ -1,5 +1,17 @@
 Revision history for Future-XS
 
+0.08    2022-12-11
+        [CHANGES]
+         * Now requires perl v5.24 or later
+           This is due to a bugfix for RT145597 which does not work on earlier
+           perls
+             https://rt.cpan.org/Ticket/Display.html?id=145597
+
+        [BUGFIXES]
+         * Remember to PUTBACK after POPx'ing after a call_method/call_sv
+         * Throw an exception if instance methods are not called on an
+           instance, rather than segfaulting
+
 0.07    2022-12-06
         [BUGFIXES]
          * Ensure that `$f->retain` on a completed Future::XS returns the

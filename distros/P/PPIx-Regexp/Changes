@@ -1,3 +1,14 @@
+0.086		2022-12-13	T. R. Wyant
+    Add width(), which returns the number of characters matched. Note
+    that an indefinite upper boumd is represented as IEEE 754 Inf if
+    that appears to be supported; otherwise by a singleton object
+    overloaded to allow stringification, numification, and numeric
+    tests.
+
+    Use width() to enhance the detection of variable-width look-behinds.
+
+    Serious clean-up on accepts_perl() subsystem.
+
 0.085		2022-04-16	T. R. Wyant
     Remove 'postderef' argument to PPIx::Regexp->new().  Postfix
     dereference is always recognized.

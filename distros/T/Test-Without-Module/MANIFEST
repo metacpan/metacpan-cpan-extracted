@@ -14,6 +14,7 @@ t/04-import-export.t
 t/05-redefine.t
 t/06-missing-hidden-modules.t
 t/embedded-Test-Without-Module.t
+t/rt122551.t
 Texts/article.txt
 xt/99-changes.t
 xt/99-compile.t

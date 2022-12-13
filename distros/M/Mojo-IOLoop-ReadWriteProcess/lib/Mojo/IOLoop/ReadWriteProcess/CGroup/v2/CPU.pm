@@ -12,9 +12,9 @@ use constant {
 has cgroup => sub { Mojo::IOLoop::ReadWriteProcess::CGroup::v2->new };
 
 sub stat        { shift->cgroup->_list(STAT_INTERFACE) }
-sub weight      { shift->cgroup->_setget(WEIGHT_INTERFACE, @_) }
+sub weight      { shift->cgroup->_setget(WEIGHT_INTERFACE,      @_) }
 sub weight_nice { shift->cgroup->_setget(WEIGHT_NICE_INTERFACE, @_) }
-sub max         { shift->cgroup->_setget(MAX_INTERFACE, @_) }
+sub max         { shift->cgroup->_setget(MAX_INTERFACE,         @_) }
 
 1;
 

@@ -26,7 +26,6 @@ share/old_stations.json
 share/renamed.json
 share/stations.csv
 share/stations.json
-share/stations.xml
 share/xml2json
 share/xml2meta
 t/20-iris-class.t

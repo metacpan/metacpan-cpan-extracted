@@ -7,7 +7,7 @@ my $build = Module::Build->new(
    module_name => 'Device::Chip::MPL3115A2',
    requires => {
       'perl' => '5.026',
-      'Object::Pad' => '0.57',
+      'Object::Pad' => '0.66',
       'Future::AsyncAwait' => '0.47', # toplevel await
 
       'Data::Bitfield' => '0.02',

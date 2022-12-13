@@ -14,7 +14,7 @@ Readonly::Array our @EXPORT_OK => qw(err);
 Readonly::Scalar my $EMPTY_STR => q{};
 Readonly::Scalar my $EVAL => 'eval {...}';
 
-our $VERSION = 0.27;
+our $VERSION = 0.28;
 
 # Process error.
 sub err {
@@ -67,6 +67,8 @@ Process error with message(s). There is key => value list after first message.
 
 =head1 EXAMPLE1
 
+=for comment filename=err_via_print_var.pl
+
  use strict;
  use warnings;
 
@@ -79,6 +81,8 @@ Process error with message(s). There is key => value list after first message.
  # 1
 
 =head1 EXAMPLE2
+
+=for comment filename=err_via_print_var_with_params.pl
 
  use strict;
  use warnings;
@@ -93,6 +97,8 @@ Process error with message(s). There is key => value list after first message.
  # 2: 3
 
 =head1 EXAMPLE3
+
+=for comment filename=err_via_print_var_with_params_from_module.pl
 
  package Example3;
 
@@ -154,6 +160,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.27
+0.28
 
 =cut

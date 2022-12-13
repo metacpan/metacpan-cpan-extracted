@@ -158,6 +158,7 @@ sub requires {
 	'Task::Weaken'		=> 0,
 	'base'			=> 0,
         'constant'		=> 0,
+	'overload'		=> 0,
         'strict'		=> 0,
         'warnings'		=> 0,
 	@extra,

@@ -18,6 +18,7 @@ RT->Config->Set('CustomFieldGroupings',
         'Group two' => ['ConditionedBy'],
     ],
 );
+RT->Config->PostLoadCheck;
 
 my $fake_ticket = RT::Ticket->new(RT->SystemUser);
 $fake_ticket->Create(Queue => 'General', Subject => 'Fake ticket to have ticket id not equal to queue id');

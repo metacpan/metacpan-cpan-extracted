@@ -56,7 +56,8 @@ sub enable {
         while ((my $pid = waitpid(-1, WNOHANG)) > 0) {
           $singleton->add_collected_info($pid, $?, $!);
         }
-        $singleton->consume_collected_info() if ($singleton->emit_from_sigchld());
+        $singleton->consume_collected_info()
+          if ($singleton->emit_from_sigchld());
       }
     });
 }
@@ -84,14 +85,14 @@ sub collect {
 }
 
 sub consume_collected_info {
-    while(my $i = shift @{$singleton->collected_info}) {
-        $singleton->collect(@$i) 
-    }
+  while (my $i = shift @{$singleton->collected_info}) {
+    $singleton->collect(@$i);
+  }
 }
 
 sub add_collected_info {
-    shift;
-    push @{$singleton->collected_info}, [@_];
+  shift;
+  push @{$singleton->collected_info}, [@_];
 }
 
 # Use as $pid => Mojo::IOLoop::ReadWriteProcess
@@ -135,7 +136,11 @@ sub contains {
   $singleton->all->grep(sub { $_->pid eq $pid })->size == 1;
 }
 
-sub reset { @{+shift}{qw(events orphans process_table collected_info handler emit_from_sigchld)} = ({}, {}, {}, [], undef, 1) }
+sub reset {
+  @{+shift}
+    {qw(events orphans process_table collected_info handler emit_from_sigchld)}
+    = ({}, {}, {}, [], undef, 1);
+}
 
 # XXX: This should be replaced by PR_GET_CHILD_SUBREAPER
 sub disable_subreaper {
@@ -170,7 +175,6 @@ sub _get_prctl_syscall {
     : ($machine eq "ppc" || $machine eq "ppc64le") ? 171
     : $machine eq "ia64"                           ? 1170
     : $machine eq "alpha"                          ? 348
-    : ($machine eq "arm" || $machine eq "armv7l")  ? 0x900000 + 172
     : $machine eq "avr32"                          ? 148
     : $machine eq "mips"                           ? 4000 + 192
     : $machine eq "mips64"                         ? 5000 + 153
@@ -361,7 +365,7 @@ Disables the SIG_CHLD handler and reset with the previous one.
     session->enable_subreaper;
 
 Mark the current process (not the child) as subreaper.
-This is used typically if you want to mark further childs as subreapers inside other forks.
+This is used typically if you want to mark further children as subreapers inside other forks.
 
     use Mojo::IOLoop::ReadWriteProcess::Session qw(session);
 

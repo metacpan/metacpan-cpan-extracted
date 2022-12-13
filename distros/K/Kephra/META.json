@@ -47,7 +47,7 @@
    "provides" : {
       "Kephra" : {
          "file" : "lib/Kephra.pm",
-         "version" : "0.403"
+         "version" : "0.404"
       }
    },
    "release_status" : "stable",
@@ -58,7 +58,7 @@
          "web" : "https://github.com/lichtkind/Kephra"
       }
    },
-   "version" : "0.403",
+   "version" : "0.404",
    "x_generated_by_perl" : "v5.30.0",
    "x_maintainers" : [
       "Herbert Breunung <lichtkind@cpan.org>"

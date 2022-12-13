@@ -4,16 +4,16 @@ NAME
 
 SYNOPSIS
 
-      use Test::Without::Module qw( My::Module );
+        use Test::Without::Module qw( My::Module );
     
-      # Now, loading of My::Module fails :
-      eval { require My::Module; };
-      warn $@ if $@;
+        # Now, loading of My::Module fails :
+        eval { require My::Module; };
+        warn $@ if $@;
     
-      # Now it works again
-      eval q{ no Test::Without::Module qw( My::Module ) };
-      eval { require My::Module; };
-      print "Found My::Module" unless $@;
+        # Now it works again
+        eval q{ no Test::Without::Module qw( My::Module ) };
+        eval { require My::Module; };
+        print "Found My::Module" unless $@;
 
 DESCRIPTION
 

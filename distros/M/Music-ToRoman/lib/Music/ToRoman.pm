@@ -3,10 +3,10 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Convert notes and chords to Roman numeral notation
 
-our $VERSION = '0.1901';
+our $VERSION = '0.1902';
 
 use strictures 2;
-use List::MoreUtils qw/ any first_index /;
+use List::SomeUtils qw(any first_index);
 use Moo;
 use Music::Note ();
 use Music::Scales qw(get_scale_notes);
@@ -362,7 +362,7 @@ Music::ToRoman - Convert notes and chords to Roman numeral notation
 
 =head1 VERSION
 
-version 0.1901
+version 0.1902
 
 =head1 SYNOPSIS
 

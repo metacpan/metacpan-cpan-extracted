@@ -4,11 +4,7 @@ MANIFEST
 META.yml
 Makefile.PL
 README
-README.md
 dist.ini
 lib/Math/Grid/Coordinates.pm
-posters_maybe.txt
-skunk/foo.pl
-skunk/foo.pl~
 t/00-load.t
 t/01-basic.t

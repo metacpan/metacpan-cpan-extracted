@@ -11,7 +11,7 @@ use File::Spec;
 __PACKAGE__->follow_best_practice;
 __PACKAGE__->mk_ro_accessors(qw(language source_dir target_dir counter));
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 =pod
 

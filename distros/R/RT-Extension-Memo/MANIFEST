@@ -37,4 +37,3 @@ xt/memo.t
 xt/merge.t
 xt/richtext.t
 xt/rights.t
-SIGNATURE                                Public-key signature (added by MakeMaker)

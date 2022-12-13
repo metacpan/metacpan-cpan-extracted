@@ -58,12 +58,12 @@ sub sched_relax_domain_level {
 sub sched_load_balance {
   shift->cgroup->_flag(SCHED_LOAD_BALANCE_INTERFACE, @_);
 }
-sub memory_spread_slab { shift->cgroup->_flag(MEM_SPREAD_SLAB_INTERFACE, @_) }
-sub memory_spread_page { shift->cgroup->_flag(MEM_SPREAD_PAGE_INTERFACE, @_) }
+sub memory_spread_slab  { shift->cgroup->_flag(MEM_SPREAD_SLAB_INTERFACE, @_) }
+sub memory_spread_page  { shift->cgroup->_flag(MEM_SPREAD_PAGE_INTERFACE, @_) }
 sub get_memory_pressure { shift->cgroup->_list(MEM_PRESSURE_INTERFACE) }
-sub mem_hardwall        { shift->cgroup->_flag(MEM_HARDWALL_INTERFACE, @_) }
-sub mem_exclusive       { shift->cgroup->_flag(MEM_EXCLUSIVE_INTERFACE, @_) }
-sub cpu_exclusive       { shift->cgroup->_flag(CPU_EXCLUSIVE_INTERFACE, @_) }
+sub mem_hardwall        { shift->cgroup->_flag(MEM_HARDWALL_INTERFACE,   @_) }
+sub mem_exclusive       { shift->cgroup->_flag(MEM_EXCLUSIVE_INTERFACE,  @_) }
+sub cpu_exclusive       { shift->cgroup->_flag(CPU_EXCLUSIVE_INTERFACE,  @_) }
 sub memory_migrate      { shift->cgroup->_flag(MEMORY_MIGRATE_INTERFACE, @_) }
 
 1;

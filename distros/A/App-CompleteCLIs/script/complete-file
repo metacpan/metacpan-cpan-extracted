@@ -1,12 +1,7 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /Complete/File/complete_file
-# and generated automatically using Perinci::CmdLine::Gen version 0.498
-
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-05-09'; # DATE
-our $DIST = 'App-CompleteCLIs'; # DIST
-our $VERSION = '0.150'; # VERSION
+# and generated automatically using Perinci::CmdLine::Gen version 0.501
 
 use 5.010001;
 use strict;
@@ -14,6 +9,11 @@ use warnings;
 use Log::ger;
 
 use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-09-09'; # DATE
+our $DIST = 'App-CompleteCLIs'; # DIST
+our $VERSION = '0.151'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/Complete/File/complete_file",
@@ -40,21 +40,11 @@ complete-file - Complete file and directory from local filesystem
 
 =head1 VERSION
 
-This document describes version 0.150 of complete-file (from Perl distribution App-CompleteCLIs), released on 2021-05-09.
+This document describes version 0.151 of complete-file (from Perl distribution App-CompleteCLIs), released on 2022-09-09.
 
 =head1 SYNOPSIS
 
-Usage:
-
- % complete-file [--allow-dot] [--debug] [--disallow-dot] [--exclude-dir]
-     [--exclude-leaf] [--file-ext-filter-json=s] [--file-ext-filter=s]
-     [--file-regex-filter=s] [--filter-json=s] [--filter=s] [--format=name]
-     [--handle-tilde] [--include-dir] [--include-leaf] [--json]
-     [--log-level=level] [--(no)naked-res] [--no-handle-tilde]
-     [--no-recurse] [--nohandle-tilde] [--norecurse]
-     [--page-result[=program]] [--quiet] [-r] [--recurse]
-     [--recurse-matching=s] [--starting-path=s] [--trace] [--verbose]
-     [--view-result[=program]] <word>
+B<complete-file> [B<--allow-dot>|B<--disallow-dot>] [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--exclude-dir>|B<--include-dir>] [B<--exclude-leaf>|B<--include-leaf>] [B<--file-ext-filter>=I<any>|B<--file-ext-filter-json>=I<json>] [B<--file-regex-filter>=I<re>] [B<--filter>=I<any>|B<--filter-json>=I<json>] [B<--format>=I<name>|B<--json>] [B<--handle-tilde>|B<--no-handle-tilde>|B<--nohandle-tilde>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--recurse>|B<-r>|B<--no-recurse>|B<--norecurse>] [B<--recurse-matching>=I<str>] [B<--starting-path>=I<str>] -- E<lt>I<word>E<gt>
 
 =head1 OPTIONS
 
@@ -66,7 +56,7 @@ C<*> marks required options.
 
 =item B<--disallow-dot>
 
-This is most useful when combined with `starting_path` option to prevent user
+This is most useful when combined with C<starting_path> option to prevent user
 going up/outside the starting path.
 
 
@@ -116,16 +106,16 @@ See C<--file-ext-filter>.
 
 =item B<--file-ext-filter>=I<s>
 
-This is also an alternative to specifying full `filter` or `file_regex_filter`.
+This is also an alternative to specifying full C<filter> or C<file_regex_filter>.
 You can set this to a regex or a set of extensions to accept. Note that like in
-`file_regex_filter`, directories of any name is also still allowed.
+C<file_regex_filter>, directories of any name is also still allowed.
 
 
 =item B<--file-regex-filter>=I<s>
 
 Filter shortcut for file regex.
 
-This is a shortcut for constructing a filter. So instead of using `filter`, you
+This is a shortcut for constructing a filter. So instead of using C<filter>, you
 use this option. This will construct a filter of including only directories or
 regular files, and the file must match a regex pattern. This use-case is common.
 
@@ -144,13 +134,13 @@ Filter can either be a string or a code.
 
 For string filter, you can specify a pipe-separated groups of sequences of these
 characters: f, d, r, w, x. Dash can appear anywhere in the sequence to mean
-not/negate. An example: `f` means to only show regular files, `-f` means only
-show non-regular files, `drwx` means to show only directories which are
-readable, writable, and executable (cd-able). `wf|wd` means writable regular
+not/negate. An example: C<f> means to only show regular files, C<-f> means only
+show non-regular files, C<drwx> means to show only directories which are
+readable, writable, and executable (cd-able). C<wf|wd> means writable regular
 files or writable directories.
 
 For code filter, you supply a coderef. The coderef will be called for each item
-with these arguments: `$name`. It should return true if it wants the item to be
+with these arguments: C<$name>. It should return true if it wants the item to be
 included.
 
 
@@ -167,6 +157,17 @@ Shortcut for --log-level=debug.
 =item B<--log-level>=I<s>
 
 Set log level.
+
+By default, these log levels are available (in order of increasing level of
+importance, from least important to most): C<trace>, C<debug>, C<info>,
+C<warn>/C<warning>, C<error>, C<fatal>. By default, the level is usually set to
+C<warn>, which means that log statements with level C<info> and less important
+levels will not be shown. To increase verbosity, choose C<info>, C<debug>, or
+C<trace>.
+
+For more details on log level and logging, as well as how new logging levels can
+be defined or existing ones modified, see L<Log::ger>.
+
 
 =item B<--quiet>
 
@@ -194,6 +195,12 @@ Default value:
 
  undef
 
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
 =item B<--json>
 
 Set output format to json.
@@ -208,24 +215,33 @@ Default value:
 
 By default, when outputing as JSON, the full enveloped result is returned, e.g.:
 
-    [200,"OK",[1,2,3],{"func.extra"=>4}]
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
 
 The reason is so you can get the status (1st element), status message (2nd
 element) as well as result metadata/extra result (4th element) instead of just
 the result (3rd element). However, sometimes you want just the result, e.g. when
 you want to pipe the result for more post-processing. In this case you can use
-`--naked-res` so you just get:
+C<--naked-res> so you just get:
 
-    [1,2,3]
+ [1,2,3]
 
 
 =item B<--page-result>
 
 Filter output through a pager.
 
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
 =item B<--view-result>
 
 View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
 
 =back
 
@@ -285,6 +301,35 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-Comple
 
 Source repository is at L<https://github.com/perlancar/perl-App-CompleteCLIs>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2021, 2020, 2019, 2017, 2016, 2015, 2014 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-CompleteCLIs>
@@ -292,16 +337,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021, 2020, 2019, 2017, 2016, 2015, 2014 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

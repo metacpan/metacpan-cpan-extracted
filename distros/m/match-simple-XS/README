@@ -5,6 +5,8 @@ SYNOPSIS
       use match::simple;
 
 DESCRIPTION
+    The user-facing module is match::simple.
+
     Nothing to see here; move along.
 
 SEE ALSO
@@ -20,7 +22,7 @@ THANKS
     The XS source code for Scalar::Util was also very useful.
 
 COPYRIGHT AND LICENCE
-    This software is copyright (c) 2014 by Toby Inkster.
+    This software is copyright (c) 2014, 2022 by Toby Inkster.
 
     This is free software; you can redistribute it and/or modify it under the
     same terms as the Perl 5 programming language system itself.

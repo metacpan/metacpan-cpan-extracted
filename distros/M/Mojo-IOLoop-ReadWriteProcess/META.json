@@ -4,7 +4,7 @@
       "Ettore Di Giacinto <edigiacinto@suse.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.12",
+   "generated_by" : "Minilla/v3.1.20",
    "license" : [
       "perl_5"
    ],
@@ -60,7 +60,7 @@
    "provides" : {
       "Mojo::IOLoop::ReadWriteProcess" : {
          "file" : "lib/Mojo/IOLoop/ReadWriteProcess.pm",
-         "version" : "0.32"
+         "version" : "0.33"
       },
       "Mojo::IOLoop::ReadWriteProcess::CGroup" : {
          "file" : "lib/Mojo/IOLoop/ReadWriteProcess/CGroup.pm"
@@ -148,25 +148,30 @@
       },
       "homepage" : "https://github.com/openSUSE/Mojo-IOLoop-ReadWriteProcess",
       "repository" : {
-         "url" : "git://github.com/openSUSE/Mojo-IOLoop-ReadWriteProcess.git",
+         "type" : "git",
+         "url" : "https://github.com/openSUSE/Mojo-IOLoop-ReadWriteProcess.git",
          "web" : "https://github.com/openSUSE/Mojo-IOLoop-ReadWriteProcess"
       }
    },
-   "version" : "0.32",
+   "version" : "0.33",
    "x_contributors" : [
       "Adam Williamson <awilliam@redhat.com>",
       "Clemens Famulla-Conrad <cfamullaconrad@suse.de>",
       "Ettore Di Giacinto <mudler@gentoo.org>",
       "Ettore Di Giacinto <mudler@users.noreply.github.com>",
       "Marius Kittler <mkittler@suse.de>",
+      "Martchus <martchus@gmx.net>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
+      "Nick Morrott <knowledgejunkie@gmail.com>",
       "Oliver Kurz <okurz@suse.de>",
       "Santiago Zarate <229240+foursixnine@users.noreply.github.com>",
       "Santiago Zarate <santiago+github@zarate.co>",
       "Santiago Zarate <santiago@zarate.co>",
+      "Sebastian Riedel <s@kraih.com>",
       "Sebastian Riedel <sri@cpan.org>",
-      "cfconrad <40127946+cfconrad@users.noreply.github.com>"
+      "cfconrad <40127946+cfconrad@users.noreply.github.com>",
+      "gregor herrmann <gregoa@debian.org>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.06",
+   "x_serialization_backend" : "JSON::PP version 4.12",
    "x_static_install" : 0
 }

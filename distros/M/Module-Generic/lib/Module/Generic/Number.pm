@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Module Generic - ~/lib/Module/Generic/Number.pm
-## Version v2.0.0
+## Version v2.0.1
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/03/20
-## Modified 2022/11/30
+## Modified 2022/12/11
 ## All rights reserved
 ## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
@@ -104,7 +104,7 @@ BEGIN
     # double floats.  To be safe, we cap at 2**53; use Math::BigFloat
     # instead for larger numbers.
     use constant MAX_INT => 2**53;
-    our( $VERSION ) = 'v2.0.0';
+    our( $VERSION ) = 'v2.0.1';
 };
 
 # use strict;
@@ -640,11 +640,23 @@ sub init
                 {
                     $default->{ $lconv_prop } = $numerics->{ $lconv_prop };
                 }
+                # POSIX::localeconv returned an incomplete hash and we need certain default values
+                # For example a locale C.UTF-8 would only have the property decimal_point set to '.' and nothing else
+                elsif( !CORE::length( $default->{ $lconv_prop } ) &&
+                       CORE::exists( $numerics->{ $lconv_prop } ) )
+                {
+                    $default->{ $lconv_prop } = $numerics->{ $lconv_prop };
+                }
                 $self->$prop( $default->{ $lconv_prop } );
                 last;
             }
+            # Set it to undef then
             else
             {
+                if( CORE::exists( $numerics->{ $lconv_prop } ) )
+                {
+                    $default->{ $lconv_prop } = $numerics->{ $lconv_prop };
+                }
                 $self->$prop( $default->{ $lconv_prop } );
             }
         }
@@ -793,7 +805,7 @@ sub format
 {
     my $self = shift( @_ );
     my $precision;
-    $precision = shift( @_ ) if( $_[0] =~ /^\d+$/ );
+    $precision = shift( @_ ) if( scalar( @_ ) && $_[0] =~ /^\d+$/ );
     my $opts = $self->_get_args_as_hash( @_ );
     no overloading;
     my $number  = $self->{_number};
@@ -1061,14 +1073,14 @@ sub format_money
         $sep_by_space = $self->space_neg;
         $cs_precedes  = $self->precede_neg;
         $sign_posn    = $self->position_neg;
-        $sign_symbol  = $self->sign_neg;
+        $sign_symbol  = $self->sign_neg // '';
     }
     else
     {
         $sep_by_space = $self->space_pos;
         $cs_precedes  = $self->precede_pos;
         $sign_posn    = $self->position_pos;
-        $sign_symbol  = $self->sign_pos;
+        $sign_symbol  = $self->sign_pos // '';
     }
 
     # Combine it all back together.

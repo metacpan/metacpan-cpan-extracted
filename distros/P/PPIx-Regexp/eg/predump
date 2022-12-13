@@ -21,7 +21,7 @@ use Scalar::Util qw{ refaddr };
 
 use vars qw{ $VERSION };
 
-$VERSION = '0.085';
+$VERSION = '0.086';
 
 my %opt = (
     default_modifiers => [],
@@ -41,7 +41,7 @@ GetOptions( \%opt,
 	indent=i locations! margin=i objectify! ordinal!
 	perl_version|perl-version!
 	ppi! short! significant! strict!
-	test! tokens! trace+ unescape! verbose+
+	test! tokens! trace+ unescape! verbose width! +
     } )
     and @ARGV
     or pod2usage( {
@@ -312,6 +312,10 @@ PPIx::Regexp::Dumper->new()|PPIx::Regexp::Dumper/new >>.
 =item --version
 
 This option displays the version of this script. The script then exits.
+
+=item --width
+
+If true, this option causes the width of the object to be dumped.
 
 =back
 

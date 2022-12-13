@@ -1,10 +1,9 @@
-package Dist::Zilla::PluginBundle::Author::Plicease 2.72 {
+package Dist::Zilla::PluginBundle::Author::Plicease 2.73 {
 
   use 5.020;
   use Moose;
   use Dist::Zilla;
-  use PerlX::Maybe qw( maybe );
-  use YAML ();
+  use PerlX::Maybe qw( maybe provided );
   use Term::ANSIColor ();
   use Dist::Zilla::Util::CurrentCmd ();
   use Path::Tiny qw( path );
@@ -22,6 +21,7 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.72 {
     preamble
     diag_preamble
     workflow
+    clean
 
     diag
     allow_dirty ) }
@@ -179,6 +179,7 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.72 {
           'repository.web'  => $self->payload->{'repository.web'}  || sprintf("https://github.com/%s/%s",        $user, $repo),
           'repository.type' => $self->payload->{'repository.type'} || 'git',
           maybe 'x_IRC' => $self->payload->{irc},
+          provided $user =~ /\APerlFFI\Z/i, 'x_twitter' => 'https://fosstodon.org/@PerlFFI',
         },
       ]);
     };
@@ -319,6 +320,8 @@ package Dist::Zilla::PluginBundle::Author::Plicease 2.72 {
       $self->_my_add_plugin(['ArchiveTar']);
     }
 
+    $self->_my_add_plugin(['Author::Plicease::Cleaner' => { maybe clean => $self->payload->{clean} }]);
+
   }
 
   __PACKAGE__->meta->make_immutable;
@@ -338,7 +341,7 @@ Dist::Zilla::PluginBundle::Author::Plicease - Dist::Zilla plugin bundle used by 
 
 =head1 VERSION
 
-version 2.72
+version 2.73
 
 =head1 SYNOPSIS
 
@@ -458,6 +461,7 @@ This plugin bundle is mostly equivalent to
  
  [Author::Plicease::NoUnsafeInc]
  [Libarchive]
+ [Author::Plicease::Cleaner]
 
 =head1 OPTIONS
 

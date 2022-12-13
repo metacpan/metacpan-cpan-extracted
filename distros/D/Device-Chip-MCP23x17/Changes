@@ -1,5 +1,9 @@
 Revision history for Device-Chip-MCP23x17
 
+0.06    2022-12-11
+        [CHANGES]
+         * Updated for Object::Pad v0.66 - use `field` instead of `has`
+
 0.05    2022-01-31
         [CHANGES]
          * Updated for Object::Pad 0.57

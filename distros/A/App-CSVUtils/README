@@ -2,8 +2,8 @@ NAME
     App::CSVUtils - CLI utilities related to CSV
 
 VERSION
-    This document describes version 0.052 of App::CSVUtils (from Perl
-    distribution App-CSVUtils), released on 2022-12-05.
+    This document describes version 0.053 of App::CSVUtils (from Perl
+    distribution App-CSVUtils), released on 2022-12-09.
 
 DESCRIPTION
     This distribution contains the following CLI utilities:
@@ -293,9 +293,9 @@ FUNCTIONS
     The new fields by default will be added at the end, unless you specify
     one of "--after" (to put after a certain field), "--before" (to put
     before a certain field), or "--at" (to put at specific position, 1 means
-    as the first field). The new fields will be clustered together though,
-    you currently cannot set the position of each new field. But you can
-    later reorder fields using csv-sort-fields.
+    the first field). The new fields will be clustered together though, you
+    currently cannot set the position of each new field. But you can later
+    reorder fields using csv-sort-fields.
 
     If supplied, your Perl code ("-e") will be called for each row
     (excluding the header row) and should return the value for the new
@@ -324,7 +324,7 @@ FUNCTIONS
 
     *   at => *int*
 
-        Put the new field at specific position (1 means as first field).
+        Put the new field at specific position (1 means first field).
 
     *   before => *str*
 

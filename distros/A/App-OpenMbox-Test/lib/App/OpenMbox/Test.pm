@@ -12,11 +12,11 @@ App::OpenMbox::Test - Auto delivery test for OpenMbox.net
 
 =head1 VERSION
 
-Version 0.10
+Version 0.13
 
 =cut
 
-our $VERSION = '0.10';
+our $VERSION = '0.13';
 
 
 =head1 SYNOPSIS
@@ -25,8 +25,17 @@ This module sends test email to those big providers for checking delivery capaci
 
     use App::OpenMbox::Test;
 
+    # test openmbox
     my $test = App::OpenMbox::Test->new('user@openmbox.net','some.pass');
     $test->deliver;
+
+    # or test pobox
+    my $test = App::OpenMbox::Test->new('user@pobox.com','some.pass');
+    $test->deliver(host=>'smtp.pobox.com',
+                   port=>465,
+                   ssl=>1,
+                   debug=>1,
+                   );
 
 
 =head1 SUBROUTINES/METHODS
@@ -57,8 +66,8 @@ It will send mails to the following providers, see __DATA__ section.
     - ProtonMail
     - GMX/Web.de
     - Vodafone
+    - T-online
     - Freenet.de
-    - Mail.de
     - Yandex
     - Mail.ru
 
@@ -70,6 +79,8 @@ After delivery you can check provider's inbox for new message. If it didn't reac
 
 sub deliver {
   my $self = shift;
+  my %args = @_;
+
   my @rec;
 
   while(<DATA>) {
@@ -86,6 +97,10 @@ sub deliver {
                   type => 'text/plain',
                   subject => 'Auto delivery test',
                   body => "This is just a test message, sent by App::OpenMbox::Test on $time",
+                  host => $args{host},
+                  port => $args{port},
+                  ssl => $args{ssl},
+                  debug => $args{debug},
                  );
 }
 
@@ -153,7 +168,7 @@ openmbox-openmbox@yahoo.com
 openmbox@protonmail.com
 openmbox@gmx-topmail.de
 openmbox@vodafone.de
+openmbox@t-online.de
 openmbox@freenet.de
-openmbox@e.mail.de
 rwbox@yandex.com
 wonder@internet.ru

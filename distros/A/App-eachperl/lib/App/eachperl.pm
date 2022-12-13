@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.73 ':experimental(init_expr)';
 
-package App::eachperl 0.08;
+package App::eachperl 0.09;
 class App::eachperl;
 
 use Config::Tiny;
@@ -404,6 +404,53 @@ method command_modpath
    return $self->exec(
       { oneline => 1, no_summary => 1 },
       "-M$module", "-e", "print \$INC{qq($filename)}, qq(\\n);"
+   );
+}
+
+method command_uninstall
+   :Command_description("Uninstalls a module")
+   :Command_arg("module", "name of the module")
+   ( $module )
+{
+   return $self->exec(
+      "-e", <<'EOPERL' =~ s/^\s+//gr, $module
+         use Errno;
+         my $module = shift;
+         ( my $path = $module ) =~ s{::}{/}g;
+         my $packlist;
+         foreach ( @INC ) {
+            my $trial = "$_/auto/$path/.packlist";
+            next unless -f $trial;
+            $packlist = $trial; last;
+         }
+         defined $packlist or
+            die "Unable to find a .packlist file for $module\n";
+         open my $fh, "<", $packlist or
+            die "Unable to read $packlist - $!";
+         my $failed;
+         sub remove {
+            my ( $path ) = @_;
+            unlink $path or
+               $! == Errno::ENOENT or
+               $failed++, warn("Unable to unlink $path - $!"), return;
+            print "UNLINK $path\n";
+
+            while( length $path ) {
+               $path =~ s{/[^/]+$}{};
+               rmdir $path and next;
+               $! == Errno::ENOENT and next;
+               $! == Errno::ENOTEMPTY and last;
+
+               $failed++, warn("Unable to rmdir $path - $!"), return;
+            }
+         }
+         while( <$fh> ) {
+            chomp;
+            remove($_);
+         }
+         remove($packlist) if !$failed;
+         exit $failed;
+EOPERL
    );
 }
 

@@ -5,8 +5,7 @@ SYNOPSIS
        use v5.10;
        use match::simple;
    
-       if ($this |M| $that)
-       {
+       if ( $this |M| $that ) {
           say "$this matches $that";
        }
 
@@ -32,8 +31,8 @@ DESCRIPTION
         then it this is called as a method, with the left hand side being
         passed as an argument.
 
-    *   If the right hand side is an object which overloads `~~`, then a true
-        smart match is performed.
+    *   If the right hand side is an object which overloads `~~`, then this
+        will be used.
 
     *   If the right hand side is an arrayref, then the operator recurses into
         the array, with the match succeeding if the left hand side matches any
@@ -48,8 +47,7 @@ DESCRIPTION
        use v5.10;
        use match::simple qw(match);
    
-       if (match($this, $that))
-       {
+       if ( match($this, $that) ) {
           say "$this matches $that";
        }
 
@@ -89,7 +87,7 @@ AUTHOR
     Toby Inkster <tobyink@cpan.org>.
 
 COPYRIGHT AND LICENCE
-    This software is copyright (c) 2013-2014, 2017 by Toby Inkster.
+    This software is copyright (c) 2013-2014, 2017, 2022 by Toby Inkster.
 
     This is free software; you can redistribute it and/or modify it under the
     same terms as the Perl 5 programming language system itself.

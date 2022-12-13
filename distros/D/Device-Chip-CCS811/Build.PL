@@ -8,7 +8,7 @@ my $build = Module::Build->new(
    requires => {
       'perl' => '5.026',
       'Future::AsyncAwait' => '0.47', # toplevel await
-      'Object::Pad' => '0.57',
+      'Object::Pad' => '0.66',
 
       'Data::Bitfield' => 0,
       'Device::Chip' => '0.03',
@@ -16,6 +16,7 @@ my $build = Module::Build->new(
    },
    test_requires => {
       'Test::Device::Chip::Adapter' => 0,
+      'Test::ExpectAndCheck::Future' => '0.04',
       'Test::More' => '0.88', # done_testing
    },
    configure_requires => {

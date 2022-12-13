@@ -13,7 +13,7 @@ use Readonly;
 Readonly::Array our @EXPORT_OK => qw(get sections);
 Readonly::Scalar my $EMPTY_STR => q{};
 
-our $VERSION = 0.12;
+our $VERSION = 0.13;
 
 # Get content for file or module.
 sub get {
@@ -82,7 +82,7 @@ sub _get_content {
 			}
 		} elsif ($child->type eq 'for') {
 			my $body = $child->body;
-			if ($body =~ m/^comment\s*filename=([\w\.]+)\s*$/ms) {
+			if ($body =~ m/^comment\s*filename=([\w\-\.]+)\s*$/ms) {
 				$example_filename = $1;
 			}
 		} else {
@@ -312,6 +312,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.12
+0.13
 
 =cut

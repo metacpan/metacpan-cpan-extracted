@@ -86,11 +86,13 @@ META.yml
 README
 t/basic.t
 t/fuzz.t
+t/inf.t
 t/locations.t
 t/parse.t
 t/unit-adhoc.t
 t/unit.t
 t/version.t
+t/width.t
 t/xplain.t
 xt/author/carp_not.t
 xt/author/changes.t

@@ -7,18 +7,12 @@ use POSIX;
 use FindBin;
 use Mojo::File qw(tempfile path);
 use lib ("$FindBin::Bin/lib", "../lib", "lib");
-use Mojo::IOLoop::ReadWriteProcess qw(process);
-use Mojo::IOLoop::ReadWriteProcess::Session qw(session);
-use Mojo::IOLoop::ReadWriteProcess::Test::Utils qw(attempt);
+use Mojo::IOLoop::ReadWriteProcess              qw(process);
+use Mojo::IOLoop::ReadWriteProcess::Session     qw(session);
+use Mojo::IOLoop::ReadWriteProcess::Test::Utils qw(attempt check_bin);
 
 subtest SIG_CHLD => sub {
-  my $test_script = "$FindBin::Bin/data/process_check.sh";
-  plan skip_all =>
-    "You do not seem to have bash, which is required (as for now) for this test"
-    unless -e '/bin/bash';
-  plan skip_all =>
-"You do not seem to have $test_script. The script is required to run the test"
-    unless -e $test_script;
+  my $test_script = check_bin("$FindBin::Bin/data/process_check.sh");
   my $reached;
   my $collect = 0;
 
@@ -98,81 +92,74 @@ subtest collect_status => sub {
 };
 
 subtest collect_from_signal_handler => sub {
-  my $p = process(execute => '/usr/bin/true');
+  check_bin('/bin/true');
+  my $p         = process(execute => '/bin/true');
   my $collected = 0;
-  my $orphan = 0;
-  my $sig_chld = 0;
+  my $orphan    = 0;
+  my $sig_chld  = 0;
   $p->session->reset();
-  $p->session->collect_status(1); # needed, because previous test set it to 0
-  $p->session->on(SIG_CHLD => sub { $sig_chld++});
-  $p->session->on(collected => sub { $collected++ });
+  $p->session->collect_status(1);    # needed, because previous test set it to 0
+  $p->session->on(SIG_CHLD         => sub { $sig_chld++ });
+  $p->session->on(collected        => sub { $collected++ });
   $p->session->on(collected_orphan => sub { $orphan++ });
   $p->start();
 
   attempt {
     attempts  => 10,
-    condition => sub { $sig_chld > 0 && $collected > 0},
+    condition => sub { $sig_chld > 0 && $collected > 0 },
   };
 
-  is($sig_chld, 1, "Event for SIG_CHILD was emitted");
+  is($sig_chld,  1, "Event for SIG_CHILD was emitted");
   is($collected, 1, "Event collected apear without doing active wait()");
-  is($orphan, 0, "No orphans where collected");
+  is($orphan,    0, "No orphans where collected");
 
   $p->wait_stop();
-  is($collected, 1, "No more collect events emitted");
-  is($orphan, 0, "No more orphans events emitted");
-  is($p->exit_status, 0 , '/usr/bin/true exited with 0');
+  is($collected,      1, "No more collect events emitted");
+  is($orphan,         0, "No more orphans events emitted");
+  is($p->exit_status, 0, '/bin/true exited with 0');
 
-  exec ('/usr/bin/true') if (fork() == 0);
+  exec('/bin/true') if (fork() == 0);
 
-  attempt {
-    attempts  => 10,
-    condition => sub { $sig_chld > 1 && $orphan > 0},
-  };
+  attempt {attempts => 10, condition => sub { $sig_chld > 1 && $orphan > 0 },};
 
-  is($sig_chld, 2, "Event for SIG_CHILD was emitted");
+  is($sig_chld,  2, "Event for SIG_CHILD was emitted");
   is($collected, 1, "No more collect events emitted (2)");
-  is($orphan, 1, "Collect one orphan");
+  is($orphan,    1, "Collect one orphan");
 };
 
 subtest emit_from_sigchld_off => sub {
-  my $p = process(execute => '/usr/bin/true');
+  check_bin('/bin/true');
+  my $p         = process(execute => '/bin/true');
   my $collected = 0;
-  my $orphan = 0;
-  my $sig_chld = 0;
+  my $orphan    = 0;
+  my $sig_chld  = 0;
   $p->session->reset();
   $p->session->collect_status(1);
   $p->session->emit_from_sigchld(0);
-  $p->session->on(SIG_CHLD => sub { $sig_chld++});
-  $p->session->on(collected => sub { $collected++ });
+  $p->session->on(SIG_CHLD         => sub { $sig_chld++ });
+  $p->session->on(collected        => sub { $collected++ });
   $p->session->on(collected_orphan => sub { $orphan++ });
   $p->start();
 
-  attempt {
-    attempts  => 10,
-    condition => sub { $sig_chld > 0},
-  };
-  is($sig_chld, 1, "Event for SIG_CHILD was emitted");
+  attempt {attempts => 10, condition => sub { $sig_chld > 0 },};
+  is($sig_chld,  1, "Event for SIG_CHILD was emitted");
   is($collected, 0, "Event collected didn't appear from sighandler");
-  is($orphan, 0, "No orphans where collected");
+  is($orphan,    0, "No orphans where collected");
 
   $p->wait_stop();
-  is($collected, 1, "No more collect events emitted");
-  is($orphan, 0, "No more orphans events emitted");
-  is($p->exit_status, 0 , '/usr/bin/true exited with 0');
+  is($collected,      1, "No more collect events emitted");
+  is($orphan,         0, "No more orphans events emitted");
+  is($p->exit_status, 0, '/bin/true exited with 0');
 
-  exec ('/usr/bin/true') if (fork() == 0);
-  attempt {
-    attempts  => 10,
-    condition => sub { $sig_chld > 1},
-  };
+  exec('/bin/true') if (fork() == 0);
+  attempt {attempts => 10, condition => sub { $sig_chld > 1 },};
   is($collected, 1, "No more collect events emitted (2)");
-  is($orphan, 0, "collect_orphan didn't appear from sighandler");
+  is($orphan,    0, "collect_orphan didn't appear from sighandler");
 
   $p->session->consume_collected_info();
-  is($sig_chld, 2, "Event for SIG_CHILD was emitted");
+  is($sig_chld,  2, "Event for SIG_CHILD was emitted");
   is($collected, 1, "No more collect events emitted (3)");
-  is($orphan, 1, "Collect one orphan");
+  is($orphan,    1, "Collect one orphan");
 };
 
 done_testing();

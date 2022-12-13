@@ -1,3 +1,8 @@
+0.151   2022-09-09  Released-By: PERLANCAR; Urgency: medium
+
+        - Add CLI: complete-random-string.
+
+
 0.150   2021-05-09  Released-By: PERLANCAR; Urgency: medium
 
 	- Add CLI: complete-rclone-remote.

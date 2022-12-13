@@ -1,9 +1,60 @@
-use 5.16.0;
+use 5.20.0;
 use warnings;
 package Games::Nintendo::Mario::Hearts 0.208;
+# ABSTRACT: a superclass for Italian plubmers who can take a beating
 
 use parent qw(Games::Nintendo::Mario);
 use Hash::Util::FieldHash qw(fieldhash);
+
+#pod =head1 SYNOPSIS
+#pod
+#pod   use Games::Nintendo::Mario::Hearts;
+#pod
+#pod   my $noone = Games::Nintendo::Mario::Hearts->new;
+#pod
+#pod   print $hero->hearts . '/' . $hero->max_hearts; # at 1/3 health
+#pod   $hero->powerup('heart');                       # up to 2/3!
+#pod   $hero->powerup('heart');                       # full health!
+#pod
+#pod   print "It's-a me!  ", $hero->name, "!\n";      # 'Mario'
+#pod
+#pod   $hero->powerup('heart');                       # Nothing happens.
+#pod
+#pod   $hero->damage for (1 .. 3);                    # cue the Mario Death Music
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod This class subclasses Games::Nintendo::Mario, providing a class for further
+#pod subclassing.  It adds the C<hearts> and C<max_hearts> methods, described below,
+#pod and it causes Mario to die when his hearts count reaches zero.  This behavior
+#pod is found in SMB2 and the Wario games.
+#pod
+#pod All of the methods described in the Mario interface exist as documented, but
+#pod the only powerup in this class is 'heart' and the only state is 'normal'
+#pod
+#pod =method hearts
+#pod
+#pod This method returns the number of hearts the plumber currently has.  It
+#pod defaults to 1 at creation.
+#pod
+#pod =method max_hearts
+#pod
+#pod This method returns the number of heart containers currently in the plumber's
+#pod heart meter.  It defaults to 3 at creation.
+#pod
+#pod =method damage
+#pod
+#pod =method powerup
+#pod
+#pod These methods are defined in Games::Nintendo::Mario.
+#pod
+#pod =method games
+#pod
+#pod This is an abstract subclass for Mario classes, and does not represent any one
+#pod game.
+#pod
+#pod =cut
+
 
 sub _states { qw[normal] }
 sub _items  { qw[heart] }
@@ -52,20 +103,24 @@ sub games {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 Games::Nintendo::Mario::Hearts - a superclass for Italian plubmers who can take a beating
 
 =head1 VERSION
 
-version 0.208
+version 0.209
 
 =head1 SYNOPSIS
 
   use Games::Nintendo::Mario::Hearts;
 
   my $noone = Games::Nintendo::Mario::Hearts->new;
-  
+
   print $hero->hearts . '/' . $hero->max_hearts; # at 1/3 health
   $hero->powerup('heart');                       # up to 2/3!
   $hero->powerup('heart');                       # full health!
@@ -81,50 +136,55 @@ version 0.208
 This class subclasses Games::Nintendo::Mario, providing a class for further
 subclassing.  It adds the C<hearts> and C<max_hearts> methods, described below,
 and it causes Mario to die when his hearts count reaches zero.  This behavior
-is found in SMB2 and the Wario games. 
+is found in SMB2 and the Wario games.
 
 All of the methods described in the Mario interface exist as documented, but
 the only powerup in this class is 'heart' and the only state is 'normal'
 
+=head1 PERL VERSION
+
+This module should work on any version of perl still receiving updates from
+the Perl 5 Porters.  This means it should work on any version of perl released
+in the last two to three years.  (That is, if the most recently released
+version is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 METHODS
 
-=over
-
-=item hearts
+=head2 hearts
 
 This method returns the number of hearts the plumber currently has.  It
 defaults to 1 at creation.
 
-=item max_hearts
+=head2 max_hearts
 
 This method returns the number of heart containers currently in the plumber's
 heart meter.  It defaults to 3 at creation.
 
-=item damage
+=head2 damage
 
-=item powerup
+=head2 powerup
 
 These methods are defined in Games::Nintendo::Mario.
 
-=item games
+=head2 games
 
 This is an abstract subclass for Mario classes, and does not represent any one
 game.
 
-=back
-
 =head1 AUTHOR
 
-Ricardo SIGNES E<lt>rjbs@cpan.orgE<gt>
+Ricardo SIGNES <cpan@semiotic.systems>
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright 2003 by Ricardo SIGNES E<lt>rjbs@cpan.orgE<gt>
+This software is copyright (c) 2003 by Ricardo SIGNES.
 
-This program is free software; you can redistribute it and/or modify it under
-the same terms as Perl itself.
-
-See http://www.perl.com/perl/misc/Artistic.html
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-

@@ -3,6 +3,10 @@
 29/macos/rakubrew
 29/perl/rakubrew
 29/win/rakubrew.exe
+30/changes
+30/macos/rakubrew
+30/perl/rakubrew
+30/win/rakubrew.exe
 Changes
 LICENSE
 MANIFEST
@@ -30,6 +34,7 @@ lib/App/Rakubrew/Update.pm
 lib/App/Rakubrew/Variables.pm
 lib/App/Rakubrew/VersionHandling.pm
 rakubrew-29.tgz
+rakubrew-30.tgz
 rakubrew.tgz
 script/rakubrew
 t/00-compile.t

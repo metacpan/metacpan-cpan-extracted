@@ -1,12 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.57;
+use Object::Pad 0.66;
 
-package Device::Chip::INA219 0.08;
+package Device::Chip::INA219 0.09;
 class Device::Chip::INA219
    :isa(Device::Chip::Base::RegisteredI2C 0.10);
 
@@ -114,7 +114,7 @@ Reads and returns the current chip configuration as a C<HASH> reference.
 
 =cut
 
-has $_config;
+field $_config;
 
 async method read_config ()
 {

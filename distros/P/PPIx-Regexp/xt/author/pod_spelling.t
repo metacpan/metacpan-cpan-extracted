@@ -37,6 +37,7 @@ lexes
 merchantability
 nav
 navigational
+numification
 perlrecharclass
 perluniprops
 POSIX
@@ -67,7 +68,7 @@ tokenizing
 trigraphs
 Un
 unicode
-unforseen
+unquantified
 unterminated
 UTF
 version's

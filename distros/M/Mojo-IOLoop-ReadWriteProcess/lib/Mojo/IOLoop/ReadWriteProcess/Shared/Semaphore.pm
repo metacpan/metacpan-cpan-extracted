@@ -10,11 +10,11 @@ our @EXPORT_OK = qw(semaphore);
 use Exporter 'import';
 
 use constant DEBUG => $ENV{MOJO_PROCESS_DEBUG};
-has key  => sub { shift->_genkey };
-has _sem => sub { $_[0]->_create(shift->key) };
+has key    => sub { shift->_genkey };
+has _sem   => sub { $_[0]->_create(shift->key) };
 has count  => 1;
 has _value => 1;
-has flags  => IPC_CREAT | IPC_EXCL | S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP
+has flags => IPC_CREAT | IPC_EXCL | S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP
   | S_IROTH | S_IWOTH;
 
 sub semaphore { __PACKAGE__->new(@_) }

@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument;
-$Lab::Moose::Instrument::VERSION = '3.831';
+$Lab::Moose::Instrument::VERSION = '3.840';
 #ABSTRACT: Base class for instrument drivers
 
 use v5.20;
@@ -77,7 +77,7 @@ sub default_connection_options {
         'VISA::USB'  => {},
         Socket       => {},
         Zhinst       => {},
-
+		WWW			 => {},
     };
 }
 
@@ -274,7 +274,7 @@ Lab::Moose::Instrument - Base class for instrument drivers
 
 =head1 VERSION
 
-version 3.831
+version 3.840
 
 =head1 SYNOPSIS
 
@@ -429,6 +429,7 @@ This software is copyright (c) 2022 by the Lab::Measurement team; in detail:
             2018       Simon Reinhardt
             2020       Andreas K. Huettel, Sam Bingner
             2021       Fabian Weinelt
+            2022       Mia Schambeck
 
 
 This is free software; you can redistribute it and/or modify it under

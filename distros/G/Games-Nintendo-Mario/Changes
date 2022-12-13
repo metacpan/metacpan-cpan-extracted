@@ -1,19 +1,20 @@
 Revision history for Games-Nintendo-Mario
 
-0.208     2013-09-04 22:09:08 America/New_York
+0.209     2022-12-09 18:33:35-05:00 America/New_York
           [IMPORTANT]
         - This may be the last update to Games-Nintendo-Mario!  Although I
           receive dozens of support requests or letters of appreciation each
           day about this code, I receive very few patches, including those to
           bring the library up to date with modern Mario standards such as
-          NSMB2 or NSMBU, let alone NSLU.  Although I am happy to continue
-          supporting this library's dedicated userbase, I cannot do so without
-          hardware for comparison testing.  Donations of a Wii U or 3DS console
-          would certainly lead to new versions, and hopefully to the
-          long-awaited Games::Nintendo::Metroid.
+          NSMB2 or NSMBU, let alone NSLU, Odyssey, or Bowser's Fury.  Although
+          I am happy to continue supporting this library's dedicated userbase,
+          I cannot do so without software for comparison testing.  A research
+          grant in the form of Nintendo eShop points could certainly lead to
+          new versions, and hopefully to the long-awaited
+          Games::Nintendo::Metroid.
 
           [LESS IMPORTANT]
-        - update bugtracker and repository
+        - update metadata and packaging
 
 0.205     2012-05-30
           add New Super Mario Bros. Wii

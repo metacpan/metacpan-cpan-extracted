@@ -1,5 +1,8 @@
 Revision history for RT-Extension-Memo
 
+0.07 2022-12-13
+ - Upgrade to RT 5
+
 0.06 2019-12-09
  - Fix display with linefeeds for text/plain stored attribute
  - Fix tests of CKEDITOR since instances are frozen on 'unloaded' state with phantomjs

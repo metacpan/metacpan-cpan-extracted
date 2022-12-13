@@ -21,7 +21,7 @@ use Readonly;
 use TimeZone::Solar;
 
 # constants
-Readonly::Scalar my $total_tests => 6 + 4 + 8 + 1;
+Readonly::Scalar my $total_tests => 3 + 4 + 8 + 1;
 
 # perform tests
 sub run_tests
@@ -31,9 +31,6 @@ sub run_tests
     dies_ok { TimeZone::Solar::version(); } "undefined class in version()";
     dies_ok { TimeZone::Solar::version("UNIVERSAL"); } "invalid class access to version() - name";
     dies_ok { TimeZone::Solar::version($uni_obj); } "invalid class access to version() - ref";
-    dies_ok { TimeZone::Solar::_get_const(); } "undefined class in _get_const()";
-    dies_ok { TimeZone::Solar::_get_const( "UNIVERSAL", "PRECISION_DIGITS" ); } "invalid class in _get_const() - name";
-    dies_ok { TimeZone::Solar::_get_const( $uni_obj,    "PRECISION_DIGITS" ); } "invalid class in _get_const() - ref";
 
     # feed bad parameters to _tz_instance() => 4 tests
     dies_ok { TimeZone::Solar::_tz_instance() } "_tz_instance() croaks on undef hashref";

@@ -21,13 +21,13 @@ no_index:
 provides:
   Kephra:
     file: lib/Kephra.pm
-    version: '0.403'
+    version: '0.404'
 requires:
   Wx: '0.9'
   perl: v5.12.0
 resources:
   repository: git://github.com/lichtkind/Kephra.git
-version: '0.403'
+version: '0.404'
 x_generated_by_perl: v5.30.0
 x_maintainers:
   - 'Herbert Breunung <lichtkind@cpan.org>'

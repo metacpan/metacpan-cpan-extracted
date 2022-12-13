@@ -7,7 +7,7 @@ use Hash::Util qw(lock_keys);
 use Carp       qw(confess);
 use Cwd;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 =pod
 

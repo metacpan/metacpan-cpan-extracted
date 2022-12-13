@@ -26,14 +26,14 @@ requires:
   autodie: '0'
   feature: '0'
   overload: '0'
-  perl: '> v5.20.0'
+  perl: v5.20.0
   strict: '0'
   utf8: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/ikluft/LongitudeTZ/issues
   repository: git://github.com/ikluft/LongitudeTZ.git
-version: 0.2.0
+version: 0.2.1
 x_generated_by_perl: v5.36.0
 x_serialization_backend: 'YAML::Tiny version 1.73'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

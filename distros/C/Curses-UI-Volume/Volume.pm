@@ -1,12 +1,10 @@
 package Curses::UI::Volume;
 
-# Pragmas.
 use Curses::UI::Widget;
 use base qw(Curses::UI::ContainerWidget);
 use strict;
 use warnings;
 
-# Modules.
 use Curses;
 use Curses::UI::Common;
 use Curses::UI::Label;
@@ -24,7 +22,7 @@ Readonly::Scalar our $LEFT_ONE_QUARTER_BLOCK => decode_utf8('▎');
 Readonly::Scalar our $LEFT_ONE_EIGHTH_BLOCK => decode_utf8('▏');
 
 # Version.
-our $VERSION = 0.02;
+our $VERSION = 0.03;
 
 # Constructor.
 sub new {
@@ -227,11 +225,11 @@ L<Curses::UI::Widget|Curses::UI::Widget>.
 
 =head1 EXAMPLE1
 
- # Pragmas.
+=for comment filename=fixed_volume_50.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Curses::UI;
 
  # Object.
@@ -257,11 +255,11 @@ L<Curses::UI::Widget|Curses::UI::Widget>.
 
 =head1 EXAMPLE2
 
- # Pragmas.
+=for comment filename=progress_example.pl
+
  use strict;
  use warnings;
 
- # Modules.
  use Curses::UI;
 
  # Object.
@@ -333,17 +331,18 @@ L<https://github.com/tupinek/Curses-UI-Volume>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2014-2015 Michal Špaček
- BSD 2-Clause License
+© 2014-2022 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.02
+0.03
 
 =cut

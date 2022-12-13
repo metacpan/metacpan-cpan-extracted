@@ -1,10 +1,50 @@
-use 5.16.0;
+use 5.20.0;
 use warnings;
-package Games::Nintendo::Mario::NSMB 0.208;
+package Games::Nintendo::Mario::NSMB 0.209;
+# ABSTRACT: a class for stylus-enabled Italian plumbers
 
 use parent qw(Games::Nintendo::Mario);
 
 use Carp ();
+
+#pod =head1 SYNOPSIS
+#pod
+#pod   use Games::Nintendo::Mario::NSMB;
+#pod
+#pod   my $hero = Games::Nintendo::Mario::SMB->new(
+#pod    name  => 'Luigi',
+#pod    state => 'normal',
+#pod   );
+#pod
+#pod   $hero->powerup('mushroom'); # doop doop doop!
+#pod   $hero->powerup('flower');   # change clothes
+#pod
+#pod   $hero->damage for (1 .. 2); # cue the Mario Death Music
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod This class subclasses Games::Nintendo::Mario, providing a model of the behavior
+#pod of the Mario Brothers in New Super Mario Brothers.  All of the methods
+#pod described in the Mario interface exist as documented.
+#pod
+#pod =head2 NAMES
+#pod
+#pod The plumber may be named Mario or Luigi.
+#pod
+#pod =head2 STATES
+#pod
+#pod The plumber's state may be any of: normal super fire shell mini mega
+#pod
+#pod =head2 POWERUPS
+#pod
+#pod Valid powerups are: mushroom flower shell mega_mushroom mini_mushroom
+#pod
+#pod =method games
+#pod
+#pod This ruleset reflects Mario in New Super Mario Bros., the first SMB game for
+#pod Nintendo DS.
+#pod
+#pod =cut
 
 sub _names  { qw[Mario Luigi] }
 sub _states { qw[normal super fire shell mini mega] }
@@ -78,13 +118,17 @@ sub damage {
 
 __END__
 
+=pod
+
+=encoding UTF-8
+
 =head1 NAME
 
 Games::Nintendo::Mario::NSMB - a class for stylus-enabled Italian plumbers
 
 =head1 VERSION
 
-version 0.208
+version 0.209
 
 =head1 SYNOPSIS
 
@@ -118,29 +162,34 @@ The plumber's state may be any of: normal super fire shell mini mega
 
 Valid powerups are: mushroom flower shell mega_mushroom mini_mushroom
 
+=head1 PERL VERSION
+
+This module should work on any version of perl still receiving updates from
+the Perl 5 Porters.  This means it should work on any version of perl released
+in the last two to three years.  (That is, if the most recently released
+version is v5.40, then this module should work on both v5.40 and v5.38.)
+
+Although it may work on older versions of perl, no guarantee is made that the
+minimum required version will not be increased.  The version may be increased
+for any reason, and there is no promise that patches will be accepted to lower
+the minimum required perl.
+
 =head1 METHODS
 
-=over 4
-
-=item C<games>
+=head2 games
 
 This ruleset reflects Mario in New Super Mario Bros., the first SMB game for
 Nintendo DS.
 
-=back
-
 =head1 AUTHOR
 
-Ricardo SIGNES E<lt>rjbs@cpan.orgE<gt>
+Ricardo SIGNES <cpan@semiotic.systems>
 
-=head1 COPYRIGHT
+=head1 COPYRIGHT AND LICENSE
 
-Copyright 2006-2007 by Ricardo SIGNES E<lt>rjbs@cpan.orgE<gt>
+This software is copyright (c) 2003 by Ricardo SIGNES.
 
-This program is free software; you can redistribute it and/or modify it under
-the same terms as Perl itself.
-
-See http://www.perl.com/perl/misc/Artistic.html
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
-

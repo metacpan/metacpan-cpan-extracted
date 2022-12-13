@@ -1,12 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2015-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2015-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.41;
+use Object::Pad 0.66;
 
-package Device::Chip::MCP23x17::Adapter 0.05;
+package Device::Chip::MCP23x17::Adapter 0.06;
 class Device::Chip::MCP23x17::Adapter;
 # can't 'extends Device::Chip::Adapter' because that doesn't provide a SUPER::new
 use base qw( Device::Chip::Adapter );
@@ -45,7 +45,7 @@ L<Device::Chip::MCP23x17/as_adapter>.
 
 =cut
 
-has $_chip :param;
+field $_chip :param;
 
 # Only supports GPIO
 method make_protocol_GPIO () { $self }

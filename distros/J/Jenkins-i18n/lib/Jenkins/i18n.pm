@@ -37,7 +37,7 @@ our @EXPORT_OK = (
     'find_missing'
 );
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 =head1 EXPORT
 

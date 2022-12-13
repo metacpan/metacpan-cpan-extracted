@@ -1,5 +1,24 @@
 Revision history for Plack-Middleware-Statsd
 
+v0.6.2    2022-12-11 16:07:04+00:00 Europe/London
+  [Enhancements]
+  - Simplified code for tracking Content-Type headers.
+
+  [Documentation]
+  - Documented support for older Perl versions.
+
+  - Fixed typo.
+
+  - Added note about psgix.informational callback.
+
+  [Other]
+  - Removed redundant import.
+
+  - Added GitHub Actions to run tests.
+
+  [Tests]
+  - Added missing author prereq for Test::Vars.
+
 v0.6.1    2022-09-02 16:05:17+01:00 Europe/London
   [Other]
   - Signed distribution.

@@ -1,12 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.57;
+use Object::Pad 0.66;
 
-package Device::Chip::TSL256x 0.07;
+package Device::Chip::TSL256x 0.08;
 class Device::Chip::TSL256x
    :isa(Device::Chip);
 
@@ -133,8 +133,8 @@ subsequent modifications more efficient. This cache will not respect the
 
 =cut
 
-has $_CONTROLbyte;
-has $_TIMINGbyte;
+field $_CONTROLbyte;
+field $_TIMINGbyte;
 
 my %INTEG_to_msec = (
    '13ms'  => 13.7,
@@ -192,7 +192,7 @@ low-level settings.
 
 =cut
 
-has $_agc_enabled;
+field $_agc_enabled;
 
 method enable_agc ( $agc )
 {
@@ -287,7 +287,7 @@ The controlling code may wish to use these to adjust the gain if required.
 
 =cut
 
-has $_smallcount;
+field $_smallcount;
 
 async method read_lux ()
 {

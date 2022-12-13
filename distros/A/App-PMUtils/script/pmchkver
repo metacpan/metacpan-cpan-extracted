@@ -8,9 +8,9 @@ use App::PMUtils;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-12'; # DATE
+our $DATE = '2022-09-11'; # DATE
 our $DIST = 'App-PMUtils'; # DIST
-our $VERSION = '0.740'; # VERSION
+our $VERSION = '0.741'; # VERSION
 
 our %SPEC;
 $SPEC{pmchkver} = {
@@ -21,6 +21,7 @@ $SPEC{pmchkver} = {
         detail => {
             summary => 'Show detail records intead of just module names',
             schema => 'bool',
+            cmdline_aliases => {l=>{}},
         },
         latest => {
             summary => 'Only show module when it is the latest version',
@@ -112,7 +113,7 @@ sub pmchkver {
         push @recs, $rec;
     }
 
-    [200, "OK", $args{detail} ? \@recs : [map {$_->{latest}} @recs],
+    [200, "OK", $args{detail} ? \@recs : [map {@recs > 1 ? [$_->{module}, $_->{latest}] : $_->{latest}} @recs],
      {
          'table.fields' => [qw/module local_version cpan_version installed on_cpan latest/],
          ('cmdline.result.interactive' => "Installed $recs[0]{module} ($recs[0]{local_version}) is ".
@@ -141,7 +142,7 @@ pmchkver - Check local module's version against version on CPAN
 
 =head1 VERSION
 
-This document describes version 0.740 of pmchkver (from Perl distribution App-PMUtils), released on 2022-08-12.
+This document describes version 0.741 of pmchkver (from Perl distribution App-PMUtils), released on 2022-09-11.
 
 =head1 SYNOPSIS
 
@@ -163,7 +164,7 @@ C<*> marks required options.
 
 =over
 
-=item B<--detail>
+=item B<--detail>, B<-l>
 
 Show detail records intead of just module names.
 

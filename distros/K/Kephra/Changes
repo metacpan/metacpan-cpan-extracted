@@ -1,4 +1,12 @@
 
+0.404  2022-11-25    lichtkind
+-------
+    * = flexible optics
+    * + delete line (Alt+Del)
+    * + view menu with 6 items
+    * ! expand style selection even if right end is a previously detected brace
+    * ! fixed bugs in select all
+
 0.403  2022-11-25    lichtkind
 -------
     * = minor improvements
@@ -22,3 +30,4 @@
     * + rich editing capabilities
 
 
+    * + shrink selection (Ctrl+Shift+A)

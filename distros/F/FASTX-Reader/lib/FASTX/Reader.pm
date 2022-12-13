@@ -7,7 +7,7 @@ use PerlIO::encoding;
 $Data::Dumper::Sortkeys = 1;
 use FASTX::Seq;
 use File::Basename;
-$FASTX::Reader::VERSION = '1.6.1';
+$FASTX::Reader::VERSION = '1.7.0';
 require Exporter;
 our @ISA = qw(Exporter);
 
@@ -440,7 +440,7 @@ FASTX::Reader - A simple module to parse FASTA and FASTQ files, supporting compr
 
 =head1 VERSION
 
-version 1.6.1
+version 1.7.0
 
 =head1 SYNOPSIS
 

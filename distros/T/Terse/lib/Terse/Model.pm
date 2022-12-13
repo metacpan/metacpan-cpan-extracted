@@ -24,7 +24,7 @@ Terse::Controller - models made simple.
 
 =head1 VERSION
 
-Version 0.110
+Version 0.120
 
 =cut
 

@@ -17,6 +17,7 @@ RT->Config->Set('CustomFieldGroupings',
         'Group two' => ['ConditionedBy'],
     ],
 );
+RT->Config->PostLoadCheck;
 
 my $ticket = RT::Ticket->new(RT->SystemUser);
 $ticket->Create(Queue => 'General', Subject => 'Test Ticket ConditionalCF');
@@ -37,8 +38,9 @@ $m->submit_form_ok({
 $m->content_contains('ee-rt.pdf added');
 $m->content_contains('/Download/CustomFieldValue/' .$cf_condition->id . '/ee-rt.pdf');
 
+sleep 1;
 my $mjs = WWW::Mechanize::PhantomJS->new();
-$mjs->driver->ua->timeout(600);
+$mjs->driver->ua->timeout(900);
 $mjs->get($m->rt_base_url . '?user=root;pass=password');
 
 # Operator: matches, condition met
@@ -61,6 +63,7 @@ ok($ticket_cf_conditioned_by->is_hidden, 'Hide ConditionalCF when Binary conditi
 # Operator: matches, condition not met
 $cf_conditioned_by->SetConditionedBy($cf_condition->id, 'matches', 'sputnik');
 $mjs->get($m->rt_base_url . 'Ticket/Modify.html?id=' . $ticket->id);
+sleep 1;
 $ticket_cf_conditioned_by = $mjs->by_id('Object-RT::Ticket-' . $ticket->id . '-CustomField:Grouptwo-' . $cf_conditioned_by->id . '-Value', single => 1);
 ok($ticket_cf_conditioned_by->is_hidden, 'Hide ConditionalCF when Binary condition val with matches operator is not met');
 
@@ -73,6 +76,7 @@ ok($ticket_cf_conditioned_by->is_displayed, "Show ConditionalCF when Binary cond
 # Operator: doesn't match, condition not met
 $cf_conditioned_by->SetConditionedBy($cf_condition->id, "doesn't match", 'rt');
 $mjs->get($m->rt_base_url . 'Ticket/Modify.html?id=' . $ticket->id);
+sleep 1;
 $ticket_cf_conditioned_by = $mjs->by_id('Object-RT::Ticket-' . $ticket->id . '-CustomField:Grouptwo-' . $cf_conditioned_by->id . '-Value', single => 1);
 ok($ticket_cf_conditioned_by->is_hidden, "Hide ConditionalCF when Binary condition val with doesn't match operator is not met");
 
@@ -85,6 +89,7 @@ ok($ticket_cf_conditioned_by->is_displayed, 'Show ConditionalCF when Binary cond
 # Operator: is, condition not met
 $cf_conditioned_by->SetConditionedBy($cf_condition->id, 'is', 'ee-rt.epub');
 $mjs->get($m->rt_base_url . 'Ticket/Modify.html?id=' . $ticket->id);
+sleep 1;
 $ticket_cf_conditioned_by = $mjs->by_id('Object-RT::Ticket-' . $ticket->id . '-CustomField:Grouptwo-' . $cf_conditioned_by->id . '-Value', single => 1);
 ok($ticket_cf_conditioned_by->is_hidden, 'Hide ConditionalCF when Binary condition val with is operator is not met');
 
@@ -97,6 +102,7 @@ ok($ticket_cf_conditioned_by->is_displayed, "Show ConditionalCF when Binary cond
 # Operator: isn't, condition not met
 $cf_conditioned_by->SetConditionedBy($cf_condition->id, "isn't", 'ee-rt.pdf');
 $mjs->get($m->rt_base_url . 'Ticket/Modify.html?id=' . $ticket->id);
+sleep 1;
 $ticket_cf_conditioned_by = $mjs->by_id('Object-RT::Ticket-' . $ticket->id . '-CustomField:Grouptwo-' . $cf_conditioned_by->id . '-Value', single => 1);
 ok($ticket_cf_conditioned_by->is_hidden, "Hide ConditionalCF when Binary condition val with isn't operator is not met");
 
@@ -109,6 +115,7 @@ ok($ticket_cf_conditioned_by->is_displayed, 'Show ConditionalCF when Binary cond
 # Operator: less than, condition not met
 $cf_conditioned_by->SetConditionedBy($cf_condition->id, 'less than', 'd');
 $mjs->get($m->rt_base_url . 'Ticket/Modify.html?id=' . $ticket->id);
+sleep 1;
 $ticket_cf_conditioned_by = $mjs->by_id('Object-RT::Ticket-' . $ticket->id . '-CustomField:Grouptwo-' . $cf_conditioned_by->id . '-Value', single => 1);
 ok($ticket_cf_conditioned_by->is_hidden, 'Hide ConditionalCF when Binary condition numerical val with less than operator is not met');
 
@@ -121,6 +128,7 @@ ok($ticket_cf_conditioned_by->is_displayed, 'Show ConditionalCF when Binary cond
 # Operator: greater than, condition not met
 $cf_conditioned_by->SetConditionedBy($cf_condition->id, 'greater than', 'g');
 $mjs->get($m->rt_base_url . 'Ticket/Modify.html?id=' . $ticket->id);
+sleep 1;
 $ticket_cf_conditioned_by = $mjs->by_id('Object-RT::Ticket-' . $ticket->id . '-CustomField:Grouptwo-' . $cf_conditioned_by->id . '-Value', single => 1);
 ok($ticket_cf_conditioned_by->is_hidden, 'Hide ConditionalCF when Binary condition numerical val with greater than operator is not met');
 
@@ -133,5 +141,6 @@ ok($ticket_cf_conditioned_by->is_displayed, 'Show ConditionalCF when Binary cond
 # Operator: between, alphabetical condition not met
 $cf_conditioned_by->SetConditionedBy($cf_condition->id, 'between', ['m', 'j']);
 $mjs->get($m->rt_base_url . 'Ticket/Modify.html?id=' . $ticket->id);
+sleep 1;
 $ticket_cf_conditioned_by = $mjs->by_id('Object-RT::Ticket-' . $ticket->id . '-CustomField:Grouptwo-' . $cf_conditioned_by->id . '-Value', single => 1);
 ok($ticket_cf_conditioned_by->is_hidden, 'Hide ConditionalCF when Binary condition alphabetical val with between operator is not met');

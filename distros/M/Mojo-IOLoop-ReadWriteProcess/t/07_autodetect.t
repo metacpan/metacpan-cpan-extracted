@@ -8,7 +8,7 @@ use FindBin;
 use Mojo::File qw(tempfile path);
 use lib ("$FindBin::Bin/lib", "../lib", "lib");
 use Mojo::IOLoop::ReadWriteProcess::Test::Utils qw(attempt);
-use Mojo::IOLoop::ReadWriteProcess qw(process);
+use Mojo::IOLoop::ReadWriteProcess              qw(process);
 use Mojo::IOLoop::ReadWriteProcess::Session;
 my $session = Mojo::IOLoop::ReadWriteProcess::Session->singleton;
 
@@ -47,12 +47,12 @@ subtest autodetect => sub {
   };
 
   $p->stop;
-  is $status, 1, 'Status fired once';
+  is $status,                       1, 'Status fired once';
   is $session->all_processes->size, 3, 'detection works' or die diag explain $p;
   ok $session->contains($orphan->pid), 'Orphan collected'
     or die diag explain $p->session->all;
   ok $session->contains($orphan2->pid), 'Orphan collected';
-  ok !$session->contains(99999999), 'Session contain works as expected';
+  ok !$session->contains(99999999),     'Session contain works as expected';
 
   is $fired,   3, 'New subprocess event fired';
   is $orphans, 0, 'New subprocess event fired';
@@ -103,8 +103,8 @@ subtest autodetect_fork => sub {
   $master_p->stop;
 
   is $master_p->exit_status, 20, 'Correct exit status from master process';
-  is $status, 6, 'Status fired 6 times';
-  is $fired,  1, 'Status fired 1 times';
+  is $status,                6,  'Status fired 6 times';
+  is $fired,                 1,  'Status fired 1 times';
 
   is $session->all->size, 7, 'detection works' or die diag explain $master_p;
 
@@ -125,8 +125,7 @@ subtest subreaper => sub {
 
   my $sys;
   eval {
-    $sys
-      = $session->_prctl(
+    $sys = $session->_prctl(
       Mojo::IOLoop::ReadWriteProcess::Session::PR_SET_CHILD_SUBREAPER(), 1);
   };
   plan skip_all => "$@ : You do not seem to have subreaper capabilities"
@@ -210,8 +209,7 @@ subtest subreaper_bash => sub {
 
   my $sys;
   eval {
-    $sys
-      = $session->_prctl(
+    $sys = $session->_prctl(
       Mojo::IOLoop::ReadWriteProcess::Session::PR_SET_CHILD_SUBREAPER(), 1);
   };
   plan skip_all => "You do not seem to have subreaper capabilities"
@@ -262,8 +260,7 @@ subtest subreaper_bash_execute => sub {
 
   my $sys;
   eval {
-    $sys
-      = $session->_prctl(
+    $sys = $session->_prctl(
       Mojo::IOLoop::ReadWriteProcess::Session::PR_SET_CHILD_SUBREAPER(), 1);
   };
   plan skip_all => "You do not seem to have subreaper capabilities"
@@ -310,8 +307,7 @@ subtest manager => sub {
 
   my $sys;
   eval {
-    $sys
-      = $session->_prctl(
+    $sys = $session->_prctl(
       Mojo::IOLoop::ReadWriteProcess::Session::PR_SET_CHILD_SUBREAPER(), 1);
   };
   plan skip_all => "You do not seem to have subreaper capabilities"
@@ -375,8 +371,7 @@ subtest subreaper_bash_roulette => sub {
 
   my $sys;
   eval {
-    $sys
-      = $session->_prctl(
+    $sys = $session->_prctl(
       Mojo::IOLoop::ReadWriteProcess::Session::PR_SET_CHILD_SUBREAPER(), 1);
   };
   plan skip_all => "You do not seem to have subreaper capabilities"

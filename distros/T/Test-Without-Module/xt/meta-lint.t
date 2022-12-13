@@ -6,7 +6,7 @@
 use warnings;
 use strict;
 use File::Find;
-use Test::More;
+use Test::More tests => 4;
 use Parse::CPAN::Meta;
 use CPAN::Meta::Validator;
 
@@ -34,5 +34,3 @@ for my $meta_file ('META.yml', 'META.json') {
     # Also check that the declared version matches the version in META.*
     is $meta->{version}, $version, "$meta_file version matches module version ($version)";
 };
-
-done_testing;

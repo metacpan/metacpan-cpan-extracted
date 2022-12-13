@@ -1,5 +1,10 @@
 Revision history for App-bookmarks
 
+0.33    2022-12-09
+        - fixed utf8 in stdout and firefox
+        - fixed bug in POD (wrong repo URL)
+        - doc arg "-" stdin as txt
+
 0.32    2022-01-13
         - fixed bug in txt files regex (space)
         - fixed bug with option -a (files not existing silently dropped)

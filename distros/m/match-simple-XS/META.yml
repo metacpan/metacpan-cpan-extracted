@@ -3,17 +3,17 @@ abstract: 'XS backend for match::simple'
 author:
   - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
 build_requires:
-  Test::Fatal: 0
-  Test::More: 0.96
+  Test::Fatal: '0'
+  Test::More: '0.96'
 configure_requires:
-  ExtUtils::MakeMaker: 6.17
+  ExtUtils::MakeMaker: '6.17'
 dynamic_config: 1
-generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.014, CPAN::Meta::Converter version 2.120921'
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010'
 keywords: []
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: match-simple-XS
 no_index:
   directory:
@@ -26,15 +26,14 @@ optional_features: {}
 provides:
   match::simple::XS:
     file: lib/match/simple/XS.pm
-    version: 0.001
-recommends:
-  match::simple: 0
+    version: '0.002'
 requires:
-  perl: 5.008
+  perl: '5.012'
 resources:
-  X_identifier: http://purl.org/NET/cpan-uri/dist/match-simple-XS/project
-  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=match-simple-XS
+  Identifier: http://purl.org/NET/cpan-uri/dist/match-simple-XS/project
+  bugtracker: https://github.com/tobyink/p5-match-simple-xs/issues
   homepage: https://metacpan.org/release/match-simple-XS
   license: http://dev.perl.org/licenses/
-  repository: https://github.com/tobyink/p5-match-simple-xs
-version: 0.001
+  repository: git://github.com/tobyink/p5-match-simple-xs.git
+version: '0.002'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -30,4 +30,5 @@ sub hello_get_with_params :get(hello_world) :params(test => 'okay') {
 	$_[1]->response->hello = "world 3";
 }
 
+
 1;

@@ -18,7 +18,7 @@ sub tryload {
 
 my ($failed,$error,$inc) = tryload( 'Nonexisting::Module' );
 is $failed, 1, "Self-test, a non-existing module fails to load";
-like $error, qr!^Can't locate Nonexisting/Module.pm in \@INC( \(you may need to install the Nonexisting::Module module\))? \(\@INC contains: ...\) line (\d+).!,
+like $error, qr!^Can't locate Nonexisting/Module.pm in \@INC( \(you may need to install the Nonexisting::Module module\))? \(\@INC !,
     'Self-test, error message shows @INC';
 #diag $error;
 
@@ -28,5 +28,5 @@ Test::Without::Module->import('IO::Socket');
 
 ($failed,$error,$inc) = tryload( 'IO::Socket' );
 is $failed, 1, "a non-existing module fails to load";
-like $error, qr!Can't locate IO/Socket.pm in \@INC( \(you may need to install the IO::Socket module\))? \(\@INC contains: ...\) line (\d+)!, 'error message for hidden module shows @INC';
+like $error, qr!Can't locate IO/Socket.pm in \@INC( \(you may need to install the IO::Socket module\))? \(\@INC !, 'error message for hidden module shows @INC';
 #diag $error;

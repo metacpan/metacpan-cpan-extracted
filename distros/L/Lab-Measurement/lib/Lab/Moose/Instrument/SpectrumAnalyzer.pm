@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::SpectrumAnalyzer;
-$Lab::Moose::Instrument::SpectrumAnalyzer::VERSION = '3.831';
+$Lab::Moose::Instrument::SpectrumAnalyzer::VERSION = '3.840';
 #ABSTRACT: Role of Generic Spectrum Analyzer for Lab::Moose::Instrument
 
 use v5.20;
@@ -266,7 +266,7 @@ Lab::Moose::Instrument::SpectrumAnalyzer - Role of Generic Spectrum Analyzer for
 
 =head1 VERSION
 
-version 3.831
+version 3.840
 
 =head1 DESCRIPTION
 

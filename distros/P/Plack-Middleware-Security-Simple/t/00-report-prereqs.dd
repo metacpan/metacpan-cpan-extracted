@@ -18,8 +18,7 @@ do { my $x = {
                                       'Test::Pod::Coverage' => '1.08',
                                       'Test::Pod::LinkCheck' => '0',
                                       'Test::Portability::Files' => '0',
-                                      'Test::TrailingSpace' => '0.0203',
-                                      'Test::Vars' => '0.015'
+                                      'Test::TrailingSpace' => '0.0203'
                                     }
                     },
        'runtime' => {
@@ -54,7 +53,8 @@ do { my $x = {
                                    'Module::Metadata' => '0',
                                    'Plack::Builder' => '0',
                                    'Plack::Test' => '0',
-                                   'Test::More' => '0'
+                                   'Test::More' => '0',
+                                   'Test::Vars' => '0.015'
                                  }
                  }
      };

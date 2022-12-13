@@ -62,6 +62,9 @@ DESCRIPTION
 
     Ctrl+E jumps to position of last edit.
 
+  View
+    F11 toggles full screen mode.
+
 PLAN
     Development is done is stages which are focused on different feature
     sets. Wer are in stage one called sed, where its all about basic editing

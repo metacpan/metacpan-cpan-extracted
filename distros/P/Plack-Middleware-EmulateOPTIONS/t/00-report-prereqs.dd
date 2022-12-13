@@ -38,7 +38,7 @@ do { my $x = {
                                    },
                    'requires' => {
                                    'File::Spec' => '0',
-                                   'HTTP::Request::Common' => '6.22',
+                                   'HTTP::Request::Common' => '6.21',
                                    'Module::Metadata' => '0',
                                    'Plack::Builder' => '0',
                                    'Plack::Middleware::ContentLength' => '0',

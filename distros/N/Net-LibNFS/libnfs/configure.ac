@@ -210,6 +210,10 @@ AC_CHECK_HEADERS([netinet/in.h])
 dnl Check for arpa/inet.h
 AC_CHECK_HEADERS([arpa/inet.h])
 
+# check for sys/uio.h
+dnl Check for sys/uio.h
+AC_CHECK_HEADERS([sys/uio.h])
+
 # check for SA_LEN
 dnl Check if sockaddr data structure includes a "sa_len"
 AC_CHECK_MEMBER([struct sockaddr.sa_len],
@@ -258,6 +262,10 @@ fi
 AM_CONDITIONAL([HAVE_TALLOC_TEVENT], [test $libiscsi_cv_HAVE_TALLOC_TEVENT = yes])
 
 AC_CHECK_MEMBERS([struct stat.st_mtim.tv_nsec])
+
+AC_CHECK_HEADERS(dispatch/dispatch.h)
+
+AC_CHECK_FUNCS(pthread_threadid_np)
 
 # check where makedev is defined
 AC_HEADER_MAJOR

@@ -10,6 +10,7 @@ my %modules;
 my $post_diag;
 
 $modules{$_} = $_ for qw(
+  Class::Method::Modifiers
   Config::INI::Reader
   Data::Section
   Dist::Zilla
@@ -26,6 +27,7 @@ $modules{$_} = $_ for qw(
   Dist::Zilla::Plugin::PodWeaver
   Dist::Zilla::Plugin::ReadmeAnyFromPod
   Dist::Zilla::Plugin::Run::BeforeBuild
+  Dist::Zilla::Role::Plugin
   Dist::Zilla::Role::PluginBundle::Easy
   Dist::Zilla::Role::TextTemplate
   Dist::Zilla::Util::AuthorDeps

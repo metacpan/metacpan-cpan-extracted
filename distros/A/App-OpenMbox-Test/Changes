@@ -3,3 +3,12 @@ Revision history for App-OpenMbox-Test
 0.10    2022-12-08
         First version
 
+0.11    2022-12-10
+        Changes Makefile.PL to correct format, thanks @Slaven
+
+0.12    2022-12-10
+        Updates sendmail method to support the thrid party smtp server
+
+0.13    2022-12-10
+        Updates the default recepients
+

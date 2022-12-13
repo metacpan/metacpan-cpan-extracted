@@ -1,3 +1,18 @@
+0.02 2022-12-12
+  [Document Changes]
+    * Added the following doc.
+
+      =head1 Library Dependencies
+      
+      On Windows, the C<wsock32> and C<ws2_32> libraries are needed.
+      if ($^O eq 'MSWin32') {
+        $config->add_libs('wsock32', 'ws2_32');
+      }
+  [Testing Bug Fix]
+    * Fixed the testing bug on Windows.
+  
+  [Test Improvement]
+    * Added github actions.
 0.01 2022-12-04
   [Changes]
     * First release.

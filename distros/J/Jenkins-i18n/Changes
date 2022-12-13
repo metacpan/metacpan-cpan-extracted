@@ -1,5 +1,8 @@
 Revision history for Perl extension Jenkins::i18n.
 
+0.10 Sun Dec 11 14:10:44 -03 2022
+    - Added the missing dependency of IO::Interactive
+
 0.09 Sat Dec 3 12:30:27 -03 2022
     - Fixed bug for cases where the Jelly file has more keys than the
     respective Properties in English

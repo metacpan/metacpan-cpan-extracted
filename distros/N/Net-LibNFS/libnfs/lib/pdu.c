@@ -43,6 +43,10 @@
 #include <sys/socket.h>
 #endif
 
+#if defined(HAVE_SYS_UIO_H) || (defined(__APPLE__) && defined(__MACH__))
+#include <sys/uio.h>
+#endif
+
 #ifdef HAVE_STRINGS_H
 #include <strings.h>
 #endif
@@ -88,9 +92,9 @@ void rpc_return_to_queue(struct rpc_queue *q, struct rpc_pdu *pdu)
 		q->tail = pdu;
 }
 
-unsigned int rpc_hash_xid(uint32_t xid)
+unsigned int rpc_hash_xid(struct rpc_context *rpc, uint32_t xid)
 {
-	return (xid * 7919) % HASHES;
+	return (xid * 7919) % rpc->num_hashes;
 }
 
 #define PAD_TO_8_BYTES(x) ((x + 0x07) & ~0x07)
@@ -103,9 +107,9 @@ static struct rpc_pdu *rpc_allocate_reply_pdu(struct rpc_context *rpc,
 
 	assert(rpc->magic == RPC_CONTEXT_MAGIC);
 
-	pdu = malloc(sizeof(struct rpc_pdu));
+	pdu = malloc(sizeof(struct rpc_pdu) + ZDR_ENCODEBUF_MINSIZE + alloc_hint);
 	if (pdu == NULL) {
-		rpc_set_error(rpc, "Out of memory: Failed to allocate pdu structure");
+		rpc_set_error(rpc, "Out of memory: Failed to allocate pdu structure and encode buffer");
 		return NULL;
 	}
 	memset(pdu, 0, sizeof(struct rpc_pdu));
@@ -116,26 +120,25 @@ static struct rpc_pdu *rpc_allocate_reply_pdu(struct rpc_context *rpc,
 	pdu->zdr_decode_fn      = NULL;
 	pdu->zdr_decode_bufsize = 0;
 
-	pdu->outdata.data = malloc(ZDR_ENCODEBUF_MINSIZE + alloc_hint);
-	if (pdu->outdata.data == NULL) {
-		rpc_set_error(rpc, "Out of memory: Failed to allocate encode buffer");
-		free(pdu);
-		return NULL;
-	}
+	pdu->outdata.data = (char *)(pdu + 1);
 
-	zdrmem_create(&pdu->zdr, pdu->outdata.data, ZDR_ENCODEBUF_MINSIZE + alloc_hint, ZDR_ENCODE);
-	if (rpc->is_udp == 0) {
-		zdr_setpos(&pdu->zdr, 4); /* skip past the record marker */
-	}
+        /* Add an iovector for the record marker. Ignored for UDP */
+        rpc_add_iovector(rpc, &pdu->out, pdu->outdata.data, 4, NULL);
+
+	zdrmem_create(&pdu->zdr, &pdu->outdata.data[4],
+                      ZDR_ENCODEBUF_MINSIZE + alloc_hint, ZDR_ENCODE);
 
 	if (zdr_replymsg(rpc, &pdu->zdr, res) == 0) {
 		rpc_set_error(rpc, "zdr_replymsg failed with %s",
 			      rpc_get_error(rpc));
 		zdr_destroy(&pdu->zdr);
-		free(pdu->outdata.data);
 		free(pdu);
 		return NULL;
 	}
+
+        /* Add an iovector for the header */
+        rpc_add_iovector(rpc, &pdu->out, &pdu->outdata.data[4],
+                         zdr_getpos(&pdu->zdr), NULL);
 
 	return pdu;
 }
@@ -154,9 +157,9 @@ struct rpc_pdu *rpc_allocate_pdu2(struct rpc_context *rpc, int program, int vers
 	pdu_size = PAD_TO_8_BYTES(sizeof(struct rpc_pdu));
 	pdu_size += PAD_TO_8_BYTES(zdr_decode_bufsize);
 
-	pdu = malloc(pdu_size);
+	pdu = malloc(pdu_size + ZDR_ENCODEBUF_MINSIZE + alloc_hint);
 	if (pdu == NULL) {
-		rpc_set_error(rpc, "Out of memory: Failed to allocate pdu structure");
+		rpc_set_error(rpc, "Out of memory: Failed to allocate pdu structure and encode buffer");
 		return NULL;
 	}
 	memset(pdu, 0, pdu_size);
@@ -176,17 +179,13 @@ struct rpc_pdu *rpc_allocate_pdu2(struct rpc_context *rpc, int program, int vers
 	pdu->zdr_decode_fn      = zdr_decode_fn;
 	pdu->zdr_decode_bufsize = zdr_decode_bufsize;
 
-	pdu->outdata.data = malloc(ZDR_ENCODEBUF_MINSIZE + alloc_hint);
-	if (pdu->outdata.data == NULL) {
-		rpc_set_error(rpc, "Out of memory: Failed to allocate encode buffer");
-		free(pdu);
-		return NULL;
-	}
+	pdu->outdata.data = ((char *)pdu + pdu_size);
 
-	zdrmem_create(&pdu->zdr, pdu->outdata.data, ZDR_ENCODEBUF_MINSIZE + alloc_hint, ZDR_ENCODE);
-	if (rpc->is_udp == 0) {
-		zdr_setpos(&pdu->zdr, 4); /* skip past the record marker */
-	}
+        /* Add an iovector for the record marker. Ignored for UDP */
+        rpc_add_iovector(rpc, &pdu->out, pdu->outdata.data, 4, NULL);
+
+        zdrmem_create(&pdu->zdr, &pdu->outdata.data[4],
+                      ZDR_ENCODEBUF_MINSIZE + alloc_hint, ZDR_ENCODE);
 
 	memset(&msg, 0, sizeof(struct rpc_msg));
 	msg.xid                = pdu->xid;
@@ -202,10 +201,13 @@ struct rpc_pdu *rpc_allocate_pdu2(struct rpc_context *rpc, int program, int vers
 		rpc_set_error(rpc, "zdr_callmsg failed with %s",
 			      rpc_get_error(rpc));
 		zdr_destroy(&pdu->zdr);
-		free(pdu->outdata.data);
 		free(pdu);
 		return NULL;
 	}
+
+        /* Add an iovector for the header */
+        rpc_add_iovector(rpc, &pdu->out, &pdu->outdata.data[4],
+                         zdr_getpos(&pdu->zdr), NULL);
 
 	return pdu;
 }
@@ -219,14 +221,13 @@ void rpc_free_pdu(struct rpc_context *rpc, struct rpc_pdu *pdu)
 {
 	assert(rpc->magic == RPC_CONTEXT_MAGIC);
 
-	free(pdu->outdata.data);
-
 	if (pdu->zdr_decode_buf != NULL) {
 		zdr_free(pdu->zdr_decode_fn, pdu->zdr_decode_buf);
 	}
 
 	zdr_destroy(&pdu->zdr);
 
+        rpc_free_iovector(rpc, &pdu->out);
 	free(pdu);
 }
 
@@ -247,8 +248,8 @@ void rpc_set_next_xid(struct rpc_context *rpc, uint32_t xid)
 
 int rpc_queue_pdu(struct rpc_context *rpc, struct rpc_pdu *pdu)
 {
-	int size;
-        int32_t recordmarker;
+	int i, size = 0, pos = zdr_getpos(&pdu->zdr);
+        uint32_t recordmarker;
 
 	assert(rpc->magic == RPC_CONTEXT_MAGIC);
 
@@ -268,22 +269,64 @@ int rpc_queue_pdu(struct rpc_context *rpc, struct rpc_pdu *pdu)
 		pdu->timeout = 0;
 	}
 
-	size = zdr_getpos(&pdu->zdr);
+        for (i = 1; i < pdu->out.niov; i++) {
+                size += pdu->out.iov[i].len;
+        }
+        pdu->out.total_size = size + 4;
+
+        /* If we need to add any additional iovectors
+         *
+         * We expect to almost always add an iovector here for the remainder
+         * of the outdata marshalling buffer.
+         * The exception is WRITE where we add an explicit iovector instead
+         * of marshalling it in ZDR. This so that we can do zero-copy for
+         * the WRITE path.
+         */
+        if (pos > size) {
+                int count = pos - size;
+
+                if (rpc_add_iovector(rpc, &pdu->out,
+                                     &pdu->outdata.data[pdu->out.total_size],
+                                     count, NULL) < 0) {
+                        rpc_free_pdu(rpc, pdu);
+                        return -1;
+                }
+                pdu->out.total_size += count;
+                size = pos;
+        }
+
+	/* write recordmarker */
+        recordmarker = htonl(size | 0x80000000);
+	memcpy(pdu->out.iov[0].buf, &recordmarker, 4);
 
 	/* for udp we dont queue, we just send it straight away */
 	if (rpc->is_udp != 0) {
 		unsigned int hash;
 
-// XXX add a rpc->udp_dest_sock_size  and get rid of sys/socket.h and netinet/in.h
-		if (sendto(rpc->fd, pdu->zdr.buf, size, MSG_DONTWAIT,
-                           (struct sockaddr *)&rpc->udp_dest,
-                           sizeof(rpc->udp_dest)) < 0) {
-			rpc_set_error(rpc, "Sendto failed with errno %s", strerror(errno));
-			rpc_free_pdu(rpc, pdu);
-			return -1;
-		}
+                if (rpc->is_broadcast) {
+                        if (sendto(rpc->fd, pdu->zdr.buf, size, MSG_DONTWAIT,
+                                   (struct sockaddr *)&rpc->udp_dest,
+                                   sizeof(rpc->udp_dest)) < 0) {
+                                rpc_set_error(rpc, "Sendto failed with errno %s", strerror(errno));
+                                rpc_free_pdu(rpc, pdu);
+                                return -1;
+                        }
+                } else {
+                        struct iovec iov[RPC_MAX_VECTORS];
+                        int niov = pdu->out.niov;
 
-		hash = rpc_hash_xid(pdu->xid);
+                        for (i = 0; i < niov; i++) {
+                                iov[i].iov_base = pdu->out.iov[i].buf;
+                                iov[i].iov_len = pdu->out.iov[i].len;
+                        }
+                        if (writev(rpc->fd, &iov[1], niov - 1) < 0) {
+                                rpc_set_error(rpc, "Sendto failed with errno %s", strerror(errno));
+                                rpc_free_pdu(rpc, pdu);
+                                return -1;
+                        }
+                }
+
+		hash = rpc_hash_xid(rpc, pdu->xid);
 #ifdef HAVE_MULTITHREADING
                 if (rpc->multithreading_enabled) {
                         nfs_mt_mutex_lock(&rpc->rpc_mutex);
@@ -298,11 +341,6 @@ int rpc_queue_pdu(struct rpc_context *rpc, struct rpc_pdu *pdu)
 #endif /* HAVE_MULTITHREADING */
 		return 0;
 	}
-
-	/* write recordmarker */
-	zdr_setpos(&pdu->zdr, 0);
-	recordmarker = (size - 4) | 0x80000000;
-	zdr_int(&pdu->zdr, &recordmarker);
 
 	pdu->outdata.size = size;
 #ifdef HAVE_MULTITHREADING
@@ -609,7 +647,7 @@ int rpc_process_pdu(struct rpc_context *rpc, char *buf, int size)
 	zdr_setpos(&zdr, pos);
 
 	/* Look up the transaction in a hash table of our requests */
-	hash = rpc_hash_xid(xid);
+	hash = rpc_hash_xid(rpc, xid);
 #ifdef HAVE_MULTITHREADING
         if (rpc->multithreading_enabled) {
                 nfs_mt_mutex_lock(&rpc->rpc_mutex);

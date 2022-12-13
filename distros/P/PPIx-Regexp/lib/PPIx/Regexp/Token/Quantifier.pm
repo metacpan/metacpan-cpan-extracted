@@ -39,7 +39,9 @@ use warnings;
 
 use base qw{ PPIx::Regexp::Token };
 
+use Carp;
 use PPIx::Regexp::Constant qw{
+    INFINITY
     LITERAL_LEFT_CURLY_ALLOWED
     MSG_LOOK_BEHIND_TOO_LONG
     TOKEN_UNKNOWN
@@ -47,7 +49,7 @@ use PPIx::Regexp::Constant qw{
     @CARP_NOT
 };
 
-our $VERSION = '0.085';
+our $VERSION = '0.086';
 
 # Return true if the token can be quantified, and false otherwise
 sub can_be_quantified { return };
@@ -108,6 +110,27 @@ sub __following_literal_left_curly_disallowed_in {
 	    return 1;
 	}
 	return 0;
+    }
+}
+
+{
+    my %width = (
+	'*'	=> [ 0, INFINITY ],
+	'+'	=> [ 1, INFINITY ],
+	'?'	=> [ 0, 1 ],
+    );
+
+    sub __quantified_width {
+	my ( $self, $raw_min, $raw_max ) = @_;
+	my $info = $width{$self->content()}
+	    or croak sprintf q<Bug - Quantifier '%s' width unknown>,
+		$self->content();
+	my ( $my_min, $my_max ) = @{ $info };
+	defined $raw_min
+	    and $raw_min *= $my_min;
+	defined $raw_max
+	    and $raw_max *= $my_max;
+	return ( $raw_min, $raw_max );
     }
 }
 

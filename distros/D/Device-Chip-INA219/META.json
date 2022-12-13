@@ -26,7 +26,7 @@
             "Device::Chip" : "0.04",
             "Device::Chip::Base::RegisteredI2C" : "0.10",
             "Future::AsyncAwait" : "0.47",
-            "Object::Pad" : "0.57",
+            "Object::Pad" : "0.66",
             "perl" : "5.026"
          }
       }
@@ -34,7 +34,7 @@
    "provides" : {
       "Device::Chip::INA219" : {
          "file" : "lib/Device/Chip/INA219.pm",
-         "version" : "0.08"
+         "version" : "0.09"
       }
    },
    "release_status" : "stable",
@@ -43,6 +43,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.08",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.09",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

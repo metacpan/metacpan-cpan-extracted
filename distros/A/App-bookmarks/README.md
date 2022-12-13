@@ -17,14 +17,14 @@ SYNOPSIS
 DESCRIPTION
 -----------
 
-`bookmarks` is a tool to export bookmarks from files supplied as arguments, or from browsers default locations (when called without arguments). The following sources are supported :
+`bookmarks` is a tool to export bookmarks from files supplied as arguments, or from browsers default locations (when called without arguments). If file is a dash "-", STDIN is read and processed as plain text source. The following sources are supported :
 
-- Safari (_.plist_)
-- Firefox (_.sqlite_)
-- Chrome and Edge (_Bookmarks_)
-- Internet Explorer (_Favorites_)
-- Markdown (_.md_)
-- Gemini (_.gmi_)
+- Safari (_*.plist_)
+- Firefox (_*.sqlite_)
+- Chrome and Edge (_*Bookmarks_)
+- Internet Explorer (_*Favorites_)
+- Markdown (_*.md_)
+- Gemini (_*.gmi_)
 - Surfraw (same as plain text)
 - Plain text (any other extension)
 

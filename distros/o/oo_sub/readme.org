@@ -1,0 +1,5 @@
+* oo_sub
+
+Perl pragma to enable natively supported OOP (object-oriented programming) for some built-in Perl functions.
+
+Please read the POD (documentation) within the =oo_sub.pm= file for the details.

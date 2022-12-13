@@ -1,0 +1,102 @@
+#!/usr/bin/env perl
+
+# PODNAME: csv2latextable
+
+use v5.22;
+
+use strict;
+use warnings;
+
+our $VERSION = '1.0.0'; # VERSION
+
+use App::CSV2LaTeXTable;
+use Getopt::Long;
+
+my %opts;
+GetOptions(
+    'csv=s'          => \$opts{csv},
+    'csv-param=s@'   => \$opts{csv_param},
+    'latex=s'        => \$opts{latex},
+    'latex-param=s@' => \$opts{latex_param},
+    'help'           => \my $help,
+);
+
+usage() if $help;
+
+if ( !$opts{csv} || !$opts{latex} ) {
+    say 'Need csv and latex parameters!';
+    usage();
+}
+
+if ( !-f $opts{csv} ) {
+    say "file $opts{csv} does not exist";
+    usage();
+}
+
+for my $key ( qw/csv_param latex_param/ ) {
+    delete $opts{$key} if !defined $opts{$key};
+}
+
+my $app = App::CSV2LaTeXTable->new( %opts ) // usage();
+$app->run;
+
+sub usage {
+    print qq~$0 --csv /path/to/file.csv --latex /path/to/table.tex
+
+    --help        Display this help.
+    --csv         A CSV file
+    --csv-param   A key value pair for Text::CSV_XS
+    --latex       The latex file will be created.
+    --latex-param A key-value pair for LaTeX::Table
+    ~;
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+csv2latextable
+
+=head1 VERSION
+
+version 1.0.0
+
+=head1 USAGE
+
+=head2 Display usage
+
+    $ csv2latextable --help
+
+=head2 Convert CSV file to LaTeX table
+
+    $ csv2latextable --csv /path/to/file.csv --latex /path/to/table.tex
+
+=head2 Pass some parameters to Text::CSV_XS
+
+L<Text::CSV_XS> is used to parse the csv.
+
+    csv2latextable --csv /path/to/file.csv --csv-param "sep_char=;" --csv-param 'quote_char="' --latex /path/to/table.tex 
+
+=head2 Pass some parameters to LaTeX::Table
+
+L<LaTeX::Table> is used to generate the tale.
+
+    csv2latextable --csv /path/to/file.csv --csv-param "sep_char=;" --csv-param 'quote_char="' --latex /path/to/table.tex 
+
+=head1 AUTHOR
+
+Renee Baecker <reneeb@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2022 by Renee Baecker.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

@@ -3,29 +3,36 @@ abstract: 'SysV Shared memory made easy'
 author:
   - 'Leon Timmermans <leont@cpan.org>'
 build_requires:
-  IO::Handle: 0
-  IPC::Open3: 0
-  Test::Fatal: 0
-  Test::More: 0
-  Test::Warnings: 0.005
+  Test::Fatal: '0'
+  Test::More: '0'
+  Test::Warnings: '0.005'
 configure_requires:
-  Module::Build::Tiny: 0.035
+  Module::Build::Tiny: '0.036'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300038, CPAN::Meta::Converter version 2.132140'
+generated_by: 'Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
-  version: 1.4
+  version: '1.4'
 name: SysV-SharedMem
+provides:
+  SysV::SharedMem:
+    file: lib/SysV/SharedMem.pm
+    version: '0.011'
 requires:
-  Carp: 0
-  IPC::SysV: 0
-  Sub::Exporter::Progressive: 0
-  XSLoader: 0
-  perl: 5.008
-  strict: 0
-  warnings: 0
+  Carp: '0'
+  IPC::SysV: '0'
+  Sub::Exporter::Progressive: '0'
+  XSLoader: '0'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
 resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=SysV-SharedMem
   repository: git://github.com/Leont/sysv-sharedmem.git
-version: 0.010
+version: '0.011'
+x_contributors:
+  - 'Leon Timmermans <fawaka@gmail.com>'
+x_generated_by_perl: v5.36.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

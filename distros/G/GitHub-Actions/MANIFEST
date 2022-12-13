@@ -7,6 +7,7 @@ t/00.load.t
 t/01-env.t
 t/02-functions.t
 t/03-set-failed.t
+t/04-env-functions.t
 t/perlcritic.t
 t/pod-coverage.t
 t/pod.t

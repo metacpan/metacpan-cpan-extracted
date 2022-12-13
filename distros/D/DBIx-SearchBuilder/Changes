@@ -1,5 +1,9 @@
 Revision history for Perl extension DBIx::SearchBuilder.
 
+1.74 2022-12-12
+ - Explicitly require version to make cpantesters happy
+ - Require perl 5.10.1+ to not support derelict versions
+
 1.73 2022-12-08
  - Remove very old CVS headers from files
  - Standardize whitespace

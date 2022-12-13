@@ -18,6 +18,7 @@ example/unbundle.pl
 inc/mymm.pl
 lib/Dist/Zilla/MintingProfile/Author/Plicease.pm
 lib/Dist/Zilla/Plugin/Author/Plicease.pm
+lib/Dist/Zilla/Plugin/Author/Plicease/Cleaner.pm
 lib/Dist/Zilla/Plugin/Author/Plicease/Core.pm
 lib/Dist/Zilla/Plugin/Author/Plicease/Init2.pm
 lib/Dist/Zilla/Plugin/Author/Plicease/MakeMaker.pm

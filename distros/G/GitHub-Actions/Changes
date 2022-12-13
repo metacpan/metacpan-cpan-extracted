@@ -1,6 +1,10 @@
+2022-12-12  jmerelo  <jmerelo@princess-carolyn>
+
+	* lib/GitHub/Actions.pm: Refactors set_output to use files contained in environment variables (same as set_env before).
+
 2021-10-09  jmerelo  <jmerelo@princess-carolyn>
 
-	* lib/GitHub/Actions.pm: 0.1.1.1 simply exports the exit function to solve error in previous one. 
+	* lib/GitHub/Actions.pm: 0.1.1.1 simply exports the exit function to solve error in previous one.
 
 2021-10-08  jmerelo  <jmerelo@princess-carolyn>
 

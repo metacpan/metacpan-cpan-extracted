@@ -19,7 +19,7 @@
             "Data::Bitfield" : "0",
             "Device::Chip" : "0",
             "Future::AsyncAwait" : "0.38",
-            "Object::Pad" : "0.57",
+            "Object::Pad" : "0.66",
             "perl" : "5.026"
          }
       },
@@ -33,7 +33,7 @@
    "provides" : {
       "Device::Chip::nRF24L01P" : {
          "file" : "lib/Device/Chip/nRF24L01P.pm",
-         "version" : "0.06"
+         "version" : "0.07"
       }
    },
    "release_status" : "stable",
@@ -42,6 +42,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.06",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.07",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

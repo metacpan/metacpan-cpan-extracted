@@ -1,3 +1,6 @@
+
+[![Build Status](https://travis-ci.org/Corion/test-without-module.svg?branch=master)](https://github.com/Corion/test-without-module)
+
 # NAME
 
 Test::Without::Module - Test fallback behaviour in absence of modules
@@ -84,8 +87,8 @@ The public support forum of this module is
 
 Please report bugs in this module via the RT CPAN bug queue at
 [https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Without-Module](https://rt.cpan.org/Public/Dist/Display.html?Name=Test-Without-Module)
-or via mail to [test-without-module-Bugs@rt.cpan.org](https://metacpan.org/pod/test-without-module-Bugs@rt.cpan.org).
+or via mail to [test-without-module-Bugs@rt.cpan.org](https://metacpan.org/pod/test-without-module-Bugs%40rt.cpan.org).
 
 # SEE ALSO
 
-[Devel::Hide](https://metacpan.org/pod/Devel::Hide), [Acme::Intraweb](https://metacpan.org/pod/Acme::Intraweb), [PAR](https://metacpan.org/pod/PAR), [perlfunc](https://metacpan.org/pod/perlfunc)
+[Devel::Hide](https://metacpan.org/pod/Devel%3A%3AHide), [Acme::Intraweb](https://metacpan.org/pod/Acme%3A%3AIntraweb), [PAR](https://metacpan.org/pod/PAR), [perlfunc](https://metacpan.org/pod/perlfunc)

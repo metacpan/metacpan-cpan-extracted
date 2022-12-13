@@ -1,3 +1,11 @@
+0.741   2022-09-11  Released-By: PERLANCAR; Urgency: medium
+
+        - [cli pmchkver] [ux] Add -l as short alias for --detail.
+
+        - [ux] Accept wildcard for other CLIs that accept multiple perl module
+          names, e.g. pmchkver, pmversion.
+
+
 0.740   2022-08-12  Released-By: PERLANCAR; Urgency: medium
 
         - [cli pmlist] Tweak docs & example.

@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.57;
 
-package Device::Chip::PCF8574 0.04;
+package Device::Chip::PCF8574 0.05;
 class Device::Chip::PCF8574
    :isa(Device::Chip::PCF857x);
 

@@ -1,5 +1,12 @@
 Revision history for Dist-Zilla-PluginBundle-Author-Plicease
 
+2.73      2022-12-13 11:24:34 -0700
+  - Added [Author::Plicease::Cleaner] plugin
+  - Minting profile includes signatures and postderef enabled
+    with the appropriate minimum required Perl
+  - Updated templates for newer Perls
+  - Remove scp releaser method that I no longer use from [Plicease::Author::Upload]
+
 2.72      2022-09-05 04:08:43 -0600
   - Bump CI in generated dist to use Perl 5.36/5.37
 

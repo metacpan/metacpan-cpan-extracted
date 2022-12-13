@@ -50,7 +50,7 @@ allow_leading_tabs = 0
 [Modules::RequireNoMatchVarsWithUseEnglish]
 [Objects::ProhibitIndirectSyntax]
 [RegularExpressions::ProhibitUselessTopic]
-[Subroutines::ProhibitNestedSubs]
+;[Subroutines::ProhibitNestedSubs]
 [ValuesAndExpressions::ProhibitLeadingZeros]
 [ValuesAndExpressions::ProhibitMixedBooleanOperators]
 [ValuesAndExpressions::ProhibitSpecialLiteralHeredocTerminator]

@@ -38,4 +38,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Log-FreeSWITCH-Line
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Log-FreeSWITCH-Line
-version: '0.07'
+version: '0.08'

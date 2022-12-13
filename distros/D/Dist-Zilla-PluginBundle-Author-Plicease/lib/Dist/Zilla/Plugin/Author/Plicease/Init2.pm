@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::Init2 2.72 {
+package Dist::Zilla::Plugin::Author::Plicease::Init2 2.73 {
 
   use 5.020;
   use Moose;
@@ -115,7 +115,21 @@ package Dist::Zilla::Plugin::Author::Plicease::Init2 2.72 {
         }
         else
         {
-          return '5.008004';
+          for(1..100)
+          {
+            my $answer = $self->chrome->prompt_str("Minimum required Perl (min: 5.008004, old: 5.014, def: 5.020 (default), or an explicit Perl version)",
+              { default => "def" },
+            );
+            return $answer    if $answer =~ /^5\.[0-9]{3,6}$/;
+            return '5.008004' if $answer eq 'min';
+            return '5.014'    if $answer eq 'old';
+            return '5.020'    if $answer eq 'def';
+            if($answer =~ /^5\.([0-9]+)\.([0-9]+)$/)
+            {
+              return sprintf "5.%03d%03d", $1, $2;
+            }
+          }
+          die "I give up";
         }
       }
     },
@@ -150,6 +164,39 @@ package Dist::Zilla::Plugin::Author::Plicease::Init2 2.72 {
 
     (my $filename = $arg->{name}) =~ s{::}{/}g;
     $self->gather_file_template($template_name => "lib/$filename.pm");
+  }
+
+  sub experimental
+  {
+    my($self) = @_;
+
+    my %x;
+
+    if($self->perl_version >= 5.020)
+    {
+      $x{signatures} = 1;
+      $x{postderef}  = 1;
+    }
+    if($self->perl_version >= 5.024)
+    {
+      delete $x{postderef};
+    }
+    if($self->perl_version >= 5.032)
+    {
+      $x{isa} = 1;
+    }
+    if($self->perl_version >= 5.034)
+    {
+      $x{try} = 1;
+    }
+    if($self->perl_version >= 5.036)
+    {
+      $x{defer} = 1;
+      delete $x{signatures};
+      delete $x{isa};
+    }
+
+    return join(' ', sort keys %x);
   }
 
   sub gather_files
@@ -195,6 +242,7 @@ package Dist::Zilla::Plugin::Author::Plicease::Init2 2.72 {
       name         => $self->zilla->name,
       abstract     => $self->abstract,
       perl_version => $self->perl_version,
+      experimental => $self->experimental,
     }, {});
     my $file = Dist::Zilla::File::InMemory->new({
       name    => $filename,
@@ -385,7 +433,7 @@ Dist::Zilla::Plugin::Author::Plicease::Init2 - Dist::Zilla initialization tasks 
 
 =head1 VERSION
 
-version 2.72
+version 2.73
 
 =head1 DESCRIPTION
 
@@ -609,10 +657,9 @@ use base qw( Alien::Base );
 
 
 __[ template/Dzil.pm ]__
-use strict;
 use warnings;
 use {{ $perl_version }};
-use experimental qw( postderef );
+use experimental qw( {{ $experimental }} );
 
 package {{ $name =~ s/-/::/gr }} {
 
@@ -628,7 +675,6 @@ package {{ $name =~ s/-/::/gr }} {
 
 
 __[ template/P5014.pm ]__
-use strict;
 use warnings;
 use {{ $perl_version }};
 
@@ -641,10 +687,9 @@ package {{ $name =~ s/-/::/gr }} {
 
 
 __[ template/P5020.pm ]__
-use strict;
 use warnings;
 use {{ $perl_version }};
-use experimental qw( postderef );
+use experimental qw( {{ $experimental }} );
 
 package {{ $name =~ s/-/::/gr }} {
 

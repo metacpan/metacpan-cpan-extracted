@@ -8,6 +8,7 @@ use Exporter;
 our @ISA = ( qw{ Exporter } );
 
 use PPIx::Regexp;
+use PPIx::Regexp::Constant qw{ INFINITY };
 use PPIx::Regexp::Dumper;
 use PPIx::Regexp::Element;
 use PPIx::Regexp::Tokenizer;
@@ -15,7 +16,7 @@ use PPIx::Regexp::Util qw{ __choose_tokenizer_class __instance };
 use Scalar::Util qw{ looks_like_number refaddr };
 use Test::More 0.88;
 
-our $VERSION = '0.085';
+our $VERSION = '0.086';
 
 use constant ARRAY_REF	=> ref [];
 
@@ -31,11 +32,13 @@ our @EXPORT_OK = qw{
     different
     done_testing
     dump_result
+    equals
     error
     fail
     false
     finis
-    equals
+    format_want
+    invocant
     is
     navigate
     note
@@ -44,12 +47,15 @@ our @EXPORT_OK = qw{
     pass
     plan
     ppi
+    raw_width
     result
     replace_characters
     skip
     tokenize
     true
     value
+    width
+    INFINITY
 };
 
 our @EXPORT = @EXPORT_OK;	## no critic (ProhibitAutomaticExportation)
@@ -238,6 +244,15 @@ sub finis {
     return is( $result, 0, 'Should be no leftover objects' );
 }
 
+sub format_want {
+    my ( $want ) = @_;
+    return _format_args( $want, bare => ref $want ? 0 : 1 );
+}
+
+sub invocant {
+    return $obj;
+}
+
 {
 
     my %array = map { $_ => 1 } qw{
@@ -315,6 +330,16 @@ sub ppi {		## no critic (RequireArgUnpacking)
     return is( $result, $expect, "$kind $nav ppi() content '$safe'" );
 }
 
+sub raw_width {
+    my ( $min, $max, $name ) = @_;
+    defined $name
+	or $name = sprintf q<%s '%s'>, ref $obj, $obj->content();
+    $Test::Builder::Level = $Test::Builder::Level + 1;
+    my @width = $obj->raw_width();
+    return is( $width[0], $min, "$name raw minimum witdh" ) && is(
+	$width[1], $max, "$name raw maximum width" );
+}
+
 sub replace_characters {
     %replace_characters	= @_;
     return;
@@ -363,7 +388,7 @@ sub true {		## no critic (RequireArgUnpacking)
 }
 
 sub value {		## no critic (RequireArgUnpacking)
-    my ( $method, $args, $expect ) = @_;
+    my ( $method, $args, $want, $name ) = @_;
     ARRAY_REF eq ref $args
 	or $args = [ $args ];
 
@@ -376,22 +401,35 @@ sub value {		## no critic (RequireArgUnpacking)
 	return ok( undef, "$class->$method() exists" );
     }
 
-    $result = ARRAY_REF eq ref $expect ?
+    $result = ARRAY_REF eq ref $want ?
 	[ $invocant->$method( @{ $args } ) ] :
 	$invocant->$method( @{ $args } );
 
     my $fmtd = _format_args( $args );
-    my $answer = _format_args( [ $expect ], bare => 1 );
+    my $answer = format_want( $want, bare => ref $want ? 0 : 1 );
+    defined $name
+	or $name = "${class}->$method$fmtd is $answer";
     if ( ref $result ) {
-	return is_deeply( $result, $expect,
-	    "${class}->$method$fmtd is $answer" );
+	return is_deeply( $result, $want, $name );
     } else {
-	return is( $result, $expect, "${class}->$method$fmtd is $answer" );
+	return is( $result, $want, $name );
     }
+}
+
+sub width {
+    my ( $min, $max, $name ) = @_;
+    defined $name
+	or $name = sprintf q<%s '%s'>, ref $obj, $obj->content();
+    $Test::Builder::Level = $Test::Builder::Level + 1;
+    my @width = $obj->width();
+    return is( $width[0], $min, "$name minimum witdh" ) && is(
+	$width[1], $max, "$name maximum width" );
 }
 
 sub _format_args {
     my ( $args, %opt ) = @_;
+    ARRAY_REF eq ref $args
+	or $args = [ $args ];
     my @rslt;
     foreach my $arg ( @{ $args } ) {
 	if ( ! defined $arg ) {
@@ -629,6 +667,13 @@ are compared by reference address and scalars by value (numeric or string
 comparison as appropriate). If the first argument is omitted it defaults
 to the current object.
 
+=head2 format_want
+
+ is $got, $want, 'Want ' . format_want( $want );
+
+This convenience subroutine formats the wanted result. If an ARRAY
+reference, the contents are enclosed in parentheses.
+
 =head2 false
 
  false( significant => [] );
@@ -643,6 +688,12 @@ on the current object, returns a false value.
 This test should be last in a series, and no references to parse objects
 should be held when it is run. It checks the number of objects in the
 internal C<%parent> hash, and succeeds if it is zero.
+
+=head2 invocant
+
+ invocant();
+
+Returns the current object.
 
 =head2 navigate
 
@@ -671,7 +722,7 @@ constructor.
 
 This subroutine is exported from L<Test::More|Test::More>.
 
-=head2 content
+=head2 ppi
 
  ppi( '$foo' );
 
@@ -679,6 +730,19 @@ This test calls the current object's C<ppi()> method, and checks to see
 if the content of the returned L<PPI::Document|PPI::Document> is equal
 to the given string. If the current object is C<undef> or does not have
 a C<ppi()> method, the test fails.
+
+=head2 raw_width
+
+ raw_width( 0, undef, "Some title" );
+
+This tests invokes the raw_width() method on the current object. The
+arguments are the expected minimum width, the expected maximum width,
+and a test title. The title defaults to the class and content of the
+current object.
+
+Two tests are actually run. The titles of these will have
+C<' raw minimum width'> and C<' raw maximum width'> appended. This
+subroutine returns true if both tests pass.
 
 =head2 result
 
@@ -722,7 +786,9 @@ on the current object, returns a true value.
  value( max_capture_number => [], 3 );
 
 This test succeeds if the given method, with the given arguments, called
-on the current object, returns the given value.
+on the current object, returns the given value. If the wanted value is
+a reference, C<is_deeply()> is used for the comparison; otherwise
+C<is()> is used.
 
 If the current object is undefined, the given method is called on the
 intended initial class, otherwise there would be no way to test the
@@ -730,6 +796,23 @@ errstr() method.
 
 The result of the method call is accessable via the L<result()|/result>
 subroutine.
+
+An optional fourth argument specifies the name of the test. If this is
+omitted or specified as C<undef>, a name is generated describing the
+arguments.
+
+=head2 width
+
+ width( 0, undef, "Some title" );
+
+This tests invokes the width() method on the current object. The
+arguments are the expected minimum width, the expected maximum width,
+and a test title. The title defaults to the class and content of the
+current object.
+
+Two tests are actually run. The titles of these will have
+C<' minimum width'> and C<' maximum width'> appended. This subroutine
+returns true if both tests pass.
 
 =head1 SUPPORT
 

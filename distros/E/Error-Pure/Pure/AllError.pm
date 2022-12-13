@@ -13,7 +13,7 @@ use Readonly;
 Readonly::Array our @EXPORT_OK => qw(err);
 Readonly::Scalar my $EVAL => 'eval {...}';
 
-our $VERSION = 0.27;
+our $VERSION = 0.28;
 
 # Process error.
 sub err {
@@ -66,6 +66,8 @@ Process error with message(s). There is key => value list after first message.
 
 =head1 EXAMPLE
 
+=for comment filename=err_via_all_error.pl
+
  use strict;
  use warnings;
 
@@ -117,6 +119,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.27
+0.28
 
 =cut

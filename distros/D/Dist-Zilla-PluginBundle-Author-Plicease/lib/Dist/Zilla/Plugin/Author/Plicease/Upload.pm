@@ -1,4 +1,4 @@
-package Dist::Zilla::Plugin::Author::Plicease::Upload 2.72 {
+package Dist::Zilla::Plugin::Author::Plicease::Upload 2.73 {
 
   use 5.020;
   use Moose;
@@ -12,11 +12,6 @@ package Dist::Zilla::Plugin::Author::Plicease::Upload 2.72 {
   has cpan => (
     is      => 'ro',
     default => sub { 1 },
-  );
-
-  has scp_dest => (
-    is      => 'ro',
-    default => sub { 'ollisg@ratbat.wdlabs.com:web/sites/dist/docs/' },
   );
 
   has url => (
@@ -61,8 +56,7 @@ package Dist::Zilla::Plugin::Author::Plicease::Upload 2.72 {
     }
     else
     {
-      use autodie qw( :system );
-      @cmd = ('scp', '-q', $archive, $self->scp_dest);
+      $self->zilla->log("no release process available, upload tarball manually");
     }
 
     {
@@ -101,7 +95,7 @@ Dist::Zilla::Plugin::Author::Plicease::Upload - Upload a dist to CPAN
 
 =head1 VERSION
 
-version 2.72
+version 2.73
 
 =head1 SYNOPSIS
 
@@ -122,9 +116,11 @@ want to do the release step when I am not connected to the Internet.
 
 =item Asks first
 
-It asks if you really want to upload to CPAN.  Some of my releases go to
-my server using C<scp> so if you either say no, or set C<cpan> to C<0>
-in the configuration it will do this instead.
+If C<cpan> is set to a true value, ask first before uploading to CPAN.
+Sometimes and for some dists I instead commit it to a GitHub pages website
+for internal use.  If C<cpan> is set to a false value or if you deny
+uploading to CPAN, the dist will be copied into the usual place where
+the aforementioned GitHub pages repository is checked out.
 
 =back
 
@@ -137,10 +133,6 @@ replace this with C<[UploadToCPAN]> if you are taking over a dist.
 
 Either C<1> or C<0>.  Set to C<0> and dist will not be uploaded to CPAN
 on release.
-
-=head2 scp_dest
-
-Valid C<scp> destination if CPAN upload is disabled.
 
 =head2 url
 

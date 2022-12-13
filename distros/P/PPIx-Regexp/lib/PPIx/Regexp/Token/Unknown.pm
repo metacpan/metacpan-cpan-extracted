@@ -41,7 +41,7 @@ use Carp ();
 use PPIx::Regexp::Constant qw{ @CARP_NOT };
 use PPIx::Regexp::Util;
 
-our $VERSION = '0.085';
+our $VERSION = '0.086';
 
 sub __new {
     my ( $class, $content, %arg ) = @_;
@@ -90,6 +90,10 @@ token.
 sub ordinal {
     my ( $self ) = @_;
     return ord $self->content();
+}
+
+sub width {
+    return ( undef, undef );
 }
 
 *__PPIX_ELEM__post_reblessing = \&PPIx::Regexp::Util::__post_rebless_error;

@@ -1,0 +1,45 @@
+{
+   "abstract" : "Enable OOP for supported Perl functions",
+   "author" : [
+      "Elvin Aslanov <rwp.primary@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [
+      "pragma",
+      "oop",
+      "cpan"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "oo_sub",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/rwp0/oo_sub"
+   },
+   "version" : "v1.0.9",
+   "x_serialization_backend" : "JSON::PP version 4.04"
+}

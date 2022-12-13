@@ -24,7 +24,7 @@ Readonly::Scalar my $TZSOLAR_CLASS        => "TimeZone::Solar";
 Readonly::Scalar my $TZSOLAR_CLASS_PREFIX => "DateTime::TimeZone::Solar::";
 Readonly::Scalar my $MAX_DEGREES          => 360;                             # maximum degrees = 360
 Readonly::Scalar my $MAX_HOURS            => 24;                              # maximum degrees = 24
-Readonly::Scalar my $tests_per_class      => 3;
+Readonly::Scalar my $tests_per_class      => 5;
 Readonly::Scalar my $total_tests => ( $MAX_DEGREES + 2 ) * $tests_per_class + ( $MAX_HOURS + 2 ) * $tests_per_class;
 Readonly::Hash my %differences => (
 
@@ -41,11 +41,13 @@ sub test_subclass_name
     my $subclass = shift;
     isa_ok( $subclass, $TZSOLAR_CLASS );
     my $expect_type = exists $differences{$subclass} ? $differences{$subclass} : $subclass;
-    my $obj;
-    lives_ok( sub { $obj = $subclass->new() }, "instantiate $subclass" );
+    my ( $obj, $obj2 );
+    lives_ok( sub { $obj = $subclass->new() }, "instantiate $subclass from new()" );
     is( ref $obj, $expect_type, exists $differences{$subclass}
         ? "got $expect_type from $subclass as expected"
         : "got $subclass as expected" );
+    lives_ok( sub { $obj2 = $subclass->instance() }, "get instance() of $subclass" );
+    ok( $obj eq $obj2, "eq comparison of $subclass objects" );
     return;
 }
 

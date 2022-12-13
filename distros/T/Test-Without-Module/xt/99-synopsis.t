@@ -12,7 +12,7 @@ GetOptions(
 my @files;
 
 my $blib = File::Spec->catfile(qw(blib lib));
-find(\&wanted, grep { -d } ($blib, 'bin'));
+find(\&wanted, grep { -d } ($blib, 'bin', 'scripts', 'examples'));
 
 plan tests => scalar @files;
 foreach my $file (@files) {

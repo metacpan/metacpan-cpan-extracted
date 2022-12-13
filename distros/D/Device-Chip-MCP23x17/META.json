@@ -24,7 +24,7 @@
          "requires" : {
             "Device::Chip" : "0.03",
             "Future::AsyncAwait" : "0.47",
-            "Object::Pad" : "0.57",
+            "Object::Pad" : "0.66",
             "perl" : "5.026"
          }
       }
@@ -32,15 +32,15 @@
    "provides" : {
       "Device::Chip::MCP23S17" : {
          "file" : "lib/Device/Chip/MCP23S17.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "Device::Chip::MCP23x17" : {
          "file" : "lib/Device/Chip/MCP23x17.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       },
       "Device::Chip::MCP23x17::Adapter" : {
          "file" : "lib/Device/Chip/MCP23x17/Adapter.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -49,6 +49,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.05",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

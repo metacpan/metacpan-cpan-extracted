@@ -99,7 +99,7 @@ struct rpc_queue {
 	struct rpc_pdu *head, *tail;
 };
 
-#define HASHES 1024
+#define DEFAULT_HASHES 4
 #define NFS_RA_TIMEOUT 5
 #define NFS_MAX_XFER_SIZE (1024 * 1024)
 #define ZDR_ENCODE_OVERHEAD 1024
@@ -130,7 +130,8 @@ struct rpc_context {
 
 	struct rpc_queue outqueue;
 	struct sockaddr_storage udp_src;
-	struct rpc_queue waitpdu[HASHES];
+        uint32_t num_hashes;
+	struct rpc_queue *waitpdu;
 	uint32_t waitpdu_len;
 #ifdef HAVE_MULTITHREADING
         int multithreading_enabled;
@@ -138,7 +139,7 @@ struct rpc_context {
 #endif /* HAVE_MULTITHREADING */
 
 	uint32_t inpos;
-	char rm_buf[4];
+	uint32_t inbuf_size;
 	char *inbuf;
 
 	/* special fields for UDP, which can sometimes be BROADCASTed */
@@ -162,12 +163,29 @@ struct rpc_context {
 	uint32_t pagecache;
 	uint32_t pagecache_ttl;
 	int debug;
+        uint64_t last_timeout_scan;
 	int timeout;
 	char ifname[IFNAMSIZ];
+	int poll_timeout;
 
         /* Is a server context ? */
         int is_server_context;
         struct rpc_endpoint *endpoints;
+};
+
+#define RPC_MAX_VECTORS 16
+
+struct rpc_iovec {
+        char *buf;
+        size_t len;
+        void (*free)(void *);
+};
+
+struct rpc_io_vectors {
+        size_t num_done;
+        int total_size;
+        int niov;
+        struct rpc_iovec iov[RPC_MAX_VECTORS];
 };
 
 struct rpc_pdu {
@@ -176,8 +194,15 @@ struct rpc_pdu {
 	uint32_t xid;
 	ZDR zdr;
 
-	uint32_t written;
 	struct rpc_data outdata;
+
+        /* For sending/receiving
+         * out contains at least three vectors:
+         * [0]  4 bytes for the stream protocol length
+         * [1]  Varying size for the rpc header (including cred & verf)
+         * [2+] command and and extra parameters
+         */
+        struct rpc_io_vectors out;
 
 	rpc_cb cb;
 	void *private_data;
@@ -196,7 +221,7 @@ struct rpc_pdu {
 void rpc_reset_queue(struct rpc_queue *q);
 void rpc_enqueue(struct rpc_queue *q, struct rpc_pdu *pdu);
 void rpc_return_to_queue(struct rpc_queue *q, struct rpc_pdu *pdu);
-unsigned int rpc_hash_xid(uint32_t xid);
+unsigned int rpc_hash_xid(struct rpc_context *rpc, uint32_t xid);
 
 struct rpc_pdu *rpc_allocate_pdu(struct rpc_context *rpc, int program, int version, int procedure, rpc_cb cb, void *private_data, zdrproc_t zdr_decode_fn, int zdr_bufsize);
 struct rpc_pdu *rpc_allocate_pdu2(struct rpc_context *rpc, int program, int version, int procedure, rpc_cb cb, void *private_data, zdrproc_t zdr_decode_fn, int zdr_bufsize, size_t alloc_hint);
@@ -247,6 +272,8 @@ void rpc_set_pagecache(struct rpc_context *rpc, uint32_t v);
 void rpc_set_pagecache_ttl(struct rpc_context *rpc, uint32_t v);
 void rpc_set_readahead(struct rpc_context *rpc, uint32_t v);
 void rpc_set_debug(struct rpc_context *rpc, int level);
+void rpc_set_poll_timeout(struct rpc_context *rpc, int poll_timeout);
+int rpc_get_poll_timeout(struct rpc_context *rpc);
 void rpc_set_timeout(struct rpc_context *rpc, int timeout);
 int rpc_get_timeout(struct rpc_context *rpc);
 int rpc_add_fragment(struct rpc_context *rpc, char *data, uint32_t size);
@@ -304,6 +331,8 @@ struct nfs_context_internal {
        int version;
        int nfsport;
        int mountport;
+       uint32_t readdir_dircount;
+       uint32_t readdir_maxcount;
 
        /* NFSv4 specific fields */
        verifier4 verifier;
@@ -430,6 +459,9 @@ struct nfsfh {
         struct stateid lock_stateid;
 };
 
+void rpc_free_iovector(struct rpc_context *rpc, struct rpc_io_vectors *v);
+int rpc_add_iovector(struct rpc_context *rpc, struct rpc_io_vectors *v,
+                     char *buf, int len, void (*free)(void *));
 const struct nfs_fh *nfs_get_rootfh(struct nfs_context *nfs);
 
 int nfs_normalize_path(struct nfs_context *nfs, char *path);

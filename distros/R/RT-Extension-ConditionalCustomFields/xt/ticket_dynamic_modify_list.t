@@ -24,6 +24,7 @@ RT->Config->Set('CustomFieldGroupings',
         'Group two' => ['ConditionedBy'],
     ],
 );
+RT->Config->PostLoadCheck;
 
 my ($base, $m) = RT::Extension::ConditionalCustomFields::Test->started_ok;
 my $mjs = WWW::Mechanize::PhantomJS->new();
@@ -74,6 +75,8 @@ $ticket_cf_conditioned_by_child = $mjs->by_id('Object-RT::Ticket-' . $ticket->id
 ok($ticket_cf_conditioned_by_child->is_hidden, "Hide Child when condition is not met");
 
 $ticket_cf_condition_passed = $mjs->by_id('Object-RT::Ticket-' . $ticket->id . '-CustomField:Groupone-' . $cf_condition->id . '-Value-' . $cf_values->[2]->id, single => 1);
+sleep 1;
 $mjs->click($ticket_cf_condition_passed);
+sleep 1;
 ok($ticket_cf_conditioned_by->is_displayed, "Show ConditionalCF when Condition is changed to be met by second val");
 ok($ticket_cf_conditioned_by_child->is_displayed, "Show Child when Condition is changed to be met by second val");

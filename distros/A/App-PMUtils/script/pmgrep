@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-12'; # DATE
+our $DATE = '2022-09-11'; # DATE
 our $DIST = 'App-PMUtils'; # DIST
-our $VERSION = '0.740'; # VERSION
+our $VERSION = '0.741'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/pmgrep/pmgrep",
@@ -42,7 +42,7 @@ pmgrep - Print lines from installed Perl module sources matching a pattern
 
 =head1 VERSION
 
-This document describes version 0.740 of pmgrep (from Perl distribution App-PMUtils), released on 2022-08-12.
+This document describes version 0.741 of pmgrep (from Perl distribution App-PMUtils), released on 2022-09-11.
 
 =head1 SYNOPSIS
 
@@ -158,7 +158,7 @@ importance, from least important to most): C<trace>, C<debug>, C<info>,
 C<warn>/C<warning>, C<error>, C<fatal>. By default, the level is usually set to
 C<warn>, which means that log statements with level C<info> and less important
 levels will not be shown. To increase verbosity, choose C<info>, C<debug>, or
-C<fatal>.
+C<trace>.
 
 For more details on log level and logging, as well as how new logging levels can
 be defined or existing ones modified, see L<Log::ger>.

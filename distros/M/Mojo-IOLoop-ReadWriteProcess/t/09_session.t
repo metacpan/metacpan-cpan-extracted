@@ -8,7 +8,7 @@ use FindBin;
 use Mojo::File qw(tempfile path);
 use lib ("$FindBin::Bin/lib", "../lib", "lib");
 
-use Mojo::IOLoop::ReadWriteProcess qw(process);
+use Mojo::IOLoop::ReadWriteProcess              qw(process);
 use Mojo::IOLoop::ReadWriteProcess::Test::Utils qw(attempt);
 use Mojo::IOLoop;
 
@@ -41,7 +41,7 @@ subtest unregister => sub {
 
   session->unregister(1);
   is session->all()->size, 0;
-  is session->resolve(1), undef;
+  is session->resolve(1),  undef;
 
   session->register(1 => $p);
   is session->all()->size, 1;

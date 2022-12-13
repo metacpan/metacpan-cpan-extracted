@@ -3,15 +3,15 @@
    "author" : [
       "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
    ],
-   "dynamic_config" : 0,
-   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.150005",
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
    "keywords" : [],
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "match-simple",
    "no_index" : {
@@ -32,7 +32,7 @@
       },
       "runtime" : {
          "recommends" : {
-            "match::simple::XS" : "0.001"
+            "match::simple::XS" : "0.002"
          },
          "requires" : {
             "Exporter::Tiny" : "0.026",
@@ -52,17 +52,17 @@
    "provides" : {
       "match::simple" : {
          "file" : "lib/match/simple.pm",
-         "version" : "0.010"
+         "version" : "0.011"
       },
       "match::smart" : {
          "file" : "lib/match/smart.pm",
-         "version" : "0.010"
+         "version" : "0.011"
       }
    },
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=match-simple"
+         "web" : "https://github.com/tobyink/p5-match-simple/issues"
       },
       "homepage" : "https://metacpan.org/release/match-simple",
       "license" : [
@@ -75,6 +75,6 @@
       },
       "x_identifier" : "http://purl.org/NET/cpan-uri/dist/match-simple/project"
    },
-   "version" : "0.010",
-   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+   "version" : "0.011",
+   "x_serialization_backend" : "JSON::PP version 4.09"
 }

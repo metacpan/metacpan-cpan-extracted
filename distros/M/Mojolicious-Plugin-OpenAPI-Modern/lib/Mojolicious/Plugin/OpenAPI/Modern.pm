@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package Mojolicious::Plugin::OpenAPI::Modern; # git description: v0.002-5-gf4ac737
+package Mojolicious::Plugin::OpenAPI::Modern; # git description: v0.003-2-g9a4bd66
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Mojolicious plugin providing access to an OpenAPI document and parser
 # KEYWORDS: validation evaluation JSON Schema OpenAPI Swagger HTTP request response
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 use 5.020;
 use if "$]" >= 5.022, experimental => 're_strict';
@@ -18,7 +18,7 @@ use YAML::PP;
 use Path::Tiny;
 use Mojo::JSON 'decode_json';
 use Safe::Isa;
-use OpenAPI::Modern 0.022;
+use OpenAPI::Modern 0.037;
 use namespace::clean;
 
 # we store data in two places: on the app (persistent storage, for the OpenAPI::Modern object
@@ -92,7 +92,7 @@ Mojolicious::Plugin::OpenAPI::Modern - Mojolicious plugin providing access to an
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

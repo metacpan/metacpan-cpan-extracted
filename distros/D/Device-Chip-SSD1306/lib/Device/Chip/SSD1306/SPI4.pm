@@ -4,9 +4,9 @@
 #  (C) Paul Evans, 2015-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.57;
+use Object::Pad 0.66;
 
-package Device::Chip::SSD1306::SPI4 0.12;
+package Device::Chip::SSD1306::SPI4 0.13;
 class Device::Chip::SSD1306::SPI4
    :isa(Device::Chip::SSD1306);
 
@@ -45,9 +45,11 @@ of the chip.
 
 =cut
 
+field $dc;
+
 method mount ( $adapter, %params )
 {
-   $self->{dc} = delete $params{dc} or
+   $dc = delete $params{dc} or
       die "Require a 'dc' parameter";
 
    return $self->SUPER::mount( $adapter, %params );
@@ -56,9 +58,9 @@ method mount ( $adapter, %params )
 # passthrough
 method power ( $on ) { $self->protocol->power( $on ) }
 
-method set_dc ( $dc )
+method set_dc ( $on )
 {
-   $self->protocol->write_gpios( { $self->{dc} => $dc } );
+   $self->protocol->write_gpios( { $dc => $on } );
 }
 
 async method send_cmd ( @vals )

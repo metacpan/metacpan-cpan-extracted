@@ -1,3 +1,15 @@
+0.011   2022-09-08  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - Tweak Abstract for the short alias CLIs.
+
+
+0.010   2022-09-08  Released-By: PERLANCAR; Urgency: medium
+
+        - [ux] Add short alias for remove-pdf-password: pdfnopass.
+
+
 0.009   2021-10-13  Released-By: PERLANCAR; Urgency: medium
 
 	- Add CLI: compress-pdf.

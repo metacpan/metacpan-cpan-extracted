@@ -6,7 +6,7 @@ use 5.014;
 
 no if $] >= 5.018, warnings => 'experimental::smartmatch';
 
-our $VERSION = '1.75';
+our $VERSION = '1.77';
 
 use Carp qw(confess cluck);
 use DateTime;
@@ -53,6 +53,15 @@ sub new_p {
 	}
 
 	my @candidates = $opt{get_station}( $opt{station} );
+
+	if ( @candidates != 1 and $opt{station} =~ m{^\d+$} ) {
+		@candidates = (
+			[
+				"D$opt{station}", "Betriebsstelle nicht bekannt $opt{station}",
+				$opt{station}
+			]
+		);
+	}
 
 	if ( @candidates == 0 ) {
 		return $promise->reject('station not found');
@@ -518,10 +527,15 @@ sub get_station {
 
 		if ( $station_node->getAttribute('ds100') =~ m{ ^ D \d+ $ }x ) {
 
-			# This is an invalid DS100 code, at least from DB perspective.
-			# So far it seems to refer to subway stations which do not have
-			# IRIS departures.
-			next;
+			# This used to indicate an invalid DS100 code, at least from DB
+			# perspective. It typically referred to subway stations which do not
+			# have IRIS departures.
+			# However, since Fahrplanwechsel 2022 / 2023, this does not seem
+			# to be the case anymore. There are some stations whose DS100 code
+			# IRIS does not know, for whatever reason. So for now, accept these
+			# stations as well.
+
+			#next;
 		}
 
 		push(
@@ -973,7 +987,7 @@ Non-blocking variant (EXPERIMENTAL):
 
 =head1 VERSION
 
-version 1.75
+version 1.77
 
 =head1 DESCRIPTION
 

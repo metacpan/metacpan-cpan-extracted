@@ -50,7 +50,9 @@ t/11_containers.t
 t/12_mocked_container.t
 t/13_shared.t
 t/data/process_check.sh
+t/data/sigchld_handler.pl
 t/data/simple_fork.pl
+t/data/simple_rwp.pl
 t/data/subreaper/child.sh
 t/data/subreaper/dead_child.sh
 t/data/subreaper/dead_master.sh

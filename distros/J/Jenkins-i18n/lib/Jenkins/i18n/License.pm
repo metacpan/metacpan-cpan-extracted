@@ -29,7 +29,7 @@ It is intended to be used to provide the license text on new properties files.
 
 =cut
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 =head1 METHODS
 

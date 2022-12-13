@@ -6,4 +6,4 @@ use Test::More 'tests' => 2;
 use Test::NoWarnings;
 
 # Test.
-is($Error::Pure::ANSIColor::Print::VERSION, 0.26, 'Version.');
+is($Error::Pure::ANSIColor::Print::VERSION, 0.27, 'Version.');

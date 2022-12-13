@@ -1,6 +1,6 @@
 package Lab::Instrument::YokogawaGS200;
 #ABSTRACT: Yokogawa GS200 DC source
-$Lab::Instrument::YokogawaGS200::VERSION = '3.831';
+$Lab::Instrument::YokogawaGS200::VERSION = '3.840';
 use v5.20;
 
 use strict;
@@ -548,7 +548,7 @@ Lab::Instrument::YokogawaGS200 - Yokogawa GS200 DC source
 
 =head1 VERSION
 
-version 3.831
+version 3.840
 
 =head1 SYNOPSIS
 

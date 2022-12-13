@@ -21,7 +21,14 @@ use IO::File;
 use TimeZone::Solar;
 
 # constants
+Readonly::Scalar my $TZSOLAR_LON_ZONE_RE  => qr((Lon0[0-9][0-9][EW]) | (Lon1[0-7][0-9][EW]) | (Lon180[EW]))x;
+Readonly::Scalar my $TZSOLAR_HOUR_ZONE_RE => qr((East|West)(0[0-9] | 1[0-2]))x;
+Readonly::Scalar my $TZSOLAR_ZONE_RE      => qr( $TZSOLAR_LON_ZONE_RE | $TZSOLAR_HOUR_ZONE_RE )x;
 Readonly::Hash my %constants => (
+    TZSOLAR_CLASS_PREFIX   => "DateTime::TimeZone::Solar::",
+    TZSOLAR_LON_ZONE_RE    => $TZSOLAR_LON_ZONE_RE,
+    TZSOLAR_HOUR_ZONE_RE   => $TZSOLAR_HOUR_ZONE_RE,
+    TZSOLAR_ZONE_RE        => $TZSOLAR_ZONE_RE,
     PRECISION_DIGITS       => 6,
     PRECISION_FP           => 0.0000005,
     MAX_DEGREES            => 360,
@@ -91,7 +98,10 @@ sub test_functions
 
     # tests which should not throw exceptions
     my @constant_keys;
-    lives_ok( sub { @constant_keys = TimeZone::Solar->_get_const() }, "runs without exception: _get_const()" );
+    lives_ok(
+        sub { @constant_keys = TimeZone::Solar::Constant::names() },
+        "runs without exception: TimeZone::Solar::Constant->names()"
+    );
     is_deeply( \@constant_keys, [ sort keys %constants ], "list of constants matches" );
 }
 
@@ -104,18 +114,18 @@ sub test_constants
 
             # floating point value
             ok(
-                fp_equal( TimeZone::Solar->_get_const($key), $constants{$key} ),
+                fp_equal( TimeZone::Solar::Constant::get($key), $constants{$key} ),
                 sprintf( "constant check: %s = %.7f", $key, $constants{$key} )
             );
         } else {
 
             # other types
-            is( TimeZone::Solar->_get_const($key), $constants{$key}, "constant check: $key = $constants{$key}" );
+            is( TimeZone::Solar::Constant::get($key), $constants{$key}, "constant check: $key = $constants{$key}" );
         }
     }
 
     # non-existent constant throws exception
-    dies_ok( sub { TimeZone::Solar->_get_const("non-existent") }, "non-existent constant fails as expected" );
+    dies_ok( sub { TimeZone::Solar::Constant::get("non-existent") }, "non-existent constant fails as expected" );
 }
 
 # formatting functions
@@ -193,7 +203,15 @@ sub expect_lon2tz
     my $class      = "DateTime::TimeZone::Solar::" . $tz_name;
     my $offset_str = _offset_min2str($offset_min);
     $debug_mode and say STDERR "debug(lon:$lon,type:" . ( $use_lon_tz ? "lon" : "hour" ) . ") -> $tz_name, $offset_min";
-    return ( short_name => $tz_name, offset_min => $offset_min, offset => $offset_str, class => $class );
+    return (
+        short_name      => $tz_name,
+        offset_min      => $offset_min,
+        offset_str      => $offset_str,
+        offset          => $offset_str,
+        class           => $class,
+        has_dst_changes => 0,
+        spans           => []
+    );
 }
 
 # perform tests for a degree of longitude
@@ -254,12 +272,15 @@ sub test_polar
         my $expect_class = "DateTime::TimeZone::Solar::" . $stz->short_name();
         is_deeply(
             {
-                longitude  => $stz->longitude(),
-                latitude   => $stz->latitude(),
-                short_name => $stz->short_name(),
-                offset_min => $stz->offset_min(),
-                offset     => $stz->offset(),
-                class      => $expect_class
+                longitude       => $stz->longitude(),
+                latitude        => $stz->latitude(),
+                short_name      => $stz->short_name(),
+                offset_min      => $stz->offset_min(),
+                offset_str      => $stz->offset_str(),
+                offset          => $stz->offset(),
+                class           => $expect_class,
+                has_dst_changes => 0,
+                spans           => [],
             },
             \%expected,
             $test_name

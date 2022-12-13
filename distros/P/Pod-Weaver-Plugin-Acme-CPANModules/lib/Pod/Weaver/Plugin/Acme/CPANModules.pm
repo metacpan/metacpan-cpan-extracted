@@ -1,21 +1,26 @@
 package Pod::Weaver::Plugin::Acme::CPANModules;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-21'; # DATE
-our $DIST = 'Pod-Weaver-Plugin-Acme-CPANModules'; # DIST
-our $VERSION = '0.012'; # VERSION
-
 use 5.010001;
 use Moose;
 with 'Pod::Weaver::Role::AddTextToSection';
 with 'Pod::Weaver::Role::Section';
 
 has entry_description_code => (is=>'rw');
+has additional_props => (is=>'rw');
+
+sub mvp_multivalue_args { qw(
+                                additional_props
+                        ) }
 
 use Pod::From::Acme::CPANModules qw(gen_pod_from_acme_cpanmodules);
 
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-10-17'; # DATE
+our $DIST = 'Pod-Weaver-Plugin-Acme-CPANModules'; # DIST
+our $VERSION = '0.013'; # VERSION
+
 sub _process_module {
-    no strict 'refs';
+    no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
 
     my ($self, $document, $input, $package) = @_;
 
@@ -48,6 +53,7 @@ sub _process_module {
         module => $package,
         _raw=>1,
         ($self->entry_description_code ? (entry_description_code => $self->entry_description_code) : ()),
+        ($self->additional_props ? (additional_props => $self->additional_props) : ()),
     );
 
     for my $section (sort keys %{$res->{pod}}) {
@@ -134,7 +140,7 @@ are found.
 }
 
 sub _process_bundle_module {
-    no strict 'refs';
+    no strict 'refs'; ## no critic: TestingAndDebugging::ProhibitNoStrict
 
     my ($self, $document, $input, $package) = @_;
 
@@ -238,7 +244,7 @@ Pod::Weaver::Plugin::Acme::CPANModules - Plugin to use when building Acme::CPANM
 
 =head1 VERSION
 
-This document describes version 0.012 of Pod::Weaver::Plugin::Acme::CPANModules (from Perl distribution Pod-Weaver-Plugin-Acme-CPANModules), released on 2021-08-21.
+This document describes version 0.013 of Pod::Weaver::Plugin::Acme::CPANModules (from Perl distribution Pod-Weaver-Plugin-Acme-CPANModules), released on 2022-10-17.
 
 =head1 SYNOPSIS
 
@@ -275,7 +281,7 @@ tool), etc.
 
 =back
 
-=for Pod::Coverage weave_section
+=for Pod::Coverage ^(weave_section|mvp_multivalue_args)$
 
 =head1 CONFIGURATION
 
@@ -283,7 +289,12 @@ tool), etc.
 
 Optional. Perl code to produce the description POD. If not specified, will use
 default template for the description POD, i.e. entry's C<description> property,
-plus C<rating>, C<alternative_modules> if available.
+plus C<rating>, C<alternative_modules> if available. See
+L<Pod::From::Acme::CPANModules> for more details.
+
+=head2 additional_props
+
+Optional. Also passed to C<Pod::From::Acme::CPANModules>.
 
 =head1 HOMEPAGE
 
@@ -292,14 +303,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/Pod-Weaver
 =head1 SOURCE
 
 Source repository is at L<https://github.com/perlancar/perl-Pod-Weaver-Plugin-Acme-CPANModules>.
-
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Weaver-Plugin-Acme-CPANModules>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
 
 =head1 SEE ALSO
 
@@ -324,15 +327,24 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2018 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021, 2020, 2019, 2018 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Weaver-Plugin-Acme-CPANModules>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

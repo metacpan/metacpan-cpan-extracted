@@ -37,7 +37,6 @@ do { my $x = {
                                       'Time::HiRes' => '0',
                                       'parent' => '0',
                                       'perl' => 'v5.14.0',
-                                      'strict' => '0',
                                       'warnings' => '0'
                                     }
                     },
@@ -59,8 +58,10 @@ do { my $x = {
                                    'Test::MockObject' => '0',
                                    'Test::More' => '0',
                                    'Test::Most' => '0',
+                                   'Test::Vars' => '0.015',
                                    'Test::Warnings' => '0',
-                                   'lib' => '0'
+                                   'lib' => '0',
+                                   'strict' => '0'
                                  }
                  }
      };

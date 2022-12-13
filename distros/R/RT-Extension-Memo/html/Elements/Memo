@@ -3,7 +3,7 @@
     <div class="memo-content" id="<% $Name %>" data-objectclass="<% ref($Object) %>" data-objectid="<% $Object->id %>"><% $Type eq 'text/html' ? $memo_content_html : $memo_linefeeds |n %></div>
 
 %   if ($Object->CurrentUserHasRight('ModifyMemo')) {
-    <textarea autocomplete="off" class="memo-edit-content<% $Type eq 'text/html' ? ' richtext' : '' %>" style="width: 100%" rows="<% $Height %>" <% $wrap_type |n %> name="<% $Name %>Edit" id="<% $Name %>Edit"><% $memo_value %></textarea>
+    <textarea autocomplete="off" class="memo-edit-content<% RT::Handle::cmp_version($RT::VERSION, '5.0.0') < 0 && $Type eq 'text/html' ? ' richtext' : '' %>" style="width: 100%" rows="<% $Height %>" <% $wrap_type |n %> name="<% $Name %>Edit" id="<% $Name %>Edit"><% $memo_value %></textarea>
 
 %       if ($Type eq 'text/html') {
     <input type="text" style="display:none" name="<% $Name %>EditType" id="<% $Name %>EditType" value="<% $m->request_args->{$Name."Type"}||$Type %>" />

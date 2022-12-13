@@ -1,12 +1,26 @@
 Revision history for Plack-Middleware-Security-Simple:
 
+v0.8.2    2022-12-12 16:40:09+00:00 Europe/London
+  [Enhancements]
+  - Added .config to the misc_extensions rule.
+
+  - Added docroot, ftproot, webroot, inetpub to the cms_prefixes rule.
+
+  - Added adm to the system_dirs rule.
+
+  [Documentation]
+  - Fixed typo in Changes.
+
+  [Tests]
+  - Fix dependency for Test::Vars.
+
 v0.8.1    2022-07-05 12:06:58+01:00 Europe/London
   [Enhancements]
   - Added .bz2 to archive_extensions rule.
 
   - Updated backup_files rule.
 
-  - Added Windows META-INF and OS/X __MAXOSX to system_dirs rule.
+  - Added Windows META-INF and OS/X __MACOSX to system_dirs rule.
 
   [Toolchain]
   - Sign release.

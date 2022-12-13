@@ -134,7 +134,7 @@ Try to acquire lock in a non-blocking way.
 
     $l->locked; # is 0
 
-Executes a function inside a locked section. Errors are catched so lock is released in case of failures.
+Executes a function inside a locked section. Errors are caught so lock is released in case of failures.
 
 =head1 ATTRIBUTES
 

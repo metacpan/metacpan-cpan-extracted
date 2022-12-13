@@ -14,7 +14,7 @@ Lab::Measurement::Installation - Installation guide for Lab::Measurement
 
 =head1 VERSION
 
-version 3.831
+version 3.840
 
 =head1 Introduction
 

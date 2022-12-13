@@ -8,3 +8,6 @@ Revision history for App-OpenMbox
 
 0.12    2022/11/21
         Resolve a CPAN uploading conflict
+
+0.13    2022/12/10
+        Updates the POD

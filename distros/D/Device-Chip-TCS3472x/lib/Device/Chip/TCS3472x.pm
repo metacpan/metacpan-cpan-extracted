@@ -1,12 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2020-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2020-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.57;
+use Object::Pad 0.66;
 
-package Device::Chip::TCS3472x 0.03;
+package Device::Chip::TCS3472x 0.04;
 class Device::Chip::TCS3472x
    :isa(Device::Chip);
 
@@ -66,7 +66,7 @@ breakout boards. This is used by the L</set_led> method.
 
 =cut
 
-has $_led_pin;
+field $_led_pin;
 
 method mount ( $adapter, %params )
 {
@@ -134,7 +134,7 @@ async method read_reg ( $addr, $len = 1 )
    );
 }
 
-has @_regcache;
+field @_regcache;
 
 async method cached_read_reg ( $addr, $len = 1 )
 {

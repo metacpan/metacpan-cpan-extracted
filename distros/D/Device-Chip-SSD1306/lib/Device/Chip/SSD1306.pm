@@ -4,9 +4,9 @@
 #  (C) Paul Evans, 2015-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.70 ':experimental(adjust_params)';
+use Object::Pad 0.73 ':experimental(adjust_params init_expr)';
 
-package Device::Chip::SSD1306 0.12;
+package Device::Chip::SSD1306 0.13;
 class Device::Chip::SSD1306
    :isa(Device::Chip)
    :strict(params);
@@ -153,13 +153,13 @@ the display, if it is mounted upside-down.
 
 =cut
 
-has $_rows :reader;
-has $_columns :reader;
+field $_rows :reader;
+field $_columns :reader;
 
-has $_column_offset;
-has $_set_com_pins_arg;
-has $_xflip            :param = 0;
-has $_yflip            :param = 0;
+field $_column_offset;
+field $_set_com_pins_arg;
+field $_xflip            :param = 0;
+field $_yflip            :param = 0;
 
 ADJUST :params ( :$model = "SSD1306-128x64" )
 {
@@ -332,10 +332,10 @@ chip after calling them.
 =cut
 
 # The internal framebuffer
-has @_display;
-has $_display_dirty;
-has $_display_dirty_xlo;
-has $_display_dirty_xhi;
+field @_display;
+field $_display_dirty;
+field $_display_dirty_xlo;
+field $_display_dirty_xhi;
 
 =head2 clear
 

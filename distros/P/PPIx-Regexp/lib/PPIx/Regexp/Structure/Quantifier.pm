@@ -40,7 +40,10 @@ use warnings;
 
 use base qw{ PPIx::Regexp::Structure };
 
+use Scalar::Util qw{ looks_like_number };
+
 use PPIx::Regexp::Constant qw{
+    INFINITY
     LITERAL_LEFT_CURLY_ALLOWED
     MINIMUM_PERL
     MSG_LOOK_BEHIND_TOO_LONG
@@ -49,7 +52,7 @@ use PPIx::Regexp::Constant qw{
     @CARP_NOT
 };
 
-our $VERSION = '0.085';
+our $VERSION = '0.086';
 
 sub can_be_quantified {
     return;
@@ -57,6 +60,9 @@ sub can_be_quantified {
 
 sub explain {
     my ( $self ) = @_;
+
+=begin comment
+
     my $content = $self->content();
     if ( $content =~ m/ \A [{] ( .*? ) [}] \z /smx ) {
 	my $quant = $1;
@@ -80,10 +86,69 @@ sub explain {
 	return "match exactly $lo times";
     }
     return $self->SUPER::explain();
+
+=end comment
+
+=cut
+
+    my ( $lo, $hi ) = $self->_min_max();
+
+    if ( looks_like_number( $hi ) ) {
+	$hi == INFINITY
+	    and return "match $lo or more times";
+	looks_like_number( $lo )
+	    and $lo == $hi
+	    and return "match exactly $lo times";
+    } elsif ( $lo eq $hi ) {
+	return "match $lo times";
+    }
+    return "match $lo to $hi times";
+}
+
+sub _min_max {
+    my ( $self ) = @_;
+    my $content = $self->content();
+    if ( $content =~ m/ \A [{] ( .*? ) [}] \z /smx ) {
+	my $quant = $1;
+	my ( $lo, $hi ) = split qr{ , }smx, $quant;
+	foreach ( $lo, $hi ) {
+	    defined
+		or next;
+	    s/ \A \s+ //smx;
+	    s/ \s+ \z //smx;
+	}
+	defined $lo
+	    and '' ne $lo
+	    or $lo = 0;
+	defined $hi
+	    and '' ne $hi
+	    and return ( $lo, $hi );
+	$quant =~ m/ , \z /smx
+	    and return ( $lo, INFINITY );
+	return ( $lo, $lo );
+    }
 }
 
 sub is_quantifier {
     return 1;
+}
+
+sub width {
+    return ( 0, 0 );
+}
+
+sub __quantified_width {
+    my ( $self, $raw_min, $raw_max ) = @_;
+    my ( $my_min, $my_max ) = $self->_min_max();
+    foreach ( $my_min, $my_max ) {
+	looks_like_number( $_ )
+	    or $_ = undef;
+    }
+    defined $raw_min
+	and $raw_min = defined $my_min ? $raw_min * $my_min : undef;
+    defined $raw_max
+	and $raw_max = defined $my_max ? $raw_max * $my_max : undef;
+    return ( $raw_min, $raw_max );
 }
 
 sub __following_literal_left_curly_disallowed_in {
@@ -135,14 +200,6 @@ sub __PPIX_LEXER__finalize {
 		}
 
 	    }
-
-	    # The problem I am having is that the dumper uses
-	    # __structured_requirements_for_perl(), which is not
-	    # sensitive to the minimum perl of structures, only
-	    # elements. But there is no logical element to hang the
-	    # minimum version on. Maybe the opening bracket is less bad
-	    # than the other choices?
-
 	}
     }
 

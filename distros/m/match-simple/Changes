@@ -3,8 +3,15 @@ match-simple
 
 Created:      2013-05-19
 Home page:    <https://metacpan.org/release/match-simple>
-Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=match-simple>
+Bug tracker:  <https://github.com/tobyink/p5-match-simple/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.011	2022-12-13
+
+ - Updated: General distribution modernization, etc.
+ - Updated: Overloaded ~~ copes better on versions of Perl which don't
+   support the ~~ operator.
+ - Updated: Use match::simple::XS 0.002 instead of match::simple::XS 0.001.
 
 0.010	2017-01-31
 

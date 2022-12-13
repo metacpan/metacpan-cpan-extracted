@@ -1,11 +1,9 @@
 package Error::Pure::ANSIColor;
 
-# Pragmas.
 use strict;
 use warnings;
 
-# Version.
-our $VERSION = 0.26;
+our $VERSION = 0.27;
 
 1;
 
@@ -63,21 +61,22 @@ Install the Error::Pure modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Error-Pure-ANSIColor>
+L<https://github.com/michal-josef-spacek/Error-Pure-ANSIColor>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2013-2017 Michal Špaček
- BSD 2-Clause License
+© 2013-2022 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.26
+0.27
 
 =cut

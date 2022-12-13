@@ -1,5 +1,8 @@
 Revision history for RT-Extension-InlineAudioVideoAttachments
 
+0.06 2022-12-13
+ - Upgrade to RT 5
+
 0.05 2018-08-10
  - Fix malformed html
 

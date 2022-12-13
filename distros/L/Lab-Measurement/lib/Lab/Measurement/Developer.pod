@@ -13,7 +13,7 @@ Lab::Measurement::Developer - Lab::Measurement developer tutorial
 
 =head1 VERSION
 
-version 3.831
+version 3.840
 
 =head1 Writing drivers
 

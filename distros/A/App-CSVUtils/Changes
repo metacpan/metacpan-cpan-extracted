@@ -1,3 +1,15 @@
+0.053   2022-12-09  Released-By: PERLANCAR; Urgency: medium
+
+        - [bugfix] [cli csv-select-rows] Fix function metadata (multiple
+          args with pos=1).
+
+        - [bugfix] [cli csv-fill-template] Fix function metadata (multiple
+          args with pos=1).
+
+        - [bugfix] [cli csv-concat] Fix function metadata (clashing argument
+          positions --filename & --output-filename) (RT#145467).
+
+
 0.052   2022-12-05  Released-By: PERLANCAR; Urgency: medium
 
         - [bugfix][clis csv-sort-rows, csv-sort-fields, csv-concat] Didn't

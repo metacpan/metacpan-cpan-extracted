@@ -22,6 +22,14 @@ static void S_warn_void_context(pTHX_ const char *func)
     warn("Calling ->%s in void context", func);
 }
 
+#define CHECK_INSTANCE(self)  \
+  if(!SvROK(self) || !SvOBJECT(SvRV(self)) ||       \
+      !sv_derived_from(self, "Future::XS")) {       \
+    GV *gv = CvGV(cv); HV *stash = GvSTASH(gv);     \
+    croak("Expected a Future instance for %s::%s",  \
+      HvNAME(stash), GvNAME(gv));                   \
+  }
+
 MODULE = Future::XS    PACKAGE = Future::XS
 
 SV *
@@ -44,6 +52,7 @@ DESTROY(SV *self)
 bool
 is_ready(SV *self)
   CODE:
+    CHECK_INSTANCE(self);
     RETVAL = future_is_ready(self);
   OUTPUT:
     RETVAL
@@ -51,6 +60,7 @@ is_ready(SV *self)
 bool
 is_done(SV *self)
   CODE:
+    CHECK_INSTANCE(self);
     RETVAL = future_is_done(self);
   OUTPUT:
     RETVAL
@@ -58,6 +68,7 @@ is_done(SV *self)
 bool
 is_failed(SV *self)
   CODE:
+    CHECK_INSTANCE(self);
     RETVAL = future_is_failed(self);
   OUTPUT:
     RETVAL
@@ -65,6 +76,7 @@ is_failed(SV *self)
 bool
 is_cancelled(SV *self)
   CODE:
+    CHECK_INSTANCE(self);
     RETVAL = future_is_cancelled(self);
   OUTPUT:
     RETVAL
@@ -72,6 +84,7 @@ is_cancelled(SV *self)
 char *
 state(SV *self)
   CODE:
+    CHECK_INSTANCE(self);
     // TODO: We can do this more efficiently sometime
     if(!future_is_ready(self))
       RETVAL = "pending";
@@ -124,6 +137,7 @@ fail(SV *self, ...)
 SV *
 on_cancel(SV *self, SV *code)
   CODE:
+    CHECK_INSTANCE(self);
     RETVAL = newSVsv(self);
     future_on_cancel(self, code);
   OUTPUT:
@@ -132,6 +146,7 @@ on_cancel(SV *self, SV *code)
 SV *
 on_ready(SV *self, SV *code)
   CODE:
+    CHECK_INSTANCE(self);
     /* Need to copy the return value first in case on_ready destroys it
      *   RT145168 */
     RETVAL = newSVsv(self);
@@ -142,6 +157,7 @@ on_ready(SV *self, SV *code)
 SV *
 await(SV *self)
   CODE:
+    CHECK_INSTANCE(self);
     if(future_is_ready(self)) {
       RETVAL = newSVsv(ST(0));
       XSRETURN(1);
@@ -157,7 +173,15 @@ result(SV *self)
     result = FALSE
     get    = TRUE
   PPCODE:
+    CHECK_INSTANCE(self);
+    /* This PUTBACK + SPAGAIN pair is required in case future_get_result_av()
+     * causes the arguments stack to be reällocated. It works fine on perls
+     * 5.24+ but causes older perls to crash. For now we just depend on 5.24
+     *   https://rt.cpan.org/Ticket/Display.html?id=145597
+     */
+    PUTBACK;
     AV *result = future_get_result_av(self, ix);
+    SPAGAIN;
     if(GIMME_V == G_LIST) {
       XPUSHs_from_AV(result);
       XSRETURN(av_count(result));
@@ -173,6 +197,7 @@ result(SV *self)
 SV *
 on_done(SV *self, SV *code)
   CODE:
+    CHECK_INSTANCE(self);
     RETVAL = newSVsv(self);
     future_on_done(self, code);
   OUTPUT:
@@ -181,7 +206,10 @@ on_done(SV *self, SV *code)
 void
 failure(SV *self)
   PPCODE:
+    CHECK_INSTANCE(self);
+    PUTBACK;
     AV *failure = future_get_failure_av(self);
+    SPAGAIN;
     if(!failure)
       XSRETURN(0);
 
@@ -200,6 +228,7 @@ failure(SV *self)
 SV *
 on_fail(SV *self, SV *code)
   CODE:
+    CHECK_INSTANCE(self);
     RETVAL = newSVsv(self);
     future_on_fail(self, code);
   OUTPUT:
@@ -208,6 +237,7 @@ on_fail(SV *self, SV *code)
 SV *
 cancel(SV *self)
   CODE:
+    CHECK_INSTANCE(self);
     future_cancel(self);
     RETVAL = SvREFCNT_inc(self);
   OUTPUT:
@@ -226,6 +256,7 @@ then(SV *self, ...)
     then        = 0
     then_with_f = FUTURE_THEN_WITH_F
   CODE:
+    CHECK_INSTANCE(self);
     if(GIMME_V == G_VOID) {
       // Need to ensure we print the ->transform message right
       const PERL_CONTEXT *cx = caller_cx(0, NULL);
@@ -272,6 +303,7 @@ else(SV *self, SV *code)
     else        = 0
     else_with_f = FUTURE_THEN_WITH_F
   CODE:
+    CHECK_INSTANCE(self);
     warn_void_context(ix ? "else_with_f" : "else");
     RETVAL = future_then(self, ix, NULL, code);
   OUTPUT:
@@ -283,6 +315,7 @@ catch(SV *self, ...)
     catch        = 0
     catch_with_f = FUTURE_THEN_WITH_F
   CODE:
+    CHECK_INSTANCE(self);
     warn_void_context(ix ? "catch_with_f" : "catch");
     items--; /* account for self */
 
@@ -304,6 +337,7 @@ catch(SV *self, ...)
 SV *
 followed_by(SV *self, SV *code)
   CODE:
+    CHECK_INSTANCE(self);
     warn_void_context("followed_by");
     RETVAL = future_followed_by(self, code);
   OUTPUT:
@@ -346,6 +380,7 @@ pending_futures(SV *self)
     failed_futures    = FUTURE_SUBS_FAILED
     cancelled_futures = FUTURE_SUBS_CANCELLED
   PPCODE:
+    CHECK_INSTANCE(self);
     PUTBACK;
     Size_t count = future_mPUSH_subs(self, ix);
     SPAGAIN;

@@ -1,5 +1,8 @@
 Revision history for Perl module Module::Generic
 
+v0.29.2 2022-12-11T14:00:48+0900
+    - Correcting oversight when dealing with undefined, but necessary property values in Module::Generic::Number
+
 v0.29.1 2022-12-09T19:30:04+0900
     - Improvement of method _set_get_hash_as_mix_object in Module::Generic
 

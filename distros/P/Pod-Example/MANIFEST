@@ -22,6 +22,7 @@ README
 SIGNATURE
 t/modules/Ex1.pm
 t/modules/Ex11.pm
+t/modules/Ex12.pm
 t/modules/Ex2.pm
 t/modules/Ex3.pm
 t/modules/Ex4.pm

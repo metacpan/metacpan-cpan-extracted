@@ -14,7 +14,7 @@ use warnings;
 ## use critic (Modules::RequireExplicitPackage)
 
 package TimeZone::Solar;
-$TimeZone::Solar::VERSION = '0.2.0';
+$TimeZone::Solar::VERSION = '0.2.1';
 use utf8;
 use autodie;
 use overload
@@ -24,33 +24,77 @@ use Carp qw(croak);
 use Readonly;
 use DateTime::TimeZone qw(0.80);
 use Try::Tiny;
+Readonly::Scalar my $debug_mode => ( exists $ENV{TZSOLAR_DEBUG} and $ENV{TZSOLAR_DEBUG} ) ? 1 : 0;
 
 # constants
-Readonly::Scalar my $debug_mode           => ( exists $ENV{TZSOLAR_DEBUG} and $ENV{TZSOLAR_DEBUG} ) ? 1 : 0;
-Readonly::Scalar my $TZSOLAR_CLASS_PREFIX => "DateTime::TimeZone::Solar::";
-Readonly::Scalar my $TZSOLAR_LON_ZONE_RE  => qr((Lon0[0-9][0-9][EW]) | (Lon1[0-7][0-9][EW]) | (Lon180[EW]))x;
-Readonly::Scalar my $TZSOLAR_HOUR_ZONE_RE => qr((East|West)(0[0-9] | 1[0-2]))x;
-Readonly::Scalar my $TZSOLAR_ZONE_RE      => qr( $TZSOLAR_LON_ZONE_RE | $TZSOLAR_HOUR_ZONE_RE )x;
-Readonly::Scalar my $PRECISION_DIGITS  => 6;                                  # max decimal digits of precision
-Readonly::Scalar my $PRECISION_FP      => ( 10**-$PRECISION_DIGITS ) / 2.0;   # 1/2 width of floating point equality
-Readonly::Scalar my $MAX_DEGREES       => 360;                                # maximum degrees = 360
-Readonly::Scalar my $MAX_LONGITUDE_INT => $MAX_DEGREES / 2;                   # min/max longitude in integer = 180
-Readonly::Scalar my $MAX_LONGITUDE_FP  => $MAX_DEGREES / 2.0;                 # min/max longitude in float = 180.0
-Readonly::Scalar my $MAX_LATITUDE_FP   => $MAX_DEGREES / 4.0;                 # min/max latitude in float = 90.0
-Readonly::Scalar my $POLAR_UTC_AREA    => 10;                                 # latitude degrees around poles to use UTC
-Readonly::Scalar my $LIMIT_LATITUDE    => $MAX_LATITUDE_FP - $POLAR_UTC_AREA; # max latitude for solar time zones
-Readonly::Scalar my $MINUTES_PER_DEGREE_LON => 4;                             # minutes per degree longitude
-Readonly::Hash my %constants => (                                             # allow tests to check constants
-    PRECISION_DIGITS       => $PRECISION_DIGITS,
-    PRECISION_FP           => $PRECISION_FP,
-    MAX_DEGREES            => $MAX_DEGREES,
-    MAX_LONGITUDE_INT      => $MAX_LONGITUDE_INT,
-    MAX_LONGITUDE_FP       => $MAX_LONGITUDE_FP,
-    MAX_LATITUDE_FP        => $MAX_LATITUDE_FP,
-    POLAR_UTC_AREA         => $POLAR_UTC_AREA,
-    LIMIT_LATITUDE         => $LIMIT_LATITUDE,
-    MINUTES_PER_DEGREE_LON => $MINUTES_PER_DEGREE_LON,
-);
+## no critic ( Modules::ProhibitMultiplePackages )
+package TimeZone::Solar::Constant {
+    use Carp qw(croak);
+    Readonly::Scalar my $TZSOLAR_CLASS_PREFIX => "DateTime::TimeZone::Solar::";
+    Readonly::Scalar my $TZSOLAR_LON_ZONE_RE  => qr((Lon0[0-9][0-9][EW]) | (Lon1[0-7][0-9][EW]) | (Lon180[EW]))x;
+    Readonly::Scalar my $TZSOLAR_HOUR_ZONE_RE => qr((East|West)(0[0-9] | 1[0-2]))x;
+    Readonly::Scalar my $TZSOLAR_ZONE_RE      => qr( $TZSOLAR_LON_ZONE_RE | $TZSOLAR_HOUR_ZONE_RE )x;
+    Readonly::Scalar my $PRECISION_DIGITS  => 6;                                  # max decimal digits of precision
+    Readonly::Scalar my $PRECISION_FP      => ( 10**-$PRECISION_DIGITS ) / 2.0;   # 1/2 width of floating point equality
+    Readonly::Scalar my $MAX_DEGREES       => 360;                                # maximum degrees = 360
+    Readonly::Scalar my $MAX_LONGITUDE_INT => $MAX_DEGREES / 2;                   # min/max longitude in integer = 180
+    Readonly::Scalar my $MAX_LONGITUDE_FP  => $MAX_DEGREES / 2.0;                 # min/max longitude in float = 180.0
+    Readonly::Scalar my $MAX_LATITUDE_FP   => $MAX_DEGREES / 4.0;                 # min/max latitude in float = 90.0
+    Readonly::Scalar my $POLAR_UTC_AREA    => 10;                                 # latitude near poles to use UTC
+    Readonly::Scalar my $LIMIT_LATITUDE    => $MAX_LATITUDE_FP - $POLAR_UTC_AREA; # max latitude for solar time zones
+    Readonly::Scalar my $MINUTES_PER_DEGREE_LON => 4;                             # minutes per degree longitude
+    Readonly::Hash my %constants => (                                             # allow tests to check constants
+        TZSOLAR_CLASS_PREFIX   => $TZSOLAR_CLASS_PREFIX,
+        TZSOLAR_LON_ZONE_RE    => $TZSOLAR_LON_ZONE_RE,
+        TZSOLAR_HOUR_ZONE_RE   => $TZSOLAR_HOUR_ZONE_RE,
+        TZSOLAR_ZONE_RE        => $TZSOLAR_ZONE_RE,
+        PRECISION_DIGITS       => $PRECISION_DIGITS,
+        PRECISION_FP           => $PRECISION_FP,
+        MAX_DEGREES            => $MAX_DEGREES,
+        MAX_LONGITUDE_INT      => $MAX_LONGITUDE_INT,
+        MAX_LONGITUDE_FP       => $MAX_LONGITUDE_FP,
+        MAX_LATITUDE_FP        => $MAX_LATITUDE_FP,
+        POLAR_UTC_AREA         => $POLAR_UTC_AREA,
+        LIMIT_LATITUDE         => $LIMIT_LATITUDE,
+        MINUTES_PER_DEGREE_LON => $MINUTES_PER_DEGREE_LON,
+    );
+
+    # get list of constant names/keys
+    sub names
+    {
+        return ( sort keys %constants );
+    }
+
+    # get the value of a constant by name
+    sub get
+    {
+        my $name = shift;
+
+        # require valid name parameter
+        if ( not exists $constants{$name} ) {
+            croak( __PACKAGE__ . ": non-existent constant requested: $name" );
+        }
+        return $constants{$name};
+    }
+}
+$TimeZone::Solar::Constant::VERSION = '0.2.1';
+## critic ( Modules::ProhibitMultiplePackages )
+
+# get list of constants
+## no critic ( Subroutines::ProhibitUnusedPrivateSubroutines )
+sub _const_names
+{
+    return TimeZone::Solar::Constant::names();
+}
+## critic ( Subroutines::ProhibitUnusedPrivateSubroutines )
+
+# access constants
+# throws exception if requested contant name doesn't exist
+sub _const
+{
+    my $name = shift;
+    return TimeZone::Solar::Constant::get($name);
+}
 
 # create timezone subclass
 # this must be before the BEGIN block which uses it
@@ -154,29 +198,6 @@ sub isa
 }
 ## critic ( Subroutines::ProhibitBuiltinHomonyms )
 
-# access constants - for use by tests
-# if no name parameter is provided, return list of constant names
-# throws exception if requested contant name doesn't exist
-## no critic ( Subroutines::ProhibitUnusedPrivateSubroutines )
-sub _get_const
-{
-    my @args = @_;
-    my ( $class, $name ) = @args;
-    _class_guard($class);
-
-    # if no name provided, return list of keys
-    if ( scalar @args <= 1 ) {
-        return ( sort keys %constants );
-    }
-
-    # require valid name parameter
-    if ( not exists $constants{$name} ) {
-        croak "non-existent constant requested: $name";
-    }
-    return $constants{$name};
-}
-## critic ( Subroutines::ProhibitUnusedPrivateSubroutines )
-
 # return TimeZone::Solar (or subclass) version number
 sub version
 {
@@ -193,7 +214,7 @@ sub version
     return "00-dev";
 }
 
-# check latitude data and initialize special case for polar regions - internal method called by init()
+# check latitude data and initialize special case for polar regions - internal method called by _tz_params()
 sub _tz_params_latitude
 {
     my $param_ref = shift;
@@ -202,12 +223,12 @@ sub _tz_params_latitude
     if ( not $param_ref->{latitude} =~ /^[-+]?\d+(\.\d+)?$/x ) {
         croak( __PACKAGE__ . "::_tz_params_latitude: latitude '" . $param_ref->{latitude} . "' is not numeric" );
     }
-    if ( abs( $param_ref->{latitude} ) > $MAX_LATITUDE_FP + $PRECISION_FP ) {
+    if ( abs( $param_ref->{latitude} ) > _const("MAX_LATITUDE_FP") + _const("PRECISION_FP") ) {
         croak __PACKAGE__ . "::_tz_params_latitude: latitude when provided must be in range -90..+90";
     }
 
     # special case: use East00/Lon000E (equal to UTC) within 10° latitude of poles
-    if ( abs( $param_ref->{latitude} ) >= $LIMIT_LATITUDE - $PRECISION_FP ) {
+    if ( abs( $param_ref->{latitude} ) >= _const("LIMIT_LATITUDE") - _const("PRECISION_FP") ) {
         my $use_lon_tz = ( exists $param_ref->{use_lon_tz} and $param_ref->{use_lon_tz} );
         $param_ref->{short_name} = $use_lon_tz ? "Lon000E" : "East00";
         $param_ref->{name}       = "Solar/" . $param_ref->{short_name};
@@ -258,7 +279,7 @@ sub _tz_params
     if ( not $params{longitude} =~ /^[-+]?\d+(\.\d+)?$/x ) {
         croak( __PACKAGE__ . "::_tz_params: longitude '" . $params{longitude} . "' is not numeric" );
     }
-    if ( abs( $params{longitude} ) > $MAX_LONGITUDE_FP + $PRECISION_FP ) {
+    if ( abs( $params{longitude} ) > _const("MAX_LONGITUDE_FP") + _const("PRECISION_FP") ) {
         croak __PACKAGE__ . "::_tz_params: longitude must be in the range -180 to +180";
     }
 
@@ -269,12 +290,12 @@ sub _tz_params
     my $tz_digits       = $use_lon_tz ? 3 : 2;
 
     # handle special case of half-wide tz at positive side of solar date line (180° longitude)
-    if (   $params{longitude} >= $MAX_LONGITUDE_INT - $tz_degree_width / 2.0 - $PRECISION_FP
-        or $params{longitude} <= -$MAX_LONGITUDE_INT + $PRECISION_FP )
+    if (   $params{longitude} >= _const("MAX_LONGITUDE_INT") - $tz_degree_width / 2.0 - _const("PRECISION_FP")
+        or $params{longitude} <= -_const("MAX_LONGITUDE_INT") + _const("PRECISION_FP") )
     {
         my $tz_name = sprintf "%s%0*d%s",
             _tz_prefix( $use_lon_tz, 1 ),
-            $tz_digits, $MAX_LONGITUDE_INT / $tz_degree_width,
+            $tz_digits, _const("MAX_LONGITUDE_INT") / $tz_degree_width,
             _tz_suffix( $use_lon_tz, 1 );
         $params{short_name} = $tz_name;
         $params{name}       = "Solar/" . $tz_name;
@@ -284,10 +305,10 @@ sub _tz_params
     }
 
     # handle special case of half-wide tz at negativ< side of solar date line (180° longitude)
-    if ( $params{longitude} <= -$MAX_LONGITUDE_INT + $tz_degree_width / 2.0 + $PRECISION_FP ) {
+    if ( $params{longitude} <= -_const("MAX_LONGITUDE_INT") + $tz_degree_width / 2.0 + _const("PRECISION_FP") ) {
         my $tz_name = sprintf "%s%0*d%s",
             _tz_prefix( $use_lon_tz, -1 ),
-            $tz_digits, $MAX_LONGITUDE_INT / $tz_degree_width,
+            $tz_digits, _const("MAX_LONGITUDE_INT") / $tz_degree_width,
             _tz_suffix( $use_lon_tz, -1 );
         $params{short_name} = $tz_name;
         $params{name}       = "Solar/" . $tz_name;
@@ -297,13 +318,13 @@ sub _tz_params
     }
 
     # handle other times zones
-    my $tz_int  = int( abs( $params{longitude} ) / $tz_degree_width + 0.5 + $PRECISION_FP );
-    my $sign    = ( $params{longitude} > -$tz_degree_width / 2.0 + $PRECISION_FP ) ? 1 : -1;
+    my $tz_int  = int( abs( $params{longitude} ) / $tz_degree_width + 0.5 + _const("PRECISION_FP") );
+    my $sign    = ( $params{longitude} > -$tz_degree_width / 2.0 + _const("PRECISION_FP") ) ? 1 : -1;
     my $tz_name = sprintf "%s%0*d%s",
         _tz_prefix( $use_lon_tz, $sign ),
         $tz_digits, $tz_int,
         _tz_suffix( $use_lon_tz, $sign );
-    my $offset = $sign * $tz_int * ( $MINUTES_PER_DEGREE_LON * $tz_degree_width );
+    my $offset = $sign * $tz_int * ( _const("MINUTES_PER_DEGREE_LON") * $tz_degree_width );
     $params{short_name} = $tz_name;
     $params{name}       = "Solar/" . $tz_name;
     $params{offset_min} = $offset;
@@ -326,7 +347,7 @@ sub _tz_instance
     if ( not exists $hashref->{short_name} ) {
         croak __PACKAGE__ . "::_tz_instance: short_name attribute missing";
     }
-    if ( $hashref->{short_name} !~ $TZSOLAR_ZONE_RE ) {
+    if ( $hashref->{short_name} !~ _const("TZSOLAR_ZONE_RE") ) {
         croak __PACKAGE__
             . "::_tz_instance: short_name attrbute "
             . $hashref->{short_name}
@@ -334,7 +355,7 @@ sub _tz_instance
     }
 
     # look up class instance, return it if found
-    my $class = $TZSOLAR_CLASS_PREFIX . $hashref->{short_name};
+    my $class = _const("TZSOLAR_CLASS_PREFIX") . $hashref->{short_name};
     if ( exists $_INSTANCES{$class} ) {
 
         # forward lat/lon parameters to the existing instance, mainly so tests can see where it came from
@@ -374,7 +395,9 @@ sub new
     }
 
     # if we got here via DataTime::TimeZone::Solar::*->new(), override longitude/use_lon_tz parameters from class name
-    if ( $in_class =~ qr( $TZSOLAR_CLASS_PREFIX ( $TZSOLAR_ZONE_RE ))x ) {
+    my $tzsolar_class_prefix = _const("TZSOLAR_CLASS_PREFIX");
+    my $tzsolar_zone_re      = _const("TZSOLAR_ZONE_RE");
+    if ( $in_class =~ qr( $tzsolar_class_prefix ( $tzsolar_zone_re ))x ) {
         my $in_tz = $1;
         if ( substr( $in_tz, 0, 4 ) eq "East" ) {
             my $tz_int = int substr( $in_tz, 4, 2 );
@@ -399,11 +422,6 @@ sub new
     # make a new one if it doesn't yet exist
     my $tz_params = _tz_params(%args);
     my $self      = _tz_instance($tz_params);
-
-    # use init() method, with support for derived classes that may override it
-    if ( my $init_func = $self->can("init") ) {
-        $init_func->($self);
-    }
     return $self;
 }
 
@@ -542,7 +560,7 @@ TimeZone::Solar - local solar timezone lookup and utilities including DateTime c
 
 =head1 VERSION
 
-version 0.2.0
+version 0.2.1
 
 =head1 SYNOPSIS
 

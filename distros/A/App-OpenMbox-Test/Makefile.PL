@@ -12,7 +12,6 @@ my %WriteMakefileArgs = (
     MIN_PERL_VERSION => '5.006',
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
-        'App::OpenMbox::Client' => '0',
     },
     TEST_REQUIRES => {
         'Test::More' => '0',
@@ -20,6 +19,7 @@ my %WriteMakefileArgs = (
     PREREQ_PM => {
         #'ABC'              => '1.6',
         #'Foo::Bar::Module' => '5.0401',
+        'App::OpenMbox::Client' => '0',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'App-OpenMbox-Test-*' },

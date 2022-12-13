@@ -61,7 +61,8 @@ sub write_handle {
     my ($self, $oid, $handle) = @_;
     Carp::confess "Called with not an open handle"
         unless openhandle $handle;
-    my $length = -s $handle
+    my $length = -s $handle;
+    defined $length
         or Carp::confess "Could not get size for filehandle $handle";
     $self->_write_from_fh($oid, $handle, $length);
 }

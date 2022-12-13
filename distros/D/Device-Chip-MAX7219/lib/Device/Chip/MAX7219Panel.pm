@@ -4,9 +4,9 @@
 #  (C) Paul Evans, 2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.70 ':experimental(adjust_params)';
+use Object::Pad 0.73 ':experimental(adjust_params init_expr)';
 
-package Device::Chip::MAX7219Panel 0.07;
+package Device::Chip::MAX7219Panel 0.08;
 class Device::Chip::MAX7219Panel
    :isa(Device::Chip);
 
@@ -79,10 +79,10 @@ use constant {
    REG_DTEST     => 0x0F,
 };
 
-has $_nchips;
+field $_nchips;
 
-has $_rows    :reader;
-has $_columns :reader;
+field $_rows    :reader;
+field $_columns :reader;
 
 =head1 CONSTRUCTOR
 
@@ -128,8 +128,8 @@ ADJUST :params (
    $_nchips = ( $_rows / 8 ) * ( $_columns / 8 );
 }
 
-has $_xflip :param :reader :writer = 0;
-has $_yflip :param :reader :writer = 0;
+field $_xflip :param :reader :writer = 0;
+field $_yflip :param :reader :writer = 0;
 
 =head1 METHODS
 
@@ -232,8 +232,8 @@ panel chips after calling them.
 
 =cut
 
-has @_display;
-has $_is_display_dirty;
+field @_display;
+field $_is_display_dirty;
 
 =head2 clear
 

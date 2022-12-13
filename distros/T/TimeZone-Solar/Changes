@@ -1,5 +1,14 @@
 Revision history for TimeZone::Solar
 
+0.2.1 2022-12-11T03:11:43+00:00 UTC
+ [REVISION]
+ - fix Perl version requirement from > 5.20.0 to >= 5.20.0
+ - move constants to their own class for consistency with Python
+   implementation and organization of tests
+ - added some tests as flagged in test coverage
+ - remove undocumented check for init() method which is no longer used
+   (flagged in test coverage)
+
 0.2.0 2022-12-07T10:17:01+00:00 UTC
  [BUG FIXES]
  - added tests to improve code coverage

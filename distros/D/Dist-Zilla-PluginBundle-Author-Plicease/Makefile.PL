@@ -3,7 +3,7 @@ BEGIN {
   my %missing = map {
     eval qq{ require $_ };
     $@ ? ($_=>1) : ()
-  } qw( Carp Encode File::Glob File::Path JSON::PP List::Util Module::CoreList Term::ANSIColor autodie experimental strict version warnings );
+  } qw( Carp Encode File::Glob File::Path JSON::PP List::Util Module::CoreList Scalar::Util Term::ANSIColor experimental strict version warnings );
   if(%missing)
   {
     print "Your Perl is missing core modules: @{[ sort keys %missing ]}\n";
@@ -58,6 +58,7 @@ my %WriteMakefileArgs = (
   "PM"               => {
     "lib/Dist/Zilla/MintingProfile/Author/Plicease.pm"          => "\$(INST_LIB)/Dist/Zilla/MintingProfile/Author/Plicease.pm",
     "lib/Dist/Zilla/Plugin/Author/Plicease.pm"                  => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease.pm",
+    "lib/Dist/Zilla/Plugin/Author/Plicease/Cleaner.pm"          => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/Cleaner.pm",
     "lib/Dist/Zilla/Plugin/Author/Plicease/Core.pm"             => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/Core.pm",
     "lib/Dist/Zilla/Plugin/Author/Plicease/Init2.pm"            => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/Init2.pm",
     "lib/Dist/Zilla/Plugin/Author/Plicease/MakeMaker.pm"        => "\$(INST_LIB)/Dist/Zilla/Plugin/Author/Plicease/MakeMaker.pm",
@@ -71,6 +72,7 @@ my %WriteMakefileArgs = (
     "lib/Dist/Zilla/PluginBundle/Author/Plicease.pm"            => "\$(INST_LIB)/Dist/Zilla/PluginBundle/Author/Plicease.pm"
   },
   "PREREQ_PM" => {
+    "Class::Method::Modifiers"                => 0,
     "Config::INI::Reader"                     => 0,
     "Data::Section"                           => 0,
     "Dist::Zilla"                             => "6.00",
@@ -85,6 +87,7 @@ my %WriteMakefileArgs = (
     "Dist::Zilla::Plugin::PodWeaver"          => "4.006",
     "Dist::Zilla::Plugin::ReadmeAnyFromPod"   => "0.150250",
     "Dist::Zilla::Plugin::Run::BeforeBuild"   => "0.035",
+    "Dist::Zilla::Role::Plugin"               => 0,
     "Dist::Zilla::Role::PluginBundle::Easy"   => 0,
     "Dist::Zilla::Role::TextTemplate"         => 0,
     "Dist::Zilla::Util::AuthorDeps"           => 0,
@@ -113,7 +116,7 @@ my %WriteMakefileArgs = (
     "Test2::V0"    => "0.000121",
     "Test::Script" => "1.10"
   },
-  "VERSION" => "2.72",
+  "VERSION" => "2.73",
   "test"    => {
     "TESTS" => "t/*.t"
   }

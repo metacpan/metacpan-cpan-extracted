@@ -1,3 +1,14 @@
+Travel::Status::DE::IRIS 1.77 - Mon Dec 12 2022
+
+    * Handle "Betriebsstelle nicht bekannt" in routes.
+    * Update station list
+
+Travel::Status::DE::IRIS 1.76 - Sun Dec 11 2022
+
+    * Improve handling of stations that are not yet present in IRIS
+      ("Betriebsstelle nicht bekannt 1234567")
+    * Update station list
+
 Travel::Status::DE::IRIS 1.75 - Sun Dec 04 2022
 
     * Update station list

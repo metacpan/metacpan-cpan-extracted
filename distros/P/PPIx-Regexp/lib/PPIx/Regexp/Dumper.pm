@@ -43,12 +43,13 @@ use Scalar::Util qw{ blessed looks_like_number };
 use PPIx::Regexp;
 use PPIx::Regexp::Constant qw{
     ARRAY_REF
+    INFINITY
     @CARP_NOT
 };
 use PPIx::Regexp::Tokenizer;
 use PPIx::Regexp::Util qw{ __choose_tokenizer_class __instance };
 
-our $VERSION = '0.085';
+our $VERSION = '0.086';
 
 use constant LOCATION_WIDTH	=> 19;
 
@@ -175,6 +176,10 @@ that the author reserves the right to change it without notice.
 
 The default is zero.
 
+=item width Boolean
+
+If true, this option causes a dump of the width of the object.
+
 =back
 
 If the thing to be dumped was a string, unrecognized arguments are
@@ -198,6 +203,7 @@ ignored.
 	test	=> 0,
 	tokens	=> 0,
 	verbose => 0,
+	width	=> 0,
     );
 
     sub new {
@@ -448,6 +454,36 @@ sub _format_modifiers_dump {
     return;
 }
 
+sub _format_width_dump {
+    my @arg = @_;
+    foreach ( @arg ) {
+	if ( defined ) {
+	    $_ == INFINITY
+		and $_ = q<'Inf'>;
+	} else {
+	    $_ = 'undef';
+	}
+    }
+    wantarray
+	and return @arg;
+    return join ', ', @arg;
+}
+
+sub _format_width_test {
+    my @arg = @_;
+    foreach ( @arg ) {
+	if ( defined ) {
+	    $_ == INFINITY
+		and $_ = 'INFINITY';
+	} else {
+	    $_ = 'undef';
+	}
+    }
+    wantarray
+	and return @arg;
+    return join ', ', @arg;
+}
+
 sub _tokens_test {
     my ( $self, $elem ) = @_;
 
@@ -531,6 +567,11 @@ sub PPIx::Regexp::Node::__PPIX_DUMPER__dump {
     $dumper->{locations}
 	and substr $rslt[0], 0, 0, ' ' x LOCATION_WIDTH;
 
+    if ( $dumper->{width} ) {
+	my $width = _format_width_dump( $self->width() );
+	$rslt[-1] .= "\t{ $width }";
+    }
+
     $dumper->{perl_version}
 	and $rslt[-1] .= "\t" . $dumper->_perl_version( $self );
 
@@ -566,6 +607,14 @@ sub PPIx::Regexp::Node::__PPIX_DUMPER__test {
 	push @rslt,
 	    'error   ( ' . $dumper->_safe( $err ) . ' );';
 
+    }
+
+    if ( $dumper->{width} ) {
+	my $raw = _format_width_test( $self->raw_width() );
+	my $width = _format_width_test( $self->width() );
+	push @rslt,
+	    "raw_width( $raw );",
+	    "width   ( $width );";
     }
 
     if ( $dumper->{perl_version} ) {
@@ -624,6 +673,12 @@ sub _format_value {
 
 	$dumper->{perl_version}
 	    and push @rslt, $dumper->_perl_version( $self );
+
+	if ( $dumper->{width} ) {
+	    my $width = _format_width_dump( $self->width() );
+	    push @rslt, "{ $width }";
+	}
+
 	if ( $dumper->{verbose} ) {
 	    foreach my $method ( qw{ number name max_capture_number } ) {
 		$self->can( $method ) or next;
@@ -684,6 +739,15 @@ sub PPIx::Regexp::Structure::__PPIX_DUMPER__test {
 		$dumper->_safe( $self->$method() ) . ' );';
 	}
     }
+
+    if ( $dumper->{width} ) {
+	my $raw = _format_width_test( $self->raw_width() );
+	my $width = _format_width_test( $self->width() );
+	push @rslt,
+	    "raw_width( $raw );",
+	    "width   ( $width );";
+    }
+
     foreach my $method ( qw{ start type finish } ) {
 	my @eles = $self->$method();
 	push @rslt, 'choose  ( ' . $dumper->__nav(
@@ -750,6 +814,11 @@ sub PPIx::Regexp::Token::__PPIX_DUMPER__dump {
 	} else {
 	    substr $_, 0, 0, '  ';
 	}
+    }
+
+    if ( $dumper->{width} ) {
+	my $width = _format_width_dump( $self->width() );
+	push @rslt, "{ $width }";
     }
 
     $dumper->{perl_version}
@@ -834,6 +903,14 @@ sub PPIx::Regexp::Token::__PPIX_DUMPER__test {
 		push @rslt, "value   ( $method => [], " .
 		    $dumper->_safe_version( $self->$method() ) . ' );';
 	    }
+	}
+
+	if ( $dumper->{width} ) {
+	    my $raw = _format_width_test( $self->raw_width() );
+	    my $width = _format_width_test( $self->width() );
+	    push @rslt,
+		"raw_width( $raw );",
+		"width   ( $width );";
 	}
 
 	if ( $dumper->{verbose} ) {

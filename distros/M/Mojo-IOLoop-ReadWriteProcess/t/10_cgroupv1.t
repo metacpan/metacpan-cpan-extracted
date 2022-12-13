@@ -10,7 +10,7 @@ use lib ("$FindBin::Bin/lib", "../lib", "lib");
 
 BEGIN { $ENV{MOJO_CGROUP_FS} = tempdir() }
 
-use Mojo::IOLoop::ReadWriteProcess qw(process);
+use Mojo::IOLoop::ReadWriteProcess              qw(process);
 use Mojo::IOLoop::ReadWriteProcess::Test::Utils qw(attempt);
 use Mojo::IOLoop;
 use Mojo::IOLoop::ReadWriteProcess::CGroup qw(cgroupv1);
@@ -22,12 +22,12 @@ subtest mock => sub {
 
   my $child_cgroup = $cgroup->child('bar');
   $child_cgroup->create();
-  ok $child_cgroup->exists, 'Child cgroup exists';
+  ok $child_cgroup->exists,     'Child cgroup exists';
   ok -d $child_cgroup->_cgroup, 'Folder is created';
   $child_cgroup->remove;
   is $child_cgroup->exists, undef, 'Child group does not exist anymore';
 
-  ok $cgroup->exists, 'Parent CGroup exists';
+  ok $cgroup->exists,     'Parent CGroup exists';
   ok -d $cgroup->_cgroup, 'Parent CGroup folder exists';
   ok $cgroup->_cgroup ne $child_cgroup->_cgroup,
     'Child and parent has different CGroup path'
@@ -42,8 +42,8 @@ subtest mock => sub {
     "procs interface contains the added pids"
     or die diag explain $child_cgroup->process_list;
 
-  ok $child_cgroup->contains_process("3"), "Child contains pid 3";
-  ok $child_cgroup->contains_process("5"), "Child contains pid 5";
+  ok $child_cgroup->contains_process("3"),   "Child contains pid 3";
+  ok $child_cgroup->contains_process("5"),   "Child contains pid 5";
   ok !$child_cgroup->contains_process("10"), "Child does not contain pid 10";
   ok !$child_cgroup->contains_process("20"), "Child does not contain pid 20";
 
@@ -66,8 +66,8 @@ subtest mock => sub {
     "thread interface contains the added threads ID"
     or die diag explain $cgroup->thread_list;
 
-  ok $cgroup->contains_thread("20"), "Parent contains thread ID 20";
-  ok $cgroup->contains_thread("40"), "Parent contains thread ID 40";
+  ok $cgroup->contains_thread("20"),  "Parent contains thread ID 20";
+  ok $cgroup->contains_thread("40"),  "Parent contains thread ID 40";
   ok !$cgroup->contains_thread("30"), "Parent does not contain thread ID 30";
   ok !$cgroup->contains_thread("50"), "Parent does not contain thread ID 50";
 

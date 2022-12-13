@@ -29,7 +29,7 @@ use Jenkins::i18n::ProcOpts;
 use Jenkins::i18n::License;
 use Jenkins::i18n::Assertions qw(can_ignore has_hudson);
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 my $current_dir = getcwd;
 my (
     $lang, $dir,   $add, $remove, $counter, $target,

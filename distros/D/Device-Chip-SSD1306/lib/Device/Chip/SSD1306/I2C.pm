@@ -4,9 +4,9 @@
 #  (C) Paul Evans, 2015-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.57;
+use Object::Pad 0.66;
 
-package Device::Chip::SSD1306::I2C 0.12;
+package Device::Chip::SSD1306::I2C 0.13;
 class Device::Chip::SSD1306::I2C
    :isa(Device::Chip::SSD1306);
 
@@ -30,9 +30,11 @@ L<Device::Chip::SSD1306> documentation.
 
 =cut
 
+field $addr;
+
 method mount ( $adapter, %params )
 {
-   $self->{addr} = delete $params{addr} // DEFAULT_ADDR;
+   $addr = delete $params{addr} // DEFAULT_ADDR;
 
    return $self->SUPER::mount( $adapter, %params );
 }
@@ -40,7 +42,7 @@ method mount ( $adapter, %params )
 method I2C_options
 {
    return (
-      addr => $self->{addr},
+      addr => $addr,
    );
 }
 

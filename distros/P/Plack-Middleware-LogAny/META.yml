@@ -4,12 +4,13 @@ author:
   - 'Sven Willenbuecher <sven.willenbuecher@kuehne-nagel.com>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Log::Any::Adapter::Log4perl: '0'
   Test::More: '0'
 configure_requires:
   Config: '0'
   ExtUtils::MakeMaker::CPANfile: '0.09'
 dynamic_config: 0
-generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.143240'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -26,5 +27,4 @@ requires:
 resources:
   bugtracker: https://github.com/XSven/Plack-Middleware-LogAny/issues
   repository: git://github.com/XSven/Plack-Middleware-LogAny.git
-version: '0.001002'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+version: '0.001003'

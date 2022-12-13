@@ -1,5 +1,11 @@
 Revision history for Device-Chip-SSD1306
 
+0.13    2022-12-12
+        [CHANGES]
+         * Updated for Object::Pad v0.73:
+            + Use `field NAME = EXPR` syntax
+         * Removed the remaining `$self->{...}` accesses
+
 0.12    2022-10-29
         [CHANGES]
          * Updates for Object::Pad v0.70

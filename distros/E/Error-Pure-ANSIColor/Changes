@@ -1,3 +1,11 @@
+0.27 2022-12-11T18:02:01+01:00
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Move bugtracker to github.
+ - Update author name.
+ - Update author github repository.
+ - Update copyright years.
+ - Update Module::Install to 1.19 version.
+
 0.26 2017-11-24T11:30:49+01:00
  - In 0.01 version was Error::Pure::AnsiColor::PrintVar with 0.25 version.
    Then grow version to bigger.

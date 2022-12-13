@@ -23,6 +23,8 @@ As per F<libnfs.h>:
 
 =over
 
+=item * C<dev>
+
 =item * C<ino>
 
 =item * C<mode>

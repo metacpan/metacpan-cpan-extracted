@@ -13,7 +13,7 @@ my @ATTRIBUTES = qw(files missing unused empty same no_jenkins keys);
 __PACKAGE__->follow_best_practice;
 __PACKAGE__->mk_ro_accessors(@ATTRIBUTES);
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 =pod
 

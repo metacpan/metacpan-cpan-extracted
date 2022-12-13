@@ -6,7 +6,7 @@ license 'gplv3';
 repository 'https://github.com/gibus/RT-Extension-BooleanCustomField';
 
 requires_rt('4.0.0');
-rt_too_new('4.6.0');
+rt_too_new('5.1.0');
 
 readme_from 'lib/RT/Extension/BooleanCustomField.pm', 0, 'md', 'README.md';
 

@@ -1,12 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2019-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2019-2022 -- leonerd@leonerd.org.uk
 
 use v5.26; # postfix-deref, signatures
-use Object::Pad 0.57;
+use Object::Pad 0.73 ':experimental(init_expr)';
 
-package Device::Chip::CC1101 0.07;
+package Device::Chip::CC1101 0.08;
 class Device::Chip::CC1101
    :isa(Device::Chip);
 
@@ -64,8 +64,8 @@ Interval in seconds to poll the chip status after transmitting. A default of
 
 =cut
 
-has $_fosc          :param = 26E6; # presets presume 26MHz XTAL
-has $_poll_interval :param = 0.05;
+field $_fosc          :param = 26E6; # presets presume 26MHz XTAL
+field $_poll_interval :param = 0.05;
 
 method SPI_options
 {
@@ -324,9 +324,9 @@ async method _read_PATABLE ()
    );
 }
 
-has $_config;
-has $_patable;
-has %_cached_config;
+field $_config;
+field $_patable;
+field %_cached_config;
 
 async method read_config ()
 {

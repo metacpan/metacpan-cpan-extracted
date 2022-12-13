@@ -20,10 +20,14 @@ $m->submit;
 is($m->status, 200, "request successful");
 $m->content_contains("Create a new ticket", 'Ticket create page');
 
-$m->form_name('TicketCreate');
-$m->field('Subject', 'Audio attachment test');
-$m->field('Content', 'Content with audio');
-$m->submit;
+$m->submit_form(
+    form_name => "TicketCreate",
+    fields    => {
+        Subject => 'Audio attachment test',
+        Content => 'Content with audio',
+    },
+    button => 'SubmitTicket',
+);
 is($m->status, 200, "Request successful");
 
 $m->content_contains('Audio attachment test', 'We have subject on the page');
@@ -32,11 +36,15 @@ $m->content_contains('Content with audio', 'And content');
 # Reply with uploaded attachments
 $m->follow_link_ok({text => 'Reply'}, "Reply to the ticket");
 $m->content_lacks('AttachExisting');
-$m->form_name('TicketUpdate');
-$m->field('Attach', $audio_file);
-$m->field('UpdateContent', 'Message');
-$m->click('SubmitTicket');
+$m->submit_form(
+    form_name => 'TicketUpdate',
+    fields    => {
+        Attach => $audio_file,
+        UpdateContent => 'Message',
+    },
+    button => 'SubmitTicket',
+);
 is($m->status, 200, "Request successful");
 
 $m->content_contains("Download $audio_name", 'Page has file name');
-$m->content_like(qr{<audio controls preload="metadata"><source src="Attachment/\d+/\d+/$audio_name" type="audio/mpeg">Your browser does not support the audio tag.</audio>}, 'Audio can be heard in HTML5 player');
+$m->content_like(qr{<audio controls[^>]*><source src="Attachment/\d+/\d+/$audio_name" type="audio/mpeg">Your browser does not support the audio tag.</audio>}, 'Audio can be listened in HTML5 player');

@@ -32,6 +32,7 @@ use warnings;
 # diag( "Environment variables: ", Dumper( \%ENV ) );
 
 BEGIN { use_ok( 'Module::Generic::Number' ) || BAIL_OUT( "Unable to load Module::Generic::Number" ); }
+# POSIX::setlocale( &POSIX::LC_ALL, 'C.UTF-8' ) if( $DEBUG );
 my $curr_locale = POSIX::setlocale( &POSIX::LC_ALL );
 diag( "Current locale is '$curr_locale'" ) if( $DEBUG );
 # require Data::Dump;
@@ -61,7 +62,7 @@ $lconv = $Module::Generic::Number::DEFAULT if( !$curr_locale );
 my( $sep_space, $tho_sep, $dec_sep, $n );
 if( scalar( keys( %$lconv ) ) )
 {
-    $sep_space = int( $lconv->{p_sep_by_space} // '' ) > 0 ? qr/[[:blank:]\h]+/ : '';
+    $sep_space = int( $lconv->{p_sep_by_space} // 0 ) > 0 ? qr/[[:blank:]\h]+/ : '';
     $tho_sep = CORE::length( $lconv->{thousands_sep} )
         ? $lconv->{thousands_sep} 
         : $lconv->{mon_thousands_sep};
@@ -150,9 +151,9 @@ SKIP:
     my $n_loc = Module::Generic::Number->new( 100, { lang => 'fr_FR', precede => 1, precision => 2, thousand => ' ', decimal => ',', debug => 0 });
     isa_ok( $n_loc, 'Module::Generic::Number', 'Object with locale language string' );
     is( $n_loc->precision, 2, 'French precision => 2' );
-    ## RT #132667
-    ## https://perldoc.perl.org/5.10.1/perlrecharclass.html
-    ## [:blank:] does not catch non-breaking space, but horizontal space \h does
+    # RT #132667
+    # https://perldoc.perl.org/5.10.1/perlrecharclass.html
+    # [:blank:] does not catch non-breaking space, but horizontal space \h does
     like( $n_loc->thousand, qr/[[:blank:]\h]+/, 'French thousand separator => space' );
     is( $n_loc->decimal, ',', 'French decimal separator => comma' );
 };
@@ -220,13 +221,13 @@ isa_ok( $n, 'Module::Generic::Number', 'Number regexp check after concatenation'
 is( $n .= 'X', '1281284X', 'String concatenation with non-number' );
 isa_ok( $n, 'Module::Generic::Scalar', 'Regexp check after concatenation and class -> Module::Generic::Scalar' );
 
-is( $n2->decimal, $dec_sep, 'Decimal separator' );
+is( $n2->decimal, $dec_sep, "Decimal separator -> '" . ( defined( $dec_sep ) ? $dec_sep : 'undef' ) . "'" );
 # is( $n2->thousand->scalar, $tho_sep, 'Thousand separator' );
 # diag( "\$tho_sep is defined? ", defined( $tho_sep ) ? 'yes' : 'no' );
 # diag( "\$n2->thousand is defined? ", defined( $n2->thousand ) ? 'yes' : 'no' );
-is( $n2->thousand, $tho_sep, 'Thousand separator' );
-is( $n2->precision, 2, 'Precision' );
-is( $n2->currency, '€', 'Currency symbol' );
+is( $n2->thousand, $tho_sep, "Thousand separator -> '" . ( defined( $tho_sep ) ? $tho_sep : 'undef' ) . "'" );
+is( $n2->precision, 2, "Precision -> '2'" );
+is( $n2->currency, '€', "Currency symbol -> '€'" );
 isa_ok( $n2->currency, 'Module::Generic::Scalar', 'Returns property as string object' );
 
 diag( "Number to unformat is '$n'" ) if( $DEBUG );
@@ -239,8 +240,8 @@ $dec_sep = '' if( !defined( $dec_sep ) );
 $tho_sep = '' if( !defined( $tho_sep ) );
 # diag( "Thousand separator is: '", $n3->thousand, "'" );
 # diag( "Number::Format object is: ", Dumper( $n3->{_fmt} ) );
-is( $n3->format, "1${tho_sep}281${tho_sep}284${dec_sep}00", 'Formatting number using format()' );
-is( $n3->currency, '€', 'Currency symbol' );
+is( $n3->format, "1${tho_sep}281${tho_sep}284${dec_sep}00", "Formatting number using format() -> 1${tho_sep}281${tho_sep}284${dec_sep}00" );
+is( $n3->currency, '€', "Currency symbol -> '€'" );
 my $n_money = $n3->format_money;
 if( $n3->precede )
 {

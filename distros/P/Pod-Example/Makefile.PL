@@ -31,7 +31,7 @@ test_requires 'File::Object' => 0.05;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.12';
+version '0.13';
 
 # Run.
 WriteAll();

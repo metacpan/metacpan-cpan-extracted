@@ -1,5 +1,8 @@
 Revision history for experimental
 
+0.030     2022-12-10 13:02:15+01:00 Europe/Amsterdam
+          - Adapt to future deprecation of smartmatch
+
 0.029     2022-10-25 23:22:21+02:00 Europe/Amsterdam
           - Fix handling of warning categories that have been removed
 

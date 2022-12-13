@@ -53,6 +53,7 @@ scripts/NestedInt.pl
 scripts/PE.pl
 scripts/README.md
 scripts/Reader.pl
+scripts/Seqclass.pl
 scripts/Stdin.pl
 scripts/Utils.pl
 setup.sh
@@ -89,6 +90,7 @@ t/40_two_files.t
 t/51_basic_seq.t
 t/52_methods_seq.t
 t/53_with_fastxseq.t
+t/54_invalid_seq.t
 t/release-00-pod.t
 t/release-01-pod-coverage.t
 t/release-03-minimum-standards.t

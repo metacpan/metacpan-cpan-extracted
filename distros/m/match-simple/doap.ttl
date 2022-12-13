@@ -15,22 +15,23 @@
 	a                    doap:Project;
 	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap-deps:runtime-recommendation [
-		doap-deps:on "match::simple::XS 0.001"^^doap-deps:CpanId;
+		doap-deps:on "match::simple::XS 0.002"^^doap-deps:CpanId;
 	];
 	doap-deps:runtime-requirement [
 		doap-deps:on "Exporter::Tiny 0.026"^^doap-deps:CpanId;
 	], [ doap-deps:on "List::Util 1.33"^^doap-deps:CpanId ], [ doap-deps:on "Scalar::Util"^^doap-deps:CpanId ], [ doap-deps:on "perl 5.006001"^^doap-deps:CpanId ], [ doap-deps:on "Sub::Infix 0.004"^^doap-deps:CpanId ];
 	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [ doap-deps:on "Test::Fatal"^^doap-deps:CpanId ];
-	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=match-simple>;
+	doap:bug-database    <https://github.com/tobyink/p5-match-simple/issues>;
 	doap:created         "2013-05-19"^^xsd:date;
 	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:download-page   <https://metacpan.org/release/match-simple>;
+	doap:helper          <http://purl.org/NET/cpan-uri/person/bricker>;
 	doap:homepage        <https://metacpan.org/release/match-simple>;
 	doap:license         <http://dev.perl.org/licenses/>;
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "match-simple";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-001>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-002>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-003>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-004>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-005>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-006>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-007_01>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-007_02>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-007_03>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-008>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-009>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-010>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-001>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-002>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-003>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-004>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-005>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-006>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-007_01>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-007_02>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-007_03>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-008>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-009>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-010>, <http://purl.org/NET/cpan-uri/dist/match-simple/v_0-011>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-match-simple>;
@@ -215,6 +216,32 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/match-simple-0.010.tar.gz>;
 	doap:revision        "0.010"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/match-simple/v_0-011>
+	a                    doap:Version;
+	dc:identifier        "match-simple-0.011"^^xsd:string;
+	dc:issued            "2022-12-13"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "Use match::simple::XS 0.002 instead of match::simple::XS 0.001.";
+		], [
+			a doap-changeset:Update;
+			rdfs:label "Overloaded ~~ copes better on versions of Perl which don't support the ~~ operator.";
+		], [
+			a doap-changeset:Update;
+			rdfs:label "General distribution modernization, etc.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/match-simple-0.011.tar.gz>;
+	doap:revision        "0.011"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/bricker>
+	a                    foaf:Person;
+	foaf:name            "Bill Ricker";
+	foaf:nick            "BRICKER";
+	foaf:page            <https://metacpan.org/author/BRICKER>.
 
 <http://purl.org/NET/cpan-uri/person/tobyink>
 	a                    foaf:Person;

@@ -6,7 +6,13 @@ use warnings;
 
 use List::Util qw( max );
 
-our $VERSION = '0.58';
+our $VERSION = '0.59';
+
+## no critic (BuiltinFunctions::ProhibitComplexMappings)
+## no critic (BuiltinFunctions::RequireBlockGrep)
+## no critic (BuiltinFunctions::RequireBlockMap)
+## no critic (ControlStructures::ProhibitCStyleForLoops)
+## no critic (Subroutines::ProhibitManyArgs)
 
 sub any (&@) {
     my $f = shift;
@@ -276,13 +282,16 @@ sub pairwise (&\@\@) {
     # Localise $a, $b
     my ( $caller_a, $caller_b ) = do {
         my $pkg = caller();
+        ## no critic (TestingAndDebugging::ProhibitNoStrict)
         no strict 'refs';
+        ## no critic (ValuesAndExpressions::ProhibitCommaSeparatedStatements)
         \*{ $pkg . '::a' }, \*{ $pkg . '::b' };
     };
 
     # Loop iteration limit
     my $limit = $#A > $#B ? $#A : $#B;
 
+    ## no critic (Variables::RequireInitializationForLocalVars)
     # This map expression is also the return value
     local ( *$caller_a, *$caller_b );
     map {
@@ -499,7 +508,7 @@ List::SomeUtils::PP - Pure Perl implementation for List::SomeUtils
 
 =head1 VERSION
 
-version 0.58
+version 0.59
 
 =head1 DESCRIPTION
 
@@ -516,8 +525,6 @@ Copyright 2013 - 2015 by Jens Rehsack
 =head1 SUPPORT
 
 Bugs may be submitted at L<https://github.com/houseabsolute/List-SomeUtils/issues>.
-
-I am also usually active on IRC as 'autarch' on C<irc://irc.perl.org>.
 
 =head1 SOURCE
 
@@ -547,7 +554,7 @@ Dave Rolsky <autarch@urth.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Dave Rolsky <autarch@urth.org>.
+This software is copyright (c) 2022 by Dave Rolsky <autarch@urth.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

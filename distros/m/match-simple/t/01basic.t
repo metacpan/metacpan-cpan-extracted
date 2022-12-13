@@ -24,8 +24,15 @@ use strict;
 use warnings;
 use Test::More;
 
-use_ok('match::simple');
-use_ok('match::smart');
+{
+	package Local::Foo;
+	::use_ok('match::simple');
+}
+
+{
+	package Local::Bar;
+	::use_ok('match::smart');
+}
 
 done_testing;
 

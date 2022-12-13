@@ -9,8 +9,8 @@ use FindBin;
 use IO::Select;
 use Mojo::File qw(tempfile path);
 use lib ("$FindBin::Bin/lib", "../lib", "lib");
-use Mojo::IOLoop::ReadWriteProcess qw(process);
-use Mojo::IOLoop::ReadWriteProcess::Test::Utils qw(attempt);
+use Mojo::IOLoop::ReadWriteProcess              qw(process);
+use Mojo::IOLoop::ReadWriteProcess::Test::Utils qw(attempt check_bin);
 
 subtest process => sub {
 
@@ -35,7 +35,7 @@ subtest 'process basic functions' => sub {
     $p->start();
     $p->stop();
   };
-  ok $@,   "Error expected";
+  ok $@, "Error expected";
   like $@, qr/Nothing to do/,
     "Process with no code nor execute command, will fail";
 
@@ -88,8 +88,8 @@ subtest 'process is_running()' => sub {
 
   close(PARENT);
   chomp @output;
-  is $output[0], "FOOBARFTW", 'right output from process';
-  is $p->is_running, 0, "Process now is stopped";
+  is $output[0],     "FOOBARFTW", 'right output from process';
+  is $p->is_running, 0,           "Process now is stopped";
 
   # Redefine new code and restart it.
   pipe(PARENT, CHILD);
@@ -106,8 +106,8 @@ subtest 'process is_running()' => sub {
   @output = scalar <PARENT>;
   $p->stop();
   chomp @output;
-  is $output[0], "FOOBAZFTW", 'right output from process';
-  is $p->is_running, 0, "Process now is not running";
+  is $output[0],     "FOOBAZFTW", 'right output from process';
+  is $p->is_running, 0,           "Process now is not running";
   @output = ('');
 
   pipe(PARENT, CHILD);
@@ -129,24 +129,15 @@ subtest 'process is_running()' => sub {
 };
 
 subtest 'process execute()' => sub {
-  my $test_script         = "$FindBin::Bin/data/process_check.sh";
-  my $test_script_sigtrap = "$FindBin::Bin/data/term_trap.sh";
-  plan skip_all =>
-    "You do not seem to have bash, which is required (as for now) for this test"
-    unless -e '/bin/bash';
-  plan skip_all =>
-"You do not seem to have $test_script. The script is required to run the test"
-    unless -e $test_script;
-  plan skip_all =>
-"You do not seem to have $test_script_sigtrap. The script is required to run the test"
-    unless -e $test_script_sigtrap;
-  my $p = Mojo::IOLoop::ReadWriteProcess->new(
+  my $test_script         = check_bin("$FindBin::Bin/data/process_check.sh");
+  my $test_script_sigtrap = check_bin("$FindBin::Bin/data/term_trap.sh");
+  my $p                   = Mojo::IOLoop::ReadWriteProcess->new(
     sleeptime_during_kill => 0.1,
     execute               => $test_script
   )->start();
   is $p->getline,     "TEST normal print\n", 'Get right output from stdout';
   is $p->err_getline, "TEST error print\n",  'Get right output from stderr';
-  is $p->is_running, 1, 'process is still waiting for our input';
+  is $p->is_running,  1, 'process is still waiting for our input';
   $p->write("FOOBAR");
   is $p->read, "you entered FOOBAR\n",
     'process received input and printed it back';
@@ -163,7 +154,7 @@ subtest 'process execute()' => sub {
     ])->start();
   is $p->stdout,      "TEST normal print\n", 'Get right output from stdout';
   is $p->err_getline, "TEST error print\n",  'Get right output from stderr';
-  is $p->is_running, 1, 'process is still waiting for our input';
+  is $p->is_running,  1, 'process is still waiting for our input';
   $p->write("FOOBAR");
   is $p->getline, "you entered FOOBAR\n",
     'process received input and printed it back';
@@ -178,7 +169,7 @@ subtest 'process execute()' => sub {
   )->args([qw(FOO BAZ)])->start();
   is $p->stdout,      "TEST normal print\n", 'Get right output from stdout';
   is $p->err_getline, "TEST error print\n",  'Get right output from stderr';
-  is $p->is_running, 1, 'process is still waiting for our input';
+  is $p->is_running,  1, 'process is still waiting for our input';
   $p->write("FOOBAR");
   is $p->getline, "you entered FOOBAR\n",
     'process received input and printed it back';
@@ -223,9 +214,10 @@ subtest 'process execute()' => sub {
     max_kill_attempts     => -4,
   );    # ;)
   $p->start();
+  is($p->read_stdout(), "term_trap.sh started\n");
   $p->stop();
-  is $p->is_running, 1, 'process is still running';
-  is $p->_status, undef, 'no status yet';
+  is $p->is_running, 1,     'process is still running';
+  is $p->_status,    undef, 'no status yet';
   my $err = ${(@{$p->error})[0]};
   my $exp = qr/Could not kill process/;
   like $err, $exp, 'Error is not empty if process could not be killed';
@@ -266,8 +258,8 @@ subtest 'process execute()' => sub {
     pidfile               => $pidfile
   )->start();
   my $pid = path($pidfile)->slurp();
-  is -e $pidfile, 1, 'Pidfile is there!';
-  is $pid, $p->pid, "Pidfile was correctly written";
+  is -e $pidfile, 1,       'Pidfile is there!';
+  is $pid,        $p->pid, "Pidfile was correctly written";
   $p->stop();
   is -e $pidfile, undef, 'Pidfile got removed after stop()';
 
@@ -283,8 +275,8 @@ subtest 'process execute()' => sub {
   )->start();
   $p->write_pidfile($pidfile);
   $pid = path($pidfile)->slurp();
-  is -e $pidfile, 1, 'Pidfile is there!';
-  is $pid, $p->pid, "Pidfile was correctly written";
+  is -e $pidfile, 1,       'Pidfile is there!';
+  is $pid,        $p->pid, "Pidfile was correctly written";
   $p->stop();
   is -e $pidfile, undef, 'Pidfile got removed after stop()';
 
@@ -301,10 +293,15 @@ subtest 'process execute()' => sub {
   $p->stop();
 };
 
-subtest 'process(execute =>"/usr/bin/true")' => sub {
-  plan skip_all => "Missing '/usr/bin/true'" unless -e '/usr/bin/true';
+subtest 'process(execute => /bin/true)' => sub {
+  check_bin('/bin/true');
 
-  is(process(execute => '/usr/bin/true')->quirkiness(1)->start()->wait_stop()->exit_status(), 0, 'Simple exec of "/usr/bin/true" return 0');
+  is(
+    process(execute => '/bin/true')->quirkiness(1)->start()->wait_stop()
+      ->exit_status(),
+    0,
+    'Simple exec of /bin/true return 0'
+  );
 };
 
 subtest 'process code()' => sub {
@@ -464,14 +461,11 @@ subtest 'process code()' => sub {
   $p->write("a");
   $p->wait_stop();
   like $p->stderr_all, qr/TEST error print/, 'read all from stderr works';
-  is $p->read_all,     '',                   'stdout is empty';
+  is $p->read_all, '', 'stdout is empty';
 };
 
 subtest stop_whole_process_group_gracefully => sub {
-  my $test_script = "$FindBin::Bin/data/simple_fork.pl";
-  plan skip_all =>
-    "You do not seem to have $test_script which is required to run the test"
-    unless -e $test_script;
+  my $test_script = check_bin("$FindBin::Bin/data/simple_fork.pl");
 
   # run the "term_trap.pl" script and its sub processes within its own
   # process group
@@ -546,46 +540,88 @@ process';
 
 subtest 'process_args' => sub {
   my $code = sub {
-    shift; 
-    print $_.$/ for(@_);
+    shift;
+    print "$_$/" for @_;
   };
 
-  my $p = Mojo::IOLoop::ReadWriteProcess->new($code, args => '0' )->start->wait_stop();
+  my $p = Mojo::IOLoop::ReadWriteProcess->new($code, args => '0')
+    ->start->wait_stop();
   is($p->read_all_stdout(), "0$/", '1) False scalar value was given as args.');
 
-  $p = Mojo::IOLoop::ReadWriteProcess->new($code)->args('0')->start->wait_stop();
+  $p
+    = Mojo::IOLoop::ReadWriteProcess->new($code)->args('0')->start->wait_stop();
   is($p->read_all_stdout(), "0$/", '2) False scalar value was given as args.');
 
-  $p = Mojo::IOLoop::ReadWriteProcess->new($code, args => [(0..3)] )->start->wait_stop();
+  $p = Mojo::IOLoop::ReadWriteProcess->new($code, args => [(0 .. 3)])
+    ->start->wait_stop();
   is($p->read_all_stdout(), "0$/1$/2$/3$/", '1) Args given as arrayref.');
 
-  $p = Mojo::IOLoop::ReadWriteProcess->new($code)->args([(0..3)])->start->wait_stop();
+  $p = Mojo::IOLoop::ReadWriteProcess->new($code)->args([(0 .. 3)])
+    ->start->wait_stop();
   is($p->read_all_stdout(), "0$/1$/2$/3$/", '2) Args given as arrayref.');
 };
 
 subtest 'process in process' => sub {
-    my $p = process(sub {
-        is( process(execute => '/usr/bin/true')->quirkiness(1)->start()->wait_stop()->exit_status(), 0, 'process(execute) from process(code) -- retval check true');
-        is( process(execute => '/usr/bin/false')->quirkiness(1)->start()->wait_stop()->exit_status(), 1, 'process(execute) from process(code) -- retval check false');
-        is( process(sub { print 'sub-sub-process'})->start()->wait_stop()->read_all_stdout, 'sub-sub-process', 'process(code) works from process(code)');
-        print 'DONE';
+  check_bin('/bin/true');
+  check_bin('/bin/false');
+
+  my $p = process(
+    sub {
+      is(
+        process(execute => '/bin/true')->quirkiness(1)->start()->wait_stop()
+          ->exit_status(),
+        0,
+        'process(execute) from process(code) -- retval check true'
+      );
+      is(
+        process(execute => '/bin/false')->quirkiness(1)->start()->wait_stop()
+          ->exit_status(),
+        1,
+        'process(execute) from process(code) -- retval check false'
+      );
+      is(
+        process(sub { print 'sub-sub-process' })->start()->wait_stop()
+          ->read_all_stdout,
+        'sub-sub-process',
+        'process(code) works from process(code)'
+      );
+      print 'DONE';
     })->start()->wait_stop();
 
-    is ($p->read_all_stdout(), 'DONE', "Use ReadWriteProcess inside of ReadWriteProcess(code=>'')");
+  is($p->read_all_stdout(), 'DONE',
+    "Use ReadWriteProcess inside of ReadWriteProcess(code=>'')");
 };
 
 subtest 'execute exeption handling' => sub {
-    throws_ok {
-        process(execute => '/I/do/not/exist')->start()->wait_stop()->exit_status();
-    } qr%/I/do/not/exist%, 'Execute throw exception, if executable does not exists';
+  throws_ok {
+    process(execute => '/I/do/not/exist')->start()->wait_stop()->exit_status();
+  }
+  qr%/I/do/not/exist%, 'Execute throw exception, if executable does not exists';
 
-    my $p = process(execute => 'sleep 0.2')->start();
-    attempt {
-        attempts  => 20,
-        condition => sub { defined($p->exit_status)},
-    };
-    is ($p->is_running(), 0, 'Process not running');
-    is ($p->exit_status(), 0, 'Exit status is 0');
+  my $p = process(execute => 'sleep 0.2')->start();
+  attempt {attempts => 20, condition => sub { defined($p->exit_status) },};
+  is($p->is_running(),  0, 'Process not running');
+  is($p->exit_status(), 0, 'Exit status is 0');
+};
+
+subtest 'SIG_CHLD handler in spawned process' => sub {
+  my $simple_rwp      = check_bin("$FindBin::Bin/data/simple_rwp.pl");
+  my $sigchld_handler = check_bin("$FindBin::Bin/data/sigchld_handler.pl");
+
+  # use `perl <script>` here, as Github ci action place the used perl executable
+  # somewhere like /opt/hostedtoolcache/perl/<version>/<arch>/bin/perl so
+  # /usr/bin/perl wouldn't have all needed dependencies
+  is(
+    process(execute => 'perl')->args([$simple_rwp])->start()->wait_stop()
+      ->exit_status(),
+    0,
+    'simple_rwp.pl exit with 0'
+  );
+
+  my $p = process(execute => $sigchld_handler);
+  is($p->start()->wait_stop()->exit_status(),
+    0, 'sigchld_handler.pl exit with 0');
+  like($p->read_all_stdout, qr/SIG_CHLD/, "SIG_CHLD handler was executed");
 };
 
 done_testing;

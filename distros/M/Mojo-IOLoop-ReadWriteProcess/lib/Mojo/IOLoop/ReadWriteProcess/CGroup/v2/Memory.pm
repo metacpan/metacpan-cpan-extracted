@@ -18,9 +18,9 @@ has cgroup => sub { Mojo::IOLoop::ReadWriteProcess::CGroup::v2->new };
 
 sub current      { shift->cgroup->_list(CURRENT_INTERFACE) }
 sub swap_current { shift->cgroup->_list(SWAP_CURRENT_INTERFACE) }
-sub low          { shift->cgroup->_setget(LOW_INTERFACE, @_) }
-sub high         { shift->cgroup->_setget(HIGH_INTERFACE, @_) }
-sub max          { shift->cgroup->_setget(MAX_INTERFACE, @_) }
+sub low          { shift->cgroup->_setget(LOW_INTERFACE,      @_) }
+sub high         { shift->cgroup->_setget(HIGH_INTERFACE,     @_) }
+sub max          { shift->cgroup->_setget(MAX_INTERFACE,      @_) }
 sub swap_max     { shift->cgroup->_setget(SWAP_MAX_INTERFACE, @_) }
 sub events       { shift->cgroup->_list(EVENTS_INTERFACE) }
 sub stat         { shift->cgroup->_list(STAT_INTERFACE) }

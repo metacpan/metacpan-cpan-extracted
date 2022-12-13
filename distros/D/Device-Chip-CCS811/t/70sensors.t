@@ -71,7 +71,7 @@ my %sensors = map { $_->name => $_ } @sensors;
 # failures are not cached
 {
    $adapter->expect_write_then_read( "\x02", 6 )
-      ->fails( "I2C read timeout\n" );
+      ->will_fail( "I2C read timeout\n" );
 
    my $fT = $sensors{eCO2}->read;
    my $fP = $sensors{eTVOC}->read;

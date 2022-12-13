@@ -2,7 +2,7 @@ package App::Rakubrew;
 use strict;
 use warnings;
 use 5.010;
-our $VERSION = '30';
+our $VERSION = '31';
 
 use Encode::Locale qw(env);
 if (-t) {
@@ -238,7 +238,7 @@ EOL
             }
 
             my $name = "$impl-$ver";
-            $name = $impl if $impl eq 'moar-blead' && $ver eq 'master';
+            $name = $impl if $impl eq 'moar-blead' && $ver eq 'main';
 
             if ($impl && $impl eq 'all') {
                 for (App::Rakubrew::Variables::available_backends()) {

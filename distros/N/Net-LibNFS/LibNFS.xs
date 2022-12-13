@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <math.h>
+#include <inttypes.h>
 
 // For some reason sys/time.h causes funky arrow-pointer errors
 // in Strawberry Perl …
@@ -150,7 +151,7 @@ typedef SV* (*_cb_parser) (pTHX_ void*, const char*, int, void *, SV**, void*);
 
 typedef struct {
 #ifdef MULTIPLICITY
-    pTHX;
+    tTHX aTHX;
 #endif
     SV* cb;
     void* arg;
@@ -188,7 +189,7 @@ static void __do_perl_callback_internal(
     perl_cb_s* cb_sp = (perl_cb_s*) private_data;
 
 #ifdef MULTIPLICITY
-    pTHX = cb_sp->aTHX;
+    tTHX aTHX = cb_sp->aTHX;
 #endif
 
     SV* err_sv = NULL;
@@ -660,12 +661,19 @@ typedef struct {
 
 static const _int_setting_s INT_SETTINGS[] = {
     { .name = "tcp_syncnt", .func = nfs_set_tcp_syncnt },
-    { .name = "uid", .func = nfs_set_uid },
-    { .name = "gid", .func = nfs_set_gid },
     { .name = "debug", .func = nfs_set_debug },
+#ifdef NLNFS_NFS_SET_AUTO_TRAVERSE_MOUNTS
+    { .name = "auto_traverse_mounts", .func = nfs_set_auto_traverse_mounts },
+#endif
     { .name = "dircache", .func = nfs_set_dircache },
     { .name = "autoreconnect", .func = nfs_set_autoreconnect },
     { .name = "timeout", .func = nfs_set_timeout },
+#ifdef NLNFS_NFS_SET_NFSPORT
+    { .name = "nfsport", .func = nfs_set_nfsport },
+#endif
+#ifdef NLNFS_NFS_SET_MOUNTPORT
+    { .name = "mountport", .func = nfs_set_mountport },
+#endif
 };
 
 static const unsigned INT_SETTINGS_COUNT = sizeof(INT_SETTINGS) / sizeof(_int_setting_s);
@@ -680,6 +688,8 @@ typedef struct {
 } _u32_setting_s;
 
 static const _u32_setting_s U32_SETTINGS[] = {
+    { .name = "uid", .func = (_lnfs_u32_setter) nfs_set_uid },
+    { .name = "gid", .func = (_lnfs_u32_setter) nfs_set_gid },
     { .name = "pagecache", .func = nfs_set_pagecache },
     { .name = "pagecache_ttl", .func = nfs_set_pagecache_ttl },
     { .name = "readahead", .func = nfs_set_readahead },
@@ -792,6 +802,9 @@ static inline void _croak_if_buffer_is_reference( pTHX_ SV* buf_sv ) {
         croak("Given buffer must be a plain scalar, not %" SVf, buf_sv);
     }
 }
+
+#define _croak_if_uv_exceeds_u32(name, value) \
+    if (value > UINT32_MAX) croak("%s: value (%" UVuf ") exceeds maximum (%" PRIu32 ")", name, value, UINT32_MAX);
 
 // ----------------------------------------------------------------------
 
@@ -965,7 +978,15 @@ static void _set_unix_authn(pTHX_ struct nfs_context* nfs, SV* value_sv) {
         SV** svp = av_fetch(authn_av, n, 0);
         assert(svp);
 
-        nums[n] = exs_SvUV(*svp);
+        UV value = exs_SvUV(*svp);
+
+        // The RPC protocol transmits these values using 4 bytes.
+        // Thus, u32 is the maximum, despite libnfs’s use of plain int
+        // for these values.
+        //
+        _croak_if_uv_exceeds_u32("unix_authn", value);
+
+        nums[n] = value;
     }
 
     struct AUTH* auth = libnfs_authunix_create(UNIX_AUTHN_MACHINE_NAME, nums[0], nums[1], nums_count - 2, 2 + nums);
@@ -973,6 +994,48 @@ static void _set_unix_authn(pTHX_ struct nfs_context* nfs, SV* value_sv) {
 
     nfs_set_auth(nfs, auth);
 }
+
+#ifdef NLNFS_NFS_SET_READDIR_MAX_BUFFER_SIZE
+
+#define MAX_BUFFER_SIZE_ARRAY_SIZE 2
+#define READDIR_BUFFER_SETTING "readdir_buffer"
+
+static void _set_readdir_max_buffer_size(pTHX_ struct nfs_context* nfs, SV* value_sv) {
+
+    uint32_t dircount, maxcount;
+
+    if (SvROK(value_sv) && (SvTYPE(SvRV(value_sv)) == SVt_PVAV)) {
+        AV* av = (AV*) SvRV(value_sv);
+        uint32_t nums_count = 1 + av_len(av);
+        if (nums_count != MAX_BUFFER_SIZE_ARRAY_SIZE) croak("“%s” must contain exactly %d numbers", READDIR_BUFFER_SETTING, MAX_BUFFER_SIZE_ARRAY_SIZE);
+
+        uint32_t nums[MAX_BUFFER_SIZE_ARRAY_SIZE];
+
+        for (unsigned n=0; n<nums_count; n++) {
+            SV** svp = av_fetch(av, n, 0);
+            assert(svp);
+
+            UV value = exs_SvUV(*svp);
+            _croak_if_uv_exceeds_u32(READDIR_BUFFER_SETTING, value);
+
+            nums[n] = value;
+        }
+
+        dircount = nums[0];
+        maxcount = nums[1];
+    } else if (SvROK(value_sv)) {
+        croak("“%s” must be an array reference or scalar, not %" SVf, READDIR_BUFFER_SETTING, value_sv);
+    } else {
+        UV value = exs_SvUV(value_sv);
+        _croak_if_uv_exceeds_u32(READDIR_BUFFER_SETTING, value);
+
+        dircount = value;
+        maxcount = value;
+    }
+
+    nfs_set_readdir_max_buffer_size(nfs, dircount, maxcount);
+}
+#endif
 
 // ----------------------------------------------------------------------
 
@@ -1001,14 +1064,28 @@ find_local_servers ()
             XSRETURN_EMPTY;
         }
 
-        struct nfs_server_list *cur_srv = servers;
+        struct nfs_server_list *srvlist = servers;
+        struct nfs_server_list *cur_srv = srvlist;
+
+        unsigned srvcount = 0;
 
         while (cur_srv) {
-            XPUSHs( newSVpv(cur_srv->addr, 0) );
+            srvcount++;
             cur_srv = cur_srv->next;
         }
 
-        free_nfs_srvr_list(servers);
+        cur_srv = srvlist;
+
+        if (srvcount) {
+            EXTEND(SP, srvcount);
+
+            while (cur_srv) {
+                mPUSHs( newSVpv(cur_srv->addr, 0) );
+                cur_srv = cur_srv->next;
+            }
+        }
+
+        free_nfs_srvr_list(srvlist);
 
 void
 mount_getexports (SV* server_sv, SV* timeout_sv=&PL_sv_undef)
@@ -1110,9 +1187,7 @@ set (SV* self_sv, ...)
 
                 UV value = exs_SvUV(value_sv);
 
-                if (value > UINT32_MAX) {
-                    croak("%s: value (%" UVuf ") exceeds maximum (%u)", param, value, UINT32_MAX);
-                }
+                _croak_if_uv_exceeds_u32(param, value);
 
                 U32_SETTINGS[ss].func(perl_nfs->nfs, value);
 
@@ -1155,6 +1230,14 @@ set (SV* self_sv, ...)
 
                 continue;
             }
+#ifdef NLNFS_NFS_SET_READDIR_MAX_BUFFER_SIZE
+
+            if (!strcmp(param, READDIR_BUFFER_SETTING)) {
+                _set_readdir_max_buffer_size(aTHX_ perl_nfs->nfs, value_sv);
+
+                continue;
+            }
+#endif
 
             // string --------------------------------------------------
 
@@ -2002,17 +2085,29 @@ read (SV* self_sv)
         nlnfs_s* perl_nfs = exs_structref_ptr(nfs_sv);
 
         unsigned retcount = 0;
-        struct nfsdirent* dent;
+        struct nfsdirent* dent = nfs_readdir( perl_nfs->nfs, nfs_dh->nfsdh );
+        struct nfsdirent* cur_dent = dent;
 
-        while (1) {
-            dent = nfs_readdir( perl_nfs->nfs, nfs_dh->nfsdh );
-
-            if (!dent) break;
-
-            XPUSHs(_ptr_to_perl_dirent_obj(aTHX_ dent));
+        while (cur_dent) {
             retcount++;
-
             if (GIMME_V != G_ARRAY) break;
+
+            cur_dent = cur_dent->next;
+        }
+
+        if (retcount) {
+            EXTEND(SP, retcount);
+
+            unsigned retcount_copy = retcount;
+
+            while (1) {
+                mPUSHs(_ptr_to_perl_dirent_obj(aTHX_ dent));
+
+                retcount_copy--;
+                if (!retcount_copy) break;
+
+                dent = nfs_readdir( perl_nfs->nfs, nfs_dh->nfsdh );
+            }
         }
 
         XSRETURN(retcount);

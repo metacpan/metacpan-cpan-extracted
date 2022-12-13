@@ -21,7 +21,7 @@ configure_requires:
   ExtUtils::MakeMaker: '0'
   Text::ParseWords: '0'
 dynamic_config: 1
-generated_by: 'Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.028, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,28 +30,32 @@ name: List-SomeUtils
 provides:
   List::SomeUtils:
     file: lib/List/SomeUtils.pm
-    version: '0.58'
+    version: '0.59'
   List::SomeUtils::PP:
     file: lib/List/SomeUtils/PP.pm
-    version: '0.58'
+    version: '0.59'
 requires:
   Carp: '0'
   Exporter: '0'
   List::Util: '0'
-  Module::Implementation: '0'
+  Module::Implementation: '0.04'
   perl: '5.006'
   strict: '0'
   vars: '0'
   warnings: '0'
 resources:
   bugtracker: https://github.com/houseabsolute/List-SomeUtils/issues
-  homepage: http://metacpan.org/release/List-SomeUtils
+  homepage: https://metacpan.org/release/List-SomeUtils
   repository: git://github.com/houseabsolute/List-SomeUtils.git
-version: '0.58'
+version: '0.59'
 x_Dist_Zilla:
   perl:
-    version: '5.026002'
+    version: '5.032001'
   plugins:
+    -
+      class: Dist::Zilla::Plugin::DROLSKY::BundleAuthordep
+      name: '@DROLSKY/DROLSKY::BundleAuthordep'
+      version: '1.22'
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
       config:
@@ -72,27 +76,27 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::GatherDir:
           include_untracked: 0
       name: '@DROLSKY/Git::GatherDir'
-      version: '2.046'
+      version: '2.048'
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@DROLSKY/ManifestSkip'
-      version: '6.012'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::License
       name: '@DROLSKY/License'
-      version: '6.012'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@DROLSKY/ExecDir'
-      version: '6.012'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@DROLSKY/ShareDir'
-      version: '6.012'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@DROLSKY/Manifest'
-      version: '6.012'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::CheckVersionIncrement
       name: '@DROLSKY/CheckVersionIncrement'
@@ -100,20 +104,20 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@DROLSKY/TestRelease'
-      version: '6.012'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@DROLSKY/ConfirmRelease'
-      version: '6.012'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@DROLSKY/UploadToCPAN'
-      version: '6.012'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::VersionFromMainModule
       config:
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000033'
+          Module::Metadata: '1.000037'
           version: '0.006'
       name: '@DROLSKY/VersionFromMainModule'
       version: '0.04'
@@ -124,7 +128,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: '@DROLSKY/AutoPrereqs'
-      version: '6.012'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::CopyFilesFromBuild
       name: '@DROLSKY/CopyFilesFromBuild'
@@ -132,18 +136,18 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::GitHub::Meta
       name: '@DROLSKY/GitHub::Meta'
-      version: '0.47'
+      version: '0.48'
     -
       class: Dist::Zilla::Plugin::GitHub::Update
       config:
         Dist::Zilla::Plugin::GitHub::Update:
           metacpan: 1
       name: '@DROLSKY/GitHub::Update'
-      version: '0.47'
+      version: '0.48'
     -
       class: Dist::Zilla::Plugin::MetaResources
       name: '@DROLSKY/MetaResources'
-      version: '6.012'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::MetaProvides::Package
       config:
@@ -152,7 +156,7 @@ x_Dist_Zilla:
             -
               class: Dist::Zilla::Plugin::FinderCode
               name: '@DROLSKY/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-              version: '6.012'
+              version: '6.028'
           include_underscores: 0
         Dist::Zilla::Role::MetaProvider::Provider:
           $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002004'
@@ -160,7 +164,7 @@ x_Dist_Zilla:
           inherit_version: '1'
           meta_noindex: '1'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000033'
+          Module::Metadata: '1.000037'
           version: '0.006'
       name: '@DROLSKY/MetaProvides::Package'
       version: '2.004003'
@@ -171,19 +175,19 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@DROLSKY/MetaConfig'
-      version: '6.012'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@DROLSKY/MetaJSON'
-      version: '6.012'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@DROLSKY/MetaYAML'
-      version: '6.012'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: '@DROLSKY/NextRelease'
-      version: '6.012'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -191,15 +195,15 @@ x_Dist_Zilla:
           phase: test
           type: requires
       name: '@DROLSKY/Test::More with subtest'
-      version: '6.012'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
         Dist::Zilla::Plugin::Prereqs:
           phase: develop
           type: requires
-      name: '@DROLSKY/Modules for use with tidyall'
-      version: '6.012'
+      name: '@DROLSKY/Tools for use with precious'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -207,7 +211,7 @@ x_Dist_Zilla:
           phase: develop
           type: requires
       name: '@DROLSKY/Test::Version which fixes https://github.com/plicease/Test-Version/issues/7'
-      version: '6.012'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::PromptIfStale
       config:
@@ -220,7 +224,7 @@ x_Dist_Zilla:
           run_under_travis: 0
           skip: []
       name: '@DROLSKY/Dist::Zilla::PluginBundle::DROLSKY'
-      version: '0.055'
+      version: '0.057'
     -
       class: Dist::Zilla::Plugin::PromptIfStale
       config:
@@ -231,14 +235,18 @@ x_Dist_Zilla:
           phase: release
           run_under_travis: 0
           skip:
+            - Dist::Zilla::Plugin::DROLSKY::BundleAuthordep
             - Dist::Zilla::Plugin::DROLSKY::Contributors
             - Dist::Zilla::Plugin::DROLSKY::Git::CheckFor::CorrectBranch
             - Dist::Zilla::Plugin::DROLSKY::License
-            - Dist::Zilla::Plugin::DROLSKY::TidyAll
+            - Dist::Zilla::Plugin::DROLSKY::MakeMaker
+            - Dist::Zilla::Plugin::DROLSKY::PerlLinterConfigFiles
+            - Dist::Zilla::Plugin::DROLSKY::Precious
+            - Dist::Zilla::Plugin::DROLSKY::Test::Precious
             - Dist::Zilla::Plugin::DROLSKY::WeaverConfig
             - Pod::Weaver::PluginBundle::DROLSKY
       name: '@DROLSKY/PromptIfStale'
-      version: '0.055'
+      version: '0.057'
     -
       class: Dist::Zilla::Plugin::Test::Pod::Coverage::Configurable
       name: '@DROLSKY/Test::Pod::Coverage::Configurable'
@@ -253,96 +261,58 @@ x_Dist_Zilla:
           spell_cmd: ''
           stopwords:
             - ARRAYn
-            - ARRAYn
-            - Anno
             - Anno
             - AnnoCPAN
-            - AnnoCPAN
-            - Branno
             - Branno
             - DROLSKY
             - "DROLSKY's"
             - EXPR
-            - EXPR
-            - Filmer
             - Filmer
             - Inkster
             - Jens
             - KEYFUNC
-            - KEYFUNC
             - LMU
             - MULTICALL
-            - MULTICALL
             - McCauley
-            - McCauley
-            - Muey
             - Muey
             - PRs
             - Parseval
             - PayPal
             - Purkis
-            - Purkis
-            - Rabbitson
             - Rabbitson
             - Rehsack
-            - Rezic
             - Rezic
             - Rolsky
             - "Rolsky's"
             - Roode
-            - Roode
-            - Siegel
             - Siegel
             - Signes
             - Slaven
-            - Slaven
             - Summersault
-            - Summersault
-            - TODO
             - TODO
             - Tassilo
             - Tatham
-            - Tatham
             - Thegler
-            - Thegler
-            - bsearchidx
             - bsearchidx
             - de
             - drolsky
             - firstidx
-            - firstidx
-            - firstres
             - firstres
             - firstval
-            - firstval
-            - glitchy
             - glitchy
             - lastidx
-            - lastidx
-            - lastres
             - lastres
             - lastval
-            - lastval
-            - listify
             - listify
             - minmax
-            - minmax
-            - natatime
             - natatime
             - notall
-            - notall
-            - onlyidx
             - onlyidx
             - onlyres
-            - onlyres
             - onlyval
-            - onlyval
-            - refactor
             - refactor
             - rehsackATcpan
             - thusly
-            - thusly
-            - uniq
             - uniq
             - von
           wordlist: Pod::Wordlist
@@ -351,18 +321,18 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@DROLSKY/PodSyntaxTests'
-      version: '6.012'
-    -
-      class: Dist::Zilla::Plugin::DROLSKY::RunExtraTests
-      config:
-        Dist::Zilla::Role::TestRunner:
-          default_jobs: 24
-      name: '@DROLSKY/DROLSKY::RunExtraTests'
-      version: '1.01'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::MojibakeTests
       name: '@DROLSKY/MojibakeTests'
       version: '0.8'
+    -
+      class: Dist::Zilla::Plugin::RunExtraTests
+      config:
+        Dist::Zilla::Role::TestRunner:
+          default_jobs: '12'
+      name: '@DROLSKY/RunExtraTests'
+      version: '0.029'
     -
       class: Dist::Zilla::Plugin::Test::CPAN::Changes
       config:
@@ -403,11 +373,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Test::Portability:
           options: ''
       name: '@DROLSKY/Test::Portability'
-      version: '2.001000'
-    -
-      class: Dist::Zilla::Plugin::Test::TidyAll
-      name: '@DROLSKY/Test::TidyAll'
-      version: '0.04'
+      version: '2.001001'
     -
       class: Dist::Zilla::Plugin::Test::Compile
       config:
@@ -429,26 +395,30 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Test::ReportPrereqs
       name: '@DROLSKY/Test::ReportPrereqs'
-      version: '0.027'
+      version: '0.028'
     -
       class: Dist::Zilla::Plugin::Test::Version
       name: '@DROLSKY/Test::Version'
       version: '1.09'
     -
+      class: Dist::Zilla::Plugin::DROLSKY::Test::Precious
+      name: '@DROLSKY/DROLSKY::Test::Precious'
+      version: '1.22'
+    -
       class: Dist::Zilla::Plugin::DROLSKY::Contributors
       name: '@DROLSKY/DROLSKY::Contributors'
-      version: '1.01'
+      version: '1.22'
     -
       class: Dist::Zilla::Plugin::Git::Contributors
       config:
         Dist::Zilla::Plugin::Git::Contributors:
-          git_version: 2.20.1
+          git_version: 2.38.1
           include_authors: 0
           include_releaser: 1
           order_by: name
           paths: []
       name: '@DROLSKY/Git::Contributors'
-      version: '0.035'
+      version: '0.036'
     -
       class: Dist::Zilla::Plugin::SurgicalPodWeaver
       config:
@@ -462,79 +432,79 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Plugin::EnsurePod5
               name: '@CorePrep/EnsurePod5'
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Plugin::H1Nester
               name: '@CorePrep/H1Nester'
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Plugin::SingleEncoding
               name: '@DROLSKY/SingleEncoding'
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Plugin::Transformer
               name: '@DROLSKY/List'
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Plugin::Transformer
               name: '@DROLSKY/Verbatim'
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Region
               name: '@DROLSKY/header'
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Name
               name: '@DROLSKY/Name'
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Version
               name: '@DROLSKY/Version'
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Region
               name: '@DROLSKY/prelude'
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Generic
               name: SYNOPSIS
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Generic
               name: DESCRIPTION
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Generic
               name: OVERVIEW
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Collect
               name: ATTRIBUTES
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Collect
               name: METHODS
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Collect
               name: FUNCTIONS
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Collect
               name: TYPES
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Leftovers
               name: '@DROLSKY/Leftovers'
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Region
               name: '@DROLSKY/postlude'
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::GenerateSection
               name: '@DROLSKY/generate SUPPORT'
-              version: '1.06'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::AllowOverride
               name: '@DROLSKY/allow override SUPPORT'
@@ -542,15 +512,15 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::GenerateSection
               name: '@DROLSKY/generate SOURCE'
-              version: '1.06'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::GenerateSection
               name: '@DROLSKY/generate DONATIONS'
-              version: '1.06'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Authors
               name: '@DROLSKY/Authors'
-              version: '4.015'
+              version: '4.018'
             -
               class: Pod::Weaver::Section::Contributors
               name: '@DROLSKY/Contributors'
@@ -558,17 +528,21 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::Legal
               name: '@DROLSKY/Legal'
-              version: '4.015'
+              version: '4.018'
+            -
+              class: Pod::Weaver::Section::AllowOverride
+              name: '@DROLSKY/allow override Legal'
+              version: '0.05'
             -
               class: Pod::Weaver::Section::Region
               name: '@DROLSKY/footer'
-              version: '4.015'
+              version: '4.018'
       name: '@DROLSKY/SurgicalPodWeaver'
       version: '0.0023'
     -
       class: Dist::Zilla::Plugin::DROLSKY::WeaverConfig
       name: '@DROLSKY/DROLSKY::WeaverConfig'
-      version: '1.01'
+      version: '1.22'
     -
       class: Dist::Zilla::Plugin::ReadmeAnyFromPod
       config:
@@ -591,7 +565,7 @@ x_Dist_Zilla:
           repo_root: .
           version: '0.009'
       name: '@DROLSKY/Generate CONTRIBUTING.md'
-      version: '0.014'
+      version: '0.015'
     -
       class: Dist::Zilla::Plugin::GenerateFile::FromShareDir
       config:
@@ -607,23 +581,23 @@ x_Dist_Zilla:
           repo_root: .
           version: '0.009'
       name: '@DROLSKY/Generate CODE_OF_CONDUCT.md'
-      version: '0.014'
+      version: '0.015'
     -
       class: Dist::Zilla::Plugin::InstallGuide
       config:
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000033'
+          Module::Metadata: '1.000037'
           version: '0.006'
       name: '@DROLSKY/InstallGuide'
-      version: '1.200013'
+      version: '1.200014'
     -
       class: Dist::Zilla::Plugin::CPANFile
       name: '@DROLSKY/CPANFile'
-      version: '6.012'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::DROLSKY::License
       name: '@DROLSKY/DROLSKY::License'
-      version: '1.01'
+      version: '1.22'
     -
       class: Dist::Zilla::Plugin::CheckStrictVersion
       name: '@DROLSKY/CheckStrictVersion'
@@ -635,22 +609,22 @@ x_Dist_Zilla:
           finder:
             - ':InstallModules'
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000033'
+          Module::Metadata: '1.000037'
           version: '0.006'
       name: '@DROLSKY/CheckSelfDependency'
       version: '0.011'
     -
       class: Dist::Zilla::Plugin::CheckPrereqsIndexed
       name: '@DROLSKY/CheckPrereqsIndexed'
-      version: '0.020'
+      version: '0.021'
     -
       class: Dist::Zilla::Plugin::DROLSKY::Git::CheckFor::CorrectBranch
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.20.1
+          git_version: 2.38.1
           repo_root: .
       name: '@DROLSKY/DROLSKY::Git::CheckFor::CorrectBranch'
-      version: '1.01'
+      version: '1.22'
     -
       class: Dist::Zilla::Plugin::EnsureChangesHasContent
       name: '@DROLSKY/EnsureChangesHasContent'
@@ -659,14 +633,22 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
       config:
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.20.1
+          git_version: 2.38.1
           repo_root: .
       name: '@DROLSKY/Git::CheckFor::MergeConflicts'
       version: '0.014'
     -
-      class: Dist::Zilla::Plugin::DROLSKY::TidyAll
-      name: '@DROLSKY/DROLSKY::TidyAll'
-      version: '1.01'
+      class: Dist::Zilla::Plugin::DROLSKY::PerlLinterConfigFiles
+      name: '@DROLSKY/DROLSKY::PerlLinterConfigFiles'
+      version: '1.22'
+    -
+      class: Dist::Zilla::Plugin::DROLSKY::DevTools
+      name: '@DROLSKY/DROLSKY::DevTools'
+      version: '1.22'
+    -
+      class: Dist::Zilla::Plugin::DROLSKY::Precious
+      name: '@DROLSKY/DROLSKY::Precious'
+      version: '1.22'
     -
       class: Dist::Zilla::Plugin::Git::Check
       config:
@@ -681,20 +663,21 @@ x_Dist_Zilla:
             - Makefile.PL
             - README.md
             - cpanfile
-            - tidyall.ini
+            - precious.toml
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.20.1
+          git_version: 2.38.1
           repo_root: .
       name: '@DROLSKY/Git::Check'
-      version: '2.046'
+      version: '2.048'
     -
       class: Dist::Zilla::Plugin::Git::Commit
       config:
         Dist::Zilla::Plugin::Git::Commit:
           add_files_in: []
           commit_msg: v%V%n%n%c
+          signoff: 0
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
             - CODE_OF_CONDUCT.md
@@ -704,16 +687,16 @@ x_Dist_Zilla:
             - Makefile.PL
             - README.md
             - cpanfile
-            - tidyall.ini
+            - precious.toml
           allow_dirty_match: []
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.20.1
+          git_version: 2.38.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@DROLSKY/Commit generated files'
-      version: '2.046'
+      version: '2.048'
     -
       class: Dist::Zilla::Plugin::Git::Tag
       config:
@@ -721,16 +704,16 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.58
+          tag: v0.59
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.20.1
+          git_version: 2.38.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@DROLSKY/Git::Tag'
-      version: '2.046'
+      version: '2.048'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -739,10 +722,10 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.20.1
+          git_version: 2.38.1
           repo_root: .
       name: '@DROLSKY/Git::Push'
-      version: '2.046'
+      version: '2.048'
     -
       class: Dist::Zilla::Plugin::BumpVersionAfterRelease
       config:
@@ -760,6 +743,7 @@ x_Dist_Zilla:
         Dist::Zilla::Plugin::Git::Commit:
           add_files_in: []
           commit_msg: 'Bump version after release'
+          signoff: 0
         Dist::Zilla::Role::Git::DirtyFiles:
           allow_dirty:
             - Changes
@@ -768,12 +752,12 @@ x_Dist_Zilla:
             - (?^:.+)
           changelog: Changes
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.20.1
+          git_version: 2.38.1
           repo_root: .
         Dist::Zilla::Role::Git::StringFormatter:
           time_zone: local
       name: '@DROLSKY/Commit version bump'
-      version: '2.046'
+      version: '2.048'
     -
       class: Dist::Zilla::Plugin::Git::Push
       config:
@@ -782,23 +766,23 @@ x_Dist_Zilla:
             - origin
           remotes_must_exist: 1
         Dist::Zilla::Role::Git::Repo:
-          git_version: 2.20.1
+          git_version: 2.38.1
           repo_root: .
       name: '@DROLSKY/Push version bump'
-      version: '2.046'
+      version: '2.048'
     -
       class: Dist::Zilla::Plugin::DROLSKY::MakeMaker
       config:
         Dist::Zilla::Plugin::MakeMaker:
           make_path: make
-          version: '6.012'
+          version: '6.028'
         Dist::Zilla::Plugin::MakeMaker::Awesome:
-          version: '0.42'
+          version: '0.49'
         Dist::Zilla::Role::TestRunner:
-          default_jobs: 24
-          version: '6.012'
+          default_jobs: '12'
+          version: '6.028'
       name: '@DROLSKY/DROLSKY::MakeMaker'
-      version: '1.01'
+      version: '1.22'
     -
       class: Dist::Zilla::Plugin::Prereqs
       config:
@@ -806,64 +790,64 @@ x_Dist_Zilla:
           phase: develop
           type: requires
       name: DevelopRequires
-      version: '6.012'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::DynamicPrereqs
       config:
         Dist::Zilla::Role::ModuleMetadata:
-          Module::Metadata: '1.000033'
+          Module::Metadata: '1.000037'
           version: '0.006'
       name: DynamicPrereqs
-      version: '0.035'
+      version: '0.039'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: '6.012'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: '6.012'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: '6.012'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExtraTestFiles'
-      version: '6.012'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: '6.012'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':PerlExecFiles'
-      version: '6.012'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: '6.012'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: '6.012'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':AllFiles'
-      version: '6.012'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':NoFiles'
-      version: '6.012'
+      version: '6.028'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: '@DROLSKY/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
-      version: '6.012'
+      version: '6.028'
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: '0'
-    version: '6.012'
+    version: '6.028'
 x_authority: cpan:DROLSKY
 x_contributors:
   - 'Aaron Crane <arc@cpan.org>'
@@ -879,5 +863,6 @@ x_contributors:
   - 'Toby Inkster <mail@tobyinkster.co.uk>'
   - 'Tokuhiro Matsuno <tokuhirom@cpan.org>'
   - 'Tom Wyant <wyant@cpan.org>'
-x_generated_by_perl: v5.26.2
+x_generated_by_perl: v5.32.1
 x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

@@ -1,5 +1,10 @@
 Revision history for MIDI-Bassline-Walk
 
+0.0506 2022-12-10 12:18:49
+    - Add the wrap attribute.
+    - Improve tests.
+    - Improve documentation.
+
 0.0505 2022-10-23 08:07:32
     - Avoid implicit imports.
 

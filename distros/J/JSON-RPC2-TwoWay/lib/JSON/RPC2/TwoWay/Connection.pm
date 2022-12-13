@@ -4,7 +4,7 @@ use 5.10.0;
 use strict;
 use warnings;
 
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.07'; # VERSION
 
 # standard perl
 use Carp;
@@ -24,7 +24,8 @@ sub new {
 	croak 'no write?' unless $opt{write} and ref $opt{write} eq 'CODE';
 	my $self = {
 		calls => {},
-		debug => $opt{debug} // 0,
+		debug => $opt{debug} ? 1 : 0,
+		log => ref $opt{debug} eq 'CODE' ? $opt{debug} : sub { say STDERR @_ },
 		next_id => 1,
 		owner => $opt{owner},
 		request => undef,
@@ -53,7 +54,7 @@ sub call {
 		id  => $id,
 	});
 	$self->{calls}->{$id} = [ $cb, 0 ]; # not raw
-	#say STDERR "call: $request" if $self->{debug};
+	#$self->{log}->("call: $request") if $self->{debug};
 	$self->write($request);
 	return;
 }
@@ -70,7 +71,7 @@ sub callraw {
 	$request->{id} = $id;
 	$request = $self->{json}->encode($request);
 	$self->{calls}->{$id} = [ $cb, 1 ]; # raw
-	#say STDERR "callraw: $request" if $self->{debug};
+	#$self->{log}->("callraw: $request") if $self->{debug};
 	$self->write($request);
 	return;
 }
@@ -85,7 +86,7 @@ sub notify {
 		method => $name,
 		params => $args,
 	});
-	#say STDERR "notify: $request" if $self->{debug};
+	#$self->{log}->("notify: $request") if $self->{debug};
 	$self->write($request);
 	return;
 }
@@ -99,7 +100,7 @@ sub handle {
 
 sub _handle {
 	my ($self, $jsonr) = @_;
-	say STDERR '    handle: ', $$jsonr if $self->{debug};
+	$self->{log}->('    handle: ' . $$jsonr) if $self->{debug};
 	local $@;
 	my $r = eval { $self->{json}->decode($$jsonr) };
 	return "json decode failed: $@" if $@;
@@ -118,7 +119,7 @@ sub _handle {
 
 sub _handle_response {
 	my ($self, $r) = @_;
-	#say STDERR '_handle_response: ', Dumper($r) if $self->{debug};
+	#$self->{log}->('_handle_response: ' . Dumper($r)) if $self->{debug};
 	my $id = $r->{id};
 	my ($cb, $raw);
 	$cb = delete $self->{calls}->{$id} if $id;
@@ -147,7 +148,7 @@ sub _handle_response {
 
 sub write {
 	my $self = shift;
-	say STDERR '    writing: ', @_ if $self->{debug};
+	$self->{log}->('    writing: ' . join '', @_) if $self->{debug};
 	$self->{write}->(@_);
 }
 
@@ -171,7 +172,7 @@ sub close {
 
 #sub DESTROY {
 #	my $self = shift;
-#	say STDERR 'destroying ', $self;
+#	$self->{log}->('destroying ' . $self) if $self->{debug};
 #}
 
 1;
@@ -212,7 +213,8 @@ Valid arguments are:
 
 =over 4
 
-=item - debug: print debugging to STDERR
+=item - debug: print debugging to STDERR, or if coderef is given call that with 
+the debugging line.
 
 (default false)
 
@@ -336,6 +338,16 @@ L<http://www.jsonrpc.org/specification>: JSON-RPC 2.0 Specification
 This software has been developed with support from L<STRATO|https://www.strato.com/>.
 In German: Diese Software wurde mit Unterstützung von L<STRATO|https://www.strato.de/> entwickelt.
 
+=head1 THANKS
+
+=over 4
+
+=item *
+
+'greencoloured' for multiple PRs
+
+=back
+
 =head1 AUTHORS
 
 =over 4
@@ -348,7 +360,7 @@ Wieger Opmeer <wiegerop@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016-2019 by Wieger Opmeer.
+This software is copyright (c) 2016-2022 by Wieger Opmeer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

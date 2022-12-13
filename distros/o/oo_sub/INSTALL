@@ -1,0 +1,5 @@
+perl Makefile.PL # generates the Makefile
+
+make # builds into blib
+
+sudo make install # installs the module and manpages

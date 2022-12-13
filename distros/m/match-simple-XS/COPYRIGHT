@@ -3,8 +3,7 @@ Upstream-Name: match-simple-XS
 Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
 Source: https://metacpan.org/release/match-simple-XS
 
-Files: CONTRIBUTING
- INSTALL
+Files: INSTALL
  LICENSE
  Makefile.PL
  XS.xs
@@ -17,16 +16,8 @@ License: Unknown
 Files: Changes
  META.json
  META.yml
- dist.ini
  doap.ttl
-Copyright: Copyright 2014 Toby Inkster.
-License: GPL-1.0+ or Artistic-1.0
-
-Files: README
- lib/match/simple/XS.pm
- t/01basic.t
- t/03coderefs.t
-Copyright: This software is copyright (c) 2014 by Toby Inkster.
+Copyright: Copyright 2022 Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
 Files: COPYRIGHT
@@ -35,19 +26,33 @@ Files: COPYRIGHT
 Copyright: None
 License: public-domain
 
+Files: README
+ lib/match/simple/XS.pm
+Copyright: This software is copyright (c) 2014, 2022 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/01basic.t
+ t/03coderefs.t
+Copyright: This software is copyright (c) 2014 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 Files: t/02simple.t
 Copyright: This software is copyright (c) 2013-2014 by Toby Inkster.
 License: GPL-1.0+ or Artistic-1.0
 
+Files: dist.ini
+Copyright: Copyright 2014 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
 License: Artistic-1.0
- This software is Copyright (c) 2014 by the copyright holder(s).
+ This software is Copyright (c) 2022 by the copyright holder(s).
  
  This is free software, licensed under:
  
    The Artistic License 1.0
 
 License: GPL-1.0
- This software is Copyright (c) 2014 by the copyright holder(s).
+ This software is Copyright (c) 2022 by the copyright holder(s).
  
  This is free software, licensed under:
  

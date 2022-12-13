@@ -27,7 +27,7 @@ Blocking I/O:
         print "Name: ", $dir_obj->name(), $/;
     }
 
-    $nfs->unmount();
+    $nfs->umount();
 
 Non-blocking I/O, using [IO::Async](https://metacpan.org/pod/IO%3A%3AAsync):
 
@@ -42,7 +42,7 @@ Non-blocking I/O, using [IO::Async](https://metacpan.org/pod/IO%3A%3AAsync):
             print "Name: ", $dir_obj->name(), $/;
         }
     } )->then( sub {
-        $nfsa->unmount();
+        $nfsa->umount();
     } )->finally( sub { $loop->stop() } );
 
     $loop->run();
@@ -61,11 +61,11 @@ If a shared libnfs is available and is version 5.0.0 or later we’ll
 link (dynamically) against that.
 Otherwise we try to compile our own libnfs and bundle it (statically).
 
-A shared libnfs is preferable because it can receive updates on its
+A shared libnfs is usually preferable because it can receive updates on its
 own; a static libnfs locks you into that version of the library until you
 rebuild Net::LibNFS.
 
-If, though, you have a usable shared libnfs but for some reason still want
+If you have a usable shared libnfs but for some reason still want
 to bundle a custom-built static one, set `NET_LIBNFS_LINK_STATIC` to a
 truthy value in the environment as you run this distribution’s
 `Makefile.PL`.
@@ -110,16 +110,21 @@ A setter for multiple settings; e.g., where libnfs exposes
 `nfs_set_version()`, here you pass `version` with the appropriate
 value.
 
-Recognized options are:
+Recognized options are as follows. (Some may be unavailable if you
+use an older, shared libnfs.)
 
 - `version`
 - `client_name` and `verifier` (NFSv4 only)
-- `tcp_syncnt`, `uid`, `gid`, `debug`, `dircache`,
-`autoreconnect`, `timeout`
+- `tcp_syncnt`, `uid`, `gid`, `debug`, `auto_traverse_mounts`,
+`dircache`, `autoreconnect`, `timeout`, `nfsport`, `mountport`
 - `unix_authn` (arrayref) - Sets UID, GID, and auxiliary GIDs
 at once. Clobbers (and is clobbered by) `uid` and `gid`.
 - `pagecache`, `pagecache_ttl`, `readahead`
 - `readmax`, `writemax`
+- `readdir_buffer` - Sets the maximum buffer size for `READDIRPLUS`
+(which is used by _OBJ_->opendir). Can be a two-element arrayref to set
+`dircount` and `maxcount` independently or an unsigned integer to set both
+to the same value.
 
 ## $old\_umask = _OBJ_->umask( $NEW\_UMASK )
 

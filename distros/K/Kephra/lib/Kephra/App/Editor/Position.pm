@@ -6,13 +6,20 @@ package Kephra::App::Editor::Position;
 package Kephra::App::Editor;
 
 
+sub line_start {
+    my ($self, $pos) = @_;
+    my $line = $self->LineFromPosition( $pos );
+    return $line if $line == -1;
+    $self->GetLineIndentPosition( $line );
+}
+
 sub word_edges {
     my ($self, $pos) = @_;
     $pos = $self->GetCurrentPos unless defined $pos;
     ($self->WordStartPosition( $pos, 1 ), $self->WordEndPosition( $pos, 1 ) );
 }
 
-sub block_edges {
+sub block_edges_expand {
     my ($self, $sel_start, $sel_end) = @_;
     $sel_start = $self->GetCurrentPos unless defined $sel_start;
     $sel_end //= $sel_start;
@@ -36,7 +43,6 @@ sub style_edges {
     my ($self, $sel_start, $sel_end) = @_;
     $sel_start = $self->GetCurrentPos unless defined $sel_start;
     $sel_end //= $sel_start;
-    
     my ($style_start, $style_end) = ($sel_start, $sel_start);
     my $style = $self->GetStyleAt( $sel_start );
     $style_start-- while $style_start and $self->GetStyleAt( $style_start ) == $style;
@@ -44,10 +50,11 @@ sub style_edges {
     my $last_pos = $self->GetTextLength - 1;
     $style_end++ while $style_end < $last_pos and $self->GetStyleAt( $style_end ) == $style;
     # $style_end-- if $self->GetStyleAt( $style_end ) != $style;
+    return if $style_start == $sel_start and $style_end == $sel_end;
     return ($style_start, $style_end) if $style_end >= $sel_end;
 }
 
-sub brace_edges {
+sub brace_edges_expand {
     my ($self, $sel_start, $sel_end, $line) = @_; # look only in $line if defined
     $sel_start = $self->GetCurrentPos unless defined $sel_start;
     $sel_end //= $sel_start;
@@ -61,29 +68,95 @@ sub brace_edges {
     ($npos, $match+1); 
 }
 
+sub brace_edges_shrink {
+    my ($self, $sel_start, $sel_end) = @_;
+    return () unless defined $sel_end;
+    ($sel_start, $sel_end) = ($sel_end, $sel_start) if $sel_start > $sel_end;
+    $self->GotoPos( $sel_start + 1 );
+    $self->SearchAnchor;
+    my $npos = $self->SearchNext( &Wx::wxSTC_FIND_REGEXP, '[([{]');
+    return () if $npos < 0 or $npos >= $sel_end;
+    my $match = $self->BraceMatch( $npos );
+    return if $match < 0 or $match >= $sel_end;
+    ($npos, $match+1); 
+}
 
-sub loop_edges {
+sub loop_edges_expand {
     my ($self, $sel_start, $sel_end) = @_;
     $sel_start = $self->GetCurrentPos unless defined $sel_start;
     $sel_end //= $sel_start; # $self->GetStyleAt( $pos); 5
+    ($sel_start, $sel_end) = ($sel_end, $sel_start) if $sel_start > $sel_end;
+    my $search_start = $sel_start;
+    my $line_start = $self->line_start( $sel_start );
+    $search_start = $line_start if $line_start > $search_start;
     my $loop_start = -1;
     my $npos;
-    $self->GotoPos( $sel_start );
+    $self->GotoPos( $search_start + 5 );
     $self->SearchAnchor;
     $npos = $self->SearchPrev( 0, 'for');
     $loop_start = $npos if $npos > $loop_start and $self->GetStyleAt( $npos ) == 5;
-    $self->GotoPos( $sel_start );
-    $self->SearchAnchor;
     $npos = $self->SearchPrev( 0, 'until');
     $loop_start = $npos if $npos > $loop_start and $self->GetStyleAt( $npos ) == 5;
-    $self->GotoPos( $sel_start );
-    $self->SearchAnchor;
     $npos = $self->SearchPrev( 0, 'while');
     $loop_start = $npos if $npos > $loop_start and $self->GetStyleAt( $npos ) == 5;
     return if $loop_start == -1;
-    $self->GotoPos( $loop_start );
+    my @edges = $self->loop_edges( $loop_start );
+    return unless @edges and $edges[1] >= $sel_end;
+    return @edges if $edges[0] < $sel_start or $edges[1] > $sel_end;
+    $self->GotoPos(  $loop_start );
     $self->SearchAnchor;
-    $npos = $self->SearchNext( 0, '(');
+    $loop_start = -1;
+    $npos = $self->SearchPrev( 0, 'for');
+    $loop_start = $npos if $npos > $loop_start and $self->GetStyleAt( $npos ) == 5;
+    $npos = $self->SearchPrev( 0, 'until');
+    $loop_start = $npos if $npos > $loop_start and $self->GetStyleAt( $npos ) == 5;
+    $npos = $self->SearchPrev( 0, 'while');
+    $loop_start = $npos if $npos > $loop_start and $self->GetStyleAt( $npos ) == 5;
+    return unless $loop_start > -1;
+    $self->loop_edges( $loop_start );
+}
+sub loop_edges_shrink {
+    my ($self, $sel_start, $sel_end) = @_;
+    return () unless defined $sel_end;
+    ($sel_start, $sel_end) = ($sel_end, $sel_start) if $sel_start > $sel_end;
+    my $search_start = $sel_start;
+    my $line_start = $self->line_start( $sel_start );
+    $search_start = $line_start if $line_start > $search_start;
+    my $loop_start = -1;
+    my $npos;
+    $self->GotoPos( $sel_start - 5);
+    $self->SearchAnchor;
+    $npos = $self->SearchNext( 0, 'for');
+    $loop_start = $npos if $npos > $loop_start and $self->GetStyleAt( $npos ) == 5;
+    $npos = $self->SearchNext( 0, 'until');
+    $loop_start = $npos if $npos > $loop_start and $self->GetStyleAt( $npos ) == 5;
+    $npos = $self->SearchNext( 0, 'while');
+    $loop_start = $npos if $npos > $loop_start and $self->GetStyleAt( $npos ) == 5;
+    return if $loop_start == -1;
+    my @edges = $self->loop_edges( $loop_start );
+    return unless @edges and $edges[1] <= $sel_end;
+    return @edges if $edges[0] > $sel_start or $edges[1] < $sel_end;
+    $search_start = $loop_start;
+    $self->GotoPos(  $search_start );
+    $self->SearchAnchor;
+    $loop_start = -1;
+    $npos = $self->SearchNext( 0, 'for');
+    $loop_start = $npos if $npos > $loop_start and $self->GetStyleAt( $npos ) == 5;
+    $npos = $self->SearchNext( 0, 'until');
+    $loop_start = $npos if $npos > $loop_start and $self->GetStyleAt( $npos ) == 5;
+    $npos = $self->SearchNext( 0, 'while');
+    $loop_start = $npos if $npos > $loop_start and $self->GetStyleAt( $npos ) == 5;
+    return if  $loop_start == $search_start;
+    @edges = $self->loop_edges( $loop_start );
+    return $edges[1] > $sel_end;
+    @edges;
+}
+
+sub loop_edges {
+    my ($self, $start) = @_;
+    $self->GotoPos( $start );
+    $self->SearchAnchor;
+    my $npos = $self->SearchNext( 0, '(');
     return if $npos == -1;
     my $match = $self->BraceMatch( $npos );
     return if $match == -1;
@@ -92,10 +165,11 @@ sub loop_edges {
     return if $npos == -1;
     $match = $self->BraceMatch( $npos );
     return if $match == -1;
-    ($loop_start, $match+1); 
+    ($self->PositionFromLine( $self->LineFromPosition( $start )), $match+1);
 }
 
-sub sub_edges {
+
+sub sub_edges_expand {
     my ($self, $sel_start, $sel_end) = @_;
     $sel_start = $self->GetCurrentPos unless defined $sel_start;
     $sel_end //= $sel_start;
@@ -109,6 +183,22 @@ sub sub_edges {
     return if $bpos == -1;
     my $sub_end = $self->BraceMatch( $bpos );
     return if $sub_end == -1 or $sub_end < $sel_end;
+    return if $sub_start == $sel_start and  $sub_end == $sel_end;
+    ($sub_start, $sub_end+1);
+}
+sub sub_edges_shrink {
+    my ($self, $sel_start, $sel_end) = @_;
+    return () unless defined $sel_end;
+    ($sel_start, $sel_end) = ($sel_end, $sel_start) if $sel_start > $sel_end;
+    my $start_line = $self->next_sub( $sel_start);
+    return if $start_line < 0;
+    my $sub_start = $self->PositionFromLine( $self->LineFromPosition( $start_line ) );
+    $self->GotoPos( $sub_start );
+    $self->SearchAnchor;
+    my $bpos = $self->SearchNext( 0, '{');
+    return if $bpos == -1;
+    my $sub_end = $self->BraceMatch( $bpos );
+    return if $sub_end == -1 or $sub_end > $sel_end;
     return if $sub_start == $sel_start and  $sub_end == $sel_end;
     ($sub_start, $sub_end+1);
 }
@@ -180,22 +270,6 @@ sub prev_sub {
 }
 
 sub next_sub {
-    my ($self, $pos) = @_;
-    $pos = $self->GetCurrentPos unless defined $pos;
-    $self->GotoPos( $pos+1 );
-    $self->SearchAnchor;
-    $self->SearchNext( &Wx::wxSTC_FIND_REGEXP, '^\s*sub ');
-}
-
-sub prev_construct_line_nr {
-    my ($self, $pos) = @_;
-    $pos = $self->GetCurrentPos unless defined $pos;
-    $self->GotoPos( $pos-1 );
-    $self->SearchAnchor;
-    $self->SearchPrev( &Wx::wxSTC_FIND_REGEXP, '^\s*sub ');
-}
-
-sub next_construct_line_nr {
     my ($self, $pos) = @_;
     $pos = $self->GetCurrentPos unless defined $pos;
     $self->GotoPos( $pos+1 );

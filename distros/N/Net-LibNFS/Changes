@@ -1,5 +1,14 @@
 Revision history for Perl extension Net::LibNFS:
 
+0.05 Mon 12 Dec 2022
+- Attempt better i386 compatibility.
+- Feature-detection added to support different libnfs versions.
+- Fix memory leak when reading directories and local nodes.
+  (Thank you, rovo89!)
+- Additional features added from upstream libnfs.
+- Optimize return of directory reads & local-node reads.
+- Fix spelling of “umount” in examples. (Thank you, rovo89!)
+
 0.04 Wed 10 Aug 2022
 - Update to latest X::Tiny to fix an error with exception creation.
 - Fix dynamic linking.

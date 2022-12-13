@@ -1,5 +1,10 @@
 Revision history for App-eachperl
 
+0.09    2022-12-12
+        [CHANGES]
+         * Added `uninstall` command
+         * Added `--ver` shortcut option for selecting exactly one version
+
 0.08    2022-12-08
         [CHANGES]
          * List and allow selecting on devel-version status

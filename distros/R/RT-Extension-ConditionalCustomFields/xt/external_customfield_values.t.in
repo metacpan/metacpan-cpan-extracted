@@ -82,7 +82,7 @@ is($cf_conditioned_by_CF_options[2]->get_value, $cf_condition->id, 'Can be condi
 
 $cf_conditioned_by_CF_select = $mjs->xpath('//select[@name="ConditionalCF"]', single => 1);
 $mjs->field($cf_conditioned_by_CF_select, $cf_condition->id);
-$mjs->eval_in_page("jQuery('.conditionedby select').trigger('change');");
+$mjs->eval_in_page("jQuery('select[name=ConditionalCF]').trigger('change');");
 
 my @cf_conditioned_by_CFV_options = $mjs->xpath('//input[@name="ConditionedBy"]');
 is(scalar(@cf_conditioned_by_CFV_options), 3, 'Three values available for conditioned by');

@@ -8,9 +8,9 @@ use Log::ger;
 use Hash::Subset qw(hash_subset);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-12-05'; # DATE
+our $DATE = '2022-12-09'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '0.052'; # VERSION
+our $VERSION = '0.053'; # VERSION
 
 our %SPEC;
 
@@ -1599,7 +1599,7 @@ $SPEC{csv_add_fields} = {
 
 The new fields by default will be added at the end, unless you specify one of
 `--after` (to put after a certain field), `--before` (to put before a certain
-field), or `--at` (to put at specific position, 1 means as the first field). The
+field), or `--at` (to put at specific position, 1 means the first field). The
 new fields will be clustered together though, you currently cannot set the
 position of each new field. But you can later reorder fields using
 <prog:csv-sort-fields>.
@@ -1637,7 +1637,7 @@ _
         },
         at => {
             summary => 'Put the new field at specific position '.
-                '(1 means as first field)',
+                '(1 means first field)',
             schema => ['int*', min=>1],
         },
     },
@@ -2154,7 +2154,7 @@ $SPEC{csv_select_rows} = {
             summary => 'Row number (e.g. 2 for first data row), '.
                 'range (2-7), or comma-separated list of such (2-7,10,20-23)',
             req => 1,
-            pos => 1,
+            pos => 2,
         },
     },
     description => '' . $common_desc,
@@ -2493,7 +2493,7 @@ _
         %argspecs_common,
         %argspecs_csv_output,
         %argspec_filenames_0plus,
-        %argspecopt_output_filename_1,
+        %argspecopt_output_filename,
         %argspecopt_overwrite,
     },
     tags => ['outputs_csv'],
@@ -2640,7 +2640,7 @@ $SPEC{csv_fill_template} = {
         template_filename => {
             schema => 'filename*',
             req => 1,
-            pos => 1,
+            pos => 2,
         },
         # XXX whether to output multiple files or combined
         # XXX row selection?
@@ -3270,7 +3270,7 @@ App::CSVUtils - CLI utilities related to CSV
 
 =head1 VERSION
 
-This document describes version 0.052 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2022-12-05.
+This document describes version 0.053 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2022-12-09.
 
 =head1 DESCRIPTION
 
@@ -3571,7 +3571,7 @@ Examples:
 
 The new fields by default will be added at the end, unless you specify one of
 C<--after> (to put after a certain field), C<--before> (to put before a certain
-field), or C<--at> (to put at specific position, 1 means as the first field). The
+field), or C<--at> (to put at specific position, 1 means the first field). The
 new fields will be clustered together though, you currently cannot set the
 position of each new field. But you can later reorder fields using
 L<csv-sort-fields>.
@@ -3603,7 +3603,7 @@ Put the new field after specified field.
 
 =item * B<at> => I<int>
 
-Put the new field at specific position (1 means as first field).
+Put the new field at specific position (1 means first field).
 
 =item * B<before> => I<str>
 

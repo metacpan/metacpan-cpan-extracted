@@ -14,20 +14,19 @@
 	a                    doap:Project;
 	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
-	doap-deps:runtime-recommendation [ doap-deps:on "match::simple"^^doap-deps:CpanId ];
-	doap-deps:runtime-requirement [ doap-deps:on "perl 5.008"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.012"^^doap-deps:CpanId ];
 	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ], [ doap-deps:on "Test::Fatal"^^doap-deps:CpanId ];
-	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=match-simple-XS>;
+	doap:bug-database    <https://github.com/tobyink/p5-match-simple-xs/issues>;
 	doap:created         "2014-02-20"^^xsd:date;
 	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:download-page   <https://metacpan.org/release/match-simple-XS>;
-	doap:helper          <http://purl.org/NET/cpan-uri/person/bulkdd>, <http://purl.org/NET/cpan-uri/person/flora>, <http://purl.org/NET/cpan-uri/person/ilmari>, <http://purl.org/NET/cpan-uri/person/leont>, <http://purl.org/NET/cpan-uri/person/wolfsage>;
+	doap:helper          <http://purl.org/NET/cpan-uri/person/bricker>, <http://purl.org/NET/cpan-uri/person/bulkdd>, <http://purl.org/NET/cpan-uri/person/flora>, <http://purl.org/NET/cpan-uri/person/ilmari>, <http://purl.org/NET/cpan-uri/person/leont>, <http://purl.org/NET/cpan-uri/person/wolfsage>;
 	doap:homepage        <https://metacpan.org/release/match-simple-XS>;
 	doap:license         <http://dev.perl.org/licenses/>;
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:name            "match-simple-XS";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/match-simple-XS/v_0-000_01>, <http://purl.org/NET/cpan-uri/dist/match-simple-XS/v_0-000_02>, <http://purl.org/NET/cpan-uri/dist/match-simple-XS/v_0-000_03>, <http://purl.org/NET/cpan-uri/dist/match-simple-XS/v_0-000_04>, <http://purl.org/NET/cpan-uri/dist/match-simple-XS/v_0-000_05>, <http://purl.org/NET/cpan-uri/dist/match-simple-XS/v_0-001>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/match-simple-XS/v_0-000_01>, <http://purl.org/NET/cpan-uri/dist/match-simple-XS/v_0-000_02>, <http://purl.org/NET/cpan-uri/dist/match-simple-XS/v_0-000_03>, <http://purl.org/NET/cpan-uri/dist/match-simple-XS/v_0-000_04>, <http://purl.org/NET/cpan-uri/dist/match-simple-XS/v_0-000_05>, <http://purl.org/NET/cpan-uri/dist/match-simple-XS/v_0-001>, <http://purl.org/NET/cpan-uri/dist/match-simple-XS/v_0-002>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://github.com/tobyink/p5-match-simple-xs>;
@@ -114,6 +113,29 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/match-simple-XS-0.001.tar.gz>;
 	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/match-simple-XS/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "match-simple-XS-0.002"^^xsd:string;
+	dc:issued            "2022-12-13"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Don't internally use ~~ ever, even on overloaded objects.";
+		], [
+			a doap-changeset:Update;
+			rdfs:label "No longer support Perl older than 5.12.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/match-simple-XS-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/bricker>
+	a                    foaf:Person;
+	foaf:name            "Bill Ricker";
+	foaf:nick            "BRICKER";
+	foaf:page            <https://metacpan.org/author/BRICKER>.
 
 <http://purl.org/NET/cpan-uri/person/bulkdd>
 	a                    foaf:Person;

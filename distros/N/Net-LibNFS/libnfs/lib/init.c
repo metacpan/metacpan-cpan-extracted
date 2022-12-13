@@ -71,11 +71,40 @@ uint64_t rpc_current_time(void)
 #endif
 }
 
+int rpc_set_hash_size(struct rpc_context *rpc, int hashes)
+{
+	uint32_t i;
+
+#ifdef HAVE_MULTITHREADING
+        if (rpc->multithreading_enabled) {
+                nfs_mt_mutex_lock(&rpc->rpc_mutex);
+        }
+#endif /* HAVE_MULTITHREADING */
+        rpc->num_hashes = hashes;
+        free(rpc->waitpdu);
+	rpc->waitpdu = malloc(sizeof(struct rpc_queue) * rpc->num_hashes);
+        if (rpc->waitpdu == NULL) {
+                return -1;
+        }
+	for (i = 0; i < rpc->num_hashes; i++)
+		rpc_reset_queue(&rpc->waitpdu[i]);
+#ifdef HAVE_MULTITHREADING
+        if (rpc->multithreading_enabled) {
+                nfs_mt_mutex_unlock(&rpc->rpc_mutex);
+        }
+#endif /* HAVE_MULTITHREADING */
+        return 0;
+}
+
+int nfs_set_hash_size(struct nfs_context *nfs, int hashes)
+{
+        return rpc_set_hash_size(nfs->rpc, hashes);
+}
+
 struct rpc_context *rpc_init_context(void)
 {
 	struct rpc_context *rpc;
 	static uint32_t salt = 0;
-	unsigned int i;
 
 	rpc = malloc(sizeof(struct rpc_context));
 	if (rpc == NULL) {
@@ -83,6 +112,11 @@ struct rpc_context *rpc_init_context(void)
 	}
 	memset(rpc, 0, sizeof(struct rpc_context));
 
+	if (rpc_set_hash_size(rpc, DEFAULT_HASHES)) {
+                free(rpc);
+		return NULL;
+	}
+        
 	rpc->magic = RPC_CONTEXT_MAGIC;
 
 #ifdef HAVE_MULTITHREADING
@@ -91,6 +125,7 @@ struct rpc_context *rpc_init_context(void)
 
  	rpc->auth = authunix_create_default();
 	if (rpc->auth == NULL) {
+		free(rpc->waitpdu);
 		free(rpc);
 		return NULL;
 	}
@@ -108,22 +143,12 @@ struct rpc_context *rpc_init_context(void)
 	rpc->uid = getuid();
 	rpc->gid = getgid();
 #endif
-#ifdef HAVE_MULTITHREADING
-        if (rpc->multithreading_enabled) {
-                nfs_mt_mutex_lock(&rpc->rpc_mutex);
-        }
-#endif /* HAVE_MULTITHREADING */
 	rpc_reset_queue(&rpc->outqueue);
-	for (i = 0; i < HASHES; i++)
-		rpc_reset_queue(&rpc->waitpdu[i]);
-#ifdef HAVE_MULTITHREADING
-        if (rpc->multithreading_enabled) {
-                nfs_mt_mutex_unlock(&rpc->rpc_mutex);
-        }
-#endif /* HAVE_MULTITHREADING */
 
 	/* Default is no timeout */
 	rpc->timeout = -1;
+	/* Default is to timeout after 100ms of poll(2) */
+	rpc->poll_timeout = 100;
 
 	return rpc;
 }
@@ -341,7 +366,7 @@ static void rpc_purge_all_pdus(struct rpc_context *rpc, int status, const char *
         }
 #endif /* HAVE_MULTITHREADING */
 
-	for (i = 0; i < HASHES; i++) {
+	for (i = 0; i < rpc->num_hashes; i++) {
 		struct rpc_queue waitqueue;
 
 #ifdef HAVE_MULTITHREADING
@@ -437,6 +462,8 @@ void rpc_destroy_context(struct rpc_context *rpc)
 		rpc->error_string = NULL;
 	}
 
+        free(rpc->waitpdu);
+        rpc->waitpdu = NULL;
 	free(rpc->inbuf);
 	rpc->inbuf = NULL;
 
@@ -445,6 +472,20 @@ void rpc_destroy_context(struct rpc_context *rpc)
         nfs_mt_mutex_destroy(&rpc->rpc_mutex);
 #endif /* HAVE_MULTITHREADING */
 	free(rpc);
+}
+
+void rpc_set_poll_timeout(struct rpc_context *rpc, int poll_timeout)
+{
+	assert(rpc->magic == RPC_CONTEXT_MAGIC);
+
+	rpc->poll_timeout = poll_timeout;
+}
+
+int rpc_get_poll_timeout(struct rpc_context *rpc)
+{
+	assert(rpc->magic == RPC_CONTEXT_MAGIC);
+
+	return rpc->poll_timeout;
 }
 
 void rpc_set_timeout(struct rpc_context *rpc, int timeout)
@@ -486,6 +527,34 @@ int rpc_register_service(struct rpc_context *rpc, int program, int version,
         endpoint->num_procs = num_procs;
         endpoint->next = rpc->endpoints;
         rpc->endpoints = endpoint;
+
+        return 0;
+}
+
+void rpc_free_iovector(struct rpc_context *rpc, struct rpc_io_vectors *v)
+{
+        int i;
+
+        for (i = 0; i < v->niov; i++) {
+                if (v->iov[i].free) {
+                        v->iov[i].free(v->iov[i].buf);
+                }
+        }
+        v->niov = 0;
+}
+
+int rpc_add_iovector(struct rpc_context *rpc, struct rpc_io_vectors *v,
+                      char *buf, int len, void (*free)(void *))
+{
+        if (v->niov >= RPC_MAX_VECTORS) {
+                rpc_set_error(rpc, "Too many io vectors");
+                return -1;
+        }
+
+        v->iov[v->niov].buf = buf;
+        v->iov[v->niov].len = len;
+        v->iov[v->niov].free = free;
+        v->niov++;
 
         return 0;
 }

@@ -1,6 +1,7 @@
 #!/bin/bash
-(sleep 25; echo "Hello World") &
 trap "echo I ALWAYS WIN" SIGINT SIGTERM
+echo "term_trap.sh started"
+(sleep 25; echo "Hello World") &
 echo "pid is $$"
 
 while :

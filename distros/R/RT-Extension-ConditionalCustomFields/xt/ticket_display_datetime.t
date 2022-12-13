@@ -21,6 +21,7 @@ RT->Config->Set('CustomFieldGroupings',
         'Group two' => ['ConditionedBy'],
     ],
 );
+RT->Config->PostLoadCheck;
 
 my $ticket = RT::Ticket->new($user);
 $ticket->Create(Queue => 'General', Subject => 'Test Ticket ConditionalCF');

@@ -1,3 +1,11 @@
+0.03 2022-12-10T19:20:52+01:00
+ - Change example files to better names.
+ - Fix use of Module::Install.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Update author name.
+ - Update copyright years to 2022.
+ - Update Module::Install to 1.19 version.
+
 0.02 2015-10-14T08:06:39+02:00
  - Improve LICENSE AND COPYRIGHT section in doc.
  - Improve SEE ALSO section in doc.

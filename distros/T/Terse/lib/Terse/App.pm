@@ -7,15 +7,15 @@ use B 'svref_2object';
 use Cwd qw(abs_path cwd);
 
 sub start {
-	my ($pkg, @args) = @_;
+	my ($pkg, %args) = @_;
 	my $path = $pkg->_path($pkg);
 	my $self = $pkg->new(
 		app => 1,
-		models => $pkg->_build_models($pkg, $path),
-		views => $pkg->_build_views($pkg, $path),
-		controllers => $pkg->_build_controllers($pkg, $path),
-		plugins => $pkg->_build_plugins($pkg, $path),
-		@args
+		models => $pkg->_build_models($pkg, $path, $args{lib}),
+		views => $pkg->_build_views($pkg, $path, $args{lib}),
+		controllers => $pkg->_build_controllers($pkg, $path, $args{lib}),
+		plugins => $pkg->_build_plugins($pkg, $path, $args{lib}),
+		%args
 	);
 	$self->build_app() if ($self->can('build_app'));
 	return $self;
@@ -40,47 +40,52 @@ sub preprocess_req {
 }
 
 sub _build_models {
-	my ($self, $pkg, $path) =@_; 
+	my ($self, $pkg, $path, $lib) =@_; 
 	return $self->_load_modules(
 		path => $path,
 		pkg => $pkg,
-		type => 'Model'
+		type => 'Model',
+		lib => $lib
 	);
 }
 
 
 sub _build_views {
-	my ($self, $pkg, $path) =@_; 
+	my ($self, $pkg, $path, $lib) =@_; 
 	return $self->_load_modules(
 		path => $path,
 		pkg => $pkg,
-		type => 'View'
+		type => 'View',
+		lib => $lib
 	);
 }
 
 sub _build_controllers {
-	my ($self, $pkg, $path) =@_; 
+	my ($self, $pkg, $path, $lib) =@_; 
 	return $self->_load_modules(
 		path => $path,
 		pkg => $pkg,
-		type => 'Controller'
+		type => 'Controller',
+		lib => $lib
 	);
 }
 
 sub _build_plugins {
-	my ($self, $pkg, $path) =@_; 
+	my ($self, $pkg, $path, $lib) =@_; 
 	return $self->_load_modules(
 		path => $path,
 		pkg => $pkg,
-		type => 'Plugin'
+		type => 'Plugin',
+		lib => $lib
 	);
 }
 
 sub _load_modules {
 	my ($self, %args) = @_;
 	my $type = $args{type};
+	$args{path} =~ s/([^\/]+)$/$args{lib}\/$1/ if ($args{lib});
 	my @modules = map {
-		(my $m = $_) =~ s/\.pm$//ig;
+		(my $m = $_) =~ s/^(\/)|(\.pm)$//ig;
 		$m =~ s/\//::/g;
 		[
 			"$args{path}/${type}/${_}",
@@ -92,7 +97,7 @@ sub _load_modules {
 		eval {
 			require $module->[0];
 		};
-		$self->raiseError($@) && die $@ if $@;
+		die $@ if $@;
 		$module = $module->[1]->new(app => 1);
 		die $@ && next if $@;
 		$mods{_alias} = { %{$mods{_alias} || {}}, %{$Terse::Controller::dispatcher{ref $module}{_alias} || {}} }; 
@@ -117,8 +122,7 @@ sub _recurse_directory {
 	for (readdir $d) {
 		next if $_ =~ m/^\./;
 	 	if (-d "$dir/$_") {
-			$path .= "/$_" if $path;
-			push @files, $self->_recurse_directory("$dir/$_", $path || $_);
+			push @files, $self->_recurse_directory("$dir/$_", ($path || "") . "/$_");
 		} elsif ($_ =~ m/\.pm/) {
 			push @files, $path ? "$path/$_" : $_;
 		}
@@ -129,7 +133,8 @@ sub _recurse_directory {
 
 sub dispatch {
 	my ($self, $req, $t, @params) = @_;
-	(my $path = $t->request->uri->path) =~ s/^\///g;
+	my $root_path = $t->_root_path || "";
+	(my $path = $t->request->uri->path) =~ s/^$root_path\///g;
 	my $controller = $t->controller($path);
 	if ($path && ! $controller) {
 		$t->logError('Path not found - ' . $path, 500);
@@ -164,7 +169,7 @@ Terse::App - Lightweight MVC applications.
 
 =head1 VERSION
 
-Version 0.110
+Version 0.120
 
 =cut
 

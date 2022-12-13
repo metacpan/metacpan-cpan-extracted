@@ -6,7 +6,7 @@
 use v5.26;
 use Object::Pad 0.57;
 
-package Device::Chip::MCP23S17 0.05;
+package Device::Chip::MCP23S17 0.06;
 class Device::Chip::MCP23S17
    :isa(Device::Chip::MCP23x17);
 

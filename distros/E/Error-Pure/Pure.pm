@@ -13,10 +13,10 @@ Readonly::Array our @EXPORT_OK => qw(err);
 Readonly::Scalar my $TYPE_DEFAULT => 'Die';
 Readonly::Scalar my $LEVEL_DEFAULT => 4;
 
-our $VERSION = 0.27;
+our $VERSION = 0.28;
 
 # Type of error.
-our $TYPE = $TYPE_DEFAULT;
+our $TYPE;
 
 # Level for this class.
 our $LEVEL = $LEVEL_DEFAULT;
@@ -26,7 +26,7 @@ sub err {
 	my @msg = @_;
 	$Error::Pure::Utils::LEVEL = $LEVEL;
 	my $class;
-	if ($TYPE && $TYPE ne $TYPE_DEFAULT) {
+	if (defined $TYPE) {
 		$class = 'Error::Pure::'.$TYPE;
 	} elsif ($ENV{'ERROR_PURE_TYPE'}) {
 		$class = 'Error::Pure::'.
@@ -104,6 +104,8 @@ Process error with message(s). There is key => value list after first message.
 
 =head1 EXAMPLE1
 
+=for comment filename=err_with_die.pl
+
  use strict;
  use warnings;
 
@@ -119,6 +121,8 @@ Process error with message(s). There is key => value list after first message.
  # 1 at example1.pl line 9.
 
 =head1 EXAMPLE2
+
+=for comment filename=err_with_error_list.pl
 
  use strict;
  use warnings;
@@ -136,6 +140,8 @@ Process error with message(s). There is key => value list after first message.
 
 =head1 EXAMPLE3
 
+=for comment filename=err_with_all_error.pl
+
  use strict;
  use warnings;
 
@@ -152,6 +158,8 @@ Process error with message(s). There is key => value list after first message.
  # main  err  path_to_script  12
 
 =head1 EXAMPLE4
+
+=for comment filename=die_via_err.pl
 
  use strict;
  use warnings;
@@ -173,6 +181,8 @@ Process error with message(s). There is key => value list after first message.
  # #Error [path_to_script.pl:17] Error
 
 =head1 EXAMPLE5
+
+=for comment filename=err_in_eval_and_print.pl
 
  use strict;
  use warnings;
@@ -239,6 +249,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.27
+0.28
 
 =cut

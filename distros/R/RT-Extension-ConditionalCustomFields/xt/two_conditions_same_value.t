@@ -28,6 +28,7 @@ RT->Config->Set('CustomFieldGroupings',
         'Group two' => ['ConditionTwo', 'ConditionedByTwo'],
     ],
 );
+RT->Config->PostLoadCheck;
 
 my ($base, $m) = RT::Extension::ConditionalCustomFields::Test->started_ok;
 my $mjs = WWW::Mechanize::PhantomJS->new();

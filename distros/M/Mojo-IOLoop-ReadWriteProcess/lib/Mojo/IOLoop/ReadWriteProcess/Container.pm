@@ -197,7 +197,7 @@ Mojo::IOLoop::ReadWriteProcess::Container - (kinda) Pure Perl containers.
 
 =head1 DESCRIPTION
 
-L<Mojo::IOLoop::ReadWriteProcess::Container> ties anonymous functions or a L<Mojo::IOLoop::ReadWriteProcess> object to differents
+L<Mojo::IOLoop::ReadWriteProcess::Container> ties anonymous functions or a L<Mojo::IOLoop::ReadWriteProcess> object to different
 sets of L<Mojo::IOLoop::ReadWriteProcess::CGroup> implementations.
 
 When the C<pid_isolation> attribute is set, it needs special permissions (CAP_SYS_ADMIN capabilities).

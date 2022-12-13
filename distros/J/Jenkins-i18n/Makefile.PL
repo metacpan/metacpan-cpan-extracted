@@ -19,6 +19,7 @@ WriteMakefile(
         'Set::Tiny'          => 0.04,
         'Term::ANSIColor'    => 5.01,
         'Term::ProgressBar'  => 2.22,
+        'IO::Interactive'    => 1.023
     },
     TEST_REQUIRES => {
         'Test::TempDir::Tiny' => 0.018,

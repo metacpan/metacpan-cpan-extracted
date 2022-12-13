@@ -25,13 +25,14 @@
             "Device::Chip" : "0.03",
             "Device::Chip::Sensor" : "0",
             "Future::AsyncAwait" : "0.47",
-            "Object::Pad" : "0.57",
+            "Object::Pad" : "0.66",
             "perl" : "5.026"
          }
       },
       "test" : {
          "requires" : {
             "Test::Device::Chip::Adapter" : "0",
+            "Test::ExpectAndCheck::Future" : "0.04",
             "Test::More" : "0.88"
          }
       }
@@ -39,7 +40,7 @@
    "provides" : {
       "Device::Chip::CCS811" : {
          "file" : "lib/Device/Chip/CCS811.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -48,6 +49,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.01",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

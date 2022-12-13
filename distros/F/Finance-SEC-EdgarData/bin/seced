@@ -1,0 +1,35 @@
+#!/usr/bin/env perl
+use Getopt::Std;
+use JSON::XS qw(encode_json);
+use Finance::SEC::EdgarData qw(
+  get_filing_dates
+  get_filing
+);
+use strict;
+use warnings;
+use v5.24;
+
+my %opts = ();
+getopts('s:t:d:l', \%opts);
+my $sym = $opts{s};
+my $t = $opts{t};
+my $d = $opts{d};
+
+if ((not defined $sym) || (not defined $t)) {
+  say 'symbol and filing type required';
+  exit;
+}
+
+if ($opts{l}) {
+  my @dates = get_filing_dates($sym, $t);
+  say join "\n", @dates;
+  exit;
+}
+
+if (not defined $d) {
+  say 'date required';
+  exit;
+}
+
+my $root = get_filing($sym, $t, $d);
+say encode_json($root);

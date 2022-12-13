@@ -27,8 +27,8 @@ is(exception { shared_chmod $map, 0600 }, undef, 'Can chmod shared memory');
 
 is shared_stat($map)->{mode} & 0777, 0600;
 
-is(exception { shared_remove $map }, undef, "Can unlink '/name'");
-
 is(exception { shared_open my $copy, undef, '+<', id => shared_identifier($map) }, undef, 'Can reopen segment');
+
+is(exception { shared_remove $map }, undef, "Can unlink '/name'");
 
 done_testing();

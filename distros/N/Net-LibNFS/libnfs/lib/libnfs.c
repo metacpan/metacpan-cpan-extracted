@@ -316,7 +316,7 @@ nfs_set_context_args(struct nfs_context *nfs, const char *arg, const char *val)
 	} else if (!strcmp(arg, "debug")) {
 		rpc_set_debug(nfs_get_rpc_context(nfs), atoi(val));
 	} else if (!strcmp(arg, "auto-traverse-mounts")) {
-		nfs->nfsi->auto_traverse_mounts = atoi(val);
+		nfs_set_auto_traverse_mounts(nfs, atoi(val));
 	} else if (!strcmp(arg, "dircache")) {
 		nfs_set_dircache(nfs, atoi(val));
 	} else if (!strcmp(arg, "autoreconnect")) {
@@ -332,9 +332,18 @@ nfs_set_context_args(struct nfs_context *nfs, const char *arg, const char *val)
 			return -1;
 		}
 	} else if (!strcmp(arg, "nfsport")) {
-		nfs->nfsi->nfsport =  atoi(val);
+		nfs_set_nfsport(nfs, atoi(val));
 	} else if (!strcmp(arg, "mountport")) {
-		nfs->nfsi->mountport =  atoi(val);
+		nfs_set_mountport(nfs, atoi(val));
+	} else if (!strcmp(arg, "readdir-buffer")) {
+		char *strp = strchr(val, ',');
+		if (strp) {
+			*strp = 0;
+			strp++;
+			nfs_set_readdir_max_buffer_size(nfs, atoi(val), atoi(strp));
+		} else {
+			nfs_set_readdir_max_buffer_size(nfs, atoi(val), atoi(val));
+		}
 	}
 	return 0;
 }
@@ -569,6 +578,8 @@ nfs_init_context(void)
 	/* Default is never give up, never surrender */
 	nfs->nfsi->auto_reconnect = -1;
 	nfs->nfsi->version = NFS_V3;
+	nfs->nfsi->readdir_dircount = 8192;
+	nfs->nfsi->readdir_maxcount = 8192;
 
         /* NFSv4 parameters */
         /* We need a "random" initial verifier */
@@ -1939,6 +1950,11 @@ nfs_set_debug(struct nfs_context *nfs, int level) {
 }
 
 void
+nfs_set_auto_traverse_mounts(struct nfs_context *nfs, int enabled) {
+	nfs->nfsi->auto_traverse_mounts = enabled;
+}
+
+void
 nfs_set_dircache(struct nfs_context *nfs, int enabled) {
 	nfs->nfsi->dircache_enabled = enabled;
 }
@@ -1965,6 +1981,22 @@ nfs_set_version(struct nfs_context *nfs, int version) {
 int
 nfs_get_version(struct nfs_context *nfs) {
         return nfs->nfsi->version;
+}
+
+void
+nfs_set_nfsport(struct nfs_context *nfs, int port) {
+	nfs->nfsi->nfsport = port;
+}
+
+void
+nfs_set_mountport(struct nfs_context *nfs, int port) {
+	nfs->nfsi->mountport = port;
+}
+
+void
+nfs_set_readdir_max_buffer_size(struct nfs_context *nfs, uint32_t dircount, uint32_t maxcount) {
+	nfs->nfsi->readdir_dircount = dircount;
+	nfs->nfsi->readdir_maxcount = maxcount;
 }
 
 void
@@ -2124,12 +2156,30 @@ nfs_umask(struct nfs_context *nfs, uint16_t mask) {
 }
 
 /*
+* Sets polling timeout for nfs apis
+*/
+void
+nfs_set_poll_timeout(struct nfs_context *nfs, int poll_timeout)
+{
+	rpc_set_timeout(nfs->rpc,poll_timeout);
+}
+
+/*
+* Gets polling timeout for nfs apis
+*/
+int
+nfs_get_poll_timeout(struct nfs_context *nfs)
+{
+	return rpc_get_poll_timeout(nfs->rpc);
+}
+
+/*
 * Sets timeout for nfs apis
 */
 void
 nfs_set_timeout(struct nfs_context *nfs,int timeout)
 {
-	 rpc_set_timeout(nfs->rpc,timeout);
+	rpc_set_timeout(nfs->rpc,timeout);
 }
 
 /*

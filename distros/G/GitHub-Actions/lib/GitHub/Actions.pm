@@ -11,7 +11,11 @@ use v5.14;
 our %github;
 our $EXIT_CODE = 0;
 
-our @EXPORT = qw( %github set_output set_env debug error warning set_failed command_on_file error_on_file warning_on_file start_group end_group exit_action);
+our @EXPORT = qw(
+                  %github set_output set_env debug error warning
+                  set_failed error_on_file warning_on_file
+                  start_group end_group exit_action
+               );
 
 BEGIN {
   for my $k ( keys(%ENV) ) {
@@ -22,20 +26,26 @@ BEGIN {
   }
 }
 
-use version; our $VERSION = qv('0.1.1.1');
+use version; our $VERSION = qv('0.1.2');
+
+sub _write_to_github_file {
+  my ($github_var, $content) = @_;
+  open(my $fh, '>>', $github{$github_var}) or die "Could not open file ". $github{$github_var} ." $!";
+  say $fh $content;
+  close $fh;
+}
 
 sub set_output {
   carp "Need name and value" unless @_;
   my ($output_name, $output_value) = @_;
-  $output_value ||='';
-  say "::set-output name=$output_name\::$output_value";
+  $output_value ||=1;
+  _write_to_github_file( 'OUTPUT', "$output_name=$output_value" );
 }
 
 sub set_env {
   my ($env_var_name, $env_var_value) = @_;
-  open(my $fh, '>>', $github{'ENV'}) or die "Could not open file ". $github{'ENV'} ." $!";
-  say $fh "$env_var_name=$env_var_value";
-  close $fh;
+  $env_var_value ||='1';
+  _write_to_github_file( 'ENV', "$env_var_name=$env_var_value" );
 }
 
 sub debug {
@@ -111,7 +121,7 @@ This document describes GitHub::Actions version 0.1.1.1
     use GitHub::Actions;
     use v5.14;
 
-    # %github contains all GITHUB_* environment variables
+    # Imported %github contains all GITHUB_* environment variables
     for my $g (keys %github ) {
        say "GITHUB_$g -> ", $github{$g}
     }
@@ -123,10 +133,26 @@ This document describes GitHub::Actions version 0.1.1.1
     set_env("FOO", "BAR");
 
     # Produces an error and sets exit code to 1
-    error( "FOO has happened" )
+    error( "FOO has happened" );
+
+    # Error/warning with information on file
+    error_on_file( "There's foo", $file, $line, $col );
+    warning_on_file( "There's bar", $file, $line, $col );
+
+    # Debugging messages and warnings
+    debug( "Value of FOO is $bar" );
+    warning( "Value of FOO is $bar" );
+
+    # Start and end group
+    start_group( "Foo" );
+    # do stuff
+    end_group;
 
     # Exits with error if that's the case
     exit_action();
+
+    # Errors and exits
+    set_failed( "We're doomed" );
 
 Install this module within a GitHub action
 

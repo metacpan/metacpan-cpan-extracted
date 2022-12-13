@@ -13,6 +13,7 @@ use Kephra::App::Editor::Position;
 use Kephra::App::Editor::Select;
 use Kephra::App::Editor::SyntaxMode;
 use Kephra::App::Editor::Tool;
+use Kephra::App::Editor::View;
 
 sub new {
     my( $class, $parent, $style) = @_;
@@ -24,6 +25,7 @@ sub new {
     $self->SetAdditionalCaretsBlink( 1 );
     $self->SetAdditionalCaretsVisible( 1 );
     $self->SetAdditionalSelectionTyping( 1 );
+    $self->SetIndentationGuides( 2 );  # wxSTC_WS_VISIBLEAFTERINDENT   2   wxSTC_WS_VISIBLEALWAYS 1
     # $self->SetAdditionalSelAlpha( 1 );
     $self->SetScrollWidth(300);
     Kephra::App::Editor::SyntaxMode::apply( $self );
@@ -42,22 +44,23 @@ sub mount_events {
         my ($ed, $event) = @_;
         my $code = $event->GetKeyCode; # my $raw = $event->GetRawKeyCode;
         my $mod = $event->GetModifiers; #  say $code;
-        #     say " mod  $mod ; alt ",$event->AltDown, " ; ctrl ",$event->ControlDown;
-        # say "mod $mod";
+        #   alt ",$event->AltDown, " ; ctrl ",$event->ControlDown; say "mod $mod code $code";
 
         if ( $event->ControlDown and $mod != 3) { # $mod == 2 and 
             if ($event->AltDown) {
                 $event->Skip
             } else {
                 if ($event->ShiftDown){
-                    if    ($code == 65)                { $ed->shrink_selecton   } # A
-                    elsif ($code == &Wx::WXK_UP)       { $ed->select_prev_block }
+                    #if    ($code == 65)                { $ed->shrink_selecton   } # A
+                    if    ($code == &Wx::WXK_UP)       { $ed->select_prev_block }
                     elsif ($code == &Wx::WXK_DOWN)     { $ed->select_next_block }
                     elsif ($code == &Wx::WXK_PAGEUP )  { $ed->select_prev_sub   }
                     elsif ($code == &Wx::WXK_PAGEDOWN ){ $ed->select_next_sub   }
                     else                               { $event->Skip           }
                 } else {
-                    if    ($code == 65)                { $ed->expand_selecton   } # A
+                    if    ($code == 43 or $code == 388){ $ed->zoom_in           } # +
+                    elsif ($code == 45 or $code == 390){ $ed->zoom_out          } # -
+                    elsif ($code == 65)                { $ed->expand_selecton   } # A
                     elsif ($code == 67)                { $ed->copy              } # C
                     elsif ($code == 76)                { $ed->sel               } # L
                     elsif ($code == 88)                { $ed->cut               } # X
@@ -94,6 +97,7 @@ sub mount_events {
                     elsif ($code == &Wx::WXK_PAGEDOWN) { $ed->move_page_down    }
                     elsif ($code == &Wx::WXK_HOME)     { $ed->move_to_start     }
                     elsif ($code == &Wx::WXK_END )     { $ed->move_to_end       }
+                    elsif ($code == &Wx::WXK_DELETE)   { $ed->delete_line       }
                     elsif ($code == 55 )               { $ed->insert_brace('{', '}') }
                     elsif ($code == 56 )               { $ed->insert_brace('[', ']') }
                     else                               { $event->Skip }
@@ -105,8 +109,7 @@ sub mount_events {
                     elsif ($code == 50 )                   { $ed->insert_brace('"', '"') }
                     else                                   { $event->Skip                }
                 } else {
-                    if    ($code == &Wx::WXK_F11)          { $self->GetParent->ShowFullScreen( not $self->GetParent->IsFullScreen ) }
-                    elsif ($code == &Wx::WXK_ESCAPE )      { $ed->escape                 }
+                    if    ($code == &Wx::WXK_ESCAPE )      { $ed->escape                 }
                     elsif ($code == &Wx::WXK_RETURN)       { $self->new_line             }
                     else                                   { $event->Skip                }
                 }
@@ -122,7 +125,7 @@ sub mount_events {
         $ev->Skip;
     });
     # Wx::Event::EVT_RIGHT_DOWN( $self, sub {});
-    # Wx::Event::EVT_MIDDLE_UP( $self, sub { say 'right';  $_[1]->Skip;  });
+    Wx::Event::EVT_MIDDLE_UP( $self, sub {  $_[1]->Skip;  });
  
     # Wx::Event::EVT_STC_CHARADDED( $self, $self, sub {  });
     Wx::Event::EVT_STC_CHANGE ( $self, -1, sub {  # edit event
@@ -229,6 +232,11 @@ sub new_line {
 
 sub escape {
     my ($self) = @_;
+    #my ($start_pos, $end_pos) = $self->GetSelection;
+    my $win = $self->GetParent;
+    #if ($start_pos != $end_pos) { return $self->GotoPos ( $self->GetCurrentPos ) }
+    if ($win->IsFullScreen) { return $win->toggle_full_screen};
+    # 3. focus  to edit field
     #say 'esc';
 }    
 

@@ -160,6 +160,7 @@ lib/Lab/Moose/Instrument/DummySource.pm
 lib/Lab/Moose/Instrument/HP34410A.pm
 lib/Lab/Moose/Instrument/HP34420A.pm
 lib/Lab/Moose/Instrument/HP3458A.pm
+lib/Lab/Moose/Instrument/HP83732A.pm
 lib/Lab/Moose/Instrument/HP8596E.pm
 lib/Lab/Moose/Instrument/HPE4400B.pm
 lib/Lab/Moose/Instrument/Keithley2000.pm
@@ -184,6 +185,7 @@ lib/Lab/Moose/Instrument/OI_IPS/Strunk_3He.pm
 lib/Lab/Moose/Instrument/OI_ITC503.pm
 lib/Lab/Moose/Instrument/OI_Mercury/Magnet.pm
 lib/Lab/Moose/Instrument/OI_Triton.pm
+lib/Lab/Moose/Instrument/ProStep4.pm
 lib/Lab/Moose/Instrument/RS_FSV.pm
 lib/Lab/Moose/Instrument/RS_RTB2000.pm
 lib/Lab/Moose/Instrument/RS_SMB.pm

@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-12-05'; # DATE
+our $DATE = '2022-12-09'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '0.052'; # VERSION
+our $VERSION = '0.053'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/CSVUtils/csv_lookup_fields",
@@ -39,7 +39,7 @@ csv-lookup-fields - Fill fields of a CSV file from another
 
 =head1 VERSION
 
-This document describes version 0.052 of csv-lookup-fields (from Perl distribution App-CSVUtils), released on 2022-12-05.
+This document describes version 0.053 of csv-lookup-fields (from Perl distribution App-CSVUtils), released on 2022-12-09.
 
 =head1 SYNOPSIS
 

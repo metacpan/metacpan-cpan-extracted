@@ -1,12 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2015-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2015-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.57;
+use Object::Pad 0.66;
 
-package Device::Chip::MCP23x17 0.05;
+package Device::Chip::MCP23x17 0.06;
 class Device::Chip::MCP23x17
    :isa(Device::Chip);
 
@@ -68,7 +68,7 @@ pin of the chip, if there is one. This will be used by the L</reset> method.
 
 =cut
 
-has $_resetpin;
+field $_resetpin;
 
 async method mount ( $adapter, %params )
 {
@@ -93,7 +93,7 @@ use constant {
    REG_OLAT    => 0x14,
 };
 
-has %_regcache;
+field %_regcache;
 
 async method _cached_maskedwrite_u16 ( $name, $val, $mask )
 {

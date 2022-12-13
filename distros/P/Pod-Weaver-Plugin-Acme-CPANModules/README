@@ -41,7 +41,8 @@
         $self->log(["Generated POD for '%s'", $filename]);
     }
 
-    sub _process_bundle_module { no strict 'refs';
+    sub _process_bundle_module { no strict 'refs'; ## no critic:
+    TestingAndDebugging::ProhibitNoStrict
 
         my ($self, $document, $input, $package) = @_;
 
@@ -139,9 +140,9 @@ NAME
     Acme::CPANModules::* distribution
 
 VERSION
-    This document describes version 0.012 of
+    This document describes version 0.013 of
     Pod::Weaver::Plugin::Acme::CPANModules (from Perl distribution
-    Pod-Weaver-Plugin-Acme-CPANModules), released on 2021-08-21.
+    Pod-Weaver-Plugin-Acme-CPANModules), released on 2022-10-17.
 
 SYNOPSIS
     In your weaver.ini:
@@ -174,7 +175,10 @@ CONFIGURATION
     Optional. Perl code to produce the description POD. If not specified,
     will use default template for the description POD, i.e. entry's
     "description" property, plus "rating", "alternative_modules" if
-    available.
+    available. See Pod::From::Acme::CPANModules for more details.
+
+  additional_props
+    Optional. Also passed to "Pod::From::Acme::CPANModules".
 
 HOMEPAGE
     Please visit the project's homepage at
@@ -183,14 +187,6 @@ HOMEPAGE
 SOURCE
     Source repository is at
     <https://github.com/perlancar/perl-Pod-Weaver-Plugin-Acme-CPANModules>.
-
-BUGS
-    Please report any bugs or feature requests on the bugtracker website
-    <https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Weaver-Plugin-Acm
-    e-CPANModules>
-
-    When submitting a bug or request, please include a test-file or a patch
-    to an existing test-file that illustrates the bug or desired feature.
 
 SEE ALSO
     Acme::CPANModules
@@ -211,15 +207,23 @@ CONTRIBUTING
 
     If you want to build the distribution (e.g. to try to install it locally
     on your system), you can install Dist::Zilla,
-    Dist::Zilla::PluginBundle::Author::PERLANCAR, and sometimes one or two
-    other Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional
-    steps required beyond that are considered a bug and can be reported to
-    me.
+    Dist::Zilla::PluginBundle::Author::PERLANCAR,
+    Pod::Weaver::PluginBundle::Author::PERLANCAR, and sometimes one or two
+    other Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps
+    required beyond that are considered a bug and can be reported to me.
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2021, 2020, 2019, 2018 by perlancar
+    This software is copyright (c) 2022, 2021, 2020, 2019, 2018 by perlancar
     <perlancar@cpan.org>.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Weaver-Plugin-Acm
+    e-CPANModules>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
 

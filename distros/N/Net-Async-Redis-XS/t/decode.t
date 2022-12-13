@@ -78,10 +78,10 @@ is_deeply(
 );
 
 {
-    my $pubsub;
-    local $instance->{pubsub} = sub { fail('called more than once') if $pubsub; $pubsub = shift; };
+    my @pubsub;
+    local $instance->{pubsub} = sub { fail('called more than once') if @pubsub; @pubsub = @_; };
     is_deeply([ Net::Async::Redis::XS::decode_buffer($instance, ">1$Z:8$Z") ], [ ], 'can decode_buffer for pubsub with no data');
-    is_deeply($pubsub, [ 8 ]);
+    is_deeply(\@pubsub, [ 8 ]);
 }
 
 is_deeply(

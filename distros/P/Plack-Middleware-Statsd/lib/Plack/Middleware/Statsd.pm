@@ -2,14 +2,12 @@ package Plack::Middleware::Statsd;
 
 # ABSTRACT: send statistics to statsd
 
-# RECOMMEND PREREQ:  Net::Statsd::Tiny v0.3.0
-# RECOMMEND PREREQ:  HTTP::Status 6.16
-# RECOMMEND PREREQ:  List::Util::XS
-# RECOMMEND PREREQ:  Ref::Util::XS
+# RECOMMEND PREREQ: Net::Statsd::Tiny v0.3.0
+# RECOMMEND PREREQ: HTTP::Status 6.16
+# RECOMMEND PREREQ: List::Util::XS
+# RECOMMEND PREREQ: Ref::Util::XS
 
 use v5.14;
-
-use strict;
 use warnings;
 
 use parent qw/ Plack::Middleware /;
@@ -22,7 +20,7 @@ use Plack::Util::Accessor
 use Ref::Util qw/ is_coderef /;
 use Time::HiRes;
 
-our $VERSION = 'v0.6.1';
+our $VERSION = 'v0.6.2';
 
 # Note: You may be able to omit the client if there is a client
 # defined in the environment hash at C<psgix.monitor.statsd>, and the
@@ -142,10 +140,7 @@ sub call {
                 $increment->( $env, 'psgi.request.method.' . $method, $rate );
             }
 
-            if ( my $type = $env->{CONTENT_TYPE} ) {
-                $type =~ s#\.#-#g;
-                $type =~ s#/#.#g;
-                $type =~ s/;.*$//;
+            if ( my $type = _mime_type_to_metric( $env->{CONTENT_TYPE} ) ) {
                 $increment->( $env, 'psgi.request.content-type.' . $type, $rate );
             }
 
@@ -170,10 +165,7 @@ sub call {
                 $histogram->( $env, 'psgi.response.content-length', $length, $rate );
             }
 
-            if ( my $type = $h->get('Content-Type') ) {
-                $type =~ s#\.#-#g;
-                $type =~ s#/#.#g;
-                $type =~ s/;.*$//;
+            if ( my $type = _mime_type_to_metric( $h->get('Content-Type') ) ) {
                 $increment->( $env, 'psgi.response.content-type.' . $type, $rate );
             }
 
@@ -196,6 +188,11 @@ sub call {
 
 }
 
+sub _mime_type_to_metric {
+    my $type = $_[0] or return;
+    return $type =~ s#\.#-#gr =~ s#/#.#gr =~ s/;.*$//r;
+}
+
 
 1;
 
@@ -211,7 +208,7 @@ Plack::Middleware::Statsd - send statistics to statsd
 
 =head1 VERSION
 
-version v0.6.1
+version v0.6.2
 
 =head1 SYNOPSIS
 
@@ -351,7 +348,7 @@ and returns a valid response, for example.
   enable "Statsd",
      catch_errors => \&handle_errors;
 
-This is disable by default, which means that no metrics will be logged
+This is disabled by default, which means that no metrics will be logged
 if there is a fatal error.
 
 Added in v0.5.0.
@@ -495,6 +492,20 @@ allow you to monitor process size information.  In your F<app.psgi>:
 
 If your application is returning a status code that is not handled by
 L<HTTP::Status>, then the metrics may not be logged for that reponse.
+
+=head2 psgix.informational
+
+This does not add a wrapper around the C<psgix.informational>
+callback.  If you are making use of it in your code, then you will
+need to add metrics logging yourself.
+
+=head1 SUPPORT FOR OLDER PERL VERSIONS
+
+Since v0.6.0, the this module requires Perl v5.14 or later.
+
+If you need this module on Perl v5.10, please use one of the v0.5.x
+versions of this module.  Significant bug or security fixes may be
+backported to those versions.
 
 =head1 SEE ALSO
 

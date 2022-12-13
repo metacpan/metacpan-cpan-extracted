@@ -143,11 +143,11 @@ function parseIP(ip) {
     return ip;
 }
 
-function get_selector(name, type, render_type) {
+function get_selector(name, type, render_type, rt_v5) {
     var selector;
     if (type == 'Text' || type == 'Wikitext') {
         selector = 'textarea[name="' + name + '"]';
-    } else if ((type == 'Select' && render_type == 'List') || type == 'Image' || type == 'Binary') {
+    } else if ((type == 'Select' && render_type == 'List') || type == 'Image' || type == 'Binary' || (rt_v5 >= 0 && (type == 'Combobox' || type == 'Date' || type == 'DateTime'))) {
         selector = 'input[name="' + name + '"]';
     } else {
         selector = '#' + name;

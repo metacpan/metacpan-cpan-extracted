@@ -48,4 +48,9 @@ sub insert_text {
     $self->SetSelection( $pos, $pos );
 }
 
+sub delete_line {
+    my ($self) = @_;
+    $self->LineDelete;    
+}
+
 1;

@@ -26,7 +26,7 @@
             "Device::Chip::Sensor" : "0.23",
             "Future::AsyncAwait" : "0.47",
             "Future::Mutex" : "0.47",
-            "Object::Pad" : "0.57",
+            "Object::Pad" : "0.66",
             "perl" : "5.026"
          }
       },
@@ -40,7 +40,7 @@
    "provides" : {
       "Device::Chip::MPL3115A2" : {
          "file" : "lib/Device/Chip/MPL3115A2.pm",
-         "version" : "0.11"
+         "version" : "0.12"
       }
    },
    "release_status" : "stable",
@@ -49,6 +49,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.11",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "0.12",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

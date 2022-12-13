@@ -52,7 +52,7 @@ PPCODE:
     const char *end = in + len;
     struct pending_stack *ps = NULL;
     AV *results = (AV *) sv_2mortal((SV *) newAV());
-    int extracted_item = 0;
+    bool extracted_item = false;
     SV *extracted = &PL_sv_undef;
     /* Perl strings _should_ guarantee this, so perhaps better as an assert? */
     if(*end != '\0') {
@@ -88,10 +88,12 @@ PPCODE:
                         av_extend(x, n);
                     }
                     struct pending_stack *pn = Newx(pn, 1, struct pending_stack);
-                    pn->data = x;
-                    pn->prev = ps;
-                    pn->expected = n;
-                    pn->type = array;
+                    *pn = (struct pending_stack) {
+                        .data = x,
+                        .prev = ps,
+                        .expected = n,
+                        .type = array
+                    };
                     ps = pn;
                     break;
                 }
@@ -114,10 +116,12 @@ PPCODE:
                         av_extend(x, n);
                     }
                     struct pending_stack *pn = Newx(pn, 1, struct pending_stack);
-                    pn->data = x;
-                    pn->prev = ps;
-                    pn->expected = n;
-                    pn->type = push;
+                    *pn = (struct pending_stack) {
+                        .data = x,
+                        .prev = ps,
+                        .expected = n,
+                        .type = push
+                    };
                     ps = pn;
                     break;
                 }
@@ -142,10 +146,12 @@ PPCODE:
                         av_extend(x, n);
                     }
                     struct pending_stack *pn = Newx(pn, 1, struct pending_stack);
-                    pn->data = x;
-                    pn->prev = ps;
-                    pn->expected = n;
-                    pn->type = map;
+                    *pn = (struct pending_stack) {
+                        .data = x,
+                        .prev = ps,
+                        .expected = n,
+                        .type = map
+                    };
                     ps = pn;
                     break;
                 }
@@ -175,7 +181,7 @@ PPCODE:
                         add_value(ps, v);
                     } else {
                         av_push(results, v);
-                        extracted_item = 1;
+                        extracted_item = true;
                     }
                     break;
                 }
@@ -197,7 +203,7 @@ PPCODE:
                         add_value(ps, v);
                     } else {
                         av_push(results, v);
-                        extracted_item = 1;
+                        extracted_item = true;
                     }
                     break;
                 }
@@ -235,7 +241,7 @@ PPCODE:
                         add_value(ps, v);
                     } else {
                         av_push(results, v);
-                        extracted_item = 1;
+                        extracted_item = true;
                     }
                     break;
                 }
@@ -258,7 +264,7 @@ PPCODE:
                         add_value(ps, v);
                     } else {
                         av_push(results, v);
-                        extracted_item = 1;
+                        extracted_item = true;
                     }
                     break;
                 }
@@ -322,7 +328,7 @@ PPCODE:
                         add_value(ps, v);
                     } else {
                         av_push(results, v);
-                        extracted_item = 1;
+                        extracted_item = true;
                     }
                     break;
                 }
@@ -338,8 +344,8 @@ PPCODE:
                 AV *data = ps->data;
                 struct pending_stack *orig = ps;
                 ps = orig->prev;
-                SV *value_ref = newRV((SV *) data);
                 if(ps) {
+                    SV *value_ref = newRV((SV *) data);
                     av_push(
                         ps->data,
                         value_ref
@@ -356,8 +362,13 @@ PPCODE:
                                 ENTER;
                                 SAVETMPS;
                                 PUSHMARK(SP);
-                                EXTEND(SP, 1);
-                                PUSHs(sv_2mortal(value_ref));
+                                long count = av_count(data);
+                                if(count) {
+                                    EXTEND(SP, count);
+                                    for(int i = 0; i < count; ++i) {
+                                        mPUSHs(av_shift(data));
+                                    }
+                                }
                                 PUTBACK;
                                 call_sv((SV *) cv, G_VOID | G_DISCARD);
                                 FREETMPS;
@@ -376,6 +387,7 @@ PPCODE:
                          * by returning a blessed object for example
                          */
                         SV *rv = SvRV(this);
+                        SV *value_ref = newRV((SV *) data);
                         if(hv_exists((HV *) rv, "attribute", 9)) {
                             SV **cv_ptr = hv_fetchs((HV *) rv, "attribute", 0);
                             if(cv_ptr) {
@@ -398,18 +410,20 @@ PPCODE:
                         }
                         break;
                     }
-                    default:
+                    default: {
                         /* Yes, we fall through as a default for map and array: unless the
                          * hashrefs option is set, we want to map all key/value pairs to plain
                          * arrays anyway.
                          */
+                        SV *value_ref = newRV((SV *) data);
                         av_push(
                             results,
                             value_ref
                         );
-                        extracted_item = 1;
                         break;
                     }
+                    }
+                    extracted_item = true;
                 }
                 Safefree(orig);
             }
@@ -423,9 +437,9 @@ PPCODE:
                 sv_chop(p, ptr);
                 ptr = SvPVbyte(p, len);
                 end = ptr + len;
-                extracted_item = 0;
+                extracted_item = false;
                 /* ... and our "list" is only ever going to be a single item if we're in scalar context */
-                if (GIMME_V == G_SCALAR) {
+                if (GIMME_V == G_SCALAR && av_count(results) > 0) {
                     extracted = av_shift(results);
                     break;
                 }

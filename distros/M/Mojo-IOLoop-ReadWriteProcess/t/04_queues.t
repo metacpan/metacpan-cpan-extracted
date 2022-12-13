@@ -36,7 +36,7 @@ subtest queues => sub {
   is $q->pool->size,              3;
   is $q->pool->maximum_processes, 3;
   $q->consume;
-  is $fired, $proc;
+  is $fired,          $proc;
   is $q->queue->size, 0;
   is $q->pool->size,  0;
   is $q->done->size,  $proc;
@@ -72,7 +72,7 @@ subtest test_2 => sub {
   is $q->pool->size,              2;
   is $q->pool->maximum_processes, 2;
   $q->consume;
-  is $fired, $proc;
+  is $fired,          $proc;
   is $q->queue->size, 0;
   is $q->pool->size,  0;
   is $q->done->size,  $proc;
@@ -108,7 +108,7 @@ subtest atomic_queues => sub {
   is $q->pool->size,              1;
   is $q->pool->maximum_processes, 1;
   $q->consume;
-  is $fired, $proc;
+  is $fired,          $proc;
   is $q->queue->size, 0;
   is $q->pool->size,  0;
   is $q->done->size,  $proc;
@@ -147,7 +147,7 @@ subtest test_3 => sub {
   is $q->queue->size, 0;
   is $q->pool->size,  0;
   is $q->done->size,  $proc;
-  is $fired, $proc;
+  is $fired,          $proc;
   $i = 1;
   for (1 .. $proc) {
     is $output{$i + 42}, 1 or diag explain \%output;
@@ -189,7 +189,7 @@ subtest stress_test => sub {
   is $q->queue->size, 0;
   is $q->pool->size,  0;
   is $q->done->size,  $proc;
-  is $fired, $proc;
+  is $fired,          $proc;
   $i = 1;
   for (1 .. $proc) {
     is $output{$i}, 1 or diag explain \%output;

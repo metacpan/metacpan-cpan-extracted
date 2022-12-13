@@ -39,4 +39,23 @@ sub hello_get_with_params :get(hello_world) :params(test => 'okay') {
 	$_[1]->response->hello = "world 3";
 }
 
+sub web :websocket {
+	my ($self, $t) = @_;
+	return (
+		disconnect => sub {
+		},
+		connect => sub {
+			my ($websocket) = @_;
+			$websocket->send('Hello');
+		},
+		recieve => sub {
+			my ($websocket) = @_;
+			$websocket->send('response');
+		},
+		error => sub {
+			$t->logError('Kaput' . $_[1]);
+		} 
+	);
+}
+
 1;

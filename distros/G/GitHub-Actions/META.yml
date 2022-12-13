@@ -4,12 +4,13 @@ author:
   - 'JJ Merelo <jmerelo@CPAN.org>'
 build_requires:
   ExtUtils::MakeMaker: '0'
+  Test::File::Contents: '0'
   Test::Output: '0'
   Test::Perl::Critic: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: unknown
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,5 +26,5 @@ requires:
 resources:
   bugtracker: https://github.com/JJ/perl-GitHub-Actions/issues
   repository: https://github.com/JJ/perl-GitHub-Actions/
-version: 0.1.1.1
-x_serialization_backend: 'CPAN::Meta::YAML version 0.012'
+version: 0.1.2
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

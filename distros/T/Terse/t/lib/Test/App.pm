@@ -22,5 +22,24 @@ sub logout {
 	return 1;
 }
 
+sub web :websocket {
+	my ($self, $t) = @_;
+	return (
+		disconnect => sub {
+		},
+		connect => sub {
+			my ($websocket) = @_;
+			$websocket->send('Hello');
+		},
+		recieve => sub {
+			my ($websocket) = @_;
+			$websocket->send('response');
+		},
+		error => sub {
+			$t->logError('Kaput' . $_[1]);
+		} 
+	);
+}
+
 1;
 

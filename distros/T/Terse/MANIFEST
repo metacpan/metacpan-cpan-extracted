@@ -6,6 +6,7 @@ lib/Terse/Controller.pm
 lib/Terse/Model.pm
 lib/Terse/Plugin.pm
 lib/Terse/View.pm
+lib/Terse/WebSocket.pm
 Makefile.PL
 MANIFEST			This list of files
 README

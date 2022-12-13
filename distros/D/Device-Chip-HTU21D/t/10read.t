@@ -20,7 +20,7 @@ await $chip->mount(
 {
    $adapter->expect_write( "\xF3" );
    $adapter->expect_read( 2 )
-      ->returns( "\x5A\x2C" );
+      ->will_done( "\x5A\x2C" );
 
    is( int( await $chip->read_temperature ), 15,
        '$chip->read_temperature' );
@@ -32,10 +32,10 @@ await $chip->mount(
 {
    $adapter->expect_write( "\xF3" );
    $adapter->expect_read( 2 )
-      ->fails( "NACK" );
+      ->will_fail( "NACK" );
    $adapter->expect_sleep( "0.01" );
    $adapter->expect_read( 2 )
-      ->returns( "\x5D\x20" );
+      ->will_done( "\x5D\x20" );
 
    is( int( await $chip->read_temperature ), 17,
        '$chip->read_temperature delayed' );
@@ -47,7 +47,7 @@ await $chip->mount(
 {
    $adapter->expect_write( "\xF5" );
    $adapter->expect_read( 2 )
-      ->returns( "\x5A\x2C" );
+      ->will_done( "\x5A\x2C" );
 
    is( int( await $chip->read_humidity ), 38,
        '$chip->read_humidity' );

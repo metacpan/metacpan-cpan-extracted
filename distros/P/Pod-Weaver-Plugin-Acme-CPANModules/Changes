@@ -1,3 +1,9 @@
+0.013   2022-10-17  Released-By: PERLANCAR; Urgency: medium
+
+        - Add configuration option: additional_props (from
+          Pod::From::Acme::CPANModules 0.012).
+
+
 0.012   2021-08-21  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

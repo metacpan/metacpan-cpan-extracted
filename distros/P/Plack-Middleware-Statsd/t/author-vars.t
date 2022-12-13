@@ -12,6 +12,6 @@ BEGIN {
 
 use Test::More;
 
-eval "use Test::Vars";
+eval "use Test::Vars 0.015";
 
 all_vars_ok();

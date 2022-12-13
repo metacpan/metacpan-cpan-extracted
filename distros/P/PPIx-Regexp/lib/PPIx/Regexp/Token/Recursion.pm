@@ -36,7 +36,7 @@ use base qw{ PPIx::Regexp::Token::Reference };
 use Carp qw{ confess };
 use PPIx::Regexp::Constant qw{ RE_CAPTURE_NAME @CARP_NOT };
 
-our $VERSION = '0.085';
+our $VERSION = '0.086';
 
 # Return true if the token can be quantified, and false otherwise
 # sub can_be_quantified { return };
@@ -66,6 +66,14 @@ sub explain {
 
 sub perl_version_introduced {
     return '5.009005';
+}
+
+sub raw_width {
+    return ( undef, undef );
+}
+
+sub width {
+    return ( undef, undef );
 }
 
 # This must be implemented by tokens which do not recognize themselves.

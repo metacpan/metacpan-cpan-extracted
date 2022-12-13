@@ -35,11 +35,13 @@ use warnings;
 use base qw{ PPIx::Regexp::Structure };
 
 use Carp qw{ confess };
+use List::Util qw{ max };
 
-our $VERSION = '0.085';
+our $VERSION = '0.086';
 
 use PPIx::Regexp::Constant qw{
     LITERAL_LEFT_CURLY_ALLOWED
+    VARIABLE_LENGTH_LOOK_BEHIND_INTRODUCED
     @CARP_NOT
 };
 
@@ -65,6 +67,32 @@ assertion, or a false value if it is a negative assertion.
 sub is_positive {
     my ( $self ) = @_;
     return $self->_get_type()->is_positive();
+}
+
+sub perl_version_introduced {
+    my ( $self ) = @_;
+    return( $self->{perl_version_introduced} ||=
+	$self->_perl_version_introduced() );
+}
+
+sub _perl_version_introduced {
+    my ( $self ) = @_;
+    my $ver = max( map { $_->perl_version_introduced() }
+	$self->children() );
+    if ( $ver < VARIABLE_LENGTH_LOOK_BEHIND_INTRODUCED &&
+	!  $self->is_look_ahead()
+    ) {
+	my ( $wid_min, $wid_max ) = $self->raw_width();
+	defined $wid_min
+	    and defined $wid_max
+	    and $wid_min < $wid_max
+	    and $ver = max( $ver, VARIABLE_LENGTH_LOOK_BEHIND_INTRODUCED );
+    }
+    return $ver;
+}
+
+sub width {
+    return ( 0, 0 );
 }
 
 # An un-escaped literal left curly bracket can always follow this

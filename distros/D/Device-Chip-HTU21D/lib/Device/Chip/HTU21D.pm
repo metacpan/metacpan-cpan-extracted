@@ -1,12 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.57;
+use Object::Pad 0.66;
 
-package Device::Chip::HTU21D 0.08;
+package Device::Chip::HTU21D 0.09;
 class Device::Chip::HTU21D
    :isa(Device::Chip);
 
@@ -141,7 +141,7 @@ async method change_config ( %changes )
    await $self->protocol->write( pack "C a", CMD_WRITE_REG, $val );
 }
 
-has $_mutex;
+field $_mutex;
 
 async method _trigger_nohold ( $cmd )
 {

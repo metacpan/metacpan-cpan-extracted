@@ -8,7 +8,7 @@ use parent                qw( Plack::Middleware );
 use Log::Any              qw();
 use Plack::Util::Accessor qw( category logger );
 
-our $VERSION = '0.001002';
+our $VERSION = '0.001003';
 
 sub prepare_app {
   my ( $self ) = @_;
@@ -21,7 +21,9 @@ sub call {
   $env->{ 'psgix.logger' } = sub {
     my ( $level, $message ) = @{ $_[ 0 ] }{ qw( level message ) };
 
-    $self->logger->$level( $message );
+    my $logger = $self->logger;
+    @_ = ( $logger, $message );
+    goto &{ $logger->can( $level ) };
   };
 
   $self->app->( $env );

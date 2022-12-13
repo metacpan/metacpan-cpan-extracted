@@ -14,7 +14,7 @@ use PPIx::Regexp;
 use PPIx::Regexp::Dumper;
 use PPIx::Regexp::Tokenizer;
 
-our $VERSION = '0.085';
+our $VERSION = '0.086';
 
 my %opt = (
     verbose	=> 0,
@@ -39,6 +39,7 @@ my @ignore;
 if ( $opt{ignore} ) {
     my $fh = IO::File->new( $opt{ignore}, '<' )
 	or die "Unable to open $opt{ignore}: $!\n";
+    local $_ = undef;	# while (<>) ... does not localize $_.
     while ( <$fh> ) {
 	s/ \s+ \z //smx;
 	$_ or next;

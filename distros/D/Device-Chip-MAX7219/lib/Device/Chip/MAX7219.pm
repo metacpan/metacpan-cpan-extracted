@@ -1,12 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.57;
+use Object::Pad 0.73 ':experimental(init_expr)';
 
-package Device::Chip::MAX7219 0.07;
+package Device::Chip::MAX7219 0.08;
 class Device::Chip::MAX7219
    :isa(Device::Chip);
 
@@ -56,7 +56,7 @@ concepts or features, only the use of this module to access them.
 
 =cut
 
-has $_decode = 0;
+field $_decode = 0;
 
 method SPI_options
 {

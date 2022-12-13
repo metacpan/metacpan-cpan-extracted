@@ -1,5 +1,38 @@
 Revision history for Terse
 
+0.120    [2022-12-13]
+        - Allow inheritance of controller endpoints. 
+
+0.119    [2022-12-13]
+        - Allow inheritance of controller endpoints. 
+
+0.118    [2022-12-13]
+	- Die early when we have no request context
+	- Fix setting of response headers and cookies.
+
+0.117    [2022-12-12]
+	- Fix delayed_response to handle content type better
+	- Handle errors from views, with an option to send an empty body which will use the browsers response.
+
+0.116    [2022-12-11]
+	- Fix websockets so they can parse/recieve multiple frames a time.
+	- Add to_app method to Terse.
+
+0.115    [2022-12-11]
+	- Adds :websocket(req) suppoert to Terse::Controller.
+
+0.114    [2022-12-10]
+	- WebSocket fixes.
+
+0.112    [2022-12-10]
+	- Adds WebSocket support.
+
+0.112    [2022-12-10]
+	- Adds WebSocket support.
+
+0.111    [2022-12-10]
+	- Adds WebSocket support.
+
 0.110    [2022-12-09]
 	- Provide plugins and models connect callback with application context.
 

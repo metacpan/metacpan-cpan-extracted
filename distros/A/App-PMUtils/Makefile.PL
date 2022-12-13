@@ -72,7 +72,7 @@ my %WriteMakefileArgs = (
     "Data::Sah::Compiler::perl::TH::str" => "0.911",
     "Data::Sah::Filter::perl::Perl::normalize_perl_modname" => 0,
     "Data::Sah::Value::perl::Perl::these_mods" => 0,
-    "Dist::Util" => 0,
+    "Dist::Util" => "0.070",
     "ExtUtils::MakeMaker" => 0,
     "File::ShareDir" => 0,
     "File::Spec" => 0,
@@ -115,7 +115,7 @@ my %WriteMakefileArgs = (
     "IPC::Open3" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.740",
+  "VERSION" => "0.741",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -138,7 +138,7 @@ my %FallbackPrereqs = (
   "Data::Sah::Compiler::perl::TH::str" => "0.911",
   "Data::Sah::Filter::perl::Perl::normalize_perl_modname" => 0,
   "Data::Sah::Value::perl::Perl::these_mods" => 0,
-  "Dist::Util" => 0,
+  "Dist::Util" => "0.070",
   "ExtUtils::MakeMaker" => 0,
   "File::ShareDir" => 0,
   "File::Spec" => 0,

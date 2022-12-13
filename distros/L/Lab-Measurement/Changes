@@ -4,6 +4,11 @@ History for the Lab-Measurement Perl distribution
 This document is work in progress (in the sense of adding
 historical information).
 
+3.840 2022-12-12
+  * New driver (work in progress): ProStep4 step motor
+  * New driver (work in progress): HP83732A signal generator
+  * Improve Synctek MCL1-540 code
+
 3.831 2022-11-30
   * Nanonis Tramea: Add more functionality
 

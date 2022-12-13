@@ -1,0 +1,13 @@
+\begin{table}
+\centering
+\begin{tabular}{lrl}
+\toprule
+Name & Age & City \\
+\midrule
+Mr X & 34 & London \\
+Q    & 43 & London \\
+M    & 55 & London \\
+\bottomrule
+\end{tabular}
+\label{table:test}
+\end{table}

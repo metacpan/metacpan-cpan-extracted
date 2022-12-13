@@ -1,0 +1,82 @@
+NAME
+
+    App::CSV2LaTeXTable - Generate LaTeX table from CSV file
+
+VERSION
+
+    version 1.0.0
+
+SYNOPSIS
+
+        use App::CSV2LaTeXTable;
+    
+        my $csv   = '/path/to/a_csv_file.csv';
+        my $latex = '/path/to/resulting_latex_file.tex';
+    
+        my $obj = App::CSV2LaTeXTable->new(
+            csv   => $csv,
+            latex => $latex,
+        );
+    
+        $obj->run;
+
+    Using this CSV file:
+
+        Name,Age,City
+        Mr X,34,London
+        Q,43,London
+        M,55,London
+
+    This module generates this:
+
+        \begin{table}
+        \centering
+        \begin{tabular}{lrl}
+        \toprule
+        Name & Age & City \\
+        \midrule
+        Mr X & 34 & London \\
+        Q    & 43 & London \\
+        M    & 55 & London \\
+        \bottomrule
+        \end{tabular}
+        \label{table:a_csv_file}
+        \end{table}
+
+DESCRIPTION
+
+    This is the module behind csv2latextable.
+
+ATTRIBUTES
+
+      * csv
+
+      * csv_param
+
+      * latex
+
+      * latex_param
+
+METHODS
+
+ run
+
+        my $obj = App::CSV2LaTeXTable->new(
+            csv   => 'A-csv-file.csv',
+            latex => 'Target_file.tex',
+        );
+    
+        $obj->run;
+
+AUTHOR
+
+    Renee Baecker <reneeb@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2022 by Renee Baecker.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

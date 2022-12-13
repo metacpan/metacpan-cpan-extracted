@@ -1,16 +1,7 @@
 #include "spvm_native.h"
+#include "spvm_socket_util.h"
 
 #include <assert.h>
-
-#ifdef _WIN32
-  #include <ws2tcpip.h>
-  #include <winsock2.h>
-  #include <io.h>
-#else
-  #include <sys/types.h>
-  #include <sys/socket.h>
-  #include <netinet/in.h>
-#endif
 
 const char* FILE_NAME = "Sys/Socket/Ip_mreq_source.c";
 

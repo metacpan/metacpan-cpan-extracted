@@ -1,7 +1,7 @@
 package RPC::Switch::Client;
 use Mojo::Base 'Mojo::EventEmitter';
 
-our $VERSION = '0.21'; # VERSION
+our $VERSION = '0.22'; # VERSION
 
 #
 # Mojo's default reactor uses EV, and EV does not play nice with signals
@@ -26,12 +26,12 @@ use Encode qw(encode_utf8 decode_utf8);
 use File::Basename;
 use IO::Handle;
 use POSIX ();
-use Scalar::Util qw(blessed refaddr);
+use Scalar::Util qw(blessed refaddr weaken);
 use Storable;
 use Sys::Hostname;
 
 # from cpan
-use JSON::RPC2::TwoWay 0.05; # for configurable json encoder
+use JSON::RPC2::TwoWay 0.07; # for configurable json encoder
 # JSON::RPC2::TwoWay depends on JSON::MaybeXS anyways, so it can be used here
 # without adding another dependency
 use JSON::MaybeXS qw();
@@ -106,8 +106,19 @@ sub connect {
 		$self->ioloop->stop;
 	});
 
+	my $debug = do {
+		weaken(my $self = $self);
+		$self->{debug} ? sub { 
+			if ($self->{log}) {
+				$self->log->debug(@_) 
+			} else {
+				warn join(' ', @_)."\n";
+			}
+		} : undef
+	};
+
 	my $rpc = JSON::RPC2::TwoWay->new(
-		debug => $self->{debug},
+		debug => $debug,
 		json => $self->{jsonobject},
 	) or croak 'no rpc?';
 	$rpc->register('rpcswitch.greetings', sub { $self->rpc_greetings(@_) }, notification => 1);
@@ -1115,6 +1126,16 @@ L<https://github.com/a6502/rpc-switch>: RPC-Switch
 This software has been developed with support from L<STRATO|https://www.strato.com/>.
 In German: Diese Software wurde mit Unterstützung von L<STRATO|https://www.strato.de/> entwickelt.
 
+=head1 THANKS
+
+=over 4
+
+=item *
+
+'greencoloured' for multiple PRs
+
+=back
+
 =head1 AUTHORS
 
 =over 4
@@ -1127,7 +1148,7 @@ Wieger Opmeer <wiegerop@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2018 by Wieger Opmeer.
+This software is copyright (c) 2018-2022 by Wieger Opmeer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -1,5 +1,10 @@
 Revision history for Device-Chip-CCS811
 
+0.02    2022-12-11
+        [CHANGES]
+         * Updated for Object::Pad v0.66 - use `field` instead of `has`
+         * Updated for Test::ExpectAndCheck::Future v0.04
+
 0.01    2021-12-22
         First version, released on an unsuspecting world.
 

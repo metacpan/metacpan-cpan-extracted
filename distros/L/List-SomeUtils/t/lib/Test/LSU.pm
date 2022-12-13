@@ -1,6 +1,7 @@
 package Test::LSU;
 
 use strict;
+use warnings;
 
 require Exporter;
 use Test::More import => ['!pass'];
@@ -8,6 +9,7 @@ use Carp qw/croak/;
 
 use base qw(Test::Builder::Module Exporter);
 
+## no critic (Modules::ProhibitAutomaticExportation)
 our @EXPORT
     = qw(is_true is_false is_defined is_undef is_dying grow_stack leak_free_ok);
 our @EXPORT_OK
@@ -19,34 +21,35 @@ my $CLASS = __PACKAGE__;
 # Support Functions
 
 sub is_true {
-    @_ == 1 or croak "Expected 1 param";
+    @_ == 1 or croak 'Expected 1 param';
     my $tb = $CLASS->builder();
-    $tb->ok( $_[0], "is_true ()" );
+    $tb->ok( $_[0], 'is_true()' );
 }
 
 sub is_false {
-    @_ == 1 or croak "Expected 1 param";
+    @_ == 1 or croak 'Expected 1 param';
     my $tb = $CLASS->builder();
-    $tb->ok( !$_[0], "is_false()" );
+    $tb->ok( !$_[0], 'is_false()' );
 }
 
 sub is_defined {
-    @_ < 1 or croak "Expected 0..1 param";
+    @_ < 1 or croak 'Expected 0..1 param';
     my $tb = $CLASS->builder();
-    $tb->ok( defined( $_[0] ), "is_defined ()" );
+    $tb->ok( defined( $_[0] ), 'is_defined()' );
 }
 
 sub is_undef {
-    @_ <= 1 or croak "Expected 0..1 param";
+    @_ <= 1 or croak 'Expected 0..1 param';
     my $tb = $CLASS->builder();
-    $tb->ok( !defined( $_[0] ), "is_undef()" );
+    $tb->ok( !defined( $_[0] ), 'is_undef()' );
 }
 
 sub is_dying {
-    @_ == 1 or croak "Expected 1 param";
+    @_ == 1 or croak 'Expected 1 param';
     my $tb = $CLASS->builder();
+    ## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
     eval { $_[0]->(); };
-    $tb->ok( $@, "is_dying()" );
+    $tb->ok( $@, 'is_dying()' );
 }
 
 my @bigary = (1) x 500;
@@ -71,9 +74,9 @@ SKIP:
 }
 
 {
-
+    ## no critic (Modules::ProhibitMultiplePackages)
     package DieOnStringify;
-    use overload '""' => \&stringify;
+    use overload q{""} => \&stringify;
     sub new       { bless {}, shift }
     sub stringify { die 'DieOnStringify exception' }
 }

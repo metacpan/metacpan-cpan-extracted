@@ -18,7 +18,7 @@ my %module_build_args = (
     "Ian Kluft <ian.kluft+github\@gmail.com>"
   ],
   "dist_name" => "TimeZone-Solar",
-  "dist_version" => "0.2.0",
+  "dist_version" => "0.2.1",
   "license" => "perl",
   "module_name" => "TimeZone::Solar",
   "recursive_test_files" => 1,
@@ -31,7 +31,7 @@ my %module_build_args = (
     "autodie" => 0,
     "feature" => 0,
     "overload" => 0,
-    "perl" => "> v5.20.0",
+    "perl" => "v5.20.0",
     "strict" => 0,
     "utf8" => 0,
     "warnings" => 0

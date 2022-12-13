@@ -13,7 +13,7 @@ Readonly::Array our @EXPORT_OK => qw{parse serialize};
 Readonly::Scalar our $LOG_REGEXP => qr{(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2}:\d{2}\.?\d*)\s+\[(\w+)\]\s+([^:]+):(\d+)\s+(.*)};
 Readonly::Scalar our $SPACE => q{ };
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 # Parse FreeSWITCH log line.
 sub parse {
@@ -79,19 +79,21 @@ Log::FreeSWITCH::Line - FreeSWITCH log line parsing and serializing.
 
 =head1 SUBROUTINES
 
-=over 8
+=head2 C<parse>
 
-=item C<parse($data)>
+ my $data_o = parse($data);
 
- Parse FreeSWITCH log line.
- Returns Log::FreeSWITCH::Line::Data object.
+Parse FreeSWITCH log line.
 
-=item C<serialize($data_o)>
+Returns Log::FreeSWITCH::Line::Data object.
 
- Serialize Log::FreeSWITCH::Line::Data object to FreeSWITCH log line.
- Returns string.
+=head2 C<serialize>
 
-=back
+ my $data = serialize($data_o);
+
+Serialize Log::FreeSWITCH::Line::Data object to FreeSWITCH log line.
+
+Returns string.
 
 =head1 ERRORS
 
@@ -103,6 +105,8 @@ Log::FreeSWITCH::Line - FreeSWITCH log line parsing and serializing.
          Serialize object must be 'Log::FreeSWITCH::Line::Data' object.
 
 =head1 EXAMPLE1
+
+=for comment filename=parse_log_line.pl
 
  use strict;
  use warnings;
@@ -136,6 +140,8 @@ Log::FreeSWITCH::Line - FreeSWITCH log line parsing and serializing.
  # }
 
 =head1 EXAMPLE2
+
+=for comment filename=serialize_log_structure.pl
 
  use strict;
  use warnings;
@@ -189,12 +195,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2014-2021 Michal Josef Špaček
+© 2014-2022 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut

@@ -8,7 +8,7 @@ use Error::Pure::Always;
 use Error::Pure qw(err);
 use Mo qw(builder is required);
 
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 
 has date => (
 	'is' => 'ro',
@@ -103,11 +103,13 @@ Log::FreeSWITCH::Line::Data - Data object which represents FreeSWITCH log line.
 
 =head1 METHODS
 
-=over 8
+=head2 C<new>
 
-=item C<new(%params)>
+ my $obj = Log::FreeSWITCH::Line::Data->new(%params);
 
- Constructor.
+Constructor.
+
+Returns instance of object.
 
 =over 8
 
@@ -148,47 +150,69 @@ Log::FreeSWITCH::Line::Data - Data object which represents FreeSWITCH log line.
 
 =back
 
-=item C<date()>
+=head2 C<date>
 
- Get log entry date.
- Returns string with date in 'YYYY-MM-DD' format.
+ my $date = $obj->date;
 
-=item C<datetime_obj()>
+Get log entry date.
 
- Get DateTime object.
- Returns DateTime object.
+Returns string with date in 'YYYY-MM-DD' format.
 
-=item C<file()>
+=head2 C<datetime_obj>
 
- Get file in log entry.
- Returns string.
+ my $datetime_o = $obj->datetime_obj;
 
-=item C<file_line()>
+Get DateTime object.
 
- Get file line in log entry.
- Returns string.
+Returns DateTime object.
 
-=item C<message()>
+=head2 C<file>
 
- Get log message.
- Returns string.
+ my $file = $obj->file;
 
-=item C<raw($raw)>
+Get file in log entry.
 
- Get or set raw FreeSWITCH log entry.
- Returns string.
+Returns string.
 
-=item C<time()>
+=head2 C<file_line>
 
- Get log entry time.
- Returns string with time in 'HH:MM:SS' format.
+ my $file_line = $obj->file_line;
 
-=item C<type()>
+Get file line in log entry.
 
- Get log entry type.
- Returns string.
+Returns string.
 
-=back
+=head2 C<message>
+
+ my $message = $obj->message;
+
+Get log message.
+
+Returns string.
+
+=head2 C<raw>
+
+ my $raw = $obj->raw($raw);
+
+Get or set raw FreeSWITCH log entry.
+
+Returns string.
+
+=head2 C<time>
+
+ my $time = $obj->time;
+
+Get log entry time.
+
+Returns string with time in 'HH:MM:SS' format.
+
+=head2 C<type>
+
+ my $type = $obj->type;
+
+Get log entry type.
+
+Returns string.
 
 =head1 ERRORS
 
@@ -206,6 +230,8 @@ Log::FreeSWITCH::Line::Data - Data object which represents FreeSWITCH log line.
                  Error: %s
 
 =head1 EXAMPLE
+
+=for comment filename=log_line_data_object.pl
 
  use strict;
  use warnings;
@@ -258,12 +284,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© 2014-2021 Michal Josef Špaček
+© 2014-2022 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.07
+0.08
 
 =cut

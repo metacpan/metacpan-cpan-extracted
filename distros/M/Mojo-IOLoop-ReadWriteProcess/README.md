@@ -266,7 +266,7 @@ Defaults to `0`, If enabled data returned from forked process will be serialized
 
 ## kill\_sleeptime
 
-Defaults to `1`, it's the seconds to wait before attempting SIGKILL when blocking\_stop is setted to 1.
+Defaults to `1`, it's the seconds to wait before attempting SIGKILL when blocking\_stop is set to 1.
 
 ## separate\_err
 
@@ -361,7 +361,7 @@ Inspect the codeblock return.
     my $p = process()->enable_subreaper;
 
 Mark the current process (not the child) as subreaper.
-This is used typically if you want to mark further childs as subreapers inside other forks.
+This is used typically if you want to mark further children as subreapers inside other forks.
 
     my $master_p = process(
       sub {

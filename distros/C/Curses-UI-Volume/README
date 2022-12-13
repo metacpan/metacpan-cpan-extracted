@@ -71,11 +71,9 @@ WIDGET-SPECIFIC METHODS
              Returns volume number (0-100%).
 
 EXAMPLE1
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Curses::UI;
 
      # Object.
@@ -100,11 +98,9 @@ EXAMPLE1
      # █▌
 
 EXAMPLE2
-     # Pragmas.
      use strict;
      use warnings;
 
-     # Modules.
      use Curses::UI;
 
      # Object.
@@ -162,14 +158,15 @@ REPOSITORY
     <https://github.com/tupinek/Curses-UI-Volume>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2014-2015 Michal Špaček
-     BSD 2-Clause License
+    © 2014-2022 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 VERSION
-    0.02
+    0.03
 

@@ -13,7 +13,7 @@ push @extra_compiler_flags, qw( -DDEBUGGING=-g ) if $^X =~ m|/debugperl|;
 my $build = Module::Build->new(
    module_name => 'Future::XS',
    requires => {
-      'perl' => '5.014',
+      'perl' => '5.024', # RT145597
       'Future' => '0.48_001', # for Future::_base
    },
    test_requires => {

@@ -88,11 +88,16 @@ nfs_set_auth
 nfs_set_autoreconnect
 rpc_set_auxiliary_gids
 nfs_set_debug
+nfs_set_auto_traverse_mounts
 nfs_set_dircache
 nfs_set_gid
+nfs_set_hash_size
+nfs_set_mountport
+nfs_set_nfsport
 nfs_set_pagecache
 nfs_set_pagecache_ttl
 nfs_set_readahead
+nfs_set_readdir_max_buffer_size
 nfs_set_readmax
 nfs_set_tcp_syncnt
 nfs_set_timeout
@@ -262,5 +267,6 @@ rpc_send_reply
 rpc_service
 rpc_set_fd
 rpc_set_gid
+rpc_set_hash_size
 rpc_set_uid
 rpc_which_events

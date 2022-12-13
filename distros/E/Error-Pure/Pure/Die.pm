@@ -8,7 +8,7 @@ use Error::Pure::Utils qw(err_helper);
 use List::MoreUtils qw(none);
 use Readonly;
 
-our $VERSION = 0.27;
+our $VERSION = 0.28;
 
 Readonly::Array our @EXPORT_OK => qw(err);
 Readonly::Scalar my $EVAL => 'eval {...}';
@@ -68,6 +68,8 @@ Process error with message(s). There is key => value list after first message.
 
 =head1 EXAMPLE1
 
+=for comment filename=err_via_die.pl
+
  use strict;
  use warnings;
 
@@ -81,6 +83,8 @@ Process error with message(s). There is key => value list after first message.
 
 =head1 EXAMPLE2
 
+=for comment filename=err_via_die_with_params.pl
+
  use strict;
  use warnings;
 
@@ -93,6 +97,8 @@ Process error with message(s). There is key => value list after first message.
  # 1 at example2.pl line 9.
 
 =head1 EXAMPLE3
+
+=for comment filename=err_via_die_with_params_in_eval_and_dump.pl
 
  use strict;
  use warnings;
@@ -172,6 +178,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.27
+0.28
 
 =cut

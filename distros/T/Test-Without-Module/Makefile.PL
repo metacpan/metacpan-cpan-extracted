@@ -104,6 +104,11 @@ sub regen_README {
         $parser->parse_from_file($_[0]);
         open my $fh, '>', 'README.mkdn'
             or die "Couldn't open 'README.mkdn': $!";
+        print $fh <<STATUS;
+
+[![Build Status](https://travis-ci.org/Corion/test-without-module.svg?branch=master)](https://github.com/Corion/test-without-module)
+
+STATUS
         print $fh $parser->as_markdown;
     };
 }

@@ -30,7 +30,7 @@ our @EXPORT = qw(
    wordpress
 );
 
-our $VERSION = 'v0.8.1';
+our $VERSION = 'v0.8.2';
 
 
 
@@ -61,7 +61,7 @@ sub cgi_bin {
 
 
 sub cms_prefixes {
-    my $re = qr{/(?:drupal|include|joomla|laravel|lib|magento|plugin|plus|vendor|wordpress|wp|yii|zend)};
+    my $re = qr{/(?:docroot|drupal|ftproot|include|inetpub|joomla|laravel|lib|magento|plugin|plus|vendor|webroot|wp|wordpress|yii|zend)};
     return (
         PATH_INFO    => $re,
     );
@@ -102,7 +102,7 @@ sub ip_address_referer {
 
 
 sub misc_extensions {
-    my $re = qr{[.](?:backup|bak|bck|bkp|cfg|conf|dat|ibz|in[ci]|npb|old|ps[bc]|yml)\b};
+    my $re = qr{[.](?:backup|bak|bck|bkp|cfg|conf(?:ig)?|dat|ibz|in[ci]|npb|old|ps[bc]|yml)\b};
     return (
         PATH_INFO    => $re,
         QUERY_STRING => $re,
@@ -153,7 +153,7 @@ sub script_extensions {
 
 
 sub system_dirs {
-    my $re = qr{/(?:s?bin|etc|usr|var|srv|opt|__MACOSX|META-INF)/};
+    my $re = qr{/(?:s?adm|bin|etc|usr|var|srv|opt|__MACOSX|META-INF)/};
     return (
         PATH_INFO    => $re,
         QUERY_STRING => $re,
@@ -196,7 +196,7 @@ Plack::Middleware::Security::Common - A simple security filter for Plack with co
 
 =head1 VERSION
 
-version v0.8.1
+version v0.8.2
 
 =head1 SYNOPSIS
 
@@ -278,7 +278,7 @@ or query string, or a C<cgi_wrapper> script.
 =head2 cms_prefixes
 
 This blocks requests that refer to directories with common CMS
-applications or libraries.
+applications, libraries, or web servers.
 
 Added in v0.8.0.
 

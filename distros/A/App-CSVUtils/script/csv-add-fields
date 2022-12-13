@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-12-05'; # DATE
+our $DATE = '2022-12-09'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '0.052'; # VERSION
+our $VERSION = '0.053'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/CSVUtils/csv_add_fields",
@@ -39,7 +39,7 @@ csv-add-fields - Add one or more fields to CSV file
 
 =head1 VERSION
 
-This document describes version 0.052 of csv-add-fields (from Perl distribution App-CSVUtils), released on 2022-12-05.
+This document describes version 0.053 of csv-add-fields (from Perl distribution App-CSVUtils), released on 2022-12-09.
 
 =head1 SYNOPSIS
 
@@ -57,7 +57,7 @@ See examples in the L</EXAMPLES> section.
 
 The new fields by default will be added at the end, unless you specify one of
 C<--after> (to put after a certain field), C<--before> (to put before a certain
-field), or C<--at> (to put at specific position, 1 means as the first field). The
+field), or C<--at> (to put at specific position, 1 means the first field). The
 new fields will be clustered together though, you currently cannot set the
 position of each new field. But you can later reorder fields using
 L<csv-sort-fields>.
@@ -91,7 +91,7 @@ Put the new field after specified field.
 
 =item B<--at>=I<s>
 
-Put the new field at specific position (1 means as first field).
+Put the new field at specific position (1 means first field).
 
 =item B<--before>=I<s>
 

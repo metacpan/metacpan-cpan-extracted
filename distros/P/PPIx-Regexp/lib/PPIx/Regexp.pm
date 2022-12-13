@@ -195,7 +195,7 @@ use PPIx::Regexp::Util qw{
 };
 use Scalar::Util qw{ refaddr };
 
-our $VERSION = '0.085';
+our $VERSION = '0.086';
 
 =head2 new
 
@@ -932,6 +932,10 @@ green. Companion module L<YAPE::Regex::Explain|YAPE::Regex::Explain>
 says what the various pieces of a regex do, though constructs added in
 perl 5.10 and later are not supported. I have no idea how I missed this
 when I originally went looking for C<Regexp> parsers.
+
+L<PPR|PPR>, which recognizes Perl of all sorts, including regular
+expressions, but does not actually provide a parse of the recognized
+constructs.
 
 =head1 SUPPORT
 

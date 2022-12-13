@@ -54,7 +54,7 @@ use PPIx::Regexp::Constant qw{
     @CARP_NOT
 };
 
-our $VERSION = '0.085';
+our $VERSION = '0.086';
 
 =head2 accepts_perl
 
@@ -712,6 +712,27 @@ sub previous_token {
     }
 }
 
+=head2 raw_width
+
+ my ( $raw_min, $raw_max ) = $self->raw_width();
+
+This public method returns the minimum and maximum width matched by the
+element before taking into account such details as what the element
+actually is and how it is quantified. Either or both elements can be
+C<undef> if the width can not be determined, and the maximum can be
+C<Inf>.
+
+This method was added in version 0.085_01.
+
+=cut
+
+# This implementation is appropriate to a structural element -- i.e. it
+# returns C<( 0, 0 )>.
+
+sub raw_width {
+    return ( 0, 0 );
+}
+
 =head2 remove_insignificant
 
 This method returns a new object manufactured from the invocant, but
@@ -723,7 +744,7 @@ you will get back a deep clone, but without the insignificant elements.
 
 If you call this method on any other L<PPIx::Regexp|PPIx::Regexp> class
 you will get back either the invocant or nothing. This may change to a
-clone of the invocant or nothing if unforseen problems arise with
+clone of the invocant or nothing if unforeseen problems arise with
 returning the invocant, or if objects become mutable (unlikely, but not
 impossible.)
 
@@ -765,7 +786,7 @@ This method was added in version 0.051_01.
 sub requirements_for_perl {
     my ( $self ) = @_;
     my @req;
-    foreach my $r ( @{ $self->__structured_requirements_for_perl() || [] } ) {
+    foreach my $r ( $self->__perl_requirements() ) {
 	push @req, defined $r->{removed} ?
 	"$r->{introduced} <= \$] < $r->{removed}" :
 	"$r->{introduced} <= \$]";
@@ -932,56 +953,6 @@ sub statement {
     return $source->statement();
 }
 
-# NOTE: This method is to be used ONLY for requirements_for_perl(). I
-# _may_ eventually expose it, but at the moment I do not consider it
-# stable. The exposure would be
-# sub structured_requirements_for_perl {
-#     my ( $self ) = @_;
-#     return $self->__structured_requirements_for_perl();
-# }
-# The return ia a reference to an array of hashes. Each hash contains
-# key {introduced} (the version the element was introduced) and MAYBE
-# key {removed} (the version the element was removed). There may be more
-# than one such, and their ranges will not overlap.
-sub __structured_requirements_for_perl {
-    my ( $self, $rslt ) = @_;
-    $rslt ||= $self->__structured_requirements_for_any_perl();
-
-    my @merged;
-    foreach my $left ( $self->__perl_requirements() ) {
-	foreach my $right ( @{ $rslt } ) {
-	    my $min = max( $left->{introduced}, $right->{introduced} );
-	    my $max = defined $left->{removed} ?
-		defined $right->{removed} ?
-		    min( $left->{removed}, $right->{removed} ) :
-		    $left->{removed} :
-		$right->{removed};
-	    defined $max
-		and $max <= $min
-		and next;
-	    push @merged, {
-		introduced	=> $min,
-		removed		=> $max,
-	    };
-	}
-    }
-    @{ $rslt } = @merged;
-
-    return $rslt;
-}
-
-# NOTE: This method is to be used ONLY to initialize
-# __structured_requirements_for_perl(). It returns a structure that
-# matches any Perl.
-sub __structured_requirements_for_any_perl {
-    return [
-	{
-	    introduced	=> MINIMUM_PERL,
-	    removed	=> undef,
-	},
-    ];
-}
-
 =head2 tokens
 
 This method returns all tokens contained in the element.
@@ -1040,6 +1011,36 @@ otherwise.
 
 sub whitespace {
     return;
+}
+
+=head2 width
+
+ my ( $min, $max ) = $self->width();
+
+This method returns the minimum and maximum number of characters this
+element can match.
+
+Either element can be C<undef> if it cannot be determined. For example,
+for C</$foo/> both elements will be C<undef>.  Recursions will return
+C<undef> because they can not be analyzed statically -- or at least I am
+not smart enough to do so. Back references B<may> return C<undef> if the
+referred-to group can not be uniquely determined.
+
+It is possible for C<$max> to be C<Inf>. For example, for C</x*/>
+C<$max> will be C<Inf>.
+
+Elements that do not actually match anything will return zeroes.
+
+B<Note:> This method was added because I wanted better detection of
+variable-length look-behinds. Both it and L<raw_width()|/raw_width>
+(above) should be considered somewhat experimental.
+
+This method was added in version 0.085_01.
+
+=cut
+
+sub width {
+    return ( 0, 0 );
 }
 
 =head2 nav

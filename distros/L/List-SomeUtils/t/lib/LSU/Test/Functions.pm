@@ -6,11 +6,17 @@ use warnings;
 use Config;
 use List::SomeUtils ':all';
 use Scalar::Util qw( weaken );
-use Storable qw( freeze );
-use Tie::Array ();
+use Storable     qw( freeze );
+use Tie::Array   ();
 
 use Test::More 0.96;
 use Test::LSU;
+
+## no critic (ErrorHandling::RequireCheckingReturnValueOfEval)
+## no critic (Subroutines::ProtectPrivateSubs)
+## no critic (TestingAndDebugging::RequireTestLabels)
+## no critic (ValuesAndExpressions::ProhibitInterpolationOfLiterals)
+## no critic (Variables::ProhibitReusedNames)
 
 # Run all tests
 sub run_tests {
@@ -75,11 +81,11 @@ sub test_any_u {
 
     # Normal cases
     my @list = ( 1 .. 10000 );
-    is_true( any_u  { $_ == 5000 } @list );
-    is_true( any_u  { $_ == 5000 } 1 .. 10000 );
-    is_true( any_u  {defined} @list );
+    is_true( any_u { $_ == 5000 } @list );
+    is_true( any_u { $_ == 5000 } 1 .. 10000 );
+    is_true( any_u {defined} @list );
     is_false( any_u { not defined } @list );
-    is_true( any_u  { not defined } undef );
+    is_true( any_u { not defined } undef );
     is_undef( any_u {} );
 
     leak_free_ok(
@@ -107,8 +113,8 @@ sub test_all_u {
 
     # Normal cases
     my @list = ( 1 .. 10000 );
-    is_true( all_u  {defined} @list );
-    is_true( all_u  { $_ > 0 } @list );
+    is_true( all_u {defined} @list );
+    is_true( all_u { $_ > 0 } @list );
     is_false( all_u { $_ < 5000 } @list );
     is_undef( all_u {} );
 
@@ -128,8 +134,8 @@ sub test_none_u {
 
     # Normal cases
     my @list = ( 1 .. 10000 );
-    is_true( none_u  { not defined } @list );
-    is_true( none_u  { $_ > 10000 } @list );
+    is_true( none_u { not defined } @list );
+    is_true( none_u { $_ > 10000 } @list );
     is_false( none_u {defined} @list );
     is_undef( none_u {} );
 
@@ -149,8 +155,8 @@ sub test_notall_u {
 
     # Normal cases
     my @list = ( 1 .. 10000 );
-    is_true( notall_u  { !defined } @list );
-    is_true( notall_u  { $_ < 10000 } @list );
+    is_true( notall_u { !defined } @list );
+    is_true( notall_u { $_ < 10000 } @list );
     is_false( notall_u { $_ <= 10000 } @list );
     is_undef( notall_u {} );
 
@@ -170,9 +176,9 @@ sub test_one_u {
 
     # Normal cases
     my @list = ( 1 .. 300 );
-    is_true( one_u  { 1 == $_ } @list );
-    is_true( one_u  { 150 == $_ } @list );
-    is_true( one_u  { 300 == $_ } @list );
+    is_true( one_u { 1 == $_ } @list );
+    is_true( one_u { 150 == $_ } @list );
+    is_true( one_u { 300 == $_ } @list );
     is_false( one_u { 0 == $_ } @list );
     is_false( one_u { 1 <= $_ } @list );
     is_false( one_u { !( 127 & $_ ) } @list );
@@ -247,13 +253,13 @@ sub test_firstidx {
     is( 4999, ( firstidx { $_ >= 5000 } @list ),  "firstidx" );
     is( -1,   ( firstidx { not defined } @list ), "invalid firstidx" );
     is( 0,    ( firstidx {defined} @list ),       "real firstidx" );
-    is( -1, ( firstidx {} ), "empty firstidx" );
+    is( -1,   ( firstidx {} ),                    "empty firstidx" );
 
     # Test the alias
     is( 4999, first_index { $_ >= 5000 } @list );
     is( -1,   first_index { not defined } @list );
     is( 0,    first_index {defined} @list );
-    is( -1, first_index {} );
+    is( -1,   first_index {} );
 
     leak_free_ok(
         firstidx => sub {
@@ -272,13 +278,13 @@ sub test_lastidx {
     is( 9999, lastidx { $_ >= 5000 } @list );
     is( -1,   lastidx { not defined } @list );
     is( 9999, lastidx {defined} @list );
-    is( -1, lastidx {} );
+    is( -1,   lastidx {} );
 
     # Test aliases
     is( 9999, last_index { $_ >= 5000 } @list );
     is( -1,   last_index { not defined } @list );
     is( 9999, last_index {defined} @list );
-    is( -1, last_index {} );
+    is( -1,   last_index {} );
 
     leak_free_ok(
         lastidx => sub {
@@ -324,15 +330,15 @@ sub test_onlyidx {
 sub test_insert_after {
     my @list = qw{This is a list};
     insert_after { $_ eq "a" } "longer" => @list;
-    is( join( ' ', @list ), "This is a longer list" );
+    is( join( q{ }, @list ), "This is a longer list" );
     insert_after {0} "bla" => @list;
-    is( join( ' ', @list ), "This is a longer list" );
+    is( join( q{ }, @list ), "This is a longer list" );
     insert_after { $_ eq "list" } "!" => @list;
-    is( join( ' ', @list ), "This is a longer list !" );
+    is( join( q{ }, @list ), "This is a longer list !" );
     @list = ( qw{This is}, undef, qw{list} );
     insert_after { not defined($_) } "longer" => @list;
     $list[2] = "a";
-    is( join( ' ', @list ), "This is a longer list" );
+    is( join( q{ }, @list ), "This is a longer list" );
 
     leak_free_ok(
         insert_after => sub {
@@ -356,14 +362,14 @@ sub test_insert_after {
 sub test_insert_after_string {
     my @list = qw{This is a list};
     insert_after_string "a", "longer" => @list;
-    is( join( ' ', @list ), "This is a longer list" );
+    is( join( q{ }, @list ), "This is a longer list" );
     @list = ( undef, qw{This is a list} );
     insert_after_string "a", "longer", @list;
     shift @list;
-    is( join( ' ', @list ), "This is a longer list" );
+    is( join( q{ }, @list ), "This is a longer list" );
     @list = ( "This\0", "is\0", "a\0", "list\0" );
     insert_after_string "a\0", "longer\0", @list;
-    is( join( ' ', @list ), "This\0 is\0 a\0 longer\0 list\0" );
+    is( join( q{ }, @list ), "This\0 is\0 a\0 longer\0 list\0" );
 
     leak_free_ok(
         insert_after_string => sub {
@@ -392,10 +398,10 @@ sub test_apply {
     my @list1 = apply { $_++ } @list;
     ok( is_deeply( \@list,  [ 0 .. 9 ] ) );
     ok( is_deeply( \@list1, [ 1 .. 10 ] ) );
-    @list  = ( " foo ", " bar ", "     ", "foobar" );
+    @list  = ( " foo ", " bar ", q{     }, "foobar" );
     @list1 = apply {s/^\s+|\s+$//g} @list;
-    ok( is_deeply( \@list,  [ " foo ", " bar ", "     ", "foobar" ] ) );
-    ok( is_deeply( \@list1, [ "foo",   "bar",   "",      "foobar" ] ) );
+    ok( is_deeply( \@list,  [ " foo ", " bar ", q{     }, "foobar" ] ) );
+    ok( is_deeply( \@list1, [ "foo",   "bar",   q{},      "foobar" ] ) );
     my $item = apply {s/^\s+|\s+$//g} @list;
     is( $item, "foobar" );
 
@@ -446,8 +452,8 @@ sub test_indexes {
             @e  = indexes { !( $_ & 1 ) } ( 10 .. 15 );
         }
     );
-    $lr and is_deeply( \@s, [ 2 .. 5 ], "indexes/leak: some" );
-    $lr and is_deeply( \@n, [],         "indexes/leak: none" );
+    $lr and is_deeply( \@s, [ 2 .. 5 ],  "indexes/leak: some" );
+    $lr and is_deeply( \@n, [],          "indexes/leak: none" );
     $lr and is_deeply( \@o, [ 1, 3, 5 ], "indexes/leak: odd" );
     $lr and is_deeply( \@e, [ 0, 2, 4 ], "indexes/leak: even" );
 
@@ -460,8 +466,8 @@ sub test_indexes {
         }
     );
 
-    $lr and is_deeply( \@s, [ 2 .. 5 ], "indexes/leak: some" );
-    $lr and is_deeply( \@n, [],         "indexes/leak: none" );
+    $lr and is_deeply( \@s, [ 2 .. 5 ],  "indexes/leak: some" );
+    $lr and is_deeply( \@n, [],          "indexes/leak: none" );
     $lr and is_deeply( \@o, [ 1, 3, 5 ], "indexes/leak: odd" );
     $lr and is_deeply( \@e, [ 0, 2, 4 ], "indexes/leak: even" );
 
@@ -712,6 +718,7 @@ sub test_onlyres {
     is( ( onlyres { $_ * 2 } @empty ), undef );
 }
 
+## no critic (Variables::RequireLocalizedPunctuationVars)
 sub test_each_array {
 SCOPE:
     {
@@ -940,7 +947,7 @@ SKIP:
         my @l1 = ( 1 .. 10 );
         @t = pairwise { $a + $b } @l1, @l1;
         like(
-            join( "", @warns[ 0, 1 ] ),
+            join( q{}, @warns[ 0, 1 ] ),
             qr/Use of uninitialized value.*? in addition/,
             "warning on broken caller"
         );
@@ -972,7 +979,7 @@ sub test_natatime {
         my @x  = ( 'a' .. 'g' );
         my $it = natatime 3, @x;
         my @r;
-        local $" = " ";
+        local $" = q{ };
         while ( my @vals = $it->() ) {
             push @r, "@vals";
         }
@@ -1042,8 +1049,8 @@ SCOPE:
             is_deeply(
                 \@z,
                 [
-                    1, undef, 2, undef, 3, undef, 4, undef, 5, undef, 6,
-                    undef, 7, undef, 8, undef, 9, undef, 10, undef,
+                    1,     undef, 2, undef, 3, undef, 4, undef,  5, undef, 6,
+                    undef, 7,     undef, 8, undef, 9, undef, 10, undef,
                 ]
             )
         );
@@ -1097,8 +1104,8 @@ SCOPE:
             is_deeply(
                 \@z,
                 [
-                    1, undef, 2, undef, 3, undef, 4, undef, 5, undef, 6,
-                    undef, 7, undef, 8, undef, 9, undef, 10, undef,
+                    1,     undef, 2, undef, 3, undef, 4, undef,  5, undef, 6,
+                    undef, 7,     undef, 8, undef, 9, undef, 10, undef,
                 ]
             )
         );
@@ -1186,8 +1193,8 @@ SCOPE:
 
 SCOPE:
     {
-        my @foo  = ( 'a', 'b', '', undef, 'b', 'c', '' );
-        my @ufoo = ( 'a', 'b', '', undef, 'c' );
+        my @foo  = ( 'a', 'b', q{}, undef, 'b', 'c', q{} );
+        my @ufoo = ( 'a', 'b', q{}, undef, 'c' );
         is_deeply( [ uniq @foo ], \@ufoo, 'undef is supported correctly' );
     }
 
@@ -1276,14 +1283,14 @@ SCOPE:
 
 SCOPE:
     {
-        my @foo  = ( 'a', 'b',   '', undef, 'b', 'c', '' );
+        my @foo  = ( 'a', 'b',   q{}, undef, 'b', 'c', q{} );
         my @sfoo = ( 'a', undef, 'c' );
         is_deeply(
             [ singleton @foo ], \@sfoo,
             'one undef is supported correctly by singleton'
         );
-        @foo  = ( 'a', 'b', '', undef, 'b', 'c', undef );
-        @sfoo = ( 'a', '',  'c' );
+        @foo  = ( 'a', 'b', q{}, undef, 'b', 'c', undef );
+        @sfoo = ( 'a', q{}, 'c' );
         is_deeply(
             [ singleton @foo ], \@sfoo,
             'twice undef is supported correctly by singleton'
@@ -1425,7 +1432,7 @@ sub test_minmax {
 
     # Floating-point comparison cunningly avoided
     is( sprintf( "%.2f", $min ), "-3.33" );
-    is( $max, 10000 );
+    is( $max,                    10000 );
 
     # Test with a single negative list value
     my $input = -1;
@@ -1433,6 +1440,7 @@ sub test_minmax {
     is( $min, -1 );
     is( $max, -1 );
 
+    ## no critic (BuiltinFunctions::ProhibitComplexMappings)
     # COW causes missing max when optimization for 1 argument is applied
     @list = grep { defined $_ } map {
         my ( $min, $max ) = minmax( sprintf( "%.3g", rand ) );
@@ -1583,12 +1591,12 @@ sub test_any {
 
     # Normal cases
     my @list = ( 1 .. 10000 );
-    is_true( any  { $_ == 5000 } @list );
-    is_true( any  { $_ == 5000 } 1 .. 10000 );
-    is_true( any  {defined} @list );
+    is_true( any { $_ == 5000 } @list );
+    is_true( any { $_ == 5000 } 1 .. 10000 );
+    is_true( any {defined} @list );
     is_false( any { not defined } @list );
-    is_true( any  { not defined } undef );
-    is_false( any {} );
+    is_true( any { not defined } undef );
+    is_false( any { } );
 
     leak_free_ok(
         any => sub {
@@ -1615,10 +1623,10 @@ sub test_all {
 
     # Normal cases
     my @list = ( 1 .. 10000 );
-    is_true( all  {defined} @list );
-    is_true( all  { $_ > 0 } @list );
+    is_true( all {defined} @list );
+    is_true( all { $_ > 0 } @list );
     is_false( all { $_ < 5000 } @list );
-    is_true( all {} );
+    is_true( all { } );
 
     leak_free_ok(
         all => sub {
@@ -1636,10 +1644,10 @@ sub test_none {
 
     # Normal cases
     my @list = ( 1 .. 10000 );
-    is_true( none  { not defined } @list );
-    is_true( none  { $_ > 10000 } @list );
+    is_true( none { not defined } @list );
+    is_true( none { $_ > 10000 } @list );
     is_false( none {defined} @list );
-    is_true( none {} );
+    is_true( none { } );
 
     leak_free_ok(
         none => sub {
@@ -1657,10 +1665,10 @@ sub test_notall {
 
     # Normal cases
     my @list = ( 1 .. 10000 );
-    is_true( notall  { !defined } @list );
-    is_true( notall  { $_ < 10000 } @list );
+    is_true( notall { !defined } @list );
+    is_true( notall { $_ < 10000 } @list );
     is_false( notall { $_ <= 10000 } @list );
-    is_false( notall {} );
+    is_false( notall { } );
 
     leak_free_ok(
         notall => sub {
@@ -1678,9 +1686,9 @@ sub test_one {
 
     # Normal cases
     my @list = ( 1 .. 300 );
-    is_true( one  { 1 == $_ } @list );
-    is_true( one  { 150 == $_ } @list );
-    is_true( one  { 300 == $_ } @list );
+    is_true( one { 1 == $_ } @list );
+    is_true( one { 150 == $_ } @list );
+    is_true( one { 300 == $_ } @list );
     is_false( one { 0 == $_ } @list );
     is_false( one { 1 <= $_ } @list );
     is_false( one { !( 127 & $_ ) } @list );
@@ -1814,6 +1822,7 @@ sub test_mode {
 }
 
 {
+    ## no critic (Modules::ProhibitMultiplePackages)
     package Overloaded;
     use overload q{""} => sub { $_[0]->{string} };
 

@@ -102,14 +102,16 @@ doesnt_match(0, $obj2);
 
 # If the right hand side is an object which overloads "~~", then a
 # true smart match is performed.
-if ($] >= 5.010001 and $] < 5.019000)
-{
+if ( $] le '5.036000' ) {
 	my $obj3 = eval q{
 		no warnings;
+		no strict 'refs';
 		package Local::YetAnotherClass;
-		use overload q[~~] => sub { $_[1] };
+		use overload q[~~] => sub { $_[1] }, fallback => 1;
 		bless [];
 	};
+	my $e = $@;
+	ok($obj3, 'eval worked') or diag($e);
 	does_match(1, $obj3);
 	doesnt_match(0, $obj3);
 }

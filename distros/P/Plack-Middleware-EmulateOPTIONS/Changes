@@ -1,5 +1,9 @@
 Revision history for Plack-Middleware-EmulateOPTIONS:
 
+v0.2.2    2022-12-12 16:50:49+00:00 Europe/London
+  [Tests]
+  - Adjusted minimum version of HTTP::Request::Common used for testing.
+
 v0.2.1    2022-09-05 13:59:49+01:00 Europe/London
   [Tests]
   - Add minimum version of HTTP::Request::Common used for testing.

@@ -1,6 +1,6 @@
 package SPVM::Resource::SocketUtil;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 1;
 
@@ -16,6 +16,14 @@ C<SPVM::Resource::SocketUtil> is the L<SPVM>'s C<Resource::SocketUtil> L<resourc
 
   # MyClass.config
   $config->use_resource('Resource::SocketUtil');
+
+=head1 Library Dependencies
+
+On Windows, the C<wsock32> and C<ws2_32> libraries are needed.
+
+if ($^O eq 'MSWin32') {
+  $config->add_libs('wsock32', 'ws2_32');
+}
 
 =head1 Headers
 

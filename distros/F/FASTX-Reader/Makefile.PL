@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
     "PerlIO::encoding" => 0,
     "Time::HiRes" => 0
   },
-  "VERSION" => "1.6.1",
+  "VERSION" => "1.7.0",
   "test" => {
     "TESTS" => "t/*.t"
   }

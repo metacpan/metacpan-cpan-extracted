@@ -1,8 +1,10 @@
 package LSU::Test::Import;
 
 use strict;
+use warnings;
 
 BEGIN {
+    ## no critic (Variables::RequireLocalizedPunctuationVars)
     $| = 1;
 }
 
@@ -55,7 +57,7 @@ sub run_tests {
             sort_by
             true
             uniq
-            ),
+        ),
         qw(
             bsearch_index
             distinct
@@ -69,7 +71,7 @@ sub run_tests {
             only_result
             only_value
             zip
-            )
+        )
     );
     done_testing();
 }

@@ -8,10 +8,10 @@ use FindBin;
 use Mojo::File qw(tempfile tempdir path);
 use lib ("$FindBin::Bin/lib", "../lib", "lib");
 
-use Mojo::IOLoop::ReadWriteProcess qw(process);
+use Mojo::IOLoop::ReadWriteProcess              qw(process);
 use Mojo::IOLoop::ReadWriteProcess::Test::Utils qw(attempt);
-use Mojo::IOLoop::ReadWriteProcess::CGroup qw(cgroupv2 cgroupv1);
-use Mojo::IOLoop::ReadWriteProcess::Container qw(container);
+use Mojo::IOLoop::ReadWriteProcess::CGroup      qw(cgroupv2 cgroupv1);
+use Mojo::IOLoop::ReadWriteProcess::Container   qw(container);
 
 eval {
   my $try_cgroup
@@ -54,7 +54,7 @@ subtest belongs => sub {
 
 };
 
-subtest childs => sub {
+subtest children => sub {
   my $cgroup = cgroupv1(controller => 'pids', name => 'group')->child('test');
   isa_ok $cgroup, 'Mojo::IOLoop::ReadWriteProcess::CGroup::v1';
   is $cgroup->exists(), 1, 'Cgroup exists';
@@ -233,7 +233,7 @@ subtest container_no_pid_isolation => sub {
 
   $c->stop();
   is $cgroup->processes->size, 0;
-  is $cgroup->process_list, '' or die diag explain $cgroup->process_list;
+  is $cgroup->process_list,    '' or die diag explain $cgroup->process_list;
   $cgroup->remove();
   is scalar(@pids), 5 or diag explain \@pids;
   isnt $virtual_pid, '1',

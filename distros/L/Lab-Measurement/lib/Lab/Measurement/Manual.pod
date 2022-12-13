@@ -14,7 +14,7 @@ Lab::Measurement::Manual - API documentation manual for Lab::Measurement
 
 =head1 VERSION
 
-version 3.831
+version 3.840
 
 =head1 OVERVIEW
 
@@ -292,6 +292,8 @@ contains support for temperature sensor and He/N2 level meters.
 
 =item * L<Lab::Moose::Instrument::Keysight33600>
 
+=item * L<Lab::Moose::Instrument::HP83732A>
+
 =back
 
 =head3 Special
@@ -299,6 +301,8 @@ contains support for temperature sensor and He/N2 level meters.
 =over
 
 =item * L<Lab::Moose::Instrument::NanonisTramea> (work in progress)
+
+=item * L<Lab::Moose::Instrument::ProStep4> (work in progress)
 
 =back
 

@@ -4,7 +4,7 @@ List::SomeUtils - Provide the stuff missing in List::Util
 
 # VERSION
 
-version 0.58
+version 0.59
 
 # SYNOPSIS
 
@@ -22,7 +22,7 @@ version 0.58
 # DESCRIPTION
 
 **List::SomeUtils** provides some trivial but commonly needed functionality on
-lists which is not going to go into [List::Util](https://metacpan.org/pod/List::Util).
+lists which is not going to go into [List::Util](https://metacpan.org/pod/List%3A%3AUtil).
 
 All of the below functions are implementable in only a couple of lines of Perl
 code. Using the functions from this module however should give slightly better
@@ -33,7 +33,7 @@ couldn't be compiled on this machine.
 # WHY DOES THIS MODULE EXIST?
 
 You might wonder why this module exists when we already have
-[List::MoreUtils](https://metacpan.org/pod/List::MoreUtils). In fact, this module is (nearly) the same code as is found
+[List::MoreUtils](https://metacpan.org/pod/List%3A%3AMoreUtils). In fact, this module is (nearly) the same code as is found
 in LMU with no significant changes. However, the LMU distribution depends on
 several modules for configuration (to run the Makefile.PL) that some folks in
 the Perl community don't think are appropriate for a module high upstream in
@@ -67,15 +67,15 @@ tags.
 
 ### _Treatment of an empty list_
 
-There are two schools of thought for how to evaluate a junction on an
-empty list:
+There are two schools of thought for how to evaluate a junction on an empty
+list:
 
 - Reduction to an identity (boolean)
 - Result is undefined (three-valued)
 
 In the first case, the result of the junction applied to the empty list is
-determined by a mathematical reduction to an identity depending on whether
-the underlying comparison is "or" or "and".  Conceptually:
+determined by a mathematical reduction to an identity depending on whether the
+underlying comparison is "or" or "and".  Conceptually:
 
                     "any are true"      "all are true"
                     --------------      --------------
@@ -83,11 +83,11 @@ the underlying comparison is "or" or "and".  Conceptually:
     1 element:      A || 0              A && 1
     0 elements:     0                   1
 
-In the second case, three-value logic is desired, in which a junction
-applied to an empty list returns `undef` rather than true or false
+In the second case, three-value logic is desired, in which a junction applied
+to an empty list returns `undef` rather than true or false
 
-Junctions with a `_u` suffix implement three-valued logic.  Those
-without are boolean.
+Junctions with a `_u` suffix implement three-valued logic.  Those without are
+boolean.
 
 ### all BLOCK LIST
 
@@ -160,8 +160,8 @@ Thus, `notall_u(@list)` is equivalent to `@list ? notall(@list) : undef`.
 
 ### one\_u BLOCK LIST
 
-Returns a true value if precisely one item in LIST meets the criterion
-given through BLOCK. Sets `$_` for each item in LIST in turn:
+Returns a true value if precisely one item in LIST meets the criterion given
+through BLOCK. Sets `$_` for each item in LIST in turn:
 
     print "Precisely one value defined"
         if one { defined($_) } @list;
@@ -170,9 +170,9 @@ Returns false otherwise.
 
 For an empty LIST, `one` returns false and `one_u` returns `undef`.
 
-The expression `one BLOCK LIST` is almost equivalent to
-`1 == true BLOCK LIST`, except for short-cutting.
-Evaluation of BLOCK will immediately stop at the second true value.
+The expression `one BLOCK LIST` is almost equivalent to `1 == true BLOCK
+LIST`, except for short-cutting. Evaluation of BLOCK will immediately stop at
+the second true value.
 
 ## Transformation
 
@@ -248,8 +248,8 @@ them will modify the input arrays.
 
 ### zip ARRAY1 ARRAY2 \[ ARRAY3 ... \]
 
-Returns a list consisting of the first elements of each array, then
-the second, then the third, etc, until all arrays are exhausted.
+Returns a list consisting of the first elements of each array, then the second,
+then the third, etc, until all arrays are exhausted.
 
 Examples:
 
@@ -268,10 +268,10 @@ Examples:
 
 ### distinct LIST
 
-Returns a new list by stripping duplicate values in LIST by comparing
-the values as hash keys, except that undef is considered separate from ''.
-The order of elements in the returned list is the same as in LIST. In
-scalar context, returns the number of unique elements in LIST.
+Returns a new list by stripping duplicate values in LIST by comparing the
+values as hash keys, except that undef is considered separate from ''. The
+order of elements in the returned list is the same as in LIST. In scalar
+context, returns the number of unique elements in LIST.
 
     my @x = uniq 1, 1, 2, 2, 3, 5, 3, 4; # returns 1 2 3 5 4
     my $x = uniq 1, 1, 2, 2, 3, 5, 3, 4; # returns 5
@@ -290,8 +290,8 @@ scalar context, returns the number of unique elements in LIST.
 
 Returns a new list by stripping values in LIST occurring more than once by
 comparing the values as hash keys, except that undef is considered separate
-from ''.  The order of elements in the returned list is the same as in LIST.
-In scalar context, returns the number of elements occurring only once in LIST.
+from ''.  The order of elements in the returned list is the same as in LIST. In
+scalar context, returns the number of elements occurring only once in LIST.
 
     my @x = singleton 1,1,2,2,3,4,5 # returns 3 4 5
 
@@ -299,8 +299,8 @@ In scalar context, returns the number of elements occurring only once in LIST.
 
 ### after BLOCK LIST
 
-Returns a list of the values of LIST after (and not including) the point
-where BLOCK returns a true value. Sets `$_` for each element in LIST in turn.
+Returns a list of the values of LIST after (and not including) the point where
+BLOCK returns a true value. Sets `$_` for each element in LIST in turn.
 
     @x = after { $_ % 5 == 0 } (1..9);    # returns 6, 7, 8, 9
 
@@ -310,8 +310,8 @@ Same as `after` but also includes the element for which BLOCK is true.
 
 ### before BLOCK LIST
 
-Returns a list of values of LIST up to (and not including) the point where BLOCK
-returns a true value. Sets `$_` for each element in LIST in turn.
+Returns a list of values of LIST up to (and not including) the point where
+BLOCK returns a true value. Sets `$_` for each element in LIST in turn.
 
 ### before\_incl BLOCK LIST
 
@@ -361,19 +361,19 @@ This is useful for looping over more than one array at once:
 
 The iterator returns the empty list when it reached the end of all arrays.
 
-If the iterator is passed an argument of '`index`', then it returns
-the index of the last fetched set of values, as a scalar.
+If the iterator is passed an argument of '`index`', then it returns the index
+of the last fetched set of values, as a scalar.
 
 ### each\_arrayref LIST
 
-Like each\_array, but the arguments are references to arrays, not the
-plain arrays.
+Like each\_array, but the arguments are references to arrays, not the plain
+arrays.
 
 ### natatime EXPR, LIST
 
-Creates an array iterator, for looping over an array in chunks of
-`$n` items at a time.  (n at a time, get it?).  An example is
-probably a better explanation than I could give in words.
+Creates an array iterator, for looping over an array in chunks of `$n` items
+at a time.  (n at a time, get it?).  An example is probably a better
+explanation than I could give in words.
 
 Example:
 
@@ -395,19 +395,19 @@ This prints
 ### bsearch BLOCK LIST
 
 Performs a binary search on LIST which must be a sorted list of values. BLOCK
-must return a negative value if the current element (stored in `$_`) is smaller,
-a positive value if it is bigger and zero if it matches.
+must return a negative value if the current element (stored in `$_`) is
+smaller, a positive value if it is bigger and zero if it matches.
 
-Returns a boolean value in scalar context. In list context, it returns the element
-if it was found, otherwise the empty list.
+Returns a boolean value in scalar context. In list context, it returns the
+element if it was found, otherwise the empty list.
 
 ### bsearchidx BLOCK LIST
 
 ### bsearch\_index BLOCK LIST
 
 Performs a binary search on LIST which must be a sorted list of values. BLOCK
-must return a negative value if the current element (stored in `$_`) is smaller,
-a positive value if it is bigger and zero if it matches.
+must return a negative value if the current element (stored in `$_`) is
+smaller, a positive value if it is bigger and zero if it matches.
 
 Returns the index of found element, otherwise `-1`.
 
@@ -427,9 +427,9 @@ has been found.
 
 ### only\_value BLOCK LIST
 
-Returns the only element in LIST for which BLOCK evaluates to true. Sets
-`$_` for each item in LIST in turn. Returns `undef` if no such element
-has been found.
+Returns the only element in LIST for which BLOCK evaluates to true. Sets `$_`
+for each item in LIST in turn. Returns `undef` if no such element has been
+found.
 
 `only_value` is an alias for `onlyval`.
 
@@ -458,8 +458,8 @@ evaluates to true. Each element of LIST is set to `$_` in turn. Returns
 ### only\_result BLOCK LIST
 
 Returns the result of BLOCK for the first element in LIST for which BLOCK
-evaluates to true. Sets `$_` for each item in LIST in turn. Returns
-`undef` if no such element has been found.
+evaluates to true. Sets `$_` for each item in LIST in turn. Returns `undef`
+if no such element has been found.
 
 `only_result` is an alias for `onlyres`.
 
@@ -501,16 +501,15 @@ Returns `-1` if no such item could be found.
 
 ### only\_index BLOCK LIST
 
-Returns the index of the only element in LIST for which the criterion
-in BLOCK is true. Sets `$_` for each item in LIST in turn:
+Returns the index of the only element in LIST for which the criterion in BLOCK
+is true. Sets `$_` for each item in LIST in turn:
 
     my @list = (1, 3, 4, 3, 2, 4);
-    printf "uniqe index of item 2 in list is %i", onlyidx { $_ == 2 } @list;
+    printf "unique index of item 2 in list is %i", onlyidx { $_ == 2 } @list;
     __END__
     unique index of item 2 in list is 4
 
-Returns `-1` if either no such item or more than one of these
-has been found.
+Returns `-1` if either no such item or more than one of these has been found.
 
 `only_index` is an alias for `onlyidx`.
 
@@ -534,28 +533,28 @@ Returns `-1` if no such item could be found.
 
 ### sort\_by BLOCK LIST
 
-Returns the list of values sorted according to the string values returned by the
-KEYFUNC block or function. A typical use of this may be to sort objects according
-to the string value of some accessor, such as
+Returns the list of values sorted according to the string values returned by
+the KEYFUNC block or function. A typical use of this may be to sort objects
+according to the string value of some accessor, such as
 
     sort_by { $_->name } @people
 
-The key function is called in scalar context, being passed each value in turn as
-both $\_ and the only argument in the parameters, @\_. The values are then sorted
-according to string comparisons on the values returned.
-This is equivalent to
+The key function is called in scalar context, being passed each value in turn
+as both $\_ and the only argument in the parameters, @\_. The values are then
+sorted according to string comparisons on the values returned. This is
+equivalent to
 
     sort { $a->name cmp $b->name } @people
 
-except that it guarantees the name accessor will be executed only once per value.
-One interesting use-case is to sort strings which may have numbers embedded in them
-"naturally", rather than lexically.
+except that it guarantees the name accessor will be executed only once per
+value. One interesting use-case is to sort strings which may have numbers
+embedded in them "naturally", rather than lexically.
 
     sort_by { s/(\d+)/sprintf "%09d", $1/eg; $_ } @strings
 
-This sorts strings by generating sort keys which zero-pad the embedded numbers to
-some level (9 digits in this case), helping to ensure the lexical sort puts them
-in the correct order.
+This sorts strings by generating sort keys which zero-pad the embedded numbers
+to some level (9 digits in this case), helping to ensure the lexical sort puts
+them in the correct order.
 
 ### nsort\_by BLOCK LIST
 
@@ -572,8 +571,8 @@ Sets `$_` for  each item in LIST in turn:
 
 ### false BLOCK LIST
 
-Counts the number of elements in LIST for which the criterion in BLOCK is false.
-Sets `$_` for each item in LIST in turn:
+Counts the number of elements in LIST for which the criterion in BLOCK is
+false. Sets `$_` for each item in LIST in turn:
 
     printf "%i item(s) are not defined", false { defined($_) } @list;
 
@@ -596,8 +595,8 @@ limitation does not apply to the XS version.
 ### mode LIST
 
 Calculates the most common items in the list and returns them as a list. This
-is effectively done by string comparisons, so references will be
-stringified. If they implement string overloading, this will be used.
+is effectively done by string comparisons, so references will be stringified.
+If they implement string overloading, this will be used.
 
 If more than one item appears the same number of times in the list, all such
 items will be returned. For example, the mode of a unique list is the list
@@ -608,16 +607,15 @@ count indicating the number of modes in the list.
 
 # MAINTENANCE
 
-The maintenance goal is to preserve the documented semantics of the API;
-bug fixes that bring actual behavior in line with semantics are allowed.
-New API functions may be added over time.  If a backwards incompatible
-change is unavoidable, we will attempt to provide support for the legacy
-API using the same export tag mechanism currently in place.
+The maintenance goal is to preserve the documented semantics of the API; bug
+fixes that bring actual behavior in line with semantics are allowed. New API
+functions may be added over time.  If a backwards incompatible change is
+unavoidable, we will attempt to provide support for the legacy API using the
+same export tag mechanism currently in place.
 
-This module attempts to use few non-core dependencies. Non-core
-configuration and testing modules will be bundled when reasonable;
-run-time dependencies will be added only if they deliver substantial
-benefit.
+This module attempts to use few non-core dependencies. Non-core configuration
+and testing modules will be bundled when reasonable; run-time dependencies will
+be added only if they deliver substantial benefit.
 
 # KNOWN ISSUES
 
@@ -637,7 +635,7 @@ or
 Perl 5.5.x and Perl 5.8.x don't suffer from this limitation.
 
 If you have a functionality that you could imagine being in this module, please
-drop me a line. This module's policy will be less strict than [List::Util](https://metacpan.org/pod/List::Util)'s
+drop me a line. This module's policy will be less strict than [List::Util](https://metacpan.org/pod/List%3A%3AUtil)'s
 when it comes to additions as it isn't a core module.
 
 When you report bugs, it would be nice if you could additionally give me the
@@ -651,7 +649,7 @@ pure-Perl or possibly both).
 
 Credits go to a number of people: Steve Purkis for giving me namespace advice
 and James Keenan and Terrence Branno for their effort of keeping the CPAN
-tidier by making [List::Util](https://metacpan.org/pod/List::Util) obsolete.
+tidier by making [List::Util](https://metacpan.org/pod/List%3A%3AUtil) obsolete.
 
 Brian McCauley suggested the inclusion of apply() and provided the pure-Perl
 implementation for it.
@@ -680,30 +678,30 @@ XS-implementation of part() work.
 
 ## Jens Rehsack
 
-Credits goes to all people contributing feedback during the v0.400
-development releases.
+Credits goes to all people contributing feedback during the v0.400 development
+releases.
 
-Special thanks goes to David Golden who spent a lot of effort to develop
-a design to support current state of CPAN as well as ancient software
-somewhere in the dark. He also contributed a lot of patches to refactor
-the API frontend to welcome any user of List::SomeUtils - from ancient
-past to recently last used.
+Special thanks goes to David Golden who spent a lot of effort to develop a
+design to support current state of CPAN as well as ancient software somewhere
+in the dark. He also contributed a lot of patches to refactor the API frontend
+to welcome any user of List::SomeUtils - from ancient past to recently last
+used.
 
-Toby Inkster provided a lot of useful feedback for sane importer code
-and was a nice sounding board for API discussions.
+Toby Inkster provided a lot of useful feedback for sane importer code and was a
+nice sounding board for API discussions.
 
-Peter Rabbitson provided a sane git repository setup containing entire
-package history.
+Peter Rabbitson provided a sane git repository setup containing entire package
+history.
 
 # TODO
 
-A pile of requests from other people is still pending further processing in
-my mailbox. This includes:
+A pile of requests from other people is still pending further processing in my
+mailbox. This includes:
 
 - List::Util export pass-through
 
-    Allow **List::SomeUtils** to pass-through the regular [List::Util](https://metacpan.org/pod/List::Util)
-    functions to end users only need to `use` the one module.
+    Allow **List::SomeUtils** to pass-through the regular [List::Util](https://metacpan.org/pod/List%3A%3AUtil) functions to
+    end users only need to `use` the one module.
 
 - uniq\_by(&@)
 
@@ -727,7 +725,7 @@ my mailbox. This includes:
 
 # SEE ALSO
 
-[List::Util](https://metacpan.org/pod/List::Util), [List::AllUtils](https://metacpan.org/pod/List::AllUtils), [List::UtilsBy](https://metacpan.org/pod/List::UtilsBy)
+[List::Util](https://metacpan.org/pod/List%3A%3AUtil), [List::AllUtils](https://metacpan.org/pod/List%3A%3AAllUtils), [List::UtilsBy](https://metacpan.org/pod/List%3A%3AUtilsBy)
 
 # HISTORICAL COPYRIGHT
 
@@ -740,8 +738,6 @@ Copyright 2013 - 2015 by Jens Rehsack
 # SUPPORT
 
 Bugs may be submitted at [https://github.com/houseabsolute/List-SomeUtils/issues](https://github.com/houseabsolute/List-SomeUtils/issues).
-
-I am also usually active on IRC as 'autarch' on `irc://irc.perl.org`.
 
 # SOURCE
 
@@ -762,7 +758,7 @@ software much more, unless I get so many donations that I can consider working
 on free software full time (let's all have a chuckle at that together).
 
 To donate, log into PayPal and send money to autarch@urth.org, or use the
-button at [http://www.urth.org/~autarch/fs-donation.html](http://www.urth.org/~autarch/fs-donation.html).
+button at [https://houseabsolute.com/foss-donations/](https://houseabsolute.com/foss-donations/).
 
 # AUTHORS
 
@@ -789,7 +785,7 @@ button at [http://www.urth.org/~autarch/fs-donation.html](http://www.urth.org/~a
 
 # COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2019 by Dave Rolsky <autarch@urth.org>.
+This software is copyright (c) 2022 by Dave Rolsky <autarch@urth.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

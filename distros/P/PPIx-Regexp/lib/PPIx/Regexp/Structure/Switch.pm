@@ -36,7 +36,21 @@ use base qw{ PPIx::Regexp::Structure };
 
 use PPIx::Regexp::Constant qw{ @CARP_NOT };
 
-our $VERSION = '0.085';
+our $VERSION = '0.086';
+
+sub __raw_width {
+    my ( $self ) = @_;
+    my $cond;
+    $cond = $self->schild( 0 )
+	and $cond->isa( 'PPIx::Regexp::Token::Condition' )
+	and $cond->content() eq '(DEFINE)'
+	and return ( 0, 0, 1 );
+    my ( $node_min, $node_max, $alternatives ) = $self->SUPER::__raw_width();
+    defined $node_min
+	and $alternatives < 2
+	and $node_min = 0;
+    return ( $node_min, $node_max, $alternatives );
+}
 
 sub __PPIX_LEXER__finalize {
     my ( $self, $lexer ) = @_;

@@ -35,11 +35,16 @@ $m->submit_form(
     form_name => "TicketCreate",
     fields    => {
         Subject => 'test_ticket',
+        SubmitTicket => "Create",
     },
+    button => 'SubmitTicket',
 );
 $m->content_contains("Ticket created", 'Ticket created');
-$m->content_like(qr{<td class="label">Active:</td>\s*<td class="value">\s*&\#10004;\s*</td>}, 'Checked CF Boolean displayed in HTML');
-
+if (RT::Handle::cmp_version($RT::VERSION, '5.0.0') < 0) {
+    $m->content_like(qr{<td class="label">Active:</td>\s*<td class="value">\s*&\#10004;\s*</td>}, 'Checked CF Boolean displayed in HTML');
+} else {
+    $m->content_like(qr{<div class="label col-\d+">\s*<span class="prev-icon-helper">Active:</span><span class="far fa-question-circle icon-helper" data-toggle="tooltip" data-placement="top" data-original-title="Check/Uncheck"></span>\s*</div>\s*<div class="value col-\d+\s*">\s*<span class="current-value">\s*&\#10004;\s*</span>\s*</div>}, 'Checked CF Boolean displayed in HTML');
+}
 $m->follow_link_ok({ id => 'page-basics' }, 'Ticket modify link');
 my $modify_form = $m->form_name('TicketModify');
 ok($modify_form, "Modify form with unchecked CF Boolean");
@@ -54,6 +59,10 @@ $m->submit_form(
 );
 $m->content_contains("1 is no longer a value for custom field Active", 'Ticket modified with unchecked CF Boolean');
 $m->follow_link_ok({ id => 'page-display' }, 'Ticket display link');
-$m->content_like(qr{<td class="label">Active:</td>\s*<td class="value no-value">\s*\(no value\)\s*</td>}, 'Unchecked CF Boolean displayed in HTML');
+if (RT::Handle::cmp_version($RT::VERSION, '5.0.0') < 0) {
+    $m->content_like(qr{<td class="label">Active:</td>\s*<td class="value no-value">\s*\(no value\)\s*</td>}, 'Unchecked CF Boolean displayed in HTML');
+} else {
+    $m->content_like(qr{<div class="label col-\d+">\s*<span class="prev-icon-helper">Active:</span><span class="far fa-question-circle icon-helper" data-toggle="tooltip" data-placement="top" data-original-title="Check/Uncheck"></span>\s*</div>\s*<div class="value col-\d+\s* no-value">\s*<span class="current-value">\s*\(no value\)\s*</span>\s*</div>}, 'Unchecked CF Boolean displayed in HTML');
+}
 
 undef $m;

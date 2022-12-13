@@ -4,7 +4,11 @@ use warnings;
 
 use Test::More 0.96;
 
-BEGIN { $ENV{LIST_SOMEUTILS_IMPLEMENTATION} = 'PP' }
+BEGIN {
+    ## no critic (Variables::RequireLocalizedPunctuationVars)
+    $ENV{LIST_SOMEUTILS_IMPLEMENTATION} = 'PP';
+}
+
 use List::SomeUtils;
 
 is(

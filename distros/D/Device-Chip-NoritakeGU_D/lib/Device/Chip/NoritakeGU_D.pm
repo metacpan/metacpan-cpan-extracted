@@ -1,12 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2020-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2020-2022 -- leonerd@leonerd.org.uk
 
 use v5.26; # signatures
-use Object::Pad 0.57;
+use Object::Pad 0.66;
 
-package Device::Chip::NoritakeGU_D 0.04;
+package Device::Chip::NoritakeGU_D 0.05;
 class Device::Chip::NoritakeGU_D
    :isa(Device::Chip);
 
@@ -62,8 +62,8 @@ my %INTERFACES = (
    UART => 1, I2C => 1, SPI => 1,
 );
 
-has $_protocol  :param(interface);
-has $_interface;
+field $_protocol  :param(interface);
+field $_interface;
 
 ADJUST
 {
@@ -453,7 +453,7 @@ async method read_touchswitches
 class Device::Chip::NoritakeGU_D::_Iface::UART {
    use constant DEFAULT_BAUDRATE => 38400;
 
-   has $_baudrate;
+   field $_baudrate;
 
    method mountopts ( $params )
    {
@@ -481,7 +481,7 @@ class Device::Chip::NoritakeGU_D::_Iface::UART {
 class Device::Chip::NoritakeGU_D::_Iface::I2C {
    use constant DEFAULT_ADDR => 0x50;
 
-   has $_addr;
+   field $_addr;
 
    method mountopts ( $params )
    {

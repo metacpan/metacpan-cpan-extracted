@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-06-17'; # DATE
+our $DATE = '2022-11-26'; # DATE
 our $DIST = 'App-MineralUtils'; # DIST
-our $VERSION = '0.008'; # VERSION
+our $VERSION = '0.010'; # VERSION
 
 our %SPEC;
 
@@ -85,6 +85,17 @@ my @magnesium_forms = (
         magnesium_ratio => 24.305 / 238.48, # 10.2%
         summary => 'Magnesium lactate dihydrate (C6H14MgO8), in milligrams',
     },
+
+    {
+        name=>'mg-mg-chloride-ah',
+        magnesium_ratio => 24.305/95.211, # 25.5%
+        summary => 'Magnesium chloride (anhydrous, MgCl2), in milligrams',
+    },
+    {
+        name=>'mg-mg-chloride-hexahydrate',
+        magnesium_ratio => 24.305/203.31, # 12.0%
+        summary => 'Magnesium chloride (hexahydrate, H12Cl2MgO6), in milligrams',
+    },
 );
 
 # XXX share with App::VitaminUtils
@@ -127,6 +138,7 @@ our @potassium_forms = (
         potassium_ratio => 1,
         summary => 'Elemental potassium, in milligrams',
     },
+    # note: unlike magnesium (MgCl hexahydrate), KCl and NaCl does not form hydrates
     {
         name => 'mg-k-chloride',
         potassium_ratio => 39.0983/74.5513, # 52.45%
@@ -183,6 +195,7 @@ our @sodium_forms = (
         sodium_ratio => 1,
         summary => 'Elemental sodium, in milligrams',
     },
+    # note: unlike magnesium (MgCl hexahydrate), KCl and NaCl does not form hydrates
     {
         name => 'mg-na-chloride',
         sodium_ratio => 22.989769/58.44, # 39.34%
@@ -261,6 +274,14 @@ _
             args=>{quantity=>'2500 mg-mg-bisglycinate-nowfoods', to_unit=>'mg-mg-elem'},
             summary=>'Find out how many milligrams of elemental magnesium is in 2.5g (1 recommended serving) of NOW Foods magnesium bisglycinate powder (magnesium content is as advertised on the label)',
         },
+        {
+            args=>{quantity=>'350 mg-mg-elem'},
+            summary=>'If I want to supplement 350mg elemental magnesium, how much of each compound should we use? (This does not yet take bioavailability into account)',
+        },
+        {
+            args=>{quantity=>'1000 mg-mg-chloride-hexahydrate', to_unit=>'mg-mg-elem'},
+            summary=>'How much elemental magnesium is in 1000mg (1g) of magnesium chloride powder in capsule form? The chloride is in the common hexahydrate form',
+        },
     ],
 };
 sub convert_magnesium_unit {
@@ -316,6 +337,18 @@ _
         {
             args=>{quantity=>'1000 mg-k-elem', to_unit=>'mg-k-cl'},
             summary=>'How much of potassium chloride provides 1000 mg of elemental potassium?',
+        },
+        {
+            args=>{quantity=>'1000 mg-k-chloride', to_unit=>'mg-k-chloride'},
+            summary=>'How much elemental potassium is in 1000mg (1g) of potassium chloride powder in capsule form?',
+        },
+        {
+            args=>{quantity=>'600 mg-k-chloride', to_unit=>'mg-k-elem'},
+            summary=>'A tablet supplement called KSR contains 600mg of potassium chloride; how much elemental potassium is that?',
+        },
+        {
+            args=>{quantity=>'4700 mg-k-elem', to_unit=>'mg-k-chloride'},
+            summary=>'Recommended daily intake (DV) of (elemental) potassium for adults and children 4 years or older is 4,700mg according to US FDA; how much is that equivalent to in KCl? Note that it is *NOT* recommended (and most probably dangerous) to take KCl supplement that much as potassium is contained in other sources too',
         },
     ],
 };
@@ -424,7 +457,7 @@ App::MineralUtils - Utilities related to mineral supplements
 
 =head1 VERSION
 
-This document describes version 0.008 of App::MineralUtils (from Perl distribution App-MineralUtils), released on 2022-06-17.
+This document describes version 0.010 of App::MineralUtils (from Perl distribution App-MineralUtils), released on 2022-11-26.
 
 =head1 DESCRIPTION
 
@@ -525,10 +558,20 @@ Result:
        unit    => "mg-mg-lactate-dihydrate",
        summary => "Magnesium lactate dihydrate (C6H14MgO8), in milligrams",
      },
+     {
+       amount  => 3.92156862745098,
+       unit    => "mg-mg-chloride-ah",
+       summary => "Magnesium chloride (anhydrous, MgCl2), in milligrams",
+     },
+     {
+       amount  => 8.33333333333333,
+       unit    => "mg-mg-chloride-hexahydrate",
+       summary => "Magnesium chloride (hexahydrate, H12Cl2MgO6), in milligrams",
+     },
    ],
    {
-     "table.fields"        => ["amount", "unit", "summary"],
      "table.field_aligns"  => ["number", "left", "left"],
+     "table.fields"        => ["amount", "unit", "summary"],
      "table.field_formats" => [
                                 ["number", { thousands_sep => "", precision => 3 }],
                                 undef,
@@ -567,6 +610,109 @@ Result:
 
  [200, "OK", 250, {}]
 
+=item * If I want to supplement 350mg elemental magnesium, how much of each compound should we use? (This does not yet take bioavailability into account):
+
+ convert_magnesium_unit(quantity => "350 mg-mg-elem");
+
+Result:
+
+ [
+   200,
+   "OK",
+   [
+     {
+       amount  => 350,
+       unit    => "mg-mg-elem",
+       summary => "Elemental magnesium, in milligrams",
+     },
+     {
+       amount  => 3097.34513274336,
+       unit    => "mg-mg-citrate",
+       summary => "Magnesium citrate (C6H6MgO7), in milligrams",
+     },
+     {
+       amount  => 2201.25786163522,
+       unit    => "mg-mg-citrate-ah",
+       summary => "Magnesium citrate anhydrous (C6H5Mg3O7), in milligrams",
+     },
+     {
+       amount  => 2413.79310344828,
+       unit    => "mg-mg-citrate-ah-nowfoods",
+       summary => "Magnesium citrate in NOW Foods supplement (anhydrous, C6H5Mg3O7, 90.9% pure, contains citric acid etc), in milligrams",
+     },
+     {
+       amount  => 2482.2695035461,
+       unit    => "mg-mg-glycinate",
+       summary => "Magnesium glycinate/bisglycinate (C4H8MgN2O4), in milligrams",
+     },
+     {
+       amount  => 2482.2695035461,
+       unit    => "mg-mg-bisglycinate",
+       summary => "Magnesium glycinate/bisglycinate (C4H8MgN2O4), in milligrams",
+     },
+     {
+       amount  => 3500,
+       unit    => "mg-mg-bisglycinate-nowfoods",
+       summary => "Magnesium bisglycinate in NOW Foods supplement (C4H8MgN2O4, 70.5% pure, contains citric acid etc), in milligrams",
+     },
+     {
+       amount  => 5384.61538461538,
+       unit    => "mg-mg-ascorbate",
+       summary => "Magnesium ascorbate (C12H14MgO12), in milligrams",
+     },
+     {
+       amount  => 4022.98850574713,
+       unit    => "mg-mg-pidolate",
+       summary => "Magnesium pidolate (C10H12MgN2O6), in milligrams",
+     },
+     {
+       amount  => 4216.86746987952,
+       unit    => "mg-mg-l-threonate",
+       summary => "Magnesium L-threonate (C8H14MgO10), in milligrams",
+     },
+     {
+       amount  => 580.431177446103,
+       unit    => "mg-mg-oxide",
+       summary => "Magnesium oxide (MgO), in milligrams",
+     },
+     {
+       amount  => 3431.37254901961,
+       unit    => "mg-mg-lactate-dihydrate",
+       summary => "Magnesium lactate dihydrate (C6H14MgO8), in milligrams",
+     },
+     {
+       amount  => 1372.54901960784,
+       unit    => "mg-mg-chloride-ah",
+       summary => "Magnesium chloride (anhydrous, MgCl2), in milligrams",
+     },
+     {
+       amount  => 2916.66666666667,
+       unit    => "mg-mg-chloride-hexahydrate",
+       summary => "Magnesium chloride (hexahydrate, H12Cl2MgO6), in milligrams",
+     },
+   ],
+   {
+     "table.field_formats" => [
+                                ["number", { thousands_sep => "", precision => 3 }],
+                                undef,
+                                undef,
+                              ],
+     "table.fields"        => ["amount", "unit", "summary"],
+     "table.field_aligns"  => ["number", "left", "left"],
+   },
+ ]
+
+=item * How much elemental magnesium is in 1000mg (1g) of magnesium chloride powder in capsule form? The chloride is in the common hexahydrate form:
+
+ convert_magnesium_unit(
+   quantity => "1000 mg-mg-chloride-hexahydrate",
+   to_unit  => "mg-mg-elem"
+ );
+
+Result:
+
+ [200, "OK", 120, {}]
+
 =back
 
 If target unit is not specified, will show all known conversions.
@@ -579,7 +725,11 @@ Arguments ('*' denotes required arguments):
 
 =item * B<quantity> => I<str> (default: "1 mg")
 
+(No description)
+
 =item * B<to_unit> => I<str>
+
+(No description)
 
 
 =back
@@ -641,13 +791,13 @@ Result:
      },
    ],
    {
-     "table.field_aligns"  => ["number", "left", "left"],
+     "table.fields"        => ["amount", "unit", "summary"],
      "table.field_formats" => [
-                                ["number", { thousands_sep => "", precision => 3 }],
+                                ["number", { precision => 3, thousands_sep => "" }],
                                 undef,
                                 undef,
                               ],
-     "table.fields"        => ["amount", "unit", "summary"],
+     "table.field_aligns"  => ["number", "left", "left"],
    },
  ]
 
@@ -658,6 +808,26 @@ Result:
 Result:
 
  [200, "OK", 1908.39694656489, {}]
+
+=item * How much elemental potassium is in 1000mg (1g) of potassium chloride powder in capsule form?:
+
+ convert_potassium_unit(quantity => "1000 mg-k-chloride", to_unit => "mg-k-chloride");
+
+Result:
+
+ [200, "OK", 1000, {}]
+
+=item * A tablet supplement called KSR contains 600mg of potassium chloride; how much elemental potassium is that?:
+
+ convert_potassium_unit(quantity => "600 mg-k-chloride", to_unit => "mg-k-elem"); # -> [200, "OK", 314.4, {}]
+
+=item * Recommended daily intake (DV) of (elemental) potassium for adults and children 4 years or older is 4,700mg according to US FDA; how much is that equivalent to in KCl? Note that it is *NOT* recommended (and most probably dangerous) to take KCl supplement that much as potassium is contained in other sources too:
+
+ convert_potassium_unit(quantity => "4700 mg-k-elem", to_unit => "mg-k-chloride");
+
+Result:
+
+ [200, "OK", 8969.46564885496, {}]
 
 =back
 
@@ -671,7 +841,11 @@ Arguments ('*' denotes required arguments):
 
 =item * B<quantity> => I<str> (default: "1 mg")
 
+(No description)
+
 =item * B<to_unit> => I<str>
+
+(No description)
 
 
 =back
@@ -733,13 +907,13 @@ Result:
      },
    ],
    {
+     "table.fields"        => ["amount", "unit", "summary"],
      "table.field_formats" => [
                                 ["number", { thousands_sep => "", precision => 3 }],
                                 undef,
                                 undef,
                               ],
      "table.field_aligns"  => ["number", "left", "left"],
-     "table.fields"        => ["amount", "unit", "summary"],
    },
  ]
 
@@ -763,7 +937,11 @@ Arguments ('*' denotes required arguments):
 
 =item * B<quantity> => I<str> (default: "1 mg")
 
+(No description)
+
 =item * B<to_unit> => I<str>
+
+(No description)
 
 
 =back
@@ -810,9 +988,10 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 

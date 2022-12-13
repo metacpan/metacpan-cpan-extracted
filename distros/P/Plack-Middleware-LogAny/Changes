@@ -16,3 +16,8 @@ Release history for Plack-Middleware-LogAny
 0.001002  2022-12-05
           - do not create authoring related MakeMaker postamble section
             on some platforms (background: the make syntax differs)
+
+0.001003  2022-12-10
+          - use tailcall to replace the current invocation of psgix.logger
+          - make sure that the issuer of a logging request (%M) is set
+            properly [RT #144221]

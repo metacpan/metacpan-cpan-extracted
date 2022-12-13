@@ -4,7 +4,7 @@ Plack::Middleware::Statsd - send statistics to statsd
 
 # VERSION
 
-version v0.6.1
+version v0.6.2
 
 # SYNOPSIS
 
@@ -136,7 +136,7 @@ enable "Statsd",
    catch_errors => \&handle_errors;
 ```
 
-This is disable by default, which means that no metrics will be logged
+This is disabled by default, which means that no metrics will be logged
 if there is a fatal error.
 
 Added in v0.5.0.
@@ -280,6 +280,20 @@ builder {
 
 If your application is returning a status code that is not handled by
 [HTTP::Status](https://metacpan.org/pod/HTTP%3A%3AStatus), then the metrics may not be logged for that reponse.
+
+## psgix.informational
+
+This does not add a wrapper around the `psgix.informational`
+callback.  If you are making use of it in your code, then you will
+need to add metrics logging yourself.
+
+# SUPPORT FOR OLDER PERL VERSIONS
+
+Since v0.6.0, the this module requires Perl v5.14 or later.
+
+If you need this module on Perl v5.10, please use one of the v0.5.x
+versions of this module.  Significant bug or security fixes may be
+backported to those versions.
 
 # SEE ALSO
 

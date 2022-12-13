@@ -42,9 +42,9 @@ use PPIx::Regexp::Constant qw{
     TOKEN_UNKNOWN
     @CARP_NOT
 };
-use PPIx::Regexp::Util qw{ __to_ordinal_en };
+use PPIx::Regexp::Util qw{ __to_ordinal_en width };
 
-our $VERSION = '0.085';
+our $VERSION = '0.086';
 
 # Return true if the token can be quantified, and false otherwise
 # sub can_be_quantified { return };
@@ -77,6 +77,49 @@ sub explain {
 	    MINIMUM_PERL;
     }
 
+}
+
+sub raw_width {
+    my ( $self ) = @_;
+    my $re = $self->top()
+	or return ( undef, undef );	# Shouldn't happen.
+    my @capture;
+    if ( $self->is_named() ) {
+	my $name = $self->name();
+	foreach my $elem ( @{ $re->find(
+	    'PPIx::Regexp::Structure::NamedCapture' ) || [] } ) {
+	    $elem->name() eq $name
+		or next;
+	    $re->__token_post_order( $elem, $self ) < 0
+		or last;
+	    push @capture, $elem;
+	}
+    } else {
+	my $number = $self->absolute();
+	foreach my $elem ( @{ $re->find(
+	    'PPIx::Regexp::Structure::Capture' ) || [] } ) {
+	    $elem->number() == $number
+		or next;
+	    $re->__token_post_order( $elem, $self ) < 0
+		or last;
+	    push @capture, $elem;
+	}
+    }
+    @capture == 1
+	and return $capture[0]->raw_width();
+    my ( $base_min, $base_max ) = $capture[0]->raw_width();
+    foreach my $elem ( @capture[ 1 .. $#capture ] ) {
+	my ( $ele_min, $ele_max ) = $elem->raw_width();
+	defined $ele_min
+	    or $base_min = undef;
+	defined $base_min
+	    and $base_min = $base_min == $ele_min ? $base_min : undef;
+	defined $ele_max
+	    or $base_max = undef;
+	defined $base_max
+	    and $base_max = $base_max == $ele_max ? $base_max : undef;
+    }
+    return ( $base_min, $base_max );
 }
 
 my @external = (	# Recognition used externally

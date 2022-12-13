@@ -16,7 +16,7 @@ name: App-eachperl
 provides:
   App::eachperl:
     file: lib/App/eachperl.pm
-    version: '0.08'
+    version: '0.09'
 requires:
   Attribute::Storage: '0'
   Commandable::Finder::MethodAttributes: '0'
@@ -31,5 +31,5 @@ requires:
   perl: '5.026'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.08'
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -22,13 +22,15 @@ subtest throws => sub {
     throws_ok { MIDI::Bassline::Walk->new(verbose => BOGUS) }
         qr/not a boolean/, 'bogus verbose';
     throws_ok { MIDI::Bassline::Walk->new(keycenter => BOGUS) }
-        qr/not a valid key/, 'bogus keycenter';
+        qr/not a valid pitch/, 'bogus keycenter';
     throws_ok { MIDI::Bassline::Walk->new(intervals => BOGUS) }
         qr/not an array reference/, 'bogus intervals';
     throws_ok { MIDI::Bassline::Walk->new(octave => BOGUS) }
         qr/not a positive integer/, 'bogus octave';
     throws_ok { MIDI::Bassline::Walk->new(scale => BOGUS) }
         qr/not a code reference/, 'bogus scale';
+    throws_ok { MIDI::Bassline::Walk->new(wrap => BOGUS) }
+        qr/not valid/, 'bogus wrap';
 };
 
 subtest attrs => sub {
@@ -36,7 +38,7 @@ subtest attrs => sub {
         verbose => VERBOSE,
     ];
 
-    is $obj->octave, 2, 'octave';
+    is $obj->octave, 1, 'octave';
 
     my $expect = [qw(-3 -2 -1 1 2 3)];
     is_deeply $obj->intervals, $expect, 'intervals';
@@ -47,12 +49,14 @@ subtest attrs => sub {
     is $got, 'major', 'scale';
     $got = $obj->scale->('Dm7b5');
     is $got, 'minor', 'scale';
+};
 
-    $obj = new_ok 'MIDI::Bassline::Walk' => [
+subtest scale => sub {
+    my $obj = new_ok 'MIDI::Bassline::Walk' => [
         verbose => VERBOSE,
         modal   => 1,
     ];
-    $got = $obj->scale->('Dm7b5');
+    my $got = $obj->scale->('Dm7b5');
     is $got, 'dorian', 'scale';
 };
 
@@ -64,16 +68,11 @@ subtest generate => sub {
     my $got = $obj->generate('C7b5', 4);
     is scalar(@$got), 4, 'generate';
 
-    my $expect = [qw(41 43 45)]; # C-F note intersection
-    $got = $obj->generate('C', 4, 'F');
-    $got = grep { $_ eq $got->[-1] } @$expect;
-    ok $got, 'intersection';
-
     $obj = new_ok 'MIDI::Bassline::Walk' => [
         verbose => VERBOSE,
         tonic   => 1,
     ];
-    $expect = [qw(36 40 43)]; # I,III,V of the C2 major scale
+    my $expect = [qw(24 28 31)]; # I,III,V of the C1 major scale
     $got = $obj->generate('C', 4);
     $got = grep { $_ eq $got->[0] } @$expect;
     ok $got, 'tonic';
@@ -96,14 +95,21 @@ subtest generate => sub {
     $got = $obj->generate('Dm7b5', 99); # A G# would surely not...
     $got = grep { $_ != $expect } @$got;
     ok $got, 'chord_notes';
+};
 
-    #$obj = MIDI::Bassline::Walk->new(
-    #    verbose   => VERBOSE,
-    #    guitar    => 1,
-    #    modal     => 1,
-    #    keycenter => 'Bb',
-    #);
-    #$got = $obj->generate('F7', 4);
+subtest wrap => sub {
+    # set the octave above the wrap!
+    my $obj = new_ok 'MIDI::Bassline::Walk' => [
+        verbose   => VERBOSE,
+        octave    => 3,
+        wrap      => 'C3',
+        modal     => 1,
+        keycenter => 'C',
+    ];
+
+    my $got = $obj->generate('C', 4);
+    $got = grep { $_ <= 48 } @$got;
+    is $got, 4, 'wrap';
 };
 
 done_testing();

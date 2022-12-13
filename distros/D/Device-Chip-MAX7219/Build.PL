@@ -7,7 +7,7 @@ my $build = Module::Build->new(
    module_name => 'Device::Chip::MAX7219',
    requires => {
       'perl' => '5.026',
-      'Object::Pad' => '0.70',
+      'Object::Pad' => '0.74', # 0.73 + bugfix
       'Future::AsyncAwait' => '0.47', # toplevel await
 
       'Device::Chip' => '0.03',

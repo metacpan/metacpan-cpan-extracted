@@ -3,8 +3,10 @@ our $AUTHORITY = 'cpan:GENE';
 
 # ABSTRACT: Generate walking basslines
 
-our $VERSION = '0.0505';
+our $VERSION = '0.0506';
 
+use Moo;
+use strictures 2;
 use Data::Dumper::Compact qw(ddc);
 use Carp qw(croak);
 use List::SomeUtils qw(first_index);
@@ -14,9 +16,9 @@ use Music::Note ();
 use Music::Scales qw(get_scale_notes get_scale_MIDI);
 use Music::VoiceGen ();
 use Set::Array ();
-use Moo;
-use strictures 2;
 use namespace::clean;
+
+use constant E1 => 28; # lowest note on a bass guitar in standard tuning
 
 with('Music::PitchNum');
 
@@ -24,6 +26,13 @@ with('Music::PitchNum');
 has guitar => (
     is      => 'ro',
     isa     => \&_boolean,
+    default => sub { 0 },
+);
+
+
+has wrap => (
+    is      => 'ro',
+    isa     => sub { croak 'not valid' unless $_[0] =~ /^[0A-G][#b]?\d?$/ },
     default => sub { 0 },
 );
 
@@ -44,7 +53,7 @@ has chord_notes => (
 
 has keycenter => (
     is      => 'ro',
-    isa     => sub { croak 'not a valid key' unless $_[0] =~ /^[A-G][#b]?$/ },
+    isa     => sub { croak 'not a valid pitch' unless $_[0] =~ /^[A-G][#b]?$/ },
     default => sub { 'C' },
 );
 
@@ -59,7 +68,7 @@ has intervals => (
 has octave => (
     is      => 'ro',
     isa     => sub { croak 'not a positive integer' unless $_[0] =~ /^\d+$/ },
-    default => sub { 2 },
+    default => sub { 1 },
 );
 
 
@@ -182,7 +191,13 @@ sub generate {
     }
 
     if ($self->guitar) {
-        @fixed = sort { $a <=> $b } map { $_ < 40 ? $_ + 12 : $_ } @fixed;
+        @fixed = sort { $a <=> $b } map { $_ < E1 ? $_ + 12 : $_ } @fixed;
+    }
+
+    if ($self->wrap) {
+        my $n = Music::Note->new($self->wrap, 'ISO');
+        $n = $n->format('midinum');
+        @fixed = sort { $a <=> $b } map { $_ > $n ? $_ - 12 : $_ } @fixed;
     }
 
     # Make sure there are no duplicate pitches
@@ -281,7 +296,7 @@ MIDI::Bassline::Walk - Generate walking basslines
 
 =head1 VERSION
 
-version 0.0505
+version 0.0506
 
 =head1 SYNOPSIS
 
@@ -293,6 +308,7 @@ version 0.0505
   $bassline = MIDI::Bassline::Walk->new(
     verbose   => 1,
     guitar    => 1,
+    wrap      => 'C3',
     modal     => 1,
     keycenter => 'Bb',
   );
@@ -325,9 +341,19 @@ notes until they sound suitable.
 
   $guitar = $bassline->guitar;
 
-Transpose notes below C<E2> (midinum C<40>) up an octave.
+Transpose notes below C<E1> (midinum C<28>) up an octave. This is the
+lowest note of a bass guitar in standard tuning.
 
 Default: C<0>
+
+=head2 wrap
+
+  $wrap = $bassline->wrap;
+
+Transpose notes that are above this ISO pitch (e.g. C3), down an
+octave.
+
+Default: C<0> (do not wrap)
 
 =head2 modal
 
@@ -368,7 +394,7 @@ Default: C<[ -3 -2 -1 1 2 3 ]>
 
 Lowest MIDI octave.
 
-Default: C<2>
+Default: C<1>
 
 =head2 scale
 
@@ -415,6 +441,8 @@ Show progress.
 Default: C<0>
 
 =head1 METHODS
+
+=for Pod::Coverage E1
 
 =head2 new
 

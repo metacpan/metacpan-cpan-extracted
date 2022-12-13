@@ -1,0 +1,29 @@
+---
+abstract: 'Libraries and Utilities to work with Dogecoin'
+author:
+  - 'chromatic <chromatic@wgz.org>'
+build_requires:
+  Test::Compile: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Finance-Dogecoin-Utils
+requires:
+  File::HomeDir: '0'
+  JSON: '0'
+  Mojo::JSON: '0'
+  Mojo::UserAgent: '0'
+  Object::Pad: '0.74'
+  Path::Tiny: '0'
+resources:
+  homepage: https://github.com/chromatic/Finance-Dogecoin-Utils
+  repository: https://github.com/chromatic/Finance-Dogecoin-Utils.git
+version: 1.20221211.2353
+x_generated_by_perl: v5.36.0
+x_serialization_backend: 'YAML::Tiny version 1.73'
+x_spdx_expression: MIT

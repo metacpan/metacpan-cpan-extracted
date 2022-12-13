@@ -1,12 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2016-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2016-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.43;
+use Object::Pad 0.66;
 
-package Device::Chip::PCF857x 0.04;
+package Device::Chip::PCF857x 0.05;
 class Device::Chip::PCF857x
    :isa(Device::Chip);
 
@@ -51,9 +51,9 @@ use Carp;
 
 use Future;
 
-has $_chip :param;
-has $_mask;
-has $_gpiobits;
+field $_chip :param;
+field $_mask;
+field $_gpiobits;
 
 ADJUST
 {

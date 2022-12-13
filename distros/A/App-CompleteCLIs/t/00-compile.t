@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 57 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 58 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'App/CompleteCLIs.pm'
@@ -53,6 +53,7 @@ my @scripts = (
     'script/complete-ppr-subpattern',
     'script/complete-proc-name',
     'script/complete-program',
+    'script/complete-random-string',
     'script/complete-rclone-remote',
     'script/complete-regexp-pattern-module',
     'script/complete-regexp-pattern-pattern',

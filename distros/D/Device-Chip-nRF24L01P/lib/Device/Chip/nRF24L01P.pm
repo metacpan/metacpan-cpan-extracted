@@ -1,12 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.57;
+use Object::Pad 0.66;
 
-package Device::Chip::nRF24L01P 0.06;
+package Device::Chip::nRF24L01P 0.07;
 class Device::Chip::nRF24L01P
    :isa(Device::Chip);
 
@@ -49,7 +49,7 @@ my %DEFAULT_CE = (
    'Device::Chip::Adapter::FTDI'      => "D4",
 );
 
-has $_gpio_ce;
+field $_gpio_ce;
 
 async method mount ( $adapter, %params )
 {
@@ -184,7 +184,7 @@ This should not normally be necessary, other than for debugging.
 
 =cut
 
-has @_registers;
+field @_registers;
 
 method clear_caches ()
 {
@@ -208,7 +208,7 @@ to 5) or undef.
 
 =cut
 
-has $_latest_status;
+field $_latest_status;
 
 method latest_status ()
 {

@@ -38,9 +38,9 @@ use PPIx::Regexp::Constant qw{
     LITERAL_LEFT_CURLY_REMOVED_PHASE_2
     @CARP_NOT
 };
-use PPIx::Regexp::Util qw{ __instance };
+use PPIx::Regexp::Util qw{ :width_one __instance };
 
-our $VERSION = '0.085';
+our $VERSION = '0.086';
 
 sub __new {
     my ( $class, @args ) = @_;

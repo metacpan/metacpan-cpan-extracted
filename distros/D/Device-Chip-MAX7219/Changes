@@ -1,5 +1,10 @@
 Revision history for Device-Chip-MAX7219
 
+0.08    2022-12-12
+        [CHANGES]
+         * Updated for Object::Pad v0.73:
+            + Use `field NAME = EXPR` syntax
+
 0.07    2022-10-29
         [CHANGES]
          * Updates for Object::Pad v0.70

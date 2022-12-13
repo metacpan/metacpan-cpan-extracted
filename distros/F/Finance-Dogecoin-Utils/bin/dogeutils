@@ -1,0 +1,119 @@
+#! perl
+
+use strict;
+use warnings;
+use feature 'say';
+
+use Path::Tiny;
+use File::HomeDir;
+
+use Finance::Dogecoin::Utils::NodeRPC;
+use Finance::Dogecoin::Utils::ProxyActions;
+
+exit main( @ARGV );
+
+sub main {
+    my ($action, @args)  = @_;
+
+    my $conf_dir     = path(File::HomeDir->my_data)->child('dogeutils')->mkdir;
+
+    if ($action =~ /^--(.+)$/) {
+        if (my $func = __PACKAGE__->can( $1 )) {
+            return $func->( $conf_dir, @args );
+        }
+    }
+
+    my $address_file = $conf_dir->child( 'addressLabels.json' );
+    my $auth_file    = $conf_dir->child( 'auth.json' );
+
+    my $rpc     = Finance::Dogecoin::Utils::NodeRPC->new( user => $ENV{DOGEUTILS_USER}, auth_file => $auth_file );
+    my $actions = Finance::Dogecoin::Utils::ProxyActions->new( rpc => $rpc, address_file => $address_file );
+
+    if (my $action_method = $actions->can( $action )) {
+        return !! $actions->$action_method( @args );
+    } else {
+        warn "Don't recognize action '$action'\n";
+        return 1;
+    }
+
+    return 0;
+}
+
+sub conf_dir {
+    my ($conf_dir, @args) = @_;
+    say "Configuration dir is $conf_dir";
+
+    return 0;
+}
+
+__END__
+
+=head1 NAME
+
+dogeutils - command-line utility to work with Dogecoin Core nodes
+
+=head1 SYNOPSIS
+
+  dogeutils setlabel <address> <label name>
+  dogeutils getreceivedbylabel <label name>
+
+=head1 COMMANDS
+
+The Dogecoin Core provides several useful RPC features, but they're often
+building blocks and sometimes incomplete. This program (and the associated
+libraries) allow you to wrap, extend, and modify those features with your own
+code.
+
+For example, the current Dogecoin Core releases (1.14.x series) do not provide mechanisms
+to get, set, or query address labels.
+
+If you set up and run C<dogeutils> (this file) correctly, you can fix that.
+
+=head2 Authentication and Authorization
+
+This code expects you to have configured a running node with authentication.
+See the C<rpcuser> documentation for more information.
+
+L<https://github.com/dogecoin/dogecoin/tree/master/share/rpcuser>
+
+Create a JSON file named C<auth.json> in the appropriate configuration
+directory (run C<dogeutils --confdir> to see where). This file should contain a
+JSON object where the keys are usernames and the values are passwords.
+
+Set the C<DOGEUTILS_USER> to the username you want to use to authenticate. For example:
+
+  $ DOGEUTILS_USER=lisasimpson dogeutils getreceivedbylabel 'Saxophone Lesson Fund'
+
+=head2 Limitations
+
+Currently this expects that your node is running on C<localhost> on port
+C<22555>. This will be configurable in future versions.
+
+=head2 Available Commands
+
+This suite supports a few commands right now:
+
+=over 4
+
+=item * C<setlabel>
+
+Given a Dogecoin address and a label, associates the label with this address. Yes, this matches the Bitcoin RPC method. That's no accident.
+
+=item * C<getreceivedbylabel>
+
+Given a label corresponding to a Dogecoin address (already set with
+C<setlabel>), returns the JSON from the C<getreceivedbyaddress> RPC call.
+
+=back
+
+=head1 SEE ALSO
+
+L<Finance::Dogecoin::Utils::ProxyActions>
+
+L<Finance::Dogecoin::Utils::NodeRPC>
+
+=head1 AUTHOR
+
+chromatic
+
+=cut

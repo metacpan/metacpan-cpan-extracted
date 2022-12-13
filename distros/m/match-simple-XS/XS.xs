@@ -131,20 +131,43 @@ _match (SV *const a, SV *const b)
 			return ret_truth;
 		}
 		
-		bool r;
-		ENTER;
-		SAVETMPS;
-		PUSHMARK(SP);
-		XPUSHs(a);
-		XPUSHs(b);
-		PUTBACK;
-		count = call_pv("match::simple::XS::_smartmatch", G_SCALAR);
-		SPAGAIN;
-		r = POPi;
-		PUTBACK;
-		FREETMPS;
-		LEAVE;
-		return (r != 0);
+		if ( 1 ) {
+			dSP;
+			int countx;
+			SV* rx;
+			bool overload_r;
+			ENTER;
+			SAVETMPS;
+			PUSHMARK(SP);
+			XPUSHs(b);
+			PUTBACK;
+			countx = call_pv("match::simple::XS::_overloaded_smartmatch", G_SCALAR);
+			SPAGAIN;
+			rx = POPs;
+			PUTBACK;
+			
+			if (SvTYPE(rx) == SVt_IV) {
+				SV* coderef = rx;
+				SV* one = newSViv(1);
+				dSP;
+				int count;
+				PUSHMARK(SP);
+				XPUSHs(b);
+				XPUSHs(a);
+				XPUSHs(one);
+				PUTBACK;
+				count = call_sv(coderef, G_SCALAR);
+				SPAGAIN;
+				overload_r = POPi;
+				PUTBACK;
+			}
+			
+			FREETMPS;
+			LEAVE;
+			return (overload_r != 0);
+		}
+		
+		return FALSE;
 	}
 	
 	SV *sv_b = SvRV(b);
@@ -206,5 +229,13 @@ match (a, b)
 	SV *b
 CODE:
 	RETVAL = _match(a, b);
+OUTPUT:
+	RETVAL
+
+bool
+is_regexp (r)
+	SV *r
+CODE:
+	RETVAL = SvRXOK(r);
 OUTPUT:
 	RETVAL

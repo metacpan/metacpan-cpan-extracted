@@ -12,12 +12,6 @@ my %WriteMakefileArgs = (
     MIN_PERL_VERSION => '5.006',
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => '0',
-        'MIME::Lite' => '0',
-        'MIME::Words' => '0',
-        'MIME::Base64' => '0',
-        'Authen::SASL' => '0',
-        'Net::SSLeay' => '0',
-        'IO::Socket::SSL' => '0',
     },
     TEST_REQUIRES => {
         'Test::More' => '0',
@@ -25,6 +19,12 @@ my %WriteMakefileArgs = (
     PREREQ_PM => {
         #'ABC'              => '1.6',
         #'Foo::Bar::Module' => '5.0401',
+        'MIME::Lite' => '0',
+        'MIME::Words' => '0',
+        'MIME::Base64' => '0',
+        'Authen::SASL' => '0',
+        'Net::SSLeay' => '0',
+        'IO::Socket::SSL' => '0',
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'App-OpenMbox-Client-*' },

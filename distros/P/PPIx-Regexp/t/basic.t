@@ -20,7 +20,7 @@ can_ok( 'PPIx::Regexp::Util', 'is_ppi_regexp_element' ) or BAIL_OUT;
 require_ok( 'PPIx::Regexp' ) or BAIL_OUT;
 class_isa_ok( 'PPIx::Regexp', 'PPIx::Regexp::Node' ) or BAIL_OUT;
 
-require_ok( 'PPIx::Regexp::Constant' );
+require_ok( 'PPIx::Regexp::Constant' ) or BAIL_OUT;
 class_isa_ok( 'PPIx::Regexp::Constant', 'Exporter' );
 
 require_ok( 'PPIx::Regexp::Dumper' ) or BAIL_OUT;

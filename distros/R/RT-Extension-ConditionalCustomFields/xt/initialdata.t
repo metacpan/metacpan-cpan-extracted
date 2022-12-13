@@ -14,24 +14,25 @@ ok($rv, "Inserted test data from $initialdata: $msg");
 my $attributes = RT::Attributes->new(RT->SystemUser);
 $attributes->Limit(FIELD => 'Name', VALUE => 'ConditionedBy');
 is($attributes->Count, 3, 'All attributes created');
+my $first_attribute_id = RT::Handle::cmp_version($RT::VERSION, '5.0.0') < 0 ? 7 : RT::Handle::cmp_version($RT::VERSION, '5.0.2') < 0 ? 8 : 11;
 while (my $attribute = $attributes->Next) {
-    if ($attribute->id == 7) {
+    if ($attribute->id == $first_attribute_id) {
         is($attribute->Content->{CF}, 3, 'First ConditionedBy CF');
         is($attribute->Content->{op}, 'is', 'First ConditionedBy op');
         is(scalar(@{$attribute->Content->{vals}}), 1, 'First ConditionedBy one val');
         is($attribute->Content->{vals}->[0], 'Passed', 'First ConditionedBy val');
-    } elsif ($attribute->id == 8) {
+    } elsif ($attribute->id == $first_attribute_id + 1) {
         is($attribute->Content->{CF}, 3, 'Second ConditionedBy CF');
         is($attribute->Content->{op}, "isn't", 'Second ConditionedBy op');
         is(scalar(@{$attribute->Content->{vals}}), 1, 'Second ConditionedBy one val');
         is($attribute->Content->{vals}->[0], 'Failed', 'Second ConditionedBy val');
-    } elsif ($attribute->id == 9) {
+    } elsif ($attribute->id == $first_attribute_id + 2) {
         is($attribute->Content->{CF}, 3, 'Third ConditionedBy CF');
         is(scalar(@{$attribute->Content->{vals}}), 2, 'Third ConditionedBy one val');
         is($attribute->Content->{op}, 'is', 'Third ConditionedBy op');
         is($attribute->Content->{vals}->[0], 'Passed', 'Third ConditionedBy first val');
         is($attribute->Content->{vals}->[1], 'Schrödingerized', 'Third ConditionedBy second val');
     } else {
-        is($attribute->id, '7 or 8 or 9', 'Unexpected attribute id');
+        is($attribute->id, $first_attribute_id . ', ' . $first_attribute_id + 1 . ' or ' . $first_attribute_id +2, 'Unexpected attribute id');
     }
 }

@@ -198,6 +198,7 @@ SV *Future_new_proto(pTHX_ SV *f1)
 
   SV *ret = SvREFCNT_inc(POPs);
 
+  PUTBACK;
   FREETMPS;
   LEAVE;
 
@@ -370,6 +371,7 @@ static SV *S_wrap_cb(pTHX_ SV *f, const char *name, SV *cv)
   SPAGAIN;
   SV *ret = newSVsv(POPs);
 
+  PUTBACK;
   FREETMPS;
   LEAVE;
 
@@ -440,6 +442,7 @@ static SV *S_invoke_seq_callback(pTHX_ struct FutureXS *self, SV *selfsv, struct
   SV *f2 = POPs;
   SvREFCNT_inc(f2);
 
+  PUTBACK;
   FREETMPS;
   LEAVE;
 
@@ -747,6 +750,7 @@ void Future_failv(pTHX_ SV *f, SV **svp, size_t n)
 
       av_push(failure, SvREFCNT_inc(POPs));
 
+      PUTBACK;
       FREETMPS;
       LEAVE;
     }
@@ -766,6 +770,7 @@ void Future_failv(pTHX_ SV *f, SV **svp, size_t n)
 
       av_push(failure, SvREFCNT_inc(POPs));
 
+      PUTBACK;
       FREETMPS;
       LEAVE;
     }
@@ -790,7 +795,6 @@ void Future_failv(pTHX_ SV *f, SV **svp, size_t n)
       SP -= count;
 
       PUTBACK;
-
       FREETMPS;
       LEAVE;
     }
@@ -972,6 +976,7 @@ AV *Future_get_result_av(pTHX_ SV *f, bool await)
 
       exception = SvREFCNT_inc(POPs);
 
+      PUTBACK;
       FREETMPS;
       LEAVE;
     }

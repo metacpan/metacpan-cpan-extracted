@@ -169,6 +169,7 @@ YAML
       stash => $expected_stash = {
         method => 'post',
         operation_id => 'operation_foo',
+        operation_path => '/paths/~1foo~1{foo_id}/post',
         path_template => '/foo/{foo_id}',
         path_captures => { foo_id => '123' },
       },
@@ -204,6 +205,7 @@ YAML
       stash => {
         method => 'post',
         operation_id => 'operation_foo',
+        operation_path => '/paths/~1foo~1{foo_id}/post',
         path_template => '/foo/{foo_id}',
         path_captures => { foo_id => 'hi' },
       },
@@ -227,6 +229,7 @@ YAML
       stash => $expected_stash = {
         method => 'post',
         operation_id => 'operation_foo',
+        operation_path => '/paths/~1foo~1{foo_id}/post',
         path_template => '/foo/{foo_id}',
         path_captures => { foo_id => 'hi' },
       },
@@ -265,6 +268,7 @@ YAML
     {
       method => 'get',
       operation_id => 'operation_skip_validate_request',
+      operation_path => '/paths/~1skip_validate_request/get',
       path_template => '/skip_validate_request',
       path_captures => {},
     },

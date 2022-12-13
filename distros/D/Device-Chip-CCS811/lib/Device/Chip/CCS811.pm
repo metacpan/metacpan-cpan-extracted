@@ -1,12 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.57;
+use Object::Pad 0.66;
 
-package Device::Chip::CCS811 0.01;
+package Device::Chip::CCS811 0.02;
 class Device::Chip::CCS811
    :isa(Device::Chip::Base::RegisteredI2C);
 
@@ -139,7 +139,7 @@ containing the following fields:
 
 =cut
 
-has $_configbyte;
+field $_configbyte;
 
 async method read_config ()
 {
@@ -219,7 +219,7 @@ async method init ()
    }
 }
 
-has $_pending_read_f;
+field $_pending_read_f;
 
 method _next_read ()
 {

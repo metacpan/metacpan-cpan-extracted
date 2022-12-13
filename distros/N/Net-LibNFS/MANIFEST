@@ -240,7 +240,7 @@ libnfs/tests/test_0450_utimes.sh
 libnfs/tests/test_0460_opendir.sh
 libnfs/tests/test_1000_mount_paths.sh
 libnfs/tests/test_1010_chdir_paths.sh
-libnfs/tests/test_8000_timeout.sh
+libnfs/tests/test_8000_timeout.sh.disabled
 libnfs/tests/test_9900_valgrind_leak_check_full.sh
 libnfs/tests/test_9910_valgrind_timeout.sh
 libnfs/tests/test_9990_build_rpm.sh

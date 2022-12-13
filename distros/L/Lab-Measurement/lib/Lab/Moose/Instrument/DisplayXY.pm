@@ -1,5 +1,5 @@
 package Lab::Moose::Instrument::DisplayXY;
-$Lab::Moose::Instrument::DisplayXY::VERSION = '3.831';
+$Lab::Moose::Instrument::DisplayXY::VERSION = '3.840';
 #ABSTRACT: Display with y vs x traces Role for Lab::Moose::Instrument
 
 use v5.20;
@@ -313,7 +313,7 @@ Lab::Moose::Instrument::DisplayXY - Display with y vs x traces Role for Lab::Moo
 
 =head1 VERSION
 
-version 3.831
+version 3.840
 
 =head1 DESCRIPTION
 

@@ -4,7 +4,7 @@
       "Sven Willenbuecher <sven.willenbuecher@kuehne-nagel.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.143240",
    "license" : [
       "perl_5"
    ],
@@ -46,6 +46,7 @@
       },
       "test" : {
          "requires" : {
+            "Log::Any::Adapter::Log4perl" : "0",
             "Test::More" : "0"
          }
       }
@@ -61,6 +62,5 @@
          "web" : "https://github.com/XSven/Plack-Middleware-LogAny"
       }
    },
-   "version" : "0.001002",
-   "x_serialization_backend" : "JSON::PP version 4.12"
+   "version" : "0.001003"
 }

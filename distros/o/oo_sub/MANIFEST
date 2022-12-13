@@ -1,0 +1,11 @@
+eg/oo_sub.pl
+INSTALL
+lib/oo_sub.pm
+Makefile.PL
+MANIFEST			This list of files
+MYMETA.json
+MYMETA.yml
+readme.org
+t/class.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

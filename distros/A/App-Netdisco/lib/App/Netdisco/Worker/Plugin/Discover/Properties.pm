@@ -364,14 +364,26 @@ register_worker({ phase => 'early', driver => 'snmp' }, sub {
       }
   }
 
+  # update num_ports
+  $device->num_ports( scalar values %deviceports );
+
   # support for Hooks
   vars->{'hook_data'}->{'ports'} = [values %deviceports];
 
   schema('netdisco')->resultset('DevicePort')->txn_do_locked(sub {
+    # backup the custom_fields
+    my @fields = grep {exists $deviceports{$_->{port}}} $device->ports
+      ->search(undef, {columns => [qw/port custom_fields/]})->hri->all;
+    $deviceports{$_->{port}}->{custom_fields} = $_->{custom_fields}
+      for @fields;
+
     my $gone = $device->ports->delete({keep_nodes => 1});
     debug sprintf ' [%s] interfaces - removed %d interfaces',
       $device->ip, $gone;
-    $device->update_or_insert(undef, {for => 'update'});
+
+    # uptime and num_ports changed
+    $device->update();
+
     $device->ports->populate([values %deviceports]);
 
     return Status->info(sprintf ' [%s] interfaces - added %d new interfaces',

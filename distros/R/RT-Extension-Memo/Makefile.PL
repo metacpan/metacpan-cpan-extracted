@@ -6,7 +6,7 @@ license 'gpl_3';
 repository 'https://github.com/gibus/RT-Extension-Memo';
 
 requires_rt('4.2.0');
-rt_too_new('4.6.0');
+rt_too_new('5.1.0');
 
 readme_from 'lib/RT/Extension/Memo.pm', 0, 'md', 'README.md';
 

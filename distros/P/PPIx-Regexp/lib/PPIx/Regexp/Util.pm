@@ -7,6 +7,8 @@ use warnings;
 
 use Carp;
 use PPIx::Regexp::Constant qw{
+    INFINITY
+    MINIMUM_PERL
     @CARP_NOT
 };
 use Scalar::Util qw{ blessed };
@@ -18,12 +20,20 @@ our @EXPORT_OK = qw{
     __choose_tokenizer_class
     __instance
     __is_ppi_regexp_element
+    __merge_perl_requirements
     __ns_can
     __post_rebless_error
+    raw_width
     __to_ordinal_en
+    width
 };
 
-our $VERSION = '0.085';
+our %EXPORT_TAGS = (
+    all		=> \@EXPORT_OK,
+    width_one	=> [ qw{ raw_width width } ],
+);
+
+our $VERSION = '0.086';
 
 sub is_ppi_regexp_element {
     my ( $elem ) = @_;
@@ -60,6 +70,35 @@ sub __instance {
     return $object->isa( $class );
 }
 
+sub __merge_perl_requirements {	## no critic (RequireArgUnpacking)
+    my @work =
+    sort { $a->[0] <=> $b->[0] || $b->[1] <=> $a->[1] }
+    map { ( [ $_->[0], 1 ], [ $_->[1], 0 ] ) }
+    map { [ $_->{introduced}, defined $_->{removed} ? $_->{removed} : INFINITY ] } @_;
+    my @rslt;
+    while ( @work ) {
+	my ( $intro, $rem );
+	$intro = ( shift @work )->[0] while @work && $work[0][1];
+	if ( @work ) {
+	    $rem = $work[0][0];
+	    shift @work while @work && ! $work[0][1];
+	}
+	defined $intro
+	    or $intro = MINIMUM_PERL;
+	defined $rem
+	    or $rem = INFINITY;
+	$intro != $rem
+	    and push @rslt, {
+		introduced	=> $intro,
+		removed	=> $rem,
+	    };
+    }
+    @rslt
+	and $rslt[-1]{removed} == INFINITY
+	and delete $rslt[-1]{removed};
+    return @rslt;
+}
+
 sub __ns_can {
     my ( $class, $name ) = @_;
     my $fqn = join '::', ref $class || $class, $name;
@@ -83,6 +122,11 @@ sub __post_rebless_error {
 
 }
 
+# Unquantified number of characters matched.
+sub raw_width {
+    return ( 1, 1 );
+}
+
 sub __to_ordinal_en {
     my ( $num ) = @_;
     $num += 0;
@@ -95,6 +139,16 @@ sub __to_ordinal_en {
     3 == $num % 10
 	and return "${num}rd";
     return "${num}th";
+}
+
+sub width {
+    my ( $self ) = @_;
+    my @raw_width = $self->raw_width();
+    my ( $code, $next_sib );
+    $next_sib = $self->snext_sibling()
+	and $code = $next_sib->can( '__quantified_width' )
+	or return @raw_width;
+    return $code->( $next_sib, @raw_width );
 }
 
 1;
@@ -162,6 +216,13 @@ This is a synonym for L<is_ppi_regexp_element()|/is_ppi_regexp_element>,
 and is deprecated in favor of it. If called, it will complain via
 C<Carp::cluck()> and then C<goto &is_ppi_regexp_element>.
 
+=head2 __merge_perl_requirements
+
+This subroutine is B<private> to the C<PPIx-Regexp> package.
+
+This subroutine merges perl requirements as returned by the various
+C<__perl_requirements()> methods.
+
 =head2 __ns_can
 
 This subroutine is B<private> to the C<PPIx-Regexp> package.
@@ -180,6 +241,15 @@ C<{explanation}> defaults to C<{error}>.
 
 It returns the number of errors to add to the parse.
 
+=head2 raw_width
+
+This public method returns the minimum and maximum width matched by the
+element before taking into account such details as what the element
+actually is and how it is quantified.
+
+This implementation is appropriate to things that match exactly one
+character -- i.e. it returns C<( 1, 1 )>.
+
 =head2 __to_ordinal_en
 
 This subroutine is B<private> to the C<PPIx-Regexp> package.
@@ -189,6 +259,30 @@ representing its ordinal in English. For example
 
  say __to_ordinal_en( 17 );
  # 17th
+
+=head2 width
+
+ my ( $min_wid, $max_wid ) = $self->width();
+
+This public method (well, mixin) returns the minimum and maximum width
+of the text matched by the element.
+
+Elements which import this method must also implement a C<raw_width()>
+method which returns the unquantified width of the element.
+
+=head1 EXPORT TAGS
+
+The following export tags are defined by this module. All are private to
+the C<PPIx-Regexp> package unless otherwise documented.
+
+=head2 all
+
+This tag exports everything exportable by this module.
+
+=head2 width_one
+
+This tag is appropriate to an element which, when unquantified, matches
+exactly one character. It exports C<raw_width()> and C<width()>.
 
 =head1 SEE ALSO
 

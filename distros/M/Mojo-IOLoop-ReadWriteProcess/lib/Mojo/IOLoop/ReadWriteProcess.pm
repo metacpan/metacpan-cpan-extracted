@@ -1,6 +1,6 @@
 package Mojo::IOLoop::ReadWriteProcess;
 
-our $VERSION = '0.32';
+our $VERSION = '0.33';
 
 use Mojo::Base 'Mojo::EventEmitter';
 use Mojo::File 'path';
@@ -56,8 +56,8 @@ has session => sub { Mojo::IOLoop::ReadWriteProcess::Session->singleton };
 
 has _deparse => sub { B::Deparse->new }
   if DEBUG;
-has _deserialize => sub { \&Storable::thaw };
-has _serialize   => sub { \&Storable::freeze };
+has _deserialize             => sub { \&Storable::thaw };
+has _serialize               => sub { \&Storable::freeze };
 has _default_kill_signal     => POSIX::SIGTERM;
 has _default_blocking_signal => POSIX::SIGKILL;
 
@@ -76,7 +76,7 @@ sub to_ioloop {
   my $me = $$;
   $stream->on(
     close => sub {
-      return unless $$ == $me;
+      return                unless $$ == $me;
       $self->_collect->stop unless defined $self->_status;
     });
   return $stream;
@@ -396,10 +396,11 @@ sub exit_status {
 sub restart {
   $_[0]->is_running ? $_[0]->stop->start : $_[0]->start;
 }
+
 sub is_running {
-    my ($self) = shift;
-    $self->session->consume_collected_info;
-    $self->process_id ? kill 0 => $self->process_id : 0;
+  my ($self) = shift;
+  $self->session->consume_collected_info;
+  $self->process_id ? kill 0 => $self->process_id : 0;
 }
 
 sub write_pidfile {
@@ -513,7 +514,7 @@ sub stop {
   my $self = shift;
 
   my $pid = $self->pid;
-  return $self unless defined $pid;
+  return $self               unless defined $pid;
   return $self->_shutdown(1) unless $self->is_running;
   $self->_diag("Stopping $pid") if DEBUG;
 
@@ -902,7 +903,7 @@ Defaults to C<0>, If enabled data returned from forked process will be serialize
 
 =head2 kill_sleeptime
 
-Defaults to C<1>, it's the seconds to wait before attempting SIGKILL when blocking_stop is setted to 1.
+Defaults to C<1>, it's the seconds to wait before attempting SIGKILL when blocking_stop is set to 1.
 
 =head2 separate_err
 
@@ -998,7 +999,7 @@ Inspect the codeblock return.
     my $p = process()->enable_subreaper;
 
 Mark the current process (not the child) as subreaper.
-This is used typically if you want to mark further childs as subreapers inside other forks.
+This is used typically if you want to mark further children as subreapers inside other forks.
 
     my $master_p = process(
       sub {

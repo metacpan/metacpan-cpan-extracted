@@ -21,6 +21,7 @@ lib/Kephra/App/Editor/Position.pm
 lib/Kephra/App/Editor/Select.pm
 lib/Kephra/App/Editor/SyntaxMode.pm
 lib/Kephra/App/Editor/Tool.pm
+lib/Kephra/App/Editor/View.pm
 lib/Kephra/App/ReplaceBar.pm
 lib/Kephra/App/SearchBar.pm
 lib/Kephra/App/Window.pm

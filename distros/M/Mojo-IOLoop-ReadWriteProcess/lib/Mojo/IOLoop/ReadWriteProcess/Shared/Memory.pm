@@ -15,8 +15,8 @@ use Exporter 'import';
 
 has key => sub { Mojo::IOLoop::ReadWriteProcess::Shared::Semaphore::_genkey() };
 has 'buffer';
-has destroy    => 0;
-has flags      => S_IRWXU() | S_IRWXG() | IPC_CREAT();
+has destroy => 0;
+has flags   => S_IRWXU() | S_IRWXG() | IPC_CREAT();
 has lock_flags => IPC_CREAT | IPC_EXCL | S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP
   | S_IROTH | S_IWOTH;
 has _size          => 10 * 1024;

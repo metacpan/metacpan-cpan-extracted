@@ -4,7 +4,7 @@ use warnings;
 use Test::More;
 
 use File::Spec;
-use HTTP::Request::Common 6.22;
+use HTTP::Request::Common 6.21;
 use HTTP::Status qw/ :constants status_message /;
 use Plack::Builder;
 use Plack::Response;

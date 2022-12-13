@@ -3,7 +3,7 @@ use 5.10.0;
 use strict;
 use warnings;
 
-our $VERSION = '0.06'; # VERSION
+our $VERSION = '0.07'; # VERSION
 
 # standard perl
 use Carp;
@@ -26,7 +26,8 @@ use constant ERR_PARSE    => -32700;
 sub new {
 	my ($class, %opt) = @_;
 	my $self = {
-		debug => $opt{debug} // 0,
+		debug => $opt{debug} ? 1 : 0,
+		log => ref $opt{debug} eq 'CODE' ? $opt{debug} : sub { say STDERR @_ },
 		json => $opt{json} // JSON::MaybeXS->new(utf8 => 1),
 		methods => {},
 	};
@@ -39,7 +40,7 @@ sub newconnection {
 		rpc => $self,
 		owner => $opt{owner},
 		write => $opt{write},
-		debug => $self->{debug},
+		debug => $self->{debug} ? $self->{log} : 0,
 		json => $self->{json},
 	);
 	return $conn
@@ -83,7 +84,7 @@ sub unregister {
 
 sub _handle_request {
 	my ($self, $c, $r) = @_;
-	say STDERR '    in handle_request' if $self->{debug};
+	$self->{log}->('    in handle_request') if $self->{debug};
 	#print Dumper(\@_);
 	my $m = $self->{methods}->{$r->{method}};
 	my $id = $r->{id};
@@ -107,7 +108,7 @@ sub _handle_request {
 		#my @ret = eval { $m->{cb}->($c, $jsonr, $r, $cb)};
 		my @ret = eval { $m->{cb}->($c, $r, $cb)};
 		return $self->_error($c, $id, ERR_ERR, "Method threw error: $@") if $@;
-		#say STDERR 'method returned: ', Dumper(\@ret);
+		#$self->{log}->('method returned: ' . Dumper(\@ret)) if $self->{debug};
 
 		$c->write($self->{json}->encode($ret[0])) if !$cb and $id;
 		return
@@ -119,7 +120,7 @@ sub _handle_request {
 	local $@;
 	my @ret = eval { $m->{cb}->($c, $r->{params}, $cb)};
 	return $self->_error($c, $id, ERR_ERR, "Method threw error: $@") if $@;
-	#say STDERR 'method returned: ', Dumper(\@ret);
+	#$self->{log}->('method returned: ' . Dumper(\@ret)) if $self->{debug};
 	
 	return $self->_result($c, $id, \@ret) if !$cb and $id;
 	return;
@@ -128,7 +129,7 @@ sub _handle_request {
 sub _error {
 	my ($self, $c, $id, $code, $message, $data) = @_;
 	my $err = "error: $code " . $message // '';
-	say STDERR $err if $self->{debug};
+	$self->{log}->($err) if $self->{debug};
 	$c->write($self->{json}->encode({
 		jsonrpc     => '2.0',
 		id          => $id,
@@ -144,7 +145,7 @@ sub _error {
 sub _result {
 	my ($self, $c, $id, $result) = @_;
 	$result = $$result[0] if scalar(@$result) == 1;
-	#say STDERR Dumper($result) if $self->{debug};
+	#$self->{log}->(Dumper($result)) if $self->{debug};
 	$c->write($self->{json}->encode({
 		jsonrpc     => '2.0',
 		id          => $id,
@@ -155,7 +156,7 @@ sub _result {
 
 #sub DESTROY {
 #       my $self = shift;
-#       say 'destroying ', $self;
+#       $self->{log}->('destroying ' . $self) if $self->{debug};
 #}
 
 1;
@@ -197,7 +198,8 @@ Valid arguments are:
 
 =over 4
 
-=item - debug: print debugging to STDERR
+=item - debug: print debugging to STDERR, or if coderef is given call that with 
+the debugging line.
 
 =item - json: json encoder/decoder object to use. Defaults to JSON::MaybeXS->new().
 
@@ -291,6 +293,16 @@ L<http://www.jsonrpc.org/specification>: JSON-RPC 2.0 Specification
 This software has been developed with support from L<STRATO|https://www.strato.com/>.
 In German: Diese Software wurde mit Unterstützung von L<STRATO|https://www.strato.de/> entwickelt.
 
+=head1 THANKS
+
+=over 4
+
+=item *
+
+'greencoloured' for multiple PRs
+
+=back
+
 =head1 AUTHORS
 
 =over 4
@@ -303,7 +315,7 @@ Wieger Opmeer <wiegerop@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2016-2019 by Wieger Opmeer.
+This software is copyright (c) 2016-2022 by Wieger Opmeer.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

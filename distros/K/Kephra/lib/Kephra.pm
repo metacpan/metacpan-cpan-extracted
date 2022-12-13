@@ -6,7 +6,7 @@ use Kephra::App::Window;
 
 package Kephra;
 
-our $VERSION = '0.403';
+our $VERSION = '0.404';
 our $NAME = 'Kephra';
 our $STAGE = 'sed';
 
@@ -21,11 +21,11 @@ sub OnInit {
     1;
 }
     
-sub close  { $_[0]->{'frame'}->Close() }
+sub close  { $_[0]->{'win'}->Close() }
 
 sub OnExit {
     my $app = shift;
-    Wx::wxTheClipboard->Flush;
+   	Wx::wxTheClipboard->Flush;
     # $app->{'win'}->Destroy;
     1;
 }
@@ -107,6 +107,10 @@ navigate the findings of search (up and down) and replace term (Alt+up/down)
 and change it in both directions with (Alt+)Enter.
 
 Ctrl+E jumps to position of last edit.
+
+=head2 View
+
+F11 toggles full screen mode.
 
 =head1 PLAN
 

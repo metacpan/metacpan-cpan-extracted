@@ -7,6 +7,11 @@ use warnings;
 
 use Test::More 0.88;	# Because of done_testing();
 
+BEGIN {
+    "$]" >= 5.016
+	or plan skip_all => 'Dodgy test requires at least Perl 5.16';
+}
+
 # Mung with manifest constants, since at the time this was written they
 # were undefined.
 
@@ -23,6 +28,7 @@ use constant REMOVE_PHASE_3	=> '5.032';
 {
 
     no warnings qw{ redefine };
+    no warnings;
 
     # These get hammered over what was loaded above. At least under
     # 5.26.1, we do NOT want an explicit return(), because it seems to

@@ -8,7 +8,7 @@ use FindBin;
 use Mojo::File qw(tempfile path);
 use lib ("$FindBin::Bin/lib", "../lib", "lib");
 
-use Mojo::IOLoop::ReadWriteProcess qw(process);
+use Mojo::IOLoop::ReadWriteProcess              qw(process);
 use Mojo::IOLoop::ReadWriteProcess::Test::Utils qw(attempt);
 use Mojo::IOLoop;
 
@@ -16,13 +16,13 @@ subtest to_ioloop => sub {
 
   my $p = process(sub { print "Hello from first process\n"; sleep 1; exit 70 });
 
-  $p->start();    # Start and sets the handlers
+  $p->start();                   # Start and sets the handlers
   my $stream = $p->to_ioloop;    # Get the stream
   my $output;
 
   $stream->on(
     read => sub { $output .= pop; is $p->is_running, 1, 'Process is running!' }
-  );                             # Hook on Mojo::IOLoop::Stream events
+  );    # Hook on Mojo::IOLoop::Stream events
 
   Mojo::IOLoop->singleton->start() unless Mojo::IOLoop->singleton->is_running;
 

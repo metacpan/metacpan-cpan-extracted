@@ -8,11 +8,14 @@ use Getopt::Long qw( :config no_ignore_case pass_through );
 
 STDOUT->autoflush;
 
+my $SINCE_VERSION;
+my $UNTIL_VERSION;
 GetOptions(
    'no-system-perl' => \( my $NO_SYSTEM_PERL ),
    'no-test'        => \( my $NO_TEST ),
-   'since=s'        => \( my $SINCE_VERSION ),
-   'until=s'        => \( my $UNTIL_VERSION ),
+   'since=s'        => \(    $SINCE_VERSION ),
+   'until=s'        => \(    $UNTIL_VERSION ),
+   'ver=s'          => sub { $SINCE_VERSION = $UNTIL_VERSION = $_[1] },
    'only-if=s'      => \( my $ONLY_IF ),
    'devel!'         => \( my $USE_DEVEL ),
    'reverse|r'      => \( my $REVERSE ),
@@ -153,6 +156,13 @@ Prints the path to the named module.
    perl5.30.0: /usr/share/perl/5.30/CPAN.pm
    bleadperl: /home/user/perl5/perlbrew/perls/bleadperl/lib/5.32.0/CPAN.pm
 
+=head2 uninstall
+
+Attempts to uninstall an installed module, by removing each of the files
+listed in its F<.packlist> and the packlist itself.
+
+   $ eachperl uninstall A::CPAN::Module
+
 =head1 OPTIONS
 
 =head2 --since VER
@@ -164,6 +174,10 @@ Any perl binaries older than this will be skipped.
 
 Selects only perl versions that are at least as old as the requested version.
 Any perl binaries newer than this will be skipped.
+
+=head2 --ver VER
+
+Selects only this exact perl version.
 
 =head2 --devel, --no-devel
 

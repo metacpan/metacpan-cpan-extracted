@@ -1,12 +1,12 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2015-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2015-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.57;
+use Object::Pad 0.66;
 
-package Device::Chip::MPL3115A2 0.11;
+package Device::Chip::MPL3115A2 0.12;
 class Device::Chip::MPL3115A2
    :isa(Device::Chip::Base::RegisteredI2C);
 
@@ -195,7 +195,7 @@ subsequent modifications more efficient. This cache will not respect the
 
 =cut
 
-has $_configbytes;
+field $_configbytes;
 
 async method _cached_read_ctrlreg ()
 {
@@ -461,7 +461,7 @@ async method oneshot ()
    await $self->busywait_oneshot;
 }
 
-has $_pending_trigger;
+field $_pending_trigger;
 
 method _next_trigger
 {

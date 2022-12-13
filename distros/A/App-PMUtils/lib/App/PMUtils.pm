@@ -6,20 +6,27 @@ use warnings;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-08-12'; # DATE
+our $DATE = '2022-09-11'; # DATE
 our $DIST = 'App-PMUtils'; # DIST
-our $VERSION = '0.740'; # VERSION
+our $VERSION = '0.741'; # VERSION
 
 our %SPEC;
 
 our $arg_module_multiple = {
-    #schema => ['perl::modnames*', min_len=>1], # XXX Perinci::Sub::GetArgs::Argv can't yet handle case for greedy=1 and when 'array' is not specified explicitly
+
+    # XXX Perinci::Sub::GetArgs::Argv can't yet handle case for greedy=1 and when 'array' is not specified explicitly
+    #schema => ['perl::modnames*', {
+    #    min_len=>1,
+    #    'x.perl.default_value_rules' => ["Perl::these_mods"],
+    #}],
+
     schema => ['array*', {
         of=>['perl::modname*'],
         min_len=>1,
         'x.perl.default_value_rules' => ["Perl::these_mods"],
+        "x.perl.coerce_rules" => ["From_str_or_array::expand_perl_modname_wildcard"],
     }],
-    #req    => 1,
+
     pos    => 0,
     slurpy => 1,
     element_completion => sub {
@@ -311,7 +318,7 @@ App::PMUtils - Command-line utilities related to Perl modules
 
 =head1 VERSION
 
-This document describes version 0.740 of App::PMUtils (from Perl distribution App-PMUtils), released on 2022-08-12.
+This document describes version 0.741 of App::PMUtils (from Perl distribution App-PMUtils), released on 2022-09-11.
 
 =head1 SYNOPSIS
 

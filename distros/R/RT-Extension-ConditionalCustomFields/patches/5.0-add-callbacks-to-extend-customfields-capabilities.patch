@@ -1,0 +1,79 @@
+From b81d0108b71733b45820d0d1fd5ffb0b777b31f9 Mon Sep 17 00:00:00 2001
+From: gibus <gibus@easter-eggs.com>
+Date: Thu, 8 Dec 2022 16:15:39 +0100
+Subject: [PATCH 1/3] Add callback to allow extensions to process a custom
+ field when created or updated
+
+---
+ share/html/Admin/CustomFields/Modify.html | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/share/html/Admin/CustomFields/Modify.html b/share/html/Admin/CustomFields/Modify.html
+index 4a23208fc..4ed13682c 100644
+--- a/share/html/Admin/CustomFields/Modify.html
++++ b/share/html/Admin/CustomFields/Modify.html
+@@ -443,6 +443,9 @@ if ( $ARGS{'Update'} && $id ne 'new' ) {
+         push @results, $msg;
+     }
+ 
++    # Add oportunity for extensions to do something
++    $m->callback(CallbackName => 'Massage', CustomField => $CustomFieldObj, Results => \@results, ARGSRef => \%ARGS);
++
+     # Update any existing values
+     my $paramtag = "CustomField-". $CustomFieldObj->Id ."-Value";
+     my $values = $CustomFieldObj->ValuesObj;
+-- 
+2.30.2
+
+
+From 4dbe787548b55d58f133b9049c2aa69ce7fa47ad Mon Sep 17 00:00:00 2001
+From: gibus <gibus@easter-eggs.com>
+Date: Thu, 8 Dec 2022 16:16:02 +0100
+Subject: [PATCH 2/3] Add callback to allow extensions to process a Queue's
+ custom field when modifying this Queue
+
+---
+ share/html/Admin/Queues/Modify.html | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/share/html/Admin/Queues/Modify.html b/share/html/Admin/Queues/Modify.html
+index fd20c83f1..cd5c2723b 100644
+--- a/share/html/Admin/Queues/Modify.html
++++ b/share/html/Admin/Queues/Modify.html
+@@ -160,6 +160,7 @@
+       <& /Elements/EditCustomField, CustomField => $CF,
+                                     Object => $QueueObj, &>
+     </div>
++% $m->callback( CallbackName => 'AfterCustomFieldValue', CustomField => $CF, Object => $QueueObj);
+   </div>
+ % }
+ 
+-- 
+2.30.2
+
+
+From 29780235b2db3daad71a86d1bd8bed1a5c81bfe9 Mon Sep 17 00:00:00 2001
+From: gibus <gibus@easter-eggs.com>
+Date: Thu, 8 Dec 2022 16:16:25 +0100
+Subject: [PATCH 3/3] Add callback to allow extensions to process an Article's
+ custom field when modifying this Article
+
+---
+ share/html/Articles/Article/Elements/EditCustomFields | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/share/html/Articles/Article/Elements/EditCustomFields b/share/html/Articles/Article/Elements/EditCustomFields
+index 5582623a8..292f498a6 100644
+--- a/share/html/Articles/Article/Elements/EditCustomFields
++++ b/share/html/Articles/Article/Elements/EditCustomFields
+@@ -62,6 +62,7 @@
+       Cols => 70
+     &>
+   </div>
++% $m->callback( CallbackName => 'AfterCustomFieldValue', CustomField => $CustomField, Object => $ArticleObj);
+ </div>
+ % }
+ <%INIT>
+-- 
+2.30.2
+

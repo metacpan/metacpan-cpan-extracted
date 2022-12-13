@@ -15,16 +15,16 @@ name: FASTX-Reader
 provides:
   FASTX::Reader:
     file: lib/FASTX/Reader.pm
-    version: v1.6.1
+    version: v1.7.0
   FASTX::ReaderPaired:
     file: lib/FASTX/ReaderPaired.pm
-    version: v1.6.1
+    version: v1.7.0
   FASTX::ScriptHelper:
     file: lib/FASTX/ScriptHelper.pm
-    version: v1.6.1
+    version: v1.7.0
   FASTX::Seq:
     file: lib/FASTX/Seq.pm
-    version: v1.6.1
+    version: v1.7.0
 recommends:
   File::Which: '0'
 requires:
@@ -39,5 +39,5 @@ requires:
   perl: '5.012'
 resources:
   repository: https://github.com/telatin/FASTX-Reader
-version: 1.6.1
+version: 1.7.0
 x_serialization_backend: 'YAML::Tiny version 1.70'

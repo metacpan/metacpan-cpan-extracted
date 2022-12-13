@@ -7,7 +7,7 @@ my $meta = {
   "abstract"       => "XS backend for match::simple",
   "author"         => ["Toby Inkster (TOBYINK) <tobyink\@cpan.org>"],
   "dynamic_config" => 1,
-  "generated_by"   => "Dist::Inkt::Profile::TOBYINK version 0.014, CPAN::Meta::Converter version 2.120921",
+  "generated_by"   => "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150010",
   "keywords"       => [],
   "license"        => ["perl_5"],
   "meta-spec"      => {
@@ -19,33 +19,33 @@ my $meta = {
   "prereqs"        => {
                         configure => { requires => { "ExtUtils::MakeMaker" => 6.17 } },
                         develop   => { recommends => { "Dist::Inkt" => 0.001 } },
-                        runtime   => {
-                                       recommends => { "match::simple" => 0 },
-                                       requires   => { perl => 5.008 },
-                                     },
+                        runtime   => { requires => { perl => 5.012 } },
                         test      => { requires => { "Test::Fatal" => 0, "Test::More" => 0.96 } },
                       },
   "provides"       => {
-                        "match::simple::XS" => { file => "lib/match/simple/XS.pm", version => 0.001 },
+                        "match::simple::XS" => { file => "lib/match/simple/XS.pm", version => 0.002 },
                       },
   "release_status" => "stable",
   "resources"      => {
-                        bugtracker   => {
-                                          web => "http://rt.cpan.org/Dist/Display.html?Queue=match-simple-XS",
-                                        },
+                        bugtracker   => { web => "https://github.com/tobyink/p5-match-simple-xs/issues" },
                         homepage     => "https://metacpan.org/release/match-simple-XS",
                         license      => ["http://dev.perl.org/licenses/"],
                         repository   => {
                                           type => "git",
+                                          url  => "git://github.com/tobyink/p5-match-simple-xs.git",
                                           web  => "https://github.com/tobyink/p5-match-simple-xs",
                                         },
-                        X_identifier => "http://purl.org/NET/cpan-uri/dist/match-simple-XS/project",
+                        x_identifier => "http://purl.org/NET/cpan-uri/dist/match-simple-XS/project",
                       },
-  "version"        => 0.001,
+  "version"        => 0.002,
 };
 
 my %dynamic_config;
 do {
+	if ( $] lt '5.010' ) {
+		$meta->{prereqs}{runtime}{requires}{'MRO::Compat'} = '0';
+	}
+	
 	# Probably a lot of the following is cargo cult.
 	# My XS-fu is not strong.
 	#
@@ -144,28 +144,8 @@ else
 	}
 }
 
-sub FixMakefile
-{
-	return unless -d 'inc';
-	my $file = shift;
-	
-	local *MAKEFILE;
-	open MAKEFILE, "< $file" or die "FixMakefile: Couldn't open $file: $!; bailing out";
-	my $makefile = do { local $/; <MAKEFILE> };
-	close MAKEFILE or die $!;
-	
-	$makefile =~ s/\b(test_harness\(\$\(TEST_VERBOSE\), )/$1'inc', /;
-	$makefile =~ s/( -I\$\(INST_ARCHLIB\))/ -Iinc$1/g;
-	$makefile =~ s/( "-I\$\(INST_LIB\)")/ "-Iinc"$1/g;
-	$makefile =~ s/^(FULLPERL = .*)/$1 "-Iinc"/m;
-	$makefile =~ s/^(PERL = .*)/$1 "-Iinc"/m;
-	
-	open  MAKEFILE, "> $file" or die "FixMakefile: Couldn't open $file: $!; bailing out";
-	print MAKEFILE $makefile or die $!;
-	close MAKEFILE or die $!;
-}
 
 my $mm = WriteMakefile(%WriteMakefileArgs);
-FixMakefile($mm->{FIRST_MAKEFILE} || 'Makefile');
+
 exit(0);
 

@@ -1,5 +1,9 @@
 Revision history for Device-Chip-MPL3115A2
 
+0.12    2022-12-11
+        [CHANGES]
+         * Updated for Object::Pad v0.66 - use `field` instead of `has`
+
 0.11    2022-10-07
         [CHANGES]
          * Updates for Test::Device::Chip::Adapter 0.24

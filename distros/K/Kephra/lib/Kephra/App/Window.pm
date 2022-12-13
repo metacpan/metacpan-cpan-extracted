@@ -102,4 +102,10 @@ sub set_title {
     $self->SetTitle( $title );
 }
 
+sub toggle_full_screen {
+    my ($self) = @_;
+    $self->ShowFullScreen( not $self->IsFullScreen );
+    $self->GetMenuBar->Check(16410, $self->IsFullScreen);
+}
+
 1;

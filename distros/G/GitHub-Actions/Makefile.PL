@@ -13,7 +13,8 @@ WriteMakefile(
                             'version'    => 0,
                            },
               TEST_REQUIRES => { "Test::Perl::Critic" => 0,
-                                 "Test::Output" => 0},
+                                 "Test::Output" => 0,
+                                 "Test::File::Contents" => 0},
               dist                => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
               clean               => { FILES => 'GitHub-Actions-*' },
               META_MERGE => {

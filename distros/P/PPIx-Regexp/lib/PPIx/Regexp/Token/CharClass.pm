@@ -41,7 +41,9 @@ use base qw{ PPIx::Regexp::Token };
 
 use PPIx::Regexp::Constant qw{ @CARP_NOT };
 
-our $VERSION = '0.085';
+use PPIx::Regexp::Util qw{ :width_one };
+
+our $VERSION = '0.086';
 
 # Return true if the token can be quantified, and false otherwise
 # sub can_be_quantified { return };

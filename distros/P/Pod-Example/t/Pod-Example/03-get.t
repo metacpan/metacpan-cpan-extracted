@@ -4,7 +4,7 @@ use warnings;
 use English qw(-no_match_vars);
 use File::Object;
 use Pod::Example qw(get);
-use Test::More 'tests' => 18;
+use Test::More 'tests' => 20;
 use Test::NoWarnings;
 
 # Load module.
@@ -147,4 +147,17 @@ print "Foo.\n";
 END
 chomp $right_ret;
 is($ret, $right_ret, 'Example.');
-is($example_file, 'example.pl', 'Parse example filename from comment.');
+is($example_file, 'example.pl', 'Parse example filename from comment (example.pl).');
+
+# Test.
+($ret, $example_file) = get($modules_dir->file('Ex12.pm')->s);
+$right_ret = <<'END';
+use strict;
+use warnings;
+
+# Print.
+print "Foo.\n";
+END
+chomp $right_ret;
+is($ret, $right_ret, 'Example.');
+is($example_file, 'example_number-2.pl', 'Parse example filename from comment (example_number-2.pl).');

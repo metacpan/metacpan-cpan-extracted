@@ -86,6 +86,7 @@ sub build_terse {
 
 sub MODIFY_CODE_ATTRIBUTES {
 	my ($package, $coderef, @attributes, @disallowed) = @_;
+	no warnings qw(reserved);
 	my $name = svref_2object($coderef)->GV->NAME;
 	my %attr = PARSE_ATTRIBUTES($name, @attributes);
 	push @{ $Terse::Controller::dispatcher{$package}{$attr{req}} }, \%attr;
@@ -119,14 +120,15 @@ sub PARSE_ATTRIBUTES {
 		elsif ($attribute =~ m/^\s*([^\s\(]+)\s*\(([\s\'\"]*?)(.*)([\s\'\"]*?)\)/) {
 			my $k = lc($1);
 			$attr{$k} = $3;
-			if ($HTTP{$k} || $k eq 'any') {
-				$attr{req} = $3;
-			}	
+			if ($HTTP{$k} || $k =~ m/^(any|websocket|deleayed)$/i) {
+				$attr{req} = $attr{$k};
+			}
 		}
 		else {
 			$attr{lc($attribute)} = 1; 
 		}
 	}
+	$attr{any} = 1 if ($attr{websocket} && scalar keys %attr < 4);
 	return %attr;
 }
 
@@ -134,9 +136,9 @@ sub delayed_response_handle {
 	my ($self, $t,  $response, $sid, $ct, $status) = @_;
 	$t->{_delayed_response} = sub {
 		my $responder = shift;
-		my $view = $t->view($self->response_view);
+		my $view = $t->view($t->response_view || $self->response_view);
 		my $res = $t->_build_response($sid, 
-			$view ? ($view->content_type || $view->content_type($ct)) : $ct, 
+			$t->content_type || $view && $view->content_type || $ct,
 			$t->response->status_code ||= $status ||= 200
 		);
 		$res = [splice @{$res->finalize}, 0, 2];
@@ -149,8 +151,19 @@ sub delayed_response_handle {
 			return $responder->($res);
 		}
 		elsif ($response) {
-			$view = $t->view($self->response_view);
-			$writer->write($view ? [$view->render($t, $response)]->[1] : $response->serialize);
+			$view = $t->view($t->response_view || $self->response_view);
+			if ($view) {
+				my (undef, $render) = $view->render($t, $response);
+				if ($t->response->error) {
+					$res->[0] = $t->response->status_code || 500;
+					push @{$res}, [$t->response->no_response ? () : $t->response->serialize];
+					return $responder->($res);
+				}
+				$response = $render;
+			} else {
+				$response = $response->serialize;
+			}
+			$writer->write($response);
 		}
 		$writer->close;
 	};
@@ -163,26 +176,34 @@ sub response_handle {
 	$ct ||= 'application/json';
 	my $res = $t->{_delayed_response};
 	return $res if ($res);
-	my ($content_type, $body) = $self->views->{$self->response_view} 
-		? $t->view($self->response_view)->render($t, $response_body) 
+	my ($content_type, $body) = $self->views->{$t->response_view || $self->response_view} 
+		? $t->view($t->response_view || $self->response_view)->render($t, $response_body) 
 		: ($ct, $response_body->serialize());
+	$body = undef if $response_body->error && $response_body->no_response;
 	$res = $t->_build_response($sid, $content_type, $response_body->status_code ||= $status ||= 200);
-	$res->body($body);
+	$res->body($body) if $body;
 	return $res->finalize;
 }
 
 sub dispatch {
 	my ($self, $req, $t, @params) = @_;
 	my $package = ref $self || $self;
-	my $dispatcher = $Terse::Controller::dispatcher{$package}{$req};
-	if (!$dispatcher) {
+	my $dispatch = $Terse::Controller::dispatcher{$package};
+	my @dispatcher = @{ $dispatch->{$req} || [] };
+	my @ISA = eval "\@${package}::ISA";
+	for (@ISA) {
+		$dispatch = $Terse::Controller::dispatcher{$_};
+		next unless $dispatch && $dispatch->{$req};
+		unshift @dispatcher, @{ $dispatch->{$req} };
+	}
+	if (!scalar @dispatcher) {
 		$t->logError('Invalid dispatch request', 400);
 		return;
 	}
-	my $dispatch;
+	$dispatch = undef;
 	my $path = $t->request->uri->path;
 	my $caps = scalar @{ $t->captured || [] };
-	DISPATCH: for my $candidate (reverse @{$dispatcher}) {
+	DISPATCH: for my $candidate (reverse @dispatcher) {
 		next DISPATCH unless ($candidate->{lc($t->request->method)} || $candidate->{any});
 		next DISPATCH unless (!$candidate->{captured} || $caps == $candidate->{captured});
 		if ($candidate->{params}) {
@@ -203,8 +224,14 @@ sub dispatch {
 		$t->logError('No callback found to dispatch the request', 400);
 		return;
 	}
+	$t->response_view = $dispatch->{view} if $dispatch->{view};
+	$t->content_type($dispatch->{content_type}) if $dispatch->{content_type};
 	if ($dispatch->{delayed}) {
 		return $t->delayed_response(sub { $self->$callback($t, @params); $t->response; });
+	} elsif ($dispatch->{websocket}) {
+		$self->websockets ||= {};
+		$self->websockets->{$t->sid->value} = $t->websocket($self->$callback($t, @params), close_delete => 1);
+		return $t;
 	}
 	return $self->$callback($t, @params);
 }
@@ -240,7 +267,7 @@ Terse::Controller - controllers made simple.
 
 =head1 VERSION
 
-Version 0.110
+Version 0.120
 
 =cut
 
@@ -282,6 +309,31 @@ Version 0.110
 		... # 5
 	}
 
+	sub group_chat :websocket {
+		my ($self, $context) = @_;
+		return (
+			connect => sub {
+				$_[0]->send('welcome');
+			},
+			retrieve => sub {
+				my ($websocket, $msg) = @_;
+				# $msg = '{"confrim_sha":"XXX", "message": "Howdy world."}';
+				if ($self->plugin->validate->user_message_sha($context, $websocket->graft('retrieved',$msg))) {
+					$websocket->send($websocket->retrieved->confirm_sha);
+					for my $open (%{ $self->websockets }) {
+						$self->websockets->$open->send($websocket->retrieved->message);
+					}
+				}
+			},
+			error => sub {
+
+			},
+			disconnect => sub {
+
+			}
+		);
+	}
+
 
 	1;
 
@@ -310,6 +362,8 @@ Version 0.110
 	POST http://localhost:5000/ {"req":"purchase", "virtual":1} #4
 
 	GET http://localhost:5000/foo/555/bar #5
+
+	CONNECT ws://localhost:5000/?req=group_chat;
 
 =cut
 

@@ -7,7 +7,7 @@ use warnings;
 use Cwd qw(abs_path);
 use Readonly;
 
-our $VERSION = 0.27;
+our $VERSION = 0.28;
 
 Readonly::Array our @EXPORT_OK => qw(clean err_get err_helper err_msg err_msg_hr);
 Readonly::Scalar my $DOTS => '...';
@@ -305,6 +305,8 @@ Default value is 50.
 
 =head1 EXAMPLE1
 
+=for comment filename=err_get.pl
+
  use strict;
  use warnings;
 
@@ -351,6 +353,8 @@ Default value is 50.
 
 =head1 EXAMPLE2
 
+=for comment filename=err_msg.pl
+
  use strict;
  use warnings;
 
@@ -377,6 +381,8 @@ Default value is 50.
  # item4
 
 =head1 EXAMPLE3
+
+=for comment filename=err_msg_hr.pl
 
  use strict;
  use warnings;
@@ -438,6 +444,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.27
+0.28
 
 =cut

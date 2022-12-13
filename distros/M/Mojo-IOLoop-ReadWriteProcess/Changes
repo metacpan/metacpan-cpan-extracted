@@ -1,6 +1,17 @@
 
 Revision history for Perl extension Mojo-IOLoop-ReadWriteProcess
 
+0.33 2022-12-12T12:22:13Z
+ - Apply perltidy v20221112
+ - remove hard-coding of OABI syscall entry point
+ - Fix typos detected by lintian (Debian) (#47)
+ - tests: Check executable, before using it in tests
+ - Fix sporadic 01_run.t failure -- "process is still running"
+ - Fix all .perltidyrc violations
+ - Run perltidy for pull requests
+ - Add test for SIG_CHLD handler in spawned process
+
+
 0.32 2021-12-09T18:03:02Z
  - Project moved to https://github.com/openSUSE/Mojo-IOLoop-ReadWriteProcess
  - Introduce emit_from_sigchld()
