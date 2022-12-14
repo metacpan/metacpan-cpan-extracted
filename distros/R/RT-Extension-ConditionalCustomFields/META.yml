@@ -1,7 +1,7 @@
 ---
 abstract: 'CF conditioned by the value of another CF'
 author:
-  - 'Gérald Sédrati-Dinet <gibus@easter-eggs.com>'
+  - 'Gérald Sédrati <gibus@easter-eggs.com>'
 build_requires:
   ExtUtils::MakeMaker: 6.59
 configure_requires:
@@ -25,7 +25,7 @@ requires:
 resources:
   license: http://opensource.org/licenses/gpl-license.php
   repository: https://github.com/gibus/RT-Extension-ConditionalCustomFields
-version: '1.06'
+version: '1.08'
 x_module_install_rtx_version: '0.43'
 x_requires_rt: 4.2.0
 x_rt_too_new: 5.1.0

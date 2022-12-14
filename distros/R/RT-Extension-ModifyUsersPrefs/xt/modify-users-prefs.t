@@ -15,7 +15,8 @@ ok($m->login('root', 'password'), 'Logged in root');
 
 # Modify user's prefs
 $m->get_ok($m->rt_base_url . 'Admin/Users/Modify.html?id=' . $user->id, 'Modify user');
-$m->content_contains('<li id="li-page-userprefs"><a id="page-userprefs" class="menu-item" href="/Admin/Users/Prefs.html?id=' . $user->id . '">Preferences</a></li>', "Menu link to user's prefs");
+my $user_id = $user->id;
+$m->content_like(qr{<li id="li-page-userprefs"><a id="page-userprefs" class="menu-item[^"]*" href="/Admin/Users/Prefs\.html\?id=$user_id">Preferences</a></li>}, "Menu link to user's prefs");
 $m->follow_link_ok({ id => 'page-userprefs' }, 'Modify user prefs link');
 $m->submit_form_ok(
     {

@@ -6,7 +6,7 @@ use Tie::IxHash qw{};
 use Path::Class qw{};
 use RF::Functions 0.04, qw{dbd_dbi dbi_dbd};
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 our $PACKAGE = __PACKAGE__;
 
 =head1 NAME
@@ -32,7 +32,7 @@ Create a blank object, load data from other sources, then write antenna pattern 
 
 This package reads and writes antenna radiation patterns in Planet MSI antenna format.
 
-Planet is a RF propagation simulation tool initially developed by MSI. Planet was a 2G radio planning tool which has set a standard in the early days of computer aided radio network design. The antenna pattern file and the format which is currently known as ".msi" format or .msi-file has become a standard.
+Planet is a RF propagation simulation tool initially developed by MSI. Planet was a 2G radio planning tool which has set a standard in the early days of computer aided radio network design. The antenna pattern file and the format which is currently known as the ".msi" format or an msi file has become a standard.
 
 =head1 CONSTRUCTORS
 
@@ -222,7 +222,8 @@ sub write {
     $fh              = $file->open('w') or die(qq{Error: Cannot open "$filename" for writing});
   } else {
     require File::Temp;
-    ($fh, $filename) = File::Temp::tempfile('antenna_pattern_XXXXXXXX', TMPDIR => 1, SUFFIX => '.msi');
+    my $suffix = $self->file_extension;
+    ($fh, $filename) = File::Temp::tempfile('antenna_pattern_XXXXXXXX', TMPDIR => 1, SUFFIX => $suffix);
     $file            = Path::Class::file($filename);
   }
 
@@ -274,6 +275,35 @@ sub write {
   return $file;
 }
 
+=head2 file_extension
+
+Sets and returns the file extension to use for write method when called without any parameters.
+ 
+  my $suffix = $antenna->file_extension('.prn');
+
+Default: .msi
+
+Alternatives: .pla, .pln, .ptn, .txt, .ant
+
+=cut
+
+sub file_extension {
+  my $self = shift;
+  $self->{'file_extension'} = shift if @_;
+  $self->{'file_extension'} = '.msi' unless defined($self->{'write_file_extension'});
+  return $self->{'file_extension'};
+}
+
+=head2 media_type
+
+Returns the Media Type (formerly known as MIME Type) for use in Internet applications.
+
+Default: application/vnd.planet-antenna-pattern
+
+=cut
+
+sub media_type {'application/vnd.planet-antenna-pattern'};
+
 =head1 DATA STRUCTURE METHODS
 
 =head2 header
@@ -316,13 +346,11 @@ sub header {
   return $self->{'header'};
 }
 
-=head2 horizontal, vertical
+=head2 horizontal
 
-Horizontal or vertical data structure for the angle and relative loss values from the specified gain in the header.
+Sets and returns the horizontal data structure for angles with relative loss values from the specified gain in the header.  The data structure is an array reference of array references [[$angle1, $value1], [$angle2, $value2], ...]
 
-Each methods sets and returns an array reference of array references [[$angle1, $value1], [$angle2, $value2], ...]
-
-Please note that the format uses equal spacing of data points by angle.  Most files that I have seen use 360 one degree measurements from 0 (i.e. boresight) to 359 degrees with values in dB down from the maximum lobe even if that lobe is not the boresight.
+Conventions: The industry has standardized on using 360 points from 0 to 359 degrees with non-negative loss values.  The angle 0 is the boresight with increasing values continuing clockwise (e.g., top-down view). Typically, plots show horizontal patterns with 0 degrees pointing up (i.e., North).  This is standard compass convention.
 
 =cut
 
@@ -331,6 +359,14 @@ sub horizontal {
   $self->{'horizontal'} = shift if @_;
   return $self->{'horizontal'};
 }
+
+=head2 vertical
+
+Sets and returns the vertical data structure for angles with relative loss values from the specified gain in the header.  The data structure is an array reference of array references [[$angle1, $value1], [$angle2, $value2], ...]
+
+Conventions: The industry has standardized on using 360 points from 0 to 359 degrees with non-negative loss values. The angle 0 is the boresight with increasing values continuing clockwise (e.g., left-side view).  The angle 0 is the boresight pointing towards the horizon with increasing values continuing clockwise where 90 degrees is pointing to the ground and 270 is pointing into the sky.  Typically, plots show vertical patterns with 0 degrees pointing right (i.e., East).
+
+=cut
 
 sub vertical {
   my $self            = shift;

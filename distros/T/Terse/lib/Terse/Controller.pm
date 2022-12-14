@@ -215,6 +215,7 @@ sub dispatch {
 				);
 			}
 		}
+		$t->request->uri->path =~ m/$candidate->{path}/ or next if $candidate->{path};
 		$dispatch = $candidate;
 		last;
 	}
@@ -267,7 +268,7 @@ Terse::Controller - controllers made simple.
 
 =head1 VERSION
 
-Version 0.120
+Version 0.121
 
 =cut
 

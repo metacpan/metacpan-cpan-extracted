@@ -1,3 +1,7 @@
+0.29 2022-12-14T08:27:18+01:00
+ [Common]
+ - Move from List::MoreUtils to List::Util.
+
 0.28 2022-12-11T18:00:17+01:00
  [Common]
  - Change bugtracker to github.

@@ -13,6 +13,10 @@ sub init {
 		security => {
 			api_key => sub {
 				my ($c, $definition, $scopes, $cb) = @_;
+				if(exists($c->session->{apikey})) {
+					return $c->$cb('API key invalid') unless $c->session->{apikey} eq $c->req->headers->header("X-SReview-Key");
+					return $c->$cb();
+				}
 				return $c->$cb('API key not configured') unless defined($config->get('api_key'));
 				return $c->$cb('API key not present') unless defined($c->req->headers->header("X-SReview-Key"));
 				return $c->$cb('API key invalid') unless $c->req->headers->header("X-SReview-Key") eq $config->get('api_key');
@@ -79,6 +83,29 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ConfigData'
+  /config/legend:
+    get:
+      tags:
+      - system
+      x-mojo-to:
+        controller: config
+        action: get_legend
+      summary: get legend
+      operationId: get_legend
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    expl:
+                      type: string
   /collection/list:
     get:
       tags:
@@ -247,7 +274,7 @@ paths:
       tags:
       - rawfile
       summary: Update a raw file's metadata
-      description: "Update a raw file's metadata in the database. The difference between this operation and the `update_raw_file` one is that the former only adds the given metadata to the database, whereas this one will create a new `SReview::Video` object for the file's name, and compute the `endtime` property based on the `starttime` one and the file's length. This requires that the file be accessible from the server."
+      description: "Update a raw file's metadata in the database. The difference between this operation and the `update_raw_file` one is that the former only adds the given metadata to the database, whereas this one will create a new `Media::Convert::Asset` object for the file's name, and compute the `endtime` property based on the `starttime` one and the file's length. This requires that the file be accessible from the server."
       operationId: update_raw_file_server
       parameters:
       - name: collectionName
@@ -1447,6 +1474,8 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Track'
+      security:
+      - api_key: []
       x-mojo-to:
         controller: track
         action: list
@@ -1499,6 +1528,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Track'
+      security:
+      - api_key: []
       x-mojo-to:
         controller: track
         action: getById
@@ -1641,6 +1672,43 @@ paths:
       x-mojo-to:
         controller: user
         action: list
+  /user/login:
+    post:
+      tags:
+      - user
+      summary: Log in
+      operationId: user_login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogonRequest'
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogonResponse'
+        403:
+          description: Invalid username or password
+          content:
+            text/plain: {}
+      x-mojo-to:
+        controller: user
+        action: login
+  /user/logout:
+    post:
+      tags:
+      - user
+      summary: Log out
+      operationId: user_logout
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema: {}
 components:
   schemas:
     ConfigData:
@@ -1755,6 +1823,7 @@ components:
           description: stream of this talk that is currently active
         upstreamid:
           type: string
+          nullable: true
         flags:
           type: object
           description: JSON object of flags on this talk, if any
@@ -1796,11 +1865,14 @@ components:
           format: int64
         name:
           type: string
+          nullable: true
         email:
           type: string
           format: email
+          nullable: true
         upstreamid:
           type: string
+          nullable: true
     User:
       type: object
       properties:
@@ -1873,6 +1945,8 @@ components:
           $ref: '#/components/schemas/Talk/properties/state'
         progress:
           $ref: '#/components/schemas/Talk/properties/progress'
+        track:
+          $ref: '#/components/schemas/Track/properties/name'
     TalkCorrections:
       type: object
       properties:
@@ -1985,6 +2059,19 @@ components:
                 type: object
                 additionalProperties:
                   type: string
+    LogonRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+    LogonResponse:
+      type: object
+      properties:
+        apiKey:
+          type: string
   securitySchemes:
     api_key:
       type: apiKey

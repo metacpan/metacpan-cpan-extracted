@@ -1,5 +1,8 @@
 Revision history for Terse
 
+0.121    [2022-12-14]
+	- Fix the dispatcher when using paths.
+
 0.120    [2022-12-13]
         - Allow inheritance of controller endpoints. 
 

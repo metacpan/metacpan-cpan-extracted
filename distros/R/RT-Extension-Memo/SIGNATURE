@@ -1,0 +1,61 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.83.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA256 19dd31b832322c6dcb12df4fbcd3155416c50edc07acf177b3eb41177ebcaada Changes
+SHA256 4bc6caae11cf25b72dbda59f78f5bc4f9a82f73e770ce3007d872b278b8f5ac1 LICENSE
+SHA256 0322e5841a767d15bd91161225d13bb7818186bbdad72a7894f0cb1e355e74b3 MANIFEST
+SHA256 2a6b7c081e0b2838a96f392459cde784b86baa98fb2ac481fc74bec46ae66057 META.yml
+SHA256 fb9b7c48a1d7f3fde0f4023791c031d4617b8e46d5e62cc1d56dfb964efbba56 Makefile.PL
+SHA256 9ff40279cda6202d54b440247578e5cb01e264bdcfabe095cb6a9fc5ebc0e75f README
+SHA256 763fa7fb845027ce0d6f3ed050562c5f971005164678526f2dcf9943c4ac9d02 README.md
+SHA256 d53922cdd88f6e0dc87558a911f1e6e86d9e12bcf3de6a1b3ccb330614a5f3a4 etc/Memo_Config.pm
+SHA256 79ac6b20f750419a008d04372469ea4f54aed9875f7f9c13e4244bceeaa27acc html/Callbacks/RT-Extension-Memo/Elements/JavascriptConfig/Data
+SHA256 bf2744db0166a8ac763cbd2e8f640dc467b034571be0c48abe731a191553fff9 html/Callbacks/RT-Extension-Memo/Ticket/Display.html/BeforeShowHistory
+SHA256 7419380607e9f8c1a0a55b3d3a3f834a6e666295eecc808ec85766b41bbf3c81 html/Elements/Memo
+SHA256 ad54706514d9bbfdfe1668818183a437265b53413a8c8086a601d055f1818a32 html/Helpers/GetMemo
+SHA256 f48fd084c6ead18e90de33d06554519c8d5f01896fecca4c035cf9a77f27c4ff html/Helpers/SetMemo
+SHA256 7fe8013fad8ecb0b9ef8bad3fd7287486c1c61c776f76beb7d9d24e06ee3ab44 inc/Module/AutoInstall.pm
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 1e48ae2cb24e1d16193d476e735579dfcd0eefb3685921ad4736390df75d939b inc/Module/Install/AutoInstall.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a97bf661b739643c3adee064addf7a85f22e25e1bbffc137974cd8754ffa5c66 inc/Module/Install/Include.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 492f566c84b3db9340895ef53f31f0d83310feb01f0362db28b9d579ef90e01a inc/Module/Install/RTx.pm
+SHA256 a7c5323f81fc052097b0470bd3e6e7e2de2ac9d90c59646948d89c4c7e46cfe6 inc/Module/Install/RTx/Runtime.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 9f50489182b83fb275494764918038d1f176067f32bd59bad7b912cc6d29cacb inc/Module/Install/Substitute.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 3164c32202bf4604ab1f90b926a81e15493b191e0bc2f90ae42d8358f18259d6 inc/YAML/Tiny.pm
+SHA256 9c13ab9432104846248d587e4c41c3a3d551cc5bb58d77bbd5b5bec0126e1b25 lib/RT/Extension/Memo.pm
+SHA256 a762f13c89587d019bf61cfe026f1e61d403a90cab4e1e9dcf177b34662200bd lib/RT/Extension/Memo/Test.pm.in
+SHA256 d57355b191659a8b4d1e00095b441aa6ba9e4b44b25bdc623f2d695b76d63111 po/fr.po
+SHA256 06d817d7e1f6431937d944aa4ddacccd6533e0ea352e66805208ec610924ddf5 static/css/memo.css
+SHA256 035345e508ef2ae2d4bd85861cd24b9ab414c2728aa0fe7128877a0c0f543dbe static/js/memo.js
+SHA256 2af74c5056c4dc1486ee1ecd87ea6c43442c9f9a3d9e889695eb340544b273c0 xt/00-load.t
+SHA256 0e604bfa815ad3e7aec5a6e020130cd1fa2721f28cd139906d4ef7453bc4f317 xt/memo.t
+SHA256 6db80e256e595e3f4cec9a7b7e4c539b9981a5575d019c0620aae70d86b3b72b xt/merge.t
+SHA256 848589f0556224736f2659a508dfa92d5e5b7eaf84307510ee31acf5db29a4c5 xt/richtext.t
+SHA256 225f9054f1f3bd41322d17d0eeee195518744944218b642c164185ef46819264 xt/rights.t
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQRR24FY+Z56D/YyPs7z3XhnulP5PwUCY5mJtwAKCRDz3XhnulP5
+P22fAJ9iFsv3meba4PPWVTULugwOFxkzWACguuLFgdg1CjhrzSgLp1RHNhR0J+Y=
+=zJgT
+-----END PGP SIGNATURE-----

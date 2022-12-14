@@ -10,9 +10,9 @@ use warnings;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-22'; # DATE
+our $DATE = '2022-11-23'; # DATE
 our $DIST = 'App-SubtitleUtils'; # DIST
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/SubtitleUtils/srtcombine2text",
@@ -23,7 +23,7 @@ my $cmdline = Perinci::CmdLine::Any->new(
 
 $cmdline->run;
 
-# ABSTRACT: Combine the text of two or more subtitle files (e.g. for different languages) into one
+# ABSTRACT: Combine the text of two subtitle files (e.g. for different languages) into one
 # PODNAME: srtcombine2text
 
 __END__
@@ -34,11 +34,11 @@ __END__
 
 =head1 NAME
 
-srtcombine2text - Combine the text of two or more subtitle files (e.g. for different languages) into one
+srtcombine2text - Combine the text of two subtitle files (e.g. for different languages) into one
 
 =head1 VERSION
 
-This document describes version 0.011 of srtcombine2text (from Perl distribution App-SubtitleUtils), released on 2022-11-22.
+This document describes version 0.012 of srtcombine2text (from Perl distribution App-SubtitleUtils), released on 2022-11-23.
 
 =head1 SYNOPSIS
 

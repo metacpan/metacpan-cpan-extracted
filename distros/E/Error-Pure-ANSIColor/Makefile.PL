@@ -15,10 +15,10 @@ license 'bsd';
 name 'Error-Pure-ANSIColor';
 readme_from 'ANSIColor.pm';
 recursive_author_tests('xt');
-requires 'Error::Pure::Output::ANSIColor' => 0.01;
+requires 'Error::Pure::Output::ANSIColor' => 0.04;
 requires 'Error::Pure::Utils' => 0.24;
 requires 'Exporter' => 0;
-requires 'List::MoreUtils' => 0;
+requires 'List::Util' => 1.33;
 requires 'Readonly' => 0;
 requires 'perl' => '5.6.2';
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Error-Pure-ANSIColor/issues';
@@ -27,7 +27,7 @@ resources 'repository' => 'git://github.com/michal-josef-spacek/Error-Pure-ANSIC
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.27';
+version '0.29';
 
 # Run.
 WriteAll();

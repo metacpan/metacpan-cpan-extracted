@@ -194,7 +194,7 @@ It should be noted that with version 0.99, the number of cases to test has expon
 
 # AUTHOR
 
-Gérald Sédrati-Dinet <gibus@easter-eggs.com>
+Gérald Sédrati <gibus@easter-eggs.com>
 
 # REPOSITORY
 
@@ -212,7 +212,7 @@ or via the web at
 
 # LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2017-2019 by Gérald Sédrati-Dinet, Easter-Eggs
+This software is Copyright (c) 2017-2022 by Gérald Sédrati, Easter-Eggs
 
 This is free software, licensed under:
 

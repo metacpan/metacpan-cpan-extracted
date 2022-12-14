@@ -1,5 +1,9 @@
 Revision history for Perl extension RF::Antenna::Planet::MSI::Format.
 
+0.11 2022-12-14
+  - Updated documentation for horizontal and vertical methods
+  - Added methods file_extension and media_type
+
 0.10 2022-12-02
   - Imported functions dbd_dbi and dbi_dbd from RF::Functions whch uses 2.15 conversion factor instead of 2.14.
   - Simplified dbi logic in gain_dbd method

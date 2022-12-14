@@ -6,10 +6,10 @@ use warnings;
 
 use Error::Pure::Output::ANSIColor qw(err_die);
 use Error::Pure::Utils qw(err_helper);
-use List::MoreUtils qw(none);
+use List::Util qw(none);
 use Readonly;
 
-our $VERSION = 0.27;
+our $VERSION = 0.29;
 
 # Constants.
 Readonly::Array our @EXPORT_OK => qw(err);
@@ -54,19 +54,28 @@ Error::Pure::ANSIColor::Die - Error::Pure module with classic die.
 =head1 SYNOPSIS
 
  use Error::Pure::ANSIColor::Die qw(err);
+
  err 'This is a fatal error', 'name', 'value';
+
+ # __or__
+
+ use Error::Pure qw(err);
+
+ $ENV{'ERROR_PURE_TYPE'} = 'ANSIColor::Die';
+
+ err "This is a fatal error.", "name", "value";
 
 =head1 SUBROUTINES
 
-=over 8
+=head2 B<err>
 
-=item B<err(@messages)>
+ err 'This is a fatal error', 'name', 'value';
 
- Process error with messages @messages.
-
-=back
+Process error with messages (error, error_key/value pairs).
 
 =head1 EXAMPLE1
+
+=for comment filename=err_via_ansicolor_die.pl
 
  use strict;
  use warnings;
@@ -77,9 +86,11 @@ Error::Pure::ANSIColor::Die - Error::Pure module with classic die.
  err '1';
 
  # Output:
- # 1 at example1.pl line 9.
+ # 1 at ../err_via_ansicolor_die.pl line 9.
 
 =head1 EXAMPLE2
+
+=for comment filename=err_via_ansicolor_die_with_params.pl
 
  use strict;
  use warnings;
@@ -90,9 +101,11 @@ Error::Pure::ANSIColor::Die - Error::Pure module with classic die.
  err '1', '2', '3';
 
  # Output:
- # 1 at example2.pl line 9.
+ # 123 at ../err_via_ansicolor_die_with_params.pl line 9.
 
 =head1 EXAMPLE3
+
+=for comment filename=err_via_ansicolor_die_with_params_in_eval_and_dump.pl
 
  use strict;
  use warnings;
@@ -105,13 +118,13 @@ Error::Pure::ANSIColor::Die - Error::Pure module with classic die.
  eval { err '1', '2', '3'; };
 
  # Error structure.
- my $err_ar = err_get();
+ my @err = err_get();
 
  # Dump.
  my $dump = Dumpvalue->new;
- $dump->dumpValues($err_ar);
+ $dump->dumpValues(@err);
 
- # In $err_ar:
+ # In @err:
  # [
  #         {
  #                 'msg' => [
@@ -124,14 +137,14 @@ Error::Pure::ANSIColor::Die - Error::Pure module with classic die.
  #                                 'args' => '(1)',
  #                                 'class' => 'main',
  #                                 'line' => '9',
- #                                 'prog' => 'script.pl',
+ #                                 'prog' => 'err_via_ansicolor_die_with_params_in_eval_and_dump.pl',
  #                                 'sub' => 'err',
  #                         },
  #                         {
  #                                 'args' => '',
  #                                 'class' => 'main',
  #                                 'line' => '9',
- #                                 'prog' => 'script.pl',
+ #                                 'prog' => 'err_via_ansicolor_die_with_params_in_eval_and_dump.pl',
  #                                 'sub' => 'eval {...}',
  #                         },
  #                 ],
@@ -143,7 +156,7 @@ Error::Pure::ANSIColor::Die - Error::Pure module with classic die.
 L<Error::Pure::Output::ANSIColor>,
 L<Error::Pure::Utils>,
 L<Exporter>,
-L<List::MoreUtils>,
+L<List::Util>,
 L<Readonly>.
 
 =head1 SEE ALSO
@@ -174,6 +187,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.27
+0.29
 
 =cut

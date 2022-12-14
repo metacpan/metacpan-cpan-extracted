@@ -4,7 +4,7 @@ use warnings;
 no warnings qw(redefine);
 package RT::Extension::Memo;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 =encoding utf8
 
@@ -80,7 +80,7 @@ Works with RT 4.2 or greater
 
 May need root permissions
 
-=item Edit your F</opt/rt4/etc/RT_SiteConfig.pm>
+=item Edit your F</opt/rt5/etc/RT_SiteConfig.pm>
 
 If you are using RT 4.2 or greater, add this line:
 
@@ -94,7 +94,7 @@ or add C<RT::Extension::Memo> to your existing C<@Plugins> line.
 
 =item Clear your mason cache
 
-    rm -rf /opt/rt4/var/mason_data/obj
+    rm -rf /opt/rt5/var/mason_data/obj
 
 =item Restart your webserver
 
@@ -171,7 +171,7 @@ my $old_MergeInto = RT::Ticket->can("_MergeInto");
 
 =head1 AUTHOR
 
-Gérald Sédrati-Dinet E<lt>gibus@easter-eggs.comE<gt>
+Gérald Sédrati E<lt>gibus@easter-eggs.comE<gt>
 
 =head1 REPOSITORY
 
@@ -189,7 +189,7 @@ L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-Memo
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2017 by Gérald Sédrati-Dinet, Easter-Eggs
+This software is Copyright (c) 2017-2022 by Gérald Sédrati, Easter-Eggs
 
 This is free software, licensed under:
 

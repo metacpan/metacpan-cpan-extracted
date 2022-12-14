@@ -6,7 +6,7 @@ license 'gpl_3';
 repository 'https://github.com/gibus/RT-Extension-RichtextCustomField';
 
 requires_rt('4.0.0');
-rt_too_new('4.6.0');
+rt_too_new('5.0.3');
 
 readme_from 'lib/RT/Extension/RichtextCustomField.pm', 0, 'md', 'README.md';
 

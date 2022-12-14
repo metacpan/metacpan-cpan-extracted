@@ -1,5 +1,5 @@
 package Terse;
-our $VERSION = '0.120';
+our $VERSION = '0.121';
 use 5.006;
 use strict;
 use warnings;
@@ -372,7 +372,7 @@ Terse - Lightweight Web Framework
 
 =head1 VERSION
 
-Version 0.120
+Version 0.121
 
 =cut
 

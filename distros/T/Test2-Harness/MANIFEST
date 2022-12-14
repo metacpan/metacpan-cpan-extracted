@@ -94,6 +94,7 @@ lib/Test2/Harness/Runner/Reloader.pm
 lib/Test2/Harness/Runner/Resource.pm
 lib/Test2/Harness/Runner/Resource/JobCount.pm
 lib/Test2/Harness/Runner/Resource/SharedJobSlots.pm
+lib/Test2/Harness/Runner/Resource/SharedJobSlots/Config.pm
 lib/Test2/Harness/Runner/Resource/SharedJobSlots/State.pm
 lib/Test2/Harness/Runner/Run.pm
 lib/Test2/Harness/Runner/Spawn.pm
@@ -305,6 +306,8 @@ t/unit/App/Yath/Plugin/Git.t
 t/unit/App/Yath/Plugin/SysInfo.t
 t/unit/App/Yath/Util.t
 t/unit/Test2/Harness/Runner/DepTracer.t
+t/unit/Test2/Harness/Runner/Resource/SharedJobSlots/.sharedjobslots.yml
+t/unit/Test2/Harness/Runner/Resource/SharedJobSlots/Config.t
 t/unit/Test2/Harness/Runner/Resource/SharedJobSlots/State.t
 t/unit/Test2/Harness/Settings.t
 t/unit/Test2/Harness/Settings/Prefix.t

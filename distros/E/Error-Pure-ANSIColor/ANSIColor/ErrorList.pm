@@ -6,14 +6,14 @@ use warnings;
 
 use Error::Pure::Utils qw(err_helper);
 use Error::Pure::Output::ANSIColor qw(err_line_all);
-use List::MoreUtils qw(none);
+use List::Util qw(none);
 use Readonly;
 
 # Constants.
 Readonly::Array our @EXPORT_OK => qw(err);
 Readonly::Scalar my $EVAL => 'eval {...}';
 
-our $VERSION = 0.27;
+our $VERSION = 0.29;
 
 # Process error.
 sub err {
@@ -54,19 +54,28 @@ with informations.
 =head1 SYNOPSIS
 
  use Error::Pure::ANSIColor::ErrorList qw(err);
+
+ err "This is a fatal error.", "name", "value";
+
+ # __or__
+
+ use Error::Pure qw(err);
+
+ $ENV{'ERROR_PURE_TYPE'} = 'ANSIColor::ErrorList';
+
  err "This is a fatal error.", "name", "value";
 
 =head1 SUBROUTINES
 
-=over 4
+=head2 B<err>
 
-=item B<err(@messages)>
+ err 'This is a fatal error', 'name', 'value';
 
- Process error with messages @messages.
-
-=back
+Process error with messages (error, error_key/value pairs).
 
 =head1 EXAMPLE1
+
+=for comment filename=err_via_ansicolor_error_list.pl
 
  use strict;
  use warnings;
@@ -81,6 +90,8 @@ with informations.
 
 =head1 EXAMPLE2
 
+=for comment filename=err_via_ansicolor_error_list_with_params.pl
+
  use strict;
  use warnings;
 
@@ -93,6 +104,8 @@ with informations.
  # #Error [example2.pl:9] 1
 
 =head1 EXAMPLE3
+
+=for comment filename=err_via_ansicolor_error_list_in_eval_plus_err.pl
 
  use strict;
  use warnings;
@@ -115,7 +128,7 @@ with informations.
 L<Error::Pure::Utils>,
 L<Error::Pure::Output::Text>,
 L<Exporter>,
-L<List::MoreUtils>,
+L<List::Util>,
 L<Readonly>.
 
 =head1 SEE ALSO
@@ -146,6 +159,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.27
+0.29
 
 =cut

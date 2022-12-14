@@ -1,0 +1,67 @@
+---
+abstract: 'Find or build libboost'
+author:
+  - 'Thibault Duponchelle <thibault.duponchelle@gmail.com>'
+build_requires:
+  Alien::Build::MM: '0.25'
+  Archive::Tar: '0'
+  HTTP::Tiny: '0.044'
+  IO::Socket::SSL: '1.56'
+  Mojo::DOM: '0'
+  Mojolicious: '7.00'
+  Mozilla::CA: '0'
+  Net::SSLeay: '1.49'
+  Sort::Versions: '0'
+  URI: '0'
+  URI::Escape: '0'
+configure_requires:
+  Alien::Build: '1.19'
+  Alien::Build::MM: '0.25'
+  ExtUtils::CBuilder: '0'
+  ExtUtils::MakeMaker: '6.52'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Alien-Boost-ProgramOptions
+no_index:
+  directory:
+    - t
+    - inc
+    - bundled
+    - my
+  package:
+    - DynaLoader
+    - in
+    - version
+requires:
+  Alien::Base: '0.038'
+  Alien::Build: '0.25'
+  Test::Alien: '0'
+  Test::Alien::CPP: '0'
+  Test::Alien::Diag: '0'
+resources:
+  IRC: irc://irc.perl.org/#native
+  bugtracker: https://github.com/thibaultduponchelle/Alien-Boost-ProgramOptions/issues
+  homepage: https://metacpan.org/release/Alien-Boost-ProgramOptions
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/thibaultduponchelle/Alien-Boost-ProgramOptions.git
+version: '1.7'
+x_alienfile:
+  generated_by: 'Alien::Build::MM version 2.74'
+  requires:
+    share:
+      Archive::Tar: '0'
+      HTTP::Tiny: '0.044'
+      IO::Socket::SSL: '1.56'
+      Mojo::DOM: '0'
+      Mojolicious: '7.00'
+      Mozilla::CA: '0'
+      Net::SSLeay: '1.49'
+      Sort::Versions: '0'
+      URI: '0'
+      URI::Escape: '0'
+    system: {}
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

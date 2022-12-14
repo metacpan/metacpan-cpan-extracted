@@ -1118,5 +1118,3 @@ perl-brace-imaginary-offset: 0
 perl-label-offset: -4
 tab-width: 4
 End:
-
-=cut

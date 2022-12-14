@@ -18,7 +18,7 @@ Works with RT 4.4 or greater
 
     May need root permissions
 
-- Edit your `/opt/rt4/etc/RT_SiteConfig.pm`
+- Edit your `/opt/rt5/etc/RT_SiteConfig.pm`
 
     If you are using RT 4.2 or greater, add this line:
 
@@ -32,13 +32,13 @@ Works with RT 4.4 or greater
 
 - Clear your mason cache
 
-        rm -rf /opt/rt4/var/mason_data/obj
+        rm -rf /opt/rt5/var/mason_data/obj
 
 - Restart your webserver
 
 # AUTHOR
 
-Gérald Sédrati-Dinet <gibus@easter-eggs.com>
+Gérald Sédrati <gibus@easter-eggs.com>
 
 # REPOSITORY
 
@@ -56,7 +56,7 @@ or via the web at
 
 # LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2018 by Gérald Sédrati-Dinet, Easter-Eggs
+This software is Copyright (c) 2018-2022 by Gérald Sédrati, Easter-Eggs
 
 This is free software, licensed under:
 

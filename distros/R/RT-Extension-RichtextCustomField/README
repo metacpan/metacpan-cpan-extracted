@@ -3,11 +3,25 @@ NAME
 
 DESCRIPTION
     Provide a new type of custom field
-    <https://docs.bestpractical.com/rt/4.4.4/RT/CustomField.html>, similar
+    <https://docs.bestpractical.com/rt/5.0.2/RT/CustomField.html>, similar
     to Text but with wysiwyg editor when editing value.
 
 RT VERSION
-    Works with RT 4.2 or greater
+    Works with RT 4.2 or greater. Since RT 5.0.3, there is a new HTML type
+    of CustomField which has the same role as this plugin, so it is useless
+    from RT 5.0.3.
+
+    If you have install this plugin and want to migrate to RT 5.0.3, all you
+    have to do is to add the following line to file
+    /opt/rt5/etc/update/5.0.3/schema.Pg if your RT uses PostgreSQL database,
+    or create /opt/rt5/etc/update/5.0.3/schema.mysql,
+    /opt/rt5/etc/update/5.0.3/ or /opt/rt5/etc/update/5.0.3/ according to
+    your RT database type, with this single line:
+
+        UPDATE CustomFields SET Type = 'HTML', EntryHint = 'Fill in one HTML area' WHERE Type = 'Richtext';
+
+    This will be processed by standard RT database upgrade with
+    /opt/rt5/sbin/rt-setup-database --action upgrade.
 
 INSTALLATION
     perl Makefile.PL
@@ -17,19 +31,19 @@ INSTALLATION
 
     Patch your RT
         RichtextCustomField requires a small patch to allow custom fields
-        <https://docs.bestpractical.com/rt/4.4.4/RT/CustomField.html> with
+        <https://docs.bestpractical.com/rt/5.0.2/RT/CustomField.html> with
         Richtext type to be chosen as recipient for extracting from a ticket
-        <https://docs.bestpractical.com/rt/4.4.4/RT/Ticket.html> into an
-        article <https://docs.bestpractical.com/rt/4.4.4/RT/Article.pm>.
+        <https://docs.bestpractical.com/rt/5.0.2/RT/Ticket.html> into an
+        article <https://docs.bestpractical.com/rt/5.0.2/RT/Article.pm>.
         *You have to apply this patch if you need this feature, and only in
         this case.*
 
         For RT 4.4 or lower, apply the included patch:
 
-            cd /opt/rt4 # Your location may be different
+            cd /opt/rt5 # Your location may be different
             patch -p1 < /download/dir/RT-Extension-RichtextCustomField/patches/4.4-add-Richtext-CFs-ExtractArticleFromTicket.patch
 
-    Edit your /opt/rt4/etc/RT_SiteConfig.pm
+    Edit your /opt/rt5/etc/RT_SiteConfig.pm
         If you are using RT 4.2 or greater, add this line:
 
             Plugin('RT::Extension::RichtextCustomField');
@@ -42,12 +56,12 @@ INSTALLATION
         line.
 
     Clear your mason cache
-            rm -rf /opt/rt4/var/mason_data/obj
+            rm -rf /opt/rt5/var/mason_data/obj
 
     Restart your webserver
 
 AUTHOR
-    Gérald Sédrati-Dinet <gibus@easter-eggs.com>
+    Gérald Sédrati <gibus@easter-eggs.com>
 
 REPOSITORY
     <https://github.com/gibus/RT-Extension-RichtextCustomField>
@@ -65,7 +79,7 @@ BUGS
     ustomField>.
 
 LICENSE AND COPYRIGHT
-    This software is Copyright (c) 2017 by Gérald Sédrati-Dinet, Easter-Eggs
+    This software is Copyright (c) 2017-2022 by Gérald Sédrati, Easter-Eggs
 
     This is free software, licensed under:
 

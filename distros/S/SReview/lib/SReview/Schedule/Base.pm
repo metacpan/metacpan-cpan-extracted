@@ -163,6 +163,7 @@ sub _load_endtime {
 	$start->set_time_zone('UTC');
 	my $end = $self->starttime + $self->length;
 	$start->set_time_zone($tz);
+	$end->set_time_zone($tz);
 	return $end;
 }
 
@@ -251,7 +252,7 @@ has 'speakers' => (
 );
 
 sub _load_speakers {
-	return undef;
+	return [];
 }
 
 has 'filtered' => (
@@ -270,6 +271,7 @@ no Moose;
 package SReview::Schedule::Base::Event;
 
 use Moose;
+use DateTime::TimeZone;
 
 has 'talks' => (
 	is => 'ro',
@@ -293,14 +295,32 @@ sub _load_name {
 	return "";
 }
 
+has 'timezone' => (
+	is => 'ro',
+	isa => 'DateTime::TimeZone',
+	lazy => 1,
+	builder => '_load_timezone',
+);
+
+sub _load_timezone {
+	return DateTime::TimeZone->new(name => 'local');
+}
+
 package SReview::Schedule::Base;
 
 use Moose;
 use Mojo::UserAgent;
+use Mojo::URL;
 
 has 'url' => (
 	required => 1,
 	is => 'ro',
+);
+
+has 'timezone' => (
+	is => 'ro',
+	isa => 'Maybe[Str]',
+	predicate => 'has_timezone',
 );
 
 has '_raw' => (
@@ -314,6 +334,14 @@ sub _load_raw {
 	my $self = shift;
 	my $ua = Mojo::UserAgent->new;
 	$ua->proxy->detect;
+	my $url = Mojo::URL->new($self->url);
+	if($url->scheme eq "file") {
+		local $/ = undef;
+		open my $f, "<", $url->host . $url->path;
+		my $rv = <$f>;
+		close $f;
+		return $rv;
+	}
 	my $res = $ua->get($self->url)->result;
 	die "Could not access " . $self->url . ": " . $res->code . " " . $res->message unless $res->is_success;
 	return $res->body;

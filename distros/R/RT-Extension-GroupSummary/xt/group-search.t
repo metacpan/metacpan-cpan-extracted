@@ -24,13 +24,13 @@ $m->get_ok($m->rt_base_url . 'Group/Search.html', 'Group Summary Search page');
 
 $m->content_like(qr{<li id="li-search-users"><a id="search-users" class="menu-item" href="/User/Search.html">Users</a></li>\s*<li id="li-search-groups"><a id="search-groups" class="menu-item" href="/Group/index.html">Groups</a></li>}, 'Group Search in menu');
 $m->content_like(qr{<input type="text" name="GroupString" value="" data-autocomplete="Groups" id="autocomplete-GroupString" />}, 'Go to group input field');
-$m->content_like(qr{<select name="GroupField">\s*<option  value="Name">Name</option>\s*<option  value="Description">Description</option>\s*</select>}, 'GroupField input field');
-$m->content_like(qr{<select name="GroupOp">\s*<option value="LIKE"  selected="selected">matches</option>\s*<option value="NOT LIKE" >doesn&#39;t match</option>\s*<option value="=" >is</option>\s*<option value="!=" >isn&#39;t</option>\s*</select>}, 'GroupOp input field');
-$m->content_like(qr{<input size="8" name="GroupString" value="" />}, 'GroupString input field');
+$m->content_like(qr{<select name="GroupField"[^>]*>\s*<option  value="Name">Name</option>\s*<option  value="Description">Description</option>\s*</select>}, 'GroupField input field');
+$m->content_like(qr{<select name="GroupOp"[^>]*>\s*<option value="LIKE"  selected="selected">matches</option>\s*<option value="NOT LIKE" >doesn&#39;t match</option>\s*<option value="=" >is</option>\s*<option value="!=" >isn&#39;t</option>\s*</select>}, 'GroupOp input field');
+$m->content_like(qr{<input .*name="GroupString" value="" .*/>}, 'GroupString input field');
 
-$m->content_like(qr{<tbody class="list-item" data-record-id="$group_always_found_id">}, 'First group found without request');
-$m->content_like(qr{<tbody class="list-item" data-record-id="$group_sometimes_found_id">}, 'Second group found without request');
-$m->content_like(qr{<tbody class="list-item" data-record-id="$group_hidden_id">}, 'Third group found without request');
+$m->content_like(qr{<tbody class="list-item" .*data-record-id="$group_always_found_id">}, 'First group found without request');
+$m->content_like(qr{<tbody class="list-item" .*data-record-id="$group_sometimes_found_id">}, 'Second group found without request');
+$m->content_like(qr{<tbody class="list-item" .*data-record-id="$group_hidden_id">}, 'Third group found without request');
 
 $m->submit_form(
     form_number => 4,
@@ -42,9 +42,9 @@ $m->submit_form(
 );
 $m->warning_like(qr/Case sensitive search by Groups.Name/, "Case sensitive search warning");
 
-$m->content_like(qr{<tbody class="list-item" data-record-id="$group_always_found_id">}, 'First group found with large request');
-$m->content_like(qr{<tbody class="list-item" data-record-id="$group_sometimes_found_id">}, 'First group found with large request');
-$m->content_unlike(qr{<tbody class="list-item" data-record-id="$group_hidden_id">}, 'Second group not found with large request');
+$m->content_like(qr{<tbody class="list-item" (?:data-index="1"  )*data-record-id="$group_always_found_id">}, 'First group found with large request');
+$m->content_like(qr{<tbody class="list-item" (?:data-index="2"  )*data-record-id="$group_sometimes_found_id">}, 'Second group found with large request');
+$m->content_unlike(qr{<tbody class="list-item" (?:data-index="3"  )*data-record-id="$group_hidden_id">}, 'Third group not found with large request');
 
 $m->submit_form(
     form_number => 4,

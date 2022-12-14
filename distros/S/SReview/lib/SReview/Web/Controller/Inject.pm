@@ -1,13 +1,13 @@
 package SReview::Web::Controller::Inject;
 
+use Media::Convert::Asset;
 use Mojo::Base 'Mojolicious::Controller';
 use Mojo::Collection 'c';
-use Data::Dumper;
+use File::Basename "dirname";
 
-use SReview::Access qw/admin_for/;
+use SReview::Access "admin_for";
 use SReview::Files::Factory;
 use SReview::Talk;
-use SReview::Video;
 
 sub view {
 	my $c = shift;
@@ -86,7 +86,8 @@ sub update {
 			$c->app->log->debug("copying video asset " . $upload->filename);
 			my @parts = split /\./, $upload->filename;
 			my $ext = pop @parts;
-			my $fn = join('.', $talk->slug, $ext);
+			my $relname = dirname($talk->relative_name);
+			my $fn = join('.', $relname, $ext);
 			my $coll;
 			if($collname eq "input") {
 				$coll = SReview::Files::Factory->create("input", $c->srconfig->get("inputglob"), $c->srconfig);
@@ -96,12 +97,12 @@ sub update {
 				$coll = SReview::Files::Factory->create($collname, $c->srconfig->get("extra_collections")->{$collname});
 			}
 			my $file = $coll->add_file(relname => join("/", "injected", $fn));
-			$c->dbh->prepare("DELETE FROM raw_files WHERE filename LIKE ? AND stream = 'injected' AND room = ?")->execute($coll->url . "/injected/" . $talk->slug . ".%", $talk->roomid);
+			$c->dbh->prepare("DELETE FROM raw_files WHERE filename LIKE ? AND stream = 'injected' AND room = ?")->execute($coll->url . "/injected/" . $relname . ".%", $talk->roomid);
 			my $st = $c->dbh->prepare("INSERT INTO raw_files(filename, room, starttime, stream) VALUES(?,?,?,'injected') ON CONFLICT DO NOTHING");
 			$st->execute($file->url, $talk->roomid, $talk->corrected_times->{start});
 			$upload->move_to($file->filename);
 			$c->app->log->debug("checking video asset " . $upload->filename);
-			my $input = SReview::Video->new(url => $file->filename);
+			my $input = Media::Convert::Asset->new(url => $file->filename);
 			my $checks = $c->srconfig->get("inject_fatal_checks");
 			foreach my $prop(keys %$checks) {
 				my $attr = $input->meta->find_attribute_by_name($prop);

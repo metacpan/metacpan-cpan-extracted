@@ -1,13 +1,14 @@
 package SReview::Talk;
 
 use Moose;
+
+use Media::Convert::Asset;
+use Media::Convert::Asset::ProfileFactory;
 use Mojo::Pg;
 use Mojo::Template;
 use Mojo::JSON qw/encode_json decode_json/;
 use SReview::Config::Common;
 use SReview::Talk::State;
-use SReview::Video;
-use SReview::Video::ProfileFactory;
 use DateTime::Format::Pg;
 
 my $config = SReview::Config::Common::setup;
@@ -81,8 +82,6 @@ sub _load_pathinfo {
 	my $eventdata = $pg->db->dbh->prepare("SELECT events.id AS eventid, events.name AS event, events.outputdir AS event_output, rooms.name AS room, rooms.outputname AS room_output, rooms.id AS room_id, talks.starttime, talks.starttime::date AS date, to_char(starttime, 'DD Month yyyy at HH:MI') AS readable_date, to_char(talks.starttime, 'yyyy') AS year, talks.endtime, talks.slug, talks.title, talks.subtitle, talks.state, talks.nonce, talks.apologynote FROM talks JOIN events ON talks.event = events.id JOIN rooms ON rooms.id = talks.room WHERE talks.id = ?");
 	$eventdata->execute($self->talkid);
 	my $row = $eventdata->fetchrow_hashref();
-
-	$pathinfo->{"workdir"} = join('/', $row->{eventid}, $row->{date}, substr($row->{room}, 0, 1));
 
 	my @elements = ($config->get('outputdir'));
 	foreach my $element(@{$config->get('output_subdirs')}) {
@@ -378,7 +377,7 @@ has 'workdir' => (
 
 sub _load_workdir {
 	my $self = shift;
-	return join('/', $config->get("pubdir"), $self->_get_pathinfo->{"workdir"});
+	return join('/', $config->get("pubdir"), $self->relative_name);
 }
 
 =head2 relative_name
@@ -396,7 +395,12 @@ has 'relative_name' => (
 
 sub _load_relative_name {
 	my $self = shift;
-	return join('/', $self->_get_pathinfo->{"workdir"}, $self->_get_pathinfo->{'slug'});
+	my $n = $self->nonce;
+	my $serial = $self->has_correction("serial") ? ${$self->corrections}{serial} : 0;
+	if($self->state eq "broken" && $serial > 0) {
+		$serial -= 1;
+	}
+	return join('/', substr($n, 0, 1), substr($n, 1, 2), substr($n, 3), $serial);
 }
 
 =head2 outname
@@ -650,7 +654,7 @@ has 'speakerlist' => (
 sub _load_speakerlist {
 	my $self = shift;
 
-	my $query = $pg->db->dbh->prepare("SELECT speakers.name FROM speakers JOIN speakers_talks ON speakers.id = speakers_talks.speaker WHERE speakers_talks.talk = ?");
+	my $query = $pg->db->dbh->prepare("SELECT speakers.name FROM speakers JOIN speakers_talks ON speakers.id = speakers_talks.speaker WHERE speakers_talks.talk = ? ORDER BY speakers.name");
 
 	$query->execute($self->talkid);
 
@@ -746,13 +750,13 @@ sub _load_output_urls {
 	my $form = $config->get("output_video_url_format");
 	my $rv = [];
 	if(defined($form)) {
-		my $vid = SReview::Video->new(url => "");
+		my $vid = Media::Convert::Asset->new(url => "");
 		foreach my $prof(@{$config->get("output_profiles")}) {
 			my $item = {prof => $prof};
 			if($prof eq "copy") {
 				$prof = $config->get("input_profile");
 			}
-			my $exten = SReview::Video::ProfileFactory->create($prof, $vid)->exten;
+			my $exten = Media::Convert::Asset::ProfileFactory->create($prof, $vid, $config->get('extra_profiles'))->exten;
 			my $url = $mt->vars(1)->render($form, {
 				talk => $self,
 				year => $self->_get_pathinfo->{raw}{year},
@@ -917,9 +921,10 @@ sub set_state {
 	my $progress = shift;
 
 	$progress = 'waiting' unless defined($progress);
+	my $dbh = $pg->db->dbh;
 
-        my $st = $pg->db->dbh->prepare("UPDATE talks SET state=?, progress=? WHERE id=?");
-        $st->execute($newstate, $progress, $self->talkid);
+        my $st = $dbh->prepare("UPDATE talks SET state=?, progress=? WHERE id=?") or die $dbh->errstr;
+        $st->execute($newstate, $progress, $self->talkid) or die $dbh->errstr;
 }
 
 =head2 state_done

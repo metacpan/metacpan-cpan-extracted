@@ -66,7 +66,7 @@ use Cwd qw (abs_path);
 
 use vars qw ($VERSION);
 
-$VERSION = '1.32';
+$VERSION = '1.33';
 
 require Exporter;
 
@@ -387,7 +387,7 @@ sub __find_domain ($)
 	my $try_dirs = $bound_dirs{$domain};
 	
 	if (defined $try_dirs) {
-		my $found_dir = '';
+		my $found_dir;
 		
 		TRYDIR: foreach my $dir (grep { -d $_ } @$try_dirs) {
 			# Is there a message catalog?  We have to search recursively
@@ -412,7 +412,7 @@ sub __find_domain ($)
 		
 		# If there was no success, this will fall back to the default search
 		# directories.
-		bindtextdomain $domain => abs_path $found_dir;
+		bindtextdomain $domain => abs_path $found_dir if defined $found_dir;
     }
     
     # The search has completed.
@@ -978,6 +978,7 @@ Marks B<MSGID> as N__() does, but in the context B<MSGCTXT>.
 =item B<N__np (MSGCTXT, MSGID, MSGID_PLURAL, COUNT)>
 
 Marks B<MSGID> as N__n() does, but in the context B<MSGCTXT>.
+
 =back
 
 =head1 EXPORTED VARIABLES
@@ -1173,4 +1174,3 @@ cperl-indent-level: 4
 cperl-continued-statement-offset: 2
 tab-width: 4
 End:
-=cut

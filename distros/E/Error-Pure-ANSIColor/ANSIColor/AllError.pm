@@ -6,14 +6,14 @@ use warnings;
 
 use Error::Pure::Utils qw(err_helper);
 use Error::Pure::Output::ANSIColor qw(err_bt_pretty);
-use List::MoreUtils qw(none);
+use List::Util qw(none);
 use Readonly;
 
 # Constants.
 Readonly::Array our @EXPORT_OK => qw(err);
 Readonly::Scalar my $EVAL => 'eval {...}';
 
-our $VERSION = 0.27;
+our $VERSION = 0.29;
 
 # Process error.
 sub err {
@@ -53,31 +53,37 @@ Error::Pure::ANSIColor::AllError - Error::Pure module with full backtrace.
 =head1 SYNOPSIS
 
  use Error::Pure::ANSIColor::AllError qw(err);
+
+ err "This is a fatal error.", "name", "value";
+
+ # __or__
+
+ use Error::Pure qw(err);
+
+ $ENV{'ERROR_PURE_TYPE'} = 'ANSIColor::AllError';
+
  err "This is a fatal error.", "name", "value";
 
 =head1 SUBROUTINES
 
-=over 4
+=head2 B<err>
 
-=item B<err(@messages)>
+ err "This is a fatal error.", "name", "value";
 
- Process error with messages @messages.
-
-=back
+Process error with messages (error, error_key/value pairs).
 
 =head1 EXAMPLE
+
+=for comment filename=err_via_ansicolor_all_error.pl
 
  use strict;
  use warnings;
 
  use Error::Pure::ANSIColor::AllError qw(err);
 
- print "1\n";
  err "This is a fatal error.", "name", "value";
- print "2\n";
 
  # Output:
- # 1
  # ERROR: This is a fatal error.
  # name: value
  # main  err  ./script.pl  12
@@ -87,7 +93,7 @@ Error::Pure::ANSIColor::AllError - Error::Pure module with full backtrace.
 L<Error::Pure::Output::ANSIColor>,
 L<Error::Pure::Utils>,
 L<Exporter>,
-L<List::MoreUtils>,
+L<List::Util>,
 L<Readonly>.
 
 =head1 SEE ALSO
@@ -118,6 +124,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.27
+0.29
 
 =cut

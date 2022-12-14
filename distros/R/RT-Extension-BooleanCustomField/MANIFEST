@@ -33,3 +33,4 @@ xt/group.t
 xt/queue.t
 xt/ticket.t
 xt/user.t
+SIGNATURE                                Public-key signature (added by MakeMaker)

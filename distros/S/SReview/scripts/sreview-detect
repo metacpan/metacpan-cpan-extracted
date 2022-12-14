@@ -23,7 +23,7 @@ sreview-detect - detect new files for SReview
 
 =head1 SYNOPSIS
 
-sreview-detect
+sreview-detect [--verbose] [--day-finish] [--help]
 
 =head1 DESCRIPTION
 
@@ -40,8 +40,33 @@ review is not waiting for too long.
 
 =head1 OPTIONS
 
-None exist currently. Configuration should be done through the main
-configuration file; see L<sreview-config>.
+=head2 --verbose
+
+Produce verbose output. Will log which files are being examined.
+
+Defaults to on if the environment variable C<KUBERNETES_PORT> exists,
+off otherwise.
+
+=head2 --day-finish
+
+Normally, C<sreview-detect> migrates talks to the next state from
+C<waiting_for_files> if there is enough content available to fill all
+the scheduled time for that talk (minus 5 seconds, to account for the
+fact that sometimes the video does not not I<exactly> add up to the
+correct length). This is normally what you want, when cameras record
+continuously and content is uploaded in between breaks in talks.
+
+However, if the final talk of the day ends early, and the recording
+system is shut down immediately when the speaker stops speaking but
+before the scheduled time for the talk has arrived, then SReview will
+never see enough content for the talk to be considered "complete", and
+that final talk will remain stuck in the C<waiting_for_files> state.
+
+To remedy this, use the C<--day-finish> flag. This will migrate all
+talks that are still in the C<waiting_for_files> state, but for which at
+least I<some> content was found. This will correctly ignore talks that
+are scheduled for the next day, but will allow talks for which some
+content was found to move to the cutting state.
 
 =cut
 
@@ -50,30 +75,44 @@ use warnings;
 
 use DBI;
 use SReview::Config::Common;
-use SReview::Video;
+use Media::Convert::Asset;
 use SReview::Files::Factory;
 
 use Net::Domain qw(hostname);
+use Getopt::Long;
+use Pod::Usage;
+use DateTime;
+use DateTime::TimeZone;
+use DateTime::Format::Pg;
+
+my $finished_for_today = 0;
+my $verbose = 0;
+$verbose = 1 if exists($ENV{KUBERNETES_PORT});
+my $help = 0;
+
+GetOptions('verbose' => \$verbose, "day-finished" => \$finished_for_today, "help" => \$help);
+
+pod2usage(-exitval => 0) if $help;
 
 my $config = SReview::Config::Common::setup;
 
+my $collection = SReview::Files::Factory->create("input", $config->get("inputglob"));
+
 my $dbh = DBI->connect($config->get('dbistring'), '', '') or die "Cannot connect to database!";
+
+$dbh->prepare("UPDATE raw_files SET filename = substring(filename FROM ?), collection_name = 'input' WHERE filename LIKE ? AND collection_name IS NULL")->execute(length($collection->baseurl), $collection->baseurl . "%") or die $!;
 
 $dbh->begin_work;
 
-my $exists = $dbh->prepare("SELECT mtime FROM raw_files WHERE filename = ?");
-my $add = $dbh->prepare("INSERT INTO raw_files(filename, room, starttime, endtime, stream, mtime) VALUES (?, (SELECT id FROM rooms WHERE altname = ? OR name = ?), ?::timestamptz, ?::timestamptz + ?::interval, ?, ?)");
-my $update = $dbh->prepare("UPDATE raw_files SET endtime = starttime + ?::interval, mtime = ? WHERE filename = ?");
-
-my $verbose = 0;
-$verbose = 1 if exists($ENV{KUBERNETES_PORT});
-
-my $collection = SReview::Files::Factory->create("input", $config->get("inputglob"));
+my $exists = $dbh->prepare("SELECT mtime FROM raw_files WHERE filename = ? AND collection_name = 'input'");
+my $add = $dbh->prepare("INSERT INTO raw_files(filename, room, starttime, endtime, stream, mtime, collection_name) VALUES (?, (SELECT id FROM rooms WHERE altname = ? OR name = ?), ?::timestamptz, ?::timestamptz + ?::interval, ?, ?, 'input')");
+my $update = $dbh->prepare("UPDATE raw_files SET endtime = starttime + ?::interval, mtime = ? WHERE filename = ? AND collection_name = 'input'");
 
 print "searching collection at " . $collection->baseurl . ", accessing for files using " . $collection->fileclass . "\n" if $verbose;
 
 my $host = hostname();
 
+my $tz = DateTime::TimeZone->new(name => $config->get('file_timezone'));
 
 foreach my $file(@{$collection->children}) {
 	next if ($file->is_collection);
@@ -81,29 +120,36 @@ foreach my $file(@{$collection->children}) {
 	my $parse_re = $config->get('parse_re');
 	next unless $file->url =~ /$parse_re/;
 	print " ...passes regex" if $verbose;
+
 	my $room = $+{room};
-	my $start_hour = $+{hour} . ":" . $+{minute} . ":" . $+{second};
-	my $start_day = $+{year} . "-" . $+{month} . "-" . $+{day};
+	next unless defined($room);
+
 	my $stream = $+{stream};
 	$stream = '' unless defined $stream;
-	next unless defined($room);
+
+	my %parsed = ( %+ );
+	delete $parsed{room};
+	delete $parsed{stream};
+
+	my $start = DateTime->new(%parsed, time_zone => $tz);
 	$exists->execute($file->url);
 	my $row = $exists->fetchrow_hashref;
 	if($exists->rows == 0) {
 		print " ...is new" if $verbose;
-		my $video = SReview::Video->new(url => $file->filename);
+		my $video = Media::Convert::Asset->new(url => $file->filename);
 		my $length = $video->duration;
 		next unless defined($length);
-		$add->execute($file->url, $room, $room, "$start_day $start_hour", "$start_day $start_hour", $length, $stream, $file->mtime->epoch);
+		$start = DateTime::Format::Pg->format_datetime($start);
+		$add->execute($file->relname, $room, $room, $start, $start, $length, $stream, $file->mtime->epoch);
 		print "... stored" if $verbose;
 	} else {
 		print " ... is known" if $verbose;
 		next unless ($row->{mtime} != $file->mtime->epoch);
 		print " ... but has changed" if $verbose;
-		my $video = SReview::Video->new(url => $file->filename);
+		my $video = Media::Convert::Asset->new(url => $file->filename);
 		my $length = $video->duration;
 		next unless defined($length);
-		$update->execute("$length", $file->mtime->epoch, $file->url);
+		$update->execute("$length", $file->mtime->epoch, $file->relname);
 		print " ... length stored" if $verbose
 	}
 }
@@ -114,5 +160,9 @@ my $full = $dbh->prepare("UPDATE talks SET progress = 'done' WHERE state = 'wait
 $full->execute();
 my $partial = $dbh->prepare("UPDATE talks SET progress = 'running' WHERE state = 'waiting_for_files' AND progress < 'running' AND id IN (select distinct talkid FROM raw_talks)");
 $partial->execute();
+
+if($finished_for_today) {
+	$dbh->prepare("UPDATE talks SET progress='done' WHERE state='waiting_for_files' AND progress > 'waiting' AND progress < 'done'")->execute();
+}
 
 $dbh->commit;

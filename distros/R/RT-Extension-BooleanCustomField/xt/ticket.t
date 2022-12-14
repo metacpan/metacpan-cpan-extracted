@@ -35,7 +35,6 @@ $m->submit_form(
     form_name => "TicketCreate",
     fields    => {
         Subject => 'test_ticket',
-        SubmitTicket => "Create",
     },
     button => 'SubmitTicket',
 );

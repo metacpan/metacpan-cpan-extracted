@@ -5,6 +5,7 @@ NAME
 SYNOPSIS
      use Error::Pure::Output::ANSIColor qw(err_bt_pretty err_bt_pretty_rev err_die err_line
              err_line_all err_print err_print_var);
+
      my $ret = err_bt_pretty(@errors);
      my @ret = err_bt_pretty(@errors);
      my $ret = err_bt_pretty_rev(@errors);
@@ -462,17 +463,18 @@ SEE ALSO
         Install the Error::Pure modules.
 
 REPOSITORY
-    <https://github.com/tupinek/Error-Pure-Output-ANSIColor>
+    <https://github.com/michal-josef-spacek/Error-Pure-Output-ANSIColor>
 
 AUTHOR
-    Michal Špaček <mailto:skim@cpan.org>
+    Michal Josef Špaček <mailto:skim@cpan.org>
 
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-     © 2017 Michal Špaček
-     BSD 2-Clause License
+    © 2013-2022 Michal Josef Špaček
+
+    BSD 2-Clause License
 
 VERSION
-    0.03
+    0.04
 

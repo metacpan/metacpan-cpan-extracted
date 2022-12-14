@@ -1,14 +1,14 @@
 ---
 abstract: "Allow to modify other users' preferences"
 author:
-  - 'Gérald Sédrati-Dinet <gibus@easter-eggs.com>'
+  - 'Gérald Sédrati <gibus@easter-eggs.com>'
 build_requires:
   ExtUtils::MakeMaker: 6.59
 configure_requires:
   ExtUtils::MakeMaker: 6.59
 distribution_type: module
 dynamic_config: 1
-generated_by: 'Module::Install version 1.18'
+generated_by: 'Module::Install version 1.19'
 license: gpl_3
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -25,7 +25,7 @@ requires:
 resources:
   license: http://opensource.org/licenses/gpl-license.php
   repository: https://github.com/gibus/RT-Extension-ModifyUsersPrefs
-version: '0.01'
-x_module_install_rtx_version: '0.39'
+version: '0.02'
+x_module_install_rtx_version: '0.43'
 x_requires_rt: 4.2.0
-x_rt_too_new: 4.6.0
+x_rt_too_new: 5.1.0

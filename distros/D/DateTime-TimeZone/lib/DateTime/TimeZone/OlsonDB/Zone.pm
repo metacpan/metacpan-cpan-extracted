@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.56';
+our $VERSION = '2.57';
 
 use DateTime::TimeZone;
 use DateTime::TimeZone::OlsonDB;
@@ -133,18 +133,14 @@ sub add_change {
 
         if (   $last_change->short_name eq $change->short_name
             && $last_change->total_offset == $change->total_offset
-            && $last_change->is_dst == $change->is_dst
-            && $last_change->observance eq $change->observance ) {
+            && $last_change->is_dst == $change->is_dst ) {
             my $last_rule = $last_change->rule || q{};
             my $new_rule  = $change->rule      || q{};
 
-            if ( $last_rule eq $new_rule ) {
-                ## no critic (InputOutput::RequireCheckedSyscalls)
-                print "Skipping identical change\n"
-                    if $DateTime::TimeZone::OlsonDB::DEBUG;
-
-                return;
-            }
+            ## no critic (InputOutput::RequireCheckedSyscalls)
+            print "Skipping identical change\n"
+                if $DateTime::TimeZone::OlsonDB::DEBUG;
+            return;
         }
 
         push @{ $self->{changes} }, $change;

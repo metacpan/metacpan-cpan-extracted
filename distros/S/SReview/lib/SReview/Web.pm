@@ -5,13 +5,15 @@ use Mojo::Collection 'c';
 use Mojo::JSON qw(encode_json);
 use Mojo::Pg;
 use Mojo::URL;
+use Crypt::PRNG qw/random_string/;
 use SReview;
 use SReview::Config;
 use SReview::Config::Common;
 use SReview::Db;
-use SReview::Video;
-use SReview::Video::ProfileFactory;
+use Media::Convert::Asset;
+use Media::Convert::Asset::ProfileFactory;
 use SReview::API;
+use SReview::Files::Factory;
 
 sub startup {
 	my $self = shift;
@@ -61,7 +63,7 @@ sub startup {
 			}
 			$media .= ";";
 		}
-		$c->res->headers->content_security_policy("default-src 'none'; connect-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; font-src 'self'; style-src 'self'; img-src 'self'; frame-ancestors 'none'; $media");
+		$c->res->headers->content_security_policy("default-src 'none'; connect-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; font-src 'self'; style-src 'self'; img-src 'self' data:; frame-ancestors 'none'; $media");
 	});
 
 	$self->helper(dbh => sub {
@@ -164,7 +166,11 @@ sub startup {
 			if(exists($ENV{GIT_DESCRIBE})) {
 				$rv = $ENV{GIT_DESCRIBE};
 			} else {
-				$rv = $SReview::VERSION;
+				if(exists($ENV{OPENSHIFT_BUILD_COMMIT})) {
+					$rv = $SReview::VERSION . ", built from commit " . $ENV{OPENSHIFT_BUILD_COMMIT};
+				} else {
+					$rv = $SReview::VERSION;
+				}
 			}
 		}
 		chomp $rv;
@@ -206,6 +212,9 @@ sub startup {
 		if($c->session->{volunteer}) {
 			return $c->redirect_to('/volunteer/list');
 		} else {
+			my $apikey = random_string();
+			$c->cookie(sreview_api_key => $apikey);
+			$c->session->{apikey} = $apikey;
 			return $c->redirect_to('/admin');
 		}
 	});
@@ -232,7 +241,7 @@ sub startup {
 		$conference->{title} = $config->get("event");
 		my $row = $st->fetchrow_hashref();
 		$conference->{date} = [ $row->{min}, $row->{max} ];
-		$conference->{video_formats} = [];
+		$conference->{video_formats} = {};
 		$st = $c->dbh->prepare("SELECT filename FROM raw_files JOIN talks ON raw_files.room = talks.room WHERE talks.event = ? LIMIT 1");
 		$st->execute($c->eventid);
 		if($st->rows < 1) {
@@ -240,22 +249,30 @@ sub startup {
 			return;
 		}
 		$row = $st->fetchrow_hashref;
-		my $vid = SReview::Video->new(url => $row->{filename});
+		my $collection = SReview::Files::Factory->create(input => $config->get("inputglob"), $config);
+		my $vid = Media::Convert::Asset->new(url => $collection->get_file(relname => $row->{filename})->filename);
 		foreach my $format(@{$config->get("output_profiles")}) {
 			my $nf;
 			$self->log->debug("profile $format");
-			my $prof = SReview::Video::ProfileFactory->create($format, $vid);
+			my $prof = Media::Convert::Asset::ProfileFactory->create($format, $vid, $self->srconfig->get('extra_profiles'));
 			if(!$have_default) {
 				$nf = "default";
 				$have_default = 1;
 			} else {
 				$nf = $format;
 			}
-			push @{$conference->{video_formats}}, { $nf => { vcodec => $prof->video_codec, acodec => $prof->audio_codec, resolution => $prof->video_size, bitrate => $prof->video_bitrate } };
+			my $hash = { vcodec => $prof->video_codec, acodec => $prof->audio_codec, resolution => $prof->video_size, bitrate => $prof->video_bitrate };
+			if(!defined($hash->{bitrate})) {
+				$hash->{bitrate} = "";
+			}
+			if($hash->{bitrate} =~ /\d+/) {
+				$hash->{bitrate} = $hash->{bitrate} . "k";
+			}
+			$conference->{video_formats}{$nf} = $hash;
 			$formats{$nf} = $prof;
 		}
 		$json{conference} = $conference;
-		$st = $c->dbh->prepare("SELECT title, subtitle, speakerlist(talks.id), description, starttime, starttime::date AS date, to_char(starttime, 'yyyy') AS year, endtime, rooms.name AS room, rooms.outputname AS room_output, upstreamid, events.name AS event, slug FROM talks JOIN rooms ON talks.room = rooms.id JOIN events ON talks.event = events.id WHERE state='done' AND event = ?");
+		$st = $c->dbh->prepare("SELECT talks.id AS talkid, title, subtitle, description, starttime, starttime::date AS date, to_char(starttime, 'yyyy') AS year, endtime, rooms.name AS room, rooms.outputname AS room_output, upstreamid, events.name AS event, slug FROM talks JOIN rooms ON talks.room = rooms.id JOIN events ON talks.event = events.id WHERE state='done' AND event = ?");
 		$st->execute($c->eventid);
 		if($st->rows < 1) {
 			$c->render(json => {});
@@ -267,7 +284,7 @@ sub startup {
 			my $video = {};
 			my $subtitle = defined($row->{subtitle}) ? " " . $row->{subtitle} : "";
 			$video->{title} = $row->{title} . $subtitle;
-			$video->{speakers} = [ $row->{speakerlist} ];
+			$video->{speakers} = SReview::Talk->new(talkid => $row->{talkid})->speakerlist;
 			$video->{description} = $row->{description};
 			$video->{start} = $row->{starttime};
 			$video->{end} = $row->{endtime};
@@ -366,6 +383,9 @@ sub startup {
 		my $c = shift;
 		delete $c->session->{id};
 		delete $c->session->{room};
+		# Note, doesn't seem to work in chromium:
+		# https://bugs.chromium.org/p/chromium/issues/detail?id=696204
+		$c->cookie(sreview_api_key => '', {expires => 0});
 		$c->redirect_to('/');
 	});
 

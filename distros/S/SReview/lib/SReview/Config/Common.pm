@@ -95,13 +95,14 @@ sub setup {
 	$config->define('output_profiles', 'An array of profiles, one for each encoding, to be used for output encodings', ['webm']);
 	$config->define('input_profile', 'The profile that is used for input videos.', undef);
 	$config->define('audio_multiplex_mode', 'The way in which the primary and backup audio are multiplexed in the input stream. One of \'stereo\' for the primary in the left channel of the first audio stream and the backup in the right channel, or \'astream\' for the primary in the first audio stream, and the backup in the second audio stream', 'stereo');
-	$config->define('normalizer', 'The implementation used to normalize audio. Currently only bs1770gain is supported', 'bs1770gain');
+	$config->define('normalizer', 'The implementation used to normalize audio. Can be one of: ffmpeg, bs1770gain, or none to disable normalization altogether.', 'ffmpeg');
 	$config->define('web_pid_file', 'The PID file for the webinterface, when running under hypnotoad.','/var/run/sreview/sreview-web.pid');
 	$config->define('autoreview_detect', 'The script to run when using sreview-autoreview', undef);
 
 	# Values for detection script
 	$config->define('inputglob', 'A filename pattern (glob) that tells SReview where to find new files', '/srv/sreview/incoming/*/*/*');
 	$config->define('parse_re', 'A regular expression to parse a filename into year, month, day, hour, minute, second, room, and stream', '.*\/(?<room>[^\/]+)(?<stream>(-[^\/-]+)?)\/(?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2})\/(?<hour>\d{2}):(?<minute>\d{2}):(?<second>\d{2})');
+	$config->define('file_timezone', 'The timezone that dates and times as parsed from filenames by parse_re are expected to be in. Can be any valid value for the "name" parameter to the DateTime::TimeZone constructor.', 'local');
 	$config->define('url_re', 'If set, used with parse_re in an s///g command to produce an input URL', undef);
 
 	# Values for dispatch script

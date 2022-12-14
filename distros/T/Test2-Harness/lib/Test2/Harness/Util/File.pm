@@ -2,7 +2,7 @@ package Test2::Harness::Util::File;
 use strict;
 use warnings;
 
-our $VERSION = '1.000138';
+our $VERSION = '1.000140';
 
 use IO::Handle;
 
@@ -43,6 +43,11 @@ sub read {
 
     eval { $out = $self->decode($out); 1 } or confess "$self->{+NAME}: $@";
     return $out;
+}
+
+sub rewrite {
+    my $self = shift;
+    return Test2::Harness::Util::write_file($self->{+NAME}, $self->encode(@_));
 }
 
 sub write {

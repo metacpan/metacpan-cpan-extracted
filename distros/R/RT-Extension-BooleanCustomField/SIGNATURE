@@ -1,0 +1,51 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.83.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA256 44b167be4a53e0af54a6f007c1a5dcf55f6a46d7fa4e314857dca07867ee07ee Changes
+SHA256 4bc6caae11cf25b72dbda59f78f5bc4f9a82f73e770ce3007d872b278b8f5ac1 LICENSE
+SHA256 a133ad120cdbc6c1d27aec6e8be2edb85cdca2faf830910229b898d2c789de3e MANIFEST
+SHA256 db22122dfa031eb31520a536a9ce020bd51c6155a0ceda09dfb049de3a445922 META.yml
+SHA256 c3baec0bdce99dbeb031787e9296ef6d754af80fd1cc1920c01174ab9a350430 Makefile.PL
+SHA256 9c49e4960f29b916240ffb4ec5b7d0ec5f01c0d867064b2308a61310b3fe7de5 README
+SHA256 bf610f8468418bc64c2cd4950cc2c501cdd924d9f1ae38de18e389c081c0fe07 README.md
+SHA256 759cdc88e8240e757eece18c6ab0c4b6ec8a61633352fb5f4cbb027c147527f4 html/Elements/EditCustomFieldBoolean
+SHA256 8528a8e03d5582d3a4b5c899802a73627d7293e1b10b03db5262dc72f79cf8e9 html/Elements/ShowCustomFieldBoolean
+SHA256 7fe8013fad8ecb0b9ef8bad3fd7287486c1c61c776f76beb7d9d24e06ee3ab44 inc/Module/AutoInstall.pm
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 1e48ae2cb24e1d16193d476e735579dfcd0eefb3685921ad4736390df75d939b inc/Module/Install/AutoInstall.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a97bf661b739643c3adee064addf7a85f22e25e1bbffc137974cd8754ffa5c66 inc/Module/Install/Include.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 492f566c84b3db9340895ef53f31f0d83310feb01f0362db28b9d579ef90e01a inc/Module/Install/RTx.pm
+SHA256 a7c5323f81fc052097b0470bd3e6e7e2de2ac9d90c59646948d89c4c7e46cfe6 inc/Module/Install/RTx/Runtime.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 9f50489182b83fb275494764918038d1f176067f32bd59bad7b912cc6d29cacb inc/Module/Install/Substitute.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 3164c32202bf4604ab1f90b926a81e15493b191e0bc2f90ae42d8358f18259d6 inc/YAML/Tiny.pm
+SHA256 0b5a5a4b63783f8ed63d196c1ffa2066102198588d86564878d3152b428e3906 lib/RT/Extension/BooleanCustomField.pm
+SHA256 550208d163c5d46087c3c423804a666f148235055079a2a86392932ac115bbd5 lib/RT/Extension/BooleanCustomField/Test.pm.in
+SHA256 913aac5384da70c970f50d46aa1b5ff3c99776aa990a54a0e6fa7696c2c9dff1 xt/00-load.t
+SHA256 95f9940994c5bf909c784fa33387491dd2c09c0e4b6f9ab739fe267ad88b2c4c xt/admin_cfs.t
+SHA256 1d50fa23b145ad31586e4b8c10f4e0fe0bb3edb89b1aad54819953ebe965d72a xt/article.t
+SHA256 6820cff702e7a4538e1dcfe5533a39369a2d83ebbb967bab2d224399441cfab8 xt/asset.t
+SHA256 1ddfb85b9ae1f2f68fe8ffc6038b5ae45c6f8ce2f3c48921be1a7a807298404f xt/group.t
+SHA256 76d3dc4623237311c847ee762b00c95c3eacd53a34dd41dcc6f0cdf87862acb9 xt/queue.t
+SHA256 fdb7b121de3187458b91d5e4445c508e37c62d0d3e79aaeae99a9383a59193b4 xt/ticket.t
+SHA256 295db05afb4cfccd59c8b59a1b9bced822c3e39f8c76947a58af68715e90fcc0 xt/user.t

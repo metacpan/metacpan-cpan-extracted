@@ -2,7 +2,7 @@ package SReview::Web::Controller::Talk;
 
 use Mojo::Base 'Mojolicious::Controller';
 use SReview::API::Helpers qw/db_query update_with_json add_with_json/;
-use Mojo::Util;
+use Mojo::Util 'slugify';
 use Mojo::JSON qw/encode_json decode_json/;
 use DateTime::Format::Pg;
 
@@ -18,6 +18,14 @@ sub format_talks {
 		}
 	}
 	return $talks;
+}
+
+sub fixup {
+	my $talk = shift;
+	if($talk->{flags}) {
+		$talk->{flags} = decode_json($talk->{flags});
+	}
+	return $talk;
 }
 
 sub listByEvent {
@@ -54,8 +62,11 @@ sub add {
 
 	my $talk = $c->req->json;
 	$talk->{event} = $event->[0];
+	if(!exists($talk->{slug})) {
+		$talk->{slug} = slugify($talk->{title});
+	}
 
-	return add_with_json($c, $talk, "talks", $c->openapi->spec('/components/schemas/Talk/properties'));
+	return add_with_json($c, $talk, "talks", $c->openapi->spec('/components/schemas/Talk/properties'), \&fixup);
 }
 
 sub update {
@@ -80,7 +91,7 @@ sub update {
 		$talk->{flags} = encode_json($talk->{flags});
 	}
 
-	return update_with_json($c, $talk, "talks", $c->openapi->spec('/components/schemas/Talk/properties'));
+	return update_with_json($c, $talk, "talks", $c->openapi->spec('/components/schemas/Talk/properties'), \&fixup);
 }
 
 sub delete {
@@ -231,12 +242,7 @@ sub getByNonce {
 		$c->render(text => "not found");
 		return;
 	}
-	foreach my $r(@$talk) {
-		$r->{starttime} = DateTime::Format::Pg->parse_datetime($r->{starttime})->iso8601();
-		$r->{endtime} = DateTime::Format::Pg->parse_datetime($r->{endtime})->iso8601();
-	}
-
-	$c->render(openapi => $talk->[0]);
+	$c->render(openapi => format_talks($talk)->[0]);
 }
 
 sub getCorrections {

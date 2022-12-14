@@ -393,6 +393,5 @@ tests/po/additional.xy.po
 tests/po/additional.xy_XY.po
 tests/po/existing.xy.po
 tests/po/existing.xy_XY.po
-SIGNATURE                               Checksums and signature
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

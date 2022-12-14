@@ -1,7 +1,7 @@
 ---
 abstract: 'Add a memo widget to tickets'
 author:
-  - 'Gérald Sédrati-Dinet <gibus@easter-eggs.com>'
+  - 'Gérald Sédrati <gibus@easter-eggs.com>'
 build_requires:
   ExtUtils::MakeMaker: 6.59
 configure_requires:
@@ -27,7 +27,7 @@ requires:
 resources:
   license: http://opensource.org/licenses/gpl-license.php
   repository: https://github.com/gibus/RT-Extension-Memo
-version: '0.06'
-x_module_install_rtx_version: '0.39'
+version: '0.08'
+x_module_install_rtx_version: '0.43'
 x_requires_rt: 4.2.0
-x_rt_too_new: 4.6.0
+x_rt_too_new: 5.1.0

@@ -1,3 +1,14 @@
+0.04 2022-12-14T14:46:33+01:00
+ - Add LICENSE file.
+ - Fix err_print() to ANSI output.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SYNOPSIS section in doc.
+ - Move bugtracker to github.
+ - Update and fix copyright years.
+ - Update author github name.
+ - Update author name.
+ - Update Module::Install to 1.19 version.
+
 0.03 2017-04-02T19:38:25+02:00
  - Fix #120864 - Makefile.PL fails with no '.' in @INC.
 

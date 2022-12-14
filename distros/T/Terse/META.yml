@@ -28,5 +28,5 @@ requires:
   Time::HiRes: '0'
   Want: '0'
   perl: '5.006'
-version: '0.120'
+version: '0.121'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -87,7 +87,7 @@
    "provides" : {
       "App::CSVUtils" : {
          "file" : "lib/App/CSVUtils.pm",
-         "version" : "0.053"
+         "version" : "0.054"
       }
    },
    "release_status" : "stable",
@@ -102,7 +102,7 @@
          "web" : "https://github.com/perlancar/perl-App-CSVUtils"
       }
    },
-   "version" : "0.053",
+   "version" : "0.054",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

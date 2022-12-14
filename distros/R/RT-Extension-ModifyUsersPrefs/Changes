@@ -1,4 +1,7 @@
 Revision history for RT-Extension-ModifyUsersPrefs
 
+0.02  2022-12-14
+ - Upgrade to RT 5
+
 0.01 2017-10-17
  - Initial commit

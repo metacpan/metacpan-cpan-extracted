@@ -4,13 +4,13 @@ use warnings;
 no warnings qw(redefine);
 package RT::Extension::GroupSummary;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 =encoding utf8
 
 =head1 NAME
 
-RT-Extension-GroupSummary - Display a summary of a group
+RT::Extension::GroupSummary - Display a summary of a group
 
 =head1 DESCRIPTION
 
@@ -48,7 +48,7 @@ Works with RT 4.2 or greater
 
 May need root permissions
 
-=item Edit your F</opt/rt4/etc/RT_SiteConfig.pm>
+=item Edit your F</opt/rt5/etc/RT_SiteConfig.pm>
 
 If you are using RT 4.2 or greater, add this line:
 
@@ -62,7 +62,7 @@ or add C<RT::Extension::GroupSummary> to your existing C<@Plugins> line.
 
 =item Clear your mason cache
 
-    rm -rf /opt/rt4/var/mason_data/obj
+    rm -rf /opt/rt5/var/mason_data/obj
 
 =item Restart your webserver
 
@@ -72,7 +72,7 @@ or add C<RT::Extension::GroupSummary> to your existing C<@Plugins> line.
 
 =head1 AUTHOR
 
-Gérald Sédrati-Dinet E<lt>gibus@easter-eggs.comE<gt>
+Gérald Sédrati E<lt>gibus@easter-eggs.comE<gt>
 
 =head1 REPOSITORY
 
@@ -90,7 +90,7 @@ L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-Grou
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2017 by Gérald Sédrati-Dinet, Easter-Eggs
+This software is Copyright (c) 2017-2022 by Gérald Sédrati, Easter-Eggs
 
 This is free software, licensed under:
 

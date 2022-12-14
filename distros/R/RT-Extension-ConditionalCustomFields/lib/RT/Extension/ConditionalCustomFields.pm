@@ -4,7 +4,7 @@ use warnings;
 no warnings qw(redefine);
 package RT::Extension::ConditionalCustomFields;
 
-our $VERSION = '1.06';
+our $VERSION = '1.08';
 
 =encoding utf8
 
@@ -491,7 +491,7 @@ It should be noted that with version 0.99, the number of cases to test has expon
 
 =head1 AUTHOR
 
-Gérald Sédrati-Dinet E<lt>gibus@easter-eggs.comE<gt>
+Gérald Sédrati E<lt>gibus@easter-eggs.comE<gt>
 
 =head1 REPOSITORY
 
@@ -509,7 +509,7 @@ L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-Cond
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2017-2019 by Gérald Sédrati-Dinet, Easter-Eggs
+This software is Copyright (c) 2017-2022 by Gérald Sédrati, Easter-Eggs
 
 This is free software, licensed under:
 

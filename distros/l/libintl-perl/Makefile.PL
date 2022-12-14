@@ -234,7 +234,6 @@ WriteMakefile (
     PL_FILES                => {},
     DIR		            => [$build_gettext_xs ? ('gettext_xs') : ()],
     clean		    => { FILES => 'xs_disabled build_xs' },
-    (MM->can ('signature_target') ? (SIGN => 1) : ()),
     # If you want to build the XS version although the automatic detection
     # suggests not to build it, uncomment the following line.
     #DIR => [ ('gettext_xs') ],

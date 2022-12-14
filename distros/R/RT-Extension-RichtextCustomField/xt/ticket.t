@@ -27,6 +27,7 @@ $m->submit_form(
         Subject => 'test_ticket',
         "Object-RT::Ticket--CustomField-$cf_id-Value" => '<strong>rich</strong>',
     },
+    button => 'SubmitTicket',
 );
 $m->content_contains("Ticket created", 'Ticket created');
 $m->content_contains("<strong>rich</strong>", 'CF Richtext displayed in HTML');

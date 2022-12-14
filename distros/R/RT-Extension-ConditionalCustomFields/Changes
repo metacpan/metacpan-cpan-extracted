@@ -1,5 +1,24 @@
 Revision history for RT-Extension-ConditionalCustomFields
 
+1.07 2022-12-14
+ - Update author's name
+
+1.06 2022-12-12
+ - Update selector to hide/show queues/article according to RT5 upgrades
+ - Update computing selector to Combobox/Date/DateTime according to RT5 upgrades
+ - Fix test that cascaded List child CF is hidden when parent conditioned is changed to failed
+ - Fix event listeners for cascaded List child CF which shoul be on HTML container not on radio buttons
+ - Avoid JS error raised by bootstrap when triggering show on radio button
+ - Show bootstrap collapse box when CF is shown
+ - Increase LWP timeout and add some sleeps to please phantomjs
+ - Skip some tests since phantomjs randomly messes up with bootstrap
+ - Add call to RT->Config->PostLoadCheck when changing CustomFieldGroupings to comply with update to 5.0.3
+ - Fix jQuery selector
+ - Update test to take into account builtin attributes according to RT version
+ - Add patch for RT 5.0
+ - Upgrade to RT 5.0.3
+ - Update parsing of CustomFieldGroupings config option to comply with update to 5.0.3
+
 1.05 2022-12-08
  - Add a second ticket in tests so ticket id is distinct from queue id
  - Fix checking whether condition cf is applied to current object

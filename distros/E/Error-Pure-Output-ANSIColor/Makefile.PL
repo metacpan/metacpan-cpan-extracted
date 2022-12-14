@@ -6,7 +6,7 @@ use inc::Module::Install;
 
 # Definition.
 abstract 'Output Term::ANSIColor subroutines for Error::Pure.';
-author 'Michal Spacek <skim@cpan.org>';
+author 'Michal Josef Spacek <skim@cpan.org>';
 author_requires 'Cwd' => 0;
 author_requires 'English' => 0;
 author_requires 'File::Spec::Functions' => 0;
@@ -21,14 +21,13 @@ requires 'Exporter' => 0;
 requires 'Readonly' => 0;
 requires 'Term::ANSIColor' => 0;
 requires 'perl' => '5.6.2';
-resources 'bugtracker' => 'https://rt.cpan.org/Public/Dist/Display.html'.
-	'?Name=Error-Pure-Output-ANSIColor';
-resources 'homepage' => 'https://github.com/tupinek/Error-Pure-Output-ANSIColor';
-resources 'repository' => 'git://github.com/tupinek/Error-Pure-Output-ANSIColor';
+resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Error-Pure-Output-ANSIColor/issues';
+resources 'homepage' => 'https://github.com/michal-josef-spacek/Error-Pure-Output-ANSIColor';
+resources 'repository' => 'git://github.com/michal-josef-spacek/Error-Pure-Output-ANSIColor';
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.03';
+version '0.04';
 
 # Run.
 WriteAll();

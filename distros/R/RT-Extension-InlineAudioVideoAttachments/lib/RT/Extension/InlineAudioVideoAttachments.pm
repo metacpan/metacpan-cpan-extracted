@@ -4,7 +4,7 @@ use warnings;
 no warnings qw(redefine);
 package RT::Extension::InlineAudioVideoAttachments;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 =encoding utf8
 
@@ -56,7 +56,7 @@ or add C<RT::Extension::InlineAudioVideoAttachments> to your existing C<@Plugins
 
 =head1 AUTHOR
 
-Gérald Sédrati-Dinet E<lt>gibus@easter-eggs.comE<gt>
+Gérald Sédrati E<lt>gibus@easter-eggs.comE<gt>
 
 =head1 REPOSITORY
 
@@ -74,7 +74,7 @@ L<rt.cpan.org|http://rt.cpan.org/Public/Dist/Display.html?Name=RT-Extension-Inli
 
 =head1 LICENSE AND COPYRIGHT
 
-This software is Copyright (c) 2018 by Gérald Sédrati-Dinet, Easter-Eggs
+This software is Copyright (c) 2018-2022 by Gérald Sédrati, Easter-Eggs
 
 This is free software, licensed under:
 

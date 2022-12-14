@@ -1,5 +1,10 @@
 Revision history for Perl extension App-ansicolumn
 
+1.26 2022-12-14T10:58:20Z
+
+    - introduce --run option to set runin/runout at once
+    - do not expand tabs with -t option
+
 1.25 2022-10-18T03:26:34Z
 
     - add --border-style=random

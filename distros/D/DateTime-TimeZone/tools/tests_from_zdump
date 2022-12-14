@@ -111,6 +111,9 @@ sub make_test_file {
 
         # This seems to happen on 64-bit systems.
         next if $line =~ /= NULL$/;
+        next if $line =~ /(?:gmtime|localtime) failed/;
+        next if $line =~ /-2147481748/;
+        next if $line =~ /2147485547/;
 
         my (
             $utc_mon_name, $utc_day, $utc_hour, $utc_min, $utc_sec, $utc_year,

@@ -1,7 +1,7 @@
 ---
 abstract: 'CF with wysiwyg editor'
 author:
-  - 'Gérald Sédrati-Dinet <gibus@easter-eggs.com>'
+  - 'Gérald Sédrati <gibus@easter-eggs.com>'
 build_requires:
   ExtUtils::MakeMaker: 6.59
 configure_requires:
@@ -24,7 +24,7 @@ requires:
 resources:
   license: http://opensource.org/licenses/gpl-license.php
   repository: https://github.com/gibus/RT-Extension-RichtextCustomField
-version: '0.05'
-x_module_install_rtx_version: '0.40'
+version: '0.07'
+x_module_install_rtx_version: '0.43'
 x_requires_rt: 4.0.0
-x_rt_too_new: 4.6.0
+x_rt_too_new: 5.0.3

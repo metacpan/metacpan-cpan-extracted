@@ -1,3 +1,19 @@
+0.29 2022-12-14T15:59:13+01:00
+ - Add link to Error::Pure to doc.
+ - Change minimal dependency (0.04) to Error::Pure::Output::ANSIColor to
+   fix ansi colors in Print.
+ - Fix EXAMPLEs in Die doc.
+ - Fix minimal dependency for List::Util.
+ - Improve SYNOPSIS section by common usage with Error::Pure.
+ - Remove print to stdout from AllError example.
+ - Rewrite example files to better names.
+
+0.28 2022-12-14T08:39:59+01:00
+ - Fix links in doc.
+ - Improve SYNOPSIS section in doc.
+ - Move from List::MoreUtils to List::Util.
+ - Rewrite SUBROUTINES section in doc to use =head2.
+
 0.27 2022-12-11T18:02:01+01:00
  - Improve LICENSE AND COPYRIGHT section in doc.
  - Move bugtracker to github.

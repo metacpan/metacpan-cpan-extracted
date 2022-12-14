@@ -6,17 +6,19 @@
 use 5.010001;
 use strict;
 use warnings;
+use Log::ger;
 
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-12-09'; # DATE
+our $DATE = '2022-12-14'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '0.053'; # VERSION
+our $VERSION = '0.054'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/CSVUtils/csv_transpose",
     program_name => "csv-transpose",
+    log => 1,
     read_config => 0,
     read_env => 0,
     use_utf8 => 1,
@@ -39,7 +41,7 @@ csv-transpose - Transpose a CSV
 
 =head1 VERSION
 
-This document describes version 0.053 of csv-transpose (from Perl distribution App-CSVUtils), released on 2022-12-09.
+This document describes version 0.054 of csv-transpose (from Perl distribution App-CSVUtils), released on 2022-12-14.
 
 =head1 SYNOPSIS
 
@@ -47,7 +49,7 @@ B<csv-transpose> B<L<--help|/"--help, -h, -?">> (or B<L<-h|/"--help, -h, -?">>, 
 
 B<csv-transpose> B<L<--version|/"--version, -v">> (or B<L<-v|/"--version, -v">>)
 
-B<csv-transpose> [B<L<--escape-char|/"--escape-char=s">>=I<str>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--header|/"--no-header, --input-header">>|B<L<--input-header|/"--no-header, --input-header">>|B<L<--no-header|/"--no-header, --input-header">>|B<L<--noheader|/"--no-header, --input-header">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--output-escape-char|/"--output-escape-char=s">>=I<str>] [B<L<--output-header|/"--output-header">>|B<L<--no-output-header|/"--output-header">>|B<L<--nooutput-header|/"--output-header">>] [B<L<--output-quote-char|/"--output-quote-char=s">>=I<str>] [B<L<--output-sep-char|/"--output-sep-char=s">>=I<str>] [B<L<--output-tsv|/"--output-tsv">>|B<L<--no-output-tsv|/"--output-tsv">>|B<L<--nooutput-tsv|/"--output-tsv">>] [B<L<--overwrite|/"--overwrite, -O">>|B<L<-O|/"--overwrite, -O">>|B<L<--no-overwrite|/"--overwrite, -O">>|B<L<--nooverwrite|/"--overwrite, -O">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--quote-char|/"--quote-char=s">>=I<str>] [B<L<--sep-char|/"--sep-char=s">>=I<str>] [B<L<--tsv|/"--tsv, --input-tsv">>|B<L<--input-tsv|/"--tsv, --input-tsv">>|B<L<--no-tsv|/"--tsv, --input-tsv">>|B<L<--notsv|/"--tsv, --input-tsv">>] -- E<lt>I<L<filename|/"--filename=s*">>E<gt> [I<L<output_filename|/"--output-filename=s, -o">>]
+B<csv-transpose> [B<L<--debug|/"--debug">>|B<L<--log-level|/"--log-level=s">>=I<level>|B<L<--quiet|/"--quiet">>|B<L<--trace|/"--trace">>|B<L<--verbose|/"--verbose">>] [B<L<--escape-char|/"--escape-char=s">>=I<str>] [B<L<--format|/"--format=s">>=I<name>|B<L<--json|/"--json">>] [B<L<--header|/"--no-header, --input-header">>|B<L<--input-header|/"--no-header, --input-header">>|B<L<--no-header|/"--no-header, --input-header">>|B<L<--noheader|/"--no-header, --input-header">>] [B<L<--(no)naked-res|/"--naked-res">>] [B<L<--output-escape-char|/"--output-escape-char=s">>=I<str>] [B<L<--output-header|/"--output-header">>|B<L<--no-output-header|/"--output-header">>|B<L<--nooutput-header|/"--output-header">>] [B<L<--output-quote-char|/"--output-quote-char=s">>=I<str>] [B<L<--output-sep-char|/"--output-sep-char=s">>=I<str>] [B<L<--output-tsv|/"--output-tsv">>|B<L<--no-output-tsv|/"--output-tsv">>|B<L<--nooutput-tsv|/"--output-tsv">>] [B<L<--overwrite|/"--overwrite, -O">>|B<L<-O|/"--overwrite, -O">>|B<L<--no-overwrite|/"--overwrite, -O">>|B<L<--nooverwrite|/"--overwrite, -O">>] [B<L<--page-result|/"--page-result">>[=I<program>]|B<L<--view-result|/"--view-result">>[=I<program>]] [B<L<--quote-char|/"--quote-char=s">>=I<str>] [B<L<--sep-char|/"--sep-char=s">>=I<str>] [B<L<--tsv|/"--tsv, --input-tsv">>|B<L<--input-tsv|/"--tsv, --input-tsv">>|B<L<--no-tsv|/"--tsv, --input-tsv">>|B<L<--notsv|/"--tsv, --input-tsv">>] -- E<lt>I<L<filename|/"--filename=s*">>E<gt> [I<L<output_filename|/"--output-filename=s, -o">>]
 
 =head1 DESCRIPTION
 
@@ -109,6 +111,43 @@ Inform that input file is in TSV (tab-separated) format instead of CSV.
 Overriden by C<--sep-char>, C<--quote-char>, C<--escape-char> options. If one of
 those options is specified, then C<--tsv> will be ignored.
 
+
+=back
+
+=head2 Logging options
+
+=over
+
+=item B<--debug>
+
+Shortcut for --log-level=debug.
+
+=item B<--log-level>=I<s>
+
+Set log level.
+
+By default, these log levels are available (in order of increasing level of
+importance, from least important to most): C<trace>, C<debug>, C<info>,
+C<warn>/C<warning>, C<error>, C<fatal>. By default, the level is usually set to
+C<warn>, which means that log statements with level C<info> and less important
+levels will not be shown. To increase verbosity, choose C<info>, C<debug>, or
+C<trace>.
+
+For more details on log level and logging, as well as how new logging levels can
+be defined or existing ones modified, see L<Log::ger>.
+
+
+=item B<--quiet>
+
+Shortcut for --log-level=error.
+
+=item B<--trace>
+
+Shortcut for --log-level=trace.
+
+=item B<--verbose>
+
+Shortcut for --log-level=info.
 
 =back
 

@@ -6,9 +6,9 @@ use warnings;
 use Exporter qw(import);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-11-22'; # DATE
+our $DATE = '2022-11-23'; # DATE
 our $DIST = 'App-SubtitleUtils'; # DIST
-our $VERSION = '0.011'; # VERSION
+our $VERSION = '0.012'; # VERSION
 
 our @EXPORT_OK = qw(
                        srtparse
@@ -281,7 +281,7 @@ sub srtcombinetext {
 
 $SPEC{srtcombine2text} = {
     v => 1.1,
-    summary => 'Combine the text of two or more subtitle files (e.g. for different languages) into one',
+    summary => 'Combine the text of two subtitle files (e.g. for different languages) into one',
     description => <<'_',
 
 This is a thin wrapper for <prog:srtcombinetext>, for convenience. This:
@@ -311,7 +311,7 @@ _
     },
     examples => [
         {
-            summary => 'Display English and French subtitles together (2)',
+            summary => 'Display English and French subtitles together',
             src_plang => 'bash',
             src => q|[[prog]] azur-et-asmar.en.srt azur-et-asmar.fr.srt|,
             test => 0,
@@ -345,7 +345,7 @@ App::SubtitleUtils - Utilities related to video subtitles
 
 =head1 VERSION
 
-This document describes version 0.011 of App::SubtitleUtils (from Perl distribution App-SubtitleUtils), released on 2022-11-22.
+This document describes version 0.012 of App::SubtitleUtils (from Perl distribution App-SubtitleUtils), released on 2022-11-23.
 
 =head1 DESCRIPTION
 
@@ -424,7 +424,7 @@ Usage:
 
  srtcombine2text(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-Combine the text of two or more subtitle files (e.g. for different languages) into one.
+Combine the text of two subtitle files (e.g. for different languages) into one.
 
 This is a thin wrapper for L<srtcombinetext>, for convenience. This:
 

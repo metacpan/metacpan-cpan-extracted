@@ -1,5 +1,8 @@
 Revision history for YAML-yq-Helper
 
+0.1.1	 2022-12-13/15:10
+		 -Fix some array bits so it will nicely handle arrays in the /[.*]/ like format.
+
 0.1.0	 2022-10-26/00:30
 		 -Fix #! bits.
 		 -Add set_in_array, push_array, and dedup_array.

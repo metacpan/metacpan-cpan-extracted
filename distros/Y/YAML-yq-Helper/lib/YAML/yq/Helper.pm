@@ -12,11 +12,11 @@ YAML::yq::Helper - Wrapper for yq for various common tasks so YAML files can be 
 
 =head1 VERSION
 
-Version 0.1.0
+Version 0.1.1
 
 =cut
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.1.1';
 
 =head1 SYNOPSIS
 
@@ -284,7 +284,8 @@ sub dedup_array {
 		$yaml = [];
 	}
 	else {
-		eval { $yaml = Load($string); };
+		eval        { $yaml   = Load($string); }
+			|| eval { $string = 'foo: ' . $string; $yaml = Load($string); $yaml = $yaml->{foo} };
 	}
 
 	my $int      = 0;
@@ -485,7 +486,12 @@ sub is_array {
 	my $yaml;
 	eval { $yaml = Load($string); };
 	if ($@) {
-		die($@);
+		$string = 'foo: ' . $string;
+		$yaml   = Load($string) || die( $string . "\n\n" . $@ );
+		if ( ref( $yaml->{foo} ) eq 'ARRAY' ) {
+			return 1;
+		}
+		return 0;
 	}
 
 	if ( ref($yaml) eq 'ARRAY' ) {
@@ -692,7 +698,7 @@ sub push_array {
 
 	my $string;
 	if ( !$self->is_array( var => $opts{var} ) ) {
-			die( '"' . $opts{var} . '" is not a array or is undef' );
+		die( '"' . $opts{var} . '" is not a array or is undef' );
 	}
 
 	$string = `yq "$opts{var}" $self->{qfile} 2> /dev/null`;
@@ -702,7 +708,8 @@ sub push_array {
 		$yaml = [];
 	}
 	else {
-		eval { $yaml = Load($string); };
+		eval        { $yaml   = Load($string); }
+			|| eval { $string = 'foo: ' . $string; $yaml = Load($string); $yaml = $yaml->{foo} };
 	}
 
 	my @new_array;

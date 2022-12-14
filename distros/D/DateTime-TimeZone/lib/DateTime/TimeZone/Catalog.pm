@@ -11,7 +11,7 @@ use strict;
 use warnings;
 use namespace::autoclean;
 
-our $VERSION = '2.56';
+our $VERSION = '2.57';
 
 our @ALL =
 qw(
@@ -65,6 +65,7 @@ qw(
   America/Cayenne
   America/Chicago
   America/Chihuahua
+  America/Ciudad_Juarez
   America/Costa_Rica
   America/Cuiaba
   America/Danmarkshavn
@@ -126,7 +127,6 @@ qw(
   America/Nuuk
   America/Ojinaga
   America/Panama
-  America/Pangnirtung
   America/Paramaribo
   America/Phoenix
   America/Port-au-Prince
@@ -409,6 +409,7 @@ Caracas
 Cayenne
 Chicago
 Chihuahua
+Ciudad_Juarez
 Costa_Rica
 Cuiaba
 Danmarkshavn
@@ -470,7 +471,6 @@ North_Dakota/New_Salem
 Nuuk
 Ojinaga
 Panama
-Pangnirtung
 Paramaribo
 Phoenix
 Port-au-Prince
@@ -854,7 +854,6 @@ America/Goose_Bay
 America/Blanc-Sablon
 America/Toronto
 America/Iqaluit
-America/Pangnirtung
 America/Atikokan
 America/Winnipeg
 America/Resolute
@@ -1257,12 +1256,13 @@ America/Cancun
 America/Merida
 America/Monterrey
 America/Matamoros
-America/Mazatlan
 America/Chihuahua
+America/Ciudad_Juarez
 America/Ojinaga
+America/Mazatlan
+America/Bahia_Banderas
 America/Hermosillo
 America/Tijuana
-America/Bahia_Banderas
 ) ],
   'my' => [ qw(
 Asia/Kuala_Lumpur
@@ -1680,6 +1680,7 @@ our %LINKS =
   'America/Montserrat' => 'America/Puerto_Rico',
   'America/Nassau' => 'America/Toronto',
   'America/Nipigon' => 'America/Toronto',
+  'America/Pangnirtung' => 'America/Iqaluit',
   'America/Port_of_Spain' => 'America/Puerto_Rico',
   'America/Porto_Acre' => 'America/Rio_Branco',
   'America/Rainy_River' => 'America/Winnipeg',
@@ -1863,7 +1864,7 @@ our %LINKS =
 
 ;
 
-sub OlsonVersion { '2022f' }
+sub OlsonVersion { '2022g' }
 
 
 1;
@@ -1963,6 +1964,7 @@ so that applications can easily present a list of timezones.
   America/Cancun
   America/Chicago
   America/Chihuahua
+  America/Ciudad_Juarez
   America/Costa_Rica
   America/Dawson
   America/Dawson_Creek
@@ -2011,7 +2013,6 @@ so that applications can easily present a list of timezones.
   America/North_Dakota/New_Salem
   America/Ojinaga
   America/Panama
-  America/Pangnirtung
   America/Phoenix
   America/Port-au-Prince
   America/Puerto_Rico
@@ -2437,8 +2438,7 @@ so that applications can easily present a list of timezones.
   America/Goose_Bay - Atlantic - Labrador (most areas)
   America/Blanc-Sablon - AST - QC (Lower North Shore)
   America/Toronto - Eastern - ON, QC (most areas)
-  America/Iqaluit - Eastern - NU (most east areas)
-  America/Pangnirtung - Eastern - NU (Pangnirtung)
+  America/Iqaluit - Eastern - NU (most areas)
   America/Atikokan - EST - ON (Atikokan); NU (Coral H)
   America/Winnipeg - Central - ON (west); Manitoba
   America/Resolute - Central - NU (Resolute)
@@ -2887,17 +2887,18 @@ so that applications can easily present a list of timezones.
 
 =head3 Mexico (MX)
 
-  America/Mexico_City - Central Time
-  America/Cancun - Eastern Standard Time - Quintana Roo
-  America/Merida - Central Time - Campeche, Yucatan
-  America/Monterrey - Central Time - Durango; Coahuila, Nuevo Leon, Tamaulipas (most areas)
-  America/Matamoros - Central Time US - Coahuila, Nuevo Leon, Tamaulipas (US border)
-  America/Mazatlan - Mountain Time - Baja California Sur, Nayarit, Sinaloa
-  America/Chihuahua - Mountain Time - Chihuahua (most areas)
-  America/Ojinaga - Mountain Time US - Chihuahua (US border)
-  America/Hermosillo - Mountain Standard Time - Sonora
-  America/Tijuana - Pacific Time US - Baja California
-  America/Bahia_Banderas - Central Time - Bahia de Banderas
+  America/Mexico_City - Central Mexico
+  America/Cancun - Quintana Roo
+  America/Merida - Campeche, Yucatan
+  America/Monterrey - Durango; Coahuila, Nuevo Leon, Tamaulipas (most areas)
+  America/Matamoros - Coahuila, Nuevo Leon, Tamaulipas (US border)
+  America/Chihuahua - Chihuahua (most areas)
+  America/Ciudad_Juarez - Chihuahua (US border - west)
+  America/Ojinaga - Chihuahua (US border - east)
+  America/Mazatlan - Baja California Sur, Nayarit (most areas), Sinaloa
+  America/Bahia_Banderas - Bahia de Banderas
+  America/Hermosillo - Sonora
+  America/Tijuana - Baja California
 
 =head3 Micronesia (Federated States of) (FM)
 
@@ -3458,6 +3459,7 @@ A linked zone is an alias from one name to another.
   America/Montserrat => America/Puerto_Rico
   America/Nassau => America/Toronto
   America/Nipigon => America/Toronto
+  America/Pangnirtung => America/Iqaluit
   America/Port_of_Spain => America/Puerto_Rico
   America/Porto_Acre => America/Rio_Branco
   America/Rainy_River => America/Winnipeg

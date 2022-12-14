@@ -118,6 +118,7 @@ Chihuahua
 Chisinau
 Chita
 Choibalsan
+Ciudad_Juarez
 Colombo
 Cordoba
 Costa
@@ -367,7 +368,6 @@ Pago_Pago
 Palau
 Palmer
 Panama
-Pangnirtung
 Paprocki
 Papua
 Paramaribo

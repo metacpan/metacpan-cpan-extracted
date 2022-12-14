@@ -1,0 +1,59 @@
+use alienfile;
+
+# If the probe fails to find an already installed libevent, the
+# "share" block contains instructions for downloading and
+# installing it.
+
+plugin 'Probe::CBuilder' => (
+  libs   => '-lboost_program_options',
+);
+
+# Test lib AND header inclusion
+#use ExtUtils::CppGuess;
+#use Devel::CheckLib;
+
+#my $guess = ExtUtils::CppGuess->new;
+#my %mb_opts = $guess->module_build_options;  # even though not using Module::Build
+
+#check_lib_or_exit(
+#    lib => 'boost_program_options',
+#    header => 'boost/program_options.hpp',
+#    ccflags => $mb_opts{extra_compiler_flags},
+#    ldflags  => $mb_opts{extra_linker_flags}
+#);
+
+share {
+
+  start_url 'https://www.boost.org/users/download/';
+  plugin 'Download' => (
+    filter => qr/^boost_[0-9_]*\.tar\.gz$/,
+    version => qr/([0-9_]+)/,
+  );
+
+  plugin 'Extract';
+
+  build [
+    './bootstrap.sh --prefix=%{.install.prefix} --with-libraries=program_options',
+    './b2 install link=static cxxflags=-fPIC',
+  ];
+
+  gather sub {
+    my($build) =@_;
+    my $prefix = $build->runtime_prop->{prefix};
+    $build->runtime_prop->{cflags}        = "-I$prefix/include";
+    $build->runtime_prop->{cflags_static} = "-I$prefix/include";
+    $build->runtime_prop->{libs}          = "-L$prefix/lib -lboost_program_options";
+    $build->runtime_prop->{libs_static}   = "-L$prefix/lib -lboost_program_options";
+  };
+  
+};
+
+sys {
+
+  gather sub {
+    my($build) =@_;
+    $build->runtime_prop->{libs}          = "-lboost_program_options";
+    $build->runtime_prop->{libs_static}   = "-lboost_program_options";
+  };
+};
+

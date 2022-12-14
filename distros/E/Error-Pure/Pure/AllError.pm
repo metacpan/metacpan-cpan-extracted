@@ -6,14 +6,14 @@ use warnings;
 
 use Error::Pure::Utils qw(err_helper);
 use Error::Pure::Output::Text qw(err_bt_pretty);
-use List::MoreUtils qw(none);
+use List::Util qw(none);
 use Readonly;
 
 # Constants.
 Readonly::Array our @EXPORT_OK => qw(err);
 Readonly::Scalar my $EVAL => 'eval {...}';
 
-our $VERSION = 0.28;
+our $VERSION = 0.29;
 
 # Process error.
 sub err {
@@ -88,7 +88,7 @@ Process error with message(s). There is key => value list after first message.
 L<Error::Pure::Utils>,
 L<Error::Pure::Output::Text>,
 L<Exporter>,
-L<List::MoreUtils>,
+L<List::Util>,
 L<Readonly>.
 
 =head1 SEE ALSO
@@ -119,6 +119,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.28
+0.29
 
 =cut

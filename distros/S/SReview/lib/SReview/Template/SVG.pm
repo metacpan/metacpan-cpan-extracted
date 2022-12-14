@@ -133,8 +133,9 @@ sub process_template($$$$) {
 	print "creating $output from $input\n";
 	print $fh $template_engine->string($content);
 	close $fh;
-	my $inkscape_options = "--batch-process -o $output";
-	if($config->get("command_tune")->{inkscape} eq "0.9") {
+	my $inkscape_options = "-o $output";
+	$command_tune = $config->get('command_tune');
+	if(exists($command_tune->{inkscape}) && $command_tune->{inkscape} eq "0.9") {
 		$inkscape_options = "--export-png=$output";
 	}
 	system("inkscape $inkscape_options $outputsvg");

@@ -2,7 +2,7 @@ package Test2::Harness::Runner;
 use strict;
 use warnings;
 
-our $VERSION = '1.000138';
+our $VERSION = '1.000140';
 
 use File::Spec();
 
@@ -471,8 +471,6 @@ sub run_job {
     my $json_data = $job->TO_JSON();
     $json_data->{stamp} = $spawn_time;
     $run->jobs->write($json_data);
-
-    
 
     return $pid;
 }

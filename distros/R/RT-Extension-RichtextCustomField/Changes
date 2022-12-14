@@ -1,5 +1,12 @@
 Revision history for RT-Extension-RichtextCustomField
 
+0.07  2022-12-14
+ - Update author's name
+
+0.06 2022-12-13
+ - Upgrade to RT 5.0.2
+ - From RT 5.0.3 this plugin is useless, use CORE RT HTML CF Type
+
 0.05 2019-05-17
  - Add patch to RT to allow Richtext CFs as recipient when extracting
    from a ticket into an article

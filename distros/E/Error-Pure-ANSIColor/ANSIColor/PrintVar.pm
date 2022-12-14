@@ -6,7 +6,7 @@ use warnings;
 
 use Error::Pure::Output::ANSIColor qw(err_print_var);
 use Error::Pure::Utils qw(err_helper);
-use List::MoreUtils qw(none);
+use List::Util qw(none);
 use Readonly;
 
 # Constants.
@@ -14,7 +14,7 @@ Readonly::Array our @EXPORT_OK => qw(err);
 Readonly::Scalar my $EMPTY_STR => q{};
 Readonly::Scalar my $EVAL => 'eval {...}';
 
-our $VERSION = 0.27;
+our $VERSION = 0.29;
 
 # Process error.
 sub err {
@@ -54,19 +54,28 @@ Error::Pure::ANSIColor::PrintVar - Error::Pure module for simple error print wit
 =head1 SYNOPSIS
 
  use Error::Pure::ANSIColor::PrintVar qw(err);
+
  err 'This is a fatal error', 'name', 'value';
+
+ # __or__
+
+ use Error::Pure qw(err);
+
+ $ENV{'ERROR_PURE_TYPE'} = 'ANSIColor::PrintVar';
+
+ err "This is a fatal error.", "name", "value";
 
 =head1 SUBROUTINES
 
-=over 8
+=head2 C<err>
 
-=item C<err(@messages)>
+ err 'This is a fatal error', 'name', 'value';
 
- Process error with messages @messages.
-
-=back
+Process error with messages (error, error_key/value pairs).
 
 =head1 EXAMPLE1
+
+=for comment filename=err_via_ansicolor_print_var.pl
 
  use strict;
  use warnings;
@@ -81,6 +90,8 @@ Error::Pure::ANSIColor::PrintVar - Error::Pure module for simple error print wit
 
 =head1 EXAMPLE2
 
+=for comment filename=err_via_ansicolor_print_var_with_params.pl
+
  use strict;
  use warnings;
 
@@ -94,6 +105,8 @@ Error::Pure::ANSIColor::PrintVar - Error::Pure module for simple error print wit
  # 2: 3
 
 =head1 EXAMPLE3
+
+=for comment filename=err_via_ansicolor_print_var_with_params_from_module.pl
 
  package Example3;
 
@@ -124,7 +137,7 @@ Error::Pure::ANSIColor::PrintVar - Error::Pure module for simple error print wit
 L<Error::Pure::Output::ANSIColor>,
 L<Error::Pure::Utils>,
 L<Exporter>,
-L<List::MoreUtils>,
+L<List::Util>,
 L<Readonly>.
 
 =head1 SEE ALSO
@@ -155,6 +168,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.27
+0.29
 
 =cut

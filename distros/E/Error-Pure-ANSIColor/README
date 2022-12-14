@@ -5,27 +5,30 @@ NAME
 DESCRIPTION
     List of modules:
 
-    "Error::Pure::ANSIColor::AllError"
+    Error::Pure::ANSIColor::AllError
             Print full backtrace with Term::ANSIColor support.
 
-    "Error::Pure::ANSIColor::Die"
+    Error::Pure::ANSIColor::Die
             Die with Term::ANSIColor support.
 
-    "Error::Pure::ANSIColor::Error"
+    Error::Pure::ANSIColor::Error
             Print error on one line with Term::ANSIColor support.
 
-    "Error::Pure::ANSIColor::ErrorList"
+    Error::Pure::ANSIColor::ErrorList
             Print list of errors with ANSIColor support. Each error on one
             line.
 
-    "Error::Pure::ANSIColor::Print"
+    Error::Pure::ANSIColor::Print
             Print error as simple string with ANSIColor support
 
-    "Error::Pure::ANSIColor::PrintVar"
+    Error::Pure::ANSIColor::PrintVar
             Print error with all variables as simple string with ANSIColor
             support
 
 SEE ALSO
+    Error::Pure
+        Perl module for structured errors.
+
     Task::Error::Pure
         Install the Error::Pure modules.
 
@@ -43,5 +46,5 @@ LICENSE AND COPYRIGHT
     BSD 2-Clause License
 
 VERSION
-    0.27
+    0.29
 

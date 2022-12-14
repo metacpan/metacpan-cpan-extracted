@@ -2,8 +2,8 @@ NAME
     App::SubtitleUtils - Utilities related to video subtitles
 
 VERSION
-    This document describes version 0.011 of App::SubtitleUtils (from Perl
-    distribution App-SubtitleUtils), released on 2022-11-22.
+    This document describes version 0.012 of App::SubtitleUtils (from Perl
+    distribution App-SubtitleUtils), released on 2022-11-23.
 
 DESCRIPTION
     This distributions provides the following command-line utilities:
@@ -69,8 +69,8 @@ FUNCTIONS
 
      srtcombine2text(%args) -> [$status_code, $reason, $payload, \%result_meta]
 
-    Combine the text of two or more subtitle files (e.g. for different
-    languages) into one.
+    Combine the text of two subtitle files (e.g. for different languages)
+    into one.
 
     This is a thin wrapper for srtcombinetext, for convenience. This:
 

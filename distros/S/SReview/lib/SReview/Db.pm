@@ -1132,8 +1132,8 @@ CREATE TYPE talkstate_new AS ENUM (
     'uploading',
     'publishing',
     'announcing',
-    'done'
-    'broken'
+    'done',
+    'broken',
     'needs_work',
     'lost',
     'ignored'
@@ -1273,6 +1273,20 @@ ALTER TABLE talks ALTER state TYPE talkstate_new USING(state::varchar)::talkstat
 ALTER TABLE talks ALTER state SET DEFAULT 'waiting_for_files';
 DROP TYPE talkstate;
 ALTER TYPE talkstate_new RENAME TO talkstate;
+-- 27 up
+ALTER TABLE speakers ADD event INTEGER REFERENCES events(id);
+-- 27 down
+ALTER TABLE speakers DROP event;
+-- 28 up
+ALTER TABLE raw_files ADD collection_name VARCHAR;
+-- 28 down
+DELETE FROM raw_files WHERE collection_name IS NOT NULL;
+ALTER TABLE raw_files DROP collection_name;
+-- 29 up
+ALTER TABLE talks ALTER upstreamid DROP NOT NULL;
+-- 29 down
+UPDATE talks SET upstreamid=slug WHERE upstreamid IS NULL;
+ALTER TABLE talks ALTER upstreamid SET NOT NULL;
 @@ code
 -- 1 up
 CREATE VIEW last_room_files AS

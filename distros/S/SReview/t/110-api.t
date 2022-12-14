@@ -8,26 +8,23 @@ use Cwd 'abs_path';
 use SReview::Db;
 use SReview::Config::Common;
 
-BEGIN {
-	open my $config, ">config.pm";
-	if(exists($ENV{SREVIEWTEST_DB})) {
-		print $config '$dbistring=\'dbi:Pg:dbname=' . $ENV{SREVIEWTEST_DB} . '\';' . "\n";
-	}
-	print $config '$secret="foo";' . "\n";
-	print $config '$outputdir="' . abs_path('t/outputdir') . '";' . "\n";
-	print $config '$pubdir="' . abs_path('t/pubdir') . '";' . "\n";
-	print $config '$api_key="foobarbaz";' . "\n";
-	print $config '$preroll_template="' . abs_path('t/testvids/just-title.svg') . '";' . "\n";
-	print $config '$postroll_template="' . abs_path('t/testvids/just-title.svg') . '";' . "\n";
-	print $config '$apology_template="' . abs_path('t/testvids/just-title.svg') . '";' . "\n";
-	close $config;
+my $config = SReview::Config::Common::setup;
+
+$config->set(secret => "foo",
+	     outputdir => abs_path('t/outputdir'),
+	     pubdir => abs_path('t/pubdir'),
+	     preroll_template => abs_path('t/testvids/just-title.svg'),
+	     postroll_template => abs_path('t/testvids/just-title.svg'),
+	     apology_template => abs_path('t/testvids/just-title.svg'));
+
+if(exists($ENV{SREVIEWTEST_DB})) {
+	$config->set(dbistring => 'dbi:Pg:dbname=' . $ENV{SREVIEWTEST_DB});
 }
 
 use Test::More;
 use Test::Mojo;
 use Mojo::File qw/path/;
 
-my $cfgname = path()->to_abs->child('config.pm');
 my $do_auth = 0;
 
 SKIP: {
@@ -37,6 +34,7 @@ SKIP: {
 	SReview::Db::selfdestruct(code => 0, init => 0);
 
 	my $script;
+	my $b = '/api/v1';
 
 	if(exists($ENV{SREVIEWTEST_INSTALLED}) or exists($ENV{AUTOPKGTEST_TMP})) {
 		$script = "SReview::Web";
@@ -47,6 +45,9 @@ SKIP: {
 		chdir($script->dirname);
 	}
 	my $t = Test::Mojo->new($script);
+	$t->get_ok("$b/speaker/search/Wouter" => { "X-SReview-Key" => "foobarbaz" })->status_is(401);
+	$config->set(api_key => "foobarbaz");
+	$t = Test::Mojo->new($script);
 
 	$t->ua->on(start => sub {
 		my ($ua, $tx) = @_;
@@ -55,8 +56,8 @@ SKIP: {
 		}
 	});
 
-	my $b = '/api/v1';
-
+	# Invalid authentication key
+	$t->get_ok("$b/event/1/talk/list" => { "X-SReview-Key" => "foobar" })->status_is(401);
 	# Events
 	$t->get_ok("$b/")->status_is(200)->json_is("/info/title" => "SReview API")->json_is("/info/version" => "1.0.0");
 	$t->get_ok("$b/event/list")->status_is(200)->json_is(""=>[]);
@@ -105,12 +106,20 @@ SKIP: {
 	my $nonce = $t->post_ok("$b/event/1/talk" => json => {room => 1,slug => 'test', starttime => '2020-05-30T10:30:00',endtime => '2020-05-30T10:35:00',title=>'Test',event=>1,upstreamid=>''})->status_is(200)->json_is('/title' => 'Test')->json_is('/room' => 1)->json_is('/id' => 1)->tx->res->json->{nonce};
 	$t->get_ok("$b/event/1/talk/list")->status_is(200)->json_is('/0/title' => 'Test');
 	$t->patch_ok("$b/event/1/talk/1" => json => {subtitle => 'also test'})->status_is(200)->json_is('/title' => 'Test')->json_is('/subtitle' => 'also test');
-
 	# Talks by nonce
 	$t->get_ok("$b/nonce/$nonce/talk")->status_is(200)->json_is("/id" => 1);
 	
 	# Talk data
 	$t->get_ok("$b/nonce/$nonce/data")->status_is(200)->json_like("/start" => qr/^2020-05-30 10:30:00\+[0-9][0-9]/)->json_is("/start_iso" => "2020-05-30T10:30:00Z")->json_like("/end" => qr/^2020-05-30 10:35:00\+[0-9][0-9]/)->json_is("/end_iso" => "2020-05-30T10:35:00Z");
+
+	# Tracks
+	$do_auth = 0;
+	$t->get_ok("$b/track/list")->status_is(401);
+	$t->post_ok("$b/track" => json => { name => "test track" })->status_is(401);
+	$do_auth = 1;
+	$t->get_ok("$b/track/list")->status_is(200)->json_is([]);
+	$t->post_ok("$b/track" => json => {name =>"test track", email => 'example@example.com', upstreamid => 'example'})->status_is(200)->json_is("/name" => "test track")->json_is("/email" => 'example@example.com')->json_is("/upstreamid" => 'example');
+	$t->get_ok("$b/track/list")->status_is(200)->json_is('/0/upstreamid' => 'example');
 
 	# Speakers
 	$do_auth = 0;
@@ -145,9 +154,15 @@ SKIP: {
 	$t->get_ok("$b/event/1/talk/test/preroll")->status_is(200)->content_type_is("image/png");
 	$t->get_ok("$b/event/1/talk/test/postroll")->status_is(200)->content_type_is("image/png");
 	$t->get_ok("$b/event/1/talk/test/sorry")->status_is(200)->content_type_is("image/png");
+
+	my $json = $t->get_ok("$b/config/legend")->status_is(200)->tx->res->json;
+	foreach my $value(@{SReview::Talk::State->values}) {
+		my $val_json = shift @$json;
+		ok($value eq $val_json->{name}, "$value exists in module and legend at the same location");
+	}
+	ok(scalar(@$json) == 0, "no missing values in api");
 }
 
-unlink($cfgname);
 if(!(exists($ENV{SREVIEWTEST_INSTALLED}) or exists($ENV{AUTOPKGTEST_TMP}))) {
 	chdir('..');
 	unlink('web/t');

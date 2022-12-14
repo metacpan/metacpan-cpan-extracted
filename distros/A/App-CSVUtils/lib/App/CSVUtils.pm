@@ -8,9 +8,9 @@ use Log::ger;
 use Hash::Subset qw(hash_subset);
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-12-09'; # DATE
+our $DATE = '2022-12-14'; # DATE
 our $DIST = 'App-CSVUtils'; # DIST
-our $VERSION = '0.053'; # VERSION
+our $VERSION = '0.054'; # VERSION
 
 our %SPEC;
 
@@ -952,11 +952,15 @@ sub csvutil {
             return unless $row0;
             return [map { "field$_" } 1..@$row0];
         } elsif ($i == 1 && !$has_header) {
-            $header_row_count++;
+            $data_row_count++ if $row0;
             return $row0;
         }
-        $data_row_count++;
-        $csv_parser->getline($fh);
+        my $res = $csv_parser->getline($fh);
+        if ($res) {
+            $header_row_count++ if $i==0;
+            $data_row_count++ if $i;
+        }
+        $res;
     };
 
     my $rows = [];
@@ -2525,6 +2529,10 @@ sub csv_concat {
             }
             my $res_row = [];
             for my $j (0..$#{$row}) {
+                if ($j >= @$fields) {
+                    log_warn "File %s line %d contains more than %d fields, skipped", $filename, $i, scalar(@$fields);
+                    last;
+                }
                 my $field = $fields->[$j];
                 $res_row->[ $res_field_idxs{$field} ] = $row->[$j];
             }
@@ -3270,7 +3278,7 @@ App::CSVUtils - CLI utilities related to CSV
 
 =head1 VERSION
 
-This document describes version 0.053 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2022-12-09.
+This document describes version 0.054 of App::CSVUtils (from Perl distribution App-CSVUtils), released on 2022-12-14.
 
 =head1 DESCRIPTION
 

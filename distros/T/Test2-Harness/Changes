@@ -1,3 +1,12 @@
+1.000140  2022-12-13 18:11:36-08:00 America/Los_Angeles
+
+    - Fix permissions issue with state files
+
+1.000139  2022-12-13 11:49:03-08:00 America/Los_Angeles
+
+    - Add 'COMMON' config options for shared slots
+    - Add options for default j and x values in shared slots
+
 1.000138  2022-12-06 06:52:55-08:00 America/Los_Angeles
 
     - Fix resources output for shared slots

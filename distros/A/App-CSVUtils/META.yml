@@ -23,7 +23,7 @@ name: App-CSVUtils
 provides:
   App::CSVUtils:
     file: lib/App/CSVUtils.pm
-    version: '0.053'
+    version: '0.054'
 recommends:
   Sort::Sub: '0.120'
 requires:
@@ -64,7 +64,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-CSVUtils
   homepage: https://metacpan.org/release/App-CSVUtils
   repository: git://github.com/perlancar/perl-App-CSVUtils.git
-version: '0.053'
+version: '0.054'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

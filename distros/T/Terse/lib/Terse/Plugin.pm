@@ -23,7 +23,7 @@ Terse::Plugin - plugins made simple.
 
 =head1 VERSION
 
-Version 0.120
+Version 0.121
 
 =cut
 

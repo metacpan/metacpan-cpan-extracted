@@ -1,5 +1,8 @@
 Revision history for Terse-Static
 
+0.04    [2022-12-14]
+	- The psuedo coded Terse::Controller::Static now actually works :).
+
 0.01    Date/time
         First version, released on an unsuspecting world.
 

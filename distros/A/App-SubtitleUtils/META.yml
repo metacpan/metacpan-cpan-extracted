@@ -19,7 +19,7 @@ name: App-SubtitleUtils
 provides:
   App::SubtitleUtils:
     file: lib/App/SubtitleUtils.pm
-    version: '0.011'
+    version: '0.012'
 requires:
   Data::Sah::Compiler::perl::TH::array: '0.914'
   Data::Sah::Compiler::perl::TH::str: '0.914'
@@ -41,7 +41,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-SubtitleUtils
   homepage: https://metacpan.org/release/App-SubtitleUtils
   repository: git://github.com/perlancar/perl-App-SubtitleUtils.git
-version: '0.011'
+version: '0.012'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

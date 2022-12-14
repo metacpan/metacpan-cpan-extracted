@@ -20,7 +20,7 @@ App::CSVUtils::Manual::Tips - App::CSVUtils tips/tricks
 
 =head1 VERSION
 
-This document describes version 0.053 of App::CSVUtils::Manual::Tips (from Perl distribution App-CSVUtils), released on 2022-12-09.
+This document describes version 0.054 of App::CSVUtils::Manual::Tips (from Perl distribution App-CSVUtils), released on 2022-12-14.
 
 =head1 DESCRIPTION
 

@@ -19,7 +19,7 @@ our $EPANSI_OTHER_COLOR = 'cyan';
 our $EPANSI_SCRIPT_COLOR = 'yellow';
 our $EPANSI_SUB_COLOR = 'green';
 
-our $VERSION = 0.03;
+our $VERSION = 0.04;
 
 # Pretty print of backtrace.
 sub err_bt_pretty {
@@ -80,7 +80,7 @@ sub err_line_all {
 sub err_print {
 	my @errors = @_;
 	my $class = _err_class($errors[-1]);
-	return $class.$errors[-1]->{'msg'}->[0];
+	return $class.color($EPANSI_ERROR_COLOR).$errors[-1]->{'msg'}->[0].color('reset');
 }
 
 # Print error with all variables.
@@ -203,6 +203,7 @@ Error::Pure::Output::ANSIColor - ANSIColor Output subroutines for Error::Pure.
 
  use Error::Pure::Output::ANSIColor qw(err_bt_pretty err_bt_pretty_rev err_die err_line
          err_line_all err_print err_print_var);
+
  my $ret = err_bt_pretty(@errors);
  my @ret = err_bt_pretty(@errors);
  my $ret = err_bt_pretty_rev(@errors);
@@ -691,21 +692,22 @@ Install the Error::Pure modules.
 
 =head1 REPOSITORY
 
-L<https://github.com/tupinek/Error-Pure-Output-ANSIColor>
+L<https://github.com/michal-josef-spacek/Error-Pure-Output-ANSIColor>
 
 =head1 AUTHOR
 
-Michal Špaček L<mailto:skim@cpan.org>
+Michal Josef Špaček L<mailto:skim@cpan.org>
 
 L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
- © 2017 Michal Špaček
- BSD 2-Clause License
+© 2013-2022 Michal Josef Špaček
+
+BSD 2-Clause License
 
 =head1 VERSION
 
-0.03
+0.04
 
 =cut

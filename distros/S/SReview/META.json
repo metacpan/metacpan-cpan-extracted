@@ -4,7 +4,7 @@
       "Wouter Verhelst <w@uter.be>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "unknown"
    ],
@@ -33,15 +33,18 @@
       "runtime" : {
          "requires" : {
             "Class::Type::Enum" : "0",
+            "Crypt::PRNG" : "0",
             "DateTime" : "0",
             "DateTime::Format::ISO8601" : "0",
             "DateTime::Format::Pg" : "0",
+            "Media::Convert" : "v1.0.1",
             "Mojo::JSON" : "0",
             "Mojo::Pg" : "0",
             "Mojolicious::Plugin::OpenAPI" : "4.03",
             "Moose" : "0",
             "Net::Amazon::S3" : "0",
-            "Net::SSH::AuthorizedKeysFile" : "0"
+            "Net::SSH::AuthorizedKeysFile" : "0",
+            "Text::Format" : "0"
          }
       },
       "test" : {
@@ -60,6 +63,6 @@
          "web" : "https://github.com/yoe/SReview"
       }
    },
-   "version" : "v0.8.0",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "v0.9.0",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

@@ -1,3 +1,9 @@
+Version 1.33 - 14 Dec 2020
+
+* Bugs fixed:
+
+  https://github.com/gflohr/libintl-perl/issues/7
+
 Version 1.32 - 26 Oct 2020
 
 * Bugs fixed:

@@ -1,0 +1,53 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.83.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA256 b8e7b47e30b38d3773a30a028dd52651e83361bf342d36d72d00b55ef6a0dcde Changes
+SHA256 477faf6e006b35e2030ba57dde2e2deca9027a9e4be16af9c375f76af7e0dcb9 LICENSE
+SHA256 cac062f687235df36ea0d420e713d8f75407d586d26d30682e20e1b75dd6d23b MANIFEST
+SHA256 dce9434f3c4aa8c276b721a1b65fb375228ea92b741a6ae219db459d5960345d META.yml
+SHA256 714734cff1baae1284bd5319ecce4289b44851e6df59a333a32e7c117f68896d Makefile.PL
+SHA256 ab3501c286cc5e5d1b263df154157415b11f4aa5e90644dc7f71dc3ead8a15c0 README
+SHA256 4a8bd79a489127e5dc3f2a6cc9d77b76ae343c052960a0e8609e5fd23b0ecbb8 README.md
+SHA256 cec8c07afeb5390b2ccb079bde8bf13c8a45f8a10115133185675db554961132 html/Elements/ShowTransactionAttachments
+SHA256 7fe8013fad8ecb0b9ef8bad3fd7287486c1c61c776f76beb7d9d24e06ee3ab44 inc/Module/AutoInstall.pm
+SHA256 67d139199c03b8bf8447a5a62f0d0b6dc1bd5bf6dbe04de6d21998c577823ed6 inc/Module/Install.pm
+SHA256 1e48ae2cb24e1d16193d476e735579dfcd0eefb3685921ad4736390df75d939b inc/Module/Install/AutoInstall.pm
+SHA256 6ebcc53a161dd5dc0aae69e4704575f2b00181901d768a82e26722a309cfdbe4 inc/Module/Install/Base.pm
+SHA256 d3f8c839d03fd21c197d05362dbb277cd7cadb15da6390d124b61e851f15146e inc/Module/Install/Can.pm
+SHA256 e9e72e18921c10c87bc4ea4c20af83e52015b9f5775d00ac64073042403717ca inc/Module/Install/Fetch.pm
+SHA256 a97bf661b739643c3adee064addf7a85f22e25e1bbffc137974cd8754ffa5c66 inc/Module/Install/Include.pm
+SHA256 a7a681bf2c9eee58a372cb642ffe42b0301d1200432ba8de9f7791cd1ecc9827 inc/Module/Install/Makefile.pm
+SHA256 aa887fa65a5eb6bbd1805706ce298b3f3cd55b353ecfd37aa7d35ae419331a49 inc/Module/Install/Metadata.pm
+SHA256 492f566c84b3db9340895ef53f31f0d83310feb01f0362db28b9d579ef90e01a inc/Module/Install/RTx.pm
+SHA256 a7c5323f81fc052097b0470bd3e6e7e2de2ac9d90c59646948d89c4c7e46cfe6 inc/Module/Install/RTx/Runtime.pm
+SHA256 53825bc78e4c910b888160bc148c8bc211be58e02b99c8edcbf4854f95faa049 inc/Module/Install/ReadmeFromPod.pm
+SHA256 9f50489182b83fb275494764918038d1f176067f32bd59bad7b912cc6d29cacb inc/Module/Install/Substitute.pm
+SHA256 26b166ff62aacdb55317d1659f160aa4935097eea9810ea980e6d747206b5dc0 inc/Module/Install/Win32.pm
+SHA256 5f73a6851a91ea44e65b924f918743ad6e860620ad7a38a39d0295e0c5652a9f inc/Module/Install/WriteAll.pm
+SHA256 3164c32202bf4604ab1f90b926a81e15493b191e0bc2f90ae42d8358f18259d6 inc/YAML/Tiny.pm
+SHA256 faaae5db4cfbcee429a817d63f3d341b8539ea11a41eee86dfa79db59a8ac86a lib/RT/Extension/InlineAudioVideoAttachments.pm
+SHA256 e3a7684285957e4fbed00f7ca048a5908fc8d470005b2013d74137972e657875 lib/RT/Extension/InlineAudioVideoAttachments/Test.pm.in
+SHA256 5171895b64ad2f6308661945bf9ffa32a1c8af0d18631753c260b0c89042fe14 xt/00-load.t
+SHA256 fabebf62e99050b69eb8d1cecbdbc052a51e15fcea760a83cff2e57be3810d5a xt/audio.t
+SHA256 e990ed320b4c884d4bd0c480cbc6084bc0dea7f268a5d9d8adb335cc49d2d22a xt/data/des_armes.mp3
+SHA256 2d56ad4dd5fe8be96cbbd2ab0bd4283b4623bca265ed06a8238be58e2fb9d3ef xt/data/ete_2016.mp4
+SHA256 695c1b82faa386bcd87b4eeb64dc7070e19e5ad27791015bcf6a13dfd9dc4b37 xt/video.t
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQRR24FY+Z56D/YyPs7z3XhnulP5PwUCY5mFLgAKCRDz3XhnulP5
+P/YpAJ9UZRAyhbK/66SDQ0u8YucFW7st1ACfbvFVtpRbeiZUqwAJFj9OPVk5Ig8=
+=SDS9
+-----END PGP SIGNATURE-----

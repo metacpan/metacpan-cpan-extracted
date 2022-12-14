@@ -2,7 +2,7 @@ package Test2::Harness::Runner::Resource::SharedJobSlots::State;
 use strict;
 use warnings;
 
-our $VERSION = '1.000138';
+our $VERSION = '1.000140';
 
 use Test2::Harness::Util::File::JSON;
 use Scalar::Util qw/weaken/;
@@ -20,6 +20,8 @@ use Test2::Harness::Util::HashBase qw{
     <max_slots_per_job
     <max_slots_per_run
     <min_slots_per_run
+    <default_slots_per_job
+    <default_slots_per_run
 
     <my_max_slots
     <my_max_slots_per_job
@@ -160,10 +162,22 @@ sub _read_state {
 
     return $self->init_state unless -e $self->{+STATE_FILE};
 
-    my $file  = Test2::Harness::Util::File::JSON->new(name => $self->{+STATE_FILE});
-    my $state = $file->maybe_read() || $self->init_state;
+    my $file = Test2::Harness::Util::File::JSON->new(name => $self->{+STATE_FILE});
 
-    return $state;
+    my ($ok, $err);
+    for (1 .. 5) {
+        my $state;
+        $ok = eval { $state = $file->maybe_read(); 1};
+        $err = $@;
+
+        return $state ||= $self->init_state if $ok;
+
+        sleep 0.2;
+    }
+
+    warn "Corrupted state? Resetting state to initial. Error that caused this was:\n======\n$err\n======\n";
+
+    return $self->init_state;
 }
 
 sub _write_state {
@@ -180,7 +194,7 @@ sub _write_state {
     my $oldmask = umask($self->{+STATE_UMASK});
     my $ok = eval {
         my $file = Test2::Harness::Util::File::JSON->new(name => $self->{+STATE_FILE});
-        $file->write($state_copy);
+        $file->rewrite($state_copy);
         1;
     };
     my $err = $@;

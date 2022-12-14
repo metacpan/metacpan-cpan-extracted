@@ -6,7 +6,7 @@ use Getopt::Long;
 use YAML::yq::Helper;
 
 sub version {
-	print "yqh v. 0.1.0\n";
+	print "yqh v. 0.1.1\n";
 }
 
 sub help {
@@ -110,7 +110,7 @@ my $vals_sep = ',';
 my $key;
 my $hash_string;
 my $val;
-my $dedup=1;
+my $dedup = 1;
 Getopt::Long::Configure('no_ignore_case');
 Getopt::Long::Configure('bundling');
 GetOptions(
@@ -125,8 +125,8 @@ GetOptions(
 	'vals=s'  => \$vals_string,
 	'hash=s'  => \$hash_string,
 	'val=s'   => \$val_string,
-		   'k=s'     => \$key,
-		   'dedup=s' =>\$dedup,
+	'k=s'     => \$key,
+	'dedup=s' => \$dedup,
 );
 
 $vals_sep = quotemeta($vals_sep);
@@ -257,12 +257,15 @@ if ( $action eq 'set_val' ) {
 }
 
 if ( $action eq 'set_in_array' ) {
-	$yq->set_in_array( var => $var, vals => \@vals, dedup=>$dedup );
+	$yq->set_in_array( var => $var, vals => \@vals, dedup => $dedup );
 	exit 0;
 }
 
 if ( $action eq 'push_array' ) {
-	$yq->push_array( var => $var, vals => \@vals,  );
+	$yq->push_array( var => $var, vals => \@vals, );
+	if ($dedup) {
+		$yq->dedup_array( var => $var );
+	}
 	exit 0;
 }
 

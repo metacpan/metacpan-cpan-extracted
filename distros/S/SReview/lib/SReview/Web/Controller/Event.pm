@@ -47,7 +47,7 @@ sub getById {
 sub list {
 	my $c = shift->openapi->valid_input or return;
 
-	my $events = db_query($c->dbh, "SELECT events.* FROM events");
+	my $events = db_query($c->dbh, "SELECT events.* FROM events ORDER BY events.name");
 
 	$c->render(openapi => $events);
 }
@@ -63,10 +63,10 @@ sub overview {
 		return $c->render(openapi => {errors => [{message => "not found"}]}, status => 404);
 	}
 
-	if($c->srconfig->get("anonreviews")) {
-		$query = "SELECT CASE WHEN state IN ('preview', 'broken') THEN '/r/' || nonce WHEN state='finalreview' THEN '/f/' || nonce ELSE null END AS reviewurl, nonce, name, speakers, room, starttime::timestamp, endtime::timestamp, state, progress FROM talk_list WHERE eventid = ? AND state IS NOT NULL ORDER BY state, progress, room, starttime";
+	if($c->srconfig->get("anonreviews") || ($c->session->{admin} > 0)) {
+		$query = "SELECT CASE WHEN state IN ('preview', 'broken') THEN '/r/' || nonce WHEN state='finalreview' THEN '/f/' || nonce ELSE null END AS reviewurl, nonce, name, speakers, room, starttime::timestamp, endtime::timestamp, state, progress, track FROM talk_list WHERE eventid = ? AND state IS NOT NULL ORDER BY state, progress, room, starttime";
 	} else {
-		$query = "SELECT name, speakers, room, starttime::timestamp, endtime::timestamp, state, progress FROM talk_list WHERE eventid = ? AND state IS NOT NULL ORDER BY state, progress, room, starttime";
+		$query = "SELECT name, speakers, room, starttime::timestamp, endtime::timestamp, state, progress, track FROM talk_list WHERE eventid = ? AND state IS NOT NULL ORDER BY state, progress, room, starttime";
 	}
 
 	my $res = db_query($c->dbh, $query, $eventId);
@@ -98,11 +98,11 @@ sub talksByState {
 		return;
 	}
 	$row = $st->fetchrow_hashref;
-	my $vid = SReview::Video->new(url => $row->{filename});
+	my $vid = Media::Convert::Asset->new(url => $row->{filename});
 	foreach my $format(@{$c->srconfig->get("output_profiles")}) {
 		my $nf;
 		$c->app->log->debug("profile $format");
-		my $prof = SReview::Video::rofileFactory->create($format, $vid);
+		my $prof = Media::Convert::Asset::ProfileFactory->create($format, $vid, $c->srconfig->get('extra_profiles'));
 		if(!$have_default) {
 			$nf = 'default';
 			$have_default = 1;
