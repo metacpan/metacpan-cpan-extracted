@@ -126,11 +126,11 @@ $test->for('example', 1, 'execute', sub {
   ok $result->isa('Faker::Plugin::JaJp::AddressStreetAddress');
   ok $result->faker;
   ok $result->faker->random->reseed($seed);
-  ok $result->faker->random->make; # reset randomizer
+  ok $result->faker->random->pick; # reset randomizer
   is $result->execute, '佐藤町高橋7-5-6';
-  ok $result->faker->random->make; # reset randomizer
+  ok $result->faker->random->pick; # reset randomizer
   is $result->execute, '山本町高橋4-1-10';
-  ok $result->faker->random->make; # reset randomizer
+  ok $result->faker->random->pick; # reset randomizer
   is $result->execute, '伊藤町石田3-9-9';
 
   $result

@@ -2,7 +2,7 @@ package Zonemaster::LDNS;
 
 use 5.014;
 
-our $VERSION = '2.2.2';
+our $VERSION = '3.0.0';
 
 use parent 'Exporter';
 our @EXPORT_OK = qw[to_idn has_idn ldns_version load_zonefile];
@@ -212,11 +212,7 @@ Calle Dybedahl <calle@init.se>
 
 =head1 LICENSE
 
-This is free software, licensed under:
-
-The (three-clause) BSD License
-
-The full text of the license can be found in the
-F<LICENSE> file included with this distribution.
+This is free software under a 2-clause BSD license. The full text of the license can
+be found in the F<LICENSE> file included with this distribution.
 
 =cut

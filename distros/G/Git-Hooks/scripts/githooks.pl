@@ -20,7 +20,7 @@ githooks.pl - Git::Hooks driver script
 
 =head1 VERSION
 
-version 3.3.1
+version 3.4.0
 
 =head1 AUTHOR
 

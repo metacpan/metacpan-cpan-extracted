@@ -1,5 +1,5 @@
 package Geo::Address::Formatter;
-$Geo::Address::Formatter::VERSION = '1.991';
+$Geo::Address::Formatter::VERSION = '1.993';
 # ABSTRACT: take structured address data and format it according to the various global/country rules
 
 use strict;
@@ -18,8 +18,11 @@ use YAML::XS qw(LoadFile);
 use utf8;
 
 my $THC = Text::Hogan::Compiler->new;
+
+# optional params
 my $show_warnings = 1;
-my $debug = 0;
+my $debug         = 0;
+my $only_address  = 0;
 
 
 sub new {
@@ -27,14 +30,19 @@ sub new {
 
     my $self      = {};
     my $conf_path = $params{conf_path} || die "no conf_path set";
-    $show_warnings = 0 if (defined($params{no_warnings}) && $params{no_warnings});
+
+    # optional params
+    if ( defined($params{no_warnings}) && ($params{no_warnings})){
+        $show_warnings  = 0;
+    }
+    $only_address  = (defined($params{only_address}) && $params{only_address}) // 0;
+    $debug         = (defined($params{debug})        && $params{debug})        // 0;
 
     $self->{final_components} = undef;
     bless($self, $class);
 
-    $debug = 1 if (defined($params{debug}) && $params{debug});
     say STDERR "************* in Geo::Address::Formatter::new ***" if ($debug);
-
+    
     if ($self->_read_configuration($conf_path)){
         return $self;
     }
@@ -187,6 +195,12 @@ sub format_address {
     # 2b. should we abbreviate?
     my $abbrv = $rh_options->{abbreviate} // 0;
 
+    # 2c. was only_address set at the formatting level
+    my $oa = $only_address;
+    if (defined($rh_options->{only_address})){
+        $oa = $rh_options->{only_address};
+    }
+
     if ($debug){
         say STDERR "component_aliases";
         say STDERR Dumper $self->{component_aliases};
@@ -281,10 +295,20 @@ sub format_address {
     if ($debug){
         say STDERR "unknown_components:";
         say STDERR Dumper $ra_unknown;
+        say STDERR "object level only_address: $only_address";
+        say STDERR "formatting level only_address: $oa";
     }
 
-    if (scalar(@$ra_unknown)) {
+    if ($oa){
+        if ($debug){
+            say STDERR "ignoring unknown_components because only_address was specified";
+        }
+    }
+    elsif (scalar(@$ra_unknown)){
         $rh_components->{attention} = join(', ', map { $rh_components->{$_} } @$ra_unknown);
+        if ($debug){
+            say STDERR "adding unknown_components to 'attention'";
+        }
     }
 
     # 7. abbreviate
@@ -870,7 +894,7 @@ Geo::Address::Formatter - take structured address data and format it according t
 
 =head1 VERSION
 
-version 1.991
+version 1.993
 
 =head1 SYNOPSIS
 
@@ -900,6 +924,8 @@ I<debug>: prints tons of debugging info for use in development.
 
 I<no_warnings>: turns off a few warnings if configuration is not optimal.
 
+I<only_address>: formatted will only contain known components (will not include POI names like)
+
 =head2 final_components
 
   my $rh_components = $GAF->final_components();
@@ -915,17 +941,19 @@ completion of B<format_address>. Warns if called before they have been set
 Given a structures address (hashref) and options (hashref) returns a
 formatted address.
 
-Possible options you are:
-
-    'country', which should be an uppercase ISO 3166-1:alpha-2 code
-    e.g. 'GB' for Great Britain, 'DE' for Germany, etc.
-    If ommited we try to find the country in the address components.
+Possible options are:
 
     'abbreviate', if supplied common abbreviations are applied
     to the resulting output.
 
     'address_template', a mustache format template to be used instead of the template
     defined in the configuration
+
+    'country', which should be an uppercase ISO 3166-1:alpha-2 code
+    e.g. 'GB' for Great Britain, 'DE' for Germany, etc.
+    If ommited we try to find the country in the address components.
+
+    'only_address', same as I<only_address> global option but set at formatting level
 
 =head1 DESCRIPTION
 

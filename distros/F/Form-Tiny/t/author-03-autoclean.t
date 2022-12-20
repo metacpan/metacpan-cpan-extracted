@@ -16,6 +16,8 @@ package Form
 	use Form::Tiny;
 
 	use namespace::autoclean;
+
+	__PACKAGE__->form_meta;
 }
 
 my $form = Form->new;

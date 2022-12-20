@@ -75,7 +75,22 @@ $LOG_SA{facility} = {};		# no dbg facilities turned on
 
 # always log to stderr initially
 use Mail::SpamAssassin::Logger::Stderr;
-$LOG_SA{method}->{stderr} = Mail::SpamAssassin::Logger::Stderr->new();
+$LOG_SA{method}->{stderr} =
+  Mail::SpamAssassin::Logger::Stderr->new(escape =>
+    exists $ENV{'SA_LOGGER_ESCAPE'} ? $ENV{'SA_LOGGER_ESCAPE'} : 1
+  );
+
+# Use of M:SA:Util causes circular dependencies, separate helper here.
+my %escape_map =
+  ("\r" => '\\r', "\n" => '\\n', "\t" => '\\t', "\\" => '\\\\');
+sub escape_str {
+  # Things are already forced as octets by _log, no utf8::encode needed
+  # Control chars, DEL, backslash
+  $_[0] =~ s@
+    ( [\x00-\x1F\x7F\x80-\xFF\\] )
+    @ $escape_map{$1} || sprintf("\\x{%02X}",ord($1))
+    @egsx;
+}
 
 =head1 METHODS
 
@@ -165,7 +180,7 @@ sub log_message {
     # don't log them -- this is caller 0, the use'ing package is 1, the eval is 2
     my @caller = caller 2;
     return if (defined $caller[3] && defined $caller[0] &&
-		       $caller[3] =~ /^\(eval\)$/ &&
+		       $caller[3] eq '(eval)' &&
 		       $caller[0] =~ m#^Mail::SpamAssassin(?:$|::)#);
   }
 
@@ -215,13 +230,15 @@ sub _log_message {
   foreach my $line (split(/\n/, $_[1])) {
     # replace control characters with "_", tabs and spaces get
     # replaced with a single space.
-    $line =~ tr/\x09\x20\x00-\x1f/  _/s;
+    # Deprecated here, see new Bug 6583 escaping in Logger/*.pm modules
+    #$line =~ tr/\x09\x20\x00-\x1f/  _/s;
+
     if ($first) {
       $first = 0;
     } else {
-      local $1;
       $line =~ s/^([^:]+?):/$1: [...]/;
     }
+
     while (my ($name, $object) = each %{ $LOG_SA{method} }) {
       $object->log_message($_[0], $line, $_[2]);
     }
@@ -274,6 +291,9 @@ sub _log {
   }
 
   my ($level, $message, @args) = @_;
+
+  utf8::encode($message)  if utf8::is_utf8($message); # handle as octets
+
   $message =~ s/^(?:[a-z0-9_-]*):\s*//i;
 
   $message = sprintf($message,@args)  if @args;
@@ -284,18 +304,28 @@ sub _log {
   log_message(($level == INFO ? "info" : "dbg"), $message);
 }
 
-=item add(method => 'syslog', socket => $socket, facility => $facility)
+=item add(method => 'syslog', socket => $socket, facility => $facility, escape => $escape)
 
 C<socket> is the type the syslog ("unix" or "inet").  C<facility> is the
 syslog facility (typically "mail").
 
-=item add(method => 'file', filename => $file)
+If optional C<escape> is true, all non-ascii characters are escaped for safe
+output: backslashes change to \\ and non-ascii chars to \x{XX} or \x{XXXX}
+(Unicode).  If not defined, pre-4.0 style sanitizing is used
+( tr/\x09\x20\x00-\x1f/_/s ).
 
-C<filename> is the name of the log file.
+Escape value can be overridden with environment variable
+C<SA_LOGGER_ESCAPE>.
 
-=item add(method => 'stderr')
+=item add(method => 'file', filename => $file, escape => $escape)
 
-No options are needed for stderr logging, just don't close stderr first.
+C<filename> is the name of the log file.  C<escape> works as described
+above.
+
+=item add(method => 'stderr', escape => $escape)
+
+No options are needed for stderr logging, just don't close stderr first. 
+C<escape> works as described above.
 
 =cut
 
@@ -306,6 +336,10 @@ sub add {
   my $class = ucfirst($name);
 
   return 0 if $class !~ /^\w+$/; # be paranoid
+
+  if (exists $ENV{'SA_LOGGER_ESCAPE'}) {
+    $params{escape} = $ENV{'SA_LOGGER_ESCAPE'}
+  }
 
   eval 'use Mail::SpamAssassin::Logger::'.$class.'; 1'
   or do {

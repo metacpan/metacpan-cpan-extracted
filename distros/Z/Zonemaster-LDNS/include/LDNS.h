@@ -108,6 +108,7 @@ typedef ldns_rr *Zonemaster__LDNS__RR__X25;
 
 SV *rr2sv(ldns_rr *rr);
 char *randomize_capitalization(char *in);
+void strip_newline(char* in);
 
 #ifdef USE_ITHREADS
 void net_ldns_remember_resolver(SV *rv);

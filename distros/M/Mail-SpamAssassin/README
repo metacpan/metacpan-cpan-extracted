@@ -14,7 +14,7 @@ filtering, DNS blocklists, and collaborative filtering databases.
 Apache SpamAssassin is a project of the Apache Software Foundation (ASF).
 
 
-What Apache SpamAssassin is Not
+What Apache SpamAssassin Is Not
 -------------------------------
 
 Apache SpamAssassin is not a program to delete spam, route spam and ham to
@@ -71,9 +71,9 @@ spamassassin-users mailing list[2]. If you've found a bug (and you're
 sure it's a bug after checking the Wiki), please file a report in our
 Bugzilla[3].
 
-	[1]: http://wiki.apache.org/spamassassin/
-	[2]: http://wiki.apache.org/spamassassin/MailingLists
-	[3]: http://issues.apache.org/SpamAssassin/
+	[1]: https://wiki.apache.org/spamassassin/
+	[2]: https://wiki.apache.org/spamassassin/MailingLists
+	[3]: https://issues.apache.org/SpamAssassin/
 
 Please also be sure to read the man pages.
 
@@ -151,7 +151,7 @@ default locations that Apache SpamAssassin will look at the end.
   - $USER_HOME/.spamassassin:
 
   	User state directory.  Used to hold spamassassin state, such
-	as a per-user automatic whitelist, and the user's preferences
+	as a per-user automatic welcomelist, and the user's preferences
 	file.
 
   - $USER_HOME/.spamassassin/user_prefs:
@@ -298,7 +298,7 @@ these translations, so that they can be added to the
 distribution. Please file a bug in our Bugzilla[4], and attach your
 translations. You will, of course, be credited for this work!
 
-	[4]: http://issues.apache.org/SpamAssassin/
+	[4]: https://issues.apache.org/SpamAssassin/
 
 
 Disabled code

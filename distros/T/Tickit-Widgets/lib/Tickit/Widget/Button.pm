@@ -1,12 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2012-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2022 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.57;
+use Object::Pad 0.73 ':experimental(adjust_params init_expr)';
 
-package Tickit::Widget::Button 0.35;
+package Tickit::Widget::Button 0.36;
 class Tickit::Widget::Button
+   :strict(params)
    :isa(Tickit::Widget);
 
 use Tickit::Style;
@@ -133,20 +134,19 @@ Optional. Callback function to invoke when the button is clicked.
 
 =cut
 
-has $_label    :reader         :param = undef;
-has $_on_click :reader :writer :param = undef;
+field $_label    :reader         :param = undef;
+field $_on_click :reader :writer :param = undef;
 
-has $_active;
-has $_dragging_on_self;
+field $_active;
+field $_dragging_on_self;
 
-ADJUSTPARAMS
-{
-   my ( $params ) = @_;
 
-   foreach (qw( align valign )) {
-      my $val = delete $params->{$_};
-      $self->${\"set_$_"}( $val // 0.5 );
-   }
+ADJUST :params (
+   :$align  = 0.5,
+   :$valign = 0.5,
+) {
+   $self->set_align( $align );
+   $self->set_valign( $valign );
 }
 
 method lines
@@ -264,9 +264,9 @@ the button area. See also L<Tickit::WidgetRole::Alignable>.
 use Tickit::WidgetRole::Alignable name => "align",  style => "h";
 use Tickit::WidgetRole::Alignable name => "valign", style => "v";
 
-has $_label_line;
-has $_label_col;
-has $_label_end;
+field $_label_line;
+field $_label_col;
+field $_label_end;
 
 method reshape
 {

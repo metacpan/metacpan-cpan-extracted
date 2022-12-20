@@ -1,22 +1,17 @@
-package Dyn 0.03 {
+package Dyn 0.05 {
     use strict;
     use warnings;
-    no warnings 'redefine';
     use 5.030;
-    use XSLoader;
-    XSLoader::load( __PACKAGE__, our $VERSION );
     #
-    use Dyn::Call qw[:all];
+    use Dyn::Call     qw[:all];
     use Dyn::Callback qw[:all];
-    use Dyn::Load qw[:all];
-    use experimental 'signatures';
+    use Dyn::Load     qw[:all];
     #
     use parent 'Exporter';
     our %EXPORT_TAGS = (
-        dc    => [@Dyn::Call::EXPORT_OK],
-        dcb   => [@Dyn::Callback::EXPORT_OK],
-        dl    => [@Dyn::Load::EXPORT_OK],
-        sugar => [qw[call load MODIFY_SCALAR_ATTRIBUTES MODIFY_CODE_ATTRIBUTES AUTOLOAD]]
+        dc  => [@Dyn::Call::EXPORT_OK],
+        dcb => [@Dyn::Callback::EXPORT_OK],
+        dl  => [@Dyn::Load::EXPORT_OK],
     );
     @{ $EXPORT_TAGS{all} } = our @EXPORT_OK = map { @{ $EXPORT_TAGS{$_} } } keys %EXPORT_TAGS;
 };
@@ -27,17 +22,16 @@ __END__
 
 =head1 NAME
 
-Dyn - dyncall Backed FFI
+Dyn - dyncall-Backed FFI Building Blocks
 
 =head1 SYNOPSIS
 
-    use Dyn qw[:sugar];	# Exports nothing by default
-    sub pow : Dyn( '/usr/lib/libm-2.33.so', '(dd)d');
-    print pow( 2, 10 );	# 1024
+    use Dyn qw[:dc :dl]; # Imports all functions from Dyn::Call and Dyn::Load
 
 =head1 DESCRIPTION
 
-Dyn is a wrapper around L<dyncall|https://dyncall.org/>.
+Dyn is a wrapper around L<dyncall|https://dyncall.org/>. It's here for the sake
+of convenience.
 
 This distribution includes...
 
@@ -65,74 +59,6 @@ Functions can be imported with the C<:dl> tag.
 
 =back
 
-Honestly, you should be using one of the above packages rather than this one as
-they provide clean wrappers of dyncall's C functions. This package contains the
-sugary API.
-
-=head1 Functions
-
-While most of the upstream API is covered in the L<Dyn::Call>,
-L<Dyn::Callback>, and L<Dyn::Load> packages, all the sugar is right here in
-C<Dyn>. The most simple use of C<Dyn> would look something like this:
-
-	use Dyn ':sugar';
-	sub some_argless_function() : Dyn('somelib.so', '()v');
-	some_argless_function();
-
-Be aware that this will look a lot more like L<NativeCall from
-Raku|https://docs.raku.org/language/nativecall> before v1.0!
-
-The second line above looks like a normal Perl sub declaration but includes the
-C<:Dyn> attribute to specify that the sub is actually defined in a native
-library.
-
-To avoid banging your head on a built-in function, you may name your sub
-anything else and let Dyn know what symbol to attach:
-
-	sub my_abs : Dyn('my_lib.dll', '(d)d', 'abs');
-	CORE::say my_abs( -75 ); # Should print 75 if your abs is something that makes sense
-
-This is by far the fastest way to work with this distribution but it's not by
-any means the only way.
-
-All of the following methods may be imported by name or with the C<:sugar> tag.
-
-Note that everything here is subject to change before v1.0.
-
-=head2 C<load( ... )>
-
-Creates a wrapper around a given symbol in a given library.
-
-	my $pow = Dyn::load( 'C:\Windows\System32\user32.dll', 'pow', 'dd)d' );
-
-Expected parameters include:
-
-=over
-
-=item C<lib> - pointer returned by L<< C<dlLoadLibrary( ... )>|Dyn::Load/C<dlLoadLibrary( ... )> >> or the path of the library as a string
-
-=item C<name> - the name of the symbol to call
-
-=item C<signature> - signature defining argument types, return type, and optionally the calling convention used
-
-=back
-
-=head2 C<call( ... )>
-
-Invokes the function according to the provided L<signature|/Signatures>.
-
-	my $value = $pow->call( 2.0, 10 ); # Same as Dyn::call( $pow, 2.0, 10 )
-
-Expected parameters include:
-
-=over
-
-=item C<bind> - C<Dyn> object bound with C<load( ... )>
-
-=item C<...> - any arguments to bind to the call
-
-=back
-
 =head1 Signatures
 
 C<dyncall> uses an almost C<pack>-like syntax to define signatures. A signature
@@ -140,7 +66,6 @@ is a character string that represents a function's arguments and return value
 types. This is an essential part of mapping the more flexible and often
 abstract data types provided in scripting languages to the strict machine-level
 data types used by C-libraries.
-
 
 =for future The high-level C interface functions L<<
 C<dcCallF( ... )>|Dyn::Call/C<dcCallF( ... )> >>, L<< C<dcVCallF( ...
@@ -182,6 +107,9 @@ The following types are supported:
     d                       double
     p                       void *
     Z                       const char * (pointer to a C string)
+    A                       aggregate (struct/union described out-of-band via DCaggr)
+
+See L<Dyn::Call|Dyn::Call/Signature> for importable values.
 
 Please note that using a C<(> at the beginning of a signature string is
 possible, although not required. The character doesn't have any meaning and
@@ -199,8 +127,9 @@ begins. The following signature characters exist:
     Signature character   Calling Convention
     ------------------------------------------------------
     :                     platform's default calling convention
+    *                     C++ this calls (platform native)
     e                     vararg function
-    .                     vararg function's variadic/ellipsis part (...), to be speciﬁed before ﬁrst vararg
+    .                     vararg function's variadic/ellipsis part (...), to be specified before first vararg
     c                     only on x86: cdecl
     s                     only on x86: stdcall
     F                     only on x86: fastcall (MS)
@@ -210,6 +139,8 @@ begins. The following signature characters exist:
     A                     only on ARM: ARM mode
     a                     only on ARM: THUMB mode
     $                     syscall
+
+See L<Dyn::Call|Dyn::Call/Modes> for importable values.
 
 =head1 Platform Support
 
@@ -221,9 +152,11 @@ mips, mips64, ppc32, ppc64, sparc, sparc64, etc.).
 
 =head1 See Also
 
-Check out L<FFI::Platypus> for a more robust and mature FFI.
+L<https://dyncall.org>
 
-Examples found in C<eg/>.
+L<Affix> for a dyncall wrapper with some of the rough edges sanded down.
+
+L<FFI::Platypus> for a mature, well-tested FFI.
 
 =head1 LICENSE
 

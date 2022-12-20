@@ -6,7 +6,7 @@ use Test::More import => [ qw( BAIL_OUT is_deeply use_ok ) ], tests => 3;
 
 use HTTP::Request::Common qw( GET );
 use Log::Any::Test        qw();
-use Log::Any              qw( $logger );
+use Log::Any              qw( $logger );    # Log::Any global log buffer category is "main"
 use Plack::Test           qw();
 
 my $middleware;

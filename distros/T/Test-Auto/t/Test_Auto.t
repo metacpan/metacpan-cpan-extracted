@@ -20,7 +20,7 @@ $test->for('name');
 
 =version
 
-0.13
+0.14
 
 =cut
 
@@ -63,6 +63,8 @@ $test->for('includes');
   my $test = Test::Auto->new(
     't/Test_Auto.t'
   );
+
+  # ...
 
   # =synopsis
   #
@@ -122,7 +124,7 @@ powerful hooks into the framework for manual testing.
 
     ok my $result = $tryable->result, 'result ok';
 
-    # must return truthy to cont
+    # must return truthy to continue
     $result;
   });
 
@@ -145,7 +147,7 @@ exceptions simple, for example:
     ok my $result = $tryable->result, 'result ok';
     ok $result->isa('Path::Find::Error'), 'exception caught';
 
-    # must return truthy to cont
+    # must return truthy to continue
     $result;
   });
 
@@ -161,7 +163,7 @@ result as a L<Venus::Try> object. The first argument is the example ID (or
 
     ok my $result = $tryable->result, 'result ok';
 
-    # must return truthy to cont
+    # must return truthy to continue
     $result;
   });
 
@@ -176,7 +178,7 @@ as a L<Venus::Try> object, for example:
 
     ok my $result = $tryable->result, 'result ok';
 
-    # must return truthy to cont
+    # must return truthy to continue
     $result;
   });
 
@@ -186,47 +188,47 @@ reusability and reduces the need for complicated state and test setup.
 
 +=head1 SPECIFICATION
 
-  # Since 0.13
+  # Version 0.13+
 
   # [required]
 
   =name
   =abstract
-  =tagline
   =includes
   =synopsis
   =description
 
   # [optional]
 
+  =tagline
   =libraries
   =inherits
   =integrates
 
-  # [repeatable; optional]
+  # [optional; repeatable]
 
   =feature $name
   =example $name
 
-  # [repeatable; optional]
+  # [optional; repeatable]
 
   =attribute $name
   =signature $name
   =example-$number $name # [repeatable]
 
-  # [repeatable; optional]
+  # [optional; repeatable]
 
   =method $name
   =signature $name
   =example-$number $name # [repeatable]
 
-  # [repeatable; optional]
+  # [optional; repeatable]
 
   =function $name
   =signature $name
   =example-$number $name # [repeatable]
 
-  # [repeatable; optional]
+  # [optional; repeatable]
 
   =routine $name
   =signature $name
@@ -234,8 +236,8 @@ reusability and reduces the need for complicated state and test setup.
 
 The specification is designed to accommodate typical package declarations. It
 is used by the parser to provide the content used in test automation and
-document generation. B<Note:> When code blocks are evaluated I<"redefined">
-warnings are now automatically disabled.
+document generation. B<Note:> When code blocks are evaluated, the
+I<"redefined"> warnings are now automatically disabled.
 
 +=head2 name
 
@@ -244,6 +246,8 @@ warnings are now automatically disabled.
   Path::Find
 
   =cut
+
+  $test->for('name');
 
 The C<name> block should contain the package name. This is tested for
 loadability.
@@ -256,6 +260,8 @@ loadability.
 
   =cut
 
+  $test->for('tagline');
+
 The C<tagline> block should contain a tagline for the package. This is optional
 but if present is concatenated with the C<name> during POD generation.
 
@@ -266,6 +272,8 @@ but if present is concatenated with the C<name> during POD generation.
   Find Paths using Heuristics
 
   =cut
+
+  $test->for('abstract');
 
 The C<abstract> block should contain a subtitle describing the package. This is
 tested for existence.
@@ -280,6 +288,8 @@ tested for existence.
   method: new
 
   =cut
+
+  $test->for('includes');
 
 The C<includes> block should contain a list of C<function>, C<method>, and/or
 C<routine> names in the format of C<$type: $name>. Empty lines are ignored.
@@ -298,6 +308,14 @@ exists.
 
   =cut
 
+  $test->for('synopsis', sub {
+    my ($tryable) = @_;
+    my $result = $tryable->result;
+
+    # must return truthy to continue
+    $result
+  });
+
 The C<synopsis> block should contain the normative usage of the package. This
 is tested for existence. This block should be written in a way that allows it
 to be evaled successfully and should return a value.
@@ -311,6 +329,8 @@ to be evaled successfully and should return a value.
 
   =cut
 
+  $test->for('description');
+
 The C<description> block should contain a thorough explanation of the purpose
 of the package. This is tested for existence.
 
@@ -322,6 +342,8 @@ of the package. This is tested for existence.
   Types::TypeTiny
 
   =cut
+
+  $test->for('libraries');
 
 The C<libraries> block should contain a list of packages, each of which is
 itself a L<Type::Library>. These packages are tested for loadability, and to
@@ -335,6 +357,8 @@ ensure they are type library classes.
 
   =cut
 
+  $test->for('inherits');
+
 The C<inherits> block should contain a list of parent packages. These packages
 are tested for loadability.
 
@@ -346,6 +370,8 @@ are tested for loadability.
   Path::Find::Downable
 
   =cut
+
+  $test->for('integrates');
 
 The C<integrates> block should contain a list of packages that are involved in
 the behavior of the main package. These packages are not automatically tested.
@@ -368,6 +394,13 @@ the behavior of the main package. These packages are not automatically tested.
 
   =cut
 
+  $test->for('example', 'export-path-make', sub {
+    my ($tryable) = @_;
+    my $result = $tryable->result;
+
+    # must return truthy to continue
+    $result
+  });
 
 There are situation where a package can be configured in different ways,
 especially where it exists without functions, methods or routines for the
@@ -391,11 +424,23 @@ Each feature is tested and must be recognized to exist by the main package.
 
   cwd(Str $path) : (Object)
 
+  =cut
+
   =example-1 cwd
 
   # given: synopsis
 
   my $cwd = $path->cwd;
+
+  =cut
+
+  $test->for('example', 1, 'cwd', sub {
+    my ($tryable) = @_;
+    my $result = $tryable->result;
+
+    # must return truthy to continue
+    $result
+  });
 
   =example-2 cwd
 
@@ -404,6 +449,14 @@ Each feature is tested and must be recognized to exist by the main package.
   my $cwd = $path->cwd('/path/to/file');
 
   =cut
+
+  $test->for('example', 2, 'cwd', sub {
+    my ($tryable) = @_;
+    my $result = $tryable->result;
+
+    # must return truthy to continue
+    $result
+  });
 
 Describing an attribute requires at least three blocks, i.e. C<attribute
 $name>, C<signature $name>, and C<example-1 $name>. The C<attribute> block
@@ -428,11 +481,23 @@ is tested and must be recognized to exist by the main package.
 
   children() : [Object]
 
+  =cut
+
   =example-1 children
 
   # given: synopsis
 
   my $children = $path->children;
+
+  =cut
+
+  $test->for('example', 1, 'children', sub {
+    my ($tryable) = @_;
+    my $result = $tryable->result;
+
+    # must return truthy to continue
+    $result
+  });
 
   =example-2 children
 
@@ -441,6 +506,14 @@ is tested and must be recognized to exist by the main package.
   my $filtered = $path->children(qr/lib/);
 
   =cut
+
+  $test->for('example', 2, 'children', sub {
+    my ($tryable) = @_;
+    my $result = $tryable->result;
+
+    # must return truthy to continue
+    $result
+  });
 
 Describing a method requires at least three blocks, i.e. C<method $name>,
 C<signature $name>, and C<example-1 $name>. The C<method> block should contain
@@ -465,6 +538,8 @@ must be recognized to exist by the main package.
 
   path() : Object
 
+  =cut
+
   =example-1 path
 
   package Test::Path::Find;
@@ -474,6 +549,14 @@ must be recognized to exist by the main package.
   my $path = path;
 
   =cut
+
+  $test->for('example', 1, 'path', sub {
+    my ($tryable) = @_;
+    my $result = $tryable->result;
+
+    # must return truthy to continue
+    $result
+  });
 
 Describing a function requires at least three blocks, i.e. C<function $name>,
 C<signature $name>, and C<example-1 $name>. The C<function> block should
@@ -498,11 +581,23 @@ is tested and must be recognized to exist by the main package.
 
   algorithms() : Object
 
+  =cut
+
   =example-1 algorithms
 
   # given: synopsis
 
   $path->algorithms
+
+  =cut
+
+  $test->for('example', 1, 'algorithms', sub {
+    my ($tryable) = @_;
+    my $result = $tryable->result;
+
+    # must return truthy to continue
+    $result
+  });
 
   =example-2 algorithms
 
@@ -513,6 +608,14 @@ is tested and must be recognized to exist by the main package.
   Path::Find->algorithms;
 
   =cut
+
+  $test->for('example', 2, 'algorithms', sub {
+    my ($tryable) = @_;
+    my $result = $tryable->result;
+
+    # must return truthy to continue
+    $result
+  });
 
 Typically, a Perl subroutine is declared as a function or a method. Rarely, but
 sometimes necessary, you will need to describe a subroutine where the invocant
@@ -685,7 +788,7 @@ prevent warnings when redeclaring packages in examples.
 
   # given: synopsis
 
-  my $data = $test->for('synosis');
+  my $data = $test->for('synopsis');
 
   # bless({value => 't/Test_Auto.t'}, 'Test::Auto')
 

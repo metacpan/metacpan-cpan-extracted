@@ -8,7 +8,7 @@ my $build = Module::Build->new(
    module_name => 'Tickit::Widget::Choice',
    requires => {
       'perl' => '5.026',
-      'Object::Pad' => '0.57',
+      'Object::Pad' => '0.74', # 0.73 + bugfix
 
       'Tickit::RenderBuffer' => 0,
       'Tickit::Style' => 0,

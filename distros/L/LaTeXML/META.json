@@ -5,7 +5,7 @@
       "Deyan Ginev <deyan.ginev@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "open_source"
    ],
@@ -67,6 +67,6 @@
          "web" : "https://github.com/brucemiller/LaTeXML"
       }
    },
-   "version" : "0.8.6",
+   "version" : "0.8.7",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

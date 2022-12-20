@@ -16,7 +16,7 @@ Text::ANSI::Tabs - Tab expand and unexpand with ANSI sequence
 
 # VERSION
 
-Version 1.01
+Version 1.02
 
 # DESCRIPTION
 
@@ -24,7 +24,7 @@ ANSI sequence and Unicode wide characters aware version of Text::Tabs.
 
 # FUNCTION
 
-There are exportable functions start with **ansi\_** prefix, and
+There are exportable functions start with `ansi_` prefix, and
 unexportable functions without them.
 
 - **expand**(_text_, ...)

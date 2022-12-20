@@ -10,7 +10,7 @@ tstlocalrules ('
   body NATURAL	/\btotally <br> natural/i
 ');
 
-%patterns = ( q{ NATURAL } => 'NATURAL',);
+%patterns = ( q{ 1.0 NATURAL } => 'NATURAL',);
 %anti_patterns = ();
 sarun ("-L -t < data/spam/badctype1", \&patterns_run_cb);
 ok_all_patterns();
@@ -19,3 +19,4 @@ ok_all_patterns();
 %anti_patterns = ( q{ NATURAL } => 'NATURAL',);
 sarun ("-L -t < data/spam/badctype2", \&patterns_run_cb);
 ok_all_patterns();
+

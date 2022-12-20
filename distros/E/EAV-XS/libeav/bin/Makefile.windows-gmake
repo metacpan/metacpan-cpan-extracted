@@ -16,7 +16,7 @@ LIBS_STATIC = ${_libs_static}
 
 #----------------------------------------------------------#
 
-.PHONY: all clean debug static shared install
+.PHONY: all clean debug install strip static shared install-static strip-static eav.exe eav-static.exe uninstall
 
 all: shared
 
@@ -41,11 +41,11 @@ eav-static.exe: $(OBJECTS)
 
 strip: shared
 	$(info === bin -> strip)
-	strip --strip-unneeded -R .comment -R .note -R .note.ABI-tag eav
+	strip --strip-unneeded -R .comment -R .note -R .note.ABI-tag eav.exe
 
 strip-static: static
 	$(info === bin -> strip)
-	strip --strip-unneeded -R .comment -R .note -R .note.ABI-tag eav.static
+	strip --strip-unneeded -R .comment -R .note -R .note.ABI-tag eav-static.exe
 
 #----------------------------------------------------------#
 
@@ -57,5 +57,13 @@ clean:
 
 install: shared
 	$(INSTALL) -d $(DESTDIR)/bin
-	$(INSTALL) -m 0755 eav $(DESTDIR)/bin
+	$(INSTALL) -m 0755 eav.exe $(DESTDIR)/bin
 
+install-static: static
+	$(INSTALL) -d $(DESTDIR)/sbin
+	$(INSTALL) -m 0755 eav-static.exe $(DESTDIR)/sbin
+
+uninstall:
+	$(info === bin -> uninstalling ...)
+	$(RM) $(DESTDIR)/bin/eav.exe
+	$(RM) $(DESTDIR)/sbin/eav-static.exe

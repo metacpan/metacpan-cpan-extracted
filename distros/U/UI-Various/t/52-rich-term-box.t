@@ -40,7 +40,7 @@ BEGIN {
     chomp $_;
     -c $_  and  -w $_
 	or  plan skip_all => 'required TTY (' . $_ . ') not available';
-    plan tests => 31;
+    plan tests => 33;
 
     # define fixed environment for unit tests:
     delete $ENV{DISPLAY};
@@ -83,6 +83,12 @@ my $main = UI::Various::Main->new(width => 40);
 my $win;
 my $quit = UI::Various::Button->new(text => 'Quit',
 				    code => sub { $win->destroy; });
+my $dump;
+my $dump_and_quit = UI::Various::Button->new(text => 'Quit',
+					     code => sub {
+						 $dump = $win->dump;
+						 $win->destroy;
+					     });
 
 my $prompt = 'enter selection: ';
 
@@ -147,7 +153,7 @@ $box = UI::Various::Box->new(rows => 3, columns => 3);
 $box->add(@{long}[0..8]);
 $box->remove($long[1]);
 $box->remove($long[3]);
-$win = $main->window({title => 'normal long'}, $box, $quit);
+$win = $main->window({title => 'normal long'}, $box, $dump_and_quit);
 stdout_is
 {   _call_with_stdin("1\n", sub { $main->mainloop; });   }
     join("\n",
@@ -157,6 +163,82 @@ stdout_is
 	 '"    7777777 88888888 999999999"',
 	 '"<1> [Quit]                    "',
 	 '#==============================#',
+	 $prompt),
+    'incomplete long mainloop runs correctly';
+like($dump,
+     qr{_space:\n
+	\ \ 26:26\n
+	\ \ 3:3\n
+	\ \ 6:6\n
+	\ \ 1:1\n
+	_total_height:6\n
+	children:\n
+	\ \ UI::Various::RichTerm::Box=HASH\(0x[0-9a-f]+\):\n
+	\ \ \ \ _heights:\n
+	\ \ \ \ \ \ 1\n
+	\ \ \ \ \ \ 1\n
+	\ \ \ \ \ \ 1\n
+	\ \ \ \ _sizes:\n
+	\ \ \ \ \ \ ARRAY\(0x[0-9a-f]+\):\ 1\ 1\n
+	\ \ \ \ \ \ ARRAY\(0x[0-9a-f]+\):\ 0\ 0\n
+	\ \ \ \ \ \ ARRAY\(0x[0-9a-f]+\):\ 3\ 1\n
+	\ \ \ \ \ \ ARRAY\(0x[0-9a-f]+\):\ 0\ 0\n
+	\ \ \ \ \ \ ARRAY\(0x[0-9a-f]+\):\ 5\ 1\n
+	\ \ \ \ \ \ ARRAY\(0x[0-9a-f]+\):\ 6\ 1\n
+	\ \ \ \ \ \ ARRAY\(0x[0-9a-f]+\):\ 7\ 1\n
+	\ \ \ \ \ \ ARRAY\(0x[0-9a-f]+\):\ 8\ 1\n
+	\ \ \ \ \ \ ARRAY\(0x[0-9a-f]+\):\ 9\ 1\n
+	\ \ \ \ _widths:\n
+	\ \ \ \ \ \ 7\n
+	\ \ \ \ \ \ 8\n
+	\ \ \ \ \ \ 9\n
+	\ \ \ \ border:0\n
+	\ \ \ \ columns:3\n
+	\ \ \ \ field:\n
+	\ \ \ \ \ \ UI::Various::RichTerm::Text=HASH\(0x[0-9a-f]+\):\n
+	\ \ \ \ \ \ \ \ text:1\n
+	\ \ \ \ \ \ UI::Various::RichTerm::Text=HASH\(0x[0-9a-f]+\):\n
+	\ \ \ \ \ \ \ \ text:333\n
+	\ \ \ \ \ \ UI::Various::RichTerm::Text=HASH\(0x[0-9a-f]+\):\n
+	\ \ \ \ \ \ \ \ text:55555\n
+	\ \ \ \ \ \ UI::Various::RichTerm::Text=HASH\(0x[0-9a-f]+\):\n
+	\ \ \ \ \ \ \ \ text:666666\n
+	\ \ \ \ \ \ UI::Various::RichTerm::Text=HASH\(0x[0-9a-f]+\):\n
+	\ \ \ \ \ \ \ \ text:7777777\n
+	\ \ \ \ \ \ UI::Various::RichTerm::Text=HASH\(0x[0-9a-f]+\):\n
+	\ \ \ \ \ \ \ \ text:88888888\n
+	\ \ \ \ \ \ UI::Various::RichTerm::Text=HASH\(0x[0-9a-f]+\):\n
+	\ \ \ \ \ \ \ \ text:999999999\n
+	\ \ \ \ rows:3\n
+	\ \ UI::Various::RichTerm::Button=HASH\(0x[0-9a-f]+\):\n
+	\ \ \ \ code:CODE\(0x[0-9a-f]+\)\n
+	\ \ \ \ text:Quit\n
+	title:normal\ long\n}x,
+     'dump of incomplete window is correct');
+
+####################################
+# 4x1 box with radio buttons, border and button inside:
+my $var = 'b';
+my $radio =
+    UI::Various::Radio->new(buttons => [a => 123,
+					b => 42,
+					c => 12345],
+			    var => \$var);
+$box = UI::Various::Box->new(rows => 2, border => 2);
+$box->add($radio,$quit);
+$win = $main->window($box);
+stdout_is
+{   _call_with_stdin("2\n", sub { $main->mainloop; });   }
+    join("\n",
+	 '#============<0>#',
+	 '"+-------------+"',
+	 '"|<1> ( ) 123  |"',
+	 '"|    (o) 42   |"',
+	 '"|    ( ) 12345|"',
+	 '"+-------------+"',
+	 '"|<2> [Quit]   |"',
+	 '"+-------------+"',
+	 '#===============#',
 	 $prompt),
     'incomplete long mainloop runs correctly';
 

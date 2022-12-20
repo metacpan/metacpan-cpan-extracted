@@ -9,7 +9,7 @@ use ExtUtils::MakeMaker;
 use File::ShareDir::Install;
 $File::ShareDir::Install::INCLUDE_DOTFILES = 1;
 $File::ShareDir::Install::INCLUDE_DOTDIRS = 1;
-install_share dist => "ruby\-money\/config";
+install_share dist => "conf";
 
 
 my %WriteMakefileArgs = (
@@ -34,7 +34,7 @@ my %WriteMakefileArgs = (
     "Test::Warn" => 0,
     "Types::Serialiser" => 0
   },
-  "VERSION" => "0.23",
+  "VERSION" => "0.24",
   "test" => {
     "TESTS" => "t/*.t"
   }

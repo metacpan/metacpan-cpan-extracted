@@ -6,7 +6,7 @@ use warnings;
 use Test::More;
 use Test::Fatal;
 
-use Object::Pad ':experimental(init_expr)';
+use Object::Pad;
 
 package Base::Class {
    sub new {

@@ -85,6 +85,7 @@ $test->for('description');
 =integrates
 
 Venus::Role::Buildable
+Venus::Role::Optional
 
 =cut
 

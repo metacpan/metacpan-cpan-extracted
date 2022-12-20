@@ -51,6 +51,23 @@ around the newline character in "folded" headers will be replaced with a single
 space.  Append C<:raw> to the header name to retrieve the raw, undecoded value,
 including pristine whitespace, instead.
 
+=item tflags NAME_OF_RULE range=x-y
+
+Match only from specific MIME parts, indexed in the order they are parsed.
+Part 1 = main message headers. Part 2 = next part etc.
+
+ range=1    (match only main headers, not any subparts)
+ range=2-   (match any subparts, but not the main headers)
+ range=-3   (match only first three parts, including main headers)
+ range=2-3  (match only first two subparts)
+
+=item tflags NAME_OF_RULE concat
+
+Concatenate all headers from all mime parts (possible range applied) into a
+single string for matching.  This allows matching headers across multiple
+parts with single regex.  Normally pattern is tested individually for
+different mime parts.
+
 =back
 
 =cut
@@ -151,6 +168,9 @@ sub set_config {
       $self->{parser}->add_test($rulename, $evalfn."()",
                 $Mail::SpamAssassin::Conf::TYPE_BODY_EVALS);
 
+      # Support named regex captures
+      $self->{parser}->parse_captures($rulename, $rec);
+
       # evalfn/rulename safe, sanitized by $RULENAME_RE
       my $evalcode = '
         sub Mail::SpamAssassin::Plugin::MIMEHeader::'.$evalfn.' {
@@ -178,37 +198,104 @@ sub set_config {
 # ---------------------------------------------------------------------------
 
 sub eval_hook_called {
-  my ($pobj, $scanner, $rulename) = @_;
+  my ($pobj, $pms, $rulename) = @_;
 
-  my $rule = $scanner->{conf}->{mimeheader_tests}->{$rulename};
+  my $conf = $pms->{conf};
+  my $rule = $conf->{mimeheader_tests}->{$rulename};
   my $hdr = $rule->{hdr};
   my $negated = $rule->{negated};
-  my $if_unset = $rule->{if_unset};
   my $pattern = $rule->{pattern};
-
-
-  my $getraw;
+  my $tflags = $conf->{tflags}->{$rulename}||'';
+  
+  my $getraw = 0;
   if ($hdr =~ s/:raw$//) {
     $getraw = 1;
-  } else {
-    $getraw = 0;
   }
 
-  foreach my $p ($scanner->{msg}->find_parts(qr/./)) {
+  my $range_min = 0;
+  my $range_max = 1000;
+  if ($tflags =~ /(?:^|\s)range=(\d+)?(-)?(\d+)?(?:\s|$)/) {
+    if (defined $1 && defined $2 && defined $3) {
+      $range_min = $1;
+      $range_max = $3;
+    }
+    elsif (defined $1 && defined $2) {
+      $range_min = $1;
+    }
+    elsif (defined $2 && defined $3) {
+      $range_max = $3;
+    }
+    elsif (defined $1) {
+      $range_min = $range_max = $1;
+    }
+  }
+
+  my $multiple = $tflags =~ /\bmultiple\b/;
+  my $concat = $tflags =~ /\bconcat\b/;
+  my $maxhits = $tflags =~ /\bmaxhits=(\d+)\b/ ? $1 :
+                           $multiple ? 1000 : 1;
+  my $cval = '';
+
+  my $idx = 0;
+  foreach my $p ($pms->{msg}->find_parts(qr/./)) {
+    $idx++;
+    last if $idx > $range_max;
+    next if $idx < $range_min;
+
     my $val;
-    if ($getraw) {
+    if ($hdr eq 'ALL') {
+      $val = $p->get_all_headers($getraw, 0);
+    } elsif ($getraw) {
       $val = $p->raw_header($hdr);
     } else {
       $val = $p->get_header($hdr);
     }
-    $val = $if_unset if !defined $val;
+    $val = $rule->{if_unset}  if !defined $val;
 
-    if ($val =~ $pattern) {
-      return ($negated ? 0 : 1);
+    if ($concat) {
+      $val .= "\n" unless $val =~ /\n$/;
+      $cval .= $val;
+      next;
+    }
+
+    if (_check($pms, $rulename, $val, $pattern, $negated, $maxhits, "part $idx")) {
+      return 0;
     }
   }
 
-  return ($negated ? 1 : 0);
+  if ($concat) {
+    if (_check($pms, $rulename, $cval, $pattern, $negated, $maxhits, 'concat')) {
+      return 0;
+    }
+  }
+
+  if ($negated) {
+    dbg("mimeheader: ran rule $rulename ======> got hit: \"<negative match>\"");
+    return 1;
+  }
+
+  return 0;
+}
+
+sub _check {
+  my ($pms, $rulename, $value, $pattern, $negated, $maxhits, $desc) = @_;
+
+  my $hits = 0;
+  my %captures;
+  while ($value =~ /$pattern/gp) {
+    last if $negated;
+    if (%-) {
+      foreach my $cname (keys %-) {
+        push @{$captures{$cname}}, grep { $_ ne "" } @{$-{$cname}};
+      }
+    }
+    my $match = defined ${^MATCH} ? ${^MATCH} : "<negative match>";
+    $pms->got_hit($rulename, '', ruletype => 'eval');
+    dbg("mimeheader: ran rule $rulename ======> got hit: \"$match\" ($desc)");
+    last if ++$hits >= $maxhits;
+  }
+  $pms->set_captures(\%captures) if %captures;
+  return $hits;
 }
 
 # ---------------------------------------------------------------------------
@@ -223,5 +310,11 @@ sub finish_tests {
 }
 
 # ---------------------------------------------------------------------------
+
+sub has_all_header { 1 } # Supports ALL header query (Bug 5582)
+sub has_tflags_range { 1 } # Supports tflags range=x-y
+sub has_tflags_concat { 1 } # Supports tflags concat
+sub has_tflags_multiple { 1 } # Supports tflags multiple
+sub has_capture_rules { 1 } # Supports named regex captures (Bug 7992)
 
 1;

@@ -9,6 +9,10 @@ use Venus::Class 'base';
 
 base 'Faker::Plugin';
 
+# VERSION
+
+our $VERSION = '1.17';
+
 # METHODS
 
 sub execute {
@@ -36,6 +40,12 @@ Faker::Plugin::InternetIpAddressV4 - Internet Ip Address V4
 =head1 ABSTRACT
 
 Internet Ip Address V4 for Faker
+
+=cut
+
+=head1 VERSION
+
+1.17
 
 =cut
 

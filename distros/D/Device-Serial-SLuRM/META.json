@@ -26,7 +26,7 @@
             "Future::Buffer" : "0.03",
             "Future::IO" : "0",
             "IO::Termios" : "0",
-            "Object::Pad" : "0.73",
+            "Object::Pad" : "0.76",
             "Syntax::Keyword::Match" : "0",
             "perl" : "5.026"
          }
@@ -42,7 +42,7 @@
    "provides" : {
       "Device::Serial::SLuRM" : {
          "file" : "lib/Device/Serial/SLuRM.pm",
-         "version" : "0.04"
+         "version" : "0.05"
       }
    },
    "release_status" : "stable",
@@ -51,6 +51,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.04",
+   "version" : "0.05",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

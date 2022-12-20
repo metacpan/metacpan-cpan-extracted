@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-11'; # DATE
+our $DATE = '2022-12-16'; # DATE
 our $DIST = 'Sah-Schemas-Perl'; # DIST
-our $VERSION = '0.045'; # VERSION
+our $VERSION = '0.046'; # VERSION
 
 sub meta {
     +{
@@ -57,7 +57,7 @@ Data::Sah::Coerce::perl::To_str::From_str::convert_perl_pod_or_pm_to_path
 
 =head1 VERSION
 
-This document describes version 0.045 of Data::Sah::Coerce::perl::To_str::From_str::convert_perl_pod_or_pm_to_path (from Perl distribution Sah-Schemas-Perl), released on 2022-09-11.
+This document describes version 0.046 of Data::Sah::Coerce::perl::To_str::From_str::convert_perl_pod_or_pm_to_path (from Perl distribution Sah-Schemas-Perl), released on 2022-12-16.
 
 =head1 DESCRIPTION
 

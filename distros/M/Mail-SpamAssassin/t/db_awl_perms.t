@@ -2,27 +2,29 @@
 
 use lib '.'; use lib 't';
 use SATest; sa_t_init("db_awl_perms");
-use Test::More tests => 5;
 use IO::File;
+use Test::More;
+plan skip_all => "Tests don't work on windows" if $RUNNING_ON_WINDOWS;
+plan tests => 5;
 
 # ---------------------------------------------------------------------------
 # bug 6173
 
 tstprefs ("
-        $default_cf_lines
-        use_auto_whitelist 1
-        auto_whitelist_path ./log/user_state/awl
-        auto_whitelist_file_mode 0755
-        lock_method flock
+  use_auto_whitelist 1
+  auto_whitelist_path ./$userstate/awl
+  auto_whitelist_file_mode 0755
+  lock_method flock
 ");
 
-unlink "log/user_state/awl";
-unlink "log/user_state/awl.mutex";
+unlink "$userstate/awl";
+unlink "$userstate/awl.mutex";
 umask 022;
 sarun("--add-addr-to-whitelist whitelist_test\@example.org",
       \&patterns_run_cb);
 
-untaint_system "ls -l log/user_state";          # for the logs
+# in case this test is ever made to work on Windows
+untaint_system($RUNNING_ON_WINDOWS?("dir " . File::Spec->canonpath($userstate)):"ls -l $userstate");  # for the logs
 
 sub checkmode {
   my $fname = shift;
@@ -31,12 +33,12 @@ sub checkmode {
   return (($mode & 0777) == 0644);
 }
 
-ok checkmode "log/user_state/awl";              # DB_File
-ok checkmode "log/user_state/awl.dir";          # SDBM
-ok checkmode "log/user_state/awl.pag";          # SDBM
-ok checkmode "log/user_state/awl.mutex";
+ok checkmode "$userstate/awl";              # DB_File
+ok checkmode "$userstate/awl.dir";          # SDBM
+ok checkmode "$userstate/awl.pag";          # SDBM
+ok checkmode "$userstate/awl.mutex";
 
-unlink 'log/user_state/awl',
-    'log/user_state/awl.dir',
-    'log/user_state/awl.pag';
-ok unlink 'log/user_state/awl.mutex';
+unlink "$userstate/awl",
+    "$userstate/awl.dir",
+    "$userstate/awl.pag";
+ok unlink "$userstate/awl.mutex";

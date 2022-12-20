@@ -126,11 +126,11 @@ $test->for('example', 1, 'execute', sub {
   ok $result->isa('Faker::Plugin::EnUs::PersonLastName');
   ok $result->faker;
   ok $result->faker->random->reseed($seed);
-  ok $result->faker->random->make; # reset randomizer
+  ok $result->faker->random->pick; # reset randomizer
   is $result->execute, "Heaney";
-  ok $result->faker->random->make; # reset randomizer
+  ok $result->faker->random->pick; # reset randomizer
   is $result->execute, "Johnston";
-  ok $result->faker->random->make; # reset randomizer
+  ok $result->faker->random->pick; # reset randomizer
   is $result->execute, "Steuber";
 
   $result

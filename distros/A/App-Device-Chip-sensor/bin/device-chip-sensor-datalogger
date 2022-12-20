@@ -3,7 +3,7 @@
 use v5.26;
 use warnings;
 
-use Object::Pad 0.73 ':experimental(init_expr)';
+use Object::Pad 0.76;
 
 use Future::AsyncAwait;
 use Future::IO::Impl::IOAsync;

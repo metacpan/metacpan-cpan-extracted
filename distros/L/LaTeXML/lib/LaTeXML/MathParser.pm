@@ -27,7 +27,7 @@ use List::Util qw(min max);
 use base (qw(Exporter));
 
 our @EXPORT_OK = (qw(&Lookup &New &Absent &Apply &ApplyNary &recApply &CatSymbols
-    &Annotate &InvisibleTimes &InvisibleComma
+    &Annotate &InvisibleTimes &InvisibleComma &MorphVertbar
     &TwoPartRelop &NewFormulae &NewFormula &NewList
     &ApplyDelimited &NewScript &DecorateOperator &InterpretDelimited &NewEvalAt
     &LeftRec
@@ -36,7 +36,7 @@ our @EXPORT_OK = (qw(&Lookup &New &Absent &Apply &ApplyNary &recApply &CatSymbol
     &isMatchingClose &Fence));
 our %EXPORT_TAGS = (constructors
     => [qw(&Lookup &New &Absent &Apply &ApplyNary &recApply &CatSymbols
-      &Annotate &InvisibleTimes &InvisibleComma
+      &Annotate &InvisibleTimes &InvisibleComma &MorphVertbar
       &TwoPartRelop &NewFormulae &NewFormula &NewList
       &ApplyDelimited &NewScript &DecorateOperator &InterpretDelimited &NewEvalAt
       &LeftRec
@@ -251,6 +251,7 @@ sub parse {
   my ($self, $xnode, $document) = @_;
   local $LaTeXML::MathParser::STRICT      = 1;
   local $LaTeXML::MathParser::WARNED      = 0;
+  local $LaTeXML::MathParser::UNPARSED    = 0;
   local $LaTeXML::MathParser::XNODE       = $xnode;
   local $LaTeXML::MathParser::PUNCTUATION = {};
   local $LaTeXML::MathParser::LOSTNODES   = {};
@@ -295,8 +296,11 @@ sub parse {
       else {
         foreach my $n ($document->findnodes("descendant-or-self::ltx:XMRef[\@idref='$id']", $p)) {
           $document->setAttribute($n, idref => $repid); } } }
-    $p->setAttribute('text', text_form($result));
-  }
+    $p->setAttribute('text', text_form($result)); }
+  if ($LaTeXML::MathParser::UNPARSED && is_genuinely_unparsed($xnode, $document)) {
+    my $maybe_math = $xnode->parentNode;
+    if ($document->getNodeQName($maybe_math) eq 'ltx:Math') {
+      $maybe_math->setAttribute('class', 'ltx_math_unparsed'); } }
   return; }
 
 my %TAG_FEEDBACK = ('ltx:XMArg' => 'a', 'ltx:XMWrap' => 'w');    # [CONSTANT]
@@ -474,13 +478,11 @@ sub filter_hints {
       $node->removeAttribute('_space');
       if ((!$node->getAttribute('_phantom'))
         && ($s >= $HINT_PUNCT_THRESHOLD) && (($node->getAttribute('role') || '') ne 'PUNCT')) {
-        # Create a new Punctuation node (XMTok) from the wide space
+        # Treat the XMHint as Punctuation (role=PUNCT)
         # I'm leary that this is a safe way to create an XML node that's NOT in the tree, but...
-        my $p = $node->parentNode;
-        #        my $punct = $document->openElementAt($p,'ltx:XMTok',role=>'PUNCT',rpadding=>$s.'pt');
-        my $punct = $document->openElementAt($p, 'ltx:XMTok', role => 'PUNCT',
+        my $p     = $node->parentNode;
+        my $punct = $document->openElementAt($p, 'ltx:XMHint', role => 'PUNCT', width => $s . 'pt',
           name => ('q' x int($s / 10)) . 'uad');
-        $punct->appendText(spacingToString($s));
         $p->removeChild($punct);    # But don't actually leave it in the tree!!!!
         push(@filtered, $punct); }
       else {
@@ -557,9 +559,11 @@ sub parse_kludge {
     push(@replacements, (ref $kludge eq 'ARRAY') && ($$kludge[0] eq 'ltx:XMWrap')
       ? @$kludge[2 .. $#$kludge] : ($kludge)); }
   $document->appendTree($mathnode, @replacements);
+  p_setAttribute($mathnode, '_unparsed', '1');    # But mark as unparsed
   return; }
 
 sub parse_kludgeScripts_rec {
+  no warnings 'recursion';
   my ($self, $x, $y, @more) = @_;
   my @acc = ();
   while (defined $y) {
@@ -651,7 +655,7 @@ sub parse_single {
   if ($rule =~ s/,$//) {
     # Collect ALL trailing PUNCT|PERIOD's...
     my ($x, $r);
-    while (($x = $nodes[-1]) && ($x = realizeXMNode($x)) && (getQName($x) eq 'ltx:XMTok')
+    while (($x = $nodes[-1]) && ($x = realizeXMNode($x))
       && ($r = $x->getAttribute('role')) && (($r eq 'PUNCT') || ($r eq 'PERIOD'))) {
       my $p = pop(@nodes);
       # Special case hackery, in case this thing is XMRef'd!!!
@@ -681,6 +685,7 @@ sub parse_single {
   # Failure? No result or uparsed lexemes remain.
   # NOTE: Should do script hack??
   if ((!defined $result) || $unparsed) {
+    $LaTeXML::MathParser::UNPARSED = 1;
     $self->failureReport($document, $mathnode, $rule, $unparsed, @nodes);
     return; }
   # Success!
@@ -707,14 +712,14 @@ sub node_to_lexeme {
     if (my $font = $node->getAttribute('_font')) {
       my $font_spec = $document->decodeFont($font);
       if (my %declarations = $font_spec && $font_spec->relativeTo(LaTeXML::Common::Font->textDefault)) {
-        my @to_add             = ();
+        my %to_add             = ();
         my $font_pending       = $declarations{font}        || {};
         my $properties_pending = $$font_pending{properties} || {};
         foreach my $attr (qw(family series shape)) {
           if (my $value = $$properties_pending{$attr}) {
-            push @to_add, $value; } }
-        if (@to_add) {
-          my $prefix = join("_", sort(@to_add)) . "_";
+            $to_add{$value} = 1; } }
+        if (%to_add) {
+          my $prefix = join("_", sort(keys(%to_add))) . "_";
           $lexeme = join(" ", map { $prefix . $_ } split(' ', $lexeme)); }
     } }
     if ($lexeme =~ /^\p{L}+$/) {
@@ -731,8 +736,11 @@ sub node_to_lexeme_full {
   if ($tag eq 'ltx:XMTok' || ($role && ($tag !~ 'ltx:XM(Dual|App|Arg|Array|Wrap|ath)'))) {
 # Elements that directly represent a lexeme, or intended operation with a syntactic role (such as a postscript),
 # can proceed to building the lexeme from the leaf node.
-    return $self->node_to_lexeme($node);
-  }
+    my $lexeme = $self->node_to_lexeme($node);
+    if ($role && $role =~ /^(UNDER|OVER)ACCENT$/) {
+      # over¯ and under¯ are the lexeme names of choice for \overline and \underline
+      $lexeme = lc($1) . $lexeme; }
+    return $lexeme; }
 # Elements that do not have a role and are intermediate "may" need an argument wrapper, so that arguments
 # remain unambiguous. For instance a `\frac{a}{b}` has clear argument structure to be preserved.
   my ($mark_start, $mark_end) = ('', '');
@@ -981,6 +989,34 @@ sub textrec_array {
     push(@rows, '[' . join(', ', map { ($_->firstChild ? textrec($_->firstChild) : '') } element_nodes($row)) . ']'); }
   return $name . '[' . join(', ', @rows) . ']'; }
 
+sub is_genuinely_unparsed {
+  my ($node, $document) = @_;
+  # any unparsed fragment should be considered legitimate with one exception
+  # author-provided ungrammatical snippets in the presentation branches of XMDual
+  # are allowed to fail the parse process.
+  #
+  # For now a reliable way of if we are in that case is to descend the formula through
+  # the content branch of XMDual and check if any node has an "unparsed" mark.
+  # Then only genuine parse failures will be detected.
+  my $tag = $document->getNodeQName($node);
+  if (($tag eq 'ltx:XMWrap') || ($tag eq 'ltx:XMArg') || $node->hasAttribute('_unparsed')) {
+    return 1; }
+  elsif (($tag eq 'ltx:XMTok') || ($tag eq 'ltx:XMText') || ($tag eq 'ltx:XMHint')) {
+    return 0; }
+  elsif ($tag eq 'ltx:XMRef') {
+    # avoid infinite loops on malformed XMRefs that don't point anywhere
+    if (!$node->getAttribute('idref')) {
+      return 1; }
+    else {
+      return is_genuinely_unparsed(realizeXMNode($node), $document); } }
+  elsif ($tag eq 'ltx:XMDual') {
+    my ($content, $presentation) = element_nodes($node);
+    return is_genuinely_unparsed($content, $document); }
+  else {
+    foreach my $child (element_nodes($node)) {
+      return 1 if is_genuinely_unparsed($child, $document); }
+    return 0; } }
+
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 # Cute! Were it NOT for Sub/Superscripts, the whole parsing process only
 # builds a new superstructure around the sequence of token nodes in the input.
@@ -1060,6 +1096,15 @@ sub p_getAttribute {
     return $$item[1]{$key}; }
   elsif (ref $item eq 'XML::LibXML::Element') {
     return $item->getAttribute($key); } }
+
+sub p_setAttribute {
+  my ($item, $key, $value) = @_;
+  if (!defined $item) {
+    return; }
+  elsif (ref $item eq 'ARRAY') {
+    return $$item[1]{$key} = $value; }
+  elsif (ref $item eq 'XML::LibXML::Element') {
+    return $item->setAttribute($key, $value); } }
 
 sub p_element_nodes {
   my ($item) = @_;
@@ -1180,6 +1225,44 @@ sub Annotate {
     map { $$node[1]{$_} = $attrib{$_} } keys %attrib; }    # Now add them.
   return $node; }
 
+sub UTF {
+  my ($code) = @_;
+  return pack('U', $code); }
+
+# Convert a token with role=VERTBAR to a different role,
+# possibly changing the content to the appropriate Unicode.
+my %vertbar_category = (
+  OPEN  => 'delimiter', CLOSE => 'delimiter', MIDDLE => 'delimiter',
+  PUNCT => 'operator');
+my %vertbar_glyph = (
+  delimiter => { '|' => UTF(0x7C), '||' => "\x{2016}", '|||' => "\x{2980}",
+    "\x{2225}" => "\x{2016}" },
+  operator => { '|' => "\x{2223}", '||' => "\x{2225}", '|||' => "\x{2AF4}",
+    "\x{2016}" => "\x{2225}" },
+);
+
+sub MorphVertbar {
+  my ($node, $role) = @_;
+  #return $node;
+  my $rnode    = realizeXMNode($node);
+  my $oldrole  = p_getAttribute($rnode, 'role');
+  my $oldchar  = $rnode->textContent;
+  my $category = $vertbar_category{$role};
+  my $char     = ($oldchar && $category && $vertbar_glyph{$category}{$oldchar}) || $oldchar;
+  my $newnode  = $node;
+  # Need to modify the token.
+  if ($category && (($char ne $oldchar) || ($role ne $oldrole))) {
+    # Collect up the attributes
+    my %attrib = ();
+    if (ref $node eq 'ARRAY') {
+      %attrib = %{ $$node[2] }; }
+    else {
+      %attrib = map { (getQName($_) => $_->getValue) }
+        grep { $_->nodeType == XML_ATTRIBUTE_NODE } $node->attributes; }
+    $attrib{role} = $role;
+    $newnode = [getQName($node), {%attrib}, $char]; }
+  return $newnode; }
+
 # ================================================================================
 # Mid-level constructors
 
@@ -1223,6 +1306,7 @@ sub recApply {
 # Given  alternating expressions & separators (punctuation,...)
 # extract the separators as a concatenated string,
 # returning (separators, args...)
+# But note that the separators are never used for anything!?
 sub extract_separators {
   my (@stuff) = @_;
   my ($punct, @args);
@@ -1233,7 +1317,7 @@ sub extract_separators {
       $punct .=
         ($punct ? ' ' : '')        # Delimited by SINGLE SPACE!
         . spacingToString(getXMHintSpacing(p_getAttribute($p, 'lpadding')))
-        . p_getValue($p)
+        . (p_getValue($p) // ' ')
         . spacingToString(getXMHintSpacing(p_getAttribute($p, 'rpadding')));
       push(@args, shift(@stuff)); } }    # Collect the next expression.
   @args = grep { $_ } @args;    # drop all undef args, trailing punct could have added an undef
@@ -1251,8 +1335,8 @@ sub extract_separators {
 # For example, whether (a,b) is an interval or list?
 #  (both could reasonably be preceded by \in )
 my %balanced = (    # [CONSTANT]
-  '('        => ')', '['  => ']', '{' => '}',
-  '|'        => '|', '||' => '||',
+  '('        => ')', '['  => ']',  '{'        => '}',
+  '|'        => '|', '||' => '||', "\x{2016}" => "\x{2016}", "\x{2980}" => "\x{2980}",
   "\x{230A}" => "\x{230B}",    # lfloor, rfloor
   "\x{2308}" => "\x{2309}",    # lceil, rceil
   "\x{2329}" => "\x{232A}",    # angle brackets; NOT mathematical, but balance in case they show up.
@@ -1264,7 +1348,7 @@ my %balanced = (    # [CONSTANT]
 my %enclose1 = (    # [CONSTANT]
   '{@}'               => 'set',              # alternatively, just variant parentheses
   '|@|'               => 'absolute-value',
-  '||@||'             => 'norm', "\x{2225}@\x{2225}" => 'norm',
+  '||@||'             => 'norm', "\x{2016}@\x{2016}" => 'norm',
   "\x{230A}@\x{230B}" => 'floor',
   "\x{2308}@\x{2309}" => 'ceiling',
   '<@>'               => 'expectation',      # or just average?
@@ -1365,7 +1449,7 @@ sub NewFormula {
 sub NewList {
   my (@stuff) = @_;
   # drop placeholder token for missing trailing punct, if any
-  if (scalar(@stuff) > 1 && (p_getTokenMeaning($stuff[-1]) eq 'absent')) {
+  if (scalar(@stuff) > 1 && ((p_getTokenMeaning($stuff[-1]) || '') eq 'absent')) {
     pop(@stuff); }
   if (@stuff == 1) {
     return $stuff[0]; }

@@ -69,6 +69,20 @@ sub compiles_ok
 
 # goto
 {
+   compiles_ok
+      'defer {
+         goto HERE;
+         HERE: 1;
+      }',
+      'goto forwards within defer {}';
+
+   compiles_ok
+      'defer {
+         HERE: 1;
+         goto HERE;
+      }',
+      'goto backwards within defer {}';
+
    compile_fails_msg_line
       'while(1) {
          defer { goto HERE }

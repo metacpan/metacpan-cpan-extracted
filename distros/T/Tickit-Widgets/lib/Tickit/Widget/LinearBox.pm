@@ -3,10 +3,11 @@
 #
 #  (C) Paul Evans, 2009-2022 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.57;
+use Object::Pad 0.66;
 
-package Tickit::Widget::LinearBox 0.52;
+package Tickit::Widget::LinearBox 0.53;
 class Tickit::Widget::LinearBox
+   :strict(params)
    :isa(Tickit::ContainerWidget);
 
 use experimental 'postderef';
@@ -67,9 +68,9 @@ Returns a new C<Tickit::Widget::LinearBox>.
 
 =cut
 
-has @_children;
+field @_children;
 
-has $_suppress_redistribute;
+field $_suppress_redistribute;
 
 sub BUILDARGS
 {
@@ -79,15 +80,6 @@ sub BUILDARGS
    exists $args{$_} and $args{style}{$_} = delete $args{$_} for qw( spacing );
 
    return $class->SUPER::BUILDARGS( %args );
-}
-
-ADJUSTPARAMS
-{
-   my ( $params ) = @_;
-
-   if( delete $params->{children} ) {
-      croak "The 'children' constructor argument to ${\ref $self} is no longer recognised; use ->add_children instead";
-   }
 }
 
 =head1 METHODS

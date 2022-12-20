@@ -17,12 +17,15 @@ meta-spec:
   version: '1.4'
 name: TableDataBundle-Software-License
 provides:
+  TableData::Software::License::FromRPL:
+    file: lib/TableData/Software/License/FromRPL.pm
+    version: '0.002'
   TableData::Software::License::FromSL:
     file: lib/TableData/Software/License/FromSL.pm
-    version: '0.001'
+    version: '0.002'
   TableDataBundle::Software::License:
     file: lib/TableDataBundle/Software/License.pm
-    version: '0.001'
+    version: '0.002'
 requires:
   Role::Tiny::With: '0'
   TableDataRole::Source::CSVInDATA: '0'
@@ -31,7 +34,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=TableDataBundle-Software-License
   homepage: https://metacpan.org/release/TableDataBundle-Software-License
   repository: git://github.com/perlancar/perl-TableDataBundle-Software-License.git
-version: '0.001'
+version: '0.002'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

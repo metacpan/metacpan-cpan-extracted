@@ -178,7 +178,7 @@ my @n_widgets = map { TestWidget->new } 0 .. 3;
 
 done_testing;
 
-use Object::Pad;
+use Object::Pad 0.75 ':experimental(init_expr)';
 
 class TestWidget :isa(Tickit::Widget) {
    use constant WIDGET_PEN_FROM_STYLE => 1;
@@ -190,7 +190,7 @@ class TestWidget :isa(Tickit::Widget) {
    method lines { 1 }
    method cols  { 5 }
 
-   has $_CAN_FOCUS :reader :param = 0;
+   field $_CAN_FOCUS :reader :param //= 0;
 }
 
 class TestContainer :isa(Tickit::Widget::HBox) {

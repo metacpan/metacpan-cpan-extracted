@@ -146,7 +146,7 @@ export _withidn = $(WITH_IDN)
 
 #----------------------------------------------------------#
 
-.PHONY: all debug check clean docs install libs libeav.pc auto man tld-domains
+.PHONY: all debug check clean docs man install libs libeav.pc csv uninstall
 
 all: libs app
 
@@ -185,6 +185,8 @@ docs: man
 man:
 	$(MAKE) -f Makefile.windows-gmake -C docs VERSION=$(VERSION)
 
+csv: auto tld-domains
+
 auto:
 	$(PERL) util/gentld.pl include/eav/auto_tld.h src/auto_tld.c \
 		data/punycode.csv
@@ -219,7 +221,7 @@ libeav.pc: libeav.pc.in
 #----------------------------------------------------------#
 
 clean: clean-tests clean-bin
-	$(info cleanup)
+	$(info === cleanup)
 	$(RM) $(DLL_TARGET) $(LIB_TARGET) $(call FixPath,$(OBJECTS)) libeav.pc
 
 clean-tests:
@@ -240,6 +242,9 @@ install: install-bin install-libs install-man
 
 install-bin: $(BIN_TARGET)
 	$(MAKE) -f Makefile.windows-gmake -C bin install DESTDIR=$(DESTDIR)
+
+install-bin-static: $(BIN_TARGET)
+	$(MAKE) -f Makefile.windows-gmake -C bin install-static DESTDIR=$(DESTDIR)
 
 install-libs: install-shared install-static libeav.pc
 	$(INSTALL) -d $(DATAROOTDIR)/pkgconfig
@@ -265,3 +270,18 @@ install-static: $(LIB_TARGET)
 install-man:
 	$(INSTALL) -d $(MANDIR)/man3
 	$(INSTALL) -m 0644 docs/libeav.3.gz $(MANDIR)/man3
+
+#----------------------------------------------------------#
+
+uninstall: uninstall-bin
+	$(info === uninstalling ...)
+	$(RM) $(DATAROOTDIR)/pkgconfig/libeav.pc
+	$(RM) $(INCLUDEDIR)/eav.h
+	$(RM) $(LIBDIR)/$(LIB_TARGET) \
+	$(LIBDIR)/$(DLL_TARGET).$(VERSION) \
+	$(LIBDIR)/$(DLL_TARGET).$(MAJOR_VERSION) \
+	$(LIBDIR)/$(DLL_TARGET)
+	$(RM) $(MANDIR)/man3/libeav.3.gz
+
+uninstall-bin:
+	$(MAKE) -f Makefile.windows-gmake -C bin uninstall DESTDIR=$(DESTDIR)

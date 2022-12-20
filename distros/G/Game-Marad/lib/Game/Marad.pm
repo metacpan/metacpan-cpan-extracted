@@ -1,6 +1,6 @@
 # -*- Perl -*-
 
-package Game::Marad 0.05;
+package Game::Marad 0.06;
 use 5.26.0;
 use Object::Pad 0.52;
 class Game::Marad :strict(params);
@@ -116,6 +116,24 @@ method move( $srcx, $srcy, $dstx, $dsty ) {
 # boards of different sizes might be supported in which case clients may
 # need something like the following to obtain that information
 method size() { return BOARD_SIZE }
+
+# Zobrist Hashing metadata. the caller will need to make suitable use of
+# this, such as by indexing the [ type, owner, location ] values into an
+# 3x2x81 array populated with 64-bit random values as generated perhaps
+# by the ->irand64 method of the Math::Random::PCG32 module and then ^=
+method zobrist() {
+    my @meta;
+    my $location = 0;
+    for my $row ( $board->@* ) {
+        for my $piece ( $row->@* ) {
+            next if $piece == 0;
+            my $type = ($piece & TYPE_MASK) - 1;
+            my $owner = $piece >> PLAYER_BIT & 1;
+            push @meta, [ $type, $owner, $location++ ];
+        }
+    }
+    return @meta;
+}
 
 ########################################################################
 #
@@ -246,6 +264,13 @@ Returns the size of the game board, C<9>.
 
 Returns an array reference containing the current score. Clients again
 should not modify this, only read from it.
+
+=item B<zobrist>
+
+Returns a list of array references that contain a piece type, owner, and
+cell location suitable to index into a [3][2][81] lookup table.
+
+Since version 0.06.
 
 =back
 

@@ -71,10 +71,11 @@ sub new {
   $$self{level}          = $STATE->getFrameDepth;
   $$self{properties}     = {} unless $$self{properties};
   # Copy any attribute width, height, depth to main properties.
+  # BUT remove them from XML attributes!!! (?)
   if (my $attributes = $$self{properties}{attributes}) {
-    $$self{properties}{width}  = $$attributes{width}  if $$attributes{width};
-    $$self{properties}{height} = $$attributes{height} if $$attributes{height};
-    $$self{properties}{depth}  = $$attributes{depth}  if $$attributes{depth}; }
+    foreach my $key (qw(width height depth)) {
+      if (my $val = $$attributes{$key}) {
+        $$self{properties}{$key} = $val; delete $$attributes{$key}; } } }
   return $self; }
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -122,6 +123,7 @@ sub rows {
 sub addLine {
   my ($self, $border, @cols) = @_;
   if (my $row = $$self{current_row}) {
+    $$self{current_column} = 1;    # Pretend doesn't occupy any columns
     if (@cols) {
       foreach my $c (@cols) {
         my $colspec = $row->column($c);
@@ -296,6 +298,15 @@ sub beAbsorbed {
   $self->normalizeAlignment;
   my @rows = @{ $$self{rows} };
   return unless @rows;
+
+  # Guard via the absorb limit to avoid infinite loops
+  if ($LaTeXML::ABSORB_LIMIT) {
+    my $absorb_counter = $STATE->lookupValue('absorb_count') || 0;
+    $STATE->assignValue(absorb_count => ++$absorb_counter, 'global');
+    if ($absorb_counter > $LaTeXML::ABSORB_LIMIT) {
+      Fatal('timeout', 'absorb_limit', $self,
+        "Whatsit absorb limit of $LaTeXML::ABSORB_LIMIT exceeded, infinite loop?"); } }
+
   # We _should_ attach boxes to the alignment and rows,
   # but (ATM) we've only got sensible boxes for the cells.
   &{ $$self{openContainer} }($document, ($attr ? %$attr : ()),
@@ -403,13 +414,15 @@ sub normalize_cell_sizes {
           = $boxes->getSize(align => $$cell{align}, width => $$cell{width},
           vattach => $$cell{vattach});
         Debug("CELL (" . join(',', map { $_ . "=" . ToString($$cell{$_}); } qw(align width vattach))
-            . ") size " . showSize($cw, $ch, $cd)
+            . ") size " . showSize($w,  $h,  $d)
+            . " csize " . showSize($cw, $ch, $cd)
             . " Boxes=" . ToString($boxes)) if $LaTeXML::DEBUG{halign} && $LaTeXML::DEBUG{size};
         my $empty =
-          ((!$cw) || $cw->valueOf < 1)
-          || (((!$ch) || $ch->valueOf < 1)
-          && ((!$cd) || $cd->valueOf < 1))
-          || !(grep { !$_->getProperty('isSpace'); } $boxes->unlist);
+          (((!$cw) || $cw->valueOf < 1)
+            || (((!$ch) || $ch->valueOf < 1)
+            && ((!$cd) || $cd->valueOf < 1))
+            || !(grep { !$_->getProperty('isSpace'); } $boxes->unlist)
+          ) && !preservedBoxes($boxes);
         $$cell{cwidth}  = $w || Dimension(0);
         $$cell{cheight} = $h || Dimension(0);
         $$cell{cdepth}  = $d || Dimension(0);
@@ -497,9 +510,14 @@ sub normalize_sum_sizes {
     $colpos[$j] = Dimension($x);
     $x += $colwidths[$j];
     $x += $colrights[$j]; }
-  $$self{cwidth}  = Dimension($x);
-  $$self{cheight} = Dimension($y);    # or account for vertical position of array as a whole?
-  $$self{cdepth}  = Dimension(0);
+  $$self{cwidth}       = Dimension($x);
+  $$self{cheight}      = Dimension($y);    # or account for vertical position of array as a whole?
+  $$self{cdepth}       = Dimension(0);
+  @colwidths           = map { Dimension($_); } @colwidths;
+  @rowheights          = map { Dimension($_); } @rowheights;
+  $$self{columnwidths} = [@colwidths];
+  $$self{rowheights}   = [@rowheights];
+
   for (my $i = 0 ; $i < scalar(@rowheights) ; $i++) {
     my $row   = $rows[$i];
     my @cols  = @{ $$row{columns} };
@@ -508,17 +526,21 @@ sub normalize_sum_sizes {
     $$row{cwidth} = Dimension($x);
     for (my $j = 0 ; $j < $ncols ; $j++) {
       my $cell = $cols[$j];
-      ## NOTE Should do some further positioning (depending on align!!)
-      ## my $dx = Dimension($colwidths[$j])->subtract($$cell{cwidth})->divide(2);
-      $$cell{x} = $colpos[$j]; $$cell{y} = $rowpos[$i];
+      my $colx = $colpos[$j];
+      my $a    = $$cell{align} || 'left';
+      # Adjust position according to alignment
+      if ($colwidths[$j] && $$cell{cwidth} && ($a ne 'left')) {    # If these are defined
+        my $dx = $colwidths[$j]->subtract($$cell{cwidth});
+        if    ($a eq 'center') { $colx = $colx->add($dx->multiply(0.5)); }
+        elsif ($a eq 'right')  { $colx = $colx->add($dx); } }
+      $$cell{x} = $colx;
+      $$cell{y} = $rowpos[$i];
       Debug("CELL[$j,$i] " . showSize($$cell{cwidth}, $$cell{cheight}, $$cell{cdepth})
           . " @ " . ToString($$cell{x}) . "," . ToString($$cell{y})
           . " w/ " . join(',', map { $_ . '=' . ToString($$cell{$_}); }
             (qw(align vattach skipped colspan rowspan))))
         if $LaTeXML::DEBUG{halign} && $LaTeXML::DEBUG{size};
   } }
-  $$self{columnwidths} = [map { Dimension($_); } @colwidths];
-  $$self{rowheights}   = [map { Dimension($_); } @rowheights];
   Debug("ALIGNMENT " . showSize($$self{cwidth}, $$self{cheight}, $$self{cdepth}))
     if $LaTeXML::DEBUG{halign} && $LaTeXML::DEBUG{size};
   return; }
@@ -1309,6 +1331,3 @@ Public domain software, produced as part of work done by the
 United States Government & not subject to copyright in the US.
 
 =cut
-
-
-

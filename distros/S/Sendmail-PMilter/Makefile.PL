@@ -1,4 +1,4 @@
-use 5.014;
+use 5.008004;
 use ExtUtils::MakeMaker;
 
 my $install = ( ExtUtils::MakeMaker::prompt(<<EOT . 'Do you wish to install the Sendmail::PMilter package?' => 'yes' ) );
@@ -28,8 +28,8 @@ The interface to the running MTA follows the 'milter protocol'.  This
 protocol is driven by the MTA.  It is effected by messages of a simple
 structure which are passed between the MTA and the milter via a socket
 connection.  Over the years the Milter Protocol has progressed through
-several versions, and seems now (October 2022 2019) to be fairly well
-settled at Milter Protocol Version 6.
+several versions, and seems (December 2022) to be extremely stable at
+Milter Protocol Version 6.
 
 Choose "yes" below to install Sendmail::PMilter from this package.
 
@@ -42,13 +42,11 @@ my %PM = (
         'lib/Sendmail/PMilter/Context.pm'   =>  '$(INST_LIBDIR)/PMilter/Context.pm'
 );
 
-
 WriteMakefile(
-    ABSTRACT_FROM	=> 'lib/Sendmail/PMilter.pm',
-    AUTHOR		=> 'Ged Haywood <pause.2022.10@fixmymail.uk>',
-    PM			=>  \%PM,
-    NAME		=> 'Sendmail::PMilter',
-    VERSION_FROM	=> 'lib/Sendmail/PMilter.pm',
-    MIN_PERL_VERSION	=> 5.14.0,
-    LICENSE		=> 'perl_5'
+  NAME             => 'Sendmail::PMilter',
+  VERSION          => '1.24',
+  ABSTRACT         => 'Perl bindings for Sendmail/Postfix milter interface.',
+  AUTHOR           => 'G.W. Haywood <pause.2022.12@milter.uk>',
+  LICENSE          => 'unknown',
+  MIN_PERL_VERSION => 5.14.0,
 );

@@ -1,0 +1,210 @@
+use strict;
+use warnings;
+package C600;
+{
+  $C600::VERSION = '0.01';
+}
+use Encode;
+use REST::Client;
+use JSON;
+use DBI;
+use Encode;
+use DateTime;
+use DateTime::Format::Natural;
+use DateTime::Format::Oracle;
+use Data::Dumper;
+use List::AllUtils qw( :all );
+use File::ShareDir qw/:ALL/; 
+# ABSTRACT:  Wrap of C600
+$ENV{'NLS_DATE_FORMAT'} = 'YYYY-MM-DD HH24:MI:SS';
+my $DB_TYPE = "C600WEB";
+
+sub new{
+	my $class = shift;
+	my $dir = dist_dir('Win32'); #load meterID/varID
+	warn $dir;
+	my $init_headers = {
+    Accept => 'application/json',
+    'Content-type' => 'application/json',
+	};
+	my $init_body = '{"username":"admin","password":"Landisgyr_01"}';
+	my $host = 'http://10.86.11.248:8090';
+	my $client = REST::Client->new();
+	$client->setHost('http://10.86.11.248:8090');
+    $client->POST( '/api/login', $init_body, $init_headers);
+	die "error!!" . $client->responseCode . $client->responseContent() if $client->responseCode != 200;
+    my $response = from_json($client->responseContent());
+    my $access_header = {
+			'Content-Type' => 'application/x-www-form-urlencoded;charset=UTF-8',
+			Authorization => 'Bearer ' . $response->{'access_token'},
+};
+    my $self = {
+				'client'         => $client,
+				'access_header'  => $access_header,
+
+				# username => '',
+				# passwd => '',
+	};
+
+	return bless $self, $class;
+}
+
+sub get_single_value{
+	my $self = shift;
+	my ($device, $var, $dt) = @_;
+	
+	my $mp_str = $DB_TYPE eq 'C600' ? $var : $device . '.' . $var;
+	my $dt_str = __date2str($dt);
+
+	my $sql_str = <<"EOF";
+	select a.raw_value from dbo.met_Value a, dbo.Met_Point b where b.MP_name = \'$mp_str\' and a.datetime = \'$dt_str\'
+	and b.mp_nb = a.mp_nb and b.rtu_nb = a.rtu_nb
+EOF
+    my ($value) = $$self->selectrow_array($sql_str, {RaiseError => 1},);
+
+	return $value ? $value : 'undef';
+	
+}
+sub accu_value{
+	my $self = shift;
+	my ($device, $var, $dt_from, $dt_to) = @_;
+	my $mp_str = $DB_TYPE eq 'C600' ? $var : $device . '.' . $var;
+	my $dt_from_str = __date2str($dt_from);
+    my $dt_to_str   = __date2str($dt_to);
+	my $sql_str = <<"EOF";
+	select a.reporting_value from dbo.met_Value a, dbo.Met_Point b where b.MP_name = \'$mp_str\' and a.datetime > \'$dt_from_str\' and a.datetime <= \'$dt_to_str\'
+	and b.mp_nb = a.mp_nb and b.rtu_nb = a.rtu_nb
+EOF
+    my $values_ref = $$self->selectcol_arrayref($sql_str, {RaiseError => 1},);
+	my $value = sum @$values_ref;
+	return $value ? $value : 'undef';
+
+
+}
+sub get_range_value{1}
+sub get_meter_name{
+
+	my $self = shift;
+	my ($device, $var) = @_;
+	my $mp_str = $DB_TYPE eq 'C600' ? $var : $device . '.' . $var;
+	my $sql_str = <<"EOF";
+	select mp_name from dbo.Met_Point where MP_name like \'$mp_str\' 
+EOF
+    my $values_ref = $$self->selectcol_arrayref($sql_str, {RaiseError => 1},);
+	my $value = sum @$values_ref;
+	return $value;
+
+}
+
+sub get_event{1}
+sub get_audit_record{1}
+sub __get_vars{
+	my $self = shift;
+	$self->{client}->GET(
+		'/api/variable',
+		$self->{access_header}
+		);
+				warn "get vars error!!" . $self->{client}->responseCode if $self->{client}->responseCode != 200;
+
+		my $json = JSON->new->utf8;
+		return $json->decode($self->{client}->responseContent());
+}
+sub __get_meters{
+
+	my $self = shift;
+				$self->{client}->GET(
+		'/api/meter',
+		$self->{access_header}
+		);
+				die "get meters error!!" . $self->{client}->responseCode if $self->{client}->responseCode != 200;
+
+my $json = JSON->new->utf8;
+return $json->decode($self->{client}->responseContent());
+
+
+
+
+}
+sub __get_devices{
+	
+my $self = shift;
+				$self->{client}->GET(
+		'/api/device',
+		$self->{access_header}
+		);
+				die "get devices error!!" . $self->{client}->responseCode if $self->{client}->responseCode != 200;
+
+my $json = JSON->new->utf8;
+return $json->decode($self->{client}->responseContent());
+
+}
+
+sub __store_vmid{
+			
+
+}
+sub __list_vars{ 
+				my $self = shift;
+				my $vars_ref = $self->__get_vars(); 
+my @vars_array = ();
+for(my $i=0;$i <= $#{$vars_ref->{rows}}; $i++){
+utf8::encode($vars_ref->{rows}[$i]{'name'});
+push @vars_array, $vars_ref->{rows}[$i]{'name'};
+}
+return @vars_array;
+					}
+sub __list_meters{ 
+
+	my $self = shift;
+				my $meters_ref = $self->__get_meters(); 
+
+			my @meters_array = ();
+for(my $i=0;$i <= $#{$meters_ref->{rows}}; $i++){
+utf8::encode($meters_ref->{rows}[$i]{'name'});
+push @meters_array, $meters_ref->{rows}[$i]{'name'};
+}
+return @meters_array;
+					}
+
+sub __list_devices{ 
+my $self = shift;
+				my $device_ref = $self->__get_meters(); 
+				my @devices_array = ();
+for(my $i=0;$i <= $#{$device_ref->{rows}}; $i++){
+utf8::encode($device_ref->{rows}[$i]{'name'});
+push @devices_array, $device_ref->{rows}[$i]{'name'};
+}
+return @devices_array;
+					}
+
+
+
+sub __date2str{ DateTime::Format::Oracle->format_datetime(shift) }
+sub __str2date{ DateTime::Format::Oracle->parse_datetime(shift)  }
+
+1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+C600 - Wrap of C600
+
+=head1 VERSION
+
+version 0.01
+
+=head1 AUTHOR
+
+xiaoyafeng <xyf.xiao@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by xiaoyafeng.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

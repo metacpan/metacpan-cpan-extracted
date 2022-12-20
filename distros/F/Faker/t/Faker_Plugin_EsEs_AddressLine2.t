@@ -126,11 +126,11 @@ $test->for('example', 1, 'execute', sub {
   ok $result->isa('Faker::Plugin::EsEs::AddressLine2');
   ok $result->faker;
   ok $result->faker->random->reseed($seed);
-  ok $result->faker->random->make; # reset randomizer
+  ok $result->faker->random->pick; # reset randomizer
   is $result->execute, '1º B';
-  ok $result->faker->random->make; # reset randomizer
+  ok $result->faker->random->pick; # reset randomizer
   is $result->execute, 'Ático 8º';
-  ok $result->faker->random->make; # reset randomizer
+  ok $result->faker->random->pick; # reset randomizer
   is $result->execute, '6º E';
 
   $result

@@ -1,5 +1,12 @@
 Revision history for Tickit-Widget-Scroller
 
+0.29    2022-12-14
+        [CHANGES]
+         * Updated for Object::Pad v0.73
+            + Use `field NAME = EXPR` syntax
+            + Use `ADJUST :params`
+            + Set `:strict(params)`
+
 0.28    2022-04-25
         [CHANGES]
          * Added `new_from_formatting` convenience constructor to

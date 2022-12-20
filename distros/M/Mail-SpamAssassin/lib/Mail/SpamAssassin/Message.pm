@@ -46,10 +46,8 @@ use strict;
 use warnings;
 use re 'taint';
 
-BEGIN {
-  eval { require Digest::SHA; import Digest::SHA qw(sha1 sha1_hex); 1 }
-  or do { require Digest::SHA1; import Digest::SHA1 qw(sha1 sha1_hex) }
-}
+use Digest::SHA qw(sha1 sha1_hex);
+use Scalar::Util qw(tainted);
 
 use Mail::SpamAssassin;
 use Mail::SpamAssassin::Message::Node;
@@ -159,7 +157,7 @@ sub new {
   if (ref $message eq 'ARRAY') {
      @message = @{$message};
   }
-  elsif (ref($message) eq 'GLOB' || ref($message) =~ /^IO::/) {
+  elsif (ref($message) eq 'GLOB' || index(ref($message), 'IO::') == 0) {
     if (defined fileno $message) {
 
       # sysread+split avoids a Perl I/O bug (Bug 5985)
@@ -207,14 +205,14 @@ sub new {
   # messages? Tainting the message is important because it prevents certain
   # exploits later.
   if (Mail::SpamAssassin::Util::am_running_in_taint_mode() &&
-        grep { !Scalar::Util::tainted($_) } @message) {
+        grep { !tainted($_) } @message) {
     local($_);
     # To preserve newlines, no joining and splitting here, process each line
     # directly as is.
     foreach (@message) {
       $_ = Mail::SpamAssassin::Util::taint_var($_);
     }
-    if (grep { !Scalar::Util::tainted($_) } @message) {
+    if (grep { !tainted($_) } @message) {
       die "Mail::SpamAssassin::Message failed to enforce message taintness";
     }
   }
@@ -256,7 +254,7 @@ sub new {
   # bug 4363
   # Check to see if we should do CRLF instead of just LF
   # For now, just check the first and last line and do whatever it does
-  if (@message && ($message[0] =~ /\015\012/ || $message[-1] =~ /\015\012/)) {
+  if (index($message[0], "\015\012") != -1 || index($message[-1], "\015\012") != -1) {
     $self->{line_ending} = "\015\012";
     dbg("message: line ending changed to CRLF");
   }
@@ -270,7 +268,12 @@ sub new {
   for (;;) {
     # make sure not to lose the last header field when there is no body
     my $eof = !@message;
-    my $current = $eof ? "\n" : shift @message;
+    my $current = $eof ? $self->{line_ending} : shift @message;
+
+    # Bug 7785: spamass-milter breaks wrapped headers, add any missing \r
+    if ($squash_crlf) {
+      $current =~ s/(?<!\015)\012/\015\012/gs;
+    }
 
     if ( $current =~ /^[ \t]/ ) {
       # This wasn't useful in terms of a rule, but we may want to treat it
@@ -306,7 +309,7 @@ sub new {
         }
       }
 
-      if ($current =~ /^\r?$/) {  # a regular end of a header section
+      if ($current eq $self->{line_ending}) {  # a regular end of a header section
 	if ($eof) {
 	  $self->{'missing_head_body_separator'} = 1;
 	} else {
@@ -395,7 +398,7 @@ sub new {
   # either a blank line or the boundary (if defined), insert a blank line
   # to ensure proper parsing - do not consider MIME headers at the beginning of the body
   # to be part of the message headers.
-  if ($self->{'type'} =~ /^multipart\//i && $#message > 0 && $message[0] =~ /\S/)
+  if (index($self->{'type'}, 'multipart/') == 0 && $#message > 0 && $message[0] =~ /\S/)
   {
     if (!defined $boundary || $message[0] !~ /^--\Q$boundary\E/)
     {
@@ -535,6 +538,77 @@ Returns a scalar of the pristine message body.
 sub get_pristine_body {
   my ($self) = @_;
   return $self->{pristine_body};
+}
+
+=item get_pristine_body_digest()
+
+Returns SHA1 hex digest of the pristine message body.
+CRLF line endings are normalized to LF before hashing.
+
+=cut
+
+sub get_pristine_body_digest {
+  my ($self) = @_;
+
+  return $self->{pristine_body_digest} if exists $self->{pristine_body_digest};
+
+  if ($self->{line_ending} eq "\015\012") {
+    # Don't make a copy, process line by line to save memory
+    # CRLF should be exception, so it's not that critical here
+    my $sha = Digest::SHA->new('sha1');
+    while ($self->{pristine_body} =~ /(.*?)(\015\012)?/gs) {
+      $sha->add($1.(defined $2 ? "\012" : ""));
+    }
+    $self->{pristine_body_digest} = $sha->hexdigest;
+  } else {
+    $self->{pristine_body_digest} = sha1_hex($self->{pristine_body});
+  }
+
+  dbg("message: pristine body digest: ".$self->{pristine_body_digest});
+  return $self->{pristine_body_digest};
+}
+
+# ---------------------------------------------------------------------------
+
+=item get_msgid()
+
+Returns Message-ID header for the message, with <> and surrounding
+whitespace removed. Returns undef, if nothing found between <>.
+
+=cut
+
+sub get_msgid {
+  my ($self) = @_;
+
+  my $msgid = $self->get_header("Message-Id");
+  if (defined $msgid && $msgid =~ /^\s*<(.+)>\s*$/s) {
+    return $1;
+  } else {
+    return;
+  }
+}
+
+=item generate_msgid()
+
+Generate a calculated "Message-ID" in B<sha1hex@sa_generated> format, using
+To, Date headers and pristine body as source for hashing.
+
+=cut
+
+sub generate_msgid {
+  my ($self) = @_;
+
+  return $self->{msgid_generated} if exists $self->{msgid_generated};
+
+  # See Bug 5185, not using Received headers etc anymore
+  my $to = $self->get_header("To") || '';
+  my $date = $self->get_header("Date") || '';
+  my $body_digest = $self->get_pristine_body_digest();
+
+  $self->{msgid_generated} =
+    sha1_hex($to."\000".$date."\000".$body_digest).'@sa_generated';
+
+  return $self->{msgid_generated};
 }
 
 # ---------------------------------------------------------------------------
@@ -706,6 +780,7 @@ sub finish {
 # temporary files are deleted even if the finish() method is omitted
 sub DESTROY {
   my $self = shift;
+
   # best practices: prevent potential calls to eval and to system routines
   # in code of a DESTROY method from clobbering global variables $@ and $! 
   local($@,$!);  # keep outer error handling unaffected by DESTROY
@@ -774,7 +849,7 @@ sub parse_body {
     #
     my ($msg, $boundary, $body, $subparse) = @$toparse;
 
-    if ($msg->{'type'} =~ m{^multipart/}i && defined $boundary && $subparse > 0) {
+    if (index($msg->{'type'}, 'multipart/') == 0 && defined $boundary && $subparse > 0) {
       $self->_parse_multipart($toparse);
     }
     else {
@@ -782,7 +857,8 @@ sub parse_body {
       $self->_parse_normal($toparse);
 
       # bug 5041: process message/*, but exclude message/partial content types
-      if ($msg->{'type'} =~ m{^message/(?!partial\z)}i && $subparse > 0)
+      if (index($msg->{'type'}, 'message/') == 0 &&
+          $msg->{'type'} ne 'message/partial' && $subparse > 0)
       {
         # Just decode the part, but we don't need the resulting string here.
         $msg->decode(0);
@@ -798,7 +874,7 @@ sub parse_body {
         # bug 5051, bug 3748: check $msg->{decoded}: sometimes message/* parts
         # have no content, and we get stuck waiting for STDIN, which is bad. :(
 
-        if ($msg->{'type'} =~ m{^message/(?:rfc822|global)\z}i &&
+        if (($msg->{'type'} eq 'message/rfc822' || $msg->{'type'} eq 'message/global') &&
             defined $msg->{'decoded'} && $msg->{'decoded'} ne '')
         {
 	  # Ok, so this part is still semi-recursive, since M::SA::Message
@@ -857,6 +933,7 @@ sub _parse_multipart {
   my($self, $toparse) = @_;
 
   my ($msg, $boundary, $body, $subparse) = @{$toparse};
+  my $nested_boundary = 0;
 
   # we're not supposed to be a leaf, so prep ourselves
   $msg->{'body_parts'} = [];
@@ -907,6 +984,7 @@ sub _parse_multipart {
   my $header;
   my $part_array;
   my $found_end_boundary;
+  my $found_last_end_boundary;
   my $partcnt = 0;
 
   my $line_count = @{$body};
@@ -915,7 +993,12 @@ sub _parse_multipart {
     # deal with the mime part;
     # a triage before an unlikely-to-match regexp avoids a CPU hotspot
     $found_end_boundary = defined $boundary && substr($_,0,2) eq '--'
-                          && /^--\Q$boundary\E(?:--)?\s*$/;
+                          && /^--\Q$boundary\E(--)?\s*$/;
+    $found_last_end_boundary = $found_end_boundary && $1;
+    if ($found_end_boundary && $nested_boundary) {
+      $found_end_boundary = 0;
+      $nested_boundary = 0 if ($found_last_end_boundary); # bug 7358 - handle one level of non-unique boundary string
+    }
     if ( --$line_count == 0 || $found_end_boundary ) {
       my $line = $_; # remember the last line
 
@@ -951,8 +1034,20 @@ sub _parse_multipart {
         $part_array = [];
       }
 
-      my($p_boundary);
-      ($part_msg->{'type'}, $p_boundary) = Mail::SpamAssassin::Util::parse_content_type($part_msg->header('content-type'));
+      ($part_msg->{'type'}, my $p_boundary, undef, undef, my $ct_was_missing) =
+          Mail::SpamAssassin::Util::parse_content_type($part_msg->header('content-type'));
+
+      # bug 5741: if ct was missing and parent == multipart/digest, then
+      # type should be set as message/rfc822
+      if ($ct_was_missing) {
+        if ($msg->{'type'} eq 'multipart/digest') {
+          dbg("message: missing type, setting multipart/digest child as message/rfc822");
+          $part_msg->{'type'} = 'message/rfc822';
+        } else {
+          dbg("message: missing type, setting as default text/plain");
+        }
+      }
+
       $p_boundary ||= $boundary;
       dbg("message: found part of type ".$part_msg->{'type'}.", boundary: ".(defined $p_boundary ? $p_boundary : ''));
 
@@ -962,12 +1057,8 @@ sub _parse_multipart {
       push(@{$self->{'parse_queue'}}, [ $part_msg, $p_boundary, $part_array, $subparse ]);
       $msg->add_body_part($part_msg);
 
-      # rfc 1521 says /^--boundary--$/, some MUAs may just require /^--boundary--/
-      # but this causes problems with horizontal lines when the boundary is
-      # made up of dashes as well, etc.
       if (defined $boundary) {
-        # no re "strict";  # since perl 5.21.8: Ranges of ASCII printables...
-        if ($line =~ /^--\Q${boundary}\E--\s*$/) {
+        if ($found_last_end_boundary) {
 	  # Make a note that we've seen the end boundary
 	  $self->{mime_boundary_state}->{$boundary}--;
           last;
@@ -1016,6 +1107,12 @@ sub _parse_multipart {
         if ($header) {
           my ( $key, $value ) = split ( /:\s*/, $header, 2 );
           $part_msg->header( $key, $value );
+          if (defined $boundary && lc $key eq 'content-type') {
+	    my (undef, $nested_bound) = Mail::SpamAssassin::Util::parse_content_type($part_msg->header('content-type'));
+            if (defined $nested_bound && $nested_bound eq $boundary) {
+       	      $nested_boundary = 1;
+            }
+          }
         }
         $in_body = 1;
 
@@ -1070,12 +1167,18 @@ sub _parse_normal {
 
   dbg("message: parsing normal part");
 
-  # 0: content-type, 1: boundary, 2: charset, 3: filename
+  # 0: content-type, 1: boundary, 2: charset, 3: filename 4: ct_missing
   my @ct = Mail::SpamAssassin::Util::parse_content_type($msg->header('content-type'));
 
   # multipart sections are required to have a boundary set ...  If this
   # one doesn't, assume it's malformed and revert to text/plain
-  $msg->{'type'} = ($ct[0] !~ m@^multipart/@i || defined $boundary ) ? $ct[0] : 'text/plain';
+  # bug 5741: don't overwrite the default type assigned by _parse_multipart()
+  if (!$ct[4]) {
+    $msg->{'type'} = (index($ct[0], 'multipart/') != 0 || defined $boundary) ?
+      $ct[0] : 'text/plain'
+  } else {
+    dbg("message: missing type, setting previous multipart type: %s", $msg->{'type'});
+  }
   $msg->{'charset'} = $ct[2];
 
   # attempt to figure out a name for this attachment if there is one ...
@@ -1086,9 +1189,6 @@ sub _parse_normal {
   elsif ($ct[3]) {
     $msg->{'name'} = $ct[3];
   }
-  if ($msg->{'name'}) {
-    $msg->{'name'} = Encode::decode("MIME-Header", $msg->{'name'});
-  }
 
   $msg->{'boundary'} = $boundary;
 
@@ -1096,7 +1196,8 @@ sub _parse_normal {
   # ahead and write the part data out to a temp file -- why keep sucking
   # up RAM with something we're not going to use?
   #
-  if ($msg->{'type'} !~ m@^(?:text/(?:plain|html)$|message\b)@) {
+  unless ($msg->{'type'} eq 'text/plain' || $msg->{'type'} eq 'text/html' ||
+          index($msg->{'type'}, 'message/') == 0) {
     my($filepath, $fh);
     eval {
       ($filepath, $fh) = Mail::SpamAssassin::Util::secure_tmpfile();  1;
@@ -1131,7 +1232,7 @@ sub get_mimepart_digests {
   if (!exists $self->{mimepart_digests}) {
     # traverse all parts which are leaves, recursively
     $self->{mimepart_digests} =
-      [ map(sha1_hex($_->decode) . ':' . lc($_->{type}||''),
+      [ map(sha1_hex($_->decode) . ':' . ($_->{type}||''),
             $self->find_parts(qr/^/,1,1)) ];
   }
   return $self->{mimepart_digests};
@@ -1202,16 +1303,19 @@ sub get_body_text_array_common {
       # text/plain rendered as html otherwise.
       if ($html_needs_setting && $type eq 'text/html') {
         $self->{metadata}->{html} = $p->{html_results};
+        push @{$self->{metadata}->{html_all}}, $p->{html_results};
       }
     }
   }
 
   # whitespace handling (warning: small changes have large effects!)
-  $text =~ s/\n+\s*\n+/\f/gs;		# double newlines => form feed
+  $text =~ s/\n+\s*\n+/\x00/gs;		# double newlines => null
 # $text =~ tr/ \t\n\r\x0b\xa0/ /s;	# whitespace (incl. VT, NBSP) => space
-  $text =~ tr/ \t\n\r\x0b/ /s;		# whitespace (incl. VT) => space
-  $text =~ tr/\f/\n/;			# form feeds => newline
+# $text =~ tr/ \t\n\r\x0b/ /s;		# whitespace (incl. VT) => single space
+  $text =~ s/\s+/ /gs;		        # Unicode whitespace => single space
+  $text =~ tr/\x00/\n/;			# null => newline
 
+  utf8::encode($text) if utf8::is_utf8($text);
   my @textary = split_into_array_of_short_lines($text);
   $self->{$key} = \@textary;
 
@@ -1246,7 +1350,7 @@ sub get_decoded_body_text_array {
   my $scansize = $self->{rawbody_part_scan_size};
 
   # Find all parts which are leaves
-  my @parts = $self->find_parts(qr/^(?:text|message)\b/i,1);
+  my @parts = $self->find_parts(qr/^(?:text|message)\b/,1);
   return $self->{text_decoded} unless @parts;
 
   # Go through each part

@@ -1,5 +1,12 @@
 Revision history for Tickit-Widget-FloatBox
 
+0.11    2022-12-14
+        [CHANGES]
+         * Updated for Object::Pad v0.73
+            + Use `field NAME = EXPR` syntax
+            + Use `ADJUST :params`
+            + Set `:strict(params)`
+
 0.10    2021-11-20
         [CHANGES]
          * Updates for Object::Pad 0.57

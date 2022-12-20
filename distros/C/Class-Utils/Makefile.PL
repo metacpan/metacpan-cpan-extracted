@@ -22,6 +22,7 @@ readme_from 'Utils.pm';
 recursive_author_tests('xt');
 requires 'Error::Pure' => 0.27,
 requires 'Exporter' => 0;
+requires 'List::Util' => 1.33;
 requires 'Readonly' => 0;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Class-Utils/issues';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/Class-Utils';
@@ -30,7 +31,7 @@ test_requires 'English' => 0;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.12';
+version '0.14';
 
 # Run.
 WriteAll();

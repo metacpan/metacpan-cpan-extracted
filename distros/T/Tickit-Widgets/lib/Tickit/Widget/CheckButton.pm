@@ -3,10 +3,11 @@
 #
 #  (C) Paul Evans, 2013-2022 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.57;
+use Object::Pad 0.73 ':experimental(init_expr)';
 
-package Tickit::Widget::CheckButton 0.35;
+package Tickit::Widget::CheckButton 0.36;
 class Tickit::Widget::CheckButton
+   :strict(params)
    :isa(Tickit::Widget);
 
 use Tickit::Style;
@@ -138,10 +139,10 @@ Optional. Callback function to invoke when the check state is changed.
 
 =cut
 
-has $_label     :reader         :param = undef;
-has $_on_toggle :reader :writer :param = undef;
+field $_label     :reader         :param = undef;
+field $_on_toggle :reader :writer :param = undef;
 
-has $_active;
+field $_active;
 
 method lines
 {

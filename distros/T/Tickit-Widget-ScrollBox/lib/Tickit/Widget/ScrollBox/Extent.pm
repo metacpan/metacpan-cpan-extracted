@@ -4,9 +4,9 @@
 #  (C) Paul Evans, 2013-2021 -- leonerd@leonerd.org.uk
 
 use v5.26; # signatures
-use Object::Pad 0.44;  # :weak
+use Object::Pad 0.73 ':experimental(init_expr)';
 
-package Tickit::Widget::ScrollBox::Extent 0.11;
+package Tickit::Widget::ScrollBox::Extent 0.12;
 class Tickit::Widget::ScrollBox::Extent;
 
 =head1 NAME
@@ -21,25 +21,25 @@ returned by the C<hextent> and C<vextent> methods of the associated ScrollBox.
 
 =cut
 
-has $_start = 0;
-has $_total;
+field $_start = 0;
+field $_total;
 
-has $_scrollbox :param :weak;
-has $_id        :param;
+field $_scrollbox :param :weak;
+field $_id        :param;
 
-method _clamp ()
+method $clamp ()
 {
    my $limit = $self->total - $self->viewport;
    $_start = $limit if $_start > $limit;
 }
 
 # Internal; used by T:W:ScrollBox
-has $_viewport;
+field $_viewport;
 
 method set_viewport ( $viewport )
 {
    $_viewport = $viewport;
-   $self->_clamp if defined $_total;
+   $self->$clamp if defined $_total;
 }
 
 =head1 ACCESSORS
@@ -88,7 +88,7 @@ method set_total ( $total )
    return if defined $_total and $_total == $total;
 
    $_total = $total;
-   $self->_clamp if defined $_viewport;
+   $self->$clamp if defined $_viewport;
 
    $_scrollbox->_extent_scrolled( $_id, 0, undef );
 }

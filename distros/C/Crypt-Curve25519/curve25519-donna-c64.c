@@ -96,7 +96,7 @@ fscalar_product(felem output, const felem in, const limb scalar) {
  * On return, output[i] < 2**52
  */
 static inline void force_inline
-fmul(felem output, const felem in2, const felem in) {
+fmulren(felem output, const felem in2, const felem in) {
   uint128_t t[5];
   limb r0,r1,r2,r3,r4,s0,s1,s2,s3,s4,c;
 
@@ -305,22 +305,22 @@ fmonty(limb *x2, limb *z2, /* output 2Q */
   memcpy(origxprime, xprime, sizeof(limb) * 5);
   fsum(xprime, zprime);
   fdifference_backwards(zprime, origxprime);
-  fmul(xxprime, xprime, z);
-  fmul(zzprime, x, zprime);
+  fmulren(xxprime, xprime, z);
+  fmulren(zzprime, x, zprime);
   memcpy(origxprime, xxprime, sizeof(limb) * 5);
   fsum(xxprime, zzprime);
   fdifference_backwards(zzprime, origxprime);
   fsquare_times(x3, xxprime, 1);
   fsquare_times(zzzprime, zzprime, 1);
-  fmul(z3, zzzprime, qmqp);
+  fmulren(z3, zzzprime, qmqp);
 
   fsquare_times(xx, x, 1);
   fsquare_times(zz, z, 1);
-  fmul(x2, xx, zz);
+  fmulren(x2, xx, zz);
   fdifference_backwards(zz, xx);  // does zz = xx - zz
   fscalar_product(zzz, zz, 121665);
   fsum(zzz, xx);
-  fmul(z2, zz, zzz);
+  fmulren(z2, zz, zzz);
 }
 
 // -----------------------------------------------------------------------------
@@ -405,26 +405,26 @@ crecip(felem out, const felem z) {
 
   /* 2 */ fsquare_times(a, z, 1); // a = 2
   /* 8 */ fsquare_times(t0, a, 2);
-  /* 9 */ fmul(b, t0, z); // b = 9
-  /* 11 */ fmul(a, b, a); // a = 11
+  /* 9 */ fmulren(b, t0, z); // b = 9
+  /* 11 */ fmulren(a, b, a); // a = 11
   /* 22 */ fsquare_times(t0, a, 1);
-  /* 2^5 - 2^0 = 31 */ fmul(b, t0, b);
+  /* 2^5 - 2^0 = 31 */ fmulren(b, t0, b);
   /* 2^10 - 2^5 */ fsquare_times(t0, b, 5);
-  /* 2^10 - 2^0 */ fmul(b, t0, b);
+  /* 2^10 - 2^0 */ fmulren(b, t0, b);
   /* 2^20 - 2^10 */ fsquare_times(t0, b, 10);
-  /* 2^20 - 2^0 */ fmul(c, t0, b);
+  /* 2^20 - 2^0 */ fmulren(c, t0, b);
   /* 2^40 - 2^20 */ fsquare_times(t0, c, 20);
-  /* 2^40 - 2^0 */ fmul(t0, t0, c);
+  /* 2^40 - 2^0 */ fmulren(t0, t0, c);
   /* 2^50 - 2^10 */ fsquare_times(t0, t0, 10);
-  /* 2^50 - 2^0 */ fmul(b, t0, b);
+  /* 2^50 - 2^0 */ fmulren(b, t0, b);
   /* 2^100 - 2^50 */ fsquare_times(t0, b, 50);
-  /* 2^100 - 2^0 */ fmul(c, t0, b);
+  /* 2^100 - 2^0 */ fmulren(c, t0, b);
   /* 2^200 - 2^100 */ fsquare_times(t0, c, 100);
-  /* 2^200 - 2^0 */ fmul(t0, t0, c);
+  /* 2^200 - 2^0 */ fmulren(t0, t0, c);
   /* 2^250 - 2^50 */ fsquare_times(t0, t0, 50);
-  /* 2^250 - 2^0 */ fmul(t0, t0, b);
+  /* 2^250 - 2^0 */ fmulren(t0, t0, b);
   /* 2^255 - 2^5 */ fsquare_times(t0, t0, 5);
-  /* 2^255 - 21 */ fmul(out, t0, a);
+  /* 2^255 - 21 */ fmulren(out, t0, a);
 }
 
 int curve25519_donna(u8 *, const u8 *, const u8 *);
@@ -443,7 +443,7 @@ curve25519_donna(u8 *mypublic, const u8 *secret, const u8 *basepoint) {
   fexpand(bp, basepoint);
   cmult(x, z, e, bp);
   crecip(zmone, z);
-  fmul(z, x, zmone);
+  fmulren(z, x, zmone);
   fcontract(mypublic, z);
   return 0;
 }

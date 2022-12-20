@@ -1,18 +1,18 @@
 #!perl
 
 # Note: This script is a CLI for Riap function /App/VitaminUtils/convert_vitamin_a_unit
-# and generated automatically using Perinci::CmdLine::Gen version 0.499
-
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-08'; # DATE
-our $DIST = 'App-VitaminUtils'; # DIST
-our $VERSION = '0.004'; # VERSION
+# and generated automatically using Perinci::CmdLine::Gen version 0.501
 
 use 5.010001;
 use strict;
 use warnings;
 
 use Perinci::CmdLine::Any;
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-09-14'; # DATE
+our $DIST = 'App-VitaminUtils'; # DIST
+our $VERSION = '0.006'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/VitaminUtils/convert_vitamin_a_unit",
@@ -39,56 +39,15 @@ convert-vitamin-a-unit - Convert a vitamin A quantity from one unit to another
 
 =head1 VERSION
 
-This document describes version 0.004 of convert-vitamin-a-unit (from Perl distribution App-VitaminUtils), released on 2021-08-08.
+This document describes version 0.006 of convert-vitamin-a-unit (from Perl distribution App-VitaminUtils), released on 2022-09-14.
 
 =head1 SYNOPSIS
 
-Usage:
+B<convert-vitamin-a-unit> [B<--format>=I<name>|B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] -- E<lt>I<quantity>E<gt> [I<to_unit>]
 
-% B<convert-vitamin-a-unit> [B<--format>=I<name>] [B<--json>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]] [B<--view-result>[=I<program>]] -- E<lt>I<quantity>E<gt> [I<to_unit>]
 
-Examples:
 
-Show all possible conversions:
-
- % convert-vitamin-a-unit mcg
- +------------------+------------------------------------------------+
- | amount           | unit                                           |
- +------------------+------------------------------------------------+
- | 0.001            | mg                                             |
- | 1                | mcg                                            |
- | 1                | mcg-all-trans-retinol                          |
- | 12.000000048     | mcg-dietary-all-trans-beta-carotene            |
- | 23.999999808     | mcg-alpha-carotene                             |
- | 23.999999808     | mcg-beta-cryptoxanthin                         |
- | 2                | mcg-all-trans-beta-carotene-as-food-supplement |
- | 1.14655200007338 | mcg-all-trans-retinyl-acetate                  |
- | 1.83333333333333 | mcg-all-trans-retinyl-palmitate                |
- | 1.19666666666667 | mcg-all-trans-retinyl-propionate               |
- | 3.33333333333333 | IU                                             |
- | 3.33333333333333 | IU-retinol                                     |
- | 1.66666666666667 | IU-beta-carotene                               |
- +------------------+------------------------------------------------+
-
-Convert from mcg to IU (retinol):
-
- % convert-vitamin-a-unit '1500 mcg' IU
- 5000
-
-Convert from mcg to IU (retinol):
-
- % convert-vitamin-a-unit '1500 mcg' IU-retinol
- 5000
-
-Convert from mcg to IU (beta-carotene):
-
- % convert-vitamin-a-unit '1500 mcg' IU-beta-carotene
- 2500
-
-Convert from IU to mg:
-
- % convert-vitamin-a-unit '5000 IU' mg
- 1.5
+See examples in the L</EXAMPLES> section.
 
 =head1 DESCRIPTION
 
@@ -124,6 +83,12 @@ Default value:
 
  undef
 
+Output can be displayed in multiple formats, and a suitable default format is
+chosen depending on the application and/or whether output destination is
+interactive terminal (i.e. whether output is piped). This option specifically
+chooses an output format.
+
+
 =item B<--json>
 
 Set output format to json.
@@ -138,24 +103,33 @@ Default value:
 
 By default, when outputing as JSON, the full enveloped result is returned, e.g.:
 
-    [200,"OK",[1,2,3],{"func.extra"=>4}]
+ [200,"OK",[1,2,3],{"func.extra"=>4}]
 
 The reason is so you can get the status (1st element), status message (2nd
 element) as well as result metadata/extra result (4th element) instead of just
 the result (3rd element). However, sometimes you want just the result, e.g. when
 you want to pipe the result for more post-processing. In this case you can use
-`--naked-res` so you just get:
+C<--naked-res> so you just get:
 
-    [1,2,3]
+ [1,2,3]
 
 
 =item B<--page-result>
 
 Filter output through a pager.
 
+This option will pipe the output to a specified pager program. If pager program
+is not specified, a suitable default e.g. C<less> is chosen.
+
+
 =item B<--view-result>
 
 View output using a viewer.
+
+This option will first save the output to a temporary file, then open a viewer
+program to view the temporary file. If a viewer program is not chosen, a
+suitable default, e.g. the browser, is chosen.
+
 
 =back
 
@@ -207,6 +181,49 @@ It is also recommended to install L<shcompgen> (see above).
 
 For fish and zsh, install L<shcompgen> as described above.
 
+=head1 EXAMPLES
+
+=head2 Show all possible conversions
+
+ % convert-vitamin-a-unit mcg
+ +------------------+------------------------------------------------+
+ |           amount |                                           unit |
+ +------------------+------------------------------------------------+
+ |            0.001 |                                             mg |
+ |                1 |                                            mcg |
+ |                1 |                          mcg-all-trans-retinol |
+ |     12.000000048 |            mcg-dietary-all-trans-beta-carotene |
+ |     23.999999808 |                             mcg-alpha-carotene |
+ |     23.999999808 |                         mcg-beta-cryptoxanthin |
+ |                2 | mcg-all-trans-beta-carotene-as-food-supplement |
+ | 1.14655200007338 |                  mcg-all-trans-retinyl-acetate |
+ | 1.83333333333333 |                mcg-all-trans-retinyl-palmitate |
+ | 1.19666666666667 |               mcg-all-trans-retinyl-propionate |
+ | 3.33333333333333 |                                             IU |
+ | 3.33333333333333 |                                     IU-retinol |
+ | 1.66666666666667 |                               IU-beta-carotene |
+ +------------------+------------------------------------------------+
+
+=head2 Convert from mcg to IU (retinol)
+
+ % convert-vitamin-a-unit '1500 mcg' IU
+ 5000
+
+=head2 Convert from mcg to IU (retinol)
+
+ % convert-vitamin-a-unit '1500 mcg' IU-retinol
+ 5000
+
+=head2 Convert from mcg to IU (beta-carotene)
+
+ % convert-vitamin-a-unit '1500 mcg' IU-beta-carotene
+ 2500
+
+=head2 Convert from IU to mg
+
+ % convert-vitamin-a-unit '5000 IU' mg
+ 1.5
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/App-VitaminUtils>.
@@ -215,6 +232,35 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-Vitami
 
 Source repository is at L<https://github.com/perlancar/perl-App-VitaminUtils>.
 
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2021, 2020 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-VitaminUtils>
@@ -222,16 +268,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021, 2020 by perlancar <perlancar@cpan.org>.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

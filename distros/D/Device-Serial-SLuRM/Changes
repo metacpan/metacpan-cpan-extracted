@@ -1,5 +1,13 @@
 Revision history for Device-Serial-SLuRM
 
+0.05    2022-12-17
+        [CHANGES]
+         * Updated for Object::Pad v0.76:
+            + No longer need to disable :experimental(init_expr) warning
+         * Add docs for recently-added metrics
+         * Receipt of an unrecognised packet type should be just printed as
+           a warning, not fatal
+
 0.04    2022-12-05
         [CHANGES]
          * Additionally report a request_duration metric

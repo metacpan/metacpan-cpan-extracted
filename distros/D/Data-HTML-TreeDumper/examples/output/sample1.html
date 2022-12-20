@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="./sample.css">
+  <script type="module" src="./sample.js"></script>
+  <title>sample1 - Data::HTML::TreeDumper</title>
+</head>
+
+<body>
+  <h1>sample1 - Data::HTML::TreeDumper</h1>
+  <div id="ToC" class="z5">
+    <select id="selectToC">
+      <option value="-">Select item</option>
+      
+      <option>undef</option>
+      
+      <option>0</option>
+      
+      <option>1</option>
+      
+      <option>123</option>
+      
+      <option>blank</option>
+      
+      <option>A</option>
+      
+      <option>ABC</option>
+      
+      <option>Array1</option>
+      
+      <option>Array2</option>
+      
+      <option>Array3</option>
+      
+      <option>Array4</option>
+      
+      <option>Hash1</option>
+      
+      <option>Hash2</option>
+      
+      <option>Hash3</option>
+      
+      <option>Hash4</option>
+      
+      <option>Hash5</option>
+      
+      <option>ArrayOfHash</option>
+      
+      <option>ComplexData</option>
+      
+    </select>
+  </div>
+  
+  <div id="undef" class="hide">
+    <h2 class="stickyTop">undef</h2>
+    <h3>YAML</h3>
+    <pre>~
+</pre>
+    <h3>td_Default</h3>
+    <div><span class="trdValue">[undef]</span></div>
+    <h3>td_Depth3</h3>
+    <div><span class="trdValue">[undef]</span></div>
+  </div>
+  
+  <div id="0" class="hide">
+    <h2 class="stickyTop">0</h2>
+    <h3>YAML</h3>
+    <pre>0
+</pre>
+    <h3>td_Default</h3>
+    <div><span class="trdValue">0</span></div>
+    <h3>td_Depth3</h3>
+    <div><span class="trdValue">0</span></div>
+  </div>
+  
+  <div id="1" class="hide">
+    <h2 class="stickyTop">1</h2>
+    <h3>YAML</h3>
+    <pre>1
+</pre>
+    <h3>td_Default</h3>
+    <div><span class="trdValue">1</span></div>
+    <h3>td_Depth3</h3>
+    <div><span class="trdValue">1</span></div>
+  </div>
+  
+  <div id="123" class="hide">
+    <h2 class="stickyTop">123</h2>
+    <h3>YAML</h3>
+    <pre>123
+</pre>
+    <h3>td_Default</h3>
+    <div><span class="trdValue">123</span></div>
+    <h3>td_Depth3</h3>
+    <div><span class="trdValue">123</span></div>
+  </div>
+  
+  <div id="blank" class="hide">
+    <h2 class="stickyTop">blank</h2>
+    <h3>YAML</h3>
+    <pre>''
+</pre>
+    <h3>td_Default</h3>
+    <div><span class="trdValue"></span></div>
+    <h3>td_Depth3</h3>
+    <div><span class="trdValue"></span></div>
+  </div>
+  
+  <div id="A" class="hide">
+    <h2 class="stickyTop">A</h2>
+    <h3>YAML</h3>
+    <pre>A
+</pre>
+    <h3>td_Default</h3>
+    <div><span class="trdValue">A</span></div>
+    <h3>td_Depth3</h3>
+    <div><span class="trdValue">A</span></div>
+  </div>
+  
+  <div id="ABC" class="hide">
+    <h2 class="stickyTop">ABC</h2>
+    <h3>YAML</h3>
+    <pre>ABC
+</pre>
+    <h3>td_Default</h3>
+    <div><span class="trdValue">ABC</span></div>
+    <h3>td_Depth3</h3>
+    <div><span class="trdValue">ABC</span></div>
+  </div>
+  
+  <div id="Array1" class="hide">
+    <h2 class="stickyTop">Array1</h2>
+    <h3>YAML</h3>
+    <pre>[]
+
+</pre>
+    <h3>td_Default</h3>
+    <div><details><summary class="trdKey">Array1</summary><ol class="trdOL" start="0"></ol></details></div>
+    <h3>td_Depth3</h3>
+    <div><details><summary class="trdKey">Array1</summary><ol class="trdOL" start="0"></ol></details></div>
+  </div>
+  
+  <div id="Array2" class="hide">
+    <h2 class="stickyTop">Array2</h2>
+    <h3>YAML</h3>
+    <pre>- []
+
+- []
+
+- []
+
+</pre>
+    <h3>td_Default</h3>
+    <div><details><summary class="trdKey">Array2</summary><ol class="trdOL" start="0"><li><details><summary class="trdKey">ARRAY</summary><ol class="trdOL" start="0"></ol></details></li><li><details><summary class="trdKey">ARRAY</summary><ol class="trdOL" start="0"></ol></details></li><li><details><summary class="trdKey">ARRAY</summary><ol class="trdOL" start="0"></ol></details></li></ol></details></div>
+    <h3>td_Depth3</h3>
+    <div><details><summary class="trdKey">Array2</summary><ol class="trdOL" start="0"><li><details><summary class="trdKey">ARRAY</summary><ol class="trdOL" start="0"></ol></details></li><li><details><summary class="trdKey">ARRAY</summary><ol class="trdOL" start="0"></ol></details></li><li><details><summary class="trdKey">ARRAY</summary><ol class="trdOL" start="0"></ol></details></li></ol></details></div>
+  </div>
+  
+  <div id="Array3" class="hide">
+    <h2 class="stickyTop">Array3</h2>
+    <h3>YAML</h3>
+    <pre>- 
+  - ~
+- 
+  - 1
+  - 2
+- 
+  - 3
+  - 4
+  - 5
+</pre>
+    <h3>td_Default</h3>
+    <div><details><summary class="trdKey">Array3</summary><ol class="trdOL" start="0"><li><details><summary class="trdKey">ARRAY</summary><ol class="trdOL" start="0"><li><span class="trdValue">[undef]</span></li></ol></details></li><li><details><summary class="trdKey">ARRAY</summary><ol class="trdOL" start="0"><li><span class="trdValue">1</span></li><li><span class="trdValue">2</span></li></ol></details></li><li><details><summary class="trdKey">ARRAY</summary><ol class="trdOL" start="0"><li><span class="trdValue">3</span></li><li><span class="trdValue">4</span></li><li><span class="trdValue">5</span></li></ol></details></li></ol></details></div>
+    <h3>td_Depth3</h3>
+    <div><details><summary class="trdKey">Array3</summary><ol class="trdOL" start="0"><li><details><summary class="trdKey">ARRAY</summary><ol class="trdOL" start="0"><li><span class="trdValue">[undef]</span></li></ol></details></li><li><details><summary class="trdKey">ARRAY</summary><ol class="trdOL" start="0"><li><span class="trdValue">1</span></li><li><span class="trdValue">2</span></li></ol></details></li><li><details><summary class="trdKey">ARRAY</summary><ol class="trdOL" start="0"><li><span class="trdValue">3</span></li><li><span class="trdValue">4</span></li><li><span class="trdValue">5</span></li></ol></details></li></ol></details></div>
+  </div>
+  
+  <div id="Array4" class="hide">
+    <h2 class="stickyTop">Array4</h2>
+    <h3>YAML</h3>
+    <pre>- 1
+- 
+  - 2
+  - 
+    - 3
+    - 
+      - 4
+      - 
+        - 5
+        - 
+          - 6
+          - 
+            - 7
+            - 
+              - 8
+              - 
+                - 9
+                - 
+                  - 10
+                  - ~
+</pre>
+    <h3>td_Default</h3>
+    <div><details><summary class="trdKey">Array4</summary><ol class="trdOL" start="0"><li><span class="trdValue">1</span></li><li><details><summary class="trdKey">ARRAY</summary><ol class="trdOL" start="0"><li><span class="trdValue">2</span></li><li><details><summary class="trdKey">ARRAY</summary><ol class="trdOL" start="0"><li><span class="trdValue">3</span></li><li><details><summary class="trdKey">ARRAY</summary><ol class="trdOL" start="0"><li><span class="trdValue">4</span></li><li><details><summary class="trdKey">ARRAY</summary><ol class="trdOL" start="0"><li><span class="trdValue">5</span></li><li><details><summary class="trdKey">ARRAY</summary><ol class="trdOL" start="0"><li><span class="trdValue">6</span></li><li><details><summary class="trdKey">ARRAY</summary><ol class="trdOL" start="0"><li><span class="trdValue">7</span></li><li><details><summary class="trdKey">ARRAY</summary><ol class="trdOL" start="0"><li><span class="trdValue">8</span></li><li><span class="trdKey">ARRAY</span>: <span class="trdValue">[...]</span></li></ol></details></li></ol></details></li></ol></details></li></ol></details></li></ol></details></li></ol></details></li></ol></details></li></ol></details></div>
+    <h3>td_Depth3</h3>
+    <div><details><summary class="trdKey">Array4</summary><ol class="trdOL" start="0"><li><span class="trdValue">1</span></li><li><details><summary class="trdKey">ARRAY</summary><ol class="trdOL" start="0"><li><span class="trdValue">2</span></li><li><details><summary class="trdKey">ARRAY</summary><ol class="trdOL" start="0"><li><span class="trdValue">3</span></li><li><span class="trdKey">ARRAY</span>: <span class="trdValue">[...]</span></li></ol></details></li></ol></details></li></ol></details></div>
+  </div>
+  
+  <div id="Hash1" class="hide">
+    <h2 class="stickyTop">Hash1</h2>
+    <h3>YAML</h3>
+    <pre>{}
+
+</pre>
+    <h3>td_Default</h3>
+    <div><details><summary class="trdKey">Hash1</summary><ul class="trdUL"></ul></details></div>
+    <h3>td_Depth3</h3>
+    <div><details><summary class="trdKey">Hash1</summary><ul class="trdUL"></ul></details></div>
+  </div>
+  
+  <div id="Hash2" class="hide">
+    <h2 class="stickyTop">Hash2</h2>
+    <h3>YAML</h3>
+    <pre>a: ~
+b: 0
+c: ''
+d: []
+
+e: {}
+
+</pre>
+    <h3>td_Default</h3>
+    <div><details><summary class="trdKey">Hash2</summary><ul class="trdUL"><li><span class="trdKey">a</span>: <span class="trdValue">[undef]</span></li><li><span class="trdKey">b</span>: <span class="trdValue">0</span></li><li><span class="trdKey">c</span>: <span class="trdValue"></span></li><li><details><summary class="trdKey">d</summary><ol class="trdOL" start="0"></ol></details></li><li><details><summary class="trdKey">e</summary><ul class="trdUL"></ul></details></li></ul></details></div>
+    <h3>td_Depth3</h3>
+    <div><details><summary class="trdKey">Hash2</summary><ul class="trdUL"><li><span class="trdKey">a</span>: <span class="trdValue">[undef]</span></li><li><span class="trdKey">b</span>: <span class="trdValue">0</span></li><li><span class="trdKey">c</span>: <span class="trdValue"></span></li><li><details><summary class="trdKey">d</summary><ol class="trdOL" start="0"></ol></details></li><li><details><summary class="trdKey">e</summary><ul class="trdUL"></ul></details></li></ul></details></div>
+  </div>
+  
+  <div id="Hash3" class="hide">
+    <h2 class="stickyTop">Hash3</h2>
+    <h3>YAML</h3>
+    <pre>a: 
+  - ~
+  - 0
+  - 1
+  - 10
+b: 
+  c: 
+    f: ~
+    g: 0
+    h: ''
+  d: 
+    i: 1
+    j: 10
+  e: 
+    k: A
+    l: ABC
+</pre>
+    <h3>td_Default</h3>
+    <div><details><summary class="trdKey">Hash3</summary><ul class="trdUL"><li><details><summary class="trdKey">a</summary><ol class="trdOL" start="0"><li><span class="trdValue">[undef]</span></li><li><span class="trdValue">0</span></li><li><span class="trdValue">1</span></li><li><span class="trdValue">10</span></li></ol></details></li><li><details><summary class="trdKey">b</summary><ul class="trdUL"><li><details><summary class="trdKey">c</summary><ul class="trdUL"><li><span class="trdKey">f</span>: <span class="trdValue">[undef]</span></li><li><span class="trdKey">g</span>: <span class="trdValue">0</span></li><li><span class="trdKey">h</span>: <span class="trdValue"></span></li></ul></details></li><li><details><summary class="trdKey">d</summary><ul class="trdUL"><li><span class="trdKey">i</span>: <span class="trdValue">1</span></li><li><span class="trdKey">j</span>: <span class="trdValue">10</span></li></ul></details></li><li><details><summary class="trdKey">e</summary><ul class="trdUL"><li><span class="trdKey">k</span>: <span class="trdValue">A</span></li><li><span class="trdKey">l</span>: <span class="trdValue">ABC</span></li></ul></details></li></ul></details></li></ul></details></div>
+    <h3>td_Depth3</h3>
+    <div><details><summary class="trdKey">Hash3</summary><ul class="trdUL"><li><details><summary class="trdKey">a</summary><ol class="trdOL" start="0"><li><span class="trdValue">[undef]</span></li><li><span class="trdValue">0</span></li><li><span class="trdValue">1</span></li><li><span class="trdValue">10</span></li></ol></details></li><li><details><summary class="trdKey">b</summary><ul class="trdUL"><li><details><summary class="trdKey">c</summary><ul class="trdUL"><li><span class="trdKey">f</span>: <span class="trdValue">[undef]</span></li><li><span class="trdKey">g</span>: <span class="trdValue">0</span></li><li><span class="trdKey">h</span>: <span class="trdValue"></span></li></ul></details></li><li><details><summary class="trdKey">d</summary><ul class="trdUL"><li><span class="trdKey">i</span>: <span class="trdValue">1</span></li><li><span class="trdKey">j</span>: <span class="trdValue">10</span></li></ul></details></li><li><details><summary class="trdKey">e</summary><ul class="trdUL"><li><span class="trdKey">k</span>: <span class="trdValue">A</span></li><li><span class="trdKey">l</span>: <span class="trdValue">ABC</span></li></ul></details></li></ul></details></li></ul></details></div>
+  </div>
+  
+  <div id="Hash4" class="hide">
+    <h2 class="stickyTop">Hash4</h2>
+    <h3>YAML</h3>
+    <pre>a: 
+  c: 
+    g: 
+      o: ~
+    h: 
+      p: 0
+  d: 
+    i: 
+      q: 1
+    j: 
+      r: 2
+b: 
+  e: 
+    k: 
+      s: 3
+    l: 
+      t: 4
+  f: 
+    m: 
+      u: 5
+    "n": 
+      v: 6
+</pre>
+    <h3>td_Default</h3>
+    <div><details><summary class="trdKey">Hash4</summary><ul class="trdUL"><li><details><summary class="trdKey">a</summary><ul class="trdUL"><li><details><summary class="trdKey">c</summary><ul class="trdUL"><li><details><summary class="trdKey">g</summary><ul class="trdUL"><li><span class="trdKey">o</span>: <span class="trdValue">[undef]</span></li></ul></details></li><li><details><summary class="trdKey">h</summary><ul class="trdUL"><li><span class="trdKey">p</span>: <span class="trdValue">0</span></li></ul></details></li></ul></details></li><li><details><summary class="trdKey">d</summary><ul class="trdUL"><li><details><summary class="trdKey">i</summary><ul class="trdUL"><li><span class="trdKey">q</span>: <span class="trdValue">1</span></li></ul></details></li><li><details><summary class="trdKey">j</summary><ul class="trdUL"><li><span class="trdKey">r</span>: <span class="trdValue">2</span></li></ul></details></li></ul></details></li></ul></details></li><li><details><summary class="trdKey">b</summary><ul class="trdUL"><li><details><summary class="trdKey">e</summary><ul class="trdUL"><li><details><summary class="trdKey">k</summary><ul class="trdUL"><li><span class="trdKey">s</span>: <span class="trdValue">3</span></li></ul></details></li><li><details><summary class="trdKey">l</summary><ul class="trdUL"><li><span class="trdKey">t</span>: <span class="trdValue">4</span></li></ul></details></li></ul></details></li><li><details><summary class="trdKey">f</summary><ul class="trdUL"><li><details><summary class="trdKey">m</summary><ul class="trdUL"><li><span class="trdKey">u</span>: <span class="trdValue">5</span></li></ul></details></li><li><details><summary class="trdKey">n</summary><ul class="trdUL"><li><span class="trdKey">v</span>: <span class="trdValue">6</span></li></ul></details></li></ul></details></li></ul></details></li></ul></details></div>
+    <h3>td_Depth3</h3>
+    <div><details><summary class="trdKey">Hash4</summary><ul class="trdUL"><li><details><summary class="trdKey">a</summary><ul class="trdUL"><li><details><summary class="trdKey">c</summary><ul class="trdUL"><li><span class="trdKey">g</span>: <span class="trdValue">{...}</span></li><li><span class="trdKey">h</span>: <span class="trdValue">{...}</span></li></ul></details></li><li><details><summary class="trdKey">d</summary><ul class="trdUL"><li><span class="trdKey">i</span>: <span class="trdValue">{...}</span></li><li><span class="trdKey">j</span>: <span class="trdValue">{...}</span></li></ul></details></li></ul></details></li><li><details><summary class="trdKey">b</summary><ul class="trdUL"><li><details><summary class="trdKey">e</summary><ul class="trdUL"><li><span class="trdKey">k</span>: <span class="trdValue">{...}</span></li><li><span class="trdKey">l</span>: <span class="trdValue">{...}</span></li></ul></details></li><li><details><summary class="trdKey">f</summary><ul class="trdUL"><li><span class="trdKey">m</span>: <span class="trdValue">{...}</span></li><li><span class="trdKey">n</span>: <span class="trdValue">{...}</span></li></ul></details></li></ul></details></li></ul></details></div>
+  </div>
+  
+  <div id="Hash5" class="hide">
+    <h2 class="stickyTop">Hash5</h2>
+    <h3>YAML</h3>
+    <pre>k: 1
+v: 
+  k: 2
+  v: 
+    k: 3
+    v: 
+      k: 4
+      v: 
+        k: 5
+        v: 
+          k: 6
+          v: 
+            k: 7
+            v: 
+              k: 8
+              v: 
+                k: 9
+                v: 
+                  k: 10
+                  v: ~
+</pre>
+    <h3>td_Default</h3>
+    <div><details><summary class="trdKey">Hash5</summary><ul class="trdUL"><li><span class="trdKey">k</span>: <span class="trdValue">1</span></li><li><details><summary class="trdKey">v</summary><ul class="trdUL"><li><span class="trdKey">k</span>: <span class="trdValue">2</span></li><li><details><summary class="trdKey">v</summary><ul class="trdUL"><li><span class="trdKey">k</span>: <span class="trdValue">3</span></li><li><details><summary class="trdKey">v</summary><ul class="trdUL"><li><span class="trdKey">k</span>: <span class="trdValue">4</span></li><li><details><summary class="trdKey">v</summary><ul class="trdUL"><li><span class="trdKey">k</span>: <span class="trdValue">5</span></li><li><details><summary class="trdKey">v</summary><ul class="trdUL"><li><span class="trdKey">k</span>: <span class="trdValue">6</span></li><li><details><summary class="trdKey">v</summary><ul class="trdUL"><li><span class="trdKey">k</span>: <span class="trdValue">7</span></li><li><details><summary class="trdKey">v</summary><ul class="trdUL"><li><span class="trdKey">k</span>: <span class="trdValue">8</span></li><li><span class="trdKey">v</span>: <span class="trdValue">{...}</span></li></ul></details></li></ul></details></li></ul></details></li></ul></details></li></ul></details></li></ul></details></li></ul></details></li></ul></details></div>
+    <h3>td_Depth3</h3>
+    <div><details><summary class="trdKey">Hash5</summary><ul class="trdUL"><li><span class="trdKey">k</span>: <span class="trdValue">1</span></li><li><details><summary class="trdKey">v</summary><ul class="trdUL"><li><span class="trdKey">k</span>: <span class="trdValue">2</span></li><li><details><summary class="trdKey">v</summary><ul class="trdUL"><li><span class="trdKey">k</span>: <span class="trdValue">3</span></li><li><span class="trdKey">v</span>: <span class="trdValue">{...}</span></li></ul></details></li></ul></details></li></ul></details></div>
+  </div>
+  
+  <div id="ArrayOfHash" class="hide">
+    <h2 class="stickyTop">ArrayOfHash</h2>
+    <h3>YAML</h3>
+    <pre>- 
+  a: A
+  b: 
+    - 1
+    - 2
+    - 3
+  c: 
+    d: ~
+    e: 0
+    f: ''
+- 
+  a: B
+  b: 
+    - 4
+    - 5
+    - 6
+  c: 
+    d: 
+      - 0
+      - 1
+      - 2
+    e: 1
+    f: A
+- 
+  a: C
+  b: 
+    - 7
+    - 8
+    - 9
+  c: 
+    d: 
+      - 3
+      - 4
+      - 5
+    e: 123
+    f: ABC
+</pre>
+    <h3>td_Default</h3>
+    <div><details><summary class="trdKey">ArrayOfHash</summary><ol class="trdOL" start="0"><li><details><summary class="trdKey">HASH</summary><ul class="trdUL"><li><span class="trdKey">a</span>: <span class="trdValue">A</span></li><li><details><summary class="trdKey">b</summary><ol class="trdOL" start="0"><li><span class="trdValue">1</span></li><li><span class="trdValue">2</span></li><li><span class="trdValue">3</span></li></ol></details></li><li><details><summary class="trdKey">c</summary><ul class="trdUL"><li><span class="trdKey">d</span>: <span class="trdValue">[undef]</span></li><li><span class="trdKey">e</span>: <span class="trdValue">0</span></li><li><span class="trdKey">f</span>: <span class="trdValue"></span></li></ul></details></li></ul></details></li><li><details><summary class="trdKey">HASH</summary><ul class="trdUL"><li><span class="trdKey">a</span>: <span class="trdValue">B</span></li><li><details><summary class="trdKey">b</summary><ol class="trdOL" start="0"><li><span class="trdValue">4</span></li><li><span class="trdValue">5</span></li><li><span class="trdValue">6</span></li></ol></details></li><li><details><summary class="trdKey">c</summary><ul class="trdUL"><li><details><summary class="trdKey">d</summary><ol class="trdOL" start="0"><li><span class="trdValue">0</span></li><li><span class="trdValue">1</span></li><li><span class="trdValue">2</span></li></ol></details></li><li><span class="trdKey">e</span>: <span class="trdValue">1</span></li><li><span class="trdKey">f</span>: <span class="trdValue">A</span></li></ul></details></li></ul></details></li><li><details><summary class="trdKey">HASH</summary><ul class="trdUL"><li><span class="trdKey">a</span>: <span class="trdValue">C</span></li><li><details><summary class="trdKey">b</summary><ol class="trdOL" start="0"><li><span class="trdValue">7</span></li><li><span class="trdValue">8</span></li><li><span class="trdValue">9</span></li></ol></details></li><li><details><summary class="trdKey">c</summary><ul class="trdUL"><li><details><summary class="trdKey">d</summary><ol class="trdOL" start="0"><li><span class="trdValue">3</span></li><li><span class="trdValue">4</span></li><li><span class="trdValue">5</span></li></ol></details></li><li><span class="trdKey">e</span>: <span class="trdValue">123</span></li><li><span class="trdKey">f</span>: <span class="trdValue">ABC</span></li></ul></details></li></ul></details></li></ol></details></div>
+    <h3>td_Depth3</h3>
+    <div><details><summary class="trdKey">ArrayOfHash</summary><ol class="trdOL" start="0"><li><details><summary class="trdKey">HASH</summary><ul class="trdUL"><li><span class="trdKey">a</span>: <span class="trdValue">A</span></li><li><details><summary class="trdKey">b</summary><ol class="trdOL" start="0"><li><span class="trdValue">1</span></li><li><span class="trdValue">2</span></li><li><span class="trdValue">3</span></li></ol></details></li><li><details><summary class="trdKey">c</summary><ul class="trdUL"><li><span class="trdKey">d</span>: <span class="trdValue">[undef]</span></li><li><span class="trdKey">e</span>: <span class="trdValue">0</span></li><li><span class="trdKey">f</span>: <span class="trdValue"></span></li></ul></details></li></ul></details></li><li><details><summary class="trdKey">HASH</summary><ul class="trdUL"><li><span class="trdKey">a</span>: <span class="trdValue">B</span></li><li><details><summary class="trdKey">b</summary><ol class="trdOL" start="0"><li><span class="trdValue">4</span></li><li><span class="trdValue">5</span></li><li><span class="trdValue">6</span></li></ol></details></li><li><details><summary class="trdKey">c</summary><ul class="trdUL"><li><span class="trdKey">d</span>: <span class="trdValue">[...]</span></li><li><span class="trdKey">e</span>: <span class="trdValue">1</span></li><li><span class="trdKey">f</span>: <span class="trdValue">A</span></li></ul></details></li></ul></details></li><li><details><summary class="trdKey">HASH</summary><ul class="trdUL"><li><span class="trdKey">a</span>: <span class="trdValue">C</span></li><li><details><summary class="trdKey">b</summary><ol class="trdOL" start="0"><li><span class="trdValue">7</span></li><li><span class="trdValue">8</span></li><li><span class="trdValue">9</span></li></ol></details></li><li><details><summary class="trdKey">c</summary><ul class="trdUL"><li><span class="trdKey">d</span>: <span class="trdValue">[...]</span></li><li><span class="trdKey">e</span>: <span class="trdValue">123</span></li><li><span class="trdKey">f</span>: <span class="trdValue">ABC</span></li></ul></details></li></ul></details></li></ol></details></div>
+  </div>
+  
+  <div id="ComplexData" class="hide">
+    <h2 class="stickyTop">ComplexData</h2>
+    <h3>YAML</h3>
+    <pre>summary: Blah...
+users: 
+  - 
+    domains: 
+      - f.com
+      - b.com
+    name: budi
+    quota: 1000
+  - 
+    domains: 
+      - baz.com
+    name: arif
+    quota: 2000
+verified: 0
+</pre>
+    <h3>td_Default</h3>
+    <div><details><summary class="trdKey">ComplexData</summary><ul class="trdUL"><li><span class="trdKey">summary</span>: <span class="trdValue">Blah...</span></li><li><details><summary class="trdKey">users</summary><ol class="trdOL" start="0"><li><details><summary class="trdKey">HASH</summary><ul class="trdUL"><li><details><summary class="trdKey">domains</summary><ol class="trdOL" start="0"><li><span class="trdValue">f.com</span></li><li><span class="trdValue">b.com</span></li></ol></details></li><li><span class="trdKey">name</span>: <span class="trdValue">budi</span></li><li><span class="trdKey">quota</span>: <span class="trdValue">1000</span></li></ul></details></li><li><details><summary class="trdKey">HASH</summary><ul class="trdUL"><li><details><summary class="trdKey">domains</summary><ol class="trdOL" start="0"><li><span class="trdValue">baz.com</span></li></ol></details></li><li><span class="trdKey">name</span>: <span class="trdValue">arif</span></li><li><span class="trdKey">quota</span>: <span class="trdValue">2000</span></li></ul></details></li></ol></details></li><li><span class="trdKey">verified</span>: <span class="trdValue">0</span></li></ul></details></div>
+    <h3>td_Depth3</h3>
+    <div><details><summary class="trdKey">ComplexData</summary><ul class="trdUL"><li><span class="trdKey">summary</span>: <span class="trdValue">Blah...</span></li><li><details><summary class="trdKey">users</summary><ol class="trdOL" start="0"><li><details><summary class="trdKey">HASH</summary><ul class="trdUL"><li><span class="trdKey">domains</span>: <span class="trdValue">[...]</span></li><li><span class="trdKey">name</span>: <span class="trdValue">budi</span></li><li><span class="trdKey">quota</span>: <span class="trdValue">1000</span></li></ul></details></li><li><details><summary class="trdKey">HASH</summary><ul class="trdUL"><li><span class="trdKey">domains</span>: <span class="trdValue">[...]</span></li><li><span class="trdKey">name</span>: <span class="trdValue">arif</span></li><li><span class="trdKey">quota</span>: <span class="trdValue">2000</span></li></ul></details></li></ol></details></li><li><span class="trdKey">verified</span>: <span class="trdValue">0</span></li></ul></details></div>
+  </div>
+  
+</body>
+
+</html>

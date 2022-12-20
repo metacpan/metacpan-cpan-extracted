@@ -124,7 +124,7 @@ DefConstructor('\endnote[]{}',
     . "#2"
     . "</ltx:note>",
   mode         => 'text', bounded => 1,
-  beforeDigest => sub { reenterTextMode(1); Digest('\normalfont'); },
+  beforeDigest => sub { reenterTextMode(1); neutralizeFont(); },
   properties   => sub {
     ($_[1]
       ? (mark => $_[1])
@@ -194,8 +194,10 @@ DefConstructor('\references',
     beforeDigestBibliography(); },
   afterDigest => sub { beginBibliography($_[1]); }, locked => 1);
 
-DefConstructor('\endreferences',
-  "</ltx:biblist></ltx:bibliography>", locked => 1);
+DefConstructor('\endreferences', sub {
+    $_[0]->maybeCloseElement('ltx:biblist');
+    $_[0]->maybeCloseElement('ltx:bibliography'); },
+  locked => 1);
 # bibliography and biblist are already set as autoClose.
 
 #======================================================================
@@ -267,9 +269,9 @@ DefEnvironment('{turnpage}', '#body');
 # XX.  Extra stuff
 #======================================================================
 
-Let('\MakeTextLowercase', '\lowercase');
-Let('\MakeTextUppercase', '\uppercase');
-DefMacro('\NoCaseChange', '');
+DefMacro('\MakeTextLowercase', '\lowercase');
+DefMacro('\MakeTextUppercase', '\uppercase');
+DefMacro('\NoCaseChange',      '');
 
 # Macro & Control stuff.
 #  Are these really intended for authors to use?
@@ -417,6 +419,12 @@ DefMacroI('\ds@tighten',   undef, '\@tightenlinestrue');
 DefMacroI('\ds@floats',    undef, '\@floatstrue');
 DefMacroI('\ds@eqsecnum',  undef, '\global\secnumberstrue');
 
+DefMacro('\replace@command{}{}',     '\global\let#1#2 #1');
+DefMacro('\replace@environment{}{}', '\glet@environment{#1}{#2}\@nameuse{#1}');
+DefMacro('\glet@environment{}{}', '\global\expandafter\let'
+    . '\csname#1\expandafter\endcsname\csname#2\endcsname'
+    . '\global\expandafter\let'
+    . '\csname end#1\expandafter\endcsname\csname end#2\endcsname');
 #======================================================================
 
 1;

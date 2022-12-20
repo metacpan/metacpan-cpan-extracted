@@ -459,28 +459,28 @@ sub set_options {
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
             elsif ( $opt eq '_menu_memory' ) {
-                my $prompt = 'Choose: ';
+                my $prompt = 'Your choice: ';
                 my $sub_menu = [
                     [ 'menu_memory', "- Menu memory", [ $no, $yes ] ],
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
             elsif ( $opt eq '_table_expand' ) {
-                my $prompt = 'Choose: ';
+                my $prompt = 'Your choice: ';
                 my $sub_menu = [
                     [ 'table_expand', "- Expand table rows",   [ $no, $yes ] ],
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
             elsif ( $opt eq '_search' ) {
-                my $prompt = 'Choose: ';
+                my $prompt = 'Your choice: ';
                 my $sub_menu = [
                     [ 'search', "- Row filter", [ 'disabled', 'case insensitive', 'case sensitive' ] ]
                 ];
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
             elsif ( $opt eq '_mouse' ) {
-                my $prompt = 'Choose: ';
+                my $prompt = 'Your choice: ';
                 my $sub_menu = [
                     [ 'mouse', "- Mouse mode", [ $no, $yes ] ]
                 ];
@@ -544,7 +544,7 @@ sub set_options {
                 $sf->__settings_menu_wrap( $section, $sub_menu, $prompt );
             }
             elsif ( $opt eq '_sql_identifiers' ) {
-                my $prompt = 'Choose: ';
+                my $prompt = 'Your choice: ';
                 my $sub_menu = [
                     [ 'qualified_table_name', "- Qualified table names", [ $no, $yes ] ],
                     [ 'quote_identifiers',    "- Quote identifiers",     [ $no, $yes ] ],

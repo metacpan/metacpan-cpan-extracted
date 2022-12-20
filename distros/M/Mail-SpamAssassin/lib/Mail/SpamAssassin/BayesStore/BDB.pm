@@ -35,14 +35,11 @@ use Errno qw(EBADF);
 #use Data::Dumper;
 use File::Basename;
 use File::Path;
-
-BEGIN {
-  eval { require Digest::SHA; import Digest::SHA qw(sha1); 1 }
-  or do { require Digest::SHA1; import Digest::SHA1 qw(sha1) }
-}
+use Digest::SHA qw(sha1);
 
 use Mail::SpamAssassin::BayesStore;
 use Mail::SpamAssassin::Logger;
+use Mail::SpamAssassin::Util qw(compile_regexp);
 
 our @ISA = qw( Mail::SpamAssassin::BayesStore );
 
@@ -77,6 +74,7 @@ sub new {
 
 sub DESTROY {
   my $self = shift;
+
   $self->_close_db;
 }
 
@@ -649,6 +647,14 @@ sub dump_db_toks { dump_tokens(@_) }
 sub dump_tokens {
   my($self, $template, $regex, @vars) = @_;
   dbg("bayes: dump_tokens starting");
+
+  if (defined $regex) {
+    my ($rec, $err) = compile_regexp($regex, 2);
+    if (!$rec) {
+      die "Invalid dump_tokens regex '$regex': $err\n";
+    }
+    $regex = $rec;
+  }
 
   my $cursor = $self->{handles}->{tokens}->db_cursor;
   $cursor or die "Couldn't get cursor: $BerkeleyDB::Error";

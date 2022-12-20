@@ -24,9 +24,6 @@ use strict;
 use warnings;
 use re 'taint';
 
-require 5.008;     # need basic Unicode support for HTML::Parser::utf8_mode
-# require 5.008008;  # Bug 3787; [perl #37950]: Malformed UTF-8 character ...
-
 use HTML::Parser 3.43 ();
 use Mail::SpamAssassin::Logger;
 use Mail::SpamAssassin::Constants qw(:sa);
@@ -66,7 +63,7 @@ my %elements_whitespace = map {; $_ => 1 }
 
 # elements that push URIs
 my %elements_uri = map {; $_ => 1 }
-  qw( body table tr td a area link img frame iframe embed script form base bgsound ),
+  qw( body table tr td a area link img frame iframe embed script form base bgsound meta ),
 ;
 
 # style attribute not accepted
@@ -248,6 +245,18 @@ sub parse {
   # the HTML::Parser API won't do it for us
   $text =~ s/<(\w+)\s*\/>/<$1>/gi;
 
+  # Normalize unicode quotes, messes up attributes parsing
+  # U+201C e2 80 9c LEFT DOUBLE QUOTATION MARK
+  # U+201D e2 80 9d RIGHT DOUBLE QUOTATION MARK
+  # Examples of input:
+  # <a href=\x{E2}\x{80}\x{9D}https://foobar.com\x{E2}\x{80}\x{9D}>
+  # .. results in uri "\x{E2}\x{80}\x{9D}https://foobar.com\x{E2}\x{80}\x{9D}"
+  if (utf8::is_utf8($text)) {
+    $text =~ s/(?:\x{201C}|\x{201D})/"/g;
+  } else {
+    $text =~ s/\x{E2}\x{80}(?:\x{9C}|\x{9D})/"/g;
+  }
+
   if (!$self->UNIVERSAL::can('utf8_mode')) {
     # utf8_mode is cleared by default, only warn if it would need to be set
     warn "message: cannot set utf8_mode, module HTML::Parser is too old\n"
@@ -352,8 +361,8 @@ sub canon_uri {
   my ($self, $uri) = @_;
 
   # URIs don't have leading/trailing whitespace ...
-  $uri =~ s/^\s+//;
-  $uri =~ s/\s+$//;
+  $uri =~ s/^[\s\xA0]+//;
+  $uri =~ s/[\s\xA0]+$//;
 
   # Make sure all the URIs are nice and short
   if (length $uri > MAX_URI_LENGTH) {
@@ -413,6 +422,17 @@ sub html_uri {
 	$self->{base_href} = $uri;
       }
     }
+  }
+  elsif ($tag eq "meta" &&
+    exists $attr->{'http-equiv'} &&
+    exists $attr->{content} &&
+    $attr->{'http-equiv'} =~ /refresh/i &&
+    $attr->{content} =~ /\burl\s*=/i)
+  {
+      my $uri = $attr->{content};
+      $uri =~ s/^.*\burl\s*=\s*//i;
+      $uri =~ s/\s*;.*//i;
+      $self->push_uri($tag, $uri);
   }
 }
 
@@ -516,7 +536,7 @@ sub text_style {
 	    my $whcolor = $1 ? 'bgcolor' : 'fgcolor';
 	    my $value = lc $2;
 
-	    if ($value =~ /rgb/) {
+	    if (index($value, 'rgb') >= 0) {
 	      $value =~ tr/0-9,//cd;
 	      my @rgb = split(/,/, $value);
               $new{$whcolor} = sprintf("#%02x%02x%02x",
@@ -705,6 +725,8 @@ sub html_tests {
   {
     $self->{charsets} .= exists $self->{charsets} ? " $1" : $1;
   }
+
+  # todo: capture URI from meta refresh tag
 }
 
 sub display_text {
@@ -1154,7 +1176,7 @@ sub _merge_uri {
     return "/" . $r_path;
   }
   else {
-    if ($base_path =~ m|/|) {
+    if (index($base_path, '/') >= 0) {
       $base_path =~ s|(?<=/)[^/]*$||;
     }
     else {

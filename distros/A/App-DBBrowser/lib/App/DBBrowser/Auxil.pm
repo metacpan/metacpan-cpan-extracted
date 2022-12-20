@@ -301,7 +301,7 @@ sub alias {
         );
         $sf->print_sql_info( $info );
     }
-    if ( ! defined $alias || ! length $alias ) {
+    if ( ! length $alias ) {
         $alias = $default;
     }
     if ( $sf->{i}{driver} eq 'Pg' && ! $sf->{o}{G}{quote_identifiers} ) {

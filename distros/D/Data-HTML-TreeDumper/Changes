@@ -1,0 +1,10 @@
+Revision history for Perl extension Data-HTML-TreeDumper
+
+v0.0.3 2022-12-18T10:14:30Z
+    - update document.
+
+v0.0.2 2022-12-17T08:33:14Z
+    - add option 'MaxDepth'
+
+v0.0.1 2022-12-14T18:11:23Z
+    - implement basic functions.

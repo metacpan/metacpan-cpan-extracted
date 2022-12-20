@@ -1,3 +1,8 @@
+0.030   2022-12-16  Released-By: PERLANCAR; Urgency: medium
+
+        - Add configuration: preamble & postamble.
+
+
 0.029   2021-09-29  Released-By: PERLANCAR; Urgency: medium
 
 	- Add perlcritic exclude directive to generated Sah::SchemaR::*

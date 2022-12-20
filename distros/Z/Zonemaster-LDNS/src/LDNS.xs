@@ -1233,7 +1233,14 @@ packet_string(obj)
     Zonemaster::LDNS::Packet obj;
     CODE:
         RETVAL = ldns_pkt2str(obj);
-        RETVAL[strlen(RETVAL)-1] = '\0';
+        if(RETVAL == NULL || RETVAL[0] == '\0')
+        {
+            croak("Failed to convert packet to string");
+        }
+        else
+        {
+            strip_newline(RETVAL);
+        }
     OUTPUT:
         RETVAL
     CLEANUP:
@@ -1404,6 +1411,76 @@ packet_needs_edns(obj)
         Zonemaster::LDNS::Packet::has_edns = 1
     CODE:
         RETVAL = ldns_pkt_edns(obj);
+    OUTPUT:
+        RETVAL
+
+#
+# Function: nsid
+# --------------
+# Set the EDNS option NSID in the packet
+#
+void
+packet_nsid(obj)
+    Zonemaster::LDNS::Packet obj;
+    CODE:
+    {
+#ifdef NSID_SUPPORT
+        ldns_edns_option_list* edns_list;
+        ldns_edns_option*      edns_opt;
+
+        edns_list = ldns_pkt_edns_get_option_list(obj);
+
+        if ( !edns_list )
+            edns_list = ldns_edns_option_list_new();
+
+        edns_opt  = ldns_edns_new_from_data(LDNS_EDNS_NSID, 0, NULL);
+        if ( edns_list == NULL || edns_opt == NULL )
+            croak("Could not allocate EDNS option");
+        if ( ! ldns_edns_option_list_push(edns_list, edns_opt) )
+            croak("Could not attach EDNS option NSID");
+        ldns_pkt_set_edns_option_list(obj, edns_list);
+#else
+        croak("NSID not supported");
+#endif
+    }
+
+#
+# Function: get_nsid
+# ------------------
+# Get the EDNS option NSID if any from the packet
+#
+# returns: a bytes string (or undef if no NSID is found)
+#
+SV *
+packet_get_nsid(obj)
+    Zonemaster::LDNS::Packet obj;
+    CODE:
+    {
+#ifdef NSID_SUPPORT
+        ldns_edns_option_list* edns_list;
+        ldns_edns_option* edns_opt;
+        size_t i,count;
+
+        edns_list = ldns_pkt_edns_get_option_list(obj);
+        if ( edns_list == NULL )
+            XSRETURN_UNDEF;
+
+        RETVAL = NULL;
+        count = ldns_edns_option_list_get_count(edns_list);
+        for ( i=0; i<count; i++ )
+        {
+            edns_opt = ldns_edns_option_list_get_option(edns_list, i);
+            if ( edns_opt == NULL )
+                continue;
+            if ( ldns_edns_get_code(edns_opt) == LDNS_EDNS_NSID )
+                RETVAL = newSVpv(ldns_edns_get_data(edns_opt), ldns_edns_get_size(edns_opt));
+        }
+        if ( RETVAL == NULL )
+            XSRETURN_UNDEF;
+#else
+        croak("NSID not supported");
+#endif
+    }
     OUTPUT:
         RETVAL
 
@@ -1597,7 +1674,14 @@ rr_string(obj)
     Zonemaster::LDNS::RR obj;
     CODE:
         RETVAL = ldns_rr2str(obj);
-        RETVAL[strlen(RETVAL)-1] = '\0';
+        if(RETVAL == NULL || RETVAL[0] == '\0')
+        {
+            croak("Failed to convert RR to string");
+        }
+        else
+        {
+            strip_newline(RETVAL);
+        }
     OUTPUT:
         RETVAL
     CLEANUP:
@@ -2361,31 +2445,6 @@ rr_cname_cname(obj)
     Zonemaster::LDNS::RR::CNAME obj;
     CODE:
         RETVAL = randomize_capitalization(D_STRING(obj,0));
-    OUTPUT:
-        RETVAL
-    CLEANUP:
-        free(RETVAL);
-
-
-MODULE = Zonemaster::LDNS        PACKAGE = Zonemaster::LDNS::RR::TXT              PREFIX=rr_txt_
-
-char *
-rr_txt_txtdata(obj)
-    Zonemaster::LDNS::RR::TXT obj;
-    CODE:
-        RETVAL = D_STRING(obj,0);
-    OUTPUT:
-        RETVAL
-    CLEANUP:
-        free(RETVAL);
-
-MODULE = Zonemaster::LDNS        PACKAGE = Zonemaster::LDNS::RR::SPF              PREFIX=rr_spf_
-
-char *
-rr_spf_spfdata(obj)
-    Zonemaster::LDNS::RR::SPF obj;
-    CODE:
-        RETVAL = D_STRING(obj,0);
     OUTPUT:
         RETVAL
     CLEANUP:

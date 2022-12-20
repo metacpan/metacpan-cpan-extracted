@@ -9,6 +9,10 @@ use Venus::Class 'base';
 
 base 'Faker::Plugin::EsEs';
 
+# VERSION
+
+our $VERSION = '1.17';
+
 # METHODS
 
 sub execute {
@@ -35,6 +39,12 @@ Faker::Plugin::EsEs::InternetDomainWord - Internet Domain Word
 =head1 ABSTRACT
 
 Internet Domain Word for Faker
+
+=cut
+
+=head1 VERSION
+
+1.17
 
 =cut
 

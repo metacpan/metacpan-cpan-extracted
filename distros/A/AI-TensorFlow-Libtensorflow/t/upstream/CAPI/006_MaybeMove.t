@@ -1,7 +1,9 @@
 #!/usr/bin/env perl
 
 use Test2::V0;
-use aliased 'AI::TensorFlow::Libtensorflow' => 'tf';
+use lib 't/lib';
+use TF_TestQuiet;
+use aliased 'AI::TensorFlow::Libtensorflow';
 use aliased 'AI::TensorFlow::Libtensorflow::Tensor';
 use AI::TensorFlow::Libtensorflow::DataType qw(FLOAT);
 use FFI::Platypus::Buffer qw(window scalar_to_pointer);

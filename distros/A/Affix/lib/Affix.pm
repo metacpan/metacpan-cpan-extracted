@@ -1,4 +1,4 @@
-package Affix 0.04 {    # 'FFI' is my middle name!
+package Affix 0.08 {    # 'FFI' is my middle name!
     use strict;
     use warnings;
     no warnings 'redefine';
@@ -8,12 +8,10 @@ package Affix 0.04 {    # 'FFI' is my middle name!
     use Config;
     use Sub::Util qw[subname];
     use Text::ParseWords;
-    use Carp      qw[];
-    use vars      qw[@EXPORT_OK @EXPORT %EXPORT_TAGS];
-    use Dyn::Call qw[:sigchar];
+    use Carp qw[];
+    use vars qw[@EXPORT_OK @EXPORT %EXPORT_TAGS];
 
-    #use Attribute::Handlers;
-    #no warnings 'redefine';
+    # our $VERSION = '0.08';
     use XSLoader;
     XSLoader::load( __PACKAGE__, our $VERSION );
     #
@@ -268,100 +266,6 @@ package Affix 0.04 {    # 'FFI' is my middle name!
         return $_lib_cache->{ $name . ';' . ( $version // '' ) }
             // Carp::croak( 'Cannot locate symbol: ' . $name );
     }
-
-    # define packages that are otherwise XS-only so PAUSE will find them in META.json
-    {
-
-        package Affix::Type::Base 0.04;
-
-        package Affix::Type::Void 0.04;
-
-        package Affix::Type::Bool 0.04;
-
-        package Affix::Type::Char 0.04;
-
-        package Affix::Type::UChar 0.04;
-
-        package Affix::Type::Short 0.04;
-
-        package Affix::Type::UShort 0.04;
-
-        package Affix::Type::Int 0.04;
-
-        package Affix::Type::UInt 0.04;
-
-        package Affix::Type::Long 0.04;
-
-        package Affix::Type::ULong 0.04;
-
-        package Affix::Type::LongLong 0.04;
-
-        package Affix::Type::ULongLong 0.04;
-
-        package Affix::Type::Float 0.04;
-
-        package Affix::Type::Double 0.04;
-
-        package Affix::Type::Pointer 0.04;
-
-        package Affix::Type::Str 0.04;
-
-        package Affix::Type::Aggregate 0.04;    # Reserved
-
-        package Affix::Type::Struct 0.04;
-
-        package Affix::Type::ArrayRef 0.04;
-
-        package Affix::Type::Union 0.04;
-
-        package Affix::Type::CodeRef 0.04;
-
-        package Affix::Type::InstanceOf 0.04;
-
-        package Affix::Type::Any 0.04;
-
-        package Affix::Type::SSize_t 0.04;
-
-        package Affix::Type::Size_t 0.04;
-
-        package Affix::Type::Enum 0.04;
-
-        package Affix::Type::IntEnum 0.04;
-
-        package Affix::Type::UIntEnum 0.04;
-
-        package Affix::Type::CharEnum 0.04;
-
-        package Affix::Type::CC_DEFAULT 0.04;
-
-        package Affix::Type::CC_THISCALL 0.04;
-
-        package Affix::Type::CC_ELLIPSIS 0.04;
-
-        package Affix::Type::CC_ELLIPSIS_VARARGS 0.04;
-
-        package Affix::Type::CC_CDECL 0.04;
-
-        package Affix::Type::CC_STDCALL 0.04;
-
-        package Affix::Type::CC_FASTCALL_MS 0.04;
-
-        package Affix::Type::CC_FASTCALL_GNU 0.04;
-
-        package Affix::Type::CC_THISCALL_MS 0.04;
-
-        package Affix::Type::CC_THISCALL_GNU 0.04;
-
-        package Affix::Type::CC_ARM_ARM 0.04;
-
-        package Affix::Type::CC_ARM_THUMB 0.04;
-
-        package Affix::Type::CC_SYSCALL 0.04;
-
-        package Affix::Var 0.04;
-
-        package Affix::Pointer 0.04;
-    }
 };
 1;
 __END__
@@ -375,13 +279,19 @@ Affix - A Foreign Function Interface eXtension
 =head1 SYNOPSIS
 
     use Affix;
-    sub pow : Native(get_lib) : Signature([Double, Double] => Double);
-    print pow( 2, 10 );    # 1024
 
-    sub get_lib {
-        return 'ntdll' if $^O eq 'MSWin32';
-        return undef;
-    }
+    affix( 'libfoo', 'bar', [Str, Float] => Double );
+    print bar( 'Baz', 3.14 );
+
+    # or
+
+    my $bar = wrap( 'libfoo', 'bar', [Str, Float] => Double );
+    print $bar->( 'Baz', 3.14 );
+
+    # or
+
+    sub bar : Native('libfoo') : Signature([Str, Float] => Double);
+    print bar( 'Baz', 10.9 );
 
 =head1 DESCRIPTION
 
@@ -618,7 +528,7 @@ to print the home directory of the current user:
     sub getuid : Native : Signature([]=>Int);
     sub getpwuid : Native : Signature([Int]=>Pointer[PwStruct]);
     my $data = main::getpwuid( getuid() );
-    print Dumper( cast( $data, Pointer [ PwStruct() ] ) );
+    print Dumper( ptr2sv( $data, Pointer [ PwStruct() ] ) );
 
 =head1 Exported Variables
 
@@ -735,6 +645,14 @@ pointed to by C<$dest>.
     my $size1 = sizeof( Struct[ name => Str, age => Int ] );
 
 Returns the size, in bytes, of the L<type|/Types> passed to it.
+
+=head2 C<offsetof( ... )>
+
+    my $struct = Struct[ name => Str, age => Int ];
+    my $offset = offsetof( $struct, 'age' );
+
+Returns the offset, in bytes, from the beginning of a structure including
+padding, if any.
 
 =head1 Utility Functions
 
@@ -1064,16 +982,6 @@ C<Enum> but with unsigned integers.
 
 C<Enum> but with signed chars.
 
-=head1 See Also
-
-Check out L<FFI::Platypus> for a more robust and mature FFI.
-
-Examples found in C<eg/>.
-
-L<LibUI> for a larger demo project based on Affix
-
-L<Types::Standard> for the inspiration of the advisory types system.
-
 =head1 Calling Conventions
 
 Handle with care! Using these without understanding them can break your code!
@@ -1157,8 +1065,17 @@ that a C<char *> is best expressed with C<Str>. But C<addrinfo> is a structure,
 which means we will need to write our own type class. However, the function
 declaration is straightforward:
 
+    TODO
 
+=head1 See Also
 
+Check out L<FFI::Platypus> for a more robust and mature FFI.
+
+Examples found in C<eg/>.
+
+L<LibUI> for a larger demo project based on Affix
+
+L<Types::Standard> for the inspiration of the advisory types system.
 
 =head1 LICENSE
 

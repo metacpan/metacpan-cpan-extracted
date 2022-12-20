@@ -50,9 +50,6 @@ sub SVGNextObject {
 
 sub installPGFCommands {
   # Local definitions.
-  Let(T_CS('\lower'),  T_CS('\lxSVG@lower'));
-  Let(T_CS('\raise'),  T_CS('\lxSVG@raise'));
-  Let(T_CS('\hskip'),  T_CS('\lxSVG@hskip'));
   Let(T_CS('\halign'), T_CS('\lxSVG@halign'));
   Let('\ignorespaces', '\lx@inpgf@ignorespaces');    # Use local defn
   AssignValue(TEXT_MODE_BINDINGS => []);
@@ -74,16 +71,7 @@ DefMacro('\endlxSVG@picture', '\endgroup');
 
 # use overflow visible since we haven't got a good estimate of the TRUE size of the thing!
 # And, if we're already in a picture?
-DefConstructor('\lxSVG@insertpicture{}',
-  # '<ltx:picture>' .
-  #   '<svg:svg version="1.1" width="#pxwidth" height="#pxheight" '
-  #   . 'viewBox="#minx #miny #pxwidth #pxheight" overflow="visible">'
-  #   . '<svg:g transform="matrix(1 0 0 -1 0 #flipnmove)">'
-  #   . '#1'
-  #   . '</svg:g>'
-  #   . '</svg:svg>'
-  #   . '</ltx:picture>',
-  sub {
+DefConstructor('\lxSVG@insertpicture{}', sub {
     my ($document, $content, %props) = @_;
     my $current = $document->getNode();
     if ($document->getNodeQName($current) =~ /^svg:/) {    # Already in svg:svg ?
@@ -102,9 +90,9 @@ DefConstructor('\lxSVG@insertpicture{}',
 ####        viewBox  => "$props{minx} $props{miny} $props{pxwidth} $props{pxheight}",
         overflow => "visible");
       my $x0 = -(0 + $props{minx});
-      my $y0 = -(0 + $props{miny});
+      my $y0 = $props{pxheight} + $props{miny};
       $document->openElement('svg:g',
-        transform   => "translate($x0,$y0) matrix(1 0 0 -1 0 $props{flipnmove})",
+        transform   => "translate($x0,$y0) matrix(1 0 0 -1 0 0)",
         _scopebegin => 1);
       $document->insertElement('svg:rect', undef,
         x     => $props{minx} - 6,            y      => $props{miny} - 6,
@@ -130,18 +118,21 @@ DefConstructor('\lxSVG@insertpicture{}',
     my $h       = max($height->pxValue, 1);
     my $content = $whatsit->getArg(1);
     my ($cwidth, $cheight, $cdepth) = $content->getSize;
-    Debug("TIKZ size: " . ToString($width) . " x " . ToString($height))   if $LaTeXML::DEBUG{pgf};
-    Debug("TIKZ BODY: " . ToString($cwidth) . " x " . ToString($cheight)) if $LaTeXML::DEBUG{pgf};
-    Debug("BODY is " . ToString($content))                                if $LaTeXML::DEBUG{pgf};
+    Debug("TIKZ size: " . ToString($width) . " x " . ToString($height)) if $LaTeXML::DEBUG{pgf};
+    Debug("TIKZ pos: " . ToString($minx) . " x " . ToString($miny))     if $LaTeXML::DEBUG{pgf};
+    Debug("TIKZ BODY: " . ToString($cwidth) . " x " . ToString($cheight)
+        . " + " . ToString($cdepth)) if $LaTeXML::DEBUG{pgf};
+    Debug("BODY is " . ToString($content)) if $LaTeXML::DEBUG{pgf};
     # Note viewbox is minx, miny, width, height (NOT maxx,maxy!)
-    $whatsit->setProperty(minx      => $minx->pxValue);
-    $whatsit->setProperty(miny      => $miny->pxValue);
-    $whatsit->setProperty(width     => $width);
-    $whatsit->setProperty(height    => $height);
-    $whatsit->setProperty(depth     => Dimension(0));
-    $whatsit->setProperty(pxwidth   => $w);
-    $whatsit->setProperty(pxheight  => $h);
-    $whatsit->setProperty(flipnmove => floatformat($h + 2 * $miny->pxValue));
+##    $whatsit->setProperty(minx     => $minx->pxValue);
+##    $whatsit->setProperty(miny     => $miny->pxValue);
+    $whatsit->setProperty(minx     => 0);
+    $whatsit->setProperty(miny     => 0);
+    $whatsit->setProperty(width    => $width);
+    $whatsit->setProperty(height   => $height);
+    $whatsit->setProperty(depth    => Dimension(0));
+    $whatsit->setProperty(pxwidth  => $w);
+    $whatsit->setProperty(pxheight => $h);
     # or tikz macro (see corescopes)
     return; },
   # \pgfpicture seems to make a 0 sized box, which throws off our postprocessor
@@ -164,63 +155,6 @@ DefParameterType('SVGMoveableBox', sub {
       && ($box->getDefinition->getCSName =~ /^(\\hbox||)$/);
     $box; });
 
-# Try to avoid errors inserting random boxes (esp. ltx:text)(Is this safe?)
-Tag('svg:switch', autoOpen => 1, autoClose => 1,
-  afterClose => \&collapseSVGSwitch);    # ?
-
-# Remove empty <svg:switch><svg:foreignObject> or those that contain only <p/>
-# Possibly could incorporate the collapse when it contains only svg elements?
-sub collapseSVGSwitch {
-  my ($doc, $node) = @_;
-  my ($fo,  @rest) = element_nodes($node);
-  return if !$fo || ($doc->getNodeQName($fo) ne 'svg:foreignObject')
-    ;    ####    || scalar(@rest);    # Expect single svg:foreignObject
-  my @fo_c = element_nodes($fo);
-  if (scalar(@fo_c) == 0) {    # Empty?
-    if (scalar(@rest)) {       # Extra stuff after empty foreignObject?
-      $doc->replaceNode($node, @rest); }
-    else {
-      $doc->removeNode($node); } }    # Else just remove whole thing
-                                      # Else, single <p> element ?
-  elsif ((scalar(@fo_c) == 1) && ($doc->getNodeQName($fo_c[0]) eq 'ltx:p')) {
-    my @p_c = element_nodes($fo_c[0]);
-    if (scalar(@p_c) == 0) {          # or Empty <p/>?
-      $doc->removeNode($node); }
-    # Else, single ltx:picture or ltx:text ?
-    elsif (scalar(@p_c) == 1) {
-      my $tag = $doc->getNodeQName($p_c[0]);
-      if (($tag eq 'ltx:picture') || ($tag eq 'ltx:text')) {
-        my @pic_c = element_nodes($p_c[0]);
-        # With single svg:svg ?
-        if ((scalar(@pic_c) == 1) && ($doc->getNodeQName($pic_c[0]) eq 'svg:svg')) {
-          $doc->replaceNode($node, element_nodes($pic_c[0])); } }
-  } }
-  return; }
-
-Tag('svg:foreignObject', autoOpen => 1, autoClose => 1,
-  afterClose => sub {
-    my ($document, $node, $whatsit) = @_;
-    # Make sure we get a size, in case autoOpen'd
-    if ($whatsit) {
-      my ($w, $h, $d) = $whatsit->getSize;
-
-      my $font = $whatsit->getFont;
-      my ($fw, $fh, $fd) = $font && $font->getNominalSize;
-      # Fishing for the correct y position (maybe w/o the depth?)
-      my $y = $h->add(($font ? $fd : $d))->pxValue;    # Seemingly should NOT have ->add($d)
-          # But if the box's height has been set to 0, still need adjustment; Use font?
-      $y = $fh->add($fd)->pxValue if !$y && $font;    # Seemingly SHOULD have ->add($fd)
-
-      my $ht = $h->add($d);
-      # For some reason, these want to be in pts, not px ???
-      $node->setAttribute(width  => $w->toAttribute)  unless $node->hasAttribute('width');
-      $node->setAttribute(height => $ht->toAttribute) unless $node->hasAttribute('height');
-      # Odd, sometimes needed, sometimes too much (vtop type situations?)
-      if ($d->ptValue < 10) {                         # Random heuristic
-        $node->setAttribute(y => $d->negate->pxValue) unless $node->hasAttribute('y'); }
-      $node->setAttribute(transform => "matrix(1 0 0 -1 0 $y)");
-      $node->setAttribute(overflow  => 'visible'); } });
-
 # Check whether a svg:foreignObject is open,
 # but don't check beyond an svg:svg node, in case we're nested.
 sub foreignObjectCheck {
@@ -232,34 +166,6 @@ sub foreignObjectCheck {
     return $node if $n eq 'svg:foreignObject';
     $node = $node->parentNode; }
   return; }
-
-DefConstructor('\lxSVG@raise Dimension SVGMoveableBox', sub {
-    my ($doc, $dim, $box) = @_;
-    if (foreignObjectCheck($doc)) {
-      $doc->openElement('ltx:text', yoffset => $dim->negate->pxValue . 'px');
-      $doc->absorb($box);
-      $doc->closeElement('ltx:text'); }
-    else { $doc->absorb($box); } },
-  alias => '\raise',
-  sizer => sub { raisedSizer($_[0]->getArg(2), $_[0]->getArg(1)); });
-
-DefConstructor('\lxSVG@lower Dimension SVGMoveableBox', sub {
-    my ($doc, $dim, $box) = @_;
-    if (foreignObjectCheck($doc)) {
-      $doc->openElement('ltx:text', yoffset => $dim->pxValue . 'px');
-      $doc->absorb($box);
-      $doc->closeElement('ltx:text'); }
-    else { $doc->absorb($box); } },
-  alias => '\lower',
-  sizer => sub { raisedSizer($_[0]->getArg(2), $_[0]->getArg(1)->negate); });
-
-DefConstructor('\lxSVG@hskip Glue', sub {
-    my ($doc, $skip) = @_;
-    # but ignored outside of foreighObject doesn't seem right
-    if (foreignObjectCheck($doc)) {
-      $doc->openElement('ltx:text', 'xoffset' => $skip->pxValue . 'px'); } },
-  alias      => '\hskip', sizer => '#1',
-  properties => sub { (width => $_[1], isSpace => 1); });
 
 DefMacroI('\pgf@shift@baseline',         undef, '0pt');
 DefMacroI('\pgf@shift@baseline@smuggle', undef, '0pt');
@@ -483,84 +389,6 @@ DefConstructor('\lxSVG@begingroup@ RequiredKeyVals', sub {
       $doc->openElement('svg:svg', _autoopened => 1); }
     $doc->openElement('svg:g', $kv->getHash); },
   reversion => '', sizer => 0);
-
-# Collapse redundant svg:g nodes that have only certain
-# non-cummulative attributes
-Tag('svg:g', afterClose => \&collapseSVGGroup);
-my %collapsible_group_attributes = map { ($_ => 1); }
-  qw(fill fill-rule fill-opacity
-  stroke stroke-width stroke-linecap stroke-linejoin stroke-miterlimit
-  stroke-dasharray stroke-dashoffset stroke-opacity
-  color);
-
-# Collapse/remove/unwrap unneeded svg:g's to reduce depth of tree
-sub collapseSVGGroup {
-  my ($document, $node) = @_;
-  my ($nempty, $nredundant, $nmerged, $npopped, $npushed) = (0, 0, 0, 0, 0);
-  # Record the attributes on $node, for later use.
-  my %nodeattr = ();
-  foreach my $attr ($node->attributes) {
-    my $key = $attr->getName;
-    $nodeattr{$key} = $attr->getValue if ($key !~ /^_/); }
-  my @children = element_nodes($node);
-  # Remove empty svg:g children
-  foreach my $c (@children) {
-    if (($document->getNodeQName($c) eq 'svg:g') && !scalar(element_nodes($c))) {
-      $nempty++;
-      $document->removeNode($c); } }
-  @children = element_nodes($node) if $nempty;
-  # Move ahead, all leading children whose svg:g attributes completely mask $node's attributes.
-  # Could do same moving trailing children to back
-  my $c;
-  while (scalar(@children) && ($document->getNodeQName($c = $children[0]) eq 'svg:g')) {
-    my $nmasked = 0;
-    foreach my $attr ($c->attributes) {
-      my $key = $attr->getName;
-      if (($key !~ /^_/) && $collapsible_group_attributes{$key} && defined $nodeattr{$key}) {
-        $nmasked++; } }
-    last unless $nmasked == scalar(keys %nodeattr);              # child completely masks attr of node
-    $node->parentNode->insertBefore(shift(@children), $node);    # move it outside!
-    $npopped++; }
-  # Same story for trailing children, but move behind
-  while (scalar(@children) && ($document->getNodeQName($c = $children[-1]) eq 'svg:g')) {
-    my $nmasked = 0;
-    foreach my $attr ($c->attributes) {
-      my $key = $attr->getName;
-      if (($key !~ /^_/) && $collapsible_group_attributes{$key} && defined $nodeattr{$key}) {
-        $nmasked++; } }
-    last unless $nmasked == scalar(keys %nodeattr);              # child completely masks attr of node
-    $node->parentNode->insertAfter(pop(@children), $node);
-    $npushed++; }
-  # Now remove any redundant svg:g's (same attributes & values) [some left after above]
-  foreach my $c (@children) {
-    if ($c && ($document->getNodeQName($c) eq 'svg:g')) {        # for every nested svg:g
-      my $issame = 1;
-      foreach my $attr ($c->attributes) {
-        my $key = $attr->getName;
-        if (($key !~ /^_/) && ($attr->getValue ne ($nodeattr{$key} || ''))) {
-          $issame = 0; } }
-      if ($issame) {                                             # child is completely redundant.
-        $document->unwrapNodes($c);
-        $nredundant++; } } }
-  @children = element_nodes($node) if $nredundant;
-  # Could check if $node is empty now?
-  # Then if only one left, and it's attributes can be migrated to $node, unwrap it
-  if ((scalar(@children) == 1) && ($document->getNodeQName($c = $children[0]) eq 'svg:g')) {
-    my %av        = ();
-    my $mergeable = 1;
-    foreach my $attr ($c->attributes) {
-      my $key = $attr->getName;
-      if (($key =~ /^_/) || $collapsible_group_attributes{$key}) {
-        $av{$key} = $attr->getValue; }
-      else {
-        $mergeable = 0; } }
-    if ($mergeable) {
-      foreach my $key (sort keys %av) {
-        $nodeattr{$key} = $av{$key};
-        $node->setAttribute($key => $av{$key}); }
-      $nmerged++;
-      $document->unwrapNodes($c); } }
-  return; }
 
 #=====================================================================
 # Implementation
@@ -1095,10 +923,9 @@ sub tikzAlignmentBindings {
     openColumn     => sub { openTikzAlignmentCol($coltype, @_); },
     closeColumn    => sub { closeTikzAlignmentElement($container, @_); },
     isMath         => $ismath,
-    properties     => {%properties});
+    properties     => { preserve_structure => 1, %properties });
   AssignValue(Alignment => $alignment);
-  Let('\hline', '\@alignment@hline');
-  Let(T_MATH,   ($ismath ? '\@dollar@in@mathmode' : '\@dollar@in@textmode'));
+  Let(T_MATH, ($ismath ? '\@dollar@in@mathmode' : '\@dollar@in@textmode'));
   return; }
 
 # Note that pgf *seems* to have set the coordinate system to the center(?) (w/ \pgfsys@transformcm)
@@ -1114,8 +941,9 @@ sub openTikzAlignment {
   my $d          = ($props{cdepth}  && $props{cdepth}->pxValue)  || 0;
   my @rowheights = ($props{rowheights}   ? @{ $props{rowheights} }   : (Dimension(0)));
   my @colwidths  = ($props{columnwidths} ? @{ $props{columnwidths} } : (Dimension(0)));
-  my $x          = $colwidths[0]->pxValue / 2;
-##  my $y          = ($h + $d) - $rowheights[0]->pxValue;
+  my $x          = 0;
+  # This SHOULD be just $h+$d, but the shift is necessary to align
+  # w/additional material outside the \halign ( arrows & such)
   my $y = ($h + $d) - $rowheights[-1]->pxValue / 2;    # HEURISTIC adjustment! half of LAST row!?
   Debug("TIKZ Alignment size $w x $h + $d"
       . "  rows: " . join(',', map { $_->pxValue; } @rowheights)
@@ -1160,30 +988,22 @@ sub openTikzAlignmentRow {
 sub openTikzAlignmentCol {
   my ($tag, $doc, %props) = @_;
   my $class = 'ltx_tikzmatrix_col' . ($props{class} ? ' ' . $props{class} : '');
-  # MYSTERIOUSLY, $w seems to be HALF the "proper" width...
-  # AND assumes an equivalent \hspace in front !?!?!
-  # HOWEVER, this isn't getting accounted in Alignment.pm, for size/position/whatever
-  # so that anchors (for arrows) still aren't properly positioned!!!
-  # Moreover, the cell's horizontal position should be set according to alignment
-  # which also isn't yet done in Alignment.pm,
-  # and also it is not clear how that gets recognized by TikZ's anchors!
-  my $hw = ($props{cwidth} && $props{cwidth}->pxValue) || 0;
-  my $w  = 2 * $hw;
-  my $h  = ($props{cheight} && $props{cheight}->pxValue) || 0;
-  my $d  = ($props{cdepth}  && $props{cdepth}->pxValue)  || 0;
-  my $x  = ($props{x}       && $props{x}->pxValue)       || 0;
-
-  my $xpos = $x + $hw;
-##  my $xpos  = $x;
-  my $ypos = 0;    #-$h;
-  Debug("TIKZ alignment Cell ($w x $h + $d); x=$x"
+  # BEWARE: pgf places each column at 0 width, preceded by an \hskip width/2
+  # and followed by an extra column of width/2.
+  # Be careful accounting for rowwidths, etc while pruning & positioning in Alignment.pm
+  my $w = ($props{cwidth}  && $props{cwidth}->pxValue)  || 0;
+  my $h = ($props{cheight} && $props{cheight}->pxValue) || 0;
+  my $d = ($props{cdepth}  && $props{cdepth}->pxValue)  || 0;
+  my $x = ($props{x}       && $props{x}->pxValue)       || 0;
+  my $y = 0;
+  Debug("TIKZ alignment Cell ($w x $h + $d); x=$x; "
       . join(',', map { $_ . "=" . ToString($props{$_}); } sort keys %props)) if $LaTeXML::DEBUG{pgf};
   my $col = $doc->openElement($tag, class => $class,
     _scopebegin => 1,
-    transform   => "matrix(1 0 0 -1 $xpos $ypos)",    # NOTE: Flip!!!
+    transform   => "matrix(1 0 0 -1 $x $y)",    # NOTE: Flip!!!
   );
   $doc->insertElement('svg:rect', undef,
-    x => -$hw - 1, y => -$h - 1, width => $w + 2, height => $h + $d + 2, stroke => '#0000FF', fill => 'none')
+    x => -1, y => -$h - 1, width => $w + 2, height => $h + $d + 2, stroke => '#0000FF', fill => 'none')
     if $LaTeXML::DEBUG{pgf};
   return $col; }
 

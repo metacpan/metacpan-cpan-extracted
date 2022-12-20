@@ -12,28 +12,13 @@ use vars qw(%patterns %anti_patterns);
 
 use constant HAS_DKIM_VERIFIER => eval {
   require Mail::DKIM::Verifier;
-  version->parse(Mail::DKIM::Verifier->VERSION) >= version->parse->(0.31);
+  version->parse(Mail::DKIM::Verifier->VERSION) >= version->parse(0.31);
 };
 
 use Test::More;
 plan skip_all => "Net tests disabled" unless conf_bool('run_net_tests');
 plan skip_all => "Needs Mail::DKIM::Verifier >= 0.31" unless HAS_DKIM_VERIFIER ;
 plan tests => 258;
-
-BEGIN {
-  if (-e 't/test_dir') {
-    chdir 't';
-  }
-
-  if (-e 'test_dir') {
-    unshift(@INC, '../blib/lib');
-  }
-}
-
-my $prefix = '.';
-if (-e 'test_dir') {            # running from test directory, not ..
-  $prefix = '..';
-}
 
 use IO::File;
 use Mail::SpamAssassin;
@@ -85,6 +70,22 @@ sub test_samples($$) {
 
 # ensure rules will fire, and disable some expensive ones
 tstlocalrules("
+  full   DKIM_SIGNED           eval:check_dkim_signed()
+  full   DKIM_VALID            eval:check_dkim_valid()
+  full   DKIM_VALID_AU         eval:check_dkim_valid_author_sig()
+  meta   DKIM_INVALID          DKIM_SIGNED && !DKIM_VALID
+  header DKIM_ADSP_NXDOMAIN    eval:check_dkim_adsp('N')
+  header DKIM_ADSP_DISCARD     eval:check_dkim_adsp('D')
+  header DKIM_ADSP_ALL         eval:check_dkim_adsp('A')
+  header DKIM_ADSP_CUSTOM_LOW  eval:check_dkim_adsp('1')
+  header DKIM_ADSP_CUSTOM_MED  eval:check_dkim_adsp('2')
+  header DKIM_ADSP_CUSTOM_HIGH eval:check_dkim_adsp('3')
+  adsp_override sa-test-nxd.spamassassin.org  nxdomain
+  adsp_override sa-test-unk.spamassassin.org  unknown
+  adsp_override sa-test-all.spamassassin.org  all
+  adsp_override sa-test-dis.spamassassin.org  discardable
+  adsp_override sa-test-di2.spamassassin.org
+
   dkim_minimum_key_bits 512
   score DKIM_SIGNED          -0.1
   score DKIM_VALID           -0.1
@@ -99,18 +100,14 @@ tstlocalrules("
   header DKIM_ADSP_SEL_TEST   eval:check_dkim_adsp('*', .spamassassin.org)
   priority DKIM_ADSP_SEL_TEST -100
   score  DKIM_ADSP_SEL_TEST   0.1
-  score RAZOR2_CHECK 0
-  score RAZOR2_CF_RANGE_51_100 0
-  score RAZOR2_CF_RANGE_E4_51_100 0
-  score RAZOR2_CF_RANGE_E8_51_100 0
 ");
 
 my $dirname = "data/dkim";
 
 $spamassassin_obj = Mail::SpamAssassin->new({
-  rules_filename      => "$prefix/t/log/test_rules_copy",
-  site_rules_filename => "$prefix/t/log/localrules.tmp",
-  userprefs_filename  => "$prefix/masses/spamassassin/user_prefs",
+  rules_filename      => $localrules,
+  site_rules_filename => $siterules,
+  userprefs_filename  => $userrules,
   dont_copy_prefs     => 1,
   require_rules       => 1,
 # debug               => 'dkim',

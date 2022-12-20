@@ -5,8 +5,9 @@
 
 use Object::Pad 0.57;
 
-package Tickit::Widget::HBox 0.50;
+package Tickit::Widget::HBox 0.51;
 class Tickit::Widget::HBox
+   :strict(params)
    :isa(Tickit::Widget::LinearBox);
 
 use Tickit::Style;

@@ -1,12 +1,11 @@
 #!/usr/bin/perl -T
 #
 # test for http://issues.apache.org/SpamAssassin/show_bug.cgi?id=5574#c12 .
-# run with:   sudo prove -v t/root_spamd*
 
 use lib '.'; use lib 't';
 use SATest; sa_t_init("root_spamd_u_dcc");
 
-use constant HAS_SUDO => eval { $_ = untaint_cmd("which sudo 2>/dev/null"); chomp; -x };
+use constant HAS_SUDO => $RUNNING_ON_WINDOWS || eval { $_ = untaint_cmd("which sudo 2>/dev/null"); chomp; -x };
 
 use Test::More;
 plan skip_all => "root tests disabled" unless conf_bool('run_root_tests');
@@ -18,14 +17,12 @@ plan tests => 23;
 # ---------------------------------------------------------------------------
 
 %patterns = (
-        q{ spam reported to DCC }, 'dcc report',
-            );
+  q{ spam reported to DCC }, 'dcc report',
+);
 
-tstpre ("
-
+tstprefs ("
   loadplugin Mail::SpamAssassin::Plugin::DCC
   dcc_timeout 30
-
 ");
 
 ok sarun ("-t -D info -r < data/spam/gtubedcc.eml 2>&1", \&patterns_run_cb);
@@ -43,6 +40,9 @@ q{ X-Spam-Level: **********}, 'stars',
 
 # run spamc as unpriv uid
 $spamc = "sudo -u nobody $spamc";
+# ensure it is readable by all
+diag "Test will fail if run in directory not accessible by 'nobody' as is typical for a home directory";
+chmod 01755, $workdir;
 
 $SIG{ALRM} = sub { stop_spamd(); die "timed out"; };
 alarm 60;

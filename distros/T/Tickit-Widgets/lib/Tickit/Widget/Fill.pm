@@ -5,8 +5,9 @@
 
 use Object::Pad 0.57;
 
-package Tickit::Widget::Fill 0.35;
+package Tickit::Widget::Fill 0.36;
 class Tickit::Widget::Fill
+   :strict(params)
    :isa(Tickit::Widget);
 
 use Tickit::Style;

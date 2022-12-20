@@ -9,6 +9,10 @@ use Venus::Class 'base';
 
 base 'Faker::Plugin';
 
+# VERSION
+
+our $VERSION = '1.17';
+
 # METHODS
 
 sub execute {
@@ -56,6 +60,12 @@ Faker::Plugin::PaymentCardVisa - Payment Card Visa
 =head1 ABSTRACT
 
 Payment Card Visa for Faker
+
+=cut
+
+=head1 VERSION
+
+1.17
 
 =cut
 

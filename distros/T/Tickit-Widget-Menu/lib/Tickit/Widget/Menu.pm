@@ -1,13 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2012-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.57;
+use Object::Pad 0.66;
 
-package Tickit::Widget::Menu 0.15;
+package Tickit::Widget::Menu 0.16;
 class Tickit::Widget::Menu
+   :strict(params)
 # Much of this code actually lives in a class called T:W:Menu::base, which is
 # the base class used by T:W:Menu and T:W:MenuBar
    :isa(Tickit::Widget::Menu::base);
@@ -217,7 +218,7 @@ Hides a menu previously displayed using C<popup>.
 
 =cut
 
-has $_supermenu;
+field $_supermenu;
 
 method set_supermenu ( $supermenu )
 {
@@ -295,7 +296,7 @@ method popup_item ( $idx )
    $item->popup( $self->window, $idx + 1, $self->window->cols );
 }
 
-has $_on_activated;
+field $_on_activated;
 
 method set_on_activated ( $on_activated )
 {

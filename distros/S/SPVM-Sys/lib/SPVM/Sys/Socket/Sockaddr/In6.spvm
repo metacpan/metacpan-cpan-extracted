@@ -7,14 +7,14 @@ class Sys::Socket::Sockaddr::In6 extends Sys::Socket::Sockaddr : pointer_t {
   # Instance methods
   native method DESTROY : void ();
   
-  method sa_family : byte () {
+  method sa_family : int () {
     my $sin6_family = $self->sin6_family;
     return $sin6_family;
   }
   
-  native method sin6_family : byte ();
+  native method sin6_family : int ();
   
-  native method set_sin6_family : void ($family : byte);
+  native method set_sin6_family : void ($family : int);
 
   native method sin6_flowinfo : int ();
   
@@ -28,9 +28,9 @@ class Sys::Socket::Sockaddr::In6 extends Sys::Socket::Sockaddr : pointer_t {
   
   native method set_sin6_addr : void ($address : Sys::Socket::In6_addr);
   
-  native method sin6_port : short ();
+  native method sin6_port : int ();
   
-  native method set_sin6_port : void ($port : short);
+  native method set_sin6_port : void ($port : int);
 
   native method sizeof : int ();
 

@@ -4,13 +4,14 @@
       "The Apache SpamAssassin Project <dev@spamassassin.apache.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "ExtUtils::MakeMaker version 7.62, CPAN::Meta::Converter version 2.150010",
    "license" : [
+      "unknown",
       "apache_2_0"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Mail-SpamAssassin",
    "no_index" : {
@@ -22,26 +23,72 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "ExtUtils::MakeMaker" : "0"
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Archive::Zip" : "0",
+            "BSD::Resource" : "0",
+            "Compress::Zlib" : "0",
+            "DBD::SQLite" : "1.5901",
+            "DBI" : "0",
+            "DB_File" : "0",
+            "Email::Address::XS" : "0",
+            "Encode::Detect::Detector" : "0",
+            "Geo::IP" : "0",
+            "IO::Socket::INET6" : "0",
+            "IO::Socket::IP" : "0.09",
+            "IO::Socket::SSL" : "1.76",
+            "IO::String" : "0",
+            "IP::Country::DB_File" : "0",
+            "IP::Country::Fast" : "0",
+            "LWP::UserAgent" : "0",
+            "MIME::Base64" : "0",
+            "Mail::DKIM" : "0.37",
+            "Mail::DMARC" : "0",
+            "Mail::SPF" : "0",
+            "MaxMind::DB::Reader" : "0",
+            "MaxMind::DB::Reader::XS" : "0",
+            "Net::CIDR::Lite" : "0",
+            "Net::LibIDN" : "0",
+            "Net::LibIDN2" : "0",
+            "Net::Patricia" : "1.16",
+            "Net::SMTP" : "0",
+            "Razor2::Client::Agent" : "2.61"
+         },
          "requires" : {
             "Archive::Tar" : "1.23",
-            "Digest::SHA1" : "0",
             "Errno" : "0",
             "File::Copy" : "2.02",
             "File::Spec" : "0.8",
             "HTML::Parser" : "3.43",
             "IO::Zlib" : "1.04",
             "Mail::DKIM" : "0.31",
-            "Net::DNS" : "0.34",
+            "Net::DNS" : "0.69",
             "NetAddr::IP" : "4.01",
             "Pod::Usage" : "1.1",
             "Sys::Hostname" : "0",
-            "Test::More" : "0",
             "Time::HiRes" : "0",
-            "Time::Local" : "0"
+            "Time::Local" : "0",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "Net::DNS::Nameserver" : "0"
+         },
+         "requires" : {
+            "Devel::Cycle" : "0",
+            "Perl::Critic::Policy::Perlsecret" : "0",
+            "Perl::Critic::Policy::TestingAndDebugging::ProhibitNoStrict" : "0",
+            "Test::More" : "0",
+            "Text::Diff" : "0"
          }
       }
    },
@@ -57,5 +104,6 @@
       },
       "x_MailingList" : "http://wiki.apache.org/spamassassin/MailingLists"
    },
-   "version" : "3.004006"
+   "version" : "4.000000",
+   "x_serialization_backend" : "JSON::PP version 4.06"
 }

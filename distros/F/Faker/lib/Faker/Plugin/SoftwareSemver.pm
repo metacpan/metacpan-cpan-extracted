@@ -9,6 +9,10 @@ use Venus::Class 'base';
 
 base 'Faker::Plugin';
 
+# VERSION
+
+our $VERSION = '1.17';
+
 # METHODS
 
 sub execute {
@@ -41,6 +45,12 @@ Faker::Plugin::SoftwareSemver - Software Semver
 =head1 ABSTRACT
 
 Software Semver for Faker
+
+=cut
+
+=head1 VERSION
+
+1.17
 
 =cut
 

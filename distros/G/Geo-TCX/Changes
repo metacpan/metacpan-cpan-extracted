@@ -1,5 +1,12 @@
 Revision history for Geo-TCX
 
+1.06 [2022-12-14]
+    Use UTC as the default time zone if the local time zone cannot be determined
+        - the local time zone is determined by DateTime::TimeZone->new()
+        - on some systems/platforms (e.g. FreeBSD), this method is unable to determine the local time zone
+        - the default time zone only affects user's direct calls to Geo::TCX::Trackpoint's time_local() method
+        - all date and time calculations are already made in UTC time, so module behaviour remains the same
+
 1.05 [2022-12-07]
     Fixed bugs in the parsing of paths on MSWin32
 

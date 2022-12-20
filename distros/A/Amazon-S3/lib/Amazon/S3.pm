@@ -51,7 +51,7 @@ __PACKAGE__->mk_accessors(
   }
 );
 
-our $VERSION = '0.57'; ## no critic (ValuesAndExpressions::RequireInterpolationOfMetachars)
+our $VERSION = '0.58'; ## no critic (ValuesAndExpressions::RequireInterpolationOfMetachars)
 
 ########################################################################
 sub new {

@@ -29,13 +29,13 @@ SpamCop is a service for reporting spam.  SpamCop determines the origin
 of unwanted email and reports it to the relevant Internet service
 providers.  By reporting spam, you have a positive impact on the
 problem.  Reporting unsolicited email also helps feed spam filtering
-systems, including, but not limited to, the SpamCop blacklist used in
+systems, including, but not limited to, the SpamCop blocklist used in
 SpamAssassin as a DNSBL.
 
 Note that spam reports sent by this plugin to SpamCop each include the
 entire spam message.
 
-See http://www.spamcop.net/ for more information about SpamCop.
+See https://www.spamcop.net/ for more information about SpamCop.
 
 =cut
 
@@ -43,13 +43,13 @@ package Mail::SpamAssassin::Plugin::SpamCop;
 
 use Mail::SpamAssassin::Plugin;
 use Mail::SpamAssassin::Logger;
+use Mail::SpamAssassin::Util qw(untaint_var);
 use IO::Socket;
 use strict;
 use warnings;
 # use bytes;
 use re 'taint';
 
-use constant HAS_NET_DNS => eval { require Net::DNS; };
 use constant HAS_NET_SMTP => eval { require Net::SMTP; };
 
 our @ISA = qw(Mail::SpamAssassin::Plugin);
@@ -63,7 +63,7 @@ sub new {
   bless ($self, $class);
 
   # are network tests enabled?
-  if (!$mailsaobject->{local_tests_only} && HAS_NET_DNS && HAS_NET_SMTP) {
+  if (!$mailsaobject->{local_tests_only} && HAS_NET_SMTP) {
     $self->{spamcop_available} = 1;
     dbg("reporter: network tests on, attempting SpamCop");
   }
@@ -114,7 +114,7 @@ guess will be used as the From: address in SpamCop reports.
 =item spamcop_to_address user@example.com   (default: generic reporting address)
 
 Your customized SpamCop report submission address.  You need to obtain
-this address by registering at C<http://www.spamcop.net/>.  If this is
+this address by registering at C<https://www.spamcop.net/>.  If this is
 not set, SpamCop reports will go to a generic reporting address for
 SpamAssassin users and your reports will probably have less weight in
 the SpamCop system.
@@ -151,6 +151,35 @@ size that SpamCop will accept at the time of release.
     setting => 'spamcop_max_report_size',
     default => 50,
     type => $Mail::SpamAssassin::Conf::CONF_TYPE_NUMERIC
+  });
+
+=item spamcop_relayhost server:port  (default: direct connection to SpamCop)
+
+Direct connection to SpamCop servers (port 587) is used for report
+submission by default.  If this is undesirable or blocked by local firewall
+policies, you can specify a local SMTP relayhost to forward reports. 
+Relayhost should be configured to not scan the report, for example by using
+a separate submission port.  SSL or authentication is not supported.
+
+=cut
+
+  push (@cmds, {
+    setting => 'spamcop_relayhost',
+    default => undef,
+    type => $Mail::SpamAssassin::Conf::CONF_TYPE_STRING,
+    code => sub {
+      my ($self, $key, $value, $line) = @_;
+      if ($value =~ /^(\S+):(\d{2,5})$/) {
+	$self->{spamcop_relayhost} = untaint_var($1);
+	$self->{spamcop_relayport} = untaint_var($2);
+      }
+      elsif ($value =~ /^$/) {
+	return $Mail::SpamAssassin::Conf::MISSING_REQUIRED_VALUE;
+      }
+      else {
+	return $Mail::SpamAssassin::Conf::INVALID_VALUE;
+      }
+    }
   });
 
   $conf->{parser}->register_commands(\@cmds);
@@ -257,17 +286,31 @@ EOM
 
   # send message
   my $failure;
-  my $mx = $head{To};
   my $hello = Mail::SpamAssassin::Util::fq_hostname() || $from;
-  $mx =~ s/.*\@//;
   $hello =~ s/.*\@//;
-  for my $rr (Net::DNS::mx($mx)) {
-    my $exchange = Mail::SpamAssassin::Util::untaint_hostname($rr->exchange);
-    next unless $exchange;
-    my $smtp;
-    if ($smtp = Net::SMTP->new($exchange,
+
+  my @mxs;
+  if ($options->{report}->{conf}->{spamcop_relayhost}) {
+    push @mxs, $options->{report}->{conf}->{spamcop_relayhost};
+  } else {
+    my $mx = $head{To};
+    $mx =~ s/.*\@//;
+    foreach my $rr (Net::DNS::mx($mx)) {
+      if (defined $rr->exchange) {
+        push @mxs, Mail::SpamAssassin::Util::untaint_hostname($rr->exchange);
+      }
+    }
+    if (!@mxs) {
+      warn("reporter: failed to resolve SpamCop MX servers\n");
+      return 0;
+    }
+  }
+  my $port = $options->{report}->{conf}->{spamcop_relayport} || 587;
+
+  for my $exchange (@mxs) {
+    if (my $smtp = Net::SMTP->new($exchange,
 			       Hello => $hello,
-			       Port => 587,
+			       Port => $port,
 			       Timeout => 10))
     {
       if ($smtp->mail($from) && smtp_dbg("FROM $from", $smtp) &&

@@ -100,7 +100,7 @@ RawTeX(<<'EoTeX');
 
 \DeclareOption{nofonttune}{\CLASSOPTIONnofonttunetrue}
 \DeclareOption{captionsoff}{\CLASSOPTIONcaptionsofftrue}
-\DeclareOption{comsoc}{\CLASSOPTIONcomsoctrue\CLASSOPTIONcompsocfalse\CLASSOPTIONtransmagfalse}
+\DeclareOption{comsoc}{\CLASSOPTIONcomsoctrue\CLASSOPTIONcompsocfalse\CLASSOPTIONtransmagfalse\RequirePackage{newtxmath}}
 \DeclareOption{compsoc}{\CLASSOPTIONcomsocfalse\CLASSOPTIONcompsoctrue\CLASSOPTIONtransmagfalse}
 \DeclareOption{transmag}{\CLASSOPTIONtransmagtrue\CLASSOPTIONcomsocfalse\CLASSOPTIONcompsocfalse}
 \DeclareOption{romanappendices}{\CLASSOPTIONromanappendicestrue}
@@ -151,10 +151,10 @@ DefMacro('\IEEEauthorblockA{}', '\@add@to@frontmatter{ltx:creator}{\@@@affiliati
 
 DefMacro(T_CS('\begin{IEEEkeywords}'), '\@IEEEkeywords');
 DefMacro(T_CS('\end{IEEEkeywords}'),   '\@endIEEEkeywords');
-Let('\@endIEEEkeywords', '\relax');                             # stub
-DefMacro('\@IEEEkeywords XUntil:\@endIEEEkeywords', '\@add@frontmatter{ltx:keywords}{#1}');
-DefMacro('\IEEEraisesectionheading{}',              '#1');
-DefMacro('\IEEEPARstart{}{}',                       '#1#2');    # Eventually, dropcap?
+Let('\@endIEEEkeywords', '\relax');                # stub
+DefMacro('\@IEEEkeywords XUntil:\@endIEEEkeywords', '\@add@frontmatter{ltx:keywords}[name={\IEEEkeywordsname}]{#1}');
+DefMacro('\IEEEraisesectionheading{}', '#1');
+DefMacro('\IEEEPARstart{}{}',          '#1#2');    # Eventually, dropcap?
 
 DefMacro('\IEEEcompsocitemizethanks{}', '\thanks{#1}');
 DefMacro('\IEEEcompsocthanksitem[]',    '');
@@ -229,13 +229,15 @@ RawTeX(<<'EoTeX');
 \setlength\belowcaptionskip{0pt}
 EoTeX
 
-DefEnvironment('{IEEEbiography}[]',
+DefEnvironment('{IEEEbiography}[]{}',
   "<ltx:float class='biography'><ltx:tabular>"
-    . "<ltx:tr><ltx:td>#1</ltx:td><ltx:td><ltx:p>#body</ltx:p></ltx:td></ltx:tr>"
+    . "<ltx:tr><ltx:td>#1</ltx:td><ltx:td><ltx:inline-block><ltx:text class='ltx_font_bold'>#2</ltx:text> "
+    . "#body</ltx:inline-block></ltx:td></ltx:tr>"
     . "</ltx:tabular></ltx:float>");
-DefEnvironment('{IEEEbiographynophoto}[]',
+DefEnvironment('{IEEEbiographynophoto}[]{}',
   "<ltx:float class='biography'><ltx:tabular>"
-    . "<ltx:tr><ltx:td><ltx:p>#body</ltx:p></ltx:td></ltx:tr>"
+    . "<ltx:tr><ltx:td><ltx:inline-block><ltx:text class='ltx_font_bold'>#2</ltx:text> "
+    . "#body</ltx:inline-block></ltx:td></ltx:tr>"
     . "</ltx:tabular></ltx:float>");
 
 # IEEEeqnarray is similar to eqnarray, but supports subequation numbering.
@@ -355,6 +357,21 @@ DefEnvironment('{IEEEdescription}',
   beforeDigestEnd => sub { Digest('\par'); },
   locked          => 1, mode => 'text');
 
+# V1.7 provide string macros as article.cls does
+DefMacro('\contentsname',     'Contents');
+DefMacro('\listfigurename',   'List of Figures');
+DefMacro('\listtablename',    'List of Tables');
+DefMacro('\refname',          'References');
+DefMacro('\indexname',        'Index');
+DefMacro('\figurename',       'Fig.');
+DefMacro('\tablename',        'TABLE');
+DefMacro('\figurename',       'Figure');
+DefMacro('\partname',         'Part');
+DefMacro('\appendixname',     'Appendix');
+DefMacro('\abstractname',     'Abstract');
+DefMacro('\IEEEkeywordsname', 'Index Terms');
+DefMacro('\IEEEproofname',    'Proof');
+
 # V1.8a no more support for these legacy commands
 Let('\authorblockA',       '\IEEEauthorblockA');
 Let('\authorblockN',       '\IEEEauthorblockN');
@@ -366,7 +383,6 @@ Let('\specialpapernotice', '\IEEEspecialpapernotice');
 # and environments
 DefMacro(T_CS('\begin{keywords}'), '\@IEEEkeywords');
 DefMacro(T_CS('\end{keywords}'),   '\@endIEEEkeywords');
-
 DefMacro('\keywords', sub {
     my ($gullet) = @_;
     ($gullet->ifNext(T_BEGIN)
@@ -387,8 +403,10 @@ Let('\iedlabeljustifyr', '\IEEEiedlabeljustifyr');
 Let('\QED',       '\IEEEQED');
 Let('\QEDclosed', '\IEEEQEDclosed');
 Let('\QEDopen',   '\IEEEQEDopen');
-DefConstructor('\qed',
-  "?#isMath(<ltx:XMTok role='PUNCT'>\x{220E}</ltx:XMTok>)(\x{220E})");
+DefMacro('\qed', '\ltx@qed');
+DefConstructor('\ltx@qed',
+  "?#isMath(<ltx:XMTok role='PUNCT'>\x{220E}</ltx:XMTok>)(\x{220E})",
+  reversion => '\qed');
 Let('\proof',    '\IEEEproof');
 Let('\endproof', '\endIEEEproof');
 # V1.8 no longer support biography or biographynophoto
@@ -396,6 +414,12 @@ Let('\biography',           '\IEEEbiography');
 Let('\biographynophoto',    '\IEEEbiographynophoto');
 Let('\endbiography',        '\endIEEEbiography');
 Let('\endbiographynophoto', '\endIEEEbiographynophoto');
+
+# The \bstctlcite command
+#    which is used to invoke a BibTeX style control bibliography entry that can alter the formatting of .bst files that support it (such as IEEEtran.bst).
+# see docs at http://www.michaelshell.org/tex/ieeetran/tools/
+# TODO: Maybe once we can emulate ".bst" files natively this comes into play?
+DefMacro('\bstctlcite[]{}', Tokens());
 
 #======================================================================
 

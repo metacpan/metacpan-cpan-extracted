@@ -7,22 +7,15 @@ use Test::More tests => 4;
 # ---------------------------------------------------------------------------
 
 %patterns = (
-
-q{ Content-Type: text/html }, 'contenttype',
-q{ 
-  Sender: pertand@email.mondolink.com
-  Content-Type: text/html
-
-  <HTML></P>
-  }, 'startofbody',
-
-  q{Subject: "100% HERBALSENSATION"}, 'subj',
-
+  qr/^Content-Type: text\/html$/m, 'contenttype',
+  qr/\nSender: pertand\@email\.mondolink\.com\nContent-Type: text\/html\n\n<HTML><\/P>/, 'startofbody',
+  qr/^Subject: "100% HERBALSENSATION"$/m, 'subj',
 );
 
 tstprefs ( "
-rewrite_header subject *****SPAM*****
+  rewrite_header subject *****SPAM*****
 " );
 
 ok (sarun ("-d < data/spam/003", \&patterns_run_cb));
 ok_all_patterns();
+

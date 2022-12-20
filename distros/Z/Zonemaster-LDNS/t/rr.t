@@ -77,18 +77,18 @@ subtest 'AAAA' => sub {
 };
 
 subtest 'TXT' => sub {
-    SKIP: {
-        skip 'no network', 1 unless $ENV{TEST_WITH_NETWORK};
+    my @data = (
+        q{txt.test. 3600 IN TXT "Handling TXT RRs can be challenging"},
+        q{txt.test. 3600 IN TXT "because " "the data can " "be spl" "it up like " "this!"}
+    );
+    my @rrs = map { Zonemaster::LDNS::RR->new($_) } @data;
 
-        my $se = Zonemaster::LDNS->new( '192.36.144.107' );
-        my $pt = $se->query( 'se', 'TXT' );
-        plan skip_all => 'No response, cannot test' if not $pt;
-
-        foreach my $rr ( $pt->answer ) {
-            isa_ok( $rr, 'Zonemaster::LDNS::RR::TXT' );
-            like( $rr->txtdata, qr/^"SE zone update: / );
-        }
+    foreach my $rr ( @rrs ) {
+        isa_ok( $rr, 'Zonemaster::LDNS::RR::TXT' );
     }
+
+    is( $rrs[0]->txtdata(), q{Handling TXT RRs can be challenging} );
+    is( $rrs[1]->txtdata(), q{because the data can be split up like this!} );
 };
 
 subtest 'DNSKEY' => sub {
@@ -220,10 +220,30 @@ subtest 'SRV' => sub {
 };
 
 subtest 'SPF' => sub {
-    my $spf = Zonemaster::LDNS::RR->new(
-        'frobbit.se.		1127	IN	SPF	"v=spf1 ip4:85.30.129.185/24 mx:mail.frobbit.se ip6:2a02:80:3ffe::0/64 ~all"' );
-    isa_ok( $spf, 'Zonemaster::LDNS::RR::SPF' );
-    is( $spf->spfdata, '"v=spf1 ip4:85.30.129.185/24 mx:mail.frobbit.se ip6:2a02:80:3ffe::0/64 ~all"' );
+    my @data = (
+        q{frobbit.se.           1127    IN      SPF     "v=spf1 ip4:85.30.129.185/24 mx:mail.frobbit.se ip6:2a02:80:3ffe::0/64 ~all"},
+        q{spf.example.          3600    IN      SPF     "v=spf1 " "ip4:192.0.2.25/24 " "mx:mail.spf.example " "ip6:2001:db8::25/64 -all"}
+    );
+
+    my @rr = map { Zonemaster::LDNS::RR->new($_) } @data;
+    for my $spf (@rr) {
+        isa_ok( $spf, 'Zonemaster::LDNS::RR::SPF' );
+    }
+
+    is( $rr[0]->spfdata(), 'v=spf1 ip4:85.30.129.185/24 mx:mail.frobbit.se ip6:2a02:80:3ffe::0/64 ~all' );
+    is( $rr[1]->spfdata(), 'v=spf1 ip4:192.0.2.25/24 mx:mail.spf.example ip6:2001:db8::25/64 -all' );
+
+};
+
+subtest 'croak when given malformed CAA records' => sub {
+    my $will_croak = sub {
+        # This will croak if LDNS.xs is compiled with -DUSE_ITHREADS
+        my $bad_caa = Zonemaster::LDNS::RR->new(
+            'bad-caa.example.       3600    IN      CAA     \# 4 C0000202' );
+        # This will always croak
+        $bad_caa->string();
+    };
+    like( exception { $will_croak->() }, qr/^Failed to convert RR to string/ );
 };
 
 done_testing;

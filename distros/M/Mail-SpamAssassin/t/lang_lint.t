@@ -9,8 +9,8 @@ plan tests => 8;
 
 # ---------------------------------------------------------------------------
 
-my  @locales = qw( de es fr it nl pl pl pt_BR );
-%patterns = ( q{  }, 'anything', );
+my @locales = qw( de es fr it nl pl pl pt_BR );
+%patterns = ( qr/^/, 'anything', );
 
 for $locale (@locales) {
   $ENV{'LANGUAGE'} = $locale;
@@ -18,3 +18,4 @@ for $locale (@locales) {
   sarun ("-L --lint", \&patterns_run_cb);
   ok_all_patterns();
 }
+

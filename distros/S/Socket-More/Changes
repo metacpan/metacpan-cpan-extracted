@@ -1,11 +1,29 @@
 Revision history for Perl extension Socket::More.
 
-0.2.0  Fri Nov 25 08:20:29 AEST 2022
-	- Reduces memory usage
-	  Replaced Net::IP with Net::IP::Lite;
-	  Direct copy of IP required 'group' table and functions from Net::IP
-	  Replaced Test::Deep with Data::Cmp
-	  Only Load Scalar::Util when using socket
+0.3.0 2022-12-19T13:23:31ZAEST
+
+  [Features]
+  - Added reify_ports function 
+    Replaces all 0 port (any port) in specifications with a single real one
+    supplied by the OS. Shared amongst other 0 port entires in the same call.
+
+  - Added reify_ports_unshared function
+    Replaces all 0 port (any port) in specifications with a real one supplied
+    by the OS, likely different (not shared) for each entry in specifications.
+
+  [Documentation]
+  - Documented reify_ports and reify_ports_unshared
+
+  - Reworded some the POD sections
+
+  [Bug fixes]
+  - Suppressed 'uninitialised' warnings in specification testing.
+  - More consistent handling of host:port CLI syntax when port is missing.
+  - Fixed Changes file format
+
+0.2.0 2022-11-25T08:20:29ZAEST 
+
+  [Bug fixes]
 
 	- Attempting to fix failing tests
 	  Removed interface index mapping tests due to possible race condition
@@ -15,11 +33,19 @@ Revision history for Perl extension Socket::More.
 	  In generating the string to integer mapping for the SOCK_* constants,
 	  SOCK_CLOEXEC and SOCK_NONBLOCK where also added. These are large
 	  integers intended to be use as a mask, not a socket type. These are
-	  filtered out of the mapping now to previent all your memory being
+	  filtered out of the mapping now to prevent all your memory being
 	  consumed!
+
+  [Features]
 
 	- Added has_IPv4_interface and has_IPv6_interface routines to help test if
 	  IPv4/IPv6 is available on at least one interface
+
+	- Reduces memory usage
+	  Replaced Net::IP with Net::IP::Lite;
+	  Direct copy of IP required 'group' table and functions from Net::IP
+	  Replaced Test::Deep with Data::Cmp
+	  Only Load Scalar::Util when using socket
 
 
 0.1.0  Fri Oct 21 21:05:49 2022

@@ -1,13 +1,15 @@
 package App::VitaminUtils;
 
-our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-08-08'; # DATE
-our $DIST = 'App-VitaminUtils'; # DIST
-our $VERSION = '0.004'; # VERSION
-
 use 5.010001;
 use strict;
 use warnings;
+
+use Capture::Tiny 'capture_stderr';
+
+our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
+our $DATE = '2022-09-14'; # DATE
+our $DIST = 'App-VitaminUtils'; # DIST
+our $VERSION = '0.006'; # VERSION
 
 our %SPEC;
 
@@ -301,10 +303,13 @@ _
 sub convert_vitamin_d_unit {
     require Physics::Unit;
 
-    Physics::Unit::InitUnit(
-        ['mcg'], '0.001 mg',
-        ['IU', 'iu'], '0.025 microgram',
-    );
+    capture_stderr {
+        Physics::Unit::InitUnit(
+            ['g'], 'gram', # emits warning 'already defined' warning, but '3g' won't work if we don't add this
+            ['mcg'], '0.001 mg',
+            ['IU', 'iu'], '0.025 microgram',
+        );
+    }; # silence warning
 
     my %args = @_;
     my $quantity = Physics::Unit->new($args{quantity});
@@ -415,7 +420,7 @@ App::VitaminUtils - Utilities related to vitamins
 
 =head1 VERSION
 
-This document describes version 0.004 of App::VitaminUtils (from Perl distribution App-VitaminUtils), released on 2021-08-08.
+This document describes version 0.006 of App::VitaminUtils (from Perl distribution App-VitaminUtils), released on 2022-09-14.
 
 =head1 DESCRIPTION
 
@@ -943,14 +948,6 @@ Please visit the project's homepage at L<https://metacpan.org/release/App-Vitami
 
 Source repository is at L<https://github.com/perlancar/perl-App-VitaminUtils>.
 
-=head1 BUGS
-
-Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-VitaminUtils>
-
-When submitting a bug or request, please include a test-file or a
-patch to an existing test-file that illustrates the bug or desired
-feature.
-
 =head1 SEE ALSO
 
 L<App::MineralUtils>
@@ -965,11 +962,37 @@ L<https://avsnutrition.com.au/wp-content/themes/avs-nutrition/vitamin-converter.
 
 perlancar <perlancar@cpan.org>
 
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021, 2020 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=App-VitaminUtils>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
 
 =cut

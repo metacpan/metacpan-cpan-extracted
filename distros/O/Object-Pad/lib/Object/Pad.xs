@@ -27,6 +27,7 @@
 #include "force_list_keeping_pushmark.c.inc"
 #include "optree-additions.c.inc"
 #include "newOP_CUSTOM.c.inc"
+#include "OP_HELEMEXISTSOR.c.inc"
 
 #if HAVE_PERL_VERSION(5, 26, 0)
 #  define HAVE_PARSE_SUBSIGNATURE
@@ -309,7 +310,7 @@ static ClassMeta *S_compclassmeta(pTHX)
   SV **svp = hv_fetchs(GvHV(PL_hintgv), "Object::Pad/compclassmeta", 0);
   if(!svp || !*svp || !SvOK(*svp))
     return NULL;
-  return (ClassMeta *)SvIV(*svp);
+  return NUM2PTR(ClassMeta *, SvIV(*svp));
 }
 
 #define have_compclassmeta  S_have_compclassmeta(aTHX)
@@ -329,7 +330,7 @@ static bool S_have_compclassmeta(pTHX)
 static void S_compclassmeta_set(pTHX_ ClassMeta *meta)
 {
   SV *sv = *hv_fetchs(GvHV(PL_hintgv), "Object::Pad/compclassmeta", GV_ADD);
-  sv_setiv(sv, (IV)meta);
+  sv_setiv(sv, PTR2UV(meta));
 }
 
 ClassMeta *ObjectPad_get_compclassmeta(pTHX)
@@ -443,7 +444,7 @@ static int build_classlike(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t n
   if(!packagename)
     croak("Expected a class name after 'class'");
 
-  enum MetaType type = (enum MetaType)hookdata;
+  enum MetaType type = PTR2UV(hookdata);
 
   SV *packagever = args[argi++]->sv;
 
@@ -650,6 +651,42 @@ static const struct XSParseKeywordHooks kwhooks_role = {
   .build = &build_classlike,
 };
 
+enum {
+  FIELD_INIT_CLASSEXPR,
+  FIELD_INIT_BLOCK,
+  FIELD_INIT_EXPR,
+  FIELD_INIT_DOREXPR,
+  FIELD_INIT_OREXPR,
+};
+
+#define OP_TYPE_OR_EX(o)  ((o)->op_type == OP_NULL ? (o)->op_targ : (o)->op_type)
+
+static bool optree_is_const(OP *o)
+{
+  OP *kid;
+
+  switch(OP_TYPE_OR_EX(o)) {
+    case OP_CONST:
+    case OP_UNDEF:
+      return TRUE;
+
+    case OP_SCOPE:
+      return optree_is_const(cUNOPo->op_first);
+
+    case OP_LIST:
+      kid = cLISTOPo->op_first;
+      if(OP_TYPE_OR_EX(kid) == OP_PUSHMARK)
+        kid = OpSIBLING(kid);
+      for( ; kid; kid = OpSIBLING(kid)) {
+        if(!optree_is_const(kid))
+          return FALSE;
+      }
+      return TRUE;
+  }
+
+  return FALSE;
+}
+
 static void check_field(pTHX_ void *hookdata)
 {
   char *kwname = hookdata;
@@ -668,6 +705,7 @@ static void check_field(pTHX_ void *hookdata)
 static int build_field(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs, void *hookdata)
 {
   int argi = 0;
+  HV *hints = GvHV(PL_hintgv);
 
   SV *name = args[argi++]->sv;
   char sigil = SvPV_nolen(name)[0];
@@ -680,6 +718,9 @@ static int build_field(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs
     if(hv_fetchs(GvHV(PL_hintgv), "Object::Pad/configure(no_field_attrs)", 0))
       croak("Field attributes are not permitted");
 
+    SV **svp = hv_fetchs(GvHV(PL_hintgv), "Object::Pad/configure(only_field_attrs)", 0);
+    HV *only_field_attrs = svp && SvROK(*svp) ? HV_FROM_REF(*svp) : NULL;
+
     SV *fieldmetasv = newSV(0);
     sv_setref_uv(fieldmetasv, "Object::Pad::MOP::Field", PTR2UV(fieldmeta));
     SAVEFREESV(fieldmetasv);
@@ -687,6 +728,9 @@ static int build_field(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs
     while(argi < (nattrs+2)) {
       SV *attrname = args[argi]->attr.name;
       SV *attrval  = args[argi]->attr.value;
+
+      if(only_field_attrs && !hv_fetch_ent(only_field_attrs, attrname, 0, 0))
+        croak("Field attribute :%" SVf " is not permitted", SVfARG(attrname));
 
       inplace_trim_whitespace(attrval);
 
@@ -699,6 +743,9 @@ static int build_field(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs
     }
   }
 
+  bool is_block = FALSE,
+       warn_init_expr = !hv_fetchs(hints, "Object::Pad/experimental(init_expr)", 0);
+
   /* It would be nice to just yield some OP to represent the has field here
    * and let normal parsing of normal scalar assignment accept it. But we can't
    * because scalar assignment tries to peephole far too deply into us and
@@ -710,7 +757,7 @@ static int build_field(pTHX_ OP **out, XSParseKeywordPiece *args[], size_t nargs
       /* no expr */
       break;
 
-    case 0:
+    case FIELD_INIT_CLASSEXPR:
     {
       OP *op = args[argi++]->op;
 
@@ -751,14 +798,18 @@ field_array_hash_common:
     }
     break;
 
-    case 1:
-    case 2:
+    case FIELD_INIT_BLOCK:
+      is_block = TRUE;
+      /* FALLTHROUGH */
+    case FIELD_INIT_EXPR:
+    case FIELD_INIT_DOREXPR:
+    case FIELD_INIT_OREXPR:
     {
       OP *op = args[argi++]->op;
       U8 want = 0;
 
       forbid_outofblock_ops(op,
-        inittype == 2 ? "a field initialiser expression" : "a field initialiser block");
+        is_block ? "a field initialiser block" : "a field initialiser expression");
 
       switch(sigil) {
         case '$':
@@ -771,6 +822,27 @@ field_array_hash_common:
       }
 
       fieldmeta->defaultexpr = op_contextualize(op_scope(op), want);
+      if(inittype == FIELD_INIT_DOREXPR)
+        fieldmeta->def_if_undef = true;
+      if(inittype == FIELD_INIT_OREXPR)
+        fieldmeta->def_if_false = true;
+
+      if(warn_init_expr &&
+          !is_block && /* We already warned about blocks */
+          !optree_is_const(fieldmeta->defaultexpr)) {
+        ENTER;
+        SAVEI32(CopLINE(PL_curcop));
+
+        SV **svp;
+        if((svp = hv_fetchs(hints, "Object::Pad/fieldcopline", 0))) {
+          CopLINE(PL_curcop) = SvUV(*svp);
+        }
+
+        Perl_ck_warner(aTHX_ packWARN(WARN_EXPERIMENTAL),
+            "Non-constant field initialiser expression is experimental and may be changed or removed without notice");
+
+        LEAVE;
+      }
     }
     break;
   }
@@ -785,11 +857,6 @@ static void setup_parse_field(pTHX_ bool is_block)
   CV *was_compcv = PL_compcv;
   HV *hints = GvHV(PL_hintgv);
 
-  if(!hints || !hv_fetchs(hints, "Object::Pad/experimental(init_expr)", 0))
-    Perl_ck_warner(aTHX_ packWARN(WARN_EXPERIMENTAL),
-      "field initialiser %s is experimental and may be changed or removed without notice",
-        is_block ? "block" : "expression");
-
   resume_compcv_and_save(&compclassmeta->initfields_compcv);
 
   /* Set up this new block as if the current compiler context were its scope */
@@ -800,7 +867,8 @@ static void setup_parse_field(pTHX_ bool is_block)
   CvOUTSIDE(PL_compcv)     = (CV *)SvREFCNT_inc(was_compcv);
   CvOUTSIDE_SEQ(PL_compcv) = PL_cop_seqmax;
 
-  hv_stores(GvHV(PL_hintgv), "Object::Pad/__CLASS__", newSVsv(&PL_sv_yes));
+  hv_stores(hints, "Object::Pad/__CLASS__", newSVsv(&PL_sv_yes));
+  hv_stores(hints, "Object::Pad/fieldcopline", newSVuv(CopLINE(PL_curcop)));
 
   if(!is_block) {
     /* Hide the $self lexical by scrubbing its name */
@@ -813,6 +881,15 @@ static void setup_parse_field(pTHX_ bool is_block)
 
 static void setup_parse_field_initblock(pTHX_ void *hookdata)
 {
+  HV *hints = GvHV(PL_hintgv);
+
+  if(hv_fetchs(hints, "Object::Pad/configure(no_field_block)", 0))
+    croak("Field initialisation block is not permitted");
+
+  if(!hv_fetchs(hints, "Object::Pad/experimental(init_expr)", 0))
+    Perl_ck_warner(aTHX_ packWARN(WARN_EXPERIMENTAL),
+        "field initialiser block is experimental and may be changed or removed without notice");
+
   setup_parse_field(aTHX_ TRUE);
 }
 
@@ -820,6 +897,9 @@ static void setup_parse_field_initexpr(pTHX_ void *hookdata)
 {
   setup_parse_field(aTHX_ FALSE);
 }
+
+#define XPK_DOREQUALS  XPK_LITERAL("//=")
+#define XPK_OREQUALS   XPK_LITERAL("||=")
 
 static const struct XSParseKeywordHooks kwhooks_field = {
   .flags = XPK_FLAG_STMT,
@@ -832,9 +912,13 @@ static const struct XSParseKeywordHooks kwhooks_field = {
     XPK_ATTRIBUTES,
     XPK_TAGGEDCHOICE(
       XPK_PREFIXED_BLOCK_ENTERLEAVE(XPK_SETUP(&setup_parse_field_initblock)),
-        XPK_TAG(1),
+        XPK_TAG(FIELD_INIT_BLOCK),
       XPK_SEQUENCE(XPK_EQUALS, XPK_PREFIXED_TERMEXPR_ENTERLEAVE(XPK_SETUP(&setup_parse_field_initexpr)), XPK_AUTOSEMI),
-        XPK_TAG(2)
+        XPK_TAG(FIELD_INIT_EXPR),
+      XPK_SEQUENCE(XPK_DOREQUALS, XPK_PREFIXED_TERMEXPR_ENTERLEAVE(XPK_SETUP(&setup_parse_field_initexpr)), XPK_AUTOSEMI),
+        XPK_TAG(FIELD_INIT_DOREXPR),
+      XPK_SEQUENCE(XPK_OREQUALS, XPK_PREFIXED_TERMEXPR_ENTERLEAVE(XPK_SETUP(&setup_parse_field_initexpr)), XPK_AUTOSEMI),
+        XPK_TAG(FIELD_INIT_OREXPR)
     ),
     {0}
   },
@@ -867,7 +951,7 @@ enum PhaserType {
   PHASER_NONE, /* A normal `method`; i.e. not a phaser */
   PHASER_BUILD,
   PHASER_ADJUST,
-  PHASER_ADJUSTPARAMS, /* exactly like ADJUST, just warns that it's deprecated */
+  PHASER_ADJUSTPARAMS,
 };
 
 static const char *phasertypename[] = {
@@ -1252,41 +1336,24 @@ redo:
           newSVpvf("Required parameter '%" SVf "' is missing for %" SVf " constructor",
             SVfARG(paramname), SVfARG(compclassmeta->name)));
 
+      OP *helemop =
+        newBINOP(OP_HELEM, 0,
+          newPADxVOP(OP_PADHV, OPf_REF, PADIX_PARAMS),
+          newSVOP(OP_CONST, 0, SvREFCNT_inc(paramname)));
+
       OP *rhs;
       if(parammeta->adjust.def_if_undef) {
         /* delete $(params){KEY} // DEFEXPR */
-        rhs = newLOGOP(OP_DOR, 0,
-              newUNOP(OP_DELETE, 0,
-                newBINOP(OP_HELEM, 0,
-                  newPADxVOP(OP_PADHV, OPf_REF, PADIX_PARAMS),
-                  newSVOP(OP_CONST, 0, SvREFCNT_inc(paramname)))),
-              defexpr);
+        rhs = newLOGOP(OP_DOR, 0, newUNOP(OP_DELETE, 0, helemop), defexpr);
       }
       else if(parammeta->adjust.def_if_false) {
         /* delete $(params){KEY} || DEFEXPR */
-        rhs = newLOGOP(OP_OR, 0,
-              newUNOP(OP_DELETE, 0,
-                newBINOP(OP_HELEM, 0,
-                  newPADxVOP(OP_PADHV, OPf_REF, PADIX_PARAMS),
-                  newSVOP(OP_CONST, 0, SvREFCNT_inc(paramname)))),
-              defexpr);
+        rhs = newLOGOP(OP_OR, 0, newUNOP(OP_DELETE, 0, helemop), defexpr);
       }
       else {
-        /* exists $(params){KEY} ? delete $(params){KEY} : DEFEXPR; */
-        rhs = newCONDOP(0,
-              /* first */
-              /* OP_EXISTS has to be created a weird way... */
-              newUNOP(OP_EXISTS, 0,
-                newBINOP(OP_HELEM, 0,
-                  newPADxVOP(OP_PADHV, OPf_REF, PADIX_PARAMS),
-                  newSVOP(OP_CONST, 0, SvREFCNT_inc(paramname)))),
-              /* trueop */
-              newUNOP(OP_DELETE, 0,
-                newBINOP(OP_HELEM, 0,
-                  newPADxVOP(OP_PADHV, OPf_REF, PADIX_PARAMS),
-                  newSVOP(OP_CONST, 0, SvREFCNT_inc(paramname)))),
-              /* falseop */
-              defexpr);
+        /* Equivalent of
+         *   exists $(params){KEY} ? delete $(params){KEY} : DEFEXPR; */
+        rhs = newHELEMEXISTSOROP(OPpHELEMEXISTSOR_DELETE << 8, helemop, defexpr);
       }
 
       paramsops = op_append_elem(OP_LINESEQ, paramsops,

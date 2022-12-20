@@ -1,6 +1,8 @@
 package AI::TensorFlow::Libtensorflow::_Misc;
 # ABSTRACT: Private API
-$AI::TensorFlow::Libtensorflow::_Misc::VERSION = '0.0.2';
+$AI::TensorFlow::Libtensorflow::_Misc::VERSION = '0.0.3';
+use strict;
+use warnings;
 use namespace::autoclean;
 use AI::TensorFlow::Libtensorflow::Lib qw(arg);
 

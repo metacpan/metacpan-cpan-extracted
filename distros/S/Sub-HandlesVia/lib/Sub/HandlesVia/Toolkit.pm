@@ -5,13 +5,13 @@ use warnings;
 package Sub::HandlesVia::Toolkit;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.045';
+our $VERSION   = '0.046';
 
 use Sub::HandlesVia::Mite;
 
 use Type::Params qw(compile_named_oo);
 use Types::Standard qw( ArrayRef HashRef Str Num Int CodeRef Bool Item Object );
-use Types::Standard qw( assert_HashRef is_ArrayRef is_CodeRef is_Str );
+use Types::Standard qw( is_ArrayRef is_HashRef is_Str is_Int is_CodeRef );
 
 my $sig;
 sub install_delegations {
@@ -74,6 +74,18 @@ my %default_type = (
 	Blessed   => Object,
 );
 
+my $trait_to_class = sub {
+	my $hv_trait = shift;
+	my $hv_class = $hv_trait =~ /:/
+		? $hv_trait
+		: "Sub::HandlesVia::HandlerLibrary::$hv_trait";
+	if ( $hv_class ne $hv_trait ) {
+		local $@;
+		eval "require $hv_class; 1" or warn $@;
+	}
+	$hv_class;
+};
+
 sub clean_spec {
 	my ($me, $target, $attr, $spec) = (shift, @_);
 
@@ -93,38 +105,59 @@ sub clean_spec {
 	}
 
 	return unless $spec->{handles_via};
-	
+
 	my @handles_via = ref($spec->{handles_via}) ? @{$spec->{handles_via}} : $spec->{handles_via};
 	my $joined      = join('|', @handles_via);
+
+	for my $hv ( @handles_via ) {
+		$trait_to_class->( $hv )->preprocess_spec( $target, $attr, $spec );
+	}
 
 	if ($default_type{$joined} and not exists $spec->{isa}) {
 		$spec->{isa}    = $default_type{$joined};
 		$spec->{coerce} = 1 if $default_type{$joined}->has_coercion;
 	}
-	
-	$spec->{handles} = { map +($_ => $_), @{ $spec->{handles} } }
-		if is_ArrayRef $spec->{handles};
-	assert_HashRef $spec->{handles};
+
+	# Canonicalize handles hashref
+	my %canon_handles;
+	my @handles = is_ArrayRef( $spec->{handles} )
+		? @{ delete $spec->{handles} }
+		: delete( $spec->{handles} );
+	while ( @handles ) {
+		my $item = shift @handles;
+		$item = $trait_to_class->( $handles_via[0] )->expand_shortcut( $target, $attr, $spec, $item )
+			if is_Int $item;
+		if ( is_Str $item ) {
+			$canon_handles{$item} = $item;
+		}
+		elsif ( is_HashRef $item ) {
+			%canon_handles = ( %canon_handles, %$item );
+		}
+		else {
+			require Carp;
+			Carp::croak( "Unknown item as handles option: $item" );
+		}
+	}
 
 	return {
 		target       => $target,
 		attribute    => $attr,
-		handles_via  => delete($spec->{handles_via}),
-		handles      => delete($spec->{handles}),
+		handles_via  => delete( $spec->{handles_via} ),
+		handles      => \%canon_handles,
 	};
 }
 
 sub code_generator_for_attribute {
 	my ($me, $target, $attr) = (shift, @_);
-	
+
 	my ($get_slot, $set_slot, $default) = @$attr;
 	$set_slot = $get_slot if @$attr < 2;
-	
+
 	my $captures = {};
 	my ($get, $set, $slot, $get_is_lvalue) = (undef, undef, undef, 0);
-	
+
 	require B;
-	
+
 	if (ref $get_slot) {
 		$get = sub { shift->generate_self . '->$shv_reader' };
 		$captures->{'$shv_reader'} = \$get_slot;
@@ -145,7 +178,7 @@ sub code_generator_for_attribute {
 		my $method = B::perlstring($get_slot);
 		$get = sub { shift->generate_self . "->\${\\ $method}" };
 	}
-	
+
 	if (ref $set_slot) {
 		$set = sub {
 			my ($gen, $val) = @_;
@@ -177,7 +210,7 @@ sub code_generator_for_attribute {
 			"$self\->\${\\ $method}($val)";
 		};
 	}
-	
+
 	if (is_CodeRef $default) {
 		$captures->{'$shv_default_for_reset'} = \$default;
 	}

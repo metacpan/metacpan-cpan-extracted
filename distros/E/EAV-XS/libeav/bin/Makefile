@@ -37,11 +37,11 @@ eav.static: $(OBJECTS)
 
 
 strip: shared
-	# bin -> strip
+	# bin -> strip shared
 	strip --strip-unneeded -R .comment -R .note -R .note.ABI-tag eav
 
 strip-static: static
-	# bin -> strip
+	# bin -> strip static
 	strip --strip-unneeded -R .comment -R .note -R .note.ABI-tag eav.static
 
 #----------------------------------------------------------#
@@ -56,6 +56,15 @@ install: shared
 	$(INSTALL) -d $(DESTDIR)/bin
 	$(INSTALL) -m 0755 eav $(DESTDIR)/bin
 
+install-static: static
+	$(INSTALL) -d $(DESTDIR)/sbin
+	$(INSTALL) -m 0755 eav.static $(DESTDIR)/sbin/eav-static
+
+uninstall:
+	# === bin -> uninstalling ...
+	$(RM) $(DESTDIR)/bin/eav
+	$(RM) $(DESTDIR)/sbin/eav-static
+
 #----------------------------------------------------------#
 
-.PHONY: all clean debug install strip eav eav.static static shared
+.PHONY: all clean debug install strip static shared install-static strip-static eav eav.static uninstall

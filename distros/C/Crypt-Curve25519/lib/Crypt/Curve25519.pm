@@ -1,13 +1,13 @@
 package Crypt::Curve25519;
-our $AUTHORITY = 'cpan:AJGB';
 #ABSTRACT: Generate shared secret using elliptic-curve Diffie-Hellman function
-$Crypt::Curve25519::VERSION = '0.06';
+
 use strict;
 use warnings;
 use Carp qw( croak );
 
 require Exporter;
 our @ISA = qw(Exporter);
+our $VERSION = '0.07';
 
 our %EXPORT_TAGS = ( 'all' => [ qw(
     curve25519
@@ -83,15 +83,11 @@ __END__
 
 =pod
 
-=encoding UTF-8
+=encoding utf-8
 
 =head1 NAME
 
 Crypt::Curve25519 - Generate shared secret using elliptic-curve Diffie-Hellman function
-
-=head1 VERSION
-
-version 0.06
 
 =head1 SYNOPSIS
 
@@ -178,68 +174,22 @@ users.
 
 =head1 METHODS
 
-=head2 new
+=over
 
-    my $c = Crypt::Curve25519->new();
-
-Create a new object
-
-=head2 secret_key
-
-    my $my_secret_key_hex = $c->secret_key( $my_random_32byte_string_hex );
-
-Using hex encoded 32-byte random string from cryptographically safe source
-create masked secret key.
-
-=head2 public_key
-
-    my $public_key_hex = $c->public_key( $my_secret_key_hex );
-
-Using hex encoded masked secret key generate corresponding hex encoded 32-byte
-Curve25519 public key.
-
-=head2 shared_secret
-
-    my $shared_secret_hex = $c->shared_secret(
-        $my_secret_key_hex, $his_public_key_hex
-    );
-
-Using provided hex encoded keys generate 32-byte hex encoded shared secret,
-that both parties can use without disclosing their private secret keys.
-
-=head2 generate
-
-Access to primitive method is also provided.
-
-    my $key_hex = $c->generate($my_secret_key_hex, $basepoint_hex);
-
-    # public key
-    if ( $basepoint_hex eq unpack("H64", pack("H64", "09")) ) {
-        print "\$key_hex is a public key\n";
-    }
-    elsif ( $basepoint_hex eq $his_public_key_hex ) {
-        print "\$key_hex is a shared secret\n";
-    }
-
-Using provided hex encoded secret key and depending on the 32-byte hex
-encoded basepoint generate 32-byte hex encoded public key or shared secret.
-
-=head1 FUNCTIONS
-
-=head2 curve25519_secret_key
+=item curve25519_secret_key
 
     my $my_secret_key = curve25519_secret_key($my_random_32byte_string);
 
 Using provided 32-byte random string from cryptographically safe source create
 masked secret key.
 
-=head2 curve25519_public_key
+=item curve25519_public_key
 
     my $public_key = curve25519_public_key($my_secret_key);
 
 Using masked secret key generate corresponding 32-byte Curve25519 public key.
 
-=head2 curve25519_shared_secret
+=item curve25519_shared_secret
 
     my $shared_secret = curve25519_shared_secret(
         $my_secret_key, $his_public_key
@@ -248,7 +198,7 @@ Using masked secret key generate corresponding 32-byte Curve25519 public key.
 Using provided keys generate 32-byte shared secret, that both parties can use
 without disclosing their private secret keys.
 
-=head2 curve25519
+=item curve25519
 
 Access to primitive function is also provided.
 
@@ -267,6 +217,54 @@ Access to primitive function is also provided.
 Using provided secret key and depending on the 32-byte basepoint generate
 32-byte public key or shared secret.
 
+=item new
+
+    my $c = Crypt::Curve25519->new();
+
+Create a new object
+
+=item secret_key
+
+    my $my_secret_key_hex = $c->secret_key( $my_random_32byte_string_hex );
+
+Using hex encoded 32-byte random string from cryptographically safe source
+create masked secret key.
+
+=item public_key
+
+    my $public_key_hex = $c->public_key( $my_secret_key_hex );
+
+Using hex encoded masked secret key generate corresponding hex encoded 32-byte
+Curve25519 public key.
+
+=item shared_secret
+
+    my $shared_secret_hex = $c->shared_secret(
+        $my_secret_key_hex, $his_public_key_hex
+    );
+
+Using provided hex encoded keys generate 32-byte hex encoded shared secret,
+that both parties can use without disclosing their private secret keys.
+
+=item generate
+
+Access to primitive method is also provided.
+
+    my $key_hex = $c->generate($my_secret_key_hex, $basepoint_hex);
+
+    # public key
+    if ( $basepoint_hex eq unpack("H64", pack("H64", "09")) ) {
+        print "\$key_hex is a public key\n";
+    }
+    elsif ( $basepoint_hex eq $his_public_key_hex ) {
+        print "\$key_hex is a shared secret\n";
+    }
+
+Using provided hex encoded secret key and depending on the 32-byte hex
+encoded basepoint generate 32-byte hex encoded public key or shared secret.
+
+=back
+
 =head1 SEE ALSO
 
 =over 4
@@ -279,11 +277,16 @@ Using provided secret key and depending on the 32-byte basepoint generate
 
 Alex J. G. Burzyński <ajgb@cpan.org>
 
+=head1 MAINTAINER
+
+Dmitry Karasik <dmitry@karasik.eu.org>
+
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Alex J. G. Burzyński <ajgb@cpan.org>.
+    This software is copyright (c) 2014 by Alex J. G. Burzyński
+    <ajgb@cpan.org>.
 
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
 
 =cut

@@ -1,5 +1,8 @@
 Revision history for Perl extension Ceph::Rados::Striper.
 
+0.10 Thu 15 Dec 17:28:52 GMT 2022
+  - reading from an existing, but zero-length file should not be a fatal error
+
 0.09  Fri 14 May 18:33:34 BST 2021
   - fixes to ranged read_handle()
 

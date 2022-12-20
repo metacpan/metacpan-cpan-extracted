@@ -1,5 +1,17 @@
 Revision history for App-Device-Chip-sensor
 
+0.06    2022-12-18
+        [CHANGES]
+         * Use Object::Pad v0.76 to avoid needing to enable
+           `:experimental(init_expr)`
+         * Optionally use Future::AsyncAwait::Metrics if installed
+         * Handle mixed --config + commandline arguments in @ARGV order
+         * Permit interval/best_effort/mid3 to be specified in the config file
+
+        [BUGFIXES]
+         * Count chip failures once per chip per reading round, regardless of
+           how many sensors are reported by it
+
 0.05    2022-12-05
         [CHANGES]
          * Updated for Object::Pad v0.73:

@@ -4,10 +4,11 @@
 #  (C) Paul Evans, 2013-2021 -- leonerd@leonerd.org.uk
 #  Original render code by Tom Molesworth
 
-use Object::Pad 0.57;
+use Object::Pad 0.73 ':experimental(init_expr)';
 
-package Tickit::Widget::Placegrid 0.35;
+package Tickit::Widget::Placegrid 0.36;
 class Tickit::Widget::Placegrid
+   :strict(params)
    :isa(Tickit::Widget);
 
 use Tickit::Style;
@@ -69,7 +70,7 @@ dimensions in the centre of the grid.
 
 =cut
 
-has $_title :param = undef;
+field $_title :param = undef;
 
 method lines { 1 }
 method cols  { 1 }

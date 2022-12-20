@@ -1,3 +1,22 @@
+0.207   2022-12-19  Released-By: PERLANCAR; Urgency: low
+
+        - No functional changes.
+
+        - [ux] Tweak an error message to be more informative.
+
+
+0.206   2022-12-09  Released-By: PERLANCAR; Urgency: high
+
+        - Derp, fix another checking error.
+
+
+0.205   2022-12-09  Released-By: PERLANCAR; Urgency: high; Broken: yes
+
+        - [bugfix] Multiple slurp=1 and slurpy/pos clash were not checked.
+
+        - UPDATE: this release is broken due to a bug, please use 0.206.
+
+
 0.204   2022-12-09  Released-By: PERLANCAR; Urgency: high
 
         - [bugfix] Fix logic bug caused by typo.

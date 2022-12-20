@@ -9,6 +9,10 @@ use Venus::Class 'base';
 
 base 'Faker::Plugin';
 
+# VERSION
+
+our $VERSION = '1.17';
+
 # METHODS
 
 sub execute {
@@ -34,6 +38,12 @@ Faker::Plugin::PaymentCardExpiration - Payment Card Expiration
 =head1 ABSTRACT
 
 Payment Card Expiration for Faker
+
+=cut
+
+=head1 VERSION
+
+1.17
 
 =cut
 

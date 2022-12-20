@@ -50,7 +50,7 @@ public:
     }
 
     void add(Handle<Object> object, long ptr);
-    SV* find(Handle<Object> object);
+    SV* find(Local<Context> ctx, Handle<Object> object);
 };
 
 typedef map<int, Handle<Value> > HandleMap;

@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Scalar::Util qw/blessed/;
 
-our $VERSION = '1.00';
+our $VERSION = '1.01';
 
 our (%ERROR, %METH, $caller);
 
@@ -33,7 +33,7 @@ BEGIN {
 				}
 				elsif ( $ref && blessed $data ) {
 					my ($meth, $params) = $METH{meth_params}->($key, $data);
-					$data = $data->$meth(@{ $params });
+					$data = scalar @{ $params } ? $data->$meth(@{ $params }) : $data->$meth;
 					$METH{error}->('invalid_method', $key, $follow) if ! defined $data;
 				}
 				else {
@@ -133,7 +133,7 @@ Data::LNPath - lookup on nested data via path
 
 =head1 VERSION
 
-Version 1.00
+Version 1.01
 
 =cut
 

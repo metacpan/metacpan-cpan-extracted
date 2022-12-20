@@ -21,7 +21,11 @@ Mail::SpamAssassin::BayesStore::SQL - SQL Bayesian Storage Module Implementation
 
 =head1 DESCRIPTION
 
-This module implements a SQL based bayesian storage module.
+This module implements a SQL based bayesian storage module.  It's compatible
+with SQLite and possibly other standard SQL servers.
+
+Do not use this for MySQL/MariaDB or PgSQL, they have their own specific
+modules.
 
 =cut
 
@@ -32,11 +36,7 @@ use warnings;
 # use bytes;
 use re 'taint';
 use Errno qw(EBADF);
-
-BEGIN {
-  eval { require Digest::SHA; import Digest::SHA qw(sha1); 1 }
-  or do { require Digest::SHA1; import Digest::SHA1 qw(sha1) }
-}
+use Digest::SHA qw(sha1);
 
 use Mail::SpamAssassin::BayesStore;
 use Mail::SpamAssassin::Logger;
@@ -1676,6 +1676,13 @@ sub _connect_db {
     dbg("bayes: database connection established");
   }
 
+  # SQLite PRAGMA attributes - here for tests, see bug 8033
+  if ($self->{_dsn} =~ /^dbi:SQLite:.*?;(.+)/i) {
+    foreach my $attr (split(/;/, $1)) {
+      $dbh->do("PRAGMA $attr");
+    }
+  }
+  
   $self->{_dbh} = $dbh;
 
  return 1;
@@ -2348,12 +2355,13 @@ Description:
 This method returns the string to be used in SELECT statements to represent
 the token column.
 
-The default is to use the RPAD function to pad the token out to 5 characters.
+The default is to use the SUBSTR function to pad the token out to 5 characters.
 
 =cut
 
 sub _token_select_string {
-  return "RPAD(token, 5, ' ')";
+  # Use SQLite compatible RPAD alternative
+  return "SUBSTR(token || '     ', 1, 5)";
 }
 
 sub sa_die { Mail::SpamAssassin::sa_die(@_); }

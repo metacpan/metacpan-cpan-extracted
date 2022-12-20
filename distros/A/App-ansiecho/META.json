@@ -4,7 +4,7 @@
       "Kazumasa Utashiro"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.19",
+   "generated_by" : "Minilla/v3.1.20",
    "license" : [
       "perl_5"
    ],
@@ -43,7 +43,7 @@
       "runtime" : {
          "requires" : {
             "Encode" : "0",
-            "Getopt::EX" : "v1.28.0",
+            "Getopt::EX" : "v2.1.1",
             "Getopt::EX::Hashed" : "1.05",
             "List::Util" : "0",
             "Pod::Usage" : "0",
@@ -62,7 +62,7 @@
    "provides" : {
       "App::ansiecho" : {
          "file" : "lib/App/ansiecho.pm",
-         "version" : "1.02"
+         "version" : "1.03"
       }
    },
    "release_status" : "stable",
@@ -77,11 +77,11 @@
          "web" : "https://github.com/kaz-utashiro/App-ansiecho"
       }
    },
-   "version" : "1.02",
+   "version" : "1.03",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.07",
+   "x_serialization_backend" : "JSON::PP version 4.12",
    "x_static_install" : 1
 }

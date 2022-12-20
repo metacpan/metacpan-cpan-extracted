@@ -1,5 +1,17 @@
 Revision history for Object-Pad-ClassAttr-Struct
 
+0.05    2022-12-20
+        [CHANGES]
+         * Support `:Struct(readonly)` for declaring non-mutable structure
+           types
+
+0.04    2022-12-16
+        [CHANGES]
+         * Provide a positional-values constructor into every class
+
+        [BUGFIXES]
+         * Account for exception message changes in recent Object::Pad version
+
 0.03    2022-02-01
         [CHANGES]
          * Updated for Object::Pad 0.60

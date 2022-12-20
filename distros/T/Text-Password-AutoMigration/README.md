@@ -6,7 +6,7 @@ Text::Password::AutoMigration - generate and verify Password with any contexts
 # SYNOPSIS
 
     my $pwd = Text::Password::AutoMigration->new();
-    my( $raw, $hash ) = $pwd->genarate();          # list context is required
+    my( $raw, $hash ) = $pwd->generate();          # list context is required
     my $input = $req->body_parameters->{passwd};
     my $data = $pwd->encrypt($input);              # you don't have to care about salt
     my $flag = $pwd->verify( $input, $data );
@@ -35,7 +35,7 @@ No arguments are required. But you can set some parameters.
 
     You can set default length with using 'default' argument like below:
 
-        $pwd = Text::Pasword::AutoMiglation->new( default => 8 );
+    $pwd = Text::Password::AutoMiglation->new( default => 8 );
 
     It must be an Int, defaults to 10.
 
@@ -43,7 +43,7 @@ No arguments are required. But you can set some parameters.
 
     You can set default strength for password with usnig 'readablity' argument like below:
 
-        $pwd = Text::Pasword::AutoMiglation->new( readability => 0 );
+    $pwd = Text::Password::AutoMiglation->new( readability => 0 );
 
     It must be a Boolean, defaults to 1.
 
@@ -55,7 +55,7 @@ No arguments are required. But you can set some parameters.
 
     If you've already replaced all hash or started to make new applications with this module,
 
-    you can call the constructor with _migrate =< 0_.
+    you can call the constructor with _migrate => 0_.
 
     Then _verify()_ would not return a new hash but always 1.
 
@@ -69,40 +69,44 @@ To tell the truth, this is the most useful method of this module.
 
 it Returns a true strings instead of boolean if the verification succeeds.
 
-Every value is **brand new hash from SHA-512** because it is true anyway.
+Every value is **brand new hash from SHA-512**
+because it is actually true in Perl anyway.
 
 So you can replace hash in your Database easily like below:
 
     my $pwd = Text::Password::AutoMigration->new();
+
     my $dbh = DBI->connect(...);
     my $db_hash_ref = $dbh->fetchrow_hashref(...);
-
     my $param = $req->body_parameters;
+
     my $hash = $pwd->verify( $param->{passwd}, $db_hash_ref->{passwd} );
-    if ($hash) { # you don't have to execute this every time
+    my $verified = length $hash;
+    if ( $verified ) { # don't have to execute it every time
        my $sth = $dbh->prepare('UPDATE DB SET passwd=? WHERE uid =?') or die $dbh->errstr;
        $sth->excute( $hash, $param->{uid} ) or die $sth->errstr;
     }
 
-New hash length is at least 100 if length of nonce . So you have to change your DB like below:
+New hash length is 100 (if it defaults).
+So you have to change the Table with like below:
 
-    ALTER TABLE User CHANGE passwd passwd VARCHAR(100);
+    ALTER TABLE User MODIFY passwd VARCHAR(100);
 
 ### nonce( _Int_ )
 
 generates the random strings with enough strength.
 
-the length defaults to 10 or $self->default().
+the length defaults to 10 || $self->default().
 
 ### encrypt( _Str_ )
 
-returns hash with unix\_sha512\_crypt().
+returns hash with unix\_sha512\_crypt()
 
-salt will be made automatically.
+enough strength salts will be made automatically.
 
 ### generate( _Int_ )
 
-genarates pair of new password and it's hash.
+generates pair of new password and its hash.
 
 less readable characters(0Oo1Il|!2Zz5sS$6b9qCcKkUuVvWwXx.,:;~-^'"\`) are forbidden
 unless $self->readability is 0.

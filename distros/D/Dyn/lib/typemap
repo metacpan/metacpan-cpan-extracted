@@ -22,18 +22,20 @@ DClonglong  LONG_LONG_INT
 DCfloat     T_FLOAT
 DCdouble    T_DOUBLE
 DCpointer * T_PTROBJ_SPECIAL
-DCstruct  * T_PTROBJ_SPECIAL
+DCpointer   T_PTROBJ_SPECIAL
+
+DCaggr  *       T_PTROBJ_AGGREGATE
+const DCaggr  * T_PTROBJ_AGGREGATE
 DCsigchar * T_PV
 const DCsigchar * T_PV
-DCValue   * T_PTRREF
+DCsigchar T_CHAR
+const DCsigchar T_CHAR
 DLLib     * T_PTROBJ_SPECIAL
 DLSyms    * T_PTRREF
 DCValue   * T_PTRREF
 DCValue     T_PTRREF
-
-DCValue * T_PTRREF
-DCpointer T_PTROBJ_SPECIAL
-const DCsigchar T_CHAR
+DCfield   * T_PTRREF
+DCArgs    * T_PTRREF
 
 DCCallback * T_PTROBJ_SPECIAL
 DCCallbackHandler * T_PTRREF
@@ -47,12 +49,41 @@ LONG_LONG_INT
 
 T_PTROBJ_SPECIAL
   // $Package | $type | $ntype
-  if (sv_derived_from($arg, \"Dyn::${(my $ntt=$ntype)=~s/_/::/g;$ntt=~s[(?:VM)?Ptr$][];$ntt=~s[^DC][];\$ntt}\")){
+  if (sv_derived_from($arg, \"Dyn::${
+        (my $ntt=$ntype)=~s/_+/::/g;
+        $ntt=~s[Ptr$][];
+        $ntt=~s[^DCpointer][Call::Pointer];
+        $ntt=~s[^DCCallback][Callback];
+        $ntt=~s[^DCCallVM][Call];
+        $ntt=~s[^DCC][Callback::];
+        $ntt=~s[^DC][Call::];
+        $ntt=~s[^DL][Load::];
+        \$ntt
+        }\")){
     IV tmp = SvIV((SV*)SvRV($arg));
     $var = INT2PTR($type, tmp);
   }
   else
-    croak(\"$var is not of type Dyn::${(my $ntt=$ntype)=~s/_/::/g;$ntt=~s[(?:VM)?Ptr$][];$ntt=~s[^DC][];\$ntt}\");
+    croak(\"$var is not of type Dyn::${
+        (my $ntt=$ntype)=~s/_+/::/g;
+        $ntt=~s[Ptr$][];
+        $ntt=~s[^DCpointer][Call::Pointer];
+        $ntt=~s[^DCCallback][Callback];
+        $ntt=~s[^DCCallVM][Call];
+        $ntt=~s[^DCC][Callback::];
+        $ntt=~s[^DC][Call::];
+        $ntt=~s[^DL][Load::];
+        \$ntt
+        }\");
+
+T_PTROBJ_AGGREGATE
+  // $Package | $type | $ntype
+  if (sv_derived_from($arg, \"Dyn::Call::Aggregate\")){
+    IV tmp = SvIV((SV*)SvRV($arg));
+    $var = INT2PTR($type, tmp);
+  }
+  else
+    croak(\"$var is not of type Dyn::Call::Aggregate\");
 
 T_DYN
   if (sv_derived_from($arg, \"Dyn\")) {
@@ -71,8 +102,22 @@ LONG_LONG_INT
 
 T_PTROBJ_SPECIAL
   // $Package | $type | $ntype
-  sv_setref_pv($arg, \"Dyn::${(my $ntt=$ntype)=~s/_/::/g;$ntt=~s[(?:VM)?Ptr$][];$ntt=~s[^DC][];\$ntt}\",
-               (void*)$var);
+  sv_setref_pv($arg,
+    \"Dyn::${
+        (my $ntt=$ntype)=~s/_+/::/g;
+        $ntt=~s[Ptr$][];
+        $ntt=~s[^DCpointer][Call::Pointer];
+        $ntt=~s[^DCCallback][Callback];
+        $ntt=~s[^DCCallVM][Call];
+        $ntt=~s[^DCC][Callback::];
+        $ntt=~s[^DC][Call::];
+        $ntt=~s[^DL][Load::];
+        \$ntt
+        }\", (void*)$var);
+
+T_PTROBJ_AGGREGATE
+  // $Package | $type | $ntype
+  sv_setref_pv($arg, \"Dyn::Call::Aggregate\", (void*)$var);
 
 T_DYN
   sv_setref_pv($arg, \"Dyn\", (void*)$var);

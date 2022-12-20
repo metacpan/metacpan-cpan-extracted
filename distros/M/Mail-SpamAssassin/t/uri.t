@@ -1,24 +1,18 @@
 #!/usr/bin/perl -w -T
 
-BEGIN {
-  if (-e 't/test_dir') { # if we are running "t/rule_tests.t", kluge around ...
-    chdir 't';
-  }
-
-  if (-e 'test_dir') {            # running from test directory, not ..
-    unshift(@INC, '../blib/lib');
-  }
-}
-
-my $prefix = '.';
-if (-e 'test_dir') {            # running from test directory, not ..
-  $prefix = '..';
-}
-
 use strict;
-use Test::More tests => 102;
+use Test::More;
 use lib '.'; use lib 't';
 use SATest; sa_t_init("uri");
+
+use constant HAS_LIBIDN => eval { require Net::LibIDN; };
+use constant HAS_LIBIDN2 => eval { require Net::LibIDN2; };
+
+my $tests = 104;
+$tests += 7 if (HAS_LIBIDN);
+$tests += 7 if (HAS_LIBIDN2);
+
+plan tests => $tests;
 
 use Mail::SpamAssassin;
 use Mail::SpamAssassin::HTML;
@@ -26,13 +20,10 @@ use Mail::SpamAssassin::Util;
 
 ##############################################
 
-
-tstlocalrules ('
-
+tstlocalrules ("
   util_rb_2tld live.com
   util_rb_3tld three.3ldlive.com
-
-');
+");
 
 # initialize SpamAssassin
 my $sa = create_saobj({'dont_copy_prefs' => 1,
@@ -116,6 +107,33 @@ ok(try_domains('http://foo..bar@example.com', 'example.com'));
 ok(try_domains('bar..example.com', undef));
 ok(try_domains('http://example..com', undef));
 
+sub try_libidn {
+  ok(try_domains("Cin\x{E9}ma.ca", 'xn--cinma-dsa.ca'));
+  ok(try_domains("marcaespa\x{F1}a.es", 'xn--marcaespaa-19a.es'));
+  ok(try_domains("\x{E4}k\x{E4}slompolo.fi", 'xn--kslompolo-u2ab.fi'));
+  ok(try_domains("\N{U+00E4}k\N{U+00E4}slompolo.fi", 'xn--kslompolo-u2ab.fi'));
+  ok(try_domains("\x{C3}\x{A4}k\x{C3}\x{A4}slompolo.fi", 'xn--kslompolo-u2ab.fi'));
+  ok(try_domains("foo.xn--fiqs8s", 'foo.xn--fiqs8s'));
+  ok(try_domains("foo\x2e\xe9\xa6\x99\xe6\xb8\xaf", 'foo.xn--j6w193g'));
+}
+
+if (HAS_LIBIDN) {
+  $Mail::SpamAssassin::Util::have_libidn = 1;
+  $Mail::SpamAssassin::Util::have_libidn2 = 0;
+  try_libidn();
+}
+if (HAS_LIBIDN2) {
+  $Mail::SpamAssassin::Util::have_libidn = 0;
+  $Mail::SpamAssassin::Util::have_libidn2 = 1;
+  try_libidn();
+}
+
+# Without LibIDN, should not produce results,
+# as is_fqdn_valid() will fail
+$Mail::SpamAssassin::Util::have_libidn = 0;
+$Mail::SpamAssassin::Util::have_libidn2 = 0;
+ok(try_domains("Cin\x{E9}ma.ca", undef));
+
 ##############################################
 
 sub array_cmp {
@@ -130,7 +148,7 @@ sub array_cmp {
 sub try_canon {
   my($input, $expect) = @_;
   my $redirs = $sa->{conf}->{redirector_patterns};
-  my @input = sort { $a cmp $b } Mail::SpamAssassin::Util::uri_list_canonify($redirs, @{$input});
+  my @input = sort { $a cmp $b } Mail::SpamAssassin::Util::uri_list_canonicalize($redirs, $input, $sa->{registryboundaries});
   my @expect = sort { $a cmp $b } @{$expect};
 
   # output what we want/get for debugging
@@ -283,6 +301,12 @@ ok (try_canon([
    ], [
    'http://foo/',
    'http://www.foo.com/',
+       ]));
+# Bug 7891
+ok (try_canon([
+   'http://www.ch/',
+   ], [
+   'http://www.ch/'
        ]));
 
 ##############################################

@@ -37,7 +37,7 @@ use warnings 'once';
 use Carp;
 use Storable ();
 
-our $VERSION = '0.31';
+our $VERSION = '0.34';
 
 use UI::Various::language::en;
 
@@ -497,7 +497,7 @@ sub fatal($;@)
 
 =head3 example:
 
-    warning(1, 'message__1_missing_in__2', $message_id, $UI->{language});
+    warning('message__1_missing_in__2', $message_id, $UI->{language});
 
 =head3 parameters:
 

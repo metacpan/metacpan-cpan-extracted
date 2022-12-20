@@ -78,12 +78,6 @@ sub process {
       $self->rescan($doc); } }
   return @docs; }
 
-# Try to preserve the original form & case of the provided Bibkeys
-# HOWEVER, we downcase them before indexing & looking them up!!!!
-sub normalizeBibKey {
-  my ($key) = @_;
-  return lc($key); }
-
 # ================================================================================
 # Bibliographies can be specified either
 #  within the document (on ltx:bibliography, due to \bibliography{foo}
@@ -98,9 +92,9 @@ sub normalizeBibKey {
 # In principle, we ought to look for named files also in the file cache (eg. from {filecontents})
 sub getBibliographies {
   my ($self, $doc) = @_;
-  my @bibnames = ();
-  my $fromBibliography = 0; # coming from an 'ltx:bibliography'
-  # use the commandline bibliographies, if explicitly given.
+  my @bibnames         = ();
+  my $fromBibliography = 0;    # coming from an 'ltx:bibliography'
+                               # use the commandline bibliographies, if explicitly given.
   if ($$self{bibliographies} && scalar(@{ $$self{bibliographies} })) {
     @bibnames = @{ $$self{bibliographies} }; }
   else {
@@ -109,7 +103,7 @@ sub getBibliographies {
       || $bibnode->parentNode->getAttribute('files')    # !!!!!
     ) {
       $fromBibliography = 1;
-      @bibnames = split(',', $files); } }
+      @bibnames         = split(',', $files); } }
   my @paths   = $doc->getSearchPaths;
   my @bibs    = ();
   my @rawbibs = ();
@@ -128,7 +122,7 @@ sub getBibliographies {
       push(@rawbibs, $bib);
       next; }
     elsif ($bib =~ /\.xml$/) {
-      $bibdoc = $doc->newFromFile($bib); }                 # doc will do the searching...
+      $bibdoc = $doc->newFromFile($bib); }    # doc will do the searching...
     elsif ($bib =~ /\.bib(?:\.xml)?$/ || $fromBibliography) {
       # NOTE: We should also use kpsewhich to get the effects of $BIBINPUTS?
       # NOTE: When better integrated with Core, should also check for cached bib documents.
@@ -189,8 +183,8 @@ sub convertBibliography {
   require LaTeXML::Common::Config;
   my @preload = ();    # custom macros often used in e.g. howpublished field
                        # need to preload all packages used by the main article
-  my ($classdata, @packages) = $self->find_documentclass_and_packages($doc);
-  my ($class, $classoptions) = @$classdata;
+  my ($classdata, @packages)     = $self->find_documentclass_and_packages($doc);
+  my ($class,     $classoptions) = @$classdata;
   if ($class) {
 
     if ($classoptions) {
@@ -216,6 +210,7 @@ sub convertBibliography {
     whatsout       => 'document',
     includestyles  => 1,
     bibliographies => [],
+    paths          => $$doc{searchpaths},
     (@preload ? (preload => [@preload]) : ()));
   my $bib_converter = LaTeXML->get_converter($bib_config);
   # Tricky and HACKY, we need to release the log to capture the inner workings separately.
@@ -252,6 +247,7 @@ sub convertBibliography {
 # and then check whether author+year is unique!!!
 # Returns a list of hashes containing:
 #  bibkey : the bibliographic entry's key
+#  citedkey : the key as cited (can be different in case)
 #  bibentry : the bibentry node
 #  citations : array of bib keys that are cited somewhere within this bibentry
 #  referrers : array of ID's of places that refer to this bibentry
@@ -263,28 +259,30 @@ sub convertBibliography {
 sub getBibEntries {
   my ($self, $doc, $bib) = @_;
 
-  # First, scan the bib files for all ltx:bibentry's, (hash key is bibkey)
+  # First, scan the bib files for all ltx:bibentry's,
+  # %entries is  a hash with the key in lowercase!
   # Also, record the citations from each bibentry to others.
   my %entries = ();
   foreach my $bibdoc ($self->getBibliographies($doc)) {
     my @lists = split(/\s+/, $doc->findnode('//ltx:bibliography')->getAttribute('lists') || 'bibliography');
     foreach my $bibentry ($bibdoc->findnodes('//ltx:bibentry')) {
-      my $bibkey = normalizeBibKey($bibentry->getAttribute('key'));
-      my $bibid  = $bibentry->getAttribute('xml:id');
-      $entries{$bibkey}{bibkey}    = $bibkey;
-      $entries{$bibkey}{bibentry}  = $bibentry;
-      $entries{$bibkey}{citations} = [map { normalizeBibKey($_) } grep { $_ } map { split(',', $_->value) }
+      my $bibkey   = $bibentry->getAttribute('key');
+      my $lcbibkey = lc($bibkey);
+      my $bibid    = $bibentry->getAttribute('xml:id');
+      $entries{$lcbibkey}{bibkey}    = $bibkey;
+      $entries{$lcbibkey}{bibentry}  = $bibentry;
+      $entries{$lcbibkey}{citations} = [grep { $_ } map { split(',', $_->value) }
           $bibdoc->findnodes('.//@bibrefs', $bibentry)]; } }
   # Now, collect all bibkeys that were cited in other documents (NOT the bibliography)
   # And note any referrers to them (also only those outside the bib)
   my @lists    = split(/\s+/, $bib->getAttribute('lists') || 'bibliography');
   my $citestar = grep { $$self{db}->lookup("BIBLABEL:$_:*"); } @lists;
-
-  my @queue = ();
+  my @queue    = ();
   foreach my $dbkey ($$self{db}->getKeys) {
     if ($dbkey =~ /^BIBLABEL:(.*?):(.*)$/) {
       my ($list, $bibkey) = ($1, $2);
       next unless grep { $_ eq $list; } @lists;
+      my $lcbibkey   = lc($bibkey);
       my $bibdbentry = $$self{db}->lookup($dbkey);
       if (my $referrers = $bibdbentry->getValue('referrers')) {
         foreach my $refr (keys %$referrers) {
@@ -295,11 +293,14 @@ sub getBibEntries {
             Warn('expected', 'entry', undef,
               "Didn't find an entry for reference id=$rid"); }
           elsif ($t ne 'ltx:bibitem') {
-            $entries{$bibkey}{referrers}{$refr} = 1; } }
-        push(@queue, $bibkey) if keys %{ $entries{$bibkey}{referrers} }; }
-      elsif ($citestar) {    # If \cite{*} include all of them.
+            if (my $prevkey = $entries{$lcbibkey}{citedkey}) {
+              Warn('unexpected', 'bibkey', undef,
+                "Case mismatch in bib key '$prevkey' vs '$bibkey'") if $prevkey ne $bibkey; }
+            $entries{$lcbibkey}{citedkey} = $bibkey;            # Store bibkey with case as CITED
+            $entries{$lcbibkey}{referrers}{$refr} = 1; } }
+        push(@queue, $bibkey) if keys %{ $entries{$lcbibkey}{referrers} }; }
+      elsif ($citestar) {                                       # If \cite{*} include all of them.
         push(@queue, $bibkey); } } }
-
   # For each bibkey in the queue, complete and include the entry
   # And add any keys cited from within each include entry
   my %seen_keys    = ();
@@ -309,8 +310,9 @@ sub getBibEntries {
     next if $seen_keys{$bibkey};    # Done already.
     $seen_keys{$bibkey} = 1;
     next if $bibkey eq '*';
-    if (my $bibentry = $entries{$bibkey}{bibentry}) {
-      my $entry = $entries{$bibkey};
+    my $lcbibkey = lc($bibkey);
+    if (my $bibentry = $entries{$lcbibkey}{bibentry}) {
+      my $entry = $entries{$lcbibkey};
       # Extract names, year and title from bibentry.
       my $names     = '';
       my $sortnames = '';
@@ -343,7 +345,7 @@ sub getBibEntries {
   foreach my $sortkey (keys %$included) {
     my $entry  = $$included{$sortkey};
     my $bibkey = $$entry{bibkey};
-    map { $entries{ normalizeBibKey($_) }{bibreferrers}{$bibkey} = 1 } @{ $$entry{citations} }; }
+    map { $entries{ lc($_) }{bibreferrers}{$bibkey} = 1 } @{ $$entry{citations} }; }
 
   NoteLog("MakeBibliography: " . (scalar keys %entries) . " bibentries, " . (scalar keys %$included) . " cited");
   Warn('expected', 'bibkeys', undef,
@@ -401,6 +403,7 @@ sub makeBibliographyList {
 sub formatBibEntry {
   my ($self, $doc, $bib, $entry) = @_;
   my $bibentry   = $$entry{bibentry};
+  my $citedkey   = $$entry{citedkey} || $$entry{bibkey};
   my $id         = $bibentry->getAttribute('xml:id');
   my $key        = $bibentry->getAttribute('key');
   my $type       = $bibentry->getAttribute('type');
@@ -494,7 +497,7 @@ sub formatBibEntry {
         $aa = substr($aa, 0, 3) . "+"; } }
     else {
       $aa = uc(substr($rfnames[0]->textContent, 0, 3)); }
-    my $yrtext = (@year ? join('', map { (ref $_ ? $_->textContent : $_); } @year) : '');
+    my $yrtext = (@year                ? join('', map { (ref $_ ? $_->textContent : $_); } @year) : '');
     my $yy     = (length($yrtext) >= 2 ? substr($yrtext, 2, 2) : $yrtext);
     push(@tags, ['ltx:tag', { role => 'refnum', class => 'ltx_bib_abbrv', open => '[', close => ']' },
         $aa . $yy . ($$entry{suffix} || '')]); }
@@ -538,7 +541,7 @@ sub formatBibEntry {
   push(@blocks, ['ltx:bibblock', { class => 'ltx_bib_cited' },
       "Cited by: ", $doc->conjoin(",\n", @citedby), '.']) if @citedby;
 
-  return ['ltx:bibitem', { 'xml:id' => $id, key => $key, type => $type, class => "ltx_bib_$type" },
+  return ['ltx:bibitem', { 'xml:id' => $id, key => $citedkey, type => $type, class => "ltx_bib_$type" },
     (@tags ? (['ltx:tags', {}, @tags]) : ()),
     @blocks]; }
 
@@ -638,7 +641,7 @@ sub do_crossref {
   return (['ltx:cite', {},
       ['ltx:bibref', { bibrefs => $node->getAttribute('bibrefs'), show => 'title, author' }]]); }
 
-my $LINKS =                                       # CONSTANT
+my $LINKS =    # CONSTANT
   "ltx:bib-links | ltx:bib-review | ltx:bib-identifier | ltx:bib-url";
 
 sub do_links {
@@ -777,10 +780,10 @@ sub do_links {
     @META_BLOCK],
   website =>
     [[['ltx:bib-name[@role="author"]', '', '', 'author', \&do_authors, ''],
-      ['ltx:bib-name[@role="editor"]',      '', '', 'editor', \&do_editorsA, ''],
-      ['ltx:bib-date[@role="publication"]', '', '', 'year',   \&do_year,     ''],
-      ['ltx:title',                         '', '', 'title',  \&do_any,      ''],
-      ['ltx:bib-type',                      '', '', 'type',   \&do_any,      ''],
+      ['ltx:bib-name[@role="editor"]',      '', '', 'editor', \&do_editorsA,          ''],
+      ['ltx:bib-date[@role="publication"]', '', '', 'year',   \&do_year,              ''],
+      ['ltx:title',                         '', '', 'title',  \&do_any,               ''],
+      ['ltx:bib-type',                      '', '', 'type',   \&do_any,               ''],
       ['! ltx:bib-type',                    '', '', 'type',   sub { ('(Website)'); }, '']],
     [['ltx:bib-organization', ', ', ' ', 'publisher', \&do_any, ''],
       ['ltx:bib-place', ', ', '', 'place', \&do_any, ''],

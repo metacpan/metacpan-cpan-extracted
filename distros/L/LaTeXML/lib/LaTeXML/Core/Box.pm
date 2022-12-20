@@ -31,6 +31,10 @@ sub Box {
   $font    = $STATE->lookupValue('font')               unless defined $font;
   $locator = $STATE->getStomach->getGullet->getLocator unless defined $locator;
   $tokens  = LaTeXML::Core::Token::T_OTHER($string) if $string && !defined $tokens;
+  if ($properties{isSpace} && ($properties{width} || $properties{height} || $properties{depth})) {
+    $properties{width}  = Dimension(0) unless defined $properties{width};
+    $properties{height} = Dimension(0) unless defined $properties{height};
+    $properties{depth}  = Dimension(0) unless defined $properties{depth}; }
   my $state = $STATE;
   if ($state->lookupValue('IN_MATH')) {
     my $attr      = (defined $string) && $state->lookupValue('math_token_attributes_' . $string);
@@ -117,6 +121,15 @@ sub beAbsorbed {
   my ($self, $document) = @_;
   my $string = $$self{string};
   my $mode   = $$self{properties}{mode} || 'text';
+
+  # Guard via the absorb limit to avoid infinite loops
+  if ($LaTeXML::ABSORB_LIMIT) {
+    my $absorb_counter = $STATE->lookupValue('absorb_count') || 0;
+    $STATE->assignValue(absorb_count => ++$absorb_counter, 'global');
+    if ($absorb_counter > $LaTeXML::ABSORB_LIMIT) {
+      Fatal('timeout', 'absorb_limit', $self,
+        "Whatsit absorb limit of $LaTeXML::ABSORB_LIMIT exceeded, infinite loop?"); } }
+
   return (((defined $string) && ($string ne '')) || $$self{properties}{width}    # ?
     ? ($mode eq 'math'
       ? $document->insertMathToken($string, %{ $$self{properties} })
@@ -239,6 +252,7 @@ sub showSize {
 # Eventually, this needs to link into real font data
 sub computeSizeStore {
   my ($self, %options) = @_;
+  no warnings 'recursion';
   my $props = $self->getPropertiesRef;
   $options{width}   = $$props{width}   if $$props{width};
   $options{height}  = $$props{height}  if $$props{height};
@@ -253,6 +267,8 @@ sub computeSizeStore {
 
 sub computeSize {
   my ($self, %options) = @_;
+  if (my $body = $self->getProperty('body')) {
+    return $body->computeSize(%options); }
   my $font = $self->getProperty('font') || LaTeXML::Common::Font->textDefault;
   return $font->computeStringSize($$self{string}, %options); }
 

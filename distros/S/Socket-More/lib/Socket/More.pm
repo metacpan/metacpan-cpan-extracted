@@ -193,6 +193,8 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 	if_nameindex
 	has_IPv4_interface
 	has_IPv6_interface
+  reify_ports
+  reify_ports_unshared
 
 ) ] );
 
@@ -203,7 +205,7 @@ our @EXPORT = qw(
 	
 );
 
-our $VERSION = '0.2.0';
+our $VERSION = '0.3.0';
 
 sub getifaddrs;
 sub AUTOLOAD {
@@ -405,6 +407,7 @@ sub sockaddr_passive{
 
 
 	#Validate Family and fill out port and path
+  no warnings "uninitialized";
 	my @output;
 	for my $interface (@interfaces){
 		my $fam= sockaddr_family($interface->{addr});
@@ -524,7 +527,7 @@ sub parse_passive_spec {
 					if(/(.*):(.*)$/){
 						#TCP and ipv4 only
 						$spec{address}=[$1];
-						$spec{port}=[$2];
+						$spec{port}=length($2)?[$2]:[];
 
 						if($spec{address}[0] =~ /localhost/){
 							#do not set family
@@ -644,6 +647,56 @@ sub has_IPv6_interface{
 	my @results=sockaddr_passive $spec;
 	
 	@results>=1;
+
+}
+
+sub _reify_ports {
+
+    my $shared=shift;
+    #if any specs contain a 0 for the port number, then perform a bind to get one from the OS.
+    #Then close the socket, an hope that no one takes it :)
+    
+    my $port;
+    map {
+      if(defined($_->{port}) and $_->{port}==0){
+        if($shared and defined $port){
+          $_->{port}=$port;
+        }
+        else{
+          #attempt a bind 
+          die "Could not create socket to reify port" unless CORE::socket(my $sock, $_->{family}, $_->{type}, 0);
+          die "Could not set reuse address flag" unless setsockopt $sock, SOL_SOCKET,SO_REUSEADDR,1;
+          die "Could not bind socket to reify port" unless bind($sock, $_->{addr});
+          my $name=getsockname $sock;
+
+          my ($err, $a, $port)=getnameinfo($name, NI_NUMERICHOST);
+
+          unless($err){
+            $_->{port}=$port;
+          }
+          close $sock;
+        }
+      }
+
+      $_;
+    }
+
+
+    sockaddr_passive @_;
+
+}
+sub reify_ports {
+    _reify_ports 1, @_;
+}
+sub reify_ports_unshared {
+    _reify_ports 0, @_;
+}
+
+sub sockaddr_valid {
+	#Determin if the sock address is still a valid passive address
+}
+
+sub monitor {
 
 }
 

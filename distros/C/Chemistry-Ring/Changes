@@ -1,5 +1,12 @@
 Revision history for Perl extension Chemistry::Ring
 
+0.21  Dec 16 2022
+        - Fixed incompatibility with Statistics::Regression v0.52.
+        - Switched to Dist::Zilla.
+        - Adjusted URLs in documentation, as the source has been hosted on
+          GitHub.
+        - New co-maintainer Andrius Merkys <merkys@cpan.org>.
+
 0.20  May 10 2009
         - Silence some warnings.
         - Minor changes by Liliana Felix Avila for compatibility with 

@@ -14,7 +14,8 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Acme-Cavaspazi",
   "EXE_FILES" => [
-    "bin/cavaspazi"
+    "bin/cavaspazi",
+    "bin/solospazi"
   ],
   "LICENSE" => "mit",
   "MIN_PERL_VERSION" => "5.012",
@@ -27,7 +28,7 @@ my %WriteMakefileArgs = (
     "PerlIO::encoding" => 0,
     "Pod::Usage" => 0
   },
-  "VERSION" => "0.0.8",
+  "VERSION" => "1.0.0",
   "test" => {
     "TESTS" => "t/*.t"
   }

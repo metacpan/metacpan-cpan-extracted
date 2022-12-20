@@ -1,8 +1,11 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::perl::modname_pm;
 
-our $DATE = '2022-09-11'; # DATE
-our $VERSION = '0.045'; # VERSION
+# preamble code
+no warnings 'experimental::regex_sets';
+
+our $DATE = '2022-12-16'; # DATE
+our $VERSION = '0.046'; # VERSION
 
 our $rschema = do{my$var={base=>"str",clsets_after_base=>[{description=>"\nThis is just like the `perl::modname` schema except that instead of to\n`Foo::Bar`, it normalizes to `Foo/Bar.pm`.\n\n",examples=>[{valid=>0,value=>""},{valid=>1,validated_value=>"Foo/Bar.pm",value=>"Foo::Bar"},{valid=>1,validated_value=>"Foo/Bar.pm",value=>"Foo-Bar"},{valid=>1,validated_value=>"Foo/Bar.pm",value=>"Foo/Bar"},{valid=>1,value=>"Foo/Bar.pm"},{valid=>1,validated_value=>"Foo/Bar.pm",value=>"Foo.Bar"},{valid=>0,value=>"Foo|Bar"}],match=>"\\A(?:[A-Za-z_][A-Za-z_0-9]*(/[A-Za-z_0-9]+)*\\.pm)\\z",prefilters=>["Perl::normalize_perl_modname_pm"],summary=>"Perl module name in Foo/Bar.pm form","x.completion"=>"perl_modname"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["str"],type=>"str",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
@@ -21,7 +24,7 @@ Sah::SchemaR::perl::modname_pm - Perl module name in Foo/Bar.pm form
 
 =head1 VERSION
 
-This document describes version 0.045 of Sah::SchemaR::perl::modname_pm (from Perl distribution Sah-Schemas-Perl), released on 2022-09-11.
+This document describes version 0.046 of Sah::SchemaR::perl::modname_pm (from Perl distribution Sah-Schemas-Perl), released on 2022-12-16.
 
 =head1 DESCRIPTION
 

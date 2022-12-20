@@ -11,6 +11,7 @@ requires "perl" => "5.024";
 
 on 'test' => sub {
     requires "File::Spec" => "0";
+    requires "Test::Exception" => "0";
     requires "Test::LongString" => "0";
     requires "Test::More" => "0";
 };

@@ -6,6 +6,12 @@ Home page:    <https://metacpan.org/release/Sub-HandlesVia>
 Bug tracker:  <https://github.com/tobyink/p5-sub-handlesvia/issues>
 Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
 
+0.046	2022-12-16
+
+ - Added: Sub::HandlesVia::HandlerLibrary::Enum module.
+ - Handler libraries can now provide constants for shortcuts.
+ - Updated: Rebuild with latest Mite.
+
 0.045	2022-11-08
 
  [ Bug Fixes ]

@@ -1,5 +1,12 @@
 Revision history for Tickit-Widget-Tabbed
 
+0.027     2022-12-14
+          [CHANGES]
+           * Updated for Object::Pad v0.73
+              + Use `field NAME = EXPR` syntax
+              + Use `ADJUST :params`
+              + Set `:strict(params)`
+
 0.026     2022-02-07
           [CHANGES]
            * Updates for perl 5.35.9:

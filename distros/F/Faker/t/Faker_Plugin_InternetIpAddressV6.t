@@ -126,11 +126,11 @@ $test->for('example', 1, 'execute', sub {
   ok $result->isa('Faker::Plugin::InternetIpAddressV6');
   ok $result->faker;
   ok $result->faker->random->reseed($seed);
-  ok $result->faker->random->make; # reset randomizer
+  ok $result->faker->random->pick; # reset randomizer
   is $result->execute, "57bb:1c70:6c1e:14c3:db3f:7fb1:7a93:b0d9";
-  ok $result->faker->random->make; # reset randomizer
+  ok $result->faker->random->pick; # reset randomizer
   is $result->execute, "7680:93e0:88b2:06a0:c512:99e4:e8a9:7d48";
-  ok $result->faker->random->make; # reset randomizer
+  ok $result->faker->random->pick; # reset randomizer
   is $result->execute, "7f27:7009:5984:ec03:0f75:dc22:f8d4:d951";
 
   $result

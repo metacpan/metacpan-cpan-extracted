@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 =encoding utf-8
 
@@ -121,7 +121,7 @@ Patrick Joly C<< <patjol@cpan.org> >>.
 
 =head1 VERSION
 
-1.05
+1.06
 
 =head1 LICENSE AND COPYRIGHT
 

@@ -1,9 +1,10 @@
 ---
-abstract: 'dyncall Backed FFI'
+X_No_Archive: Yes
+abstract: 'dyncall-Backed FFI Building Blocks'
 author:
   - 'Sanko Robinson <sanko@cpan.org>'
 build_requires:
-  Test2::V0: '0'
+  Data::Dumper: '0'
   Test::More: '0.98'
 configure_requires:
   Archive::Tar: '0'
@@ -18,14 +19,12 @@ configure_requires:
   File::Path: '0'
   File::Spec::Functions: '0'
   Getopt::Long: '2.36'
-  HTTP::Tiny: '0'
   IO::Uncompress::Unzip: '0'
   JSON::PP: '2'
   Module::Build::Tiny: '0.035'
-  Module::Load::Conditional: '0'
   Path::Tiny: '0'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.12, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.20, CPAN::Meta::Converter version 2.150010'
 license: artistic_2
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -41,34 +40,32 @@ no_index:
     - examples
     - author
     - builder
-optional_features:
-  object_pad:
-    description: 'Object::Pad support'
-    requires:
-      Object::Pad: '0.57'
 provides:
   Dyn:
     file: lib/Dyn.pm
-    version: '0.03'
+    version: '0.05'
   Dyn::Call:
     file: lib/Dyn/Call.pm
-    version: '0.03'
+    version: '0.05'
   Dyn::Callback:
     file: lib/Dyn/Callback.pm
-    version: '0.03'
+    version: '0.05'
   Dyn::Load:
     file: lib/Dyn/Load.pm
-    version: '0.03'
-  Dyn::Sugar:
-    file: lib/Dyn/Sugar.pm
-    version: '0.03'
+    version: '0.05'
 requires:
+  Attribute::Handlers: '0'
+  Config: '0'
+  File::Spec: '0'
+  Sub::Util: '0'
+  Text::ParseWords: '0'
+  XSLoader: '0'
   perl: '5.030'
 resources:
   bugtracker: https://github.com/sanko/Dyn.pm/issues
   homepage: https://github.com/sanko/Dyn.pm
-  repository: git://github.com/sanko/Dyn.pm.git
-version: '0.03'
+  repository: https://github.com/sanko/Dyn.pm.git
+version: '0.05'
 x_authority: cpan:SANKO
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 0

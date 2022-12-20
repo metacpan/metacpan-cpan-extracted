@@ -1,3 +1,9 @@
+0.046   2022-12-16  Released-By: PERLANCAR; Urgency: medium
+
+        - Add schemas:
+          perl::identifier::{qualified,unqualified}_{ascii,unicode}.
+
+
 0.045   2022-09-11  Released-By: PERLANCAR; Urgency: medium
 
         - [bugfix] Fix off-by-one bug in wildcard expansion coerce rules.

@@ -37,7 +37,7 @@ use utf8;
 use Log::Any qw($log);
 use Carp;
 
-use constant VERSION => '22.11';
+use constant VERSION => '22.12';
 
 =head1 Name
 
@@ -57,7 +57,7 @@ default: 180
 
 String. custom UserAgent header
 
-default: Swagger-Codegen/22.11/perl
+default: Swagger-Codegen/22.12/perl
 
 =item api_key: (optional)
 
@@ -116,7 +116,7 @@ sub new {
 
 	# class/static variables
 	$p{http_timeout} //= 180;
-	$p{http_user_agent} //= 'Swagger-Codegen/22.11/perl';
+	$p{http_user_agent} //= 'Swagger-Codegen/22.12/perl';
 
 	# authentication setting
 	$p{api_key} //= {};

@@ -1,3 +1,9 @@
+1.000 Dec 18 2022
+	- whitespace is now stripped completely from map string
+	- add get_class_of_object method to Game::TileMap objects
+	- to_string_and_mark now uses exclamation mark by default (instead of at symbol)
+	- module now supports multiple wall and void objects (as opposed to just one before)
+
 0.002 Nov 21 2022
 	- fix check_ routines checking tile contents, not the type
 

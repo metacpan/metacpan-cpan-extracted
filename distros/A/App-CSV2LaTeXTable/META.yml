@@ -4,6 +4,7 @@ author:
   - 'Renee Baecker <reneeb@cpan.org>'
 build_requires:
   File::Spec: '0'
+  Test::Exception: '0'
   Test::LongString: '0'
   Test::More: '0'
 configure_requires:
@@ -18,7 +19,7 @@ name: App-CSV2LaTeXTable
 provides:
   App::CSV2LaTeXTable:
     file: lib/App/CSV2LaTeXTable.pm
-    version: v1.0.0
+    version: v1.1.0
 requires:
   Carp: '0'
   File::Basename: '0'
@@ -31,7 +32,7 @@ resources:
   bugtracker: https://github.com/reneeb/App-CSV2LaTeXTable/issues
   homepage: https://github.com/reneeb/App-CSV2LaTeXTable
   repository: git://github.com/reneeb/App-CSV2LaTeXTable.git
-version: 1.0.0
+version: 1.1.0
 x_contributors:
   - 'reneeb <info@perl-services.de>'
 x_generated_by_perl: v5.30.0

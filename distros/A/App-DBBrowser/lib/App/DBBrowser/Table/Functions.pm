@@ -357,7 +357,6 @@ sub __func_Replace {
 
 sub __func_Date_Time {
     my ( $sf, $sql, $cols, $func, $multi_col ) = @_;
-    my $plui = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} );
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $chosen_cols = $sf->__choose_columns( $func, $cols, $multi_col );
     if ( ! defined $chosen_cols ) {

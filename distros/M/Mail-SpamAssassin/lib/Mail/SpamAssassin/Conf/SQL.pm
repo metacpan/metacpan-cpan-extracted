@@ -27,7 +27,7 @@ Mail::SpamAssassin::Conf::SQL - load SpamAssassin scores from SQL database
 =head1 DESCRIPTION
 
 Mail::SpamAssassin is a module to identify spam using text analysis and
-several internet-based realtime blacklists.
+several internet-based realtime blocklists.
 
 This class is used internally by SpamAssassin to load scores from an SQL
 database.  Please refer to the C<Mail::SpamAssassin> documentation for public
@@ -166,6 +166,9 @@ sub load_with_dbi {
 	 }
 	 if ($config_text ne '') {
 	   $conf->{main} = $main;
+	   $config_text = "file start (sql config)\n".
+	                  $config_text.
+	                  "file end (sql config)\n";
 	   $conf->parse_scores_only($config_text);
 	   delete $conf->{main};
 	 }

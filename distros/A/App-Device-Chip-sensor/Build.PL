@@ -12,7 +12,7 @@ my $build = Module::Build->new(
       'Feature::Compat::Defer' => 0,
       'Feature::Compat::Try' => 0,
       'Future::AsyncAwait' => 0,
-      'Object::Pad' => '0.74', # 0.73 + bugfix
+      'Object::Pad' => '0.76',
 
       'Device::Chip::Adapter' => 0,
       'Device::Chip::Sensor' => '0.19',

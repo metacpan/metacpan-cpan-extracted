@@ -19,7 +19,7 @@ no multidimensional;
 
 use Cwd 'abs_path';
 
-use Test::More tests => 16;
+use Test::More tests => 17;
 use Test::Output;
 use Test::Warn;
 
@@ -237,6 +237,37 @@ stdout_like
     '_process 4 prints correct text';
 like($fs->selection(), qr'/t/00-compile.t',
      '_process 4 selected correct selection');
+
+####################################
+# use last complex object to test pretty-printer (dump):
+$_ = $main->dump;
+like($_,
+     qr{^children:\n
+	\ \ UI::Various::Compound::FileSelect=.*_inputvar:.*_msg:.*_widget:\n
+	\ \ \ \ \ \ files:\n
+	\ \ \ \ \ \ \ \ _initialised:1\n
+	\ \ \ \ \ \ \ \ first:0\n
+	\ \ \ \ \ \ \ \ height:8\n
+	\ \ \ \ \ \ \ \ on_select:CODE.*
+	\ \ \ \ \ \ \ \ selection:1\n
+	\ \ \ \ \ \ \ \ texts:\n
+	.*
+	^\ \ \ \ field:\n
+	^\ \ \ \ \ \ UI::Various::PoorTerm::Box=.*
+	^\ \ \ \ \ \ \ \ \ \ UI::Various::PoorTerm::Button=.*
+	^\ \ \ \ \ \ \ \ \ \ \ \ text:\.\.\n
+	\ \ \ \ \ \ \ \ \ \ \ \ width:2\n
+	\ \ \ \ \ \ \ \ \ \ UI::Various::PoorTerm::Text=.*
+	^\ \ \ \ \ \ UI::Various::PoorTerm::Listbox=.*
+	^\ \ \ \ \ \ UI::Various::PoorTerm::Input=.*
+	^\ \ \ \ \ \ UI::Various::PoorTerm::Text=.*
+	^height:[1-9][0-9]+\n
+	max_height:[1-9][0-9]+\n
+	max_width:[1-9][0-9]+\n
+	ui:UI::Various::PoorTerm\n
+	width:40\n\Z}msx,
+     'dump of main looks correct');
+
 $main->remove($fs);
 
 ####################################

@@ -16,7 +16,7 @@ use Carp;
 use Encode;
 use Data::Dumper;
 use File::Temp;
-File::Temp->safe_level(File::Temp::HIGH);
+File::Temp->safe_level(File::Temp::MEDIUM);
 use File::Path qw(rmtree);
 use File::Spec;
 use List::Util qw(max);
@@ -30,7 +30,7 @@ use LaTeXML::Util::ObjectDB;
 use LaTeXML::Post::Scan;
 use vars qw($VERSION);
 # This is the main version of LaTeXML being claimed.
-use version; our $VERSION = version->declare("0.8.6");
+use version; our $VERSION = version->declare("0.8.7");
 use LaTeXML::Version;
 # Derived, more informative version numbers
 our $FULLVERSION = "LaTeXML version $LaTeXML::VERSION"
@@ -338,21 +338,13 @@ sub convert {
       delete $$opts{destination}; } }
 
 # 5 Output -- if not using Post::Writer, which never considers this serialization logic
+#
 # 5.1 Serialize the XML/HTML result (or just return the Perl object, if requested)
 # GOAL: $serialized must contain a utf8-encoded string at the return.
-# NOTES: This is difficult, because we can be serializing different objects, with different serialization logic
-# 1. Byte strings: LaTeXML's Document::serialize_aux, and XML::LibXML::Document's toString and toStringHTML
-#    which have NOT been encoded into utf-8, so we need an explicit encode before printing/returning
-# 2. Unreliable: the fragment case, which uses XML::LibXML::Element (and hence Node's) toString method,
-#    is sometimes already encoded as UTF-8. In fact, the documentation claims it is by default:
-# https://metacpan.org/pod/distribution/XML-LibXML/lib/XML/LibXML/Node.pod#toString
-# Digging to the bottom of the code, we reach:
-# https://metacpan.org/source/SHLOMIF/XML-LibXML-2.0200/LibXML.xs#L5212
-# which *will* set the utf8 flag iff the "HAVE_UTF8" flag was set on the system which compiled libxml
-# that's pretty terrifying in fact, since we can't rely that libxml returns the same encoding cross-platform for its default behavior!
-# 3. Reliable: Always explicitly request the document encoding to be used in serializing a Node
-#     by passing a second true flag into toString(1,1) to ensure that the encoding is handled explicitly at the libxml2 level
-# 4. Other: returning a DOM object programmatically, or a non-XML representation (archives), has no serialization component, result is returned as-is
+#
+# This logic can be fragile, especially due to external components changing behavior between versions.
+# but also due to having a variety of serialization routes based on Core vs Post, whatsout, destination...
+#
   undef $serialized;
   my $ref_result = ref($result) || '';
   if ($$opts{format} eq 'dom') {    # No serialize needed in DOM output case
@@ -361,15 +353,14 @@ sub convert {
     if ($$opts{format} =~ /^jats|x(ht)?ml$/) {
       if ($ref_result =~ /Document$/) {
         $serialized = $result->toString(1);
-        $serialized = Encode::encode('UTF-8', $serialized) if $serialized;
+        if ($serialized and $ref_result eq 'LaTeXML::Core::Document') {
+          $serialized = Encode::encode('UTF-8', $serialized); }
       } else {    # fragment case
         $serialized = $result->toString(1, 1);
     } }
     elsif ($$opts{format} =~ /^html/) {
       if (ref($result) =~ /^LaTeXML::(Post::)?Document$/) {
-        # Needs explicit encode call, toStringHTML returns Perl byte strings
-        $serialized = $result->getDocument->toStringHTML;
-        $serialized = Encode::encode('UTF-8', $serialized) if $serialized; }
+        $serialized = $result->getDocument->toStringHTML; }
       else {      # fragment case
         local $XML::LibXML::setTagCompression = 1;
         $serialized = $result->toString(1, 1); } } }
@@ -450,6 +441,8 @@ sub convert_post {
     if (my $dbdir = pathname_directory($dbfile)) {
       pathname_mkdir($dbdir); } }
   my $DB = LaTeXML::Util::ObjectDB->new(dbfile => $dbfile, %PostOPS);
+  if ($format eq 'epub') {    # epub requires a TOC
+    $self->check_TOC($DOCUMENT); }
   ### Advanced Processors:
   if ($$opts{split}) {
     require LaTeXML::Post::Split;
@@ -457,7 +450,7 @@ sub convert_post {
         db => $DB, %PostOPS)); }
   my $scanner = ($$opts{scan} || $DB) && (LaTeXML::Post::Scan->new(
       db       => $DB,
-      labelids => $$opts{splitnaming} && ($$opts{splitnaming} =~ /^label/),
+      labelids => ($$opts{splitnaming} && ($$opts{splitnaming} =~ /^label/) ? 1 : 0),
       %PostOPS));
   push(@procs, $scanner) if $$opts{scan};
   if (!($$opts{prescan})) {
@@ -482,6 +475,10 @@ sub convert_post {
       require LaTeXML::Post::PictureImages;
       push(@procs, LaTeXML::Post::PictureImages->new(%PostOPS));
     }
+    else {
+      require LaTeXML::Post::PictureImages;
+      push(@procs, LaTeXML::Post::PictureImages->new(empty_only => 1, %PostOPS)); }
+
     if ($$opts{dographics}) {
       # TODO: Rethink full-fledged graphics support
       require LaTeXML::Post::Graphics;
@@ -533,6 +530,9 @@ sub convert_post {
         elsif ($fmt eq 'mathtex') {
           require LaTeXML::Post::TeXMath;
           push(@mprocs, LaTeXML::Post::TeXMath->new(%PostOPS)); }
+        elsif ($fmt eq 'unicodemath') {
+          require LaTeXML::Post::UnicodeMath;
+          push(@mprocs, LaTeXML::Post::UnicodeMath->new(%PostOPS)); }
         elsif ($fmt eq 'lexemes') {
           require LaTeXML::Post::LexMath;
           push(@mprocs, LaTeXML::Post::LexMath->new(%PostOPS)); }
@@ -557,8 +557,8 @@ sub convert_post {
         push(@{ $$parameters{JAVASCRIPT} }, $js); }
       if ($$opts{icon}) {
         $$parameters{ICON} = $$opts{icon}; }
-      if (!defined $$opts{timestamp}) { $$opts{timestamp}       = localtime(); }
-      if ($$opts{timestamp})          { $$parameters{TIMESTAMP} = "'" . $$opts{timestamp} . "'"; }
+      if (!defined $$opts{timestamp}) { $$opts{timestamp} = defined $ENV{SOURCE_DATE_EPOCH} ? gmtime($ENV{SOURCE_DATE_EPOCH}) : localtime(); }
+      if ($$opts{timestamp}) { $$parameters{TIMESTAMP} = "'" . $$opts{timestamp} . "'"; }
       # Now add in the explicitly given XSLT parameters
       foreach my $parm (@{ $$opts{xsltparameters} }) {
         if ($parm =~ /^\s*(\w+)\s*:\s*(.*)$/) {
@@ -648,6 +648,19 @@ sub convert_post {
   if ($$opts{destination} && $$opts{local} && ($$opts{whatsout} eq 'document')) {
     undef $postdoc; }
   return $postdoc; }
+
+# This is *very* unmodular, but introducing a pre-Epub postprocessor
+# seems rather heavy at this stage?
+# Add a full TOC, to be used for navigation, but *not* displayed.
+sub check_TOC {
+  my ($self, $document) = @_;
+  if (!$document->findnode('//ltx:TOC[@lists="toc"]')) {
+    my @s = (qw(ltx:part ltx:chapter ltx:section ltx:subsection ltx:subsubsection
+        ltx:paragraph ltx:subparagraph ltx:appendix ltx:index ltx:bibliography));
+    $document->prependNodes($document->getDocumentElement,
+      ['ltx:TOC', { lists => 'toc', scope => 'global',
+          select => join(' | ', @s), class => 'ltx_nodisplay' }]); }
+  return; }
 
 sub new_latexml {
   my ($opts) = @_;

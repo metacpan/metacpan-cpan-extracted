@@ -13,7 +13,7 @@ use Readonly;
 Readonly::Array our @EXPORT_OK => qw(err);
 Readonly::Scalar my $EVAL => 'eval {...}';
 
-our $VERSION = 0.29;
+our $VERSION = 0.30;
 
 # Process error.
 sub err {
@@ -151,6 +151,6 @@ BSD 2-Clause License
 
 =head1 VERSION
 
-0.29
+0.30
 
 =cut

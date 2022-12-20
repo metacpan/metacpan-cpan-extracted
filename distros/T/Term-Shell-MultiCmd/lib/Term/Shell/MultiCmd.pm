@@ -11,7 +11,7 @@ Term::Shell::MultiCmd -  Nested Commands Tree in Shell Interface
 
 =cut
 
-our $VERSION = '3.01';
+our $VERSION = '3.02';
 
 =head1 SYNOPSIS
 
@@ -55,11 +55,15 @@ our $VERSION = '3.01';
 
     print "All done, see you later\n" ;
 
-=head1 NOTE
+=head1 TIPS
 
 To get the most from a command line, it might be a good idea to get the latest versions of
 Term::ReadLine and Term::ReadKey.
 There are numberless ways of doing it, one of them is running 'cpan update Bundle::CPAN' (with a proper write permission).
+
+If you use MacOS, and the completion tab converts newlines to literal '\n' chars, you can try using Term::ReadLine::Perl5
+instead of Term::ReadLine::Gnu. One way of doing it is with the code below:
+BEGIN{ $ENV{PERL_RL} = "Perl o=0" }
 
 =cut
 # some of my common utility functions:
@@ -147,7 +151,7 @@ sub _travela($@) {              # explicit array
             push @path , $w ;# $path .= "$w ";
             next ;
         }
-        my @c = grep /^$w/, keys %$c ;
+        my @c = grep /^\Q$w/, keys %$c ;
         if(@c == 1) {
             $c = $c->{$c[0]} ;
             push @path, $c[0] ; # $path .= "$c[0] " ;
@@ -280,6 +284,22 @@ Note that the value of history_more must be a reference for HASH, ARRAY, or SCAL
 no warnings would be provided if any of the operations fail. It wouldn't be a good idea
 to use it for sensitive data.
 
+=item * -history_flash_file
+
+This is a newer feature, somehow replacing -history_file:
+If -history_flash_file exists, then use it for commands history - but write each command to the EOF immediatly after execution. This is
+helpful in two cases - when using multiple sessions and when the process exits ungracefully. Note that in this case,  -history_file will
+be used as a container for -history_more only.
+Example:
+
+   my %config ;
+   my $cli = new Term::Shell::MultiCmd ( -history_file => "$ENV{HOME}/.my_saved_config",       # keep \%config only
+                                         -history_size => 200,
+                                         -history_more => \%config,
+                                         -history_flash_file => "$ENV{HOME}/.my_saved_hisotry" # keep all history
+                                         ) ;
+   
+
 =item * -pager
 
 As pager's value, this module would expect a string or a sub that returns a FileHandle. If the value is a string,
@@ -389,9 +409,9 @@ sub _new_readline($) {
 sub new {
     my $class = shift ;
     my $params = 'help_cmd=help quit_cmd=quit root_cmd= prompt=shell>
-                  history_file= history_size=100 history_more= pager= pager_re=^\|
+                  history_file= history_size=10000 history_more= pager= pager_re=^\|
                   query_cmd=query enable_sh_pipe=1
-                  record_cmd= empty_cmd=
+                  record_cmd= empty_cmd= history_flash_file=
                   ';
     my %p = _params $params, @_ ;
 
@@ -411,6 +431,7 @@ sub new {
     #                                        # it could be useful when coder doesn't plan to use the loop
     #   - on second thought, create it when you have to.
     _last_setting_load $o ;
+    _last_history_flash_load $o ;
     $o
 }
 
@@ -676,11 +697,29 @@ sub _last_setting_load($) {
     } ;
 }
 
+sub _last_history_flash_load($) {
+    my $o = shift ;
+    my $f = $o->{history_flash_file} or return ;
+    return unless -f $f ;
+    my $max = $o->{history_size};
+    eval {
+        open F, '<', $f or return;
+        my @A = <F>;
+        splice @A, 0, @A-$max if @A > $max;
+        chomp @A;
+        push @{$o->{history_data}}, @A;
+        close F;
+    }
+}
+
 sub _last_setting_save($) {
     my $o = shift ;
     my $f = $o->{history_file} or return ;
-    my @his = $o -> history();
-    splice @his, 0,  @his - $o->{history_size} ;
+    my @his ;
+    unless ($o->{history_flash_file}) {
+        @his = $o -> history();
+        splice @his, 0,  @his - $o->{history_size} ;
+    }
     print
       eval {use Storable ; store ([[@his], $o->{history_more}], $f)} ? # Note: For backward compatibly, this array can only grow
         "Configuration saved in $f\n" :
@@ -754,7 +793,7 @@ sub _help_message_tree {        # inspired by Unix 'tree' command
     return _say "- $cmd : ", $h->[0] =~ /^(.*)/m if 'ARRAY' eq ref $h ;
     _say "-- $cmd" ;
     my @c = sort keys %$h ;
-    for my $c (@c) {
+    for my $c (grep {defined} @c) {
         _help_message_tree( $h->{$c},
                             $c,
                             $pre ? $pre . ($last ? '    ' : '|   ') : ' ' ,
@@ -918,6 +957,7 @@ sub _check_silent_aliases {
     return  $cmd unless $cmd;
     my $r = $o->{root} || $o->{cmds};
     my ($c, @a) = _split $o, $cmd || '';
+    $c ||= '';
 
     return _join $o, $o->{root_cmd}, (@a ? (-set => @a ) : ('-clear'))
       if ( $c eq 'cd' and
@@ -944,6 +984,13 @@ commands in a script, or testing.
 sub cmd {
     my ($o, $clt) = @_;
     $o->{record_cmd}->($clt) if 'CODE' eq ref $o->{record_cmd};
+
+    if ($o->{history_flash_file}) {
+        unless (_log_command($o->{history_flash_file}, $clt)) {
+            print STDERR "Can't write to $o->{history_flash_file}: $!\n";
+            $o->{history_flash_file} = undef;
+        }
+    }
 
     my ($cmd, $path, @args) = _travel $o, $clt or return ;
     local %SIG ;
@@ -977,6 +1024,21 @@ sub _cmd {
     return print $p{_ERR_} if $p{_ERR_} ;
     return $cmd->[1]->($o, ARG0 => $path, %p) ;
 }
+
+my $_log_command_last = '';
+sub _log_command {
+    my ($file, $cmd) = @_;
+    return unless defined $file and defined $cmd;
+    $cmd =~ s/\n*$/\n/s;
+    if ($_log_command_last ne $cmd) {
+        $_log_command_last =  $cmd;
+        open  F, '>>', $file or return undef;
+        print F $cmd;
+        close F;
+    }
+    1
+}
+
 
 =head2 command
 

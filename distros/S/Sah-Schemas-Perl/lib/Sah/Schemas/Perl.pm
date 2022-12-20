@@ -3,9 +3,9 @@
 package Sah::Schemas::Perl;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-11'; # DATE
+our $DATE = '2022-12-16'; # DATE
 our $DIST = 'Sah-Schemas-Perl'; # DIST
-our $VERSION = '0.045'; # VERSION
+our $VERSION = '0.046'; # VERSION
 
 1;
 # ABSTRACT: Sah schemas related to Perl
@@ -22,7 +22,7 @@ Sah::Schemas::Perl - Sah schemas related to Perl
 
 =head1 VERSION
 
-This document describes version 0.045 of Sah::Schemas::Perl (from Perl distribution Sah-Schemas-Perl), released on 2022-09-11.
+This document describes version 0.046 of Sah::Schemas::Perl (from Perl distribution Sah-Schemas-Perl), released on 2022-12-16.
 
 =head1 SAH SCHEMAS
 
@@ -136,6 +136,34 @@ Function name can be qualified (prefixed) by a package name, which is restricted
 to this regex:
 
  [A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*
+
+
+=item * L<perl::identifier::qualified_ascii|Sah::Schema::perl::identifier::qualified_ascii>
+
+Qualified identifier in Perl, without "use utf8" in effect.
+
+
+
+
+=item * L<perl::identifier::qualified_unicode|Sah::Schema::perl::identifier::qualified_unicode>
+
+Unqualified identifier in Perl, with "use utf8" in effect.
+
+
+
+
+=item * L<perl::identifier::unqualified_ascii|Sah::Schema::perl::identifier::unqualified_ascii>
+
+Unqualified identifier in Perl, without "use utf8" in effect.
+
+
+
+
+=item * L<perl::identifier::unqualified_unicode|Sah::Schema::perl::identifier::unqualified_unicode>
+
+Unqualified identifier in Perl, with "use utf8" in effect.
+
+
 
 
 =item * L<perl::modargs|Sah::Schema::perl::modargs>

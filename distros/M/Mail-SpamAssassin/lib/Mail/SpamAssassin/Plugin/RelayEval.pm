@@ -28,6 +28,8 @@ use re 'taint';
 
 our @ISA = qw(Mail::SpamAssassin::Plugin);
 
+my $IPV4_ADDRESS = IPV4_ADDRESS;
+
 # constructor: register the eval rule
 sub new {
   my $class = shift;
@@ -39,17 +41,17 @@ sub new {
   bless ($self, $class);
 
   # the important bit!
-  $self->register_eval_rule("check_for_numeric_helo");
-  $self->register_eval_rule("check_for_illegal_ip");
-  $self->register_eval_rule("check_all_trusted");
-  $self->register_eval_rule("check_no_relays");
-  $self->register_eval_rule("check_relays_unparseable");
-  $self->register_eval_rule("check_for_sender_no_reverse");
-  $self->register_eval_rule("check_for_from_domain_in_received_headers");
-  $self->register_eval_rule("check_for_forged_received_trail");
-  $self->register_eval_rule("check_for_forged_received_ip_helo");
-  $self->register_eval_rule("helo_ip_mismatch");
-  $self->register_eval_rule("check_for_no_rdns_dotcom_helo");
+  $self->register_eval_rule("check_for_numeric_helo"); # type does not matter
+  $self->register_eval_rule("check_for_illegal_ip"); # type does not matter
+  $self->register_eval_rule("check_all_trusted"); # type does not matter
+  $self->register_eval_rule("check_no_relays"); # type does not matter
+  $self->register_eval_rule("check_relays_unparseable"); # type does not matter
+  $self->register_eval_rule("check_for_sender_no_reverse"); # type does not matter
+  $self->register_eval_rule("check_for_from_domain_in_received_headers", $Mail::SpamAssassin::Conf::TYPE_HEAD_EVALS);
+  $self->register_eval_rule("check_for_forged_received_trail"); # type does not matter
+  $self->register_eval_rule("check_for_forged_received_ip_helo"); # type does not matter
+  $self->register_eval_rule("helo_ip_mismatch"); # type does not matter
+  $self->register_eval_rule("check_for_no_rdns_dotcom_helo"); # type does not matter
 
   return $self;
 }
@@ -72,7 +74,7 @@ sub hostname_to_domain {
   }
 }
 
-sub _helo_forgery_whitelisted {
+sub _helo_forgery_welcomelisted {
   my ($helo, $rdns) = @_;
   if ($helo eq 'msn.com' && $rdns eq 'hotmail.com') { return 1; }
   0;
@@ -84,12 +86,10 @@ sub check_for_numeric_helo {
   my $rcvd = $pms->{relays_untrusted_str};
 
   if ($rcvd) {
-    my $IP_ADDRESS = IPV4_ADDRESS;
-    my $IP_PRIVATE = IP_PRIVATE;
     local $1;
     # no re "strict";  # since perl 5.21.8: Ranges of ASCII printables...
-    if ($rcvd =~ /\bhelo=($IP_ADDRESS)(?=[\000-\040,;\[()<>]|\z)/i  # Bug 5878
-        && $1 !~ /$IP_PRIVATE/) {
+    if ($rcvd =~ /\bhelo=($IPV4_ADDRESS)(?=[\000-\040,;\[()<>]|\z)/i  # Bug 5878
+        && $1 !~ IS_IP_PRIVATE) {
       return 1;
     }
   }
@@ -108,23 +108,21 @@ sub check_for_illegal_ip {
 # due to bug in pure IPv6 address regular expression
 sub helo_ip_mismatch {
   my ($self, $pms) = @_;
-  my $IP_ADDRESS = IPV4_ADDRESS;
-  my $IP_PRIVATE = IP_PRIVATE;
 
   for my $relay (@{$pms->{relays_untrusted}}) {
     # is HELO usable?
-    next unless ($relay->{helo} =~ m/^$IP_ADDRESS$/ &&
-		 $relay->{helo} !~ /$IP_PRIVATE/);
+    next unless ($relay->{helo} =~ IS_IPV4_ADDRESS &&
+		 $relay->{helo} !~ IS_IP_PRIVATE);
     # compare HELO with IP
-    return 1 if ($relay->{ip} =~ m/^$IP_ADDRESS$/ &&
-		 $relay->{ip} !~ m/$IP_PRIVATE/ &&
+    return 1 if ($relay->{ip} =~ IS_IPV4_ADDRESS &&
+		 $relay->{ip} !~ IS_IP_PRIVATE &&
 		 $relay->{helo} ne $relay->{ip} &&
 		 # different IP is okay if in same /24
 		 $relay->{helo} =~ /^(\d+\.\d+\.\d+\.)/ &&
 		 index($relay->{ip}, $1) != 0);
   }
 
-  0;
+  return 0;
 }
 
 ###########################################################################
@@ -145,7 +143,7 @@ sub check_no_relays {
 
 sub check_relays_unparseable {
   my ($self, $pms) = @_;
-  return $pms->{num_relays_unparseable};
+  return $pms->{num_relays_unparseable} ? 1 : 0;
 }
 
 # Check if the apparent sender (in the last received header) had
@@ -215,7 +213,7 @@ sub check_for_from_domain_in_received_headers {
 sub check_for_no_rdns_dotcom_helo {
   my ($self, $pms) = @_;
   if (!exists $pms->{no_rdns_dotcom_helo}) { $self->_check_received_helos($pms); }
-  return $pms->{no_rdns_dotcom_helo};
+  return $pms->{no_rdns_dotcom_helo} ? 1 : 0;
 }
 
 # Bug 1133
@@ -346,7 +344,7 @@ sub _check_for_forged_received {
 	# allow private IP addrs here, could be a legit screwup
 	if ($hclassb && $fclassb && 
 		$hclassb ne $fclassb &&
-		!($hlo =~ /$IP_PRIVATE/o))
+		$hlo !~ IS_IP_PRIVATE)
 	{
 	  dbg2("eval: forged-HELO: massive mismatch on IP-addr HELO: '$hlo' != '$fip'");
 	  $pms->{mismatch_ip_helo}++;
@@ -357,7 +355,7 @@ sub _check_for_forged_received {
     my $prev = $from[$i-1];
     if (defined($prev) && $i > 0
 		&& $prev =~ /^\w+(?:[\w.-]+\.)+\w+$/
-		&& $by ne $prev && !_helo_forgery_whitelisted($by, $prev))
+		&& $by ne $prev && !_helo_forgery_welcomelisted($by, $prev))
     {
       dbg2("eval: forged-HELO: mismatch on from: '$prev' != '$by'");
       $pms->{mismatch_from}++;

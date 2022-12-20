@@ -19,9 +19,9 @@ no_index:
     - t
     - inc
 requires:
-  ExtUtils::CBuilder: '0.2602'
+  ExtUtils::CBuilder: '0.280236'
   Time::Piece: '1.12'
 resources:
   repository: https://github.com/yuki-kimoto/SPVM.git
-version: '0.9665'
+version: '0.9668'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

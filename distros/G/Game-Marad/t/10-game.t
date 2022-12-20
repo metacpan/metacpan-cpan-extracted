@@ -185,6 +185,22 @@ is $m->is_owner( 0, 0 ), 0;
 is $m->is_owner( 0, 2 ), 0;
 is $m->is_owner( 4, 4 ), 1;
 
-#showboard($board);
+# usually the table might have 64-bit random integers
+my @fake_zobrist;
+my $n = 0;
+for my $t ( 0 .. 2 ) {
+    for my $c ( 0 .. 1 ) {
+        for my $l ( 0 .. 80 ) {
+            $fake_zobrist[$t][$c][$l] = $n++;
+        }
+    }
+}
+# back to initial board position
+$m = Game::Marad->new;
+my $hash = 0;
+for my $ref ( $m->zobrist ) {
+    $hash ^= $fake_zobrist[ $ref->[0] ][ $ref->[1] ][ $ref->[2] ];
+}
+is $hash, 302;
 
 done_testing

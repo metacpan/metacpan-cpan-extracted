@@ -1,13 +1,14 @@
 #  You may distribute under the terms of the Artistic License (the same terms
 #  as Perl itself)
 #
-#  (C) Paul Evans, 2011-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.58;
+use Object::Pad 0.73 ':experimental(init_expr adjust_params)';
 
-package Tickit::Widget::Tabbed::Ribbon 0.026;
+package Tickit::Widget::Tabbed::Ribbon 0.027;
 class Tickit::Widget::Tabbed::Ribbon
+        :strict(params)
         :isa(Tickit::Widget);
 
 Tickit::Window->VERSION( '0.57' );  # ->bind_event
@@ -109,18 +110,20 @@ sub new_for_orientation ( $class, $orientation, @args ) {
         };
 }
 
-has $_tabbed :param :weak;
+field $_tabbed :param :weak;
 method tabbed { $_tabbed }
 
-has $_prev_more :reader;
-has $_next_more :reader;
+field $_prev_more :reader;
+field $_next_more :reader;
 
-has $_active_tab_index :param :reader = 0;
+field $_active_tab_index :param :reader = 0;
 
-has @_tabs;
+field @_tabs;
 
-ADJUSTPARAMS ( $params ) {
-        push @_tabs, (delete $params->{tabs})->@* if exists $params->{tabs};
+ADJUST :params (
+        :$tabs = undef,
+) {
+        push @_tabs, $tabs->@* if $tabs;
 }
 
 ADJUST
@@ -299,8 +302,8 @@ use constant orientation => "horizontal";
 
 use List::Util qw( sum0 );
 
-has $_active_marker :param { [ "[", "]" ] };
-has $_scroll_offset        = 0;
+field $_active_marker :param = [ "[", "]" ];
+field $_scroll_offset        = 0;
 
 method lines { 1 }
 method cols {
@@ -513,8 +516,8 @@ use constant orientation => "vertical";
 
 use List::Util qw( max );
 
-has $_tab_position  :param;
-has $_scroll_offset        = 0;
+field $_tab_position  :param;
+field $_scroll_offset        = 0;
 
 method lines {
         return scalar $self->tabs;

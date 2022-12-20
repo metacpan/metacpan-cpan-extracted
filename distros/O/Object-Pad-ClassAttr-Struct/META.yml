@@ -7,7 +7,7 @@ build_requires:
   Test::More: '0.88'
 configure_requires:
   Module::Build: '0.4004'
-  Object::Pad::ExtensionBuilder: '0.57'
+  Object::Pad::ExtensionBuilder: '0.76'
 dynamic_config: 1
 generated_by: 'Module::Build version 0.4231, CPAN::Meta::Converter version 2.150010'
 license: perl
@@ -18,10 +18,10 @@ name: Object-Pad-ClassAttr-Struct
 provides:
   Object::Pad::ClassAttr::Struct:
     file: lib/Object/Pad/ClassAttr/Struct.pm
-    version: '0.03'
+    version: '0.05'
 requires:
-  Object::Pad: '0.60'
+  Object::Pad: '0.76'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.03'
+version: '0.05'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

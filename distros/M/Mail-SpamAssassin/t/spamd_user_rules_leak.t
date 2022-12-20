@@ -6,24 +6,24 @@ use SATest; sa_t_init("spamd_user_rules_leak");
 
 use Test::More;
 plan skip_all => 'Spamd tests disabled' if $SKIP_SPAMD_TESTS;
-plan tests => 28;
+plan tests => 20;
 
 # ---------------------------------------------------------------------------
 # If user A defines a user rule (when allow_user_rules is enabled) it affects
 # user B if they also set a score for that same rule name or create a user rule
 # with the same name.
 
-tstlocalrules ("
-	allow_user_rules 1
+tstprefs ("
+  allow_user_rules 1
 ");
 
-rmtree ("log/virtualconfig/testuser1", 0, 1);
-mkpath ("log/virtualconfig/testuser1", 0, 0755);
-rmtree ("log/virtualconfig/testuser2", 0, 1);
-mkpath ("log/virtualconfig/testuser2", 0, 0755);
-rmtree ("log/virtualconfig/testuser3", 0, 1);
-mkpath ("log/virtualconfig/testuser3", 0, 0755);
-open (OUT, ">log/virtualconfig/testuser1/user_prefs");
+rmtree ("$workdir/virtualconfig/testuser1", 0, 1);
+mkpath ("$workdir/virtualconfig/testuser1", 0, 0755);
+rmtree ("$workdir/virtualconfig/testuser2", 0, 1);
+mkpath ("$workdir/virtualconfig/testuser2", 0, 0755);
+rmtree ("$workdir/virtualconfig/testuser3", 0, 1);
+mkpath ("$workdir/virtualconfig/testuser3", 0, 0755);
+open (OUT, ">$workdir/virtualconfig/testuser1/user_prefs");
 print OUT q{
 
 	header MYFOO Content-Transfer-Encoding =~ /quoted-printable/
@@ -37,7 +37,7 @@ print OUT q{
 
 };
 close OUT;
-open (OUT, ">log/virtualconfig/testuser2/user_prefs");
+open (OUT, ">$workdir/virtualconfig/testuser2/user_prefs");
 print OUT q{
 
         # create a new user rule with same name
@@ -50,7 +50,7 @@ print OUT q{
 
 };
 close OUT;
-open (OUT, ">log/virtualconfig/testuser3/user_prefs");
+open (OUT, ">$workdir/virtualconfig/testuser3/user_prefs");
 print OUT q{
 
         # no user rules here
@@ -59,33 +59,29 @@ print OUT q{
 close OUT;
 
 %patterns = (
-  q{ 3.0 MYFOO }, 'MYFOO',
-  q{ 3.0 MYBODY }, 'MYBODY',
-  q{ 3.0 MYRAWBODY }, 'MYRAWBODY',
-  q{ 3.0 MYFULL }, 'MYFULL',
+  q{ 3.0 MYFOO }, '',
+  q{ 3.0 MYBODY }, '',
+  q{ 3.0 MYRAWBODY }, '',
+  q{ 3.0 MYFULL }, '',
 );
 %anti_patterns = (
-  q{  redefined at }, 'redefined_errors_in_spamd_log',
+  'redefined at', 'redefined_errors_in_spamd_log',
 );
 
 # use -m1 so all scans use the same child
-ok (start_spamd ("--virtual-config-dir=log/virtualconfig/%u -L -u $spamd_run_as_user -m1"));
+ok (start_spamd ("--virtual-config-dir=$workdir/virtualconfig/%u -L -u $spamd_run_as_user -m1"));
 ok (spamcrun ("-u testuser1 < data/spam/009", \&patterns_run_cb));
 ok_all_patterns();
 clear_pattern_counters();
 
 %patterns = (
-  q{ does not include a real name }, 'TEST_NOREALNAME',
+  q{ does not include a real name }, '',
 );
 %anti_patterns = (
-  q{ 1.0 MYFOO }, 'MYFOO',
-  q{ 1.0 MYBODY }, 'MYBODY',
-  q{ 1.0 MYRAWBODY }, 'MYRAWBODY',
-  q{ 1.0 MYFULL }, 'MYFULL',
-  q{ 3.0 MYFOO }, 'MYFOO',
-  q{ 3.0 MYBODY }, 'MYBODY',
-  q{ 3.0 MYRAWBODY }, 'MYRAWBODY',
-  q{ 3.0 MYFULL }, 'MYFULL',
+  qr/\d MYFOO /, '',
+  qr/\d MYBODY /, '',
+  qr/\d MYRAWBODY /, '',
+  qr/\d MYFULL /, '',
 );
 ok (spamcrun ("-u testuser2 < data/spam/009", \&patterns_run_cb));
 checkfile ($spamd_stderr, \&patterns_run_cb);
@@ -93,17 +89,13 @@ ok_all_patterns();
 clear_pattern_counters();
 
 %patterns = (
-  q{ does not include a real name }, 'TEST_NOREALNAME',
+  q{ does not include a real name }, '',
 );
 %anti_patterns = (
-  q{ 1.0 MYFOO }, 'MYFOO',
-  q{ 1.0 MYBODY }, 'MYBODY',
-  q{ 1.0 MYRAWBODY }, 'MYRAWBODY',
-  q{ 1.0 MYFULL }, 'MYFULL',
-  q{ 3.0 MYFOO }, 'MYFOO',
-  q{ 3.0 MYBODY }, 'MYBODY',
-  q{ 3.0 MYRAWBODY }, 'MYRAWBODY',
-  q{ 3.0 MYFULL }, 'MYFULL',
+  qr/\d MYFOO /, '',
+  qr/\d MYBODY /, '',
+  qr/\d MYRAWBODY /, '',
+  qr/\d MYFULL /, '',
 );
 ok (spamcrun ("-u testuser3 < data/spam/009", \&patterns_run_cb));
 ok (stop_spamd ());

@@ -258,6 +258,8 @@ lib/AsposeCellsCloud/Configuration.pm
 lib/AsposeCellsCloud/Object/AboveAverage.pm
 lib/AsposeCellsCloud/Object/AccessTokenResponse.pm
 lib/AsposeCellsCloud/Object/Area.pm
+lib/AsposeCellsCloud/Object/Axis.pm
+lib/AsposeCellsCloud/Object/AxisResponse.pm
 lib/AsposeCellsCloud/Object/AutoFilter.pm
 lib/AsposeCellsCloud/Object/AutoFilterResponse.pm
 lib/AsposeCellsCloud/Object/AutoFitterOptions.pm
@@ -481,6 +483,7 @@ lib/AsposeCellsCloud/Object/TextWaterMarkerRequest.pm
 lib/AsposeCellsCloud/Object/ThemeColor.pm
 lib/AsposeCellsCloud/Object/TilePicOption.pm
 lib/AsposeCellsCloud/Object/Title.pm
+lib/AsposeCellsCloud/Object/TickLabels.pm
 lib/AsposeCellsCloud/Object/TitleResponse.pm
 lib/AsposeCellsCloud/Object/Top10.pm
 lib/AsposeCellsCloud/Object/Top10Filter.pm

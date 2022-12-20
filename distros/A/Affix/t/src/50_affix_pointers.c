@@ -74,6 +74,11 @@ DLLEXPORT massive *massive_ptr() {
     warn("Z: %s", retval.Z);
     return &retval;
 }
+DLLEXPORT bool sptr(massive *sptr) {
+    if (!strcmp(sptr->Z, "Works!")) return true;
+    return false;
+}
+
 DLLEXPORT char *dbl_ptr(double *dbl) {
     warn("# dbl == %f", *dbl);
     if (dbl == NULL)
@@ -120,4 +125,17 @@ DLLEXPORT double pointer_test(double *dbl, int arr[5], int size,
     *dbl = ret * 2;
 
     return 900;
+}
+
+typedef struct
+{
+    int i;
+    char *Z;
+
+} test;
+DLLEXPORT bool demo(test in) {
+    warn("#offsetof: %d", offsetof(test, Z));
+    warn("# i: %d", in.i);
+    warn("# Z: %s", in.Z);
+    return !strcmp(in.Z, "Here. There. Everywhere.");
 }

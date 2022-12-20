@@ -5,6 +5,7 @@ DESTDIR ?= /usr/local
 INSTALL ?= install
 PERL ?= perl
 SED ?= sed
+GCOVR ?= gcovr
 
 LIB_PATH = $(shell realpath . 2>/dev/null || readlink -f -- .)
 ifeq ($(LIB_PATH),)
@@ -192,6 +193,8 @@ docs: man
 man:
 	$(MAKE) -C docs VERSION=$(VERSION)
 
+csv: auto tld-domains
+
 auto:
 	$(PERL) util/gentld.pl include/eav/auto_tld.h src/auto_tld.c \
 		data/punycode.csv
@@ -226,10 +229,15 @@ libeav.pc: libeav.pc.in
 #----------------------------------------------------------#
 
 clean: clean-tests clean-bin
-	# cleanup
+	# === cleanup
 	$(RM) $(DLL_TARGET) $(LIB_TARGET) $(OBJECTS) libeav.pc
 	$(RM) $(gcov_gcda)
 	$(RM) $(gcov_gcno)
+
+clean-coverage:
+	$(RM) $(wildcard coverage/*.txt) $(wildcard coverage/*.xml) \
+	$(wildcard coverage/*.js) $(wildcard coverage/*.json) \
+	$(wildcard coverage/*.htm) $(wildcard coverage/*.html) $(wildcard coverage/*.css)
 
 clean-tests:
 	$(MAKE) -C tests clean
@@ -249,6 +257,9 @@ install: install-bin install-libs install-man
 
 install-bin: $(BIN_TARGET)
 	$(MAKE) -C bin install DESTDIR=$(DESTDIR)
+
+install-bin-static: $(BIN_TARGET_STATIC)
+	$(MAKE) -C bin install-static DESTDIR=$(DESTDIR)
 
 install-libs: install-shared install-static libeav.pc
 	$(INSTALL) -d $(DATAROOTDIR)/pkgconfig
@@ -277,14 +288,34 @@ install-man:
 
 #----------------------------------------------------------#
 
-coverage: CFLAGS += -O0 -coverage -fprofile-abs-path
+uninstall: uninstall-bin
+	# === uninstalling ...
+	$(RM) $(DATAROOTDIR)/pkgconfig/libeav.pc
+	$(RM) $(INCLUDEDIR)/eav.h
+	$(RM) $(LIBDIR)/$(LIB_TARGET) \
+	$(LIBDIR)/$(DLL_TARGET).$(VERSION) \
+	$(LIBDIR)/$(DLL_TARGET).$(MAJOR_VERSION) \
+	$(LIBDIR)/$(DLL_TARGET)
+	$(RM) $(MANDIR)/man3/libeav.3.gz
+
+uninstall-bin:
+	$(MAKE) -C bin uninstall DESTDIR=$(DESTDIR)
+
+#----------------------------------------------------------#
+
+coverage: CFLAGS += --coverage -g -O0 -fprofile-abs-path
 coverage: LDFLAGS += -lgcov
 coverage: coverage-check
 
 # don't use directly, use 'make coverage'
 coverage-check: libs
-	$(MAKE) -C tests check CFLAGS="-O0 -coverage -fprofile-abs-path" LDFLAGS="-lgcov"
+	$(MAKE) -C tests check CFLAGS="--coverage -g -O0 -fprofile-abs-path" LDFLAGS="-lgcov"
+
+# XXX: ideally, the filename should contain all libeav compiler flags
+#      e.g. RFC6531_FOLLOW_RFC5322 ...
+gcovr: coverage
+	$(GCOVR) -o ./coverage/$(WITH_IDN).txt --exclude-directories tests
 
 #----------------------------------------------------------#
 
-.PHONY: all debug check clean docs install libs libeav.pc coverage
+.PHONY: all debug check clean docs man install libs libeav.pc coverage csv uninstall gcovr

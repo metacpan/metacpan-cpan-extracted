@@ -1,7 +1,7 @@
 #
 # This file is part of App-SpreadRevolutionaryDate
 #
-# This software is Copyright (c) 2019 by Gérald Sédrati-Dinet.
+# This software is Copyright (c) 2019-2022 by Gérald Sédrati.
 #
 # This is free software, licensed under:
 #
@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Target::Freenode;
-$App::SpreadRevolutionaryDate::Target::Freenode::VERSION = '0.31';
+$App::SpreadRevolutionaryDate::Target::Freenode::VERSION = '0.32';
 # ABSTRACT: Target class for L<App::SpreadRevolutionaryDate> to handle spreading on Freenode.
 
 use Moose;
@@ -111,7 +111,7 @@ App::SpreadRevolutionaryDate::Target::Freenode - Target class for L<App::SpreadR
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 METHODS
 
@@ -167,11 +167,11 @@ Spreads a message to Freenode channels configured with the multivalued option C<
 
 =head1 AUTHOR
 
-Gérald Sédrati-Dinet <gibus@cpan.org>
+Gérald Sédrati <gibus@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Gérald Sédrati-Dinet.
+This software is Copyright (c) 2019-2022 by Gérald Sédrati.
 
 This is free software, licensed under:
 

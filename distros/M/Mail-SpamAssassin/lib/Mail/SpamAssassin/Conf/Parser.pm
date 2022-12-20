@@ -26,7 +26,7 @@ Mail::SpamAssassin::Conf::Parser - parse SpamAssassin configuration
 =head1 DESCRIPTION
 
 Mail::SpamAssassin is a module to identify spam using text analysis and
-several internet-based realtime blacklists.
+several internet-based realtime blocklists.
 
 This class is used internally by SpamAssassin to parse its configuration files.
 Please refer to the C<Mail::SpamAssassin> documentation for public interfaces.
@@ -61,7 +61,7 @@ The type of this setting:
  - $CONF_TYPE_NUMERIC: numeric value (float or int)
  - $CONF_TYPE_BOOL: boolean (0/no or 1/yes)
  - $CONF_TYPE_TEMPLATE: template, like "report"
- - $CONF_TYPE_ADDRLIST: list of mail addresses, like "whitelist_from"
+ - $CONF_TYPE_ADDRLIST: list of mail addresses, like "welcomelist_from"
  - $CONF_TYPE_HASH_KEY_VALUE: hash key/value pair, like "describe" or tflags
  - $CONF_TYPE_STRINGLIST list of strings, stored as an array
  - $CONF_TYPE_IPADDRLIST list of IP addresses, stored as an array of SA::NetSet
@@ -123,11 +123,6 @@ Set to 1 if this setting can only be set in the system-wide config when run
 from spamd.  (All settings can be used by local programs run directly by the
 user.)
 
-=item is_frequent
-
-Set to 1 if this value occurs frequently in the config. this means it's looked
-up first for speed.
-
 =back
 
 =cut
@@ -162,8 +157,6 @@ sub new {
   };
 
   $self->{command_luts} = { };
-  $self->{command_luts}->{frequent} = { };
-  $self->{command_luts}->{remaining} = { };
 
   bless ($self, $class);
   $self;
@@ -197,20 +190,13 @@ sub build_command_luts {
 
   my $conf = $self->{conf};
 
-  my $set;
   foreach my $cmd (@{$arrref}) {
-    # first off, decide what set this is in.
-    if ($cmd->{is_frequent}) { $set = 'frequent'; }
-    else { $set = 'remaining'; }
-
-    # next, its priority (used to ensure frequently-used params
-    # are parsed first)
     my $cmdname = $cmd->{command} || $cmd->{setting};
-    $self->{command_luts}->{$set}->{$cmdname} = $cmd;
+    $self->{command_luts}->{$cmdname} = $cmd;
 
     if ($cmd->{aliases} && scalar @{$cmd->{aliases}} > 0) {
       foreach my $name (@{$cmd->{aliases}}) {
-        $self->{command_luts}->{$set}->{$name} = $cmd;
+        $self->{command_luts}->{$name} = $cmd;
       }
     }
   }
@@ -243,24 +229,29 @@ sub parse {
   }                            # (eg. .utf8 or @euro)
 
   # get fast-access handles on the command lookup tables
-  my $lut_frequent = $self->{command_luts}->{frequent};
-  my $lut_remaining = $self->{command_luts}->{remaining};
+  my $lut = $self->{command_luts};
   my %migrated_keys = map { $_ => 1 }
             @Mail::SpamAssassin::Conf::MIGRATED_SETTINGS;
 
   $self->{currentfile} = '(no file)';
+  $self->{linenum} = ();
   my $skip_parsing = 0;
   my @curfile_stack;
   my @if_stack;
   my @conf_lines = split (/\n/, $_[1]);
   my $line;
   $self->{if_stack} = \@if_stack;
+  $self->{cond_cache} = { };
   $self->{file_scoped_attrs} = { };
 
   my $keepmetadata = $conf->{main}->{keep_config_parsing_metadata};
 
   while (defined ($line = shift @conf_lines)) {
     local ($1);         # bug 3838: prevent random taint flagging of $1
+    my $parse_error;    # undef by default, may be overridden
+
+    # don't count internal file start/end lines
+    $self->{linenum}{$self->{currentfile}}++ if index($line, 'file ') != 0;
 
     if (index($line,'#') > -1) {
       # bug 5545: used to support testing rules in the ruleqa system
@@ -270,7 +261,7 @@ sub parse {
       }
 
       # bug 6800: let X-Spam-Checker-Version also show what sa-update we are at
-      if ($line =~ /^\# UPDATE version (\d+)$/) {
+      if (index($line, '# UPD') == 0 && $line =~ /^\# UPDATE version (\d+)$/) {
         for ($self->{currentfile}) {  # just aliasing, not a loop
           $conf->{update_version}{$_} = $1  if defined $_ && $_ ne '(no file)';
         }
@@ -285,7 +276,9 @@ sub parse {
     next unless($line); # skip empty lines
 
     # handle i18n
-    if ($line =~ s/^lang\s+(\S+)\s+//) { next if ($lang !~ /^$1/i); }
+    if (index($line, 'lang') == 0 && $line =~ s/^lang\s+(\S+)\s+//) {
+      next if $lang !~ /^$1/i;
+    }
 
     my($key, $value) = split(/\s+/, $line, 2);
     $key = lc $key;
@@ -293,92 +286,94 @@ sub parse {
     $key =~ tr/-/_/;
     $value = '' unless defined($value);
 
-#   # Do a better job untainting this info ...
-#   # $value = untaint_var($value);
-#   Do NOT blindly untaint now, do it carefully later when semantics is known!
-
-    my $parse_error;       # undef by default, may be overridden
-
-    # File/line number assertions
-    if ($key eq 'file') {
-      if ($value =~ /^start\s+(.+)$/) {
-        push (@curfile_stack, $self->{currentfile});
-        $self->{currentfile} = $1;
-        next;
+    # $key if/elsif blocks sorted by most commonly used
+    if ($key eq 'endif') {
+      if ($value ne '') {
+        $parse_error = "config: '$key' must be standalone";
+        goto failed_line;
       }
-
-      if ($value =~ /^end\s/) {
-        $self->{file_scoped_attrs} = { };
-
-        if (scalar @if_stack > 0) {
-          my $cond = pop @if_stack;
-
-          if ($cond->{type} eq 'if') {
-            my $msg = "config: unclosed 'if' in ".
-                  $self->{currentfile}.": if ".$cond->{conditional}."\n";
-            warn $msg;
-            $self->lint_warn($msg, undef);
-          }
-          else {
-            # die seems a bit excessive here, but this shouldn't be possible
-            # so I suppose it's okay.
-            die "config: unknown 'if' type: ".$cond->{type}."\n";
-          }
-
-          @if_stack = ();
-        }
-        $skip_parsing = 0;
-
-        my $curfile = pop @curfile_stack;
-        if (defined $curfile) {
-          $self->{currentfile} = $curfile;
-        } else {
-          $self->{currentfile} = '(no file)';
-        }
-        next;
+      my $lastcond = pop @if_stack;
+      if (!defined $lastcond) {
+        $parse_error = "config: missing starting 'if' for '$key'";
+        goto failed_line;
       }
-    }
-
-    # now handle the commands.
-    elsif ($key eq 'include') {
-      $value = $self->fix_path_relative_to_current_file($value);
-      my $text = $conf->{main}->read_cf($value, 'included file');
-      unshift (@conf_lines, split (/\n/, $text));
+      $skip_parsing = $lastcond->{skip_parsing};
       next;
     }
-
     elsif ($key eq 'ifplugin') {
+      if ($value eq '') {
+        $parse_error = "config: missing '$key' condition";
+        goto failed_line;
+      }
       $self->handle_conditional ($key, "plugin ($value)",
                         \@if_stack, \$skip_parsing);
       next;
     }
-
     elsif ($key eq 'if') {
+      if ($value eq '') {
+        $parse_error = "config: missing '$key' condition";
+        goto failed_line;
+      }
       $self->handle_conditional ($key, $value,
                         \@if_stack, \$skip_parsing);
       next;
     }
-
-    elsif ($key eq 'else') {
-      # TODO: if/else/else won't get flagged here :(
-      if (!@if_stack) {
-        $parse_error = "config: found else without matching conditional";
+    elsif ($key eq 'file') {
+      if ($value =~ /^start\s+(.+)$/) {
+        dbg("config: parsing file $1");
+        push (@curfile_stack, $self->{currentfile});
+        $self->{currentfile} = $1;
+        next;
+      }
+      elsif ($value =~ /^end\s/) {
+        foreach (@if_stack) {
+          my $msg = "config: unclosed '$_->{type}' found ".
+                    "in $self->{currentfile} (line $_->{linenum})";
+          $self->lint_warn($msg, undef);
+        }
+        $self->{file_scoped_attrs} = { };
+        @if_stack = ();
+        $skip_parsing = 0;
+        $self->{currentfile} = pop @curfile_stack;
+        next;
+      }
+      else {
+        $parse_error = "config: missing '$key' value";
         goto failed_line;
       }
-
-      $skip_parsing = !$skip_parsing;
+    }
+    elsif ($key eq 'include') {
+      if ($value eq '') {
+        $parse_error = "config: missing '$key' value";
+        goto failed_line;
+      }
+      $value = $self->fix_path_relative_to_current_file($value);
+      my $text = $conf->{main}->read_cf($value, 'included file');
+      unshift (@conf_lines,
+          "file end $self->{currentfile}",
+          split (/\n/, $text),
+          "file start $self->{currentfile}");
       next;
     }
-
-    # and the endif statement:
-    elsif ($key eq 'endif') {
-      my $lastcond = pop @if_stack;
-      if (!defined $lastcond) {
-        $parse_error = "config: found endif without matching conditional";
+    elsif ($key eq 'else') {
+      if ($value ne '') {
+        $parse_error = "config: '$key' must be standalone";
         goto failed_line;
       }
 
-      $skip_parsing = $lastcond->{skip_parsing};
+      # TODO: if/else/else won't get flagged here :(
+      if (!@if_stack) {
+        $parse_error = "config: '$key' missing starting if";
+        goto failed_line;
+      }
+
+      # Check if we are blocked anywhere in previous if-stack (Bug 7848)
+      if (grep { $_->{skip_parsing} } @if_stack) {
+        $skip_parsing = 1;
+      } else {
+        $skip_parsing = !$skip_parsing;
+      }
+
       next;
     }
 
@@ -386,6 +381,11 @@ sub parse {
     next if $skip_parsing;
 
     if ($key eq 'require_version') {
+      if ($value eq '') {
+        $parse_error = "config: missing '$key' value";
+        goto failed_line;
+      }
+
       # if it wasn't replaced during install, assume current version ...
       next if ($value eq "\@\@VERSION\@\@");
 
@@ -400,11 +400,11 @@ sub parse {
       #$value =~ s/^(\d+)\.(\d{1,3}).*$/sprintf "%d.%d", $1, $2/e;
 
       if ($ver ne $value) {
-        my $msg = "config: configuration file \"$self->{currentfile}\" requires ".
+        my $msg = "config: configuration file '$self->{currentfile}' requires ".
                 "version $value of SpamAssassin, but this is code version ".
                 "$ver. Maybe you need to use ".
                 "the -C switch, or remove the old config files? ".
-                "Skipping this file";
+                "Skipping this file.";
         warn $msg;
         $self->lint_warn($msg, undef);
         $skip_parsing = 1;
@@ -412,10 +412,7 @@ sub parse {
       next;
     }
 
-    my $cmd = $lut_frequent->{$key}; # check the frequent command set
-    if (!$cmd) {
-      $cmd = $lut_remaining->{$key}; # no? try the rest
-    }
+    my $cmd = $lut->{$key};
 
     # we've either fallen through with no match, in which case this
     # if() will fail, or we have a match.
@@ -438,26 +435,18 @@ sub parse {
       }
 
       my $ret = &{$cmd->{code}} ($conf, $cmd->{setting}, $value, $line);
+      next if !$ret;
 
-      if ($ret && $ret eq $Mail::SpamAssassin::Conf::INVALID_VALUE)
-      {
-        $parse_error = "config: SpamAssassin failed to parse line, ".
-                        "\"$value\" is not valid for \"$key\", ".
-                        "skipping: $line";
+      if ($ret eq $Mail::SpamAssassin::Conf::INVALID_VALUE) {
+        $parse_error = "config: invalid '$key' value";
         goto failed_line;
       }
-      elsif ($ret && $ret eq $Mail::SpamAssassin::Conf::INVALID_HEADER_FIELD_NAME)
-      {
-        $parse_error = "config: SpamAssassin failed to parse line, ".
-                       "it does not specify a valid header field name, ".
-                       "skipping: $line";
+      elsif ($ret eq $Mail::SpamAssassin::Conf::INVALID_HEADER_FIELD_NAME) {
+        $parse_error = "config: invalid header field name";
         goto failed_line;
       }
-      elsif ($ret && $ret eq $Mail::SpamAssassin::Conf::MISSING_REQUIRED_VALUE)
-      {
-        $parse_error = "config: SpamAssassin failed to parse line, ".
-                        "no value provided for \"$key\", ".
-                        "skipping: $line";
+      elsif ($ret eq $Mail::SpamAssassin::Conf::MISSING_REQUIRED_VALUE) {
+        $parse_error = "config: missing '$key' value";
         goto failed_line;
       }
       else {
@@ -486,21 +475,28 @@ failed_line:
       if ($migrated_keys{$key}) {
         # this key was moved into a plugin; non-fatal for lint
         $is_error = 0;
-        $msg = "config: failed to parse, now a plugin, skipping, in \"$self->{currentfile}\": $line";
+        $msg = "config: failed to parse line, now a plugin";
       } else {
         # a real syntax error; this is fatal for --lint
-        $msg = "config: failed to parse line, skipping, in \"$self->{currentfile}\": $line";
+        $msg = "config: failed to parse line";
       }
     }
 
+    if ($self->{currentfile} eq '(no file)') {
+      $msg .= " in $self->{currentfile}: $line"; 
+    } else {
+      $msg .= " in $self->{currentfile} ".
+              "(line $self->{linenum}{$self->{currentfile}}): $line"; 
+    }
     $self->lint_warn($msg, undef, $is_error);
   }
 
   delete $self->{if_stack};
+  delete $self->{cond_cache};
+  delete $self->{linenum};
 
   $self->lint_check();
-  $self->set_default_scores();
-  $self->check_for_missing_descriptions();
+  $self->fix_tests();
 
   delete $self->{scoresonly};
 }
@@ -509,12 +505,26 @@ sub handle_conditional {
   my ($self, $key, $value, $if_stack_ref, $skip_parsing_ref) = @_;
   my $conf = $self->{conf};
 
-  my @tokens = ($value =~ /($ARITH_EXPRESSION_LEXER)/og);
+  # If we have already successfully evaled the $value,
+  # just do what we would do then
+  if (exists $self->{cond_cache}{"$key $value"}) {
+    push (@{$if_stack_ref}, {
+        'type' => $key,
+        'conditional' => $value,
+        'skip_parsing' => $$skip_parsing_ref,
+        'linenum' => $self->{linenum}{$self->{currentfile}}
+      });
+    if ($self->{cond_cache}{"$key $value"} == 0) {
+      $$skip_parsing_ref = 1;
+    }
+    return;
+  }
 
+  my @tokens = ($value =~ /($ARITH_EXPRESSION_LEXER)/og);
   my $eval = '';
-  my $bad = 0;
+
   foreach my $token (@tokens) {
-    if ($token =~ /^(?:\W{1,5}|[+-]?\d+(?:\.\d+)?)$/) {
+    if ($token eq '(' || $token eq ')' || $token eq '!') {
       # using tainted subr. argument may taint the whole expression, avoid
       my $u = untaint_var($token);
       $eval .= $u . " ";
@@ -530,53 +540,77 @@ sub handle_conditional {
     elsif ($token eq 'has') {
       # replace with a method call
       $eval .= '$self->cond_clause_has';
-    }
+    }	
     elsif ($token eq 'version') {
       $eval .= $Mail::SpamAssassin::VERSION." ";
     }
     elsif ($token eq 'perl_version') {
       $eval .= $]." ";
     }
+    elsif ($token eq 'local_tests_only') {
+      $eval .= '($self->{conf}->{main}->{local_tests_only}?1:0) '
+    }
+    elsif ($token =~ /^(?:\W{1,5}|[+-]?\d+(?:\.\d+)?)$/) {
+      # using tainted subr. argument may taint the whole expression, avoid
+      my $u = untaint_var($token);
+      $eval .= $u . " ";
+    }
     elsif ($token =~ /^\w[\w\:]+$/) { # class name
       # Strictly controlled form:
       if ($token =~ /^(?:\w+::){0,10}\w+$/) {
+        # trunk Dmarc.pm was renamed to DMARC.pm
+        # (same check also in Conf.pm loadplugin)
+        if ($token eq 'Mail::SpamAssassin::Plugin::Dmarc') {
+          $token = 'Mail::SpamAssassin::Plugin::DMARC';
+        }
+        # backwards compatible - removed in 4.1
+        # (same check also in Conf.pm loadplugin)
+        elsif ($token eq 'Mail::SpamAssassin::Plugin::WhiteListSubject') {
+          $token = 'Mail::SpamAssassin::Plugin::WelcomeListSubject';
+        }
         my $u = untaint_var($token);
         $eval .= "'$u'";
       } else {
-        warn "config: illegal name '$token' in 'if $value'\n";
-        $bad++;
-        last;
+        my $msg = "config: not allowed value '$token' ".
+            "in $self->{currentfile} (line $self->{linenum}{$self->{currentfile}})";
+        $self->lint_warn($msg, undef);
+        return;
       }
     }
     else {
-      $bad++;
-      warn "config: unparseable chars in 'if $value': '$token'\n";
-      last;
+      my $msg = "config: unparseable value '$token' ".
+          "in $self->{currentfile} (line $self->{linenum}{$self->{currentfile}})";
+      $self->lint_warn($msg, undef);
+      return;
     }
   }
 
-  if ($bad) {
-    $self->lint_warn("config: bad 'if' line, in \"$self->{currentfile}\"", undef);
-    return -1;
-  }
-
   push (@{$if_stack_ref}, {
-      type => 'if',
-      conditional => $value,
-      skip_parsing => $$skip_parsing_ref
+      'type' => $key,
+      'conditional' => $value,
+      'skip_parsing' => $$skip_parsing_ref,
+      'linenum' => $self->{linenum}{$self->{currentfile}}
     });
 
   if (eval $eval) {
+    $self->{cond_cache}{"$key $value"} = 1;
     # leave $skip_parsing as-is; we may not be parsing anyway in this block.
     # in other words, support nested 'if's and 'require_version's
   } else {
-    warn "config: error in $key - $eval: $@" if $@ ne '';
+    if ($@) {
+      my $msg = "config: error parsing conditional ".
+          "in $self->{currentfile} (line $self->{linenum}{$self->{currentfile}}): $eval ($@)";
+      warn $msg;
+      $self->lint_warn($msg, undef, 0); # not fatal?
+    }
+    $self->{cond_cache}{"$key $value"} = 0;
     $$skip_parsing_ref = 1;
   }
 }
 
 # functions supported in the "if" eval:
 sub cond_clause_plugin_loaded {
+  return 1 if $_[1] eq 'Mail::SpamAssassin::Plugin::RaciallyCharged'; # removed in 4.1
   return $_[0]->{conf}->{plugins_loaded}->{$_[1]};
 }
 
@@ -599,16 +633,18 @@ sub cond_clause_can_or_has {
 
   local($1,$2);
   if (!defined $method) {
-    $self->lint_warn("config: bad 'if' line, no argument to $fn_name(), ".
-                     "in \"$self->{currentfile}\"", undef);
+    my $msg = "config: bad 'if' line, no argument to $fn_name() ".
+              "in $self->{currentfile} (line $self->{linenum}{$self->{currentfile}})";
+    $self->lint_warn($msg, undef);
   } elsif ($method =~ /^(.*)::([^:]+)$/) {
     no strict "refs";
     my($module, $meth) = ($1, $2);
     return 1  if $module->can($meth) &&
                  ( $fn_name eq 'has' || &{$method}() );
   } else {
-    $self->lint_warn("config: bad 'if' line, cannot find '::' in $fn_name($method), ".
-                     "in \"$self->{currentfile}\"", undef);
+    my $msg = "config: bad 'if' line, cannot find '::' in $fn_name($method) ".
+              "in $self->{currentfile} (line $self->{linenum}{$self->{currentfile}})";
+    $self->lint_warn($msg, undef);
   }
   return;
 }
@@ -625,51 +661,47 @@ sub lint_check {
     # Check for description and score issues in lint fashion
     while ( my $k = each %{$conf->{descriptions}} ) {
       if (!exists $conf->{tests}->{$k}) {
-        dbg("config: warning: description exists for non-existent rule $k");
+        dbg("config: description exists for non-existent rule $k");
       }
     }
 
     while ( my($sk) = each %{$conf->{scores}} ) {
       if (!exists $conf->{tests}->{$sk}) {
         # bug 5514: not a lint warning any more
-        dbg("config: warning: score set for non-existent rule $sk");
+        dbg("config: score set for non-existent rule $sk");
       }
     }
   }
 }
 
-# we should set a default score for all valid rules...  Do this here
-# instead of add_test because mostly 'score' occurs after the rule is
-# specified, so why set the scores to default, then set them again at
-# 'score'?
-# 
-sub set_default_scores {
+# Iterate through tests and check/fix things
+sub fix_tests {
   my ($self) = @_;
+
   my $conf = $self->{conf};
+  my $would_log_dbg = would_log('dbg');
 
   while ( my $k = each %{$conf->{tests}} ) {
+    # we should set a default score for all valid rules...  Do this here
+    # instead of add_test because mostly 'score' occurs after the rule is
+    # specified, so why set the scores to default, then set them again at
+    # 'score'?
+    # 
     if ( ! exists $conf->{scores}->{$k} ) {
       # T_ rules (in a testing probationary period) get low, low scores
-      my $set_score = ($k =~/^T_/) ? 0.01 : 1.0;
+      my $set_score = index($k, 'T_') == 0 ? 0.01 : 1.0;
 
       $set_score = -$set_score if ( ($conf->{tflags}->{$k}||'') =~ /\bnice\b/ );
       for my $index (0..3) {
         $conf->{scoreset}->[$index]->{$k} = $set_score;
       }
     }
-  }
-}
 
-# loop through all the tests and if we are missing a description with debug
-# set, throw a warning except for testing T_ or meta __ rules.
-sub check_for_missing_descriptions {
-  my ($self) = @_;
-  my $conf = $self->{conf};
-
-  while ( my $k = each %{$conf->{tests}} ) {
-    if ($k !~ m/^(?:T_|__)/i) {
+    # loop through all the tests and if we are missing a description with debug
+    # set, throw a note except for testing T_ or meta __ rules.
+    if ($would_log_dbg && $k !~ m/^(?:T_|__)/i) {
       if ( ! exists $conf->{descriptions}->{$k} ) {
-        dbg("config: warning: no description set for $k");
+        dbg("config: no description set for rule $k");
       }
     }
   }
@@ -795,7 +827,7 @@ sub set_string_list {
     return $Mail::SpamAssassin::Conf::MISSING_REQUIRED_VALUE;
   }
 
-  push(@{$conf->{$key}}, split(' ', $value));
+  push(@{$conf->{$key}}, split(/\s+/, $value));
 }
 
 sub set_ipaddr_list {
@@ -805,7 +837,7 @@ sub set_ipaddr_list {
     return $Mail::SpamAssassin::Conf::MISSING_REQUIRED_VALUE;
   }
 
-  foreach my $net (split(' ', $value)) {
+  foreach my $net (split(/\s+/, $value)) {
     $conf->{$key}->add_cidr($net);
   }
   $conf->{$key.'_configured'} = 1;
@@ -828,7 +860,7 @@ sub set_addrlist_value {
   unless (defined $value && $value !~ /^$/) {
     return $Mail::SpamAssassin::Conf::MISSING_REQUIRED_VALUE;
   }
-  $conf->{parser}->add_to_addrlist ($key, split (' ', $value));  # keep tainted
+  $conf->{parser}->add_to_addrlist ($key, split(/\s+/, $value));  # keep tainted
 }
 
 sub remove_addrlist_value {
@@ -837,7 +869,7 @@ sub remove_addrlist_value {
   unless (defined $value && $value !~ /^$/) {
     return $Mail::SpamAssassin::Conf::MISSING_REQUIRED_VALUE;
   }
-  $conf->{parser}->remove_from_addrlist ($key, split (' ', $value));
+  $conf->{parser}->remove_from_addrlist ($key, split(/\s+/, $value));
 }
 
 sub set_template_append {
@@ -868,20 +900,19 @@ sub finish_parsing {
     $conf->{main}->call_plugins("user_conf_parsing_start", { conf => $conf });
   }
 
-  $self->trace_meta_dependencies();
+  # compile meta rules
+  $self->compile_meta_rules();
   $self->fix_priorities();
-
-  # don't do this if allow_user_rules is active, since it deletes entries
-  # from {tests}
-  if (!$conf->{allow_user_rules}) {
-    $self->find_dup_rules();          # must be after fix_priorities()
-  }
+  $self->fix_tflags();
 
   dbg("config: finish parsing");
 
   while (my ($name, $text) = each %{$conf->{tests}}) {
     my $type = $conf->{test_types}->{$name};
-    my $priority = $conf->{priority}->{$name} || 0;
+
+    # Adjust priority -100 for net rules instead of default 0
+    my $priority = $conf->{priority}->{$name} ? $conf->{priority}->{$name} :
+        ($conf->{tflags}->{$name}||'') =~ /\bnet\b/ ? -100 : 0;
     $conf->{priorities}->{$priority}++;
 
     # eval type handling
@@ -892,7 +923,21 @@ sub finish_parsing {
           $self->lint_warn("syntax error for eval function $name: $text");
           next;
         }
-        elsif ($type == $Mail::SpamAssassin::Conf::TYPE_BODY_EVALS) {
+
+        # Validate type
+        my $expected_type = $conf->{eval_plugins_types}->{$function};
+        if (defined $expected_type && $expected_type != $type) {
+          # Allow both body and rawbody if expecting body
+          if (!($expected_type == $Mail::SpamAssassin::Conf::TYPE_BODY_EVALS &&
+              $type == $Mail::SpamAssassin::Conf::TYPE_RAWBODY_EVALS))
+          {
+            my $estr = $Mail::SpamAssassin::Conf::TYPE_AS_STRING{$expected_type};
+            $self->lint_warn("wrong rule type defined for $name, expected '$estr'");
+            next;
+          }
+        }
+
+        if ($type == $Mail::SpamAssassin::Conf::TYPE_BODY_EVALS) {
           $conf->{body_evals}->{$priority}->{$name} = [ $function, [@$argsref] ];
         }
         elsif ($type == $Mail::SpamAssassin::Conf::TYPE_HEAD_EVALS) {
@@ -931,7 +976,7 @@ sub finish_parsing {
         $conf->{head_tests}->{$priority}->{$name} = $text;
       }
       elsif ($type == $Mail::SpamAssassin::Conf::TYPE_META_TESTS) {
-        $conf->{meta_tests}->{$priority}->{$name} = $text;
+        # Handled by compile_meta_rules()
       }
       elsif ($type == $Mail::SpamAssassin::Conf::TYPE_URI_TESTS) {
         $conf->{uri_tests}->{$priority}->{$name} = $text;
@@ -970,138 +1015,203 @@ sub finish_parsing {
   }
 }
 
-sub trace_meta_dependencies {
-  my ($self) = @_;
-  my $conf = $self->{conf};
-  $conf->{meta_dependencies} = { };
-
-  foreach my $name (keys %{$conf->{tests}}) {
-    next unless ($conf->{test_types}->{$name}
-                    == $Mail::SpamAssassin::Conf::TYPE_META_TESTS);
-    my $alreadydone = {};
-    $self->_meta_deps_recurse($conf, $name, $name, $alreadydone);
+# Returns all rulenames matching glob (FOO_*)
+sub expand_ruleglob {
+  my ($self, $ruleglob, $rulename) = @_;
+  my $expanded;
+  if (exists $self->{ruleglob_cache}{$ruleglob}) {
+    $expanded = $self->{ruleglob_cache}{$ruleglob};
+  } else {
+    my $reglob = $ruleglob;
+    $reglob =~ s/\?/./g;
+    $reglob =~ s/\*/.*?/g;
+    # Glob rules, but do not match ourselves..
+    my @rules = grep {/^${reglob}$/ && $_ ne $rulename} keys %{$self->{conf}->{scores}};
+    if (@rules) {
+      $expanded = join('+', sort @rules);
+    } else {
+      $expanded = '0';
+    }
   }
+  my $logstr = $expanded eq '0' ? 'no matches' : $expanded;
+  dbg("rules: meta $rulename rules_matching($ruleglob) expanded: $logstr");
+  $self->{ruleglob_cache}{$ruleglob} = $expanded;
+  return " ($expanded) ";
 }
 
-sub _meta_deps_recurse {
-  my ($self, $conf, $toprule, $name, $alreadydone) = @_;
+sub compile_meta_rules {
+  my ($self) = @_;
+  my (%meta, %meta_deps, %rule_deps);
+  my $conf = $self->{conf};
 
-  # Avoid recomputing the dependencies of a rule
-  return split(' ', $conf->{meta_dependencies}->{$name}) if defined $conf->{meta_dependencies}->{$name};
+  foreach my $name (keys %{$conf->{tests}}) {
+    next unless $conf->{test_types}->{$name} == $Mail::SpamAssassin::Conf::TYPE_META_TESTS;
+    my $rule = $conf->{tests}->{$name};
 
-  # Obviously, don't trace empty or nonexistent rules
-  my $rule = $conf->{tests}->{$name};
-  unless ($rule) {
-      $conf->{meta_dependencies}->{$name} = '';
-      return ( );
+    # Expand meta rules_matching() before lexing
+    $rule =~ s/${META_RULES_MATCHING_RE}/$self->expand_ruleglob($1,$name)/ge;
+
+    # Lex the rule into tokens using a rather simple RE method ...
+    my @tokens = ($rule =~ /$ARITH_EXPRESSION_LEXER/og);
+
+    # Set the rule blank to start
+    $meta{$name} = '';
+
+    # List dependencies that are meta tests in the same priority band
+    $meta_deps{$name} = [ ];
+
+    # List all rule dependencies
+    $rule_deps{$name} = [ ];
+
+    # Go through each token in the meta rule
+    foreach my $token (@tokens) {
+      # operator (triage, already validated by is_meta_valid)
+      if ($token !~ tr/+&|()!<>=//c) {
+        $meta{$name} .= "$token ";
+      }
+      # rule-like check for local_tests_only
+      elsif ($token eq 'local_tests_only') {
+        $meta{$name} .= '($_[0]->{main}->{local_tests_only}||0) ';
+      }
+      # ... rulename?
+      elsif ($token =~ IS_RULENAME) {
+        # Will end up later in a compiled sub called from do_meta_tests:
+        #  $_[0] = $pms
+        #  $_[1] = $h ($pms->{tests_already_hit}),
+        $meta{$name} .= "(\$_[1]->{'$token'}||0) ";
+
+        if (!exists $conf->{test_types}->{$token}) {
+          dbg("rules: meta test $name has undefined dependency '$token'");
+          push @{$rule_deps{$name}}, $token;
+          next;
+        }
+
+        if ($conf->{scores}->{$token} == 0) {
+          # bug 5040: net rules in a non-net scoreset
+          # there are some cases where this is expected; don't warn
+          # in those cases.
+          unless ((($conf->get_score_set()) & 1) == 0 &&
+              ($conf->{tflags}->{$token}||'') =~ /\bnet\b/)
+          {
+            dbg("rules: meta test $name has dependency '$token' with a zero score");
+          }
+        }
+
+        # If the token is another meta rule, add it as a dependency
+        if ($conf->{test_types}->{$token} == $Mail::SpamAssassin::Conf::TYPE_META_TESTS) {
+          push @{$meta_deps{$name}}, $token;
+        }
+
+        # Record all dependencies
+        push @{$rule_deps{$name}}, $token;
+      }
+      # ... number or operator (already validated by is_meta_valid)
+      else {
+        $meta{$name} .= "$token ";
+      }
+    }
   }
 
-  # Avoid infinite recursion
-  return ( ) if exists $alreadydone->{$name};
-  $alreadydone->{$name} = ( );
+  # Sort by length of dependencies list.  It's more likely we'll get
+  # the dependencies worked out this way.
+  my @metas = sort { @{$meta_deps{$a}} <=> @{$meta_deps{$b}} } keys %meta;
+  my $count;
+  do {
+    $count = $#metas;
+    my %metas = map { $_ => 1 } @metas; # keep a small cache for fast lookups
+    # Go through each meta rule we haven't done yet
+    for (my $i = 0 ; $i <= $#metas ; $i++) {
+      next if (grep( $metas{$_}, @{ $meta_deps{ $metas[$i] } }));
+      splice @metas, $i--, 1;    # remove this rule from our list
+    }
+  } while ($#metas != $count && $#metas > -1); # run until we can't go anymore
 
-  my %deps;
-
-  # Lex the rule into tokens using a rather simple RE method ...
-  my @tokens = ($rule =~ /($ARITH_EXPRESSION_LEXER)/og);
-
-  # Go through each token in the meta rule
-  my $conf_tests = $conf->{tests};
-  foreach my $token (@tokens) {
-    # has to be an alpha+numeric token
-    next if $token =~ tr{A-Za-z0-9_}{}c || substr($token,0,1) =~ tr{A-Za-z_}{}c; # even faster
-
-    # and has to be a rule name
-    next unless exists $conf_tests->{$token};
-
-    # add and recurse
-    $deps{untaint_var($token)} = ( );
-    my @subdeps = $self->_meta_deps_recurse($conf, $toprule, $token, $alreadydone);
-    @deps{@subdeps} = ( );
+  # If there are any rules left, we can't solve the dependencies so complain
+  my %unsolved_metas = map { $_ => 1 } @metas; # keep a small cache for fast lookups
+  foreach my $rulename_t (@metas) {
+    my $msg = "rules: excluding meta test $rulename_t, unsolved meta dependencies: ".
+              join(", ", grep($unsolved_metas{$_}, @{ $meta_deps{$rulename_t} }));
+    $self->lint_warn($msg);
   }
-  $conf->{meta_dependencies}->{$name} = join (' ', keys %deps);
-  return keys %deps;
+
+  foreach my $name (keys %meta) {
+    if ($unsolved_metas{$name}) {
+      $conf->{meta_tests}->{$name} = sub { 0 };
+      $rule_deps{$name} = [ ];
+    }
+    if ($meta{$name} eq '( ) ') {
+      # Bug 8061:
+      # meta FOOBAR () considered a rule declaration to support rule_hits API or
+      #  other dynamic rules, only evaluated at finish_meta_rules unless got_hit.
+      # Other style metas without dependencies will be evaluated immediately.
+      $meta{$name} = '0'; # Evaluating () would result in undef
+    }
+    elsif (@{$rule_deps{$name}}) {
+      $conf->{meta_dependencies}->{$name} = $rule_deps{$name};
+      foreach my $deprule (@{$rule_deps{$name}}) {
+        $conf->{meta_deprules}->{$deprule}->{$name} = 1;
+      }
+    } else {
+      $conf->{meta_nodeps}->{$name} = 1;
+    }
+    # Compile meta sub
+    eval '$conf->{meta_tests}->{$name} = sub { '.$meta{$name}.'};';
+    # Paranoid check
+    die "rules: meta compilation failed for $name: '$meta{$name}': $@" if ($@);
+  }
 }
 
 sub fix_priorities {
   my ($self) = @_;
   my $conf = $self->{conf};
 
-  die unless $conf->{meta_dependencies};    # order requirement
+  return unless $conf->{meta_dependencies};    # order requirement
+
   my $pri = $conf->{priority};
+  my $tflags = $conf->{tflags};
 
   # sort into priority order, lowest first -- this way we ensure that if we
   # rearrange the pri of a rule early on, we cannot accidentally increase its
   # priority later.
-  foreach my $rule (sort {
-            $pri->{$a} <=> $pri->{$b}
-          } keys %{$pri})
-  {
+  foreach my $rule (sort { $pri->{$a} <=> $pri->{$b} } keys %{$pri}) {
     # we only need to worry about meta rules -- they are the
     # only type of rules which depend on other rules
     my $deps = $conf->{meta_dependencies}->{$rule};
     next unless (defined $deps);
 
     my $basepri = $pri->{$rule};
-    foreach my $dep (split ' ', $deps) {
+    foreach my $dep (@$deps) {
       my $deppri = $pri->{$dep};
-      if ($deppri > $basepri) {
-        dbg("rules: $rule (pri $basepri) requires $dep (pri $deppri): fixed");
-        $pri->{$dep} = $basepri;
+      if (defined $deppri && $deppri > $basepri) {
+        if ($basepri < -100 && ($tflags->{$dep}||'') =~ /\bnet\b/) {
+          dbg("rules: $rule (pri $basepri) requires $dep (pri $deppri): fixed to -100 (net rule)");
+          $pri->{$dep} = -100;
+          $conf->{priorities}->{-100}++;
+        } else {
+          dbg("rules: $rule (pri $basepri) requires $dep (pri $deppri): fixed");
+          $pri->{$dep} = $basepri;
+        }
       }
     }
   }
 }
 
-sub find_dup_rules {
+sub fix_tflags {
   my ($self) = @_;
   my $conf = $self->{conf};
+  my $tflags = $conf->{tflags};
 
-  my %names_for_text;
-  my %dups;
-  while (my ($name, $text) = each %{$conf->{tests}}) {
-    my $type = $conf->{test_types}->{$name};
-
-    # skip eval and empty tests
-    next if ($type & 1) ||
-      ($type eq $Mail::SpamAssassin::Conf::TYPE_EMPTY_TESTS);
-
-    my $tf = ($conf->{tflags}->{$name}||''); $tf =~ s/\s+/ /gs;
-    # ensure similar, but differently-typed, rules are not marked as dups;
-    # take tflags into account too due to "tflags multiple"
-    $text = "$type\t$text\t$tf";
-
-    if (defined $names_for_text{$text}) {
-      $names_for_text{$text} .= " ".$name;
-      $dups{$text} = undef;     # found (at least) one
-    } else {
-      $names_for_text{$text} = $name;
-    }
-  }
-
-  foreach my $text (keys %dups) {
-    my $first;
-    my $first_pri;
-    my @names = sort {$a cmp $b} split(' ', $names_for_text{$text});
-    foreach my $name (@names) {
-      my $priority = $conf->{priority}->{$name} || 0;
-
-      if (!defined $first || $priority < $first_pri) {
-        $first_pri = $priority;
-        $first = $name;
+  # Inherit net tflags from dependencies
+  while (my($rulename,$deps) = each %{$conf->{meta_dependencies}}) {
+    my $tfl = $tflags->{$rulename}||'';
+    next if $tfl =~ /\bnet\b/;
+    foreach my $deprule (@$deps) {
+      if (($tflags->{$deprule}||'') =~ /\bnet\b/) {
+        dbg("rules: meta $rulename inherits tflag net, depends on $deprule");
+        $tflags->{$rulename} = $tfl eq '' ? 'net' : "$tfl net";
+        last;
       }
     }
-    # $first is now the earliest-occurring rule. mark others as dups
-
-    my @dups;
-    foreach my $name (@names) {
-      next if $name eq $first;
-      push @dups, $name;
-      delete $conf->{tests}->{$name};
-    }
-
-    dbg("rules: $first merged duplicates: ".join(' ', @dups));
-    $conf->{duplicate_rules}->{$first} = \@dups;
   }
 }
 
@@ -1226,10 +1336,11 @@ sub add_test {
 
   # all of these rule types are regexps
   if ($type == $Mail::SpamAssassin::Conf::TYPE_BODY_TESTS ||
-      $type == $Mail::SpamAssassin::Conf::TYPE_FULL_TESTS ||
+      $type == $Mail::SpamAssassin::Conf::TYPE_URI_TESTS ||
       $type == $Mail::SpamAssassin::Conf::TYPE_RAWBODY_TESTS ||
-      $type == $Mail::SpamAssassin::Conf::TYPE_URI_TESTS)
+      $type == $Mail::SpamAssassin::Conf::TYPE_FULL_TESTS)
   {
+    $self->parse_captures($name, \$text);
     my ($rec, $err) = compile_regexp($text, 1, $ignore_amre);
     if (!$rec) {
       $self->lint_warn("config: invalid regexp for $name '$text': $err", $name);
@@ -1239,12 +1350,19 @@ sub add_test {
   }
   elsif ($type == $Mail::SpamAssassin::Conf::TYPE_HEAD_TESTS)
   {
+    # If redefining header test, clear out opt hashes so they don't leak to
+    # the new test.  There are separate hashes for options as it saves lots
+    # of memory (exists, neg, if-unset are rarely used).
+    if (exists $conf->{tests}->{$name}) {
+      delete $conf->{test_opt_exists}->{$name};
+      delete $conf->{test_opt_unset}->{$name};
+      delete $conf->{test_opt_neg}->{$name};
+    }
     local($1,$2,$3);
     # RFC 5322 section 3.6.8, ftext printable US-ASCII chars not including ":"
     # no re "strict";  # since perl 5.21.8: Ranges of ASCII printables...
     if ($text =~ /^exists:(.*)/) {
       my $hdr = $1;
-      # check :addr etc header options
       # $hdr used in eval text, validate carefully
       if ($hdr !~ /^[\w.-]+:?$/) {
         $self->lint_warn("config: invalid head test $name header: $hdr");
@@ -1255,15 +1373,21 @@ sub add_test {
       $conf->{test_opt_exists}->{$name} = 1;
     } else {
       # $hdr used in eval text, validate carefully
+      # check :addr etc header options
       if ($text !~ /^([\w.-]+(?:\:|(?:\:[a-z]+){1,2})?)\s*([=!]~)\s*(.+)$/) {
         $self->lint_warn("config: invalid head test $name: $text");
         return;
       }
       my ($hdr, $op, $pat) = ($1, $2, $3);
       $hdr =~ s/:$//;
+      if ($hdr =~ /:(?!(?:raw|addr|name|host|domain|ip|revip|first|last)\b)/i) {
+        $self->lint_warn("config: invalid header modifier for $name: $hdr", $name);
+        return;
+      }
       if ($pat =~ s/\s+\[if-unset:\s+(.+)\]$//) {
         $conf->{test_opt_unset}->{$name} = $1;
       }
+      $self->parse_captures($name, \$pat);
       my ($rec, $err) = compile_regexp($pat, 1, $ignore_amre);
       if (!$rec) {
         $self->lint_warn("config: invalid regexp for $name '$pat': $err", $name);
@@ -1283,25 +1407,27 @@ sub add_test {
       return;
     }
   }
+  elsif (($type & 1) == 1) { # *_EVALS
+    # create eval_to_rule mappings
+    if (my ($function) = ($text =~ m/(.*?)\s*\(.*?\)\s*$/)) {
+      push @{$conf->{eval_to_rule}->{$function}}, $name;
+    }
+  }
 
   $conf->{tests}->{$name} = $text;
   $conf->{test_types}->{$name} = $type;
 
-  if ($name =~ /AUTOLEARNTEST/i) {
+  if ($name =~ /^AUTOLEARNTEST/) {
      dbg("config: auto-learn: $name has type $type = $conf->{test_types}->{$name} during add_test\n");
   }
 
-  
-  if ($type == $Mail::SpamAssassin::Conf::TYPE_META_TESTS) {
-    $conf->{priority}->{$name} ||= 500;
-  }
-  else {
-    $conf->{priority}->{$name} ||= 0;
-  }
   $conf->{priority}->{$name} ||= 0;
-  $conf->{source_file}->{$name} = $self->{currentfile};
 
   if ($conf->{main}->{keep_config_parsing_metadata}) {
+    # {source_file} eats lots of memory and is unused unless
+    # keep_config_parsing_metadata is set (ruleqa stuff)
+    $conf->{source_file}->{$name} = $self->{currentfile};
+
     $conf->{if_stack}->{$name} = $self->get_if_stack_as_string();
 
     if ($self->{file_scoped_attrs}->{testrules}) {
@@ -1348,8 +1474,8 @@ sub is_meta_valid {
   my $meta = '';
 
   # Paranoid check (Bug #7557)
-  if ($rule =~ /(?:\:\:|->)/)  {
-    warn("config: invalid meta $name rule: $rule") ;
+  if ($rule =~ /(?:\:\:|->|[\$\@\%\;\{\}])/) {
+    warn("config: invalid meta $name rule: $rule\n");
     return 0;
   }
 
@@ -1358,6 +1484,11 @@ sub is_meta_valid {
 
   # Lex the rule into tokens using a rather simple RE method ...
   my @tokens = ($rule =~ /($ARITH_EXPRESSION_LEXER)/og);
+  if (length($name) == 1) {
+    for (@tokens) {
+      print "$name $_\n "  or die "Error writing token: $!";
+    }
+  }
 
   # Go through each token in the meta rule
   foreach my $token (@tokens) {
@@ -1387,6 +1518,26 @@ sub is_meta_valid {
   $err =~ s/Illegal division by zero/division by zero possible/i;
   $self->lint_warn("config: invalid expression for rule $name: \"$rule\": $err\n", $name);
   return 0;
+}
+
+sub parse_captures {
+  my ($self, $name, $re) = @_;
+
+  # Check for named regex capture templates
+  if (index($$re, '%{') >= 0) {
+    local($1);
+    # Replace %{FOO} with %\{FOO\} so compile_regexp doesn't fail with unescaped left brace
+    while ($$re =~ s/(?<!\\)\%\{([A-Z][A-Z0-9]*(?:_[A-Z0-9]+)*(?:\([^\)\}]*\))?)\}/%\\{$1\\}/g) {
+      dbg("config: found named capture for rule $name: $1");
+      $self->{conf}->{capture_template_rules}->{$name}->{$1} = 1;
+    }
+  }
+  # Make rules with captures run before anything else
+  if ($$re =~ /\(\?P?[<'][A-Z]/) {
+    dbg("config: adjusting regex capture rule $name priority to -10000");
+    $self->{conf}->{priority}->{$name} = -10000;
+    $self->{conf}->{capture_rules}->{$name} = 1;
+  }
 }
 
 # Deprecated functions, leave just in case..
@@ -1420,7 +1571,12 @@ sub add_to_addrlist {
     $re =~ s/([^\*\?_a-zA-Z0-9])/\\$1/g;	# escape any possible metachars
     $re =~ tr/?/./;				# "?" -> "."
     $re =~ s/\*+/\.\*/g;			# "*" -> "any string"
-    $conf->{$singlelist}->{$addr} = "^${re}\$";
+    my ($rec, $err) = compile_regexp("^${re}\$", 0);
+    if (!$rec) {
+      warn "could not compile $singlelist '$addr': $err";
+      return;
+    }
+    $conf->{$singlelist}->{$addr} = $rec;
   }
 }
 
@@ -1439,7 +1595,12 @@ sub add_to_addrlist_rcvd {
     $re =~ s/([^\*\?_a-zA-Z0-9])/\\$1/g;	# escape any possible metachars
     $re =~ tr/?/./;				# "?" -> "."
     $re =~ s/\*+/\.\*/g;			# "*" -> "any string"
-    $conf->{$listname}->{$addr}{re} = "^${re}\$";
+    my ($rec, $err) = compile_regexp("^${re}\$", 0);
+    if (!$rec) {
+      warn "could not compile $listname '$addr': $err";
+      return;
+    }
+    $conf->{$listname}->{$addr}{re} = $rec;
     $conf->{$listname}->{$addr}{domain} = [ $domain ];
   }
 }

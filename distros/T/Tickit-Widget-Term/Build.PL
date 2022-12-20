@@ -7,7 +7,7 @@ my $build = Module::Build->new(
    module_name => 'Tickit::Widget::Term',
    requires => {
       'perl' => '5.026',
-      'Object::Pad' => '0.51',
+      'Object::Pad' => '0.74', # 0.73 + bugfix
       'Syntax::Keyword::Match' => 0,
 
       'Convert::Color::RGB8' => 0,

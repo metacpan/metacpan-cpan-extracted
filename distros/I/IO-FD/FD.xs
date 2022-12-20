@@ -407,7 +407,7 @@ close(fd)
 
 SV*
 sysread(fd, data, len, ...)
-                int fd;
+                SV* fd;
                 SV* data
 		int len
 		INIT:
@@ -415,11 +415,11 @@ sysread(fd, data, len, ...)
 			char *buf;
 			int offset=0;
 
-                CODE:
+    PPCODE:
 			//TODO: allow unspecified len and offset
 
 			//grow scalar to fit potental read
-
+      if(SvOK(fd) && SvIOK(fd)){
 			if(items >=4 ){
 				//len=SvIOK(ST(2))?SvIV(ST(2)):0;
 				offset=SvIOK(ST(3))?SvIV(ST(3)):0;
@@ -446,23 +446,28 @@ sysread(fd, data, len, ...)
 					
 			buf+=offset;
 
-                        ret=read(fd, buf, len);
+      ret=read(SvIV(fd), buf, len);
 			if(ret<0){
 
-				RETVAL=&PL_sv_undef;
+				//RETVAL=&PL_sv_undef;
+        XSRETURN_UNDEF;
 			}
 			else {
 				buf[ret]='\0';
 				SvCUR_set(data,ret+offset);
-				RETVAL=newSViv(ret);
+				//RETVAL=newSViv(ret);
+        mXPUSHs(newSViv(ret));
+        XSRETURN(1);
 			}
+      }
+      else{
+        XSRETURN_UNDEF;
+      }
 
-		OUTPUT:
-			RETVAL
 
 SV*
 sysread3(fd, data, len)
-		int fd;
+		SV *fd;
 		SV* data
 		int len
 
@@ -471,7 +476,8 @@ sysread3(fd, data, len)
 			char *buf;
 			int offset;
 
-		CODE:
+		PPCODE:
+    if(SvOK(fd) && SvOK(data) &&SvIOK(fd)){
 			int data_len=SvCUR(data);
 
 			#fprintf(stderr, "Length of buffer is: %d\n", data_len);
@@ -486,20 +492,26 @@ sysread3(fd, data, len)
 			ret=read(fd, buf, len);
 			if(ret<0){
 
-				RETVAL=&PL_sv_undef;
+				//RETVAL=&PL_sv_undef;
+        XSRETURN_UNDEF;
 			}
 			else {
 				buf[ret]='\0';
 				SvCUR_set(data,ret);
-				RETVAL=newSViv(ret);
+        mXPUSHs(newSViv(ret));
+        XSRETURN(1);
+				//RETVAL=newSViv(ret);
 			}
+      }
 
-		OUTPUT:
-			RETVAL
+      else {
+        XSRETURN_UNDEF;
+      }
+
 
 SV*
 sysread4(fd, data, len, offset)
-                int fd;
+                SV* fd;
                 SV* data
                 int len
 		int offset
@@ -508,7 +520,8 @@ sysread4(fd, data, len, offset)
 			int ret;
 			char *buf;
 
-                CODE:
+      PPCODE:
+      if(SvOK(fd) && SvOK(data) &&SvIOK(fd)){
 			#TODO: allow unspecified len and offset
 
 			#grow scalar to fit potental read
@@ -536,23 +549,27 @@ sysread4(fd, data, len, offset)
                         ret=read(fd, buf, len);
 			if(ret<0){
 
-				RETVAL=&PL_sv_undef;
+				//RETVAL=&PL_sv_undef;
+        XSRETURN_UNDEF;
 			}
 			else {
 				buf[ret]='\0';
 				SvCUR_set(data,ret+offset);
-				RETVAL=newSViv(ret);
+				//RETVAL=newSViv(ret);
+        mXPUSHs(newSViv(ret));
+        XSRETURN(1);
 			}
-
-		OUTPUT:
-			RETVAL
+      }
+      else {
+        XSRETURN_UNDEF;
+      }
 
 #SYSWRITE 
 ##########
 
 SV*
 syswrite(fd,data,...)
-	int fd
+	SV *fd
 	SV* data
 
 	INIT:
@@ -561,7 +578,7 @@ syswrite(fd,data,...)
 		STRLEN max=SvCUR(data);
 		int len;
 		int offset;
-	CODE:
+	PPCODE:
 		if(items >=4 ){
 			//length and  Offset provided
 			len=SvIOK(ST(2))?SvIV(ST(2)):0;
@@ -579,44 +596,52 @@ syswrite(fd,data,...)
 			offset=0;
 		}
 
-		#TODO: fix negative offset processing
-		#TODO: allow unspecified len and offset
+    if(SvOK(fd) && SvIOK(fd)){
+      #TODO: fix negative offset processing
+      #TODO: allow unspecified len and offset
 
-		#fprintf(stderr,"Input size: %zu\n",SvCUR(data));
-		offset=
-			offset>max
-				?max
-				:offset;
+      #fprintf(stderr,"Input size: %zu\n",SvCUR(data));
+      offset=
+        offset>max
+          ?max
+          :offset;
 
-		if((offset+len)>max){
-			len=max-offset;
-		}
-		
-		buf=SvPVX(data);
-		buf+=offset;
-		ret=write(fd, buf, len);
-		#fprintf(stderr, "write consumed %d bytes\n", ret);	
-		if(ret<0){
-			RETVAL=&PL_sv_undef;	
-		}
-		else{
-			RETVAL=newSViv(ret);
-		}
+      if((offset+len)>max){
+        len=max-offset;
+      }
+      
+      buf=SvPVX(data);
+      buf+=offset;
+      ret=write(SvIV(fd), buf, len);
+      #fprintf(stderr, "write consumed %d bytes\n", ret);	
+      if(ret<0){
+        XSRETURN_UNDEF;
+        //RETVAL=&PL_sv_undef;	
+      }
+      else{
+        mXPUSHs(newSViv(ret));
+        XSRETURN(1);
 
-	OUTPUT:
-		RETVAL
+        //RETVAL=newSViv(ret);
+      }
+    }
+    else{
+        XSRETURN_UNDEF;  
+    }
+
 
 SV*
 syswrite2(fd,data)
-	int fd
+	SV* fd
 	SV* data
 
 	INIT:
 		int ret;
 		char *buf;
 		int len;
-	CODE:
+	PPCODE:
 
+    if(SvOK(fd) && SvIOK(fd)){
 		len=SvPOK(data)?SvCUR(data):0;
 		#TODO: fix negative offset processing
 		#TODO: allow unspecified len and offset
@@ -625,20 +650,25 @@ syswrite2(fd,data)
 
 		
 		buf=SvPVX(data);
-		ret=write(fd, buf, len);
+		ret=write(SvIV(fd), buf, len);
 		if(ret<0){
-			RETVAL=&PL_sv_undef;	
+      XSRETURN_UNDEF;
+			//RETVAL=&PL_sv_undef;	
 		}
 		else{
-			RETVAL=newSViv(ret);
+			//RETVAL=newSViv(ret);
+      mXPUSHs(newSViv(ret));
+      XSRETURN(1);
 		}
+    }
+    else{
 
-	OUTPUT:
-		RETVAL
+      XSRETURN_UNDEF;
+    }
 
 SV*
 syswrite3(fd,data,len)
-	int fd
+	SV* fd
 	SV* data
 	int len
 
@@ -647,8 +677,9 @@ syswrite3(fd,data,len)
 		char *buf;
 		STRLEN max=SvCUR(data);
 		int offset=0;
-	CODE:
+	PPCODE:
 
+    if(SvOK(fd) && SvIOK(fd)){
 		#TODO: fix negative offset processing
 		#TODO: allow unspecified len and offset
 
@@ -659,22 +690,26 @@ syswrite3(fd,data,len)
 		}
 		
 		buf=SvPVX(data);
-		ret=write(fd,buf,len);
+		ret=write(SvIV(fd),buf,len);
 		#fprintf(stderr, "write consumed %d bytes\n", ret);	
 		if(ret<0){
-			RETVAL=&PL_sv_undef;	
+			//RETVAL=&PL_sv_undef;	
+      XSRETURN_UNDEF;
 		}
 		else{
-			RETVAL=newSViv(ret);
+			//RETVAL=newSViv(ret);
+      mXPUSHs(newSViv(ret));
+      XSRETURN(1);
 		}
-
-	OUTPUT:
-		RETVAL
+    }
+    else {
+      XSRETURN_UNDEF;
+    }
 
 
 SV*
 syswrite4(fd,data,len,offset)
-	int fd
+	SV* fd
 	SV* data
 	int len
 	int offset
@@ -683,11 +718,12 @@ syswrite4(fd,data,len,offset)
 		int ret;
 		char *buf;
 		STRLEN max=SvCUR(data);
-	CODE:
+	PPCODE:
 
 		#TODO: fix negative offset processing
 		#TODO: allow unspecified len and offset
 
+    if(SvOK(fd) && SvIOK(fd)){
 		#fprintf(stderr,"Input size: %zu\n",SvCUR(data));
 		offset=
 			offset>max
@@ -700,18 +736,20 @@ syswrite4(fd,data,len,offset)
 		
 		buf=SvPVX(data);
 		buf+=offset;
-		ret=write(fd,buf,len);
+		ret=write(SvIV(fd),buf,len);
 		#fprintf(stderr, "write consumed %d bytes\n", ret);	
 		if(ret<0){
-			RETVAL=&PL_sv_undef;	
+			//RETVAL=&PL_sv_undef;	
+      XSRETURN_UNDEF;
 		}
 		else{
-			RETVAL=newSViv(ret);
+			//RETVAL=newSViv(ret);
+      mXPUSHs(newSViv(ret));
 		}
-
-	OUTPUT:
-		RETVAL
-
+    }
+    else{
+      XSRETURN_UNDEF;
+    }
 
 #PIPE
 ######

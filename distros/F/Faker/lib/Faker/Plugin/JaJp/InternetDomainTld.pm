@@ -9,6 +9,10 @@ use Venus::Class 'base';
 
 base 'Faker::Plugin::JaJp';
 
+# VERSION
+
+our $VERSION = '1.17';
+
 # METHODS
 
 sub execute {
@@ -45,6 +49,12 @@ Faker::Plugin::JaJp::InternetDomainTld - Internet Domain Tld
 =head1 ABSTRACT
 
 Internet Domain Tld for Faker
+
+=cut
+
+=head1 VERSION
+
+1.17
 
 =cut
 

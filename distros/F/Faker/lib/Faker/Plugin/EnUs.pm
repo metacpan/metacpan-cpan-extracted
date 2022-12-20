@@ -9,6 +9,10 @@ use Venus::Class 'base';
 
 base 'Faker::Plugin';
 
+# VERSION
+
+our $VERSION = '1.17';
+
 # MODIFIERS
 
 sub new {
@@ -40,6 +44,12 @@ Faker::Plugin::EnUs - En-Us Plugin Superclass
 =head1 ABSTRACT
 
 Fake Data Plugin Superclass (En-Us)
+
+=cut
+
+=head1 VERSION
+
+1.17
 
 =cut
 

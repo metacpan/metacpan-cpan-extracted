@@ -54,33 +54,42 @@ DefEnvironment('{subfigure}[]{Dimension}',
     . "#tags"
     . "#body"
     . "</ltx:figure>",
-  properties   => { layout => 'vertical' },
-  beforeDigest => sub { DefMacroI('\@captype', undef, 'subfigure'); },
-  afterDigest  => sub { RescueCaptionCounters('subfigure', $_[1]); });
+  properties   => sub { (layout => 'vertical', width => $_[2]); },
+  beforeDigest => sub { beforeFloat('subfigure'); },
+  afterDigest  => sub { afterFloat($_[1]); });
+
 DefEnvironment('{subfigure*}[]{Dimension}',
   "^<ltx:figure xml:id='#id' inlist='#inlist' ?#1(placement='#1')>"
     . "#tags"
     . "#body"
     . "</ltx:figure>",
-  properties   => { layout => 'vertical' },
-  beforeDigest => sub { DefMacroI('\@captype', undef, 'subfigure'); },
-  afterDigest  => sub { RescueCaptionCounters('subfigure', $_[1]); });
+  properties   => sub { (layout => 'vertical', width => $_[2]); },
+  beforeDigest => sub { beforeFloat('subfigure', double => 1); },
+  afterDigest  => sub { afterFloat($_[1]); });
+
 DefEnvironment('{subtable}[]{Dimension}',
   "^<ltx:table xml:id='#id' inlist='#inlist' ?#1(placement='#1')>"
     . "#tags"
     . "#body"
     . "</ltx:table>",
-  properties   => { layout => 'vertical' },
-  beforeDigest => sub { DefMacroI('\@captype', undef, 'subtable'); },
-  afterDigest  => sub { RescueCaptionCounters('subtable', $_[1]); });
+  properties   => sub { (layout => 'vertical', width => $_[2]); },
+  beforeDigest => sub { beforeFloat('subtable'); },
+  afterDigest  => sub { afterFloat($_[1]); });
+
 DefEnvironment('{subtable*}[]{Dimension}',
   "^<ltx:table xml:id='#id' inlist='#inlist' ?#1(placement='#1')>"
     . "#tags"
     . "#body"
     . "</ltx:table>",
-  properties   => { layout => 'vertical' },
-  beforeDigest => sub { DefMacroI('\@captype', undef, 'subtable'); },
-  afterDigest  => sub { RescueCaptionCounters('subtable', $_[1]); });
+  properties   => sub { (layout => 'vertical', width => $_[2]); },
+  beforeDigest => sub { beforeFloat('subtable', double => 1); },
+  afterDigest  => sub { afterFloat($_[1]); });
+
+#======================================================================
+# Can we get by by saying \subfloat is just an alias for {subfigure} ?
+# see 2111.00007 for example.
+# TODO: \columnwidth is a quick placeholder width, this seems to be intended as automatic
+DefMacro('\subfloat[][]{}', '\begin{subfigure}{\columnwidth}#3\caption{#2}\lx@subcaption@addinlist{#1}\end{subfigure}');
 
 #======================================================================
 # \subcaptionbox[list]{caption}[width][innerpos]{contents}
@@ -94,6 +103,9 @@ DefMacro('\@@subcaptionbox{} []{} Optional:0pt []{}',
 
 DefConstructor('\lx@subcaption@addinlist{}',
   "^ inlist='#1'");
+
+DefMacro('\subref OptionalMatch:* Semiverbatim', '\ref{#2}');
+
 #======================================================================
 # should be in caption? or caption3 ?
 DefMacro('\DeclareCaptionSubType OptionalMatch:* [] {}', '');

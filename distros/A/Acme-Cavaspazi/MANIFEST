@@ -8,6 +8,7 @@ Makefile.PL
 README
 README.md
 bin/cavaspazi
+bin/solospazi
 data/motifs.dna
 'data/this is a file'
 dist.ini

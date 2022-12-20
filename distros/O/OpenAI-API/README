@@ -1,0 +1,45 @@
+OpenAI-API
+
+OpenAI::API is a Perl module that provides an interface to the OpenAI API,
+which allows you to generate text, translate languages, summarize text,
+and perform other tasks using the language models developed by OpenAI.
+
+To use the OpenAI::API module, you will need an API key, which you can obtain by
+signing up for an account on the OpenAI website (https://beta.openai.com/).
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc OpenAI::API
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/NoAuth/Bugs.html?Dist=OpenAI-API
+
+    CPAN Ratings
+        https://cpanratings.perl.org/d/OpenAI-API
+
+    Search CPAN
+        https://metacpan.org/release/OpenAI-API
+
+
+LICENSE AND COPYRIGHT
+
+This software is Copyright (c) 2022 by Nelson Ferraz.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

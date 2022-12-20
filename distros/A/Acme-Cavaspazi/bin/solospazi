@@ -1,0 +1,32 @@
+#!/usr/bin/env perl
+# PODNAME: solo
+# ABSTRACT: a simple script made only of spaces [requires Acme::Bleach]
+use Acme::Bleach;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+solo - a simple script made only of spaces [requires Acme::Bleach]
+
+=head1 VERSION
+
+version 1.0.0
+
+=head1 AUTHOR
+
+Andrea Telatin <proch@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2022 by Andrea Telatin, Nicola Vitulo.
+
+This is free software, licensed under:
+
+  The MIT (X11) License
+
+=cut

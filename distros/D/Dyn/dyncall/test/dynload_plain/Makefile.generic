@@ -1,0 +1,29 @@
+APP        = dynload_plain
+OBJS       = dynload_plain.o
+TEST_C_LD  = dynload_plain_c_ld   # helper to deduce default c lib apps are linked with
+TEST_U8_SO = dynload_plain_ß_test # @@@ unsure if every platform handles ß, here (ANSI, UTF-8, ...)
+SRCTOP     = ${VPATH}/../..
+BLDTOP     = ../..
+CFLAGS    += -I${SRCTOP}/dynload -DDEF_C_DYLIB=\"${DEF_C_DYLIB}\"
+LDLIBS_D  += -L${BLDTOP}/dynload -ldynload_s
+
+.PHONY: all clean install
+all: ${TEST_C_LD} ${TEST_U8_SO}
+	# deduce path to default libc.so file, easier to do via shell than in code
+	# (see main() in dynload_plain.c); get from what ${TEST_C_LD} is linked
+	# against, then reinvoke make with actual build
+	export X=`{ (ldd ${TEST_C_LD} | awk '/libc\.so/{for(i=1;i<=NF;++i){if($$i~"^/"){print $$i;++r}}}END{exit !r}' || ls /lib*/libc.so* || ls /usr/lib/libc.so*) | grep -v '\.a$$' | (sort -V -r || sort -t . -n -k 2) } 2>/dev/null | head -1`; \
+	${MAKE} DEF_C_DYLIB="$$X" ${APP}
+${TEST_C_LD}:
+	# dummy bin built with same toolchain and flags to deduce default c lib this is linked with
+	echo 'int main() { return 0; }' | ${CC} -x c ${CFLAGS} ${LDFLAGS} -o ${TEST_C_LD} -
+${APP}: ${OBJS}
+	${CC} ${CFLAGS} ${LDFLAGS} ${OBJS} ${LDLIBS_D} ${LDLIBS} -o ${APP}
+${TEST_U8_SO}:
+	echo 'int dynload_plain_testfunc() { return 5; }' | ${CC} ${CFLAGS} -`[ \`uname\` = Darwin ] && echo dynamiclib || echo shared` -x c - -o ${TEST_U8_SO}
+clean:
+	rm -f ${APP} ${OBJS} ${TEST_C_LD} ${TEST_U8_SO}
+install:
+	mkdir -p ${PREFIX}/test
+	cp ${APP} ${TEST_U8_SO} ${PREFIX}/test
+

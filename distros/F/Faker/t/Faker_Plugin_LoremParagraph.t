@@ -126,12 +126,12 @@ $test->for('example', 1, 'execute', sub {
   ok $result->isa('Faker::Plugin::LoremParagraph');
   ok $result->faker;
   ok $result->faker->random->reseed($seed);
-  ok $result->faker->random->make; # reset randomizer
-  like $result->execute, qr/deleniti fugiat in accusantium animi corrup/;
-  ok $result->faker->random->make; # reset randomizer
-  like $result->execute, qr/ducimus placeat autem ut sit adipisci asper/;
-  ok $result->faker->random->make; # reset randomizer
-  like $result->execute, qr/dignissimos est magni quia aut et hic eos a/;
+  ok $result->faker->random->pick; # reset randomizer
+  like $result->execute, qr/error at numquam et illum numquam iste cupiditate/;
+  ok $result->faker->random->pick; # reset randomizer
+  like $result->execute, qr/earum consequuntur perspiciatis laborum maiores aperiam/;
+  ok $result->faker->random->pick; # reset randomizer
+  like $result->execute, qr/eveniet tenetur sed quod omnis et delectus sapiente non/;
 
   $result
 });

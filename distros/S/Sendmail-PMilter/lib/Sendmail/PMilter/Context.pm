@@ -50,11 +50,11 @@ use Carp;
 use Socket;
 use UNIVERSAL;
 
-use Sendmail::PMilter 1.23 qw(:all);
+use Sendmail::PMilter 1.24 qw(:all);
 
 # use Data::Dumper;
 
-our $VERSION = '1.23';
+our $VERSION = '1.24';
 $VERSION = eval $VERSION;
 
 =pod
@@ -547,7 +547,8 @@ my $len = 0;
 		)
 	    );
 	}
-	elsif( $rc ne SMFIR_REPLYCODE || $what eq 'close' || $what eq 'abort' )	# According to the Sendmail docs the abort callback reply is ignored.  Do we still need to send it?
+	elsif( $what eq 'abort' ) { ; }					# According to the Sendmail docs the abort callback reply is ignored.
+	elsif( $rc ne SMFIR_REPLYCODE || $what eq 'close' )
 	{
 #printf( "%s PID=%d Context.pm(%3d): call_hooks: calling write_packet at [%s] callback, rc=[%s]\n", $time_now, $$, __LINE__, $what, $rc );
 ##printf( "%s Context.pm(%3d): call_hooks: calling write_packet at [%s] callback, rc=[%s] (symval{'_'}=[%s])\n", $time_now, __LINE__, $what, $rc, $this->{symbols}{SMFIC_CONNECT}{'_'}//'null' );

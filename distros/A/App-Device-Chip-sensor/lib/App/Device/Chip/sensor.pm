@@ -4,9 +4,9 @@
 #  (C) Paul Evans, 2020-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.73 ':experimental(init_expr)';
+use Object::Pad 0.76;
 
-package App::Device::Chip::sensor 0.05;
+package App::Device::Chip::sensor 0.06;
 class App::Device::Chip::sensor;
 
 use Carp;
@@ -100,11 +100,11 @@ should be.
 field @_CHIPCONFIGS;
 method _chipconfigs { @_CHIPCONFIGS }  # for unit testing
 
-field $_interval :reader = 10;
+field $_interval :mutator = 10;
 
-field $_best_effort;
+field $_best_effort :mutator;
 
-field $_mid3;
+field $_mid3 :mutator;
 
 method OPTSPEC
 {

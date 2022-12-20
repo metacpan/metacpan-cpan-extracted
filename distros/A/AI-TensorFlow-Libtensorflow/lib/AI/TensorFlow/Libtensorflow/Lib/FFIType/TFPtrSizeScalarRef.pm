@@ -1,6 +1,8 @@
 package AI::TensorFlow::Libtensorflow::Lib::FFIType::TFPtrSizeScalarRef;
 # ABSTRACT: Type to hold pointer and size in a scalar reference
-$AI::TensorFlow::Libtensorflow::Lib::FFIType::TFPtrSizeScalarRef::VERSION = '0.0.2';
+$AI::TensorFlow::Libtensorflow::Lib::FFIType::TFPtrSizeScalarRef::VERSION = '0.0.3';
+use strict;
+use warnings;
 use FFI::Platypus::Buffer qw(scalar_to_buffer);
 use FFI::Platypus::API qw(
 	arguments_set_pointer
@@ -21,7 +23,9 @@ sub perl_to_native {
 	my ($value, $i) = @_;
 	die "Value must be a ScalarRef" unless ref $value eq 'SCALAR';
 
-	my ($pointer, $size) = scalar_to_buffer($$value);
+	my ($pointer, $size) = defined $$value
+		? scalar_to_buffer($$value)
+		: (0, 0);
 
 	push @stack, [ $value, $pointer, $size ];
 	arguments_set_pointer( $i  , $pointer);

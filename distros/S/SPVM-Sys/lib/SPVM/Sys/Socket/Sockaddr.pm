@@ -36,7 +36,7 @@ Retruns C<1>.
 
 =head2 sa_family
 
-  method sa_family : byte ()
+  method sa_family : int ()
 
 Gets C<sa_family>.
 

@@ -27,7 +27,7 @@
 	doap:maintainer      <http://purl.org/NET/cpan-uri/person/jonass>;
 	doap:name            "String-Copyright";
 	doap:programming-language "Perl";
-	doap:release         <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-001>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-001001>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-001002>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-001003>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-001004>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-001005>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-002000>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-002001>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-003000>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-003001>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-003002>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-003003>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-003004>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-003005>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-003006>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-003007>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-003008>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-003009>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-003010>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-003011>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-003012>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-003013>;
+	doap:release         <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-001>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-001001>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-001002>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-001003>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-001004>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-001005>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-002000>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-002001>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-003000>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-003001>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-003002>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-003003>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-003004>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-003005>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-003006>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-003007>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-003008>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-003009>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-003010>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-003011>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-003012>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-003013>, <http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-003014>;
 	doap:repository      [
 		a doap:GitRepository;
 		doap:browse <https://anonscm.debian.org/cgit/build-common/string-copyright.git>;
@@ -641,6 +641,29 @@
 	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/jonass>;
 	doap:file-release    <http://backpan.cpan.org/authors/id/J/JO/JONASS/String-Copyright-0.003013.tar.gz>;
 	doap:revision        "0.003013"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/String-Copyright/v_0-003014>
+	a                    doap:Version;
+	dc:identifier        "String-Copyright-0.003014"^^xsd:string;
+	dc:issued            "2022-12-17"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "fix a few typos in POD";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "fix wordlist in author test pod-spell";
+		], [
+			a doap-changeset:Tests;
+			rdfs:label "check spelling of PODs with tidyall";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "detect SPDX-FileCopyrightText: as stricl label";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/jonass>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/J/JO/JONASS/String-Copyright-0.003014.tar.gz>;
+	doap:revision        "0.003014"^^xsd:string.
 
 <http://purl.org/NET/cpan-uri/person/jonass>
 	a                    foaf:Person;

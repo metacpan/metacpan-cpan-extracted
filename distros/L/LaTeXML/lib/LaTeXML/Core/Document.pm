@@ -444,11 +444,11 @@ sub finalize_rec {
       }
   } }
 
-  # Attributes that begin with (the semi-legal) "_" are for Bookkeeping.
+  # Attributes (non-namespaced) that begin with "_" are for internal, temporary, Bookkeeping.
   # Remove them now.
   foreach my $attr ($node->attributes) {
     my $n = $attr->nodeName;
-    $node->removeAttribute($n) if $n =~ /^_/; }
+    $node->removeAttribute($n) if $n && $n =~ /^_/; }
   return; }
 
 #======================================================================
@@ -683,7 +683,7 @@ sub insertComment {
   if ($$self{node}->nodeType == XML_DOCUMENT_NODE) {
     push(@{ $$self{pending} }, $comment = $$self{document}->createComment(' ' . $text . ' ')); }
   elsif (($comment = $$self{node}->lastChild) && ($comment->nodeType == XML_COMMENT_NODE)) {
-    $comment->setData($comment->data . "\n     " . $text); }
+    $comment->setData($comment->data . "\n     " . $text . ' '); }
   else {
     $comment = $$self{node}->appendChild($$self{document}->createComment(' ' . $text . ' ')); }
   return $comment; }
@@ -705,6 +705,16 @@ sub insertPI {
   else {
     $$self{document}->insertBefore($pi, $$self{document}->documentElement); }
   return $pi; }
+
+# Insert an empty element before a given node
+# Does NOT move the current insertion point
+sub insertElementBefore {
+  my ($self, $point, $name, %attrib) = @_;
+  my $new = $$self{document}->createElement($name);
+  $new->setNamespace($LaTeXML::Common::Model::LTX_NAMESPACE, '', 1);
+  for my $key (keys %attrib) {
+    $new->setAttribute($key, $attrib{$key}); }
+  return $point->parentNode->insertBefore($new, $point); }
 
 #**********************************************************************
 # Middle level, mostly public, API.
@@ -889,6 +899,25 @@ sub closeNode {
   else {                            # Found node.
                                     # Intervening non-auto-closeable nodes!!
     Error('malformed', $model->getNodeQName($node), $self,
+      "Closing " . Stringify($node) . " whose open descendents do not auto-close",
+      "Descendents are " . join(', ', map { Stringify($_) } @cant_close))
+      if @cant_close;
+    $self->closeNode_internal($node); }
+  return; }
+
+sub maybeCloseNode {
+  my ($self, $node) = @_;
+  my $model = $$self{model};
+  my ($t, @cant_close) = ();
+  my $n = $$self{node};
+  Debug("To closeNode " . Stringify($node)) if $LaTeXML::DEBUG{document};
+  while ((($t = $n->getType) != XML_DOCUMENT_NODE) && !$n->isSameNode($node)) {
+    push(@cant_close, $n) unless $self->canAutoClose($n);
+    $n = $n->parentNode; }
+  if ($t == XML_DOCUMENT_NODE) { }    # Didn't find $qname at all!!
+  else {                              # Found node.
+                                      # Intervening non-auto-closeable nodes!!
+    Info('malformed', $model->getNodeQName($node), $self,
       "Closing " . Stringify($node) . " whose open descendents do not auto-close",
       "Descendents are " . join(', ', map { Stringify($_) } @cant_close))
       if @cant_close;
@@ -1979,8 +2008,8 @@ sub appendTree {
     elsif ((ref $child) =~ /^XML::LibXML::/) {
       my $type = $child->nodeType;
       if ($type == XML_ELEMENT_NODE) {
-        my $tag        = $self->getNodeQName($child);
-        my %attributes = map { $_->nodeType == XML_ATTRIBUTE_NODE ? ($_->nodeName => $_->getValue) : () }
+        my $tag = $self->getNodeQName($child);
+        my %attributes = map { $_->nodeType == XML_ATTRIBUTE_NODE ? ($self->getNodeQName($_) => $_->getValue) : () }
           $child->attributes;
         # DANGER: REMOVE the xml:id attribute from $child!!!!
         # This protects against some versions of XML::LibXML that warn against duplicate id's

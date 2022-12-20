@@ -1,0 +1,34 @@
+# -*- mode: Perl -*-
+# /=====================================================================\ #
+# |  babel.def                                                          | #
+# | Implementation for LaTeXML                                          | #
+# |=====================================================================| #
+# | Part of LaTeXML:                                                    | #
+# |  Public domain software, produced as part of work done by the       | #
+# |  United States Government & not subject to copyright in the US.     | #
+# |---------------------------------------------------------------------| #
+# | Thanks to the arXMLiv group for initial implementation              | #
+# |    http://arxmliv.kwarc.info/                                       | #
+# | Released to the Public Domain                                       | #
+# |---------------------------------------------------------------------| #
+# | Bruce Miller <bruce.miller@nist.gov>                        #_#     | #
+# | http://dlmf.nist.gov/LaTeXML/                              (o o)    | #
+# \=========================================================ooo==U==ooo=/ #
+package LaTeXML::Package::Pool;
+use strict;
+use warnings;
+use LaTeXML::Package;
+
+# This inhibits some risky redefinitions in babel
+Let('\bbl@opt@safe', '\@empty');
+
+# I think we can best just read the current babel.def
+# and then proceed with some strategic redefinitions.
+# We should also be able to directly process the
+#  <language>.ldf files.
+InputDefinitions('txtbabel', type => 'def', noltxml => 1);
+
+RequirePackage('babel_support');
+
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+1;

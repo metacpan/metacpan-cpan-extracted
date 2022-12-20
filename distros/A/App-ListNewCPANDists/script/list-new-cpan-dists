@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-02'; # DATE
+our $DATE = '2022-09-09'; # DATE
 our $DIST = 'App-ListNewCPANDists'; # DIST
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.018'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/ListNewCPANDists/list_new_cpan_dists",
@@ -40,7 +40,7 @@ list-new-cpan-dists - List new CPAN distributions in a given time period
 
 =head1 VERSION
 
-This document describes version 0.017 of list-new-cpan-dists (from Perl distribution App-ListNewCPANDists), released on 2022-09-02.
+This document describes version 0.018 of list-new-cpan-dists (from Perl distribution App-ListNewCPANDists), released on 2022-09-09.
 
 =head1 SYNOPSIS
 

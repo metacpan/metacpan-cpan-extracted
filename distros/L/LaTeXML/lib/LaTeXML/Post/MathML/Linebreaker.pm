@@ -66,7 +66,7 @@ sub UTF {
 
 my %BREAKBEFOREOPS = map { ($_ => 1) }    # [CONSTANT]
                                           # Various addops
-  "+", "-", UTF(0xB1), "\x{2213}";
+  "+", "-", UTF(0xB1), "\x{2212}", "\x{2213}";
 my %BREAKAFTEROPS = map { ($_ => 1) }     # [CONSTANT]
   ",";
 my %RELATIONOPS = map { ($_ => 1) }       # [CONSTANT]
@@ -318,16 +318,16 @@ sub applyLayout_break {
       ? ["m:mtable", { align => 'baseline 1', columnalign => 'left', columnspacing => '0.1em',
           ($$layout{displaystyle} ? (displaystyle => 'true') : ()) },
         ["m:mtr", {},
-          ["m:mtd", {}, @firstrow[0 .. $$layout{lhs_pos} - 1]],
-          ["m:mtd", {}, @firstrow[$$layout{lhs_pos} .. $#firstrow]]],
+          ["m:mtd", { class => 'ltx_align_left' }, @firstrow[0 .. $$layout{lhs_pos} - 1]],
+          ["m:mtd", { class => 'ltx_align_left' }, @firstrow[$$layout{lhs_pos} .. $#firstrow]]],
         map { ["m:mtr", {},
-            ["m:mtd", {}],
-            ["m:mtd", {}, @$_]] } @rows]
+            ["m:mtd", { class => 'ltx_align_left' }],
+            ["m:mtd", { class => 'ltx_align_left' }, @$_]] } @rows]
       : ["m:mtable", { align => 'baseline 1', columnalign => 'left',
           ($$layout{displaystyle} ? (displaystyle => 'true') : ()) },
-        ["m:mtr", {}, ["m:mtd", {}, @firstrow]],
+        ["m:mtr", {}, ["m:mtd", { class => 'ltx_align_left' }, @firstrow]],
         map { ["m:mtr", {},
-            ["m:mtd", {}, ["m:mspace", { width => $$layout{indentation} . "em" }], @$_]] }
+            ["m:mtd", { class => 'ltx_align_left' }, ["m:mspace", { width => $$layout{indentation} . "em" }], @$_]] }
           @rows]));
   return; }
 
@@ -1016,12 +1016,12 @@ sub asScripts {
 sub layout_msub {
   my ($node, $target, $level, $demerits) = @_;
   my ($base, $sub) = nodeChildren($node);
-  return asScripts($node, $target, $level, $demerits, 0, $base, $sub, ['m:none']); }
+  return asScripts($node, $target, $level, $demerits, 0, $base, $sub, ['m:mrow']); }
 
 sub layout_msup {
   my ($node, $target, $level, $demerits) = @_;
   my ($base, $sup) = nodeChildren($node);
-  return asScripts($node, $target, $level, $demerits, 0, $base, ['m:none'], $sup); }
+  return asScripts($node, $target, $level, $demerits, 0, $base, ['m:mrow'], $sup); }
 
 sub layout_msubsup {
   my ($node, $target, $level, $demerits) = @_;
@@ -1031,12 +1031,12 @@ sub layout_msubsup {
 sub layout_munder {
   my ($node, $target, $level, $demerits) = @_;
   my ($base, $sub) = nodeChildren($node);
-  return asScripts($node, $target, $level, $demerits, 1, $base, $sub, ['m:none']); }
+  return asScripts($node, $target, $level, $demerits, 1, $base, $sub, ['m:mrow']); }
 
 sub layout_mover {
   my ($node, $target, $level, $demerits) = @_;
   my ($base, $sup) = nodeChildren($node);
-  return asScripts($node, $target, $level, $demerits, 1, $base, ['m:none'], $sup); }
+  return asScripts($node, $target, $level, $demerits, 1, $base, ['m:mrow'], $sup); }
 
 sub layout_munderover {
   my ($node, $target, $level, $demerits) = @_;

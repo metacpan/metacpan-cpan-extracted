@@ -8,8 +8,10 @@ use Wx::AUI;
 
 package App::GUI::Cellgraph::Frame;
 use base qw/Wx::Frame/;
-use App::GUI::Cellgraph::Frame::Panel::Rules;
+use App::GUI::Cellgraph::Frame::Panel::Global;
 use App::GUI::Cellgraph::Frame::Panel::Start;
+use App::GUI::Cellgraph::Frame::Panel::Rules;
+use App::GUI::Cellgraph::Frame::Panel::Mobile;
 use App::GUI::Cellgraph::Frame::Part::Board;
 use App::GUI::Cellgraph::Dialog::Function;
 use App::GUI::Cellgraph::Dialog::Interface;
@@ -25,13 +27,16 @@ sub new {
     Wx::InitAllImageHandlers();
 
     # create GUI parts
-    $self->{'tabs'}           = Wx::AuiNotebook->new( $self, -1, [-1,-1], [-1,-1], &Wx::wxAUI_NB_TOP );
-    $self->{'panel'}{'rules'} = App::GUI::Cellgraph::Frame::Panel::Rules->new( $self->{'tabs'} );
-    $self->{'panel'}{'start'} = App::GUI::Cellgraph::Frame::Panel::Start->new( $self->{'tabs'} );
-    #$self->{'tab'}{'pen'}       = Wx::Panel->new($self->{'tabs'});
-    $self->{'tabs'}->AddPage( $self->{'panel'}{'start'}, 'Start');
-    $self->{'tabs'}->AddPage( $self->{'panel'}{'rules'}, 'Rules');
-    #$self->{'tabs'}->AddPage( $self->{'tab'}{'pen'},    'Pen Settings');
+    $self->{'tabs'}            = Wx::AuiNotebook->new( $self, -1, [-1,-1], [-1,-1], &Wx::wxAUI_NB_TOP );
+    $self->{'panel'}{'global'} = App::GUI::Cellgraph::Frame::Panel::Global->new( $self->{'tabs'} );
+    $self->{'panel'}{'start'}  = App::GUI::Cellgraph::Frame::Panel::Start->new(  $self->{'tabs'} );
+    $self->{'panel'}{'rules'}  = App::GUI::Cellgraph::Frame::Panel::Rules->new(  $self->{'tabs'} );
+    $self->{'panel'}{'mobile'} = App::GUI::Cellgraph::Frame::Panel::Mobile->new( $self->{'tabs'} );
+    $self->{'panel_names'} = [qw/global start rules mobile/];
+    $self->{'tabs'}->AddPage( $self->{'panel'}{'global'}, 'Global');
+    $self->{'tabs'}->AddPage( $self->{'panel'}{'start'},  'Start');
+    $self->{'tabs'}->AddPage( $self->{'panel'}{'rules'},  'Rules');
+    $self->{'tabs'}->AddPage( $self->{'panel'}{'mobile'}, 'Action');
     $self->{'tabs'}{'type'} = 0;
     $self->{'img_size'} = 700;
     $self->{'img_format'} = 'png';
@@ -43,8 +48,7 @@ sub new {
     $self->{'dialog'}{'about'}     = App::GUI::Cellgraph::Dialog::About->new();
     # $self->{'dialog'}{'interface'} = App::GUI::Cellgraph::Dialog::Interface->new();
     # $self->{'dialog'}{'function'}  = App::GUI::Cellgraph::Dialog::Function->new();
-    $self->{'panel'}{'rules'}->SetCallBack( sub { $self->draw( ) } );
-    $self->{'panel'}{'start'}->SetCallBack( sub { $self->draw( ) } );
+    $self->{'panel'}{$_}->SetCallBack( sub { $self->draw( ) } ) for @{$self->{'panel_names'}};
 
     Wx::Event::EVT_AUINOTEBOOK_PAGE_CHANGED( $self, $self->{'tabs'}, sub {
         $self->{'tabs'}{'type'} = $self->{'tabs'}->GetSelection unless $self->{'tabs'}->GetSelection == $self->{'tabs'}->GetPageCount - 1;
@@ -58,7 +62,6 @@ sub new {
         $self->{'dialog'}{$_}->Destroy() for qw/about/; # interface function
         $_[1]->Skip(1) 
     });
-
 
     # GUI layout assembly
     
@@ -159,30 +162,31 @@ sub new {
 sub init {
     my ($self) = @_;
     #$self->{'color'}{$_}->init() for qw/start/;
-    $self->{'panel'}{ $_ }->init() for qw/rules start/;
+    $self->{'panel'}{ $_ }->init() for @{$self->{'panel_names'}};
     $self->draw( );
     $self->SetStatusText( "all settings are set to default", 0);
 }
 
 sub get_data {
     my $self = shift;
-    { 
-        rules => $self->{'panel'}{'rules'}->get_data,
-        start => $self->{'panel'}{'start'}->get_data,
-    }
+    my %data = map { $_ => $self->{'panel'}{$_}->get_data } @{$self->{'panel_names'}};
+    \%data;
 }
 
 sub set_data {
     my ($self, $data) = @_;
-    return unless ref $data eq 'HASH';
-    #$self->{'color'}{$_}->set_data( $data->{ $_.'_color' } ) for qw/start/;
-    $self->{'panel'}{ $_ }->set_data( $data->{ $_ } ) for qw/rules start/;
+    # $self->{'color'}{$_}->set_data( $data->{ $_.'_color' } ) for qw/start/;
+    $self->{'panel'}{ $_ }->set_data( $data->{ $_ } ) for @{$self->{'panel_names'}};
 }
 
 sub draw {
     my ($self) = @_;
-    $self->{'board'}->set_data( $self->get_data );
-    $self->{'board'}->Refresh;
+    my $config = $self->get_data;
+    $self->{'panel'}{'rules'}->regenerate_rules( $config );
+    $self->{'panel'}{'mobile'}->regenerate_rules( $config );
+    $self->{'panel'}{'start'}->regenerate_cells( $config );
+    $config = $self->get_data;
+    $self->{'board'}->draw( $config );
 }
 
 sub open_settings_dialog {

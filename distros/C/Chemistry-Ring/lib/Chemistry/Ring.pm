@@ -1,6 +1,7 @@
 package Chemistry::Ring;
-$VERSION = '0.20';
-#$Id: Ring.pm,v 1.2 2009/05/10 21:12:44 itubert Exp $
+
+our $VERSION = '0.21'; # VERSION
+# $Id$
 
 =head1 NAME
 
@@ -90,7 +91,7 @@ EOF
 
 =item $ring->centroid
 
-Returs a vector with the centroid, defined as the average of the coordinates
+Returns a vector with the centroid, defined as the average of the coordinates
 of all the atoms in the ring. The vecotr is a L<Math::VectorReal> object.
 
 =cut
@@ -116,7 +117,12 @@ vector is a L<Math::VectorReal> object.
 
 sub plane {
     my $self = shift;
-    my $reg = Statistics::Regression->new(3, "plane for $self", [qw(b mx my)]);
+    my $reg;
+    if( $Statistics::Regression::VERSION < 0.52 ) {
+        $reg = Statistics::Regression->new(3, "plane for $self", [qw(b mx my)]);
+    } else {
+        $reg = Statistics::Regression->new("plane for $self", [qw(b mx my)]);
+    }
     for my $atom ($self->atoms) {
         my ($x, $y, $z) = $atom->coords->array;
         $reg->include($z, [1.0, $x, $y]);
@@ -216,11 +222,13 @@ sub aromatize_mol {
     @rings;
 }
 
+1;
+
 =back
 
-=head1 VERSION
+=head1 SOURCE CODE REPOSITORY
 
-0.20
+L<https://github.com/perlmol/Chemistry-Ring>
 
 =head1 SEE ALSO
 
@@ -238,4 +246,3 @@ free software; you can redistribute it and/or modify it under the same terms as
 Perl itself.
 
 =cut
-

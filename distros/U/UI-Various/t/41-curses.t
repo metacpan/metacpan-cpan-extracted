@@ -25,7 +25,7 @@ use Test::Output;
 BEGIN {
     eval { require Curses::UI; };
     $@  and  plan skip_all => 'Curses::UI not found';
-    plan tests => 58;
+    plan tests => 62;
 
     # define fixed environment for unit tests:
     delete $ENV{DISPLAY};
@@ -35,6 +35,7 @@ BEGIN {
 use UI::Various({use => ['Curses']});
 
 use constant T_PATH => map { s|/[^/]+$||; $_ } abs_path($0);
+do(T_PATH . '/functions/sub_perl.pl');
 
 #########################################################################
 # minimal dummy classes needed for unit tests:
@@ -463,6 +464,69 @@ like($selected1, qr'/t/functions/[a-z_]+\.pl$',
      'file selection returned correct file');
 like($selected1, qr"/t/functions/$selected2", 'file selection is consistent');
 is(@{$main->{children}}, 0, 'main 9 no longer has children');
+
+####################################
+# run some tests with aborting Curses::UI due to insufficient space (using
+# the same trick as above to simulate the keyboard - note that we're still
+# "running out of input" here as our Ctrl-C does not create the appropriate
+# signal!):
+use constant RC => 255 * 256;
+my $re_too_small_error =
+    qr{
+	  Your\ screen\ is\ currently\ too\ small\ for\ this\ application\..*
+	  Resize\ the\ screen\ and\ restart\ the\ application\..*
+	  Press\ <CTRL\+C>\ to\ exit
+  }sx;
+
+$_ = _sub_perl(	<<'CODE');
+		use UI::Various({use => ["Curses"]});
+		my @chars_to_read = ();
+		package Curses::UI::Common {
+		    no warnings "redefine";
+		    sub char_read(;$)
+		    {
+			0 < @chars_to_read  or  die "run out of input";
+			local $_ = shift @chars_to_read;
+			return $_;
+		    };
+		};
+		@chars_to_read = ("0x03");
+		my $main = UI::Various::Main->new();
+		my $win;
+		$win = $main->window({title => "too small",
+ 				      width => 1, height => 1},
+				     UI::Various::Button->new
+				     (text => "Quit",
+				      code => sub{   $win->destroy;   }));
+		$main->mainloop;
+CODE
+is($?, RC, 'correct RC ' . RC . ' in sub-perl "window to small"');
+like($_, $re_too_small_error, 'error-output for small window looks correct');
+
+$_ = _sub_perl(	<<'CODE');
+		use UI::Various({use => ["Curses"]});
+		my @chars_to_read = ();
+		package Curses::UI::Common {
+		    no warnings "redefine";
+		    sub char_read(;$)
+		    {
+			0 < @chars_to_read  or  die "run out of input";
+			local $_ = shift @chars_to_read;
+			return $_;
+		    };
+		};
+		@chars_to_read = ("0x03");
+		my $main = UI::Various::Main->new();
+		my $win;
+		$win = $main->dialog({title => "too small",
+ 				      width => 1, height => 1},
+				     UI::Various::Button->new
+				     (text => "Quit",
+				      code => sub{   $win->destroy;   }));
+		$main->mainloop;
+CODE
+is($?, RC, 'correct RC ' . RC . ' in sub-perl "dialog to small"');
+like($_, $re_too_small_error, 'error-output for small dialog looks correct');
 
 ####################################
 # test unused behaviour (and get 100% coverage):

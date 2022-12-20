@@ -39,6 +39,7 @@
             "Digest::MD5::File" : "0",
             "HTTP::Date" : "0",
             "IO::Scalar" : "0",
+            "JSON::PP" : "0",
             "LWP" : "0",
             "LWP::Protocol::https" : "0",
             "LWP::UserAgent::Determined" : "0",
@@ -49,7 +50,8 @@
             "Readonly" : "0",
             "URI" : "0",
             "URI::Escape" : "0",
-            "XML::Simple" : "0"
+            "XML::Simple" : "0",
+            "perl" : "5.010000"
          }
       },
       "test" : {
@@ -63,19 +65,19 @@
    "provides" : {
       "Amazon::S3" : {
          "file" : "lib/Amazon/S3.pm",
-         "version" : "0.57"
+         "version" : "0.58"
       },
       "Amazon::S3::Bucket" : {
          "file" : "lib/Amazon/S3/Bucket.pm",
-         "version" : "0.57"
+         "version" : "0.58"
       },
       "Amazon::S3::Constants" : {
          "file" : "lib/Amazon/S3/Constants.pm",
-         "version" : "0.57"
+         "version" : "0.58"
       },
       "Amazon::S3::Logger" : {
          "file" : "lib/Amazon/S3/Logger.pm",
-         "version" : "0.57"
+         "version" : "0.58"
       },
       "Amazon::S3::Signature::V4" : {
          "file" : "lib/Amazon/S3/Signature/V4.pm",
@@ -95,6 +97,6 @@
          "web" : "http://github.com/rlauer6/perl-amazon-s3"
       }
    },
-   "version" : "0.57",
+   "version" : "0.58",
    "x_serialization_backend" : "JSON::PP version 4.07"
 }

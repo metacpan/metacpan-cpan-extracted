@@ -19,8 +19,8 @@ Command Options:
 
 Prefix Options:
 
-    -s/-S SPEC         Produce ANSI sequence
-    -c/-C SPEC ARG     Colorize next argument
+    -s/-S SPEC         Produce ANSI sequence(s)
+    -c/-C SPEC ARG     Colorize next argument(s)
     -f/-F FORMAT ARGS  Format arguments
        -E              Terminate -C -S -F effect
     -i/-a SPEC         Insert/Append ANSI sequence
@@ -28,12 +28,18 @@ Prefix Options:
 Example:
 
     ansiecho -c R Red -c M/551 Magenta/Yellow -c FSDB BlinkReverseBoldBlue
+             ┗color━┛ ┗color━━━━━━━━━━━━━━━━┛ ┗color━━━━━━━━━━━━━━━━━━━━━┛
 
     ansiecho -f '[ %12s ]' -c SR -f '%+06d' 123
+             ┃             ┃     ┗format━━━━━━┛
+             ┃             ┗color━━━━━━━━━━━━━┛
+             ┗format━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
     ansiecho -C '555/(132,0,41)' d i g i t a l
+             ┗color━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
     read -a color < <( ansiecho -S ZE K/544 K/454 K/445 )
+                                ┗sequence━━━━━━━━━━━━━┛
 
 <div>
     <p><img width="750" src="https://raw.githubusercontent.com/kaz-utashiro/App-ansiecho/main/images/synopsis.png">
@@ -41,7 +47,7 @@ Example:
 
 # VERSION
 
-Version 1.02
+Version 1.03
 
 # DESCRIPTION
 
@@ -257,6 +263,7 @@ Then use this variable like:
     Next one does the same thing for all arguments.
 
         ansiecho -CRF -F'->%s' -CUD A B C
+                  ↑    ↑        ↑
 
 - **-E**
 
@@ -410,7 +417,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright 2021-2022 Kazumasa Utashiro.
+©︎ 2021-2022 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

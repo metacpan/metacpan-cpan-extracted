@@ -7,7 +7,7 @@ use v5.22;
 use strict;
 use warnings;
 
-our $VERSION = '1.0.0'; # VERSION
+our $VERSION = '1.1.0'; # VERSION
 
 use App::CSV2LaTeXTable;
 use Getopt::Long;
@@ -18,6 +18,8 @@ GetOptions(
     'csv-param=s@'   => \$opts{csv_param},
     'latex=s'        => \$opts{latex},
     'latex-param=s@' => \$opts{latex_param},
+    'split=i'        => \$opts{split},
+    'rotate'         => \$opts{rotate},
     'help'           => \my $help,
 );
 
@@ -37,17 +39,21 @@ for my $key ( qw/csv_param latex_param/ ) {
     delete $opts{$key} if !defined $opts{$key};
 }
 
+$opts{rotate} = 90 if $opts{rotate};
+
 my $app = App::CSV2LaTeXTable->new( %opts ) // usage();
 $app->run;
 
 sub usage {
     print qq~$0 --csv /path/to/file.csv --latex /path/to/table.tex
 
-    --help        Display this help.
-    --csv         A CSV file
-    --csv-param   A key value pair for Text::CSV_XS
-    --latex       The latex file will be created.
-    --latex-param A key-value pair for LaTeX::Table
+    --help                      Display this help.
+    --csv         <filename>    A CSV file
+    --csv-param   <key=value>   A key value pair for Text::CSV_XS, can be used several times
+    --latex       <filename>    The latex file will be created.
+    --latex-param <key=value>   A key-value pair for LaTeX::Table, can be used several times
+    --split       <int>         Split the table with <int> rows max per table
+    --rotate                    Rotate the table
     ~;
 }
 
@@ -63,7 +69,7 @@ csv2latextable
 
 =head1 VERSION
 
-version 1.0.0
+version 1.1.0
 
 =head1 USAGE
 

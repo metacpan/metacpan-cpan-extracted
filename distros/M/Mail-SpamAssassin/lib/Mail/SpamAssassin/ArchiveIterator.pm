@@ -25,13 +25,13 @@ use warnings;
 use re 'taint';
 
 use Errno qw(ENOENT EACCES EBADF);
-use Mail::SpamAssassin::Util;
+use Mail::SpamAssassin::Util qw(compile_regexp);
 use Mail::SpamAssassin::Constants qw(:sa);
 use Mail::SpamAssassin::Logger;
 use Mail::SpamAssassin::AICache;
 
-# 256 KiB is a big email, unless stated otherwise
-use constant BIG_BYTES => 256*1024;
+# 500 KiB is a big email, unless stated otherwise
+use constant BIG_BYTES => 500*1024;
 
 our ( $MESSAGES, $AICache, %class_opts );
 
@@ -43,9 +43,9 @@ Mail::SpamAssassin::ArchiveIterator - find and process messages one at a time
 
 =head1 SYNOPSIS
 
-  my $iter = new Mail::SpamAssassin::ArchiveIterator(
+  my $iter = Mail::SpamAssassin::ArchiveIterator->new(
     { 
-      'opt_max_size' => 256 * 1024,  # 0 implies no limit
+      'opt_max_size' => 500 * 1024,  # 0 implies no limit
       'opt_cache' => 1,
     }
   );
@@ -77,7 +77,7 @@ and C<result_sub> functions appropriately per message.
 
 ###########################################################################
 
-=item $item = new Mail::SpamAssassin::ArchiveIterator( [ { opt => val, ... } ] )
+=item $item = Mail::SpamAssassin::ArchiveIterator->new( [ { opt => val, ... } ] )
 
 Constructs a new C<Mail::SpamAssassin::ArchiveIterator> object.  You may
 pass the following attribute-value pairs to the constructor.  The pairs are
@@ -91,7 +91,7 @@ A value of option I<opt_max_size> determines a limit (number of bytes)
 beyond which a message is considered large and is skipped by ArchiveIterator.
 
 A value 0 implies no size limit, all messages are examined. An undefined
-value implies a default limit of 256 KiB.
+value implies a default limit of 500 KiB.
 
 =item opt_all
 
@@ -205,8 +205,6 @@ sub new {
   $self->{s} = [ ];		# spam, of course
   $self->{h} = [ ];		# ham, as if you couldn't guess
 
-  $self->{access_problem} = 0;
-
   if ($self->{opt_all}) {
     $self->{opt_max_size} = 0;
   } elsif (!defined $self->{opt_max_size}) {
@@ -235,10 +233,14 @@ sub set_functions {
 
 =item run ( @target_paths )
 
-Generates the list of messages to process, then runs each message through the
-configured wanted subroutine.  Files which have a name ending in C<.gz> or
-C<.bz2> will be properly uncompressed via call to C<gzip -dc> and C<bzip2 -dc>
-respectively.
+Generates the list of messages to process, then runs each message through
+the configured wanted subroutine.
+
+Compressed files are detected and uncompressed automatically regardless of
+file extension.  Supported formats are C<gzip>, C<bzip2>, C<xz>, C<lz4>,
+C<lzip>, C<lzo>.  Gzip is uncompressed via IO::Zlib module, others use their
+specific command line tool (bzip2/xz/lz4/lzip/lzop).  Compressed
+mailbox/mbox files are not supported.
 
 The target_paths array is expected to be either one element per path in the
 following format: C<class:format:raw_location>, or a hash reference containing
@@ -292,6 +294,11 @@ sub run {
     return 0;
   }
 
+  # Find some uncompressors (gzip is handled with IO::Zlib)
+  foreach ('bzip2','xz','lz4','lzip','lzop') {
+    $self->{$_.'_path'} = Mail::SpamAssassin::Util::find_executable_in_env_path($_);
+  }
+
   # scan the targets and get the number and list of messages
   $self->_scan_targets(\@targets,
     sub {
@@ -316,11 +323,16 @@ sub run {
 sub _run {
   my ($self, $messages) = @_;
 
+  my $messages_run = 0;
   while (my $message = shift @{$messages}) {
     my($class, undef, $date, undef, $result) = $self->_run_message($message);
-    &{$self->{result_sub}}($class, $result, $date) if $result;
+    if ($result) {
+      $messages_run++;
+      &{$self->{result_sub}}($class, $result, $date);
+    }
   }
-  return ! $self->{access_problem};
+  # Return success if atleast some files were processed through
+  return $messages_run > 0;
 }
 
 ############################################################################
@@ -346,24 +358,8 @@ sub _run_message {
 sub _run_file {
   my ($self, $class, $format, $where, $date) = @_;
 
-  if (!_mail_open($where)) {
-    $self->{access_problem} = 1;
-    return;
-  }
-
-  my $stat_errn = stat(INPUT) ? 0 : 0+$!;
-  if ($stat_errn == ENOENT) {
-    dbg("archive-iterator: no such input ($where)");
-    return;
-  }
-  elsif ($stat_errn != 0) {
-    warn "archive-iterator: no access to input ($where): $!";
-    return;
-  }
-  elsif (!-f _ && !-c _ && !-p _) {
-    warn "archive-iterator: not a plain file (or char.spec. or pipe) ($where)";
-    return;
-  }
+  my $fh = $self->_mail_open($where, 1);
+  return unless $fh;
 
   my $opt_max_size = $self->{opt_max_size};
   if (!$opt_max_size) {
@@ -375,7 +371,7 @@ sub _run_file {
     # note that -s can only deal with files, it returns 0 on char.spec. STDIN
     info("archive-iterator: skipping large message: ".
          "file size %d, limit %d bytes", -s _, $opt_max_size);
-    close INPUT  or die "error closing input file: $!";
+    close $fh  or die "error closing input file: $!";
     return;
   }
 
@@ -384,12 +380,12 @@ sub _run_file {
   my $len = 0;
   my $str = '';
   my($inbuf,$nread);
-  while ( $nread=read(INPUT,$inbuf,16384) ) {
+  while ( $nread=read($fh,$inbuf,16384) ) {
     $len += $nread;
     if ($opt_max_size && $len > $opt_max_size) {
       info("archive-iterator: skipping large message: read %d, limit %d bytes",
            $len, $opt_max_size);
-      close INPUT  or die "error closing input file: $!";
+      close $fh  or die "error closing input file: $!";
       return;
     }
     $str .= $inbuf;
@@ -400,7 +396,7 @@ sub _run_file {
   for my $j (0..$#msg) {
     if ($msg[$j] =~ /^\015?$/) { $header = $j; last }
   }
-  close INPUT  or die "error closing input file: $!";
+  close $fh  or die "error closing input file: $!";
 
   if ($date == AI_TIME_UNKNOWN && $self->{determine_receive_date}) {
     $date = Mail::SpamAssassin::Util::receive_date(join('', splice(@msg, 0, $header)));
@@ -418,21 +414,20 @@ sub _run_mailbox {
   }
   my @msg;
   my $header;
-  if (!_mail_open($file)) {
-    $self->{access_problem} = 1;
-    return;
-  }
+
+  my $fh = $self->_mail_open($file, 1);
+  return unless $fh;
 
   my $opt_max_size = $self->{opt_max_size};
   dbg("archive-iterator: _run_mailbox %s, ofs %d, limit %d",
       $file, $offset, $opt_max_size||0);
 
-  seek(INPUT,$offset,0)  or die "cannot reposition file to $offset: $!";
+  seek($fh,$offset,0)  or die "cannot reposition file to $offset: $!";
 
   my $size = 0;
-  for ($!=0; <INPUT>; $!=0) {
+  for ($!=0; <$fh>; $!=0) {
     #Changed Regex to use option Per bug 6703
-    last if (substr($_,0,5) eq "From " && @msg && /$self->{opt_from_regex}/o);
+    last if (/^From / && @msg && $_ =~ $self->{opt_from_regex});
     $size += length($_);
     push (@msg, $_);
 
@@ -441,7 +436,7 @@ sub _run_mailbox {
       info("archive-iterator: skipping large message: ".
            "%d lines, %d bytes, limit %d bytes",
            scalar @msg, $size, $opt_max_size);
-      close INPUT  or die "error closing input file: $!";
+      close $fh  or die "error closing input file: $!";
       return;
     }
 
@@ -452,7 +447,7 @@ sub _run_mailbox {
   defined $_ || $!==0  or
     $!==EBADF ? dbg("archive-iterator: error reading: $!")
               : die "error reading: $!";
-  close INPUT  or die "error closing input file: $!";
+  close $fh  or die "error closing input file: $!";
 
   if ($date == AI_TIME_UNKNOWN && $self->{determine_receive_date}) {
     $date = Mail::SpamAssassin::Util::receive_date(join('', splice(@msg, 0, $header)));
@@ -464,23 +459,24 @@ sub _run_mailbox {
 sub _run_mbx {
   my ($self, $class, $format, $where, $date) = @_;
 
-  my ($file, $offset) = ($where =~ m/(.*)\.(\d+)$/);
+  my ($file, $offset);
+  { local($1,$2);  # Bug 7140 (avoids perl bug [perl #123880])
+    ($file, $offset) = ($where =~ m/(.*)\.(\d+)$/);
+  }
   my @msg;
   my $header;
 
-  if (!_mail_open($file)) {
-    $self->{access_problem} = 1;
-    return;
-  }
+  my $fh = $self->_mail_open($file, 1);
+  return unless $fh;
 
   my $opt_max_size = $self->{opt_max_size};
   dbg("archive-iterator: _run_mbx %s, ofs %d, limit %d",
       $file, $offset, $opt_max_size||0);
 
-  seek(INPUT,$offset,0)  or die "cannot reposition file to $offset: $!";
+  seek($fh,$offset,0)  or die "cannot reposition file to $offset: $!";
     
   my $size = 0;
-  for ($!=0; <INPUT>; $!=0) {
+  for ($!=0; <$fh>; $!=0) {
     last if ($_ =~ MBX_SEPARATOR);
     $size += length($_);
     push (@msg, $_);
@@ -490,7 +486,7 @@ sub _run_mbx {
       info("archive-iterator: skipping large message: ".
            "%d lines, %d bytes, limit %d bytes",
            scalar @msg, $size, $opt_max_size);
-      close INPUT  or die "error closing input file: $!";
+      close $fh  or die "error closing input file: $!";
       return;
     }
 
@@ -501,7 +497,7 @@ sub _run_mbx {
   defined $_ || $!==0  or
     $!==EBADF ? dbg("archive-iterator: error reading: $!")
               : die "error reading: $!";
-  close INPUT  or die "error closing input file: $!";
+  close $fh  or die "error closing input file: $!";
 
   if ($date == AI_TIME_UNKNOWN && $self->{determine_receive_date}) {
     $date = Mail::SpamAssassin::Util::receive_date(join('', splice(@msg, 0, $header)));
@@ -579,12 +575,9 @@ sub _scan_targets {
       if ($format eq 'detect') {
 	# detect the format
         my $stat_errn = stat($location) ? 0 : 0+$!;
-        if ($stat_errn == ENOENT) {
-          $thisformat = 'file';  # actually, no file - to be detected later
-        }
-        elsif ($stat_errn != 0) {
-          warn "archive-iterator: no access to $location: $!";
-          $thisformat = 'file';
+        if ($stat_errn != 0) {
+          warn "archive-iterator: no access to $location: $!\n";
+          next;
         }
         elsif (-d _) {
 	  # it's a directory
@@ -623,37 +616,121 @@ sub _scan_targets {
 }
 
 sub _mail_open {
-  my ($file) = @_;
+  my ($self, $file, $ignore_missing) = @_;
+  my $fh;
 
+  # Go ahead and try to open the file
   # bug 5288: the "magic" version of open will strip leading and trailing
   # whitespace from the expression.  switch to the three-argument version
   # of open which does not strip whitespace.  see "perldoc -f open" and
   # "perldoc perlipc" for more information.
-
-  # Assume that the file by default is just a plain file
-  my @expr = ( $file );
-  my $mode = '<';
-
-  # Handle different types of compressed files
-  if ($file =~ /\.gz$/) {
-    $mode = '-|';
-    unshift @expr, 'gunzip', '-cd';
-  }
-  elsif ($file =~ /\.bz2$/) {
-    $mode = '-|';
-    unshift @expr, 'bzip2', '-cd';
-  }
-
-  # Go ahead and try to open the file
-  if (!open (INPUT, $mode, @expr)) {
-    warn "archive-iterator: unable to open $file: $!\n";
-    return 0;
+  if (!open($fh, '<', $file)) {
+    # Don't warn about disappeared files
+    if ($ignore_missing && $! == ENOENT) {
+      dbg("archive-iterator: no access to $file: $!");
+    } else {
+      warn "archive-iterator: no access to $file: $!\n"
+    }
+    return;
   }
 
   # bug 5249: mail could have 8-bit data, need this on some platforms
-  binmode INPUT  or die "cannot set input file to binmode: $!";
+  binmode $fh  or die "cannot set input file to binmode: $!";
 
-  return 1;
+  # Detect compressed data (only from files, can't reopen pipe)
+  if (-f $file && read($fh, my $magic, 6)) {
+    # GZIP
+    if ($magic =~ /^\x1F\x8B/) {
+      dbg("archive-iterator: detected gzip file $file, reopening with IO::Zlib");
+      close $fh  or die "error closing input file: $!";
+      eval { require IO::Zlib; };
+      if ($@) { warn "archive-iterator: IO::Zlib required for $file: $@\n"; return; }
+      $fh = IO::Zlib->new($file, "rb");
+      if (!$fh) {
+        if ($ignore_missing && $! == ENOENT) {
+          dbg("archive-iterator: no access to $file: $!");
+        } else {
+          warn "archive-iterator: no access to $file: $!\n";
+        }
+        return;
+      }
+    }
+    # BZIP2
+    elsif ($magic =~ /^\x42\x5A(?:\x68|\x30)/) {
+      dbg("archive-iterator: detected bzip2 file $file, reopening with bzip2");
+      close $fh  or die "error closing input file: $!";
+      if (!$self->{bzip2_path}) {
+        warn "archive-iterator: bzip2 executable required for $file\n";
+        return;
+      }
+      if (!open($fh, '-|', $self->{bzip2_path}, '-cd', $file)) {
+        warn "archive-iterator: no access to $file: $!\n";
+        return;
+      }
+      binmode $fh  or die "cannot set input file to binmode: $!";
+    }
+    # XZ
+    elsif ($magic =~ /^\xFD\x37\x7A\x58\x5A\x00/) {
+      dbg("archive-iterator: detected xz file $file, reopening with xz");
+      close $fh  or die "error closing input file: $!";
+      if (!$self->{xz_path}) {
+        warn "archive-iterator: xz executable required for $file\n";
+        return;
+      }
+      if (!open($fh, '-|', $self->{xz_path}, '-cd', $file)) {
+        warn "archive-iterator: no access to $file: $!\n";
+        return;
+      }
+      binmode $fh  or die "cannot set input file to binmode: $!";
+    }
+    # LZ4
+    elsif ($magic =~ /^\x04\x22\x4D\x18/) {
+      dbg("archive-iterator: detected lz4 file $file, reopening with lz4");
+      close $fh  or die "error closing input file: $!";
+      if (!$self->{lz4_path}) {
+        warn "archive-iterator: lz4 executable required for $file\n";
+        return;
+      }
+      if (!open($fh, '-|', $self->{lz4_path}, '-cd', $file)) {
+        warn "archive-iterator: no access to $file: $!\n";
+        return;
+      }
+      binmode $fh  or die "cannot set input file to binmode: $!";
+    }
+    # LZIP
+    elsif ($magic =~ /^\x4C\x5A\x49\x50/) {
+      dbg("archive-iterator: detected lzip file $file, reopening with lzip");
+      close $fh  or die "error closing input file: $!";
+      if (!$self->{lzip_path}) {
+        warn "archive-iterator: lzip executable required for $file\n";
+        return;
+      }
+      if (!open($fh, '-|', $self->{lzip_path}, '-cd', $file)) {
+        warn "archive-iterator: no access to $file: $!\n";
+        return;
+      }
+      binmode $fh  or die "cannot set input file to binmode: $!";
+    }
+    # LZO
+    elsif ($magic =~ /^\x89\x4C\x5A\x4F\x00\x0D/) {
+      dbg("archive-iterator: detected lzo file $file, reopening with lzop");
+      close $fh  or die "error closing input file: $!";
+      if (!$self->{lzop_path}) {
+        warn "archive-iterator: lzop executable required for $file\n";
+        return;
+      }
+      if (!open($fh, '-|', $self->{lzop_path}, '-cd', $file)) {
+        warn "archive-iterator: no access to $file: $!\n";
+        return;
+      }
+      binmode $fh  or die "cannot set input file to binmode: $!";
+    } else {
+      # Reset position
+      seek($fh,0,0);
+    }
+  }
+
+  return $fh;
 }
 
 sub _set_default_message_selection_opts {
@@ -663,11 +740,15 @@ sub _set_default_message_selection_opts {
   $self->{opt_want_date} = 1 unless (defined $self->{opt_want_date});
   $self->{opt_cache} = 0 unless (defined $self->{opt_cache});
   #Changed Regex to include boundaries for Communigate Pro versions (5.2.x and later). per Bug 6413
-  $self->{opt_from_regex} = '^From \S+  ?(\S\S\S \S\S\S .?\d .?\d:\d\d:\d\d \d{4}|.?\d-\d\d-\d{4}_\d\d:\d\d:\d\d_)' unless (defined $self->{opt_from_regex});
-
-  #STRIP LEADING AND TRAILING / FROM REGEX FOR OPTION
-  $self->{opt_from_regex} =~ s/^\///;
-  $self->{opt_from_regex} =~ s/\/$//;
+  if (!defined $self->{opt_from_regex}) {
+    $self->{opt_from_regex} = qr/^From \S+  ?(\S\S\S \S\S\S .?\d .?\d:\d\d:\d\d \d{4}|.?\d-\d\d-\d{4}_\d\d:\d\d:\d\d_)/;
+  } elsif (ref($self->{opt_from_regex}) ne 'Regexp') {
+    my ($rec, $err) = compile_regexp($self->{opt_from_regex}, 1);
+    if (!$rec) {
+      die "fatal: invalid mbox_format_from_regex '$self->{opt_from_regex}': $err\n";
+    }
+    $self->{opt_from_regex} = $rec;
+  }
 
   dbg("archive-iterator: _set_default_message_selection_opts After: Scanprob[$self->{opt_scanprob}], want_date[$self->{opt_want_date}], cache[$self->{opt_cache}], from_regex[$self->{opt_from_regex}]");
 
@@ -750,7 +831,7 @@ sub _scan_directory {
     # Maildir format: bug 3003
     for my $sub ("new", "cur") {
       opendir (DIR, "$folder/$sub")
-            or die "Can't open '$folder/$sub' dir: $!\n";
+            or die "archive-iterator: can't open '$folder/$sub' dir: $!\n";
       # Don't learn from messages marked as deleted
       # Or files starting with a leading dot
       push @files, map { "$sub/$_" } grep { !/^\.|:2,.*T/ } readdir(DIR);
@@ -790,9 +871,10 @@ sub _scan_directory {
     my $stat_errn = stat($file) ? 0 : 0+$!;
     if ($stat_errn == ENOENT) {
       # no longer there?
+      dbg("archive-iterator: no access to $file: $!");
     }
     elsif ($stat_errn != 0) {
-      warn "archive-iterator: no access to $file: $!";
+      warn "archive-iterator: no access to $file: $!\n";
     }
     elsif (-f _ || -c _ || -p _) {
       $self->_scan_file($class, $file, $bkfunc);
@@ -801,7 +883,7 @@ sub _scan_directory {
       push(@subdirs, $file);
     }
     else {
-      warn "archive-iterator: $file is not a plain file or directory: $!";
+      warn "archive-iterator: $file is not a plain file or directory\n";
     }
   }
   undef @files;  # release storage
@@ -844,18 +926,17 @@ sub _scan_file {
       }
 
       my $header = '';
-      if (!_mail_open($mail)) {
-        $self->{access_problem} = 1;
-        return;
-      }
-      for ($!=0; <INPUT>; $!=0) {
+      my $fh = $self->_mail_open($mail);
+      return unless $fh;
+
+      for ($!=0; <$fh>; $!=0) {
         last if /^\015?$/s;
         $header .= $_;
       }
       defined $_ || $!==0  or
         $!==EBADF ? dbg("archive-iterator: error reading: $!")
                   : die "error reading: $!";
-      close INPUT  or die "error closing input file: $!";
+      close $fh  or die "error closing input file: $!";
 
       return if ($self->{opt_skip_empty_messages} && $header eq '');
 
@@ -896,7 +977,6 @@ sub _scan_mailbox {
     $folder =~ s/\/\s*$//; #Remove trailing slash, if there
     if (!opendir(DIR, $folder)) {
       warn "archive-iterator: can't open '$folder' dir: $!\n";
-      $self->{access_problem} = 1;
       return;
     }
     while ($_ = readdir(DIR)) {
@@ -921,9 +1001,8 @@ sub _scan_mailbox {
 
   foreach my $file (@files) {
     $self->_bump_scan_progress();
-    if ($file =~ /\.(?:gz|bz2)$/) {
+    if ($file =~ /\.(?:gz|bz2|xz|lz[o4]?)$/i) {
       warn "archive-iterator: compressed mbox folders are not supported at this time\n";
-      $self->{access_problem} = 1;
       next;
     }
 
@@ -943,20 +1022,18 @@ sub _scan_mailbox {
     }
 
     unless ($count) {
-      if (!_mail_open($file)) {
-        $self->{access_problem} = 1;
-	next;
-      }
+      my $fh = $self->_mail_open($file);
+      next unless $fh;
 
       my $start = 0;		# start of a message
       my $where = 0;		# current byte offset
       my $first = '';		# first line of message
       my $header = '';		# header text
       my $in_header = 0;	# are in we a header?
-      while (!eof INPUT) {
+      while (!eof $fh) {
         my $offset = $start;	# byte offset of this message
         my $header = $first;	# remember first line
-        for ($!=0; <INPUT>; $!=0) {
+        for ($!=0; <$fh>; $!=0) {
 	  if ($in_header) {
             if (/^\015?$/s) {
 	      $in_header = 0;
@@ -966,15 +1043,15 @@ sub _scan_mailbox {
 	    }
 	  }
           #Changed Regex to use option Per bug 6703
-	  if (substr($_,0,5) eq "From " && /$self->{opt_from_regex}/o) {
+	  if (/^From / && $_ =~ $self->{opt_from_regex}) {
 	    $in_header = 1;
 	    $first = $_;
 	    $start = $where;
-	    $where = tell INPUT;
+	    $where = tell $fh;
             $where >= 0  or die "cannot obtain file position: $!";
 	    last;
 	  }
-	  $where = tell INPUT;
+	  $where = tell $fh;
           $where >= 0  or die "cannot obtain file position: $!";
         }
         defined $_ || $!==0  or
@@ -986,7 +1063,7 @@ sub _scan_mailbox {
 	  $info->{$offset} = Mail::SpamAssassin::Util::receive_date($header);
 	}
       }
-      close INPUT  or die "error closing input file: $!";
+      close $fh  or die "error closing input file: $!";
     }
 
     while(my($k,$v) = each %{$info}) {
@@ -1027,7 +1104,6 @@ sub _scan_mbx {
     $folder =~ s/\/\s*$//; # remove trailing slash, if there is one
     if (!opendir(DIR, $folder)) {
       warn "archive-iterator: can't open '$folder' dir: $!\n";
-      $self->{access_problem} = 1;
       return;
     }
     while ($_ = readdir(DIR)) {
@@ -1053,9 +1129,8 @@ sub _scan_mbx {
   foreach my $file (@files) {
     $self->_bump_scan_progress();
 
-    if ($folder =~ /\.(?:gz|bz2)$/) {
+    if ($folder =~ /\.(?:gz|bz2|xz|lz[o4]?)$/i) {
       warn "archive-iterator: compressed mbx folders are not supported at this time\n";
-      $self->{access_problem} = 1;
       next;
     }
 
@@ -1075,13 +1150,11 @@ sub _scan_mbx {
     }
 
     unless ($count) {
-      if (!_mail_open($file)) {
-	$self->{access_problem} = 1;
-        next;
-      }
+      my $fh = $self->_mail_open($file);
+      next unless $fh;
 
       # check the mailbox is in mbx format
-      $! = 0; $fp = <INPUT>;
+      $! = 0; $fp = <$fh>;
       defined $fp || $!==0  or
         $!==EBADF ? dbg("archive-iterator: error reading: $!")
                   : die "error reading: $!";
@@ -1092,18 +1165,17 @@ sub _scan_mbx {
       }
 
       # skip mbx headers to the first email...
-      seek(INPUT,2048,0)  or die "cannot reposition file to 2048: $!";
-      my $sep = MBX_SEPARATOR;
+      seek($fh,2048,0)  or die "cannot reposition file to 2048: $!";
 
-      for ($!=0; <INPUT>; $!=0) {
-        if ($_ =~ /$sep/) {
-	  my $offset = tell INPUT;
+      for ($!=0; <$fh>; $!=0) {
+        if ($_ =~ MBX_SEPARATOR) {
+	  my $offset = tell $fh;
           $offset >= 0  or die "cannot obtain file position: $!";
 	  my $size = $2;
 
 	  # gather up the headers...
 	  my $header = '';
-          for ($!=0; <INPUT>; $!=0) {
+          for ($!=0; <$fh>; $!=0) {
             last if (/^\015?$/s);
 	    $header .= $_;
 	  }
@@ -1116,7 +1188,7 @@ sub _scan_mbx {
           }
 
 	  # go onto the next message
-	  seek(INPUT, $offset + $size, 0)
+	  seek($fh, $offset + $size, 0)
             or die "cannot reposition file to $offset + $size: $!";
 	}
         else {
@@ -1126,7 +1198,7 @@ sub _scan_mbx {
       defined $_ || $!==0  or
         $!==EBADF ? dbg("archive-iterator: error reading: $!")
                   : die "error reading: $!";
-      close INPUT  or die "error closing input file: $!";
+      close $fh  or die "error closing input file: $!";
     }
 
     while(my($k,$v) = each %{$info}) {

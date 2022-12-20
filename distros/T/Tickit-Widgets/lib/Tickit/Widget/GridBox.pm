@@ -1,12 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2022 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.57;
+use Object::Pad 0.73 ':experimental(adjust_params init_expr)';
 
-package Tickit::Widget::GridBox 0.35;
+package Tickit::Widget::GridBox 0.36;
 class Tickit::Widget::GridBox
+   :strict(params)
    :isa(Tickit::ContainerWidget);
 
 use experimental 'postderef';
@@ -98,17 +99,8 @@ sub BUILDARGS {
    return $class->SUPER::BUILDARGS( %args );
 }
 
-has @_grid;
-has $_max_col = -1;
-
-ADJUSTPARAMS
-{
-   my ( $params ) = @_;
-
-   if( $params->{children} ) {
-      croak "The 'children' constructor argument to ${\ref $self} is no longer recognised; use ->append_row instead";
-   }
-}
+field @_grid;
+field $_max_col = -1;
 
 method lines
 {

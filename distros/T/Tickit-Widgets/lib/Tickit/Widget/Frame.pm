@@ -1,12 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2022 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.57;
+use Object::Pad 0.73 ':experimental(adjust_params init_expr)';
 
-package Tickit::Widget::Frame 0.36;
+package Tickit::Widget::Frame 0.37;
 class Tickit::Widget::Frame
+   :strict(params)
    :isa(Tickit::SingleChildWidget);
 
 use Tickit::Style;
@@ -131,21 +132,16 @@ For more details see the accessors below.
 
 =cut
 
-has $_title    :reader :param = undef;
-has %_has_edge;
+field $_title    :reader :param = undef;
+field %_has_edge;
 
-ADJUSTPARAMS
-{
-   my ( $params ) = @_;
-
-   $self->set_title_align( delete $params->{title_align} || 0 );
+ADJUST :params (
+   :$title_align = 0,
+) {
+   $self->set_title_align( $title_align );
 
    # Prepopulate has_* caches
    $self->on_style_changed_values;
-
-   if( exists $params->{child} ) {
-      croak "The 'child' constructor argument to ${\ref $self} is no longer recognised; use ->add_child instead";
-   }
 }
 
 =head1 ACCESSORS

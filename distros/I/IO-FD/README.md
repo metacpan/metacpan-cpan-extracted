@@ -288,6 +288,10 @@ A alias of `IO::FD::pipe`.
 
 ### IO::FD::sysread
 
+**NOTE:** Versions prior to 0.1.4 would end up using fd = 0 (normally STDIN)
+when it was non numeric.  This is fixed in 0.1.4. An fd which is not numeric
+will cause an immediate return of undefined.
+
 ### IO::FD::sysread3
 
 Same as `IO::FD::sysread`, but expects only 3 of 4 arguments
@@ -297,6 +301,10 @@ Same as `IO::FD::sysread`, but expects only 3 of 4 arguments
 Same as `IO::FD::sysread`, but expects all four arguments
 
 ### IO::FD::syswrite
+
+**NOTE:** Versions prior to 0.1.4 would end up using fd = 0 (normally STDIN)
+when it was non numeric.  This is fixed in 0.1.4. An fd which is not numeric
+will cause an immediate return of undefined.
 
 ### IO::FD::syswrite2
 

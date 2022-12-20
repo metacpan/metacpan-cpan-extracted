@@ -155,6 +155,18 @@ sub search {
   return wantarray ? (@result) : \@result;
 }
 
+sub string {
+  my ($self, $list, $name) = @_;
+
+  my @result;
+
+  for my $item ($self->find($list, $name)) {
+    push @result, join "\n\n", @{$item->{data}};
+  }
+
+  return wantarray ? (@result) : join "\n", @result;
+}
+
 sub text {
   my ($self) = @_;
 
@@ -515,6 +527,77 @@ This method can return a list of values in list-context.
   # [
   #   { data => ["Example Title #1"], index => 2, list => "titles", name => "#1" },
   # ]
+
+=back
+
+=cut
+
+=head2 string
+
+  string(Maybe[Str] $list, Maybe[Str] $name) (Str)
+
+The string method is a wrapper around L</find> as shorthand for searching by
+C<list> and C<name>, returning only the strings found.
+
+I<Since C<1.67>>
+
+=over 4
+
+=item string example 1
+
+  # given: synopsis;
+
+  my $string = $data->docs->string(undef, 'name');
+
+  # "Example #1\nExample #2"
+
+=back
+
+=over 4
+
+=item string example 2
+
+  # given: synopsis;
+
+  my $string = $data->docs->string('head1', 'NAME');
+
+  # "Example #1\nExample #2"
+
+=back
+
+=over 4
+
+=item string example 3
+
+  # given: synopsis;
+
+  my $string = $data->text->string(undef, 'name');
+
+  # "Example Name"
+
+=back
+
+=over 4
+
+=item string example 4
+
+  # given: synopsis;
+
+  my $string = $data->text->string('titles', '#1');
+
+  # "Example Title #1"
+
+=back
+
+=over 4
+
+=item string example 5
+
+  # given: synopsis;
+
+  my @string = $data->docs->string('head1', 'NAME');
+
+  # ("Example #1", "Example #2")
 
 =back
 

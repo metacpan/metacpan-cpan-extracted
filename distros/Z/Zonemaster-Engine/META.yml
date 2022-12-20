@@ -25,8 +25,6 @@ no_index:
     - inc
     - share
     - t
-recommends:
-  Net::IP::XS: 0
 requires:
   Class::Accessor: 0
   Clone: 0
@@ -39,13 +37,14 @@ requires:
   Module::Find: 0.1
   Moose: 2.0401
   MooseX::Singleton: 0.3
-  Net::IP: 1.26
+  Net::DNS: 0
+  Net::IP::XS: 0.21
   Readonly: 0
   Text::CSV: 0
-  Zonemaster::LDNS: 2.002002
+  Zonemaster::LDNS: 3
   perl: 5.14.2
 resources:
   bugtracker: https://github.com/zonemaster/zonemaster-engine/issues
   license: http://opensource.org/licenses/bsd-license.php
   repository: https://github.com/zonemaster/zonemaster-engine
-version: '4.005001'
+version: '4.006000'

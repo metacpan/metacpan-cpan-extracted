@@ -45,30 +45,32 @@ use warnings;
 # use bytes;
 use re 'taint';
 
-require 5.008001;  # needs utf8::is_utf8()
-
 use Mail::SpamAssassin::Logger;
 
+use version 0.77;
 use Exporter ();
 
 our @ISA = qw(Exporter);
 our @EXPORT = ();
-our @EXPORT_OK = qw(&local_tz &base64_decode &untaint_var &untaint_file_path
-                  &exit_status_str &proc_status_ok &am_running_on_windows
-                  &reverse_ip_address &decode_dns_question_entry &touch_file
-                  &get_my_locales &parse_rfc822_date &get_user_groups
-                  &secure_tmpfile &secure_tmpdir &uri_list_canonicalize
-                  &compile_regexp &qr_to_string &is_fqdn_valid);
+our @EXPORT_OK = qw(&local_tz &base64_decode &base64_encode &base32_encode
+                  &untaint_var &untaint_file_path &exit_status_str
+                  &proc_status_ok &am_running_on_windows &reverse_ip_address
+                  &decode_dns_question_entry &touch_file &secure_tmpfile
+                  &secure_tmpdir &uri_list_canonicalize &get_my_locales
+                  &parse_rfc822_date &idn_to_ascii &is_valid_utf_8
+                  &get_user_groups &compile_regexp &qr_to_string
+                  &is_fqdn_valid &parse_header_addresses &force_die
+                  &domain_to_search_list);
 
 our $AM_TAINTED;
 
 use Config;
+use Encode;
 use IO::Handle;
 use File::Spec;
 use File::Basename;
 use Time::Local;
-use Sys::Hostname (); # don't import hostname() into this namespace!
-use NetAddr::IP 4.000;
+use Scalar::Util qw(tainted);
 use Fcntl;
 use Errno qw(ENOENT EACCES EEXIST);
 use POSIX qw(:sys_wait_h WIFEXITED WIFSIGNALED WIFSTOPPED WEXITSTATUS
@@ -76,12 +78,14 @@ use POSIX qw(:sys_wait_h WIFEXITED WIFSIGNALED WIFSTOPPED WEXITSTATUS
 
 ###########################################################################
 
+use constant HAS_NETADDR_IP => eval { require NetAddr::IP; };
 use constant HAS_MIME_BASE64 => eval { require MIME::Base64; };
-use constant RUNNING_ON_WINDOWS => ($^O =~ /^(?:mswin|dos|os2)/oi);
+use constant RUNNING_ON_WINDOWS => ($^O =~ /^(?:mswin|dos|os2)/i);
 
 # These are only defined as stubs on Windows (see bugs 6798 and 6470).
 BEGIN {
   if (RUNNING_ON_WINDOWS) {
+    require Win32;
     no warnings 'redefine';
 
     # See the section on $? at
@@ -93,6 +97,45 @@ BEGIN {
     *WTERMSIG    = sub { $_[0] & 127 };
   }
 }
+
+###########################################################################
+
+our $ALT_FULLSTOP_UTF8_RE;
+BEGIN {
+  # Bug 6751:
+  # RFC 3490 (IDNA): Whenever dots are used as label separators, the
+  #   following characters MUST be recognized as dots: U+002E (full stop),
+  #   U+3002 (ideographic full stop), U+FF0E (fullwidth full stop),
+  #   U+FF61 (halfwidth ideographic full stop).
+  # RFC 5895: [...] the IDEOGRAPHIC FULL STOP character (U+3002)
+  #   can be mapped to the FULL STOP before label separation occurs.
+  #   [...] Only the IDEOGRAPHIC FULL STOP character (U+3002) is added in
+  #   this mapping because the authors have not fully investigated [...]
+  # Adding also 'SMALL FULL STOP' (U+FE52) as seen in the wild,
+  # and a 'ONE DOT LEADER' (U+2024).
+  #
+  no bytes;  # make sure there is no 'use bytes' in effect
+  my $dot_chars = "\x{2024}\x{3002}\x{FF0E}\x{FF61}\x{FE52}";  # \x{002E}
+  my $dot_bytes = join('|', split(//,$dot_chars));  utf8::encode($dot_bytes);
+  $ALT_FULLSTOP_UTF8_RE = qr/$dot_bytes/s;
+}
+
+###########################################################################
+
+our ($have_libidn, $have_libidn2);
+BEGIN {
+  my $sa_libidn = ($ENV{'SA_LIBIDN'}||'') =~ /(\d+)/ ? $1 : 0;
+  if (!$sa_libidn || $sa_libidn eq '2') {
+    eval { require Net::LibIDN2; } and do { $have_libidn2 = 1; };
+  }
+  if (!$have_libidn2 && (!$sa_libidn || $sa_libidn eq '1')) {
+    eval { require Net::LibIDN; } and do { $have_libidn = 1; };
+  }
+}
+
+$have_libidn||$have_libidn2
+  or info("util: module Net::LibIDN or Net::LibIDN2 not available, ".
+          "internationalized domain names with U-labels will not be recognized!");
 
 ###########################################################################
 
@@ -108,15 +151,28 @@ BEGIN {
     if ( !$displayed_path++ ) {
       dbg("util: current PATH is: ".join($Config{'path_sep'},File::Spec->path()));
     }
+
+    my @pathext = ('');
+    if (RUNNING_ON_WINDOWS) {
+      if ( $ENV{PATHEXT} ) {
+        push @pathext, split($Config{'path_sep'}, $ENV{PATHEXT});
+      } else {
+        push @pathext, qw{.exe .com .bat};
+      }
+    }
+
     foreach my $path (File::Spec->path()) {
-      my $fname = File::Spec->catfile ($path, $filename);
-      if ( -f $fname ) {
-        if (-x $fname) {
-          dbg("util: executable for $filename was found at $fname");
-          return $fname;
-        }
-        else {
-          dbg("util: $filename was found at $fname, but isn't executable");
+      my $base = File::Spec->catfile ($path, $filename);
+      for my $ext ( @pathext ) {
+        my $fname = $base.$ext;
+        if ( -f $fname ) {
+          if (-x $fname) {
+            dbg("util: executable for $filename was found at $fname");
+            return $fname;
+          }
+          else {
+            dbg("util: $filename was found at $fname, but isn't executable");
+          }
         }
       }
     }
@@ -138,11 +194,12 @@ BEGIN {
     dbg("util: taint mode: deleting unsafe environment variables, resetting PATH");
 
     if (RUNNING_ON_WINDOWS) {
-      dbg("util: running on Win32, skipping PATH cleaning");
-      return;
+      if ( $ENV{'PATHEXT'} ) { # clean and untaint
+        $ENV{'PATHEXT'} = join($Config{'path_sep'}, grep ($_, map( {$_ =~ m/^(\.[a-zA-Z]{1,10})$/; $1; } split($Config{'path_sep'}, $ENV{'PATHEXT'}))));
+      }
+    } else {
+      delete @ENV{qw(IFS CDPATH ENV BASH_ENV)};
     }
-
-    delete @ENV{qw(IFS CDPATH ENV BASH_ENV)};
 
     # Go through and clean the PATH out
     my @path;
@@ -168,8 +225,8 @@ BEGIN {
 	dbg("util: PATH included '$dir', which isn't a directory, dropping");
 	next;
       }
-      elsif (($stat[2]&2) != 0) {
-        # World-Writable directories are considered insecure.
+      elsif (!RUNNING_ON_WINDOWS && (($stat[2]&2) != 0)) {
+        # World-Writable directories are considered insecure, but unavoidable on Windows
         # We could be more paranoid and check all of the parent directories as well,
         # but it's good for now.
 	dbg("util: PATH included '$dir', which is world writable, dropping");
@@ -223,7 +280,7 @@ sub am_running_on_windows {
 ###########################################################################
 
 # untaint a path to a file, e.g. "/home/jm/.spamassassin/foo",
-# "C:\Program Files\SpamAssassin\tmp\foo", "/home/ï¿½ï¿½t/etc".
+# "C:\Program Files\SpamAssassin\tmp\foo", "/home/õüt/etc".
 #
 # TODO: this does *not* handle locales well.  We cannot use "use locale"
 # and \w, since that will not detaint the data.  So instead just allow the
@@ -240,8 +297,8 @@ sub untaint_file_path {
   # Barry Jaspan: allow ~ and spaces, good for Windows.
   # Also return '' if input is '', as it is a safe path.
   # Bug 7264: allow also parenthesis, e.g. "C:\Program Files (x86)"
-  my $chars = '-_A-Za-z0-9.%=+,/:()\\@\\xA0-\\xFF\\\\';
-  my $re = qr{^\s*([$chars][${chars}~ ]*)\z}o;
+  my $chars = '-_A-Za-z0-9.#%=+,/:()\\@\\xA0-\\xFF\\\\';
+  my $re = qr{^\s*([$chars][${chars}~ ]*)\z};
 
   if ($path =~ $re) {
     $path = $1;
@@ -310,10 +367,13 @@ sub untaint_var {
           ${$arg}{untaint_var($k)} = untaint_var($v);
         }
       } else {
-        # hash keys are never tainted,
-        # although old version of perl had some quirks there
-        while (my($k, $v) = each %{$arg}) {
-          ${$arg}{untaint_var($k)} = untaint_var($v);
+        if($] < 5.020) {
+          # hash keys are never tainted,
+          # although old version of perl had some quirks there
+          # skip the check only for Perl > 5.020 to be on the safe side
+          while (my($k, $v) = each %{$arg}) {
+            ${$arg}{untaint_var($k)} = untaint_var($v);
+          }
         }
       }
       return %{$arg} if wantarray;
@@ -346,12 +406,21 @@ sub taint_var {
 ###########################################################################
 
 # Check for full hostname / FQDN / DNS name validity.  IP addresses must be
-# validated with other functions like $IP_ADDRESS.  Does not check for valid
-# TLD, use $self->{main}->{registryboundaries}->is_domain_valid()
-# additionally for that.
+# validated with other functions like Constants::IP_ADDRESS.  Does not check
+# for valid TLD, use $self->{main}->{registryboundaries}->is_domain_valid()
+# additionally for that.  If $is_ascii given and true, skip idn_to_ascii()
+# conversion.
 sub is_fqdn_valid {
-  my ($host) = @_;
+  my ($host, $is_ascii) = @_;
   return if !defined $host;
+
+  if ($is_ascii) {
+    utf8::encode($host)  if utf8::is_utf8($host); # force octets
+    $host = lc $host;
+  } else {
+    # convert to ascii, handles Unicode dot normalization also
+    $host = idn_to_ascii($host);
+  }
 
   # remove trailing dots
   $host =~ s/\.+\z//;
@@ -360,7 +429,7 @@ sub is_fqdn_valid {
   return if length($host) > 253;
 
   # validate dot separated components/labels
-  my @labels = split(/\./, lc $host);
+  my @labels = split(/\./, $host);
   my $cnt = scalar @labels;
   return unless $cnt > 1; # at least two labels required
   foreach my $label (@labels) {
@@ -369,6 +438,7 @@ sub is_fqdn_valid {
     return if length($label) > 63;
     # alphanumeric, - allowed only in middle part
     # underscores are allowed in DNS queries, so we allow here
+    # (idn_to_ascii made sure we are lowercase and pure ascii)
     return if $label !~ /^[a-z0-9_](?:[a-z0-9_-]*[a-z0-9_])?$/;
     # 1st-2nd level part can not contain _, only third+ can
     if ($cnt == 2 || $cnt == 1) {
@@ -379,6 +449,140 @@ sub is_fqdn_valid {
 
   # is good
   return 1;
+}
+
+###########################################################################
+
+# returns true if the provided string of octets represents a syntactically
+# valid UTF-8 string, otherwise a false is returned
+#
+sub is_valid_utf_8 {
+# my $octets = $_[0];
+  return undef if !defined $_[0]; ## no critic (ProhibitExplicitReturnUndef)
+  #
+  # RFC 6532: UTF8-non-ascii = UTF8-2 / UTF8-3 / UTF8-4
+  # RFC 3629 section 4: Syntax of UTF-8 Byte Sequences
+  #   UTF8-char   = UTF8-1 / UTF8-2 / UTF8-3 / UTF8-4
+  #   UTF8-1      = %x00-7F
+  #   UTF8-2      = %xC2-DF UTF8-tail
+  #   UTF8-3      = %xE0 %xA0-BF UTF8-tail /
+  #                 %xE1-EC 2( UTF8-tail ) /
+  #                 %xED %x80-9F UTF8-tail /
+  #                   # U+D800..U+DFFF are utf16 surrogates, not legal utf8
+  #                 %xEE-EF 2( UTF8-tail )
+  #   UTF8-4      = %xF0 %x90-BF 2( UTF8-tail ) /
+  #                 %xF1-F3 3( UTF8-tail ) /
+  #                 %xF4 %x80-8F 2( UTF8-tail )
+  #   UTF8-tail   = %x80-BF
+  #
+  # loose variant:
+  #   [\x00-\x7F] | [\xC0-\xDF][\x80-\xBF] |
+  #   [\xE0-\xEF][\x80-\xBF]{2} | [\xF0-\xF4][\x80-\xBF]{3}
+  #
+  $_[0] =~ /^ (?: [\x00-\x7F] |
+                  [\xC2-\xDF] [\x80-\xBF] |
+                  \xE0 [\xA0-\xBF] [\x80-\xBF] |
+                  [\xE1-\xEC] [\x80-\xBF]{2} |
+                  \xED [\x80-\x9F] [\x80-\xBF] |
+                  [\xEE-\xEF] [\x80-\xBF]{2} |
+                  \xF0 [\x90-\xBF] [\x80-\xBF]{2} |
+                  [\xF1-\xF3] [\x80-\xBF]{3} |
+                  \xF4 [\x80-\x8F] [\x80-\xBF]{2} )* \z/xs ? 1 : 0;
+}
+
+# Given an international domain name with U-labels (UTF-8 or Unicode chars)
+# converts it to ASCII-compatible encoding (ACE).  If the argument is in
+# ASCII (or is an invalid IDN), returns it lowercased but otherwise unchanged.
+# The result is always in octets (utf8 flag off) even if the argument was in
+# Unicode characters.
+#
+#my $idn_cache = {};
+sub idn_to_ascii {
+  no bytes;  # make sure there is no 'use bytes' in effect
+  return undef  if !defined $_[0]; ## no critic (ProhibitExplicitReturnUndef)
+  my $s = "$_[0]";  # stringify
+
+  # encode chars to UTF-8, leave octets unchanged (not necessarily valid UTF-8)
+  utf8::encode($s)  if utf8::is_utf8($s); # i.e. remove utf-8 flag if set
+
+  # Rapid return for most common case, all-ASCII (including IP address literal),
+  # no conversion needed. Also if we don't have LibIDN, nothing more we can do.
+  if ($s !~ tr/a-zA-Z0-9_.:[]-//c || !($have_libidn||$have_libidn2)) {
+    return lc $s; # retains taintedness
+  }
+
+  #if (exists $idn_cache->{$s}) {
+  #  dbg("util: idn_to_ascii: converted to ACE: '$s' -> '$idn_cache->{$s}' (cached)");
+  #  return $idn_cache->{$s};
+  #}
+  #$idn_cache = {} if %$idn_cache > 1000;
+  #my $orig_s = $s; # save original for idn_cache
+
+  # propagate taintedness of the argument
+  my $t = tainted($s);
+  if ($t) {  # untaint $s, avoids taint-related bugs in LibIDN or in old perl
+    $s = untaint_var($s);
+  }
+
+  my $charset;
+
+  # Check for valid UTF-8
+  if (is_valid_utf_8($s)) {
+    # RFC 3490 (IDNA): Whenever dots are used as label separators, the
+    # following characters MUST be recognized as dots: U+002E (full stop),
+    # U+3002 (ideographic full stop), U+FF0E (fullwidth full stop),
+    # U+FF61 (halfwidth ideographic full stop).
+    if ($s =~ s/$ALT_FULLSTOP_UTF8_RE/./gs) {
+      dbg("util: idn_to_ascii: alternative dots normalized: '%s' -> '%s'",
+           $_[0], $s);
+    }
+    $charset = 'UTF-8';
+  }
+  # Check for valid extended ISO-8859-1 including diacritics
+  elsif ($s !~ tr/a-zA-Z0-9\xc0-\xd6\xd8-\xde\xe0-\xf6\xf8-\xfe_.-//c) {
+    $charset = 'ISO-8859-1';
+  }
+
+  if ($charset) {
+    # to ASCII-compatible encoding (ACE), lowercased
+    if ($have_libidn) {
+      my $sa = Net::LibIDN::idn_to_ascii($s, $charset);
+      if (!defined $sa) {
+        info("util: idn_to_ascii: conversion to ACE failed: '%s' (charset %s)",
+             $s, $charset);
+      } else {
+        dbg("util: idn_to_ascii: converted to ACE: '%s' -> '%s' (charset %s)",
+            $s, $sa, $charset)  if $s ne $sa;
+        $s = $sa;
+      }
+    } elsif ($have_libidn2) {
+      my $si = $s;
+      if ($charset eq 'ISO-8859-1') {
+        Encode::from_to($si, 'ISO-8859-1', 'UTF-8');
+      }
+      utf8::decode($si) unless utf8::is_utf8($si);
+      my $rc = 0;
+      my $sa = Net::LibIDN2::idn2_to_ascii_8($si,
+                 &Net::LibIDN2::IDN2_NFC_INPUT + &Net::LibIDN2::IDN2_NONTRANSITIONAL,
+                 $rc);
+      if (!defined $sa) {
+        info("util: idn_to_ascii: conversion to ACE failed, %s: '%s' (charset %s) (LibIDN2)",
+             Net::LibIDN2::idn2_strerror($rc), $s, $charset);
+      } else {
+        dbg("util: idn_to_ascii: converted to ACE: '%s' -> '%s' (charset %s) (LibIDN2)",
+            $s, $sa, $charset)  if $s ne $sa;
+        $s = $sa;
+      }
+    }
+  } else {
+    my($package, $filename, $line) = caller;
+    info("util: idn_to_ascii: valid charset not detected: '%s', called from %s line %d",
+         $s, $package, $line);
+    $s = lc $s;  # garbage-in / garbage-out
+  }
+
+  return $t ? taint_var($s) : $s;  # propagate taintedness of the argument
+  #return $idn_cache->{$orig_s} = $t ? taint_var($s) : $s;  # propagate taintedness of the argument
 }
 
 ###########################################################################
@@ -685,18 +889,17 @@ sub wrap {
   my $pos = 0;
   my $pos_mod = 0;
   while ($#arr > $pos) {
-    my $tmpline = $arr[$pos] ;
-    $tmpline =~ s/\t/        /g;
-    my $len = length ($tmpline);
+    my $len = length($arr[$pos]);
+    $len += ($arr[$pos] =~ tr/\t//) * 7; # add tab lengths
+
     # if we don't want to have lines > $length (overflow==0), we
     # need to verify what will happen with the next line.  if we don't
     # care if a single line goes longer, don't care about the next
     # line.
     # we also want this to be true for the first entry on the line
     if ($pos_mod != 0 && $overflow == 0) {
-      my $tmpnext = $arr[$pos+1] ;
-      $tmpnext =~ s/\t/        /g;
-      $len += length ($tmpnext);
+      $len += length($arr[$pos+1]);
+      $len += ($arr[$pos+1] =~ tr/\t//) * 7; # add tab lengths
     }
 
     if ($len <= $length) {
@@ -786,6 +989,7 @@ sub qp_decode {
 
   # RFC 2045 explicitly prohibits lowercase characters a-f in QP encoding
   # do we really want to allow them???
+
   local $1;
   $str =~ s/=([0-9a-fA-F]{2})/chr(hex($1))/ge;
 
@@ -796,7 +1000,7 @@ sub base64_encode {
   local $_ = shift;
 
   if (HAS_MIME_BASE64) {
-    return MIME::Base64::encode_base64($_);
+    return MIME::Base64::encode_base64($_,'');
   }
 
   $_ = pack("u57", $_);
@@ -804,6 +1008,27 @@ sub base64_encode {
   tr| -_`|A-Za-z0-9+/A|; # -> #`# <- kluge against vim syntax issues
   s/(A+)$/'=' x length $1/e;
   return $_;
+}
+
+# Very basic Base32 encoder
+our %base32_bitchr = (
+  '00000'=>'A', '00001'=>'B', '00010'=>'C', '00011'=>'D', '00100'=>'E',
+  '00101'=>'F', '00110'=>'G', '00111'=>'H', '01000'=>'I', '01001'=>'J',
+  '01010'=>'K', '01011'=>'L', '01100'=>'M', '01101'=>'N', '01110'=>'O',
+  '01111'=>'P', '10000'=>'Q', '10001'=>'R', '10010'=>'S', '10011'=>'T',
+  '10100'=>'U', '10101'=>'V', '10110'=>'W', '10111'=>'X', '11000'=>'Y',
+  '11001'=>'Z', '11010'=>'2', '11011'=>'3', '11100'=>'4', '11101'=>'5',
+  '11110'=>'6', '11111'=>'7'
+);
+sub base32_encode {
+  my ($str) = @_;
+  return if !defined $str;
+  utf8::encode($str)  if utf8::is_utf8($str); # force octets
+  my $bits = unpack("B*", $str)."0000";
+  my $output;
+  local($1);
+  $output .= $base32_bitchr{$1} while ($bits =~ /(.{5})/g);
+  return $output;
 }
 
 ###########################################################################
@@ -844,6 +1069,13 @@ sub _fake_getpwuid {
 }
 
 ###########################################################################
+# Get a platform specific directory for application data
+# Just used for Windows for now
+sub common_application_data_directory {
+  return Win32::GetFolderPath(Win32::CSIDL_COMMON_APPDATA()) if (RUNNING_ON_WINDOWS);
+}
+
+###########################################################################
 
 # Given a string, extract an IPv4 address from it.  Required, since
 # we currently have no way to portably unmarshal an IPv4 address from
@@ -855,11 +1087,11 @@ sub extract_ipv4_addr_from_string {
   return unless defined($str);
 
   if ($str =~ /\b(
-			(?:1\d\d|2[0-4]\d|25[0-5]|[1-9]\d|\d)\.
-			(?:1\d\d|2[0-4]\d|25[0-5]|[1-9]\d|\d)\.
-			(?:1\d\d|2[0-4]\d|25[0-5]|[1-9]\d|\d)\.
-			(?:1\d\d|2[0-4]\d|25[0-5]|[1-9]\d|\d)
-		      )\b/ix)
+                       (?:1\d\d|2[0-4]\d|25[0-5]|[1-9]\d|\d)\.
+                       (?:1\d\d|2[0-4]\d|25[0-5]|[1-9]\d|\d)\.
+                       (?:1\d\d|2[0-4]\d|25[0-5]|[1-9]\d|\d)\.
+                       (?:1\d\d|2[0-4]\d|25[0-5]|[1-9]\d|\d)
+                     )\b/ix)
   {
     if (defined $1) { return $1; }
   }
@@ -878,7 +1110,8 @@ sub extract_ipv4_addr_from_string {
 # Sys::Hostname thinks our hostname is, might also be a full qualified one)
   sub hostname {
     return $hostname if defined($hostname);
-
+    # Load only when required
+    require Sys::Hostname;
     # Sys::Hostname isn't taint safe and might fall back to `hostname`. So we've
     # got to clean PATH before we may call it.
     clean_path_in_taint_mode();
@@ -893,7 +1126,7 @@ sub extract_ipv4_addr_from_string {
     return $fq_hostname if defined($fq_hostname);
 
     $fq_hostname = hostname();
-    if ($fq_hostname !~ /\./) { # hostname doesn't contain a dot, so it can't be a FQDN
+    if (index($fq_hostname, '.') == -1) { # hostname doesn't contain a dot, so it can't be a FQDN
       my @names = grep(/^\Q${fq_hostname}.\E/o,                         # grep only FQDNs
                     map { split } (gethostbyname($fq_hostname))[0 .. 1] # from all aliases
                   );
@@ -955,10 +1188,10 @@ sub reverse_ip_address {
   local($1,$2,$3,$4);
   if ($ip =~ /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})\z/) {
     $revip = "$4.$3.$2.$1";
-  } elsif ($ip !~ /:/ || $ip !~ /^[0-9a-fA-F:.]{2,}\z/) {  # triage
+  } elsif (index($ip, ':') == -1 || $ip !~ /^[0-9a-fA-F:.]{2,}\z/) {  # triage
     # obviously unrecognized syntax
-  } elsif (!NetAddr::IP->can('full6')) {  # since NetAddr::IP 4.010
-    info("util: version of NetAddr::IP is too old, IPv6 not supported");
+  } elsif (!HAS_NETADDR_IP || !NetAddr::IP->can('full6')) {  # since NetAddr::IP 4.010
+    info("util: sufficiently new NetAddr::IP not found, IPv6 not supported");
   } else {
     # looks like an IPv6 address, let NetAddr::IP check the details
     my $ip_obj = NetAddr::IP->new6($ip);
@@ -991,8 +1224,8 @@ sub decode_dns_question_entry {
 
   local $1;
   # Net::DNS provides a query in encoded RFC 1035 zone file format, decode it!
-  $qname =~ s{ \\ ( [0-9]{3} | [^0-9] ) }
-             { length($1)==1 ? $1 : $1 <= 255 ? chr($1) : "\\$1" }xgse;
+  $qname =~ s{ \\ ( [0-9]{3} | (?![0-9]{3}) . ) }
+             { length($1)==3 && $1 <= 255 ? chr($1) : $1 }xgse;
   return ($q->qclass, $q->qtype, $qname);
 }
 
@@ -1005,7 +1238,8 @@ sub parse_content_type {
   # but it happens), MUAs seem to take the last one and so that's what we
   # should do here.
   #
-  my $ct = $_[-1] || 'text/plain; charset=us-ascii';
+  my $missing; # flag missing content-type, even though we force it text/plain
+  my $ct = $_[-1] || do { $missing = 1; 'text/plain; charset=us-ascii' };
 
   # This could be made a bit more rigid ...
   # the actual ABNF, BTW (RFC 1521, section 7.2.1):
@@ -1066,6 +1300,7 @@ sub parse_content_type {
   # bug 4298: If at this point we don't have a content-type, assume text/plain;
   # also, bug 5399: if the content-type *starts* with "text", and isn't in a 
   # list of known bad/non-plain formats, do likewise.
+  $missing = 1 if !$ct; # flag missing content-type
   if (!$ct ||
         ($ct =~ /^text\b/ && $ct !~ /^text\/(?:x-vcard|calendar|html)$/))
   {
@@ -1078,8 +1313,10 @@ sub parse_content_type {
   # Now that the header has been parsed, return the requested information.
   # In scalar context, just the MIME type, in array context the
   # four important data parts (type, boundary, charset, and filename).
+  # Added fifth array member $missing, if caller wants to know ct was
+  # missing/invalid, even though we forced it as text/plain.
   #
-  return wantarray ? ($ct,$boundary,$charset,$name) : $ct;
+  return wantarray ? ($ct,$boundary,$charset,$name,$missing) : $ct;
 }
 
 ###########################################################################
@@ -1188,6 +1425,15 @@ sub touch_file {
 
 ###########################################################################
 
+sub pseudo_random_string {
+  my $len = shift || 6;
+  my $str = '';
+  $str .= (0..9,'A'..'Z','a'..'z')[rand 62] for (1 .. $len);
+  return $str;
+}
+
+###########################################################################
+
 =item my ($filepath, $filehandle) = secure_tmpfile();
 
 Generates a filename for a temporary file, opens it exclusively and
@@ -1212,8 +1458,7 @@ sub secure_tmpfile {
   for (my $retries = 20; $retries > 0; $retries--) {
     # we do not rely on the obscurity of this name for security,
     # we use a average-quality PRG since this is all we need
-    my $suffix = join('', (0..9,'A'..'Z','a'..'z')[rand 62, rand 62, rand 62,
-						   rand 62, rand 62, rand 62]);
+    my $suffix = pseudo_random_string(6);
     $reportfile = File::Spec->catfile($tmpdir,".spamassassin${$}${suffix}tmp");
 
     # instead, we require O_EXCL|O_CREAT to guarantee us proper
@@ -1315,7 +1560,23 @@ sub secure_tmpdir {
 
 *uri_list_canonify = \&uri_list_canonicalize;  # compatibility alias
 sub uri_list_canonicalize {
-  my($redirector_patterns, @uris) = @_;
+  my $redirector_patterns = shift;
+
+  my @uris;
+  my $rb;
+  if (ref($_[0]) eq 'ARRAY') {
+    # New call style:
+    # - reference to array of redirector_patterns
+    # - reference to array of URIs
+    # - reference to $self->{main}->{registryboundaries}
+    @uris = @{$_[0]};
+    $rb = $_[1];
+  } else {
+    # Old call style:
+    # - reference to array of redirector_patterns
+    # - rest of the arguments is list of uris
+    @uris = @_;
+  }
 
   # make sure we catch bad encoding tricks
   my @nuris;
@@ -1348,7 +1609,7 @@ sub uri_list_canonicalize {
         push @nuris, $1
       }
       # Address must be trimmed of %20
-      if ($nuri =~ tr/%20// &&
+      if (index($nuri, '%20') >= 0 &&
           $nuri =~ /^(?:mailto:)?(?:\%20)*([^\@]+\@[^?&%]+)/) {
         push @nuris, "mailto:$1";
       }
@@ -1423,22 +1684,12 @@ sub uri_list_canonicalize {
         }
       }
 
-      # Bug 6751:
-      # RFC 3490 (IDNA): Whenever dots are used as label separators, the
-      #   following characters MUST be recognized as dots: U+002E (full stop),
-      #   U+3002 (ideographic full stop), U+FF0E (fullwidth full stop),
-      #   U+FF61 (halfwidth ideographic full stop).
-      # RFC 5895: [...] the IDEOGRAPHIC FULL STOP character (U+3002)
-      #   can be mapped to the FULL STOP before label separation occurs.
-      #   [...] Only the IDEOGRAPHIC FULL STOP character (U+3002) is added in
-      #   this mapping because the authors have not fully investigated [...]
-      # Adding also 'SMALL FULL STOP' (U+FE52) as seen in the wild.
-      # Parhaps also the 'ONE DOT LEADER' (U+2024).
-      if ($host =~ s{(?: \xE3\x80\x82 | \xEF\xBC\x8E | \xEF\xBD\xA1 |
-                         \xEF\xB9\x92 | \xE2\x80\xA4 )}{.}xgs) {
-        push(@nuris, join ('', $proto, $host, $rest));
+      my $nhost = idn_to_ascii($host);
+      if ($nhost ne lc($host)) {
+        push(@nuris, join('', $proto, $nhost, $rest));
         # Also add noport variant
-        push(@nuris, join('', $proto, $host, $rest_noport)) if $rest_noport;
+        push(@nuris, join('', $proto, $nhost, $rest_noport)) if $rest_noport;
+        $host = $nhost;
       }
 
       # bug 4146: deal with non-US ASCII 7-bit chars in the host portion
@@ -1535,9 +1786,12 @@ sub uri_list_canonicalize {
       # (do this here so we don't trip on those 0x123 IPs etc..)
       # https://hg.mozilla.org/mozilla-central/file/tip/docshell/base/nsDefaultURIFixup.cpp
       elsif ($proto eq 'http://' && $auth eq '' &&
-             $host ne 'localhost' && $port eq '80' &&
-             $host =~ /^(?:www\.)?([^.]+)$/) {
-        push(@nuris, join('', $proto, 'www.', $1, '.com', $rest));
+             $nhost ne 'localhost' && $port eq '80' &&
+             $nhost =~ /^(?:www\.)?([^.]+)$/) {
+        # Do not add .com to already valid schemelessly parsed domains (Bug 7891)
+        unless (defined $rb && $rb->is_domain_valid($nhost)) {
+          push(@nuris, join('', $proto, 'www.', $1, '.com', $rest));
+        }
       }
     }
   }
@@ -1622,10 +1876,10 @@ sub receive_date {
 sub get_user_groups {
   my $suid = shift;
   dbg("util: get_user_groups: uid is $suid\n");
-  my ( $user, $passwd, $uid, $gid, $quota, $comment, $gcos, $dir, $shell, $expire ) = getpwuid($suid);
-  my $rgids="$gid ";
-  while ( my($name,$pw,$gid,$members) = getgrent() ) {
-    if ( $members =~ m/\b$user\b/ ) {
+  my ($user, $gid) = (getpwuid($suid))[0,3];
+  my $rgids = "$gid ";
+  while (my($name,$gid,$members) = (getgrent())[0,2,3]) {
+    if (grep { $_ eq $user } split(/ /, $members)) {
       $rgids .= "$gid ";
       dbg("util: get_user_groups: added $gid ($name) to group list which is now: $rgids\n");
     }
@@ -1645,16 +1899,25 @@ sub setuid_to_euid {
   my $gids = get_user_groups($touid);
   my ( $pgid, $supgs ) = split (' ',$gids,2);
   defined $supgs or $supgs=$pgid;
-  if ($( != $pgid) {
-    # Gotta be root for any of this to work
-    $> = 0 ;
+  my $prgid = 0 + $(; # bug 8043 - Only set rgid if it isn't already one of the euid's groups
+  if ( ($prgid == 0) or not (grep { $_ == $prgid } split(/ /, ${(}))) {
+    # setgid only works if euid is root, have to set that temporarily
+    $> = 0;
+    if ($> != 0) { warn("util: seteuid to 0 failed: $!"); }
     dbg("util: changing real primary gid from $( to $pgid and supplemental groups to $supgs to match effective uid $touid");
-    POSIX::setgid($pgid);
-    dbg("util: POSIX::setgid($pgid) set errno to $!");  
-    $! = 0;
-    $( = $pgid;
-    $) = "$pgid $supgs";
-    dbg("util: assignment  \$) = $pgid $supgs set errno to $!");  
+    $! = 0; POSIX::setgid($pgid);
+    if ($!) { warn("util: POSIX::setgid $pgid failed: $!\n"); }
+    $! = 0; $( = $pgid;
+    if ($!) { warn("util: failed to set gid $pgid: $!\n"); }
+    $! = 0; $) = "$pgid $supgs";
+    if ($!) {
+      # could be perl 5.30 bug #134169, let's be safe
+      if (grep { $_ eq '0' } split(/ /, ${)})) {
+        die("util: failed to set effective gid $pgid $supgs: $!\n");
+      } else {
+        warn("util: failed to set effective gid $pgid $supgs: $!\n");
+      }
+    }
   }
   if ($< != $touid) {
     dbg("util: changing real uid from $< to match effective uid $touid");
@@ -1684,23 +1947,38 @@ sub helper_app_pipe_open_windows {
   my ($fh, $stdinfile, $duperr2out, @cmdline) = @_;
 
   # use a traditional open(FOO, "cmd |")
+  $cmdline[0] = '"'.$cmdline[0].'"' if ($cmdline[0] !~ /^\".*\"$/);
   my $cmd = join(' ', @cmdline);
   if ($stdinfile) { $cmd .= qq/ < "$stdinfile"/; }
-  if ($duperr2out) { $cmd .= " 2>&1"; }
+  if ($duperr2out) {
+    # Support custom file target for STDERR, if ">file" specified
+    # Caller must make sure the destination is safe and untainted
+    if ($duperr2out =~ /^>/) {
+      $cmd .= " 2$duperr2out";
+    } else {
+      $cmd .= " 2>&1";
+    }
+  }
   return open ($fh, $cmd.'|');
 }
 
 sub force_die {
-  my ($msg) = @_;
+  my ($statrc, $msg) = @_;
 
   # note use of eval { } scope in logging -- paranoia to ensure that a broken
   # $SIG{__WARN__} implementation will not interfere with the flow of control
   # here, where we *have* to die.
-  eval { warn $msg };  # hmm, STDERR may no longer be open
-  eval { dbg("util: force_die: $msg") };
+  if ($msg) {
+    eval { warn $msg };  # hmm, STDERR may no longer be open
+    eval { dbg("util: force_die: $msg") };
+  }
 
-  POSIX::_exit(6);  # avoid END and destructor processing 
-  kill('KILL',$$);  # still kicking? die! 
+  if (am_running_on_windows()) {
+    exit($statrc); # on Windows _exit would terminate parent too BUG 8007
+  } else {
+    POSIX::_exit($statrc);  # avoid END and destructor processing 
+    kill('KILL',$$) if ($statrc);  # somehow this breaks those places that are calling it to exit(0)
+  }
 }
 
 sub helper_app_pipe_open_unix {
@@ -1730,7 +2008,7 @@ sub helper_app_pipe_open_unix {
   eval {
     # go setuid...
     setuid_to_euid();
-    info("util: setuid: ruid=$< euid=$> rgid=$( egid=$) ");
+    dbg("util: setuid: ruid=$< euid=$> rgid=$( egid=$)");
 
     # now set up the fds.  due to some weirdness, we may have to ensure that
     # we *really* close the correct fd number, since some other code may have
@@ -1782,7 +2060,15 @@ sub helper_app_pipe_open_unix {
         POSIX::close(2);
       }
 
-      open (STDERR, ">&STDOUT") or die "dup STDOUT failed: $!";
+      # Support custom file target for STDERR, if ">file" specified
+      # Caller must make sure the destination is safe and untainted
+      my $errout;
+      if ($duperr2out =~ /^>/) {
+        $errout = $duperr2out;
+      } else {
+        $errout = ">&STDOUT";
+      }
+      open (STDERR, $errout) or die "dup $errout failed: $!";
       STDERR->autoflush(1);  # make sure not to lose diagnostics if exec fails
 
       # STDERR must be fd 2 to be useful to subprocesses! (bug 3649)
@@ -1797,7 +2083,7 @@ sub helper_app_pipe_open_unix {
   my $eval_stat = $@ ne '' ? $@ : "errno=$!";  chomp $eval_stat;
 
   # bug 4370: we really have to exit here; break any eval traps
-  force_die(sprintf('util: failed to spawn a process "%s": %s',
+  force_die(6, sprintf('util: failed to spawn a process "%s": %s',
                     join(", ",@cmdline), $eval_stat));
   die;  # must be a die() otherwise -w will complain
 }
@@ -1822,11 +2108,19 @@ sub trap_sigalrm_fully {
     $SIG{ALRM} = $handler;
   } else {
     # may be using "safe" signals with %SIG; use POSIX to avoid it
-    POSIX::sigaction POSIX::SIGALRM(), new POSIX::SigAction $handler;
+    POSIX::sigaction POSIX::SIGALRM(), POSIX::SigAction->new($handler);
   }
 }
 
 ###########################################################################
+
+# Bug 6802 helper function, use /aa for perl 5.16+
+my $qr_sa;
+if ($] >= 5.016) {
+  eval '$qr_sa = sub { return qr/$_[0]/aa; }';
+} else {
+  eval '$qr_sa = sub { return qr/$_[0]/; }';
+}
 
 # returns ($compiled_re, $error)
 # if any errors, $compiled_re = undef, $error has string
@@ -1839,8 +2133,8 @@ sub compile_regexp {
   local($1);
 
   # Do not allow already compiled regexes or other funky refs
-  if (ref($re)) {
-    return (undef, 'ref passed');
+  if (ref($re) ne '') {
+    return (undef, 'ref passed: '.ref($re));
   }
 
   # try stripping by default
@@ -1886,7 +2180,7 @@ sub compile_regexp {
 
   # paranoid check for eval exec (?{foo}), in case someone
   # actually put "use re 'eval'" somewhere..
-  if ($re =~ /\(\?\??\{/) {
+  if (index($re, '?{') >= 0 && $re =~ /\(\?\??\{/) {
     return (undef, 'eval (?{}) found');
   }
 
@@ -1896,7 +2190,7 @@ sub compile_regexp {
   if ($delim_end && $delim_end !~ tr/\}\)\]//) {
     # first we remove all escaped backslashes "\\"
     my $dbs_stripped = $re;
-    $dbs_stripped =~ s/\\\\//g;
+    $dbs_stripped =~ s/\\\\//g if index($dbs_stripped, '\\\\') >= 0;
     # now we can properly check if something is unescaped
     if ($dbs_stripped =~ /(?<!\\)\Q${delim_end}\E/) {
       return (undef, "unquoted delimiter '$delim_end' found");
@@ -1925,7 +2219,7 @@ sub compile_regexp {
         die "$_[0]\n";
       }
     };
-    $compiled_re = qr/$re/;
+    $compiled_re = $qr_sa->($re);
     1;
   };
   if ($ok && ref($compiled_re) eq 'Regexp') {
@@ -1948,11 +2242,8 @@ sub is_always_matching_regexp {
   elsif ($re =~ /(?<!\\)\|\|/) {
     return "contains '||'";
   }
-  elsif ($re =~ /^\|/) {
-    return "starts with '|'";
-  }
-  elsif ($re =~ /\|(?<!\\\|)$/) {
-    return "ends with '|'";
+  elsif ($re =~ /^\||\|(?<!\\\|)$/) {
+    return "starts or ends with '|'";
   }
 
   return "";
@@ -2055,6 +2346,8 @@ sub make_qr {
 
 ###########################################################################
 
+###########################################################################
+
 sub get_my_locales {
   my ($ok_locales) = @_;
 
@@ -2104,6 +2397,34 @@ sub fisher_yates_shuffle {
 
 ###########################################################################
 
+# Given a domain name, produces a listref of successively stripped down
+# parent domains, e.g. a domain '2.10.Example.COM' would produce a list:
+# '2.10.example.com', '10.example.com', 'example.com', 'com'
+#
+sub domain_to_search_list {
+  my ($domain) = @_;
+
+  $domain =~ s/^\.+//; $domain =~ s/\.+\z//;  # strip leading and trailing dots
+  return [] unless $domain;                   # no domain left
+  return [$domain] if index($domain, '[') == 0; # don't split address literals
+
+  # initialize
+  $domain = lc $domain;
+  my @search_keys = ($domain);
+  my $pos = 0;
+
+  # split domain into search keys
+  while (($pos = index($domain, '.', $pos+1)) != -1) {
+    push @search_keys, substr($domain, $pos+1);
+  }
+
+  # enforce some sanity limit
+  if (@search_keys > 20) {
+    @search_keys = @search_keys[$#search_keys-19 .. $#search_keys];
+  }
+
+  return \@search_keys;
+}
 
 ###########################################################################
 
@@ -2137,6 +2458,330 @@ sub get_tag_value_for_score {
 
 ###########################################################################
 
+# RFC 5322 (+IDN?) parsing of addresses and names from To/From/Cc.. headers
+#
+# Return array of hashes, containing at minimum name,address,user,host
+#
+# Override parser with SA_HEADER_ADDRESS_PARSER environment variable
+
+our $header_address_parser;
+our $email_address_xs;
+our $email_address_xs_fix_address;
+BEGIN {
+  # SA_HEADER_ADDRESS_PARSER=1 only use internal parser
+  # SA_HEADER_ADDRESS_PARSER=2 only use Email::Address::XS
+  # By default internal is preferred, will defer for some cases
+  $header_address_parser = untaint_var($ENV{'SA_HEADER_ADDRESS_PARSER'});
+  if ((!defined $header_address_parser || $header_address_parser eq '2') &&
+       eval 'use Email::Address::XS; 1;') {
+    $email_address_xs = 1;
+    if (version->parse(Email::Address::XS->VERSION) < version->parse(1.02)) {
+      $email_address_xs_fix_address = 1;
+    }
+  }
+}
+
+# Helper for internal parser
+our $header_address_mailre = qr/
+  # user
+  (?:
+    # quoted localpart
+    " (?:|(?:[^"\\]++|\\.)*+) " |
+    # or un-quoted localpart
+    [^\@\s\<\>\(\)\[\]\,\:\;]+
+  )
+  # domain
+  \@ (?: [^\"\s\<\>\(\)\[\]\,\:\;]+ | \[ [\d:.]+ \] )
+/ix;
+
+# Very relaxed internal parser
+# Only handles non-nested comments in some places
+our $header_address_re = qr/^
+  \s*
+  (?:
+    # optional phrase, quoted or non-quoted
+    (?:
+      ( (?: " (?:|(?:[^"\\]++|\\.)*+) " | [^",;<]++ )+ )
+      \s*
+    )?
+    # and enclosed email (or empty)
+    # ... allow whitespace in localpart
+    < \s* ( [^>\@]* \S+ | \s* ) \s* >
+    # some output duplicate enclosures..
+    (?: \s* < \s* (?: (?: " (?:|(?:[^"\\]++|\\.)*+) " )? \S+ | \s* ) \s* > )*
+  |
+    # or standalone email or phrase
+    (?:
+      ( $header_address_mailre ) |
+      ( (?: " (?:|(?:[^"\\]++|\\.)*+) " | [^",;<]++ )+ )
+    )
+  )
+  # possible comment after (no nested support here)
+  (?: \s* \( ( (?:|(?:[^()\\]++|\\.)*+) ) \) )?
+  # Followed by comma (semi-colon sometimes) or finish
+  \s* (?: [,;] | \z )
+/ix;
+
+#
+# Main public function
+# expected input is header contents without Header: itself
+#
+sub parse_header_addresses {
+  my ($str) = @_;
+
+  return if !defined $str || $str !~ /\S/;
+
+  my @results;
+
+  # Internal parser
+  if (!$header_address_parser || $header_address_parser eq '1') {
+    @results = _parse_header_addresses($str);
+  }
+
+  # Email::Address::XS
+  if ($email_address_xs) {
+    if (!$header_address_parser || $header_address_parser eq '2') {
+      # Only consulted if no internal results, or there doesn't
+      # seem to have enough results, or possible nested comments ( (
+      my $maybe_nested = scalar($str =~ /\(/) >= 2;
+      if (!@results || $maybe_nested || @results < scalar($str =~ tr/,//)+1) {
+        my @results_xs = _parse_header_addresses_xs($str);
+        # If we have more results than internal, use it, or nested
+        if (@results_xs > @results || $maybe_nested) {
+          return @results_xs;
+        }
+      }
+    }
+  }
+
+  return @results;
+}
+
+# Check some basic parsing mistakes
+sub _valid_parsed_address {
+  return 0 if !defined $_[0];
+  return 0 if index($_[0], '""@') == 0;
+  return 0 if scalar($_[0] =~ tr/"//) == 1;
+  return 1;
+}
+
+#
+# v0.1, improved internal parser, no support for comments in strange
+# places or nested comments, but handled a large corpus atleast 99% the
+# same as Email::Address::XS and in some cases even better (retains some
+# more name/addr info, even when not fully valid).
+#
+sub _parse_header_addresses {
+  local $_ = shift;
+  local ($1, $2, $3, $4, $5);
+
+  # Clear trailing whitespace
+  s/\s+\z//s;
+
+  # Strip away all escaped blackslashes, simplifies processing a lot
+  s/\\\\//g;
+
+  # Reduce group address
+  s/^[^"()<>]+:\s*(.*?)\s*(?:;.*)?/$1/gs;
+
+  # Skip empty
+  return unless /\S/;
+
+  my @results;
+  while (s/$header_address_re//igs) {
+    my $phrase = defined $1 ? $1 :
+                 defined $4 ? $4 : undef;
+    my $address = defined $2 ? $2 :
+                defined $3 ? $3 : undef;
+    my $comment = defined $5 ? $5 : undef;
+
+    my ($user, $host, $invalid);
+
+    # Check relaxed <> capture
+    if (defined $2) {
+      # Remove comments (no nested support here)
+      $address =~ s/\((?:|(?:[^()\\]++|\\.)*+)\)//gs;
+      # Validate as somewhat email looking
+      if ($address !~ /^$header_address_mailre$/) {
+        $address = undef;
+      }
+    }
+
+    # Validate some other address oddities
+    if (!_valid_parsed_address($address)) {
+      $address = undef;
+    }
+
+    if (defined $phrase) {
+      my $newphrase;
+      # Parse phrase as quoted and unquoted parts
+      while ($phrase =~ /(?:"(|(?:[^"\\]++|\\.)*+)"|([^"]++))/igs) {
+        my $qs = $1;
+        my $nqs = $2;
+        if (defined $qs) {
+          # Unescape things inside quoted string
+          $qs =~ s/\\(?!\\)//g;
+          $qs =~ s/\\\\/\\/g;
+          #$qs =~ s/\\//g;
+          $newphrase .= $qs;
+        } else {
+          # Remove comments (no nested support here)
+          $nqs =~ s/\((?:|(?:[^()\\]++|\\.)*+)\)//gs;
+          $newphrase .= $nqs;
+        }
+      }
+      $phrase = $newphrase;
+
+      # If we only have phrase which looks email, swap when valid
+      # Check all in one if, either swap or don't
+      if (!defined $address &&
+          $phrase =~ /^$header_address_mailre$/i &&
+          _valid_parsed_address($phrase) &&
+          $phrase =~ /^[^\@]*\@([^\@]*)/ &&
+          is_fqdn_valid(idn_to_ascii($1), 1)) {
+        $address = $phrase;
+        $phrase = undef;
+      } else {
+        # Remove redundant phrase==email?
+        if (defined $address && $phrase eq $address) {
+          $phrase = undef;
+        } elsif ($phrase eq '') {
+          $phrase = undef;
+        }
+      }
+    }
+
+    # Copy comment to phrase if not defined
+    if (!defined $phrase && defined $comment) {
+      $phrase = $comment;
+    }
+
+    if (defined $address) {
+      # Unescape quoted localpart
+      #if ($address =~ /^"(.*?)"\@(.*)/) {
+      #  $user = $1;
+      #  $host = $2;
+      #  $user =~ s/\\//g;
+      #  $user =~ s/\s+//gs;
+      #  $address = "$user\@$host";
+      #}
+      # Strip sometimes seen quotes
+      #$address =~ s/^'(.*?)'$/$1/;
+      $address =~ s/^(([^\@]*)\@([^\@]*)).*/$1/;
+      ($user, $host) = ($2, $3);
+    }
+
+    $invalid = !defined $host || !is_fqdn_valid(idn_to_ascii($host), 1);
+    push @results, {
+      'phrase' => $phrase,
+      'user' => $user,
+      'host' => $host,
+      'address' => $address,
+      'comment' => $comment,
+      'invalid' => $invalid
+    };
+  }
+
+  # Was something left unparsed?
+  if (index($_, '@') != -1) {
+    # Last ditch effort, examples:
+    # =?UTF-8?Q?"Foobar"_<noreply@foobar.com>?=
+    # =?utf-8?Q?"Foobar"?=<info=foobar.com@mlsend.com>
+    while (/<($header_address_mailre)>/igs) {
+      my $address = $1;
+      next if !_valid_parsed_address($address);
+      $address =~ s/^(([^\@]*)\@([^\@]*)).*/$1/;
+      my ($user, $host) = ($2, $3);
+      my $invalid = !is_fqdn_valid(idn_to_ascii($host), 1);
+      push @results, {
+        'phrase' => undef,
+        'user' => $user,
+        'host' => $host,
+        'address' => $address,
+        'comment' => undef,
+        'invalid' => $invalid
+      };
+    }
+  }
+
+  return if !@results;
+  return @results;
+}
+
+sub _parse_header_addresses_xs {
+  my ($str) = @_;
+
+  # Strip away all escaped blackslashes, simplifies processing a lot
+  $str =~ s/\\\\//g;
+
+  my @results;
+  my @addrs = Email::Address::XS->parse($str);
+
+  local ($1, $2);
+  foreach my $addr (@addrs) {
+    my $name = $addr->name;
+    my $address = $addr->address;
+    my $user = $addr->user;
+    my $host = $addr->host;
+    my $phrase = $addr->phrase;
+    my $comment = $addr->comment;
+    my $invalid;
+
+    # Workaround Bug 5201 for Email::Address::XS
+    # From: "joe+foobar@example.com"
+    # If everything else is missing but phrase looks like
+    # an email, let's assume it is (hostname verifies)
+    if (!defined $address && !defined $user &&
+        !defined $comment && defined $phrase &&
+        _valid_parsed_address($phrase) &&
+        $phrase =~ /^([^\s\@]+)\@([^\s\@]+)$/ &&
+        is_fqdn_valid(idn_to_ascii($2), 1))
+    {
+      $user = $1;
+      $host = $2;
+      $address = $phrase;
+      $name = $user;
+      $invalid = 0;
+      $phrase = undef;
+    }
+    else {
+      $invalid = !$addr->is_valid;
+    }
+
+    # Version <1.02 borks address if both user+host are UTF-8
+    if ($email_address_xs_fix_address) {
+      if (defined $user && defined $host) {
+        # <"Another User"@foo> loses quotes in user, add back
+        if (index($user, ' ') != -1 &&
+            index($user, '"') == -1) {
+          $user = '"'.$user.'"';
+        }
+        $address = $user.'@'.$host;
+      }
+    }
+
+    # Copy comment to phrase if not defined
+    if (!defined $phrase && defined $comment) {
+      $phrase = $comment;
+    }
+
+    # Use input as name if nothing found
+    if (!defined $phrase && !defined $address) {
+      $phrase = $str;
+    }
+
+    push @results, {
+      'phrase' => $phrase,
+      'user' => $user,
+      'host' => $host,
+      'address' => $address,
+      'comment' => $comment,
+      'invalid' => $invalid
+    };
+  }
+
+  return @results;
+}
 
 1;
 

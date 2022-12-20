@@ -1,13 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.51;  # ADJUSTPARAMS
+use Object::Pad 0.75 ':experimental(init_expr adjust_params)';
 
-package Tickit::Widget::Entry::Plugin::Completion 0.01;
-class Tickit::Widget::Entry::Plugin::Completion;
+package Tickit::Widget::Entry::Plugin::Completion 0.02;
+class Tickit::Widget::Entry::Plugin::Completion
+   :strict(params);
 
 use feature 'fc';
 
@@ -135,16 +136,16 @@ sub apply
    $entry->set_style( '<Tab>' => "" );
 }
 
-has $_ignore_case :param = 0;
-has $_use_popup :param = 1;
-has $_append_after_word :param = " ";
+field $_ignore_case       :param //= 0;
+field $_use_popup         :param //= 1;
+field $_append_after_word :param //= " ";
 
-has $_gen_words :param = undef;
+field $_gen_words :param = undef;
 
-ADJUSTPARAMS ( $params )
-{
-   if( $params->{words} and !$_gen_words ) {
-      my $words = delete $params->{words};
+ADJUST :params (
+   :$words = undef,
+) {
+   if( $words and !$_gen_words ) {
       $_gen_words = sub { return $words->@* };
    }
 
@@ -152,9 +153,9 @@ ADJUSTPARAMS ( $params )
       croak "Require either 'gen_words' or 'words'";
 }
 
-has $_entry :param;
+field $_entry :param;
 
-has $_popup_window;
+field $_popup_window;
 
 method key_complete
 {

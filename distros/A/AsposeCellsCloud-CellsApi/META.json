@@ -62,7 +62,7 @@
       },
       "AsposeCellsCloud::CellsApi" : {
          "file" : "lib/AsposeCellsCloud/CellsApi.pm",
-         "version" : "22.11"
+         "version" : "22.12"
       },
       "AsposeCellsCloud::LiteCellsApi" : {
          "file" : "lib/AsposeCellsCloud/LiteCellsApi.pm"
@@ -81,6 +81,12 @@
       },
       "AsposeCellsCloud::Object::Area" : {
          "file" : "lib/AsposeCellsCloud/Object/Area.pm"
+      },      
+      "AsposeCellsCloud::Object::Axis" : {
+         "file" : "lib/AsposeCellsCloud/Object/Axis.pm"
+      },      
+      "AsposeCellsCloud::Object::AxisResponse" : {
+         "file" : "lib/AsposeCellsCloud/Object/AxisResponse.pm"
       },
       "AsposeCellsCloud::Object::AutoFilter" : {
          "file" : "lib/AsposeCellsCloud/Object/AutoFilter.pm"
@@ -753,6 +759,9 @@
       },
       "AsposeCellsCloud::Object::ThemeColor" : {
          "file" : "lib/AsposeCellsCloud/Object/ThemeColor.pm"
+      },
+      "AsposeCellsCloud::Object::TickLabels" : {
+         "file" : "lib/AsposeCellsCloud/Object/TickLabels.pm"
       },
       "AsposeCellsCloud::Object::TilePicOption" : {
          "file" : "lib/AsposeCellsCloud/Object/TilePicOption.pm"

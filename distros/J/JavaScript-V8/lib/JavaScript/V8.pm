@@ -2,7 +2,7 @@ package JavaScript::V8;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use JavaScript::V8::Context;
 require XSLoader;
@@ -96,9 +96,13 @@ install Homebrew then:
 
 =head3 Linux
 
-On Ubuntu 18.04 (and possibly Debian), the library and header files can be installed by running:
+On Ubuntu 22.04 (and possibly Debian), the library and header files can be installed by running:
 
-    sudo aptitude install libv8-3.14.5 libv8-3.14-dev
+    sudo aptitude install libnode-dev
+    V8_DIR=/usr/include/nodejs/deps/v8 perl Makefile.PL
+
+since the NodeJS package includes v8 version 7.8 (at the time of writing,
+Dec 2022).
 
 Similar packages may be available for other distributions (adjust the package names accordingly).
 

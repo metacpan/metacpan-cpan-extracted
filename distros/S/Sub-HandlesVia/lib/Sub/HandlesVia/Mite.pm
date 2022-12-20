@@ -62,39 +62,65 @@ sub confess { unshift @_, 'confess'; goto \&_error_handler }
     *guard = sub (&) { bless [ 0, @_ ] => $GUARD_PACKAGE };
 }
 
+# Exportable lock and unlock
+sub _lul {
+    my ( $lul, $ref ) = @_;
+    if ( ref $ref eq 'ARRAY' ) {
+        &Internals::SvREADONLY( $ref, $lul );
+        &Internals::SvREADONLY( \$_, $lul ) for @$ref;
+        return;
+    }
+    if ( ref $ref eq 'HASH' ) {
+        &Internals::hv_clear_placeholders( $ref );
+        &Internals::SvREADONLY( $ref, $lul );
+        &Internals::SvREADONLY( \$_, $lul ) for values %$ref;
+        return;
+    }
+    return;
+}
+
+sub lock {
+    unshift @_, true;
+    goto \&_lul;
+}
+
+sub unlock {
+    my $ref = shift;
+    _lul( 0 , $ref );
+    &guard( sub { _lul( 1, $ref ) } );
+}
+
 sub _is_compiling {
     defined $Mite::COMPILING and $Mite::COMPILING eq __PACKAGE__;
 }
 
 sub import {
     my $me = shift;
-    my %arg = map { lc($_) => true } @_;
+    my %arg = map +( lc($_) => true ), @_;
     my ( $caller, $file ) = caller;
 
     if( _is_compiling() ) {
         require Mite::Project;
-        Mite::Project->default->inject_mite_functions(
-            package => $caller,
-            file    => $file,
-            arg     => \%arg,
-            shim    => $me,
+        'Mite::Project'->default->inject_mite_functions(
+            'package' => $caller,
+            'file'    => $file,
+            'arg'     => \%arg,
+            'shim'    => $me,
         );
     }
     else {
         # Changes to this filename must be coordinated with Mite::Compiled
-        my $mite_file = $file . ".mite.pm";
-        if( !-e $mite_file ) {
-            croak "Compiled Mite file ($mite_file) for $file is missing";
-        }
-
-        {
-            local @INC = ('.', @INC);
-            require $mite_file;
+        my $mite_file = $file . '.mite.pm';
+        local @INC = ( '.', @INC );
+        local $@;
+        if ( not eval { require $mite_file; 1 } ) {
+            my $e = $@;
+            croak "Compiled Mite file ($mite_file) for $file is missing or an error occurred loading it: $e";
         }
     }
 
-    warnings->import;
-    strict->import;
+    'warnings'->import;
+    'strict'->import;
     'namespace::autoclean'->import( -cleanee => $caller )
         if _HAS_AUTOCLEAN && !$arg{'-unclean'};
 }

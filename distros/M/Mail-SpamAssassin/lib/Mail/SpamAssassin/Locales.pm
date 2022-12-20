@@ -78,9 +78,6 @@ sub is_charset_ok_for_locales {
   $cs =~ s/:.*$//gs;            # trim off multiple charsets, just use 1st
   dbg ("locales: is $cs ok for @locales?");
 
-  study $cs;  # study is a no-op since perl 5.16.0, eliminating related bugs
-  #warn "JMD $cs";
-
   # always OK (the net speaks mostly roman charsets)
   return 1 if ($cs eq 'USASCII');
   return 1 if ($cs eq 'ASCII');

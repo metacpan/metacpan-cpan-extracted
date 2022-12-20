@@ -8,7 +8,7 @@ package Net::FattureInCloud {
     use version;
     use v5.36;
 
-    our $VERSION = qv("v0.2.2");
+    our $VERSION = qv("v0.2.3");
 
     has endpoint_uri => ( is => 'ro', default => sub { 'https://api-v2.fattureincloud.it/' } );
     has token => ( is => 'ro' );

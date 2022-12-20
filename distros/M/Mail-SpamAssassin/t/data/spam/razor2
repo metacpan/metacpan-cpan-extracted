@@ -1,117 +1,14 @@
-From info@presidentsummit2021.info Sat Jan 16 17:41:58 2021
-DKIM-Signature: v=1; a=rsa-sha1; c=relaxed/relaxed; s=default; d=presidentsummit2021.info;
- h=Message-ID:Date:Subject:From:Reply-To:To:MIME-Version:Content-Type:List-Unsubscribe:List-Id; i=info@presidentsummit2021.info;
- bh=zCmdjXCkxF7SXehJvLELwjWIpFs=;
- b=1zD+yqjMCkkPLJ1VWPlx5VNRgSOmQyhalItexvfsHcuPkTbs7kniBWH99Kd0az5cKw0uZd9wkERP
-   2yhT4+KX6uY6hb9FWsbGGeZGXW7j948QdHIsO1FwfECH5wfjgIPIknzno7SZ6qeWMBlW0y6e0bET
-   Ngp2Ga4Ik2JGXprNW6HK3yf+s/0X5a0uNmXq3vrYKeSzKJ7vudPgE+5zmnTlBkk9pzjR9fE+vGhV
-   iwVPNr4nWUka27w6ebzskyiN5T3xUcPxrd9UXJ+yBQesO19jOvDjbGBFAClmmRQrMuxtdzEb/njF
-   Z7sfSMiNYYI+lMt04KXiiaESpATZ80ZrJ8qO0A==
-DomainKey-Signature: a=rsa-sha1; c=nofws; q=dns; s=default; d=presidentsummit2021.info;
- b=uMkknlU8C+GAM70ZbhmgIG1QwJVAyR2J3or3MC5rZdwPL5dBWSN3yCEwgK/cBptCtsW78enoZyyv
-   FFmcG+BILfK/b5DYPM21RjujHUQ4PPQE/nH7OtLAka8+w3S9x0lU4ldSpupgfgSAUvoMzqi43dwF
-   f68TdIOwHMpcql6WTud4kQCmip9LpdGVJe9e0wtqInf3qR/MmC4hRUJytdcnAAtpcA5coiYCJeRr
-   OMS4Y7UXoyXGMGAs9LNtDzlL2rcfvw7O7BqFKCicXVSOqj0VHovnhaftw/bW+TV81MOCGywDCkO/
-   8BP9Bx9X6xxTlyzGZiDjMv774BnatYcH1Peggg==;
-Received: from presidentsummit2021.info (127.0.0.1) by ecow1.presidentsummit2021.info id h0dlrji19tki for <redact@redact.com>; Sat, 16 Jan 2021 22:41:58 +0000 (envelope-from <info-redact=redact.com@presidentsummit2021.info>)
-Return-Path: <info@presidentsummit2021.info>
-Message-ID: <4b0231c00308db9c803683968797800d@presidentsummit2021.info>
-Date: Sat, 16 Jan 2021 22:41:58 +0000
-Subject: RE: Campaign Leads
-From: Rachel Griffin <info@presidentsummit2021.info>
-Reply-To: Rachel Griffin <rachelgriffinmail@gmail.com>
-To: "redact@redact.com" <redact@redact.com>
+Message-ID: <Razor2.1010101@example-spam-url-for-testing.com>
+Date: Wed, 23 Jul 2003 23:30:00 +0200
+From: Sender <sender@example-spam-url-for-testing.com>
+To: Recipient <recipient@example-spam-url-for-testing.com>
+Subject: Test spam mail (Razor2)
+Precedence: junk
 MIME-Version: 1.0
-Content-Type: multipart/alternative;
- boundary="_=_swift_v4_1610836918_a9651a24a0eda1c77c572d4cb05bc287_=_"
-X-Ybzc-Tracking-Did: 0
-X-Ybzc-Subscriber-Uid: gl421xmhpg4c3
-X-Ybzc-Mailer: SwiftMailer - 5.4.x
-X-Ybzc-EBS: http://presidentsummit2021.info/emm/index.php/lists/block-address
-X-Ybzc-Delivery-Sid: 1
-X-Ybzc-Customer-Uid: yc9451v43la86
-X-Ybzc-Customer-Gid: 0
-X-Ybzc-Campaign-Uid: zl108ds17n2de
-X-Sender: info@presidentsummit2021.info
-X-Report-Abuse: Please report abuse for this campaign here:
- http://presidentsummit2021.info/emm/index.php/campaigns/zl108ds17n2de/report-abuse/mz251dhqpz1e6/gl421xmhpg4c3
-X-Receiver: redact@redact.com
-Precedence: bulk
-List-Unsubscribe: <http://presidentsummit2021.info/emm/index.php/lists/mz251dhqpz1e6/unsubscribe/gl421xmhpg4c3/zl108ds17n2de/unsubscribe-direct?source=email-client-unsubscribe-button>,
- <mailto:rachelgriffinmail@gmail.com?subject=Campaign-Uid:zl108ds17n2de /
- Subscriber-Uid:gl421xmhpg4c3 - Unsubscribe request&body=Please unsubscribe
- me!>
-List-Id: mz251dhqpz1e6 <A3>
-Feedback-ID: zl108ds17n2de:gl421xmhpg4c3:mz251dhqpz1e6:yc9451v43la86
-X-KAM-Reverse: Passed - Reverse DNS of ip218.ip-51-83-191.eu/51.83.191.218
-X-Relay-Addr: 51.83.191.218
-X-Relay-Host: ip218.ip-51-83-191.eu
-X-Relay-Time: Sat Jan 16 17:42:03 2021
-Status: RO
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
-
---_=_swift_v4_1610836918_a9651a24a0eda1c77c572d4cb05bc287_=_
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-Email marketing to your target audience(any city/any country) from our
-database will generate massive leads and set appointments, we have
-verified and targeted 60Mil B2B and 180 Mil B2C data for all
-categories globally. We will share opens and clicks also with the
-complete=C2=A0report
-=C2=A0 *=C2=A0 =C2=A0Basic Plan: At=C2=A0$250=C2=A0we will send 100,000 Ema=
-ils within a
-month to your target audience
-=C2=A0 *=C2=A0 =C2=A0Standard Plan: At $750 we will send 1Mil Emails within=
- a
-month to your target audience
-=C2=A0 *=C2=A0 =C2=A0Premium plan: At $1,999 we will send 5Mil Emails withi=
-n a
-month to your target audience
-Thanks and let me know if you wish to know more.
-Rachel Griffin
-Email Marketing
-Unsubscribe
-http://presidentsummit2021.info/emm/index.php/lists/mz251dhqpz1e6/unsubscri=
-be/gl421xmhpg4c3/zl108ds17n2de
-
---_=_swift_v4_1610836918_a9651a24a0eda1c77c572d4cb05bc287_=_
-Content-Type: text/html; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-
-<!DOCTYPE html>
-<html>
-<head><meta charset=3D"utf-8"/>
-	<title></title>
-</head>
-<body>
-<p>Email marketing to your target audience(any city/any country) from our d=
-atabase will generate massive leads and set appointments, we have verified =
-and targeted 60Mil B2B and 180 Mil B2C data for all categories globally. We=
- will share opens and clicks also with the complete=C2=A0report</p>
-
-<p>=C2=A0 *=C2=A0 =C2=A0Basic Plan: At=C2=A0$250=C2=A0we will send 100,000 =
-Emails within a month to your target audience<br />
-=C2=A0 *=C2=A0 =C2=A0Standard Plan: At $750 we will send 1Mil Emails within=
- a month to your target audience<br />
-=C2=A0 *=C2=A0 =C2=A0Premium plan: At $1,999 we will send 5Mil Emails withi=
-n a month to your target audience<br />
-<br />
-Thanks and let me know if you wish to know more.</p>
-
-<p><b>Rachel Griffin<br />
-Email Marketing</b></p>
-
-<p><br />
-<br />
-<br />
-<a href=3D"http://presidentsummit2021.info/emm/index.php/lists/mz251dhqpz1e=
-6/unsubscribe/gl421xmhpg4c3/zl108ds17n2de">Unsubscribe</a></p>
-<img width=3D"1" height=3D"1" src=3D"http://presidentsummit2021.info/emm/in=
-dex.php/campaigns/zl108ds17n2de/track-opening/gl421xmhpg4c3" alt=3D"" />
-</body>
-</html>
-
---_=_swift_v4_1610836918_a9651a24a0eda1c77c572d4cb05bc287_=_--
-
+This is a test mail that should be categorized as spam by Razor2
+which flags as spam messages that include in the body the URL
+http://example-spam-url-for-testing.com
 

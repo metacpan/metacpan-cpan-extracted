@@ -5,6 +5,7 @@ use strict;
 use warnings;
 
 use lib 't/lib';
+use TF_TestQuiet;
 
 use AI::TensorFlow::Libtensorflow;
 

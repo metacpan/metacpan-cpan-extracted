@@ -45,7 +45,7 @@ sub new {
   $stylesheet = $stylesheet && LaTeXML::Common::XML::XSLT->new($stylesheet);
   if ((!ref $stylesheet) || !($stylesheet->can('transform'))) {
     Error('expected', 'stylesheet', undef, "Stylesheet '$stylesheet' is not a usable stylesheet!"); }
-  XML::LibXSLT->max_depth(500);
+  XML::LibXSLT->max_depth(1000);
   $$self{stylesheet} = $stylesheet;
   my %params = ();
   %params                    = %{ $options{parameters} } if $options{parameters};
@@ -67,7 +67,7 @@ sub process {
       foreach my $node (@resnodes) {
         my $src  = $node->getAttribute('src');
         my $path = $self->copyResource($doc, $src, $node->getAttribute('type'));
-        $node->setAttribute(src => $path) unless $path eq $src; } } }
+        $node->setAttribute(src => pathname_to_url($path)) unless $path eq $src; } } }
   if (my $css = $params{CSS}) {
     $params{CSS} = '"' . join('|', map { $self->copyResource($doc, $_, 'text/css') } @$css) . '"'; }
   if (my $js = $params{JAVASCRIPT}) {
@@ -125,4 +125,3 @@ sub copyResource {
 
 # ================================================================================
 1;
-

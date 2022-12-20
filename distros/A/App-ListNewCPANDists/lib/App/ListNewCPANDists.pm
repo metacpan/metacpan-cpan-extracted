@@ -6,9 +6,9 @@ use warnings;
 use Log::ger;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-02'; # DATE
+our $DATE = '2022-09-09'; # DATE
 our $DIST = 'App-ListNewCPANDists'; # DIST
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.018'; # VERSION
 
 our %SPEC;
 
@@ -294,15 +294,18 @@ _
             schema => $sch_date,
             pos => 0,
             cmdline_aliases => {from=>{}},
+            tags => ['category:time-filtering'],
         },
         to_time   => {
             schema => $sch_date,
             pos => 1,
             cmdline_aliases => {to=>{}},
+            tags => ['category:time-filtering'],
         },
 
         today => {
             schema => 'true*',
+            tags => ['category:time-filtering'],
         },
         this_week => {
             schema => 'true*',
@@ -311,19 +314,57 @@ _
 Monday is the start of the week.
 
 _
+            tags => ['category:time-filtering'],
         },
         this_month => {
             schema => 'true*',
+            tags => ['category:time-filtering'],
         },
-        # this_year
+        this_year => {
+            schema => 'true*',
+            tags => ['category:time-filtering'],
+        },
+        yesterday => {
+            schema => 'true*',
+            tags => ['category:time-filtering'],
+        },
+        last_week => {
+            schema => 'true*',
+            description => <<'_',
+
+Monday is the start of the week.
+
+_
+            tags => ['category:time-filtering'],
+        },
+        last_month => {
+            schema => 'true*',
+            tags => ['category:time-filtering'],
+        },
+        last_year => {
+            schema => 'true*',
+            tags => ['category:time-filtering'],
+        },
     },
     args_rels => {
-        req_one => [qw/today this_week this_month from_time/],
+        req_one => [qw/today this_week this_month this_year yesterday last_week last_month last_year from_time/],
     },
     examples => [
         {
             summary => 'Show new distributions from Jan 1, 2019 to the present',
             argv => ['2019-01-01'],
+            'x.doc.show_result' => 0,
+            test => 0,
+        },
+        {
+            summary => "Show PERLANCAR's new distributions this year",
+            argv => ['--include-author', 'PERLANCAR', '--this-year'],
+            'x.doc.show_result' => 0,
+            test => 0,
+        },
+        {
+            summary => "What are the new releases last month?",
+            argv => ['--last-month'],
             'x.doc.show_result' => 0,
             test => 0,
         },
@@ -337,23 +378,42 @@ sub list_new_cpan_dists {
     my $state = _init(\%args);
     my $dbh = $state->{dbh};
 
+    my $today = DateTime->today;
+    my $now = DateTime->now;
+    my $end_of_yesterday = $now->clone->add(days => -1)->set(hour => 23, minute => 59, second => 59);
+    my $to_time   = $args{to_time} // $now->clone;
+
     my $from_time;
     if ($args{from_time}) {
         $from_time = $args{from_time};
     } elsif ($args{today}) {
-        $from_time = DateTime->today;
+        $from_time = $today;
     } elsif ($args{this_week}) {
-        my $today = DateTime->today;
         my $dow   = $today->day_of_week;
-        my $days  = $dow > 1 ? $dow-1 : 7;
-        $from_time = $today->add(days => -$days);
+        $from_time = $today->clone->add(days => -($dow-1));
     } elsif ($args{this_month}) {
-        $from_time = DateTime->today->set(day => 1);
+        $from_time = $today->clone->set(day => 1);
+    } elsif ($args{this_year}) {
+        $from_time = $today->set(day => 1, month => 1);
+    } elsif ($args{yesterday}) {
+        $from_time = $today->add(days => -1);
+        $to_time   = $end_of_yesterday;
+    } elsif ($args{last_week}) {
+        my $dow   = $today->day_of_week;
+        my $start_of_last_week = $today->clone->add(days => -($dow-1))->add(days => -7);
+        my $end_of_last_week   = $start_of_last_week->clone->add(days => 7)->add(seconds => -1);
+        $from_time = $start_of_last_week;
+        $to_time   = $end_of_last_week;
+    } elsif ($args{last_month}) {
+        $from_time = $today->clone->set(day => 1)->add(months => -1);
+        $to_time   = $today->clone->set(day => 1)->add(seconds => -1);
+    } elsif ($args{last_year}) {
+        $from_time = $today->clone->set(day => 1, month => 1)->add(years => -1);
+        $to_time   = $today->clone->set(day => 1, month => 1)->add(seconds => -1);
     } else {
-        return [400, "Please specify today/this_week/this_month/from_time"];
+        return [400, "Please specify today/yesterday/{this,last}_{week,month,year}/from_time"];
     }
 
-    my $to_time   = $args{to_time} // DateTime->now;
     #if (!$to_time) {
     #    $to_time = $from_time->clone;
     #    $to_time->set_hour(23);
@@ -641,7 +701,7 @@ App::ListNewCPANDists - List new CPAN distributions in a given time period
 
 =head1 VERSION
 
-This document describes version 0.017 of App::ListNewCPANDists (from Perl distribution App-ListNewCPANDists), released on 2022-09-02.
+This document describes version 0.018 of App::ListNewCPANDists (from Perl distribution App-ListNewCPANDists), released on 2022-09-09.
 
 =head1 FUNCTIONS
 
@@ -798,6 +858,14 @@ Examples:
 
  list_new_cpan_dists(from_time => "2019-01-01");
 
+=item * Show PERLANCAR's new distributions this year:
+
+ list_new_cpan_dists(include_authors => ["PERLANCAR"], this_year => 1);
+
+=item * What are the new releases last month?:
+
+ list_new_cpan_dists(last_month => 1);
+
 =back
 
 This utility queries MetaCPAN to find out what CPAN distributions are new in a
@@ -844,15 +912,27 @@ Filename of database.
 
 =item * B<include_dists> => I<array[perl::distname]>
 
+=item * B<last_month> => I<true>
+
+=item * B<last_week> => I<true>
+
+Monday is the start of the week.
+
+=item * B<last_year> => I<true>
+
 =item * B<this_month> => I<true>
 
 =item * B<this_week> => I<true>
 
 Monday is the start of the week.
 
+=item * B<this_year> => I<true>
+
 =item * B<to_time> => I<date>
 
 =item * B<today> => I<true>
+
+=item * B<yesterday> => I<true>
 
 
 =back

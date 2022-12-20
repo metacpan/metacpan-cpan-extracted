@@ -3,22 +3,23 @@
 #
 #  (C) Paul Evans, 2013-2021 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.57;
+use Object::Pad 0.73 ':experimental(init_expr)';
 
-package Tickit::Widget::LinearSplit 0.35;
+package Tickit::Widget::LinearSplit 0.36;
 class Tickit::Widget::LinearSplit
+   :strict(params)
    :isa(Tickit::ContainerWidget);
 
 use Tickit::Window 0.32; # needs drag_start
 
 use Carp;
 
-has $_split_fraction = 0.5;
-has $_A_child :reader;
-has $_B_child :reader;
+field $_split_fraction = 0.5;
+field $_A_child :reader;
+field $_B_child :reader;
 
-has $_split_at;  method _split_at  { $_split_at }
-has $_split_len; method _split_len { $_split_len }
+field $_split_at;  method _split_at  { $_split_at }
+field $_split_len; method _split_len { $_split_len }
 
 method set_A_child
 {
@@ -113,7 +114,7 @@ method reshape
    $_split_len = $spacing;
 }
 
-has $_drag_mouse_offset;
+field $_drag_mouse_offset;
 
 method _on_mouse
 {

@@ -23,7 +23,14 @@ ok !!wrap( $lib, 'cb_dZb_b', [ CodeRef [ [ Double, Str, Bool ] => Bool ] ] => Bo
     sub {
         is_deeply(
             \@_,
-            [ ( $Config{uselongdouble} ? 9.90000000000000036 : 9.9 ), 'Hi', !1 ],
+            [   (
+                    $Config{usequadmath}       ? 9.90000000000000035527136788005009 :
+                        $Config{uselongdouble} ? 9.90000000000000036 :
+                        9.9
+                ),
+                'Hi',
+                !1
+            ],
             '[ Double, Str, Bool ]'
         );
         return !0;
@@ -123,19 +130,34 @@ is wrap( $lib, 'cb_L_L', [ CodeRef [ [ULongLong] => ULongLong ] ] => ULongLong )
     32232, '    => ULongLong';
 is wrap( $lib, 'cb_f_f', [ CodeRef [ [Float] => Float ] ] => Float )->(
     sub {
-        is_deeply( \@_, [ $Config{uselongdouble} ? -99.3000030517578125 : -99.3000030517578 ],
-            '[ Float ]' );
+        is_deeply(
+            \@_,
+            [   $Config{usequadmath}       ? -99.3000030517578125 :
+                    $Config{uselongdouble} ? -99.3000030517578125 :
+                    -99.3000030517578
+            ],
+            '[ Float ]'
+        );
         return -100.5;
     }
     ),
     -100.5, '    => Float';
 is wrap( $lib, 'cb_d_d', [ CodeRef [ [Double] => Double ] ] => Double )->(
     sub {
-        is_deeply( \@_, [ $Config{uselongdouble} ? 200.300000000000011 : 200.3 ], '[ Double ]' );
+        is_deeply(
+            \@_,
+            [   $Config{usequadmath}       ? 200.300000000000011368683772161603 :
+                    $Config{uselongdouble} ? 200.300000000000011 :
+                    200.3
+            ],
+            '[ Double ]'
+        );
         return 0.4;
     }
     ),
-    ( $Config{uselongdouble} ? 0.400000000000000022 : .4 ), '    => Double';
+    ( $Config{usequadmath} ? 0.400000000000000022204460492503131 :
+        $Config{uselongdouble} ? 0.400000000000000022 :
+        .4 ), '    => Double';
 is wrap( $lib, 'cb_Z_Z', [ CodeRef [ [Str] => Str ] ] => Str )->(
     sub {
         is_deeply( \@_, ['Ready!'], '[ Str ]' );

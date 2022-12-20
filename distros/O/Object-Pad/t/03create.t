@@ -7,7 +7,7 @@ use Test::More;
 
 use Scalar::Util qw( reftype );
 
-use Object::Pad ':experimental(init_expr)';
+use Object::Pad;
 
 class Point {
    field $x = 0;

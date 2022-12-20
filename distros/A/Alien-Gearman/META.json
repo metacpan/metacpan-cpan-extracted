@@ -4,7 +4,7 @@
       "Thibault Duponchelle <thibault.duponchelle@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.4702, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -22,8 +22,9 @@
    "prereqs" : {
       "build" : {
          "requires" : {
-            "Alien::Boost" : "0",
+            "Alien::Boost::ProgramOptions" : "0",
             "Alien::Build::MM" : "0.25",
+            "Alien::Build::Plugin::Download::Negotiate" : "1.30",
             "Alien::Libevent" : "0",
             "Alien::OpenSSL" : "0",
             "Alien::curl" : "0",
@@ -34,19 +35,21 @@
             "Env::ShellWords" : "0.01",
             "HTTP::Tiny" : "0.044",
             "IO::Socket::SSL" : "1.56",
-            "Mojo::DOM58" : "1.00",
+            "IO::Zlib" : "0",
+            "Mojo::DOM" : "0",
+            "Mojolicious" : "7.00",
+            "Mozilla::CA" : "0",
             "Net::SSLeay" : "1.49",
-            "Sort::Versions" : "0",
             "URI" : "0",
             "URI::Escape" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "Alien::Boost" : "0",
-            "Alien::Build" : "1.19",
+            "Alien::Boost::ProgramOptions" : "0",
             "Alien::Build::MM" : "0.25",
             "Alien::Build::Plugin::Build::SearchDep" : "0.35",
+            "Alien::Build::Plugin::Download::GitHub" : "0.09",
             "ExtUtils::MakeMaker" : "6.52"
          }
       },
@@ -73,12 +76,13 @@
       },
       "x_IRC" : "irc://irc.perl.org/#native"
    },
-   "version" : "2.3",
+   "version" : "2.4",
    "x_alienfile" : {
-      "generated_by" : "Alien::Build::MM version 2.26",
+      "generated_by" : "Alien::Build::MM version 2.74",
       "requires" : {
          "share" : {
-            "Alien::Boost" : "0",
+            "Alien::Boost::ProgramOptions" : "0",
+            "Alien::Build::Plugin::Download::Negotiate" : "1.30",
             "Alien::Libevent" : "0",
             "Alien::OpenSSL" : "0",
             "Alien::curl" : "0",
@@ -89,14 +93,16 @@
             "Env::ShellWords" : "0.01",
             "HTTP::Tiny" : "0.044",
             "IO::Socket::SSL" : "1.56",
-            "Mojo::DOM58" : "1.00",
+            "IO::Zlib" : "0",
+            "Mojo::DOM" : "0",
+            "Mojolicious" : "7.00",
+            "Mozilla::CA" : "0",
             "Net::SSLeay" : "1.49",
-            "Sort::Versions" : "0",
             "URI" : "0",
             "URI::Escape" : "0"
          },
          "system" : {}
       }
    },
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "x_serialization_backend" : "JSON::PP version 4.12"
 }

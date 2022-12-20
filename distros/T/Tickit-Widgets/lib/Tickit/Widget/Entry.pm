@@ -1,12 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2022 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.57;
+use Object::Pad 0.75 ':experimental(init_expr)';
 
-package Tickit::Widget::Entry 0.35;
+package Tickit::Widget::Entry 0.36;
 class Tickit::Widget::Entry
+   :strict(params)
    :isa(Tickit::Widget);
 
 use Carp;
@@ -179,11 +180,11 @@ Optional. Callback function to invoke when the C<< <Enter> >> key is pressed.
 
 =cut
 
-has $_text          :reader :param = "";
-has $_pos_ch        :reader(position) :param(position) = 0;
-has $_scrolloffs_co = 0;
-has $_overwrite     = 0;
-has %_keybindings = (
+field $_text          :reader :param //= "";
+field $_pos_ch        :reader(position) :param(position) //= 0;
+field $_scrolloffs_co = 0;
+field $_overwrite     = 0;
+field %_keybindings = (
    'C-a' => "key_beginning_of_line",
    'C-e' => "key_end_of_line",
    'C-k' => "key_delete_line",
@@ -206,7 +207,8 @@ has %_keybindings = (
    'Right'       => "key_forward_char",
    'C-Right'     => "key_forward_word",
 );
-has $_on_enter      :reader :param = undef;
+
+field $_on_enter :reader :param = undef;
 
 ADJUST
 {

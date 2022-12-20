@@ -1,5 +1,11 @@
 Revision history for Tickit-Widget-Term
 
+0.006   2022-12-14
+        [CHANGES]
+         * Updated for Object::Pad v0.73
+            + Use `field NAME = EXPR` syntax
+            + Set `:strict(params)`
+
 0.005   2021-09-14
         [CHANGES]
          * Added ->use_pty method to simplify common case of using an IO::Pty

@@ -3,14 +3,14 @@
 #
 #  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
 
-package Syntax::Keyword::Finally 0.07;
+package Syntax::Keyword::Finally 0.08;
 
 use v5.14;
 use warnings;
 
 =head1 NAME
 
-C<Syntax::Keyword::Finally> - add C<FINALLY> phaser block syntax to perl
+C<Syntax::Keyword::Finally> - add C<FINALLY> phaser block syntax to perl (REMOVED)
 
 =head1 SYNOPSIS
 
@@ -30,17 +30,11 @@ See instead L<Syntax::Keyword::Defer>.
 
 =head1 DESCRIPTION
 
-This module provides a syntax plugin that implements a phaser block that
-executes its block when the containing scope has finished. The syntax of the
-C<FINALLY> block looks similar to other phasers in perl (such as C<BEGIN>),
-but the semantics of its execution are different.
+This module used to provide a syntax plugin that implements a keyword called
+C<FINALLY>. The keyword has now been renamed to C<defer>.
 
-The keyword has now been renamed to C<defer> but is otherwise identical to the
-syntax and semantics that were provided here. This module currently provides
-a back-compatibility layer.
-
-This will be removed in a later version. You should change any code currently
-using it, to L<Syntax::Keyword::Defer> instead.
+You should change any code currently using it, to L<Syntax::Keyword::Defer>
+instead.
 
 =cut
 
@@ -54,8 +48,7 @@ sub import
 
 sub import_into
 {
-   require Syntax::Keyword::Defer;
-   Syntax::Keyword::Defer->import_into( $_[0], 'finally' );
+   croak "'FINALLY' has now been removed; use Syntax::Keyword::Defer instead";
 }
 
 =head1 AUTHOR

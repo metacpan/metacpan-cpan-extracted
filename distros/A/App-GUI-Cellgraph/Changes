@@ -1,3 +1,12 @@
+0.03  2022-12-19  lichtkind
+-------
+    * = feature expand
+    * + greater state alphabets for cells states and actions states
+    * + 6 different input neighbourhood sizes
+    * + circular cell ordering option
+    * - removed cell mobility for now
+    * ! no draw when enter new rule number in text field and press enter
+
 0.02  2022-11-03  lichtkind
 -------
     * = init release

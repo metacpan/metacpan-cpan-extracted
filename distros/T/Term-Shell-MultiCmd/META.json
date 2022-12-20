@@ -4,13 +4,13 @@
       "Josef Ezra <jezra@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Term-Shell-MultiCmd",
    "no_index" : {
@@ -39,6 +39,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "3.01",
-   "x_serialization_backend" : "JSON::PP version 2.27203"
+   "version" : "3.02",
+   "x_serialization_backend" : "JSON::PP version 4.12"
 }

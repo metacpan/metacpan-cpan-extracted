@@ -1,5 +1,9 @@
 Revision history for Game-Marad
 
+0.06    2022-12-16
+        Fix attribute when selecting piece already on score cell.
+        Zobrist metadata function added.
+
 0.05    2022-11-11
         Make tricky test author-only. Use less recursion to figure out
         the piece pushing.

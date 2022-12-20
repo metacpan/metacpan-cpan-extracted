@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More;
 
-use Object::Pad ':experimental(init_expr mop)';
+use Object::Pad ':experimental(mop)';
 
 {
    package AClass {

@@ -228,3 +228,20 @@ rr2sv(ldns_rr *rr)
 
     return rr_sv;
 }
+
+void
+strip_newline(char* in)
+{
+    size_t length;
+
+    if (in == NULL || in[0] == '\0')
+    {
+        return;
+    }
+
+    length = strlen(in);
+    if (in[length - 1] == '\n')
+    {
+        in[length - 1] = '\0';
+    }
+}

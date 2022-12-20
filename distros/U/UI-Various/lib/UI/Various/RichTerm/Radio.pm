@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.31';
+our $VERSION = '0.34';
 
 use UI::Various::core;
 use UI::Various::Radio;
@@ -41,6 +41,8 @@ use UI::Various::RichTerm::base qw(%D);
 require Exporter;
 our @ISA = qw(UI::Various::Radio UI::Various::RichTerm::base);
 our @EXPORT_OK = qw();
+
+use constant DECO_WIDTH => length($D{RL}) + length($D{RR}) + 2;
 
 #########################################################################
 #########################################################################
@@ -92,7 +94,7 @@ sub _prepare($$)
 	$w > $_w  or  $w = $_w;
 	$h += $_h;
     }
-    return ($w, $h);
+    return ($w + DECO_WIDTH, $h);
 }
 
 #########################################################################
@@ -142,9 +144,10 @@ sub _show($$$$)
 	local $_ = ($i == 0 ? $prefix : $blank) . $D{RL};
 	$_ .= ($var  eq  $self->{_button_keys}[$i] ? 'o' : ' ') . $D{RR} . ' ';
 	push @text, $self->_format($_, '', '', $self->{_button_values}[$i],
-				   '', '', $width, 0);
+				   '', '', $width - DECO_WIDTH, 0);
     }
-    return $self->_format('', '', '', \@text, '', '', $width, $height);
+    return $self->_format('', '', '', \@text, '', '',
+			  $width - DECO_WIDTH, $height);
 }
 
 #########################################################################

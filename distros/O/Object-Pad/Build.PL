@@ -7,6 +7,9 @@ use XS::Parse::Sublike::Builder;
 
 my @extra_compiler_flags = qw( -Iinclude -Ihax );
 
+# Perl 5.36 made -std=c99 standard; before then we'll have to request it specially
+push @extra_compiler_flags, qw( -std=c99 ) if $^V lt v5.36.0;
+
 push @extra_compiler_flags, qw( -DDEBUGGING=-g ) if $^X =~ m|/debugperl|;
 
 use Config;

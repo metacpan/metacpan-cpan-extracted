@@ -71,7 +71,7 @@ else
 endif
 endif
 	./t-dash-domains.exe ../data/xn-dash-domains.txt
-	./t-retired.exe 2 2 ../data/retired.txt
+	#./t-retired.exe 2 2 ../data/retired.txt
 
 check-lpart: t-822-localpart.exe t-5321-localpart.exe
 check-lpart: t-5322-localpart.exe t-6531-localpart.exe

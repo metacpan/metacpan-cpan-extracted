@@ -22,7 +22,7 @@ use base qw(LaTeXML::Post::Processor);
 
 #======================================================================
 # Options:
-#   dpi : dots per inch for target medium.
+#   DPI : dots per inch for target medium.
 #   ignore_options  : list of graphicx options to be ignored.
 #   warn_options    : list of graphicx options to cause warning if used.
 #   trivial_scaling : If true, web images that only need scaling will be used as-is
@@ -48,7 +48,7 @@ use base qw(LaTeXML::Post::Processor);
 sub new {
   my ($class, %options) = @_;
   my $self = $class->SUPER::new(%options);
-  $$self{dppt}            = (($options{dpi} || 90) / 72.0);    # Dots per point.
+  $$self{DPI}             = $options{DPI};
   $$self{ignore_options}  = $options{ignore_options}  || [];
   $$self{trivial_scaling} = $options{trivial_scaling} || 1;
   $$self{graphics_types}  = $options{graphics_types}
@@ -58,10 +58,10 @@ sub new {
     || {
     ai => { destination_type => 'png',
       transparent => 1,
-      prescale => 1, ncolors => '400%', quality => 90, unit => 'point' },
+      prescale    => 1, ncolors => '400%', quality => 90, unit => 'point' },
     pdf => { destination_type => 'png',
       transparent => 1,
-      prescale => 1, ncolors => '400%', quality => 90, unit => 'point' },
+      prescale    => 1, ncolors => '400%', quality => 90, unit => 'point' },
     ps => { destination_type => 'png', transparent => 1,
       prescale => 1, ncolors => '400%', quality => 90, unit => 'point' },
     eps => { destination_type => 'png', transparent => 1,
@@ -96,6 +96,21 @@ sub process {
   $doc->closeCache;    # If opened.
   return $doc; }
 
+# Need a proper API to query PI's, probably in Post
+# But Core isn't respecting @at@document@begin from preloaded packages,
+# so here we're testing BOTH a straight DPI PI and the options from latexml.sty (ugh)
+sub getParameter {
+  my ($self, $doc, $parameter) = @_;
+  my $value;
+  foreach my $pi (@{ $$doc{processingInstructions} }) {
+    if ($pi =~ /^\s*$parameter\s*=\s*([\"\'])(.*?)\1\s*$/) {
+      $value = $2; }
+    elsif ($pi =~ /^\s*package\s*=\s*([\"\'])latexml\1\s*options\s*=\s*([\"\'])(.*?)\2\s*$/i) {
+      my $options = $3;
+      if ($options =~ /\b$parameter\s*=\s*(\d+)\b/i) {
+        $value = $1; } } }
+  return $value || $$self{$parameter}; }
+
 #======================================================================
 # Potentially customizable operations.
 # find graphics file
@@ -122,6 +137,11 @@ sub findGraphicFile {
     # Find all acceptable image files, in order of search paths
     my ($dir, $name, $reqtype) = pathname_split($source);
     # Ignore the requested type? Or should it increase desirability?
+    #
+    # If this is *NOT* a known graphics type, it would be best to treat it as
+    # a name suffix (e.g. name.1 from name.1.png)
+    if ((length($reqtype) > 0) && !(grep { $_ eq lc($reqtype) } $$self{graphics_types})) {
+      $name .= ".$reqtype"; }
     my $file  = pathname_concat($dir, $name);
     my @paths = pathname_findall($file, paths => $LaTeXML::Post::Graphics::SEARCHPATHS,
       # accept empty type, incase bad type name, but actual file's content is known type.
@@ -165,9 +185,24 @@ sub setGraphicSrc {
   my ($self, $node, $src, $width, $height) = @_;
   # If we are on windows, the $src path will be used for a URI context from the 'imagesrc' attribute,
   # so we can already switch it to the canonical slashified form
-  $node->setAttribute('imagesrc',    pathname_to_url($src));
-  $node->setAttribute('imagewidth',  $width)  if defined $width;
-  $node->setAttribute('imageheight', $height) if defined $height;
+  $node->setAttribute('imagesrc', pathname_to_url($src));
+  if (defined $width) {
+    # final formats mostly expect numeric literals to be integers
+    $width = int($width) if ($width =~ /^\d*\.\d*$/);
+    $node->setAttribute('imagewidth', $width); }
+  if (defined $height) {
+    # final formats mostly expect numeric literals to be integers
+    $height = int($height) if ($height =~ /^\d*\.\d*$/);
+    $node->setAttribute('imageheight', $height); }
+  if ($width and $height) {
+    my $aspect_class = "ltx_img_square";
+    if ($width > 1.24 * $height) {
+      $aspect_class = "ltx_img_landscape"; }
+    elsif ($height > 1.24 * $width) {
+      $aspect_class = "ltx_img_portrait" }
+    my $class = $node->getAttribute('class');
+    $class = ($class ? $class . ' ' : '') . $aspect_class;
+    $node->setAttribute('class', $class); }
   return; }
 
 sub processGraphic {
@@ -190,6 +225,11 @@ sub processGraphic {
 
 sub transformGraphic {
   my ($self, $doc, $node, $source, $transform) = @_;
+  my @parameters = (
+    DPI      => $self->getParameter($doc, 'DPI') || $LaTeXML::Util::Image::DPI,
+    magnify  => $self->getParameter($doc, 'magnify'),
+    upsample => $self->getParameter($doc, 'upsample'),
+    zoomout  => $self->getParameter($doc, 'zoomout'));
   my $sourcedir = $doc->getSourceDirectory;
   ($sourcedir) = $doc->getSearchPaths unless $sourcedir;    # Fishing...
   my ($reldir, $name, $srctype)
@@ -256,7 +296,7 @@ sub transformGraphic {
       $absdest = $doc->checkDestination($dest); }
 
     Debug(" [Destination $absdest]") if $LaTeXML::DEBUG{images};
-    ($width, $height) = image_graphicx_trivial($source, $transform, ddpt => $$self{ddpt});
+    ($width, $height) = image_graphicx_trivial($source, $transform, @parameters);
     if (!($width && $height)) {
       if (!image_can_image()) {
         Warn('imageprocessing', 'imagesize', undef,
@@ -276,7 +316,7 @@ sub transformGraphic {
     my $absdest = $doc->checkDestination($dest);
     Debug(" [Destination $absdest]") if $LaTeXML::DEBUG{images};
     ($image, $width, $height) = image_graphicx_complex($source, $transform,
-      ddpt => $$self{ddpt}, background => $$self{background}, %properties);
+      @parameters, background => $$self{background}, %properties);
     if (!($image && $width && $height)) {
       Warn('expected', 'image', undef,
         "Couldn't get usable image for $source");

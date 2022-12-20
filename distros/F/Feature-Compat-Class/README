@@ -7,12 +7,8 @@ SYNOPSIS
        use Feature::Compat::Class;
     
        class Point {
-          field $x;
-          field $y;
-    
-          ADJUST {
-             $x = $y = 0;
-          }
+          field $x :param = 0;
+          field $y :param = 0;
     
           method move_to ($new_x, $new_y) {
              $x = $new_x;
@@ -23,6 +19,8 @@ SYNOPSIS
              say "A point at ($x, $y)";
           }
        }
+    
+       Point->new(x => 5, y => 10)->describe;
 
 DESCRIPTION
 
@@ -127,22 +125,62 @@ KEYWORDS
        field $NAME;
        field @NAME;
        field %NAME;
+    
+       field $NAME = EXPR;
+    
+       field $NAME :ATTRS... = EXPR;
 
     See also "field" in Object::Pad.
 
-    Attributes are not supported. In particular, rather than using the
-    accessor-generator attributes you will have to create accessor methods
-    yourself; such as
+    Most field attributes are not supported. In particular, rather than
+    using the accessor-generator attributes you will have to create
+    accessor methods yourself; such as
 
        field $var;
        method var { return $var; }
        method set_var ($new_var) { $var = $new_var; }
 
-    Field initialiser blocks are also not supported. Instead, you will have
-    to use an ADJUST block to initialise a field:
+    Since version 0.04 fields of any type may take initialising
+    expressions. Initialiser blocks are not supported.
 
-       field $five;
-       ADJUST { $five = 5; }
+       field $five = 5;
+
+    The following field attributes are supported:
+
+  :param
+
+       field $var :param;
+    
+       field $var :param(name)
+
+    Since version 0.04.
+
+    Declares that the constructor will take a named parameter to set the
+    value for this field in a new instance.
+
+       field $var :param = EXPR;
+
+    Without a defaulting expression, the parameter is mandatory. When
+    combined with a defaulting expression, the parameter is optional and
+    the default will only apply if the named parameter was not passed to
+    the constructor.
+
+       field $var :param //= EXPR;
+       field $var :param ||= EXPR;
+
+    With both the :param attribute and a defaulting expression, the
+    operator can also be written as //= or ||=. In this case, the
+    defaulting expression will be used even if the caller passed an
+    undefined value (for //=) or a false value (for ||=). This simplifies
+    many situations where undef would not be a valid value for a field
+    parameter.
+
+       class C {
+          field $timeout :param //= 20;
+       }
+    
+       C->new( timeout => $args{timeout} );
+       # default applies if %args has no 'timeout' key, or if its value is undef
 
  ADJUST
 
@@ -165,6 +203,25 @@ KEYWORDS
        has
     
        requires
+
+COMPATIBILITY NOTES
+
+    This module may use either Object::Pad or the perl core class feature
+    to implement its syntax. While the two behave very similarly and both
+    conform to the description given above, the following differences
+    should be noted.
+
+    Fields in later field expressions
+
+      The core perl class feature makes every field variable visible to the
+      initialising expression of later fields. For example,
+
+         field $one = 1;
+         field $two = $one + 1;
+
+      This is not currently supported by Object::Pad. As a result, it is
+      possible to write code that works fine with the core perl feature but
+      older perls cannot support by using Object::Pad.
 
 AUTHOR
 

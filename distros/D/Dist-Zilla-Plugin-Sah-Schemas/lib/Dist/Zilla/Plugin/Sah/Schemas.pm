@@ -9,9 +9,9 @@ use PMVersions::Util qw(version_from_pmversions);
 use Require::Hook::Source::DzilBuild;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2021-09-29'; # DATE
+our $DATE = '2022-12-16'; # DATE
 our $DIST = 'Dist-Zilla-Plugin-Sah-Schemas'; # DIST
-our $VERSION = '0.029'; # VERSION
+our $VERSION = '0.030'; # VERSION
 
 with (
     'Dist::Zilla::Role::CheckPackageDeclared',
@@ -25,6 +25,10 @@ with (
 );
 
 has exclude_module => (is => 'rw');
+
+has schemar_preamble => (is => 'rw');
+
+has schemar_postamble => (is => 'rw');
 
 use namespace::autoclean;
 
@@ -196,12 +200,16 @@ sub munge_files {
                     "package $rpkg;\n",
                     "\n",
 
+                    (defined($self->schemar_preamble) ? ("# preamble code\n", $self->schemar_preamble, "\n\n") : ()),
+
                     "# DATE\n",
                     "# VERSION\n",
                     "\n",
 
                     "our \$rschema = ", Data::Dmp::dmp($rschema), ";\n",
                     "\n",
+
+                    (defined($self->schemar_postamble) ? ("# postamble code\n", $self->schemar_postamble, "\n\n") : ()),
 
                     "1;\n",
                     "# ABSTRACT: $sch->[1]{summary}\n",
@@ -317,7 +325,7 @@ Dist::Zilla::Plugin::Sah::Schemas - Plugin to use when building Sah-Schemas-* di
 
 =head1 VERSION
 
-This document describes version 0.029 of Dist::Zilla::Plugin::Sah::Schemas (from Perl distribution Dist-Zilla-Plugin-Sah-Schemas), released on 2021-09-29.
+This document describes version 0.030 of Dist::Zilla::Plugin::Sah::Schemas (from Perl distribution Dist-Zilla-Plugin-Sah-Schemas), released on 2022-12-16.
 
 =head1 SYNOPSIS
 
@@ -374,6 +382,16 @@ build, skip resolving the schema, skip parsing the schema and extracting
 prerequisites from the schema, the and skip creating the corresponding
 C<Sah::SchemaR::*> module.
 
+=head2 schemar_preamble
+
+Code to add at the beginning of generated F<Sah/SchemaR/*.pm> files (put after
+the C<package> statemnet).
+
+=head2 schemar_postamble
+
+Code to add at the end of generated F<Sah/SchemaR/*.pm> files (put before the
+ending C<1;>).
+
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Dist-Zilla-Plugin-Sah-Schemas>.
@@ -396,9 +414,9 @@ perlancar <perlancar@cpan.org>
 
 =head1 CONTRIBUTOR
 
-=for stopwords Steven Haryanto (on PC, Bandung)
+=for stopwords Steven Haryanto
 
-Steven Haryanto (on PC, Bandung) <stevenharyanto@gmail.com>
+Steven Haryanto <stevenharyanto@gmail.com>
 
 =head1 CONTRIBUTING
 
@@ -413,13 +431,14 @@ simply modify the code, then test via:
 
 If you want to build the distribution (e.g. to try to install it locally on your
 system), you can install L<Dist::Zilla>,
-L<Dist::Zilla::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
-Dist::Zilla plugin and/or Pod::Weaver::Plugin. Any additional steps required
-beyond that are considered a bug and can be reported to me.
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
+This software is copyright (c) 2022, 2021, 2020, 2019, 2018, 2017, 2016 by perlancar <perlancar@cpan.org>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

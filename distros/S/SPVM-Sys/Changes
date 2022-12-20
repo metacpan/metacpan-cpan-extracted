@@ -1,3 +1,82 @@
+0.32 2022-12-20
+  [Prerequirement Changes]
+    * SPVM::Sys needs SPVM 0.9668+.
+0.31 2022-12-15
+  [Build Process Improvement]
+    * Added --meta option to Makefile.PL
+  [Build Process Bug Fix]
+    * Fixed the SPVM module dependency in Makefile.PL
+      [Before]
+      PREREQ_PM => {
+        'SPVM'              => '0.9665',
+      },
+      [After]
+      CONFIGURE_REQUIRES => {
+        'SPVM'              => '0.9665',
+      },
+  [Test Improvement]
+    * Improve the workflow of Github Actions.
+    
+0.30 2022-12-13
+  [Build Process Improvement]
+    * Added --no-build-spvm-modules option to Makefile.PL.
+    * Removed cpanm and added the command to download cpanm to the GitHub action script.
+    * Github action scripts becomes more portable.
+  [Incompatible Changes]
+    * Changed the following method definitions in the Sys::Socket::Sockaddr class.
+      -  method sa_family : byte ()
+      +  method sa_family : int ()
+    * Changed the following method definitions in the Sys::Socket::Sockaddr::In class.
+      -  method sa_family : byte ()
+      +  method sa_family : int ()
+      -  method sin_family : byte ();
+      +  method sin_family : int ();
+      -  method set_sin_family : void ($family : byte);
+      +  method set_sin_family : void ($family : int);
+      -  method sin_port : short ();
+      +  method sin_port : int ();
+      -  method set_sin_port : void ($port : short);
+      +  method set_sin_port : void ($port : int);
+    * Changed the following method definitions in the Sys::Socket::Sockaddr::In6 class.
+      -  method sa_family : byte ()
+      +  method sa_family : int ()
+      -  method sin6_family : byte ();
+      +  method sin6_family : int ();
+      -  method set_sin6_family : void ($family : byte);
+      +  method set_sin6_family : void ($family : int);
+      -  method sin6_port : short ();
+      +  method sin6_port : int ();
+
+      -  method set_sin6_port : void ($port : short);
+      +  method set_sin6_port : void ($port : int);
+
+    * Changed the following method definitions in the Sys::Socket::Sockaddr::Storage class.
+      -  method sa_family : byte ()
+      +  method sa_family : int ()
+      -  method ss_family : byte ();
+      +  method ss_family : int ();
+      -  method set_ss_family : void ($family : byte)
+      +  method set_ss_family : void ($family : int)
+    * Changed the following method definitions in the Sys::Socket::Sockaddr::Un class.
+      -  method sa_family : byte ()
+      +  method sa_family : int ()
+      -  method sun_family : byte ();
+      +  method sun_family : int ();
+      -  method set_sun_family : void ($family : byte)
+      +  method set_sun_family : void ($family : int)
+    * Changed the following method definitions in the Sys::Socket::Sockaddr::Interface class.
+      -  method sa_family : byte ()
+      +  method sa_family : int ()
+    * Changed the following method definitions in the Sys::Poll::PollfdArray class.
+      -  method events : short ($index : int);
+      +  method events : int ($index : int);
+      -  method set_events : void ($index : int, $events : short);
+      +  method set_events : void ($index : int, $events : int);
+      -  method revents : short ($index : short);
+      +  method revents : int ($index : int);
+      -  method set_revents : void ($index : int, $revents : short);
+      +  method set_revents : void ($index : int, $revents : int);
+
 0.29 2022-12-13
   [Internal Compatible Changes]
     * Use SPVM::Resource::SocketUtil.

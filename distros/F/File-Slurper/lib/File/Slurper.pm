@@ -1,5 +1,5 @@
 package File::Slurper;
-$File::Slurper::VERSION = '0.013';
+$File::Slurper::VERSION = '0.014';
 use strict;
 use warnings;
 
@@ -56,7 +56,7 @@ sub read_text {
 
 	local $PerlIO::encoding::fallback = STOP_AT_PARTIAL | FB_CROAK;
 	open my $fh, "<$layer", $filename or croak "Couldn't open $filename: $!";
-	return do { local $/; <$fh> };
+	return scalar do { local $/; <$fh> };
 }
 
 sub write_text {
@@ -116,7 +116,7 @@ File::Slurper - A simple, sane and efficient module to slurp a file
 
 =head1 VERSION
 
-version 0.013
+version 0.014
 
 =head1 SYNOPSIS
 

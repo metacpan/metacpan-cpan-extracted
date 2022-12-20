@@ -1,13 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;  # signatures
-use Object::Pad 0.57;
+use Object::Pad 0.75 ':experimental(adjust_params init_expr)';
 
-package Tickit::Widget::SegmentDisplay 0.08;
+package Tickit::Widget::SegmentDisplay 0.09;
 class Tickit::Widget::SegmentDisplay
+   :strict(params)
    :isa(Tickit::Widget);
 
 use Tickit::Style;
@@ -155,20 +156,22 @@ my %types = (
    symb     => [],
 );
 
-has $_reshape_method;
-has $_render_to_rb;
+field $_reshape_method;
+field $_render_to_rb;
 
-has $_use_halfline :param = 0;
-has $_linestyle;
-has $_hthickness   :param(thickness) = 2;
-has $_vthickness;
-has $_margin;
+field $_use_halfline :param //= 0;
+field $_linestyle;
+field $_hthickness   :param(thickness) //= 2;
+field $_vthickness;
+field $_margin;
 
-has $_value        :param = "";
+field $_value        :param //= "";
 
-ADJUSTPARAMS ( $params )
-{
-   my $type = ( delete $params->{type} ) // "seven";
+ADJUST :params (
+   :$type         = "seven",
+   :$use_linedraw = 0,
+   :$use_unicode  = 0,
+) {
    my $method;
    foreach my $typename ( keys %types ) {
       $type eq $typename and $method = $typename, last;
@@ -178,16 +181,12 @@ ADJUSTPARAMS ( $params )
 
    $_reshape_method = $self->can( "reshape_${method}" );
 
-   my $use_linedraw = delete $params->{use_linedraw};
-
    if( $use_linedraw and my $code = $self->can( "render_${method}_as_linedraw" ) ) {
-      $_linestyle = ( delete $params->{thickness} // 1 ) > 1 ? LINE_THICK : LINE_SINGLE;
+      $_linestyle = $_hthickness > 2 ? LINE_THICK : LINE_SINGLE;
       $_render_to_rb = $code;
    }
    else {
       my $render = $self->can( "render_${method}" );
-
-      my $use_unicode = delete $params->{use_unicode};
 
       my $flush = $self->can(
          $_use_halfline ? "flush_halfline" :
@@ -251,8 +250,8 @@ method set_value ( $new_value )
    $self->redraw;
 }
 
-has $_lit_pen;
-has $_unlit_pen;
+field $_lit_pen;
+field $_unlit_pen;
 
 method on_style_changed_values ( %values )
 {
@@ -351,7 +350,7 @@ method flush_halfline ( $buff, $rb, $rect )
    }
 }
 
-method _fill ( $buff, $startline, $endline, $startcol, $endcol, $val = LIT )
+method $fill ( $buff, $startline, $endline, $startcol, $endcol, $val = LIT )
 {
    my @colrange = ( $startcol .. $endcol + $_hthickness - 1 );
 
@@ -362,12 +361,12 @@ method _fill ( $buff, $startline, $endline, $startcol, $endcol, $val = LIT )
    }
 }
 
-method _dot ( $buff, $line, $col, $val = LIT )
+method $dot ( $buff, $line, $col, $val = LIT )
 {
-   $self->_fill( $buff, $line, $line, $col, $col, $val );
+   $self->$fill( $buff, $line, $line, $col, $col, $val );
 }
 
-has %_geom;
+field %_geom;
 
 # 7-Segment
 my %segments = (
@@ -385,7 +384,7 @@ my %segments = (
    9   => "ABCD FG",
 );
 
-method _val_for_seg ( $segment )
+method $val_for_seg ( $segment )
 {
    my $segments = $segments{substr $self->value, 0, 1} or return UNLIT;
 
@@ -422,14 +421,14 @@ method reshape_seven ( $lines, $cols, $top, $left )
 
 method render_seven ( $buff )
 {
-   $self->_fill( $buff, ( $_geom{A_line} ) x 2, $_geom{AGD_startcol}, $_geom{AGD_endcol}, $self->_val_for_seg( "A" ) );
-   $self->_fill( $buff, ( $_geom{G_line} ) x 2, $_geom{AGD_startcol}, $_geom{AGD_endcol}, $self->_val_for_seg( "G" ) );
-   $self->_fill( $buff, ( $_geom{D_line} ) x 2, $_geom{AGD_startcol}, $_geom{AGD_endcol}, $self->_val_for_seg( "D" ) );
+   $self->$fill( $buff, ( $_geom{A_line} ) x 2, $_geom{AGD_startcol}, $_geom{AGD_endcol}, $self->$val_for_seg( "A" ) );
+   $self->$fill( $buff, ( $_geom{G_line} ) x 2, $_geom{AGD_startcol}, $_geom{AGD_endcol}, $self->$val_for_seg( "G" ) );
+   $self->$fill( $buff, ( $_geom{D_line} ) x 2, $_geom{AGD_startcol}, $_geom{AGD_endcol}, $self->$val_for_seg( "D" ) );
 
-   $self->_fill( $buff, $_geom{BF_startline}, $_geom{BF_endline}, ( $_geom{FE_col} ) x 2, $self->_val_for_seg( "F" ) );
-   $self->_fill( $buff, $_geom{BF_startline}, $_geom{BF_endline}, ( $_geom{BC_col} ) x 2, $self->_val_for_seg( "B" ) );
-   $self->_fill( $buff, $_geom{CE_startline}, $_geom{CE_endline}, ( $_geom{FE_col} ) x 2, $self->_val_for_seg( "E" ) );
-   $self->_fill( $buff, $_geom{CE_startline}, $_geom{CE_endline}, ( $_geom{BC_col} ) x 2, $self->_val_for_seg( "C" ) );
+   $self->$fill( $buff, $_geom{BF_startline}, $_geom{BF_endline}, ( $_geom{FE_col} ) x 2, $self->$val_for_seg( "F" ) );
+   $self->$fill( $buff, $_geom{BF_startline}, $_geom{BF_endline}, ( $_geom{BC_col} ) x 2, $self->$val_for_seg( "B" ) );
+   $self->$fill( $buff, $_geom{CE_startline}, $_geom{CE_endline}, ( $_geom{FE_col} ) x 2, $self->$val_for_seg( "E" ) );
+   $self->$fill( $buff, $_geom{CE_startline}, $_geom{CE_endline}, ( $_geom{BC_col} ) x 2, $self->$val_for_seg( "C" ) );
 }
 
 method render_seven_as_linedraw ( $rb, $rect )
@@ -438,14 +437,14 @@ method render_seven_as_linedraw ( $rb, $rect )
 
    $rb->setpen( $_lit_pen );
 
-   $rb->hline_at( $_geom{A_line}, $_geom{AGD_startcol}, $_geom{AGD_endcol}, $_linestyle ) if $self->_val_for_seg( "A" ) == LIT;
-   $rb->hline_at( $_geom{G_line}, $_geom{AGD_startcol}, $_geom{AGD_endcol}, $_linestyle ) if $self->_val_for_seg( "G" ) == LIT;
-   $rb->hline_at( $_geom{D_line}, $_geom{AGD_startcol}, $_geom{AGD_endcol}, $_linestyle ) if $self->_val_for_seg( "D" ) == LIT;
+   $rb->hline_at( $_geom{A_line}, $_geom{AGD_startcol}, $_geom{AGD_endcol}, $_linestyle ) if $self->$val_for_seg( "A" ) == LIT;
+   $rb->hline_at( $_geom{G_line}, $_geom{AGD_startcol}, $_geom{AGD_endcol}, $_linestyle ) if $self->$val_for_seg( "G" ) == LIT;
+   $rb->hline_at( $_geom{D_line}, $_geom{AGD_startcol}, $_geom{AGD_endcol}, $_linestyle ) if $self->$val_for_seg( "D" ) == LIT;
 
-   $rb->vline_at( $_geom{BF_startline}, $_geom{BF_endline}, $_geom{FE_col}, $_linestyle ) if $self->_val_for_seg( "F" ) == LIT;
-   $rb->vline_at( $_geom{BF_startline}, $_geom{BF_endline}, $_geom{BC_col}, $_linestyle ) if $self->_val_for_seg( "B" ) == LIT;
-   $rb->vline_at( $_geom{CE_startline}, $_geom{CE_endline}, $_geom{FE_col}, $_linestyle ) if $self->_val_for_seg( "E" ) == LIT;
-   $rb->vline_at( $_geom{CE_startline}, $_geom{CE_endline}, $_geom{BC_col}, $_linestyle ) if $self->_val_for_seg( "C" ) == LIT;
+   $rb->vline_at( $_geom{BF_startline}, $_geom{BF_endline}, $_geom{FE_col}, $_linestyle ) if $self->$val_for_seg( "F" ) == LIT;
+   $rb->vline_at( $_geom{BF_startline}, $_geom{BF_endline}, $_geom{BC_col}, $_linestyle ) if $self->$val_for_seg( "B" ) == LIT;
+   $rb->vline_at( $_geom{CE_startline}, $_geom{CE_endline}, $_geom{FE_col}, $_linestyle ) if $self->$val_for_seg( "E" ) == LIT;
+   $rb->vline_at( $_geom{CE_startline}, $_geom{CE_endline}, $_geom{BC_col}, $_linestyle ) if $self->$val_for_seg( "C" ) == LIT;
 }
 
 # 7-Segment with DP
@@ -462,7 +461,7 @@ method render_seven_dp ( $buff )
    $self->render_seven( $buff );
 
    my $dp = $_value =~ m/\.$/;
-   $self->_dot( $buff, $_geom{DP_line}, $_geom{DP_col}, $dp ? LIT : UNLIT );
+   $self->$dot( $buff, $_geom{DP_line}, $_geom{DP_col}, $dp ? LIT : UNLIT );
 }
 
 # Static double-dot colon
@@ -481,8 +480,8 @@ method reshape_colon ( $lines, $cols, $top, $left )
 method render_colon ( $buff )
 {
    my $col = $_geom{colon_col};
-   $self->_dot( $buff, $_geom{A_line}, $col );
-   $self->_dot( $buff, $_geom{B_line}, $col );
+   $self->$dot( $buff, $_geom{A_line}, $col );
+   $self->$dot( $buff, $_geom{B_line}, $col );
 }
 
 method render_colon_as_linedraw ( $rb, $rect )
@@ -536,7 +535,7 @@ method reshape_symb ( $lines, $cols, $top, $left )
    $_geom{X_to_col}  = ( $cols  - 2 ) / 100;
 }
 
-method _roundpos ( $l, $c )
+method $roundpos ( $l, $c )
 {
    # Round away from the centre of the widget
    return
@@ -554,19 +553,19 @@ method render_symb ( $buff )
    foreach my $stroke ( @$strokes ) {
       my ( $start, @points ) = @$stroke;
       $start =~ m/^(\d+),(\d+)$/;
-      my ( $atL, $atC ) = $self->_roundpos( $2 * $Y_to_line, $1 * $X_to_col );
+      my ( $atL, $atC ) = $self->$roundpos( $2 * $Y_to_line, $1 * $X_to_col );
 
       foreach ( @points ) {
          m/^(\d+),(\d+)$/;
-         my ( $toL, $toC ) = $self->_roundpos( $2 * $Y_to_line, $1 * $X_to_col );
+         my ( $toL, $toC ) = $self->$roundpos( $2 * $Y_to_line, $1 * $X_to_col );
 
          if( $toL == $atL ) {
             my ( $c, $limC ) = $toC > $atC ? ( $atC, $toC ) : ( $toC, $atC );
-            $self->_fill( $buff, $atL, $atL, $c, $limC );
+            $self->$fill( $buff, $atL, $atL, $c, $limC );
          }
          elsif( $toC == $atC ) {
             my ( $l, $limL ) = $toL > $atL ? ( $atL, $toL ) : ( $toL, $atL );
-            $self->_fill( $buff, $l, $limL, $atC, $atC );
+            $self->$fill( $buff, $l, $limL, $atC, $atC );
          }
          else {
             my ( $sL, $eL, $sC, $eC ) = $toL > $atL ? ( $atL, $toL, $atC, $toC )
@@ -586,7 +585,7 @@ method render_symb ( $buff )
                   $c++, $err -= $dL if  $err > $dL;
                   $c--, $err += $dL if -$err > $dL;
 
-                  $self->_dot( $buff, $l, $c );
+                  $self->$dot( $buff, $l, $c );
 
                   $err += $dC;
                }
@@ -600,7 +599,7 @@ method render_symb ( $buff )
                   $l++, $err -= $adC if  $err > $adC;
                   $l--, $err += $adC if -$err > $adC;
 
-                  $self->_dot( $buff, $l, $c );
+                  $self->$dot( $buff, $l, $c );
 
                   $err += $dL;
                }

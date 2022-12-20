@@ -26,6 +26,7 @@ no_index:
 requires:
   Error::Pure: 0.27
   Exporter: 0
+  List::Util: 1.33
   Readonly: 0
   perl: 5.8.0
 resources:
@@ -33,4 +34,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/Class-Utils
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/Class-Utils
-version: '0.12'
+version: '0.14'

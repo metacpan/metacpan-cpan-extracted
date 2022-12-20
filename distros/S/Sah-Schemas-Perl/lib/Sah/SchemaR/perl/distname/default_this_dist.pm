@@ -1,8 +1,11 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::perl::distname::default_this_dist;
 
-our $DATE = '2022-09-11'; # DATE
-our $VERSION = '0.045'; # VERSION
+# preamble code
+no warnings 'experimental::regex_sets';
+
+our $DATE = '2022-12-16'; # DATE
+our $VERSION = '0.046'; # VERSION
 
 our $rschema = do{my$var={base=>"perl::distname",clsets_after_base=>[{description=>"\nSee <pm:App::ThisDist>'s `this_dist()` for more details on how \"this\ndistribution\" is determined. Note that `App::ThisDist` is not added as\ndependency automatically; you will have to add it manually.\n\n",examples=>[],summary=>"Perl distribution name, defaults to \"this distribution\"","x.perl.default_value_rules"=>["Perl::this_dist"]}],clsets_after_type=>[{description=>"\nThis is a schema you can use when you want to accept a Perl distribution name,\ne.g. `WWW-Mechanize`. It offers basic checking of syntax as well as a couple of\nconveniences. First, it offers completion from list of locally installed Perl\ndistribution. Second, it contains coercion rule so you can also input\n`Foo::Bar`, `Foo/Bar`, `Foo/Bar.pm`, or even 'Foo.Bar' and it will be normalized\ninto `Foo-Bar`.\n\nTo see this schema in action on the CLI, you can try e.g. the `dist-has-deb`\nscript from <pm:App::DistUtils> and activate its tab completion (see its manpage\nfor more details). Then on the CLI try typing:\n\n    % dist-has-deb WWW-<tab>\n    % dist-has-deb dzp/<tab>\n\nNote that this schema does not check that the Perl disribution exists on CPAN or\nis installed locally. To check that, use the `perl::distname::installed` schema.\nAnd there's also a `perl::distname::not_installed` schema.\n\n",match=>"\\A[A-Za-z_][A-Za-z_0-9]*(-[A-Za-z_0-9]+)*\\z",summary=>"Perl distribution name, e.g. Foo-Bar","x.completion"=>"perl_distname","x.perl.coerce_rules"=>["From_str::normalize_perl_distname"]},'$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_type}[0]','$var->{clsets_after_base}[0]'],resolve_path=>["str","perl::distname"],type=>"str",v=>2};$var->{clsets_after_type}[1]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_type}[0];$var->{"clsets_after_type.alt.merge.merged"}[1]=$var->{clsets_after_base}[0];$var};
 
@@ -21,7 +24,7 @@ Sah::SchemaR::perl::distname::default_this_dist - Perl distribution name, defaul
 
 =head1 VERSION
 
-This document describes version 0.045 of Sah::SchemaR::perl::distname::default_this_dist (from Perl distribution Sah-Schemas-Perl), released on 2022-09-11.
+This document describes version 0.046 of Sah::SchemaR::perl::distname::default_this_dist (from Perl distribution Sah-Schemas-Perl), released on 2022-12-16.
 
 =head1 DESCRIPTION
 

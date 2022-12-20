@@ -44,8 +44,8 @@ sub build_self {
   $self->name($data->{name}) if $self->name;
   $self->context('(None)') if !$self->context;
   $self->message('Exception!') if !$self->message;
-  $self->verbose(1) if !exists $data->{verbose};
-  $self->trace(2) if !@{$self->frames};
+  $self->verbose($ENV{VENUS_ERROR_VERBOSE} // 1) if !exists $data->{verbose};
+  $self->trace($ENV{VENUS_ERROR_TRACE_OFFSET} // 2) if !@{$self->frames};
 
   return $self;
 }
@@ -273,7 +273,11 @@ Error Class for Perl 5
 
 =head1 DESCRIPTION
 
-This package represents a context-aware error (exception object).
+This package represents a context-aware error (exception object). The default
+for error verbosity can be controlled via the C<VENUS_ERROR_VERBOSE>
+environment variable, e.g. a setting of C<0> disables stack traces. The default
+trace-offset can be controlled via the C<VENUS_ERROR_TRACE_OFFSET> environment
+variable, e.g. a setting of C<0> indicates no offset.
 
 =cut
 

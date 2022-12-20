@@ -1,9 +1,9 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
 
-package Syntax::Keyword::Defer 0.07;
+package Syntax::Keyword::Defer 0.08;
 
 use v5.14;
 use warnings;
@@ -145,6 +145,11 @@ Z<>
    $ perl example.pl
    Failed to increment count at examples.pl line 6.
 
+However, if a C<defer> block is being run because of exceptional return of its
+scope, any further exceptions it attempts to raise are turned into warnings.
+This ensures that the original exception which caused the stack-unwind to run
+the block in the first place does not get overwritten on the way.
+
 Because a C<defer> block is a true block (e.g. in the same way something like
 an C<if () {...}> block is), rather than an anonymous sub, it does not appear
 to C<caller()> or other stack-inspection tricks. This is useful for calling
@@ -182,7 +187,7 @@ sub import_into
    my %syms = map { $_ => 1 } @syms;
    $^H{"Syntax::Keyword::Defer/defer"}++   if delete $syms{defer};
 
-   carp "'finally' is now deprecated; use 'defer' instead" and $^H{"Syntax::Keyword::Defer/finally"}++
+   croak "'FINALLY' has now been removed; use 'defer' instead" and $^H{"Syntax::Keyword::Defer/finally"}++
       if delete $syms{finally};
 
    croak "Unrecognised import symbols @{[ keys %syms ]}" if keys %syms;
@@ -198,22 +203,14 @@ out because this implementation does not yet handle them:
 
 =item *
 
-Try to fix the double-exception test failure on Perl versions before v5.20.
-(Test currently skipped on those versions)
+Detection logic of defer-during-throw is currently based on the truth of the
+C<ERRSV> (C<$@>), which means it is liable to false positives. There may not
+be much that can be done about this.
 
 =item *
 
-Permit the use of C<goto> or C<next/last/redo> within C<defer> blocks,
-provided it does not jump to a target outside.
-
-E.g. the following ought to be permitted, but currently is not:
-
-   defer {
-      foreach my $item (@items) {
-         $item > 5 or next;
-         ...
-      }
-   }
+Try to fix the double-exception test failure on Perl versions before v5.20.
+(Test currently skipped on those versions)
 
 =item *
 

@@ -25,11 +25,14 @@ use Errno qw(EBADF);
 
 use Mail::SpamAssassin::Plugin;
 use Mail::SpamAssassin::Locales;
-use Mail::SpamAssassin::Util qw(get_my_locales parse_rfc822_date);
+use Mail::SpamAssassin::Util qw(get_my_locales parse_rfc822_date
+                                is_valid_utf_8);
 use Mail::SpamAssassin::Logger;
 use Mail::SpamAssassin::Constants qw(:sa :ip);
 
 our @ISA = qw(Mail::SpamAssassin::Plugin);
+
+my $IP_ADDRESS = IP_ADDRESS;
 
 # constructor: register the eval rule
 sub new {
@@ -42,43 +45,36 @@ sub new {
   bless ($self, $class);
 
   # the important bit!
-  $self->register_eval_rule("check_for_fake_aol_relay_in_rcvd");
-  $self->register_eval_rule("check_for_faraway_charset_in_headers");
-  $self->register_eval_rule("check_for_unique_subject_id");
-  $self->register_eval_rule("check_illegal_chars");
-  $self->register_eval_rule("check_for_forged_hotmail_received_headers");
-  $self->register_eval_rule("check_for_no_hotmail_received_headers");
-  $self->register_eval_rule("check_for_msn_groups_headers");
-  $self->register_eval_rule("check_for_forged_eudoramail_received_headers");
-  $self->register_eval_rule("check_for_forged_yahoo_received_headers");
-  $self->register_eval_rule("check_for_forged_juno_received_headers");
-  $self->register_eval_rule("check_for_forged_gmail_received_headers");
-  $self->register_eval_rule("check_for_matching_env_and_hdr_from");
-  $self->register_eval_rule("sorted_recipients");
-  $self->register_eval_rule("similar_recipients");
-  $self->register_eval_rule("check_for_missing_to_header");
-  $self->register_eval_rule("check_for_forged_gw05_received_headers");
-  $self->register_eval_rule("check_for_shifted_date");
-  $self->register_eval_rule("subject_is_all_caps");
-  $self->register_eval_rule("check_for_to_in_subject");
-  $self->register_eval_rule("check_outlook_message_id");
-  $self->register_eval_rule("check_messageid_not_usable");
-  $self->register_eval_rule("check_header_count_range");
-  $self->register_eval_rule("check_unresolved_template");
-  $self->register_eval_rule("check_ratware_name_id");
-  $self->register_eval_rule("check_ratware_envelope_from");
-  $self->register_eval_rule("gated_through_received_hdr_remover");
-  $self->register_eval_rule("received_within_months");
-  $self->register_eval_rule("check_equal_from_domains");
+  $self->register_eval_rule("check_for_fake_aol_relay_in_rcvd", $Mail::SpamAssassin::Conf::TYPE_HEAD_EVALS);
+  $self->register_eval_rule("check_for_faraway_charset_in_headers", $Mail::SpamAssassin::Conf::TYPE_HEAD_EVALS);
+  $self->register_eval_rule("check_for_unique_subject_id", $Mail::SpamAssassin::Conf::TYPE_HEAD_EVALS);
+  $self->register_eval_rule("check_illegal_chars", $Mail::SpamAssassin::Conf::TYPE_HEAD_EVALS);
+  $self->register_eval_rule("check_for_forged_hotmail_received_headers", $Mail::SpamAssassin::Conf::TYPE_HEAD_EVALS);
+  $self->register_eval_rule("check_for_no_hotmail_received_headers", $Mail::SpamAssassin::Conf::TYPE_HEAD_EVALS);
+  $self->register_eval_rule("check_for_msn_groups_headers", $Mail::SpamAssassin::Conf::TYPE_HEAD_EVALS);
+  $self->register_eval_rule("check_for_forged_eudoramail_received_headers", $Mail::SpamAssassin::Conf::TYPE_HEAD_EVALS);
+  $self->register_eval_rule("check_for_forged_yahoo_received_headers", $Mail::SpamAssassin::Conf::TYPE_HEAD_EVALS);
+  $self->register_eval_rule("check_for_forged_juno_received_headers", $Mail::SpamAssassin::Conf::TYPE_HEAD_EVALS);
+  $self->register_eval_rule("check_for_forged_gmail_received_headers", $Mail::SpamAssassin::Conf::TYPE_HEAD_EVALS);
+  $self->register_eval_rule("check_for_matching_env_and_hdr_from", $Mail::SpamAssassin::Conf::TYPE_HEAD_EVALS);
+  $self->register_eval_rule("sorted_recipients", $Mail::SpamAssassin::Conf::TYPE_HEAD_EVALS);
+  $self->register_eval_rule("similar_recipients", $Mail::SpamAssassin::Conf::TYPE_HEAD_EVALS);
+  $self->register_eval_rule("check_for_missing_to_header", $Mail::SpamAssassin::Conf::TYPE_HEAD_EVALS);
+  $self->register_eval_rule("check_for_forged_gw05_received_headers", $Mail::SpamAssassin::Conf::TYPE_HEAD_EVALS);
+  $self->register_eval_rule("check_for_shifted_date", $Mail::SpamAssassin::Conf::TYPE_HEAD_EVALS);
+  $self->register_eval_rule("subject_is_all_caps", $Mail::SpamAssassin::Conf::TYPE_HEAD_EVALS);
+  $self->register_eval_rule("check_for_to_in_subject", $Mail::SpamAssassin::Conf::TYPE_HEAD_EVALS);
+  $self->register_eval_rule("check_outlook_message_id", $Mail::SpamAssassin::Conf::TYPE_HEAD_EVALS);
+  $self->register_eval_rule("check_messageid_not_usable", $Mail::SpamAssassin::Conf::TYPE_HEAD_EVALS);
+  $self->register_eval_rule("check_header_count_range", $Mail::SpamAssassin::Conf::TYPE_HEAD_EVALS);
+  $self->register_eval_rule("check_unresolved_template", $Mail::SpamAssassin::Conf::TYPE_HEAD_EVALS);
+  $self->register_eval_rule("check_ratware_name_id", $Mail::SpamAssassin::Conf::TYPE_HEAD_EVALS);
+  $self->register_eval_rule("check_ratware_envelope_from", $Mail::SpamAssassin::Conf::TYPE_HEAD_EVALS);
+  $self->register_eval_rule("gated_through_received_hdr_remover", $Mail::SpamAssassin::Conf::TYPE_HEAD_EVALS);
+  $self->register_eval_rule("received_within_months", $Mail::SpamAssassin::Conf::TYPE_HEAD_EVALS);
+  $self->register_eval_rule("check_equal_from_domains", $Mail::SpamAssassin::Conf::TYPE_HEAD_EVALS);
 
   return $self;
-}
-
-# load triplets.txt into memory 
-sub compile_now_start {
-  my ($self) = @_;
-
-  $self->word_is_in_dictionary("aba");
 }
 
 sub check_for_fake_aol_relay_in_rcvd {
@@ -86,7 +82,7 @@ sub check_for_fake_aol_relay_in_rcvd {
   local ($_);
 
   $_ = $pms->get('Received');
-  s/\s/ /gs;
+  s/\s+/ /gs;
 
   # this is the hostname format used by AOL for their relays. Spammers love 
   # forging it.  Don't make it more specific to match aol.com only, though --
@@ -122,142 +118,20 @@ sub check_for_faraway_charset_in_headers {
   return 0 if grep { $_ eq "all" } @locales;
 
   for my $h (qw(From Subject)) {
-    my @hdrs = $pms->get("$h:raw");  # ??? get() returns a scalar ???
-    if ($#hdrs >= 0) {
-      $hdr = join(" ", @hdrs);
-    } else {
-      $hdr = '';
-    }
-    while ($hdr =~ /=\?(.+?)\?.\?.*?\?=/g) {
-      Mail::SpamAssassin::Locales::is_charset_ok_for_locales($1, @locales)
-	  or return 1;
-    }
+    my @hdrs = $pms->get("$h:raw");
+    foreach my $hdr (@hdrs) {
+      while ($hdr =~ /=\?(.+?)\?.\?.*?\?=/g) {
+        Mail::SpamAssassin::Locales::is_charset_ok_for_locales($1, @locales)
+          or return 1;
+      }
+    }     
   }
   0;
 }
 
+# Deprecated (Bug 8051)
 sub check_for_unique_subject_id {
-  my ($self, $pms) = @_;
-  local ($_);
-  $_ = lc $pms->get('Subject');
-  study;  # study is a no-op since perl 5.16.0, eliminating related bugs
-
-  my $id = 0;
-  if (/[-_\.\s]{7,}([-a-z0-9]{4,})$/
-	|| /\s{10,}(?:\S\s)?(\S+)$/
-	|| /\s{3,}[-:\#\(\[]+([-a-z0-9]{4,})[\]\)]+$/
-	|| /\s{3,}[:\#\(\[]*([a-f0-9]{4,})[\]\)]*$/
-	|| /\s{3,}[-:\#]([a-z0-9]{5,})$/
-	|| /[\s._]{3,}([^0\s._]\d{3,})$/
-	|| /[\s._]{3,}\[(\S+)\]$/
-
-        # (7217vPhZ0-478TLdy5829qicU9-0@26) and similar
-        || /\(([-\w]{7,}\@\d+)\)$/
-
-        # Seven or more digits at the end of a subject is almost certainly a id
-        || /\b(\d{7,})\s*$/
-
-        # stuff at end of line after "!" or "?" is usually an id
-        || /[!\?]\s*(\d{4,}|\w+(-\w+)+)\s*$/
-
-        # 9095IPZK7-095wsvp8715rJgY8-286-28 and similar
-	# excluding 'Re:', etc and the first word
-        || /(?:\w{2,3}:\s)?\w+\s+(\w{7,}-\w{7,}(-\w+)*)\s*$/
-
-        # #30D7 and similar
-        || /\s#\s*([a-f0-9]{4,})\s*$/
-     )
-  {
-    $id = $1;
-    # exempt online purchases
-    if ($id =~ /\d{5,}/
-	&& /(?:item|invoice|order|number|confirmation).{1,6}\Q$id\E\s*$/)
-    {
-      $id = 0;
-    }
-
-    # for the "foo-bar-baz" case, otherwise it won't
-    # be found in the dict:
-    $id =~ s/-//;
-  }
-
-  return ($id && !$self->word_is_in_dictionary($id));
-}
-
-# word_is_in_dictionary()
-#
-# See if the word looks like an English word, by checking if each triplet
-# of letters it contains is one that can be found in the English language.
-# Does not include triplets only found in proper names, or in the Latin
-# and Greek terms that might be found in a larger dictionary
-
-my %triplets;
-my $triplets_loaded = 0;
-
-sub word_is_in_dictionary {
-  my ($self, $word) = @_;
-  local ($_);
-  local $/ = "\n";		# Ensure $/ is set appropriately
-
-  # $word =~ tr/A-Z/a-z/;	# already done by this stage
-  $word =~ s/^\s+//;
-  $word =~ s/\s+$//;
-
-  # If it contains a digit, dash, etc, it's not a valid word.
-  # Don't reject words like "can't" and "I'll"
-  return 0 if ($word =~ /[^a-z\']/);
-
-  # handle a few common "blah blah blah (comment)" styles
-  return 1 if ($word eq "ot");	# off-topic
-  return 1 if ($word =~ /(?:linux|nix|bsd)/); # not in most dicts
-  return 1 if ($word =~ /(?:whew|phew|attn|tha?nx)/);  # not in most dicts
-
-  my $word_len = length($word);
-
-  # Unique IDs probably aren't going to be only one or two letters long
-  return 1 if ($word_len < 3);
-
-  if (!$triplets_loaded) {
-    # take a copy to avoid modifying the real one
-    my @default_triplets_path = @Mail::SpamAssassin::default_rules_path;
-    s{$}{/triplets.txt}  for @default_triplets_path;
-    my $filename = $self->{main}->first_existing_path (@default_triplets_path);
-
-    if (!defined $filename) {
-      dbg("eval: failed to locate the triplets.txt file");
-      return 1;
-    }
-
-    local *TRIPLETS;
-    if (!open (TRIPLETS, "<$filename")) {
-      dbg("eval: failed to open '$filename', cannot check dictionary: $!");
-      return 1;
-    }
-    for($!=0; <TRIPLETS>; $!=0) {
-      chomp;
-      $triplets{$_} = 1;
-    }
-    defined $_ || $!==0  or
-      $!==EBADF ? dbg("eval: error reading from $filename: $!")
-                : die "error reading from $filename: $!";
-    close(TRIPLETS)  or die "error closing $filename: $!";
-
-    $triplets_loaded = 1;
-  } # if (!$triplets_loaded)
-
-
-  my $i;
-
-  for ($i = 0; $i < ($word_len - 2); $i++) {
-    my $triplet = substr($word, $i, 3);
-    if (!$triplets{$triplet}) {
-      dbg("eval: unique ID: letter triplet '$triplet' from word '$word' not valid");
-      return 0;
-    }
-  } # for ($i = 0; $i < ($word_len - 2); $i++)
-
-  # All letter triplets in word were found to be valid
-  return 1;
+  return 0;
 }
 
 # look for 8-bit and other illegal characters that should be MIME
@@ -268,7 +142,18 @@ sub check_illegal_chars {
 
   $header .= ":raw" unless $header =~ /:raw$/;
   my $str = $pms->get($header);
-  return 0 if !defined $str || $str eq '';
+  return 0 if !defined $str || $str !~ /\S/;
+
+  if ($str =~ tr/\x00-\x7F//c && is_valid_utf_8($str)) {
+    # is non-ASCII and is valid UTF-8
+    if ($str =~ tr/\x00-\x08\x0B\x0C\x0E-\x1F//) {
+      dbg("eval: %s is valid UTF-8 but contains controls: %s", $header, $str);
+    } else {
+      # todo: only with a SMTPUTF8 mail
+      dbg("eval: %s is valid UTF-8: %s", $header, $str);
+      return 0;
+    }
+  }
 
   # count illegal substrings (RFC 2045)
   # (non-ASCII + C0 controls except TAB, NL, CR)
@@ -291,12 +176,12 @@ sub gated_through_received_hdr_remover {
   my ($self, $pms) = @_;
 
   my $txt = $pms->get("Mailing-List",undef);
-  if (defined $txt && $txt =~ /^contact \S+\@\S+\; run by ezmlm$/) {
+  if (defined $txt && $txt =~ /^contact \S+\@\S+\; run by ezmlm$/m) {
     my $dlto = $pms->get("Delivered-To");
     my $rcvd = $pms->get("Received");
 
     # ensure we have other indicative headers too
-    if ($dlto =~ /^mailing list \S+\@\S+/ &&
+    if ($dlto =~ /^mailing list \S+\@\S+/m &&
         $rcvd =~ /qmail \d+ invoked (?:from network|by .{3,20})\); \d+ ... \d+/)
     {
       return 1;
@@ -336,9 +221,8 @@ sub _check_for_forged_hotmail_received_headers {
   return if $self->check_for_msn_groups_headers($pms);
 
   my $ip = $pms->get('X-Originating-Ip',undef);
-  my $IP_ADDRESS = IP_ADDRESS;
   my $orig = $pms->get('X-OriginatorOrg',undef);
-  my $ORIGINATOR = 'hotmail.com';
+  my $ORIGINATOR = qr/hotmail\.com|msonline\-outlook/;
 
   if (defined $ip && $ip =~ /$IP_ADDRESS/) { $ip = 1; } else { $ip = 0; }
   if (defined $orig && $orig =~ /$ORIGINATOR/) { $orig = 1; } else { $orig = 0; }
@@ -347,6 +231,8 @@ sub _check_for_forged_hotmail_received_headers {
   # Received: from hotmail.com (f135.law8.hotmail.com [216.33.241.135])
   # or like
   # Received: from EUR01-VE1-obe.outbound.protection.outlook.com (mail-oln040092066056.outbound.protection.outlook.com [40.92.66.56])
+  # or
+  # Received: from VI1PR04MB3039.eurprd04.prod.outlook.com (2603:10a6:802:b::13)
   # spammers do not ;)
 
   if ($self->gated_through_received_hdr_remover($pms)) { return; }
@@ -354,6 +240,8 @@ sub _check_for_forged_hotmail_received_headers {
   if ($rcvd =~ /from (?:\S*\.)?hotmail.com \(\S+\.hotmail(?:\.msn)?\.com[ \)]/ && $ip)
                 { return; }
   if ($rcvd =~ /from \S*\.outbound\.protection\.outlook\.com \(\S+\.outbound\.protection\.outlook\.com[ \)]/ && $orig)
+                { return; }
+  if ($rcvd =~ /from \S*\.eurprd\d+\.prod\.outlook\.com \($IP_ADDRESS\)/ && $orig)
                 { return; }
   if ($rcvd =~ /from \S*\.hotmail.com \(\[$IP_ADDRESS\][ \):]/ && $ip)
                 { return; }
@@ -465,7 +353,6 @@ sub check_for_forged_eudoramail_received_headers {
   $rcvd =~ s/\s+/ /gs;		# just spaces, simplify the regexp
 
   my $ip = $pms->get('X-Sender-Ip',undef);
-  my $IP_ADDRESS = IP_ADDRESS;
   if (defined $ip && $ip =~ /$IP_ADDRESS/) { $ip = 1; } else { $ip = 0; }
 
   # Eudoramail formats its received headers like this:
@@ -518,7 +405,6 @@ sub check_for_forged_yahoo_received_headers {
   if ($rcvd =~ /by web\S+\.mail\S*\.yahoo\.com via HTTP/) { return 0; }
   if ($rcvd =~ /by sonic\S+\.consmr\.mail\S*\.yahoo\.com with HTTP/) { return 0; }
   if ($rcvd =~ /by smtp\S+\.yahoo\.com with SMTP/) { return 0; }
-  my $IP_ADDRESS = IP_ADDRESS;
   if ($rcvd =~
       /from \[$IP_ADDRESS\] by \S+\.(?:groups|scd|dcn)\.yahoo\.com with NNFMP/) {
     return 0;
@@ -554,13 +440,12 @@ sub check_for_forged_juno_received_headers {
   my $xorig = $pms->get('X-Originating-IP');
   my $xmailer = $pms->get('X-Mailer');
   my $rcvd = $pms->get('Received');
-  my $IP_ADDRESS = IP_ADDRESS;
 
   if ($xorig ne '') {
     # New style Juno has no X-Originating-IP header, and other changes
     if($rcvd !~ /from.*\b(?:juno|untd)\.com.*[\[\(]$IP_ADDRESS[\]\)].*by/
         && $rcvd !~ / cookie\.(?:juno|untd)\.com /) { return 1; }
-    if($xmailer !~ /Juno /) { return 1; }
+    if(index($xmailer, 'Juno ') == -1) { return 1; }
   } else {
     if($rcvd =~ /from.*\bmail\.com.*\[$IP_ADDRESS\].*by/) {
       if($xmailer !~ /\bmail\.com/) { return 1; }
@@ -593,6 +478,7 @@ sub check_for_forged_gmail_received_headers {
   if ($received =~ /by smtp\.googlemail\.com with ESMTPSA id \S+/) {
     return 0;
   }
+
   if ( (length($xgms) >= GOOGLE_MESSAGE_STATE_LENGTH_MIN) && 
     (length($xss) >= GOOGLE_SMTP_SOURCE_LENGTH_MIN)) {
       return 0;
@@ -637,10 +523,9 @@ sub _check_recipients {
   my @inputs;
 
   # ToCc: pseudo-header works best, but sometimes Bcc: is better
-  for ('ToCc', 'Bcc') {
-    my $to = $pms->get($_);	# get recipients
-    $to =~ s/\(.*?\)//g;	# strip out the (comments)
-    push(@inputs, ($to =~ m/([\w.=-]+\@\w+(?:[\w.-]+\.)+\w+)/g));
+  for ('ToCc:addr', 'Bcc:addr') {
+    my @to = $pms->get($_);	# get recipients
+    push @inputs, @to;
     last if scalar(@inputs) >= TOCC_SIMILAR_COUNT;
   }
 

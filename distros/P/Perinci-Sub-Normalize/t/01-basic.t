@@ -64,6 +64,8 @@ subtest normalize_function_metadata => sub {
                     'basics 1';
                 lives_ok { normalize_function_metadata({v=>1.1, args=>{ a1=>{schema=>'int*', pos=>0}, a2=>{schema=>'int*', pos=>1}, a3=>{schema=>'int*', pos=>2} }}) }
                     'basics 2';
+                lives_ok { normalize_function_metadata({v=>1.1, args=>{ a1=>{schema=>'int*', pos=>0}, a2=>{schema=>'int*', pos=>1, slurpy=>1} }}) }
+                    'basics 3';
                 dies_ok { normalize_function_metadata({v=>1.1, args=>{a1=>{schema=>'int*', pos=>1}}}) }
                     'Missing argument with pos=0';
                 dies_ok { normalize_function_metadata({v=>1.1, args=>{a1=>{schema=>'int*', pos=>0}, a2=>{schema=>'int*', pos=>0}}}) }
@@ -74,9 +76,9 @@ subtest normalize_function_metadata => sub {
                     'Slurpy without pos';
                 dies_ok { normalize_function_metadata({v=>1.1, args=>{a1=>{schema=>'int*', greedy=>1}}}) }
                     'greedy property still observed';
-                dies_ok { normalize_function_metadata({v=>1.1, args=>{a1=>{schema=>'int*', pos=>0, slurpy=>1}, a1=>{schema=>'int*', pos=>1, slurpy=>1}}}) }
+                dies_ok { normalize_function_metadata({v=>1.1, args=>{a1=>{schema=>'int*', pos=>0, slurpy=>1}, a2=>{schema=>'int*', pos=>1, slurpy=>1}}}) }
                     'Multiple slurpies';
-                dies_ok { normalize_function_metadata({v=>1.1, args=>{a1=>{schema=>'int*', pos=>0, slurpy=>1}, a1=>{schema=>'int*', pos=>1}}}) }
+                dies_ok { normalize_function_metadata({v=>1.1, args=>{a1=>{schema=>'int*', pos=>0, slurpy=>1}, a2=>{schema=>'int*', pos=>1}}}) }
                     'Clash between slurpy and pos';
             };
         };

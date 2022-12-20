@@ -4,8 +4,12 @@ Revision history for Perl extension Sendmail::PMilter V1.1x and later.
 
 https://rt.cpan.org/Public/Dist/Display.html?Name=Sendmail-PMilter
 
+1.24
+    Thu 15 Dec 2022 12:28:00 GMT released
+    - [145263] Make no reply to MTA from the abort callback.
+		Such replies seem to cause problems for Postfix.
 1.23
-    Sun 30 Oct 2022 18:01:50 GMT 2022 released
+    Sun 30 Oct 2022 18:01:50 GMT released
     - [144401] Replace deprecated IO::Socket::INET6 with IO::Socket::IP
     - [144971] ) Most callbacks were not recognized unless the appropriate
     - [144273] ) flags were set during the negotiate callback

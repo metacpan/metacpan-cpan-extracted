@@ -2,7 +2,7 @@
 #
 # This file is part of App-SpreadRevolutionaryDate
 #
-# This software is Copyright (c) 2019 by Gérald Sédrati-Dinet.
+# This software is Copyright (c) 2019-2022 by Gérald Sédrati.
 #
 # This is free software, licensed under:
 #

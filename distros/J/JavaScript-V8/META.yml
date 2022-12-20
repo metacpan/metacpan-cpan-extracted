@@ -23,5 +23,5 @@ no_index:
 resources:
   IRC: irc://irc.perl.org/#v8
   repository: http://github.com/dgl/javascript-v8
-version: '0.10'
+version: '0.11'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

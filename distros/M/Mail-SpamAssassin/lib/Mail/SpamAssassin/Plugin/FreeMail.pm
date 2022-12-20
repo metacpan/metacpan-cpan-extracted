@@ -20,7 +20,7 @@ use strict;
 use warnings;
 use re 'taint';
 
-my $VERSION = 2.003;
+my $VERSION = 4.000;
 
 =head1 NAME
 
@@ -48,19 +48,21 @@ freemail_domains domain ...
    For example:
    freemail_domains hotmail.com hotmail.co.?? yahoo.* yahoo.*.*
 
-freemail_whitelist email/domain ...
+freemail_welcomelist email/domain ...
+
+   Previously freemail_whitelist which will work interchangeably until 4.1.
 
    Emails or domains listed here are ignored (pretend they aren't
    freemail). No wildcards!
 
-freemail_import_whitelist_auth 1/0
+freemail_import_welcomelist_auth 1/0
 
-   Entries in whitelist_auth will also be used to whitelist emails
+   Entries in welcomelist_auth will also be used to welcomelist emails
    or domains from being freemail.  Default is 0.
 
-freemail_import_def_whitelist_auth 1/0
+freemail_import_def_welcomelist_auth 1/0
 
-   Entries in def_whitelist_auth will also be used to whitelist emails
+   Entries in def_welcomelist_auth will also be used to welcomelist emails
    or domains from being freemail.  Default is 0.
 
 header FREEMAIL_REPLYTO eval:check_freemail_replyto(['option'])
@@ -96,17 +98,6 @@ header FREEMAIL_BODY eval:check_freemail_body(['regex'])
 
    Searches body for freemail address. With optional regex to match.
 
-=head1 CHANGELOG
-
- 1.996 - fix freemail_skip_bulk_envfrom
- 1.997 - set freemail_skip_when_over_max to 1 by default
- 1.998 - don't warn about missing freemail_domains when linting
- 1.999 - default whitelist undisclosed-recipient@yahoo.com etc
- 2.000 - some cleaning up
- 2.001 - fix freemail_whitelist
- 2.002 - _add_desc -> _got_hit, fix description email append bug
- 2.003 - freemail_import_(def_)whitelist_auth
-
 =cut
 
 use Mail::SpamAssassin::Plugin;
@@ -115,8 +106,8 @@ use Mail::SpamAssassin::Util qw(compile_regexp);
 
 our @ISA = qw(Mail::SpamAssassin::Plugin);
 
-# default email whitelist
-our $email_whitelist = qr/
+# default email welcomelist
+our $email_welcomelist = qr/
   ^(?:
       abuse|support|sales|info|helpdesk|contact|kontakt
     | (?:post|host|domain)master
@@ -142,7 +133,7 @@ our $skip_replyto_envfrom = qr/
   )\@
 /xi;
 
-sub dbg { Mail::SpamAssassin::Plugin::dbg ("FreeMail: @_"); }
+sub dbg { my $msg = shift; Mail::SpamAssassin::Plugin::dbg("FreeMail: $msg", @_); }
 
 sub new {
     my ($class, $mailsa) = @_;
@@ -153,10 +144,10 @@ sub new {
 
     $self->{freemail_available} = 1;
     $self->set_config($mailsa->{conf});
-    $self->register_eval_rule("check_freemail_replyto");
-    $self->register_eval_rule("check_freemail_from");
-    $self->register_eval_rule("check_freemail_header");
-    $self->register_eval_rule("check_freemail_body");
+    $self->register_eval_rule("check_freemail_replyto", $Mail::SpamAssassin::Conf::TYPE_HEAD_EVALS);
+    $self->register_eval_rule("check_freemail_from", $Mail::SpamAssassin::Conf::TYPE_HEAD_EVALS);
+    $self->register_eval_rule("check_freemail_header", $Mail::SpamAssassin::Conf::TYPE_HEAD_EVALS);
+    $self->register_eval_rule("check_freemail_body", $Mail::SpamAssassin::Conf::TYPE_HEAD_EVALS);
 
     return $self;
 }
@@ -215,13 +206,15 @@ sub set_config {
         }
     );
     push(@cmds, {
-        setting => 'freemail_import_whitelist_auth',
+        setting => 'freemail_import_welcomelist_auth',
+        aliases => ['freemail_import_whitelist_auth'], # removed in 4.1
         default => 0,
         type => $Mail::SpamAssassin::Conf::CONF_TYPE_NUMERIC,
         }
     );
     push(@cmds, {
-        setting => 'freemail_import_def_whitelist_auth',
+        setting => 'freemail_import_def_welcomelist_auth',
+        aliases => ['freemail_import_def_whitelist_auth'], # removed in 4.1
         default => 0,
         type => $Mail::SpamAssassin::Conf::CONF_TYPE_NUMERIC,
         }
@@ -234,9 +227,9 @@ sub parse_config {
 
     if ($opts->{key} eq "freemail_domains") {
         foreach my $temp (split(/\s+/, $opts->{value})) {
-            if ($temp =~ /^[a-z0-9.*?-]+$/i) {
+            if ($temp !~ tr/a-zA-Z0-9.*?-//c) {
                 my $value = lc($temp);
-                if ($value =~ /[*?]/) { # separate wildcard list
+                if ($value =~ tr/*?//) { # separate wildcard list
                     $self->{freemail_temp_wc}{$value} = 1;
                 }
                 else {
@@ -244,21 +237,21 @@ sub parse_config {
                 }
             }
             else {
-                warn("invalid freemail_domains: $temp");
+                warn("freemail: invalid freemail_domains: $temp\n");
             }
         }
         $self->inhibit_further_callbacks();
         return 1;
     }
 
-    if ($opts->{key} eq "freemail_whitelist") {
+    if ($opts->{key} eq "freemail_welcomelist" || $opts->{key} eq "freemail_whitelist") {
         foreach my $temp (split(/\s+/, $opts->{value})) {
             my $value = lc($temp);
             if ($value =~ /\w[.@]\w/) {
-                $self->{freemail_whitelist}{$value} = 1;
+                $self->{freemail_welcomelist}{$value} = 1;
             }
             else {
-                warn("invalid freemail_whitelist: $temp");
+                warn("freemail: invalid freemail_welcomelist: $temp\n");
             }
         }
         $self->inhibit_further_callbacks();
@@ -292,12 +285,7 @@ sub finish_parsing_end {
         dbg("loaded freemail_domains entries: $count normal, $wcount wildcard");
     }
     else {
-        if ($self->{main}->{lint_rules} ||1) {
-            dbg("no freemail_domains entries defined, disabling plugin");
-        }
-        else {
-            warn("no freemail_domains entries defined, disabling plugin");
-        }
+        dbg("no freemail_domains entries defined, disabling plugin");
         $self->{freemail_available} = 0;
     }
 
@@ -315,29 +303,29 @@ sub _is_freemail {
 
     return 0 if $email eq '';
 
-    if (defined $self->{freemail_whitelist}{$email}) {
-        dbg("whitelisted email: $email");
+    if (defined $self->{freemail_welcomelist}{$email}) {
+        dbg("welcomelisted email: $email");
         return 0;
     }
 
     my $domain = $email;
     $domain =~ s/.*\@//;
 
-    if (defined $self->{freemail_whitelist}{$domain}) {
-        dbg("whitelisted domain: $domain");
+    if (defined $self->{freemail_welcomelist}{$domain}) {
+        dbg("welcomelisted domain: $domain");
         return 0;
     }
 
-    if ($email =~ $email_whitelist) {
-        dbg("whitelisted email, default: $email");
+    if ($email =~ $email_welcomelist) {
+        dbg("welcomelisted email, default: $email");
         return 0;
     }
 
-    foreach my $list ('whitelist_auth','def_whitelist_auth') {
+    foreach my $list ('welcomelist_auth','def_welcomelist_auth') {
         if ($pms->{conf}->{"freemail_import_$list"}) {
             foreach my $regexp (values %{$pms->{conf}->{$list}}) {
                 if ($email =~ /$regexp/o) {
-                    dbg("whitelisted email, $list: $email");
+                    dbg("welcomelisted email, $list: $email");
                     return 0;
                 }
             }
@@ -422,21 +410,13 @@ sub _parse_body {
     return 1;
 }
 
-sub _got_hit {
-    my ($self, $pms, $email, $desc) = @_;
+sub _test_log {
+    my ($self, $pms, $email, $rulename) = @_;
 
-    my $rulename = $pms->get_current_eval_rule_name();
-
-    if (defined $pms->{conf}->{descriptions}->{$rulename}) {
-        $desc = $pms->{conf}->{descriptions}->{$rulename};
+    if ($pms->{conf}->{freemail_add_describe_email}) {
+        $email =~ s/\@/(at)/g;
+        $pms->test_log($email, $rulename);
     }
-
-    if ($pms->{main}->{conf}->{freemail_add_describe_email}) {
-        $email =~ s/\@/[at]/g;
-        $pms->test_log($email);
-    }
-
-    $pms->got_hit($rulename, "", description => $desc, ruletype => 'eval');
 }
 
 sub check_freemail_header {
@@ -448,7 +428,7 @@ sub check_freemail_header {
     dbg("RULE ($rulename) check_freemail_header".(defined $regex ? " regex:$regex" : ""));
 
     unless (defined $header) {
-        warn("check_freemail_header needs argument");
+        warn("freemail: check_freemail_header needs argument\n");
         return 0;
     }
 
@@ -462,13 +442,13 @@ sub check_freemail_header {
         $re = $rec;
     }
 
-    my @emails = map (lc, $pms->{main}->find_all_addrs_in_line ($pms->get($header)));
+    my @emails = map (lc, $pms->get("$header:addr"));
 
     if (!scalar (@emails)) {
          dbg("header $header not found from mail");
          return 0;
     }
-    dbg("addresses from header $header: ".join(';',@emails));
+    dbg("addresses from header $header: ".join(', ', @emails));
 
     foreach my $email (@emails) {    
         if ($self->_is_freemail($email, $pms)) {
@@ -479,7 +459,7 @@ sub check_freemail_header {
             else {
                 dbg("HIT! $email is freemail");
             }
-            $self->_got_hit($pms, $email, "Header $header is freemail");
+            $self->_test_log($pms, $email, $rulename);
             return 1;
          }
     }
@@ -511,16 +491,16 @@ sub check_freemail_body {
         foreach my $email (keys %{$pms->{freemail_cache}{body}}) {
             if ($email =~ /$re/o) {
                 dbg("HIT! email from body is freemail and matches regex: $email");
-                $self->_got_hit($pms, $email, "Email from body is freemail");
-                return 0;
+                $self->_test_log($pms, $email, $rulename);
+                return 1;
             }
         }
     }
     elsif (scalar keys %{$pms->{freemail_cache}{body}}) {
         my $emails = join(', ', keys %{$pms->{freemail_cache}{body}});
         dbg("HIT! body has freemails: $emails");
-        $self->_got_hit($pms, $emails, "Body contains freemails");
-        return 0;
+        $self->_test_log($pms, $emails, $rulename);
+        return 1;
     }
 
     return 0;
@@ -563,8 +543,8 @@ sub check_freemail_from {
         else {
             dbg("HIT! $email is freemail");
         }
-        $self->_got_hit($pms, $email, "Sender address is freemail");
-        return 0;
+        $self->_test_log($pms, $email, $rulename);
+        return 1;
     }
 
     return 0;
@@ -580,7 +560,7 @@ sub check_freemail_replyto {
 
     if (defined $what) {
         if ($what ne 'replyto' and $what ne 'reply') {
-            warn("invalid check_freemail_replyto option: $what");
+            warn("freemail: invalid check_freemail_replyto option: $what\n");
             return 0;
         }
     }
@@ -590,25 +570,34 @@ sub check_freemail_replyto {
 
     # Skip mailing-list etc looking requests, mostly FPs from them
     if ($pms->{main}->{conf}->{freemail_skip_bulk_envfrom}) {
-        my $envfrom = lc($pms->get("EnvelopeFrom"));
-        if ($envfrom =~ $skip_replyto_envfrom) {
+        my $envfrom = ($pms->get("EnvelopeFrom"))[0];
+        if (defined $envfrom && $envfrom =~ $skip_replyto_envfrom) {
             dbg("envelope sender looks bulk, skipping check: $envfrom");
             return 0;
         }
     }
 
-    my $from = lc($pms->get("From:addr"));
-    my $replyto = lc($pms->get("Reply-To:addr"));
-    my $from_is_fm = $self->_is_freemail($from, $pms);
-    my $replyto_is_fm = $self->_is_freemail($replyto, $pms);
+    my @from_addrs = map (lc, $pms->get("From:addr"));
+    dbg("From address: ".join(", ", @from_addrs)) if @from_addrs;
 
-    dbg("From address: $from") if $from ne '';
-    dbg("Reply-To address: $replyto") if $replyto ne '';
+    my @replyto_addrs = map (lc, $pms->get("Reply-To:addr"));
+    dbg("Reply-To address: ".join(", ", @replyto_addrs)) if @replyto_addrs;
 
-    if ($from_is_fm and $replyto_is_fm and ($from ne $replyto)) {
+    my $from_is_fm = grep { $self->_is_freemail($_, $pms) } @from_addrs;
+    my $replyto_is_fm = grep { $self->_is_freemail($_, $pms) } @replyto_addrs;
+
+    my $from_not_in_replyto = 1;
+    foreach my $from (@from_addrs) {
+        next unless grep { $_ eq $from } @replyto_addrs;
+        $from_not_in_replyto = 0;
+    }
+
+    if ($from_is_fm and $replyto_is_fm and $from_not_in_replyto) {
         dbg("HIT! From and Reply-To are different freemails");
-        $self->_got_hit($pms, "$from, $replyto", "From and Reply-To are different freemails");
-        return 0;
+        my $from = join(",", @from_addrs);
+        my $replyto = join(",", @replyto_addrs);
+        $self->_test_log($pms, "$from -> $replyto", $rulename);
+        return 1;
     }
 
     if ($what eq 'replyto') {
@@ -618,7 +607,7 @@ sub check_freemail_replyto {
         }
     }
     elsif ($what eq 'reply') {
-        if ($replyto ne '' and !$replyto_is_fm) {
+        if (@replyto_addrs and !$replyto_is_fm) {
             dbg("Reply-To defined and is not freemail, skipping check");
             return 0;
         }
@@ -627,19 +616,21 @@ sub check_freemail_replyto {
             return 0;
         }
     }
-    my $reply = $replyto_is_fm ? $replyto : $from;
 
     return 0 unless $self->_parse_body($pms);
-    
+
     # Compare body to headers
     if (scalar keys %{$pms->{freemail_cache}{body}}) {
-        my $check = $what eq 'replyto' ? $replyto : $reply;
-        dbg("comparing $check to body freemails");
-        foreach my $email (keys %{$pms->{freemail_cache}{body}}) {
-            if ($email ne $check) {
-                dbg("HIT! $check and $email are different freemails");
-                $self->_got_hit($pms, "$check, $email", "Different freemails in reply header and body");
-                return 0;
+        my $reply_addrs = $what eq 'replyto' ? \@replyto_addrs :
+                              $replyto_is_fm ? \@replyto_addrs : \@from_addrs;
+        dbg("comparing to body freemails: ".join(", ", @$reply_addrs));
+        foreach my $body_email (keys %{$pms->{freemail_cache}{body}}) {
+            foreach my $reply_email (@$reply_addrs) {
+                if ($body_email ne $reply_email) {
+                    dbg("HIT! $reply_email (Reply) and $body_email (Body) are different freemails");
+                    $self->_test_log($pms, "$reply_email, $body_email", $rulename);
+                    return 1;
+                }
             }
         }
     }

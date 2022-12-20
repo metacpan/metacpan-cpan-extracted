@@ -117,7 +117,6 @@ Spain
     );
 }
 
-
 # does it warn if no country_code
 {
     my $rh_components = {
@@ -137,11 +136,10 @@ Spain
     } qr /no country_code, unable to abbreviate/, 'got warning';
 }
 
-
 # shouldnt warn if we set no_warnings
 {
-    my $GAF_nw  = $CLASS->new(conf_path => $path, no_warnings => 1);
-        my $rh_components = {
+    my $GAF_nw  = Geo::Address::Formatter->new(conf_path => $path, no_warnings => 1);
+    my $rh_components = {
         "city"          => "Barcelona",
         "city_district" => "Sarrià - Sant Gervasi",
         "country"       => "Spain",
@@ -155,8 +153,6 @@ Spain
     };
     my $out = $GAF_nw->format_address($rh_components, {abbreviate => 1});
 }
-
-
 
 
 1;

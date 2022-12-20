@@ -1,12 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2022 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.57;
+use Object::Pad 0.73 ':experimental(adjust_params init_expr)';
 
-package Tickit::Widget::Static 0.55;
+package Tickit::Widget::Static 0.56;
 class Tickit::Widget::Static
+   :strict(params)
    :isa(Tickit::Widget);
 
 use Tickit::Style;
@@ -89,16 +90,17 @@ For more details see the accessors below.
 
 =cut
 
-has @_lines;
-has $_on_click :reader :writer :param = undef;
+field @_lines;
+field $_on_click :reader :writer :param = undef;
 
-ADJUSTPARAMS
-{
-   my ( $params ) = @_;
-
-   $self->set_text( delete $params->{text} );
-   $self->set_align( delete $params->{align} || 0 );
-   $self->set_valign( delete $params->{valign} || 0 );
+ADJUST :params (
+   :$text   = undef,
+   :$align  = 0,
+   :$valign = 0,
+) {
+   $self->set_text( $text );
+   $self->set_align( $align );
+   $self->set_valign( $valign );
 }
 
 =head1 ACCESSORS

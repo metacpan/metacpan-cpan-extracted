@@ -1,13 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2012-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.57;
+use Object::Pad 0.73 ':experimental(init_expr)';
 
-package Tickit::Widget::Menu::Item 0.15;
+package Tickit::Widget::Menu::Item 0.16;
 class Tickit::Widget::Menu::Item
+   :strict(params)
    :does(Tickit::Widget::Menu::itembase);
 
 use Tickit::Utils qw( textwidth );
@@ -49,7 +50,7 @@ Callback to invoke when the menu item is clicked on.
 
 =cut
 
-has $_on_activate :param = undef;
+field $_on_activate :param = undef;
 
 method activate ()
 {

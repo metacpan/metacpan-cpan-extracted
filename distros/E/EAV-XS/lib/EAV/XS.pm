@@ -122,7 +122,7 @@ our %EXPORT_TAGS = ( 'all' => [ qw(
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = ();
 
-our $VERSION = "0.7.2";
+our $VERSION = "0.7.4";
 
 require XSLoader;
 XSLoader::load('EAV::XS', $VERSION);
@@ -184,6 +184,42 @@ L<ExtUtils::MakeMaker> B<5.62> or newer
 L<ExtUtils::PkgConfig> B<1.16> or newer
 
 =back
+
+=head2 INSTALLING DEPENDENCIES
+
+On Debian 10+, Ubuntu:
+
+    # libidn2 (recommended)
+    sudo apt-get install libidn2-dev
+
+    # libidn (only if you really need it or there is no libidn2)
+    sudo apt-get install libidn11-dev
+
+    # If in doubt, try search by keyword libidn
+    # or idn on other systems.
+    #
+    # Then try to install XYZ-dev package, where XYZ
+    # is libidn2 or libidn2-0 or similar package name.
+    apt-cache search libidn
+
+To install idnkit, download latest release of idnkit2.
+Unpack it, then build and install:
+
+    tar xjvf idnkit-2.3.tar.bz2
+    cd idnkit-2.3
+    ./configure
+    make
+    sudo make install
+
+By default idnkit2 will be installed in the /usr/local directory.
+You may change it by defining prefix at configure stage,
+for instance:
+
+    ./configure --prefix=$HOME/local
+    make
+    make install
+
+Please, see documentation of idnkit for details.
 
 =head1 METHODS
 

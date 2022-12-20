@@ -31,7 +31,14 @@ sub new {
     Wx::Event::EVT_LEFT_DOWN( $self, sub {
         my $value = $self->GetValue;
         $value++;
-        $value = 0 if $value >= @{$self->{'colors'}};
+        $value = 0 if $value > $self->GetMaxValue;
+        $self->SetValue( $value );
+        $self->{'callback'}->( $self->{'value'}  );
+    });
+    Wx::Event::EVT_RIGHT_DOWN( $self, sub {
+        my $value = $self->GetValue;
+        $value--;
+        $value = $self->GetMaxValue if $value < 0;
         $self->SetValue( $value );
         $self->{'callback'}->( $self->{'value'}  );
     });
@@ -45,9 +52,20 @@ sub init { $_[0]->SetValue( $_[0]->{'init'} ) }
 sub GetValue { $_[0]->{'value'} }
 sub SetValue {
     my ( $self, $value ) = @_;
-    return unless defined $value and $value > -1 and $value < @{$self->{'colors'}};
+    return unless defined $value and $value > -1 and $value <= $self->GetMaxValue;
     $self->{'value'} = $value;
     $self->Refresh;
+}
+
+sub GetMaxValue { $#{$_[0]->{'colors'} } }
+
+sub SetColors {
+    my ( $self, $colors ) = @_;
+    return unless ref $colors eq 'ARRAY' and @$colors > 1;
+    for (@$colors){ return unless ref $_ eq 'ARRAY' and @$_ == 3 }
+    $self->{'colors'} = $colors;
+    $self->{'init'} = $#$colors if $self->{'init'} > $#$colors;
+    $self->SetValue( $#$colors ) if $self->{'value'} > $#$colors;
 }
 
 sub SetCallBack {    

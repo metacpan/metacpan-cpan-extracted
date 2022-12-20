@@ -1,5 +1,5 @@
 package Form::Tiny::Meta;
-$Form::Tiny::Meta::VERSION = '2.15';
+$Form::Tiny::Meta::VERSION = '2.16';
 use v5.10;
 use strict;
 use warnings;
@@ -99,7 +99,7 @@ sub set_package
 		no warnings 'redefine';
 
 		*{"${package}::form_meta"} = sub {
-			return get_package_form_meta(ref $_[0] || $_[0]);
+			goto \&get_package_form_meta;
 		};
 		set_subname "${package}::form_meta", *{"${package}::form_meta"};
 	}
@@ -356,7 +356,7 @@ sub _build_blueprint
 		my ($def) = @_;
 
 		if ($def->is_subform && $recurse) {
-			my $meta = get_package_form_meta(ref $def->type);
+			my $meta = get_package_form_meta($def->type);
 			return $meta->blueprint($def->type, %params);
 		}
 

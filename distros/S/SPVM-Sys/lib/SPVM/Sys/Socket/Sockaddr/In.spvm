@@ -7,22 +7,22 @@ class Sys::Socket::Sockaddr::In extends Sys::Socket::Sockaddr : pointer_t {
   # Instance methods
   native method DESTROY : void ();
 
-  method sa_family : byte () {
+  method sa_family : int () {
     my $sin_family = $self->sin_family;
     return $sin_family;
   }
   
-  native method sin_family : byte ();
+  native method sin_family : int ();
   
-  native method set_sin_family : void ($family : byte);
+  native method set_sin_family : void ($family : int);
   
   native method copy_sin_addr : Sys::Socket::In_addr ();
   
   native method set_sin_addr : void ($address : Sys::Socket::In_addr);
   
-  native method sin_port : short ();
+  native method sin_port : int ();
   
-  native method set_sin_port : void ($port : short);
+  native method set_sin_port : void ($port : int);
 
   native method sizeof : int ();
   

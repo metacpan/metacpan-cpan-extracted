@@ -11,7 +11,10 @@ inc/Module/Install/Win32.pm
 inc/Module/Install/WriteAll.pm
 inc/Module/Install/XSUtil.pm
 include/LDNS.h
+ldns/.github/FUNDING.yml
+ldns/.github/workflows/testsuite.yml
 ldns/buffer.c
+ldns/Changelog
 ldns/compat/b64_ntop.c
 ldns/compat/b64_pton.c
 ldns/compat/strlcpy.c
@@ -25,6 +28,7 @@ ldns/dnssec_sign.c
 ldns/dnssec_verify.c
 ldns/dnssec_zone.c
 ldns/duration.c
+ldns/edns.c
 ldns/error.c
 ldns/higher.c
 ldns/host2str.c
@@ -41,6 +45,7 @@ ldns/ldns/dnssec_sign.h
 ldns/ldns/dnssec_verify.h
 ldns/ldns/dnssec_zone.h
 ldns/ldns/duration.h
+ldns/ldns/edns.h
 ldns/ldns/error.h
 ldns/ldns/higher.h
 ldns/ldns/host2str.h
@@ -64,6 +69,7 @@ ldns/ldns/update.h
 ldns/ldns/util.h.in
 ldns/ldns/wire2host.h
 ldns/ldns/zone.h
+ldns/libdns.doxygen.in
 ldns/LICENSE
 ldns/ltmain.sh
 ldns/Makefile.in
@@ -75,6 +81,7 @@ ldns/parse.c
 ldns/radix.c
 ldns/rbtree.c
 ldns/rdata.c
+ldns/README-Travis.md
 ldns/resolver.c
 ldns/rr.c
 ldns/rr_functions.c
@@ -180,6 +187,7 @@ t/example.org
 t/idn.t
 t/load_zonefile.t
 t/netldns.t
+t/nsid.t
 t/packet.t
 t/regression.t
 t/resolver.t

@@ -116,7 +116,7 @@ use constant FALSE => 0;
 use constant TRUE => 1;
 use constant INTEGRITY_HASH_SALT => 'wefnwioefh9032ur3';
 
-our $VERSION = "0.3.2"; # do not change manually, this variable is updated when calling make
+our $VERSION = "0.3.3"; # do not change manually, this variable is updated when calling make
 
 =head3 is_valid_interface($interface)
 
@@ -293,9 +293,10 @@ sub commit($self, $is_hot_config = FALSE, $plain = FALSE, $ref_hash_integrity_ke
             $self->{parsed_config}{$interface_name}{mtime} = get_mtime($file_name);
             $self->{n_conf_files}++ if (defined $is_new);
             $self->_reset_changed($interface_name);
+            # Close file handle before calling reload callbacks, otherwise the exclusive lock is kept!
+            close $fh;
             # Notify listeners about a file change
             $self->_call_reload_listeners($interface_name);
-            close $fh;
         }
     }
 }

@@ -81,16 +81,13 @@ my $table = $w->Scrolled('HMListbox'
 
         );
 
-#See also "make test" (test.pl).
-
 =head1 STANDARD OPTIONS
 
 B<-background> B<-borderwidth> B<-cursor> B<-disabledforeground> 
-B<-exportselection> B<-font> B<-foreground> B<-height> 
-B<-highlightbackground> B<-highlightcolor> B<-highlightthickness> 
-B<-relief> B<-selectbackground> B<-selectborderwidth> 
-B<-selectforeground> B<-setgrid> B<-state> B<-takefocus> B<-width> 
-B<-xscrollcommand> B<-yscrollcommand>
+B<-exportselection> B<-font> B<-foreground> B<-height> B<-highlightbackground> 
+B<-highlightcolor> B<-highlightthickness> B<-relief> B<-selectbackground> 
+B<-selectborderwidth> B<-selectforeground> B<-setgrid> B<-state> B<-takefocus> 
+B<-width> B<-xscrollcommand> B<-yscrollcommand>
 
 =head1 WIDGET SPECIFIC OPTIONS
 
@@ -131,9 +128,9 @@ keyboard focus.  This is a holdover from Tk::SMListbox, where it
 is useful to better display the active element cursor due to the 
 fact that it depends on Tk::Listbox, which does not display the  
 active element (usually underlined) unless the listbox itself has the 
-focus.  This allows the programmer to specify a colum other than the 
+focus.  This allows the programmer to specify a column other than the 
 first one, ie, if the main column of interest to the user is not the 
-first one.
+first (leftmost) one.
 
 Tk::HMListbox depends instead on Tk::HListbox, which does 
 display the active element without specifically being focused 
@@ -142,6 +139,11 @@ active cursor, so therefore all column listboxes show the active
 element regardless of which has the focus and Tk::HListbox can 
 assign the first column (the default if this isn't specified here) 
 the focus and everything displays properly.
+
+One possibly useful reason to still specify this column, is if there 
+is a specific column other than the first with many wide values where a 
+user might wish to be able to scroll the column horizontally using the 
+left and right arrow-keys.  
 
 NOTE:  none of this applies if B<-nocolumnfocus> is set, which 
 also has the side effect of disabling most keyboard bindings on 
@@ -215,6 +217,15 @@ Default:  B<black>.
 
 Note that you can also specify -separatorcolor on a column
 by column basis. See the B<COLUMNS> section below.
+
+=item B<-scrollbarfocus> => I<value>
+
+Specifies which scrollbars (if any) are allowed to take keyboard 
+focus via the tab-circulate order:  Valid values are:  
+B<0> (no scrollbars take focus), B<1> or B<"xy"> (all scrollbars take focus, 
+B<"x"> (only horizontal scrollbar takes focus), or B<"y"> (only vertical 
+scrollbar takes focus).  Default is B<""> (Allow all to take focus based 
+on Tk's default focusing model).
 
 =item B<-separatorwidth> => I<integer>
 
@@ -296,6 +307,7 @@ should be sorted by numerical value:
     -comparecommand => sub { $_[0] <=> $_[1]}
 
 Default:  B<sub { $_[0] cmp $_[1] }>  #(Ascending by string)
+
 NOTE:  If the column data is images or hashrefs (both 
 text and images or contains additional cell-specific 
 options, then one should specify a component of that 
@@ -478,6 +490,7 @@ should be sorted by numerical value:
     -comparecommand => sub { $_[0] <=> $_[1]}
 
 Default:  B<sub { $_[0] cmp $_[1] }>  #(Ascending by string)
+
 NOTE:  If the column data is images or hashrefs (both 
 text and images or contains additional cell-specific 
 options, then one should specify a component of that 
@@ -748,6 +761,12 @@ An empty string is returned in all other cases.
 
 =back
 
+=head1 KNOWN BUGS
+
+Setting both scrollbars to optional, ie. -scrollbars => 'osoe' causes the 
+scrollbars to flicker and not work, if the initial width of the widget is 
+set less than the combined width of the underlying HListbox widgets.
+ 
 =head1 KEYWORDS
 
 hmlistbox, smlistbox, mlistbox, listbox, hlist, widget
@@ -881,8 +900,8 @@ L<Tk::SMListbox> L<Tk::MListbox> L<Tk::HListbox>
 				-pixelwidth => ['PASSIVE'],
 				-bitmap => [qw/SELF bitmap bitmap/, 'noarrow'],
 				-compound => [qw/SELF compound compound/, 'right'],
-				-background    => [qw/SELF background Background/, $Tk::NORMAL_BG],
-				-foreground    => [qw/SELF foreground Foreground/, $Tk::NORMAL_FG]
+				-background    => [qw/SELF background Background/, undef],
+				-foreground    => [qw/SELF foreground Foreground/, undef]
 		);
 	}
 
@@ -913,7 +932,7 @@ L<Tk::SMListbox> L<Tk::MListbox> L<Tk::HListbox>
 		$w->SUPER::Populate($args);
 		my $hdrBG = $args->{'-headerbackground'} || $args->{'-background'} || undef;
 		my $hdrFG = $args->{'-headerforeground'} || $args->{'-foreground'} || undef;
-		my $disableFG = $args->{'-disabledforeground'} || $Tk::DISABLED_FG;
+		my $disableFG = $args->{'-disabledforeground'} || undef;
 
 		## HMLColumn Components
 		## $sep - separator - Frame
@@ -990,12 +1009,13 @@ END_STR
 		$w->Advertise("listbox" => $lb);
 		$w->Delegates (DEFAULT => $lb);
 
-		my $bgWidgets = $hdrBG ? [$f, $lb] : [$f, $hdr, $lb];
-		my $fgWidgets = $hdrFG ? [$f, $lb] : [$f, $hdr, $lb];
+		my $bgWidgets = defined($hdrBG) ? [$f, $lb] : [$f, $hdr, $lb];
+		my $fgWidgets = defined($hdrFG) ? [$f, $lb] : [$f, $hdr, $lb];
+		my $dfgWidgets = defined($disableFG) ? [$f, $lb] : [$f, $hdr, $lb];
 		$w->ConfigSpecs(
 #				-background     => [[$f, $lb], 
-				-background     => [$bgWidgets, 
-						qw/background Background/, $Tk::NORMAL_BG],
+				-background     => [$bgWidgets,
+						qw/background Background/, undef],
 				-comparecommand => ['CALLBACK', undef, undef,
 						sub{$_[0] cmp $_[1]}],
 				-configurecommand => ['CALLBACK'],
@@ -1003,10 +1023,10 @@ END_STR
 				-font           => [[$hdr, $lb], qw/font Font/, undef],
 #				-foreground     => [[$lb],
 				-foreground     => [$fgWidgets,
-						qw/foreground Foreground/, $Tk::NORMAL_FG],
+						qw/foreground Foreground/, undef],
 				-headerbackground => [qw/PASSIVE headerBackground HeaderBackground/, $hdrBG],
 				-headerforeground => [qw/PASSIVE headerForeground HeaderForeground/, $hdrFG],
-				-disabledforeground => [qw/PASSIVE disabledForeground DisabledForeground/, $disableFG],
+				-disabledforeground => [$dfgWidgets, qw/disabledForeground DisabledForeground/, $disableFG],
 				-separatorwidth => [{-width => $sep}, 
 						qw/separatorWidth Separator 1/],
 				-separatorcolor => [{-background => $sep}, 
@@ -1030,8 +1050,9 @@ END_STR
 				-width      => '-textwidth'
 		);
 
-		$hdr->configure('-background' => $hdrBG)  if ($hdrBG);
-		$hdr->configure('-foreground' => $hdrFG)  if ($hdrFG);
+		$hdr->configure('-background' => $hdrBG)  if (defined $hdrBG);
+		$hdr->configure('-foreground' => $hdrFG)  if (defined $hdrFG);
+		$hdr->configure('-disabledforeground' => $disableFG)  if (defined $disableFG);
 	}
 
 ######################################################################
@@ -1048,9 +1069,6 @@ END_STR
 	}
 
 	sub compare {
-#		my ($w,$a,$b) = @_;
-
-#		$w->Callback(-comparecommand => $a, $b);
 		shift->Callback(-comparecommand => $_[0], $_[1]);
 	}
 
@@ -1111,7 +1129,7 @@ package Tk::HMListbox;
 use strict;
 use Carp;
 use vars qw($VERSION);
-$VERSION = '4.01';
+$VERSION = '4.2';
 
 use Tk;
 
@@ -1126,7 +1144,7 @@ sub Tk::Widget::Scrolled {
 	my ($parent, $kind, %args) = @_;
 
 	my $colAR;
-	$colAR = delete $args{'-columns'} if $kind eq "HMListbox";
+	$colAR = delete $args{'-columns'} if $kind eq 'HMListbox';
 
 	## Find args that are Frame create time args
 	my @args = Tk::Frame->CreateArgs($parent,\%args);
@@ -1142,7 +1160,7 @@ sub Tk::Widget::Scrolled {
 	}
 	## Anything else must be for target widget - pass at widget create time
 	my $w  = $cw->$kind(%args);
-	$cw->{'__HMListbox__'} = $w  if ($w =~ /HMListbox/o);  #JWT:SAVE ME FOR USE IN THE LEFT-TAB BIND ABOVE!
+	$cw->{'__HMListbox__'} = $w  if ($w =~ /HMListbox/o);  #JWT:SAVE ME FOR FUTURE USE!
 	## Now re-set %args to be ones Frame can handle
 	## RCS NOTE: I've also slightly modified the ConfigSpecs
 	%args = @args;
@@ -1162,6 +1180,13 @@ sub Tk::Widget::Scrolled {
 	$args{'-scrollbarfocus'} = $scrollbarfocus  if (defined($scrollbarfocus) && $scrollbarfocus =~ /[xy01]/);
 	$cw->configure(-columns => $colAR) if $colAR;
 	$w->scrollbarfocus($scrollbarfocus)  if ($scrollbarfocus =~ /[xy01]/);
+	#MAKE HORIZ. SCROLLBAR SCROLL WINDOW HORIZONTALLY (SCROLLING IN COLUMNS SCROLLS JUST THAT COLUMN):
+	$w->parent->Subwidget('xscrollbar')->bind('<Button-6>', sub {
+		$cw->{'__HMListbox__'}->_chgView('xview','scroll',-1,'units')  if (defined $cw->{'__HMListbox__'});
+	});
+	$w->parent->Subwidget('xscrollbar')->bind('<Button-7>', sub {
+		$cw->{'__HMListbox__'}->_chgView('xview','scroll',1,'units')  if (defined $cw->{'__HMListbox__'});
+	});
 
 	#JWT:FOR SOME STUPID REASON THIS 1 DIRECTIONAL BINDING REQUIRES A SLIGHT FRACTION ABOVE ZERO?!
 	#(THE OTHER 3 WORK FINE AUTOMATICALLY!) :-/
@@ -1243,7 +1268,6 @@ sub ClassInit {
 			".........."
 	);
 	$mw->DefineBitmap('noarrow' => 10,10, $noArrowBits);
-
 }
 
 ## Do some slightly tricky stuff: The -columns option, if called is
@@ -1284,20 +1308,20 @@ sub Populate {
 	my $hdr = $w->Subwidget('heading');
 
 	$w->ConfigSpecs(
-			-background        => [qw/METHOD background Background/, $Tk::NORMAL_BG ],
+			-background        => [qw/METHOD background Background/, undef],
 			-columns           => [qw/METHOD/],
 			-configurecommand  => [qw/CALLBACK/],
 			-font              => [qw/METHOD font Font/, $font],
-			-foreground        => [qw/METHOD foreground Foreground/, $Tk::NORMAL_FG ],
-			-headerbackground  => [qw/METHOD headerbackground headerBackground/, $Tk::NORMAL_BG ],
-			-headerforeground  => [qw/METHOD headerforeground headerForeground/, $Tk::NORMAL_FG ],
+			-foreground        => [qw/METHOD foreground Foreground/, undef],
+			-headerbackground  => [qw/METHOD headerbackground headerBackground/, undef],
+			-headerforeground  => [qw/METHOD headerforeground headerForeground/, undef],
 			-height            => [qw/METHOD height Height 10/],
 			-moveable          => [qw/PASSIVE moveable Moveable 1/],
 			-resizeable        => [qw/METHOD resizeable Resizeable 1/],
-			-selectbackground  => [qw/METHOD selectBackground Background/, $Tk::SELECT_BG],
+			-selectbackground  => [qw/METHOD selectBackground Background/, undef],
 			-selectborderwidth => [qw/METHOD selectBorderwidth Borderwidth 1/],
-			-selectforeground  => [qw/METHOD selectForeground Foreground/, $Tk::SELECT_FG],
-			-disabledforeground => [qw/PASSIVE disabledForeground DisabledForeground/, $Tk::DISABLED_FG],
+			-selectforeground  => [qw/METHOD selectForeground Foreground/, undef],
+			-disabledforeground => [qw/PASSIVE disabledForeground DisabledForeground/, undef],
 			-selectmode        => [qw/METHOD selectMode Mode browse/],
 			-compound          => [qw/METHOD compound compound right/],
 			-showallsortcolumns      => [qw/METHOD showallsortcolumns showallsortcolumns 0/],
@@ -1565,7 +1589,7 @@ sub _bindCallback {
 }
 
 ## bind subwidgets is used by other public bind methods to
-## apply a callback to an event dequence of a particular subwidget 
+## apply a callback to an event sequence of a particular subwidget 
 ## within each of the columns. Any defined callbacks are passed
 ## to the _bindCallback which is actually the callback that gets
 ## bound. 
@@ -1593,7 +1617,7 @@ sub _bindSubwidgets {
 	my @args = ('_bindCallback', $callback);
 	foreach (@{$w->{'_columns'}}) {
 		my $sw = $_->Subwidget($subwidget);
-		if ($sw->class ne "HMCListbox") {
+		if ($sw->class ne 'HMCListbox') {
 			$sw->Tk::bind($sequence, [$w => @args, $sw, $col++]);
 		} else {
 			$sw->Tk::bind($sequence, [$w => @args, $sw, $col++, Ev('y')]);
@@ -1660,9 +1684,7 @@ sub _dragOrSort {
 	return  if ($w->state() =~ /disable/o);  #DON'T ALLOW SORTING OR DRAGGING IF DISABLED!
 
 	if (!$w->cget('-moveable') || (defined($sortAnyway) && $sortAnyway)) {
-		if ($c->cget('-sortable') && $w->{Configure}{-sortable}) {
-			$w->sort(undef, $c);
-		}
+		$w->sort(undef, $c)  if ($c->cget('-sortable') && $w->{Configure}{-sortable});
 		return;
 	}
 
@@ -1766,7 +1788,7 @@ sub _getEntryFromY {
 	my ($cw, $sw, $yCoord) = @_;
 	my $nearest = $sw->indexOf($sw->nearest($yCoord));
 
-	return $nearest  if ($nearest <= ($sw->size() - 1));
+	return $nearest  if (defined($nearest) && $nearest <= ($sw->size() - 1));
 
 #x	my ($x, $y, $w, $h) = $sw->bbox($nearest);   #JWT:NEXT 4 REMOVED SINCE HLIST DOESN'T SUPPORT bbox & THIS CODE DOESN'T SEEM TO BE NEEDED ANYWAY.
 #x	my $lastY = $y + $h;
@@ -2357,7 +2379,7 @@ sub state {
 
 	$w->{'_statechg'} = 1;
 	if ($val =~ /d/o) {              #WE'RE DISABLING (SAVE CURRENT ENABLED STATUS STUFF, THEN DISABLE USER-INTERACTION):
-		$w->{Configure}{'-state'} = 'normal';
+#?		$w->{Configure}{'-state'} = 'normal';
 		$w->{'_saveactive'} = $w->index('active') || 0;
 		$w->{'_foreground'} = $w->cget('-foreground');  #SAVE CURRENT (ENABLED) FG COLOR!
 		$w->{Configure}{'-state'} = $val;
@@ -2403,6 +2425,7 @@ sub xscan {
 
 sub xview { shift->Subwidget("pane")->xview(@_) }
 sub yview { shift->_firstVisible->yview(@_)}
-1;
+
+1
 
 __END__

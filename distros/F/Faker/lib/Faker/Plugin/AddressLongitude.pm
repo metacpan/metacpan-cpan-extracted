@@ -9,6 +9,10 @@ use Venus::Class 'base';
 
 base 'Faker::Plugin';
 
+# VERSION
+
+our $VERSION = '1.17';
+
 # METHODS
 
 sub execute {
@@ -17,7 +21,7 @@ sub execute {
   my $random = $self->faker->random;
 
   my $string = $random->select(
-    [int($random->make(90000000)), int($random->make(-90000000))]
+    [int($random->pick(90000000)), int($random->pick(-90000000))]
   );
 
   $string =~ s/\d*(\d\d)(\d{6})$/$1.$2/;
@@ -38,6 +42,12 @@ Faker::Plugin::AddressLongitude - Address Longitude
 =head1 ABSTRACT
 
 Address Longitude for Faker
+
+=cut
+
+=head1 VERSION
+
+1.17
 
 =cut
 

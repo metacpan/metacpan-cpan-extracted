@@ -1,5 +1,28 @@
 Release history for Zonemaster component Zonemaster-LDNS
 
+3.0.0 2022-12-19
+
+ [Breaking change]
+ - Improves access to text data in TXT and SPF resource records
+   (#157, #155)
+
+ [Features]
+ - Uses internal LDNS for docker image (#162)
+ - Adds support for NSID option (#151)
+ - Updates internal LDNS to 1.8.3 (#151, #143)
+ - Adds options to build with Libidn and LDNS in custom locations
+   (#152)
+
+ [Fixes]
+ - Fixes a bug when building LDNS with link to OpenSSL (#161)
+ - Corrects the license statement in LDNS.pm (#159)
+ - Fixes unsafe string manipulations in XS code (#153, #149)
+ - Automatically reconfigures internal libldns on "ldns/Changelog"
+   updates (#158)
+ - URL fragments referring to internal headings in lowercase
+   (#154)
+
+
 2.2.2 2022-06-09
 
  [Features]

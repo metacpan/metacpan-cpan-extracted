@@ -1435,7 +1435,7 @@
           <tr>
             <td align="left" thead="row"><Math mode="inline" tex="\partial" text="partial-differential" xml:id="S0.SS0.SSS0.Px11.p2.m3">
                 <XMath>
-                  <XMTok meaning="partial-differential" name="partial" role="OPERATOR">∂</XMTok>
+                  <XMTok meaning="partial-differential" name="partial" role="DIFFOP">∂</XMTok>
                 </XMath>
               </Math></td>
             <td align="left"><text font="typewriter">\partial</text></td>
@@ -4481,9 +4481,9 @@
             <td align="left"><text font="typewriter">|</text></td>
           </tr>
           <tr>
-            <td align="left" thead="row"><Math mode="inline" tex="\|" text="parallel-to" xml:id="S0.SS0.SSS0.Px26.p2.m15">
+            <td align="left" thead="row"><Math mode="inline" tex="\|" text="||" xml:id="S0.SS0.SSS0.Px26.p2.m15">
                 <XMath>
-                  <XMTok meaning="parallel-to" name="||" role="VERTBAR">∥</XMTok>
+                  <XMTok name="||" role="VERTBAR">∥</XMTok>
                 </XMath>
               </Math></td>
             <td align="left"><text font="typewriter">\Vert</text></td>

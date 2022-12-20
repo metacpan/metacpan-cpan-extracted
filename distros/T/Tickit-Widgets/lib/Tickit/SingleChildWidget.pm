@@ -1,11 +1,11 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2022 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.57;
+use Object::Pad 0.70 ':experimental(adjust_params)';
 
-package Tickit::SingleChildWidget 0.56;
+package Tickit::SingleChildWidget 0.57;
 class Tickit::SingleChildWidget
    :isa(Tickit::ContainerWidget)
    :does(Tickit::WidgetRole::SingleChildContainer);
@@ -42,11 +42,9 @@ Constructs a new C<Tickit::SingleChildWidget> object.
 
 =cut
 
-ADJUSTPARAMS
+ADJUST :params ( :$child = undef )
 {
-   my ( $params ) = @_;
-
-   if( exists $params->{child} ) {
+   if( $child ) {
       croak "The 'child' constructor argument to ${\ref $self} is no longer recognised; use ->set_child instead";
    }
 }

@@ -1,13 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2012-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.57;
+use Object::Pad 0.70 ':experimental(adjust_params)';
 
-package Tickit::Widget::Menu::base 0.15;
+package Tickit::Widget::Menu::base 0.16;
 class Tickit::Widget::Menu::base
+   :strict(params)
    :isa(Tickit::Widget)
    :does(Tickit::Widget::Menu::itembase);
 
@@ -22,15 +23,16 @@ use constant separator => [];
 #         croak "$class cannot ->$method - do you subclass and implement it?";
 #   }
 
-has @_items;
-has @_itemwidths;
+field @_items;
+field @_itemwidths;
 
-has $_active_idx; # index of keyboard-selected highlight
+field $_active_idx; # index of keyboard-selected highlight
 
-ADJUSTPARAMS ( $params )
-{
-   if( exists $params->{items} ) {
-      $self->push_item( $_ ) for @{ delete $params->{items} };
+ADJUST :params (
+   :$items = undef
+) {
+   if( $items ) {
+      $self->push_item( $_ ) for $items->@*;
    }
 }
 

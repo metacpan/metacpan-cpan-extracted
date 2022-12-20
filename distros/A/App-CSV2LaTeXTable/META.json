@@ -44,6 +44,7 @@
       "test" : {
          "requires" : {
             "File::Spec" : "0",
+            "Test::Exception" : "0",
             "Test::LongString" : "0",
             "Test::More" : "0"
          }
@@ -52,7 +53,7 @@
    "provides" : {
       "App::CSV2LaTeXTable" : {
          "file" : "lib/App/CSV2LaTeXTable.pm",
-         "version" : "v1.0.0"
+         "version" : "v1.1.0"
       }
    },
    "release_status" : "stable",
@@ -67,7 +68,7 @@
          "web" : "https://github.com/reneeb/App-CSV2LaTeXTable"
       }
    },
-   "version" : "1.0.0",
+   "version" : "1.1.0",
    "x_contributors" : [
       "reneeb <info@perl-services.de>"
    ],

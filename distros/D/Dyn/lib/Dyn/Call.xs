@@ -1,19 +1,6 @@
-#include "lib/xshelper.h"
+#include "lib/clutter.h"
 
-#define dcAllocMem Newxz
-#define dcFreeMem  Safefree
-
-// Based on https://github.com/svn2github/dyncall/blob/master/bindings/ruby/rbdc/rbdc.c
-
-#include <dynload.h>
-#include <dyncall.h>
-#include <dyncall_value.h>
-#include <dyncall_callf.h>
-#include <dyncall_signature.h>
-#include <dyncall_callback.h>
-//#include <dyncall/dyncall_signature.h>
-
-#include "lib/types.h"
+// clang-format off
 
 MODULE = Dyn::Call   PACKAGE = Dyn::Call
 
@@ -21,17 +8,22 @@ DCCallVM *
 dcNewCallVM(DCsize size);
 
 void
-dcFree(DCCallVM * vm);
+dcFree(DCCallVM * vm)
 CODE:
+    // clang-format on
     dcFree(vm);
-    SV* sv = (SV*) &PL_sv_undef;
-    sv_setsv(ST(0), sv);
+SV *sv = (SV *)&PL_sv_undef;
+sv_setsv(ST(0), sv);
+// clang-format off
+
+void
+dcReset(DCCallVM * vm);
 
 void
 dcMode(DCCallVM * vm, DCint mode);
 
 void
-dcReset(DCCallVM * vm);
+dcBeginCallAggr(DCCallVM * vm, DCaggr * ag);
 
 void
 dcArgBool(DCCallVM * vm, DCbool arg);
@@ -60,27 +52,22 @@ dcArgDouble(DCCallVM * vm, DCdouble arg);
 void
 dcArgPointer(DCCallVM * vm, arg);
 CODE:
-    if (sv_derived_from(ST(1), "Dyn::Callback") ) {
-        IV tmp = SvIV((SV*)SvRV(ST(1)));
-        DCCallback * arg = INT2PTR(DCCallback *, tmp);
-        dcArgPointer(vm, arg);
-    }
-    else if (sv_derived_from(ST(1), "Dyn::pointer")){
-        IV tmp = SvIV((SV*)SvRV(ST(1)));
-        DCpointer arg = INT2PTR(DCpointer, tmp);
-        dcArgPointer(vm, arg);
-    }
-    else
-        croak("arg is not of type Dyn::pointer");
+    // clang-format on
+    if (sv_derived_from(ST(1), "Dyn::Callback")) {
+    IV tmp = SvIV((SV *)SvRV(ST(1)));
+    DCCallback *arg = INT2PTR(DCCallback *, tmp);
+    dcArgPointer(vm, arg);
+}
+else if (sv_derived_from(ST(1), "Dyn::Call::Pointer")) {
+    IV tmp = SvIV((SV *)SvRV(ST(1)));
+    DCpointer arg = INT2PTR(DCpointer, tmp);
+    dcArgPointer(vm, arg);
+}
+else croak("arg is not of type Dyn::Call::Pointer or Dyn::Callback");
+// clang-format off
 
 void
-dcArgStruct(DCCallVM * vm, DCstruct * s, DCpointer value);
-
-=pod
-
-=for This is not part of dyncall's API
-
-=cut
+dcArgAggr(DCCallVM * vm, DCaggr * s, DCpointer value);
 
 void
 dcArgString(DCCallVM * vm, char * arg);
@@ -117,6 +104,9 @@ dcCallDouble(DCCallVM * vm, DCpointer funcptr);
 DCpointer
 dcCallPointer(DCCallVM * vm, DCpointer funcptr);
 
+DCpointer
+dcCallAggr(DCCallVM* vm, DCpointer funcptr, DCaggr* ag, DCpointer ret);
+
 const char *
 dcCallString(DCCallVM * vm, DCpointer funcptr);
 CODE:
@@ -151,71 +141,11 @@ dcVCallF(DCCallVM * vm, DCValue * result, DCpointer funcptr, const DCsigchar * s
 DCint
 dcGetError(DCCallVM* vm);
 
-
-
-void
-struct_test( )
-CODE:
-    {
-        typedef struct {
-            double a, b, c, d;
-        } S;
-
-        size_t size;
-        DCstruct* s = dcNewStruct(4, DEFAULT_ALIGNMENT);
-        dcStructField(s, DC_SIGCHAR_DOUBLE, DEFAULT_ALIGNMENT, 1);
-        dcStructField(s, DC_SIGCHAR_DOUBLE, DEFAULT_ALIGNMENT, 1);
-        dcStructField(s, DC_SIGCHAR_DOUBLE, DEFAULT_ALIGNMENT, 1);
-        dcStructField(s, DC_SIGCHAR_DOUBLE, DEFAULT_ALIGNMENT, 1);
-        dcCloseStruct(s);
-
-        //DC_TEST_STRUCT_SIZE(S, s);
-        dcFreeStruct(s);
-    }
-
-DCstruct *
-dcNewStruct( DCsize fieldCount, DCint alignment )
-
-void
-dcStructField( DCstruct* s, int type, DCint alignment, DCsize arrayLength )
-
-void
-dcSubStruct( DCstruct *s, DCsize fieldCount, DCint alignment, DCsize arrayLength )
-
-void
-dcCloseStruct( DCstruct *s )
-
-DCsize
-dcStructSize( DCstruct *s )
-
-DCsize
-dcStructAlignment( DCstruct *s )
-
-void
-dcFreeStruct( DCstruct * s )
-
-DCstruct *
-dcDefineStruct( const char * signature );
-
-=pod
-
-DC_API DCstruct*  dcNewStruct      (DCsize fieldCount, DCint alignment);
-DC_API void       dcStructField    (DCstruct* s, DCint type, DCint alignment, DCsize arrayLength);
-DC_API void       dcSubStruct      (DCstruct* s, DCsize fieldCount, DCint alignment, DCsize arrayLength);
-/* Each dcNewStruct or dcSubStruct call must be paired with a dcCloseStruct. */
-DC_API void       dcCloseStruct    (DCstruct* s);
-DC_API DCsize     dcStructSize     (DCstruct* s);
-DC_API DCsize     dcStructAlignment(DCstruct* s);
-DC_API void       dcFreeStruct     (DCstruct* s);
-
-DC_API DCstruct*  dcDefineStruct  (const char* signature);
-
-=cut
-
 BOOT:
+// clang-format on
 {
-    HV *stash = gv_stashpv("Dyn::Call", 0);
 
+    HV *stash = gv_stashpv("Dyn::Call", 0);
     // Supported Calling Convention Modes
     newCONSTSUB(stash, "DC_CALL_C_DEFAULT", newSViv(DC_CALL_C_DEFAULT));
     newCONSTSUB(stash, "DC_CALL_C_ELLIPSIS", newSViv(DC_CALL_C_ELLIPSIS));
@@ -255,45 +185,160 @@ BOOT:
     newCONSTSUB(stash, "DC_CALL_SYS_PPC64", newSViv(DC_CALL_SYS_PPC64));
 
     // Signature characters
-    newCONSTSUB(stash, "DC_SIGCHAR_VOID", newSViv(DC_SIGCHAR_VOID));
-    newCONSTSUB(stash, "DC_SIGCHAR_BOOL", newSViv(DC_SIGCHAR_BOOL));
-    newCONSTSUB(stash, "DC_SIGCHAR_CHAR", newSViv(DC_SIGCHAR_CHAR));
-    newCONSTSUB(stash, "DC_SIGCHAR_UCHAR", newSViv(DC_SIGCHAR_UCHAR));
-    newCONSTSUB(stash, "DC_SIGCHAR_SHORT", newSViv(DC_SIGCHAR_SHORT));
-    newCONSTSUB(stash, "DC_SIGCHAR_USHORT", newSViv(DC_SIGCHAR_USHORT));
-    newCONSTSUB(stash, "DC_SIGCHAR_INT", newSViv(DC_SIGCHAR_INT));
-    newCONSTSUB(stash, "DC_SIGCHAR_UINT", newSViv(DC_SIGCHAR_UINT));
-    newCONSTSUB(stash, "DC_SIGCHAR_LONG", newSViv(DC_SIGCHAR_LONG));
-    newCONSTSUB(stash, "DC_SIGCHAR_ULONG", newSViv(DC_SIGCHAR_ULONG));
-    newCONSTSUB(stash, "DC_SIGCHAR_LONGLONG", newSViv(DC_SIGCHAR_LONGLONG));
-    newCONSTSUB(stash, "DC_SIGCHAR_ULONGLONG", newSViv(DC_SIGCHAR_ULONGLONG));
-    newCONSTSUB(stash, "DC_SIGCHAR_FLOAT", newSViv(DC_SIGCHAR_FLOAT));
-    newCONSTSUB(stash, "DC_SIGCHAR_DOUBLE", newSViv(DC_SIGCHAR_DOUBLE));
-    newCONSTSUB(stash, "DC_SIGCHAR_POINTER", newSViv(DC_SIGCHAR_POINTER));
-    newCONSTSUB(stash, "DC_SIGCHAR_STRING", newSViv(DC_SIGCHAR_STRING));/* in theory same as 'p', but convenient to disambiguate */
-    newCONSTSUB(stash, "DC_SIGCHAR_STRUCT", newSViv(DC_SIGCHAR_STRUCT));
-    newCONSTSUB(stash, "DC_SIGCHAR_ENDARG", newSViv(DC_SIGCHAR_ENDARG));/* also works for end struct */
+    newCONSTSUB(stash, "DC_SIGCHAR_VOID", newSVpv(form("%c", DC_SIGCHAR_VOID), 1));
+    newCONSTSUB(stash, "DC_SIGCHAR_BOOL", newSVpv(form("%c", DC_SIGCHAR_BOOL), 1));
+    newCONSTSUB(stash, "DC_SIGCHAR_CHAR", newSVpv(form("%c", DC_SIGCHAR_CHAR), 1));
+    newCONSTSUB(stash, "DC_SIGCHAR_UCHAR", newSVpv(form("%c", DC_SIGCHAR_UCHAR), 1));
+    newCONSTSUB(stash, "DC_SIGCHAR_SHORT", newSVpv(form("%c", DC_SIGCHAR_SHORT), 1));
+    newCONSTSUB(stash, "DC_SIGCHAR_USHORT", newSVpv(form("%c", DC_SIGCHAR_USHORT), 1));
+    newCONSTSUB(stash, "DC_SIGCHAR_INT", newSVpv(form("%c", DC_SIGCHAR_INT), 1));
+    newCONSTSUB(stash, "DC_SIGCHAR_UINT", newSVpv(form("%c", DC_SIGCHAR_UINT), 1));
+    newCONSTSUB(stash, "DC_SIGCHAR_LONG", newSVpv(form("%c", DC_SIGCHAR_LONG), 1));
+    newCONSTSUB(stash, "DC_SIGCHAR_ULONG", newSVpv(form("%c", DC_SIGCHAR_ULONG), 1));
+    newCONSTSUB(stash, "DC_SIGCHAR_LONGLONG", newSVpv(form("%c", DC_SIGCHAR_LONGLONG), 1));
+    newCONSTSUB(stash, "DC_SIGCHAR_ULONGLONG", newSVpv(form("%c", DC_SIGCHAR_ULONGLONG), 1));
+    newCONSTSUB(stash, "DC_SIGCHAR_FLOAT", newSVpv(form("%c", DC_SIGCHAR_FLOAT), 1));
+    newCONSTSUB(stash, "DC_SIGCHAR_DOUBLE", newSVpv(form("%c", DC_SIGCHAR_DOUBLE), 1));
+    newCONSTSUB(stash, "DC_SIGCHAR_POINTER", newSVpv(form("%c", DC_SIGCHAR_POINTER), 1));
+    newCONSTSUB(stash, "DC_SIGCHAR_STRING",
+                newSVpv(form("%c", DC_SIGCHAR_STRING),
+                        1)); /* in theory same as 'p', but convenient to disambiguate */
+    newCONSTSUB(stash, "DC_SIGCHAR_AGGREGATE", newSVpv(form("%c", DC_SIGCHAR_AGGREGATE), 1));
+    newCONSTSUB(stash, "DC_SIGCHAR_ENDARG",
+                newSVpv(form("%c", DC_SIGCHAR_ENDARG), 1)); /* also works for end struct */
 
     /* calling convention / mode signatures */
-    newCONSTSUB(stash, "DC_SIGCHAR_CC_PREFIX", newSViv(DC_SIGCHAR_CC_PREFIX));
-    newCONSTSUB(stash, "DC_SIGCHAR_CC_DEFAULT", newSViv(DC_SIGCHAR_CC_DEFAULT));
-    newCONSTSUB(stash, "DC_SIGCHAR_CC_ELLIPSIS", newSViv(DC_SIGCHAR_CC_ELLIPSIS));
-    newCONSTSUB(stash, "DC_SIGCHAR_CC_ELLIPSIS_VARARGS", newSViv(DC_SIGCHAR_CC_ELLIPSIS_VARARGS));
-    newCONSTSUB(stash, "DC_SIGCHAR_CC_CDECL", newSViv(DC_SIGCHAR_CC_CDECL));
-    newCONSTSUB(stash, "DC_SIGCHAR_CC_STDCALL", newSViv(DC_SIGCHAR_CC_STDCALL));
-    newCONSTSUB(stash, "DC_SIGCHAR_CC_FASTCALL_MS", newSViv(DC_SIGCHAR_CC_FASTCALL_MS));
-    newCONSTSUB(stash, "DC_SIGCHAR_CC_FASTCALL_GNU", newSViv(DC_SIGCHAR_CC_FASTCALL_GNU));
-    newCONSTSUB(stash, "DC_SIGCHAR_CC_THISCALL_MS", newSViv(DC_SIGCHAR_CC_THISCALL_MS));
-    newCONSTSUB(stash, "DC_SIGCHAR_CC_THISCALL_GNU", newSViv(DC_SIGCHAR_CC_THISCALL_GNU));
-    newCONSTSUB(stash, "DC_SIGCHAR_CC_ARM_ARM", newSViv(DC_SIGCHAR_CC_ARM_ARM));
-    newCONSTSUB(stash, "DC_SIGCHAR_CC_ARM_THUMB", newSViv(DC_SIGCHAR_CC_ARM_THUMB));
-    newCONSTSUB(stash, "DC_SIGCHAR_CC_SYSCALL", newSViv(DC_SIGCHAR_CC_SYSCALL));
+    newCONSTSUB(stash, "DC_SIGCHAR_CC_PREFIX", newSVpv(form("%c", DC_SIGCHAR_CC_PREFIX), 1));
+    newCONSTSUB(stash, "DC_SIGCHAR_CC_DEFAULT", newSVpv(form("%c", DC_SIGCHAR_CC_DEFAULT), 1));
+    newCONSTSUB(stash, "DC_SIGCHAR_CC_THISCALL", newSVpv(form("%c", DC_SIGCHAR_CC_THISCALL), 1));
+    newCONSTSUB(stash, "DC_SIGCHAR_CC_ELLIPSIS", newSVpv(form("%c", DC_SIGCHAR_CC_ELLIPSIS), 1));
+    newCONSTSUB(stash, "DC_SIGCHAR_CC_ELLIPSIS_VARARGS",
+                newSVpv(form("%c", DC_SIGCHAR_CC_ELLIPSIS_VARARGS), 1));
+    newCONSTSUB(stash, "DC_SIGCHAR_CC_CDECL", newSVpv(form("%c", DC_SIGCHAR_CC_CDECL), 1));
+    newCONSTSUB(stash, "DC_SIGCHAR_CC_STDCALL", newSVpv(form("%c", DC_SIGCHAR_CC_STDCALL), 1));
+    newCONSTSUB(stash, "DC_SIGCHAR_CC_FASTCALL_MS",
+                newSVpv(form("%c", DC_SIGCHAR_CC_FASTCALL_MS), 1));
+    newCONSTSUB(stash, "DC_SIGCHAR_CC_FASTCALL_GNU",
+                newSVpv(form("%c", DC_SIGCHAR_CC_FASTCALL_GNU), 1));
+    newCONSTSUB(stash, "DC_SIGCHAR_CC_THISCALL_MS",
+                newSVpv(form("%c", DC_SIGCHAR_CC_THISCALL_MS), 1));
+    newCONSTSUB(stash, "DC_SIGCHAR_CC_THISCALL_GNU",
+                newSVpv(form("%c", DC_SIGCHAR_CC_THISCALL_GNU), 1));
+    newCONSTSUB(stash, "DC_SIGCHAR_CC_ARM_ARM", newSVpv(form("%c", DC_SIGCHAR_CC_ARM_ARM), 1));
+    newCONSTSUB(stash, "DC_SIGCHAR_CC_ARM_THUMB", newSVpv(form("%c", DC_SIGCHAR_CC_ARM_THUMB), 1));
+    newCONSTSUB(stash, "DC_SIGCHAR_CC_SYSCALL", newSVpv(form("%c", DC_SIGCHAR_CC_SYSCALL), 1));
 
     // Error codes
     newCONSTSUB(stash, "DC_ERROR_NONE", newSViv(DC_ERROR_NONE));
     newCONSTSUB(stash, "DC_ERROR_UNSUPPORTED_MODE", newSViv(DC_ERROR_UNSUPPORTED_MODE));
 
-    // Struct alignment
-    newCONSTSUB(stash, "DEFAULT_ALIGNMENT", newSViv(DEFAULT_ALIGNMENT));
-}
+    export_function("Dyn::Call", "dcNewCallVM", "call");
+    export_function("Dyn::Call", "dcFree", "call");
+    export_function("Dyn::Call", "dcMode", "call");
+    export_function("Dyn::Call", "dcReset", "call");
 
+    export_function("Dyn::Call", "dcArgBool", "call");
+    export_function("Dyn::Call", "dcArgChar", "call");
+    export_function("Dyn::Call", "dcArgShort", "call");
+    export_function("Dyn::Call", "dcArgInt", "call");
+    export_function("Dyn::Call", "dcArgLong", "call");
+    export_function("Dyn::Call", "dcArgLongLong", "call");
+    export_function("Dyn::Call", "dcArgFloat", "call");
+    export_function("Dyn::Call", "dcArgDouble", "call");
+    export_function("Dyn::Call", "dcArgPointer", "call");
+    export_function("Dyn::Call", "dcArgString", "call");
+    export_function("Dyn::Call", "dcArgAggr", "call");
+
+    export_function("Dyn::Call", "dcCallVoid", "call");
+    export_function("Dyn::Call", "dcCallBool", "call");
+    export_function("Dyn::Call", "dcCallChar", "call");
+    export_function("Dyn::Call", "dcCallShort", "call");
+    export_function("Dyn::Call", "dcCallInt", "call");
+    export_function("Dyn::Call", "dcCallLong", "call");
+    export_function("Dyn::Call", "dcCallLongLong", "call");
+    export_function("Dyn::Call", "dcCallFloat", "call");
+    export_function("Dyn::Call", "dcCallDouble", "call");
+    export_function("Dyn::Call", "dcCallPointer", "call");
+    export_function("Dyn::Call", "dcCallString", "call");
+    export_function("Dyn::Call", "dcCallAggr", "call");
+    export_function("Dyn::Call", "dcBeginCallAggr", "call");
+
+    export_function("Dyn::Call", "DC_CALL_C_DEFAULT", "vars");
+    export_function("Dyn::Call", "DC_CALL_C_ELLIPSIS", "vars");
+    export_function("Dyn::Call", "DC_CALL_C_ELLIPSIS_VARARGS", "vars");
+    export_function("Dyn::Call", "DC_CALL_C_X86_CDECL", "vars");
+    export_function("Dyn::Call", "DC_CALL_C_X86_WIN32_STD", "vars");
+    export_function("Dyn::Call", "DC_CALL_C_X86_WIN32_FAST_MS", "vars");
+    export_function("Dyn::Call", "DC_CALL_C_X86_WIN32_FAST_GNU", "vars");
+    export_function("Dyn::Call", "DC_CALL_C_X86_WIN32_THIS_MS", "vars");
+    export_function("Dyn::Call", "DC_CALL_C_X86_WIN32_THIS_GNU", "vars");
+    export_function("Dyn::Call", "DC_CALL_C_X64_WIN64", "vars");
+    export_function("Dyn::Call", "DC_CALL_C_X64_SYSV", "vars");
+    export_function("Dyn::Call", "DC_CALL_C_PPC32_DARWIN", "vars");
+    export_function("Dyn::Call", "DC_CALL_C_PPC32_OSX", "vars");
+    export_function("Dyn::Call", "DC_CALL_C_ARM_ARM_EABI", "vars");
+    export_function("Dyn::Call", "DC_CALL_C_ARM_THUMB_EABI", "vars");
+    export_function("Dyn::Call", "DC_CALL_C_ARM_ARMHF", "vars");
+    export_function("Dyn::Call", "DC_CALL_C_MIPS32_EABI", "vars");
+    export_function("Dyn::Call", "DC_CALL_C_MIPS32_PSPSDK", "vars");
+    export_function("Dyn::Call", "DC_CALL_C_PPC32_SYSV", "vars");
+    export_function("Dyn::Call", "DC_CALL_C_PPC32_LINUX", "vars");
+    export_function("Dyn::Call", "DC_CALL_C_ARM_ARM", "vars");
+    export_function("Dyn::Call", "DC_CALL_C_ARM_THUMB", "vars");
+    export_function("Dyn::Call", "DC_CALL_C_MIPS32_O32", "vars");
+    export_function("Dyn::Call", "DC_CALL_C_MIPS64_N32", "vars");
+    export_function("Dyn::Call", "DC_CALL_C_MIPS64_N64", "vars");
+    export_function("Dyn::Call", "DC_CALL_C_X86_PLAN9", "vars");
+    export_function("Dyn::Call", "DC_CALL_C_SPARC32", "vars");
+    export_function("Dyn::Call", "DC_CALL_C_SPARC64", "vars");
+    export_function("Dyn::Call", "DC_CALL_C_ARM64", "vars");
+    export_function("Dyn::Call", "DC_CALL_C_PPC64", "vars");
+    export_function("Dyn::Call", "DC_CALL_C_PPC64_LINUX", "vars");
+    export_function("Dyn::Call", "DC_CALL_SYS_DEFAULT", "vars");
+    export_function("Dyn::Call", "DC_CALL_SYS_X86_INT80H_LINUX", "vars");
+    export_function("Dyn::Call", "DC_CALL_SYS_X86_INT80H_BSD", "vars");
+    export_function("Dyn::Call", "DC_CALL_SYS_PPC32", "vars");
+    export_function("Dyn::Call", "DC_CALL_SYS_PPC64", "vars");
+
+    export_function("Dyn::Call", "DC_ERROR_NONE", "vars");
+    export_function("Dyn::Call", "DC_ERROR_UNSUPPORTED_MODE", "vars");
+
+    export_function("Dyn::Call", "DC_SIGCHAR_VOID", "sigchar");
+    export_function("Dyn::Call", "DC_SIGCHAR_BOOL", "sigchar");
+    export_function("Dyn::Call", "DC_SIGCHAR_CHAR", "sigchar");
+    export_function("Dyn::Call", "DC_SIGCHAR_UCHAR", "sigchar");
+    export_function("Dyn::Call", "DC_SIGCHAR_SHORT", "sigchar");
+    export_function("Dyn::Call", "DC_SIGCHAR_USHORT", "sigchar");
+    export_function("Dyn::Call", "DC_SIGCHAR_INT", "sigchar");
+    export_function("Dyn::Call", "DC_SIGCHAR_UINT", "sigchar");
+    export_function("Dyn::Call", "DC_SIGCHAR_LONG", "sigchar");
+    export_function("Dyn::Call", "DC_SIGCHAR_ULONG", "sigchar");
+    export_function("Dyn::Call", "DC_SIGCHAR_LONGLONG", "sigchar");
+    export_function("Dyn::Call", "DC_SIGCHAR_ULONGLONG", "sigchar");
+    export_function("Dyn::Call", "DC_SIGCHAR_FLOAT", "sigchar");
+    export_function("Dyn::Call", "DC_SIGCHAR_DOUBLE", "sigchar");
+    export_function("Dyn::Call", "DC_SIGCHAR_POINTER", "sigchar");
+    export_function("Dyn::Call", "DC_SIGCHAR_STRING", "sigchar");
+    export_function("Dyn::Call", "DC_SIGCHAR_STRUCT", "sigchar");
+    export_function("Dyn::Call", "DC_SIGCHAR_ENDARG", "sigchar");
+    export_function("Dyn::Call", "DC_SIGCHAR_CC_PREFIX", "sigchar");
+    export_function("Dyn::Call", "DC_SIGCHAR_CC_DEFAULT", "sigchar");
+    export_function("Dyn::Call", "DC_SIGCHAR_CC_ELLIPSIS", "sigchar");
+    export_function("Dyn::Call", "DC_SIGCHAR_CC_ELLIPSIS_VARARGS", "sigchar");
+    export_function("Dyn::Call", "DC_SIGCHAR_CC_CDECL", "sigchar");
+    export_function("Dyn::Call", "DC_SIGCHAR_CC_STDCALL", "sigchar");
+    export_function("Dyn::Call", "DC_SIGCHAR_CC_THISCALL", "sigchar");
+    export_function("Dyn::Call", "DC_SIGCHAR_CC_FASTCALL_MS", "sigchar");
+    export_function("Dyn::Call", "DC_SIGCHAR_CC_FASTCALL_GNU", "sigchar");
+    export_function("Dyn::Call", "DC_SIGCHAR_CC_THISCALL_MS", "sigchar");
+    export_function("Dyn::Call", "DC_SIGCHAR_CC_THISCALL_GNU", "sigchar");
+    export_function("Dyn::Call", "DC_SIGCHAR_CC_ARM_ARM", "sigchar");
+    export_function("Dyn::Call", "DC_SIGCHAR_CC_ARM_THUMB", "sigchar");
+    export_function("Dyn::Call", "DC_SIGCHAR_CC_SYSCALL", "sigchar");
+    export_function("Dyn::Call", "DEFAULT_ALIGNMENT", "vars");
+}
+// clang-format off
+
+INCLUDE: Call/Aggregate.xsh
+
+INCLUDE: Call/Pointer.xsh

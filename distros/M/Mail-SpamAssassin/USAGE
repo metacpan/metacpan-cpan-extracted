@@ -84,7 +84,7 @@ If you use procmail, or haven't decided on any of the above examples:
 If you want to use SpamAssassin site-wide:
 
   - take a look at the notes on the Wiki website, currently at
-    <http://wiki.apache.org/spamassassin/UsingSiteWide>.  You will probably
+    <https://wiki.apache.org/spamassassin/UsingSiteWide>.  You will probably
     want to use 'spamd' (see below).   You may want to investigate the
     new Apache mod_perl module, in the 'spamd-apache2' directory, too.
 
@@ -101,11 +101,11 @@ If you want to use SpamAssassin site-wide:
     add the line 'DROPPRIVS=yes' at the top of the file.
 
 
-The Auto-Whitelist
+The Auto-Welcomelist
 ------------------
 
-The auto-whitelist is enabled using the 'use_auto_whitelist' option.
-(See http://wiki.apache.org/spamassassin/AutoWhitelist for details on
+The auto-welcomelist is enabled using the 'use_auto_welcomelist' option.
+(See https://wiki.apache.org/spamassassin/AutoWelcomelist for details on
 how it works, if you're curious.)
 
 
@@ -113,15 +113,6 @@ Other Installation Notes
 ------------------------
 
   
-  - Hashcash is a useful system; it requires that senders exercise a
-    CPU-intensive task before they can send mail to you, so we give that
-    some bonus points.  However, it requires that you list what addresses
-    you expect to receive mail for, by adding 'hashcash_accept' lines to
-    your ~/.spamassassin/user_prefs or /etc/mail/spamassassin/local.cf
-    files.  See the Mail::SpamAssassin::Plugin::Hashcash manual page for
-    details on how to specify these.
-
-
   - SpamAssassin now uses a temporary file in /tmp (or $TMPDIR, if that's
     set in the environment) for Pyzor and DCC checks.  Make sure that this
     directory is either (a) not writable by other users, or (b) not shared
@@ -161,7 +152,7 @@ Other Installation Notes
   - A very handy new feature is SPF support, which allows you to check
     that the message sender is permitted by their domain to send from the
     IP address used.  This has the potential to greatly cut down on mail
-    forgery.  (see http://spf.pobox.com/ for more details.)
+    forgery.
 
 
   - MDaemon users should add this line to their "local.cf" file:
@@ -219,7 +210,7 @@ Other Installation Notes
     to do this, take a look here [1] for a simple forwarding-based
     alternative.
 
-      [1]: http://wiki.apache.org/spamassassin/SpamTrapping
+      [1]: https://wiki.apache.org/spamassassin/SpamTrapping
 
 
   - Scores and other user preferences can now be loaded from, and Bayes
@@ -242,7 +233,7 @@ Other Installation Notes
 
 
   - Lots more ways to integrate SpamAssassin can be read at
-    http://wiki.SpamAssassin.org/ .
+    https://wiki.apache.org/spamassassin/ .
 
 
 (end of USAGE)

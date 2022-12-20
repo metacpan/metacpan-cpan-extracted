@@ -17,6 +17,7 @@
 #include "optree-additions.c.inc"
 #include "make_argcheck_ops.c.inc"
 #include "newOP_CUSTOM.c.inc"
+#include "OP_HELEMEXISTSOR.c.inc"
 
 #if HAVE_PERL_VERSION(5,36,0)
 #  define HAVE_OP_WEAKEN
@@ -326,21 +327,21 @@ static OP *S_gen_field_init_op(pTHX_ FieldMeta *fieldmeta)
             newSVpvf("Required parameter '%" SVf "' is missing for %" SVf " constructor",
               SVfARG(paramname), SVfARG(classmeta->name)));
 
-        valueop = newCONDOP(0,
-          /* exists $params{$paramname} */
-          newUNOP(OP_EXISTS, 0,
-            newBINOP(OP_HELEM, 0,
-              newPADxVOP(OP_PADHV, OPf_REF, PADIX_PARAMS),
-              newSVOP(OP_CONST, 0, SvREFCNT_inc(paramname)))),
+        OP *helemop =
+          newBINOP(OP_HELEM, 0,
+            newPADxVOP(OP_PADHV, OPf_REF, PADIX_PARAMS),
+            newSVOP(OP_CONST, 0, SvREFCNT_inc(paramname)));
 
-          /* ? delete $params{$paramname} */
-          newUNOP(OP_DELETE, 0,
-            newBINOP(OP_HELEM, 0,
-              newPADxVOP(OP_PADHV, OPf_REF, PADIX_PARAMS),
-              newSVOP(OP_CONST, 0, SvREFCNT_inc(paramname)))),
-
-          /* : valueop or die */
-          valueop);
+        if(fieldmeta->def_if_undef)
+          /* delete $params{$paramname} // valueop */
+          valueop = newLOGOP(OP_DOR, 0, newUNOP(OP_DELETE, 0, helemop), valueop);
+        else if(fieldmeta->def_if_false)
+          /* delete $params{$paramname} || valueop */
+          valueop = newLOGOP(OP_OR, 0, newUNOP(OP_DELETE, 0, helemop), valueop);
+        else
+          /* Equivalent of
+           *   exists $params{$paramname} ? delete $params{$paramname} : valueop; */
+          valueop = newHELEMEXISTSOROP(OPpHELEMEXISTSOR_DELETE << 8, helemop, valueop);
       }
 
       if(valueop)

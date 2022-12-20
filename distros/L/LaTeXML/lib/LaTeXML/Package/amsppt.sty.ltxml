@@ -129,7 +129,17 @@ DefConstructor('\subhead Until:\endsubhead',
     . "<ltx:title>#1</ltx:title>",
   bounded    => 1,
   properties => sub { RefStepID('subsection') });
-DefMacro('\subheading Until:\endsubheading', '\subhead#1\endsubhead');
+# TODO: This can be used as a simple macro \subheading{..}, see e.g. arxiv:math/0001062
+DefMacro('\subheading', sub {
+    my ($gullet) = @_;
+    return ($gullet->ifNext(T_BEGIN)
+      ? (T_CS('\subheading@onearg'))
+      : (T_CS('\subheading@env'))); },
+  locked => 1);
+
+DefMacro('\subheading@onearg {}',                '\subhead#1\endsubhead');
+DefMacro('\subheading@env Until:\endsubheading', '\subhead#1\endsubhead');
+
 DefConstructor('\subsubhead Until:\endsubsubhead',
   "<ltx:subsubsection inlist='toc' xml:id='#id'>"
     . "#tags"
@@ -157,7 +167,7 @@ NewCounter('theorem', 'document', idprefix => "Thm");
 Tag('ltx:theorem', autoClose => 1);
 Tag('ltx:proof',   autoClose => 1);
 
-DefConstructor('\proclaim{} Until:\endproclaim',
+DefConstructor('\proclaim Undigested DigestUntil:\endproclaim',
   "<ltx:theorem class='ltx_theorem_proclaim' xml:id='#id'>"
     . "#tags"
     . "<ltx:title>#1</ltx:title>"
@@ -269,7 +279,7 @@ DefConstructor('\footnote[]{}',
     . "#2"
     . "</ltx:note>",
   mode         => 'text', bounded => 1,
-  beforeDigest => sub { reenterTextMode(1); Digest('\normalfont'); },
+  beforeDigest => sub { reenterTextMode(1); neutralizeFont(); },
   properties   => sub {
     ($_[1]
       ? (mark => $_[1])
@@ -311,7 +321,8 @@ DefMacro('\rom{}', '{rm #1}');
 
 DefMacro('\PSAMSFonts', '');
 RawTeX('\newif\ifPSAMSFonts\PSAMSFontstrue');
-DefConstructor('\qed', "?#isMath(<ltx:XMTok role='PUNCT'>\x{220E}</ltx:XMTok>)(\x{220E})");
+DefMacro('\qed', '\ltx@qed');
+DefConstructor('\ltx@qed', "?#isMath(<ltx:XMTok role='PUNCT'>\x{220E}</ltx:XMTok>)(\x{220E})", reversion => '\qed');
 
 DefPrimitiveI('\tildechar', undef, "~", font => { family => 'typewriter' });
 DefMacro('\breakcheck', '');

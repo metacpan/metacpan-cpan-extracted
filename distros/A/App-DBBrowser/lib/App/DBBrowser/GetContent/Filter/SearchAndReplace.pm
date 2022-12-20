@@ -40,7 +40,7 @@ sub search_and_replace {
     my $used_names = [];
 
     my @bu;
-    my ( $hidden, $add ) = ( 'Choose:', '  ADD search & replace' );
+    my ( $hidden, $add ) = ( 'Your choice:', '  ADD search & replace' );
 
     ADD_SEARCH_AND_REPLACE: while ( 1 ) {
         my @tmp_info = ( '', $filter_str );

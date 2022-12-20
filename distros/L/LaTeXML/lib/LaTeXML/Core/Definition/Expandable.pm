@@ -55,6 +55,7 @@ sub getExpansion {
 
 # Expand the expandable control sequence. This should be carried out by the Gullet.
 sub invoke {
+  no warnings 'recursion';
   my ($self, $gullet, $onceonly) = @_;
   # shortcut for "trivial" macros; but only if not tracing & profiling!!!!
   my $tracing   = $STATE->lookupValue('TRACINGMACROS');
@@ -75,7 +76,7 @@ sub invoke {
       Debug($self->tracingArgs(@args)) if @args; } }
   elsif (!$$self{parameters}) {                    # Trivial macro
     LaTeXML::Core::Definition::startProfiling($profiled, 'expand') if $profiled;
-    Debug($self->tracingCSName . ' -> ' . tracetoString($expansion))
+    Debug($self->tracingCSName . ' ->' . tracetoString($expansion))
       if $tracing || $LaTeXML::DEBUG{tracing};
     # For trivial expansion, make sure we don't get \cs or \relax\cs direct recursion!
     if (!$onceonly && $$self{cs}) {
@@ -96,7 +97,7 @@ sub invoke {
           && (($r eq 'LaTeXML::Core::Token') || ($r eq 'LaTeXML::Core::Tokens'))
         ? $_ : Tokens(Revert($_))); } @args;
     if ($tracing || $LaTeXML::DEBUG{tracing}) {    # More involved...
-      Debug($self->tracingCSName . ' -> ' . tracetoString($expansion));
+      Debug($self->tracingCSName . ' ->' . tracetoString($expansion));
       Debug($self->tracingArgs(@targs)) if @args; }
     LaTeXML::Core::Definition::startProfiling($profiled, 'expand') if $profiled;
     $result = $expansion->substituteParameters(@targs); }

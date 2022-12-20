@@ -15,7 +15,7 @@ on 'runtime' => sub {
 
 on 'test' => sub {
   requires 'Test::More'                  => '0';
-  requires 'Log::Any::Adapter::Log4perl' => '0';
+  requires 'Log::Any::Adapter::Log4perl' => '>= 0.09';
 };
 
 on 'develop' => sub {

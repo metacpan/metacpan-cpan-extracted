@@ -1246,7 +1246,7 @@ The definition of syntax parsing of SPVM language. This is written by yacc/bison
   %type <opval> switch_statement case_statement case_statements opt_case_statements default_statement
   %type <opval> block eval_block init_block switch_block if_require_statement
   %type <opval> unary_operator binary_operator comparison_operator isa is_type
-  %type <opval> call_spvm_method opt_vaarg
+  %type <opval> call_method opt_vaarg
   %type <opval> array_access field_access weaken_field unweaken_field isweak_field convert array_length
   %type <opval> assign inc dec allow has_impl
   %type <opval> new array_init die opt_extends
@@ -1497,7 +1497,7 @@ The definition of syntax parsing of SPVM language. This is written by yacc/bison
     | EXCEPTION_VAR
     | CONSTANT
     | UNDEF
-    | call_spvm_method
+    | call_method
     | field_access
     | array_access
     | convert
@@ -1621,7 +1621,7 @@ The definition of syntax parsing of SPVM language. This is written by yacc/bison
     | array_access '[' operator ']'
     | field_access '[' operator ']'
 
-  call_spvm_method
+  call_method
     : CURRENT_CLASS SYMBOL_NAME '(' opt_operators  ')'
     | CURRENT_CLASS SYMBOL_NAME
     | class_name ARROW method_name '(' opt_operators  ')'
@@ -8933,6 +8933,58 @@ The C<SUPER::> qualifier calls the method of the super class of the current clas
 A instance method can be called statically by specifing the calss name.
 
   $point3d->Point::clear;
+
+=head2 items Operator
+
+The C<items> operator gets the stack length of the arguments passed to the method.
+
+  items
+
+Note that the stack length of the arguments is different from the length of the arguments.
+
+If the method call is the instance method call, the stack length of the arguments is the length of the arguments + C<1> for the invocant.
+
+If an argument is a multi-numeric type, the stack length of the argument becomes the length of the fields.
+
+Examples:
+  
+  static method my_static_method : int ($args : int, $bar = 0 : int) {
+    my $items = items;
+    
+    return $items;
+  };
+  
+  # 1
+  &my_static_method(1);
+  
+  # 2
+  &my_static_method(1, 2);
+  
+  static method my_instance_method : int ($args : int, $bar = 0 : int) {
+    my $items = items;
+    
+    return $items;
+  };
+  
+  # 2 (1 + the invocant)
+  &my_instance_method(1);
+  
+  # 3 (2 + the invocant)
+  &my_instance_method(1, 2);
+
+  static method my_mulnum_method : int ($z : Complex_2d, $bar = 0 : int) {
+    my $items = items;
+    
+    return $items;
+  };
+
+  # 2 (The length of the fields of Complex_2d)
+  my $z : Complex_2d;
+  &my_mulnum_method($z);
+  
+  # 3 (The length of the fields of Complex_2d + 1)
+  my $z : Complex_2d;
+  &my_mulnum_method($z, 2);
 
 =head1 Exception
 

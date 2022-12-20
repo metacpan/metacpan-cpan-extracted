@@ -21,7 +21,7 @@ Mail::SpamAssassin::PerMsgStatus - per-message status (spam or not-spam)
 
 =head1 SYNOPSIS
 
-  my $spamtest = new Mail::SpamAssassin ({
+  my $spamtest = Mail::SpamAssassin->new({
     'rules_filename'      => '/etc/spamassassin.rules',
     'userprefs_filename'  => $ENV{HOME}.'/.spamassassin/user_prefs'
   });
@@ -55,20 +55,23 @@ use re 'taint';
 
 use Errno qw(ENOENT);
 use Time::HiRes qw(time);
+use Encode;
 
-use Mail::SpamAssassin::Constants qw(:sa);
+use Mail::SpamAssassin::Constants qw(:sa :ip);
 use Mail::SpamAssassin::AsyncLoop;
 use Mail::SpamAssassin::Conf;
-use Mail::SpamAssassin::Util qw(untaint_var uri_list_canonicalize is_fqdn_valid);
+use Mail::SpamAssassin::Util qw(untaint_var base64_encode idn_to_ascii
+                                uri_list_canonicalize reverse_ip_address
+                                is_fqdn_valid parse_header_addresses);
 use Mail::SpamAssassin::Timeout;
 use Mail::SpamAssassin::Logger;
 
 our @ISA = qw();
 
-# methods defined by the compiled ruleset; deleted in finish_tests()
+# methods defined by the compiled ruleset; deleted in finish()
 our @TEMPORARY_METHODS;
 
-# methods defined by register_plugin_eval_glue(); deleted in finish_tests()
+# methods defined by register_plugin_eval_glue(); deleted in finish()
 our %TEMPORARY_EVAL_GLUE_METHODS;
 
 ###########################################################################
@@ -133,10 +136,28 @@ BEGIN {
       $pms->{tag_data}->{'REMOTEHOSTADDR'} || "127.0.0.1";
     },
 
+    FIRSTTRUSTEDIP => sub {
+      my $pms = shift;
+      my $lasthop = $pms->{msg}->{metadata}->{relays_trusted}->[-1];
+      $lasthop ? $lasthop->{ip} : '';
+    },
+
+    FIRSTTRUSTEDREVIP => sub {
+      my $pms = shift;
+      my $lasthop = $pms->{msg}->{metadata}->{relays_trusted}->[-1];
+      $lasthop ? reverse_ip_address($lasthop->{ip}) : '';
+    },
+
     LASTEXTERNALIP => sub {
       my $pms = shift;
       my $lasthop = $pms->{msg}->{metadata}->{relays_external}->[0];
       $lasthop ? $lasthop->{ip} : '';
+    },
+
+    LASTEXTERNALREVIP => sub {
+      my $pms = shift;
+      my $lasthop = $pms->{msg}->{metadata}->{relays_external}->[0];
+      $lasthop ? reverse_ip_address($lasthop->{ip}) : '';
     },
 
     LASTEXTERNALRDNS => sub {
@@ -228,8 +249,8 @@ BEGIN {
     HEADER => sub {
       my $pms = shift;
       my $hdr = shift;
-      return if !$hdr;
-      $pms->get($hdr,undef);
+      return '' if !$hdr;
+      $pms->get($hdr, '');
     },
 
     TIMING => sub {
@@ -256,6 +277,8 @@ BEGIN {
   );
 }
 
+my $IP_ADDRESS = IP_ADDRESS;
+
 sub new {
   my $class = shift;
   $class = ref($class) || $class;
@@ -265,12 +288,13 @@ sub new {
     'main'              => $main,
     'msg'               => $msg,
     'score'             => 0,
-    'test_log_msgs'     => { },
+    'test_log_msgs'     => { }, # deprecated since 4.0, renamed to test_logs to prevent conflicts
+    'test_logs'         => { },
     'test_names_hit'    => [ ],
     'subtest_names_hit' => [ ],
     'spamd_result_log_items' => [ ],
     'tests_already_hit' => { },
-    'c'                 => { },
+    'get_cache'         => { },
     'tag_data'          => { },
     'rule_errors'       => 0,
     'disable_auto_learning' => 0,
@@ -280,8 +304,9 @@ sub new {
     'async'             => Mail::SpamAssassin::AsyncLoop->new($main),
     'master_deadline'   => $msg->{master_deadline},  # dflt inherited from msg
     'deadline_exceeded' => 0,  # time limit exceeded, skipping further tests
+    'tmpfiles'          => { },
     'uri_detail_list'   => { },
-    'subjprefix'        => "",
+    'subjprefix'        => undef,
   };
 
   dbg("check: pms new, time limit in %.3f s",
@@ -320,8 +345,14 @@ sub new {
 
 sub DESTROY {
   my ($self) = shift;
-  local $@;
-  eval { $self->delete_fulltext_tmpfile() };  # Bug 5808
+
+  # best practices: prevent potential calls to eval and to system routines
+  # in code of a DESTROY method from clobbering global variables $@ and $! 
+  local($@,$!);  # keep outer error handling unaffected by DESTROY
+  # Bug 5808 - cleanup tmpfiles
+  foreach my $fn (keys %{$self->{tmpfiles}}) {
+    unlink($fn) or dbg("check: cannot unlink $fn: $!");
+  }
 }
 
 ###########################################################################
@@ -356,6 +387,9 @@ sub check_timed {
   $self->{head_only_points} = 0;
   $self->{score} = 0;
 
+  # flush any old stale DNS responses
+  $self->{main}->{resolver}->flush_responses();
+
   # clear NetSet cache before every check to prevent it growing too large
   foreach my $nset_name (qw(internal_networks trusted_networks msa_networks)) {
     my $netset = $self->{conf}->{$nset_name};
@@ -369,7 +403,7 @@ sub check_timed {
   # this lets us see ludicrously spammish mails (score: 40) etc., which
   # we can then immediately submit to spamblocking services.
   #
-  # TODO: change this to do whitelist/blacklists first? probably a plan
+  # TODO: change this to do welcomelist/blocklists first? probably a plan
   # NOTE: definitely need AWL stuff last, for regression-to-mean of score
 
   # TVD: we may want to do more than just clearing out the headers, but ...
@@ -402,7 +436,7 @@ sub check_timed {
 
   # now that we've finished checking the mail, clear out this cache
   # to avoid unforeseen side-effects.
-  $self->{c} = { };
+  $self->{get_cache} = { };
 
   # Round the score to 3 decimal places to avoid rounding issues
   # We assume required_score to be properly rounded already.
@@ -419,6 +453,75 @@ sub check_timed {
   $self->{main}->call_plugins ("check_end", { permsgstatus => $self });
 
   1;
+}
+
+# Called from Check.pm after Plugins check_cleanup calls
+# Cleanup and finish things before learning/rewrites etc
+# TODO: document?
+sub check_cleanup {
+  my ($self) = shift;
+
+  # Create subjprefix
+  if (defined $self->{subjprefix}) {
+    $self->{tag_data}->{SUBJPREFIX} = $self->{subjprefix};
+  }
+
+  # Create reports
+  $self->{tag_data}->{REPORT} = '';
+  $self->{tag_data}->{SUMMARY} = '';
+  my $test_logs = $self->{test_logs};
+  my $scores = $self->{conf}->{scores};
+  foreach my $rule (@{$self->{test_names_hit}}) {
+    my $score = $scores->{$rule};
+    my $area = $test_logs->{$rule}->{area} || '';
+    my $desc = $test_logs->{$rule}->{desc} || '';
+
+    if ($score >= 10 || $score <= -10) {
+      $score = sprintf("%4.0f", $score);
+    } else {
+      $score = sprintf("%4.1f", $score);
+    }
+
+    my $terse = '';
+    my $long = '';
+    if (defined $test_logs->{$rule}->{msg}) {
+      my @msgs;
+      if (($self->{conf}->{tflags}->{$rule}||'') =~ /\bnolog\b/) {
+        push(@msgs, '*REDACTED*');
+      } else {
+        @msgs = @{$test_logs->{$rule}->{msg}};
+      }
+      local $1;
+      foreach my $msg (@msgs) {
+        while ($msg =~ s/^(.{30,48})\s//) {
+          $terse .= sprintf ("[%s]\n", $1);
+          if (length($1) > 47) {
+            $long .= sprintf ("%78s\n", "[$1]");
+          } else {
+            $long .= sprintf ("%27s [%s]\n", "", $1);
+          }
+        }
+        $terse .= sprintf ("[%s]\n", $msg);
+        if (length($msg) > 47) {
+          $long .= sprintf ("%78s\n", "[$msg]");
+        } else {
+          $long .= sprintf ("%27s [%s]\n", "", $msg);
+        }
+      }
+    }
+
+    $self->{tag_data}->{REPORT} .= sprintf ("* %s %s %s%s\n%s",
+        $score, $rule, $area,
+        $self->_wrap_desc($desc,
+            4+length($rule)+length($score)+length($area), "*      "),
+        ($terse ? "*      " . $terse : ''));
+
+    $self->{tag_data}->{SUMMARY} .= sprintf ("%s %-22s %s%s\n%s",
+        $score, $rule, $area,
+        $self->_wrap_desc($desc,
+            3+length($rule)+length($score)+length($area), " " x 28),
+        $long);
+  }
 }
 
 ###########################################################################
@@ -528,7 +631,7 @@ ignored:
 
   - rules with tflags set to 'learn' (the Bayesian rules)
 
-  - rules with tflags set to 'userconf' (user white/black-listing rules, etc)
+  - rules with tflags set to 'userconf' (user welcome/block-listing rules, etc)
 
   - rules with tflags set to 'noautolearn'
 
@@ -620,6 +723,21 @@ sub get_autolearn_force_names {
   return $names;
 }
 
+sub _get_autolearn_testtype {
+  my ($self, $test) = @_;
+  return '' unless defined $test;
+  return 'head' if $test == $Mail::SpamAssassin::Conf::TYPE_HEAD_TESTS
+                || $test == $Mail::SpamAssassin::Conf::TYPE_HEAD_EVALS;
+  return 'body' if $test == $Mail::SpamAssassin::Conf::TYPE_BODY_TESTS
+                || $test == $Mail::SpamAssassin::Conf::TYPE_BODY_EVALS
+                || $test == $Mail::SpamAssassin::Conf::TYPE_RAWBODY_TESTS
+                || $test == $Mail::SpamAssassin::Conf::TYPE_RAWBODY_EVALS
+                || $test == $Mail::SpamAssassin::Conf::TYPE_URI_TESTS
+                || $test == $Mail::SpamAssassin::Conf::TYPE_URI_EVALS;
+  return 'meta' if $test == $Mail::SpamAssassin::Conf::TYPE_META_TESTS;
+  return '';
+}
+
 sub _get_autolearn_points {
   my ($self) = @_;
 
@@ -627,11 +745,13 @@ sub _get_autolearn_points {
   # ensure it only gets computed once, even if we return early
   $self->{autolearn_points} = 0;
 
+  my $conf = $self->{conf};
+
   # This function needs to use use sum($score[scoreset % 2]) not just {score}.
   # otherwise we shift what we autolearn on and it gets really weird.  - tvd
-  my $orig_scoreset = $self->{conf}->get_score_set();
+  my $orig_scoreset = $conf->get_score_set();
   my $new_scoreset = $orig_scoreset;
-  my $scores = $self->{conf}->{scores};
+  my $scores = $conf->{scores};
 
   if (($orig_scoreset & 2) == 0) { # we don't need to recompute
     dbg("learn: auto-learn: currently using scoreset $orig_scoreset");
@@ -639,10 +759,10 @@ sub _get_autolearn_points {
   else {
     $new_scoreset = $orig_scoreset & ~2;
     dbg("learn: auto-learn: currently using scoreset $orig_scoreset, recomputing score based on scoreset $new_scoreset");
-    $scores = $self->{conf}->{scoreset}->[$new_scoreset];
+    $scores = $conf->{scoreset}->[$new_scoreset];
   }
 
-  my $tflags = $self->{conf}->{tflags};
+  my $tflags = $conf->{tflags};
   my $points = 0;
 
   # Just in case this function is called multiple times, clear out the
@@ -653,6 +773,7 @@ sub _get_autolearn_points {
   $self->{autolearn_force} = 0;
 
   foreach my $test (@{$self->{test_names_hit}}) {
+    my $force_type = '';
     # According to the documentation, noautolearn, userconf, and learn
     # rules are ignored for autolearning.
     if (exists $tflags->{$test}) {
@@ -663,7 +784,7 @@ sub _get_autolearn_points {
       # Use the original scoreset since it'll be 0 in sets 0 and 1.
       if ($tflags->{$test} =~ /\blearn\b/) {
 	# we're guaranteed that the score will be defined
-        $self->{learned_points} += $self->{conf}->{scoreset}->[$orig_scoreset]->{$test};
+        $self->{learned_points} += $conf->{scoreset}->[$orig_scoreset]->{$test};
 	next;
       }
 
@@ -673,6 +794,12 @@ sub _get_autolearn_points {
         #ADD RULE NAME TO LIST
         $self->{autolearn_force_names}.="$test,";
       }
+
+      # Bug 7907
+      local $1;
+      if ($tflags->{$test} =~ /\bautolearn_(body|header)\b/) {
+        $force_type = $1;
+      }
     }
 
     # ignore tests with 0 score (or undefined) in this scoreset
@@ -680,14 +807,41 @@ sub _get_autolearn_points {
 
     # Go ahead and add points to the proper locations
     # Changed logic because in testing, I was getting both head and body. Bug 5503
-    if ($self->{conf}->maybe_header_only ($test)) {
+    # Cleanup logic, Bug 7905/7906
+    my $type = $self->_get_autolearn_testtype($conf->{test_types}->{$test});
+    if ($force_type eq 'header' || ($force_type eq '' && $type eq 'head')) {
       $self->{head_only_points} += $scores->{$test};
-      dbg("learn: auto-learn: adding head_only points $scores->{$test}");
-    } elsif ($self->{conf}->maybe_body_only ($test)) {
+      dbg("learn: auto-learn: adding header points $scores->{$test} ($test)");
+    }
+    elsif ($force_type eq 'body' || ($force_type eq '' && $type eq 'body')) {
       $self->{body_only_points} += $scores->{$test};
-      dbg("learn: auto-learn: adding body_only points $scores->{$test}");
-    } else {
-      dbg("learn: auto-learn: not considered head or body scores: $scores->{$test}");
+      dbg("learn: auto-learn: adding body points $scores->{$test} ($test)");
+    }
+    elsif ($type eq 'meta') {
+      if ($conf->{meta_dependencies}->{$test}) {
+        my $dep_head = 0;
+        my $dep_body = 0;
+        foreach my $deptest (@{$conf->{meta_dependencies}->{$test}}) {
+          my $deptype = $self->_get_autolearn_testtype($conf->{test_types}->{$deptest});
+          if ($deptype eq 'head') { $dep_head++; }
+          elsif ($deptype eq 'body') { $dep_body++; }
+        }
+        if ($dep_head || $dep_body) {
+          my $dep_total = $dep_head + $dep_body;
+          my $p_head = sprintf "%0.3f", $scores->{$test} * ($dep_head / $dep_total);
+          my $p_body = sprintf "%0.3f", $scores->{$test} * ($dep_body / $dep_total);
+          $self->{head_only_points} += $p_head;
+          $self->{body_only_points} += $p_body;
+          dbg("learn: auto-learn: adding $p_head header and $p_body body points, $dep_head/$dep_body ratio ($test)");
+        } else {
+          dbg("learn: auto-learn: not considered as header or body points, no header/body deps ($test)");
+        }
+      } else {
+          dbg("learn: auto-learn: not considered as header or body points, no meta deps ($test)");
+      }
+    }
+    else {
+      dbg("learn: auto-learn: not considered as header or body points, ignored ruletype ($test)");
     }
 
     $points += $scores->{$test};
@@ -1050,7 +1204,7 @@ sub _get_added_headers {
   foreach my $hf_ref (@{$self->{conf}->{$which}}) {
     my($hfname, $hfbody) = @$hf_ref;
     my $line = $self->_process_header($hfname,$hfbody);
-    $line = $self->qp_encode_header($line);
+    $line = $self->mime_encode_header($line);
     $str .= "X-Spam-$hfname: $line\n";
   }
   return $str;
@@ -1072,21 +1226,23 @@ sub rewrite_report_safe {
   # This is the new message.
   my $newmsg = '';
 
-  # the report charset
-  my $report_charset = "; charset=iso-8859-1";
-  if ($self->{conf}->{report_charset}) {
-    $report_charset = "; charset=" . $self->{conf}->{report_charset};
-  }
+  # the character set of a report
+  my $report_charset = $self->{conf}->{report_charset} || "UTF-8";
 
   # the SpamAssassin report
   my $report = $self->get_report();
 
-  # If there are any wide characters, need to MIME-encode in UTF-8
-  # TODO: If $report_charset is something other than iso-8859-1/us-ascii, then
-  # we could try converting to that charset if possible
-  unless ($] < 5.008 || utf8::downgrade($report, 1)) {
-      $report_charset = "; charset=utf-8";
-      utf8::encode($report);
+  if (!utf8::is_utf8($report)) {
+    # already in octets
+  } else {
+    # encode to octets
+    if (uc $report_charset eq 'UTF-8') {
+      dbg("check: encoding report to $report_charset");
+      utf8::encode($report);  # very fast
+    } else {
+      dbg("check: encoding report to $report_charset. Slow, to be avoided!");
+      $report = Encode::encode($report_charset, $report);  # slow
+    }
   }
 
   # get original headers, "pristine" if we can do it
@@ -1103,7 +1259,7 @@ sub rewrite_report_safe {
   if (defined $self->{conf}->{rewrite_header}->{Subject}) {
     # Add a prefix to the subject if needed
     $subject = "\n" if !defined $subject;
-    if((defined $self->{subjprefix}) and ($self->{subjprefix} ne "")) {
+    if (defined $self->{subjprefix}) {
       $tag = $self->_replace_tags($self->{subjprefix});
       $tag =~ s/\n/ /gs;
       $subject = $tag . $subject;
@@ -1206,7 +1362,7 @@ Content-Type: multipart/mixed; boundary="$boundary"
 This is a multi-part message in MIME format.
 
 --$boundary
-Content-Type: text/plain$report_charset
+Content-Type: text/plain; charset=$report_charset
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 
@@ -1291,19 +1447,14 @@ sub rewrite_no_report_safe {
 	# The tag should be a comment for this header ...
 	$tag = "($tag)" if ($hdr =~ /^(?:From|To)$/);
 
-        if((defined $self->{subjprefix}) and (defined $self->{conf}->{rewrite_header}->{Subject})) {
-	  if($self->{subjprefix} ne "") {
-            $ntag = $self->_replace_tags($self->{subjprefix});
-            $ntag =~ s/\n/ /gs;
-	    $ntag =~ s/\s+$//;
-
-            local $1;
-	    if(defined $ntag) {
-              s/^([^:]+:)[ \t]*(?:\Q${ntag}\E )?/$1 ${ntag} /i;
-	    }
-	  }
-        }
-        s/^([^:]+:)[ \t]*(?:\Q${tag}\E )?/$1 ${tag} /i;
+	if (defined $self->{subjprefix}) {
+	  $ntag = $self->_replace_tags($self->{subjprefix});
+	  $ntag =~ s/\n/ /gs;
+	  $ntag =~ s/\s+$//;
+	  local $1;
+	  s/^([^:]+:)[ \t]*(?:\Q${ntag}\E )?/$1 ${ntag} /i;
+	}
+	s/^([^:]+:)[ \t]*(?:\Q${tag}\E )?/$1 ${tag} /i;
       }
 
       $addition = 'headers_spam';
@@ -1326,20 +1477,14 @@ sub rewrite_no_report_safe {
 	my $hdr = ucfirst(lc($1));
 	next if (!defined $self->{conf}->{rewrite_header}->{$hdr});
 
-        if((defined $self->{subjprefix}) and (defined $self->{conf}->{rewrite_header}->{Subject})) {
-	  if($self->{subjprefix} ne "") {
-            $ntag = $self->_replace_tags($self->{subjprefix});
-            $ntag =~ s/\n/ /gs;
-	    $ntag =~ s/\s+$//;
-
-            local $1;
-	    if(defined $ntag) {
-              s/^([^:]+:)[ \t]*(?:\Q${ntag}\E )?/$1 ${ntag} /i;
-	    }
-	  }
+        if (defined $self->{subjprefix}) {
+          $ntag = $self->_replace_tags($self->{subjprefix});
+          $ntag =~ s/\n/ /gs;
+          $ntag =~ s/\s+$//;
+          local $1;
+          s/^([^:]+:)[ \t]*(?:\Q${ntag}\E )?/$1 ${ntag} /i;
         }
       }
-
   }
 
   # Break the pristine header set into two blocks; $new_hdrs_pre is the stuff
@@ -1368,35 +1513,59 @@ sub rewrite_no_report_safe {
   return $newmsg.$self->{msg}->get_pristine_body();
 }
 
-sub qp_encode_header {
+# encode a header field body into ASCII as per RFC 2047
+#
+sub mime_encode_header {
   my ($self, $text) = @_;
 
-  # return unchanged if there are no 8-bit characters
-  return $text  if $text !~ tr/\x00-\x7F//c;
+  utf8::encode($text)  if utf8::is_utf8($text);
 
-  my $cs = 'ISO-8859-1';
-  if ($self->{report_charset}) {
-    $cs = $self->{report_charset};
+  my $result = '';
+  for my $line (split(/^/, $text)) {
+
+    if ($line =~ /^[\x09\x20-\x7E]*\r?\n\z/s) {
+      $result .= $line;  # no need for encoding
+
+    } else {
+      my $prefix = '';
+      my $suffix = '';
+
+      local $1;
+      if ($line =~ s/( (?: ^ | [ \t] ) [\x09\x20-\x7E]* (?: \r?\n )? ) \z//xs) {
+        $suffix = $1;
+      } elsif ($line =~ s/(\r?\n)\z//s) {
+        $suffix = $1;
+      }
+
+      if ($line =~ s/^ ( [\x09\x20-\x7E]* (?: [ \t] | \z ) )//xs) {
+        $prefix = $1;
+      }
+
+      if ($line eq '') {
+        $result .= $prefix . $suffix;
+      } else {
+        my $qp_enc_count = $line =~ tr/=?_\x00-\x1F\x7F-\xFF//;
+        if (length($line) + $qp_enc_count*2 <= 4 * int(length($line)+2)/3) {
+          # RFC 2047: Upper case should be used for hex digits A through F
+          $line =~ s{ ( [=?_\x00-\x20\x7F-\xFF] ) }
+                    { $1 eq ' ' ? '_' : sprintf("=%02X", ord $1) }xges;
+          $result .= $prefix . '=?UTF-8?Q?' . $line;
+        } else {
+          $result .= $prefix . '=?UTF-8?B?' . base64_encode($line);
+        }
+        $result .= '?=' . $suffix;
+      }
+    }
   }
 
-  my @hexchars = split('', '0123456789abcdef');
-  my $ord;
-  local $1;
-  $text =~ s{([\x80-\xff])}{
-		$ord = ord $1;
-		'='.$hexchars[($ord & 0xf0) >> 4].$hexchars[$ord & 0x0f]
-	}ges;
-
-  $text = '=?'.$cs.'?Q?'.$text.'?=';
-
-  dbg("markup: encoding header in $cs: $text");
-  return $text;
+  dbg("markup: mime_encode_header: %s", $result);
+  return $result;
 }
 
 sub _process_header {
   my ($self, $hdr_name, $hdr_data) = @_;
 
-  $hdr_data = $self->_replace_tags($hdr_data);
+  $hdr_data = $self->_replace_tags($hdr_data);  # as octets
   $hdr_data =~ s/(?:\r?\n)+$//; # make sure there are no trailing newlines ...
 
   if ($self->{conf}->{fold_headers}) {
@@ -1426,19 +1595,24 @@ sub _replace_tags {
 
   # default to leaving the original string in place, if we cannot find
   # a tag for it (bug 4793)
-  local($1,$2,$3);
-  $text =~ s{(_(\w+?)(?:\((.*?)\))?_)}{
-        my $full = $1;
-        my $tag = $2;
+  local($1);
+  $text =~ s{_([A-Z][A-Z0-9]*(?:_[A-Z0-9]+)*(?:\(.*?\))?)_}{
+        my $tag = $1;
         my $result;
         if ($tag =~ /^ADDEDHEADER(?:HAM|SPAM|)\z/) {
           # Bug 6278: break infinite recursion through _get_added_headers and
           # _get_tag on an attempt to use such tag in add_header template
         } else {
-          $result = $self->get_tag_raw($tag,$3);
-          $result = join(' ',@$result)  if ref $result eq 'ARRAY';
+          $result = $self->get_tag_raw($tag);
+          if (!ref $result) {
+            utf8::encode($result) if utf8::is_utf8($result);
+          } elsif (ref $result eq 'ARRAY') {
+            my @values = @$result;  # avoid modifying referenced array
+            for (@values) { utf8::encode($_) if utf8::is_utf8($_) }
+            $result = join(' ', @values);
+          }
         }
-        defined $result ? $result : $full;
+        defined $result ? $result : "_${tag}_";
       }ge;
 
   return $text;
@@ -1465,15 +1639,15 @@ sub action_depends_on_tags {
     or die "action_depends_on_tags: argument must be a subroutine ref";
 
   # tag names on which the given action depends
-  my @dep_tags = !ref $tags ? uc $tags : map(uc($_),@$tags);
+  my @dep_tags = !ref $tags ? $tags : @$tags;
 
-  # @{$self->{tagrun_subs}}            list of all submitted subroutines
-  # @{$self->{tagrun_actions}{$tag}}   bitmask of action indices blocked by tag
-  # $self->{tagrun_tagscnt}[$action_ind]  count of tags still pending
-
-  # store action details, obtain its index
-  push(@{$self->{tagrun_subs}}, [$code,@args]);
-  my $action_ind = $#{$self->{tagrun_subs}};
+  # uppercase tag, but not args, f.e. HEADER(foo)
+  local($1,$2);
+  foreach (@dep_tags) {
+    if (/^ ([^\(]+) (\(.*)? $/x) {
+      $_ = uc($1).(defined $2 ? $2 : '');
+    }
+  }
 
   # list dependency tag names which are not already satisfied
   my @blocking_tags;
@@ -1484,16 +1658,24 @@ sub action_depends_on_tags {
     }
   }
 
-  $self->{tagrun_tagscnt}[$action_ind] = scalar @blocking_tags;
-  $self->{tagrun_actions}{$_}[$action_ind] = 1  for @blocking_tags;
+  if (!@blocking_tags) {
+    dbg("check: tagrun - tag %s was ready, runnable immediately: %s",
+        join(', ',@dep_tags), join(', ',$code,@args));
+    &$code($self, @args);
+  } else {
+    # @{$self->{tagrun_subs}}            list of all submitted subroutines
+    # @{$self->{tagrun_actions}{$tag}}   bitmask of action indices blocked by tag
+    # $self->{tagrun_tagscnt}[$action_ind]  count of tags still pending
 
-  if (@blocking_tags) {
+    # store action details, obtain its index
+    push(@{$self->{tagrun_subs}}, [$code,@args]);
+    my $action_ind = $#{$self->{tagrun_subs}};
+
+    $self->{tagrun_tagscnt}[$action_ind] = scalar @blocking_tags;
+    $self->{tagrun_actions}{$_}[$action_ind] = 1  for @blocking_tags;
+
     dbg("check: tagrun - action %s blocking on tags %s",
         $action_ind, join(', ',@blocking_tags));
-  } else {
-    dbg("check: tagrun - tag %s was ready, action %s runnable immediately: %s",
-        join(', ',@dep_tags), $action_ind, join(', ',$code,@args));
-    &$code($self, @args);
   }
 }
 
@@ -1512,7 +1694,7 @@ sub tag_is_ready {
   $tag = uc $tag;
 
   if (would_log('dbg', 'check')) {
-    my $tag_val = $self->{tag_data}{$tag};
+    my $tag_val = $self->{tag_data}->{$tag};
     dbg("check: tagrun - tag %s is now ready, value: %s",
          $tag, !defined $tag_val ? '<UNDEF>'
                : ref $tag_val ne 'ARRAY' ? $tag_val
@@ -1556,9 +1738,12 @@ sub report_unsatisfied_actions {
 
 =item $status->set_tag($tagname, $value)
 
-Set a template tag, as used in C<add_header>, report templates, etc.
-This API is intended for use by plugins.  Tag names will be converted
-to an all-uppercase representation internally.
+Set a template tag, as used in C<add_header>, report templates, etc.  This
+API is intended for use by plugins.  Tag names will be converted to an
+all-uppercase representation internally.  Tag names must consist only of
+[A-Z0-9_] characters and must not contain consecutive underscores.  Also the
+name must not start or end in an underscore, as that is the template tagging
+format.
 
 C<$value> can be a simple scalar (string or number), or a reference to an
 array, in which case the public method get_tag will join array elements
@@ -1568,7 +1753,7 @@ compatibility.
 C<$value> can also be a subroutine reference, which will be evaluated
 each time the template is expanded. The first argument passed by get_tag
 to a called subroutine will be a PerMsgStatus object (this module's object),
-followed by optional arguments provided a caller to get_tag.
+followed by optional arguments provided by a caller to get_tag.
 
 Note that perl supports closures, which means that variables set in the
 caller's scope can be accessed inside this C<sub>. For example:
@@ -1579,10 +1764,9 @@ caller's scope can be accessed inside this C<sub>. For example:
               return $text;
             });
 
-See C<Mail::SpamAssassin::Conf>'s C<TEMPLATE TAGS> section for more details
-on how template tags are used.
-
-C<undef> will be returned if a tag by that name has not been defined.
+See C<Mail::SpamAssassin::Conf>'s C<TEMPLATE TAGS> and C<CAPTURING TAGS
+USING REGEX NAMED CAPTURE GROUPS> sections for more details on how template
+tags are used.
 
 =cut
 
@@ -1598,9 +1782,11 @@ sub set_tag {
 
 Get the current value of a template tag, as used in C<add_header>, report
 templates, etc. This API is intended for use by plugins.  Tag names will be
-converted to an all-uppercase representation internally.  See
-C<Mail::SpamAssassin::Conf>'s C<TEMPLATE TAGS> section for more details on
-tags.
+converted to an all-uppercase representation internally.
+
+See C<Mail::SpamAssassin::Conf>'s C<TEMPLATE TAGS> and C<CAPTURING TAGS
+USING REGEX NAMED CAPTURE GROUPS> sections for more details on how template
+tags are used.
 
 C<undef> will be returned if a tag by that name has not been defined.
 
@@ -1610,7 +1796,14 @@ sub get_tag {
   my($self, $tag, @args) = @_;
 
   return if !defined $tag;
+
+  # handle TAGNAME(args) format
+  local($1);
+  if ($tag =~ s/\((.*?)\)$//) {
+    @args = ($1);
+  }
   $tag = uc $tag;
+
   my $data;
   if (exists $common_tags{$tag}) {
     # tag data from traditional pre-defined tag subroutines
@@ -1639,6 +1832,13 @@ sub get_tag_raw {
   my($self, $tag, @args) = @_;
 
   return if !defined $tag;
+
+  # handle TAGNAME(args) format
+  local($1);
+  if ($tag =~ s/\((.*?)\)$//) {
+    @args = ($1);
+  }
+
   my $data;
   if (exists $common_tags{$tag}) {
     # tag data from traditional pre-defined tag subroutines
@@ -1748,16 +1948,9 @@ sub finish {
 	  permsgstatus => $self
 	});
 
-  $self->report_unsatisfied_actions;
+  $self->report_unsatisfied_actions();
 
-  # Delete out all of the members of $self.  This will remove any direct
-  # circular references and let the memory get reclaimed while also being more
-  # efficient than a foreach() loop over the keys.
-  %{$self} = ();
-}
-
-sub finish_tests {
-  my ($conf) = @_;
+  # Clean up temporary methods
   foreach my $method (@TEMPORARY_METHODS) {
     if (defined &{$method}) {
       undef &{$method};
@@ -1765,8 +1958,17 @@ sub finish_tests {
   }
   @TEMPORARY_METHODS = ();      # clear for next time
   %TEMPORARY_EVAL_GLUE_METHODS = ();
+
+  # Delete out all of the members of $self.  This will remove any direct
+  # circular references and let the memory get reclaimed while also being more
+  # efficient than a foreach() loop over the keys.
+  %{$self} = ();
 }
 
+# Deprecated for clarity, only Plugins have this function
+sub finish_tests {}
+
+###########################################################################
 
 =item $name = $status->get_current_eval_rule_name()
 
@@ -1802,23 +2004,31 @@ sub extract_message_metadata {
     $self->{$item} = $self->{msg}->{metadata}->{$item};
   }
 
-  # TODO: International domain names (UTF-8) must be converted to
-  # ASCII-compatible encoding (ACE) for the purpose of setting the
-  # SENDERDOMAIN and AUTHORDOMAIN tags (and probably for other uses too).
-  # (explicitly required for DMARC, draft-kucherawy-dmarc-base sect. 5.6.1)
+  # International domain names (UTF-8) must be converted to ASCII-compatible
+  # encoding (ACE) for the purpose of setting the SENDERDOMAIN and AUTHORDOMAIN
+  # tags (explicitly required for DMARC, RFC 7489)
   #
   { local $1;
-    my $addr = $self->get('EnvelopeFrom:addr', undef);
+    my $host = ($self->get('EnvelopeFrom:first:addr:host'))[0];
     # collect a FQDN, ignoring potential trailing WSP
-    if (defined $addr && $addr =~ /\@([^@. \t]+\.[^@ \t]+?)[ \t]*\z/s) {
-      $self->set_tag('SENDERDOMAIN', lc $1);
+    if (defined $host) {
+      my $d = idn_to_ascii($host);
+      $self->set_tag('SENDERDOMAIN', $d);
+      $self->{msg}->put_metadata("X-SenderDomain", $d);
+      dbg("metadata: X-SenderDomain: %s", $d);
     }
-    # TODO: the get ':addr' only returns the first address; this should be
-    # augmented to be able to return all addresses in a header field, multiple
-    # addresses in a From header field are allowed according to RFC 5322
-    $addr = $self->get('From:addr', undef);
-    if (defined $addr && $addr =~ /\@([^@. \t]+\.[^@ \t]+?)[ \t]*\z/s) {
-      $self->set_tag('AUTHORDOMAIN', lc $1);
+    my @from_doms;
+    my %seen;
+    foreach ($self->get('From:addr:host')) {
+      next if $seen{$_}++;
+      my $d = idn_to_ascii($_);
+      push @from_doms, $d;
+    }
+    if (@from_doms) {
+      $self->set_tag('AUTHORDOMAIN', @from_doms > 1 ? \@from_doms : $from_doms[0]);
+      my $d = join(" ", @from_doms);
+      $self->{msg}->put_metadata("X-AuthorDomain", $d);
+      dbg("metadata: X-AuthorDomain: %s", $d);
     }
   }
 
@@ -1833,6 +2043,7 @@ sub extract_message_metadata {
     $self->get_decoded_stripped_body_text_array();
   }
   $self->{html} = $self->{msg}->{metadata}->{html};
+  $self->{html_all} = $self->{msg}->{metadata}->{html_all};
 
   # allow plugins to add more metadata, read the stuff that's there, etc.
   $self->{main}->call_plugins ("parsed_metadata", { permsgstatus => $self });
@@ -1880,25 +2091,32 @@ sub get_decoded_stripped_body_text_array {
 
 =item $status->get (header_name [, default_value])
 
-Returns a message header, pseudo-header, real name or address.
-C<header_name> is the name of a mail header, such as 'Subject', 'To',
-etc.  If C<default_value> is given, it will be used if the requested
-C<header_name> does not exist.
+Returns a message header, pseudo-header or a real name, email-address or
+some other parsed value set by modifiers.  C<header_name> is the name of a
+mail header, such as 'Subject', 'To', etc.
 
-Appending C<:raw> to the header name will inhibit decoding of quoted-printable
-or base-64 encoded strings.
+Should be called in list context since 4.0.  Will return list of headers
+content, or other values when modifiers used.
 
-Appending a modifier C<:addr> to a header field name will cause everything
-except the first email address to be removed from the header field.  It is
-mainly applicable to header fields 'From', 'Sender', 'To', 'Cc' along with
-their 'Resent-*' counterparts, and the 'Return-Path'. For example, all of
-the following will result in "example@foo":
+If C<default_value> is given, it will be used if the requested
+C<header_name> does not exist.  This is mainly useful when called in scalar
+context to set 'undef' instead of legacy '' return value when header does
+not exist.
+
+Appending C<:raw> modifier to the header name will inhibit decoding of
+quoted-printable or base-64 encoded strings.
+
+Appending C<:addr> modifier to the header name will return all
+email-addresses found in the header.  It is mainly applicable to header
+fields 'From', 'Sender', 'To', 'Cc' along with their 'Resent-*'
+counterparts, and the 'Return-Path'.  For example, all of the following will
+result in "example@foo" (and "example@bar"):
 
 =over 4
 
 =item example@foo
 
-=item example@foo (Foo Blah)
+=item example@foo (Foo Blah), <example@bar>
 
 =item example@foo, example@bar
 
@@ -1912,18 +2130,18 @@ the following will result in "example@foo":
 
 =back
 
-Appending a modifier C<:name> to a header field name will cause everything
-except the first display name to be removed from the header field. It is
-mainly applicable to header fields containing a single mail address: 'From',
-'Sender', along with their 'Resent-From' and 'Resent-Sender' counterparts.
-For example, all of the following will result in "Foo Blah". One level of
-single quotes is stripped too, as it is often seen.
+Appending C<:name> modifier to the header name will return all "display
+names" from the header field.  As with C<:addr>, it is mainly applicable to
+header fields 'From', 'Sender', 'To', 'Cc' along with their 'Resent-*'
+counterparts, and the 'Return-Path'.  For example, all of the following will
+result in "Foo Blah" (and "Bar Baz").  One level of single quotes is
+stripped too, as it is often seen.
 
 =over 4
 
 =item example@foo (Foo Blah)
 
-=item example@foo (Foo Blah), example@bar
+=item example@foo (Foo Blah), "Bar Baz" <example@bar>
 
 =item display: example@foo (Foo Blah), example@bar ;
 
@@ -1934,6 +2152,28 @@ single quotes is stripped too, as it is often seen.
 =item "'Foo Blah'" <example@foo>
 
 =back
+
+Appending C<:host> to the header name will return the first hostname-looking
+string that ends with a valid TLD.  First it tries to find a match after @
+character (possible email), then from any part of the header.  Normal use of
+this would be for example 'From:addr:host' to return the hostname portion of
+a From-address.
+
+Appending C<:domain> to the header name implies C<:host>, but will return
+only domain part of the hostname, as returned by
+RegistryBoundaries::trim_domain().
+
+Appending C<:ip> to the header name, will return the first IPv4 or IPv6
+address string found.  Could be used for example as 'X-Originating-IP:ip'.
+
+Appending C<:revip> to the header name implies C<:ip>, but will return the
+found IP in reverse (usually for DNSBL usage).
+
+Appending C<:first> modifier to the header name will return only the first
+(topmost) header, in case there are multiple ones.  Similarly C<:last> will
+select the last one.  These affect only the physical header line selection. 
+If selected header is parsed further with C<:addr> or similar, it may return
+multiple results, if the selected header contains multiple addresses.
 
 There are several special pseudo-headers that can be specified:
 
@@ -1975,6 +2215,12 @@ the message has passed through
 =item C<X-Spam-Relays-Trusted> is the generated metadata of trusted relays
 the message has passed through
 
+=item C<X-Spam-Relays-External> is the generated metadata of external relays
+the message has passed through
+
+=item C<X-Spam-Relays-Internal> is the generated metadata of internal relays
+the message has passed through
+
 =back
 
 =cut
@@ -1983,90 +2229,106 @@ the message has passed through
 sub _get {
   my ($self, $request) = @_;
 
-  my $result;
+  my @results;
   my $getaddr = 0;
   my $getname = 0;
   my $getraw = 0;
+  my $needraw = 0;
+  my $gethost = 0;
+  my $getdomain = 0;
+  my $getip = 0;
+  my $getrevip = 0;
+  my $getfirst = 0;
+  my $getlast = 0;
 
   # special queries - process and strip modifiers
   if (index($request,':') >= 0) {  # triage
     local $1;
     while ($request =~ s/:([^:]*)//) {
-      if    ($1 eq 'raw')  { $getraw  = 1 }
-      elsif ($1 eq 'addr') { $getaddr = $getraw = 1 }
-      elsif ($1 eq 'name') { $getname = 1 }
+      if    ($1 eq 'raw')    { $getraw  = 1 }
+      elsif ($1 eq 'addr')   { $getaddr = $needraw = 1 }
+      elsif ($1 eq 'name')   { $getname = $needraw = 1 }
+      elsif ($1 eq 'host')   { $gethost = 1 }
+      elsif ($1 eq 'domain') { $gethost = $getdomain = 1 }
+      elsif ($1 eq 'ip')     { $getip = 1 }
+      elsif ($1 eq 'revip')  { $getip = $getrevip = 1 }
+      elsif ($1 eq 'first')  { $getfirst = 1 }
+      elsif ($1 eq 'last')   { $getlast = 1 }
     }
   }
   my $request_lc = lc $request;
 
   # ALL: entire pristine or semi-raw headers
   if ($request eq 'ALL') {
-    return ($getraw ? $self->{msg}->get_pristine_header()
-                    : $self->{msg}->get_all_headers(0));
+    if ($getraw) {
+      @results = $self->{msg}->get_pristine_header() =~ /^([^ \t].*?\n)(?![ \t])/smgi;
+    } else {
+      @results = $self->{msg}->get_all_headers(0);
+    }
+    return \@results;
   }
   # ALL-TRUSTED: entire trusted raw headers
   elsif ($request eq 'ALL-TRUSTED') {
     # '+1' since we added the received header even though it's not considered
     # trusted, so we know that those headers can be trusted too
-    return $self->get_all_hdrs_in_rcvd_index_range(
+    @results = $self->get_all_hdrs_in_rcvd_index_range(
 			undef, $self->{last_trusted_relay_index}+1,
 			undef, undef, $getraw);
+    return \@results;
   }
   # ALL-INTERNAL: entire internal raw headers
   elsif ($request eq 'ALL-INTERNAL') {
     # '+1' for the same reason as in ALL-TRUSTED above
-    return $self->get_all_hdrs_in_rcvd_index_range(
+    @results = $self->get_all_hdrs_in_rcvd_index_range(
 			undef, $self->{last_internal_relay_index}+1,
 			undef, undef, $getraw);
+    return \@results;
   }
   # ALL-UNTRUSTED: entire untrusted raw headers
   elsif ($request eq 'ALL-UNTRUSTED') {
     # '+1' for the same reason as in ALL-TRUSTED above
-    return $self->get_all_hdrs_in_rcvd_index_range(
+    @results = $self->get_all_hdrs_in_rcvd_index_range(
 			$self->{last_trusted_relay_index}+1, undef,
 			undef, undef, $getraw);
+    return \@results;
   }
   # ALL-EXTERNAL: entire external raw headers
   elsif ($request eq 'ALL-EXTERNAL') {
     # '+1' for the same reason as in ALL-TRUSTED above
-    return $self->get_all_hdrs_in_rcvd_index_range(
+    @results = $self->get_all_hdrs_in_rcvd_index_range(
 			$self->{last_internal_relay_index}+1, undef,
 			undef, undef, $getraw);
+    return \@results;
   }
   # EnvelopeFrom: the SMTP MAIL FROM: address
   elsif ($request_lc eq "\LEnvelopeFrom") {
-    $result = $self->get_envelope_from();
+    push @results, $self->get_envelope_from();
   }
   # untrusted relays list, as string
   elsif ($request_lc eq "\LX-Spam-Relays-Untrusted") {
-    $result = $self->{relays_untrusted_str};
+    push @results, $self->{relays_untrusted_str};
   }
   # trusted relays list, as string
   elsif ($request_lc eq "\LX-Spam-Relays-Trusted") {
-    $result = $self->{relays_trusted_str};
+    push @results, $self->{relays_trusted_str};
   }
   # external relays list, as string
   elsif ($request_lc eq "\LX-Spam-Relays-External") {
-    $result = $self->{relays_external_str};
+    push @results, $self->{relays_external_str};
   }
   # internal relays list, as string
   elsif ($request_lc eq "\LX-Spam-Relays-Internal") {
-    $result = $self->{relays_internal_str};
+    push @results, $self->{relays_internal_str};
   }
   # ToCc: the combined recipients list
   elsif ($request_lc eq "\LToCc") {
-    $result = join("\n", $self->{msg}->get_header('To', $getraw));
-    if ($result ne '') {
-      chomp $result;
-      $result .= ", " if $result =~ /\S/;
-    }
-    $result .= join("\n", $self->{msg}->get_header('Cc', $getraw));
-    $result = undef if $result eq '';
+    push @results, $self->{msg}->get_header('To', $getraw);
+    push @results, $self->{msg}->get_header('Cc', $getraw);
   }
   # MESSAGEID: handle lists which move the real message-id to another
   # header for resending.
   elsif ($request eq 'MESSAGEID') {
-    $result = join("\n", grep { defined($_) && $_ ne '' }
+    push @results, grep { defined($_) && $_ ne '' } (
 		   $self->{msg}->get_header('X-Message-Id', $getraw),
 		   $self->{msg}->get_header('Resent-Message-Id', $getraw),
 		   $self->{msg}->get_header('X-Original-Message-ID', $getraw),
@@ -2074,83 +2336,126 @@ sub _get {
   }
   # a conventional header
   else {
-    my @results = $getraw ? $self->{msg}->raw_header($request)
-                          : $self->{msg}->get_header($request);
-  # dbg("message: get(%s)%s = %s",
-  #     $request, $getraw?'raw':'', join(", ",@results));
-    if (@results) {
-      $result = join('', @results);
-    } else {  # metadata
-      $result = $self->{msg}->get_metadata($request);
+    my @res = $getraw||$needraw ? $self->{msg}->raw_header($request)
+                                : $self->{msg}->get_header($request);
+    if (!@res) {
+      if (defined(my $m = $self->{msg}->get_metadata($request))) {
+        push @res, $m;
+      }
     }
+    push @results, @res if @res;
   }
 
-  # special queries
-  if (defined $result && ($getaddr || $getname)) {
-    local $1;
-    $result =~ s/^[^:]+:(.*);\s*$/$1/gs;	# 'undisclosed-recipients: ;'
-    $result =~ s/\s+/ /g;			# reduce whitespace
-    $result =~ s/^\s+//;			# leading whitespace
-    $result =~ s/\s+$//;			# trailing whitespace
-
-    if ($getaddr) {
-      # Get the email address out of the header
-      # All of these should result in "jm@foo":
-      # jm@foo
-      # jm@foo (Foo Blah)
-      # jm@foo, jm@bar
-      # display: jm@foo (Foo Blah), jm@bar ;
-      # Foo Blah <jm@foo>
-      # "Foo Blah" <jm@foo>
-      # "'Foo Blah'" <jm@foo>
-      #
-      # strip out the (comments)
-      $result =~ s/\s*\(.*?\)//g;
-      # strip out the "quoted text", unless it's the only thing in the string
-      if ($result !~ /^".*"$/) {
-        $result =~ s/(?<!<)"[^"]*"(?!\@)//g;   #" emacs
-      }
-      # Foo Blah <jm@xxx> or <jm@xxx>
-      local $1;
-      $result =~ s/^[^"<]*?<(.*?)>.*$/$1/;
-      # multiple addresses on one line? remove all but first
-      $result =~ s/,.*$//;
-    }
-    elsif ($getname) {
-      # Get the display name out of the header
-      # All of these should result in "Foo Blah":
-      #
-      # jm@foo (Foo Blah)
-      # (Foo Blah) jm@foo
-      # jm@foo (Foo Blah), jm@bar
-      # display: jm@foo (Foo Blah), jm@bar ;
-      # Foo Blah <jm@foo>
-      # "Foo Blah" <jm@foo>
-      # "'Foo Blah'" <jm@foo>
-      #
-      local $1;
-      # does not handle mailbox-list or address-list or quotes well, to be improved
-      if ($result =~ /^ \s* " (.*?) (?<!\\)" \s* < [^<>]* >/sx ||
-          $result =~ /^ \s* (.*?) \s* < [^<>]* >/sx) {
-        $result = $1;  # display-name, RFC 5322
-        # name-addr    = [display-name] angle-addr
-        # display-name = phrase
-        # phrase       = 1*word / obs-phrase
-        # word         = atom / quoted-string
-        # obs-phrase   = word *(word / "." / CFWS)
-        $result =~ s{ " ( (?: [^"\\] | \\. )* ) " }
-                { my $s=$1; $s=~s{\\(.)}{$1}gs; $s }gsxe;
-        $result =~ s/\\"/"/gs;
-      } elsif ($result =~ /^ [^(,]*? \( (.*?) \) /sx) {  # legacy form
-        # nested comments are not handled, to be improved
-        $result = $1;
-      } else {  # no display name
-        $result = '';
-      }
-      $result =~ s/^ \s* ' \s* (.*?) \s* ' \s* \z/$1/sx;
-    }
+  # Nothing found to process further, bail out quick
+  if (!@results) {
+    return \@results;
   }
-  return $result;
+
+  # Continue processing only first (topmost) or last header
+  if ($getfirst) {
+    @results = ($results[0]);
+  } elsif ($getlast) {
+    @results = ($results[-1]);
+  }
+
+  # special addr/name
+  if ($getaddr || $getname) {
+    my @res;
+    foreach my $line (@results) {
+      next unless defined $line;
+      # Note: parse_header_addresses always called with raw undecoded value
+      # Skip invalid addresses here
+      my @addrs = parse_header_addresses($line);
+      if (@addrs) {
+        if ($getaddr) {
+          foreach my $addr (@addrs) {
+            push @res, $addr->{address} if defined $addr->{address};
+          }
+        }
+        elsif ($getname) {
+          foreach my $addr (@addrs) {
+            next unless defined $addr->{phrase};
+            if ($getraw) {
+              # phrase=name, could also be username or comment unless name found
+              push @res, $addr->{phrase};
+            } else {
+              # If :raw was not specifically asked, decode mimewords
+              # TODO: silly call to Node module, should probably be in Util
+              my $decoded = Mail::SpamAssassin::Message::Node::_decode_header(
+                              $addr->{phrase}, "PMS:get:$request");
+              # Normalize whitespace, unless it's all white-space
+              if ($decoded =~ /\S/) {
+                $decoded =~ s/\s+/ /gs;
+                $decoded =~ s/^\s+//;
+                $decoded =~ s/\s+$//;
+                $decoded =~ s/^'(.*?)'$/$1/; # remove single quotes
+              }
+              push @res, $decoded if defined $decoded;
+            }
+          }
+        }
+      }
+    }
+    @results = @res;
+  }
+
+  # special host/domain
+  if (@results && ($gethost || $getdomain || $getip)) {
+    my @res;
+    if ($gethost) {
+      # TODO: IDN matching needs honing
+      my $tldsRE = $self->{main}->{registryboundaries}->{valid_tlds_re};
+      #my $hostRE = qr/(?<![._-])\b([a-z\d][a-z\d._-]{0,251}\.${tldsRE})\b(?![._-])/i;
+      my $hostRE = qr/(?<![._-])(\S{1,251}\.${tldsRE})(?![._-])/i;
+      foreach my $line (@results) {
+        next unless defined $line;
+        my $host;
+        if ($getaddr) {
+          # If :addr already preparsed the line, just grab domain liberally
+          if ($line =~ /.*\@(\S+)/) {
+            $host = $1;
+          }
+        }
+        else {
+          # try grabbing email/msgid domain first, because user part might look like
+          # a valid host..
+          if ($line =~ /.*\@${hostRE}/i) {
+            if (is_fqdn_valid(idn_to_ascii($1), 1)) {
+              $host = $1;
+            }
+          }
+          # otherwise try hard to find a valid host
+          if (!$host) {
+            while ($line =~ /${hostRE}/ig) {
+              if (is_fqdn_valid(idn_to_ascii($1), 1)) {
+                $host = $1;
+                last;
+              }
+            }
+          }
+        }
+        if ($host) {
+          if ($getdomain) {
+            $host = $self->{main}->{registryboundaries}->trim_domain($host, 1);
+          }
+          push @res, $host;
+        }
+      }
+    } else {
+      my $ipRE = qr/(?<!\.)\b(${IP_ADDRESS})\b(?!\.)/;
+      foreach my $line (@results) {
+        next unless defined $line;
+        my $host;
+        if ($line =~ $ipRE) {
+          $host = $getrevip ? reverse_ip_address($1) : $1;
+        }
+        push @res, $host  if defined $host;
+      }
+    }
+    @results = @res;
+  }
+
+  return \@results;
 }
 
 # optimized for speed
@@ -2158,8 +2463,8 @@ sub _get {
 # $_[1] is request
 # $_[2] is defval
 sub get {
-  my $cache = $_[0]->{c};
-  my $found;
+  my $cache = $_[0]->{get_cache};
+  my $found = [];
   if (exists $cache->{$_[1]}) {
     # return cache entry if it is known
     # (measured hit/attempts rate on a production mailer is about 47%)
@@ -2167,13 +2472,34 @@ sub get {
   } else {
     # fill in a cache entry
     $found = _get(@_);
+    # filter out undefined
+    @$found = grep { defined } @$found;
     $cache->{$_[1]} = $found;
   }
   # if the requested header wasn't found, we should return a default value
   # as specified by the caller: if defval argument is present it represents
   # a default value even if undef; if defval argument is absent a default
   # value is an empty string for upwards compatibility
-  return (defined $found ? $found : @_ > 2 ? $_[2] : '');
+  if (@$found) {
+    # new list context usage in 4.0, return all values always
+    if (wantarray) {
+      return @$found;
+    }
+    # legacy scalar context expected only single return value for some
+    # queries, without a newline
+    if ($_[1] =~ /:(?:addr|name|host|domain|ip|revip)\b/ ||
+        $_[1] eq 'EnvelopeFrom') {
+      my $res = $found->[0];
+      $res =~ s/\n\z$//;
+      return $res;
+    } else {
+      return join('', @$found);
+    }
+  } elsif (@_ > 2) {
+    return wantarray ? ($_[2]) : $_[2];
+  } else {
+    return wantarray ? () : '';
+  }
 }
 
 ###########################################################################
@@ -2384,6 +2710,9 @@ sub _process_text_uri_list {
       next if exists $seen{$rawuri};
       $seen{$rawuri} = 1;
 
+      # Ignore bogus mail captures (@ might have been trimmed from the end above..)
+      next if $rawtype eq 'mail' && index($rawuri, '@') == -1;
+
       dbg("uri: found rawuri from text ($rawtype): $rawuri") if $would_log_uri_all;
 
       # Quick ignore if schemeless host not valid
@@ -2409,6 +2738,10 @@ sub _process_text_uri_list {
           $uri = "ftp://$uri";
         }
         elsif ($uri =~ /^www\d{0,2}\./i) {
+          $uri = "http://$uri";
+        }
+        elsif ($uri =~ /\/.+\@/) {
+          # if a "/" is found before @ it cannot be a valid email address
           $uri = "http://$uri";
         }
         elsif (index($uri, '@') != -1) {
@@ -2456,18 +2789,20 @@ sub _process_html_uri_list {
   my ($self) = @_;
 
   # get URIs from HTML parsing
-  # use the metadata version since $self->{html} may not be setup
-  my $detail = $self->{msg}->{metadata}->{html}->{uri_detail} || { };
-  $self->{'uri_truncated'} = 1 if $self->{msg}->{metadata}->{html}->{uri_truncated};
+  # use the metadata version since $self->{html_all} may not be setup
+  foreach my $html (@{$self->{msg}->{metadata}->{html_all}}) {
+    my $detail = $html->{uri_detail} || { };
+    $self->{'uri_truncated'} = 1 if $html->{uri_truncated};
 
-  # canonicalize the HTML parsed URIs
-  while(my($uri, $info) = each %{ $detail }) {
-    if ($self->add_uri_detail_list($uri, $info->{types}, 'html', 0)) {
-      # Need also to copy and uniq anchor text
-      if (exists $info->{anchor_text}) {
-        my %seen;
-        foreach (grep { !$seen{$_}++ } @{$info->{anchor_text}}) {
-          push @{$self->{uri_detail_list}->{$uri}->{anchor_text}}, $_;
+    # canonicalize the HTML parsed URIs
+    while(my($uri, $info) = each %{ $detail }) {
+      if ($self->add_uri_detail_list($uri, $info->{types}, 'html', 0)) {
+        # Need also to copy and uniq anchor text
+        if (exists $info->{anchor_text}) {
+          my %seen;
+          foreach (grep { !$seen{$_}++ } @{$info->{anchor_text}}) {
+            push @{$self->{uri_detail_list}->{$uri}->{anchor_text}}, $_;
+          }
         }
       }
     }
@@ -2486,15 +2821,16 @@ sub _process_dkim_uri_list {
 
   # Look for the domain in DK/DKIM headers
   if ($self->{conf}->{parse_dkim_uris}) {
-    my $dk = join(" ", grep {defined} ( $self->get('DomainKey-Signature',undef ),
-                                        $self->get('DKIM-Signature',undef) ));
-    while ($dk =~ /\bd\s*=\s*([^;]+)/g) {
-      my $d = $1;
-      $d =~ s/\s+//g;
-      # prefix with domainkeys: so it doesn't merge with identical keys
-      $self->add_uri_detail_list("domainkeys:$d",
-        {'domainkeys'=>1, 'nocanon'=>1, 'noclean'=>1},
-        'domainkeys', 1);
+    foreach my $dk ( $self->get('DomainKey-Signature'),
+                     $self->get('DKIM-Signature') ) {
+      while ($dk =~ /\bd\s*=\s*([^;]+)/g) {
+        my $d = $1;
+        $d =~ s/\s+//g;
+        # prefix with domainkeys: so it doesn't merge with identical keys
+        $self->add_uri_detail_list("domainkeys:$d",
+          {'domainkeys'=>1, 'nocanon'=>1, 'noclean'=>1},
+          'domainkeys', 1);
+      }
     }
   }
 }
@@ -2538,7 +2874,7 @@ sub add_uri_detail_list {
   if ($types->{nocanon}) {
     push @uris, $uri;
   } else {
-    @uris = uri_list_canonicalize($self->{conf}->{redirector_patterns}, $uri);
+    @uris = uri_list_canonicalize($self->{conf}->{redirector_patterns}, [$uri], $self->{main}->{registryboundaries});
   }
   foreach my $cleanuri (@uris) {
     # Make sure all the URIs are nice and short
@@ -2583,35 +2919,10 @@ sub add_uri_detail_list {
   return 1;
 }
 
-
 ###########################################################################
 
-sub ensure_rules_are_complete {
-  my $self = shift;
-  my $metarule = shift;
-  # @_ is now the list of rules
-
-  foreach my $r (@_) {
-    # dbg("rules: meta rule depends on net rule $r");
-    next if ($self->is_rule_complete($r));
-
-    dbg("rules: meta rule $metarule depends on pending rule $r, blocking");
-    my $timer = $self->{main}->time_method("wait_for_pending_rules");
-
-    my $start = time;
-    $self->harvest_until_rule_completes($r);
-    my $elapsed = sprintf "%.2f", time - $start;
-
-    if (!$self->is_rule_complete($r)) {
-      dbg("rules: rule $r is still not complete; exited early?");
-    }
-    elsif ($elapsed > 0) {
-      my $txt = "rules: $r took $elapsed seconds to complete, for $metarule";
-      # Info only if something took over 1 sec to wait, prevent log flood
-      if ($elapsed >= 1) { info($txt); } else { dbg($txt); }
-    }
-  }
-}
+# Deprecated since 4.0, meta rules do not depend on priorities anymore
+sub ensure_rules_are_complete {}
 
 ###########################################################################
 
@@ -2658,35 +2969,25 @@ ENDOFEVAL
   eval $evalstr . '; 1'   ## no critic
   or do {
     my $eval_stat = $@ ne '' ? $@ : "errno=$!";  chomp $eval_stat;
-    warn "rules: failed to run header tests, skipping some: $eval_stat\n";
+    warn "rules: failed to compile method '$function': $eval_stat\n";
     $self->{rule_errors}++;
   };
 
-  # ensure this method is deleted if finish_tests() is called
+  # ensure this method is deleted if finish() is called
   push (@TEMPORARY_METHODS, $function);
 }
 
 ###########################################################################
 
-# note: only eval tests should store state in $self->{test_log_msgs};
-# pattern tests do not.
-#
-# the clearing of the test state is now inlined as:
-#
-# %{$self->{test_log_msgs}} = ();        # clear test state
-#
-# except for this public API for plugin use:
-
 =item $status->clear_test_state()
 
-Clear test state, including test log messages from C<$status-E<gt>test_log()>.
+DEPRECATED, UNNEEDED SINCE 4.0
 
 =cut
 
-sub clear_test_state {
-    my ($self) = @_;
-    %{$self->{test_log_msgs}} = ();
-}
+sub clear_test_state {}
+
+###########################################################################
 
 # internal API, called only by got_hit()
 # TODO: refactor and merge this into that function
@@ -2701,7 +3002,7 @@ sub _handle_hit {
       });
 
     # ignore meta-match sub-rules.
-    if ($rule =~ /^__/) { push(@{$self->{subtest_names_hit}}, $rule); return; }
+    if (index($rule, '__') == 0) { push(@{$self->{subtest_names_hit}}, $rule); return; }
 
     # this should not happen; warn about it
     if (!defined $score) {
@@ -2719,32 +3020,10 @@ sub _handle_hit {
     $self->{score} += $score;
 
     push(@{$self->{test_names_hit}}, $rule);
-    $area ||= '';
 
-    if ($score >= 10 || $score <= -10) {
-      $score = sprintf("%4.0f", $score);
-    }
-    else {
-      $score = sprintf("%4.1f", $score);
-    }
-
-    # save both summaries
-    # TODO: this is slower than necessary, if we only need one
-    $self->{tag_data}->{REPORT} .= sprintf ("* %s %s %s%s\n%s",
-              $score, $rule, $area,
-              $self->_wrap_desc($desc,
-                  4+length($rule)+length($score)+length($area), "*      "),
-              ($self->{test_log_msgs}->{TERSE} ?
-              "*      " . $self->{test_log_msgs}->{TERSE} : ''));
-
-    $self->{tag_data}->{SUMMARY} .= sprintf ("%s %-22s %s%s\n%s",
-              $score, $rule, $area,
-              $self->_wrap_desc($desc,
-                  3+length($rule)+length($score)+length($area), " " x 28),
-              ($self->{test_log_msgs}->{LONG} || ''));
-    if((defined $self->{subjprefix}) and ($self->{subjprefix} ne "")) {
-      $self->{tag_data}->{SUBJPREFIX} = $self->{subjprefix};
-    }
+    # Save for report processing
+    $self->{test_logs}->{$rule}->{area} = $area;
+    $self->{test_logs}->{$rule}->{desc} = $desc;
 }
 
 sub _wrap_desc {
@@ -2832,7 +3111,6 @@ sub got_hit {
   # adding a hit does nothing if we don't have a score -- we probably
   # shouldn't have run it in the first place
   if (!$score) {
-    %{$self->{test_log_msgs}} = ();
     return;
   }
 
@@ -2851,10 +3129,10 @@ sub got_hit {
   my $already_hit = $self->{tests_already_hit}->{$rule} || 0;
   # don't count hits multiple times, unless 'tflags multiple' is on
   if ($already_hit && ($tflags_ref->{$rule}||'') !~ /\bmultiple\b/) {
-    %{$self->{test_log_msgs}} = ();
     return;
   }
 
+  $self->rule_ready($rule, 1); # mark ready for metas
   $self->{tests_already_hit}->{$rule} = $already_hit + $value;
 
   # default ruletype, if not specified:
@@ -2875,11 +3153,12 @@ sub got_hit {
   #$rule_descr = $rule  if !defined $rule_descr || $rule_descr eq '';
   $rule_descr = "No description available." if !defined $rule_descr || $rule_descr eq '';
 
-  if(defined $self->{conf}->{rewrite_header}->{Subject}) {
+  if (defined $self->{conf}->{rewrite_header}->{Subject}) {
     my $rule_subjprefix = $conf_ref->{subjprefix}->{$rule};
     if (defined $rule_subjprefix) {
       dbg("subjprefix: setting Subject prefix to $rule_subjprefix");
-      if($self->{subjprefix} !~ /\Q$rule_subjprefix\E/) {
+      $self->{subjprefix} ||= '';
+      if (index($self->{subjprefix}, $rule_subjprefix) == -1) {
         $self->{subjprefix} .= $rule_subjprefix . " ";  # save dynamic subject prefix.
       }
     }
@@ -2891,39 +3170,63 @@ sub got_hit {
             $params{ruletype},
             $rule_descr);
 
-  # take care of duplicate rules, too (bug 5206)
-  my $dups = $conf_ref->{duplicate_rules}->{$rule};
-  if ($dups && @{$dups}) {
-    foreach my $dup (@{$dups}) {
-      $self->got_hit($dup, $area, %params);
-    }
+  return 1;
+}
+
+=item $status->rule_ready ($rulename [, $no_async])
+
+Mark an asynchronous rule ready, so it can be considered for meta rule
+evaluation.  Asynchronous rule is a rule whose eval-function returns undef,
+marking that it's not ready yet, expecting results later. 
+$status->rule_ready() must be called later to mark it ready, alternatively
+$status->got_hit() also does this.  If neither is called, then any meta rule
+that depends on this rule might not evaluate.
+
+Optional boolean $no_async skips checking if there are pending async DNS
+lookups for the rule.
+
+=cut
+
+sub rule_ready {
+  my ($self, $rule, $no_async) = @_;
+
+  # Ready already?
+  return if exists $self->{tests_already_hit}->{$rule};
+
+  if (!$no_async && $self->get_async_pending_rules($rule)) {
+    # Can't be ready if there are pending DNS lookups, ignore for now.
+    return;
   }
 
-  %{$self->{test_log_msgs}} = ();  # clear test logs
-  return 1;
+  # record rules that depend on this, so do_meta_tests will be run
+  foreach (keys %{$self->{conf}->{meta_deprules}->{$rule}}) {
+    $self->{meta_check_ready}->{$_} = 1;
+  }
+
+  # mark ready
+  $self->{tests_already_hit}->{$rule} ||= 0;
 }
 
 ###########################################################################
 
-# TODO: this needs API doc
+=item $status->test_log ($text [, $rulename])
+
+Add $text log entry for a hit rule in final message REPORT/SUMMARY.
+
+Usually called just before got_hit(), to describe for example what URI the
+rule matched on.  Optional <$rulename> argument is recommended to make sure
+log is written to correct rule.  If rulename is not provided,
+get_current_eval_rule_name() is used as fallback.
+
+Can be called multiple times per rule for additional entries.
+
+=cut
+
 sub test_log {
-  my ($self, $msg) = @_;
-  local $1;
-  while ($msg =~ s/^(.{30,48})\s//) {
-    $self->_test_log_line ($1);
-  }
-  $self->_test_log_line ($msg);
-}
-
-sub _test_log_line {
-  my ($self, $msg) = @_;
-
-  $self->{test_log_msgs}->{TERSE} .= sprintf ("[%s]\n", $msg);
-  if (length($msg) > 47) {
-    $self->{test_log_msgs}->{LONG} .= sprintf ("%78s\n", "[$msg]");
-  } else {
-    $self->{test_log_msgs}->{LONG} .= sprintf ("%27s [%s]\n", "", $msg);
-  }
+  my ($self, $msg, $rulename) = @_;
+  $rulename ||= $self->get_current_eval_rule_name();
+  return if !defined $rulename;
+  push @{$self->{test_logs}->{$rulename}->{msg}}, $msg;
 }
 
 ###########################################################################
@@ -2947,8 +3250,8 @@ sub get_envelope_from {
   # Assume that because they have configured it, their MTA will always add it.
   # This will prevent us falling through and picking up inappropriate headers.
   if (defined $self->{conf}->{envelope_sender_header}) {
-    # make sure we get the most recent copy - there can be only one EnvelopeSender.
-    $envf = $self->get($self->{conf}->{envelope_sender_header}.":addr",undef);
+    # get the most recent (topmost) copy - there can be only one EnvelopeSender.
+    $envf = ($self->get($self->{conf}->{envelope_sender_header}.":first:addr"))[0];
     # ok if it contains an "@" sign, or is "" (ie. "<>" without the < and >)
     if (defined $envf && (index($envf, '@') > 0 || $envf eq '')) {
       dbg("message: using envelope_sender_header '%s' as EnvelopeFrom: '%s'",
@@ -3001,17 +3304,19 @@ sub get_envelope_from {
   # lines, we cannot trust any Envelope-From headers, since they're likely to
   # be incorrect fetchmail guesses.
 
-  if (index($self->get("X-Sender"), '@') != -1) {
-    my $rcvd = join(' ', $self->get("Received"));
-    if (index($rcvd, '(fetchmail') != -1) {
-      dbg("message: X-Sender and fetchmail signatures found, cannot trust envelope-from");
-      $self->{envelopefrom} = undef;
-      return;
+  my $x_sender = ($self->get("X-Sender:first:addr"))[0];
+  if (defined $x_sender && index($x_sender, '@') != -1) {
+    foreach ($self->get("Received")) {
+      if (index($_, '(fetchmail') != -1) {
+        dbg("message: X-Sender and fetchmail signatures found, cannot trust envelope-from");
+        $self->{envelopefrom} = undef;
+        return;
+      }
     }
   }
 
   # procmailrc notes this (we now recommend adding it to Received instead)
-  if (defined($envf = $self->get("X-Envelope-From:addr",undef))) {
+  if (defined($envf = ($self->get("X-Envelope-From:first:addr"))[0])) {
     # heuristic: this could have been relayed via a list which then used
     # a *new* Envelope-from.  check
     if ($self->get("ALL") =~ /^Received:.*?^X-Envelope-From:/smi) {
@@ -3026,7 +3331,7 @@ sub get_envelope_from {
   }
 
   # qmail, new-inject(1)
-  if (defined($envf = $self->get("Envelope-Sender:addr",undef))) {
+  if (defined($envf = ($self->get("Envelope-Sender:first:addr"))[0])) {
     # heuristic: this could have been relayed via a list which then used
     # a *new* Envelope-from.  check
     if ($self->get("ALL") =~ /^Received:.*?^Envelope-Sender:/smi) {
@@ -3045,7 +3350,7 @@ sub get_envelope_from {
   #   data.  This use of return-path is required; mail systems MUST support
   #   it.  The return-path line preserves the information in the <reverse-
   #   path> from the MAIL command.
-  if (defined($envf = $self->get("Return-Path:addr",undef))) {
+  if (defined($envf = ($self->get("Return-Path:first:addr"))[0])) {
     # heuristic: this could have been relayed via a list which then used
     # a *new* Envelope-from.  check
     if ($self->get("ALL") =~ /^Received:.*?^Return-Path:/smi) {
@@ -3085,7 +3390,7 @@ sub get_all_hdrs_in_rcvd_index_range {
   $include_end_rcvd = 1 unless defined $include_end_rcvd;
 
   my $cur_rcvd_index = -1;  # none found yet
-  my $result = '';
+  my @results;
 
   my @hdrs;
   if ($getraw) {
@@ -3104,14 +3409,20 @@ sub get_all_hdrs_in_rcvd_index_range {
     }
     if ((!defined $start_rcvd || $start_rcvd <= $cur_rcvd_index) &&
 	(!defined $end_rcvd || $cur_rcvd_index < $end_rcvd)) {
-      $result .= $hdr;
+      push @results, $hdr;
     }
     elsif (defined $end_rcvd && $cur_rcvd_index == $end_rcvd) {
-      $result .= $hdr;
+      push @results, $hdr;
       last;
     }
   }
-  return ($result eq '' ? undef : $result);
+
+  if (wantarray) {
+    return @results;
+  } else {
+    my $result = join('', @results);
+    return ($result eq '' ? undef : $result);
+  }
 }
 
 ###########################################################################
@@ -3123,26 +3434,31 @@ sub sa_die { Mail::SpamAssassin::sa_die(@_); }
 =item $status->create_fulltext_tmpfile (fulltext_ref)
 
 This function creates a temporary file containing the passed scalar
-reference data (typically the full/pristine text of the message).
-This is typically used by external programs like pyzor and dccproc, to
-avoid hangs due to buffering issues.   Methods that need this, should
-call $self->create_fulltext_tmpfile($fulltext) to retrieve the temporary
-filename; it will be created if it has not already been.
+reference data.  If no scalar is passed, full/pristine message text is
+assumed.  This is typically used by external programs like pyzor and
+dccproc, to avoid hangs due to buffering issues.
 
-Note: This can only be called once until $status->delete_fulltext_tmpfile() is
-called.
+All tempfiles are automatically cleaned up by PerMsgStatus destructor.
 
 =cut
 
 sub create_fulltext_tmpfile {
   my ($self, $fulltext) = @_;
 
-  if (defined $self->{fulltext_tmpfile}) {
-    return $self->{fulltext_tmpfile};
+  my $pristine;
+  if (!defined $fulltext) {
+    if (defined $self->{fulltext_tmpfile}) {
+      return $self->{fulltext_tmpfile};
+    }
+    $fulltext = \$self->{msg}->get_pristine();
+    $pristine = 1;
   }
 
   my ($tmpf, $tmpfh) = Mail::SpamAssassin::Util::secure_tmpfile();
   $tmpfh  or die "failed to create a temporary file";
+
+  # record all created files so we can remove on DESTROY
+  $self->{tmpfiles}->{$tmpf} = 1;
 
   # PerlIO's buffered print writes in 8 kB chunks - which can be slow.
   #   print $tmpfh $$fulltext  or die "error writing to $tmpf: $!";
@@ -3156,30 +3472,33 @@ sub create_fulltext_tmpfile {
   }
   close $tmpfh  or die "error closing $tmpf: $!";
 
-  $self->{fulltext_tmpfile} = $tmpf;
+  $self->{fulltext_tmpfile} = $tmpf  if $pristine;
 
   dbg("check: create_fulltext_tmpfile, written %d bytes to file %s",
       length($$fulltext), $tmpf);
 
-  return $self->{fulltext_tmpfile};
+  return $tmpf;
 }
 
-=item $status->delete_fulltext_tmpfile ()
+=item $status->delete_fulltext_tmpfile (tmpfile)
 
 Will cleanup after a $status->create_fulltext_tmpfile() call.  Deletes the
-temporary file and uncaches the filename.
+temporary file and uncaches the filename.  Generally there no need to call
+this, PerMsgStatus destructor cleans up all tmpfiles.
 
 =cut
 
 sub delete_fulltext_tmpfile {
-  my ($self) = @_;
-  if (defined $self->{fulltext_tmpfile}) {
-    if (!unlink $self->{fulltext_tmpfile}) {
-      my $msg = sprintf("cannot unlink %s: %s", $self->{fulltext_tmpfile}, $!);
-      # don't fuss too much if file is missing, perhaps it wasn't even created
-      if ($! == ENOENT) { warn $msg } else { die $msg }
+  my ($self, $tmpfile) = @_;
+
+  $tmpfile = $self->{fulltext_tmpfile} if !defined $tmpfile;
+  if (defined $tmpfile && $self->{tmpfiles}->{$tmpfile}) {
+    unlink($tmpfile) or dbg("cannot unlink $tmpfile: $!");
+    if ($self->{fulltext_tmpfile} &&
+          $tmpfile eq $self->{fulltext_tmpfile}) {
+      delete $self->{fulltext_tmpfile};
     }
-    $self->{fulltext_tmpfile} = undef;
+    delete $self->{tmpfiles}->{$tmpfile};
   }
 }
 
@@ -3193,26 +3512,27 @@ sub all_from_addrs {
   my @addrs;
 
   # Resent- headers take priority, if present. see bug 672
-  my $resent = $self->get('Resent-From',undef);
-  if (defined $resent && $resent =~ /\S/) {
-    @addrs = $self->{main}->find_all_addrs_in_line ($resent);
+  my @resent = $self->get('Resent-From:first:addr');
+  if (@resent) {
+    @addrs = @resent;
   }
   else {
-    # bug 2292: Used to use find_all_addrs_in_line() with the same
-    # headers, but the would catch addresses in comments which caused
-    # FNs for things like whitelist_from.  Since all of these are From
-    # headers, there should only be 1 address in each anyway (not exactly
-    # true, RFC 2822 allows multiple addresses in a From header field),
-    # so use the :addr code...
+    # bug 2292: Used to use find_all_addrs_in_line() with the same headers,
+    # but the would catch addresses in comments which caused FNs for things
+    # like welcomelist_from.  Since all of these are From headers, there
+    # should only be 1 address in each anyway (not exactly true, RFC 2822
+    # allows multiple addresses in a From header field)
+    # *** since 4.0 all addresses are returned from Header correctly ***
     # bug 3366: some addresses come in as 'foo@bar...', which is invalid.
     # so deal with the multiple periods.
+    # TODO: 4.0 need :first:addr here ? Why check so many headers ?
     ## no critic
     @addrs = map { tr/././s; $_ } grep { $_ ne '' }
-        ($self->get('From:addr'),		# std
-         $self->get('Envelope-Sender:addr'),	# qmail: new-inject(1)
-         $self->get('Resent-Sender:addr'),	# procmailrc manpage
-         $self->get('X-Envelope-From:addr'),	# procmailrc manpage
-         $self->get('EnvelopeFrom:addr'));	# SMTP envelope
+      ($self->get('From:addr'),            # std
+       $self->get('Envelope-Sender:addr'), # qmail: new-inject(1)
+       $self->get('Resent-Sender:addr'),   # procmailrc manpage
+       $self->get('X-Envelope-From:addr'), # procmailrc manpage
+       $self->get('EnvelopeFrom:addr'));   # SMTP envelope
     # http://www.cs.tut.fi/~jkorpela/headers.html is useful here
   }
 
@@ -3270,50 +3590,68 @@ sub all_to_addrs {
   my @addrs;
 
   # Resent- headers take priority, if present. see bug 672
-  my $resent = join('', $self->get('Resent-To'), $self->get('Resent-Cc'));
-  if ($resent =~ /\S/) {
-    @addrs = $self->{main}->find_all_addrs_in_line($resent);
+  my @resent = ( $self->get('Resent-To:first:addr'),
+                 $self->get('Resent-Cc:first:addr') );
+  if (@resent) {
+    @addrs = @resent;
   } else {
     # OK, a fetchmail trick: try to find the recipient address from
     # the most recent 3 Received lines.  This is required for sendmail,
     # since it does not add a helpful header like exim, qmail
     # or Postfix do.
     #
-    my $rcvd = $self->get('Received');
-    $rcvd =~ s/\n[ \t]+/ /gs;
-    $rcvd =~ s/\n+/\n/gs;
-
-    my @rcvdlines = split(/\n/, $rcvd, 4); pop @rcvdlines; # forget last one
+    my @rcvd = ($self->get('Received'))[0 .. 2];
     my @rcvdaddrs;
-    foreach my $line (@rcvdlines) {
-      if ($line =~ / for (\S+\@\S+);/) { push (@rcvdaddrs, $1); }
+    foreach my $line (@rcvd) {
+      next unless defined $line;
+      if ($line =~ / for <?(\S+\@(\S+?))>?;/) {
+        if (is_fqdn_valid(idn_to_ascii($2), 1)) {
+          push @rcvdaddrs, $1;
+        }
+      }
     }
 
-    @addrs = $self->{main}->find_all_addrs_in_line (
-       join('',
-	 join(" ", @rcvdaddrs)."\n",
-         $self->get('To'),			# std
-  	 $self->get('Apparently-To'),		# sendmail, from envelope
-  	 $self->get('Delivered-To'),		# Postfix, poss qmail
-  	 $self->get('Envelope-Recipients'),	# qmail: new-inject(1)
-  	 $self->get('Apparently-Resent-To'),	# procmailrc manpage
-  	 $self->get('X-Envelope-To'),		# procmailrc manpage
-  	 $self->get('Envelope-To'),		# exim
-	 $self->get('X-Delivered-To'),		# procmail quick start
-	 $self->get('X-Original-To'),		# procmail quick start
-	 $self->get('X-Rcpt-To'),		# procmail quick start
-	 $self->get('X-Real-To'),		# procmail quick start
-	 $self->get('Cc')));			# std
+    # TODO: 4.0 use :first:addr ? Why so many headers ?
+    @addrs = (
+      @rcvdaddrs,
+      $self->get('To:addr'),                   # std
+      $self->get('Apparently-To:addr'),        # sendmail, from envelope
+      $self->get('Delivered-To:addr'),         # Postfix, poss qmail
+      $self->get('Envelope-Recipients:addr'),  # qmail: new-inject(1)
+      $self->get('Apparently-Resent-To:addr'), # procmailrc manpage
+      $self->get('X-Envelope-To:addr'),        # procmailrc manpage
+      $self->get('Envelope-To:addr'),          # exim
+      $self->get('X-Delivered-To:addr'),       # procmail quick start
+      $self->get('X-Original-To:addr'),        # procmail quick start
+      $self->get('X-Rcpt-To:addr'),            # procmail quick start
+      $self->get('X-Real-To:addr'),            # procmail quick start
+      $self->get('Cc:addr'));                  # std
     # those are taken from various sources; thanks to Nancy McGough, who
     # noted some in <http://www.ii.com/internet/robots/procmail/qs/#envelope>
   }
 
-  dbg("eval: all '*To' addrs: " . join(" ", @addrs));
-  $self->{all_to_addrs} = \@addrs;
-  return @addrs;
+  my %seen;
+  my @result = grep { !$seen{$_}++ } @addrs;
+
+  dbg("eval: all '*To' addrs: " . join(" ", @result));
+  $self->{all_to_addrs} = \@result;
+  return @result;
 
 # http://www.cs.tut.fi/~jkorpela/headers.html is useful here, also
 # http://www.exim.org/pipermail/exim-users/Week-of-Mon-20001009/021672.html
+}
+
+###########################################################################
+
+# Save and tag regex named captures, $captures is ref to %- results
+sub set_captures {
+  my ($self, $captures) = @_;
+
+  foreach my $cname (keys %$captures) {
+    next unless $cname =~ /^[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)*$/; # safety check
+    my @cvals = do { my %seen; grep { !$seen{$_}++ } @{$captures->{$cname}} };
+    $self->set_tag($cname, @cvals == 1 ? $cvals[0] : \@cvals);
+  }
 }
 
 ###########################################################################

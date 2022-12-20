@@ -8,6 +8,8 @@ struct FieldMeta {
   FIELDOFFSET fieldix;
   SV *paramname;
   AV *hooks; /* NULL, or AV of raw pointers directly to FieldHook structs */
+  unsigned int def_if_undef : 1;
+  unsigned int def_if_false : 1;
 };
 
 #define MOP_FIELD_RUN_HOOKS_NOARGS(fieldmeta, func)                                       \

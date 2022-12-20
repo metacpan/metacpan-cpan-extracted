@@ -2,7 +2,7 @@ package Geo::TCX::Trackpoint;
 use strict;
 use warnings;
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 
 =encoding utf-8
 
@@ -257,23 +257,29 @@ use warnings;
 use DateTime::Format::ISO8601;
 use Carp qw(confess croak cluck);
 
-our $VERSION = '1.05';
+our $VERSION = '1.06';
 our @ISA=qw(Geo::TCX::Trackpoint);
-
 
 { # lexical scope for that package
 
 use vars qw($AUTOLOAD %possible_attr);
 
-our ($LocalTZ, $Formatter);
-$LocalTZ   = DateTime::TimeZone->new( name => 'local' );
-$Formatter = DateTime::Format::Strptime->new( pattern => '%a %b %e %H:%M:%S %Y' );
-my $formatter_xsd = DateTime::Format::Strptime->new( pattern => '%Y-%m-%dT%H:%M:%SZ' );
-# ... to avoid looking up timezone each time Trackpoint->new is called
-
-# file-scoped lexicals
 my @attr = qw/ LatitudeDegrees LongitudeDegrees AltitudeMeters DistanceMeters Time HeartRateBpm Cadence SensorState /;
 $possible_attr{$_} = 1 for @attr;
+
+my ($formatter, $formatter_xsd, $local_tz);
+$formatter     = DateTime::Format::Strptime->new( pattern => '%a %b %e %H:%M:%S %Y' );
+$formatter_xsd = DateTime::Format::Strptime->new( pattern => '%Y-%m-%dT%H:%M:%SZ' );
+
+# Determine local timezone:
+#   - avoids looking it up each time new()is called
+#   - default to UTC: on some systems/platforms, the local timezone may not be found
+eval { $local_tz  = DateTime::TimeZone->new( name => 'local' ) };
+if ($@) {
+    if ($@ =~ /Cannot determine local time zone/) {
+        $local_tz  = DateTime::TimeZone->new( name => 'UTC' )
+    } else { die "Something else happened: $@\n" }
+}
 
 sub new {
     my ($proto, $pt_str, $previous_pt) = (shift, shift, shift);
@@ -411,7 +417,9 @@ sub time_datetime    { return DateTime::Format::ISO8601->parse_datetime( shift->
 
 =item time_local( $trackpoint )
 
-Returns the formatted local time of the trackpoint. The local time is always represented based on the locale of the system that calls this method, not that of where the trackpoint was recorded. It is not possible to know in which time zone a trackpoint was recorded at this stage.
+Returns a representation of the time of a trackpoint in the user's local time zone. The local time is always based on the locale of the user's system, and not that of where the trackpoint was recorded. It is not possible to know in which time zone a trackpoint was recorded at this stage.
+
+The local time zone is determined by calling L<DateTime::TimeZone>'s C<< new() >> constructor with C<< name => 'local' >>. On some systems and platforms, this method is unable to determine the local time zone, in which case we default to C<UTC>. See L<DateTime::TimeZone> for more information.
 
 =back
 
@@ -634,8 +642,8 @@ sub _time_format {
     # !! TODO:  check that ref is not a Garmin Object (croack that function is not a class method)
     my %opts = @_;
     if ($opts{'local'}) {
-        $dt->set_formatter( $Formatter );      # see pattern in $Formatter
-        $dt->set_time_zone( $LocalTZ )
+        $dt->set_formatter( $formatter );      # see pattern in $formatter
+        $dt->set_time_zone( $local_tz )
     } else {
         $dt->set_formatter( $formatter_xsd )
     }
@@ -677,11 +685,11 @@ Patrick Joly
 
 =head1 VERSION
 
-1.05
+1.06
 
 =head1 SEE ALSO
 
-perl(1).
+L<DateTime>, L<DateTime::TimeZone>.
 
 =cut
 

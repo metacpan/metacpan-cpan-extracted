@@ -9,8 +9,8 @@ the Makefile using 'perl Makefile.PL', then run 'make' three times as
 shown in the following example:
 
 $  cd ~/sources
-$  tar xzvf sendmail-pmilter-1.23.tgz
-$  cd sendmail-pmilter-1.23
+$  tar xzvf sendmail-pmilter-1.24.tgz
+$  cd sendmail-pmilter-1.24
 $  perl Makefile.PL
 $  make
 $  make test

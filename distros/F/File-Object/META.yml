@@ -27,8 +27,8 @@ no_index:
     - t
     - xt
 requires:
-  Class::Utils: 0.03
-  Error::Pure: 0.27
+  Class::Utils: 0.14
+  Error::Pure: 0.3
   File::Spec::Functions: 0
   FindBin: 0
   perl: 5.6.2
@@ -37,4 +37,4 @@ resources:
   homepage: https://github.com/michal-josef-spacek/File-Object
   license: http://opensource.org/licenses/bsd-license.php
   repository: git://github.com/michal-josef-spacek/File-Object
-version: '0.15'
+version: '0.17'

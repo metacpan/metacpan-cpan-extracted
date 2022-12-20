@@ -136,7 +136,7 @@ int32_t SPVM__Sys__Poll__PollfdArray__events(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int16_t events = fds[index].events;
   
-  stack[0].sval = events;
+  stack[0].ival = events;
   
   return 0;
 }
@@ -154,7 +154,7 @@ int32_t SPVM__Sys__Poll__PollfdArray__set_events(SPVM_ENV* env, SPVM_VALUE* stac
     return env->die(env, stack, "The index must be less than the length of the file descripters", FILE_NAME, __LINE__);
   }
 
-  int16_t events = stack[2].sval;
+  int16_t events = stack[2].ival;
   
   struct pollfd* fds = env->get_pointer(env, stack, obj_self);
   
@@ -182,7 +182,7 @@ int32_t SPVM__Sys__Poll__PollfdArray__revents(SPVM_ENV* env, SPVM_VALUE* stack) 
   
   int16_t revents = fds[index].revents;
   
-  stack[0].sval = revents;
+  stack[0].ival = revents;
   
   return 0;
 }
@@ -200,7 +200,7 @@ int32_t SPVM__Sys__Poll__PollfdArray__set_revents(SPVM_ENV* env, SPVM_VALUE* sta
     return env->die(env, stack, "The index must be less than the length of the file descripters", FILE_NAME, __LINE__);
   }
 
-  int16_t revents = stack[2].sval;
+  int16_t revents = stack[2].ival;
   
   struct pollfd* fds = env->get_pointer(env, stack, obj_self);
   

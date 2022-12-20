@@ -1,7 +1,7 @@
 #
 # This file is part of App-SpreadRevolutionaryDate
 #
-# This software is Copyright (c) 2019 by Gérald Sédrati-Dinet.
+# This software is Copyright (c) 2019-2022 by Gérald Sédrati.
 #
 # This is free software, licensed under:
 #
@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::it;
-$App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::it::VERSION = '0.31';
+$App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::it::VERSION = '0.32';
 # ABSTRACT: Italian localization of (part of) L<DateTime::Calendar::FrenchRevolutionary>
 
 use Moose;
@@ -505,7 +505,7 @@ App::SpreadRevolutionaryDate::MsgMaker::RevolutionaryDate::Locale::it - Italian 
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 DESCRIPTION
 
@@ -555,11 +555,11 @@ This modules adds Italian translations to L<DateTime::Calendar::FrenchRevolution
 
 =head1 AUTHOR
 
-Gérald Sédrati-Dinet <gibus@cpan.org>
+Gérald Sédrati <gibus@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Gérald Sédrati-Dinet.
+This software is Copyright (c) 2019-2022 by Gérald Sédrati.
 
 This is free software, licensed under:
 

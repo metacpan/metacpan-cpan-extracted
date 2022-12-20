@@ -5,7 +5,7 @@ use warnings;
 package Sub::HandlesVia::CodeGenerator;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.045';
+our $VERSION   = '0.046';
 
 use Sub::HandlesVia::Mite -all;
 
@@ -481,9 +481,7 @@ sub _handle_sigcheck {
 
 sub _handle_prelude {
 	my ( $self, $method_name, $handler, $env, $code, $state ) = @_;
-	
-	push @$code, $self->generate_prelude();
-	
+	push @$code, grep !!$_, $self->generate_prelude();
 	return $self;
 }
 

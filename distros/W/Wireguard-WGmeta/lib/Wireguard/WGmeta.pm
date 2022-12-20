@@ -66,6 +66,6 @@ use strict;
 use warnings FATAL => 'all';
 package Wireguard::WGmeta;
 
-our $VERSION = "0.3.2"; # Do not change manually
+our $VERSION = "0.3.3"; # Do not change manually
 
 1;

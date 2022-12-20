@@ -5,13 +5,13 @@ class Sys::IO::Flock {
   # Instance methods
   native method DESTROY : void ();
 
-  native method l_type : short ();
+  native method l_type : int ();
 
-  native method set_l_type : void ($type : short);
+  native method set_l_type : void ($type : int);
 
-  native method l_whence : short ();
+  native method l_whence : int ();
 
-  native method set_l_whence : void ($whence : short);
+  native method set_l_whence : void ($whence : int);
 
   native method l_start : long ();
 

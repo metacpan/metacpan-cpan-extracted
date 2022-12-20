@@ -16,6 +16,7 @@ use warnings;
 use LaTeXML::Util::Pathname;
 use LaTeXML::Common::XML;
 use LaTeXML::Common::Error;
+use LaTeXML::Post::UnicodeMath;
 use charnames qw(:full);
 use LaTeXML::Post;
 use base qw(LaTeXML::Post::Processor);
@@ -41,16 +42,20 @@ sub new {
 sub process {
   my ($self, $doc, $root) = @_;
   local %LaTeXML::Post::CrossRef::MISSING = ();
-  if (my $navtoc = $$self{navigation_toc}) { # If a navigation toc requested, put a toc in nav; will get filled in
-    my $toc = ['ltx:TOC', { format => $navtoc }];
-    if (my $nav = $doc->findnode('//ltx:navigation')) {
-      $doc->addNodes($nav, $toc); }
-    else {
-      $doc->addNodes($doc->getDocumentElement, ['ltx:navigation', {}, $toc]); } }
-  $self->fillInGlossaryRef($doc);
+
+  my $navtoc   = $$self{navigation_toc};  # If a navigation toc requested, put a toc in nav to fill in
+  my $doctitle = $self->generateDocumentTile($doc);
+  my $nav      = $doc->findnode('//ltx:navigation');
+  if (!$nav && ($navtoc || (defined $doctitle))) {    # Need navigation block
+    $doc->addNodes($doc->getDocumentElement, ['ltx:navigation', {}]);
+    $nav = $doc->findnode('//ltx:navigation'); }
+  $doc->addNodes($nav, ['ltx:TOC', { format => $navtoc }]) if $navtoc;
+  $doc->addNodes($nav, ['ltx:title', {}, $doctitle]) if defined $doctitle;
+
   $self->fill_in_relations($doc);
   $self->fill_in_tocs($doc);
   $self->fill_in_frags($doc);
+  $self->fill_in_glossaryrefs($doc);
   $self->fill_in_refs($doc);
   $self->fill_in_RDFa_refs($doc);
   $self->fill_in_bibrefs($doc);
@@ -355,7 +360,7 @@ sub fill_in_refs {
           $ref->setAttribute(title => $titlestring); } }
       if (!$ref->textContent && !element_nodes($ref)
         && !(($tag eq 'ltx:graphics') || ($tag eq 'ltx:picture'))) {
-        my $is_nameref = ($ref->getAttribute('class')||'') =~ 'ltx_refmacro_nameref';
+        my $is_nameref = ($ref->getAttribute('class') || '') =~ 'ltx_refmacro_nameref';
         $doc->addNodes($ref, $self->generateRef($doc, $id, $show, $is_nameref)); }
       if (my $entry = $$self{db}->lookup("ID:$id")) {
         $ref->setAttribute(stub => 1) if $entry->getValue('stub'); }
@@ -398,7 +403,7 @@ sub fill_in_mathlinks {
   my $n  = 0;
   foreach my $sym ($doc->findnodes('descendant::*[@decl_id or @meaning]')) {
     my $tag = $doc->getQName($sym);
-    next if $tag eq 'ltx:XMRef';               # Blech; list those TO fill-in, or list those to exclude?
+    next if $tag eq 'ltx:XMRef';          # Blech; list those TO fill-in, or list those to exclude?
     next if $sym->hasAttribute('href');
     my $decl_id = $sym->getAttribute('decl_id');
     my $meaning = $sym->getAttribute('meaning');
@@ -445,6 +450,36 @@ sub getIDForDeclaration {
     }
     return $pid; } }
 
+sub fill_in_glossaryrefs {
+  my ($self, $doc) = @_;
+  my $n = 0;
+  foreach my $ref ($doc->findnodes('descendant::ltx:glossaryref')) {
+    $n++;
+    my $key   = $ref->getAttribute('key');
+    my $list  = $ref->getAttribute('inlist');
+    my $show  = $ref->getAttribute('show') || 'name';
+    my $entry = $$self{db}->lookup(join(':', 'GLOSSARY', $list, $key));
+    if ($entry) {
+      my $title = $entry->getValue('phrase:definition');
+      if (!$ref->getAttribute('title') && $title) {
+        $ref->setAttribute(title => $title->textContent); }
+      if (my $id = $entry->getValue('id')) {
+        $ref->setAttribute(idref => $id); }
+      if (!$ref->textContent && !element_nodes($ref)) {
+        my @stuff = $self->generateGlossaryRefTitle($doc, $entry, $show);
+        if (@stuff) {
+          $doc->addNodes($ref, @stuff); }
+        else {
+          $self->note_missing('warn', "Glossary contents ($show) for key", $key);
+          $doc->addNodes($ref, $key);
+          $doc->addClass($ref, 'ltx_missing'); } } }
+    else {
+      $self->note_missing('warn', "Glossary Entry for key", $key); }
+    if (!$ref->textContent && !element_nodes($ref)) {
+      $doc->addNodes($ref, $key);
+      $doc->addClass($ref, 'ltx_missing'); } }
+  return; }
+
 # Needs to evolve into the combined stuff that we had in DLMF.
 # (eg. concise author/year combinations for multiple bibrefs)
 sub fill_in_bibrefs {
@@ -479,9 +514,8 @@ sub make_bibcite {
   my @lists   = split(/\s+/, $bibref->getAttribute('inlist') || 'bibliography');
   foreach my $key (@keys) {
     my ($bentry, $id, $entry);
-    # NOTE: bibkeys are downcased when we look them up!
     foreach my $list (@lists) {            # Find the first of the lists that contains this bibkey
-      $bentry = $$self{db}->lookup("BIBLABEL:" . $list . ':' . lc($key));
+      $bentry = $$self{db}->lookup("BIBLABEL:" . $list . ':' . $key);
       last if $bentry; }
     if ($bentry
       && ($id    = $bentry->getValue('id'))
@@ -499,9 +533,9 @@ sub make_bibcite {
       my $titlestring = undef;
       if (defined $title) {
         $titlestring = $title->textContent;
-        $titlestring =~ s/^\s+//;                       # Trim leading whitespace
-        $titlestring =~ s/\s+$//;                       # and trailing
-        $titlestring =~ s/\s+/ /gs; }                   # and normalize all other whitespace.
+        $titlestring =~ s/^\s+//;        # Trim leading whitespace
+        $titlestring =~ s/\s+$//;        # and trailing
+        $titlestring =~ s/\s+/ /gs; }    # and normalize all other whitespace.
       if ($year && ($year->textContent) =~ /^(\d\d\d\d)(\w)$/) {
         ($rawyear, $suffix) = ($1, $2); }
       $show = 'refnum' unless ($show eq 'none') || $authors || $fauthors || $keytag; # Disable author-year format!
@@ -544,6 +578,7 @@ sub make_bibcite {
     # Add delimeters for parsing...
     $show =~ s/(\w)year/$1\{\}year/gi;
     $show =~ s/(\w)phrase/$1\{\}phrase/gi;
+    $show =~ s/phrase(\d)(\w)/phrase$1\{\}$2/gi;
     while ($show) {
       if ($show =~ s/^(\w+)//) {
         my $role = lc($1); $role =~ s/s$//;    # remove trailing plural
@@ -631,7 +666,7 @@ sub generateURL {
         $url .= '#' . $fragid; }
       elsif ($location eq $doclocation) {
         $url = ''; }
-      return $url; }
+      return pathname_to_url($url); }
     else {
       $self->note_missing('warn', 'File location for ID', $id); } }
   else {
@@ -668,7 +703,7 @@ sub generateRef {
     return @stuff; }
   else {
     $self->note_missing('info', 'Usable title for ID', $reqid);
-    return ($reqid); } }               # id is crummy, but better than "?"... or?
+    return ($reqid); } }    # id is crummy, but better than "?"... or?
 
 # Just return the reqshow value for $reqid, or nothing
 sub generateRef_simple {
@@ -709,7 +744,6 @@ sub text_content_aux {
 
 my %ref_fallbacks = (    # Alternative fields, when not found
   typerefnum  => [qw(refnum)],
-  rrefnum     => [qw(typerefnum frefnum refnum)],    # obsolete?
   toctitle    => [qw(title toccaption)],
   title       => [qw(toccaption)],
   rawtoctitle => [qw(toctitle title toccaption)],
@@ -766,6 +800,18 @@ sub prepRawRefText {
       $node->removeChild($first); } }
   return $node; }
 
+# Generate a title for this document.
+sub generateDocumentTile {
+  my ($self, $doc) = @_;
+  my $title;
+  if (my $docid = $doc->getDocumentElement->getAttribute('xml:id')) {    # If has a id?
+    $title = $self->generateTitle($doc, $docid); }
+  return $title if (defined $title) && ($title ne '');
+  if (my $node = $doc->findnode('//ltx:title | //ltx:toctitle | //ltx:caption | //ltx:toccaption')) {
+    $title = getTextContent($doc, $node); }
+  return $title if (defined $title) && ($title ne '');
+  return; }
+
 # Generate a title string for ltx:ref
 sub generateTitle {
   my ($self, $doc, $id) = @_;
@@ -774,10 +820,7 @@ sub generateTitle {
   my $altstring = "";
   while (my $entry = $id && $$self{db}->lookup("ID:$id")) {
     my $title = $self->fillInTitle($doc,
-###      $entry->getValue('title') || $entry->getValue('rrefnum')
-      $entry->getValue('title') || $entry->getValue('typerefnum')
-        || $entry->getValue('frefnum') || $entry->getValue('refnum'));
-    #    $title = $title->textContent if $title && ref $title;
+      $entry->getValue('title') || $entry->getValue('typerefnum') || $entry->getValue('refnum'));
     $title = getTextContent($doc, $title) if $title && ref $title;
     if ($title) {
       $string .= $$self{ref_join} if $string;
@@ -802,8 +845,10 @@ sub getTextContent_rec {
     my $tag = $doc->getQName($node);
     if ($tag eq 'ltx:tag') {
       return ($node->getAttribute('open') || '')
-        . $node->textContent         # assuming no nested ltx:tag
+        . $node->textContent    # assuming no nested ltx:tag
         . ($node->getAttribute('close') || ''); }
+    elsif ($tag eq 'ltx:Math') {
+      return unicodemath($doc, $node); }
     else {
       return join('', map { getTextContent_rec($doc, $_); } $node->childNodes); } }
   elsif ($type == XML_DOCUMENT_FRAG_NODE) {
@@ -835,40 +880,6 @@ sub fillInTitle {
   foreach my $break ($doc->findnodes('descendant::ltx:break', $title)) {
     $doc->replaceNode($break, ['ltx:text', {}, " "]); }
   return $title; }
-
-sub fillInGlossaryRef {
-  my ($self, $doc) = @_;
-  my $n = 0;
-  foreach my $ref ($doc->findnodes('descendant::ltx:glossaryref')) {
-    $n++;
-    my $key   = $ref->getAttribute('key');
-    my @lists = split(/\s+/, $ref->getAttribute('inlist') || 'glossary');
-    my $show  = $ref->getAttribute('show');
-    my ($list, $entry) = ('', undef);
-    foreach my $alist (@lists) {    # Find list with this key
-      if ($entry = $$self{db}->lookup(join(':', 'GLOSSARY', $alist, $key))) {
-        $list = $alist; last; } }
-    if ($entry) {
-      my $title = $entry->getValue('phrase:definition');
-      if (!$ref->getAttribute('title') && $title) {
-        $ref->setAttribute(title => $title->textContent); }
-      if (my $id = $entry->getValue('id')) {
-        $ref->setAttribute(idref => $id); }
-      if (!$ref->textContent && !element_nodes($ref)) {
-        my @stuff = $self->generateGlossaryRefTitle($doc, $entry, $show);
-        if (@stuff) {
-          $doc->addNodes($ref, @stuff); }
-        else {
-          $self->note_missing('warn', "Glossary ($list) contents ($show) for key", $key);
-          $doc->addNodes($ref, $key);
-          $doc->addClass($ref, 'ltx_missing'); } } }
-    else {
-      $self->note_missing('warn', "Glossary ($list) Entry for key", $key); }
-    if (!$ref->textContent && !element_nodes($ref)) {
-      $doc->addNodes($ref, $key);
-      $doc->addClass($ref, 'ltx_missing'); } }
-  Debug("Filled in $n glossaryrefs") if $LaTeXML::DEBUG{crossref};
-  return; }
 
 sub generateGlossaryRefTitle {
   my ($self, $doc, $entry, $show) = @_;

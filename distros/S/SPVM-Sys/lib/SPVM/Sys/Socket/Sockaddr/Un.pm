@@ -36,19 +36,19 @@ The destructor.
 
 =head2 sa_family
 
-  method sa_family : byte ()
+  method sa_family : int ()
 
 Gets C<sa_family>. This is the overriden method of the L<sa_family|SPVM::Sys::Socket::Sockaddr/"sa_family"> method in the Sys::Socket::Sockaddr class.
 
 =head2 sun_family
 
-  method sun_family : byte ();
+  method sun_family : int ();
 
 Gets C<sun_family>.
 
 =head2 set_sun_family
 
-  method set_sun_family : void ($family : byte)
+  method set_sun_family : void ($family : int)
 
 Sets C<sun_family>.
 

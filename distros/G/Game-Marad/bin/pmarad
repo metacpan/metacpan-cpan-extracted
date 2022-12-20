@@ -6,6 +6,7 @@ use 5.26.0;
 use warnings;
 use Curses;
 use Game::Marad 0.04;
+use Scalar::Util 'looks_like_number';
 
 use constant {
     COLOFF => 2,    # two screen columns per one game column
@@ -222,7 +223,11 @@ sub move_select {
         my ( $y,   $x ) = ( $row + CURS_OFF_Y, int( ( $col + CURS_OFF_X ) / COLOFF ) );
         if ( $app->{game}->is_owner( $x, $y ) ) {
             $app->@{qw(state srcy srcx)} = ( STATE_SELECT, $row, $col );
-            addch $row, $col, A_BOLD | ord inch $row, $col;
+            # NOTE Curses.pm helpfully returns an IV or a PV depending
+            # on whether there are attributes already set or not
+            my $chtype = inch $row, $col;
+            addch $row, $col,
+              A_BOLD | ( looks_like_number($chtype) ? $chtype : ord $chtype );
             move $row, $col;
         }
         return NEXT_KEY;

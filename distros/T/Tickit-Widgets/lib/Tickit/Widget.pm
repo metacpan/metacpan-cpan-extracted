@@ -1,11 +1,11 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2009-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2009-2022 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.52;  # ADJUSTPARAMS superclass bugfix
+use Object::Pad 0.70 ':experimental(adjust_params)';
 
-package Tickit::Widget 0.55;
+package Tickit::Widget 0.56;
 class Tickit::Widget :repr(HASH);
 
 use experimental 'postderef';
@@ -120,9 +120,9 @@ values.
 
 =cut
 
-has @_style_classes;
-has $_style_direct;
-has %_style_tag;
+field @_style_classes;
+field $_style_direct;
+field %_style_tag;
 
 ADJUST
 {
@@ -133,21 +133,26 @@ ADJUST
    }
 }
 
-ADJUSTPARAMS
-{
-   my ( $params ) = @_;
+ADJUST :params (
+   :$class = undef,
+   :$classes = [ $class ],
+) {
+   @_style_classes = $classes->@*;
+}
 
-   @_style_classes = @{ delete $params->{classes} // [ delete $params->{class} ] };
-
+ADJUST :params (
+   :$style = undef,
+   %params
+) {
    # Legacy direct-applied-style argument support
    foreach my $attr ( @Tickit::Pen::ALL_ATTRS ) {
-      next unless defined( my $val = delete $params->{$attr} );
+      next unless defined( my $val = delete $params{$attr} );
 
       carp "Applying legacy direct pen attribute '$attr' for ${\ref $self}";
-      $params->{style}{$attr} = $val;
+      $style->{$attr} = $val;
    }
 
-   if( my $style = delete $params->{style} ) {
+   if( $style ) {
       my $tagset = $_style_direct = Tickit::Style::_Tagset->new;
       foreach my $key ( keys %$style ) {
          $tagset->add( $key, $style->{$key} );
@@ -157,13 +162,13 @@ ADJUSTPARAMS
    $self->_update_pen( $self->get_style_pen );
 }
 
-has $_parent :reader;
-has $_window :reader;
-has $_pen    :reader;
+field $_parent :reader;
+field $_window :reader;
+field $_pen    :reader;
 
-has $_focus_pending;
+field $_focus_pending;
 
-has %_event_ids;
+field %_event_ids;
 
 =head1 METHODS
 
@@ -263,7 +268,7 @@ in scalar context.
 
 =cut
 
-has %_style_cache;
+field %_style_cache;
 
 method get_style_values
 {
@@ -336,7 +341,7 @@ returned pen instance is immutable, and may be cached.
 
 =cut
 
-has %_style_pen_cache;
+field %_style_pen_cache;
 
 method get_style_pen
 {
@@ -688,8 +693,8 @@ window if the dimensions are now different to last time.
 
 =cut
 
-has $_req_lines;
-has $_req_cols;
+field $_req_lines;
+field $_req_cols;
 
 method set_requested_size
 {

@@ -237,9 +237,31 @@ sub find_preambles {
         push(@preambles, $3); } } }
   return join("\n", @preambles); }
 
+# Utility to Copy any foreign attributes from $node onto the $newnode
+# Allow both $node & $newnode to be XML Elements ore array representation
+sub copy_foreign_attributes {
+  my ($self, $newnode, $node) = @_;
+  my %attr = ();
+  if (ref $node eq 'ARRAY') {
+    %attr = %{ $$node[1] }; }
+  else {
+    foreach my $attr ($node->attributes()) {
+      if ($attr->nodeType == XML_ATTRIBUTE_NODE) {
+        $attr{ $attr->nodeName } = $attr->getValue; } } }
+  foreach my $key (keys %attr) {
+    next if $key     =~ /^xml:/;
+    next unless $key =~ /:/;
+    my $value = $attr{$key};
+    if (ref $newnode eq 'ARRAY') {
+      $$newnode[1]{$key} = $value unless defined $$newnode[1]{$key}; }
+    else {
+      $newnode->setAttribute($key => $value) unless $newnode->hasAttribute($key); } }
+  return; }
+
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 package LaTeXML::Post::MathProcessor;
 use strict;
+use LaTeXML::Util::Pathname;
 use LaTeXML::Post;
 use LaTeXML::Common::Error;
 use base qw(LaTeXML::Post::Processor);
@@ -318,6 +340,8 @@ sub process {
   NoteLog("converted $n Maths");
   return $doc; }
 
+sub canConvert { return 1; }
+
 # Make THIS MathProcessor the primary branch (of whatever parallel markup it supports),
 # and make all of the @moreprocessors be secondary ones.
 sub setParallel {
@@ -351,6 +375,8 @@ sub processNode {
     my $primary     = $self->convertNode($doc, $xmath);
     my @secondaries = ();
     foreach my $proc (@{ $$self{secondary_processors} }) {
+      # Exception: Do not generate Content MathML for kludge parses
+      next unless $proc->canConvert($doc, $math);
       local $LaTeXML::Post::MATHPROCESSOR = $proc;
       my $secondary = $proc->convertNode($doc, $xmath);
       # IF it is (first) image, copy image attributes to ltx:Math ???
@@ -364,6 +390,9 @@ sub processNode {
   # (if there's an XMath PostProcessing module, it will add it back, with appropriate id's)
   if (my $xml = $$conversion{xml}) {
     $$conversion{xml} = $self->outerWrapper($doc, $xmath, $xml); }
+  elsif (my $string = $$conversion{string}) {
+    my $mimetype = $$conversion{mimetype} || 'unknown';
+    $$conversion{xml} = ['ltx:text', { class => 'ltx_math_' . $mimetype }, $string]; }
   $doc->removeNodes($xmath);
   # NOTE: Unless XMath is the primary, (preserving the XMath, w/no IDSuffix)
   # we've got to remove the id's from the XMath, since the primary will get same id's
@@ -382,7 +411,7 @@ sub maybeSetMathImage {
   if ((($$conversion{mimetype} || '') =~ /^image\//)    # Got an image?
     && !$math->getAttribute('imagesrc')) {              # and it's the first one
     if (my $src = $$conversion{src}) {
-      $math->setAttribute(imagesrc    => $src);
+      $math->setAttribute(imagesrc    => pathname_to_url($src));
       $math->setAttribute(imagewidth  => $$conversion{width});
       $math->setAttribute(imageheight => $$conversion{height});
       $math->setAttribute(imagedepth  => $$conversion{depth}); } }
@@ -477,10 +506,13 @@ sub rawIDSuffix {
 # * the containing XMDual (which makes more sense when we've generated a "container")
 # * the containing XMDual's semantic operator (makes more sense when we're generating
 #   tokens that are only visible from the presentation branch)
+#
+# Additionally: piggy-back here copying any foreign-namespaced attributes from source to target
 sub associateNode {
   my ($self, $node, $currentnode, $noxref) = @_;
   my $r = ref $node;
   return unless $currentnode && $r && ($r eq 'ARRAY' || $r eq 'XML::LibXML::Element');
+  $self->copy_foreign_attributes($node, $currentnode);
   my $document = $LaTeXML::Post::DOCUMENT;
   # Check if already associated with a source node
   my $isarray = ref $node eq 'ARRAY';
@@ -546,9 +578,9 @@ sub associateNode {
         $node->setAttribute('xml:id' => $id); }
       push(@{ $$self{convertedIDs}{$sourceid} }, $id) unless $noxref; } }
   $self->associateNodeHook($node, $sourcenode, $noxref);
-  if ($isarray) {                                                # Array represented
+  if ($isarray) {    # Array represented
     map { $self->associateNode($_, $currentnode, $noxref) } @$node[2 .. $#$node]; }
-  else {                                                         # LibXML node
+  else {             # LibXML node
     map { $self->associateNode($_, $currentnode, $noxref) } element_nodes($node); }
   return; }
 
@@ -606,7 +638,7 @@ sub addCrossrefs {
                 || !$$others_map{$xpid})) { }
             if ($xpid) {
               $other_ids = $$others_map{$xpid}; } } } } }
-    if ($other_ids) {                                         # Hopefully, we've got the targets, now
+    if ($other_ids) {    # Hopefully, we've got the targets, now
       my $xref_id = $$other_ids[0];
       if (scalar(@$other_ids) > 1) {    # Find 1st in document order! (order is cached)
         ($xref_id) = sort { $$xrefids{$a} <=> $$xrefids{$b} } @$other_ids; }
@@ -616,6 +648,10 @@ sub addCrossrefs {
     else {
   } }
   return; }
+
+sub mathIsParsed {
+  my ($doc, $math) = @_;
+  return $math && (($math->getAttribute('class') || '') !~ 'ltx_math_unparsed'); }
 
 #%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -830,12 +866,7 @@ sub addDate {
     my @dates;
     #  $fromdoc's document has some, so copy them.
     if ($fromdoc && (@dates = $fromdoc->findnodes('ltx:date', $fromdoc->getDocumentElement))) {
-      $self->addNodes($self->getDocumentElement, @dates); }
-    else {
-      my ($sec, $min, $hour, $mday, $mon, $year) = localtime(time());
-      $self->addNodes($self->getDocumentElement,
-        ['ltx:date', { role => 'creation' },
-          $MonthNames[$mon] . " " . $mday . ", " . (1900 + $year)]); } }
+      $self->addNodes($self->getDocumentElement, @dates); } }
   return; }
 
 #======================================================================

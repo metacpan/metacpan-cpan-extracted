@@ -1,8 +1,11 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::perl::modprefix;
 
-our $DATE = '2022-09-11'; # DATE
-our $VERSION = '0.045'; # VERSION
+# preamble code
+no warnings 'experimental::regex_sets';
+
+our $DATE = '2022-12-16'; # DATE
+our $VERSION = '0.046'; # VERSION
 
 our $rschema = do{my$var={base=>"str",clsets_after_base=>[{description=>"\nPerl module prefix, e.g. `Foo::Bar::`. An empty prefix ('') is also allowed.\n\nContains coercion rule so you can also input:\n\n    Foo-Bar\n    Foo-Bar-\n    Foo-Bar\n    Foo/Bar\n    Foo/Bar/\n    Foo::Bar\n\nand it will be normalized into `Foo::Bar::`.\n\n",examples=>[{valid=>1,value=>""},{valid=>0,value=>"::"},{valid=>1,value=>"Foo::"},{valid=>1,validated_value=>"Foo::Bar::",value=>"Foo::Bar"},{valid=>1,value=>"Foo::Bar::"},{valid=>0,value=>"::Foo"},{valid=>1,validated_value=>"Foo::",value=>"Foo"},{valid=>1,validated_value=>"Foo::",value=>"Foo/"},{valid=>1,validated_value=>"Foo::",value=>"Foo-"}],match=>"\\A(?:[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*::)?\\z",summary=>"Perl module prefix, e.g. Foo::Bar::","x.completion"=>"perl_modprefix","x.perl.coerce_rules"=>["From_str::normalize_perl_modprefix"]}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["str"],type=>"str",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
@@ -21,7 +24,7 @@ Sah::SchemaR::perl::modprefix - Perl module prefix, e.g. Foo::Bar::
 
 =head1 VERSION
 
-This document describes version 0.045 of Sah::SchemaR::perl::modprefix (from Perl distribution Sah-Schemas-Perl), released on 2022-09-11.
+This document describes version 0.046 of Sah::SchemaR::perl::modprefix (from Perl distribution Sah-Schemas-Perl), released on 2022-12-16.
 
 =head1 DESCRIPTION
 

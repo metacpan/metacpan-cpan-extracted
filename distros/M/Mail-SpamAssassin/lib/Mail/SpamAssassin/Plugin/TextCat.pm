@@ -87,8 +87,8 @@ sub new {
     }
   }
 
-  $self->register_eval_rule("check_language");
-  $self->register_eval_rule("check_body_8bits");
+  $self->register_eval_rule("check_language"); # type does not matter
+  $self->register_eval_rule("check_body_8bits", $Mail::SpamAssassin::Conf::TYPE_BODY_EVALS);
 
   $self->set_config($mailsaobject->{conf});
 
@@ -114,7 +114,7 @@ confidence. In that case, no action is taken.
 
 The rule C<UNWANTED_LANGUAGE_BODY> is triggered if none of the languages
 detected are in the "ok" list. Note that this is the only effect of the
-"ok" list. It does not act as a whitelist against any other form of spam
+"ok" list. It does not act as a welcomelist against any other form of spam
 scanning.
 
 In your configuration, you must use the two or three letter language
@@ -406,7 +406,7 @@ sub load_models {
   # create language ngram maps once
   for (@lm) {
     # look for end delimiter
-    if (/^0 (.+)/) {
+    if (index($_, '0 ') == 0 && /^0 (.+)/) {
       $ngram->{"language"} = $1;
       push(@nm, $ngram);
       # reset for next language
@@ -449,7 +449,14 @@ sub classify {
       $p += exists($ngram->{$_}) ? abs($ngram->{$_} - $i) : $maxp;
       $i++;
     }
-    $results{$language} = $p;
+    # Most latin1 languages have xx and xx.utf8 alternatives (those which
+    # don't have should be named xx.utf-8).  Always strip .utf8 from name,
+    # it will not be accurate as matching will depend on normalize_charset
+    # and mail encoding.  Keep track of the best score for alternatives.
+    $language = $short  if index($language, '.utf8') > 0;
+    if (!exists $results{$language} || $results{$language} > $p) {
+      $results{$language} = $p
+    }
   }
   my @results = sort { $results{$a} <=> $results{$b} } keys %results;
 
@@ -459,7 +466,11 @@ sub classify {
   my @results_tag;
   foreach (@results[0..19]) {
     last unless defined $_;
-    push @results_tag, sprintf "%s:%s(%.02f)", $_, $results{$_}, $results{$_} / $best;
+    if($best != 0) {
+      push @results_tag, sprintf "%s:%s(%.02f)", $_, $results{$_}, $results{$_} / $best;
+    } else {
+      push @results_tag, sprintf "%s:%s(unknown)", $_, $results{$_};
+    }
   }
   $opts->{permsgstatus}->set_tag('TEXTCATRESULTS', join(' ', @results_tag));
 
@@ -539,11 +550,14 @@ sub extract_metadata {
 
   my $body = $msg->get_rendered_body_text_array();
   $body = join("\n", @{$body});
-  $body =~ s/^Subject://i;
+
+  # Strip subject prefixes, enhances results
+  $body =~ s/^(?:[a-z]{2,12}:\s*){1,10}//i;
 
   # Strip anything that looks like url or email, enhances results
-  $body =~ s{https?://\S+}{ }gs;
-  $body =~ s{\S+?\@[a-zA-Z]\S+}{ }gs;
+  $body =~ s/https?(?:\:\/\/|:&#x2F;&#x2F;|%3A%2F%2F)\S{1,1024}/ /gs;
+  $body =~ s/\S{1,64}?\@[a-zA-Z]\S{1,128}/ /gs;
+  $body =~ s/\bwww\.\S{1,128}/ /gs;
 
   my $len = length($body);
   # truncate after 10k; that should be plenty to classify it

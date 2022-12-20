@@ -4,9 +4,9 @@
 #  (C) Paul Evans, 2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.73 ':experimental(init_expr adjust_params)';
+use Object::Pad 0.76 ':experimental(adjust_params)';
 
-package Device::Serial::SLuRM 0.04;
+package Device::Serial::SLuRM 0.05;
 class Device::Serial::SLuRM;
 
 use Carp;
@@ -113,6 +113,15 @@ discarded due to failing CRC check.
 
 A counter, labelled by direction and packet type, tracking the number of
 packets sent and received of each type.
+
+=item request_success_attempts
+
+A distribution that tracks how many attempts it took to get a response to each
+request.
+
+=item request_duration
+
+A timer that tracks how long it took to get a response to each request.
 
 =item retransmits
 
@@ -263,8 +272,8 @@ ADJUST :params (
    }
 }
 
-field $_retransmit_delay :param = 0.05;
-field $_retransmit_count :param = 2;
+field $_retransmit_delay :param //= 0.05;
+field $_retransmit_count :param //= 2;
 
 field $_on_notify;
 
@@ -427,7 +436,7 @@ async method _run
             await $self->send_packet_twice( SLURM_PKTCTRL_ACK | $seqno, "" );
          }
          default {
-            die sprintf "TODO: Received unrecognised packet type=%02X\n", $pktctrl;
+            warn sprintf "Received unrecognised packet type=%02X\n", $pktctrl;
          }
       }
    }

@@ -108,7 +108,7 @@ sub Revert {
   my ($thing) = @_;
   no warnings 'recursion';
   return (defined $thing
-    ? (ref $thing ? map { $_->unlist } $thing->revert
+    ? (ref $thing ? map { $_ ? $_->unlist : () } $thing->revert
       : LaTeXML::Core::Token::Explode($thing))    # Ugh!!
     : ()); }
 
@@ -158,6 +158,14 @@ sub beDigested {
 
 sub beAbsorbed {
   my ($self, $document) = @_;
+  # Guard via the absorb limit to avoid infinite loops
+  if ($LaTeXML::ABSORB_LIMIT) {
+    my $absorb_counter = $STATE->lookupValue('absorb_count') || 0;
+    $STATE->assignValue(absorb_count => ++$absorb_counter, 'global');
+    if ($absorb_counter > $LaTeXML::ABSORB_LIMIT) {
+      Fatal('timeout', 'absorb_limit', $self,
+        "Whatsit absorb limit of $LaTeXML::ABSORB_LIMIT exceeded, infinite loop?"); } }
+
   return $document->openText($self->toString, $document->getNodeFont($document->getElement)); }
 
 sub unlist {

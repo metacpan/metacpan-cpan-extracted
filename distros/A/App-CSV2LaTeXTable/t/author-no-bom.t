@@ -18,8 +18,11 @@ my @files = (
     'bin/csv2latextable',
     'lib/App/CSV2LaTeXTable.pm',
     't/base.t',
+    't/croak.t',
     't/data/test.csv',
-    't/data/test.latex'
+    't/latex-params.t',
+    't/rotate.t',
+    't/split_tables.t'
 );
 
 ok(file_hasnt_bom($_)) for @files;

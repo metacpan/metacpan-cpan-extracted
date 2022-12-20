@@ -1,4 +1,14 @@
 Revision history for Perl extension IO::FD.
+0.1.4   Sat 17 Dec 2022 12:09:40 AEST
+  - Fixed undefined fd sysread/syswrite bug
+    An undefined fd value passed to sysread* or syswrite* would be be converted
+    to 0, which normally is a valid fd (STDIN). 
+
+    Change sysread* and syswrite* functions to expect an SV instead of an int
+    and test for undefined fd and return undefined.
+  
+
+
 
 0.1.3   Tue 15 Nov 2022 20:45:17 AEST
 	- Added accept_multiple routine

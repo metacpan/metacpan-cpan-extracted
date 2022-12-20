@@ -3,9 +3,9 @@ package TableDataBundle::Software::License;
 use strict;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-07-25'; # DATE
+our $DATE = '2022-07-27'; # DATE
 our $DIST = 'TableDataBundle-Software-License'; # DIST
-our $VERSION = '0.001'; # VERSION
+our $VERSION = '0.002'; # VERSION
 
 1;
 # ABSTRACT: Collection of TableData:: modules related to software license
@@ -22,13 +22,15 @@ TableDataBundle::Software::License - Collection of TableData:: modules related t
 
 =head1 VERSION
 
-This document describes version 0.001 of TableDataBundle::Software::License (from Perl distribution TableDataBundle-Software-License), released on 2022-07-25.
+This document describes version 0.002 of TableDataBundle::Software::License (from Perl distribution TableDataBundle-Software-License), released on 2022-07-27.
 
 =head1 DESCRIPTION
 
 This distribution contains the following L<TableData>:: modules:
 
 =over
+
+=item * L<TableData::Software::License::FromRPL>
 
 =item * L<TableData::Software::License::FromSL>
 

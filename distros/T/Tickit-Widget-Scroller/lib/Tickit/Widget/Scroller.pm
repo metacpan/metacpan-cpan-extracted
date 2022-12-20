@@ -1,13 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2022 -- leonerd@leonerd.org.uk
 
 use v5.26; # signatures
-use Object::Pad 0.57;
+use Object::Pad 0.73 ':experimental(adjust_params init_expr)';
 
-package Tickit::Widget::Scroller 0.28;
+package Tickit::Widget::Scroller 0.29;
 class Tickit::Widget::Scroller
+   :strict(params)
    :isa(Tickit::Widget);
 
 use Tickit::Style;
@@ -140,11 +141,11 @@ C<set_gen_top_indicator> and C<set_gen_bottom_indicator>.
 
 =cut
 
-has @_items;
-has @_itemheights;
+field @_items;
+field @_itemheights;
 
-has $_start_item = 0;
-has $_start_partial = 0;
+field $_start_item = 0;
+field $_start_partial = 0;
 
 # accessor methods for t/30indicator.t to use
 # TODO: Should think about whether these should be made public
@@ -154,22 +155,21 @@ method _start_partial { $_start_partial }
 
 # We're going to cache window height because we need pre-resize height
 # during resize event
-has $_window_lines;
-has $_window_cols;
+field $_window_lines;
+field $_window_cols;
 
-has $_gravity_bottom;
+field $_gravity_bottom;
 
-has $_pending_scroll_to_bottom;
+field $_pending_scroll_to_bottom;
 
-has $_on_scrolled :param :reader :writer = undef;
+field $_on_scrolled :param :reader :writer = undef;
 
-has $_gen_top_indicator    :param = undef;
-has $_gen_bottom_indicator :param = undef;
+field $_gen_top_indicator    :param = undef;
+field $_gen_bottom_indicator :param = undef;
 
-ADJUSTPARAMS ( $params )
-{
-   my $gravity = ( delete $params->{gravity} ) || "top";
-
+ADJUST :params (
+   :$gravity = "top",
+) {
    $_gravity_bottom = ( $gravity eq "bottom" );
 }
 
@@ -978,8 +978,8 @@ return different text now.
 
 =cut
 
-has %_indicator_win;
-has %_indicator_text;
+field %_indicator_win;
+field %_indicator_text;
 
 method update_indicators ()
 {

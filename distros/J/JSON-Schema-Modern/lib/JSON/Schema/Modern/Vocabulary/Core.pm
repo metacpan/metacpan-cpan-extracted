@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::Core;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Core vocabulary
 
-our $VERSION = '0.558';
+our $VERSION = '0.559';
 
 use 5.020;
 use Moo;
@@ -93,8 +93,7 @@ sub _eval_keyword_id ($self, $data, $schema, $state) {
   $state->{schema_path} = '';
   $state->{spec_version} = $schema_info->{specification_version};
   $state->{vocabularies} = $schema_info->{vocabularies};
-  # it's possible that a different schema resource has its own set of configs, different from the
-  # JSM attribute value
+
   if ($state->{validate_formats}) {
     $state->{vocabularies} = [
       map s/^JSON::Schema::Modern::Vocabulary::Format\KAnnotation$/Assertion/r, $state->{vocabularies}->@*
@@ -356,7 +355,7 @@ JSON::Schema::Modern::Vocabulary::Core - Implementation of the JSON Schema Core 
 
 =head1 VERSION
 
-version 0.558
+version 0.559
 
 =head1 DESCRIPTION
 

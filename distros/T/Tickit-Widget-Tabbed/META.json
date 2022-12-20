@@ -4,7 +4,7 @@
       "Tom Molesworth <cpan@entitymodel.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -39,7 +39,7 @@
       "runtime" : {
          "requires" : {
             "List::Util" : "1.26",
-            "Object::Pad" : "0.58",
+            "Object::Pad" : "0.74",
             "Scalar::Util" : "0",
             "Struct::Dumb" : "0",
             "Tickit::ContainerWidget" : "0.44",
@@ -53,14 +53,14 @@
    "provides" : {
       "Tickit::Widget::Tabbed" : {
          "file" : "lib/Tickit/Widget/Tabbed.pm",
-         "version" : "0.026"
+         "version" : "0.027"
       },
       "Tickit::Widget::Tabbed::Ribbon" : {
          "file" : "lib/Tickit/Widget/Tabbed/Ribbon.pm",
-         "version" : "0.026"
+         "version" : "0.027"
       }
    },
    "release_status" : "stable",
-   "version" : "0.026",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.027",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

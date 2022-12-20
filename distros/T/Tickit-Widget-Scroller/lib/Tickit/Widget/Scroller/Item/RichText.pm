@@ -5,8 +5,9 @@
 
 use Object::Pad 0.57;
 
-package Tickit::Widget::Scroller::Item::RichText 0.28;
+package Tickit::Widget::Scroller::Item::RichText 0.29;
 class Tickit::Widget::Scroller::Item::RichText
+   :strict(params)
    :isa(Tickit::Widget::Scroller::Item::Text);
 
 use Tickit::Utils qw( textwidth );

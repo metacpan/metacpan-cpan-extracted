@@ -1,3 +1,7 @@
+0.14 2022-12-17
+
+- [update] Add missing "subtests" method
+
 0.13 2022-08-09
 
 - [change] Refactor underlying architecture

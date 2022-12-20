@@ -47,6 +47,7 @@ my %WriteMakefileArgs = (
   "DISTNAME" => "Git-Hooks",
   "EXE_FILES" => [
     "scripts/find-secret-leakage-in-git-diff.pl",
+    "scripts/githooks-docker.sh",
     "scripts/githooks.pl"
   ],
   "LICENSE" => "perl",
@@ -82,7 +83,7 @@ my %WriteMakefileArgs = (
     "Test::Requires::Git" => 0,
     "lib" => 0
   },
-  "VERSION" => "3.3.1",
+  "VERSION" => "3.4.0",
   "test" => {
     "TESTS" => "t/*.t"
   }

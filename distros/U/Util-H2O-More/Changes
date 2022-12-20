@@ -40,3 +40,13 @@
 0.0.9 Fri Nov 25 14:00:00 2022
     - corrected some minor documentation and code
       examples for using opt2h2o with Getopt::Long
+
+0.1   Thu Dec 16 14:00:00 2022
+     - added h3o for bags of HASH refs, h3o and
+       the reverser, o3h
+     - added vmethods for ARRAY containers: all,
+       push, pop, unshift, shift, scalar
+     - updated POD, added tests for all new things
+     - specified minimum version of Perl as 5.10
+       in dist.ini and all meta data that follows
+

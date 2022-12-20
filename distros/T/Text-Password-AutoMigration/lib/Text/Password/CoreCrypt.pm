@@ -1,8 +1,8 @@
 package Text::Password::CoreCrypt;
-our $VERSION = "0.17";
+our $VERSION = "0.18";
 
 require 5.008_008;
-use Carp qw(croak carp);
+use autouse 'Carp' => qw(croak carp);
 
 use Moo;
 use strictures 2;
@@ -15,7 +15,7 @@ has readability => ( is => 'rw', isa => Bool, default => 1 );
 
 no Moo::sification;
 
-my @w     = ( 'a' .. 'z', 'A' .. 'Z', 0 .. 9 );
+my @w     = ( 0 .. 9, 'a' .. 'z', 'A' .. 'Z' );
 my @seeds = ( @w,     '.', '/' );
 my @ascii = ( @seeds, '#', ',', qw# ! " $ % & ' ( ) * + - : ; < = > ? @ [ \ ] ^ _ ` { | } ~ # );
 
@@ -28,7 +28,7 @@ Text::Password::CoreCrypt - generate and verify Password with perl CORE::crypt()
 =head1 SYNOPSIS
 
  my $pwd = Text::Password::CoreCrypt->new();
- my( $raw, $hash ) = $pwd->genarate();          # list context is required
+ my( $raw, $hash ) = $pwd->generate();          # list context is required
  my $input = $req->body_parameters->{passwd};
 my $data = $pwd->encrypt($input);    # you don't have to care about salt
 
@@ -54,7 +54,8 @@ No arguments are required. But you can set some parameters.
 
 You can set default length with param 'default' like below:
 
- $pwd = Text::Pasword::AutoMiglation->new( default => 12 );
+$pwd = Text::Password::AutoMiglation->new( default => 12 );
+
 
 
 =item readablity( I<Bool> )
@@ -66,7 +67,8 @@ It must be a boolean, default is 1.
 
 If it was set as 0, you can generate stronger passwords with generate().
 
- $pwd = Text::Pasword::AutoMiglation->new( readability => 0 );
+$pwd = Text::Password::AutoMiglation->new( readability => 0 );
+
 
 =back
 
@@ -81,11 +83,9 @@ returns true if the verification succeeds.
 sub verify {
     my $self = shift;
     my ( $input, $data ) = @_;
-
     warn __PACKAGE__, " makes 13 bytes hash strings. Your data must be wrong: ", $data
         unless $data =~ /^[ !-~]{13}$/;
     return $data eq CORE::crypt( $input, $data );
-
 }
 
 =head3 nonce( I<Int> )
@@ -131,7 +131,7 @@ sub encrypt {
 
 =head3 generate( I<Int> )
 
-genarates pair of new password and it's hash.
+generates pair of new password and its hash.
 
 less readable characters(0Oo1Il|!2Zz5sS$6b9qCcKkUuVvWwXx.,:;~-^'"`) are forbidden
 unless $self->readability is 0.
@@ -152,7 +152,6 @@ sub generate {
     do {    # redo unless it gets enough readability
         $raw = $self->nonce($length);
         return $raw, $self->encrypt($raw) unless $self->readability();
-
     } while $raw =~ /[0Oo1Il|!2Zz5sS\$6b9qCcKkUuVvWwXx.,:;~\-^'"`]/;
     return $raw, $self->encrypt($raw);
 }

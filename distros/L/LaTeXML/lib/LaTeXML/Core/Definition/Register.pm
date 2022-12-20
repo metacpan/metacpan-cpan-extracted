@@ -13,6 +13,8 @@ package LaTeXML::Core::Definition::Register;
 use strict;
 use warnings;
 use LaTeXML::Global;
+use LaTeXML::Common::Object;
+use LaTeXML::Common::Error;
 use base qw(LaTeXML::Core::Definition::Primitive);
 
 # Known Traits:
@@ -44,7 +46,15 @@ sub valueOf {
 
 sub setValue {
   my ($self, $value, @args) = @_;
-  &{ $$self{setter} }($value, @args);
+  my $tracing = $STATE->lookupValue('TRACINGCOMMANDS');
+  if ($tracing || $LaTeXML::DEBUG{tracing}) {
+    my $scope  = $STATE->getPrefix('global') ? 'globally ' : '';
+    my $csname = ToString($$self{cs});
+    Debug("{$scope" . "changing " . $csname . "=" . ToString($self->valueOf(@args)) . "}");
+    &{ $$self{setter} }($value, @args);
+    Debug("{into " . $csname . "=" . ToString($self->valueOf(@args)) . "}"); }
+  else {
+    &{ $$self{setter} }($value, @args); }
   return; }
 
 sub addValue {

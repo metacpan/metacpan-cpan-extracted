@@ -34,7 +34,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.31';
+our $VERSION = '0.34';
 
 use UI::Various::core;
 use UI::Various::Listbox;
@@ -201,7 +201,8 @@ the rectangular text box for UI element
 sub _show($$$$)
 {
     my ($self, $prefix, $width, $height, $pre_active) = @_;
-    my $blank = ' ' x length($prefix);
+    my $l_prefix = length($prefix);
+    my $blank = ' ' x $l_prefix;
     my ($i, $h, $selection) = ($self->first, $self->height, $self->selection);
     my @text = ();
     my $entries = @{$self->texts};
@@ -245,6 +246,7 @@ sub _show($$$$)
 	{   push @text, ' ';   }
 	$_++;
     }
+    $width += $l_prefix;	# input width doesn't contain prefix (text does!)
     return $self->_format('', '', '', \@text, '', '', $width, $height);
 }
 

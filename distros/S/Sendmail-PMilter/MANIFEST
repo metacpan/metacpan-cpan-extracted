@@ -12,7 +12,7 @@ LICENSE
 Makefile.PL
 MANIFEST			This list of files
 README
-README.1.23
+README.1.24
 t/00_pmilter.t
 t/files/sendmail0.cf
 t/files/sendmail1.cf

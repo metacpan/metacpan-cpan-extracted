@@ -1,11 +1,11 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2022 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.57;
+use Object::Pad 0.66;
 
-package Tickit::Style::Parser 0.53;
+package Tickit::Style::Parser 0.54;
 class Tickit::Style::Parser
    :isa(Parser::MGC)
    :strict(params);
@@ -99,10 +99,10 @@ method token_boolean
 class # hide from indexer
    Tickit::Style::Parser::_Definition :strict(params) {
 
-   has $type  :reader :param;
-   has $class :reader :param;
-   has $tags  :reader :param;
-   has $style :reader :param;
+   field $type  :reader :param;
+   field $class :reader :param;
+   field $tags  :reader :param;
+   field $style :reader :param;
 }
 
 0x55AA;

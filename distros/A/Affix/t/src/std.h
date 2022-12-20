@@ -1,13 +1,14 @@
 #pragma once
 
-#include <stdio.h>
-#include <string.h>
 #include <math.h>
 #include <stdbool.h>
 #include <stddef.h> // offsetof
+#include <stdio.h>
+#include <string.h>
 
 #define warn(FORMAT, ...)                                                                          \
-    fprintf(stderr, FORMAT " in %s at line %i\n", ##__VA_ARGS__, __FILE__, __LINE__)
+    fprintf(stderr, FORMAT " in %s at line %i\n", ##__VA_ARGS__, __FILE__, __LINE__);              \
+    fflush(stderr);
 
 #if defined _WIN32 || defined __CYGWIN__
 #include <BaseTsd.h>

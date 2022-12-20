@@ -1,19 +1,14 @@
 #!/usr/bin/perl
-require 5.6.1;
+require v5.14.0;
 
 use strict;
 use warnings;
 use Config;
 
-use ExtUtils::MakeMaker;
+use ExtUtils::MakeMaker 6.64;
 
-# avoid stupid 'Argument "6.30_01" isn't numeric in numeric ge (>=)' warnings;
-my $mm_version = eval $ExtUtils::MakeMaker::VERSION;
-
-# raising the version of makemaker to 6.46 per bug 6598 & 6131
-if ($mm_version < 6.46) {
-  die "Apache SpamAssassin Makefile.PL requires at least ExtUtils::MakeMaker v6.46";
-}
+# raising the version of makemaker to 6.64 to use TEST_REQUIRES
+use constant MIN_MAKEMAKER_VERSION => 6.64;
 
 use constant RUNNING_ON_WINDOWS => ($^O =~ /^(mswin|dos|os2)/oi);
 use constant HAS_DBI => eval { require DBI; };
@@ -167,7 +162,7 @@ my %makefile = (
     'PMLIBDIRS' => [ 'lib' ],
 
     'PM_FILTER' => '$(PREPROCESS) -Mconditional -Mvars -DVERSION="$(VERSION)" \
-    	-DPREFIX="$(I_PREFIX)" \
+	-DPREFIX="$(I_PREFIX)" \
 	-DDEF_RULES_DIR="$(I_DATADIR)" \
 	-DLOCAL_RULES_DIR="$(I_CONFDIR)" \
 	-DLOCAL_STATE_DIR="$(I_LOCALSTATEDIR)"',
@@ -177,9 +172,7 @@ my %makefile = (
     },
 
     # be quite explicit about this; afaik CPAN.pm is sensible using this
-    # also see CURRENT_PM below
     'PREREQ_PM' => {
-        'Digest::SHA1'         => 0,             # 2.0 is oldest tested version
         'File::Spec'           => 0.8,           # older versions lack some routines we need
         'File::Copy'           => 2.02,          # this version is shipped with 5.005_03, the oldest version known to work
         'Pod::Usage'           => 1.10,          # all versions prior to this do seem to be buggy
@@ -187,18 +180,37 @@ my %makefile = (
         'Archive::Tar'         => 1.23,          # for sa-update
         'IO::Zlib'             => 1.04,          # for sa-update
         'Mail::DKIM'           => 0.31,
-        'Net::DNS'             => (RUNNING_ON_WINDOWS ? 0.46 : 0.34), # bugs in older revs
+        'Net::DNS'             => 0.69,
         'NetAddr::IP'          => 4.010,
         'Sys::Hostname'        => 0,
-        'Test::More'           => 0,
         'Time::HiRes'          => 0,
         'Time::Local'          => 0,
         'Errno'                => 0,
     },
 
+    # In case MIN_MAKEMAKER_VERSION is greater than the version bundled in the core of MIN_PERL_VERSION
+    # use this to ensure CPAN will automatically upgrade MakeMaker if needed
+    'BUILD_REQUIRES' => {
+        'ExtUtils::MakeMaker' => MIN_MAKEMAKER_VERSION,
+    },
+
+    'CONFIGURE_REQUIRES' => {
+        'ExtUtils::MakeMaker' => MIN_MAKEMAKER_VERSION,
+    },
+
+    # The modules that are not core that are used in default tests
+    'TEST_REQUIRES' => {
+        'Devel::Cycle' => 0,
+        'Test::More'   => 0,
+        'Text::Diff' => 0,
+        'Perl::Critic::Policy::TestingAndDebugging::ProhibitNoStrict' => 0,
+        'Perl::Critic::Policy::Perlsecret' => 0,
+    },
+
     'dist' => {
         COMPRESS => 'gzip -9f',
-        SUFFIX => 'gz',
+        SUFFIX => '.gz',
+        TARFLAGS => 'cf',
         DIST_DEFAULT => 'tardist',
 
         CI => 'svn commit',
@@ -228,12 +240,8 @@ my %makefile = (
 
         'rules/*.pm',
 
-        # don't remove these. they are built from 'rulesrc' in SVN, but
-        # in a distribution tarball, they're not
-        # 'rules/70_sandbox.cf',
-        # 'rules/72_active.cf',
-
-        # this file is no longer built, or used
+        'rules/70_sandbox.cf',
+        'rules/72_active.cf',
         'rules/70_inactive.cf',
 
       )
@@ -246,6 +254,7 @@ my %makefile = (
     # We have only this Makefile.PL and this option keeps MakeMaker from
     # asking all questions twice after a 'make dist*'.
     'NORECURS' => 1,
+    'MIN_PERL_VERSION'=> 5.014000,
 );
 
 # rules/72_active.cf is built from "rulesrc", but *must* exist before
@@ -253,14 +262,6 @@ my %makefile = (
 my @FILES_THAT_MUST_EXIST = qw(
         rules/72_active.cf
     );
-
-# make sure certain optional modules are up-to-date if they are installed
-# also see PREREQ_PM above
-my %CURRENT_PM = (
-    'Net::DNS' => (RUNNING_ON_WINDOWS ? 0.46 : 0.34),
-    'Razor2::Client::Agent' => 2.40,
-);
-
 
 # All the $(*MAN1*) stuff is empty/zero if Perl was Configured with -Dman1dir=none;
 # however, support site/vendor man1 dirs (bug 5338)
@@ -324,11 +325,13 @@ See that file if you wish to customize what tests are run, and how.
 
 # check optional module versions
 use lib 'lib';
-use Mail::SpamAssassin::Util::DependencyInfo;
-if (Mail::SpamAssassin::Util::DependencyInfo::long_diagnostics() != 0) {
-  # missing required module?  die!
-  # bug 5908: http://cpantest.grango.org/wiki/CPANAuthorNotes says
-  # we should exit with a status of 0, but without creating Makefile
+require Mail::SpamAssassin::Util::DependencyInfo;
+if (Mail::SpamAssassin::Util::DependencyInfo::long_diagnostics(1) != 0) {
+  # This prints a full report of missing required and optional modules and binaries
+  # but only exit 0 without creating Makefile if there are missing required binaries.
+  # See http://cpantest.grango.org/wiki/CPANAuthorNotes
+  # Continuing when there are missing required CPAN modules allows cpan to install them
+  # before it runs make on the Makefile
   exit 0;
 }
 
@@ -362,26 +365,45 @@ $makefile{META_MERGE} = {
     MailingList => 'http://wiki.apache.org/spamassassin/MailingLists',
   },
 
-  recommends => {
-    'MIME::Base64' =>              0,
-    'DB_File' =>                   0,
-    'Net::SMTP' =>                 0,
-    'Mail::SPF' =>                 0,
-    'Geo::IP' =>                   0,
-    'Razor2::Client::Agent' =>     2.61,
-    'Net::Ident' =>                0,
-    'IO::Socket::INET6' =>         0,
-    'IO::Socket::SSL' =>           1.76,
-    'Compress::Zlib' =>            0,
-    'Mail::DKIM' =>                0.37,
-    'DBI' =>                       0,
-    'Getopt::Long' =>              2.32,
-    'LWP::UserAgent' =>            0,
-    'HTTP::Date' =>                0,
-    'Archive::Tar' =>              1.23,
-    'IO::Zlib' =>                  1.04,
-    'Encode::Detect' =>            0
-  }
+  prereqs => {
+    runtime => {
+      recommends => {
+        'MIME::Base64' =>              0,
+        'DB_File' =>                   0,
+        'Net::SMTP' =>                 0,
+        'Net::LibIDN2' =>              0,
+        'Net::LibIDN' =>               0,
+        'Mail::SPF' =>                 0,
+        'MaxMind::DB::Reader' =>       0,
+        'MaxMind::DB::Reader::XS' =>   0,
+        'Geo::IP' =>                   0,
+        'IP::Country::DB_File' =>      0,
+        'IP::Country::Fast' =>         0,
+        'Razor2::Client::Agent' =>     2.61,
+        'IO::Socket::IP' =>            0.09,
+        'IO::Socket::INET6' =>         0,
+        'IO::Socket::SSL' =>           1.76,
+        'Compress::Zlib' =>            0,
+        'Mail::DKIM' =>                0.37,
+        'DBI' =>                       0,
+        'DBD::SQLite' =>               1.59_01,
+        'LWP::UserAgent' =>            0,
+        'Encode::Detect::Detector' =>  0,
+        'Net::Patricia' =>             1.16,
+        'Net::CIDR::Lite' =>           0,
+        'BSD::Resource' =>             0,
+        'Archive::Zip' =>              0,
+        'IO::String' =>                0,
+        'Email::Address::XS' =>        0,
+        'Mail::DMARC' =>               0,
+      },
+    },
+    test => {
+      recommends => {
+        'Net::DNS::Nameserver' =>      0,
+      },
+    },
+  },
 };
 
 #######################################################################
@@ -390,7 +412,7 @@ $makefile{META_MERGE} = {
 $makefile{EXE_FILES} = [ values %{$makefile{EXE_FILES}} ];
 $makefile{AUTHOR} =~ s/(<.+) at (.+>)/$1\@$2/;
 WriteMakefile(%makefile);
-print "Makefile written by ExtUtils::MakeMaker $mm_version\n";
+print "Makefile written by ExtUtils::MakeMaker $ExtUtils::MakeMaker::VERSION\n";
 
 #######################################################################
 
@@ -795,7 +817,14 @@ sub _set_macro_PERL_TAINT {
 sub _set_macro_PREPROCESS {
 
   return if get_macro('PREPROCESS');
-  set_macro('PREPROCESS', join(' ', macro_ref('PERL_BIN'), qq{build/preprocessor}));
+  # Bug 8038 - work around quirk of newer Extutils::MakeMaker on Windows with dmake
+  my $perl_bin = get_expanded_macro('FULLPERL');
+  if ($RUNNING_ON_WINDOWS and ($::Config{make} eq 'dmake') and ($perl_bin =~ /^([a-zA-Z]:)?\\"(.*)$/)) {
+    $perl_bin = "\"$1\\$2";
+  } else {
+    $perl_bin = macro_ref('PERL_BIN');
+  }
+  set_macro('PREPROCESS', join(' ', $perl_bin, qq{build/preprocessor}));
 }
 
 # This routine sets the value for CONFIGURE (spamc only).
@@ -1131,6 +1160,7 @@ conf__install:
 	$(PERL) -MFile::Copy -e "copy(q[rules/v341.pre], q[$(B_CONFDIR)/v341.pre]) unless -f q[$(B_CONFDIR)/v341.pre]"
 	$(PERL) -MFile::Copy -e "copy(q[rules/v342.pre], q[$(B_CONFDIR)/v342.pre]) unless -f q[$(B_CONFDIR)/v342.pre]"
 	$(PERL) -MFile::Copy -e "copy(q[rules/v343.pre], q[$(B_CONFDIR)/v343.pre]) unless -f q[$(B_CONFDIR)/v343.pre]"
+	$(PERL) -MFile::Copy -e "copy(q[rules/v400.pre], q[$(B_CONFDIR)/v400.pre]) unless -f q[$(B_CONFDIR)/v400.pre]"
 
 data__install:
 	-$(MKPATH) $(B_DATADIR)

@@ -59,6 +59,7 @@ my @files = (
     't/additional-tests-draft2020-12/format-ipv4.json',
     't/additional-tests-draft2020-12/format-relative-json-pointer.json',
     't/additional-tests-draft2020-12/format-time.json',
+    't/additional-tests-draft2020-12/formats.json',
     't/additional-tests-draft2020-12/id.json',
     't/additional-tests-draft2020-12/integers.json',
     't/additional-tests-draft2020-12/keyword-independence.json',

@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-11'; # DATE
+our $DATE = '2022-12-16'; # DATE
 our $DIST = 'Sah-Schemas-Perl'; # DIST
-our $VERSION = '0.045'; # VERSION
+our $VERSION = '0.046'; # VERSION
 
 our $schema = [str => {
     summary => 'Perl distribution name (e.g. Foo-Bar) with optional version number suffix (e.g. Foo-Bar@0.001)',
@@ -59,7 +59,7 @@ Sah::Schema::perl::distname_with_optional_ver - Perl distribution name (e.g. Foo
 
 =head1 VERSION
 
-This document describes version 0.045 of Sah::Schema::perl::distname_with_optional_ver (from Perl distribution Sah-Schemas-Perl), released on 2022-09-11.
+This document describes version 0.046 of Sah::Schema::perl::distname_with_optional_ver (from Perl distribution Sah-Schemas-Perl), released on 2022-12-16.
 
 =head1 SYNOPSIS
 
@@ -97,11 +97,11 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data);
  
  # a sample valid data
- $data = "Foo-Bar\@1";
+ $data = "Foo::Bar\@0.5_001";
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
- $data = "";
+ $data = "Foo-Bar\@a";
  my $errmsg = $validator->($data); # => "Must match regex pattern \\A[A-Za-z_][A-Za-z_0-9]*(-[A-Za-z_0-9]+)*(\@[0-9][0-9A-Za-z]*(\\.[0-9A-Za-z_]+)*)?\\z"
 
 Often a schema has coercion rule or default value, so after validation the
@@ -112,12 +112,12 @@ prefiltered) value:
  my $res = $validator->($data); # [$errmsg, $validated_val]
  
  # a sample valid data
- $data = "Foo-Bar\@1";
- my $res = $validator->($data); # => ["","Foo-Bar\@1"]
+ $data = "Foo::Bar\@0.5_001";
+ my $res = $validator->($data); # => ["","Foo-Bar\@0.5_001"]
  
  # a sample invalid data
- $data = "";
- my $res = $validator->($data); # => ["Must match regex pattern \\A[A-Za-z_][A-Za-z_0-9]*(-[A-Za-z_0-9]+)*(\@[0-9][0-9A-Za-z]*(\\.[0-9A-Za-z_]+)*)?\\z",""]
+ $data = "Foo-Bar\@a";
+ my $res = $validator->($data); # => ["Must match regex pattern \\A[A-Za-z_][A-Za-z_0-9]*(-[A-Za-z_0-9]+)*(\@[0-9][0-9A-Za-z]*(\\.[0-9A-Za-z_]+)*)?\\z","Foo-Bar\@a"]
 
 Data::Sah can also create validator that returns a hash of detailed error
 message. Data::Sah can even create validator that targets other language, like
@@ -179,6 +179,23 @@ L<Perinci::CmdLine> (L<Perinci::CmdLine::Lite>) to create a CLI:
  % ./myapp.pl --version
 
  % ./myapp.pl --arg1 ...
+
+
+=head2 Using with Type::Tiny
+
+To create a type constraint and type library from a schema:
+
+ package My::Types {
+     use Type::Library -base;
+     use Type::FromSah qw( sah2type );
+
+     __PACKAGE__->add_type(
+         sah2type('$sch_name*', name=>'PerlDistnameWithOptionalVer')
+     );
+ }
+
+ use My::Types qw(PerlDistnameWithOptionalVer);
+ PerlDistnameWithOptionalVer->assert_valid($data);
 
 =head1 DESCRIPTION
 

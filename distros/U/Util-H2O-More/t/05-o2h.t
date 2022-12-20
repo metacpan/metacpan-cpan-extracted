@@ -2,11 +2,12 @@ use strict;
 use warnings;
 
 use Test::More q//;
+use Util::H2O::More qw/h2o o2h/;
+
+# for included module required for testing
 use FindBin qw/$Bin/;
 use lib qq{$Bin/lib};
 use Foo;
-
-use Util::H2O::More qw/h2o o2h/;
 
 my $origin_ref = {
     somewhere => q{over},

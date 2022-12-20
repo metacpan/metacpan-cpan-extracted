@@ -158,7 +158,7 @@ Patrick Joly
 
 # VERSION
 
-1.05
+1.06
 
 # LICENSE AND COPYRIGHT
 

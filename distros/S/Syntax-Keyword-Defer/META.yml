@@ -18,15 +18,15 @@ name: Syntax-Keyword-Defer
 provides:
   Syntax::Keyword::Defer:
     file: lib/Syntax/Keyword/Defer.pm
-    version: '0.07'
+    version: '0.08'
   Syntax::Keyword::Finally:
     file: lib/Syntax/Keyword/Finally.pm
-    version: '0.07'
+    version: '0.08'
 requires:
   XS::Parse::Keyword: '0.13'
   perl: '5.014'
 resources:
   IRC: irc://irc.perl.org/#io-async
   license: http://dev.perl.org/licenses/
-version: '0.07'
+version: '0.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

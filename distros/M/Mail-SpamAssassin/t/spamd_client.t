@@ -1,21 +1,5 @@
 #!/usr/bin/perl -T
 
-BEGIN {
-  if (-e 't/test_dir') { # if we are running "t/rule_tests.t", kluge around ...
-    chdir 't';
-  }
-
-  if (-e 'test_dir') {            # running from test directory, not ..
-    unshift(@INC, '../blib/lib');
-    unshift(@INC, '../lib');
-  }
-}
-
-my $prefix = '.';
-if (-e 'test_dir') {            # running from test directory, not ..
-  $prefix = '..';
-}
-
 use lib '.'; use lib 't';
 use SATest; sa_t_init("spamd_client");
 
@@ -47,9 +31,9 @@ my $testmsg = getmessage("data/spam/gtube.eml");
 ok($testmsg);
 
 %patterns = (
-q{ X-Spam-Flag: YES}, 'flag',
-q{ BODY: Generic Test for Unsolicited Bulk Email }, 'gtube',
-q{ XJS*C4JDBQADN1.NSBN3*2IDNEN*GTUBE-STANDARD-ANTI-UBE-TEST-EMAIL*C.34X }, 'gtube string',
+  qr/^X-Spam-Flag: YES/m, 'flag',
+  q{ 1000 GTUBE }, 'gtube',
+  'XJS*C4JDBQADN1.NSBN3*2IDNEN*GTUBE-STANDARD-ANTI-UBE-TEST-EMAIL*C.34X', 'gtube string',
 );
 
 ok(start_spamd("-L"));
@@ -82,11 +66,11 @@ ok_all_patterns();
 
 clear_pattern_counters();
 %patterns = (
-q{ X-Spam-Flag: YES}, 'flag',
+qr/^X-Spam-Flag: YES/m, 'flag',
 );
 
 %anti_patterns = (
-q{ XJS*C4JDBQADN1.NSBN3*2IDNEN*GTUBE-STANDARD-ANTI-UBE-TEST-EMAIL*C.34X }, 'gtube string',
+  'XJS*C4JDBQADN1.NSBN3*2IDNEN*GTUBE-STANDARD-ANTI-UBE-TEST-EMAIL*C.34X', 'gtube string',
 );
 
 $result = $client->headers($testmsg);
@@ -106,14 +90,14 @@ if (!$RUNNING_ON_WINDOWS) {
   $spamd_already_killed = undef;
 
   %patterns = (
-    q{ X-Spam-Flag: YES}, 'flag',
-    q{ BODY: Generic Test for Unsolicited Bulk Email }, 'gtube',
-    q{ XJS*C4JDBQADN1.NSBN3*2IDNEN*GTUBE-STANDARD-ANTI-UBE-TEST-EMAIL*C.34X }, 'gtube string',
+    qr/^X-Spam-Flag: YES/m, 'flag',
+    q{ 1000 GTUBE }, 'gtube',
+    'XJS*C4JDBQADN1.NSBN3*2IDNEN*GTUBE-STANDARD-ANTI-UBE-TEST-EMAIL*C.34X', 'gtube string',
       );
 
   %anti_patterns = ();
 
-  my $sockpath = mk_safe_tmpdir()."/spamd.sock";
+  my $sockpath = mk_socket_tempdir()."/spamd.sock";
   ok(start_spamd("-L --socketpath=$sockpath"));
 
   $client = create_clientobj({
@@ -142,15 +126,15 @@ if (!$RUNNING_ON_WINDOWS) {
   ok_all_patterns();
 
   ok(stop_spamd());
-  cleanup_safe_tmpdir();
 }
 
 if (HAS_SDBM_FILE) {
 
   clear_pattern_counters();
   $spamd_already_killed = undef;
-  tstlocalrules ("
-        bayes_store_module Mail::SpamAssassin::BayesStore::SDBM
+
+  tstprefs ("
+    bayes_store_module Mail::SpamAssassin::BayesStore::SDBM
   ");
 
   ok(start_spamd("-L --allow-tell"));
@@ -218,3 +202,4 @@ sub getmessage {
 
   return $msg;
 }
+

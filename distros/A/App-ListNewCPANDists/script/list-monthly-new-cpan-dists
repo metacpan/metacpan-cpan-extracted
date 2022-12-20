@@ -11,9 +11,9 @@ use Log::ger;
 use Perinci::CmdLine::Any;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-02'; # DATE
+our $DATE = '2022-09-09'; # DATE
 our $DIST = 'App-ListNewCPANDists'; # DIST
-our $VERSION = '0.017'; # VERSION
+our $VERSION = '0.018'; # VERSION
 
 my $cmdline = Perinci::CmdLine::Any->new(
     url => "/App/ListNewCPANDists/list_monthly_new_cpan_dists",
@@ -40,11 +40,11 @@ list-monthly-new-cpan-dists - List new CPAN distributions in a given month
 
 =head1 VERSION
 
-This document describes version 0.017 of list-monthly-new-cpan-dists (from Perl distribution App-ListNewCPANDists), released on 2022-09-02.
+This document describes version 0.018 of list-monthly-new-cpan-dists (from Perl distribution App-ListNewCPANDists), released on 2022-09-09.
 
 =head1 SYNOPSIS
 
-B<list-monthly-new-cpan-dists> [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--exclude-author-re>=I<re>] [(B<--exclude-author>=I<cpan::pause_id>)+|B<--exclude-authors-json>=I<json>] [B<--exclude-dist-re>=I<re>] [(B<--exclude-dist>=I<perl::distname>)+|B<--exclude-dists-json>=I<json>] [B<--format>=I<name>|B<--json>] [B<--include-author-re>=I<re>] [(B<--include-author>=I<cpan::pause_id>)+|B<--include-authors-json>=I<json>] [B<--include-dist-re>=I<re>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--include-dists-json>=I<json>] -- E<lt>I<month>E<gt> E<lt>I<year>E<gt>
+B<list-monthly-new-cpan-dists> [B<--debug>|B<--log-level>=I<level>|B<--quiet>|B<--trace>|B<--verbose>] [B<--exclude-author-re>=I<re>] [(B<--exclude-author>=I<cpan::pause_id>)+|B<--exclude-authors-json>=I<json>] [B<--exclude-dist-re>=I<re>] [(B<--exclude-dist>=I<perl::distname>)+|B<--include-dists-json>=I<json>] [B<--format>=I<name>|B<--json>] [B<--include-author-re>=I<re>] [(B<--include-author>=I<cpan::pause_id>)+|B<--include-authors-json>=I<json>] [B<--include-dist-re>=I<re>] [B<--(no)naked-res>] [B<--page-result>[=I<program>]|B<--view-result>[=I<program>]] [B<--exclude-dists-json>=I<json>] -- E<lt>I<month>E<gt> E<lt>I<year>E<gt>
 
 =head1 DESCRIPTION
 
@@ -91,8 +91,6 @@ Can be specified multiple times.
 
 =item B<--exclude-dists-json>=I<s>
 
-See C<--exclude-dist>.
-
 =item B<--include-author-re>=I<s>
 
 =item B<--include-author>=I<s@>
@@ -106,6 +104,8 @@ See C<--include-author>.
 =item B<--include-dist-re>=I<s>
 
 =item B<--include-dists-json>=I<s>
+
+See C<--exclude-dist>.
 
 =back
 

@@ -1,10 +1,12 @@
 use Test2::V0;
 
-plan 70;
+plan 71;
 
 use String::Copyright {
 	format => sub { join ':', $_->[0] || '', $_->[1] || '' }
 };
+
+is copyright("SPDX-FileCopyrightText: Foo"), ':Foo', 'SPDX identifier';
 
 is copyright("© Foo"),   ':Foo', 'copyright sign as identifier';
 is copyright("©Foo"),    ':Foo', 'copyright sign and no space as identifier';
@@ -25,8 +27,8 @@ is copyright("RenÃ© Foo"), '', 'bogus latin1-as-utf8 accent acute';
 is copyright("¬© Foo"), ':Foo',
 	'MacRoman-misparsed-as-utf8 copyright sign as identifier';
 
-is copyright("Copyright: Foo"),        ':Foo', '"Copyright:" as identifier';
-is copyright('Copyright : Foo'),       ':Foo', '"Copyright :" as identifier';
+is copyright("Copyright: Foo"),  ':Foo', '"Copyright:" as identifier';
+is copyright('Copyright : Foo'), ':Foo', '"Copyright :" as identifier';
 is copyright("Copyright-holder: Foo"), ':Foo',
 	'"Copyright-holder:" as identifier';
 is copyright("Copyright-holders: Foo"), ':Foo',

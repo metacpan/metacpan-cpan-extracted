@@ -33,6 +33,7 @@ CheckReference
 CheckRewrite
 CheckWhitespace
 Dave
+Dockerfile
 FIGlet
 FILTERs
 GerritChangeId

@@ -1,6 +1,13 @@
 Revision history for App-DBBrowser
 
 
+2.305    2022-12-20
+        - Firebird: 'similar to' matches only case sensitive.
+        - Default alias for aggregate functions.
+        - Stringify the output of 'group_concat'.
+        - Bugfix 'update' 'join' mysql/MariaDB.
+        - Bugfix MariaDB: no 'offset' without 'limit'.
+
 2.304    2022-10-12
         - Term::TablePrint minimum version is '0.154'.
 

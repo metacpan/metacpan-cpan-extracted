@@ -1,9 +1,5 @@
 /* vi: set ft=c : */
 
-#ifndef av_count
-#  define av_count(av)           (AvFILL(av) + 1)
-#endif
-
 #if HAVE_PERL_VERSION(5, 22, 0)
 #  define PadnameIsNULL(pn)  (!(pn))
 #else
@@ -238,14 +234,19 @@ static bool MY_lex_consume_unichar(pTHX_ U32 c)
   return TRUE;
 }
 
-#if HAVE_PERL_VERSION(5, 16, 0)
-#  define sv_derived_from_hv(sv, hv)  MY_sv_derived_from_hv(aTHX_ sv, hv)
-static bool MY_sv_derived_from_hv(pTHX_ SV *sv, HV *hv)
+#define av_push_from_av_inc(dst, src)    S_av_push_from_av(aTHX_ dst, src, TRUE)
+#define av_push_from_av_noinc(dst, src)  S_av_push_from_av(aTHX_ dst, src, FALSE)
+static void S_av_push_from_av(pTHX_ AV *dst, AV *src, bool refcnt_inc)
 {
-  char *hvname = HvNAME(hv);
-  if(!hvname)
-    return FALSE;
+  SSize_t count = av_count(src);
+  SSize_t i;
 
-  return sv_derived_from_pvn(sv, hvname, HvNAMELEN(hv), HvNAMEUTF8(hv) ? SVf_UTF8 : 0);
+  av_extend(dst, av_count(dst) + count - 1);
+
+  SV **vals = AvARRAY(src);
+
+  for(i = 0; i < count; i++) {
+    SV *sv = vals[i];
+    av_push(dst, refcnt_inc ? SvREFCNT_inc(sv) : sv);
+  }
 }
-#endif

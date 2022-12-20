@@ -1,5 +1,15 @@
 Revision history for Data-MoneyCurrency
 
+
+0.24    Fr 16 Dez 2022 13:59:12 MST
+        - unfortunately ruby-money no longer seems actively maintained
+          so we have a forked version
+        - correct formatting for ZAR
+        - new currency symbol for GEL
+        - new currency SEL
+        - html_entity for euro
+        - EUR as second currency for HR (full switch on 2023.1.1)
+        
 0.23    Sa 25 Jun 2022 12:59:39 CEST
         - newest ruby-money conf
         - VE now mapped to ves as currency

@@ -9,6 +9,10 @@ use Venus::Class 'base';
 
 base 'Faker::Plugin';
 
+# VERSION
+
+our $VERSION = '1.17';
+
 # METHODS
 
 sub execute {
@@ -43,6 +47,12 @@ Faker::Plugin::SoftwareVersion - Software Version
 =head1 ABSTRACT
 
 Software Version for Faker
+
+=cut
+
+=head1 VERSION
+
+1.17
 
 =cut
 

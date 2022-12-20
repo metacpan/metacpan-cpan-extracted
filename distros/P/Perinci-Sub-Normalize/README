@@ -2,8 +2,8 @@ NAME
     Perinci::Sub::Normalize - Normalize Rinci function metadata
 
 VERSION
-    This document describes version 0.204 of Perinci::Sub::Normalize (from
-    Perl distribution Perinci-Sub-Normalize), released on 2022-12-09.
+    This document describes version 0.207 of Perinci::Sub::Normalize (from
+    Perl distribution Perinci-Sub-Normalize), released on 2022-12-19.
 
 SYNOPSIS
      use Perinci::Sub::Normalize qw(normalize_function_metadata);

@@ -66,6 +66,20 @@ sub check_start {
   }
 }
 
+sub check_cleanup {
+  my ($self, $params) = @_;
+  my $pms = $params->{permsgstatus};
+  my $scoresptr = $pms->{conf}->{scores};
+
+  # Force all body rules ready for meta rules.  Need to do it here in
+  # cleanup, because the body is scanned per line instead of per rule
+  if ($pms->{conf}->{skip_body_rules}) {
+    foreach (keys %{$pms->{conf}->{skip_body_rules}}) {
+      $pms->rule_ready($_, 1)  if $scoresptr->{$_};
+    }
+  }
+}
+
 ###########################################################################
 
 1;
@@ -96,13 +110,16 @@ sub do_one_line_body_tests {
 
     if (($conf->{tflags}->{$rulename}||'') =~ /\bmultiple\b/)
     {
+      $sub .= '
+        my $hitsptr = $self->{tests_already_hit};
+      ';
       # support multiple matches
       my ($max) = $conf->{tflags}->{$rulename} =~ /\bmaxhits=(\d+)\b/;
       $max = untaint_var($max);
       if ($max) {
         $sub .= '
-          if (exists $self->{tests_already_hit}->{q{'.$rulename.'}}) {
-            return 0 if $self->{tests_already_hit}->{q{'.$rulename.'}} >= '.$max.';
+          if ($hitsptr->{q{'.$rulename.'}}) {
+            return 0 if $hitsptr->{q{'.$rulename.'}} >= '.$max.';
           }
         ';
       }
@@ -111,23 +128,28 @@ sub do_one_line_body_tests {
       my $lref = \$line;
       pos $$lref = 0;
       '.$self->hash_line_for_rule($pms, $rulename).'
-      while ($$lref =~ /$qrptr->{q{'.$rulename.'}}/go) {
+      while ($$lref =~ /$qrptr->{q{'.$rulename.'}}/gop) {
         $self->got_hit(q{'.$rulename.'}, "BODY: ", ruletype => "one_line_body");
         '. $self->hit_rule_plugin_code($pms, $rulename, "one_line_body", "") . '
-        '. ($max? 'last if $self->{tests_already_hit}->{q{'.$rulename.'}} >= '.$max.';' : '') . '
+        '. ($max? 'last if $hitsptr->{q{'.$rulename.'}} >= '.$max.';' : '') . '
       }
       ';
 
     } else {
       $sub .= '
       '.$self->hash_line_for_rule($pms, $rulename).'
-      if ($line =~ /$qrptr->{q{'.$rulename.'}}/o) {
+      if ($line =~ /$qrptr->{q{'.$rulename.'}}/op) {
         $self->got_hit(q{'.$rulename.'}, "BODY: ", ruletype => "one_line_body");
         '. $self->hit_rule_plugin_code($pms, $rulename, "one_line_body", "return 1") . '
       }
       ';
 
     }
+
+    # Make sure rule is marked ready for meta rules
+    $sub .= '
+      $self->rule_ready(q{'.$rulename.'}, 1);
+    ';
 
     return if ($opts{doing_user_rules} &&
                   !$self->is_user_rule_sub($rulename.'_one_line_body_test'));

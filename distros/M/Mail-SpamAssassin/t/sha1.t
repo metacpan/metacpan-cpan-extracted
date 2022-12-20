@@ -1,28 +1,11 @@
 #!/usr/bin/perl -w -T
 
-BEGIN {
-  if (-e 't/test_dir') { # if we are running "t/rule_tests.t", kluge around ...
-    chdir 't';
-  }
-
-  if (-e 'test_dir') {            # running from test directory, not ..
-    unshift(@INC, '../blib/lib');
-  }
-}
-
-my $prefix = '.';
-if (-e 'test_dir') {            # running from test directory, not ..
-  $prefix = '..';
-}
-
 use strict;
+use lib '.'; use lib 't';
+use SATest; sa_t_init("sha1");
 
 use Mail::SpamAssassin;
-
-BEGIN {
-  eval { require Digest::SHA; import Digest::SHA qw(sha1_hex); 1 }
-  or do { require Digest::SHA1; import Digest::SHA1 qw(sha1_hex) }
-}
+use Digest::SHA qw(sha1_hex);
 
 use Test::More tests => 15;
 
@@ -30,7 +13,7 @@ sub try {
   my ($data, $want) = @_;
 
   if ($want ne sha1_hex($data)) {
-    print "Digest::SHA(1) sha1 mismatch\n";
+    print "Digest::SHA sha1 mismatch\n";
     return 0;
   }
   return 1;

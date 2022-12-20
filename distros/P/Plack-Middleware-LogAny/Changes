@@ -1,7 +1,22 @@
 Release history for Plack-Middleware-LogAny
 
-0.001     2012-11-02
-          - initial release
+0.002001  2022-12-19
+          - fix required test dependency
+            (at least Log::Any::Adapter::Log4perl 0.09 needed)
+
+0.002     2022-12-17
+          - revert release history
+          - revise perl pod
+          - on request pass HTTP headers to logging context
+
+0.001003  2022-12-10
+          - use tailcall to replace the current invocation of psgix.logger
+          - make sure that the issuer of a logging request (%M) is set
+            properly [RT #144221]
+
+0.001002  2022-12-05
+          - do not create authoring related MakeMaker postamble section
+            on some platforms (background: the make syntax differs)
 
 0.001001  2022-12-01
           - adoption (original author:
@@ -13,11 +28,5 @@ Release history for Plack-Middleware-LogAny
           - increase test coverage to 100%
           - handle 0 category accurately
 
-0.001002  2022-12-05
-          - do not create authoring related MakeMaker postamble section
-            on some platforms (background: the make syntax differs)
-
-0.001003  2022-12-10
-          - use tailcall to replace the current invocation of psgix.logger
-          - make sure that the issuer of a logging request (%M) is set
-            properly [RT #144221]
+0.001     2012-11-02
+          - initial release

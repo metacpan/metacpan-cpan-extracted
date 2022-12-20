@@ -1,6 +1,8 @@
 package AI::TensorFlow::Libtensorflow::Tensor;
 # ABSTRACT: A multi-dimensional array of elements of a single data type
-$AI::TensorFlow::Libtensorflow::Tensor::VERSION = '0.0.2';
+$AI::TensorFlow::Libtensorflow::Tensor::VERSION = '0.0.3';
+use strict;
+use warnings;
 use namespace::autoclean;
 use AI::TensorFlow::Libtensorflow::Lib qw(arg);
 use FFI::Platypus::Closure;
@@ -13,15 +15,9 @@ $ffi->mangler(AI::TensorFlow::Libtensorflow::Lib->mangler_default);
 $ffi->load_custom_type('AI::TensorFlow::Libtensorflow::Lib::FFIType::TFPtrSizeScalarRef'
 	=> 'tf_tensor_buffer'
 );
-$ffi->load_custom_type('AI::TensorFlow::Libtensorflow::Lib::FFIType::TFDimsBuffer'
-	=> 'tf_dims_buffer'
-);
 
 
 
-# C: TF_NewTensor
-#
-# Constructor
 $ffi->attach( [ 'NewTensor' => 'New' ] =>
 	[
 		arg 'TF_DataType' => 'dtype',
@@ -78,7 +74,7 @@ $ffi->attach( [ 'AllocateTensor', 'Allocate' ],
 		if( ! defined $len ) {
 			$len = product($dtype->Size, @$dims);
 		}
-		my $obj = $xs->(@rest);
+		my $obj = $xs->($dtype, $dims, $len);
 	}
 );
 
@@ -86,8 +82,8 @@ $ffi->attach( [ 'DeleteTensor' => 'DESTROY' ],
 	[ arg 'TF_Tensor' => 't' ]
 	=> 'void'
 	=> sub {
-		my ($xs, $t) = @_;
-		$xs->($t);
+		my ($xs, $self) = @_;
+		$xs->($self);
 		if( exists $self->{_deallocator_closure} ) {
 			$self->{_deallocator_closure}->unstick;
 		}
@@ -139,6 +135,10 @@ $ffi->attach(  [ 'TensorMaybeMove' => 'MaybeMove' ] =>
 	=> 'TF_Tensor',
 );
 
+$ffi->attach( ['TensorIsAligned' => 'IsAligned'] => [
+	arg TF_Tensor => 't'
+] => 'bool' );
+
 eval {# TF v2.10.0
 $ffi->attach(  [ 'SetShape' => 'SetShape' ] =>
 	[
@@ -149,8 +149,17 @@ $ffi->attach(  [ 'SetShape' => 'SetShape' ] =>
 );
 };
 
+$ffi->attach( [  'TensorBitcastFrom' => 'BitcastFrom' ] => [
+	arg TF_Tensor => 'from',
+	arg TF_DataType => 'type',
+	arg TF_Tensor => 'to',
+	arg 'tf_dims_buffer'   => [ qw(new_dims num_new_dims) ],
+	arg TF_Status => 'status',
+] => 'void' );
+
 #### Array helpers ####
 use FFI::C::ArrayDef;
+use FFI::C::StructDef;
 my $adef = FFI::C::ArrayDef->new(
 	$ffi,
 	name => 'TF_Tensor_array',
@@ -175,6 +184,17 @@ sub _as_array {
 	}
 	$array;
 }
+sub _from_array {
+	my ($class, $array) = @_;
+	return [
+		map {
+			$ffi->cast(
+				'opaque',
+				'TF_Tensor',
+				$array->[$_]->p)
+		} 0.. $array->count - 1
+	]
+}
 
 1;
 
@@ -198,7 +218,12 @@ AI::TensorFlow::Libtensorflow::Tensor - A multi-dimensional array of elements of
 
   # Allocate a 3 by 3 ndarray of type FLOAT
   my $t = Tensor->Allocate(FLOAT, $dims);
-  ok $t->TensorByteSize, product(FLOAT->Size, @$dims);
+  is $t->ByteSize, product(FLOAT->Size, @$dims), 'correct size';
+
+  my $scalar_dims = [];
+  my $scalar_t = Tensor->Allocate(FLOAT, $scalar_dims);
+  is $scalar_t->ElementCount, 1, 'single element';
+  is $scalar_t->ByteSize, FLOAT->Size, 'single FLOAT';
 
 =head1 DESCRIPTION
 
@@ -319,7 +344,7 @@ See L</Data> for how to write to the data buffer.
 
   # Allocate a 2-by-2 ndarray of type DOUBLE
   $dims = [2,2];
-  $t = Tensor->Allocate(DOUBLE, $dims, product(DOUBLE->Size, @$dims));
+  my $t = Tensor->Allocate(DOUBLE, $dims, product(DOUBLE->Size, @$dims));
 
 B<Parameters>
 
@@ -365,7 +390,7 @@ data (do not write to memory outside the size of the buffer).
   use FFI::Platypus::Buffer qw(scalar_to_pointer);
   use FFI::Platypus::Memory qw(memcpy);
 
-  $t = Tensor->Allocate(DOUBLE, [2,2]);
+  my $t = Tensor->Allocate(DOUBLE, [2,2]);
 
   # [2,2] identity matrix
   my $eye_data = pack 'd*', (1, 0, 0, 1);
@@ -495,6 +520,10 @@ C<TFTensor> untouched if not.
 
 B<C API>: L<< C<TF_TensorMaybeMove>|AI::TensorFlow::Libtensorflow::Manual::CAPI/TF_TensorMaybeMove >>
 
+=head2 IsAligned
+
+B<C API>: L<< C<TF_TensorIsAligned>|AI::TensorFlow::Libtensorflow::Manual::CAPI/TF_TensorIsAligned >>
+
 =head2 SetShape
 
 =over 2
@@ -518,6 +547,10 @@ B<Parameters>
 B<C API>: L<< C<TF_SetShape>|AI::TensorFlow::Libtensorflow::Manual::CAPI/TF_SetShape >>
 
 C<libtensorflow> version: v2.10.0
+
+=head2 BitcastFrom
+
+B<C API>: L<< C<TF_TensorBitcastFrom>|AI::TensorFlow::Libtensorflow::Manual::CAPI/TF_TensorBitcastFrom >>
 
 =head1 DESTRUCTORS
 

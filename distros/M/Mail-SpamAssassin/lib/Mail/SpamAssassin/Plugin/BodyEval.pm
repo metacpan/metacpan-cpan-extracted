@@ -39,16 +39,16 @@ sub new {
   bless ($self, $class);
 
   # the important bit!
-  $self->register_eval_rule("multipart_alternative_difference");
-  $self->register_eval_rule("multipart_alternative_difference_count");
-  $self->register_eval_rule("check_blank_line_ratio");
-  $self->register_eval_rule("tvd_vertical_words");
-  $self->register_eval_rule("check_stock_info");
-  $self->register_eval_rule("check_body_length");
+  $self->register_eval_rule("multipart_alternative_difference", $Mail::SpamAssassin::Conf::TYPE_BODY_EVALS);
+  $self->register_eval_rule("multipart_alternative_difference_count", $Mail::SpamAssassin::Conf::TYPE_BODY_EVALS);
+  $self->register_eval_rule("check_blank_line_ratio", $Mail::SpamAssassin::Conf::TYPE_BODY_EVALS);
+  $self->register_eval_rule("tvd_vertical_words", $Mail::SpamAssassin::Conf::TYPE_BODY_EVALS);
+  $self->register_eval_rule("check_stock_info", $Mail::SpamAssassin::Conf::TYPE_BODY_EVALS);
+  $self->register_eval_rule("check_body_length", $Mail::SpamAssassin::Conf::TYPE_BODY_EVALS);
 
-  $self->register_eval_rule("plaintext_body_length");
-  $self->register_eval_rule("plaintext_sig_length");
-  $self->register_eval_rule("plaintext_body_sig_ratio");
+  $self->register_eval_rule("plaintext_body_length", $Mail::SpamAssassin::Conf::TYPE_BODY_EVALS);
+  $self->register_eval_rule("plaintext_sig_length", $Mail::SpamAssassin::Conf::TYPE_BODY_EVALS);
+  $self->register_eval_rule("plaintext_body_sig_ratio", $Mail::SpamAssassin::Conf::TYPE_BODY_EVALS);
 
   return $self;
 }
@@ -69,7 +69,7 @@ sub multipart_alternative_difference_count {
   my ($self, $pms, $fulltext, $ratio, $minhtml) = @_;
   $self->_multipart_alternative_difference($pms) unless (exists $pms->{madiff});
   return 0 unless $pms->{madiff_html} > $minhtml;
-  return(($pms->{madiff_text} / $pms->{madiff_html}) > $ratio);
+  return (($pms->{madiff_text} / $pms->{madiff_html}) > $ratio);
 }
 
 sub _multipart_alternative_difference {
@@ -81,7 +81,7 @@ sub _multipart_alternative_difference {
   my $msg = $pms->{msg};
 
   # Find all multipart/alternative parts in the message
-  my @ma = $msg->find_parts(qr@^multipart/alternative\b@i);
+  my @ma = $msg->find_parts(qr@^multipart/alternative\b@);
 
   # If there are no multipart/alternative sections, skip this test.
   return if (!@ma);
@@ -104,7 +104,7 @@ sub _multipart_alternative_difference {
     my %text;
 
     # limit our search to text-based parts
-    my @txt = $part->find_parts(qr@^text\b@i);
+    my @txt = $part->find_parts(qr@^text\b@);
     foreach my $text (@txt) {
       # we only care about the rendered version of the part
       my ($type, $rnd) = $text->rendered();
@@ -123,7 +123,7 @@ sub _multipart_alternative_difference {
         }
 
 	# If there are no words, mark if there's at least 1 image ...
-	if (!%html && exists $pms->{html}{inside}{img}) {
+	if (!%html && exists $text->{html_results}{inside}{img}) {
 	  # Use "\n" as the mark since it can't ever occur normally
 	  $html{"\n"}=1;
 	}
@@ -222,7 +222,7 @@ sub tvd_vertical_words {
   }
 
   dbg("eval: tvd_vertical_words value: $pms->{tvd_vertical_words} / min: $min / max: $max - value must be >= min and < max");
-  return 1 if ($pms->{tvd_vertical_words} >= $min && $pms->{tvd_vertical_words} < $max);
+  return ($pms->{tvd_vertical_words} >= $min && $pms->{tvd_vertical_words} < $max);
 }
 
 sub check_stock_info {
@@ -241,7 +241,7 @@ sub _check_stock_info {
   $pms->{stock_info} = 0;
 
   # Find all multipart/alternative parts in the message
-  my @parts = $pms->{msg}->find_parts(qr@^text/plain$@i);
+  my @parts = $pms->{msg}->find_parts(qr@^text/plain$@);
   return if (!@parts);
 
   # Go through each of the multipart parts
@@ -360,11 +360,17 @@ sub _plaintext_body_sig_ratio {
 
   # Find the last occurence of a signature delimiter and get the body and
   # signature lengths.
-  my ($len_b, $len_s) = map { length } $text =~ /(^|.*\n)-- \n(.*?)$/s;
 
-  if (! defined $len_b) {     # no sig marker, all body
-      $len_b = length $text;
-      $len_s = 0;
+  my $len_b = length($text);
+  my $len_s = 0;
+
+  while ($text =~ /^-- ?\r?$/mg) {
+
+    # ignore decoy marker at the end
+    next if ( length($text) - $+[0] <= 4 );
+
+    $len_b = $-[0];
+    $len_s = length($text) - $+[0];
   }
 
   $pms->{plaintext_body_sig_ratio}->{body_length} = $len_b;

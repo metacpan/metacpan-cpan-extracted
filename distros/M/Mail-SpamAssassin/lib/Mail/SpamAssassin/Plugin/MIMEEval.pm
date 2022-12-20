@@ -68,18 +68,18 @@ sub new {
   bless ($self, $class);
 
   # the important bit!
-  $self->register_eval_rule("check_for_mime");
-  $self->register_eval_rule("check_for_mime_html");
-  $self->register_eval_rule("check_for_mime_html_only");
-  $self->register_eval_rule("check_mime_multipart_ratio");
-  $self->register_eval_rule("check_msg_parse_flags");
-  $self->register_eval_rule("check_for_ascii_text_illegal");
-  $self->register_eval_rule("check_abundant_unicode_ratio");
-  $self->register_eval_rule("check_for_faraway_charset");
-  $self->register_eval_rule("check_for_uppercase");
-  $self->register_eval_rule("check_ma_non_text");
-  $self->register_eval_rule("check_base64_length");
-  $self->register_eval_rule("check_qp_ratio");
+  $self->register_eval_rule("check_for_mime", $Mail::SpamAssassin::Conf::TYPE_BODY_EVALS);
+  $self->register_eval_rule("check_for_mime_html", $Mail::SpamAssassin::Conf::TYPE_BODY_EVALS);
+  $self->register_eval_rule("check_for_mime_html_only", $Mail::SpamAssassin::Conf::TYPE_BODY_EVALS);
+  $self->register_eval_rule("check_mime_multipart_ratio", $Mail::SpamAssassin::Conf::TYPE_BODY_EVALS);
+  $self->register_eval_rule("check_msg_parse_flags", $Mail::SpamAssassin::Conf::TYPE_HEADER_EVALS);
+  $self->register_eval_rule("check_for_ascii_text_illegal", $Mail::SpamAssassin::Conf::TYPE_BODY_EVALS);
+  $self->register_eval_rule("check_abundant_unicode_ratio", $Mail::SpamAssassin::Conf::TYPE_BODY_EVALS);
+  $self->register_eval_rule("check_for_faraway_charset", $Mail::SpamAssassin::Conf::TYPE_BODY_EVALS);
+  $self->register_eval_rule("check_for_uppercase", $Mail::SpamAssassin::Conf::TYPE_BODY_EVALS);
+  $self->register_eval_rule("check_ma_non_text", $Mail::SpamAssassin::Conf::TYPE_BODY_EVALS);
+  $self->register_eval_rule("check_base64_length", $Mail::SpamAssassin::Conf::TYPE_BODY_EVALS);
+  $self->register_eval_rule("check_qp_ratio", $Mail::SpamAssassin::Conf::TYPE_BODY_EVALS);
 
   return $self;
 }
@@ -89,8 +89,7 @@ sub new {
 sub are_more_high_bits_set {
   my ($self, $str) = @_;
 
-  # TODO: I suspect a tr// trick may be faster here
-  my $numhis = () = ($str =~ /[\200-\377]/g);
+  my $numhis = $str =~ tr/\x00-\x7F//c;  # number of non-ASCII chars
   my $numlos = length($str) - $numhis;
 
   ($numlos <= $numhis && $numhis > 3);
@@ -182,7 +181,7 @@ sub check_for_mime {
 
   $self->_check_attachments($pms) unless exists $pms->{mime_checked_attachments};
   return 0 unless exists $pms->{$test};
-  return $pms->{$test};
+  return $pms->{$test} ? 1 : 0;
 }
 
 # any text/html MIME part
@@ -232,19 +231,19 @@ sub _check_mime_header {
     $pms->{mime_body_text_count}++;
   }
 
-  if ($cte =~ /base64/) {
+  if (index($cte, 'base64') >= 0) {
     $pms->{mime_base64_count}++;
   }
-  elsif ($cte =~ /quoted-printable/) {
+  elsif (index($cte, 'quoted-printable') >= 0) {
     $pms->{mime_qp_count}++;
   }
 
-  if ($cd && $cd =~ /attachment/) {
+  if ($cd && index($cd, 'attachment') >= 0) {
     $pms->{mime_attachment}++;
   }
 
   if ($ctype =~ /^text/ &&
-      $cte =~ /base64/ &&
+      index($cte, 'base64') >= 0 &&
       (!$charset || $charset =~ /(?:us-ascii|ansi_x3\.4-1968|iso-ir-6|ansi_x3\.4-1986|iso_646\.irv:1991|ascii|iso646-us|us|ibm367|cp367|csascii)/) &&
       !($cd && $cd =~ /^(?:attachment|inline)/))
   {
@@ -366,9 +365,9 @@ sub _check_attachments {
 
     $part++;
     $part_type[$part] = $ctype;
-    $part_bytes[$part] = 0 if $cd !~ /attachment/;
+    $part_bytes[$part] = 0 if index($cd, 'attachment') == -1;
 
-    my $cte_is_base64 = $cte =~ /base64/i;
+    my $cte_is_base64 = index($cte, 'base64') >= 0;
     my $previous = '';
     foreach (@{$p->raw()}) {
 
@@ -385,12 +384,12 @@ sub _check_attachments {
       # if ($pms->{mime_html_no_charset} && $ctype eq 'text/html' && defined $charset) {
       # $pms->{mime_html_no_charset} = 0;
       # }
-      if ($pms->{mime_multipart_alternative} && $cd !~ /attachment/ &&
+      if ($pms->{mime_multipart_alternative} && index($cd, 'attachment') == -1 &&
           ($ctype eq 'text/plain' || $ctype eq 'text/html')) {
 	$part_bytes[$part] += length;
       }
 
-      if ($where != 1 && $cte eq "quoted-printable" && ! /^SPAM: /) {
+      if ($where != 1 && $cte eq "quoted-printable" && index($_, 'SPAM: ') != 0) {
         # RFC 5322: Each line SHOULD be no more than 78 characters,
         #           excluding the CRLF.
         # RFC 2045: The Quoted-Printable encoding REQUIRES that
@@ -415,9 +414,11 @@ sub _check_attachments {
         # }
 
         # count excessive QP bytes
-        if (index($_, '=') != -1) {
+        if (index($_, '=') >= 0) {
+## no critic (Perlsecret)
 	  # whoever wrote this next line is an evil hacker -- jm
 	  my $qp = () = m/=(?:09|3[0-9ABCEF]|[2456][0-9A-F]|7[0-9A-E])/g;
+## use critic
 	  if ($qp) {
 	    $qp_count += $qp;
 	    # tabs and spaces at end of encoded line are okay.  Also, multiple
@@ -630,7 +631,7 @@ sub get_charset_from_ct_line {
 sub check_ma_non_text {
   my($self, $pms) = @_;
 
-  foreach my $map ($pms->{msg}->find_parts(qr@^multipart/alternative$@i)) {
+  foreach my $map ($pms->{msg}->find_parts(qr@^multipart/alternative$@)) {
     foreach my $p ($map->find_parts(qr/./, 1, 0)) {
       next if (lc $p->{'type'} eq 'multipart/related');
       next if (lc $p->{'type'} eq 'application/rtf');

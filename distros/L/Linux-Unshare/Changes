@@ -1,5 +1,13 @@
 Revision history for Perl extension Linux::Unshare.
 
+1.2   Sun Dec 18 22:52:35 2022
+	- Fixed a BUG with missing CLONE_NEWPID
+    - Handled GNU_SOURCE warning
+    - Handled PROTOTYPING
+    - Added .gitignore repo ingore file
+    - Updated copyright year
+    - Fixed a type in the LICENSE
+
 1.1   Mon Jan  1 00:38:33 2017
     - updated copyright year
     - fixed an error in the META.[json|yml] (I had mistakenly changed the name of the module to Linux::Setns in the json and yml files)

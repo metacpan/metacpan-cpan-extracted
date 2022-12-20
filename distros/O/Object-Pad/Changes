@@ -1,5 +1,27 @@
 Revision history for Object-Pad
 
+0.77    2022-12-19
+        [BUGFIXES]
+         * Fix C compiler errors and warnings
+            + Neater handling of OP_NULL in optrees; avoids error of a case
+              label applied to a declaration, which upsets non-gcc compilers
+            + Use PTR2UV / NUM2PTR pairs instead of plain casting
+
+0.76    2022-12-16
+        [CHANGES]
+         * No longer consider `field VAR = CONST` experimental for constant
+           expressions
+         * Make field assignment and `ADJUST :params` slightly more efficient
+           by stealing new OP_HELEMEXISTSOR op from upcoming perl version
+         * Defined new ABI version 0.76
+            + Adds `pre_seal` and `post_seal` functions for class hooks 
+
+0.75    2022-12-14
+        [CHANGES]
+         * Support fields using `//=` and `||=` defaulting operators, to match
+           the core perl `class` feature
+         * Define more configuration options for `Feature::Compat::Class`
+
 0.74    2022-12-04
         [BUGFIXES]
          * Ensure that all struct fields are initialised after Newx(), by

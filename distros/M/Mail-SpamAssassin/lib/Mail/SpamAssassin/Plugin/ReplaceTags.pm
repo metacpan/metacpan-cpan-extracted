@@ -49,7 +49,6 @@ SpamAssassin; it is not guaranteed to work with other versions of SpamAssassin.
 
 package Mail::SpamAssassin::Plugin::ReplaceTags;
 
-use Mail::SpamAssassin;
 use Mail::SpamAssassin::Plugin;
 use Mail::SpamAssassin::Logger;
 use Mail::SpamAssassin::Util qw(compile_regexp qr_to_string);
@@ -136,7 +135,7 @@ sub finish_parsing_end {
         my $pre = $conf->{replace_pre}->{$pre_name};
         if ($pre) {
           s{($start.+?$end)}{$pre$1}  for @re;
-         }
+        }
       }
       if ($post_name) {
         my $post = $conf->{replace_post}->{$post_name};
@@ -173,12 +172,15 @@ sub finish_parsing_end {
       # do the actual replacement
       my ($rec, $err) = compile_regexp($re, 0);
       if (!$rec) {
-        info("replacetags: regexp compilation failed '$re': $err");
+        info("replacetags: regexp compilation failed for $rule: '$re': $err");
         next;
       }
       $conf->{test_qrs}->{$rule} = $rec;
-      #dbg("replacetags: replaced $rule: '$origre' => '$re'");
-      dbg("replacetags: replaced $rule");
+      if (would_log('dbg','replacetags') > 1) {
+        dbg("replacetags: replaced $rule: '$origre' => '$re'");
+      } else {
+        dbg("replacetags: replaced $rule");
+      }
     } else {
       dbg("replacetags: nothing was replaced in $rule");
     }

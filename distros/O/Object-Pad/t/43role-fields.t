@@ -6,7 +6,7 @@ use warnings;
 use Test::More;
 use Test::Refcount;
 
-use Object::Pad ':experimental(init_expr)';
+use Object::Pad;
 
 role ARole {
    field $one = 1;

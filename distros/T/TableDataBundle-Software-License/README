@@ -3,12 +3,14 @@ NAME
     related to software license
 
 VERSION
-    This document describes version 0.001 of
+    This document describes version 0.002 of
     TableDataBundle::Software::License (from Perl distribution
-    TableDataBundle-Software-License), released on 2022-07-25.
+    TableDataBundle-Software-License), released on 2022-07-27.
 
 DESCRIPTION
     This distribution contains the following TableData:: modules:
+
+    *   TableData::Software::License::FromRPL
 
     *   TableData::Software::License::FromSL
 

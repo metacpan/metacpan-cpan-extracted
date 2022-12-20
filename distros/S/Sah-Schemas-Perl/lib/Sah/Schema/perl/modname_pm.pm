@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-11'; # DATE
+our $DATE = '2022-12-16'; # DATE
 our $DIST = 'Sah-Schemas-Perl'; # DIST
-our $VERSION = '0.045'; # VERSION
+our $VERSION = '0.046'; # VERSION
 
 use Regexp::Pattern::Perl::Module ();
 
@@ -54,7 +54,7 @@ Sah::Schema::perl::modname_pm - Perl module name in Foo/Bar.pm form
 
 =head1 VERSION
 
-This document describes version 0.045 of Sah::Schema::perl::modname_pm (from Perl distribution Sah-Schemas-Perl), released on 2022-09-11.
+This document describes version 0.046 of Sah::Schema::perl::modname_pm (from Perl distribution Sah-Schemas-Perl), released on 2022-12-16.
 
 =head1 SYNOPSIS
 
@@ -90,11 +90,11 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data);
  
  # a sample valid data
- $data = "Foo.Bar";
+ $data = "Foo/Bar";
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
- $data = "Foo|Bar";
+ $data = "";
  my $errmsg = $validator->($data); # => "Must match regex pattern \\A(?:[A-Za-z_][A-Za-z_0-9]*(/[A-Za-z_0-9]+)*\\.pm)\\z"
 
 Often a schema has coercion rule or default value, so after validation the
@@ -105,12 +105,12 @@ prefiltered) value:
  my $res = $validator->($data); # [$errmsg, $validated_val]
  
  # a sample valid data
- $data = "Foo.Bar";
+ $data = "Foo/Bar";
  my $res = $validator->($data); # => ["","Foo/Bar.pm"]
  
  # a sample invalid data
- $data = "Foo|Bar";
- my $res = $validator->($data); # => ["Must match regex pattern \\A(?:[A-Za-z_][A-Za-z_0-9]*(/[A-Za-z_0-9]+)*\\.pm)\\z","Foo|Bar.pm"]
+ $data = "";
+ my $res = $validator->($data); # => ["Must match regex pattern \\A(?:[A-Za-z_][A-Za-z_0-9]*(/[A-Za-z_0-9]+)*\\.pm)\\z",".pm"]
 
 Data::Sah can also create validator that returns a hash of detailed error
 message. Data::Sah can even create validator that targets other language, like
@@ -172,6 +172,23 @@ L<Perinci::CmdLine> (L<Perinci::CmdLine::Lite>) to create a CLI:
  % ./myapp.pl --version
 
  % ./myapp.pl --arg1 ...
+
+
+=head2 Using with Type::Tiny
+
+To create a type constraint and type library from a schema:
+
+ package My::Types {
+     use Type::Library -base;
+     use Type::FromSah qw( sah2type );
+
+     __PACKAGE__->add_type(
+         sah2type('$sch_name*', name=>'PerlModnamePm')
+     );
+ }
+
+ use My::Types qw(PerlModnamePm);
+ PerlModnamePm->assert_valid($data);
 
 =head1 DESCRIPTION
 

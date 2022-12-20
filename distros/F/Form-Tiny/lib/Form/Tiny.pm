@@ -1,5 +1,5 @@
 package Form::Tiny;
-$Form::Tiny::VERSION = '2.15';
+$Form::Tiny::VERSION = '2.16';
 use v5.10;
 use strict;
 use warnings;

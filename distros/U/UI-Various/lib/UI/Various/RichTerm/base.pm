@@ -43,7 +43,7 @@ use Text::Wrap;
 $Text::Wrap::huge = 'overflow';
 $Text::Wrap::unexpand = 0;
 
-our $VERSION = '0.31';
+our $VERSION = '0.34';
 
 use UI::Various::core;
 
@@ -182,7 +182,7 @@ sub _size($$$)
 
     $string = $ui_element->_format($prefix, $decoration_before, $effect_before,
                                    $text, $effect_after, $decoration_after,
-                                   $width, $height);
+                                   $width, $height [, $no_wrap]);
         or
 
     $string = $ui_element->_format($prefix, $decoration_before, $effect_before,
@@ -204,6 +204,7 @@ sub _size($$$)
     $decoration_after   decoration after content of each line
     $width              the width returned by _size above
     $height             the height returned by _size above
+    $no_wrap            optional flag to inhibit wrapping of a text string
 
 =head3 description:
 
@@ -235,10 +236,10 @@ the rectangular text box for the given string
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
-sub _format($$$$$$$$$)
+sub _format($$$$$$$$$;$)
 {
     my ($self, $prefix, $deco_before, $effect_before, $text,
-	$effect_after, $deco_after, $w, $h) = @_;
+	$effect_after, $deco_after, $w, $h, $no_wrap) = @_;
     my $alignment = 7; # TODO L8R: $self->alignment;
 
     my $len_p = length($prefix);
@@ -253,6 +254,8 @@ sub _format($$$$$$$$$)
     my @text;
     if (ref($text) eq 'ARRAY')
     {   push @text, split("\n", $_) foreach @{$text};   }
+    elsif ($no_wrap)
+    {   @text = split "\n", $text;   }
     else
     {
 	$Text::Wrap::columns = $w + 1;
@@ -277,9 +280,8 @@ sub _format($$$$$$$$$)
 	my $empty = ' ' x ($len_d_bef + $w + $len_d_aft);
 	foreach (scalar(@text)..$h-1)
 	{
-	    my $p = $_ == 0 ? $prefix : $blank_prefix;
 	    # TODO: this is only the code for the alignments 7/8/9:
-	    {   push @text, $p . $empty;   }
+	    {   push @text, $blank_prefix . $empty;   }
 
 	}
     }

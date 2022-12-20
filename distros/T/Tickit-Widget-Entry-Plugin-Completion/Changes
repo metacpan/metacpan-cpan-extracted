@@ -1,5 +1,11 @@
 Revision history for Tickit-Widget-Entry-Plugin-Completion
 
+0.02    2022-12-14
+        [CHANGES]
+         * Updated for Object::Pad v0.75
+            + Use `field NAME :param //= EXPR` syntax
+            + Use `ADJUST :params`
+
 0.01    2021-08-28
         First version, released on an unsuspecting world.
 

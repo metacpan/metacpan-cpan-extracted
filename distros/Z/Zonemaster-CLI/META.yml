@@ -24,11 +24,12 @@ requires:
   Locale::TextDomain: 1.23
   MooseX::Getopt: 0
   Text::Reflow: 0
-  Zonemaster::Engine: 4.005001
-  Zonemaster::LDNS: 2.002002
+  Try::Tiny: 0
+  Zonemaster::Engine: 4.006
+  Zonemaster::LDNS: 3
   perl: 5.14.2
 resources:
   bugtracker: https://github.com/zonemaster/zonemaster-cli/issues
   license: http://opensource.org/licenses/bsd-license.php
   repository: https://github.com/zonemaster/zonemaster-cli
-version: '4.000001'
+version: '5.000000'

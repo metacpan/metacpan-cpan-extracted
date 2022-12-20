@@ -11,19 +11,9 @@ plan skip_all => "Long running tests disabled" unless conf_bool('run_long_tests'
 plan skip_all => "No SDBM_File" unless HAS_SDBM_FILE;
 plan tests => 54;
 
-BEGIN {
-  if (-e 't/test_dir') {
-    chdir 't';
-  }
-
-  if (-e 'test_dir') {
-    unshift(@INC, '../blib/lib');
-  }
-}
-
-tstlocalrules ("
-        bayes_store_module Mail::SpamAssassin::BayesStore::SDBM
-        bayes_learn_to_journal 0
+tstprefs ("
+  bayes_store_module Mail::SpamAssassin::BayesStore::SDBM
+  bayes_learn_to_journal 0
 ");
 
 use Mail::SpamAssassin;
@@ -64,11 +54,12 @@ my $toks = getimpl->tokenize($mail, $body);
 
 ok(scalar(keys %{$toks}) > 0);
 
-my($msgid,$msgid_hdr) = getimpl->get_msgid($mail);
+my $msgid = $mail->generate_msgid();
+my $msgid_hdr = $mail->get_msgid();
 
 # $msgid is the generated hash messageid
 # $msgid_hdr is the Message-Id header
-ok($msgid eq '4cf5cc4d53b22e94d3e55932a606b18641a54041@sa_generated');
+ok($msgid eq '71f849915d7e469ddc1890cd8175f6876843f99e@sa_generated');
 ok($msgid_hdr eq '9PS291LhupY');
 
 ok(getimpl->{store}->tie_db_writable());
@@ -144,44 +135,44 @@ getimpl->{store}->untie_db();
 
 undef $sa;
 
-sa_t_init('bayes'); # this wipes out what is there and begins anew
+sa_t_init('bayessdbm_seen_delete'); # this wipes out what is there and begins anew
 
 # make sure we learn to a journal
-tstlocalrules ("
-        bayes_store_module Mail::SpamAssassin::BayesStore::SDBM
-        bayes_learn_to_journal 1
+tstprefs ("
+  bayes_store_module Mail::SpamAssassin::BayesStore::SDBM
+  bayes_learn_to_journal 1
 ");
 
 $sa = create_saobj();
 
 $sa->init();
 
-ok(!-e 'log/user_state/bayes_journal');
+ok(!-e "$userstate/bayes_journal");
 
 ok($sa->{bayes_scanner}->learn(1, $mail));
 
-ok(-e 'log/user_state/bayes_journal');
+ok(-e "$userstate/bayes_journal");
 
 $sa->{bayes_scanner}->sync(1); # always returns 0, so no need to check return
 
-ok(!-e 'log/user_state/bayes_journal');
+ok(!-e "$userstate/bayes_journal");
 
-ok(-e 'log/user_state/bayes_seen.pag');
-ok(-e 'log/user_state/bayes_seen.dir');
+ok(-e "$userstate/bayes_seen.pag");
+ok(-e "$userstate/bayes_seen.dir");
 
-ok(-e 'log/user_state/bayes_toks.pag');
-ok(-e 'log/user_state/bayes_toks.dir');
+ok(-e "$userstate/bayes_toks.pag");
+ok(-e "$userstate/bayes_toks.dir");
 
 undef $sa;
 
-sa_t_init('bayes'); # this wipes out what is there and begins anew
+sa_t_init('bayessdbm_seen_delete'); # this wipes out what is there and begins anew
 
 # make sure we learn to a journal
-tstlocalrules ("
-        bayes_store_module Mail::SpamAssassin::BayesStore::SDBM
-bayes_learn_to_journal 0
-bayes_min_spam_num 10
-bayes_min_ham_num 10
+tstprefs ("
+  bayes_store_module Mail::SpamAssassin::BayesStore::SDBM
+  bayes_learn_to_journal 0
+  bayes_min_spam_num 10
+  bayes_min_ham_num 10
 ");
 
 # we get to bastardize the existing pattern matching code here.  It lets us provide
@@ -194,7 +185,7 @@ ok_all_patterns();
 ok(salearnrun("--ham data/nice", \&check_examined));
 ok_all_patterns();
 
-ok(salearnrun("--ham data/whitelists", \&check_examined));
+ok(salearnrun("--ham data/welcomelists", \&check_examined));
 ok_all_patterns();
 
 %patterns = ( 'non-token data: bayes db version' => 'db version' );
@@ -203,9 +194,9 @@ ok_all_patterns();
 
 # now delete the journal and bayes_seen -- should still be possible
 # for Bayes to continue...
-unlink 'log/user_state/bayes_journal';
-ok(unlink 'log/user_state/bayes_seen.pag');
-ok(unlink 'log/user_state/bayes_seen.dir');
+unlink "$userstate/bayes_journal";
+ok(unlink "$userstate/bayes_seen.pag");
+ok(unlink "$userstate/bayes_seen.dir");
 
 use constant SCAN_USING_PERL_CODE_TEST => 1;
 
@@ -266,11 +257,11 @@ ok($score =~ /\d/ && $score <= 1.0 && $score != .5);
 
 ok(getimpl->{store}->clear_database());
 
-ok(!-e 'log/user_state/bayes_journal');
-ok(!-e 'log/user_state/bayes_seen.pag');
-ok(!-e 'log/user_state/bayes_seen.dir');
-ok(!-e 'log/user_state/bayes_toks.pag');
-ok(!-e 'log/user_state/bayes_toks.dir');
+ok(!-e "$userstate/bayes_journal");
+ok(!-e "$userstate/bayes_seen.pag");
+ok(!-e "$userstate/bayes_seen.dir");
+ok(!-e "$userstate/bayes_toks.pag");
+ok(!-e "$userstate/bayes_toks.dir");
 
 sub check_examined {
   local ($_);

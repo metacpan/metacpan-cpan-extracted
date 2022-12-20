@@ -10,30 +10,49 @@ SYNOPSIS
      my ($object_params_ar, $other_params_ar) = split_params($object_keys_ar, @params);
 
 SUBROUTINES
-    "set_params($self, @params)"
-             Sets object parameters to user values.
-             If setted key doesn't exist in $self object, turn fatal error.
-             $self - Object or hash reference.
-             @params - Key, value pairs.
+  "set_params"
+     set_params($self, @params);
 
-    "set_params_pub($self, @params)"
-             Sets object parameters to user values. Only public arguments.
-             Private arguments are defined by '_' character on begin of key and will be
-             skip.
-             If setted public key doesn't exist in $self object, turn fatal error.
-             $self - Object or hash reference.
-             @params - Key, value pairs.
+    Sets object parameters to user values. If set key doesn't exist in $self
+    object, turn fatal error.
 
-    "set_split_params($self, @params)"
-             Set object params and other returns.
-             $self - Object or hash reference.
-             @params - Key, value pairs.
-             Returns array with other parameters.
+    $self - Object or hash reference. @params - Key, value pairs.
 
-    "split_params($object_keys_ar, @params)"
-             Split params to list of object params and other params.
-             Returns array with two values. First is reference to array with object
-             parameters. Second in reference to array with other parameters.
+  "set_params_pub"
+     set_params_pub($self, @params);
+
+    Sets object parameters to user values. Only public arguments. Private
+    arguments are defined by '_' character on begin of key and will be skip.
+    If set public key doesn't exist in $self object, turn fatal error.
+
+    $self
+        Object or hash reference.
+
+    @params
+        Key, value pairs.
+
+    Returns undef.
+
+  "set_split_params"
+     my @other_params = set_split_params($self, @params);
+
+    Set object params and other returns.
+
+    $self
+        Object or hash reference.
+
+    @params
+        Key, value pairs.
+
+    Returns list of parameters.
+
+  "split_params"
+     my ($object_params_ar, $other_params_ar) = split_params($object_keys_ar, @params);
+
+    Split params to list of object params and other params.
+
+    Returns array with two values. First is reference to array with object
+    parameters. Second in reference to array with other parameters.
 
 ERRORS
      set_params():
@@ -152,7 +171,7 @@ EXAMPLE5
      # * bad: value
 
 DEPENDENCIES
-    Error::Pure, Exporter, List::MoreUtils, Readonly.
+    Error::Pure, Exporter, List::Util, Readonly.
 
 REPOSITORY
     <https://github.com/michal-josef-spacek/Class-Utils>
@@ -163,10 +182,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © Michal Josef Špaček 2011-2022
+    © 2011-2022 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.12
+    0.14
 

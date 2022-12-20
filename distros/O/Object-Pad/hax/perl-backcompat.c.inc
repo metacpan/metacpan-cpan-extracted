@@ -92,6 +92,10 @@ static PADNAME *S_newPADNAMEpvn(pTHX_ const char *pv, STRLEN n)
 #  define OpSIBLING(op)  ((op)->op_sibling)
 #endif
 
+#ifndef OpHAS_SIBLING
+#  define OpHAS_SIBLING(op)  (cBOOL(OpSIBLING(op)))
+#endif
+
 #ifndef OpMORESIB_set
 #  define OpMORESIB_set(op,sib)  ((op)->op_sibling = (sib))
 #endif
@@ -199,3 +203,13 @@ static bool MY_sv_derived_from_hv(pTHX_ SV *sv, HV *hv)
 #define AV_FROM_REF(ref)  xV_FROM_REF(AV, ref)
 #define CV_FROM_REF(ref)  xV_FROM_REF(CV, ref)
 #define HV_FROM_REF(ref)  xV_FROM_REF(HV, ref)
+
+#ifndef newPADxVOP
+#  define newPADxVOP(type, flags, padix)  S_newPADxVOP(aTHX_ type, flags, padix)
+static OP *S_newPADxVOP(pTHX_ I32 type, I32 flags, PADOFFSET padix)
+{
+  OP *op = newOP(type, flags);
+  op->op_targ = padix;
+  return op;
+}
+#endif

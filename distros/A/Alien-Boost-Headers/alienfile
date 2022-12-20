@@ -1,0 +1,45 @@
+use alienfile;
+
+# If the probe fails to find an already installed libevent, the
+# "share" block contains instructions for downloading and
+# installing it.
+
+plugin 'Probe::CBuilder' => (
+  program => q{
+#include <stdio.h>
+#include <boost/version.hpp>
+int main(int argc, char *argv[])
+{
+  printf("version = '%s'\n", BOOST_LIB_VERSION);
+  return 0;
+}
+},
+);
+
+share {
+
+  start_url 'https://www.boost.org/users/download/';
+  plugin 'Download' => (
+    filter => qr/^boost_[0-9_]*\.tar\.gz$/,
+    version => qr/([0-9_]+)/,
+  );
+
+
+  plugin 'Extract';
+
+  build [
+    './bootstrap.sh --prefix=%{.install.prefix} --without-libraries=atomic,chrono,container,context,contract,coroutine,date_time,exception,fiber,filesystem,graph,graph_parallel,headers,iostreams,json,locale,log,math,mpi,nowide,program_options,python,random,regex,serialization,stacktrace,system,test,thread,timer,type_erasure,url,wave',
+    './b2 headers',
+    'mkdir -p %{.install.prefix}/include',
+    'cp boost %{.install.prefix}/include -R'
+  ];
+
+  gather sub {
+    my($build) =@_;
+    my $prefix = $build->runtime_prop->{prefix};
+    $build->runtime_prop->{cflags}        = "-I$prefix/include";
+    $build->runtime_prop->{cflags_static} = "-I$prefix/include";
+  };
+  
+};
+

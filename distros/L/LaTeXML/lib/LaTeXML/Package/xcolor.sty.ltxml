@@ -278,8 +278,8 @@ sub DecodeColor {
   my $dec_re         = qr/[+-]*(?:\d*\.?\d*)/;
   # <ext_expr>     : <core_model>,<div>:<expr1><dec1>;...;<exprk><deck>
   #                     | <core_model>:<expr1><dec1>;...;<exprk><deck>
-  my $ext_expr_re = qr/($core_model_re)(,($div_re))?:
-                       (($expr_re|$name_re),$dec_re(?:;(?:$expr_re|$name_re),$dec_re)*)/x;
+  my $ext_expr_re = qr/($core_model_re)(,($div_re))?:\s*
+                       (($expr_re|$name_re),$dec_re(?:;\s*(?:$expr_re|$name_re),$dec_re)*)/x;
   # <color_expr>   : <name> | <expr> | <ext_expt>
   my $color_expr_re = qr/$expr_re|$ext_expr_re/;
   my $function_re   = qr/wheel|twheel/;
@@ -742,7 +742,8 @@ DefConstructor('\@tabular@row@before@xcolor', sub {
     my ($document, %props) = @_;
     if (my $bg = $props{background}) {    # only set if explicitly set a color
       if (my $node = $document->findnode('ancestor-or-self::ltx:tr', $document->getNode)) {
-        $document->setAttribute($node, backgroundcolor => $bg); } }
+        if (!$node->hasAttribute('backgroundcolor')) {
+          $document->setAttribute($node, backgroundcolor => $bg); } } }
     return; },
   afterDigest => sub {
     my ($stomach, $whatsit) = @_;
@@ -856,6 +857,18 @@ DefPrimitive('\rrshift Variable', sub {
     return () unless $var;
     my ($defn, @args) = @$var;
     $defn->setValue($defn->valueOf(@args)->multiply(0.01), @args); });
+
+#\fcolorbox{name}{text} or \fcolorbox[model]{spec}{text}
+DefConstructor('\fcolorbox[]{}{} Undigested',
+  "<ltx:text framed='rectangle' framecolor='#framecolor'"
+    . " _noautoclose='1'>#text</ltx:text>",
+  bounded     => 1, mode => 'text',
+  afterDigest => sub {
+    my ($stomach, $whatsit) = @_;
+    my ($model, $fspec, $bspec, $text) = $whatsit->getArgs;
+    $whatsit->setProperty(framecolor => ParseXColor($model, $fspec));
+    MergeFont(background => ParseXColor($model, $bspec));
+    $whatsit->setProperty(text => Digest($text)); });
 
 #======================================================================
 # General TeX internals

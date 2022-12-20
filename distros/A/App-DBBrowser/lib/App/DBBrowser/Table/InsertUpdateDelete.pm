@@ -39,8 +39,8 @@ sub table_write_access {
         push @stmt_types, 'Update' if $sf->{o}{enable}{update};
         push @stmt_types, 'Delete' if $sf->{o}{enable}{delete};
     }
-    elsif ( $sf->{i}{special_table} eq 'join' && $sf->{i}{driver} eq 'mysql' ) {
-        push @stmt_types, 'Update' if $sf->{o}{G}{enable}{update};
+    elsif ( $sf->{i}{special_table} eq 'join' && $sf->{i}{driver} =~ /^(?:mysql|MariaDB)\z/ ) {
+        push @stmt_types, 'Update' if $sf->{o}{enable}{update};
     }
     if ( ! @stmt_types ) {
         return;

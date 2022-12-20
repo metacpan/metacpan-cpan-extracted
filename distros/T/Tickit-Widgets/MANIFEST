@@ -44,7 +44,11 @@ lib/Tickit/WidgetRole.pm
 lib/Tickit/WidgetRole/Alignable.pm
 lib/Tickit/WidgetRole/SingleChildContainer.pm
 lib/Tickit/Widgets.pm
+LICENSE
 MANIFEST			This list of files
+META.json
+META.yml
+README
 t/00use.t
 t/01widget.t
 t/02widget-window.t
@@ -72,7 +76,3 @@ t/34gridbox.t
 t/35hsplit.t
 t/35vsplit.t
 t/99pod.t
-README
-LICENSE
-META.yml
-META.json

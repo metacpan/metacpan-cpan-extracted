@@ -1,12 +1,12 @@
 {
-   "abstract" : "Perl binding of Sendmail Milter protocol",
+   "abstract" : "Perl bindings for Sendmail/Postfix milter interface.",
    "author" : [
-      "Ged Haywood <pause.2022.10@fixmymail.uk>"
+      "G.W. Haywood <pause.2022.12@milter.uk>"
    ],
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
    "license" : [
-      "perl_5"
+      "unknown"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -37,6 +37,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "1.23",
+   "version" : "1.24",
    "x_serialization_backend" : "JSON::PP version 4.04"
 }

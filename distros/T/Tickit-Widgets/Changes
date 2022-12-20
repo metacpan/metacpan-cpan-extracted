@@ -1,5 +1,12 @@
 Revision history for Tickit-Widgets
 
+0.36    2022-12-14
+        [CHANGES]
+         * Updated for Object::Pad v0.75
+            + Use `field NAME :param //= EXPR` syntax
+            + Use `ADJUST :params`
+            + Set `:strict(params)`
+
 0.35    2022-07-07
         [CHANGES]
          * Updates for Object::Pad 0.63

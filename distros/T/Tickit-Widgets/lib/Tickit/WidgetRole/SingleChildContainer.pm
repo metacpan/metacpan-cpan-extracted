@@ -3,9 +3,9 @@
 #
 #  (C) Paul Evans, 2020-2022 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.32;
+use Object::Pad 0.66;
 
-package Tickit::WidgetRole::SingleChildContainer 0.35;
+package Tickit::WidgetRole::SingleChildContainer 0.36;
 role Tickit::WidgetRole::SingleChildContainer;
 
 use Carp;
@@ -25,7 +25,7 @@ single other widget
 
 =cut
 
-has $_child :reader;
+field $_child :reader;
 
 =head1 METHODS
 

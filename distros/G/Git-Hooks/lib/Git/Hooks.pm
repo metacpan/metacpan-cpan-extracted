@@ -2,7 +2,7 @@ use warnings;
 
 package Git::Hooks;
 # ABSTRACT: Framework for implementing Git (and Gerrit) hooks
-$Git::Hooks::VERSION = '3.3.1';
+$Git::Hooks::VERSION = '3.4.0';
 use v5.16.0;
 use utf8;
 use Carp;
@@ -294,7 +294,7 @@ Git::Hooks - Framework for implementing Git (and Gerrit) hooks
 
 =head1 VERSION
 
-version 3.3.1
+version 3.4.0
 
 =head1 SYNOPSIS
 
@@ -417,7 +417,9 @@ don't worry. Git::Hooks can drive external hooks very easily.
 
 =head1 USAGE
 
-Please, read the L<Git::Hooks::Tutorial> if you want an easy guide to start
+Please, read the
+L<Git::Hooks::Tutorial|https://metacpan.org/dist/Git-Hooks/view/lib/Git/Hooks/Tutorial.pod>
+if you want an easy guide to start
 using the framework. Most probably you can set it up in a few minutes with
 it. Continue on if you want to get deeper in the Documentation.
 
@@ -1727,7 +1729,7 @@ disable the feature.
 
 =over
 
-=item * L<Git::Hooks::Tutorial>
+=item * L<Git::Hooks::Tutorial|https://metacpan.org/dist/Git-Hooks/view/lib/Git/Hooks/Tutorial.pod>
 
 Tutorials for Git users and administrators.
 

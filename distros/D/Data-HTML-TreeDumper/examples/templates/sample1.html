@@ -1,0 +1,36 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" type="text/css" href="./sample.css">
+  <script type="module" src="./sample.js"></script>
+  <title>sample1 - Data::HTML::TreeDumper</title>
+</head>
+
+<body>
+  <h1>sample1 - Data::HTML::TreeDumper</h1>
+  <div id="ToC" class="z5">
+    <select id="selectToC">
+      <option value="-">Select item</option>
+      [% FOREACH testCase IN testCases %]
+      <option>[% testCase.name %]</option>
+      [% END %]
+    </select>
+  </div>
+  [% FOREACH testCase IN testCases %]
+  <div id="[% testCase.name %]" class="hide">
+    <h2 class="stickyTop">[% testCase.name %]</h2>
+    <h3>YAML</h3>
+    <pre>[% testCase.yaml %]</pre>
+    <h3>td_Default</h3>
+    <div>[% testCase.td_Default %]</div>
+    <h3>td_Depth3</h3>
+    <div>[% testCase.td_Depth3 %]</div>
+  </div>
+  [% END %]
+</body>
+
+</html>

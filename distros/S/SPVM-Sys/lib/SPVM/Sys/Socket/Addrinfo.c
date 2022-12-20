@@ -186,7 +186,7 @@ int32_t SPVM__Sys__Socket__Addrinfo__copy_ai_addr(SPVM_ENV* env, SPVM_VALUE* sta
       
       stack[0].oval = obj_ai_addr;
       int32_t args_stack_length = 1;
-      e = env->call_instance_method_by_name(env, stack, obj_ai_addr, "clone", args_stack_length, FILE_NAME, __LINE__);
+      e = env->call_instance_method_by_name(env, stack, "clone", args_stack_length, FILE_NAME, __LINE__);
       if (e) { return e; };
       obj_ai_addr_clone = stack[0].oval;
     }

@@ -165,7 +165,7 @@ sub detach_db {
         for my $elem ( @$attached_db ) {
             push @choices, sprintf '- %s  (%s)', @$elem[1,0];
         }
-        my $prompt = "\n" . 'Choose:';
+        my $prompt = "\n" . 'Your choice:';
         my @pre = ( undef, $sf->{i}{_confirm} );
         my $info = join "\n", @tmp_info;
         # Choose

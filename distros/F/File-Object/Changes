@@ -1,3 +1,15 @@
+0.17 2022-12-16T11:23:38+01:00
+ - Add DESCRIPTION section to doc.
+ - Add Path::Tiny to SEE ALSO section in doc.
+ - Fix new() doc.
+ - Improve doc for up() method.
+
+0.16 2022-12-16T09:02:39+01:00
+ - Fix minimal dependencies for Error::Pure and Class::Utils (because of
+   List::MoreUtils)
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Rename example files to better name.
+
 0.15 2022-02-24T00:33:56+01:00
  - Fix default Error::Pure module via fix in Error::Pure.
 

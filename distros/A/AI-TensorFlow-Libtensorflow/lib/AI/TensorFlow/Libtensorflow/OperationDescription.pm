@@ -1,8 +1,11 @@
 package AI::TensorFlow::Libtensorflow::OperationDescription;
 # ABSTRACT: Operation being built
-$AI::TensorFlow::Libtensorflow::OperationDescription::VERSION = '0.0.2';
+$AI::TensorFlow::Libtensorflow::OperationDescription::VERSION = '0.0.3';
+use strict;
+use warnings;
 use namespace::autoclean;
 use AI::TensorFlow::Libtensorflow::Lib qw(arg);
+use AI::TensorFlow::Libtensorflow::Lib::FFIType::Variant::PackableArrayRef;
 
 my $ffi = AI::TensorFlow::Libtensorflow::Lib->ffi;
 $ffi->mangler(AI::TensorFlow::Libtensorflow::Lib->mangler_default);
@@ -12,13 +15,13 @@ $ffi->load_custom_type('AI::TensorFlow::Libtensorflow::Lib::FFIType::TFPtrSizeSc
 $ffi->load_custom_type('AI::TensorFlow::Libtensorflow::Lib::FFIType::TFPtrPtrLenSizeArrayRefScalar'
         => 'tf_attr_string_list'
 );
-$ffi->load_custom_type('AI::TensorFlow::Libtensorflow::Lib::FFIType::TFInt64SizeArrayRef'
+$ffi->load_custom_type(PackableArrayRef('Int64ArrayRef', pack_type => 'q')
         => 'tf_attr_int_list'
 );
-$ffi->load_custom_type('AI::TensorFlow::Libtensorflow::Lib::FFIType::TFFloat32SizeArrayRef'
+$ffi->load_custom_type(PackableArrayRef('Float32ArrayRef', pack_type => 'f')
 	=> 'tf_attr_float_list'
 );
-$ffi->load_custom_type('AI::TensorFlow::Libtensorflow::Lib::FFIType::TFBoolSizeArrayRef'
+$ffi->load_custom_type(PackableArrayRef('BoolArrayRef', pack_type => 'C')
 	=> 'tf_attr_bool_list',
 );
 
@@ -26,7 +29,10 @@ $ffi->attach( [ 'NewOperation' => 'New' ] => [
 	arg 'TF_Graph' => 'graph',
 	arg 'string'   => 'op_type',
 	arg 'string'   => 'oper_name',
-] => 'TF_OperationDescription' );
+] => 'TF_OperationDescription' => sub {
+	my ($xs, $class, @rest) = @_;
+	$xs->(@rest);
+});
 
 $ffi->attach( [ 'NewOperationLocked' => 'NewLocked' ] => [
 	arg 'TF_Graph' => 'graph',
@@ -46,12 +52,13 @@ $ffi->attach( 'AddInput' => [
 
 $ffi->attach( AddInputList => [
 	arg 'TF_OperationDescription' => 'desc',
-	arg 'TF_Output_array' => 'inputs',
-	arg 'int' => 'num_inputs'
+	arg 'TF_Output_struct_array' => 'inputs',
+	arg 'int' => 'num_inputs',
 ] => 'void' => sub {
-	my ($xs, $self, $inputs) = @_;
-	my $inputs_a    = AI::TensorFlow::Libtensorflow::Output->_as_array(@$inputs);
-	$xs->( $self, $inputs_a, $inputs_a->count );
+	my $xs = shift;
+	$_[1]  = AI::TensorFlow::Libtensorflow::Output->_as_array( @{ $_[1] } );
+	$_[2]  = $_[1]->count;
+	$xs->(@_);
 });
 
 $ffi->attach( AddControlInput => [

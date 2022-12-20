@@ -150,6 +150,9 @@
             <xsl:value-of select="concat('vertical-align:-',@imagedepth,'px')"/>
           </xsl:if>
         </xsl:with-param>
+        <xsl:with-param name="extra_classes">
+          <xsl:if test="not(@imagesrc)">ltx_missing ltx_missing_image</xsl:if>
+        </xsl:with-param>
       </xsl:call-template>
       <xsl:if test="@imagewidth">
         <xsl:attribute name='width'>
@@ -168,12 +171,11 @@
           </xsl:attribute>
         </xsl:when>
         <xsl:when test="ancestor::ltx:figure/ltx:caption">
-          <xsl:attribute name='alt'>
-            <xsl:value-of select="ancestor::ltx:figure/ltx:caption/text()"/>
-          </xsl:attribute>
+          <xsl:attribute name='alt'><xsl:text>Refer to caption</xsl:text></xsl:attribute>
+          <!-- Possibly aria-describedby, providing the caption has an id ??? -->
         </xsl:when>
         <xsl:otherwise>
-          <xsl:attribute name='alt'></xsl:attribute> <!--required; what else? -->
+          <xsl:attribute name='alt'><xsl:text>[Uncaptioned image]</xsl:text></xsl:attribute>
         </xsl:otherwise>
       </xsl:choose>
       <xsl:apply-templates select="." mode="begin">
@@ -195,7 +197,7 @@
           <xsl:value-of select="@description"/>
         </xsl:when>
         <xsl:when test="ancestor::ltx:figure/ltx:caption">
-            <xsl:value-of select="ancestor::ltx:figure/ltx:caption/text()"/>
+          <xsl:attribute name='alt'><xsl:text>Refer to caption</xsl:text></xsl:attribute>
         </xsl:when>
         <xsl:otherwise/>
       </xsl:choose>

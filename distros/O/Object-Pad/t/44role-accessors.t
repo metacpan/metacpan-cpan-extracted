@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More;
 
-use Object::Pad ':experimental(init_expr)';
+use Object::Pad;
 
 role ARole {
    field $one :reader = 1;

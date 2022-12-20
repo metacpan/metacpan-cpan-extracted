@@ -5,7 +5,7 @@ use warnings;
 package Sub::HandlesVia::HandlerLibrary;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.045';
+our $VERSION   = '0.046';
 
 use Types::Standard qw( Any Item );
 
@@ -48,6 +48,15 @@ sub _populate_cache {
 	my %hash;
 	$hash{$_} = 1 for $_[0]->handler_names;
 	\%hash;
+}
+
+sub expand_shortcut {
+	use Carp;
+	Carp::croak( "Not implemented" );
+}
+
+sub preprocess_spec {
+	return;
 }
 
 1;

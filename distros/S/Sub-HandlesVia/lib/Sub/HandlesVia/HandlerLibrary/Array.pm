@@ -5,13 +5,48 @@ use warnings;
 package Sub::HandlesVia::HandlerLibrary::Array;
 
 our $AUTHORITY = 'cpan:TOBYINK';
-our $VERSION   = '0.045';
+our $VERSION   = '0.046';
 
+use Exporter::Tiny;
 use Sub::HandlesVia::HandlerLibrary;
-our @ISA = 'Sub::HandlesVia::HandlerLibrary';
+our @ISA = qw(
+	Exporter::Tiny
+	Sub::HandlesVia::HandlerLibrary
+);
 
 use Sub::HandlesVia::Handler qw( handler );
 use Types::Standard qw( ArrayRef Optional Str CodeRef Int Item Any Ref Defined FileHandle );
+
+sub HandleQueue     () { 1 }
+sub HandleStack     () { 2 }
+
+our @EXPORT = qw(
+	HandleQueue
+	HandleStack
+);
+
+sub expand_shortcut {
+	require Carp;
+	my ( $class, $target, $attrname, $spec, $shortcut ) = @_;
+	my %handlers;
+
+	if ( HandleQueue & $shortcut ) {
+		$handlers{"$attrname\_is_empty"}  = 'is_empty';
+		$handlers{"$attrname\_size"}      = 'count';
+		$handlers{"$attrname\_enqueue"}   = 'push...';
+		$handlers{"$attrname\_dequeue"}   = 'shift';
+		$handlers{"$attrname\_peek"}      = [ get => 0 ];
+	}
+	if ( HandleStack & $shortcut ) {
+		$handlers{"$attrname\_is_empty"}  = 'is_empty';
+		$handlers{"$attrname\_size"}      = 'count';
+		$handlers{"$attrname\_push"}      = 'push...';
+		$handlers{"$attrname\_pop"}       = 'pop';
+		$handlers{"$attrname\_peek"}      = [ get => -1 ];
+	}
+
+	return \%handlers;
+}
 
 our @METHODS = qw( count is_empty all elements flatten get pop push shift
 	unshift clear first first_index reduce set accessor natatime any

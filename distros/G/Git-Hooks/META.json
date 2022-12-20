@@ -4,7 +4,7 @@
       "Gustavo L. de M. Chaves <gnustavo@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.012, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "git",
       "gerrit",
@@ -88,63 +88,63 @@
    "provides" : {
       "Git::Hooks" : {
          "file" : "lib/Git/Hooks.pm",
-         "version" : "v3.3.1"
+         "version" : "v3.4.0"
       },
       "Git::Hooks::CheckCommit" : {
          "file" : "lib/Git/Hooks/CheckCommit.pm",
-         "version" : "v3.3.1"
+         "version" : "v3.4.0"
       },
       "Git::Hooks::CheckDiff" : {
          "file" : "lib/Git/Hooks/CheckDiff.pm",
-         "version" : "v3.3.1"
+         "version" : "v3.4.0"
       },
       "Git::Hooks::CheckFile" : {
          "file" : "lib/Git/Hooks/CheckFile.pm",
-         "version" : "v3.3.1"
+         "version" : "v3.4.0"
       },
       "Git::Hooks::CheckJira" : {
          "file" : "lib/Git/Hooks/CheckJira.pm",
-         "version" : "v3.3.1"
+         "version" : "v3.4.0"
       },
       "Git::Hooks::CheckLog" : {
          "file" : "lib/Git/Hooks/CheckLog.pm",
-         "version" : "v3.3.1"
+         "version" : "v3.4.0"
       },
       "Git::Hooks::CheckReference" : {
          "file" : "lib/Git/Hooks/CheckReference.pm",
-         "version" : "v3.3.1"
+         "version" : "v3.4.0"
       },
       "Git::Hooks::CheckRewrite" : {
          "file" : "lib/Git/Hooks/CheckRewrite.pm",
-         "version" : "v3.3.1"
+         "version" : "v3.4.0"
       },
       "Git::Hooks::CheckWhitespace" : {
          "file" : "lib/Git/Hooks/CheckWhitespace.pm",
-         "version" : "v3.3.1"
+         "version" : "v3.4.0"
       },
       "Git::Hooks::GerritChangeId" : {
          "file" : "lib/Git/Hooks/GerritChangeId.pm",
-         "version" : "v3.3.1"
+         "version" : "v3.4.0"
       },
       "Git::Hooks::Notify" : {
          "file" : "lib/Git/Hooks/Notify.pm",
-         "version" : "v3.3.1"
+         "version" : "v3.4.0"
       },
       "Git::Hooks::PrepareLog" : {
          "file" : "lib/Git/Hooks/PrepareLog.pm",
-         "version" : "v3.3.1"
+         "version" : "v3.4.0"
       },
       "Git::Hooks::Test" : {
          "file" : "lib/Git/Hooks/Test.pm",
-         "version" : "v3.3.1"
+         "version" : "v3.4.0"
       },
       "Git::Message" : {
          "file" : "lib/Git/Message.pm",
-         "version" : "v3.3.1"
+         "version" : "v3.4.0"
       },
       "Git::Repository::Plugin::GitHooks" : {
          "file" : "lib/Git/Repository/Plugin/GitHooks.pm",
-         "version" : "v3.3.1"
+         "version" : "v3.4.0"
       }
    },
    "release_status" : "stable",
@@ -157,13 +157,14 @@
          "url" : "https://github.com/gnustavo/Git-Hooks.git"
       }
    },
-   "version" : "3.3.1",
+   "version" : "3.4.0",
    "x_contributors" : [
       "Mikko Koivunalho <mikkoi@cpan.org>",
       "Dave Rolsky <autarch@urth.org>",
       "Szymon Niezna\u0144ski <s.nez@member.fsf.org>"
    ],
-   "x_generated_by_perl" : "v5.30.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.19"
+   "x_generated_by_perl" : "v5.34.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.32",
+   "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

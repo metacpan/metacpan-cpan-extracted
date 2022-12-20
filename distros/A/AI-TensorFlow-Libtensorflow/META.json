@@ -4,7 +4,7 @@
       "Zakariyya Mughal <zmughal@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.025, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.029, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "apache_2_0"
    ],
@@ -20,7 +20,8 @@
          "inc",
          "share",
          "t",
-         "xt"
+         "xt",
+         "maint"
       ]
    },
    "prereqs" : {
@@ -37,6 +38,21 @@
             "Test::Pod::LinkCheck::Lite" : "0",
             "Test::Pod::Snippets" : "0",
             "Test::Pod::Snippets::Parser" : "0"
+         },
+         "suggests" : {
+            "CLI::Osprey" : "0",
+            "Data::Printer" : "0",
+            "File::Find::Rule" : "0",
+            "Function::Parameters" : "0",
+            "Hook::LexWrap" : "0",
+            "List::SomeUtils" : "0",
+            "Module::Runtime" : "0",
+            "Mu" : "0",
+            "Path::Tiny" : "0",
+            "Sort::Key::Multi" : "0",
+            "Sub::Uplevel" : "0",
+            "Syntax::Construct" : "0",
+            "Types::Path::Tiny" : "0"
          }
       },
       "runtime" : {
@@ -49,28 +65,32 @@
             "Exporter::Tiny" : "0",
             "FFI::C" : "0.12",
             "FFI::C::ArrayDef" : "0",
+            "FFI::C::StructDef" : "0",
             "FFI::CheckLib" : "0.28",
             "FFI::Platypus" : "2.00",
             "FFI::Platypus::API" : "0",
             "FFI::Platypus::Buffer" : "0",
             "FFI::Platypus::Closure" : "0",
             "FFI::Platypus::Memory" : "0",
+            "FFI::Platypus::Record" : "0",
             "FFI::Platypus::Type::Enum" : "0",
             "FFI::Platypus::Type::PtrObject" : "0",
             "Feature::Compat::Defer" : "0",
             "List::Util" : "0",
+            "Module::Runtime" : "0",
             "PDL" : "0",
-            "Scalar::Util" : "0",
+            "Package::Variant" : "0",
+            "Sub::Delete" : "0",
             "Sub::Quote" : "0",
             "Type::Library" : "0.008",
             "Type::Utils" : "0",
             "Types::Common" : "0",
             "Types::Standard" : "0",
             "base" : "0",
+            "constant" : "0",
             "feature" : "0",
             "namespace::autoclean" : "0",
             "overload" : "0",
-            "parent" : "0",
             "perl" : "5.014",
             "strict" : "0",
             "warnings" : "0"
@@ -78,6 +98,7 @@
       },
       "test" : {
          "requires" : {
+            "Data::Dumper" : "0",
             "PDL" : "0",
             "PDL::Core" : "0",
             "PDL::Primitive" : "0",
@@ -100,7 +121,7 @@
          "web" : "https://github.com/EntropyOrg/perl-AI-TensorFlow-Libtensorflow"
       }
    },
-   "version" : "0.0.2",
+   "version" : "0.0.3",
    "x_generated_by_perl" : "v5.26.1",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.28",
    "x_spdx_expression" : "Apache-2.0"

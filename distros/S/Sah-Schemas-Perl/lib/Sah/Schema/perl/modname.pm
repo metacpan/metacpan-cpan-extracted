@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-11'; # DATE
+our $DATE = '2022-12-16'; # DATE
 our $DIST = 'Sah-Schemas-Perl'; # DIST
-our $VERSION = '0.045'; # VERSION
+our $VERSION = '0.046'; # VERSION
 
 use Regexp::Pattern::Perl::Module ();
 
@@ -70,7 +70,7 @@ Sah::Schema::perl::modname - Perl module name, e.g. Foo::Bar
 
 =head1 VERSION
 
-This document describes version 0.045 of Sah::Schema::perl::modname (from Perl distribution Sah-Schemas-Perl), released on 2022-09-11.
+This document describes version 0.046 of Sah::Schema::perl::modname (from Perl distribution Sah-Schemas-Perl), released on 2022-12-16.
 
 =head1 SYNOPSIS
 
@@ -106,7 +106,7 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data);
  
  # a sample valid data
- $data = "Foo/Bar.pm";
+ $data = "Foo-Bar";
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
@@ -121,7 +121,7 @@ prefiltered) value:
  my $res = $validator->($data); # [$errmsg, $validated_val]
  
  # a sample valid data
- $data = "Foo/Bar.pm";
+ $data = "Foo-Bar";
  my $res = $validator->($data); # => ["","Foo::Bar"]
  
  # a sample invalid data
@@ -188,6 +188,23 @@ L<Perinci::CmdLine> (L<Perinci::CmdLine::Lite>) to create a CLI:
  % ./myapp.pl --version
 
  % ./myapp.pl --arg1 ...
+
+
+=head2 Using with Type::Tiny
+
+To create a type constraint and type library from a schema:
+
+ package My::Types {
+     use Type::Library -base;
+     use Type::FromSah qw( sah2type );
+
+     __PACKAGE__->add_type(
+         sah2type('$sch_name*', name=>'PerlModname')
+     );
+ }
+
+ use My::Types qw(PerlModname);
+ PerlModname->assert_valid($data);
 
 =head1 DESCRIPTION
 

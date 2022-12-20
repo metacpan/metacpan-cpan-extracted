@@ -1,6 +1,6 @@
 package constant::more;
 
-use version; our $VERSION=version->declare("v0.1.1");
+use version; our $VERSION=version->declare("v0.1.2");
 use strict;
 use warnings;
 
@@ -75,7 +75,10 @@ sub import {
 				unless($name=~/::/){
 					$name=$caller."::".$name;
 				}
-				$table{$name}=$value;
+        #Only configure contant for addition if it doesn't exist
+        #in target namespace
+        #say STDERR *{$name}{CODE};
+				$table{$name}=$value unless(*{$name}{CODE})
 			}
 
 			$success=1;
@@ -119,19 +122,9 @@ sub import {
 
 			#Actually
 			#Create the constants
-			while(my($name,$val)=each %table){
-				#check where to install the constant
-				unless($seen{$name}){
-					#Define
-					*{$name}=sub (){$val};
-					$seen{$name}=1;
-					next;
-
-				}
-				else {
-					next;
-				}
-			}
+      while(my($name,$val)=each %table){
+        *{$name}=sub (){$val} 
+      }
 }
 
 1;

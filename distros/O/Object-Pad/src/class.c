@@ -75,6 +75,15 @@ static void register_class_attribute(const char *name, const struct ClassHookFun
   classattrs = reg;
 }
 
+struct ClassHookFuncs_v57 {
+  U32 ver;
+  U32 flags;
+  const char *permit_hintkey;
+  bool (*apply)(pTHX_ ClassMeta *classmeta, SV *value, SV **hookdata_ptr, void *funcdata);
+  /* No pre- or post-seal */
+  void (*post_add_field)(pTHX_ ClassMeta *classmeta, SV *hookdata, void *funcdata, FieldMeta *fieldmeta);
+};
+
 void ObjectPad_register_class_attribute(pTHX_ const char *name, const struct ClassHookFuncs *funcs, void *funcdata)
 {
   if(funcs->ver < 57)
@@ -89,6 +98,23 @@ void ObjectPad_register_class_attribute(pTHX_ const char *name, const struct Cla
 
   if(!funcs->permit_hintkey)
     croak("Third-party class attributes require a permit hinthash key");
+
+  if(funcs->ver < OBJECTPAD_ABIVERSION) {
+    const struct ClassHookFuncs_v57 *funcs_v57 = (const struct ClassHookFuncs_v57 *)funcs;
+
+    struct ClassHookFuncs *funcs_v76;
+    Newx(funcs_v76, 1, struct ClassHookFuncs);
+
+    *funcs_v76 = (struct ClassHookFuncs){
+      .ver            = OBJECTPAD_ABIVERSION,
+      .flags          = funcs_v57->flags,
+      .permit_hintkey = funcs_v57->permit_hintkey,
+      .apply          = funcs_v57->apply,
+      .post_add_field = funcs_v57->post_add_field,
+    };
+
+    funcs = funcs_v76;
+  }
 
   register_class_attribute(name, funcs, funcdata);
 }
@@ -1211,6 +1237,8 @@ void ObjectPad_mop_class_seal(pTHX_ ClassMeta *meta)
   if(meta->sealed) /* idempotent */
     return;
 
+  MOP_CLASS_RUN_HOOKS_NOARGS(meta, pre_seal);
+
   if(meta->type == METATYPE_CLASS &&
       meta->cls.supermeta && !meta->cls.supermeta->sealed) {
     /* Must defer sealing until superclass is sealed first
@@ -1296,6 +1324,8 @@ void ObjectPad_mop_class_seal(pTHX_ ClassMeta *meta)
   S_generate_initfields_method(aTHX_ meta);
 
   meta->sealed = true;
+
+  MOP_CLASS_RUN_HOOKS_NOARGS(meta, post_seal);
 
   if(meta->pending_submeta) {
     int i;

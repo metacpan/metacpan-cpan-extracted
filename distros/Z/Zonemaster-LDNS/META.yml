@@ -35,4 +35,4 @@ resources:
   bugtracker: https://github.com/zonemaster/zonemaster-ldns/issues
   license: http://opensource.org/licenses/bsd-license.php
   repository: https://github.com/zonemaster/zonemaster-ldns
-version: 2.2.2
+version: 3.0.0

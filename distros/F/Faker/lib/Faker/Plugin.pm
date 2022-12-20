@@ -8,43 +8,24 @@ use warnings;
 use Venus::Class 'attr', 'with';
 
 with 'Venus::Role::Buildable';
-with 'Venus::Role::Coercible';
+with 'Venus::Role::Optional';
 
-use Faker;
+# VERSION
+
+our $VERSION = '1.17';
 
 # ATTRIBUTES
 
 attr 'faker';
 
-# MODIFIERS
+# DEFAULTS
 
-sub faker {
-  my ($self, $data) = @_;
-
-  if ($data) {
-    return $self->{faker} = $self->coercion({faker => $data})->{faker};
-  }
-  else {
-    return $self->{faker};
-  }
+sub coerce_faker {
+  return 'Faker';
 }
 
-# BUILDERS
-
-sub build_self {
-  my ($self, $data) = @_;
-
-  $self->faker(Faker->new) if !$self->faker;
-
-  return $self;
-}
-
-# COERCIONS
-
-sub coerce {
-  {
-    faker => 'Faker',
-  }
+sub default_faker {
+  return {};
 }
 
 # METHODS
@@ -771,6 +752,12 @@ Fake Data Plugin Base
 
 =cut
 
+=head1 VERSION
+
+1.17
+
+=cut
+
 =head1 SYNOPSIS
 
   package main;
@@ -861,6 +848,8 @@ I<Since C<1.10>>
 This package integrates behaviors from:
 
 L<Venus::Role::Buildable>
+
+L<Venus::Role::Optional>
 
 =cut
 

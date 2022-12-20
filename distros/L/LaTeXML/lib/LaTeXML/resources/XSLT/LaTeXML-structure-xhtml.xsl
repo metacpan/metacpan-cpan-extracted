@@ -464,6 +464,8 @@
           <br class="ltx_break"/>
           <xsl:apply-templates select="ltx:contact[@role='email']" />
           <br class="ltx_break"/>
+          <xsl:apply-templates select="ltx:contact[@role='orcid']" />
+          <br class="ltx_break"/>
           <xsl:apply-templates select="ltx:contact[@role='homepage']" />
        </h4>
       </div>
@@ -496,11 +498,9 @@
       <xsl:if test="ltx:contact">
         <xsl:element name="span" namespace="{$html_ns}">
           <xsl:attribute name="class">ltx_author_notes</xsl:attribute>
-          <xsl:element name="span" namespace="{$html_ns}">
-            <xsl:apply-templates select="ltx:contact">
-              <xsl:with-param name="context" select="$innercontext"/>
-            </xsl:apply-templates>
-          </xsl:element>
+          <xsl:apply-templates select="ltx:contact">
+            <xsl:with-param name="context" select="$innercontext"/>
+          </xsl:apply-templates>
         </xsl:element>
       </xsl:if>
       <xsl:apply-templates select="." mode="end">
@@ -593,6 +593,27 @@
       </xsl:apply-templates>
       <xsl:text>&#x0A;</xsl:text>
     </xsl:element>
+  </xsl:template>
+
+  <xsl:template match="ltx:contact[@role='orcid']">
+    <xsl:param name="context"/>
+    <xsl:text>&#x0A;</xsl:text>
+    <xsl:element name="span" namespace="{$html_ns}">
+      <xsl:variable name="innercontext" select="'inline'"/><!-- override -->
+      <xsl:call-template name="add_id"/>
+      <xsl:call-template name="add_attributes">
+      </xsl:call-template>
+      <xsl:apply-templates select="." mode="begin">
+        <xsl:with-param name="context" select="$innercontext"/>
+      </xsl:apply-templates>
+      <xsl:apply-templates>
+        <xsl:with-param name="context" select="$innercontext"/>
+      </xsl:apply-templates>
+      <xsl:apply-templates select="." mode="end">
+        <xsl:with-param name="context" select="$innercontext"/>
+      </xsl:apply-templates>
+    </xsl:element>
+    <xsl:text>&#x0A;</xsl:text>
   </xsl:template>
 
   <xsl:template match="ltx:contact[@role='homepage']">

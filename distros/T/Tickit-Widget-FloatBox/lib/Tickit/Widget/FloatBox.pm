@@ -1,13 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2022 -- leonerd@leonerd.org.uk
 
 use v5.26; # signatures
-use Object::Pad 0.57;
+use Object::Pad 0.73 ':experimental(adjust_params init_expr)';
 
-package Tickit::Widget::FloatBox 0.10;
+package Tickit::Widget::FloatBox 0.11;
 class Tickit::Widget::FloatBox
+   :strict(params)
    :isa(Tickit::ContainerWidget);
 
 use Carp;
@@ -62,15 +63,8 @@ mutator.
 
 =cut
 
-has $_base_child;
-has @_floats;
-
-BUILD ( %args )
-{
-   if( $args{base_child} ) {
-      croak "The 'base_child' constructor argument to ${\ref $self} is no longer supported; use ->set_base_child instead";
-   }
-}
+field $_base_child;
+field @_floats;
 
 =head1 ACCESSORS
 
@@ -241,14 +235,14 @@ class # hide
 {
    use Carp;
 
-   has $_fb     :param(floatbox);
-   has $_child  :param;
-   has $_hidden :param = 0;
+   field $_fb     :param(floatbox);
+   field $_child  :param;
+   field $_hidden :param = 0;
 
-   ADJUSTPARAMS ( $params )
+   ADJUST :params ( %params )
    {
-      $self->move( %{$params}{qw( top bottom left right )} );
-      delete @{$params}{qw( top bottom left right )};
+      $self->move( %params{qw( top bottom left right )} );
+      delete @params{qw( top bottom left right )};
    }
 
 =head2 child
@@ -291,10 +285,10 @@ current value pass a value of C<undef>.
 
 =cut
 
-   has $_top;
-   has $_bottom;
-   has $_left;
-   has $_right;
+   field $_top;
+   field $_bottom;
+   field $_left;
+   field $_right;
 
    method move ( %args )
    {

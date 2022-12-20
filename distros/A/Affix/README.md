@@ -7,13 +7,19 @@ Affix - A Foreign Function Interface eXtension
 
 ```perl
 use Affix;
-sub pow : Native(get_lib) : Signature([Double, Double] => Double);
-print pow( 2, 10 );    # 1024
 
-sub get_lib {
-    return 'ntdll' if $^O eq 'MSWin32';
-    return undef;
-}
+affix( 'libfoo', 'bar', [Str, Float] => Double );
+print bar( 'Baz', 3.14 );
+
+# or
+
+my $bar = wrap( 'libfoo', 'bar', [Str, Float] => Double );
+print $bar->( 'Baz', 3.14 );
+
+# or
+
+sub bar : Native('libfoo') : Signature([Str, Float] => Double);
+print bar( 'Baz', 10.9 );
 ```
 
 # DESCRIPTION
@@ -263,7 +269,7 @@ typedef PwStruct => Struct [
 sub getuid : Native : Signature([]=>Int);
 sub getpwuid : Native : Signature([Int]=>Pointer[PwStruct]);
 my $data = main::getpwuid( getuid() );
-print Dumper( cast( $data, Pointer [ PwStruct() ] ) );
+print Dumper( ptr2sv( $data, Pointer [ PwStruct() ] ) );
 ```
 
 # Exported Variables
@@ -398,6 +404,16 @@ my $size1 = sizeof( Struct[ name => Str, age => Int ] );
 ```
 
 Returns the size, in bytes, of the [type](#types) passed to it.
+
+## `offsetof( ... )`
+
+```perl
+my $struct = Struct[ name => Str, age => Int ];
+my $offset = offsetof( $struct, 'age' );
+```
+
+Returns the offset, in bytes, from the beginning of a structure including
+padding, if any.
 
 # Utility Functions
 
@@ -750,16 +766,6 @@ Same as `Enum`.
 
 `Enum` but with signed chars.
 
-# See Also
-
-Check out [FFI::Platypus](https://metacpan.org/pod/FFI%3A%3APlatypus) for a more robust and mature FFI.
-
-Examples found in `eg/`.
-
-[LibUI](https://metacpan.org/pod/LibUI) for a larger demo project based on Affix
-
-[Types::Standard](https://metacpan.org/pod/Types%3A%3AStandard) for the inspiration of the advisory types system.
-
 # Calling Conventions
 
 Handle with care! Using these without understanding them can break your code!
@@ -830,6 +836,20 @@ From the table of Affix types we know that an `int` is `Int`. We also know
 that a `char *` is best expressed with `Str`. But `addrinfo` is a structure,
 which means we will need to write our own type class. However, the function
 declaration is straightforward:
+
+```
+TODO
+```
+
+# See Also
+
+Check out [FFI::Platypus](https://metacpan.org/pod/FFI%3A%3APlatypus) for a more robust and mature FFI.
+
+Examples found in `eg/`.
+
+[LibUI](https://metacpan.org/pod/LibUI) for a larger demo project based on Affix
+
+[Types::Standard](https://metacpan.org/pod/Types%3A%3AStandard) for the inspiration of the advisory types system.
 
 # LICENSE
 

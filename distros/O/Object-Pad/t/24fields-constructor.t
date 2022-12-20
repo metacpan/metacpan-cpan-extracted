@@ -5,7 +5,7 @@ use warnings;
 
 use Test::More;
 
-use Object::Pad ':experimental(init_expr)';
+use Object::Pad;
 
 class Point {
    field $x :param;
@@ -60,6 +60,33 @@ class Point3D :isa(Point) {
       'constructor complains about unrecognised param name' );
    like( $@, qr/^Unrecognised parameters for Colour constructor: 'yellow' at \S+ line $LINE\./,
       'exception message from unrecognised parameter' );
+}
+
+# Param assignment modes
+{
+   class AllTheOps {
+      field $exists  :param   = "default";
+      field $defined :param //= "default";
+      field $true    :param ||= "default";
+
+      method values { return ( $exists, $defined, $true ); }
+   }
+
+   is_deeply( [ AllTheOps->new(exists => "value", defined => "value", true => "value")->values ],
+      [ "value", "value", "value" ],
+      'AllTheOps for true values' );
+
+   is_deeply( [ AllTheOps->new(exists => 0, defined => 0, true => 0)->values ],
+      [ 0, 0, "default" ],
+      'AllTheOps for false values' );
+
+   is_deeply( [ AllTheOps->new(exists => undef, defined => undef, true => undef)->values ],
+      [ undef, "default", "default" ],
+      'AllTheOps for undef values' );
+
+   is_deeply( [ AllTheOps->new()->values ],
+      [ "default", "default", "default" ],
+      'AllTheOps for missing values' );
 }
 
 done_testing;

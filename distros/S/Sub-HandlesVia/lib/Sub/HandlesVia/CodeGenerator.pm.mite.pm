@@ -7,7 +7,7 @@
 
     our $USES_MITE    = "Mite::Class";
     our $MITE_SHIM    = "Sub::HandlesVia::Mite";
-    our $MITE_VERSION = "0.010008";
+    our $MITE_VERSION = "0.012000";
 
     # Mite keywords
     BEGIN {
@@ -47,10 +47,12 @@
         *false   = \&Sub::HandlesVia::Mite::false;
         *guard   = \&Sub::HandlesVia::Mite::guard;
         *lazy    = \&Sub::HandlesVia::Mite::lazy;
+        *lock    = \&Sub::HandlesVia::Mite::lock;
         *ro      = \&Sub::HandlesVia::Mite::ro;
         *rw      = \&Sub::HandlesVia::Mite::rw;
         *rwp     = \&Sub::HandlesVia::Mite::rwp;
         *true    = \&Sub::HandlesVia::Mite::true;
+        *unlock  = \&Sub::HandlesVia::Mite::unlock;
     }
 
     # Gather metadata for constructor and destructor

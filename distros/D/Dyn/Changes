@@ -1,9 +1,8 @@
 Revision history for Perl extension Dyn.pm
 
-0.03 2021-12-05T01:23:23Z
+0.05 2022-12-14T16:21:49Z
 
-    - Attach a native call to a perl sub with :Dyn attribute (demo and subject to change before v1.0)
-    - Cut down time to execute regular ol' variable based bound bindings by ~75%
+    - Pull upstream changes to dyncall 1.4 (stable)
 
 0.02 2021-11-18T15:34:12Z
 

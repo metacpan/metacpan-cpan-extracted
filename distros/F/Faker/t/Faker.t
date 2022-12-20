@@ -19,14 +19,6 @@ Faker
 
 $test->for('name');
 
-=version
-
-1.10
-
-=cut
-
-$test->for('version');
-
 =tagline
 
 Fake Data Generator
@@ -63,6 +55,7 @@ method: address_state_name
 method: address_street_address
 method: address_street_name
 method: address_street_suffix
+method: cache
 method: color_hex_code
 method: color_name
 method: color_rgb_colorset
@@ -163,9 +156,8 @@ $test->for('description');
 =integrates
 
 Venus::Role::Buildable
-Venus::Role::Coercible
-Venus::Role::Doable
 Venus::Role::Proxyable
+Venus::Role::Optional
 
 =cut
 
@@ -1232,6 +1224,82 @@ $test->for('example', 1, 'address_street_suffix', sub {
   is $address_street_suffix, "Street";
 
   $address_street_suffix
+});
+
+=method cache
+
+The cache method dispatches to the method specified, caches the method name and
+return value, and returns the value. Subsequent calls will return the cached
+value.
+
+=signature cache
+
+  cache(Str $method, Any @args) (Str)
+
+=metadata cache
+
+{
+  since => '1.10',
+}
+
+=example-1 cache
+
+  package main;
+
+  use Faker;
+
+  my $faker = Faker->new('en-us');
+
+  # my $cache = $faker->cache('person_name');
+
+  # "Keeley Balistreri"
+
+  # $cache = $faker->cache('person_name');
+
+  # "Keeley Balistreri"
+
+=cut
+
+$test->for('example', 1, 'cache', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  my $cache = $result->cache('person_name');
+  is $cache, "Keeley Balistreri";
+  $cache = $result->cache('person_name');
+  is $cache, "Keeley Balistreri";
+  $result->caches->delete('person_name');
+
+  $result
+});
+
+=example-2 cache
+
+  package main;
+
+  use Faker;
+
+  my $faker = Faker->new('en-us');
+
+  # my $cache = $faker->cache('company_tagline');
+
+  # "iterate back-end content"
+
+  # $cache = $faker->cache('company_tagline');
+
+  # "iterate back-end content"
+
+=cut
+
+$test->for('example', 2, 'cache', sub {
+  my ($tryable) = @_;
+  ok my $result = $tryable->result;
+  my $cache = $result->cache('company_tagline');
+  is $cache, "iterate back-end content";
+  $cache = $result->cache('company_tagline');
+  is $cache, "iterate back-end content";
+  $result->caches->delete('company_tagline');
+
+  $result
 });
 
 =method color_hex_code
@@ -2551,11 +2619,11 @@ $test->for('example', 1, 'lorem_paragraph', sub {
   ok $result->isa('Faker');
   ok $result->random->reseed($seed);
   my $lorem_paragraph = $result->lorem_paragraph;
-  like $lorem_paragraph, qr/deleniti fugiat in accusantium animi corrupti dol/;
+  like $lorem_paragraph, qr/deleniti eligendi fugiat in provident accusantium/;
   ok $lorem_paragraph = $result->lorem_paragraph;
-  like $lorem_paragraph, qr/ducimus placeat autem ut sit adipisci asperiores /;
+  like $lorem_paragraph, qr/magnam sed quasi quas vel earum est veniam quaerat/;
   ok $lorem_paragraph = $result->lorem_paragraph;
-  like $lorem_paragraph, qr/dignissimos est magni quia aut et hic eos archite/;
+  like $lorem_paragraph, qr/consequatur earum ducimus minus placeat et autem/;
 
   $lorem_paragraph
 });
@@ -2602,11 +2670,11 @@ $test->for('example', 1, 'lorem_paragraphs', sub {
   ok $result->isa('Faker');
   ok $result->random->reseed($seed);
   my $lorem_paragraphs = $result->lorem_paragraphs;
-  like $lorem_paragraphs, qr/eligendi laudantium provident assumenda voluptate/;
+  like $lorem_paragraphs, qr/vero et deleniti eligendi fugiat in provident/;
   ok $lorem_paragraphs = $result->lorem_paragraphs;
-  like $lorem_paragraphs, qr/accusantium ex pariatur perferendis voluptate ius/;
+  like $lorem_paragraphs, qr/deserunt consequatur ducimus enim blanditiis/;
   ok $lorem_paragraphs = $result->lorem_paragraphs;
-  like $lorem_paragraphs, qr/sit ut molestiae consequatur error tempora invent/;
+  like $lorem_paragraphs, qr/accusantium sit ex totam pariatur odio/;
 
   $lorem_paragraphs
 });
@@ -2653,11 +2721,11 @@ $test->for('example', 1, 'lorem_sentence', sub {
   ok $result->isa('Faker');
   ok $result->random->reseed($seed);
   my $lorem_sentence = $result->lorem_sentence;
-  like $lorem_sentence, qr/vitae et eligendi laudantium provident assumenda /;
+  like $lorem_sentence, qr/nihil vitae vero et deleniti eligendi fugiat/;
   ok $lorem_sentence = $result->lorem_sentence;
-  like $lorem_sentence, qr/aspernatur qui ad error numquam illum sunt cupidi/;
+  like $lorem_sentence, qr/voluptates corrupti sed dolores iusto aliquid/;
   ok $lorem_sentence = $result->lorem_sentence;
-  like $lorem_sentence, qr/incidunt ut ratione sequi non illum laborum dolor/;
+  like $lorem_sentence, qr/nostrum error at numquam et illum numquam/;
 
   $lorem_sentence
 });
@@ -2704,11 +2772,11 @@ $test->for('example', 1, 'lorem_sentences', sub {
   ok $result->isa('Faker');
   ok $result->random->reseed($seed);
   my $lorem_sentences = $result->lorem_sentences;
-  like $lorem_sentences, qr/vero deleniti fugiat in accusantium animi corrupt/;
+  like $lorem_sentences, qr/vero et deleniti eligendi fugiat laudantium/;
   ok $lorem_sentences = $result->lorem_sentences;
-  like $lorem_sentences, qr/enim accusantium aliquid id reprehenderit consequ/;
+  like $lorem_sentences, qr/incidunt voluptas ut et ratione in sequi dolore/;
   ok $lorem_sentences = $result->lorem_sentences;
-  like $lorem_sentences, qr/reprehenderit ut autem cumque ea sint dolorem imp/;
+  like $lorem_sentences, qr/sit dolorem adipisci consequatur asperiores et/;
 
   $lorem_sentences
 });
@@ -2806,11 +2874,11 @@ $test->for('example', 1, 'lorem_words', sub {
   ok $result->isa('Faker');
   ok $result->random->reseed($seed);
   my $lorem_words = $result->lorem_words;
-  is $lorem_words, "aut vitae et eligendi laudantium";
+  is $lorem_words, "nisi aut nihil vitae vero";
   ok $lorem_words = $result->lorem_words;
-  is $lorem_words, "accusantium animi corrupti dolores aliquid";
+  is $lorem_words, "deleniti eligendi fugiat laudantium in";
   ok $lorem_words = $result->lorem_words;
-  is $lorem_words, "eos pariatur quia corporis illo";
+  is $lorem_words, "accusantium assumenda animi voluptates corrupti";
 
   $lorem_words
 });

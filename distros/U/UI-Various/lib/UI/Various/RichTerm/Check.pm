@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.31';
+our $VERSION = '0.34';
 
 use UI::Various::core;
 use UI::Various::Check;
@@ -41,6 +41,8 @@ use UI::Various::RichTerm::base qw(%D);
 require Exporter;
 our @ISA = qw(UI::Various::Check UI::Various::RichTerm::base);
 our @EXPORT_OK = qw();
+
+use constant DECO_WIDTH => length($D{CL}) + length($D{CR}) + 2;
 
 #########################################################################
 #########################################################################
@@ -82,7 +84,8 @@ width and height the UI element will require or need when printed
 sub _prepare($$)
 {
     my ($self, $content_width) = @_;
-    return $self->_size($self->text, $content_width);
+    my ($w, $h) = $self->_size($self->text, $content_width);
+    return ($w + DECO_WIDTH, $h);
 }
 
 #########################################################################
@@ -124,7 +127,8 @@ sub _show($$$$)
     my ($self, $prefix, $width, $height) = @_;
     # Note that the accessors automatically dereference the SCALARs here:
     local $_ = $prefix . $D{CL} . ($self->var ? 'X' : ' ') . $D{CR} . ' ';
-    return $self->_format($_, '', '', $self->text, '', '', $width, $height);
+    return $self->_format($_, '', '', $self->text, '', '',
+			  $width - DECO_WIDTH, $height);
 }
 
 #########################################################################

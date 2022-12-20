@@ -41,7 +41,7 @@ BEGIN {
     chomp $_;
     -c $_  and  -w $_
 	or  plan skip_all => 'required TTY (' . $_ . ') not available';
-    plan tests => 18;
+    plan tests => 19;
 
     # define fixed environment for unit tests:
     delete $ENV{DISPLAY};
@@ -479,3 +479,52 @@ stdout_is
 
 ####################################
 # triggering remaining missing coverage:
+$lb8 = UI::Various::Listbox->new(texts => \@text8, height => 3,
+				 selection => 1);
+my $del = UI::Various::Button->new(text => ' - ',
+				   width => 3,
+				   code => sub{
+				       local $_ = $lb8->selected();
+				       defined $_  and  $lb8->remove($_);
+				   });
+my $box = UI::Various::Box->new(border => 1, rows => 2);
+$box->add($lb8, $del);
+$win = $main->window({title => '8-3-1'}, $box, $quit);
+stdout_is
+{   _call_with_stdin("4\n5\n6", sub { $main->mainloop; });   }
+    join("\n",
+	 '#= 8-3-1 ========<0>#',
+	 '"    +-------------+"',
+	 '"    |<1>+1-3/8    |"',
+	 '"    |<2> 1st entry|"',
+	 '"    |<3> 2nd entry|"',
+	 '"    |<4> 3rd entry|"',
+	 '"    +-------------+"',
+	 '"    |<5> [ - ]    |"',
+	 '"    +-------------+"',
+	 '"<6> [Quit]         "',
+	 '#===================#',
+	 $prompt . 	 '#= 8-3-1 ========<0>#',
+	 '"    +-------------+"',
+	 '"    |<1>+1-3/8    |"',
+	 '"    |<2> 1st entry|"',
+	 '"    |<3> 2nd entry|"',
+	 '"    |<4> '.$D{SL1}.'3rd entry'.$D{SL0}.'|"',
+	 '"    +-------------+"',
+	 '"    |<5> [ - ]    |"',
+	 '"    +-------------+"',
+	 '"<6> [Quit]         "',
+	 '#===================#',
+	 $prompt . '#= 8-3-1 ========<0>#',
+	 '"    +-------------+"',
+	 '"    |<1>+1-3/7    |"',
+	 '"    |<2> 1st entry|"',
+	 '"    |<3> 2nd entry|"',
+	 '"    |<4> 4th entry|"',
+	 '"    +-------------+"',
+	 '"    |<5> [ - ]    |"',
+	 '"    +-------------+"',
+	 '"<6> [Quit]         "',
+	 '#===================#',
+	 $prompt),
+    'simple 8-3-1 in box runs correctly too';

@@ -34,13 +34,14 @@ our(@BAYES_VARS, @IP_VARS, @SA_VARS, %EXPORT_TAGS, @EXPORT_OK);
 BEGIN { 
   @IP_VARS = qw(
 	IP_IN_RESERVED_RANGE IP_PRIVATE LOCALHOST IPV4_ADDRESS IP_ADDRESS
+	IS_IP_PRIVATE IS_LOCALHOST IS_IPV4_ADDRESS IS_IP_ADDRESS
   );
   @BAYES_VARS = qw(
 	DUMP_MAGIC DUMP_TOKEN DUMP_BACKUP 
   );
   # These are generic constants that may be used across several modules
   @SA_VARS = qw(
-	HARVEST_DNSBL_PRIORITY MBX_SEPARATOR
+	MBX_SEPARATOR
 	MAX_BODY_LINE_LENGTH MAX_HEADER_KEY_LENGTH MAX_HEADER_VALUE_LENGTH
 	MAX_HEADER_LENGTH ARITH_EXPRESSION_LEXER AI_TIME_UNKNOWN
 	CHARSETS_LIKELY_TO_FP_AS_CAPS MAX_URI_LENGTH RULENAME_RE IS_RULENAME
@@ -168,7 +169,10 @@ use constant IP_PRIVATE => qr{^(?:
     )
     (?![a-f0-9:])
   )
-)}oxi;
+)}xi;
+
+# exact match
+use constant IS_IP_PRIVATE => qr/^${\(IP_PRIVATE)}$/;
 
 # backward compatibility
 use constant IP_IN_RESERVED_RANGE => IP_PRIVATE;
@@ -246,7 +250,10 @@ use constant LOCALHOST => qr/
 		      )
 		      (?![a-f0-9:])
 		    )
-		  /oxi;
+		  /xi;
+
+# exact match
+use constant IS_LOCALHOST => qr/^${\(LOCALHOST)}$/;
 
 # ---------------------------------------------------------------------------
 # an IP address, in IPv4 format only.
@@ -256,11 +263,13 @@ use constant IPV4_ADDRESS => qr/\b
                     (?:1\d\d|2[0-4]\d|25[0-5]|[1-9]\d|\d)\.
                     (?:1\d\d|2[0-4]\d|25[0-5]|[1-9]\d|\d)\.
                     (?:1\d\d|2[0-4]\d|25[0-5]|[1-9]\d|\d)
-                  \b/ox;
+                  \b/x;
+
+# exact match
+use constant IS_IPV4_ADDRESS => qr/^${\(IPV4_ADDRESS)}$/;
 
 # ---------------------------------------------------------------------------
-# an IP address, in IPv4, IPv4-mapped-in-IPv6, or IPv6 format.  NOTE: cannot
-# just refer to $IPV4_ADDRESS, due to perl bug reported in nesting qr//s. :(
+# an IP address, in IPv4, IPv4-mapped-in-IPv6, or IPv6 format.
 #
 use constant IP_ADDRESS => qr/
 		    (?:
@@ -344,11 +353,12 @@ use constant IP_ADDRESS => qr/
 		      )
 		      (?![a-f0-9:])
 		    )
-		  /oxi;
+		  /xi;
+
+# exact match
+use constant IS_IP_ADDRESS => qr/^${\(IP_ADDRESS)}$/;
 
 # ---------------------------------------------------------------------------
-
-use constant HARVEST_DNSBL_PRIORITY =>  500;
 
 # regular expression that matches message separators in The University of
 # Washington's MBX mailbox format
@@ -388,7 +398,7 @@ use constant ARITH_EXPRESSION_LEXER => qr/(?:
         !=|                                     # NEQ
         [\+\-\*\/]|                             # Mathematical Operator
         [\?:]                                   # ? : Operator
-      )/ox;
+      )/x;
 
 # ArchiveIterator
 

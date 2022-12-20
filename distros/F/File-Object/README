@@ -14,13 +14,17 @@ SYNOPSIS
      my $self = $obj->set;
      my $self = $obj->up($num);
 
+DESCRIPTION
+    This provides an object oriented interface to file/directory paths, such
+    as actual, parent or explicit directory and relative paths to them.
+
 METHODS
   "new"
      my $obj = File::Object->new(%parameters);
 
     Constructor.
 
-    Returns instance of object.
+    Constructor parameters are:
 
     *       "dir"
 
@@ -42,6 +46,8 @@ METHODS
              - dir
 
             Default value is 'dir'.
+
+    Returns instance of object.
 
   "dir"
      my $self = $obj->dir(@dir);
@@ -96,7 +102,7 @@ METHODS
   "up"
      my $self = $obj->up($num);
 
-    Go to $up_num upper directory.
+    Go to upper directory/ies defined by $num count. Default value is one.
 
     Returns instance of object.
 
@@ -196,6 +202,9 @@ SEE ALSO
     Path::Class
         Cross-platform path specification manipulation
 
+    Path::Tiny
+        File path utility
+
 REPOSITORY
     <https://github.com/michal-josef-spacek/File-Object>
 
@@ -205,10 +214,10 @@ AUTHOR
     <http://skim.cz>
 
 LICENSE AND COPYRIGHT
-    © Michal Josef Špaček 2009-2022
+    © 2009-2022 Michal Josef Špaček
 
     BSD 2-Clause License
 
 VERSION
-    0.15
+    0.17
 

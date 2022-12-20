@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 74 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 82 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Data/Sah/Coerce/perl/To_array/From_str_or_array/expand_perl_modname_wildcard.pm',
@@ -34,6 +34,10 @@ my @module_files = (
     'Sah/Schema/perl/distname_with_ver.pm',
     'Sah/Schema/perl/filename.pm',
     'Sah/Schema/perl/funcname.pm',
+    'Sah/Schema/perl/identifier/qualified_ascii.pm',
+    'Sah/Schema/perl/identifier/qualified_unicode.pm',
+    'Sah/Schema/perl/identifier/unqualified_ascii.pm',
+    'Sah/Schema/perl/identifier/unqualified_unicode.pm',
     'Sah/Schema/perl/modargs.pm',
     'Sah/Schema/perl/modname.pm',
     'Sah/Schema/perl/modname/default_this_mod.pm',
@@ -61,6 +65,10 @@ my @module_files = (
     'Sah/SchemaR/perl/distname_with_ver.pm',
     'Sah/SchemaR/perl/filename.pm',
     'Sah/SchemaR/perl/funcname.pm',
+    'Sah/SchemaR/perl/identifier/qualified_ascii.pm',
+    'Sah/SchemaR/perl/identifier/qualified_unicode.pm',
+    'Sah/SchemaR/perl/identifier/unqualified_ascii.pm',
+    'Sah/SchemaR/perl/identifier/unqualified_unicode.pm',
     'Sah/SchemaR/perl/modargs.pm',
     'Sah/SchemaR/perl/modname.pm',
     'Sah/SchemaR/perl/modname/default_this_mod.pm',

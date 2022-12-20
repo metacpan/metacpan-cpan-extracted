@@ -13,13 +13,27 @@ WriteMakefile(
     LIBS              => [''],
     DEFINE            => '',
     INC               => '-I.',
+    META_MERGE => {
+        'meta-spec' => { version => 2 },
+         resources => {
+             repository => {
+                 type => 'git',
+                 url  => 'https://github.com/hackman/Linux-Unshare.git',
+                 web  => 'https://github.com/hackman/Linux-Unshare',
+             },
+             bugtracker => {
+                 web => 'https://github.com/hackman/Linux-Unshare/issues'
+             },
+             homepage   => 'https://github.com/hackman/Linux-Unshare',
+         },
+    },
 );
 if (eval {require ExtUtils::Constant; 1}) {
   # If you edit these definitions to change the constants used by this module,
   # you will need to use the generated const-c.inc and const-xs.inc
   # files to replace their "fallback" counterparts before distributing your
   # changes.
-  my @names = (qw(CLONE_THREAD CLONE_FS CLONE_NEWNS CLONE_SIGHAND CLONE_VM
+  my @names = (qw(CLONE_THREAD CLONE_FS CLONE_NEWNS CLONE_SIGHAND CLONE_VM CLONE_NEWPID CLONE_NEWCGROUP
 	  CLONE_FILES CLONE_SYSVSEM CLONE_NEWUTS CLONE_NEWIPC CLONE_NEWNET CLONE_NEWUSER ));
   ExtUtils::Constant::WriteConstants(
                                      NAME         => 'Linux::Unshare',

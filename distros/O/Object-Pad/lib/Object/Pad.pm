@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2019-2022 -- leonerd@leonerd.org.uk
 
-package Object::Pad 0.74;
+package Object::Pad 0.77;
 
 use v5.14;
 use warnings;
@@ -447,6 +447,9 @@ the role.
 
    field $var = EXPR;
 
+   field $var //= EXPR;
+   field $var ||= EXPR;
+
    field $var { BLOCK }
 
 I<Since version 0.66.>
@@ -611,16 +614,35 @@ simply a runtime assignment operator that happens once at the time the class
 is declared. Just like the block form describe above, the expression is
 evaluated during the constructor of every instance.
 
+I<Since version 0.74> this expression may also be written using a defined-or
+or logical-or assignment operator (C<//=> or C<||=>). In these case, the
+default expression will be evaluated and assigned if the caller did not pass a
+value to the constructor at all, or if the value passed was undef (for C<//=>)
+or false (for C<||=>). For most scalar parameters, where C<undef> is not a
+valid value, you probably wanted to use C<//=> to assign defaults.
+
+   class Action {
+      field $timeout :param //= 20;
+      ...
+   }
+
+   # The default of 20 will apply here too
+   my $act = Action->new( timeout => $opts{timeout} );
+
 Note that C<$self> is specifically I<not> visible during an initialiser
 expression. This is because the object is not yet fully constructed, so it
 would be dangerous to allow access to it while in this state. However, the
 C<__CLASS__> keyword is available, so initialiser expressions can make use of
 class-based dispatch to invoke class-level methods to help provide values.
 
-This feature should be considered B<experimental>, and will emit warnings to
-that effect. They can be silenced with
+This feature should be considered partly B<experimental> and may emit warnings
+to that effect. They can be silenced with
 
-   use Object::Pad qw( :experimental(init_expr) );
+   use Object::Pad ':experimental(init_expr)';
+
+I<Since version 0.76> expressions that are purely compiletime constants
+(either as single scalars or entire lists of constants) are no longer
+considered experimental. They can be used without silencing the warning.
 
 Control flow that attempts to leave a field initialiser expression or block is
 not permitted. This includes any C<return> expression, any C<next/last/redo>
@@ -847,7 +869,7 @@ variables.
 This feature should be considered B<experimental>, and will emit warnings to
 that effect. They can be silenced with
 
-   use Object::Pad qw( :experimental(adjust_params) );
+   use Object::Pad ':experimental(adjust_params)';
 
 Before the block itself, a list of lexical variables are introduced, inside
 parentheses. The name of each one is preceeded by a colon, and consumes a
@@ -1202,12 +1224,12 @@ sub _import_configuration
 
       if( $sym =~ m/^:config\((.*)\)$/ ) {
          foreach my $opt ( split m/\s+/, $1 =~ s/^\s+|\s+$//gr ) {
-            if( $opt =~ m/^only_class_attrs=(.*)$/ ) {
+            if( $opt =~ m/^(only_class_attrs|only_field_attrs)=(.*)$/ ) {
                # Store an entire sub-hash inside the hints hash. This won't
                # survive squashing into a COP for runtime but we only need it
                # during compile so that's OK
-               my $attrs = $1;
-               $^H{"Object::Pad/configure(only_class_attrs)"} = { map { $_ => 1 } split m/,/, $attrs };
+               my ( $name, $attrs ) = ( $1, $2 );
+               $^H{"Object::Pad/configure($name)"} = { map { $_ => 1 } split m/,/, $attrs };
             }
             else {
                $^H{"Object::Pad/configure($opt)"}++
@@ -1256,8 +1278,7 @@ sub Object::Pad::UNIVERSAL::BUILDARGS
 sub Object::Pad::MOP::SlotAttr::register
 {
    shift; # $class
-   carp "Object::Pad::MOP::SlotAttr->register is now deprecated; use Object::Pad::MOP::FieldAttr->register instead";
-   return Object::Pad::MOP::FieldAttr->register( @_ );
+   croak "Object::Pad::MOP::SlotAttr->register is now removed; use Object::Pad::MOP::FieldAttr->register instead";
 }
 
 =head1 WITH OTHER MODULES

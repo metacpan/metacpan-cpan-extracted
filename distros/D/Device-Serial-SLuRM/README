@@ -74,6 +74,16 @@ DESCRIPTION
       A counter, labelled by direction and packet type, tracking the number
       of packets sent and received of each type.
 
+    request_success_attempts
+
+      A distribution that tracks how many attempts it took to get a
+      response to each request.
+
+    request_duration
+
+      A timer that tracks how long it took to get a response to each
+      request.
+
     retransmits
 
       An unlabelled counter tracking the number of times a (REQUEST) packet

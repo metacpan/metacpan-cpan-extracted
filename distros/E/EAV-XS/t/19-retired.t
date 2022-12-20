@@ -10,12 +10,14 @@ my $eav = EAV::XS->new('allow_tld' => EAV::XS::TLD_RETIRED);
 ok (defined $eav);
 
 my @email_pass = (
-    'retired@example.iinet',
-    'retired@example.mtpc',
+#    'retired@example.iinet',
+#    'retired@example.mtpc',
 );
 
 my @email_fail = (
     'generic@metacpan.org',
+    'retired@example.iinet',
+    'retired@example.mtpc',
 );
 
 for my $email (@email_pass) {

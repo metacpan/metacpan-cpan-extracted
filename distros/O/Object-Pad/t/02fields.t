@@ -6,7 +6,7 @@ use warnings;
 use Test::More;
 use Test::Refcount;
 
-use Object::Pad ':experimental(init_expr)';
+use Object::Pad;
 
 use constant HAVE_DATA_DUMP => defined eval { require Data::Dump; };
 
@@ -62,6 +62,8 @@ class Counter {
 }
 
 {
+   use Object::Pad ':experimental(init_expr)';
+
    my $class_in_fieldblock;
 
    class AllTheTypesByBlock {

@@ -3,7 +3,7 @@ use warnings;
 use lib '../lib', '../blib/arch', '../blib/lib', 'blib/arch', 'blib/lib';
 use Affix     qw[:all];
 use Dyn::Load qw[:all];
-use Dyn::Call qw[/dc/ /DC_/];
+use Dyn::Call qw[/dc/];
 use FFI::Platypus 1.58;
 use Config;
 use Benchmark qw[cmpthese timethese :hireswallclock];

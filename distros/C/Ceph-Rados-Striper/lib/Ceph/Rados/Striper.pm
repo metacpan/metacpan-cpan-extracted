@@ -12,7 +12,7 @@ use AutoLoader;
 
 our @ISA = qw(Exporter);
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 # Preloaded methods go here.
 
@@ -54,7 +54,8 @@ sub write_handle_perl {
     my ($self, $soid, $handle) = @_;
     Carp::confess "Called with not an open handle"
         unless openhandle $handle;
-    my $length = -s $handle
+    my $length = -s $handle;
+    defined $length
         or Carp::confess "Could not get size for filehandle $handle";
     $self->object_layout();
     my ($retval, $data);

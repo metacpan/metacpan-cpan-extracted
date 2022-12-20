@@ -32,6 +32,7 @@ my @files = (
     'lib/Git/Message.pm',
     'lib/Git/Repository/Plugin/GitHooks.pm',
     'scripts/find-secret-leakage-in-git-diff.pl',
+    'scripts/githooks-docker.sh',
     'scripts/githooks.pl',
     't/00-load.t',
     't/00-report-prereqs.dd',

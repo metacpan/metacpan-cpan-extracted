@@ -74,13 +74,13 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.31';
+our $VERSION = '0.34';
 
 #########################################################################
 
 =head1 EXPORT
 
-=head2 %T - hash of english texts, 3 sections (errors, warnings/information
+=head2 %T - hash of English texts, 3 sections (errors, warnings/information
 and special), each section alphabetically sorted by key
 
 Note that C<%T> is not exported into the callers name-space, it must always

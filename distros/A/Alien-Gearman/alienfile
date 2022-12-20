@@ -3,25 +3,24 @@ use alienfile;
 plugin 'PkgConfig' => 'libgearman';
 
 configure {
-  requires "Alien::Boost";
+  requires "Alien::Boost::ProgramOptions";
 };
 
 share {
 
   plugin 'Build::SearchDep' => (
-    aliens => [qw( Alien::libuuid Alien::OpenSSL Alien::gperf Alien::Libevent Alien::curl Alien::Boost )],
+    aliens => [qw( Alien::libuuid Alien::OpenSSL Alien::gperf Alien::Libevent Alien::curl Alien::Boost::ProgramOptions )],
   );
 
-  start_url 'https://github.com/gearman/gearmand/releases';
-  plugin 'Download' => (
-    filter => qr/^gearmand-.*\.tar\.gz$/,
+  plugin 'Download::GitHub' => (
+    github_user => 'gearman',
+    github_repo => 'gearmand',
+    asset => 1,
     version => qr/([0-9\.]+)/,
   );
 
-  plugin 'Extract';
-
-  require Alien::Boost;
-  my $BOOSTDIR = Alien::Boost->dist_dir();
+  require Alien::Boost::ProgramOptions;
+  my $BOOSTDIR = Alien::Boost::ProgramOptions->dist_dir();
 
   $ENV{CFLAGS} .= " -fpermissive";
   $ENV{CXXFLAGS} .= " -fpermissive";

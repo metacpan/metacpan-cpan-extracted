@@ -6,7 +6,6 @@ use lib '.'; use lib 't';
 use SATest; sa_t_init("uribl_all_types");
 
 use Test::More;
-plan skip_all => "Long running tests disabled" unless conf_bool('run_long_tests');
 plan skip_all => "Net tests disabled"                unless conf_bool('run_net_tests');
 plan skip_all => "Can't use Net::DNS Safely"   unless can_use_net_dns_safely();
 plan tests => 3;
@@ -14,12 +13,9 @@ plan tests => 3;
 # ---------------------------------------------------------------------------
 
 %patterns = (
-
-   q{ X_URIBL_IPSONLY [URIs: 144.137.3.98] } => 'X_URIBL_IPSONLY',
-
-   # can be either uribl-example-b.com or uribl-example-c.com
-   q{ X_URIBL_DOMSONLY [URIs: uribl-example} => 'X_URIBL_DOMSONLY',
-
+ q{ X_URIBL_IPSONLY [URI: 144.137.3.98] } => 'X_URIBL_IPSONLY',
+ # can be either uribl-example-b.com or uribl-example-c.com
+ q{ X_URIBL_DOMSONLY [URI: uribl-example} => 'X_URIBL_DOMSONLY',
 );
 
 tstlocalrules(q{

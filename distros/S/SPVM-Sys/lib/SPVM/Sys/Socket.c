@@ -151,10 +151,10 @@ int32_t SPVM__Sys__Socket__inet_pton(SPVM_ENV* env, SPVM_VALUE* stack) {
   int32_t InvalidNetworkAddress = env->get_class_id_by_name(env, stack, "Sys::Socket::Error::InetInvalidNetworkAddress", &e, FILE_NAME, __LINE__);
   if (e) { return e; }
 
-  int32_t In_addr = env->get_basic_type_id(env, "Sys::Socket::In_addr");
+  int32_t In_addr = env->get_basic_type_id(env, stack, "Sys::Socket::In_addr");
   if (e) { return e; }
 
-  int32_t In6_addr = env->get_basic_type_id(env, "Sys::Socket::In6_addr");
+  int32_t In6_addr = env->get_basic_type_id(env, stack, "Sys::Socket::In6_addr");
   if (e) { return e; }
 
   int32_t af = stack[0].ival;

@@ -10,7 +10,7 @@ use LaTeX::Table;
 use Moo;
 use Text::CSV_XS;
 
-our $VERSION = '1.0.0'; # VERSION
+our $VERSION = '1.1.0'; # VERSION
 
 use experimental 'signatures';
 
@@ -18,6 +18,8 @@ has csv         => ( is => 'ro', required => 1 );
 has csv_param   => ( is => 'ro', default => sub { [] } );
 has latex       => ( is => 'ro', required => 1 );
 has latex_param => ( is => 'ro', default => sub { [] } );
+has rotate      => ( is => 'ro', default => sub { 0 } );
+has split       => ( is => 'ro', default => sub { 0 } );
 
 sub run ($self) {
     my %csv_params = map { split /=/, $_, 2 } $self->csv_param->@*;
@@ -42,21 +44,64 @@ sub run ($self) {
     }
     close $fh or croak $!;
 
-    my %latex_params = map { split /=/, $_, 2 } $self->latex_param->@*;
+    my $table_sets = $data;
 
-    if ( !defined $latex_params{label} ) {
-        my $basename = basename $self->csv, '.csv';
-        $latex_params{label} = 'table:' . $basename;
+    if ( $self->split ) {
+        $table_sets = [];
+
+        my $per_set  = $self->split;
+        my $index    = 0;
+        my @all_data = $data->@*;
+
+        my $counter = 1;
+        while ( my $row = shift @all_data ) {
+            push $table_sets->[$index]->@*, $row;
+
+            if ( $counter++ == $per_set ) {
+                $index++;
+                $counter = 1;
+            }
+        }
     }
 
-    my $table = LaTeX::Table->new({
-        %latex_params,
-        filename => $self->latex,
-        header   => $header,
-        data     => $data,
-    });
+    my $counter;
+    while ( my $table_set = shift $table_sets->@* ) {
+        my %latex_params = map { split /=/, $_, 2 } $self->latex_param->@*;
 
-    $table->generate;
+        my $suffix = '';
+        if ( $self->split ) {
+            $suffix = sprintf "-%s", ++$counter;
+        }
+
+        if ( $table_sets->@* ) {
+            delete $latex_params{caption};
+        }
+
+        if ( !defined $latex_params{label} ) {
+            my $basename = basename $self->csv, '.csv';
+            $latex_params{label} = 'table:' . $basename . $suffix;
+        }
+
+        my $table = LaTeX::Table->new({
+            %latex_params,
+            header   => $header,
+            data     => $data,
+        });
+
+        my $latex_string = $table->generate_string;
+
+        if ( $self->rotate ) {
+            my $rotatebox = sprintf 'rotatebox{%s}{', $self->rotate;
+            $latex_string =~ s{begin\{table\}}{$rotatebox};
+            $latex_string =~ s{\\end\{table\}$}{\}};
+        }
+
+        my $latex_file = $self->latex =~ s{(\.[^\.]+)}{$suffix$1}r;
+
+        open my $tex_fh, '>', $latex_file or croak $!;
+        print $tex_fh $latex_string;
+        close $tex_fh or croak $!;
+    }
 }
 
 1;
@@ -73,7 +118,7 @@ App::CSV2LaTeXTable - Generate LaTeX table from CSV file
 
 =head1 VERSION
 
-version 1.0.0
+version 1.1.0
 
 =head1 SYNOPSIS
 
@@ -128,6 +173,10 @@ This is the module behind L<csv2latextable>.
 
 =item * latex_param
 
+=item * rotate
+
+=item * split
+
 =back
 
 =head1 METHODS
@@ -140,6 +189,20 @@ This is the module behind L<csv2latextable>.
     );
 
     $obj->run;
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<LaTeX::Table>
+
+Used to generate the LaTeX code.
+
+=item * L<Text::CSV_XS>
+
+Used to parse the CSV file
+
+=back
 
 =head1 AUTHOR
 

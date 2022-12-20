@@ -19,7 +19,7 @@ my %module_build_args = (
     "Patrick Joly <patjol\@cpan.org>"
   ],
   "dist_name" => "Geo-TCX",
-  "dist_version" => "1.05",
+  "dist_version" => "1.06",
   "license" => "perl",
   "module_name" => "Geo::TCX",
   "recursive_test_files" => 1,

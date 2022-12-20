@@ -32,7 +32,7 @@ rules apply to all URIs found in the message.
 
 The format for defining a rule is as follows:
 
-  uri_detail SYMBOLIC_TEST_NAME key1 =~ /value1/  key2 !~ /value2/ ...
+  uri_detail SYMBOLIC_TEST_NAME key1 =~ /value1/i  key2 !~ /value2/ ...
 
 Supported keys are:
 
@@ -239,12 +239,10 @@ sub check_uri_detail {
       dbg("uri: criteria for $test met");
     }
     
-    $permsg->got_hit($test);
-
     # reset hash
     keys %uri_detail;
 
-    return 0;
+    return 1;
   }
 
   return 0;

@@ -58,7 +58,7 @@ int32_t SPVM__Sys__Socket__Sockaddr__Un__sun_family(SPVM_ENV* env, SPVM_VALUE* s
   
   struct sockaddr_un* socket_address = env->get_pointer(env, stack, obj_self);
   
-  stack[0].bval = socket_address->sun_family;
+  stack[0].ival = socket_address->sun_family;
   
   return 0;
 #endif
@@ -74,7 +74,7 @@ int32_t SPVM__Sys__Socket__Sockaddr__Un__set_sun_family(SPVM_ENV* env, SPVM_VALU
   
   struct sockaddr_un* socket_address = env->get_pointer(env, stack, obj_self);
   
-  socket_address->sun_family = stack[1].bval;
+  socket_address->sun_family = stack[1].ival;
   
   return 0;
 #endif

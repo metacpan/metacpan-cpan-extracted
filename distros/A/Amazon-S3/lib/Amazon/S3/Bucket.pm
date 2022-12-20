@@ -19,7 +19,7 @@ use URI;
 
 use parent qw{Class::Accessor::Fast};
 
-our $VERSION = '0.57'; ## no critic
+our $VERSION = '0.58'; ## no critic
 
 __PACKAGE__->mk_accessors(
   qw{bucket creation_date account buffer_size region logger verify_region });

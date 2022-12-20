@@ -54,7 +54,7 @@
    "provides" : {
       "Perinci::Sub::Normalize" : {
          "file" : "lib/Perinci/Sub/Normalize.pm",
-         "version" : "0.204"
+         "version" : "0.207"
       }
    },
    "release_status" : "stable",
@@ -69,7 +69,7 @@
          "web" : "https://github.com/perlancar/perl-Perinci-Sub-Normalize"
       }
    },
-   "version" : "0.204",
+   "version" : "0.207",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

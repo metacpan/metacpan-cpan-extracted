@@ -31,9 +31,10 @@ package Mail::SpamAssassin::Util::DependencyInfo;
 
 use strict;
 use warnings;
-# use bytes;
 use re 'taint';
 use version 0.77;
+
+use Mail::SpamAssassin::Util;
 
 our ( $EXIT_STATUS, $WARNINGS );
 
@@ -52,15 +53,10 @@ our @MODULES = (
 },
 {
   module => 'Net::DNS',
-  version => ($^O =~ /^(mswin|dos|os2)/oi ? '0.46' : '0.34'),
+  version => '0.69',
   desc => 'Used for all DNS-based tests (SBL, XBL, SpamCop, DSBL, etc.),
   perform MX checks, and is also used when manually reporting spam to
-  SpamCop.
-
-  You need to make sure the Net::DNS version is sufficiently up-to-date:
-
-  - version 0.34 or higher on Unix systems
-  - version 0.46 or higher on Windows systems',
+  SpamCop.',
 },
 {
   'module' => 'NetAddr::IP',
@@ -110,7 +106,7 @@ our @OPTIONAL_MODULES = (
   module => 'DB_File',
   version => 0,
   desc => 'Used to store data on-disk, for the Bayes-style logic and
-  auto-whitelist.  *Much* more efficient than the other standard Perl
+  auto-welcomelist.  *Much* more efficient than the other standard Perl
   database packages.  Strongly recommended.',
 },
 {
@@ -120,13 +116,30 @@ our @OPTIONAL_MODULES = (
   desc => 'Used when manually reporting spam to SpamCop with "spamassassin -r".',
 },
 {
+  module => 'Net::LibIDN2',
+  version => 0,
+  desc => "Newer version of the optional Net::LibIDN module.
+  Provides mapping between Internationalized Domain Names (IDN) in
+  Unicode and ASCII-compatible encoding (ACE) for use in DNS and comparisions.
+  The module is optional, but without it Unicode IDN names found in mail will
+  not be suitable for DNS queries and welcome/blocklisting.",
+},
+{
+  module => 'Net::LibIDN',
+  version => 0,
+  desc => "Provides mapping between Internationalized Domain Names (IDN) in
+  Unicode and ASCII-compatible encoding (ACE) for use in DNS and comparisions.
+  The module is optional, but without it Unicode IDN names found in mail will
+  not be suitable for DNS queries and welcome/blocklisting.",
+},
+{
   module => 'Mail::SPF',
   version => 0,
   desc => 'Used to check DNS Sender Policy Framework (SPF) records to fight email
   address forgery and make it easier to identify spams.',
 },
 {
-  module => 'GeoIP2::Database::Reader',
+  module => 'MaxMind::DB::Reader',
   version => 0,
   desc => 'Used by the RelayCountry plugin (not enabled by default) to
   determine the domain country codes of each relay in the path of an email. 
@@ -134,11 +147,19 @@ our @OPTIONAL_MODULES = (
   and Country code based filtering.',
 },
 {
+  module => 'MaxMind::DB::Reader::XS',
+  version => 0,
+
+  desc => 'Recommended much faster version of the optional MaxMind::DB::Reader module,
+  used by RelayCountry / URILocalBL plugins.',
+},
+{
   module => 'Geo::IP',
   version => 0,
-  desc => 'Used by the RelayCountry plugin (not enabled by default) to determine
-  the domain country codes of each relay in the path of an email.  Also used by 
-  the URILocalBL plugin to provide ISP and Country code based filtering.',
+  desc => 'Used by the RelayCountry plugin (not enabled by default) to
+  determine the domain country codes of each relay in the path of an email. 
+  Also used by the URILocalBL plugin (not enabled by default) to provide ISP
+  and Country code based filtering.',
 },
 {
   module => 'IP::Country::DB_File',
@@ -149,9 +170,12 @@ our @OPTIONAL_MODULES = (
   Country code based filtering.',
 },
 {
-  module => 'Net::CIDR::Lite',
+  module => 'IP::Country::Fast',
   version => 0,
-  desc => 'Used by the URILocalBL plugin to process IP address ranges.',
+  desc => 'Used by the RelayCountry plugin (not enabled by default) to
+  determine the domain country codes of each relay in the path of an email. 
+  Also used by the URILocalBL plugin (not enabled by default) to provide
+  Country code based filtering.',
 },
 {
   module => 'Razor2::Client::Agent',
@@ -165,12 +189,6 @@ our @OPTIONAL_MODULES = (
   More info on installing and using Razor can be found
   at http://wiki.apache.org/spamassassin/InstallingRazor .',
 },
-#{
-# module => 'Net::Ident',
-# version => 0,
-# desc => 'If you plan to use the --auth-ident option to spamd, you will need
-# to install this module.',
-#},
 {
   module => 'IO::Socket::IP',
   version => 0.09,
@@ -184,7 +202,7 @@ our @OPTIONAL_MODULES = (
 {
   module => 'IO::Socket::INET6',
   version => 0,
-  desc => 'This module is an older alternative to IO::Socket::IP.
+  desc => 'This module is a deprecated alternative to IO::Socket::IP.
   Spamd, as well some underlying modules, will fall back to using
   IO::Socket::INET6 if IO::Socket::IP is unavailable. One or the other
   module is required to support IPv6 (e.g. in spamd/spamc protocol,
@@ -227,44 +245,45 @@ our @OPTIONAL_MODULES = (
   your database.',
 },
 {
-  module => 'Getopt::Long',
-  version => '2.32',        # min version was included in 5.8.0, which works
-  desc => 'The "sa-stats.pl" program included in "tools", used to generate
-  summary reports from spamd\'s syslog messages, requires this version
-  of Getopt::Long or newer.',
+  module => 'DBD::SQLite',
+  version => 1.59,
+  desc => 'If you intend to use SpamAssassin with SQLite as the SQL database
+  backend for the DBI module, this is the DBD driver required. Version 1.59_01
+  or later is needed to provide SQLite 3.25.0 or later.',
 },
 {
   module => 'LWP::UserAgent',
   version => 0,
-  desc => 'The "sa-update" program requires this module to make HTTP requests.',
-},
-{
-  module => 'HTTP::Date',
-  version => 0,
-  desc => 'The "sa-update" program requires this module to make HTTP
-  If-Modified-Since GET requests.',
+  desc => 'The "sa-update" program can use this module to make HTTP requests.
+  Also used by DecodeShortURLs plugin.',
 },
 {
   module => 'Encode::Detect::Detector',
   version => 0,
-  desc => 'If you plan to use the normalize_charset config setting to
-  decode message parts from their declared character set into Unicode, and
-  such decoding fails, the Encode::Detect::Detector module (when available)
-  may be consulted to provide an alternative guess on a character set of a
-  problematic message part.',
+  desc => 'If normalize_charset decoding of message parts from their
+  declared character set into Unicode fails, the Encode::Detect::Detector
+  module (when available) may be consulted to provide an alternative guess
+  on a character set of a problematic message part.',
 },
 {
   module => 'Net::Patricia',
   version => 1.16,
-  desc => 'If this module is available, it will be used for IP address lookups
-  in tables internal_networks, trusted_networks, and msa_networks. Recommended
-  when a number of entries in these tables is large, i.e. in hundreds
-  or thousands. However, in case of overlapping (or conflicting) networks
-  in these tables, lookup results may differ as Net::Patricia finds a
-  tightest-matching entry, while a sequential NetAddr::IP search finds
-  a first-matching entry. So when overlapping network ranges are given,
-  specifying more specific subnets (longest netmask) first, followed by
-  wider subnets ensures predictable results.',
+  desc => 'If this module is available, it will be used for IP address
+  lookups in tables internal_networks, trusted_networks, msa_networks and
+  uri_local_cidr.  Recommended when a number of entries in these tables is
+  large, i.e.  in hundreds or thousands.  However, in case of overlapping
+  (or conflicting) networks in these tables, lookup results may differ as
+  Net::Patricia finds a tightest-matching entry, while a sequential
+  NetAddr::IP search finds a first-matching entry.  So when overlapping
+  network ranges are given, specifying more specific subnets (longest
+  netmask) first, followed by wider subnets ensures predictable results.',
+},
+{
+  module => 'Net::CIDR::Lite',
+  version => 0,
+  desc => 'If this module is available, then dash separated IP range format
+  "192.168.1.1-192.168.255.255" can be used for internal_networks,
+  trusted_networks, msa_networks and uri_local_cidr.',
 },
 {
   module => 'Net::DNS::Nameserver',
@@ -291,6 +310,18 @@ our @OPTIONAL_MODULES = (
   version => 0,
   desc => 'IO::String emulates file interface for in-core strings.
   It is used by the optional OLEVBMacro Plugin.',
+},
+{
+  module => 'Email::Address::XS',
+  version => 0,
+  desc => 'Email::Address::XS is used to parse email addresses from header
+  fields like To/From/cc, per RFC 5322. If installed, it may additionally
+  be used by internal parser to process complex lists.',
+},
+{
+  module => 'Mail::DMARC',
+  version => 0,
+  desc => 'Mail::DMARC is used by the optional DMARC plugin.',
 },
 );
 
@@ -332,14 +363,6 @@ our @OPTIONAL_BINARIES = (
   version_check_regex => 'curl ([\d\.]*)',
   desc => $lwp_note,
 },
-#Fetch is a FreeBSD Product. We do not believe it has any way to check the version from
-#the command line.  It has been tested with FreeBSD version 8 through 9.1.
-{
-  binary => 'fetch',
-  version => '0',
-  
-  desc => $lwp_note,
-},
 {
   binary => 're2c',
   version => '0',
@@ -348,6 +371,16 @@ our @OPTIONAL_BINARIES = (
   for regular expressions to speed up scanning.',
 }
 );
+
+#Fetch is a FreeBSD Product. We do not believe it has any way to check the version from
+#the command line.  It has been tested with FreeBSD version 8 through 9.1.
+if ($^O eq 'freebsd') {
+  push @OPTIONAL_BINARIES, {
+    binary => 'fetch',
+    version => '0',
+    desc => $lwp_note,
+  };
+}
 
 ###########################################################################
 
@@ -367,14 +400,6 @@ problems.
 sub debug_diagnostics {
   my $out = "diag: perl platform: $] $^O\n";
 
-# # this avoids an unsightly warning due to a shortcoming of Net::Ident;
-# # "Net::Ident::_export_hooks() called too early to check prototype at
-# # /usr/share/perl5/Net/Ident.pm line 29."   It only needs to be
-# # called here.
-# eval '
-#   sub Net::Ident::_export_hooks;
-# ';
-
   my $prefix = '';
   foreach my $moddef (@MODULES, 'optional', @OPTIONAL_MODULES) {
     if ($moddef eq 'optional') { $prefix = 'optional '; next; }
@@ -391,7 +416,10 @@ sub debug_diagnostics {
   return $out;
 }
 
+# When called from Makefile.PL use optional argument so it distinguishes between missing required modules
+# that CPAN will install before continuing, and missing required binaries that can't be fixed by CPAN install
 sub long_diagnostics {
+  my ($missing_modules_are_continuable) = @_;
   my $summary = "";
 
   print "checking module dependencies and their versions...\n";
@@ -403,6 +431,11 @@ sub long_diagnostics {
   }
   foreach my $moddef (@OPTIONAL_MODULES) {
     try_module(0, $moddef, \$summary);
+  }
+
+  if ($missing_modules_are_continuable) {
+    $WARNINGS += $EXIT_STATUS;
+    $EXIT_STATUS = 0;
   }
 
   print "checking binary dependencies and their versions...\n";
@@ -436,51 +469,20 @@ sub try_binary {
   my $required_version = $bindef->{version};
   my $recommended_version = $bindef->{recommended_min_version};
   my $errtype;
-  my ($command, $output);
 
-
-  # only viable on unix based systems, so exclude windows, etc. here
-  if ($^O =~ /^(mswin|dos|os2)/i) {
-    $$summref .= "Warning: Unable to test on this platform for the optional \"$bindef->{'binary'}\" binary\n";
-    $errtype = 'is unknown for this platform';
-  } else {
-    $command = "which $bindef->{'binary'} 2>&1";
-    #print "DEBUG: running $command\n";
-    $output = `$command`;
-
-    if (!defined $output || $output eq '') {
-      $installed = 0;
-    } elsif ($output =~ /which: no \Q$bindef->{'binary'}\E in/i) {
-      $installed = 0;
-    } else {
-      #COMMAND APPEARS TO EXIST
-      $command = $output;
-      chomp ($command);
-
-      $installed = 1;
-    }
-    #print "DEBUG: $command completed and output parsed\n";
-  }
-
-
-  if ($installed) {
-    #SANITIZE THE RETURNED COMMAND JUST IN CASE
-    $command =~ s/[^a-z0-9\/]//ig;
-
+  my $command = Mail::SpamAssassin::Util::find_executable_in_env_path($bindef->{'binary'});
+  if (defined $command) {
     #GET THE VERSION
-    $command .= " ";
     if (defined $bindef->{'version_check_params'}) {
-      $command .= $bindef->{'version_check_params'};
+      $command .= " ".$bindef->{'version_check_params'};
     }
-    $command .= " 2>&1";
 
     #print "DEBUG: running $command to check the version\n";
-    $output = `$command`;
+    my $output = `$command 2>&1`;
 
-    if (!defined $output) {
-      $installed = 0;
+    if (defined $output && $output ne '') {
+      $installed = 1;
 
-    } else {
       if (defined $bindef->{'version_check_regex'}) {
         $output =~ m/$bindef->{'version_check_regex'}/;
         $binary_version = $1;

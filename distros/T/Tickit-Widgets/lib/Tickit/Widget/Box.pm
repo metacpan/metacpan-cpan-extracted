@@ -1,12 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2012-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2022 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.57;
+use Object::Pad 0.70 ':experimental(adjust_params)';
 
-package Tickit::Widget::Box 0.56;
+package Tickit::Widget::Box 0.57;
 class Tickit::Widget::Box
+   :strict(params)
    :isa(Tickit::SingleChildWidget);
 
 use Carp;
@@ -103,24 +104,19 @@ Initial values for alignment options.
 
 =cut
 
-ADJUSTPARAMS
-{
-   my ( $params ) = @_;
-
+ADJUST :params (
+   :$align  = 0.5,
+   :$valign = 0.5,
+   %params,  # easier than declaring 6 named ones
+) {
    foreach (qw( child_lines_min child_lines_max child_cols_min child_cols_max
                 child_lines                     child_cols )) {
-      my $val = delete $params->{$_};
+      my $val = delete $params{$_};
       $self->${\"set_$_"}( $val ) if defined $val;
    }
 
-   foreach (qw( align valign )) {
-      my $val = delete $params->{$_};
-      $self->${\"set_$_"}( $val // 0.5 );
-   }
-
-   if( exists $params->{child} ) {
-      croak "The 'child' constructor argument to ${\ref $self} is no longer recognised; use ->add_child instead";
-   }
+   $self->set_align( $align );
+   $self->set_valign( $valign );
 }
 
 method lines
@@ -202,22 +198,22 @@ the same value. This has the effect of forcing the size of the child widget.
 
 =cut
 
-has $_child_lines_max; method _child_lines_max :lvalue { $_child_lines_max }
-has $_child_lines_min; method _child_lines_min :lvalue { $_child_lines_min }
-has $_child_cols_max;  method _child_cols_max  :lvalue { $_child_cols_max  }
-has $_child_cols_min;  method _child_cols_min  :lvalue { $_child_cols_min  }
+field $_child_lines_max; method _child_lines_max :lvalue { $_child_lines_max }
+field $_child_lines_min; method _child_lines_min :lvalue { $_child_lines_min }
+field $_child_cols_max;  method _child_cols_max  :lvalue { $_child_cols_max  }
+field $_child_cols_min;  method _child_cols_min  :lvalue { $_child_cols_min  }
 
 # Because I hate copying code 4 times
 foreach my $dir (qw( lines cols )) {
    my %subs;
 
    foreach my $lim (qw( max min )) {
-      my $slotmeth = "_child_${dir}_${lim}";
+      my $fieldmeth = "_child_${dir}_${lim}";
       my $name = "child_${dir}_${lim}";
 
       $subs{$name} = sub {
          my $self = shift;
-         my $value = $self->$slotmeth;
+         my $value = $self->$fieldmeth;
          if( !defined $value ) {
             return undef;
          }
@@ -232,7 +228,7 @@ foreach my $dir (qw( lines cols )) {
 
       $subs{"set_$name"} = sub {
          my $self = shift;
-         ( $self->$slotmeth ) = @_;
+         ( $self->$fieldmeth ) = @_;
          $self->resized;
       };
    }

@@ -1,7 +1,7 @@
 package Chemistry::Ring::Find;
 
-$VERSION = 0.20;
-# $Id: Find.pm,v 1.2 2009/05/10 21:12:44 itubert Exp $
+our $VERSION = '0.21'; # VERSION
+# $Id$
 
 =head1 NAME
 
@@ -69,7 +69,7 @@ our $DEBUG = 0;
 
 =item find_ring($origin, %opts)
 
-Find the smallest ring containg $origin, which may be either an atom or a bond.
+Find the smallest ring containing $origin, which may be either an atom or a bond.
 Returns a Chemistry::Ring object. Options:
 
 =over
@@ -323,13 +323,13 @@ sub find_ring_bonds {
 The "all" option in find_ring doesn't quite work as expected. It finds all
 simple rings and some bridged rings. It never finds fused rings (which is good).
 
-=head1 VERSION
+=head1 SOURCE CODE REPOSITORY
 
-0.20
+L<https://github.com/perlmol/Chemistry-Ring>
 
 =head1 SEE ALSO
 
-L<Chemistry::Ring>, L<http://www.perlmol.org>.
+L<Chemistry::Ring>
 
 =head1 AUTHOR
 
@@ -342,4 +342,3 @@ free software; you can redistribute it and/or modify it under the same terms as
 Perl itself.
 
 =cut
-

@@ -155,19 +155,9 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
   ok(SPVM::TestCase::NativeAPI->enter_scope_leave_scope);
 }
 
-# env->call_spvm_method
+# env->call_method
 {
-  ok(SPVM::TestCase::NativeAPI->native_call_spvm_method);
-}
-
-# env->call_class_method
-{
-  ok(SPVM::TestCase::NativeAPI->native_call_class_method);
-}
-
-# env->call_instance_method
-{
-  ok(SPVM::TestCase::NativeAPI->native_call_instance_method);
+  ok(SPVM::TestCase::NativeAPI->native_call_method);
 }
 
 # env->call_class_method_by_name
@@ -175,6 +165,14 @@ my $start_memory_blocks_count = SPVM::get_memory_blocks_count();
   ok(SPVM::TestCase::NativeAPI->native_call_class_method_by_name);
   
   eval { SPVM::TestCase::NativeAPI->native_call_class_method_by_name_exception; };
+  ok($@);
+}
+
+# env->call_instance_method_static_by_name
+{
+  ok(SPVM::TestCase::NativeAPI->call_instance_method_static_by_name);
+  
+  eval { SPVM::TestCase::NativeAPI->call_instance_method_static_by_name_exception; };
   ok($@);
 }
 
@@ -287,9 +285,14 @@ ok(!-f "$build_dir/work/object/SPVM/CORE.o");
   ok(SPVM::TestCase::NativeAPI->new_object_array_raw);
 }
 
-# new_object_array
+# get_args_stack_length
 {
   ok(SPVM::TestCase::NativeAPI->get_args_stack_length);
+}
+
+# items
+{
+  ok(SPVM::TestCase::NativeAPI->items);
 }
 
 # new_string_array

@@ -47,9 +47,14 @@ DefMacro('\thm@space@setup', '\thm@preskip=\topsep \thm@postskip=\thm@preskip');
 
 # activate a certain theorem style
 DefPrimitive('\theoremstyle{}', sub {
-    my $style = ToString($_[1]);
+    my $style    = ToString($_[1]);
+    my $style_cs = T_CS('\th@' . $style);
+    if (!IsDefined($style_cs)) {
+      Warn("undefined", "theoremstyle", $_[0], "Unknown theorem style '$style', reverting to 'plain'.");
+      $style    = 'plain';
+      $style_cs = T_CS('\th@plain'); }
     AssignValue('\thm@style' => $style);
-    Digest(T_CS('\th@' . $style));
+    Digest($style_cs);
     return; });
 
 DefMacro('\swapnumbers', sub {
@@ -112,8 +117,10 @@ DefMacro('\popQED',    sub { (PopValue('QED@stack') || ()); });
 
 # Should mark this as somehow ignorable for math,
 # but we DO want to keep it in the formula...
-DefConstructor('\qed',
-  "?#isMath(<ltx:XMTok role='PUNCT'>\x{220E}</ltx:XMTok>)(\x{220E})");
+DefMacro('\qed', '\ltx@qed');
+DefConstructor('\ltx@qed',
+  "?#isMath(<ltx:XMTok role='PUNCT'>\x{220E}</ltx:XMTok>)(\x{220E})",
+  reversion => '\qed');
 Let('\mathqed',    '\qed');
 Let('\textsquare', '\qed');
 Let('\qedsymbol',  '\qed');

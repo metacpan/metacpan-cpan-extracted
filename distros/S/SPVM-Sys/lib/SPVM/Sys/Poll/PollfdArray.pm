@@ -62,7 +62,7 @@ The index must be less than the length of the file descripters. Otherwise an exc
 
 =head2 events
 
-  method events : short ($index : int);
+  method events : int ($index : int);
 
 Get C<events> of the position specifed by the index.
 
@@ -74,7 +74,7 @@ See L<Sys::Poll::PollfdArray|SPVM::Sys::Poll::PollfdArray> about the constant va
 
 =head2 set_events
 
-  method set_events : void ($index : int, $events : short);
+  method set_events : void ($index : int, $events : int);
 
 Set C<events> of the position specifed by the index.
 
@@ -86,7 +86,7 @@ See L<Sys::Poll::PollfdArray|SPVM::Sys::Poll::PollfdArray> about the constant va
 
 =head2 events
 
-  method revents : short ($index : short);
+  method revents : int ($index : int);
 
 Get C<revents> of the position specifed by the index.
 
@@ -98,7 +98,7 @@ See L<Sys::Poll::PollfdArray|SPVM::Sys::Poll::PollfdArray> about the constant va
 
 =head2 set_revents
 
-  method set_revents : void ($index : int, $revents : short);
+  method set_revents : void ($index : int, $revents : int);
 
 Set C<revents> of the position specifed by the index.
 

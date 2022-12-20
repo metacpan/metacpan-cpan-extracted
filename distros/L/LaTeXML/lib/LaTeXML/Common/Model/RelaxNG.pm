@@ -37,7 +37,7 @@ my $XMLPARSER = LaTeXML::Common::XML::Parser->new();    # [CONSTANT]
 sub new {
   my ($class, $model, $name) = @_;
   my $self = { name => $name, model => $model,
-    modules => [], elementdefs => {}, defs => {}, elements => {},
+    modules           => [], elementdefs => {}, defs => {}, elements => {},
     internal_grammars => 0 };
   weaken($$self{model});    # circular back ref; weaked so can be garbage collected.
   bless $self, $class;
@@ -79,9 +79,9 @@ sub loadSchema {
 
   # Distill the info into allowed children & attributes for each element.
   foreach my $tag (sort keys %{ $$self{elements} }) {
-    if ($tag eq 'ANY') {
+    if ($tag eq '*:*') {
       # Ignore any internal structure (side effect of restricted names)
-      $$self{model}->addTagContent($tag, 'ANY');
+      $$self{model}->addTagContent($tag, '*:*');
       next; }
     my @body = @{ $$self{elements}{$tag} };
     my ($content, $attributes) = $self->extractContent($tag, @body);
@@ -105,8 +105,8 @@ sub extractContent {
     my $item = shift(@body);
     if (ref $item eq 'ARRAY') {
       my ($op, $name, @args) = @$item;
-      if    ($op eq 'attribute')  { $attr{$name}  = 1; }
-      elsif ($op eq 'elementref') { $child{$name} = 1; }
+      if    ($op eq 'attribute')   { $attr{$name}  = 1; }
+      elsif ($op eq 'elementref')  { $child{$name} = 1; }
       elsif ($op eq 'doc')         { }
       elsif ($op eq 'combination') { push(@body, @args); }
       elsif ($op eq 'grammar')     { push(@body, $self->extractStart(@args)); }
@@ -343,7 +343,7 @@ sub scanNameClass {
     my @exceptions = ();    # Check for exceptions!
     if (my @children = getElements($node)) {
       @exceptions = map { $self->scanNameClass($_, $forattr, $ns) } @children; }
-    return ('ANY', @exceptions); }
+    return ('*:*', @exceptions); }
   elsif ($relaxop eq 'rng:nsName') {
     my @exceptions = ();    # Check for exceptions!
     if (my @children = getElements($node)) {
@@ -353,12 +353,12 @@ sub scanNameClass {
     my %names = ();
     foreach my $choice ($node->childNodes) {
       map { $names{$_} = 1 } $self->scanNameClass($choice, $forattr, $ns); }
-    return ($names{ANY} ? ('ANY') : sort keys %names); }
+    return (sort keys %names); }
   elsif ($relaxop eq 'rng:except') {
     my %names = ();
     foreach my $choice (getElements($node)) {
       map { $names{$_} = 1 } $self->scanNameClass($choice, $forattr, $ns); }
-    return map { "!$_" } ($names{ANY} ? ('ANY') : sort keys %names); }
+    return map { "!$_" } (sort keys %names); }
   else {
     my $op = $node->nodeName;
     Fatal('misdefined', $op, undef,
@@ -433,7 +433,7 @@ sub simplify {
     elsif ($op eq 'module') {
       my $module = ['module', $name];
       push(@{ $$self{modules} }, $module);    # Keep in order: push first, then scan contents
-      push(@$module, $self->simplify_args($binding, $parentbinding, $container, @args));
+      push(@$module,             $self->simplify_args($binding, $parentbinding, $container, @args));
       return ($module); }
     elsif ($op eq 'element') {
       @args = $self->simplify_args($binding, $parentbinding, "element:$name", @args);
@@ -526,7 +526,8 @@ sub showSchema {
 #======================================================================
 # The svg schema can only just barely be read in and recognized,
 # but it is structured in a way that makes a joke of our attempt at automatic documentation
-my $SKIP_SVG = 1;    # [CONFIGURABLE?]
+my $SKIP_SVG  = 1;    # [CONFIGURABLE?]
+my $SKIP_ARIA = 1;
 
 sub documentModules {
   my ($self) = @_;
@@ -588,7 +589,6 @@ sub toTeX {
       my $content = join(' ', map { $self->toTeX($_) } @spec);
       return "\\item[\\textit{Start}]\\textbf{==}\\ $content" . ($docs ? " \\par$docs" : ''); }
     elsif ($op eq 'grammar') {    # Don't otherwise mention it?
-##      join("\n",'\item[\textit{Grammar}:] '.$name,
       return join("\n", map { $self->toTeX($_) } @data); }
     elsif ($op eq 'module') {
       $name =~ s/^urn:x-LaTeXML:RelaxNG://;    # Remove the urn part.
@@ -614,7 +614,8 @@ sub toTeX_ref {
 sub toTeX_def {
   my ($self, $combiner, $name, @data) = @_;
   my $qname = $name;
-  $name =~ s/^\w+://;      # Strip off qualifier!!!! (watch for clash in docs?)
+  return "" if ($name =~ /\baria\b/) && $SKIP_ARIA;
+  $name =~ s/^\w+://;    # Strip off qualifier!!!! (watch for clash in docs?)
   $name = cleanTeX($name);
   my ($docs, @spec)    = $self->toTeXExtractDocs(@data);
   my ($attr, $content) = $self->toTeXBody(@spec);

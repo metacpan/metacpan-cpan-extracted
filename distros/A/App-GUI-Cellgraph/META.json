@@ -16,6 +16,9 @@
    "no_index" : {
       "directory" : [
          "t"
+      ],
+      "namespace" : [
+         "App::GUI::Cellgraph"
       ]
    },
    "prereqs" : {
@@ -24,84 +27,29 @@
             "ExtUtils::MakeMaker" : "0"
          }
       },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
       "runtime" : {
          "requires" : {
             "File::Spec" : "3",
+            "Graphics::Toolkit::Color" : "1",
             "Wx" : "0.9",
             "perl" : "v5.12.0"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "1.3",
-            "Test::Warn" : "0.30"
+            "Test::More" : "1.3"
          }
       }
    },
    "provides" : {
       "App::GUI::Cellgraph" : {
          "file" : "lib/App/GUI/Cellgraph.pm",
-         "version" : "0.02"
-      },
-      "App::GUI::Cellgraph::Dialog::About" : {
-         "file" : "lib/App/GUI/Cellgraph/Dialog/About.pm",
-         "version" : "0.02"
-      },
-      "App::GUI::Cellgraph::Dialog::Function" : {
-         "file" : "lib/App/GUI/Cellgraph/Dialog/Function.pm",
-         "version" : "0.02"
-      },
-      "App::GUI::Cellgraph::Dialog::Interface" : {
-         "file" : "lib/App/GUI/Cellgraph/Dialog/Interface.pm",
-         "version" : "0.02"
-      },
-      "App::GUI::Cellgraph::Frame" : {
-         "file" : "lib/App/GUI/Cellgraph/Frame.pm",
-         "version" : "0.02"
-      },
-      "App::GUI::Cellgraph::Frame::Panel::Rules" : {
-         "file" : "lib/App/GUI/Cellgraph/Frame/Panel/Rules.pm",
-         "version" : "0.02"
-      },
-      "App::GUI::Cellgraph::Frame::Panel::Start" : {
-         "file" : "lib/App/GUI/Cellgraph/Frame/Panel/Start.pm",
-         "version" : "0.02"
-      },
-      "App::GUI::Cellgraph::Frame::Part::Board" : {
-         "file" : "lib/App/GUI/Cellgraph/Frame/Part/Board.pm",
-         "version" : "0.02"
-      },
-      "App::GUI::Cellgraph::Grid" : {
-         "file" : "lib/App/GUI/Cellgraph/Grid.pm",
-         "version" : "0.02"
-      },
-      "App::GUI::Cellgraph::RuleGenerator" : {
-         "file" : "lib/App/GUI/Cellgraph/RuleGenerator.pm",
-         "version" : "0.02"
-      },
-      "App::GUI::Cellgraph::Settings" : {
-         "file" : "lib/App/GUI/Cellgraph/Settings.pm",
-         "version" : "0.02"
-      },
-      "App::GUI::Cellgraph::Widget::Action" : {
-         "file" : "lib/App/GUI/Cellgraph/Widget/Action.pm",
-         "version" : "0.02"
-      },
-      "App::GUI::Cellgraph::Widget::ColorDisplay" : {
-         "file" : "lib/App/GUI/Cellgraph/Widget/ColorDisplay.pm",
-         "version" : "0.02"
-      },
-      "App::GUI::Cellgraph::Widget::ColorToggle" : {
-         "file" : "lib/App/GUI/Cellgraph/Widget/ColorToggle.pm",
-         "version" : "0.02"
-      },
-      "App::GUI::Cellgraph::Widget::Rule" : {
-         "file" : "lib/App/GUI/Cellgraph/Widget/Rule.pm",
-         "version" : "0.02"
-      },
-      "App::GUI::Cellgraph::Widget::SliderCombo" : {
-         "file" : "lib/App/GUI/Cellgraph/Widget/SliderCombo.pm",
-         "version" : "0.02"
+         "version" : "0.03"
       }
    },
    "release_status" : "stable",
@@ -112,7 +60,7 @@
          "web" : "https://github.com/lichtkind/App-GUI-Cellgraph"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_generated_by_perl" : "v5.30.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.19",
    "x_spdx_expression" : "GPL-3.0-only"

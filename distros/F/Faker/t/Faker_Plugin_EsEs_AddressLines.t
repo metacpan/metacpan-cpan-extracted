@@ -126,13 +126,13 @@ $test->for('example', 1, 'execute', sub {
   ok $result->isa('Faker::Plugin::EsEs::AddressLines');
   ok $result->faker;
   ok $result->faker->random->reseed($seed);
-  ok $result->faker->random->make; # reset randomizer
+  ok $result->faker->random->pick; # reset randomizer
   is $result->execute, 'Praza Rocío, 50, 94º A
 El Apodaca, Zamora 22037';
-  ok $result->faker->random->make; # reset randomizer
+  ok $result->faker->random->pick; # reset randomizer
   is $result->execute, 'Paseo Salas, 558, Entre suelo 5º
 Los Blanco del Barco, La Rioja 96220';
-  ok $result->faker->random->make; # reset randomizer
+  ok $result->faker->random->pick; # reset randomizer
   is $result->execute, 'Praza Nevárez, 12, 8º
 Las Negrón, Valladolid 56907';
 

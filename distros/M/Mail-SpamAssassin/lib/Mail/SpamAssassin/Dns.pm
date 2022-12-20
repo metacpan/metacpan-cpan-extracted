@@ -29,7 +29,7 @@ use Mail::SpamAssassin::Conf;
 use Mail::SpamAssassin::PerMsgStatus;
 use Mail::SpamAssassin::AsyncLoop;
 use Mail::SpamAssassin::Constants qw(:ip);
-use Mail::SpamAssassin::Util qw(untaint_var am_running_on_windows);
+use Mail::SpamAssassin::Util qw(untaint_var am_running_on_windows compile_regexp);
 
 use File::Spec;
 use IO::Socket;
@@ -37,30 +37,24 @@ use POSIX ":sys_wait_h";
 
 
 our $KNOWN_BAD_DIALUP_RANGES; # Nothing uses this var???
-our $LAST_DNS_CHECK;
+our $LAST_DNS_CHECK = 0;
 
 # use very well-connected domains (fast DNS response, many DNS servers,
 # geographical distribution is a plus, TTL of at least 3600s)
+# these MUST contain both A/AAAA records so we can test dns_options v6
+# Updated 8/2019 from https://ip6.nl/#!list?db=alexa500
+# 
 our @EXISTING_DOMAINS = qw{
-  adelphia.net
   akamai.com
-  apache.org
-  cingular.com
-  colorado.edu
-  comcast.net
-  doubleclick.com
-  ebay.com
-  gmx.net
+  bing.com
+  cloudflare.com
+  digitalpoint.com
+  facebook.com
   google.com
-  intel.com
-  kernel.org
-  linux.org
-  mit.edu
-  motorola.com
-  msn.com
-  sourceforge.net
-  sun.com
-  w3.org
+  linkedin.com
+  netflix.com
+  php.net
+  wikipedia.org
   yahoo.com
 };
 
@@ -85,10 +79,6 @@ BEGIN {
 
   no warnings;
   eval {
-    require Net::DNS;
-    require Net::DNS::Resolver;
-  };
-  eval {
     require MIME::Base64;
   };
   eval {
@@ -101,71 +91,52 @@ BEGIN {
 sub do_rbl_lookup {
   my ($self, $rule, $set, $type, $host, $subtest) = @_;
 
-  $host =~ s/\.\z//s;  # strip a redundant trailing dot
-  my $key = "dns:$type:$host";
-  my $existing_ent = $self->{async}->get_lookup($key);
-
-  # only make a specific query once
-  if (!$existing_ent) {
-    my $ent = {
-      key => $key,
-      zone => $host,  # serves to fetch other per-zone settings
-      type => "DNSBL-".$type,
-      sets => [ ],  # filled in below
-      rules => [ ], # filled in below
-      # id is filled in after we send the query below
-    };
-    $existing_ent = $self->{async}->bgsend_and_start_lookup(
-        $host, $type, undef, $ent,
-        sub { my($ent, $pkt) = @_; $self->process_dnsbl_result($ent, $pkt) },
-      master_deadline => $self->{master_deadline} );
-  }
-
-  if ($existing_ent) {
-    # always add set
-    push @{$existing_ent->{sets}}, $set;
-
-    # sometimes match or always match
-    if (defined $subtest) {
-      $self->{dnspost}->{$set}->{$subtest} = $rule;
-    } else {
-      push @{$existing_ent->{rules}}, $rule;
+  if (defined $subtest) {
+    if ($subtest =~ /^sb:/) {
+      info("dns: ignored $rule, SenderBase rules are deprecated");
+      return 0;
     }
-
-    $self->{rule_to_rblkey}->{$rule} = $key;
-  }
-}
-
-# TODO: these are constant so they should only be added once at startup
-sub register_rbl_subtest {
-  my ($self, $rule, $set, $subtest) = @_;
-
-  if ($subtest =~ /^sb:/) {
-    warn("dns: ignored $rule, SenderBase rules are deprecated\n");
-    return 0;
+    # Compile as regex if not pure ip/bitmask (same check in process_dnsbl_result)
+    if ($subtest !~ /^\d+(?:\.\d+\.\d+\.\d+)?$/) {
+      my ($rec, $err) = compile_regexp($subtest, 0);
+      if (!$rec) {
+        warn("dns: invalid rule $rule subtest regexp '$subtest': $err\n");
+        return 0;
+      }
+      $subtest = $rec;
+    }
   }
 
-  $self->{dnspost}->{$set}->{$subtest} = $rule;
+  dbg("dns: launching rule %s, set %s, type %s, %s", $rule, $set, $type,
+    defined $subtest ? "subtest $subtest" : 'no subtest');
+
+  my $ent = {
+    rulename => $rule,
+    type => "DNSBL",
+    set => $set,
+    subtest => $subtest,
+  };
+  my $ret = $self->{async}->bgsend_and_start_lookup($host, $type, undef, $ent,
+    sub { my($ent, $pkt) = @_; $self->process_dnsbl_result($ent, $pkt) },
+    master_deadline => $self->{master_deadline}
+  );
+
+  return 0 if defined $ret; # no query started
+  return; # return undef for async status
 }
 
+# Deprecated, was only used from DNSEval.pm?
 sub do_dns_lookup {
   my ($self, $rule, $type, $host) = @_;
 
-  $host =~ s/\.\z//s;  # strip a redundant trailing dot
-  my $key = "dns:$type:$host";
-
   my $ent = {
-    key => $key,
-    zone => $host,  # serves to fetch other per-zone settings
-    type => "DNSBL-".$type,
-    rules => [ $rule ],
-    # id is filled in after we send the query below
+    rulename => $rule,
+    type => "DNSBL",
   };
-  $ent = $self->{async}->bgsend_and_start_lookup(
-      $host, $type, undef, $ent,
-      sub { my($ent, $pkt) = @_; $self->process_dnsbl_result($ent, $pkt) },
-    master_deadline => $self->{master_deadline} );
-  $ent;
+  $self->{async}->bgsend_and_start_lookup($host, $type, undef, $ent,
+    sub { my($ent, $pkt) = @_; $self->process_dnsbl_result($ent, $pkt) },
+    master_deadline => $self->{master_deadline}
+  );
 }
 
 ###########################################################################
@@ -180,38 +151,31 @@ sub dnsbl_hit {
     # txtdata returns a non- zone-file-format encoded result, unlike rdstring;
     # avoid space-separated RDATA <character-string> fields if possible,
     # txtdata provides a list of strings in a list context since Net::DNS 0.69
-    $log = join('',$answer->txtdata);
+    $log = join('', $answer->txtdata);
+    utf8::encode($log)  if utf8::is_utf8($log);
     local $1;
     $log =~ s{ (?<! [<(\[] ) (https? : // \S+)}{<$1>}xgi;
   } else {  # assuming $answer->type eq 'A'
     local($1,$2,$3,$4,$5);
-    if ($question->string =~ m/^((?:[0-9a-fA-F]\.){32})(\S+\w)/) {
+    if ($question->string =~ /^((?:[0-9a-fA-F]\.){32})(\S+\w)/) {
       $log = ' listed in ' . lc($2);
       my $ipv6addr = join('', reverse split(/\./, lc $1));
       $ipv6addr =~ s/\G(....)/$1:/g;  chop $ipv6addr;
       $ipv6addr =~ s/:0{1,3}/:/g;
       $log = $ipv6addr . $log;
-    } elsif ($question->string =~ m/^(\d+)\.(\d+)\.(\d+)\.(\d+)\.(\S+\w)/) {
+    } elsif ($question->string =~ /^(\d+)\.(\d+)\.(\d+)\.(\d+)\.(\S+\w)/) {
       $log = "$4.$3.$2.$1 listed in " . lc($5);
-    } else {
-      $log = 'listed in ' . $question->string;
+    } elsif ($question->string =~ /^(\S+)(?<!\.)/) {
+      $log = "listed in ".lc($1);
     }
   }
 
-  # TODO: this may result in some log messages appearing under the
-  # wrong rules, since we could see this sequence: { test one hits,
-  # test one's message is logged, test two hits, test one fires again
-  # on another IP, test one's message is logged for that other IP --
-  # but under test two's heading }.   Right now though it's better
-  # than just not logging at all.
-
-  $self->{already_logged} ||= { };
-  if ($log && !$self->{already_logged}->{$log}) {
-    $self->test_log($log);
-    $self->{already_logged}->{$log} = 1;
+  if ($log) {
+    $self->test_log($log, $rule);
   }
 
   if (!$self->{tests_already_hit}->{$rule}) {
+    dbg("dns: rbl rule $rule hit");
     $self->got_hit($rule, "RBL: ", ruletype => "dnsbl");
   }
 }
@@ -219,16 +183,26 @@ sub dnsbl_hit {
 sub dnsbl_uri {
   my ($self, $question, $answer) = @_;
 
-  my $qname = $question->qname;
+  my $rdatastr;
+  if ($answer->UNIVERSAL::can('txtdata')) {
+    # txtdata returns a non- zone-file-format encoded result, unlike rdstring;
+    # avoid space-separated RDATA <character-string> fields if possible,
+    # txtdata provides a list of strings in a list context since Net::DNS 0.69
+    $rdatastr = join('', $answer->txtdata);
+  } else {
+    $rdatastr = $answer->rdstring;
+    # encoded in a RFC 1035 zone file format (escaped), decode it
+    $rdatastr =~ s{ \\ ( [0-9]{3} | (?![0-9]{3}) . ) }
+                  { length($1)==3 && $1 <= 255 ? chr($1) : $1 }xgse;
+  }
 
-  # txtdata returns a non- zone-file-format encoded result, unlike rdstring;
-  # avoid space-separated RDATA <character-string> fields if possible,
-  # txtdata provides a list of strings in a list context since Net::DNS 0.69
-  #
-  # rdatastr() is historical/undocumented, use rdstring() since Net::DNS 0.69
-  my $rdatastr = $answer->UNIVERSAL::can('txtdata') ? join('',$answer->txtdata)
-               : $answer->UNIVERSAL::can('rdstring') ? $answer->rdstring
-                                                    : $answer->rdatastr;
+  # Bug 7236: Net::DNS attempts to decode text strings in a TXT record as
+  # UTF-8 since version 0.69, which is undesired: octets failing the UTF-8
+  # decoding are converted to a Unicode "replacement character" U+FFFD, and
+  # ASCII text is unnecessarily flagged as perl native characters.
+  utf8::encode($rdatastr)  if utf8::is_utf8($rdatastr);
+
+  my $qname = $question->qname;
   if (defined $qname && defined $rdatastr) {
     my $qclass = $question->qclass;
     my $qtype = $question->qtype;
@@ -236,8 +210,8 @@ sub dnsbl_uri {
     push(@vals, "class=$qclass") if $qclass ne "IN";
     push(@vals, "type=$qtype") if $qtype ne "A";
     my $uri = "dns:$qname" . (@vals ? "?" . join(";", @vals) : "");
-    push @{ $self->{dnsuri}->{$uri} }, $rdatastr;
 
+    $self->{dnsuri}{$uri}{$rdatastr} = 1;
     dbg("dns: hit <$uri> $rdatastr");
   }
 }
@@ -251,19 +225,17 @@ sub process_dnsbl_result {
   my $question = ($pkt->question)[0];
   return if !$question;
 
-  my $sets = $ent->{sets} || [];
-  my $rules = $ent->{rules};
+  my $rulename = $ent->{rulename};
 
-  # NO_DNS_FOR_FROM
-  if ($self->{sender_host} &&
-        # fishy, qname should have been "RFC 1035 zone format" -decoded first
-      lc($question->qname) eq lc($self->{sender_host}) &&
-      $question->qtype =~ /^(?:A|MX)$/ &&
-      $pkt->header->rcode =~ /^(?:NXDOMAIN|SERVFAIL)$/ &&
-      ++$self->{sender_host_fail} == 2)
-  {
-    for my $rule (@{$rules}) {
-      $self->got_hit($rule, "DNS: ", ruletype => "dns");
+  # Mark rule ready for meta rules, but only if this was the last lookup
+  # pending, rules can have many lookups launched for different IPs
+  if (!$self->get_async_pending_rules($rulename)) {
+    $self->rule_ready($rulename);
+    # Mark depending check_rbl_sub rules too
+    if (exists $self->{rbl_subs}{$ent->{set}}) {
+      foreach (@{$self->{rbl_subs}{$ent->{set}}}) {
+        $self->rule_ready($_->[1]);
+      }
     }
   }
 
@@ -274,85 +246,91 @@ sub process_dnsbl_result {
     $self->dnsbl_uri($question, $answer);
     my $answ_type = $answer->type;
     # TODO: there are some CNAME returns that might be useful
-    next if ($answ_type ne 'A' && $answ_type ne 'TXT');
-    if ($answ_type eq 'A') {
-      # Net::DNS::RR::A::address() is available since Net::DNS 0.69
-      my $ip_address = $answer->UNIVERSAL::can('address') ? $answer->address
-                                                          : $answer->rdatastr;
-      # skip any A record that isn't on 127.0.0.0/8
-      next if $ip_address !~ /^127\./;
+    next if $answ_type ne 'A' && $answ_type ne 'TXT';
+
+    my $rdatastr;
+    if ($answer->UNIVERSAL::can('txtdata')) {
+      # txtdata returns a non- zone-file-format encoded result, unlike rdstring;
+      # avoid space-separated RDATA <character-string> fields if possible,
+      # txtdata provides a list of strings in a list context since Net::DNS 0.69
+      $rdatastr = join('', $answer->txtdata);
+    } else {
+      $rdatastr = $answer->rdstring;
+      # encoded in a RFC 1035 zone file format (escaped), decode it
+      $rdatastr =~ s{ \\ ( [0-9]{3} | (?![0-9]{3}) . ) }
+                    { length($1)==3 && $1 <= 255 ? chr($1) : $1 }xgse;
     }
-    for my $rule (@{$rules}) {
-      $self->dnsbl_hit($rule, $question, $answer);
-    }
-    for my $set (@{$sets}) {
-      if ($self->{dnspost}->{$set}) {
-	$self->process_dnsbl_set($set, $question, $answer);
+
+    # Bug 7236: Net::DNS attempts to decode text strings in a TXT record as
+    # UTF-8 since version 0.69, which is undesired: octets failing the UTF-8
+    # decoding are converted to a Unicode "replacement character" U+FFFD, and
+    # ASCII text is unnecessarily flagged as perl native characters.
+    utf8::encode($rdatastr)  if utf8::is_utf8($rdatastr);
+
+    # skip any A record that isn't on 127.0.0.0/8
+    next if $answ_type eq 'A' && $rdatastr !~ /^127\./;
+
+    # check_rbl tests
+    if (defined $ent->{subtest}) {
+      if ($self->check_subtest($rdatastr, $ent->{subtest})) {
+        $self->dnsbl_hit($rulename, $question, $answer);
       }
+    } else {
+      $self->dnsbl_hit($rulename, $question, $answer);
+    }
+
+    # check_rbl_sub tests
+    if (exists $self->{rbl_subs}{$ent->{set}}) {
+      $self->process_dnsbl_set($ent->{set}, $question, $answer, $rdatastr);
     }
   }
+
   return 1;
 }
 
 sub process_dnsbl_set {
-  my ($self, $set, $question, $answer) = @_;
+  my ($self, $set, $question, $answer, $rdatastr) = @_;
 
-  # txtdata returns a non- zone-file-format encoded result, unlike rdstring;
-  # avoid space-separated RDATA <character-string> fields if possible,
-  # txtdata provides a list of strings in a list context since Net::DNS 0.69
-  #
-  # rdatastr() is historical/undocumented, use rdstring() since Net::DNS 0.69
-  my $rdatastr = $answer->UNIVERSAL::can('txtdata')  ? join('',$answer->txtdata)
-               : $answer->UNIVERSAL::can('rdstring') ? $answer->rdstring
-                                                    : $answer->rdatastr;
-
-  while (my ($subtest, $rule) = each %{ $self->{dnspost}->{$set} }) {
+  foreach my $args (@{$self->{rbl_subs}{$set}}) {
+    my $subtest = $args->[0];
+    my $rule = $args->[1];
     next if $self->{tests_already_hit}->{$rule};
-
-    if ($subtest =~ /^\d+\.\d+\.\d+\.\d+$/) {
-      # test for exact equality, not a regexp (an IPv4 address)
-      $self->dnsbl_hit($rule, $question, $answer)  if $subtest eq $rdatastr;
-    }
-    # bitmask
-    elsif ($subtest =~ /^\d+$/) {
-      # Bug 6803: response should be within 127.0.0.0/8, ignore otherwise
-      if ($rdatastr =~ m/^127\.\d{1,3}\.\d{1,3}\.\d{1,3}$/ &&
-	  Mail::SpamAssassin::Util::my_inet_aton($rdatastr) & $subtest)
-      {
-	$self->dnsbl_hit($rule, $question, $answer);
-      }
-    }
-    # regular expression
-    else {
-      my $test = qr/$subtest/;
-      if ($rdatastr =~ /$test/) {
-	$self->dnsbl_hit($rule, $question, $answer);
-      }
+    if ($self->check_subtest($rdatastr, $subtest)) {
+      $self->dnsbl_hit($rule, $question, $answer);
     }
   }
 }
 
-sub harvest_until_rule_completes {
-  my ($self, $rule) = @_;
+sub check_subtest {
+  my ($self, $rdatastr, $subtest) = @_;
 
-  dbg("dns: harvest_until_rule_completes");
-  my $result = 0;
-
-  for (my $first=1;  ; $first=0) {
-    # complete_lookups() may call completed_callback(), which may
-    # call start_lookup() again (like in Plugin::URIDNSBL)
-    my ($alldone,$anydone) =
-      $self->{async}->complete_lookups($first ? 0 : 1.0,  1);
-
-    $result = 1  if $self->is_rule_complete($rule);
-    last  if $result || $alldone;
-
-    dbg("dns: harvest_until_rule_completes - check_tick");
-    $self->{main}->call_plugins ("check_tick", { permsgstatus => $self });
+  # regular expression
+  if (ref($subtest) eq 'Regexp') {
+    if ($rdatastr =~ $subtest) {
+      return 1;
+    }
+  }
+  # bitmask
+  elsif ($subtest =~ /^\d+$/) {
+    # Bug 6803: response should be within 127.0.0.0/8, ignore otherwise
+    if ($rdatastr =~ m/^127\.\d{1,3}\.\d{1,3}\.\d{1,3}$/ &&
+        Mail::SpamAssassin::Util::my_inet_aton($rdatastr) & $subtest)
+    {
+      return 1;
+    }
+  }
+  else {
+    # test for exact equality (an IPv4 address)
+    if ($subtest eq $rdatastr) {
+      return 1;
+    }
   }
 
-  return $result;
+  return 0;
 }
+
+# Deprecated since 4.0, meta rules do not depend on priorities anymore
+sub harvest_until_rule_completes {}
 
 sub harvest_dnsbl_queries {
   my ($self) = @_;
@@ -370,7 +348,7 @@ sub harvest_dnsbl_queries {
     my ($alldone,$anydone) =
       $self->{async}->complete_lookups($first ? 0 : 1.0,  1);
 
-    last  if $alldone;
+    last  if $alldone || $self->{deadline_exceeded} || $self->{shortcircuited};
 
     dbg("dns: harvest_dnsbl_queries - check_tick");
     $self->{main}->call_plugins ("check_tick", { permsgstatus => $self });
@@ -379,7 +357,6 @@ sub harvest_dnsbl_queries {
   # explicitly abort anything left
   $self->{async}->abort_remaining_lookups();
   $self->{async}->log_lookups_timing();
-  $self->mark_all_async_rules_complete();
   1;
 }
 
@@ -403,12 +380,14 @@ sub harvest_completed_queries {
 sub set_rbl_tag_data {
   my ($self) = @_;
 
+  return if !$self->{dnsuri};
+
   # DNS URIs
   my $rbl_tag = $self->{tag_data}->{RBL};  # just in case, should be empty
   $rbl_tag = ''  if !defined $rbl_tag;
-  while (my ($dnsuri, $answers) = each %{ $self->{dnsuri} }) {
+  while (my ($dnsuri, $answers) = each %{$self->{dnsuri}}) {
     # when parsing, look for elements of \".*?\" or \S+ with ", " as separator
-    $rbl_tag .= "<$dnsuri>" . " [" . join(", ", @{ $answers }) . "]\n";
+    $rbl_tag .= "<$dnsuri>" . " [" . join(", ", keys %$answers) . "]\n";
   }
   if (defined $rbl_tag && $rbl_tag ne '') {
     chomp $rbl_tag;
@@ -423,7 +402,7 @@ sub rbl_finish {
 
   $self->set_rbl_tag_data();
 
-  delete $self->{dnspost};
+  delete $self->{rbl_subs};
   delete $self->{dnsuri};
 }
 
@@ -442,55 +421,103 @@ sub clear_resolver {
   return 0;
 }
 
+# Deprecated since 4.0.0
 sub lookup_ns {
+  warn "dns: deprecated lookup_ns called, query ignored\n";
+  return;
+}
+
+sub test_dns_a_aaaa {
   my ($self, $dom) = @_;
 
-  return unless $self->load_resolver();
   return if ($self->server_failed_to_respond_for_domain ($dom));
 
-  my $nsrecords;
-  dbg("dns: looking up NS for '$dom'");
+  my ($a, $aaaa) = (0, 0);
 
-  eval {
-    my $query = $self->{resolver}->send($dom, 'NS');
-    my @nses;
-    if ($query) {
-      foreach my $rr ($query->answer) {
-        if ($rr->type eq "NS") { push (@nses, $rr->nsdname); }
+  if ($self->{conf}->{dns_options}->{v4}) {
+    eval {
+      my $query = $self->{resolver}->send($dom, 'A');
+      if ($query) {
+        foreach my $rr ($query->answer) {
+          if ($rr->type eq 'A') { $a = 1; last; }
+        }
       }
+      1;
+    } or do {
+      my $eval_stat = $@ ne '' ? $@ : "errno=$!";  chomp $eval_stat;
+      dbg("dns: test A lookup failed horribly, perhaps bad resolv.conf setting? (%s)", $eval_stat);
+      return (undef, undef);
+    };
+    if (!$a) {
+      dbg("dns: test A lookup returned no results, use \"dns_options nov4\" if resolver doesn't support A queries");
     }
-    $nsrecords = [ @nses ];
-    1;
-  } or do {
-    my $eval_stat = $@ ne '' ? $@ : "errno=$!";  chomp $eval_stat;
-    dbg("dns: NS lookup failed horribly, perhaps bad resolv.conf setting? (%s)", $eval_stat);
-    return;
-  };
+  } else {
+    $a = 1;
+  }
 
-  $nsrecords;
+  if ($self->{conf}->{dns_options}->{v6}) {
+    eval {
+      my $query = $self->{resolver}->send($dom, 'AAAA');
+      if ($query) {
+        foreach my $rr ($query->answer) {
+          if ($rr->type eq 'AAAA') { $aaaa = 1; last; }
+        }
+      }
+      1;
+    } or do {
+      my $eval_stat = $@ ne '' ? $@ : "errno=$!";  chomp $eval_stat;
+      dbg("dns: test AAAA lookup failed horribly, perhaps bad resolv.conf setting? (%s)", $eval_stat);
+      return (undef, undef);
+    };
+    if (!$aaaa) {
+      dbg("dns: test AAAA lookup returned no results, use \"dns_options nov6\" if resolver doesn't support AAAA queries");
+    }
+  } else {
+    $aaaa = 1;
+  }
+
+  return ($a, $aaaa);
 }
 
 sub is_dns_available {
   my ($self) = @_;
   my $dnsopt = $self->{conf}->{dns_available};
-  my $dnsint = $self->{conf}->{dns_test_interval} || 600;
-  my @domains;
 
-  $LAST_DNS_CHECK ||= 0;
-  my $diff = time() - $LAST_DNS_CHECK;
+  # Fast response for the most common cases
+  return 1 if $IS_DNS_AVAILABLE && $dnsopt eq "yes";
+  return 0 if defined $IS_DNS_AVAILABLE && $dnsopt eq "no";
+
+  # croak on misconfigured flags
+  if (!$self->{conf}->{dns_options}->{v4} &&
+      !$self->{conf}->{dns_options}->{v6})
+  {
+    warn 'dns: error: dns_options "nov4" and "nov6" are both set, '.
+         ' only use either, or use "dns_available no" to really disable DNS'.
+         "\n";
+    $IS_DNS_AVAILABLE = 0;
+    $self->{conf}->{dns_available} = "no";
+    return 0;
+  }
 
   # undef $IS_DNS_AVAILABLE if we should be testing for
   # working DNS and our check interval time has passed
-  if ($dnsopt eq "test" && $diff > $dnsint) {
-    $IS_DNS_AVAILABLE = undef;
-    dbg("dns: is_dns_available() last checked %.1f seconds ago; re-checking",
-        $diff);
+  if ($dnsopt eq "test") {
+    my $diff = time - $LAST_DNS_CHECK;
+    if ($diff > ($self->{conf}->{dns_test_interval}||600)) {
+      $IS_DNS_AVAILABLE = undef;
+      if ($LAST_DNS_CHECK) {
+        dbg("dns: is_dns_available() last checked %.1f seconds ago; re-checking", $diff);
+      } else {
+        dbg("dns: is_dns_available() initial check");
+      }
+    }
+    $LAST_DNS_CHECK = time;
   }
 
-  return $IS_DNS_AVAILABLE if (defined $IS_DNS_AVAILABLE);
-  $LAST_DNS_CHECK = time();
+  return $IS_DNS_AVAILABLE if defined $IS_DNS_AVAILABLE;
 
   $IS_DNS_AVAILABLE = 0;
+
   if ($dnsopt eq "no") {
     dbg("dns: dns_available set to no in config file, skipping test");
     return $IS_DNS_AVAILABLE;
@@ -498,26 +525,16 @@ sub is_dns_available {
 
   # Even if "dns_available" is explicitly set to "yes", we want to ignore
   # DNS if we're only supposed to be looking at local tests.
-  goto done if ($self->{main}->{local_tests_only});
-
-  # Check version numbers - runtime check only
-  if (defined $Net::DNS::VERSION) {
-    if (am_running_on_windows()) {
-      if ($Net::DNS::VERSION < 0.46) {
-	warn("dns: Net::DNS version is $Net::DNS::VERSION, but need 0.46 for Win32");
-	return $IS_DNS_AVAILABLE;
-      }
-    }
-    else {
-      if ($Net::DNS::VERSION < 0.34) {
-	warn("dns: Net::DNS version is $Net::DNS::VERSION, but need 0.34");
-	return $IS_DNS_AVAILABLE;
-      }
-    }
+  if ($self->{main}->{local_tests_only}) {
+    dbg("dns: using local tests only, DNS not available");
+    return $IS_DNS_AVAILABLE;
   }
 
-  $self->clear_resolver();
-  goto done unless $self->load_resolver();
+  #$self->clear_resolver();
+  if (!$self->load_resolver()) {
+    dbg("dns: could not load resolver, DNS not available");
+    return $IS_DNS_AVAILABLE;
+  }
 
   if ($dnsopt eq "yes") {
     # optionally shuffle the list of nameservers to distribute the load
@@ -532,13 +549,18 @@ sub is_dns_available {
     return $IS_DNS_AVAILABLE;
   }
 
+  my @domains;
+  my @rtypes;
+  push @rtypes, 'A' if $self->{main}->{conf}->{dns_options}->{v4};
+  push @rtypes, 'AAAA' if $self->{main}->{conf}->{dns_options}->{v6};
   if ($dnsopt =~ /^test:\s*(\S.*)$/) {
     @domains = split (/\s+/, $1);
-    dbg("dns: looking up NS records for user specified domains: %s",
-        join(", ", @domains));
+    dbg("dns: testing %s records for user specified domains: %s",
+        join("/", @rtypes), join(", ", @domains));
   } else {
     @domains = @EXISTING_DOMAINS;
-    dbg("dns: looking up NS records for built-in domains");
+    dbg("dns: testing %s records for built-in domains: %s",
+        join("/", @rtypes), join(", ", @domains));
   }
 
   # do the test with a full set of configured nameservers
@@ -556,19 +578,19 @@ sub is_dns_available {
   my @good_nameservers;
   foreach my $ns (@nameservers) {
     $self->{resolver}->available_nameservers($ns);  # try just this one
-    for (my $retry = 3; $retry > 0 && @domains; $retry--) {
+    for (my $retry = 0; $retry < 3 && @domains; $retry++) {
       my $domain = splice(@domains, rand(@domains), 1);
-      dbg("dns: trying ($retry) $domain, server $ns ...");
-      my $result = $self->lookup_ns($domain);
+      dbg("dns: trying $domain, server $ns ..." .
+          ($retry ? " (retry $retry)" : ""));
+      my ($ok_a, $ok_aaaa) = $self->test_dns_a_aaaa($domain);
       $self->{resolver}->finish_socket();
-      if (!$result) {
-        dbg("dns: NS lookup of $domain using $ns failed horribly, ".
-            "may not be a valid nameserver");
+      if (!defined $ok_a || !defined $ok_aaaa) {
+        # error printed already
         last;
-      } elsif (!@$result) {
-        dbg("dns: NS lookup of $domain using $ns failed, no results found");
+      } elsif (!$ok_a && !$ok_aaaa) {
+        dbg("dns: lookup of $domain using $ns failed, no results found");
       } else {
-        dbg("dns: NS lookup of $domain using $ns succeeded => DNS available".
+        dbg("dns: lookup of $domain using $ns succeeded => DNS available".
             " (set dns_available to override)");
         push(@good_nameservers, $ns);
         last;
@@ -585,8 +607,6 @@ sub is_dns_available {
     $self->{resolver}->available_nameservers(@good_nameservers);
   }
 
-done:
-  # jm: leaving this in!
   dbg("dns: is DNS available? " . $IS_DNS_AVAILABLE);
   return $IS_DNS_AVAILABLE;
 }
@@ -676,55 +696,26 @@ sub cleanup_kids {
 
 ###########################################################################
 
-sub register_async_rule_start {
+# Deprecated async functions, everything is handled automatically
+# now by bgsend .. $self->{async}->{pending_rules}
+sub register_async_rule_start {}
+sub register_async_rule_finish {}
+sub mark_all_async_rules_complete {}
+sub is_rule_complete {}
+
+# Return number of pending DNS lookups for a rule,
+# or list all of rules still pending
+sub get_async_pending_rules {
   my ($self, $rule) = @_;
-  dbg("dns: $rule lookup start");
-  $self->{rule_to_rblkey}->{$rule} = '*ASYNC_START';
-}
-
-sub register_async_rule_finish {
-  my ($self, $rule) = @_;
-  dbg("dns: $rule lookup finished");
-  delete $self->{rule_to_rblkey}->{$rule};
-}
-
-sub mark_all_async_rules_complete {
-  my ($self) = @_;
-  $self->{rule_to_rblkey} = { };
-}
-
-sub is_rule_complete {
-  my ($self, $rule) = @_;
-
-  my $key = $self->{rule_to_rblkey}->{$rule};
-  if (!defined $key) {
-    # dbg("dns: $rule lookup complete, not in list");
-    return 1;
+  if (defined $rule) {
+    return 0 if !exists $self->{async}->{pending_rules}{$rule};
+    return scalar keys %{$self->{async}->{pending_rules}{$rule}};
+  } else {
+    return grep { %{$self->{async}->{pending_rules}{$_}} }
+             keys %{$self->{async}->{pending_rules}};
   }
-
-  if ($key eq '*ASYNC_START') {
-    dbg("dns: $rule lookup not yet complete");
-    return 0;       # not yet complete
-  }
-
-  my $ent = $self->{async}->get_lookup($key);
-  if (!defined $ent) {
-    dbg("dns: $rule lookup complete, $key no longer pending");
-    return 1;
-  }
-
-  dbg("dns: $rule lookup not yet complete");
-  return 0;         # not yet complete
 }
 
 ###########################################################################
-
-# interface called by SPF plugin
-sub check_for_from_dns {
-  my ($self, $pms) = @_;
-  if (defined $pms->{sender_host_fail}) {
-    return ($pms->{sender_host_fail} == 2); # both MX and A need to fail
-  }
-}
 
 1;

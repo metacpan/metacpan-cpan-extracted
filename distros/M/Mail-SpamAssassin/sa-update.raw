@@ -22,11 +22,11 @@ use warnings;
 use re 'taint';
 
 my $VERSION = 'svnunknown';
-if ('$Id: sa-update.raw 1881784 2020-09-17 07:17:40Z gbechis $' =~ ':') {
-  # Subversion keyword "$Id: sa-update.raw 1881784 2020-09-17 07:17:40Z gbechis $" has been successfully expanded.
+if ('$Id: sa-update.raw 1900642 2022-05-07 06:01:02Z hege $' =~ ':') {
+  # Subversion keyword "$Id: sa-update.raw 1900642 2022-05-07 06:01:02Z hege $" has been successfully expanded.
   # Doesn't happen with automated launchpad builds:
   # https://bugs.launchpad.net/launchpad/+bug/780916
-  $VERSION = &Mail::SpamAssassin::Version . ' / svn' . (split(/\s+/, '$Id: sa-update.raw 1881784 2020-09-17 07:17:40Z gbechis $'))[2];
+  $VERSION = &Mail::SpamAssassin::Version . ' / svn' . (split(/\s+/, '$Id: sa-update.raw 1900642 2022-05-07 06:01:02Z hege $'))[2];
 }
 
 my $PREFIX          = '@@PREFIX@@';             # substituted at 'make' time
@@ -86,7 +86,6 @@ BEGIN {                          # see comments in "spamassassin.raw" for doco
 
 # These are the non-standard required modules
 use Net::DNS;
-use HTTP::Date qw(time2str);
 use Archive::Tar 1.23;
 use IO::Zlib 1.04;
 use Mail::SpamAssassin::Logger qw(:DEFAULT info log_message);
@@ -96,7 +95,7 @@ our ($have_lwp, $io_socket_module_name, $have_inet4, $use_inet4, $have_inet6, $u
 BEGIN {
   # Deal with optional modules
 
-  eval { require Digest::SHA; import Digest::SHA qw(sha256_hex sha512_hex); 1 } and do { $have_sha256=1; $have_sha512=1 }
+  eval { require Digest::SHA; Digest::SHA->import(qw(sha256_hex sha512_hex)); 1 } and do { $have_sha256=1; $have_sha512=1 }
   or die "Unable to verify file hashes! You must install a modern version of Digest::SHA.";
   
     $have_lwp = eval {
@@ -190,7 +189,10 @@ GetOptions(
   'allowplugins'                        => \$opt{'allowplugins'},
   'reallyallowplugins'                  => \$opt{'reallyallowplugins'},
   'refreshmirrors'                      => \$opt{'refreshmirrors'},
+  'forcemirror=s'                       => \$opt{'forcemirror'},
   'httputil=s'                          => \$opt{'httputil'},
+  'score-multiplier=s'                  => \$opt{'score-multiplier'},
+  'score-limit=s'                       => \$opt{'score-limit'},
 
   # allow multiple of these on the commandline
   'gpgkey=s'				=> $opt{'gpgkey'},
@@ -243,6 +245,13 @@ if ( defined $opt{'httputil'} && $opt{'httputil'} !~ /^(curl|wget|fetch|lwp)$/ )
   warn "Invalid parameter for --httputil, curl|wget|fetch|lwp wanted\n";
 }
 
+if ( defined $opt{'score-multiplier'} && $opt{'score-multiplier'} !~ /^\d+(?:\.\d+)?$/ ) {
+  die "Invalid parameter for --score-multiplier, integer or float expected.\n";
+}
+if ( defined $opt{'score-limit'} && $opt{'score-limit'} !~ /^\d+(?:\.\d+)?$/ ) {
+  die "Invalid parameter for --score-limit, integer or float expected.\n";
+}
+
 # Figure out what version of SpamAssassin we're using, and also figure out the
 # reverse of it for the DNS query.  Handle x.yyyzzz as well as x.yz.
 my $SAVersion = $Mail::SpamAssassin::VERSION;
@@ -258,13 +267,7 @@ else {
 my $RevSAVersion = join(".", reverse split(/\./, $SAVersion));
 
 # set debug areas, if any specified (only useful for command-line tools)
-$SAVersion =~ /^(\d+\.\d+)/;
-if ($1+0 > 3.0) {
-  $opt{'debug'} ||= 'all' if (defined $opt{'debug'});
-}
-else {
-  $opt{'debug'} = defined $opt{'debug'};
-}
+$opt{'debug'} ||= 'all' if (defined $opt{'debug'});
 
 # Find the default site rule directory, also setup debugging and other M::SA bits
 my $SA = Mail::SpamAssassin->new({
@@ -617,10 +620,10 @@ foreach my $channel (@channels) {
   my $GPG;
 
   if ($instfile) {
-    dbg("channel: using --install files $instfile\{,.sha256,.sha512,.asc\}");
+    dbg("channel: using --install files $instfile\{,.asc,.sha512,.sha256\}");
     $content = read_install_file($instfile);
-    if ( -s "$instfile.sha512" ) { $SHA512 = read_install_file($instfile.".sha512"); }
-    if ( -s "$instfile.sha256" ) { $SHA256 = read_install_file($instfile.".sha256"); }
+    if ( -f "$instfile.sha512" ) { $SHA512 = read_install_file($instfile.".sha512"); }
+    if ( -f "$instfile.sha256" ) { $SHA256 = read_install_file($instfile.".sha256"); }
     $GPG = read_install_file($instfile.".asc") if $GPG_ENABLED;
 
   } else {  # not an install file, obtain fresh rules from network
@@ -667,6 +670,8 @@ foreach my $channel (@channels) {
         channel_failed("channel '$channel': MIRRORED.BY file URL was not in DNS");
         next;
       }
+      # make sure requests spread randomly
+      Mail::SpamAssassin::Util::fisher_yates_shuffle(\@mirrors);
       foreach my $mirror (@mirrors) {
         my ($result_fname, $http_ok) =
           http_get($mirror, $UPDDir, $mirby_path, $mirby_force_reload);
@@ -720,6 +725,12 @@ foreach my $channel (@channels) {
     my @mirrors = split(/^/, $mirby);
     while(my $mirror = shift @mirrors) {
       chomp $mirror;
+      if ( defined $opt{'forcemirror'} ) {
+        $mirror = $opt{'forcemirror'};
+        $mirrors{$mirror}->{"weight"} = 1;
+        dbg("channel: found mirror $mirror (forced)");
+	last;
+      }
 
       $mirror =~ s/#.*$//;   # remove comments
       $mirror =~ s/^\s+//;   # remove leading whitespace
@@ -798,19 +809,6 @@ foreach my $channel (@channels) {
         next;
       }
 
-      # SHA512 of the archive file
-      ($result_fname, $http_ok) = http_get("$mirror/$newV.tar.gz.sha512", $UPDDir);
-      if (!$http_ok || !-s $result_fname) {
-        # If not found, try SHA256 instead
-        ($result_fname, $http_ok) = http_get("$mirror/$newV.tar.gz.sha256", $UPDDir);
-        if (!$http_ok || !-s $result_fname) {
-          dbg("channel: No sha512 or sha256 file available from $mirror, %s",
-            %mirrors ? "sleeping $sleep_sec sec and trying next" : 'no mirrors left');
-          sleep($sleep_sec) if %mirrors;
-          next;
-        }
-      }
-
       # if GPG is enabled, the GPG detached signature of the archive file
       if ($GPG_ENABLED) {
         ($result_fname, $http_ok) = http_get("$mirror/$newV.tar.gz.asc", $UPDDir);
@@ -819,6 +817,20 @@ foreach my $channel (@channels) {
             %mirrors ? "sleeping $sleep_sec sec and trying next" : 'no mirrors left');
           sleep($sleep_sec) if %mirrors;
           next;
+        }
+      }
+      else {
+        # SHA512 of the archive file
+        ($result_fname, $http_ok) = http_get("$mirror/$newV.tar.gz.sha512", $UPDDir);
+        if (!$http_ok || !-s $result_fname) {
+          # If not found, try SHA256 instead
+          ($result_fname, $http_ok) = http_get("$mirror/$newV.tar.gz.sha256", $UPDDir);
+          if (!$http_ok || !-s $result_fname) {
+            dbg("channel: No sha512 or sha256 file available from $mirror, %s",
+              %mirrors ? "sleeping $sleep_sec sec and trying next" : 'no mirrors left');
+            sleep($sleep_sec) if %mirrors;
+            next;
+          }
         }
       }
 
@@ -846,8 +858,12 @@ foreach my $channel (@channels) {
     }
   }
 
-  unless ($content && ( $SHA512 || $SHA256 ) && (!$GPG_ENABLED || $GPG)) {
-    channel_failed("channel '$channel': could not find working mirror");
+  unless ($content && (($GPG_ENABLED && $GPG) || (!$GPG_ENABLED && ($SHA512 || $SHA256)))) {
+    if ($instfile) {
+      channel_failed("channel '$channel': missing checksum files $instfile\{,.sha512,.sha256\}");
+    } else {
+      channel_failed("channel '$channel': could not find working mirror");
+    }
     next;
   }
 
@@ -1281,6 +1297,7 @@ sub read_install_file {
   my $all;
   { local $/ = undef; $all = <IN> }
   close IN or die "cannot close $file: $!";
+  defined $all && $all ne '' or die "empty file $file\n";
   return $all;
 }
 
@@ -1349,12 +1366,49 @@ sub taint_safe_archive_extract {
         # also, if --allowplugins is not specified, comment out
         # all loadplugin or tryplugin lines (and others that can load code)
         if ( !$opt{'allowplugins'} ) {
-          $content =~ s{^\s*((?:load|try)plugin|\S+_modules?|\S+_factory)\s}
+          $content =~ s{^\s*(
+              loadplugin |
+              tryplugin |
+              \S+_modules? |
+              \S+_factory |
+              dcc_(?:path|options) |
+              pyzor_(?:path|options) |
+              extracttext_external
+            )\s}
             {#(commented by sa-update, no --allowplugins switch specified)# $1}gmx;
         }
 
         # other stuff never allowed for safety
         $content =~ s/^\s*(dns_server)/#(commented by sa-update, not allowed)# $1/gm;
+
+        # adjust scores
+        if ($opt{'score-multiplier'} || $opt{'score-limit'}) {
+          my $adjust_score = sub {
+            my @scores = split(/\s+/, $_[1]);
+            my $touched = 0;
+            foreach (@scores) {
+              next if $_ == 0; # Can't adjust if zero..
+              my $old = $_;
+              $_ = $_ * $opt{'score-multiplier'} if $opt{'score-multiplier'};
+              $_ = $opt{'score-limit'} if $opt{'score-limit'} && $_ > $opt{'score-limit'};
+              if ($old != $_) {
+                if ($_ == 0) { # Prevent zeroing scores
+                  $_ = $old < 0 ? "-0.001" : "0.001"
+                } else {
+                  $_ = sprintf("%.3f", $_);
+                }
+                $touched++ if $old != $_;
+              }
+            }
+            if ($touched) {
+              return $_[0].join(' ', @scores)." #(score adjusted by sa-update, $_[1])#".$_[2];
+            } else {
+              return $_[0].$_[1].$_[2];
+            }
+          };
+          $content =~ s/^(\s*score\s+\w+\s+)(-?\d+(?:\.\d+)?(?:\s+-?\d+(?:\.\d+)?)*)(.*)$
+            /$adjust_score->($1,$2,$3)/igmex;
+        }
       }
 
       print OUT $content
@@ -1481,7 +1535,11 @@ sub http_get_lwp {
     $request->url($url);
 
     if (defined $ims) {
-      my $str = time2str($ims);
+      my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday) = gmtime($ims);
+      my $str = sprintf("%s, %02d %s %04d %02d:%02d:%02d GMT",
+          qw(Sun Mon Tue Wed Thu Fri Sat)[$wday], $mday,
+          qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec)[$mon],
+          $year + 1900, $hour, $min, $sec);
       $request->header('If-Modified-Since', $str);
       dbg("http: IMS GET request, $url, $str");
     }
@@ -1530,7 +1588,6 @@ sub http_get_lwp {
 
 # Do a GET request via HTTP for a given URL using an external program,
 # or fall back to LWP if no external downloading program is available.
-# Use the optional time_t value to do an IMS GET
 sub http_get {
   my($url, $dir, $suggested_out_fname, $force_reload) = @_;
   my $content;
@@ -1917,7 +1974,7 @@ sub lint_check_dir {
   # due to the Logger module's globalness (all M::SA objects share the same
   # Logger setup), we can't change the debug level here to only include
   # "config" or otherwise be more terse. :(
-  my $spamtest = new Mail::SpamAssassin( {
+  my $spamtest = Mail::SpamAssassin->new( {
     rules_filename       => $dir,
     site_rules_filename  => $LOCAL_RULES_DIR,
     ignore_site_cf_files => 1,
@@ -1958,9 +2015,9 @@ Options:
                           Use multiple times for multiple channels
   --channelfile file      Retrieve updates from the channels in the file
   --checkonly             Check for update availability, do not install
-  --install filename      Install updates directly from this file. Signature
-                          verification will use "file.asc", "file.sha256",
-                          and "file.sha512".
+  --install file          Install updates directly from this file. Signature
+                          verification will use "file.asc", or "file.sha512"
+                          or "file.sha256".
   --allowplugins          Allow updates to load plugin code (DANGEROUS)
   --gpgkey key            Trust the key id to sign releases
                           Use multiple times for multiple keys
@@ -1975,8 +2032,15 @@ Options:
                           SpamAssassin site rules directory
                           (default: @@LOCAL_STATE_DIR@@/@@VERSION@@)
   --refreshmirrors        Force the MIRRORED.BY file to be updated
+  --forcemirror url       Use a specific mirror instead of downloading from
+                          official mirrors
   --httputil util         Force used download tool. By default first found
                           from these is used: curl, wget, fetch, lwp
+  --score-multiplier x.x  Adjust all scores from update channel, multiply
+                          with given value (integer or float).
+  --score-limit x.x       Adjust all scores from update channel, limit
+                          to given value (integer or float). Limiting
+                          is done after possible multiply operation.
   -D, --debug [area=n,...]  Print debugging messages
   -v, --verbose           Be verbose, like print updated channel names;
                           For more verbosity specify multiple times
@@ -1992,8 +2056,9 @@ configuration, based on channels.  The default channel is
 I<updates.spamassassin.org>, which has updated rules since the previous
 release.
 
-Update archives are verified using SHA256 and SHA512 hashes and GPG signatures,
-by default.
+Update archives are verified using GPG signatures by default.  If GPG is
+disabled (not recommended), file integrity is checked with SHA512 or SHA256
+checksums.
 
 Note that C<sa-update> will not restart C<spamd> or otherwise cause
 a scanner to reload the now-updated ruleset automatically.  Instead,
@@ -2041,10 +2106,10 @@ The exit code will be C<0> or C<1> as described below.
 Install updates "offline", from the named tar.gz file, instead of performing
 DNS lookups and HTTP invocations.
 
-Files named B<file>.sha256, B<file>.sha512, and B<file>.asc will be used for
-the SHA256 and SHA512 hashes and the GPG signature, respectively.  The filename
-provided must contain a version number of at least 3 digits, which will be used
-as the channel's update version number.
+Files named B<file>.asc, B<file>.sha512, or B<file>.sha256 will be used for
+GPG signature, and the SHA256 and SHA512 checksums, respectively.  The
+filename provided must contain a version number of at least 3 digits, which
+will be used as the channel's update version number.
 
 Multiple B<--channel> switches cannot be used with B<--install>.  To install
 multiple channels from tarballs, run C<sa-update> multiple times with different
@@ -2068,19 +2133,18 @@ Use --reallyallowplugins option to bypass warnings and make it work.
 
 =item B<--gpg>, B<--nogpg>
 
-sa-update by default will verify update archives by use of SHA256 and SHA512
-checksums and GPG signature.  SHA* hashes can verify whether or not the
-downloaded archive has been corrupted, but it does not offer any form of
-security regarding whether or not the downloaded archive is legitimate
-(aka: non-modifed by evildoers).  GPG verification of the archive is used to
-solve that problem.
+sa-update by default will verify update archives by use of GPG signature. 
 
-If you wish to skip GPG verification, you can use the B<--nogpg> option
-to disable its use.  Use of the following gpgkey-related options will
-override B<--nogpg> and keep GPG verification enabled.
+If you wish to skip GPG verification (very unsafe), you can use the
+B<--nogpg> option to disable its use.  Use of the following gpgkey-related
+options will override B<--nogpg> and keep GPG verification enabled.
 
-Note: Currently, only GPG itself is supported (ie: not PGP).  v1.2 has been
-tested, although later versions ought to work as well.
+If GPG is disabled, only SHA512 or SHA256 checksums are used to verify
+whether or not the downloaded archive has been corrupted, but it does not
+offer any form of security regarding whether or not the downloaded archive
+is legitimate (aka: non-modifed by evildoers).
+
+Note: Only GnuPG is supported (ie: not any other PGP software).
 
 =item B<--gpgkey>
 
@@ -2135,6 +2199,11 @@ Force the list of sa-update mirrors for each channel, stored in the MIRRORED.BY
 file, to be updated.  By default, the MIRRORED.BY file will be cached for up to
 7 days after each time it is downloaded.
 
+=item B<--forcemirror>
+
+Force the download from a specific host instead of relying on mirrors listed
+in MIRRORED.BY.
+
 =item B<--updatedir>
 
 By default, C<sa-update> will use the system-wide rules update directory:
@@ -2159,7 +2228,7 @@ diagnostic output on channel, gpg, and http, use:
 
 For more information about which areas (also known as channels) are
 available, please see the documentation at
-L<http://wiki.apache.org/spamassassin/DebugChannels>.
+L<https://wiki.apache.org/spamassassin/DebugChannels>.
 
 =item B<-h>, B<--help>
 
@@ -2196,7 +2265,7 @@ Mail::SpamAssassin(3)
 Mail::SpamAssassin::Conf(3)
 spamassassin(1)
 spamd(1)
-<http://wiki.apache.org/spamassassin/RuleUpdates>
+<https://wiki.apache.org/spamassassin/RuleUpdates>
 
 =head1 PREREQUISITES
 
@@ -2204,7 +2273,7 @@ C<Mail::SpamAssassin>
 
 =head1 BUGS
 
-See <http://issues.apache.org/SpamAssassin/>
+See <https://issues.apache.org/SpamAssassin/>
 
 =head1 AUTHORS
 

@@ -27,6 +27,7 @@ lib/Sub/HandlesVia/HandlerLibrary/Code.pm
 lib/Sub/HandlesVia/HandlerLibrary/Code.pod
 lib/Sub/HandlesVia/HandlerLibrary/Counter.pm
 lib/Sub/HandlesVia/HandlerLibrary/Counter.pod
+lib/Sub/HandlesVia/HandlerLibrary/Enum.pm
 lib/Sub/HandlesVia/HandlerLibrary/Hash.pm
 lib/Sub/HandlesVia/HandlerLibrary/Hash.pod
 lib/Sub/HandlesVia/HandlerLibrary/Number.pm
@@ -126,7 +127,9 @@ t/09barebones.t
 t/10barebones_eagerbuilder.t
 t/11delegation.t
 t/12slotaccess.t
+t/14enum.t
 t/15preludes.t
+t/16stackqueue.t
 t/20moosex_extended.t
 t/30egpod/array.t
 t/30egpod/bool.t

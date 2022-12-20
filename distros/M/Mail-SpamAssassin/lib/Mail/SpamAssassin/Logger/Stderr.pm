@@ -36,6 +36,7 @@ use re 'taint';
 
 use POSIX ();
 use Time::HiRes ();
+use Mail::SpamAssassin::Logger;
 
 our @ISA = ();
 
@@ -59,6 +60,7 @@ sub new {
 
   my %params = @_;
   $self->{timestamp_fmt} = $params{timestamp_fmt};
+  $self->{escape} = $params{escape} if exists $params{escape};
 
   return($self);
 }
@@ -82,6 +84,16 @@ sub log_message {
     $timestamp = POSIX::strftime($fmt, localtime($now));
   }
   $timestamp .= ' '  if $timestamp ne '';
+
+  if ($self->{escape}) {
+    # Bug 6583, escape
+    Mail::SpamAssassin::Logger::escape_str($msg);
+  } elsif (!exists $self->{escape}) {
+    # Backwards compatible pre-4.0 escaping, if $escape not given.
+    # replace control characters with "_", tabs and spaces get
+    # replaced with a single space.
+    $msg =~ tr/\x09\x20\x00-\x1f/  _/s;
+  }
 
   my($nwrite) = syswrite(STDERR, sprintf("%s[%d] %s: %s%s",
                                          $timestamp, $$, $level, $msg, $eol));

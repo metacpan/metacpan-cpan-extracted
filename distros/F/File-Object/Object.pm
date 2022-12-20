@@ -8,7 +8,7 @@ use Error::Pure qw(err);
 use File::Spec::Functions qw(catdir catfile splitdir);
 use FindBin qw($Bin $Script);
 
-our $VERSION = 0.15;
+our $VERSION = 0.17;
 
 # Constructor.
 sub new {
@@ -267,6 +267,11 @@ File::Object - Object system for filesystem paths.
  my $self = $obj->set;
  my $self = $obj->up($num);
 
+=head1 DESCRIPTION
+
+This provides an object oriented interface to file/directory paths, such as
+actual, parent or explicit directory and relative paths to them.
+
 =head1 METHODS
 
 =head2 C<new>
@@ -275,7 +280,7 @@ File::Object - Object system for filesystem paths.
 
 Constructor.
 
-Returns instance of object.
+Constructor parameters are:
 
 =over 8
 
@@ -302,6 +307,8 @@ Types:
 Default value is 'dir'.
 
 =back
+
+Returns instance of object.
 
 =head2 C<dir>
 
@@ -364,7 +371,7 @@ Returns instance of object.
 
  my $self = $obj->up($num);
 
-Go to $up_num upper directory.
+Go to upper directory/ies defined by C<$num> count. Default value is one.
 
 Returns instance of object.
 
@@ -383,6 +390,8 @@ Returns instance of object.
 
 =head1 EXAMPLE1
 
+=for comment filename=actual_directory.pl
+
  use strict;
  use warnings;
 
@@ -396,6 +405,8 @@ Returns instance of object.
 
 =head1 EXAMPLE2
 
+=for comment filename=parent_directory.pl
+
  use strict;
  use warnings;
 
@@ -408,6 +419,8 @@ Returns instance of object.
  # /usr/local
 
 =head1 EXAMPLE3
+
+=for comment filename=relative_file_path_to_defined_dir.pl
 
  use strict;
  use warnings;
@@ -434,6 +447,8 @@ Returns instance of object.
  # path\to\subdir\file2
 
 =head1 EXAMPLE4
+
+=for comment filename=relative_dir_path_to_defined_dir.pl
 
  use strict;
  use warnings;
@@ -478,6 +493,10 @@ portably perform operations on file names
 
 Cross-platform path specification manipulation
 
+=item L<Path::Tiny>
+
+File path utility
+
 =back
 
 =head1 REPOSITORY
@@ -492,12 +511,12 @@ L<http://skim.cz>
 
 =head1 LICENSE AND COPYRIGHT
 
-© Michal Josef Špaček 2009-2022
+© 2009-2022 Michal Josef Špaček
 
 BSD 2-Clause License
 
 =head1 VERSION
 
-0.15
+0.17
 
 =cut

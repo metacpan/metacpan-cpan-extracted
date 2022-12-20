@@ -9,6 +9,10 @@ use Venus::Class 'base';
 
 base 'Faker::Plugin::JaJp';
 
+# VERSION
+
+our $VERSION = '1.17';
+
 # METHODS
 
 sub execute {
@@ -36,6 +40,12 @@ Faker::Plugin::JaJp::AddressCitySuffix - Address City Suffix
 =head1 ABSTRACT
 
 Address City Suffix for Faker
+
+=cut
+
+=head1 VERSION
+
+1.17
 
 =cut
 

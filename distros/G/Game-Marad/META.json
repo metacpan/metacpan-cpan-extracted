@@ -22,6 +22,7 @@
       "runtime" : {
          "requires" : {
             "Object::Pad" : "0.52",
+            "Scalar::Util" : "0",
             "perl" : "v5.26.0"
          }
       },
@@ -34,7 +35,7 @@
    "provides" : {
       "Game::Marad" : {
          "file" : "lib/Game/Marad.pm",
-         "version" : "0.05"
+         "version" : "0.06"
       }
    },
    "release_status" : "stable",
@@ -46,6 +47,6 @@
          "url" : "https://thrig.me/src/Game-Marad.git"
       }
    },
-   "version" : "0.05",
+   "version" : "0.06",
    "x_serialization_backend" : "JSON::PP version 4.12"
 }

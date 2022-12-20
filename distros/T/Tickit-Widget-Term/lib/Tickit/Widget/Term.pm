@@ -1,16 +1,17 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2021-2022 -- leonerd@leonerd.org.uk
 
 use v5.26; # signatures
-use Object::Pad 0.51;
+use Object::Pad 0.73 ':experimental(init_expr)';
 
 use Syntax::Keyword::Match;
 
-package Tickit::Widget::Term 0.005;
+package Tickit::Widget::Term 0.006;
 class Tickit::Widget::Term
-   isa Tickit::Widget;
+   :strict(params)
+   :isa(Tickit::Widget);
 
 use constant WIDGET_PEN_FROM_STYLE => 1;
 use constant KEYPRESSES_FROM_STYLE => 1;
@@ -102,10 +103,10 @@ sub _coltopen ( $name, $col )
    );
 }
 
-has $_vterm;
-has $_screen;
+field $_vterm;
+field $_screen;
 
-ADJUSTPARAMS ( $params )
+ADJUST
 {
    $_vterm = Term::VTerm->new(
       rows => 1,
@@ -215,7 +216,7 @@ generated in response to some received query sequences.
 
 =cut
 
-has $_on_output :reader :writer :param = undef;
+field $_on_output :reader :writer :param = undef;
 
 =head2 flush
 
@@ -252,7 +253,7 @@ the terminal of its new output size.
 
 =cut
 
-has $_on_resize :reader :writer :param = undef;
+field $_on_resize :reader :writer :param = undef;
 
 # Various bits of PTY setup need access to the toplevel Tickit instance
 # for its event loop handling. We might not have that yet.
@@ -261,7 +262,7 @@ has $_on_resize :reader :writer :param = undef;
 # TODO: That we have to do this at all suggests an API shape problem in
 #   Tickit itself
 
-has @_on_tickit;
+field @_on_tickit;
 method _on_tickit ( $code )
 {
    if( my $win = $self->window ) {
@@ -282,8 +283,8 @@ method window_gained ( $win )
    }
 }
 
-has $_pty;
-has $_pty_read_watch;
+field $_pty;
+field $_pty_read_watch;
 
 =head2 use_pty
 

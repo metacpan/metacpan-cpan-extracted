@@ -1,6 +1,6 @@
 # NAME
 
-Socket::More - Interface and scoped passive addressing routines
+Socket::More - Interface scoped passive/listener addressing
 
 # SYNOPSIS
 
@@ -18,7 +18,7 @@ Or import any of the functions by name:
     use Socket::More qw<getifaddrs sockaddr_passive ...>;
 ```
 
-Simple list of all interfaces:
+Simple list of all network interfaces:
 
 ```perl
     #List basic interface information on all available interfaces
@@ -49,10 +49,12 @@ family, port  and paths are discarded:
 
 # DESCRIPTION
 
-This module makes it easier to generate the data structures to bind sockets on
-multiple addresses, socket types, and families (including unix) on a particular
-set of interfaces by name. It implements `sockaddr_passive`, which facilitates
-solutions to requirements like these:
+This module makes it easier to generate the data structures to bind multiple
+sockets of multiple addresses, types, and families (including unix) on a
+particular set of interfaces by name. 
+
+It implements `sockaddr_passive`, which facilitates solutions to requirements
+like these:
 
 ```
     'listen on interfaces eth0 and eth1, using IPv6 and port numbers 9090
@@ -65,17 +67,19 @@ solutions to requirements like these:
     ipv6 address'
 ```
 
-In order to achieve this, several 'inet.h' and similar routines are also
-implemented. This includes `getifaddrs`, `if_nametoindex`, `if_indextoname`,
-`if_nameindex`.
+In addition it also makes it easy to specify multiple listen/passive addresses
+from the command line, using concise key/value notation and string to socket
+family/type conversions.
 
-To help support using this module in an application, address family and socket
-type support functions for  string to constant mapping, constant to string
-mapping and command line parsing routines are also implemented.  Please see the
-[API](https://metacpan.org/pod/API) section for  a complete listing.
+It also makes it easy to generate 'random' ports to bind to, **before** your
+program binds, to aid in testing scenarios.
+
+Several 'inet.h' and similar routines are also implemented (eg `getifaddrs`,
+`if_nametoindex`, `if_indextoname`, `if_nameindex`).
 
 No symbols are exported by default. All symbols can be exported with the ":all"
-tag or individually by name.
+tag or individually by name.  Please see the [API](https://metacpan.org/pod/API) section for a complete
+listing.
 
 # MOTIVATION
 
@@ -457,6 +461,51 @@ Returns true if at least one IPv4 interface was found. False otherwise.
 ```
 
 Returns true if at least one IPv6 interface was found. False otherwise.
+
+## reify\_ports
+
+```perl
+reify_ports $specs, ...
+
+example:
+  reify_ports {address=>"127.0.0.1", port=>0}
+```
+
+Iterates through list of specifications and replacing `port` fields equal to 0
+(any port), with a 'random' one supplied by the operating system. This performs
+a `sockaddr_passive` call to to 'flatten' any internal structures in the
+specifications provided. 
+
+This works by taking the first entry which results in a 0 port number, creating a
+socket and binding it. The 0 port will result in the OS choosing a port for
+use.  The resulting port is extracted from the socket (getsocketname) and
+replaces the 0 port value in **all** the specification entries. The socket has
+`SO_REUSEADDR` applied to ensure it can be bound again immediately.
+
+If the specifications request two or more  0 ports in otherwise identical
+specifications, it is up the user to choose how to handle any duplicate bind
+complications (i.e `SO_REUSEPORT`)
+
+**NOTE:** There is a chance that another program can use the port number
+returned after a call to `reify_ports`.
+
+**NOTE:** The interface/address tested to generate the random port might return
+a port which is already in use on other interfaces.
+
+## reify\_ports\_unshared
+
+```perl
+  reify_ports_chaos $specs, ...
+
+example:
+  reify_ports {address=>"127.0.0.1", port=>[0,0]};
+  reify_ports {address=>"127.0.0.1", port=>0}, {port=>0};
+```
+
+Operates like `reify_ports` with the exception that all 0 port entries in the
+specifications cause a query to the OS. The port numbers are not explicitly
+'shared' between specifications, thus returning potentially (most likely)
+different port numbers for each entry.
 
 # EXAMPLES
 

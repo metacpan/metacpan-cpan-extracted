@@ -7,9 +7,9 @@ use warnings;
 use Exporter 'import';
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-12-09'; # DATE
+our $DATE = '2022-12-19'; # DATE
 our $DIST = 'Perinci-Sub-Normalize'; # DIST
-our $VERSION = '0.204'; # VERSION
+our $VERSION = '0.207'; # VERSION
 
 our @EXPORT_OK = qw(
                        normalize_function_metadata
@@ -21,30 +21,31 @@ sub _check {
   CHECK_ARGS: {
         my $argspecs = $meta->{args};
       CHECK_ARGS_POS: {
-            my @pos;
+            my @arg_at_pos;
             my $slurpy_pos;
             for my $argname (keys %$argspecs) {
                 my $argspec = $argspecs->{$argname};
                 if (defined $argspec->{pos}) {
                     return "Argument $argname: Negative pos" if $argspec->{pos} < 0;
-                    return "Duplicate position $argspec->{pos}" if defined $pos[ $argspec->{pos} ];
-                    $pos[ $argspec->{pos} ] = $argname;
+                    return "Duplicate argument position $argspec->{pos} (arg $argname vs $arg_at_pos[$argspec->{pos}])" if defined $arg_at_pos[ $argspec->{pos} ];
+                    $arg_at_pos[ $argspec->{pos} ] = $argname;
                 }
                 if ($argspec->{slurpy} || $argspec->{greedy}) { # greedy is deprecated, but we should keep observing to make us properly strict
                     return "Argument $argname: slurpy=1 without setting pos"
                         unless defined $argspec->{pos};
                     return "Multiple args with slurpy=1" if defined $slurpy_pos;
+                    $slurpy_pos = $argspec->{pos};
                 }
             }
-            if (defined $slurpy_pos && $slurpy_pos < @pos) {
-                return "Clash of argument positions: slurpy=1 defined for pos >= $slurpy_pos but there is another argument with pos > $slurpy_pos";
+            if (defined $slurpy_pos && $slurpy_pos < @arg_at_pos-1) {
+                return "Clash of argument positions: slurpy=1 defined for pos=$slurpy_pos but there is another argument with pos > $slurpy_pos";
             }
             # we have holes
             return "There needs to be more arguments that define pos"
-                if grep { !defined } @pos;
+                if grep { !defined } @arg_at_pos;
             if ($meta->{args_as} && $meta->{args_as} =~ /\Aarray(ref)?\z/) {
                 return "Function accepts array/arrayref but there are arguments with no pos defined"
-                    if scalar(keys %$argspecs) > @pos;
+                    if scalar(keys %$argspecs) > @arg_at_pos;
             }
         }
     }
@@ -207,7 +208,7 @@ Perinci::Sub::Normalize - Normalize Rinci function metadata
 
 =head1 VERSION
 
-This document describes version 0.204 of Perinci::Sub::Normalize (from Perl distribution Perinci-Sub-Normalize), released on 2022-12-09.
+This document describes version 0.207 of Perinci::Sub::Normalize (from Perl distribution Perinci-Sub-Normalize), released on 2022-12-19.
 
 =head1 SYNOPSIS
 

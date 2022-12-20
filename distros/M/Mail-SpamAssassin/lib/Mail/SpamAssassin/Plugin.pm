@@ -427,10 +427,39 @@ The C<Mail::SpamAssassin::PerMsgStatus> context object for this scan.
 
 =back
 
+=item $plugin->check_dnsbl ( { options ... } )
+
+Called when DNSBL or other network lookups are being launched, implying
+current running priority of -100.  This is the place to start your own
+asynchronously-started network lookups.
+
+=over 4
+
+=item permsgstatus
+
+The C<Mail::SpamAssassin::PerMsgStatus> context object for this scan.
+
+=back
+
 =item $plugin->check_post_dnsbl ( { options ... } )
 
 Called after the DNSBL results have been harvested.  This is a good
 place to harvest your own asynchronously-started network lookups.
+
+=over 4
+
+=item permsgstatus
+
+The C<Mail::SpamAssassin::PerMsgStatus> context object for this scan.
+
+=back
+
+=item $plugin->check_cleanup ( { options ... } )
+
+Called just before message check is finishing and before possible
+auto-learning.  This is guaranteed to be always called, unlike check_tick
+and check_post_dnsbl.  Used for cleaning up left callbacks or forked
+children etc, last chance to make rules hit.
 
 =over 4
 
@@ -817,7 +846,9 @@ Reference to the original message object.
 
 =back
 
-=item $plugin->whitelist_address( { options ... } )
+=item $plugin->welcomelist_address( { options ... } )
+
+Previously whitelist_address which will work interchangeably until 4.1.
 
 Called when a request is made to add an address to a
 persistent address list.
@@ -834,7 +865,9 @@ Indicate if the call is being made from a command line interface.
 
 =back
 
-=item $plugin->blacklist_address( { options ... } )
+=item $plugin->blocklist_address( { options ... } )
+
+Previously blacklist_address which will work interchangeably until 4.1.
 
 Called when a request is made to add an address to a
 persistent address list.
@@ -882,7 +915,7 @@ only spamd calls this API.
 =item result
 
 The C<'result: ...'> line for this scan.  Format is as described
-at B<http://wiki.apache.org/spamassassin/SpamdSyslogFormat>.
+at B<https://wiki.apache.org/spamassassin/SpamdSyslogFormat>.
 
 =back
 
@@ -1013,17 +1046,27 @@ to receive specific events, or control the callback chain behaviour.
 
 =over 4
 
-=item $plugin->register_eval_rule ($nameofevalsub)
+=item $plugin->register_eval_rule ($nameofevalsub, $ruletype)
 
 Plugins that implement an eval test will need to call this, so that
 SpamAssassin calls into the object when that eval test is encountered.
 See the B<REGISTERING EVAL RULES> section for full details.
 
+Since 4.0, optional $ruletype can be specified to enforce that eval function
+cannot be called with wrong ruletype from configuration, for example user
+using "header FOO eval:foobar()" instead of "body FOO eval:foobar()". 
+Mismatch will result in lint failure. $ruletype can be one of:
+
+  $Mail::SpamAssassin::Conf::TYPE_HEAD_EVALS
+  $Mail::SpamAssassin::Conf::TYPE_BODY_EVALS  (allows both body and rawbody)
+  $Mail::SpamAssassin::Conf::TYPE_RAWBODY_EVALS
+  $Mail::SpamAssassin::Conf::TYPE_FULL_EVALS
+
 =cut
 
 sub register_eval_rule {
-  my ($self, $nameofsub) = @_;
-  $self->{main}->{conf}->register_eval_rule ($self, $nameofsub);
+  my ($self, $nameofsub, $ruletype) = @_;
+  $self->{main}->{conf}->register_eval_rule ($self, $nameofsub, $ruletype);
 }
 
 =item $plugin->register_generated_rule_method ($nameofsub)
@@ -1132,7 +1175,7 @@ called from rules in the configuration files, in the plugin class' constructor.
 
 For example,
 
-  $plugin->register_eval_rule ('check_for_foo')
+  $plugin->register_eval_rule ('check_for_foo', $Mail::SpamAssassin::Conf::TYPE_HEAD_EVALS)
 
 will cause C<$plugin-E<gt>check_for_foo()> to be called for this
 SpamAssassin rule:
@@ -1157,17 +1200,20 @@ In other words, the eval test method should look something like this:
 
   sub check_for_foo {
     my ($self, $permsgstatus, ...arguments...) = @_;
-    ...code returning 0 or 1
+    ...code returning 0 (miss), 1 (hit), or undef (async function)
   }
+
+The eval rule should return C<1> for a hit, or C<0> if the rule is not hit. 
+Special case of "return undef" must be used when result is not yet ready and
+it will be later declared with PerMsgStatus functions got_hit() or
+rule_ready() - see their documentation for more info.  Make sure not to
+return undef by mistake.
 
 Note that the headers can be accessed using the C<get()> method on the
 C<Mail::SpamAssassin::PerMsgStatus> object, and the body by
 C<get_decoded_stripped_body_text_array()> and other similar methods.
 Similarly, the C<Mail::SpamAssassin::Conf> object holding the current
 configuration may be accessed through C<$permsgstatus-E<gt>{main}-E<gt>{conf}>.
-
-The eval rule should return C<1> for a hit, or C<0> if the rule
-is not hit.
 
 State for a single message being scanned should be stored on the C<$permsgstatus>
 object, not on the C<$self> object, since C<$self> persists between scan
@@ -1216,8 +1262,8 @@ Mail::SpamAssassin(3)
 
 Mail::SpamAssassin::PerMsgStatus(3)
 
-http://wiki.apache.org/spamassassin/PluginWritingTips
+https://wiki.apache.org/spamassassin/PluginWritingTips
 
-http://issues.apache.org/SpamAssassin/show_bug.cgi?id=2163
+https://issues.apache.org/SpamAssassin/show_bug.cgi?id=2163
 
 =cut

@@ -30,6 +30,15 @@
 /* Define to 1 if you have the `calloc' function. */
 #undef HAVE_CALLOC
 
+/* Define to 1 if you have the `CONF_modules_unload' function. */
+#undef HAVE_CONF_MODULES_UNLOAD
+
+/* Define to 1 if you have the `CRYPTO_cleanup_all_ex_data' function. */
+#undef HAVE_CRYPTO_CLEANUP_ALL_EX_DATA
+
+/* Define to 1 if you have the `CRYPTO_memcmp' function. */
+#undef HAVE_CRYPTO_MEMCMP
+
 /* Define to 1 if you have the `ctime_r' function. */
 #undef HAVE_CTIME_R
 
@@ -38,6 +47,10 @@
 
 /* Is a CAPATH given at configure time */
 #undef HAVE_DANE_CA_PATH
+
+/* Define to 1 if you have the declaration of `EVP_PKEY_base_id', and to 0 if
+   you don't. */
+#undef HAVE_DECL_EVP_PKEY_BASE_ID
 
 /* Define to 1 if you have the declaration of `NID_ED25519', and to 0 if you
    don't. */
@@ -79,11 +92,20 @@
 /* Define to 1 if you have the `endservent' function. */
 #undef HAVE_ENDSERVENT
 
-/* Define to 1 if you have the `ENGINE_load_cryptodev' function. */
-#undef HAVE_ENGINE_LOAD_CRYPTODEV
+/* Define to 1 if you have the `ENGINE_cleanup' function. */
+#undef HAVE_ENGINE_CLEANUP
+
+/* Define to 1 if you have the `ENGINE_free' function. */
+#undef HAVE_ENGINE_FREE
+
+/* Define to 1 if you have the `ERR_free_strings' function. */
+#undef HAVE_ERR_FREE_STRINGS
 
 /* Define to 1 if you have the `ERR_load_crypto_strings' function. */
 #undef HAVE_ERR_LOAD_CRYPTO_STRINGS
+
+/* Define to 1 if you have the `EVP_cleanup' function. */
+#undef HAVE_EVP_CLEANUP
 
 /* Define to 1 if you have the `EVP_dss1' function. */
 #undef HAVE_EVP_DSS1
@@ -91,8 +113,11 @@
 /* Define to 1 if you have the `EVP_MD_CTX_new' function. */
 #undef HAVE_EVP_MD_CTX_NEW
 
-/* Define to 1 if you have the `EVP_PKEY_base_id' function. */
+/* Define to 1 if you have the EVP_PKEY_base_id function or macro. */
 #undef HAVE_EVP_PKEY_BASE_ID
+
+/* Define to 1 if you have the `EVP_PKEY_get_base_id' function. */
+#undef HAVE_EVP_PKEY_GET_BASE_ID
 
 /* Define to 1 if you have the `EVP_PKEY_keygen' function. */
 #undef HAVE_EVP_PKEY_KEYGEN
@@ -112,6 +137,9 @@
 /* Define to 1 if you have the `fork' function. */
 #undef HAVE_FORK
 
+/* if fork is available for compile */
+#undef HAVE_FORK_AVAILABLE
+
 /* Whether getaddrinfo is available */
 #undef HAVE_GETADDRINFO
 
@@ -120,9 +148,6 @@
 
 /* Define to 1 if you have the `gmtime_r' function. */
 #undef HAVE_GMTIME_R
-
-/* If you have HMAC_Update */
-#undef HAVE_HMAC_UPDATE
 
 /* Define to 1 if you have the `inet_aton' function. */
 #undef HAVE_INET_ATON
@@ -153,10 +178,6 @@
 
 /* Define to 1 if you have the `localtime_r' function. */
 #undef HAVE_LOCALTIME_R
-
-/* Define to 1 if your system has a GNU libc compatible `malloc' function, and
-   to 0 otherwise. */
-#undef HAVE_MALLOC
 
 /* Define to 1 if you have the `memmove' function. */
 #undef HAVE_MEMMOVE
@@ -200,8 +221,17 @@
 /* Define to 1 if you have the <net/if.h> header file. */
 #undef HAVE_NET_IF_H
 
+/* Define to 1 if you have the <openssl/conf.h> header file. */
+#undef HAVE_OPENSSL_CONF_H
+
+/* Define to 1 if you have the <openssl/engine.h> header file. */
+#undef HAVE_OPENSSL_ENGINE_H
+
 /* Define to 1 if you have the <openssl/err.h> header file. */
 #undef HAVE_OPENSSL_ERR_H
+
+/* Define to 1 if you have the <openssl/evp.h> header file. */
+#undef HAVE_OPENSSL_EVP_H
 
 /* Define to 1 if you have the `OPENSSL_init_crypto' function. */
 #undef HAVE_OPENSSL_INIT_CRYPTO
@@ -226,10 +256,6 @@
 
 /* Define to 1 if you have the `random' function. */
 #undef HAVE_RANDOM
-
-/* Define to 1 if your system has a GNU libc compatible `realloc' function,
-   and to 0 otherwise. */
-#undef HAVE_REALLOC
 
 /* Define to 1 if you have the `sleep' function. */
 #undef HAVE_SLEEP
@@ -281,6 +307,9 @@
 
 /* define if you have sys/types.h */
 #undef HAVE_SYS_TYPES_H
+
+/* Define to 1 if you have the <TargetConditionals.h> header file. */
+#undef HAVE_TARGETCONDITIONALS_H
 
 /* Define to 1 if you have the `timegm' function. */
 #undef HAVE_TIMEGM
@@ -356,6 +385,9 @@
 
 /* Define this to enable RR type RKEY. */
 #undef RRTYPE_RKEY
+
+/* Define this to enable RR types SVCB and HTTPS. */
+#undef RRTYPE_SVCB_HTTPS
 
 /* Define this to enable RR type TA. */
 #undef RRTYPE_TA
@@ -482,14 +514,8 @@
 /* Define to `size_t' if <sys/types.h> does not define. */
 #undef intptr_t
 
-/* Define to rpl_malloc if the replacement function should be used. */
-#undef malloc
-
 /* Define to `int' if <sys/types.h> does not define. */
 #undef pid_t
-
-/* Define to rpl_realloc if the replacement function should be used. */
-#undef realloc
 
 /* Define to `unsigned int' if <sys/types.h> does not define. */
 #undef size_t

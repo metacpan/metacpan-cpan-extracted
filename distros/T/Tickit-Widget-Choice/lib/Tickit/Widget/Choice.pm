@@ -1,13 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2014-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2014-2022 -- leonerd@leonerd.org.uk
 
 use v5.26; # signatures
-use Object::Pad 0.57;
+use Object::Pad 0.73 ':experimental(adjust_params init_expr)';
 
-package Tickit::Widget::Choice 0.06;
+package Tickit::Widget::Choice 0.07;
 class Tickit::Widget::Choice
+   :strict(params)
    :isa(Tickit::Widget);
 
 use Carp;
@@ -76,14 +77,15 @@ event handler.
 
 =cut
 
-has @_choices;
-has $_on_changed :param = undef;
+field @_choices;
+field $_on_changed :param = undef;
 
-has $_chosen;
+field $_chosen;
 
-ADJUSTPARAMS ( $params )
-{
-   $self->push_choice( @$_ ) for @{ delete $params->{choices} || [] };
+ADJUST :params (
+   :$choices = []
+) {
+   $self->push_choice( @$_ ) for $choices->@*;
 }
 
 method lines () { 1 }
@@ -207,11 +209,11 @@ Display the popup menu in a modal float until a choice is made.
 
 =cut
 
-has $_menu;
+field $_menu;
 
 method popup_menu ()
 {
-   my $menu = $_menu = Tickit::Widget::Menu->new(
+   $_menu = Tickit::Widget::Menu->new(
       items => [ map {
          my ( $value, $caption ) = @$_;
          Tickit::Widget::Menu::Item->new(
@@ -227,9 +229,9 @@ method popup_menu ()
    my $top = -1;
    $top = 0 if $self->window->abs_top == 0;
 
-   $menu->popup( $self->window, $top, 0 );
+   $_menu->popup( $self->window, $top, 0 );
 
-   $menu->highlight_item( $_chosen );
+   $_menu->highlight_item( $_chosen );
 }
 
 method render_to_rb ( $rb, $rect )

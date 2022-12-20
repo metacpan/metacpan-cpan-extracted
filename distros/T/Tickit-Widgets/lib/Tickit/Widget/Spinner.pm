@@ -1,12 +1,13 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2022 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.57;
+use Object::Pad 0.75 ':experimental(adjust_params init_expr)';
 
-package Tickit::Widget::Spinner 0.35;
+package Tickit::Widget::Spinner 0.36;
 class Tickit::Widget::Spinner
+   :strict(params)
    :isa(Tickit::Widget);
 
 use experimental 'postderef';
@@ -70,24 +71,23 @@ Optional. The time each string is displayed for. Defaults to 0.5.
 
 =cut
 
-has @_chars;
-has $_state = 0;
-has $_interval :param = 0.5;
-has $_cols;
+field @_chars;
+field $_state = 0;
+field $_interval :param //= 0.5;
+field $_cols;
 
-ADJUSTPARAMS
-{
-   my ( $params ) = @_;
-
-   @_chars = $params->{chars} ? $params->{chars}->@* : (qw( - \ | / ));
+ADJUST :params (
+   :$chars = [qw( - \ | / )],
+) {
+   @_chars = $chars->@*;
 
    $_cols = max map { textwidth $_ } @_chars;
 }
 
-has $_running;
-has $_x;
-has $_y;
-has $_rect;
+field $_running;
+field $_x;
+field $_y;
+field $_rect;
 
 =head1 METHODS
 

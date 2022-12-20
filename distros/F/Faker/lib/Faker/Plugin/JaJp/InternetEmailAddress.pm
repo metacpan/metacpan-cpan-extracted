@@ -9,6 +9,10 @@ use Venus::Class 'base';
 
 base 'Faker::Plugin::JaJp';
 
+# VERSION
+
+our $VERSION = '1.17';
+
 # METHODS
 
 sub execute {
@@ -55,6 +59,12 @@ Faker::Plugin::JaJp::InternetEmailAddress - Internet Email Address
 =head1 ABSTRACT
 
 Internet Email Address for Faker
+
+=cut
+
+=head1 VERSION
+
+1.17
 
 =cut
 

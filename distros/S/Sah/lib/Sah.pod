@@ -24,7 +24,7 @@ Sah - Schema for data structures (specification)
 
 =head1 VERSION
 
-This document describes version 0.9.50 of Sah (from Perl distribution Sah), released on 2021-07-20.
+This document describes version 0.9.51 of Sah (from Perl distribution Sah), released on 2022-10-21.
 
 =head1 STATUS
 
@@ -51,12 +51,9 @@ Sah schemas are regular data structures, specifically arrays:
 
  [TYPE_NAME, CLAUSE_SET]
 
-C<TYPE_NAME> is a string, C<CLAUSE_SET> is a hash of clauses. The old form:
+C<TYPE_NAME> is a string, C<CLAUSE_SET> is a hash of clauses.
 
- [TYPE_NAME, CLAUSE_SET, EXTRAS]
-
-(where EXTRAS is a hash) is deprecated but still supported, although EXTRAS is
-ignored. Some examples:
+Some examples:
 
  ["int", {"min": 0, "max": 100}]
 
@@ -199,8 +196,8 @@ Examples of invalid data:
 It is up to the implementation where the base schemas should be stored. The
 L<Data::Sah> implementation looks up base schemas in C<Sah::Schema::*> modules
 in the C<$schema> package variables. Old specification of Sah allows base
-schemas to be put in the schema itself in the extras part, but for simplicity
-this has been removed.
+schemas to be put in the schema itself in the so-called "e.xtras" part, but for
+simplicity this has been removed in later specification.
 
 =head1 CLAUSE AND CLAUSE SET
 
@@ -627,16 +624,6 @@ len(ARRAY) will return the number of elements in the ARRAY, while len(STR) will
 return the number of characters in the string. However, when an inappropriate
 argument is given, an exception will be thrown.
 
-=head1 HISTORY
-
-2012-07-21 split specification to Sah
-
-2011-11-23 Data::Sah
-
-2009-03-30 Data::Schema (first CPAN release)
-
-Previous incarnation as Schema-Nested (internal)
-
 =head1 HOMEPAGE
 
 Please visit the project's homepage at L<https://metacpan.org/release/Sah>.
@@ -645,6 +632,56 @@ Please visit the project's homepage at L<https://metacpan.org/release/Sah>.
 
 Source repository is at L<https://github.com/perlancar/perl-Sah>.
 
+=head1 SEE ALSO
+
+L<DefHash>
+
+L<Sah::Type>, L<Sah::FAQ>
+
+=head1 HISTORY
+
+=head2 2012-07-21
+
+Split specification to Sah.
+
+=head2 2011-11-23
+
+L<Data::Sah>.
+
+=head2 2009-03-30
+
+Data::Schema (first CPAN release). Previous incarnation as Schema-Nested
+(internal).
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 CONTRIBUTING
+
+
+To contribute, you can send patches by email/via RT, or send pull requests on
+GitHub.
+
+Most of the time, you don't need to build the distribution yourself. You can
+simply modify the code, then test via:
+
+ % prove -l
+
+If you want to build the distribution (e.g. to try to install it locally on your
+system), you can install L<Dist::Zilla>,
+L<Dist::Zilla::PluginBundle::Author::PERLANCAR>,
+L<Pod::Weaver::PluginBundle::Author::PERLANCAR>, and sometimes one or two other
+Dist::Zilla- and/or Pod::Weaver plugins. Any additional steps required beyond
+that are considered a bug and can be reported to me.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2022, 2020, 2019, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar <perlancar@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
 =head1 BUGS
 
 Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Sah>
@@ -652,22 +689,5 @@ Please report any bugs or feature requests on the bugtracker website L<https://r
 When submitting a bug or request, please include a test-file or a
 patch to an existing test-file that illustrates the bug or desired
 feature.
-
-=head1 SEE ALSO
-
-L<DefHash>
-
-L<Sah::Type>, L<Sah::FAQ>
-
-=head1 AUTHOR
-
-perlancar <perlancar@cpan.org>
-
-=head1 COPYRIGHT AND LICENSE
-
-This software is copyright (c) 2021, 2020, 2019, 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
-
-This is free software; you can redistribute it and/or modify it under
-the same terms as the Perl 5 programming language system itself.
 
 =cut

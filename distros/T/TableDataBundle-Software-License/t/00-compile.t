@@ -6,9 +6,10 @@ use warnings;
 
 use Test::More;
 
-plan tests => 2 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 3 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
+    'TableData/Software/License/FromRPL.pm',
     'TableData/Software/License/FromSL.pm',
     'TableDataBundle/Software/License.pm'
 );

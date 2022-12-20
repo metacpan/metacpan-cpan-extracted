@@ -217,6 +217,8 @@ man:
 	LABELS_ALLOW_UNDERSCORE="${LABELS_ALLOW_UNDERSCORE}" \
 	${MAKE} -f Makefile.bsd -C docs VERSION=${VERSION}
 
+csv: auto tld-domains
+
 auto:
 	${PERL} util/gentld.pl include/eav/auto_tld.h src/auto_tld.c \
 		data/punycode.csv
@@ -251,7 +253,7 @@ libeav.pc: libeav.pc.in
 #----------------------------------------------------------#
 
 clean: clean-tests clean-bin
-	# cleanup
+	# === cleanup
 	${RM} ${DLL_TARGET} ${LIB_TARGET} ${OBJECTS} libeav.pc
 
 clean-tests:
@@ -332,7 +334,22 @@ install-bin: $(BIN_TARGET)
 	RFC6531_FOLLOW_RFC5322="${RFC6531_FOLLOW_RFC5322}" \
 	RFC6531_FOLLOW_RFC20="${RFC6531_FOLLOW_RFC20}" \
 	LABELS_ALLOW_UNDERSCORE="${LABELS_ALLOW_UNDERSCORE}" \
-	$(MAKE) -f Makefile.bsd -C bin install DESTDIR=$(DESTDIR)
+	${MAKE} -f Makefile.bsd -C bin install DESTDIR=$(DESTDIR)
+
+install-bin-static: $(BIN_TARGET)
+	env _defs="${DEFS}" \
+	_libs="${LIBS}" \
+	_pkg_config="${PKG_CONFIG}" \
+	_install="${INSTALL}" \
+	_idnkit_dir="${IDNKIT_DIR}" \
+	_destdir="${DESTDIR}" \
+	_objects="${OBJECTS}" \
+	_libpath="${LIB_PATH}" \
+	_withidn="${WITH_IDN}" \
+	RFC6531_FOLLOW_RFC5322="${RFC6531_FOLLOW_RFC5322}" \
+	RFC6531_FOLLOW_RFC20="${RFC6531_FOLLOW_RFC20}" \
+	LABELS_ALLOW_UNDERSCORE="${LABELS_ALLOW_UNDERSCORE}" \
+	${MAKE} -f Makefile.bsd -C bin install-static DESTDIR=$(DESTDIR)
 
 install-libs: install-shared install-static libeav.pc
 	$(INSTALL) -d $(DATAROOTDIR)/pkgconfig
@@ -361,4 +378,31 @@ install-man:
 
 #----------------------------------------------------------#
 
-.PHONY: all debug check clean docs install libs libeav.pc
+uninstall: uninstall-bin
+	# === uninstalling ...
+	${RM} $(DATAROOTDIR)/pkgconfig/libeav.pc
+	${RM} $(INCLUDEDIR)/eav.h
+	${RM} $(LIBDIR)/$(LIB_TARGET) \
+	$(LIBDIR)/$(DLL_TARGET).$(VERSION) \
+	$(LIBDIR)/$(DLL_TARGET).$(MAJOR_VERSION) \
+	$(LIBDIR)/$(DLL_TARGET)
+	${RM} $(MANDIR)/man3/libeav.3.gz
+
+uninstall-bin:
+	env _defs="${DEFS}" \
+	_libs="${LIBS}" \
+	_pkg_config="${PKG_CONFIG}" \
+	_install="${INSTALL}" \
+	_idnkit_dir="${IDNKIT_DIR}" \
+	_destdir="${DESTDIR}" \
+	_objects="${OBJECTS}" \
+	_libpath="${LIB_PATH}" \
+	_withidn="${WITH_IDN}" \
+	RFC6531_FOLLOW_RFC5322="${RFC6531_FOLLOW_RFC5322}" \
+	RFC6531_FOLLOW_RFC20="${RFC6531_FOLLOW_RFC20}" \
+	LABELS_ALLOW_UNDERSCORE="${LABELS_ALLOW_UNDERSCORE}" \
+	${MAKE} -f Makefile.bsd -C bin uninstall DESTDIR=$(DESTDIR)
+
+#----------------------------------------------------------#
+
+.PHONY: all debug check clean docs man install libs libeav.pc csv uninstall

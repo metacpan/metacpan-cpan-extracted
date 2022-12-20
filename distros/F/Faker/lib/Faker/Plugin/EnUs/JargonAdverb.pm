@@ -9,6 +9,10 @@ use Venus::Class 'base';
 
 base 'Faker::Plugin::EnUs';
 
+# VERSION
+
+our $VERSION = '1.17';
+
 # METHODS
 
 sub execute {
@@ -135,6 +139,12 @@ Faker::Plugin::EnUs::JargonAdverb - Jargon Adverb
 =head1 ABSTRACT
 
 Jargon Adverb for Faker
+
+=cut
+
+=head1 VERSION
+
+1.17
 
 =cut
 

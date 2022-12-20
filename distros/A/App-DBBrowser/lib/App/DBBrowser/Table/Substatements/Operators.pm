@@ -5,7 +5,7 @@ use warnings;
 use strict;
 use 5.014;
 
-use List::MoreUtils qw( any );
+use List::MoreUtils qw( any uniq );
 
 use Term::Choose         qw();
 use Term::Form::ReadLine qw();
@@ -77,6 +77,9 @@ sub choose_and_add_operator {
     else {
         $menu_addition = '=' . $sf->{i}{menu_addition};
         @operators_default = @{$sf->{o}{G}{operators}};
+        if ( $sf->{i}{driver} eq 'Firebird' ) {
+            @operators_default = uniq map { s/(?<=REGEXP)_i\z//; $_ } @operators_default;
+        }
         @operators_limited = ( " = ", " != ", " < ", " > ", " >= ", " <= ", "IN", "NOT IN" );
     }
     if ( $sf->{o}{enable}{'expand_' . $clause} ) {
@@ -199,7 +202,7 @@ sub __add_operator {
     }
     elsif ( $op =~ /REGEXP(_i)?\z/ ) {
         $sql->{$stmt} =~ s/ (?: (?<=\() | \s ) \Q$quote_col\E \z //x;
-        my $do_not_match_regexp = $op =~ /^NOT/       ? 1 : 0;
+        my $do_not_match_regexp = $op =~ /^NOT/ ? 1 : 0;
         my $case_sensitive      = $op =~ /REGEXP_i\z/ ? 0 : 1;
         my $regex_op;
         if ( ! eval {

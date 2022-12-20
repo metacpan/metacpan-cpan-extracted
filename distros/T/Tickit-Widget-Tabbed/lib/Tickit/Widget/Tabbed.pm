@@ -2,13 +2,14 @@
 #  as Perl itself)
 #
 #  (C) Tom Molesworth 2011,
-#      Paul Evans, 2011-2015 -- leonerd@leonerd.org.uk
+#      Paul Evans, 2011-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.57;
+use Object::Pad 0.73 ':experimental(init_expr adjust_params)';
 
-package Tickit::Widget::Tabbed 0.026;
+package Tickit::Widget::Tabbed 0.027;
 class Tickit::Widget::Tabbed
+        :strict(params)
         :isa(Tickit::ContainerWidget);
 
 Tickit::Widget->VERSION("0.12");
@@ -112,18 +113,18 @@ Takes the following named parameters:
 
 =cut
 
-has $_tab_class :param = undef;
+field $_tab_class :param = undef;
 method TAB_CLASS { $_tab_class || "Tickit::Widget::Tabbed::Tab" }
 
-has $_ribbon_class :param = undef;
+field $_ribbon_class :param = undef;
 method RIBBON_CLASS { $_ribbon_class || "Tickit::Widget::Tabbed::Ribbon" }
 
-has $_ribbon :reader;
+field $_ribbon :reader;
 
-has @_child_window_geometry;
+field @_child_window_geometry;
 
-ADJUSTPARAMS ( $params ) {
-        $self->tab_position(delete($params->{tab_position}) || 'top');
+ADJUST :params ( :$tab_position = "top" ) {
+        $self->tab_position($tab_position);
         # sets $_ribbon
 
         $_ribbon->set_style( $self->get_style_pen("ribbon")->getattrs );
@@ -247,7 +248,7 @@ Accessor for the tab position (top, left, right, bottom).
 
 =cut
 
-has $_tab_position;
+field $_tab_position;
 method tab_position ( $pos = return $_tab_position ) {
         my $orientation = ( $pos eq "top" or $pos eq "bottom" ) ? "horizontal" :
                           ( $pos eq "left" or $pos eq "right" ) ? "vertical" :
@@ -422,14 +423,14 @@ sub BUILDARGS ( $class, $tabbed, %args ) {
         return ( tabbed => $tabbed, %args );
 }
 
-has $_tabbed :param :weak;
+field $_tabbed :param :weak;
 
-has $_widget :param :reader;
-has $_label  :param :reader;
-has $_active        = 0;
+field $_widget :param :reader;
+field $_label  :param :reader;
+field $_active                = 0;
 
-has $_on_activated   :writer;
-has $_on_deactivated :writer;
+field $_on_activated   :writer;
+field $_on_deactivated :writer;
 
 =head2 index
 
@@ -455,7 +456,7 @@ Returns the current label text
 
 =cut
 
-has $_label_width;
+field $_label_width;
 
 method label_width () {
         return $_label_width //= textwidth( $_label );
@@ -530,7 +531,7 @@ pen on the tab, use the C<set_pen> method instead.
 
 =cut
 
-has $_pen :reader;
+field $_pen :reader;
 
 method _has_pen () { defined $_pen }
 

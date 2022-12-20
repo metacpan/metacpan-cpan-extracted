@@ -16,13 +16,13 @@ name: Tickit-Widget-SegmentDisplay
 provides:
   Tickit::Widget::SegmentDisplay:
     file: lib/Tickit/Widget/SegmentDisplay.pm
-    version: '0.08'
+    version: '0.09'
 requires:
-  Object::Pad: '0.57'
+  Object::Pad: '0.75'
   Tickit::Test: '0.12'
   Tickit::Widget: '0.36'
   perl: '5.026'
 resources:
   license: http://dev.perl.org/licenses/
-version: '0.08'
+version: '0.09'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,3 +1,10 @@
+Mon Dec 19 09:25:04 2022  Rob Lauer  <rlauer6@comcast.net>
+
+	[0.58 - min perl required]:
+	* VERSION: bump
+	* cpan/buildspec.yml: min perl 5.10
+	* cpan/requires: JSON::PP
+
 Sat Dec  3 14:09:29 2022  Rob Lauer  <rlauer6@comcast.net>
 
 	[0.57 - rpm packaging]:

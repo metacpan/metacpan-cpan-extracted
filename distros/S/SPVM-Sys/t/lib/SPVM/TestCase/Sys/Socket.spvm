@@ -59,9 +59,9 @@ class TestCase::Sys::Socket {
   static method htons : int () {
     {
       my $host_short = (short)20000;
-      my $net_short = Sys::Socket->htons($host_short);
+      my $net_short = Sys::Socket->htons((short)$host_short);
       
-      my $host_short_again = Sys::Socket->ntohs($net_short);
+      my $host_short_again = Sys::Socket->ntohs((short)$net_short);
       
       warn "\n[Test Output]htons:$host_short -> $net_short -> $host_short_again";
       
@@ -76,9 +76,9 @@ class TestCase::Sys::Socket {
     
     {
       my $host_short = (short)50000;
-      my $net_short = Sys::Socket->htons($host_short);
+      my $net_short = Sys::Socket->htons((short)$host_short);
       
-      my $host_short_again = Sys::Socket->ntohs($net_short);
+      my $host_short_again = Sys::Socket->ntohs((short)$net_short);
       
       warn "\n[Test Output]htons:$host_short -> $net_short -> $host_short_again";
       
@@ -97,9 +97,9 @@ class TestCase::Sys::Socket {
   static method ntohs : int () {
     {
       my $net_short = (short)8270;
-      my $host_short = Sys::Socket->ntohs($net_short);
+      my $host_short = Sys::Socket->ntohs((short)$net_short);
       
-      my $net_short_again = Sys::Socket->htons($host_short);
+      my $net_short_again = Sys::Socket->htons((short)$host_short);
       
       warn "\n[Test Output]ntohs:$net_short -> $host_short -> $net_short_again";
       
@@ -114,9 +114,9 @@ class TestCase::Sys::Socket {
     
     {
       my $net_short = (short)20675;
-      my $host_short = Sys::Socket->ntohs($net_short);
+      my $host_short = Sys::Socket->ntohs((short)$net_short);
       
-      my $net_short_again = Sys::Socket->htons($host_short);
+      my $net_short_again = Sys::Socket->htons((short)$host_short);
       
       warn "\n[Test Output]ntohs:$net_short -> $host_short -> $net_short_again";
       
@@ -714,7 +714,7 @@ class TestCase::Sys::Socket {
       return 0;
     }
     
-    unless (Sys::Socket->ntohs($result_address->sin_port) == $port) {
+    unless (Sys::Socket->ntohs((short)$result_address->sin_port) == $port) {
       return 0;
     }
     
@@ -759,7 +759,7 @@ class TestCase::Sys::Socket {
       return 0;
     }
     
-    unless (Sys::Socket->ntohs($result_address->sin_port) != 0) {
+    unless (Sys::Socket->ntohs((short)$result_address->sin_port) != 0) {
       return 0;
     }
     
@@ -1037,7 +1037,7 @@ class TestCase::Sys::Socket {
       
       my $port_net = $ai_addr->(Sys::Socket::Sockaddr::In)->sin_port;
 
-      my $port_host = Sys::Socket->ntohs($port_net);
+      my $port_host = (int)Sys::Socket->ntohs((short)$port_net);
       
       unless ($port_host == 80) {
         return 0;

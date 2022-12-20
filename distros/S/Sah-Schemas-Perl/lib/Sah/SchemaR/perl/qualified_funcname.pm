@@ -1,8 +1,11 @@
 ## no critic: TestingAndDebugging::RequireStrict
 package Sah::SchemaR::perl::qualified_funcname;
 
-our $DATE = '2022-09-11'; # DATE
-our $VERSION = '0.045'; # VERSION
+# preamble code
+no warnings 'experimental::regex_sets';
+
+our $DATE = '2022-12-16'; # DATE
+our $VERSION = '0.046'; # VERSION
 
 our $rschema = do{my$var={base=>"str",clsets_after_base=>[{description=>"\nCurrently function name is restricted to this regex:\n\n    \\A[A-Za-z_][A-Za-z_0-9]*\\z\n\nand package name is restricted to this regex:\n\n    [A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*\n\nThis schema includes syntax validity check only; it does not check whether the\nfunction actually exists.\n\n",match=>"\\A(?:[A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*::)[A-Za-z_]([A-Za-z_0-9]+)*\\z",summary=>"Perl function name qualified with a package name, e.g. Foo::subname"}],clsets_after_type=>['$var->{clsets_after_base}[0]'],"clsets_after_type.alt.merge.merged"=>['$var->{clsets_after_base}[0]'],resolve_path=>["str"],type=>"str",v=>2};$var->{clsets_after_type}[0]=$var->{clsets_after_base}[0];$var->{"clsets_after_type.alt.merge.merged"}[0]=$var->{clsets_after_base}[0];$var};
 
@@ -21,7 +24,7 @@ Sah::SchemaR::perl::qualified_funcname - Perl function name qualified with a pac
 
 =head1 VERSION
 
-This document describes version 0.045 of Sah::SchemaR::perl::qualified_funcname (from Perl distribution Sah-Schemas-Perl), released on 2022-09-11.
+This document describes version 0.046 of Sah::SchemaR::perl::qualified_funcname (from Perl distribution Sah-Schemas-Perl), released on 2022-12-16.
 
 =head1 DESCRIPTION
 

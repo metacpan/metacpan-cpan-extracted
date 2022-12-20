@@ -3,8 +3,9 @@ abstract: 'Find or build libgearman'
 author:
   - 'Thibault Duponchelle <thibault.duponchelle@gmail.com>'
 build_requires:
-  Alien::Boost: '0'
+  Alien::Boost::ProgramOptions: '0'
   Alien::Build::MM: '0.25'
+  Alien::Build::Plugin::Download::Negotiate: '1.30'
   Alien::Libevent: '0'
   Alien::OpenSSL: '0'
   Alien::curl: '0'
@@ -15,19 +16,21 @@ build_requires:
   Env::ShellWords: '0.01'
   HTTP::Tiny: '0.044'
   IO::Socket::SSL: '1.56'
-  Mojo::DOM58: '1.00'
+  IO::Zlib: '0'
+  Mojo::DOM: '0'
+  Mojolicious: '7.00'
+  Mozilla::CA: '0'
   Net::SSLeay: '1.49'
-  Sort::Versions: '0'
   URI: '0'
   URI::Escape: '0'
 configure_requires:
-  Alien::Boost: '0'
-  Alien::Build: '1.19'
+  Alien::Boost::ProgramOptions: '0'
   Alien::Build::MM: '0.25'
   Alien::Build::Plugin::Build::SearchDep: '0.35'
+  Alien::Build::Plugin::Download::GitHub: '0.09'
   ExtUtils::MakeMaker: '6.52'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.4702, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -48,12 +51,13 @@ resources:
   homepage: https://metacpan.org/release/Alien-Gearman
   license: http://dev.perl.org/licenses/
   repository: https://github.com/thibaultduponchelle/Alien-Gearman.git
-version: '2.3'
+version: '2.4'
 x_alienfile:
-  generated_by: 'Alien::Build::MM version 2.26'
+  generated_by: 'Alien::Build::MM version 2.74'
   requires:
     share:
-      Alien::Boost: '0'
+      Alien::Boost::ProgramOptions: '0'
+      Alien::Build::Plugin::Download::Negotiate: '1.30'
       Alien::Libevent: '0'
       Alien::OpenSSL: '0'
       Alien::curl: '0'
@@ -64,9 +68,11 @@ x_alienfile:
       Env::ShellWords: '0.01'
       HTTP::Tiny: '0.044'
       IO::Socket::SSL: '1.56'
-      Mojo::DOM58: '1.00'
+      IO::Zlib: '0'
+      Mojo::DOM: '0'
+      Mojolicious: '7.00'
+      Mozilla::CA: '0'
       Net::SSLeay: '1.49'
-      Sort::Versions: '0'
       URI: '0'
       URI::Escape: '0'
     system: {}

@@ -32,7 +32,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.31';
+our $VERSION = '0.34';
 
 use UI::Various::core;
 use UI::Various::Box;
@@ -100,9 +100,7 @@ sub _prepare($$$)
     # 2. determine active and/or marked (checkbox or radio button) columns
     #    (which need prefixes somewhere):
     my @active_column = (0) x $columns;
-    my @marked_column = (0) x $columns;
     my $active_columns = 0;
-    my $marked_width = 0;
     foreach my $column (0..($columns - 1))
     {
 	foreach (0..($rows - 1))
@@ -110,25 +108,19 @@ sub _prepare($$$)
 	    $_ = $self->field($_, $column);
 	    if (defined $_)
 	    {
-		$active_column[$column] = 1  if  $_->can('_process');
 		my $type = ref($_);
-		my $mw = ($type =~ m/::(?:Check|Radio)$/ ? 4 :
-			  0);
-		$marked_column[$column] > $mw
-		    or  $marked_column[$column] = $mw;
+		$active_column[$column] = 1
+		    if  $_->can('_process')  and  $type !~ m/::Listbox$/;
 	    }
 	}
 	$active_columns++  if  $active_column[$column];
-	$marked_width += $marked_column[$column];
     }
     $self->{_active} = \@active_column;	# keep list of active columns for _show
-    $self->{_marked} = \@marked_column;	# keep list of marked columns for _show
 
     # 3. determine needed width of each column for even distribution of widths:
     my $text_width =
 	$content_width
 	- $prefix_length * ($active_columns - 1)
-	- $marked_width
 	- $columns + 1;		# borders between columns (visible or not)
     $text_width > $columns  or  $text_width = $columns;
     my $even_width = int($text_width / $columns);
@@ -145,12 +137,9 @@ sub _prepare($$$)
 	    my ($w, $h) = $_->_prepare($width, $prefix_length);
 	    $max_width = $w  if  $max_width < $w;
 	}
-	if ($max_width < $even_width)
-	{
-	    $widths[$column] = $max_width;
-	    $free_space += $even_width - $max_width;
-	}
-	else
+	$free_space += $even_width - $max_width;
+	$widths[$column] = $max_width;
+	if ($max_width >= $even_width)
 	{   $need_max++;   }
     }
 
@@ -189,7 +178,10 @@ sub _prepare($$$)
     }
     $self->{_widths} = \@widths;	# keep computed widths for _show
 
-    # 5. now the height of each row can be computed:
+    # 5. now the height of each row can be computed and we can keep the
+    #    individual sizes:
+    $self->{_sizes} = [];
+    push @{$self->{_sizes}}, [([0,0]) x $self->columns] foreach 1..$self->rows;
     my @heights = ();
     foreach my $row (0..($rows - 1))
     {
@@ -200,6 +192,7 @@ sub _prepare($$$)
 	    defined $_  or  next;
 	    my ($w, $h) = $_->_prepare($widths[$column], $prefix_length);
 	    $max_height = $h  if  $max_height < $h;
+	    $self->{_sizes}[$row][$column] = [$w, $h];
 	}
 	push @heights, $max_height;
     }
@@ -211,7 +204,6 @@ sub _prepare($$$)
     --$columns;
     $w += $widths[$_] foreach (0..$columns);
     $w += $prefix_length * $active_columns;	# here we need the real count!
-    $w += $marked_width;
     $w += $columns;
     $w += 2  if  $self->border;
     $h += $heights[$_] foreach (0..($rows - 1));
@@ -270,7 +262,6 @@ sub _show($$$$$)
 	{
 	    $text .= $D{b8}  if  $column > 0;
 	    $text .= $D{B8} x $self->{_widths}[$column];
-	    $text .= $D{B8} x $self->{_marked}[$column];
 	    $text .= $D{B8} x length($blank) if $self->{_active}[$column];
 	}
 	$text .= $D{B9} . "\n";
@@ -286,7 +277,6 @@ sub _show($$$$$)
 	    {
 		$text .= $D{b5}  if  $column > 0;
 		$text .= $D{c5} x $self->{_widths}[$column];
-		$text .= $D{c5} x $self->{_marked}[$column];
 		$text .= $D{c5} x length($blank) if $self->{_active}[$column];
 	    }
 	    $text .= $D{b6} . "\n";
@@ -294,13 +284,12 @@ sub _show($$$$$)
 
 	# now for the content of the fields, which are returned in correct
 	# size by _show (and _format):
-	my $h = $self->{_heights}[$row];
+	my $hf = $self->{_heights}[$row];
 	# 3. concatenate fields of columns line by line in temporary array:
 	my @output = ();
 	my $border = $self->border ? $D{B5} : ' ';
 	foreach my $column (0..($self->columns - 1))
 	{
-	    my $w = $self->{_widths}[$column];
 	    $_ = $self->field($row, $column);
 	    my $prefix = '';
 	    if ($self->{_active}[$column])
@@ -317,11 +306,14 @@ sub _show($$$$$)
 		else
 		{   $prefix = $blank;   }
 	    }
+	    my ($w, $h) = @{$self->{_sizes}[$row][$column]};
+	    my $content = defined $_
+		?  $_->_show($prefix, $w, $h, $pre_active)
+		: $self->_format($prefix, '', '', ' ', '', '', 1, 1, 1);
+	    my $wf = $self->{_widths}[$column] + length($prefix);
 	    my @field =
 		split(m/\n/,
-		      defined $_
-		      ?  $_->_show($prefix, $w, $h, $pre_active)
-		      : $self->_format($prefix, '', '', ' ', '', '', $w, $h));
+		      $self->_format('', '', '', $content, '', '', $wf, $hf, 1));
 	    if ($column > 0)
 	    {   $output[$_] .= $border . $field[$_]  foreach  (0..$#field);   }
 	    else
@@ -343,7 +335,6 @@ sub _show($$$$$)
 	{
 	    $text .= $D{b2}  if  $column > 0;
 	    $text .= $D{B2} x $self->{_widths}[$column];
-	    $text .= $D{B2} x $self->{_marked}[$column];
 	    $text .= $D{B2} x length($blank) if $self->{_active}[$column];
 	}
 	$text .= $D{B3} . "\n";

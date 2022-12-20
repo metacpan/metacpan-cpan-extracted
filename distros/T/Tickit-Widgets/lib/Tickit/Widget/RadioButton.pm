@@ -3,10 +3,11 @@
 #
 #  (C) Paul Evans, 2013-2022 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.57;
+use Object::Pad 0.73 ':experimental(init_expr)';
 
-package Tickit::Widget::RadioButton 0.35;
+package Tickit::Widget::RadioButton 0.36;
 class Tickit::Widget::RadioButton
+   :strict(params)
    :isa(Tickit::Widget);
 
 use Object::Pad qw( :experimental(init_expr) );
@@ -152,10 +153,10 @@ is passed to the group's C<on_changed> callback.
 
 =cut
 
-has $_label     :reader         :param;
-has $_on_toggle :reader :writer :param = undef;
-has $_value     :reader :writer :param = undef;
-has $_group     :reader         :param { Tickit::Widget::RadioButton::Group->new };
+field $_label     :reader         :param;
+field $_on_toggle :reader :writer :param = undef;
+field $_value     :reader :writer :param = undef;
+field $_group     :reader         :param = Tickit::Widget::RadioButton::Group->new;
 
 method lines
 {
@@ -347,8 +348,8 @@ Returns a new group.
 
 =cut
 
-   has $_active :reader;
-   has $_on_changed :reader :writer;
+   field $_active :reader;
+   field $_on_changed :reader :writer;
 
 =head2 active
 

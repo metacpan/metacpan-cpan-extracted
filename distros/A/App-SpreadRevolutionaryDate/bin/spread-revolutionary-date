@@ -2,7 +2,7 @@
 #
 # This file is part of App-SpreadRevolutionaryDate
 #
-# This software is Copyright (c) 2019 by Gérald Sédrati-Dinet.
+# This software is Copyright (c) 2019-2022 by Gérald Sédrati.
 #
 # This is free software, licensed under:
 #
@@ -33,7 +33,7 @@ spread-revolutionary-date - Spread date and time from Revolutionary (Republican)
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 DESCRIPTION
 
@@ -505,11 +505,11 @@ Because of the trick on prefix and suffix for feasts and the needed mapping for 
 
 =head1 AUTHOR
 
-Gérald Sédrati-Dinet <gibus@cpan.org>
+Gérald Sédrati <gibus@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Gérald Sédrati-Dinet.
+This software is Copyright (c) 2019-2022 by Gérald Sédrati.
 
 This is free software, licensed under:
 

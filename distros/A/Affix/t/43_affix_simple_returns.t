@@ -36,7 +36,8 @@ is ReturnNegShort(), -102, 'returning negative short works';
 #
 TODO: {
     sub ReturnByte : Signature([]=>Char) : Native('t/43_simple_returns');
-    local $TODO = 'platforms are might define a char any way they like';
+
+    #local $TODO = 'platforms are might define a char any way they like';
     is ReturnByte(), -103, 'returning char works';
     is ReturnByte(), -103, 'returning char works';
 }

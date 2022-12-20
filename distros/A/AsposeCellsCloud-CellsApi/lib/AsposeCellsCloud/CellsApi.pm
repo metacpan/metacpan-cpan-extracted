@@ -3377,6 +3377,635 @@ sub cells_charts_delete_worksheet_delete_chart {
     my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
     return $_response_object;
 }
+#
+# cells_charts_get_chart_category_axis
+#
+# Get chart Category Axis
+# 
+# @param string $name  (required)
+# @param string $sheet_name  (required)
+# @param int $chart_index  (required)
+# @param string $folder  (optional)
+# @param string $storage_name  (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'sheet_name' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'chart_index' => {
+        data_type => 'int',
+        description => '',
+        required => '1',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => '',
+        required => '0',
+    },
+    'storage_name' => {
+        data_type => 'string',
+        description => '',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'cells_charts_get_chart_category_axis' } = { 
+    	summary => 'Get chart Category Axis',
+        params => $params,
+        returns => 'AxisResponse',
+        };
+}
+# @return AxisResponse
+#
+sub cells_charts_get_chart_category_axis {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling cells_charts_get_chart_category_axis");
+    }
+
+    # verify the required parameter 'sheet_name' is set
+    unless (exists $args{'sheet_name'}) {
+      croak("Missing the required parameter 'sheet_name' when calling cells_charts_get_chart_category_axis");
+    }
+
+    # verify the required parameter 'chart_index' is set
+    unless (exists $args{'chart_index'}) {
+      croak("Missing the required parameter 'chart_index' when calling cells_charts_get_chart_category_axis");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/{name}/worksheets/{sheetName}/charts/{chartIndex}/categoryaxis';
+
+    my $_method = 'GET';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'sheet_name'}) {
+        my $_base_variable = "{" . "sheetName" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'sheet_name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'chart_index'}) {
+        my $_base_variable = "{" . "chartIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'chart_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    $self->{api_client}->check_access_token();
+    my $_body_data;
+    # authentication setting, if any
+    my $auth_settings = [qw()];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('AxisResponse', $response);
+    return $_response_object;
+}
+
+#
+# cells_charts_get_chart_second_category_axis
+#
+# Get chart second category axis 
+# 
+# @param string $name  (required)
+# @param string $sheet_name  (required)
+# @param int $chart_index  (required)
+# @param string $folder  (optional)
+# @param string $storage_name  (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'sheet_name' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'chart_index' => {
+        data_type => 'int',
+        description => '',
+        required => '1',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => '',
+        required => '0',
+    },
+    'storage_name' => {
+        data_type => 'string',
+        description => '',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'cells_charts_get_chart_second_category_axis' } = { 
+    	summary => 'Get chart second category axis ',
+        params => $params,
+        returns => 'AxisResponse',
+        };
+}
+# @return AxisResponse
+#
+sub cells_charts_get_chart_second_category_axis {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling cells_charts_get_chart_second_category_axis");
+    }
+
+    # verify the required parameter 'sheet_name' is set
+    unless (exists $args{'sheet_name'}) {
+      croak("Missing the required parameter 'sheet_name' when calling cells_charts_get_chart_second_category_axis");
+    }
+
+    # verify the required parameter 'chart_index' is set
+    unless (exists $args{'chart_index'}) {
+      croak("Missing the required parameter 'chart_index' when calling cells_charts_get_chart_second_category_axis");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/{name}/worksheets/{sheetName}/charts/{chartIndex}/secondcategoryaxis';
+
+    my $_method = 'GET';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'sheet_name'}) {
+        my $_base_variable = "{" . "sheetName" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'sheet_name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'chart_index'}) {
+        my $_base_variable = "{" . "chartIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'chart_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    $self->{api_client}->check_access_token();
+    my $_body_data;
+    # authentication setting, if any
+    my $auth_settings = [qw()];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('AxisResponse', $response);
+    return $_response_object;
+}
+
+#
+# cells_charts_get_chart_second_value_axis
+#
+# Get chart second value axis 
+# 
+# @param string $name  (required)
+# @param string $sheet_name  (required)
+# @param int $chart_index  (required)
+# @param string $folder  (optional)
+# @param string $storage_name  (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'sheet_name' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'chart_index' => {
+        data_type => 'int',
+        description => '',
+        required => '1',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => '',
+        required => '0',
+    },
+    'storage_name' => {
+        data_type => 'string',
+        description => '',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'cells_charts_get_chart_second_value_axis' } = { 
+    	summary => 'Get chart second value axis ',
+        params => $params,
+        returns => 'AxisResponse',
+        };
+}
+# @return AxisResponse
+#
+sub cells_charts_get_chart_second_value_axis {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling cells_charts_get_chart_second_value_axis");
+    }
+
+    # verify the required parameter 'sheet_name' is set
+    unless (exists $args{'sheet_name'}) {
+      croak("Missing the required parameter 'sheet_name' when calling cells_charts_get_chart_second_value_axis");
+    }
+
+    # verify the required parameter 'chart_index' is set
+    unless (exists $args{'chart_index'}) {
+      croak("Missing the required parameter 'chart_index' when calling cells_charts_get_chart_second_value_axis");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/{name}/worksheets/{sheetName}/charts/{chartIndex}/secondvalueaxis';
+
+    my $_method = 'GET';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'sheet_name'}) {
+        my $_base_variable = "{" . "sheetName" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'sheet_name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'chart_index'}) {
+        my $_base_variable = "{" . "chartIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'chart_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    $self->{api_client}->check_access_token();
+    my $_body_data;
+    # authentication setting, if any
+    my $auth_settings = [qw()];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('AxisResponse', $response);
+    return $_response_object;
+}
+
+#
+# cells_charts_get_chart_series_axis
+#
+# Get chart Series Axis
+# 
+# @param string $name  (required)
+# @param string $sheet_name  (required)
+# @param int $chart_index  (required)
+# @param string $folder  (optional)
+# @param string $storage_name  (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'sheet_name' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'chart_index' => {
+        data_type => 'int',
+        description => '',
+        required => '1',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => '',
+        required => '0',
+    },
+    'storage_name' => {
+        data_type => 'string',
+        description => '',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'cells_charts_get_chart_series_axis' } = { 
+    	summary => 'Get chart Series Axis',
+        params => $params,
+        returns => 'AxisResponse',
+        };
+}
+# @return AxisResponse
+#
+sub cells_charts_get_chart_series_axis {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling cells_charts_get_chart_series_axis");
+    }
+
+    # verify the required parameter 'sheet_name' is set
+    unless (exists $args{'sheet_name'}) {
+      croak("Missing the required parameter 'sheet_name' when calling cells_charts_get_chart_series_axis");
+    }
+
+    # verify the required parameter 'chart_index' is set
+    unless (exists $args{'chart_index'}) {
+      croak("Missing the required parameter 'chart_index' when calling cells_charts_get_chart_series_axis");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/{name}/worksheets/{sheetName}/charts/{chartIndex}/seriesaxis';
+
+    my $_method = 'GET';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'sheet_name'}) {
+        my $_base_variable = "{" . "sheetName" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'sheet_name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'chart_index'}) {
+        my $_base_variable = "{" . "chartIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'chart_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    $self->{api_client}->check_access_token();
+    my $_body_data;
+    # authentication setting, if any
+    my $auth_settings = [qw()];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('AxisResponse', $response);
+    return $_response_object;
+}
+
+#
+# cells_charts_get_chart_value_axis
+#
+# Get chart Value Axis
+# 
+# @param string $name  (required)
+# @param string $sheet_name  (required)
+# @param int $chart_index  (required)
+# @param string $folder  (optional)
+# @param string $storage_name  (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'sheet_name' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'chart_index' => {
+        data_type => 'int',
+        description => '',
+        required => '1',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => '',
+        required => '0',
+    },
+    'storage_name' => {
+        data_type => 'string',
+        description => '',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'cells_charts_get_chart_value_axis' } = { 
+    	summary => 'Get chart Value Axis',
+        params => $params,
+        returns => 'AxisResponse',
+        };
+}
+# @return AxisResponse
+#
+sub cells_charts_get_chart_value_axis {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling cells_charts_get_chart_value_axis");
+    }
+
+    # verify the required parameter 'sheet_name' is set
+    unless (exists $args{'sheet_name'}) {
+      croak("Missing the required parameter 'sheet_name' when calling cells_charts_get_chart_value_axis");
+    }
+
+    # verify the required parameter 'chart_index' is set
+    unless (exists $args{'chart_index'}) {
+      croak("Missing the required parameter 'chart_index' when calling cells_charts_get_chart_value_axis");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/{name}/worksheets/{sheetName}/charts/{chartIndex}/valueaxis';
+
+    my $_method = 'GET';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'sheet_name'}) {
+        my $_base_variable = "{" . "sheetName" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'sheet_name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'chart_index'}) {
+        my $_base_variable = "{" . "chartIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'chart_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    $self->{api_client}->check_access_token();
+    my $_body_data;
+    # authentication setting, if any
+    my $auth_settings = [qw()];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('AxisResponse', $response);
+    return $_response_object;
+}
 
 #
 # cells_charts_get_worksheet_chart
@@ -3874,6 +4503,715 @@ sub cells_charts_get_worksheet_charts {
     my $_response_object = $self->{api_client}->deserialize('ChartsResponse', $response);
     return $_response_object;
 }
+#
+# cells_charts_post_chart_category_axis
+#
+# Update chart Category Axis
+# 
+# @param string $name  (required)
+# @param string $sheet_name  (required)
+# @param int $chart_index  (required)
+# @param Axis $axis  (required)
+# @param string $folder  (optional)
+# @param string $storage_name  (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'sheet_name' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'chart_index' => {
+        data_type => 'int',
+        description => '',
+        required => '1',
+    },
+    'axis' => {
+        data_type => 'Axis',
+        description => '',
+        required => '1',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => '',
+        required => '0',
+    },
+    'storage_name' => {
+        data_type => 'string',
+        description => '',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'cells_charts_post_chart_category_axis' } = { 
+    	summary => 'Update chart Category Axis',
+        params => $params,
+        returns => 'CellsCloudResponse',
+        };
+}
+# @return CellsCloudResponse
+#
+sub cells_charts_post_chart_category_axis {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling cells_charts_post_chart_category_axis");
+    }
+
+    # verify the required parameter 'sheet_name' is set
+    unless (exists $args{'sheet_name'}) {
+      croak("Missing the required parameter 'sheet_name' when calling cells_charts_post_chart_category_axis");
+    }
+
+    # verify the required parameter 'chart_index' is set
+    unless (exists $args{'chart_index'}) {
+      croak("Missing the required parameter 'chart_index' when calling cells_charts_post_chart_category_axis");
+    }
+
+    # verify the required parameter 'axis' is set
+    unless (exists $args{'axis'}) {
+      croak("Missing the required parameter 'axis' when calling cells_charts_post_chart_category_axis");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/{name}/worksheets/{sheetName}/charts/{chartIndex}/categoryaxis';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'sheet_name'}) {
+        my $_base_variable = "{" . "sheetName" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'sheet_name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'chart_index'}) {
+        my $_base_variable = "{" . "chartIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'chart_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    $self->{api_client}->check_access_token();
+    my $_body_data;
+    # body params
+    if ( exists $args{'axis'}) {
+        $_body_data = $args{'axis'};
+    }
+
+    # authentication setting, if any
+    my $auth_settings = [qw()];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# cells_charts_post_chart_second_category_axis
+#
+# Update chart second category axis 
+# 
+# @param string $name  (required)
+# @param string $sheet_name  (required)
+# @param int $chart_index  (required)
+# @param Axis $axis  (required)
+# @param string $folder  (optional)
+# @param string $storage_name  (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'sheet_name' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'chart_index' => {
+        data_type => 'int',
+        description => '',
+        required => '1',
+    },
+    'axis' => {
+        data_type => 'Axis',
+        description => '',
+        required => '1',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => '',
+        required => '0',
+    },
+    'storage_name' => {
+        data_type => 'string',
+        description => '',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'cells_charts_post_chart_second_category_axis' } = { 
+    	summary => 'Update chart second category axis ',
+        params => $params,
+        returns => 'CellsCloudResponse',
+        };
+}
+# @return CellsCloudResponse
+#
+sub cells_charts_post_chart_second_category_axis {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling cells_charts_post_chart_second_category_axis");
+    }
+
+    # verify the required parameter 'sheet_name' is set
+    unless (exists $args{'sheet_name'}) {
+      croak("Missing the required parameter 'sheet_name' when calling cells_charts_post_chart_second_category_axis");
+    }
+
+    # verify the required parameter 'chart_index' is set
+    unless (exists $args{'chart_index'}) {
+      croak("Missing the required parameter 'chart_index' when calling cells_charts_post_chart_second_category_axis");
+    }
+
+    # verify the required parameter 'axis' is set
+    unless (exists $args{'axis'}) {
+      croak("Missing the required parameter 'axis' when calling cells_charts_post_chart_second_category_axis");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/{name}/worksheets/{sheetName}/charts/{chartIndex}/secondcategoryaxis';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'sheet_name'}) {
+        my $_base_variable = "{" . "sheetName" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'sheet_name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'chart_index'}) {
+        my $_base_variable = "{" . "chartIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'chart_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    $self->{api_client}->check_access_token();
+    my $_body_data;
+    # body params
+    if ( exists $args{'axis'}) {
+        $_body_data = $args{'axis'};
+    }
+
+    # authentication setting, if any
+    my $auth_settings = [qw()];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# cells_charts_post_chart_second_value_axis
+#
+# Update chart second value axis 
+# 
+# @param string $name  (required)
+# @param string $sheet_name  (required)
+# @param int $chart_index  (required)
+# @param Axis $axis  (required)
+# @param string $folder  (optional)
+# @param string $storage_name  (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'sheet_name' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'chart_index' => {
+        data_type => 'int',
+        description => '',
+        required => '1',
+    },
+    'axis' => {
+        data_type => 'Axis',
+        description => '',
+        required => '1',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => '',
+        required => '0',
+    },
+    'storage_name' => {
+        data_type => 'string',
+        description => '',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'cells_charts_post_chart_second_value_axis' } = { 
+    	summary => 'Update chart second value axis ',
+        params => $params,
+        returns => 'CellsCloudResponse',
+        };
+}
+# @return CellsCloudResponse
+#
+sub cells_charts_post_chart_second_value_axis {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling cells_charts_post_chart_second_value_axis");
+    }
+
+    # verify the required parameter 'sheet_name' is set
+    unless (exists $args{'sheet_name'}) {
+      croak("Missing the required parameter 'sheet_name' when calling cells_charts_post_chart_second_value_axis");
+    }
+
+    # verify the required parameter 'chart_index' is set
+    unless (exists $args{'chart_index'}) {
+      croak("Missing the required parameter 'chart_index' when calling cells_charts_post_chart_second_value_axis");
+    }
+
+    # verify the required parameter 'axis' is set
+    unless (exists $args{'axis'}) {
+      croak("Missing the required parameter 'axis' when calling cells_charts_post_chart_second_value_axis");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/{name}/worksheets/{sheetName}/charts/{chartIndex}/secondvalueaxis';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'sheet_name'}) {
+        my $_base_variable = "{" . "sheetName" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'sheet_name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'chart_index'}) {
+        my $_base_variable = "{" . "chartIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'chart_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    $self->{api_client}->check_access_token();
+    my $_body_data;
+    # body params
+    if ( exists $args{'axis'}) {
+        $_body_data = $args{'axis'};
+    }
+
+    # authentication setting, if any
+    my $auth_settings = [qw()];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# cells_charts_post_chart_series_axis
+#
+# Update chart Series Axis
+# 
+# @param string $name  (required)
+# @param string $sheet_name  (required)
+# @param int $chart_index  (required)
+# @param Axis $axis  (required)
+# @param string $folder  (optional)
+# @param string $storage_name  (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'sheet_name' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'chart_index' => {
+        data_type => 'int',
+        description => '',
+        required => '1',
+    },
+    'axis' => {
+        data_type => 'Axis',
+        description => '',
+        required => '1',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => '',
+        required => '0',
+    },
+    'storage_name' => {
+        data_type => 'string',
+        description => '',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'cells_charts_post_chart_series_axis' } = { 
+    	summary => 'Update chart Series Axis',
+        params => $params,
+        returns => 'CellsCloudResponse',
+        };
+}
+# @return CellsCloudResponse
+#
+sub cells_charts_post_chart_series_axis {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling cells_charts_post_chart_series_axis");
+    }
+
+    # verify the required parameter 'sheet_name' is set
+    unless (exists $args{'sheet_name'}) {
+      croak("Missing the required parameter 'sheet_name' when calling cells_charts_post_chart_series_axis");
+    }
+
+    # verify the required parameter 'chart_index' is set
+    unless (exists $args{'chart_index'}) {
+      croak("Missing the required parameter 'chart_index' when calling cells_charts_post_chart_series_axis");
+    }
+
+    # verify the required parameter 'axis' is set
+    unless (exists $args{'axis'}) {
+      croak("Missing the required parameter 'axis' when calling cells_charts_post_chart_series_axis");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/{name}/worksheets/{sheetName}/charts/{chartIndex}/seriesaxis';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'sheet_name'}) {
+        my $_base_variable = "{" . "sheetName" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'sheet_name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'chart_index'}) {
+        my $_base_variable = "{" . "chartIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'chart_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    $self->{api_client}->check_access_token();
+    my $_body_data;
+    # body params
+    if ( exists $args{'axis'}) {
+        $_body_data = $args{'axis'};
+    }
+
+    # authentication setting, if any
+    my $auth_settings = [qw()];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
+
+#
+# cells_charts_post_chart_value_axis
+#
+# Update chart value axis 
+# 
+# @param string $name  (required)
+# @param string $sheet_name  (required)
+# @param int $chart_index  (required)
+# @param Axis $axis  (required)
+# @param string $folder  (optional)
+# @param string $storage_name  (optional)
+{
+    my $params = {
+    'name' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'sheet_name' => {
+        data_type => 'string',
+        description => '',
+        required => '1',
+    },
+    'chart_index' => {
+        data_type => 'int',
+        description => '',
+        required => '1',
+    },
+    'axis' => {
+        data_type => 'Axis',
+        description => '',
+        required => '1',
+    },
+    'folder' => {
+        data_type => 'string',
+        description => '',
+        required => '0',
+    },
+    'storage_name' => {
+        data_type => 'string',
+        description => '',
+        required => '0',
+    },
+    };
+    __PACKAGE__->method_documentation->{ 'cells_charts_post_chart_value_axis' } = { 
+    	summary => 'Update chart value axis ',
+        params => $params,
+        returns => 'CellsCloudResponse',
+        };
+}
+# @return CellsCloudResponse
+#
+sub cells_charts_post_chart_value_axis {
+    my ($self, %args) = @_;
+
+    # verify the required parameter 'name' is set
+    unless (exists $args{'name'}) {
+      croak("Missing the required parameter 'name' when calling cells_charts_post_chart_value_axis");
+    }
+
+    # verify the required parameter 'sheet_name' is set
+    unless (exists $args{'sheet_name'}) {
+      croak("Missing the required parameter 'sheet_name' when calling cells_charts_post_chart_value_axis");
+    }
+
+    # verify the required parameter 'chart_index' is set
+    unless (exists $args{'chart_index'}) {
+      croak("Missing the required parameter 'chart_index' when calling cells_charts_post_chart_value_axis");
+    }
+
+    # verify the required parameter 'axis' is set
+    unless (exists $args{'axis'}) {
+      croak("Missing the required parameter 'axis' when calling cells_charts_post_chart_value_axis");
+    }
+
+    # parse inputs
+    my $_resource_path = '/cells/{name}/worksheets/{sheetName}/charts/{chartIndex}/valueaxis';
+
+    my $_method = 'POST';
+    my $query_params = {};
+    my $header_params = {};
+    my $form_params = {};
+
+    # 'Accept' and 'Content-Type' header
+    my $_header_accept = $self->{api_client}->select_header_accept('application/json');
+    if ($_header_accept) {
+        $header_params->{'Accept'} = $_header_accept;
+    }
+    $header_params->{'Content-Type'} = $self->{api_client}->select_header_content_type('application/json');
+
+    # query params
+    if ( exists $args{'folder'}) {
+        $query_params->{'folder'} = $self->{api_client}->to_query_value($args{'folder'});
+    }
+
+    # query params
+    if ( exists $args{'storage_name'}) {
+        $query_params->{'storageName'} = $self->{api_client}->to_query_value($args{'storage_name'});
+    }
+
+    # path params
+    if ( exists $args{'name'}) {
+        my $_base_variable = "{" . "name" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'sheet_name'}) {
+        my $_base_variable = "{" . "sheetName" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'sheet_name'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    # path params
+    if ( exists $args{'chart_index'}) {
+        my $_base_variable = "{" . "chartIndex" . "}";
+        my $_base_value = $self->{api_client}->to_path_value($args{'chart_index'});
+        $_resource_path =~ s/$_base_variable/$_base_value/g;
+    }
+
+    $self->{api_client}->check_access_token();
+    my $_body_data;
+    # body params
+    if ( exists $args{'axis'}) {
+        $_body_data = $args{'axis'};
+    }
+
+    # authentication setting, if any
+    my $auth_settings = [qw()];
+
+    # make the API Call
+    my $response = $self->{api_client}->call_api($_resource_path, $_method,
+                                           $query_params, $form_params,
+                                           $header_params, $_body_data, $auth_settings);
+    if (!$response) {
+        return;
+    }
+    my $_response_object = $self->{api_client}->deserialize('CellsCloudResponse', $response);
+    return $_response_object;
+}
 
 #
 # cells_charts_post_worksheet_chart
@@ -3925,6 +5263,7 @@ sub cells_charts_get_worksheet_charts {
         returns => 'CellsCloudResponse',
         };
 }
+
 # @return CellsCloudResponse
 #
 sub cells_charts_post_worksheet_chart {

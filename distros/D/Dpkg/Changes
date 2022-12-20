@@ -1,7 +1,69 @@
+dpkg (1.21.13) unstable; urgency=medium
+
+  [ Guillem Jover ]
+  * Perl modules:
+    - Test::Dpkg: Refactor OpenPGP requisite into test_needs_openpgp_backend().
+    - Dpkg::Backend::GnuPG: Ensure future signing interop with gpg --openpgp.
+  * Documentation:
+    - man: Move parallel-safe note from dpkg-buildpackage -j option to
+      --jobs-force.
+  * Code internals:
+    - start-stop-daemon: Cast struct sockaddr_un to struct sockaddr on bind()
+      call.
+    - lib: Stop using register keyword.
+    - libcompat: Remove unused arguments from ngettext() fallback macro.
+    - libcompat: Switch manual copying to memcpy() in obstack module.
+    - libcompat: Switch obstack to use size_t.
+    - libcompat: Use an union to track chunkfun and freefun.
+    - dpkg-architecture: Fix indentation.
+    - libdpkg: Fix pdb_lax_stanza_parser and pdb_allow_empty aliased values.
+    - libcompat: Add noreturn and sentinel C attributes.
+    - utils: Switch to use libcompat attributes.
+    - libdpkg: Add new multi-threaded xz decompression support. Closes: #956452
+    - libdpkg: Pass -T+1 instead of -T1 to xz when compressing.
+    - libdpkg: On threads-max > 0 pass --no-adjust to xz to force threaded
+      mode.
+    - Use hyphenated multi-threaded in text.
+  * Build system:
+    - Consider lib and utils prefixes as internal in gen-changelog.
+    - Fix m4 files coding style.
+    - Include <stdio.h> for printf() usage in __progname check.
+  * Packaging:
+    - Require liblzma >= 5.4.0 for multi-threaded compressor support.
+    - Clarify versioned dependency rationale comments.
+    - Add pkgconf as main Build-Depends alternative to pkg-config.
+  * Test suite:
+    - Skip deb-format tests if required compressors are not present.
+    - Use a custom dpkg database directory for dpkg-buildpackage tests.
+    - Switch Dpkg::Source::Package test to use test_needs_openpgp_backend().
+    - Skip deb-format tests if gzip is not present.
+    - Skip dpkg-source tests if xz is not present.
+    - Use the PERL detected at configure time in autotests.
+    - Use perl instead of yes+dd to generate a data-file for deb-split.
+  * Localization:
+    - Update Simplified Chinese programs translation.
+      Thanks to Boyuan Yang <byang@debian.org>. Closes: #1025625
+
+ -- Guillem Jover <guillem@debian.org>  Mon, 19 Dec 2022 02:07:45 +0100
+
+dpkg (1.21.12) unstable; urgency=medium
+
+  [ Guillem Jover ]
+  * dpkg-architecture: Properly compute required information to gather.
+    Reported by Sören Tempel <soeren@soeren-tempel.net>.
+  * Code internals:
+    - dpkg-architecture: Rename information tracking constants and variables.
+  * Packaging:
+    - Set paths for configure in autopkgtests to match installed ones.
+    - Add libmd-dev to libdpkg-dev Depends.
+      Reported by Alexandre Detiste <alexandre.detiste@gmail.com>.
+
+ -- Guillem Jover <guillem@debian.org>  Tue, 06 Dec 2022 04:27:57 +0100
+
 dpkg (1.21.11) unstable; urgency=medium
 
   [ Guillem Jover ]
-  * dpkg-genbuildinfo: Do not fail if there is no cross-comiler.
+  * dpkg-genbuildinfo: Do not fail if there is no cross-compiler.
     Closes: #1025273
   * Documentation:
     - doc: Update Doxyfile after code reorganization.
@@ -3948,7 +4010,7 @@ dpkg (1.18.4) unstable; urgency=medium
     Fixes CVE-2015-0860.
   * Fix an off-by-one read access in dpkg-deb when parsing ar member names.
     Thanks to Hanno Böck <hanno@hboeck.de>.
-  * Add experimental multithreaded xz compression support in libdpkg, which
+  * Add experimental multi-threaded xz compression support in libdpkg, which
     requires xz >= 5.2.0.
   * Fix physical file offset comparison in dpkg. Closes: #808912
     Thanks to Yuri Gribov <tetra2005@gmail.com>.

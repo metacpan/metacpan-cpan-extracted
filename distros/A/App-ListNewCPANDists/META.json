@@ -83,7 +83,7 @@
    "provides" : {
       "App::ListNewCPANDists" : {
          "file" : "lib/App/ListNewCPANDists.pm",
-         "version" : "0.017"
+         "version" : "0.018"
       }
    },
    "release_status" : "stable",
@@ -98,7 +98,7 @@
          "web" : "https://github.com/perlancar/perl-App-ListNewCPANDists"
       }
    },
-   "version" : "0.017",
+   "version" : "0.018",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

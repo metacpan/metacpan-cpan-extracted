@@ -40,7 +40,7 @@ Mail::SpamAssassin - Spam detector and markup engine
 =head1 DESCRIPTION
 
 Mail::SpamAssassin is a module to identify spam using several methods
-including text analysis, internet-based realtime blacklists, statistical
+including text analysis, internet-based realtime blocklists, statistical
 analysis, and internet-based hashing algorithms.
 
 Using its rule base, it uses a wide range of heuristic tests on mail
@@ -64,7 +64,7 @@ use warnings;
 # use bytes;
 use re 'taint';
 
-require 5.006_001;
+require v5.14.0;
 
 use Mail::SpamAssassin::Logger;
 use Mail::SpamAssassin::Constants;
@@ -87,10 +87,9 @@ use Time::HiRes qw(time);
 use Cwd;
 use Config;
 
-our $VERSION = "3.004006";      # update after release (same format as perl $])
+our $VERSION = "4.000000";      # update after release (same format as perl $])
 #our $IS_DEVEL_BUILD = 1;        # 1 for devel build 
 our $IS_DEVEL_BUILD = 0;        # 0 for release versions including rc & pre releases
-
 
 # Used during the prerelease/release-candidate part of the official release
 # process. If you hacked up your SA, you should add a version_tag to your .cf
@@ -101,18 +100,18 @@ our @ISA = qw();
 
 # SUB_VERSION is now just <yyyy>-<mm>-<dd>
 our $SUB_VERSION = 'svnunknown';
-if ('$LastChangedDate: 2021-04-09 19:54:52 +1200 (Fri, 09 Apr 2021) $' =~ ':') {
-  # Subversion keyword "$LastChangedDate: 2021-04-09 19:54:52 +1200 (Fri, 09 Apr 2021) $" has been successfully expanded.
+if ('$LastChangedDate: 2022-12-14 02:29:30 +0000 (Wed, 14 Dec 2022) $' =~ ':') {
+  # Subversion keyword "$LastChangedDate: 2022-12-14 02:29:30 +0000 (Wed, 14 Dec 2022) $" has been successfully expanded.
   # Doesn't happen with automated launchpad builds:
   # https://bugs.launchpad.net/launchpad/+bug/780916
-  $SUB_VERSION = (split(/\s+/,'$LastChangedDate: 2021-04-09 19:54:52 +1200 (Fri, 09 Apr 2021) $ updated by SVN'))[1];
+  $SUB_VERSION = (split(/\s+/,'$LastChangedDate: 2022-12-14 02:29:30 +0000 (Wed, 14 Dec 2022) $ updated by SVN'))[1];
 }
 
 
 if (defined $IS_DEVEL_BUILD && $IS_DEVEL_BUILD) {
-  if ('$LastChangedRevision: 1888548 $' =~ ':') {
-    # Subversion keyword "$LastChangedRevision: 1888548 $" has been successfully expanded.
-    push(@EXTRA_VERSION, ('r' . qw{$LastChangedRevision: 1888548 $ updated by SVN}[1]));
+  if ('$LastChangedRevision: 1905971 $' =~ ':') {
+    # Subversion keyword "$LastChangedRevision: 1905971 $" has been successfully expanded.
+    push(@EXTRA_VERSION, ('r' . qw{$LastChangedRevision: 1905971 $ updated by SVN}[1]));
   } else {
     push(@EXTRA_VERSION, ('r' . 'svnunknown'));
   }
@@ -428,8 +427,8 @@ sub new {
     $self->timer_enable();
   }
 
-  $self->{conf} ||= new Mail::SpamAssassin::Conf ($self);
-  $self->{plugins} = Mail::SpamAssassin::PluginHandler->new ($self);
+  $self->{conf} ||= Mail::SpamAssassin::Conf->new($self);
+  $self->{plugins} = Mail::SpamAssassin::PluginHandler->new($self);
 
   $self->{save_pattern_hits} ||= 0;
 
@@ -469,7 +468,7 @@ sub create_locker {
   # for slow but safe, by keeping in quotes
   eval '
     use Mail::SpamAssassin::Locker::'.$class.';
-    $self->{locker} = new Mail::SpamAssassin::Locker::'.$class.' ($self);
+    $self->{locker} = Mail::SpamAssassin::Locker::'.$class.'->new($self);
     1;
   ' or do {
     my $eval_stat = $@ ne '' ? $@ : "errno=$!";  chomp $eval_stat;
@@ -728,6 +727,9 @@ sub init_learner {
     if (exists $opts->{$k}) { $self->{$v} = $opts->{$k}; }
   }
 
+  # Set flag which can be checked from plugins etc
+  $self->{learning} = 1;
+
   return \%ret;
 }
 
@@ -757,6 +759,7 @@ Finish learning.
 sub finish_learner {
   my $self = shift;
   $self->{bayes_scanner}->force_close(1) if $self->{bayes_scanner};
+  delete $self->{learning};
   1;
 }
 
@@ -832,7 +835,7 @@ sub signal_user_changed {
   $self->{bayes_scanner}->finish() if $self->{bayes_scanner};
   if ($self->{conf}->{use_bayes}) {
       require Mail::SpamAssassin::Bayes;
-      $self->{bayes_scanner} = new Mail::SpamAssassin::Bayes ($self);
+      $self->{bayes_scanner} = Mail::SpamAssassin::Bayes->new($self);
   } else {
       delete $self->{bayes_scanner} if $self->{bayes_scanner};
   }
@@ -949,73 +952,84 @@ sub revoke_as_spam {
 
 ###########################################################################
 
-=item $f->add_address_to_whitelist ($addr, $cli_p)
+=item $f->add_address_to_welcomelist ($addr, $cli_p)
+
+Previously add_address_to_whitelist which will work interchangeably until 4.1.
 
 Given a string containing an email address, add it to the automatic
-whitelist database.
+welcomelist database.
 
 If $cli_p is set then underlying plugin may give visual feedback on additions/failures.
 
 =cut
 
-sub add_address_to_whitelist {
+sub add_address_to_welcomelist {
   my ($self, $addr, $cli_p) = @_;
 
-  $self->call_plugins("whitelist_address", { address => $addr,
+  $self->call_plugins("welcomelist_address", { address => $addr,
                                              cli_p => $cli_p });
 }
+*add_address_to_whitelist = \&add_address_to_welcomelist; # removed in 4.1
 
 ###########################################################################
 
-=item $f->add_all_addresses_to_whitelist ($mail, $cli_p)
+=item $f->add_all_addresses_to_welcomelist ($mail, $cli_p)
+
+Previously add_all_addresses_to_whitelist which will work interchangeably until 4.1.
 
 Given a mail message, find as many addresses in the usual headers (To, Cc, From
-etc.), and the message body, and add them to the automatic whitelist database.
+etc.), and the message body, and add them to the automatic welcomelist database.
 
 If $cli_p is set then underlying plugin may give visual feedback on additions/failures.
 
 =cut
 
-sub add_all_addresses_to_whitelist {
+sub add_all_addresses_to_welcomelist {
   my ($self, $mail_obj, $cli_p) = @_;
 
   foreach my $addr ($self->find_all_addrs_in_mail ($mail_obj)) {
-    $self->call_plugins("whitelist_address", { address => $addr,
+    $self->call_plugins("welcomelist_address", { address => $addr,
                                                cli_p => $cli_p });
   }
 }
+*add_all_addresses_to_whitelist = \&add_all_addresses_to_welcomelist; # removed in 4.1
 
 ###########################################################################
 
-=item $f->remove_address_from_whitelist ($addr, $cli_p)
+=item $f->remove_address_from_welcomelist ($addr, $cli_p)
+
+Previously remove_address_from_whitelist which will work interchangeably until 4.1.
 
 Given a string containing an email address, remove it from the automatic
-whitelist database.
+welcomelist database.
 
 If $cli_p is set then underlying plugin may give visual feedback on additions/failures.
 
 =cut
 
-sub remove_address_from_whitelist {
+sub remove_address_from_welcomelist {
   my ($self, $addr, $cli_p) = @_;
 
   $self->call_plugins("remove_address", { address => $addr,
                                           cli_p => $cli_p });
 }
+*remove_address_from_whitelist = \&remove_address_from_welcomelist; # removed in 4.1
 
 ###########################################################################
 
-=item $f->remove_all_addresses_from_whitelist ($mail, $cli_p)
+=item $f->remove_all_addresses_from_welcomelist ($mail, $cli_p)
+
+Previously remove_all_addresses_from_whitelist which will work interchangeably until 4.1.
 
 Given a mail message, find as many addresses in the usual headers (To, Cc, From
-etc.), and the message body, and remove them from the automatic whitelist
+etc.), and the message body, and remove them from the automatic welcomelist
 database.
 
 If $cli_p is set then underlying plugin may give visual feedback on additions/failures.
 
 =cut
 
-sub remove_all_addresses_from_whitelist {
+sub remove_all_addresses_from_welcomelist {
   my ($self, $mail_obj, $cli_p) = @_;
 
   foreach my $addr ($self->find_all_addrs_in_mail ($mail_obj)) {
@@ -1023,30 +1037,36 @@ sub remove_all_addresses_from_whitelist {
                                             cli_p => $cli_p });
   }
 }
+*remove_all_addresses_from_whitelist = \&remove_all_addresses_from_welcomelist; # removed in 4.1
 
 ###########################################################################
 
-=item $f->add_address_to_blacklist ($addr, $cli_p)
+=item $f->add_address_to_blocklist ($addr, $cli_p)
+
+Previously add_address_to_blacklist which will work interchangeably until 4.1.
 
 Given a string containing an email address, add it to the automatic
-whitelist database with a high score, effectively blacklisting them.
+welcomelist database with a high score, effectively blocklisting them.
 
 If $cli_p is set then underlying plugin may give visual feedback on additions/failures.
 
 =cut
 
-sub add_address_to_blacklist {
+sub add_address_to_blocklist {
   my ($self, $addr, $cli_p) = @_;
-  $self->call_plugins("blacklist_address", { address => $addr,
+  $self->call_plugins("blocklist_address", { address => $addr,
                                              cli_p => $cli_p });
 }
+*add_address_to_blacklist = \&add_address_to_blocklist; # removed in 4.1
 
 ###########################################################################
 
-=item $f->add_all_addresses_to_blacklist ($mail, $cli_p)
+=item $f->add_all_addresses_to_blocklist ($mail, $cli_p)
+
+Previously add_all_addresses_to_blacklist which will work interchangeably until 4.1.
 
 Given a mail message, find addresses in the From headers and add them to the
-automatic whitelist database with a high score, effectively blacklisting them.
+automatic welcomelist database with a high score, effectively blocklisting them.
 
 Note that To and Cc addresses are not used.
 
@@ -1054,23 +1074,26 @@ If $cli_p is set then underlying plugin may give visual feedback on additions/fa
 
 =cut
 
-sub add_all_addresses_to_blacklist {
+sub add_all_addresses_to_blocklist {
   my ($self, $mail_obj, $cli_p) = @_;
 
   $self->init(1);
 
   my @addrlist;
   my @hdrs = $mail_obj->get_header('From');
-  if ($#hdrs >= 0) {
-    push (@addrlist, $self->find_all_addrs_in_line (join (" ", @hdrs)));
+  foreach my $hdr (@hdrs) {
+    my @addrs = Mail::SpamAssassin::Util::parse_header_addresses($hdr);
+    foreach my $addr (@addrs) {
+      push @addrlist, $addr->{address} if defined $addr->{address};
+    }
   }
 
   foreach my $addr (@addrlist) {
-    $self->call_plugins("blacklist_address", { address => $addr,
+    $self->call_plugins("blocklist_address", { address => $addr,
                                                cli_p => $cli_p });
   }
-
 }
+*add_all_addresses_to_blacklist = \&add_all_addresses_to_blocklist; # removed in 4.1
 
 ###########################################################################
 
@@ -1158,13 +1181,12 @@ sub remove_spamassassin_markup {
   my $hdrs = $mail_obj->get_pristine_header();
   my $body = $mail_obj->get_pristine_body();
 
-  # remove DOS line endings
-  $hdrs =~ s/\r//gs;
+  # force \n for line-ending processing temporarily
+  $hdrs =~ s/\015?\012/\n/gs;
+  $body =~ s/\015?\012/\n/gs;
 
   # unfold SA added headers, but not X-Spam-Prev headers ...
-  $hdrs = "\n".$hdrs;   # simplifies regexp below
-  1 while $hdrs =~ s/(\nX-Spam-(?!Prev).+?)\n[ \t]+(\S.*\n)/$1 $2/g;
-  $hdrs =~ s/^\n//;
+  1 while $hdrs =~ s/((?:^|\n)X-Spam-(?!Prev).+?)\n[ \t]+(\S.*\n)/$1 $2/g;
 
 ###########################################################################
   # Backward Compatibility, pre 3.0.x.
@@ -1215,14 +1237,11 @@ sub remove_spamassassin_markup {
   }
 
   # remove any other X-Spam headers we added, will be unfolded
-  $hdrs = "\n".$hdrs;   # simplifies regexp below
-  1 while $hdrs =~ s/\nX-Spam-.*\n/\n/g;
-  $hdrs =~ s/^\n//;
+  1 while $hdrs =~ s/(^|\n)X-Spam-.*\n/$1/g;
 
-  # re-add DOS line endings
-  if ($mail_obj->{line_ending} ne "\n") {
-    $hdrs =~ s/\r?\n/$mail_obj->{line_ending}/gs;
-  }
+  # force original message line endings
+  $hdrs =~ s/\n/$mail_obj->{line_ending}/gs;
+  $body =~ s/\n/$mail_obj->{line_ending}/gs;
 
   # Put the whole thing back together ...
   return join ('', $mbox, $hdrs, $body);
@@ -1235,8 +1254,8 @@ sub remove_spamassassin_markup {
 Read a configuration file and parse user preferences from it.
 
 User preferences are as defined in the C<Mail::SpamAssassin::Conf> manual page.
-In other words, they include scoring options, scores, whitelists and
-blacklists, and so on, but do not include rule definitions, privileged
+In other words, they include scoring options, scores, welcomelists and
+blocklists, and so on, but do not include rule definitions, privileged
 settings, etc. unless C<allow_user_rules> is enabled; and they never include
 the administrator settings.
 
@@ -1261,7 +1280,8 @@ sub read_scoreonly_config {
 
   $text = "file start $filename\n" . $text;
   # add an extra \n in case file did not end in one.
-  $text .= "\nfile end $filename\n";
+  $text .= "\n" unless $text =~ /\n\z/;
+  $text .= "file end $filename\n";
 
   $self->{conf}->{main} = $self;
   $self->{conf}->parse_scores_only ($text);
@@ -1326,7 +1346,7 @@ sub load_scoreonly_ldap {
 =item $f->set_persistent_address_list_factory ($factoryobj)
 
 Set the persistent address list factory, used to create objects for the
-automatic whitelist algorithm's persistent-storage back-end.  See
+automatic welcomelist algorithm's persistent-storage back-end.  See
 C<Mail::SpamAssassin::PersistentAddrList> for the API these factory objects
 must implement, and the API the objects they produce must implement.
 
@@ -1499,7 +1519,7 @@ sub lint_rules {
   $self->{dont_copy_prefs} = $olddcp;       # revert back to previous
 
   # bug 5048: override settings to ensure a faster lint
-  $self->{'conf'}->{'use_auto_whitelist'} = 0;
+  $self->{'conf'}->{'use_auto_welcomelist'} = 0;
   $self->{'conf'}->{'bayes_auto_learn'} = 0;
 
   my $mail = $self->parse(\@testmsg, 1, { master_deadline => undef });
@@ -1531,7 +1551,6 @@ sub finish {
   $self->call_plugins("finish_tests", { conf => $self->{conf},
                                         main => $self });
 
-  $self->{conf}->finish(); delete $self->{conf};
   $self->{plugins}->finish(); delete $self->{plugins};
 
   if ($self->{bayes_scanner}) {
@@ -1540,6 +1559,8 @@ sub finish {
   }
 
   $self->{resolver}->finish()  if $self->{resolver};
+
+  $self->{conf}->finish(); delete $self->{conf};
 
   $self->timer_end("finish");
   %{$self} = ();
@@ -1662,6 +1683,11 @@ sub init {
   # Note that this PID has run init()
   $self->{_initted} = $$;
 
+  # if spamd or other forking, wait for spamd_child_init
+  if (!$self->{skip_prng_reseeding}) {
+    $self->set_global_state_dir();
+  }
+
   #fix spamd reading root prefs file
   if (!defined $use_user_pref) {
     $use_user_pref = 1;
@@ -1737,10 +1763,18 @@ sub init {
   }
 
   if ($self->{pre_config_text}) {
-    $self->{config_text} = $self->{pre_config_text} . $self->{config_text};
+    $self->{pre_config_text} .= "\n" unless $self->{pre_config_text} =~ /\n\z/;
+    $self->{config_text} = "file start (pre_config_text)\n".
+                           $self->{pre_config_text}.
+                           "file end (pre_config_text)\n".
+                           $self->{config_text};
   }
   if ($self->{post_config_text}) {
-    $self->{config_text} .= $self->{post_config_text};
+    $self->{post_config_text} .= "\n" unless $self->{post_config_text} =~ /\n\z/;
+    $self->{config_text} .= "\n" unless $self->{config_text} =~ /\n\z/;
+    $self->{config_text} .= "file start (post_config_text)\n".
+                            $self->{post_config_text}.
+                            "file end (post_config_text)\n";
   }
 
   if ($self->{config_text} !~ /\S/) {
@@ -1771,7 +1805,7 @@ sub init {
   # Initialize the Bayes subsystem
   if ($self->{conf}->{use_bayes}) {
       require Mail::SpamAssassin::Bayes;
-      $self->{bayes_scanner} = new Mail::SpamAssassin::Bayes ($self);
+      $self->{bayes_scanner} = Mail::SpamAssassin::Bayes->new($self);
   }
   $self->{'learn_to_journal'} = $self->{conf}->{bayes_learn_to_journal};
 
@@ -1795,6 +1829,21 @@ sub init {
 
   # should be called only after configuration has been parsed
   $self->{resolver} = Mail::SpamAssassin::DnsResolver->new($self);
+
+  # load GeoDB if some plugin wants it
+  if ($self->{geodb_wanted}) {
+    eval '
+      use Mail::SpamAssassin::GeoDB;
+      $self->{geodb} = Mail::SpamAssassin::GeoDB->new({
+        conf => $self->{conf}->{geodb},
+        wanted => $self->{geodb_wanted},
+      });
+      1;
+    ';
+    if ($@ || !$self->{geodb}) {
+      dbg("config: GeoDB disabled: $@");
+    }
+  }
 
   # TODO -- open DNS cache etc. if necessary
 }
@@ -1826,10 +1875,10 @@ sub _read_cf_pre {
       dbg("config: file or directory $path not accessible: $!");
     } elsif (-d _) {
       foreach my $file ($self->$filelistmethod($path)) {
-        $txt .= read_cf_file($file);
+        $txt .= $self->read_cf_file($file);
       }
     } elsif (-f _ && -s _ && -r _) {
-      $txt .= read_cf_file($path);
+      $txt .= $self->read_cf_file($path);
     }
   }
 
@@ -1838,8 +1887,13 @@ sub _read_cf_pre {
 
 
 sub read_cf_file {
-  my($path) = @_;
+  my($self, $path) = @_;
   my $txt = '';
+
+  if ($self->{cf_files_read}->{$path}++) {
+    dbg("config: skipping already read file: $path");
+    return $txt;
+  }
 
   local *IN;
   if (open (IN, "<".$path)) {
@@ -1852,7 +1906,8 @@ sub read_cf_file {
 
     $txt = "file start $path\n" . $txt;
     # add an extra \n in case file did not end in one.
-    $txt .= "\nfile end $path\n";
+    $txt .= "\n" unless $txt =~ /\n\z/;
+    $txt .= "file end $path\n";
 
     dbg("config: read file $path");
   }
@@ -1900,7 +1955,7 @@ sub get_and_create_userstate_dir {
     dbg("config: error accessing $fname: $!");
   } else {  # does not exist, create it
     eval {
-      mkpath($fname, 0, 0700);  1;
+      mkpath(Mail::SpamAssassin::Util::untaint_file_path($fname), 0, 0700);  1;
     } or do {
       my $eval_stat = $@ ne '' ? $@ : "errno=$!";  chomp $eval_stat;
       dbg("config: mkdir $fname failed: $eval_stat");
@@ -1908,6 +1963,58 @@ sub get_and_create_userstate_dir {
   }
 
   $fname;
+}
+
+# find the most global writable state dir
+# used by dns_block_rule state files etc
+sub set_global_state_dir {
+  my ($self) = @_;
+  # try home_dir_for_helpers
+  my $helper_dir = $self->{home_dir_for_helpers} || '';
+  if ($helper_dir) {
+    my $dir = File::Spec->catdir($helper_dir, ".spamassassin");
+    return if $self->test_global_state_dir($dir);
+  }
+  # try user home (if different from helper home)
+  my $home;
+  if (am_running_on_windows()) {
+    # Windows has a special folder for common appdata (Bug 8050)
+    $home = Mail::SpamAssassin::Util::common_application_data_directory();
+  } else {
+    $home = (Mail::SpamAssassin::Util::portable_getpwuid ($>))[7];
+  }
+  if ($home && $home ne $helper_dir) {
+    my $dir = File::Spec->catdir($home, ".spamassassin");
+    return if $self->test_global_state_dir($dir);
+  }
+  # try LOCAL_STATE_DIR
+  return if $self->test_global_state_dir($self->{LOCAL_STATE_DIR});
+  # fallback to userstate
+  $self->{global_state_dir} = $self->get_and_create_userstate_dir();
+  dbg("config: global_state_dir set to userstate_dir: $self->{global_state_dir}");
+}
+
+sub test_global_state_dir {
+    my ($self, $dir) = @_;
+    eval { mkpath($dir, 0, 0700); }; # just a single stat if exists already
+    # Purge stale test files (enough to do only some times randomly)
+    if (rand() < 0.2 && opendir(WT_DIR, $dir)) {
+      foreach (grep {index($_, '.sawritetest') == 0 &&
+                 (-M File::Spec->catfile($dir, $_)||0) > 0.0001} readdir(WT_DIR)) {
+        unlink(Mail::SpamAssassin::Util::untaint_file_path(File::Spec->catfile($dir, $_)));
+      }
+      closedir WT_DIR;
+    }
+    my $n = ".sawritetest$$".Mail::SpamAssassin::Util::pseudo_random_string(6);
+    my $file = File::Spec->catfile($dir, $n);
+    if (Mail::SpamAssassin::Util::touch_file($file, { create_exclusive => 1 })) {
+      dbg("config: global_state_dir set to $dir");
+      $self->{global_state_dir} = $dir;
+      unlink($file);
+      return 1;
+    }
+    unlink($file); # just in case?
+    return 0;
 }
 
 =item $fullpath = $f->find_rule_support_file ($filename)
@@ -1923,8 +2030,22 @@ it exists, or undef if it doesn't exist.
 sub find_rule_support_file {
   my ($self, $filename) = @_;
 
+  my @paths;
+  # search custom directories first
+  if ($self->{site_rules_filename}) {
+    foreach my $path (split("\000", $self->{site_rules_filename})) {
+      push @paths, $path  if -d $path;
+    }
+  }
+  if ($self->{rules_filename} && -d $self->{rules_filename}) {
+    push @paths, $self->{rules_filename}
+  }
+  # updates sub-directory missing from @default_rules_path
+  push @paths, '__local_state_dir__/__version__/updates_spamassassin_org';
+  push @paths, @default_rules_path;
+
   return $self->first_existing_path(
-    map { my $p = $_; $p =~ s{$}{/$filename}; $p } @default_rules_path );
+    map { my $p = $_; $p =~ s{$}{/$filename}; $p } @paths );
 }
 
 =item $f->create_default_prefs ($filename, $username [ , $userdir ] )
@@ -2006,15 +2127,15 @@ sub expand_name {
   if (am_running_on_windows()) {
     my $userprofile = $ENV{USERPROFILE} || '';
 
-    return $userprofile if ($userprofile && $userprofile =~ m/^[a-z]\:[\/\\]/oi);
-    return $userprofile if ($userprofile =~ m/^\\\\/o);
+    return $userprofile if ($userprofile && $userprofile =~ m/^[a-z]\:[\/\\]/i);
+    return $userprofile if ($userprofile =~ m/^\\\\/);
 
-    return $home if ($home && $home =~ m/^[a-z]\:[\/\\]/oi);
-    return $home if ($home =~ m/^\\\\/o);
+    return $home if ($home && $home =~ m/^[a-z]\:[\/\\]/i);
+    return $home if ($home =~ m/^\\\\/);
 
     return '';
   } else {
-    return $home if ($home && $home =~ /\//o);
+    return $home if ($home && index($home, '/') != -1);
     return (getpwnam($name))[7] if ($name ne '');
     return (getpwuid($>))[7];
   }
@@ -2028,6 +2149,9 @@ sub sed_path {
     return $self->{conf}->{sed_path_cache}->{$path};
   }
 
+  # <4.0 compatibility check, to be removed in 4.1
+  my $check_compat = $path eq '__userstate__/auto-welcomelist';
+
   my $orig_path = $path;
 
   $path =~ s/__local_rules_dir__/$self->{LOCAL_RULES_DIR} || ''/ges;
@@ -2035,9 +2159,20 @@ sub sed_path {
   $path =~ s/__def_rules_dir__/$self->{DEF_RULES_DIR} || ''/ges;
   $path =~ s{__prefix__}{$self->{PREFIX} || $Config{prefix} || '/usr'}ges;
   $path =~ s{__userstate__}{$self->get_and_create_userstate_dir() || ''}ges;
+  $path =~ s/__global_state_dir__/$self->{global_state_dir} || ''/ges;
   $path =~ s{__perl_major_ver__}{$self->get_perl_major_version()}ges;
   $path =~ s/__version__/${VERSION}/gs;
   $path =~ s/^\~([^\/]*)/$self->expand_name($1)/es;
+
+  # <4.0 compatibility check, to be removed in 4.1
+  if ($check_compat) {
+    if ($path =~ m{^(.+)/(.+)$}) {
+      # Use auto-whitelist if found
+      if (!-e $path && -e "$1/auto-whitelist") {
+        $path = "$1/auto-whitelist";
+      }
+    }
+  }
 
   $path = Mail::SpamAssassin::Util::untaint_file_path ($path);
   $self->{conf}->{sed_path_cache}->{$orig_path} = $path;
@@ -2077,16 +2212,32 @@ sub get_pre_files_in_dir {
   return $self->_get_cf_pre_files_in_dir($dir, 'pre');
 }
 
+sub _reorder_dir {
+  # Official ASF channel should be loaded first in
+  # order to be able to override scores by using custom channels
+  # bz 7991
+  if($a eq 'updates_spamassassin_org.cf') {
+    return -1;
+  } elsif ($b eq 'updates_spamassassin_org.cf') {
+    return 1;
+  }
+  return $a cmp $b;
+}
+
 sub _get_cf_pre_files_in_dir {
   my ($self, $dir, $type) = @_;
 
   if ($self->{config_tree_recurse}) {
     my @cfs;
-
+    # copied from Mail::SpamAssassin::Util::untaint_file_path
+    # fix bugs 8010 and 8025 by using an untaint pattern that is better on Windows than File::Find's default
+    my $chars = '-_A-Za-z0-9.#%=+,/:()\\@\\xA0-\\xFF\\\\';
+    my $re = qr{^\s*([$chars][${chars}~ ]*)\z};
     # use "eval" to avoid loading File::Find unless this is specified
     eval ' use File::Find qw();
       File::Find::find(
         { untaint => 1,
+          am_running_on_windows() ? (untaint_pattern => $re) : (),
           follow => 1,
           wanted =>
             sub { push(@cfs, $File::Find::name) if /\.\Q$type\E$/i && -f $_ }
@@ -2095,7 +2246,7 @@ sub _get_cf_pre_files_in_dir {
       my $eval_stat = $@ ne '' ? $@ : "errno=$!";  chomp $eval_stat;
       die "_get_cf_pre_files_in_dir error: $eval_stat";
     };
-    @cfs = sort { $a cmp $b } @cfs;
+    @cfs = sort { _reorder_dir($a, $b) } @cfs;
     return @cfs;
   }
   else {
@@ -2104,7 +2255,7 @@ sub _get_cf_pre_files_in_dir {
                      /\.${type}$/i && -f "$dir/$_" } readdir(SA_CF_DIR);
     closedir SA_CF_DIR;
 
-    return map { "$dir/$_" } sort { $a cmp $b } @cfs;
+    return map { "$dir/$_" } sort { _reorder_dir($a, $b) } @cfs;
   }
 }
 
@@ -2127,11 +2278,18 @@ sub call_plugins {
   return unless $self->{plugins};
 
   # Use some calls ourself too
-  if ($subname eq 'finish_parsing_end') {
+  if ($subname eq 'spamd_child_init') {
+    # set global dir now if spamd
+    $self->set_global_state_dir();
+  } elsif ($subname eq 'finish_parsing_end') {
     # Initialize RegistryBoundaries, now that util_rb_tld etc from config is
     # read.  Plugins can also now use {valid_tlds_re} to one time compile
     # regexes in finish_parsing_end.
     $self->{registryboundaries} = Mail::SpamAssassin::RegistryBoundaries->new ($self);
+  } elsif ($subname eq 'whitelist_address' || $subname eq 'blacklist_address') {
+    # Warn about backwards compatibility, removed in 4.1
+    # Third party usage should be rare event, so do not translate function names
+    warn "config: Deprecated $subname called from call_plugins, use welcomelist_address or blocklist_address\n";
   }
 
   # safety net in case some plugin changes global settings, Bug 6218
@@ -2152,8 +2310,12 @@ sub find_all_addrs_in_mail {
   				Errors-To Mail-Followup-To))
   {
     my @hdrs = $mail_obj->get_header($header);
-    if ($#hdrs < 0) { next; }
-    push (@addrlist, $self->find_all_addrs_in_line(join (" ", @hdrs)));
+    foreach my $hdr (@hdrs) {
+      my @addrs = Mail::SpamAssassin::Util::parse_header_addresses($hdr);
+      foreach my $addr (@addrs) {
+        push @addrlist, $addr->{address} if defined $addr->{address};
+      }
+    }
   }
 
   # find addrs in body, too
@@ -2176,17 +2338,22 @@ sub find_all_addrs_in_mail {
 sub find_all_addrs_in_line {
   my ($self, $line) = @_;
 
+  return () unless defined $line;
+
   # a more permissive pattern based on "dot-atom" as per RFC2822
-  my $ID_PATTERN   = '[-a-z0-9_\+\:\=\!\#\$\%\&\*\^\?\{\}\|\~\/\.]+';
-  my $HOST_PATTERN = '[-a-z0-9_\+\:\/]+';
+  my $ID_PATTERN   = qr/[-a-zA-Z0-9_\+\:\=\!\#\$\%\&\*\^\?\{\}\|\~\/\.]+/;
+  my $HOST_PATTERN = qr/[-a-zA-Z0-9_\+\:\/]+/;
 
   my @addrs;
   my %seen;
   while ($line =~ s/(?:mailto:)?\s*
 	      ($ID_PATTERN \@
-	      $HOST_PATTERN(?:\.$HOST_PATTERN)+)//oix) 
+	      ($HOST_PATTERN(?:\.$HOST_PATTERN)+))//oix) 
   {
     my $addr = $1;
+    my $host = $2;
+    next unless Mail::SpamAssassin::Util::is_fqdn_valid($host);
+    next unless $self->{registryboundaries}->is_domain_valid($host);
     $addr =~ s/^mailto://;
     next if (defined ($seen{$addr})); $seen{$addr} = 1;
     push (@addrs, $addr);

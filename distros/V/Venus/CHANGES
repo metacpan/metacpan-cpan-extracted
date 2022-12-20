@@ -1,3 +1,17 @@
+1.71 2022-12-20
+
+- [feature] Implement Venus::Log
+- [feature] Implement Venus::Cli
+
+1.68 2022-12-16
+
+- [feature] Implement Venus::Data#string
+
+1.67 2022-12-15
+
+- [feature] Allow envvars to control tracing in Venus::Error
+- [feature] Add unused arguments to Venus::Opt
+
 1.66 2022-12-14
 
 - [feature] Cache Venus::Meta for better performance

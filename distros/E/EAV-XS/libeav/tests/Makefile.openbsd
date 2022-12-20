@@ -83,8 +83,8 @@ check-domain: t-dash-domains.bin t-retired.bin
 .endif
 	env LD_LIBRARY_PATH="${LIB_PATH}" \
 	./t-dash-domains.bin ../data/xn-dash-domains.txt
-	env LD_LIBRARY_PATH="${LIB_PATH}" \
-	./t-retired.bin 2 2 ../data/retired.txt
+	#env LD_LIBRARY_PATH="${LIB_PATH}" \
+	#./t-retired.bin 2 2 ../data/retired.txt
 
 check-lpart: t-822-localpart.bin t-5321-localpart.bin
 check-lpart: t-5322-localpart.bin t-6531-localpart.bin

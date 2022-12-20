@@ -21,7 +21,7 @@ name: App-ListNewCPANDists
 provides:
   App::ListNewCPANDists:
     file: lib/App/ListNewCPANDists.pm
-    version: '0.017'
+    version: '0.018'
 requires:
   DBI: '0'
   Data::Sah::Coerce::perl::To_date::From_float::epoch: '0'
@@ -61,7 +61,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-ListNewCPANDists
   homepage: https://metacpan.org/release/App-ListNewCPANDists
   repository: git://github.com/perlancar/perl-App-ListNewCPANDists.git
-version: '0.017'
+version: '0.018'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-11'; # DATE
+our $DATE = '2022-12-16'; # DATE
 our $DIST = 'Sah-Schemas-Perl'; # DIST
-our $VERSION = '0.045'; # VERSION
+our $VERSION = '0.046'; # VERSION
 
 our $schema = [str => {
     summary => 'A .pod or .pm filename, e.g. /path/Foo.pm or /path/Bar/Baz.pod',
@@ -79,7 +79,7 @@ Sah::Schema::perl::pod_or_pm_filename - A .pod or .pm filename, e.g. /path/Foo.p
 
 =head1 VERSION
 
-This document describes version 0.045 of Sah::Schema::perl::pod_or_pm_filename (from Perl distribution Sah-Schemas-Perl), released on 2022-09-11.
+This document describes version 0.046 of Sah::Schema::perl::pod_or_pm_filename (from Perl distribution Sah-Schemas-Perl), released on 2022-12-16.
 
 =head1 SYNOPSIS
 
@@ -165,6 +165,23 @@ L<Perinci::CmdLine> (L<Perinci::CmdLine::Lite>) to create a CLI:
  % ./myapp.pl --version
 
  % ./myapp.pl --arg1 ...
+
+
+=head2 Using with Type::Tiny
+
+To create a type constraint and type library from a schema:
+
+ package My::Types {
+     use Type::Library -base;
+     use Type::FromSah qw( sah2type );
+
+     __PACKAGE__->add_type(
+         sah2type('$sch_name*', name=>'PerlPodOrPmFilename')
+     );
+ }
+
+ use My::Types qw(PerlPodOrPmFilename);
+ PerlPodOrPmFilename->assert_valid($data);
 
 =head1 DESCRIPTION
 

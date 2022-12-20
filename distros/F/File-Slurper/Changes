@@ -1,5 +1,8 @@
 Revision history for File-Slurper
 
+0.014     2022-12-16 16:08:16+01:00 Europe/Amsterdam
+          - Always return an empty file as an empty string
+
 0.013     2021-12-25 10:09:17+01:00 Europe/Amsterdam
           Always split on newlines in read_lines
 

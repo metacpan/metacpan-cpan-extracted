@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-11'; # DATE
+our $DATE = '2022-12-16'; # DATE
 our $DIST = 'Sah-Schemas-Perl'; # DIST
-our $VERSION = '0.045'; # VERSION
+our $VERSION = '0.046'; # VERSION
 
 use Regexp::Pattern::Perl::Module ();
 
@@ -125,7 +125,7 @@ Sah::Schema::perl::modname_with_optional_args - Perl module name (e.g. Foo::Bar)
 
 =head1 VERSION
 
-This document describes version 0.045 of Sah::Schema::perl::modname_with_optional_args (from Perl distribution Sah-Schemas-Perl), released on 2022-09-11.
+This document describes version 0.046 of Sah::Schema::perl::modname_with_optional_args (from Perl distribution Sah-Schemas-Perl), released on 2022-12-16.
 
 =head1 SYNOPSIS
 
@@ -169,12 +169,12 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data);
  
  # a sample valid data
- $data = "Foo::Bar=arg1,arg2";
+ $data = ["Foo"];
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
  $data = ["Foo","arg"];
- my $errmsg = $validator->($data); # => "String is not a valid JSON: malformed JSON string, neither tag, array, object, number, string or atom, at character offset 0 (before \"Foo::Bar=arg1,arg2\") at (eval 3014) line 29.\n"
+ my $errmsg = $validator->($data); # => "\@[1]: Not of type array"
 
 Often a schema has coercion rule or default value, so after validation the
 validated value is different. To return the validated (set-as-default, coerced,
@@ -184,12 +184,12 @@ prefiltered) value:
  my $res = $validator->($data); # [$errmsg, $validated_val]
  
  # a sample valid data
- $data = "Foo::Bar=arg1,arg2";
- my $res = $validator->($data); # => ["","Foo::Bar=arg1,arg2"]
+ $data = ["Foo"];
+ my $res = $validator->($data); # => ["",["Foo"]]
  
  # a sample invalid data
  $data = ["Foo","arg"];
- my $res = $validator->($data); # => ["String is not a valid JSON: malformed JSON string, neither tag, array, object, number, string or atom, at character offset 0 (before \"Foo::Bar=arg1,arg2\") at (eval 3034) line 29.\n",["Foo","arg"]]
+ my $res = $validator->($data); # => ["\@[1]: Not of type array",["Foo","arg"]]
 
 Data::Sah can also create validator that returns a hash of detailed error
 message. Data::Sah can even create validator that targets other language, like
@@ -251,6 +251,23 @@ L<Perinci::CmdLine> (L<Perinci::CmdLine::Lite>) to create a CLI:
  % ./myapp.pl --version
 
  % ./myapp.pl --arg1 ...
+
+
+=head2 Using with Type::Tiny
+
+To create a type constraint and type library from a schema:
+
+ package My::Types {
+     use Type::Library -base;
+     use Type::FromSah qw( sah2type );
+
+     __PACKAGE__->add_type(
+         sah2type('$sch_name*', name=>'PerlModnameWithOptionalArgs')
+     );
+ }
+
+ use My::Types qw(PerlModnameWithOptionalArgs);
+ PerlModnameWithOptionalArgs->assert_valid($data);
 
 =head1 DESCRIPTION
 

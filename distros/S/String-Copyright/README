@@ -2,7 +2,7 @@ NAME
     String::Copyright - Representation of text-based copyright statements
 
 VERSION
-    Version 0.003013
+    Version 0.003014
 
 SYNOPSIS
         use String::Copyright;
@@ -31,7 +31,7 @@ OPTIONS
   threshold, threshold_before, threshold_after
         use String::Copyright { threshold_after => 5 };
 
-    Stop parsing after this many lines whithout copyright information, before
+    Stop parsing after this many lines without copyright information, before
     or after having found any copyright information at all. `threshold` sets
     both `threshold_before` and `threshold_after`.
 
@@ -62,7 +62,7 @@ BUGS/CAVEATS/etc
 
     Only ASCII characters and © (copyright sign) are directly processed.
 
-    If copyright sign is mis-detected or accents or multi-byte characters
+    If copyright sign is not detected or accents or multi-byte characters
     display wrong, then most likely the data was not decoded into a string.
 
     If ranges or lists of years are not tidied, then maybe it contained

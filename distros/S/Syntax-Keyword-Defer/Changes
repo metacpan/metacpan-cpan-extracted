@@ -1,5 +1,13 @@
 Revision history for Syntax-Keyword-Defer
 
+0.08    2022-12-15
+        [CHANGES]
+         * Permit safe forms of `goto` entirely within the defer block
+         * Attempt to fix the double-exception problem (RT144761) by turning
+           subsequent exceptions into warnings
+         * Removed the `FINALLY` support entirely; the module now just croaks
+           immediately.
+
 0.07    2022-02-20
         [CHANGES]
          * Various tidying up of hax/ support files

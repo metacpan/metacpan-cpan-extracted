@@ -1,12 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2011-2020 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2011-2022 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.27;
+use v5.26;
+use Object::Pad 0.70 ':experimental(adjust_params)';
 
-package Tickit::Widget::Scroller::Item::Text 0.28;
-class Tickit::Widget::Scroller::Item::Text;
+package Tickit::Widget::Scroller::Item::Text 0.29;
+class Tickit::Widget::Scroller::Item::Text
+   :strict(params);
 
 use Tickit::Utils qw( textwidth cols2chars );
 
@@ -59,17 +61,19 @@ amount. Does not apply to the first line.
 
 sub BUILDARGS ( $class, $text, %opts ) { return ( text => $text, %opts ) }
 
-has $_indent;
-has @_chunks;
+field $_indent;
+field @_chunks;
 
-has $_width; # width for which the @_lineruns are valid
-has @_lineruns;
+field $_width; # width for which the @_lineruns are valid
+field @_lineruns;
 
-ADJUSTPARAMS ( $params )
-{
-   $_indent = delete $params->{indent} if exists $params->{indent};
+ADJUST :params (
+   :$indent = undef,
+   :$text   = undef,
+) {
+   $_indent = $indent if defined $indent;
 
-   @_chunks = $self->_build_chunks_for( delete $params->{text} );
+   @_chunks = $self->_build_chunks_for( $text );
 }
 
 =head1 METHODS
@@ -179,7 +183,7 @@ method render ( $rb, %args )
       $rb->goto( $lineidx, 0 );
       $rb->erase( $indent ) if $indent;
 
-      foreach my $chunk ( @{ $_lineruns[$lineidx] } ) {
+      foreach my $chunk ( $_lineruns[$lineidx]->@* ) {
          my ( $text, $width, $chunkpen ) = @$chunk;
          $rb->text( $text, $chunkpen );
       }

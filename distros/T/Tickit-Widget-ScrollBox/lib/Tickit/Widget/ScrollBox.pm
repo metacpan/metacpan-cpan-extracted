@@ -1,13 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2022 -- leonerd@leonerd.org.uk
 
 use v5.26; # signatures
-use Object::Pad 0.57;
+use Object::Pad 0.70 ':experimental(adjust_params)';
 
-package Tickit::Widget::ScrollBox 0.11;
+package Tickit::Widget::ScrollBox 0.12;
 class Tickit::Widget::ScrollBox
+   :strict(params)
    :isa(Tickit::SingleChildWidget 0.53);
 
 Tickit::Window->VERSION( '0.39' ); # ->scroll_with_children, default expose_after_scroll
@@ -171,21 +172,20 @@ child content necessary to display.
 
 =cut
 
-has $_vextent;
-has $_hextent;
+field $_vextent;
+field $_hextent;
 
-has $_v_on_demand;
-has $_h_on_demand;
+field $_v_on_demand;
+field $_h_on_demand;
 
-has $_child_is_scrollable;
+field $_child_is_scrollable;
 
-has $_viewport;
+field $_viewport;
 
-ADJUSTPARAMS ( $params )
-{
-   my $vertical   = ( delete $params->{vertical} ) // 1;
-   my $horizontal = ( delete $params->{horizontal} );
-
+ADJUST :params (
+   :$vertical   = 1,
+   :$horizontal = 0,
+) {
    $vertical and
       $_vextent = Tickit::Widget::ScrollBox::Extent->new(
          scrollbox => $self,
@@ -483,8 +483,8 @@ method key_to_bottom    { $_vextent or return; $_vextent->scroll_to( $_vextent->
 method key_to_leftmost  { $_hextent or return; $_hextent->scroll_to( 0 ); 1 }
 method key_to_rightmost { $_hextent or return; $_hextent->scroll_to( $_hextent->limit ); 1 }
 
-has $_drag_offset;
-has $_drag_bar;
+field $_drag_offset;
+field $_drag_bar;
 
 method on_mouse ( $args )
 {

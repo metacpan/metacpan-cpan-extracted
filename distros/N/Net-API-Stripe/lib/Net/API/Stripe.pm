@@ -1,11 +1,11 @@
 # -*- perl -*-
 ##----------------------------------------------------------------------------
 ## Stripe API - ~/lib/Net/API/Stripe.pm
-## Version v2.0.1
+## Version v2.0.2
 ## Copyright(c) 2022 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2018/07/19
-## Modified 2022/10/29
+## Modified 2022/12/19
 ## All rights reserved.
 ## 
 ## 
@@ -53,7 +53,7 @@ BEGIN
     use constant API_BASE => 'https://api.stripe.com/v1';
     use constant FILES_BASE => 'https://files.stripe.com/v1';
     use constant STRIPE_WEBHOOK_SOURCE_IP => [qw( 54.187.174.169 54.187.205.235 54.187.216.72 54.241.31.99 54.241.31.102 54.241.34.107 )];
-    our $VERSION = 'v2.0.1';
+    our $VERSION = 'v2.0.2';
     our $EXCEPTION_CLASS = 'Net::API::Stripe::Exception';
 };
 
@@ -11924,7 +11924,7 @@ sub setup_intent_create
     customer => { type => "string" },
     description => { type => "string" },
     flow_directions => { type => "array" },
-    id => { re => qr/^\w+$/, required => 1 },
+    # id => { re => qr/^\w+$/, required => 1 },
     mandate_data => {
         fields => [
                       "customer_acceptance.type",
@@ -16018,79 +16018,13 @@ sub _check_parameters
         if( ref( $dict ) eq 'HASH' )
         {
             my $pkg;
-#             if( $dict->{fields} && ref( $dict->{fields} ) eq 'ARRAY' )
-#             {
-#                 my $this = $dict->{fields};
-#                 if( ref( $args->{ $k } ) eq 'ARRAY' && $dict->{type} eq 'array' )
-#                 {
-#                     # Just saying it's ok
-#                 }
-#                 elsif( ref( $args->{ $k } ) ne 'HASH' )
-#                 {
-#                     push( @$err, sprintf( "Parameter \"$k\" must be a dictionary definition with following possible hash keys: \"%s\". Did you forget type => 'array' ?", join( ', ', @$this ) ) );
-#                     next;
-#                 }
-#                 
-#                 # We build a test mirror hash structure against which we will check if actual data fields exist or not
-#                 my $mirror = {};
-#                 # $self->messagef( 7, "Building mirror check data structure fpr '$k' with %d fields.", scalar( @$this ) );
-#                 foreach my $f ( @$this )
-#                 {
-#                     my @path = CORE::split( /\./, $f );
-#                     # $self->message( 7, "\tProcessing '$f'." );
-#                     my $parent_hash = $mirror;
-#                     for( my $i = 0; $i < scalar( @path ); $i++ )
-#                     {
-#                         my $p = $path[$i];
-#                         my $is_required = 0;
-#                         if( substr( $p, -1, 1 ) eq '!' )
-#                         {
-#                             $p = substr( $p, 0, CORE::length( $p ) - 1 );
-#                             $is_required = 1;
-#                         }
-#                         # $self->message( 7, "\t\t$p is ", ( $is_required ? '' : 'not ' ), "required." );
-#                         
-#                         if( $i == $#path )
-#                         {
-#                             $parent_hash->{ $p } = $is_required;
-#                         }
-#                         else
-#                         {
-#                             my $prev_val = $parent_hash->{ $p };
-#                             $parent_hash->{ $p } = {} unless( CORE::exists( $parent_hash->{ $p } ) && ref( $parent_hash->{ $p } ) eq 'HASH' );
-#                             $parent_hash = $parent_hash->{ $p };
-#                             unless( exists( $parent_hash->{_required} ) )
-#                             {
-#                                 $parent_hash->{_required} = $is_required ? $is_required : ref( $prev_val ) ne 'HASH' ? $prev_val : $is_required;
-#                             }
-#                         }
-#                     }
-#                 }
-#                 
-#                 # $self->message( 7, "Mirror is: ", sub{ $self->dump( $mirror ); } );
-#                 
-#                 # Do we have dots in field names? If so, this is a multi dimensional hash we are potentially looking at
-#                 if( ref( $args->{ $k } ) eq 'HASH' )
-#                 {
-#                     my $res = $check_fields_recursive->( $args->{ $k }, $mirror, $k, ( exists( $dict->{required} ) ? $dict->{required} : {} ) );
-#                     push( @$err, @$res ) if( scalar( @$res ) );
-#                 }
-#                 elsif( ref( $args->{ $k } ) eq 'ARRAY' && $dict->{type} eq 'array' )
-#                 {
-#                     my $arr = $args->{ $k };
-#                     for( my $i = 0; $i < scalar( @$arr ); $i++ )
-#                     {
-#                         if( ref( $arr->[ $i ] ) ne 'HASH' )
-#                         {
-#                             push( @$err, sprintf( "Invalid data type at offset $i. Parameter \"$k\" must be a dictionary definition with following possible hash keys: \"%s\"", join( ', ', @$this ) ) );
-#                             next;
-#                         }
-#                         my $res = $check_fields_recursive->( $arr->[ $i ], $mirror, $k, ( exists( $dict->{required} ) ? $dict->{required} : {} ) );
-#                         push( @$err, @$res ) if( scalar( @$res ) );
-#                     }
-#                 }
-#                 # $clean_up_check_fields_recursive->( $args->{ $k } );
-#             }
+            # We stringify object that can be stringified
+            if( defined( $args->{ $k } ) &&
+                ref( $args->{ $k } ) &&
+                overload::Method( $args->{ $k } => '""' ) )
+            {
+                $args->{ $k } = $args->{ $k } . '';
+            }
             
             if( defined( $dict->{required} ) && 
                 $dict->{required} && 
@@ -16113,6 +16047,13 @@ sub _check_parameters
                 push( @$err, "Parameter \"$k\" with value \"$args->{$k}\" does not have a legitimate value." );
             }
             elsif( defined( $dict->{type} ) &&
+                   $dict->{type} eq 'boolean' && 
+                   defined( $args->{ $k } ) && 
+                   CORE::length( $args->{ $k } ) )
+            {
+                $args->{ $k } = ( $args->{ $k } eq 'true' || ( $args->{ $k } ne 'false' && $args->{ $k } ) ) ? 'true' : 'false';
+            }
+            elsif( defined( $dict->{type} ) &&
                    $dict->{type} && 
                    ( 
                        ( $dict->{type} eq 'scalar' && ref( $args->{ $k } ) ) ||
@@ -16121,13 +16062,6 @@ sub _check_parameters
                  )
             {
                 push( @$err, "I was expecting a data of type $dict->{type}, but got " . lc( ref( $args->{ $k } ) ) );
-            }
-            elsif( defined( $dict->{type} ) &&
-                   $dict->{type} eq 'boolean' && 
-                   defined( $args->{ $k } ) && 
-                   CORE::length( $args->{ $k } ) )
-            {
-                $args->{ $k } = ( $args->{ $k } eq 'true' || ( $args->{ $k } ne 'false' && $args->{ $k } ) ) ? 'true' : 'false';
             }
             elsif( defined( $dict->{type} ) &&
                    $dict->{type} eq 'integer' )
@@ -16664,8 +16598,8 @@ sub _get_args
 {
     my $self = shift( @_ );
     CORE::return( {} ) if( !scalar( @_ ) || ( scalar( @_ ) == 1 && !defined( $_[0] ) ) );
-    # Arg is one unique object
-    CORE::return( $_[0] ) if( $self->_is_object( $_[0] ) );
+    # Arg is one of our unique object
+    CORE::return( $_[0] ) if( $self->_is_a( $_[0] => 'Net::API::Stripe::Generic' ) );
     my $args = ref( $_[0] ) eq 'HASH' ? $_[0] : { @_ == 1 ? ( id => $_[0] ) : @_ };
     CORE::return( $args );
 }

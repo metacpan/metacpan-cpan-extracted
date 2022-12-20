@@ -7,7 +7,7 @@ my $build = Module::Build->new(
    module_name => 'Tickit::Widget::Entry::Plugin::Completion',
    requires => {
       'perl' => '5.026',
-      'Object::Pad' => '0.51',
+      'Object::Pad' => '0.75',
    },
    configure_requires => {
       'Module::Build' => '0.4004', # test_requires

@@ -14,16 +14,21 @@ run_long_tests=y
 
 run_net_tests=n
 
+# If you have resolver capable of returning IPv6/AAAA addresses
+run_ipv6_dns_tests=n
+
 # Run DCC Tests
 run_dcc_tests=n
 
 # ---------------------------------------------------------------------------
-# Run SQL-based user pref tests during 'make test' REQUIRES DBD::SQLite
+# Run SQL-based user pref tests during 'make test' REQUIRES DBD::SQLite 1.59_01 or later
 run_sql_pref_tests=n
 
 # ---------------------------------------------------------------------------
-# Run SQL-based Auto-whitelist tests during 'make test' (additional
-# information required, below:)
+# Run SQL-based Auto-whitelist tests during 'make test'
+# NOTE: AWL test is always run with DBD::SQLite when available, only enable
+# this when you want to additionally test for example MySQL or PostgresSQL
+# (for which database needs to be created manually and configured below).
 run_awl_sql_tests=n
 
 # SQL AWL DSN
@@ -36,12 +41,14 @@ user_awl_sql_password=
 user_awl_sql_table=awl
 
 # ---------------------------------------------------------------------------
-# Run Bayes SQL storage tests during 'make test' (additional
-# information required, below:)
+# Run Bayes SQL storage tests during 'make test'
+# NOTE: Bayes test is always run with DBD::SQLite when available, only enable
+# this when you want to additionally test for example MySQL or PostgresSQL
+# (for which database needs to be created manually and configured below).
 run_bayes_sql_tests=n
 
 # Bayes Store Module (bayes_store_module)
-bayes_store_module=Mail::SpamAssassin::BayesStore::SQL
+bayes_store_module=Mail::SpamAssassin::BayesStore::MySQL
 # Bayes SQL DSN (bayes_sql_dsn)
 bayes_sql_dsn=dbi:mysql:spamassassin:localhost
 # Bayes SQL DB username (bayes_sql_username)
@@ -61,12 +68,6 @@ run_spamd_prefork_stress_test=n
 # rule_names.t fails continually due to changes in the rulesrc repository;
 # TODO: we need a better way to test this.
 run_rule_name_tests=n
-
-# ---------------------------------------------------------------------------
-
-# This test requires the Devel::SawAmpersand CPAN module, and may also fail
-# depending on changes in the third-party modules we import.
-run_saw_ampersand_test=n
 
 # ---------------------------------------------------------------------------
 

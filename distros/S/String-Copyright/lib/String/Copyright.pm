@@ -21,11 +21,11 @@ String::Copyright - Representation of text-based copyright statements
 
 =head1 VERSION
 
-Version 0.003013
+Version 0.003014
 
 =cut
 
-our $VERSION = '0.003013';
+our $VERSION = '0.003014';
 
 # Dependencies
 use parent 'Exporter::Tiny';
@@ -76,7 +76,7 @@ Options can be set as an argument to the 'use' statement.
 
     use String::Copyright { threshold_after => 5 };
 
-Stop parsing after this many lines whithout copyright information,
+Stop parsing after this many lines without copyright information,
 before or after having found any copyright information at all.
 C<threshold> sets both C<threshold_before> and C<threshold_after>.
 
@@ -107,6 +107,7 @@ my $blank           = '[ \t]';
 my $blank_or_break_ = "$blank*\\n?$blank*";
 my $dash            = '[-˗‐‑‒–—―⁃−﹣－]';
 my $colons_         = "$blank?:{1,2}";
+my $strictlabel     = 'SPDX-FileCopyrightText:';
 my $label           = '(?i:copyright(?:-holders?)?\b|copr\.)';
 my $sign            = '[©⒞Ⓒⓒ🄒🄫🅒]';
 my $nroff_sign_     = '\\\\[(]co';
@@ -159,7 +160,7 @@ my $owner_prefix  = '[(*<@\[{]';
 my $owner_initial = '[^\s!"#$%&\'()*+,./:;<=>?@[\\\\\]^_`{|}~-]';
 
 my $signs
-	= "(?m:(?:$label|$sign|$nroff_sign_|(?:^|$blank)$pseudo_sign_)(?:$colon_or_dash?$blank*(?:$label|$sign|$pseudo_sign_))*)";
+	= "(?m:$strictlabel$blank*|(?:$label|$sign|$nroff_sign_|(?:^|$blank)$pseudo_sign_)(?:$colon_or_dash?$blank*(?:$label|$sign|$pseudo_sign_))*)";
 my $yearspan_ = "$year_(?:$dash_spacy_$year_)?";
 my $years_    = "$yearspan_(?:$comma_spacy$yearspan_)*";
 my $owners_
@@ -324,7 +325,7 @@ need to be decoded to strings before use.
 
 Only ASCII characters and B<©> (copyright sign) are directly processed.
 
-If copyright sign is mis-detected
+If copyright sign is not detected
 or accents or multi-byte characters display wrong,
 then most likely the data was not decoded into a string.
 

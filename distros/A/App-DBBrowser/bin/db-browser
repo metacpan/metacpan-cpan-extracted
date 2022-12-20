@@ -3,7 +3,7 @@ use warnings;
 use strict;
 use 5.014;
 
-our $VERSION = '2.304';
+our $VERSION = '2.305';
 
 use Term::Choose::Screen qw( hide_cursor show_cursor clear_to_end_of_screen );
 
@@ -47,7 +47,7 @@ C<db-browser> - Browse C<SQLite>/C<MySQL>/C<PostgreSQL> databases and their tabl
 
 =head1 VERSION
 
-Version 2.304
+Version 2.305
 
 =head1 SYNOPSIS
 
@@ -304,7 +304,7 @@ selected aggregate functions and the selected group-by columns.
 
 =head4 AGGREGATE
 
-C<AVG>, C<COUNT>, C<COUNT(*)>, C<GROUP_CONCAT>/C<STRING_AGG>, C<MAX>, C<MIN>, C<SUM>
+C<AVG>, C<COUNT>, C<COUNT(*)>, C<GROUP_CONCAT>, C<MAX>, C<MIN>, C<SUM>
 
 =head4 DISTINCT
 
@@ -513,7 +513,7 @@ In the replacement it can be used the variable C<$c> as a counter. C<$c> is set 
 
 Available modifiers: C<g>, C<i>, C<e>.
 
-By selecting the prompt line (C<Choose:>) one can save search & replace instructions for later use.
+By selecting the prompt line (C<Your choice:>) one can save search & replace instructions for later use.
 
 If a search & replace has altered the first row of the input data, a menu entry named C<RESTORE header row> is offered.
 
@@ -866,8 +866,8 @@ With C<MySQL> the sensitive match is achieved by enabling the C<BINARY> operator
 
 =head3 Aliases
 
-If enabled, it is asked for an alias. If entered nothing, no alias is added except for joined tables and unions and for
-derived tables which get then a default alias.
+If enabled, it is asked for an alias. If entered nothing, no alias is added except for joined tables, union tables,
+derived tables and aggregate functons which get then a default alias.
 
 =over
 

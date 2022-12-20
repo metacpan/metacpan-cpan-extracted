@@ -27,14 +27,10 @@ use Errno qw(EBADF);
 use File::Basename;
 use File::Spec;
 use File::Path;
-
-BEGIN {
-  eval { require Digest::SHA; import Digest::SHA qw(sha1); 1 }
-  or do { require Digest::SHA1; import Digest::SHA1 qw(sha1) }
-}
+use Digest::SHA qw(sha1);
 
 use Mail::SpamAssassin;
-use Mail::SpamAssassin::Util qw(untaint_var am_running_on_windows);
+use Mail::SpamAssassin::Util qw(untaint_var am_running_on_windows compile_regexp);
 use Mail::SpamAssassin::BayesStore;
 use Mail::SpamAssassin::Logger;
 
@@ -992,9 +988,17 @@ sub get_storage_variables {
 sub dump_db_toks {
   my ($self, $template, $regex, @vars) = @_;
 
+  if (defined $regex) {
+    my ($rec, $err) = compile_regexp($regex, 2);
+    if (!$rec) {
+      die "Invalid dump_tokens regex '$regex': $err\n";
+    }
+    $regex = $rec;
+  }
+
   while (my ($tok, $tokvalue) = each %{$self->{db_toks}}) {
     next if ($tok =~ MAGIC_RE); # skip magic tokens
-    next if (defined $regex && ($tok !~ /$regex/o));
+    next if (defined $regex && $tok !~ /$regex/o);
 
     # We have the value already, so just unpack it.
     my ($ts, $th, $atime) = $self->tok_unpack ($tokvalue);

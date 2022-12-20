@@ -1,6 +1,8 @@
 package AI::TensorFlow::Libtensorflow::Lib::Types;
 # ABSTRACT: Type library
-$AI::TensorFlow::Libtensorflow::Lib::Types::VERSION = '0.0.2';
+$AI::TensorFlow::Libtensorflow::Lib::Types::VERSION = '0.0.3';
+use strict;
+use warnings;
 use Type::Library 0.008 -base,
 	-declare => [qw(
 		TFTensor
@@ -10,7 +12,7 @@ use Type::Library 0.008 -base,
 		Dims
 	)];
 use Type::Utils -all;
-use Types::Standard qw(ArrayRef Int);
+use Types::Standard qw(ArrayRef Int Tuple InstanceOf);
 
 class_type TFTensor => { class => 'AI::TensorFlow::Libtensorflow::Tensor' };
 
@@ -31,6 +33,29 @@ class_type TFOperation => { class => 'AI::TensorFlow::Libtensorflow::Operation' 
 
 declare Dims => as ArrayRef[Int];
 
+class_type TFOutput => { class => 'AI::TensorFlow::Libtensorflow::Output' };
+
+declare_coercion "TFOutputFromTuple",
+	to_type 'TFOutput',
+	from Tuple[InstanceOf['AI::TensorFlow::Libtensorflow::Operation'],Int],
+	q {
+		AI::TensorFlow::Libtensorflow::Output->New({
+			oper  => $_->[0],
+			index => $_->[1],
+		});
+	};
+
+class_type TFInput => { class => 'AI::TensorFlow::Libtensorflow::Input' };
+
+declare_coercion "TFInputFromTuple",
+	to_type 'TFInput',
+	from Tuple[InstanceOf['AI::TensorFlow::Libtensorflow::Operation'],Int],
+	q {
+		AI::TensorFlow::Libtensorflow::Input->New({
+			oper  => $_->[0],
+			index => $_->[1],
+		});
+	};
 
 1;
 
@@ -81,6 +106,14 @@ Type for class L<AI::TensorFlow::Libtensorflow::Operation>
 =head2 Dims
 
 C<ArrayRef> of C<Int>
+
+=head2 TFOutput
+
+Type for class L<AI::TensorFlow::Libtensorflow::Output>
+
+=head2 TFInput
+
+Type for class L<AI::TensorFlow::Libtensorflow::Input>
 
 =head1 AUTHOR
 

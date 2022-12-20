@@ -3,9 +3,9 @@
 #
 #  (C) Paul Evans, 2009-2022 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.57;
+use Object::Pad 0.66;
 
-package Tickit::ContainerWidget 0.56;
+package Tickit::ContainerWidget 0.57;
 class Tickit::ContainerWidget
    :isa(Tickit::Widget);
 
@@ -56,7 +56,7 @@ section below.
 
 =cut
 
-has %_child_opts;
+field %_child_opts;
 
 # This class should probably be a role
 ADJUST

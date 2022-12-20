@@ -9,6 +9,10 @@ use Venus::Class 'base';
 
 base 'Faker::Plugin::EsEs';
 
+# VERSION
+
+our $VERSION = '1.17';
+
 # METHODS
 
 sub execute {
@@ -47,6 +51,12 @@ Faker::Plugin::EsEs::AddressCityPrefix - Address City Prefix
 =head1 ABSTRACT
 
 Address City Prefix for Faker
+
+=cut
+
+=head1 VERSION
+
+1.17
 
 =cut
 

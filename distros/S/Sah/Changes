@@ -1,3 +1,12 @@
+0.9.51  2022-10-21  Released-By: PERLANCAR; Urgency: low
+
+        - No spec changes.
+
+        - Remove some more mentions of the old extras part.
+
+        - Tweak POD formatting.
+
+
 0.9.50  2021-07-20  Released-By: PERLANCAR; Urgency: medium
 
         - No spec changes.

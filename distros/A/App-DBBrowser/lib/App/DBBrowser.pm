@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use 5.014;
 
-our $VERSION = '2.304';
+our $VERSION = '2.305';
 
 use File::Basename        qw( basename );
 use File::Spec::Functions qw( catfile catdir );
@@ -38,7 +38,7 @@ BEGIN {
 sub new {
     my ( $class ) = @_;
     my $info = {
-        tc_default  => { hide_cursor => 0, clear_screen => 1, page => 2, undef => '<<', prompt => 'Choose:' },
+        tc_default  => { hide_cursor => 0, clear_screen => 1, page => 2, undef => '<<', prompt => 'Your choice:' },
         tf_default  => { hide_cursor => 2, clear_screen => 1, page => 2 },
         tr_default  => { hide_cursor => 2, clear_screen => 1, page => 2 },
         tcu_default => { hide_cursor => 0, clear_screen => 1, page => 2 }, ##
@@ -533,8 +533,8 @@ sub run {
                     }
                     if ( $sf->{i}{special_table} ) {
                         $sf->{d}{table} = ucfirst $sf->{i}{special_table};
-                        my $qc = $sf->{i}{quote_char};
-                        if ( $qt_table =~ /\sAS\s\Q$qc\E([^\Q$qc\E]+)\Q$qc\E\z/ ) {
+                        my $qc = quotemeta $sf->{i}{quote_char};
+                        if ( $qt_table =~ /\sAS\s$qc([^$qc]+)$qc\z/ ) {
                             $sf->{d}{table} .= ': ' . $1;
                         }
                     }
@@ -591,7 +591,7 @@ App::DBBrowser - Browse SQLite/MySQL/PostgreSQL databases and their tables inter
 
 =head1 VERSION
 
-Version 2.304
+Version 2.305
 
 =head1 DESCRIPTION
 

@@ -7,6 +7,18 @@ Home page:    <https://metacpan.org/release/String-Copyright>
 Bug tracker:  <https://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=libstring-copyright-perl>
 Maintainer:   Jonas Smedegaard (JONASS) <jonass@cpan.org>
 
+0.003014	2022-12-17
+
+ [ Documentation ]
+ - fix a few typos in POD
+
+ [ Test Suite ]
+ - check spelling of PODs with tidyall
+ - fix wordlist in author test pod-spell
+
+ [ Other ]
+ - detect SPDX-FileCopyrightText: as stricl label
+
 0.003013	2022-01-16
 
  [ Documentation ]

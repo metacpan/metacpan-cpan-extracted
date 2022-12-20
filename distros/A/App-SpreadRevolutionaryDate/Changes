@@ -1,6 +1,10 @@
 Changelog for App-SpreadRevolutionaryDate
 
-0.31 2021-06-02T18:23:35
+0.32 2022-12-15T07:06:09
+ - Update author's name and copyright years
+ - Sync Changes
+
+0.31 2021-06-02T18:23:35Z
  - Update doc with command line options for liberachat fixed
  - Fix command line options for liberachat
 

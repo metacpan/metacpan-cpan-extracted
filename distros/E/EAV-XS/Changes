@@ -1,5 +1,12 @@
 Revision history for Perl extension EAV::XS.
 
+0.7.4  Sun Dec 18 08:57:35 UTC 2022
+	- update IANA database
+
+0.7.3  Wed Dec  7 06:30:49 UTC 2022
+	- added notes about installing dependencies, thanks to Gabor Szabo
+	- update IANA database
+
 0.7.2  Sat Oct 15 13:50:26 UTC 2022
 	- skip return value check of setlocale in tests
 	- fixed passing RFC options when generating XS.c

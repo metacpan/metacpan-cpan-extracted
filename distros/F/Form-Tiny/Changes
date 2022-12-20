@@ -1,5 +1,8 @@
 Revision history for Perl extension Form::Tiny.
 
+2.16 Mon Dec 19 2022
+	- Empty child forms now produce a proper error message (gh#8)
+
 2.15 Sun Oct 30 2022
 	- Add new method 'value' to forms
 

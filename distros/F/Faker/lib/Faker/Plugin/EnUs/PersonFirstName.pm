@@ -9,6 +9,10 @@ use Venus::Class 'base';
 
 base 'Faker::Plugin::EnUs';
 
+# VERSION
+
+our $VERSION = '1.17';
+
 # METHODS
 
 sub execute {
@@ -3043,6 +3047,12 @@ Faker::Plugin::EnUs::PersonFirstName - Person First Name
 =head1 ABSTRACT
 
 Person First Name for Faker
+
+=cut
+
+=head1 VERSION
+
+1.17
 
 =cut
 

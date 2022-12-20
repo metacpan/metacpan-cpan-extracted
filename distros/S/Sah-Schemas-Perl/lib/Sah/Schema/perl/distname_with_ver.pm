@@ -4,9 +4,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-11'; # DATE
+our $DATE = '2022-12-16'; # DATE
 our $DIST = 'Sah-Schemas-Perl'; # DIST
-our $VERSION = '0.045'; # VERSION
+our $VERSION = '0.046'; # VERSION
 
 our $schema = [str => {
     summary => 'Perl distribution name with version number suffix, e.g. Foo-Bar@0.001',
@@ -60,7 +60,7 @@ Sah::Schema::perl::distname_with_ver - Perl distribution name with version numbe
 
 =head1 VERSION
 
-This document describes version 0.045 of Sah::Schema::perl::distname_with_ver (from Perl distribution Sah-Schemas-Perl), released on 2022-09-11.
+This document describes version 0.046 of Sah::Schema::perl::distname_with_ver (from Perl distribution Sah-Schemas-Perl), released on 2022-12-16.
 
 =head1 SYNOPSIS
 
@@ -98,7 +98,7 @@ valid, a non-empty error message otherwise):
  my $errmsg = $validator->($data);
  
  # a sample valid data
- $data = "Foo-Bar\@1.0.0";
+ $data = "Foo::Bar\@1.0.0";
  my $errmsg = $validator->($data); # => ""
  
  # a sample invalid data
@@ -113,7 +113,7 @@ prefiltered) value:
  my $res = $validator->($data); # [$errmsg, $validated_val]
  
  # a sample valid data
- $data = "Foo-Bar\@1.0.0";
+ $data = "Foo::Bar\@1.0.0";
  my $res = $validator->($data); # => ["","Foo-Bar\@1.0.0"]
  
  # a sample invalid data
@@ -180,6 +180,23 @@ L<Perinci::CmdLine> (L<Perinci::CmdLine::Lite>) to create a CLI:
  % ./myapp.pl --version
 
  % ./myapp.pl --arg1 ...
+
+
+=head2 Using with Type::Tiny
+
+To create a type constraint and type library from a schema:
+
+ package My::Types {
+     use Type::Library -base;
+     use Type::FromSah qw( sah2type );
+
+     __PACKAGE__->add_type(
+         sah2type('$sch_name*', name=>'PerlDistnameWithVer')
+     );
+ }
+
+ use My::Types qw(PerlDistnameWithVer);
+ PerlDistnameWithVer->assert_valid($data);
 
 =head1 DESCRIPTION
 

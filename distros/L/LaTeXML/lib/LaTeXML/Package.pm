@@ -159,8 +159,13 @@ sub UTF {
 
 sub coerceCS {
   my ($cs) = @_;
-  $cs = T_CS($cs)           unless ref $cs;
-  $cs = T_CS(ToString($cs)) unless ref $cs eq 'LaTeXML::Core::Token';
+  if ((ref $cs) && (ref $cs ne 'LaTeXML::Core::Token')) {
+    $cs = ToString($cs); }
+  if    (ref $cs) { }
+  elsif ($cs =~ s/^\\csname\s+(.*)\\endcsname//) {
+    $cs = T_CS('\\' . $1); }
+  else {
+    $cs = T_CS($cs); }
   return $cs; }
 
 sub parsePrototype {
@@ -607,6 +612,8 @@ sub DefColumnType {
 sub NewCounter {
   my ($ctr, $within, %options) = @_;
   my $unctr = "UN$ctr";    # UNctr is counter for generating ID's for UN-numbered items.
+  if ($within && ($within ne 'document') && !LookupValue("\\c\@$within")) {
+    NewCounter($within); }
   DefRegisterI(T_CS("\\c\@$ctr"), undef, Number(0));
   AssignValue("\\c\@$ctr" => Number(0), 'global');
   AfterAssignment();
@@ -647,7 +654,7 @@ sub NewCounter {
 
 sub CounterValue {
   my ($ctr) = @_;
-  $ctr = ToString($ctr) if ref $ctr;
+  $ctr = ToString(Expand($ctr)) if ref $ctr;
   my $value = LookupValue('\c@' . $ctr);
   if (!$value) {
     Warn('undefined', $ctr, $STATE->getStomach,
@@ -663,7 +670,7 @@ sub AfterAssignment {
 
 sub SetCounter {
   my ($ctr, $value) = @_;
-  $ctr = ToString($ctr) if ref $ctr;
+  $ctr = ToString(Expand($ctr)) if ref $ctr;
   AssignValue('\c@' . $ctr => $value, 'global');
   AfterAssignment();
   DefMacroI(T_CS("\\\@$ctr\@ID"), undef, Tokens(Explode($value->valueOf)), scope => 'global');
@@ -671,7 +678,7 @@ sub SetCounter {
 
 sub AddToCounter {
   my ($ctr, $value) = @_;
-  $ctr = ToString($ctr) if ref $ctr;
+  $ctr = ToString(Expand($ctr)) if ref $ctr;
   my $v = CounterValue($ctr)->add($value);
   AssignValue('\c@' . $ctr => $v, 'global');
   AfterAssignment();
@@ -697,6 +704,7 @@ sub StepCounter {
 sub RefStepCounter {
   my ($type, $noreset) = @_;
   my $ctr = LookupMapping('counter_for_type', $type) || $type;
+  $ctr = ToString(Expand($ctr)) if ref $ctr;
   StepCounter($ctr, $noreset);
   maybePreemptRefnum($ctr);
   my $iddef = $STATE->lookupDefinition(T_CS("\\the$ctr\@ID"));
@@ -894,7 +902,7 @@ sub Invocation {
     return Tokens($token, ($params ? $params->revertArguments(@args) : ())); }
   else {
     $STATE->generateErrorStub(undef, $token, convertLaTeXArgs(scalar(@args), 0));
-    return Tokens($token, map { (T_BEGIN, $_->unlist, T_END) } @args); } }
+    return Tokens($token, map { ($_ ? (T_BEGIN, $_->unlist, T_END) : ()) } @args); } }
 
 sub RawTeX {
   my ($text) = @_;
@@ -904,7 +912,8 @@ sub RawTeX {
   my $savedcc = $STATE->lookupCatcode('@');
   $STATE->assignCatcode('@' => CC_LETTER);
 
-  $stomach->getGullet->readingFromMouth(LaTeXML::Core::Mouth->new($text, fordefinitions => 1), sub {
+  $stomach->getGullet->readingFromMouth(LaTeXML::Core::Mouth->new($text,
+      fordefinitions => 1, at_letter => 1), sub {
       my ($gullet) = @_;
       my $token;
       while ($token = $gullet->readXToken(0)) {
@@ -1418,7 +1427,8 @@ sub createXMRefs {
     my $box     = ($isarray ? $$arg[1]{_box} : $document->getNodeBox($arg));
     # XMHint's are ephemeral, they may disappear; so just clone it w/o id
     if ($qname eq 'ltx:XMHint') {
-      my %attr = ($isarray ? %{ $$arg[1] } : (map { $_->nodeName => $_->getValue } $arg->attributes));
+      my %attr = ($isarray ? %{ $$arg[1] }
+        : (map { $document->getNodeQName($_) => $_->getValue } $arg->attributes));
       delete $attr{'xml:id'};
       push(@refs, [$qname, {%attr}]); }
     # Likewise, clone an XMRef (w/o any attributes or id ?) rather than create an XMRef to an XMRef.
@@ -2001,33 +2011,78 @@ sub FindFile_aux {
     return $path; }
   return; }
 
+# A fallback mechanism aiming to load the applicable pieces of arXiv's long-tail
+# suffixes preceded by a separator
+our @find_fallback_suffixes = (
+  # arxiv-specific suffixes
+  'arx', 'arxiv',     'conference', 'workshop',
+  'tmp', 'alternate', 'preprint',   'fixed',
+  # arbitrary 1,2-letter trailing markers
+  # tragically this is too general:
+  # -- tikz-cd.sty is a real package
+  # '\w\w?',
+  #
+  # version-oriented suffixes
+  '[vV]?[-_.\d]+',
+  # mixed
+  'old',      'new',    'final', 'clean',
+  'mine',     'priv',   'rev',   'mod',
+  'modified', 'edited', 'custom',
+  'altered',  'rtx'
+);
+# suffixes without a separator
+our @find_fallback_glued_suffixes = (
+  # version-oriented suffixes
+  '[vV]?[-_.\d]+',
+  # long domain-specific words
+  # that DO NOT conflict with names of packages
+  # e.g. we have no binding matching '*arxiv*'
+  'arxiv'
+);
+our @find_fallback_prefixes = (
+  # see e.g. astro-ph/0002461 for rw_
+  'rw', 'my', 'preprint',
+);
+
 sub FindFile_fallback {
   my ($file, $ltxml_paths, %options) = @_;
-
-  # Supported:
-  # Numeric suffixes (version nums, dates) with optional separators
   my $fallback_file = $file;
   my $type          = $options{type};
   if ($fallback_file =~ s/\.(sty|cls)$//) {
     # if we provide the type, that remains primary.
     $type = $1 unless $type; }
   if ($type) {    # if we know what we're dealing with...
-    my $discard = "";
-    if ($fallback_file =~ s/([-_](?:arxiv|conference|workshop))$//) {
-      # arxiv-specific suffixes, maybe move those out to an extension package?
-      $discard = $1;
-    }
-    # TODO: If we want a Whitelist hash table -- add it here, before further regexing.
-    if ($fallback_file =~ s/([-_]?v?[-_\d]+)$//) {
-      $discard = "$1$discard";
-    }
+    my $prefixes_str = '^((?:' . join("|", @find_fallback_prefixes) . ')[-_.]?)';
+    my $prefixes_rx  = qr/$prefixes_str/i;
+    # Note that we also remove numbers glued directly onto the name without a separator.
+    my $suffixes_str       = '([._-](?:' . join("|", @find_fallback_suffixes) . '))$';
+    my $suffixes_rx        = qr/$suffixes_str/i;
+    my $glued_suffixes_str = '(' . join("|", @find_fallback_glued_suffixes) . ')$';
+    my $glued_suffixes_rx  = qr/$glued_suffixes_str/i;
+    my ($discard_pre, $discard_post) = ('', '');
+    # First look at delimited suffixes, then glued ones, and finally prefixes
+    while ($fallback_file) {
+      if ($fallback_file =~ s/$suffixes_rx//) {
+        $discard_post = "$1$discard_post";
+        next; }
+      if ($fallback_file =~ s/$glued_suffixes_rx//) {
+        $discard_post = "$1$discard_post";
+        next; }
+      if ($fallback_file =~ s/$prefixes_rx//) {
+        $discard_pre .= $1;
+        next; }
+      last; }
+    $discard_pre .= '...' if $discard_pre && $discard_post;
+    my $discard = $discard_pre . $discard_post;
     if ($discard) {    # we had something to discard, so a new query is needed
       my $fallback_query = "$fallback_file.$type";
-      if (my $path = pathname_find("$fallback_query.ltxml", paths => $ltxml_paths, installation_subdir => 'Package')) {
+      if (my $path =
+        pathname_find("$fallback_query.ltxml", paths => $ltxml_paths, installation_subdir => 'Package')) {
         Info('fallback', $file, $STATE->getStomach->getGullet,
 "Interpreted $discard as a versioned package/class name, falling back to generic $fallback_query\n");
         return $path; } } }
-  return; }
+  else {
+    return; } }
 
 sub pathname_is_nasty {
   my ($pathname) = @_;
@@ -2070,6 +2125,7 @@ my $input_options = {};    # [CONSTANT]
 sub Input {
   my ($request, %options) = @_;
   $request = ToString($request);
+  $request =~ s/^("+)(.+)\g1$/$2/;    # unwrap if in quotes \input{"file name"}
   CheckOptions("Input ($request)", $input_options, %options);
   # HEURISTIC! First check if equivalent style file, but only under very specific circumstances
   if (pathname_is_literaldata($request)) {
@@ -2091,14 +2147,17 @@ sub Input {
   if (LookupValue('INTERPRETING_DEFINITIONS')) {
     InputDefinitions($request); }
   elsif (my $path = FindFile($request)) {    # Found something plausible..
-    my $type = (pathname_is_literaldata($path) ? 'tex' : pathname_type($path));
-
+    my ($ignoredir, $type);
+    if (pathname_is_literaldata($path)) {
+      $type = 'tex'; }
+    else {
+      ($ignoredir, $request, $type) = pathname_split($path); }
     # Should we be doing anything about options in the next 2 cases?..... I kinda think not, but?
-    if ($type eq 'ltxml') {                  # it's a LaTeXML binding.
+    if ($type eq 'ltxml') {    # it's a LaTeXML binding.
       loadLTXML($request, $path); }
     # Else some sort of "known" definitions type file, but not simply 'tex'
     elsif (($type ne 'tex') && (pathname_is_raw($path))) {
-      loadTeXDefinitions($request, $path); }
+      loadTeXDefinitions($request, $path, fordefinitions => 1, notes => 1); }
     else {
       loadTeXContent($path); } }
   else {    # Couldn't find anything?
@@ -2121,14 +2180,16 @@ sub loadLTXML {
     return; }
   $pathname = pathname_absolute($pathname);
   my ($dir, $name, $type) = pathname_split($pathname);
+  my $ltxname = $name . '.ltxml';
   # Don't load if the requested path was loaded (with or without the .ltxml)
   # We want to check against the original request, but WITH the type
   $request .= '.' . $type unless $request =~ /\Q.$type\E$/;    # make sure the .ltxml is added here
   my $trequest = $request; $trequest =~ s/\.ltxml$//;          # and NOT added here!
-  return if LookupValue($request . '_loaded') || LookupValue($trequest . '_loaded');
+  return if LookupValue($request . '_loaded') || LookupValue($trequest . '_loaded')
+    || LookupValue($name . '_loaded') || LookupValue($ltxname . '_loaded');
   # Note (only!) that the ltxml version of this was loaded; still could load raw tex!
   AssignValue($request . '_loaded' => 1, 'global');
-
+  AssignValue($ltxname . '_loaded' => 1, 'global') if $ltxname ne $request;
   $STATE->getStomach->getGullet->readingFromMouth(LaTeXML::Core::Mouth::Binding->new($pathname), sub {
       do $pathname;
       Fatal('die', $pathname, $STATE->getStomach->getGullet,
@@ -2139,8 +2200,13 @@ sub loadLTXML {
   Let(T_CS('\ver@' . $trequest), T_CS('\fmtversion'), 'global');
   return; }
 
+my $loadtexdefinitions_options = { fordefinitions => 1, at_letter => 1, notes => 1 };   # [CONSTANT]
+
 sub loadTeXDefinitions {
-  my ($request, $pathname) = @_;
+  my ($request, $pathname, %options) = @_;
+  # FILTER, not check options!
+  my %mouth_options = map { ($_ => (exists $options{$_} ? $options{$_} : 1)) }
+    keys %$loadtexdefinitions_options;
   # We can't analyze literal data's pathnames!
   if (!pathname_is_literaldata($pathname)) {
     # Don't load if we've already loaded it before.
@@ -2168,9 +2234,8 @@ sub loadTeXDefinitions {
   # This re-locks defns during reading of TeX packages.
   local $LaTeXML::Core::State::UNLOCKED = 0;
   $stomach->getGullet->readingFromMouth(
-    LaTeXML::Core::Mouth->create($pathname,
-      fordefinitions => 1, notes => 1,
-      content        => LookupValue($pathname . '_contents')),
+    LaTeXML::Core::Mouth->create($pathname, %mouth_options,
+      content => LookupValue($pathname . '_contents')),
     sub {
       my ($gullet) = @_;
       my $token;
@@ -2231,7 +2296,7 @@ sub PassOptions {
 # Unless noundefine=>1 (like for \ExecuteOptions), all option definitions
 # undefined after execution.
 my $processoptions_options = {    # [CONSTANT]
-  inorder => 1 };
+  inorder => 1, keysets => 1 };
 
 sub ProcessOptions {
   my (%options) = @_;
@@ -2252,16 +2317,16 @@ sub ProcessOptions {
 
   if ($options{inorder}) {    # Execute options in the order passed in (eg. \ProcessOptions*)
     foreach my $option (@classoptions) {    # process global options, but no error
-      if (executeOption_internal($option)) { } }
+      if (executeOption_internal($option, %options)) { } }
 
     foreach my $option (@curroptions) {
-      if    (executeOption_internal($option))        { }
-      elsif (executeDefaultOption_internal($option)) { } } }
+      if    (executeOption_internal($option, %options)) { }
+      elsif (executeDefaultOption_internal($option))    { } } }
   else {                                    # Execute options in declared order (eg. \ProcessOptions)
     foreach my $option (@declaredoptions) {
       if (grep { $option eq $_ } @curroptions, @classoptions) {
         @curroptions = grep { $option ne $_ } @curroptions;    # Remove it, since it's been handled.
-        executeOption_internal($option); } }
+        executeOption_internal($option, %options); } }
     # Now handle any remaining options (eg. default options), in the given order.
     foreach my $option (@curroptions) {
       executeDefaultOption_internal($option); } }
@@ -2271,8 +2336,18 @@ sub ProcessOptions {
   return; }
 
 sub executeOption_internal {
-  my ($option) = @_;
+  my ($option, %options) = @_;
   my $cs = T_CS('\ds@' . $option);
+  # Simplified keyval options for classes & packages
+  # Note that the option is a string with an "=" at this point.
+  if ($options{keysets} && ($option =~ /^(.*)=(.*)$/)) {
+    my ($key, $value) = ($1, $2);
+    foreach my $keyset (@{ $options{keysets} }) {
+      my $qname = keyval_qname('KV', $keyset, $key);
+      if (my $keytype = keyval_get($qname, 'type')) {
+        Debug("PROCESS KeyVal OPTION $key => $value") if $LaTeXML::DEBUG{packageoptions};
+        Digest(Tokens(T_CS('\\' . $qname), T_BEGIN, Revert($value), T_END));
+        return 1; } } }
   if ($STATE->lookupDefinition($cs)) {
     Debug("PROCESS OPTION $option") if $LaTeXML::DEBUG{packageoptions};
     DefMacroI('\CurrentOption', undef, $option);
@@ -2327,9 +2402,9 @@ sub AddToMacro {
 
 #======================================================================
 my $inputdefinitions_options = {    # [CONSTANT]
-  options          => 1, withoptions => 1, handleoptions => 1,
-  type             => 1, as_class    => 1, noltxml       => 1, notex => 1, noerror => 1, after => 1,
-  searchpaths_only => 1 };
+  options   => 1, withoptions      => 1, handleoptions => 1,
+  type      => 1, as_class         => 1, noltxml       => 1, notex => 1, noerror => 1, after => 1,
+  at_letter => 1, searchpaths_only => 1 };
 #   options=>[options...]
 #   withoptions=>boolean : pass options from calling class/package
 #   after=>code or tokens or string as $name.$type-h@@k macro. (executed after the package is loaded)
@@ -2410,7 +2485,7 @@ sub InputDefinitions {
       if (!$options{noltxml} && ($file =~ /\.cls$/)) {
         RelaxNGSchema("LaTeXML");
         RequireResource('ltx-article.css'); }
-      loadTeXDefinitions($filename, $file); }
+      loadTeXDefinitions($filename, $file, %options); }
     if ($options{handleoptions}) {
       Digest(T_CS('\\' . $name . '.' . $astype . '-h@@k'));
       DefMacroI('\@currname', undef, Tokens(Explode($prevname))) if $prevname;
@@ -2649,7 +2724,7 @@ sub LoadFontMap {
   my $map = LookupValue($encoding . '_fontmap');
   if (!$map && !LookupValue($encoding . '_fontmap_failed_to_load')) {
     AssignValue($encoding . '_fontmap_failed_to_load' => 1);    # Stop recursion?
-    RequirePackage(lc($encoding), type => 'fontmap');
+    InputDefinitions(lc($encoding), type => 'fontmap', noerror => 1);
     if ($map = LookupValue($encoding . '_fontmap')) {           # Got map?
       AssignValue($encoding . '_fontmap_failed_to_load' => 0); }
     else {
@@ -3933,6 +4008,9 @@ Processes the options that have been passed to the current package
 or class in a fashion similar to LaTeX.  The only option (to C<ProcessOptions>
 is C<inorder=E<gt>I<boolean>> indicating whehter the (package) options are processed in the
 order they were used, like C<ProcessOptions*>.
+
+This will also process a limited form of keyval class and package options,
+if option C<keysets> provides a list of keyval set names, and option C<inorder> is true.
 
 =item C<ExecuteOptions(I<@options>);>
 

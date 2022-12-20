@@ -19,13 +19,9 @@ use strict;
 use warnings;
 use LaTeXML::Package;
 
-# Basically, all false, right?
-DefConditional('\ifvtex');
-DefConditional('\ifvtexdvi');
-DefConditional('\ifvtexpdf');
-DefConditional('\ifvtexps');
-DefConditional('\ifvtexhtml');
-DefConditional('\ifvtexgex');
+# This extended iftex is designed to replace the original iftex and also the packages
+# ifetex, ifluatex, ifvtex, ifxetex, ifpdf
+RequirePackage('iftex');
 
 #======================================================================
 1;

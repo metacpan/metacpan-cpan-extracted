@@ -8,6 +8,7 @@ use 5.014;
 use Term::Choose       qw();
 use Term::Choose::Util qw();
 
+use App::DBBrowser::DB; ##
 use App::DBBrowser::Auxil;
 use App::DBBrowser::Table::Extensions;
 use App::DBBrowser::Table::Substatements::Operators;
@@ -19,8 +20,7 @@ sub new {
         i => $info,
         o => $options,
         d => $data,
-        # SQLite: GROUP_CONCAT(DISTINCT "Col")  or  GROUP_CONCAT("Col",",");
-        aggregate     => [ "AVG(X)", "COUNT(X)", "COUNT(*)", "GROUP_CONCAT(X)", "MAX(X)", "MIN(X)", "SUM(X)" ],
+        aggregate     => [ "AVG(X)", "COUNT(X)", "COUNT(*)", "MAX(X)", "MIN(X)", "SUM(X)" ],
         distinct      => "DISTINCT",
         all           => "ALL",
         asc           => "ASC",
@@ -28,13 +28,10 @@ sub new {
         and           => "AND",
         or            => "OR",
     };
-    if ( $info->{driver} eq 'Pg' ) {
-        $sf->{aggregate}[3] = "STRING_AGG(X)";
-    }
-    elsif ( $info->{driver} eq 'Firebird' ) {
-        # LIST ([ALL | DISTINCT] <expr> [, separator ])
-        $sf->{aggregate}[3] = "LIST(X)";
-    }
+    if    ( $info->{driver} =~ /^(?:SQLite|mysql|MariaDB)\z/ ) { push @{$sf->{aggregate}}, "GROUP_CONCAT(X)"; }
+    elsif ( $info->{driver} eq 'Pg' )                          { push @{$sf->{aggregate}}, "STRING_AGG(X)"; }
+    elsif ( $info->{driver} eq 'Firebird' )                    { push @{$sf->{aggregate}}, "LIST(X)"; }
+    elsif ( $info->{driver} =~ /^(?:db2|oracle)\z/ )           { push @{$sf->{aggregate}}, "LISTAGG(X)"; }
     $sf->{i}{menu_addition} = '%%';
     bless $sf, $class;
 }
@@ -170,6 +167,7 @@ sub __add_aggregate_substmt {
     my $tc = Term::Choose->new( $sf->{i}{tc_default} );
     my $ax = App::DBBrowser::Auxil->new( $sf->{i}, $sf->{o}, $sf->{d} );
     my @pre = ( undef, $sf->{i}{ok} );
+    my $GROUP_CONCAT = $sf->{aggregate}[-1] =~ s/\(\X\)\z//r;
     my $i = @{$sql->{aggr_cols}};
     my $info = $ax->get_sql_info( $sql );
     # Choose
@@ -184,13 +182,17 @@ sub __add_aggregate_substmt {
     elsif ( $aggr eq $sf->{i}{ok} ) {
         return $aggr;
     }
+    my $default_alias;
     if ( $aggr eq 'COUNT(*)' ) {
         $sql->{aggr_cols}[$i] = $aggr;
+        $default_alias = 'COUNT *';
     }
     else {
-        $aggr =~ s/\(\S\)\z//; #
+        $aggr =~ s/\(\X\)\z//;
         $sql->{aggr_cols}[$i] = $aggr . "(";
-        if ( $aggr =~ /^(?:COUNT|GROUP_CONCAT|STRING_AGG|LIST)\z/ ) {
+        $default_alias = $aggr;
+
+        if ( $aggr =~ /^(?:COUNT|$GROUP_CONCAT)\z/ ) {
             my $info = $ax->get_sql_info( $sql );
             # Choose
             my $all_or_distinct = $tc->choose(
@@ -202,29 +204,63 @@ sub __add_aggregate_substmt {
                 return;
             }
             if ( $all_or_distinct eq $sf->{distinct} ) {
-                $sql->{aggr_cols}[$i] .= $sf->{distinct};
+                $sql->{aggr_cols}[$i] .= $sf->{distinct} . " ";
+                $default_alias .= ' ' .  $sf->{distinct};
             }
         }
         my $info = $ax->get_sql_info( $sql );
         # Choose
-        my $f_col = $tc->choose(
+        my $qt_col = $tc->choose(
             [ undef, @{$sql->{cols}} ],
             { %{$sf->{i}{lyt_h}}, info => $info }
         );
         $ax->print_sql_info( $info );
-        if ( ! defined $f_col ) {
+        if ( ! defined $qt_col ) {
             return;
         }
-        if ( $aggr eq 'STRING_AGG' ) {
-            # pg: the separator is mandatory in STRING_AGG(DISTINCT, "Col", ',')
-            $sql->{aggr_cols}[$i] .= ' ' . $f_col . ", ',' )";
+        my $qc = quotemeta $sf->{i}{quote_char};
+        $default_alias .= ' ' . $qt_col =~ s/^$qc(.+)$qc\z/$1/r;
+        if ( $aggr =~ /^$GROUP_CONCAT\z/ ) {
+            if ( $sf->{i}{driver} eq 'Pg' ) {
+                # Pg, STRING_AGG: separator mandatory
+                $sql->{aggr_cols}[$i] .= "${qt_col}::text, ',')";
+            }
+            else {
+                # https://sqlite.org/forum/info/221c2926f5e6f155
+                # SQLite: group_concat with DISTINCT and custom seperator does not work
+                $sql->{aggr_cols}[$i] .= "$qt_col)";
+            }
+            #my $sep = ',';
+            #if ( $sf->{i}{driver} eq 'SQLite' ) { # && $sql->{aggr_cols}[$i] =~ /$sf->{distinct}\s\z/ ) {
+            #    # https://sqlite.org/forum/info/221c2926f5e6f155
+            #    # SQLite: group_concat with DISTINCT and custom seperator does not work
+            #    $sql->{aggr_cols}[$i] .= "$qt_col)";
+            #}
+            #elsif ( $sf->{i}{driver} =~ /^(?:mysql|MariaDB)\z/ ) {
+            #    $sql->{aggr_cols}[$i] .= "$qt_col ORDER BY $qt_col SEPARATOR '$sep')";
+            #}
+            #elsif ( $sf->{i}{driver} eq 'Pg' ) {
+            #    $sql->{aggr_cols}[$i] .= "${qt_col}::text, '$sep' ORDER BY $qt_col)";
+            #}
+            #elsif ( $sf->{i}{driver} eq 'Firebird' ) {
+            #    $sql->{aggr_cols}[$i] .= "$qt_col, '$sep')";
+            #}
+            #elsif ( $sf->{i}{driver} =~ /^(?:db2|oracle)\z/ ) {
+            #    $sql->{aggr_cols}[$i] .= "$qt_col, '$sep') WITHIN GROUP (ORDER BY $qt_col)";
+            #}
+            #else {
+            #    return;
+            #}
+            my $plui = App::DBBrowser::DB->new( $sf->{i}, $sf->{o} ); ##
+            $sql->{aggr_cols}[$i] = $plui->concatenate( [ $sql->{aggr_cols}[$i], "';'" ] );
+            # so that a group with only one number is also treated as a string (left-justified)
         }
         else {
-            $sql->{aggr_cols}[$i] .= ' ' . $f_col . " )";
+            $sql->{aggr_cols}[$i] .= "$qt_col)";
         }
     }
-    my $alias = $ax->alias( $sql, 'aggregate', $sql->{aggr_cols}[$i] );
-    if ( defined $alias && length $alias ) {
+    my $alias = $ax->alias( $sql, 'aggregate', $sql->{aggr_cols}[$i], $default_alias );
+    if ( length $alias ) {
         $sql->{alias}{$sql->{aggr_cols}[$i]} = $ax->quote_col_qualified( [ $alias ] );
     }
     return 1;
@@ -704,9 +740,11 @@ sub limit_offset {
         }
         if ( $choice eq $offset ) {
             if ( ! $sql->{limit_stmt} ) {
+                # SQLite/mysql/MariaDB: no offset without limit
                 $sql->{limit_stmt} = "LIMIT " . ( $sf->{o}{G}{auto_limit} || '9223372036854775807'  ) if $sf->{i}{driver} eq 'SQLite';   # 2 ** 63 - 1
-                # MySQL 5.7 Reference Manual - SELECT Syntax - Limit clause: SELECT * FROM tbl LIMIT 95,18446744073709551615;
-                $sql->{limit_stmt} = "LIMIT " . ( $sf->{o}{G}{auto_limit} || '18446744073709551615' ) if $sf->{i}{driver} eq 'mysql';    # 2 ** 64 - 1
+                $sql->{limit_stmt} = "LIMIT " . ( $sf->{o}{G}{auto_limit} || '18446744073709551615' ) if $sf->{i}{driver} =~ /^(?:mysql|MariaDB)\z/;    # 2 ** 64 - 1
+                # MySQL 8.0 Reference Manual - SQL Statements/Data Manipulation Statements/Select Statement/Limit clause:
+                #    SELECT * FROM tbl LIMIT 95,18446744073709551615;   -> all rows from the 95th to the last
             }
             $sql->{offset_stmt} = "OFFSET";
             my $info = $ax->get_sql_info( $sql );

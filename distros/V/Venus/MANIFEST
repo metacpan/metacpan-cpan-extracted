@@ -29,6 +29,7 @@ lib/Venus/Assert.pm
 lib/Venus/Boolean.pm
 lib/Venus/Box.pm
 lib/Venus/Class.pm
+lib/Venus/Cli.pm
 lib/Venus/Code.pm
 lib/Venus/Core.pm
 lib/Venus/Core/Class.pm
@@ -46,6 +47,7 @@ lib/Venus/Json.pm
 lib/Venus/Kind.pm
 lib/Venus/Kind/Utility.pm
 lib/Venus/Kind/Value.pm
+lib/Venus/Log.pm
 lib/Venus/Match.pm
 lib/Venus/Meta.pm
 lib/Venus/Mixin.pm
@@ -106,6 +108,7 @@ t/Venus_Assert.t
 t/Venus_Boolean.t
 t/Venus_Box.t
 t/Venus_Class.t
+t/Venus_Cli.t
 t/Venus_Code.t
 t/Venus_Core.t
 t/Venus_Core_Class.t
@@ -123,6 +126,7 @@ t/Venus_Json.t
 t/Venus_Kind.t
 t/Venus_Kind_Utility.t
 t/Venus_Kind_Value.t
+t/Venus_Log.t
 t/Venus_Match.t
 t/Venus_Meta.t
 t/Venus_Mixin.t

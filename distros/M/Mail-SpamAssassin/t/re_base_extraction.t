@@ -10,20 +10,9 @@ use strict;
 use warnings;
 
 my $debug = 0;
-my $running_perl56 = ($] < 5.007);
 
-# perl 5.6.1 on Solaris fails all tests here if PERL_DL_NONLAZY=1
-# but works fine if it is =0.  ho hum
-$ENV{'PERL_DL_NONLAZY'} = 0;
-
-close STDIN;    # inhibits noise from sa-compile
-
-BEGIN { 
-  if (-e 't/test_dir') { chdir 't'; } 
-  if (-e 'test_dir') { unshift(@INC, '../blib/lib'); }
-}
-
-use Test::More tests => 128;
+use Test::More;
+plan tests => 128;
 use lib '../lib';
 
 # ---------------------------------------------------------------------------
@@ -199,11 +188,7 @@ use lib '../lib';
 # skip this one for perl 5.6.*; it does not truncate the long strings in the
 # same place as 5.8.* and 5.9.*, although they still work fine
 
-($running_perl56) and ok(1);
-($running_perl56) and ok(1);
-($running_perl56) and ok(1);
-($running_perl56) and ok(1);
-(!$running_perl56) and try_extraction ('
+try_extraction ('
 
   body VIRUS_WARNING345                /(This message contained attachments that have been blocked by Guinevere|This is an automatic message from the Guinevere Internet Antivirus Scanner)\./
   body VIRUS_WARNING345I                /(This message contained attachments that have been blocked by Guinevere|This is an automatic message from the Guinevere Internet Antivirus Scanner)\./i
@@ -224,11 +209,7 @@ use lib '../lib';
 
 # ---------------------------------------------------------------------------
 
-# also not suitable for perl 5.6.x
-($running_perl56) and ok(1);
-($running_perl56) and ok(1);
-($running_perl56) and ok(1);
-(!$running_perl56) and try_extraction ('
+try_extraction ('
 
   body FOO /foobar\x{e2}\x{82}\x{ac}baz/
 
@@ -445,9 +426,9 @@ sub try_extraction {
   my ($rules, $params, $output, $notoutput) = @_;
 
   my $sa = Mail::SpamAssassin->new({
-    rules_filename => "log/test_rules_copy",
-    site_rules_filename => "log/test_default.cf",
-    userprefs_filename  => "log/userprefs.cf",
+    rules_filename => $localrules,
+    site_rules_filename => $siterules,
+    userprefs_filename  => $userrules,
     local_tests_only    => 1,
     debug               => $debug,
     dont_copy_prefs     => 1,
@@ -456,18 +437,19 @@ sub try_extraction {
   ok($sa);
 
   # remove all rules and plugins; we want just our stuff
-  untaint_system("rm -f log/test_rules_copy/*.pre");
-  untaint_system("rm -f log/test_rules_copy/*.pm");
+  foreach (<$siterules/*.pre>, <$siterules/*.pm>) {
+    unlink(untaint_var($_));
+  }
   # keep 20_aux_tlds.cf to suppress RB warnings
-  rename("log/test_rules_copy/20_aux_tlds.cf", "log/test_rules_copy/20_aux_tlds.cf.tmp");
-  untaint_system("rm -f log/test_rules_copy/*.cf");
-  rename("log/test_rules_copy/20_aux_tlds.cf.tmp", "log/test_rules_copy/20_aux_tlds.cf");
+  foreach (<$localrules/*.cf>) {
+    unlink(untaint_var($_)) unless $_ =~ /20_aux_tlds.cf$/;
+  }
 
   { # suppress unnecessary warning:
     #   "Filehandle STDIN reopened as STDOUT only for output"
     # See https://rt.perl.org/rt3/Public/Bug/Display.html?id=23838
     no warnings 'io';
-    open (OUT, ">log/test_rules_copy/00_test.cf")
+    open (OUT, ">$localrules/99_test.cf")
       or die "failed to write rule";
   }
   print OUT "

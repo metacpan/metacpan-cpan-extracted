@@ -20,7 +20,7 @@ name: Perinci-Sub-Normalize
 provides:
   Perinci::Sub::Normalize:
     file: lib/Perinci/Sub/Normalize.pm
-    version: '0.204'
+    version: '0.207'
 requires:
   Data::Sah::Normalize: '0.051'
   Exporter: '5.57'
@@ -32,7 +32,7 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Sub-Normalize
   homepage: https://metacpan.org/release/Perinci-Sub-Normalize
   repository: git://github.com/perlancar/perl-Perinci-Sub-Normalize.git
-version: '0.204'
+version: '0.207'
 x_Dist_Zilla:
   perl:
     version: '5.034000'

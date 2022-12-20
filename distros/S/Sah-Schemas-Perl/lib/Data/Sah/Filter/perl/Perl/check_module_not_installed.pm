@@ -5,9 +5,9 @@ use strict;
 use warnings;
 
 our $AUTHORITY = 'cpan:PERLANCAR'; # AUTHORITY
-our $DATE = '2022-09-11'; # DATE
+our $DATE = '2022-12-16'; # DATE
 our $DIST = 'Sah-Schemas-Perl'; # DIST
-our $VERSION = '0.045'; # VERSION
+our $VERSION = '0.046'; # VERSION
 
 sub meta {
     +{
@@ -48,7 +48,7 @@ Data::Sah::Filter::perl::Perl::check_module_not_installed
 
 =head1 VERSION
 
-This document describes version 0.045 of Data::Sah::Filter::perl::Perl::check_module_not_installed (from Perl distribution Sah-Schemas-Perl), released on 2022-09-11.
+This document describes version 0.046 of Data::Sah::Filter::perl::Perl::check_module_not_installed (from Perl distribution Sah-Schemas-Perl), released on 2022-12-16.
 
 =for Pod::Coverage ^(meta|filter)$
 

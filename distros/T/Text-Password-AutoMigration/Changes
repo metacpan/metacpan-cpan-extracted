@@ -1,5 +1,8 @@
 Revision history for Perl extension Text-Password-AutoMigration
 
+0.18 2022-12-14T18:15:26Z
+  - Fixed typos in PODs. thanks for PR #8
+
 0.17 2022-12-07T06:20:42Z
   - Replaced Moose to Moo
 

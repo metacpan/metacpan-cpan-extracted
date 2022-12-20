@@ -1,6 +1,24 @@
 Revision history for Perl extension UI-Various
 
-0.31 2022-08-03T09:05:10Z
+0.34 2022-12-20T13:27:32Z
+
+0.34 2022-12-20T13:24:55Z
+
+    - some more fixes for formatting bugs in RichTerm
+    - fixed bug in widget::dump
+    - minor fix in comment
+
+0.33 2022-12-19T07:00:15Z
+
+    - fixed regular expression in unit test 41-curses.t
+
+0.32 2022-12-18T09:51:41Z
+
+    - fixed several formatting bugs in RichTerm
+    - added unit tests for too small Curses screen
+    - added method to dump internal structure to pretty-printed string
+    - added nicer listbox example
+    - minor fix in comment
 
 0.31 2022-08-03T09:04:33Z
 

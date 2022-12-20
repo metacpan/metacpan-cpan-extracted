@@ -55,3 +55,6 @@ Revision history for Term-Shell-MultiCmd
 
 3.01   2016-06-10
        Allow default query command (when excuting a node)
+
+3.02   2022-12-17
+       Split history file(s)

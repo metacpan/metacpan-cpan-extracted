@@ -1,10 +1,22 @@
-0.1.1   Fri 15 Apr 2022 22:22:44 AEST
-	
+Revision history for Perl extension constant::more
+
+0.1.2 2022-12-19
+  [Bug fixes]
+  - Existing constant checking would only consider constants created by
+    constant::more and would attempt to redefine constants if they already
+    existed from other packages. This is fixed by only exporting a constant if
+    the target package doesn't have an existing glob CODE slot.
+
+  - Tidy of Changes file
+
+0.1.1 2022-04-15
+  [Bug fixes]	
 	- Fixed tests calling wrong perl command
 
-0.1.0   Thu 14 Apr 2022 21:34:36 AEST
-        - First version
-        - Supports command line options
-        - Supports Environment variables
-        - User sub for advanced configuration
+0.1.0 2022-04-14 
+  [Features]
+  - First version
+  - Supports command line options
+  - Supports Environment variables
+  - User sub for advanced configuration
 

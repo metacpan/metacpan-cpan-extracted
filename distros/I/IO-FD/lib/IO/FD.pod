@@ -291,6 +291,10 @@ A alias of C<IO::FD::pipe>.
 
 =head3 IO::FD::sysread
 
+B<NOTE:> Versions prior to 0.1.4 would end up using fd = 0 (normally STDIN)
+when it was non numeric.  This is fixed in 0.1.4. An fd which is not numeric
+will cause an immediate return of undefined.
+
 =head3 IO::FD::sysread3
 
 Same as C<IO::FD::sysread>, but expects only 3 of 4 arguments
@@ -300,6 +304,10 @@ Same as C<IO::FD::sysread>, but expects only 3 of 4 arguments
 Same as C<IO::FD::sysread>, but expects all four arguments
 
 =head3 IO::FD::syswrite
+
+B<NOTE:> Versions prior to 0.1.4 would end up using fd = 0 (normally STDIN)
+when it was non numeric.  This is fixed in 0.1.4. An fd which is not numeric
+will cause an immediate return of undefined.
 
 =head3 IO::FD::syswrite2
 

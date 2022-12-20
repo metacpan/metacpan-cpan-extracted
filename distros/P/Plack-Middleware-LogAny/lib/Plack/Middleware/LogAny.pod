@@ -2,36 +2,45 @@
 
 =head1 NAME
 
-Plack::Middleware::LogAny - Use Log::Any to handle logging from your Plack app
+Plack::Middleware::LogAny - Use Log::Any to handle logging from your PSGI
+application
 
 =head1 SYNOPSIS
 
+  # in app.psgi file
+  use Plack::Builder;
+
+  # PSGI application
+  my $app = sub { ... };
+
+  # DSL interface
   builder {
-    enable 'LogAny', category => 'plack';
+    enable 'LogAny', category => 'plack', context => [ qw( X-Request-ID ) ];
     $app;
   }
+
+  # alternative OO interface
+  Plack::Middleware::LogAny->wrap( $app, category => 'plack', context => [ qw( X-Request-ID ) ] );
 
 =head1 DESCRIPTION
 
 LogAny is a L<Plack::Middleware> component that allows you to use L<Log::Any>
-to handle the logging object, C<psgix.logger>.
-
-It really tries to be the thinnest possible shim, so it doesn't handle any
-configuration beyond setting the category to which messages from plack might be
-logged.
+to handle the C<psgix.logger> logging object. This object is a code reference
+that is described in L<PSGI::Extensions>.
 
 =head1 METHODS
 
-=head2 prepare_app
+=head2 prepare_app()
 
 This method initializes the logger using the category that you (optionally)
 set.
 
-=head2 call
+=head2 call()
 
-Actually handles making sure the logger is invoked.
+This method sets the logging object and the logging context. The logging
+context is localized.
 
-=head1 CONFIGURATION
+=head1 CONFIGURATION OPTIONS
 
 =over 4
 
@@ -39,6 +48,13 @@ Actually handles making sure the logger is invoked.
 
 The C<Log::Any> category to send logs to. Defaults to C<''> which means it send
 to the root logger.
+
+=item context
+
+As of release 0.002.
+
+A list of HTTP header names that is passed from the L<PSGI
+environment|PSGI/"The Environment"> to the C<Log::Any> logging context.
 
 =back
 

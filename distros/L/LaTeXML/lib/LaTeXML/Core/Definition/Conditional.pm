@@ -57,6 +57,9 @@ sub invoke_conditional {
   # Keep a stack of the conditionals we are processing.
   my $ifid = $STATE->lookupValue('if_count') || 0;
   $STATE->assignValue(if_count => ++$ifid, 'global');
+  if ($LaTeXML::IF_LIMIT and $ifid > $LaTeXML::IF_LIMIT) {
+    Fatal('timeout', 'if_limit', $self,
+      "Conditional limit of $LaTeXML::IF_LIMIT exceeded, infinite loop?"); }
   local $LaTeXML::IFFRAME = { token => $LaTeXML::CURRENT_TOKEN, start => $gullet->getLocator,
     parsing => 1, elses => 0, ifid => $ifid };
   $STATE->unshiftValue(if_stack => $LaTeXML::IFFRAME);
@@ -186,6 +189,12 @@ sub invoke_fi {
         . " [for " . Stringify($$LaTeXML::IFFRAME{token}) . " #" . $$LaTeXML::IFFRAME{ifid} . "]")
       if $STATE->lookupValue('TRACINGCOMMANDS') || $LaTeXML::DEBUG{tracing};
     return; } }
+
+sub equals {
+  my ($self, $other) = @_;
+  return (defined $other && (ref $self) eq (ref $other))
+    && Equals($self->getParameters, $other->getParameters)
+    && Equals($self->getTest,       $other->getTest); }
 
 #===============================================================================
 1;

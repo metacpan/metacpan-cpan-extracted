@@ -5,13 +5,11 @@ use warnings;
 
 use Test::More;
 BEGIN {
-   eval { require Devel::MAT; Devel::MAT->VERSION( '0.46' ) } or
-      plan skip_all => "No Devel::MAT version 0.46";
+   eval { require Devel::MAT; Devel::MAT->VERSION( '0.49' ) } or
+      plan skip_all => "No Devel::MAT version 0.49";
 
    require Devel::MAT::Dumper;
 }
-
-use List::Util qw( first );
 
 use Object::Pad;
 
@@ -31,10 +29,9 @@ my $df = $pmat->dumpfile;
 
 # class/field/method representation
 {
-   # TODO: Do we want an `$sv->find_outref` method?
-   my $classmeta = ( first { $_->name eq "the Object::Pad class" }
-      $pmat->find_symbol( "&AClass::META" )->constval->rv->outrefs
-   )->sv;
+   my $classmeta = $pmat->find_symbol( "&AClass::META" )->constval->rv
+      ->outref_named( "the Object::Pad class" )
+      ->sv;
 
    ok( $classmeta, 'AClass has a classmeta' );
    isa_ok( $classmeta, "Devel::MAT::SV::C_STRUCT", '$classmeta' );

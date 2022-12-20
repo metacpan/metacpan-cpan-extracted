@@ -1,7 +1,7 @@
 #
 # This file is part of App-SpreadRevolutionaryDate
 #
-# This software is Copyright (c) 2019 by Gérald Sédrati-Dinet.
+# This software is Copyright (c) 2019-2022 by Gérald Sédrati.
 #
 # This is free software, licensed under:
 #
@@ -17,7 +17,7 @@ use ExtUtils::MakeMaker;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Spread date and time from Revolutionary (Republican) Calendar on Twitter, Mastodon, Freenode and Liberachat.",
-  "AUTHOR" => "G\x{e9}rald S\x{e9}drati-Dinet <gibus\@cpan.org>",
+  "AUTHOR" => "G\x{e9}rald S\x{e9}drati <gibus\@cpan.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -68,7 +68,7 @@ my %WriteMakefileArgs = (
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.31",
+  "VERSION" => "0.32",
   "test" => {
     "TESTS" => "t/*.t"
   }

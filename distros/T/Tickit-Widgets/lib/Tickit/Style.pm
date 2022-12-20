@@ -1,11 +1,11 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2013-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2013-2022 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.51;
+use Object::Pad 0.70 ':experimental(adjust_params)';
 
-package Tickit::Style 0.53;
+package Tickit::Style 0.54;
 
 use strict;
 use warnings;
@@ -479,8 +479,8 @@ class # hide from indexer
 
    # A "Keyset" is the set of style keys applied to one particular set of
    # style tags
-   has $tags  :reader :param;
-   has $style :reader :param;
+   field $tags  :reader :param;
+   field $style :reader :param;
 
    method clone
    {
@@ -493,14 +493,9 @@ class # hide from indexer
 
 use experimental 'postderef';
 
-has @_keysets;
+field @_keysets;
 
-ADJUSTPARAMS
-{
-   my ( $params ) = @_;
-   $params->{keysets} and
-      @_keysets = ( delete $params->{keysets} )->@*;
-}
+ADJUST :params ( :$keysets = undef ) { @_keysets = $keysets->@* if $keysets; }
 
 method clone
 {

@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Base role for JSON Schema vocabulary classes
 
-our $VERSION = '0.558';
+our $VERSION = '0.559';
 
 use 5.020;
 use Moo::Role;
@@ -72,6 +72,14 @@ sub eval_subschema_at_uri ($self, $data, $schema, $state, $uri) {
   my $schema_info = $state->{evaluator}->_fetch_from_uri($uri);
   abort($state, 'EXCEPTION: unable to find resource %s', $uri) if not $schema_info;
 
+  my $vocabularies = $schema_info->{vocabularies};
+  if ($state->{validate_formats}) {
+    $vocabularies = [
+      map s/^JSON::Schema::Modern::Vocabulary::Format\KAnnotation$/Assertion/r, $state->{vocabularies}->@*
+    ];
+    require JSON::Schema::Modern::Vocabulary::FormatAssertion;
+  }
+
   return $state->{evaluator}->_eval_subschema($data, $schema_info->{schema},
     +{
       $schema_info->{configs}->%*,
@@ -85,7 +93,7 @@ sub eval_subschema_at_uri ($self, $data, $schema, $state, $uri) {
       document_path => $schema_info->{document_path},
       spec_version => $schema_info->{specification_version},
       schema_path => '',
-      vocabularies => $schema_info->{vocabularies}, # reference, not copy
+      vocabularies => $vocabularies,
     });
 }
 
@@ -103,7 +111,7 @@ JSON::Schema::Modern::Vocabulary - Base role for JSON Schema vocabulary classes
 
 =head1 VERSION
 
-version 0.558
+version 0.559
 
 =head1 SYNOPSIS
 

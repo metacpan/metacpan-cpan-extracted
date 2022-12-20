@@ -1,5 +1,9 @@
 Revision history for Perl extension Text-ANSI-Tabs
 
+1.02 2022-12-20T09:08:18Z
+
+    - require Text::ANSI::Fold@2.17
+
 1.01 2022-08-05T23:11:23Z
 
     - Release 1.01.

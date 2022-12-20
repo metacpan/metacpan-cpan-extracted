@@ -56,7 +56,9 @@ Files: Changes
  t/06mouse/trait_hash.t
  t/10barebones_eagerbuilder.t
  t/11delegation.t
+ t/14enum.t
  t/15preludes.t
+ t/16stackqueue.t
  t/30egpod/array.t
  t/30egpod/bool.t
  t/30egpod/code.t
@@ -160,6 +162,7 @@ License: GPL-1.0+ or Artistic-1.0
 
 Files: lib/Sub/HandlesVia/Declare.pm
  lib/Sub/HandlesVia/HandlerLibrary/Blessed.pm
+ lib/Sub/HandlesVia/HandlerLibrary/Enum.pm
  lib/Sub/HandlesVia/Manual/Advanced.pod
  lib/Sub/HandlesVia/Manual/Comparison.pod
  lib/Sub/HandlesVia/Manual/WithClassTiny.pod

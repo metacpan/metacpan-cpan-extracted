@@ -83,9 +83,9 @@ use mysql or LDAP for per-user configuration there is no reason in the world
 to run as root, and this remains fully functional.
 
 If you do not need to let your users define their own rules, maintain
-their own whitelists, or have non-world-readable home and ~/.spamassassin
+their own welcomelists, or have non-world-readable home and ~/.spamassassin
 directories, then just set spamd up to run with the "-u username" option.
-Since spamd can use auto-whitelisting, which requires it maintain a
+Since spamd can use auto-welcomelisting, which requires it maintain a
 database of email addresses on-disk, you should use a non-"root" but
 non-"nobody" user: "mailnull" or "mail" are good choices, or even create a
 "spamd" user.
@@ -112,7 +112,7 @@ you will need to either
 
   2. Alternatively, let the users train their individual Bayes database.
 
-http://wiki.apache.org/spamassassin/SiteWideBayesFeedback can be very
+https://wiki.apache.org/spamassassin/SiteWideBayesFeedback can be very
 helpful here.
 
 We have implemented an auto-learning algorithm (option 'bayes_auto_learn', on
@@ -129,7 +129,7 @@ spamc, it is easily possible for malicious users invoking modified
 spamc clients to make spamd:
 
  (1.)  read (and hence determine) the contents of other users configurations
- (2.)  change the contents of other users configurations (whitelisting)
+ (2.)  change the contents of other users configurations (welcomelisting)
  (3.)  grab CPU time as that user -- this is an issue on ulimit'd systems
 
 If users do not have the opportunity to invoke spamc themselves, and
@@ -194,7 +194,7 @@ There are no known bugs with this setup.  Several reasonable sized sites
 are now running it on their production mail systems.  However, you should
 still test it completely in *your environment* before trusting all your
 mail to it.  If you discover compilation, runtime, or load-performance
-bugs, please open a ticket at http://issues.apache.org/SpamAssassin/
+bugs, please open a ticket at https://issues.apache.org/SpamAssassin/
 
 There is an issue if you run spamd using the standard perl installation
 on Mac OS X and certain *BSD-flavored UNIX platforms.  spamd will change

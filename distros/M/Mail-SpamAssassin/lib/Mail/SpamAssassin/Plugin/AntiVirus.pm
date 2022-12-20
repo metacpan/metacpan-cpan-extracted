@@ -64,8 +64,8 @@ sub new {
   my $self = $class->SUPER::new($mailsaobject);
   bless ($self, $class);
 
-  $self->register_eval_rule("check_microsoft_executable");
-  $self->register_eval_rule("check_suspect_name");
+  $self->register_eval_rule("check_microsoft_executable", $Mail::SpamAssassin::Conf::TYPE_BODY_EVALS);
+  $self->register_eval_rule("check_suspect_name", $Mail::SpamAssassin::Conf::TYPE_BODY_EVALS);
 
   return $self;
 }
@@ -107,7 +107,7 @@ sub _check_attachments {
       # file extension indicates an executable
       $pms->{antivirus_microsoft_exe} = 1;
     }
-    elsif ($cte =~ /base64/ && defined $p->raw()->[0] &&
+    elsif (index($cte, 'base64') >= 0 && defined $p->raw()->[0] &&
 	   $p->raw()->[0] =~ /^TV[opqr].A..[AB].[AQgw][A-H].A/)
     {
       # base64-encoded executable

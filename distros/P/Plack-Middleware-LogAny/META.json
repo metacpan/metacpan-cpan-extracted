@@ -1,5 +1,5 @@
 {
-   "abstract" : "Use Log::Any to handle logging from your Plack app",
+   "abstract" : "Use Log::Any to handle logging from your PSGI application",
    "author" : [
       "Sven Willenbuecher <sven.willenbuecher@kuehne-nagel.com>"
    ],
@@ -46,7 +46,7 @@
       },
       "test" : {
          "requires" : {
-            "Log::Any::Adapter::Log4perl" : "0",
+            "Log::Any::Adapter::Log4perl" : "0.08",
             "Test::More" : "0"
          }
       }
@@ -62,5 +62,5 @@
          "web" : "https://github.com/XSven/Plack-Middleware-LogAny"
       }
    },
-   "version" : "0.001003"
+   "version" : "0.002001"
 }

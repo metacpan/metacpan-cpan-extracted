@@ -3,7 +3,7 @@
 #
 #  (C) Paul Evans, 2022 -- leonerd@leonerd.org.uk
 
-package Feature::Compat::Class 0.03;
+package Feature::Compat::Class 0.04;
 
 use v5.14;
 use warnings;
@@ -20,12 +20,8 @@ C<Feature::Compat::Class> - make C<class> syntax available
    use Feature::Compat::Class;
 
    class Point {
-      field $x;
-      field $y;
-
-      ADJUST {
-         $x = $y = 0;
-      }
+      field $x :param = 0;
+      field $y :param = 0;
 
       method move_to ($new_x, $new_y) {
          $x = $new_x;
@@ -36,6 +32,8 @@ C<Feature::Compat::Class> - make C<class> syntax available
          say "A point at ($x, $y)";
       }
    }
+
+   Point->new(x => 5, y => 10)->describe;
 
 =head1 DESCRIPTION
 
@@ -78,9 +76,10 @@ sub import
    }
    else {
       require Object::Pad;
-      Object::Pad->VERSION( '0.70' );
+      Object::Pad->VERSION( '0.75' );
       Object::Pad->import(qw( class method field ADJUST ),
-         ':config(always_strict only_class_attrs=isa no_field_attrs no_adjust_attrs)',
+         ':experimental(init_expr)',
+         ':config(always_strict only_class_attrs=isa only_field_attrs=param no_field_block no_adjust_attrs)',
       );
    }
 }
@@ -157,9 +156,13 @@ Lexical methods are not supported.
    field @NAME;
    field %NAME;
 
+   field $NAME = EXPR;
+
+   field $NAME :ATTRS... = EXPR;
+
 See also L<Object::Pad/field>.
 
-Attributes are not supported. In particular, rather than using the
+Most field attributes are not supported. In particular, rather than using the
 accessor-generator attributes you will have to create accessor methods
 yourself; such as
 
@@ -167,11 +170,45 @@ yourself; such as
    method var { return $var; }
    method set_var ($new_var) { $var = $new_var; }
 
-Field initialiser blocks are also not supported. Instead, you will have to use
-an C<ADJUST> block to initialise a field:
+I<Since version 0.04> fields of any type may take initialising expressions.
+Initialiser blocks are not supported.
 
-   field $five;
-   ADJUST { $five = 5; }
+   field $five = 5;
+
+The following field attributes are supported:
+
+=head3 :param
+
+   field $var :param;
+
+   field $var :param(name)
+
+I<Since version 0.04.>
+
+Declares that the constructor will take a named parameter to set the value for
+this field in a new instance.
+
+   field $var :param = EXPR;
+
+Without a defaulting expression, the parameter is mandatory. When combined
+with a defaulting expression, the parameter is optional and the default will
+only apply if the named parameter was not passed to the constructor.
+
+   field $var :param //= EXPR;
+   field $var :param ||= EXPR;
+
+With both the C<:param> attribute and a defaulting expression, the operator
+can also be written as C<//=> or C<||=>. In this case, the defaulting
+expression will be used even if the caller passed an undefined value (for
+C<//=>) or a false value (for C<||=>). This simplifies many situations where
+C<undef> would not be a valid value for a field parameter.
+
+   class C {
+      field $timeout :param //= 20;
+   }
+
+   C->new( timeout => $args{timeout} );
+   # default applies if %args has no 'timeout' key, or if its value is undef
 
 =head2 ADJUST
 
@@ -194,6 +231,30 @@ at all:
    has
 
    requires
+
+=cut
+
+=head1 COMPATIBILITY NOTES
+
+This module may use either L<Object::Pad> or the perl core C<class> feature to
+implement its syntax. While the two behave very similarly and both conform to
+the description given above, the following differences should be noted.
+
+=over 4
+
+=item Fields in later field expressions
+
+The core perl C<class> feature makes every field variable visible to the
+initialising expression of later fields. For example,
+
+   field $one = 1;
+   field $two = $one + 1;
+
+This is not currently supported by C<Object::Pad>. As a result, it is possible
+to write code that works fine with the core perl feature but older perls
+cannot support by using C<Object::Pad>.
+
+=back
 
 =cut
 

@@ -79,8 +79,6 @@ EXAMPLES
 
             );
 
-    #See also "make test" (test.pl).
-
 STANDARD OPTIONS
     -background -borderwidth -cursor -disabledforeground -exportselection
     -font -foreground -height -highlightbackground -highlightcolor
@@ -120,9 +118,9 @@ WIDGET SPECIFIC OPTIONS
         useful to better display the active element cursor due to the fact
         that it depends on Tk::Listbox, which does not display the active
         element (usually underlined) unless the listbox itself has the
-        focus. This allows the programmer to specify a colum other than the
+        focus. This allows the programmer to specify a column other than the
         first one, ie, if the main column of interest to the user is not the
-        first one.
+        first (leftmost) one.
 
         Tk::HMListbox depends instead on Tk::HListbox, which does display
         the active element without specifically being focused making it
@@ -131,6 +129,11 @@ WIDGET SPECIFIC OPTIONS
         regardless of which has the focus and Tk::HListbox can assign the
         first column (the default if this isn't specified here) the focus
         and everything displays properly.
+
+        One possibly useful reason to still specify this column, is if there
+        is a specific column other than the first with many wide values
+        where a user might wish to be able to scroll the column horizontally
+        using the left and right arrow-keys.
 
         NOTE: none of this applies if -nocolumnfocus is set, which also has
         the side effect of disabling most keyboard bindings on the
@@ -193,6 +196,14 @@ WIDGET SPECIFIC OPTIONS
 
         Note that you can also specify -separatorcolor on a column by column
         basis. See the COLUMNS section below.
+
+    -scrollbarfocus => *value*
+        Specifies which scrollbars (if any) are allowed to take keyboard
+        focus via the tab-circulate order: Valid values are: 0 (no
+        scrollbars take focus), 1 or "xy" (all scrollbars take focus, "x"
+        (only horizontal scrollbar takes focus), or "y" (only vertical
+        scrollbar takes focus). Default is "" (Allow all to take focus based
+        on Tk's default focusing model).
 
     -separatorwidth => *integer*
         Specifies the width in pixels of the separator lines (the vertical
@@ -258,11 +269,12 @@ WIDGET SPECIFIC, COLUMN-SPECIFIC OPTIONS
 
             -comparecommand => sub { $_[0] <=> $_[1]}
 
-        Default: sub { $_[0] cmp $_[1] } #(Ascending by string) NOTE: If the
-        column data is images or hashrefs (both text and images or contains
-        additional cell-specific options, then one should specify a
-        component of that hash to sort by, ie. the special "-sort" key is
-        handy, then one can sort using something like:
+        Default: sub { $_[0] cmp $_[1] } #(Ascending by string)
+
+        NOTE: If the column data is images or hashrefs (both text and images
+        or contains additional cell-specific options, then one should
+        specify a component of that hash to sort by, ie. the special "-sort"
+        key is handy, then one can sort using something like:
 
                 sub { $_[0]->{'-sort'} cmp $_[1]->{'-sort'} } or maybe:
 
@@ -404,11 +416,13 @@ WIDGET METHODS
 
                 -comparecommand => sub { $_[0] <=> $_[1]}
 
-            Default: sub { $_[0] cmp $_[1] } #(Ascending by string) NOTE: If
-            the column data is images or hashrefs (both text and images or
-            contains additional cell-specific options, then one should
-            specify a component of that hash to sort by, ie. the special
-            "-sort" key is handy, then one can sort using something like:
+            Default: sub { $_[0] cmp $_[1] } #(Ascending by string)
+
+            NOTE: If the column data is images or hashrefs (both text and
+            images or contains additional cell-specific options, then one
+            should specify a component of that hash to sort by, ie. the
+            special "-sort" key is handy, then one can sort using something
+            like:
 
                     sub { $_[0]->{'-sort'} cmp $_[1]->{'-sort'} } or maybe:
 
@@ -634,6 +648,12 @@ BINDING EVENTS TO HMLISTBOX
         unbound. An empty string is returned.
 
         An empty string is returned in all other cases.
+
+KNOWN BUGS
+    Setting both scrollbars to optional, ie. -scrollbars => 'osoe' causes
+    the scrollbars to flicker and not work, if the initial width of the
+    widget is set less than the combined width of the underlying HListbox
+    widgets.
 
 KEYWORDS
     hmlistbox, smlistbox, mlistbox, listbox, hlist, widget

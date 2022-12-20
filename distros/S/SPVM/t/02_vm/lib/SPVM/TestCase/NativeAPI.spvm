@@ -12,6 +12,7 @@ class TestCase::NativeAPI {
   use Fn;
   use Array;
   use Error;
+  use Complex_2d;
   
   our $BYTE_VALUE : byte;
   our $SHORT_VALUE : short;
@@ -1092,9 +1093,32 @@ class TestCase::NativeAPI {
   
   static method my_value : int ($value : int) { return $value; }
   
-  native static method native_call_spvm_method : int ();
+  native static method native_call_method : int ();
   native static method native_call_class_method_by_name : int ();
   native static method native_call_class_method_by_name_exception : int ();
+
+  static method call_instance_method_static_by_name : int () {
+    my $minimal = TestCase::Minimal->new;
+    $minimal->set_x(5);
+    
+    my $value = &call_instance_method_static_by_name_native($minimal);
+    
+    unless ($value == 5) {
+      return 0;
+    }
+    
+    return 1;
+  }
+  native static method call_instance_method_static_by_name_native : int ($minimal : TestCase::Minimal);
+  static method call_instance_method_static_by_name_exception : int () {
+    my $minimal = TestCase::Minimal->new;
+    $minimal->set_x(5);
+
+    &call_instance_method_static_by_name_exception_native($minimal);
+    
+    return 1;
+  }
+  native static method call_instance_method_static_by_name_exception_native : int ($minimal : TestCase::Minimal);
 
   static method call_instance_method_by_name : int () {
     my $minimal = TestCase::Minimal->new;
@@ -1118,9 +1142,6 @@ class TestCase::NativeAPI {
     return 1;
   }
   native static method call_instance_method_by_name_exception_native : int ($minimal : TestCase::Minimal);
-
-  native static method native_call_class_method : int ();
-  native static method native_call_instance_method : int ();
 
   static method new_object_by_name : int () {
     my $minimal = TestCase::NativeAPI->native_new_object_by_name();
@@ -1255,7 +1276,30 @@ class TestCase::NativeAPI {
     }
     
     {
+      my $args_length = &get_args_stack_length_2(0);
+      unless ($args_length == 1) {
+        return 0;
+      }
+    }
+    
+    {
       my $args_length = &get_args_stack_length_2(0, 0);
+      unless ($args_length == 2) {
+        return 0;
+      }
+    }
+
+    {
+      my $z : Complex_2d;
+      my $args_length = &get_args_stack_length_4($z, 0, 0);
+      unless ($args_length == 4) {
+        return 0;
+      }
+    }
+
+    {
+      my $z : Complex_2d;
+      my $args_length = &get_args_stack_length_4($z);
       unless ($args_length == 2) {
         return 0;
       }
@@ -1265,7 +1309,62 @@ class TestCase::NativeAPI {
   }
   native static method get_args_stack_length_0 : int ();
   native static method get_args_stack_length_1 : int ($args0 : int);
-  native static method get_args_stack_length_2 : int ($args0 : int, $args1 : int);
+  native static method get_args_stack_length_2 : int ($args0 : int, $args1 = 0 : int);
+  native static method get_args_stack_length_4 : int ($args_2d : Complex_2d, $args0 = 0 : int, $args1 = 0 : int);
+
+  static method items : int () {
+    {
+      my $args_length = &items_0;
+      unless ($args_length == 0) {
+        return 0;
+      }
+    }
+    
+    
+    {
+      my $args_length = &items_1(0);
+      unless ($args_length == 1) {
+        return 0;
+      }
+    }
+    
+    {
+      my $args_length = &items_2(0);
+      unless ($args_length == 1) {
+        return 0;
+      }
+    }
+    
+    {
+      my $args_length = &items_2(0, 0);
+      unless ($args_length == 2) {
+        return 0;
+      }
+    }
+
+    {
+      my $z : Complex_2d;
+      my $args_length = &items_4($z, 0, 0);
+      unless ($args_length == 4) {
+        return 0;
+      }
+    }
+
+    {
+      my $z : Complex_2d;
+      my $args_length = &items_4($z);
+      unless ($args_length == 2) {
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  native static method items_0 : int ();
+  native static method items_1 : int ($args0 : int);
+  native static method items_2 : int ($args0 : int, $args1 = 0 : int);
+  native static method items_4 : int ($args_2d : Complex_2d, $args0 = 0 : int, $args1 = 0 : int);
+
   native static method dumpc : int ();
   native static method pointer_fields : int ();
   native static method get_pointer_no_need_free : int ();

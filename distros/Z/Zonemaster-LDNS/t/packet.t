@@ -28,4 +28,35 @@ is($p->answerfrom, undef, 'No answerfrom');
 $p->answerfrom('127.0.0.1');
 is($p->answerfrom, '127.0.0.1', 'Localhost');
 
+subtest "croak when stringifying packet with malformed CAA" => sub {
+    my $will_croak = sub {
+        # Constructing a synthetic packet that would have the following string
+        # representation in dig-like format:
+        #
+        # ;; ->>HEADER<<- opcode: QUERY, rcode: NOERROR, id: 13944
+        # ;; flags: qr aa ; QUERY: 1, ANSWER: 1, AUTHORITY: 0, ADDITIONAL: 0
+        # ;; QUESTION SECTION:
+        # ;; bad-caa.example.       IN      CAA
+        #
+        # ;; ANSWER SECTION:
+        # bad-caa.example.  3600    IN      CAA     \# 4 C0000202
+        #
+        # ;; AUTHORITY SECTION:
+        #
+        # ;; ADDITIONAL SECTION:
+        my $packet_bin = pack(
+            'H*',
+            '367884000001000100000000' . # header
+            '076261642d636161076578616d706c650001010001' . # question
+            'c00c0101000100000e100004c0000202' # bad answer
+        );
+
+        my $packet = Zonemaster::LDNS::Packet->new_from_wireformat( $packet_bin );
+
+        # This must croak
+        $packet->string;
+    };
+    like( exception { $will_croak->() }, qr/^Failed to convert packet to string/ );
+};
+
 done_testing();

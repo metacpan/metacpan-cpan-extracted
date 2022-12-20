@@ -41,7 +41,7 @@ BEGIN {
     chomp $tty;
     -c $tty  and  -w $tty
 	or  plan skip_all => 'required TTY (' . $tty . ') not available';
-    plan tests => 53;
+    plan tests => 54;
 
     # define fixed environment for unit tests:
     delete $ENV{DISPLAY};
@@ -165,7 +165,7 @@ $var = 0;
 my $check = UI::Various::Check->new(text => 'on or off', var => \$var);
 is(ref($check), 'UI::Various::RichTerm::Check', 'Check is concrete class');
 ($w, $h) = $check->_prepare(8);
-is($w, 5, '_prepare (Check) returns correct width');
+is($w, 9, '_prepare (Check) returns correct width');
 is($h, 2, '_prepare (Check) returns correct height');
 $_ = $check->_show('<1> ', $w, $h);
 is($_,
@@ -195,7 +195,7 @@ my $radio =
 			    var => \$var);
 is(ref($radio), 'UI::Various::RichTerm::Radio', 'Radio is concrete class');
 ($w, $h) = $radio->_prepare(8);
-is($w, 7, '_prepare (Radio 1) returns correct width');
+is($w, 11, '_prepare (Radio 1) returns correct width');
 is($h, 4, '_prepare (Radio 1) returns correct height');
 $_ = $radio->_show('<1> ', $w, $h);
 is($_,
@@ -208,7 +208,7 @@ $radio =
     UI::Various::Radio->new(buttons => [a => 'red', b => 'green', c => 'blue'],
 			    var => \$var);
 ($w, $h) = $radio->_prepare(8);
-is($w, 5, '_prepare (Radio 2) returns correct width');
+is($w, 9, '_prepare (Radio 2) returns correct width');
 is($h, 3, '_prepare (Radio 2) returns correct height');
 $_ = $radio->_show('<1> ', $w, $h);
 is($_,
@@ -365,6 +365,24 @@ stdout_is
 {   $win1->_show();   }
     "#====#\n\"HI! \"\n\"BYE!\"\n" . ("\"    \"\n" x 6) . "#====#\n",
     '_show 8 prints correct text';
+
+$_ = $win1->dump;
+like($_,
+     qr{^_space:\n
+	\ \ 3:3\n
+	\ \ 1:1\n
+	\ \ 4:4\n
+	\ \ 1:1\n
+	_total_height:4\n
+	children:\n
+	\ \ UI::Various::RichTerm::Text=HASH\(0x[0-9a-f]+\):\n
+	\ \ \ \ text:HI!\n
+	\ \ \ \ width:3\n
+	\ \ UI::Various::RichTerm::Text=HASH\(0x[0-9a-f]+\):\n
+	\ \ \ \ text:BYE!\n
+	height:12\n
+	title:\n\Z}msx,
+     'dump of window looks correct');
 
 $main->remove($win1);
 

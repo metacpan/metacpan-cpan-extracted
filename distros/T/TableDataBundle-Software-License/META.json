@@ -44,13 +44,17 @@
       }
    },
    "provides" : {
+      "TableData::Software::License::FromRPL" : {
+         "file" : "lib/TableData/Software/License/FromRPL.pm",
+         "version" : "0.002"
+      },
       "TableData::Software::License::FromSL" : {
          "file" : "lib/TableData/Software/License/FromSL.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       },
       "TableDataBundle::Software::License" : {
          "file" : "lib/TableDataBundle/Software/License.pm",
-         "version" : "0.001"
+         "version" : "0.002"
       }
    },
    "release_status" : "stable",
@@ -65,7 +69,7 @@
          "web" : "https://github.com/perlancar/perl-TableDataBundle-Software-License"
       }
    },
-   "version" : "0.001",
+   "version" : "0.002",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.034000"

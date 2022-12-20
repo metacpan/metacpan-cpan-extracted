@@ -428,6 +428,9 @@ KEYWORDS
     
        field $var = EXPR;
     
+       field $var //= EXPR;
+       field $var ||= EXPR;
+    
        field $var { BLOCK }
 
     Since version 0.66.
@@ -596,6 +599,22 @@ KEYWORDS
     time the class is declared. Just like the block form describe above,
     the expression is evaluated during the constructor of every instance.
 
+    Since version 0.74 this expression may also be written using a
+    defined-or or logical-or assignment operator (//= or ||=). In these
+    case, the default expression will be evaluated and assigned if the
+    caller did not pass a value to the constructor at all, or if the value
+    passed was undef (for //=) or false (for ||=). For most scalar
+    parameters, where undef is not a valid value, you probably wanted to
+    use //= to assign defaults.
+
+       class Action {
+          field $timeout :param //= 20;
+          ...
+       }
+    
+       # The default of 20 will apply here too
+       my $act = Action->new( timeout => $opts{timeout} );
+
     Note that $self is specifically not visible during an initialiser
     expression. This is because the object is not yet fully constructed, so
     it would be dangerous to allow access to it while in this state.
@@ -603,10 +622,15 @@ KEYWORDS
     can make use of class-based dispatch to invoke class-level methods to
     help provide values.
 
-    This feature should be considered experimental, and will emit warnings
-    to that effect. They can be silenced with
+    This feature should be considered partly experimental and may emit
+    warnings to that effect. They can be silenced with
 
-       use Object::Pad qw( :experimental(init_expr) );
+       use Object::Pad ':experimental(init_expr)';
+
+    Since version 0.76 expressions that are purely compiletime constants
+    (either as single scalars or entire lists of constants) are no longer
+    considered experimental. They can be used without silencing the
+    warning.
 
     Control flow that attempts to leave a field initialiser expression or
     block is not permitted. This includes any return expression, any
@@ -838,7 +862,7 @@ KEYWORDS
     This feature should be considered experimental, and will emit warnings
     to that effect. They can be silenced with
 
-       use Object::Pad qw( :experimental(adjust_params) );
+       use Object::Pad ':experimental(adjust_params)';
 
     Before the block itself, a list of lexical variables are introduced,
     inside parentheses. The name of each one is preceeded by a colon, and

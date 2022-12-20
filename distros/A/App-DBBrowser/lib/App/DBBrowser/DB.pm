@@ -5,7 +5,7 @@ use warnings;
 use strict;
 use 5.014;
 
-our $VERSION = '2.304';
+our $VERSION = '2.305';
 
 #use bytes; # required
 use Scalar::Util qw( looks_like_number );
@@ -88,7 +88,7 @@ sub get_schemas {
         }
         elsif( $driver eq 'Pg' ) {
             my $sth = $dbh->table_info( undef, '%', undef, undef );
-            # pg_schema: the unquoted name of the schema
+            # 'pg_schema' holds the unquoted name of the schema
             my $info = $sth->fetchall_hashref( 'pg_schema' );
             my $qr = qr/^(?:pg_|information_schema$)/;
             for my $schema ( keys %$info ) {
@@ -294,38 +294,52 @@ sub regexp {
     my ( $sf, $col, $do_not_match, $case_sensitive ) = @_;
     if ( $sf->get_db_driver eq 'SQLite' ) {
         if ( $do_not_match ) {
-            return sprintf ' NOT REGEXP(?,%s,%d)', $col, $case_sensitive;
+            return sprintf " NOT REGEXP(?,%s,%d)", $col, $case_sensitive;
         }
         else {
-            return sprintf ' REGEXP(?,%s,%d)', $col, $case_sensitive;
+            return sprintf " REGEXP(?,%s,%d)", $col, $case_sensitive;
         }
     }
     elsif ( $sf->get_db_driver =~ /^(?:mysql|MariaDB)\z/ ) {
         if ( $do_not_match ) {
-            return ' ' . $col . ' NOT REGEXP ?'        if ! $case_sensitive;
-            return ' ' . $col . ' NOT REGEXP BINARY ?' if   $case_sensitive;
+            return " $col NOT REGEXP ?"        if ! $case_sensitive;
+            return " $col NOT REGEXP BINARY ?" if   $case_sensitive;
         }
         else {
-            return ' ' . $col . ' REGEXP ?'            if ! $case_sensitive;
-            return ' ' . $col . ' REGEXP BINARY ?'     if   $case_sensitive;
+            return " $col REGEXP ?"            if ! $case_sensitive;
+            return " $col REGEXP BINARY ?"     if   $case_sensitive;
         }
     }
     elsif ( $sf->get_db_driver eq 'Pg' ) {
         if ( $do_not_match ) {
-            return ' ' . $col . '::text' . ' !~* ?' if ! $case_sensitive;
-            return ' ' . $col . '::text' . ' !~ ?'  if   $case_sensitive;
+            return " ${col}::text !~* ?" if ! $case_sensitive;
+            return " ${col}::text !~ ?"  if   $case_sensitive;
         }
         else {
-            return ' ' . $col . '::text' . ' ~* ?'  if ! $case_sensitive;
-            return ' ' . $col . '::text' . ' ~ ?'   if   $case_sensitive;
+            return " ${col}::text ~* ?"  if ! $case_sensitive;
+            return " ${col}::text ~ ?"   if   $case_sensitive;
         }
     }
     elsif ( $sf->get_db_driver eq 'Firebird' ) {
+        # SIMILAR TO
+        # Unlike in some other languages, the pattern must match the entire
+        # string in order to succeed—matching a substring is not enough.
+        # wildcards: '%' and '_'
         if ( $do_not_match ) {
-            return ' ' . $col . ' NOT SIMILAR TO ? ESCAPE \'#\'';
+            return " $col NOT SIMILAR TO ? ESCAPE '#'";
         }
         else {
-            return ' ' . $col . ' SIMILAR TO ? ESCAPE \'#\'';
+            return " $col SIMILAR TO ? ESCAPE '#'";
+        }
+    }
+    elsif ( $sf->get_db_driver =~ /^(?:db2|oracle)\z/ ) {
+        if ( $do_not_match ) {
+            return " NOT REGEXP_LIKE($col,?,'i')" if ! $case_sensitive;
+            return " NOT REGEXP_LIKE($col,?,'c')" if   $case_sensitive;
+        }
+        else {
+            return " REGEXP_LIKE($col,?,'i')"     if ! $case_sensitive;
+            return " REGEXP_LIKE($col,?,'c')"     if   $case_sensitive;
         }
     }
 }
@@ -362,7 +376,7 @@ sub function_with_col_and_arg {
         #    my $prec_num = '1' . '0' x $arg;
         #    return "cast( ( $col * $prec_num ) as int ) / $prec_num.0";
         #}
-        return "TRUNC($col,$arg)"     if $sf->get_db_driver =~ /^(?:Pg|Firebird)\z/;
+        return "TRUNC($col,$arg)"     if $sf->get_db_driver =~ /^(?:Pg|Firebird|oracle)\z/;
         return "TRUNCATE($col,$arg)";
     }
 }
@@ -388,10 +402,12 @@ sub concatenate {
 
 sub epoch_to_date {
     my ( $sf, $col, $interval ) = @_;
-    return "DATE($col/$interval,'unixepoch','localtime')"                        if $sf->get_db_driver eq 'SQLite';
-    return "FROM_UNIXTIME($col/$interval,'%Y-%m-%d')"                            if $sf->get_db_driver =~ /^(?:mysql|MariaDB)\z/;
-    return "TO_TIMESTAMP(${col}::bigint/$interval)::date"                        if $sf->get_db_driver eq 'Pg';
-    return "DATEADD(CAST($col AS BIGINT)/$interval SECOND TO DATE '1970-01-01')" if $sf->get_db_driver eq 'Firebird';
+    return "DATE($col/$interval,'unixepoch','localtime')"                                  if $sf->get_db_driver eq 'SQLite';
+    return "FROM_UNIXTIME($col/$interval,'%Y-%m-%d')"                                      if $sf->get_db_driver =~ /^(?:mysql|MariaDB)\z/;
+    return "TO_TIMESTAMP(${col}::bigint/$interval)::date"                                  if $sf->get_db_driver eq 'Pg';
+    return "DATEADD(CAST($col AS BIGINT)/$interval SECOND TO DATE '1970-01-01')"           if $sf->get_db_driver eq 'Firebird';
+    return "TIMESTAMP('1970-01-01') + ($col/$interval) SECONDS"                            if $sf->get_db_driver eq 'db2';
+    return "TO_DATE('1970-01-01','YYYY-MM-DD') + NUMTODSINTERVAL($col/$interval,'SECOND')" if $sf->get_db_driver eq 'oracle';
 }
 
 
@@ -401,6 +417,8 @@ sub epoch_to_datetime {
     return "FROM_UNIXTIME($col/$interval,'%Y-%m-%d %H:%i:%s')"                                 if $sf->get_db_driver =~ /^(?:mysql|MariaDB)\z/;        # mysql: FROM_UNIXTIME doesn't work with negative timestamps
     return "TO_TIMESTAMP(${col}::bigint/$interval)::timestamp"                                 if $sf->get_db_driver eq 'Pg';
     return "DATEADD(CAST($col AS BIGINT)/$interval SECOND TO TIMESTAMP '1970-01-01 00:00:00')" if $sf->get_db_driver eq 'Firebird';
+    return "TIMESTAMP('1970-01-01 00:00:00') + ($col/$interval) SECONDS"                       if $sf->get_db_driver eq 'db2';
+    return "TO_TIMESTAMP('1970-01-01 00:00:00','YYYY-MM-DD HH24:MI:SS') + NUMTODSINTERVAL($col/$interval,'SECOND')"  if $sf->get_db_driver eq 'oracle';
 }
 
 
@@ -409,7 +427,7 @@ sub replace {
     return "REPLACE($col,$string_to_replace,$replacement_string)";
 }
 
-
+# db2 and oracle untested
 
 
 1;
@@ -427,7 +445,7 @@ App::DBBrowser::DB - Database plugin documentation.
 
 =head1 VERSION
 
-Version 2.304
+Version 2.305
 
 =head1 DESCRIPTION
 

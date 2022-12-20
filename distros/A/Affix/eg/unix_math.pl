@@ -2,7 +2,7 @@ use strict;
 use warnings;
 use lib '../lib', '../blib/arch', '../blib/lib';
 use Affix;
-use File::Find;
+use Config;
 $|++;
 my $libfile
     = $^O eq 'MSWin32' ? 'ntdll.dll' :

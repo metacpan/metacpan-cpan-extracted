@@ -15,21 +15,6 @@ enum {
 };
 
 /*
-  Runtime information APIs
-*/
-
-int32_t SPVM_API_get_class_id(SPVM_ENV* env, const char* class_name);
-int32_t SPVM_API_get_basic_type_id(SPVM_ENV* env, const char* name);
-int32_t SPVM_API_get_class_method_id(SPVM_ENV* env, const char* class_name, const char* method_name);
-int32_t SPVM_API_get_instance_method_id(SPVM_ENV* env, SPVM_OBJECT* object, const char* method_name);
-int32_t SPVM_API_get_class_var_id(SPVM_ENV* env, const char* class_name, const char* class_var_name);
-int32_t SPVM_API_get_field_id(SPVM_ENV* env, SPVM_OBJECT* object, const char* field_name);
-int32_t SPVM_API_get_field_index(SPVM_ENV* env, int32_t field_id);
-int32_t SPVM_API_get_field_offset(SPVM_ENV* env, int32_t field_id);
-int32_t SPVM_API_get_instance_method_id_static(SPVM_ENV* env, const char* class_name, const char* method_name);
-int32_t SPVM_API_object_header_byte_size(SPVM_ENV* env);
-
-/*
   Environment APIs
 */
 
@@ -39,7 +24,7 @@ SPVM_ENV* SPVM_API_new_env(SPVM_ENV* env);
 int32_t SPVM_API_init_env(SPVM_ENV* env);
 void SPVM_API_free_env(SPVM_ENV* env);
 void SPVM_API_free_env_prepared(SPVM_ENV* env);
-void* SPVM_API_new_memory_env(SPVM_ENV* env, size_t byte_size);
+void* SPVM_API_new_memory_env(SPVM_ENV* env, size_t size);
 void SPVM_API_free_memory_env(SPVM_ENV* env, void* block);
 int32_t SPVM_API_get_memory_blocks_count_env(SPVM_ENV* env);
 SPVM_VALUE* SPVM_API_new_stack(SPVM_ENV* env);
@@ -50,11 +35,22 @@ void SPVM_API_free_stack(SPVM_ENV* env, SPVM_VALUE* stack);
   These APIs need stack argument
 */
 
+// Runtime information
+
+int32_t SPVM_API_get_class_id(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name);
+int32_t SPVM_API_get_basic_type_id(SPVM_ENV* env, SPVM_VALUE* stack, const char* name);
+int32_t SPVM_API_get_class_method_id(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, const char* method_name);
+int32_t SPVM_API_get_instance_method_id(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, const char* method_name);
+int32_t SPVM_API_get_class_var_id(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, const char* class_var_name);
+int32_t SPVM_API_get_field_id(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, const char* field_name);
+int32_t SPVM_API_get_field_id_static(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, const char* field_name);
+int32_t SPVM_API_get_field_offset(SPVM_ENV* env, SPVM_VALUE* stack, int32_t field_id);
+int32_t SPVM_API_get_instance_method_id_static(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, const char* method_name);
+
 // Manipulate memory
-void* SPVM_API_new_memory_stack(SPVM_ENV* env, SPVM_VALUE* stack, size_t byte_size);
+void* SPVM_API_new_memory_stack(SPVM_ENV* env, SPVM_VALUE* stack, size_t size);
 void SPVM_API_free_memory_stack(SPVM_ENV* env, SPVM_VALUE* stack, void* block);
 int32_t SPVM_API_get_memory_blocks_count_stack(SPVM_ENV* env, SPVM_VALUE* stack);
-
 
 // Call INIT blocks
 void SPVM_API_call_init_blocks(SPVM_ENV* env, SPVM_VALUE* stack);
@@ -70,15 +66,15 @@ int32_t SPVM_API_get_class_id_by_name(SPVM_ENV* env, SPVM_VALUE* stack, const ch
 int32_t SPVM_API_get_basic_type_id_by_name(SPVM_ENV* env, SPVM_VALUE* stack, const char* basic_type_name, int32_t* error, const char* file, int32_t line);
 
 // Call Method
-int32_t SPVM_API_call_spvm_method(SPVM_ENV* env, SPVM_VALUE* stack, int32_t method_id, int32_t args_stack_length);
-int32_t SPVM_API_call_class_method(SPVM_ENV* env, SPVM_VALUE* stack, int32_t method_id, int32_t args_stack_length);
-int32_t SPVM_API_call_instance_method(SPVM_ENV* env, SPVM_VALUE* stack, int32_t method_id, int32_t args_stack_length);
+int32_t SPVM_API_call_method(SPVM_ENV* env, SPVM_VALUE* stack, int32_t method_id, int32_t args_stack_length);
 int32_t SPVM_API_get_args_stack_length(SPVM_ENV* env, SPVM_VALUE* stack);
+int32_t SPVM_API_items(SPVM_ENV* env, SPVM_VALUE* stack);
 void SPVM_API_set_args_stack_length(SPVM_ENV* env, SPVM_VALUE* stack, int32_t args_length);
 
 // Call Method by name
 int32_t SPVM_API_call_class_method_by_name(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, const char* method_name, int32_t args_stack_length, const char* file, int32_t line);
-int32_t SPVM_API_call_instance_method_by_name(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, const char* method_name, int32_t args_stack_length, const char* file, int32_t line);
+int32_t SPVM_API_call_instance_method_static_by_name(SPVM_ENV* env, SPVM_VALUE* stack, const char* class_name, const char* method_name, int32_t args_stack_length, const char* file, int32_t line);
+int32_t SPVM_API_call_instance_method_by_name(SPVM_ENV* env, SPVM_VALUE* stack, const char* method_name, int32_t args_stack_length, const char* file, int32_t line);
 
 // Cleanup global variables
 void SPVM_API_cleanup_global_vars(SPVM_ENV* env, SPVM_VALUE* stack);
@@ -176,7 +172,7 @@ void SPVM_API_set_field_double_by_name(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OB
 void SPVM_API_set_field_object_by_name(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, const char* field_name, SPVM_OBJECT* value, int32_t* error, const char* file, int32_t line);
 
 // Get array information
-int32_t SPVM_API_get_elem_byte_size(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* array);
+int32_t SPVM_API_get_elem_size(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* array);
 
 // Get array elements
 int8_t* SPVM_API_get_elems_byte(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* array);
@@ -320,6 +316,6 @@ void* SPVM_API_strerror_string(SPVM_ENV* env, SPVM_VALUE* stack, int32_t errno_v
 int32_t SPVM_API_get_pointer_no_need_free(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object);
 void SPVM_API_set_pointer_no_need_free(SPVM_ENV* env, SPVM_VALUE* stack, SPVM_OBJECT* object, int32_t flag);
 
-int32_t SPVM_API_call_spvm_method_vm(SPVM_ENV* env, SPVM_VALUE* stack, int32_t method_id, int32_t args_stack_length);
+int32_t SPVM_API_call_method_vm(SPVM_ENV* env, SPVM_VALUE* stack, int32_t method_id, int32_t args_stack_length);
 
 #endif

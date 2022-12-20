@@ -30,6 +30,9 @@ In addition, this module will support rollback on error, if you are
 using the InnoDB database table type in MySQL.  For more information
 please review the instructions in sql/README.bayes.
 
+This module is also compatible with MariaDB and DBD::MariaDB can be used
+instead of DBD::mysql driver.
+
 =cut
 
 package Mail::SpamAssassin::BayesStore::MySQL;
@@ -292,7 +295,8 @@ sub set_running_expire_tok {
 
   return 0 unless (defined($self->{_dbh}));
 
-  my $sql = "INSERT INTO bayes_expire (id,runtime) VALUES (?,?)";
+  my $sql = "INSERT INTO bayes_expire (id,runtime) VALUES (?,?)
+             ON DUPLICATE KEY UPDATE runtime=VALUES(runtime)";
 
   my $time = time();
 
@@ -337,6 +341,147 @@ sub remove_running_expire_tok {
 
   $self->{_dbh}->commit();
   return 1;
+}
+
+=head2 tok_get
+
+public instance (Integer, Integer, Integer) tok_get (String $token)
+
+Description:
+This method retrieves a specified token (C<$token>) from the database
+and returns it's spam_count, ham_count and last access time.
+
+=cut
+
+sub tok_get {
+  my ($self, $token) = @_;
+
+  return (0,0,0) unless (defined($self->{_dbh}));
+
+  my $sql = "SELECT spam_count, ham_count, atime
+               FROM bayes_token
+              WHERE id = ?
+                AND token = ?";
+
+  my $sth = $self->{_dbh}->prepare_cached($sql);
+
+  unless (defined($sth)) {
+    dbg("bayes: tok_get: SQL error: ".$self->{_dbh}->errstr());
+    $self->{_dbh}->rollback();
+    return (0,0,0);
+  }
+
+  $sth->bind_param(1, $self->{_userid});
+  $sth->bind_param(2, $token, DBI::SQL_BINARY);
+
+  my $rc = $sth->execute();
+
+  unless ($rc) {
+    dbg("bayes: tok_get: SQL error: ".$self->{_dbh}->errstr());
+    $self->{_dbh}->rollback();
+    return (0,0,0);
+  }
+
+  my ($spam_count, $ham_count, $atime) = $sth->fetchrow_array();
+
+  $sth->finish();
+
+  $spam_count = 0 if (!$spam_count || $spam_count < 0);
+  $ham_count = 0 if (!$ham_count || $ham_count < 0);
+  $atime = 0 if (!$atime);
+
+  return ($spam_count, $ham_count, $atime)
+}
+
+=head2 tok_get_all
+
+public instance (\@) tok_get (@ $tokens)
+
+Description:
+This method retrieves the specified tokens (C<$tokens>) from storage and returns
+an array ref of arrays spam count, ham count and last access time.
+
+=cut
+
+sub tok_get_all {
+  my ($self, @tokens) = @_;
+
+  return [] unless (defined($self->{_dbh}));
+
+  my $token_list_size = scalar(@tokens);
+  dbg("bayes: tok_get_all: token count: $token_list_size");
+  my @tok_results;
+
+  my $search_index = 0;
+  my $results_index = 0;
+  my $bunch_end;
+
+  my $token_select = $self->_token_select_string();
+
+  my $multi_sql = "SELECT $token_select, spam_count, ham_count, atime
+                     FROM bayes_token
+                    WHERE id = ?
+                      AND token IN ";
+
+  # fetch tokens in bunches of 100 until there are <= 100 left, then just fetch the rest
+  while ($token_list_size > $search_index) {
+    my $bunch_size;
+    if ($token_list_size - $search_index > 100) {
+      $bunch_size = 100;
+    }
+    else {
+      $bunch_size = $token_list_size - $search_index;
+    }
+    while ($token_list_size - $search_index >= $bunch_size) {
+      my @tok;
+      my $in_str = '(';
+
+      $bunch_end = $search_index + $bunch_size;
+      for ( ; $search_index < $bunch_end; $search_index++) {
+	$in_str .= '?,';
+	push(@tok, $tokens[$search_index]);
+      }
+      chop $in_str;
+      $in_str .= ')';
+
+      my $dynamic_sql = $multi_sql . $in_str;
+
+      my $sth = $self->{_dbh}->prepare($dynamic_sql);
+
+      unless (defined($sth)) {
+	dbg("bayes: tok_get_all: SQL error: ".$self->{_dbh}->errstr());
+	$self->{_dbh}->rollback();
+	return [];
+      }
+
+      my $idx = 0;
+      $sth->bind_param(++$idx, $self->{_userid});
+      $sth->bind_param(++$idx, $_, DBI::SQL_BINARY) foreach (@tok);
+
+      my $rc = $sth->execute();
+
+      unless ($rc) {
+	dbg("bayes: tok_get_all: SQL error: ".$self->{_dbh}->errstr());
+	$self->{_dbh}->rollback();
+	return [];
+      }
+
+      my $results = $sth->fetchall_arrayref();
+
+      $sth->finish();
+
+      foreach my $result (@{$results}) {
+	# Make sure that spam_count and ham_count are not negative
+	$result->[1] = 0 if (!$result->[1] || $result->[1] < 0);
+	$result->[2] = 0 if (!$result->[2] || $result->[2] < 0);
+	# Make sure that atime has a value
+	$result->[3] = 0 if (!$result->[3]);
+	$tok_results[$results_index++] = $result;
+      }
+    }
+  }
+
+  return \@tok_results;
 }
 
 =head2 nspam_nham_change
@@ -421,10 +566,22 @@ sub tok_touch {
                 AND token = ?
                 AND atime < ?";
 
-  my $rows = $self->{_dbh}->do($sql, undef, $atime, $self->{_userid},
-			       $token, $atime);
+  my $sth = $self->{_dbh}->prepare_cached($sql);
 
-  unless (defined($rows)) {
+  unless (defined($sth)) {
+    dbg("bayes: tok_touch: SQL error: ".$self->{_dbh}->errstr());
+    $self->{_dbh}->rollback();
+    return 0;
+  }
+
+  $sth->bind_param(1, $atime);
+  $sth->bind_param(2, $self->{_userid});
+  $sth->bind_param(3, $token, DBI::SQL_BINARY);
+  $sth->bind_param(4, $atime);
+
+  my $rows = $sth->execute();
+
+  unless ($rows) {
     dbg("bayes: tok_touch: SQL error: ".$self->{_dbh}->errstr());
     $self->{_dbh}->rollback();
     return 0;
@@ -478,20 +635,29 @@ sub tok_touch_all {
   return 1 unless (scalar(@{$tokens}));
 
   my $sql = "UPDATE bayes_token SET atime = ? WHERE id = ? AND token IN (";
-
-  my @bindings = ($atime, $self->{_userid});
-  foreach my $token (@{$tokens}) {
+  foreach (@{$tokens}) {
     $sql .= "?,";
-    push(@bindings, $token);
   }
   chop($sql); # get rid of trailing ,
-
   $sql .= ") AND atime < ?";
-  push(@bindings, $atime);
 
-  my $rows = $self->{_dbh}->do($sql, undef, @bindings);
+  my $sth = $self->{_dbh}->prepare($sql);
 
-  unless (defined($rows)) {
+  unless (defined($sth)) {
+    dbg("bayes: tok_touch_all: SQL error: ".$self->{_dbh}->errstr());
+    $self->{_dbh}->rollback();
+    return [];
+  }
+
+  my $idx = 0;
+  $sth->bind_param(++$idx, $atime);
+  $sth->bind_param(++$idx, $self->{_userid});
+  $sth->bind_param(++$idx, $_, DBI::SQL_BINARY) foreach (@{$tokens});
+  $sth->bind_param(++$idx, $atime);
+
+  my $rows = $sth->execute();
+
+  unless ($rows) {
     dbg("bayes: tok_touch_all: SQL error: ".$self->{_dbh}->errstr());
     $self->{_dbh}->rollback();
     return 0;
@@ -735,7 +901,8 @@ sub _initialize_db {
     return 0;
   }
 
-  $id = $self->{_dbh}->{'mysql_insertid'};
+  $id = $self->{_dsn} =~ /^DBI:MariaDB/i ?
+    $self->{_dbh}->{'mariadb_insertid'} : $self->{_dbh}->{'mysql_insertid'};
 
   $self->{_dbh}->commit();
 
@@ -797,10 +964,12 @@ sub _put_token {
       return 0;
     }
 
-    my $rc = $sth->execute($spam_count,
-			   $ham_count,
-			   $self->{_userid},
-			   $token);
+    $sth->bind_param(1, $spam_count);
+    $sth->bind_param(2, $ham_count);
+    $sth->bind_param(3, $self->{_userid});
+    $sth->bind_param(4, $token, DBI::SQL_BINARY);
+
+    my $rc = $sth->execute();
 
     unless ($rc) {
       dbg("bayes: _put_token: SQL error: ".$self->{_dbh}->errstr());
@@ -824,14 +993,16 @@ sub _put_token {
       return 0;
     }
 
-    my $rc = $sth->execute($self->{_userid},
-			   $token,
-			   $spam_count,
-			   $ham_count,
-			   $atime,
-			   $spam_count,
-			   $ham_count,
-			   $atime);
+    $sth->bind_param(1, $self->{_userid});
+    $sth->bind_param(2, $token, DBI::SQL_BINARY);
+    $sth->bind_param(3, $spam_count);
+    $sth->bind_param(4, $ham_count);
+    $sth->bind_param(5, $atime);
+    $sth->bind_param(6, $spam_count);
+    $sth->bind_param(7, $ham_count);
+    $sth->bind_param(8, $atime);
+
+    my $rc = $sth->execute();
 
     unless ($rc) {
       dbg("bayes: _put_token: SQL error: ".$self->{_dbh}->errstr());
@@ -948,12 +1119,15 @@ sub _put_tokens {
       return 0;
     }
 
+    $sth->bind_param(1, $spam_count);
+    $sth->bind_param(2, $ham_count);
+    $sth->bind_param(3, $self->{_userid});
+    # 4, update token in foreach loop
+
     my $error_p = 0;
     foreach my $token (keys %{$tokens}) {
-      my $rc = $sth->execute($spam_count,
-			     $ham_count,
-			     $self->{_userid},
-			     $token);
+      $sth->bind_param(4, $token, DBI::SQL_BINARY);
+      my $rc = $sth->execute();
 
       unless ($rc) {
 	dbg("bayes: _put_tokens: SQL error: ".$self->{_dbh}->errstr());
@@ -984,18 +1158,21 @@ sub _put_tokens {
       return 0;
     }
 
+    $sth->bind_param(1, $self->{_userid});
+    # 2, update token in foreach loop
+    $sth->bind_param(3, $spam_count);
+    $sth->bind_param(4, $ham_count);
+    $sth->bind_param(5, $atime);
+    $sth->bind_param(6, $spam_count);
+    $sth->bind_param(7, $ham_count);
+    $sth->bind_param(8, $atime);
+
     my $error_p = 0;
     my $new_tokens = 0;
     my $need_atime_update_p = 0;
     foreach my $token (keys %{$tokens}) {
-      my $rc = $sth->execute($self->{_userid},
-			     $token,
-			     $spam_count,
-			     $ham_count,
-			     $atime,
-			     $spam_count,
-			     $ham_count,
-			     $atime);
+      $sth->bind_param(2, $token, DBI::SQL_BINARY);
+      my $rc = $sth->execute();
 
       if (!$rc) {
 	dbg("bayes: _put_tokens: SQL error: ".$self->{_dbh}->errstr());
@@ -1068,6 +1245,22 @@ sub _put_tokens {
 
   $self->{_dbh}->commit();
   return 1;
+}
+
+=head2 _token_select_string
+
+private instance (String) _token_select_string
+
+Description:
+This method returns the string to be used in SELECT statements to represent
+the token column.
+
+The default is to use the RPAD function to pad the token out to 5 characters.
+
+=cut
+
+sub _token_select_string {
+  return "RPAD(token, 5, ' ')";
 }
 
 sub sa_die { Mail::SpamAssassin::sa_die(@_); }

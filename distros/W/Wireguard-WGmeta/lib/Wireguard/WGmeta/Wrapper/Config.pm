@@ -50,7 +50,7 @@ use Wireguard::WGmeta::ValidAttributes;
 use Wireguard::WGmeta::Utils;
 use Wireguard::WGmeta::Parser::Conf qw(INTERNAL_KEY_PREFIX);
 
-our $VERSION = "0.3.2"; # do not change manually, this variable is updated when calling make
+our $VERSION = "0.3.3"; # do not change manually, this variable is updated when calling make
 
 use constant FALSE => 0;
 use constant TRUE => 1;

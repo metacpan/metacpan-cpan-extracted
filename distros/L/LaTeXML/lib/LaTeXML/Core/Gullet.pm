@@ -245,8 +245,7 @@ sub handleTemplate {
   return; }
 
 # If it is a column ending token, Returns the token, a keyword and whether it is "hidden"
-our @column_ends = (
-  [T_ALIGN, 'align', 0],
+our @column_ends = (    # besides T_ALIGN
   [T_CS('\cr'),           'cr',     0],
   [T_CS('\crcr'),         'crcr',   0],
   [T_CS('\hidden@cr'),    'cr',     1],
@@ -257,7 +256,8 @@ our @column_ends = (
 sub isColumnEnd {
   my ($self, $token) = @_;
   my $cc = $$token[1];
-  return unless ($cc == CC_ALIGN) || ($cc == CC_CS);
+  return ($token, 'align', 0) if $cc == CC_ALIGN;
+  return unless $cc == CC_CS;
   # Embedded version of Equals, knowing both are tokens
   my $defn = $STATE->lookupMeaning($token) || $token;
   foreach my $end (@column_ends) {
@@ -286,6 +286,14 @@ sub readToken {
         elsif ($cc == CC_MARKER) {
           $self->handleMarker($token); } } }
     ProgressStep() if ($$self{progress}++ % $TOKEN_PROGRESS_QUANTUM) == 0;
+    # some infinite loops are hard to predict and may be
+    # better guarded against via a global token limit.
+    if ($LaTeXML::TOKEN_LIMIT and $$self{progress} > $LaTeXML::TOKEN_LIMIT) {
+      Fatal('timeout', 'token_limit', $self,
+        "Token limit of $LaTeXML::TOKEN_LIMIT exceeded, infinite loop?"); }
+    if ($LaTeXML::PUSHBACK_LIMIT and scalar(@{ $$self{pushback} }) > $LaTeXML::PUSHBACK_LIMIT) {
+      Fatal('timeout', 'pushback_limit', $self,
+        "Pushback limit of $LaTeXML::PUSHBACK_LIMIT exceeded, infinite loop?"); }
     # Wow!!!!! See TeX the Program \S 309
     if ((defined $token)
       && !$LaTeXML::ALIGN_STATE    # SHOULD count nesting of { }!!! when SCANNED (not digested)
@@ -331,7 +339,7 @@ sub readXToken {
         push(@{ $$self{pending_comments} }, $token); }
       elsif ($cc == CC_MARKER) {
         $self->handleMarker($token); } }
-    if (!defined $token) {           # Else read from current mouth
+    if (!defined $token) {    # Else read from current mouth
       while (($token = $$self{mouth}->readToken()) && $CATCODE_HOLD[$cc = $$token[1]]) {
         if ($cc == CC_COMMENT) {
           return $token if $commentsok;
@@ -341,7 +349,7 @@ sub readXToken {
     ProgressStep() if ($$self{progress}++ % $TOKEN_PROGRESS_QUANTUM) == 0;
     if (!defined $token) {
       return unless $autoclose && $$self{autoclose} && @{ $$self{mouthstack} };
-      $self->closeMouth; }           # Next input stream.
+      $self->closeMouth; }    # Next input stream.
         # Handle \noexpand and  smuggled tokens; either expand to $$token[2] or defer till later
     elsif (my $unexpanded = $$token[2]) {    # Inline get_dont_expand
       return ($cc != CC_SMUGGLE_THE) || $LaTeXML::SMUGGLE_THE ? $token : $unexpanded; }
@@ -358,6 +366,7 @@ sub readXToken {
       && ($for_evaluation || !$$defn{isProtected})) { # is this the right logic here? don't expand unless di
       local $LaTeXML::CURRENT_TOKEN = $token;
       my $r;
+      no warnings 'recursion';
       my @expansion = map { (($r = ref $_) eq 'LaTeXML::Core::Token' ? $_
           : ($r eq 'LaTeXML::Core::Tokens' ? @$_
             : Error('misdefined', $r, undef, "Expected a Token, got " . Stringify($_),
@@ -632,8 +641,15 @@ sub readValue {
   elsif ($type eq 'Glue')      { return $self->readGlue; }
   elsif ($type eq 'MuGlue')    { return $self->readMuGlue; }
   elsif ($type eq 'Tokens')    { return $self->readTokensValue; }
-  elsif ($type eq 'Token')     { return $self->readToken; }
-  elsif ($type eq 'any')       { return $self->readArg; }
+  elsif ($type eq 'Token') {
+    my $token = $self->readToken;
+    if (Equals($token, T_CS('\csname'))) {
+      my $cstoken = $STATE->lookupDefinition($token)->invoke($self);
+      $self->unread($cstoken->unlist);
+      return $self->readToken; }
+    else {
+      return $token; } }
+  elsif ($type eq 'any') { return $self->readArg; }
   else {
     Error('unexpected', $type, $self,
       "Gullet->readValue Didn't expect this type: $type");
@@ -659,7 +675,7 @@ sub readTokensValue {
   my $token = $self->readNonSpace;
   if (!defined $token) {
     return; }
-  elsif ($$token[1] == CC_BEGIN) {             # Inline ->getCatcode!
+  elsif ($$token[1] == CC_BEGIN) {    # Inline ->getCatcode!
     return $self->readBalanced; }
   elsif (my $defn = $STATE->lookupDefinition($token)) {
     if ($defn->isRegister eq 'Tokens') {
@@ -667,10 +683,14 @@ sub readTokensValue {
       return $defn->valueOf(($parms ? $parms->readArguments($self) : ())); }
     elsif ($defn->isExpandable) {
       if (my $x = $defn->invoke($self)) {
-        $self->unread(@{$x}); }
+        $self->unread($x->unlist); }
       return $self->readTokensValue; }
+    elsif (Equals($token, T_CS('\csname'))) {
+      my $cstoken = $defn->invoke($self);
+      $self->unread($cstoken->unlist);
+      return $self->readToken; }
     else {
-      return $token; } }                       # ?
+      return $token; } }    # ?
   else {
     return $token; } }
 
@@ -805,10 +825,9 @@ sub readDimension {
     return Dimension($s * $d->valueOf); }
   elsif (defined($d = $self->readFactor)) {
     my $unit = $self->readUnit;
-    if (!defined $unit) {
-      Warn('expected', '<unit>', $self, "Illegal unit of measure (pt inserted).");
-      $unit = 65536; }
-    return Dimension($s * $d * $unit); }
+    if (!defined $unit) {    # but leave undefined (effectively not rescaled)
+      Warn('expected', '<unit>', $self, "Illegal unit of measure (pt inserted)."); }
+    return Dimension(fixpoint($s * $d, $unit)); }
   else {
     Warn('expected', '<number>', $self, "Missing number (Dimension), treated as zero.",
       "while processing " . ToString($LaTeXML::CURRENT_TOKEN), $self->showUnexpected);
@@ -861,9 +880,8 @@ sub readMuDimension {
   if (defined(my $m = $self->readFactor)) {
     my $munit = $self->readMuUnit;
     if (!defined $munit) {
-      Warn('expected', '<unit>', $self, "Illegal unit of measure (mu inserted).");
-      $munit = $STATE->convertUnit('mu'); }
-    return MuDimension($s * $m * $munit); }
+      Warn('expected', '<unit>', $self, "Illegal unit of measure (mu inserted)."); }
+    return MuDimension(fixpoint($s * $m, $munit)); }
   elsif (defined($m = $self->readInternalMuGlue)) {
     return MuDimension($s * $m->valueOf); }
   else {
@@ -874,7 +892,7 @@ sub readMuUnit {
   my ($self) = @_;
   if (my $m = $self->readKeyword('mu')) {
     $self->skip1Space(1);
-    return $STATE->convertUnit($m); }
+    return $UNITY; }    # effectively, scaled mu
   elsif ($m = $self->readInternalMuGlue) {
     return $m->valueOf; }
   else {
@@ -914,19 +932,13 @@ sub readRubber {
     $f = ($mu ? $self->readMuDimension : $self->readDimension);
     return ($f->valueOf * $s, 0); }
   elsif (defined(my $fil = $self->readKeyword('filll', 'fill', 'fil'))) {
-    return ($s * $f, $FILLS{$fil}); }
-  elsif ($mu) {
-    my $u = $self->readMuUnit;
-    if (!defined $u) {
-      Warn('expected', '<unit>', $self, "Illegal unit of measure (mu inserted).");
-      $u = $STATE->convertUnit('mu'); }
-    return ($s * $f * $u, 0); }
+    return (fixpoint($s * $f), $FILLS{$fil}); }
   else {
-    my $u = $self->readUnit;
+    my $u = ($mu ? $self->readMuUnit : $self->readUnit);
     if (!defined $u) {
-      Warn('expected', '<unit>', $self, "Illegal unit of measure (pt inserted).");
-      $u = 65536; }
-    return ($s * $f * $u, 0); } }
+      Warn('expected', '<unit>', $self,
+        "Illegal unit of measure (" . ($mu ? 'mu' : 'pt') . " inserted)."); }
+    return (fixpoint($s * $f, $u), 0); } }
 
 # Return a glue value or undef.
 sub readInternalGlue {

@@ -153,8 +153,10 @@ DefEnvironment('{@subfigure}',
     . "#tags"
     . "#body"
     . "</ltx:figure>",
-  beforeDigest => sub { DefMacroI('\@captype', undef, 'subfigure'); },
-  afterDigest  => sub { RescueCaptionCounters('subfigure', $_[1]); });
+  properties   => { layout => 'vertical' },
+  beforeDigest => sub { beforeFloat('subfigure'); },
+  afterDigest  => sub { afterFloat($_[1]); });
+
 DefMacro('\subtable[][]{}',
   '\begin{@subtable}'
     . '\iftabletopcap\else\addtocounter{table}{1}\fi'
@@ -172,9 +174,10 @@ DefEnvironment('{@subtable}',
     . "#tags"
     . "#body"
     . "</ltx:table>",
-  beforeDigest => sub { DefMacroI('\@captype', undef, 'subtable'); },
-  afterDigest  => sub { RescueCaptionCounters('subtable', $_[1]); });
+  properties   => { layout => 'vertical' },
+  beforeDigest => sub { beforeFloat('subtable'); },
+  afterDigest  => sub { afterFloat($_[1]); });
 
-DefMacro('\subref OptionalMatch:* Semiverbatim', '\ref{#1}');
+DefMacro('\subref OptionalMatch:* Semiverbatim', '\ref{#2}');
 
 1;

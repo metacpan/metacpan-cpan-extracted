@@ -4,13 +4,13 @@
       "Tobias Bossert <tobib at cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.44, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.0402, CPAN::Meta::Converter version 2.150001",
    "license" : [
       "mit"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : 2
+      "version" : "2"
    },
    "name" : "Wireguard-WGmeta",
    "no_index" : {
@@ -47,6 +47,5 @@
          "url" : "https://github.com/sirtoobii/wg-meta"
       }
    },
-   "version" : "v0.3.2",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "v0.3.3"
 }

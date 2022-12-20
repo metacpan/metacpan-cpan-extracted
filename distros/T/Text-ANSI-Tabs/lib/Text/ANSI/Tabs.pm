@@ -1,5 +1,5 @@
 package Text::ANSI::Tabs;
-our $VERSION = "1.01";
+our $VERSION = "1.02";
 
 =encoding utf-8
 
@@ -20,7 +20,7 @@ Text::ANSI::Tabs - Tab expand and unexpand with ANSI sequence
 
 =head1 VERSION
 
-Version 1.01
+Version 1.02
 
 =cut
 
@@ -41,23 +41,17 @@ our @EXPORT_OK = qw(
     );
 our %EXPORT_TAGS = ( all => [ @EXPORT_OK ] );
 
-use Text::ANSI::Fold();
+use Text::ANSI::Fold qw(
+    $csi_re
+    $reset_re
+    $erase_re
+    );
+my  $end_re = qr{ $reset_re | $erase_re }x;
 
 my $fold = Text::ANSI::Fold->new;
 
 our $tabstop = 8;
 our $REMOVE_REDUNDANT = 1;
-
-my $reset_re = qr{ \e \[ [0;]* m }x;
-my $erase_re = qr{ \e \[ [\d;]* K }x;
-my $end_re   = qr{ $reset_re | $erase_re }x;
-my $csi_re   = qr{
-    # see ECMA-48 5.4 Control sequences
-    \e \[		# csi
-    [\x30-\x3f]*	# parameter bytes
-    [\x20-\x2f]*	# intermediate bytes
-    [\x40-\x7e]		# final byte
-}x;
 
 sub configure {
     my $class = shift;
@@ -115,7 +109,7 @@ ANSI sequence and Unicode wide characters aware version of Text::Tabs.
 
 =head1 FUNCTION
 
-There are exportable functions start with B<ansi_> prefix, and
+There are exportable functions start with C<ansi_> prefix, and
 unexportable functions without them.
 
 =over 7

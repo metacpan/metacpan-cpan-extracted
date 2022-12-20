@@ -20,21 +20,16 @@ parse_file (const char *file, eav_t *eav)
     int failed = 0;
 
 
-    setlocale(LC_ALL, "en_US.UTF-8");
-
-    fh = fopen (file, "r");
-
-    if (fh == NULL) {
-        msg_warn ("open: %s: %s", file, strerror(errno));
+    if (!(fh = fopen (file, "r"))) {
+        msg_warn ("failed to open `%s': %s\n", file, strerror(errno));
         return;
     }
 
     while ((read = getline (&line, &len, fh)) != EOF) {
-        /* XXX no critic; some dirty hacks */
-        if (line[read - 2] == '\r')
-            line[read - 2] = '\0';
-        else
-            line[read - 1] = '\0';
+        if (read >= 2 && (memcmp(line + read - 2, "\r\n", 2)) == 0)
+            line[read-2] = '\0';
+        else if (read >= 1 && line[read-1] == '\n')
+            line[read-1] = '\0'; \
 
         if (line[0] == '#') /* skip comments */
             continue;
@@ -63,6 +58,7 @@ parse_file (const char *file, eav_t *eav)
 
     if (line != NULL)
         free (line);
+
     fclose (fh);
     msg_warn ("%s: pass = %d fail = %d\n", file, passed, failed);
 }
@@ -77,7 +73,9 @@ main (int argc, char *argv[])
 #endif
 
 
-    if (argc < 2) {
+    if (argc < 2 ||
+        !(strcmp(argv[1], "-h") && strcmp(argv[1], "--help")))
+    {
         msg_warn ("usage: %s FILE [FILE2 FILE3 ...]\n", argv[0]);
         return 1;
     }

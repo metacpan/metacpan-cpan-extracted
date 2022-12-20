@@ -23,5 +23,5 @@ requires:
   XSLoader: '0'
 resources:
   repository: https://github.com/gh0stwizard/p5-EAV-XS.git
-version: v0.7.2
+version: v0.7.4
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -21,7 +21,7 @@
       },
       "runtime" : {
          "requires" : {
-            "Object::Pad" : "0.57",
+            "Object::Pad" : "0.74",
             "Tickit::RenderBuffer" : "0.43",
             "Tickit::Test" : "0",
             "Tickit::Widget" : "0.36",
@@ -39,23 +39,23 @@
    "provides" : {
       "Tickit::Widget::Menu" : {
          "file" : "lib/Tickit/Widget/Menu.pm",
-         "version" : "0.15"
+         "version" : "0.16"
       },
       "Tickit::Widget::Menu::Item" : {
          "file" : "lib/Tickit/Widget/Menu/Item.pm",
-         "version" : "0.15"
+         "version" : "0.16"
       },
       "Tickit::Widget::Menu::base" : {
          "file" : "lib/Tickit/Widget/Menu/base.pm",
-         "version" : "0.15"
+         "version" : "0.16"
       },
       "Tickit::Widget::Menu::itembase" : {
          "file" : "lib/Tickit/Widget/Menu/itembase.pm",
-         "version" : "0.15"
+         "version" : "0.16"
       },
       "Tickit::Widget::MenuBar" : {
          "file" : "lib/Tickit/Widget/MenuBar.pm",
-         "version" : "0.15"
+         "version" : "0.16"
       }
    },
    "release_status" : "stable",
@@ -65,6 +65,6 @@
       ],
       "x_IRC" : "irc://irc.freenode.net/#tickit"
    },
-   "version" : "0.15",
-   "x_serialization_backend" : "JSON::PP version 4.04"
+   "version" : "0.16",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

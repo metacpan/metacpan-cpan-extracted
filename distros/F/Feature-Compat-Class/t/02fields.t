@@ -10,12 +10,8 @@ use Feature::Compat::Class;
 # We can't just clone many of the tests from Object-Pad/t/02field.t because a
 # lot of those use init_expr
 
-# We'll do our best with ADJUST blocks instead even though we've not actually
-# tested those yet
-
 class Counter {
-   field $count;
-   ADJUST { $count = 0; }
+   field $count = 0;
 
    method inc { $count++ }
 
@@ -34,6 +30,23 @@ class Counter {
    my $counter2 = Counter->new;
    is( $counter2->describe, "Count is now 0",
       '$counter2 has its own $count' );
+}
+
+# Basic init expressions
+{
+   class AllTheTypes {
+      field $scalar = 123;
+      field @array  = ( 45, 67 );
+      field %hash   = ( 89 => 10 );
+
+      method test {
+         Test::More::is(        $scalar, 123,         '$scalar field' );
+         Test::More::is_deeply( \@array, [ 45, 67 ],  '@array field' );
+         Test::More::is_deeply( \%hash, { 89 => 10 }, '%hash field' );
+      }
+   }
+
+   AllTheTypes->new->test;
 }
 
 # Fields are visible to string-eval()

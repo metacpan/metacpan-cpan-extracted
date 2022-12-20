@@ -9,6 +9,10 @@ use Venus::Class 'base';
 
 base 'Faker::Plugin::EsEs';
 
+# VERSION
+
+our $VERSION = '1.17';
+
 # METHODS
 
 sub execute {
@@ -42,6 +46,12 @@ Faker::Plugin::EsEs::InternetUrl - Internet Url
 =head1 ABSTRACT
 
 Internet Url for Faker
+
+=cut
+
+=head1 VERSION
+
+1.17
 
 =cut
 

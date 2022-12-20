@@ -37,13 +37,17 @@ use re 'taint';
 use POSIX ();
 use Time::HiRes ();
 use Mail::SpamAssassin::Logger;
-use Mail::SpamAssassin::Util qw(am_running_on_windows);
 
 our @ISA = ();
 
 # ADDING OS-DEPENDENT LINE TERMINATOR - BUG 6456
+
+# Using Mail::SpamAssassin::Util::am_running_on_windows() leads to circular
+# dependencies. So, we are duplicating the code instead.
+use constant RUNNING_ON_WINDOWS => ($^O =~ /^(?:mswin|dos|os2)/oi);
+
 my $eol = "\n";
-if (am_running_on_windows()) {
+if (RUNNING_ON_WINDOWS) {
   $eol = "\r\n";
 }
 
@@ -58,6 +62,7 @@ sub new {
   my %params = @_;
   $self->{filename} = $params{filename} || 'spamassassin.log';
   $self->{timestamp_fmt} = $params{timestamp_fmt};
+  $self->{escape} = $params{escape} if exists $params{escape};
 
   if (! $self->init()) {
     die "logger: file initialization failed$eol";
@@ -100,6 +105,16 @@ sub log_message {
     $timestamp = POSIX::strftime($fmt, localtime($now));
   }
   $timestamp .= ' '  if $timestamp ne '';
+
+  if ($self->{escape}) {
+    # Bug 6583, escape
+    Mail::SpamAssassin::Logger::escape_str($msg);
+  } elsif (!exists $self->{escape}) {
+    # Backwards compatible pre-4.0 escaping, if $escape not given.
+    # replace control characters with "_", tabs and spaces get
+    # replaced with a single space.
+    $msg =~ tr/\x09\x20\x00-\x1f/  _/s;
+  }
 
   my($nwrite) = syswrite(STDLOG, sprintf("%s[%s] %s: %s%s",
                                          $timestamp, $$, $level, $msg, $eol));

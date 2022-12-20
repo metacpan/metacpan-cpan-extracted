@@ -9,6 +9,10 @@ use Venus::Class 'base';
 
 base 'Faker::Plugin';
 
+# VERSION
+
+our $VERSION = '1.17';
+
 # METHODS
 
 sub execute {
@@ -32,6 +36,12 @@ Faker::Plugin::ColorHexCode - Color Hex Code
 =head1 ABSTRACT
 
 Color Hex Code for Faker
+
+=cut
+
+=head1 VERSION
+
+1.17
 
 =cut
 

@@ -1,5 +1,11 @@
 Revision history for Alien-Gearman
 
+2.4      Sun Dec 14 2022
+         - Switch to Alien::Boost::ProgramOptions
+
+2.3      Sun Aug 1 2020
+         - Use flag fpermissive (?)
+
 2.2      Sun Jul 19 2020
          - Configure require Alien::Boost
 

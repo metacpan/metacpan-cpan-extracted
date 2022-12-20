@@ -1,3 +1,14 @@
+0.006   2022-09-14  Released-By: PERLANCAR; Urgency: medium
+
+        - Revert previous change, as 'ng' is uncommon and can be confused with
+          vitamin D serum concentration. Make '1g' work instead.
+
+
+0.005   2022-09-14  Released-By: PERLANCAR; Urgency: medium
+
+        - Add ng to vitamin D units.
+
+
 0.004   2021-08-08  Released-By: PERLANCAR; Urgency: low
 
 	- No functional changes.

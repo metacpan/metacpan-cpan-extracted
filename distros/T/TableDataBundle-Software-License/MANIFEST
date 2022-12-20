@@ -7,6 +7,7 @@ META.yml
 Makefile.PL
 README
 dist.ini
+lib/TableData/Software/License/FromRPL.pm
 lib/TableData/Software/License/FromSL.pm
 lib/TableDataBundle/Software/License.pm
 t/00-compile.t

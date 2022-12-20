@@ -19,11 +19,11 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Mojolicious" => "9.28",
     "Moo" => 2,
-    "Text::Exception" => 0,
+    "Test::Exception" => 0,
     "namespace::clean" => "0.27",
     "version" => 0
   },
-  "VERSION" => "0.2.2",
+  "VERSION" => "0.2.3",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -33,7 +33,7 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Mojolicious" => "9.28",
   "Moo" => 2,
-  "Text::Exception" => 0,
+  "Test::Exception" => 0,
   "namespace::clean" => "0.27",
   "version" => 0
 );

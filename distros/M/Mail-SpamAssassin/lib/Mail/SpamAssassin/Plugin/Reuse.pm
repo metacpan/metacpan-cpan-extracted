@@ -10,6 +10,8 @@ Mail::SpamAssassin::Plugin::Reuse - For reusing old rule hits during a mass-chec
 
   reuse NETWORK_RULE [ NETWORK_RULE_OLD_NAME ]
 
+  run_reuse_tests_only 0/1
+
   endif
 
 =head1 DESCRIPTION
@@ -18,6 +20,15 @@ The purpose of this plugin is to work in conjunction with B<mass-check
 --reuse> to map rules hit in input messages to rule hits in the
 mass-check output.
 
+run_reuse_tests_only 1 is special option for spamassassin/spamd use.
+Only reuse flagged tests will be run. It will also _enable_ network/DNS
+lookups. This is mainly intended for fast mass processing of corpus
+messages, so they can be properly reused later. For example:
+  spamd --pre="loadmodule Mail::SpamAssassin::Plugin::Reuse" \
+    --pre="run_reuse_tests_only 1" ...
+Such dedicated spamd could be scripted to add X-Spam-Status header to
+messages efficiently.
+
 =cut
 
 package Mail::SpamAssassin::Plugin::Reuse;
@@ -25,11 +36,15 @@ package Mail::SpamAssassin::Plugin::Reuse;
 # use bytes;
 use strict;
 use warnings;
+use re 'taint';
 
 use Mail::SpamAssassin::Conf;
 use Mail::SpamAssassin::Logger;
+use Mail::SpamAssassin::Constants qw(:sa);
 
 our @ISA = qw(Mail::SpamAssassin::Plugin);
+
+my $RULENAME_RE = RULENAME_RE;
 
 # constructor
 sub new {
@@ -42,7 +57,7 @@ sub new {
   bless ($self, $class);
 
   $self->set_config($samain->{conf});
-  # make sure we run last (or close) of the finish_parsing_start since
+  # make sure we run last (or close) of the finish_parsing_end since
   # we need all other rules to be defined
   $self->register_method_priority("finish_parsing_start", 100);
   return $self;
@@ -56,28 +71,35 @@ sub set_config {
   # e.g.
   # reuse NET_TEST_V1 NET_TEST_V0
 
-  push (@cmds, { setting => 'reuse',
-                 code => sub {
-                   my ($conf, $key, $value, $line) = @_;
+  push (@cmds, {
+    setting => 'reuse',
+    type => $Mail::SpamAssassin::Conf::CONF_TYPE_HASH_KEY_VALUE,
+    code => sub {
+      my ($conf, $key, $value, $line) = @_;
 
-                   if ($value !~ /\s*(\w+)(?:\s+(\w+(?:\s+\w+)*))?\s*$/) {
-                     return $Mail::SpamAssassin::Conf::INVALID_VALUE;
-                   }
+      if ($value !~ /^\s*(${RULENAME_RE})(?:\s+(${RULENAME_RE}(?:\s+${RULENAME_RE})*))?\s*$/) {
+        return $Mail::SpamAssassin::Conf::INVALID_VALUE;
+      }
 
-                   my $new_name = $1;
-		   my @old_names = ($new_name);
-		   if ($2) {
-		     push @old_names, split (' ', $2);
-		   }
+      my $new_name = $1;
+      my @old_names = ($new_name);
+      if (defined $2) {
+        push @old_names, split (/\s+/, $2);
+      }
 
-                   dbg("reuse: read rule, old: @old_names new: $new_name");
+      dbg("reuse: read rule, old: %s new: %s", join(' ', @old_names), $new_name);
+  
+      foreach my $old (@old_names) {
+        push @{$conf->{reuse_tests}->{$new_name}}, $old;
+      }
+    }
+  });
 
-                   foreach my $old (@old_names) {
-                     push @{$conf->{reuse_tests}->{$new_name}}, $old;
-                   }
-
-               }});
-
+  push(@cmds, {
+    setting => 'run_reuse_tests_only',
+    default => 0,
+    type => $Mail::SpamAssassin::Conf::CONF_TYPE_BOOL,
+  });
 
   $conf->{parser}->register_commands(\@cmds);
 }
@@ -86,10 +108,26 @@ sub finish_parsing_start {
   my ($self, $opts) = @_;
 
   my $conf = $opts->{conf};
+  my $tflags = $conf->{tflags};
 
-  dbg("reuse: finish_parsing_start called");
+  while (my($rulename,$tfl) = each %{$tflags}) {
+    if ($tfl =~ /\bnet\b/ && !exists $conf->{reuse_tests}->{$rulename}) {
+      dbg("reuse: forcing reuse of net rule $rulename");
+      push @{$conf->{reuse_tests}->{$rulename}}, $rulename;
+    }
+  }
 
   return 0 if (!exists $conf->{reuse_tests});
+
+  if ($conf->{run_reuse_tests_only}) {
+    # simply delete all rules not reuse
+    foreach (keys %{$conf->{tests}}) {
+      if (!defined $conf->{reuse_tests}->{$_}) {
+        delete $conf->{tests}->{$_};
+      }
+    }
+    return 0;
+  }
 
   foreach my $rule_name (keys %{$conf->{reuse_tests}}) {
 
@@ -100,7 +138,7 @@ sub finish_parsing_start {
     }
     if (!exists $conf->{scores}->{$rule_name}) {
       my $set_score = ($rule_name =~/^T_/) ? 0.01 : 1.0;
-      $set_score = -$set_score if ( ($conf->{tflags}->{$rule_name}||'') =~ /\bnice\b/ );
+      $set_score = -$set_score if ( ($tflags->{$rule_name}||'') =~ /\bnice\b/ );
       foreach my $ss (0..3) {
         $conf->{scoreset}->[$ss]->{$rule_name} = $set_score;
       }
@@ -108,7 +146,7 @@ sub finish_parsing_start {
 
     # Figure out when to add any hits -- grab priority and "stage"
     my $priority = $conf->{priority}->{$rule_name} || 0;
-    my $stage = $self->_get_stage_from_rule($opts->{conf}, $rule_name);
+    my $stage = $self->_get_stage_from_rule($conf, $rule_name);
     $conf->{reuse_tests_order}->{$rule_name} = [ $priority, $stage ];
 
   }
@@ -118,6 +156,10 @@ sub check_start {
   my ($self, $opts) = @_;
 
   my $pms = $opts->{permsgstatus};
+  my $conf = $pms->{conf};
+  my $scoreset = $conf->{scoreset};
+
+  return 0 if $conf->{run_reuse_tests_only};
 
   # Can we reuse?
   my $msg = $pms->get_message();
@@ -130,30 +172,34 @@ sub check_start {
 
   # now go through the rules and priorities and figure out which ones
   # need to be disabled
-  foreach my $rule (keys %{$pms->{conf}->{reuse_tests}}) {
+  foreach my $rule (keys %{$conf->{reuse_tests}}) {
 
-    dbg("reuse: looking at rule $rule");
-    my ($priority, $stage) = @{$pms->{conf}->{reuse_tests_order}->{$rule}};
+    my ($priority, $stage) = @{$conf->{reuse_tests_order}->{$rule}};
 
     # score set could change after check_start but before we add hits,
     # so we need to disable the rule in all sets
+    my @dis;
     foreach my $ss (0..3) {
-      if (exists $pms->{conf}->{scoreset}->[$ss]->{$rule}) {
-	dbg("reuse: disabling rule $rule in score set $ss");
-	$pms->{reuse_old_scores}->{$rule}->[$ss] =
-	  $pms->{conf}->{scoreset}->[$ss]->{$rule};
-	$pms->{conf}->{scoreset}->[$ss]->{$rule} = 0;
+      if (exists $scoreset->[$ss]->{$rule}) {
+        $pms->{reuse_old_scores}->{$rule}->[$ss] =
+          $scoreset->[$ss]->{$rule};
+        $scoreset->[$ss]->{$rule} = 0;
+        push @dis, $ss;
       }
     }
+    dbg("reuse: disabling rule $rule in score sets %s",
+      join(',', @dis)) if @dis;
 
     # now, check for hits
-  OLD: foreach my $old_test (@{$pms->{conf}->{reuse_tests}->{$rule}}) {
-      dbg("reuse: looking for rule $old_test");
+    foreach my $old_test (@{$conf->{reuse_tests}->{$rule}}) {
       if ($old_hash->{$old_test}) {
         push @{$pms->{reuse_hits_to_add}->{"$priority $stage"}}, $rule;
         dbg("reuse: rule $rule hit, will add at priority $priority, stage " .
-	    "$stage");
-        last OLD;
+           "$stage");
+        last;
+      } else {
+        # Make sure rule is marked ready for meta rules
+        $pms->rule_ready($rule);
       }
     }
   }
@@ -163,11 +209,15 @@ sub check_end {
   my ($self, $opts) = @_;
 
   my $pms = $opts->{permsgstatus};
+  my $conf = $pms->{conf};
+  my $scoreset = $conf->{scoreset};
+
+  return 0 if $conf->{run_reuse_tests_only};
 
   foreach my $disabled_rule (keys %{$pms->{reuse_old_scores}}) {
     foreach my $ss (0..3) {
-      next unless exists $pms->{conf}->{scoreset}->[$ss]->{$disabled_rule};
-      $pms->{conf}->{scoreset}->[$ss]->{$disabled_rule} =
+      next unless exists $scoreset->[$ss]->{$disabled_rule};
+      $scoreset->[$ss]->{$disabled_rule} =
         $pms->{reuse_old_scores}->{$disabled_rule}->[$ss];
     }
   }
@@ -178,8 +228,11 @@ sub check_end {
 sub start_rules {
   my ($self, $opts) = @_;
 
-  return $self->_add_hits($opts->{permsgstatus}, $opts->{priority},
-			  $opts->{ruletype});
+  my $pms = $opts->{permsgstatus};
+
+  return 0 if $pms->{conf}->{run_reuse_tests_only};
+
+  return $self->_add_hits($pms, $opts->{priority}, $opts->{ruletype});
 }
 
 sub _add_hits {
@@ -194,7 +247,7 @@ sub _add_hits {
       $pms->{reuse_old_scores}->{$rule}->[$ss] || 0.001;
 
     dbg("reuse: registering hit for $rule: score: " .
-	$pms->{conf}->{scores}->{$rule});
+       $pms->{conf}->{scores}->{$rule});
     $pms->got_hit($rule);
 
     $pms->{conf}->{scores}->{$rule} = 0;
@@ -203,19 +256,19 @@ sub _add_hits {
 }
 
 my %type_to_stage = (
-		     $Mail::SpamAssassin::Conf::TYPE_HEAD_TESTS    => "head",
-		     $Mail::SpamAssassin::Conf::TYPE_HEAD_EVALS    => "eval",
-		     $Mail::SpamAssassin::Conf::TYPE_BODY_TESTS    => "body",
-		     $Mail::SpamAssassin::Conf::TYPE_BODY_EVALS    => "eval",
-		     $Mail::SpamAssassin::Conf::TYPE_FULL_TESTS    => "full",
-		     $Mail::SpamAssassin::Conf::TYPE_FULL_EVALS    => "eval",
-		     $Mail::SpamAssassin::Conf::TYPE_RAWBODY_TESTS => "rawbody",
-		     $Mail::SpamAssassin::Conf::TYPE_RAWBODY_EVALS => "eval",
-		     $Mail::SpamAssassin::Conf::TYPE_URI_TESTS     => "uri",
-		     $Mail::SpamAssassin::Conf::TYPE_URI_EVALS     => "eval",
-		     $Mail::SpamAssassin::Conf::TYPE_META_TESTS    => "meta",
-		     $Mail::SpamAssassin::Conf::TYPE_RBL_EVALS     => "eval",
-		    );
+  $Mail::SpamAssassin::Conf::TYPE_HEAD_TESTS    => "head",
+  $Mail::SpamAssassin::Conf::TYPE_HEAD_EVALS    => "eval",
+  $Mail::SpamAssassin::Conf::TYPE_BODY_TESTS    => "body",
+  $Mail::SpamAssassin::Conf::TYPE_BODY_EVALS    => "eval",
+  $Mail::SpamAssassin::Conf::TYPE_FULL_TESTS    => "full",
+  $Mail::SpamAssassin::Conf::TYPE_FULL_EVALS    => "eval",
+  $Mail::SpamAssassin::Conf::TYPE_RAWBODY_TESTS => "rawbody",
+  $Mail::SpamAssassin::Conf::TYPE_RAWBODY_EVALS => "eval",
+  $Mail::SpamAssassin::Conf::TYPE_URI_TESTS     => "uri",
+  $Mail::SpamAssassin::Conf::TYPE_URI_EVALS     => "eval",
+  $Mail::SpamAssassin::Conf::TYPE_META_TESTS    => "meta",
+  $Mail::SpamAssassin::Conf::TYPE_RBL_EVALS     => "eval",
+);
 
 sub _get_stage_from_rule {
   my  ($self, $conf, $rule) = @_;
@@ -239,4 +292,4 @@ sub _get_stage_from_rule {
   }
 }
 
-
+1;

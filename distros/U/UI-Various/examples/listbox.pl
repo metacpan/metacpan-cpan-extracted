@@ -49,10 +49,13 @@ $window =
 		   }));
 $main->mainloop;
 
+#########################################################################
 # Trick to see previously stored standard error output even when Curses
-# clears the screen at the very end of program:
+# clears the screen at the very end of program (and not at the end of the
+# main event-loop, note that this seems to be nondeterministic depending on
+# errors occurring):
 END {
-    if (UI::Various::using() eq 'Curses')
+    if (UI::Various::using() eq 'Curses'  and  ($? != 0  or  $@))
     {
 	print STDERR "\r\n waiting 10 seconds before screen is cleared\r\n";
 	sleep 10;

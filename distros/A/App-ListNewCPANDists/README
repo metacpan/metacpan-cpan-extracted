@@ -3,8 +3,8 @@ NAME
     period
 
 VERSION
-    This document describes version 0.017 of App::ListNewCPANDists (from
-    Perl distribution App-ListNewCPANDists), released on 2022-09-02.
+    This document describes version 0.018 of App::ListNewCPANDists (from
+    Perl distribution App-ListNewCPANDists), released on 2022-09-09.
 
 FUNCTIONS
   create_new_cpan_dists_stats
@@ -141,6 +141,14 @@ FUNCTIONS
 
          list_new_cpan_dists(from_time => "2019-01-01");
 
+    *   Show PERLANCAR's new distributions this year:
+
+         list_new_cpan_dists(include_authors => ["PERLANCAR"], this_year => 1);
+
+    *   What are the new releases last month?:
+
+         list_new_cpan_dists(last_month => 1);
+
     This utility queries MetaCPAN to find out what CPAN distributions are
     new in a given time period (i.e. has their first release made during
     that time period). This utility also collects the information in a
@@ -184,15 +192,27 @@ FUNCTIONS
 
     *   include_dists => *array[perl::distname]*
 
+    *   last_month => *true*
+
+    *   last_week => *true*
+
+        Monday is the start of the week.
+
+    *   last_year => *true*
+
     *   this_month => *true*
 
     *   this_week => *true*
 
         Monday is the start of the week.
 
+    *   this_year => *true*
+
     *   to_time => *date*
 
     *   today => *true*
+
+    *   yesterday => *true*
 
     Returns an enveloped result (an array).
 

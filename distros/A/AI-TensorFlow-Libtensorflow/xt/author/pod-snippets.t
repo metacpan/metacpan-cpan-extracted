@@ -6,7 +6,12 @@ use Test::More;
 use Test::Pod::Snippets;
 
 my @modules = qw/
+	AI::TensorFlow::Libtensorflow
+	AI::TensorFlow::Libtensorflow::ApiDefMap
+	AI::TensorFlow::Libtensorflow::Buffer
 	AI::TensorFlow::Libtensorflow::DataType
+	AI::TensorFlow::Libtensorflow::Graph
+	AI::TensorFlow::Libtensorflow::Tensor
 /;
 
 plan tests => 0 + @modules;
@@ -31,13 +36,12 @@ package # hide from PAUSE
 	}
 }
 
-my $parser = My::Test::Pod::Snippets::Parser->new;
-my $tps = Test::Pod::Snippets->new(
-	parser => $parser,
-);
-$parser->{tps} = $tps;
-
 for (@modules) {
+	my $parser = My::Test::Pod::Snippets::Parser->new;
+	my $tps = Test::Pod::Snippets->new(
+		parser => $parser,
+	);
+	$parser->{tps} = $tps;
 	subtest "Testing module $_ snippets" => sub {
 		$tps->runtest( module => $_, testgroup => 0 );
 	};

@@ -9,6 +9,10 @@ use Venus::Class 'base';
 
 base 'Faker::Plugin';
 
+# VERSION
+
+our $VERSION = '1.17';
+
 # METHODS
 
 sub execute {
@@ -30,6 +34,12 @@ Faker::Plugin::ColorRgbColorsetCss - Color Rgb Colorset Css
 =head1 ABSTRACT
 
 Color Rgb Colorset Css for Faker
+
+=cut
+
+=head1 VERSION
+
+1.17
 
 =cut
 

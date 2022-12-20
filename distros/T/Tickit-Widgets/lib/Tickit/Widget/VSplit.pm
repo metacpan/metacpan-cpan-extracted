@@ -5,8 +5,9 @@
 
 use Object::Pad 0.57;
 
-package Tickit::Widget::VSplit 0.35;
+package Tickit::Widget::VSplit 0.37;
 class Tickit::Widget::VSplit
+   :strict(params)
    :isa(Tickit::Widget::LinearSplit);
 
 use Tickit::Style;
@@ -98,17 +99,6 @@ use constant VALUE_METHOD => "cols";
 Constructs a new C<Tickit::Widget::VSplit> object.
 
 =cut
-
-ADJUSTPARAMS
-{
-   my ( $params ) = @_;
-
-   croak "The 'left_child' constructor argument to ${\ref $self} is no longer recognised; use ->set_left_child instead"
-      if delete $params->{left_child};
-
-   croak "The 'right_child' constructor argument to ${\ref $self} is no longer recognised; use ->set_right_child instead"
-      if delete $params->{right_child};
-}
 
 method lines
 {

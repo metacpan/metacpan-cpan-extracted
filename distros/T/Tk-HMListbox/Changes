@@ -70,3 +70,10 @@ Revision history for Perl extension Tk::HMListbox.
 	  clicking on an HMListbox that does not have the keyboard focus and 
 	  -takefocus is set to '' instead of 1. (in which case the HMListbox 
 	  remains unfocused).
+4.2   Sat Dec 17, 2022
+	- Document the -scrollbarfocus option.
+	- Fix user-set -disabledforeground color setting being ignored.
+	- General code and doc. cleanups.
+	- Add bindings for the 2nd (horizontal) scrollwheel/device (buttons 6 and 
+	  7) to scroll the widget horizontally when hovering over the horizontal 
+	  scrollbar.

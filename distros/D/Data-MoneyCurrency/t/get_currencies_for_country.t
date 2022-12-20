@@ -21,6 +21,7 @@ is_deeply(get_currencies_for_country('us'), ['usd'],        'Test USA');
 is_deeply(get_currencies_for_country('va'), ['eur'],        'Test Vatican');
 is_deeply(get_currencies_for_country('cu'), ['cuc', 'cup'], 'Test Cuba');
 is_deeply(get_currencies_for_country('lt'), ['eur'],        'Test Lithuania');
+#is_deeply(get_currencies_for_country('hr'), ['eur'],        'Test Croatia');
 is_deeply(get_currencies_for_country('xk'), ['eur'],        'Test Kosovo');
 is_deeply(get_currencies_for_country('sv'), ['usd', 'btc'], 'Test SV');
 

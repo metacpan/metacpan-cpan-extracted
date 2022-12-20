@@ -37,12 +37,16 @@ package Mail::SpamAssassin::Plugin::Pyzor;
 use Mail::SpamAssassin::Plugin;
 use Mail::SpamAssassin::Logger;
 use Mail::SpamAssassin::Timeout;
-use Mail::SpamAssassin::Util qw(untaint_var untaint_file_path
-                                proc_status_ok exit_status_str);
+use Mail::SpamAssassin::SubProcBackChannel;
+use Mail::SpamAssassin::Util qw(untaint_var untaint_file_path am_running_on_windows
+                                proc_status_ok exit_status_str force_die);
 use strict;
 use warnings;
 # use bytes;
 use re 'taint';
+
+use Storable;
+use POSIX qw(PIPE_BUF WNOHANG);
 
 our @ISA = qw(Mail::SpamAssassin::Plugin);
 
@@ -64,7 +68,7 @@ sub new {
     dbg("pyzor: network tests on, attempting Pyzor");
   }
 
-  $self->register_eval_rule("check_pyzor");
+  $self->register_eval_rule("check_pyzor", $Mail::SpamAssassin::Conf::TYPE_FULL_EVALS);
 
   $self->set_config($mailsaobject->{conf});
 
@@ -87,11 +91,27 @@ Whether to use Pyzor, if it is available.
 
   push (@cmds, {
     setting => 'use_pyzor',
+    is_admin => 1,
     default => 1,
     type => $Mail::SpamAssassin::Conf::CONF_TYPE_BOOL
   });
 
-=item pyzor_max NUMBER		(default: 5)
+=item pyzor_fork (0|1)		(default: 1)
+
+Instead of running Pyzor synchronously, fork separate process for it and
+read the results in later (similar to async DNS lookups).  Increases
+throughput. Considered experimental on Windows, where default is 0.
+
+=cut
+
+  push(@cmds, {
+    setting => 'pyzor_fork',
+    is_admin => 1,
+    default => am_running_on_windows()?0:1,
+    type => $Mail::SpamAssassin::Conf::CONF_TYPE_NUMERIC,
+  });
+
+=item pyzor_count_min NUMBER	(default: 5)
 
 This option sets how often a message's body checksum must have been
 reported to the Pyzor server before SpamAssassin will consider the Pyzor
@@ -103,8 +123,59 @@ set this to a relatively low value, e.g. C<5>.
 =cut
 
   push (@cmds, {
-    setting => 'pyzor_max',
+    setting => 'pyzor_count_min',
+    is_admin => 1,
     default => 5,
+    type => $Mail::SpamAssassin::Conf::CONF_TYPE_NUMERIC
+  });
+
+  # Deprecated setting, the name makes no sense!
+  push (@cmds, {
+    setting => 'pyzor_max',
+    is_admin => 1,
+    type => $Mail::SpamAssassin::Conf::CONF_TYPE_NUMERIC,
+    code => sub {
+      my ($self, $key, $value, $line) = @_;
+      warn("deprecated setting used, change pyzor_max to pyzor_count_min\n");
+      if ($value !~ /^\d+$/) {
+        return $Mail::SpamAssassin::Conf::INVALID_VALUE;
+      }
+      $self->{pyzor_count_min} = $value;
+    }
+  });
+
+=item pyzor_welcomelist_min NUMBER	(default: 10)
+
+Previously pyzor_whitelist_min which will work interchangeably until 4.1.
+
+This option sets how often a message's body checksum must have been
+welcomelisted to the Pyzor server for SpamAssassin to consider ignoring the
+result.  Final decision is made by pyzor_welcomelist_factor.
+
+=cut
+
+  push (@cmds, {
+    setting => 'pyzor_welcomelist_min',
+    aliases => ['pyzor_whitelist_min'], # removed in 4.1
+    is_admin => 1,
+    default => 10,
+    type => $Mail::SpamAssassin::Conf::CONF_TYPE_NUMERIC
+  });
+
+=item pyzor_welcomelist_factor NUMBER	(default: 0.2)
+
+Previously pyzor_whitelist_factor which will work interchangeably until 4.1.
+
+Ignore Pyzor result if REPORTCOUNT x NUMBER >= pyzor_welcomelist_min.
+For default setting this means: 50 reports requires 10 welcomelistings.
+
+=cut
+
+  push (@cmds, {
+    setting => 'pyzor_welcomelist_factor',
+    aliases => ['pyzor_whitelist_factor'], # removed in 4.1
+    is_admin => 1,
+    default => 0.2,
     type => $Mail::SpamAssassin::Conf::CONF_TYPE_NUMERIC
   });
 
@@ -114,7 +185,7 @@ set this to a relatively low value, e.g. C<5>.
 
 =over 4
 
-=item pyzor_timeout n		(default: 3.5)
+=item pyzor_timeout n		(default: 5)
 
 How many seconds you wait for Pyzor to complete, before scanning continues
 without the Pyzor results. A numeric value is optionally suffixed by a
@@ -142,7 +213,7 @@ removing one of them.
   push (@cmds, {
     setting => 'pyzor_timeout',
     is_admin => 1,
-    default => 3.5,
+    default => 5,
     type => $Mail::SpamAssassin::Conf::CONF_TYPE_DURATION
   });
 
@@ -202,190 +273,352 @@ you should use this, as the current PATH will have been cleared.
 sub is_pyzor_available {
   my ($self) = @_;
 
-  my $pyzor = $self->{main}->{conf}->{pyzor_path} || '';
-  unless ($pyzor) {
-    $pyzor = Mail::SpamAssassin::Util::find_executable_in_env_path('pyzor');
-  }
+  my $pyzor = $self->{main}->{conf}->{pyzor_path} ||
+    Mail::SpamAssassin::Util::find_executable_in_env_path('pyzor');
+
   unless ($pyzor && -x $pyzor) {
-    dbg("pyzor: pyzor is not available: no pyzor executable found");
+    dbg("pyzor: no pyzor executable found");
+    $self->{pyzor_available} = 0;
     return 0;
   }
 
   # remember any found pyzor
   $self->{main}->{conf}->{pyzor_path} = $pyzor;
 
-  dbg("pyzor: pyzor is available: " . $self->{main}->{conf}->{pyzor_path});
+  dbg("pyzor: pyzor is available: $pyzor");
   return 1;
 }
 
-sub get_pyzor_interface {
-  my ($self) = @_;
+sub finish_parsing_start {
+  my ($self, $opts) = @_;
 
-  if (!$self->{main}->{conf}->{use_pyzor}) {
-    dbg("pyzor: use_pyzor option not enabled, disabling Pyzor");
-    $self->{pyzor_interface} = "disabled";
-    $self->{pyzor_available} = 0;
-  }
-  elsif ($self->is_pyzor_available()) {
-    $self->{pyzor_interface} = "pyzor";
-    $self->{pyzor_available} = 1;
-  }
-  else {
-    dbg("pyzor: no pyzor found, disabling Pyzor");
-    $self->{pyzor_available} = 0;
+  # If forking, hard adjust priority -100 to launch early
+  # Find rulenames from eval_to_rule mappings
+  if ($opts->{conf}->{pyzor_fork}) {
+    foreach (@{$opts->{conf}->{eval_to_rule}->{check_pyzor}}) {
+      dbg("pyzor: adjusting rule $_ priority to -100");
+      $opts->{conf}->{priority}->{$_} = -100;
+    }
   }
 }
 
 sub check_pyzor {
-  my ($self, $permsgstatus, $full) = @_;
+  my ($self, $pms, $full) = @_;
 
-  # initialize valid tags
-  $permsgstatus->{tag_data}->{PYZOR} = "";
+  return 0 if !$self->{pyzor_available};
+  return 0 if !$self->{main}->{conf}->{use_pyzor};
+
+  return 0 if $pms->{pyzor_running};
+  $pms->{pyzor_running} = 1;
+
+  return 0 if !$self->is_pyzor_available();
 
   my $timer = $self->{main}->time_method("check_pyzor");
 
-  $self->get_pyzor_interface();
-  return 0 unless $self->{pyzor_available};
+  # initialize valid tags
+  $pms->{tag_data}->{PYZOR} = '';
 
-  return $self->pyzor_lookup($permsgstatus, $full);
+  # create fulltext tmpfile now (before possible forking)
+  $pms->{pyzor_tmpfile} = $pms->create_fulltext_tmpfile();
+
+  ## non-forking method
+
+  if (!$self->{main}->{conf}->{pyzor_fork}) {
+    my @results = $self->pyzor_lookup($pms);
+    return $self->_check_result($pms, \@results);
+  }
+
+  ## forking method
+
+  $pms->{pyzor_rulename} = $pms->get_current_eval_rule_name();
+
+  # create socketpair for communication
+  $pms->{pyzor_backchannel} = Mail::SpamAssassin::SubProcBackChannel->new();
+  my $back_selector = '';
+  $pms->{pyzor_backchannel}->set_selector(\$back_selector);
+  eval {
+    $pms->{pyzor_backchannel}->setup_backchannel_parent_pre_fork();
+  } or do {
+    dbg("pyzor: backchannel pre-setup failed: $@");
+    delete $pms->{pyzor_backchannel};
+    return 0;
+  };
+
+  my $pid = fork();
+  if (!defined $pid) {
+    info("pyzor: child fork failed: $!");
+    delete $pms->{pyzor_backchannel};
+    return 0;
+  }
+  if (!$pid) {
+    $0 = "$0 (pyzor)";
+    $SIG{CHLD} = 'DEFAULT';
+    $SIG{PIPE} = 'IGNORE';
+    $SIG{$_} = sub {
+      eval { dbg("pyzor: child process $$ caught signal $_[0]"); };
+      force_die(6);  # avoid END and destructor processing
+      } foreach am_running_on_windows()?qw(INT HUP TERM QUIT):qw(INT HUP TERM TSTP QUIT USR1 USR2);
+    dbg("pyzor: child process $$ forked");
+    $pms->{pyzor_backchannel}->setup_backchannel_child_post_fork();
+    my @results = $self->pyzor_lookup($pms);
+    my $backmsg;
+    eval {
+      $backmsg = Storable::freeze(\@results);
+    };
+    if ($@) {
+      dbg("pyzor: child return value freeze failed: $@");
+      force_die(0); # avoid END and destructor processing
+    }
+    if (!syswrite($pms->{pyzor_backchannel}->{parent}, $backmsg)) {
+      dbg("pyzor: child backchannel write failed: $!");
+    }
+    force_die(0); # avoid END and destructor processing
+  }
+
+  $pms->{pyzor_pid} = $pid;
+
+  eval {
+    $pms->{pyzor_backchannel}->setup_backchannel_parent_post_fork($pid);
+  } or do {
+    dbg("pyzor: backchannel post-setup failed: $@");
+    delete $pms->{pyzor_backchannel};
+    return 0;
+  };
+
+  return; # return undef for async status
 }
 
 sub pyzor_lookup {
-  my ($self, $permsgstatus, $fulltext) = @_;
-  my @response;
-  my $pyzor_count;
-  my $pyzor_whitelisted;
-  my $timeout = $self->{main}->{conf}->{pyzor_timeout};
+  my ($self, $pms) = @_;
 
-  $pyzor_count = 0;
-  $pyzor_whitelisted = 0;
-  my $pid;
-
-  # use a temp file here -- open2() is unreliable, buffering-wise, under spamd
-  my $tmpf = $permsgstatus->create_fulltext_tmpfile($fulltext);
+  my $conf = $self->{main}->{conf};
+  my $timeout = $conf->{pyzor_timeout};
 
   # note: not really tainted, this came from system configuration file
-  my $path = untaint_file_path($self->{main}->{conf}->{pyzor_path});
-  my $opts = untaint_var($self->{main}->{conf}->{pyzor_options}) || '';
+  my $path = untaint_file_path($conf->{pyzor_path});
+  my $opts = untaint_var($conf->{pyzor_options}) || '';
 
-  $permsgstatus->enter_helper_run_mode();
+  $pms->enter_helper_run_mode();
 
+  my $pid;
+  my @resp;
   my $timer = Mail::SpamAssassin::Timeout->new(
-           { secs => $timeout, deadline => $permsgstatus->{master_deadline} });
+           { secs => $timeout, deadline => $pms->{master_deadline} });
   my $err = $timer->run_and_catch(sub {
-
     local $SIG{PIPE} = sub { die "__brokenpipe__ignore__\n" };
- 
-    dbg("pyzor: opening pipe: " . join(' ', $path, $opts, "check", "< $tmpf"));
+
+    dbg("pyzor: opening pipe: ".
+      join(' ', $path, $opts, "check", "<".$pms->{pyzor_tmpfile}));
 
     $pid = Mail::SpamAssassin::Util::helper_app_pipe_open(*PYZOR,
-	$tmpf, 1, $path, split(' ', $opts), "check");
+	$pms->{pyzor_tmpfile}, 1, $path, split(' ', $opts), "check");
     $pid or die "$!\n";
 
     # read+split avoids a Perl I/O bug (Bug 5985)
-    my($inbuf,$nread,$resp); $resp = '';
-    while ( $nread=read(PYZOR,$inbuf,8192) ) { $resp .= $inbuf }
+    my($inbuf, $nread);
+    my $resp = '';
+    while ($nread = read(PYZOR, $inbuf, 8192)) { $resp .= $inbuf }
     defined $nread  or die "error reading from pipe: $!";
-    @response = split(/^/m, $resp, -1);  undef $resp;
+    @resp = split(/^/m, $resp, -1);
 
-    my $errno = 0;  close PYZOR or $errno = $!;
-    if (proc_status_ok($?,$errno)) {
+    my $errno = 0;
+    close PYZOR or $errno = $!;
+    if (proc_status_ok($?, $errno)) {
       dbg("pyzor: [%s] finished successfully", $pid);
-    } elsif (proc_status_ok($?,$errno, 0,1)) {  # sometimes it exits with 1
-      dbg("pyzor: [%s] finished: %s", $pid, exit_status_str($?,$errno));
+    } elsif (proc_status_ok($?, $errno, 0, 1)) {  # sometimes it exits with 1
+      dbg("pyzor: [%s] finished: %s", $pid, exit_status_str($?, $errno));
     } else {
-      info("pyzor: [%s] error: %s", $pid, exit_status_str($?,$errno));
-    }
-
-    if (!@response) {
-      # this exact string is needed below
-      warn("no response\n");	# yes, this is possible
-      return;
-    }
-    chomp for @response;
-
-    if ($response[0] =~ /^Traceback/) {
-      warn("internal error, python traceback seen in response: ".
-        join("\\n", @response));
-    } else {
-      dbg("pyzor: got response: ".join("\\n", @response));
+      info("pyzor: [%s] error: %s", $pid, exit_status_str($?, $errno));
     }
 
   });
 
   if (defined(fileno(*PYZOR))) {  # still open
     if ($pid) {
-      if (kill('TERM',$pid)) { dbg("pyzor: killed stale helper [$pid]") }
-      else { dbg("pyzor: killing helper application [$pid] failed: $!") }
+      if (kill('TERM', $pid)) {
+        dbg("pyzor: killed stale helper [$pid]");
+      } else {
+        dbg("pyzor: killing helper application [$pid] failed: $!");
+      }
     }
-    my $errno = 0;  close PYZOR or $errno = $!;
-    proc_status_ok($?,$errno)
-      or info("pyzor: [%s] error: %s", $pid, exit_status_str($?,$errno));
+    my $errno = 0;
+    close PYZOR or $errno = $!;
+    proc_status_ok($?, $errno)
+      or info("pyzor: [%s] error: %s", $pid, exit_status_str($?, $errno));
   }
-  $permsgstatus->leave_helper_run_mode();
+
+  $pms->leave_helper_run_mode();
 
   if ($timer->timed_out()) {
     dbg("pyzor: check timed out after $timeout seconds");
-    return 0;
+    return ();
+  } elsif ($err) {
+    chomp $err;
+    info("pyzor: check failed: $err");
+    return ();
   }
 
-  if ($err) {
-    chomp $err;
-    if ($err eq "__brokenpipe__ignore__") {
-      dbg("pyzor: check failed: broken pipe");
-    } elsif ($err eq "no response") {
-      dbg("pyzor: check failed: no response");
-    } else {
-      warn("pyzor: check failed: $err\n");
+  return @resp;
+}
+
+sub check_tick {
+  my ($self, $opts) = @_;
+  $self->_check_forked_result($opts->{permsgstatus}, 0);
+}
+
+sub check_cleanup {
+  my ($self, $opts) = @_;
+  $self->_check_forked_result($opts->{permsgstatus}, 1);
+}
+
+sub _check_forked_result {
+  my ($self, $pms, $finish) = @_;
+
+  return 0 if !$pms->{pyzor_backchannel};
+  return 0 if !$pms->{pyzor_pid};
+
+  my $timer = $self->{main}->time_method("check_pyzor");
+
+  $pms->{pyzor_abort} = $pms->{deadline_exceeded} || $pms->{shortcircuited};
+
+  my $kid_pid = $pms->{pyzor_pid};
+  # if $finish, force waiting for the child
+  my $pid = waitpid($kid_pid, $finish && !$pms->{pyzor_abort} ? 0 : WNOHANG);
+  if ($pid == 0) {
+    #dbg("pyzor: child process $kid_pid not finished yet, trying later");
+    if ($pms->{pyzor_abort}) {
+      dbg("pyzor: bailing out due to deadline/shortcircuit");
+      kill('TERM', $kid_pid);
+      if (waitpid($kid_pid, WNOHANG) == 0) {
+        sleep(1);
+        if (waitpid($kid_pid, WNOHANG) == 0) {
+          dbg("pyzor: child process $kid_pid still alive, KILL");
+          kill('KILL', $kid_pid);
+          waitpid($kid_pid, 0);
+        }
+      }
+      delete $pms->{pyzor_pid};
+      delete $pms->{pyzor_backchannel};
     }
     return 0;
+  } elsif ($pid == -1) {
+    # child does not exist?
+    dbg("pyzor: child process $kid_pid already handled?");
+    delete $pms->{pyzor_backchannel};
+    return 0;
   }
 
-  foreach my $one_response (@response) {
+  $pms->rule_ready($pms->{pyzor_rulename}); # mark rule ready for metas
+
+  dbg("pyzor: child process $kid_pid finished, reading results");
+
+  my $backmsg;
+  my $ret = sysread($pms->{pyzor_backchannel}->{latest_kid_fh}, $backmsg, am_running_on_windows()?512:PIPE_BUF);
+  if (!defined $ret || $ret == 0) {
+    dbg("pyzor: could not read result from child: ".($ret == 0 ? 0 : $!));
+    delete $pms->{pyzor_backchannel};
+    return 0;
+  }
+
+  delete $pms->{pyzor_backchannel};
+
+  my $results;
+  eval {
+    $results = Storable::thaw($backmsg);
+  };
+  if ($@) {
+    dbg("pyzor: child return value thaw failed: $@");
+    return;
+  }
+
+  $self->_check_result($pms, $results);
+}
+
+sub _check_result {
+  my ($self, $pms, $results) = @_;
+
+  if (!@$results) {
+    dbg("pyzor: no response from server");
+    return 0;
+  }
+
+  my $count = 0;
+  my $count_wl = 0;
+  foreach my $res (@$results) {
+    chomp($res);
+    if ($res =~ /^Traceback/) {
+      info("pyzor: internal error, python traceback seen in response: $res");
+      return 0;
+    }
+    dbg("pyzor: got response: $res");
     # this regexp is intended to be a little bit forgiving
-    if ($one_response =~ /^\S+\t.*?\t(\d+)\t(\d+)\s*$/) {
+    if ($res =~ /^\S+\t.*?\t(\d+)\t(\d+)\s*$/) {
       # until pyzor servers can sync their DBs,
       # sum counts obtained from all servers
-      $pyzor_whitelisted += $2+0;
-      $pyzor_count += $1+0;
-    }
-    else {
+      $count += untaint_var($1)+0; # crazy but needs untainting
+      $count_wl += untaint_var($2)+0;
+    } else {
       # warn on failures to parse
-      dbg("pyzor: failure to parse response \"$one_response\"");
+      info("pyzor: failure to parse response \"$res\"");
     }
   }
 
-  $permsgstatus->set_tag('PYZOR', $pyzor_whitelisted ? "Whitelisted."
-                                             : "Reported $pyzor_count times.");
+  my $conf = $self->{main}->{conf};
 
-  if ($pyzor_count >= $self->{main}->{conf}->{pyzor_max}) {
-    dbg("pyzor: listed: COUNT=$pyzor_count/$self->{main}->{conf}->{pyzor_max} WHITELIST=$pyzor_whitelisted");
+  my $count_min = $conf->{pyzor_count_min};
+  my $wl_min = $conf->{pyzor_welcomelist_min};
+
+  my $wl_limit = $count_wl >= $wl_min ?
+    $count * $conf->{pyzor_welcomelist_factor} : 0;
+
+  dbg("pyzor: result: COUNT=$count/$count_min WELCOMELIST=$count_wl/$wl_min/%.1f",
+    $wl_limit);
+  $pms->set_tag('PYZOR', "Reported $count times, welcomelisted $count_wl times.");
+
+  # Empty body etc results in same hash, we should skip very large numbers..
+  if ($count >= 1000000 || $count_wl >= 10000) {
+    dbg("pyzor: result exceeded hardcoded limits, ignoring: count/wl 1000000/10000");
+    return 0;
+  }
+
+  # Welcomelisted?
+  if ($wl_limit && $count_wl >= $wl_limit) {
+    dbg("pyzor: message welcomelisted");
+    return 0;
+  }
+
+  if ($count >= $count_min) {
+    if ($conf->{pyzor_fork}) {
+      # forked needs to run got_hit()
+      $pms->got_hit($pms->{pyzor_rulename}, "", ruletype => 'eval');
+      return 0;
+    }
     return 1;
   }
-
   return 0;
 }
 
 sub plugin_report {
   my ($self, $options) = @_;
 
-  return unless $self->{pyzor_available};
-  return unless $self->{main}->{conf}->{use_pyzor};
+  return if !$self->{pyzor_available};
+  return if !$self->{main}->{conf}->{use_pyzor};
+  return if $options->{report}->{options}->{dont_report_to_pyzor};
+  return if !$self->is_pyzor_available();
 
-  if (!$options->{report}->{options}->{dont_report_to_pyzor} && $self->is_pyzor_available())
-  {
-    # use temporary file: open2() is unreliable due to buffering under spamd
-    my $tmpf = $options->{report}->create_fulltext_tmpfile($options->{text});
-    if ($self->pyzor_report($options, $tmpf)) {
-      $options->{report}->{report_available} = 1;
-      info("reporter: spam reported to Pyzor");
-      $options->{report}->{report_return} = 1;
-    }
-    else {
-      info("reporter: could not report spam to Pyzor");
-    }
-    $options->{report}->delete_fulltext_tmpfile();
+  # use temporary file: open2() is unreliable due to buffering under spamd
+  my $tmpf = $options->{report}->create_fulltext_tmpfile($options->{text});
+  if ($self->pyzor_report($options, $tmpf)) {
+    $options->{report}->{report_available} = 1;
+    info("reporter: spam reported to Pyzor");
+    $options->{report}->{report_return} = 1;
   }
+  else {
+    info("reporter: could not report spam to Pyzor");
+  }
+  $options->{report}->delete_fulltext_tmpfile($tmpf);
+
+  return 1;
 }
 
 sub pyzor_report {
@@ -448,6 +681,9 @@ sub pyzor_report {
 
   return 1;
 }
+
+# Version features
+sub has_fork { 1 }
 
 1;
 

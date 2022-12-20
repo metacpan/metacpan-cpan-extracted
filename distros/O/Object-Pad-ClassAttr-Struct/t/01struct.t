@@ -27,7 +27,8 @@ class Example :Struct {
    ok( !defined eval { Example->new( x => 0, y => 0, w => "no" ) },
       'Example constructor does not like w param' );
    my $e = $@;
-   like( $e, qr/^Unrecognised parameters for Example constructor: w /,
+   # Recent versions of Object::Pad added quotes around the argument names
+   like( $e, qr/^Unrecognised parameters for Example constructor: '?w'? /,
       'exception from Example constructor param failure' );
 }
 

@@ -1,5 +1,5 @@
 package Game::TileMap::Legend;
-$Game::TileMap::Legend::VERSION = '0.002';
+$Game::TileMap::Legend::VERSION = '1.000';
 use v5.10;
 use strict;
 use warnings;
@@ -9,8 +9,8 @@ use Mooish::AttributeBuilder -standard;
 use Carp qw(croak);
 
 use constant TERRAIN_CLASS => 'terrain';
-use constant WALL_OBJECT => '';
-use constant VOID_OBJECT => '0';
+use constant WALL_OBJECT => 'wall';
+use constant VOID_OBJECT => 'void';
 
 has field 'classes' => (
 	default => sub { {} },
@@ -34,6 +34,18 @@ has field 'objects' => (
 	default => sub { {} },
 
 	# isa => HashRef [Any],
+);
+
+has field 'walls' => (
+	default => sub { {} },
+
+	# isa => HashRef [Bool],
+);
+
+has field 'voids' => (
+	default => sub { {} },
+
+	# isa => HashRef [Bool],
 );
 
 sub _build_object_map
@@ -63,16 +75,22 @@ sub get_class_of_object
 
 sub add_wall
 {
-	my ($self, $marker) = @_;
+	my ($self, $marker, $object) = @_;
+	$object //= WALL_OBJECT;
 
-	return $self->add_terrain($marker, WALL_OBJECT);
+	$self->add_terrain($marker, $object);
+	$self->walls->{$object} = !!1;
+	return $self;
 }
 
 sub add_void
 {
-	my ($self, $marker) = @_;
+	my ($self, $marker, $object) = @_;
+	$object //= VOID_OBJECT;
 
-	return $self->add_terrain($marker, VOID_OBJECT);
+	$self->add_terrain($marker, $object);
+	$self->voids->{$object} = !!1;
+	return $self;
 }
 
 sub add_terrain
@@ -111,7 +129,8 @@ Game::TileMap::Legend - Map contents description
 All object classes must be string.
 
 All map markers are strings with length equal to L</characters_per_tile>. Don't
-use whitespace - map strings are trimmed before parsing.
+use whitespace - it is removed before parsing, so can be used freely to improve
+map readability, especially for multicharacter tiles.
 
 All objects can be anything, but not C<undef>. String probably works best.
 
@@ -133,19 +152,26 @@ Note: it may be easier to call L<Game::TileMap/new_legend>.
 
 =head3 add_wall
 
-	$legend = $legend->add_wall($marker);
+	$legend = $legend->add_wall($marker, $wall_object);
 
 Defines a marker used to store a wall. You are required to set this.
 
-Walls are considered not a part of the map.
+C<$wall_object> is not required, by default it will be just C<'wall'>. You may
+have more than one wall object.
+
+Walls are considered not a part of the map. Think of them as physical obstacles.
 
 =head3 add_void
 
-	$legend = $legend->add_void($marker);
+	$legend = $legend->add_void($marker, $void_object);
 
 Defines a marker used to store a void. You are required to set this.
 
-Voids are considered a part of the map, but they are not accessible. Think of them as chasms.
+C<$void_object> is not required, by default it will be just C<'void'>. You may
+have more than one void object.
+
+Voids are considered a part of the map, but they are not accessible. Think of
+them as chasms which you can see over, but can't walk over.
 
 =head3 add_terrain
 

@@ -6,7 +6,7 @@ use warnings;
 use Test::More;
 use Test::Fatal;
 
-use Object::Pad ':experimental(init_expr mop)';
+use Object::Pad ':experimental(mop)';
 
 class Example {
    field $field :mutator :param(initial_field) = undef;

@@ -35,25 +35,25 @@ The destructor.
 
 =head2 l_type
 
-  native method l_type : short ();
+  native method l_type : int ();
 
 Get C<l_type>.
 
 =head2 set_l_type
 
-  native method set_l_type : void ($type : short);
+  native method set_l_type : void ($type : int);
 
 Set C<l_type>.
 
 =head2 l_whence
 
-  native method l_whence : short ();
+  native method l_whence : int ();
 
 Get C<l_whence>.
 
 =head2 set_l_whence
 
-  native method set_l_whence : void ($whence : short);
+  native method set_l_whence : void ($whence : int);
 
 Set C<l_whence>.
 

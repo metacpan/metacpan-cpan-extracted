@@ -9,7 +9,7 @@ UI::Various::Compound::FileSelect - general file selection widget of L<UI::Vario
 =head1 SYNOPSIS
 
     use UI::Various;
-    my $main = UI::Various::main();
+    my $main = UI::Various::Main->new(height => 20, width => 60);
     my $fs =
         UI::Various::Compound::FileSelect->new(
             mode => 2,
@@ -57,7 +57,7 @@ use warnings 'once';
 
 use Cwd 'abs_path';
 
-our $VERSION = '0.31';
+our $VERSION = '0.34';
 
 use UI::Various::core;
 use UI::Various::Box;
@@ -95,11 +95,11 @@ sub directory($;$)
 a list of filters that can be applied to the files listed (as
 L<Optionmenu|UI::Various::Optionmenu>)
 
-The list of filters must be either an ARRAY of pairs (reference to an ARRAY
-with two elements each).  The first entry of a pair is the entry shown in
-the selection and the second one must be a regular expression used to filter
-the files to be displayed.  (We don't use a glob as a regular expression
-allows much more flexibility.)
+The list of filters must be an ARRAY of pairs (reference to an ARRAY with
+two elements each).  The first entry of a pair is the entry shown in the
+selection and the second one must be a regular expression used to filter the
+files to be displayed.  (We don't use a glob as a regular expression allows
+much more flexibility.)
 
 Note that directories are always displayed to allow traversing the file
 system.

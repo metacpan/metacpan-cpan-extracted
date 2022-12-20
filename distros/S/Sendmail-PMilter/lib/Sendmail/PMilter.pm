@@ -53,7 +53,7 @@ use Socket;
 use Symbol;
 use UNIVERSAL;
 
-our $VERSION = '1.23';
+our $VERSION = '1.24';
 $VERSION = eval $VERSION;
 
 our $DEBUG = 0;

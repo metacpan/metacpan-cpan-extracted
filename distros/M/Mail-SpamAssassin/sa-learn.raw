@@ -173,15 +173,14 @@ if ( !defined $isspam
   && !defined $opt{'folders'} )
 {
   usage( 0,
-"Please select either --spam, --ham, --folders, --forget, --sync, --import,\n--dump, --clear, --backup or --restore"
+    "Please select either --spam, --ham, --folders, --forget, --sync, --import,\n--dump, --clear, --backup or --restore"
   );
 }
 
 # We need to make sure the journal syncs pre-forget...
 if ( defined $forget && $opt{'nosync'} ) {
   $opt{'nosync'} = 0;
-  warn
-"sa-learn warning: --forget requires read/write access to the database, and is incompatible with --no-sync\n";
+  warn "sa-learn warning: --forget requires read/write access to the database, and is incompatible with --no-sync\n";
 }
 
 if ( defined $opt{'old_format'} ) {
@@ -217,7 +216,7 @@ if (defined $opt{'dump'} || defined $opt{'import'} || defined $opt{'clear'} ||
 $post_config .= join("\n", @{$opt{'cf'}})."\n";
 
 # create the tester factory
-$spamtest = new Mail::SpamAssassin(
+$spamtest = Mail::SpamAssassin->new(
   {
     rules_filename      => $opt{'configpath'},
     site_rules_filename => $opt{'siteconfigpath'},
@@ -459,10 +458,10 @@ eval {
 
   ###########################################################################
 
-  my $iter = new Mail::SpamAssassin::ArchiveIterator(
+  my $iter = Mail::SpamAssassin::ArchiveIterator->new(
     {
         # skip messages larger than max-size bytes,
-        # 0 for no limit, undef defaults to 256 KB
+        # 0 for no limit, undef defaults to 500 KB
       'opt_max_size' => $opt{'max-size'},
       'opt_want_date' => 0,
       'opt_from_regex' => $spamtest->{conf}->{mbox_format_from_regex},
@@ -517,6 +516,12 @@ sub killed {
 sub target {
   my ($target) = @_;
 
+  if (!defined $isspam && !$forget)
+  {
+    usage( 0,
+      "Please select either --spam or --ham or --forget before the first target"
+    );
+  }
   my $class = ( $isspam ? "spam" : "ham" );
   my $format = ( defined( $opt{'format'} ) ? $opt{'format'} : "detect" );
 
@@ -618,9 +623,9 @@ B<sa-learn> [options] --dump [ all | data | magic ]
 
 Options:
 
- --ham                 Learn messages as ham (non-spam)
- --spam                Learn messages as spam
- --forget              Forget a message
+ --ham                 Learn the following messages as ham (non-spam)
+ --spam                Learn the following messages as spam
+ --forget              Forget the following messages
  --use-ignores         Use bayes_ignore_from and bayes_ignore_to
  --sync                Synchronize the database and the journal if needed
  --force-expire        Force a database sync and expiry run
@@ -636,12 +641,13 @@ Options:
  --mbox                Input sources are in mbox format
  --mbx                 Input sources are in mbx format
  --max-size <b>        Skip messages larger than b bytes;
-                       defaults to 256 KB, 0 implies no limit
+                       defaults to 500 KB, 0 implies no limit
  --showdots            Show progress using dots
  --progress            Show progress using progress bar
  --no-sync             Skip synchronizing the database and journal
                        after learning
- -L, --local           Operate locally, no network accesses
+ -L, --local           Operate locally, no network accesses. Use
+                       of this is recommended, see documentation.
  --import              Migrate data from older version/non DB_File
                        based databases
  --clear               Wipe out existing database
@@ -657,7 +663,7 @@ Options:
  --siteconfigpath=path Path for site configs
                        (default:  @@PREFIX@@/etc/mail/spamassassin)
  --cf='config line'    Additional line of configuration
- -D, --debug [area=n,...]  Print debugging messages
+ -D, --debug [area,...]  Print debugging messages
  -V, --version         Print version
  -h, --help            Print usage message
 
@@ -678,6 +684,9 @@ that matches.  See C<Mail::SpamAssassin::ArchiveIterator> for more details.
 If you are using mail boxes in format other than maildir you should use
 the B<--mbox> or B<--mbx> parameters.
 
+Files compressed with gzip/bzip2/xz/lz4/lzip/lzo are uncompressed
+automatically.  See C<Mail::SpamAssassin::ArchiveIterator> for more details.
+
 SpamAssassin remembers which mail messages it has learnt already, and will not
 re-learn those messages again, unless you use the B<--forget> option. Messages
 learnt as spam will have SpamAssassin markup removed, on the fly.
@@ -696,21 +705,21 @@ should investigate the C<spamc -L> switch.
 
 =item B<--ham>
 
-Learn the input message(s) as ham.   If you have previously learnt any of the
-messages as spam, SpamAssassin will forget them first, then re-learn them as
-ham.  Alternatively, if you have previously learnt them as ham, it'll skip them
-this time around.  If the messages have already been filtered through
-SpamAssassin, the learner will ignore any modifications SpamAssassin may have
-made.
+Learn the input message(s) in the files following the option as ham.
+If you have previously learnt any of the messages as spam, SpamAssassin will
+forget them first, then re-learn them as ham.  Alternatively, if you have
+previously learnt them as ham, it'll skip them this time around.
+If the messages have already been filtered through SpamAssassin, the learner
+will ignore any modifications SpamAssassin may have made.
 
 =item B<--spam>
 
-Learn the input message(s) as spam.   If you have previously learnt any of the
-messages as ham, SpamAssassin will forget them first, then re-learn them as
-spam.  Alternatively, if you have previously learnt them as spam, it'll skip
-them this time around.  If the messages have already been filtered through
-SpamAssassin, the learner will ignore any modifications SpamAssassin may have
-made.
+Learn the input message(s) in the files following the option as spam.
+If you have previously learnt any of the messages as ham, SpamAssassin will
+forget them first, then re-learn them as spam.  Alternatively, if you have
+previously learnt them as spam, it'll skip them this time around.
+If the messages have already been filtered through SpamAssassin, the learner
+will ignore any modifications SpamAssassin may havemmade.
 
 =item B<--folders>=I<filename>, B<-f> I<filename>
 
@@ -757,7 +766,8 @@ into the Bayes databases.
 
 =item B<--forget>
 
-Forget a given message previously learnt.
+Forget the input message(s) in the files following the option as previously
+learnt.
 
 =item B<--dbpath>
 
@@ -842,10 +852,13 @@ diagnostic output on bayes, learn, and dns, use:
 
         spamassassin -D bayes,learn,dns
 
+Use an empty string (-D '') to indicate no areas when the next item on the
+command line is a path, to prevent the path from being parsed as an area.
+
 For more information about which areas (also known as channels) are available,
 please see the documentation at:
 
-        C<http://wiki.apache.org/spamassassin/DebugChannels>
+        C<https://wiki.apache.org/spamassassin/DebugChannels>
 
 Higher priority informational messages that are suitable for logging in normal
 circumstances are available with an area of "info".
@@ -870,11 +883,10 @@ ignored since there is no learn operation.
 =item B<-L>, B<--local>
 
 Do not perform any network accesses while learning details about the mail
-messages.  This will speed up the learning process, but may result in a
-slightly lower accuracy.
-
-Note that this is currently ignored, as current versions of SpamAssassin will
-not perform network access while learning; but future versions may.
+messages.  This should be normally used, as there really isn't anything
+Bayes can learn from network lookup results.  Official SpamAssassin plugins
+do not currently do any network lookups when learning, but it's possible
+that third party ones might.
 
 =item B<--import>
 
@@ -986,7 +998,7 @@ With Bayesian analysis, it's all probabilities - "because the past says
 it is likely as this falls into a probabilistic distribution common to past
 spam in your systems". Tell that to your users!  Tell that to the client
 when he asks "what can I do to change this". (By the way, the answer in
-this case is "use whitelisting".)
+this case is "use welcomelisting".)
 
 =item It will take disk space and memory.
 
@@ -1015,6 +1027,7 @@ Otherwise, the results may be pretty skewed.
 
 	sa-learn --spam /path/to/spam/folder
 	sa-learn --ham /path/to/ham/folder
+	sa-learn --ham hampath1 hampath2 --spam spampath1 spampath2
 	...
 
 Let SpamAssassin proceed, learning stuff. When it finds ham and spam
@@ -1344,7 +1357,7 @@ Paul Graham's "A Plan For Spam" paper
 E<lt>http://www.linuxjournal.com/article/6467E<gt>
 Gary Robinson's f(x) and combining algorithms, as used in SpamAssassin
 
-E<lt>http://www.bgl.nu/~glouis/bogofilter/E<gt>
+E<lt>http://web.archive.org/web/20120512230723/http://www.bgl.nu/~glouis/bogofilter/E<gt>
 'Training on error' page.  A discussion of various Bayes training regimes,
 including 'train on error' and unsupervised training.
 

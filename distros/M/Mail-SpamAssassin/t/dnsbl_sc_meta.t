@@ -11,8 +11,8 @@ plan tests => 2;
 # ---------------------------------------------------------------------------
 
 %patterns = (
- q{ DNSBL_TEST_TOP } => 'DNSBL_TEST_TOP',
- q{ SC_DNSBL } => 'SC_DNSBL',
+ q{ 1.0 DNSBL_TEST_TOP } => 'DNSBL_TEST_TOP',
+ q{ 1.0 SC_DNSBL } => 'SC_DNSBL',
 );
 
 %anti_patterns = (

@@ -29,10 +29,11 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "File::Spec" => 0,
+    "Test::Exception" => 0,
     "Test::LongString" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "1.0.0",
+  "VERSION" => "1.1.0",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -46,6 +47,7 @@ my %FallbackPrereqs = (
   "Getopt::Long" => 0,
   "LaTeX::Table" => "1.0",
   "Moo" => "2.0",
+  "Test::Exception" => 0,
   "Test::LongString" => 0,
   "Test::More" => 0,
   "Text::CSV_XS" => "1.40"

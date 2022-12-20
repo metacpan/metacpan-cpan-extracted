@@ -392,7 +392,7 @@ sub __remove_subqueries {
         [ map { $_->[1] } @$history_HD ],
         {
             info => $info, cs_label => "Remove:\n", cs_begin => "  ", cs_separator => "\n  ", cs_end => "\n",
-            prompt => 'Choose:', back => $sf->{i}{_back}, confirm => $sf->{i}{_confirm}, prefix => '- ', layout => 2,
+            back => $sf->{i}{_back}, confirm => $sf->{i}{_confirm}, prefix => '- ', layout => 2,
             clear_screen => 1, index => 1, all_by_default => 0
         }
     );

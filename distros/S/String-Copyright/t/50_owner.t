@@ -20,9 +20,9 @@ is copyright("© , Foo"),         ':Foo', 'messy owner starting with comma';
 is copyright("Copyright,, Foo"),  '', 'messy owner starting with dual comma';
 is copyright("Copyright, , Foo"), '', 'messy owner starting with dual comma';
 
-is copyright("© - Foo"),       ':Foo',     'owner after dash';
-is copyright("© -- Foo"),      ':Foo',     'owner after double dash';
-is copyright("© 1999 - Foo"),  '1999:Foo', 'owner after year and dash';
+is copyright("© - Foo"),      ':Foo',     'owner after dash';
+is copyright("© -- Foo"),     ':Foo',     'owner after double dash';
+is copyright("© 1999 - Foo"), '1999:Foo', 'owner after year and dash';
 is copyright("© 1999 -- Foo"), '1999:Foo',
 	'owner after year and double-dash';
 

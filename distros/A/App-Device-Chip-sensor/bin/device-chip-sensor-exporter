@@ -6,9 +6,6 @@ use experimental 'signatures';
 
 use utf8;
 
-use Carp;
-use Scalar::Util qw( reftype );
-
 use Object::Pad 0.66;
 
 use Future::AsyncAwait;
@@ -16,38 +13,83 @@ use Future::IO::Impl::IOAsync;
 
 use Net::Prometheus;
 use Metrics::Any::Adapter "Prometheus";
+use Metrics::Any '$metrics';
+our $metrics;
+
+eval { require Future::AsyncAwait::Metrics };
+
+$metrics->make_counter( chip_failures =>
+   name        => "app_device_chip_sensor_chip_failures",
+   description => "Number of times a failure has been reported, per chip",
+   labels      => [qw( chip )],
+);
 
 STDOUT->autoflush(1);
 STDOUT->binmode( ":encoding(UTF-8)" );
 
 my $PORT;
 my $VERBOSE;
-my $CONFIGFILE;
 
 my $STRFTIME = "%Y-%m-%d %H:%M:%S";
 
 class MyApp :isa(App::Device::Chip::sensor)
 {
-   use Metrics::Any '$metrics';
-
+   use Carp;
    use POSIX qw( strftime );
-   use Scalar::Util qw( refaddr );
-
-   ADJUST {
-      $metrics->make_counter( chip_failures =>
-         name        => "app_device_chip_sensor_chip_failures",
-         description => "Number of times a failure has been reported, per chip",
-         labels      => [qw( chip )],
-      );
-   }
+   use Scalar::Util qw( refaddr reftype );
 
    method OPTSPEC
    {
       return $self->SUPER::OPTSPEC, (
          'port=i'     => \$PORT,
          'verbose+'   => \$VERBOSE,
-         'config|c=s' => \$CONFIGFILE,
+         'config|c=s' => sub { $self->read_config_file( $_[1] ); },
       );
+   }
+
+   method read_config_file ( $path )
+   {
+      require YAML;
+
+      # Config file is YAML and can override a number of settings, and add chips
+      my $config = YAML::LoadFile( $path );
+
+      if( $config->{adapters} ) {
+         foreach my $c ( ( delete $config->{adapters} )->@* ) {
+            my $type = delete $c->{type} // croak "Expected adapter config to have a 'type'";
+            my $chips = delete $c->{chips} // croak "Expected adapter config to have a 'chips'";
+
+            # TODO: It'd be really nice if Device::Chip::Adapter->make( $type, %opts ) existed
+            my $desc = $type . join( ":", "", map { "$_=$c->{$_}" } sort keys %$c );
+            my $adapter = Device::Chip::Adapter->new_from_description( $desc );
+
+            foreach my $c ( $chips->@* ) {
+               my ( $type, %config ) = ( reftype($c)//"" eq "HASH" )
+                  ? ( delete $c->{type}, $c->%* )
+                  : ( $c, () );
+
+               $self->add_chip(
+                  type      => $type,
+                  adapter   => $adapter,
+                  mountopts => $config{mountopts},
+                  config    => $config{config},
+               );
+            }
+         }
+      }
+
+      if( exists $config->{port} ) {
+         $PORT = $config->{port};
+         delete $config->{port};
+      }
+
+      foreach my $opt (qw( interval best_effort mid3 )) {
+         exists $config->{$opt} and
+            $self->$opt = delete $config->{$opt};
+      }
+
+      die "Unrecognised config file items " . join( ", ", sort keys %$config ) . "\n"
+         if keys %$config;
    }
 
    async method after_sensors :override ( @sensors )
@@ -80,6 +122,11 @@ class MyApp :isa(App::Device::Chip::sensor)
       }
    }
 
+   # Count the failures per reading round
+   field %failures_per_chip;
+   # Counts in total
+   field %chip_failures;
+
    method output_readings ( $now, $sensors, $values )
    {
       if( $VERBOSE ) {
@@ -100,9 +147,17 @@ class MyApp :isa(App::Device::Chip::sensor)
          $metrics->$m( $sensor->name,
             $sensor->format( $value ), [ chip => $chipname ] );
       }
-   }
 
-   field %chip_failures;
+      foreach my $chipaddr ( keys %failures_per_chip ) {
+         if( ++$chip_failures{ $chipaddr } >= 5 ) {
+            die "This sensor chip has failed 5 times in a row; aborting\n";
+         }
+         if( keys %chip_failures >= 3 ) {
+            die "Three or more sensor chips have failed; aborting\n";
+         }
+      }
+      undef %failures_per_chip;
+   }
 
    method on_sensor_fail ( $sensor, $failure ) {
       $self->SUPER::on_sensor_fail( $sensor, $failure );
@@ -112,12 +167,7 @@ class MyApp :isa(App::Device::Chip::sensor)
 
       $metrics->inc_counter( chip_failures => [ chip => $chipname ] );
 
-      if( ++$chip_failures{ refaddr $chip } >= 5 ) {
-         die "This sensor chip has failed 5 times in a row; aborting\n";
-      }
-      if( keys %chip_failures >= 3 ) {
-         die "Three or more sensor chips have failed; aborting\n";
-      }
+      $failures_per_chip{ refaddr $chip } = 1;
    }
 
    method on_sensor_ok ( $sensor ) {
@@ -128,46 +178,6 @@ class MyApp :isa(App::Device::Chip::sensor)
 my $client = Net::Prometheus->new;
 
 my $app = MyApp->new->parse_argv;
-
-if( defined $CONFIGFILE ) {
-   require YAML;
-   # Config file is YAML and can override a number of settings, and add chips
-   my $config = YAML::LoadFile( $CONFIGFILE );
-
-   if( $config->{adapters} ) {
-      foreach my $c ( ( delete $config->{adapters} )->@* ) {
-         my $type = delete $c->{type} // croak "Expected adapter config to have a 'type'";
-         my $chips = delete $c->{chips} // croak "Expected adapter config to have a 'chips'";
-
-         # TODO: It'd be really nice if Device::Chip::Adapter->make( $type, %opts ) existed
-         my $desc = $type . join( ":", "", map { "$_=$c->{$_}" } sort keys %$c );
-         my $adapter = Device::Chip::Adapter->new_from_description( $desc );
-
-         foreach my $c ( $chips->@* ) {
-            my ( $type, %config ) = ( reftype($c)//"" eq "HASH" )
-               ? ( delete $c->{type}, $c->%* )
-               : ( $c, () );
-
-            $app->add_chip(
-               type      => $type,
-               adapter   => $adapter,
-               mountopts => $config{mountopts},
-               config    => $config{config},
-            );
-         }
-      }
-   }
-
-   if( defined $config->{port} ) {
-      $PORT //= $config->{port};
-      delete $config->{port};
-   }
-
-   # TODO: Many other options here?
-
-   die "Unrecognised config file items " . join( ", ", sort keys %$config ) . "\n"
-      if keys %$config;
-}
 
 $client->export_to_IO_Async( undef, port => $PORT );
 

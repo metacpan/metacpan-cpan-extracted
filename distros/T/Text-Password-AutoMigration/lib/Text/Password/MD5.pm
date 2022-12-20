@@ -1,11 +1,13 @@
 package Text::Password::MD5;
-our $VERSION = "0.17";
+our $VERSION = "0.18";
 
 use Moo;
 use strictures 2;
+extends 'Text::Password::CoreCrypt';
+use constant Min => 4;
+
 use autouse 'Carp'             => qw(croak carp);
 use autouse 'Crypt::PasswdMD5' => qw(unix_md5_crypt);
-use constant Min => 4;
 
 =encoding utf-8
 
@@ -16,7 +18,7 @@ Text::Password::MD5 - generate and verify Password with unix_md5_crypt()
 =head1 SYNOPSIS
 
  my $pwd = Text::Password::MD5->new();
- my( $raw, $hash ) = $pwd->genarate();          # list context is required
+ my( $raw, $hash ) = $pwd->generate();          # list context is required
  my $input = $req->body_parameters->{passwd};
 my $data = $pwd->encrypt($input);    # you don't have to care about salt
 
@@ -40,7 +42,8 @@ No arguments are required. But you can set some parameters.
 
 You can set default length with param 'default' like below:
 
- $pwd = Text::Pasword::AutoMiglation->new( default => 12 );
+$pwd = Text::Password::AutoMiglation->new( default => 12 );
+
 
 =item readablity
 
@@ -50,7 +53,8 @@ It must be a boolean, default is 1.
 
 If it was set as 0, you can generate stronger passwords with generate().
 
- $pwd = Text::Pasword::AutoMiglation->new( readability => 0 );
+$pwd = Text::Password::AutoMiglation->new( readability => 0 );
+
 
 =back
 
@@ -62,13 +66,10 @@ returns true if the verification succeeds.
 
 =cut
 
-extends 'Text::Password::CoreCrypt';
-
 sub verify {
     my ( $self, $input, $data ) = ( shift, @_ );
     carp ref $self, " doesn't allow any Wide Characters or white spaces" if $input =~ /[^ -~]/;
     return $data eq unix_md5_crypt(@_);
-
 }
 
 =head3 nonce( I<Int> )
@@ -99,7 +100,7 @@ sub encrypt {
 
 =head3 generate( I<Int> )
 
-genarates pair of new password and it's hash.
+generates pair of new password and its hash.
 
 less readable characters I<(0Oo1Il|!2Zz5sS$6b9qCcKkUuVvWwXx.,:;~-^'"`)>
 are forbiddenunless $self->readability is 0.

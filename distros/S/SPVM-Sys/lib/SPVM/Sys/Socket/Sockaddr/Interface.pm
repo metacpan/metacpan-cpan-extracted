@@ -24,7 +24,7 @@ The required method.
 
 =head2 sa_family
 
-  method sa_family : byte ()
+  method sa_family : int ()
 
 Gets C<sa_family>.
 

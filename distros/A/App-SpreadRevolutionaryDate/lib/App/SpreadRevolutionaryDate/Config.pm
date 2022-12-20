@@ -1,7 +1,7 @@
 #
 # This file is part of App-SpreadRevolutionaryDate
 #
-# This software is Copyright (c) 2019 by Gérald Sédrati-Dinet.
+# This software is Copyright (c) 2019-2022 by Gérald Sédrati.
 #
 # This is free software, licensed under:
 #
@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::Config;
-$App::SpreadRevolutionaryDate::Config::VERSION = '0.31';
+$App::SpreadRevolutionaryDate::Config::VERSION = '0.32';
 # ABSTRACT: Companion class of L<App::SpreadRevolutionaryDate>, to handle configuration file and command line arguments, subclass of L<AppConfig>.
 
 use Moose;
@@ -382,7 +382,7 @@ App::SpreadRevolutionaryDate::Config - Companion class of L<App::SpreadRevolutio
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 METHODS
 
@@ -458,11 +458,11 @@ Prints usage with command line parameters and exits.
 
 =head1 AUTHOR
 
-Gérald Sédrati-Dinet <gibus@cpan.org>
+Gérald Sédrati <gibus@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Gérald Sédrati-Dinet.
+This software is Copyright (c) 2019-2022 by Gérald Sédrati.
 
 This is free software, licensed under:
 

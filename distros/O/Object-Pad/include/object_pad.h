@@ -1,7 +1,7 @@
 #ifndef __OBJECT_PAD__TYPES_H__
 #define __OBJECT_PAD__TYPES_H__
 
-#define OBJECTPAD_ABIVERSION_MINOR 57
+#define OBJECTPAD_ABIVERSION_MINOR 76
 #define OBJECTPAD_ABIVERSION_MAJOR 0
 
 #define OBJECTPAD_ABIVERSION  ((OBJECTPAD_ABIVERSION_MAJOR << 16) | (OBJECTPAD_ABIVERSION_MINOR))
@@ -40,6 +40,11 @@ struct ClassHookFuncs {
 
   /* called immediately at apply time; return FALSE means it did its thing immediately, so don't store it */
   bool (*apply)(pTHX_ ClassMeta *classmeta, SV *value, SV **hookdata_ptr, void *funcdata);
+
+  /* called immediately before class seal */
+  void (*pre_seal)(pTHX_ ClassMeta *classmeta, SV *hookdata, void *funcdata);
+  /* called immediately after class seal */
+  void (*post_seal)(pTHX_ ClassMeta *classmeta, SV *hookdata, void *funcdata);
 
   /* called by mop_class_add_field() */
   void (*post_add_field)(pTHX_ ClassMeta *classmeta, SV *hookdata, void *funcdata, FieldMeta *fieldmeta);

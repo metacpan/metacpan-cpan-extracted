@@ -17,7 +17,7 @@ use Time::HiRes qw(sleep);
 # doesn't provide a separate interface for getpgid, though it's part of the
 # standard and used internally.
 use constant HAS_PORTABLE_GETPGRP =>
-    !! ($Config{d_getpgid} || $Config{d_bsdgetpgrp} || $Config{d_getpgrp2});
+    !! grep defined, @Config{qw( d_getpgid d_bsdgetpgrp d_getpgrp2 )};
 
 my $filename = (File::Spec->splitpath(__FILE__))[-1];
 my @option = (
@@ -57,8 +57,10 @@ usage('--run must be >0') if defined $run and 0 >= $run;
 usage('--stop must be >0') if defined $stop and 0 >= $stop;
 usage("Can't use --limit with both --run and --stop")
     if defined $limit and defined $run and defined $stop;
-usage('limit must be between 1..99')
-    if defined $limit and (1 > $limit or 99 < $limit);
+if (defined $limit) {
+    $limit *= 100 if $limit and 1 > $limit;
+    usage('--limit must be between 1..99') if 1 > $limit or 99 < $limit;
+}
 
 $limit ||= 50;
 $run   ||= 1;
@@ -104,7 +106,7 @@ unless ($notty) {
     $ttyfh = first { isatty $_ } *STDIN, *STDERR, *STDOUT;
     if (! $ttyfh) {
         warn "No attached terminal found\n" if $verbose;
-        $tty = 0 if 1 == $tty
+        $tty = 0 if 1 == $tty;
     }
     else { $tty ||= 1 }
     if ($tty) {
@@ -256,7 +258,7 @@ sub get_kill_list {
             my @c = @p;
             while (@c = map { @{ $child{$_} || [] } } @c) {
                 # Don't include members of any given process group.
-                push @p, grep { ! exists $g{$_} } @c
+                push @p, grep { ! exists $g{$_} } @c;
             }
         }
 
@@ -316,7 +318,7 @@ run-stop-run - limit CPU usage of processes
 =head1 SYNOPSIS
 
   run-stop-run [options] command [arguments]
-  run-stop-run [options] -p PID1,-PGID
+  run-stop-run [options] -p PID,-PGID
 
 =head1 DESCRIPTION
 
@@ -432,9 +434,9 @@ L<https://en.wikipedia.org/wiki/Cgroups>
 
 L<https://www.freedesktop.org/software/systemd/man/systemd.resource-control.html>
 
-L<bash/ulimit>
+L<bash(1)/ulimit>
 
-L<nice(8)>
+L<nice(1)>, L<renice(8)>
 
 =head1 COPYRIGHT AND LICENSE
 

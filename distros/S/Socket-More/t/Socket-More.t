@@ -214,6 +214,48 @@ use Socket::More ":all";
 	ok $results[0]{address} eq "::", "unspecified address";
 }
 
+{
+  #Test obtaining an unused port
+	my @results=Socket::More::reify_ports Socket::More::sockaddr_passive( {address=>"0.0.0.0", port=>0, family=>AF_INET, type=>SOCK_DGRAM});
+  
+  #test the ports are non zero and all the same
+  my $prev;
+  for my $r (@results){
+    ok ((defined($r->{port}) and $r->{port}!=0), "port reified");
+    if(defined($prev)){
+        ok ($prev==$r->{port}), "Ports are the same";     
+        $prev=$r->{port};
+    }
+
+    #Test that we can rebind to port immediately
+    #
+    ok defined (socket my $sock, $r->{family}, $r->{type}, 0), "Could not create port refied socket";
+    ok defined (bind $sock, $r->{addr}), "Could not rebind reified port";
+    close $sock;
+  }
+}
+{
+  #Test obtaining an unused port
+	my @results=Socket::More::reify_ports_unshared Socket::More::sockaddr_passive( {address=>"0.0.0.0", port=>0, family=>AF_INET, type=>SOCK_DGRAM});
+  
+  #test the ports are non zero
+  my $prev;
+  for my $r (@results){
+    ok ((defined($r->{port}) and $r->{port}!=0), "port reified");
+    if(defined($prev)){
+
+        #NOTE: This is likely to work.. but no guarentee that port numbers will be different accross interfaces
+        ok ($prev!=$r->{port}), "Port different";     
+        $prev=$r->{port};
+    }
+
+    #Test that we can rebind to port immediately
+    #
+    ok defined (socket my $sock, $r->{family}, $r->{type}, 0), "Could not create port refied socket";
+    ok defined (bind $sock, $r->{addr}), "Could not rebind reified port";
+    close $sock;
+  }
+}
 ##########################################################################
 # {                                                                      #
 #         #IF name and index mapping                                     #

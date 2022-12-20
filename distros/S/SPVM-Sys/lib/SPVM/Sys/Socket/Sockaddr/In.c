@@ -39,7 +39,7 @@ int32_t SPVM__Sys__Socket__Sockaddr__In__sin_family(SPVM_ENV* env, SPVM_VALUE* s
   
   struct sockaddr_in* socket_address = env->get_pointer(env, stack, obj_self);
   
-  stack[0].bval = socket_address->sin_family;
+  stack[0].ival = socket_address->sin_family;
   
   return 0;
 }
@@ -50,7 +50,7 @@ int32_t SPVM__Sys__Socket__Sockaddr__In__set_sin_family(SPVM_ENV* env, SPVM_VALU
   
   struct sockaddr_in* socket_address = env->get_pointer(env, stack, obj_self);
   
-  socket_address->sin_family = stack[1].bval;
+  socket_address->sin_family = stack[1].ival;
   
   return 0;
 }
@@ -101,7 +101,7 @@ int32_t SPVM__Sys__Socket__Sockaddr__In__sin_port(SPVM_ENV* env, SPVM_VALUE* sta
   
   struct sockaddr_in* socket_address = env->get_pointer(env, stack, obj_self);
   
-  stack[0].sval = socket_address->sin_port;
+  stack[0].ival = socket_address->sin_port;
   
   return 0;
 }
@@ -112,7 +112,7 @@ int32_t SPVM__Sys__Socket__Sockaddr__In__set_sin_port(SPVM_ENV* env, SPVM_VALUE*
   
   struct sockaddr_in* socket_address = env->get_pointer(env, stack, obj_self);
   
-  socket_address->sin_port = stack[1].sval;
+  socket_address->sin_port = stack[1].ival;
   
   return 0;
 }

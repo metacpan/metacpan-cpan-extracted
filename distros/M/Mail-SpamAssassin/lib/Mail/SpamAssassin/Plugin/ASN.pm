@@ -50,13 +50,30 @@ Autonomous System Number (ASN) of the connecting IP address.
 
  loadplugin Mail::SpamAssassin::Plugin::ASN
 
- asn_lookup asn.routeviews.org _ASN_ _ASNCIDR_
- 
- asn_lookup_ipv6 origin6.asn.cymru.com _ASN_ _ASNCIDR_
+ # Default / recommended settings
+ asn_use_geodb 1
+ asn_use_dns 1
+ asn_prefer_geodb 1
 
+ # Do lookups and add tags / X-Spam-ASN header
+ asn_lookup asn.routeviews.org _ASN_ _ASNCIDR_
+ asn_lookup_ipv6 origin6.asn.cymru.com _ASN_ _ASNCIDR_
  add_header all ASN _ASN_ _ASNCIDR_
 
- header TEST_AS1234 X-ASN =~ /^1234$/
+ # Rules to test ASN or Organization
+ # NOTE: Do not use rules that check metadata X-ASN header,
+ # only check_asn() eval function works correctly.
+ # Rule argument is full regexp to match.
+
+ # ASN Number: GeoIP ASN or DNS
+ # Matched string includes asn_prefix if defined, and normally
+ # looks like "AS1234" (DNS) or "AS1234 Google LLC" (GeoIP)
+ header AS_1234 eval:check_asn('/^AS1234\b/')
+
+ # ASN Organisation: GeoIP ASN has, DNS lists might not have
+ # Note the second parameter which checks MYASN tag (default is ASN)
+ asn_lookup myview.example.com _MYASN_ _MYASNCIDR_
+ header AS_GOOGLE eval:check_asn('/\bGoogle\b/i', 'MYASN')
 
 =head1 DESCRIPTION
 
@@ -68,12 +85,17 @@ high-volume environment> or that you should use a local mirror of the
 zone (see C<ftp://ftp.routeviews.org/dnszones/>).  Other similar zones
 may also be used.
 
+GeoDB (GeoIP ASN) database lookups are supported since SpamAssassin 4.0 and
+it's recommended to use them instead of DNS queries, unless C<_ASNCIDR_>
+is needed.
+
 =head1 TEMPLATE TAGS
 
 This plugin allows you to create template tags containing the connecting
 IP's AS number and route info for that AS number.
 
-The default config will add a header field that looks like this:
+If you use add_header as documented in the example before, a header field is
+added that looks like this:
 
  X-Spam-ASN: AS24940 213.239.192.0/18
 
@@ -87,28 +109,18 @@ all be added to the C<_ASNCIDR_> tag, separated by spaces, eg:
 Note that the literal "AS" before the ASN in the _ASN_ tag is configurable
 through the I<asn_prefix> directive and may be set to an empty string.
 
-=head1 CONFIGURATION
+C<_ASNCIDR_> is not available with local GeoDB ASN lookups.
 
-The standard ruleset contains a configuration that will add a header field
-containing ASN data to scanned messages.  The bayes tokenizer will use the
-added header field for bayes calculations, and thus affect which BAYES_* rule
-will trigger for a particular message.
+=head1 BAYES
 
-B<Note> that in most cases you should not score on the ASN data directly.
-Bayes learning will probably trigger on the _ASNCIDR_ tag, but probably not
-very well on the _ASN_ tag alone.
+The bayes tokenizer will use ASN data for bayes calculations, and thus
+affect which BAYES_* rule will trigger for a particular message.  No
+in-depth analysis of the usefulness of bayes tokenization of ASN data has
+been performed.
 
 =head1 SEE ALSO
 
 http://www.routeviews.org/ - all data regarding routing, ASNs, etc....
-
-http://issues.apache.org/SpamAssassin/show_bug.cgi?id=4770 -
-SpamAssassin Issue #4770 concerning this plugin
-
-=head1 STATUS
-
-No in-depth analysis of the usefulness of bayes tokenization of ASN data has
-been performed.
 
 =cut
 
@@ -120,15 +132,10 @@ use re 'taint';
 
 use Mail::SpamAssassin::Plugin;
 use Mail::SpamAssassin::Logger;
-use Mail::SpamAssassin::Util qw(reverse_ip_address);
-use Mail::SpamAssassin::Dns;
+use Mail::SpamAssassin::Util qw(reverse_ip_address compile_regexp);
 use Mail::SpamAssassin::Constants qw(:ip);
 
 our @ISA = qw(Mail::SpamAssassin::Plugin);
-
-our $txtdata_can_provide_a_list;
-
-my $IPV4_ADDRESS = IPV4_ADDRESS;
 
 sub new {
   my ($class, $mailsa) = @_;
@@ -136,11 +143,12 @@ sub new {
   my $self = $class->SUPER::new($mailsa);
   bless ($self, $class);
 
+  $self->register_eval_rule("check_asn", $Mail::SpamAssassin::Conf::TYPE_HEAD_EVALS);
+
   $self->set_config($mailsa->{conf});
 
-  #$txtdata_can_provide_a_list = Net::DNS->VERSION >= 0.69;
-  #more robust version check from Damyan Ivanov - Bug 7095
-  $txtdata_can_provide_a_list = version->parse(Net::DNS->VERSION) >= version->parse('0.69');
+  # we need GeoDB ASN
+  $self->{main}->{geodb_wanted}->{asn} = 1;
 
   return $self;
 }
@@ -200,6 +208,25 @@ it as a tag. This prefix is rather redundant, but its default value 'AS'
 is kept for backward compatibility with versions of SpamAssassin earlier
 than 3.4.0. A sensible setting is an empty string. The argument may be (but
 need not be) enclosed in single or double quotes for clarity.
+
+=item asn_use_geodb ( 0 / 1 )          (default: 1)
+
+Use Mail::SpamAssassin::GeoDB module to lookup ASN numbers.  You need
+suitable supported module like GeoIP2 or GeoIP with ISP or ASN database
+installed (for example, add EditionIDs GeoLite2-ASN in GeoIP.conf for
+geoipupdate program).
+
+GeoDB can only set _ASN_ tag, it has no data for _ASNCIDR_.  If you need
+both, then set asn_prefer_geodb 0 so DNS rules are tried.
+
+=item asn_prefer_geodb ( 0 / 1 )       (default: 1)
+
+If set, DNS lookups (asn_lookup rules) will not be run if GeoDB successfully
+finds ASN. Set this to 0 to get _ASNCIDR_ even if GeoDB finds _ASN_.
+
+=item asn_use_dns ( 0 / 1 )            (default: 1)
+
+Set to 0 to never allow DNS queries.
 
 =back
 
@@ -272,25 +299,52 @@ need not be) enclosed in single or double quotes for clarity.
     }
   });
 
+  push (@cmds, {
+    setting => 'asn_use_geodb',
+    default => 1,
+    is_admin => 1,
+    type => $Mail::SpamAssassin::Conf::CONF_TYPE_BOOL,
+  });
+
+  push (@cmds, {
+    setting => 'asn_prefer_geodb',
+    default => 1,
+    is_admin => 1,
+    type => $Mail::SpamAssassin::Conf::CONF_TYPE_BOOL,
+  });
+
+  push (@cmds, {
+    setting => 'asn_use_dns',
+    default => 1,
+    is_admin => 1,
+    type => $Mail::SpamAssassin::Conf::CONF_TYPE_BOOL,
+  });
+
   $conf->{parser}->register_commands(\@cmds);
 }
 
 # ---------------------------------------------------------------------------
 
-sub parsed_metadata {
+sub extract_metadata {
   my ($self, $opts) = @_;
 
   my $pms = $opts->{permsgstatus};
-  my $conf = $self->{main}->{conf};
+  my $conf = $pms->{conf};
 
-  if (!$pms->is_dns_available()) {
-    dbg("asn: DNS is not available, skipping ASN checks");
-    return;
-  }
-
-  if (!$conf->{asnlookups} && !$conf->{asnlookups_ipv6}) {
-    dbg("asn: no asn_lookups configured, skipping ASN lookups");
-    return;
+  my $geodb = $self->{main}->{geodb};
+  my $has_geodb = $conf->{asn_use_geodb} && $geodb && $geodb->can('asn');
+  if ($has_geodb) {
+    dbg("asn: using GeoDB ASN for lookups");
+  } else {
+    dbg("asn: GeoDB ASN not available");
+    if (!$conf->{asn_use_dns} || !$pms->is_dns_available()) {
+      dbg("asn: DNS is not available, skipping ASN check");
+      return;
+    }
+    if ($self->{main}->{learning}) {
+      dbg("asn: learning message, skipping DNS-based ASN check");
+      return;
+    }
   }
 
   # initialize the tag data so that if no result is returned from the DNS
@@ -309,9 +363,11 @@ sub parsed_metadata {
     }
   }
 
-  # get reversed IP address of last external relay to lookup
-  # don't return until we've initialized the template tags
-  my $relay = $pms->{relays_external}->[0];
+  # Initialize status
+  $pms->{asn_results} = ();
+
+  # get IP address of last external relay to lookup
+  my $relay = $opts->{msg}->{metadata}->{relays_external}->[0];
   if (!defined $relay) {
     dbg("asn: no first external relay IP available, skipping ASN check");
     return;
@@ -319,18 +375,45 @@ sub parsed_metadata {
     dbg("asn: first external relay is a private IP, skipping ASN check");
     return;
   }
-
   my $ip = $relay->{ip};
-  my $reversed_ip = reverse_ip_address($ip);
-  if (defined $reversed_ip) {
-    dbg("asn: using first external relay IP for lookups: %s", $ip);
-  } else {
-    dbg("asn: could not parse first external relay IP: %s, skipping", $ip);
+  dbg("asn: using first external relay IP for lookups: %s", $ip);
+
+  # GeoDB lookup
+  my $asn_found;
+  if ($has_geodb) {
+    my $asn = $geodb->get_asn($ip);
+    my $org = $geodb->get_asn_org($ip);
+    if (!defined $asn) {
+      dbg("asn: GeoDB ASN lookup failed");
+    } else {
+      $asn_found = 1;
+      dbg("asn: GeoDB found ASN $asn");
+      # Prevent double prefix
+      my $asn_value =
+        length($conf->{asn_prefix}) && index($asn, $conf->{asn_prefix}) != 0 ?
+          $conf->{asn_prefix}.$asn : $asn;
+      $asn_value .= ' '.$org if defined $org && length($org);
+      $pms->set_tag('ASN', $asn_value);
+      # For Bayes
+      $pms->{msg}->put_metadata('X-ASN', $asn);
+    }
+  }
+
+  # Skip DNS if GeoDB was successful and preferred
+  if ($asn_found && $conf->{asn_prefer_geodb}) {
+    dbg("asn: GeoDB lookup successful, skipping DNS lookups");
     return;
   }
 
+  # No point continuing without DNS from now on
+  if (!$conf->{asn_use_dns} || !$pms->is_dns_available()) {
+    dbg("asn: skipping disabled DNS lookups");
+    return;
+  }
+
+  dbg("asn: using DNS for lookups");
   my $lookup_zone;
-  if ($ip =~ /^$IPV4_ADDRESS$/o) {
+  if ($ip =~ IS_IPV4_ADDRESS) {
     if (!defined $conf->{asnlookups}) {
       dbg("asn: asn_lookup for IPv4 not defined, skipping");
       return;
@@ -344,6 +427,12 @@ sub parsed_metadata {
     $lookup_zone = "asnlookups_ipv6";
   }
   
+  my $reversed_ip = reverse_ip_address($ip);
+  if (!defined $reversed_ip) {
+    dbg("asn: could not parse IP: %s, skipping", $ip);
+    return;
+  }
+
   # we use arrays and array indices rather than hashes and hash keys
   # in case someone wants the same zone added to multiple sets of tags
   my $index = 0;
@@ -351,14 +440,12 @@ sub parsed_metadata {
     # do the DNS query, have the callback process the result
     my $zone_index = $index;
     my $zone = $reversed_ip . '.' . $entry->{zone};
-    my $key = "asnlookup-${lookup_zone}-${zone_index}-".$entry->{zone};
-    my $ent = $pms->{async}->bgsend_and_start_lookup($zone, 'TXT', undef,
-      { type => 'ASN', key => $key, zone => $lookup_zone },
+    $pms->{async}->bgsend_and_start_lookup($zone, 'TXT', undef,
+      { rulename => 'asn_lookup', type => 'ASN' },
       sub { my($ent, $pkt) = @_;
             $self->process_dns_result($pms, $pkt, $zone_index, $lookup_zone) },
       master_deadline => $pms->{master_deadline}
     );
-    $pms->register_async_rule_start($key) if $ent;
     $index++;
   }
 }
@@ -375,6 +462,9 @@ sub parsed_metadata {
 #
 sub process_dns_result {
   my ($self, $pms, $pkt, $zone_index, $lookup_zone) = @_;
+
+  # NOTE: $pkt will be undef if the DNS query was aborted (e.g. timed out)
+  return if !$pkt;
 
   my $conf = $self->{main}->{conf};
 
@@ -403,14 +493,10 @@ sub process_dns_result {
     %route_tag_data_seen = map(($_,1), @route_tag_data);
   }
 
-  # NOTE: $pkt will be undef if the DNS query was aborted (e.g. timed out)
-  my @answer = !defined $pkt ? () : $pkt->answer;
-
-  foreach my $rr (@answer) {
+  foreach my $rr ($pkt->answer) {
     #dbg("asn: %s: lookup result packet: %s", $zone, $rr->string);
     next if $rr->type ne 'TXT';
-    my @strings = $txtdata_can_provide_a_list ? $rr->txtdata :
-      $rr->char_str_list; # historical
+    my @strings = $rr->txtdata;
     next if !@strings;
     for (@strings) { utf8::encode($_) if utf8::is_utf8($_) }
 
@@ -485,7 +571,49 @@ sub process_dns_result {
   }
 }
 
+sub check_asn {
+  my ($self, $pms, $re, $asn_tag) = @_;
+
+  my $rulename = $pms->get_current_eval_rule_name();
+  if (!defined $re) {
+    warn "asn: rule $rulename eval argument missing\n";
+    return 0;
+  }
+
+  my ($rec, $err) = compile_regexp($re, 2);
+  if (!$rec) {
+    warn "asn: invalid regexp for $rulename '$re': $err\n";
+    return 0;
+  }
+
+  $asn_tag = 'ASN' unless defined $asn_tag;
+  $pms->action_depends_on_tags($asn_tag,
+    sub { my($pms,@args) = @_;
+      $self->_check_asn($pms, $rulename, $rec, $asn_tag);
+    }
+  );
+
+  return; # return undef for async status
+}
+
+sub _check_asn {
+  my ($self, $pms, $rulename, $rec, $asn_tag) = @_;
+
+  $pms->rule_ready($rulename); # mark rule ready for metas
+
+  my $asn = $pms->get_tag($asn_tag);
+  return if !defined $asn;
+
+  if ($asn =~ $rec) {
+    $pms->test_log("$asn_tag: $asn", $rulename);
+    $pms->got_hit($rulename, "");
+  }
+}
+
 # Version features
 sub has_asn_lookup_ipv6 { 1 }
+sub has_asn_geodb { 1 }
+sub has_check_asn { 1 }
+sub has_check_asn_tag { 1 } # $asn_tag parameter for check_asn()
 
 1;

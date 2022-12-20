@@ -49,13 +49,12 @@ sub wrapped : Native('t/42_simple_args') : Signature([Int]=>Int);
 sub wrapper ($arg) { is wrapped($arg), 8, 'wrapped sub' }
 wrapper(42);
 TODO: {
-    local $TODO = 'Some platforms choke on 64bit math';
-
+    #local $TODO = 'Some platforms choke on 64bit math';
     # 64-bit integer
-    sub TakeInt64 : Native('t/42_simple_args') : Signature([Long]=>Long);
+    sub TakeInt64 : Native('t/42_simple_args') : Signature([LongLong]=>Int);
     {
-        no warnings 'portable';
-        is TakeInt64(0xFFFFFFFFFF), 9, 'passed int64 0xFFFFFFFFFF';
+        use Math::BigInt;
+        is TakeInt64( Math::BigInt->new('0xFFFFFFFFFF') ), 9, 'passed int64 0xFFFFFFFFFF';
     }
 }
 

@@ -29,7 +29,7 @@ sub defineExcluded {
         my ($line);
         my $gullet = $istomach->getGullet;
         $gullet->readRawLine;    # IGNORE 1st line (after the \begin{$name} !!!
-        while (defined($line = $gullet->readRawLine) && ($line ne $endmark)) {
+        while (defined($line = $gullet->readRawLine) && ($line !~ /^\s*\Q$endmark\E\s*$/)) {
           $nlines++; }
         NoteLog("[Skipped $name ($nlines lines)]"); }]);
   return; }
@@ -53,6 +53,8 @@ DefPrimitive('\includecomment{}',     \&defineIncluded);
 DefPrimitive('\excludecomment{}',     \&defineExcluded);
 DefPrimitive('\specialcomment{}{}{}', \&defineIncluded);
 #DefPrimitive('\processcomment{}{}{}{}',);
+
+DefMacro('\csarg{}{}', '\expandafter#1\csname#2\endcsname');
 
 #**********************************************************************
 1;

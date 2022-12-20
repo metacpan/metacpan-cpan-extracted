@@ -80,7 +80,7 @@ else
 	./t-domain-length.bin 4 5 ../data/domain-length.txt
 endif
 	./t-dash-domains.bin ../data/xn-dash-domains.txt
-	./t-retired.bin 2 2 ../data/retired.txt
+	#./t-retired.bin 2 2 ../data/retired.txt
 
 check-lpart: t-822-localpart.bin t-5321-localpart.bin
 check-lpart: t-5322-localpart.bin t-6531-localpart.bin

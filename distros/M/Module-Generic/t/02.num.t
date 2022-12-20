@@ -32,7 +32,7 @@ use warnings;
 # diag( "Environment variables: ", Dumper( \%ENV ) );
 
 BEGIN { use_ok( 'Module::Generic::Number' ) || BAIL_OUT( "Unable to load Module::Generic::Number" ); }
-# POSIX::setlocale( &POSIX::LC_ALL, 'C.UTF-8' ) if( $DEBUG );
+POSIX::setlocale( &POSIX::LC_ALL, 'C.UTF-8' ) if( $DEBUG );
 my $curr_locale = POSIX::setlocale( &POSIX::LC_ALL );
 diag( "Current locale is '$curr_locale'" ) if( $DEBUG );
 # require Data::Dump;
@@ -60,9 +60,15 @@ $lconv = $Module::Generic::Number::DEFAULT if( !$curr_locale );
 #         @$lconv{ @$fail } = ( -1 ) x scalar( @$fail );
 # POSIX::setlocale( &POSIX::LC_ALL, $prev_locale );
 my( $sep_space, $tho_sep, $dec_sep, $n );
-if( scalar( keys( %$lconv ) ) )
+if( !scalar( keys( %$lconv ) ) || [split(/\./, $curr_locale)]->[0] eq 'C' )
 {
-    $sep_space = int( $lconv->{p_sep_by_space} // 0 ) > 0 ? qr/[[:blank:]\h]+/ : '';
+    diag( "No locale could be found for language \"", ( $ENV{LANG} // '' ), "\"" );
+    $tho_sep = ',';
+    $dec_sep = '.';
+    $n = Module::Generic::Number->new( 10, precision => 2, thousand => $tho_sep, decimal => $dec_sep, debug => $DEBUG );
+}
+else
+{
     $tho_sep = CORE::length( $lconv->{thousands_sep} )
         ? $lconv->{thousands_sep} 
         : $lconv->{mon_thousands_sep};
@@ -71,13 +77,8 @@ if( scalar( keys( %$lconv ) ) )
         : $lconv->{mon_decimal_point};
     $n = Module::Generic::Number->new( 10, precision => 2, debug => $DEBUG );
 }
-else
-{
-    diag( "No locale could be found for language \"$ENV{LANG}\"" );
-    $tho_sep = ',';
-    $dec_sep = '.';
-    $n = Module::Generic::Number->new( 10, precision => 2, thousand => $tho_sep, decimal => $dec_sep, debug => $DEBUG );
-}
+$sep_space = int( $lconv->{p_sep_by_space} // 0 ) > 0 ? qr/[[:blank:]\h]+/ : '';
+
 if( !defined( $n ) )
 {
     diag( "Error: '", Module::Generic::Number->error, "'" );

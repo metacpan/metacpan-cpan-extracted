@@ -1,7 +1,7 @@
 #
 # This file is part of App-SpreadRevolutionaryDate
 #
-# This software is Copyright (c) 2019 by Gérald Sédrati-Dinet.
+# This software is Copyright (c) 2019-2022 by Gérald Sédrati.
 #
 # This is free software, licensed under:
 #
@@ -10,7 +10,7 @@
 use 5.014;
 use utf8;
 package App::SpreadRevolutionaryDate::MsgMaker;
-$App::SpreadRevolutionaryDate::MsgMaker::VERSION = '0.31';
+$App::SpreadRevolutionaryDate::MsgMaker::VERSION = '0.32';
 # ABSTRACT: Role providing interface for crafting a message to be spread by L<App::SpreadRevolutionaryDate>.
 
 use Moose::Role;
@@ -60,7 +60,7 @@ App::SpreadRevolutionaryDate::MsgMaker - Role providing interface for crafting a
 
 =head1 VERSION
 
-version 0.31
+version 0.32
 
 =head1 DESCRIPTION
 
@@ -114,11 +114,11 @@ This role provides a C<locale> required attribute (defaults to C<'fr'>), which h
 
 =head1 AUTHOR
 
-Gérald Sédrati-Dinet <gibus@cpan.org>
+Gérald Sédrati <gibus@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2019 by Gérald Sédrati-Dinet.
+This software is Copyright (c) 2019-2022 by Gérald Sédrati.
 
 This is free software, licensed under:
 

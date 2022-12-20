@@ -8,7 +8,7 @@ ABSTRACT
 
 VERSION
 
-    1.10
+    1.17
 
 SYNOPSIS
 
@@ -98,11 +98,9 @@ INTEGRATES
 
     Venus::Role::Buildable
 
-    Venus::Role::Coercible
-
-    Venus::Role::Doable
-
     Venus::Role::Proxyable
+
+    Venus::Role::Optional
 
 METHODS
 
@@ -585,6 +583,48 @@ METHODS
         # $address_street_suffix = $faker->address_street_suffix;
       
         # "Street"
+
+ cache
+
+      cache(Str $method, Any @args) (Str)
+
+    The cache method dispatches to the method specified, caches the method
+    name and return value, and returns the value. Subsequent calls will
+    return the cached value.
+
+    Since 1.10
+
+    cache example 1
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $cache = $faker->cache('person_name');
+      
+        # "Keeley Balistreri"
+      
+        # $cache = $faker->cache('person_name');
+      
+        # "Keeley Balistreri"
+
+    cache example 2
+
+        package main;
+      
+        use Faker;
+      
+        my $faker = Faker->new('en-us');
+      
+        # my $cache = $faker->cache('company_tagline');
+      
+        # "iterate back-end content"
+      
+        # $cache = $faker->cache('company_tagline');
+      
+        # "iterate back-end content"
 
  color_hex_code
 

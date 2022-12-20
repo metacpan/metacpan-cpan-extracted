@@ -121,3 +121,17 @@ It is possible to create a single package plugin that will mix in a role into th
 	1;
 
 The late import of L<Moo::Role> prevents the C<plugin> method from being mixed in along with C<some_method>.
+
+=head2 Empty forms
+
+Form::Tiny tries hard not to force you to finalize building your form like Moose does with C<make_immutable>. Form definition is built incrementally with each DSL call. One limitation of this is that if your form contains nothing, there's no place to process plugins and inheritance.
+
+In rare occasions where you actually want to have an empty form, you have to call C<form_meta> method on the package before going out of scope, for example:
+
+	package ChildForm;
+
+	use Form::Tiny;
+	extends 'ParentForm';
+
+	__PACKAGE__->form_meta;
+

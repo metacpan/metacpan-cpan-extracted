@@ -2,8 +2,8 @@ NAME
     Sah::Schemas::Perl - Sah schemas related to Perl
 
 VERSION
-    This document describes version 0.045 of Sah::Schemas::Perl (from Perl
-    distribution Sah-Schemas-Perl), released on 2022-09-11.
+    This document describes version 0.046 of Sah::Schemas::Perl (from Perl
+    distribution Sah-Schemas-Perl), released on 2022-12-16.
 
 SAH SCHEMAS
     The following schemas are included in this distribution:
@@ -118,6 +118,22 @@ SAH SCHEMAS
         is restricted to this regex:
 
          [A-Za-z_][A-Za-z_0-9]*(::[A-Za-z_0-9]+)*
+
+    *   perl::identifier::qualified_ascii
+
+        Qualified identifier in Perl, without "use utf8" in effect.
+
+    *   perl::identifier::qualified_unicode
+
+        Unqualified identifier in Perl, with "use utf8" in effect.
+
+    *   perl::identifier::unqualified_ascii
+
+        Unqualified identifier in Perl, without "use utf8" in effect.
+
+    *   perl::identifier::unqualified_unicode
+
+        Unqualified identifier in Perl, with "use utf8" in effect.
 
     *   perl::modargs
 

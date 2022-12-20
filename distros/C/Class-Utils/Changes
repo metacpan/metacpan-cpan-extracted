@@ -1,3 +1,12 @@
+0.14 2022-12-15T16:11:54+01:00
+ - Fix minimal depndency for List::Util::any().
+
+0.13 2022-12-15T16:06:31+01:00
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Rename example files to better names.
+ - Rewrite doc to use =head2.
+ - Rewrite from List::MoreUtils to List::Util.
+
 0.12 2022-02-24T00:35:16+01:00
  - Fix default Error::Pure module via fix in Error::Pure.
 

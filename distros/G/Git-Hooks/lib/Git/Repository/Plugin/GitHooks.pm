@@ -2,7 +2,7 @@ use warnings;
 
 package Git::Repository::Plugin::GitHooks;
 # ABSTRACT: A Git::Repository plugin with some goodies for hook developers
-$Git::Repository::Plugin::GitHooks::VERSION = '3.3.1';
+$Git::Repository::Plugin::GitHooks::VERSION = '3.4.0';
 use parent qw/Git::Repository::Plugin/;
 
 use v5.16.0;
@@ -1419,8 +1419,7 @@ sub file_mode {
             croak "Internal error: git-diff-index should return a single line";
         }
     } else {
-        my $path = path($file);
-        my @ls_tree = $git->run('ls-tree', "$rev:" . $path->dirname, $path->basename);
+        my @ls_tree = $git->run('ls-tree', "$rev:", $file );
 
         if (@ls_tree == 1) {
             if (my ($mode, $type, $object, $filename) =
@@ -1614,7 +1613,7 @@ Git::Repository::Plugin::GitHooks - A Git::Repository plugin with some goodies f
 
 =head1 VERSION
 
-version 3.3.1
+version 3.4.0
 
 =head1 SYNOPSIS
 

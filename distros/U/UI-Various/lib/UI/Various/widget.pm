@@ -59,7 +59,7 @@ no indirect 'fatal';
 no multidimensional;
 use warnings 'once';
 
-our $VERSION = '0.31';
+our $VERSION = '0.34';
 
 use UI::Various::core;
 
@@ -170,6 +170,108 @@ sub new($;\[@$])
 
 #########################################################################
 
+=head2 B<dump> - dump internal structure to pretty-printed string
+
+    $dump = $ui_element->dump([$level]);
+
+=head3 example:
+
+    print $ui_element->dump;
+
+=head3 parameters:
+
+    $level              optional level used for indention
+
+=head3 description:
+
+This method returns a string with the pretty-printed internal structure of
+the UI element without following into the structures of foreign UI packages.
+The level usually can be omitted and is initialised with 0 in those cases.
+Indention is two times the level.
+
+=head3 returns:
+
+pretty-printed dump of UI element
+
+=cut
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+sub dump($;$)
+{
+    my ($self, $level) = @_;
+    defined $level  or  $level = 0;
+    my $indent = ' ' x (2 * $level);
+    my $type = ref($self);
+    my $dump = '';
+    local $_;
+
+    for my $key (sort keys %$self)
+    {
+	next if $key =~ m/^(_active|_active_index|_button_.*|parent|_selected)$/;
+	next if $key =~ m/^(children)$/  and  $type =~ m/::(Box|FileSelect)$/;
+	$dump .= $indent . $key . ':';
+	my $ref = ref($self->{$key});
+	if ($ref eq '')
+	{   $dump .= $self->{$key} . "\n";   }
+	elsif ($ref eq 'SCALAR')
+	{   $dump .= '->' . ${$self->{$key}} . "\n";   }
+	elsif ($ref eq 'ARRAY')
+	{
+	    $dump .= "\n";
+	    foreach my $element (@{$self->{$key}})
+	    {
+		$_ = ref($element);
+		if ($_ eq '')
+		{   $dump .= $indent . '  ' . $element . "\n";   }
+		elsif ($_ eq 'ARRAY')
+		{
+		    foreach (@{$element})
+		    {
+			next unless defined $_;
+			$dump .= $indent . '  ' . $_ . ':';
+			if (ref($_) =~ m/^UI::Various::/)
+			{
+			    $dump .= "\n" . $_->dump($level + 2);
+			}
+			elsif (ref($_) eq 'ARRAY')
+			{   $dump .= " @$_\n";   }
+			else
+			{   $dump .= $_ . "\n";   }
+		    }
+		}
+		# We use else and not
+		#elsif (m/^UI::Various::/)
+		# as others should never be part of an array and we want to
+		# get a Perl error if that happens by other errors:
+		else
+		{
+		    $dump .= $indent . '  ' . $element . ":\n";
+		    $dump .= $element->dump($level + 2);
+		}
+		# If above statement proves wrong we need this else part
+		# again:
+		#else
+		#{   $dump .= $indent . '  ' . $ref . "\n";   }
+	    }
+	}
+	elsif ($ref eq 'HASH')
+	{
+	    $dump .= "\n";
+	    foreach (sort keys %{$self->{$key}})
+	    {
+		$dump .= $indent . '  ' . $_ . ":\n";
+		$dump .= $self->{$key}{$_}->dump($level + 2);
+	    }
+	}
+	else
+	{   $dump .= $self->{$key} . "\n";   }
+    }
+    return $dump;
+}
+
+#########################################################################
+
 =head2 B<top> - determine top UI element of hierarchy
 
     $top = $ui_element->top;
@@ -217,7 +319,6 @@ sub top($)
     return error('cyclic_parent_relationship_detected__1_levels_above',
 		 $seen{$self});
 }
-
 
 #########################################################################
 
@@ -280,7 +381,7 @@ sub _toplevel($)
     return $_;
 }
 
-# TODO: Debug?, terminal_color
+# TODO: terminal_color
 
 1;
 

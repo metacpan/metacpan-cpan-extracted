@@ -1,53 +1,14 @@
-package Dyn::Call 0.03 {
+package Dyn::Call 0.05 {
     use strict;
     use warnings;
     use 5.030;
     use XSLoader;
     XSLoader::load( __PACKAGE__, our $VERSION );
     use parent 'Exporter';
-    our %EXPORT_TAGS = (
-        bind => [
-            qw[dcArgBool dcArgChar dcArgShort dcArgInt dcArgLong dcArgLongLong
-                dcArgFloat dcArgDouble
-                dcArgPointer
-                dcArgString
-                dcArgStruct
-            ]
-        ],
-        callvm => [qw[dcNewCallVM dcFree dcMode dcReset]],
-        call   => [qw[dcCallVoid dcCallInt dcCallPointer dcCallString]],
-        struct =>
-            [qw[dcNewStruct dcCloseStruct dcStructSize dcStructField dcSubStruct dcFreeStruct]],
-        vars => [
-            qw[
-                DC_CALL_C_DEFAULT
-                DC_CALL_C_ELLIPSIS DC_CALL_C_ELLIPSIS_VARARGS
-                DC_CALL_C_X86_CDECL DC_CALL_C_X86_WIN32_STD DC_CALL_C_X86_WIN32_FAST_MS
-                DC_CALL_C_X86_WIN32_FAST_GNU DC_CALL_C_X86_WIN32_THIS_MS DC_CALL_C_X86_WIN32_THIS_GNU
-                DC_CALL_C_X64_WIN64 DC_CALL_C_X64_SYSV
-                DC_CALL_C_PPC32_DARWIN DC_CALL_C_PPC32_OSX
-                DC_CALL_C_ARM_ARM_EABI DC_CALL_C_ARM_THUMB_EABI DC_CALL_C_ARM_ARMHF
-                DC_CALL_C_MIPS32_EABI DC_CALL_C_MIPS32_PSPSDK
-                DC_CALL_C_PPC32_SYSV DC_CALL_C_PPC32_LINUX
-                DC_CALL_C_ARM_ARM DC_CALL_C_ARM_THUMB
-                DC_CALL_C_MIPS32_O32 DC_CALL_C_MIPS64_N32 DC_CALL_C_MIPS64_N64
-                DC_CALL_C_X86_PLAN9 DC_CALL_C_SPARC32 DC_CALL_C_SPARC64
-                DC_CALL_C_ARM64
-                DC_CALL_C_PPC64 DC_CALL_C_PPC64_LINUX
-                DC_CALL_SYS_DEFAULT DC_CALL_SYS_X86_INT80H_LINUX DC_CALL_SYS_X86_INT80H_BSD
-                DC_CALL_SYS_PPC32 DC_CALL_SYS_PPC64], qw[DC_ERROR_NONE DC_ERROR_UNSUPPORTED_MODE],
-            qw[DC_SIGCHAR_VOID DC_SIGCHAR_BOOL DC_SIGCHAR_CHAR DC_SIGCHAR_UCHAR DC_SIGCHAR_SHORT
-                DC_SIGCHAR_USHORT DC_SIGCHAR_INT DC_SIGCHAR_UINT DC_SIGCHAR_LONG DC_SIGCHAR_ULONG
-                DC_SIGCHAR_LONGLONG DC_SIGCHAR_ULONGLONG DC_SIGCHAR_FLOAT DC_SIGCHAR_DOUBLE
-                DC_SIGCHAR_POINTER DC_SIGCHAR_STRING DC_SIGCHAR_STRUCT DC_SIGCHAR_ENDARG
-                DC_SIGCHAR_CC_PREFIX DC_SIGCHAR_CC_DEFAULT DC_SIGCHAR_CC_ELLIPSIS
-                DC_SIGCHAR_CC_ELLIPSIS_VARARGS DC_SIGCHAR_CC_CDECL DC_SIGCHAR_CC_STDCALL
-                DC_SIGCHAR_CC_FASTCALL_MS DC_SIGCHAR_CC_FASTCALL_GNU DC_SIGCHAR_CC_THISCALL_MS
-                DC_SIGCHAR_CC_THISCALL_GNU DC_SIGCHAR_CC_ARM_ARM DC_SIGCHAR_CC_ARM_THUMB
-                DC_SIGCHAR_CC_SYSCALL], qw[DEFAULT_ALIGNMENT]
-        ]
-    );
-    @{ $EXPORT_TAGS{all} } = our @EXPORT_OK = map { @{ $EXPORT_TAGS{$_} } } keys %EXPORT_TAGS;
+    our %EXPORT_TAGS;
+    push @{ $EXPORT_TAGS{vars} }, @{ $EXPORT_TAGS{sigchar} };
+    push @{ $EXPORT_TAGS{default} }, @{ $EXPORT_TAGS{call} }, @{ $EXPORT_TAGS{vars} };
+    @{ $EXPORT_TAGS{all} } = our @EXPORT_OK = sort map { @{ $EXPORT_TAGS{$_} } } keys %EXPORT_TAGS;
 }
 1;
 __END__
@@ -547,7 +508,7 @@ by name or with the C<:struct> tag.
 
 Creates a new C<DCstruct>.
 
-	my $struct = dcNewStruct( 4, DEFAULT_ALIGNMENT );
+    my $struct = dcNewStruct( 4, DEFAULT_ALIGNMENT );
 
 Expected parameters include:
 
@@ -563,7 +524,7 @@ Expected parameters include:
 
 Adds a new field to the structure.
 
-	dcStructField( $struct, DC_SIGCHAR_INT, DEFAULT_ALIGNMENT, 1 );
+    dcStructField( $struct, DC_SIGCHAR_INT, DEFAULT_ALIGNMENT, 1 );
 
 Expected parameters include:
 
@@ -583,7 +544,7 @@ Expected parameters include:
 
 Nests a structure inside of another.
 
-	dcSubStruct( $struct, 1, DEFAULT_ALIGNMENT, 1 );
+    dcSubStruct( $struct, 1, DEFAULT_ALIGNMENT, 1 );
 
 Expected parameters include:
 
@@ -776,6 +737,11 @@ You may set the calling convention to use with L<< C<dcMode( ... )>|/C<dcMode(
 =item C<DEFAULT_ALIGNMENT> - Default value for data structure alignment
 
 =back
+
+=head1 Memory Functions
+
+See Dyn::Call::Pointer for a list of direct memory manipulation functions which
+may be imported with the C<:memory> tag.
 
 =head1 Platform Support
 

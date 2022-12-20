@@ -1,5 +1,8 @@
 Revision history for Perl module Module::Generic
 
+v0.29.3 2022-12-18T13:03:04+0900
+    - Correcting unit test for Module::Generic::Number
+
 v0.29.2 2022-12-11T14:00:48+0900
     - Correcting oversight when dealing with undefined, but necessary property values in Module::Generic::Number
 

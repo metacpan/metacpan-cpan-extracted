@@ -33,10 +33,8 @@ use re 'taint';
 our @ISA = qw();
 
 use Mail::SpamAssassin::Logger;
+use Mail::SpamAssassin::Util qw(idn_to_ascii is_fqdn_valid);
 use Mail::SpamAssassin::Constants qw(:ip);
-use Mail::SpamAssassin::Util qw(is_fqdn_valid);
-
-my $IP_ADDRESS = IP_ADDRESS;
 
 # called from SpamAssassin->init() to create $self->{util_rb}
 sub new {
@@ -89,7 +87,7 @@ our %US_STATES = qw(
 
 =over 4
 
-=item ($hostname, $domain) = split_domain ($fqdn)
+=item ($hostname, $domain) = split_domain ($fqdn, $is_ascii)
 
 Cut a fully-qualified hostname into the hostname part and the domain
 part, splitting at the DNS registry boundary.
@@ -99,11 +97,20 @@ Examples:
     "www.foo.com" => ( "www", "foo.com" )
     "www.foo.co.uk" => ( "www", "foo.co.uk" )
 
+If $is_ascii given and true, skip idn_to_ascii() conversion
+
 =cut
 
 sub split_domain {
-  my $self = shift;
-  my $domain = lc shift;
+  my ($self, $domain, $is_ascii) = @_;
+
+  if ($is_ascii) {
+    utf8::encode($domain)  if utf8::is_utf8($domain); # force octets
+    $domain = lc $domain;
+  } else {
+    # convert to ascii, handles Unicode dot normalization also
+    $domain = idn_to_ascii($domain);
+  }
 
   my $hostname = '';
 
@@ -120,16 +127,11 @@ sub split_domain {
     my @hostname;
 
     while (@domparts > 1) { # go until we find the TLD
-      if (@domparts == 4) {
-        if ($domparts[3] eq 'us' &&
-            (($domparts[0] eq 'pvt' && $domparts[1] eq 'k12') ||
-             ($domparts[0] =~ /^c[io]$/)))
-        {
-          # http://www.neustar.us/policies/docs/rfc_1480.txt
-          # "Fire-Dept.CI.Los-Angeles.CA.US"
-          # "<school-name>.PVT.K12.<state>.US"
-          last if ($US_STATES{$domparts[2]});
-        }
+      if (@domparts == 2) {
+        # co.uk, etc.
+        my $temp = join(".", @domparts);
+        # International domain names in ASCII-compatible encoding (ACE)
+        last if ($self->{conf}->{two_level_domains}{$temp});
       }
       elsif (@domparts == 3) {
         # http://www.neustar.us/policies/docs/rfc_1480.txt
@@ -141,13 +143,20 @@ sub split_domain {
         }
         else {
           my $temp = join(".", @domparts);
+          # International domain names in ASCII-compatible encoding (ACE)
           last if ($self->{conf}->{three_level_domains}{$temp});
         }
       }
-      elsif (@domparts == 2) {
-        # co.uk, etc.
-        my $temp = join(".", @domparts);
-        last if ($self->{conf}->{two_level_domains}{$temp});
+      elsif (@domparts == 4) {
+        if ($domparts[3] eq 'us' &&
+            (($domparts[0] eq 'pvt' && $domparts[1] eq 'k12') ||
+             ($domparts[0] =~ /^c[io]$/)))
+        {
+          # http://www.neustar.us/policies/docs/rfc_1480.txt
+          # "Fire-Dept.CI.Los-Angeles.CA.US"
+          # "<school-name>.PVT.K12.<state>.US"
+          last if ($US_STATES{$domparts[2]});
+        }
       }
       push(@hostname, shift @domparts);
     }
@@ -167,7 +176,7 @@ sub split_domain {
 
 ###########################################################################
 
-=item $domain = trim_domain($fqdn)
+=item $domain = trim_domain($fqdn, $is_ascii)
 
 Cut a fully-qualified hostname into the hostname part and the domain
 part, returning just the domain.
@@ -177,39 +186,51 @@ Examples:
     "www.foo.com" => "foo.com"
     "www.foo.co.uk" => "foo.co.uk"
 
+If $is_ascii given and true, skip idn_to_ascii() conversion
+
 =cut
 
 sub trim_domain {
-  my $self = shift;
-  my $domain = shift;
+  my ($self, $domain, $is_ascii) = @_;
 
-  my ($host, $dom) = $self->split_domain($domain);
+  my (undef, $dom) = $self->split_domain($domain, $is_ascii);
   return $dom;
 }
 
 ###########################################################################
 
-=item $ok = is_domain_valid($dom)
+=item $ok = is_domain_valid($dom, $is_ascii)
 
-Return C<1> if the domain is valid, C<undef> otherwise.  A valid domain
-(a) does not contain whitespace, (b) contains at least one dot, and (c)
-uses a valid TLD or ccTLD.
+Return C<1> if the domain/hostname uses valid known TLD, C<undef> otherwise.
+
+If $is_ascii given and true, skip idn_to_ascii() conversion.
+
+Note that this only checks the TLD validity and nothing else.  To verify
+that the complete fqdn is in a valid legal format, Util::is_fqdn_valid() can
+additionally be used.
 
 =back
 
 =cut
 
 sub is_domain_valid {
-  my ($self, $dom) = @_;
+  my ($self, $dom, $is_ascii) = @_;
 
   return 0 unless defined $dom;
+  if ($is_ascii) {
+    utf8::encode($dom)  if utf8::is_utf8($dom); # force octets
+    $dom = lc $dom;
+  } else {
+    # convert to ascii, handles Unicode dot normalization also
+    $dom = idn_to_ascii($dom);
+  }
 
   # domains don't have whitespace
   return 0 if ($dom =~ /\s/);
 
   # ensure it ends in a known-valid TLD, and has at least 1 dot
   return 0 unless ($dom =~ /\.([^.]+)$/);
-  return 0 unless ($self->{conf}->{valid_tlds}{lc $1});
+  return 0 unless exists $self->{conf}->{valid_tlds}{$1};
 
   return 1;     # nah, it's ok.
 }
@@ -245,20 +266,20 @@ sub uri_to_domain {
   # we'll see the decoded version as well.  see url_encode()
   return if $uri =~ /\%(?:2[1-9a-f]|[3-6][0-9a-f]|7[0-9a-e])/;
 
-  my $host = $uri;  # unstripped/full domain name
+  my $host = idn_to_ascii($uri);  # unstripped/full domain name
   my $domain = $host;
 
   # keep IPs intact
-  if ($host !~ /^$IP_ADDRESS$/) { 
+  if ($host !~ IS_IP_ADDRESS) {
     # check that it's a valid hostname/fqdn
-    return unless is_fqdn_valid($host);
+    return unless is_fqdn_valid($host, 1);
     # ignore invalid TLDs
-    return unless $self->is_domain_valid($host);
+    return unless $self->is_domain_valid($host, 1);
     # get rid of hostname part of domain, understanding delegation
-    $domain = $self->trim_domain($host);
+    $domain = $self->trim_domain($host, 1);
   }
   
-  # $uri is now the domain only, optionally return unstripped host name
+  # optionally return unstripped host name
   return !wantarray ? $domain : ($domain, $host);
 }
 

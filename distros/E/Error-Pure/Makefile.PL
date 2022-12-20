@@ -22,7 +22,7 @@ requires 'Cwd' => 0;
 requires 'English' => 0;
 requires 'Exporter' => 0;
 requires 'Error::Pure::Output::Text' => 0.21;
-requires 'List::Util' => 0;
+requires 'List::Util' => 1.33;
 requires 'Readonly' => 0;
 resources 'bugtracker' => 'https://github.com/michal-josef-spacek/Error-Pure/issues';
 resources 'homepage' => 'https://github.com/michal-josef-spacek/Error-Pure';
@@ -35,7 +35,7 @@ test_requires 'IO::CaptureOutput' => 1.02;
 test_requires 'Test::More' => 0;
 test_requires 'Test::NoWarnings' => 0;
 tests_recursive;
-version '0.29';
+version '0.30';
 
 # Run.
 WriteAll();

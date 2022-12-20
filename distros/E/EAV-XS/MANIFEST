@@ -11,6 +11,8 @@ libeav/bin/Makefile.openbsd
 libeav/bin/Makefile.windows-gmake
 libeav/bin/utf8_decode.c
 libeav/bin/utf8_decode.h
+libeav/codecov.yml
+libeav/coverage/README.md
 libeav/data/domain-length.txt
 libeav/data/email-reg.ru.txt
 libeav/data/email-result-check.txt
@@ -44,6 +46,7 @@ libeav/Makefile.openbsd
 libeav/Makefile.windows-gmake
 libeav/misc/checkall.sh
 libeav/misc/clean-gcov.sh
+libeav/misc/coverage.sh
 libeav/partial/idn/eav.c
 libeav/partial/idn/is_6531_email.c
 libeav/partial/idn/is_utf8_domain.c

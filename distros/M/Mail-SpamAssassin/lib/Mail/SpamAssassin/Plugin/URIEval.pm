@@ -38,9 +38,9 @@ sub new {
   bless ($self, $class);
 
   # the important bit!
-  $self->register_eval_rule("check_for_http_redirector");
-  $self->register_eval_rule("check_https_ip_mismatch");
-  $self->register_eval_rule("check_uri_truncated");
+  $self->register_eval_rule("check_for_http_redirector"); # type does not matter
+  $self->register_eval_rule("check_https_ip_mismatch"); # type does not matter
+  $self->register_eval_rule("check_uri_truncated"); # type does not matter
 
   return $self;
 }
@@ -54,7 +54,7 @@ sub check_for_http_redirector {
     while (s{^https?://([^/:\?]+).+?(https?:/{0,2}?([^/:\?]+).*)$}{$2}i) {
       my ($redir, $dest) = ($1, $3);
       foreach ($redir, $dest) {
-	$_ = $self->{main}->{registryboundaries}->uri_to_domain($_) || $_;
+        $_ = $self->{main}->{registryboundaries}->uri_to_domain($_) || $_;
       }
       next if ($redir eq $dest);
       dbg("eval: redirect: found $redir to $dest, flagging");
@@ -69,13 +69,15 @@ sub check_for_http_redirector {
 sub check_https_ip_mismatch {
   my ($self, $pms) = @_;
 
-  while (my($k,$v) = each %{$pms->{html}->{uri_detail}}) {
-    next if ($k !~ m%^https?:/*(?:[^\@/]+\@)?\d+\.\d+\.\d+\.\d+%i);
-    foreach (@{$v->{anchor_text}}) {
-      next if (m%^https:/*(?:[^\@/]+\@)?\d+\.\d+\.\d+\.\d+%i);
-      if (m%https:%i) {
-	keys %{$self->{html}->{uri_detail}}; # resets iterator, bug 4829
-	return 1;
+  foreach my $html (@{$pms->{html_all}}) {
+    foreach my $k (keys %{$html->{uri_detail}}) {
+      my $v = $html->{uri_detail}->{$k};
+      next if ($k !~ m%^https?:/*(?:[^\@/]+\@)?\d+\.\d+\.\d+\.\d+%i);
+      foreach (@{$v->{anchor_text}}) {
+        next if (m%^https:/*(?:[^\@/]+\@)?\d+\.\d+\.\d+\.\d+%i);
+        if (m%https:%i) {
+          return 1;
+        }
       }
     }
   }
@@ -88,7 +90,7 @@ sub check_https_ip_mismatch {
 # is there a better way to do this?
 sub check_uri_truncated {
   my ($self, $pms) = @_;
-  return $pms->{'uri_truncated'};
+  return $pms->{'uri_truncated'} ? 1 : 0;
 }
 
 1;

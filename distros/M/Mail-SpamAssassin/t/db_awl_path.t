@@ -2,10 +2,12 @@
 
 use lib '.'; use lib 't';
 use SATest; sa_t_init("db_awl_path");
-use Test::More tests => 4;
+use Test::More;
+plan tests => 4;
 use IO::File;
 
 # ---------------------------------------------------------------------------
+diag "Note: This test when successful displays lockfile warning messages";
 
 %is_spam_patterns = (
 q{ X-Spam-Status: Yes}, 'isspam',
@@ -15,14 +17,13 @@ q{ X-Spam-Status: Yes}, 'isspam',
 # is tell SpamAssassin to use an inaccessible one, then verify that
 # the address in question was *not* whitelisted successfully.   '
 
-open (OUT, ">log/awl");
+open (OUT, ">$workdir/awl");
 print OUT "file created to block AWL from working; AWL expects a dir";
 close OUT;
 
 tstprefs ("
-        $default_cf_lines
-        auto_whitelist_path ./log/awl/shouldbeinaccessible
-        auto_whitelist_file_mode 0755
+  auto_whitelist_path ./$workdir/awl/this_lock_warning_is_ok
+  auto_whitelist_file_mode 0755
 ");
 
 my $fh = IO::File->new_tmpfile();
@@ -44,4 +45,4 @@ like($error, qr/(cannot create tmp lockfile)|(unlink of lock file.*failed)/, "Ch
 sarun ("-L -t < data/spam/004", \&patterns_run_cb);
 ok_all_patterns();
 
-ok(unlink 'log/awl'); # need a little cleanup
+ok(unlink "$workdir/awl"); # need a little cleanup

@@ -19,8 +19,9 @@ using namespace std;
 int V8Context::number = 0;
 
 v8::Isolate* isolate;
+std::unique_ptr<Platform> plf;
 
-void set_perl_error(const TryCatch& try_catch) {
+void set_perl_error(Local<Context> ctx, const TryCatch& try_catch) {
     Handle<Message> msg = try_catch.Message();
 
     char message[1024];
@@ -28,10 +29,10 @@ void set_perl_error(const TryCatch& try_catch) {
         message,
         1024,
         "%s at %s:%d:%d\n",
-        *(String::Utf8Value(try_catch.Exception())),
-        !msg.IsEmpty() ? *(String::Utf8Value(msg->GetScriptResourceName())) : "eval",
-        !msg.IsEmpty() ? msg->GetLineNumber() : 0,
-        !msg.IsEmpty() ? msg->GetStartColumn(): 0
+        *(String::Utf8Value(isolate, try_catch.Exception())),
+        !msg.IsEmpty() ? *(String::Utf8Value(isolate, msg->GetScriptResourceName())) : "eval",
+        !msg.IsEmpty() ? msg->GetLineNumber(ctx).FromMaybe(0) : 0,
+        !msg.IsEmpty() ? msg->GetStartColumn(ctx).FromMaybe(0) : 0
     );
 
     sv_setpv(ERRSV, message);
@@ -129,11 +130,11 @@ void SvMap::add(Handle<Object> object, long ptr) {
     );
 }
 
-SV* SvMap::find(Handle<Object> object) {
+SV* SvMap::find(Local<Context> ctx, Handle<Object> object) {
     int hash = object->GetIdentityHash();
 
     for (sv_map::const_iterator it = objects.find(hash); it != objects.end() && it->first == hash; it++)
-        if (it->second->object->Equals(object))
+        if (it->second->object->Equals(ctx, object).FromMaybe(0))
             return newRV_inc(INT2PTR(SV*, it->second->ptr));
 
     return NULL;
@@ -222,7 +223,7 @@ class V8FunctionData : public V8ObjectData {
 public:
     V8FunctionData(V8Context* context_, Handle<Object> object_, SV* sv_)
         : V8ObjectData(context_, object_, sv_)
-        , returns_list(object_->Has(String::NewFromUtf8(isolate, "__perlReturnsList", v8::String::kNormalString)))
+        , returns_list(object_->Has(context_->get_local_context(), String::NewFromUtf8(isolate, "__perlReturnsList", v8::String::kNormalString)).FromMaybe(0))
     { }
 
     bool returns_list;
@@ -327,8 +328,8 @@ V8Context::V8Context(
 
     if (!isolate) {
         //v8::V8::InitializeICU();
-        Platform* platform = platform::CreateDefaultPlatform();
-        V8::InitializePlatform(platform);
+        plf = platform::NewDefaultPlatform();
+        V8::InitializePlatform(plf.get());
         V8::Initialize();
 
         v8::Isolate::CreateParams create_params;
@@ -357,10 +358,11 @@ V8Context::V8Context(
 
     context->Global()->Set(
         v8::String::NewFromUtf8(isolate, "__perlFunctionWrapper", v8::String::kNormalString),
-        tmpl->GetFunction()
+        tmpl->GetFunction(context).ToLocalChecked()
     );
 
     Handle<Script> script = Script::Compile(
+        context,
         v8::String::NewFromUtf8(
             isolate,
             "(function(wrap) {"
@@ -372,9 +374,9 @@ V8Context::V8Context(
             "})",
             v8::String::kNormalString
         )
-    );
+    ).ToLocalChecked();
 
-    make_function.Reset(isolate, Handle<Function>::Cast(script->Run()));
+    make_function.Reset(isolate, Handle<Function>::Cast(script->Run(context).ToLocalChecked()));
 
     string_wrap.Reset(isolate, String::NewFromUtf8(isolate, "wrap"));
 
@@ -508,7 +510,7 @@ private:
         ts.tv_nsec = tv.tv_usec * 1000;
 
         if (pthread_cond_timedwait(&me->cond_, &me->mutex_, &ts) == ETIMEDOUT) {
-            V8::TerminateExecution(isolate);
+            isolate->TerminateExecution();
         }
         pthread_mutex_unlock(&me->mutex_);
         return NULL;
@@ -524,35 +526,35 @@ SV*
 V8Context::eval(SV* source, SV* origin) {
     Isolate::Scope isolate_scope(isolate);
     HandleScope handle_scope(isolate);
-    TryCatch try_catch;
+    TryCatch try_catch(isolate);
     Local<Context> local_context = context.Get(isolate);
     Context::Scope context_scope(local_context);
 
     // V8 expects everything in UTF-8, ensure SVs are upgraded.
     sv_utf8_upgrade(source);
-    Handle<Script> script = Script::Compile(
+    ScriptOrigin orig(origin ? sv2v8str(origin) : String::NewFromUtf8(isolate, "eval", v8::String::kNormalString));
+    MaybeLocal<Script> script = Script::Compile(
+        local_context,
         sv2v8str(source),
-        origin ? sv2v8str(origin) : String::NewFromUtf8(isolate, "eval", v8::String::kNormalString)
+        &orig
     );
 
     if (try_catch.HasCaught()) {
-        set_perl_error(try_catch);
+        set_perl_error(local_context, try_catch);
         return &PL_sv_undef;
-    } else {
-        thread_canceller canceller(time_limit_);
-        Handle<Value> val = script->Run();
-
-        if (val.IsEmpty()) {
-            set_perl_error(try_catch);
-            return &PL_sv_undef;
-        } else {
-            sv_setsv(ERRSV,&PL_sv_undef);
-            if (GIMME_V == G_VOID) {
-                return &PL_sv_undef;
-            }
-            return v82sv(val);
-        }
     }
+    thread_canceller canceller(time_limit_);
+    MaybeLocal<Value> val = script.ToLocalChecked()->Run(local_context);
+
+    if (val.IsEmpty()) {
+        set_perl_error(local_context, try_catch);
+        return &PL_sv_undef;
+    }
+    sv_setsv(ERRSV,&PL_sv_undef);
+    if (GIMME_V == G_VOID) {
+        return &PL_sv_undef;
+    }
+    return v82sv(val.ToLocalChecked());
 }
 
 Handle<Value>
@@ -621,24 +623,25 @@ V8Context::v82sv(Handle<Value> value, SvMap& seen) {
     if (value->IsNull())
         return newSV(0);
 
+    Local<Context> ctx = this->get_local_context();
     if (value->IsInt32())
-        return newSViv(value->Int32Value());
+        return newSViv(value->Int32Value(ctx).FromMaybe(0));
 
     if (value->IsBoolean())
-        return newSVuv(value->Uint32Value());
+        return newSVuv(value->Uint32Value(ctx).FromMaybe(0));
 
     if (value->IsNumber())
-        return newSVnv(value->NumberValue());
+        return newSVnv(value->NumberValue(ctx).FromMaybe(0));
 
     if (value->IsString()) {
-        String::Utf8Value str(value);
+        String::Utf8Value str(isolate, value);
         SV *sv = newSVpvn(*str, str.length());
         sv_utf8_decode(sv);
         return sv;
     }
 
     if (value->IsArray() || value->IsObject() || value->IsFunction()) {
-        Handle<Object> object = value->ToObject();
+        Handle<Object> object = value->ToObject(isolate);
 
         if (SV *cached = seen_v8(object))
             return cached;
@@ -648,7 +651,7 @@ V8Context::v82sv(Handle<Value> value, SvMap& seen) {
             return function2sv(fn);
         }
 
-        if (SV* cached = seen.find(object))
+        if (SV* cached = seen.find(ctx, object))
             return cached;
 
         if (value->IsArray()) {
@@ -679,7 +682,7 @@ V8Context::fill_prototype(Handle<Object> prototype, HV* stash) {
         SV *key = HeSVKEY_force(he);
         Local<String> name = v8::String::NewFromUtf8(isolate, SvPV_nolen(key), v8::String::kNormalString);
 
-        if (prototype->Has(name))
+        if (prototype->Has(this->get_local_context(), name).FromMaybe(0))
             continue;
 
         prototype->Set(name, (new PerlMethodData(this, SvPV_nolen(key)))->object.Get(isolate));
@@ -767,7 +770,7 @@ V8Context::rv2v8(SV *rv, HandleMap& seen) {
 Handle<Object>
 V8Context::blessed2object(SV *sv) {
     Handle<Object> object = Object::New(isolate);
-    object->SetPrototype(get_prototype(sv));
+    (void)object->SetPrototype(this->get_local_context(), get_prototype(sv)).FromMaybe(0);
 
     return (new PerlObjectData(this, object, sv))->object.Get(isolate);
 }
@@ -822,7 +825,7 @@ V8Context::array2sv(Handle<Array> array, SvMap& seen) {
 
 SV *
 V8Context::object2sv(Handle<Object> obj, SvMap& seen) {
-    if (enable_blessing && obj->Has(v8::String::NewFromUtf8(isolate, "__perlPackage", v8::String::kNormalString))) {
+    if (enable_blessing && obj->Has(this->get_local_context(), v8::String::NewFromUtf8(isolate, "__perlPackage", v8::String::kNormalString)).FromMaybe(0)) {
         return object2blessed(obj);
     }
 
@@ -831,11 +834,11 @@ V8Context::object2sv(Handle<Object> obj, SvMap& seen) {
 
     seen.add(obj, PTR2IV(hv));
 
-    Local<Array> properties = obj->GetPropertyNames();
+    Local<Array> properties = obj->GetPropertyNames(this->get_local_context()).ToLocalChecked();
     for (int i = 0; i < properties->Length(); i++) {
         Local<Integer> propertyIndex = Integer::New( isolate, i );
         Local<String> propertyName = Local<String>::Cast( properties->Get( propertyIndex ) );
-        String::Utf8Value propertyNameUTF8( propertyName );
+        String::Utf8Value propertyNameUTF8( isolate, propertyName );
 
         Local<Value> propertyValue = obj->Get( propertyName );
         if (*propertyValue)
@@ -872,7 +875,7 @@ my_gv_setsv(pTHX_ GV* const gv, SV* const sv){
          * middle of the block, v8 will segfault at program exit. */ \
         Isolate::Scope  isolate_scope(isolate); \
         HandleScope     scope(isolate); \
-        TryCatch        try_catch; \
+        TryCatch try_catch(isolate); \
         V8FunctionData* data = (V8FunctionData*)sv_object_data((SV*)cv); \
         if (data->context) { \
         V8Context      *self = data->context; \
@@ -884,14 +887,14 @@ my_gv_setsv(pTHX_ GV* const gv, SV* const sv){
             argv.push_back(self->sv2v8(ST(i))); \
         }
 
-#define CONVERT_V8_RESULT(POP) \
+#define CONVERT_V8_RESULT() \
         if (try_catch.HasCaught()) { \
-            set_perl_error(try_catch); \
+            set_perl_error(ctx, try_catch); \
             die = true; \
         } \
         else { \
-            if (data->returns_list && GIMME_V == G_ARRAY && result->IsArray()) { \
-                Handle<Array> array = Handle<Array>::Cast(result); \
+            if (data->returns_list && GIMME_V == G_ARRAY && result.ToLocalChecked()->IsArray()) { \
+                Handle<Array> array = Handle<Array>::Cast(result.ToLocalChecked()); \
                 if (GIMME_V == G_ARRAY) { \
                     count = array->Length(); \
                     EXTEND(SP, count - items); \
@@ -904,7 +907,7 @@ my_gv_setsv(pTHX_ GV* const gv, SV* const sv){
                 } \
             } \
             else { \
-                ST(0) = sv_2mortal(self->v82sv(result)); \
+                ST(0) = sv_2mortal(self->v82sv(result.ToLocalChecked())); \
             } \
         } \
         } \
@@ -922,21 +925,21 @@ XSRETURN(count);
 
 XS(v8closure) {
     SETUP_V8_CALL(0)
-    Handle<Value> result = Handle<Function>::Cast(data->object.Get(isolate))->Call(ctx->Global(), items, &argv[0]);
+    MaybeLocal<Value> result = Handle<Function>::Cast(data->object.Get(isolate))->Call(ctx, ctx->Global(), items, &argv[0]);
     CONVERT_V8_RESULT()
 }
 
 XS(v8method) {
     SETUP_V8_CALL(1)
     V8ObjectData* This = (V8ObjectData*)SvIV((SV*)SvRV(ST(0)));
-    Handle<Value> result = Handle<Function>::Cast(data->object.Get(isolate))->Call(This->object.Get(isolate), items - 1, &argv[0]);
-    CONVERT_V8_RESULT(POPs);
+    MaybeLocal<Value> result = Handle<Function>::Cast(data->object.Get(isolate))->Call(ctx, This->object.Get(isolate), items - 1, &argv[0]);
+    CONVERT_V8_RESULT();
 }
 
 SV*
 V8Context::function2sv(Handle<Function> fn) {
     CV          *code = newXS(NULL, v8closure, __FILE__);
-    V8ObjectData *data = new V8FunctionData(this, fn->ToObject(), (SV*)code);
+    V8ObjectData *data = new V8FunctionData(this, fn->ToObject(isolate), (SV*)code);
     return newRV_noinc((SV*)code);
 }
 
@@ -944,7 +947,7 @@ SV*
 V8Context::object2blessed(Handle<Object> obj) {
     char package[128];
 
-    String::Utf8Value stringified(obj->Get( String::NewFromUtf8(isolate, "__perlPackage") )->ToString());
+    String::Utf8Value stringified( isolate, obj->Get( String::NewFromUtf8(isolate, "__perlPackage") )->ToString(isolate));
 
     snprintf(
         package,
@@ -958,13 +961,13 @@ V8Context::object2blessed(Handle<Object> obj) {
     HV *stash = gv_stashpv(package, 0);
 
     if (!stash) {
-        Local<Object> prototype = obj->GetPrototype()->ToObject();
+        Local<Object> prototype = obj->GetPrototype()->ToObject(isolate);
 
         stash = gv_stashpv(package, GV_ADD);
 
-        Local<Array> properties = prototype->GetPropertyNames();
+        Local<Array> properties = prototype->GetPropertyNames(this->get_local_context()).ToLocalChecked();
         for (int i = 0; i < properties->Length(); i++) {
-            Local<String> name = properties->Get(i)->ToString();
+            Local<String> name = properties->Get(i)->ToString(isolate);
             Local<Value> property = prototype->Get(name);
 
             if (!property->IsFunction())
@@ -975,8 +978,8 @@ V8Context::object2blessed(Handle<Object> obj) {
             CV *code = newXS(NULL, v8method, __FILE__);
             V8ObjectData *data = new V8FunctionData(this, fn, (SV*)code);
 
-            GV* gv = (GV*)*hv_fetch(stash, *String::Utf8Value(name), name->Length(), TRUE);
-            gv_init(gv, stash, *String::Utf8Value(name), name->Length(), GV_ADDMULTI); /* vivify */
+            GV* gv = (GV*)*hv_fetch(stash, *String::Utf8Value(isolate, name), name->Length(), TRUE);
+            gv_init(gv, stash, *String::Utf8Value(isolate, name), name->Length(), GV_ADDMULTI); /* vivify */
             my_gv_setsv(aTHX_ gv, (SV*)code);
         }
     }

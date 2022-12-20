@@ -106,6 +106,10 @@ sub new {
     $self->{username} = $args->{username};
   }
 
+  if ($args->{max_size}) {
+    $self->{max_size} = $args->{max_size};
+  }
+
   if ($args->{timeout}) {
     $self->{timeout} = $args->{timeout} || 30;
   }
@@ -135,6 +139,8 @@ threshold
 
 message
 
+report
+
 =cut
 
 sub process {
@@ -148,6 +154,41 @@ sub process {
   }
 
   return $self->_filter($msg, $command);
+}
+
+=head2 spam_report
+
+public instance (\%) spam_report (String $msg)
+
+Description:
+The method implements the report call.
+
+See the process method for the return value.
+
+=cut
+
+sub spam_report {
+  my ($self, $msg) = @_;
+
+  return $self->_filter($msg, 'REPORT');
+}
+
+=head2 spam_report_ifspam
+
+public instance (\%) spam_report_ifspam (String $msg)
+
+Description:
+The method implements the report_ifspam call.
+A report will be returned only if the message is spam.
+
+See the process method for the return value.
+
+=cut
+
+sub spam_report_ifspam {
+  my ($self, $msg) = @_;
+
+  return $self->_filter($msg, 'REPORT_IFSPAM');
 }
 
 =head2 check
@@ -270,10 +311,10 @@ sub learn {
   close $remote  or die "error closing socket: $!";
 
   if ($learntype == 0 || $learntype == 1) {
-    return $did_set =~ /local/;
+    return index($did_set, 'local') >= 0;
   }
   else { #safe since we've already checked the $learntype values
-    return $did_remove =~ /local/;
+    return index($did_remove, 'local') >= 0;
   }
 }
 
@@ -534,12 +575,15 @@ threshold
 
 message (if available)
 
+report (if available)
+
 =cut
 
 sub _filter {
   my ($self, $msg, $command) = @_;
 
   my %data;
+  my $msgsize;
 
   $self->_clear_errors();
 
@@ -547,7 +591,10 @@ sub _filter {
 
   return 0 unless ($remote);
 
-  my $msgsize = length($msg.$EOL);
+  if(defined $self->{max_size}) {
+    $msg = substr($msg,0,$self->{max_size});
+  }
+  $msgsize = length($msg.$EOL);
 
   print $remote "$command $PROTOVERSION$EOL";
   print $remote "Content-length: $msgsize$EOL";
@@ -595,7 +642,11 @@ sub _filter {
     $!==EBADF ? dbg("error reading from spamd (10): $!")
               : die "error reading from spamd (10): $!";
 
-  $data{message} = $return_msg if ($return_msg);
+  if($command =~ /^REPORT/) {
+    $data{report} = $return_msg if ($return_msg);
+  } else {
+    $data{message} = $return_msg if ($return_msg);
+  }
 
   close $remote  or die "error closing socket: $!";
 

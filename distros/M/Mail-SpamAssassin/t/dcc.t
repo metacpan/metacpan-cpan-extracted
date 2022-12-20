@@ -3,13 +3,14 @@
 use lib '.'; use lib 't';
 use SATest; sa_t_init("dcc");
 
-use constant HAS_DCC => eval { $_ = untaint_cmd("which cdcc"); chomp; -x };
+use constant HAS_DCC => !$RUNNING_ON_WINDOWS && eval { $_ = untaint_cmd("which cdcc"); chomp; -x };
 
 use Test::More;
+plan skip_all => "Tests don't work on windows" if $RUNNING_ON_WINDOWS;
 plan skip_all => "Net tests disabled" unless conf_bool('run_net_tests');
 plan skip_all => "DCC tests disabled" unless conf_bool('run_dcc_tests');
 plan skip_all => "DCC executable not found in path" unless HAS_DCC;
-plan tests => 4;
+plan tests => 12;
 
 diag('Note: Failure may not be an SpamAssassin bug, as DCC tests can fail due to problems with the DCC servers.');
 
@@ -17,26 +18,37 @@ diag('Note: Failure may not be an SpamAssassin bug, as DCC tests can fail due to
 # ---------------------------------------------------------------------------
 
 %patterns = (
-
   q{ spam reported to DCC }, 'dcc report',
-
 );
 
-tstpre ("
-
-  loadplugin Mail::SpamAssassin::Plugin::DCC
-  dcc_timeout 30
-
+tstprefs ("
+  full     DCC_CHECK  eval:check_dcc()
+  tflags   DCC_CHECK  net autolearn_body
+  priority DCC_CHECK  10
+  dns_available no
+  use_dcc 1
+  meta X_META_POS DCC_CHECK
+  meta X_META_NEG !DCC_CHECK
+  score DCC_CHECK 3.3
+  score X_META_POS 3.3
+  score X_META_NEG 3.3
 ");
 
 ok sarun ("-t -D info -r < data/spam/gtubedcc.eml 2>&1", \&patterns_run_cb);
 ok_all_patterns();
+ok sarun ("-t -D info -r < data/spam/gtubedcc_crlf.eml 2>&1", \&patterns_run_cb);
+ok_all_patterns();
 
 %patterns = (
-
-  q{ Detected as bulk mail by DCC }, 'dcc',
-
+  q{ 3.3 DCC_CHECK }, 'dcc',
+  q{ 3.3 X_META_POS }, 'pos',
+);
+%anti_patterns = (
+  q{ X_META_NEG }, 'neg',
 );
 
-ok sarun ("-t < data/spam/gtubedcc.eml", \&patterns_run_cb);
+ok sarun ("-t < data/spam/gtubedcc.eml 2>&1", \&patterns_run_cb);
 ok_all_patterns();
+ok sarun ("-t < data/spam/gtubedcc_crlf.eml 2>&1", \&patterns_run_cb);
+ok_all_patterns();
+

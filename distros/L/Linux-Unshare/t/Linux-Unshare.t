@@ -40,6 +40,10 @@ SKIP: {
 	is(unshare(CLONE_NEWUSER), 1);
 };
 SKIP: {
+	skip "Should be root to test CLONE_NEWPID", 1 if $<;
+	is(unshare(CLONE_NEWPID), 1);
+};
+SKIP: {
 	skip "Should be root to test CLONE_CONTAINER", 1 if $<;
 	is(unshare(CLONE_CONTAINER), 1);
 };

@@ -9,9 +9,9 @@ class Sys::Poll::PollfdArray {
   native method fd : int ($index : int);
   native method set_fd : void ($index : int, $fd : int);
   
-  native method events : short ($index : int);
-  native method set_events : void ($index : int, $events : short);
+  native method events : int ($index : int);
+  native method set_events : void ($index : int, $events : int);
   
-  native method revents : short ($index : short);
-  native method set_revents : void ($index : int, $revents : short);
+  native method revents : int ($index : int);
+  native method set_revents : void ($index : int, $revents : int);
 }

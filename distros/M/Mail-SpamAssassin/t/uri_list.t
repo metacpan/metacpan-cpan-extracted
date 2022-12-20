@@ -2,27 +2,12 @@
 
 # Tests for Bug #7591, which is actually a bug seen in the EL7 build of Perl.
 # The real root cause is obscure, so we test for the bug not the Perl version.
- 
-BEGIN {
-  if (-e 't/test_dir') { # if we are running "t/rule_names.t", kluge around ...
-    chdir 't';
-  }
 
-  if (-e 'test_dir') {            # running from test directory, not ..
-    unshift(@INC, '../blib/lib');
-  }
-}
-
-my $prefix = '.';
-if (-e 'test_dir') {            # running from test directory, not ..
-  $prefix = '..';
-}
-
-use lib '.'; use lib 't';
 use strict;
+use lib '.'; use lib 't';
+use SATest; sa_t_init("uri_list");
 use Test::More tests=> 12;
 use Mail::SpamAssassin::Util;
-use SATest; sa_t_init("uri_list");
 use warnings;
 use Cwd;
 
@@ -126,8 +111,7 @@ http://host5.example.com
 http://host6.example.com
 
 EOT
-my $tmpdir = mk_safe_tmpdir();
-warn "temp dir is $tmpdir\n";
+my $tmpdir = $workdir;
 
 for my $mail  ($twoplus, $threeurls, $threeplus, $foururls, $fiveurls, $sixurls) {
   my @urls = grep(/\bhttp:/m,$mail);
@@ -146,8 +130,9 @@ for my $mail  ($twoplus, $threeurls, $threeplus, $foururls, $fiveurls, $sixurls)
   # this is ugly, but it actually demos the bug. 
   open (my $mfh, ">", "$tmpdir/msg");
   print $mfh "$mail";
-  my $haverules = (  -f "../rules/25_uribl.cf" ) ;
-  my  $sarcnt = qx/..\/spamassassin -D all < $tmpdir\/msg 2>&1 |grep -c 'uridnsbl:.*skip'/;
+  my $haverules = (  -f "../rules/25_uribl.cf" );
+  use vars qw($sarcnt);
+  sarun("-D all < $tmpdir/msg 2>&1", \&sarcount);
   # test isn't very useful without this component, but this will at least skip the subtest when it can't be run
   SKIP: {
     skip  "No rules found!\n", 1 if (! $haverules ); 
@@ -155,6 +140,8 @@ for my $mail  ($twoplus, $threeurls, $threeplus, $foururls, $fiveurls, $sixurls)
       warn "Simple grep for http:// found $count URLs, get_uri_list found $ulcnt URLs, spamassassin script found $sarcnt\n";
     }
   }
+  sub sarcount {
+    $sarcnt = grep(/uridnsbl:.*skip/, <IN>);
+  }
 }
 
-cleanup_safe_tmpdir();

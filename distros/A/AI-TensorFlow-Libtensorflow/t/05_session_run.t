@@ -3,6 +3,7 @@
 use Test::Most tests => 1;
 
 use lib 't/lib';
+use TF_TestQuiet;
 use TF_Utils;
 use PDL::Primitive qw(random);
 use PDL::Core;
@@ -48,7 +49,7 @@ subtest "Session run" => sub {
 	my $status = AI::TensorFlow::Libtensorflow::Status->New;
 	my $options = AI::TensorFlow::Libtensorflow::SessionOptions->New;
 	my $session = AI::TensorFlow::Libtensorflow::Session->New($graph, $options, $status);
-	die "Could not create session" unless $status->GetCode eq 'OK';
+	die "Could not create session" unless $status->GetCode == AI::TensorFlow::Libtensorflow::Status::OK;
 
 	my @output_values;
 	my $target_op_a = undef;
@@ -61,7 +62,7 @@ subtest "Session run" => sub {
 		$status
 	);
 
-	die "run failed" unless $status->GetCode eq 'OK';
+	die "run failed" unless $status->GetCode == AI::TensorFlow::Libtensorflow::Status::OK;
 
 	my $output_tensor = $output_values[0];
 	my $output_pdl = zeros(float,( map $output_tensor->Dim($_), 0..$output_tensor->NumDims-1) );
@@ -77,7 +78,7 @@ subtest "Session run" => sub {
 
 	$session->Close($status);
 
-	is $status->GetCode, 'OK', 'status ok';
+	is $status->GetCode, AI::TensorFlow::Libtensorflow::Status::OK, 'status ok';
 };
 
 done_testing;

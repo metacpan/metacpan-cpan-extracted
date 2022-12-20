@@ -1,5 +1,8 @@
 Revision history for App-RunStopRun
 
+0.05  Fri Dec 16 04:20:09 UTC 2022
+    - Convert the limit to a percentage if given as a decimal fraction.
+
 0.04  Mon May  2 15:15:35 UTC 2022
     - Add an option to disable creating a new process group or determining
       associated PGIDs.

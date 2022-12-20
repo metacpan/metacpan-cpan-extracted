@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Modern
 
-our $VERSION = '0.558';
+our $VERSION = '0.559';
 
 use 5.020;
 use strictures 2;
@@ -365,7 +365,7 @@ JSON::Schema::Modern::Utilities - Internal utilities for JSON::Schema::Modern
 
 =head1 VERSION
 
-version 0.558
+version 0.559
 
 =head1 SYNOPSIS
 

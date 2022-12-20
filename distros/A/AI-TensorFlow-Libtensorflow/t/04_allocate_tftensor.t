@@ -4,7 +4,9 @@ use Test::More tests => 1;
 
 use strict;
 use warnings;
+use lib 't/lib';
 
+use TF_TestQuiet;
 use AI::TensorFlow::Libtensorflow;
 use AI::TensorFlow::Libtensorflow::DataType qw(FLOAT);
 use List::Util qw(product);

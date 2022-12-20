@@ -1,0 +1,49 @@
+---
+abstract: 'dumps perl data as HTML5 open/close tree'
+author:
+  - L<TakeAsh|https://github.com/TakeAsh/>
+build_requires:
+  FindBin::libs: '0'
+  Test::More: '0.98'
+  Test::More::UTF8: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.20, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-HTML-TreeDumper
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Data::HTML::TreeDumper:
+    file: lib/Data/HTML/TreeDumper.pm
+    version: v0.0.3
+requires:
+  Const::Fast: '0'
+  Encode: '0'
+  HTML::Entities: '0'
+  Ref::Util: '0'
+  YAML::Syck: '0'
+  perl: '5.010'
+  version: '0.77'
+resources:
+  bugtracker: https://github.com/TakeAsh/p-Data-HTML-TreeDumper/issues
+  homepage: https://github.com/TakeAsh/p-Data-HTML-TreeDumper
+  repository: https://github.com/TakeAsh/p-Data-HTML-TreeDumper.git
+version: v0.0.3
+x_authority: cpan:TAKEASH
+x_contributors:
+  - 'TakeAsh <take@TakeAsh.net>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

@@ -3,10 +3,11 @@
 #
 #  (C) Paul Evans, 2011-2022 -- leonerd@leonerd.org.uk
 
-use Object::Pad 0.57;
+use Object::Pad 0.73 ':experimental(adjust_params init_expr)';
 
-package Tickit::Widget::Border 0.35;
+package Tickit::Widget::Border 0.36;
 class Tickit::Widget::Border
+   :strict(params)
    :isa(Tickit::SingleChildWidget);
 
 use Tickit::Style;
@@ -60,16 +61,14 @@ without the C<set_> prefix.
 
 =cut
 
-has $_top_border    :reader = 0;
-has $_bottom_border :reader = 0;
-has $_left_border   :reader = 0;
-has $_right_border  :reader = 0;
+field $_top_border    :reader = 0;
+field $_bottom_border :reader = 0;
+field $_left_border   :reader = 0;
+field $_right_border  :reader = 0;
 
-ADJUSTPARAMS
+ADJUST :params ( %params )
 {
-   my ( $params ) = @_;
-
-   defined $params->{$_} and $self->${\"set_$_"}( delete $params->{$_} ) for qw(
+   defined $params{$_} and $self->${\"set_$_"}( delete $params{$_} ) for qw(
       border
       h_border v_border
       top_border bottom_border left_border right_border

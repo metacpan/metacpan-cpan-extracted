@@ -1,5 +1,8 @@
 package AI::TensorFlow::Libtensorflow::SessionOptions;
-$AI::TensorFlow::Libtensorflow::SessionOptions::VERSION = '0.0.2';
+# ABSTRACT: Holds options that can be passed during session creation
+$AI::TensorFlow::Libtensorflow::SessionOptions::VERSION = '0.0.3';
+use strict;
+use warnings;
 use namespace::autoclean;
 use AI::TensorFlow::Libtensorflow::Lib qw(arg);;
 my $ffi = AI::TensorFlow::Libtensorflow::Lib->ffi;
@@ -23,6 +26,11 @@ $ffi->attach( 'SetConfig' => [
 	arg 'TF_Status' => 'status',
 ] => 'void' );
 
+$ffi->attach( 'EnableXLACompilation' => [
+	arg TF_SessionOptions => 'options',
+	arg 'unsigned char'   => 'enable'
+] => 'void' );
+
 1;
 
 __END__
@@ -33,7 +41,7 @@ __END__
 
 =head1 NAME
 
-AI::TensorFlow::Libtensorflow::SessionOptions
+AI::TensorFlow::Libtensorflow::SessionOptions - Holds options that can be passed during session creation
 
 =head1 CONSTRUCTORS
 
@@ -60,6 +68,10 @@ B<C API>: L<< C<TF_SetTarget>|AI::TensorFlow::Libtensorflow::Manual::CAPI/TF_Set
 =head2 SetConfig
 
 B<C API>: L<< C<TF_SetConfig>|AI::TensorFlow::Libtensorflow::Manual::CAPI/TF_SetConfig >>
+
+=head2 EnableXLACompilation
+
+B<C API>: L<< C<TF_EnableXLACompilation>|AI::TensorFlow::Libtensorflow::Manual::CAPI/TF_EnableXLACompilation >>
 
 =head1 DESTRUCTORS
 

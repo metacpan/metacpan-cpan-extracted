@@ -1,13 +1,14 @@
 #  You may distribute under the terms of either the GNU General Public License
 #  or the Artistic License (the same terms as Perl itself)
 #
-#  (C) Paul Evans, 2012-2021 -- leonerd@leonerd.org.uk
+#  (C) Paul Evans, 2012-2022 -- leonerd@leonerd.org.uk
 
 use v5.26;
-use Object::Pad 0.57;
+use Object::Pad 0.66;
 
-package Tickit::Widget::MenuBar 0.15;
+package Tickit::Widget::MenuBar 0.16;
 class Tickit::Widget::MenuBar
+   :strict(params)
    :isa(Tickit::Widget::Menu::base);
 
 use Tickit::Style;
@@ -114,7 +115,7 @@ style_definition base =>
 use constant KEYPRESSES_FROM_STYLE => 1;
 use constant WIDGET_PEN_FROM_STYLE => 1;
 
-has @_itempos;
+field @_itempos;
 
 method lines ()
 {
@@ -198,7 +199,7 @@ method render_to_rb ( $rb, $rect )
          my $item = $items[$idx];
          next if $item == separator;
 
-         my ( $left, $right ) = @{ $_itempos[$idx] };
+         my ( $left, $right ) = $_itempos[$idx]->@*;
          last if $left > $rect->right;
          next if $right < $rect->left;
 

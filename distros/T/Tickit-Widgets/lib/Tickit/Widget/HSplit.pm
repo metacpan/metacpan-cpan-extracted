@@ -5,8 +5,9 @@
 
 use Object::Pad 0.57;
 
-package Tickit::Widget::HSplit 0.35;
+package Tickit::Widget::HSplit 0.36;
 class Tickit::Widget::HSplit
+   :strict(params)
    :isa(Tickit::Widget::LinearSplit);
 
 use Tickit::Style;
@@ -98,17 +99,6 @@ use constant VALUE_METHOD => "lines";
 Constructs a new C<Tickit::Widget::HSplit> object.
 
 =cut
-
-ADJUSTPARAMS
-{
-   my ( $params ) = @_;
-
-   croak "The 'top_child' constructor argument to ${\ref $self} is no longer recognised; use ->set_top_child instead"
-      if delete $params->{top_child};
-
-   croak "The 'bottom_child' constructor argument to ${\ref $self} is no longer recognised; use ->set_bottom_child instead"
-      if delete $params->{bottom_child};
-}
 
 method lines
 {

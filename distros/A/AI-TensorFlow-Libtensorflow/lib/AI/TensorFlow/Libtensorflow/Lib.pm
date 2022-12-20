@@ -1,6 +1,6 @@
 package AI::TensorFlow::Libtensorflow::Lib;
 # ABSTRACT: Private class for AI::TensorFlow::Libtensorflow
-$AI::TensorFlow::Libtensorflow::Lib::VERSION = '0.0.2';
+$AI::TensorFlow::Libtensorflow::Lib::VERSION = '0.0.3';
 use strict;
 use warnings;
 
@@ -8,6 +8,9 @@ use feature qw(state);
 use FFI::CheckLib 0.28 qw( find_lib_or_die );
 use Alien::Libtensorflow;
 use FFI::Platypus;
+use AI::TensorFlow::Libtensorflow::Lib::FFIType::Variant::PackableArrayRef;
+use AI::TensorFlow::Libtensorflow::Lib::FFIType::Variant::PackableMaybeArrayRef;
+use AI::TensorFlow::Libtensorflow::Lib::FFIType::TFPtrSizeScalar;
 
 use base 'Exporter::Tiny';
 our @EXPORT_OK = qw(arg);
@@ -30,12 +33,20 @@ sub ffi {
 		$ffi->load_custom_type('::PointerSizeBuffer' => 'tf_tensor_shape_proto_buffer');
 		$ffi->load_custom_type('::PointerSizeBuffer' => 'tf_attr_value_proto_buffer');
 
+		$ffi->load_custom_type('AI::TensorFlow::Libtensorflow::Lib::FFIType::TFPtrSizeScalar'
+			=> 'tf_text_buffer');
 
-		$ffi->type('opaque' => 'TF_SessionOptions');
+		$ffi->load_custom_type( PackableMaybeArrayRef( 'DimsBuffer', pack_type => 'q' )
+			=> 'tf_dims_buffer'
+		);
+
+
+		$ffi->type('object(AI::TensorFlow::Libtensorflow::SessionOptions)' => 'TF_SessionOptions');
 
 		$ffi->type('object(AI::TensorFlow::Libtensorflow::Graph)' => 'TF_Graph');
 
-		$ffi->type('opaque' => 'TF_OperationDescription');
+		$ffi->type('object(AI::TensorFlow::Libtensorflow::OperationDescription)'
+			=> 'TF_OperationDescription');
 
 		$ffi->load_custom_type('::PtrObject', 'TF_Operation' => 'AI::TensorFlow::Libtensorflow::Operation');
 
@@ -45,17 +56,17 @@ sub ffi {
 
 		$ffi->type('object(AI::TensorFlow::Libtensorflow::ImportGraphDefOptions)' => 'TF_ImportGraphDefOptions');
 
-		$ffi->type('opaque' => 'TF_ImportGraphDefResults');
+		$ffi->type('object(AI::TensorFlow::Libtensorflow::ImportGraphDefResults)' => 'TF_ImportGraphDefResults');
 
 		$ffi->type('object(AI::TensorFlow::Libtensorflow::Session)' => 'TF_Session');
 
 		$ffi->type('opaque' => 'TF_DeprecatedSession');
 
-		$ffi->type('opaque' => 'TF_DeviceList');
+		$ffi->type('object(AI::TensorFlow::Libtensorflow::DeviceList)' => 'TF_DeviceList');
 
 		$ffi->type('opaque' => 'TF_Library');
 
-		$ffi->type('opaque' => 'TF_ApiDefMap');
+		$ffi->type('object(AI::TensorFlow::Libtensorflow::ApiDefMap)' => 'TF_ApiDefMap');
 
 		$ffi->type('opaque' => 'TF_Server');
 
@@ -99,6 +110,9 @@ sub ffi {
 		$ffi->load_custom_type('::PtrObject', 'TF_Tensor' => 'AI::TensorFlow::Libtensorflow::Tensor');
 
 
+		$ffi->load_custom_type('::PtrObject', 'TF_TString' => 'AI::TensorFlow::Libtensorflow::TString');
+
+
 
 		## Callbacks for deallocation
 		# For TF_Buffer
@@ -138,6 +152,14 @@ sub arg(@) {
 	return $arg, @_;
 }
 
+# from FFI::Platypus::Type::StringArray
+use constant _pointer_incantation =>
+  $^O eq 'MSWin32' && do { require Config; $Config::Config{archname} =~ /MSWin32-x64/ }
+  ? 'Q'
+  : 'L!';
+use constant _size_of_pointer => FFI::Platypus->new( api => 2 )->sizeof('opaque');
+use constant _pointer_buffer => "P" . _size_of_pointer;
+
 package # hide from PAUSE
   AI::TensorFlow::Libtensorflow::Lib::_Arg {
 
@@ -174,6 +196,8 @@ AI::TensorFlow::Libtensorflow::Lib - Private class for AI::TensorFlow::Libtensor
 
 =head3 TF_SessionOptions
 
+L<AI::TensorFlow::Libtensorflow::SessionOptions>
+
 =for TF_CAPI_DEF typedef struct TF_SessionOptions TF_SessionOptions;
 
 =head3 TF_Graph
@@ -184,9 +208,13 @@ L<AI::TensorFlow::Libtensorflow::Graph>
 
 =head3 TF_OperationDescription
 
+L<AI::TensorFlow::Libtensorflow::OperationDescription>
+
 =for TF_CAPI_DEF typedef struct TF_OperationDescription TF_OperationDescription;
 
 =head3 TF_Operation
+
+L<AI::TensorFlow::Libtensorflow::Operation>
 
 =for TF_CAPI_DEF typedef struct TF_Operation TF_Operation;
 
@@ -200,13 +228,19 @@ L<AI::TensorFlow::Libtensorflow::Graph>
 
 =head3 TF_ImportGraphDefOptions
 
+L<AI::TensorFlow::Libtensorflow::ImportGraphDefOptions>
+
 =for TF_CAPI_DEF typedef struct TF_ImportGraphDefOptions TF_ImportGraphDefOptions;
 
 =head3 TF_ImportGraphDefResults
 
+L<AI::TensorFlow::Libtensorflow::ImportGraphDefResults>
+
 =for TF_CAPI_DEF typedef struct TF_ImportGraphDefResults TF_ImportGraphDefResults;
 
 =head3 TF_Session
+
+L<AI::TensorFlow::Libtensorflow::Session>
 
 =for TF_CAPI_DEF typedef struct TF_Session TF_Session;
 
@@ -216,6 +250,8 @@ L<AI::TensorFlow::Libtensorflow::Graph>
 
 =head3 TF_DeviceList
 
+L<AI::TensorFlow::Libtensorflow::DeviceList>
+
 =for TF_CAPI_DEF typedef struct TF_DeviceList TF_DeviceList;
 
 =head3 TF_Library
@@ -223,6 +259,8 @@ L<AI::TensorFlow::Libtensorflow::Graph>
 =for TF_CAPI_DEF typedef struct TF_Library TF_Library;
 
 =head3 TF_ApiDefMap
+
+L<AI::TensorFlow::Libtensorflow::ApiDefMap>
 
 =for TF_CAPI_DEF typedef struct TF_ApiDefMap TF_ApiDefMap;
 
@@ -307,6 +345,12 @@ L<AI::TensorFlow::Libtensorflow::Status>
 L<AI::TensorFlow::Libtensorflow::Tensor>
 
 =for TF_CAPI_DEF typedef struct TF_Tensor TF_Tensor;
+
+=head2 C<tensorflow/tsl/platform/ctstring_internal.h>
+
+=head3 TF_TString
+
+L<AI::TensorFlow::Libtensorflow::TString>
 
 =head1 AUTHOR
 

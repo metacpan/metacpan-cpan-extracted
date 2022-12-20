@@ -1,5 +1,5 @@
 package Game::TileMap;
-$Game::TileMap::VERSION = '0.002';
+$Game::TileMap::VERSION = '1.000';
 use v5.10;
 use strict;
 use warnings;
@@ -11,7 +11,6 @@ use Carp qw(croak);
 
 use Game::TileMap::Legend;
 use Game::TileMap::Tile;
-use Game::TileMap::_Utils;
 
 has param 'legend' => (
 
@@ -74,8 +73,8 @@ sub from_string
 
 	my @map_lines =
 		reverse
-		grep { /\S/ }
-		map { Game::TileMap::_Utils::trim $_ }
+		grep { length }
+		map { s/\s//g; $_ }
 		split "\n", $map_str
 		;
 
@@ -108,7 +107,12 @@ sub from_array
 
 		for my $col (0 .. $#{$map[$line]}) {
 			my $prev_obj = $map[$line][$col];
-			my $obj = Game::TileMap::Tile->new(contents => $prev_obj, x => $col, y => $line);
+			my $obj = Game::TileMap::Tile->new(
+				legend => $self->legend,
+				contents => $prev_obj,
+				x => $col,
+				y => $line,
+			);
 
 			$new_map[$col][$line] = $obj;
 			push @{$guide{$self->legend->get_class_of_object($prev_obj)}}, $obj;
@@ -131,7 +135,7 @@ sub to_string
 sub to_string_and_mark
 {
 	my ($self, $mark_positions, $with) = @_;
-	$with //= '@' x $self->legend->characters_per_tile;
+	$with //= '!' x $self->legend->characters_per_tile;
 
 	my @lines;
 	my %markers_rev = map {
@@ -177,8 +181,8 @@ Game::TileMap - Representation of tile-based two-dimensional rectangular maps
 	my $legend = Game::TileMap->new_legend;
 
 	$legend
-		->add_wall('#') # required
-		->add_void('.') # required
+		->add_wall('#')
+		->add_void('.')
 		->add_terrain('_' => 'pavement')
 		->add_object('monster_spawns', 'a' => 'spawn_a')
 		->add_object('monster_spawns', 'b' => 'spawn_b')
@@ -228,9 +232,11 @@ array of array of L<Game::TileMap::Tile>. Some helpful features are in place:
 
 =item * map markers (usually just single characters) are translated into objects specified in the legend
 
-Map characters can't be whitespace (map lines are trimmed before processing).
+Map characters can't be whitespace (whitespace is removed before processing -
+can be used for improved visibility).
 
-Legend objects can't be falsy, but other than that they can be anything (string, object, reference).
+Legend objects can't be falsy, but other than that they can be anything
+(string, object, reference).
 
 =item * each legend object is assigned to a class, which you can query for later
 
@@ -277,11 +283,11 @@ This way you can get more familiar notation:
 	;
 
 	my $map_str = <<MAP;
-	_,_______~
-	_,__####_~
-	____####_~
-	_,__####_~
-	_,_______~
+	_, __ __ __ _~
+	_, __ ## ## _~
+	__ __ ## ## _~
+	_, __ ## ## _~
+	_, __ __ __ _~
 	MAP
 
 =back
@@ -356,7 +362,7 @@ Creates a string from a map.
 	print $str = $map->to_string_and_mark([[5, 5]], 'X');
 
 Creates a string from a map and marks given positions with a marker. The
-default marker is C<'@'> (times the number of characters per tile).
+default marker is C<'!'> (times the number of characters per tile).
 
 Useful during debugging.
 
@@ -391,6 +397,13 @@ assigned to a given class (found out by string equality check).
 
 Returns all map objects (in form of L<Game::TileMap::Tile> instances) that are
 of a given object type (found out by string equality check).
+
+=head3 get_class_of_object
+
+	my $class_name = $map->get_class_of_object($object);
+
+Does the reverse of L</get_all_of_class> for one C<$object>, which can be
+either an instance of L<Game::TileMap::Tile> or just a string.
 
 =head1 SEE ALSO
 

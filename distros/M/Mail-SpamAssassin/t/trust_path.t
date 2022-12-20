@@ -1,28 +1,12 @@
 #!/usr/bin/perl -T
 
-BEGIN {
-  if (-e 't/test_dir') { # if we are running "t/rule_tests.t", kluge around ...
-    chdir 't';
-  }
-
-  if (-e 'test_dir') {            # running from test directory, not ..
-    unshift(@INC, '../blib/lib');
-    unshift(@INC, '../lib');
-  }
-}
-
 our $have_patricia = 0;
 eval {
   require Net::Patricia;
   Net::Patricia->VERSION(1.16);  # need AF_INET6 support
-  import Net::Patricia;
+  Net::Patricia->import;
   $have_patricia = 1;
 };
-
-my $prefix = '.';
-if (-e 'test_dir') {            # running from test directory, not ..
-  $prefix = '..';
-}
 
 use lib '.'; use lib 't';
 use SATest; sa_t_init("trust_path");
@@ -40,6 +24,13 @@ open(OLDERR, ">&STDERR") || die "Cannot copy STDERR file handle";
 
 # quiet "used only once" warnings
 1 if *OLDERR;
+
+tstlocalrules ("
+  clear_originating_ip_headers
+  originating_ip_headers X-Yahoo-Post-IP X-Originating-IP X-Apparently-From
+  originating_ip_headers X-SenderIP X-AOL-IP
+  originating_ip_headers X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp
+");
 
 my @data = (
 
@@ -672,7 +663,7 @@ while (1) {
   }
 
   my $sa = create_saobj({
-              userprefs_filename => "log/tst.cf",
+              userprefs_filename => $userrules,
               # debug => 1
             });
 

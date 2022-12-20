@@ -37,7 +37,43 @@ And the chi-square probability combiner as described here:
 
 The results are incorporated into SpamAssassin as the BAYES_* rules.
 
-=head1 METHODS
+=head1 ADMINISTRATOR SETTINGS
+
+=over 4
+
+=item bayes_stopword_languages lang             (default: en)
+
+Languages enabled in bayes stopwords processing, every language have a
+default stopwords regexp, tokens matching this regular expression will not
+be considered in bayes processing.
+
+Custom regular expressions for additional languages can be defined in C<local.cf>.
+
+Custom regular expressions can be specified by using the C<bayes_stopword_lang>
+keyword like in the following example:
+
+ bayes_stopword_languages en se
+ bayes_stopword_en (?:you|me)
+ bayes_stopword_se (?:du|mig)
+
+Regexps are case-insensitive will be anchored automatically at beginning and
+end.
+
+To disable stopwords usage, specify C<bayes_stopword_languages disable>.
+
+Only one bayes_stopword_languages or bayes_stopword_xx configuration line
+can be used.  New configuration line will override the old one, for example
+the ones from SpamAssassin default ruleset (60_bayes_stopwords.cf).
+
+=back
+
+=over 4
+
+=item bayes_max_token_length (default: 15)
+
+Configure the maximum number of character a token could contain
+
+=back
 
 =cut
 
@@ -48,16 +84,12 @@ use warnings;
 # use bytes;
 use re 'taint';
 
-BEGIN {
-  eval { require Digest::SHA; import Digest::SHA qw(sha1 sha1_hex); 1 }
-  or do { require Digest::SHA1; import Digest::SHA1 qw(sha1 sha1_hex) }
-}
+use Digest::SHA qw(sha1 sha1_hex);
 
-use Mail::SpamAssassin;
 use Mail::SpamAssassin::Plugin;
 use Mail::SpamAssassin::PerMsgStatus;
 use Mail::SpamAssassin::Logger;
-use Mail::SpamAssassin::Util qw(untaint_var);
+use Mail::SpamAssassin::Util qw(compile_regexp untaint_var);
 
 # pick ONLY ONE of these combining implementations.
 use Mail::SpamAssassin::Bayes::CombineChi;
@@ -135,13 +167,16 @@ our $IGNORED_HDRS = qr{(?: (?:X-)?Sender    # misc noise
   | X-Gnus-Mail-Source
   | Xref
 
-)}x;
+)}ix;
 
 # Note only the presence of these headers, in order to reduce the
 # hapaxen they generate.
 our $MARK_PRESENCE_ONLY_HDRS = qr{(?: X-Face
   |X-(?:Gnu-?PG|PGP|GPG)(?:-Key)?-Fingerprint
   |D(?:KIM|omainKey)-Signature
+  |X-Google-DKIM-Signature
+  |ARC-(?:Message-Signature|Seal)
+  |Autocrypt
 )}ix;
 
 # tweaks tested as of Nov 18 2002 by jm posted to -devel at
@@ -220,6 +255,8 @@ use constant REQUIRE_SIGNIFICANT_TOKENS_TO_SCORE => -1;
 
 # How long a token should we hold onto?  (note: German speakers typically
 # will require a longer token than English ones.)
+# This is just a default value, option can be changed using
+# bayes_max_token_length option
 use constant MAX_TOKEN_LENGTH => 15;
 
 ###########################################################################
@@ -236,8 +273,98 @@ sub new {
   $self->{conf} = $main->{conf};
   $self->{use_ignores} = 1;
 
-  $self->register_eval_rule("check_bayes");
+  # Old default stopword list, need to have hardcoded one incase sa-update is not available
+  $self->{bayes_stopword}{en} = qr/(?:a(?:ble|l(?:ready|l)|n[dy]|re)|b(?:ecause|oth)|c(?:an|ome)|e(?:ach|mail|ven)|f(?:ew|irst|or|rom)|give|h(?:a(?:ve|s)|ttp)|i(?:n(?:formation|to)|t\'s)|just|know|l(?:ike|o(?:ng|ok))|m(?:a(?:de|il(?:(?:ing|to))?|ke|ny)|o(?:re|st)|uch)|n(?:eed|o[tw]|umber)|o(?:ff|n(?:ly|e)|ut|wn)|p(?:eople|lace)|right|s(?:ame|ee|uch)|t(?:h(?:at|is|rough|e)|ime)|using|w(?:eb|h(?:ere|y)|ith(?:out)?|or(?:ld|k))|y(?:ears?|ou(?:(?:\'re|r))?))/;
+
+  $self->set_config($self->{conf});
+  $self->register_eval_rule("check_bayes", $Mail::SpamAssassin::Conf::TYPE_BODY_EVALS);
   $self;
+}
+
+sub set_config {
+  my ($self, $conf) = @_;
+  my @cmds;
+
+  push(@cmds, {
+    setting => 'bayes_max_token_length',
+    default => MAX_TOKEN_LENGTH,
+    is_admin => 1,
+    type => $Mail::SpamAssassin::Conf::CONF_TYPE_NUMERIC,
+  });
+
+  push(@cmds, {
+    setting => 'bayes_stopword_languages',
+    default => ['en'],
+    is_admin => 1,
+    type => $Mail::SpamAssassin::Conf::CONF_TYPE_STRINGLIST,
+    code => sub {
+      my ($self, $key, $value, $line) = @_;
+      my @langs;
+      if ($value eq 'disable') {
+        @{$self->{bayes_stopword_languages}} = ();
+      }
+      else {
+        foreach my $lang (split(/(?:\s*,\s*|\s+)/, lc($value))) {
+          if ($lang !~ /^([a-z]{2})$/) {
+            return $Mail::SpamAssassin::Conf::INVALID_VALUE;
+          }
+          push @langs, $lang;
+        }
+        if (!@langs) {
+          return $Mail::SpamAssassin::Conf::MISSING_REQUIRED_VALUE;
+        }
+        @{$self->{bayes_stopword_languages}} = @langs;
+      }
+    }
+  });
+
+  $conf->{parser}->register_commands(\@cmds);
+}
+
+sub parse_config {
+  my ($self, $opts) = @_;
+
+  # Ignore users's configuration lines
+  return 0 if $opts->{user_config};
+
+  if ($opts->{key} =~ /^bayes_stopword_([a-z]{2})$/i) {
+      $self->inhibit_further_callbacks();
+      my $lang = lc($1);
+      foreach my $re (split(/\s+/, $opts->{value})) {
+        my ($rec, $err) = compile_regexp('^(?i)'.$re.'$', 0);
+        if (!$rec) {
+          warn "bayes: invalid regexp for $opts->{key}: $err\n";
+          return 0;
+        }
+        $self->{bayes_stopword}{$lang} = $rec;
+      }
+      return 1;
+  }
+
+  return 0;
+}
+
+sub finish_parsing_end {
+  my ($self, $opts) = @_;
+  my $conf = $opts->{conf};
+
+  my @langs;
+  foreach my $lang (@{$conf->{bayes_stopword_languages}}) {
+    if (defined $self->{bayes_stopword}{$lang}) {
+      push @langs, $lang;
+    } else {
+      warn "bayes: missing stopwords regexp for language '$lang'\n";
+    }
+  }
+  if (@langs) {
+    dbg("bayes: stopwords for languages enabled: ".join(' ', @langs));
+    @{$conf->{bayes_stopword_languages}} = @langs;
+  } else {
+    dbg("bayes: no stopword languages enabled");
+    $conf->{bayes_stopword_languages} = [];
+  }
+
+  return 0;
 }
 
 sub finish {
@@ -410,10 +537,11 @@ sub _learn_trapped {
   my @msgid = ( $msgid );
 
   if (!defined $msgid) {
-    @msgid = $self->get_msgid($msg);
+    @msgid = ( $msg->generate_msgid(), $msg->get_msgid() );
   }
 
   foreach my $msgid_t ( @msgid ) {
+    next if !defined $msgid_t;
     my $seen = $self->{store}->seen_get ($msgid_t);
 
     if (defined ($seen)) {
@@ -545,7 +673,7 @@ sub _forget_trapped {
   my $isspam;
 
   if (!defined $msgid) {
-    @msgid = $self->get_msgid($msg);
+    @msgid = ( $msg->generate_msgid(), $msg->get_msgid() );
   }
 
   while( $msgid = shift @msgid ) {
@@ -671,7 +799,6 @@ sub learner_is_scan_available {
 
 sub scan {
   my ($self, $permsgstatus, $msg) = @_;
-  my $score;
 
   return unless $self->{conf}->{use_learner};
 
@@ -756,6 +883,7 @@ sub scan {
   if (@pw_keys > N_SIGNIFICANT_TOKENS) { $#pw_keys = N_SIGNIFICANT_TOKENS - 1 }
 
   my @sorted;
+  my $score;
   foreach my $tok (@pw_keys) {
     next if $tok_strength{$tok} <
                 $Mail::SpamAssassin::Bayes::Combine::MIN_PROB_STRENGTH;
@@ -964,49 +1092,6 @@ sub learner_dump_database {
 ###########################################################################
 # TODO: these are NOT public, but the test suite needs to call them.
 
-sub get_msgid {
-  my ($self, $msg) = @_;
-
-  my @msgid;
-
-  my $msgid = $msg->get_header("Message-Id");
-  if (defined $msgid && $msgid ne '' && $msgid !~ /^\s*<\s*(?:\@sa_generated)?>.*$/) {
-    # remove \r and < and > prefix/suffixes
-    chomp $msgid;
-    $msgid =~ s/^<//; $msgid =~ s/>.*$//g;
-    push(@msgid, $msgid);
-  }
-
-  # Modified 2012-01-17  per bug 5185 to remove last received from msg_id calculation
-
-  # Use sha1_hex(Date: and top N bytes of body)
-  # where N is MIN(1024 bytes, 1/2 of body length)
-  #
-  my $date = $msg->get_header("Date");
-  $date = "None" if (!defined $date || $date eq ''); # No Date?
-
-  #Removed per bug 5185
-  #my @rcvd = $msg->get_header("Received");
-  #my $rcvd = $rcvd[$#rcvd];
-  #$rcvd = "None" if (!defined $rcvd || $rcvd eq ''); # No Received?
-
-  # Make a copy since pristine_body is a reference ...
-  my $body = join('', $msg->get_pristine_body());
-
-  if (length($body) > 64) { # Small Body?
-    my $keep = ( length $body > 2048 ? 1024 : int(length($body) / 2) );
-    substr($body, $keep) = '';
-  }
-
-  #Stripping all CR and LF so that testing midstream from MTA and post delivery don't 
-  #generate different id's simply because of LF<->CR<->CRLF changes.
-  $body =~ s/[\r\n]//g;
-
-  unshift(@msgid, sha1_hex($date."\000".$body).'@sa_generated');
-
-  return wantarray ? @msgid : $msgid[0];
-}
-
 sub get_body_from_msg {
   my ($self, $msg) = @_;
 
@@ -1024,7 +1109,7 @@ sub get_body_from_msg {
 
   if (!defined $msgdata) {
     # why?!
-    warn "bayes: failed to get body for ".scalar($self->get_msgid($self->{msg}))."\n";
+    warn "bayes: failed to get body for ".scalar($self->{msg}->generate_msgid())."\n";
     return { };
   }
 
@@ -1052,8 +1137,10 @@ sub _get_msgdata_from_permsgstatus {
 # The calling functions expect a uniq'ed array of tokens ...
 sub tokenize {
   my ($self, $msg, $msgdata) = @_;
+  my $conf = $self->{conf};
+  my $t_src = $conf->{bayes_token_sources};
 
-  my $t_src = $self->{conf}->{bayes_token_sources};
+  $self->{stopword_cache} = ();
 
   # visible tokens from the body
   my @tokens_body;
@@ -1117,6 +1204,8 @@ sub tokenize {
     dbg("bayes: tokenized header: %d tokens", scalar @tokens_header);
   }
 
+  delete $self->{stopword_cache};
+
   # Go ahead and uniq the array, skip null tokens (can happen sometimes)
   # generate an SHA1 hash and take the lower 40 bits as our token
   my %tokens;
@@ -1137,6 +1226,7 @@ sub _tokenize_line {
   my $region = $_[3];
   local ($_) = $_[1];
 
+  my $conf = $self->{conf};
   my @rettokens;
 
   # include quotes, .'s and -'s for URIs, and [$,]'s for Nigerian-scam strings,
@@ -1174,7 +1264,7 @@ sub _tokenize_line {
   # cleared, even if the source string has perl characters semantics !!!
   # Is this really still desirable?
 
-  foreach my $token (split) {
+TOKEN: foreach my $token (split) {
     $token =~ s/^[-'"\.,]+//;        # trim non-alphanum chars at start or end
     $token =~ s/[-'"\.,]+$//;        # so we don't get loads of '"foo' tokens
 
@@ -1183,7 +1273,7 @@ sub _tokenize_line {
     # tokens, so the SQL BayesStore returns undef.  I really want a way
     # of optimizing that out, but I haven't come up with anything yet.
     #
-    next if ( defined $magic_re && $token =~ /$magic_re/ );
+    next if ( defined $magic_re && $token =~ /$magic_re/o );
 
     # *do* keep 3-byte tokens; there's some solid signs in there
     my $len = length($token);
@@ -1192,8 +1282,24 @@ sub _tokenize_line {
     # area, and it just slows us down to record them.
     # See http://wiki.apache.org/spamassassin/BayesStopList for more info.
     #
-    next if $len < 3 ||
-	($token =~ /^(?:a(?:ble|l(?:ready|l)|n[dy]|re)|b(?:ecause|oth)|c(?:an|ome)|e(?:ach|mail|ven)|f(?:ew|irst|or|rom)|give|h(?:a(?:ve|s)|ttp)|i(?:n(?:formation|to)|t\'s)|just|know|l(?:ike|o(?:ng|ok))|m(?:a(?:de|il(?:(?:ing|to))?|ke|ny)|o(?:re|st)|uch)|n(?:eed|o[tw]|umber)|o(?:ff|n(?:ly|e)|ut|wn)|p(?:eople|lace)|right|s(?:ame|ee|uch)|t(?:h(?:at|is|rough|e)|ime)|using|w(?:eb|h(?:ere|y)|ith(?:out)?|or(?:ld|k))|y(?:ears?|ou(?:(?:\'re|r))?))$/i);
+    next if $len < 3;
+
+    # check stopwords regexp if not cached
+    if (@{$conf->{bayes_stopword_languages}}) {
+      if (!exists $self->{stopword_cache}{$token}) {
+        foreach my $lang (@{$conf->{bayes_stopword_languages}}) {
+          if ($token =~ $self->{bayes_stopword}{$lang}) {
+            dbg("bayes: skipped token '$token' because it's in stopword list for language '$lang'");
+            $self->{stopword_cache}{$token} = 1;
+            next TOKEN;
+          }
+        }
+        $self->{stopword_cache}{$token} = 0;
+      } else {
+        # bail out if cached known
+        next if $self->{stopword_cache}{$token};
+      }
+    }
 
     # are we in the body?  If so, apply some body-specific breakouts
     if ($region == 1 || $region == 2) {
@@ -1212,7 +1318,7 @@ sub _tokenize_line {
     # used as part of split tokens such as "HTo:D*net" indicating that 
     # the domain ".net" appeared in the To header.
     #
-    if ($len > MAX_TOKEN_LENGTH && $token !~ /\*/) {
+    if ($len > $conf->{bayes_max_token_length} && index($token, '*') == -1) {
 
       if (TOKENIZE_LONG_8BIT_SEQS_AS_UTF8_CHARS && $token =~ /[\x80-\xBF]{2}/) {
 	# Bug 7135
@@ -1287,9 +1393,6 @@ sub _tokenize_headers {
 
   my %parsed;
 
-  my %user_ignore;
-  $user_ignore{lc $_} = 1 for @{$self->{main}->{conf}->{bayes_ignore_headers}};
-
   # get headers in array context
   my @hdrs;
   my @rcvdlines;
@@ -1317,7 +1420,7 @@ sub _tokenize_headers {
 
     # remove user-specified headers here, after Received, in case they
     # want to ignore that too
-    next if exists $user_ignore{lc $hdr};
+    next if exists $self->{conf}->{bayes_ignore_header}->{lc $hdr};
 
     # Prep the header value
     $val ||= '';
@@ -1344,20 +1447,36 @@ sub _tokenize_headers {
     elsif ($hdr =~ /^${MARK_PRESENCE_ONLY_HDRS}$/i) {
       $val = "1"; # just mark the presence, they create lots of hapaxen
     }
+    elsif ($hdr =~ /^x-spam-relays-(?:external|internal|trusted|untrusted)$/) {
+      # remove redundant rdns helo ident envfrom intl auth msa words
+      $val =~ s/ [a-z]+=/ /g;
+    }
 
     if (MAP_HEADERS_MID) {
       if ($hdr =~ /^(?:In-Reply-To|References|Message-ID)$/i) {
-        $parsed{"*MI"} = $val;
+        if (exists $parsed{"*MI"}) {
+          $parsed{"*MI"} .= " ".$val;
+        } else {
+          $parsed{"*MI"} = $val;
+        }
       }
     }
     if (MAP_HEADERS_FROMTOCC) {
       if ($hdr =~ /^(?:From|To|Cc)$/i) {
-        $parsed{"*Ad"} = $val;
+        if (exists $parsed{"*Ad"}) {
+          $parsed{"*Ad"} .= " ".$val;
+        } else {
+          $parsed{"*Ad"} = $val;
+        }
       }
     }
     if (MAP_HEADERS_USERAGENT) {
       if ($hdr =~ /^(?:X-Mailer|User-Agent)$/i) {
-        $parsed{"*UA"} = $val;
+        if (exists $parsed{"*UA"}) {
+          $parsed{"*UA"} .= " ".$val;
+        } else {
+          $parsed{"*UA"} = $val;
+        }
       }
     }
 
@@ -1371,11 +1490,13 @@ sub _tokenize_headers {
     } else {
       $parsed{$hdr} = $val;
     }
-    if (would_log('dbg', 'bayes') > 1) {
+  }
+
+  if (would_log('dbg', 'bayes') > 1) {
+    foreach my $hdr (sort keys %parsed) {
       dbg("bayes: header tokens for $hdr = \"$parsed{$hdr}\"");
     }
   }
-
   return %parsed;
 }
 
@@ -1393,7 +1514,7 @@ sub _pre_chew_content_type {
   }
 
   # stop-list words for Content-Type header: these wind up totally gray
-  $val =~ s/\b(?:text|charset)\b//;
+  $val =~ s/\b(?:text|charset)\b/ /g;
 
   $val;
 }
@@ -1468,10 +1589,17 @@ sub _pre_chew_addr_header {
   my ($self, $val) = @_;
   local ($_);
 
-  my @addrs = $self->{main}->find_all_addrs_in_line ($val);
+  my @addrs = Mail::SpamAssassin::Util::parse_header_addresses($val);
   my @toks;
-  foreach (@addrs) {
-    push (@toks, $self->_tokenize_mail_addrs ($_));
+  foreach my $addr (@addrs) {
+    if (defined $addr->{phrase}) {
+      foreach (split(/\s+/, $addr->{phrase})) {
+        push @toks, "N*".$_; # Bug 6319
+      }
+    }
+    if (defined $addr->{address}) {
+      push @toks, $self->_tokenize_mail_addrs($addr->{address});
+    }
   }
   return join (' ', @toks);
 }

@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.557-9-g7a2a81fa
+package JSON::Schema::Modern; # git description: v0.558-2-g0a6a83cb
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema
 # KEYWORDS: JSON Schema validator data validation structure specification
 
-our $VERSION = '0.558';
+our $VERSION = '0.559';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -993,7 +993,7 @@ JSON::Schema::Modern - Validate data against a schema
 
 =head1 VERSION
 
-version 0.558
+version 0.559
 
 =head1 SYNOPSIS
 

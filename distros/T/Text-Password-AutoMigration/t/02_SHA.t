@@ -31,12 +31,14 @@ SKIP: {
     is $@, '', "succeed to encrypt the strings with space";                                        # 9
 
     eval { $hash = $pwd->encrypt("f e\tw") };
-    like $@, qr/^Text::Password::SHA doesn't allow any Wide Characters or white spaces/,
+    like $@, qr/^Text::Password::SHA doesn't allow any Wide Characters or control codes/,
+
         "fail to encrypt with forbidden charactors";                                               #10
 
     subtest "generate with SHA-512" => sub {                                                       #11
         plan tests => 3;
-        ( $raw, $hash ) = $pwd->generate;
+        my ( $raw, $hash ) = $pwd->generate;
+
         like $hash, qr|^\$6\$[!-~]{1,$m}\$[\w/\.]{86}$|, "succeed to generate hash with SHA512";   # 11.1
         is $pwd->verify( $raw,        $hash ), 1,  "succeed to verify";                            # 11.2
         is $pwd->verify( $pwd->nonce, $hash ), '', "fail to verify with random strings";           # 11.3
